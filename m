@@ -1,26 +1,26 @@
-Received: from eggs.gnu.org ([209.51.188.92]:34519)
+Received: from eggs.gnu.org ([209.51.188.92]:34505)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1hGNf9-0004dL-52
+	(envelope-from <peter.maydell@linaro.org>) id 1hGNf8-0004cs-Mb
 	for qemu-devel@nongnu.org; Tue, 16 Apr 2019 08:58:12 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1hGNf7-0001CQ-9B
-	for qemu-devel@nongnu.org; Tue, 16 Apr 2019 08:58:11 -0400
-Received: from mail-wr1-x443.google.com ([2a00:1450:4864:20::443]:41749)
+	(envelope-from <peter.maydell@linaro.org>) id 1hGNf6-0001Bk-Oy
+	for qemu-devel@nongnu.org; Tue, 16 Apr 2019 08:58:10 -0400
+Received: from mail-wr1-x442.google.com ([2a00:1450:4864:20::442]:44711)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1hGNf6-00013V-R3
-	for qemu-devel@nongnu.org; Tue, 16 Apr 2019 08:58:09 -0400
-Received: by mail-wr1-x443.google.com with SMTP id r4so26905548wrq.8
-	for <qemu-devel@nongnu.org>; Tue, 16 Apr 2019 05:57:57 -0700 (PDT)
+	id 1hGNf6-00017t-Ea
+	for qemu-devel@nongnu.org; Tue, 16 Apr 2019 08:58:08 -0400
+Received: by mail-wr1-x442.google.com with SMTP id y7so26892221wrn.11
+	for <qemu-devel@nongnu.org>; Tue, 16 Apr 2019 05:58:03 -0700 (PDT)
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 16 Apr 2019 13:57:23 +0100
-Message-Id: <20190416125744.27770-6-peter.maydell@linaro.org>
+Date: Tue, 16 Apr 2019 13:57:26 +0100
+Message-Id: <20190416125744.27770-9-peter.maydell@linaro.org>
 In-Reply-To: <20190416125744.27770-1-peter.maydell@linaro.org>
 References: <20190416125744.27770-1-peter.maydell@linaro.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH 05/26] target/arm: Honour M-profile FP enable
- bits
+Subject: [Qemu-devel] [PATCH 08/26] target/arm: Handle SFPA and FPCA bits in
+ reads and writes of CONTROL
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,135 +31,124 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-arm@nongnu.org, qemu-devel@nongnu.org
 
-Like AArch64, M-profile floating point has no FPEXC enable
-bit to gate floating point; so always set the VFPEN TB flag.
-
-M-profile also has CPACR and NSACR similar to A-profile;
-they behave slightly differently:
- * the CPACR is banked between Secure and Non-Secure
- * if the NSACR forces a trap then this is taken to
-   the Secure state, not the Non-Secure state
-
-Honour the CPACR and NSACR settings. The NSACR handling
-requires us to borrow the exception.target_el field
-(usually meaningless for M profile) to distinguish the
-NOCP UsageFault taken to Secure state from the more
-usual fault taken to the current security state.
+The M-profile CONTROL register has two bits -- SFPA and FPCA --
+which relate to floating-point support, and should be RES0 otherwise.
+Handle them correctly in the MSR/MRS register access code.
+Neither is banked between security states, so they are stored
+in v7m.control[M_REG_S] regardless of current security state.
 
 Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 ---
- target/arm/helper.c    | 55 +++++++++++++++++++++++++++++++++++++++---
- target/arm/translate.c | 10 ++++++--
- 2 files changed, 60 insertions(+), 5 deletions(-)
+ target/arm/helper.c | 57 ++++++++++++++++++++++++++++++++++++++-------
+ 1 file changed, 49 insertions(+), 8 deletions(-)
 
 diff --git a/target/arm/helper.c b/target/arm/helper.c
-index a36f4b3d699..27e5f98bc73 100644
+index b4f1609a1c6..297eb38fef0 100644
 --- a/target/arm/helper.c
 +++ b/target/arm/helper.c
-@@ -7561,6 +7561,25 @@ uint32_t arm_phys_excp_target_el(CPUState *cs, uint32_t excp_idx,
-     return target_el;
- }
- 
-+/*
-+ * Return true if the v7M CPACR permits access to the FPU for the specified
-+ * security state and privilege level.
-+ */
-+static bool v7m_cpacr_pass(CPUARMState *env, bool is_secure, bool is_priv)
-+{
-+    switch (extract32(env->v7m.cpacr[is_secure], 20, 2)) {
-+    case 0:
-+    case 2: /* UNPREDICTABLE: we treat like 0 */
-+        return false;
-+    case 1:
-+        return is_priv;
-+    case 3:
-+        return true;
-+    default:
-+        g_assert_not_reached();
-+    }
-+}
-+
- static bool v7m_stack_write(ARMCPU *cpu, uint32_t addr, uint32_t value,
-                             ARMMMUIdx mmu_idx, bool ignfault)
- {
-@@ -8820,9 +8839,23 @@ void arm_v7m_cpu_do_interrupt(CPUState *cs)
-         env->v7m.cfsr[env->v7m.secure] |= R_V7M_CFSR_UNDEFINSTR_MASK;
+@@ -12032,7 +12032,14 @@ uint32_t HELPER(v7m_mrs)(CPUARMState *env, uint32_t reg)
+         return xpsr_read(env) & mask;
          break;
-     case EXCP_NOCP:
--        armv7m_nvic_set_pending(env->nvic, ARMV7M_EXCP_USAGE, env->v7m.secure);
--        env->v7m.cfsr[env->v7m.secure] |= R_V7M_CFSR_NOCP_MASK;
+     case 20: /* CONTROL */
+-        return env->v7m.control[env->v7m.secure];
 +    {
-+        /*
-+         * NOCP might be directed to something other than the current
-+         * security state if this fault is because of NSACR; we indicate
-+         * the target security state using exception.target_el.
-+         */
-+        int target_secstate;
-+
-+        if (env->exception.target_el == 3) {
-+            target_secstate = M_REG_S;
-+        } else {
-+            target_secstate = env->v7m.secure;
++        uint32_t value = env->v7m.control[env->v7m.secure];
++        if (!env->v7m.secure) {
++            /* SFPA is RAZ/WI from NS; FPCA is stored in the M_REG_S bank */
++            value |= env->v7m.control[M_REG_S] & R_V7M_CONTROL_FPCA_MASK;
 +        }
-+        armv7m_nvic_set_pending(env->nvic, ARMV7M_EXCP_USAGE, target_secstate);
-+        env->v7m.cfsr[target_secstate] |= R_V7M_CFSR_NOCP_MASK;
-         break;
++        return value;
 +    }
-     case EXCP_INVSTATE:
-         armv7m_nvic_set_pending(env->nvic, ARMV7M_EXCP_USAGE, env->v7m.secure);
-         env->v7m.cfsr[env->v7m.secure] |= R_V7M_CFSR_INVSTATE_MASK;
-@@ -12756,6 +12789,22 @@ int fp_exception_el(CPUARMState *env, int cur_el)
-         return 0;
+     case 0x94: /* CONTROL_NS */
+         /* We have to handle this here because unprivileged Secure code
+          * can read the NS CONTROL register.
+@@ -12040,7 +12047,8 @@ uint32_t HELPER(v7m_mrs)(CPUARMState *env, uint32_t reg)
+         if (!env->v7m.secure) {
+             return 0;
+         }
+-        return env->v7m.control[M_REG_NS];
++        return env->v7m.control[M_REG_NS] |
++            (env->v7m.control[M_REG_S] & R_V7M_CONTROL_FPCA_MASK);
      }
  
-+    if (arm_feature(env, ARM_FEATURE_M)) {
-+        /* CPACR can cause a NOCP UsageFault taken to current security state */
-+        if (!v7m_cpacr_pass(env, env->v7m.secure, cur_el != 0)) {
-+            return 1;
-+        }
-+
-+        if (arm_feature(env, ARM_FEATURE_M_SECURITY) && !env->v7m.secure) {
-+            if (!extract32(env->v7m.nsacr, 10, 1)) {
-+                /* FP insns cause a NOCP UsageFault taken to Secure */
-+                return 3;
+     if (el == 0) {
+@@ -12146,9 +12154,13 @@ void HELPER(v7m_msr)(CPUARMState *env, uint32_t maskreg, uint32_t val)
+      */
+     uint32_t mask = extract32(maskreg, 8, 4);
+     uint32_t reg = extract32(maskreg, 0, 8);
++    int cur_el = arm_current_el(env);
+ 
+-    if (arm_current_el(env) == 0 && reg > 7) {
+-        /* only xPSR sub-fields may be written by unprivileged */
++    if (cur_el == 0 && reg > 7 && reg != 20) {
++        /*
++         * only xPSR sub-fields and CONTROL.SFPA may be written by
++         * unprivileged code
++         */
+         return;
+     }
+ 
+@@ -12207,6 +12219,15 @@ void HELPER(v7m_msr)(CPUARMState *env, uint32_t maskreg, uint32_t val)
+                 env->v7m.control[M_REG_NS] &= ~R_V7M_CONTROL_NPRIV_MASK;
+                 env->v7m.control[M_REG_NS] |= val & R_V7M_CONTROL_NPRIV_MASK;
+             }
++            /*
++             * SFPA is RAZ/WI from NS. FPCA is RO if NSACR.CP10 == 0,
++             * RES0 if the FPU is not present, and is stored in the S bank
++             */
++            if (arm_feature(env, ARM_FEATURE_VFP) &&
++                extract32(env->v7m.nsacr, 10, 1)) {
++                env->v7m.control[M_REG_S] &= ~R_V7M_CONTROL_FPCA_MASK;
++                env->v7m.control[M_REG_S] |= val & R_V7M_CONTROL_FPCA_MASK;
++            }
+             return;
+         case 0x98: /* SP_NS */
+         {
+@@ -12309,21 +12330,41 @@ void HELPER(v7m_msr)(CPUARMState *env, uint32_t maskreg, uint32_t val)
+         env->v7m.faultmask[env->v7m.secure] = val & 1;
+         break;
+     case 20: /* CONTROL */
+-        /* Writing to the SPSEL bit only has an effect if we are in
++        /*
++         * Writing to the SPSEL bit only has an effect if we are in
+          * thread mode; other bits can be updated by any privileged code.
+          * write_v7m_control_spsel() deals with updating the SPSEL bit in
+          * env->v7m.control, so we only need update the others.
+          * For v7M, we must just ignore explicit writes to SPSEL in handler
+          * mode; for v8M the write is permitted but will have no effect.
++         * All these bits are writes-ignored from non-privileged code,
++         * except for SFPA.
+          */
+-        if (arm_feature(env, ARM_FEATURE_V8) ||
+-            !arm_v7m_is_handler_mode(env)) {
++        if (cur_el > 0 && (arm_feature(env, ARM_FEATURE_V8) ||
++                           !arm_v7m_is_handler_mode(env))) {
+             write_v7m_control_spsel(env, (val & R_V7M_CONTROL_SPSEL_MASK) != 0);
+         }
+-        if (arm_feature(env, ARM_FEATURE_M_MAIN)) {
++        if (cur_el > 0 && arm_feature(env, ARM_FEATURE_M_MAIN)) {
+             env->v7m.control[env->v7m.secure] &= ~R_V7M_CONTROL_NPRIV_MASK;
+             env->v7m.control[env->v7m.secure] |= val & R_V7M_CONTROL_NPRIV_MASK;
+         }
++        if (arm_feature(env, ARM_FEATURE_VFP)) {
++            /*
++             * SFPA is RAZ/WI from NS or if no FPU.
++             * FPCA is RO if NSACR.CP10 == 0, RES0 if the FPU is not present.
++             * Both are stored in the S bank.
++             */
++            if (env->v7m.secure) {
++                env->v7m.control[M_REG_S] &= ~R_V7M_CONTROL_SFPA_MASK;
++                env->v7m.control[M_REG_S] |= val & R_V7M_CONTROL_SFPA_MASK;
++            }
++            if (cur_el > 0 &&
++                (env->v7m.secure || !arm_feature(env, ARM_FEATURE_M_SECURITY) ||
++                 extract32(env->v7m.nsacr, 10, 1))) {
++                env->v7m.control[M_REG_S] &= ~R_V7M_CONTROL_FPCA_MASK;
++                env->v7m.control[M_REG_S] |= val & R_V7M_CONTROL_FPCA_MASK;
 +            }
 +        }
-+
-+        return 0;
-+    }
-+
-     /* The CPACR controls traps to EL1, or PL1 if we're 32 bit:
-      * 0, 2 : trap EL0 and EL1/PL1 accesses
-      * 1    : trap only EL0 accesses
-@@ -12943,7 +12992,7 @@ void cpu_get_tb_cpu_state(CPUARMState *env, target_ulong *pc,
-         flags = FIELD_DP32(flags, TBFLAG_A32, SCTLR_B, arm_sctlr_b(env));
-         flags = FIELD_DP32(flags, TBFLAG_A32, NS, !access_secure_reg(env));
-         if (env->vfp.xregs[ARM_VFP_FPEXC] & (1 << 30)
--            || arm_el_is_aa64(env, 1)) {
-+            || arm_el_is_aa64(env, 1) || arm_feature(env, ARM_FEATURE_M)) {
-             flags = FIELD_DP32(flags, TBFLAG_A32, VFPEN, 1);
-         }
-         flags = FIELD_DP32(flags, TBFLAG_A32, XSCALE_CPAR, env->cp15.c15_cpar);
-diff --git a/target/arm/translate.c b/target/arm/translate.c
-index d56488ec847..bb539111179 100644
---- a/target/arm/translate.c
-+++ b/target/arm/translate.c
-@@ -3398,8 +3398,14 @@ static int disas_vfp_insn(DisasContext *s, uint32_t insn)
-      * for attempts to execute invalid vfp/neon encodings with FP disabled.
-      */
-     if (s->fp_excp_el) {
--        gen_exception_insn(s, 4, EXCP_UDEF,
--                           syn_fp_access_trap(1, 0xe, false), s->fp_excp_el);
-+        if (arm_dc_feature(s, ARM_FEATURE_M)) {
-+            gen_exception_insn(s, 4, EXCP_NOCP, syn_uncategorized(),
-+                               s->fp_excp_el);
-+        } else {
-+            gen_exception_insn(s, 4, EXCP_UDEF,
-+                               syn_fp_access_trap(1, 0xe, false),
-+                               s->fp_excp_el);
-+        }
-         return 0;
-     }
- 
+         break;
+     default:
+     bad_reg:
 -- 
 2.20.1
