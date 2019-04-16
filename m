@@ -1,21 +1,34 @@
-Received: from eggs.gnu.org ([209.51.188.92]:43941)
+Received: from eggs.gnu.org ([209.51.188.92]:44467)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1hGIVy-0004wA-VO
-	for qemu-devel@nongnu.org; Tue, 16 Apr 2019 03:28:24 -0400
+	(envelope-from <bounces@canonical.com>) id 1hGIYG-0005dJ-N6
+	for qemu-devel@nongnu.org; Tue, 16 Apr 2019 03:30:45 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1hGIVx-0007lm-V9
-	for qemu-devel@nongnu.org; Tue, 16 Apr 2019 03:28:22 -0400
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Date: Tue, 16 Apr 2019 07:28:14 +0000
-Message-ID: <40daf835-2481-e11e-dcdb-421f7063c566@virtuozzo.com>
-References: <20190402153730.54145-1-vsementsov@virtuozzo.com>
-In-Reply-To: <20190402153730.54145-1-vsementsov@virtuozzo.com>
-Content-Language: en-US
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <A8F2CFE192A966479E1F3B7823C497BF@eurprd08.prod.outlook.com>
-Content-Transfer-Encoding: base64
+	(envelope-from <bounces@canonical.com>) id 1hGIYF-000142-Mt
+	for qemu-devel@nongnu.org; Tue, 16 Apr 2019 03:30:44 -0400
+Received: from indium.canonical.com ([91.189.90.7]:42004)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1hGIYF-00012V-Do
+	for qemu-devel@nongnu.org; Tue, 16 Apr 2019 03:30:43 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1hGIYE-0002QC-3m
+	for <qemu-devel@nongnu.org>; Tue, 16 Apr 2019 07:30:42 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 086752E80CC
+	for <qemu-devel@nongnu.org>; Tue, 16 Apr 2019 07:30:42 +0000 (UTC)
 MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [PATCH v5 00/10] qcow2: encryption threads
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Tue, 16 Apr 2019 07:16:46 -0000
+From: Thomas Huth <1529226@bugs.launchpad.net>
+Reply-To: Bug 1529226 <1529226@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <20151225114312.18411.84061.malonedeb@wampee.canonical.com>
+Message-Id: <155539900643.8369.575534524882169330.malone@wampee.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1529226] Re: qemu-i386-user on 32-bit Linux:
+ uncaught target signal 11
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,49 +37,43 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>
-Cc: "mreitz@redhat.com" <mreitz@redhat.com>, "kwolf@redhat.com" <kwolf@redhat.com>, "berto@igalia.com" <berto@igalia.com>, "pbonzini@redhat.com" <pbonzini@redhat.com>, Denis Lunev <den@virtuozzo.com>, "berrange@redhat.com" <berrange@redhat.com>
+To: qemu-devel@nongnu.org
 
-cGluZw0KDQowMi4wNC4yMDE5IDE4OjM3LCBWbGFkaW1pciBTZW1lbnRzb3YtT2dpZXZza2l5IHdy
-b3RlOg0KPiB2NTogcmViYXNlIG9uIG1hc3Rlciwgc29tZSBjb25mbGljdHMgcmVzb2x2ZWQgZHVl
-IHRvIGRhdGEtZmlsZSBmZWF0dXJlDQo+IA0KPiAwMTogbmV3IHBhdGNoLCBqdXN0IG1vdmUgdGVz
-dCBmcm9tIGNvdmVyIGxldHRlciB0byBhIGZpbGUuIEkgcmVhbGx5IGhvcGUgdGhhdCBpdA0KPiAg
-ICAgIHdpbGwgbm90IGhhbmcgdGhlIHdob2xlIHNlcmllcywgc28sIGlmIHdlIGRvbid0IHdhbnQg
-aXQgYXMgaXMgb3Igd2l0aCByZWFsbHkNCj4gICAgICB0aW55IGltcHJvdmVtZW50cywgSSdkIHBy
-ZWZlciB0byBza2lwIGl0IGFuZCBxdWV1ZSAwMi0xMCBmaXJzdC4NCj4gMDk6ICJ0cnVlIiBwYXJh
-bWV0ZXIgYWRkZWQgdG8gbW92ZWQgcWNvdzJfcHJlX3dyaXRlX292ZXJsYXBfY2hlY2soKSBjYWxs
-IGR1ZSB0bw0KPiAgICAgIHJlYmFzZSBvbiBtYXN0ZXIgKGJvdGggYmVmb3JlIGFuZCBhZnRlciBw
-YXRjaCkuIFNlZW1zIE9LLCBzbyBrZWVwIEFsYmVydG8ncyByLWIuDQo+IA0KPiBwZXJmb3JtYW5j
-ZToNCj4gDQo+IGFmdGVyIDAxOg0KPiAgICMgLi90ZXN0cy9wZXJmL2Jsb2NrL3Fjb3cyL2NvbnZl
-cnQtdG8tZW5jcnlwdGVkIC9zc2Qvc3JjLnJhdyAvc3NkL2RzdC5lbmMucWNvdzINCj4gMTQuMTgN
-Cj4gICAjIC4vdGVzdHMvcGVyZi9ibG9jay9xY293Mi9jb252ZXJ0LXRvLWVuY3J5cHRlZCAvc3Nk
-L3NyYy5yYXcgL3NzZC9kc3QuZW5jLnFjb3cyIC1XDQo+IDEzLjc3DQo+IA0KPiBhZnRlciAxMDoN
-Cj4gICAjIC4vdGVzdHMvcGVyZi9ibG9jay9xY293Mi9jb252ZXJ0LXRvLWVuY3J5cHRlZCAvc3Nk
-L3NyYy5yYXcgL3NzZC9kc3QuZW5jLnFjb3cyDQo+IDE0LjM1DQo+ICAgIyAuL3Rlc3RzL3BlcmYv
-YmxvY2svcWNvdzIvY29udmVydC10by1lbmNyeXB0ZWQgL3NzZC9zcmMucmF3IC9zc2QvZHN0LmVu
-Yy5xY293MiAtVw0KPiA1LjYyDQo+IA0KPiBWbGFkaW1pciBTZW1lbnRzb3YtT2dpZXZza2l5ICgx
-MCk6DQo+ICAgIHRlc3RzL3BlcmY6IFRlc3QgcWVtdS1pbWcgY29udmVydCBmcm9tIHJhdyB0byBl
-bmNyeXB0ZWQgcWNvdzINCj4gICAgcWNvdzIuaDogYWRkIG1pc3NpbmcgaW5jbHVkZQ0KPiAgICBx
-Y293MjogYWRkIHNlcGFyYXRlIGZpbGUgZm9yIHRocmVhZGVkIGRhdGEgcHJvY2Vzc2luZyBmdW5j
-dGlvbnMNCj4gICAgcWNvdzItdGhyZWFkczogdXNlIHRocmVhZF9wb29sX3N1Ym1pdF9jbw0KPiAg
-ICBxY293Mi10aHJlYWRzOiBxY293Ml9jb19kb19jb21wcmVzczogcHJvdGVjdCBxdWV1aW5nIGJ5
-IG11dGV4DQo+ICAgIHFjb3cyLXRocmVhZHM6IHNwbGl0IG91dCBnZW5lcmljIHBhdGgNCj4gICAg
-cWNvdzI6IHFjb3cyX2NvX3ByZWFkdjogaW1wcm92ZSBsb2NraW5nDQo+ICAgIHFjb3cyOiBxY293
-Ml9jb19wcmVhZHY6IHNraXAgdXNpbmcgaGRfcWlvdiB3aGVuIHBvc3NpYmxlDQo+ICAgIHFjb3cy
-OiBiZHJ2X2NvX3B3cml0ZXY6IG1vdmUgZW5jcnlwdGlvbiBjb2RlIG91dCBvZiB0aGUgbG9jaw0K
-PiAgICBxY293MjogZG8gZW5jcnlwdGlvbiBpbiB0aHJlYWRzDQo+IA0KPiAgIGJsb2NrL3Fjb3cy
-LmggICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgfCAgMjAgKy0NCj4gICBibG9jay9xY293
-Mi1iaXRtYXAuYyAgICAgICAgICAgICAgICAgICAgICAgIHwgICAxIC0NCj4gICBibG9jay9xY293
-Mi1jYWNoZS5jICAgICAgICAgICAgICAgICAgICAgICAgIHwgICAxIC0NCj4gICBibG9jay9xY293
-Mi1jbHVzdGVyLmMgICAgICAgICAgICAgICAgICAgICAgIHwgICA4ICstDQo+ICAgYmxvY2svcWNv
-dzItcmVmY291bnQuYyAgICAgICAgICAgICAgICAgICAgICB8ICAgMSAtDQo+ICAgYmxvY2svcWNv
-dzItc25hcHNob3QuYyAgICAgICAgICAgICAgICAgICAgICB8ICAgMSAtDQo+ICAgYmxvY2svcWNv
-dzItdGhyZWFkcy5jICAgICAgICAgICAgICAgICAgICAgICB8IDI2OCArKysrKysrKysrKysrKysr
-KysrDQo+ICAgYmxvY2svcWNvdzIuYyAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICB8IDI3
-NSArKysrLS0tLS0tLS0tLS0tLS0tLQ0KPiAgIGJsb2NrL01ha2VmaWxlLm9ianMgICAgICAgICAg
-ICAgICAgICAgICAgICAgfCAgIDIgKy0NCj4gICB0ZXN0cy9wZXJmL2Jsb2NrL3Fjb3cyL2NvbnZl
-cnQtdG8tZW5jcnlwdGVkIHwgIDQ4ICsrKysNCj4gICAxMCBmaWxlcyBjaGFuZ2VkLCAzODkgaW5z
-ZXJ0aW9ucygrKSwgMjM2IGRlbGV0aW9ucygtKQ0KPiAgIGNyZWF0ZSBtb2RlIDEwMDY0NCBibG9j
-ay9xY293Mi10aHJlYWRzLmMNCj4gICBjcmVhdGUgbW9kZSAxMDA3NTUgdGVzdHMvcGVyZi9ibG9j
-ay9xY293Mi9jb252ZXJ0LXRvLWVuY3J5cHRlZA0KPiANCg0KDQotLSANCkJlc3QgcmVnYXJkcywN
-ClZsYWRpbWlyDQo=
+Looking through old bug tickets... can you still reproduce this issue
+with the latest version of QEMU?
+
+** Changed in: qemu
+       Status: New =3D> Incomplete
+
+-- =
+
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1529226
+
+Title:
+  qemu-i386-user on 32-bit Linux: uncaught target signal 11
+
+Status in QEMU:
+  Incomplete
+
+Bug description:
+  Even though the command I'm trying to run (a wrapper script for
+  qemu-i386-user running rustc, the rust compiler)  produces the
+  expected  compiled output, the build process is interrupted:
+
+  qemu: uncaught target signal 11 (Segmentation fault) - core dumped
+  i686-unknown-linux-gnu/stage0/bin/rustc: line 1:  7474 Segmentation fault=
+      /usr/local/bin/qemu-i386 -cpu qemu32 /home/petevine/stage0/rustc.bin =
+-C target-cpu=3Dpentium2 -L /home/petevine/unpacked/rust-master/i686-unknow=
+n-linux-gnu/stage0/lib/rustlib/i686-unknown-linux-gnu/lib/ "$@"
+  make: *** [i686-unknown-linux-gnu/stage0/lib/rustlib/i686-unknown-linux-g=
+nu/lib/stamp.rustc_back] Error 139
+
+  The stamp file is not being created so this could be about forking
+  bash after finishing the wrapper script.
+
+  Qemu was compiled from the latest git source.
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1529226/+subscriptions
