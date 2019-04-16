@@ -7,73 +7,73 @@ X-Spam-Status: No, score=-8.7 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3A76FC10F13
-	for <qemu-devel@archiver.kernel.org>; Tue, 16 Apr 2019 13:01:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7159CC10F13
+	for <qemu-devel@archiver.kernel.org>; Tue, 16 Apr 2019 13:02:34 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 055DB20693
-	for <qemu-devel@archiver.kernel.org>; Tue, 16 Apr 2019 13:01:06 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 3A6D820693
+	for <qemu-devel@archiver.kernel.org>; Tue, 16 Apr 2019 13:02:34 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="yPmVw9Vm"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 055DB20693
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="e0Ilpe1N"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3A6D820693
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:36316 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:36324 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hGNhx-0006um-7j
-	for qemu-devel@archiver.kernel.org; Tue, 16 Apr 2019 09:01:05 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:34403)
+	id 1hGNjN-000863-Hi
+	for qemu-devel@archiver.kernel.org; Tue, 16 Apr 2019 09:02:33 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:34497)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1hGNf4-0004Y9-Pc
-	for qemu-devel@nongnu.org; Tue, 16 Apr 2019 08:58:07 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1hGNf8-0004cf-IM
+	for qemu-devel@nongnu.org; Tue, 16 Apr 2019 08:58:11 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1hGNf2-00018x-SK
-	for qemu-devel@nongnu.org; Tue, 16 Apr 2019 08:58:06 -0400
-Received: from mail-wr1-x443.google.com ([2a00:1450:4864:20::443]:47023)
+	(envelope-from <peter.maydell@linaro.org>) id 1hGNf6-0001Bt-VT
+	for qemu-devel@nongnu.org; Tue, 16 Apr 2019 08:58:10 -0400
+Received: from mail-wm1-x329.google.com ([2a00:1450:4864:20::329]:36135)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1hGNf0-00014I-TY
-	for qemu-devel@nongnu.org; Tue, 16 Apr 2019 08:58:04 -0400
-Received: by mail-wr1-x443.google.com with SMTP id t17so26886014wrw.13
-	for <qemu-devel@nongnu.org>; Tue, 16 Apr 2019 05:57:58 -0700 (PDT)
+	id 1hGNf6-00019V-KM
+	for qemu-devel@nongnu.org; Tue, 16 Apr 2019 08:58:08 -0400
+Received: by mail-wm1-x329.google.com with SMTP id h18so25326435wml.1
+	for <qemu-devel@nongnu.org>; Tue, 16 Apr 2019 05:58:06 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
 	h=from:to:subject:date:message-id:in-reply-to:references:mime-version
 	:content-transfer-encoding;
-	bh=xc3UIGC5SvjlHs9DchEFUCKpsleMW6NB4iU50Hc4tGE=;
-	b=yPmVw9Vm2MHaue//8t6SPQ/AQlQsCrh3+Bv5D8HFaaVR9Q1mganklBEN6OVfzObcbR
-	erJvWHQzigC05an4Luo9d0uLxauQBDxXae8bZw6LlUsJ6qNXoNTeSk9/tOkpYZv2y4v1
-	T1HRBkaA5U27N5fB6MLiC1ZZmMBlLORsIE6tE748XMLXZlsQ2cmlYW3fw8xMyhz6V1Qr
-	BXA9YaMGAYn0ofaZf10bRfcYGncJsU5ZkgKUzkfTO7Km9pQppcWQllSZEoq9IWuJNbJj
-	8K/g8dj9cdhw76SQyK0KqNw39BuisLx3pwVZzQDvRASaPFNjKBpGKojYL4KRzBTlgY7w
-	PeRQ==
+	bh=BFL/4mmLnGxA0smTiBCKZfrdKeTsfE6ZtDY8NLO49os=;
+	b=e0Ilpe1NU8SWZ4EcFHTIQOONo+Vj7nYG75Oum+SzAr3zQfR5WwR9fkNbHE7r29s+pH
+	oNnXCH/bHBS95C5VsCeXYTYVT7RAnRjDTQXdry0QwixKSit9jHCpKt0Chh97TY+16MqV
+	kSz54y2buvyI5iR6cWQ4rG7Ff5yaoMz1dHzZKak0zzUVic+ku0oFv32ku53zzUfc+BfE
+	MoKzbmfbtDnA7q4uoxTURYsz9Yj+EJEquh2dSosSK8K2J/JfZ5GGCiJVYV8WYeNCQAzO
+	jiWvAQCAwTNib5RK9ADU8hbWniprDy7KzXyGzKbSjz/NKMyWITE9SD9Rg8tAmKDsBHrf
+	clQg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
 	d=1e100.net; s=20161025;
 	h=x-gm-message-state:from:to:subject:date:message-id:in-reply-to
 	:references:mime-version:content-transfer-encoding;
-	bh=xc3UIGC5SvjlHs9DchEFUCKpsleMW6NB4iU50Hc4tGE=;
-	b=ebqgsEfG+Arz5LMc5nGxGCq+EIDTkBvICV/2gxsAWu1/scHUawMGIRTT0U/5JE0F6g
-	R8cOYBiWFQZEAMna5v/5vOcqzzG5JcucRLEpsNILwKCv6tc7+Fxnq5xcC6MQEePFeuwR
-	dPNJxQgQuJusffEA4MhaNL9Yqsp1Q9ltLUtvf4+kb2BXU5Ikg6SSL3oMc5NDd6OkbdSD
-	GCxyZG1F/XTf5Cfp7u7DMyW6jRWRuSg0IerhjuCQo6fkrAVScGnKXiJjLxEYH79ThDc6
-	0lkne7x4vhMo3WTlOQuVf4wnyacZVB9h/97BdiQqHzJXQj4mbRGaA912FNzTOdKr/AZe
-	mKHg==
-X-Gm-Message-State: APjAAAVBC9Vi458XfFzm80VJaw2MpJJoiAuCyEgiyJOSmxYkOnT8PwzC
-	nUH2D1yvlyIO32jsy/MsihpDDA==
-X-Google-Smtp-Source: APXvYqw2gRjMcAiAtTv/ngrhodkBRKGqmi38Qa5NLwWPjn4DTQHv2oXotLLVIPu5709074X1U+0J0w==
-X-Received: by 2002:adf:de07:: with SMTP id b7mr23886402wrm.196.1555419478176; 
-	Tue, 16 Apr 2019 05:57:58 -0700 (PDT)
+	bh=BFL/4mmLnGxA0smTiBCKZfrdKeTsfE6ZtDY8NLO49os=;
+	b=dDvsKX18/oVOwLg+rQTMLsZo2HQIThsO9Ep8TlEDw/AR8AnNlNGQtIRnynclAM99UM
+	b58hrZyx+IzZFThiIdT94aitYDGZZEtJ0nNiBM8e5dnH6/AXop1ayGwqW19AgMm2q+lD
+	dn2JK/hmCaU9Sc7t29k6yD3fmWOq7pPUg0yFV+5BJieOsPergksYUp0qaPZwXzAZBjqi
+	cOzf0gOGyB81dpv/LrHVDjve+4+7jZp3m94U2qolpB+3E+beBBuRfiSWgvSpxHnxVxa5
+	TkwCEPeO8KEbFYR7N3DV8Vh4lh6ae+uC9zAiuR/dltX7VIgcK650m5mgvvJdUGqf/ey0
+	drQw==
+X-Gm-Message-State: APjAAAWRUFl5WyspKHpIA7Rj+iAG9Im3NDe6SXDcX8ceTP7z3N0acm4D
+	GSQvVDDIdLzQGw2QYG54yOfQtg==
+X-Google-Smtp-Source: APXvYqxSUXTBSAtxr7EyxlwJXcDSCBKJw/Gw/OU8s7s/Hcte2ShcoY/EwYvSyhFdzthzFWm5cHrnlQ==
+X-Received: by 2002:a1c:cfcb:: with SMTP id f194mr25672482wmg.51.1555419485136;
+	Tue, 16 Apr 2019 05:58:05 -0700 (PDT)
 Received: from orth.archaic.org.uk (orth.archaic.org.uk. [81.2.115.148])
 	by smtp.gmail.com with ESMTPSA id
-	v184sm39476572wma.6.2019.04.16.05.57.56
+	v184sm39476572wma.6.2019.04.16.05.58.02
 	(version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-	Tue, 16 Apr 2019 05:57:57 -0700 (PDT)
+	Tue, 16 Apr 2019 05:58:03 -0700 (PDT)
 From: Peter Maydell <peter.maydell@linaro.org>
 To: qemu-arm@nongnu.org,
 	qemu-devel@nongnu.org
-Date: Tue, 16 Apr 2019 13:57:24 +0100
-Message-Id: <20190416125744.27770-7-peter.maydell@linaro.org>
+Date: Tue, 16 Apr 2019 13:57:27 +0100
+Message-Id: <20190416125744.27770-10-peter.maydell@linaro.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20190416125744.27770-1-peter.maydell@linaro.org>
 References: <20190416125744.27770-1-peter.maydell@linaro.org>
@@ -81,9 +81,9 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
 	recognized.
-X-Received-From: 2a00:1450:4864:20::443
-Subject: [Qemu-devel] [PATCH 06/26] target/arm: Decode FP instructions for M
- profile
+X-Received-From: 2a00:1450:4864:20::329
+Subject: [Qemu-devel] [PATCH 09/26] target/arm/helper: don't return early
+ for STKOF faults during stacking
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -99,67 +99,77 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 Content-Type: text/plain; charset="UTF-8"
-Message-ID: <20190416125724.ORORdDmV2swAFCAdvlLdjS6YXDBacvAHRO8UEVGoqHI@z>
+Message-ID: <20190416125727.p-m7C8IYRicBjh9dDU5zfaU1odGkMo80ix7rmtp3OhI@z>
 
-Correct the decode of the M-profile "coprocessor and
-floating-point instructions" space:
- * op0 == 0b11 is always unallocated
- * if the CPU has an FPU then all insns with op1 == 0b101
-   are floating point and go to disas_vfp_insn()
-
-For the moment we leave VLLDM and VLSTM as NOPs; in
-a later commit we will fill in the proper implementation
-for the case where an FPU is present.
+Currently the code in v7m_push_stack() which detects a violation
+of the v8M stack limit simply returns early if it does so. This
+is OK for the current integer-only code, but won't work for the
+floating point handling we're about to add. We need to continue
+executing the rest of the function so that we check for other
+exceptions like not having permission to use the FPU and so
+that we correctly set the FPCCR state if we are doing lazy
+stacking. Refactor to avoid the early return.
 
 Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 ---
- target/arm/translate.c | 26 ++++++++++++++++++++++----
- 1 file changed, 22 insertions(+), 4 deletions(-)
+ target/arm/helper.c | 23 ++++++++++++++++++-----
+ 1 file changed, 18 insertions(+), 5 deletions(-)
 
-diff --git a/target/arm/translate.c b/target/arm/translate.c
-index bb539111179..d280b3a9a3a 100644
---- a/target/arm/translate.c
-+++ b/target/arm/translate.c
-@@ -11727,10 +11727,19 @@ static void disas_thumb2_insn(DisasContext *s, uint32_t insn)
-     case 6: case 7: case 14: case 15:
-         /* Coprocessor.  */
-         if (arm_dc_feature(s, ARM_FEATURE_M)) {
--            /* We don't currently implement M profile FP support,
--             * so this entire space should give a NOCP fault, with
--             * the exception of the v8M VLLDM and VLSTM insns, which
--             * must be NOPs in Secure state and UNDEF in Nonsecure state.
-+            /* 0b111x_11xx_xxxx_xxxx_xxxx_xxxx_xxxx_xxxx */
-+            if (extract32(insn, 24, 2) == 3) {
-+                goto illegal_op; /* op0 = 0b11 : unallocated */
-+            }
-+
+diff --git a/target/arm/helper.c b/target/arm/helper.c
+index 297eb38fef0..a2222f84803 100644
+--- a/target/arm/helper.c
++++ b/target/arm/helper.c
+@@ -8187,7 +8187,7 @@ static bool v7m_push_stack(ARMCPU *cpu)
+      * should ignore further stack faults trying to process
+      * that derived exception.)
+      */
+-    bool stacked_ok;
++    bool stacked_ok = true, limitviol = false;
+     CPUARMState *env = &cpu->env;
+     uint32_t xpsr = xpsr_read(env);
+     uint32_t frameptr = env->regs[13];
+@@ -8218,7 +8218,14 @@ static bool v7m_push_stack(ARMCPU *cpu)
+             armv7m_nvic_set_pending(env->nvic, ARMV7M_EXCP_USAGE,
+                                     env->v7m.secure);
+             env->regs[13] = limit;
+-            return true;
 +            /*
-+             * Decode VLLDM and VLSTM first: these are nonstandard because:
-+             *  * if there is no FPU then these insns must NOP in
-+             *    Secure state and UNDEF in Nonsecure state
-+             *  * if there is an FPU then these insns do not have
-+             *    the usual behaviour that disas_vfp_insn() provides of
-+             *    being controlled by CPACR/NSACR enable bits or the
-+             *    lazy-stacking logic.
-              */
-             if (arm_dc_feature(s, ARM_FEATURE_V8) &&
-                 (insn & 0xffa00f00) == 0xec200a00) {
-@@ -11744,6 +11753,15 @@ static void disas_thumb2_insn(DisasContext *s, uint32_t insn)
-                 /* Just NOP since FP support is not implemented */
-                 break;
-             }
-+            if (arm_dc_feature(s, ARM_FEATURE_VFP) &&
-+                ((insn >> 8) & 0xe) == 10) {
-+                /* FP, and the CPU supports it */
-+                if (disas_vfp_insn(s, insn)) {
-+                    goto illegal_op;
-+                }
-+                break;
-+            }
-+
-             /* All other insns: NOCP */
-             gen_exception_insn(s, 4, EXCP_NOCP, syn_uncategorized(),
-                                default_exception_el(s));
++             * We won't try to perform any further memory accesses but
++             * we must continue through the following code to check for
++             * permission faults during FPU state preservation, and we
++             * must update FPCCR if lazy stacking is enabled.
++             */
++            limitviol = true;
++            stacked_ok = false;
+         }
+     }
+ 
+@@ -8227,7 +8234,7 @@ static bool v7m_push_stack(ARMCPU *cpu)
+      * (which may be taken in preference to the one we started with
+      * if it has higher priority).
+      */
+-    stacked_ok =
++    stacked_ok = stacked_ok &&
+         v7m_stack_write(cpu, frameptr, env->regs[0], mmu_idx, false) &&
+         v7m_stack_write(cpu, frameptr + 4, env->regs[1], mmu_idx, false) &&
+         v7m_stack_write(cpu, frameptr + 8, env->regs[2], mmu_idx, false) &&
+@@ -8237,8 +8244,14 @@ static bool v7m_push_stack(ARMCPU *cpu)
+         v7m_stack_write(cpu, frameptr + 24, env->regs[15], mmu_idx, false) &&
+         v7m_stack_write(cpu, frameptr + 28, xpsr, mmu_idx, false);
+ 
+-    /* Update SP regardless of whether any of the stack accesses failed. */
+-    env->regs[13] = frameptr;
++    /*
++     * If we broke a stack limit then SP was already updated earlier;
++     * otherwise we update SP regardless of whether any of the stack
++     * accesses failed or we took some other kind of fault.
++     */
++    if (!limitviol) {
++        env->regs[13] = frameptr;
++    }
+ 
+     return !stacked_ok;
+ }
 -- 
 2.20.1
 
