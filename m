@@ -1,31 +1,23 @@
-Received: from eggs.gnu.org ([209.51.188.92]:44721)
+Received: from eggs.gnu.org ([209.51.188.92]:48653)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jo@durchholz.org>) id 1hGSRT-0007MB-Kn
-	for qemu-devel@nongnu.org; Tue, 16 Apr 2019 14:04:24 -0400
+	(envelope-from <david@redhat.com>) id 1hGShL-0004K8-IJ
+	for qemu-devel@nongnu.org; Tue, 16 Apr 2019 14:20:48 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jo@durchholz.org>) id 1hGSRN-0003ey-PP
-	for qemu-devel@nongnu.org; Tue, 16 Apr 2019 14:04:21 -0400
-Received: from 5.itsy.de ([188.40.84.14]:50319)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <jo@durchholz.org>) id 1hGSRL-0003Y0-O1
-	for qemu-devel@nongnu.org; Tue, 16 Apr 2019 14:04:15 -0400
-Received: from [192.168.178.32] (unknown [195.48.33.209])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-	(No client certificate requested)
-	by 5.itsy.de (Postfix) with ESMTPSA id 614546505E
-	for <qemu-devel@nongnu.org>; Tue, 16 Apr 2019 20:04:08 +0200 (CEST)
-References: <874f0f8e-780e-6600-e11b-b97f5b055cf8@durchholz.org>
-	<dbd6541e-5013-d0bc-b23e-a8de4f4cd171@redhat.com>
-	<20190416072430.dp742ehg27drpplb@sirius.home.kraxel.org>
-From: Joachim Durchholz <jo@durchholz.org>
-Message-ID: <00f0ada2-a68b-2264-ab72-f49fe7d654e7@durchholz.org>
-Date: Tue, 16 Apr 2019 20:04:08 +0200
+	(envelope-from <david@redhat.com>) id 1hGShK-0003Ec-Et
+	for qemu-devel@nongnu.org; Tue, 16 Apr 2019 14:20:47 -0400
+References: <20190411100836.646-1-david@redhat.com>
+	<20190411100836.646-42-david@redhat.com>
+	<0871b6f8-6073-4311-78a5-4772817a009e@linaro.org>
+From: David Hildenbrand <david@redhat.com>
+Message-ID: <5cadf319-7320-85a1-67d4-e03638cc4d63@redhat.com>
+Date: Tue, 16 Apr 2019 20:20:42 +0200
 MIME-Version: 1.0
-In-Reply-To: <20190416072430.dp742ehg27drpplb@sirius.home.kraxel.org>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-GB
+In-Reply-To: <0871b6f8-6073-4311-78a5-4772817a009e@linaro.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] curses.c: "We need a terminal output" ?
+Subject: Re: [Qemu-devel] [PATCH v1 41/41] s390x/tcg: Implement VECTOR TEST
+ UNDER MASK
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,45 +26,62 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Richard Henderson <richard.henderson@linaro.org>, qemu-devel@nongnu.org
+Cc: qemu-s390x@nongnu.org, Cornelia Huck <cohuck@redhat.com>, Thomas Huth <thuth@redhat.com>, Richard Henderson <rth@twiddle.net>
 
-Am 16.04.19 um 09:24 schrieb Gerd Hoffmann:
-> On Mon, Apr 15, 2019 at 03:10:09PM -0400, John Snow wrote:
->> <CC'ing curses maintainer>
->>
->> On 4/13/19 5:02 AM, Joachim Durchholz wrote:
->>> Hi all,
->>>
->>> what's the reasoning behind "We need a terminal output" in curses.c?
+On 13.04.19 08:28, Richard Henderson wrote:
+> On 4/11/19 12:08 AM, David Hildenbrand wrote:
+>> +void HELPER(gvec_vtm)(void *v1, const void *v2, CPUS390XState *env,
+>> +                      uint32_t desc)
+>> +{
+>> +    S390Vector tmp;
+>> +
+>> +    s390_vec_and(&tmp, v1, v2);
+>> +    if (s390_vec_is_zero(&tmp)) {
+>> +        /* Selected bits all zeros; or all mask bits zero */
+>> +        env->cc_op = 0;
+>> +    } else if (s390_vec_equal(&tmp, v2)) {
+>> +        /* Selected bits all ones */
+>> +        env->cc_op = 3;
+>> +    } else {
+>> +        /* Selected bits a mix of zeros and ones */
+>> +        env->cc_op = 1;
+>> +    }
+>> +}
 > 
-> curses needs a terminal.
-
-I commented out the check, and guess what: qemu and the OS in the VM 
-would run just fine.
-
->>> I don't really see a scenario where it's problematic if qemu emits
->>> escape sequences to a pipe.
+> Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 > 
-> It's not about sending escape sequences.  A pipe simply doesn't support
-> all the tty ioctls (query terminal size, turn echo on/off, set all kinds
-> of terminal modes, ...).
-
-Then I don't understand why it just ran fine.
-I don't expect fullscreen output to work perfectly anyway; just enough 
-so I can use qemu expect-style.
-
-Also, is qemu -curses actually using all the terminal shenanigans?
-I don't think so. If it is, it's not really needed it seems, things work 
-fine.
-
->>> I can see another scenario when this is problematic: Unit testing code
->>> that directly writes to the console. E.g. testing BIOS code, or testing
->>> operating systems when using the serial port is not an option.
+> However, if you return this value, then you can do
 > 
-> seabios can work with the serial console just fine, try "qemu -nographic"
+> DEF_HELPER_FLAGS_4(gvec_vtm, TCG_CALL_NO_RWG_SE, i32, cptr, cptr)
+> 
+> static DisasJumpType op_vtm(DisasContext *s, DisasOps *o)
+> {
+>     TCGv_ptr p1 = tcg_temp_new_ptr();
+>     TCGv_ptr p2 = tcg_temp_new_ptr();
+> 
+>     tcg_gen_addi_ptr(p1, cpu_env,
+>         vec_full_reg_offset(get_field(s->fields, v1)));
+>     tcg_gen_addi_ptr(p2, cpu_env,
+>         vec_full_reg_offset(get_field(s->fields, v2)));
+>     gen_helper_gvec_vtm(cc_op, p1, p2);
+>     tcg_temp_free_ptr(p1);
+>     tcg_temp_free_ptr(p2);
+>     set_cc_static(s);
+>     return DISAS_NEXT;
+> }
+> 
+> Perhaps it doesn't matter though, since use of vtm probably implies a jump,
+> which implies end of TB, which means that registers are going to get saved to
+> backing store anyway.
 
-Well, can you tell me how convince any *BSD to talk to seabios intead of 
-to the terminal...
+Had a similar idea, but I guess it doesn't really matter. This way, we
+can at least use standardized gvec ool helpers. Will leave it as is for
+now, thanks!
 
-Regards,
-Jo
+
+-- 
+
+Thanks,
+
+David / dhildenb
