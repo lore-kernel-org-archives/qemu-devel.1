@@ -1,29 +1,27 @@
-Received: from eggs.gnu.org ([209.51.188.92]:38422)
+Received: from eggs.gnu.org ([209.51.188.92]:39763)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1hGTqN-00058N-L4
-	for qemu-devel@nongnu.org; Tue, 16 Apr 2019 15:34:12 -0400
+	(envelope-from <bsd@redhat.com>) id 1hGTxJ-0007Tn-M5
+	for qemu-devel@nongnu.org; Tue, 16 Apr 2019 15:41:22 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1hGTqM-00039N-FL
-	for qemu-devel@nongnu.org; Tue, 16 Apr 2019 15:34:11 -0400
-Received: from mail-ot1-x343.google.com ([2607:f8b0:4864:20::343]:44435)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1hGTqJ-00033F-NH
-	for qemu-devel@nongnu.org; Tue, 16 Apr 2019 15:34:09 -0400
-Received: by mail-ot1-x343.google.com with SMTP id d24so18592952otl.11
-	for <qemu-devel@nongnu.org>; Tue, 16 Apr 2019 12:34:02 -0700 (PDT)
-MIME-Version: 1.0
+	(envelope-from <bsd@redhat.com>) id 1hGTxI-0000Dh-3m
+	for qemu-devel@nongnu.org; Tue, 16 Apr 2019 15:41:21 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:35078)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <bsd@redhat.com>) id 1hGTxF-00009Q-BY
+	for qemu-devel@nongnu.org; Tue, 16 Apr 2019 15:41:19 -0400
+From: Bandan Das <bsd@redhat.com>
 References: <20190415154503.6758-1-berrange@redhat.com>
-	<CAFEAcA-YpG71aGtTVMafShGyd9uM599Uy_8S3vvvnPzfiKMqnw@mail.gmail.com>
-	<CAFEAcA-kywfUEZARqzH=obD1p3UsAcsNneK-X0BPpoFnV-QK0A@mail.gmail.com>
-In-Reply-To: <CAFEAcA-kywfUEZARqzH=obD1p3UsAcsNneK-X0BPpoFnV-QK0A@mail.gmail.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 16 Apr 2019 20:33:49 +0100
-Message-ID: <CAFEAcA_+sf3L5ChBDKEekKb5iTTQZu4mEfF7eiTL78oMDuR16A@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
+	<20190415154503.6758-3-berrange@redhat.com>
+Date: Tue, 16 Apr 2019 15:41:09 -0400
+In-Reply-To: <20190415154503.6758-3-berrange@redhat.com> ("Daniel
+	P. \=\?utf-8\?Q\?Berrang\=C3\=A9\=22's\?\= message of "Mon,
+	15 Apr 2019 16:45:02 +0100")
+Message-ID: <jpg5zrdbuwa.fsf@linux.bootlegged.copy>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH 0/3] usb-mtp: fix ObjectInfo request
- handling
+Subject: Re: [Qemu-devel] [PATCH 2/3] usb-mtp: fix bounds check for guest
+ provided filename
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,50 +30,51 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Daniel_P=2E_Berrang=C3=A9?= <berrange@redhat.com>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, Gerd Hoffmann <kraxel@redhat.com>, Bandan Das <bsd@redhat.com>, Thomas Huth <thuth@redhat.com>, Greg Kurz <groug@kaod.org>, Eric Blake <eblake@redhat.com>
+To: "Daniel P. =?utf-8?Q?Berrang=C3=A9?=" <berrange@redhat.com>
+Cc: qemu-devel@nongnu.org, Peter Maydell <peter.maydell@linaro.org>, Thomas Huth <thuth@redhat.com>, Greg Kurz <groug@kaod.org>, Gerd Hoffmann <kraxel@redhat.com>
 
-On Tue, 16 Apr 2019 at 18:27, Peter Maydell <peter.maydell@linaro.org> wrot=
-e:
+Daniel P. Berrang=C3=A9 <berrange@redhat.com> writes:
+
+> The ObjectInfo struct has a variable length array containing the UTF-16
+> encoded filename. The number of characters of trailing data is given by
+> the 'length' field in the struct and this must be validated against the
+> size of the data packet received from the guest.
 >
-> On Tue, 16 Apr 2019 at 14:35, Peter Maydell <peter.maydell@linaro.org> wr=
-ote:
-> >
-> > On Mon, 15 Apr 2019 at 16:45, Daniel P. Berrang=C3=A9 <berrange@redhat.=
-com> wrote:
-> > >
-> > > Two previous attempts to fix this due to GCC 9 highlighting
-> > > unaligned data access. My attempt:
-> > >
-> > >   https://lists.gnu.org/archive/html/qemu-devel/2019-03/msg07763.html
-> > >
-> > > And a previous one:
-> > >
-> > >   https://lists.gnu.org/archive/html/qemu-devel/2019-02/msg07923.html
-> > >   https://lists.gnu.org/archive/html/qemu-devel/2019-03/msg00162.html
-> > >
-> > > There are a number of bugs in the USB MTP usb_mtp_write_metadata
-> > > method handling the filename character set conversion.
-> > >
-> > > The 2nd patch in this series is a security flaw fix since the
-> > > code was not correctly validating guest provided data length.
-> >
-> > Given that we don't seem to be confident in this fix just now,
-> > and this is a read-only buffer overrun in a not-commonly-used
-> > feature that only happens if you explicitly enable write support,
-> > my current thought is that we should not try to put this into 4.0
-> > (but instead treat it as we would a security issue that had
-> > occurred after we released 4.0).
-> >
-> > Opinions? Maybe we should just apply patch 2/3 for 4.0 ?
+> Since the data is UTF-16, we must convert the byte count we have to a
+> character count before validating. This must take care to truncate if
+> a malicious guest sent an odd number of bytes.
 >
-> Having thought a bit more I think I'd definitely like to apply
-> just patch 2 for 4.0. Could people try to test that and confirm
-> that it at least does not make the feature behave any worse?
+> Signed-off-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
+> ---
+>  hw/usb/dev-mtp.c | 11 +++++++++--
+>  1 file changed, 9 insertions(+), 2 deletions(-)
+>
+> diff --git a/hw/usb/dev-mtp.c b/hw/usb/dev-mtp.c
+> index 838cd74da6..6b7d1296e4 100644
+> --- a/hw/usb/dev-mtp.c
+> +++ b/hw/usb/dev-mtp.c
+> @@ -1699,12 +1699,19 @@ static void usb_mtp_write_metadata(MTPState *s, u=
+int64_t dlen)
+>      MTPObject *o;
+>      MTPObject *p =3D usb_mtp_object_lookup(s, s->dataset.parent_handle);
+>      uint32_t next_handle =3D s->next_handle;
+> +    size_t filename_chars =3D dlen - offsetof(ObjectInfo, filename);
+> +
+> +    /*
+> +     * filename is utf-16. We're intentionally doing
+> +     * integer division to truncate if malicious guest
+> +     * sent an odd number of bytes.
+> +     */
+> +    filename_chars /=3D 2;
+>=20=20
+>      assert(!s->write_pending);
+>      assert(p !=3D NULL);
+>=20=20
+> -    filename =3D utf16_to_str(MIN(dataset->length,
+> -                                dlen - offsetof(ObjectInfo, filename)),
+> +    filename =3D utf16_to_str(MIN(dataset->length, filename_chars),
+>                              dataset->filename);
+>=20=20
+>      if (strchr(filename, '/')) {
 
-I've done a tentative merge test of patch 2, which is OK.
-I'd like to push that either today or tomorrow (uk time):
-objections?
-
-thanks
--- PMM
+Reviewed-by: Bandan Das <bsd@redhat.com>
