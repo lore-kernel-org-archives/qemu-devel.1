@@ -1,28 +1,31 @@
-Received: from eggs.gnu.org ([209.51.188.92]:37818)
+Received: from eggs.gnu.org ([209.51.188.92]:38572)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1hGRsM-0005Kb-K5
-	for qemu-devel@nongnu.org; Tue, 16 Apr 2019 13:28:07 -0400
+	(envelope-from <richard.henderson@linaro.org>) id 1hGRwe-0006Vk-EG
+	for qemu-devel@nongnu.org; Tue, 16 Apr 2019 13:32:34 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1hGRsL-000108-MQ
-	for qemu-devel@nongnu.org; Tue, 16 Apr 2019 13:28:06 -0400
-Received: from mail-oi1-x242.google.com ([2607:f8b0:4864:20::242]:38726)
+	(envelope-from <richard.henderson@linaro.org>) id 1hGRwd-0002me-G3
+	for qemu-devel@nongnu.org; Tue, 16 Apr 2019 13:32:32 -0400
+Received: from mail-pg1-x543.google.com ([2607:f8b0:4864:20::543]:43139)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1hGRsL-0000zd-FK
-	for qemu-devel@nongnu.org; Tue, 16 Apr 2019 13:28:05 -0400
-Received: by mail-oi1-x242.google.com with SMTP id a6so17661273oie.5
-	for <qemu-devel@nongnu.org>; Tue, 16 Apr 2019 10:28:05 -0700 (PDT)
+	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+	id 1hGRwd-0002ls-25
+	for qemu-devel@nongnu.org; Tue, 16 Apr 2019 13:32:31 -0400
+Received: by mail-pg1-x543.google.com with SMTP id z9so10661133pgu.10
+	for <qemu-devel@nongnu.org>; Tue, 16 Apr 2019 10:32:30 -0700 (PDT)
+From: Richard Henderson <richard.henderson@linaro.org>
+References: <20190401031155.21293-1-richard.henderson@linaro.org>
+	<20190401031155.21293-4-richard.henderson@linaro.org>
+	<c6b66db9-24d5-b55b-8b45-e73f3d7c3fba@mail.uni-paderborn.de>
+	<50effb1c-3bbe-126b-9bfb-0b65eacc9c36@linaro.org>
+Message-ID: <abdf9c63-8f27-8cb2-dc94-22318c3836ae@linaro.org>
+Date: Tue, 16 Apr 2019 07:32:25 -1000
 MIME-Version: 1.0
-References: <20190415154503.6758-1-berrange@redhat.com>
-	<CAFEAcA-YpG71aGtTVMafShGyd9uM599Uy_8S3vvvnPzfiKMqnw@mail.gmail.com>
-In-Reply-To: <CAFEAcA-YpG71aGtTVMafShGyd9uM599Uy_8S3vvvnPzfiKMqnw@mail.gmail.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 16 Apr 2019 18:27:52 +0100
-Message-ID: <CAFEAcA-kywfUEZARqzH=obD1p3UsAcsNneK-X0BPpoFnV-QK0A@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH 0/3] usb-mtp: fix ObjectInfo request
- handling
+In-Reply-To: <50effb1c-3bbe-126b-9bfb-0b65eacc9c36@linaro.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH for-4.1 3/8] target/riscv: Merge argument
+ sets for insn32 and insn16
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,43 +34,51 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Daniel_P=2E_Berrang=C3=A9?= <berrange@redhat.com>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, Gerd Hoffmann <kraxel@redhat.com>, Bandan Das <bsd@redhat.com>, Thomas Huth <thuth@redhat.com>, Greg Kurz <groug@kaod.org>, Peter Maydell <peter.maydell@linaro.org>, Eric Blake <eblake@redhat.com>
+To: Bastian Koppelmann <kbastian@mail.uni-paderborn.de>, qemu-devel@nongnu.org
+Cc: palmer@sifive.com, Alistair.Francis@wdc.com, qemu-riscv@nongnu.org
 
-On Tue, 16 Apr 2019 at 14:35, Peter Maydell <peter.maydell@linaro.org> wrot=
-e:
->
-> On Mon, 15 Apr 2019 at 16:45, Daniel P. Berrang=C3=A9 <berrange@redhat.co=
-m> wrote:
-> >
-> > Two previous attempts to fix this due to GCC 9 highlighting
-> > unaligned data access. My attempt:
-> >
-> >   https://lists.gnu.org/archive/html/qemu-devel/2019-03/msg07763.html
-> >
-> > And a previous one:
-> >
-> >   https://lists.gnu.org/archive/html/qemu-devel/2019-02/msg07923.html
-> >   https://lists.gnu.org/archive/html/qemu-devel/2019-03/msg00162.html
-> >
-> > There are a number of bugs in the USB MTP usb_mtp_write_metadata
-> > method handling the filename character set conversion.
-> >
-> > The 2nd patch in this series is a security flaw fix since the
-> > code was not correctly validating guest provided data length.
->
-> Given that we don't seem to be confident in this fix just now,
-> and this is a read-only buffer overrun in a not-commonly-used
-> feature that only happens if you explicitly enable write support,
-> my current thought is that we should not try to put this into 4.0
-> (but instead treat it as we would a security issue that had
-> occurred after we released 4.0).
->
-> Opinions? Maybe we should just apply patch 2/3 for 4.0 ?
+On 4/16/19 7:22 AM, Richard Henderson wrote:
+> diff --git a/target/riscv/translate.c b/target/riscv/translate.c
+> index fb66e886bf..c96c616539 100644
+> --- a/target/riscv/translate.c
+> +++ b/target/riscv/translate.c
+> @@ -695,6 +695,7 @@ static bool gen_shift(DisasContext *ctx, arg_r *a,
+>   */
+>  #pragma GCC diagnostic push
+>  #pragma GCC diagnostic ignored "-Wredundant-decls"
+> +#pragma GCC diagnostic ignored "-Wtypedef-redefinition"
 
-Having thought a bit more I think I'd definitely like to apply
-just patch 2 for 4.0. Could people try to test that and confirm
-that it at least does not make the feature behave any worse?
+Bah.  Of course gcc doesn't know this one.  And looking closer elsewhere, I see
+we've got a configure test for the pragmas, which I suppose I ought to use.
 
-thanks
--- PMM
+
+r~
+
+
+diff --git a/target/riscv/translate.c b/target/riscv/translate.c
+index fb66e886bf..b62ca04281 100644
+--- a/target/riscv/translate.c
++++ b/target/riscv/translate.c
+@@ -693,12 +693,19 @@ static bool gen_shift(DisasContext *ctx, arg_r *a,
+  * initially declared by the 32-bit decoder, which results in duplicate
+  * declaration warnings.  Suppress them.
+  */
+-#pragma GCC diagnostic push
+-#pragma GCC diagnostic ignored "-Wredundant-decls"
++#ifdef CONFIG_PRAGMA_DIAGNOSTIC_AVAILABLE
++# pragma GCC diagnostic push
++# pragma GCC diagnostic ignored "-Wredundant-decls"
++# ifdef __clang__
++#  pragma GCC diagnostic ignored "-Wtypedef-redefinition"
++# endif
++#endif
+
+ #include "decode_insn16.inc.c"
+
+-#pragma GCC diagnostic pop
++#ifdef CONFIG_PRAGMA_DIAGNOSTIC_AVAILABLE
++# pragma GCC diagnostic pop
++#endif
+
+ static void decode_opc(DisasContext *ctx)
+ {
