@@ -2,74 +2,128 @@ Return-Path: <SRS0=xvb4=SS=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.7 required=3.0 tests=FREEMAIL_FORGED_FROMDOMAIN,
-	FREEMAIL_FROM,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 040C7C10F13
-	for <qemu-devel@archiver.kernel.org>; Tue, 16 Apr 2019 13:57:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AAC31C10F13
+	for <qemu-devel@archiver.kernel.org>; Tue, 16 Apr 2019 14:02:57 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id CED7D21B26
-	for <qemu-devel@archiver.kernel.org>; Tue, 16 Apr 2019 13:57:05 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CED7D21B26
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=centrum.cz
+	by mail.kernel.org (Postfix) with ESMTPS id 7FB1B223AF
+	for <qemu-devel@archiver.kernel.org>; Tue, 16 Apr 2019 14:02:57 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7FB1B223AF
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:37376 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:37460 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hGOa9-0001Kl-1M
-	for qemu-devel@archiver.kernel.org; Tue, 16 Apr 2019 09:57:05 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:48564)
+	id 1hGOfo-0002X6-Dt
+	for qemu-devel@archiver.kernel.org; Tue, 16 Apr 2019 10:02:56 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:49656)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1hGOYi-0000N9-9p
-	for qemu-devel@nongnu.org; Tue, 16 Apr 2019 09:55:37 -0400
+	(envelope-from <pbonzini@redhat.com>) id 1hGOec-0002AI-Tl
+	for qemu-devel@nongnu.org; Tue, 16 Apr 2019 10:01:43 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1hGOYh-0006Pv-7D
-	for qemu-devel@nongnu.org; Tue, 16 Apr 2019 09:55:36 -0400
-Received: from indium.canonical.com ([91.189.90.7]:38828)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1hGOYh-0006PR-0S
-	for qemu-devel@nongnu.org; Tue, 16 Apr 2019 09:55:35 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1hGOYf-0001rG-N7
-	for <qemu-devel@nongnu.org>; Tue, 16 Apr 2019 13:55:33 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id ADFD92E80C0
-	for <qemu-devel@nongnu.org>; Tue, 16 Apr 2019 13:55:33 +0000 (UTC)
+	(envelope-from <pbonzini@redhat.com>) id 1hGOeY-0001Jn-2y
+	for qemu-devel@nongnu.org; Tue, 16 Apr 2019 10:01:42 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:48338)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1hGOeX-0001J4-Hq
+	for qemu-devel@nongnu.org; Tue, 16 Apr 2019 10:01:37 -0400
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+	[10.5.11.11])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 3412B307EAA0;
+	Tue, 16 Apr 2019 14:01:36 +0000 (UTC)
+Received: from [10.36.112.49] (ovpn-112-49.ams2.redhat.com [10.36.112.49])
+	by smtp.corp.redhat.com (Postfix) with ESMTPS id E897F60139;
+	Tue, 16 Apr 2019 14:01:31 +0000 (UTC)
+To: Wei Li <wei.d.li@oracle.com>, Stefan Hajnoczi <stefanha@gmail.com>
+References: <5FF901C1-0AA5-4308-A65C-C448D0A2BA63@oracle.com>
+	<20190305172905.GD13806@stefanha-x1.localdomain>
+	<2D7F11D0-4A02-4A0F-961D-854240376B17@oracle.com>
+	<20190401090724.GA643@stefanha-x1.localdomain>
+	<C0F977FC-A960-4FA5-B2DF-BBD9DA664F8A@oracle.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Openpgp: preference=signencrypt
+Autocrypt: addr=pbonzini@redhat.com; prefer-encrypt=mutual; keydata=
+	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
+	uUHgL9dKIfvpm+rNXRn9wAwGjk0X/A==
+Message-ID: <0c0f2d54-2b94-e278-cbce-b7175ba29cc8@redhat.com>
+Date: Tue, 16 Apr 2019 16:01:29 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+	Thunderbird/60.6.1
 MIME-Version: 1.0
+In-Reply-To: <C0F977FC-A960-4FA5-B2DF-BBD9DA664F8A@oracle.com>
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Tue, 16 Apr 2019 13:39:16 -0000
-From: John Doe <maildir@centrum.cz>
-To: qemu-devel@nongnu.org
-X-Launchpad-Notification-Type: bug
-X-Launchpad-Bug: product=qemu; status=Incomplete; importance=Undecided;
-	assignee=None; 
-X-Launchpad-Bug-Information-Type: Public
-X-Launchpad-Bug-Private: no
-X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: maildir-2 th-huth
-X-Launchpad-Bug-Reporter: John Doe (maildir-2)
-X-Launchpad-Bug-Modifier: John Doe (maildir-2)
-References: <20160208150110.15874.66099.malonedeb@gac.canonical.com>
-Message-Id:
- <155542195661.20393.16865013643813448698.malone@chaenomeles.canonical.com>
-X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
-X-Launchpad-Message-For: qemu-devel-ml
-Precedence: bulk
-X-Generated-By: Launchpad (canonical.com); Revision="18920";
-	Instance="launchpad-lazr.conf"
-X-Launchpad-Hash: 6be592aad7fb88d43ee01f29dc21ddc4e78ed295
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+	(mx1.redhat.com [10.5.110.44]);
+	Tue, 16 Apr 2019 14:01:36 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 91.189.90.7
-Subject: [Qemu-devel] [Bug 1543163] Re: VMs unable to boot from network with
- e1000 since 2.2
+X-Received-From: 209.132.183.28
+Subject: Re: [Qemu-devel] Following up questions related to QEMU and I/O
+ Thread
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
+Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -78,81 +132,24 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1543163 <1543163@bugs.launchpad.net>
+Cc: qemu-devel@nongnu.org, Stefan Hajnoczi <stefanha@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190416133916.j09XeQ3kGG1J3r4fvylrYLyYa70THTTixP6ZFJQONwo@z>
+Message-ID: <20190416140129.J6tx3UtgFSDdb3NZ8RMSq-MkrA8EvC7fdf2BA-Js7Lw@z>
 
-I have 3.10 and I managed to boot with e1000 at least in BIOS mode. I am no=
-t sure about UEFI mode, because I get no output on "screen" for whatever, p=
-erhaps unrelated reason.
-Anyway, I think we may close it for now.
+On 05/04/19 23:09, Wei Li wrote:
+> Thanks Stefan for your quick response!
+> 
+> Hi Paolo, Could you please send us a link related to the multiqueue
+> feature which you are working on so that we could start getting some
+> details about the feature.
 
--- =
+I have never gotten to the point of multiqueue, a prerequisite for that
+was to make the block layer thread safe.
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1543163
+The latest state of the work is at github.com/bonzini/qemu, branch
+dataplane7.
 
-Title:
-  VMs unable to boot from network with e1000 since 2.2
-
-Status in QEMU:
-  Incomplete
-
-Bug description:
-  With KVM/QEMU version 1.4, using e1000 NIC, virtual machines boot from
-  network alright; they get an IP from DHCP server (machine A), then
-  connect to Microsoft System Center (machine B) and proceed to boot
-  into Windows PE, install images etc.
-
-  However, with versions at least 2.2 and 2.5, using same NIC, virtual
-  machines fail to boot from network; they still get an IP from A, but
-  then fail "contacting B using gateway (0.0.0.0). Different NICs do not
-  help except for i82551, which however causes problems further down the
-  road (presumably because there is no driver for that card in PE (based
-  on Windows 7/8/10)).
-
-  Note that actual physical machines work.
-
-  Wireshark reveals this:
-
-  QEMU 1.4 + Intel e1000
-  **********************
-  1) client sends DHCP discover
-  2) machine A answers, offers an IP, gateway and itself as next server
-  3) machine B answers, offers no IP, but gateway and itself as next server
-  4) client requests the IP
-  5) machine A ACKs
-  6) client sends unicast request for ??? to B
-  7) B offers (unicast) a boot file (some .com)
-  8) client sends another unicast request for ??? to B
-  9) B again offers the boot file
-  (then they chat a bit, B offers another file, client downloads some stuff=
- via TFTP etc.)
-
-  =
-
-  QEMU 2.2/2.5 + Intel e1000
-  **************************
-  1) client sends DHCP discover
-  2) machine A answers, offers an IP, gateway and itself as next server
-  3) machine B answers, offers no IP, but gateway and itself as next server
-  4) client requests the IP
-  5) machine A ACKs
-  6) client sends _broadcast_ request for ??? to B
-  7) B offers (likewise broadcast) a boot file
-  8) client sends another request, this time unicast and claims "Client IP =
-address =3D 0.0.0.0"
-  (and it basically hangs)
-
-  =
-
-  So, since some time after 1.4, QEMUlated machines with otherwise trusty e=
-1000 can no longer boot from network and it might be due to different behav=
-iour.
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1543163/+subscriptions
+Paolo
 
