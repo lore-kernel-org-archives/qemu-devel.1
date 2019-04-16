@@ -1,34 +1,26 @@
-Received: from eggs.gnu.org ([209.51.188.92]:44467)
+Received: from eggs.gnu.org ([209.51.188.92]:46535)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1hGIYG-0005dJ-N6
-	for qemu-devel@nongnu.org; Tue, 16 Apr 2019 03:30:45 -0400
+	(envelope-from <sgarzare@redhat.com>) id 1hGIis-0006o4-Ka
+	for qemu-devel@nongnu.org; Tue, 16 Apr 2019 03:41:43 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1hGIYF-000142-Mt
-	for qemu-devel@nongnu.org; Tue, 16 Apr 2019 03:30:44 -0400
-Received: from indium.canonical.com ([91.189.90.7]:42004)
+	(envelope-from <sgarzare@redhat.com>) id 1hGIir-0007oi-At
+	for qemu-devel@nongnu.org; Tue, 16 Apr 2019 03:41:42 -0400
+Received: from mail-wm1-f67.google.com ([209.85.128.67]:56037)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1hGIYF-00012V-Do
-	for qemu-devel@nongnu.org; Tue, 16 Apr 2019 03:30:43 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1hGIYE-0002QC-3m
-	for <qemu-devel@nongnu.org>; Tue, 16 Apr 2019 07:30:42 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 086752E80CC
-	for <qemu-devel@nongnu.org>; Tue, 16 Apr 2019 07:30:42 +0000 (UTC)
+	(Exim 4.71) (envelope-from <sgarzare@redhat.com>) id 1hGIiq-0007ne-Uv
+	for qemu-devel@nongnu.org; Tue, 16 Apr 2019 03:41:41 -0400
+Received: by mail-wm1-f67.google.com with SMTP id o25so23969060wmf.5
+	for <qemu-devel@nongnu.org>; Tue, 16 Apr 2019 00:41:39 -0700 (PDT)
+Date: Tue, 16 Apr 2019 09:41:35 +0200
+From: Stefano Garzarella <sgarzare@redhat.com>
+Message-ID: <20190416074135.qo4l3vra2g6n2rts@steredhat.homenet.telecomitalia.it>
+References: <CAMo8BfLCON2wbQ36dkVQ92tcVPWoPdje12CqySFnJyoYDDOdDg@mail.gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Tue, 16 Apr 2019 07:16:46 -0000
-From: Thomas Huth <1529226@bugs.launchpad.net>
-Reply-To: Bug 1529226 <1529226@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <20151225114312.18411.84061.malonedeb@wampee.canonical.com>
-Message-Id: <155539900643.8369.575534524882169330.malone@wampee.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1529226] Re: qemu-i386-user on 32-bit Linux:
- uncaught target signal 11
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CAMo8BfLCON2wbQ36dkVQ92tcVPWoPdje12CqySFnJyoYDDOdDg@mail.gmail.com>
+Subject: Re: [Qemu-devel] recent QEMU-w64 does not load multiboot kernels by
+ default
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,43 +29,33 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Max Filippov <jcmvbkbc@gmail.com>
+Cc: qemu-devel <qemu-devel@nongnu.org>, Stefan Weil <sw@weilnetz.de>
 
-Looking through old bug tickets... can you still reproduce this issue
-with the latest version of QEMU?
+On Mon, Apr 15, 2019 at 03:20:42PM -0700, Max Filippov wrote:
+> Hello,
+> 
+> recent qemu-system-i386 for w64 (e.g. one installed from
+> https://qemu.weilnetz.de/w64/qemu-w64-setup-20190218.exe )
+> refuses to load multiboot kernel by default:
+> 
+>   "C:\Program Files\qemu\qemu-system-i386.exe" -kernel p:\tmp\kernel
+>   C:\Program Files\qemu\qemu-system-i386.exe: Error loading
+> uncompressed kernel without PVH ELF Note
+> 
+> Adding -M pc-i440fx-3.1 (as well as most other machines, but not
+> pc-i440fx-4.0) fixes that. On linux host the same kernel gets loaded
+> either way (with or without -M).
 
-** Changed in: qemu
-       Status: New =3D> Incomplete
+Hi Max,
+there was an issue when we introduced PVH support and we fixed it. [1]
+Maybe the build that you used (20190218) was compiled before the merge of
+that fix (20190311).
 
--- =
+Can you try to build the 4.0-rc3?
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1529226
+Cheers,
+Stefano
 
-Title:
-  qemu-i386-user on 32-bit Linux: uncaught target signal 11
 
-Status in QEMU:
-  Incomplete
-
-Bug description:
-  Even though the command I'm trying to run (a wrapper script for
-  qemu-i386-user running rustc, the rust compiler)  produces the
-  expected  compiled output, the build process is interrupted:
-
-  qemu: uncaught target signal 11 (Segmentation fault) - core dumped
-  i686-unknown-linux-gnu/stage0/bin/rustc: line 1:  7474 Segmentation fault=
-      /usr/local/bin/qemu-i386 -cpu qemu32 /home/petevine/stage0/rustc.bin =
--C target-cpu=3Dpentium2 -L /home/petevine/unpacked/rust-master/i686-unknow=
-n-linux-gnu/stage0/lib/rustlib/i686-unknown-linux-gnu/lib/ "$@"
-  make: *** [i686-unknown-linux-gnu/stage0/lib/rustlib/i686-unknown-linux-g=
-nu/lib/stamp.rustc_back] Error 139
-
-  The stamp file is not being created so this could be about forking
-  bash after finishing the wrapper script.
-
-  Qemu was compiled from the latest git source.
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1529226/+subscriptions
+[1] https://patchwork.ozlabs.org/patch/1042337/
