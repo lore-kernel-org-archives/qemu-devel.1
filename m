@@ -5,45 +5,45 @@ X-Spam-Level:
 X-Spam-Status: No, score=-0.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	MAILING_LIST_MULTI,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E6366C10F13
-	for <qemu-devel@archiver.kernel.org>; Tue, 16 Apr 2019 14:32:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 46A84C10F13
+	for <qemu-devel@archiver.kernel.org>; Tue, 16 Apr 2019 14:51:36 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B729B205F4
-	for <qemu-devel@archiver.kernel.org>; Tue, 16 Apr 2019 14:32:09 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B729B205F4
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id 1B6102077C
+	for <qemu-devel@archiver.kernel.org>; Tue, 16 Apr 2019 14:51:36 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1B6102077C
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=trillinis.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:37820 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:38008 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hGP85-0002V1-00
-	for qemu-devel@archiver.kernel.org; Tue, 16 Apr 2019 10:32:09 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:56513)
+	id 1hGPQs-0006XE-Vb
+	for qemu-devel@archiver.kernel.org; Tue, 16 Apr 2019 10:51:34 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:60397)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1hGP70-00021k-Kv
-	for qemu-devel@nongnu.org; Tue, 16 Apr 2019 10:31:03 -0400
+	(envelope-from <bounces@canonical.com>) id 1hGPQ0-0006Dw-Ae
+	for qemu-devel@nongnu.org; Tue, 16 Apr 2019 10:50:41 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1hGP6z-0004aL-Kb
-	for qemu-devel@nongnu.org; Tue, 16 Apr 2019 10:31:02 -0400
-Received: from indium.canonical.com ([91.189.90.7]:48938)
+	(envelope-from <bounces@canonical.com>) id 1hGPPz-00030o-AR
+	for qemu-devel@nongnu.org; Tue, 16 Apr 2019 10:50:40 -0400
+Received: from indium.canonical.com ([91.189.90.7]:54294)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1hGP6z-0004ZR-Dg
-	for qemu-devel@nongnu.org; Tue, 16 Apr 2019 10:31:01 -0400
+	id 1hGPPz-0002yM-20
+	for qemu-devel@nongnu.org; Tue, 16 Apr 2019 10:50:39 -0400
 Received: from loganberry.canonical.com ([91.189.90.37])
 	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1hGP6x-0007Uk-66
-	for <qemu-devel@nongnu.org>; Tue, 16 Apr 2019 14:30:59 +0000
+	id 1hGPPx-0001tR-GY
+	for <qemu-devel@nongnu.org>; Tue, 16 Apr 2019 14:50:37 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 23CA52E80CB
-	for <qemu-devel@nongnu.org>; Tue, 16 Apr 2019 14:30:59 +0000 (UTC)
+	by loganberry.canonical.com (Postfix) with ESMTP id 7A7B92E80CC
+	for <qemu-devel@nongnu.org>; Tue, 16 Apr 2019 14:50:37 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Tue, 16 Apr 2019 14:17:17 -0000
-From: Peter Maydell <peter.maydell@linaro.org>
+Date: Tue, 16 Apr 2019 14:41:31 -0000
+From: TimeMaster <timemaster@trillinis.com>
 To: qemu-devel@nongnu.org
 X-Launchpad-Notification-Type: bug
 X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
@@ -53,16 +53,15 @@ X-Launchpad-Bug-Private: no
 X-Launchpad-Bug-Security-Vulnerability: no
 X-Launchpad-Bug-Commenters: pmaydell timemaster5
 X-Launchpad-Bug-Reporter: TimeMaster (timemaster5)
-X-Launchpad-Bug-Modifier: Peter Maydell (pmaydell)
+X-Launchpad-Bug-Modifier: TimeMaster (timemaster5)
 References: <155531602468.14046.8896369782282114161.malonedeb@gac.canonical.com>
-Message-Id:
- <155542423775.21329.1334631485013398012.malone@soybean.canonical.com>
+Message-Id: <155542569115.14094.5882527741991186132.malone@gac.canonical.com>
 X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
 X-Launchpad-Message-For: qemu-devel-ml
 Precedence: bulk
 X-Generated-By: Launchpad (canonical.com); Revision="18920";
 	Instance="launchpad-lazr.conf"
-X-Launchpad-Hash: c03e1c5a07829e810bdbff44e175cded51d86577
+X-Launchpad-Hash: 62a38bd7cf2cc236b8897cb71cd19271f32f828f
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 91.189.90.7
 Subject: [Qemu-devel] [Bug 1824768] Re: Qemu ARMv7 TCG MultiThreading for
@@ -81,18 +80,19 @@ Reply-To: Bug 1824768 <1824768@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190416141717.3_3KZL33vsJVJfZzu9T8EECFIUuro2Gd_4yZR2NNCS8@z>
+Message-ID: <20190416144131.FnYACb9kbsXh57OYiWdOaHCZQeE8OASeUQNhK7zGRoY@z>
 
-Implementing a stronger guest memory model than the host has is tricky
--- we would need to emit barrier instructions after each guest load or
-store, which would slow down straight-line execution speed by quite a
-lot, perhaps by so much that it would outweigh the gain from being able
-to run more than one thread at once. (Perhaps some of the armv8 load-
-acquire/store-release insns would help, but they're no good to you on a
-v7 CPU.)
+Yes, I can imagine that.
 
-There aren't many people overall who want to try to run emulation on
-anything other than x86 host.
+Unfortunately, my programming knowledge isn't so strong to help you with
+it. But can help with testing if it is useful.
+
+Alex Benn=C3=A9e pointed me to this patch: =
+
+[RFC,v3,4/5] mttcg: Implement implicit ordering semantics
+
+Which maybe could help. I can try to compile it and do the requested
+tests.
 
 -- =
 
