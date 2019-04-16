@@ -2,112 +2,73 @@ Return-Path: <SRS0=xvb4=SS=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.7 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 61754C10F13
-	for <qemu-devel@archiver.kernel.org>; Tue, 16 Apr 2019 08:14:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 27138C10F13
+	for <qemu-devel@archiver.kernel.org>; Tue, 16 Apr 2019 08:17:00 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1AB1320821
-	for <qemu-devel@archiver.kernel.org>; Tue, 16 Apr 2019 08:14:30 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="P0QlTMD6"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1AB1320821
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
+	by mail.kernel.org (Postfix) with ESMTPS id E9F7620821
+	for <qemu-devel@archiver.kernel.org>; Tue, 16 Apr 2019 08:16:59 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E9F7620821
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:32783 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:32821 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hGJEb-0005n9-4D
-	for qemu-devel@archiver.kernel.org; Tue, 16 Apr 2019 04:14:29 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:54557)
+	id 1hGJH1-0006dE-7j
+	for qemu-devel@archiver.kernel.org; Tue, 16 Apr 2019 04:16:59 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:56438)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1hGJDk-0005RC-GC
-	for qemu-devel@nongnu.org; Tue, 16 Apr 2019 04:13:37 -0400
+	(envelope-from <bounces@canonical.com>) id 1hGJG0-0006JP-7J
+	for qemu-devel@nongnu.org; Tue, 16 Apr 2019 04:15:57 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1hGJDh-0002XQ-5P
-	for qemu-devel@nongnu.org; Tue, 16 Apr 2019 04:13:36 -0400
-Received: from mail-eopbgr70109.outbound.protection.outlook.com
-	([40.107.7.109]:61255
-	helo=EUR04-HE1-obe.outbound.protection.outlook.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
-	id 1hGJDe-0002VQ-0g; Tue, 16 Apr 2019 04:13:31 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=virtuozzo.com;
-	s=selector1;
-	h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
-	bh=HKjDxFNiBFWmkeKnD+h+c4y7N8d0l0hEju7/Tjgh9rg=;
-	b=P0QlTMD6qOrzOOkMklPACAXE6w9gNhZr9xQoLpuInbzUa9iiMWCWL15oSVC5jIqixXNu0M1bCp4Zr12eztZ5SnOPL6EnwJxoIVo9+zB4lgOelxcbrz6P3+apdIDaeWuLRKKNwNUGxVcHA74KrzN44esHxPJOV7gxc9MRWGfhwjA=
-Received: from DB7PR08MB3851.eurprd08.prod.outlook.com (20.178.46.222) by
-	DB7PR08MB3388.eurprd08.prod.outlook.com (20.176.238.93) with Microsoft
-	SMTP
-	Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
-	15.20.1792.19; Tue, 16 Apr 2019 08:13:25 +0000
-Received: from DB7PR08MB3851.eurprd08.prod.outlook.com
-	([fe80::3c82:5da0:1633:f949]) by
-	DB7PR08MB3851.eurprd08.prod.outlook.com
-	([fe80::3c82:5da0:1633:f949%3]) with mapi id 15.20.1792.018;
-	Tue, 16 Apr 2019 08:13:25 +0000
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-To: Max Reitz <mreitz@redhat.com>, "qemu-block@nongnu.org"
-	<qemu-block@nongnu.org>
-Thread-Topic: [PATCH v3 7/7] iotests: Test qemu-img convert -C --salvage
-Thread-Index: AQHU8hmBT59lFszKXEWbUVa7Q32DKKY+dFAA
-Date: Tue, 16 Apr 2019 08:13:25 +0000
-Message-ID: <c923c1c0-e866-9bbc-f351-1c5d861d830d@virtuozzo.com>
-References: <20190413165343.9018-1-mreitz@redhat.com>
-	<20190413165343.9018-8-mreitz@redhat.com>
-In-Reply-To: <20190413165343.9018-8-mreitz@redhat.com>
-Accept-Language: ru-RU, en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-clientproxiedby: HE1PR0701CA0059.eurprd07.prod.outlook.com
-	(2603:10a6:3:9e::27) To DB7PR08MB3851.eurprd08.prod.outlook.com
-	(2603:10a6:10:7b::30)
-authentication-results: spf=none (sender IP is )
-	smtp.mailfrom=vsementsov@virtuozzo.com; 
-x-ms-exchange-messagesentrepresentingtype: 1
-x-tagtoolbar-keys: D20190416111322433
-x-originating-ip: [185.231.240.5]
-x-ms-publictraffictype: Email
-x-ms-office365-filtering-correlation-id: 448d8191-d6c4-4f73-bb5b-08d6c24365fb
-x-microsoft-antispam: BCL:0; PCL:0;
-	RULEID:(2390118)(7020095)(4652040)(8989299)(4534185)(4627221)(201703031133081)(201702281549075)(8990200)(5600140)(711020)(4605104)(2017052603328)(7193020);
-	SRVR:DB7PR08MB3388; 
-x-ms-traffictypediagnostic: DB7PR08MB3388:
-x-microsoft-antispam-prvs: <DB7PR08MB3388F01F062C74C6F837915DC1240@DB7PR08MB3388.eurprd08.prod.outlook.com>
-x-forefront-prvs: 000947967F
-x-forefront-antispam-report: SFV:NSPM;
-	SFS:(10019020)(366004)(376002)(136003)(39850400004)(346002)(396003)(189003)(199004)(53936002)(476003)(6486002)(11346002)(6512007)(81166006)(107886003)(4326008)(8676002)(2616005)(229853002)(7736002)(110136005)(486006)(26005)(6436002)(14454004)(36756003)(6246003)(386003)(6506007)(81156014)(2501003)(6116002)(3846002)(25786009)(446003)(102836004)(186003)(256004)(54906003)(105586002)(31686004)(76176011)(97736004)(106356001)(99286004)(86362001)(71200400001)(478600001)(5660300002)(305945005)(8936002)(2906002)(68736007)(71190400001)(31696002)(66066001)(316002)(52116002);
-	DIR:OUT; SFP:1102; SCL:1; SRVR:DB7PR08MB3388;
-	H:DB7PR08MB3851.eurprd08.prod.outlook.com; FPR:; SPF:None;
-	LANG:en; PTR:InfoNoRecords; MX:1; A:1; 
-received-spf: None (protection.outlook.com: virtuozzo.com does not designate
-	permitted sender hosts)
-x-ms-exchange-senderadcheck: 1
-x-microsoft-antispam-message-info: c/voNTvwt7gLzV8cMWrTHhPgx2KcqnzYvL8CQlOsHz6q3WAGZ5iEz+FJz7Rm15+vTq9eplwXTfsxn0utuLi5Dsz1dwAx7TWSlEIA1HGd8BxgIYByskzJJh7RCNui4YeIsiowIGhePzpiR1ILPL8RB7y6NAnfjx1r6oQ42UJbFHOuklgFf1dB1cnGzS16vRGMAxKaD+yN4vEvzb1f/9eyi66vDBCpyiUpIJXcVbiLSrqygv5NaC8W5AE8efqzDBRdCoAgiV+zdA7cOi8uU5TUNqyPopA4q4ZDGxbK4aVD8QCdPb9MTXXKRDwwYx68PQXurz2g91bwYUYR6hEoYx+njcdhSOdGwTsTnG7JcmjkHNeiPT4YHd+Aswkl3OK/LYwyxffc4HdP1cAGvoTrDiZMIz844AvPp45ERKATFwKb9bY=
-Content-Type: text/plain; charset="UTF-8"
-Content-ID: <9D2143B25A15A14C8335426A255FE39A@eurprd08.prod.outlook.com>
-Content-Transfer-Encoding: base64
+	(envelope-from <bounces@canonical.com>) id 1hGJFz-0004Ou-1e
+	for qemu-devel@nongnu.org; Tue, 16 Apr 2019 04:15:56 -0400
+Received: from indium.canonical.com ([91.189.90.7]:51724)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1hGJFy-0004Nv-NV
+	for qemu-devel@nongnu.org; Tue, 16 Apr 2019 04:15:54 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1hGJFx-00085A-Fk
+	for <qemu-devel@nongnu.org>; Tue, 16 Apr 2019 08:15:53 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id EC43E2E80CC
+	for <qemu-devel@nongnu.org>; Tue, 16 Apr 2019 08:15:52 +0000 (UTC)
 MIME-Version: 1.0
-X-OriginatorOrg: virtuozzo.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 448d8191-d6c4-4f73-bb5b-08d6c24365fb
-X-MS-Exchange-CrossTenant-originalarrivaltime: 16 Apr 2019 08:13:25.2620 (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 0bc7f26d-0264-416e-a6fc-8352af79c58f
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DB7PR08MB3388
-X-detected-operating-system: by eggs.gnu.org: Windows 7 or 8 [fuzzy]
-X-Received-From: 40.107.7.109
-Subject: Re: [Qemu-devel] [PATCH v3 7/7] iotests: Test qemu-img convert -C
- --salvage
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Tue, 16 Apr 2019 08:08:37 -0000
+From: Thomas Huth <1824053@bugs.launchpad.net>
+To: qemu-devel@nongnu.org
+X-Launchpad-Notification-Type: bug
+X-Launchpad-Bug: product=qemu; status=Fix Released; importance=Undecided;
+	assignee=None; 
+X-Launchpad-Bug-Information-Type: Public
+X-Launchpad-Bug-Private: no
+X-Launchpad-Bug-Security-Vulnerability: no
+X-Launchpad-Bug-Commenters: jnsnow lizhengui th-huth
+X-Launchpad-Bug-Reporter: =?utf-8?b?6LSe6LS15p2OIChsaXpoZW5ndWkp?=
+X-Launchpad-Bug-Modifier: Thomas Huth (th-huth)
+References: <155486495593.20543.13567634487304856304.malonedeb@chaenomeles.canonical.com>
+Message-Id: <155540211727.14159.9797590858773633952.malone@gac.canonical.com>
+X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
+X-Launchpad-Message-For: qemu-devel-ml
+Precedence: bulk
+X-Generated-By: Launchpad (canonical.com); Revision="18920";
+	Instance="launchpad-lazr.conf"
+X-Launchpad-Hash: 750bcbcabc3f01aeb6fc01ddfa05a9e507f6dc30
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 91.189.90.7
+Subject: [Qemu-devel] [Bug 1824053] Re: Qemu-img convert appears to be stuck
+ on aarch64 host with low probability
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
-Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -116,49 +77,82 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>,
-	Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>,
-	"qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
-	Denis Lunev <den@virtuozzo.com>
+Reply-To: Bug 1824053 <1824053@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190416081325.UUuju82B4vqYNTsLp7ewTwWc66cDvCZPDs_q8jV-zIg@z>
+Message-ID: <20190416080837.njhmr3VHX2QYpJgWediqdHu_ihnk4AQ_pRtNE-Nxyno@z>
 
-MTMuMDQuMjAxOSAxOTo1MywgTWF4IFJlaXR6IHdyb3RlOg0KPiBXZSBkbyBub3Qgc3VwcG9ydCB0
-aGlzIGNvbWJpbmF0aW9uICh5ZXQpLCBzbyB0aGlzIHNob3VsZCB5aWVsZCBhbiBlcnJvcg0KPiBt
-ZXNzYWdlLg0KPiANCj4gU2lnbmVkLW9mZi1ieTogTWF4IFJlaXR6IDxtcmVpdHpAcmVkaGF0LmNv
-bT4NCg0KVGVzdGVkLWJ5OiBWbGFkaW1pciBTZW1lbnRzb3YtT2dpZXZza2l5IDx2c2VtZW50c292
-QHZpcnR1b3p6by5jb20+DQogICAgICAgICAgICBbb25seSAtcWNvdzIsIGFzIC1uZnMgLXFjb3cy
-IGlzIGFscmVhZHkgYnJva2VuXQ0KUmV2aWV3ZWQtYnk6IFZsYWRpbWlyIFNlbWVudHNvdi1PZ2ll
-dnNraXkgPHZzZW1lbnRzb3ZAdmlydHVvenpvLmNvbT4NCg0KSG1tLCBpbnRlcmVzdGluZywgdGhh
-dCB0aGlzIHRlc3QgaXMgZGVmaW5lZCBhcw0KX3N1cHBvcnRlZF9mbXQgcWNvdzINCl9zdXBwb3J0
-ZWRfcHJvdG8gZmlsZSBuZnMNCg0KQW5kIG9mIGNvdXJzZSwgaXQgZG9lc24ndCB3b3JrIGZvciAt
-cWNvdzIgLW5mcyBjb21iaW5hdGlvbi4uDQoNCj4gLS0tDQo+ICAgdGVzdHMvcWVtdS1pb3Rlc3Rz
-LzA4MiAgICAgfCAxICsNCj4gICB0ZXN0cy9xZW11LWlvdGVzdHMvMDgyLm91dCB8IDMgKysrDQo+
-ICAgMiBmaWxlcyBjaGFuZ2VkLCA0IGluc2VydGlvbnMoKykNCj4gDQo+IGRpZmYgLS1naXQgYS90
-ZXN0cy9xZW11LWlvdGVzdHMvMDgyIGIvdGVzdHMvcWVtdS1pb3Rlc3RzLzA4Mg0KPiBpbmRleCBk
-MGFmYTQ2ZTlhLi5jNThiMzcxMjdmIDEwMDc1NQ0KPiAtLS0gYS90ZXN0cy9xZW11LWlvdGVzdHMv
-MDgyDQo+ICsrKyBiL3Rlc3RzL3FlbXUtaW90ZXN0cy8wODINCj4gQEAgLTE2Myw2ICsxNjMsNyBA
-QCBlY2hvID09PSBjb252ZXJ0OiAtQyBhbmQgb3RoZXIgb3B0aW9ucyA9PT0NCj4gICBydW5fcWVt
-dV9pbWcgY29udmVydCAtQyAtUyA0ayAtTyAkSU1HRk1UICIkVEVTVF9JTUciICIkVEVTVF9JTUci
-LnRhcmdldA0KPiAgIHJ1bl9xZW11X2ltZyBjb252ZXJ0IC1DIC1TIDhrIC1PICRJTUdGTVQgIiRU
-RVNUX0lNRyIgIiRURVNUX0lNRyIudGFyZ2V0DQo+ICAgcnVuX3FlbXVfaW1nIGNvbnZlcnQgLUMg
-LWMgLU8gJElNR0ZNVCAiJFRFU1RfSU1HIiAiJFRFU1RfSU1HIi50YXJnZXQNCj4gK3J1bl9xZW11
-X2ltZyBjb252ZXJ0IC1DIC0tc2FsdmFnZSAtTyAkSU1HRk1UICIkVEVTVF9JTUciICIkVEVTVF9J
-TUciLnRhcmdldA0KPiAgIA0KPiAgIGVjaG8NCj4gICBlY2hvID09PSBhbWVuZDogT3B0aW9ucyBz
-cGVjaWZpZWQgbW9yZSB0aGFuIG9uY2UgPT09DQo+IGRpZmYgLS1naXQgYS90ZXN0cy9xZW11LWlv
-dGVzdHMvMDgyLm91dCBiL3Rlc3RzL3FlbXUtaW90ZXN0cy8wODIub3V0DQo+IGluZGV4IGQzNjkz
-OGRhOWIuLjlkNGY3NTc0YzkgMTAwNjQ0DQo+IC0tLSBhL3Rlc3RzL3FlbXUtaW90ZXN0cy8wODIu
-b3V0DQo+ICsrKyBiL3Rlc3RzL3FlbXUtaW90ZXN0cy8wODIub3V0DQo+IEBAIC01NTUsNiArNTU1
-LDkgQEAgcWVtdS1pbWc6IENhbm5vdCBlbmFibGUgY29weSBvZmZsb2FkaW5nIHdoZW4gLVMgaXMg
-dXNlZA0KPiAgIFRlc3Rpbmc6IGNvbnZlcnQgLUMgLWMgLU8gcWNvdzIgVEVTVF9ESVIvdC5xY293
-MiBURVNUX0RJUi90LnFjb3cyLnRhcmdldA0KPiAgIHFlbXUtaW1nOiBDYW5ub3QgZW5hYmxlIGNv
-cHkgb2ZmbG9hZGluZyB3aGVuIC1jIGlzIHVzZWQNCj4gICANCj4gK1Rlc3Rpbmc6IGNvbnZlcnQg
-LUMgLS1zYWx2YWdlIC1PIHFjb3cyIFRFU1RfRElSL3QucWNvdzIgVEVTVF9ESVIvdC5xY293Mi50
-YXJnZXQNCj4gK3FlbXUtaW1nOiBDYW5ub3QgdXNlIGNvcHkgb2ZmbG9hZGluZyBpbiBzYWx2YWdp
-bmcgbW9kZQ0KPiArDQo+ICAgPT09IGFtZW5kOiBPcHRpb25zIHNwZWNpZmllZCBtb3JlIHRoYW4g
-b25jZSA9PT0NCj4gICANCj4gICBUZXN0aW5nOiBhbWVuZCAtZiBmb28gLWYgcWNvdzIgLW8gbGF6
-eV9yZWZjb3VudHM9b24gVEVTVF9ESVIvdC5xY293Mg0KPiANCg0KDQotLSANCkJlc3QgcmVnYXJk
-cywNClZsYWRpbWlyDQo=
+Ok, we can track the bug reported by Dann Frazier in ticket 1805256
+instead.
+
+** Bug watch removed: Red Hat Bugzilla #1524770
+   https://bugzilla.redhat.com/show_bug.cgi?id=3D1524770
+
+-- =
+
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1824053
+
+Title:
+  Qemu-img convert appears to be stuck on aarch64 host with low
+  probability
+
+Status in QEMU:
+  Fix Released
+
+Bug description:
+  Hi,  I found a problem that qemu-img convert appears to be stuck on
+  aarch64 host with low probability.
+
+  The convert command  line is  "qemu-img convert -f qcow2 -O raw
+  disk.qcow2 disk.raw ".
+
+  The bt is below:
+
+  Thread 2 (Thread 0x40000b776e50 (LWP 27215)):
+  #0  0x000040000a3f2994 in sigtimedwait () from /lib64/libc.so.6
+  #1  0x000040000a39c60c in sigwait () from /lib64/libpthread.so.0
+  #2  0x0000aaaaaae82610 in sigwait_compat (opaque=3D0xaaaac5163b00) at uti=
+l/compatfd.c:37
+  #3  0x0000aaaaaae85038 in qemu_thread_start (args=3Dargs@entry=3D0xaaaac5=
+163b90) at util/qemu_thread_posix.c:496
+  #4  0x000040000a3918bc in start_thread () from /lib64/libpthread.so.0
+  #5  0x000040000a492b2c in thread_start () from /lib64/libc.so.6
+
+  Thread 1 (Thread 0x40000b573370 (LWP 27214)):
+  #0  0x000040000a489020 in ppoll () from /lib64/libc.so.6
+  #1  0x0000aaaaaadaefc0 in ppoll (__ss=3D0x0, __timeout=3D0x0, __nfds=3D<o=
+ptimized out>, __fds=3D<optimized out>) at /usr/include/bits/poll2.h:77
+  #2  qemu_poll_ns (fds=3D<optimized out>, nfds=3D<optimized out>, timeout=
+=3D<optimized out>) at qemu_timer.c:391
+  #3  0x0000aaaaaadae014 in os_host_main_loop_wait (timeout=3D<optimized ou=
+t>) at main_loop.c:272
+  #4  0x0000aaaaaadae190 in main_loop_wait (nonblocking=3D<optimized out>) =
+at main_loop.c:534
+  #5  0x0000aaaaaad97be0 in convert_do_copy (s=3D0xffffdc32eb48) at qemu-im=
+g.c:1923
+  #6  0x0000aaaaaada2d70 in img_convert (argc=3D<optimized out>, argv=3D<op=
+timized out>) at qemu-img.c:2414
+  #7  0x0000aaaaaad99ac4 in main (argc=3D7, argv=3D<optimized out>) at qemu=
+-img.c:5305
+
+  =
+
+  The problem seems to be very similar to the phenomenon described by this =
+patch (https://resources.ovirt.org/pub/ovirt-4.1/src/qemu-kvm-ev/0025-aio_n=
+otify-force-main-loop-wakeup-with-SIGIO-aarch64.patch), =
+
+
+  which force main loop wakeup with SIGIO.  But this patch was reverted
+  by the patch (http://ovirt.repo.nfrance.com/src/qemu-kvm-ev/kvm-
+  Revert-aio_notify-force-main-loop-wakeup-with-SIGIO-.patch).
+
+  The problem still seems to exist in aarch64 host. The qemu version I used=
+ is 2.8.1. The host version is 4.19.28-1.2.108.aarch64.
+   Do you have any solutions to fix it?  Thanks for your reply !
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1824053/+subscriptions
 
