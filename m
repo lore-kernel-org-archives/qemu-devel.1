@@ -1,23 +1,24 @@
-Received: from eggs.gnu.org ([209.51.188.92]:34045)
+Received: from eggs.gnu.org ([209.51.188.92]:34238)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <wzssyqa@gmail.com>) id 1hGNe8-0003y2-Vh
-	for qemu-devel@nongnu.org; Tue, 16 Apr 2019 08:57:10 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1hGNep-0004L6-Ly
+	for qemu-devel@nongnu.org; Tue, 16 Apr 2019 08:57:53 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <wzssyqa@gmail.com>) id 1hGNe7-0000Xb-2x
-	for qemu-devel@nongnu.org; Tue, 16 Apr 2019 08:57:08 -0400
-Received: from mail-pf1-x443.google.com ([2607:f8b0:4864:20::443]:36876)
+	(envelope-from <peter.maydell@linaro.org>) id 1hGNen-0000zv-W3
+	for qemu-devel@nongnu.org; Tue, 16 Apr 2019 08:57:51 -0400
+Received: from mail-wr1-x431.google.com ([2a00:1450:4864:20::431]:35804)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <wzssyqa@gmail.com>) id 1hGNe4-0000UA-HT
-	for qemu-devel@nongnu.org; Tue, 16 Apr 2019 08:57:05 -0400
-Received: by mail-pf1-x443.google.com with SMTP id 8so10386845pfr.4
-	for <qemu-devel@nongnu.org>; Tue, 16 Apr 2019 05:57:01 -0700 (PDT)
-Sender: YunQiang Su <wzssyqa@gmail.com>
-From: YunQiang Su <syq@debian.org>
-Date: Tue, 16 Apr 2019 20:56:41 +0800
-Message-Id: <20190416125641.3068-1-syq@debian.org>
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1hGNen-0000ym-EJ
+	for qemu-devel@nongnu.org; Tue, 16 Apr 2019 08:57:49 -0400
+Received: by mail-wr1-x431.google.com with SMTP id w1so26953421wrp.2
+	for <qemu-devel@nongnu.org>; Tue, 16 Apr 2019 05:57:49 -0700 (PDT)
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Tue, 16 Apr 2019 13:57:18 +0100
+Message-Id: <20190416125744.27770-1-peter.maydell@linaro.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH] binfmt_misc: pass info about P flag by AT_FLAGS
+Subject: [Qemu-devel] [PATCH 00/26] target/arm: Implement M profile floating
+ point
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,122 +27,77 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: linux-fsdevel@vger.kernel.org
-Cc: qemu-devel@nongnu.org, pburton@wavecomp.com, YunQiang Su <ysu@wavecomp.com>
+To: qemu-arm@nongnu.org, qemu-devel@nongnu.org
 
-From: YunQiang Su <ysu@wavecomp.com>
+This patchset implements floating point support for the
+M-profile Arm cores and enables it for the Cortex-M4 and
+Cortex-M33 (both of which should really have an FPU).
 
-Currently program invoked by binfmt_misc cannot be aware about whether
-P flag, aka preserve path is enabled.
+The floating point instructions for M-profile are basically
+the same as for A-profile (with some minor differences like
+not having all the VFP sysregs, and definitely not having
+the old VFP length/stride handling). The major differences are
+in the exception handling:
+ * on exception entry and exit we may want to stack and
+   unstack FP registers, as we do for integer registers
+ * M-profile supports a "lazy stacking" mode, which means that
+   on exception entry we do not stack the FP registers that
+   the calling convention requires us to preserve, but just
+   reserve space for them. Then if the exception handler
+   executes an FP instruction we spill the FP registers to
+   the stack only at that point
 
-Some applications like qemu need to know since it has 2 use case:
-  1. call by hand, like: qemu-mipsel-static test.app OPTION
-     so, qemu have to assume that P option is not enabled.
-  2. call by binfmt_misc. If qemu cannot know about whether P flag is
-     enabled, distribution's have to set qemu without P flag, and
-     binfmt_misc call qemu like:
-       qemu-mipsel-static /absolute/path/to/test.app OPTION
-     even test.app is not called by absoulute path, like
-       ./relative/path/to/test.app
+There are also two M-profile-only instructions, VLLDM and
+VLSTM, which are for guest code to actively trigger the
+lazy-stacking.
 
-This patch passes this information by the 3rd bits of unused AT_FLAGS.
-Then, in qemu, we can get this info by:
-   getauxval(AT_FLAGS) & (1<<3)
+Most interesting bit to review is probably whether I got the
+handling of the new TB flag bits right (in patches 18, 19
+and 23), since they have a kind of self-clearing property
+that's a bit non-standard.
 
-See: https://bugs.launchpad.net/qemu/+bug/1818483
-Signed-off-by: YunQiang Su <ysu@wavecomp.com>
----
- fs/binfmt_elf.c         | 6 +++++-
- fs/binfmt_elf_fdpic.c   | 9 +++++++--
- fs/binfmt_misc.c        | 2 ++
- include/linux/binfmts.h | 4 ++++
- 4 files changed, 18 insertions(+), 3 deletions(-)
+thanks
+-- PMM
 
-diff --git a/fs/binfmt_elf.c b/fs/binfmt_elf.c
-index 09e76b25d833..30688fbad615 100644
---- a/fs/binfmt_elf.c
-+++ b/fs/binfmt_elf.c
-@@ -175,6 +175,7 @@ create_elf_tables(struct linux_binprm *bprm, struct elfhdr *exec,
- 	unsigned char k_rand_bytes[16];
- 	int items;
- 	elf_addr_t *elf_info;
-+	elf_addr_t flags = 0;
- 	int ei_index = 0;
- 	const struct cred *cred = current_cred();
- 	struct vm_area_struct *vma;
-@@ -249,7 +250,10 @@ create_elf_tables(struct linux_binprm *bprm, struct elfhdr *exec,
- 	NEW_AUX_ENT(AT_PHENT, sizeof(struct elf_phdr));
- 	NEW_AUX_ENT(AT_PHNUM, exec->e_phnum);
- 	NEW_AUX_ENT(AT_BASE, interp_load_addr);
--	NEW_AUX_ENT(AT_FLAGS, 0);
-+	if (bprm->interp_flags & BINPRM_FLAGS_PRESERVE_ARGV0) {
-+		flags |= BINPRM_FLAGS_PRESERVE_ARGV0;
-+	}
-+	NEW_AUX_ENT(AT_FLAGS, flags);
- 	NEW_AUX_ENT(AT_ENTRY, exec->e_entry);
- 	NEW_AUX_ENT(AT_UID, from_kuid_munged(cred->user_ns, cred->uid));
- 	NEW_AUX_ENT(AT_EUID, from_kuid_munged(cred->user_ns, cred->euid));
-diff --git a/fs/binfmt_elf_fdpic.c b/fs/binfmt_elf_fdpic.c
-index b53bb3729ac1..ba3385be00fb 100644
---- a/fs/binfmt_elf_fdpic.c
-+++ b/fs/binfmt_elf_fdpic.c
-@@ -46,7 +46,7 @@
- 
- typedef char *elf_caddr_t;
- 
--#if 0
-+#if 1
- #define kdebug(fmt, ...) printk("FDPIC "fmt"\n" ,##__VA_ARGS__ )
- #else
- #define kdebug(fmt, ...) do {} while(0)
-@@ -511,6 +511,7 @@ static int create_elf_fdpic_tables(struct linux_binprm *bprm,
- 	char __user *u_platform, *u_base_platform, *p;
- 	int loop;
- 	int nr;	/* reset for each csp adjustment */
-+	unsigned long flags = 0;
- 
- #ifdef CONFIG_MMU
- 	/* In some cases (e.g. Hyper-Threading), we want to avoid L1 evictions
-@@ -651,7 +652,11 @@ static int create_elf_fdpic_tables(struct linux_binprm *bprm,
- 	NEW_AUX_ENT(AT_PHENT,	sizeof(struct elf_phdr));
- 	NEW_AUX_ENT(AT_PHNUM,	exec_params->hdr.e_phnum);
- 	NEW_AUX_ENT(AT_BASE,	interp_params->elfhdr_addr);
--	NEW_AUX_ENT(AT_FLAGS,	0);
-+	if (bprm->interp_flags & BINPRM_FLAGS_PRESERVE_ARGV0) {
-+		flags |= BINPRM_FLAGS_PRESERVE_ARGV0;
-+	}
-+	kdebug("AT_FLAGS %ld\n", flags);
-+	NEW_AUX_ENT(AT_FLAGS,	flags);
- 	NEW_AUX_ENT(AT_ENTRY,	exec_params->entry_addr);
- 	NEW_AUX_ENT(AT_UID,	(elf_addr_t) from_kuid_munged(cred->user_ns, cred->uid));
- 	NEW_AUX_ENT(AT_EUID,	(elf_addr_t) from_kuid_munged(cred->user_ns, cred->euid));
-diff --git a/fs/binfmt_misc.c b/fs/binfmt_misc.c
-index aa4a7a23ff99..46c509cd096e 100644
---- a/fs/binfmt_misc.c
-+++ b/fs/binfmt_misc.c
-@@ -156,6 +156,8 @@ static int load_misc_binary(struct linux_binprm *bprm)
- 		retval = remove_arg_zero(bprm);
- 		if (retval)
- 			goto ret;
-+	} else {
-+		bprm->interp_flags |= BINPRM_FLAGS_PRESERVE_ARGV0;
- 	}
- 
- 	if (fmt->flags & MISC_FMT_OPEN_BINARY) {
-diff --git a/include/linux/binfmts.h b/include/linux/binfmts.h
-index 688ab0de7810..c082650a0310 100644
---- a/include/linux/binfmts.h
-+++ b/include/linux/binfmts.h
-@@ -77,6 +77,10 @@ struct linux_binprm {
- #define BINPRM_FLAGS_PATH_INACCESSIBLE_BIT 2
- #define BINPRM_FLAGS_PATH_INACCESSIBLE (1 << BINPRM_FLAGS_PATH_INACCESSIBLE_BIT)
- 
-+/* if preserve the argv0 for the interpreter  */
-+#define BINPRM_FLAGS_PRESERVE_ARGV0_BIT 3
-+#define BINPRM_FLAGS_PRESERVE_ARGV0 (1 << BINPRM_FLAGS_PRESERVE_ARGV0_BIT)
-+
- /* Function parameter for binfmt->coredump */
- struct coredump_params {
- 	const kernel_siginfo_t *siginfo;
+Peter Maydell (26):
+  target/arm: Make sure M-profile FPSCR RES0 bits are not settable
+  hw/intc/armv7m_nvic: Allow reading of M-profile MVFR* registers
+  target/arm: Implement dummy versions of M-profile FP-related registers
+  target/arm: Disable most VFP sysregs for M-profile
+  target/arm: Honour M-profile FP enable bits
+  target/arm: Decode FP instructions for M profile
+  target/arm: Clear CONTROL_S.SFPA in SG insn if FPU present
+  target/arm: Handle SFPA and FPCA bits in reads and writes of CONTROL
+  target/arm/helper: don't return early for STKOF faults during stacking
+  target/arm: Handle floating point registers in exception entry
+  target/arm: Implement v7m_update_fpccr()
+  target/arm: Clear CONTROL.SFPA in BXNS and BLXNS
+  target/arm: Clean excReturn bits when tail chaining
+  target/arm: Allow for floating point in callee stack integrity check
+  target/arm: Handle floating point registers in exception return
+  target/arm: Move NS TBFLAG from bit 19 to bit 6
+  target/arm: Overlap VECSTRIDE and XSCALE_CPAR TB flags
+  target/arm: Set FPCCR.S when executing M-profile floating point insns
+  target/arm: Activate M-profile floating point context when FPCCR.ASPEN
+    is set
+  target/arm: New helper function arm_v7m_mmu_idx_all()
+  target/arm: New function armv7m_nvic_set_pending_lazyfp()
+  target/arm: Add lazy-FP-stacking support to v7m_stack_write()
+  target/arm: Implement M-profile lazy FP state preservation
+  target/arm: Implement VLSTM for v7M CPUs with an FPU
+  target/arm: Implement VLLDM for v7M CPUs with an FPU
+  target/arm: Enable FPU for Cortex-M4 and Cortex-M33
+
+ target/arm/cpu.h        |  95 ++++-
+ target/arm/helper.h     |   5 +
+ target/arm/translate.h  |   3 +
+ hw/intc/armv7m_nvic.c   | 261 ++++++++++++
+ target/arm/cpu.c        |  20 +
+ target/arm/helper.c     | 873 +++++++++++++++++++++++++++++++++++++---
+ target/arm/machine.c    |  16 +
+ target/arm/translate.c  | 150 ++++++-
+ target/arm/vfp_helper.c |   8 +
+ 9 files changed, 1350 insertions(+), 81 deletions(-)
+
 -- 
 2.20.1
