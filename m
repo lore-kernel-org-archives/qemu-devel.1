@@ -2,49 +2,51 @@ Return-Path: <SRS0=xvb4=SS=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A1CA9C10F13
-	for <qemu-devel@archiver.kernel.org>; Tue, 16 Apr 2019 09:11:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D1074C10F13
+	for <qemu-devel@archiver.kernel.org>; Tue, 16 Apr 2019 09:14:37 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 77C2320645
-	for <qemu-devel@archiver.kernel.org>; Tue, 16 Apr 2019 09:11:51 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 77C2320645
+	by mail.kernel.org (Postfix) with ESMTPS id 9DAAE20675
+	for <qemu-devel@archiver.kernel.org>; Tue, 16 Apr 2019 09:14:37 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9DAAE20675
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:33523 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:33542 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hGK86-0003c4-NY
-	for qemu-devel@archiver.kernel.org; Tue, 16 Apr 2019 05:11:50 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:43322)
+	id 1hGKAm-0004bz-EY
+	for qemu-devel@archiver.kernel.org; Tue, 16 Apr 2019 05:14:36 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:43908)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1hGK6t-0002y3-Vx
-	for qemu-devel@nongnu.org; Tue, 16 Apr 2019 05:10:36 -0400
+	(envelope-from <david@redhat.com>) id 1hGK9V-00040u-R6
+	for qemu-devel@nongnu.org; Tue, 16 Apr 2019 05:13:18 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1hGK6t-0002vp-1E
-	for qemu-devel@nongnu.org; Tue, 16 Apr 2019 05:10:35 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:49854)
+	(envelope-from <david@redhat.com>) id 1hGK9T-000467-V4
+	for qemu-devel@nongnu.org; Tue, 16 Apr 2019 05:13:17 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:35711)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <david@redhat.com>)
-	id 1hGK6s-0002ut-Kn; Tue, 16 Apr 2019 05:10:34 -0400
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
-	[10.5.11.22])
+	id 1hGK9Q-000427-Cu; Tue, 16 Apr 2019 05:13:14 -0400
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+	[10.5.11.15])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id BC0D73086229;
-	Tue, 16 Apr 2019 09:10:33 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id BBF50811A9;
+	Tue, 16 Apr 2019 09:13:09 +0000 (UTC)
 Received: from [10.36.116.179] (ovpn-116-179.ams2.redhat.com [10.36.116.179])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id 81F19104C512;
-	Tue, 16 Apr 2019 09:10:31 +0000 (UTC)
-To: Richard Henderson <richard.henderson@linaro.org>, qemu-devel@nongnu.org
+	by smtp.corp.redhat.com (Postfix) with ESMTP id 5F6A85D71B;
+	Tue, 16 Apr 2019 09:13:08 +0000 (UTC)
+To: Richard Henderson <rth@twiddle.net>,
+	Richard Henderson <richard.henderson@linaro.org>, qemu-devel@nongnu.org
 References: <20190411100836.646-1-david@redhat.com>
-	<20190411100836.646-16-david@redhat.com>
-	<1365cc84-fdb6-3a36-9b5f-6921f04423e0@linaro.org>
+	<20190411100836.646-10-david@redhat.com>
+	<71ce854d-da00-565e-0b36-9458a7bc9183@linaro.org>
+	<a7298c65-fea3-7839-6b68-5b3bf5d64c1a@redhat.com>
+	<7e9ca895-031e-9843-8617-491e72a330e7@twiddle.net>
 From: David Hildenbrand <david@redhat.com>
 Openpgp: preference=signencrypt
 Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
@@ -91,23 +93,23 @@ Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
 	+8Umfre0Xt4713VxMygW0PnQt5aSQdMD58jHFxTk092mU+yIHj5LeYgvwSgZN4airXk5yRXl
 	SE+xAvmumFBY
 Organization: Red Hat GmbH
-Message-ID: <190241b2-efbe-c700-32dd-180ac0d25150@redhat.com>
-Date: Tue, 16 Apr 2019 11:10:30 +0200
+Message-ID: <5f193a1c-5695-1759-1b06-dd404ebd1854@redhat.com>
+Date: Tue, 16 Apr 2019 11:13:07 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
 	Thunderbird/60.6.1
 MIME-Version: 1.0
-In-Reply-To: <1365cc84-fdb6-3a36-9b5f-6921f04423e0@linaro.org>
+In-Reply-To: <7e9ca895-031e-9843-8617-491e72a330e7@twiddle.net>
 Content-Type: text/plain; charset="UTF-8"
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.42]);
-	Tue, 16 Apr 2019 09:10:33 +0000 (UTC)
+	(mx1.redhat.com [10.5.110.27]);
+	Tue, 16 Apr 2019 09:13:09 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH v1 15/41] s390x/tcg: Implement VECTOR
- GALOIS FIELD MULTIPLY SUM (AND ACCUMULATE)
+Subject: Re: [Qemu-devel] [PATCH v1 09/41] s390x/tcg: Implement VECTOR
+ CHECKSUM
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -120,45 +122,30 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 Cc: qemu-s390x@nongnu.org, Cornelia Huck <cohuck@redhat.com>,
-	Thomas Huth <thuth@redhat.com>, Richard Henderson <rth@twiddle.net>
+	Thomas Huth <thuth@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190416091030.klEGgdQKotaN8qrpPWHViaboFOYFpBf9F_lOQ6OkBVk@z>
+Message-ID: <20190416091307.h0ljvJX1kS-7eNChnOc41AxViHjdJFCTAmcRuMAYix4@z>
 
-On 13.04.19 01:44, Richard Henderson wrote:
-> On 4/11/19 12:08 AM, David Hildenbrand wrote:
->> A galois field multiplication in field 2 is like binary multiplication,
->> however instead of doing ordinary binary additions, xor's are performed.
->> So no carries are considered.
+On 16.04.19 11:08, Richard Henderson wrote:
+> On 4/15/19 10:58 PM, David Hildenbrand wrote:
+>>> You could use
+>>>
+>>>   tcg_gen_add2_i32(sum, tmp, sum, zero, tmp, zero);
+>>>   tcg_gen_add_i32(sum, sum, tmp);
+>> That makes perfect sense, I will use that for now, thanks!
 >>
->> Implement all variants via helpers. s390_vec_sar() and s390_vec_shr()
->> will be reused later on.
->>
->> Signed-off-by: David Hildenbrand <david@redhat.com>
->> ---
->>  target/s390x/helper.h           |   8 ++
->>  target/s390x/insn-data.def      |   4 +
->>  target/s390x/translate_vx.inc.c |  38 ++++++++
->>  target/s390x/vec_int_helper.c   | 168 ++++++++++++++++++++++++++++++++
->>  4 files changed, 218 insertions(+)
 > 
-> FYI, this is now the 4th copy of this operation.
+> Here's a funny one.  We can do this in one operation:
 > 
->   arm: pmull
->   x86: pclmulqdq
->   ppc: vpmsum[bhwd]
-> 
-> We really should promote this to generic.  But that can come later,
+>   tcg_gen_add2_i32(tmp, sum, sum, sum, tmp, tmp);
 
-huh, I tried my best to search for anything related to galois, but seems
-like only s390x uses that terminology.  :) Well at least I learned how
-it is supposed to be calculated.
-
-Thanks!
+:D I had to look at it 10 times. Very nice trick.
 
 > 
-> Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+> The lower (sum+tmp) carries into the upper (sum+tmp).
+> We take the upper result and discard the lower.
 > 
 > 
 > r~
