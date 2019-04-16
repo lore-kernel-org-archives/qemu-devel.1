@@ -1,25 +1,34 @@
-Received: from eggs.gnu.org ([209.51.188.92]:38052)
+Received: from eggs.gnu.org ([209.51.188.92]:41532)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <rth7680@gmail.com>) id 1hGPu3-000602-D7
-	for qemu-devel@nongnu.org; Tue, 16 Apr 2019 11:21:47 -0400
+	(envelope-from <bounces@canonical.com>) id 1hGQ8t-0003UH-QL
+	for qemu-devel@nongnu.org; Tue, 16 Apr 2019 11:37:04 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <rth7680@gmail.com>) id 1hGPtz-0003Ry-Ij
-	for qemu-devel@nongnu.org; Tue, 16 Apr 2019 11:21:41 -0400
-Sender: Richard Henderson <rth7680@gmail.com>
-References: <20190411100836.646-1-david@redhat.com>
-	<20190411100836.646-32-david@redhat.com>
-	<6594280f-cefb-cfb0-35b4-fcf53c32d871@linaro.org>
-	<129e5499-a05c-15f1-fe26-6ae0a78cfa7b@redhat.com>
-From: Richard Henderson <rth@twiddle.net>
-Message-ID: <c3f8cae1-7be1-54ec-e225-d9423a0a92b3@twiddle.net>
-Date: Tue, 16 Apr 2019 05:21:24 -1000
+	(envelope-from <bounces@canonical.com>) id 1hGQ8s-0008EA-Jr
+	for qemu-devel@nongnu.org; Tue, 16 Apr 2019 11:37:03 -0400
+Received: from indium.canonical.com ([91.189.90.7]:45436)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1hGQ8s-0008Cs-B5
+	for qemu-devel@nongnu.org; Tue, 16 Apr 2019 11:37:02 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1hGQ8p-0003nW-Cm
+	for <qemu-devel@nongnu.org>; Tue, 16 Apr 2019 15:36:59 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 571A12E80E4
+	for <qemu-devel@nongnu.org>; Tue, 16 Apr 2019 15:36:55 +0000 (UTC)
 MIME-Version: 1.0
-In-Reply-To: <129e5499-a05c-15f1-fe26-6ae0a78cfa7b@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v1 31/41] s390x/tcg: Implement VECTOR SHIFT
- LEFT DOUBLE BY BYTE
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Tue, 16 Apr 2019 15:16:11 -0000
+From: Thomas Huth <1543163@bugs.launchpad.net>
+Reply-To: Bug 1543163 <1543163@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <20160208150110.15874.66099.malonedeb@gac.canonical.com>
+Message-Id: <155542777199.13712.64254462462121085.malone@gac.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1543163] Re: VMs unable to boot from network with
+ e1000 since 2.2
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,48 +37,76 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Hildenbrand <david@redhat.com>, Richard Henderson <richard.henderson@linaro.org>, qemu-devel@nongnu.org
-Cc: qemu-s390x@nongnu.org, Cornelia Huck <cohuck@redhat.com>, Thomas Huth <thuth@redhat.com>
+To: qemu-devel@nongnu.org
 
-On 4/15/19 11:45 PM, David Hildenbrand wrote:
-> On 13.04.19 02:54, Richard Henderson wrote:
->> On 4/11/19 12:08 AM, David Hildenbrand wrote:
->>> +static DisasJumpType op_vsldb(DisasContext *s, DisasOps *o)
->>> +{
->>> +    int src_idx = get_field(s->fields, i4) & 0xf;
->>> +
->>> +    if (src_idx == 0) {
->>> +        gen_gvec_mov(get_field(s->fields, v1), get_field(s->fields, v2));
->>> +    } else {
->>> +        gen_gvec_3_ool(get_field(s->fields, v1), get_field(s->fields, v2),
->>> +                       get_field(s->fields, v3), src_idx,
->>> +                       gen_helper_gvec_vsldb);
->>> +        return DISAS_NEXT;
->>
->> You could also expand this inline using your new extract2 primitive.
->>
->>   int i4 = get_field(s->fields, i4);
->>   int left_shift, right_shift;
->>
->>   left_shift = (i4 & 7) * 8;
->>   right_shift = 64 - left_shift;
->>
->>   if ((i4 & 8) == 0) {
->>       read_vec_element_i64(t0, get_field(s->fields, v2), 0, ES_64);
->>       read_vec_element_i64(t1, get_field(s->fields, v2), 1, ES_64);
->>       read_vec_element_i64(t2, get_field(s->fields, v3), 0, ES_64);
->>   } else {
->>       read_vec_element_i64(t0, get_field(s->fields, v2), 1, ES_64);
->>       read_vec_element_i64(t1, get_field(s->fields, v3), 0, ES_64);
->>       read_vec_element_i64(t2, get_field(s->fields, v3), 1, ES_64);
->>   }
->>   tcg_gen_extract2_i64(t0, t1, t0, right_shift);
->>   tcg_gen_extract2_i64(t1, t2, t1, right_shift);
-> 
-> Trying to understand the magic, left_shift is really only used to to
-> calculate right_shift, right?
+Ok, thanks for checking. Closing now.
 
-Yes.  I thought that was clearer as a separate step.
+** Changed in: qemu
+       Status: Incomplete =3D> Fix Released
 
+-- =
 
-r~
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1543163
+
+Title:
+  VMs unable to boot from network with e1000 since 2.2
+
+Status in QEMU:
+  Fix Released
+
+Bug description:
+  With KVM/QEMU version 1.4, using e1000 NIC, virtual machines boot from
+  network alright; they get an IP from DHCP server (machine A), then
+  connect to Microsoft System Center (machine B) and proceed to boot
+  into Windows PE, install images etc.
+
+  However, with versions at least 2.2 and 2.5, using same NIC, virtual
+  machines fail to boot from network; they still get an IP from A, but
+  then fail "contacting B using gateway (0.0.0.0). Different NICs do not
+  help except for i82551, which however causes problems further down the
+  road (presumably because there is no driver for that card in PE (based
+  on Windows 7/8/10)).
+
+  Note that actual physical machines work.
+
+  Wireshark reveals this:
+
+  QEMU 1.4 + Intel e1000
+  **********************
+  1) client sends DHCP discover
+  2) machine A answers, offers an IP, gateway and itself as next server
+  3) machine B answers, offers no IP, but gateway and itself as next server
+  4) client requests the IP
+  5) machine A ACKs
+  6) client sends unicast request for ??? to B
+  7) B offers (unicast) a boot file (some .com)
+  8) client sends another unicast request for ??? to B
+  9) B again offers the boot file
+  (then they chat a bit, B offers another file, client downloads some stuff=
+ via TFTP etc.)
+
+  =
+
+  QEMU 2.2/2.5 + Intel e1000
+  **************************
+  1) client sends DHCP discover
+  2) machine A answers, offers an IP, gateway and itself as next server
+  3) machine B answers, offers no IP, but gateway and itself as next server
+  4) client requests the IP
+  5) machine A ACKs
+  6) client sends _broadcast_ request for ??? to B
+  7) B offers (likewise broadcast) a boot file
+  8) client sends another request, this time unicast and claims "Client IP =
+address =3D 0.0.0.0"
+  (and it basically hangs)
+
+  =
+
+  So, since some time after 1.4, QEMUlated machines with otherwise trusty e=
+1000 can no longer boot from network and it might be due to different behav=
+iour.
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1543163/+subscriptions
