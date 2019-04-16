@@ -2,74 +2,74 @@ Return-Path: <SRS0=xvb4=SS=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 42E7DC10F14
-	for <qemu-devel@archiver.kernel.org>; Tue, 16 Apr 2019 11:05:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6985BC10F13
+	for <qemu-devel@archiver.kernel.org>; Tue, 16 Apr 2019 11:10:19 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 05E302073F
-	for <qemu-devel@archiver.kernel.org>; Tue, 16 Apr 2019 11:05:39 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 05E302073F
+	by mail.kernel.org (Postfix) with ESMTPS id 2BE3820675
+	for <qemu-devel@archiver.kernel.org>; Tue, 16 Apr 2019 11:10:19 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2BE3820675
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=de.ibm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:34834 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:34862 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hGLuE-0008Fx-AT
-	for qemu-devel@archiver.kernel.org; Tue, 16 Apr 2019 07:05:38 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:38047)
+	id 1hGLyk-0001Bb-ET
+	for qemu-devel@archiver.kernel.org; Tue, 16 Apr 2019 07:10:18 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:39058)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <borntraeger@de.ibm.com>) id 1hGLrx-0007AU-P9
-	for qemu-devel@nongnu.org; Tue, 16 Apr 2019 07:03:20 -0400
+	(envelope-from <borntraeger@de.ibm.com>) id 1hGLxr-0000q9-Tq
+	for qemu-devel@nongnu.org; Tue, 16 Apr 2019 07:09:25 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <borntraeger@de.ibm.com>) id 1hGLrw-0006Ic-Ll
-	for qemu-devel@nongnu.org; Tue, 16 Apr 2019 07:03:17 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:41584)
+	(envelope-from <borntraeger@de.ibm.com>) id 1hGLxq-0000dZ-QT
+	for qemu-devel@nongnu.org; Tue, 16 Apr 2019 07:09:23 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:39566)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <borntraeger@de.ibm.com>)
-	id 1hGLrw-0006Gt-Aq
-	for qemu-devel@nongnu.org; Tue, 16 Apr 2019 07:03:16 -0400
-Received: from pps.filterd (m0098393.ppops.net [127.0.0.1])
+	id 1hGLxp-0000ca-7K
+	for qemu-devel@nongnu.org; Tue, 16 Apr 2019 07:09:22 -0400
+Received: from pps.filterd (m0098409.ppops.net [127.0.0.1])
 	by mx0a-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id
-	x3GB286D060487
-	for <qemu-devel@nongnu.org>; Tue, 16 Apr 2019 07:03:15 -0400
-Received: from e06smtp05.uk.ibm.com (e06smtp05.uk.ibm.com [195.75.94.101])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2rwdd2gv26-1
+	x3GB7l5W055580
+	for <qemu-devel@nongnu.org>; Tue, 16 Apr 2019 07:09:18 -0400
+Received: from e06smtp01.uk.ibm.com (e06smtp01.uk.ibm.com [195.75.94.97])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2rwcb546yv-1
 	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Tue, 16 Apr 2019 07:03:11 -0400
+	for <qemu-devel@nongnu.org>; Tue, 16 Apr 2019 07:09:17 -0400
 Received: from localhost
-	by e06smtp05.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	by e06smtp01.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
 	Only! Violators will be prosecuted
 	for <qemu-devel@nongnu.org> from <borntraeger@de.ibm.com>;
-	Tue, 16 Apr 2019 12:02:47 +0100
-Received: from b06cxnps3075.portsmouth.uk.ibm.com (9.149.109.195)
-	by e06smtp05.uk.ibm.com (192.168.101.135) with IBM ESMTP SMTP Gateway:
+	Tue, 16 Apr 2019 12:09:15 +0100
+Received: from b06cxnps4074.portsmouth.uk.ibm.com (9.149.109.196)
+	by e06smtp01.uk.ibm.com (192.168.101.131) with IBM ESMTP SMTP Gateway:
 	Authorized Use Only! Violators will be prosecuted; 
 	(version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
-	Tue, 16 Apr 2019 12:02:44 +0100
+	Tue, 16 Apr 2019 12:09:10 +0100
 Received: from b06wcsmtp001.portsmouth.uk.ibm.com
 	(b06wcsmtp001.portsmouth.uk.ibm.com [9.149.105.160])
-	by b06cxnps3075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with
-	ESMTP id x3GB2hj945023348
+	by b06cxnps4074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with
+	ESMTP id x3GB99IC33751288
 	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256
-	verify=OK); Tue, 16 Apr 2019 11:02:43 GMT
+	verify=OK); Tue, 16 Apr 2019 11:09:09 GMT
 Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 55E15A4067;
-	Tue, 16 Apr 2019 11:02:43 +0000 (GMT)
+	by IMSVA (Postfix) with ESMTP id 4C0BBA405B;
+	Tue, 16 Apr 2019 11:09:09 +0000 (GMT)
 Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id E26C9A405F;
-	Tue, 16 Apr 2019 11:02:42 +0000 (GMT)
+	by IMSVA (Postfix) with ESMTP id D18D9A4066;
+	Tue, 16 Apr 2019 11:09:08 +0000 (GMT)
 Received: from oc7455500831.ibm.com (unknown [9.152.224.131])
 	by b06wcsmtp001.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-	Tue, 16 Apr 2019 11:02:42 +0000 (GMT)
-From: Christian Borntraeger <borntraeger@de.ibm.com>
+	Tue, 16 Apr 2019 11:09:08 +0000 (GMT)
 To: Igor Mammedov <imammedo@redhat.com>, qemu-devel@nongnu.org
 References: <1555334842-195718-1-git-send-email-imammedo@redhat.com>
 	<1555334842-195718-6-git-send-email-imammedo@redhat.com>
-	<43f77950-019d-f06f-bfbc-4daa831430e3@de.ibm.com>
+From: Christian Borntraeger <borntraeger@de.ibm.com>
 Openpgp: preference=signencrypt
 Autocrypt: addr=borntraeger@de.ibm.com; prefer-encrypt=mutual; keydata=
 	mQINBE6cPPgBEAC2VpALY0UJjGmgAmavkL/iAdqul2/F9ONz42K6NrwmT+SI9CylKHIX+fdf
@@ -114,27 +114,27 @@ Autocrypt: addr=borntraeger@de.ibm.com; prefer-encrypt=mutual; keydata=
 	RGIN40QWFVlZvkKIEkzlzqpAyGaRLhXJPv/6tpoQaCQQoSAc5Z9kM/wEd9e2zMeojcWjUXgg
 	oWj8A/wY4UXExGBu+UCzzP/6sQRpBiPFgmqPTytrDo/gsUGqjOudLiHQcMU+uunULYQxVghC
 	syiRa+UVlsKmx1hsEg==
-Date: Tue, 16 Apr 2019 13:02:42 +0200
+Date: Tue, 16 Apr 2019 13:09:08 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
 	Thunderbird/60.6.1
 MIME-Version: 1.0
-In-Reply-To: <43f77950-019d-f06f-bfbc-4daa831430e3@de.ibm.com>
+In-Reply-To: <1555334842-195718-6-git-send-email-imammedo@redhat.com>
 Content-Type: text/plain; charset="UTF-8"
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
 X-TM-AS-GCONF: 00
-x-cbid: 19041611-0020-0000-0000-0000033060CE
+x-cbid: 19041611-4275-0000-0000-000003286775
 X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
-x-cbparentid: 19041611-0021-0000-0000-00002182A47B
-Message-Id: <531023ac-8e7a-01d1-3fff-e9252625fb16@de.ibm.com>
+x-cbparentid: 19041611-4276-0000-0000-0000383797DE
+Message-Id: <89ca3a70-066b-e40e-faaf-39a39ec976bf@de.ibm.com>
 X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:, ,
 	definitions=2019-04-16_04:, , signatures=0
 X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
 	priorityscore=1501
-	malwarescore=0 suspectscore=0 phishscore=0 bulkscore=0 spamscore=0
-	clxscore=1011 lowpriorityscore=0 mlxscore=0 impostorscore=0
-	mlxlogscore=727 adultscore=0 classifier=spam adjust=0 reason=mlx
-	scancount=1 engine=8.0.1-1810050000 definitions=main-1904160074
+	malwarescore=0 suspectscore=2 phishscore=0 bulkscore=0 spamscore=0
+	clxscore=1015 lowpriorityscore=0 mlxscore=0 impostorscore=0
+	mlxlogscore=999 adultscore=0 classifier=spam adjust=0 reason=mlx
+	scancount=1 engine=8.0.1-1810050000 definitions=main-1904160075
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic]
 X-Received-From: 148.163.156.1
 Subject: Re: [Qemu-devel] [PATCH v1 5/5] s390: do not call
@@ -161,27 +161,82 @@ Cc: qemu-ppc@nongnu.org, David Hildenbrand <david@redhat.com>,
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190416110242.cbREZFkUCa_YoJIBxWCsMw-YfTU2DYX_BimlskWgwmk@z>
+Message-ID: <20190416110908.vnwEhDqKjFsh7xDQzDL03iPg5A4eqEy1oQas475BYvo@z>
 
-On 16.04.19 13:01, Christian Borntraeger wrote:
-> This crashes
-> 
-> a simple -kernel -initrd example on s390x.
-> 
-> #0  0x000003ff94e3e47c in __GI_raise (sig=sig@entry=6) at ../sysdeps/unix/sysv/linux/raise.c:50
-> #1  0x000003ff94e23d18 in __GI_abort () at abort.c:79
-> #2  0x000003ff94e365e6 in __assert_fail_base
->     (fmt=0x3ff94f60ca6 "%s%s%s:%u: %s%sAssertion `%s' failed.\n%n", assertion=assertion@entry=0x14aac70 "new_block", file=file@entry=0x13b1168 "/home/cborntra/REPOS/qemu/exec.c", line=line@entry=2041, function=function@entry=0x13b0c8a <__PRETTY_FUNCTION__.34656> "qemu_ram_set_idstr") at assert.c:92
-> #3  0x000003ff94e36664 in __GI___assert_fail
->     (assertion=assertion@entry=0x14aac70 "new_block", file=file@entry=0x13b1168 "/home/cborntra/REPOS/qemu/exec.c", line=line@entry=2041, function=function@entry=0x13b0c8a <__PRETTY_FUNCTION__.34656> "qemu_ram_set_idstr") at assert.c:101
-> #4  0x000000000102e062 in qemu_ram_set_idstr (new_block=new_block@entry=0x0, name=<optimized out>, dev=dev@entry=0x0) at /home/cborntra/REPOS/qemu/exec.c:2041
-> #5  0x00000000011f5b0a in vmstate_register_ram (mr=0x2cd2dd0, mr@entry=<error reading variable: value has been optimized out>, dev=dev@entry=0x0) at /home/cborntra/REPOS/qemu/migration/savevm.c:2828
-> #6  0x00000000011f5b5a in vmstate_register_ram_global (mr=<error reading variable: value has been optimized out>) at /home/cborntra/REPOS/qemu/migration/savevm.c:2841
-> #7  0x000000000110d2ce in s390_memory_init (mem_size=<optimized out>) at /home/cborntra/REPOS/qemu/hw/s390x/s390-virtio-ccw.c:186
-> #8  0x000000000110d2ce in ccw_init (machine=0x2a96770) at /home/cborntra/REPOS/qemu/hw/s390x/s390-virtio-ccw.c:266
-> #9  0x00000000011b342c in machine_run_board_init (machine=0x2a96770) at /home/cborntra/REPOS/qemu/hw/core/machine.c:1030
-> #10 0x0000000001026fee in main (argc=<optimized out>, argv=<optimized out>, envp=<optimized out>) at /home/cborntra/REPOS/qemu/vl.c:4479
+This fails with more than 8TB, e.g.  "-m 9T "
 
-Sorry, I forgot to also add Patch4. With that the crash is gone. I will have a look at the patch.
+[pid 231065] ioctl(10, KVM_SET_USER_MEMORY_REGION, {slot=0, flags=0, guest_phys_addr=0, memory_size=0, userspace_addr=0x3ffc8500000}) = 0
+[pid 231065] ioctl(10, KVM_SET_USER_MEMORY_REGION, {slot=0, flags=0, guest_phys_addr=0, memory_size=9895604649984, userspace_addr=0x3ffc8500000}) = -1 EINVAL (Invalid argument)
+
+seems that the 2nd memslot gets the full size (and not 9TB-size of first slot).
+
+
+On 15.04.19 15:27, Igor Mammedov wrote:
+> s390 was trying to solve limited memslot size issue by abusing
+> memory_region_allocate_system_memory(), which breaks API contract
+> where the function might be called only once.
+> 
+> s390 should have used memory aliases to fragment inital memory into
+> smaller chunks to satisfy KVM's memslot limitation. But its a bit
+> late now, since allocated pieces are transfered in migration stream
+> separately, so it's not possible to just replace broken layout with
+> correct one. Previous patch made MemoryRegion alases migratable and
+> this patch switches to use them to split big initial RAM chunk into
+> smaller pieces up to KVM_SLOT_MAX_BYTES each and registers aliases
+> for migration.
+> 
+> Signed-off-by: Igor Mammedov <imammedo@redhat.com>
+> ---
+> A don't have access to a suitable system to test it, so I've simulated
+> it with smaller chunks on x84 host. Ping-pong migration between old
+> and new QEMU worked fine.  KVM part should be fine as memslots
+> using mapped MemoryRegions (in this case it would be aliases) as
+> far as I know but is someone could test it on big enough host it
+> would be nice.
+> ---
+>  hw/s390x/s390-virtio-ccw.c | 20 +++++++++++++++-----
+>  1 file changed, 15 insertions(+), 5 deletions(-)
+> 
+> diff --git a/hw/s390x/s390-virtio-ccw.c b/hw/s390x/s390-virtio-ccw.c
+> index d11069b..12ca3a9 100644
+> --- a/hw/s390x/s390-virtio-ccw.c
+> +++ b/hw/s390x/s390-virtio-ccw.c
+> @@ -161,20 +161,30 @@ static void virtio_ccw_register_hcalls(void)
+>  static void s390_memory_init(ram_addr_t mem_size)
+>  {
+>      MemoryRegion *sysmem = get_system_memory();
+> +    MemoryRegion *ram = g_new(MemoryRegion, 1);
+>      ram_addr_t chunk, offset = 0;
+>      unsigned int number = 0;
+>      gchar *name;
+>  
+>      /* allocate RAM for core */
+> +    memory_region_allocate_system_memory(ram, NULL, "s390.whole.ram", mem_size);
+> +    /*
+> +     * memory_region_allocate_system_memory() registers allocated RAM for
+> +     * migration, however for compat reasons the RAM should be passed over
+> +     * as RAMBlocks of the size upto KVM_SLOT_MAX_BYTES. So unregister just
+> +     * allocated RAM so it won't be migrated directly. Aliases will take
+> +     * of segmenting RAM into legacy chunks.
+> +     */
+> +    vmstate_unregister_ram(ram, NULL);
+>      name = g_strdup_printf("s390.ram");
+>      while (mem_size) {
+> -        MemoryRegion *ram = g_new(MemoryRegion, 1);
+> -        uint64_t size = mem_size;
+> +        MemoryRegion *alias = g_new(MemoryRegion, 1);
+>  
+>          /* KVM does not allow memslots >= 8 TB */
+> -        chunk = MIN(size, KVM_SLOT_MAX_BYTES);
+> -        memory_region_allocate_system_memory(ram, NULL, name, chunk);
+> -        memory_region_add_subregion(sysmem, offset, ram);
+> +        chunk = MIN(mem_size, KVM_SLOT_MAX_BYTES);
+> +        memory_region_init_alias(alias, NULL, name, ram, offset, chunk);
+> +        vmstate_register_ram_global(alias);
+> +        memory_region_add_subregion(sysmem, offset, alias);
+>          mem_size -= chunk;
+>          offset += chunk;
+>          g_free(name);
+> 
 
 
