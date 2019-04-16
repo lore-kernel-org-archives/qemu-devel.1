@@ -6,56 +6,57 @@ X-Spam-Status: No, score=-6.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 18247C10F13
-	for <qemu-devel@archiver.kernel.org>; Tue, 16 Apr 2019 19:03:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 47C56C10F13
+	for <qemu-devel@archiver.kernel.org>; Tue, 16 Apr 2019 19:04:15 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E440C20663
-	for <qemu-devel@archiver.kernel.org>; Tue, 16 Apr 2019 19:03:30 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E440C20663
+	by mail.kernel.org (Postfix) with ESMTPS id 1F9A520663
+	for <qemu-devel@archiver.kernel.org>; Tue, 16 Apr 2019 19:04:15 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1F9A520663
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:41187 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:41189 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hGTMg-0004iv-6Z
-	for qemu-devel@archiver.kernel.org; Tue, 16 Apr 2019 15:03:30 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:54507)
+	id 1hGTNO-0005Fv-CI
+	for qemu-devel@archiver.kernel.org; Tue, 16 Apr 2019 15:04:14 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:54819)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1hGTD5-0004j9-A4
-	for qemu-devel@nongnu.org; Tue, 16 Apr 2019 14:53:36 -0400
+	(envelope-from <david@redhat.com>) id 1hGTDT-000588-5D
+	for qemu-devel@nongnu.org; Tue, 16 Apr 2019 14:54:00 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1hGTD3-0004hR-1x
-	for qemu-devel@nongnu.org; Tue, 16 Apr 2019 14:53:34 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:37606)
+	(envelope-from <david@redhat.com>) id 1hGTDS-0005W0-0q
+	for qemu-devel@nongnu.org; Tue, 16 Apr 2019 14:53:59 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:30555)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <david@redhat.com>)
-	id 1hGTD2-0004cF-Hf; Tue, 16 Apr 2019 14:53:32 -0400
+	id 1hGTDO-0005DW-Kp; Tue, 16 Apr 2019 14:53:56 -0400
 Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
 	[10.5.11.15])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 229A88830F;
-	Tue, 16 Apr 2019 18:53:30 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id 5F33A30ADBB2;
+	Tue, 16 Apr 2019 18:53:48 +0000 (UTC)
 Received: from t460s.redhat.com (ovpn-116-105.ams2.redhat.com [10.36.116.105])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id CA39B5D707;
-	Tue, 16 Apr 2019 18:53:27 +0000 (UTC)
+	by smtp.corp.redhat.com (Postfix) with ESMTP id D113D5D707;
+	Tue, 16 Apr 2019 18:53:46 +0000 (UTC)
 From: David Hildenbrand <david@redhat.com>
 To: qemu-devel@nongnu.org
-Date: Tue, 16 Apr 2019 20:52:29 +0200
-Message-Id: <20190416185301.25344-10-david@redhat.com>
+Date: Tue, 16 Apr 2019 20:52:38 +0200
+Message-Id: <20190416185301.25344-19-david@redhat.com>
 In-Reply-To: <20190416185301.25344-1-david@redhat.com>
 References: <20190416185301.25344-1-david@redhat.com>
 MIME-Version: 1.0
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.28]);
-	Tue, 16 Apr 2019 18:53:30 +0000 (UTC)
+	(mx1.redhat.com [10.5.110.47]);
+	Tue, 16 Apr 2019 18:53:48 +0000 (UTC)
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] [PATCH v2 09/41] s390x/tcg: Implement VECTOR CHECKSUM
+Subject: [Qemu-devel] [PATCH v2 18/41] s390x/tcg: Implement VECTOR
+ (MAXIMUM|MINIMUM) (LOGICAL)
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -75,122 +76,76 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 Content-Type: text/plain; charset="UTF-8"
-Message-ID: <20190416185229.gVYTknRKTXMkrvLbRqSvfFZC5KM0eXFCC91zWAeybLA@z>
+Message-ID: <20190416185238.OcdCZdawSxQzptFs8I29rqLe18ooqaUbClBgAg37HA4@z>
 
-Time to introduce read_vec_element_i32 and write_vec_element_i32.
-Take proper care of properly adding the carry. We can perform both
-additions including the carry via tcg_gen_add2_i32().
+Luckily, we already have gvec helpers for all four cases.
 
 Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 Signed-off-by: David Hildenbrand <david@redhat.com>
 ---
- target/s390x/insn-data.def      |  2 +
- target/s390x/translate_vx.inc.c | 65 +++++++++++++++++++++++++++++++++
- 2 files changed, 67 insertions(+)
+ target/s390x/insn-data.def      |  8 ++++++++
+ target/s390x/translate_vx.inc.c | 31 +++++++++++++++++++++++++++++++
+ 2 files changed, 39 insertions(+)
 
 diff --git a/target/s390x/insn-data.def b/target/s390x/insn-data.def
-index 9889dc0b01..64459465c5 100644
+index fc8886ff42..b22d9f0f6a 100644
 --- a/target/s390x/insn-data.def
 +++ b/target/s390x/insn-data.def
-@@ -1072,6 +1072,8 @@
-     F(0xe7f2, VAVG,    VRR_c, V,   0, 0, 0, 0, vavg, 0, IF_VEC)
- /* VECTOR AVERAGE LOGICAL */
-     F(0xe7f0, VAVGL,   VRR_c, V,   0, 0, 0, 0, vavgl, 0, IF_VEC)
-+/* VECTOR CHECKSUM */
-+    F(0xe766, VCKSM,   VRR_c, V,   0, 0, 0, 0, vcksm, 0, IF_VEC)
+@@ -1098,6 +1098,14 @@
+     F(0xe7de, VLC,     VRR_a, V,   0, 0, 0, 0, vlc, 0, IF_VEC)
+ /* VECTOR LOAD POSITIVE */
+     F(0xe7df, VLP,     VRR_a, V,   0, 0, 0, 0, vlp, 0, IF_VEC)
++/* VECTOR MAXIMUM */
++    F(0xe7ff, VMX,     VRR_c, V,   0, 0, 0, 0, vmx, 0, IF_VEC)
++/* VECTOR MAXIMUM LOGICAL */
++    F(0xe7fd, VMXL,    VRR_c, V,   0, 0, 0, 0, vmx, 0, IF_VEC)
++/* VECTOR MINIMUM */
++    F(0xe7fe, VMN,     VRR_c, V,   0, 0, 0, 0, vmx, 0, IF_VEC)
++/* VECTOR MINIMUM LOGICAL */
++    F(0xe7fc, VMNL,    VRR_c, V,   0, 0, 0, 0, vmx, 0, IF_VEC)
 =20
  #ifndef CONFIG_USER_ONLY
  /* COMPARE AND SWAP AND PURGE */
 diff --git a/target/s390x/translate_vx.inc.c b/target/s390x/translate_vx.=
 inc.c
-index 7e8418e585..0f90f981b6 100644
+index 91854ab4a4..d0577115a8 100644
 --- a/target/s390x/translate_vx.inc.c
 +++ b/target/s390x/translate_vx.inc.c
-@@ -90,6 +90,33 @@ static void read_vec_element_i64(TCGv_i64 dst, uint8_t=
- reg, uint8_t enr,
-     }
- }
-=20
-+static void read_vec_element_i32(TCGv_i32 dst, uint8_t reg, uint8_t enr,
-+                                 TCGMemOp memop)
-+{
-+    const int offs =3D vec_reg_offset(reg, enr, memop & MO_SIZE);
-+
-+    switch (memop) {
-+    case ES_8:
-+        tcg_gen_ld8u_i32(dst, cpu_env, offs);
-+        break;
-+    case ES_16:
-+        tcg_gen_ld16u_i32(dst, cpu_env, offs);
-+        break;
-+    case ES_8 | MO_SIGN:
-+        tcg_gen_ld8s_i32(dst, cpu_env, offs);
-+        break;
-+    case ES_16 | MO_SIGN:
-+        tcg_gen_ld16s_i32(dst, cpu_env, offs);
-+        break;
-+    case ES_32:
-+    case ES_32 | MO_SIGN:
-+        tcg_gen_ld_i32(dst, cpu_env, offs);
-+        break;
-+    default:
-+        g_assert_not_reached();
-+    }
-+}
-+
- static void write_vec_element_i64(TCGv_i64 src, int reg, uint8_t enr,
-                                   TCGMemOp memop)
- {
-@@ -113,6 +140,25 @@ static void write_vec_element_i64(TCGv_i64 src, int =
-reg, uint8_t enr,
-     }
- }
-=20
-+static void write_vec_element_i32(TCGv_i32 src, int reg, uint8_t enr,
-+                                  TCGMemOp memop)
-+{
-+    const int offs =3D vec_reg_offset(reg, enr, memop & MO_SIZE);
-+
-+    switch (memop) {
-+    case ES_8:
-+        tcg_gen_st8_i32(src, cpu_env, offs);
-+        break;
-+    case ES_16:
-+        tcg_gen_st16_i32(src, cpu_env, offs);
-+        break;
-+    case ES_32:
-+        tcg_gen_st_i32(src, cpu_env, offs);
-+        break;
-+    default:
-+        g_assert_not_reached();
-+    }
-+}
-=20
- static void get_vec_element_ptr_i64(TCGv_ptr ptr, uint8_t reg, TCGv_i64 =
-enr,
-                                     uint8_t es)
-@@ -1300,3 +1346,22 @@ static DisasJumpType op_vavgl(DisasContext *s, Dis=
-asOps *o)
-                get_field(s->fields, v3), &g[es]);
+@@ -1574,3 +1574,34 @@ static DisasJumpType op_vlp(DisasContext *s, Disas=
+Ops *o)
+     gen_gvec_2(get_field(s->fields, v1), get_field(s->fields, v2), &g[es=
+]);
      return DISAS_NEXT;
  }
 +
-+static DisasJumpType op_vcksm(DisasContext *s, DisasOps *o)
++static DisasJumpType op_vmx(DisasContext *s, DisasOps *o)
 +{
-+    TCGv_i32 tmp =3D tcg_temp_new_i32();
-+    TCGv_i32 sum =3D tcg_temp_new_i32();
-+    int i;
++    const uint8_t v1 =3D get_field(s->fields, v1);
++    const uint8_t v2 =3D get_field(s->fields, v2);
++    const uint8_t v3 =3D get_field(s->fields, v3);
++    const uint8_t es =3D get_field(s->fields, m4);
 +
-+    read_vec_element_i32(sum, get_field(s->fields, v3), 1, ES_32);
-+    for (i =3D 0; i < 4; i++) {
-+        read_vec_element_i32(tmp, get_field(s->fields, v2), i, ES_32);
-+        tcg_gen_add2_i32(tmp, sum, sum, sum, tmp, tmp);
++    if (es > ES_64) {
++        gen_program_exception(s, PGM_SPECIFICATION);
++        return DISAS_NORETURN;
 +    }
-+    zero_vec(get_field(s->fields, v1));
-+    write_vec_element_i32(sum, get_field(s->fields, v1), 1, ES_32);
 +
-+    tcg_temp_free_i32(tmp);
-+    tcg_temp_free_i32(sum);
++    switch (s->fields->op2) {
++    case 0xff:
++        gen_gvec_fn_3(smax, es, v1, v2, v3);
++        break;
++    case 0xfd:
++        gen_gvec_fn_3(umax, es, v1, v2, v3);
++        break;
++    case 0xfe:
++        gen_gvec_fn_3(smin, es, v1, v2, v3);
++        break;
++    case 0xfc:
++        gen_gvec_fn_3(umin, es, v1, v2, v3);
++        break;
++    default:
++        g_assert_not_reached();
++    }
 +    return DISAS_NEXT;
 +}
 --=20
