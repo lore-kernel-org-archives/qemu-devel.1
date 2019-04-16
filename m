@@ -2,109 +2,71 @@ Return-Path: <SRS0=xvb4=SS=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.7 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_PASS autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E9B04C10F13
-	for <qemu-devel@archiver.kernel.org>; Tue, 16 Apr 2019 06:41:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8DF9EC10F13
+	for <qemu-devel@archiver.kernel.org>; Tue, 16 Apr 2019 06:58:46 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B439B2073F
-	for <qemu-devel@archiver.kernel.org>; Tue, 16 Apr 2019 06:41:43 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="aKecNnBN"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B439B2073F
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
+	by mail.kernel.org (Postfix) with ESMTPS id 5BD4B2075B
+	for <qemu-devel@archiver.kernel.org>; Tue, 16 Apr 2019 06:58:46 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5BD4B2075B
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=hygon.cn
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:60212 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:60333 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hGHmp-0004gm-0C
-	for qemu-devel@archiver.kernel.org; Tue, 16 Apr 2019 02:41:43 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:59060)
+	id 1hGI3J-0006mV-83
+	for qemu-devel@archiver.kernel.org; Tue, 16 Apr 2019 02:58:45 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:38050)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1hGHly-0004Me-3R
-	for qemu-devel@nongnu.org; Tue, 16 Apr 2019 02:40:50 -0400
+	(envelope-from <puwen@hygon.cn>) id 1hGI2X-0006Tc-2V
+	for qemu-devel@nongnu.org; Tue, 16 Apr 2019 02:57:57 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1hGHlx-0003PS-8S
-	for qemu-devel@nongnu.org; Tue, 16 Apr 2019 02:40:50 -0400
-Received: from mail-vi1eur04on0700.outbound.protection.outlook.com
-	([2a01:111:f400:fe0e::700]:27970
-	helo=EUR04-VI1-obe.outbound.protection.outlook.com)
+	(envelope-from <puwen@hygon.cn>) id 1hGI2U-0006GM-9a
+	for qemu-devel@nongnu.org; Tue, 16 Apr 2019 02:57:56 -0400
+Received: from [110.188.70.11] (port=25496 helo=spam2.hygon.cn)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
-	id 1hGHlw-0003Nr-Vn; Tue, 16 Apr 2019 02:40:49 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=virtuozzo.com;
-	s=selector1;
-	h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
-	bh=TIbT2RPdWKbJ1XQ8mOVMJj/zmSQCuBmtVrPO+hvrvGM=;
-	b=aKecNnBNIZq/TWME3xgK+FlKgn088MJreRXNq1uVsvCyVL3I+abLsi8e1hTOT2aJVz7X9OQdd3zta96gFGweaD/QDMtzbbycA9lBSsfRKWN5c9ZCvE/c4mK5VIqb6F4yIQ8thnN+uZyZ/Y+lo6xj+siC2rPG4Av3t2geym4Df/M=
-Received: from DB7PR08MB3851.eurprd08.prod.outlook.com (20.178.46.222) by
-	DB7PR08MB3291.eurprd08.prod.outlook.com (52.134.111.29) with Microsoft
-	SMTP
-	Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
-	15.20.1792.17; Tue, 16 Apr 2019 06:40:46 +0000
-Received: from DB7PR08MB3851.eurprd08.prod.outlook.com
-	([fe80::3c82:5da0:1633:f949]) by
-	DB7PR08MB3851.eurprd08.prod.outlook.com
-	([fe80::3c82:5da0:1633:f949%3]) with mapi id 15.20.1792.018;
-	Tue, 16 Apr 2019 06:40:46 +0000
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-To: Max Reitz <mreitz@redhat.com>, "qemu-block@nongnu.org"
-	<qemu-block@nongnu.org>
-Thread-Topic: [PATCH v3 2/7] qemu-img: Add salvaging mode to convert
-Thread-Index: AQHU8hl6+/MfRHz0vkKjIW849FbbwqY+Wm2A
-Date: Tue, 16 Apr 2019 06:40:45 +0000
-Message-ID: <b40c4ff2-d5ad-12ae-39ce-eef61dadffb5@virtuozzo.com>
-References: <20190413165343.9018-1-mreitz@redhat.com>
-	<20190413165343.9018-3-mreitz@redhat.com>
-In-Reply-To: <20190413165343.9018-3-mreitz@redhat.com>
-Accept-Language: ru-RU, en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-clientproxiedby: HE1PR0402CA0003.eurprd04.prod.outlook.com
-	(2603:10a6:3:d0::13) To DB7PR08MB3851.eurprd08.prod.outlook.com
-	(2603:10a6:10:7b::30)
-authentication-results: spf=none (sender IP is )
-	smtp.mailfrom=vsementsov@virtuozzo.com; 
-x-ms-exchange-messagesentrepresentingtype: 1
-x-tagtoolbar-keys: D20190416094043667
-x-originating-ip: [185.231.240.5]
-x-ms-publictraffictype: Email
-x-ms-office365-filtering-correlation-id: ce071750-0f75-460c-bcc1-08d6c2367466
-x-microsoft-antispam: BCL:0; PCL:0;
-	RULEID:(2390118)(7020095)(4652040)(8989299)(5600140)(711020)(4605104)(4534185)(4627221)(201703031133081)(201702281549075)(8990200)(2017052603328)(7193020);
-	SRVR:DB7PR08MB3291; 
-x-ms-traffictypediagnostic: DB7PR08MB3291:
-x-microsoft-antispam-prvs: <DB7PR08MB32912AB05FC1AAF3E6CA9330C1240@DB7PR08MB3291.eurprd08.prod.outlook.com>
-x-forefront-prvs: 000947967F
-x-forefront-antispam-report: SFV:NSPM;
-	SFS:(10019020)(346002)(39850400004)(366004)(396003)(376002)(136003)(189003)(199004)(105586002)(86362001)(68736007)(106356001)(76176011)(31696002)(14454004)(52116002)(81156014)(31686004)(6512007)(4326008)(97736004)(478600001)(7736002)(8676002)(305945005)(3846002)(81166006)(6116002)(2906002)(53936002)(6246003)(8936002)(54906003)(102836004)(2616005)(6486002)(26005)(229853002)(256004)(6436002)(36756003)(6506007)(386003)(107886003)(5660300002)(71200400001)(11346002)(4744005)(71190400001)(25786009)(99286004)(66066001)(446003)(486006)(2501003)(110136005)(316002)(186003)(476003);
-	DIR:OUT; SFP:1102; SCL:1; SRVR:DB7PR08MB3291;
-	H:DB7PR08MB3851.eurprd08.prod.outlook.com; FPR:; SPF:None;
-	LANG:en; PTR:InfoNoRecords; MX:1; A:1; 
-received-spf: None (protection.outlook.com: virtuozzo.com does not designate
-	permitted sender hosts)
-x-ms-exchange-senderadcheck: 1
-x-microsoft-antispam-message-info: NzXdrhfkbWYTCculY37A1d3yfJeqko+7tazMBZkUTYIsQlqOJDxpplrRIg30qTNJhiP7TfH9nm/dVvilxVdYRaCDQynqBIX4DvagCRm9HsFko3PA1keikZrVWLQm7j/5885Jy2Xr+P960n3bzSPF3XYX/FN58ciepoe2/C4RKrgHZoF2uaJFzOVhf8QTupvOjvbrdLvp/zVIIIw2SduiID/7h4t7XgF3lYnpgV0Q4omCAd1zGEaym5j3rJ0H6BX48DEHD42dC3a4B0IF33TeGAngbQ9qKI88VHb93GzVXI6davnxmo/XMHOsHUgNZOV7a4+FyAG8E548WliWlC2ltYkrtQoJwNWCgDMXiUwbnXhoSv8xPeh2DydgvjziQr2AsUXT9/snkBl9gAVrc5l/BiMfG/Y0zYwx5f8a+7SO1lY=
-Content-Type: text/plain; charset="UTF-8"
-Content-ID: <B230078AB146D14FBF708BA0AA2A9FC1@eurprd08.prod.outlook.com>
-Content-Transfer-Encoding: base64
+	(Exim 4.71) (envelope-from <puwen@hygon.cn>) id 1hGI2Q-00066z-GP
+	for qemu-devel@nongnu.org; Tue, 16 Apr 2019 02:57:52 -0400
+Received: from MK-FE.hygon.cn ([172.23.18.61])
+	by spam2.hygon.cn with ESMTP id x3G6v5vb051875;
+	Tue, 16 Apr 2019 14:57:06 +0800 (GMT-8)
+	(envelope-from puwen@hygon.cn)
+Received: from cncheex02.Hygon.cn ([172.23.18.12])
+	by MK-FE.hygon.cn with ESMTP id x3G6uVNf013018;
+	Tue, 16 Apr 2019 14:56:31 +0800 (GMT-8)
+	(envelope-from puwen@hygon.cn)
+Received: from [172.20.20.110] (172.23.18.44) by cncheex02.Hygon.cn
+	(172.23.18.12) with Microsoft SMTP Server (version=TLS1_2,
+	cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.1466.3;
+	Tue, 16 Apr 2019 14:57:03 +0800
+To: =?UTF-8?Q?Daniel_P=2e_Berrang=c3=a9?= <berrange@redhat.com>
+References: <1555124080-27089-1-git-send-email-puwen@hygon.cn>
+	<20190415092500.GD5718@redhat.com>
+From: Pu Wen <puwen@hygon.cn>
+Message-ID: <aa92336f-681e-30d9-2670-7d0093d9912a@hygon.cn>
+Date: Tue, 16 Apr 2019 14:56:12 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
+	Thunderbird/60.6.1
 MIME-Version: 1.0
-X-OriginatorOrg: virtuozzo.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: ce071750-0f75-460c-bcc1-08d6c2367466
-X-MS-Exchange-CrossTenant-originalarrivaltime: 16 Apr 2019 06:40:45.9108 (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 0bc7f26d-0264-416e-a6fc-8352af79c58f
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DB7PR08MB3291
-X-detected-operating-system: by eggs.gnu.org: Windows 7 or 8 [fuzzy]
-X-Received-From: 2a01:111:f400:fe0e::700
-Subject: Re: [Qemu-devel] [PATCH v3 2/7] qemu-img: Add salvaging mode to
- convert
+In-Reply-To: <20190415092500.GD5718@redhat.com>
+Content-Type: text/plain; charset="UTF-8"; format="flowed"
+Content-Language: en-US
+X-Originating-IP: [172.23.18.44]
+X-ClientProxiedBy: cncheex02.Hygon.cn (172.23.18.12) To cncheex02.Hygon.cn
+	(172.23.18.12)
+X-MAIL: spam2.hygon.cn x3G6v5vb051875
+X-DNSRBL: 
+Content-Transfer-Encoding: quoted-printable
+X-MIME-Autoconverted: from 8bit to quoted-printable by spam2.hygon.cn id
+	x3G6v5vb051875
+X-detected-operating-system: by eggs.gnu.org: FreeBSD 9.x
+X-Received-From: 110.188.70.11
+Subject: Re: [Qemu-devel] [PATCH v2] i386: Add new Hygon 'Dhyana' CPU model
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -116,21 +78,48 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>,
-	Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>,
+Cc: "ehabkost@redhat.com" <ehabkost@redhat.com>,
+	"mst@redhat.com" <mst@redhat.com>,
 	"qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
-	Denis Lunev <den@virtuozzo.com>
+	"pbonzini@redhat.com" <pbonzini@redhat.com>,
+	"rth@twiddle.net" <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190416064045.GTAaRwUJxszBjnI5WUktM9_HFeMaEF2sEbqZ45z-8Ng@z>
+Message-ID: <20190416065612.-MsppJvYz3H9tbOBfrv157iIlYt4L-hSinvQsy4pQx0@z>
 
-MTMuMDQuMjAxOSAxOTo1MywgTWF4IFJlaXR6IHdyb3RlOg0KPiBUaGlzIGFkZHMgYSBzYWx2YWdp
-bmcgbW9kZSAoLS1zYWx2YWdlKSB0byBxZW11LWltZyBjb252ZXJ0IHdoaWNoIGlnbm9yZXMNCj4g
-cmVhZCBlcnJvcnMgYW5kIHRyZWF0cyB0aGUgcmVzcGVjdGl2ZSBhcmVhcyBhcyBjb250YWluaW5n
-IG9ubHkgemVyb2VzLg0KPiBUaGlzIGNhbiBiZSB1c2VkIGZvciBpbnN0YW5jZSB0byBhdCBsZWFz
-dCBwYXJ0aWFsbHkgcmVjb3ZlciB0aGUgZGF0YQ0KPiBmcm9tIHRlcm1pbmFsbHkgY29ycnVwdGVk
-IHFjb3cyIGltYWdlcy4NCj4gDQo+IFNpZ25lZC1vZmYtYnk6IE1heCBSZWl0ejxtcmVpdHpAcmVk
-aGF0LmNvbT4NCg0KUmV2aWV3ZWQtYnk6IFZsYWRpbWlyIFNlbWVudHNvdi1PZ2lldnNraXkgPHZz
-ZW1lbnRzb3ZAdmlydHVvenpvLmNvbT4NCg0KLS0gDQpCZXN0IHJlZ2FyZHMsDQpWbGFkaW1pcg0K
+On 2019/4/15 17:25, Daniel P. Berrang=C3=A9 wrote:
+> On Sat, Apr 13, 2019 at 10:54:40AM +0800, Pu Wen wrote:
+...
+>> diff --git a/hw/i386/pc.c b/hw/i386/pc.c
+>> index f2c15bf..551bec9 100644
+>> --- a/hw/i386/pc.c
+>> +++ b/hw/i386/pc.c
+>> @@ -128,6 +128,8 @@ GlobalProperty pc_compat_3_1[] =3D {
+>>       { "EPYC" "-" TYPE_X86_CPU, "nrip-save", "off" },
+>>       { "EPYC-IBPB" "-" TYPE_X86_CPU, "npt", "off" },
+>>       { "EPYC-IBPB" "-" TYPE_X86_CPU, "nrip-save", "off" },
+>> +    { "Dhyana" "-" TYPE_X86_CPU, "npt", "off" },
+>> +    { "Dhyana" "-" TYPE_X86_CPU, "nrip-save", "off" },
+>>       { "Skylake-Client" "-" TYPE_X86_CPU,      "mpx", "on" },
+>>       { "Skylake-Client-IBRS" "-" TYPE_X86_CPU, "mpx", "on" },
+>>       { "Skylake-Server" "-" TYPE_X86_CPU,      "mpx", "on" },
+>> @@ -152,6 +154,7 @@ GlobalProperty pc_compat_2_12[] =3D {
+>>       { TYPE_X86_CPU, "topoext", "off" },
+>>       { "EPYC-" TYPE_X86_CPU, "xlevel", "0x8000000a" },
+>>       { "EPYC-IBPB-" TYPE_X86_CPU, "xlevel", "0x8000000a" },
+>> +    { "Dhyana-" TYPE_X86_CPU, "xlevel", "0x8000000a" },
+>>   };
+>>   const size_t pc_compat_2_12_len =3D G_N_ELEMENTS(pc_compat_2_12);
+>=20
+> You can drop the changes in this file. This CPU model didn't exist
+> in any older QEMU releases, so there's no machine type backcompat
+> required, at least from upstream QEMU POV.
+
+Then how about running QEMU with the parameter like "-M pc-i440fx-2.12"?=20
+Although the default machine is newer than that.
+
+--=20
+Regards,
+Pu Wen
 
