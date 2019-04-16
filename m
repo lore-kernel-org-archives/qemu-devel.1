@@ -1,26 +1,26 @@
-Received: from eggs.gnu.org ([209.51.188.92]:34521)
+Received: from eggs.gnu.org ([209.51.188.92]:34519)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1hGNf9-0004dN-5P
+	(envelope-from <peter.maydell@linaro.org>) id 1hGNf9-0004dL-52
 	for qemu-devel@nongnu.org; Tue, 16 Apr 2019 08:58:12 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1hGNf7-0001C6-2s
+	(envelope-from <peter.maydell@linaro.org>) id 1hGNf7-0001CQ-9B
 	for qemu-devel@nongnu.org; Tue, 16 Apr 2019 08:58:11 -0400
-Received: from mail-wm1-x341.google.com ([2a00:1450:4864:20::341]:40152)
+Received: from mail-wr1-x443.google.com ([2a00:1450:4864:20::443]:41749)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1hGNf6-0001Ai-O7
-	for qemu-devel@nongnu.org; Tue, 16 Apr 2019 08:58:08 -0400
-Received: by mail-wm1-x341.google.com with SMTP id z24so25491371wmi.5
-	for <qemu-devel@nongnu.org>; Tue, 16 Apr 2019 05:58:08 -0700 (PDT)
+	id 1hGNf6-00013V-R3
+	for qemu-devel@nongnu.org; Tue, 16 Apr 2019 08:58:09 -0400
+Received: by mail-wr1-x443.google.com with SMTP id r4so26905548wrq.8
+	for <qemu-devel@nongnu.org>; Tue, 16 Apr 2019 05:57:57 -0700 (PDT)
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 16 Apr 2019 13:57:28 +0100
-Message-Id: <20190416125744.27770-11-peter.maydell@linaro.org>
+Date: Tue, 16 Apr 2019 13:57:23 +0100
+Message-Id: <20190416125744.27770-6-peter.maydell@linaro.org>
 In-Reply-To: <20190416125744.27770-1-peter.maydell@linaro.org>
 References: <20190416125744.27770-1-peter.maydell@linaro.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH 10/26] target/arm: Handle floating point
- registers in exception entry
+Subject: [Qemu-devel] [PATCH 05/26] target/arm: Honour M-profile FP enable
+ bits
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,160 +31,135 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-arm@nongnu.org, qemu-devel@nongnu.org
 
-Handle floating point registers in exception entry.
-This corresponds to the FP-specific parts of the pseudocode
-functions ActivateException() and PushStack().
+Like AArch64, M-profile floating point has no FPEXC enable
+bit to gate floating point; so always set the VFPEN TB flag.
 
-We defer the code corresponding to UpdateFPCCR() to a later patch.
+M-profile also has CPACR and NSACR similar to A-profile;
+they behave slightly differently:
+ * the CPACR is banked between Secure and Non-Secure
+ * if the NSACR forces a trap then this is taken to
+   the Secure state, not the Non-Secure state
+
+Honour the CPACR and NSACR settings. The NSACR handling
+requires us to borrow the exception.target_el field
+(usually meaningless for M profile) to distinguish the
+NOCP UsageFault taken to Secure state from the more
+usual fault taken to the current security state.
 
 Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 ---
- target/arm/helper.c | 98 +++++++++++++++++++++++++++++++++++++++++++--
- 1 file changed, 95 insertions(+), 3 deletions(-)
+ target/arm/helper.c    | 55 +++++++++++++++++++++++++++++++++++++++---
+ target/arm/translate.c | 10 ++++++--
+ 2 files changed, 60 insertions(+), 5 deletions(-)
 
 diff --git a/target/arm/helper.c b/target/arm/helper.c
-index a2222f84803..7b2174a5e61 100644
+index a36f4b3d699..27e5f98bc73 100644
 --- a/target/arm/helper.c
 +++ b/target/arm/helper.c
-@@ -8172,6 +8172,9 @@ static void v7m_exception_taken(ARMCPU *cpu, uint32_t lr, bool dotailchain,
-     switch_v7m_security_state(env, targets_secure);
-     write_v7m_control_spsel(env, 0);
-     arm_clear_exclusive(env);
-+    /* Clear SFPA and FPCA (has no effect if no FPU) */
-+    env->v7m.control[M_REG_S] &=
-+        ~(R_V7M_CONTROL_FPCA_MASK | R_V7M_CONTROL_SFPA_MASK);
-     /* Clear IT bits */
-     env->condexec_bits = 0;
-     env->regs[14] = lr;
-@@ -8192,6 +8195,20 @@ static bool v7m_push_stack(ARMCPU *cpu)
-     uint32_t xpsr = xpsr_read(env);
-     uint32_t frameptr = env->regs[13];
-     ARMMMUIdx mmu_idx = arm_mmu_idx(env);
-+    uint32_t framesize;
-+    bool nsacr_cp10 = extract32(env->v7m.nsacr, 10, 1);
-+
-+    if ((env->v7m.control[M_REG_S] & R_V7M_CONTROL_FPCA_MASK) &&
-+        (env->v7m.secure || nsacr_cp10)) {
-+        if (env->v7m.secure &&
-+            env->v7m.fpccr[M_REG_S] & R_V7M_FPCCR_TS_MASK) {
-+            framesize = 0xa8;
-+        } else {
-+            framesize = 0x68;
-+        }
-+    } else {
-+        framesize = 0x20;
-+    }
+@@ -7561,6 +7561,25 @@ uint32_t arm_phys_excp_target_el(CPUState *cs, uint32_t excp_idx,
+     return target_el;
+ }
  
-     /* Align stack pointer if the guest wants that */
-     if ((frameptr & 4) &&
-@@ -8200,7 +8217,13 @@ static bool v7m_push_stack(ARMCPU *cpu)
-         xpsr |= XPSR_SPREALIGN;
++/*
++ * Return true if the v7M CPACR permits access to the FPU for the specified
++ * security state and privilege level.
++ */
++static bool v7m_cpacr_pass(CPUARMState *env, bool is_secure, bool is_priv)
++{
++    switch (extract32(env->v7m.cpacr[is_secure], 20, 2)) {
++    case 0:
++    case 2: /* UNPREDICTABLE: we treat like 0 */
++        return false;
++    case 1:
++        return is_priv;
++    case 3:
++        return true;
++    default:
++        g_assert_not_reached();
++    }
++}
++
+ static bool v7m_stack_write(ARMCPU *cpu, uint32_t addr, uint32_t value,
+                             ARMMMUIdx mmu_idx, bool ignfault)
+ {
+@@ -8820,9 +8839,23 @@ void arm_v7m_cpu_do_interrupt(CPUState *cs)
+         env->v7m.cfsr[env->v7m.secure] |= R_V7M_CFSR_UNDEFINSTR_MASK;
+         break;
+     case EXCP_NOCP:
+-        armv7m_nvic_set_pending(env->nvic, ARMV7M_EXCP_USAGE, env->v7m.secure);
+-        env->v7m.cfsr[env->v7m.secure] |= R_V7M_CFSR_NOCP_MASK;
++    {
++        /*
++         * NOCP might be directed to something other than the current
++         * security state if this fault is because of NSACR; we indicate
++         * the target security state using exception.target_el.
++         */
++        int target_secstate;
++
++        if (env->exception.target_el == 3) {
++            target_secstate = M_REG_S;
++        } else {
++            target_secstate = env->v7m.secure;
++        }
++        armv7m_nvic_set_pending(env->nvic, ARMV7M_EXCP_USAGE, target_secstate);
++        env->v7m.cfsr[target_secstate] |= R_V7M_CFSR_NOCP_MASK;
+         break;
++    }
+     case EXCP_INVSTATE:
+         armv7m_nvic_set_pending(env->nvic, ARMV7M_EXCP_USAGE, env->v7m.secure);
+         env->v7m.cfsr[env->v7m.secure] |= R_V7M_CFSR_INVSTATE_MASK;
+@@ -12756,6 +12789,22 @@ int fp_exception_el(CPUARMState *env, int cur_el)
+         return 0;
      }
  
--    frameptr -= 0x20;
-+    xpsr &= ~XPSR_SFPA;
-+    if (env->v7m.secure &&
-+        (env->v7m.control[M_REG_S] & R_V7M_CONTROL_SFPA_MASK)) {
-+        xpsr |= XPSR_SFPA;
-+    }
++    if (arm_feature(env, ARM_FEATURE_M)) {
++        /* CPACR can cause a NOCP UsageFault taken to current security state */
++        if (!v7m_cpacr_pass(env, env->v7m.secure, cur_el != 0)) {
++            return 1;
++        }
 +
-+    frameptr -= framesize;
- 
-     if (arm_feature(env, ARM_FEATURE_V8)) {
-         uint32_t limit = v7m_sp_limit(env);
-@@ -8244,6 +8267,73 @@ static bool v7m_push_stack(ARMCPU *cpu)
-         v7m_stack_write(cpu, frameptr + 24, env->regs[15], mmu_idx, false) &&
-         v7m_stack_write(cpu, frameptr + 28, xpsr, mmu_idx, false);
- 
-+    if (env->v7m.control[M_REG_S] & R_V7M_CONTROL_FPCA_MASK) {
-+        /* FPU is active, try to save its registers */
-+        bool fpccr_s = env->v7m.fpccr[M_REG_S] & R_V7M_FPCCR_S_MASK;
-+        bool lspact = env->v7m.fpccr[fpccr_s] & R_V7M_FPCCR_LSPACT_MASK;
-+
-+        if (lspact && arm_feature(env, ARM_FEATURE_M_SECURITY)) {
-+            qemu_log_mask(CPU_LOG_INT,
-+                          "...SecureFault because LSPACT and FPCA both set\n");
-+            env->v7m.sfsr |= R_V7M_SFSR_LSERR_MASK;
-+            armv7m_nvic_set_pending(env->nvic, ARMV7M_EXCP_SECURE, false);
-+        } else if (!env->v7m.secure && !nsacr_cp10) {
-+            qemu_log_mask(CPU_LOG_INT,
-+                          "...Secure UsageFault with CFSR.NOCP because "
-+                          "NSACR.CP10 prevents stacking FP regs\n");
-+            armv7m_nvic_set_pending(env->nvic, ARMV7M_EXCP_USAGE, M_REG_S);
-+            env->v7m.cfsr[M_REG_S] |= R_V7M_CFSR_NOCP_MASK;
-+        } else {
-+            if (!(env->v7m.fpccr[M_REG_S] & R_V7M_FPCCR_LSPEN_MASK)) {
-+                /* Lazy stacking disabled, save registers now */
-+                int i;
-+                bool cpacr_pass = v7m_cpacr_pass(env, env->v7m.secure,
-+                                                 arm_current_el(env) != 0);
-+
-+                if (stacked_ok && !cpacr_pass) {
-+                    /*
-+                     * Take UsageFault if CPACR forbids access. The pseudocode
-+                     * here does a full CheckCPEnabled() but we know the NSACR
-+                     * check can never fail as we have already handled that.
-+                     */
-+                    qemu_log_mask(CPU_LOG_INT,
-+                                  "...UsageFault with CFSR.NOCP because "
-+                                  "CPACR.CP10 prevents stacking FP regs\n");
-+                    armv7m_nvic_set_pending(env->nvic, ARMV7M_EXCP_USAGE,
-+                                            env->v7m.secure);
-+                    env->v7m.cfsr[env->v7m.secure] |= R_V7M_CFSR_NOCP_MASK;
-+                    stacked_ok = false;
-+                }
-+
-+                for (i = 0; i < ((framesize == 0xa8) ? 32 : 16); i += 2) {
-+                    uint64_t dn = *aa32_vfp_dreg(env, i / 2);
-+                    uint32_t faddr = frameptr + 0x20 + 4 * i;
-+                    uint32_t slo = extract64(dn, 0, 32);
-+                    uint32_t shi = extract64(dn, 32, 32);
-+
-+                    if (i >= 16) {
-+                        faddr += 8; /* skip the slot for the FPSCR */
-+                    }
-+                    stacked_ok = stacked_ok &&
-+                        v7m_stack_write(cpu, faddr, slo, mmu_idx, false) &&
-+                        v7m_stack_write(cpu, faddr + 4, shi, mmu_idx, false);
-+                }
-+                stacked_ok = stacked_ok &&
-+                    v7m_stack_write(cpu, frameptr + 0x60,
-+                                    vfp_get_fpscr(env), mmu_idx, false);
-+                if (cpacr_pass) {
-+                    for (i = 0; i < ((framesize == 0xa8) ? 32 : 16); i += 2) {
-+                        *aa32_vfp_dreg(env, i / 2) = 0;
-+                    }
-+                    vfp_set_fpscr(env, 0);
-+                }
-+            } else {
-+                /* Lazy stacking enabled, save necessary info to stack later */
-+                /* TODO : equivalent of UpdateFPCCR() pseudocode */
++        if (arm_feature(env, ARM_FEATURE_M_SECURITY) && !env->v7m.secure) {
++            if (!extract32(env->v7m.nsacr, 10, 1)) {
++                /* FP insns cause a NOCP UsageFault taken to Secure */
++                return 3;
 +            }
 +        }
++
++        return 0;
 +    }
 +
-     /*
-      * If we broke a stack limit then SP was already updated earlier;
-      * otherwise we update SP regardless of whether any of the stack
-@@ -9004,8 +9094,7 @@ void arm_v7m_cpu_do_interrupt(CPUState *cs)
- 
-     if (arm_feature(env, ARM_FEATURE_V8)) {
-         lr = R_V7M_EXCRET_RES1_MASK |
--            R_V7M_EXCRET_DCRS_MASK |
--            R_V7M_EXCRET_FTYPE_MASK;
-+            R_V7M_EXCRET_DCRS_MASK;
-         /* The S bit indicates whether we should return to Secure
-          * or NonSecure (ie our current state).
-          * The ES bit indicates whether we're taking this exception
-@@ -9020,6 +9109,9 @@ void arm_v7m_cpu_do_interrupt(CPUState *cs)
-         if (env->v7m.secure) {
-             lr |= R_V7M_EXCRET_S_MASK;
+     /* The CPACR controls traps to EL1, or PL1 if we're 32 bit:
+      * 0, 2 : trap EL0 and EL1/PL1 accesses
+      * 1    : trap only EL0 accesses
+@@ -12943,7 +12992,7 @@ void cpu_get_tb_cpu_state(CPUARMState *env, target_ulong *pc,
+         flags = FIELD_DP32(flags, TBFLAG_A32, SCTLR_B, arm_sctlr_b(env));
+         flags = FIELD_DP32(flags, TBFLAG_A32, NS, !access_secure_reg(env));
+         if (env->vfp.xregs[ARM_VFP_FPEXC] & (1 << 30)
+-            || arm_el_is_aa64(env, 1)) {
++            || arm_el_is_aa64(env, 1) || arm_feature(env, ARM_FEATURE_M)) {
+             flags = FIELD_DP32(flags, TBFLAG_A32, VFPEN, 1);
          }
-+        if (!(env->v7m.control[M_REG_S] & R_V7M_CONTROL_FPCA_MASK)) {
-+            lr |= R_V7M_EXCRET_FTYPE_MASK;
+         flags = FIELD_DP32(flags, TBFLAG_A32, XSCALE_CPAR, env->cp15.c15_cpar);
+diff --git a/target/arm/translate.c b/target/arm/translate.c
+index d56488ec847..bb539111179 100644
+--- a/target/arm/translate.c
++++ b/target/arm/translate.c
+@@ -3398,8 +3398,14 @@ static int disas_vfp_insn(DisasContext *s, uint32_t insn)
+      * for attempts to execute invalid vfp/neon encodings with FP disabled.
+      */
+     if (s->fp_excp_el) {
+-        gen_exception_insn(s, 4, EXCP_UDEF,
+-                           syn_fp_access_trap(1, 0xe, false), s->fp_excp_el);
++        if (arm_dc_feature(s, ARM_FEATURE_M)) {
++            gen_exception_insn(s, 4, EXCP_NOCP, syn_uncategorized(),
++                               s->fp_excp_el);
++        } else {
++            gen_exception_insn(s, 4, EXCP_UDEF,
++                               syn_fp_access_trap(1, 0xe, false),
++                               s->fp_excp_el);
 +        }
-     } else {
-         lr = R_V7M_EXCRET_RES1_MASK |
-             R_V7M_EXCRET_S_MASK |
+         return 0;
+     }
+ 
 -- 
 2.20.1
