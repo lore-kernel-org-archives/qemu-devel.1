@@ -1,34 +1,29 @@
-Received: from eggs.gnu.org ([209.51.188.92]:48564)
+Received: from eggs.gnu.org ([209.51.188.92]:49656)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1hGOYi-0000N9-9p
-	for qemu-devel@nongnu.org; Tue, 16 Apr 2019 09:55:37 -0400
+	(envelope-from <pbonzini@redhat.com>) id 1hGOec-0002AI-Tl
+	for qemu-devel@nongnu.org; Tue, 16 Apr 2019 10:01:43 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1hGOYh-0006Pv-7D
-	for qemu-devel@nongnu.org; Tue, 16 Apr 2019 09:55:36 -0400
-Received: from indium.canonical.com ([91.189.90.7]:38828)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1hGOYh-0006PR-0S
-	for qemu-devel@nongnu.org; Tue, 16 Apr 2019 09:55:35 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1hGOYf-0001rG-N7
-	for <qemu-devel@nongnu.org>; Tue, 16 Apr 2019 13:55:33 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id ADFD92E80C0
-	for <qemu-devel@nongnu.org>; Tue, 16 Apr 2019 13:55:33 +0000 (UTC)
+	(envelope-from <pbonzini@redhat.com>) id 1hGOeY-0001Jn-2y
+	for qemu-devel@nongnu.org; Tue, 16 Apr 2019 10:01:42 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:48338)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1hGOeX-0001J4-Hq
+	for qemu-devel@nongnu.org; Tue, 16 Apr 2019 10:01:37 -0400
+References: <5FF901C1-0AA5-4308-A65C-C448D0A2BA63@oracle.com>
+	<20190305172905.GD13806@stefanha-x1.localdomain>
+	<2D7F11D0-4A02-4A0F-961D-854240376B17@oracle.com>
+	<20190401090724.GA643@stefanha-x1.localdomain>
+	<C0F977FC-A960-4FA5-B2DF-BBD9DA664F8A@oracle.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <0c0f2d54-2b94-e278-cbce-b7175ba29cc8@redhat.com>
+Date: Tue, 16 Apr 2019 16:01:29 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Tue, 16 Apr 2019 13:39:16 -0000
-From: John Doe <maildir@centrum.cz>
-Reply-To: Bug 1543163 <1543163@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <20160208150110.15874.66099.malonedeb@gac.canonical.com>
-Message-Id: <155542195661.20393.16865013643813448698.malone@chaenomeles.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1543163] Re: VMs unable to boot from network with
- e1000 since 2.2
+In-Reply-To: <C0F977FC-A960-4FA5-B2DF-BBD9DA664F8A@oracle.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] Following up questions related to QEMU and I/O
+ Thread
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,76 +32,20 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Wei Li <wei.d.li@oracle.com>, Stefan Hajnoczi <stefanha@gmail.com>
+Cc: Stefan Hajnoczi <stefanha@redhat.com>, qemu-devel@nongnu.org
 
-I have 3.10 and I managed to boot with e1000 at least in BIOS mode. I am no=
-t sure about UEFI mode, because I get no output on "screen" for whatever, p=
-erhaps unrelated reason.
-Anyway, I think we may close it for now.
+On 05/04/19 23:09, Wei Li wrote:
+> Thanks Stefan for your quick response!
+> 
+> Hi Paolo, Could you please send us a link related to the multiqueue
+> feature which you are working on so that we could start getting some
+> details about the feature.
 
--- =
+I have never gotten to the point of multiqueue, a prerequisite for that
+was to make the block layer thread safe.
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1543163
+The latest state of the work is at github.com/bonzini/qemu, branch
+dataplane7.
 
-Title:
-  VMs unable to boot from network with e1000 since 2.2
-
-Status in QEMU:
-  Incomplete
-
-Bug description:
-  With KVM/QEMU version 1.4, using e1000 NIC, virtual machines boot from
-  network alright; they get an IP from DHCP server (machine A), then
-  connect to Microsoft System Center (machine B) and proceed to boot
-  into Windows PE, install images etc.
-
-  However, with versions at least 2.2 and 2.5, using same NIC, virtual
-  machines fail to boot from network; they still get an IP from A, but
-  then fail "contacting B using gateway (0.0.0.0). Different NICs do not
-  help except for i82551, which however causes problems further down the
-  road (presumably because there is no driver for that card in PE (based
-  on Windows 7/8/10)).
-
-  Note that actual physical machines work.
-
-  Wireshark reveals this:
-
-  QEMU 1.4 + Intel e1000
-  **********************
-  1) client sends DHCP discover
-  2) machine A answers, offers an IP, gateway and itself as next server
-  3) machine B answers, offers no IP, but gateway and itself as next server
-  4) client requests the IP
-  5) machine A ACKs
-  6) client sends unicast request for ??? to B
-  7) B offers (unicast) a boot file (some .com)
-  8) client sends another unicast request for ??? to B
-  9) B again offers the boot file
-  (then they chat a bit, B offers another file, client downloads some stuff=
- via TFTP etc.)
-
-  =
-
-  QEMU 2.2/2.5 + Intel e1000
-  **************************
-  1) client sends DHCP discover
-  2) machine A answers, offers an IP, gateway and itself as next server
-  3) machine B answers, offers no IP, but gateway and itself as next server
-  4) client requests the IP
-  5) machine A ACKs
-  6) client sends _broadcast_ request for ??? to B
-  7) B offers (likewise broadcast) a boot file
-  8) client sends another request, this time unicast and claims "Client IP =
-address =3D 0.0.0.0"
-  (and it basically hangs)
-
-  =
-
-  So, since some time after 1.4, QEMUlated machines with otherwise trusty e=
-1000 can no longer boot from network and it might be due to different behav=
-iour.
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1543163/+subscriptions
+Paolo
