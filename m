@@ -7,73 +7,73 @@ X-Spam-Status: No, score=-8.7 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 48073C10F13
-	for <qemu-devel@archiver.kernel.org>; Tue, 16 Apr 2019 13:17:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CD065C10F14
+	for <qemu-devel@archiver.kernel.org>; Tue, 16 Apr 2019 13:18:55 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0E65D2077C
-	for <qemu-devel@archiver.kernel.org>; Tue, 16 Apr 2019 13:17:04 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 96D542077C
+	for <qemu-devel@archiver.kernel.org>; Tue, 16 Apr 2019 13:18:55 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="xQh+F+4A"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0E65D2077C
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="g5BhKRB7"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 96D542077C
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:36612 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:36635 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hGNxP-0003Ej-7L
-	for qemu-devel@archiver.kernel.org; Tue, 16 Apr 2019 09:17:03 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:34860)
+	id 1hGNzC-0004aE-Rj
+	for qemu-devel@archiver.kernel.org; Tue, 16 Apr 2019 09:18:54 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:34966)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1hGNfY-00055v-KR
-	for qemu-devel@nongnu.org; Tue, 16 Apr 2019 08:58:38 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1hGNfc-0005BA-PA
+	for qemu-devel@nongnu.org; Tue, 16 Apr 2019 08:58:42 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1hGNfW-0001V6-JC
-	for qemu-devel@nongnu.org; Tue, 16 Apr 2019 08:58:36 -0400
-Received: from mail-wm1-x343.google.com ([2a00:1450:4864:20::343]:39344)
+	(envelope-from <peter.maydell@linaro.org>) id 1hGNfa-0001Yc-Ow
+	for qemu-devel@nongnu.org; Tue, 16 Apr 2019 08:58:40 -0400
+Received: from mail-wr1-x444.google.com ([2a00:1450:4864:20::444]:34512)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1hGNfU-0001Qs-Fy
-	for qemu-devel@nongnu.org; Tue, 16 Apr 2019 08:58:33 -0400
-Received: by mail-wm1-x343.google.com with SMTP id n25so25318242wmk.4
-	for <qemu-devel@nongnu.org>; Tue, 16 Apr 2019 05:58:28 -0700 (PDT)
+	id 1hGNfY-0001Vl-Og
+	for qemu-devel@nongnu.org; Tue, 16 Apr 2019 08:58:38 -0400
+Received: by mail-wr1-x444.google.com with SMTP id p10so26962613wrq.1
+	for <qemu-devel@nongnu.org>; Tue, 16 Apr 2019 05:58:35 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
 	h=from:to:subject:date:message-id:in-reply-to:references:mime-version
 	:content-transfer-encoding;
-	bh=Bad+ohxUQ2aXQF4pfMXnuYXIWQ2Nayau0QYhuZSUXeA=;
-	b=xQh+F+4AbZ+JCj/OZ/rPi5WMngHxfn7bzPGmvSBmXWAksdoKPWFbXxpRxG+ubwvYzr
-	xMuGppCtKP8bU2c0rfGv0rB6FmHFLCP8kPXniXAgn/uOVyapMzSBZq0nUbQPmUwTIFyO
-	9j9i/9aWuzWeNIJfun9jaWvbNk89jz9Dv7EJZAzAYMwIPEKHFMtG3vp7LlOOepW7dP5G
-	AyFEn8yODfKJ6LtFT6c2+gumefP6ofHSDDUXhySESONyYP9IjaAAOWtbY/nHCW2N5QRh
-	WFciEQN+3hqik5lXeP/HwyyHv0Ffyb63k54R3JCI+aiMclp3aZDgh8VjNOZZ9kcryJzT
-	yyiA==
+	bh=tO2IbzqkFfPLxQHEQtP7KD/Py5uleD69zDN6a2d6v0s=;
+	b=g5BhKRB7QoF5P+fGXAexdSpC1m8IYCNpc8uaDDbaLKubN4BHTVCGY3h6IB5RWIqQZA
+	MbV0nk4g1nemo1xF1ayKqp3yRJop5eu+ERgC0mI0DrpjQQ2eE+4hJ7pBjZbzg6GplElH
+	Kj6pOUeoCx+0P5kaz/buSy3cYm9Fc1yEjB9hMMksAw9KGWU/NoKcvVMjP4qSM+aPvEVC
+	xArfrW0aM1oLfNFTFRkNaF/aYEH0gIC0adBh0y+SVtLsMdBQ2pIyhvNhg1NofUke05U7
+	5z/KAkcV6d/7FQlR7UjRNmj2HInRvIJX6xQcGaaUgGqWLekq4ecwrSfQ6HwsyZjLHXFd
+	m3ow==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
 	d=1e100.net; s=20161025;
 	h=x-gm-message-state:from:to:subject:date:message-id:in-reply-to
 	:references:mime-version:content-transfer-encoding;
-	bh=Bad+ohxUQ2aXQF4pfMXnuYXIWQ2Nayau0QYhuZSUXeA=;
-	b=juPA5JVBqcogd6FvuCDwqGKWCRHlXGxXSZ7HNBLvTZHKSfv/00WZG1xOF4f936Soip
-	pr0rIFuf1ucD8dgI3lMQih8xBJKPPgx//gF8YhNNbO8y6Lc5Pbywx18PYJMrsCM5RLYC
-	+Udkifxhsk9YhUDTQxsr/6MZyiKoX89VNij9wl0oXXKOHbM+kshHk0TsE04UN8AIM2bP
-	ZifjgjLu/Ya5vlYiVffq7+AR/gdwvoD0c4Ry5uNVy3v/wyeCQMtTGONav1C48OJ9mWBm
-	UN9J3paea2SEJuUyy1viz9eWicqjSqD7PZ21gowtXys+uWCb/iQMYUQ8/iOS0hdLN+aJ
-	H/VQ==
-X-Gm-Message-State: APjAAAVSrS4Qnxn2tF6eXBH1yRp6j+orLZEP1/limjFq5U9ATf7rw2to
-	3/WmC6tZbjnKc4R8a93tGxpDaw==
-X-Google-Smtp-Source: APXvYqwCwOsyF7xm5StMQ+0Gl7Rnfk9xS5aaqHRR31UM6URdlacOLi2dhQQu/zPWFZxeQjOJYd879Q==
-X-Received: by 2002:a1c:80cd:: with SMTP id b196mr26034521wmd.84.1555419507531;
-	Tue, 16 Apr 2019 05:58:27 -0700 (PDT)
+	bh=tO2IbzqkFfPLxQHEQtP7KD/Py5uleD69zDN6a2d6v0s=;
+	b=MadBPL6Y4zJ5QeUJh1uPO60CtuQ1itiudLDPwGmX6n3Hz/qe9/mzwUa/+AeBaZa/W8
+	ei17i2+NswzQVG2RfNhl3959fPNAq0qQZVPSJhpI+gJ3WJ+QKWgkeNya6j+5xDkRtZyZ
+	35t//5F7rLhcMO63vJOqe69837KvodAKFpktdDsISUQsOfmGV+9pFdo98IpJpgJs4Y9A
+	nG+KQzibuLmGiPUJb5D4aMuTWVxPWuje3/ZZP3X/oaupF58pQAtyvE7qRCSqrIu50X7Q
+	sGN5Q6mzEXflNM+42XjKJ/9nundc4lXh6WSXHYAJg2VMFticzmFgzv2k0t2MnzbghwLa
+	xUOw==
+X-Gm-Message-State: APjAAAVPZUD38euyVtLiy5abR2/WuJ5XkU9yW9TatGxTrvEaHJ97n24E
+	BZh5dqL3WpjYU61AcX/97vPVdEjHoPs=
+X-Google-Smtp-Source: APXvYqwh7/cSxCAppGXQHXu3W1Z4WJSBow/CYQ2cdKHKfXAsWyggL2b4uSB8x1+qi96fCuRF66YkJQ==
+X-Received: by 2002:adf:f78d:: with SMTP id q13mr51758249wrp.194.1555419515116;
+	Tue, 16 Apr 2019 05:58:35 -0700 (PDT)
 Received: from orth.archaic.org.uk (orth.archaic.org.uk. [81.2.115.148])
 	by smtp.gmail.com with ESMTPSA id
-	v184sm39476572wma.6.2019.04.16.05.58.26
+	v184sm39476572wma.6.2019.04.16.05.58.33
 	(version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-	Tue, 16 Apr 2019 05:58:26 -0700 (PDT)
+	Tue, 16 Apr 2019 05:58:34 -0700 (PDT)
 From: Peter Maydell <peter.maydell@linaro.org>
 To: qemu-arm@nongnu.org,
 	qemu-devel@nongnu.org
-Date: Tue, 16 Apr 2019 13:57:38 +0100
-Message-Id: <20190416125744.27770-21-peter.maydell@linaro.org>
+Date: Tue, 16 Apr 2019 13:57:44 +0100
+Message-Id: <20190416125744.27770-27-peter.maydell@linaro.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20190416125744.27770-1-peter.maydell@linaro.org>
 References: <20190416125744.27770-1-peter.maydell@linaro.org>
@@ -81,9 +81,9 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
 	recognized.
-X-Received-From: 2a00:1450:4864:20::343
-Subject: [Qemu-devel] [PATCH 20/26] target/arm: New helper function
- arm_v7m_mmu_idx_all()
+X-Received-From: 2a00:1450:4864:20::444
+Subject: [Qemu-devel] [PATCH 26/26] target/arm: Enable FPU for Cortex-M4 and
+ Cortex-M33
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -99,83 +99,46 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 Content-Type: text/plain; charset="UTF-8"
-Message-ID: <20190416125738.M6_zErhvw6RVJMDayfEnirrm4re9tGEIKEuFlHEZqV0@z>
+Message-ID: <20190416125744.denULOxJfHyaPtaTXFsigHsfeCHnv5xvj2CaPw6PXjo@z>
 
-Add a new helper function which returns the MMU index to use
-for v7M, where the caller specifies all of the security
-state, privilege level and whether the execution priority
-is negative, and reimplement the existing
-arm_v7m_mmu_idx_for_secstate_and_priv() in terms of it.
-
-We are going to need this for the lazy-FP-stacking code.
+Enable the FPU by default for the Cortex-M4 and Cortex-M33.
 
 Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 ---
-Suggestions for better function name welcome.
-arm_v7m_mmu_idx_for_secstate_and_priv_and_negpri()
-just seems way too long and unwieldy...
----
- target/arm/cpu.h    |  7 +++++++
- target/arm/helper.c | 14 +++++++++++---
- 2 files changed, 18 insertions(+), 3 deletions(-)
+ target/arm/cpu.c | 8 ++++++++
+ 1 file changed, 8 insertions(+)
 
-diff --git a/target/arm/cpu.h b/target/arm/cpu.h
-index 500e0ab4c5d..0a1b82dc996 100644
---- a/target/arm/cpu.h
-+++ b/target/arm/cpu.h
-@@ -2912,6 +2912,13 @@ static inline int arm_mmu_idx_to_el(ARMMMUIdx mmu_idx)
-     }
- }
- 
-+/*
-+ * Return the MMU index for a v7M CPU with all relevant information
-+ * manually specified.
-+ */
-+ARMMMUIdx arm_v7m_mmu_idx_all(CPUARMState *env,
-+                              bool secstate, bool priv, bool negpri);
-+
- /* Return the MMU index for a v7M CPU in the specified security and
-  * privilege state.
-  */
-diff --git a/target/arm/helper.c b/target/arm/helper.c
-index 2feb3f664fe..c8e30b40366 100644
---- a/target/arm/helper.c
-+++ b/target/arm/helper.c
-@@ -13235,8 +13235,8 @@ int fp_exception_el(CPUARMState *env, int cur_el)
-     return 0;
- }
- 
--ARMMMUIdx arm_v7m_mmu_idx_for_secstate_and_priv(CPUARMState *env,
--                                                bool secstate, bool priv)
-+ARMMMUIdx arm_v7m_mmu_idx_all(CPUARMState *env,
-+                              bool secstate, bool priv, bool negpri)
- {
-     ARMMMUIdx mmu_idx = ARM_MMU_IDX_M;
- 
-@@ -13244,7 +13244,7 @@ ARMMMUIdx arm_v7m_mmu_idx_for_secstate_and_priv(CPUARMState *env,
-         mmu_idx |= ARM_MMU_IDX_M_PRIV;
-     }
- 
--    if (armv7m_nvic_neg_prio_requested(env->nvic, secstate)) {
-+    if (negpri) {
-         mmu_idx |= ARM_MMU_IDX_M_NEGPRI;
-     }
- 
-@@ -13255,6 +13255,14 @@ ARMMMUIdx arm_v7m_mmu_idx_for_secstate_and_priv(CPUARMState *env,
-     return mmu_idx;
- }
- 
-+ARMMMUIdx arm_v7m_mmu_idx_for_secstate_and_priv(CPUARMState *env,
-+                                                bool secstate, bool priv)
-+{
-+    bool negpri = armv7m_nvic_neg_prio_requested(env->nvic, secstate);
-+
-+    return arm_v7m_mmu_idx_all(env, secstate, priv, negpri);
-+}
-+
- /* Return the MMU index for a v7M CPU in the specified security state */
- ARMMMUIdx arm_v7m_mmu_idx_for_secstate(CPUARMState *env, bool secstate)
- {
+diff --git a/target/arm/cpu.c b/target/arm/cpu.c
+index dd6c4f6da8d..00d3299e212 100644
+--- a/target/arm/cpu.c
++++ b/target/arm/cpu.c
+@@ -1494,8 +1494,12 @@ static void cortex_m4_initfn(Object *obj)
+     set_feature(&cpu->env, ARM_FEATURE_M);
+     set_feature(&cpu->env, ARM_FEATURE_M_MAIN);
+     set_feature(&cpu->env, ARM_FEATURE_THUMB_DSP);
++    set_feature(&cpu->env, ARM_FEATURE_VFP4);
+     cpu->midr = 0x410fc240; /* r0p0 */
+     cpu->pmsav7_dregion = 8;
++    cpu->isar.mvfr0 = 0x10110021;
++    cpu->isar.mvfr1 = 0x11000011;
++    cpu->isar.mvfr2 = 0x00000000;
+     cpu->id_pfr0 = 0x00000030;
+     cpu->id_pfr1 = 0x00000200;
+     cpu->id_dfr0 = 0x00100000;
+@@ -1522,9 +1526,13 @@ static void cortex_m33_initfn(Object *obj)
+     set_feature(&cpu->env, ARM_FEATURE_M_MAIN);
+     set_feature(&cpu->env, ARM_FEATURE_M_SECURITY);
+     set_feature(&cpu->env, ARM_FEATURE_THUMB_DSP);
++    set_feature(&cpu->env, ARM_FEATURE_VFP4);
+     cpu->midr = 0x410fd213; /* r0p3 */
+     cpu->pmsav7_dregion = 16;
+     cpu->sau_sregion = 8;
++    cpu->isar.mvfr0 = 0x10110021;
++    cpu->isar.mvfr1 = 0x11000011;
++    cpu->isar.mvfr2 = 0x00000040;
+     cpu->id_pfr0 = 0x00000030;
+     cpu->id_pfr1 = 0x00000210;
+     cpu->id_dfr0 = 0x00200000;
 -- 
 2.20.1
 
