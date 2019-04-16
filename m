@@ -1,27 +1,25 @@
-Received: from eggs.gnu.org ([209.51.188.92]:49194)
+Received: from eggs.gnu.org ([209.51.188.92]:49701)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <prvs=002ee81e8=Paul.Durrant@citrix.com>)
-	id 1hGKWH-0006Hk-EJ
-	for qemu-devel@nongnu.org; Tue, 16 Apr 2019 05:36:51 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1hGKYI-00079I-Nb
+	for qemu-devel@nongnu.org; Tue, 16 Apr 2019 05:38:55 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <prvs=002ee81e8=Paul.Durrant@citrix.com>)
-	id 1hGKWF-0001tl-P6
-	for qemu-devel@nongnu.org; Tue, 16 Apr 2019 05:36:48 -0400
-From: Paul Durrant <Paul.Durrant@citrix.com>
-Date: Tue, 16 Apr 2019 09:36:29 +0000
-Message-ID: <3ce7ee587d3d443b9d1b407a3c9e37a7@AMSPEX02CL01.citrite.net>
-References: <20190408151617.13025-1-paul.durrant@citrix.com>
-	<20190408151617.13025-3-paul.durrant@citrix.com>
-	<20190410125708.GE1435@perard.uk.xensource.com>
-	<582f92f1ddf24985b75c32fe913784df@AMSPEX02CL01.citrite.net>
-	<20190415084249.GA29134@stefanha-x1.localdomain>
-In-Reply-To: <20190415084249.GA29134@stefanha-x1.localdomain>
-Content-Language: en-US
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+	(envelope-from <peter.maydell@linaro.org>) id 1hGKYH-0003DE-Qc
+	for qemu-devel@nongnu.org; Tue, 16 Apr 2019 05:38:54 -0400
+Received: from mail-oi1-x244.google.com ([2607:f8b0:4864:20::244]:35319)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1hGKYH-0003Ck-JC
+	for qemu-devel@nongnu.org; Tue, 16 Apr 2019 05:38:53 -0400
+Received: by mail-oi1-x244.google.com with SMTP id j132so16399075oib.2
+	for <qemu-devel@nongnu.org>; Tue, 16 Apr 2019 02:38:51 -0700 (PDT)
 MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [Qemu-block] [PATCH 2/3] xen-bus: allow AioContext
- to be specified for each event channel
+References: <20190415180618.1450-1-samuel.thibault@ens-lyon.org>
+In-Reply-To: <20190415180618.1450-1-samuel.thibault@ens-lyon.org>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Tue, 16 Apr 2019 10:38:38 +0100
+Message-ID: <CAFEAcA9z-ELZJ+WunWYwprzMOpC7WPxPiwNjdtFoNxL+LE=jQQ@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PULL 0/1] slirp gcc9 build fix
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,51 +28,41 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: 'Stefan Hajnoczi' <stefanha@gmail.com>
-Cc: Kevin Wolf <kwolf@redhat.com>, Stefano Stabellini <sstabellini@kernel.org>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, Max Reitz <mreitz@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, Anthony Perard <anthony.perard@citrix.com>, "xen-devel@lists.xenproject.org" <xen-devel@lists.xenproject.org>
+To: Samuel Thibault <samuel.thibault@ens-lyon.org>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, Stefan Hajnoczi <stefanha@redhat.com>, Jan Kiszka <jan.kiszka@siemens.com>
 
-> -----Original Message-----
-[snip]
-> > > I wonder if the `'is_external' parameter of aio_set_fd_handler shoud =
-be
-> > > `true' here, instead. That flag seems to be used when making a snapsh=
-ot
-> > > of a blockdev, for example.
-> > >
-> > > That was introduced by:
-> > > dca21ef23ba48f6f1428c59f295a857e5dc203c8^..c07bc2c1658fffeee08eb46402=
-b2f66d55b07586
-> > >
-> > > What do you think?
-> >
-> > Interesting. I admit I was merely transcribing what qemu_set_fd_handler=
-() passes without really
-> looking into the values. Looking at the arguments that virtio-blk passes =
-to aio_set_event_notifier()
-> though, and what 'is_external' means, it would appear that setting it to =
-true is probably the right
-> thing to do. Do you want me to send a v2 of the series or can you fix it =
-up?
->=20
-> Hi,
-> Handlers are invoked by the aio_poll() event loop.  Some handlers are
-> considered "external" in the sense that they submit new I/O requests
-> from the guest or outside world.  Others are considered "internal" in
-> the sense that they are part of the block layer and not an entry point
-> into the block layer.
->=20
-> There are points where the block layer wants to run the event loop but
-> new requests must not be submitted.  In this case aio_disable_external()
-> will be called so that "external" handlers are not processed.
->=20
-> For example, see virtio's virtio_queue_aio_set_host_notifier_handler().
-> This is the virtqueue kick ioeventfd and it shouldn't be processed when
-> aio_disable_external() has been called.
->=20
+On Mon, 15 Apr 2019 at 19:06, Samuel Thibault
+<samuel.thibault@ens-lyon.org> wrote:
+>
+> The following changes since commit afccfc0c4c6134a7bc9da6375996b3b91d291de4:
+>
+>   Merge remote-tracking branch 'remotes/kevin/tags/for-upstream' into staging (2019-04-12 17:06:49 +0100)
+>
+> are available in the Git repository at:
+>
+>   https://people.debian.org/~sthibault/qemu.git tags/samuel-thibault
+>
+> for you to fetch changes up to 6fabae61a9393fd2bc703837e464b9c34ec5ef25:
+>
+>   slirp: Gcc 9 -O3 fix (2019-04-15 20:01:18 +0200)
+>
+> ----------------------------------------------------------------
+> Slirp updates
+>
+> Dr. David Alan Gilbert (1):
+>   slirp: Gcc 9 -O3 fix
+>
+> ----------------------------------------------------------------
+> Dr. David Alan Gilbert (1):
+>       slirp: Gcc 9 -O3 fix
+>
+>  slirp/src/socket.c | 5 ++++-
+>  1 file changed, 4 insertions(+), 1 deletion(-)
 
-Thanks for the explanation Stefan. Xen event channels/shared rings should i=
-ndeed be considered as external sources.
 
-  Cheers,
+Applied, thanks.
 
-    Paul
+Please update the changelog at https://wiki.qemu.org/ChangeLog/4.0
+for any user-visible changes.
+
+-- PMM
