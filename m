@@ -1,26 +1,32 @@
-Received: from eggs.gnu.org ([209.51.188.92]:58295)
+Received: from eggs.gnu.org ([209.51.188.92]:58804)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1hGHfz-0002ki-V1
-	for qemu-devel@nongnu.org; Tue, 16 Apr 2019 02:34:41 -0400
+	(envelope-from <vsementsov@virtuozzo.com>) id 1hGHjd-0003dL-MB
+	for qemu-devel@nongnu.org; Tue, 16 Apr 2019 02:38:26 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1hGHfx-000157-Sk
-	for qemu-devel@nongnu.org; Tue, 16 Apr 2019 02:34:39 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:60132)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1hGHfv-00014S-Tn
-	for qemu-devel@nongnu.org; Tue, 16 Apr 2019 02:34:37 -0400
-From: Markus Armbruster <armbru@redhat.com>
+	(envelope-from <vsementsov@virtuozzo.com>) id 1hGHja-0002S7-BE
+	for qemu-devel@nongnu.org; Tue, 16 Apr 2019 02:38:24 -0400
+Received: from mail-ve1eur01on0708.outbound.protection.outlook.com
+	([2a01:111:f400:fe1f::708]:10816
+	helo=EUR01-VE1-obe.outbound.protection.outlook.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
+	id 1hGHjZ-0002R7-A0
+	for qemu-devel@nongnu.org; Tue, 16 Apr 2019 02:38:22 -0400
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Date: Tue, 16 Apr 2019 06:38:17 +0000
+Message-ID: <da576bee-8ed5-13d9-7f29-74110d6ccb4b@virtuozzo.com>
 References: <20190413160732.55505-1-vsementsov@virtuozzo.com>
 	<87zhorbytu.fsf@dusky.pond.sub.org>
 	<3381f703-4fc1-ac3c-658c-f7399403acf9@virtuozzo.com>
 	<874l6za00z.fsf@dusky.pond.sub.org>
 	<e432f8cf-4014-8175-4a56-167a14534528@virtuozzo.com>
-Date: Tue, 16 Apr 2019 08:34:32 +0200
-In-Reply-To: <e432f8cf-4014-8175-4a56-167a14534528@virtuozzo.com> (Vladimir
-	Sementsov-Ogievskiy's message of "Mon, 15 Apr 2019 13:35:59 +0000")
-Message-ID: <87k1fu791j.fsf@dusky.pond.sub.org>
+	<87k1fu791j.fsf@dusky.pond.sub.org>
+In-Reply-To: <87k1fu791j.fsf@dusky.pond.sub.org>
+Content-Language: en-US
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <5F32F1A628189144B204160DC9F73AFF@eurprd08.prod.outlook.com>
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-Content-Type: text/plain
 Subject: Re: [Qemu-devel] [PATCH] util/error: do not free error on
  error_abort
 List-Id: <qemu-devel.nongnu.org>
@@ -31,99 +37,80 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+To: Markus Armbruster <armbru@redhat.com>
 Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
 
-Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com> writes:
-
-> 15.04.2019 16:08, Markus Armbruster wrote:
->> Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com> writes:
->> 
->>> 15.04.2019 8:51, Markus Armbruster wrote:
->>>> Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com> writes:
->>>>
->>>>> It would be nice to have Error object not freed away when debugging a
->>>>> coredump.
->>>>>
->>>>> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
->>>>> ---
->>>>>    util/error.c | 8 +++++---
->>>>>    1 file changed, 5 insertions(+), 3 deletions(-)
->>>>>
->>>>> diff --git a/util/error.c b/util/error.c
->>>>> index 934a78e1b1..f9180c0f30 100644
->>>>> --- a/util/error.c
->>>>> +++ b/util/error.c
->>>>> @@ -32,9 +32,11 @@ Error *error_fatal;
->>>>>    static void error_handle_fatal(Error **errp, Error *err)
->>>>>    {
->>>>>        if (errp == &error_abort) {
->>>>> -        fprintf(stderr, "Unexpected error in %s() at %s:%d:\n",
->>>>> -                err->func, err->src, err->line);
->>>>> -        error_report_err(err);
->>>>> +        error_report("Unexpected error in %s() at %s:%d: %s",
->>>>> +                     err->func, err->src, err->line, error_get_pretty(err));
->>>>> +        if (err->hint) {
->>>>> +            error_printf_unless_qmp("%s", err->hint->str);
->>>>> +        }
->>>>>            abort();
->>>>>        }
->>>>>        if (errp == &error_fatal) {
->>>>
->>>> No objections to not freeing the error object on the path to abort().
->>>>
->>>> You also format the error message differently.  Commit 1e9b65bb1ba's
->>>> example
->>>>
->>>>           Unexpected error in parse_block_error_action() at .../qemu/blockdev.c:322:
->>>>           qemu-system-x86_64: -drive if=none,werror=foo: 'foo' invalid write error action
->>>>           Aborted (core dumped)
->>>>
->>>> changes to (guesswork, not tested):
->>>>
->>>>           qemu-system-x86_64: -drive if=none,werror=foo: Unexpected error in parse_block_error_action() at .../qemu/blockdev.c:322: 'foo' invalid write error action
->>>>           Aborted (core dumped)
->>>
->>> hm. checkpatch don't allow to put \n into error_report. So, should I call error_report twice?
->>>
->>> Transition from fprintf to error_report is OK for you?
->> 
->> Let's simply not mess with the formatting at all.  Something like:
->> 
->> (1) Inline error_report_err(), delete the error_free()
->> 
->> (2) Optional: replace fprintf() by error_printf()
->> 
->> (3) Optional: clean up the additional copy of
->> 
->>          if (err->hint) {
->>              error_printf_unless_qmp("%s", err->hint->str);
->>          }
->> 
->> (3a) Either create a helper function, replacing all three copies,
->> 
->> (3b) Or simply delete the new copy from the path leading to abort(),
->>       since the hint is unlikely to be useful there.
->> 
->
-> Why we print error always but hint only "unless_qmp"?
-
-"Hints" are intended for giving hints to a human user (although they are
-misused for other purposes in places):
-
-/*
- * Append a printf-style human-readable explanation to an existing error.
- * If the error is later reported to a human user with
- * error_report_err() or warn_report_err(), the hints will be shown,
- * too.  If it's reported via QMP, the hints will be ignored.
- * Intended use is adding helpful hints on the human user interface,
- * e.g. a list of valid values.  It's not for clarifying a confusing
- * error message.
- * @errp may be NULL, but not &error_fatal or &error_abort.
- * Trivially the case if you call it only after error_setg() or
- * error_propagate().
- * May be called multiple times.  The resulting hint should end with a
- * newline.
- */
-void error_append_hint(Error **errp, const char *fmt, ...)
-    GCC_FMT_ATTR(2, 3);
+MTYuMDQuMjAxOSA5OjM0LCBNYXJrdXMgQXJtYnJ1c3RlciB3cm90ZToNCj4gVmxhZGltaXIgU2Vt
+ZW50c292LU9naWV2c2tpeSA8dnNlbWVudHNvdkB2aXJ0dW96em8uY29tPiB3cml0ZXM6DQo+IA0K
+Pj4gMTUuMDQuMjAxOSAxNjowOCwgTWFya3VzIEFybWJydXN0ZXIgd3JvdGU6DQo+Pj4gVmxhZGlt
+aXIgU2VtZW50c292LU9naWV2c2tpeSA8dnNlbWVudHNvdkB2aXJ0dW96em8uY29tPiB3cml0ZXM6
+DQo+Pj4NCj4+Pj4gMTUuMDQuMjAxOSA4OjUxLCBNYXJrdXMgQXJtYnJ1c3RlciB3cm90ZToNCj4+
+Pj4+IFZsYWRpbWlyIFNlbWVudHNvdi1PZ2lldnNraXkgPHZzZW1lbnRzb3ZAdmlydHVvenpvLmNv
+bT4gd3JpdGVzOg0KPj4+Pj4NCj4+Pj4+PiBJdCB3b3VsZCBiZSBuaWNlIHRvIGhhdmUgRXJyb3Ig
+b2JqZWN0IG5vdCBmcmVlZCBhd2F5IHdoZW4gZGVidWdnaW5nIGENCj4+Pj4+PiBjb3JlZHVtcC4N
+Cj4+Pj4+Pg0KPj4+Pj4+IFNpZ25lZC1vZmYtYnk6IFZsYWRpbWlyIFNlbWVudHNvdi1PZ2lldnNr
+aXkgPHZzZW1lbnRzb3ZAdmlydHVvenpvLmNvbT4NCj4+Pj4+PiAtLS0NCj4+Pj4+PiAgICAgdXRp
+bC9lcnJvci5jIHwgOCArKysrKy0tLQ0KPj4+Pj4+ICAgICAxIGZpbGUgY2hhbmdlZCwgNSBpbnNl
+cnRpb25zKCspLCAzIGRlbGV0aW9ucygtKQ0KPj4+Pj4+DQo+Pj4+Pj4gZGlmZiAtLWdpdCBhL3V0
+aWwvZXJyb3IuYyBiL3V0aWwvZXJyb3IuYw0KPj4+Pj4+IGluZGV4IDkzNGE3OGUxYjEuLmY5MTgw
+YzBmMzAgMTAwNjQ0DQo+Pj4+Pj4gLS0tIGEvdXRpbC9lcnJvci5jDQo+Pj4+Pj4gKysrIGIvdXRp
+bC9lcnJvci5jDQo+Pj4+Pj4gQEAgLTMyLDkgKzMyLDExIEBAIEVycm9yICplcnJvcl9mYXRhbDsN
+Cj4+Pj4+PiAgICAgc3RhdGljIHZvaWQgZXJyb3JfaGFuZGxlX2ZhdGFsKEVycm9yICoqZXJycCwg
+RXJyb3IgKmVycikNCj4+Pj4+PiAgICAgew0KPj4+Pj4+ICAgICAgICAgaWYgKGVycnAgPT0gJmVy
+cm9yX2Fib3J0KSB7DQo+Pj4+Pj4gLSAgICAgICAgZnByaW50ZihzdGRlcnIsICJVbmV4cGVjdGVk
+IGVycm9yIGluICVzKCkgYXQgJXM6JWQ6XG4iLA0KPj4+Pj4+IC0gICAgICAgICAgICAgICAgZXJy
+LT5mdW5jLCBlcnItPnNyYywgZXJyLT5saW5lKTsNCj4+Pj4+PiAtICAgICAgICBlcnJvcl9yZXBv
+cnRfZXJyKGVycik7DQo+Pj4+Pj4gKyAgICAgICAgZXJyb3JfcmVwb3J0KCJVbmV4cGVjdGVkIGVy
+cm9yIGluICVzKCkgYXQgJXM6JWQ6ICVzIiwNCj4+Pj4+PiArICAgICAgICAgICAgICAgICAgICAg
+ZXJyLT5mdW5jLCBlcnItPnNyYywgZXJyLT5saW5lLCBlcnJvcl9nZXRfcHJldHR5KGVycikpOw0K
+Pj4+Pj4+ICsgICAgICAgIGlmIChlcnItPmhpbnQpIHsNCj4+Pj4+PiArICAgICAgICAgICAgZXJy
+b3JfcHJpbnRmX3VubGVzc19xbXAoIiVzIiwgZXJyLT5oaW50LT5zdHIpOw0KPj4+Pj4+ICsgICAg
+ICAgIH0NCj4+Pj4+PiAgICAgICAgICAgICBhYm9ydCgpOw0KPj4+Pj4+ICAgICAgICAgfQ0KPj4+
+Pj4+ICAgICAgICAgaWYgKGVycnAgPT0gJmVycm9yX2ZhdGFsKSB7DQo+Pj4+Pg0KPj4+Pj4gTm8g
+b2JqZWN0aW9ucyB0byBub3QgZnJlZWluZyB0aGUgZXJyb3Igb2JqZWN0IG9uIHRoZSBwYXRoIHRv
+IGFib3J0KCkuDQo+Pj4+Pg0KPj4+Pj4gWW91IGFsc28gZm9ybWF0IHRoZSBlcnJvciBtZXNzYWdl
+IGRpZmZlcmVudGx5LiAgQ29tbWl0IDFlOWI2NWJiMWJhJ3MNCj4+Pj4+IGV4YW1wbGUNCj4+Pj4+
+DQo+Pj4+PiAgICAgICAgICAgIFVuZXhwZWN0ZWQgZXJyb3IgaW4gcGFyc2VfYmxvY2tfZXJyb3Jf
+YWN0aW9uKCkgYXQgLi4uL3FlbXUvYmxvY2tkZXYuYzozMjI6DQo+Pj4+PiAgICAgICAgICAgIHFl
+bXUtc3lzdGVtLXg4Nl82NDogLWRyaXZlIGlmPW5vbmUsd2Vycm9yPWZvbzogJ2ZvbycgaW52YWxp
+ZCB3cml0ZSBlcnJvciBhY3Rpb24NCj4+Pj4+ICAgICAgICAgICAgQWJvcnRlZCAoY29yZSBkdW1w
+ZWQpDQo+Pj4+Pg0KPj4+Pj4gY2hhbmdlcyB0byAoZ3Vlc3N3b3JrLCBub3QgdGVzdGVkKToNCj4+
+Pj4+DQo+Pj4+PiAgICAgICAgICAgIHFlbXUtc3lzdGVtLXg4Nl82NDogLWRyaXZlIGlmPW5vbmUs
+d2Vycm9yPWZvbzogVW5leHBlY3RlZCBlcnJvciBpbiBwYXJzZV9ibG9ja19lcnJvcl9hY3Rpb24o
+KSBhdCAuLi4vcWVtdS9ibG9ja2Rldi5jOjMyMjogJ2ZvbycgaW52YWxpZCB3cml0ZSBlcnJvciBh
+Y3Rpb24NCj4+Pj4+ICAgICAgICAgICAgQWJvcnRlZCAoY29yZSBkdW1wZWQpDQo+Pj4+DQo+Pj4+
+IGhtLiBjaGVja3BhdGNoIGRvbid0IGFsbG93IHRvIHB1dCBcbiBpbnRvIGVycm9yX3JlcG9ydC4g
+U28sIHNob3VsZCBJIGNhbGwgZXJyb3JfcmVwb3J0IHR3aWNlPw0KPj4+Pg0KPj4+PiBUcmFuc2l0
+aW9uIGZyb20gZnByaW50ZiB0byBlcnJvcl9yZXBvcnQgaXMgT0sgZm9yIHlvdT8NCj4+Pg0KPj4+
+IExldCdzIHNpbXBseSBub3QgbWVzcyB3aXRoIHRoZSBmb3JtYXR0aW5nIGF0IGFsbC4gIFNvbWV0
+aGluZyBsaWtlOg0KPj4+DQo+Pj4gKDEpIElubGluZSBlcnJvcl9yZXBvcnRfZXJyKCksIGRlbGV0
+ZSB0aGUgZXJyb3JfZnJlZSgpDQo+Pj4NCj4+PiAoMikgT3B0aW9uYWw6IHJlcGxhY2UgZnByaW50
+ZigpIGJ5IGVycm9yX3ByaW50ZigpDQo+Pj4NCj4+PiAoMykgT3B0aW9uYWw6IGNsZWFuIHVwIHRo
+ZSBhZGRpdGlvbmFsIGNvcHkgb2YNCj4+Pg0KPj4+ICAgICAgICAgICBpZiAoZXJyLT5oaW50KSB7
+DQo+Pj4gICAgICAgICAgICAgICBlcnJvcl9wcmludGZfdW5sZXNzX3FtcCgiJXMiLCBlcnItPmhp
+bnQtPnN0cik7DQo+Pj4gICAgICAgICAgIH0NCj4+Pg0KPj4+ICgzYSkgRWl0aGVyIGNyZWF0ZSBh
+IGhlbHBlciBmdW5jdGlvbiwgcmVwbGFjaW5nIGFsbCB0aHJlZSBjb3BpZXMsDQo+Pj4NCj4+PiAo
+M2IpIE9yIHNpbXBseSBkZWxldGUgdGhlIG5ldyBjb3B5IGZyb20gdGhlIHBhdGggbGVhZGluZyB0
+byBhYm9ydCgpLA0KPj4+ICAgICAgICBzaW5jZSB0aGUgaGludCBpcyB1bmxpa2VseSB0byBiZSB1
+c2VmdWwgdGhlcmUuDQo+Pj4NCj4+DQo+PiBXaHkgd2UgcHJpbnQgZXJyb3IgYWx3YXlzIGJ1dCBo
+aW50IG9ubHkgInVubGVzc19xbXAiPw0KPiANCj4gIkhpbnRzIiBhcmUgaW50ZW5kZWQgZm9yIGdp
+dmluZyBoaW50cyB0byBhIGh1bWFuIHVzZXIgKGFsdGhvdWdoIHRoZXkgYXJlDQo+IG1pc3VzZWQg
+Zm9yIG90aGVyIHB1cnBvc2VzIGluIHBsYWNlcyk6DQo+IA0KPiAvKg0KPiAgICogQXBwZW5kIGEg
+cHJpbnRmLXN0eWxlIGh1bWFuLXJlYWRhYmxlIGV4cGxhbmF0aW9uIHRvIGFuIGV4aXN0aW5nIGVy
+cm9yLg0KPiAgICogSWYgdGhlIGVycm9yIGlzIGxhdGVyIHJlcG9ydGVkIHRvIGEgaHVtYW4gdXNl
+ciB3aXRoDQo+ICAgKiBlcnJvcl9yZXBvcnRfZXJyKCkgb3Igd2Fybl9yZXBvcnRfZXJyKCksIHRo
+ZSBoaW50cyB3aWxsIGJlIHNob3duLA0KPiAgICogdG9vLiAgSWYgaXQncyByZXBvcnRlZCB2aWEg
+UU1QLCB0aGUgaGludHMgd2lsbCBiZSBpZ25vcmVkLg0KPiAgICogSW50ZW5kZWQgdXNlIGlzIGFk
+ZGluZyBoZWxwZnVsIGhpbnRzIG9uIHRoZSBodW1hbiB1c2VyIGludGVyZmFjZSwNCj4gICAqIGUu
+Zy4gYSBsaXN0IG9mIHZhbGlkIHZhbHVlcy4gIEl0J3Mgbm90IGZvciBjbGFyaWZ5aW5nIGEgY29u
+ZnVzaW5nDQo+ICAgKiBlcnJvciBtZXNzYWdlLg0KPiAgICogQGVycnAgbWF5IGJlIE5VTEwsIGJ1
+dCBub3QgJmVycm9yX2ZhdGFsIG9yICZlcnJvcl9hYm9ydC4NCj4gICAqIFRyaXZpYWxseSB0aGUg
+Y2FzZSBpZiB5b3UgY2FsbCBpdCBvbmx5IGFmdGVyIGVycm9yX3NldGcoKSBvcg0KPiAgICogZXJy
+b3JfcHJvcGFnYXRlKCkuDQo+ICAgKiBNYXkgYmUgY2FsbGVkIG11bHRpcGxlIHRpbWVzLiAgVGhl
+IHJlc3VsdGluZyBoaW50IHNob3VsZCBlbmQgd2l0aCBhDQo+ICAgKiBuZXdsaW5lLg0KPiAgICov
+DQo+IHZvaWQgZXJyb3JfYXBwZW5kX2hpbnQoRXJyb3IgKiplcnJwLCBjb25zdCBjaGFyICpmbXQs
+IC4uLikNCj4gICAgICBHQ0NfRk1UX0FUVFIoMiwgMyk7DQo+IA0KDQpIbW0sIHRoaXMgbWVhbnMs
+IHRoYXQgaW4gZXJyb3JfcmVwb3J0X2VyciBjaGVja2luZyBmb3IgcW1wIG1vbml0b3IgaXMgd3Jv
+bmcgdGhpbmcsDQphcyBlcnJvcl9yZXBvcnRfZXJyIGlzIGV4YWN0bHkgZm9yIGh1bWFuIHVzZXIg
+d2hvIHdpbGwgcmVhZCBxZW11IGxvZyBhbmQgd2lsbCBuZWVkDQptYXhpbXVtIGluZm9ybWF0aW9u
+Lg0KDQotLSANCkJlc3QgcmVnYXJkcywNClZsYWRpbWlyDQo=
