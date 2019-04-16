@@ -3,48 +3,47 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
 X-Spam-Status: No, score=-0.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+	MAILING_LIST_MULTI,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 71C58C10F13
-	for <qemu-devel@archiver.kernel.org>; Tue, 16 Apr 2019 09:24:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DAF54C282DA
+	for <qemu-devel@archiver.kernel.org>; Tue, 16 Apr 2019 09:28:09 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 018B220675
-	for <qemu-devel@archiver.kernel.org>; Tue, 16 Apr 2019 09:24:16 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 018B220675
+	by mail.kernel.org (Postfix) with ESMTPS id B159B20821
+	for <qemu-devel@archiver.kernel.org>; Tue, 16 Apr 2019 09:28:09 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B159B20821
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:33696 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:33747 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hGKK8-0002D4-36
-	for qemu-devel@archiver.kernel.org; Tue, 16 Apr 2019 05:24:16 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:46596)
+	id 1hGKNs-0003iJ-Mm
+	for qemu-devel@archiver.kernel.org; Tue, 16 Apr 2019 05:28:08 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:47296)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1hGKJM-0001v7-JC
-	for qemu-devel@nongnu.org; Tue, 16 Apr 2019 05:23:29 -0400
+	(envelope-from <david@redhat.com>) id 1hGKN4-0003Qs-VN
+	for qemu-devel@nongnu.org; Tue, 16 Apr 2019 05:27:19 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1hGKJL-00032t-Rq
-	for qemu-devel@nongnu.org; Tue, 16 Apr 2019 05:23:28 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:39996)
+	(envelope-from <david@redhat.com>) id 1hGKN4-00055q-1s
+	for qemu-devel@nongnu.org; Tue, 16 Apr 2019 05:27:18 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:41284)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <david@redhat.com>)
-	id 1hGKJL-00032H-Ek; Tue, 16 Apr 2019 05:23:27 -0400
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
-	[10.5.11.14])
+	id 1hGKN3-00055I-MH; Tue, 16 Apr 2019 05:27:17 -0400
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+	[10.5.11.11])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 0214E30832EF;
-	Tue, 16 Apr 2019 09:23:26 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id 9F73230832EF;
+	Tue, 16 Apr 2019 09:27:16 +0000 (UTC)
 Received: from [10.36.116.179] (ovpn-116-179.ams2.redhat.com [10.36.116.179])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id 973245D9CA;
-	Tue, 16 Apr 2019 09:23:24 +0000 (UTC)
+	by smtp.corp.redhat.com (Postfix) with ESMTP id 37EFB6013D;
+	Tue, 16 Apr 2019 09:27:15 +0000 (UTC)
 To: Richard Henderson <richard.henderson@linaro.org>, qemu-devel@nongnu.org
 References: <20190411100836.646-1-david@redhat.com>
-	<20190411100836.646-21-david@redhat.com>
-	<940b3c42-5225-c8e0-41be-5ee0df498f39@linaro.org>
+	<20190411100836.646-28-david@redhat.com>
+	<0f53d073-92ba-87e3-2dd4-4e4629ead801@linaro.org>
 From: David Hildenbrand <david@redhat.com>
 Openpgp: preference=signencrypt
 Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
@@ -91,23 +90,23 @@ Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
 	+8Umfre0Xt4713VxMygW0PnQt5aSQdMD58jHFxTk092mU+yIHj5LeYgvwSgZN4airXk5yRXl
 	SE+xAvmumFBY
 Organization: Red Hat GmbH
-Message-ID: <3617a274-af05-acc3-f19a-81856f2e43ac@redhat.com>
-Date: Tue, 16 Apr 2019 11:23:23 +0200
+Message-ID: <0ab17af4-e96c-8550-9b93-3d1a6fb2a231@redhat.com>
+Date: Tue, 16 Apr 2019 11:27:14 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
 	Thunderbird/60.6.1
 MIME-Version: 1.0
-In-Reply-To: <940b3c42-5225-c8e0-41be-5ee0df498f39@linaro.org>
+In-Reply-To: <0f53d073-92ba-87e3-2dd4-4e4629ead801@linaro.org>
 Content-Type: text/plain; charset="UTF-8"
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
 	(mx1.redhat.com [10.5.110.44]);
-	Tue, 16 Apr 2019 09:23:26 +0000 (UTC)
+	Tue, 16 Apr 2019 09:27:16 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH v1 20/41] s390x/tcg: Implement VECTOR
- MULTIPLY *
+Subject: Re: [Qemu-devel] [PATCH v1 27/41] s390x/tcg: Implement VECTOR
+ ELEMENT ROTATE LEFT LOGICAL
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -124,12 +123,34 @@ Cc: qemu-s390x@nongnu.org, Cornelia Huck <cohuck@redhat.com>,
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190416092323.4OzNodSmi4BAeKt4R-R14Cseje85kkqCJRQABTKEjjw@z>
+Message-ID: <20190416092714.AyhQlu58Q-X3HTimAfO268YvQeJkmo04yGCOU_Lsu3g@z>
 
-On 13.04.19 02:04, Richard Henderson wrote:
+On 13.04.19 02:15, Richard Henderson wrote:
+> On 4/11/19 12:08 AM, David Hildenbrand wrote:
+>> +#define DEF_ROTL(BITS)                                                         \
+>> +static uint##BITS##_t rotl##BITS(uint##BITS##_t a, uint8_t count)            \
+>> +{                                                                            \
+>> +    count &= BITS - 1;                                                       \
+>> +    return (a << count) | (a >> (BITS - count));                             \
+>> +}
+>> +DEF_ROTL(8)
+>> +DEF_ROTL(16)
+> 
+> We already have rol8 and rol16 in <qemu/bitops.h> for this.
+> Otherwise,
+> 
+
+Thanks, missed these helpers!
+
 > Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+> 
+> This does point out that I should go ahead and fill out the
+> variable shift and rotate patterns in gvec...
+> 
+> 
+> r~
+> 
 
-Changed, thanks!
 
 -- 
 
