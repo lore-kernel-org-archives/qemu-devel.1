@@ -1,34 +1,27 @@
-Received: from eggs.gnu.org ([209.51.188.92]:43428)
+Received: from eggs.gnu.org ([209.51.188.92]:44464)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1hGOAb-0005Wc-Mz
-	for qemu-devel@nongnu.org; Tue, 16 Apr 2019 09:30:43 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1hGOFK-0000IB-Co
+	for qemu-devel@nongnu.org; Tue, 16 Apr 2019 09:35:35 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1hGOAa-0001uY-Cx
-	for qemu-devel@nongnu.org; Tue, 16 Apr 2019 09:30:41 -0400
-Received: from indium.canonical.com ([91.189.90.7]:59830)
+	(envelope-from <peter.maydell@linaro.org>) id 1hGOFH-00059G-Mt
+	for qemu-devel@nongnu.org; Tue, 16 Apr 2019 09:35:34 -0400
+Received: from mail-ot1-x341.google.com ([2607:f8b0:4864:20::341]:35231)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1hGOAa-0001tu-5b
-	for qemu-devel@nongnu.org; Tue, 16 Apr 2019 09:30:40 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1hGOAY-0006Ah-St
-	for <qemu-devel@nongnu.org>; Tue, 16 Apr 2019 13:30:38 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id D640B2E80CD
-	for <qemu-devel@nongnu.org>; Tue, 16 Apr 2019 13:30:38 +0000 (UTC)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1hGOFF-0004yI-CE
+	for qemu-devel@nongnu.org; Tue, 16 Apr 2019 09:35:29 -0400
+Received: by mail-ot1-x341.google.com with SMTP id m10so17612093otp.2
+	for <qemu-devel@nongnu.org>; Tue, 16 Apr 2019 06:35:16 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+References: <20190415154503.6758-1-berrange@redhat.com>
+In-Reply-To: <20190415154503.6758-1-berrange@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Tue, 16 Apr 2019 14:35:04 +0100
+Message-ID: <CAFEAcA-YpG71aGtTVMafShGyd9uM599Uy_8S3vvvnPzfiKMqnw@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Tue, 16 Apr 2019 13:20:43 -0000
-From: diddly <dflogeras2@gmail.com>
-Reply-To: Bug 1805913 <1805913@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <154353638253.10384.17899256838547579767.malonedeb@chaenomeles.canonical.com>
-Message-Id: <155542084365.21129.3132847180218761017.malone@chaenomeles.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1805913] Re: readdir() returns NULL
- (errno=EOVERFLOW) for 32-bit user-static qemu on 64-bit host
+Subject: Re: [Qemu-devel] [PATCH 0/3] usb-mtp: fix ObjectInfo request
+ handling
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,66 +30,36 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: =?UTF-8?Q?Daniel_P=2E_Berrang=C3=A9?= <berrange@redhat.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, Gerd Hoffmann <kraxel@redhat.com>, Bandan Das <bsd@redhat.com>, Thomas Huth <thuth@redhat.com>, Greg Kurz <groug@kaod.org>, Peter Maydell <peter.maydell@linaro.org>, Eric Blake <eblake@redhat.com>
 
-https://lkml.org/lkml/2018/12/27/155
+On Mon, 15 Apr 2019 at 16:45, Daniel P. Berrang=C3=A9 <berrange@redhat.com>=
+ wrote:
+>
+> Two previous attempts to fix this due to GCC 9 highlighting
+> unaligned data access. My attempt:
+>
+>   https://lists.gnu.org/archive/html/qemu-devel/2019-03/msg07763.html
+>
+> And a previous one:
+>
+>   https://lists.gnu.org/archive/html/qemu-devel/2019-02/msg07923.html
+>   https://lists.gnu.org/archive/html/qemu-devel/2019-03/msg00162.html
+>
+> There are a number of bugs in the USB MTP usb_mtp_write_metadata
+> method handling the filename character set conversion.
+>
+> The 2nd patch in this series is a security flaw fix since the
+> code was not correctly validating guest provided data length.
 
--- =
+Given that we don't seem to be confident in this fix just now,
+and this is a read-only buffer overrun in a not-commonly-used
+feature that only happens if you explicitly enable write support,
+my current thought is that we should not try to put this into 4.0
+(but instead treat it as we would a security issue that had
+occurred after we released 4.0).
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1805913
+Opinions? Maybe we should just apply patch 2/3 for 4.0 ?
 
-Title:
-  readdir() returns NULL (errno=3DEOVERFLOW) for 32-bit user-static qemu
-  on 64-bit host
-
-Status in QEMU:
-  New
-
-Bug description:
-  This can be simply reproduced by compiling and running the attached C
-  code (readdir-bug.c) under 32-bit user-static qemu, such as qemu-arm-
-  static:
-
-  # Setup docker for user-static binfmt
-  docker run --rm --privileged multiarch/qemu-user-static:register --reset
-  # Compile the code and run (readdir for / is fine, so create a new direct=
-ory /test).
-  docker run -v /path/to/qemu-arm-static:/usr/bin/qemu-arm-static -v /path/=
-to/readdir-bug.c:/tmp/readdir-bug.c -it --rm arm32v7/ubuntu:18.10 bash -c '=
-{ apt update && apt install -y gcc; } >&/dev/null && mkdir -p /test && cd /=
-test && gcc /tmp/readdir-bug.c && ./a.out'
-  dir=3D0xff5b4150
-  readdir(dir)=3D(nil)
-  errno=3D75: Value too large for defined data type
-
-  Do remember to replace the /path/to/qemu-arm-static and /path/to
-  /readdir-bug.c to the actual paths of the files.
-
-  The root cause is in glibc:
-  https://sourceware.org/git/?p=3Dglibc.git;a=3Dblob;f=3Dsysdeps/unix/sysv/=
-linux/getdents.c;h=3D6d09a5be7057e2792be9150d3a2c7b293cf6fc34;hb=3Da5275ba5=
-378c9256d18e582572b4315e8edfcbfb#l87
-
-  By C standard, the return type of readdir() is DIR*, in which the
-  inode number and offset are 32-bit integers, therefore, glibc calls
-  getdents64() and check if the inode number and offset fits the 32-bit
-  range, and reports EOVERFLOW if not.
-
-  The problem here is for 32-bit user-static qemu running on 64-bit
-  host, getdents64 simply passing through the inode number and offset
-  from underlying getdents64 syscall (from 64-bit kernel), which is very
-  likely to not fit into 32-bit range. On real hardware, the 32-bit
-  kernel creates 32-bit inode numbers, therefore works properly.
-
-  The glibc code makes sense to do the check to be conformant with C
-  standard, therefore ideally it should be a fix on qemu side. I admit
-  this is difficult because qemu has to maintain a mapping between
-  underlying 64-bit inode numbers and 32-bit inode numbers, which would
-  severely hurt the performance. I don't expect this could be fix
-  anytime soon (or even there would be a fix), but it would be
-  worthwhile to surface this issue.
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1805913/+subscriptions
+thanks
+-- PMM
