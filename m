@@ -2,86 +2,74 @@ Return-Path: <SRS0=xvb4=SS=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.7 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E417CC10F13
-	for <qemu-devel@archiver.kernel.org>; Tue, 16 Apr 2019 10:31:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 46521C10F13
+	for <qemu-devel@archiver.kernel.org>; Tue, 16 Apr 2019 10:56:41 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id ABC0A20693
-	for <qemu-devel@archiver.kernel.org>; Tue, 16 Apr 2019 10:31:19 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="L0FuBf5/"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org ABC0A20693
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id 16DB82075B
+	for <qemu-devel@archiver.kernel.org>; Tue, 16 Apr 2019 10:56:41 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 16DB82075B
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:34479 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:34722 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hGLN0-0001RO-Vo
-	for qemu-devel@archiver.kernel.org; Tue, 16 Apr 2019 06:31:19 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:60632)
+	id 1hGLlX-0004zI-Sb
+	for qemu-devel@archiver.kernel.org; Tue, 16 Apr 2019 06:56:39 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:36580)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1hGLMD-00019U-UU
-	for qemu-devel@nongnu.org; Tue, 16 Apr 2019 06:30:30 -0400
+	(envelope-from <bounces@canonical.com>) id 1hGLkf-0004aZ-Mk
+	for qemu-devel@nongnu.org; Tue, 16 Apr 2019 06:55:46 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1hGLMD-0006lF-45
-	for qemu-devel@nongnu.org; Tue, 16 Apr 2019 06:30:29 -0400
-Received: from mail-ot1-x341.google.com ([2607:f8b0:4864:20::341]:43707)
+	(envelope-from <bounces@canonical.com>) id 1hGLke-0002iI-JR
+	for qemu-devel@nongnu.org; Tue, 16 Apr 2019 06:55:45 -0400
+Received: from indium.canonical.com ([91.189.90.7]:50834)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1hGLMC-0006ku-SA
-	for qemu-devel@nongnu.org; Tue, 16 Apr 2019 06:30:29 -0400
-Received: by mail-ot1-x341.google.com with SMTP id u15so17122616otq.10
-	for <qemu-devel@nongnu.org>; Tue, 16 Apr 2019 03:30:28 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
-	h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-	:cc:content-transfer-encoding;
-	bh=NLBFo7BD6wX8nYsaAoFBIIdYHciufGtKDam4ZuR8zDA=;
-	b=L0FuBf5/qilVVgbf4MaRL2RN+pK7bVilcfoukA1Zn84HDezulUJ6oyrplP3RadK3l8
-	NiTtKUOzk+l0N1Ot1+3GTIFNSqilAWBDmpzBTJCOlATaOxUHshpZlTfJuGpe7bCVxp5o
-	peuCC+zVQBsttVf0HE0P5+8SbKZRPVB2NbbaSju8ycN5K2kqW+5ZDEqIEIj2tZdspmO9
-	3b5UsPr6HlfD+GArrz4OP2qj8R4/jdwlze59OizMnQjdozL2iqnn8UdU+POuXR0qRdca
-	3QeLtMP+5hRCw47uy+TvOzhGIi2PsaKMhVEEs0HSp5YdrnQhSaJa6woNvlDv0L+9OakK
-	lE9w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=1e100.net; s=20161025;
-	h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-	:message-id:subject:to:cc:content-transfer-encoding;
-	bh=NLBFo7BD6wX8nYsaAoFBIIdYHciufGtKDam4ZuR8zDA=;
-	b=TNkMnIfLqQb94KUQuP6RI/3eSOV+NV1Of+Sb19s/iW7hpZ7qAhNpv6pOSY2g0mKFWH
-	WPsargjghRa5vuV6dMmFeXKvKWFBD29hkEy4HXnBrMsuh2R1d6vo2oeaEc+as9twKHvb
-	VCqbga94TufvOobZ87gl/E9x/Ko4RcgfnIpHx6/oFej1G+cBuYgJohQvfEMX7XC9/DAp
-	lXk23pF4voO9JYMhE8vlgzNPiRJxSexj7IoaPObn0TizAr4K+R7XObFeZPl+8ahJtvLN
-	N6uORkABFaTz8wBUlRoeiaX3aLce8PwKUBLozBrLzAvq3FxFT5fsTA9Vhyj37ev0r33C
-	QfUw==
-X-Gm-Message-State: APjAAAWZThhUagIx7jsihw82E5itCTJd1qaSacs0ZDBnmlsOPJTJzMFn
-	BySAXqofRKtLnPYqhq+1pwIZ+OY4IruLWtx1qbQ5wQ==
-X-Google-Smtp-Source: APXvYqwJloIifP1jiHlFxnUNgDV6dvLZO0KdUof/ZQfortOdJoVSr5kEqvd1escs3sFW5SQ4FY0uaI/vSQou0SNhgYo=
-X-Received: by 2002:a05:6830:1497:: with SMTP id
-	s23mr47671682otq.236.1555410627700; 
-	Tue, 16 Apr 2019 03:30:27 -0700 (PDT)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1hGLke-0002fu-Aw
+	for qemu-devel@nongnu.org; Tue, 16 Apr 2019 06:55:44 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1hGLkc-0001Si-SV
+	for <qemu-devel@nongnu.org>; Tue, 16 Apr 2019 10:55:42 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id D02C82E80C7
+	for <qemu-devel@nongnu.org>; Tue, 16 Apr 2019 10:55:42 +0000 (UTC)
 MIME-Version: 1.0
-References: <20190415163337.2795-1-marcandre.lureau@redhat.com>
-In-Reply-To: <20190415163337.2795-1-marcandre.lureau@redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 16 Apr 2019 11:30:15 +0100
-Message-ID:
- <CAFEAcA-v+RJ7gYyJWTcZ5SBQO1MRPdfNq6jM9yXmg8Q_ig_J0A@mail.gmail.com>
-To: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@redhat.com>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
-	recognized.
-X-Received-From: 2607:f8b0:4864:20::341
-Subject: Re: [Qemu-devel] [PATCH v4] socket: allow wait=false for client
- socket
+Date: Tue, 16 Apr 2019 10:37:35 -0000
+From: Prem Anand <1544524@bugs.launchpad.net>
+To: qemu-devel@nongnu.org
+X-Launchpad-Notification-Type: bug
+X-Launchpad-Bug: product=qemu; status=Fix Released; importance=Undecided;
+	assignee=None; 
+X-Launchpad-Bug-Information-Type: Public
+X-Launchpad-Bug-Private: no
+X-Launchpad-Bug-Security-Vulnerability: no
+X-Launchpad-Bug-Commenters: h.prem.anand th-huth
+X-Launchpad-Bug-Reporter: Prem Anand (h.prem.anand)
+X-Launchpad-Bug-Modifier: Prem Anand (h.prem.anand)
+References: <20160211115903.17778.55276.malonedeb@soybean.canonical.com>
+Message-Id:
+ <155541105529.21013.8091076072969556373.malone@chaenomeles.canonical.com>
+X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
+X-Launchpad-Message-For: qemu-devel-ml
+Precedence: bulk
+X-Generated-By: Launchpad (canonical.com); Revision="18920";
+	Instance="launchpad-lazr.conf"
+X-Launchpad-Hash: 2ab876db4dd31d1b8d32c7c9ca4b384b68d5a1fd
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 91.189.90.7
+Subject: [Qemu-devel] [Bug 1544524] Re: "info chardev" not showing the real
+ port in use
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
-Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -90,30 +78,62 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "reviewer:Incompatible changes" <libvir-list@redhat.com>,
-	Paolo Bonzini <pbonzini@redhat.com>,
-	QEMU Developers <qemu-devel@nongnu.org>
+Reply-To: Bug 1544524 <1544524@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190416103015.z5vsNB3gYnERL4cT1tkZoZGwsvm0AkFkTYPpSxnZTig@z>
+Message-ID: <20190416103735.isaunQiz_yk8Y4Ssmb2bEQkvyflcdwf0QMrYJ-BONeY@z>
 
-On Mon, 15 Apr 2019 at 17:34, Marc-Andr=C3=A9 Lureau
-<marcandre.lureau@redhat.com> wrote:
->
-> Commit 767abe7 ("chardev: forbid 'wait' option with client sockets")
-> is a bit too strict. Current libvirt always set wait=3Dfalse, and will
-> thus fail to add client chardev.
->
-> Make the code more permissive, allowing wait=3Dfalse with client socket
-> chardevs. Deprecate usage of 'wait' with client sockets.
->
-> Fixes: 767abe7f49e8be14d29da5db3527817b5d696a52
-> Cc: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
-> Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
-> ---
+Yes. This was fixed some time back and I can confirm it working with
+qemu 2.8
 
-Applied to master for rc4, thanks.
+QEMU 2.8.1 monitor - type 'help' for more information
+(qemu) info chardev
+parallel0: filename=3Dvc
+serial0: filename=3Dtelnet:127.0.0.1:35293,server <-> 127.0.0.1:52820
+compat_monitor0: filename=3Dstdio
 
--- PMM
+-- =
+
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1544524
+
+Title:
+  "info chardev" not showing the real port in use
+
+Status in QEMU:
+  Fix Released
+
+Bug description:
+  With Qemu 2.1.2
+  =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+  pharidos@uks2:~$ qemu-system-x86_64 -hda Disk.qcow2 -serial telnet::0,ser=
+ver,nowait -nographic
+  QEMU 2.1.2 monitor - type 'help' for more information
+  (qemu) info chardev
+  parallel0: filename=3Dnull
+  serial0: filename=3Dtelnet:0.0.0.0:44189,server
+  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0^^^^^^^^^^^^^^^^^^^^^^^^^^^ serial cons=
+ole is using port 44189
+  compat_monitor0: filename=3Dstdio
+  (qemu)
+
+  With Qemu 2.5.0
+  =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+  pharidos@uks2:~$ qemu-system-x86_64 -hda Disk.qcow2 -serial  telnet::0,se=
+rver,nowait -nographic
+  QEMU 2.5.0 monitor - type 'help' for more information
+  (qemu) info chardev
+  parallel0: filename=3Dnull
+  serial0: filename=3Ddisconnected:telnet::0,server
+  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ serial co=
+nsole port not shown
+  compat_monitor0: filename=3Dstdio
+  (qemu)
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1544524/+subscriptions
 
