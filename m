@@ -1,26 +1,34 @@
-Received: from eggs.gnu.org ([209.51.188.92]:49879)
+Received: from eggs.gnu.org ([209.51.188.92]:51544)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <lersek@redhat.com>) id 1hGOfQ-0002Wd-H3
-	for qemu-devel@nongnu.org; Tue, 16 Apr 2019 10:02:36 -0400
+	(envelope-from <bounces@canonical.com>) id 1hGOnw-0004xF-NT
+	for qemu-devel@nongnu.org; Tue, 16 Apr 2019 10:11:21 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <lersek@redhat.com>) id 1hGOfO-0002E7-W2
-	for qemu-devel@nongnu.org; Tue, 16 Apr 2019 10:02:32 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:44024)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <lersek@redhat.com>) id 1hGOfO-0002Dx-OF
-	for qemu-devel@nongnu.org; Tue, 16 Apr 2019 10:02:30 -0400
-References: <874f0f8e-780e-6600-e11b-b97f5b055cf8@durchholz.org>
-	<dbd6541e-5013-d0bc-b23e-a8de4f4cd171@redhat.com>
-	<20190416072430.dp742ehg27drpplb@sirius.home.kraxel.org>
-From: Laszlo Ersek <lersek@redhat.com>
-Message-ID: <2af5fa7d-bbdc-a3c7-23da-dd00dd1ed351@redhat.com>
-Date: Tue, 16 Apr 2019 16:02:19 +0200
+	(envelope-from <bounces@canonical.com>) id 1hGOnv-0006vR-Ln
+	for qemu-devel@nongnu.org; Tue, 16 Apr 2019 10:11:20 -0400
+Received: from indium.canonical.com ([91.189.90.7]:44776)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1hGOnv-0006tx-Em
+	for qemu-devel@nongnu.org; Tue, 16 Apr 2019 10:11:19 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1hGOnt-00053b-RV
+	for <qemu-devel@nongnu.org>; Tue, 16 Apr 2019 14:11:17 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 99B6E2E80CB
+	for <qemu-devel@nongnu.org>; Tue, 16 Apr 2019 14:11:17 +0000 (UTC)
 MIME-Version: 1.0
-In-Reply-To: <20190416072430.dp742ehg27drpplb@sirius.home.kraxel.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] curses.c: "We need a terminal output" ?
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Tue, 16 Apr 2019 14:05:15 -0000
+From: TimeMaster <timemaster@trillinis.com>
+Reply-To: Bug 1824768 <1824768@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <155531602468.14046.8896369782282114161.malonedeb@gac.canonical.com>
+Message-Id: <155542351526.20682.6727297620728065945.malone@soybean.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1824768] Re: Qemu ARMv7 TCG MultiThreading for
+ i386 guest doesn't work
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,42 +37,63 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Gerd Hoffmann <kraxel@redhat.com>, John Snow <jsnow@redhat.com>
-Cc: Joachim Durchholz <jo@durchholz.org>, qemu-devel@nongnu.org
+To: qemu-devel@nongnu.org
 
-On 04/16/19 09:24, Gerd Hoffmann wrote:
-> On Mon, Apr 15, 2019 at 03:10:09PM -0400, John Snow wrote:
->> <CC'ing curses maintainer>
->>
->> On 4/13/19 5:02 AM, Joachim Durchholz wrote:
->>> Hi all,
->>>
->>> what's the reasoning behind "We need a terminal output" in curses.c?
-> 
-> curses needs a terminal.
-> 
->>> I don't really see a scenario where it's problematic if qemu emits
->>> escape sequences to a pipe.
-> 
-> It's not about sending escape sequences.  A pipe simply doesn't support
-> all the tty ioctls (query terminal size, turn echo on/off, set all kinds
-> of terminal modes, ...).
+Thank you for the explanation. I found some patches a few years old, so
+I thought the implementation is now complete especially when ARM is
+getting more and more popular.
 
-(
+Does it have some priority assigned? Or does it even make sense to do
+it? From my perspective, yes even with the broken support the whole boot
+process was blazingly fast on Raspberry and seemed that kernel was able
+to start and then crashed. Even this was so fast compared to one core.
+It's interesting there are no more people wanting this. Maybe I am
+missing another trend :)
 
-Indeed, it's called the "General Terminal Interface".
+-- =
 
-http://pubs.opengroup.org/onlinepubs/9699919799/basedefs/V1_chap11.html
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1824768
 
-)
+Title:
+  Qemu ARMv7 TCG MultiThreading for i386 guest doesn't work
 
->>> I can see another scenario when this is problematic: Unit testing code
->>> that directly writes to the console. E.g. testing BIOS code, or testing
->>> operating systems when using the serial port is not an option.
-> 
-> seabios can work with the serial console just fine, try "qemu -nographic"
-> 
-> cheers,
->   Gerd
-> 
-> 
+Status in QEMU:
+  New
+
+Bug description:
+  Using any Linux image (in this case Alpine Linux iso) I want to
+  utilise all cores of my Raspberry with --accel,thread=3Dmulti. I know
+  there is a probably still problem with memory ordering of the host,
+  but I have also seen some very old commits which could potentially
+  help with it.
+
+  But anyway, with version qemu-i386 version 3.1.0 (Debian 1:3.1+dfsg-7)
+  I can see OpenRC starting up services and then the kernel crash.
+
+  With version QEMU emulator version 3.1.93 (v4.0.0-rc3-dirty)
+  The whole machine crash with this error:
+  Illegal instruction
+
+  Using command:
+  ./qemu-system-i386 -cdrom alpine.iso --accel tcg,thread=3Dmulti
+
+  Full Console Output:
+  qemu-system-i386: warning: Guest expects a stronger memory ordering than =
+the host provides
+  This may cause strange/hard to debug errors
+  Illegal instruction
+
+  Kernel:
+  Linux raspberrypi 4.14.98-v7+ #1200 SMP Tue Feb 12 20:27:48 GMT 2019 armv=
+7l GNU/Linux
+
+  CPU:
+  ARMv7 Processor rev 5 (v7l)
+  Features: half thumb fastmult vfp edsp neon vfpv3 tls vfpv4 idiva idivt v=
+fpd32 lpae evtstrm
+  4 cores
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1824768/+subscriptions
