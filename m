@@ -1,23 +1,31 @@
-Received: from eggs.gnu.org ([209.51.188.92]:44387)
+Received: from eggs.gnu.org ([209.51.188.92]:44721)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1hGSQE-0006Zi-5Z
-	for qemu-devel@nongnu.org; Tue, 16 Apr 2019 14:03:08 -0400
+	(envelope-from <jo@durchholz.org>) id 1hGSRT-0007MB-Kn
+	for qemu-devel@nongnu.org; Tue, 16 Apr 2019 14:04:24 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1hGSQ9-0002Pb-8u
-	for qemu-devel@nongnu.org; Tue, 16 Apr 2019 14:03:04 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:47046)
+	(envelope-from <jo@durchholz.org>) id 1hGSRN-0003ey-PP
+	for qemu-devel@nongnu.org; Tue, 16 Apr 2019 14:04:21 -0400
+Received: from 5.itsy.de ([188.40.84.14]:50319)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1hGSQ6-0002Mo-LD
-	for qemu-devel@nongnu.org; Tue, 16 Apr 2019 14:02:58 -0400
-Date: Tue, 16 Apr 2019 15:02:51 -0300
-From: Eduardo Habkost <ehabkost@redhat.com>
-Message-ID: <20190416180251.GI32317@habkost.net>
-References: <1555416373-28690-1-git-send-email-puwen@hygon.cn>
+	(Exim 4.71) (envelope-from <jo@durchholz.org>) id 1hGSRL-0003Y0-O1
+	for qemu-devel@nongnu.org; Tue, 16 Apr 2019 14:04:15 -0400
+Received: from [192.168.178.32] (unknown [195.48.33.209])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+	(No client certificate requested)
+	by 5.itsy.de (Postfix) with ESMTPSA id 614546505E
+	for <qemu-devel@nongnu.org>; Tue, 16 Apr 2019 20:04:08 +0200 (CEST)
+References: <874f0f8e-780e-6600-e11b-b97f5b055cf8@durchholz.org>
+	<dbd6541e-5013-d0bc-b23e-a8de4f4cd171@redhat.com>
+	<20190416072430.dp742ehg27drpplb@sirius.home.kraxel.org>
+From: Joachim Durchholz <jo@durchholz.org>
+Message-ID: <00f0ada2-a68b-2264-ab72-f49fe7d654e7@durchholz.org>
+Date: Tue, 16 Apr 2019 20:04:08 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1555416373-28690-1-git-send-email-puwen@hygon.cn>
-Subject: Re: [Qemu-devel] [PATCH v3] i386: Add new Hygon 'Dhyana' CPU model
+In-Reply-To: <20190416072430.dp742ehg27drpplb@sirius.home.kraxel.org>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-GB
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] curses.c: "We need a terminal output" ?
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,26 +34,45 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Pu Wen <puwen@hygon.cn>
-Cc: qemu-devel@nongnu.org, berrange@redhat.com, pbonzini@redhat.com, rth@twiddle.net, mst@redhat.com, marcel.apfelbaum@gmail.com
+To: qemu-devel@nongnu.org
 
-On Tue, Apr 16, 2019 at 08:06:13PM +0800, Pu Wen wrote:
-> Add a new base CPU model called 'Dhyana' to model processors from Hygon
-> Dhyana(family 18h), which derived from AMD EPYC(family 17h).
+Am 16.04.19 um 09:24 schrieb Gerd Hoffmann:
+> On Mon, Apr 15, 2019 at 03:10:09PM -0400, John Snow wrote:
+>> <CC'ing curses maintainer>
+>>
+>> On 4/13/19 5:02 AM, Joachim Durchholz wrote:
+>>> Hi all,
+>>>
+>>> what's the reasoning behind "We need a terminal output" in curses.c?
 > 
-> The following features bits have been removed compare to AMD EPYC:
-> aes, pclmulqdq, sha_ni
-> 
-> The Hygon Dhyana support to KVM in Linux is already accepted upstream[1].
-> So add Hygon Dhyana support to Qemu is necessary to create Hygon's own
-> CPU model.
-> 
-> Reference:
-> [1] https://git.kernel.org/tip/fec98069fb72fb656304a3e52265e0c2fc9adf87
-> 
-> Signed-off-by: Pu Wen <puwen@hygon.cn>
+> curses needs a terminal.
 
-Queued for 4.1, thanks!
+I commented out the check, and guess what: qemu and the OS in the VM 
+would run just fine.
 
--- 
-Eduardo
+>>> I don't really see a scenario where it's problematic if qemu emits
+>>> escape sequences to a pipe.
+> 
+> It's not about sending escape sequences.  A pipe simply doesn't support
+> all the tty ioctls (query terminal size, turn echo on/off, set all kinds
+> of terminal modes, ...).
+
+Then I don't understand why it just ran fine.
+I don't expect fullscreen output to work perfectly anyway; just enough 
+so I can use qemu expect-style.
+
+Also, is qemu -curses actually using all the terminal shenanigans?
+I don't think so. If it is, it's not really needed it seems, things work 
+fine.
+
+>>> I can see another scenario when this is problematic: Unit testing code
+>>> that directly writes to the console. E.g. testing BIOS code, or testing
+>>> operating systems when using the serial port is not an option.
+> 
+> seabios can work with the serial console just fine, try "qemu -nographic"
+
+Well, can you tell me how convince any *BSD to talk to seabios intead of 
+to the terminal...
+
+Regards,
+Jo
