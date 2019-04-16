@@ -1,26 +1,26 @@
-Received: from eggs.gnu.org ([209.51.188.92]:34816)
+Received: from eggs.gnu.org ([209.51.188.92]:34860)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1hGNfW-00053W-Lx
-	for qemu-devel@nongnu.org; Tue, 16 Apr 2019 08:58:35 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1hGNfY-00055v-KR
+	for qemu-devel@nongnu.org; Tue, 16 Apr 2019 08:58:38 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1hGNfU-0001Tb-I1
-	for qemu-devel@nongnu.org; Tue, 16 Apr 2019 08:58:34 -0400
-Received: from mail-wm1-x341.google.com ([2a00:1450:4864:20::341]:53927)
+	(envelope-from <peter.maydell@linaro.org>) id 1hGNfW-0001V6-JC
+	for qemu-devel@nongnu.org; Tue, 16 Apr 2019 08:58:36 -0400
+Received: from mail-wm1-x343.google.com ([2a00:1450:4864:20::343]:39344)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1hGNfS-0001P2-LE
-	for qemu-devel@nongnu.org; Tue, 16 Apr 2019 08:58:30 -0400
-Received: by mail-wm1-x341.google.com with SMTP id q16so25248636wmj.3
-	for <qemu-devel@nongnu.org>; Tue, 16 Apr 2019 05:58:25 -0700 (PDT)
+	id 1hGNfU-0001Qs-Fy
+	for qemu-devel@nongnu.org; Tue, 16 Apr 2019 08:58:33 -0400
+Received: by mail-wm1-x343.google.com with SMTP id n25so25318242wmk.4
+	for <qemu-devel@nongnu.org>; Tue, 16 Apr 2019 05:58:28 -0700 (PDT)
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 16 Apr 2019 13:57:36 +0100
-Message-Id: <20190416125744.27770-19-peter.maydell@linaro.org>
+Date: Tue, 16 Apr 2019 13:57:38 +0100
+Message-Id: <20190416125744.27770-21-peter.maydell@linaro.org>
 In-Reply-To: <20190416125744.27770-1-peter.maydell@linaro.org>
 References: <20190416125744.27770-1-peter.maydell@linaro.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH 18/26] target/arm: Set FPCCR.S when executing
- M-profile floating point insns
+Subject: [Qemu-devel] [PATCH 20/26] target/arm: New helper function
+ arm_v7m_mmu_idx_all()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,106 +31,80 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-arm@nongnu.org, qemu-devel@nongnu.org
 
-The M-profile FPCCR.S bit indicates the security status of
-the floating point context. In the pseudocode ExecuteFPCheck()
-function it is unconditionally set to match the current
-security state whenever a floating point instruction is
-executed.
+Add a new helper function which returns the MMU index to use
+for v7M, where the caller specifies all of the security
+state, privilege level and whether the execution priority
+is negative, and reimplement the existing
+arm_v7m_mmu_idx_for_secstate_and_priv() in terms of it.
 
-Implement this by adding a new TB flag which tracks whether
-FPCCR.S is different from the current security state, so
-that we only need to emit the code to update it in the
-less-common case when it is not already set correctly.
-
-Note that we will add the handling for the other work done
-by ExecuteFPCheck() in later commits.
+We are going to need this for the lazy-FP-stacking code.
 
 Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 ---
- target/arm/cpu.h       |  2 ++
- target/arm/translate.h |  1 +
- target/arm/helper.c    |  5 +++++
- target/arm/translate.c | 20 ++++++++++++++++++++
- 4 files changed, 28 insertions(+)
+Suggestions for better function name welcome.
+arm_v7m_mmu_idx_for_secstate_and_priv_and_negpri()
+just seems way too long and unwieldy...
+---
+ target/arm/cpu.h    |  7 +++++++
+ target/arm/helper.c | 14 +++++++++++---
+ 2 files changed, 18 insertions(+), 3 deletions(-)
 
 diff --git a/target/arm/cpu.h b/target/arm/cpu.h
-index a4e4d17e787..95924303dd5 100644
+index 500e0ab4c5d..0a1b82dc996 100644
 --- a/target/arm/cpu.h
 +++ b/target/arm/cpu.h
-@@ -3154,6 +3154,8 @@ FIELD(TBFLAG_A32, NS, 6, 1)
- FIELD(TBFLAG_A32, VFPEN, 7, 1)
- FIELD(TBFLAG_A32, CONDEXEC, 8, 8)
- FIELD(TBFLAG_A32, SCTLR_B, 16, 1)
-+/* For M profile only, set if FPCCR.S does not match current security state */
-+FIELD(TBFLAG_A32, FPCCR_S_WRONG, 20, 1)
- /* For M profile only, Handler (ie not Thread) mode */
- FIELD(TBFLAG_A32, HANDLER, 21, 1)
- /* For M profile only, whether we should generate stack-limit checks */
-diff --git a/target/arm/translate.h b/target/arm/translate.h
-index 912cc2a4a52..26b2c29bb57 100644
---- a/target/arm/translate.h
-+++ b/target/arm/translate.h
-@@ -40,6 +40,7 @@ typedef struct DisasContext {
-     bool v7m_handler_mode;
-     bool v8m_secure; /* true if v8M and we're in Secure mode */
-     bool v8m_stackcheck; /* true if we need to perform v8M stack limit checks */
-+    bool v8m_fpccr_s_wrong; /* true if v8M FPCCR.S != v8m_secure */
-     /* Immediate value in AArch32 SVC insn; must be set if is_jmp == DISAS_SWI
-      * so that top level loop can generate correct syndrome information.
-      */
+@@ -2912,6 +2912,13 @@ static inline int arm_mmu_idx_to_el(ARMMMUIdx mmu_idx)
+     }
+ }
+ 
++/*
++ * Return the MMU index for a v7M CPU with all relevant information
++ * manually specified.
++ */
++ARMMMUIdx arm_v7m_mmu_idx_all(CPUARMState *env,
++                              bool secstate, bool priv, bool negpri);
++
+ /* Return the MMU index for a v7M CPU in the specified security and
+  * privilege state.
+  */
 diff --git a/target/arm/helper.c b/target/arm/helper.c
-index d8a9620b870..539da192e4e 100644
+index 2feb3f664fe..c8e30b40366 100644
 --- a/target/arm/helper.c
 +++ b/target/arm/helper.c
-@@ -13422,6 +13422,11 @@ void cpu_get_tb_cpu_state(CPUARMState *env, target_ulong *pc,
-         flags = FIELD_DP32(flags, TBFLAG_A32, STACKCHECK, 1);
-     }
- 
-+    if (arm_feature(env, ARM_FEATURE_M_SECURITY) &&
-+        FIELD_EX32(env->v7m.fpccr[M_REG_S], V7M_FPCCR, S) != env->v7m.secure) {
-+        flags = FIELD_DP32(flags, TBFLAG_A32, FPCCR_S_WRONG, 1);
-+    }
-+
-     *pflags = flags;
-     *cs_base = 0;
+@@ -13235,8 +13235,8 @@ int fp_exception_el(CPUARMState *env, int cur_el)
+     return 0;
  }
-diff --git a/target/arm/translate.c b/target/arm/translate.c
-index 9172a382c4d..a4fb811d6f2 100644
---- a/target/arm/translate.c
-+++ b/target/arm/translate.c
-@@ -3420,6 +3420,25 @@ static int disas_vfp_insn(DisasContext *s, uint32_t insn)
-         }
+ 
+-ARMMMUIdx arm_v7m_mmu_idx_for_secstate_and_priv(CPUARMState *env,
+-                                                bool secstate, bool priv)
++ARMMMUIdx arm_v7m_mmu_idx_all(CPUARMState *env,
++                              bool secstate, bool priv, bool negpri)
+ {
+     ARMMMUIdx mmu_idx = ARM_MMU_IDX_M;
+ 
+@@ -13244,7 +13244,7 @@ ARMMMUIdx arm_v7m_mmu_idx_for_secstate_and_priv(CPUARMState *env,
+         mmu_idx |= ARM_MMU_IDX_M_PRIV;
      }
  
-+    if (arm_dc_feature(s, ARM_FEATURE_M)) {
-+        /* Handle M-profile lazy FP state mechanics */
-+
-+        /* Update ownership of FP context: set FPCCR.S to match current state */
-+        if (s->v8m_fpccr_s_wrong) {
-+            TCGv_i32 tmp;
-+
-+            tmp = load_cpu_field(v7m.fpccr[M_REG_S]);
-+            if (s->v8m_secure) {
-+                tcg_gen_ori_i32(tmp, tmp, R_V7M_FPCCR_S_MASK);
-+            } else {
-+                tcg_gen_andi_i32(tmp, tmp, ~R_V7M_FPCCR_S_MASK);
-+            }
-+            store_cpu_field(tmp, v7m.fpccr[M_REG_S]);
-+            /* Don't need to do this for any further FP insns in this TB */
-+            s->v8m_fpccr_s_wrong = false;
-+        }
-+    }
-+
-     if (extract32(insn, 28, 4) == 0xf) {
-         /*
-          * Encodings with T=1 (Thumb) or unconditional (ARM):
-@@ -13340,6 +13359,7 @@ static void arm_tr_init_disas_context(DisasContextBase *dcbase, CPUState *cs)
-     dc->v8m_secure = arm_feature(env, ARM_FEATURE_M_SECURITY) &&
-         regime_is_secure(env, dc->mmu_idx);
-     dc->v8m_stackcheck = FIELD_EX32(tb_flags, TBFLAG_A32, STACKCHECK);
-+    dc->v8m_fpccr_s_wrong = FIELD_EX32(tb_flags, TBFLAG_A32, FPCCR_S_WRONG);
-     dc->cp_regs = cpu->cp_regs;
-     dc->features = env->features;
+-    if (armv7m_nvic_neg_prio_requested(env->nvic, secstate)) {
++    if (negpri) {
+         mmu_idx |= ARM_MMU_IDX_M_NEGPRI;
+     }
  
+@@ -13255,6 +13255,14 @@ ARMMMUIdx arm_v7m_mmu_idx_for_secstate_and_priv(CPUARMState *env,
+     return mmu_idx;
+ }
+ 
++ARMMMUIdx arm_v7m_mmu_idx_for_secstate_and_priv(CPUARMState *env,
++                                                bool secstate, bool priv)
++{
++    bool negpri = armv7m_nvic_neg_prio_requested(env->nvic, secstate);
++
++    return arm_v7m_mmu_idx_all(env, secstate, priv, negpri);
++}
++
+ /* Return the MMU index for a v7M CPU in the specified security state */
+ ARMMMUIdx arm_v7m_mmu_idx_for_secstate(CPUARMState *env, bool secstate)
+ {
 -- 
 2.20.1
