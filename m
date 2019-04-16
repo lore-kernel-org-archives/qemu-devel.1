@@ -1,17 +1,33 @@
-Received: from eggs.gnu.org ([209.51.188.92]:42313)
+Received: from eggs.gnu.org ([209.51.188.92]:47931)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <npiggin@gmail.com>) id 1hGG8d-0003HX-HN
-	for qemu-devel@nongnu.org; Tue, 16 Apr 2019 00:56:08 -0400
+	(envelope-from <bounces@canonical.com>) id 1hGGkt-00006D-5U
+	for qemu-devel@nongnu.org; Tue, 16 Apr 2019 01:35:40 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <npiggin@gmail.com>) id 1hGG8c-0006IO-F4
-	for qemu-devel@nongnu.org; Tue, 16 Apr 2019 00:56:07 -0400
-From: Nicholas Piggin <npiggin@gmail.com>
-Date: Tue, 16 Apr 2019 14:55:52 +1000
-Message-Id: <20190416045552.24573-1-npiggin@gmail.com>
+	(envelope-from <bounces@canonical.com>) id 1hGGks-00038B-0W
+	for qemu-devel@nongnu.org; Tue, 16 Apr 2019 01:35:39 -0400
+Received: from indium.canonical.com ([91.189.90.7]:54106)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1hGGkr-00037r-OR
+	for qemu-devel@nongnu.org; Tue, 16 Apr 2019 01:35:37 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1hGGkq-0000br-I8
+	for <qemu-devel@nongnu.org>; Tue, 16 Apr 2019 05:35:36 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 8535A2E8055
+	for <qemu-devel@nongnu.org>; Tue, 16 Apr 2019 05:35:36 +0000 (UTC)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH v3] spapr: add splpar hcalls H_PROD, H_CONFER
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Tue, 16 Apr 2019 05:29:34 -0000
+From: Thomas Huth <1788582@bugs.launchpad.net>
+Reply-To: Bug 1788582 <1788582@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <153501548405.31458.2315196104370535583.malonedeb@soybean.canonical.com>
+Message-Id: <155539257499.8369.8332462272323027089.malone@wampee.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1788582] Re: Race condition during shutdown
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -20,110 +36,101 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Gibson <david@gibson.dropbear.id.au>
-Cc: Nicholas Piggin <npiggin@gmail.com>, qemu-ppc@nongnu.org, qemu-devel@nongnu.org, Benjamin Herrenschmidt <benh@kernel.crashing.org>, =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>
+To: qemu-devel@nongnu.org
 
-These implementations have a few deficiencies that are noted, but are
-good enough for Linux to use.
+Ok, so marking this bug as "fixed" according to Marc's comment.
 
-Signed-off-by: Nicholas Piggin <npiggin@gmail.com>
----
+** Changed in: qemu
+       Status: New =3D> Fix Released
 
-v3: Removed wrong comment about GPR3, drop H_JOIN for now (at least until
-it is tested some more in Linux/KVM), and expand the comment about not
-prod bit.
+-- =
 
- hw/ppc/spapr_hcall.c | 71 ++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 71 insertions(+)
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1788582
 
-diff --git a/hw/ppc/spapr_hcall.c b/hw/ppc/spapr_hcall.c
-index 8a736797b9..8892ad008b 100644
---- a/hw/ppc/spapr_hcall.c
-+++ b/hw/ppc/spapr_hcall.c
-@@ -1065,6 +1065,74 @@ static target_ulong h_cede(PowerPCCPU *cpu, SpaprMachineState *spapr,
-     return H_SUCCESS;
- }
- 
-+static target_ulong h_confer(PowerPCCPU *cpu, SpaprMachineState *spapr,
-+                           target_ulong opcode, target_ulong *args)
-+{
-+    target_long target = args[0];
-+    CPUState *cs = CPU(cpu);
-+
-+    /*
-+     * This does not do a targeted yield or confer, but check the parameter
-+     * anyway. -1 means confer to all/any other CPUs.
-+     */
-+    if (target != -1 && !CPU(spapr_find_cpu(target))) {
-+        return H_PARAMETER;
-+    }
-+
-+    /*
-+     * PAPR calls for waiting until proded in this case (or presumably
-+     * an external interrupt if MSR[EE]=1, without dispatch sequence count
-+     * check.
-+     */
-+    if (cpu == spapr_find_cpu(target)) {
-+        cs->halted = 1;
-+        cs->exception_index = EXCP_HALTED;
-+        cs->exit_request = 1;
-+
-+        return H_SUCCESS;
-+    }
-+
-+    /*
-+     * This does not implement the dispatch sequence check that PAPR calls for,
-+     * but PAPR also specifies a stronger implementation where the target must
-+     * be run (or EE, or H_PROD) before H_CONFER returns. Without such a hard
-+     * scheduling requirement implemented, there is no correctness reason to
-+     * implement the dispatch sequence check.
-+     */
-+    cs->exception_index = EXCP_YIELD;
-+    cpu_loop_exit(cs);
-+
-+    return H_SUCCESS;
-+}
-+
-+static target_ulong h_prod(PowerPCCPU *cpu, SpaprMachineState *spapr,
-+                           target_ulong opcode, target_ulong *args)
-+{
-+    target_long target = args[0];
-+    CPUState *cs;
-+
-+    /*
-+     * PAPR specifies there should be a prod flag should be associated with
-+     * a vCPU, which gets set here, tested by H_CEDE, and cleared any time
-+     * the vCPU is dispatched, including via preemption.
-+     *
-+     * We don't implement this because it is not used by Linux. The bit would
-+     * be difficult or impossible to use properly because preemption can not
-+     * be prevented so dispatch sequence count would have to somehow be used
-+     * to detect it.
-+     */
-+
-+    cs = CPU(spapr_find_cpu(target));
-+    if (!cs) {
-+        return H_PARAMETER;
-+    }
-+
-+    cs->halted = 0;
-+    qemu_cpu_kick(cs);
-+
-+    return H_SUCCESS;
-+}
-+
- static target_ulong h_rtas(PowerPCCPU *cpu, SpaprMachineState *spapr,
-                            target_ulong opcode, target_ulong *args)
- {
-@@ -1860,6 +1928,9 @@ static void hypercall_register_types(void)
-     /* hcall-splpar */
-     spapr_register_hypercall(H_REGISTER_VPA, h_register_vpa);
-     spapr_register_hypercall(H_CEDE, h_cede);
-+    spapr_register_hypercall(H_CONFER, h_confer);
-+    spapr_register_hypercall(H_PROD, h_prod);
-+
-     spapr_register_hypercall(H_SIGNAL_SYS_RESET, h_signal_sys_reset);
- 
-     /* processor register resource access h-calls */
--- 
-2.20.1
+Title:
+  Race condition during shutdown
+
+Status in QEMU:
+  Fix Released
+
+Bug description:
+  I ran into a bug when I started several VMs in parallel using
+  libvirt. The VMs are using only a kernel and a initrd (which includes a
+  minimal OS). The guest OS itself does a 'poweroff -f' as soon as the
+  login prompt shows up. So the expectaction is that the VMs will start,
+  the shutdown will be initiated, and the QEMU processes will then
+  end. But instead some of the QEMU processes get stuck in ppoll().
+
+  A bisect showed that the first bad commit was
+  0f12264e7a41458179ad10276a7c33c72024861a ("block: Allow graph changes in
+  bdrv_drain_all_begin/end sections").
+
+  I've already tried the current master (13b7b188501d419a7d63c016e00065bcc6=
+93b7d4) =
+
+  since the problem might be related
+  to the commit a1405acddeb0af6625dd9c30e8277b08e0885bd3 ("aio: Do
+  aio_notify_accept only during blocking aio_poll"). But the bug is still
+  there. I=E2=80=99ve reproduced the bug on x86_64 and on s390x.
+
+  The backtrace of a hanging QEMU process:
+
+  (gdb) bt
+  #0  0x00007f5d0e251b36 in ppoll () from target:/lib64/libc.so.6
+  #1  0x0000560191052014 in qemu_poll_ns (fds=3D0x560193b23d60, nfds=3D5, t=
+imeout=3D55774838936000) at /home/user/git/qemu/util/qemu-timer.c:334
+  #2  0x00005601910531fa in os_host_main_loop_wait (timeout=3D5577483893600=
+0) at /home/user/git/qemu/util/main-loop.c:233
+  #3  0x0000560191053119 in main_loop_wait (nonblocking=3D0) at /home/user/=
+git/qemu/util/main-loop.c:497
+  #4  0x0000560190baf454 in main_loop () at /home/user/git/qemu/vl.c:1866
+  #5  0x0000560190baa552 in main (argc=3D71, argv=3D0x7ffde10e41c8, envp=3D=
+0x7ffde10e4408) at /home/user/git/qemu/vl.c:4644
+
+  The used domain definition is:
+
+  <domain type=3D'kvm'>
+    <name>test</name>
+    <memory unit=3D'KiB'>716800</memory>
+    <vcpu placement=3D'static'>2</vcpu>
+    <iothreads>8</iothreads>
+    <os>
+      <type arch=3D'x86_64' machine=3D'pc-i440fx-3.0'>hvm</type>
+      <kernel>/var/lib/libvirt/images/vmlinuz-4.14.13-200.fc26.x86_64</kern=
+el>
+      <initrd>/var/lib/libvirt/images/test-image-qemux86_64+modules-4.14.13=
+-200.fc26.x86_64.cpio.gz</initrd>
+      <cmdline>console=3Dhvc0 STARTUP=3Dshutdown.sh</cmdline>
+      <boot dev=3D'hd'/>
+    </os>
+    <features>
+      <acpi/>
+    </features>
+    <clock offset=3D'utc'/>
+    <on_poweroff>destroy</on_poweroff>
+    <on_reboot>restart</on_reboot>
+    <on_crash>preserve</on_crash>
+    <devices>
+      <emulator>/usr/local/qemu/master/bin/qemu-system-x86_64</emulator>
+      <controller type=3D'usb' index=3D'0' model=3D'piix3-uhci'>
+        <address type=3D'pci' domain=3D'0x0000' bus=3D'0x00' slot=3D'0x01' =
+function=3D'0x2'/>
+      </controller>
+      <controller type=3D'pci' index=3D'0' model=3D'pci-root'/>
+      <controller type=3D'virtio-serial' index=3D'0'>
+        <address type=3D'pci' domain=3D'0x0000' bus=3D'0x00' slot=3D'0x02' =
+function=3D'0x0'/>
+      </controller>
+      <console type=3D'pty'>
+        <target type=3D'virtio' port=3D'0'/>
+      </console>
+      <input type=3D'mouse' bus=3D'ps2'/>
+      <input type=3D'keyboard' bus=3D'ps2'/>
+      <memballoon model=3D'none'/>
+    </devices>
+  </domain>
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1788582/+subscriptions
