@@ -1,16 +1,23 @@
-Received: from eggs.gnu.org ([209.51.188.92]:59567)
+Received: from eggs.gnu.org ([209.51.188.92]:46877)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pixo@polepetko.eu>) id 1hGNT7-0000BP-Ug
-	for qemu-devel@nongnu.org; Tue, 16 Apr 2019 08:45:46 -0400
+	(envelope-from <divyavipin.hyd@gmail.com>) id 1hGDOa-0003ne-BB
+	for qemu-devel@nongnu.org; Mon, 15 Apr 2019 22:00:25 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pixo@polepetko.eu>) id 1hGNT6-0001Jz-JN
-	for qemu-devel@nongnu.org; Tue, 16 Apr 2019 08:45:45 -0400
-From: Stanislav Lanci <pixo@polepetko.eu>
-Date: Tue, 16 Apr 2019 14:38:33 +0200
-Message-Id: <20190416123833.60649-1-pixo@polepetko.eu>
+	(envelope-from <divyavipin.hyd@gmail.com>) id 1hGDOY-0004Lm-N9
+	for qemu-devel@nongnu.org; Mon, 15 Apr 2019 22:00:24 -0400
+Received: from mail-it1-x129.google.com ([2607:f8b0:4864:20::129]:40492)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <divyavipin.hyd@gmail.com>)
+	id 1hGDOX-0004Ji-87
+	for qemu-devel@nongnu.org; Mon, 15 Apr 2019 22:00:22 -0400
+Received: by mail-it1-x129.google.com with SMTP id k64so6462784itb.5
+	for <qemu-devel@nongnu.org>; Mon, 15 Apr 2019 19:00:20 -0700 (PDT)
 MIME-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH] Pass through cache information for TOPOEXT CPUs
+From: Divya Vipin <divyavipin.hyd@gmail.com>
+Date: Tue, 16 Apr 2019 07:30:08 +0530
+Message-ID: <CAG+jzpqx28OHiAqtc-0qBn2_0G4eX7m_=Fdtf=rLTE+aEsZN2Q@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: [Qemu-devel] Programmable BAR registers in PCIe
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -20,30 +27,14 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: qemu-trivial@nongnu.org, Stanislav Lanci <pixo@polepetko.eu>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Eduardo Habkost <ehabkost@redhat.com>
 
-Signed-off-by: Stanislav Lanci <pixo@polepetko.eu>
----
- target/i386/cpu.c | 5 +++++
- 1 file changed, 5 insertions(+)
+Hi,
 
-diff --git a/target/i386/cpu.c b/target/i386/cpu.c
-index d6bb57d210..bc0559fc51 100644
---- a/target/i386/cpu.c
-+++ b/target/i386/cpu.c
-@@ -4546,6 +4546,11 @@ void cpu_x86_cpuid(CPUX86State *env, uint32_t inde=
-x, uint32_t count,
-         break;
-     case 0x8000001D:
-         *eax =3D 0;
-+        /* pass through cache information */
-+        if (cpu->cache_info_passthrough) {
-+            host_cpuid(index, count, eax, ebx, ecx, edx);
-+            break;
-+        }
-         switch (count) {
-         case 0: /* L1 dcache info */
-             encode_cache_cpuid8000001d(env->cache_info_amd.l1d_cache, cs=
-,
---=20
-2.21.0
+Is there any way to reprogram the BAR register sizes in QEMU? The use case
+is that the device is agnostic to the size of memory available in the host.
+So after enumeration succeeds the first time, if the device is capable of
+knowing that there is more memory provided by the host, can we change the
+BAR size in QEMU?
+
+Thanks,
+Divya
