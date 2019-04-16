@@ -1,87 +1,81 @@
-Return-Path: <SRS0=VGOL=SR=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.kernel.org@kernel.org>
+Return-Path: <SRS0=xvb4=SS=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.kernel.org@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.5 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
 	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.0
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 79763C10F0E
-	for <qemu-devel@archiver.kernel.org>; Mon, 15 Apr 2019 23:59:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5169FC10F0E
+	for <qemu-devel@archiver.kernel.org>; Tue, 16 Apr 2019 00:24:09 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 26DC520848
-	for <qemu-devel@archiver.kernel.org>; Mon, 15 Apr 2019 23:59:14 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 0C5D5206BA
+	for <qemu-devel@archiver.kernel.org>; Tue, 16 Apr 2019 00:24:08 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="tmTp+34p"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 26DC520848
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="YPv0beQi"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0C5D5206BA
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:56954 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:57187 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hGBVJ-0000QL-0K
-	for qemu-devel@archiver.kernel.org; Mon, 15 Apr 2019 19:59:13 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:57938)
+	id 1hGBtP-0005SJ-UR
+	for qemu-devel@archiver.kernel.org; Mon, 15 Apr 2019 20:24:07 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:33337)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alistair23@gmail.com>) id 1hGBU3-00088c-TV
-	for qemu-devel@nongnu.org; Mon, 15 Apr 2019 19:57:57 -0400
+	(envelope-from <alistair23@gmail.com>) id 1hGBsg-00059L-81
+	for qemu-devel@nongnu.org; Mon, 15 Apr 2019 20:23:23 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alistair23@gmail.com>) id 1hGBTy-0003t9-Qp
-	for qemu-devel@nongnu.org; Mon, 15 Apr 2019 19:57:55 -0400
-Received: from mail-lf1-x141.google.com ([2a00:1450:4864:20::141]:43303)
+	(envelope-from <alistair23@gmail.com>) id 1hGBsc-00015n-OJ
+	for qemu-devel@nongnu.org; Mon, 15 Apr 2019 20:23:22 -0400
+Received: from mail-lf1-x142.google.com ([2a00:1450:4864:20::142]:36811)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <alistair23@gmail.com>)
-	id 1hGBTy-0003re-H5; Mon, 15 Apr 2019 19:57:50 -0400
-Received: by mail-lf1-x141.google.com with SMTP id i68so3551742lfi.10;
-	Mon, 15 Apr 2019 16:57:49 -0700 (PDT)
+	id 1hGBsc-000143-Bj; Mon, 15 Apr 2019 20:23:18 -0400
+Received: by mail-lf1-x142.google.com with SMTP id u17so14529396lfi.3;
+	Mon, 15 Apr 2019 17:23:17 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
 	h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-	:cc; bh=utp70kpvqVYAgzmbP1/KSHWEj/gyntLc4EKiJ3F1dMY=;
-	b=tmTp+34p3fD1XZmlQwOt8RpbUB48npaVbjDtPz/NDerIywJXf/pjmUdw/84Jk0ac0K
-	E63vfEDWI6Oo+hWfzTlPteHYyuddmpgDZCgBSMS8ACyLrbMPQ4XBVcat/F5Qotst5ad6
-	8S251z5CzwSjYCoDZ9OsIrxeor1BpEFdzZshoB35Jjl0ktvBCCfeQBJdXC2eOngWjKLe
-	BQlbjP9W8ovqmYcWTQ57f/wXJDptuUFvN+H0OIGQMN69Pn8uNtDAzmCu+nTxdvmoOTxT
-	AWq1/XwqhE7nevOnFCdGJmuB8KEVJw3XQzE3/fYrQ1VM7CU+9cvBlv5lAM3fGJVLO0x+
-	qIrQ==
+	:cc; bh=fzBFY8uhtToBEgg6zq34CnLkRBXtozoWkO12/xnHxfU=;
+	b=YPv0beQiYUBRhA7GQEM+3Ua/bXdEdsCdFgF5qskWDML35aVHdGdiRN69bkiDSQykZ2
+	pVjybVpCs5vj1PzLMUd1e9OME/kka//n16ugHcYSuTIVHz91crL1UNmcwbeMQ8JHKvLE
+	TRaIu/KDrO3Y77QWRsZuASdQMPlvZb8nxDNIPHOlIvV3/Y6HpFE1RlydqFVMUajE4T+4
+	Y1DKnCiZfYRFPauqIYS4NwB1LmM4068h9IxnVPhkX++NuusXmDFJGst8Jg5yjVfieF6J
+	gebKB3le7UO1OSZVKXkWmjxkOA9m0RiTh9Xtsp/gj4TUyuTWJxIGvqSYs9iL2KTwkIxy
+	mX5A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
 	d=1e100.net; s=20161025;
 	h=x-gm-message-state:mime-version:references:in-reply-to:from:date
 	:message-id:subject:to:cc;
-	bh=utp70kpvqVYAgzmbP1/KSHWEj/gyntLc4EKiJ3F1dMY=;
-	b=U7z/ypinEG6G0i7h5YXZgcvdB99t7Gb8WTqlIHDl8GcHtMwGLShybcw6b0i/NJglnK
-	YR+lRizUuYoExkFYmJyMz/49EHJC7n7GGfD9fiUzCLh7ZfBOffS45LwGvTjJeKKsyuoM
-	GwcBSxkkR9+6Exi/gEknbB4dSSx8RvbHXgmRBQctGi3gjDc1+MtBOOWgdbSX15J8sojw
-	p1FctAOvQE8xoaGKY4Wps13B72MfHU4izaYWQv7F8Q9V8/6XPkIWzzCd3x1ERGpefLxB
-	aeqn8ySNFoGIOwHeEeKdYYRxDCrIdlu86DsvppVLnspN8PD9PhGU5zR5MYVnQPfEzDc1
-	rMTw==
-X-Gm-Message-State: APjAAAWS5RHOdZlkcyMbTf4dp7wmb/1ylKzWtA5DrGZcFHMLUxBVvbFj
-	whwwZ6qfcL3sWwLaD54hrQ+bk0ZprlZaf56e3QdihQGZGCU=
-X-Google-Smtp-Source: APXvYqxTsXW6Y+VaJ0pL/wd8dD1qKe9Mc5q23rk953OJM7jFGALhlPqFCZ0UzFT9hVwdpOfauGgITTHoyWLNp9KrDIU=
-X-Received: by 2002:a19:f512:: with SMTP id j18mr35428968lfb.48.1555372668825; 
-	Mon, 15 Apr 2019 16:57:48 -0700 (PDT)
+	bh=fzBFY8uhtToBEgg6zq34CnLkRBXtozoWkO12/xnHxfU=;
+	b=J0HDKWVIJwiT7Jg01IImHI/wsoNhGOv1+NuI4bu7H2H8uUVgQnXdgj8K61cmCnBG8h
+	CopZJ9QNvRsIN23bHEbh/xdbWuFd3uj3UV8zq+g+fR8X8Ljnb25H7/f72mnGfwDH9cEr
+	sWAqAsZYv6rVm1MNQfmEAwhpBKQ8u2HIyEH5Km5d5zYKUYjlRIRt1ub3ayZvLk4llQJj
+	qRJwFT3gOu6gejrRqIWAc2gb2glNyLjUAdcqk5V3zSoEa0YD7Gyz4UX1jzl/E46opav+
+	hTRvV5hqR6YsfhM/4jNl0Au7XLCU/EnxA/gtbE7CxCxSV7W0GK8Bdm2l/myotrgKCy00
+	558g==
+X-Gm-Message-State: APjAAAXzkSqcbybEOJ3DvasUh3QapKXK9uG4NYGsXmH29KUAzbSRSbpU
+	pHhoHObHwrrBZqhxG20Fzgu3vaV2VsSj/fZPJPA=
+X-Google-Smtp-Source: APXvYqz7mGPP+9qpULGFlmFC5c6vLVo/7+DzeixiQxjLjhKQTxgSjwVI9B8gg5/iazhwpRo9MdwBTtc5KgGqTUOMdss=
+X-Received: by 2002:ac2:41d8:: with SMTP id d24mr26261627lfi.56.1555374196335; 
+	Mon, 15 Apr 2019 17:23:16 -0700 (PDT)
 MIME-Version: 1.0
-References: <cover.1554937288.git.alistair.francis@wdc.com>
-	<efb2140df508fc04be96c5dc0f989923bfcb7424.1554937288.git.alistair.francis@wdc.com>
-	<20190411141848.119ee969@redhat.com>
-	<CAKmqyKOQ9a5Q8c83ufCgQgsa_RdQv01dDFCLFGmiSC8mkTw0LQ@mail.gmail.com>
-	<20190412103558.7be8383d@redhat.com>
-	<CAKmqyKOFs8Pv4np+BXyVYGRFwLKn9N-H7q=7JN+nBprAjHBYCQ@mail.gmail.com>
-	<20190415103815.35f45e99@Igors-MacBook-Pro.local>
-In-Reply-To: <20190415103815.35f45e99@Igors-MacBook-Pro.local>
+References: <CANnJOVEkpkBAOo566s1BJk9YQBVeNkf2kpbS_kdjkn9j=3i1VA@mail.gmail.com>
+In-Reply-To: <CANnJOVEkpkBAOo566s1BJk9YQBVeNkf2kpbS_kdjkn9j=3i1VA@mail.gmail.com>
 From: Alistair Francis <alistair23@gmail.com>
-Date: Mon, 15 Apr 2019 16:56:08 -0700
+Date: Mon, 15 Apr 2019 17:21:36 -0700
 Message-ID:
- <CAKmqyKOYif-SVvz3btkx+D9RDCFOmEaQSOR+0y4k18WLtrk3rQ@mail.gmail.com>
-To: Igor Mammedov <imammedo@redhat.com>
+ <CAKmqyKPM=XUyF+KweO2CLBQ3bEuu_BTU2fu+R7R09rV-1O9TkQ@mail.gmail.com>
+To: Jonathan Behrens <fintelia@gmail.com>
 Content-Type: text/plain; charset="UTF-8"
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
 	recognized.
-X-Received-From: 2a00:1450:4864:20::141
-Subject: Re: [Qemu-devel] [PATCH for 4.1 v3 2/6] target/riscv: Fall back to
- generating a RISC-V CPU
+X-Received-From: 2a00:1450:4864:20::142
+Subject: Re: [Qemu-devel] [PATCH] target/riscv: Expose time CSRs when
+ allowed by [m|s]counteren
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -93,171 +87,198 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "qemu-riscv@nongnu.org" <qemu-riscv@nongnu.org>,
-	"palmer@sifive.com" <palmer@sifive.com>,
-	Alistair Francis <Alistair.Francis@wdc.com>,
-	"qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
-	"ijc@hellion.org.uk" <ijc@hellion.org.uk>
+Cc: "open list:RISC-V" <qemu-riscv@nongnu.org>,
+	Sagar Karandikar <sagark@eecs.berkeley.edu>,
+	Bastian Koppelmann <kbastian@mail.uni-paderborn.de>,
+	Palmer Dabbelt <palmer@sifive.com>,
+	"qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>,
+	Alistair Francis <Alistair.Francis@wdc.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190415235608.3XFQPN9e5cSN1NbEK7i0WH-n7o-m6Zl6ouBVGANs1Og@z>
+Message-ID: <20190416002136.kWPsHo8ZTv32kCsdAzPFAb8qP9rTbAxsrgQRIo50vRs@z>
 
-On Mon, Apr 15, 2019 at 1:38 AM Igor Mammedov <imammedo@redhat.com> wrote:
+On Fri, Apr 12, 2019 at 12:04 PM Jonathan Behrens <fintelia@gmail.com> wrote:
 >
-> On Fri, 12 Apr 2019 14:19:16 -0700
-> Alistair Francis <alistair23@gmail.com> wrote:
+> Currently mcounteren.TM acts as though it is hardwired to zero, even though
+> QEMU
+> allows it to be set. This change resolves the issue by allowing reads to the
+> time and timeh control registers when running in a privileged mode where
+> such
+> accesses are allowed.
 >
+> Signed-off-by: Jonathan Behrens <fintelia@gmail.com>
+> ---
+>  hw/riscv/sifive_clint.c |  1 +
+>  target/riscv/cpu.c      | 14 ++++++++++++++
+>  target/riscv/cpu.h      |  2 ++
+>  target/riscv/csr.c      | 17 +++++++++++------
+>  4 files changed, 28 insertions(+), 6 deletions(-)
+>
+> diff --git a/hw/riscv/sifive_clint.c b/hw/riscv/sifive_clint.c
+> index d4c159e937..3ad4fe6139 100644
+> --- a/hw/riscv/sifive_clint.c
+> +++ b/hw/riscv/sifive_clint.c
+> @@ -237,6 +237,7 @@ DeviceState *sifive_clint_create(hwaddr addr, hwaddr
+> size, uint32_t num_harts,
+>          env->timer = timer_new_ns(QEMU_CLOCK_VIRTUAL,
+>                                    &sifive_clint_timer_cb, cpu);
+>          env->timecmp = 0;
+> +        env->time_freq = SIFIVE_CLINT_TIMEBASE_FREQ;
 
-...
-
-> > >
-> > > if it's programming error it should be assert
-> > > but in general instance_init()  should never fail.
-> >
-> > We are checking for a user specified CPU string, not a programming
-> > error so an assert() isn't correct here.
-> >
-> > If *init() can't fail how should this be handled?
-> typical flow for device object is
->
->  object_new(foo) -> foo_init_fn()
->  set properties on foo
->  set 'realize' property to 'true' -> foo_realize_fn()
->
-> all checks should be performed in realize() or during property setting.
-
-I thought there was a reason realise didn't work, but now I can't see
-what it is. I can move it to realise.
-
->
-> > > the same applies to errors or warnings within this function.
-> > >
-> > > > > > +    }
-> > > > > > +
-> > > > > > +    if (riscv_cpu[0] == 'r' && riscv_cpu[1] == 'v') {
-> > > > > > +        /* Starts with "rv" */
-> > > > > > +        if (riscv_cpu[2] == '3' && riscv_cpu[3] == '2') {
-> > > > > > +            valid = true;
-> > > > > > +            rvxlen = RV32;
-> > > > > > +        }
-> > > > > > +        if (riscv_cpu[2] == '6' && riscv_cpu[3] == '4') {
-> > > > > > +            valid = true;
-> > > > > > +            rvxlen = RV64;
-> > > > > > +        }
-> > > > > > +    }
-> > > > > > +
-> > > > > > +    if (!valid) {
-> > > > > > +        error_report("'%s' does not appear to be a valid RISC-V CPU",
-> > > > > > +                     riscv_cpu);
-> > > > > > +        exit(1);
-> > > > > > +    }
-> > > > > > +
-> > > > > > +    for (i = 4; i < strlen(riscv_cpu); i++) {
-> > > > > > +        switch (riscv_cpu[i]) {
-> > > > > > +        case 'i':
-> > > > > > +            if (target_misa & RVE) {
-> > > > > > +                error_report("I and E extensions are incompatible");
-> > > > > > +                exit(1);
-> > > > > > +            }
-> > > > > > +            target_misa |= RVI;
-> > > > > > +            continue;
-> > > > > > +        case 'e':
-> > > > > > +            if (target_misa & RVI) {
-> > > > > > +                error_report("I and E extensions are incompatible");
-> > > > > > +                exit(1);
-> > > > > > +            }
-> > > > > > +            target_misa |= RVE;
-> > > > > > +            continue;
-> > > > > > +        case 'g':
-> > > > > > +            target_misa |= RVI | RVM | RVA | RVF | RVD;
-> > > > > > +            continue;
-> > > > > > +        case 'm':
-> > > > > > +            target_misa |= RVM;
-> > > > > > +            continue;
-> > > > > > +        case 'a':
-> > > > > > +            target_misa |= RVA;
-> > > > > > +            continue;
-> > > > > > +        case 'f':
-> > > > > > +            target_misa |= RVF;
-> > > > > > +            continue;
-> > > > > > +        case 'd':
-> > > > > > +            target_misa |= RVD;
-> > > > > > +            continue;
-> > > > > > +        case 'c':
-> > > > > > +            target_misa |= RVC;
-> > > > > > +            continue;
-> > > > > > +        case 's':
-> > > > > > +            target_misa |= RVS;
-> > > > > > +            continue;
-> > > > > > +        case 'u':
-> > > > > > +            target_misa |= RVU;
-> > > > > > +            continue;
-> > > > > > +        default:
-> > > > > > +            warn_report("QEMU does not support the %c extension",
-> > > > > > +                        riscv_cpu[i]);
-> > > that's what looks to me like fallback, and what makes
-> > > CPU features for this CPU type non deterministic.
-> >
-> > What do you mean? QEMU will always parse the specified CPU string and
-> > create a CPU based on the features specified by the user. For each
-> > version of QEMU it will always result in the same outcome for the same
-> > user supplied command line argument.
->
-> I've meant that here you would print warning and happily continue parsing
-> user input ignoring input error. One should error out instead and make
-> user fix error.
-
-Ah, ok. I can change this one to an error.
-
->
-> >
-> > Newer QEMU versions will support more features though, so they will
-> > accept different options.
-> >
-> > > I'm not sure what you are trying to achieve here, but it look like
-> > > you are trying to verify MachineClass field in object constructor
-> > > along with other things.
-> >
-> > I'm just trying to parse the -cpu string option.
-> >
-> > >
-> > > I'd put all MachineClass checks in class_init and abort on error
-> > > since invalid mcc->isa_str is codding error.
-> >
-> > No, it's a user error.
->
-> Parsing -cpu by assigning to class members user input looks unusual.
->
-> We had a custom parsing for x86 & sparc cpus, but that was factored out
-> into compat utilities and we shouldn't do it anywhere else without very
-> compelling reason.
-
-I did see that, but it didn't seem to work the same way as this.
-
->
-> Currently it's preferred to use canonical form for cpu properties, like:
->
->   -cpu foo,prop1=x,prop2=y,...
-
-Yeah, but I don't see how that would work nicely.
-
-Instead of:
-    -cpu rv64gcsu
-we would have:
-    -cpu rvgen,xlen=64,g=true,c=true,s=true,u=true
-which seems more complex for users
-
->
-> and let the generic parser to do the job. For it to work you would need
-> to create a property per a cpu feature.
->
-> This way it will work fine with -cpu and -device/device_add without any
-> custom parsing involved.
-
-Although I think it's messy for users, it is the cleanest
-implementation in terms of QOM. Maybe that will be the only solution.
+Why do you need to set this here?
 
 Alistair
-...
+
+>      }
+>
+>      DeviceState *dev = qdev_create(NULL, TYPE_SIFIVE_CLINT);
+> diff --git a/target/riscv/cpu.c b/target/riscv/cpu.c
+> index d61bce6d55..ff17d54691 100644
+> --- a/target/riscv/cpu.c
+> +++ b/target/riscv/cpu.c
+> @@ -103,12 +103,20 @@ static void set_resetvec(CPURISCVState *env, int
+> resetvec)
+>  #endif
+>  }
+>
+> +static void set_time_freq(CPURISCVState *env, uint64_t freq)
+> +{
+> +#ifndef CONFIG_USER_ONLY
+> +    env->time_freq = freq;
+> +#endif
+> +}
+> +
+>  static void riscv_any_cpu_init(Object *obj)
+>  {
+>      CPURISCVState *env = &RISCV_CPU(obj)->env;
+>      set_misa(env, RVXLEN | RVI | RVM | RVA | RVF | RVD | RVC | RVU);
+>      set_versions(env, USER_VERSION_2_02_0, PRIV_VERSION_1_10_0);
+>      set_resetvec(env, DEFAULT_RSTVEC);
+> +    set_time_freq(env, NANOSECONDS_PER_SECOND);
+>  }
+>
+>  #if defined(TARGET_RISCV32)
+> @@ -121,6 +129,7 @@ static void rv32gcsu_priv1_09_1_cpu_init(Object *obj)
+>      set_resetvec(env, DEFAULT_RSTVEC);
+>      set_feature(env, RISCV_FEATURE_MMU);
+>      set_feature(env, RISCV_FEATURE_PMP);
+> +    set_time_freq(env, NANOSECONDS_PER_SECOND);
+>  }
+>
+>  static void rv32gcsu_priv1_10_0_cpu_init(Object *obj)
+> @@ -131,6 +140,7 @@ static void rv32gcsu_priv1_10_0_cpu_init(Object *obj)
+>      set_resetvec(env, DEFAULT_RSTVEC);
+>      set_feature(env, RISCV_FEATURE_MMU);
+>      set_feature(env, RISCV_FEATURE_PMP);
+> +    set_time_freq(env, NANOSECONDS_PER_SECOND);
+>  }
+>
+>  static void rv32imacu_nommu_cpu_init(Object *obj)
+> @@ -140,6 +150,7 @@ static void rv32imacu_nommu_cpu_init(Object *obj)
+>      set_versions(env, USER_VERSION_2_02_0, PRIV_VERSION_1_10_0);
+>      set_resetvec(env, DEFAULT_RSTVEC);
+>      set_feature(env, RISCV_FEATURE_PMP);
+> +    set_time_freq(env, NANOSECONDS_PER_SECOND);
+>  }
+>
+>  #elif defined(TARGET_RISCV64)
+> @@ -152,6 +163,7 @@ static void rv64gcsu_priv1_09_1_cpu_init(Object *obj)
+>      set_resetvec(env, DEFAULT_RSTVEC);
+>      set_feature(env, RISCV_FEATURE_MMU);
+>      set_feature(env, RISCV_FEATURE_PMP);
+> +    set_time_freq(env, NANOSECONDS_PER_SECOND);
+>  }
+>
+>  static void rv64gcsu_priv1_10_0_cpu_init(Object *obj)
+> @@ -162,6 +174,7 @@ static void rv64gcsu_priv1_10_0_cpu_init(Object *obj)
+>      set_resetvec(env, DEFAULT_RSTVEC);
+>      set_feature(env, RISCV_FEATURE_MMU);
+>      set_feature(env, RISCV_FEATURE_PMP);
+> +    set_time_freq(env, NANOSECONDS_PER_SECOND);
+>  }
+>
+>  static void rv64imacu_nommu_cpu_init(Object *obj)
+> @@ -171,6 +184,7 @@ static void rv64imacu_nommu_cpu_init(Object *obj)
+>      set_versions(env, USER_VERSION_2_02_0, PRIV_VERSION_1_10_0);
+>      set_resetvec(env, DEFAULT_RSTVEC);
+>      set_feature(env, RISCV_FEATURE_PMP);
+> +    set_time_freq(env, NANOSECONDS_PER_SECOND);
+>  }
+>
+>  #endif
+> diff --git a/target/riscv/cpu.h b/target/riscv/cpu.h
+> index 20bce8742e..67b1769ad3 100644
+> --- a/target/riscv/cpu.h
+> +++ b/target/riscv/cpu.h
+> @@ -173,7 +173,9 @@ struct CPURISCVState {
+>      /* temporary htif regs */
+>      uint64_t mfromhost;
+>      uint64_t mtohost;
+> +
+>      uint64_t timecmp;
+> +    uint64_t time_freq;
+>
+>      /* physical memory protection */
+>      pmp_table_t pmp_state;
+> diff --git a/target/riscv/csr.c b/target/riscv/csr.c
+> index e1d91b6c60..6083c782a1 100644
+> --- a/target/riscv/csr.c
+> +++ b/target/riscv/csr.c
+> @@ -191,22 +191,31 @@ static int read_instreth(CPURISCVState *env, int
+> csrno, target_ulong *val)
+>  }
+>  #endif /* TARGET_RISCV32 */
+>
+> -#if defined(CONFIG_USER_ONLY)
+>  static int read_time(CPURISCVState *env, int csrno, target_ulong *val)
+>  {
+> +#if !defined(CONFIG_USER_ONLY)
+> +    *val = muldiv64(qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL),
+> +                    env->time_freq, NANOSECONDS_PER_SECOND);
+> +#else
+>      *val = cpu_get_host_ticks();
+> +#endif
+>      return 0;
+>  }
+>
+>  #if defined(TARGET_RISCV32)
+>  static int read_timeh(CPURISCVState *env, int csrno, target_ulong *val)
+>  {
+> +#if !defined(CONFIG_USER_ONLY)
+> +    *val = muldiv64(qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL),
+> +                    env->time_freq, NANOSECONDS_PER_SECOND) >> 32;
+> +#else
+>      *val = cpu_get_host_ticks() >> 32;
+> +#endif
+>      return 0;
+>  }
+>  #endif
+>
+> -#else /* CONFIG_USER_ONLY */
+> +#if !defined(CONFIG_USER_ONLY)
+>
+>  /* Machine constants */
+>
+> @@ -854,14 +863,10 @@ static riscv_csr_operations csr_ops[CSR_TABLE_SIZE] =
+> {
+>      [CSR_INSTRETH] =            { ctr,
+> read_instreth                       },
+>  #endif
+>
+> -    /* User-level time CSRs are only available in linux-user
+> -     * In privileged mode, the monitor emulates these CSRs */
+> -#if defined(CONFIG_USER_ONLY)
+>      [CSR_TIME] =                { ctr,
+> read_time                           },
+>  #if defined(TARGET_RISCV32)
+>      [CSR_TIMEH] =               { ctr,
+> read_timeh                          },
+>  #endif
+> -#endif
+>
+>  #if !defined(CONFIG_USER_ONLY)
+>      /* Machine Timers and Counters */
+> --
+> 2.20.1
 
