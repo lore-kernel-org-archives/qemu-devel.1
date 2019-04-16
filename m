@@ -1,27 +1,26 @@
-Received: from eggs.gnu.org ([209.51.188.92]:45367)
+Received: from eggs.gnu.org ([209.51.188.92]:49760)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <catherine.hecx@gmail.com>) id 1hGDBZ-0002NK-Jj
-	for qemu-devel@nongnu.org; Mon, 15 Apr 2019 21:46:59 -0400
+	(envelope-from <andrew.smirnov@gmail.com>) id 1hGDmT-0006Kj-UB
+	for qemu-devel@nongnu.org; Mon, 15 Apr 2019 22:25:07 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <catherine.hecx@gmail.com>) id 1hGDBY-0003rR-Fv
-	for qemu-devel@nongnu.org; Mon, 15 Apr 2019 21:46:57 -0400
-Received: from mail-ot1-x344.google.com ([2607:f8b0:4864:20::344]:39067)
+	(envelope-from <andrew.smirnov@gmail.com>) id 1hGDmR-0008AH-SB
+	for qemu-devel@nongnu.org; Mon, 15 Apr 2019 22:25:05 -0400
+Received: from mail-it1-x142.google.com ([2607:f8b0:4864:20::142]:35044)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <catherine.hecx@gmail.com>)
-	id 1hGDBY-0003r1-6Q
-	for qemu-devel@nongnu.org; Mon, 15 Apr 2019 21:46:56 -0400
-Received: by mail-ot1-x344.google.com with SMTP id f10so16234917otb.6
-	for <qemu-devel@nongnu.org>; Mon, 15 Apr 2019 18:46:55 -0700 (PDT)
+	(Exim 4.71) (envelope-from <andrew.smirnov@gmail.com>)
+	id 1hGDmR-00089s-EZ
+	for qemu-devel@nongnu.org; Mon, 15 Apr 2019 22:25:03 -0400
+Received: by mail-it1-x142.google.com with SMTP id w15so30166384itc.0
+	for <qemu-devel@nongnu.org>; Mon, 15 Apr 2019 19:25:02 -0700 (PDT)
 MIME-Version: 1.0
-References: <1554688616-18583-1-git-send-email-catherine.hecx@gmail.com>
-	<1554712933-18682-1-git-send-email-catherine.hecx@gmail.com>
-In-Reply-To: <1554712933-18682-1-git-send-email-catherine.hecx@gmail.com>
-From: Catherine Ho <catherine.hecx@gmail.com>
-Date: Tue, 16 Apr 2019 09:46:40 +0800
-Message-ID: <CAEn6zmE-QJh260_Se7ygQdWyQ_jObViJ5173ErU3Z+ECF2=9YQ@mail.gmail.com>
+References: <87d0mwatbu.fsf@dusky.pond.sub.org>
+In-Reply-To: <87d0mwatbu.fsf@dusky.pond.sub.org>
+From: Andrey Smirnov <andrew.smirnov@gmail.com>
+Date: Mon, 15 Apr 2019 19:24:49 -0700
+Message-ID: <CAHQ1cqEDxNMeAGb5t4OrV9DWpq-VTn4GVhjQh4BePZv=JP8-Ow@mail.gmail.com>
 Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH v4] migration: do not rom_reset() during
- incoming migration
+Subject: Re: [Qemu-devel] Maintainers,
+ please tell us how to boot your machines!
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,71 +29,123 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Cc: Markus Armbruster <armbru@redhat.com>, Juan Quintela <quintela@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>, Peter Xu <peterx@redhat.com>
+To: Markus Armbruster <armbru@redhat.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, =?UTF-8?Q?C=C3=A9dric_Le_Goater?= <clg@kaod.org>, "Edgar E. Iglesias" <edgar.iglesias@gmail.com>, =?UTF-8?Q?Herv=C3=A9_Poussineau?= <hpoussin@reactos.org>, "Michael S. Tsirkin" <mst@redhat.com>, =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>, Aleksandar Markovic <amarkovic@wavecomp.com>, Aleksandar Rikalo <arikalo@wavecomp.com>, Alistair Francis <Alistair.Francis@wdc.com>, Alistair Francis <alistair@alistair23.me>, Andrew Baumann <Andrew.Baumann@microsoft.com>, Andrew Jeffery <andrew@aj.id.au>, Andrzej Zaborowski <balrogg@gmail.com>, Anthony Green <green@moxielogic.com>, Anthony Perard <anthony.perard@citrix.com>, Antony Pavlov <antonynpavlov@gmail.com>, Artyom Tarasenko <atar4qemu@gmail.com>, Aurelien Jarno <aurelien@aurel32.net>, BALATON Zoltan <balaton@eik.bme.hu>, Bastian Koppelmann <kbastian@mail.uni-paderborn.de>, Beniamino Galvani <b.galvani@gmail.com>, Chris Wulff <crwulff@gmail.com>, Christian Borntraeger <borntraeger@de.ibm.com>, Cornelia Huck <cohuck@redhat.com>, David Gibson <david@gibson.dropbear.id.au>, David Hildenbrand <david@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, Fabien Chouteau <chouteau@adacore.com>, Guan Xuetao <gxt@mprc.pku.edu.cn>, Halil Pasic <pasic@linux.ibm.com>, Helge Deller <deller@gmx.de>, Igor Mitsyanko <i.mitsyanko@gmail.com>, Jan Kiszka <jan.kiszka@web.de>, Jean-Christophe Dubois <jcd@tribudubois.net>, Jia Liu <proljc@gmail.com>, Joel Stanley <joel@jms.id.au>, Magnus Damm <magnus.damm@gmail.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, Marek Vasut <marex@denx.de>, Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, Max Filippov <jcmvbkbc@gmail.com>, Michael Walle <michael@walle.cc>, Palmer Dabbelt <palmer@sifive.com>, Paolo Bonzini <pbonzini@redhat.com>, Paul Burton <pburton@wavecomp.com>, Paul Durrant <paul.durrant@citrix.com>, Peter Chubb <peter.chubb@nicta.com.au>, Peter Maydell <peter.maydell@linaro.org>, Richard Henderson <rth@twiddle.net>, Rob Herring <robh@kernel.org>, Sagar Karandikar <sagark@eecs.berkeley.edu>, Stafford Horne <shorne@gmail.com>, Stefano Stabellini <sstabellini@kernel.org>, Subbaraya Sundeep <sundeep.lkml@gmail.com>, Thomas Huth <huth@tuxfamily.org>
 
-Ping, thanks
+On Tue, Mar 12, 2019 at 10:36 AM Markus Armbruster <armbru@redhat.com> wrote:
+>
+> Dear board code maintainers,
+>
+> This is a (rather late) follow-up to the last QEMU summit.  Minutes[*]:
+>
+>  * Deprecating unmaintained features (devices, targets, backends) in QEMU
+>
+>    QEMU has a mechanism to deprecate features but there remains a lot of
+>    old unmaintained code.  Refactoring is hindered by untested legacy
+>    code, so there is a desire to deprecate unmaintained features more
+>    often.
+>
+>    [...]
+>
+>    We should require at least a minimal test for each board; if nobody
+>    cares enough to come up with one, that board should be deprecated.
+>
+>    [...]
+>
+>    Also see the qemu-devel discussion about deprecating code:
+>    https://lists.nongnu.org/archive/html/qemu-devel/2018-10/msg05828.html.
+>
+> That's a link to "Minutes of KVM Forum BoF on deprecating stuff".
+> Quote:
+>
+>  * One obvious class of candidates for removal is machines we don't know
+>    how to boot, or can't boot, say because we lack required firmware
+>    and/or OS.
+>
+>    Of course, "can boot" should be an automated test.  As a first step
+>    towards that, we should at least document how to boot each machine.
+>    We're going to ask machine maintainers to do that.
+>
+> Let's get going on this.
+>
+> I gathered the machine types, mapped them to source files, which I fed
+> to get_maintainer.pl.  Results are appended.  If you're cc'ed,
+> MAINTAINERS fingers you for at least one machine type's source file.
+> Please tell us for all of them how to to a "meaningful" boot test.
+>
+> For now, what's "meaningful" is entirely up to you.  Booting Linux
+> certainly is.
+>
+> Make sure to include a complete QEMU command line.  If your QEMU command
+> line requires resources beyond the QEMU source tree and what we build
+> from it, please detail them, and provide download URLs as far as
+> possible.
+>
+> Goals for this exercise:
+>
+> * Gather information we need to cover more machines in our automated
+>   testing.
+>
+>   Related work:
+>   [PATCH v4 00/19] Acceptance Tests: target architecture support
+>   Message-Id: <20190312121150.8638-1-crosa@redhat.com>
+>   https://lists.gnu.org/archive/html/qemu-devel/2019-03/msg03881.html
+>
+> * Maybe identify a few machines we don't know how to boot anymore.
+>
+> Thanks in advance for your help!
+>
+>
+>
+> Machines with at least one maintainer:
+>
+>
+>     = hw/arm/mcimx7d-sabre.c =
+>     Peter Maydell <peter.maydell@linaro.org> (odd fixer:MCIMX7D SABRE / i...)
+>     Andrey Smirnov <andrew.smirnov@gmail.com> (reviewer:MCIMX7D SABRE / i...)
+>     qemu-arm@nongnu.org (open list:MCIMX7D SABRE / i...)
+>
 
-B.R.
-Catherine
+Sorry I am late to this party. I haven't used i.MX7 emulation in a
+while and things didn't go smoothly out of the box, so I had to create
+a number of fixes (submitted to the ML).
 
-On Mon, 8 Apr 2019 at 16:43, Catherine Ho <catherine.hecx@gmail.com> wrote:
+I use Linux kernel built using Buildroot for validation. Buildroot
+should have a default i.MX7 Sabred SD configuration and that should
+probably work. I usually change mine slightly to use compiled-in
+rootfs to simplify storage setup.
 
-> Commit 18269069c310 ("migration: Introduce ignore-shared capability")
-> addes ignore-shared capability to bypass the shared ramblock (e,g,
-> membackend + numa node). It does good to live migration.
->
-> As told by Yury,this commit expectes that QEMU doesn't write to guest RAM
-> until VM starts, but it does on aarch64 qemu:
-> Backtrace:
-> 1  0x000055f4a296dd84 in address_space_write_rom_internal () at
-> exec.c:3458
-> 2  0x000055f4a296de3a in address_space_write_rom () at exec.c:3479
-> 3  0x000055f4a2d519ff in rom_reset () at hw/core/loader.c:1101
-> 4  0x000055f4a2d475ec in qemu_devices_reset () at hw/core/reset.c:69
-> 5  0x000055f4a2c90a28 in qemu_system_reset () at vl.c:1675
-> 6  0x000055f4a2c9851d in main () at vl.c:4552
->
-> Actually, on arm64 virt marchine, ramblock "dtb" will be filled into ram
-> druing rom_reset. In ignore-shared incoming case, this rom filling
-> is not required since all the data has been stored in memory backend
-> file.
->
-> Further more, as suggested by Peter Xu, if we do rom_reset() now with
-> these ROMs then the RAM data should be re-filled again too with the
-> migration stream coming in.
->
-> Fixes: commit 18269069c310 ("migration: Introduce ignore-shared
-> capability")
-> Suggested-by: Yury Kotov <yury-kotov@yandex-team.ru>
-> Suggested-by: Peter Xu <peterx@redhat.com>
-> Signed-off-by: Catherine Ho <catherine.hecx@gmail.com>
-> ---
->  hw/core/loader.c | 9 +++++++++
->  1 file changed, 9 insertions(+)
->
-> diff --git a/hw/core/loader.c b/hw/core/loader.c
-> index fe5cb24122..040109464b 100644
-> --- a/hw/core/loader.c
-> +++ b/hw/core/loader.c
-> @@ -1087,6 +1087,15 @@ static void rom_reset(void *unused)
->  {
->      Rom *rom;
->
-> +    /*
-> +     * We don't need to fill in the RAM with ROM data because we'll fill
-> +     * the data in during the next incoming migration in all cases.  Note
-> +     * that some of those RAMs can actually be modified by the guest on
-> ARM
-> +     * so this is probably the only right thing to do here.
-> +     */
-> +    if (runstate_check(RUN_STATE_INMIGRATE))
-> +        return;
-> +
->      QTAILQ_FOREACH(rom, &roms, next) {
->          if (rom->fw_file) {
->              continue;
-> --
-> 2.17.1
->
->
+In case this is helpful here's a number of commands I use to start my
+test cases:
+
+* PCIe (e1000 ethernet attached), USB (usb stick attached), SD:
+arm-softmmu/qemu-system-arm -smp 2 -m 1024 -machine mcimx7d-sabre
+-nographic -serial mon:stdio -kernel <path to zImage> -dtb <path to
+DTB> -device e1000e,bus="dw-pcie",netdev=lan0 -netdev
+tap,id=lan0,ifname=tap0,script=no,downscript=no -append
+"console=ttymxc0,115200 noinitrd" -usb -drive
+if=none,id=stick,file=<patch to USB stick image>,format=raw -device
+usb-storage,bus=usb-bus.0,drive=stick -drive
+id=sd1,if=sd,format=file,file=<path to SD1> -drive
+id=sd2,if=sd,format=file,file=<path to SD2> -driv
+eid=sd3,if=sd,format=file,file=<path to SD3>
+
+* EHCI USB attached via PCIe with legacy interrupts, Ethernet
+connected to built-in controller:
+arm-softmmu/qemu-system-arm -smp 2 -m 1024 -machine mcimx7d-sabre
+-nographic -serial mon:stdio -kernel <path to zImage> -dtb <path to
+DTB> -device usb-ehci,id=ehci,bus="dw-pcie" -net
+nic,model=imx.fec,netdev=lan0 -netdev
+tap,id=lan0,ifname=tap0,script=no,downscript=no -append
+"console=ttymxc0,115200 noinitrd pci=nomsi" -usb -drive
+if=none,id=stick,file=<path to USB stick image>,format=raw
+
+Also, I don't think anyone would try to do this, but just as a
+warning, building QEMU with --enable-tcg-interpreter doesn't really
+work that well (/init gets SIGKILLed every time), so I'd recommend
+avoiding using that option.
+
+Hopefully this is enough info, but if not, feel free to ask me more questions.
+
+Thanks,
+Andrey Smirnov
