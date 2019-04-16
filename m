@@ -1,31 +1,27 @@
-Received: from eggs.gnu.org ([209.51.188.92]:57014)
+Received: from eggs.gnu.org ([209.51.188.92]:57193)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1hGJHc-00072J-IU
-	for qemu-devel@nongnu.org; Tue, 16 Apr 2019 04:17:37 -0400
+	(envelope-from <berrange@redhat.com>) id 1hGJIG-0007PA-AQ
+	for qemu-devel@nongnu.org; Tue, 16 Apr 2019 04:18:17 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1hGJHb-00056d-MZ
-	for qemu-devel@nongnu.org; Tue, 16 Apr 2019 04:17:36 -0400
-Received: from mail-pg1-x542.google.com ([2607:f8b0:4864:20::542]:36227)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1hGJHb-000563-6q
-	for qemu-devel@nongnu.org; Tue, 16 Apr 2019 04:17:35 -0400
-Received: by mail-pg1-x542.google.com with SMTP id 85so9959806pgc.3
-	for <qemu-devel@nongnu.org>; Tue, 16 Apr 2019 01:17:34 -0700 (PDT)
-References: <20190411100836.646-1-david@redhat.com>
-	<20190411100836.646-4-david@redhat.com>
-	<50db1745-397d-03e0-626a-12d1b2a2a554@linaro.org>
-	<0fdae81c-eecb-90cd-26f8-b52964d375a3@redhat.com>
-From: Richard Henderson <richard.henderson@linaro.org>
-Message-ID: <b0567193-e353-d391-b438-e5b580d699a4@linaro.org>
-Date: Mon, 15 Apr 2019 22:17:28 -1000
+	(envelope-from <berrange@redhat.com>) id 1hGJIF-0005Jx-79
+	for qemu-devel@nongnu.org; Tue, 16 Apr 2019 04:18:16 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:47918)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1hGJIE-0005JZ-VX
+	for qemu-devel@nongnu.org; Tue, 16 Apr 2019 04:18:15 -0400
+Date: Tue, 16 Apr 2019 09:18:04 +0100
+From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+Message-ID: <20190416081804.GC31311@redhat.com>
+Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+References: <1555124080-27089-1-git-send-email-puwen@hygon.cn>
+	<20190415092500.GD5718@redhat.com>
+	<aa92336f-681e-30d9-2670-7d0093d9912a@hygon.cn>
 MIME-Version: 1.0
-In-Reply-To: <0fdae81c-eecb-90cd-26f8-b52964d375a3@redhat.com>
 Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v1 03/41] s390x/tcg: Implement VECTOR ADD
- COMPUTE CARRY
+Content-Disposition: inline
+In-Reply-To: <aa92336f-681e-30d9-2670-7d0093d9912a@hygon.cn>
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v2] i386: Add new Hygon 'Dhyana' CPU model
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,60 +30,55 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Hildenbrand <david@redhat.com>, qemu-devel@nongnu.org
-Cc: qemu-s390x@nongnu.org, Thomas Huth <thuth@redhat.com>, Cornelia Huck <cohuck@redhat.com>
+To: Pu Wen <puwen@hygon.cn>
+Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "pbonzini@redhat.com" <pbonzini@redhat.com>, "rth@twiddle.net" <rth@twiddle.net>, "ehabkost@redhat.com" <ehabkost@redhat.com>, "mst@redhat.com" <mst@redhat.com>, "marcel.apfelbaum@gmail.com" <marcel.apfelbaum@gmail.com>
 
-On 4/15/19 10:01 PM, David Hildenbrand wrote:
-> On 12.04.19 23:05, Richard Henderson wrote:
->> On 4/11/19 12:07 AM, David Hildenbrand wrote:
->>> +    static const GVecGen3 g[5] = {
->>> +        { .fni8 = gen_acc8_i64, },
->>> +        { .fni8 = gen_acc16_i64, },
->>> +        { .fni8 = gen_acc32_i64, },
->>> +        { .fni8 = gen_acc_i64, },
->>> +        { .fno = gen_helper_gvec_vacc128, },
->>> +    };
->>
->> Vector versions of the first four are fairly simple too.
->>
->> static void gen_acc_vec(unsigned vece, TCGv_vec d, TCGv_vec a, TCGv_vec b)
->> {
->>     tcgv_vec t = tcg_temp_new_vec_matching(d);
->>
->>     tcg_gen_add_vec(vece, t, a, b);
->>     tcg_gen_cmp_vec(TCG_COND_LTU, vece, d, r, a);  /* produces -1 for carry */
->>     tcg_gen_neg_vec(vece, d, d);                 /* convert to +1 for carry */
->> }
->>
->>   { .fni8 = gen_acc8_i64,
->>     .fniv = gen_acc_vec,
->>     .opc = INDEX_op_cmp_vec,
->>     .vece = MO_8 },
->>   ...
->>
-> 
-> Indeed, I didn't really explore vector operations yet. This is more
-> compact than I expected :)
+On Tue, Apr 16, 2019 at 02:56:12PM +0800, Pu Wen wrote:
+> On 2019/4/15 17:25, Daniel P. Berrang=C3=A9 wrote:
+> > On Sat, Apr 13, 2019 at 10:54:40AM +0800, Pu Wen wrote:
+> ...
+> > > diff --git a/hw/i386/pc.c b/hw/i386/pc.c
+> > > index f2c15bf..551bec9 100644
+> > > --- a/hw/i386/pc.c
+> > > +++ b/hw/i386/pc.c
+> > > @@ -128,6 +128,8 @@ GlobalProperty pc_compat_3_1[] =3D {
+> > >       { "EPYC" "-" TYPE_X86_CPU, "nrip-save", "off" },
+> > >       { "EPYC-IBPB" "-" TYPE_X86_CPU, "npt", "off" },
+> > >       { "EPYC-IBPB" "-" TYPE_X86_CPU, "nrip-save", "off" },
+> > > +    { "Dhyana" "-" TYPE_X86_CPU, "npt", "off" },
+> > > +    { "Dhyana" "-" TYPE_X86_CPU, "nrip-save", "off" },
+> > >       { "Skylake-Client" "-" TYPE_X86_CPU,      "mpx", "on" },
+> > >       { "Skylake-Client-IBRS" "-" TYPE_X86_CPU, "mpx", "on" },
+> > >       { "Skylake-Server" "-" TYPE_X86_CPU,      "mpx", "on" },
+> > > @@ -152,6 +154,7 @@ GlobalProperty pc_compat_2_12[] =3D {
+> > >       { TYPE_X86_CPU, "topoext", "off" },
+> > >       { "EPYC-" TYPE_X86_CPU, "xlevel", "0x8000000a" },
+> > >       { "EPYC-IBPB-" TYPE_X86_CPU, "xlevel", "0x8000000a" },
+> > > +    { "Dhyana-" TYPE_X86_CPU, "xlevel", "0x8000000a" },
+> > >   };
+> > >   const size_t pc_compat_2_12_len =3D G_N_ELEMENTS(pc_compat_2_12);
+> >=20
+> > You can drop the changes in this file. This CPU model didn't exist
+> > in any older QEMU releases, so there's no machine type backcompat
+> > required, at least from upstream QEMU POV.
+>=20
+> Then how about running QEMU with the parameter like "-M pc-i440fx-2.12"=
+?
+> Although the default machine is newer than that.
 
-:-)
+That doesnt matter.  This back-compat property table is about ensuring
+that "-cpu Skylake-Client -M pc-i440fx-2.12" run on QEMU 4.0.0 release
+works the same way as when run on QEMU 2.12.0 release.
 
-That said, in implementing vector variable shifts today,
-I've come up with a representational problem here.
-You may want to hold off on these until I can address them.
+Since there is no Dhyana CPU model in QEMU 2.12.0 release, there's no
+back compat issue to fix.
 
-
->>   tcg_gen_add2_i64(tl, th, al, zero, bl, zero);
->>   tcg_gen_add2_i64(tl, th, th, zero, ah, zero);
->>   tcg_gen_add2_i64(tl, th, tl, th, bl, zero);
->>   /* carry out in th */
-> 
-> Nice trick. Just so I get it right, the third line should actually be
-> 
-> tcg_gen_add2_i64(tl, th, tl, th, bh, zero);
-> 
-> right? Thanks!
-
-Oops, yes, typo indeed.
-
-
-r~
+Regards,
+Daniel
+--=20
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberran=
+ge :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.c=
+om :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberran=
+ge :|
