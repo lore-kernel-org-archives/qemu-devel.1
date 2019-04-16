@@ -1,40 +1,31 @@
-Received: from eggs.gnu.org ([209.51.188.92]:37577)
+Received: from eggs.gnu.org ([209.51.188.92]:37599)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <borntraeger@de.ibm.com>) id 1hGLpz-0005wp-Rs
-	for qemu-devel@nongnu.org; Tue, 16 Apr 2019 07:01:17 -0400
+	(envelope-from <yury-kotov@yandex-team.ru>) id 1hGLq1-0005y1-N3
+	for qemu-devel@nongnu.org; Tue, 16 Apr 2019 07:01:18 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <borntraeger@de.ibm.com>) id 1hGLpy-00052k-GN
-	for qemu-devel@nongnu.org; Tue, 16 Apr 2019 07:01:15 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:57216)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <borntraeger@de.ibm.com>)
-	id 1hGLpy-00051q-5Y
-	for qemu-devel@nongnu.org; Tue, 16 Apr 2019 07:01:14 -0400
-Received: from pps.filterd (m0098409.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id
-	x3GB087U030908
-	for <qemu-devel@nongnu.org>; Tue, 16 Apr 2019 07:01:10 -0400
-Received: from e06smtp05.uk.ibm.com (e06smtp05.uk.ibm.com [195.75.94.101])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2rwcb53thq-1
-	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Tue, 16 Apr 2019 07:01:09 -0400
-Received: from localhost
-	by e06smtp05.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
-	Only! Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <borntraeger@de.ibm.com>;
-	Tue, 16 Apr 2019 12:01:06 +0100
-References: <1555334842-195718-1-git-send-email-imammedo@redhat.com>
-	<1555334842-195718-6-git-send-email-imammedo@redhat.com>
-From: Christian Borntraeger <borntraeger@de.ibm.com>
-Date: Tue, 16 Apr 2019 13:01:01 +0200
+	(envelope-from <yury-kotov@yandex-team.ru>) id 1hGLq0-000552-HD
+	for qemu-devel@nongnu.org; Tue, 16 Apr 2019 07:01:17 -0400
+Received: from forwardcorp1o.mail.yandex.net ([2a02:6b8:0:1a2d::193]:45780)
+	by eggs.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <yury-kotov@yandex-team.ru>) id 1hGLpz-000520-LA
+	for qemu-devel@nongnu.org; Tue, 16 Apr 2019 07:01:16 -0400
+From: Yury Kotov <yury-kotov@yandex-team.ru>
+In-Reply-To: <20190415113045.GI2852@work-vm>
+References: <20190411123911.GR3641@redhat.com>
+	<226271554987011@iva6-8a76e93b6298.qloud-c.yandex.net>
+	<243191555321803@vla1-1374b6242101.qloud-c.yandex.net>
+	<20190415101101.GF5718@redhat.com>
+	<251681555323421@vla1-1374b6242101.qloud-c.yandex.net>
+	<20190415102520.GG5718@redhat.com>
+	<259551555324396@vla1-1374b6242101.qloud-c.yandex.net>
+	<20190415104725.GI5718@redhat.com> <20190415111511.GG2852@work-vm>
+	<20190415111911.GK5718@redhat.com> <20190415113045.GI2852@work-vm>
 MIME-Version: 1.0
-In-Reply-To: <1555334842-195718-6-git-send-email-imammedo@redhat.com>
+Date: Tue, 16 Apr 2019 14:01:10 +0300
+Message-Id: <612681555412465@iva6-8a76e93b6298.qloud-c.yandex.net>
 Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Message-Id: <43f77950-019d-f06f-bfbc-4daa831430e3@de.ibm.com>
-Subject: Re: [Qemu-devel] [PATCH v1 5/5] s390: do not call
- memory_region_allocate_system_memory() multiple times
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH] migration: Fix handling fd protocol
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -43,93 +34,130 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Igor Mammedov <imammedo@redhat.com>, qemu-devel@nongnu.org
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Helge Deller <deller@gmx.de>, =?UTF-8?Q?Herv=c3=a9_Poussineau?= <hpoussin@reactos.org>, David Gibson <david@gibson.dropbear.id.au>, Cornelia Huck <cohuck@redhat.com>, Halil Pasic <pasic@linux.ibm.com>, David Hildenbrand <david@redhat.com>, Artyom Tarasenko <atar4qemu@gmail.com>, Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, qemu-ppc@nongnu.org, qemu-s390x@nongnu.org
+To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>, =?utf-8?B?RGFuaWVsIFAuIEJlcnJhbmfDqQ==?= <berrange@redhat.com>
+Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "yc-core@yandex-team.ru" <yc-core@yandex-team.ru>, Juan Quintela <quintela@redhat.com>
 
-This crashes
+15.04.2019, 14:30, "Dr. David Alan Gilbert" <dgilbert@redhat.com>:
+> * Daniel P. Berrang=C3=A9 (berrange@redhat.com) wrote:
+>> =C2=A0On Mon, Apr 15, 2019 at 12:15:12PM +0100, Dr. David Alan Gilbert=
+ wrote:
+>> =C2=A0> * Daniel P. Berrang=C3=A9 (berrange@redhat.com) wrote:
+>> =C2=A0> > On Mon, Apr 15, 2019 at 01:33:21PM +0300, Yury Kotov wrote:
+>> =C2=A0> > > 15.04.2019, 13:25, "Daniel P. Berrang=C3=A9" <berrange@red=
+hat.com>:
+>> =C2=A0> > > > On Mon, Apr 15, 2019 at 01:17:06PM +0300, Yury Kotov wro=
+te:
+>> =C2=A0> > > >> =C2=A015.04.2019, 13:11, "Daniel P. Berrang=C3=A9" <ber=
+range@redhat.com>:
+>> =C2=A0> > > >> =C2=A0> On Mon, Apr 15, 2019 at 12:50:08PM +0300, Yury =
+Kotov wrote:
+>> =C2=A0> > > >> =C2=A0>> =C2=A0Hi,
+>> =C2=A0> > > >> =C2=A0>>
+>> =C2=A0> > > >> =C2=A0>> =C2=A0Just to clarify. I see two possible solu=
+tions:
+>> =C2=A0> > > >> =C2=A0>>
+>> =C2=A0> > > >> =C2=A0>> =C2=A01) Since the migration code doesn't rece=
+ive fd, it isn't responsible for
+>> =C2=A0> > > >> =C2=A0>> =C2=A0closing it. So, it may be better to use =
+migrate_fd_param for both
+>> =C2=A0> > > >> =C2=A0>> =C2=A0incoming/outgoing and add dupping for mi=
+grate_fd_param. Thus, clients must
+>> =C2=A0> > > >> =C2=A0>> =C2=A0close the fd themselves. But existing cl=
+ients will have a leak.
+>> =C2=A0> > > >> =C2=A0>
+>> =C2=A0> > > >> =C2=A0> We can't break existing clients in this way as =
+they are correctly
+>> =C2=A0> > > >> =C2=A0> using the monitor with its current semantics.
+>> =C2=A0> > > >> =C2=A0>
+>> =C2=A0> > > >> =C2=A0>> =C2=A02) If we don't duplicate fd, then at lea=
+st we should remove fd from
+>> =C2=A0> > > >> =C2=A0>> =C2=A0the corresponding list. Therefore, the s=
+olution is to fix qemu_close to find
+>> =C2=A0> > > >> =C2=A0>> =C2=A0the list and remove fd from it. But qemu=
+_close is currently consistent with
+>> =C2=A0> > > >> =C2=A0>> =C2=A0qemu_open (which opens/dups fd), so addi=
+ng additional logic might not be
+>> =C2=A0> > > >> =C2=A0>> =C2=A0a very good idea.
+>> =C2=A0> > > >> =C2=A0>
+>> =C2=A0> > > >> =C2=A0> qemu_close is not appropriate place to deal wit=
+h something speciifc
+>> =C2=A0> > > >> =C2=A0> to the montor.
+>> =C2=A0> > > >> =C2=A0>
+>> =C2=A0> > > >> =C2=A0>> =C2=A0I don't see any other solution, but I mi=
+ght miss something.
+>> =C2=A0> > > >> =C2=A0>> =C2=A0What do you think?
+>> =C2=A0> > > >> =C2=A0>
+>> =C2=A0> > > >> =C2=A0> All callers of monitor_get_fd() will close() th=
+e FD they get back.
+>> =C2=A0> > > >> =C2=A0> Thus monitor_get_fd() should remove it from the=
+ list when it returns
+>> =C2=A0> > > >> =C2=A0> it, and we should add API docs to monitor_get_f=
+d() to explain this.
+>> =C2=A0> > > >> =C2=A0>
+>> =C2=A0> > > >> =C2=A0Ok, it sounds reasonable. But monitor_get_fd is o=
+nly about outgoing migration.
+>> =C2=A0> > > >> =C2=A0But what about the incoming migration? It doesn't=
+ use monitor_get_fd but just
+>> =C2=A0> > > >> =C2=A0converts input string to int and use it as fd.
+>> =C2=A0> > > >
+>> =C2=A0> > > > The incoming migration expects the FD to be passed into =
+QEMU by the mgmt
+>> =C2=A0> > > > app when it is exec'ing the QEMU binary. It doesn't inte=
+ract with the
+>> =C2=A0> > > > monitor at all AFAIR.
+>> =C2=A0> > > >
+>> =C2=A0> > >
+>> =C2=A0> > > Oh, sorry. This use case is not obvious. We used add-fd to=
+ pass fd for
+>> =C2=A0> > > migrate-incoming and such way has described problems.
+>> =C2=A0> >
+>> =C2=A0> > That's a bug in your usage of QEMU IMHO, as the incoming cod=
+e is not
+>> =C2=A0> > designed to use add-fd.
+>> =C2=A0>
+>> =C2=A0> Hmm, that's true - although:
+>> =C2=A0> a) It's very non-obvious
+>> =C2=A0> b) Unfortunate, since it would go well with -incoming defer
+>>
+>> =C2=A0Yeah I think this is a screw up on QMEU's part when introducing =
+'defer'.
+>>
+>> =C2=A0We should have mandated use of 'add-fd' when using 'defer', sinc=
+e FD
+>> =C2=A0inheritance-over-execve() should only be used for command line a=
+rgs,
+>> =C2=A0not monitor commands.
+>>
+>> =C2=A0Not sure how to best fix this is QEMU though without breaking ba=
+ck
+>> =C2=A0compat for apps using 'defer' already.
+>
+> We could add mon-fd: transports that has the same behaviour as now for
+> outgoing, and for incoming uses the add-fd stash.
+>
 
-a simple -kernel -initrd example on s390x.
+Oh, I'm sorry again. I think my suggestion about monitor_fd_param wasn't
+relevant to this issue. If migrate-incoming + "fd:" + add-fd is an invali=
+d use
+case, should we disallow this?
+I may add a check to fd_start_incoming_migration if fd is in mon fds list=
+.
+But I'm afraid there are users like me who are already using this wrong u=
+se case.
+Because currently nothing in QEMU's docs disallow this.
 
-#0  0x000003ff94e3e47c in __GI_raise (sig=sig@entry=6) at ../sysdeps/unix/sysv/linux/raise.c:50
-#1  0x000003ff94e23d18 in __GI_abort () at abort.c:79
-#2  0x000003ff94e365e6 in __assert_fail_base
-    (fmt=0x3ff94f60ca6 "%s%s%s:%u: %s%sAssertion `%s' failed.\n%n", assertion=assertion@entry=0x14aac70 "new_block", file=file@entry=0x13b1168 "/home/cborntra/REPOS/qemu/exec.c", line=line@entry=2041, function=function@entry=0x13b0c8a <__PRETTY_FUNCTION__.34656> "qemu_ram_set_idstr") at assert.c:92
-#3  0x000003ff94e36664 in __GI___assert_fail
-    (assertion=assertion@entry=0x14aac70 "new_block", file=file@entry=0x13b1168 "/home/cborntra/REPOS/qemu/exec.c", line=line@entry=2041, function=function@entry=0x13b0c8a <__PRETTY_FUNCTION__.34656> "qemu_ram_set_idstr") at assert.c:101
-#4  0x000000000102e062 in qemu_ram_set_idstr (new_block=new_block@entry=0x0, name=<optimized out>, dev=dev@entry=0x0) at /home/cborntra/REPOS/qemu/exec.c:2041
-#5  0x00000000011f5b0a in vmstate_register_ram (mr=0x2cd2dd0, mr@entry=<error reading variable: value has been optimized out>, dev=dev@entry=0x0) at /home/cborntra/REPOS/qemu/migration/savevm.c:2828
-#6  0x00000000011f5b5a in vmstate_register_ram_global (mr=<error reading variable: value has been optimized out>) at /home/cborntra/REPOS/qemu/migration/savevm.c:2841
-#7  0x000000000110d2ce in s390_memory_init (mem_size=<optimized out>) at /home/cborntra/REPOS/qemu/hw/s390x/s390-virtio-ccw.c:186
-#8  0x000000000110d2ce in ccw_init (machine=0x2a96770) at /home/cborntra/REPOS/qemu/hw/s390x/s390-virtio-ccw.c:266
-#9  0x00000000011b342c in machine_run_board_init (machine=0x2a96770) at /home/cborntra/REPOS/qemu/hw/core/machine.c:1030
-#10 0x0000000001026fee in main (argc=<optimized out>, argv=<optimized out>, envp=<optimized out>) at /home/cborntra/REPOS/qemu/vl.c:4479
+So which solution is better in your opinion?
+1) Disallow fd's from mon fds list in fd_start_incoming_migration
+2) Allow these fds, but dup them or close them correctly
 
+And how to migrate-incoming defer through fd correctly?
+1) Add "mon-fd:" protocol to work with fds passed by "add-fd/remove-fd" c=
+ommands
+as suggested by Dave
+2) My suggestion about monitor_fd_param and make "fd:" for
+migrate/migrate-incoming consistent. So user will be able to use
+getfd + migrate-incoming
+3) Both of them or something else
 
-
-On 15.04.19 15:27, Igor Mammedov wrote:
-> s390 was trying to solve limited memslot size issue by abusing
-> memory_region_allocate_system_memory(), which breaks API contract
-> where the function might be called only once.
-> 
-> s390 should have used memory aliases to fragment inital memory into
-> smaller chunks to satisfy KVM's memslot limitation. But its a bit
-> late now, since allocated pieces are transfered in migration stream
-> separately, so it's not possible to just replace broken layout with
-> correct one. Previous patch made MemoryRegion alases migratable and
-> this patch switches to use them to split big initial RAM chunk into
-> smaller pieces up to KVM_SLOT_MAX_BYTES each and registers aliases
-> for migration.
-> 
-> Signed-off-by: Igor Mammedov <imammedo@redhat.com>
-> ---
-> A don't have access to a suitable system to test it, so I've simulated
-> it with smaller chunks on x84 host. Ping-pong migration between old
-> and new QEMU worked fine.  KVM part should be fine as memslots
-> using mapped MemoryRegions (in this case it would be aliases) as
-> far as I know but is someone could test it on big enough host it
-> would be nice.
-> ---
->  hw/s390x/s390-virtio-ccw.c | 20 +++++++++++++++-----
->  1 file changed, 15 insertions(+), 5 deletions(-)
-> 
-> diff --git a/hw/s390x/s390-virtio-ccw.c b/hw/s390x/s390-virtio-ccw.c
-> index d11069b..12ca3a9 100644
-> --- a/hw/s390x/s390-virtio-ccw.c
-> +++ b/hw/s390x/s390-virtio-ccw.c
-> @@ -161,20 +161,30 @@ static void virtio_ccw_register_hcalls(void)
->  static void s390_memory_init(ram_addr_t mem_size)
->  {
->      MemoryRegion *sysmem = get_system_memory();
-> +    MemoryRegion *ram = g_new(MemoryRegion, 1);
->      ram_addr_t chunk, offset = 0;
->      unsigned int number = 0;
->      gchar *name;
->  
->      /* allocate RAM for core */
-> +    memory_region_allocate_system_memory(ram, NULL, "s390.whole.ram", mem_size);
-> +    /*
-> +     * memory_region_allocate_system_memory() registers allocated RAM for
-> +     * migration, however for compat reasons the RAM should be passed over
-> +     * as RAMBlocks of the size upto KVM_SLOT_MAX_BYTES. So unregister just
-> +     * allocated RAM so it won't be migrated directly. Aliases will take
-> +     * of segmenting RAM into legacy chunks.
-> +     */
-> +    vmstate_unregister_ram(ram, NULL);
->      name = g_strdup_printf("s390.ram");
->      while (mem_size) {
-> -        MemoryRegion *ram = g_new(MemoryRegion, 1);
-> -        uint64_t size = mem_size;
-> +        MemoryRegion *alias = g_new(MemoryRegion, 1);
->  
->          /* KVM does not allow memslots >= 8 TB */
-> -        chunk = MIN(size, KVM_SLOT_MAX_BYTES);
-> -        memory_region_allocate_system_memory(ram, NULL, name, chunk);
-> -        memory_region_add_subregion(sysmem, offset, ram);
-> +        chunk = MIN(mem_size, KVM_SLOT_MAX_BYTES);
-> +        memory_region_init_alias(alias, NULL, name, ram, offset, chunk);
-> +        vmstate_register_ram_global(alias);
-> +        memory_region_add_subregion(sysmem, offset, alias);
->          mem_size -= chunk;
->          offset += chunk;
->          g_free(name);
-> 
+Regards,
+Yury Kotov
