@@ -1,26 +1,34 @@
-Received: from eggs.gnu.org ([209.51.188.92]:51343)
+Received: from eggs.gnu.org ([209.51.188.92]:51464)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <fengyd81@gmail.com>) id 1hGJ0y-0001h3-44
-	for qemu-devel@nongnu.org; Tue, 16 Apr 2019 04:00:25 -0400
+	(envelope-from <bounces@canonical.com>) id 1hGJ1X-00025F-KL
+	for qemu-devel@nongnu.org; Tue, 16 Apr 2019 04:01:04 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <fengyd81@gmail.com>) id 1hGJ0s-0001zo-Dm
-	for qemu-devel@nongnu.org; Tue, 16 Apr 2019 04:00:24 -0400
-Received: from mail-it1-x135.google.com ([2607:f8b0:4864:20::135]:55386)
+	(envelope-from <bounces@canonical.com>) id 1hGJ1V-0002Q6-Aw
+	for qemu-devel@nongnu.org; Tue, 16 Apr 2019 04:00:59 -0400
+Received: from indium.canonical.com ([91.189.90.7]:48334)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <fengyd81@gmail.com>) id 1hGJ0o-0001wA-Tq
-	for qemu-devel@nongnu.org; Tue, 16 Apr 2019 04:00:16 -0400
-Received: by mail-it1-x135.google.com with SMTP id y134so31518854itc.5
-	for <qemu-devel@nongnu.org>; Tue, 16 Apr 2019 01:00:12 -0700 (PDT)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1hGJ1T-0002NW-7C
+	for qemu-devel@nongnu.org; Tue, 16 Apr 2019 04:00:55 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1hGJ1Q-00067H-Qz
+	for <qemu-devel@nongnu.org>; Tue, 16 Apr 2019 08:00:52 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id B3EFB2E80CB
+	for <qemu-devel@nongnu.org>; Tue, 16 Apr 2019 08:00:52 +0000 (UTC)
 MIME-Version: 1.0
-References: <CACnvu8YKqaZA7XSD41=SQrUL7h9YafJMgKPe5cJZd3XZ3zrSNw@mail.gmail.com>
-	<20190415145358.GA2893@work-vm>
-	<CACnvu8a5DjAUhfAGmi6GtpD1V2hfoNLTkKEgbsFuL_6GrRc+pg@mail.gmail.com>
-In-Reply-To: <CACnvu8a5DjAUhfAGmi6GtpD1V2hfoNLTkKEgbsFuL_6GrRc+pg@mail.gmail.com>
-From: fengyd <fengyd81@gmail.com>
-Date: Tue, 16 Apr 2019 15:59:58 +0800
-Message-ID: <CACnvu8Y9Ub5PAOt18ukzvOoDxmfzwvygWWwOZaT5Q2Eig6YFTw@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: [Qemu-devel] Fwd:  How live migration work for vhost-user
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Tue, 16 Apr 2019 07:53:58 -0000
+From: =?utf-8?b?6LSe6LS15p2O?= <1824053@bugs.launchpad.net>
+Reply-To: Bug 1824053 <1824053@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <155486495593.20543.13567634487304856304.malonedeb@chaenomeles.canonical.com>
+Message-Id: <155540123890.13756.11813533199984613297.malone@gac.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1824053] Re: Qemu-img convert appears to be stuck
+ on aarch64 host with low probability
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,76 +39,88 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
----------- Forwarded message ---------
-From: fengyd <fengyd81@gmail.com>
-Date: Tue, 16 Apr 2019 at 09:17
-Subject: Re: [Qemu-devel] How live migration work for vhost-user
-To: Dr. David Alan Gilbert <dgilbert@redhat.com>
+dann frazier met the same problem as me in
+(https://bugs.launchpad.net/qemu/+bug/1805256).
+
+He said this bugs still persists w/ latest upstream (@ afccfc0). His
+reply to me is below:
+
+No, sorry - this bugs still persists w/ latest upstream (@ afccfc0). I
+found a report of similar symptoms:
+
+  https://patchwork.kernel.org/patch/10047341/
+  https://bugzilla.redhat.com/show_bug.cgi?id=3D1524770#c13
+
+To be clear, ^ is already fixed upstream, so it is not the *same* issue
+- but perhaps related.
 
 
-Hi,
+** Bug watch added: Red Hat Bugzilla #1524770
+   https://bugzilla.redhat.com/show_bug.cgi?id=3D1524770
 
-Any special feature needs to be supported on guest driver?
-Because it's OK for standard Linux VM, but not OK for our VM where virtio
-is  implemented by ourself.
+-- =
 
-And with qemu-kvm-ev-2.6, live migration can work with our VM where virtio
-is  implemented by ourself.
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1824053
 
-Thanks
-Yafeng
+Title:
+  Qemu-img convert appears to be stuck on aarch64 host with low
+  probability
 
-On Mon, 15 Apr 2019 at 22:54, Dr. David Alan Gilbert <dgilbert@redhat.com>
-wrote:
+Status in QEMU:
+  Fix Released
 
-> * fengyd (fengyd81@gmail.com) wrote:
-> > Hi,
-> >
-> > During live migration,  the folloing log can see in nova-compute.log in
-> my
-> > environment:
-> >  ERROR nova.virt.libvirt.driver [req-039a85e1-e7a1-4a63-bc6d-c4b9a044aab6
-> > 0cdab20dc79f4bc6ae5790e7b4a898ac 3363c319773549178acc67f32c78310e -
-> default
-> > default] [instance: 5ec719f4-1865-4afe-a207-3d9fae22c410] Live Migration
-> > failure: internal error: qemu unexpectedly closed the monitor:
-> > 2019-04-15T02:58:22.213897Z qemu-kvm: VQ 0
-> > size 0x100 < last_avail_idx 0x1e - used_idx 0x23
-> >
-> > It's OK for standard Linux VM, but not OK for our VM where virtio is
-> > implemented by ourself.
-> > KVM version as follow:
-> > qemu-kvm-common-ev-2.12.0-18.el7_6.3.1.x86_64
-> > qemu-kvm-ev-2.12.0-18.el7_6.3.1.x86_64
-> > libvirt-daemon-kvm-3.9.0-14.2.el7.centos.ncir.8.x86_64
-> >
-> > Do you know what's the difference between virtio and vhost-user during
-> > migration?
-> > The function virtio_load in Qemu is called for virtio and vhost-user
-> during
-> > migration.
-> > For virtio,  last_avail_idx  and used_idx are stored in Qemu, Qemu is
-> > responsible for updating their values accordingly
-> > For vhost-user, last_avail_idx  and used_idx are stored in vhost-user
-> app,
-> > eg. DPDK, not in Qemu?
-> > How does migration work for vhost-user?
->
-> I don't know the details, but my understanding is that vhost-user
-> tells the vhost-user client about an area of 'log' memory, where the
-> vhost-user client must mark pages as dirty.
->
-> In the qemu source, see docs/interop/vhost-user.txt and see
-> the VHOST_SET_LOG_BASE and VHOST_USER_SET_LOG_FD calls.
->
-> If the client correctly marks the areas as dirty, then qemu
-> should resend those pages across.
->
->
-> Dave
->
-> > Thanks in advance
-> > Yafeng
-> --
-> Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
->
+Bug description:
+  Hi,  I found a problem that qemu-img convert appears to be stuck on
+  aarch64 host with low probability.
+
+  The convert command  line is  "qemu-img convert -f qcow2 -O raw
+  disk.qcow2 disk.raw ".
+
+  The bt is below:
+
+  Thread 2 (Thread 0x40000b776e50 (LWP 27215)):
+  #0  0x000040000a3f2994 in sigtimedwait () from /lib64/libc.so.6
+  #1  0x000040000a39c60c in sigwait () from /lib64/libpthread.so.0
+  #2  0x0000aaaaaae82610 in sigwait_compat (opaque=3D0xaaaac5163b00) at uti=
+l/compatfd.c:37
+  #3  0x0000aaaaaae85038 in qemu_thread_start (args=3Dargs@entry=3D0xaaaac5=
+163b90) at util/qemu_thread_posix.c:496
+  #4  0x000040000a3918bc in start_thread () from /lib64/libpthread.so.0
+  #5  0x000040000a492b2c in thread_start () from /lib64/libc.so.6
+
+  Thread 1 (Thread 0x40000b573370 (LWP 27214)):
+  #0  0x000040000a489020 in ppoll () from /lib64/libc.so.6
+  #1  0x0000aaaaaadaefc0 in ppoll (__ss=3D0x0, __timeout=3D0x0, __nfds=3D<o=
+ptimized out>, __fds=3D<optimized out>) at /usr/include/bits/poll2.h:77
+  #2  qemu_poll_ns (fds=3D<optimized out>, nfds=3D<optimized out>, timeout=
+=3D<optimized out>) at qemu_timer.c:391
+  #3  0x0000aaaaaadae014 in os_host_main_loop_wait (timeout=3D<optimized ou=
+t>) at main_loop.c:272
+  #4  0x0000aaaaaadae190 in main_loop_wait (nonblocking=3D<optimized out>) =
+at main_loop.c:534
+  #5  0x0000aaaaaad97be0 in convert_do_copy (s=3D0xffffdc32eb48) at qemu-im=
+g.c:1923
+  #6  0x0000aaaaaada2d70 in img_convert (argc=3D<optimized out>, argv=3D<op=
+timized out>) at qemu-img.c:2414
+  #7  0x0000aaaaaad99ac4 in main (argc=3D7, argv=3D<optimized out>) at qemu=
+-img.c:5305
+
+  =
+
+  The problem seems to be very similar to the phenomenon described by this =
+patch (https://resources.ovirt.org/pub/ovirt-4.1/src/qemu-kvm-ev/0025-aio_n=
+otify-force-main-loop-wakeup-with-SIGIO-aarch64.patch), =
+
+
+  which force main loop wakeup with SIGIO.  But this patch was reverted
+  by the patch (http://ovirt.repo.nfrance.com/src/qemu-kvm-ev/kvm-
+  Revert-aio_notify-force-main-loop-wakeup-with-SIGIO-.patch).
+
+  The problem still seems to exist in aarch64 host. The qemu version I used=
+ is 2.8.1. The host version is 4.19.28-1.2.108.aarch64.
+   Do you have any solutions to fix it?  Thanks for your reply !
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1824053/+subscriptions
