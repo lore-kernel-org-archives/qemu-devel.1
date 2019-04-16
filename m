@@ -2,59 +2,90 @@ Return-Path: <SRS0=xvb4=SS=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DDF7FC282DA
-	for <qemu-devel@archiver.kernel.org>; Tue, 16 Apr 2019 15:41:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 070A7C10F14
+	for <qemu-devel@archiver.kernel.org>; Tue, 16 Apr 2019 15:51:36 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id AD55720872
-	for <qemu-devel@archiver.kernel.org>; Tue, 16 Apr 2019 15:41:23 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AD55720872
+	by mail.kernel.org (Postfix) with ESMTPS id BE893204EC
+	for <qemu-devel@archiver.kernel.org>; Tue, 16 Apr 2019 15:51:35 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BE893204EC
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:38661 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:38764 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hGQD5-00069e-1S
-	for qemu-devel@archiver.kernel.org; Tue, 16 Apr 2019 11:41:23 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:41948)
+	id 1hGQMw-0000JS-P3
+	for qemu-devel@archiver.kernel.org; Tue, 16 Apr 2019 11:51:34 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:44522)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1hGQAg-0004Up-1M
-	for qemu-devel@nongnu.org; Tue, 16 Apr 2019 11:38:55 -0400
+	(envelope-from <eblake@redhat.com>) id 1hGQMA-0008R2-0q
+	for qemu-devel@nongnu.org; Tue, 16 Apr 2019 11:50:47 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1hGQAf-0000ma-2C
-	for qemu-devel@nongnu.org; Tue, 16 Apr 2019 11:38:54 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:60568)
+	(envelope-from <eblake@redhat.com>) id 1hGQM8-0001jg-SM
+	for qemu-devel@nongnu.org; Tue, 16 Apr 2019 11:50:45 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:48898)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1hGQAe-0000m6-Qc
-	for qemu-devel@nongnu.org; Tue, 16 Apr 2019 11:38:52 -0400
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
-	[10.5.11.14])
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1hGQM8-0001iZ-Gf
+	for qemu-devel@nongnu.org; Tue, 16 Apr 2019 11:50:44 -0400
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+	[10.5.11.22])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 1A90881F18;
-	Tue, 16 Apr 2019 15:38:52 +0000 (UTC)
-Received: from blackfin.pond.sub.org (ovpn-116-116.ams2.redhat.com
-	[10.36.116.116])
-	by smtp.corp.redhat.com (Postfix) with ESMTPS id D9FB55D9CA;
-	Tue, 16 Apr 2019 15:38:51 +0000 (UTC)
-Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
-	id AF9A61138648; Tue, 16 Apr 2019 17:38:50 +0200 (CEST)
-From: Markus Armbruster <armbru@redhat.com>
-To: qemu-devel@nongnu.org
-Date: Tue, 16 Apr 2019 17:38:50 +0200
-Message-Id: <20190416153850.5186-1-armbru@redhat.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+	by mx1.redhat.com (Postfix) with ESMTPS id 2F2283002607;
+	Tue, 16 Apr 2019 15:50:43 +0000 (UTC)
+Received: from [10.3.116.146] (ovpn-116-146.phx2.redhat.com [10.3.116.146])
+	by smtp.corp.redhat.com (Postfix) with ESMTPS id 889781001F41;
+	Tue, 16 Apr 2019 15:50:42 +0000 (UTC)
+To: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
+References: <20190416153850.5186-1-armbru@redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Openpgp: preference=signencrypt
+Autocrypt: addr=eblake@redhat.com; keydata=
+	xsBNBEvHyWwBCACw7DwsQIh0kAbUXyqhfiKAKOTVu6OiMGffw2w90Ggrp4bdVKmCaEXlrVLU
+	xphBM8mb+wsFkU+pq9YR621WXo9REYVIl0FxKeQo9dyQBZ/XvmUMka4NOmHtFg74nvkpJFCD
+	TUNzmqfcjdKhfFV0d7P/ixKQeZr2WP1xMcjmAQY5YvQ2lUoHP43m8TtpB1LkjyYBCodd+LkV
+	GmCx2Bop1LSblbvbrOm2bKpZdBPjncRNob73eTpIXEutvEaHH72LzpzksfcKM+M18cyRH+nP
+	sAd98xIbVjm3Jm4k4d5oQyE2HwOur+trk2EcxTgdp17QapuWPwMfhaNq3runaX7x34zhABEB
+	AAHNHkVyaWMgQmxha2UgPGVibGFrZUByZWRoYXQuY29tPsLAegQTAQgAJAIbAwULCQgHAwUV
+	CgkICwUWAgMBAAIeAQIXgAUCS8fL9QIZAQAKCRCnoWtKJSdDahBHCACbl/5FGkUqJ89GAjeX
+	RjpAeJtdKhujir0iS4CMSIng7fCiGZ0fNJCpL5RpViSo03Q7l37ss+No+dJI8KtAp6ID+PMz
+	wTJe5Egtv/KGUKSDvOLYJ9WIIbftEObekP+GBpWP2+KbpADsc7EsNd70sYxExD3liwVJYqLc
+	Rw7so1PEIFp+Ni9A1DrBR5NaJBnno2PHzHPTS9nmZVYm/4I32qkLXOcdX0XElO8VPDoVobG6
+	gELf4v/vIImdmxLh/w5WctUpBhWWIfQDvSOW2VZDOihm7pzhQodr3QP/GDLfpK6wI7exeu3P
+	pfPtqwa06s1pae3ad13mZGzkBdNKs1HEm8x6zsBNBEvHyWwBCADGkMFzFjmmyqAEn5D+Mt4P
+	zPdO8NatsDw8Qit3Rmzu+kUygxyYbz52ZO40WUu7EgQ5kDTOeRPnTOd7awWDQcl1gGBXgrkR
+	pAlQ0l0ReO57Q0eglFydLMi5bkwYhfY+TwDPMh3aOP5qBXkm4qIYSsxb8A+i00P72AqFb9Q7
+	3weG/flxSPApLYQE5qWGSXjOkXJv42NGS6o6gd4RmD6Ap5e8ACo1lSMPfTpGzXlt4aRkBfvb
+	NCfNsQikLZzFYDLbQgKBA33BDeV6vNJ9Cj0SgEGOkYyed4I6AbU0kIy1hHAm1r6+sAnEdIKj
+	cHi3xWH/UPrZW5flM8Kqo14OTDkI9EtlABEBAAHCwF8EGAEIAAkFAkvHyWwCGwwACgkQp6Fr
+	SiUnQ2q03wgAmRFGDeXzc58NX0NrDijUu0zx3Lns/qZ9VrkSWbNZBFjpWKaeL1fdVeE4TDGm
+	I5mRRIsStjQzc2R9b+2VBUhlAqY1nAiBDv0Qnt+9cLiuEICeUwlyl42YdwpmY0ELcy5+u6wz
+	mK/jxrYOpzXKDwLq5k4X+hmGuSNWWAN3gHiJqmJZPkhFPUIozZUCeEc76pS/IUN72NfprZmF
+	Dp6/QDjDFtfS39bHSWXKVZUbqaMPqlj/z6Ugk027/3GUjHHr8WkeL1ezWepYDY7WSoXwfoAL
+	2UXYsMAr/uUncSKlfjvArhsej0S4zbqim2ZY6S8aRWw94J3bSvJR+Nwbs34GPTD4Pg==
+Organization: Red Hat, Inc.
+Message-ID: <5ee06a0b-90bc-602d-5ee3-3bb3f80f2f6c@redhat.com>
+Date: Tue, 16 Apr 2019 10:50:41 -0500
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+	Thunderbird/60.6.1
+MIME-Version: 1.0
+In-Reply-To: <20190416153850.5186-1-armbru@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="SVCks8YEUtf3ixGkq0K3oBRqsTLfSU9Ud"
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.27]);
-	Tue, 16 Apr 2019 15:38:52 +0000 (UTC)
+	(mx1.redhat.com [10.5.110.40]);
+	Tue, 16 Apr 2019 15:50:43 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] [PATCH] error: Fix error_report_err(),
+X-Content-Filtered-By: Mailman/MimeDel 2.1.21
+Subject: Re: [Qemu-devel] [PATCH] error: Fix error_report_err(),
  warn_report_err() hint printing
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
@@ -71,81 +102,111 @@ Cc: vsementsov@virtuozzo.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Content-Type: text/plain; charset="UTF-8"
-Message-ID: <20190416153850.wp0MK_BRW8lF2JiqbG_4VcGYJDWhY7G5MigGLwhGMlw@z>
+Message-ID: <20190416155041.ol1KbZgNbNEfrQwVf9VWZTqBr8BfZp9IjufVobm3ZpY@z>
 
-Before the from qerror_report() to error_setg(), hints looked like
-this:
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--SVCks8YEUtf3ixGkq0K3oBRqsTLfSU9Ud
+From: Eric Blake <eblake@redhat.com>
+To: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
+Cc: vsementsov@virtuozzo.com
+Message-ID: <5ee06a0b-90bc-602d-5ee3-3bb3f80f2f6c@redhat.com>
+Subject: Re: [PATCH] error: Fix error_report_err(), warn_report_err() hint
+ printing
+References: <20190416153850.5186-1-armbru@redhat.com>
+In-Reply-To: <20190416153850.5186-1-armbru@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-    qerror_report(QERR_MACRO, ... arguments ...);
-    error_printf_unless_qmp(... hint ...);
+On 4/16/19 10:38 AM, Markus Armbruster wrote:
+> Before the from qerror_report() to error_setg(), hints looked like
 
-error_printf_unless_qmp() made perfect sense: it printed exactly when
-qerror_report() did.
+s/the from/the change from/
 
-After the conversion to error_setg():
+> this:
+>=20
+>     qerror_report(QERR_MACRO, ... arguments ...);
+>     error_printf_unless_qmp(... hint ...);
+>=20
+> error_printf_unless_qmp() made perfect sense: it printed exactly when
+> qerror_report() did.
+>=20
+> After the conversion to error_setg():
 
-    error_setg(errp, QERR_MACRO, ... arguments ...);
-    error_printf_unless_qmp(... hint ...);
+Commit id?
 
-The "unless QMP part" still made some sense; in QMP context, the
-caller generally uses the error as QMP response instead of printing
-it.
+>=20
+>     error_setg(errp, QERR_MACRO, ... arguments ...);
+>     error_printf_unless_qmp(... hint ...);
+>=20
+> The "unless QMP part" still made some sense; in QMP context, the
+> caller generally uses the error as QMP response instead of printing
+> it.
+>=20
+> However, everything else is wrong.  If the caller handles the error,
+> the hint gets printed anyway (unless QMP).  If the caller reports the
+> error, the hint gets printed *before* the report (unless QMP) or not
+> at all (if QMP).
+>=20
+> Commit 50b7b000c91 fixed this by making hints a member of Error.  It
 
-However, everything else is wrong.  If the caller handles the error,
-the hint gets printed anyway (unless QMP).  If the caller reports the
-error, the hint gets printed *before* the report (unless QMP) or not
-at all (if QMP).
+Belongs to 2.5.0.
 
-Commit 50b7b000c91 fixed this by making hints a member of Error.  It
-kept printing hints with error_printf_unless_qmp():
+> kept printing hints with error_printf_unless_qmp():
+>=20
+>      void error_report_err(Error *err)
+>      {
+> 	 error_report("%s", error_get_pretty(err));
+>     +    if (err->hint) {
+>     +        error_printf_unless_qmp("%s\n", err->hint->str);
+>     +    }
+> 	 error_free(err);
+>      }
+>=20
+> This is wrong.  We should (and now can) print the hint exactly when we
+> print the error.
+>=20
+> The mistake has since been copied to warn_report_err().
 
-     void error_report_err(Error *err)
-     {
-	 error_report("%s", error_get_pretty(err));
-    +    if (err->hint) {
-    +        error_printf_unless_qmp("%s\n", err->hint->str);
-    +    }
-	 error_free(err);
-     }
+Commit id?
 
-This is wrong.  We should (and now can) print the hint exactly when we
-print the error.
+>=20
+> Fix both to use error_printf().
+>=20
+> Reported-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+> Cc: Eric Blake <eblake@redhat.com>
+> Signed-off-by: Markus Armbruster <armbru@redhat.com>
+> ---
+>  util/error.c | 4 ++--
+>  1 file changed, 2 insertions(+), 2 deletions(-)
+>=20
 
-The mistake has since been copied to warn_report_err().
+Probably too late for 4.0-rc4. Then again, it regressed in 2.5, so
+having yet one more release with the lame output doesn't hurt.
 
-Fix both to use error_printf().
+Reviewed-by: Eric Blake <eblake@redhat.com>
 
-Reported-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Cc: Eric Blake <eblake@redhat.com>
-Signed-off-by: Markus Armbruster <armbru@redhat.com>
----
- util/error.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3226
+Virtualization:  qemu.org | libvirt.org
 
-diff --git a/util/error.c b/util/error.c
-index 934a78e1b1..712b4d4b5d 100644
---- a/util/error.c
-+++ b/util/error.c
-@@ -223,7 +223,7 @@ void error_report_err(Error *err)
- {
-     error_report("%s", error_get_pretty(err));
-     if (err->hint) {
--        error_printf_unless_qmp("%s", err->hint->str);
-+        error_printf("%s", err->hint->str);
-     }
-     error_free(err);
- }
-@@ -232,7 +232,7 @@ void warn_report_err(Error *err)
- {
-     warn_report("%s", error_get_pretty(err));
-     if (err->hint) {
--        error_printf_unless_qmp("%s", err->hint->str);
-+        error_printf("%s", err->hint->str);
-     }
-     error_free(err);
- }
--- 
-2.17.2
 
+--SVCks8YEUtf3ixGkq0K3oBRqsTLfSU9Ud
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAly1+dEACgkQp6FrSiUn
+Q2pdfggAmt/iG0db8ks1Y5U/XLGgx9dKwX56yRpCBU+pf2rCFHFpePp//08Sg+9a
+goMs4eyi30h1SjEMqWQlZX3C/aPDgG73t6CvJyT5tAUOA5ZzqLz8q93YUj6Qsqfd
+g/E3CmxfEbkdHqloPNb6dUWyPRf0DncAcK1y5Z6EDP31ELesZKgqGfzmTrkrvoTy
+zbrbtHGWyod6LNbdGE7P0Z7Hku+5GPOEm/+KOs6Q8BDJB7jMQGqcZA6QUTs+LmoD
+WRCAx4XwdGvBAf5fngOUqI67Ot5tCBtpa0qMcw9TxPW2f5HFHfKhGUiLZHg0D86a
+rfIoO3jVB0nqi8NZJZPCddVw0nptGA==
+=aoyA
+-----END PGP SIGNATURE-----
+
+--SVCks8YEUtf3ixGkq0K3oBRqsTLfSU9Ud--
 
