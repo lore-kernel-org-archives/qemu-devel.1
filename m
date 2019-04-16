@@ -6,67 +6,68 @@ X-Spam-Status: No, score=-0.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	MAILING_LIST_MULTI,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C2D80C10F13
-	for <qemu-devel@archiver.kernel.org>; Tue, 16 Apr 2019 05:46:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BBF84C10F13
+	for <qemu-devel@archiver.kernel.org>; Tue, 16 Apr 2019 05:55:56 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 41CF12075B
-	for <qemu-devel@archiver.kernel.org>; Tue, 16 Apr 2019 05:46:38 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 41CF12075B
+	by mail.kernel.org (Postfix) with ESMTPS id 901072075B
+	for <qemu-devel@archiver.kernel.org>; Tue, 16 Apr 2019 05:55:56 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 901072075B
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:59743 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:59815 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hGGvV-0002tm-EK
-	for qemu-devel@archiver.kernel.org; Tue, 16 Apr 2019 01:46:37 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:49406)
+	id 1hGH4V-0004bw-I8
+	for qemu-devel@archiver.kernel.org; Tue, 16 Apr 2019 01:55:55 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:51070)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1hGGua-0002Wt-K2
-	for qemu-devel@nongnu.org; Tue, 16 Apr 2019 01:45:41 -0400
+	(envelope-from <bounces@canonical.com>) id 1hGH3i-0004DU-7u
+	for qemu-devel@nongnu.org; Tue, 16 Apr 2019 01:55:07 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1hGGuX-0000ru-IR
-	for qemu-devel@nongnu.org; Tue, 16 Apr 2019 01:45:39 -0400
-Received: from indium.canonical.com ([91.189.90.7]:54888)
+	(envelope-from <bounces@canonical.com>) id 1hGH3h-0004Zn-1s
+	for qemu-devel@nongnu.org; Tue, 16 Apr 2019 01:55:06 -0400
+Received: from indium.canonical.com ([91.189.90.7]:55826)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1hGGuW-0000qo-3h
-	for qemu-devel@nongnu.org; Tue, 16 Apr 2019 01:45:37 -0400
+	id 1hGH3g-0004ZW-OQ
+	for qemu-devel@nongnu.org; Tue, 16 Apr 2019 01:55:04 -0400
 Received: from loganberry.canonical.com ([91.189.90.37])
 	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1hGGuV-0001Da-8a
-	for <qemu-devel@nongnu.org>; Tue, 16 Apr 2019 05:45:35 +0000
+	id 1hGH3f-0001rr-C2
+	for <qemu-devel@nongnu.org>; Tue, 16 Apr 2019 05:55:03 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 3B1B92E80C8
-	for <qemu-devel@nongnu.org>; Tue, 16 Apr 2019 05:45:35 +0000 (UTC)
+	by loganberry.canonical.com (Postfix) with ESMTP id 0003D2E80D2
+	for <qemu-devel@nongnu.org>; Tue, 16 Apr 2019 05:55:02 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Tue, 16 Apr 2019 05:37:26 -0000
-From: Thomas Huth <1811758@bugs.launchpad.net>
+Date: Tue, 16 Apr 2019 05:42:22 -0000
+From: Thomas Huth <1544524@bugs.launchpad.net>
 To: qemu-devel@nongnu.org
 X-Launchpad-Notification-Type: bug
-X-Launchpad-Bug: product=qemu; status=New; importance=Wishlist; assignee=None; 
+X-Launchpad-Bug: product=qemu; status=Fix Released; importance=Undecided;
+	assignee=None; 
 X-Launchpad-Bug-Information-Type: Public
 X-Launchpad-Bug-Private: no
 X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: dkg0 th-huth
-X-Launchpad-Bug-Reporter: dkg (dkg0)
+X-Launchpad-Bug-Commenters: h.prem.anand th-huth
+X-Launchpad-Bug-Reporter: Prem Anand (h.prem.anand)
 X-Launchpad-Bug-Modifier: Thomas Huth (th-huth)
-References: <154753485996.31938.10842883255904010357.malonedeb@wampee.canonical.com>
+References: <20160211115903.17778.55276.malonedeb@soybean.canonical.com>
 Message-Id:
- <155539304622.13876.14766283166073144058.malone@gac.canonical.com>
+ <155539334288.20468.15627176047103669087.malone@chaenomeles.canonical.com>
 X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
 X-Launchpad-Message-For: qemu-devel-ml
 Precedence: bulk
 X-Generated-By: Launchpad (canonical.com); Revision="18920";
 	Instance="launchpad-lazr.conf"
-X-Launchpad-Hash: dbf8affc91c228c00b142398157eb14787b6d590
+X-Launchpad-Hash: 2b4cf0ff5b874cf51f3f39074c0a87e4321e04cb
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 91.189.90.7
-Subject: [Qemu-devel] [Bug 1811758] Re: virtio-rng backend should use
- getentropy() syscall when available
+Subject: [Qemu-devel] [Bug 1544524] Re: "info chardev" not showing the real
+ port in use
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 List-Id: <qemu-devel.nongnu.org>
@@ -77,41 +78,66 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1811758 <1811758@bugs.launchpad.net>
+Reply-To: Bug 1544524 <1544524@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190416053726.vZaoazctk2GYs5LT51AcxnNNmpydyD8WXU_w6yBUNWk@z>
+Message-ID: <20190416054222.DptZ1qhqRWfdPv7zCepCzQhMdAe448nLflQrcEyRfF4@z>
 
-Feel free to send some patches to implement this! Alternatively, you
-could also try to write a mail to the virtio-rng maintainer (see the
-MAINTAINER file in the top directory of the sources), maybe he can help.
+Seems like this has been fixed in recent versions of QEMU again:
+
+$ qemu-system-x86_64 -serial telnet::0,server,nowait -nographic
+QEMU 3.1.93 monitor - type 'help' for more information
+(qemu) info chardev
+parallel0: filename=3Dnull
+serial0: filename=3Ddisconnected:telnet:0.0.0.0:41346,server
+compat_monitor0: filename=3Dstdio
+
 
 ** Changed in: qemu
-   Importance: Undecided =3D> Wishlist
+       Status: New =3D> Fix Released
 
 -- =
 
 You received this bug notification because you are a member of qemu-
 devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1811758
+https://bugs.launchpad.net/bugs/1544524
 
 Title:
-  virtio-rng backend should use getentropy() syscall when available
+  "info chardev" not showing the real port in use
 
 Status in QEMU:
-  New
+  Fix Released
 
 Bug description:
-  According to https://wiki.qemu.org/Features/VirtIORNG the default
-  backend for `virtio-rng-pci` is `/dev/random`.  Alternately, the user
-  can point it to a different backend file, like `/dev/urandom`.
+  With Qemu 2.1.2
+  =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+  pharidos@uks2:~$ qemu-system-x86_64 -hda Disk.qcow2 -serial telnet::0,ser=
+ver,nowait -nographic
+  QEMU 2.1.2 monitor - type 'help' for more information
+  (qemu) info chardev
+  parallel0: filename=3Dnull
+  serial0: filename=3Dtelnet:0.0.0.0:44189,server
+  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0^^^^^^^^^^^^^^^^^^^^^^^^^^^ serial cons=
+ole is using port 44189
+  compat_monitor0: filename=3Dstdio
+  (qemu)
 
-  However, both of these files have suboptimal behavior in one way or
-  another, as documented in `random(7)`.  Instead, the default behavior
-  should be to pull the requested octets from the `getrandom()` system
-  call, if available, called with no flags set.
+  With Qemu 2.5.0
+  =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+  pharidos@uks2:~$ qemu-system-x86_64 -hda Disk.qcow2 -serial  telnet::0,se=
+rver,nowait -nographic
+  QEMU 2.5.0 monitor - type 'help' for more information
+  (qemu) info chardev
+  parallel0: filename=3Dnull
+  serial0: filename=3Ddisconnected:telnet::0,server
+  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ serial co=
+nsole port not shown
+  compat_monitor0: filename=3Dstdio
+  (qemu)
 
 To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1811758/+subscriptions
+https://bugs.launchpad.net/qemu/+bug/1544524/+subscriptions
 
