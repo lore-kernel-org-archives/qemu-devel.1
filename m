@@ -1,26 +1,23 @@
-Received: from eggs.gnu.org ([209.51.188.92]:40797)
+Received: from eggs.gnu.org ([209.51.188.92]:41228)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <yuval.shaia@oracle.com>) id 1hGJtT-0004iI-OR
-	for qemu-devel@nongnu.org; Tue, 16 Apr 2019 04:56:44 -0400
+	(envelope-from <david@redhat.com>) id 1hGJvK-0005ZX-43
+	for qemu-devel@nongnu.org; Tue, 16 Apr 2019 04:58:39 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <yuval.shaia@oracle.com>) id 1hGJtS-0002IQ-Na
-	for qemu-devel@nongnu.org; Tue, 16 Apr 2019 04:56:43 -0400
-Received: from aserp2130.oracle.com ([141.146.126.79]:44656)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <yuval.shaia@oracle.com>)
-	id 1hGJtS-0002Hk-Cg
-	for qemu-devel@nongnu.org; Tue, 16 Apr 2019 04:56:42 -0400
-Date: Tue, 16 Apr 2019 11:56:21 +0300
-From: Yuval Shaia <yuval.shaia@oracle.com>
-Message-ID: <20190416085620.GA4493@lap1>
-References: <20190411110157.14252-1-yuval.shaia@oracle.com>
-	<20190411110157.14252-4-yuval.shaia@oracle.com>
-	<f133d122-5b00-2e3b-f5cc-efc6d2cc3d3b@acm.org>
+	(envelope-from <david@redhat.com>) id 1hGJvJ-0003RH-3c
+	for qemu-devel@nongnu.org; Tue, 16 Apr 2019 04:58:38 -0400
+References: <20190411100836.646-1-david@redhat.com>
+	<20190411100836.646-10-david@redhat.com>
+	<71ce854d-da00-565e-0b36-9458a7bc9183@linaro.org>
+From: David Hildenbrand <david@redhat.com>
+Message-ID: <a7298c65-fea3-7839-6b68-5b3bf5d64c1a@redhat.com>
+Date: Tue, 16 Apr 2019 10:58:25 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <f133d122-5b00-2e3b-f5cc-efc6d2cc3d3b@acm.org>
-Subject: Re: [Qemu-devel] [RFC 3/3] RDMA/virtio-rdma: VirtIO rdma driver
+In-Reply-To: <71ce854d-da00-565e-0b36-9458a7bc9183@linaro.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v1 09/41] s390x/tcg: Implement VECTOR
+ CHECKSUM
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,101 +26,49 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Bart Van Assche <bvanassche@acm.org>
-Cc: virtualization@lists.linux-foundation.org, qemu-devel@nongnu.org, mst@redhat.com, cohuck@redhat.com, marcel.apfelbaum@gmail.com, linux-rdma@vger.kernel.org, jgg@mellanox.com
+To: Richard Henderson <richard.henderson@linaro.org>, qemu-devel@nongnu.org
+Cc: qemu-s390x@nongnu.org, Cornelia Huck <cohuck@redhat.com>, Thomas Huth <thuth@redhat.com>, Richard Henderson <rth@twiddle.net>
 
-On Mon, Apr 15, 2019 at 06:07:52PM -0700, Bart Van Assche wrote:
-> On 4/11/19 4:01 AM, Yuval Shaia wrote:
-> > +++ b/drivers/infiniband/hw/virtio/Kconfig
-> > @@ -0,0 +1,6 @@
-> > +config INFINIBAND_VIRTIO_RDMA
-> > +	tristate "VirtIO Paravirtualized RDMA Driver"
-> > +	depends on NETDEVICES && ETHERNET && PCI && INET
-> > +	---help---
-> > +	  This driver provides low-level support for VirtIO Paravirtual
-> > +	  RDMA adapter.
+On 13.04.19 01:01, Richard Henderson wrote:
+> On 4/11/19 12:08 AM, David Hildenbrand wrote:
+>> +    read_vec_element_i32(sum, get_field(s->fields, v3), 1, ES_32);
+>> +    for (i = 0; i < 4; i++) {
+>> +        read_vec_element_i32(tmp, get_field(s->fields, v2), i, ES_32);
+>> +        tcg_gen_add_i32(sum, sum, tmp);
+>> +        tcg_gen_setcond_i32(TCG_COND_LTU, tmp, sum, tmp);
+>> +        tcg_gen_add_i32(sum, sum, tmp);
+>> +    }
+>> +    zero_vec(get_field(s->fields, v1));
+>> +    write_vec_element_i32(sum, get_field(s->fields, v1), 1, ES_32);
 > 
-> Does this driver really depend on Ethernet, or does it also work with
-> Ethernet support disabled?
+> It seems like it should be possible to implement this with i64, and fold the
+> carry around at the end -- 2 insns instead of 12 for managing carry.  But I
+> can't quite tell if that produces the same results.
 
-The device should eventually expose Ethernet interface as well as IB.
-
+I had the same in mind but also wasn't sure if it would produce the
+exact same result. Feels like it should.
 > 
-> > +static inline struct virtio_rdma_info *to_vdev(struct ib_device *ibdev)
-> > +{
-> > +	return container_of(ibdev, struct virtio_rdma_info, ib_dev);
-> > +}
+> You could use
 > 
-> Is it really worth to introduce this function? Have you considered to
-> use container_of(ibdev, struct virtio_rdma_info, ib_dev) directly instead
-> of to_vdev()?
+>   tcg_gen_add2_i32(sum, tmp, sum, zero, tmp, zero);
+>   tcg_gen_add_i32(sum, sum, tmp);
 
-Agree, not sure really needed, just saw that some drivers uses this pattern.
+That makes perfect sense, I will use that for now, thanks!
 
 > 
-> > +static void rdma_ctrl_ack(struct virtqueue *vq)
-> > +{
-> > +	struct virtio_rdma_info *dev = vq->vdev->priv;
-> > +
-> > +	wake_up(&dev->acked);
-> > +
-> > +	printk("%s\n", __func__);
-> > +}
+> instead of computing carry manually with setcond.
 > 
-> Should that printk() be changed into pr_debug()? The same comment holds for
-> all other printk() calls.
-
-All prints will be removed, this is still wip.
-
+> That said, your code exactly matches the language in the manual, so
 > 
-> > +#define VIRTIO_RDMA_BOARD_ID	1
-> > +#define VIRTIO_RDMA_HW_NAME	"virtio-rdma"
-> > +#define VIRTIO_RDMA_HW_REV	1
-> > +#define VIRTIO_RDMA_DRIVER_VER	"1.0"
+> Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 > 
-> Is a driver version number useful in an upstream driver?
-
-I've noticed that other drivers exposes this in sysfs.
-
 > 
-> > +struct ib_cq *virtio_rdma_create_cq(struct ib_device *ibdev,
-> > +				    const struct ib_cq_init_attr *attr,
-> > +				    struct ib_ucontext *context,
-> > +				    struct ib_udata *udata)
-> > +{
-> > +	struct scatterlist in, out;
-> > +	struct virtio_rdma_ib_cq *vcq;
-> > +	struct cmd_create_cq *cmd;
-> > +	struct rsp_create_cq *rsp;
-> > +	struct ib_cq *cq = NULL;
-> > +	int rc;
-> > +
-> > +	/* TODO: Check MAX_CQ */
-> > +
-> > +	cmd = kmalloc(sizeof(*cmd), GFP_ATOMIC);
-> > +	if (!cmd)
-> > +		return ERR_PTR(-ENOMEM);
-> > +
-> > +	rsp = kmalloc(sizeof(*rsp), GFP_ATOMIC);
-> > +	if (!rsp) {
-> > +		kfree(cmd);
-> > +		return ERR_PTR(-ENOMEM);
-> > +	}
-> > +
-> > +	vcq = kzalloc(sizeof(*vcq), GFP_KERNEL);
-> > +	if (!vcq)
-> > +		goto out;
+> r~
 > 
-> Are you sure that you want to mix GFP_ATOMIC and GFP_KERNEL in a single
-> function?
 
-Right, a mistake.
 
-> 
-> Thanks,
-> 
-> Bart.
+-- 
 
-Thanks.
+Thanks,
 
-> 
+David / dhildenb
