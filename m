@@ -1,26 +1,28 @@
-Received: from eggs.gnu.org ([209.51.188.92]:37320)
+Received: from eggs.gnu.org ([209.51.188.92]:37818)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1hGRpZ-0004W3-QL
-	for qemu-devel@nongnu.org; Tue, 16 Apr 2019 13:25:14 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1hGRsM-0005Kb-K5
+	for qemu-devel@nongnu.org; Tue, 16 Apr 2019 13:28:07 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1hGRpY-0007jX-Q3
-	for qemu-devel@nongnu.org; Tue, 16 Apr 2019 13:25:13 -0400
-Received: from mail-wr1-f42.google.com ([209.85.221.42]:33666)
+	(envelope-from <peter.maydell@linaro.org>) id 1hGRsL-000108-MQ
+	for qemu-devel@nongnu.org; Tue, 16 Apr 2019 13:28:06 -0400
+Received: from mail-oi1-x242.google.com ([2607:f8b0:4864:20::242]:38726)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1hGRpY-0007hx-GA
-	for qemu-devel@nongnu.org; Tue, 16 Apr 2019 13:25:12 -0400
-Received: by mail-wr1-f42.google.com with SMTP id q1so28236751wrp.0
-	for <qemu-devel@nongnu.org>; Tue, 16 Apr 2019 10:25:11 -0700 (PDT)
-References: <20190416083150.19649-1-richard.henderson@linaro.org>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Message-ID: <e16e0501-fe91-9cf6-efd8-eb5696fb26fb@redhat.com>
-Date: Tue, 16 Apr 2019 19:25:09 +0200
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1hGRsL-0000zd-FK
+	for qemu-devel@nongnu.org; Tue, 16 Apr 2019 13:28:05 -0400
+Received: by mail-oi1-x242.google.com with SMTP id a6so17661273oie.5
+	for <qemu-devel@nongnu.org>; Tue, 16 Apr 2019 10:28:05 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20190416083150.19649-1-richard.henderson@linaro.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH 0/2] tcg: Fix launchpad 1824853
+References: <20190415154503.6758-1-berrange@redhat.com>
+	<CAFEAcA-YpG71aGtTVMafShGyd9uM599Uy_8S3vvvnPzfiKMqnw@mail.gmail.com>
+In-Reply-To: <CAFEAcA-YpG71aGtTVMafShGyd9uM599Uy_8S3vvvnPzfiKMqnw@mail.gmail.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Tue, 16 Apr 2019 18:27:52 +0100
+Message-ID: <CAFEAcA-kywfUEZARqzH=obD1p3UsAcsNneK-X0BPpoFnV-QK0A@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH 0/3] usb-mtp: fix ObjectInfo request
+ handling
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,57 +31,43 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Richard Henderson <richard.henderson@linaro.org>, qemu-devel@nongnu.org
-Cc: peter.maydell@linaro.org, 1824853@bugs.launchpad.net
+To: =?UTF-8?Q?Daniel_P=2E_Berrang=C3=A9?= <berrange@redhat.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, Gerd Hoffmann <kraxel@redhat.com>, Bandan Das <bsd@redhat.com>, Thomas Huth <thuth@redhat.com>, Greg Kurz <groug@kaod.org>, Peter Maydell <peter.maydell@linaro.org>, Eric Blake <eblake@redhat.com>
 
-On 4/16/19 10:31 AM, Richard Henderson wrote:
-> This is a case where we generate more than 64k code for a mere 231
-> guest instructions.  This hits some assertions within TCG that we're
-> not overflowing the uint16_t that we use for representing our
-> unwind info.
-> 
-> Fix this by returning an error indication, rather than asserting.
-> This lets us try again from tb_gen_code with a lower max_insns.
-> 
-> This should resolve the problem for x86 as a host.  There are other
-> failure modes wrt out-of-range relocations that might affect the
-> RISC hosts.  I'm going to leave those for a different patch set.
+On Tue, 16 Apr 2019 at 14:35, Peter Maydell <peter.maydell@linaro.org> wrot=
+e:
+>
+> On Mon, 15 Apr 2019 at 16:45, Daniel P. Berrang=C3=A9 <berrange@redhat.co=
+m> wrote:
+> >
+> > Two previous attempts to fix this due to GCC 9 highlighting
+> > unaligned data access. My attempt:
+> >
+> >   https://lists.gnu.org/archive/html/qemu-devel/2019-03/msg07763.html
+> >
+> > And a previous one:
+> >
+> >   https://lists.gnu.org/archive/html/qemu-devel/2019-02/msg07923.html
+> >   https://lists.gnu.org/archive/html/qemu-devel/2019-03/msg00162.html
+> >
+> > There are a number of bugs in the USB MTP usb_mtp_write_metadata
+> > method handling the filename character set conversion.
+> >
+> > The 2nd patch in this series is a security flaw fix since the
+> > code was not correctly validating guest provided data length.
+>
+> Given that we don't seem to be confident in this fix just now,
+> and this is a read-only buffer overrun in a not-commonly-used
+> feature that only happens if you explicitly enable write support,
+> my current thought is that we should not try to put this into 4.0
+> (but instead treat it as we would a security issue that had
+> occurred after we released 4.0).
+>
+> Opinions? Maybe we should just apply patch 2/3 for 4.0 ?
 
-Very clean way to solve this. Nice cleanup in patch #1 (interesting
-Nios2 case), Simple fix in patch #2. It would be fun to trigger the
-assert(max_insns > 1) =)
+Having thought a bit more I think I'd definitely like to apply
+just patch 2 for 4.0. Could people try to test that and confirm
+that it at least does not make the feature behave any worse?
 
-Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
-
-> Richard Henderson (2):
->   tcg: Hoist max_insns computation to tb_gen_code
->   tcg: Restart after TB code generation overflow
-> 
->  include/exec/exec-all.h       |  4 +--
->  include/exec/translator.h     |  3 +-
->  accel/tcg/translate-all.c     | 54 +++++++++++++++++++++++++++++------
->  accel/tcg/translator.c        | 15 ++--------
->  target/alpha/translate.c      |  4 +--
->  target/arm/translate.c        |  4 +--
->  target/cris/translate.c       | 10 +------
->  target/hppa/translate.c       |  5 ++--
->  target/i386/translate.c       |  4 +--
->  target/lm32/translate.c       | 10 +------
->  target/m68k/translate.c       |  4 +--
->  target/microblaze/translate.c | 10 +------
->  target/mips/translate.c       |  4 +--
->  target/moxie/translate.c      | 11 ++-----
->  target/nios2/translate.c      | 14 ++-------
->  target/openrisc/translate.c   |  4 +--
->  target/ppc/translate.c        |  4 +--
->  target/riscv/translate.c      |  4 +--
->  target/s390x/translate.c      |  4 +--
->  target/sh4/translate.c        |  4 +--
->  target/sparc/translate.c      |  4 +--
->  target/tilegx/translate.c     | 12 +-------
->  target/tricore/translate.c    | 16 ++---------
->  target/unicore32/translate.c  | 10 +------
->  target/xtensa/translate.c     |  4 +--
->  tcg/tcg.c                     |  4 +++
->  26 files changed, 93 insertions(+), 133 deletions(-)
-> 
+thanks
+-- PMM
