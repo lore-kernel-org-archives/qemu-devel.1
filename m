@@ -1,18 +1,19 @@
-Received: from eggs.gnu.org ([209.51.188.92]:54295)
+Received: from eggs.gnu.org ([209.51.188.92]:54335)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1hGTCh-0004P3-7a
-	for qemu-devel@nongnu.org; Tue, 16 Apr 2019 14:53:12 -0400
+	(envelope-from <david@redhat.com>) id 1hGTCj-0004PT-KJ
+	for qemu-devel@nongnu.org; Tue, 16 Apr 2019 14:53:14 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1hGTCe-0003km-Rq
-	for qemu-devel@nongnu.org; Tue, 16 Apr 2019 14:53:10 -0400
+	(envelope-from <david@redhat.com>) id 1hGTCi-0003vk-EF
+	for qemu-devel@nongnu.org; Tue, 16 Apr 2019 14:53:13 -0400
 From: David Hildenbrand <david@redhat.com>
-Date: Tue, 16 Apr 2019 20:52:21 +0200
-Message-Id: <20190416185301.25344-2-david@redhat.com>
+Date: Tue, 16 Apr 2019 20:52:23 +0200
+Message-Id: <20190416185301.25344-4-david@redhat.com>
 In-Reply-To: <20190416185301.25344-1-david@redhat.com>
 References: <20190416185301.25344-1-david@redhat.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v2 01/41] tcg: Implement tcg_gen_gvec_3i()
+Subject: [Qemu-devel] [PATCH v2 03/41] s390x/tcg: Implement VECTOR ADD
+ COMPUTE CARRY
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,249 +25,141 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: qemu-s390x@nongnu.org, Thomas Huth <thuth@redhat.com>, Cornelia Huck <cohuck@redhat.com>, Richard Henderson <rth@twiddle.net>, David Hildenbrand <david@redhat.com>
 
-Let's add tcg_gen_gvec_3i(), similar to tcg_gen_gvec_2i(), however
-without introducing "gen_helper_gvec_3i *fnoi", as it isn't needed
-for now.
+128-bit handling courtesy of Richard H.
 
 Signed-off-by: David Hildenbrand <david@redhat.com>
 ---
- tcg/tcg-op-gvec.c | 139 ++++++++++++++++++++++++++++++++++++++++++++++
- tcg/tcg-op-gvec.h |  24 ++++++++
- 2 files changed, 163 insertions(+)
+ target/s390x/insn-data.def      |  2 +
+ target/s390x/translate_vx.inc.c | 94 +++++++++++++++++++++++++++++++++
+ 2 files changed, 96 insertions(+)
 
-diff --git a/tcg/tcg-op-gvec.c b/tcg/tcg-op-gvec.c
-index 0996ef0812..f831adb4e7 100644
---- a/tcg/tcg-op-gvec.c
-+++ b/tcg/tcg-op-gvec.c
-@@ -663,6 +663,29 @@ static void expand_3_i32(uint32_t dofs, uint32_t aof=
-s,
-     tcg_temp_free_i32(t0);
+diff --git a/target/s390x/insn-data.def b/target/s390x/insn-data.def
+index 74a0ccc770..f0e62b9aa8 100644
+--- a/target/s390x/insn-data.def
++++ b/target/s390x/insn-data.def
+@@ -1058,6 +1058,8 @@
+=20
+ /* VECTOR ADD */
+     F(0xe7f3, VA,      VRR_c, V,   0, 0, 0, 0, va, 0, IF_VEC)
++/* VECTOR ADD COMPUTE CARRY */
++    F(0xe7f1, VACC,    VRR_c, V,   0, 0, 0, 0, vacc, 0, IF_VEC)
+=20
+ #ifndef CONFIG_USER_ONLY
+ /* COMPARE AND SWAP AND PURGE */
+diff --git a/target/s390x/translate_vx.inc.c b/target/s390x/translate_vx.=
+inc.c
+index 2f84ea0511..312c5f67be 100644
+--- a/target/s390x/translate_vx.inc.c
++++ b/target/s390x/translate_vx.inc.c
+@@ -136,6 +136,9 @@ static void get_vec_element_ptr_i64(TCGv_ptr ptr, uin=
+t8_t reg, TCGv_i64 enr,
+     tcg_temp_free_i64(tmp);
  }
 =20
-+static void expand_3i_i32(uint32_t dofs, uint32_t aofs, uint32_t bofs,
-+                          uint32_t oprsz, int32_t c, bool load_dest,
-+                          void (*fni)(TCGv_i32, TCGv_i32, TCGv_i32, int3=
-2_t))
-+{
-+    TCGv_i32 t0 =3D tcg_temp_new_i32();
-+    TCGv_i32 t1 =3D tcg_temp_new_i32();
-+    TCGv_i32 t2 =3D tcg_temp_new_i32();
-+    uint32_t i;
-+
-+    for (i =3D 0; i < oprsz; i +=3D 4) {
-+        tcg_gen_ld_i32(t0, cpu_env, aofs + i);
-+        tcg_gen_ld_i32(t1, cpu_env, bofs + i);
-+        if (load_dest) {
-+            tcg_gen_ld_i32(t2, cpu_env, dofs + i);
-+        }
-+        fni(t2, t0, t1, c);
-+        tcg_gen_st_i32(t2, cpu_env, dofs + i);
-+    }
-+    tcg_temp_free_i32(t0);
-+    tcg_temp_free_i32(t1);
-+    tcg_temp_free_i32(t2);
-+}
-+
- /* Expand OPSZ bytes worth of three-operand operations using i32 element=
-s.  */
- static void expand_4_i32(uint32_t dofs, uint32_t aofs, uint32_t bofs,
-                          uint32_t cofs, uint32_t oprsz, bool write_aofs,
-@@ -770,6 +793,29 @@ static void expand_3_i64(uint32_t dofs, uint32_t aof=
-s,
-     tcg_temp_free_i64(t0);
++#define gen_gvec_3(v1, v2, v3, gen) \
++    tcg_gen_gvec_3(vec_full_reg_offset(v1), vec_full_reg_offset(v2), \
++                   vec_full_reg_offset(v3), 16, 16, gen)
+ #define gen_gvec_3_ool(v1, v2, v3, data, fn) \
+     tcg_gen_gvec_3_ool(vec_full_reg_offset(v1), vec_full_reg_offset(v2),=
+ \
+                        vec_full_reg_offset(v3), 16, 16, data, fn)
+@@ -985,3 +988,94 @@ static DisasJumpType op_va(DisasContext *s, DisasOps=
+ *o)
+                   get_field(s->fields, v3));
+     return DISAS_NEXT;
  }
-=20
-+static void expand_3i_i64(uint32_t dofs, uint32_t aofs, uint32_t bofs,
-+                          uint32_t oprsz, int64_t c, bool load_dest,
-+                          void (*fni)(TCGv_i64, TCGv_i64, TCGv_i64, int6=
-4_t))
++
++static void gen_acc(TCGv_i64 d, TCGv_i64 a, TCGv_i64 b, uint8_t es)
 +{
-+    TCGv_i64 t0 =3D tcg_temp_new_i64();
++    const uint8_t msb_bit_nr =3D NUM_VEC_ELEMENT_BITS(es) - 1;
++    TCGv_i64 msb_mask =3D tcg_const_i64(dup_const(es, 1ull << msb_bit_nr=
+));
 +    TCGv_i64 t1 =3D tcg_temp_new_i64();
 +    TCGv_i64 t2 =3D tcg_temp_new_i64();
-+    uint32_t i;
++    TCGv_i64 t3 =3D tcg_temp_new_i64();
 +
-+    for (i =3D 0; i < oprsz; i +=3D 8) {
-+        tcg_gen_ld_i64(t0, cpu_env, aofs + i);
-+        tcg_gen_ld_i64(t1, cpu_env, bofs + i);
-+        if (load_dest) {
-+            tcg_gen_ld_i64(t2, cpu_env, dofs + i);
-+        }
-+        fni(t2, t0, t1, c);
-+        tcg_gen_st_i64(t2, cpu_env, dofs + i);
-+    }
-+    tcg_temp_free_i64(t0);
++    /* Calculate the carry into the MSB, ignoring the old MSBs */
++    tcg_gen_andc_i64(t1, a, msb_mask);
++    tcg_gen_andc_i64(t2, b, msb_mask);
++    tcg_gen_add_i64(t1, t1, t2);
++    /* Calculate the MSB without any carry into it */
++    tcg_gen_xor_i64(t3, a, b);
++    /* Calculate the carry out of the MSB in the MSB bit position */
++    tcg_gen_and_i64(d, a, b);
++    tcg_gen_and_i64(t1, t1, t3);
++    tcg_gen_or_i64(d, d, t1);
++    /* Isolate and shift the carry into position */
++    tcg_gen_and_i64(d, d, msb_mask);
++    tcg_gen_shri_i64(d, d, msb_bit_nr);
++
 +    tcg_temp_free_i64(t1);
 +    tcg_temp_free_i64(t2);
++    tcg_temp_free_i64(t3);
 +}
 +
- /* Expand OPSZ bytes worth of three-operand operations using i64 element=
-s.  */
- static void expand_4_i64(uint32_t dofs, uint32_t aofs, uint32_t bofs,
-                          uint32_t cofs, uint32_t oprsz, bool write_aofs,
-@@ -883,6 +929,35 @@ static void expand_3_vec(unsigned vece, uint32_t dof=
-s, uint32_t aofs,
-     tcg_temp_free_vec(t0);
- }
-=20
-+/*
-+ * Expand OPSZ bytes worth of three-vector operands and an immediate ope=
-rand
-+ * using host vectors.
-+ */
-+static void expand_3i_vec(unsigned vece, uint32_t dofs, uint32_t aofs,
-+                          uint32_t bofs, uint32_t oprsz, uint32_t tysz,
-+                          TCGType type, int64_t c, bool load_dest,
-+                          void (*fni)(unsigned, TCGv_vec, TCGv_vec, TCGv=
-_vec,
-+                                      int64_t))
++static void gen_acc8_i64(TCGv_i64 d, TCGv_i64 a, TCGv_i64 b)
 +{
-+    TCGv_vec t0 =3D tcg_temp_new_vec(type);
-+    TCGv_vec t1 =3D tcg_temp_new_vec(type);
-+    TCGv_vec t2 =3D tcg_temp_new_vec(type);
-+    uint32_t i;
-+
-+    for (i =3D 0; i < oprsz; i +=3D tysz) {
-+        tcg_gen_ld_vec(t0, cpu_env, aofs + i);
-+        tcg_gen_ld_vec(t1, cpu_env, bofs + i);
-+        if (load_dest) {
-+            tcg_gen_ld_vec(t2, cpu_env, dofs + i);
-+        }
-+        fni(vece, t2, t0, t1, c);
-+        tcg_gen_st_vec(t2, cpu_env, dofs + i);
-+    }
-+    tcg_temp_free_vec(t0);
-+    tcg_temp_free_vec(t1);
-+    tcg_temp_free_vec(t2);
++    gen_acc(d, a, b, ES_8);
 +}
 +
- /* Expand OPSZ bytes worth of four-operand operations using host vectors=
-.  */
- static void expand_4_vec(unsigned vece, uint32_t dofs, uint32_t aofs,
-                          uint32_t bofs, uint32_t cofs, uint32_t oprsz,
-@@ -1174,6 +1249,70 @@ void tcg_gen_gvec_3(uint32_t dofs, uint32_t aofs, =
-uint32_t bofs,
-     }
- }
-=20
-+/* Expand a vector operation with three vectors and an immediate.  */
-+void tcg_gen_gvec_3i(uint32_t dofs, uint32_t aofs, uint32_t bofs,
-+                     uint32_t oprsz, uint32_t maxsz, int64_t c,
-+                     const GVecGen3i *g)
++static void gen_acc16_i64(TCGv_i64 d, TCGv_i64 a, TCGv_i64 b)
 +{
-+    TCGType type;
-+    uint32_t some;
-+
-+    check_size_align(oprsz, maxsz, dofs | aofs | bofs);
-+    check_overlap_3(dofs, aofs, bofs, maxsz);
-+
-+    type =3D 0;
-+    if (g->fniv) {
-+        type =3D choose_vector_type(g->opc, g->vece, oprsz, g->prefer_i6=
-4);
-+    }
-+    switch (type) {
-+    case TCG_TYPE_V256:
-+        /*
-+         * Recall that ARM SVE allows vector sizes that are not a
-+         * power of 2, but always a multiple of 16.  The intent is
-+         * that e.g. size =3D=3D 80 would be expanded with 2x32 + 1x16.
-+         */
-+        some =3D QEMU_ALIGN_DOWN(oprsz, 32);
-+        expand_3i_vec(g->vece, dofs, aofs, bofs, some, 32, TCG_TYPE_V256=
-,
-+                      c, g->load_dest, g->fniv);
-+        if (some =3D=3D oprsz) {
-+            break;
-+        }
-+        dofs +=3D some;
-+        aofs +=3D some;
-+        bofs +=3D some;
-+        oprsz -=3D some;
-+        maxsz -=3D some;
-+        /* fallthru */
-+    case TCG_TYPE_V128:
-+        expand_3i_vec(g->vece, dofs, aofs, bofs, oprsz, 16, TCG_TYPE_V12=
-8,
-+                      c, g->load_dest, g->fniv);
-+        break;
-+    case TCG_TYPE_V64:
-+        expand_3i_vec(g->vece, dofs, aofs, bofs, oprsz, 8, TCG_TYPE_V64,
-+                      c, g->load_dest, g->fniv);
-+        break;
-+
-+    case 0:
-+        if (g->fni8 && check_size_impl(oprsz, 8)) {
-+            expand_3i_i64(dofs, aofs, bofs, oprsz, c, g->load_dest, g->f=
-ni8);
-+        } else if (g->fni4 && check_size_impl(oprsz, 4)) {
-+            expand_3i_i32(dofs, aofs, bofs, oprsz, c, g->load_dest, g->f=
-ni4);
-+        } else {
-+            assert(g->fno !=3D NULL);
-+            tcg_gen_gvec_3_ool(dofs, aofs, bofs, oprsz, maxsz, c, g->fno=
-);
-+            return;
-+        }
-+        break;
-+
-+    default:
-+        g_assert_not_reached();
-+    }
-+
-+    if (oprsz < maxsz) {
-+        expand_clr(dofs + oprsz, maxsz - oprsz);
-+    }
++    gen_acc(d, a, b, ES_16);
 +}
 +
- /* Expand a vector four-operand operation.  */
- void tcg_gen_gvec_4(uint32_t dofs, uint32_t aofs, uint32_t bofs, uint32_=
-t cofs,
-                     uint32_t oprsz, uint32_t maxsz, const GVecGen4 *g)
-diff --git a/tcg/tcg-op-gvec.h b/tcg/tcg-op-gvec.h
-index 850da32ded..c093243c4c 100644
---- a/tcg/tcg-op-gvec.h
-+++ b/tcg/tcg-op-gvec.h
-@@ -164,6 +164,27 @@ typedef struct {
-     bool load_dest;
- } GVecGen3;
-=20
-+typedef struct {
-+    /*
-+     * Expand inline as a 64-bit or 32-bit integer. Only one of these wi=
-ll be
-+     * non-NULL.
-+     */
-+    void (*fni8)(TCGv_i64, TCGv_i64, TCGv_i64, int64_t);
-+    void (*fni4)(TCGv_i32, TCGv_i32, TCGv_i32, int32_t);
-+    /* Expand inline with a host vector type.  */
-+    void (*fniv)(unsigned, TCGv_vec, TCGv_vec, TCGv_vec, int64_t);
-+    /* Expand out-of-line helper w/descriptor, data in descriptor.  */
-+    gen_helper_gvec_3 *fno;
-+    /* The opcode, if any, to which this corresponds.  */
-+    TCGOpcode opc;
-+    /* The vector element size, if applicable.  */
-+    uint8_t vece;
-+    /* Prefer i64 to v64.  */
-+    bool prefer_i64;
-+    /* Load dest as a 3rd source operand.  */
-+    bool load_dest;
-+} GVecGen3i;
++static void gen_acc32_i64(TCGv_i64 d, TCGv_i64 a, TCGv_i64 b)
++{
++    gen_acc(d, a, b, ES_32);
++}
 +
- typedef struct {
-     /* Expand inline as a 64-bit or 32-bit integer.
-        Only one of these will be non-NULL.  */
-@@ -193,6 +214,9 @@ void tcg_gen_gvec_2s(uint32_t dofs, uint32_t aofs, ui=
-nt32_t oprsz,
-                      uint32_t maxsz, TCGv_i64 c, const GVecGen2s *);
- void tcg_gen_gvec_3(uint32_t dofs, uint32_t aofs, uint32_t bofs,
-                     uint32_t oprsz, uint32_t maxsz, const GVecGen3 *);
-+void tcg_gen_gvec_3i(uint32_t dofs, uint32_t aofs, uint32_t bofs,
-+                     uint32_t oprsz, uint32_t maxsz, int64_t c,
-+                     const GVecGen3i *);
- void tcg_gen_gvec_4(uint32_t dofs, uint32_t aofs, uint32_t bofs, uint32_=
-t cofs,
-                     uint32_t oprsz, uint32_t maxsz, const GVecGen4 *);
-=20
++static void gen_acc_i64(TCGv_i64 d, TCGv_i64 a, TCGv_i64 b)
++{
++    TCGv_i64 t =3D tcg_temp_new_i64();
++
++    tcg_gen_add_i64(t, a, b);
++    tcg_gen_setcond_i64(TCG_COND_LTU, d, t, b);
++    tcg_temp_free_i64(t);
++}
++
++static void gen_acc2_i64(TCGv_i64 dl, TCGv_i64 dh, TCGv_i64 al,
++                         TCGv_i64 ah, TCGv_i64 bl, TCGv_i64 bh)
++{
++    TCGv_i64 th =3D tcg_temp_new_i64();
++    TCGv_i64 tl =3D tcg_temp_new_i64();
++    TCGv_i64 zero =3D tcg_const_i64(0);
++
++    tcg_gen_add2_i64(tl, th, al, zero, bl, zero);
++    tcg_gen_add2_i64(tl, th, th, zero, ah, zero);
++    tcg_gen_add2_i64(tl, dl, tl, th, bh, zero);
++    tcg_gen_mov_i64(dh, zero);
++
++    tcg_temp_free_i64(th);
++    tcg_temp_free_i64(tl);
++    tcg_temp_free_i64(zero);
++}
++
++static DisasJumpType op_vacc(DisasContext *s, DisasOps *o)
++{
++    const uint8_t es =3D get_field(s->fields, m4);
++    static const GVecGen3 g[4] =3D {
++        { .fni8 =3D gen_acc8_i64, },
++        { .fni8 =3D gen_acc16_i64, },
++        { .fni8 =3D gen_acc32_i64, },
++        { .fni8 =3D gen_acc_i64, },
++    };
++
++    if (es > ES_128) {
++        gen_program_exception(s, PGM_SPECIFICATION);
++        return DISAS_NORETURN;
++    } else if (es =3D=3D ES_128) {
++        gen_gvec128_3_i64(gen_acc2_i64, get_field(s->fields, v1),
++                          get_field(s->fields, v2), get_field(s->fields,=
+ v3));
++        return DISAS_NEXT;
++    }
++    gen_gvec_3(get_field(s->fields, v1), get_field(s->fields, v2),
++               get_field(s->fields, v3), &g[es]);
++    return DISAS_NEXT;
++}
 --=20
 2.20.1
