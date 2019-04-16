@@ -1,36 +1,27 @@
-Received: from eggs.gnu.org ([209.51.188.92]:59670)
+Received: from eggs.gnu.org ([209.51.188.92]:60632)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1hGLHt-00008z-Fg
-	for qemu-devel@nongnu.org; Tue, 16 Apr 2019 06:26:02 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1hGLMD-00019U-UU
+	for qemu-devel@nongnu.org; Tue, 16 Apr 2019 06:30:30 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1hGLHs-0003s9-EV
-	for qemu-devel@nongnu.org; Tue, 16 Apr 2019 06:26:01 -0400
-Received: from indium.canonical.com ([91.189.90.7]:46276)
+	(envelope-from <peter.maydell@linaro.org>) id 1hGLMD-0006lF-45
+	for qemu-devel@nongnu.org; Tue, 16 Apr 2019 06:30:29 -0400
+Received: from mail-ot1-x341.google.com ([2607:f8b0:4864:20::341]:43707)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1hGLHs-0003r6-5j
-	for qemu-devel@nongnu.org; Tue, 16 Apr 2019 06:26:00 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1hGLHo-0006vo-G9
-	for <qemu-devel@nongnu.org>; Tue, 16 Apr 2019 10:25:56 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id DF92D2E81A0
-	for <qemu-devel@nongnu.org>; Tue, 16 Apr 2019 10:25:53 +0000 (UTC)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1hGLMC-0006ku-SA
+	for qemu-devel@nongnu.org; Tue, 16 Apr 2019 06:30:29 -0400
+Received: by mail-ot1-x341.google.com with SMTP id u15so17122616otq.10
+	for <qemu-devel@nongnu.org>; Tue, 16 Apr 2019 03:30:28 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+References: <20190415163337.2795-1-marcandre.lureau@redhat.com>
+In-Reply-To: <20190415163337.2795-1-marcandre.lureau@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Tue, 16 Apr 2019 11:30:15 +0100
+Message-ID: <CAFEAcA-v+RJ7gYyJWTcZ5SBQO1MRPdfNq6jM9yXmg8Q_ig_J0A@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Tue, 16 Apr 2019 10:16:31 -0000
-From: Satheesh Rajendran <sathnaga@linux.vnet.ibm.com>
-Reply-To: Bug 1824528 <1824528@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <155507354518.20682.14175680260454866144.malonedeb@soybean.canonical.com>
-Message-Id: <155540979138.21524.11685983736784473474.malone@soybean.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] =?utf-8?q?=5BBug_1824528=5D_Re=3A_qemu_fails_to_comp?=
- =?utf-8?q?ile_on_gcc_9_=60error=3A_taking_address_of_packed_member_of_?=
- =?utf-8?q?=E2=80=98struct_=3Canonymous=3E=E2=80=99_may_result_in_an_unali?=
- =?utf-8?q?gned_pointer_value_=5B-Werror=3Daddress-of-packed-member=5D=60?=
+Subject: Re: [Qemu-devel] [PATCH v4] socket: allow wait=false for client
+ socket
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -39,52 +30,24 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@redhat.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, "reviewer:Incompatible changes" <libvir-list@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
 
-Sure, Thanks, using the workaround to proceed.
+On Mon, 15 Apr 2019 at 17:34, Marc-Andr=C3=A9 Lureau
+<marcandre.lureau@redhat.com> wrote:
+>
+> Commit 767abe7 ("chardev: forbid 'wait' option with client sockets")
+> is a bit too strict. Current libvirt always set wait=3Dfalse, and will
+> thus fail to add client chardev.
+>
+> Make the code more permissive, allowing wait=3Dfalse with client socket
+> chardevs. Deprecate usage of 'wait' with client sockets.
+>
+> Fixes: 767abe7f49e8be14d29da5db3527817b5d696a52
+> Cc: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
+> Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+> ---
 
-Good if each commit goes through a automated build test across different
-platforms vs gcc versions.
+Applied to master for rc4, thanks.
 
-Regards,
--Satheesh.
-
--- =
-
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1824528
-
-Title:
-  qemu fails to compile on gcc 9 `error: taking address of packed member
-  of =E2=80=98struct <anonymous>=E2=80=99 may result in an unaligned pointe=
-r value
-  [-Werror=3Daddress-of-packed-member]`
-
-Status in QEMU:
-  New
-
-Bug description:
-  Qemu compilation fails with below error on ppc64le host with gcc 9(9.0.1 =
-20190328)
-  repo: https://github.com/qemu/qemu.git
-  branch: master
-  commit e1be98540ee672ef93292b65a986055512237c35
-
-  =
-
-    CC      net/dump.o
-  hw/usb/dev-mtp.c: In function =E2=80=98usb_mtp_write_metadata=E2=80=99:
-  hw/usb/dev-mtp.c:1708:36: error: taking address of packed member of =E2=
-=80=98struct <anonymous>=E2=80=99 may result in an unaligned pointer value =
-[-Werror=3Daddress-of-packed-member]
-   1708 |                             dataset->filename);
-        |                             ~~~~~~~^~~~~~~~~~
-  cc1: all warnings being treated as errors
-    CC      net/eth.o
-  make: *** [/home/kvmci/qemu-main/rules.mak:69: hw/usb/dev-mtp.o] Error 1
-  make: *** Waiting for unfinished jobs....
-    CC      net/announce.o
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1824528/+subscriptions
+-- PMM
