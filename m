@@ -1,23 +1,21 @@
-Received: from eggs.gnu.org ([209.51.188.92]:51254)
+Received: from eggs.gnu.org ([209.51.188.92]:51808)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1hGKeR-0008V8-WC
-	for qemu-devel@nongnu.org; Tue, 16 Apr 2019 05:45:16 -0400
+	(envelope-from <danielhb413@gmail.com>) id 1hGKgz-00010k-Us
+	for qemu-devel@nongnu.org; Tue, 16 Apr 2019 05:47:55 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1hGKeQ-0006BX-Va
-	for qemu-devel@nongnu.org; Tue, 16 Apr 2019 05:45:15 -0400
-References: <20190411100836.646-1-david@redhat.com>
-	<20190411100836.646-32-david@redhat.com>
-	<6594280f-cefb-cfb0-35b4-fcf53c32d871@linaro.org>
-From: David Hildenbrand <david@redhat.com>
-Message-ID: <129e5499-a05c-15f1-fe26-6ae0a78cfa7b@redhat.com>
-Date: Tue, 16 Apr 2019 11:45:09 +0200
+	(envelope-from <danielhb413@gmail.com>) id 1hGKgy-0008S5-Ih
+	for qemu-devel@nongnu.org; Tue, 16 Apr 2019 05:47:53 -0400
+References: <20190326211742.26140-1-danielhb413@gmail.com>
+From: Daniel Henrique Barboza <danielhb413@gmail.com>
+Message-ID: <00afefc4-7fd7-1f62-ea21-acb31ac79373@gmail.com>
+Date: Tue, 16 Apr 2019 06:47:42 -0300
 MIME-Version: 1.0
-In-Reply-To: <6594280f-cefb-cfb0-35b4-fcf53c32d871@linaro.org>
-Content-Type: text/plain; charset=utf-8
+In-Reply-To: <20190326211742.26140-1-danielhb413@gmail.com>
 Content-Language: en-US
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v1 31/41] s390x/tcg: Implement VECTOR SHIFT
- LEFT DOUBLE BY BYTE
+Subject: Re: [Qemu-devel] [PATCH v3 0/3] delete created files when
+ block_crypto_co_create_opts_luks fails
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,56 +24,31 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Richard Henderson <richard.henderson@linaro.org>, qemu-devel@nongnu.org
-Cc: qemu-s390x@nongnu.org, Cornelia Huck <cohuck@redhat.com>, Thomas Huth <thuth@redhat.com>, Richard Henderson <rth@twiddle.net>
+To: qemu-devel@nongnu.org
+Cc: qemu-block@nongnu.org, kwolf@redhat.com, mreitz@redhat.com, berrange@redhat.com
 
-On 13.04.19 02:54, Richard Henderson wrote:
-> On 4/11/19 12:08 AM, David Hildenbrand wrote:
->> +static DisasJumpType op_vsldb(DisasContext *s, DisasOps *o)
->> +{
->> +    int src_idx = get_field(s->fields, i4) & 0xf;
->> +
->> +    if (src_idx == 0) {
->> +        gen_gvec_mov(get_field(s->fields, v1), get_field(s->fields, v2));
->> +    } else {
->> +        gen_gvec_3_ool(get_field(s->fields, v1), get_field(s->fields, v2),
->> +                       get_field(s->fields, v3), src_idx,
->> +                       gen_helper_gvec_vsldb);
->> +        return DISAS_NEXT;
-> 
-> You could also expand this inline using your new extract2 primitive.
-> 
->   int i4 = get_field(s->fields, i4);
->   int left_shift, right_shift;
-> 
->   left_shift = (i4 & 7) * 8;
->   right_shift = 64 - left_shift;
-> 
->   if ((i4 & 8) == 0) {
->       read_vec_element_i64(t0, get_field(s->fields, v2), 0, ES_64);
->       read_vec_element_i64(t1, get_field(s->fields, v2), 1, ES_64);
->       read_vec_element_i64(t2, get_field(s->fields, v3), 0, ES_64);
->   } else {
->       read_vec_element_i64(t0, get_field(s->fields, v2), 1, ES_64);
->       read_vec_element_i64(t1, get_field(s->fields, v3), 0, ES_64);
->       read_vec_element_i64(t2, get_field(s->fields, v3), 1, ES_64);
->   }
->   tcg_gen_extract2_i64(t0, t1, t0, right_shift);
->   tcg_gen_extract2_i64(t1, t2, t1, right_shift);
+Ping
 
-Trying to understand the magic, left_shift is really only used to to
-calculate right_shift, right?
-
->   write_vec_element_i64(t0, get_field(s->fields, v1), 0, ES_64);
->   write_vec_element_i64(t1, get_field(s->fields, v1), 1, ES_64);
-> 
-> 
-> r~
-> 
-
-
--- 
-
-Thanks,
-
-David / dhildenb
+On 3/26/19 6:17 PM, Daniel Henrique Barboza wrote:
+> In this new interation, the following changes were made from
+> the previous version [1]:
+> - moved the 'generic' code from block.c to file-posix.c
+> - moved the file delete call from qemu_img to the error path
+> of block_crypto_co_create_opts_luks
+>
+> [1] https://lists.gnu.org/archive/html/qemu-devel/2019-03/msg06444.html
+>
+>
+> Daniel Henrique Barboza (3):
+>    block: introducing 'bdrv_co_delete_file' interface
+>    block.c: adding bdrv_delete_file
+>    crypto.c: cleanup created file when block_crypto_co_create_opts_luks
+>      fails
+>
+>   block.c                   | 82 +++++++++++++++++++++++++++++++++++++++
+>   block/crypto.c            | 31 +++++++++++++++
+>   block/file-posix.c        | 28 +++++++++++++
+>   include/block/block.h     |  3 ++
+>   include/block/block_int.h |  6 +++
+>   5 files changed, 150 insertions(+)
+>
