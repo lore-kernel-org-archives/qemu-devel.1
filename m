@@ -1,26 +1,26 @@
-Received: from eggs.gnu.org ([209.51.188.92]:34369)
+Received: from eggs.gnu.org ([209.51.188.92]:34403)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1hGNf2-0004Vf-II
-	for qemu-devel@nongnu.org; Tue, 16 Apr 2019 08:58:05 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1hGNf4-0004Y9-Pc
+	for qemu-devel@nongnu.org; Tue, 16 Apr 2019 08:58:07 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1hGNez-00016M-1k
-	for qemu-devel@nongnu.org; Tue, 16 Apr 2019 08:58:02 -0400
-Received: from mail-wr1-x444.google.com ([2a00:1450:4864:20::444]:34507)
+	(envelope-from <peter.maydell@linaro.org>) id 1hGNf2-00018x-SK
+	for qemu-devel@nongnu.org; Tue, 16 Apr 2019 08:58:06 -0400
+Received: from mail-wr1-x443.google.com ([2a00:1450:4864:20::443]:47023)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1hGNev-00012p-9x
-	for qemu-devel@nongnu.org; Tue, 16 Apr 2019 08:57:59 -0400
-Received: by mail-wr1-x444.google.com with SMTP id p10so26959475wrq.1
-	for <qemu-devel@nongnu.org>; Tue, 16 Apr 2019 05:57:56 -0700 (PDT)
+	id 1hGNf0-00014I-TY
+	for qemu-devel@nongnu.org; Tue, 16 Apr 2019 08:58:04 -0400
+Received: by mail-wr1-x443.google.com with SMTP id t17so26886014wrw.13
+	for <qemu-devel@nongnu.org>; Tue, 16 Apr 2019 05:57:58 -0700 (PDT)
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 16 Apr 2019 13:57:22 +0100
-Message-Id: <20190416125744.27770-5-peter.maydell@linaro.org>
+Date: Tue, 16 Apr 2019 13:57:24 +0100
+Message-Id: <20190416125744.27770-7-peter.maydell@linaro.org>
 In-Reply-To: <20190416125744.27770-1-peter.maydell@linaro.org>
 References: <20190416125744.27770-1-peter.maydell@linaro.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH 04/26] target/arm: Disable most VFP sysregs for
- M-profile
+Subject: [Qemu-devel] [PATCH 06/26] target/arm: Decode FP instructions for M
+ profile
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,57 +31,64 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-arm@nongnu.org, qemu-devel@nongnu.org
 
-The only "system register" that M-profile floating point exposes
-via the VMRS/VMRS instructions is FPSCR, and it does not have
-the odd special case for rd==15. Add a check to ensure we only
-expose FPSCR.
+Correct the decode of the M-profile "coprocessor and
+floating-point instructions" space:
+ * op0 == 0b11 is always unallocated
+ * if the CPU has an FPU then all insns with op1 == 0b101
+   are floating point and go to disas_vfp_insn()
+
+For the moment we leave VLLDM and VLSTM as NOPs; in
+a later commit we will fill in the proper implementation
+for the case where an FPU is present.
 
 Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 ---
- target/arm/translate.c | 19 +++++++++++++++++--
- 1 file changed, 17 insertions(+), 2 deletions(-)
+ target/arm/translate.c | 26 ++++++++++++++++++++++----
+ 1 file changed, 22 insertions(+), 4 deletions(-)
 
 diff --git a/target/arm/translate.c b/target/arm/translate.c
-index d408e4d7ef4..d56488ec847 100644
+index bb539111179..d280b3a9a3a 100644
 --- a/target/arm/translate.c
 +++ b/target/arm/translate.c
-@@ -3512,12 +3512,27 @@ static int disas_vfp_insn(DisasContext *s, uint32_t insn)
-                     }
-                 }
-             } else { /* !dp */
-+                bool is_sysreg;
+@@ -11727,10 +11727,19 @@ static void disas_thumb2_insn(DisasContext *s, uint32_t insn)
+     case 6: case 7: case 14: case 15:
+         /* Coprocessor.  */
+         if (arm_dc_feature(s, ARM_FEATURE_M)) {
+-            /* We don't currently implement M profile FP support,
+-             * so this entire space should give a NOCP fault, with
+-             * the exception of the v8M VLLDM and VLSTM insns, which
+-             * must be NOPs in Secure state and UNDEF in Nonsecure state.
++            /* 0b111x_11xx_xxxx_xxxx_xxxx_xxxx_xxxx_xxxx */
++            if (extract32(insn, 24, 2) == 3) {
++                goto illegal_op; /* op0 = 0b11 : unallocated */
++            }
 +
-                 if ((insn & 0x6f) != 0x00)
-                     return 1;
-                 rn = VFP_SREG_N(insn);
-+
-+                is_sysreg = extract32(insn, 21, 1);
-+
-+                if (arm_dc_feature(s, ARM_FEATURE_M)) {
-+                    /*
-+                     * The only M-profile VFP vmrs/vmsr sysreg is FPSCR.
-+                     * Writes to R15 are UNPREDICTABLE; we choose to undef.
-+                     */
-+                    if (is_sysreg && (rd == 15 || (rn >> 1) != ARM_VFP_FPSCR)) {
-+                        return 1;
-+                    }
++            /*
++             * Decode VLLDM and VLSTM first: these are nonstandard because:
++             *  * if there is no FPU then these insns must NOP in
++             *    Secure state and UNDEF in Nonsecure state
++             *  * if there is an FPU then these insns do not have
++             *    the usual behaviour that disas_vfp_insn() provides of
++             *    being controlled by CPACR/NSACR enable bits or the
++             *    lazy-stacking logic.
+              */
+             if (arm_dc_feature(s, ARM_FEATURE_V8) &&
+                 (insn & 0xffa00f00) == 0xec200a00) {
+@@ -11744,6 +11753,15 @@ static void disas_thumb2_insn(DisasContext *s, uint32_t insn)
+                 /* Just NOP since FP support is not implemented */
+                 break;
+             }
++            if (arm_dc_feature(s, ARM_FEATURE_VFP) &&
++                ((insn >> 8) & 0xe) == 10) {
++                /* FP, and the CPU supports it */
++                if (disas_vfp_insn(s, insn)) {
++                    goto illegal_op;
 +                }
++                break;
++            }
 +
-                 if (insn & ARM_CP_RW_BIT) {
-                     /* vfp->arm */
--                    if (insn & (1 << 21)) {
-+                    if (is_sysreg) {
-                         /* system register */
-                         rn >>= 1;
- 
-@@ -3584,7 +3599,7 @@ static int disas_vfp_insn(DisasContext *s, uint32_t insn)
-                     }
-                 } else {
-                     /* arm->vfp */
--                    if (insn & (1 << 21)) {
-+                    if (is_sysreg) {
-                         rn >>= 1;
-                         /* system register */
-                         switch (rn) {
+             /* All other insns: NOCP */
+             gen_exception_insn(s, 4, EXCP_NOCP, syn_uncategorized(),
+                                default_exception_el(s));
 -- 
 2.20.1
