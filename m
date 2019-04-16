@@ -2,75 +2,118 @@ Return-Path: <SRS0=xvb4=SS=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_PASS,URIBL_BLOCKED autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 20EB8C10F13
-	for <qemu-devel@archiver.kernel.org>; Tue, 16 Apr 2019 08:47:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 98A43C10F13
+	for <qemu-devel@archiver.kernel.org>; Tue, 16 Apr 2019 08:47:50 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E56C220821
-	for <qemu-devel@archiver.kernel.org>; Tue, 16 Apr 2019 08:47:11 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E56C220821
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=twiddle.net
+	by mail.kernel.org (Postfix) with ESMTPS id 66BC920821
+	for <qemu-devel@archiver.kernel.org>; Tue, 16 Apr 2019 08:47:50 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 66BC920821
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:33173 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:33175 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hGJkF-00008s-51
-	for qemu-devel@archiver.kernel.org; Tue, 16 Apr 2019 04:47:11 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:38173)
+	id 1hGJkr-0000am-IY
+	for qemu-devel@archiver.kernel.org; Tue, 16 Apr 2019 04:47:49 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:38354)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1hGJiy-00083M-E6
-	for qemu-devel@nongnu.org; Tue, 16 Apr 2019 04:45:53 -0400
+	(envelope-from <david@redhat.com>) id 1hGJjZ-0008Pj-Eg
+	for qemu-devel@nongnu.org; Tue, 16 Apr 2019 04:46:30 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1hGJiw-0004lS-Nn
-	for qemu-devel@nongnu.org; Tue, 16 Apr 2019 04:45:52 -0400
-Received: from indium.canonical.com ([91.189.90.7]:57266)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1hGJiv-0004k1-Lq
-	for qemu-devel@nongnu.org; Tue, 16 Apr 2019 04:45:49 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1hGJit-000325-OP
-	for <qemu-devel@nongnu.org>; Tue, 16 Apr 2019 08:45:47 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 95D1C2E80CB
-	for <qemu-devel@nongnu.org>; Tue, 16 Apr 2019 08:45:47 +0000 (UTC)
+	(envelope-from <david@redhat.com>) id 1hGJjY-0005Ed-Ix
+	for qemu-devel@nongnu.org; Tue, 16 Apr 2019 04:46:29 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:57676)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <david@redhat.com>)
+	id 1hGJjY-0005Dh-5r; Tue, 16 Apr 2019 04:46:28 -0400
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+	[10.5.11.16])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 24F5C59460;
+	Tue, 16 Apr 2019 08:46:27 +0000 (UTC)
+Received: from [10.36.116.179] (ovpn-116-179.ams2.redhat.com [10.36.116.179])
+	by smtp.corp.redhat.com (Postfix) with ESMTP id E05085C1B4;
+	Tue, 16 Apr 2019 08:46:25 +0000 (UTC)
+To: Richard Henderson <richard.henderson@linaro.org>, qemu-devel@nongnu.org
+References: <20190411100836.646-1-david@redhat.com>
+	<20190411100836.646-4-david@redhat.com>
+	<50db1745-397d-03e0-626a-12d1b2a2a554@linaro.org>
+	<0fdae81c-eecb-90cd-26f8-b52964d375a3@redhat.com>
+	<b0567193-e353-d391-b438-e5b580d699a4@linaro.org>
+	<0d400fda-85a7-6c5d-a693-1d0bfec63ce3@redhat.com>
+	<9f632efd-37b9-5aaf-fe81-7c332ad51d7a@linaro.org>
+From: David Hildenbrand <david@redhat.com>
+Openpgp: preference=signencrypt
+Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
+	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
+	SE+xAvmumFBY
+Organization: Red Hat GmbH
+Message-ID: <3f8eb0e0-be2a-d67f-7b3a-9fec65fc52da@redhat.com>
+Date: Tue, 16 Apr 2019 10:46:25 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+	Thunderbird/60.6.1
 MIME-Version: 1.0
+In-Reply-To: <9f632efd-37b9-5aaf-fe81-7c332ad51d7a@linaro.org>
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Tue, 16 Apr 2019 08:36:29 -0000
-From: Richard Henderson <rth@twiddle.net>
-To: qemu-devel@nongnu.org
-X-Launchpad-Notification-Type: bug
-X-Launchpad-Bug: product=qemu; status=In Progress; importance=Undecided;
-	assignee=rth@twiddle.net; 
-X-Launchpad-Bug-Information-Type: Public
-X-Launchpad-Bug-Private: no
-X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: rth zhroma
-X-Launchpad-Bug-Reporter: Roman Zhuykov (zhroma)
-X-Launchpad-Bug-Modifier: Richard Henderson (rth)
-References: <155534806981.13632.6401186723464432088.malonedeb@gac.canonical.com>
-Message-Id:
- <155540378930.8369.3177751361022402125.malone@wampee.canonical.com>
-X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
-X-Launchpad-Message-For: qemu-devel-ml
-Precedence: bulk
-X-Generated-By: Launchpad (canonical.com); Revision="18920";
-	Instance="launchpad-lazr.conf"
-X-Launchpad-Hash: 38e93cfb2942db22afd02511264f741c2e4c987b
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+	(mx1.redhat.com [10.5.110.39]);
+	Tue, 16 Apr 2019 08:46:27 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 91.189.90.7
-Subject: [Qemu-devel] [Bug 1824853] Re: 4.0.0-rc3 crashes with
- tcg/tcg.c:3952: tcg_gen_code: Assertion `s->gen_insn_end_off[num_insns] ==
- off' failed
+X-Received-From: 209.132.183.28
+Subject: Re: [Qemu-devel] [PATCH v1 03/41] s390x/tcg: Implement VECTOR ADD
+ COMPUTE CARRY
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
+Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -79,96 +122,49 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1824853 <1824853@bugs.launchpad.net>
+Cc: qemu-s390x@nongnu.org, Cornelia Huck <cohuck@redhat.com>,
+	Thomas Huth <thuth@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190416083629.yXfYGjhmCJU5vv1EV--GGdwAZjMxZwKzIMjsy2-YVPY@z>
+Message-ID: <20190416084625.m_ZRFdZQD-TBmq_z2wc7Kebtu_iHiece9IaBljHnEiA@z>
 
-Patch set posted:
-https://patchwork.ozlabs.org/project/qemu-devel/list/?series=3D102978
+On 16.04.19 10:43, Richard Henderson wrote:
+> On 4/15/19 10:33 PM, David Hildenbrand wrote:
+>>>>
+>>>> Indeed, I didn't really explore vector operations yet. This is more
+>>>> compact than I expected :)
+>>>
+>>> :-)
+>>>
+>>> That said, in implementing vector variable shifts today,
+>>> I've come up with a representational problem here.
+>>> You may want to hold off on these until I can address them.
+>>
+>> I assume you mean vector helpers *in general* in this file. Yes, we can
+>> add them later.
+>>
+>> What exact problem are you dealing with?
+> 
+> The .opc field lets you only specify one opcode which is optional in the
+> backend on which you depend.  In writing support for AArch64 USHL, I find that
+> I needed 3 optional opcodes.
 
--- =
+I was asking myself this exact thing when looking at the opc field in
+the example you gave ("which instruction is one supposed to indicate
+here") :)
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1824853
+> 
+> I'm thinking of a mass change whereby .opc becomes a pointer to an array with
+> terminator.  But then, for debugging purposes, I think I need to validate that
+> array, so that it's not missing things that ought to be specified, but which
+> happen to be supported by the current host.
 
-Title:
-  4.0.0-rc3 crashes with tcg/tcg.c:3952: tcg_gen_code: Assertion
-  `s->gen_insn_end_off[num_insns] =3D=3D off' failed
+Makes sense!
 
-Status in QEMU:
-  In Progress
+-- 
 
-Bug description:
-  I tried to bootstrap and regtested gcc trunk (gcc svn rev 270278,
-  datestamp 20190411) inside my arm64-gentoo installation under qemu-
-  system-aarch64.
+Thanks,
 
-  Qemu version was 4.0.0-rc3 and -cpu cortex-a57. Qemu configured with
-  only --target-list=3Daarch64-softmmu,aarch64-linux-user and compiled
-  using gcc "version 5.5.0 20171010 (Ubuntu 5.5.0-12ubuntu1~16.04)".
-
-  Executable created from gcc/testsuite/gcc.target/aarch64/advsimd-
-  intrinsics/vldX.c compiled with -O2 crashed the whole qemu-system.
-
-  To investigate a bit I also manually run
-  ~/gcc/inst/trunk/bin/gcc ~/gcc/src/trunk/gcc/testsuite/gcc.target/aarch64=
-/advsimd-intrinsics/vldX.c
-  with different options like:
-  -O0 -lm -o d0.exe
-  -O1 -lm -o d1.exe
-  -O2 -lm -o d2.exe
-  -O0 -static -lm -o s0.exe
-  -O1 -static -lm -o s1.exe
-  -O2 -static -lm -o s2.exe
-
-  So, now I have 6 different arm64 executables created with different optim=
-ization levels. O0 and O1 versions run ok.
-  Three sN.exe static executables I've also tried in qemu user mode (with s=
-ame -cpu), no issue in user mode.
-
-  And inside qemu-system I can see that
-  running "d2.exe" (attached) gives:
-  tcg/tcg.c:3952: tcg_gen_code: Assertion `s->gen_insn_end_off[num_insns] =
-=3D=3D off' failed.
-
-  And running "s2.exe" gives:
-  tcg/tcg.c:320: set_jmp_reset_offset: Assertion `s->tb_jmp_reset_offset[wh=
-ich] =3D=3D off' failed.
-
-  It seems like this test is an counter-example for logic that
-  "tcg_ctx->nb_ops < 4000" implies tcg will fit into 16-bit signed size
-  (see tcg_op_buf_full comments).
-
-  Richard's changes in abebf92597186 and 9f754620651d were not enough, tran=
-slation block must be smaller, or we have to find some proper way to bail o=
-ut when buffer overflows.
-  I don't know why this situation is not caught by code_gen_highwater logic=
- in tcg.c
-
-  I've also tried this "bail out" patch
-
-  diff --git a/tcg/tcg.c b/tcg/tcg.c
-  --- a/tcg/tcg.c
-  +++ b/tcg/tcg.c
-  @@ -3949,7 +3949,8 @@ int tcg_gen_code(TCGContext *s, TranslationBlock *t=
-b)
-                   size_t off =3D tcg_current_code_size(s);
-                   s->gen_insn_end_off[num_insns] =3D off;
-                   /* Assert that we do not overflow our stored offset.  */
-  -                assert(s->gen_insn_end_off[num_insns] =3D=3D off);
-  +                if (s->gen_insn_end_off[num_insns] !=3D off)
-  +                  return -1;
-               }
-               num_insns++;
-               for (i =3D 0; i < TARGET_INSN_START_WORDS; ++i) {
-
-  But then running "d2.exe" just hangs the whole qemu-system. It seems
-  that when tcg_gen_code return -1 (like in highwater logic mentioned
-  before), we just re-call it again and again.
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1824853/+subscriptions
+David / dhildenb
 
