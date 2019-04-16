@@ -1,23 +1,34 @@
-Received: from eggs.gnu.org ([209.51.188.92]:54557)
+Received: from eggs.gnu.org ([209.51.188.92]:56438)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1hGJDk-0005RC-GC
-	for qemu-devel@nongnu.org; Tue, 16 Apr 2019 04:13:37 -0400
+	(envelope-from <bounces@canonical.com>) id 1hGJG0-0006JP-7J
+	for qemu-devel@nongnu.org; Tue, 16 Apr 2019 04:15:57 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1hGJDh-0002XQ-5P
-	for qemu-devel@nongnu.org; Tue, 16 Apr 2019 04:13:36 -0400
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Date: Tue, 16 Apr 2019 08:13:25 +0000
-Message-ID: <c923c1c0-e866-9bbc-f351-1c5d861d830d@virtuozzo.com>
-References: <20190413165343.9018-1-mreitz@redhat.com>
-	<20190413165343.9018-8-mreitz@redhat.com>
-In-Reply-To: <20190413165343.9018-8-mreitz@redhat.com>
-Content-Language: en-US
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <9D2143B25A15A14C8335426A255FE39A@eurprd08.prod.outlook.com>
-Content-Transfer-Encoding: base64
+	(envelope-from <bounces@canonical.com>) id 1hGJFz-0004Ou-1e
+	for qemu-devel@nongnu.org; Tue, 16 Apr 2019 04:15:56 -0400
+Received: from indium.canonical.com ([91.189.90.7]:51724)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1hGJFy-0004Nv-NV
+	for qemu-devel@nongnu.org; Tue, 16 Apr 2019 04:15:54 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1hGJFx-00085A-Fk
+	for <qemu-devel@nongnu.org>; Tue, 16 Apr 2019 08:15:53 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id EC43E2E80CC
+	for <qemu-devel@nongnu.org>; Tue, 16 Apr 2019 08:15:52 +0000 (UTC)
 MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [PATCH v3 7/7] iotests: Test qemu-img convert -C
- --salvage
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Tue, 16 Apr 2019 08:08:37 -0000
+From: Thomas Huth <1824053@bugs.launchpad.net>
+Reply-To: Bug 1824053 <1824053@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <155486495593.20543.13567634487304856304.malonedeb@chaenomeles.canonical.com>
+Message-Id: <155540211727.14159.9797590858773633952.malone@gac.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1824053] Re: Qemu-img convert appears to be stuck
+ on aarch64 host with low probability
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,42 +37,77 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Max Reitz <mreitz@redhat.com>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>
-Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>, Eric Blake <eblake@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Denis Lunev <den@virtuozzo.com>
+To: qemu-devel@nongnu.org
 
-MTMuMDQuMjAxOSAxOTo1MywgTWF4IFJlaXR6IHdyb3RlOg0KPiBXZSBkbyBub3Qgc3VwcG9ydCB0
-aGlzIGNvbWJpbmF0aW9uICh5ZXQpLCBzbyB0aGlzIHNob3VsZCB5aWVsZCBhbiBlcnJvcg0KPiBt
-ZXNzYWdlLg0KPiANCj4gU2lnbmVkLW9mZi1ieTogTWF4IFJlaXR6IDxtcmVpdHpAcmVkaGF0LmNv
-bT4NCg0KVGVzdGVkLWJ5OiBWbGFkaW1pciBTZW1lbnRzb3YtT2dpZXZza2l5IDx2c2VtZW50c292
-QHZpcnR1b3p6by5jb20+DQogICAgICAgICAgICBbb25seSAtcWNvdzIsIGFzIC1uZnMgLXFjb3cy
-IGlzIGFscmVhZHkgYnJva2VuXQ0KUmV2aWV3ZWQtYnk6IFZsYWRpbWlyIFNlbWVudHNvdi1PZ2ll
-dnNraXkgPHZzZW1lbnRzb3ZAdmlydHVvenpvLmNvbT4NCg0KSG1tLCBpbnRlcmVzdGluZywgdGhh
-dCB0aGlzIHRlc3QgaXMgZGVmaW5lZCBhcw0KX3N1cHBvcnRlZF9mbXQgcWNvdzINCl9zdXBwb3J0
-ZWRfcHJvdG8gZmlsZSBuZnMNCg0KQW5kIG9mIGNvdXJzZSwgaXQgZG9lc24ndCB3b3JrIGZvciAt
-cWNvdzIgLW5mcyBjb21iaW5hdGlvbi4uDQoNCj4gLS0tDQo+ICAgdGVzdHMvcWVtdS1pb3Rlc3Rz
-LzA4MiAgICAgfCAxICsNCj4gICB0ZXN0cy9xZW11LWlvdGVzdHMvMDgyLm91dCB8IDMgKysrDQo+
-ICAgMiBmaWxlcyBjaGFuZ2VkLCA0IGluc2VydGlvbnMoKykNCj4gDQo+IGRpZmYgLS1naXQgYS90
-ZXN0cy9xZW11LWlvdGVzdHMvMDgyIGIvdGVzdHMvcWVtdS1pb3Rlc3RzLzA4Mg0KPiBpbmRleCBk
-MGFmYTQ2ZTlhLi5jNThiMzcxMjdmIDEwMDc1NQ0KPiAtLS0gYS90ZXN0cy9xZW11LWlvdGVzdHMv
-MDgyDQo+ICsrKyBiL3Rlc3RzL3FlbXUtaW90ZXN0cy8wODINCj4gQEAgLTE2Myw2ICsxNjMsNyBA
-QCBlY2hvID09PSBjb252ZXJ0OiAtQyBhbmQgb3RoZXIgb3B0aW9ucyA9PT0NCj4gICBydW5fcWVt
-dV9pbWcgY29udmVydCAtQyAtUyA0ayAtTyAkSU1HRk1UICIkVEVTVF9JTUciICIkVEVTVF9JTUci
-LnRhcmdldA0KPiAgIHJ1bl9xZW11X2ltZyBjb252ZXJ0IC1DIC1TIDhrIC1PICRJTUdGTVQgIiRU
-RVNUX0lNRyIgIiRURVNUX0lNRyIudGFyZ2V0DQo+ICAgcnVuX3FlbXVfaW1nIGNvbnZlcnQgLUMg
-LWMgLU8gJElNR0ZNVCAiJFRFU1RfSU1HIiAiJFRFU1RfSU1HIi50YXJnZXQNCj4gK3J1bl9xZW11
-X2ltZyBjb252ZXJ0IC1DIC0tc2FsdmFnZSAtTyAkSU1HRk1UICIkVEVTVF9JTUciICIkVEVTVF9J
-TUciLnRhcmdldA0KPiAgIA0KPiAgIGVjaG8NCj4gICBlY2hvID09PSBhbWVuZDogT3B0aW9ucyBz
-cGVjaWZpZWQgbW9yZSB0aGFuIG9uY2UgPT09DQo+IGRpZmYgLS1naXQgYS90ZXN0cy9xZW11LWlv
-dGVzdHMvMDgyLm91dCBiL3Rlc3RzL3FlbXUtaW90ZXN0cy8wODIub3V0DQo+IGluZGV4IGQzNjkz
-OGRhOWIuLjlkNGY3NTc0YzkgMTAwNjQ0DQo+IC0tLSBhL3Rlc3RzL3FlbXUtaW90ZXN0cy8wODIu
-b3V0DQo+ICsrKyBiL3Rlc3RzL3FlbXUtaW90ZXN0cy8wODIub3V0DQo+IEBAIC01NTUsNiArNTU1
-LDkgQEAgcWVtdS1pbWc6IENhbm5vdCBlbmFibGUgY29weSBvZmZsb2FkaW5nIHdoZW4gLVMgaXMg
-dXNlZA0KPiAgIFRlc3Rpbmc6IGNvbnZlcnQgLUMgLWMgLU8gcWNvdzIgVEVTVF9ESVIvdC5xY293
-MiBURVNUX0RJUi90LnFjb3cyLnRhcmdldA0KPiAgIHFlbXUtaW1nOiBDYW5ub3QgZW5hYmxlIGNv
-cHkgb2ZmbG9hZGluZyB3aGVuIC1jIGlzIHVzZWQNCj4gICANCj4gK1Rlc3Rpbmc6IGNvbnZlcnQg
-LUMgLS1zYWx2YWdlIC1PIHFjb3cyIFRFU1RfRElSL3QucWNvdzIgVEVTVF9ESVIvdC5xY293Mi50
-YXJnZXQNCj4gK3FlbXUtaW1nOiBDYW5ub3QgdXNlIGNvcHkgb2ZmbG9hZGluZyBpbiBzYWx2YWdp
-bmcgbW9kZQ0KPiArDQo+ICAgPT09IGFtZW5kOiBPcHRpb25zIHNwZWNpZmllZCBtb3JlIHRoYW4g
-b25jZSA9PT0NCj4gICANCj4gICBUZXN0aW5nOiBhbWVuZCAtZiBmb28gLWYgcWNvdzIgLW8gbGF6
-eV9yZWZjb3VudHM9b24gVEVTVF9ESVIvdC5xY293Mg0KPiANCg0KDQotLSANCkJlc3QgcmVnYXJk
-cywNClZsYWRpbWlyDQo=
+Ok, we can track the bug reported by Dann Frazier in ticket 1805256
+instead.
+
+** Bug watch removed: Red Hat Bugzilla #1524770
+   https://bugzilla.redhat.com/show_bug.cgi?id=3D1524770
+
+-- =
+
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1824053
+
+Title:
+  Qemu-img convert appears to be stuck on aarch64 host with low
+  probability
+
+Status in QEMU:
+  Fix Released
+
+Bug description:
+  Hi,  I found a problem that qemu-img convert appears to be stuck on
+  aarch64 host with low probability.
+
+  The convert command  line is  "qemu-img convert -f qcow2 -O raw
+  disk.qcow2 disk.raw ".
+
+  The bt is below:
+
+  Thread 2 (Thread 0x40000b776e50 (LWP 27215)):
+  #0  0x000040000a3f2994 in sigtimedwait () from /lib64/libc.so.6
+  #1  0x000040000a39c60c in sigwait () from /lib64/libpthread.so.0
+  #2  0x0000aaaaaae82610 in sigwait_compat (opaque=3D0xaaaac5163b00) at uti=
+l/compatfd.c:37
+  #3  0x0000aaaaaae85038 in qemu_thread_start (args=3Dargs@entry=3D0xaaaac5=
+163b90) at util/qemu_thread_posix.c:496
+  #4  0x000040000a3918bc in start_thread () from /lib64/libpthread.so.0
+  #5  0x000040000a492b2c in thread_start () from /lib64/libc.so.6
+
+  Thread 1 (Thread 0x40000b573370 (LWP 27214)):
+  #0  0x000040000a489020 in ppoll () from /lib64/libc.so.6
+  #1  0x0000aaaaaadaefc0 in ppoll (__ss=3D0x0, __timeout=3D0x0, __nfds=3D<o=
+ptimized out>, __fds=3D<optimized out>) at /usr/include/bits/poll2.h:77
+  #2  qemu_poll_ns (fds=3D<optimized out>, nfds=3D<optimized out>, timeout=
+=3D<optimized out>) at qemu_timer.c:391
+  #3  0x0000aaaaaadae014 in os_host_main_loop_wait (timeout=3D<optimized ou=
+t>) at main_loop.c:272
+  #4  0x0000aaaaaadae190 in main_loop_wait (nonblocking=3D<optimized out>) =
+at main_loop.c:534
+  #5  0x0000aaaaaad97be0 in convert_do_copy (s=3D0xffffdc32eb48) at qemu-im=
+g.c:1923
+  #6  0x0000aaaaaada2d70 in img_convert (argc=3D<optimized out>, argv=3D<op=
+timized out>) at qemu-img.c:2414
+  #7  0x0000aaaaaad99ac4 in main (argc=3D7, argv=3D<optimized out>) at qemu=
+-img.c:5305
+
+  =
+
+  The problem seems to be very similar to the phenomenon described by this =
+patch (https://resources.ovirt.org/pub/ovirt-4.1/src/qemu-kvm-ev/0025-aio_n=
+otify-force-main-loop-wakeup-with-SIGIO-aarch64.patch), =
+
+
+  which force main loop wakeup with SIGIO.  But this patch was reverted
+  by the patch (http://ovirt.repo.nfrance.com/src/qemu-kvm-ev/kvm-
+  Revert-aio_notify-force-main-loop-wakeup-with-SIGIO-.patch).
+
+  The problem still seems to exist in aarch64 host. The qemu version I used=
+ is 2.8.1. The host version is 4.19.28-1.2.108.aarch64.
+   Do you have any solutions to fix it?  Thanks for your reply !
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1824053/+subscriptions
