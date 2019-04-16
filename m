@@ -6,68 +6,56 @@ X-Spam-Status: No, score=-6.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1741FC10F13
-	for <qemu-devel@archiver.kernel.org>; Tue, 16 Apr 2019 15:40:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DDF7FC282DA
+	for <qemu-devel@archiver.kernel.org>; Tue, 16 Apr 2019 15:41:23 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D88A4205ED
-	for <qemu-devel@archiver.kernel.org>; Tue, 16 Apr 2019 15:40:20 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D88A4205ED
+	by mail.kernel.org (Postfix) with ESMTPS id AD55720872
+	for <qemu-devel@archiver.kernel.org>; Tue, 16 Apr 2019 15:41:23 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AD55720872
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:38619 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:38661 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hGQC4-0005Eb-5r
-	for qemu-devel@archiver.kernel.org; Tue, 16 Apr 2019 11:40:20 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:41919)
+	id 1hGQD5-00069e-1S
+	for qemu-devel@archiver.kernel.org; Tue, 16 Apr 2019 11:41:23 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:41948)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1hGQAb-0004SY-BJ
-	for qemu-devel@nongnu.org; Tue, 16 Apr 2019 11:38:50 -0400
+	(envelope-from <armbru@redhat.com>) id 1hGQAg-0004Up-1M
+	for qemu-devel@nongnu.org; Tue, 16 Apr 2019 11:38:55 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1hGQAa-0000jv-5T
-	for qemu-devel@nongnu.org; Tue, 16 Apr 2019 11:38:49 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:60226)
+	(envelope-from <armbru@redhat.com>) id 1hGQAf-0000ma-2C
+	for qemu-devel@nongnu.org; Tue, 16 Apr 2019 11:38:54 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:60568)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1hGQAZ-0000jd-Re
-	for qemu-devel@nongnu.org; Tue, 16 Apr 2019 11:38:48 -0400
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
-	[10.5.11.15])
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1hGQAe-0000m6-Qc
+	for qemu-devel@nongnu.org; Tue, 16 Apr 2019 11:38:52 -0400
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+	[10.5.11.14])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 149792D808;
-	Tue, 16 Apr 2019 15:38:47 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id 1A90881F18;
+	Tue, 16 Apr 2019 15:38:52 +0000 (UTC)
 Received: from blackfin.pond.sub.org (ovpn-116-116.ams2.redhat.com
 	[10.36.116.116])
-	by smtp.corp.redhat.com (Postfix) with ESMTPS id B28275D71A;
-	Tue, 16 Apr 2019 15:38:46 +0000 (UTC)
+	by smtp.corp.redhat.com (Postfix) with ESMTPS id D9FB55D9CA;
+	Tue, 16 Apr 2019 15:38:51 +0000 (UTC)
 Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
-	id 463671138648; Tue, 16 Apr 2019 17:38:45 +0200 (CEST)
+	id AF9A61138648; Tue, 16 Apr 2019 17:38:50 +0200 (CEST)
 From: Markus Armbruster <armbru@redhat.com>
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-References: <20190413160732.55505-1-vsementsov@virtuozzo.com>
-	<87zhorbytu.fsf@dusky.pond.sub.org>
-	<3381f703-4fc1-ac3c-658c-f7399403acf9@virtuozzo.com>
-	<874l6za00z.fsf@dusky.pond.sub.org>
-	<e432f8cf-4014-8175-4a56-167a14534528@virtuozzo.com>
-	<87k1fu791j.fsf@dusky.pond.sub.org>
-	<da576bee-8ed5-13d9-7f29-74110d6ccb4b@virtuozzo.com>
-Date: Tue, 16 Apr 2019 17:38:45 +0200
-In-Reply-To: <da576bee-8ed5-13d9-7f29-74110d6ccb4b@virtuozzo.com> (Vladimir
-	Sementsov-Ogievskiy's message of "Tue, 16 Apr 2019 06:38:17 +0000")
-Message-ID: <87a7gq55a2.fsf@dusky.pond.sub.org>
-User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.1 (gnu/linux)
-MIME-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+To: qemu-devel@nongnu.org
+Date: Tue, 16 Apr 2019 17:38:50 +0200
+Message-Id: <20190416153850.5186-1-armbru@redhat.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.30]);
-	Tue, 16 Apr 2019 15:38:47 +0000 (UTC)
+	(mx1.redhat.com [10.5.110.27]);
+	Tue, 16 Apr 2019 15:38:52 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH] util/error: do not free error on
- error_abort
+Subject: [Qemu-devel] [PATCH] error: Fix error_report_err(),
+ warn_report_err() hint printing
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -79,113 +67,85 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+Cc: vsementsov@virtuozzo.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190416153845.ZfG7iCgokTyrppgmatxAxi3JD7ZBglZ98q1YqsabLWQ@z>
+Content-Type: text/plain; charset="UTF-8"
+Message-ID: <20190416153850.wp0MK_BRW8lF2JiqbG_4VcGYJDWhY7G5MigGLwhGMlw@z>
 
-Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com> writes:
+Before the from qerror_report() to error_setg(), hints looked like
+this:
 
-> 16.04.2019 9:34, Markus Armbruster wrote:
->> Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com> writes:
->> 
->>> 15.04.2019 16:08, Markus Armbruster wrote:
->>>> Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com> writes:
->>>>
->>>>> 15.04.2019 8:51, Markus Armbruster wrote:
->>>>>> Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com> writes:
->>>>>>
->>>>>>> It would be nice to have Error object not freed away when debugging a
->>>>>>> coredump.
->>>>>>>
->>>>>>> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
->>>>>>> ---
->>>>>>>     util/error.c | 8 +++++---
->>>>>>>     1 file changed, 5 insertions(+), 3 deletions(-)
->>>>>>>
->>>>>>> diff --git a/util/error.c b/util/error.c
->>>>>>> index 934a78e1b1..f9180c0f30 100644
->>>>>>> --- a/util/error.c
->>>>>>> +++ b/util/error.c
->>>>>>> @@ -32,9 +32,11 @@ Error *error_fatal;
->>>>>>>     static void error_handle_fatal(Error **errp, Error *err)
->>>>>>>     {
->>>>>>>         if (errp == &error_abort) {
->>>>>>> -        fprintf(stderr, "Unexpected error in %s() at %s:%d:\n",
->>>>>>> -                err->func, err->src, err->line);
->>>>>>> -        error_report_err(err);
->>>>>>> +        error_report("Unexpected error in %s() at %s:%d: %s",
->>>>>>> +                     err->func, err->src, err->line, error_get_pretty(err));
->>>>>>> +        if (err->hint) {
->>>>>>> +            error_printf_unless_qmp("%s", err->hint->str);
->>>>>>> +        }
->>>>>>>             abort();
->>>>>>>         }
->>>>>>>         if (errp == &error_fatal) {
->>>>>>
->>>>>> No objections to not freeing the error object on the path to abort().
->>>>>>
->>>>>> You also format the error message differently.  Commit 1e9b65bb1ba's
->>>>>> example
->>>>>>
->>>>>>            Unexpected error in parse_block_error_action() at .../qemu/blockdev.c:322:
->>>>>>            qemu-system-x86_64: -drive if=none,werror=foo: 'foo' invalid write error action
->>>>>>            Aborted (core dumped)
->>>>>>
->>>>>> changes to (guesswork, not tested):
->>>>>>
->>>>>>            qemu-system-x86_64: -drive if=none,werror=foo: Unexpected error in parse_block_error_action() at .../qemu/blockdev.c:322: 'foo' invalid write error action
->>>>>>            Aborted (core dumped)
->>>>>
->>>>> hm. checkpatch don't allow to put \n into error_report. So, should I call error_report twice?
->>>>>
->>>>> Transition from fprintf to error_report is OK for you?
->>>>
->>>> Let's simply not mess with the formatting at all.  Something like:
->>>>
->>>> (1) Inline error_report_err(), delete the error_free()
->>>>
->>>> (2) Optional: replace fprintf() by error_printf()
->>>>
->>>> (3) Optional: clean up the additional copy of
->>>>
->>>>           if (err->hint) {
->>>>               error_printf_unless_qmp("%s", err->hint->str);
->>>>           }
->>>>
->>>> (3a) Either create a helper function, replacing all three copies,
->>>>
->>>> (3b) Or simply delete the new copy from the path leading to abort(),
->>>>        since the hint is unlikely to be useful there.
->>>>
->>>
->>> Why we print error always but hint only "unless_qmp"?
->> 
->> "Hints" are intended for giving hints to a human user (although they are
->> misused for other purposes in places):
->> 
->> /*
->>   * Append a printf-style human-readable explanation to an existing error.
->>   * If the error is later reported to a human user with
->>   * error_report_err() or warn_report_err(), the hints will be shown,
->>   * too.  If it's reported via QMP, the hints will be ignored.
->>   * Intended use is adding helpful hints on the human user interface,
->>   * e.g. a list of valid values.  It's not for clarifying a confusing
->>   * error message.
->>   * @errp may be NULL, but not &error_fatal or &error_abort.
->>   * Trivially the case if you call it only after error_setg() or
->>   * error_propagate().
->>   * May be called multiple times.  The resulting hint should end with a
->>   * newline.
->>   */
->> void error_append_hint(Error **errp, const char *fmt, ...)
->>      GCC_FMT_ATTR(2, 3);
->> 
->
-> Hmm, this means, that in error_report_err checking for qmp monitor is wrong thing,
-> as error_report_err is exactly for human user who will read qemu log and will need
-> maximum information.
+    qerror_report(QERR_MACRO, ... arguments ...);
+    error_printf_unless_qmp(... hint ...);
 
-You're right.  I'll post a patch.
+error_printf_unless_qmp() made perfect sense: it printed exactly when
+qerror_report() did.
+
+After the conversion to error_setg():
+
+    error_setg(errp, QERR_MACRO, ... arguments ...);
+    error_printf_unless_qmp(... hint ...);
+
+The "unless QMP part" still made some sense; in QMP context, the
+caller generally uses the error as QMP response instead of printing
+it.
+
+However, everything else is wrong.  If the caller handles the error,
+the hint gets printed anyway (unless QMP).  If the caller reports the
+error, the hint gets printed *before* the report (unless QMP) or not
+at all (if QMP).
+
+Commit 50b7b000c91 fixed this by making hints a member of Error.  It
+kept printing hints with error_printf_unless_qmp():
+
+     void error_report_err(Error *err)
+     {
+	 error_report("%s", error_get_pretty(err));
+    +    if (err->hint) {
+    +        error_printf_unless_qmp("%s\n", err->hint->str);
+    +    }
+	 error_free(err);
+     }
+
+This is wrong.  We should (and now can) print the hint exactly when we
+print the error.
+
+The mistake has since been copied to warn_report_err().
+
+Fix both to use error_printf().
+
+Reported-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Cc: Eric Blake <eblake@redhat.com>
+Signed-off-by: Markus Armbruster <armbru@redhat.com>
+---
+ util/error.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/util/error.c b/util/error.c
+index 934a78e1b1..712b4d4b5d 100644
+--- a/util/error.c
++++ b/util/error.c
+@@ -223,7 +223,7 @@ void error_report_err(Error *err)
+ {
+     error_report("%s", error_get_pretty(err));
+     if (err->hint) {
+-        error_printf_unless_qmp("%s", err->hint->str);
++        error_printf("%s", err->hint->str);
+     }
+     error_free(err);
+ }
+@@ -232,7 +232,7 @@ void warn_report_err(Error *err)
+ {
+     warn_report("%s", error_get_pretty(err));
+     if (err->hint) {
+-        error_printf_unless_qmp("%s", err->hint->str);
++        error_printf("%s", err->hint->str);
+     }
+     error_free(err);
+ }
+-- 
+2.17.2
+
 
