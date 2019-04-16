@@ -2,82 +2,111 @@ Return-Path: <SRS0=xvb4=SS=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.5 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 81C18C10F13
-	for <qemu-devel@archiver.kernel.org>; Tue, 16 Apr 2019 08:01:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 61F34C10F13
+	for <qemu-devel@archiver.kernel.org>; Tue, 16 Apr 2019 08:02:39 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 45EB3206BA
-	for <qemu-devel@archiver.kernel.org>; Tue, 16 Apr 2019 08:01:11 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="GCV4hUzw"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 45EB3206BA
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	by mail.kernel.org (Postfix) with ESMTPS id 353FE206BA
+	for <qemu-devel@archiver.kernel.org>; Tue, 16 Apr 2019 08:02:39 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 353FE206BA
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:60908 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:60917 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hGJ1i-00023n-CG
-	for qemu-devel@archiver.kernel.org; Tue, 16 Apr 2019 04:01:10 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:51343)
+	id 1hGJ38-0002ud-H3
+	for qemu-devel@archiver.kernel.org; Tue, 16 Apr 2019 04:02:38 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:51538)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <fengyd81@gmail.com>) id 1hGJ0y-0001h3-44
-	for qemu-devel@nongnu.org; Tue, 16 Apr 2019 04:00:25 -0400
+	(envelope-from <david@redhat.com>) id 1hGJ1m-0002Fs-Gx
+	for qemu-devel@nongnu.org; Tue, 16 Apr 2019 04:01:15 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <fengyd81@gmail.com>) id 1hGJ0s-0001zo-Dm
-	for qemu-devel@nongnu.org; Tue, 16 Apr 2019 04:00:24 -0400
-Received: from mail-it1-x135.google.com ([2607:f8b0:4864:20::135]:55386)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <fengyd81@gmail.com>) id 1hGJ0o-0001wA-Tq
-	for qemu-devel@nongnu.org; Tue, 16 Apr 2019 04:00:16 -0400
-Received: by mail-it1-x135.google.com with SMTP id y134so31518854itc.5
-	for <qemu-devel@nongnu.org>; Tue, 16 Apr 2019 01:00:12 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
-	h=mime-version:references:in-reply-to:from:date:message-id:subject:to; 
-	bh=T6Bxgs8V4wEcS8SORC785Avu0Z5WdvarTUDirrj915w=;
-	b=GCV4hUzw8LAdPn4sttoPv9c3YrDzS2bjYVSEFIT5rLFAwD/bbfcKPuHqGXKivCERAE
-	pE7bwnsKpsRGljNhJ648vjKgWJDFBW/5wUsvLyispsXL8/cR5tR0DvkDlRG4VWsdEdOh
-	QY+grbkB1YtaRHQrzBpW1BRf4zS/JVuHiIX5HIfq+FvJLedGMnkY4qiNHIeHGKexQz6T
-	HfKjWb5kcubGW7evY5jLejfmfJRiqwzpXQEa+VAbxUO4c/FthXMTSc3sVVgU2lmpN7k3
-	jHFawaGX4cpihvoC5CxqVE3pGWZOLPgk54sze/2PJgVZyVXrFuy5mTTjlEvoRBxT+X0p
-	5zkQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=1e100.net; s=20161025;
-	h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-	:message-id:subject:to;
-	bh=T6Bxgs8V4wEcS8SORC785Avu0Z5WdvarTUDirrj915w=;
-	b=tF6Hvp4URTtbP6bQQJcRidSajgBFdptTX0RKafutNzANcEDoHHgTVEZIHPA0frzsnW
-	x+BFFAUG0bWGft17ihA5ql7dZ0XLnl+wdJpfI1/VVAM1SBp8M5GBoAsf2iloK0y+HQxE
-	+TG+FtH1H45Kz2kUHeR1kIH3yAACLItW3ZLtAS7UbhR9yjsp9Z7QeqmPtHWHZOeYfqCe
-	/5a7gd5vK9lyeNQRLEIgNGkCOWnM+4r5LAqA89s/Ak5ebo55lhTV7QfiW0vlftcm3ZSW
-	04z7+EaOr5KEu25DAzd4ezSL158+sJZjVxoGIpKV/BRxqbDMUNQqFRsZWss60aWupScR
-	AAmg==
-X-Gm-Message-State: APjAAAW8kwAiPFTYDGeS4zYTJHBy7412IoNTy1YrxE6+1JAUsluo/Z3w
-	dVUNeIGY/6IAH0LDIfrKmLl+4uZeq5G4iHOyif8JLA==
-X-Google-Smtp-Source: APXvYqzRbuEOhrqYsDSj2cigSjM/UccF4gWa7FtOvgidddLmmmzdr0W+THPI5JRRpr3Pycp1ACKkqlReVwwtPQyV3t8=
-X-Received: by 2002:a24:205:: with SMTP id 5mr27056382itu.150.1555401610347;
-	Tue, 16 Apr 2019 01:00:10 -0700 (PDT)
+	(envelope-from <david@redhat.com>) id 1hGJ1k-0002bu-RP
+	for qemu-devel@nongnu.org; Tue, 16 Apr 2019 04:01:14 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:49700)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <david@redhat.com>)
+	id 1hGJ1k-0002YW-Ge; Tue, 16 Apr 2019 04:01:12 -0400
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+	[10.5.11.13])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id E3FAA8665D;
+	Tue, 16 Apr 2019 08:01:07 +0000 (UTC)
+Received: from [10.36.116.179] (ovpn-116-179.ams2.redhat.com [10.36.116.179])
+	by smtp.corp.redhat.com (Postfix) with ESMTP id 9DF9E608C3;
+	Tue, 16 Apr 2019 08:01:06 +0000 (UTC)
+To: Richard Henderson <richard.henderson@linaro.org>, qemu-devel@nongnu.org
+References: <20190411100836.646-1-david@redhat.com>
+	<20190411100836.646-4-david@redhat.com>
+	<50db1745-397d-03e0-626a-12d1b2a2a554@linaro.org>
+From: David Hildenbrand <david@redhat.com>
+Openpgp: preference=signencrypt
+Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
+	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
+	SE+xAvmumFBY
+Organization: Red Hat GmbH
+Message-ID: <0fdae81c-eecb-90cd-26f8-b52964d375a3@redhat.com>
+Date: Tue, 16 Apr 2019 10:01:05 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+	Thunderbird/60.6.1
 MIME-Version: 1.0
-References: <CACnvu8YKqaZA7XSD41=SQrUL7h9YafJMgKPe5cJZd3XZ3zrSNw@mail.gmail.com>
-	<20190415145358.GA2893@work-vm>
-	<CACnvu8a5DjAUhfAGmi6GtpD1V2hfoNLTkKEgbsFuL_6GrRc+pg@mail.gmail.com>
-In-Reply-To: <CACnvu8a5DjAUhfAGmi6GtpD1V2hfoNLTkKEgbsFuL_6GrRc+pg@mail.gmail.com>
-From: fengyd <fengyd81@gmail.com>
-Date: Tue, 16 Apr 2019 15:59:58 +0800
-Message-ID:
- <CACnvu8Y9Ub5PAOt18ukzvOoDxmfzwvygWWwOZaT5Q2Eig6YFTw@mail.gmail.com>
-To: qemu-devel@nongnu.org
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
-	recognized.
-X-Received-From: 2607:f8b0:4864:20::135
+In-Reply-To: <50db1745-397d-03e0-626a-12d1b2a2a554@linaro.org>
 Content-Type: text/plain; charset="UTF-8"
-X-Content-Filtered-By: Mailman/MimeDel 2.1.21
-Subject: [Qemu-devel] Fwd:  How live migration work for vhost-user
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+	(mx1.redhat.com [10.5.110.26]);
+	Tue, 16 Apr 2019 08:01:08 +0000 (UTC)
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 209.132.183.28
+Subject: Re: [Qemu-devel] [PATCH v1 03/41] s390x/tcg: Implement VECTOR ADD
+ COMPUTE CARRY
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -89,81 +118,62 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: qemu-s390x@nongnu.org, Cornelia Huck <cohuck@redhat.com>,
+	Thomas Huth <thuth@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190416075958.zZP2cP4xfuvFVvwOWuCtU67N6Y_IudQYLaFeGgrE44Q@z>
+Message-ID: <20190416080105.vRXjMGvFeIUK3cUPV-uZQWXyhZPFkmjvTVeuYrBhtBk@z>
 
----------- Forwarded message ---------
-From: fengyd <fengyd81@gmail.com>
-Date: Tue, 16 Apr 2019 at 09:17
-Subject: Re: [Qemu-devel] How live migration work for vhost-user
-To: Dr. David Alan Gilbert <dgilbert@redhat.com>
+On 12.04.19 23:05, Richard Henderson wrote:
+> On 4/11/19 12:07 AM, David Hildenbrand wrote:
+>> +    static const GVecGen3 g[5] = {
+>> +        { .fni8 = gen_acc8_i64, },
+>> +        { .fni8 = gen_acc16_i64, },
+>> +        { .fni8 = gen_acc32_i64, },
+>> +        { .fni8 = gen_acc_i64, },
+>> +        { .fno = gen_helper_gvec_vacc128, },
+>> +    };
+> 
+> Vector versions of the first four are fairly simple too.
+> 
+> static void gen_acc_vec(unsigned vece, TCGv_vec d, TCGv_vec a, TCGv_vec b)
+> {
+>     tcgv_vec t = tcg_temp_new_vec_matching(d);
+> 
+>     tcg_gen_add_vec(vece, t, a, b);
+>     tcg_gen_cmp_vec(TCG_COND_LTU, vece, d, r, a);  /* produces -1 for carry */
+>     tcg_gen_neg_vec(vece, d, d);                 /* convert to +1 for carry */
+> }
+> 
+>   { .fni8 = gen_acc8_i64,
+>     .fniv = gen_acc_vec,
+>     .opc = INDEX_op_cmp_vec,
+>     .vece = MO_8 },
+>   ...
+> 
 
+Indeed, I didn't really explore vector operations yet. This is more
+compact than I expected :)
 
-Hi,
+> 
+> I'm surprised that you're expanding the 128-bit addition out-of-line.
+> One possible expansion is
+> 
+>   tcg_gen_add2_i64(tl, th, al, zero, bl, zero);
+>   tcg_gen_add2_i64(tl, th, th, zero, ah, zero);
+>   tcg_gen_add2_i64(tl, th, tl, th, bl, zero);
+>   /* carry out in th */
 
-Any special feature needs to be supported on guest driver?
-Because it's OK for standard Linux VM, but not OK for our VM where virtio
-is  implemented by ourself.
+Nice trick. Just so I get it right, the third line should actually be
 
-And with qemu-kvm-ev-2.6, live migration can work with our VM where virtio
-is  implemented by ourself.
+tcg_gen_add2_i64(tl, th, tl, th, bh, zero);
 
-Thanks
-Yafeng
+right? Thanks!
 
-On Mon, 15 Apr 2019 at 22:54, Dr. David Alan Gilbert <dgilbert@redhat.com>
-wrote:
+-- 
 
-> * fengyd (fengyd81@gmail.com) wrote:
-> > Hi,
-> >
-> > During live migration,  the folloing log can see in nova-compute.log in
-> my
-> > environment:
-> >  ERROR nova.virt.libvirt.driver [req-039a85e1-e7a1-4a63-bc6d-c4b9a044aab6
-> > 0cdab20dc79f4bc6ae5790e7b4a898ac 3363c319773549178acc67f32c78310e -
-> default
-> > default] [instance: 5ec719f4-1865-4afe-a207-3d9fae22c410] Live Migration
-> > failure: internal error: qemu unexpectedly closed the monitor:
-> > 2019-04-15T02:58:22.213897Z qemu-kvm: VQ 0
-> > size 0x100 < last_avail_idx 0x1e - used_idx 0x23
-> >
-> > It's OK for standard Linux VM, but not OK for our VM where virtio is
-> > implemented by ourself.
-> > KVM version as follow:
-> > qemu-kvm-common-ev-2.12.0-18.el7_6.3.1.x86_64
-> > qemu-kvm-ev-2.12.0-18.el7_6.3.1.x86_64
-> > libvirt-daemon-kvm-3.9.0-14.2.el7.centos.ncir.8.x86_64
-> >
-> > Do you know what's the difference between virtio and vhost-user during
-> > migration?
-> > The function virtio_load in Qemu is called for virtio and vhost-user
-> during
-> > migration.
-> > For virtio,  last_avail_idx  and used_idx are stored in Qemu, Qemu is
-> > responsible for updating their values accordingly
-> > For vhost-user, last_avail_idx  and used_idx are stored in vhost-user
-> app,
-> > eg. DPDK, not in Qemu?
-> > How does migration work for vhost-user?
->
-> I don't know the details, but my understanding is that vhost-user
-> tells the vhost-user client about an area of 'log' memory, where the
-> vhost-user client must mark pages as dirty.
->
-> In the qemu source, see docs/interop/vhost-user.txt and see
-> the VHOST_SET_LOG_BASE and VHOST_USER_SET_LOG_FD calls.
->
-> If the client correctly marks the areas as dirty, then qemu
-> should resend those pages across.
->
->
-> Dave
->
-> > Thanks in advance
-> > Yafeng
-> --
-> Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
->
+Thanks,
+
+David / dhildenb
+
