@@ -1,19 +1,27 @@
-Received: from eggs.gnu.org ([209.51.188.92]:44088)
+Received: from eggs.gnu.org ([209.51.188.92]:45367)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <andrew.smirnov@gmail.com>) id 1hGD4W-0006XX-1i
-	for qemu-devel@nongnu.org; Mon, 15 Apr 2019 21:39:41 -0400
+	(envelope-from <catherine.hecx@gmail.com>) id 1hGDBZ-0002NK-Jj
+	for qemu-devel@nongnu.org; Mon, 15 Apr 2019 21:46:59 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <andrew.smirnov@gmail.com>) id 1hGD4V-0007qx-1d
-	for qemu-devel@nongnu.org; Mon, 15 Apr 2019 21:39:40 -0400
-From: Andrey Smirnov <andrew.smirnov@gmail.com>
-Date: Mon, 15 Apr 2019 18:39:02 -0700
-Message-Id: <20190416013902.4941-6-andrew.smirnov@gmail.com>
-In-Reply-To: <20190416013902.4941-1-andrew.smirnov@gmail.com>
-References: <20190416013902.4941-1-andrew.smirnov@gmail.com>
+	(envelope-from <catherine.hecx@gmail.com>) id 1hGDBY-0003rR-Fv
+	for qemu-devel@nongnu.org; Mon, 15 Apr 2019 21:46:57 -0400
+Received: from mail-ot1-x344.google.com ([2607:f8b0:4864:20::344]:39067)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <catherine.hecx@gmail.com>)
+	id 1hGDBY-0003r1-6Q
+	for qemu-devel@nongnu.org; Mon, 15 Apr 2019 21:46:56 -0400
+Received: by mail-ot1-x344.google.com with SMTP id f10so16234917otb.6
+	for <qemu-devel@nongnu.org>; Mon, 15 Apr 2019 18:46:55 -0700 (PDT)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH 5/5] i.mx7d: pci: Update PCI IRQ mapping to
- match HW
+References: <1554688616-18583-1-git-send-email-catherine.hecx@gmail.com>
+	<1554712933-18682-1-git-send-email-catherine.hecx@gmail.com>
+In-Reply-To: <1554712933-18682-1-git-send-email-catherine.hecx@gmail.com>
+From: Catherine Ho <catherine.hecx@gmail.com>
+Date: Tue, 16 Apr 2019 09:46:40 +0800
+Message-ID: <CAEn6zmE-QJh260_Se7ygQdWyQ_jObViJ5173ErU3Z+ECF2=9YQ@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH v4] migration: do not rom_reset() during
+ incoming migration
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,79 +30,71 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-arm@nongnu.org
-Cc: Andrey Smirnov <andrew.smirnov@gmail.com>, Peter Maydell <peter.maydell@linaro.org>, "Michael S . Tsirkin" <mst@redhat.com>, qemu-devel@nongnu.org
+To: Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Cc: Markus Armbruster <armbru@redhat.com>, Juan Quintela <quintela@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>, Peter Xu <peterx@redhat.com>
 
-Datasheet for i.MX7 is incorrect and i.MX7's PCI IRQ mapping matches
-that of i.MX6:
+Ping, thanks
 
-    * INTD/MSI    122
-    * INTC        123
-    * INTB        124
-    * INTA        125
+B.R.
+Catherine
 
-Fix all of the relevant code to reflect that fact. Needed by latest
-Linux kernels.
+On Mon, 8 Apr 2019 at 16:43, Catherine Ho <catherine.hecx@gmail.com> wrote:
 
-Signed-off-by: Andrey Smirnov <andrew.smirnov@gmail.com>
-Cc: Peter Maydell <peter.maydell@linaro.org>
-Cc: Michael S. Tsirkin <mst@redhat.com>
-Cc: qemu-devel@nongnu.org
-Cc: qemu-arm@nongnu.org
----
- include/hw/arm/fsl-imx7.h | 8 ++++----
- hw/pci-host/designware.c  | 6 ++++--
- 2 files changed, 8 insertions(+), 6 deletions(-)
-
-diff --git a/include/hw/arm/fsl-imx7.h b/include/hw/arm/fsl-imx7.h
-index 3efa697adc..9750003a4f 100644
---- a/include/hw/arm/fsl-imx7.h
-+++ b/include/hw/arm/fsl-imx7.h
-@@ -213,10 +213,10 @@ enum FslIMX7IRQs {
-     FSL_IMX7_USB2_IRQ     = 42,
-     FSL_IMX7_USB3_IRQ     = 40,
- 
--    FSL_IMX7_PCI_INTA_IRQ = 122,
--    FSL_IMX7_PCI_INTB_IRQ = 123,
--    FSL_IMX7_PCI_INTC_IRQ = 124,
--    FSL_IMX7_PCI_INTD_IRQ = 125,
-+    FSL_IMX7_PCI_INTA_IRQ = 125,
-+    FSL_IMX7_PCI_INTB_IRQ = 124,
-+    FSL_IMX7_PCI_INTC_IRQ = 123,
-+    FSL_IMX7_PCI_INTD_IRQ = 122,
- 
-     FSL_IMX7_UART7_IRQ    = 126,
- 
-diff --git a/hw/pci-host/designware.c b/hw/pci-host/designware.c
-index e80facc4a0..f4c58b25c1 100644
---- a/hw/pci-host/designware.c
-+++ b/hw/pci-host/designware.c
-@@ -50,6 +50,8 @@
- #define DESIGNWARE_PCIE_ATU_DEVFN(x)               (((x) >> 16) & 0xff)
- #define DESIGNWARE_PCIE_ATU_UPPER_TARGET           0x91C
- 
-+#define DESIGNWARE_PCIE_IRQ_MSI                    3
-+
- static DesignwarePCIEHost *
- designware_pcie_root_to_host(DesignwarePCIERoot *root)
- {
-@@ -66,7 +68,7 @@ static void designware_pcie_root_msi_write(void *opaque, hwaddr addr,
-     root->msi.intr[0].status |= BIT(val) & root->msi.intr[0].enable;
- 
-     if (root->msi.intr[0].status & ~root->msi.intr[0].mask) {
--        qemu_set_irq(host->pci.irqs[0], 1);
-+        qemu_set_irq(host->pci.irqs[DESIGNWARE_PCIE_IRQ_MSI], 1);
-     }
- }
- 
-@@ -310,7 +312,7 @@ static void designware_pcie_root_config_write(PCIDevice *d, uint32_t address,
-     case DESIGNWARE_PCIE_MSI_INTR0_STATUS:
-         root->msi.intr[0].status ^= val;
-         if (!root->msi.intr[0].status) {
--            qemu_set_irq(host->pci.irqs[0], 0);
-+            qemu_set_irq(host->pci.irqs[DESIGNWARE_PCIE_IRQ_MSI], 0);
-         }
-         break;
- 
--- 
-2.20.1
+> Commit 18269069c310 ("migration: Introduce ignore-shared capability")
+> addes ignore-shared capability to bypass the shared ramblock (e,g,
+> membackend + numa node). It does good to live migration.
+>
+> As told by Yury,this commit expectes that QEMU doesn't write to guest RAM
+> until VM starts, but it does on aarch64 qemu:
+> Backtrace:
+> 1  0x000055f4a296dd84 in address_space_write_rom_internal () at
+> exec.c:3458
+> 2  0x000055f4a296de3a in address_space_write_rom () at exec.c:3479
+> 3  0x000055f4a2d519ff in rom_reset () at hw/core/loader.c:1101
+> 4  0x000055f4a2d475ec in qemu_devices_reset () at hw/core/reset.c:69
+> 5  0x000055f4a2c90a28 in qemu_system_reset () at vl.c:1675
+> 6  0x000055f4a2c9851d in main () at vl.c:4552
+>
+> Actually, on arm64 virt marchine, ramblock "dtb" will be filled into ram
+> druing rom_reset. In ignore-shared incoming case, this rom filling
+> is not required since all the data has been stored in memory backend
+> file.
+>
+> Further more, as suggested by Peter Xu, if we do rom_reset() now with
+> these ROMs then the RAM data should be re-filled again too with the
+> migration stream coming in.
+>
+> Fixes: commit 18269069c310 ("migration: Introduce ignore-shared
+> capability")
+> Suggested-by: Yury Kotov <yury-kotov@yandex-team.ru>
+> Suggested-by: Peter Xu <peterx@redhat.com>
+> Signed-off-by: Catherine Ho <catherine.hecx@gmail.com>
+> ---
+>  hw/core/loader.c | 9 +++++++++
+>  1 file changed, 9 insertions(+)
+>
+> diff --git a/hw/core/loader.c b/hw/core/loader.c
+> index fe5cb24122..040109464b 100644
+> --- a/hw/core/loader.c
+> +++ b/hw/core/loader.c
+> @@ -1087,6 +1087,15 @@ static void rom_reset(void *unused)
+>  {
+>      Rom *rom;
+>
+> +    /*
+> +     * We don't need to fill in the RAM with ROM data because we'll fill
+> +     * the data in during the next incoming migration in all cases.  Note
+> +     * that some of those RAMs can actually be modified by the guest on
+> ARM
+> +     * so this is probably the only right thing to do here.
+> +     */
+> +    if (runstate_check(RUN_STATE_INMIGRATE))
+> +        return;
+> +
+>      QTAILQ_FOREACH(rom, &roms, next) {
+>          if (rom->fw_file) {
+>              continue;
+> --
+> 2.17.1
+>
+>
