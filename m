@@ -2,79 +2,111 @@ Return-Path: <SRS0=xvb4=SS=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.7 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,MAILING_LIST_MULTI,
-	SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 91A60C10F13
-	for <qemu-devel@archiver.kernel.org>; Tue, 16 Apr 2019 09:39:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 32463C10F13
+	for <qemu-devel@archiver.kernel.org>; Tue, 16 Apr 2019 09:46:05 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 55FC420652
-	for <qemu-devel@archiver.kernel.org>; Tue, 16 Apr 2019 09:39:45 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="hYLR8ujE"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 55FC420652
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id 0291220684
+	for <qemu-devel@archiver.kernel.org>; Tue, 16 Apr 2019 09:46:04 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0291220684
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:33876 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:33971 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hGKZ6-0007SY-Gh
-	for qemu-devel@archiver.kernel.org; Tue, 16 Apr 2019 05:39:44 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:49701)
+	id 1hGKfE-0000UC-7f
+	for qemu-devel@archiver.kernel.org; Tue, 16 Apr 2019 05:46:04 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:51254)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1hGKYI-00079I-Nb
-	for qemu-devel@nongnu.org; Tue, 16 Apr 2019 05:38:55 -0400
+	(envelope-from <david@redhat.com>) id 1hGKeR-0008V8-WC
+	for qemu-devel@nongnu.org; Tue, 16 Apr 2019 05:45:16 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1hGKYH-0003DE-Qc
-	for qemu-devel@nongnu.org; Tue, 16 Apr 2019 05:38:54 -0400
-Received: from mail-oi1-x244.google.com ([2607:f8b0:4864:20::244]:35319)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1hGKYH-0003Ck-JC
-	for qemu-devel@nongnu.org; Tue, 16 Apr 2019 05:38:53 -0400
-Received: by mail-oi1-x244.google.com with SMTP id j132so16399075oib.2
-	for <qemu-devel@nongnu.org>; Tue, 16 Apr 2019 02:38:51 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
-	h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-	:cc; bh=Da64giMSswQc3+eRqPUWfjQL/4dsVUHVzHxC0cXdJ8I=;
-	b=hYLR8ujEXi/kGlPwoxX6fm116vbVDk+uO/IhbBP7ki43Nr9OL9Pei3rMFXC39esPbh
-	lF39NbPPKhv/rPXobyIXq6hyFI61k0rhQSpvnQh5Mt/Y8Y4jMOcPs5WgETGW740KN1js
-	HDU0t6ojT+Mj1yIUP2D3/sZ9EtJlOK6+mSxcLmwT8ANxh21R/4s9nPyj50e969WethbF
-	5BkkG3qjBZKwrp30Fbqz5eN0N24chZyplmSVqHMz6nZ6TJeJeNZMaU2cRZ4gDPIE/sb4
-	875RNTZ98R6aIPUcmJsGlnMbXL0ANEZzQDGjgwawjlIDyxoi4/RR7wTlpuAa+Vz26gDT
-	VaBA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=1e100.net; s=20161025;
-	h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-	:message-id:subject:to:cc;
-	bh=Da64giMSswQc3+eRqPUWfjQL/4dsVUHVzHxC0cXdJ8I=;
-	b=iKwN9tJK8cibD18VV3t8fpiSU2c67hgIsB1R308Xvinn3eppHHXbHrZncWgb+nOSH/
-	G7DY/ZUA0DX3V0ND4H8I05tIK16O60oz9/wEtpnNg/VKUMv2zoRm+IKDNLPTp00knwW0
-	RqVjBNHAuvfo6zdkhDjVHE3yNmC/KEfDI+geF5VSFsz95ujzk8g1dhtaPhHpuEHVZD/G
-	4NzWv/LtwHzvECNVxwTHIUd3BiPJb+pAVvU18zHsiZlXAo0c8pnUXxOTnuePK2UIXj67
-	H81WWBzoEanxAqYI7M2+PzEjZ18dVN0K0oU8gGMMa6PF5LlU8mQ0LclTKDX2FtLruJVB
-	rwCA==
-X-Gm-Message-State: APjAAAXxaZcP+kQbgP8jNpYCN+1116aHh2VrJDOmRVHp+JdZ8ZY7+xwW
-	YlLUzoJbnm3bITDhuifKrgS4XiWCQp5ZnkmA8VDkDA==
-X-Google-Smtp-Source: APXvYqzOKCw2VmsC0GvHu6t94jjGtgbseeB7xbK0POvAMfXLcpl49rakGCy+RCE0FdmgNJqvWNhBjbUbMAdA7uBqPHI=
-X-Received: by 2002:aca:b3c2:: with SMTP id c185mr23372904oif.98.1555407530027;
-	Tue, 16 Apr 2019 02:38:50 -0700 (PDT)
+	(envelope-from <david@redhat.com>) id 1hGKeQ-0006BX-Va
+	for qemu-devel@nongnu.org; Tue, 16 Apr 2019 05:45:15 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:41220)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <david@redhat.com>)
+	id 1hGKeQ-0006Al-GP; Tue, 16 Apr 2019 05:45:14 -0400
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+	[10.5.11.16])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 6EFD983F3D;
+	Tue, 16 Apr 2019 09:45:13 +0000 (UTC)
+Received: from [10.36.116.179] (ovpn-116-179.ams2.redhat.com [10.36.116.179])
+	by smtp.corp.redhat.com (Postfix) with ESMTP id 05FD25C220;
+	Tue, 16 Apr 2019 09:45:09 +0000 (UTC)
+To: Richard Henderson <richard.henderson@linaro.org>, qemu-devel@nongnu.org
+References: <20190411100836.646-1-david@redhat.com>
+	<20190411100836.646-32-david@redhat.com>
+	<6594280f-cefb-cfb0-35b4-fcf53c32d871@linaro.org>
+From: David Hildenbrand <david@redhat.com>
+Openpgp: preference=signencrypt
+Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
+	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
+	SE+xAvmumFBY
+Organization: Red Hat GmbH
+Message-ID: <129e5499-a05c-15f1-fe26-6ae0a78cfa7b@redhat.com>
+Date: Tue, 16 Apr 2019 11:45:09 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+	Thunderbird/60.6.1
 MIME-Version: 1.0
-References: <20190415180618.1450-1-samuel.thibault@ens-lyon.org>
-In-Reply-To: <20190415180618.1450-1-samuel.thibault@ens-lyon.org>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 16 Apr 2019 10:38:38 +0100
-Message-ID:
- <CAFEAcA9z-ELZJ+WunWYwprzMOpC7WPxPiwNjdtFoNxL+LE=jQQ@mail.gmail.com>
-To: Samuel Thibault <samuel.thibault@ens-lyon.org>
+In-Reply-To: <6594280f-cefb-cfb0-35b4-fcf53c32d871@linaro.org>
 Content-Type: text/plain; charset="UTF-8"
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
-	recognized.
-X-Received-From: 2607:f8b0:4864:20::244
-Subject: Re: [Qemu-devel] [PULL 0/1] slirp gcc9 build fix
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+	(mx1.redhat.com [10.5.110.27]);
+	Tue, 16 Apr 2019 09:45:13 +0000 (UTC)
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 209.132.183.28
+Subject: Re: [Qemu-devel] [PATCH v1 31/41] s390x/tcg: Implement VECTOR SHIFT
+ LEFT DOUBLE BY BYTE
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -86,47 +118,61 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Jan Kiszka <jan.kiszka@siemens.com>,
-	QEMU Developers <qemu-devel@nongnu.org>,
-	Stefan Hajnoczi <stefanha@redhat.com>
+Cc: qemu-s390x@nongnu.org, Cornelia Huck <cohuck@redhat.com>,
+	Thomas Huth <thuth@redhat.com>, Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190416093838.ojwUsR-Xo5pEl1TLA9wI148t3JisL24pwN2zC2oAnIg@z>
+Message-ID: <20190416094509.FGl3Jo3TflJRDYtpUOdHhTHcmA00NF0pB2eat2bp_C0@z>
 
-On Mon, 15 Apr 2019 at 19:06, Samuel Thibault
-<samuel.thibault@ens-lyon.org> wrote:
->
-> The following changes since commit afccfc0c4c6134a7bc9da6375996b3b91d291de4:
->
->   Merge remote-tracking branch 'remotes/kevin/tags/for-upstream' into staging (2019-04-12 17:06:49 +0100)
->
-> are available in the Git repository at:
->
->   https://people.debian.org/~sthibault/qemu.git tags/samuel-thibault
->
-> for you to fetch changes up to 6fabae61a9393fd2bc703837e464b9c34ec5ef25:
->
->   slirp: Gcc 9 -O3 fix (2019-04-15 20:01:18 +0200)
->
-> ----------------------------------------------------------------
-> Slirp updates
->
-> Dr. David Alan Gilbert (1):
->   slirp: Gcc 9 -O3 fix
->
-> ----------------------------------------------------------------
-> Dr. David Alan Gilbert (1):
->       slirp: Gcc 9 -O3 fix
->
->  slirp/src/socket.c | 5 ++++-
->  1 file changed, 4 insertions(+), 1 deletion(-)
+On 13.04.19 02:54, Richard Henderson wrote:
+> On 4/11/19 12:08 AM, David Hildenbrand wrote:
+>> +static DisasJumpType op_vsldb(DisasContext *s, DisasOps *o)
+>> +{
+>> +    int src_idx = get_field(s->fields, i4) & 0xf;
+>> +
+>> +    if (src_idx == 0) {
+>> +        gen_gvec_mov(get_field(s->fields, v1), get_field(s->fields, v2));
+>> +    } else {
+>> +        gen_gvec_3_ool(get_field(s->fields, v1), get_field(s->fields, v2),
+>> +                       get_field(s->fields, v3), src_idx,
+>> +                       gen_helper_gvec_vsldb);
+>> +        return DISAS_NEXT;
+> 
+> You could also expand this inline using your new extract2 primitive.
+> 
+>   int i4 = get_field(s->fields, i4);
+>   int left_shift, right_shift;
+> 
+>   left_shift = (i4 & 7) * 8;
+>   right_shift = 64 - left_shift;
+> 
+>   if ((i4 & 8) == 0) {
+>       read_vec_element_i64(t0, get_field(s->fields, v2), 0, ES_64);
+>       read_vec_element_i64(t1, get_field(s->fields, v2), 1, ES_64);
+>       read_vec_element_i64(t2, get_field(s->fields, v3), 0, ES_64);
+>   } else {
+>       read_vec_element_i64(t0, get_field(s->fields, v2), 1, ES_64);
+>       read_vec_element_i64(t1, get_field(s->fields, v3), 0, ES_64);
+>       read_vec_element_i64(t2, get_field(s->fields, v3), 1, ES_64);
+>   }
+>   tcg_gen_extract2_i64(t0, t1, t0, right_shift);
+>   tcg_gen_extract2_i64(t1, t2, t1, right_shift);
+
+Trying to understand the magic, left_shift is really only used to to
+calculate right_shift, right?
+
+>   write_vec_element_i64(t0, get_field(s->fields, v1), 0, ES_64);
+>   write_vec_element_i64(t1, get_field(s->fields, v1), 1, ES_64);
+> 
+> 
+> r~
+> 
 
 
-Applied, thanks.
+-- 
 
-Please update the changelog at https://wiki.qemu.org/ChangeLog/4.0
-for any user-visible changes.
+Thanks,
 
--- PMM
+David / dhildenb
 
