@@ -2,62 +2,112 @@ Return-Path: <SRS0=xvb4=SS=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS autolearn=ham
+X-Spam-Status: No, score=-3.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A13CAC10F13
-	for <qemu-devel@archiver.kernel.org>; Tue, 16 Apr 2019 09:18:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 117EEC10F13
+	for <qemu-devel@archiver.kernel.org>; Tue, 16 Apr 2019 09:20:18 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 710E820675
-	for <qemu-devel@archiver.kernel.org>; Tue, 16 Apr 2019 09:18:46 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 710E820675
+	by mail.kernel.org (Postfix) with ESMTPS id C2BD720675
+	for <qemu-devel@archiver.kernel.org>; Tue, 16 Apr 2019 09:20:11 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C2BD720675
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:33622 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:33641 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hGKEn-000898-It
-	for qemu-devel@archiver.kernel.org; Tue, 16 Apr 2019 05:18:45 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:44171)
+	id 1hGKG6-0000bX-P0
+	for qemu-devel@archiver.kernel.org; Tue, 16 Apr 2019 05:20:06 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:45016)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1hGKAC-0004Tk-S8
-	for qemu-devel@nongnu.org; Tue, 16 Apr 2019 05:14:05 -0400
+	(envelope-from <david@redhat.com>) id 1hGKCx-00070B-JS
+	for qemu-devel@nongnu.org; Tue, 16 Apr 2019 05:16:54 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1hGKAB-0004Xd-OW
-	for qemu-devel@nongnu.org; Tue, 16 Apr 2019 05:14:00 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:55342)
+	(envelope-from <david@redhat.com>) id 1hGKCw-00066G-7b
+	for qemu-devel@nongnu.org; Tue, 16 Apr 2019 05:16:51 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:49268)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>)
-	id 1hGKA6-0004T9-MA; Tue, 16 Apr 2019 05:13:54 -0400
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
-	[10.5.11.14])
+	(Exim 4.71) (envelope-from <david@redhat.com>)
+	id 1hGKCv-00060m-J2; Tue, 16 Apr 2019 05:16:49 -0400
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+	[10.5.11.16])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id D47F380F79;
-	Tue, 16 Apr 2019 09:13:53 +0000 (UTC)
-Received: from blackfin.pond.sub.org (ovpn-116-116.ams2.redhat.com
-	[10.36.116.116])
-	by smtp.corp.redhat.com (Postfix) with ESMTPS id 922745D9CA;
-	Tue, 16 Apr 2019 09:13:49 +0000 (UTC)
-Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
-	id 1B4511132BD3; Tue, 16 Apr 2019 11:13:48 +0200 (CEST)
-From: Markus Armbruster <armbru@redhat.com>
-To: qemu-devel@nongnu.org
-Date: Tue, 16 Apr 2019 11:13:47 +0200
-Message-Id: <20190416091348.26075-3-armbru@redhat.com>
-In-Reply-To: <20190416091348.26075-1-armbru@redhat.com>
-References: <20190416091348.26075-1-armbru@redhat.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+	by mx1.redhat.com (Postfix) with ESMTPS id 52D61307D864;
+	Tue, 16 Apr 2019 09:16:45 +0000 (UTC)
+Received: from [10.36.116.179] (ovpn-116-179.ams2.redhat.com [10.36.116.179])
+	by smtp.corp.redhat.com (Postfix) with ESMTP id EE82B5C1B4;
+	Tue, 16 Apr 2019 09:16:43 +0000 (UTC)
+To: Richard Henderson <richard.henderson@linaro.org>, qemu-devel@nongnu.org
+References: <20190411100836.646-1-david@redhat.com>
+	<20190411100836.646-18-david@redhat.com>
+	<baebe333-5e28-9fd3-adef-7027c166a599@linaro.org>
+From: David Hildenbrand <david@redhat.com>
+Openpgp: preference=signencrypt
+Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
+	xsFNBFXLn5EBEAC+zYvAFJxCBY9Tr1xZgcESmxVNI/0ffzE/ZQOiHJl6mGkmA1R7/uUpiCjJ
+	dBrn+lhhOYjjNefFQou6478faXE6o2AhmebqT4KiQoUQFV4R7y1KMEKoSyy8hQaK1umALTdL
+	QZLQMzNE74ap+GDK0wnacPQFpcG1AE9RMq3aeErY5tujekBS32jfC/7AnH7I0v1v1TbbK3Gp
+	XNeiN4QroO+5qaSr0ID2sz5jtBLRb15RMre27E1ImpaIv2Jw8NJgW0k/D1RyKCwaTsgRdwuK
+	Kx/Y91XuSBdz0uOyU/S8kM1+ag0wvsGlpBVxRR/xw/E8M7TEwuCZQArqqTCmkG6HGcXFT0V9
+	PXFNNgV5jXMQRwU0O/ztJIQqsE5LsUomE//bLwzj9IVsaQpKDqW6TAPjcdBDPLHvriq7kGjt
+	WhVhdl0qEYB8lkBEU7V2Yb+SYhmhpDrti9Fq1EsmhiHSkxJcGREoMK/63r9WLZYI3+4W2rAc
+	UucZa4OT27U5ZISjNg3Ev0rxU5UH2/pT4wJCfxwocmqaRr6UYmrtZmND89X0KigoFD/XSeVv
+	jwBRNjPAubK9/k5NoRrYqztM9W6sJqrH8+UWZ1Idd/DdmogJh0gNC0+N42Za9yBRURfIdKSb
+	B3JfpUqcWwE7vUaYrHG1nw54pLUoPG6sAA7Mehl3nd4pZUALHwARAQABzSREYXZpZCBIaWxk
+	ZW5icmFuZCA8ZGF2aWRAcmVkaGF0LmNvbT7CwX4EEwECACgFAljj9eoCGwMFCQlmAYAGCwkI
+	BwMCBhUIAgkKCwQWAgMBAh4BAheAAAoJEE3eEPcA/4Na5IIP/3T/FIQMxIfNzZshIq687qgG
+	8UbspuE/YSUDdv7r5szYTK6KPTlqN8NAcSfheywbuYD9A4ZeSBWD3/NAVUdrCaRP2IvFyELj
+	xoMvfJccbq45BxzgEspg/bVahNbyuBpLBVjVWwRtFCUEXkyazksSv8pdTMAs9IucChvFmmq3
+	jJ2vlaz9lYt/lxN246fIVceckPMiUveimngvXZw21VOAhfQ+/sofXF8JCFv2mFcBDoa7eYob
+	s0FLpmqFaeNRHAlzMWgSsP80qx5nWWEvRLdKWi533N2vC/EyunN3HcBwVrXH4hxRBMco3jvM
+	m8VKLKao9wKj82qSivUnkPIwsAGNPdFoPbgghCQiBjBe6A75Z2xHFrzo7t1jg7nQfIyNC7ez
+	MZBJ59sqA9EDMEJPlLNIeJmqslXPjmMFnE7Mby/+335WJYDulsRybN+W5rLT5aMvhC6x6POK
+	z55fMNKrMASCzBJum2Fwjf/VnuGRYkhKCqqZ8gJ3OvmR50tInDV2jZ1DQgc3i550T5JDpToh
+	dPBxZocIhzg+MBSRDXcJmHOx/7nQm3iQ6iLuwmXsRC6f5FbFefk9EjuTKcLMvBsEx+2DEx0E
+	UnmJ4hVg7u1PQ+2Oy+Lh/opK/BDiqlQ8Pz2jiXv5xkECvr/3Sv59hlOCZMOaiLTTjtOIU7Tq
+	7ut6OL64oAq+zsFNBFXLn5EBEADn1959INH2cwYJv0tsxf5MUCghCj/CA/lc/LMthqQ773ga
+	uB9mN+F1rE9cyyXb6jyOGn+GUjMbnq1o121Vm0+neKHUCBtHyseBfDXHA6m4B3mUTWo13nid
+	0e4AM71r0DS8+KYh6zvweLX/LL5kQS9GQeT+QNroXcC1NzWbitts6TZ+IrPOwT1hfB4WNC+X
+	2n4AzDqp3+ILiVST2DT4VBc11Gz6jijpC/KI5Al8ZDhRwG47LUiuQmt3yqrmN63V9wzaPhC+
+	xbwIsNZlLUvuRnmBPkTJwwrFRZvwu5GPHNndBjVpAfaSTOfppyKBTccu2AXJXWAE1Xjh6GOC
+	8mlFjZwLxWFqdPHR1n2aPVgoiTLk34LR/bXO+e0GpzFXT7enwyvFFFyAS0Nk1q/7EChPcbRb
+	hJqEBpRNZemxmg55zC3GLvgLKd5A09MOM2BrMea+l0FUR+PuTenh2YmnmLRTro6eZ/qYwWkC
+	u8FFIw4pT0OUDMyLgi+GI1aMpVogTZJ70FgV0pUAlpmrzk/bLbRkF3TwgucpyPtcpmQtTkWS
+	gDS50QG9DR/1As3LLLcNkwJBZzBG6PWbvcOyrwMQUF1nl4SSPV0LLH63+BrrHasfJzxKXzqg
+	rW28CTAE2x8qi7e/6M/+XXhrsMYG+uaViM7n2je3qKe7ofum3s4vq7oFCPsOgwARAQABwsFl
+	BBgBAgAPBQJVy5+RAhsMBQkJZgGAAAoJEE3eEPcA/4NagOsP/jPoIBb/iXVbM+fmSHOjEshl
+	KMwEl/m5iLj3iHnHPVLBUWrXPdS7iQijJA/VLxjnFknhaS60hkUNWexDMxVVP/6lbOrs4bDZ
+	NEWDMktAeqJaFtxackPszlcpRVkAs6Msn9tu8hlvB517pyUgvuD7ZS9gGOMmYwFQDyytpepo
+	YApVV00P0u3AaE0Cj/o71STqGJKZxcVhPaZ+LR+UCBZOyKfEyq+ZN311VpOJZ1IvTExf+S/5
+	lqnciDtbO3I4Wq0ArLX1gs1q1XlXLaVaA3yVqeC8E7kOchDNinD3hJS4OX0e1gdsx/e6COvy
+	qNg5aL5n0Kl4fcVqM0LdIhsubVs4eiNCa5XMSYpXmVi3HAuFyg9dN+x8thSwI836FoMASwOl
+	C7tHsTjnSGufB+D7F7ZBT61BffNBBIm1KdMxcxqLUVXpBQHHlGkbwI+3Ye+nE6HmZH7IwLwV
+	W+Ajl7oYF+jeKaH4DZFtgLYGLtZ1LDwKPjX7VAsa4Yx7S5+EBAaZGxK510MjIx6SGrZWBrrV
+	TEvdV00F2MnQoeXKzD7O4WFbL55hhyGgfWTHwZ457iN9SgYi1JLPqWkZB0JRXIEtjd4JEQcx
+	+8Umfre0Xt4713VxMygW0PnQt5aSQdMD58jHFxTk092mU+yIHj5LeYgvwSgZN4airXk5yRXl
+	SE+xAvmumFBY
+Organization: Red Hat GmbH
+Message-ID: <2b89fec6-a270-f6f5-5ff8-1f40f0b9a7a5@redhat.com>
+Date: Tue, 16 Apr 2019 11:16:43 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+	Thunderbird/60.6.1
+MIME-Version: 1.0
+In-Reply-To: <baebe333-5e28-9fd3-adef-7027c166a599@linaro.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.27]);
-	Tue, 16 Apr 2019 09:13:54 +0000 (UTC)
+	(mx1.redhat.com [10.5.110.48]);
+	Tue, 16 Apr 2019 09:16:45 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] [PATCH v2 2/3] pflash_cfi01: New
- pflash_cfi01_legacy_drive()
+Subject: Re: [Qemu-devel] [PATCH v1 17/41] s390x/tcg: Implement VECTOR LOAD
+ POSITIVE
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -69,122 +119,43 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: kwolf@redhat.com, peter.maydell@linaro.org, qemu-block@nongnu.org,
-	philmd@redhat.com, mreitz@redhat.com, qemu-arm@nongnu.org,
-	lersek@redhat.com
+Cc: qemu-s390x@nongnu.org, Cornelia Huck <cohuck@redhat.com>,
+	Thomas Huth <thuth@redhat.com>, Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Content-Type: text/plain; charset="UTF-8"
-Message-ID: <20190416091347.mewXN1xZcmYcAYEi2Zl4AUaaVIv2OvH7X4s-dH4Nb-0@z>
+Message-ID: <20190416091643.1-jyrxV9RNtuwBpOvEG1K6Nn4THKzY0E4ZzpnbJ-aOo@z>
 
-Factored out of pc_system_firmware_init() so the next commit can reuse
-it in hw/arm/virt.c.
+On 13.04.19 01:50, Richard Henderson wrote:
+> On 4/11/19 12:08 AM, David Hildenbrand wrote:
+>> Similar to VECTOR LOAD COMPLEMENT but unfortunately we don't have a
+>> gvec helper.
+>>
+>> Signed-off-by: David Hildenbrand <david@redhat.com>
+>> ---
+>>  target/s390x/helper.h           |  2 ++
+>>  target/s390x/insn-data.def      |  2 ++
+>>  target/s390x/translate_vx.inc.c | 40 +++++++++++++++++++++++++++++++++
+>>  target/s390x/vec_int_helper.c   | 14 ++++++++++++
+>>  4 files changed, 58 insertions(+)
+> 
+> I would be happy to add ABS as a gvec primitive, if you like.
+> Expandable with MAX or CMP on hosts without ABS.
 
-Signed-off-by: Markus Armbruster <armbru@redhat.com>
----
- hw/block/pflash_cfi01.c  | 28 ++++++++++++++++++++++++++++
- hw/i386/pc_sysfw.c       | 16 ++--------------
- include/hw/block/flash.h |  1 +
- 3 files changed, 31 insertions(+), 14 deletions(-)
+Sure, that would be great. Once you have that one implemented we can
+throw most of this stuff away (either before or after merging). Thanks!
 
-diff --git a/hw/block/pflash_cfi01.c b/hw/block/pflash_cfi01.c
-index 16dfae14b8..333b736277 100644
---- a/hw/block/pflash_cfi01.c
-+++ b/hw/block/pflash_cfi01.c
-@@ -44,9 +44,12 @@
- #include "qapi/error.h"
- #include "qemu/timer.h"
- #include "qemu/bitops.h"
-+#include "qemu/error-report.h"
- #include "qemu/host-utils.h"
- #include "qemu/log.h"
-+#include "qemu/option.h"
- #include "hw/sysbus.h"
-+#include "sysemu/blockdev.h"
- #include "sysemu/sysemu.h"
- #include "trace.h"
- 
-@@ -968,6 +971,31 @@ MemoryRegion *pflash_cfi01_get_memory(PFlashCFI01 *fl)
-     return &fl->mem;
- }
- 
-+/*
-+ * Handle -drive if=pflash for machines that use properties.
-+ * If @dinfo is null, do nothing.
-+ * Else if @fl's property "drive" is already set, fatal error.
-+ * Else set it to the BlockBackend with @dinfo.
-+ */
-+void pflash_cfi01_legacy_drive(PFlashCFI01 *fl, DriveInfo *dinfo)
-+{
-+    Location loc;
-+
-+    if (!dinfo) {
-+        return;
-+    }
-+
-+    loc_push_none(&loc);
-+    qemu_opts_loc_restore(dinfo->opts);
-+    if (fl->blk) {
-+        error_report("clashes with -machine");
-+        exit(1);
-+    }
-+    qdev_prop_set_drive(DEVICE(fl), "drive",
-+                        blk_by_legacy_dinfo(dinfo), &error_fatal);
-+    loc_pop(&loc);
-+}
-+
- static void postload_update_cb(void *opaque, int running, RunState state)
- {
-     PFlashCFI01 *pfl = opaque;
-diff --git a/hw/i386/pc_sysfw.c b/hw/i386/pc_sysfw.c
-index 75925f5d3f..751fcafa12 100644
---- a/hw/i386/pc_sysfw.c
-+++ b/hw/i386/pc_sysfw.c
-@@ -269,9 +269,7 @@ void pc_system_firmware_init(PCMachineState *pcms,
- {
-     PCMachineClass *pcmc = PC_MACHINE_GET_CLASS(pcms);
-     int i;
--    DriveInfo *pflash_drv;
-     BlockBackend *pflash_blk[ARRAY_SIZE(pcms->flash)];
--    Location loc;
- 
-     if (!pcmc->pci_enabled) {
-         old_pc_system_rom_init(rom_memory, true);
-@@ -280,18 +278,8 @@ void pc_system_firmware_init(PCMachineState *pcms,
- 
-     /* Map legacy -drive if=pflash to machine properties */
-     for (i = 0; i < ARRAY_SIZE(pcms->flash); i++) {
--        pflash_drv = drive_get(IF_PFLASH, 0, i);
--        if (pflash_drv) {
--            loc_push_none(&loc);
--            qemu_opts_loc_restore(pflash_drv->opts);
--            if (pflash_cfi01_get_blk(pcms->flash[i])) {
--                error_report("clashes with -machine");
--                exit(1);
--            }
--            qdev_prop_set_drive(DEVICE(pcms->flash[i]), "drive",
--                                blk_by_legacy_dinfo(pflash_drv), &error_fatal);
--            loc_pop(&loc);
--        }
-+        pflash_cfi01_legacy_drive(pcms->flash[i],
-+                                  drive_get(IF_PFLASH, 0, i));
-         pflash_blk[i] = pflash_cfi01_get_blk(pcms->flash[i]);
-     }
- 
-diff --git a/include/hw/block/flash.h b/include/hw/block/flash.h
-index a0f488732a..1acaf7de80 100644
---- a/include/hw/block/flash.h
-+++ b/include/hw/block/flash.h
-@@ -24,6 +24,7 @@ PFlashCFI01 *pflash_cfi01_register(hwaddr base,
-                                    int be);
- BlockBackend *pflash_cfi01_get_blk(PFlashCFI01 *fl);
- MemoryRegion *pflash_cfi01_get_memory(PFlashCFI01 *fl);
-+void pflash_cfi01_legacy_drive(PFlashCFI01 *dev, DriveInfo *dinfo);
- 
- /* pflash_cfi02.c */
- 
+> 
+> Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+> 
+> 
+> r~
+> 
+
+
 -- 
-2.17.2
 
+Thanks,
+
+David / dhildenb
 
