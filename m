@@ -2,103 +2,88 @@ Return-Path: <SRS0=xvb4=SS=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.7 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+X-Spam-Status: No, score=-5.9 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_PASS,UNPARSEABLE_RELAY,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+	SPF_PASS,UNWANTED_LANGUAGE_BODY,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D0A13C10F13
-	for <qemu-devel@archiver.kernel.org>; Tue, 16 Apr 2019 13:24:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E2DFEC10F13
+	for <qemu-devel@archiver.kernel.org>; Tue, 16 Apr 2019 13:25:07 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 97DB92064A
-	for <qemu-devel@archiver.kernel.org>; Tue, 16 Apr 2019 13:24:02 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 9A57C20643
+	for <qemu-devel@archiver.kernel.org>; Tue, 16 Apr 2019 13:25:06 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="IxTpEU+1"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 97DB92064A
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=oracle.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="CpPJxqaw"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9A57C20643
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:36733 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:36735 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hGO49-0008NC-M9
-	for qemu-devel@archiver.kernel.org; Tue, 16 Apr 2019 09:24:01 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:35254)
+	id 1hGO5C-0000k2-19
+	for qemu-devel@archiver.kernel.org; Tue, 16 Apr 2019 09:25:06 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:35019)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <liran.alon@oracle.com>) id 1hGNga-00064O-7E
-	for qemu-devel@nongnu.org; Tue, 16 Apr 2019 08:59:41 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1hGNfe-0005Dx-Vu
+	for qemu-devel@nongnu.org; Tue, 16 Apr 2019 08:58:44 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <liran.alon@oracle.com>) id 1hGNgY-00022c-3s
-	for qemu-devel@nongnu.org; Tue, 16 Apr 2019 08:59:40 -0400
-Received: from userp2120.oracle.com ([156.151.31.85]:37994)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <liran.alon@oracle.com>)
-	id 1hGNgX-00021t-Pf
-	for qemu-devel@nongnu.org; Tue, 16 Apr 2019 08:59:38 -0400
-Received: from pps.filterd (userp2120.oracle.com [127.0.0.1])
-	by userp2120.oracle.com (8.16.0.27/8.16.0.27) with SMTP id
-	x3GCxTmU055626; Tue, 16 Apr 2019 12:59:36 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com;
-	h=from : to : cc :
-	subject : date : message-id : in-reply-to : references : mime-version :
-	content-type : content-transfer-encoding; s=corp-2018-07-02;
-	bh=/f6Vn0qOWjqIheyoMHr5MtfUPS8Upb1rVgZ3o5Gcs3s=;
-	b=IxTpEU+1oXtFTLCfD7pqlb4x7sT+xoRA+0kK62O2EZ84BetkPkosnMK2Gu0w8EKI5QyC
-	7w47ffzqdJEDOgSJ7wp/XAqyNXUTk9tXKUNOeq2YtMU4P0NtjaYqiOjii3IGCWOZCQgs
-	Cz1IIXVHD8cLkxuzQAFpBwywhaQSA4KsKmdysYV3qzQ9Xb2UAq7/nJi7D0awK6yWJSGg
-	qGrpUfj1guRYBF6OL8ICdeMrn1OH9BEiYO9wpZr8/7TpB6O/1uxRkKxxk4+5OPah+ZB5
-	UZE/xf7ECOYSa3aiNu3CrB/MX40V6dpB8oH8fDYhnbKrM7uYNCunnQWXZGaGfqpsqZ2/
-	9A== 
-Received: from aserp3030.oracle.com (aserp3030.oracle.com [141.146.126.71])
-	by userp2120.oracle.com with ESMTP id 2rusnetf76-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Tue, 16 Apr 2019 12:59:36 +0000
-Received: from pps.filterd (aserp3030.oracle.com [127.0.0.1])
-	by aserp3030.oracle.com (8.16.0.27/8.16.0.27) with SMTP id
-	x3GCwAUL185417; Tue, 16 Apr 2019 12:59:35 GMT
-Received: from userv0122.oracle.com (userv0122.oracle.com [156.151.31.75])
-	by aserp3030.oracle.com with ESMTP id 2rwe79s8ag-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Tue, 16 Apr 2019 12:59:35 +0000
-Received: from abhmp0013.oracle.com (abhmp0013.oracle.com [141.146.116.19])
-	by userv0122.oracle.com (8.14.4/8.14.4) with ESMTP id x3GCxXGX020497;
-	Tue, 16 Apr 2019 12:59:34 GMT
-Received: from spark.ravello.local (/213.57.127.2)
-	by default (Oracle Beehive Gateway v4.0)
-	with ESMTP ; Tue, 16 Apr 2019 05:59:33 -0700
-From: Liran Alon <liran.alon@oracle.com>
-To: qemu-devel@nongnu.org
-Date: Tue, 16 Apr 2019 15:59:10 +0300
-Message-Id: <20190416125912.44001-2-liran.alon@oracle.com>
+	(envelope-from <peter.maydell@linaro.org>) id 1hGNfc-0001Zy-Md
+	for qemu-devel@nongnu.org; Tue, 16 Apr 2019 08:58:42 -0400
+Received: from mail-wr1-x443.google.com ([2a00:1450:4864:20::443]:44715)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1hGNfa-0001SZ-HD
+	for qemu-devel@nongnu.org; Tue, 16 Apr 2019 08:58:38 -0400
+Received: by mail-wr1-x443.google.com with SMTP id y7so26894393wrn.11
+	for <qemu-devel@nongnu.org>; Tue, 16 Apr 2019 05:58:31 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+	h=from:to:subject:date:message-id:in-reply-to:references:mime-version
+	:content-transfer-encoding;
+	bh=BzHkJFvKAiz/tlfhEM+yVQrC/PFkZx9GRWTUJ1dPqLQ=;
+	b=CpPJxqawwEkeQg2hqGYbIiLUiWSFo7xA6g6Mnh5Szd8aESdmkwQXoMu+4/UCBLcuwZ
+	9CaFEnnJUM7CWtrPee3AEdxoItgYVUgNjQC5l5FEuu3O4q2onhnlVLzlp0IkmR2rUfxi
+	X9XAVjqcVrGJ7lSErXShdnRQJx78o4aTnUGJam24EEU/3WCAaxDjlIrVanodFi3oyYXE
+	nSIAtpoj++xOyg/4dzhJBKHdPy7dXjYIlhjIL8AXi0wiRYiEG4ToqFnI+6aDL0q+AyrZ
+	F9qOsZcGuSe/pMt88EuKrv30KrVtfGHZfRqewWpqkxOOYWMq4vCWIftuUbu03vj0ddyF
+	/tJQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=1e100.net; s=20161025;
+	h=x-gm-message-state:from:to:subject:date:message-id:in-reply-to
+	:references:mime-version:content-transfer-encoding;
+	bh=BzHkJFvKAiz/tlfhEM+yVQrC/PFkZx9GRWTUJ1dPqLQ=;
+	b=fXpzIXVt1vPN3QLJ9+ELRJMIJbR+LFmSrNDQ+9zT5Ll+/OuZeZyWVSZ8LYixdAapaz
+	y7qFqh6Qx5H8/XxmKp1C+qitQiIOwUAMzpbXKlQ40AezC/hKt57X2hgWKS2p9jvVHpkR
+	Z5YeWnIRk4CdarByXhU8MoTh7lc7dNPTJHZ8Ph9AlzzcKOUG9Sr+oBoicArZ2dymMeqG
+	GNl1fsLszhKxX8/J1TDOU7vUwtMJ2ASODxs79HN8IHmbJA/RPXAlBKd40475mIgWbp5G
+	TIw684ShMBjeNFK9GegcAlvhLEEry/4FhWG1rsTeBL6V3hBqxemS7bsdobROPFrE5OPj
+	pY0g==
+X-Gm-Message-State: APjAAAXhCDv6JGfHB/4wKxxtuQajAVoEncZNe7dPscl3QbssQX5a9+Pc
+	KHCx6BBSjMcowmLYVhqM1aYEVI0NrZ4=
+X-Google-Smtp-Source: APXvYqz711nJNKaGLQORO5oj3FOhJV4qO2CWShypw0x7hPHUz9CfJD+A645d3Wh5y5JADEcFPUPODQ==
+X-Received: by 2002:adf:f30a:: with SMTP id i10mr51156723wro.111.1555419510156;
+	Tue, 16 Apr 2019 05:58:30 -0700 (PDT)
+Received: from orth.archaic.org.uk (orth.archaic.org.uk. [81.2.115.148])
+	by smtp.gmail.com with ESMTPSA id
+	v184sm39476572wma.6.2019.04.16.05.58.28
+	(version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+	Tue, 16 Apr 2019 05:58:29 -0700 (PDT)
+From: Peter Maydell <peter.maydell@linaro.org>
+To: qemu-arm@nongnu.org,
+	qemu-devel@nongnu.org
+Date: Tue, 16 Apr 2019 13:57:40 +0100
+Message-Id: <20190416125744.27770-23-peter.maydell@linaro.org>
 X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20190416125912.44001-1-liran.alon@oracle.com>
-References: <20190416125912.44001-1-liran.alon@oracle.com>
+In-Reply-To: <20190416125744.27770-1-peter.maydell@linaro.org>
+References: <20190416125744.27770-1-peter.maydell@linaro.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
-X-Proofpoint-Virus-Version: vendor=nai engine=5900 definitions=9228
-	signatures=668685
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=1
-	malwarescore=0
-	phishscore=0 bulkscore=0 spamscore=0 mlxscore=0 mlxlogscore=999
-	adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
-	engine=8.0.1-1810050000 definitions=main-1904160088
-X-Proofpoint-Virus-Version: vendor=nai engine=5900 definitions=9228
-	signatures=668685
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0
-	priorityscore=1501 malwarescore=0
-	suspectscore=1 phishscore=0 bulkscore=0 spamscore=0 clxscore=1011
-	lowpriorityscore=0 mlxscore=0 impostorscore=0 mlxlogscore=999
-	adultscore=0
-	classifier=spam adjust=0 reason=mlx scancount=1 engine=8.0.1-1810050000
-	definitions=main-1904160088
-Content-Transfer-Encoding: quoted-printable
-X-MIME-Autoconverted: from 8bit to quoted-printable by userp2120.oracle.com id
-	x3GCxTmU055626
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic]
-X-Received-From: 156.151.31.85
-Subject: [Qemu-devel] [PATCH v2 1/3] vhost-scsi: The vhost backend should be
- stopped when the VM is not running
+Content-Transfer-Encoding: 8bit
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+	recognized.
+X-Received-From: 2a00:1450:4864:20::443
+Subject: [Qemu-devel] [PATCH 22/26] target/arm: Add lazy-FP-stacking support
+ to v7m_stack_write()
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -110,61 +95,218 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: ehabkost@redhat.com, stefanha@gmail.com, mtosatti@redhat.com,
-	bijan.mottahedeh@oracle.com, Liran Alon <liran.alon@oracle.com>,
-	pbonzini@redhat.com, nir.weiner@oracle.com, rth@twiddle.net
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190416125910.Z5pH0C6O37JTmH7yR1XOoNMIS-0XLfojIxGpri654ck@z>
+Content-Type: text/plain; charset="UTF-8"
+Message-ID: <20190416125740.JP1UssHaBwTnK3EoxM9PvlNHZcFCuQiERId_vTQU0Rc@z>
 
-From: Nir Weiner <nir.weiner@oracle.com>
+Pushing registers to the stack for v7M needs to handle three cases:
+ * the "normal" case where we pend exceptions
+ * an "ignore faults" case where we set FSR bits but
+   do not pend exceptions (this is used when we are
+   handling some kinds of derived exception on exception entry)
+ * a "lazy FP stacking" case, where different FSR bits
+   are set and the exception is pended differently
 
-vhost-scsi doesn=E2=80=99t takes into account whether the VM is running o=
-r not in
-order to decide if it should start/stop vhost backend.
-This would lead to vhost backend still being active when VM's RunState
-suddenly change to stopped.
+Implement this by changing the existing flag argument that
+tells us whether to ignore faults or not into an enum that
+specifies which of the 3 modes we should handle.
 
-An example of when this issue is encountered is when Live-Migration Pre-C=
-opy
-phase completes. As in this case, VM state will be changed to stopped (wh=
-ile
-vhost backend is still active), which will result in
-virtio_vmstate_change() -> virtio_set_status() -> vhost_scsi_set_status()
-executed but vhost_scsi_set_status() will just return without stopping
-vhost backend.
-
-To handle this, change code to consider that vhost processing should be
-stopped when VM is not running. Similar to how it is done in vhost-vsock
-device at vhost_vsock_set_status().
-
-Fixes: 5e9be92d7752 ("vhost-scsi: new device supporting the tcm_vhost Lin=
-ux kernel module=E2=80=9D)
-Reviewed-by: Bijan Mottahedeh <bijan.mottahedeh@oracle.com>
-Reviewed-by: Liran Alon <liran.alon@oracle.com>
-Signed-off-by: Nir Weiner <nir.weiner@oracle.com>
+Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 ---
- hw/scsi/vhost-scsi.c | 4 ++++
- 1 file changed, 4 insertions(+)
+ target/arm/helper.c | 118 +++++++++++++++++++++++++++++---------------
+ 1 file changed, 79 insertions(+), 39 deletions(-)
 
-diff --git a/hw/scsi/vhost-scsi.c b/hw/scsi/vhost-scsi.c
-index 61e2e57da9d5..ca42cff1b907 100644
---- a/hw/scsi/vhost-scsi.c
-+++ b/hw/scsi/vhost-scsi.c
-@@ -114,6 +114,10 @@ static void vhost_scsi_set_status(VirtIODevice *vdev=
-, uint8_t val)
-     VHostSCSICommon *vsc =3D VHOST_SCSI_COMMON(s);
-     bool start =3D (val & VIRTIO_CONFIG_S_DRIVER_OK);
-=20
-+    if (!vdev->vm_running) {
-+        start =3D false;
-+    }
-+
-     if (vsc->dev.started =3D=3D start) {
-         return;
+diff --git a/target/arm/helper.c b/target/arm/helper.c
+index c8e30b40366..975ac9c6fc4 100644
+--- a/target/arm/helper.c
++++ b/target/arm/helper.c
+@@ -7580,8 +7580,18 @@ static bool v7m_cpacr_pass(CPUARMState *env, bool is_secure, bool is_priv)
      }
---=20
+ }
+ 
++/*
++ * What kind of stack write are we doing? This affects how exceptions
++ * generated during the stacking are treated.
++ */
++typedef enum StackingMode {
++    STACK_NORMAL,
++    STACK_IGNFAULTS,
++    STACK_LAZYFP,
++} StackingMode;
++
+ static bool v7m_stack_write(ARMCPU *cpu, uint32_t addr, uint32_t value,
+-                            ARMMMUIdx mmu_idx, bool ignfault)
++                            ARMMMUIdx mmu_idx, StackingMode mode)
+ {
+     CPUState *cs = CPU(cpu);
+     CPUARMState *env = &cpu->env;
+@@ -7599,15 +7609,31 @@ static bool v7m_stack_write(ARMCPU *cpu, uint32_t addr, uint32_t value,
+                       &attrs, &prot, &page_size, &fi, NULL)) {
+         /* MPU/SAU lookup failed */
+         if (fi.type == ARMFault_QEMU_SFault) {
+-            qemu_log_mask(CPU_LOG_INT,
+-                          "...SecureFault with SFSR.AUVIOL during stacking\n");
+-            env->v7m.sfsr |= R_V7M_SFSR_AUVIOL_MASK | R_V7M_SFSR_SFARVALID_MASK;
++            if (mode == STACK_LAZYFP) {
++                qemu_log_mask(CPU_LOG_INT,
++                              "...SecureFault with SFSR.LSPERR "
++                              "during lazy stacking\n");
++                env->v7m.sfsr |= R_V7M_SFSR_LSPERR_MASK;
++            } else {
++                qemu_log_mask(CPU_LOG_INT,
++                              "...SecureFault with SFSR.AUVIOL "
++                              "during stacking\n");
++                env->v7m.sfsr |= R_V7M_SFSR_AUVIOL_MASK;
++            }
++            env->v7m.sfsr |= R_V7M_SFSR_SFARVALID_MASK;
+             env->v7m.sfar = addr;
+             exc = ARMV7M_EXCP_SECURE;
+             exc_secure = false;
+         } else {
+-            qemu_log_mask(CPU_LOG_INT, "...MemManageFault with CFSR.MSTKERR\n");
+-            env->v7m.cfsr[secure] |= R_V7M_CFSR_MSTKERR_MASK;
++            if (mode == STACK_LAZYFP) {
++                qemu_log_mask(CPU_LOG_INT,
++                              "...MemManageFault with CFSR.MLSPERR\n");
++                env->v7m.cfsr[secure] |= R_V7M_CFSR_MLSPERR_MASK;
++            } else {
++                qemu_log_mask(CPU_LOG_INT,
++                              "...MemManageFault with CFSR.MSTKERR\n");
++                env->v7m.cfsr[secure] |= R_V7M_CFSR_MSTKERR_MASK;
++            }
+             exc = ARMV7M_EXCP_MEM;
+             exc_secure = secure;
+         }
+@@ -7617,8 +7643,13 @@ static bool v7m_stack_write(ARMCPU *cpu, uint32_t addr, uint32_t value,
+                          attrs, &txres);
+     if (txres != MEMTX_OK) {
+         /* BusFault trying to write the data */
+-        qemu_log_mask(CPU_LOG_INT, "...BusFault with BFSR.STKERR\n");
+-        env->v7m.cfsr[M_REG_NS] |= R_V7M_CFSR_STKERR_MASK;
++        if (mode == STACK_LAZYFP) {
++            qemu_log_mask(CPU_LOG_INT, "...BusFault with BFSR.LSPERR\n");
++            env->v7m.cfsr[M_REG_NS] |= R_V7M_CFSR_LSPERR_MASK;
++        } else {
++            qemu_log_mask(CPU_LOG_INT, "...BusFault with BFSR.STKERR\n");
++            env->v7m.cfsr[M_REG_NS] |= R_V7M_CFSR_STKERR_MASK;
++        }
+         exc = ARMV7M_EXCP_BUS;
+         exc_secure = false;
+         goto pend_fault;
+@@ -7633,11 +7664,19 @@ pend_fault:
+      * later if we have two derived exceptions.
+      * The only case when we must not pend the exception but instead
+      * throw it away is if we are doing the push of the callee registers
+-     * and we've already generated a derived exception. Even in this
+-     * case we will still update the fault status registers.
++     * and we've already generated a derived exception (this is indicated
++     * by the caller passing STACK_IGNFAULTS). Even in this case we will
++     * still update the fault status registers.
+      */
+-    if (!ignfault) {
++    switch (mode) {
++    case STACK_NORMAL:
+         armv7m_nvic_set_pending_derived(env->nvic, exc, exc_secure);
++        break;
++    case STACK_LAZYFP:
++        armv7m_nvic_set_pending_lazyfp(env->nvic, exc, exc_secure);
++        break;
++    case STACK_IGNFAULTS:
++        break;
+     }
+     return false;
+ }
+@@ -8014,6 +8053,7 @@ static bool v7m_push_callee_stack(ARMCPU *cpu, uint32_t lr, bool dotailchain,
+     uint32_t limit;
+     bool want_psp;
+     uint32_t sig;
++    StackingMode smode = ignore_faults ? STACK_IGNFAULTS : STACK_NORMAL;
+ 
+     if (dotailchain) {
+         bool mode = lr & R_V7M_EXCRET_MODE_MASK;
+@@ -8057,23 +8097,15 @@ static bool v7m_push_callee_stack(ARMCPU *cpu, uint32_t lr, bool dotailchain,
+      */
+     sig = v7m_integrity_sig(env, lr);
+     stacked_ok =
+-        v7m_stack_write(cpu, frameptr, sig, mmu_idx, ignore_faults) &&
+-        v7m_stack_write(cpu, frameptr + 0x8, env->regs[4], mmu_idx,
+-                        ignore_faults) &&
+-        v7m_stack_write(cpu, frameptr + 0xc, env->regs[5], mmu_idx,
+-                        ignore_faults) &&
+-        v7m_stack_write(cpu, frameptr + 0x10, env->regs[6], mmu_idx,
+-                        ignore_faults) &&
+-        v7m_stack_write(cpu, frameptr + 0x14, env->regs[7], mmu_idx,
+-                        ignore_faults) &&
+-        v7m_stack_write(cpu, frameptr + 0x18, env->regs[8], mmu_idx,
+-                        ignore_faults) &&
+-        v7m_stack_write(cpu, frameptr + 0x1c, env->regs[9], mmu_idx,
+-                        ignore_faults) &&
+-        v7m_stack_write(cpu, frameptr + 0x20, env->regs[10], mmu_idx,
+-                        ignore_faults) &&
+-        v7m_stack_write(cpu, frameptr + 0x24, env->regs[11], mmu_idx,
+-                        ignore_faults);
++        v7m_stack_write(cpu, frameptr, sig, mmu_idx, smode) &&
++        v7m_stack_write(cpu, frameptr + 0x8, env->regs[4], mmu_idx, smode) &&
++        v7m_stack_write(cpu, frameptr + 0xc, env->regs[5], mmu_idx, smode) &&
++        v7m_stack_write(cpu, frameptr + 0x10, env->regs[6], mmu_idx, smode) &&
++        v7m_stack_write(cpu, frameptr + 0x14, env->regs[7], mmu_idx, smode) &&
++        v7m_stack_write(cpu, frameptr + 0x18, env->regs[8], mmu_idx, smode) &&
++        v7m_stack_write(cpu, frameptr + 0x1c, env->regs[9], mmu_idx, smode) &&
++        v7m_stack_write(cpu, frameptr + 0x20, env->regs[10], mmu_idx, smode) &&
++        v7m_stack_write(cpu, frameptr + 0x24, env->regs[11], mmu_idx, smode);
+ 
+     /* Update SP regardless of whether any of the stack accesses failed. */
+     *frame_sp_p = frameptr;
+@@ -8352,14 +8384,20 @@ static bool v7m_push_stack(ARMCPU *cpu)
+      * if it has higher priority).
+      */
+     stacked_ok = stacked_ok &&
+-        v7m_stack_write(cpu, frameptr, env->regs[0], mmu_idx, false) &&
+-        v7m_stack_write(cpu, frameptr + 4, env->regs[1], mmu_idx, false) &&
+-        v7m_stack_write(cpu, frameptr + 8, env->regs[2], mmu_idx, false) &&
+-        v7m_stack_write(cpu, frameptr + 12, env->regs[3], mmu_idx, false) &&
+-        v7m_stack_write(cpu, frameptr + 16, env->regs[12], mmu_idx, false) &&
+-        v7m_stack_write(cpu, frameptr + 20, env->regs[14], mmu_idx, false) &&
+-        v7m_stack_write(cpu, frameptr + 24, env->regs[15], mmu_idx, false) &&
+-        v7m_stack_write(cpu, frameptr + 28, xpsr, mmu_idx, false);
++        v7m_stack_write(cpu, frameptr, env->regs[0], mmu_idx, STACK_NORMAL) &&
++        v7m_stack_write(cpu, frameptr + 4, env->regs[1],
++                        mmu_idx, STACK_NORMAL) &&
++        v7m_stack_write(cpu, frameptr + 8, env->regs[2],
++                        mmu_idx, STACK_NORMAL) &&
++        v7m_stack_write(cpu, frameptr + 12, env->regs[3],
++                        mmu_idx, STACK_NORMAL) &&
++        v7m_stack_write(cpu, frameptr + 16, env->regs[12],
++                        mmu_idx, STACK_NORMAL) &&
++        v7m_stack_write(cpu, frameptr + 20, env->regs[14],
++                        mmu_idx, STACK_NORMAL) &&
++        v7m_stack_write(cpu, frameptr + 24, env->regs[15],
++                        mmu_idx, STACK_NORMAL) &&
++        v7m_stack_write(cpu, frameptr + 28, xpsr, mmu_idx, STACK_NORMAL);
+ 
+     if (env->v7m.control[M_REG_S] & R_V7M_CONTROL_FPCA_MASK) {
+         /* FPU is active, try to save its registers */
+@@ -8409,12 +8447,14 @@ static bool v7m_push_stack(ARMCPU *cpu)
+                         faddr += 8; /* skip the slot for the FPSCR */
+                     }
+                     stacked_ok = stacked_ok &&
+-                        v7m_stack_write(cpu, faddr, slo, mmu_idx, false) &&
+-                        v7m_stack_write(cpu, faddr + 4, shi, mmu_idx, false);
++                        v7m_stack_write(cpu, faddr, slo,
++                                        mmu_idx, STACK_NORMAL) &&
++                        v7m_stack_write(cpu, faddr + 4, shi,
++                                        mmu_idx, STACK_NORMAL);
+                 }
+                 stacked_ok = stacked_ok &&
+                     v7m_stack_write(cpu, frameptr + 0x60,
+-                                    vfp_get_fpscr(env), mmu_idx, false);
++                                    vfp_get_fpscr(env), mmu_idx, STACK_NORMAL);
+                 if (cpacr_pass) {
+                     for (i = 0; i < ((framesize == 0xa8) ? 32 : 16); i += 2) {
+                         *aa32_vfp_dreg(env, i / 2) = 0;
+-- 
 2.20.1
 
 
