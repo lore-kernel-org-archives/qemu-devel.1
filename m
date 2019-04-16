@@ -2,75 +2,82 @@ Return-Path: <SRS0=xvb4=SS=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=FROM_EXCESS_BASE64,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS,URIBL_BLOCKED
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.1 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_PASS,UPPERCASE_50_75 autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CA552C282DA
-	for <qemu-devel@archiver.kernel.org>; Tue, 16 Apr 2019 13:41:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 92D7FC10F13
+	for <qemu-devel@archiver.kernel.org>; Tue, 16 Apr 2019 13:51:28 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9D1912190A
-	for <qemu-devel@archiver.kernel.org>; Tue, 16 Apr 2019 13:41:58 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9D1912190A
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
+	by mail.kernel.org (Postfix) with ESMTPS id 5DE3822327
+	for <qemu-devel@archiver.kernel.org>; Tue, 16 Apr 2019 13:51:28 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5DE3822327
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:37169 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:37278 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hGOLV-0002jD-QM
-	for qemu-devel@archiver.kernel.org; Tue, 16 Apr 2019 09:41:57 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:45585)
+	id 1hGOUh-0005CW-5C
+	for qemu-devel@archiver.kernel.org; Tue, 16 Apr 2019 09:51:27 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:47166)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1hGOKi-0002PV-QS
-	for qemu-devel@nongnu.org; Tue, 16 Apr 2019 09:41:09 -0400
+	(envelope-from <pbonzini@redhat.com>) id 1hGOTE-0004P4-9B
+	for qemu-devel@nongnu.org; Tue, 16 Apr 2019 09:49:57 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1hGOKh-0007Yb-PI
-	for qemu-devel@nongnu.org; Tue, 16 Apr 2019 09:41:08 -0400
-Received: from indium.canonical.com ([91.189.90.7]:34750)
+	(envelope-from <pbonzini@redhat.com>) id 1hGOTD-0003MW-Ez
+	for qemu-devel@nongnu.org; Tue, 16 Apr 2019 09:49:56 -0400
+Received: from mail-wm1-f68.google.com ([209.85.128.68]:54166)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1hGOKh-0007Y9-IV
-	for qemu-devel@nongnu.org; Tue, 16 Apr 2019 09:41:07 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1hGOKe-0007lL-21
-	for <qemu-devel@nongnu.org>; Tue, 16 Apr 2019 13:41:04 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 0B1A72E80DE
-	for <qemu-devel@nongnu.org>; Tue, 16 Apr 2019 13:41:02 +0000 (UTC)
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1hGOTD-0003GO-7B
+	for qemu-devel@nongnu.org; Tue, 16 Apr 2019 09:49:55 -0400
+Received: by mail-wm1-f68.google.com with SMTP id q16so25472724wmj.3
+	for <qemu-devel@nongnu.org>; Tue, 16 Apr 2019 06:49:48 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=1e100.net; s=20161025;
+	h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+	:user-agent:mime-version:in-reply-to:content-language
+	:content-transfer-encoding;
+	bh=HVKK906KNEy6oWQT8utm04vxUSnctf0Fq3KUesE03EQ=;
+	b=NoDwr/+Qp2t7eoTDCARX799U4XZvNnpd5GhXZNB39/bZdjwKC4J336JzqPMNwzwU/F
+	S4Sryy0ePtD9Kp4B4TpgpyXr/oCDKo0ufQQMeYQ5FmTPW8/bXuqbVkWyqHmOyvi7V2OF
+	YtniP+1dCkjXuNw5gBCOoPJUV0/Z30domNh3HO6v0F3/Cqx8XqGxsspMba0VUkCIkwaM
+	HFzoP3jz3MBSpAmtj3AeUg4mriSWT8D83I1x/30FPANcMnEMRj7gM6XnJ4xTnTj3vOV4
+	IVHY2h0qX7qAukspccwUgg/XAaWYquCshQmsnYxplOfIzDdz/BtsVppAADfLoPGn8zcX
+	671g==
+X-Gm-Message-State: APjAAAUacd1C/T68wsyX+NyYrIZTAZbpeBS1IioXaQ2BSUanXW0YfQ3U
+	9RcPF/AwJCvfHqYz93NWwajdM0gPpqU=
+X-Google-Smtp-Source: APXvYqzcsEPy9ibb1gI0rJfH3wcV2KCtcwikhsVJnFOQ20W7lVuUavMRxOc8dpoOcFBcE85YQH6s9w==
+X-Received: by 2002:a1c:6c09:: with SMTP id h9mr26458533wmc.130.1555422587755; 
+	Tue, 16 Apr 2019 06:49:47 -0700 (PDT)
+Received: from ?IPv6:2001:b07:6468:f312:ac27:aac4:c65c:6eb?
+	([2001:b07:6468:f312:ac27:aac4:c65c:6eb])
+	by smtp.gmail.com with ESMTPSA id
+	91sm10680875wra.86.2019.04.16.06.49.46
+	(version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+	Tue, 16 Apr 2019 06:49:47 -0700 (PDT)
+To: Maxim Levitsky <mlevitsk@redhat.com>, qemu-block@nongnu.org
+References: <20190415135746.7571-1-mlevitsk@redhat.com>
+	<20190415135746.7571-5-mlevitsk@redhat.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <db949b72-40f1-137e-42a0-2682ff79f64b@redhat.com>
+Date: Tue, 16 Apr 2019 15:49:45 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+	Thunderbird/60.6.1
 MIME-Version: 1.0
+In-Reply-To: <20190415135746.7571-5-mlevitsk@redhat.com>
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Tue, 16 Apr 2019 13:32:03 -0000
-From: =?utf-8?b?6LSe6LS15p2O?= <1805256@bugs.launchpad.net>
-To: qemu-devel@nongnu.org
-X-Launchpad-Notification-Type: bug
-X-Launchpad-Bug: product=qemu; status=Confirmed; importance=Undecided;
-	assignee=None; 
-X-Launchpad-Bug-Tags: qemu-img
-X-Launchpad-Bug-Information-Type: Public
-X-Launchpad-Bug-Private: no
-X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: dannf jnsnow lizhengui
-X-Launchpad-Bug-Reporter: dann frazier (dannf)
-X-Launchpad-Bug-Modifier: =?utf-8?b?6LSe6LS15p2OIChsaXpoZW5ndWkp?=
-References: <154327283728.15443.11625169757714443608.malonedeb@soybean.canonical.com>
-Message-Id:
- <155542152324.20625.2395560011589838514.malone@chaenomeles.canonical.com>
-X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
-X-Launchpad-Message-For: qemu-devel-ml
-Precedence: bulk
-X-Generated-By: Launchpad (canonical.com); Revision="18920";
-	Instance="launchpad-lazr.conf"
-X-Launchpad-Hash: 160eac6a9028c62ef4077b93f31e650d227ca738
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 91.189.90.7
-Subject: [Qemu-devel] [Bug 1805256] Re: qemu-img hangs on high core count
- ARM system
+	[fuzzy]
+X-Received-From: 209.85.128.68
+Subject: Re: [Qemu-devel] [Qemu-block] [PATCH 4/5] block/nvme: add support
+ for write zeros
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
+Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -79,66 +86,22 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1805256 <1805256@bugs.launchpad.net>
+Cc: Fam Zheng <fam@euphon.net>, Kevin Wolf <kwolf@redhat.com>,
+	qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190416133203.4tEL9oIyaPIaE2A9ZTqRbbPltdK88QqqAlgxm0lCNSc@z>
+Message-ID: <20190416134945.Aua0iwQ-VOw6UUxXYrSwSs1GzbmMiG3IRKcMBh0xwyw@z>
 
-frazier, Do you find the conditions that necessarily make this problem appe=
-ar?
+On 15/04/19 15:57, Maxim Levitsky wrote:
+> +#define NVME_ID_NS_DLFEAT_READ_BEHAVIER(dlfeat)     ((dlfeat) & 0x3)
+> +#define NVME_ID_NS_DLFEAT_READ_BEHAVIER_UNDEFINED  0
+> +#define NVME_ID_NS_DLFEAT_READ_BEHAVIER_ZEROS  1
+> +#define NVME_ID_NS_DLFEAT_READ_BEHAVIER_ONES   2
+> +
+> +
 
--- =
+s/BEHAVIER/BEHAVIOR/
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1805256
-
-Title:
-  qemu-img hangs on high core count ARM system
-
-Status in QEMU:
-  Confirmed
-
-Bug description:
-  On the HiSilicon D06 system - a 96 core NUMA arm64 box - qemu-img
-  frequently hangs (~50% of the time) with this command:
-
-  qemu-img convert -f qcow2 -O qcow2 /tmp/cloudimg /tmp/cloudimg2
-
-  Where "cloudimg" is a standard qcow2 Ubuntu cloud image. This
-  qcow2->qcow2 conversion happens to be something uvtool does every time
-  it fetches images.
-
-  Once hung, attaching gdb gives the following backtrace:
-
-  (gdb) bt
-  #0  0x0000ffffae4f8154 in __GI_ppoll (fds=3D0xaaaae8a67dc0, nfds=3D187650=
-274213760, =
-
-      timeout=3D<optimized out>, timeout@entry=3D0x0, sigmask=3D0xffffc123b=
-950)
-      at ../sysdeps/unix/sysv/linux/ppoll.c:39
-  #1  0x0000aaaabbefaf00 in ppoll (__ss=3D0x0, __timeout=3D0x0, __nfds=3D<o=
-ptimized out>, =
-
-      __fds=3D<optimized out>) at /usr/include/aarch64-linux-gnu/bits/poll2=
-.h:77
-  #2  qemu_poll_ns (fds=3D<optimized out>, nfds=3D<optimized out>, =
-
-      timeout=3Dtimeout@entry=3D-1) at util/qemu-timer.c:322
-  #3  0x0000aaaabbefbf80 in os_host_main_loop_wait (timeout=3D-1)
-      at util/main-loop.c:233
-  #4  main_loop_wait (nonblocking=3D<optimized out>) at util/main-loop.c:497
-  #5  0x0000aaaabbe2aa30 in convert_do_copy (s=3D0xffffc123bb58) at qemu-im=
-g.c:1980
-  #6  img_convert (argc=3D<optimized out>, argv=3D<optimized out>) at qemu-=
-img.c:2456
-  #7  0x0000aaaabbe2333c in main (argc=3D7, argv=3D<optimized out>) at qemu=
--img.c:4975
-
-  Reproduced w/ latest QEMU git (@ 53744e0a182)
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1805256/+subscriptions
+Paolo
 
