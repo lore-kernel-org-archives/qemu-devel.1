@@ -2,72 +2,119 @@ Return-Path: <SRS0=xvb4=SS=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.7 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 35BC9C10F13
-	for <qemu-devel@archiver.kernel.org>; Tue, 16 Apr 2019 09:07:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6CA17C10F13
+	for <qemu-devel@archiver.kernel.org>; Tue, 16 Apr 2019 09:10:02 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 07C832073F
-	for <qemu-devel@archiver.kernel.org>; Tue, 16 Apr 2019 09:07:46 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 07C832073F
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=hygon.cn
+	by mail.kernel.org (Postfix) with ESMTPS id 2E70120645
+	for <qemu-devel@archiver.kernel.org>; Tue, 16 Apr 2019 09:10:02 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="O3Y2cXPS"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2E70120645
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=twiddle.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:33451 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:33477 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hGK4A-0000rU-78
-	for qemu-devel@archiver.kernel.org; Tue, 16 Apr 2019 05:07:46 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:42489)
+	id 1hGK6L-0002JZ-Fg
+	for qemu-devel@archiver.kernel.org; Tue, 16 Apr 2019 05:10:01 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:42954)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <puwen@hygon.cn>) id 1hGK2r-00008x-UH
-	for qemu-devel@nongnu.org; Tue, 16 Apr 2019 05:06:26 -0400
+	(envelope-from <rth7680@gmail.com>) id 1hGK59-0001fc-DV
+	for qemu-devel@nongnu.org; Tue, 16 Apr 2019 05:08:48 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <puwen@hygon.cn>) id 1hGK2q-00013w-0Y
-	for qemu-devel@nongnu.org; Tue, 16 Apr 2019 05:06:25 -0400
-Received: from [110.188.70.11] (port=31148 helo=spam1.hygon.cn)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <puwen@hygon.cn>) id 1hGK2p-0000wS-9t
-	for qemu-devel@nongnu.org; Tue, 16 Apr 2019 05:06:23 -0400
-Received: from MK-FE.hygon.cn ([172.23.18.61])
-	by spam1.hygon.cn with ESMTP id x3G95Vl4001700;
-	Tue, 16 Apr 2019 17:05:31 +0800 (GMT-8)
-	(envelope-from puwen@hygon.cn)
-Received: from cncheex02.Hygon.cn ([172.23.18.12])
-	by MK-FE.hygon.cn with ESMTP id x3G94sQ2023199;
-	Tue, 16 Apr 2019 17:04:54 +0800 (GMT-8)
-	(envelope-from puwen@hygon.cn)
-Received: from [172.20.20.110] (172.23.18.44) by cncheex02.Hygon.cn
-	(172.23.18.12) with Microsoft SMTP Server (version=TLS1_2,
-	cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.1466.3;
-	Tue, 16 Apr 2019 17:05:26 +0800
-To: =?UTF-8?Q?Daniel_P=2e_Berrang=c3=a9?= <berrange@redhat.com>
-References: <1555124080-27089-1-git-send-email-puwen@hygon.cn>
-	<20190415092500.GD5718@redhat.com>
-	<aa92336f-681e-30d9-2670-7d0093d9912a@hygon.cn>
-	<20190416081804.GC31311@redhat.com>
-From: Pu Wen <puwen@hygon.cn>
-Message-ID: <8622eb20-ed78-fcc8-4e24-f9b8333af381@hygon.cn>
-Date: Tue, 16 Apr 2019 17:04:36 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
+	(envelope-from <rth7680@gmail.com>) id 1hGK57-00025X-Np
+	for qemu-devel@nongnu.org; Tue, 16 Apr 2019 05:08:46 -0400
+Received: from mail-pg1-x52c.google.com ([2607:f8b0:4864:20::52c]:39536)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <rth7680@gmail.com>)
+	id 1hGK53-00023V-Lu; Tue, 16 Apr 2019 05:08:42 -0400
+Received: by mail-pg1-x52c.google.com with SMTP id k3so10019727pga.6;
+	Tue, 16 Apr 2019 02:08:39 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+	h=sender:subject:to:cc:references:from:openpgp:autocrypt:message-id
+	:date:user-agent:mime-version:in-reply-to:content-language
+	:content-transfer-encoding;
+	bh=u5VZrIqhBiZN7qlI4iwCPvfUdmlwqv6KnlYUCHDUmF0=;
+	b=O3Y2cXPSd6BuJyCRhXs+IpCFwn119t+TCd0m23V+/1fplxzAo9amYe4UCuPorjcTre
+	XaoMuQq5wcR9dMNgjTGr1QUsGa5myaQEdG6dle8JN4mRthCoq120twlDc2DwH9/mE8aT
+	YvKS94jwFBemp5D4AMqh7OGr2cvqXS3apqRuX6Ub0QO5ZixBekuu0oinpcgroXZKdiaR
+	v097fFP1QavUygWD1HC374uEpHG/a/2p1PFTMnovRUEjk4iUJujz4yLV22tEs64wY/8o
+	J4EmZFXMMSgIMPaqgHOQKwdcPVcubliFbQXmbtFMGBw67znprjp0/YFey2iwwu0LpEXZ
+	jrFg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=1e100.net; s=20161025;
+	h=x-gm-message-state:sender:subject:to:cc:references:from:openpgp
+	:autocrypt:message-id:date:user-agent:mime-version:in-reply-to
+	:content-language:content-transfer-encoding;
+	bh=u5VZrIqhBiZN7qlI4iwCPvfUdmlwqv6KnlYUCHDUmF0=;
+	b=FxMRmPwnIgtqyeQ2aH7GdmLgjy3wPMirgU9qwwoLK1oLqBjK4jgApfn0FBQJnnDG5H
+	Es4t8TFhLEhvuah71gK5/+AczhnrjyphoqMHHXF+5HPKZw53rmhG8e88E/5MfXoisL8G
+	mziy2RX/hscqlhY5X9dWEXF/kTgVPW6mK4OJsz3GdnPai4OxaeRYtXi4XIGdOgn2irtU
+	gwPp2e/Aa6SPChNmF2VsZ80vOcKFbEMpJEIVvqXXbA5LVzk2ZqroV9+S6OmRooZ4Ly12
+	Vd+VfKZa5g/MjL28NdPTRP7SjL4h5tphI5lRJhxcBQyB4OtlvKBuhU3gf9UUUTWnmyAe
+	q5dg==
+X-Gm-Message-State: APjAAAX5Vm8oPn0tg4c7Kh7oqnx/GD5hR9Mhmcz6io8/hX/xOmkomz52
+	2qk+mT/ck9+9Sc7nJg+1mxs=
+X-Google-Smtp-Source: APXvYqysdIOCaK6uux+W3rWZdQDJ2V4Ip3FA1UooTpcfOiifGe+Wt20jF8MbtEErSWbrDfRd0osfNg==
+X-Received: by 2002:a63:4847:: with SMTP id x7mr76041583pgk.233.1555405717988; 
+	Tue, 16 Apr 2019 02:08:37 -0700 (PDT)
+Received: from [172.20.101.138] (rrcs-66-91-136-155.west.biz.rr.com.
+	[66.91.136.155]) by smtp.googlemail.com with ESMTPSA id
+	v1sm81903644pff.81.2019.04.16.02.08.35
+	(version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+	Tue, 16 Apr 2019 02:08:36 -0700 (PDT)
+To: David Hildenbrand <david@redhat.com>,
+	Richard Henderson <richard.henderson@linaro.org>, qemu-devel@nongnu.org
+References: <20190411100836.646-1-david@redhat.com>
+	<20190411100836.646-10-david@redhat.com>
+	<71ce854d-da00-565e-0b36-9458a7bc9183@linaro.org>
+	<a7298c65-fea3-7839-6b68-5b3bf5d64c1a@redhat.com>
+From: Richard Henderson <rth@twiddle.net>
+Openpgp: preference=signencrypt
+Autocrypt: addr=rth@twiddle.net; prefer-encrypt=mutual; keydata=
+	mQENBFGuLC8BCADcAoWcnW9lTsDMzbO3MBU+KbiGaj5JPatEUscRDkQYM2fyNjJp2tIWDK5a
+	n4yngeXB3eX61WbYR3QraRK8mlYLGxyAdHMEQfPipbqf3TmN043fssT2bc82ApJcs1zvLYgI
+	rhMht7Dck7A0wNC1jo+ZjVVFig5gDTN7gOzaAdBtV8tVNUddwkLzzaGpfihhSD6U46NdqKOG
+	Wlnn6TrkMy0QGdQ5NaXHkRlUjnnUTSW/nKfoxD+EI+A9V4sYOd8mc/TL4aJh/i/AiU57eLbo
+	n17uQI6/VTWDUWl8USiz4x9c8vmqlywLx00tAFxxoRWqk4KVJlj+Sh0up/D/sJ+vPpgBABEB
+	AAG0I1JpY2hhcmQgSGVuZGVyc29uIDxydGhAdHdpZGRsZS5uZXQ+iQFBBBMBAgArAhsDBgsJ
+	CAcDAgYVCAIJCgsEFgIDAQIeAQIXgAUJC7UHogUCWaDNVgIZAQAKCRCtEnDMTdAnm9N5CADO
+	cB8F/SudJ72IupxQf40hbJdBK176+gb3sHMsixyLtrU59lee+lIM1OZmlNjsnCYmiSnbA5ks
+	Q7p0HfO7DgdmfLzcK6xsHZukqSZy5LByw348Y913ZyjOrJZFdPP7kDg1MnqRqH4+3ZdzxV4y
+	eYBWFU9GYMIF06JbUubossOOO4ArNVZbnIPu8Vn2tDZVVqsCBqkoCSBMj519xrvyOu5z4mHS
+	LkCglXmVDOXMbqLuNAC3rfNXSnyM4hYkLUyfALJlAAy1Ro+jUqYhu7XUFV/MiwRuFMh5GbtY
+	Urkx7tqsWQXLT3GeDk/LqvpWJQwk4cHHckYjRih+70CHIenm81PVuQENBFGuLC8BCACyEx3x
+	94HIkTX0CHu2sA0w75+h9wuoA8ggJ7+S4ri0y2YsijWad5TTt6z6MMiqxk9kSA5bppaj4HXh
+	86hBF/dWCtMpNr3Rb8FNOKyeA/qkYHVD6HiAiw9c6D8Dr9hWmOk3/HSmGrNURxeUFOckDXsv
+	I+yGGKBNshj59j7QZr7ZiuIi2rWlBL8dFN/OWa/o3x7HKsE4k6K8ngwvCKP/QbDLwLLBOWH+
+	VEUtpyeyxTr3OJ47ECTxdYvXoAV2iJaKr+6doVQiiR5eVFiMYrUPUECJeolOCwqc/JlWE18L
+	+PCAFaW1H+/mpPVfSpN4wnkJ5cQiQVB41IaCM4p20iRzx7ZJABEBAAGJASUEGAECAA8CGwwF
+	AlmgzYEFCQu1CEoACgkQrRJwzE3QJ5s7rggAwABzDAGrZ6uWsMxg5PeiiAYPy6LBnCBJSpB5
+	Tfy5jH8QTmLfXW+u4Ib4sWXG7PYNR7sIrtqUHjRqXLVXrSnBX9ASGcYw/Xil45khW6LsRpO1
+	prHv9gkwQfa6fTiWXVfSfm2Nant6u02q+MaYtQpCVTiz/9ki4FfftUwUHFLU0MhIQogjd11y
+	/E08RJsqBwaHQdt14PwU1HphDOzSkhOXRXQLSd3ysyeGUXvL+gqQoXl5XYdvk8IId4PoJRo4
+	jcyJ4VbnldvXh5gdGhFA/f9JgkLk9tPW+C3wNtNWyRUq8azR9hF2fg2HJUf4IXQlIu8OOgh1
+	VcROBqvtH3ecaIL9iw==
+Message-ID: <7e9ca895-031e-9843-8617-491e72a330e7@twiddle.net>
+Date: Mon, 15 Apr 2019 23:08:32 -1000
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
 	Thunderbird/60.6.1
 MIME-Version: 1.0
-In-Reply-To: <20190416081804.GC31311@redhat.com>
-Content-Type: text/plain; charset="UTF-8"; format="flowed"
+In-Reply-To: <a7298c65-fea3-7839-6b68-5b3bf5d64c1a@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
 Content-Language: en-US
-X-Originating-IP: [172.23.18.44]
-X-ClientProxiedBy: cncheex01.Hygon.cn (172.23.18.10) To cncheex02.Hygon.cn
-	(172.23.18.12)
-X-MAIL: spam1.hygon.cn x3G95Vl4001700
-X-DNSRBL: 
-Content-Transfer-Encoding: quoted-printable
-X-MIME-Autoconverted: from 8bit to quoted-printable by spam1.hygon.cn id
-	x3G95Vl4001700
-X-detected-operating-system: by eggs.gnu.org: FreeBSD 9.x
-X-Received-From: 110.188.70.11
-Subject: Re: [Qemu-devel] [PATCH v2] i386: Add new Hygon 'Dhyana' CPU model
+Content-Transfer-Encoding: 7bit
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+	recognized.
+X-Received-From: 2607:f8b0:4864:20::52c
+Subject: Re: [Qemu-devel] [PATCH v1 09/41] s390x/tcg: Implement VECTOR
+ CHECKSUM
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -79,46 +126,28 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "ehabkost@redhat.com" <ehabkost@redhat.com>,
-	"mst@redhat.com" <mst@redhat.com>,
-	"qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
-	"pbonzini@redhat.com" <pbonzini@redhat.com>,
-	"rth@twiddle.net" <rth@twiddle.net>
+Cc: qemu-s390x@nongnu.org, Cornelia Huck <cohuck@redhat.com>,
+	Thomas Huth <thuth@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190416090436.0xs0vHRzIqYo1c4oOfFpChv6S-Bl0he1U-vesf2Calw@z>
+Message-ID: <20190416090832.8eDMfo39A28sHDg2g3nC8pFeMlg6VT__tPTVNWzaH7U@z>
 
-On 2019/4/16 16:19, Daniel P. Berrang=C3=A9 wrote:
-> On Tue, Apr 16, 2019 at 02:56:12PM +0800, Pu Wen wrote:
->> On 2019/4/15 17:25, Daniel P. Berrang=C3=A9 wrote:
->>> On Sat, Apr 13, 2019 at 10:54:40AM +0800, Pu Wen wrote:
->>>> @@ -152,6 +154,7 @@ GlobalProperty pc_compat_2_12[] =3D {
->>>>        { TYPE_X86_CPU, "topoext", "off" },
->>>>        { "EPYC-" TYPE_X86_CPU, "xlevel", "0x8000000a" },
->>>>        { "EPYC-IBPB-" TYPE_X86_CPU, "xlevel", "0x8000000a" },
->>>> +    { "Dhyana-" TYPE_X86_CPU, "xlevel", "0x8000000a" },
->>>>    };
->>>>    const size_t pc_compat_2_12_len =3D G_N_ELEMENTS(pc_compat_2_12);
->>>
->>> You can drop the changes in this file. This CPU model didn't exist
->>> in any older QEMU releases, so there's no machine type backcompat
->>> required, at least from upstream QEMU POV.
+On 4/15/19 10:58 PM, David Hildenbrand wrote:
+>> You could use
 >>
->> Then how about running QEMU with the parameter like "-M pc-i440fx-2.12=
-"?
->> Although the default machine is newer than that.
->=20
-> That doesnt matter.  This back-compat property table is about ensuring
-> that "-cpu Skylake-Client -M pc-i440fx-2.12" run on QEMU 4.0.0 release
-> works the same way as when run on QEMU 2.12.0 release.
->=20
-> Since there is no Dhyana CPU model in QEMU 2.12.0 release, there's no
-> back compat issue to fix.
+>>   tcg_gen_add2_i32(sum, tmp, sum, zero, tmp, zero);
+>>   tcg_gen_add_i32(sum, sum, tmp);
+> That makes perfect sense, I will use that for now, thanks!
+> 
 
-Thanks for the explanation. Will drop the changes in next version patch.
+Here's a funny one.  We can do this in one operation:
 
---=20
-Regards,
-Pu Wen
+  tcg_gen_add2_i32(tmp, sum, sum, sum, tmp, tmp);
+
+The lower (sum+tmp) carries into the upper (sum+tmp).
+We take the upper result and discard the lower.
+
+
+r~
 
