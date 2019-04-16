@@ -1,34 +1,21 @@
-Received: from eggs.gnu.org ([209.51.188.92]:33885)
+Received: from eggs.gnu.org ([209.51.188.92]:35094)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1hGJPo-0001i6-1l
-	for qemu-devel@nongnu.org; Tue, 16 Apr 2019 04:26:05 -0400
+	(envelope-from <richard.henderson@linaro.org>) id 1hGJVV-0002rv-0a
+	for qemu-devel@nongnu.org; Tue, 16 Apr 2019 04:31:58 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1hGJPm-0001p1-Sc
-	for qemu-devel@nongnu.org; Tue, 16 Apr 2019 04:26:04 -0400
-Received: from indium.canonical.com ([91.189.90.7]:53644)
+	(envelope-from <richard.henderson@linaro.org>) id 1hGJVT-0006Fc-VX
+	for qemu-devel@nongnu.org; Tue, 16 Apr 2019 04:31:56 -0400
+Received: from mail-pg1-x52f.google.com ([2607:f8b0:4864:20::52f]:35768)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1hGJPm-0001o7-J8
-	for qemu-devel@nongnu.org; Tue, 16 Apr 2019 04:26:02 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1hGJPk-0000lm-SU
-	for <qemu-devel@nongnu.org>; Tue, 16 Apr 2019 08:26:00 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id CE0E42E80CD
-	for <qemu-devel@nongnu.org>; Tue, 16 Apr 2019 08:26:00 +0000 (UTC)
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Tue, 16 Apr 2019 08:16:52 -0000
-From: =?utf-8?b?6LSe6LS15p2O?= <1805256@bugs.launchpad.net>
-Reply-To: Bug 1805256 <1805256@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <154327283728.15443.11625169757714443608.malonedeb@soybean.canonical.com>
-Message-Id: <155540261243.20543.14968057980308156113.malone@chaenomeles.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1805256] Re: qemu-img hangs on high core count
- ARM system
+	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+	id 1hGJVT-0006CT-Ir
+	for qemu-devel@nongnu.org; Tue, 16 Apr 2019 04:31:55 -0400
+Received: by mail-pg1-x52f.google.com with SMTP id g8so9991863pgf.2
+	for <qemu-devel@nongnu.org>; Tue, 16 Apr 2019 01:31:55 -0700 (PDT)
+From: Richard Henderson <richard.henderson@linaro.org>
+Date: Mon, 15 Apr 2019 22:31:48 -1000
+Message-Id: <20190416083150.19649-1-richard.henderson@linaro.org>
+Subject: [Qemu-devel] [PATCH 0/2] tcg: Fix launchpad 1824853
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -38,60 +25,55 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
+Cc: peter.maydell@linaro.org
 
-Do you have any good ideas about it? Maybe somewhere lack of memeory
-barriers that cause it?
+This is a case where we generate more than 64k code for a mere 231
+guest instructions.  This hits some assertions within TCG that we're
+not overflowing the uint16_t that we use for representing our
+unwind info.
 
--- =
+Fix this by returning an error indication, rather than asserting.
+This lets us try again from tb_gen_code with a lower max_insns.
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1805256
+This should resolve the problem for x86 as a host.  There are other
+failure modes wrt out-of-range relocations that might affect the
+RISC hosts.  I'm going to leave those for a different patch set.
 
-Title:
-  qemu-img hangs on high core count ARM system
 
-Status in QEMU:
-  Confirmed
+r~
 
-Bug description:
-  On the HiSilicon D06 system - a 96 core NUMA arm64 box - qemu-img
-  frequently hangs (~50% of the time) with this command:
 
-  qemu-img convert -f qcow2 -O qcow2 /tmp/cloudimg /tmp/cloudimg2
+Richard Henderson (2):
+  tcg: Hoist max_insns computation to tb_gen_code
+  tcg: Restart after TB code generation overflow
 
-  Where "cloudimg" is a standard qcow2 Ubuntu cloud image. This
-  qcow2->qcow2 conversion happens to be something uvtool does every time
-  it fetches images.
+ include/exec/exec-all.h       |  4 +--
+ include/exec/translator.h     |  3 +-
+ accel/tcg/translate-all.c     | 54 +++++++++++++++++++++++++++++------
+ accel/tcg/translator.c        | 15 ++--------
+ target/alpha/translate.c      |  4 +--
+ target/arm/translate.c        |  4 +--
+ target/cris/translate.c       | 10 +------
+ target/hppa/translate.c       |  5 ++--
+ target/i386/translate.c       |  4 +--
+ target/lm32/translate.c       | 10 +------
+ target/m68k/translate.c       |  4 +--
+ target/microblaze/translate.c | 10 +------
+ target/mips/translate.c       |  4 +--
+ target/moxie/translate.c      | 11 ++-----
+ target/nios2/translate.c      | 14 ++-------
+ target/openrisc/translate.c   |  4 +--
+ target/ppc/translate.c        |  4 +--
+ target/riscv/translate.c      |  4 +--
+ target/s390x/translate.c      |  4 +--
+ target/sh4/translate.c        |  4 +--
+ target/sparc/translate.c      |  4 +--
+ target/tilegx/translate.c     | 12 +-------
+ target/tricore/translate.c    | 16 ++---------
+ target/unicore32/translate.c  | 10 +------
+ target/xtensa/translate.c     |  4 +--
+ tcg/tcg.c                     |  4 +++
+ 26 files changed, 93 insertions(+), 133 deletions(-)
 
-  Once hung, attaching gdb gives the following backtrace:
-
-  (gdb) bt
-  #0  0x0000ffffae4f8154 in __GI_ppoll (fds=3D0xaaaae8a67dc0, nfds=3D187650=
-274213760, =
-
-      timeout=3D<optimized out>, timeout@entry=3D0x0, sigmask=3D0xffffc123b=
-950)
-      at ../sysdeps/unix/sysv/linux/ppoll.c:39
-  #1  0x0000aaaabbefaf00 in ppoll (__ss=3D0x0, __timeout=3D0x0, __nfds=3D<o=
-ptimized out>, =
-
-      __fds=3D<optimized out>) at /usr/include/aarch64-linux-gnu/bits/poll2=
-.h:77
-  #2  qemu_poll_ns (fds=3D<optimized out>, nfds=3D<optimized out>, =
-
-      timeout=3Dtimeout@entry=3D-1) at util/qemu-timer.c:322
-  #3  0x0000aaaabbefbf80 in os_host_main_loop_wait (timeout=3D-1)
-      at util/main-loop.c:233
-  #4  main_loop_wait (nonblocking=3D<optimized out>) at util/main-loop.c:497
-  #5  0x0000aaaabbe2aa30 in convert_do_copy (s=3D0xffffc123bb58) at qemu-im=
-g.c:1980
-  #6  img_convert (argc=3D<optimized out>, argv=3D<optimized out>) at qemu-=
-img.c:2456
-  #7  0x0000aaaabbe2333c in main (argc=3D7, argv=3D<optimized out>) at qemu=
--img.c:4975
-
-  Reproduced w/ latest QEMU git (@ 53744e0a182)
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1805256/+subscriptions
+-- 
+2.17.1
