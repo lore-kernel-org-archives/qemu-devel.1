@@ -2,66 +2,112 @@ Return-Path: <SRS0=xvb4=SS=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F1110C10F13
-	for <qemu-devel@archiver.kernel.org>; Tue, 16 Apr 2019 08:51:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5072EC10F14
+	for <qemu-devel@archiver.kernel.org>; Tue, 16 Apr 2019 08:53:26 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5F80020821
-	for <qemu-devel@archiver.kernel.org>; Tue, 16 Apr 2019 08:51:33 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5F80020821
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.intel.com
+	by mail.kernel.org (Postfix) with ESMTPS id 2234E20821
+	for <qemu-devel@archiver.kernel.org>; Tue, 16 Apr 2019 08:53:26 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2234E20821
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:33249 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:33269 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hGJoS-0003FW-DP
-	for qemu-devel@archiver.kernel.org; Tue, 16 Apr 2019 04:51:32 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:38890)
+	id 1hGJqH-0003uj-DI
+	for qemu-devel@archiver.kernel.org; Tue, 16 Apr 2019 04:53:25 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:39953)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <like.xu@linux.intel.com>) id 1hGJlC-0000ve-QJ
-	for qemu-devel@nongnu.org; Tue, 16 Apr 2019 04:48:12 -0400
+	(envelope-from <david@redhat.com>) id 1hGJpX-0003cj-EO
+	for qemu-devel@nongnu.org; Tue, 16 Apr 2019 04:52:40 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <like.xu@linux.intel.com>) id 1hGJlB-00066f-DF
-	for qemu-devel@nongnu.org; Tue, 16 Apr 2019 04:48:10 -0400
-Received: from mga14.intel.com ([192.55.52.115]:12633)
+	(envelope-from <david@redhat.com>) id 1hGJpW-0008BI-EC
+	for qemu-devel@nongnu.org; Tue, 16 Apr 2019 04:52:39 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:34106)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <like.xu@linux.intel.com>)
-	id 1hGJl8-00063Q-2P; Tue, 16 Apr 2019 04:48:06 -0400
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from orsmga008.jf.intel.com ([10.7.209.65])
-	by fmsmga103.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384;
-	16 Apr 2019 01:47:59 -0700
-X-IronPort-AV: E=Sophos;i="5.60,357,1549958400"; d="scan'208";a="134746093"
-Received: from likexu-mobl1.ccr.corp.intel.com (HELO [10.239.196.162])
-	([10.239.196.162])
-	by orsmga008-auth.jf.intel.com with ESMTP/TLS/AES128-SHA;
-	16 Apr 2019 01:47:57 -0700
-To: Igor Mammedov <imammedo@redhat.com>
-References: <1553849325-44201-1-git-send-email-like.xu@linux.intel.com>
-	<1553849325-44201-4-git-send-email-like.xu@linux.intel.com>
-	<20190408145424.45af3db8@redhat.com>
-From: Like Xu <like.xu@linux.intel.com>
-Organization: Intel OTC
-Message-ID: <4d0ce2df-b396-80a0-a3b9-f2513bd2289d@linux.intel.com>
-Date: Tue, 16 Apr 2019 16:47:55 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
+	(Exim 4.71) (envelope-from <david@redhat.com>)
+	id 1hGJpV-0008Ac-WB; Tue, 16 Apr 2019 04:52:38 -0400
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+	[10.5.11.22])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id EA209300261E;
+	Tue, 16 Apr 2019 08:52:36 +0000 (UTC)
+Received: from [10.36.116.179] (ovpn-116-179.ams2.redhat.com [10.36.116.179])
+	by smtp.corp.redhat.com (Postfix) with ESMTP id 8ACE41001DD8;
+	Tue, 16 Apr 2019 08:52:35 +0000 (UTC)
+To: Richard Henderson <richard.henderson@linaro.org>, qemu-devel@nongnu.org
+References: <20190411100836.646-1-david@redhat.com>
+	<20190411100836.646-8-david@redhat.com>
+	<0c0c45f1-0721-78a8-fb46-f32e7701da0e@linaro.org>
+From: David Hildenbrand <david@redhat.com>
+Openpgp: preference=signencrypt
+Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
+	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
+	SE+xAvmumFBY
+Organization: Red Hat GmbH
+Message-ID: <fd06217f-3fe6-d10d-726a-886c5fab8820@redhat.com>
+Date: Tue, 16 Apr 2019 10:52:34 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
 	Thunderbird/60.6.1
 MIME-Version: 1.0
-In-Reply-To: <20190408145424.45af3db8@redhat.com>
-Content-Type: text/plain; charset="UTF-8"; format="flowed"
+In-Reply-To: <0c0c45f1-0721-78a8-fb46-f32e7701da0e@linaro.org>
+Content-Type: text/plain; charset="UTF-8"
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
-	recognized.
-X-Received-From: 192.55.52.115
-Subject: Re: [Qemu-devel] [PATCH 3/9] cpu/topology: add uncommon arch
- support for smp machine properties
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+	(mx1.redhat.com [10.5.110.40]);
+	Tue, 16 Apr 2019 08:52:37 +0000 (UTC)
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 209.132.183.28
+Subject: Re: [Qemu-devel] [PATCH v1 07/41] s390x/tcg: Implement VECTOR
+ AVERAGE
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -73,226 +119,72 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Eduardo Habkost <ehabkost@redhat.com>, qemu-trivial@nongnu.org,
-	qemu-devel@nongnu.org, like.xu@intel.com,
-	Paolo Bonzini <pbonzini@redhat.com>
+Cc: qemu-s390x@nongnu.org, Cornelia Huck <cohuck@redhat.com>,
+	Thomas Huth <thuth@redhat.com>, Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190416084755.zIPmefarcJxLfgaDNoIdUtz58mkqUfTPuiXf97QHuAk@z>
+Message-ID: <20190416085234.2W0qn2x9tsJ_jX2fOakhWvoGzvuDqegq8zrtGEdARuU@z>
 
-On 2019/4/8 20:54, Igor Mammedov wrote:
-> On Fri, 29 Mar 2019 16:48:39 +0800
-> Like Xu <like.xu@linux.intel.com> wrote:
+On 13.04.19 00:34, Richard Henderson wrote:
+> On 4/11/19 12:08 AM, David Hildenbrand wrote:
+>> +}
+>> +static DisasJumpType op_vavg(DisasContext *s, DisasOps *o)
+>> +{
 > 
-> here should be a commit message explaining what patch does
-> in more detail.
-> 
-> 
->> Signed-off-by: Like Xu <like.xu@linux.intel.com>
-> 
-> Generic note, try not call qdev_get_machine() every time
-> you replace smp_cpus or other variables. It's often possible
-> to pass MachineState via call chain with trivial fixups.
+> Watch your spacing.
 
-Hi Igor,
-
-I have some doubts on this comments after some attempts.
-
-I'm not sure if this idea could apply to all qdev_get_machine()
-usages in tree or just for this smp-touch-only patch.
-
-It takes a lot of efforts on hooks overrides when we
-undo calls to qdev_get_machine() with modification of incoming parameters.
-
-The implementation of qdev_get_machine() couldn't be simpler more
-and it doesn't seem to bring much overhead compared with parameter stack.
+Whoops.
 
 > 
->> ---
->>   hw/alpha/dp264.c     | 1 +
->>   hw/hppa/machine.c    | 4 ++++
->>   hw/mips/boston.c     | 1 +
->>   hw/mips/mips_malta.c | 9 +++++++++
->>   hw/sparc/sun4m.c     | 2 ++
->>   hw/sparc64/sun4u.c   | 2 ++
->>   hw/xtensa/sim.c      | 1 +
->>   hw/xtensa/xtfpga.c   | 1 +
->>   8 files changed, 21 insertions(+)
->>
->> diff --git a/hw/alpha/dp264.c b/hw/alpha/dp264.c
->> index 0347eb8..ee5d432 100644
->> --- a/hw/alpha/dp264.c
->> +++ b/hw/alpha/dp264.c
->> @@ -63,6 +63,7 @@ static void clipper_init(MachineState *machine)
->>       char *palcode_filename;
->>       uint64_t palcode_entry, palcode_low, palcode_high;
->>       uint64_t kernel_entry, kernel_low, kernel_high;
->> +    unsigned int smp_cpus = machine->topo.smp_cpus;
->>   
->>       /* Create up to 4 cpus.  */
->>       memset(cpus, 0, sizeof(cpus));
->> diff --git a/hw/hppa/machine.c b/hw/hppa/machine.c
->> index d1b1d3c..f652891 100644
->> --- a/hw/hppa/machine.c
->> +++ b/hw/hppa/machine.c
->> @@ -16,6 +16,7 @@
->>   #include "hw/ide.h"
->>   #include "hw/timer/i8254.h"
->>   #include "hw/char/serial.h"
->> +#include "hw/boards.h"
->>   #include "hppa_sys.h"
->>   #include "qemu/units.h"
->>   #include "qapi/error.h"
->> @@ -72,6 +73,7 @@ static void machine_hppa_init(MachineState *machine)
->>       MemoryRegion *ram_region;
->>       MemoryRegion *cpu_region;
->>       long i;
->> +    unsigned int smp_cpus = machine->topo.smp_cpus;
-> I'd prefer to replace smp_cpus with machine->topo.smp_cpus
-> directly at places it's used, as it makes affected sites
-> more visible in the patch.
-> And use local smp_cpus only in places where using machine->topo.smp_cpus
-> makes core less readable.
-> (but it's just personal preference so I don't insist on it)
 > 
->>   
->>       ram_size = machine->ram_size;
->>   
->> @@ -242,7 +244,9 @@ static void machine_hppa_init(MachineState *machine)
->>   
->>   static void hppa_machine_reset(void)
->>   {
->> +    MachineState *ms = MACHINE(qdev_get_machine());
->>       int i;
->> +    unsigned int smp_cpus = ms->topo.smp_cpus;
+>> +    static const GVecGen3 g[4] = {
+>> +        { .fno = gen_helper_gvec_vavg8, },
+>> +        { .fno = gen_helper_gvec_vavg16, },
+>> +        { .fni4 = gen_avg_i32, },
+>> +        { .fni8 = gen_avg_i64, },
+>> +    };
 > 
-> ***)
-> It would be better to pass MachineState as argument to
-> hppa_machine_reset(), a patch to so should go before this one.
+> Pondering possible vector expansions.  I think one possibility is
 > 
-> Quick look shows only 3 overrides (hppa, pc, pnv) and one caller,
-> so I'd rather fix it than calling qdev_get_machine() unnecessarily
+>   t1 = (a >> 1) + (b >> 1);
 > 
->>   
->>       qemu_devices_reset();
->>   
->> diff --git a/hw/mips/boston.c b/hw/mips/boston.c
->> index e5bab3c..7752c10 100644
->> --- a/hw/mips/boston.c
->> +++ b/hw/mips/boston.c
->> @@ -434,6 +434,7 @@ static void boston_mach_init(MachineState *machine)
->>       DriveInfo *hd[6];
->>       Chardev *chr;
->>       int fw_size, fit_err;
->> +    unsigned int smp_cpus = machine->topo.smp_cpus;
->>       bool is_64b;
->>   
->>       if ((machine->ram_size % GiB) ||
->> diff --git a/hw/mips/mips_malta.c b/hw/mips/mips_malta.c
->> index 439665a..d595375 100644
->> --- a/hw/mips/mips_malta.c
->> +++ b/hw/mips/mips_malta.c
->> @@ -1095,6 +1095,8 @@ static int64_t load_kernel (void)
->>   
->>   static void malta_mips_config(MIPSCPU *cpu)
->>   {
->> +    MachineState *ms = MACHINE(qdev_get_machine());
->> +    unsigned int smp_cpus = ms->topo.smp_cpus;
->>       CPUMIPSState *env = &cpu->env;
->>       CPUState *cs = CPU(cpu);
-> this one also called from reset, so the same [***] applies here too.
+> We still have the two "0.5 bits" to add back in, plus we round up by adding
+> another 0.5.  This means if either lsb is set, then we have carry in to the 1's
+> bit.  So:
 > 
->>   
->> @@ -1127,9 +1129,11 @@ static void main_cpu_reset(void *opaque)
->>   static void create_cpu_without_cps(const char *cpu_type,
->>                                      qemu_irq *cbus_irq, qemu_irq *i8259_irq)
->>   {
->> +    MachineState *ms = MACHINE(qdev_get_machine());
-> caller has an access to MachineState so pass it down call chain all the way
+>   t1 = t1 + ((a | b) & 1);
 > 
->>       CPUMIPSState *env;
->>       MIPSCPU *cpu;
->>       int i;
->> +    unsigned int smp_cpus = ms->topo.smp_cpus;
->>   
->>       for (i = 0; i < smp_cpus; i++) {
->>           cpu = MIPS_CPU(cpu_create(cpu_type));
->> @@ -1149,7 +1153,9 @@ static void create_cpu_without_cps(const char *cpu_type,
->>   static void create_cps(MaltaState *s, const char *cpu_type,
->>                          qemu_irq *cbus_irq, qemu_irq *i8259_irq)
->>   {
->> +    MachineState *ms = MACHINE(qdev_get_machine());
-> ditto
+> Which leads to
 > 
->>       Error *err = NULL;
->> +    unsigned int smp_cpus = ms->topo.smp_cpus;
->>   
->>       s->cps = MIPS_CPS(object_new(TYPE_MIPS_CPS));
->>       qdev_set_parent_bus(DEVICE(s->cps), sysbus_get_default());
->> @@ -1171,6 +1177,9 @@ static void create_cps(MaltaState *s, const char *cpu_type,
->>   static void mips_create_cpu(MaltaState *s, const char *cpu_type,
->>                               qemu_irq *cbus_irq, qemu_irq *i8259_irq)
->>   {
->> +    MachineState *ms = MACHINE(qdev_get_machine());
-> ditto
+>   tcg_gen_sari_vec(vece, t0, a, 1);
+>   tcg_gen_sari_vec(vece, t1, b, 1);
+>   tcg_gen_or_vec(vece, t2, a, b);
+>   tcg_gen_add_vec(vece, t0, t0, t1);
+>   tcg_gen_dupi_vec(vece, t1, 1);
+>   tcg_gen_and_vec(vece, t2, t2, t1);
+>   tcg_gen_add_vec(vece, t0, t0, t2);
 > 
->> +    unsigned int smp_cpus = ms->topo.smp_cpus;
->> +
->>       if ((smp_cpus > 1) && cpu_supports_cps_smp(cpu_type)) {
->>           create_cps(s, cpu_type, cbus_irq, i8259_irq);
->>       } else {
->> diff --git a/hw/sparc/sun4m.c b/hw/sparc/sun4m.c
->> index ca1e382..2321cfb 100644
->> --- a/hw/sparc/sun4m.c
->> +++ b/hw/sparc/sun4m.c
->> @@ -853,6 +853,8 @@ static void sun4m_hw_init(const struct sun4m_hwdef *hwdef,
->>       unsigned int num_vsimms;
->>       DeviceState *dev;
->>       SysBusDevice *s;
->> +    unsigned int smp_cpus = machine->topo.smp_cpus;
->> +    unsigned int max_cpus = machine->topo.max_cpus;
->>   
->>       /* init CPUs */
->>       for(i = 0; i < smp_cpus; i++) {
->> diff --git a/hw/sparc64/sun4u.c b/hw/sparc64/sun4u.c
->> index 399f2d7..d089c4d 100644
->> --- a/hw/sparc64/sun4u.c
->> +++ b/hw/sparc64/sun4u.c
->> @@ -546,6 +546,8 @@ static void sun4uv_init(MemoryRegion *address_space_mem,
->>       NICInfo *nd;
->>       MACAddr macaddr;
->>       bool onboard_nic;
->> +    unsigned int smp_cpus = machine->topo.smp_cpus;
->> +    unsigned int max_cpus = machine->topo.max_cpus;
->>   
->>       /* init CPUs */
->>       cpu = sparc64_cpu_devinit(machine->cpu_type, hwdef->prom_addr);
->> diff --git a/hw/xtensa/sim.c b/hw/xtensa/sim.c
->> index 12c7437..cc0396b 100644
->> --- a/hw/xtensa/sim.c
->> +++ b/hw/xtensa/sim.c
->> @@ -59,6 +59,7 @@ static void xtensa_sim_init(MachineState *machine)
->>       ram_addr_t ram_size = machine->ram_size;
->>       const char *kernel_filename = machine->kernel_filename;
->>       int n;
->> +    unsigned int smp_cpus = machine->topo.smp_cpus;
->>   
->>       for (n = 0; n < smp_cpus; n++) {
->>           cpu = XTENSA_CPU(cpu_create(machine->cpu_type));
->> diff --git a/hw/xtensa/xtfpga.c b/hw/xtensa/xtfpga.c
->> index e05ef75..f71a15e 100644
->> --- a/hw/xtensa/xtfpga.c
->> +++ b/hw/xtensa/xtfpga.c
->> @@ -238,6 +238,7 @@ static void xtfpga_init(const XtfpgaBoardDesc *board, MachineState *machine)
->>       const unsigned system_io_size = 224 * MiB;
->>       uint32_t freq = 10000000;
->>       int n;
->> +    unsigned int smp_cpus = machine->topo.smp_cpus;
->>   
->>       if (smp_cpus > 1) {
->>           mx_pic = xtensa_mx_pic_init(31);
+>   { .fnv = gen_avg_vec,
+>     .fno = gen_helper_gvec_vavg8,
+>     .opc = INDEX_op_sari_vec },
 > 
+> But what you have here is correct and the above is mere optimization so,
+> Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 > 
 
+Looks sane, as discussed, let's handle vector expansions later.
+
+Thanks!
+
+> 
+> r~
+> 
+
+
+-- 
+
+Thanks,
+
+David / dhildenb
 
