@@ -2,82 +2,105 @@ Return-Path: <SRS0=xvb4=SS=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A0B69C10F0E
-	for <qemu-devel@archiver.kernel.org>; Tue, 16 Apr 2019 00:47:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 57AF0C10F0E
+	for <qemu-devel@archiver.kernel.org>; Tue, 16 Apr 2019 01:08:48 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5345A20830
-	for <qemu-devel@archiver.kernel.org>; Tue, 16 Apr 2019 00:47:17 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="O4AfVasc"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5345A20830
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	by mail.kernel.org (Postfix) with ESMTPS id 1D4ED20818
+	for <qemu-devel@archiver.kernel.org>; Tue, 16 Apr 2019 01:08:48 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1D4ED20818
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=acm.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:57412 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:57555 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hGCFo-0000RE-Ls
-	for qemu-devel@archiver.kernel.org; Mon, 15 Apr 2019 20:47:16 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:36895)
+	id 1hGCac-0002m4-Sv
+	for qemu-devel@archiver.kernel.org; Mon, 15 Apr 2019 21:08:46 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:39656)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <fintelia@gmail.com>) id 1hGCEy-00005k-7s
-	for qemu-devel@nongnu.org; Mon, 15 Apr 2019 20:46:26 -0400
+	(envelope-from <bart.vanassche@gmail.com>) id 1hGCZq-0002Va-1p
+	for qemu-devel@nongnu.org; Mon, 15 Apr 2019 21:07:58 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <fintelia@gmail.com>) id 1hGCEw-0002qR-5r
-	for qemu-devel@nongnu.org; Mon, 15 Apr 2019 20:46:24 -0400
-Received: from mail-lf1-x144.google.com ([2a00:1450:4864:20::144]:44692)
+	(envelope-from <bart.vanassche@gmail.com>) id 1hGCZp-0003IU-2s
+	for qemu-devel@nongnu.org; Mon, 15 Apr 2019 21:07:58 -0400
+Received: from mail-pl1-f196.google.com ([209.85.214.196]:36146)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <fintelia@gmail.com>)
-	id 1hGCEv-0002lx-MN; Mon, 15 Apr 2019 20:46:22 -0400
-Received: by mail-lf1-x144.google.com with SMTP id h18so14514291lfj.11;
-	Mon, 15 Apr 2019 17:46:21 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
-	h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-	:cc; bh=rsdyoSNBUFQCy30ybdnZsnIJbz8/AMTSta5FXgEs45M=;
-	b=O4AfVascLLIoPjIUrDxfnAhZvzClnQSVOZokDRIRxirC5vVMMOX7Ob7gdklYhVRsn/
-	TnlA5i0nNrRya5oPTOGdqR4wR5+6bvh2arj5gklgBCx4MVaRVgAuXyMocgWGR9XpC81p
-	mp7dgTdToNK/Peij0uKQkTM1pR3P1zFsXGffCiG8czfTvQ6fyHO2NHCbQIAbuDbSVF0L
-	/ooGeXhqe7QyCMQVu4O0MvfnNM1i+tnoQajcfjZ6l93k94AM3A+26DxCGJ99TTFRgZgb
-	RoboRQ+NrLTQjpStciAC9dX5Ju5laq+tKC3fBaVatIFdBJHoqiBaCW14jl94JHCJGSDj
-	3fOQ==
+	(Exim 4.71) (envelope-from <bart.vanassche@gmail.com>)
+	id 1hGCZo-0003I9-Pn
+	for qemu-devel@nongnu.org; Mon, 15 Apr 2019 21:07:57 -0400
+Received: by mail-pl1-f196.google.com with SMTP id ck15so9455600plb.3
+	for <qemu-devel@nongnu.org>; Mon, 15 Apr 2019 18:07:56 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
 	d=1e100.net; s=20161025;
-	h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-	:message-id:subject:to:cc;
-	bh=rsdyoSNBUFQCy30ybdnZsnIJbz8/AMTSta5FXgEs45M=;
-	b=JdoRZgl2ubHQlMtfIB5NrWGMcVRx+PoROlyV4dbasBBZrn56fv5smn2qapJlG17FFF
-	AjJhyUZxmS1r97pakNY5m9Eiu6JeWBjKuy3iOFFp72aZu8zjRYIK70N13bH5v64Vs8sl
-	2y3NdjaaaQfP+iRWU9hvJjl/+GrMvsTClGylPYSRS1NvSdpyA21QZ2T0d5ZrWGbbDIO3
-	eQX2fPsuf15VRPP+W75SrGrILzLS1zfuN3wejwxJT/4FtRg43fEJ1tFDY3h6JE1PsOPg
-	qjFK3UslHZRL8geJyBZ82sMjoK7JuIKfwbes/+y9fFE/s6L6K+72btZH2djYfzwCoRCa
-	1+ZQ==
-X-Gm-Message-State: APjAAAW6hqVzaPTbBcdAY4tvtjQVPO8kox8LpA6QTngURy+1YW0wMqWW
-	3Zi/DN9DpeKYMvwbXFrrtNnsPu3SxJWlE54PLyc=
-X-Google-Smtp-Source: APXvYqzuSmMSc4jWAUbK3/PNzHWYuMW9FWNRLoxtuKgZszeSCAbnhOzOaMqTwGEPu1wZVrUYd0ZwHo2TdoF7EM3Ka6g=
-X-Received: by 2002:ac2:518b:: with SMTP id u11mr24315590lfi.46.1555375579070; 
-	Mon, 15 Apr 2019 17:46:19 -0700 (PDT)
+	h=x-gm-message-state:subject:to:references:from:openpgp:autocrypt
+	:message-id:date:user-agent:mime-version:in-reply-to
+	:content-language:content-transfer-encoding;
+	bh=gepmAu+EbSLBTd3XpYQ1NggYoa+7MfGdlMgpVMREOhw=;
+	b=P+hvaaHzW0YPWIhGBkrdeHKB5QQCJUnAHiLEIENogSvfljLBJ1s4CRrF3GCQa51yJ0
+	EBq5AG7Hw4TYzFFXVSx9LL1tyEz1ZY4+owcJZz6cFc2g7Qtnzslzj5xTSpDgbXknhj72
+	Bx+DiIgRuUNFK20/2PgTYG7DNMlDrn2XqXj4c4pcCom0wzYk1/R2h4UsgPncwTXM3Q2j
+	YI349PGD1HfaMW+8QWPo0U1Jr9ZQtQJYFeL+Wuy2l5VdeGz2jvq2Rcw6nG/V6tcFLKP+
+	uHPCLzely28XL9B6SeV7end1mbuySAYkkOnZNHtK//KvSAgWfP6AYek5YcBZRbmpHdFb
+	UA8A==
+X-Gm-Message-State: APjAAAUueAoKWrujQzfPHA89zH4fc/B3CLZjdOo7SayPA9BLBp2Dduae
+	4R7KYXem5+9iTgY4VB8jdBU=
+X-Google-Smtp-Source: APXvYqzIcOW4vW458lGTtk9ZDkfMYAnwpkxJ5UaFEFYL99S0K3XGSap9BMmHFKK7O0VQ8iGzWdQqKQ==
+X-Received: by 2002:a17:902:8604:: with SMTP id
+	f4mr68360745plo.245.1555376875141; 
+	Mon, 15 Apr 2019 18:07:55 -0700 (PDT)
+Received: from asus.site (c-67-188-93-131.hsd1.ca.comcast.net. [67.188.93.131])
+	by smtp.gmail.com with ESMTPSA id
+	h4sm65405022pfo.119.2019.04.15.18.07.53
+	(version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+	Mon, 15 Apr 2019 18:07:54 -0700 (PDT)
+To: Yuval Shaia <yuval.shaia@oracle.com>,
+	virtualization@lists.linux-foundation.org, qemu-devel@nongnu.org,
+	mst@redhat.com, cohuck@redhat.com, marcel.apfelbaum@gmail.com,
+	linux-rdma@vger.kernel.org, jgg@mellanox.com
+References: <20190411110157.14252-1-yuval.shaia@oracle.com>
+	<20190411110157.14252-4-yuval.shaia@oracle.com>
+From: Bart Van Assche <bvanassche@acm.org>
+Openpgp: preference=signencrypt
+Autocrypt: addr=bvanassche@acm.org; prefer-encrypt=mutual; keydata=
+	mQENBFSOu4oBCADcRWxVUvkkvRmmwTwIjIJvZOu6wNm+dz5AF4z0FHW2KNZL3oheO3P8UZWr
+	LQOrCfRcK8e/sIs2Y2D3Lg/SL7qqbMehGEYcJptu6mKkywBfoYbtBkVoJ/jQsi2H0vBiiCOy
+	fmxMHIPcYxaJdXxrOG2UO4B60Y/BzE6OrPDT44w4cZA9DH5xialliWU447Bts8TJNa3lZKS1
+	AvW1ZklbvJfAJJAwzDih35LxU2fcWbmhPa7EO2DCv/LM1B10GBB/oQB5kvlq4aA2PSIWkqz4
+	3SI5kCPSsygD6wKnbRsvNn2mIACva6VHdm62A7xel5dJRfpQjXj2snd1F/YNoNc66UUTABEB
+	AAG0JEJhcnQgVmFuIEFzc2NoZSA8YnZhbmFzc2NoZUBhY20ub3JnPokBOQQTAQIAIwUCVI67
+	igIbAwcLCQgHAwIBBhUIAgkKCwQWAgMBAh4BAheAAAoJEHFcPTXFzhAJ8QkH/1AdXblKL65M
+	Y1Zk1bYKnkAb4a98LxCPm/pJBilvci6boefwlBDZ2NZuuYWYgyrehMB5H+q+Kq4P0IBbTqTa
+	jTPAANn62A6jwJ0FnCn6YaM9TZQjM1F7LoDX3v+oAkaoXuq0dQ4hnxQNu792bi6QyVdZUvKc
+	macVFVgfK9n04mL7RzjO3f+X4midKt/s+G+IPr4DGlrq+WH27eDbpUR3aYRk8EgbgGKvQFdD
+	CEBFJi+5ZKOArmJVBSk21RHDpqyz6Vit3rjep7c1SN8s7NhVi9cjkKmMDM7KYhXkWc10lKx2
+	RTkFI30rkDm4U+JpdAd2+tP3tjGf9AyGGinpzE2XY1K5AQ0EVI67igEIAKiSyd0nECrgz+H5
+	PcFDGYQpGDMTl8MOPCKw/F3diXPuj2eql4xSbAdbUCJzk2ETif5s3twT2ER8cUTEVOaCEUY3
+	eOiaFgQ+nGLx4BXqqGewikPJCe+UBjFnH1m2/IFn4T9jPZkV8xlkKmDUqMK5EV9n3eQLkn5g
+	lco+FepTtmbkSCCjd91EfThVbNYpVQ5ZjdBCXN66CKyJDMJ85HVr5rmXG/nqriTh6cv1l1Js
+	T7AFvvPjUPknS6d+BETMhTkbGzoyS+sywEsQAgA+BMCxBH4LvUmHYhpS+W6CiZ3ZMxjO8Hgc
+	++w1mLeRUvda3i4/U8wDT3SWuHcB3DWlcppECLkAEQEAAYkBHwQYAQIACQUCVI67igIbDAAK
+	CRBxXD01xc4QCZ4dB/0QrnEasxjM0PGeXK5hcZMT9Eo998alUfn5XU0RQDYdwp6/kMEXMdmT
+	oH0F0xB3SQ8WVSXA9rrc4EBvZruWQ+5/zjVrhhfUAx12CzL4oQ9Ro2k45daYaonKTANYG22y
+	//x8dLe2Fv1By4SKGhmzwH87uXxbTJAUxiWIi1np0z3/RDnoVyfmfbbL1DY7zf2hYXLLzsJR
+	mSsED/1nlJ9Oq5fALdNEPgDyPUerqHxcmIub+pF0AzJoYHK5punqpqfGmqPbjxrJLPJfHVKy
+	goMj5DlBMoYqEgpbwdUYkH6QdizJJCur4icy8GUNbisFYABeoJ91pnD4IGei3MTdvINSZI5e
+Message-ID: <f133d122-5b00-2e3b-f5cc-efc6d2cc3d3b@acm.org>
+Date: Mon, 15 Apr 2019 18:07:52 -0700
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+	Thunderbird/60.6.1
 MIME-Version: 1.0
-References: <CANnJOVEkpkBAOo566s1BJk9YQBVeNkf2kpbS_kdjkn9j=3i1VA@mail.gmail.com>
-	<CAKmqyKPM=XUyF+KweO2CLBQ3bEuu_BTU2fu+R7R09rV-1O9TkQ@mail.gmail.com>
-In-Reply-To: <CAKmqyKPM=XUyF+KweO2CLBQ3bEuu_BTU2fu+R7R09rV-1O9TkQ@mail.gmail.com>
-From: Jonathan Behrens <fintelia@gmail.com>
-Date: Mon, 15 Apr 2019 20:45:52 -0400
-Message-ID:
- <CANnJOVFOq4-kQASRMiFhAQrAdm5tL6fZf1VofDO=s2_yrEU63w@mail.gmail.com>
-To: Alistair Francis <alistair23@gmail.com>
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
-	recognized.
-X-Received-From: 2a00:1450:4864:20::144
+In-Reply-To: <20190411110157.14252-4-yuval.shaia@oracle.com>
 Content-Type: text/plain; charset="UTF-8"
-X-Content-Filtered-By: Mailman/MimeDel 2.1.21
-Subject: Re: [Qemu-devel] [PATCH] target/riscv: Expose time CSRs when
- allowed by [m|s]counteren
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+	[fuzzy]
+X-Received-From: 209.85.214.196
+Subject: Re: [Qemu-devel] [RFC 3/3] RDMA/virtio-rdma: VirtIO rdma driver
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -89,220 +112,84 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "open list:RISC-V" <qemu-riscv@nongnu.org>,
-	Sagar Karandikar <sagark@eecs.berkeley.edu>,
-	Bastian Koppelmann <kbastian@mail.uni-paderborn.de>,
-	Palmer Dabbelt <palmer@sifive.com>,
-	"qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>,
-	Alistair Francis <Alistair.Francis@wdc.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190416004552.P5bdcXYwZ59smuF6HTkz6EsMkIexttW-kMht1PC2_cQ@z>
+Message-ID: <20190416010752.NdGzE-RV-dWlDNj1PiQ_lGS6HCF7MAffWMG6cc30QbQ@z>
 
-For any chip that has a CLINT, we want the frequency of the time register
-and the frequency of the CLINT to match. That frequency,
-SIFIVE_CLINT_TIMEBASE_FREQ
-(=10MHz) is currently defined in hw/riscv/sifive_clint.h and so isn't
-visible to target/riscv/cpu.c where the CPURISCVState is first created.
-Instead, I first initialize the frequency to a reasonable default (1GHz)
-and then let the CLINT override the value if one is attached. Phrased
-differently, the values produced by the `sifive_clint.c:
-cpu_riscv_read_rtc()` and `csr.c: read_time()` must match, and this is one
-way of doing that.
+On 4/11/19 4:01 AM, Yuval Shaia wrote:
+> +++ b/drivers/infiniband/hw/virtio/Kconfig
+> @@ -0,0 +1,6 @@
+> +config INFINIBAND_VIRTIO_RDMA
+> +	tristate "VirtIO Paravirtualized RDMA Driver"
+> +	depends on NETDEVICES && ETHERNET && PCI && INET
+> +	---help---
+> +	  This driver provides low-level support for VirtIO Paravirtual
+> +	  RDMA adapter.
 
-I'd be open to other suggestions.
+Does this driver really depend on Ethernet, or does it also work with
+Ethernet support disabled?
 
-Jonathan
+> +static inline struct virtio_rdma_info *to_vdev(struct ib_device *ibdev)
+> +{
+> +	return container_of(ibdev, struct virtio_rdma_info, ib_dev);
+> +}
 
-On Mon, Apr 15, 2019 at 8:23 PM Alistair Francis <alistair23@gmail.com>
-wrote:
+Is it really worth to introduce this function? Have you considered to
+use container_of(ibdev, struct virtio_rdma_info, ib_dev) directly instead
+of to_vdev()?
 
-> On Fri, Apr 12, 2019 at 12:04 PM Jonathan Behrens <fintelia@gmail.com>
-> wrote:
-> >
-> > Currently mcounteren.TM acts as though it is hardwired to zero, even
-> though
-> > QEMU
-> > allows it to be set. This change resolves the issue by allowing reads to
-> the
-> > time and timeh control registers when running in a privileged mode where
-> > such
-> > accesses are allowed.
-> >
-> > Signed-off-by: Jonathan Behrens <fintelia@gmail.com>
-> > ---
-> >  hw/riscv/sifive_clint.c |  1 +
-> >  target/riscv/cpu.c      | 14 ++++++++++++++
-> >  target/riscv/cpu.h      |  2 ++
-> >  target/riscv/csr.c      | 17 +++++++++++------
-> >  4 files changed, 28 insertions(+), 6 deletions(-)
-> >
-> > diff --git a/hw/riscv/sifive_clint.c b/hw/riscv/sifive_clint.c
-> > index d4c159e937..3ad4fe6139 100644
-> > --- a/hw/riscv/sifive_clint.c
-> > +++ b/hw/riscv/sifive_clint.c
-> > @@ -237,6 +237,7 @@ DeviceState *sifive_clint_create(hwaddr addr, hwaddr
-> > size, uint32_t num_harts,
-> >          env->timer = timer_new_ns(QEMU_CLOCK_VIRTUAL,
-> >                                    &sifive_clint_timer_cb, cpu);
-> >          env->timecmp = 0;
-> > +        env->time_freq = SIFIVE_CLINT_TIMEBASE_FREQ;
->
-> Why do you need to set this here?
->
-> Alistair
->
-> >      }
-> >
-> >      DeviceState *dev = qdev_create(NULL, TYPE_SIFIVE_CLINT);
-> > diff --git a/target/riscv/cpu.c b/target/riscv/cpu.c
-> > index d61bce6d55..ff17d54691 100644
-> > --- a/target/riscv/cpu.c
-> > +++ b/target/riscv/cpu.c
-> > @@ -103,12 +103,20 @@ static void set_resetvec(CPURISCVState *env, int
-> > resetvec)
-> >  #endif
-> >  }
-> >
-> > +static void set_time_freq(CPURISCVState *env, uint64_t freq)
-> > +{
-> > +#ifndef CONFIG_USER_ONLY
-> > +    env->time_freq = freq;
-> > +#endif
-> > +}
-> > +
-> >  static void riscv_any_cpu_init(Object *obj)
-> >  {
-> >      CPURISCVState *env = &RISCV_CPU(obj)->env;
-> >      set_misa(env, RVXLEN | RVI | RVM | RVA | RVF | RVD | RVC | RVU);
-> >      set_versions(env, USER_VERSION_2_02_0, PRIV_VERSION_1_10_0);
-> >      set_resetvec(env, DEFAULT_RSTVEC);
-> > +    set_time_freq(env, NANOSECONDS_PER_SECOND);
-> >  }
-> >
-> >  #if defined(TARGET_RISCV32)
-> > @@ -121,6 +129,7 @@ static void rv32gcsu_priv1_09_1_cpu_init(Object *obj)
-> >      set_resetvec(env, DEFAULT_RSTVEC);
-> >      set_feature(env, RISCV_FEATURE_MMU);
-> >      set_feature(env, RISCV_FEATURE_PMP);
-> > +    set_time_freq(env, NANOSECONDS_PER_SECOND);
-> >  }
-> >
-> >  static void rv32gcsu_priv1_10_0_cpu_init(Object *obj)
-> > @@ -131,6 +140,7 @@ static void rv32gcsu_priv1_10_0_cpu_init(Object *obj)
-> >      set_resetvec(env, DEFAULT_RSTVEC);
-> >      set_feature(env, RISCV_FEATURE_MMU);
-> >      set_feature(env, RISCV_FEATURE_PMP);
-> > +    set_time_freq(env, NANOSECONDS_PER_SECOND);
-> >  }
-> >
-> >  static void rv32imacu_nommu_cpu_init(Object *obj)
-> > @@ -140,6 +150,7 @@ static void rv32imacu_nommu_cpu_init(Object *obj)
-> >      set_versions(env, USER_VERSION_2_02_0, PRIV_VERSION_1_10_0);
-> >      set_resetvec(env, DEFAULT_RSTVEC);
-> >      set_feature(env, RISCV_FEATURE_PMP);
-> > +    set_time_freq(env, NANOSECONDS_PER_SECOND);
-> >  }
-> >
-> >  #elif defined(TARGET_RISCV64)
-> > @@ -152,6 +163,7 @@ static void rv64gcsu_priv1_09_1_cpu_init(Object *obj)
-> >      set_resetvec(env, DEFAULT_RSTVEC);
-> >      set_feature(env, RISCV_FEATURE_MMU);
-> >      set_feature(env, RISCV_FEATURE_PMP);
-> > +    set_time_freq(env, NANOSECONDS_PER_SECOND);
-> >  }
-> >
-> >  static void rv64gcsu_priv1_10_0_cpu_init(Object *obj)
-> > @@ -162,6 +174,7 @@ static void rv64gcsu_priv1_10_0_cpu_init(Object *obj)
-> >      set_resetvec(env, DEFAULT_RSTVEC);
-> >      set_feature(env, RISCV_FEATURE_MMU);
-> >      set_feature(env, RISCV_FEATURE_PMP);
-> > +    set_time_freq(env, NANOSECONDS_PER_SECOND);
-> >  }
-> >
-> >  static void rv64imacu_nommu_cpu_init(Object *obj)
-> > @@ -171,6 +184,7 @@ static void rv64imacu_nommu_cpu_init(Object *obj)
-> >      set_versions(env, USER_VERSION_2_02_0, PRIV_VERSION_1_10_0);
-> >      set_resetvec(env, DEFAULT_RSTVEC);
-> >      set_feature(env, RISCV_FEATURE_PMP);
-> > +    set_time_freq(env, NANOSECONDS_PER_SECOND);
-> >  }
-> >
-> >  #endif
-> > diff --git a/target/riscv/cpu.h b/target/riscv/cpu.h
-> > index 20bce8742e..67b1769ad3 100644
-> > --- a/target/riscv/cpu.h
-> > +++ b/target/riscv/cpu.h
-> > @@ -173,7 +173,9 @@ struct CPURISCVState {
-> >      /* temporary htif regs */
-> >      uint64_t mfromhost;
-> >      uint64_t mtohost;
-> > +
-> >      uint64_t timecmp;
-> > +    uint64_t time_freq;
-> >
-> >      /* physical memory protection */
-> >      pmp_table_t pmp_state;
-> > diff --git a/target/riscv/csr.c b/target/riscv/csr.c
-> > index e1d91b6c60..6083c782a1 100644
-> > --- a/target/riscv/csr.c
-> > +++ b/target/riscv/csr.c
-> > @@ -191,22 +191,31 @@ static int read_instreth(CPURISCVState *env, int
-> > csrno, target_ulong *val)
-> >  }
-> >  #endif /* TARGET_RISCV32 */
-> >
-> > -#if defined(CONFIG_USER_ONLY)
-> >  static int read_time(CPURISCVState *env, int csrno, target_ulong *val)
-> >  {
-> > +#if !defined(CONFIG_USER_ONLY)
-> > +    *val = muldiv64(qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL),
-> > +                    env->time_freq, NANOSECONDS_PER_SECOND);
-> > +#else
-> >      *val = cpu_get_host_ticks();
-> > +#endif
-> >      return 0;
-> >  }
-> >
-> >  #if defined(TARGET_RISCV32)
-> >  static int read_timeh(CPURISCVState *env, int csrno, target_ulong *val)
-> >  {
-> > +#if !defined(CONFIG_USER_ONLY)
-> > +    *val = muldiv64(qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL),
-> > +                    env->time_freq, NANOSECONDS_PER_SECOND) >> 32;
-> > +#else
-> >      *val = cpu_get_host_ticks() >> 32;
-> > +#endif
-> >      return 0;
-> >  }
-> >  #endif
-> >
-> > -#else /* CONFIG_USER_ONLY */
-> > +#if !defined(CONFIG_USER_ONLY)
-> >
-> >  /* Machine constants */
-> >
-> > @@ -854,14 +863,10 @@ static riscv_csr_operations
-> csr_ops[CSR_TABLE_SIZE] =
-> > {
-> >      [CSR_INSTRETH] =            { ctr,
-> > read_instreth                       },
-> >  #endif
-> >
-> > -    /* User-level time CSRs are only available in linux-user
-> > -     * In privileged mode, the monitor emulates these CSRs */
-> > -#if defined(CONFIG_USER_ONLY)
-> >      [CSR_TIME] =                { ctr,
-> > read_time                           },
-> >  #if defined(TARGET_RISCV32)
-> >      [CSR_TIMEH] =               { ctr,
-> > read_timeh                          },
-> >  #endif
-> > -#endif
-> >
-> >  #if !defined(CONFIG_USER_ONLY)
-> >      /* Machine Timers and Counters */
-> > --
-> > 2.20.1
->
+> +static void rdma_ctrl_ack(struct virtqueue *vq)
+> +{
+> +	struct virtio_rdma_info *dev = vq->vdev->priv;
+> +
+> +	wake_up(&dev->acked);
+> +
+> +	printk("%s\n", __func__);
+> +}
+
+Should that printk() be changed into pr_debug()? The same comment holds for
+all other printk() calls.
+
+> +#define VIRTIO_RDMA_BOARD_ID	1
+> +#define VIRTIO_RDMA_HW_NAME	"virtio-rdma"
+> +#define VIRTIO_RDMA_HW_REV	1
+> +#define VIRTIO_RDMA_DRIVER_VER	"1.0"
+
+Is a driver version number useful in an upstream driver?
+
+> +struct ib_cq *virtio_rdma_create_cq(struct ib_device *ibdev,
+> +				    const struct ib_cq_init_attr *attr,
+> +				    struct ib_ucontext *context,
+> +				    struct ib_udata *udata)
+> +{
+> +	struct scatterlist in, out;
+> +	struct virtio_rdma_ib_cq *vcq;
+> +	struct cmd_create_cq *cmd;
+> +	struct rsp_create_cq *rsp;
+> +	struct ib_cq *cq = NULL;
+> +	int rc;
+> +
+> +	/* TODO: Check MAX_CQ */
+> +
+> +	cmd = kmalloc(sizeof(*cmd), GFP_ATOMIC);
+> +	if (!cmd)
+> +		return ERR_PTR(-ENOMEM);
+> +
+> +	rsp = kmalloc(sizeof(*rsp), GFP_ATOMIC);
+> +	if (!rsp) {
+> +		kfree(cmd);
+> +		return ERR_PTR(-ENOMEM);
+> +	}
+> +
+> +	vcq = kzalloc(sizeof(*vcq), GFP_KERNEL);
+> +	if (!vcq)
+> +		goto out;
+
+Are you sure that you want to mix GFP_ATOMIC and GFP_KERNEL in a single
+function?
+
+Thanks,
+
+Bart.
+
