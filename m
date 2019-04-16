@@ -1,27 +1,34 @@
-Received: from eggs.gnu.org ([209.51.188.92]:60632)
+Received: from eggs.gnu.org ([209.51.188.92]:36580)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1hGLMD-00019U-UU
-	for qemu-devel@nongnu.org; Tue, 16 Apr 2019 06:30:30 -0400
+	(envelope-from <bounces@canonical.com>) id 1hGLkf-0004aZ-Mk
+	for qemu-devel@nongnu.org; Tue, 16 Apr 2019 06:55:46 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1hGLMD-0006lF-45
-	for qemu-devel@nongnu.org; Tue, 16 Apr 2019 06:30:29 -0400
-Received: from mail-ot1-x341.google.com ([2607:f8b0:4864:20::341]:43707)
+	(envelope-from <bounces@canonical.com>) id 1hGLke-0002iI-JR
+	for qemu-devel@nongnu.org; Tue, 16 Apr 2019 06:55:45 -0400
+Received: from indium.canonical.com ([91.189.90.7]:50834)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1hGLMC-0006ku-SA
-	for qemu-devel@nongnu.org; Tue, 16 Apr 2019 06:30:29 -0400
-Received: by mail-ot1-x341.google.com with SMTP id u15so17122616otq.10
-	for <qemu-devel@nongnu.org>; Tue, 16 Apr 2019 03:30:28 -0700 (PDT)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1hGLke-0002fu-Aw
+	for qemu-devel@nongnu.org; Tue, 16 Apr 2019 06:55:44 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1hGLkc-0001Si-SV
+	for <qemu-devel@nongnu.org>; Tue, 16 Apr 2019 10:55:42 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id D02C82E80C7
+	for <qemu-devel@nongnu.org>; Tue, 16 Apr 2019 10:55:42 +0000 (UTC)
 MIME-Version: 1.0
-References: <20190415163337.2795-1-marcandre.lureau@redhat.com>
-In-Reply-To: <20190415163337.2795-1-marcandre.lureau@redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 16 Apr 2019 11:30:15 +0100
-Message-ID: <CAFEAcA-v+RJ7gYyJWTcZ5SBQO1MRPdfNq6jM9yXmg8Q_ig_J0A@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v4] socket: allow wait=false for client
- socket
+Date: Tue, 16 Apr 2019 10:37:35 -0000
+From: Prem Anand <1544524@bugs.launchpad.net>
+Reply-To: Bug 1544524 <1544524@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <20160211115903.17778.55276.malonedeb@soybean.canonical.com>
+Message-Id: <155541105529.21013.8091076072969556373.malone@chaenomeles.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1544524] Re: "info chardev" not showing the real
+ port in use
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,24 +37,57 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@redhat.com>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, "reviewer:Incompatible changes" <libvir-list@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
+To: qemu-devel@nongnu.org
 
-On Mon, 15 Apr 2019 at 17:34, Marc-Andr=C3=A9 Lureau
-<marcandre.lureau@redhat.com> wrote:
->
-> Commit 767abe7 ("chardev: forbid 'wait' option with client sockets")
-> is a bit too strict. Current libvirt always set wait=3Dfalse, and will
-> thus fail to add client chardev.
->
-> Make the code more permissive, allowing wait=3Dfalse with client socket
-> chardevs. Deprecate usage of 'wait' with client sockets.
->
-> Fixes: 767abe7f49e8be14d29da5db3527817b5d696a52
-> Cc: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
-> Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
-> ---
+Yes. This was fixed some time back and I can confirm it working with
+qemu 2.8
 
-Applied to master for rc4, thanks.
+QEMU 2.8.1 monitor - type 'help' for more information
+(qemu) info chardev
+parallel0: filename=3Dvc
+serial0: filename=3Dtelnet:127.0.0.1:35293,server <-> 127.0.0.1:52820
+compat_monitor0: filename=3Dstdio
 
--- PMM
+-- =
+
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1544524
+
+Title:
+  "info chardev" not showing the real port in use
+
+Status in QEMU:
+  Fix Released
+
+Bug description:
+  With Qemu 2.1.2
+  =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+  pharidos@uks2:~$ qemu-system-x86_64 -hda Disk.qcow2 -serial telnet::0,ser=
+ver,nowait -nographic
+  QEMU 2.1.2 monitor - type 'help' for more information
+  (qemu) info chardev
+  parallel0: filename=3Dnull
+  serial0: filename=3Dtelnet:0.0.0.0:44189,server
+  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0^^^^^^^^^^^^^^^^^^^^^^^^^^^ serial cons=
+ole is using port 44189
+  compat_monitor0: filename=3Dstdio
+  (qemu)
+
+  With Qemu 2.5.0
+  =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+  pharidos@uks2:~$ qemu-system-x86_64 -hda Disk.qcow2 -serial  telnet::0,se=
+rver,nowait -nographic
+  QEMU 2.5.0 monitor - type 'help' for more information
+  (qemu) info chardev
+  parallel0: filename=3Dnull
+  serial0: filename=3Ddisconnected:telnet::0,server
+  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ serial co=
+nsole port not shown
+  compat_monitor0: filename=3Dstdio
+  (qemu)
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1544524/+subscriptions
