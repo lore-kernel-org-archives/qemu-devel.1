@@ -1,24 +1,21 @@
-Received: from eggs.gnu.org ([209.51.188.92]:43273)
+Received: from eggs.gnu.org ([209.51.188.92]:43941)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1hGISL-0004H2-Os
-	for qemu-devel@nongnu.org; Tue, 16 Apr 2019 03:24:38 -0400
+	(envelope-from <vsementsov@virtuozzo.com>) id 1hGIVy-0004wA-VO
+	for qemu-devel@nongnu.org; Tue, 16 Apr 2019 03:28:24 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1hGISK-0005U7-RD
-	for qemu-devel@nongnu.org; Tue, 16 Apr 2019 03:24:37 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:43770)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1hGISK-0005So-JB
-	for qemu-devel@nongnu.org; Tue, 16 Apr 2019 03:24:36 -0400
-Date: Tue, 16 Apr 2019 09:24:30 +0200
-From: Gerd Hoffmann <kraxel@redhat.com>
-Message-ID: <20190416072430.dp742ehg27drpplb@sirius.home.kraxel.org>
-References: <874f0f8e-780e-6600-e11b-b97f5b055cf8@durchholz.org>
-	<dbd6541e-5013-d0bc-b23e-a8de4f4cd171@redhat.com>
+	(envelope-from <vsementsov@virtuozzo.com>) id 1hGIVx-0007lm-V9
+	for qemu-devel@nongnu.org; Tue, 16 Apr 2019 03:28:22 -0400
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Date: Tue, 16 Apr 2019 07:28:14 +0000
+Message-ID: <40daf835-2481-e11e-dcdb-421f7063c566@virtuozzo.com>
+References: <20190402153730.54145-1-vsementsov@virtuozzo.com>
+In-Reply-To: <20190402153730.54145-1-vsementsov@virtuozzo.com>
+Content-Language: en-US
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <A8F2CFE192A966479E1F3B7823C497BF@eurprd08.prod.outlook.com>
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <dbd6541e-5013-d0bc-b23e-a8de4f4cd171@redhat.com>
-Subject: Re: [Qemu-devel] curses.c: "We need a terminal output" ?
+Subject: Re: [Qemu-devel] [PATCH v5 00/10] qcow2: encryption threads
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,31 +24,49 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: John Snow <jsnow@redhat.com>
-Cc: Joachim Durchholz <jo@durchholz.org>, qemu-devel@nongnu.org
+To: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>
+Cc: "mreitz@redhat.com" <mreitz@redhat.com>, "kwolf@redhat.com" <kwolf@redhat.com>, "berto@igalia.com" <berto@igalia.com>, "pbonzini@redhat.com" <pbonzini@redhat.com>, Denis Lunev <den@virtuozzo.com>, "berrange@redhat.com" <berrange@redhat.com>
 
-On Mon, Apr 15, 2019 at 03:10:09PM -0400, John Snow wrote:
-> <CC'ing curses maintainer>
-> 
-> On 4/13/19 5:02 AM, Joachim Durchholz wrote:
-> > Hi all,
-> > 
-> > what's the reasoning behind "We need a terminal output" in curses.c?
-
-curses needs a terminal.
-
-> > I don't really see a scenario where it's problematic if qemu emits
-> > escape sequences to a pipe.
-
-It's not about sending escape sequences.  A pipe simply doesn't support
-all the tty ioctls (query terminal size, turn echo on/off, set all kinds
-of terminal modes, ...).
-
-> > I can see another scenario when this is problematic: Unit testing code
-> > that directly writes to the console. E.g. testing BIOS code, or testing
-> > operating systems when using the serial port is not an option.
-
-seabios can work with the serial console just fine, try "qemu -nographic"
-
-cheers,
-  Gerd
+cGluZw0KDQowMi4wNC4yMDE5IDE4OjM3LCBWbGFkaW1pciBTZW1lbnRzb3YtT2dpZXZza2l5IHdy
+b3RlOg0KPiB2NTogcmViYXNlIG9uIG1hc3Rlciwgc29tZSBjb25mbGljdHMgcmVzb2x2ZWQgZHVl
+IHRvIGRhdGEtZmlsZSBmZWF0dXJlDQo+IA0KPiAwMTogbmV3IHBhdGNoLCBqdXN0IG1vdmUgdGVz
+dCBmcm9tIGNvdmVyIGxldHRlciB0byBhIGZpbGUuIEkgcmVhbGx5IGhvcGUgdGhhdCBpdA0KPiAg
+ICAgIHdpbGwgbm90IGhhbmcgdGhlIHdob2xlIHNlcmllcywgc28sIGlmIHdlIGRvbid0IHdhbnQg
+aXQgYXMgaXMgb3Igd2l0aCByZWFsbHkNCj4gICAgICB0aW55IGltcHJvdmVtZW50cywgSSdkIHBy
+ZWZlciB0byBza2lwIGl0IGFuZCBxdWV1ZSAwMi0xMCBmaXJzdC4NCj4gMDk6ICJ0cnVlIiBwYXJh
+bWV0ZXIgYWRkZWQgdG8gbW92ZWQgcWNvdzJfcHJlX3dyaXRlX292ZXJsYXBfY2hlY2soKSBjYWxs
+IGR1ZSB0bw0KPiAgICAgIHJlYmFzZSBvbiBtYXN0ZXIgKGJvdGggYmVmb3JlIGFuZCBhZnRlciBw
+YXRjaCkuIFNlZW1zIE9LLCBzbyBrZWVwIEFsYmVydG8ncyByLWIuDQo+IA0KPiBwZXJmb3JtYW5j
+ZToNCj4gDQo+IGFmdGVyIDAxOg0KPiAgICMgLi90ZXN0cy9wZXJmL2Jsb2NrL3Fjb3cyL2NvbnZl
+cnQtdG8tZW5jcnlwdGVkIC9zc2Qvc3JjLnJhdyAvc3NkL2RzdC5lbmMucWNvdzINCj4gMTQuMTgN
+Cj4gICAjIC4vdGVzdHMvcGVyZi9ibG9jay9xY293Mi9jb252ZXJ0LXRvLWVuY3J5cHRlZCAvc3Nk
+L3NyYy5yYXcgL3NzZC9kc3QuZW5jLnFjb3cyIC1XDQo+IDEzLjc3DQo+IA0KPiBhZnRlciAxMDoN
+Cj4gICAjIC4vdGVzdHMvcGVyZi9ibG9jay9xY293Mi9jb252ZXJ0LXRvLWVuY3J5cHRlZCAvc3Nk
+L3NyYy5yYXcgL3NzZC9kc3QuZW5jLnFjb3cyDQo+IDE0LjM1DQo+ICAgIyAuL3Rlc3RzL3BlcmYv
+YmxvY2svcWNvdzIvY29udmVydC10by1lbmNyeXB0ZWQgL3NzZC9zcmMucmF3IC9zc2QvZHN0LmVu
+Yy5xY293MiAtVw0KPiA1LjYyDQo+IA0KPiBWbGFkaW1pciBTZW1lbnRzb3YtT2dpZXZza2l5ICgx
+MCk6DQo+ICAgIHRlc3RzL3BlcmY6IFRlc3QgcWVtdS1pbWcgY29udmVydCBmcm9tIHJhdyB0byBl
+bmNyeXB0ZWQgcWNvdzINCj4gICAgcWNvdzIuaDogYWRkIG1pc3NpbmcgaW5jbHVkZQ0KPiAgICBx
+Y293MjogYWRkIHNlcGFyYXRlIGZpbGUgZm9yIHRocmVhZGVkIGRhdGEgcHJvY2Vzc2luZyBmdW5j
+dGlvbnMNCj4gICAgcWNvdzItdGhyZWFkczogdXNlIHRocmVhZF9wb29sX3N1Ym1pdF9jbw0KPiAg
+ICBxY293Mi10aHJlYWRzOiBxY293Ml9jb19kb19jb21wcmVzczogcHJvdGVjdCBxdWV1aW5nIGJ5
+IG11dGV4DQo+ICAgIHFjb3cyLXRocmVhZHM6IHNwbGl0IG91dCBnZW5lcmljIHBhdGgNCj4gICAg
+cWNvdzI6IHFjb3cyX2NvX3ByZWFkdjogaW1wcm92ZSBsb2NraW5nDQo+ICAgIHFjb3cyOiBxY293
+Ml9jb19wcmVhZHY6IHNraXAgdXNpbmcgaGRfcWlvdiB3aGVuIHBvc3NpYmxlDQo+ICAgIHFjb3cy
+OiBiZHJ2X2NvX3B3cml0ZXY6IG1vdmUgZW5jcnlwdGlvbiBjb2RlIG91dCBvZiB0aGUgbG9jaw0K
+PiAgICBxY293MjogZG8gZW5jcnlwdGlvbiBpbiB0aHJlYWRzDQo+IA0KPiAgIGJsb2NrL3Fjb3cy
+LmggICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgfCAgMjAgKy0NCj4gICBibG9jay9xY293
+Mi1iaXRtYXAuYyAgICAgICAgICAgICAgICAgICAgICAgIHwgICAxIC0NCj4gICBibG9jay9xY293
+Mi1jYWNoZS5jICAgICAgICAgICAgICAgICAgICAgICAgIHwgICAxIC0NCj4gICBibG9jay9xY293
+Mi1jbHVzdGVyLmMgICAgICAgICAgICAgICAgICAgICAgIHwgICA4ICstDQo+ICAgYmxvY2svcWNv
+dzItcmVmY291bnQuYyAgICAgICAgICAgICAgICAgICAgICB8ICAgMSAtDQo+ICAgYmxvY2svcWNv
+dzItc25hcHNob3QuYyAgICAgICAgICAgICAgICAgICAgICB8ICAgMSAtDQo+ICAgYmxvY2svcWNv
+dzItdGhyZWFkcy5jICAgICAgICAgICAgICAgICAgICAgICB8IDI2OCArKysrKysrKysrKysrKysr
+KysrDQo+ICAgYmxvY2svcWNvdzIuYyAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICB8IDI3
+NSArKysrLS0tLS0tLS0tLS0tLS0tLQ0KPiAgIGJsb2NrL01ha2VmaWxlLm9ianMgICAgICAgICAg
+ICAgICAgICAgICAgICAgfCAgIDIgKy0NCj4gICB0ZXN0cy9wZXJmL2Jsb2NrL3Fjb3cyL2NvbnZl
+cnQtdG8tZW5jcnlwdGVkIHwgIDQ4ICsrKysNCj4gICAxMCBmaWxlcyBjaGFuZ2VkLCAzODkgaW5z
+ZXJ0aW9ucygrKSwgMjM2IGRlbGV0aW9ucygtKQ0KPiAgIGNyZWF0ZSBtb2RlIDEwMDY0NCBibG9j
+ay9xY293Mi10aHJlYWRzLmMNCj4gICBjcmVhdGUgbW9kZSAxMDA3NTUgdGVzdHMvcGVyZi9ibG9j
+ay9xY293Mi9jb252ZXJ0LXRvLWVuY3J5cHRlZA0KPiANCg0KDQotLSANCkJlc3QgcmVnYXJkcywN
+ClZsYWRpbWlyDQo=
