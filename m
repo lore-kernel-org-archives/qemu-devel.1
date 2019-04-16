@@ -1,28 +1,16 @@
-Received: from eggs.gnu.org ([209.51.188.92]:39656)
+Received: from eggs.gnu.org ([209.51.188.92]:43991)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bart.vanassche@gmail.com>) id 1hGCZq-0002Va-1p
-	for qemu-devel@nongnu.org; Mon, 15 Apr 2019 21:07:58 -0400
+	(envelope-from <andrew.smirnov@gmail.com>) id 1hGD4Q-0006Ru-U5
+	for qemu-devel@nongnu.org; Mon, 15 Apr 2019 21:39:35 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bart.vanassche@gmail.com>) id 1hGCZp-0003IU-2s
-	for qemu-devel@nongnu.org; Mon, 15 Apr 2019 21:07:58 -0400
-Received: from mail-pl1-f196.google.com ([209.85.214.196]:36146)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bart.vanassche@gmail.com>)
-	id 1hGCZo-0003I9-Pn
-	for qemu-devel@nongnu.org; Mon, 15 Apr 2019 21:07:57 -0400
-Received: by mail-pl1-f196.google.com with SMTP id ck15so9455600plb.3
-	for <qemu-devel@nongnu.org>; Mon, 15 Apr 2019 18:07:56 -0700 (PDT)
-References: <20190411110157.14252-1-yuval.shaia@oracle.com>
-	<20190411110157.14252-4-yuval.shaia@oracle.com>
-From: Bart Van Assche <bvanassche@acm.org>
-Message-ID: <f133d122-5b00-2e3b-f5cc-efc6d2cc3d3b@acm.org>
-Date: Mon, 15 Apr 2019 18:07:52 -0700
+	(envelope-from <andrew.smirnov@gmail.com>) id 1hGD4Q-0007nf-4r
+	for qemu-devel@nongnu.org; Mon, 15 Apr 2019 21:39:34 -0400
+From: Andrey Smirnov <andrew.smirnov@gmail.com>
+Date: Mon, 15 Apr 2019 18:38:57 -0700
+Message-Id: <20190416013902.4941-1-andrew.smirnov@gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <20190411110157.14252-4-yuval.shaia@oracle.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [RFC 3/3] RDMA/virtio-rdma: VirtIO rdma driver
+Content-Transfer-Encoding: 8bit
+Subject: [Qemu-devel] [PATCH 0/5] Various i.MX7 fixes
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,80 +19,33 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Yuval Shaia <yuval.shaia@oracle.com>, virtualization@lists.linux-foundation.org, qemu-devel@nongnu.org, mst@redhat.com, cohuck@redhat.com, marcel.apfelbaum@gmail.com, linux-rdma@vger.kernel.org, jgg@mellanox.com
+To: qemu-arm@nongnu.org
+Cc: Andrey Smirnov <andrew.smirnov@gmail.com>, Peter Maydell <peter.maydell@linaro.org>, "Michael S . Tsirkin" <mst@redhat.com>, qemu-devel@nongnu.org
 
-On 4/11/19 4:01 AM, Yuval Shaia wrote:
-> +++ b/drivers/infiniband/hw/virtio/Kconfig
-> @@ -0,0 +1,6 @@
-> +config INFINIBAND_VIRTIO_RDMA
-> +	tristate "VirtIO Paravirtualized RDMA Driver"
-> +	depends on NETDEVICES && ETHERNET && PCI && INET
-> +	---help---
-> +	  This driver provides low-level support for VirtIO Paravirtual
-> +	  RDMA adapter.
+Everyone:
 
-Does this driver really depend on Ethernet, or does it also work with
-Ethernet support disabled?
+I recently revisited my i.MX7 work and this series contains all of the
+fixes I had to make to get it to work with latest (5.1-rc1) Linux
+kernel again as well as fixes for genuine bugs that I somehow missed
+during original submission ("pci: designware" patches). Hopefully each
+patch is self-explanatory.
 
-> +static inline struct virtio_rdma_info *to_vdev(struct ib_device *ibdev)
-> +{
-> +	return container_of(ibdev, struct virtio_rdma_info, ib_dev);
-> +}
-
-Is it really worth to introduce this function? Have you considered to
-use container_of(ibdev, struct virtio_rdma_info, ib_dev) directly instead
-of to_vdev()?
-
-> +static void rdma_ctrl_ack(struct virtqueue *vq)
-> +{
-> +	struct virtio_rdma_info *dev = vq->vdev->priv;
-> +
-> +	wake_up(&dev->acked);
-> +
-> +	printk("%s\n", __func__);
-> +}
-
-Should that printk() be changed into pr_debug()? The same comment holds for
-all other printk() calls.
-
-> +#define VIRTIO_RDMA_BOARD_ID	1
-> +#define VIRTIO_RDMA_HW_NAME	"virtio-rdma"
-> +#define VIRTIO_RDMA_HW_REV	1
-> +#define VIRTIO_RDMA_DRIVER_VER	"1.0"
-
-Is a driver version number useful in an upstream driver?
-
-> +struct ib_cq *virtio_rdma_create_cq(struct ib_device *ibdev,
-> +				    const struct ib_cq_init_attr *attr,
-> +				    struct ib_ucontext *context,
-> +				    struct ib_udata *udata)
-> +{
-> +	struct scatterlist in, out;
-> +	struct virtio_rdma_ib_cq *vcq;
-> +	struct cmd_create_cq *cmd;
-> +	struct rsp_create_cq *rsp;
-> +	struct ib_cq *cq = NULL;
-> +	int rc;
-> +
-> +	/* TODO: Check MAX_CQ */
-> +
-> +	cmd = kmalloc(sizeof(*cmd), GFP_ATOMIC);
-> +	if (!cmd)
-> +		return ERR_PTR(-ENOMEM);
-> +
-> +	rsp = kmalloc(sizeof(*rsp), GFP_ATOMIC);
-> +	if (!rsp) {
-> +		kfree(cmd);
-> +		return ERR_PTR(-ENOMEM);
-> +	}
-> +
-> +	vcq = kzalloc(sizeof(*vcq), GFP_KERNEL);
-> +	if (!vcq)
-> +		goto out;
-
-Are you sure that you want to mix GFP_ATOMIC and GFP_KERNEL in a single
-function?
+Feedback is welcome!
 
 Thanks,
+Andrey Smirnov
 
-Bart.
+Andrey Smirnov (5):
+  i.mx7d: Add no-op/unimplemented APBH DMA module
+  i.mx7d: Add no-op/unimplemented PCIE PHY IP block
+  pci: designware: Update MSI mapping unconditionally
+  pci: designware: Update MSI mapping when MSI address changes
+  i.mx7d: pci: Update PCI IRQ mapping to match HW
+
+ include/hw/arm/fsl-imx7.h | 14 ++++++++++----
+ hw/arm/fsl-imx7.c         | 11 +++++++++++
+ hw/pci-host/designware.c  | 18 ++++++++----------
+ 3 files changed, 29 insertions(+), 14 deletions(-)
+
+-- 
+2.20.1
