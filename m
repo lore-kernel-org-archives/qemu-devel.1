@@ -1,28 +1,33 @@
-Received: from eggs.gnu.org ([209.51.188.92]:36983)
+Received: from eggs.gnu.org ([209.51.188.92]:37560)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1hGJeU-0005tU-4D
-	for qemu-devel@nongnu.org; Tue, 16 Apr 2019 04:41:15 -0400
+	(envelope-from <richard.henderson@linaro.org>) id 1hGJh1-0007ET-7G
+	for qemu-devel@nongnu.org; Tue, 16 Apr 2019 04:43:53 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1hGJeT-0001wR-2u
-	for qemu-devel@nongnu.org; Tue, 16 Apr 2019 04:41:14 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:47920)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1hGJeS-0001w7-QZ
-	for qemu-devel@nongnu.org; Tue, 16 Apr 2019 04:41:13 -0400
-Date: Tue, 16 Apr 2019 09:40:59 +0100
-From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-Message-ID: <20190416084059.GD31311@redhat.com>
-Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-References: <20190415154503.6758-1-berrange@redhat.com>
-	<jpgk1fvp5wm.fsf@linux.bootlegged.copy>
-	<20190415165426.GT5718@redhat.com>
+	(envelope-from <richard.henderson@linaro.org>) id 1hGJgx-00037Z-0R
+	for qemu-devel@nongnu.org; Tue, 16 Apr 2019 04:43:50 -0400
+Received: from mail-pf1-x442.google.com ([2607:f8b0:4864:20::442]:46656)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+	id 1hGJgS-0002y5-Rv
+	for qemu-devel@nongnu.org; Tue, 16 Apr 2019 04:43:46 -0400
+Received: by mail-pf1-x442.google.com with SMTP id 9so10018914pfj.13
+	for <qemu-devel@nongnu.org>; Tue, 16 Apr 2019 01:43:16 -0700 (PDT)
+References: <20190411100836.646-1-david@redhat.com>
+	<20190411100836.646-4-david@redhat.com>
+	<50db1745-397d-03e0-626a-12d1b2a2a554@linaro.org>
+	<0fdae81c-eecb-90cd-26f8-b52964d375a3@redhat.com>
+	<b0567193-e353-d391-b438-e5b580d699a4@linaro.org>
+	<0d400fda-85a7-6c5d-a693-1d0bfec63ce3@redhat.com>
+From: Richard Henderson <richard.henderson@linaro.org>
+Message-ID: <9f632efd-37b9-5aaf-fe81-7c332ad51d7a@linaro.org>
+Date: Mon, 15 Apr 2019 22:43:11 -1000
 MIME-Version: 1.0
+In-Reply-To: <0d400fda-85a7-6c5d-a693-1d0bfec63ce3@redhat.com>
 Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20190415165426.GT5718@redhat.com>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH 0/3] usb-mtp: fix ObjectInfo request
- handling
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v1 03/41] s390x/tcg: Implement VECTOR ADD
+ COMPUTE CARRY
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,58 +36,33 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Bandan Das <bsd@redhat.com>
-Cc: Peter Maydell <peter.maydell@linaro.org>, Thomas Huth <thuth@redhat.com>, Greg Kurz <groug@kaod.org>, qemu-devel@nongnu.org, Gerd Hoffmann <kraxel@redhat.com>
+To: David Hildenbrand <david@redhat.com>, qemu-devel@nongnu.org
+Cc: qemu-s390x@nongnu.org, Thomas Huth <thuth@redhat.com>, Cornelia Huck <cohuck@redhat.com>
 
-On Mon, Apr 15, 2019 at 05:54:26PM +0100, Daniel P. Berrang=C3=A9 wrote:
-> On Mon, Apr 15, 2019 at 12:52:41PM -0400, Bandan Das wrote:
-> > Daniel P. Berrang=C3=A9 <berrange@redhat.com> writes:
-> >=20
-> > > Two previous attempts to fix this due to GCC 9 highlighting
-> > > unaligned data access. My attempt:
-> > >
-> > >   https://lists.gnu.org/archive/html/qemu-devel/2019-03/msg07763.ht=
-ml
-> > >
-> > > And a previous one:
-> > >
-> > >   https://lists.gnu.org/archive/html/qemu-devel/2019-02/msg07923.ht=
-ml
-> > >   https://lists.gnu.org/archive/html/qemu-devel/2019-03/msg00162.ht=
-ml
-> > >
-> > > There are a number of bugs in the USB MTP usb_mtp_write_metadata
-> > > method handling the filename character set conversion.
-> > >
-> > > The 2nd patch in this series is a security flaw fix since the
-> > > code was not correctly validating guest provided data length.
-> > >
-> > > I've been unable to figure out how to exercise the codepath that
-> > > calls usb_mtp_write_metadata. At a guess, it looks like something
-> > > that should be called when writing to a file from a guest, but the
-> > > GNOME GVFS MTP driver doesn't provide write support. Using the
-> > > command line MTP tools "mtp-sendfile" command results in an
-> > > protocol error
-> > >
-> > >     # mtp-sendfile foo eek.txt
-> > >     libmtp version: 1.1.14
-> > >
-> >=20
-> > The store is read only by default. Are you trying something like:
-> >  -device usb-mtp,rootdir=3D/code/mtpshare,readonly=3Dfalse ?
->=20
-> Ah ha, I didn't realize I had to enable write support explicitly. Will
-> retry with that.
+On 4/15/19 10:33 PM, David Hildenbrand wrote:
+>>>
+>>> Indeed, I didn't really explore vector operations yet. This is more
+>>> compact than I expected :)
+>>
+>> :-)
+>>
+>> That said, in implementing vector variable shifts today,
+>> I've come up with a representational problem here.
+>> You may want to hold off on these until I can address them.
+> 
+> I assume you mean vector helpers *in general* in this file. Yes, we can
+> add them later.
+> 
+> What exact problem are you dealing with?
 
-Even after setting  readonly=3Dfalse, I still can't get "mtp-sendfile"
-to succeed in a guest.
+The .opc field lets you only specify one opcode which is optional in the
+backend on which you depend.  In writing support for AArch64 USHL, I find that
+I needed 3 optional opcodes.
 
-Regards,
-Daniel
---=20
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberran=
-ge :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.c=
-om :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberran=
-ge :|
+I'm thinking of a mass change whereby .opc becomes a pointer to an array with
+terminator.  But then, for debugging purposes, I think I need to validate that
+array, so that it's not missing things that ought to be specified, but which
+happen to be supported by the current host.
+
+
+r~
