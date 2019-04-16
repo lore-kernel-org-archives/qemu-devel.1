@@ -2,94 +2,80 @@ Return-Path: <SRS0=xvb4=SS=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.7 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 15CE9C10F13
-	for <qemu-devel@archiver.kernel.org>; Tue, 16 Apr 2019 17:33:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 77A71C10F13
+	for <qemu-devel@archiver.kernel.org>; Tue, 16 Apr 2019 17:39:58 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D228C20872
-	for <qemu-devel@archiver.kernel.org>; Tue, 16 Apr 2019 17:33:34 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="l083H1G8"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D228C20872
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id 4C1D92073F
+	for <qemu-devel@archiver.kernel.org>; Tue, 16 Apr 2019 17:39:58 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4C1D92073F
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:40130 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:40186 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hGRxd-0006oh-TV
-	for qemu-devel@archiver.kernel.org; Tue, 16 Apr 2019 13:33:33 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:38572)
+	id 1hGS3p-00008k-8l
+	for qemu-devel@archiver.kernel.org; Tue, 16 Apr 2019 13:39:57 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:39556)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1hGRwe-0006Vk-EG
-	for qemu-devel@nongnu.org; Tue, 16 Apr 2019 13:32:34 -0400
+	(envelope-from <philmd@redhat.com>) id 1hGS2q-00088S-7a
+	for qemu-devel@nongnu.org; Tue, 16 Apr 2019 13:38:57 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1hGRwd-0002me-G3
-	for qemu-devel@nongnu.org; Tue, 16 Apr 2019 13:32:32 -0400
-Received: from mail-pg1-x543.google.com ([2607:f8b0:4864:20::543]:43139)
+	(envelope-from <philmd@redhat.com>) id 1hGS2i-0006Td-1w
+	for qemu-devel@nongnu.org; Tue, 16 Apr 2019 13:38:52 -0400
+Received: from mail-wm1-f67.google.com ([209.85.128.67]:35856)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1hGRwd-0002ls-25
-	for qemu-devel@nongnu.org; Tue, 16 Apr 2019 13:32:31 -0400
-Received: by mail-pg1-x543.google.com with SMTP id z9so10661133pgu.10
-	for <qemu-devel@nongnu.org>; Tue, 16 Apr 2019 10:32:30 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
-	h=subject:from:to:cc:references:openpgp:message-id:date:user-agent
-	:mime-version:in-reply-to:content-language:content-transfer-encoding;
-	bh=DZgxGGKLa0kE9VqJcscCmcCSakbkChpoYfz20lljoeQ=;
-	b=l083H1G8ceMz3zTYuOKwzkSAYPpAaIZA1d67HLyohD9pXM0uVajyRQ2Z99FKYGGXYE
-	lnmmny58VdF87YsY2FxDRmFHOI5b2walIkBCfcgJkxdTIVwB66oNbOoW+U0Y2vJoOw/0
-	jHAUFX3+mLbN7+SQecALFEC+eVdSgIQWN5Jbd8UJcRsCBbAQNCP8aX07stU0qHrxJAFm
-	tgjD3tSnYovyvfCPXEEfpGwGN/R/OIpX5pLsM0YKnFP0+JaPjT8I5IuhAnM4BLHgRVUV
-	k0/QcEUR1ca6GLUNOOawhcNN40OK2gHH2oDRFztpER5L8A+bVjTpWyLSMVSTy0roR5D2
-	kq5w==
+	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1hGS2h-0006Sd-RC
+	for qemu-devel@nongnu.org; Tue, 16 Apr 2019 13:38:48 -0400
+Received: by mail-wm1-f67.google.com with SMTP id h18so73942wml.1
+	for <qemu-devel@nongnu.org>; Tue, 16 Apr 2019 10:38:47 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
 	d=1e100.net; s=20161025;
-	h=x-gm-message-state:subject:from:to:cc:references:openpgp:message-id
+	h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
 	:date:user-agent:mime-version:in-reply-to:content-language
 	:content-transfer-encoding;
-	bh=DZgxGGKLa0kE9VqJcscCmcCSakbkChpoYfz20lljoeQ=;
-	b=RugjEuc8lQVmcs+1seilUhyVS2Gd0/IowENTw7VUMxpEh4pf1sUjWoJAGgMCPjgO9q
-	r1+tcqNQtiloVj7alXn0e3WWCP/LfBE1rnM6CRfYBh5Ray2PH9z+Ie+PKA5dlaDqAPMk
-	+t+tyg3nOCXVoD/onP79Z2xxCw5Eo20zhLBUaMD7WWdIy3DQQQs44BypQTLWI2VjZNlf
-	+iOYmfPDSW2b84AkafY5zQo/ATyXkQI/F1fvHDfVSw/ejih98gOgKusaltZGFQV3Bduy
-	l2Hp4FSm7QzZzgr3jNOnAys/u8rIX8TWhkyVho8Q1kmhskozxzgSDOYkJ2Ql5hLmyFoR
-	AGSQ==
-X-Gm-Message-State: APjAAAVy5/OyICwMjhgBkM7VniE/9hqjNdD4lzMOGkMZhpnalE562NGZ
-	5aOVl17Y4MTPujJEsJGnrB7tOMmh7YQ=
-X-Google-Smtp-Source: APXvYqxDCZbpjR6FZOuWE1Yv+vM83LbE0aghRK0jo1whhe3Wwqc697VenAKo+zMYJ60Fcp2bG4nIsQ==
-X-Received: by 2002:a63:8848:: with SMTP id l69mr73483641pgd.137.1555435949830;
-	Tue, 16 Apr 2019 10:32:29 -0700 (PDT)
-Received: from [172.20.101.138] (rrcs-66-91-136-155.west.biz.rr.com.
-	[66.91.136.155]) by smtp.gmail.com with ESMTPSA id
-	e126sm130574179pfh.35.2019.04.16.10.32.28
-	(version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-	Tue, 16 Apr 2019 10:32:28 -0700 (PDT)
-From: Richard Henderson <richard.henderson@linaro.org>
-To: Bastian Koppelmann <kbastian@mail.uni-paderborn.de>, qemu-devel@nongnu.org
-References: <20190401031155.21293-1-richard.henderson@linaro.org>
-	<20190401031155.21293-4-richard.henderson@linaro.org>
-	<c6b66db9-24d5-b55b-8b45-e73f3d7c3fba@mail.uni-paderborn.de>
-	<50effb1c-3bbe-126b-9bfb-0b65eacc9c36@linaro.org>
-Openpgp: preference=signencrypt
-Message-ID: <abdf9c63-8f27-8cb2-dc94-22318c3836ae@linaro.org>
-Date: Tue, 16 Apr 2019 07:32:25 -1000
+	bh=gSUCcgG6wPa0hvMtI0TJYrUwX5y+E+Fsm3WwCaySzdY=;
+	b=ExjSHFDVRxyQgFE5wLwE9/WQ9OMq+5mvGSW/7Tt70/EqzjUoYtXo9YZcweH83GcjO+
+	AIZkwllhBqHc87youVBpYEtk9t2WSBe/lyppeqNplM0BQN2z6//ogdcuvXC1idnPVTc+
+	N3bvHzoZWLFZEZ/16U33iOhoFMICYSKnqdowM1d9ven9vx8/4ID4mpstJW214yjyWAom
+	3l13tg0g6EKVTl585DJbCv5l1P2G1XdU9BHhgLQGn4yJMiM8e7ftRz+NP0gF9dAuJqp0
+	i4jVMuMhL3oBv4qVjqvNqZcSXkmykr8g6JXUXLQoK+jJXVKx9lpdi5g3RHWShF2QKj2X
+	mI+g==
+X-Gm-Message-State: APjAAAVqWXiK0GXfnvHQocR0VcYEmtn1cbvbJZm/RyH0bFjzxwRFCGYe
+	TKm4uy3hnHqpED0076jCZWTjZw==
+X-Google-Smtp-Source: APXvYqxiAqWgxx0kHtdcrsWWyhOHZHhWFH6UR33kr2k1BsTFRH+d86OaHGrV1AaCyJDgbq2pqn5cuA==
+X-Received: by 2002:a7b:c1cf:: with SMTP id a15mr26572360wmj.44.1555436326157; 
+	Tue, 16 Apr 2019 10:38:46 -0700 (PDT)
+Received: from [192.168.1.33] (193.red-88-21-103.staticip.rima-tde.net.
+	[88.21.103.193]) by smtp.gmail.com with ESMTPSA id
+	z18sm79910257wrr.90.2019.04.16.10.38.45
+	(version=TLS1_3 cipher=AEAD-AES128-GCM-SHA256 bits=128/128);
+	Tue, 16 Apr 2019 10:38:45 -0700 (PDT)
+To: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
+References: <20190416091348.26075-1-armbru@redhat.com>
+	<20190416091348.26075-2-armbru@redhat.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Openpgp: id=89C1E78F601EE86C867495CBA2A3FD6EDEADC0DE;
+	url=http://pgp.mit.edu/pks/lookup?op=get&search=0xA2A3FD6EDEADC0DE
+Message-ID: <ae1c979b-9cb2-cbaa-584c-b70dbf97d1e4@redhat.com>
+Date: Tue, 16 Apr 2019 19:38:39 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
 	Thunderbird/60.6.1
 MIME-Version: 1.0
-In-Reply-To: <50effb1c-3bbe-126b-9bfb-0b65eacc9c36@linaro.org>
+In-Reply-To: <20190416091348.26075-2-armbru@redhat.com>
 Content-Type: text/plain; charset="UTF-8"
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
-	recognized.
-X-Received-From: 2607:f8b0:4864:20::543
-Subject: Re: [Qemu-devel] [PATCH for-4.1 3/8] target/riscv: Merge argument
- sets for insn32 and insn16
+Content-Transfer-Encoding: 8bit
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+	[fuzzy]
+X-Received-From: 209.85.128.67
+Subject: Re: [Qemu-devel] [PATCH v2 1/3] pc: Rearrange
+ pc_system_firmware_init()'s legacy -drive loop
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -101,55 +87,63 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-riscv@nongnu.org, palmer@sifive.com, Alistair.Francis@wdc.com
+Cc: kwolf@redhat.com, peter.maydell@linaro.org, qemu-block@nongnu.org,
+	mreitz@redhat.com, qemu-arm@nongnu.org, lersek@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190416173225.0PJuUysFFHLFa80RaDqN9arMWSh6OcmBdE49-JrBMAI@z>
+Message-ID: <20190416173839.X3kFk-w81LyCmZaVD3wLmBjBaR-rHD7ARDejJ_mpHqU@z>
 
-On 4/16/19 7:22 AM, Richard Henderson wrote:
-> diff --git a/target/riscv/translate.c b/target/riscv/translate.c
-> index fb66e886bf..c96c616539 100644
-> --- a/target/riscv/translate.c
-> +++ b/target/riscv/translate.c
-> @@ -695,6 +695,7 @@ static bool gen_shift(DisasContext *ctx, arg_r *a,
->   */
->  #pragma GCC diagnostic push
->  #pragma GCC diagnostic ignored "-Wredundant-decls"
-> +#pragma GCC diagnostic ignored "-Wtypedef-redefinition"
+On 4/16/19 11:13 AM, Markus Armbruster wrote:
+> The loop does two things: map legacy -drive to properties, and collect
+> all the backends for use after the loop.  The next patch will factor
+> out the former for reuse in hw/arm/virt.c.  To make that easier,
+> rearrange the loop so it does the first thing first, and the second
+> thing second.
+> 
+> Signed-off-by: Markus Armbruster <armbru@redhat.com>
+> ---
+>  hw/i386/pc_sysfw.c | 24 +++++++++++-------------
+>  1 file changed, 11 insertions(+), 13 deletions(-)
+> 
+> diff --git a/hw/i386/pc_sysfw.c b/hw/i386/pc_sysfw.c
+> index c628540774..75925f5d3f 100644
+> --- a/hw/i386/pc_sysfw.c
+> +++ b/hw/i386/pc_sysfw.c
+> @@ -280,21 +280,19 @@ void pc_system_firmware_init(PCMachineState *pcms,
+>  
+>      /* Map legacy -drive if=pflash to machine properties */
+>      for (i = 0; i < ARRAY_SIZE(pcms->flash); i++) {
+> -        pflash_blk[i] = pflash_cfi01_get_blk(pcms->flash[i]);
+>          pflash_drv = drive_get(IF_PFLASH, 0, i);
+> -        if (!pflash_drv) {
+> -            continue;
+> +        if (pflash_drv) {
+> +            loc_push_none(&loc);
+> +            qemu_opts_loc_restore(pflash_drv->opts);
+> +            if (pflash_cfi01_get_blk(pcms->flash[i])) {
+> +                error_report("clashes with -machine");
+> +                exit(1);
+> +            }
+> +            qdev_prop_set_drive(DEVICE(pcms->flash[i]), "drive",
+> +                                blk_by_legacy_dinfo(pflash_drv), &error_fatal);
+> +            loc_pop(&loc);
+>          }
+> -        loc_push_none(&loc);
+> -        qemu_opts_loc_restore(pflash_drv->opts);
+> -        if (pflash_blk[i]) {
+> -            error_report("clashes with -machine");
+> -            exit(1);
+> -        }
+> -        pflash_blk[i] = blk_by_legacy_dinfo(pflash_drv);
+> -        qdev_prop_set_drive(DEVICE(pcms->flash[i]),
+> -                            "drive", pflash_blk[i], &error_fatal);
+> -        loc_pop(&loc);
+> +        pflash_blk[i] = pflash_cfi01_get_blk(pcms->flash[i]);
+>      }
+>  
+>      /* Reject gaps */
+> 
 
-Bah.  Of course gcc doesn't know this one.  And looking closer elsewhere, I see
-we've got a configure test for the pragmas, which I suppose I ought to use.
-
-
-r~
-
-
-diff --git a/target/riscv/translate.c b/target/riscv/translate.c
-index fb66e886bf..b62ca04281 100644
---- a/target/riscv/translate.c
-+++ b/target/riscv/translate.c
-@@ -693,12 +693,19 @@ static bool gen_shift(DisasContext *ctx, arg_r *a,
-  * initially declared by the 32-bit decoder, which results in duplicate
-  * declaration warnings.  Suppress them.
-  */
--#pragma GCC diagnostic push
--#pragma GCC diagnostic ignored "-Wredundant-decls"
-+#ifdef CONFIG_PRAGMA_DIAGNOSTIC_AVAILABLE
-+# pragma GCC diagnostic push
-+# pragma GCC diagnostic ignored "-Wredundant-decls"
-+# ifdef __clang__
-+#  pragma GCC diagnostic ignored "-Wtypedef-redefinition"
-+# endif
-+#endif
-
- #include "decode_insn16.inc.c"
-
--#pragma GCC diagnostic pop
-+#ifdef CONFIG_PRAGMA_DIAGNOSTIC_AVAILABLE
-+# pragma GCC diagnostic pop
-+#endif
-
- static void decode_opc(DisasContext *ctx)
- {
+Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
 
