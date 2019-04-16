@@ -2,66 +2,112 @@ Return-Path: <SRS0=xvb4=SS=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.3 required=3.0 tests=FROM_EXCESS_BASE64,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_PASS,URIBL_BLOCKED,USER_AGENT_MUTT autolearn=ham autolearn_force=no
+X-Spam-Status: No, score=-0.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E4D7AC10F14
-	for <qemu-devel@archiver.kernel.org>; Tue, 16 Apr 2019 09:05:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0B10CC10F13
+	for <qemu-devel@archiver.kernel.org>; Tue, 16 Apr 2019 09:06:26 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A234E20645
-	for <qemu-devel@archiver.kernel.org>; Tue, 16 Apr 2019 09:05:19 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A234E20645
+	by mail.kernel.org (Postfix) with ESMTPS id CE04D20645
+	for <qemu-devel@archiver.kernel.org>; Tue, 16 Apr 2019 09:06:25 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CE04D20645
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:33422 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:33439 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hGK1n-0007gb-04
-	for qemu-devel@archiver.kernel.org; Tue, 16 Apr 2019 05:05:19 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:42080)
+	id 1hGK2r-0008Sc-29
+	for qemu-devel@archiver.kernel.org; Tue, 16 Apr 2019 05:06:25 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:42301)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1hGK0j-0007AV-QM
-	for qemu-devel@nongnu.org; Tue, 16 Apr 2019 05:04:16 -0400
+	(envelope-from <david@redhat.com>) id 1hGK1l-0007sC-L2
+	for qemu-devel@nongnu.org; Tue, 16 Apr 2019 05:05:18 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1hGK0h-0008HI-Se
-	for qemu-devel@nongnu.org; Tue, 16 Apr 2019 05:04:13 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:45532)
+	(envelope-from <david@redhat.com>) id 1hGK1k-0000TR-Ow
+	for qemu-devel@nongnu.org; Tue, 16 Apr 2019 05:05:17 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:41026)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1hGK0f-0008Fb-NX
-	for qemu-devel@nongnu.org; Tue, 16 Apr 2019 05:04:11 -0400
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
-	[10.5.11.16])
+	(Exim 4.71) (envelope-from <david@redhat.com>)
+	id 1hGK1k-0000Rs-Ah; Tue, 16 Apr 2019 05:05:16 -0400
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+	[10.5.11.15])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 2D72187632;
-	Tue, 16 Apr 2019 09:04:08 +0000 (UTC)
-Received: from redhat.com (ovpn-112-50.ams2.redhat.com [10.36.112.50])
-	by smtp.corp.redhat.com (Postfix) with ESMTPS id 574245C220;
-	Tue, 16 Apr 2019 09:04:01 +0000 (UTC)
-Date: Tue, 16 Apr 2019 10:03:58 +0100
-From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-To: Markus Armbruster <armbru@redhat.com>
-Message-ID: <20190416090358.GF31311@redhat.com>
-References: <20190415141547.15444-1-berrange@redhat.com>
-	<87a7gq75l6.fsf@dusky.pond.sub.org>
+	by mx1.redhat.com (Postfix) with ESMTPS id 91E15308AA12;
+	Tue, 16 Apr 2019 09:05:15 +0000 (UTC)
+Received: from [10.36.116.179] (ovpn-116-179.ams2.redhat.com [10.36.116.179])
+	by smtp.corp.redhat.com (Postfix) with ESMTP id 2D9B75D707;
+	Tue, 16 Apr 2019 09:05:14 +0000 (UTC)
+To: Richard Henderson <richard.henderson@linaro.org>, qemu-devel@nongnu.org
+References: <20190411100836.646-1-david@redhat.com>
+	<20190411100836.646-11-david@redhat.com>
+	<59b43a53-8c25-53ea-c5a8-1cd33b4011e5@linaro.org>
+From: David Hildenbrand <david@redhat.com>
+Openpgp: preference=signencrypt
+Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
+	xsFNBFXLn5EBEAC+zYvAFJxCBY9Tr1xZgcESmxVNI/0ffzE/ZQOiHJl6mGkmA1R7/uUpiCjJ
+	dBrn+lhhOYjjNefFQou6478faXE6o2AhmebqT4KiQoUQFV4R7y1KMEKoSyy8hQaK1umALTdL
+	QZLQMzNE74ap+GDK0wnacPQFpcG1AE9RMq3aeErY5tujekBS32jfC/7AnH7I0v1v1TbbK3Gp
+	XNeiN4QroO+5qaSr0ID2sz5jtBLRb15RMre27E1ImpaIv2Jw8NJgW0k/D1RyKCwaTsgRdwuK
+	Kx/Y91XuSBdz0uOyU/S8kM1+ag0wvsGlpBVxRR/xw/E8M7TEwuCZQArqqTCmkG6HGcXFT0V9
+	PXFNNgV5jXMQRwU0O/ztJIQqsE5LsUomE//bLwzj9IVsaQpKDqW6TAPjcdBDPLHvriq7kGjt
+	WhVhdl0qEYB8lkBEU7V2Yb+SYhmhpDrti9Fq1EsmhiHSkxJcGREoMK/63r9WLZYI3+4W2rAc
+	UucZa4OT27U5ZISjNg3Ev0rxU5UH2/pT4wJCfxwocmqaRr6UYmrtZmND89X0KigoFD/XSeVv
+	jwBRNjPAubK9/k5NoRrYqztM9W6sJqrH8+UWZ1Idd/DdmogJh0gNC0+N42Za9yBRURfIdKSb
+	B3JfpUqcWwE7vUaYrHG1nw54pLUoPG6sAA7Mehl3nd4pZUALHwARAQABzSREYXZpZCBIaWxk
+	ZW5icmFuZCA8ZGF2aWRAcmVkaGF0LmNvbT7CwX4EEwECACgFAljj9eoCGwMFCQlmAYAGCwkI
+	BwMCBhUIAgkKCwQWAgMBAh4BAheAAAoJEE3eEPcA/4Na5IIP/3T/FIQMxIfNzZshIq687qgG
+	8UbspuE/YSUDdv7r5szYTK6KPTlqN8NAcSfheywbuYD9A4ZeSBWD3/NAVUdrCaRP2IvFyELj
+	xoMvfJccbq45BxzgEspg/bVahNbyuBpLBVjVWwRtFCUEXkyazksSv8pdTMAs9IucChvFmmq3
+	jJ2vlaz9lYt/lxN246fIVceckPMiUveimngvXZw21VOAhfQ+/sofXF8JCFv2mFcBDoa7eYob
+	s0FLpmqFaeNRHAlzMWgSsP80qx5nWWEvRLdKWi533N2vC/EyunN3HcBwVrXH4hxRBMco3jvM
+	m8VKLKao9wKj82qSivUnkPIwsAGNPdFoPbgghCQiBjBe6A75Z2xHFrzo7t1jg7nQfIyNC7ez
+	MZBJ59sqA9EDMEJPlLNIeJmqslXPjmMFnE7Mby/+335WJYDulsRybN+W5rLT5aMvhC6x6POK
+	z55fMNKrMASCzBJum2Fwjf/VnuGRYkhKCqqZ8gJ3OvmR50tInDV2jZ1DQgc3i550T5JDpToh
+	dPBxZocIhzg+MBSRDXcJmHOx/7nQm3iQ6iLuwmXsRC6f5FbFefk9EjuTKcLMvBsEx+2DEx0E
+	UnmJ4hVg7u1PQ+2Oy+Lh/opK/BDiqlQ8Pz2jiXv5xkECvr/3Sv59hlOCZMOaiLTTjtOIU7Tq
+	7ut6OL64oAq+zsFNBFXLn5EBEADn1959INH2cwYJv0tsxf5MUCghCj/CA/lc/LMthqQ773ga
+	uB9mN+F1rE9cyyXb6jyOGn+GUjMbnq1o121Vm0+neKHUCBtHyseBfDXHA6m4B3mUTWo13nid
+	0e4AM71r0DS8+KYh6zvweLX/LL5kQS9GQeT+QNroXcC1NzWbitts6TZ+IrPOwT1hfB4WNC+X
+	2n4AzDqp3+ILiVST2DT4VBc11Gz6jijpC/KI5Al8ZDhRwG47LUiuQmt3yqrmN63V9wzaPhC+
+	xbwIsNZlLUvuRnmBPkTJwwrFRZvwu5GPHNndBjVpAfaSTOfppyKBTccu2AXJXWAE1Xjh6GOC
+	8mlFjZwLxWFqdPHR1n2aPVgoiTLk34LR/bXO+e0GpzFXT7enwyvFFFyAS0Nk1q/7EChPcbRb
+	hJqEBpRNZemxmg55zC3GLvgLKd5A09MOM2BrMea+l0FUR+PuTenh2YmnmLRTro6eZ/qYwWkC
+	u8FFIw4pT0OUDMyLgi+GI1aMpVogTZJ70FgV0pUAlpmrzk/bLbRkF3TwgucpyPtcpmQtTkWS
+	gDS50QG9DR/1As3LLLcNkwJBZzBG6PWbvcOyrwMQUF1nl4SSPV0LLH63+BrrHasfJzxKXzqg
+	rW28CTAE2x8qi7e/6M/+XXhrsMYG+uaViM7n2je3qKe7ofum3s4vq7oFCPsOgwARAQABwsFl
+	BBgBAgAPBQJVy5+RAhsMBQkJZgGAAAoJEE3eEPcA/4NagOsP/jPoIBb/iXVbM+fmSHOjEshl
+	KMwEl/m5iLj3iHnHPVLBUWrXPdS7iQijJA/VLxjnFknhaS60hkUNWexDMxVVP/6lbOrs4bDZ
+	NEWDMktAeqJaFtxackPszlcpRVkAs6Msn9tu8hlvB517pyUgvuD7ZS9gGOMmYwFQDyytpepo
+	YApVV00P0u3AaE0Cj/o71STqGJKZxcVhPaZ+LR+UCBZOyKfEyq+ZN311VpOJZ1IvTExf+S/5
+	lqnciDtbO3I4Wq0ArLX1gs1q1XlXLaVaA3yVqeC8E7kOchDNinD3hJS4OX0e1gdsx/e6COvy
+	qNg5aL5n0Kl4fcVqM0LdIhsubVs4eiNCa5XMSYpXmVi3HAuFyg9dN+x8thSwI836FoMASwOl
+	C7tHsTjnSGufB+D7F7ZBT61BffNBBIm1KdMxcxqLUVXpBQHHlGkbwI+3Ye+nE6HmZH7IwLwV
+	W+Ajl7oYF+jeKaH4DZFtgLYGLtZ1LDwKPjX7VAsa4Yx7S5+EBAaZGxK510MjIx6SGrZWBrrV
+	TEvdV00F2MnQoeXKzD7O4WFbL55hhyGgfWTHwZ457iN9SgYi1JLPqWkZB0JRXIEtjd4JEQcx
+	+8Umfre0Xt4713VxMygW0PnQt5aSQdMD58jHFxTk092mU+yIHj5LeYgvwSgZN4airXk5yRXl
+	SE+xAvmumFBY
+Organization: Red Hat GmbH
+Message-ID: <b275e358-6cc4-c8f7-1db4-26ef43eeb7e1@redhat.com>
+Date: Tue, 16 Apr 2019 11:05:13 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+	Thunderbird/60.6.1
 MIME-Version: 1.0
+In-Reply-To: <59b43a53-8c25-53ea-c5a8-1cd33b4011e5@linaro.org>
 Content-Type: text/plain; charset="UTF-8"
-Content-Disposition: inline
-In-Reply-To: <87a7gq75l6.fsf@dusky.pond.sub.org>
-User-Agent: Mutt/1.11.3 (2019-02-01)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.26]);
-	Tue, 16 Apr 2019 09:04:08 +0000 (UTC)
-Content-Transfer-Encoding: quoted-printable
+	(mx1.redhat.com [10.5.110.41]);
+	Tue, 16 Apr 2019 09:05:15 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH v2] vl: set LC_CTYPE early in main() for
- all code
+Subject: Re: [Qemu-devel] [PATCH v1 10/41] s390x/tcg: Implement VECTOR
+ ELEMENT COMPARE *
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -73,293 +119,61 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Bandan Das <bsd@redhat.com>,
-	qemu-devel@nongnu.org, Samuel Thibault <samuel.thibault@ens-lyon.org>,
-	Gerd Hoffmann <kraxel@redhat.com>
+Cc: qemu-s390x@nongnu.org, Cornelia Huck <cohuck@redhat.com>,
+	Thomas Huth <thuth@redhat.com>, Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190416090358.ras3NWsCQOIz4GNOvlOD97aei1DDYE73soRvlsYNCb4@z>
+Message-ID: <20190416090513.R120I2YRCs0g8lcg3eXdc1oLUs-yxAZlJ8BkJ05YddI@z>
 
-On Tue, Apr 16, 2019 at 09:49:09AM +0200, Markus Armbruster wrote:
-> Daniel P. Berrang=C3=A9 <berrange@redhat.com> writes:
->=20
-> > Localization is not a feature whose impact is limited to the UI
-> > frontends. Other parts of QEMU rely in localization.
->=20
-> Typically by accident :)
->=20
-> >                                                      In particular th=
-e
-> > USB MTP driver needs to be able to convert filenames from the locale
-> > specified character set into UTF-16 / UCS-2 encoded wide characters.
->=20
-> Oookay.  I guess that makes some sense.
->=20
-> > setlocale() is only set from two of the UI frontends though, and wors=
-e,
-> > there is inconsistent behaviour with GTK setting LC_CTYPE to C.UTF-8,
-> > while ncurses honours whatever is set in the user's environment.
-> >
-> > This causes the USP MTP driver to behave differently depending on whi=
-ch
-> > UI frontend is activated.
-> >
-> > Furthermore, the curses settings are dangerous because LC_CTYPE will =
-affect
-> > the is{upper,lower,alnum} functions which much QEMU code assumes to h=
-ave
-> > C locale sorting behaviour. This also breaks QMP if the env requests =
-a
-> > non-UTF-8 locale, since QMP is defined to use UTF-8 encoding for JSON=
-.
->=20
-> Can you elaborate on how QMP breaks with a non-UTF-8 locale?  Ah, you d=
-o
-> in the comment you add to vl.c.
->=20
-> > This problematic curses code was introduced in:
-> >
-> >   commit 2f8b7cd587558944532f587abb5203ce54badba9
-> >   Author: Samuel Thibault <samuel.thibault@ens-lyon.org>
-> >   Date:   Mon Mar 11 14:51:27 2019 +0100
-> >
-> >     curses: add option to specify VGA font encoding
-> >
-> > This patch moves the GTK frontend setlocale() handling into the main(=
-)
-> > method. This ensures QMP and other QEMU code has a predictable C.UTF-=
-8.
-> >
-> > Eventually QEMU should set LC_ALL, honouring the full user environmen=
-t,
-> > but this needs various cleanups in QEMU code first.
->=20
-> Eventually, we'll all be dead.
->=20
-> >                                                     Hardcoding LC_CTY=
-PE
-> > to C.UTF-8 is a partial regression vs the above curses commit, since =
-it
-> > will break the curses wide character handling for non-UTF-8 locales b=
-ut
-> > this is unavoidable until QEMU is cleaned up to cope with non-UTF-8
-> > locales fully.
-> >
-> > Setting of LC_MESSAGES is left in the GTK code since only the GTK
-> > frontend is using translation of strings. This lets us avoid the
-> > platform portability problem where LC_MESSAGES is not provided by
-> > locale.h on MinGW. GTK pulls it in indirectly from libintl.h via
-> > gi18n.h header, but we don't want to pull that into the global
-> > QEMU namespace.
-> >
-> > Signed-off-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
-> > ---
-> >
-> > Changed in v2:
-> >
-> >  - Leave LC_MESSAGES setting in gtk code to avoid platform
-> >    portability problems.
-> >
-> >  ui/curses.c |  2 --
-> >  ui/gtk.c    | 32 +++++++++++---------------------
-> >  vl.c        | 40 ++++++++++++++++++++++++++++++++++++++++
-> >  3 files changed, 51 insertions(+), 23 deletions(-)
-> >
-> > diff --git a/ui/curses.c b/ui/curses.c
-> > index cc6d6da684..403cd57913 100644
-> > --- a/ui/curses.c
-> > +++ b/ui/curses.c
-> > @@ -27,7 +27,6 @@
-> >  #include <sys/ioctl.h>
-> >  #include <termios.h>
-> >  #endif
-> > -#include <locale.h>
-> >  #include <wchar.h>
-> >  #include <langinfo.h>
-> >  #include <iconv.h>
-> > @@ -716,7 +715,6 @@ static void curses_display_init(DisplayState *ds,=
- DisplayOptions *opts)
-> >      }
-> >  #endif
-> > =20
-> > -    setlocale(LC_CTYPE, "");
-> >      if (opts->u.curses.charset) {
-> >          font_charset =3D opts->u.curses.charset;
-> >      }
-> > diff --git a/ui/gtk.c b/ui/gtk.c
-> > index e96e15435a..e6a41c79ab 100644
-> > --- a/ui/gtk.c
-> > +++ b/ui/gtk.c
-> > @@ -2208,12 +2208,12 @@ static void gtk_display_init(DisplayState *ds=
-, DisplayOptions *opts)
-> > =20
-> >      s->free_scale =3D FALSE;
-> > =20
-> > -    /* Mostly LC_MESSAGES only. See early_gtk_display_init() for det=
-ails. For
-> > -     * LC_CTYPE, we need to make sure that non-ASCII characters are =
-considered
-> > -     * printable, but without changing any of the character classes =
-to make
-> > -     * sure that we don't accidentally break implicit assumptions.  =
-*/
-> > +    /*
-> > +     * See comment in main() for why it has only setup LC_CTYPE,
-> > +     * as opposed to LC_ALL. Given that we need to enable
-> > +     * LC_MESSAGES too for menu translations.
-> > +     */
-> >      setlocale(LC_MESSAGES, "");
-> > -    setlocale(LC_CTYPE, "C.UTF-8");
-> >      bindtextdomain("qemu", CONFIG_QEMU_LOCALEDIR);
-> >      textdomain("qemu");
-> > =20
-> > @@ -2262,22 +2262,12 @@ static void gtk_display_init(DisplayState *ds=
-, DisplayOptions *opts)
-> > =20
-> >  static void early_gtk_display_init(DisplayOptions *opts)
-> >  {
-> > -    /* The QEMU code relies on the assumption that it's always run i=
-n
-> > -     * the C locale. Therefore it is not prepared to deal with
-> > -     * operations that produce different results depending on the
-> > -     * locale, such as printf's formatting of decimal numbers, and
-> > -     * possibly others.
-> > -     *
-> > -     * Since GTK+ calls setlocale() by default -importing the locale
-> > -     * settings from the environment- we must prevent it from doing =
-so
-> > -     * using gtk_disable_setlocale().
-> > -     *
-> > -     * QEMU's GTK+ UI, however, _does_ have translations for some of
-> > -     * the menu items. As a trade-off between a functionally correct
-> > -     * QEMU and a fully internationalized UI we support importing
-> > -     * LC_MESSAGES from the environment (see the setlocale() call
-> > -     * earlier in this file). This allows us to display translated
-> > -     * messages leaving everything else untouched.
-> > +    /*
-> > +     * GTK calls setlocale() by default, importing the locale
-> > +     * settings from the environment. QEMU's main() method will
-> > +     * have set LC_MESSAGES and LC_CTYPE to allow GTK to display
-> > +     * translated messages, including use of wide characters. We
-> > +     * must not allow GTK to change other aspects of the locale.
-> >       */
-> >      gtk_disable_setlocale();
-> >      gtkinit =3D gtk_init_check(NULL, NULL);
-> > diff --git a/vl.c b/vl.c
-> > index c696ad2a13..87a55cddb3 100644
-> > --- a/vl.c
-> > +++ b/vl.c
-> > @@ -49,6 +49,7 @@ int main(int argc, char **argv)
-> >  #define main qemu_main
-> >  #endif /* CONFIG_COCOA */
-> > =20
-> > +#include <locale.h>
-> > =20
-> >  #include "qemu/error-report.h"
-> >  #include "qemu/sockets.h"
-> > @@ -3022,6 +3023,45 @@ int main(int argc, char **argv, char **envp)
-> >      char *dir, **dirs;
-> >      BlockdevOptionsQueue bdo_queue =3D QSIMPLEQ_HEAD_INITIALIZER(bdo=
-_queue);
-> > =20
-> > +    /*
-> > +     * Ideally we would set LC_ALL, but QEMU currently isn't able to=
- cope
-> > +     * with arbitrary localization settings. In particular there are=
- two
-> > +     * known problems
-> > +     *
-> > +     *   - The QMP monitor needs to use the C locale rules for numer=
-ic
-> > +     *     formatting. This would need a double/int -> string format=
-ter
-> > +     *     that is locale independant.
->=20
-> Aha.
->=20
-> Reminds me of the story of a FORTRAN compiler that rejected only
-> far-away customers' programs...
->=20
-> > +     *
-> > +     *   - The QMP monitor needs to encode all data as UTF-8. This n=
-eeds
-> > +     *     to be updated to use iconv(3) to explicitly convert the c=
-urrent
-> > +     *     locale's charset into utf-8
->=20
-> Really?  What locale-dependent text gets sent to QMP?
+On 13.04.19 01:14, Richard Henderson wrote:
+> On 4/11/19 12:08 AM, David Hildenbrand wrote:
+>> +                         es | logical ? 0 : MO_SIGN);
+> 
+> Incorrect operator precedence.  You need:
+> 
+>   es | (logical ? 0 : MO_SIGN)
+> 
+> or
+> 
+>   logical ? es : es | MO_SIGN
+> 
+> And perhaps cse this expression into a temporary
+> and not replicate it between the two reads.
+> 
+> Otherwise,
+> Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+> 
+> 
+> r~
+> 
 
-The main thing I can see would be filenames.
+Thanks, good catch! I'll do it like this
 
-Though having said it is UTF-8 on looking more closely I think QEMU is
-probably 8-bit clean in its handling, so will just be blindly passing
-whatever filename string it get from libvirt straight on to the kernel
-with no interpretation.
-
-Libvirt has enabled UTF-8 validation in its JSON library when encoding
-data it sends to QEMU, so any data libvirt is sending will be a valid
-UTF-8 byte sequence at least. Libvirt doesn't axctually do any charset
-conversion though, so if libvirt runs in a non-UTF8 locale it will
-likely trip over this UTF-8 validation.
++static DisasJumpType op_vec(DisasContext *s, DisasOps *o)
++{
++    uint8_t es = get_field(s->fields, m3);
++    const uint8_t enr = NUM_VEC_ELEMENTS(es) / 2 - 1;
++
++    if (es > ES_64) {
++        gen_program_exception(s, PGM_SPECIFICATION);
++        return DISAS_NORETURN;
++    }
++    if (s->fields->op2 == 0xdb) {
++        es |= MO_SIGN;
++    }
++
++    o->in1 = tcg_temp_new_i64();
++    o->in2 = tcg_temp_new_i64();
++    read_vec_element_i64(o->in1, get_field(s->fields, v1), enr, es);
++    read_vec_element_i64(o->in2, get_field(s->fields, v2), enr, es);
++    return DISAS_NEXT;
++}
 
 
+-- 
 
->=20
-> > +     *
-> > +     *   - Lots of codes uses is{upper,lower,alnum,...} functions, e=
-xpecting
-> > +     *     C locale sorting behaviour. Most QEMU usage should likely=
- be
-> > +     *     changed to g_ascii_is{upper,lower,alnum...} to match code
-> > +     *     assumptions, without being broken by locale settnigs.
-> > +     *
-> > +     * We do still have two requirements
-> > +     *
-> > +     *   - Ability to correct display translated text according to t=
-he
-> > +     *     user's locale
-> > +     *
-> > +     *   - Ability to handle multibyte characters, ideally according=
- to
-> > +     *     user's locale specified character set. This affects abili=
-ty
-> > +     *     of usb-mtp to correctly convert filenames to UCS16 and cu=
-rses
-> > +     *     & GTK frontends wide character display.
-> > +     *
-> > +     * The second requirement would need LC_CTYPE to be honoured, bu=
-t
-> > +     * this conflicts with the 2nd & 3rd problems listed earlier. Fo=
-r
-> > +     * now we make a tradeoff, trying to set an explicit UTF-8 local=
-ee
-> > +     *
-> > +     * Note we can't set LC_MESSAGES here, since mingw doesn't defin=
-e
-> > +     * this constant in locale.h Fortunately we only need it for the
-> > +     * GTK frontend and that uses gi18n.h which pulls in a definitio=
-n
-> > +     * of LC_MESSAGES.
-> > +     */
-> > +    setlocale(LC_CTYPE, "C.UTF-8");
-> > +
-> >      module_call_init(MODULE_INIT_TRACE);
-> > =20
-> >      qemu_init_cpu_list();
->=20
-> We should've stayed out of the GUI business.
+Thanks,
 
-This isn't only a GUI problem as above, it affects USB MTP.
-
-Regards,
-Daniel
---=20
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberran=
-ge :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.c=
-om :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberran=
-ge :|
+David / dhildenb
 
