@@ -1,25 +1,23 @@
-Received: from eggs.gnu.org ([209.51.188.92]:35466)
+Received: from eggs.gnu.org ([209.51.188.92]:36929)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1hGJWc-0003U7-Te
-	for qemu-devel@nongnu.org; Tue, 16 Apr 2019 04:33:07 -0400
+	(envelope-from <david@redhat.com>) id 1hGJeH-0005mS-2H
+	for qemu-devel@nongnu.org; Tue, 16 Apr 2019 04:41:01 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1hGJWc-00071q-4B
-	for qemu-devel@nongnu.org; Tue, 16 Apr 2019 04:33:06 -0400
+	(envelope-from <david@redhat.com>) id 1hGJeF-0001rF-GY
+	for qemu-devel@nongnu.org; Tue, 16 Apr 2019 04:41:00 -0400
 References: <20190411100836.646-1-david@redhat.com>
-	<20190411100836.646-4-david@redhat.com>
-	<50db1745-397d-03e0-626a-12d1b2a2a554@linaro.org>
-	<0fdae81c-eecb-90cd-26f8-b52964d375a3@redhat.com>
-	<b0567193-e353-d391-b438-e5b580d699a4@linaro.org>
+	<20190411100836.646-6-david@redhat.com>
+	<fed7735f-6d51-f84d-8160-6967ffec2338@linaro.org>
 From: David Hildenbrand <david@redhat.com>
-Message-ID: <0d400fda-85a7-6c5d-a693-1d0bfec63ce3@redhat.com>
-Date: Tue, 16 Apr 2019 10:33:02 +0200
+Message-ID: <b2442338-174b-65fc-0fc4-b6af58c60eb0@redhat.com>
+Date: Tue, 16 Apr 2019 10:40:52 +0200
 MIME-Version: 1.0
-In-Reply-To: <b0567193-e353-d391-b438-e5b580d699a4@linaro.org>
+In-Reply-To: <fed7735f-6d51-f84d-8160-6967ffec2338@linaro.org>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v1 03/41] s390x/tcg: Implement VECTOR ADD
- COMPUTE CARRY
+Subject: Re: [Qemu-devel] [PATCH v1 05/41] s390x/tcg: Implement VECTOR ADD
+ WITH CARRY COMPUTE CARRY
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,22 +27,44 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: Richard Henderson <richard.henderson@linaro.org>, qemu-devel@nongnu.org
-Cc: qemu-s390x@nongnu.org, Thomas Huth <thuth@redhat.com>, Cornelia Huck <cohuck@redhat.com>
+Cc: qemu-s390x@nongnu.org, Cornelia Huck <cohuck@redhat.com>, Thomas Huth <thuth@redhat.com>, Richard Henderson <rth@twiddle.net>
 
->>
->> Indeed, I didn't really explore vector operations yet. This is more
->> compact than I expected :)
+On 12.04.19 23:58, Richard Henderson wrote:
+> On 4/11/19 12:08 AM, David Hildenbrand wrote:
+>> +static DisasJumpType op_vaccc(DisasContext *s, DisasOps *o)
+>> +{
+>> +    if (get_field(s->fields, m5) != ES_128) {
+>> +        gen_program_exception(s, PGM_SPECIFICATION);
+>> +        return DISAS_NORETURN;
+>> +    }
+>> +
+>> +    gen_gvec_4_ool(get_field(s->fields, v1), get_field(s->fields, v2),
+>> +                   get_field(s->fields, v3), get_field(s->fields, v4), 0,
+>> +                   gen_helper_gvec_vaccc128);
+>> +    return DISAS_NEXT;
+>> +}
 > 
-> :-)
+> An inline expansion could be
 > 
-> That said, in implementing vector variable shifts today,
-> I've come up with a representational problem here.
-> You may want to hold off on these until I can address them.
+> One possible expansion is
+> 
+>   tcg_gen_andi_i64(tl, cl, 1);
+>   tcg_gen_add2_i64(tl, th, tl, zero, al, zero);
+>   tcg_gen_add2_i64(tl, th, tl, th, bl, zero);
+>   tcg_gen_add2_i64(tl, th, th, zero, ah, zero);
+>   tcg_gen_add2_i64(tl, th, tl, th, bl, zero);
+>   /* carry out in th */
+> 
+> This is 8 insns for the addition vs the hw optimal 6, but we're not exactly an
+> optimizing compiler either.  ;-)
+> 
 
-I assume you mean vector helpers *in general* in this file. Yes, we can
-add them later.
+Yes, very nice! Thanks!
 
-What exact problem are you dealing with?
+> 
+> r~
+> 
+
 
 -- 
 
