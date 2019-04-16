@@ -4,76 +4,75 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-8.7 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+	SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C47E5C10F13
-	for <qemu-devel@archiver.kernel.org>; Tue, 16 Apr 2019 13:05:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 37B64C10F13
+	for <qemu-devel@archiver.kernel.org>; Tue, 16 Apr 2019 13:05:55 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8ECD920675
-	for <qemu-devel@archiver.kernel.org>; Tue, 16 Apr 2019 13:05:40 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id E325A20675
+	for <qemu-devel@archiver.kernel.org>; Tue, 16 Apr 2019 13:05:54 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="UbcPRQfM"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8ECD920675
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="UCxrSCP0"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E325A20675
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:36377 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:36387 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hGNmN-00025y-QN
-	for qemu-devel@archiver.kernel.org; Tue, 16 Apr 2019 09:05:39 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:34341)
+	id 1hGNmc-0002OR-49
+	for qemu-devel@archiver.kernel.org; Tue, 16 Apr 2019 09:05:54 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:34505)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1hGNf0-0004TX-Jp
-	for qemu-devel@nongnu.org; Tue, 16 Apr 2019 08:58:03 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1hGNf8-0004cs-Mb
+	for qemu-devel@nongnu.org; Tue, 16 Apr 2019 08:58:12 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1hGNex-00014z-7X
-	for qemu-devel@nongnu.org; Tue, 16 Apr 2019 08:58:00 -0400
-Received: from mail-wm1-x343.google.com ([2a00:1450:4864:20::343]:40150)
+	(envelope-from <peter.maydell@linaro.org>) id 1hGNf6-0001Bk-Oy
+	for qemu-devel@nongnu.org; Tue, 16 Apr 2019 08:58:10 -0400
+Received: from mail-wr1-x442.google.com ([2a00:1450:4864:20::442]:44711)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1hGNet-00010w-Cw
-	for qemu-devel@nongnu.org; Tue, 16 Apr 2019 08:57:57 -0400
-Received: by mail-wm1-x343.google.com with SMTP id z24so25490158wmi.5
-	for <qemu-devel@nongnu.org>; Tue, 16 Apr 2019 05:57:52 -0700 (PDT)
+	id 1hGNf6-00017t-Ea
+	for qemu-devel@nongnu.org; Tue, 16 Apr 2019 08:58:08 -0400
+Received: by mail-wr1-x442.google.com with SMTP id y7so26892221wrn.11
+	for <qemu-devel@nongnu.org>; Tue, 16 Apr 2019 05:58:03 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
 	h=from:to:subject:date:message-id:in-reply-to:references:mime-version
 	:content-transfer-encoding;
-	bh=Cdsm6rjvWmI4e6EeMdiLshilhoveyvisAWdYOPDLvS8=;
-	b=UbcPRQfMjFKcki+y5mz4nyoIqifqrFfEvVWwpycZV2t0/2oKu0Lz5rb66YOk8dVH6k
-	H+gynXOiulmANFAe2qguw+VjG2W66JVSYZ9qRXku0v6Xq8o/Y1RWFMdE9WsZEqCEQZ4v
-	RkJbFT2htqCrk12xUiZjBmZ7EKSwIUkzmlK6Q7XJon+Ae9Yma0+CNogP+8rb1d9sk81F
-	wtx4EtltNb5oA1JWEyYhsKsVEW5RwwEjm13xaFOje8hCZXd9l8rS0H7Rq22UDbFAQmOa
-	MQJs7Q270tXx3lT37sWvIVPM8LeyvngaBB0ZgBLkT/pjldDazV7f1NfBXkpHDn9jglOP
-	nU+g==
+	bh=FJePOyZA9Q3WiPn2k7ahGOza/ZX3bYrlq3y5WZmHrm8=;
+	b=UCxrSCP0eboG54fxzgq65yS18UP31ZSBcboUV8nMm2G9k2XUGj7s8gq9Q9NtIjzq94
+	4DCyBggg0BKfLwtJFNiytIcIuhBN+7Rpjt5svYgPHLJqJtl8AWp8R4pWsVDqP2w38SXq
+	ua9Rufc8OiECFQwTH3mMmxMZYvqWPDku/ryXgWbW1SnT0ptgP9jkNHmt+w9SO/oQ9gRp
+	wQ1cmyQLhOBE4pE31iNmPscs4Z5j4nawFqSHRXgg14IYjmYVwK3agPBCet0ZkO7HhFSL
+	68WucII1TcFTeLuzaB36FkvCzBfvVYuSeDSFCTHYfbmfAOjp2MPI6dMABPlCEJwgVo9g
+	ByYA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
 	d=1e100.net; s=20161025;
 	h=x-gm-message-state:from:to:subject:date:message-id:in-reply-to
 	:references:mime-version:content-transfer-encoding;
-	bh=Cdsm6rjvWmI4e6EeMdiLshilhoveyvisAWdYOPDLvS8=;
-	b=QtEWlMIaTqI2Oz60Q16J8Fd1dREgXTUq46pZDqwM9w5txOo38gMiEIkitkFkIKNg2h
-	mG2S/D/xh3KVH/MIXrcIT/nd30DxquYncxRdABwBdELBJPIIxJQUap2lmvwR9jUu8CFB
-	NUbzbFBbJ96MFj6pbFOZf0hbRFcJLZi1sA3DNvygJc0fzLr6Iuwi6kGZYZ+4XUpHQr9x
-	GFwjueyuXtMDuQKFZr+3s6JLi0MAX2fFiRJ9Af6cTa2jzzU6/PwAUUu96HKrWsKetz7S
-	5uSY1oknipOrNkGJmQrdZVNbPw4AaQpux3jMXjKZQHTlGZLAeZ57Tinc37AiQm9y+pE9
-	927Q==
-X-Gm-Message-State: APjAAAX6TCE0/LvjlgJmoVPwljMS7YvfevoKw+yCbbBDAmR347qOQe8K
-	0ZJ4Yjo3QZQ9ynmth+mHlzTsp88RkaI=
-X-Google-Smtp-Source: APXvYqwtHpIDl6ni7Lp1l92UaDb4/A9szvAO3aPUVBFX7k8h0YuFc9ho1JyDM6b/e8Xi+bU1t408AA==
-X-Received: by 2002:a1c:eb07:: with SMTP id j7mr25520428wmh.138.1555419471361; 
-	Tue, 16 Apr 2019 05:57:51 -0700 (PDT)
+	bh=FJePOyZA9Q3WiPn2k7ahGOza/ZX3bYrlq3y5WZmHrm8=;
+	b=nRL0UCOD8xbNPO4LE70pvy3brksSwOU2ZKWQrADY6q7IhgNqKhHT2MAZHDp4s1Lez+
+	gpQW/kL8NsRW0QvYcAJ7wMoAZ9PeW4r3vpfk4LjOp/v+O2iL6RZcxGCxsOnjqqrH01IJ
+	JgKNmgier7RroqLrP4y2FEpaOzDOPIGKJMuK6SFUMoD0XerHDhFnCKR+CFPNXrvegeNw
+	xyVGsDC+K9VpB5qXekLm5csuJsExjf9s3oxwZ+0JtfgXGpVoF99p8uhLvf5OReWfiM5D
+	n8t6ul9LqR5Kwn4ZsyKEeI2l5t3Bj4b9ku+QVA63KviIf7U0GNiaZDfKYABjU/hBGk7u
+	iFlw==
+X-Gm-Message-State: APjAAAVrUzjwMDKtAnsPY/pn5uPGs6O9hLksuZMVx6jqtol+fgkk3cHI
+	8l3RHhdh0nTswZG876c3n+Np1Q==
+X-Google-Smtp-Source: APXvYqw9l4wnEmEtIMaZZC/0sVVLC8/pgvpe2hqJK05P9azhdTK9PxwD+fTc47rGerYAw6xKNNJUQw==
+X-Received: by 2002:adf:e951:: with SMTP id m17mr42025658wrn.287.1555419482909;
+	Tue, 16 Apr 2019 05:58:02 -0700 (PDT)
 Received: from orth.archaic.org.uk (orth.archaic.org.uk. [81.2.115.148])
 	by smtp.gmail.com with ESMTPSA id
-	v184sm39476572wma.6.2019.04.16.05.57.49
+	v184sm39476572wma.6.2019.04.16.05.58.00
 	(version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-	Tue, 16 Apr 2019 05:57:49 -0700 (PDT)
+	Tue, 16 Apr 2019 05:58:01 -0700 (PDT)
 From: Peter Maydell <peter.maydell@linaro.org>
 To: qemu-arm@nongnu.org,
 	qemu-devel@nongnu.org
-Date: Tue, 16 Apr 2019 13:57:20 +0100
-Message-Id: <20190416125744.27770-3-peter.maydell@linaro.org>
+Date: Tue, 16 Apr 2019 13:57:26 +0100
+Message-Id: <20190416125744.27770-9-peter.maydell@linaro.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20190416125744.27770-1-peter.maydell@linaro.org>
 References: <20190416125744.27770-1-peter.maydell@linaro.org>
@@ -81,9 +80,9 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
 	recognized.
-X-Received-From: 2a00:1450:4864:20::343
-Subject: [Qemu-devel] [PATCH 02/26] hw/intc/armv7m_nvic: Allow reading of
- M-profile MVFR* registers
+X-Received-From: 2a00:1450:4864:20::442
+Subject: [Qemu-devel] [PATCH 08/26] target/arm: Handle SFPA and FPCA bits in
+ reads and writes of CONTROL
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -99,34 +98,127 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 Content-Type: text/plain; charset="UTF-8"
-Message-ID: <20190416125720.4KzRHxvj49XKLW7F1q4Q9OuSF2tyR74sIvCQrTMiSCo@z>
+Message-ID: <20190416125726.ztGu4pUkV0Mcxc_SskrZudPLM7EnnjC_IJdsrhfAW5w@z>
 
-For M-profile the MVFR* ID registers are memory mapped, in the
-range we implement via the NVIC. Allow them to be read.
-(If the CPU has no FPU, these registers are defined to be RAZ.)
+The M-profile CONTROL register has two bits -- SFPA and FPCA --
+which relate to floating-point support, and should be RES0 otherwise.
+Handle them correctly in the MSR/MRS register access code.
+Neither is banked between security states, so they are stored
+in v7m.control[M_REG_S] regardless of current security state.
 
 Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 ---
- hw/intc/armv7m_nvic.c | 6 ++++++
- 1 file changed, 6 insertions(+)
+ target/arm/helper.c | 57 ++++++++++++++++++++++++++++++++++++++-------
+ 1 file changed, 49 insertions(+), 8 deletions(-)
 
-diff --git a/hw/intc/armv7m_nvic.c b/hw/intc/armv7m_nvic.c
-index ab822f42514..45d72f86bdf 100644
---- a/hw/intc/armv7m_nvic.c
-+++ b/hw/intc/armv7m_nvic.c
-@@ -1222,6 +1222,12 @@ static uint32_t nvic_readl(NVICState *s, uint32_t offset, MemTxAttrs attrs)
+diff --git a/target/arm/helper.c b/target/arm/helper.c
+index b4f1609a1c6..297eb38fef0 100644
+--- a/target/arm/helper.c
++++ b/target/arm/helper.c
+@@ -12032,7 +12032,14 @@ uint32_t HELPER(v7m_mrs)(CPUARMState *env, uint32_t reg)
+         return xpsr_read(env) & mask;
+         break;
+     case 20: /* CONTROL */
+-        return env->v7m.control[env->v7m.secure];
++    {
++        uint32_t value = env->v7m.control[env->v7m.secure];
++        if (!env->v7m.secure) {
++            /* SFPA is RAZ/WI from NS; FPCA is stored in the M_REG_S bank */
++            value |= env->v7m.control[M_REG_S] & R_V7M_CONTROL_FPCA_MASK;
++        }
++        return value;
++    }
+     case 0x94: /* CONTROL_NS */
+         /* We have to handle this here because unprivileged Secure code
+          * can read the NS CONTROL register.
+@@ -12040,7 +12047,8 @@ uint32_t HELPER(v7m_mrs)(CPUARMState *env, uint32_t reg)
+         if (!env->v7m.secure) {
              return 0;
          }
-         return cpu->env.v7m.sfar;
-+    case 0xf40: /* MVFR0 */
-+        return cpu->isar.mvfr0;
-+    case 0xf44: /* MVFR1 */
-+        return cpu->isar.mvfr1;
-+    case 0xf48: /* MVFR2 */
-+        return cpu->isar.mvfr2;
+-        return env->v7m.control[M_REG_NS];
++        return env->v7m.control[M_REG_NS] |
++            (env->v7m.control[M_REG_S] & R_V7M_CONTROL_FPCA_MASK);
+     }
+ 
+     if (el == 0) {
+@@ -12146,9 +12154,13 @@ void HELPER(v7m_msr)(CPUARMState *env, uint32_t maskreg, uint32_t val)
+      */
+     uint32_t mask = extract32(maskreg, 8, 4);
+     uint32_t reg = extract32(maskreg, 0, 8);
++    int cur_el = arm_current_el(env);
+ 
+-    if (arm_current_el(env) == 0 && reg > 7) {
+-        /* only xPSR sub-fields may be written by unprivileged */
++    if (cur_el == 0 && reg > 7 && reg != 20) {
++        /*
++         * only xPSR sub-fields and CONTROL.SFPA may be written by
++         * unprivileged code
++         */
+         return;
+     }
+ 
+@@ -12207,6 +12219,15 @@ void HELPER(v7m_msr)(CPUARMState *env, uint32_t maskreg, uint32_t val)
+                 env->v7m.control[M_REG_NS] &= ~R_V7M_CONTROL_NPRIV_MASK;
+                 env->v7m.control[M_REG_NS] |= val & R_V7M_CONTROL_NPRIV_MASK;
+             }
++            /*
++             * SFPA is RAZ/WI from NS. FPCA is RO if NSACR.CP10 == 0,
++             * RES0 if the FPU is not present, and is stored in the S bank
++             */
++            if (arm_feature(env, ARM_FEATURE_VFP) &&
++                extract32(env->v7m.nsacr, 10, 1)) {
++                env->v7m.control[M_REG_S] &= ~R_V7M_CONTROL_FPCA_MASK;
++                env->v7m.control[M_REG_S] |= val & R_V7M_CONTROL_FPCA_MASK;
++            }
+             return;
+         case 0x98: /* SP_NS */
+         {
+@@ -12309,21 +12330,41 @@ void HELPER(v7m_msr)(CPUARMState *env, uint32_t maskreg, uint32_t val)
+         env->v7m.faultmask[env->v7m.secure] = val & 1;
+         break;
+     case 20: /* CONTROL */
+-        /* Writing to the SPSEL bit only has an effect if we are in
++        /*
++         * Writing to the SPSEL bit only has an effect if we are in
+          * thread mode; other bits can be updated by any privileged code.
+          * write_v7m_control_spsel() deals with updating the SPSEL bit in
+          * env->v7m.control, so we only need update the others.
+          * For v7M, we must just ignore explicit writes to SPSEL in handler
+          * mode; for v8M the write is permitted but will have no effect.
++         * All these bits are writes-ignored from non-privileged code,
++         * except for SFPA.
+          */
+-        if (arm_feature(env, ARM_FEATURE_V8) ||
+-            !arm_v7m_is_handler_mode(env)) {
++        if (cur_el > 0 && (arm_feature(env, ARM_FEATURE_V8) ||
++                           !arm_v7m_is_handler_mode(env))) {
+             write_v7m_control_spsel(env, (val & R_V7M_CONTROL_SPSEL_MASK) != 0);
+         }
+-        if (arm_feature(env, ARM_FEATURE_M_MAIN)) {
++        if (cur_el > 0 && arm_feature(env, ARM_FEATURE_M_MAIN)) {
+             env->v7m.control[env->v7m.secure] &= ~R_V7M_CONTROL_NPRIV_MASK;
+             env->v7m.control[env->v7m.secure] |= val & R_V7M_CONTROL_NPRIV_MASK;
+         }
++        if (arm_feature(env, ARM_FEATURE_VFP)) {
++            /*
++             * SFPA is RAZ/WI from NS or if no FPU.
++             * FPCA is RO if NSACR.CP10 == 0, RES0 if the FPU is not present.
++             * Both are stored in the S bank.
++             */
++            if (env->v7m.secure) {
++                env->v7m.control[M_REG_S] &= ~R_V7M_CONTROL_SFPA_MASK;
++                env->v7m.control[M_REG_S] |= val & R_V7M_CONTROL_SFPA_MASK;
++            }
++            if (cur_el > 0 &&
++                (env->v7m.secure || !arm_feature(env, ARM_FEATURE_M_SECURITY) ||
++                 extract32(env->v7m.nsacr, 10, 1))) {
++                env->v7m.control[M_REG_S] &= ~R_V7M_CONTROL_FPCA_MASK;
++                env->v7m.control[M_REG_S] |= val & R_V7M_CONTROL_FPCA_MASK;
++            }
++        }
+         break;
      default:
-     bad_offset:
-         qemu_log_mask(LOG_GUEST_ERROR, "NVIC: Bad read offset 0x%x\n", offset);
+     bad_reg:
 -- 
 2.20.1
 
