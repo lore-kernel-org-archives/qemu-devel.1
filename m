@@ -1,27 +1,30 @@
-Received: from eggs.gnu.org ([209.51.188.92]:52677)
+Received: from eggs.gnu.org ([209.51.188.92]:57039)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <sw@weilnetz.de>) id 1hGQre-0004sn-1y
-	for qemu-devel@nongnu.org; Tue, 16 Apr 2019 12:23:19 -0400
+	(envelope-from <bsd@redhat.com>) id 1hGRD6-00010V-TA
+	for qemu-devel@nongnu.org; Tue, 16 Apr 2019 12:45:30 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <sw@weilnetz.de>) id 1hGQrb-0004WB-1m
-	for qemu-devel@nongnu.org; Tue, 16 Apr 2019 12:23:17 -0400
-Received: from mail.weilnetz.de ([37.120.169.71]:33746
-	helo=v2201612906741603.powersrv.de)
-	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <sw@weilnetz.de>) id 1hGQra-0004Tq-9j
-	for qemu-devel@nongnu.org; Tue, 16 Apr 2019 12:23:14 -0400
-References: <CAMo8BfLCON2wbQ36dkVQ92tcVPWoPdje12CqySFnJyoYDDOdDg@mail.gmail.com>
-	<20190416074135.qo4l3vra2g6n2rts@steredhat.homenet.telecomitalia.it>
-From: Stefan Weil <sw@weilnetz.de>
-Message-ID: <06b923b2-8406-b599-f3b8-a300bb6a22a5@weilnetz.de>
-Date: Tue, 16 Apr 2019 18:13:29 +0200
+	(envelope-from <bsd@redhat.com>) id 1hGRD4-0001BF-UR
+	for qemu-devel@nongnu.org; Tue, 16 Apr 2019 12:45:28 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:57942)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <bsd@redhat.com>) id 1hGRD0-0000zj-WC
+	for qemu-devel@nongnu.org; Tue, 16 Apr 2019 12:45:25 -0400
+From: Bandan Das <bsd@redhat.com>
+References: <20190415154503.6758-1-berrange@redhat.com>
+	<jpgk1fvp5wm.fsf@linux.bootlegged.copy>
+	<20190415165426.GT5718@redhat.com> <20190416084059.GD31311@redhat.com>
+	<jpglg0a3p93.fsf@linux.bootlegged.copy>
+	<20190416161242.GU31311@redhat.com>
+Date: Tue, 16 Apr 2019 12:45:04 -0400
+In-Reply-To: <20190416161242.GU31311@redhat.com> ("Daniel P.
+	\=\?utf-8\?Q\?Ber\?\= \=\?utf-8\?Q\?rang\=C3\=A9\=22's\?\=
+	message of "Tue, 16 Apr 2019 17:12:42 +0100")
+Message-ID: <jpgwojtoq5r.fsf@linux.bootlegged.copy>
 MIME-Version: 1.0
-In-Reply-To: <20190416074135.qo4l3vra2g6n2rts@steredhat.homenet.telecomitalia.it>
 Content-Type: text/plain; charset=utf-8
-Content-Language: de-DE
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] recent QEMU-w64 does not load multiboot kernels by
- default
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH 0/3] usb-mtp: fix ObjectInfo request
+ handling
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,40 +33,63 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefano Garzarella <sgarzare@redhat.com>, Max Filippov <jcmvbkbc@gmail.com>
-Cc: qemu-devel <qemu-devel@nongnu.org>
+To: "Daniel P. =?utf-8?Q?Berrang=C3=A9?=" <berrange@redhat.com>
+Cc: qemu-devel@nongnu.org, Peter Maydell <peter.maydell@linaro.org>, Thomas Huth <thuth@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>, Greg Kurz <groug@kaod.org>
 
-On 16.04.19 09:41, Stefano Garzarella wrote:
-> On Mon, Apr 15, 2019 at 03:20:42PM -0700, Max Filippov wrote:
->> Hello,
->>
->> recent qemu-system-i386 for w64 (e.g. one installed from
->> https://qemu.weilnetz.de/w64/qemu-w64-setup-20190218.exe )
->> refuses to load multiboot kernel by default:
->>
->>   "C:\Program Files\qemu\qemu-system-i386.exe" -kernel p:\tmp\kernel
->>   C:\Program Files\qemu\qemu-system-i386.exe: Error loading
->> uncompressed kernel without PVH ELF Note
->>
->> Adding -M pc-i440fx-3.1 (as well as most other machines, but not
->> pc-i440fx-4.0) fixes that. On linux host the same kernel gets loaded
->> either way (with or without -M).
-> 
-> Hi Max,
-> there was an issue when we introduced PVH support and we fixed it. [1]
-> Maybe the build that you used (20190218) was compiled before the merge of
-> that fix (20190311).
-> 
-> Can you try to build the 4.0-rc3?
-> 
-> Cheers,
-> Stefano
+Daniel P. Berrang=C3=A9 <berrange@redhat.com> writes:
 
+> On Tue, Apr 16, 2019 at 12:10:16PM -0400, Bandan Das wrote:
+>> Daniel P. Berrang=C3=A9 <berrange@redhat.com> writes:
+>> ...
+>> >> > The store is read only by default. Are you trying something like:
+>> >> >  -device usb-mtp,rootdir=3D/code/mtpshare,readonly=3Dfalse ?
+>> >>=20
+>> >> Ah ha, I didn't realize I had to enable write support explicitly. Will
+>> >> retry with that.
+>> >
+>> > Even after setting  readonly=3Dfalse, I still can't get "mtp-sendfile"
+>> > to succeed in a guest.
+>> >
+>> I posted a patch for a bug introduced by a recent commit that made small=
+er
+>> file sizes return back with a incomplete file transfer.
+>>=20
+>> https://lists.gnu.org/archive/html/qemu-devel/2019-04/msg02552.html
+>
+> Yes, I applied that and didn't see any difference in behaviour
+>
 
-The build of qemu-w64-setup-20190218.exe only contains patches merged up
-to that date, so the fix is missing.
+Just noticed the error message you posted:
 
-The next release of the installer will include the fix.
+    Error sending file.
+    Error 2: PTP Layer error 02ff: send_file_object_info(): Could not send =
+object info.
+    Error 2: Error 02ff: PTP I/O Error
+    ERROR: Could not close session!
 
-Kind regards
-Stefan
+I can't find usb-mtp sending a "I/O error" on an error condition
+for the objectinfo phase. It might be libmtp or even the command itself
+failing for some reason. For incomplete transfer, I just checked, it's
+spitting out the error message correctly as INCOMPLETE_FILE_TRANSFER.
+
+With libmtp version 1.13 on a FC24 guest, here's the output:
+
+$ mtp-sendfile test.txt test.img
+libmtp version: 1.1.13
+
+Device 0 (VID=3D46f4 and PID=3D0004) is UNKNOWN in libmtp v1.1.13.
+Please report this VID/PID and the device model to the libmtp development t=
+eam
+ignoring libusb_claim_interface() =3D -6PTP_ERROR_IO: failed to open sessio=
+n, trying again after resetting USB interface
+LIBMTP libusb: Attempt to reset device
+Sending test.txt to test.img
+type: txt, 44
+Sending file...
+Progress: 322 of 322 (100%)
+New file ID: 7
+
+What guest is this ? I can try to reproduce.
+
+> Regards,
+> Daniel
