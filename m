@@ -2,67 +2,75 @@ Return-Path: <SRS0=xvb4=SS=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.4 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,USER_AGENT_MUTT autolearn=ham
+X-Spam-Status: No, score=-3.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_PASS,URIBL_BLOCKED autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2E5AFC10F0E
-	for <qemu-devel@archiver.kernel.org>; Tue, 16 Apr 2019 02:52:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9FEA1C10F13
+	for <qemu-devel@archiver.kernel.org>; Tue, 16 Apr 2019 04:16:33 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id EE9BD2075B
-	for <qemu-devel@archiver.kernel.org>; Tue, 16 Apr 2019 02:52:45 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EE9BD2075B
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 6D2802064B
+	for <qemu-devel@archiver.kernel.org>; Tue, 16 Apr 2019 04:16:33 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6D2802064B
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=twiddle.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:58392 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:59041 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hGEDF-0003Vi-2c
-	for qemu-devel@archiver.kernel.org; Mon, 15 Apr 2019 22:52:45 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:53510)
+	id 1hGFWK-0005Ob-Cl
+	for qemu-devel@archiver.kernel.org; Tue, 16 Apr 2019 00:16:32 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:36701)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1hGECS-0003En-6Y
-	for qemu-devel@nongnu.org; Mon, 15 Apr 2019 22:51:57 -0400
+	(envelope-from <bounces@canonical.com>) id 1hGFVV-00053P-Bl
+	for qemu-devel@nongnu.org; Tue, 16 Apr 2019 00:15:42 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1hGECR-0003S8-71
-	for qemu-devel@nongnu.org; Mon, 15 Apr 2019 22:51:56 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:49604)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1hGECQ-0003Qz-VN
-	for qemu-devel@nongnu.org; Mon, 15 Apr 2019 22:51:55 -0400
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
-	[10.5.11.23])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 3D5863092645;
-	Tue, 16 Apr 2019 02:51:52 +0000 (UTC)
-Received: from xz-x1 (dhcp-14-116.nay.redhat.com [10.66.14.116])
-	by smtp.corp.redhat.com (Postfix) with ESMTPS id 8095019C6A;
-	Tue, 16 Apr 2019 02:51:49 +0000 (UTC)
-Date: Tue, 16 Apr 2019 10:51:47 +0800
-From: Peter Xu <peterx@redhat.com>
-To: Catherine Ho <catherine.hecx@gmail.com>
-Message-ID: <20190416025147.GA20550@xz-x1>
-References: <1554688616-18583-1-git-send-email-catherine.hecx@gmail.com>
-	<1554712933-18682-1-git-send-email-catherine.hecx@gmail.com>
+	(envelope-from <bounces@canonical.com>) id 1hGFVT-0007AW-Cq
+	for qemu-devel@nongnu.org; Tue, 16 Apr 2019 00:15:41 -0400
+Received: from indium.canonical.com ([91.189.90.7]:43426)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1hGFVR-00078o-Gb
+	for qemu-devel@nongnu.org; Tue, 16 Apr 2019 00:15:39 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1hGFVO-000222-R5
+	for <qemu-devel@nongnu.org>; Tue, 16 Apr 2019 04:15:34 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 9085C2E80CB
+	for <qemu-devel@nongnu.org>; Tue, 16 Apr 2019 04:15:34 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="UTF-8"
-Content-Disposition: inline
-In-Reply-To: <1554712933-18682-1-git-send-email-catherine.hecx@gmail.com>
-User-Agent: Mutt/1.10.1 (2018-07-13)
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.43]);
-	Tue, 16 Apr 2019 02:51:52 +0000 (UTC)
+Content-Transfer-Encoding: quoted-printable
+Date: Tue, 16 Apr 2019 04:01:16 -0000
+From: Richard Henderson <rth@twiddle.net>
+To: qemu-devel@nongnu.org
+X-Launchpad-Notification-Type: bug
+X-Launchpad-Bug: product=qemu; status=In Progress; importance=Undecided;
+	assignee=rth@twiddle.net; 
+X-Launchpad-Bug-Information-Type: Public
+X-Launchpad-Bug-Private: no
+X-Launchpad-Bug-Security-Vulnerability: no
+X-Launchpad-Bug-Commenters: rth zhroma
+X-Launchpad-Bug-Reporter: Roman Zhuykov (zhroma)
+X-Launchpad-Bug-Modifier: Richard Henderson (rth)
+References: <155534806981.13632.6401186723464432088.malonedeb@gac.canonical.com>
+Message-Id:
+ <155538727676.8124.13231873298190691578.malone@wampee.canonical.com>
+X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
+X-Launchpad-Message-For: qemu-devel-ml
+Precedence: bulk
+X-Generated-By: Launchpad (canonical.com); Revision="18920";
+	Instance="launchpad-lazr.conf"
+X-Launchpad-Hash: 28579eddd1036d47f089ea50e135326afa3b7854
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH v4] migration: do not rom_reset() during
- incoming migration
+X-Received-From: 91.189.90.7
+Subject: [Qemu-devel] [Bug 1824853] Re: 4.0.0-rc3 crashes with
+ tcg/tcg.c:3952: tcg_gen_code: Assertion `s->gen_insn_end_off[num_insns] ==
+ off' failed
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
-Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -71,47 +79,110 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Juan Quintela <quintela@redhat.com>, Markus Armbruster <armbru@redhat.com>,
-	qemu-devel@nongnu.org, "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
-	Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>
+Reply-To: Bug 1824853 <1824853@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190416025147.G0zZQcpqbvfyNF-_Er-21tLAKz6exz0C6eTicCVU52Q@z>
+Message-ID: <20190416040116.Bfr71V7PbvskCZLvO4UcdJa-97F9CLhTnKSdYB2wAtc@z>
 
-On Mon, Apr 08, 2019 at 04:42:13AM -0400, Catherine Ho wrote:
-> Commit 18269069c310 ("migration: Introduce ignore-shared capability")
-> addes ignore-shared capability to bypass the shared ramblock (e,g,
-> membackend + numa node). It does good to live migration.
-> 
-> As told by Yury,this commit expectes that QEMU doesn't write to guest RAM
-> until VM starts, but it does on aarch64 qemu:
-> Backtrace:
-> 1  0x000055f4a296dd84 in address_space_write_rom_internal () at
-> exec.c:3458
-> 2  0x000055f4a296de3a in address_space_write_rom () at exec.c:3479
-> 3  0x000055f4a2d519ff in rom_reset () at hw/core/loader.c:1101
-> 4  0x000055f4a2d475ec in qemu_devices_reset () at hw/core/reset.c:69
-> 5  0x000055f4a2c90a28 in qemu_system_reset () at vl.c:1675
-> 6  0x000055f4a2c9851d in main () at vl.c:4552
-> 
-> Actually, on arm64 virt marchine, ramblock "dtb" will be filled into ram
-> druing rom_reset. In ignore-shared incoming case, this rom filling
-> is not required since all the data has been stored in memory backend
-> file.
-> 
-> Further more, as suggested by Peter Xu, if we do rom_reset() now with
-> these ROMs then the RAM data should be re-filled again too with the
-> migration stream coming in.
-> 
-> Fixes: commit 18269069c310 ("migration: Introduce ignore-shared
-> capability")
-> Suggested-by: Yury Kotov <yury-kotov@yandex-team.ru>
-> Suggested-by: Peter Xu <peterx@redhat.com>
-> Signed-off-by: Catherine Ho <catherine.hecx@gmail.com>
+Returning -1 does not help because all that signals that the buffer is full.
+We then flush the buffer and try again, assuming the at the buffer will not=
+ fill.
+Given that the buffer is usually many megabytes, this is reasonable.
 
-Acked-by: Peter Xu <peterx@redhat.com>
+We need something different to signal that the buffer is not full, but that
+another offset has overflowed.
 
--- 
-Peter Xu
+** Changed in: qemu
+       Status: New =3D> Confirmed
+
+** Changed in: qemu
+       Status: Confirmed =3D> In Progress
+
+** Changed in: qemu
+     Assignee: (unassigned) =3D> Richard Henderson (rth)
+
+-- =
+
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1824853
+
+Title:
+  4.0.0-rc3 crashes with tcg/tcg.c:3952: tcg_gen_code: Assertion
+  `s->gen_insn_end_off[num_insns] =3D=3D off' failed
+
+Status in QEMU:
+  In Progress
+
+Bug description:
+  I tried to bootstrap and regtested gcc trunk (gcc svn rev 270278,
+  datestamp 20190411) inside my arm64-gentoo installation under qemu-
+  system-aarch64.
+
+  Qemu version was 4.0.0-rc3 and -cpu cortex-a57. Qemu configured with
+  only --target-list=3Daarch64-softmmu,aarch64-linux-user and compiled
+  using gcc "version 5.5.0 20171010 (Ubuntu 5.5.0-12ubuntu1~16.04)".
+
+  Executable created from gcc/testsuite/gcc.target/aarch64/advsimd-
+  intrinsics/vldX.c compiled with -O2 crashed the whole qemu-system.
+
+  To investigate a bit I also manually run
+  ~/gcc/inst/trunk/bin/gcc ~/gcc/src/trunk/gcc/testsuite/gcc.target/aarch64=
+/advsimd-intrinsics/vldX.c
+  with different options like:
+  -O0 -lm -o d0.exe
+  -O1 -lm -o d1.exe
+  -O2 -lm -o d2.exe
+  -O0 -static -lm -o s0.exe
+  -O1 -static -lm -o s1.exe
+  -O2 -static -lm -o s2.exe
+
+  So, now I have 6 different arm64 executables created with different optim=
+ization levels. O0 and O1 versions run ok.
+  Three sN.exe static executables I've also tried in qemu user mode (with s=
+ame -cpu), no issue in user mode.
+
+  And inside qemu-system I can see that
+  running "d2.exe" (attached) gives:
+  tcg/tcg.c:3952: tcg_gen_code: Assertion `s->gen_insn_end_off[num_insns] =
+=3D=3D off' failed.
+
+  And running "s2.exe" gives:
+  tcg/tcg.c:320: set_jmp_reset_offset: Assertion `s->tb_jmp_reset_offset[wh=
+ich] =3D=3D off' failed.
+
+  It seems like this test is an counter-example for logic that
+  "tcg_ctx->nb_ops < 4000" implies tcg will fit into 16-bit signed size
+  (see tcg_op_buf_full comments).
+
+  Richard's changes in abebf92597186 and 9f754620651d were not enough, tran=
+slation block must be smaller, or we have to find some proper way to bail o=
+ut when buffer overflows.
+  I don't know why this situation is not caught by code_gen_highwater logic=
+ in tcg.c
+
+  I've also tried this "bail out" patch
+
+  diff --git a/tcg/tcg.c b/tcg/tcg.c
+  --- a/tcg/tcg.c
+  +++ b/tcg/tcg.c
+  @@ -3949,7 +3949,8 @@ int tcg_gen_code(TCGContext *s, TranslationBlock *t=
+b)
+                   size_t off =3D tcg_current_code_size(s);
+                   s->gen_insn_end_off[num_insns] =3D off;
+                   /* Assert that we do not overflow our stored offset.  */
+  -                assert(s->gen_insn_end_off[num_insns] =3D=3D off);
+  +                if (s->gen_insn_end_off[num_insns] !=3D off)
+  +                  return -1;
+               }
+               num_insns++;
+               for (i =3D 0; i < TARGET_INSN_START_WORDS; ++i) {
+
+  But then running "d2.exe" just hangs the whole qemu-system. It seems
+  that when tcg_gen_code return -1 (like in highwater logic mentioned
+  before), we just re-call it again and again.
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1824853/+subscriptions
 
