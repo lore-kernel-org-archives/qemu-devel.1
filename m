@@ -2,82 +2,63 @@ Return-Path: <SRS0=xvb4=SS=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.4 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_PASS,USER_AGENT_MUTT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 68A2EC282DA
-	for <qemu-devel@archiver.kernel.org>; Tue, 16 Apr 2019 17:57:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 25D86C10F14
+	for <qemu-devel@archiver.kernel.org>; Tue, 16 Apr 2019 18:03:54 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4131B2075B
-	for <qemu-devel@archiver.kernel.org>; Tue, 16 Apr 2019 17:57:02 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4131B2075B
+	by mail.kernel.org (Postfix) with ESMTPS id F1ADE206B6
+	for <qemu-devel@archiver.kernel.org>; Tue, 16 Apr 2019 18:03:53 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F1ADE206B6
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:40420 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:40482 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hGSKL-0005F2-5i
-	for qemu-devel@archiver.kernel.org; Tue, 16 Apr 2019 13:57:01 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:42856)
+	id 1hGSQz-0006po-0q
+	for qemu-devel@archiver.kernel.org; Tue, 16 Apr 2019 14:03:53 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:44302)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1hGSJN-0004kF-QJ
-	for qemu-devel@nongnu.org; Tue, 16 Apr 2019 13:56:02 -0400
+	(envelope-from <ehabkost@redhat.com>) id 1hGSPh-0006N2-PC
+	for qemu-devel@nongnu.org; Tue, 16 Apr 2019 14:02:34 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1hGSJK-0005jS-OQ
-	for qemu-devel@nongnu.org; Tue, 16 Apr 2019 13:56:01 -0400
-Received: from mail-wm1-f65.google.com ([209.85.128.65]:32947)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1hGSJH-0005UB-HY
-	for qemu-devel@nongnu.org; Tue, 16 Apr 2019 13:55:57 -0400
-Received: by mail-wm1-f65.google.com with SMTP id z6so2868618wmi.0
-	for <qemu-devel@nongnu.org>; Tue, 16 Apr 2019 10:55:36 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=1e100.net; s=20161025;
-	h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
-	:date:user-agent:mime-version:in-reply-to:content-language
-	:content-transfer-encoding;
-	bh=N7vJfiZxeg/FUQjpiota7F685VfcwfBGepfztdU2+4Y=;
-	b=q3S8ylAgdNgFm4MQryyRdSCgcBOqbAuSzsiEcVRewpBUeprfeQkSizFJq2/PHFUaO+
-	ASWyRnY55ig44OgJJ0ZT+zGMz9dX273Rv0ZP5utoIm93+EOlfqTotVPHEMnFdAgr0nwt
-	bxkanFtT9o5FcxlviYDsuhxzsaA4Rtuun0A9joI2UTZetqsp7C0lx2HweiWeSxzljya1
-	hxCqfLSA+dJ2fOw/3MncXPnVWHteWUmwoUio0s2aEbIM9vblWFFITWn2/I+Xf3m4vOg/
-	Xn/wc3YWxk0DJ21SXsxB/Pr1ettCTGnkF60Pr0Ri223LOyqv0K7dPE2cD6pRB2EZuMvT
-	9iFA==
-X-Gm-Message-State: APjAAAWBI4twfAqDHI+puzsAebFQjHH04zKQrbnF2WLg/NNcXYbOV5au
-	rOzCpaaZtPtyxruIV1XndB4zNg==
-X-Google-Smtp-Source: APXvYqyRGyvxIH7QXfX98Uh/ZjhaP5jndIp9IKrP4RLvwMc4S/+IreHwzVL5w0W118a9YojpzpvxEw==
-X-Received: by 2002:a7b:c14c:: with SMTP id z12mr26795935wmi.138.1555437336049;
-	Tue, 16 Apr 2019 10:55:36 -0700 (PDT)
-Received: from [192.168.1.33] (193.red-88-21-103.staticip.rima-tde.net.
-	[88.21.103.193]) by smtp.gmail.com with ESMTPSA id
-	v190sm188491wme.18.2019.04.16.10.55.35
-	(version=TLS1_3 cipher=AEAD-AES128-GCM-SHA256 bits=128/128);
-	Tue, 16 Apr 2019 10:55:35 -0700 (PDT)
-To: Eric Blake <eblake@redhat.com>,
-	Richard Henderson <richard.henderson@linaro.org>, qemu-devel@nongnu.org
-References: <20190416083150.19649-1-richard.henderson@linaro.org>
-	<20190416083150.19649-3-richard.henderson@linaro.org>
-	<6860567d-8678-783e-e001-1dd53785c84a@redhat.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Openpgp: id=89C1E78F601EE86C867495CBA2A3FD6EDEADC0DE;
-	url=http://pgp.mit.edu/pks/lookup?op=get&search=0xA2A3FD6EDEADC0DE
-Message-ID: <df82da11-f32e-f07c-15fe-0fb9b5f3540a@redhat.com>
-Date: Tue, 16 Apr 2019 19:55:29 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
-	Thunderbird/60.6.1
+	(envelope-from <ehabkost@redhat.com>) id 1hGSPg-00027u-Ol
+	for qemu-devel@nongnu.org; Tue, 16 Apr 2019 14:02:33 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:39144)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1hGSPg-00027G-Gs
+	for qemu-devel@nongnu.org; Tue, 16 Apr 2019 14:02:32 -0400
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+	[10.5.11.14])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 3612E7CDEA;
+	Tue, 16 Apr 2019 18:02:28 +0000 (UTC)
+Received: from localhost (ovpn-116-9.gru2.redhat.com [10.97.116.9])
+	by smtp.corp.redhat.com (Postfix) with ESMTP id 4EB4E5D9D3;
+	Tue, 16 Apr 2019 18:02:22 +0000 (UTC)
+Date: Tue, 16 Apr 2019 15:02:20 -0300
+From: Eduardo Habkost <ehabkost@redhat.com>
+To: Pavel Hrdina <phrdina@redhat.com>
+Message-ID: <20190416180220.GH32317@habkost.net>
+References: <1555416373-28690-1-git-send-email-puwen@hygon.cn>
+	<20190416141700.GR18986@antique-laptop>
 MIME-Version: 1.0
-In-Reply-To: <6860567d-8678-783e-e001-1dd53785c84a@redhat.com>
 Content-Type: text/plain; charset="UTF-8"
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
+In-Reply-To: <20190416141700.GR18986@antique-laptop>
+User-Agent: Mutt/1.10.1 (2018-07-13)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+	(mx1.redhat.com [10.5.110.28]);
+	Tue, 16 Apr 2019 18:02:28 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-	[fuzzy]
-X-Received-From: 209.85.128.65
-Subject: Re: [Qemu-devel] [PATCH 2/2] tcg: Restart after TB code generation
- overflow
+X-Received-From: 209.132.183.28
+Subject: Re: [Qemu-devel] [PATCH v3] i386: Add new Hygon 'Dhyana' CPU model
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -89,31 +70,53 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: peter.maydell@linaro.org
+Cc: Pu Wen <puwen@hygon.cn>, rth@twiddle.net, pbonzini@redhat.com,
+	qemu-devel@nongnu.org, mst@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190416175529.IlXn-0r5dB6KnHFJu-bu44wxjDLcmTs5odSNZIlPCW8@z>
+Message-ID: <20190416180220.o1VqUyPhyFAgLORCw2KuF17dBT75HzKJJUBW-Scufw4@z>
 
-On 4/16/19 7:47 PM, Eric Blake wrote:
-> On 4/16/19 3:31 AM, Richard Henderson wrote:
->> If a TB generates too much code, try again with fewer insns.
->>
->> Fixes: https://bugs.launchpad.net/bugs/1824853
->> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
->> ---
->>  accel/tcg/translate-all.c | 39 +++++++++++++++++++++++++++++++++------
->>  tcg/tcg.c                 |  4 ++++
->>  2 files changed, 37 insertions(+), 6 deletions(-)
->>
+On Tue, Apr 16, 2019 at 04:17:00PM +0200, Pavel Hrdina wrote:
+> On Tue, Apr 16, 2019 at 08:06:13PM +0800, Pu Wen wrote:
+> > Add a new base CPU model called 'Dhyana' to model processors from Hygon
+> > Dhyana(family 18h), which derived from AMD EPYC(family 17h).
+> > 
+> > The following features bits have been removed compare to AMD EPYC:
+> > aes, pclmulqdq, sha_ni
+> > 
+> > The Hygon Dhyana support to KVM in Linux is already accepted upstream[1].
+> > So add Hygon Dhyana support to Qemu is necessary to create Hygon's own
+> > CPU model.
 > 
->> +             * Try again with half as many insns as we attempted this time.
->> +             * If a single insn overflows, there's a bug somewhere...
->> +             */
->> +            max_insns = tb->icount;
->> +qemu_log("TB overflow: pc=%lx insns=%d\n", (unsigned long)pc, max_insns);
+> I have once question that we will have to solve for EPYC CPUs as well.
+> The name should not be based on the Product name or Model name as that
+> usually doesn't change with introduction of new microarchitecture.
 > 
-> Leftover debugging? Or should it be kept but properly indented?
+> With EPYC we made a mistake to name the CPU like that, luckily with
+> Intel we already use the microarchitecture name, so the EPYC CPU should
+> have been named ZEN-Server and for Ryzen CPUs there should be ZEN-Client
+> if there is any difference or otherwise we can simply use ZEN.
+> 
+> The issue here is what happens once the ZEN2 microarchitecture is out
+> wihch introduces new features and we will have to come up with a CPU
+> name.
+> 
+> Obviously we cannot change/remove the EPYC models so the question is
+> what is the difference between the AMD EPYC CPU and this new Dhyana CPU
+> if they are both based on the ZEN microarchitecture?
+> 
+> In addition is there any way how we can introduce ZEN-Server &
+> ZEN-Client or simply ZEN, if there is no difference, as an alias or a
+> new model next to the EPYC?
 
-Oops. I'd rather keep it between #ifdef CONFIG_DEBUG_TCG/#endif.
+Currently there's no CPU model alias or inheritance system in x86
+(yet), but feel free to submit a CPU model that's a copy of EPYC,
+including the justification above.
+
+When we implement CPU model versioning, we can make "EPYC" be
+translated to "ZEN" by the CPU model version resolution API.
+
+-- 
+Eduardo
 
