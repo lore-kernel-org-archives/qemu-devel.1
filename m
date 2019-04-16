@@ -2,72 +2,83 @@ Return-Path: <SRS0=xvb4=SS=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-10.7 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AFE2CC10F13
-	for <qemu-devel@archiver.kernel.org>; Tue, 16 Apr 2019 15:38:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6EDAAC10F13
+	for <qemu-devel@archiver.kernel.org>; Tue, 16 Apr 2019 15:39:49 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7E3D520872
-	for <qemu-devel@archiver.kernel.org>; Tue, 16 Apr 2019 15:38:07 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7E3D520872
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
+	by mail.kernel.org (Postfix) with ESMTPS id 36077205ED
+	for <qemu-devel@archiver.kernel.org>; Tue, 16 Apr 2019 15:39:49 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="d87ipYoQ"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 36077205ED
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:38601 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:38615 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hGQ9u-0003v3-BV
-	for qemu-devel@archiver.kernel.org; Tue, 16 Apr 2019 11:38:06 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:41532)
+	id 1hGQBY-0004uq-Ge
+	for qemu-devel@archiver.kernel.org; Tue, 16 Apr 2019 11:39:48 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:41791)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1hGQ8t-0003UH-QL
-	for qemu-devel@nongnu.org; Tue, 16 Apr 2019 11:37:04 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1hGQAC-0004Cs-Ck
+	for qemu-devel@nongnu.org; Tue, 16 Apr 2019 11:38:25 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1hGQ8s-0008EA-Jr
-	for qemu-devel@nongnu.org; Tue, 16 Apr 2019 11:37:03 -0400
-Received: from indium.canonical.com ([91.189.90.7]:45436)
+	(envelope-from <peter.maydell@linaro.org>) id 1hGQAB-0000YJ-C7
+	for qemu-devel@nongnu.org; Tue, 16 Apr 2019 11:38:24 -0400
+Received: from mail-oi1-x22f.google.com ([2607:f8b0:4864:20::22f]:43118)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1hGQ8s-0008Cs-B5
-	for qemu-devel@nongnu.org; Tue, 16 Apr 2019 11:37:02 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1hGQ8p-0003nW-Cm
-	for <qemu-devel@nongnu.org>; Tue, 16 Apr 2019 15:36:59 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 571A12E80E4
-	for <qemu-devel@nongnu.org>; Tue, 16 Apr 2019 15:36:55 +0000 (UTC)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1hGQAA-0000Ur-Rm
+	for qemu-devel@nongnu.org; Tue, 16 Apr 2019 11:38:23 -0400
+Received: by mail-oi1-x22f.google.com with SMTP id t81so17331678oig.10
+	for <qemu-devel@nongnu.org>; Tue, 16 Apr 2019 08:38:19 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+	h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+	:cc; bh=3dRX2ZVJjnc63D9aV1WFofCsH5TIO9/qmrOMac70/Y0=;
+	b=d87ipYoQxSasiZPS40WsfvGcL1clFpZX6EQ7xr7pAurh1vRcgwLab0FoR/xZbR5oYh
+	YOp/Y7B2yCGq2vbtFTgQA6JKEpUwtQ/SP9HcSQ6MfmX4c2UMS4xwPllLFf6bQHUaBDiA
+	JrMgtLG41XDJJ6lhotw5mFLLZ82driaX66WtjvGBv3hjx8BtNomkK+fbBnKu/u6+nyYL
+	i9iCjQ33CKzcWG883ctcEtM54j+Q7nZvEDEV9crOVC6fNfrGD6//9YX0iSrSfM13jzZa
+	hlcGHdPxEvkJQd26pelKgupNQ+P3kDpcHE1FfnlpuJBBQlIXBwrKQFck2OIq+vmEvdTU
+	cXww==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=1e100.net; s=20161025;
+	h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+	:message-id:subject:to:cc;
+	bh=3dRX2ZVJjnc63D9aV1WFofCsH5TIO9/qmrOMac70/Y0=;
+	b=Ad8uuNGt4bAoqM83YzsjdKsw7XN73Y7+0t4Sxgu9AcW4gLActZE7aoz8O0unaq5Ghe
+	TFOCYkKRBFHJhA9T1IFh3rFnxIQ701ynsJ9QgctcVvNY1sgWZ4soIRHDSrzj0/J4xiIY
+	1x+NW5cWPUB0M1l4rIR4RqCZ/JT8GpJEhWxLOqy//qkjfqOQv8bRxqVA3uizN4SpzV8D
+	+MUNq593Mm6/m1zEoAyRJHnZWFT57j5+25fv+hbxPDizyjevfY5apkXTm+THuoZYxXAw
+	9rZPFE/x3I28UZn6wdY/XWgM8evckA1tlAYqM7XsiJhFxA0iTydaoRhfdtMGIqlPTH/P
+	y6YA==
+X-Gm-Message-State: APjAAAWxBRVHJnF+1HrPaonShyO5a+qp8oJov4IsBjfDuki6Qag1xUt4
+	mtxpnmSIC2g0gCXhKY5+ASlCmeLMe63VZ+CLCqZbVg==
+X-Google-Smtp-Source: APXvYqwJoJJtc0gFMOpn60ytpIkKUVjJqCyJlEcQOOvTuwZoLqBG6rjzaqy8+zBVglrjRMMZ3SfXs28Mgtch/2V7wF8=
+X-Received: by 2002:aca:e054:: with SMTP id x81mr23158378oig.146.1555429098311;
+	Tue, 16 Apr 2019 08:38:18 -0700 (PDT)
 MIME-Version: 1.0
+References: <20190416142802.11990-1-kwolf@redhat.com>
+In-Reply-To: <20190416142802.11990-1-kwolf@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Tue, 16 Apr 2019 16:38:07 +0100
+Message-ID:
+ <CAFEAcA_=qyZZLj2sVacnCP0pEpkzSVwsA5YKk6VhB+0Z4HvPvg@mail.gmail.com>
+To: Kevin Wolf <kwolf@redhat.com>
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Tue, 16 Apr 2019 15:16:11 -0000
-From: Thomas Huth <1543163@bugs.launchpad.net>
-To: qemu-devel@nongnu.org
-X-Launchpad-Notification-Type: bug
-X-Launchpad-Bug: product=qemu; status=Fix Released; importance=Undecided;
-	assignee=None; 
-X-Launchpad-Bug-Information-Type: Public
-X-Launchpad-Bug-Private: no
-X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: maildir-2 th-huth
-X-Launchpad-Bug-Reporter: John Doe (maildir-2)
-X-Launchpad-Bug-Modifier: Thomas Huth (th-huth)
-References: <20160208150110.15874.66099.malonedeb@gac.canonical.com>
-Message-Id: <155542777199.13712.64254462462121085.malone@gac.canonical.com>
-X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
-X-Launchpad-Message-For: qemu-devel-ml
-Precedence: bulk
-X-Generated-By: Launchpad (canonical.com); Revision="18920";
-	Instance="launchpad-lazr.conf"
-X-Launchpad-Hash: 16af93752d5f2fac1c9440f665b8f9efffc5c1d3
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 91.189.90.7
-Subject: [Qemu-devel] [Bug 1543163] Re: VMs unable to boot from network with
- e1000 since 2.2
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+	recognized.
+X-Received-From: 2607:f8b0:4864:20::22f
+Subject: Re: [Qemu-devel] [PULL 0/1] qcow2: Fix potential corruption with
+ external data file
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
+Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -76,81 +87,40 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1543163 <1543163@bugs.launchpad.net>
+Cc: Peter Maydell <peter.maydell@linaro.org>,
+	QEMU Developers <qemu-devel@nongnu.org>, Qemu-block <qemu-block@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190416151611.9-2UTMNsCVKIj3d_ohZ3DLDdFnHP6Kh7-eKvs5rpUug@z>
+Message-ID: <20190416153807._Fe2Z8KGEKbSwEqkuVf4iFwyQZ1mLGgmVGIoDzfGXvs@z>
 
-Ok, thanks for checking. Closing now.
+On Tue, 16 Apr 2019 at 15:28, Kevin Wolf <kwolf@redhat.com> wrote:
+>
+> The following changes since commit a9b305ba291fb74f7ff732b3d7b8f4c812431ddf:
+>
+>   socket: allow wait=false for client socket (2019-04-16 10:40:43 +0100)
+>
+> are available in the Git repository at:
+>
+>   git://repo.or.cz/qemu/kevin.git tags/for-upstream
+>
+> for you to fetch changes up to 93e32b3e2012a668e4da1c2566d2935c24060435:
+>
+>   qcow2: Fix preallocation bdrv_pwrite to wrong file (2019-04-16 16:23:24 +0200)
+>
+> ----------------------------------------------------------------
+> Block layer patches:
+>
+> - qcow2: Fix potential corruption for preallocated resize with external data file
+>
+> ----------------------------------------------------------------
+> Kevin Wolf (1):
+>       qcow2: Fix preallocation bdrv_pwrite to wrong file
 
-** Changed in: qemu
-       Status: Incomplete =3D> Fix Released
+Applied, thanks.
 
--- =
+Please update the changelog at https://wiki.qemu.org/ChangeLog/4.0
+for any user-visible changes.
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1543163
-
-Title:
-  VMs unable to boot from network with e1000 since 2.2
-
-Status in QEMU:
-  Fix Released
-
-Bug description:
-  With KVM/QEMU version 1.4, using e1000 NIC, virtual machines boot from
-  network alright; they get an IP from DHCP server (machine A), then
-  connect to Microsoft System Center (machine B) and proceed to boot
-  into Windows PE, install images etc.
-
-  However, with versions at least 2.2 and 2.5, using same NIC, virtual
-  machines fail to boot from network; they still get an IP from A, but
-  then fail "contacting B using gateway (0.0.0.0). Different NICs do not
-  help except for i82551, which however causes problems further down the
-  road (presumably because there is no driver for that card in PE (based
-  on Windows 7/8/10)).
-
-  Note that actual physical machines work.
-
-  Wireshark reveals this:
-
-  QEMU 1.4 + Intel e1000
-  **********************
-  1) client sends DHCP discover
-  2) machine A answers, offers an IP, gateway and itself as next server
-  3) machine B answers, offers no IP, but gateway and itself as next server
-  4) client requests the IP
-  5) machine A ACKs
-  6) client sends unicast request for ??? to B
-  7) B offers (unicast) a boot file (some .com)
-  8) client sends another unicast request for ??? to B
-  9) B again offers the boot file
-  (then they chat a bit, B offers another file, client downloads some stuff=
- via TFTP etc.)
-
-  =
-
-  QEMU 2.2/2.5 + Intel e1000
-  **************************
-  1) client sends DHCP discover
-  2) machine A answers, offers an IP, gateway and itself as next server
-  3) machine B answers, offers no IP, but gateway and itself as next server
-  4) client requests the IP
-  5) machine A ACKs
-  6) client sends _broadcast_ request for ??? to B
-  7) B offers (likewise broadcast) a boot file
-  8) client sends another request, this time unicast and claims "Client IP =
-address =3D 0.0.0.0"
-  (and it basically hangs)
-
-  =
-
-  So, since some time after 1.4, QEMUlated machines with otherwise trusty e=
-1000 can no longer boot from network and it might be due to different behav=
-iour.
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1543163/+subscriptions
+-- PMM
 
