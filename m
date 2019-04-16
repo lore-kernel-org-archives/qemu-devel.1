@@ -2,112 +2,100 @@ Return-Path: <SRS0=xvb4=SS=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-2.2 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS,UNPARSEABLE_RELAY,
+	USER_AGENT_MUTT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5072EC10F14
-	for <qemu-devel@archiver.kernel.org>; Tue, 16 Apr 2019 08:53:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 427CFC10F13
+	for <qemu-devel@archiver.kernel.org>; Tue, 16 Apr 2019 08:57:31 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2234E20821
-	for <qemu-devel@archiver.kernel.org>; Tue, 16 Apr 2019 08:53:26 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2234E20821
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 0A8D82073F
+	for <qemu-devel@archiver.kernel.org>; Tue, 16 Apr 2019 08:57:30 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="pJ7gOEd9"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0A8D82073F
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=oracle.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:33269 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:33327 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hGJqH-0003uj-DI
-	for qemu-devel@archiver.kernel.org; Tue, 16 Apr 2019 04:53:25 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:39953)
+	id 1hGJuE-00051S-As
+	for qemu-devel@archiver.kernel.org; Tue, 16 Apr 2019 04:57:30 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:40797)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1hGJpX-0003cj-EO
-	for qemu-devel@nongnu.org; Tue, 16 Apr 2019 04:52:40 -0400
+	(envelope-from <yuval.shaia@oracle.com>) id 1hGJtT-0004iI-OR
+	for qemu-devel@nongnu.org; Tue, 16 Apr 2019 04:56:44 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1hGJpW-0008BI-EC
-	for qemu-devel@nongnu.org; Tue, 16 Apr 2019 04:52:39 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:34106)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <david@redhat.com>)
-	id 1hGJpV-0008Ac-WB; Tue, 16 Apr 2019 04:52:38 -0400
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
-	[10.5.11.22])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id EA209300261E;
-	Tue, 16 Apr 2019 08:52:36 +0000 (UTC)
-Received: from [10.36.116.179] (ovpn-116-179.ams2.redhat.com [10.36.116.179])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id 8ACE41001DD8;
-	Tue, 16 Apr 2019 08:52:35 +0000 (UTC)
-To: Richard Henderson <richard.henderson@linaro.org>, qemu-devel@nongnu.org
-References: <20190411100836.646-1-david@redhat.com>
-	<20190411100836.646-8-david@redhat.com>
-	<0c0c45f1-0721-78a8-fb46-f32e7701da0e@linaro.org>
-From: David Hildenbrand <david@redhat.com>
-Openpgp: preference=signencrypt
-Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
-	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
-	SE+xAvmumFBY
-Organization: Red Hat GmbH
-Message-ID: <fd06217f-3fe6-d10d-726a-886c5fab8820@redhat.com>
-Date: Tue, 16 Apr 2019 10:52:34 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
-	Thunderbird/60.6.1
+	(envelope-from <yuval.shaia@oracle.com>) id 1hGJtS-0002IQ-Na
+	for qemu-devel@nongnu.org; Tue, 16 Apr 2019 04:56:43 -0400
+Received: from aserp2130.oracle.com ([141.146.126.79]:44656)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <yuval.shaia@oracle.com>)
+	id 1hGJtS-0002Hk-Cg
+	for qemu-devel@nongnu.org; Tue, 16 Apr 2019 04:56:42 -0400
+Received: from pps.filterd (aserp2130.oracle.com [127.0.0.1])
+	by aserp2130.oracle.com (8.16.0.27/8.16.0.27) with SMTP id
+	x3G8sMhh041422; Tue, 16 Apr 2019 08:56:30 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com;
+	h=date : from : to : cc
+	: subject : message-id : references : mime-version : content-type :
+	in-reply-to; s=corp-2018-07-02;
+	bh=7WmhKGCLMOl08RFR0t4p+Nbaq4WeQhMg2l3J/gNS1e8=;
+	b=pJ7gOEd93SBek/wSJo+zgs0NDRG/4YZrUibaeZWBEFj7B2X7xwu2x74i8y9OQwLh3LGP
+	ARq4sT+3/H0yIlKUhGWp1gz2I8Nq9ZgUXxdNvgVSNes1YtodfVjk998Ht0D0ZrvhiN3o
+	D6sz02OEzXL+79DOLIEozItm+bDySTOLNs2z5IFLfzS+rDMDwa/DG2UnuVqv1PMCyBk7
+	89JjSpAEyQqtRG7zI1dhFXybLdsBEY8c2H7Y49UPXyxQ+L3VmdWcB5wlSHHVcqM1s4tm
+	ReAhlGDNRhyA4olinBdYYgMlCkMJmWRoeurO0aVzKflwjvluxi1SYmbM9ublUV+gfSWz
+	9g== 
+Received: from userp3020.oracle.com (userp3020.oracle.com [156.151.31.79])
+	by aserp2130.oracle.com with ESMTP id 2ru59d3eqg-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Tue, 16 Apr 2019 08:56:30 +0000
+Received: from pps.filterd (userp3020.oracle.com [127.0.0.1])
+	by userp3020.oracle.com (8.16.0.27/8.16.0.27) with SMTP id
+	x3G8uMU2009366; Tue, 16 Apr 2019 08:56:29 GMT
+Received: from aserv0121.oracle.com (aserv0121.oracle.com [141.146.126.235])
+	by userp3020.oracle.com with ESMTP id 2rubq677q9-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Tue, 16 Apr 2019 08:56:29 +0000
+Received: from abhmp0005.oracle.com (abhmp0005.oracle.com [141.146.116.11])
+	by aserv0121.oracle.com (8.14.4/8.13.8) with ESMTP id x3G8uS5P016975;
+	Tue, 16 Apr 2019 08:56:28 GMT
+Received: from lap1 (/77.138.183.59) by default (Oracle Beehive Gateway v4.0)
+	with ESMTP ; Tue, 16 Apr 2019 01:56:27 -0700
+Date: Tue, 16 Apr 2019 11:56:21 +0300
+From: Yuval Shaia <yuval.shaia@oracle.com>
+To: Bart Van Assche <bvanassche@acm.org>
+Message-ID: <20190416085620.GA4493@lap1>
+References: <20190411110157.14252-1-yuval.shaia@oracle.com>
+	<20190411110157.14252-4-yuval.shaia@oracle.com>
+	<f133d122-5b00-2e3b-f5cc-efc6d2cc3d3b@acm.org>
 MIME-Version: 1.0
-In-Reply-To: <0c0c45f1-0721-78a8-fb46-f32e7701da0e@linaro.org>
 Content-Type: text/plain; charset="UTF-8"
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.40]);
-	Tue, 16 Apr 2019 08:52:37 +0000 (UTC)
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH v1 07/41] s390x/tcg: Implement VECTOR
- AVERAGE
+Content-Disposition: inline
+In-Reply-To: <f133d122-5b00-2e3b-f5cc-efc6d2cc3d3b@acm.org>
+User-Agent: Mutt/1.10.1 (2018-07-13)
+X-Proofpoint-Virus-Version: vendor=nai engine=5900 definitions=9228
+	signatures=668685
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=0
+	malwarescore=0
+	phishscore=0 bulkscore=0 spamscore=0 mlxscore=0 mlxlogscore=999
+	adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+	engine=8.0.1-1810050000 definitions=main-1904160063
+X-Proofpoint-Virus-Version: vendor=nai engine=5900 definitions=9228
+	signatures=668685
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0
+	priorityscore=1501 malwarescore=0
+	suspectscore=0 phishscore=0 bulkscore=0 spamscore=0 clxscore=1015
+	lowpriorityscore=0 mlxscore=0 impostorscore=0 mlxlogscore=999
+	adultscore=0
+	classifier=spam adjust=0 reason=mlx scancount=1 engine=8.0.1-1810050000
+	definitions=main-1904160063
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic]
+X-Received-From: 141.146.126.79
+Subject: Re: [Qemu-devel] [RFC 3/3] RDMA/virtio-rdma: VirtIO rdma driver
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -119,72 +107,107 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-s390x@nongnu.org, Cornelia Huck <cohuck@redhat.com>,
-	Thomas Huth <thuth@redhat.com>, Richard Henderson <rth@twiddle.net>
+Cc: mst@redhat.com, linux-rdma@vger.kernel.org, cohuck@redhat.com,
+	qemu-devel@nongnu.org, virtualization@lists.linux-foundation.org,
+	jgg@mellanox.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190416085234.2W0qn2x9tsJ_jX2fOakhWvoGzvuDqegq8zrtGEdARuU@z>
+Message-ID: <20190416085621.97qXiel2ZeGLvp9ml0V1najf_3IBkf83bs2DMzMn-KE@z>
 
-On 13.04.19 00:34, Richard Henderson wrote:
-> On 4/11/19 12:08 AM, David Hildenbrand wrote:
->> +}
->> +static DisasJumpType op_vavg(DisasContext *s, DisasOps *o)
->> +{
+On Mon, Apr 15, 2019 at 06:07:52PM -0700, Bart Van Assche wrote:
+> On 4/11/19 4:01 AM, Yuval Shaia wrote:
+> > +++ b/drivers/infiniband/hw/virtio/Kconfig
+> > @@ -0,0 +1,6 @@
+> > +config INFINIBAND_VIRTIO_RDMA
+> > +	tristate "VirtIO Paravirtualized RDMA Driver"
+> > +	depends on NETDEVICES && ETHERNET && PCI && INET
+> > +	---help---
+> > +	  This driver provides low-level support for VirtIO Paravirtual
+> > +	  RDMA adapter.
 > 
-> Watch your spacing.
+> Does this driver really depend on Ethernet, or does it also work with
+> Ethernet support disabled?
 
-Whoops.
-
-> 
-> 
->> +    static const GVecGen3 g[4] = {
->> +        { .fno = gen_helper_gvec_vavg8, },
->> +        { .fno = gen_helper_gvec_vavg16, },
->> +        { .fni4 = gen_avg_i32, },
->> +        { .fni8 = gen_avg_i64, },
->> +    };
-> 
-> Pondering possible vector expansions.  I think one possibility is
-> 
->   t1 = (a >> 1) + (b >> 1);
-> 
-> We still have the two "0.5 bits" to add back in, plus we round up by adding
-> another 0.5.  This means if either lsb is set, then we have carry in to the 1's
-> bit.  So:
-> 
->   t1 = t1 + ((a | b) & 1);
-> 
-> Which leads to
-> 
->   tcg_gen_sari_vec(vece, t0, a, 1);
->   tcg_gen_sari_vec(vece, t1, b, 1);
->   tcg_gen_or_vec(vece, t2, a, b);
->   tcg_gen_add_vec(vece, t0, t0, t1);
->   tcg_gen_dupi_vec(vece, t1, 1);
->   tcg_gen_and_vec(vece, t2, t2, t1);
->   tcg_gen_add_vec(vece, t0, t0, t2);
-> 
->   { .fnv = gen_avg_vec,
->     .fno = gen_helper_gvec_vavg8,
->     .opc = INDEX_op_sari_vec },
-> 
-> But what you have here is correct and the above is mere optimization so,
-> Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
-> 
-
-Looks sane, as discussed, let's handle vector expansions later.
-
-Thanks!
+The device should eventually expose Ethernet interface as well as IB.
 
 > 
-> r~
+> > +static inline struct virtio_rdma_info *to_vdev(struct ib_device *ibdev)
+> > +{
+> > +	return container_of(ibdev, struct virtio_rdma_info, ib_dev);
+> > +}
 > 
+> Is it really worth to introduce this function? Have you considered to
+> use container_of(ibdev, struct virtio_rdma_info, ib_dev) directly instead
+> of to_vdev()?
 
+Agree, not sure really needed, just saw that some drivers uses this pattern.
 
--- 
+> 
+> > +static void rdma_ctrl_ack(struct virtqueue *vq)
+> > +{
+> > +	struct virtio_rdma_info *dev = vq->vdev->priv;
+> > +
+> > +	wake_up(&dev->acked);
+> > +
+> > +	printk("%s\n", __func__);
+> > +}
+> 
+> Should that printk() be changed into pr_debug()? The same comment holds for
+> all other printk() calls.
 
-Thanks,
+All prints will be removed, this is still wip.
 
-David / dhildenb
+> 
+> > +#define VIRTIO_RDMA_BOARD_ID	1
+> > +#define VIRTIO_RDMA_HW_NAME	"virtio-rdma"
+> > +#define VIRTIO_RDMA_HW_REV	1
+> > +#define VIRTIO_RDMA_DRIVER_VER	"1.0"
+> 
+> Is a driver version number useful in an upstream driver?
+
+I've noticed that other drivers exposes this in sysfs.
+
+> 
+> > +struct ib_cq *virtio_rdma_create_cq(struct ib_device *ibdev,
+> > +				    const struct ib_cq_init_attr *attr,
+> > +				    struct ib_ucontext *context,
+> > +				    struct ib_udata *udata)
+> > +{
+> > +	struct scatterlist in, out;
+> > +	struct virtio_rdma_ib_cq *vcq;
+> > +	struct cmd_create_cq *cmd;
+> > +	struct rsp_create_cq *rsp;
+> > +	struct ib_cq *cq = NULL;
+> > +	int rc;
+> > +
+> > +	/* TODO: Check MAX_CQ */
+> > +
+> > +	cmd = kmalloc(sizeof(*cmd), GFP_ATOMIC);
+> > +	if (!cmd)
+> > +		return ERR_PTR(-ENOMEM);
+> > +
+> > +	rsp = kmalloc(sizeof(*rsp), GFP_ATOMIC);
+> > +	if (!rsp) {
+> > +		kfree(cmd);
+> > +		return ERR_PTR(-ENOMEM);
+> > +	}
+> > +
+> > +	vcq = kzalloc(sizeof(*vcq), GFP_KERNEL);
+> > +	if (!vcq)
+> > +		goto out;
+> 
+> Are you sure that you want to mix GFP_ATOMIC and GFP_KERNEL in a single
+> function?
+
+Right, a mistake.
+
+> 
+> Thanks,
+> 
+> Bart.
+
+Thanks.
+
+> 
 
