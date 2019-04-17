@@ -1,29 +1,26 @@
-Received: from eggs.gnu.org ([209.51.188.92]:33146)
+Received: from eggs.gnu.org ([209.51.188.92]:38888)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1hGe6U-0004EZ-ED
-	for qemu-devel@nongnu.org; Wed, 17 Apr 2019 02:31:31 -0400
+	(envelope-from <kraxel@redhat.com>) id 1hGei9-0000nH-Fc
+	for qemu-devel@nongnu.org; Wed, 17 Apr 2019 03:10:26 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1hGe6T-0005wQ-DD
-	for qemu-devel@nongnu.org; Wed, 17 Apr 2019 02:31:30 -0400
-Received: from mail-eopbgr50134.outbound.protection.outlook.com
-	([40.107.5.134]:19743
-	helo=EUR03-VE1-obe.outbound.protection.outlook.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
-	id 1hGe6S-0005vX-Ls
-	for qemu-devel@nongnu.org; Wed, 17 Apr 2019 02:31:29 -0400
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Date: Wed, 17 Apr 2019 06:31:23 +0000
-Message-ID: <1b423cd5-3814-5b1d-f5fe-b315e4268137@virtuozzo.com>
-References: <20190416153850.5186-1-armbru@redhat.com>
-In-Reply-To: <20190416153850.5186-1-armbru@redhat.com>
-Content-Language: en-US
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <AC85C3E4AEA1CE4F85878461AA93A0E6@eurprd08.prod.outlook.com>
-Content-Transfer-Encoding: base64
+	(envelope-from <kraxel@redhat.com>) id 1hGei7-0000nn-0t
+	for qemu-devel@nongnu.org; Wed, 17 Apr 2019 03:10:24 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:38374)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1hGei3-0000lz-A8
+	for qemu-devel@nongnu.org; Wed, 17 Apr 2019 03:10:20 -0400
+Date: Wed, 17 Apr 2019 09:10:12 +0200
+From: Gerd Hoffmann <kraxel@redhat.com>
+Message-ID: <20190417071012.fxedabu3makmoyuz@sirius.home.kraxel.org>
+References: <874f0f8e-780e-6600-e11b-b97f5b055cf8@durchholz.org>
+	<dbd6541e-5013-d0bc-b23e-a8de4f4cd171@redhat.com>
+	<20190416072430.dp742ehg27drpplb@sirius.home.kraxel.org>
+	<00f0ada2-a68b-2264-ab72-f49fe7d654e7@durchholz.org>
 MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [PATCH] error: Fix error_report_err(),
- warn_report_err() hint printing
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <00f0ada2-a68b-2264-ab72-f49fe7d654e7@durchholz.org>
+Subject: Re: [Qemu-devel] curses.c: "We need a terminal output" ?
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,50 +29,51 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Markus Armbruster <armbru@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+To: Joachim Durchholz <jo@durchholz.org>
+Cc: qemu-devel@nongnu.org
 
-MTYuMDQuMjAxOSAxODozOCwgTWFya3VzIEFybWJydXN0ZXIgd3JvdGU6DQo+IEJlZm9yZSB0aGUg
-ZnJvbSBxZXJyb3JfcmVwb3J0KCkgdG8gZXJyb3Jfc2V0ZygpLCBoaW50cyBsb29rZWQgbGlrZQ0K
-PiB0aGlzOg0KPiANCj4gICAgICBxZXJyb3JfcmVwb3J0KFFFUlJfTUFDUk8sIC4uLiBhcmd1bWVu
-dHMgLi4uKTsNCj4gICAgICBlcnJvcl9wcmludGZfdW5sZXNzX3FtcCguLi4gaGludCAuLi4pOw0K
-PiANCj4gZXJyb3JfcHJpbnRmX3VubGVzc19xbXAoKSBtYWRlIHBlcmZlY3Qgc2Vuc2U6IGl0IHBy
-aW50ZWQgZXhhY3RseSB3aGVuDQo+IHFlcnJvcl9yZXBvcnQoKSBkaWQuDQo+IA0KPiBBZnRlciB0
-aGUgY29udmVyc2lvbiB0byBlcnJvcl9zZXRnKCk6DQo+IA0KPiAgICAgIGVycm9yX3NldGcoZXJy
-cCwgUUVSUl9NQUNSTywgLi4uIGFyZ3VtZW50cyAuLi4pOw0KPiAgICAgIGVycm9yX3ByaW50Zl91
-bmxlc3NfcW1wKC4uLiBoaW50IC4uLik7DQo+IA0KPiBUaGUgInVubGVzcyBRTVAgcGFydCIgc3Rp
-bGwgbWFkZSBzb21lIHNlbnNlOyBpbiBRTVAgY29udGV4dCwgdGhlDQo+IGNhbGxlciBnZW5lcmFs
-bHkgdXNlcyB0aGUgZXJyb3IgYXMgUU1QIHJlc3BvbnNlIGluc3RlYWQgb2YgcHJpbnRpbmcNCj4g
-aXQuDQo+IA0KPiBIb3dldmVyLCBldmVyeXRoaW5nIGVsc2UgaXMgd3JvbmcuICBJZiB0aGUgY2Fs
-bGVyIGhhbmRsZXMgdGhlIGVycm9yLA0KPiB0aGUgaGludCBnZXRzIHByaW50ZWQgYW55d2F5ICh1
-bmxlc3MgUU1QKS4gIElmIHRoZSBjYWxsZXIgcmVwb3J0cyB0aGUNCj4gZXJyb3IsIHRoZSBoaW50
-IGdldHMgcHJpbnRlZCAqYmVmb3JlKiB0aGUgcmVwb3J0ICh1bmxlc3MgUU1QKSBvciBub3QNCj4g
-YXQgYWxsIChpZiBRTVApLg0KPiANCj4gQ29tbWl0IDUwYjdiMDAwYzkxIGZpeGVkIHRoaXMgYnkg
-bWFraW5nIGhpbnRzIGEgbWVtYmVyIG9mIEVycm9yLiAgSXQNCj4ga2VwdCBwcmludGluZyBoaW50
-cyB3aXRoIGVycm9yX3ByaW50Zl91bmxlc3NfcW1wKCk6DQo+IA0KPiAgICAgICB2b2lkIGVycm9y
-X3JlcG9ydF9lcnIoRXJyb3IgKmVycikNCj4gICAgICAgew0KPiAJIGVycm9yX3JlcG9ydCgiJXMi
-LCBlcnJvcl9nZXRfcHJldHR5KGVycikpOw0KPiAgICAgICsgICAgaWYgKGVyci0+aGludCkgew0K
-PiAgICAgICsgICAgICAgIGVycm9yX3ByaW50Zl91bmxlc3NfcW1wKCIlc1xuIiwgZXJyLT5oaW50
-LT5zdHIpOw0KPiAgICAgICsgICAgfQ0KPiAJIGVycm9yX2ZyZWUoZXJyKTsNCj4gICAgICAgfQ0K
-PiANCj4gVGhpcyBpcyB3cm9uZy4gIFdlIHNob3VsZCAoYW5kIG5vdyBjYW4pIHByaW50IHRoZSBo
-aW50IGV4YWN0bHkgd2hlbiB3ZQ0KPiBwcmludCB0aGUgZXJyb3IuDQo+IA0KPiBUaGUgbWlzdGFr
-ZSBoYXMgc2luY2UgYmVlbiBjb3BpZWQgdG8gd2Fybl9yZXBvcnRfZXJyKCkuDQo+IA0KPiBGaXgg
-Ym90aCB0byB1c2UgZXJyb3JfcHJpbnRmKCkuDQo+IA0KPiBSZXBvcnRlZC1ieTogVmxhZGltaXIg
-U2VtZW50c292LU9naWV2c2tpeSA8dnNlbWVudHNvdkB2aXJ0dW96em8uY29tPg0KPiBDYzogRXJp
-YyBCbGFrZSA8ZWJsYWtlQHJlZGhhdC5jb20+DQo+IFNpZ25lZC1vZmYtYnk6IE1hcmt1cyBBcm1i
-cnVzdGVyIDxhcm1icnVAcmVkaGF0LmNvbT4NCj4gLS0tDQo+ICAgdXRpbC9lcnJvci5jIHwgNCAr
-Ky0tDQo+ICAgMSBmaWxlIGNoYW5nZWQsIDIgaW5zZXJ0aW9ucygrKSwgMiBkZWxldGlvbnMoLSkN
-Cj4gDQo+IGRpZmYgLS1naXQgYS91dGlsL2Vycm9yLmMgYi91dGlsL2Vycm9yLmMNCj4gaW5kZXgg
-OTM0YTc4ZTFiMS4uNzEyYjRkNGI1ZCAxMDA2NDQNCj4gLS0tIGEvdXRpbC9lcnJvci5jDQo+ICsr
-KyBiL3V0aWwvZXJyb3IuYw0KPiBAQCAtMjIzLDcgKzIyMyw3IEBAIHZvaWQgZXJyb3JfcmVwb3J0
-X2VycihFcnJvciAqZXJyKQ0KPiAgIHsNCj4gICAgICAgZXJyb3JfcmVwb3J0KCIlcyIsIGVycm9y
-X2dldF9wcmV0dHkoZXJyKSk7DQo+ICAgICAgIGlmIChlcnItPmhpbnQpIHsNCj4gLSAgICAgICAg
-ZXJyb3JfcHJpbnRmX3VubGVzc19xbXAoIiVzIiwgZXJyLT5oaW50LT5zdHIpOw0KPiArICAgICAg
-ICBlcnJvcl9wcmludGYoIiVzIiwgZXJyLT5oaW50LT5zdHIpOw0KPiAgICAgICB9DQo+ICAgICAg
-IGVycm9yX2ZyZWUoZXJyKTsNCj4gICB9DQo+IEBAIC0yMzIsNyArMjMyLDcgQEAgdm9pZCB3YXJu
-X3JlcG9ydF9lcnIoRXJyb3IgKmVycikNCj4gICB7DQo+ICAgICAgIHdhcm5fcmVwb3J0KCIlcyIs
-IGVycm9yX2dldF9wcmV0dHkoZXJyKSk7DQo+ICAgICAgIGlmIChlcnItPmhpbnQpIHsNCj4gLSAg
-ICAgICAgZXJyb3JfcHJpbnRmX3VubGVzc19xbXAoIiVzIiwgZXJyLT5oaW50LT5zdHIpOw0KPiAr
-ICAgICAgICBlcnJvcl9wcmludGYoIiVzIiwgZXJyLT5oaW50LT5zdHIpOw0KPiAgICAgICB9DQo+
-ICAgICAgIGVycm9yX2ZyZWUoZXJyKTsNCj4gICB9DQo+IA0KDQoNClJldmlld2VkLWJ5OiBWbGFk
-aW1pciBTZW1lbnRzb3YtT2dpZXZza2l5IDx2c2VtZW50c292QHZpcnR1b3p6by5jb20+DQoNCg0K
-LS0gDQpCZXN0IHJlZ2FyZHMsDQpWbGFkaW1pcg0K
+  Hi,
+
+> Then I don't understand why it just ran fine.
+> I don't expect fullscreen output to work perfectly anyway;
+
+If you don't expect the output to actually work,
+then fine, feel free to comment out that check.
+
+I don't consider that being a sane approach though.
+
+> just enough so I can use qemu expect-style.
+> 
+> Also, is qemu -curses actually using all the terminal shenanigans?
+> I don't think so. If it is, it's not really needed it seems, things work
+> fine.
+
+The curses library depends on them, sure.  How else do you think the
+curses UI manages to work correctly no matter how big your terminal
+window is?
+
+> > > > I can see another scenario when this is problematic: Unit testing code
+> > > > that directly writes to the console. E.g. testing BIOS code, or testing
+> > > > operating systems when using the serial port is not an option.
+> > 
+> > seabios can work with the serial console just fine, try "qemu -nographic"
+> 
+> Well, can you tell me how convince any *BSD to talk to seabios intead of to
+> the terminal...
+
+All boot loaders I've seen so far actually talk to seabios.  Which is
+enough to enable the kernel's serial console support.  The general
+approach is the same on any unix-ish guest operating system.  The
+details may vary of course.
+
+FreeBSD:
+ (1) qemu-system-x86_64 -nographic -cdrom FreeBSD-11.0-RELEASE-amd64-disc1.iso
+ (2) At the bootloader menu hit '3' (Escape to loader prompt).
+ (3) set console=comconsole
+ (4) boot
+
+Figuring the procedure for other guests is left as an exercise to the
+reader.
+
+cheers,
+  Gerd
