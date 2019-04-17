@@ -1,21 +1,22 @@
-Received: from eggs.gnu.org ([209.51.188.92]:50163)
+Received: from eggs.gnu.org ([209.51.188.92]:51334)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1hGd5Q-0006i3-LL
-	for qemu-devel@nongnu.org; Wed, 17 Apr 2019 01:26:21 -0400
+	(envelope-from <richard.henderson@linaro.org>) id 1hGdBT-0007vs-Oq
+	for qemu-devel@nongnu.org; Wed, 17 Apr 2019 01:32:37 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1hGd5P-0006Pt-FE
-	for qemu-devel@nongnu.org; Wed, 17 Apr 2019 01:26:20 -0400
-From: Markus Armbruster <armbru@redhat.com>
-References: <1555315185-16414-1-git-send-email-like.xu@linux.intel.com>
-	<1555315185-16414-2-git-send-email-like.xu@linux.intel.com>
-Date: Wed, 17 Apr 2019 07:26:14 +0200
-In-Reply-To: <1555315185-16414-2-git-send-email-like.xu@linux.intel.com> (Like
-	Xu's message of "Mon, 15 Apr 2019 15:59:44 +0800")
-Message-ID: <87bm1519u1.fsf@dusky.pond.sub.org>
-MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PATCH v3 1/2] vl.c: refactor current_machine as
- non-global variable
+	(envelope-from <richard.henderson@linaro.org>) id 1hGdBR-0002fI-V8
+	for qemu-devel@nongnu.org; Wed, 17 Apr 2019 01:32:35 -0400
+Received: from mail-pg1-x541.google.com ([2607:f8b0:4864:20::541]:46122)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+	id 1hGdBQ-0002cq-3o
+	for qemu-devel@nongnu.org; Wed, 17 Apr 2019 01:32:33 -0400
+Received: by mail-pg1-x541.google.com with SMTP id q1so11432420pgv.13
+	for <qemu-devel@nongnu.org>; Tue, 16 Apr 2019 22:32:30 -0700 (PDT)
+From: Richard Henderson <richard.henderson@linaro.org>
+Date: Tue, 16 Apr 2019 19:32:24 -1000
+Message-Id: <20190417053225.27505-1-richard.henderson@linaro.org>
+Subject: [Qemu-devel] [PATCH 0/1] util/path: Do not cache all filenames at
+ startup
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,36 +25,41 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Like Xu <like.xu@linux.intel.com>
-Cc: qemu-trivial@nongnu.org, Peter Maydell <peter.maydell@linaro.org>, Thomas Huth <thuth@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, like.xu@intel.com, qemu-devel@nongnu.org, Igor Mammedov <imammedo@redhat.com>
+To: qemu-devel@nongnu.org
+Cc: laurent@vivier.eu, evgreen@chromium.org, peter.maydell@linaro.org
 
-Like Xu <like.xu@linux.intel.com> writes:
+This is a third variant attempting to fix the problem of
+the -L interp_prefix handling not coping well pointing to
+a full chroot.
 
-> This patch makes the remaining dozen or so uses of the global
-> current_machine outside vl.c use qdev_get_machine() instead,
-> and then make current_machine local to vl.c instead of global.
->
-> Suggested-by: Peter Maydell <peter.maydell@linaro.org>
-> Signed-off-by: Like Xu <like.xu@linux.intel.com>
+Previous versions include:
+https://lists.gnu.org/archive/html/qemu-devel/2018-05/msg06592.html
+https://lists.gnu.org/archive/html/qemu-devel/2018-05/msg07304.html
 
-I'm afraid I dislike this one, too.
+Both of the other versions keep an open file descriptor to
+the directory that is interp_prefix.  While this seems to be
+efficient, they also leak a file descriptor into the guest.
+This has follow-on effects on the emulation, causing failures
+e.g. within the LTP testsuite.
 
-The patch does not reduce global state, it's merely MICAHI (make it
-complicated and hide it).
+This version uses only string manipulation and access(2).
 
-It does not improve safety, it merely turns dereferences of null
-current_machine into unwanted creation of "/machine" as container (ugh),
-which the next patch then fixes up to assertion failure.
+A plausible criticism of this is the mutex and the cache.
+Are they really needed?  I have no idea.  I can imagine
+removing that is actually more efficient, not needing a
+lock around a shared data structure.
 
-The only benefit I can see is you can't assign to current_machine
-outside vl.c anymore.  Nobody ever did, thus complete non-issue.
+Comments?
 
-If you want to hide global state without actually reducing it, create an
-accessor function.  You can then use that to replace qdev_get_machine(),
-getting rid of its surprising side effect.  *That* would be an
-improvement I could get behind.
 
-Better that *hiding* use of global state would be *eliminating* use of
-global state: pass current_machine around.  This isn't always practical.
-But where it is, the dependence on "machine created" becomes obvious in
-the code.
+r~
+
+
+Richard Henderson (1):
+  util/path: Do not cache all filenames at startup
+
+ util/path.c | 211 ++++++++++++++--------------------------------------
+ 1 file changed, 57 insertions(+), 154 deletions(-)
+
+-- 
+2.17.1
