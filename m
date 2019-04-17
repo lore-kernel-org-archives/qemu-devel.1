@@ -6,44 +6,44 @@ X-Spam-Status: No, score=-0.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	MAILING_LIST_MULTI,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 71CA2C282DA
-	for <qemu-devel@archiver.kernel.org>; Wed, 17 Apr 2019 21:03:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6BF46C282DC
+	for <qemu-devel@archiver.kernel.org>; Wed, 17 Apr 2019 21:03:05 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2EA622183E
-	for <qemu-devel@archiver.kernel.org>; Wed, 17 Apr 2019 21:03:01 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2EA622183E
+	by mail.kernel.org (Postfix) with ESMTPS id 2A0C12183E
+	for <qemu-devel@archiver.kernel.org>; Wed, 17 Apr 2019 21:03:05 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2A0C12183E
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=pobox.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:59653 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:59655 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hGrhr-0005vG-V9
-	for qemu-devel@archiver.kernel.org; Wed, 17 Apr 2019 17:03:00 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:56265)
+	id 1hGrhw-0005vr-B2
+	for qemu-devel@archiver.kernel.org; Wed, 17 Apr 2019 17:03:04 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:56264)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1hGrfv-00052e-BF
+	(envelope-from <bounces@canonical.com>) id 1hGrfv-00052d-Av
 	for qemu-devel@nongnu.org; Wed, 17 Apr 2019 17:01:01 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1hGrfr-0001j1-FR
+	(envelope-from <bounces@canonical.com>) id 1hGrfr-0001iu-Eq
 	for qemu-devel@nongnu.org; Wed, 17 Apr 2019 17:00:59 -0400
-Received: from indium.canonical.com ([91.189.90.7]:56182)
+Received: from indium.canonical.com ([91.189.90.7]:56168)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1hGrfn-0001fz-Q0
+	id 1hGrfn-0001ft-Ql
 	for qemu-devel@nongnu.org; Wed, 17 Apr 2019 17:00:53 -0400
 Received: from loganberry.canonical.com ([91.189.90.37])
 	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1hGrfl-0003Lf-IF
+	id 1hGrfl-0003Lj-1A
 	for <qemu-devel@nongnu.org>; Wed, 17 Apr 2019 21:00:49 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 761A12E80CC
-	for <qemu-devel@nongnu.org>; Wed, 17 Apr 2019 21:00:49 +0000 (UTC)
+	by loganberry.canonical.com (Postfix) with ESMTP id E4DCC2E80CC
+	for <qemu-devel@nongnu.org>; Wed, 17 Apr 2019 21:00:48 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Wed, 17 Apr 2019 20:49:46 -0000
+Date: Wed, 17 Apr 2019 20:49:25 -0000
 From: Daniel Santos <daniel.santos@pobox.com>
 To: qemu-devel@nongnu.org
 X-Launchpad-Notification-Type: bug
@@ -56,13 +56,13 @@ X-Launchpad-Bug-Reporter: Daniel Santos (daniel-santos)
 X-Launchpad-Bug-Modifier: Daniel Santos (daniel-santos)
 References: <155542675846.7866.6509809085972568558.malonedeb@wampee.canonical.com>
 Message-Id:
- <155553418682.6615.8537423502740481986.malone@chaenomeles.canonical.com>
+ <155553416543.14412.15975383701303439057.malone@gac.canonical.com>
 X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
 X-Launchpad-Message-For: qemu-devel-ml
 Precedence: bulk
 X-Generated-By: Launchpad (canonical.com); Revision="18928";
 	Instance="launchpad-lazr.conf"
-X-Launchpad-Hash: 34c521a826115c49f50198d0031247ef65b98a54
+X-Launchpad-Hash: 6bb02471604ef9d8f43b51f125a5913cf48d2799
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 91.189.90.7
 Subject: [Qemu-devel] [Bug 1825002] Re: "qemu: Unexpected FPU mode" since
@@ -81,9 +81,11 @@ Reply-To: Bug 1825002 <1825002@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190417204946._0PuudpfMUy4XTshrp6n55Ut4c21j0KkzU3ZN3hIIyU@z>
+Message-ID: <20190417204925.-yCoZUZa-nE1FPJFn3yNo3-eFksHvBN3BNRBVo7w41o@z>
 
-And thank you Thomas for the instructions!
+Thanks Peter.  I was just reading up on the CVE process and I agree.
+Obviously, it's dangerous to use uninitialized values, but that doesn't
+necessarily make it a vulnerability.
 
 -- =
 
