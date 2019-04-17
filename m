@@ -1,33 +1,22 @@
-Received: from eggs.gnu.org ([209.51.188.92]:42524)
+Received: from eggs.gnu.org ([209.51.188.92]:44488)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <sgarzare@redhat.com>) id 1hGf5h-0004Hl-G9
-	for qemu-devel@nongnu.org; Wed, 17 Apr 2019 03:34:46 -0400
+	(envelope-from <david@redhat.com>) id 1hGfDF-0005uE-0F
+	for qemu-devel@nongnu.org; Wed, 17 Apr 2019 03:42:34 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <sgarzare@redhat.com>) id 1hGf5g-0000gB-L5
-	for qemu-devel@nongnu.org; Wed, 17 Apr 2019 03:34:45 -0400
-Received: from mail-wr1-f66.google.com ([209.85.221.66]:34624)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <sgarzare@redhat.com>) id 1hGf5g-0000fT-Cw
-	for qemu-devel@nongnu.org; Wed, 17 Apr 2019 03:34:44 -0400
-Received: by mail-wr1-f66.google.com with SMTP id w16so557648wrl.1
-	for <qemu-devel@nongnu.org>; Wed, 17 Apr 2019 00:34:43 -0700 (PDT)
-Date: Wed, 17 Apr 2019 09:34:38 +0200
-From: Stefano Garzarella <sgarzare@redhat.com>
-Message-ID: <20190417073438.r57lemi6emu4x3ld@steredhat>
-References: <20190411105025.97397-1-sgarzare@redhat.com>
-	<20190411105025.97397-2-sgarzare@redhat.com>
-	<CA+aFP1AMzNjWtMeGy4MpWBa26qxShgciYkcEZ8mkSmDrtCvfqA@mail.gmail.com>
-	<20190411130245.ltfyp7d2dfe2cr3h@steredhat>
-	<CA+aFP1B7ZZ_xwNOfMbKUzEjYbMH=9dJstLYEyVq4LphPR81u0Q@mail.gmail.com>
-	<20190414132008.uxoia6avdpp4jov6@steredhat.homenet.telecomitalia.it>
-	<CA+aFP1D8VYcnwWpB=4PzAdBKr+YK-r8bSwzKKUCkH7jT3kVvoQ@mail.gmail.com>
-	<20190415080452.GA6031@localhost.localdomain>
+	(envelope-from <david@redhat.com>) id 1hGfDE-0005Ml-4k
+	for qemu-devel@nongnu.org; Wed, 17 Apr 2019 03:42:32 -0400
+References: <20190416185301.25344-1-david@redhat.com>
+	<20190416185301.25344-2-david@redhat.com>
+	<7ab7e798-1d68-99f8-acda-873ad94a5fae@linaro.org>
+From: David Hildenbrand <david@redhat.com>
+Message-ID: <74ad67c6-bd3e-d37f-598a-334d2febcea1@redhat.com>
+Date: Wed, 17 Apr 2019 09:42:28 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20190415080452.GA6031@localhost.localdomain>
-Subject: Re: [Qemu-devel] [PATCH RFC 1/1] block/rbd: increase dynamically
- the image size
+In-Reply-To: <7ab7e798-1d68-99f8-acda-873ad94a5fae@linaro.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v2 01/41] tcg: Implement tcg_gen_gvec_3i()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,33 +25,32 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Kevin Wolf <kwolf@redhat.com>
-Cc: dillaman@redhat.com, qemu-devel <qemu-devel@nongnu.org>, Josh Durgin <jdurgin@redhat.com>, qemu-block <qemu-block@nongnu.org>, Max Reitz <mreitz@redhat.com>
+To: Richard Henderson <richard.henderson@linaro.org>, qemu-devel@nongnu.org
+Cc: qemu-s390x@nongnu.org, Cornelia Huck <cohuck@redhat.com>, Thomas Huth <thuth@redhat.com>, Richard Henderson <rth@twiddle.net>
 
-On Mon, Apr 15, 2019 at 10:04:52AM +0200, Kevin Wolf wrote:
+On 17.04.19 06:30, Richard Henderson wrote:
+> On 4/16/19 8:52 AM, David Hildenbrand wrote:
+>> Let's add tcg_gen_gvec_3i(), similar to tcg_gen_gvec_2i(), however
+>> without introducing "gen_helper_gvec_3i *fnoi", as it isn't needed
+>> for now.
+>>
+>> Signed-off-by: David Hildenbrand <david@redhat.com>
+>> ---
+>>  tcg/tcg-op-gvec.c | 139 ++++++++++++++++++++++++++++++++++++++++++++++
+>>  tcg/tcg-op-gvec.h |  24 ++++++++
+>>  2 files changed, 163 insertions(+)
 > 
-> I think a potential actual use case could be persistent dirty bitmaps
-> for incremental backup. Though maybe that would be better served by
-> using the rbd image just as a raw external data file and keeping the
-> qcow2 metadata on a filesystem.
-
-Thanks to point it out! I'll take a look to understand how to keep
-metadata separated from the data.
-
+> Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 > 
-> How fast is rbd_resize()? Does automatically resizing for every write
-> request actually work reasonably well in practice? If it does, there is
-> probably little reason not to allow it, even if the use cases are rather
-> obscure.
+> 
+> r~
+> 
 
-I'll try to measure the percentage of the time spent in the rbd_resize.
+Thanks, can this go via Conny's tree or do you want to include this one
+in your next TCG pull request?
 
-Another solution could be to pass to the rbd driver the virtual size of
-the image and resize it only one time also if the preallocation is
-disabled, because RBD will not allocate blocks but IIUC it only set the max
-size.
-
-Do you think make sense? Is it feasible?
+-- 
 
 Thanks,
-Stefano
+
+David / dhildenb
