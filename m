@@ -2,59 +2,66 @@ Return-Path: <SRS0=PAXx=ST=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.4 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED,USER_AGENT_MUTT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4C55AC282DA
-	for <qemu-devel@archiver.kernel.org>; Wed, 17 Apr 2019 17:10:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7FB7EC282DA
+	for <qemu-devel@archiver.kernel.org>; Wed, 17 Apr 2019 17:12:34 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1B89420675
-	for <qemu-devel@archiver.kernel.org>; Wed, 17 Apr 2019 17:10:36 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1B89420675
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=durchholz.org
+	by mail.kernel.org (Postfix) with ESMTPS id 546CB20675
+	for <qemu-devel@archiver.kernel.org>; Wed, 17 Apr 2019 17:12:34 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 546CB20675
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:56846 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:56872 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hGo4x-0006qn-8e
-	for qemu-devel@archiver.kernel.org; Wed, 17 Apr 2019 13:10:35 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:58902)
+	id 1hGo6r-0008QC-E1
+	for qemu-devel@archiver.kernel.org; Wed, 17 Apr 2019 13:12:33 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:59349)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jo@durchholz.org>) id 1hGo3y-0006TU-L9
-	for qemu-devel@nongnu.org; Wed, 17 Apr 2019 13:09:35 -0400
+	(envelope-from <ehabkost@redhat.com>) id 1hGo5P-0007TD-TO
+	for qemu-devel@nongnu.org; Wed, 17 Apr 2019 13:11:04 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jo@durchholz.org>) id 1hGo3w-0005wF-Bh
-	for qemu-devel@nongnu.org; Wed, 17 Apr 2019 13:09:34 -0400
-Received: from 5.itsy.de ([188.40.84.14]:47002)
+	(envelope-from <ehabkost@redhat.com>) id 1hGo5O-0007Nr-Su
+	for qemu-devel@nongnu.org; Wed, 17 Apr 2019 13:11:03 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:34730)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <jo@durchholz.org>) id 1hGo3u-0005sj-OT
-	for qemu-devel@nongnu.org; Wed, 17 Apr 2019 13:09:32 -0400
-Received: from [192.168.178.32] (unknown [195.48.33.209])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+	(Exim 4.71) (envelope-from <ehabkost@redhat.com>)
+	id 1hGo5O-0007N7-KW; Wed, 17 Apr 2019 13:11:02 -0400
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+	[10.5.11.22])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by 5.itsy.de (Postfix) with ESMTPSA id 242D9645AB
-	for <qemu-devel@nongnu.org>; Wed, 17 Apr 2019 19:09:27 +0200 (CEST)
-To: qemu-devel@nongnu.org
-References: <874f0f8e-780e-6600-e11b-b97f5b055cf8@durchholz.org>
-	<dbd6541e-5013-d0bc-b23e-a8de4f4cd171@redhat.com>
-	<20190416072430.dp742ehg27drpplb@sirius.home.kraxel.org>
-	<00f0ada2-a68b-2264-ab72-f49fe7d654e7@durchholz.org>
-	<20190417071012.fxedabu3makmoyuz@sirius.home.kraxel.org>
-From: Joachim Durchholz <jo@durchholz.org>
-Message-ID: <993002d4-28dd-00f0-e8c1-7b0d9ab2de12@durchholz.org>
-Date: Wed, 17 Apr 2019 19:09:26 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
-	Thunderbird/60.6.1
+	by mx1.redhat.com (Postfix) with ESMTPS id B989C88AAA;
+	Wed, 17 Apr 2019 17:11:01 +0000 (UTC)
+Received: from localhost (ovpn-116-9.gru2.redhat.com [10.97.116.9])
+	by smtp.corp.redhat.com (Postfix) with ESMTP id F1C0B1001DCC;
+	Wed, 17 Apr 2019 17:11:00 +0000 (UTC)
+Date: Wed, 17 Apr 2019 14:10:59 -0300
+From: Eduardo Habkost <ehabkost@redhat.com>
+To: Markus Armbruster <armbru@redhat.com>
+Message-ID: <20190417171059.GC25134@habkost.net>
+References: <1555315185-16414-1-git-send-email-like.xu@linux.intel.com>
+	<1555315185-16414-3-git-send-email-like.xu@linux.intel.com>
+	<20190416212003.GB2272@habkost.net>
+	<87ftqh1ae5.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-In-Reply-To: <20190417071012.fxedabu3makmoyuz@sirius.home.kraxel.org>
-Content-Type: text/plain; charset="UTF-8"; format="flowed"
-Content-Language: en-GB
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset="UTF-8"
+Content-Disposition: inline
+In-Reply-To: <87ftqh1ae5.fsf@dusky.pond.sub.org>
+User-Agent: Mutt/1.10.1 (2018-07-13)
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+	(mx1.redhat.com [10.5.110.26]);
+	Wed, 17 Apr 2019 17:11:01 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 188.40.84.14
-Subject: Re: [Qemu-devel] curses.c: "We need a terminal output" ?
+X-Received-From: 209.132.183.28
+Subject: Re: [Qemu-devel] [PATCH v3 2/2] core/qdev: refactor
+ qdev_get_machine() with type assertion
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -66,36 +73,57 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: Peter Maydell <peter.maydell@linaro.org>, Thomas Huth <thuth@redhat.com>,
+	Like Xu <like.xu@linux.intel.com>, qemu-trivial@nongnu.org,
+	qemu-devel@nongnu.org, like.xu@intel.com,
+	Igor Mammedov <imammedo@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190417170926.iliYBVeWi6tIN2dq_vAe9RVQzDE1p_bO6YjuQJUpzOk@z>
+Message-ID: <20190417171059.xzIpwMbF6PfOrB0rjD6JtqYF0g2HdtobYjJazyk8kMU@z>
 
-Sorry, I'm done having to argue against(!) a person who's stonewalling 
-me by wilfully ignoring differences ("doesn't work perfectly" 
-interpreted as "does not work at all"), discounting 
-just-for-testing-purpose workarounds as if they were actual proposed 
-solutions ("not a sane approach"), ignoring the use case (still 
-insisting on terminal size mutability), and proposing a nonworking 
-solution (-nographic does not give me any output, of course because it 
-doesn't have a terminal to talk to).
+On Wed, Apr 17, 2019 at 07:14:10AM +0200, Markus Armbruster wrote:
+> Eduardo Habkost <ehabkost@redhat.com> writes:
+> 
+> > On Mon, Apr 15, 2019 at 03:59:45PM +0800, Like Xu wrote:
+> >> To avoid the misuse of qdev_get_machine() if machine hasn't been created yet,
+> >> this patch uses qdev_get_machine_uncheck() for obj-common (share with user-only
+> >> mode) and adds type assertion to qdev_get_machine() in system-emulation mode.
+> >> 
+> >> Suggested-by: Igor Mammedov <imammedo@redhat.com>
+> >> Signed-off-by: Like Xu <like.xu@linux.intel.com>
+> >
+> > Reviewed-by: Eduardo Habkost <ehabkost@redhat.com>
+> >
+> > I'm queueing the series on machine-next, thanks!
+> 
+> Hold your horses, please.
+> 
+> I dislike the name qdev_get_machine_uncheck().  I could live with
+> qdev_get_machine_unchecked().
+> 
+> However, I doubt this is the right approach.
+> 
+> The issue at hand is undisciplined creation of QOM object /machine.
+> 
+> This patch adds an asseertion "undisciplined creation of /machine didn't
+> create crap", but only in some places.
+> 
+> I think we should never create /machine as (surprising!) side effect of
+> qdev_get_machine().  Create it explicitly instead, and have
+> qdev_get_machine() use object_resolve_path("/machine", NULL) to get it.
+> Look ma, no side effects.
 
-Reminds me of discussions in the Maven group, there, anything that 
-didn't fit their shiny predefined ideas was brushed off in a similar manner.
-Choosing the same solution: Use a different workaround, chalk this up 
-under the Passive-Aggressive Unhelpfulness Encountered column.
+OK, I'm dropping this one while we discuss it.
 
-No hard feelings towards the community.
+I really miss a good explanation why qdev_get_machine_unchecked()
+needs to exist.  When exactly do we want /machine to exist but
+not be TYPE_MACHINE?  Why?
 
-Have a nice day everyone.
-Jo
+Once the expectations and use cases are explained, we can choose
+a better name for qdev_get_machine_unchecked() and document it
+properly.
 
-P.S.: Frustrated. In two ways.
-Latin "frustra" = "in vain".
-
-P.P.S.: I will stick around a bit so I can answer to questions based on 
-genuine interest, but I'll disconnect from the list after that.
-
-P.P.P.S.: No hard feelings towards the community in general. In fact, 
-thanks to those two who tried to help.
+-- 
+Eduardo
 
