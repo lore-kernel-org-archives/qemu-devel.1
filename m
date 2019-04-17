@@ -1,25 +1,27 @@
-Received: from eggs.gnu.org ([209.51.188.92]:34799)
+Received: from eggs.gnu.org ([209.51.188.92]:34796)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1hGq4Y-0008V1-R3
+	(envelope-from <armbru@redhat.com>) id 1hGq4Y-0008Up-K9
 	for qemu-devel@nongnu.org; Wed, 17 Apr 2019 15:18:20 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1hGq4U-00005G-LI
+	(envelope-from <armbru@redhat.com>) id 1hGq4V-00006D-3E
 	for qemu-devel@nongnu.org; Wed, 17 Apr 2019 15:18:17 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:37396)
+Received: from mx1.redhat.com ([209.132.183.28]:56700)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1hGq4R-0008Oj-Gn
-	for qemu-devel@nongnu.org; Wed, 17 Apr 2019 15:18:12 -0400
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1hGq4S-0008OQ-QS
+	for qemu-devel@nongnu.org; Wed, 17 Apr 2019 15:18:13 -0400
 Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
 	[10.5.11.12])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 4840E309E9A7
+	by mx1.redhat.com (Postfix) with ESMTPS id 1470959464
 	for <qemu-devel@nongnu.org>; Wed, 17 Apr 2019 19:18:09 +0000 (UTC)
 From: Markus Armbruster <armbru@redhat.com>
-Date: Wed, 17 Apr 2019 21:17:48 +0200
-Message-Id: <20190417191805.28198-1-armbru@redhat.com>
-Subject: [Qemu-devel] [PATCH v2 00/17] Clean up and simplify around
- fprintf_function
+Date: Wed, 17 Apr 2019 21:18:00 +0200
+Message-Id: <20190417191805.28198-13-armbru@redhat.com>
+In-Reply-To: <20190417191805.28198-1-armbru@redhat.com>
+References: <20190417191805.28198-1-armbru@redhat.com>
+Subject: [Qemu-devel] [PATCH v2 12/17] qom/cpu: Simplify how
+ CPUClass::dump_statistics() prints
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,198 +33,145 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: dgilbert@redhat.com
 
-We pass around fprintf_function callbacks together a FILE * argument.
-Three cases:
+CPUClass method dump_statistics() takes an fprintf()-like callback and
+a FILE * to pass to it.
 
-* We pass fprintf() and stdout, stderr or qemu_log_file.  Okay.
+Its only caller hmp_info_cpustats() (via cpu_dump_statistics()) passes
+monitor_fprintf() and the current monitor cast to FILE *.
+monitor_fprintf() casts it right back, and is otherwise identical to
+monitor_printf().  The type-punning is ugly.
 
-* We pass monitor_fprintf() together with the current monitor cast to
-  FILE *.  The type-punning is ugly.
+Drop the callback, and call qemu_printf() instead.
 
-* We pass monitor_printf() cast to fprintf_function together with the
-  current monitor cast to FILE *.  Even uglier.
+Signed-off-by: Markus Armbruster <armbru@redhat.com>
+Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+---
+ include/qom/cpu.h      | 11 ++++-------
+ monitor.c              |  2 +-
+ qom/cpu.c              |  5 ++---
+ target/ppc/cpu.h       |  3 +--
+ target/ppc/translate.c |  9 ++++-----
+ 5 files changed, 12 insertions(+), 18 deletions(-)
 
-All but two instances can be replaced by using qemu_printf() directly
-instead of printing through a callback.
-
-One more can be replace by using new qemu_fprintf() directly.
-
-The last one can use qemu_fprintf() to at least avoid the
-type-punning.
-
-Based-on: <20190417190641.26814-1-armbru@redhat.com>
-
-v2:
-* PATCH 08: Commit message pasto [Dave]
-* PATCH 09: Commit message typo [Dave]
-* PATCH 14: Drop spurious change to x86_cpu_dump_local_apic_state()
-  [Dave]
-
-Markus Armbruster (17):
-  include: Include fprintf-fn.h only where needed
-  trace: Simplify how st_print_trace_file_status() prints
-  tcg: Simplify how dump_opcount_info() prints
-  tcg: Simplify how dump_exec_info() prints
-  tcg: Simplify how dump_drift_info() prints
-  qsp: Simplify how qsp_report() prints
-  block/qapi: Clean up how we print to monitor or stdout
-  memory: Clean up how mtree_info() prints
-  target: Simplify how the TARGET_cpu_list() print
-  target: Clean up how the dump_mmu() print
-  target/i386: Simplify how x86_cpu_dump_local_apic_state() prints
-  qom/cpu: Simplify how CPUClass::dump_statistics() prints
-  qemu-print: New qemu_fprintf(), qemu_vfprintf()
-  qom/cpu: Simplify how CPUClass:cpu_dump_state() prints
-  monitor: Clean up how monitor_disas() funnels output to monitor
-  disas: Rename include/disas/bfd.h back to include/disas/dis-asm.h
-  include: Move fprintf_function to disas/
-
- accel/kvm/kvm-all.c                |   4 +-
- accel/tcg/translate-all.c          |  49 ++--
- block/qapi.c                       | 120 +++++-----
- bsd-user/main.c                    |   4 +-
- cpus.c                             |  21 +-
- disas.c                            |   5 +-
- disas/alpha.c                      |   2 +-
- disas/arm-a64.cc                   |   2 +-
- disas/arm.c                        |   2 +-
- disas/cris.c                       |   2 +-
- disas/hppa.c                       |   2 +-
- disas/i386.c                       |   2 +-
- disas/lm32.c                       |   2 +-
- disas/m68k.c                       |   2 +-
- disas/microblaze.c                 |   2 +-
- disas/mips.c                       |   2 +-
- disas/moxie.c                      |   2 +-
- disas/nanomips.cpp                 |   2 +-
- disas/nios2.c                      |   2 +-
- disas/ppc.c                        |   2 +-
- disas/riscv.c                      |   2 +-
- disas/s390.c                       |   2 +-
- disas/sh4.c                        |   2 +-
- disas/sparc.c                      |   2 +-
- disas/tci.c                        |   2 +-
- disas/xtensa.c                     |   2 +-
- exec.c                             |  42 ++--
- hmp.c                              |  12 +-
- include/block/qapi.h               |   9 +-
- include/disas/{bfd.h => dis-asm.h} |   5 +-
- include/exec/cpu-all.h             |   4 +-
- include/exec/cpu-common.h          |  13 --
- include/exec/log.h                 |   2 +-
- include/exec/memory-internal.h     |   3 +-
- include/exec/memory.h              |   3 +-
- include/monitor/monitor.h          |   1 -
- include/qemu-common.h              |   2 -
- include/qemu/cutils.h              |   2 -
- include/qemu/fprintf-fn.h          |  14 --
- include/qemu/qemu-print.h          |   4 +
- include/qemu/qsp.h                 |   6 +-
- include/qom/cpu.h                  |  24 +-
- include/sysemu/cpus.h              |   4 +-
- linux-user/alpha/cpu_loop.c        |   2 +-
- linux-user/cpu_loop-common.h       |   2 +-
- linux-user/cris/cpu_loop.c         |   2 +-
- linux-user/main.c                  |   2 +-
- linux-user/microblaze/cpu_loop.c   |   4 +-
- linux-user/s390x/cpu_loop.c        |   4 +-
- linux-user/sh4/cpu_loop.c          |   2 +-
- linux-user/sparc/cpu_loop.c        |   2 +-
- memory.c                           | 156 ++++++-------
- monitor.c                          |  30 +--
- qemu-img.c                         |   6 +-
- qemu-io-cmds.c                     |   2 +-
- qom/cpu.c                          |  11 +-
- target/alpha/cpu.c                 |  15 +-
- target/alpha/cpu.h                 |   5 +-
- target/alpha/helper.c              |  24 +-
- target/arm/arm-semi.c              |   2 +-
- target/arm/cpu.c                   |   1 -
- target/arm/cpu.h                   |   5 +-
- target/arm/helper.c                |  15 +-
- target/arm/translate-a64.c         |  82 +++----
- target/arm/translate.c             |  58 ++---
- target/arm/translate.h             |   7 +-
- target/cris/cpu.c                  |  14 +-
- target/cris/cpu.h                  |   5 +-
- target/cris/helper.c               |   2 +-
- target/cris/translate.c            |  36 +--
- target/hppa/cpu.c                  |  14 +-
- target/hppa/cpu.h                  |   4 +-
- target/hppa/helper.c               |  24 +-
- target/i386/cpu.c                  |  29 +--
- target/i386/cpu.h                  |   8 +-
- target/i386/hax-all.c              |   4 +-
- target/i386/helper.c               | 356 ++++++++++++++---------------
- target/i386/monitor.c              |   3 +-
- target/lm32/cpu.c                  |  14 +-
- target/lm32/cpu.h                  |   5 +-
- target/lm32/translate.c            |  36 +--
- target/m68k/cpu.h                  |   8 +-
- target/m68k/helper.c               | 129 +++++------
- target/m68k/monitor.c              |   2 +-
- target/m68k/translate.c            |  86 +++----
- target/microblaze/cpu.h            |   3 +-
- target/microblaze/helper.c         |   2 +-
- target/microblaze/translate.c      |  39 ++--
- target/mips/cpu.h                  |   2 +-
- target/mips/internal.h             |   3 +-
- target/mips/translate.c            |  77 ++++---
- target/mips/translate_init.inc.c   |   5 +-
- target/moxie/cpu.h                 |   3 +-
- target/moxie/helper.c              |   2 +-
- target/moxie/translate.c           |  22 +-
- target/nios2/cpu.h                 |   5 +-
- target/nios2/helper.c              |   2 +-
- target/nios2/mmu.c                 |   7 +-
- target/nios2/monitor.c             |   2 +-
- target/nios2/translate.c           |  24 +-
- target/openrisc/cpu.c              |  15 +-
- target/openrisc/cpu.h              |   5 +-
- target/openrisc/disas.c            |   2 +-
- target/openrisc/translate.c        |  11 +-
- target/ppc/cpu.h                   |  10 +-
- target/ppc/mmu-hash64.c            |   7 +-
- target/ppc/mmu-hash64.h            |   2 +-
- target/ppc/mmu_helper.c            |  70 +++---
- target/ppc/monitor.c               |   2 +-
- target/ppc/translate.c             | 170 +++++++-------
- target/ppc/translate_init.inc.c    |  28 +--
- target/riscv/cpu.c                 |  54 ++---
- target/riscv/cpu.h                 |   2 +-
- target/s390x/cpu.h                 |   2 +-
- target/s390x/cpu_models.c          |  21 +-
- target/s390x/helper.c              |  42 ++--
- target/s390x/internal.h            |   3 +-
- target/sh4/cpu.c                   |  17 +-
- target/sh4/cpu.h                   |   5 +-
- target/sh4/translate.c             |  27 +--
- target/sparc/cpu.c                 | 133 ++++++-----
- target/sparc/cpu.h                 |   7 +-
- target/sparc/ldst_helper.c         |  18 +-
- target/sparc/mmu_helper.c          |  97 ++++----
- target/sparc/monitor.c             |   2 +-
- target/tilegx/cpu.c                |  14 +-
- target/tricore/cpu.h               |   5 +-
- target/tricore/helper.c            |  15 +-
- target/tricore/translate.c         |  26 +--
- target/unicore32/cpu.h             |   3 +-
- target/unicore32/translate.c       |  39 ++--
- target/xtensa/cpu.h                |   7 +-
- target/xtensa/helper.c             |   7 +-
- target/xtensa/mmu_helper.c         |  24 +-
- target/xtensa/monitor.c            |   2 +-
- target/xtensa/translate.c          |  40 ++--
- tcg/tcg.c                          |  50 ++--
- tcg/tcg.h                          |   4 +-
- trace/simple.c                     |   7 +-
- trace/simple.h                     |   2 +-
- util/qemu-print.c                  |  27 +++
- util/qsp.c                         |  21 +-
- vl.c                               |   2 +-
- 143 files changed, 1353 insertions(+), 1503 deletions(-)
- rename include/disas/{bfd.h => dis-asm.h} (99%)
- delete mode 100644 include/qemu/fprintf-fn.h
-
+diff --git a/include/qom/cpu.h b/include/qom/cpu.h
+index 1d6099e5d4..31bafee2b1 100644
+--- a/include/qom/cpu.h
++++ b/include/qom/cpu.h
+@@ -184,8 +184,7 @@ typedef struct CPUClass {
+     void (*dump_state)(CPUState *cpu, FILE *f, fprintf_function cpu_fprintf,
+                        int flags);
+     GuestPanicInformation* (*get_crash_info)(CPUState *cpu);
+-    void (*dump_statistics)(CPUState *cpu, FILE *f,
+-                            fprintf_function cpu_fprintf, int flags);
++    void (*dump_statistics)(CPUState *cpu, int flags);
+     int64_t (*get_arch_id)(CPUState *cpu);
+     bool (*get_paging_enabled)(const CPUState *cpu);
+     void (*get_memory_mapping)(CPUState *cpu, MemoryMappingList *list,
+@@ -576,14 +575,12 @@ void cpu_dump_state(CPUState *cpu, FILE *f, fprintf_function cpu_fprintf,
+ /**
+  * cpu_dump_statistics:
+  * @cpu: The CPU whose state is to be dumped.
+- * @f: File to dump to.
+- * @cpu_fprintf: Function to dump with.
+  * @flags: Flags what to dump.
+  *
+- * Dumps CPU statistics.
++ * Dump CPU statistics to the current monitor if we have one, else to
++ * stdout.
+  */
+-void cpu_dump_statistics(CPUState *cpu, FILE *f, fprintf_function cpu_fprintf,
+-                         int flags);
++void cpu_dump_statistics(CPUState *cpu, int flags);
+ 
+ #ifndef CONFIG_USER_ONLY
+ /**
+diff --git a/monitor.c b/monitor.c
+index 0819b99ef7..fb5b681099 100644
+--- a/monitor.c
++++ b/monitor.c
+@@ -1364,7 +1364,7 @@ static void hmp_info_cpustats(Monitor *mon, const QDict *qdict)
+         monitor_printf(mon, "No CPU available\n");
+         return;
+     }
+-    cpu_dump_statistics(cs, (FILE *)mon, &monitor_fprintf, 0);
++    cpu_dump_statistics(cs, 0);
+ }
+ 
+ static void hmp_info_trace_events(Monitor *mon, const QDict *qdict)
+diff --git a/qom/cpu.c b/qom/cpu.c
+index a8d2958956..029e7fe9b0 100644
+--- a/qom/cpu.c
++++ b/qom/cpu.c
+@@ -230,13 +230,12 @@ void cpu_dump_state(CPUState *cpu, FILE *f, fprintf_function cpu_fprintf,
+     }
+ }
+ 
+-void cpu_dump_statistics(CPUState *cpu, FILE *f, fprintf_function cpu_fprintf,
+-                         int flags)
++void cpu_dump_statistics(CPUState *cpu, int flags)
+ {
+     CPUClass *cc = CPU_GET_CLASS(cpu);
+ 
+     if (cc->dump_statistics) {
+-        cc->dump_statistics(cpu, f, cpu_fprintf, flags);
++        cc->dump_statistics(cpu, flags);
+     }
+ }
+ 
+diff --git a/target/ppc/cpu.h b/target/ppc/cpu.h
+index 8572241364..27a36b9605 100644
+--- a/target/ppc/cpu.h
++++ b/target/ppc/cpu.h
+@@ -1270,8 +1270,7 @@ void ppc_cpu_do_interrupt(CPUState *cpu);
+ bool ppc_cpu_exec_interrupt(CPUState *cpu, int int_req);
+ void ppc_cpu_dump_state(CPUState *cpu, FILE *f, fprintf_function cpu_fprintf,
+                         int flags);
+-void ppc_cpu_dump_statistics(CPUState *cpu, FILE *f,
+-                             fprintf_function cpu_fprintf, int flags);
++void ppc_cpu_dump_statistics(CPUState *cpu, int flags);
+ hwaddr ppc_cpu_get_phys_page_debug(CPUState *cpu, vaddr addr);
+ int ppc_cpu_gdb_read_register(CPUState *cpu, uint8_t *buf, int reg);
+ int ppc_cpu_gdb_read_register_apple(CPUState *cpu, uint8_t *buf, int reg);
+diff --git a/target/ppc/translate.c b/target/ppc/translate.c
+index badc1ae1a3..f99f27a134 100644
+--- a/target/ppc/translate.c
++++ b/target/ppc/translate.c
+@@ -7593,8 +7593,7 @@ void ppc_cpu_dump_state(CPUState *cs, FILE *f, fprintf_function cpu_fprintf,
+ #undef RFPL
+ }
+ 
+-void ppc_cpu_dump_statistics(CPUState *cs, FILE*f,
+-                             fprintf_function cpu_fprintf, int flags)
++void ppc_cpu_dump_statistics(CPUState *cs, int flags)
+ {
+ #if defined(DO_PPC_STATISTICS)
+     PowerPCCPU *cpu = POWERPC_CPU(cs);
+@@ -7614,7 +7613,7 @@ void ppc_cpu_dump_statistics(CPUState *cs, FILE*f,
+                         handler = t3[op3];
+                         if (handler->count == 0)
+                             continue;
+-                        cpu_fprintf(f, "%02x %02x %02x (%02x %04d) %16s: "
++                        qemu_printf("%02x %02x %02x (%02x %04d) %16s: "
+                                     "%016" PRIx64 " %" PRId64 "\n",
+                                     op1, op2, op3, op1, (op3 << 5) | op2,
+                                     handler->oname,
+@@ -7623,7 +7622,7 @@ void ppc_cpu_dump_statistics(CPUState *cs, FILE*f,
+                 } else {
+                     if (handler->count == 0)
+                         continue;
+-                    cpu_fprintf(f, "%02x %02x    (%02x %04d) %16s: "
++                    qemu_printf("%02x %02x    (%02x %04d) %16s: "
+                                 "%016" PRIx64 " %" PRId64 "\n",
+                                 op1, op2, op1, op2, handler->oname,
+                                 handler->count, handler->count);
+@@ -7632,7 +7631,7 @@ void ppc_cpu_dump_statistics(CPUState *cs, FILE*f,
+         } else {
+             if (handler->count == 0)
+                 continue;
+-            cpu_fprintf(f, "%02x       (%02x     ) %16s: %016" PRIx64
++            qemu_printf("%02x       (%02x     ) %16s: %016" PRIx64
+                         " %" PRId64 "\n",
+                         op1, op1, handler->oname,
+                         handler->count, handler->count);
 -- 
 2.17.2
