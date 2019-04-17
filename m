@@ -3,60 +3,59 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
 X-Spam-Status: No, score=-8.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8AAACC10F14
-	for <qemu-devel@archiver.kernel.org>; Wed, 17 Apr 2019 01:43:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 801D5C10F14
+	for <qemu-devel@archiver.kernel.org>; Wed, 17 Apr 2019 01:43:30 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5B9602073F
-	for <qemu-devel@archiver.kernel.org>; Wed, 17 Apr 2019 01:43:24 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5B9602073F
+	by mail.kernel.org (Postfix) with ESMTPS id 4FFE92073F
+	for <qemu-devel@archiver.kernel.org>; Wed, 17 Apr 2019 01:43:30 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4FFE92073F
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.intel.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:45257 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:45259 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hGZbf-0007dh-Gs
-	for qemu-devel@archiver.kernel.org; Tue, 16 Apr 2019 21:43:23 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:47835)
+	id 1hGZbl-0007jr-GX
+	for qemu-devel@archiver.kernel.org; Tue, 16 Apr 2019 21:43:29 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:47775)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richardw.yang@linux.intel.com>) id 1hGZZp-0006VY-9g
-	for qemu-devel@nongnu.org; Tue, 16 Apr 2019 21:41:30 -0400
+	(envelope-from <richardw.yang@linux.intel.com>) id 1hGZZl-0006Sb-Iu
+	for qemu-devel@nongnu.org; Tue, 16 Apr 2019 21:41:26 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richardw.yang@linux.intel.com>) id 1hGZZn-0006Lv-TJ
-	for qemu-devel@nongnu.org; Tue, 16 Apr 2019 21:41:29 -0400
-Received: from mga01.intel.com ([192.55.52.88]:47707)
+	(envelope-from <richardw.yang@linux.intel.com>) id 1hGZZk-0006KX-IG
+	for qemu-devel@nongnu.org; Tue, 16 Apr 2019 21:41:25 -0400
+Received: from mga01.intel.com ([192.55.52.88]:47698)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <richardw.yang@linux.intel.com>)
-	id 1hGZZk-0006KG-NY; Tue, 16 Apr 2019 21:41:24 -0400
+	id 1hGZZi-0006G3-4F; Tue, 16 Apr 2019 21:41:22 -0400
 X-Amp-Result: SKIPPED(no attachment in message)
 X-Amp-File-Uploaded: False
 Received: from fmsmga006.fm.intel.com ([10.253.24.20])
 	by fmsmga101.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384;
-	16 Apr 2019 18:41:23 -0700
+	16 Apr 2019 18:41:16 -0700
 X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.60,360,1549958400"; d="scan'208";a="338161183"
+X-IronPort-AV: E=Sophos;i="5.60,360,1549958400"; d="scan'208";a="338161165"
 Received: from richard.sh.intel.com (HELO localhost) ([10.239.159.54])
-	by fmsmga006.fm.intel.com with ESMTP; 16 Apr 2019 18:41:21 -0700
+	by fmsmga006.fm.intel.com with ESMTP; 16 Apr 2019 18:41:14 -0700
 From: Wei Yang <richardw.yang@linux.intel.com>
 To: qemu-devel@nongnu.org,
 	qemu-arm@nongnu.org
-Date: Wed, 17 Apr 2019 09:40:36 +0800
-Message-Id: <20190417014038.26018-5-richardw.yang@linux.intel.com>
+Date: Wed, 17 Apr 2019 09:40:33 +0800
+Message-Id: <20190417014038.26018-2-richardw.yang@linux.intel.com>
 X-Mailer: git-send-email 2.19.1
 In-Reply-To: <20190417014038.26018-1-richardw.yang@linux.intel.com>
 References: <20190417014038.26018-1-richardw.yang@linux.intel.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
 	recognized.
 X-Received-From: 192.55.52.88
-Subject: [Qemu-devel] [PATCH v3 4/6] hw/arm/virt-acpi-build: pass
- AcpiMcfgInfo to build_mcfg()
+Subject: [Qemu-devel] [PATCH v3 1/6] q35: acpi: do not create dummy MCFG
+ table
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -75,146 +74,71 @@ Cc: yang.zhong@intel.com, peter.maydell@linaro.org, mst@redhat.com,
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190417014036.JP2ONT3yk0xSzKTv-OP4PnpnNFE_5hA9Ib4k5HEDUVo@z>
+Content-Type: text/plain; charset="UTF-8"
+Message-ID: <20190417014033.cuUWmwjgjJYEAzkAMtvQPReAjlYd9kcRcr3klHxUrww@z>
 
-To build MCFG, two information is necessary:
+From: Igor Mammedov <imammedo@redhat.com>
 
-    * bus number
-    * base address
+Dummy table (with signature "QEMU") creation came from original SeaBIOS
+codebase. And QEMU would have to keep it around if there were Q35 machine
+that depended on keeping ACPI tables blob constant size. Luckily there
+were no versioned Q35 machine types before commit:
+  (since 2.3) a1666142db acpi-build: make ROMs RAM blocks resizeable
+which obsoleted need to keep ACPI tables blob the same size on source/destination.
 
-Abstract these two information to AcpiMcfgInfo so that build_mcfg and
-build_mcfg_q35 will have the same declaration.
+Considering the 1st versioned machine is pc-q35-2.4, the dummy table
+is not really necessary and it's safe to drop it without breaking
+cross version migration in both directions unconditionally.
 
+Signed-off-by: Igor Mammedov <imammedo@redhat.com>
 Signed-off-by: Wei Yang <richardw.yang@linux.intel.com>
-Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
-
 ---
-v3:
-  * move AcpiMcfgInfo to pci.h
-v2:
-  * for arm platform, construct a AcpiMcfgInfo directly
----
- hw/arm/virt-acpi-build.c | 18 +++++++++++-------
- hw/i386/acpi-build.c     |  6 +-----
- include/hw/acpi/pci.h    | 33 +++++++++++++++++++++++++++++++++
- 3 files changed, 45 insertions(+), 12 deletions(-)
- create mode 100644 include/hw/acpi/pci.h
+ hw/i386/acpi-build.c | 18 ++++--------------
+ 1 file changed, 4 insertions(+), 14 deletions(-)
 
-diff --git a/hw/arm/virt-acpi-build.c b/hw/arm/virt-acpi-build.c
-index e09e7eff8d..ebddcde596 100644
---- a/hw/arm/virt-acpi-build.c
-+++ b/hw/arm/virt-acpi-build.c
-@@ -40,6 +40,7 @@
- #include "hw/hw.h"
- #include "hw/acpi/aml-build.h"
- #include "hw/acpi/utils.h"
-+#include "hw/acpi/pci.h"
- #include "hw/pci/pcie_host.h"
- #include "hw/pci/pci.h"
- #include "hw/arm/virt.h"
-@@ -546,21 +547,18 @@ build_srat(GArray *table_data, BIOSLinker *linker, VirtMachineState *vms)
- }
- 
- static void
--build_mcfg(GArray *table_data, BIOSLinker *linker, VirtMachineState *vms)
-+build_mcfg(GArray *table_data, BIOSLinker *linker, AcpiMcfgInfo *info)
- {
-     AcpiTableMcfg *mcfg;
--    const MemMapEntry *memmap = vms->memmap;
--    int ecam_id = VIRT_ECAM_ID(vms->highmem_ecam);
-     int len = sizeof(*mcfg) + sizeof(mcfg->allocation[0]);
- 
-     mcfg = acpi_data_push(table_data, len);
--    mcfg->allocation[0].address = cpu_to_le64(memmap[ecam_id].base);
-+    mcfg->allocation[0].address = cpu_to_le64(info->base);
- 
-     /* Only a single allocation so no need to play with segments */
-     mcfg->allocation[0].pci_segment = cpu_to_le16(0);
-     mcfg->allocation[0].start_bus_number = 0;
--    mcfg->allocation[0].end_bus_number =
--        PCIE_MMCFG_BUS(memmap[ecam_id].size - 1);
-+    mcfg->allocation[0].end_bus_number = PCIE_MMCFG_BUS(info->size - 1);
- 
-     build_header(linker, table_data, (void *)mcfg, "MCFG", len, 1, NULL, NULL);
- }
-@@ -801,7 +799,13 @@ void virt_acpi_build(VirtMachineState *vms, AcpiBuildTables *tables)
-     build_gtdt(tables_blob, tables->linker, vms);
- 
-     acpi_add_table(table_offsets, tables_blob);
--    build_mcfg(tables_blob, tables->linker, vms);
-+    {
-+        AcpiMcfgInfo mcfg = {
-+           .base = vms->memmap[VIRT_ECAM_ID(vms->highmem_ecam)].base,
-+           .size = vms->memmap[VIRT_ECAM_ID(vms->highmem_ecam)].size,
-+        };
-+        build_mcfg(tables_blob, tables->linker, &mcfg);
-+    }
- 
-     acpi_add_table(table_offsets, tables_blob);
-     build_spcr(tables_blob, tables->linker, vms);
 diff --git a/hw/i386/acpi-build.c b/hw/i386/acpi-build.c
-index f0d27bffd6..c2de7f4b01 100644
+index b17d4a711d..d009176072 100644
 --- a/hw/i386/acpi-build.c
 +++ b/hw/i386/acpi-build.c
-@@ -58,6 +58,7 @@
+@@ -2401,7 +2401,6 @@ static void
+ build_mcfg_q35(GArray *table_data, BIOSLinker *linker, AcpiMcfgInfo *info)
+ {
+     AcpiTableMcfg *mcfg;
+-    const char *sig;
+     int len = sizeof(*mcfg) + 1 * sizeof(mcfg->allocation[0]);
  
- #include "hw/acpi/aml-build.h"
- #include "hw/acpi/utils.h"
-+#include "hw/acpi/pci.h"
+     mcfg = acpi_data_push(table_data, len);
+@@ -2411,19 +2410,7 @@ build_mcfg_q35(GArray *table_data, BIOSLinker *linker, AcpiMcfgInfo *info)
+     mcfg->allocation[0].start_bus_number = 0;
+     mcfg->allocation[0].end_bus_number = PCIE_MMCFG_BUS(info->mcfg_size - 1);
  
- #include "qom/qom-qobject.h"
- #include "hw/i386/amd_iommu.h"
-@@ -86,11 +87,6 @@
- /* Default IOAPIC ID */
- #define ACPI_BUILD_IOAPIC_ID 0x0
+-    /* MCFG is used for ECAM which can be enabled or disabled by guest.
+-     * To avoid table size changes (which create migration issues),
+-     * always create the table even if there are no allocations,
+-     * but set the signature to a reserved value in this case.
+-     * ACPI spec requires OSPMs to ignore such tables.
+-     */
+-    if (info->mcfg_base == PCIE_BASE_ADDR_UNMAPPED) {
+-        /* Reserved signature: ignored by OSPM */
+-        sig = "QEMU";
+-    } else {
+-        sig = "MCFG";
+-    }
+-    build_header(linker, table_data, (void *)mcfg, sig, len, 1, NULL, NULL);
++    build_header(linker, table_data, (void *)mcfg, "MCFG", len, 1, NULL, NULL);
+ }
  
--typedef struct AcpiMcfgInfo {
--    uint64_t base;
--    uint32_t size;
--} AcpiMcfgInfo;
--
- typedef struct AcpiPmInfo {
-     bool s3_disabled;
-     bool s4_disabled;
-diff --git a/include/hw/acpi/pci.h b/include/hw/acpi/pci.h
-new file mode 100644
-index 0000000000..124af7d32a
---- /dev/null
-+++ b/include/hw/acpi/pci.h
-@@ -0,0 +1,33 @@
-+/*
-+ * Support for generating PCI related ACPI tables and passing them to Guests
-+ *
-+ * Copyright (C) 2006 Fabrice Bellard
-+ * Copyright (C) 2008-2010  Kevin O'Connor <kevin@koconnor.net>
-+ * Copyright (C) 2013-2019 Red Hat Inc
-+ * Copyright (C) 2019 Intel Corporation
-+ *
-+ * Author: Wei Yang <richardw.yang@linux.intel.com>
-+ * Author: Michael S. Tsirkin <mst@redhat.com>
-+ *
-+ * This program is free software; you can redistribute it and/or modify
-+ * it under the terms of the GNU General Public License as published by
-+ * the Free Software Foundation; either version 2 of the License, or
-+ * (at your option) any later version.
-+
-+ * This program is distributed in the hope that it will be useful,
-+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+ * GNU General Public License for more details.
-+
-+ * You should have received a copy of the GNU General Public License along
-+ * with this program; if not, see <http://www.gnu.org/licenses/>.
-+ */
-+#ifndef HW_ACPI_PCI_H
-+#define HW_ACPI_PCI_H
-+
-+typedef struct AcpiMcfgInfo {
-+    uint64_t base;
-+    uint32_t size;
-+} AcpiMcfgInfo;
-+
-+#endif
+ /*
+@@ -2592,6 +2579,9 @@ static bool acpi_get_mcfg(AcpiMcfgInfo *mcfg)
+     }
+     mcfg->mcfg_base = qnum_get_uint(qobject_to(QNum, o));
+     qobject_unref(o);
++    if (mcfg->mcfg_base == PCIE_BASE_ADDR_UNMAPPED) {
++        return false;
++    }
+ 
+     o = object_property_get_qobject(pci_host, PCIE_HOST_MCFG_SIZE, NULL);
+     assert(o);
 -- 
 2.19.1
 
