@@ -1,30 +1,20 @@
-Received: from eggs.gnu.org ([209.51.188.92]:47334)
+Received: from eggs.gnu.org ([209.51.188.92]:47778)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <wei.d.li@oracle.com>) id 1hGZXR-0005dy-Px
-	for qemu-devel@nongnu.org; Tue, 16 Apr 2019 21:39:02 -0400
+	(envelope-from <richardw.yang@linux.intel.com>) id 1hGZZl-0006Sc-M4
+	for qemu-devel@nongnu.org; Tue, 16 Apr 2019 21:41:26 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <wei.d.li@oracle.com>) id 1hGZXQ-0005dU-Su
-	for qemu-devel@nongnu.org; Tue, 16 Apr 2019 21:39:01 -0400
-Received: from userp2130.oracle.com ([156.151.31.86]:43824)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <wei.d.li@oracle.com>) id 1hGZXQ-0005cY-Fc
-	for qemu-devel@nongnu.org; Tue, 16 Apr 2019 21:39:00 -0400
-Date: Tue, 16 Apr 2019 18:38:49 -0700
-From: Wei Li <wei.d.li@oracle.com>
-Message-ID: <85DF2701-24E2-4159-94F5-CB9C60D333BE@oracle.com>
-References: <5FF901C1-0AA5-4308-A65C-C448D0A2BA63@oracle.com>
-	<20190305172905.GD13806@stefanha-x1.localdomain>
-	<2D7F11D0-4A02-4A0F-961D-854240376B17@oracle.com>
-	<20190401090724.GA643@stefanha-x1.localdomain>
-	<C0F977FC-A960-4FA5-B2DF-BBD9DA664F8A@oracle.com>
-	<0c0f2d54-2b94-e278-cbce-b7175ba29cc8@redhat.com>
-In-Reply-To: <0c0f2d54-2b94-e278-cbce-b7175ba29cc8@redhat.com>
-Mime-version: 1.0
-Content-type: text/plain;
-	charset="UTF-8"
-Content-transfer-encoding: quoted-printable
-Subject: Re: [Qemu-devel] Following up questions related to QEMU and I/O
- Thread
+	(envelope-from <richardw.yang@linux.intel.com>) id 1hGZZk-0006Kc-Kw
+	for qemu-devel@nongnu.org; Tue, 16 Apr 2019 21:41:25 -0400
+From: Wei Yang <richardw.yang@linux.intel.com>
+Date: Wed, 17 Apr 2019 09:40:35 +0800
+Message-Id: <20190417014038.26018-4-richardw.yang@linux.intel.com>
+In-Reply-To: <20190417014038.26018-1-richardw.yang@linux.intel.com>
+References: <20190417014038.26018-1-richardw.yang@linux.intel.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Subject: [Qemu-devel] [PATCH v3 3/6] i386,
+ acpi: remove mcfg_ prefix in AcpiMcfgInfo members
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,33 +23,68 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>, Stefan Hajnoczi <stefanha@gmail.com>
-Cc: Stefan Hajnoczi <stefanha@redhat.com>, qemu-devel@nongnu.org
+To: qemu-devel@nongnu.org, qemu-arm@nongnu.org
+Cc: mst@redhat.com, imammedo@redhat.com, shannon.zhaosl@gmail.com, peter.maydell@linaro.org, marcel.apfelbaum@gmail.com, yang.zhong@intel.com, philmd@redhat.com, Wei Yang <richardw.yang@linux.intel.com>
 
-Thanks Paolo for your response and clarification.=20
+This is obvious the member in AcpiMcfgInfo describe MCFG's property.
 
-Btw, is there any rough schedule about when are you planning to start worki=
-ng on the multi queue feature?  Once you start working on the feature, I wou=
-ld like to hear more details about the design and better understand how this=
- feature will benefit the performance of virtio-scsi.
+Remove the mcfg_ prefix.
 
-Thanks again,
-Wei
+Signed-off-by: Wei Yang <richardw.yang@linux.intel.com>
+Suggested-by: Igor Mammedov <imammedo@redhat.com>
+Reviewed-by: Igor Mammedov <imammedo@redhat.com>
+Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+---
+ hw/i386/acpi-build.c | 14 +++++++-------
+ 1 file changed, 7 insertions(+), 7 deletions(-)
 
-=EF=BB=BFOn 4/16/19, 7:01 AM, "Paolo Bonzini" <pbonzini@redhat.com> wrote:
-
-    On 05/04/19 23:09, Wei Li wrote:
-    > Thanks Stefan for your quick response!
-    >=20
-    > Hi Paolo, Could you please send us a link related to the multiqueue
-    > feature which you are working on so that we could start getting some
-    > details about the feature.
-   =20
-    I have never gotten to the point of multiqueue, a prerequisite for that
-    was to make the block layer thread safe.
-   =20
-    The latest state of the work is at github.com/bonzini/qemu, branch
-    dataplane7.
-   =20
-    Paolo
-   =20
+diff --git a/hw/i386/acpi-build.c b/hw/i386/acpi-build.c
+index d009176072..f0d27bffd6 100644
+--- a/hw/i386/acpi-build.c
++++ b/hw/i386/acpi-build.c
+@@ -87,8 +87,8 @@
+ #define ACPI_BUILD_IOAPIC_ID 0x0
+ 
+ typedef struct AcpiMcfgInfo {
+-    uint64_t mcfg_base;
+-    uint32_t mcfg_size;
++    uint64_t base;
++    uint32_t size;
+ } AcpiMcfgInfo;
+ 
+ typedef struct AcpiPmInfo {
+@@ -2404,11 +2404,11 @@ build_mcfg_q35(GArray *table_data, BIOSLinker *linker, AcpiMcfgInfo *info)
+     int len = sizeof(*mcfg) + 1 * sizeof(mcfg->allocation[0]);
+ 
+     mcfg = acpi_data_push(table_data, len);
+-    mcfg->allocation[0].address = cpu_to_le64(info->mcfg_base);
++    mcfg->allocation[0].address = cpu_to_le64(info->base);
+     /* Only a single allocation so no need to play with segments */
+     mcfg->allocation[0].pci_segment = cpu_to_le16(0);
+     mcfg->allocation[0].start_bus_number = 0;
+-    mcfg->allocation[0].end_bus_number = PCIE_MMCFG_BUS(info->mcfg_size - 1);
++    mcfg->allocation[0].end_bus_number = PCIE_MMCFG_BUS(info->size - 1);
+ 
+     build_header(linker, table_data, (void *)mcfg, "MCFG", len, 1, NULL, NULL);
+ }
+@@ -2577,15 +2577,15 @@ static bool acpi_get_mcfg(AcpiMcfgInfo *mcfg)
+     if (!o) {
+         return false;
+     }
+-    mcfg->mcfg_base = qnum_get_uint(qobject_to(QNum, o));
++    mcfg->base = qnum_get_uint(qobject_to(QNum, o));
+     qobject_unref(o);
+-    if (mcfg->mcfg_base == PCIE_BASE_ADDR_UNMAPPED) {
++    if (mcfg->base == PCIE_BASE_ADDR_UNMAPPED) {
+         return false;
+     }
+ 
+     o = object_property_get_qobject(pci_host, PCIE_HOST_MCFG_SIZE, NULL);
+     assert(o);
+-    mcfg->mcfg_size = qnum_get_uint(qobject_to(QNum, o));
++    mcfg->size = qnum_get_uint(qobject_to(QNum, o));
+     qobject_unref(o);
+     return true;
+ }
+-- 
+2.19.1
