@@ -6,87 +6,89 @@ X-Spam-Status: No, score=-4.0 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,
 	SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 92877C10F12
-	for <qemu-devel@archiver.kernel.org>; Wed, 17 Apr 2019 04:31:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 68E22C10F12
+	for <qemu-devel@archiver.kernel.org>; Wed, 17 Apr 2019 04:35:56 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 59F1920835
-	for <qemu-devel@archiver.kernel.org>; Wed, 17 Apr 2019 04:31:55 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 2611F20835
+	for <qemu-devel@archiver.kernel.org>; Wed, 17 Apr 2019 04:35:56 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="tMDsRBAd"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 59F1920835
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="D++qCVuz"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2611F20835
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:46708 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:46758 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hGcEk-00040r-Fx
-	for qemu-devel@archiver.kernel.org; Wed, 17 Apr 2019 00:31:54 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:41871)
+	id 1hGcId-00058R-DY
+	for qemu-devel@archiver.kernel.org; Wed, 17 Apr 2019 00:35:55 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:42432)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1hGcDn-0003ff-Kq
-	for qemu-devel@nongnu.org; Wed, 17 Apr 2019 00:30:56 -0400
+	(envelope-from <richard.henderson@linaro.org>) id 1hGcHp-0004dZ-Eu
+	for qemu-devel@nongnu.org; Wed, 17 Apr 2019 00:35:06 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1hGcDm-00085P-Mu
-	for qemu-devel@nongnu.org; Wed, 17 Apr 2019 00:30:55 -0400
-Received: from mail-pg1-x533.google.com ([2607:f8b0:4864:20::533]:33239)
+	(envelope-from <richard.henderson@linaro.org>) id 1hGcHo-0000y8-Kx
+	for qemu-devel@nongnu.org; Wed, 17 Apr 2019 00:35:05 -0400
+Received: from mail-pl1-x643.google.com ([2607:f8b0:4864:20::643]:43232)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1hGcDm-00084v-A7
-	for qemu-devel@nongnu.org; Wed, 17 Apr 2019 00:30:54 -0400
-Received: by mail-pg1-x533.google.com with SMTP id k19so11400799pgh.0
-	for <qemu-devel@nongnu.org>; Tue, 16 Apr 2019 21:30:54 -0700 (PDT)
+	id 1hGcHo-0000xw-8p
+	for qemu-devel@nongnu.org; Wed, 17 Apr 2019 00:35:04 -0400
+Received: by mail-pl1-x643.google.com with SMTP id n8so11381048plp.10
+	for <qemu-devel@nongnu.org>; Tue, 16 Apr 2019 21:35:04 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
 	h=subject:to:cc:references:from:openpgp:message-id:date:user-agent
 	:mime-version:in-reply-to:content-language:content-transfer-encoding;
-	bh=WBhgcWdcSjB5K40xoT6RaN8PIHJdaMd7bKLbQFYgd3k=;
-	b=tMDsRBAd+wn1sj6y9PM5QCp49jahXyGjnlre/XMvWMx+5FlQwrSsXMEUx2hDDfAj1D
-	Bx2iL4XHa1WDqt3oM7wjRAQ206bXXoikHDWXTR6C+zWn3dsILND40Z5N3aCKMDjNMzSL
-	Nl6UieyJKJro5EGo63ihirZjJzLYdR8uhO4VWMpSCxzjH9HbxGWQFlYls+/evKlZuMfJ
-	oBWWTDJvkauP0xjP4FpEA28y4roQv2cis8deIJ5u6TXMaRW1tKUfYA6AFHoxK0yZRjKl
-	3hmDK7wTw4F4gMR3O8WjJrO2MY2IKZVzaoElmD8FfqWlDO2W9ekoPsVAVXSjCJP23QcP
-	3NZQ==
+	bh=8ioZoRHGgxcke29rUZn5yk7U5UmI8nnmWlL/vqftbzw=;
+	b=D++qCVuzkB0dwJ9mCQNkk3L3j+zT3oKEkgfLibJgZfVg8se5nQbgPtJ8K203M1MSEP
+	8MQgh46IlV5m9mkw4DCJ4U1MsCLHZN/Ryx3z5u8WkpEH8Gk+SYvlczKY3nTOCjaHftO8
+	lfrYYnatl6Y5bHYwnc8OpnDib8nwtqnGBDcjbE4BzTUO0X9jFcgzNmAZ90rWCW55jfzk
+	fP7SneHl3zn3ypv/s4dbKufhgGH3fGDmrtBRfbRxPBTLuzdhFyy0QxATl1wFqKxKGosH
+	eiFEBXC9eNEJsLTQkhkpuyxhcu4VYsVSQV0T95Of7NE7jfnFE8pCPoAA4ecA44kpAlY+
+	vpCA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
 	d=1e100.net; s=20161025;
 	h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
 	:date:user-agent:mime-version:in-reply-to:content-language
 	:content-transfer-encoding;
-	bh=WBhgcWdcSjB5K40xoT6RaN8PIHJdaMd7bKLbQFYgd3k=;
-	b=fBDaZjnOJMPUmQUm8PIYoplUU3MQzYLiP7Hu44I5ju+5vGpWTR8ig6ZHCjqRl0TKJz
-	j3MVauhCs2g+pkPn3af/wrelIioTs5wyqQHFGJI9rbrP9Pw+348mZQa9NJ+PmEGjOU9R
-	CyvGL29fnKEGfFza+yuKpZqKX/jkIyC3wrGMpZvmhVDJdNEZqMA4mSYt37TONOkTet5z
-	hQxkC/3PSAOHiWVfkyRTWYIOfJ6xZxG24Py7oA6t/lU9srkWt0kR3o+XME8WwTX83mgs
-	cL/Lxaqi8JXx0DxJCTjaJTLzoCR0iSdt+v8AYO92vUrcwP6LZID4OCgQgtnSnrWt8hZw
-	ogVw==
-X-Gm-Message-State: APjAAAVogH9ncRdj0oZU6tVZfNrOHbgUtfT0c/TZ5I+AD/HoXXq2rEPC
-	kWxw1RkqOneJkX34gvzA6p3OhA==
-X-Google-Smtp-Source: APXvYqzhxStFCBH3PHJaUfXaCr4GCwYIK9mE68NvLBjVg7IN59VgO4e96e4iD8e86eH4d668T2SJ8Q==
-X-Received: by 2002:a63:e653:: with SMTP id p19mr79414302pgj.284.1555475453254;
-	Tue, 16 Apr 2019 21:30:53 -0700 (PDT)
+	bh=8ioZoRHGgxcke29rUZn5yk7U5UmI8nnmWlL/vqftbzw=;
+	b=T1cMr8V1hGNIYMYkeF56Itz54x/KRQqAvFyvsuKnB4rsBuBAL3VydcTeGGXnMIA7rs
+	8FKwuaqXCS8LkjMPMRjOj9/aoJX/kLLBV6Gkt0eM1FttjzuVPLT90qva6m9HfF7KuQ3y
+	gJ48iNE5dB5o57jkf7m0SDmaaVO1w3NNh0KpdfU6eiBsNGCAT9EvB9oH8LZ70vMcBtU3
+	/2ZWl8m6Ez6V/6BBNTV0J+m9vnrBiwjd18/XKrZ7vkWcwedUSJLm5Bq1YVLp4Xf3ceqn
+	vw8ZiLq8pDu4UBa55Po5bgagVBK/kfEMWHmpfb+xTBM/+ZxRNhrNivDpNuMrsdG3UoZd
+	HwWg==
+X-Gm-Message-State: APjAAAXTC8Os/svzJraWbdeBB9PLV27wp6MXV3mA/sLZGR3rx8BA6Bea
+	e60EZ+E5br8Vc5rMVAiyZT+3cA==
+X-Google-Smtp-Source: APXvYqz/Pr4pf5LyHz6Mz7LZ9F8oVPjNdCN0UIlKj/wclVL39rT+uvyuiazSkdpou7bkvqMqapJ65Q==
+X-Received: by 2002:a17:902:a607:: with SMTP id
+	u7mr87936730plq.66.1555475702963; 
+	Tue, 16 Apr 2019 21:35:02 -0700 (PDT)
 Received: from [172.20.101.138] (rrcs-66-91-136-155.west.biz.rr.com.
 	[66.91.136.155]) by smtp.gmail.com with ESMTPSA id
-	25sm32733838pfo.145.2019.04.16.21.30.51
+	r145sm131237752pgr.84.2019.04.16.21.35.00
 	(version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-	Tue, 16 Apr 2019 21:30:52 -0700 (PDT)
+	Tue, 16 Apr 2019 21:35:01 -0700 (PDT)
 To: David Hildenbrand <david@redhat.com>, qemu-devel@nongnu.org
 References: <20190416185301.25344-1-david@redhat.com>
-	<20190416185301.25344-2-david@redhat.com>
+	<20190416185301.25344-4-david@redhat.com>
 From: Richard Henderson <richard.henderson@linaro.org>
 Openpgp: preference=signencrypt
-Message-ID: <7ab7e798-1d68-99f8-acda-873ad94a5fae@linaro.org>
-Date: Tue, 16 Apr 2019 18:30:48 -1000
+Message-ID: <a721581d-ee23-8dfc-d618-48db9d1d38e2@linaro.org>
+Date: Tue, 16 Apr 2019 18:34:58 -1000
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
 	Thunderbird/60.6.1
 MIME-Version: 1.0
-In-Reply-To: <20190416185301.25344-2-david@redhat.com>
+In-Reply-To: <20190416185301.25344-4-david@redhat.com>
 Content-Type: text/plain; charset="UTF-8"
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
 	recognized.
-X-Received-From: 2607:f8b0:4864:20::533
-Subject: Re: [Qemu-devel] [PATCH v2 01/41] tcg: Implement tcg_gen_gvec_3i()
+X-Received-From: 2607:f8b0:4864:20::643
+Subject: Re: [Qemu-devel] [PATCH v2 03/41] s390x/tcg: Implement VECTOR ADD
+ COMPUTE CARRY
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -103,21 +105,20 @@ Cc: qemu-s390x@nongnu.org, Cornelia Huck <cohuck@redhat.com>,
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190417043048.kACsRHTAYn8eiZ3cwxkSQQoLlEo1A5FJasZb0QrQvtM@z>
+Message-ID: <20190417043458.32tuZbxOo4OT-s-oSwHynv9jHw33BhOdMYU0P1BTl_M@z>
 
 On 4/16/19 8:52 AM, David Hildenbrand wrote:
-> Let's add tcg_gen_gvec_3i(), similar to tcg_gen_gvec_2i(), however
-> without introducing "gen_helper_gvec_3i *fnoi", as it isn't needed
-> for now.
+> 128-bit handling courtesy of Richard H.
 > 
 > Signed-off-by: David Hildenbrand <david@redhat.com>
 > ---
->  tcg/tcg-op-gvec.c | 139 ++++++++++++++++++++++++++++++++++++++++++++++
->  tcg/tcg-op-gvec.h |  24 ++++++++
->  2 files changed, 163 insertions(+)
+>  target/s390x/insn-data.def      |  2 +
+>  target/s390x/translate_vx.inc.c | 94 +++++++++++++++++++++++++++++++++
+>  2 files changed, 96 insertions(+)
 
 Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 
 
 r~
+
 
