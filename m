@@ -1,31 +1,21 @@
-Received: from eggs.gnu.org ([209.51.188.92]:60259)
+Received: from eggs.gnu.org ([209.51.188.92]:60253)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1hGptP-0007eF-I2
+	(envelope-from <armbru@redhat.com>) id 1hGptP-0007eD-Bo
 	for qemu-devel@nongnu.org; Wed, 17 Apr 2019 15:06:48 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1hGptO-0003Zt-JN
+	(envelope-from <armbru@redhat.com>) id 1hGptO-0003ZW-Dh
 	for qemu-devel@nongnu.org; Wed, 17 Apr 2019 15:06:47 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:56640)
+Received: from mx1.redhat.com ([209.132.183.28]:56636)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1hGptO-0003Yk-9a
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1hGptO-0003Ye-3W
 	for qemu-devel@nongnu.org; Wed, 17 Apr 2019 15:06:46 -0400
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
-	[10.5.11.12])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 74DF930031AC
-	for <qemu-devel@nongnu.org>; Wed, 17 Apr 2019 19:06:45 +0000 (UTC)
-Received: from blackfin.pond.sub.org (ovpn-116-116.ams2.redhat.com
-	[10.36.116.116])
-	by smtp.corp.redhat.com (Postfix) with ESMTPS id 447FD60C64
-	for <qemu-devel@nongnu.org>; Wed, 17 Apr 2019 19:06:45 +0000 (UTC)
 From: Markus Armbruster <armbru@redhat.com>
-Date: Wed, 17 Apr 2019 21:06:40 +0200
-Message-Id: <20190417190641.26814-15-armbru@redhat.com>
+Date: Wed, 17 Apr 2019 21:06:35 +0200
+Message-Id: <20190417190641.26814-10-armbru@redhat.com>
 In-Reply-To: <20190417190641.26814-1-armbru@redhat.com>
 References: <20190417190641.26814-1-armbru@redhat.com>
-Subject: [Qemu-devel] [PATCH v3 14/15] char-pty: Print "char device
- redirected" message to stdout
+Subject: [Qemu-devel] [PATCH v3 09/15] vl: Make -machine $TYPE,
+ help and -accel help print to stdout
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,44 +26,47 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-char_pty_open() prints a "char device redirected to PTY_NAME (label
-LABEL)" message to the current monitor or else to stderr.  This is not
-an error, so it shouldn't go to stderr.  Print it to stdout instead.
+Command line help help explicitly requested by the user should be
+printed to stdout, not stderr.  We do elsewhere.  Adjust -machine
+$TYPE,help and -accel help to match: use printf() instead of
+error_printf().
 
-Why is it even printed?  No other ChardevClass::open() prints anything
-on success.  It's because you need to know PTY_NAME to actually use
-this char device, e.g. like e.g. "socat STDIO,cfmakeraw FILE:PTY_NAME"
-to use the monitor's readline interface.  You can get PTY_NAME with
-"info chardev" (a.k.a. query-chardev for QMP), but only if you already
-have a monitor.
-
+Cc: Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
 Signed-off-by: Markus Armbruster <armbru@redhat.com>
+Reviewed-by: Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
 ---
- chardev/char-pty.c | 5 +++--
- 1 file changed, 3 insertions(+), 2 deletions(-)
+ vl.c | 10 +++++-----
+ 1 file changed, 5 insertions(+), 5 deletions(-)
 
-diff --git a/chardev/char-pty.c b/chardev/char-pty.c
-index b034332edd..04759b0ef9 100644
---- a/chardev/char-pty.c
-+++ b/chardev/char-pty.c
-@@ -28,6 +28,7 @@
- #include "io/channel-file.h"
- #include "qemu/sockets.h"
- #include "qemu/error-report.h"
-+#include "qemu/qemu-print.h"
+diff --git a/vl.c b/vl.c
+index 9877972d97..190c773176 100644
+--- a/vl.c
++++ b/vl.c
+@@ -1556,12 +1556,12 @@ static int machine_help_func(QemuOpts *opts, MachineState *machine)
+             continue;
+         }
  
- #include "chardev/char-io.h"
+-        error_printf("%s.%s=%s", MACHINE_GET_CLASS(machine)->name,
+-                     prop->name, prop->type);
++        printf("%s.%s=%s", MACHINE_GET_CLASS(machine)->name,
++               prop->name, prop->type);
+         if (prop->description) {
+-            error_printf(" (%s)\n", prop->description);
++            printf(" (%s)\n", prop->description);
+         } else {
+-            error_printf("\n");
++            printf("\n");
+         }
+     }
  
-@@ -211,8 +212,8 @@ static void char_pty_open(Chardev *chr,
-     qemu_set_nonblock(master_fd);
- 
-     chr->filename = g_strdup_printf("pty:%s", pty_name);
--    error_printf("char device redirected to %s (label %s)\n",
--                 pty_name, chr->label);
-+    qemu_printf("char device redirected to %s (label %s)\n",
-+                pty_name, chr->label);
- 
-     s = PTY_CHARDEV(chr);
-     s->ioc = QIO_CHANNEL(qio_channel_file_new_fd(master_fd));
+@@ -3643,7 +3643,7 @@ int main(int argc, char **argv, char **envp)
+                                                      optarg, true);
+                 optarg = qemu_opt_get(accel_opts, "accel");
+                 if (!optarg || is_help_option(optarg)) {
+-                    error_printf("Possible accelerators: kvm, xen, hax, tcg\n");
++                    printf("Possible accelerators: kvm, xen, hax, tcg\n");
+                     exit(0);
+                 }
+                 opts = qemu_opts_create(qemu_find_opts("machine"), NULL,
 -- 
 2.17.2
