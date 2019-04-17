@@ -2,65 +2,59 @@ Return-Path: <SRS0=PAXx=ST=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.4 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED,USER_AGENT_MUTT
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 43105C282DA
-	for <qemu-devel@archiver.kernel.org>; Wed, 17 Apr 2019 17:07:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4C55AC282DA
+	for <qemu-devel@archiver.kernel.org>; Wed, 17 Apr 2019 17:10:36 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 12D6420675
-	for <qemu-devel@archiver.kernel.org>; Wed, 17 Apr 2019 17:07:10 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 12D6420675
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 1B89420675
+	for <qemu-devel@archiver.kernel.org>; Wed, 17 Apr 2019 17:10:36 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1B89420675
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=durchholz.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:56782 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:56846 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hGo1d-0005hX-6Z
-	for qemu-devel@archiver.kernel.org; Wed, 17 Apr 2019 13:07:09 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:58153)
+	id 1hGo4x-0006qn-8e
+	for qemu-devel@archiver.kernel.org; Wed, 17 Apr 2019 13:10:35 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:58902)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1hGo0i-0005Lc-Fh
-	for qemu-devel@nongnu.org; Wed, 17 Apr 2019 13:06:13 -0400
+	(envelope-from <jo@durchholz.org>) id 1hGo3y-0006TU-L9
+	for qemu-devel@nongnu.org; Wed, 17 Apr 2019 13:09:35 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1hGo0Y-0002vK-4q
-	for qemu-devel@nongnu.org; Wed, 17 Apr 2019 13:06:06 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:40092)
+	(envelope-from <jo@durchholz.org>) id 1hGo3w-0005wF-Bh
+	for qemu-devel@nongnu.org; Wed, 17 Apr 2019 13:09:34 -0400
+Received: from 5.itsy.de ([188.40.84.14]:47002)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <ehabkost@redhat.com>)
-	id 1hGo0W-0002pJ-7R; Wed, 17 Apr 2019 13:06:00 -0400
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
-	[10.5.11.16])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(Exim 4.71) (envelope-from <jo@durchholz.org>) id 1hGo3u-0005sj-OT
+	for qemu-devel@nongnu.org; Wed, 17 Apr 2019 13:09:32 -0400
+Received: from [192.168.178.32] (unknown [195.48.33.209])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id E8511C05001C;
-	Wed, 17 Apr 2019 17:05:53 +0000 (UTC)
-Received: from localhost (ovpn-116-9.gru2.redhat.com [10.97.116.9])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id F3C345C207;
-	Wed, 17 Apr 2019 17:05:50 +0000 (UTC)
-Date: Wed, 17 Apr 2019 14:05:49 -0300
-From: Eduardo Habkost <ehabkost@redhat.com>
-To: Markus Armbruster <armbru@redhat.com>
-Message-ID: <20190417170549.GB25134@habkost.net>
-References: <1555315185-16414-1-git-send-email-like.xu@linux.intel.com>
-	<1555315185-16414-2-git-send-email-like.xu@linux.intel.com>
-	<87bm1519u1.fsf@dusky.pond.sub.org>
+	by 5.itsy.de (Postfix) with ESMTPSA id 242D9645AB
+	for <qemu-devel@nongnu.org>; Wed, 17 Apr 2019 19:09:27 +0200 (CEST)
+To: qemu-devel@nongnu.org
+References: <874f0f8e-780e-6600-e11b-b97f5b055cf8@durchholz.org>
+	<dbd6541e-5013-d0bc-b23e-a8de4f4cd171@redhat.com>
+	<20190416072430.dp742ehg27drpplb@sirius.home.kraxel.org>
+	<00f0ada2-a68b-2264-ab72-f49fe7d654e7@durchholz.org>
+	<20190417071012.fxedabu3makmoyuz@sirius.home.kraxel.org>
+From: Joachim Durchholz <jo@durchholz.org>
+Message-ID: <993002d4-28dd-00f0-e8c1-7b0d9ab2de12@durchholz.org>
+Date: Wed, 17 Apr 2019 19:09:26 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+	Thunderbird/60.6.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
-Content-Disposition: inline
-In-Reply-To: <87bm1519u1.fsf@dusky.pond.sub.org>
-User-Agent: Mutt/1.10.1 (2018-07-13)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.31]);
-	Wed, 17 Apr 2019 17:05:54 +0000 (UTC)
+In-Reply-To: <20190417071012.fxedabu3makmoyuz@sirius.home.kraxel.org>
+Content-Type: text/plain; charset="UTF-8"; format="flowed"
+Content-Language: en-GB
+Content-Transfer-Encoding: 7bit
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH v3 1/2] vl.c: refactor current_machine as
- non-global variable
+X-Received-From: 188.40.84.14
+Subject: Re: [Qemu-devel] curses.c: "We need a terminal output" ?
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -72,59 +66,36 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>, Thomas Huth <thuth@redhat.com>,
-	Like Xu <like.xu@linux.intel.com>, qemu-trivial@nongnu.org,
-	qemu-devel@nongnu.org, like.xu@intel.com,
-	Igor Mammedov <imammedo@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190417170549.j2urS1IODygwzUnsEVCUnpJ3oDhq9a-g4ELejGvjN8c@z>
+Message-ID: <20190417170926.iliYBVeWi6tIN2dq_vAe9RVQzDE1p_bO6YjuQJUpzOk@z>
 
-On Wed, Apr 17, 2019 at 07:26:14AM +0200, Markus Armbruster wrote:
-> Like Xu <like.xu@linux.intel.com> writes:
-> 
-> > This patch makes the remaining dozen or so uses of the global
-> > current_machine outside vl.c use qdev_get_machine() instead,
-> > and then make current_machine local to vl.c instead of global.
-> >
-> > Suggested-by: Peter Maydell <peter.maydell@linaro.org>
-> > Signed-off-by: Like Xu <like.xu@linux.intel.com>
-> 
-> I'm afraid I dislike this one, too.
-> 
-> The patch does not reduce global state, it's merely MICAHI (make it
-> complicated and hide it).
-> 
-> It does not improve safety, it merely turns dereferences of null
-> current_machine into unwanted creation of "/machine" as container (ugh),
-> which the next patch then fixes up to assertion failure.
-> 
-> The only benefit I can see is you can't assign to current_machine
-> outside vl.c anymore.  Nobody ever did, thus complete non-issue.
+Sorry, I'm done having to argue against(!) a person who's stonewalling 
+me by wilfully ignoring differences ("doesn't work perfectly" 
+interpreted as "does not work at all"), discounting 
+just-for-testing-purpose workarounds as if they were actual proposed 
+solutions ("not a sane approach"), ignoring the use case (still 
+insisting on terminal size mutability), and proposing a nonworking 
+solution (-nographic does not give me any output, of course because it 
+doesn't have a terminal to talk to).
 
-The benefit I see is that we now have a single way to access the
-existing global state instead of two.
+Reminds me of discussions in the Maven group, there, anything that 
+didn't fit their shiny predefined ideas was brushed off in a similar manner.
+Choosing the same solution: Use a different workaround, chalk this up 
+under the Passive-Aggressive Unhelpfulness Encountered column.
 
-> 
-> If you want to hide global state without actually reducing it, create an
-> accessor function.  You can then use that to replace qdev_get_machine(),
-> getting rid of its surprising side effect.  *That* would be an
-> improvement I could get behind.
-> 
-> Better that *hiding* use of global state would be *eliminating* use of
-> global state: pass current_machine around.  This isn't always practical.
-> But where it is, the dependence on "machine created" becomes obvious in
-> the code.
+No hard feelings towards the community.
 
-I agree qdev_get_machine() has many issues.  I dislike
-qdev_get_machine() a lot, and I think I had suggested we stop
-using it and use current_machine instead.
+Have a nice day everyone.
+Jo
 
-But at least now we have one imperfect API instead of two
-imperfect APIs.  I do think this makes future clean up work
-easier.
+P.S.: Frustrated. In two ways.
+Latin "frustra" = "in vain".
 
--- 
-Eduardo
+P.P.S.: I will stick around a bit so I can answer to questions based on 
+genuine interest, but I'll disconnect from the list after that.
+
+P.P.P.S.: No hard feelings towards the community in general. In fact, 
+thanks to those two who tried to help.
 
