@@ -1,31 +1,31 @@
-Received: from eggs.gnu.org ([209.51.188.92]:56264)
+Received: from eggs.gnu.org ([209.51.188.92]:56265)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1hGrfv-00052d-Av
+	(envelope-from <bounces@canonical.com>) id 1hGrfv-00052e-BF
 	for qemu-devel@nongnu.org; Wed, 17 Apr 2019 17:01:01 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1hGrfr-0001iu-Eq
+	(envelope-from <bounces@canonical.com>) id 1hGrfr-0001j1-FR
 	for qemu-devel@nongnu.org; Wed, 17 Apr 2019 17:00:59 -0400
-Received: from indium.canonical.com ([91.189.90.7]:56168)
+Received: from indium.canonical.com ([91.189.90.7]:56182)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1hGrfn-0001ft-Ql
+	id 1hGrfn-0001fz-Q0
 	for qemu-devel@nongnu.org; Wed, 17 Apr 2019 17:00:53 -0400
 Received: from loganberry.canonical.com ([91.189.90.37])
 	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1hGrfl-0003Lj-1A
+	id 1hGrfl-0003Lf-IF
 	for <qemu-devel@nongnu.org>; Wed, 17 Apr 2019 21:00:49 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id E4DCC2E80CC
-	for <qemu-devel@nongnu.org>; Wed, 17 Apr 2019 21:00:48 +0000 (UTC)
+	by loganberry.canonical.com (Postfix) with ESMTP id 761A12E80CC
+	for <qemu-devel@nongnu.org>; Wed, 17 Apr 2019 21:00:49 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Wed, 17 Apr 2019 20:49:25 -0000
+Date: Wed, 17 Apr 2019 20:49:46 -0000
 From: Daniel Santos <daniel.santos@pobox.com>
 Reply-To: Bug 1825002 <1825002@bugs.launchpad.net>
 Sender: bounces@canonical.com
 References: <155542675846.7866.6509809085972568558.malonedeb@wampee.canonical.com>
-Message-Id: <155553416543.14412.15975383701303439057.malone@gac.canonical.com>
+Message-Id: <155553418682.6615.8537423502740481986.malone@chaenomeles.canonical.com>
 Errors-To: bounces@canonical.com
 Subject: [Qemu-devel] [Bug 1825002] Re: "qemu: Unexpected FPU mode" since
  0c1bbedc10e86ea9366b6af8c5520fafa3266b2f
@@ -39,9 +39,7 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-Thanks Peter.  I was just reading up on the CVE process and I agree.
-Obviously, it's dangerous to use uninitialized values, but that doesn't
-necessarily make it a vulnerability.
+And thank you Thomas for the instructions!
 
 -- =
 
