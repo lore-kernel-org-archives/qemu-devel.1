@@ -1,20 +1,28 @@
-Received: from eggs.gnu.org ([209.51.188.92]:47026)
+Received: from eggs.gnu.org ([209.51.188.92]:48889)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1hGfPQ-0007S5-4S
-	for qemu-devel@nongnu.org; Wed, 17 Apr 2019 03:55:09 -0400
+	(envelope-from <kwolf@redhat.com>) id 1hGfYw-0000PF-5x
+	for qemu-devel@nongnu.org; Wed, 17 Apr 2019 04:04:59 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1hGfPP-000799-24
-	for qemu-devel@nongnu.org; Wed, 17 Apr 2019 03:55:08 -0400
-Date: Wed, 17 Apr 2019 09:54:56 +0200
-From: Cornelia Huck <cohuck@redhat.com>
-Message-ID: <20190417095456.741383a7.cohuck@redhat.com>
-In-Reply-To: <20190416185301.25344-1-david@redhat.com>
-References: <20190416185301.25344-1-david@redhat.com>
+	(envelope-from <kwolf@redhat.com>) id 1hGfYv-0005jw-7Q
+	for qemu-devel@nongnu.org; Wed, 17 Apr 2019 04:04:58 -0400
+Date: Wed, 17 Apr 2019 10:04:43 +0200
+From: Kevin Wolf <kwolf@redhat.com>
+Message-ID: <20190417080443.GA8330@localhost.localdomain>
+References: <20190411105025.97397-1-sgarzare@redhat.com>
+	<20190411105025.97397-2-sgarzare@redhat.com>
+	<CA+aFP1AMzNjWtMeGy4MpWBa26qxShgciYkcEZ8mkSmDrtCvfqA@mail.gmail.com>
+	<20190411130245.ltfyp7d2dfe2cr3h@steredhat>
+	<CA+aFP1B7ZZ_xwNOfMbKUzEjYbMH=9dJstLYEyVq4LphPR81u0Q@mail.gmail.com>
+	<20190414132008.uxoia6avdpp4jov6@steredhat.homenet.telecomitalia.it>
+	<CA+aFP1D8VYcnwWpB=4PzAdBKr+YK-r8bSwzKKUCkH7jT3kVvoQ@mail.gmail.com>
+	<20190415080452.GA6031@localhost.localdomain>
+	<20190417073438.r57lemi6emu4x3ld@steredhat>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v2 00/41] s390x/tcg: Vector Instruction
- Support Part 2
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20190417073438.r57lemi6emu4x3ld@steredhat>
+Subject: Re: [Qemu-devel] [PATCH RFC 1/1] block/rbd: increase dynamically
+ the image size
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,37 +31,46 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Hildenbrand <david@redhat.com>
-Cc: qemu-devel@nongnu.org, qemu-s390x@nongnu.org, Thomas Huth <thuth@redhat.com>, Richard Henderson <rth@twiddle.net>
+To: Stefano Garzarella <sgarzare@redhat.com>
+Cc: dillaman@redhat.com, qemu-devel <qemu-devel@nongnu.org>, Josh Durgin <jdurgin@redhat.com>, qemu-block <qemu-block@nongnu.org>, Max Reitz <mreitz@redhat.com>
 
-On Tue, 16 Apr 2019 20:52:20 +0200
-David Hildenbrand <david@redhat.com> wrote:
+Am 17.04.2019 um 09:34 hat Stefano Garzarella geschrieben:
+> On Mon, Apr 15, 2019 at 10:04:52AM +0200, Kevin Wolf wrote:
+> > 
+> > I think a potential actual use case could be persistent dirty bitmaps
+> > for incremental backup. Though maybe that would be better served by
+> > using the rbd image just as a raw external data file and keeping the
+> > qcow2 metadata on a filesystem.
+> 
+> Thanks to point it out! I'll take a look to understand how to keep
+> metadata separated from the data.
 
-> This is the second part of vector instruction support for s390x. It is
-> based on the series soon to land upstream:
->     [PATCH 0/9] tcg: Add tcg_gen_extract2_{i32,i64}
-> 
-> Part 1: Vector Support Instructions
-> Part 2: Vector Integer Instructions
-> Part 3: Vector String Instructions
-> Part 4: Vector Floating-Point Instructions
-> 
-> The current state can be found at (kept updated):
->     https://github.com/davidhildenbrand/qemu/tree/vx
-> 
-> With the current state I can boot Linux kernel + user space compiled with
-> SIMD support. This allows to boot distributions compiled exclusively for
-> z13, requiring SIMD support. Also, it is now possible to build a complete
-> kernel using rpmbuild as quite some issues have been sorted out.
-> 
-> In this part, all Vector Integer Instructions introduced with the
-> "Vector Facility" are added. Some instructions part of the Vector Extension
-> Facilities are also added.
-> 
-> v1 -> v2:
-> - Many suggestions and fixes as outlined by Richard H.
-> -- Mostly avoid oom helpers for 128-bit add/sub variants
-> -- New vector helpers are not considered for now
+I'd consider the feature still experimental, but for local files, it
+works like this:
 
-FWIW, I'd prefer a pull request for that over picking 41 patches :)
-(I'm unlikely to be able to provide more insightful review anyway ;)
+    qemu-img create -f qcow2 -o data_file=test.raw test.qcow2 4G
+
+And then just use test.qcow2. As long as you can put everything you need
+into an rbd URL, the same approach should work. Otherwise, you may need
+to use QMP blockdev-create on creation and possibly the data-file option
+of the qcow2 driver for opening.
+
+> > How fast is rbd_resize()? Does automatically resizing for every write
+> > request actually work reasonably well in practice? If it does, there is
+> > probably little reason not to allow it, even if the use cases are rather
+> > obscure.
+> 
+> I'll try to measure the percentage of the time spent in the rbd_resize.
+> 
+> Another solution could be to pass to the rbd driver the virtual size of
+> the image and resize it only one time also if the preallocation is
+> disabled, because RBD will not allocate blocks but IIUC it only set the max
+> size.
+> 
+> Do you think make sense? Is it feasible?
+
+In theory yes, though it requires modification of every driver that
+should be usable together with rbd (i.e. ideally all of the drivers). If
+automatic resize works good enough, I'd prefer that.
+
+Kevin
