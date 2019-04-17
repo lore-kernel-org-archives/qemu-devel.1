@@ -2,60 +2,58 @@ Return-Path: <SRS0=PAXx=ST=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0AC93C10F14
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0C34CC282DA
 	for <qemu-devel@archiver.kernel.org>; Wed, 17 Apr 2019 01:48:14 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0365421773
+	by mail.kernel.org (Postfix) with ESMTPS id 0A6112177B
 	for <qemu-devel@archiver.kernel.org>; Wed, 17 Apr 2019 01:48:13 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0365421773
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0A6112177B
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.intel.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:45336 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:45334 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hGZgK-0002gz-9J
+	id 1hGZgK-0002gs-AF
 	for qemu-devel@archiver.kernel.org; Tue, 16 Apr 2019 21:48:12 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:47874)
+Received: from eggs.gnu.org ([209.51.188.92]:47998)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richardw.yang@linux.intel.com>) id 1hGZZt-0006ZZ-0B
-	for qemu-devel@nongnu.org; Tue, 16 Apr 2019 21:41:34 -0400
+	(envelope-from <richardw.yang@linux.intel.com>) id 1hGZad-00078K-9E
+	for qemu-devel@nongnu.org; Tue, 16 Apr 2019 21:42:20 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richardw.yang@linux.intel.com>) id 1hGZZs-0006NZ-0L
-	for qemu-devel@nongnu.org; Tue, 16 Apr 2019 21:41:32 -0400
-Received: from mga01.intel.com ([192.55.52.88]:47710)
+	(envelope-from <richardw.yang@linux.intel.com>) id 1hGZac-0006bj-78
+	for qemu-devel@nongnu.org; Tue, 16 Apr 2019 21:42:19 -0400
+Received: from mga14.intel.com ([192.55.52.115]:15517)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <richardw.yang@linux.intel.com>)
-	id 1hGZZp-0006LW-FN; Tue, 16 Apr 2019 21:41:29 -0400
+	id 1hGZaa-0006FQ-5a; Tue, 16 Apr 2019 21:42:16 -0400
 X-Amp-Result: SKIPPED(no attachment in message)
 X-Amp-File-Uploaded: False
-Received: from fmsmga006.fm.intel.com ([10.253.24.20])
-	by fmsmga101.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384;
-	16 Apr 2019 18:41:29 -0700
+Received: from fmsmga005.fm.intel.com ([10.253.24.32])
+	by fmsmga103.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384;
+	16 Apr 2019 18:41:13 -0700
 X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.60,360,1549958400"; d="scan'208";a="338161195"
+X-IronPort-AV: E=Sophos;i="5.60,360,1549958400"; d="scan'208";a="338295302"
 Received: from richard.sh.intel.com (HELO localhost) ([10.239.159.54])
-	by fmsmga006.fm.intel.com with ESMTP; 16 Apr 2019 18:41:26 -0700
+	by fmsmga005.fm.intel.com with ESMTP; 16 Apr 2019 18:41:12 -0700
 From: Wei Yang <richardw.yang@linux.intel.com>
 To: qemu-devel@nongnu.org,
 	qemu-arm@nongnu.org
-Date: Wed, 17 Apr 2019 09:40:38 +0800
-Message-Id: <20190417014038.26018-7-richardw.yang@linux.intel.com>
+Date: Wed, 17 Apr 2019 09:40:32 +0800
+Message-Id: <20190417014038.26018-1-richardw.yang@linux.intel.com>
 X-Mailer: git-send-email 2.19.1
-In-Reply-To: <20190417014038.26018-1-richardw.yang@linux.intel.com>
-References: <20190417014038.26018-1-richardw.yang@linux.intel.com>
 MIME-Version: 1.0
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
 	recognized.
-X-Received-From: 192.55.52.88
-Subject: [Qemu-devel] [PATCH v3 6/6] acpi: pci: use build_append_foo() API
- to construct MCFG
+X-Received-From: 192.55.52.115
+Subject: [Qemu-devel] [PATCH v3 0/6] Extract build_mcfg
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -74,90 +72,38 @@ Cc: yang.zhong@intel.com, peter.maydell@linaro.org, mst@redhat.com,
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Content-Type: text/plain; charset="UTF-8"
-Message-ID: <20190417014038.OZ4uvn6sI6RQnTJ32CAK9NLGizuJ90PDRA9xoPPUwQU@z>
+Message-ID: <20190417014032.VBKpdnIzs8Fu_8Tjb5SPb8zURxPJVpe9op7f-mQPBXw@z>
 
-build_append_foo() API doesn't need explicit endianness conversions
-which eliminates a source of errors and it makes build_mcfg() look like
-declarative definition of MCFG table in ACPI spec, which makes it easy
-to review.
+This patch set tries to generalize MCFG table build process. And it is
+based on one un-merged patch from Igor, which is included in this serials.
 
-Signed-off-by: Wei Yang <richardw.yang@linux.intel.com>
-Suggested-by: Igor Mammedov <imammedo@redhat.com>
----
- hw/acpi/pci.c               | 30 ++++++++++++++++++------------
- include/hw/acpi/acpi-defs.h | 18 ------------------
- 2 files changed, 18 insertions(+), 30 deletions(-)
+v2->v3:
+    * Includes the un-merged patch from Igor
+    * use build_append_foo() API to construct MCFG
 
-diff --git a/hw/acpi/pci.c b/hw/acpi/pci.c
-index fa0fa30bb9..05050fa087 100644
---- a/hw/acpi/pci.c
-+++ b/hw/acpi/pci.c
-@@ -30,17 +30,23 @@
- 
- void build_mcfg(GArray *table_data, BIOSLinker *linker, AcpiMcfgInfo *info)
- {
--    AcpiTableMcfg *mcfg;
--    int len = sizeof(*mcfg) + sizeof(mcfg->allocation[0]);
--
--    mcfg = acpi_data_push(table_data, len);
--    mcfg->allocation[0].address = cpu_to_le64(info->base);
--
--    /* Only a single allocation so no need to play with segments */
--    mcfg->allocation[0].pci_segment = cpu_to_le16(0);
--    mcfg->allocation[0].start_bus_number = 0;
--    mcfg->allocation[0].end_bus_number = PCIE_MMCFG_BUS(info->size - 1);
--
--    build_header(linker, table_data, (void *)mcfg, "MCFG", len, 1, NULL, NULL);
-+    int mcfg_start = table_data->len;
-+
-+    acpi_data_push(table_data, sizeof(AcpiTableHeader));
-+
-+    /* PCI fw r3.0 MCFG table. */
-+    /* Base address, processor-relative */
-+    build_append_int_noprefix(table_data, info->base, 8);
-+    /* PCI segment group number */
-+    build_append_int_noprefix(table_data, 0, 2);
-+    /* Starting PCI Bus number */
-+    build_append_int_noprefix(table_data, 0, 1);
-+    /* Final PCI Bus number */
-+    build_append_int_noprefix(table_data, PCIE_MMCFG_BUS(info->size - 1), 1);
-+    /* Reserved */
-+    build_append_int_noprefix(table_data, 0, 4);
-+
-+    build_header(linker, table_data, (void *)(table_data->data + mcfg_start),
-+                 "MCFG", table_data->len - mcfg_start, 1, NULL, NULL);
- }
- 
-diff --git a/include/hw/acpi/acpi-defs.h b/include/hw/acpi/acpi-defs.h
-index f9aa4bd398..57a3f58b0c 100644
---- a/include/hw/acpi/acpi-defs.h
-+++ b/include/hw/acpi/acpi-defs.h
-@@ -449,24 +449,6 @@ struct AcpiSratProcessorGiccAffinity {
- 
- typedef struct AcpiSratProcessorGiccAffinity AcpiSratProcessorGiccAffinity;
- 
--/* PCI fw r3.0 MCFG table. */
--/* Subtable */
--struct AcpiMcfgAllocation {
--    uint64_t address;                /* Base address, processor-relative */
--    uint16_t pci_segment;            /* PCI segment group number */
--    uint8_t start_bus_number;       /* Starting PCI Bus number */
--    uint8_t end_bus_number;         /* Final PCI Bus number */
--    uint32_t reserved;
--} QEMU_PACKED;
--typedef struct AcpiMcfgAllocation AcpiMcfgAllocation;
--
--struct AcpiTableMcfg {
--    ACPI_TABLE_HEADER_DEF;
--    uint8_t reserved[8];
--    AcpiMcfgAllocation allocation[0];
--} QEMU_PACKED;
--typedef struct AcpiTableMcfg AcpiTableMcfg;
--
- /*
-  * TCPA Description Table
-  *
+Igor Mammedov (1):
+  q35: acpi: do not create dummy MCFG table
+
+Wei Yang (5):
+  hw/arm/virt-acpi-build: remove unnecessary variable mcfg_start
+  i386, acpi: remove mcfg_ prefix in AcpiMcfgInfo members
+  hw/arm/virt-acpi-build: pass AcpiMcfgInfo to build_mcfg()
+  hw/acpi: Extract build_mcfg to pci.c
+  acpi: pci: use build_append_foo() API to construct MCFG
+
+ default-configs/arm-softmmu.mak  |  1 +
+ default-configs/i386-softmmu.mak |  1 +
+ hw/acpi/Kconfig                  |  4 +++
+ hw/acpi/Makefile.objs            |  1 +
+ hw/acpi/pci.c                    | 52 ++++++++++++++++++++++++++++++++
+ hw/arm/virt-acpi-build.c         | 31 +++++--------------
+ hw/i386/acpi-build.c             | 44 +++++----------------------
+ include/hw/acpi/acpi-defs.h      | 18 -----------
+ include/hw/acpi/pci.h            | 34 +++++++++++++++++++++
+ 9 files changed, 108 insertions(+), 78 deletions(-)
+ create mode 100644 hw/acpi/pci.c
+ create mode 100644 include/hw/acpi/pci.h
+
 -- 
 2.19.1
 
