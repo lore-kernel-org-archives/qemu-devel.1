@@ -3,60 +3,60 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
 X-Spam-Status: No, score=-6.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.0
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7CA7BC282DA
-	for <qemu-devel@archiver.kernel.org>; Wed, 17 Apr 2019 11:33:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8030DC282DD
+	for <qemu-devel@archiver.kernel.org>; Wed, 17 Apr 2019 11:34:02 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3BE1D2073F
-	for <qemu-devel@archiver.kernel.org>; Wed, 17 Apr 2019 11:33:52 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3BE1D2073F
+	by mail.kernel.org (Postfix) with ESMTPS id 40E142054F
+	for <qemu-devel@archiver.kernel.org>; Wed, 17 Apr 2019 11:34:02 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 40E142054F
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:50910 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:50912 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hGip5-0002BQ-Ck
-	for qemu-devel@archiver.kernel.org; Wed, 17 Apr 2019 07:33:51 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:59954)
+	id 1hGipF-0002Hi-Gf
+	for qemu-devel@archiver.kernel.org; Wed, 17 Apr 2019 07:34:01 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:59938)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1hGinT-0001H9-HF
-	for qemu-devel@nongnu.org; Wed, 17 Apr 2019 07:32:12 -0400
-Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1hGinR-0001yr-KT
+	(envelope-from <david@redhat.com>) id 1hGinR-0001Fu-Iz
 	for qemu-devel@nongnu.org; Wed, 17 Apr 2019 07:32:11 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:57808)
+Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
+	(envelope-from <david@redhat.com>) id 1hGinP-0001x4-K9
+	for qemu-devel@nongnu.org; Wed, 17 Apr 2019 07:32:09 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:46762)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <david@redhat.com>)
-	id 1hGinP-0001wB-JC; Wed, 17 Apr 2019 07:32:09 -0400
+	id 1hGinL-0001tg-TU; Wed, 17 Apr 2019 07:32:05 -0400
 Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
 	[10.5.11.22])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 132B781F1B;
-	Wed, 17 Apr 2019 11:32:06 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id F0EF537E85;
+	Wed, 17 Apr 2019 11:32:02 +0000 (UTC)
 Received: from t460s.redhat.com (ovpn-117-141.ams2.redhat.com [10.36.117.141])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id 44B6310027DF;
-	Wed, 17 Apr 2019 11:32:03 +0000 (UTC)
+	by smtp.corp.redhat.com (Postfix) with ESMTP id 569761001E66;
+	Wed, 17 Apr 2019 11:31:55 +0000 (UTC)
 From: David Hildenbrand <david@redhat.com>
 To: qemu-devel@nongnu.org
-Date: Wed, 17 Apr 2019 13:31:43 +0200
-Message-Id: <20190417113143.5551-3-david@redhat.com>
+Date: Wed, 17 Apr 2019 13:31:42 +0200
+Message-Id: <20190417113143.5551-2-david@redhat.com>
 In-Reply-To: <20190417113143.5551-1-david@redhat.com>
 References: <20190417113143.5551-1-david@redhat.com>
 MIME-Version: 1.0
 X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.27]);
-	Wed, 17 Apr 2019 11:32:06 +0000 (UTC)
+	(mx1.redhat.com [10.5.110.29]);
+	Wed, 17 Apr 2019 11:32:03 +0000 (UTC)
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] [PATCH v3 2/2] exec: Introduce qemu_maxrampagesize()
- and rename qemu_getrampagesize()
+Subject: [Qemu-devel] [PATCH v3 1/2] s390x/kvm: Configure page size after
+ memory has actually been initialized
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -80,195 +80,205 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 Content-Type: text/plain; charset="UTF-8"
-Message-ID: <20190417113143.rJpXgVXv-pHgVPbUza5ZitLrLRA8_OFnR5fvdi_cM7o@z>
+Message-ID: <20190417113142.kUhI1NBX70GTHDto1GSY5vXExpy8lSdk7faSWek5RLU@z>
 
-Rename qemu_getrampagesize() to qemu_minrampagesize(). While at it,
-properly rename find_max_supported_pagesize() to
-find_min_backend_pagesize().
+Right now we configure the pagesize quite early, when initializing KVM.
+This is long before system memory is actually allocated via
+memory_region_allocate_system_memory(), and therefore memory backends
+marked as mapped.
 
-s390x is actually interested into the maximum ram pagesize, so
-introduce and use qemu_maxrampagesize().
+Instead, let's configure the maximum page size after initializing
+memory in s390_memory_init(). cap_hpage_1m is still properly
+configured before creating any CPUs, and therefore before configuring
+the CPU model and eventually enabling CMMA.
 
-Add a TODO, indicating that looking at any mapped memory backends is not
-100% correct in some cases.
+This is not a fix but rather a preparation for the future, when initial
+memory might reside on memory backends (not the case for s390x right now)
+We will replace qemu_getrampagesize() soon by a function that will always
+return the maximum page size (not the minimum page size, which only
+works by pure luck so far, as there are no memory backends).
 
+Acked-by: Igor Mammedov <imammedo@redhat.com>
+Reviewed-by: David Gibson <david@gibson.dropbear.id.au>
 Signed-off-by: David Hildenbrand <david@redhat.com>
 ---
- exec.c                     | 44 ++++++++++++++++++++++++++++++++++----
- hw/ppc/spapr_caps.c        |  4 ++--
- hw/s390x/s390-virtio-ccw.c |  2 +-
- hw/vfio/spapr.c            |  2 +-
- include/exec/ram_addr.h    |  3 ++-
- target/ppc/kvm.c           |  2 +-
- 6 files changed, 47 insertions(+), 10 deletions(-)
+ hw/s390x/s390-virtio-ccw.c | 12 ++++++++++++
+ target/s390x/cpu.c         |  7 +++++++
+ target/s390x/cpu.h         |  1 +
+ target/s390x/kvm-stub.c    |  4 ++++
+ target/s390x/kvm.c         | 35 ++++++++++++++---------------------
+ target/s390x/kvm_s390x.h   |  1 +
+ 6 files changed, 39 insertions(+), 21 deletions(-)
 
-diff --git a/exec.c b/exec.c
-index 6ab62f4eee..f9b834ef82 100644
---- a/exec.c
-+++ b/exec.c
-@@ -1687,7 +1687,7 @@ void ram_block_dump(Monitor *mon)
-  * when we actually open and map them.  Iterate over the file
-  * descriptors instead, and use qemu_fd_getpagesize().
-  */
--static int find_max_supported_pagesize(Object *obj, void *opaque)
-+static int find_min_backend_pagesize(Object *obj, void *opaque)
- {
-     long *hpsize_min =3D opaque;
+diff --git a/hw/s390x/s390-virtio-ccw.c b/hw/s390x/s390-virtio-ccw.c
+index d11069b860..3be5679657 100644
+--- a/hw/s390x/s390-virtio-ccw.c
++++ b/hw/s390x/s390-virtio-ccw.c
+@@ -15,6 +15,7 @@
+ #include "cpu.h"
+ #include "hw/boards.h"
+ #include "exec/address-spaces.h"
++#include "exec/ram_addr.h"
+ #include "hw/s390x/s390-virtio-hcall.h"
+ #include "hw/s390x/sclp.h"
+ #include "hw/s390x/s390_flic.h"
+@@ -163,6 +164,7 @@ static void s390_memory_init(ram_addr_t mem_size)
+     MemoryRegion *sysmem =3D get_system_memory();
+     ram_addr_t chunk, offset =3D 0;
+     unsigned int number =3D 0;
++    Error *local_err =3D NULL;
+     gchar *name;
 =20
-@@ -1703,7 +1703,27 @@ static int find_max_supported_pagesize(Object *obj=
-, void *opaque)
+     /* allocate RAM for core */
+@@ -182,6 +184,15 @@ static void s390_memory_init(ram_addr_t mem_size)
+     }
+     g_free(name);
+=20
++    /*
++     * Configure the maximum page size. As no memory devices were create=
+d
++     * yet, this is the page size of initial memory only.
++     */
++    s390_set_max_pagesize(qemu_getrampagesize(), &local_err);
++    if (local_err) {
++        error_report_err(local_err);
++        exit(EXIT_FAILURE);
++    }
+     /* Initialize storage key device */
+     s390_skeys_init();
+     /* Initialize storage attributes device */
+@@ -253,6 +264,7 @@ static void ccw_init(MachineState *machine)
+     DeviceState *dev;
+=20
+     s390_sclp_init();
++    /* init memory + setup max page size. Required for the CPU model */
+     s390_memory_init(machine->ram_size);
+=20
+     /* init CPUs (incl. CPU model) early so s390_has_feature() works */
+diff --git a/target/s390x/cpu.c b/target/s390x/cpu.c
+index 698dd9cb82..b58ef0a8ef 100644
+--- a/target/s390x/cpu.c
++++ b/target/s390x/cpu.c
+@@ -399,6 +399,13 @@ int s390_set_memory_limit(uint64_t new_limit, uint64=
+_t *hw_limit)
      return 0;
  }
 =20
--long qemu_getrampagesize(void)
-+static int find_max_backend_pagesize(Object *obj, void *opaque)
++void s390_set_max_pagesize(uint64_t pagesize, Error **errp)
 +{
-+    long *hpsize_max =3D opaque;
-+
-+    if (object_dynamic_cast(obj, TYPE_MEMORY_BACKEND)) {
-+        HostMemoryBackend *backend =3D MEMORY_BACKEND(obj);
-+        long hpsize =3D host_memory_backend_pagesize(backend);
-+
-+        if (host_memory_backend_is_mapped(backend) && (hpsize > *hpsize_=
-max)) {
-+            *hpsize_max =3D hpsize;
-+        }
++    if (kvm_enabled()) {
++        kvm_s390_set_max_pagesize(pagesize, errp);
 +    }
-+
-+    return 0;
 +}
 +
-+/*
-+ * TODO: We assume right now that all mapped host memory backends are
-+ * used as RAM, however some might be used for different purposes.
-+ */
-+long qemu_minrampagesize(void)
+ void s390_cmma_reset(void)
  {
-     long hpsize =3D LONG_MAX;
-     long mainrampagesize;
-@@ -1723,7 +1743,7 @@ long qemu_getrampagesize(void)
-      */
-     memdev_root =3D object_resolve_path("/objects", NULL);
-     if (memdev_root) {
--        object_child_foreach(memdev_root, find_max_supported_pagesize, &=
-hpsize);
-+        object_child_foreach(memdev_root, find_min_backend_pagesize, &hp=
-size);
-     }
-     if (hpsize =3D=3D LONG_MAX) {
-         /* No additional memory regions found =3D=3D> Report main RAM pa=
-ge size */
-@@ -1746,8 +1766,24 @@ long qemu_getrampagesize(void)
-=20
-     return hpsize;
- }
-+
-+long qemu_maxrampagesize(void)
-+{
-+    long pagesize =3D qemu_mempath_getpagesize(mem_path);
-+    Object *memdev_root =3D object_resolve_path("/objects", NULL);
-+
-+    if (memdev_root) {
-+        object_child_foreach(memdev_root, find_max_backend_pagesize,
-+                             &pagesize);
-+    }
-+    return pagesize;
-+}
- #else
--long qemu_getrampagesize(void)
-+long qemu_minrampagesize(void)
-+{
-+    return getpagesize();
-+}
-+long qemu_maxrampagesize(void)
- {
-     return getpagesize();
- }
-diff --git a/hw/ppc/spapr_caps.c b/hw/ppc/spapr_caps.c
-index edc5ed0e0c..9b1c10baa6 100644
---- a/hw/ppc/spapr_caps.c
-+++ b/hw/ppc/spapr_caps.c
-@@ -347,7 +347,7 @@ static void cap_hpt_maxpagesize_apply(SpaprMachineSta=
-te *spapr,
-         warn_report("Many guests require at least 64kiB hpt-max-page-siz=
-e");
-     }
-=20
--    spapr_check_pagesize(spapr, qemu_getrampagesize(), errp);
-+    spapr_check_pagesize(spapr, qemu_minrampagesize(), errp);
- }
-=20
- static bool spapr_pagesize_cb(void *opaque, uint32_t seg_pshift,
-@@ -609,7 +609,7 @@ static SpaprCapabilities default_caps_with_cpu(SpaprM=
-achineState *spapr,
-         uint8_t mps;
-=20
-         if (kvmppc_hpt_needs_host_contiguous_pages()) {
--            mps =3D ctz64(qemu_getrampagesize());
-+            mps =3D ctz64(qemu_minrampagesize());
-         } else {
-             mps =3D 34; /* allow everything up to 16GiB, i.e. everything=
- */
-         }
-diff --git a/hw/s390x/s390-virtio-ccw.c b/hw/s390x/s390-virtio-ccw.c
-index 3be5679657..7e256d3d31 100644
---- a/hw/s390x/s390-virtio-ccw.c
-+++ b/hw/s390x/s390-virtio-ccw.c
-@@ -188,7 +188,7 @@ static void s390_memory_init(ram_addr_t mem_size)
-      * Configure the maximum page size. As no memory devices were create=
-d
-      * yet, this is the page size of initial memory only.
-      */
--    s390_set_max_pagesize(qemu_getrampagesize(), &local_err);
-+    s390_set_max_pagesize(qemu_maxrampagesize(), &local_err);
-     if (local_err) {
-         error_report_err(local_err);
-         exit(EXIT_FAILURE);
-diff --git a/hw/vfio/spapr.c b/hw/vfio/spapr.c
-index 57fe758e54..96c0ad9d9b 100644
---- a/hw/vfio/spapr.c
-+++ b/hw/vfio/spapr.c
-@@ -148,7 +148,7 @@ int vfio_spapr_create_window(VFIOContainer *container=
+     if (kvm_enabled()) {
+diff --git a/target/s390x/cpu.h b/target/s390x/cpu.h
+index cb6d77053a..c14be2b5ba 100644
+--- a/target/s390x/cpu.h
++++ b/target/s390x/cpu.h
+@@ -734,6 +734,7 @@ static inline void s390_do_cpu_load_normal(CPUState *=
+cs, run_on_cpu_data arg)
+ /* cpu.c */
+ void s390_crypto_reset(void);
+ int s390_set_memory_limit(uint64_t new_limit, uint64_t *hw_limit);
++void s390_set_max_pagesize(uint64_t pagesize, Error **errp);
+ void s390_cmma_reset(void);
+ void s390_enable_css_support(S390CPU *cpu);
+ int s390_assign_subch_ioeventfd(EventNotifier *notifier, uint32_t sch_id=
 ,
-     uint64_t pagesize =3D memory_region_iommu_get_min_page_size(iommu_mr=
-);
-     unsigned entries, bits_total, bits_per_level, max_levels;
-     struct vfio_iommu_spapr_tce_create create =3D { .argsz =3D sizeof(cr=
-eate) };
--    long rampagesize =3D qemu_getrampagesize();
-+    long rampagesize =3D qemu_minrampagesize();
+diff --git a/target/s390x/kvm-stub.c b/target/s390x/kvm-stub.c
+index bf7795e47a..22b4514ca6 100644
+--- a/target/s390x/kvm-stub.c
++++ b/target/s390x/kvm-stub.c
+@@ -93,6 +93,10 @@ int kvm_s390_set_mem_limit(uint64_t new_limit, uint64_=
+t *hw_limit)
+     return 0;
+ }
 =20
-     /*
-      * The host might not support the guest supported IOMMU page size,
-diff --git a/include/exec/ram_addr.h b/include/exec/ram_addr.h
-index 9ecd911c3e..139ad79390 100644
---- a/include/exec/ram_addr.h
-+++ b/include/exec/ram_addr.h
-@@ -73,7 +73,8 @@ static inline unsigned long int ramblock_recv_bitmap_of=
-fset(void *host_addr,
++void kvm_s390_set_max_pagesize(uint64_t pagesize, Error **errp)
++{
++}
++
+ void kvm_s390_crypto_reset(void)
+ {
+ }
+diff --git a/target/s390x/kvm.c b/target/s390x/kvm.c
+index 19530fb94e..bee73dc1a4 100644
+--- a/target/s390x/kvm.c
++++ b/target/s390x/kvm.c
+@@ -283,44 +283,37 @@ void kvm_s390_crypto_reset(void)
+     }
+ }
 =20
- bool ramblock_is_pmem(RAMBlock *rb);
+-static int kvm_s390_configure_mempath_backing(KVMState *s)
++void kvm_s390_set_max_pagesize(uint64_t pagesize, Error **errp)
+ {
+-    size_t path_psize =3D qemu_getrampagesize();
+-
+-    if (path_psize =3D=3D 4 * KiB) {
+-        return 0;
++    if (pagesize =3D=3D 4 * KiB) {
++        return;
+     }
 =20
--long qemu_getrampagesize(void);
-+long qemu_minrampagesize(void);
-+long qemu_maxrampagesize(void);
+     if (!hpage_1m_allowed()) {
+-        error_report("This QEMU machine does not support huge page "
+-                     "mappings");
+-        return -EINVAL;
++        error_setg(errp, "This QEMU machine does not support huge page "
++                   "mappings");
++        return;
+     }
 =20
- /**
-  * qemu_ram_alloc_from_file,
-diff --git a/target/ppc/kvm.c b/target/ppc/kvm.c
-index 2427c8ee13..59d92c4275 100644
---- a/target/ppc/kvm.c
-+++ b/target/ppc/kvm.c
-@@ -2136,7 +2136,7 @@ uint64_t kvmppc_rma_size(uint64_t current_size, uns=
-igned int hash_shift)
-     /* Find the largest hardware supported page size that's less than
-      * or equal to the (logical) backing page size of guest RAM */
-     kvm_get_smmu_info(&info, &error_fatal);
--    rampagesize =3D qemu_getrampagesize();
-+    rampagesize =3D qemu_minrampagesize();
-     best_page_shift =3D 0;
+-    if (path_psize !=3D 1 * MiB) {
+-        error_report("Memory backing with 2G pages was specified, "
+-                     "but KVM does not support this memory backing");
+-        return -EINVAL;
++    if (pagesize !=3D 1 * MiB) {
++        error_setg(errp, "Memory backing with 2G pages was specified, "
++                   "but KVM does not support this memory backing");
++        return;
+     }
 =20
-     for (i =3D 0; i < KVM_PPC_PAGE_SIZES_MAX_SZ; i++) {
+-    if (kvm_vm_enable_cap(s, KVM_CAP_S390_HPAGE_1M, 0)) {
+-        error_report("Memory backing with 1M pages was specified, "
+-                     "but KVM does not support this memory backing");
+-        return -EINVAL;
++    if (kvm_vm_enable_cap(kvm_state, KVM_CAP_S390_HPAGE_1M, 0)) {
++        error_setg(errp, "Memory backing with 1M pages was specified, "
++                   "but KVM does not support this memory backing");
++        return;
+     }
+=20
+     cap_hpage_1m =3D 1;
+-    return 0;
+ }
+=20
+ int kvm_arch_init(MachineState *ms, KVMState *s)
+ {
+     MachineClass *mc =3D MACHINE_GET_CLASS(ms);
+=20
+-    if (kvm_s390_configure_mempath_backing(s)) {
+-        return -EINVAL;
+-    }
+-
+     mc->default_cpu_type =3D S390_CPU_TYPE_NAME("host");
+     cap_sync_regs =3D kvm_check_extension(s, KVM_CAP_SYNC_REGS);
+     cap_async_pf =3D kvm_check_extension(s, KVM_CAP_ASYNC_PF);
+diff --git a/target/s390x/kvm_s390x.h b/target/s390x/kvm_s390x.h
+index 6e52287da3..caf985955b 100644
+--- a/target/s390x/kvm_s390x.h
++++ b/target/s390x/kvm_s390x.h
+@@ -36,6 +36,7 @@ int kvm_s390_cmma_active(void);
+ void kvm_s390_cmma_reset(void);
+ void kvm_s390_reset_vcpu(S390CPU *cpu);
+ int kvm_s390_set_mem_limit(uint64_t new_limit, uint64_t *hw_limit);
++void kvm_s390_set_max_pagesize(uint64_t pagesize, Error **errp);
+ void kvm_s390_crypto_reset(void);
+ void kvm_s390_restart_interrupt(S390CPU *cpu);
+ void kvm_s390_stop_interrupt(S390CPU *cpu);
 --=20
 2.20.1
 
