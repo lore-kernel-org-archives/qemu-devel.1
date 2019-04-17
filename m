@@ -6,63 +6,66 @@ X-Spam-Status: No, score=-0.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	MAILING_LIST_MULTI,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 34C07C282DA
-	for <qemu-devel@archiver.kernel.org>; Wed, 17 Apr 2019 18:23:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D615FC282DA
+	for <qemu-devel@archiver.kernel.org>; Wed, 17 Apr 2019 18:29:02 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 068CF20674
-	for <qemu-devel@archiver.kernel.org>; Wed, 17 Apr 2019 18:23:00 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 068CF20674
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=patchew.org
+	by mail.kernel.org (Postfix) with ESMTPS id 9823D2064B
+	for <qemu-devel@archiver.kernel.org>; Wed, 17 Apr 2019 18:29:02 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9823D2064B
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:57748 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:57799 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hGpD1-0006zA-Tj
-	for qemu-devel@archiver.kernel.org; Wed, 17 Apr 2019 14:22:59 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:52677)
+	id 1hGpIr-0008Ib-K2
+	for qemu-devel@archiver.kernel.org; Wed, 17 Apr 2019 14:29:01 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:53691)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1hGpC5-0006eQ-R4
-	for qemu-devel@nongnu.org; Wed, 17 Apr 2019 14:22:02 -0400
+	(envelope-from <lersek@redhat.com>) id 1hGpHp-0007q5-ET
+	for qemu-devel@nongnu.org; Wed, 17 Apr 2019 14:27:58 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1hGpC4-0001mU-Lx
-	for qemu-devel@nongnu.org; Wed, 17 Apr 2019 14:22:01 -0400
-Resent-Date: Wed, 17 Apr 2019 14:22:01 -0400
-Resent-Message-Id: <E1hGpC4-0001mU-Lx@eggs.gnu.org>
-Received: from sender4-of-o55.zoho.com ([136.143.188.55]:21595)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
-	id 1hGpC4-0001l7-2X
-	for qemu-devel@nongnu.org; Wed, 17 Apr 2019 14:22:00 -0400
-ARC-Seal: i=1; a=rsa-sha256; t=1555525294; cv=none; d=zoho.com; s=zohoarc; 
-	b=dq1s+tkwPpD1NcS5tITiecFjMPgPOgu9ja409NPqWGhWRw6PLdEkFmbLxh5zOc+mOeWI/kthWrzb6pVWH+pcRv4ZqXeSGA4rO8+EGKJR75FV3HGEpOMMOV9Op1Y0GSKq6L2Atcq1hJv2FhoEFpccXXhN4DlOdFV3UMLt36SscF4=
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zoho.com;
-	s=zohoarc; t=1555525294;
-	h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:Reply-To:Subject:To:ARC-Authentication-Results;
-	bh=N3tVhxhSTXGZaKg+rAa02e6/3guHMbIstJt3QZ4XU2k=; 
-	b=BRwRzTnThidWub2XByZ1zlCTf40mrV4gr1YBZZTK4ZEaKE3Ykjsbp07n27unTu7Z5b/f/imP6uuETK0kTvIyyIQL7jwjYEPUrWBAEzQ6PNp2oT4Cexk7iBaIOCY5oZwNJguJ5z+JyBfdJW1cG+CGBUIO0LC0lsKNmKc/BFkrQ7s=
-ARC-Authentication-Results: i=1; mx.zoho.com; dkim=pass  header.i=patchew.org;
-	spf=pass  smtp.mailfrom=no-reply@patchew.org;
-	dmarc=pass header.from=<no-reply@patchew.org>
-	header.from=<no-reply@patchew.org>
-Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by
-	mx.zohomail.com with SMTPS id 1555525293943775.5434954446962;
-	Wed, 17 Apr 2019 11:21:33 -0700 (PDT)
-Message-ID: <155552529277.17102.9216298997846682613@76452e4e88f2>
-In-Reply-To: <87mukov6vk.fsf@dusky.pond.sub.org>
+	(envelope-from <lersek@redhat.com>) id 1hGpHn-0004qa-VY
+	for qemu-devel@nongnu.org; Wed, 17 Apr 2019 14:27:57 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:35960)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <lersek@redhat.com>) id 1hGpHn-0004pR-EO
+	for qemu-devel@nongnu.org; Wed, 17 Apr 2019 14:27:55 -0400
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+	[10.5.11.15])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 2BD74307D9D1;
+	Wed, 17 Apr 2019 18:27:53 +0000 (UTC)
+Received: from lacos-laptop-7.usersys.redhat.com (ovpn-123-180.rdu2.redhat.com
+	[10.10.123.180])
+	by smtp.corp.redhat.com (Postfix) with ESMTP id 449D15D6A6;
+	Wed, 17 Apr 2019 18:27:51 +0000 (UTC)
+To: Joachim Durchholz <jo@durchholz.org>, qemu-devel@nongnu.org
+References: <874f0f8e-780e-6600-e11b-b97f5b055cf8@durchholz.org>
+	<dbd6541e-5013-d0bc-b23e-a8de4f4cd171@redhat.com>
+	<20190416072430.dp742ehg27drpplb@sirius.home.kraxel.org>
+	<00f0ada2-a68b-2264-ab72-f49fe7d654e7@durchholz.org>
+	<20190417071012.fxedabu3makmoyuz@sirius.home.kraxel.org>
+	<993002d4-28dd-00f0-e8c1-7b0d9ab2de12@durchholz.org>
+From: Laszlo Ersek <lersek@redhat.com>
+Message-ID: <4ce336d0-6651-286f-07ee-3a5b3236309a@redhat.com>
+Date: Wed, 17 Apr 2019 20:27:51 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:52.0) Gecko/20100101
+	Thunderbird/52.9.1
 MIME-Version: 1.0
+In-Reply-To: <993002d4-28dd-00f0-e8c1-7b0d9ab2de12@durchholz.org>
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: base64
-Resent-From: 
-From: no-reply@patchew.org
-To: armbru@redhat.com
-Date: Wed, 17 Apr 2019 11:21:33 -0700 (PDT)
-X-ZohoMailClient: External
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+	(mx1.redhat.com [10.5.110.48]);
+	Wed, 17 Apr 2019 18:27:53 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 136.143.188.55
-Subject: Re: [Qemu-devel] [PATCH v2 14.5/15] char-pty: Print "char device
- redirected" message to stdout
+X-Received-From: 209.132.183.28
+Subject: Re: [Qemu-devel] curses.c: "We need a terminal output" ?
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -74,32 +77,118 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: qemu-devel@nongnu.org
-Cc: fam@euphon.net, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190417182133.-T8-pzvQAUvJHutTCYlezd-qaXBSNqp0rR08RLVDvGk@z>
+Message-ID: <20190417182751.PMnDWGa9Qp3l3nnfhzxJBuNwIfWlYrXCDtS4cznQCyo@z>
 
-UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS84N211a292NnZrLmZzZkBkdXNr
-eS5wb25kLnN1Yi5vcmcvCgoKCkhpLAoKVGhpcyBzZXJpZXMgZmFpbGVkIHRoZSBhc2FuIGJ1aWxk
-IHRlc3QuIFBsZWFzZSBmaW5kIHRoZSB0ZXN0aW5nIGNvbW1hbmRzIGFuZAp0aGVpciBvdXRwdXQg
-YmVsb3cuIElmIHlvdSBoYXZlIERvY2tlciBpbnN0YWxsZWQsIHlvdSBjYW4gcHJvYmFibHkgcmVw
-cm9kdWNlIGl0CmxvY2FsbHkuCgo9PT0gVEVTVCBTQ1JJUFQgQkVHSU4gPT09CiMhL2Jpbi9iYXNo
-CnRpbWUgbWFrZSBkb2NrZXItdGVzdC1kZWJ1Z0BmZWRvcmEgVEFSR0VUX0xJU1Q9eDg2XzY0LXNv
-ZnRtbXUgSj0xNCBORVRXT1JLPTEKPT09IFRFU1QgU0NSSVBUIEVORCA9PT0KCiAgQVIgICAgICBs
-aWJxZW11dXRpbC5hCiAgTElOSyAgICBlbGYyZG1wCiAgQVMgICAgICBvcHRpb25yb20vbXVsdGli
-b290Lm8KL3RtcC9xZW11LXRlc3Qvc3JjL2NoYXJkZXYvY2hhci1wdHkuYzoyMTQ6NTogZXJyb3I6
-IGltcGxpY2l0IGRlY2xhcmF0aW9uIG9mIGZ1bmN0aW9uICdxZW11X3ByaW50ZicgaXMgaW52YWxp
-ZCBpbiBDOTkgWy1XZXJyb3IsLVdpbXBsaWNpdC1mdW5jdGlvbi1kZWNsYXJhdGlvbl0KICAgIHFl
-bXVfcHJpbnRmKCJjaGFyIGRldmljZSByZWRpcmVjdGVkIHRvICVzIChsYWJlbCAlcylcbiIsCiAg
-ICBeCi90bXAvcWVtdS10ZXN0L3NyYy9jaGFyZGV2L2NoYXItcHR5LmM6MjE0OjU6IGVycm9yOiB0
-aGlzIGZ1bmN0aW9uIGRlY2xhcmF0aW9uIGlzIG5vdCBhIHByb3RvdHlwZSBbLVdlcnJvciwtV3N0
-cmljdC1wcm90b3R5cGVzXQoyIGVycm9ycyBnZW5lcmF0ZWQuCiAgTElOSyAgICBpdnNobWVtLWNs
-aWVudAogIExJTksgICAgaXZzaG1lbS1zZXJ2ZXIKCgpUaGUgZnVsbCBsb2cgaXMgYXZhaWxhYmxl
-IGF0Cmh0dHA6Ly9wYXRjaGV3Lm9yZy9sb2dzLzg3bXVrb3Y2dmsuZnNmQGR1c2t5LnBvbmQuc3Vi
-Lm9yZy90ZXN0aW5nLmFzYW4vP3R5cGU9bWVzc2FnZS4KLS0tCkVtYWlsIGdlbmVyYXRlZCBhdXRv
-bWF0aWNhbGx5IGJ5IFBhdGNoZXcgW2h0dHBzOi8vcGF0Y2hldy5vcmcvXS4KUGxlYXNlIHNlbmQg
-eW91ciBmZWVkYmFjayB0byBwYXRjaGV3LWRldmVsQHJlZGhhdC5jb20=
+Hi Joachim,
 
+On 04/17/19 19:09, Joachim Durchholz wrote:
+> Sorry, I'm done having to argue against(!) a person who's stonewalling
+> me by wilfully ignoring differences ("doesn't work perfectly"
+> interpreted as "does not work at all"), discounting
+> just-for-testing-purpose workarounds as if they were actual proposed
+> solutions ("not a sane approach"), ignoring the use case (still
+> insisting on terminal size mutability), and proposing a nonworking
+> solution (-nographic does not give me any output, of course because it
+> doesn't have a terminal to talk to).
+
+you use the word "solution" twice above, but in this thread, I haven't
+seen a problem statement from you.
+
+What is the end goal you're trying to achieve?
+
+The source file "ui/curses.c" carries the following comment at the top:
+
+  QEMU curses/ncurses display driver
+
+It is a display backend that is based on Curses.
+
+Curses -- in its originally standardized form, XCURSES -- is an
+interface specification for manipulating terminals. Please see:
+
+  https://pubs.opengroup.org/onlinepubs/7908799/xcurses/intov.html
+
+It writes:
+
+    [...] a comprehensive API lets the application perform terminal
+    operations. The Curses run-time system receives each terminal
+    request and sends appropriate commands to the terminal to achieve
+    the desired effect. [...]  Applications using Curses should not also
+    control the terminal using capabilities of the general terminal
+    interface defined in the XBD specification, General Terminal
+    Interface. [...]
+
+(I sent the link to the General Terminal Interface earlier.)
+
+So, let's look at your original question again (which was not a problem
+statement):
+
+> what's the reasoning behind "We need a terminal output" in curses.c?
+
+The reasoning is that "curses.c" is a QEMU display backend written in
+terms of the Curses [XCURSES] interface specification, and that
+interface specification is inherently based on terminals, as defined by
+the General Terminal Interface of the Single Unix Specification. (BTW
+SUS and POSIX have merged into one set of specs at SUSv3.)
+
+If you tell us what you want to achieve in the end (i.e. you state the
+problem), maybe we can tell you what to use *instead of* "ui/curses.c",
+as the QEMU display backend. We might also be able to suggest ways to
+use "ui/curses.c", so that it give you what you need.
+
+
+Let me speculate a bit. You mentioned wanting to connect "ui/curses.c"
+to a pipe, possibly to transfer the output elsewhere. This is a common
+use case -- it's what terminal emulators such as "xterm" do, also what
+"ssh" does (when you log in interactively with it). "screen" and "tmux"
+are other programs in this class.
+
+The way they all work is, they set up a pseudo-terminal (pty). The pty
+has a master end and a slave end. The slave end looks like a real
+terminal and provides the General Terminal Interface -- so "ui/curses.c"
+would consume that. The kernel driver for pseudo-terminals provides all
+the necessary terminal features. On the master end, you get a file
+descriptor to a bidirectional stream (similar to a unix domain stream
+socket). The various terminal emulators (xterm, ssh, screen, tmux) read
+and write the master end, and perform various stuff on the data received
+(e.g. "screen" passes the data for display to the other screen process
+for display, if there is such an "other" screen process; xterm draws the
+characters, clears the screen, changes colors, and beeps; sshd encrypts
+the data, transfers it over the network, ssh decrypts the data and
+writes it to the local *slave* end; and so on).
+
+One interface to check here is posix_openpt():
+
+http://pubs.opengroup.org/onlinepubs/9699919799/functions/posix_openpt.html
+
+What's important here is that the translation between the master end and
+the slave end is *thick*. For example, assuming appropriate settings, if
+you write the appropriate character ("INTR") to the master-end file
+descriptor, the program for which the slave-end is the "controlling
+terminal" -- another term to look up in POSIX -- will get a SIGINT. This
+translation (i.e. the raising of SIGINT) is done by the kernel's
+pseudo-terminal (pty) driver. This is what happens e.g. when you press
+"Ctrl-C" in xterm.
+
+Anyway, you mentioned "pexpect":
+
+https://pexpect.readthedocs.io/en/stable/
+
+"pexpect" is a python facility for automating interactions with programs
+that require a terminal (such as the QEMU display backend
+"ui/curses.c"). I don't know "pexpect"'s internals, but it will
+*unavoidably* have to use a pseudo-terminal.
+
+I think that, if you need "just a pipe", you can satisfy "ui/curses.c"'s
+need for a terminal by giving it a slave terminal device with "pexpect".
+Then you can read the master-end (pexpect should let you do that as
+well) -- the master-end will indeed read similarly to pipe. Just be
+aware that all the terminal output goo, such as cursor positioning,
+color change sequences, beeps, screen resolution changes, etc, will show
+up as binary garbage in the stream.
+
+Thanks
+Laszlo
 
