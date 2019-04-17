@@ -1,27 +1,27 @@
-Received: from eggs.gnu.org ([209.51.188.92]:34801)
+Received: from eggs.gnu.org ([209.51.188.92]:34877)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1hGq4Y-0008V3-R8
-	for qemu-devel@nongnu.org; Wed, 17 Apr 2019 15:18:20 -0400
+	(envelope-from <armbru@redhat.com>) id 1hGq4c-00004w-JV
+	for qemu-devel@nongnu.org; Wed, 17 Apr 2019 15:18:24 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1hGq4V-00006Y-5P
-	for qemu-devel@nongnu.org; Wed, 17 Apr 2019 15:18:17 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:41056)
+	(envelope-from <armbru@redhat.com>) id 1hGq4a-0000FW-PF
+	for qemu-devel@nongnu.org; Wed, 17 Apr 2019 15:18:22 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:43200)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1hGq4T-0008QV-5L
-	for qemu-devel@nongnu.org; Wed, 17 Apr 2019 15:18:14 -0400
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
-	[10.5.11.23])
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1hGq4Y-0008Qm-Rm
+	for qemu-devel@nongnu.org; Wed, 17 Apr 2019 15:18:19 -0400
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+	[10.5.11.13])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 8B4B713A82
+	by mx1.redhat.com (Postfix) with ESMTPS id A8DB8307E059
 	for <qemu-devel@nongnu.org>; Wed, 17 Apr 2019 19:18:10 +0000 (UTC)
 From: Markus Armbruster <armbru@redhat.com>
-Date: Wed, 17 Apr 2019 21:18:05 +0200
-Message-Id: <20190417191805.28198-18-armbru@redhat.com>
+Date: Wed, 17 Apr 2019 21:18:03 +0200
+Message-Id: <20190417191805.28198-16-armbru@redhat.com>
 In-Reply-To: <20190417191805.28198-1-armbru@redhat.com>
 References: <20190417191805.28198-1-armbru@redhat.com>
-Subject: [Qemu-devel] [PATCH v2 17/17] include: Move fprintf_function to
- disas/
+Subject: [Qemu-devel] [PATCH v2 15/17] monitor: Clean up how monitor_disas()
+ funnels output to monitor
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,65 +33,78 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: dgilbert@redhat.com
 
-The previous commits have eliminated fprintf_function outside
-disassemblers, simplifying code and cleaning up the ugly type-punning
-fprintf_function seems to attract.  Move fprintf_function to
-include/disas/dis-asm.h to reduce the temptation to abuse it.
+INIT_DISASSEMBLE_INFO() takes an fprintf()-like callback and a FILE *
+to pass to it.  monitor_disas() passes monitor_fprintf() and the
+current monitor cast to FILE *.  monitor_fprintf() casts it right
+back, and is otherwise identical to monitor_printf().  The
+type-pinning is ugly.
 
-I considered renaming it to fprintf_ftype (reverting that part of
-commit 6e2d864edf5, v0.14.0) to get us closer to binutils, but I
-figure the fork is too distant to make this worthwhile.
+Pass qemu_fprintf() and NULL instead.
+
+monitor_fprintf() is now unused; delete it.
 
 Signed-off-by: Markus Armbruster <armbru@redhat.com>
 Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
 ---
- include/disas/dis-asm.h   |  5 +++--
- include/qemu/fprintf-fn.h | 14 --------------
- 2 files changed, 3 insertions(+), 16 deletions(-)
- delete mode 100644 include/qemu/fprintf-fn.h
+ disas.c                   |  3 ++-
+ include/monitor/monitor.h |  1 -
+ monitor.c                 | 11 -----------
+ 3 files changed, 2 insertions(+), 13 deletions(-)
 
-diff --git a/include/disas/dis-asm.h b/include/disas/dis-asm.h
-index 41b61c85f9..9240ec32c2 100644
---- a/include/disas/dis-asm.h
-+++ b/include/disas/dis-asm.h
-@@ -9,8 +9,6 @@
- #ifndef DISAS_BFD_H
- #define DISAS_BFD_H
+diff --git a/disas.c b/disas.c
+index d9aa713a40..d15cceb863 100644
+--- a/disas.c
++++ b/disas.c
+@@ -3,6 +3,7 @@
+ #include "qemu-common.h"
+ #include "disas/bfd.h"
+ #include "elf.h"
++#include "qemu/qemu-print.h"
  
--#include "qemu/fprintf-fn.h"
--
- typedef void *PTR;
- typedef uint64_t bfd_vma;
- typedef int64_t bfd_signed_vma;
-@@ -243,6 +241,9 @@ typedef struct symbol_cache_entry
-     } udata;
- } asymbol;
+ #include "cpu.h"
+ #include "disas/disas.h"
+@@ -609,7 +610,7 @@ void monitor_disas(Monitor *mon, CPUState *cpu,
+     int count, i;
+     CPUDebug s;
  
-+typedef int (*fprintf_function)(FILE *f, const char *fmt, ...)
-+    GCC_FMT_ATTR(2, 3);
-+
- enum dis_insn_type {
-   dis_noninsn,			/* Not a valid instruction */
-   dis_nonbranch,		/* Not a branch instruction */
-diff --git a/include/qemu/fprintf-fn.h b/include/qemu/fprintf-fn.h
-deleted file mode 100644
-index 9068a960b3..0000000000
---- a/include/qemu/fprintf-fn.h
-+++ /dev/null
-@@ -1,14 +0,0 @@
--/*
-- * Typedef for fprintf-alike function pointers.
-- *
-- * This work is licensed under the terms of the GNU GPL, version 2 or later.
-- * See the COPYING file in the top-level directory.
-- */
+-    INIT_DISASSEMBLE_INFO(s.info, (FILE *)mon, monitor_fprintf);
++    INIT_DISASSEMBLE_INFO(s.info, NULL, qemu_fprintf);
+ 
+     s.cpu = cpu;
+     s.info.read_memory_func
+diff --git a/include/monitor/monitor.h b/include/monitor/monitor.h
+index 316a168c41..86656297f1 100644
+--- a/include/monitor/monitor.h
++++ b/include/monitor/monitor.h
+@@ -31,7 +31,6 @@ int monitor_fd_param(Monitor *mon, const char *fdname, Error **errp);
+ int monitor_vprintf(Monitor *mon, const char *fmt, va_list ap)
+     GCC_FMT_ATTR(2, 0);
+ int monitor_printf(Monitor *mon, const char *fmt, ...) GCC_FMT_ATTR(2, 3);
+-int monitor_fprintf(FILE *stream, const char *fmt, ...) GCC_FMT_ATTR(2, 3);
+ void monitor_flush(Monitor *mon);
+ int monitor_set_cpu(int cpu_index);
+ int monitor_get_cpu_index(void);
+diff --git a/monitor.c b/monitor.c
+index ad6cec54a1..9b5f10b475 100644
+--- a/monitor.c
++++ b/monitor.c
+@@ -480,17 +480,6 @@ int monitor_printf(Monitor *mon, const char *fmt, ...)
+     return ret;
+ }
+ 
+-int monitor_fprintf(FILE *stream, const char *fmt, ...)
+-{
+-    int ret;
 -
--#ifndef QEMU_FPRINTF_FN_H
--#define QEMU_FPRINTF_FN_H
+-    va_list ap;
+-    va_start(ap, fmt);
+-    ret = monitor_vprintf((Monitor *)stream, fmt, ap);
+-    va_end(ap);
+-    return ret;
+-}
 -
--typedef int (*fprintf_function)(FILE *f, const char *fmt, ...)
--    GCC_FMT_ATTR(2, 3);
--
--#endif
+ static void qmp_send_response(Monitor *mon, const QDict *rsp)
+ {
+     const QObject *data = QOBJECT(rsp);
 -- 
 2.17.2
