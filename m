@@ -1,24 +1,22 @@
-Received: from eggs.gnu.org ([209.51.188.92]:32953)
+Received: from eggs.gnu.org ([209.51.188.92]:33477)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1hGoB6-00038y-BI
-	for qemu-devel@nongnu.org; Wed, 17 Apr 2019 13:16:57 -0400
+	(envelope-from <mreitz@redhat.com>) id 1hGoDC-0004Yw-Ji
+	for qemu-devel@nongnu.org; Wed, 17 Apr 2019 13:19:07 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1hGoB5-0004UU-Dr
-	for qemu-devel@nongnu.org; Wed, 17 Apr 2019 13:16:56 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:45026)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1hGoB5-0004Ti-4t
-	for qemu-devel@nongnu.org; Wed, 17 Apr 2019 13:16:55 -0400
-From: Markus Armbruster <armbru@redhat.com>
-References: <20190415142519.73060-1-vsementsov@virtuozzo.com>
-Date: Wed, 17 Apr 2019 19:16:52 +0200
-In-Reply-To: <20190415142519.73060-1-vsementsov@virtuozzo.com> (Vladimir
-	Sementsov-Ogievskiy's message of "Mon, 15 Apr 2019 17:25:19 +0300")
-Message-ID: <877ebswnzv.fsf@dusky.pond.sub.org>
+	(envelope-from <mreitz@redhat.com>) id 1hGoDB-0006K4-QU
+	for qemu-devel@nongnu.org; Wed, 17 Apr 2019 13:19:06 -0400
+References: <20190417171101.1254-1-eblake@redhat.com>
+	<20190417171101.1254-2-eblake@redhat.com>
+From: Max Reitz <mreitz@redhat.com>
+Message-ID: <06319948-8ce3-7fdc-9398-7a9fab36c4c6@redhat.com>
+Date: Wed, 17 Apr 2019 19:18:59 +0200
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PATCH v2] util/error: do not free error on
- error_abort
+In-Reply-To: <20190417171101.1254-2-eblake@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="F8mA5E6nf5NFa0SlcYMsTcY3FQpYXQs8v"
+Subject: Re: [Qemu-devel] [PATCH v3 1/2] cutils: Fix size_to_str() on 32-bit
+ platforms
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,43 +25,54 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Cc: qemu-devel@nongnu.org
+To: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org
+Cc: kwolf@redhat.com, qemu-block@nongnu.org, qemu-stable@nongnu.org
 
-Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com> writes:
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--F8mA5E6nf5NFa0SlcYMsTcY3FQpYXQs8v
+From: Max Reitz <mreitz@redhat.com>
+To: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org
+Cc: kwolf@redhat.com, qemu-block@nongnu.org, qemu-stable@nongnu.org
+Message-ID: <06319948-8ce3-7fdc-9398-7a9fab36c4c6@redhat.com>
+Subject: Re: [PATCH v3 1/2] cutils: Fix size_to_str() on 32-bit platforms
+References: <20190417171101.1254-1-eblake@redhat.com>
+ <20190417171101.1254-2-eblake@redhat.com>
+In-Reply-To: <20190417171101.1254-2-eblake@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-> It would be nice to have Error object not freed away when debugging a
-> coredump.
->
-> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+On 17.04.19 19:11, Eric Blake wrote:
+> When extracting a human-readable size formatter, we changed 'uint64_t
+> div' pre-patch to 'unsigned long div' post-patch. Which breaks on
+> 32-bit platforms, resulting in 'inf' instead of intended values larger
+> than 999GB.
+>=20
+> Fixes: 22951aaa
+> CC: qemu-stable@nongnu.org
+> Reported-by: Max Reitz <mreitz@redhat.com>
+> Signed-off-by: Eric Blake <eblake@redhat.com>
 > ---
->
-> v2: don't change error output format
->
->  util/error.c | 5 ++++-
->  1 file changed, 4 insertions(+), 1 deletion(-)
->
-> diff --git a/util/error.c b/util/error.c
-> index 934a78e1b1..22f8a7924f 100644
-> --- a/util/error.c
-> +++ b/util/error.c
-> @@ -34,7 +34,10 @@ static void error_handle_fatal(Error **errp, Error *err)
->      if (errp == &error_abort) {
->          fprintf(stderr, "Unexpected error in %s() at %s:%d:\n",
->                  err->func, err->src, err->line);
-> -        error_report_err(err);
-> +        error_report("%s", error_get_pretty(err));
-> +        if (err->hint) {
-> +            error_printf_unless_qmp("%s", err->hint->str);
-> +        }
->          abort();
->      }
->      if (errp == &error_fatal) {
+>  util/cutils.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
 
-We've since found out that the hint should be printed with
-error_printf(), see "[PATCH] error: Fix error_report_err(),
-warn_report_err() hint printing".  With that:
+Reviewed-by: Max Reitz <mreitz@redhat.com>
 
-Reviewed-by: Markus Armbruster <armbru@redhat.com>
 
-Queued with this change.  Thanks!
+--F8mA5E6nf5NFa0SlcYMsTcY3FQpYXQs8v
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAly3YAQACgkQ9AfbAGHV
+z0DyyQf9FcMrvk/ZfqX8sXOAOsNwh6KVl7MzLayTCk1G3+8E+NPNxwfPT85k2jWJ
+6zZLy12EkcZkJX+8wVRw5ZuGvj1LGRmINYE50mFFSre3V484IhxeOxjUeV/5pcx+
+GL2JlPWlCsFyrX1eZGjrhwVeovzAVvuoJgslvOiIi0aOQhrs6pP1z71SP7BIdgKW
+zyjjnwsDniv3Yjhr9sxd72qphJc5W61vdyBLByyHxgBIHucMBQdciHvLUSrcvYEV
+HrpCldenkH+VNcvlXyk85I5UwddRu/RYHVK+sovItBi2Qh1OPalAB2xd8ibReriF
+6gXGiDN63IaRj+RHnfttmsKkUv6kiA==
+=ocNo
+-----END PGP SIGNATURE-----
+
+--F8mA5E6nf5NFa0SlcYMsTcY3FQpYXQs8v--
