@@ -3,61 +3,63 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
 X-Spam-Status: No, score=-6.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.0
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D65BDC282DA
-	for <qemu-devel@archiver.kernel.org>; Wed, 17 Apr 2019 19:09:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 77AADC282DC
+	for <qemu-devel@archiver.kernel.org>; Wed, 17 Apr 2019 19:09:08 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A7728206BA
-	for <qemu-devel@archiver.kernel.org>; Wed, 17 Apr 2019 19:09:05 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A7728206BA
+	by mail.kernel.org (Postfix) with ESMTPS id 37BDD206BA
+	for <qemu-devel@archiver.kernel.org>; Wed, 17 Apr 2019 19:09:08 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 37BDD206BA
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:58138 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:58140 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hGpvc-0000ct-Oy
-	for qemu-devel@archiver.kernel.org; Wed, 17 Apr 2019 15:09:04 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:60350)
+	id 1hGpvf-0000fS-A3
+	for qemu-devel@archiver.kernel.org; Wed, 17 Apr 2019 15:09:07 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:60228)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1hGptR-0007g3-Cq
-	for qemu-devel@nongnu.org; Wed, 17 Apr 2019 15:06:49 -0400
+	(envelope-from <armbru@redhat.com>) id 1hGptO-0007dz-U7
+	for qemu-devel@nongnu.org; Wed, 17 Apr 2019 15:06:48 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1hGptQ-0003bm-23
-	for qemu-devel@nongnu.org; Wed, 17 Apr 2019 15:06:49 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:55474)
+	(envelope-from <armbru@redhat.com>) id 1hGptN-0003YJ-Fc
+	for qemu-devel@nongnu.org; Wed, 17 Apr 2019 15:06:46 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:53471)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1hGptP-0003ac-NK
-	for qemu-devel@nongnu.org; Wed, 17 Apr 2019 15:06:47 -0400
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
-	[10.5.11.14])
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1hGptN-0003Wu-3D
+	for qemu-devel@nongnu.org; Wed, 17 Apr 2019 15:06:45 -0400
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+	[10.5.11.23])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id EDD0EC058CAF
-	for <qemu-devel@nongnu.org>; Wed, 17 Apr 2019 19:06:46 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id E3A11C050061;
+	Wed, 17 Apr 2019 19:06:43 +0000 (UTC)
 Received: from blackfin.pond.sub.org (ovpn-116-116.ams2.redhat.com
 	[10.36.116.116])
-	by smtp.corp.redhat.com (Postfix) with ESMTPS id 917245D9E1;
-	Wed, 17 Apr 2019 19:06:46 +0000 (UTC)
+	by smtp.corp.redhat.com (Postfix) with ESMTPS id 82B5119C58;
+	Wed, 17 Apr 2019 19:06:43 +0000 (UTC)
 Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
-	id 4BE9C1132783; Wed, 17 Apr 2019 21:06:42 +0200 (CEST)
+	id D991E1132B6C; Wed, 17 Apr 2019 21:06:41 +0200 (CEST)
 From: Markus Armbruster <armbru@redhat.com>
 To: qemu-devel@nongnu.org
-Date: Wed, 17 Apr 2019 21:06:41 +0200
-Message-Id: <20190417190641.26814-16-armbru@redhat.com>
+Date: Wed, 17 Apr 2019 21:06:29 +0200
+Message-Id: <20190417190641.26814-4-armbru@redhat.com>
 In-Reply-To: <20190417190641.26814-1-armbru@redhat.com>
 References: <20190417190641.26814-1-armbru@redhat.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+MIME-Version: 1.0
+Content-Type: text/plain; charset="UTF-8"
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.32]);
-	Wed, 17 Apr 2019 19:06:46 +0000 (UTC)
+	(mx1.redhat.com [10.5.110.31]);
+	Wed, 17 Apr 2019 19:06:43 +0000 (UTC)
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] [PATCH v3 15/15] monitor: Simplify how
- -device/device_add print help
+Subject: [Qemu-devel] [PATCH v3 03/15] loader-fit: Wean off error_printf()
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -69,158 +71,270 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "Dr . David Alan Gilbert" <dgilbert@redhat.com>
+Cc: Aleksandar Rikalo <arikalo@wavecomp.com>,
+	Paul Burton <pburton@wavecomp.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Content-Type: text/plain; charset="UTF-8"
-Message-ID: <20190417190641.dgC9Mi0uKJs_sj_uchjlh8WIfugQ1JdKMP7Q9v-CXaw@z>
+Message-ID: <20190417190629.cpjF08pilyRCjDxX4qouEvupWFynH32fxYw6nYuidO4@z>
 
-Commit a95db58f210 added monitor_vfprintf() as an error_printf()
-generalized from stderr to arbitrary streams, then used it wrapped in
-helper out_printf() to print -device/device_add help to stdout.  Use
-qemu_printf() instead, and delete monitor_vfprintf() and out_printf().
+load_fit() reports errors with error_printf() instead of
+error_report().  Worse, it even reports errors it actually recovers
+from, in fit_cfg_compatible() and fit_load_fdt().  Messed up in
+initial commit 51b58561c1d.
 
-Cc: Dr. David Alan Gilbert <dgilbert@redhat.com>
+Convert the helper functions for load_fit() to Error.  Make sure each
+failure path sets an error.
+
+Fix fit_cfg_compatible() and fit_load_fdt() not to report errors they
+actually recover from.
+
+Convert load_fit() to error_report().
+
+Cc: Paul Burton <pburton@wavecomp.com>
+Cc: Aleksandar Rikalo <arikalo@wavecomp.com>
 Signed-off-by: Markus Armbruster <armbru@redhat.com>
-Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
 ---
- include/monitor/monitor.h |  3 ---
- monitor.c                 | 16 ++++------------
- qdev-monitor.c            | 36 ++++++++++++++----------------------
- 3 files changed, 18 insertions(+), 37 deletions(-)
+ hw/core/loader-fit.c | 62 +++++++++++++++++++++++++-------------------
+ 1 file changed, 36 insertions(+), 26 deletions(-)
 
-diff --git a/include/monitor/monitor.h b/include/monitor/monitor.h
-index e4c3717454..316a168c41 100644
---- a/include/monitor/monitor.h
-+++ b/include/monitor/monitor.h
-@@ -48,7 +48,4 @@ int monitor_fdset_dup_fd_add(int64_t fdset_id, int dup_fd);
- void monitor_fdset_dup_fd_remove(int dup_fd);
- int monitor_fdset_dup_fd_find(int dup_fd);
- 
--int monitor_vfprintf(FILE *stream,
--                     const char *fmt, va_list ap) GCC_FMT_ATTR(2, 0);
--
- #endif /* MONITOR_H */
-diff --git a/monitor.c b/monitor.c
-index 7b4a78d798..10be8bdb86 100644
---- a/monitor.c
-+++ b/monitor.c
-@@ -4541,23 +4541,15 @@ static void monitor_readline_flush(void *opaque)
-     monitor_flush(opaque);
- }
- 
--/*
-- * Print to current monitor if we have one, else to stream.
-- */
--int monitor_vfprintf(FILE *stream, const char *fmt, va_list ap)
--{
--    if (cur_mon && !monitor_cur_is_qmp()) {
--        return monitor_vprintf(cur_mon, fmt, ap);
--    }
--    return vfprintf(stream, fmt, ap);
--}
--
- /*
-  * Print to current monitor if we have one, else to stderr.
+diff --git a/hw/core/loader-fit.c b/hw/core/loader-fit.c
+index 447f60857d..f27b6af942 100644
+--- a/hw/core/loader-fit.c
++++ b/hw/core/loader-fit.c
+@@ -18,6 +18,7 @@
   */
- int error_vprintf(const char *fmt, va_list ap)
+=20
+ #include "qemu/osdep.h"
++#include "qapi/error.h"
+ #include "qemu/units.h"
+ #include "exec/memory.h"
+ #include "hw/loader.h"
+@@ -33,7 +34,7 @@
+ #define FIT_LOADER_MAX_PATH (128)
+=20
+ static const void *fit_load_image_alloc(const void *itb, const char *nam=
+e,
+-                                        int *poff, size_t *psz)
++                                        int *poff, size_t *psz, Error **=
+errp)
  {
--    return monitor_vfprintf(stderr, fmt, ap);
-+    if (cur_mon && !monitor_cur_is_qmp()) {
-+        return monitor_vprintf(cur_mon, fmt, ap);
-+    }
-+    return vfprintf(stderr, fmt, ap);
- }
- 
- int error_vprintf_unless_qmp(const char *fmt, va_list ap)
-diff --git a/qdev-monitor.c b/qdev-monitor.c
-index d4320986a2..373b9ad445 100644
---- a/qdev-monitor.c
-+++ b/qdev-monitor.c
-@@ -31,6 +31,7 @@
- #include "qemu/error-report.h"
- #include "qemu/help_option.h"
- #include "qemu/option.h"
-+#include "qemu/qemu-print.h"
- #include "sysemu/block-backend.h"
- #include "migration/misc.h"
- 
-@@ -104,31 +105,22 @@ static bool qdev_class_has_alias(DeviceClass *dc)
-     return (qdev_class_get_alias(dc) != NULL);
- }
- 
--static void out_printf(const char *fmt, ...)
--{
--    va_list ap;
--
--    va_start(ap, fmt);
--    monitor_vfprintf(stdout, fmt, ap);
--    va_end(ap);
--}
--
- static void qdev_print_devinfo(DeviceClass *dc)
- {
--    out_printf("name \"%s\"", object_class_get_name(OBJECT_CLASS(dc)));
-+    qemu_printf("name \"%s\"", object_class_get_name(OBJECT_CLASS(dc)));
-     if (dc->bus_type) {
--        out_printf(", bus %s", dc->bus_type);
-+        qemu_printf(", bus %s", dc->bus_type);
+     const void *data;
+     const char *comp;
+@@ -46,6 +47,7 @@ static const void *fit_load_image_alloc(const void *itb=
+, const char *name,
+=20
+     off =3D fdt_path_offset(itb, path);
+     if (off < 0) {
++        error_setg(errp, "can't find node %s", path);
+         return NULL;
      }
-     if (qdev_class_has_alias(dc)) {
--        out_printf(", alias \"%s\"", qdev_class_get_alias(dc));
-+        qemu_printf(", alias \"%s\"", qdev_class_get_alias(dc));
+     if (poff) {
+@@ -54,6 +56,7 @@ static const void *fit_load_image_alloc(const void *itb=
+, const char *name,
+=20
+     data =3D fdt_getprop(itb, off, "data", &sz);
+     if (!data) {
++        error_setg(errp, "can't get %s/data", path);
+         return NULL;
      }
-     if (dc->desc) {
--        out_printf(", desc \"%s\"", dc->desc);
-+        qemu_printf(", desc \"%s\"", dc->desc);
-     }
-     if (!dc->user_creatable) {
--        out_printf(", no-user");
-+        qemu_printf(", no-user");
-     }
--    out_printf("\n");
-+    qemu_printf("\n");
- }
- 
- static void qdev_print_devinfos(bool show_no_user)
-@@ -164,7 +156,7 @@ static void qdev_print_devinfos(bool show_no_user)
-                 continue;
-             }
-             if (!cat_printed) {
--                out_printf("%s%s devices:\n", i ? "\n" : "", cat_name[i]);
-+                qemu_printf("%s%s devices:\n", i ? "\n" : "", cat_name[i]);
-                 cat_printed = true;
-             }
-             qdev_print_devinfo(dc);
-@@ -286,20 +278,20 @@ int qdev_device_help(QemuOpts *opts)
-     }
- 
-     if (prop_list) {
--        out_printf("%s options:\n", driver);
-+        qemu_printf("%s options:\n", driver);
-     } else {
--        out_printf("There are no options for %s.\n", driver);
-+        qemu_printf("There are no options for %s.\n", driver);
-     }
-     for (prop = prop_list; prop; prop = prop->next) {
-         int len;
--        out_printf("  %s=<%s>%n", prop->value->name, prop->value->type, &len);
-+        qemu_printf("  %s=<%s>%n", prop->value->name, prop->value->type, &len);
-         if (prop->value->has_description) {
-             if (len < 24) {
--                out_printf("%*s", 24 - len, "");
-+                qemu_printf("%*s", 24 - len, "");
-             }
--            out_printf(" - %s\n", prop->value->description);
-+            qemu_printf(" - %s\n", prop->value->description);
-         } else {
--            out_printf("\n");
-+            qemu_printf("\n");
+=20
+@@ -73,7 +76,7 @@ static const void *fit_load_image_alloc(const void *itb=
+, const char *name,
+=20
+         uncomp_len =3D gunzip(uncomp_data, uncomp_len, (void *) data, sz=
+);
+         if (uncomp_len < 0) {
+-            error_printf("unable to decompress %s image\n", name);
++            error_setg(errp, "unable to decompress %s image", name);
+             g_free(uncomp_data);
+             return NULL;
          }
+@@ -85,18 +88,19 @@ static const void *fit_load_image_alloc(const void *i=
+tb, const char *name,
+         return data;
      }
- 
--- 
+=20
+-    error_printf("unknown compression '%s'\n", comp);
++    error_setg(errp, "unknown compression '%s'", comp);
+     return NULL;
+ }
+=20
+ static int fit_image_addr(const void *itb, int img, const char *name,
+-                          hwaddr *addr)
++                          hwaddr *addr, Error **errp)
+ {
+     const void *prop;
+     int len;
+=20
+     prop =3D fdt_getprop(itb, img, name, &len);
+     if (!prop) {
++        error_setg(errp, "can't find %s address", name);
+         return -ENOENT;
+     }
+=20
+@@ -108,13 +112,14 @@ static int fit_image_addr(const void *itb, int img,=
+ const char *name,
+         *addr =3D fdt64_to_cpu(*(fdt64_t *)prop);
+         return 0;
+     default:
+-        error_printf("invalid %s address length %d\n", name, len);
++        error_setg(errp, "invalid %s address length %d", name, len);
+         return -EINVAL;
+     }
+ }
+=20
+ static int fit_load_kernel(const struct fit_loader *ldr, const void *itb=
+,
+-                           int cfg, void *opaque, hwaddr *pend)
++                           int cfg, void *opaque, hwaddr *pend,
++                           Error **errp)
+ {
+     const char *name;
+     const void *data;
+@@ -126,26 +131,26 @@ static int fit_load_kernel(const struct fit_loader =
+*ldr, const void *itb,
+=20
+     name =3D fdt_getprop(itb, cfg, "kernel", NULL);
+     if (!name) {
+-        error_printf("no kernel specified by FIT configuration\n");
++        error_setg(errp, "no kernel specified by FIT configuration");
+         return -EINVAL;
+     }
+=20
+-    load_data =3D data =3D fit_load_image_alloc(itb, name, &img_off, &sz=
+);
++    load_data =3D data =3D fit_load_image_alloc(itb, name, &img_off, &sz=
+, errp);
+     if (!data) {
+-        error_printf("unable to load kernel image from FIT\n");
++        error_prepend(errp, "unable to load kernel image from FIT: ");
+         return -EINVAL;
+     }
+=20
+-    err =3D fit_image_addr(itb, img_off, "load", &load_addr);
++    err =3D fit_image_addr(itb, img_off, "load", &load_addr, errp);
+     if (err) {
+-        error_printf("unable to read kernel load address from FIT\n");
++        error_prepend(errp, "unable to read kernel load address from FIT=
+: ");
+         ret =3D err;
+         goto out;
+     }
+=20
+-    err =3D fit_image_addr(itb, img_off, "entry", &entry_addr);
++    err =3D fit_image_addr(itb, img_off, "entry", &entry_addr, errp);
+     if (err) {
+-        error_printf("unable to read kernel entry address from FIT\n");
++        error_prepend(errp, "unable to read kernel entry address from FI=
+T: ");
+         ret =3D err;
+         goto out;
+     }
+@@ -172,7 +177,7 @@ out:
+=20
+ static int fit_load_fdt(const struct fit_loader *ldr, const void *itb,
+                         int cfg, void *opaque, const void *match_data,
+-                        hwaddr kernel_end)
++                        hwaddr kernel_end, Error **errp)
+ {
+     const char *name;
+     const void *data;
+@@ -187,16 +192,18 @@ static int fit_load_fdt(const struct fit_loader *ld=
+r, const void *itb,
+         return 0;
+     }
+=20
+-    load_data =3D data =3D fit_load_image_alloc(itb, name, &img_off, &sz=
+);
++    load_data =3D data =3D fit_load_image_alloc(itb, name, &img_off, &sz=
+, errp);
+     if (!data) {
+-        error_printf("unable to load FDT image from FIT\n");
++        error_prepend(errp, "unable to load FDT image from FIT: ");
+         return -EINVAL;
+     }
+=20
+-    err =3D fit_image_addr(itb, img_off, "load", &load_addr);
++    err =3D fit_image_addr(itb, img_off, "load", &load_addr, errp);
+     if (err =3D=3D -ENOENT) {
+         load_addr =3D ROUND_UP(kernel_end, 64 * KiB) + (10 * MiB);
++        error_free(*errp);
+     } else if (err) {
++        error_prepend(errp, "unable to read FDT load address from FIT: "=
+);
+         ret =3D err;
+         goto out;
+     }
+@@ -229,7 +236,7 @@ static bool fit_cfg_compatible(const void *itb, int c=
+fg, const char *compat)
+         return false;
+     }
+=20
+-    fdt =3D fit_load_image_alloc(itb, fdt_name, NULL, NULL);
++    fdt =3D fit_load_image_alloc(itb, fdt_name, NULL, NULL, NULL);
+     if (!fdt) {
+         return false;
+     }
+@@ -252,11 +259,12 @@ out:
+=20
+ int load_fit(const struct fit_loader *ldr, const char *filename, void *o=
+paque)
+ {
++    Error *err =3D NULL;
+     const struct fit_loader_match *match;
+     const void *itb, *match_data =3D NULL;
+     const char *def_cfg_name;
+     char path[FIT_LOADER_MAX_PATH];
+-    int itb_size, configs, cfg_off, off, err;
++    int itb_size, configs, cfg_off, off;
+     hwaddr kernel_end;
+     int ret;
+=20
+@@ -267,6 +275,7 @@ int load_fit(const struct fit_loader *ldr, const char=
+ *filename, void *opaque)
+=20
+     configs =3D fdt_path_offset(itb, "/configurations");
+     if (configs < 0) {
++        error_report("can't find node /configurations");
+         ret =3D configs;
+         goto out;
+     }
+@@ -301,20 +310,21 @@ int load_fit(const struct fit_loader *ldr, const ch=
+ar *filename, void *opaque)
+     }
+=20
+     if (cfg_off < 0) {
+-        /* couldn't find a configuration to use */
++        error_report("can't find configuration");
+         ret =3D cfg_off;
+         goto out;
+     }
+=20
+-    err =3D fit_load_kernel(ldr, itb, cfg_off, opaque, &kernel_end);
+-    if (err) {
+-        ret =3D err;
++    ret =3D fit_load_kernel(ldr, itb, cfg_off, opaque, &kernel_end, &err=
+);
++    if (ret) {
++        error_report_err(err);
+         goto out;
+     }
+=20
+-    err =3D fit_load_fdt(ldr, itb, cfg_off, opaque, match_data, kernel_e=
+nd);
+-    if (err) {
+-        ret =3D err;
++    ret =3D fit_load_fdt(ldr, itb, cfg_off, opaque, match_data, kernel_e=
+nd,
++                       &err);
++    if (ret) {
++        error_report_err(err);
+         goto out;
+     }
+=20
+--=20
 2.17.2
 
 
