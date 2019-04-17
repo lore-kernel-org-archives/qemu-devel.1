@@ -1,27 +1,27 @@
-Received: from eggs.gnu.org ([209.51.188.92]:34800)
+Received: from eggs.gnu.org ([209.51.188.92]:34854)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1hGq4Y-0008V2-R9
+	(envelope-from <armbru@redhat.com>) id 1hGq4a-00004s-OW
 	for qemu-devel@nongnu.org; Wed, 17 Apr 2019 15:18:24 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1hGq4T-0008V0-8i
-	for qemu-devel@nongnu.org; Wed, 17 Apr 2019 15:18:17 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:52652)
+	(envelope-from <armbru@redhat.com>) id 1hGq4Y-0000Ac-17
+	for qemu-devel@nongnu.org; Wed, 17 Apr 2019 15:18:20 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:37394)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1hGq4R-0008OP-Aw
-	for qemu-devel@nongnu.org; Wed, 17 Apr 2019 15:18:11 -0400
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
-	[10.5.11.15])
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1hGq4U-0008ON-KK
+	for qemu-devel@nongnu.org; Wed, 17 Apr 2019 15:18:15 -0400
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+	[10.5.11.12])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 118363078ADD
+	by mx1.redhat.com (Postfix) with ESMTPS id 0F25B308FFB1
 	for <qemu-devel@nongnu.org>; Wed, 17 Apr 2019 19:18:09 +0000 (UTC)
 From: Markus Armbruster <armbru@redhat.com>
-Date: Wed, 17 Apr 2019 21:17:56 +0200
-Message-Id: <20190417191805.28198-9-armbru@redhat.com>
+Date: Wed, 17 Apr 2019 21:17:55 +0200
+Message-Id: <20190417191805.28198-8-armbru@redhat.com>
 In-Reply-To: <20190417191805.28198-1-armbru@redhat.com>
 References: <20190417191805.28198-1-armbru@redhat.com>
-Subject: [Qemu-devel] [PATCH v2 08/17] memory: Clean up how mtree_info()
- prints
+Subject: [Qemu-devel] [PATCH v2 07/17] block/qapi: Clean up how we print to
+ monitor or stdout
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,12 +33,14 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: dgilbert@redhat.com
 
-mtree_info() takes an fprintf()-like callback and a FILE * to pass to
-it, and so do its helper functions.  Passing around callback and
-argument is rather tiresome.
+bdrv_snapshot_dump(), bdrv_image_info_specific_dump(),
+bdrv_image_info_dump() and their helpers take an fprintf()-like
+callback and a FILE * to pass to it.
 
-Its only caller hmp_info_mtree() passes monitor_printf() cast to
-fprintf_function and the current monitor cast to FILE *.
+hmp.c passes monitor_printf() cast to fprintf_function and the current
+monitor cast to FILE *.
+
+qemu-img.c and qemu-io-cmds.c pass fprintf and stdout.
 
 The type-punning is technically undefined behaviour, but works in
 practice.  Clean up: drop the callback, and call qemu_printf()
@@ -47,472 +49,384 @@ instead.
 Signed-off-by: Markus Armbruster <armbru@redhat.com>
 Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
 ---
- exec.c                         |  40 ++++-----
- include/exec/memory-internal.h |   3 +-
- include/exec/memory.h          |   3 +-
- memory.c                       | 156 ++++++++++++++++-----------------
- monitor.c                      |   3 +-
- 5 files changed, 98 insertions(+), 107 deletions(-)
+ block/qapi.c         | 120 ++++++++++++++++++++-----------------------
+ hmp.c                |  12 ++---
+ include/block/qapi.h |  10 ++--
+ qemu-img.c           |   6 +--
+ qemu-io-cmds.c       |   2 +-
+ 5 files changed, 67 insertions(+), 83 deletions(-)
 
-diff --git a/exec.c b/exec.c
-index 6ab62f4eee..85d15606f1 100644
---- a/exec.c
-+++ b/exec.c
-@@ -35,6 +35,7 @@
- #include "qemu/timer.h"
- #include "qemu/config-file.h"
- #include "qemu/error-report.h"
+diff --git a/block/qapi.c b/block/qapi.c
+index 21edab34fc..e3e74f898f 100644
+--- a/block/qapi.c
++++ b/block/qapi.c
+@@ -36,6 +36,7 @@
+ #include "qapi/qmp/qlist.h"
+ #include "qapi/qmp/qnum.h"
+ #include "qapi/qmp/qstring.h"
 +#include "qemu/qemu-print.h"
- #if defined(CONFIG_USER_ONLY)
- #include "qemu.h"
- #else /* !CONFIG_USER_ONLY */
-@@ -4117,42 +4118,41 @@ void page_size_init(void)
+ #include "sysemu/block-backend.h"
+ #include "qemu/cutils.h"
  
- #if !defined(CONFIG_USER_ONLY)
- 
--static void mtree_print_phys_entries(fprintf_function mon, void *f,
--                                     int start, int end, int skip, int ptr)
-+static void mtree_print_phys_entries(int start, int end, int skip, int ptr)
- {
-     if (start == end - 1) {
--        mon(f, "\t%3d      ", start);
-+        qemu_printf("\t%3d      ", start);
-     } else {
--        mon(f, "\t%3d..%-3d ", start, end - 1);
-+        qemu_printf("\t%3d..%-3d ", start, end - 1);
-     }
--    mon(f, " skip=%d ", skip);
-+    qemu_printf(" skip=%d ", skip);
-     if (ptr == PHYS_MAP_NODE_NIL) {
--        mon(f, " ptr=NIL");
-+        qemu_printf(" ptr=NIL");
-     } else if (!skip) {
--        mon(f, " ptr=#%d", ptr);
-+        qemu_printf(" ptr=#%d", ptr);
-     } else {
--        mon(f, " ptr=[%d]", ptr);
-+        qemu_printf(" ptr=[%d]", ptr);
-     }
--    mon(f, "\n");
-+    qemu_printf("\n");
+@@ -660,8 +661,7 @@ static char *get_human_readable_size(char *buf, int buf_size, int64_t size)
+     return buf;
  }
  
- #define MR_SIZE(size) (int128_nz(size) ? (hwaddr)int128_get64( \
-                            int128_sub((size), int128_one())) : 0)
- 
--void mtree_print_dispatch(fprintf_function mon, void *f,
--                          AddressSpaceDispatch *d, MemoryRegion *root)
-+void mtree_print_dispatch(AddressSpaceDispatch *d, MemoryRegion *root)
+-void bdrv_snapshot_dump(fprintf_function func_fprintf, void *f,
+-                        QEMUSnapshotInfo *sn)
++void bdrv_snapshot_dump(QEMUSnapshotInfo *sn)
  {
-     int i;
+     char buf1[128], date_buf[128], clock_buf[128];
+     struct tm tm;
+@@ -669,9 +669,8 @@ void bdrv_snapshot_dump(fprintf_function func_fprintf, void *f,
+     int64_t secs;
  
--    mon(f, "  Dispatch\n");
--    mon(f, "    Physical sections\n");
-+    qemu_printf("  Dispatch\n");
-+    qemu_printf("    Physical sections\n");
+     if (!sn) {
+-        func_fprintf(f,
+-                     "%-10s%-20s%7s%20s%15s",
+-                     "ID", "TAG", "VM SIZE", "DATE", "VM CLOCK");
++        qemu_printf("%-10s%-20s%7s%20s%15s",
++                    "ID", "TAG", "VM SIZE", "DATE", "VM CLOCK");
+     } else {
+         ti = sn->date_sec;
+         localtime_r(&ti, &tm);
+@@ -684,50 +683,46 @@ void bdrv_snapshot_dump(fprintf_function func_fprintf, void *f,
+                  (int)((secs / 60) % 60),
+                  (int)(secs % 60),
+                  (int)((sn->vm_clock_nsec / 1000000) % 1000));
+-        func_fprintf(f,
+-                     "%-10s%-20s%7s%20s%15s",
+-                     sn->id_str, sn->name,
+-                     get_human_readable_size(buf1, sizeof(buf1),
+-                                             sn->vm_state_size),
+-                     date_buf,
+-                     clock_buf);
++        qemu_printf("%-10s%-20s%7s%20s%15s",
++                    sn->id_str, sn->name,
++                    get_human_readable_size(buf1, sizeof(buf1),
++                                            sn->vm_state_size),
++                    date_buf,
++                    clock_buf);
+     }
+ }
  
-     for (i = 0; i < d->map.sections_nb; ++i) {
-         MemoryRegionSection *s = d->map.sections + i;
-         const char *names[] = { " [unassigned]", " [not dirty]",
-                                 " [ROM]", " [watch]" };
+-static void dump_qdict(fprintf_function func_fprintf, void *f, int indentation,
+-                       QDict *dict);
+-static void dump_qlist(fprintf_function func_fprintf, void *f, int indentation,
+-                       QList *list);
++static void dump_qdict(int indentation, QDict *dict);
++static void dump_qlist(int indentation, QList *list);
  
--        mon(f, "      #%d @" TARGET_FMT_plx ".." TARGET_FMT_plx " %s%s%s%s%s",
-+        qemu_printf("      #%d @" TARGET_FMT_plx ".." TARGET_FMT_plx
-+                    " %s%s%s%s%s",
-             i,
-             s->offset_within_address_space,
-             s->offset_within_address_space + MR_SIZE(s->mr->size),
-@@ -4163,20 +4163,20 @@ void mtree_print_dispatch(fprintf_function mon, void *f,
-             s->mr->is_iommu ? " [iommu]" : "");
- 
-         if (s->mr->alias) {
--            mon(f, " alias=%s", s->mr->alias->name ?
-+            qemu_printf(" alias=%s", s->mr->alias->name ?
-                     s->mr->alias->name : "noname");
+-static void dump_qobject(fprintf_function func_fprintf, void *f,
+-                         int comp_indent, QObject *obj)
++static void dump_qobject(int comp_indent, QObject *obj)
+ {
+     switch (qobject_type(obj)) {
+         case QTYPE_QNUM: {
+             QNum *value = qobject_to(QNum, obj);
+             char *tmp = qnum_to_string(value);
+-            func_fprintf(f, "%s", tmp);
++            qemu_printf("%s", tmp);
+             g_free(tmp);
+             break;
          }
--        mon(f, "\n");
+         case QTYPE_QSTRING: {
+             QString *value = qobject_to(QString, obj);
+-            func_fprintf(f, "%s", qstring_get_str(value));
++            qemu_printf("%s", qstring_get_str(value));
+             break;
+         }
+         case QTYPE_QDICT: {
+             QDict *value = qobject_to(QDict, obj);
+-            dump_qdict(func_fprintf, f, comp_indent, value);
++            dump_qdict(comp_indent, value);
+             break;
+         }
+         case QTYPE_QLIST: {
+             QList *value = qobject_to(QList, obj);
+-            dump_qlist(func_fprintf, f, comp_indent, value);
++            dump_qlist(comp_indent, value);
+             break;
+         }
+         case QTYPE_QBOOL: {
+             QBool *value = qobject_to(QBool, obj);
+-            func_fprintf(f, "%s", qbool_get_bool(value) ? "true" : "false");
++            qemu_printf("%s", qbool_get_bool(value) ? "true" : "false");
+             break;
+         }
+         default:
+@@ -735,8 +730,7 @@ static void dump_qobject(fprintf_function func_fprintf, void *f,
+     }
+ }
+ 
+-static void dump_qlist(fprintf_function func_fprintf, void *f, int indentation,
+-                       QList *list)
++static void dump_qlist(int indentation, QList *list)
+ {
+     const QListEntry *entry;
+     int i = 0;
+@@ -744,17 +738,16 @@ static void dump_qlist(fprintf_function func_fprintf, void *f, int indentation,
+     for (entry = qlist_first(list); entry; entry = qlist_next(entry), i++) {
+         QType type = qobject_type(entry->value);
+         bool composite = (type == QTYPE_QDICT || type == QTYPE_QLIST);
+-        func_fprintf(f, "%*s[%i]:%c", indentation * 4, "", i,
+-                     composite ? '\n' : ' ');
+-        dump_qobject(func_fprintf, f, indentation + 1, entry->value);
++        qemu_printf("%*s[%i]:%c", indentation * 4, "", i,
++                    composite ? '\n' : ' ');
++        dump_qobject(indentation + 1, entry->value);
+         if (!composite) {
+-            func_fprintf(f, "\n");
++            qemu_printf("\n");
+         }
+     }
+ }
+ 
+-static void dump_qdict(fprintf_function func_fprintf, void *f, int indentation,
+-                       QDict *dict)
++static void dump_qdict(int indentation, QDict *dict)
+ {
+     const QDictEntry *entry;
+ 
+@@ -769,18 +762,17 @@ static void dump_qdict(fprintf_function func_fprintf, void *f, int indentation,
+             key[i] = entry->key[i] == '-' ? ' ' : entry->key[i];
+         }
+         key[i] = 0;
+-        func_fprintf(f, "%*s%s:%c", indentation * 4, "", key,
+-                     composite ? '\n' : ' ');
+-        dump_qobject(func_fprintf, f, indentation + 1, entry->value);
++        qemu_printf("%*s%s:%c", indentation * 4, "", key,
++                    composite ? '\n' : ' ');
++        dump_qobject(indentation + 1, entry->value);
+         if (!composite) {
+-            func_fprintf(f, "\n");
++            qemu_printf("\n");
+         }
+         g_free(key);
+     }
+ }
+ 
+-void bdrv_image_info_specific_dump(fprintf_function func_fprintf, void *f,
+-                                   ImageInfoSpecific *info_spec)
++void bdrv_image_info_specific_dump(ImageInfoSpecific *info_spec)
+ {
+     QObject *obj, *data;
+     Visitor *v = qobject_output_visitor_new(&obj);
+@@ -788,13 +780,12 @@ void bdrv_image_info_specific_dump(fprintf_function func_fprintf, void *f,
+     visit_type_ImageInfoSpecific(v, NULL, &info_spec, &error_abort);
+     visit_complete(v, &obj);
+     data = qdict_get(qobject_to(QDict, obj), "data");
+-    dump_qobject(func_fprintf, f, 1, data);
++    dump_qobject(1, data);
+     qobject_unref(obj);
+     visit_free(v);
+ }
+ 
+-void bdrv_image_info_dump(fprintf_function func_fprintf, void *f,
+-                          ImageInfo *info)
++void bdrv_image_info_dump(ImageInfo *info)
+ {
+     char size_buf[128], dsize_buf[128];
+     if (!info->has_actual_size) {
+@@ -804,49 +795,48 @@ void bdrv_image_info_dump(fprintf_function func_fprintf, void *f,
+                                 info->actual_size);
+     }
+     get_human_readable_size(size_buf, sizeof(size_buf), info->virtual_size);
+-    func_fprintf(f,
+-                 "image: %s\n"
+-                 "file format: %s\n"
+-                 "virtual size: %s (%" PRId64 " bytes)\n"
+-                 "disk size: %s\n",
+-                 info->filename, info->format, size_buf,
+-                 info->virtual_size,
+-                 dsize_buf);
++    qemu_printf("image: %s\n"
++                "file format: %s\n"
++                "virtual size: %s (%" PRId64 " bytes)\n"
++                "disk size: %s\n",
++                info->filename, info->format, size_buf,
++                info->virtual_size,
++                dsize_buf);
+ 
+     if (info->has_encrypted && info->encrypted) {
+-        func_fprintf(f, "encrypted: yes\n");
++        qemu_printf("encrypted: yes\n");
+     }
+ 
+     if (info->has_cluster_size) {
+-        func_fprintf(f, "cluster_size: %" PRId64 "\n",
+-                       info->cluster_size);
++        qemu_printf("cluster_size: %" PRId64 "\n",
++                    info->cluster_size);
+     }
+ 
+     if (info->has_dirty_flag && info->dirty_flag) {
+-        func_fprintf(f, "cleanly shut down: no\n");
++        qemu_printf("cleanly shut down: no\n");
+     }
+ 
+     if (info->has_backing_filename) {
+-        func_fprintf(f, "backing file: %s", info->backing_filename);
++        qemu_printf("backing file: %s", info->backing_filename);
+         if (!info->has_full_backing_filename) {
+-            func_fprintf(f, " (cannot determine actual path)");
++            qemu_printf(" (cannot determine actual path)");
+         } else if (strcmp(info->backing_filename,
+                           info->full_backing_filename) != 0) {
+-            func_fprintf(f, " (actual path: %s)", info->full_backing_filename);
++            qemu_printf(" (actual path: %s)", info->full_backing_filename);
+         }
+-        func_fprintf(f, "\n");
 +        qemu_printf("\n");
+         if (info->has_backing_filename_format) {
+-            func_fprintf(f, "backing file format: %s\n",
+-                         info->backing_filename_format);
++            qemu_printf("backing file format: %s\n",
++                        info->backing_filename_format);
+         }
      }
  
--    mon(f, "    Nodes (%d bits per level, %d levels) ptr=[%d] skip=%d\n",
-+    qemu_printf("    Nodes (%d bits per level, %d levels) ptr=[%d] skip=%d\n",
-                P_L2_BITS, P_L2_LEVELS, d->phys_map.ptr, d->phys_map.skip);
-     for (i = 0; i < d->map.nodes_nb; ++i) {
-         int j, jprev;
-         PhysPageEntry prev;
-         Node *n = d->map.nodes + i;
+     if (info->has_snapshots) {
+         SnapshotInfoList *elem;
  
--        mon(f, "      [%d]\n", i);
-+        qemu_printf("      [%d]\n", i);
+-        func_fprintf(f, "Snapshot list:\n");
+-        bdrv_snapshot_dump(func_fprintf, f, NULL);
+-        func_fprintf(f, "\n");
++        qemu_printf("Snapshot list:\n");
++        bdrv_snapshot_dump(NULL);
++        qemu_printf("\n");
  
-         for (j = 0, jprev = 0, prev = *n[0]; j < ARRAY_SIZE(*n); ++j) {
-             PhysPageEntry *pe = *n + j;
-@@ -4185,14 +4185,14 @@ void mtree_print_dispatch(fprintf_function mon, void *f,
-                 continue;
-             }
+         /* Ideally bdrv_snapshot_dump() would operate on SnapshotInfoList but
+          * we convert to the block layer's native QEMUSnapshotInfo for now.
+@@ -862,13 +852,13 @@ void bdrv_image_info_dump(fprintf_function func_fprintf, void *f,
  
--            mtree_print_phys_entries(mon, f, jprev, j, prev.skip, prev.ptr);
-+            mtree_print_phys_entries(jprev, j, prev.skip, prev.ptr);
- 
-             jprev = j;
-             prev = *pe;
+             pstrcpy(sn.id_str, sizeof(sn.id_str), elem->value->id);
+             pstrcpy(sn.name, sizeof(sn.name), elem->value->name);
+-            bdrv_snapshot_dump(func_fprintf, f, &sn);
+-            func_fprintf(f, "\n");
++            bdrv_snapshot_dump(&sn);
++            qemu_printf("\n");
          }
+     }
  
-         if (jprev != ARRAY_SIZE(*n)) {
--            mtree_print_phys_entries(mon, f, jprev, j, prev.skip, prev.ptr);
-+            mtree_print_phys_entries(jprev, j, prev.skip, prev.ptr);
-         }
+     if (info->has_format_specific) {
+-        func_fprintf(f, "Format specific information:\n");
+-        bdrv_image_info_specific_dump(func_fprintf, f, info->format_specific);
++        qemu_printf("Format specific information:\n");
++        bdrv_image_info_specific_dump(info->format_specific);
      }
  }
-diff --git a/include/exec/memory-internal.h b/include/exec/memory-internal.h
-index bb08fa4d2f..d1a9dd1ec8 100644
---- a/include/exec/memory-internal.h
-+++ b/include/exec/memory-internal.h
-@@ -45,8 +45,7 @@ AddressSpaceDispatch *address_space_dispatch_new(FlatView *fv);
- void address_space_dispatch_compact(AddressSpaceDispatch *d);
- void address_space_dispatch_free(AddressSpaceDispatch *d);
+diff --git a/hmp.c b/hmp.c
+index 8eec768088..4bb3af748e 100644
+--- a/hmp.c
++++ b/hmp.c
+@@ -580,8 +580,7 @@ static void print_block_info(Monitor *mon, BlockInfo *info,
+         monitor_printf(mon, "\nImages:\n");
+         image_info = inserted->image;
+         while (1) {
+-                bdrv_image_info_dump((fprintf_function)monitor_printf,
+-                                     mon, image_info);
++                bdrv_image_info_dump(image_info);
+             if (image_info->has_backing_image) {
+                 image_info = image_info->backing_image;
+             } else {
+@@ -1586,7 +1585,7 @@ void hmp_info_snapshots(Monitor *mon, const QDict *qdict)
+     monitor_printf(mon, "List of snapshots present on all disks:\n");
  
--void mtree_print_dispatch(fprintf_function mon, void *f,
--                          struct AddressSpaceDispatch *d,
-+void mtree_print_dispatch(struct AddressSpaceDispatch *d,
-                           MemoryRegion *root);
- 
- struct page_collection;
-diff --git a/include/exec/memory.h b/include/exec/memory.h
-index 1625913f84..9144a47f57 100644
---- a/include/exec/memory.h
-+++ b/include/exec/memory.h
-@@ -1720,8 +1720,7 @@ void memory_global_dirty_log_start(void);
-  */
- void memory_global_dirty_log_stop(void);
- 
--void mtree_info(fprintf_function mon_printf, void *f, bool flatview,
--                bool dispatch_tree, bool owner);
-+void mtree_info(bool flatview, bool dispatch_tree, bool owner);
- 
- /**
-  * memory_region_dispatch_read: perform a read directly to the specified
-diff --git a/memory.c b/memory.c
-index 9fbca52e05..bb2b71ee38 100644
---- a/memory.c
-+++ b/memory.c
-@@ -22,6 +22,7 @@
- #include "qapi/visitor.h"
- #include "qemu/bitops.h"
- #include "qemu/error-report.h"
-+#include "qemu/qemu-print.h"
- #include "qom/object.h"
- #include "trace-root.h"
- 
-@@ -2800,46 +2801,43 @@ typedef QTAILQ_HEAD(, MemoryRegionList) MemoryRegionListHead;
-                            int128_sub((size), int128_one())) : 0)
- #define MTREE_INDENT "  "
- 
--static void mtree_expand_owner(fprintf_function mon_printf, void *f,
--                               const char *label, Object *obj)
-+static void mtree_expand_owner(const char *label, Object *obj)
- {
-     DeviceState *dev = (DeviceState *) object_dynamic_cast(obj, TYPE_DEVICE);
- 
--    mon_printf(f, " %s:{%s", label, dev ? "dev" : "obj");
-+    qemu_printf(" %s:{%s", label, dev ? "dev" : "obj");
-     if (dev && dev->id) {
--        mon_printf(f, " id=%s", dev->id);
-+        qemu_printf(" id=%s", dev->id);
-     } else {
-         gchar *canonical_path = object_get_canonical_path(obj);
-         if (canonical_path) {
--            mon_printf(f, " path=%s", canonical_path);
-+            qemu_printf(" path=%s", canonical_path);
-             g_free(canonical_path);
-         } else {
--            mon_printf(f, " type=%s", object_get_typename(obj));
-+            qemu_printf(" type=%s", object_get_typename(obj));
-         }
-     }
--    mon_printf(f, "}");
-+    qemu_printf("}");
- }
- 
--static void mtree_print_mr_owner(fprintf_function mon_printf, void *f,
--                                 const MemoryRegion *mr)
-+static void mtree_print_mr_owner(const MemoryRegion *mr)
- {
-     Object *owner = mr->owner;
-     Object *parent = memory_region_owner((MemoryRegion *)mr);
- 
-     if (!owner && !parent) {
--        mon_printf(f, " orphan");
-+        qemu_printf(" orphan");
-         return;
-     }
-     if (owner) {
--        mtree_expand_owner(mon_printf, f, "owner", owner);
-+        mtree_expand_owner("owner", owner);
-     }
-     if (parent && parent != owner) {
--        mtree_expand_owner(mon_printf, f, "parent", parent);
-+        mtree_expand_owner("parent", parent);
-     }
- }
- 
--static void mtree_print_mr(fprintf_function mon_printf, void *f,
--                           const MemoryRegion *mr, unsigned int level,
-+static void mtree_print_mr(const MemoryRegion *mr, unsigned int level,
-                            hwaddr base,
-                            MemoryRegionListHead *alias_print_queue,
-                            bool owner)
-@@ -2855,7 +2853,7 @@ static void mtree_print_mr(fprintf_function mon_printf, void *f,
-     }
- 
-     for (i = 0; i < level; i++) {
--        mon_printf(f, MTREE_INDENT);
-+        qemu_printf(MTREE_INDENT);
-     }
- 
-     cur_start = base + mr->addr;
-@@ -2867,7 +2865,7 @@ static void mtree_print_mr(fprintf_function mon_printf, void *f,
-      * user who is observing this.
-      */
-     if (cur_start < base || cur_end < cur_start) {
--        mon_printf(f, "[DETECTED OVERFLOW!] ");
-+        qemu_printf("[DETECTED OVERFLOW!] ");
-     }
- 
-     if (mr->alias) {
-@@ -2886,35 +2884,35 @@ static void mtree_print_mr(fprintf_function mon_printf, void *f,
-             ml->mr = mr->alias;
-             QTAILQ_INSERT_TAIL(alias_print_queue, ml, mrqueue);
-         }
--        mon_printf(f, TARGET_FMT_plx "-" TARGET_FMT_plx
--                   " (prio %d, %s%s): alias %s @%s " TARGET_FMT_plx
--                   "-" TARGET_FMT_plx "%s",
--                   cur_start, cur_end,
--                   mr->priority,
--                   mr->nonvolatile ? "nv-" : "",
--                   memory_region_type((MemoryRegion *)mr),
--                   memory_region_name(mr),
--                   memory_region_name(mr->alias),
--                   mr->alias_offset,
--                   mr->alias_offset + MR_SIZE(mr->size),
--                   mr->enabled ? "" : " [disabled]");
-+        qemu_printf(TARGET_FMT_plx "-" TARGET_FMT_plx
-+                    " (prio %d, %s%s): alias %s @%s " TARGET_FMT_plx
-+                    "-" TARGET_FMT_plx "%s",
-+                    cur_start, cur_end,
-+                    mr->priority,
-+                    mr->nonvolatile ? "nv-" : "",
-+                    memory_region_type((MemoryRegion *)mr),
-+                    memory_region_name(mr),
-+                    memory_region_name(mr->alias),
-+                    mr->alias_offset,
-+                    mr->alias_offset + MR_SIZE(mr->size),
-+                    mr->enabled ? "" : " [disabled]");
-         if (owner) {
--            mtree_print_mr_owner(mon_printf, f, mr);
-+            mtree_print_mr_owner(mr);
+     if (total > 0) {
+-        bdrv_snapshot_dump((fprintf_function)monitor_printf, mon, NULL);
++        bdrv_snapshot_dump(NULL);
+         monitor_printf(mon, "\n");
+         for (i = 0; i < total; i++) {
+             sn = &sn_tab[global_snapshots[i]];
+@@ -1594,7 +1593,7 @@ void hmp_info_snapshots(Monitor *mon, const QDict *qdict)
+              * overwrite it.
+              */
+             pstrcpy(sn->id_str, sizeof(sn->id_str), "--");
+-            bdrv_snapshot_dump((fprintf_function)monitor_printf, mon, sn);
++            bdrv_snapshot_dump(sn);
+             monitor_printf(mon, "\n");
          }
      } else {
--        mon_printf(f,
--                   TARGET_FMT_plx "-" TARGET_FMT_plx " (prio %d, %s%s): %s%s",
--                   cur_start, cur_end,
--                   mr->priority,
--                   mr->nonvolatile ? "nv-" : "",
--                   memory_region_type((MemoryRegion *)mr),
--                   memory_region_name(mr),
--                   mr->enabled ? "" : " [disabled]");
-+        qemu_printf(TARGET_FMT_plx "-" TARGET_FMT_plx
-+                    " (prio %d, %s%s): %s%s",
-+                    cur_start, cur_end,
-+                    mr->priority,
-+                    mr->nonvolatile ? "nv-" : "",
-+                    memory_region_type((MemoryRegion *)mr),
-+                    memory_region_name(mr),
-+                    mr->enabled ? "" : " [disabled]");
-         if (owner) {
--            mtree_print_mr_owner(mon_printf, f, mr);
-+            mtree_print_mr_owner(mr);
+@@ -1608,11 +1607,10 @@ void hmp_info_snapshots(Monitor *mon, const QDict *qdict)
+         monitor_printf(mon,
+                        "\nList of partial (non-loadable) snapshots on '%s':\n",
+                        image_entry->imagename);
+-        bdrv_snapshot_dump((fprintf_function)monitor_printf, mon, NULL);
++        bdrv_snapshot_dump(NULL);
+         monitor_printf(mon, "\n");
+         QTAILQ_FOREACH(snapshot_entry, &image_entry->snapshots, next) {
+-            bdrv_snapshot_dump((fprintf_function)monitor_printf, mon,
+-                               &snapshot_entry->sn);
++            bdrv_snapshot_dump(&snapshot_entry->sn);
+             monitor_printf(mon, "\n");
          }
      }
--    mon_printf(f, "\n");
-+    qemu_printf("\n");
+diff --git a/include/block/qapi.h b/include/block/qapi.h
+index a891f43b9c..cd9410dee3 100644
+--- a/include/block/qapi.h
++++ b/include/block/qapi.h
+@@ -27,7 +27,6 @@
  
-     QTAILQ_INIT(&submr_print_queue);
+ #include "block/block.h"
+ #include "block/snapshot.h"
+-#include "qemu/fprintf-fn.h"
  
-@@ -2936,7 +2934,7 @@ static void mtree_print_mr(fprintf_function mon_printf, void *f,
-     }
+ BlockDeviceInfo *bdrv_block_device_info(BlockBackend *blk,
+                                         BlockDriverState *bs, Error **errp);
+@@ -38,10 +37,7 @@ void bdrv_query_image_info(BlockDriverState *bs,
+                            ImageInfo **p_info,
+                            Error **errp);
  
-     QTAILQ_FOREACH(ml, &submr_print_queue, mrqueue) {
--        mtree_print_mr(mon_printf, f, ml->mr, level + 1, cur_start,
-+        mtree_print_mr(ml->mr, level + 1, cur_start,
-                        alias_print_queue, owner);
-     }
- 
-@@ -2946,8 +2944,6 @@ static void mtree_print_mr(fprintf_function mon_printf, void *f,
- }
- 
- struct FlatViewInfo {
--    fprintf_function mon_printf;
--    void *f;
-     int counter;
-     bool dispatch_tree;
-     bool owner;
-@@ -2959,70 +2955,71 @@ static void mtree_print_flatview(gpointer key, gpointer value,
-     FlatView *view = key;
-     GArray *fv_address_spaces = value;
-     struct FlatViewInfo *fvi = user_data;
--    fprintf_function p = fvi->mon_printf;
--    void *f = fvi->f;
-     FlatRange *range = &view->ranges[0];
-     MemoryRegion *mr;
-     int n = view->nr;
-     int i;
-     AddressSpace *as;
- 
--    p(f, "FlatView #%d\n", fvi->counter);
-+    qemu_printf("FlatView #%d\n", fvi->counter);
-     ++fvi->counter;
- 
-     for (i = 0; i < fv_address_spaces->len; ++i) {
-         as = g_array_index(fv_address_spaces, AddressSpace*, i);
--        p(f, " AS \"%s\", root: %s", as->name, memory_region_name(as->root));
-+        qemu_printf(" AS \"%s\", root: %s",
-+                    as->name, memory_region_name(as->root));
-         if (as->root->alias) {
--            p(f, ", alias %s", memory_region_name(as->root->alias));
-+            qemu_printf(", alias %s", memory_region_name(as->root->alias));
-         }
--        p(f, "\n");
-+        qemu_printf("\n");
-     }
- 
--    p(f, " Root memory region: %s\n",
-+    qemu_printf(" Root memory region: %s\n",
-       view->root ? memory_region_name(view->root) : "(none)");
- 
-     if (n <= 0) {
--        p(f, MTREE_INDENT "No rendered FlatView\n\n");
-+        qemu_printf(MTREE_INDENT "No rendered FlatView\n\n");
-         return;
-     }
- 
-     while (n--) {
-         mr = range->mr;
-         if (range->offset_in_region) {
--            p(f, MTREE_INDENT TARGET_FMT_plx "-"
--              TARGET_FMT_plx " (prio %d, %s%s): %s @" TARGET_FMT_plx,
--              int128_get64(range->addr.start),
--              int128_get64(range->addr.start) + MR_SIZE(range->addr.size),
--              mr->priority,
--              range->nonvolatile ? "nv-" : "",
--              range->readonly ? "rom" : memory_region_type(mr),
--              memory_region_name(mr),
--              range->offset_in_region);
-+            qemu_printf(MTREE_INDENT TARGET_FMT_plx "-" TARGET_FMT_plx
-+                        " (prio %d, %s%s): %s @" TARGET_FMT_plx,
-+                        int128_get64(range->addr.start),
-+                        int128_get64(range->addr.start)
-+                        + MR_SIZE(range->addr.size),
-+                        mr->priority,
-+                        range->nonvolatile ? "nv-" : "",
-+                        range->readonly ? "rom" : memory_region_type(mr),
-+                        memory_region_name(mr),
-+                        range->offset_in_region);
-         } else {
--            p(f, MTREE_INDENT TARGET_FMT_plx "-"
--              TARGET_FMT_plx " (prio %d, %s%s): %s",
--              int128_get64(range->addr.start),
--              int128_get64(range->addr.start) + MR_SIZE(range->addr.size),
--              mr->priority,
--              range->nonvolatile ? "nv-" : "",
--              range->readonly ? "rom" : memory_region_type(mr),
--              memory_region_name(mr));
-+            qemu_printf(MTREE_INDENT TARGET_FMT_plx "-" TARGET_FMT_plx
-+                        " (prio %d, %s%s): %s",
-+                        int128_get64(range->addr.start),
-+                        int128_get64(range->addr.start)
-+                        + MR_SIZE(range->addr.size),
-+                        mr->priority,
-+                        range->nonvolatile ? "nv-" : "",
-+                        range->readonly ? "rom" : memory_region_type(mr),
-+                        memory_region_name(mr));
-         }
-         if (fvi->owner) {
--            mtree_print_mr_owner(p, f, mr);
-+            mtree_print_mr_owner(mr);
-         }
--        p(f, "\n");
-+        qemu_printf("\n");
-         range++;
-     }
- 
- #if !defined(CONFIG_USER_ONLY)
-     if (fvi->dispatch_tree && view->root) {
--        mtree_print_dispatch(p, f, view->dispatch, view->root);
-+        mtree_print_dispatch(view->dispatch, view->root);
-     }
+-void bdrv_snapshot_dump(fprintf_function func_fprintf, void *f,
+-                        QEMUSnapshotInfo *sn);
+-void bdrv_image_info_specific_dump(fprintf_function func_fprintf, void *f,
+-                                   ImageInfoSpecific *info_spec);
+-void bdrv_image_info_dump(fprintf_function func_fprintf, void *f,
+-                          ImageInfo *info);
++void bdrv_snapshot_dump(QEMUSnapshotInfo *sn);
++void bdrv_image_info_specific_dump(ImageInfoSpecific *info_spec);
++void bdrv_image_info_dump(ImageInfo *info);
  #endif
+diff --git a/qemu-img.c b/qemu-img.c
+index c376e91ca0..d7fe546b85 100644
+--- a/qemu-img.c
++++ b/qemu-img.c
+@@ -2483,11 +2483,11 @@ static void dump_snapshots(BlockDriverState *bs)
+     if (nb_sns <= 0)
+         return;
+     printf("Snapshot list:\n");
+-    bdrv_snapshot_dump(fprintf, stdout, NULL);
++    bdrv_snapshot_dump(NULL);
+     printf("\n");
+     for(i = 0; i < nb_sns; i++) {
+         sn = &sn_tab[i];
+-        bdrv_snapshot_dump(fprintf, stdout, sn);
++        bdrv_snapshot_dump(sn);
+         printf("\n");
+     }
+     g_free(sn_tab);
+@@ -2536,7 +2536,7 @@ static void dump_human_image_info_list(ImageInfoList *list)
+         }
+         delim = true;
  
--    p(f, "\n");
-+    qemu_printf("\n");
+-        bdrv_image_info_dump(fprintf, stdout, elem->value);
++        bdrv_image_info_dump(elem->value);
+     }
  }
  
- static gboolean mtree_info_flatview_free(gpointer key, gpointer value,
-@@ -3037,8 +3034,7 @@ static gboolean mtree_info_flatview_free(gpointer key, gpointer value,
-     return true;
- }
- 
--void mtree_info(fprintf_function mon_printf, void *f, bool flatview,
--                bool dispatch_tree, bool owner)
-+void mtree_info(bool flatview, bool dispatch_tree, bool owner)
- {
-     MemoryRegionListHead ml_head;
-     MemoryRegionList *ml, *ml2;
-@@ -3047,8 +3043,6 @@ void mtree_info(fprintf_function mon_printf, void *f, bool flatview,
-     if (flatview) {
-         FlatView *view;
-         struct FlatViewInfo fvi = {
--            .mon_printf = mon_printf,
--            .f = f,
-             .counter = 0,
-             .dispatch_tree = dispatch_tree,
-             .owner = owner,
-@@ -3082,16 +3076,16 @@ void mtree_info(fprintf_function mon_printf, void *f, bool flatview,
-     QTAILQ_INIT(&ml_head);
- 
-     QTAILQ_FOREACH(as, &address_spaces, address_spaces_link) {
--        mon_printf(f, "address-space: %s\n", as->name);
--        mtree_print_mr(mon_printf, f, as->root, 1, 0, &ml_head, owner);
--        mon_printf(f, "\n");
-+        qemu_printf("address-space: %s\n", as->name);
-+        mtree_print_mr(as->root, 1, 0, &ml_head, owner);
-+        qemu_printf("\n");
+diff --git a/qemu-io-cmds.c b/qemu-io-cmds.c
+index 09750a23ce..8826bebaf6 100644
+--- a/qemu-io-cmds.c
++++ b/qemu-io-cmds.c
+@@ -1699,7 +1699,7 @@ static int info_f(BlockBackend *blk, int argc, char **argv)
+     }
+     if (spec_info) {
+         printf("Format specific information:\n");
+-        bdrv_image_info_specific_dump(fprintf, stdout, spec_info);
++        bdrv_image_info_specific_dump(spec_info);
+         qapi_free_ImageInfoSpecific(spec_info);
      }
  
-     /* print aliased regions */
-     QTAILQ_FOREACH(ml, &ml_head, mrqueue) {
--        mon_printf(f, "memory-region: %s\n", memory_region_name(ml->mr));
--        mtree_print_mr(mon_printf, f, ml->mr, 1, 0, &ml_head, owner);
--        mon_printf(f, "\n");
-+        qemu_printf("memory-region: %s\n", memory_region_name(ml->mr));
-+        mtree_print_mr(ml->mr, 1, 0, &ml_head, owner);
-+        qemu_printf("\n");
-     }
- 
-     QTAILQ_FOREACH_SAFE(ml, &ml_head, mrqueue, ml2) {
-diff --git a/monitor.c b/monitor.c
-index 1650ceec3a..0819b99ef7 100644
---- a/monitor.c
-+++ b/monitor.c
-@@ -1907,8 +1907,7 @@ static void hmp_info_mtree(Monitor *mon, const QDict *qdict)
-     bool dispatch_tree = qdict_get_try_bool(qdict, "dispatch_tree", false);
-     bool owner = qdict_get_try_bool(qdict, "owner", false);
- 
--    mtree_info((fprintf_function)monitor_printf, mon, flatview, dispatch_tree,
--               owner);
-+    mtree_info(flatview, dispatch_tree, owner);
- }
- 
- static void hmp_info_numa(Monitor *mon, const QDict *qdict)
 -- 
 2.17.2
