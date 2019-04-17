@@ -1,33 +1,23 @@
-Received: from eggs.gnu.org ([209.51.188.92]:58902)
+Received: from eggs.gnu.org ([209.51.188.92]:59349)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jo@durchholz.org>) id 1hGo3y-0006TU-L9
-	for qemu-devel@nongnu.org; Wed, 17 Apr 2019 13:09:35 -0400
+	(envelope-from <ehabkost@redhat.com>) id 1hGo5P-0007TD-TO
+	for qemu-devel@nongnu.org; Wed, 17 Apr 2019 13:11:04 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jo@durchholz.org>) id 1hGo3w-0005wF-Bh
-	for qemu-devel@nongnu.org; Wed, 17 Apr 2019 13:09:34 -0400
-Received: from 5.itsy.de ([188.40.84.14]:47002)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <jo@durchholz.org>) id 1hGo3u-0005sj-OT
-	for qemu-devel@nongnu.org; Wed, 17 Apr 2019 13:09:32 -0400
-Received: from [192.168.178.32] (unknown [195.48.33.209])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-	(No client certificate requested)
-	by 5.itsy.de (Postfix) with ESMTPSA id 242D9645AB
-	for <qemu-devel@nongnu.org>; Wed, 17 Apr 2019 19:09:27 +0200 (CEST)
-References: <874f0f8e-780e-6600-e11b-b97f5b055cf8@durchholz.org>
-	<dbd6541e-5013-d0bc-b23e-a8de4f4cd171@redhat.com>
-	<20190416072430.dp742ehg27drpplb@sirius.home.kraxel.org>
-	<00f0ada2-a68b-2264-ab72-f49fe7d654e7@durchholz.org>
-	<20190417071012.fxedabu3makmoyuz@sirius.home.kraxel.org>
-From: Joachim Durchholz <jo@durchholz.org>
-Message-ID: <993002d4-28dd-00f0-e8c1-7b0d9ab2de12@durchholz.org>
-Date: Wed, 17 Apr 2019 19:09:26 +0200
+	(envelope-from <ehabkost@redhat.com>) id 1hGo5O-0007Nr-Su
+	for qemu-devel@nongnu.org; Wed, 17 Apr 2019 13:11:03 -0400
+Date: Wed, 17 Apr 2019 14:10:59 -0300
+From: Eduardo Habkost <ehabkost@redhat.com>
+Message-ID: <20190417171059.GC25134@habkost.net>
+References: <1555315185-16414-1-git-send-email-like.xu@linux.intel.com>
+	<1555315185-16414-3-git-send-email-like.xu@linux.intel.com>
+	<20190416212003.GB2272@habkost.net>
+	<87ftqh1ae5.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-In-Reply-To: <20190417071012.fxedabu3makmoyuz@sirius.home.kraxel.org>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-GB
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] curses.c: "We need a terminal output" ?
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <87ftqh1ae5.fsf@dusky.pond.sub.org>
+Subject: Re: [Qemu-devel] [PATCH v3 2/2] core/qdev: refactor
+ qdev_get_machine() with type assertion
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,32 +26,50 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Markus Armbruster <armbru@redhat.com>
+Cc: Like Xu <like.xu@linux.intel.com>, Peter Maydell <peter.maydell@linaro.org>, Thomas Huth <thuth@redhat.com>, qemu-trivial@nongnu.org, qemu-devel@nongnu.org, like.xu@intel.com, Igor Mammedov <imammedo@redhat.com>
 
-Sorry, I'm done having to argue against(!) a person who's stonewalling 
-me by wilfully ignoring differences ("doesn't work perfectly" 
-interpreted as "does not work at all"), discounting 
-just-for-testing-purpose workarounds as if they were actual proposed 
-solutions ("not a sane approach"), ignoring the use case (still 
-insisting on terminal size mutability), and proposing a nonworking 
-solution (-nographic does not give me any output, of course because it 
-doesn't have a terminal to talk to).
+On Wed, Apr 17, 2019 at 07:14:10AM +0200, Markus Armbruster wrote:
+> Eduardo Habkost <ehabkost@redhat.com> writes:
+> 
+> > On Mon, Apr 15, 2019 at 03:59:45PM +0800, Like Xu wrote:
+> >> To avoid the misuse of qdev_get_machine() if machine hasn't been created yet,
+> >> this patch uses qdev_get_machine_uncheck() for obj-common (share with user-only
+> >> mode) and adds type assertion to qdev_get_machine() in system-emulation mode.
+> >> 
+> >> Suggested-by: Igor Mammedov <imammedo@redhat.com>
+> >> Signed-off-by: Like Xu <like.xu@linux.intel.com>
+> >
+> > Reviewed-by: Eduardo Habkost <ehabkost@redhat.com>
+> >
+> > I'm queueing the series on machine-next, thanks!
+> 
+> Hold your horses, please.
+> 
+> I dislike the name qdev_get_machine_uncheck().  I could live with
+> qdev_get_machine_unchecked().
+> 
+> However, I doubt this is the right approach.
+> 
+> The issue at hand is undisciplined creation of QOM object /machine.
+> 
+> This patch adds an asseertion "undisciplined creation of /machine didn't
+> create crap", but only in some places.
+> 
+> I think we should never create /machine as (surprising!) side effect of
+> qdev_get_machine().  Create it explicitly instead, and have
+> qdev_get_machine() use object_resolve_path("/machine", NULL) to get it.
+> Look ma, no side effects.
 
-Reminds me of discussions in the Maven group, there, anything that 
-didn't fit their shiny predefined ideas was brushed off in a similar manner.
-Choosing the same solution: Use a different workaround, chalk this up 
-under the Passive-Aggressive Unhelpfulness Encountered column.
+OK, I'm dropping this one while we discuss it.
 
-No hard feelings towards the community.
+I really miss a good explanation why qdev_get_machine_unchecked()
+needs to exist.  When exactly do we want /machine to exist but
+not be TYPE_MACHINE?  Why?
 
-Have a nice day everyone.
-Jo
+Once the expectations and use cases are explained, we can choose
+a better name for qdev_get_machine_unchecked() and document it
+properly.
 
-P.S.: Frustrated. In two ways.
-Latin "frustra" = "in vain".
-
-P.P.S.: I will stick around a bit so I can answer to questions based on 
-genuine interest, but I'll disconnect from the list after that.
-
-P.P.P.S.: No hard feelings towards the community in general. In fact, 
-thanks to those two who tried to help.
+-- 
+Eduardo
