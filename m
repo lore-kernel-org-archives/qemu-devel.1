@@ -1,22 +1,34 @@
-Received: from eggs.gnu.org ([209.51.188.92]:40850)
+Received: from eggs.gnu.org ([209.51.188.92]:50427)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1hGokR-0007MP-CF
-	for qemu-devel@nongnu.org; Wed, 17 Apr 2019 13:53:28 -0400
+	(envelope-from <armbru@redhat.com>) id 1hGozi-0003Q9-Gd
+	for qemu-devel@nongnu.org; Wed, 17 Apr 2019 14:09:15 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1hGokJ-0002W0-GN
-	for qemu-devel@nongnu.org; Wed, 17 Apr 2019 13:53:22 -0400
-References: <20190417171101.1254-1-eblake@redhat.com>
-	<20190417171101.1254-3-eblake@redhat.com>
-From: Max Reitz <mreitz@redhat.com>
-Message-ID: <4ce5d8a7-8fdc-84ec-bb4c-0e7248aad62c@redhat.com>
-Date: Wed, 17 Apr 2019 19:52:57 +0200
+	(envelope-from <armbru@redhat.com>) id 1hGozh-0004WZ-Hz
+	for qemu-devel@nongnu.org; Wed, 17 Apr 2019 14:09:14 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:57596)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1hGozh-0004W2-93
+	for qemu-devel@nongnu.org; Wed, 17 Apr 2019 14:09:13 -0400
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+	[10.5.11.23])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id C35B4C057F4C
+	for <qemu-devel@nongnu.org>; Wed, 17 Apr 2019 18:09:11 +0000 (UTC)
+From: Markus Armbruster <armbru@redhat.com>
+References: <20190411145256.8614-1-armbru@redhat.com>
+	<20190411145256.8614-4-armbru@redhat.com>
+	<0683b00f-1d17-137b-1273-ba063d0d9dba@redhat.com>
+	<87tvf4v9i0.fsf@dusky.pond.sub.org>
+Date: Wed, 17 Apr 2019 20:09:07 +0200
+In-Reply-To: <87tvf4v9i0.fsf@dusky.pond.sub.org> (Markus Armbruster's message
+	of "Thu, 11 Apr 2019 17:37:11 +0200")
+Message-ID: <87zhoov70c.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-In-Reply-To: <20190417171101.1254-3-eblake@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="evzUGUgenlz3T2Qc3tMFLvCw40aCrowVM"
-Subject: Re: [Qemu-devel] [PATCH v3 2/2] qemu-img: Saner printing of large
- file sizes
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v2 03/15] char-pty: Drop "char device
+ redirected to" message
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,75 +37,56 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org
-Cc: kwolf@redhat.com, qemu-block@nongnu.org, "Richard W . M . Jones" <rjones@redhat.com>, Alberto Garcia <berto@igalia.com>, Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, Markus Armbruster <armbru@redhat.com>
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: qemu-devel@nongnu.org, =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---evzUGUgenlz3T2Qc3tMFLvCw40aCrowVM
-From: Max Reitz <mreitz@redhat.com>
-To: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org
-Cc: kwolf@redhat.com, qemu-block@nongnu.org,
- "Richard W . M . Jones" <rjones@redhat.com>,
- Alberto Garcia <berto@igalia.com>,
- Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
- Markus Armbruster <armbru@redhat.com>
-Message-ID: <4ce5d8a7-8fdc-84ec-bb4c-0e7248aad62c@redhat.com>
-Subject: Re: [PATCH v3 2/2] qemu-img: Saner printing of large file sizes
-References: <20190417171101.1254-1-eblake@redhat.com>
- <20190417171101.1254-3-eblake@redhat.com>
-In-Reply-To: <20190417171101.1254-3-eblake@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+Markus Armbruster <armbru@redhat.com> writes:
 
-On 17.04.19 19:11, Eric Blake wrote:
-> Disk sizes close to INT64_MAX cause overflow, for some pretty
-> ridiculous output:
->=20
->   $ ./nbdkit -U - memory size=3D$((2**63 - 512)) --run 'qemu-img info $=
-nbd'
->   image: nbd+unix://?socket=3D/tmp/nbdkitHSAzNz/socket
->   file format: raw
->   virtual size: -8388607T (9223372036854775296 bytes)
->   disk size: unavailable
->=20
-> But there's no reason to have two separate implementations of integer
-> to human-readable abbreviation, where one has overflow and stops at
-> 'T', while the other avoids overflow and goes all the way to 'E'. With
-> this patch, the output now claims 8EiB instead of -8388607T, which
-> really is the correct rounding of largest file size supported by qemu
-> (we could go 511 bytes larger if we used byte-accurate sizing instead
-> of rounding up to the next sector boundary, but that wouldn't change
-> the human-readable result).
->=20
-> Quite a few iotests need updates to expected output to match.
->=20
-> Reported-by: Richard W.M. Jones <rjones@redhat.com>
-> Signed-off-by: Eric Blake <eblake@redhat.com>
-> Tested-by: Richard W.M. Jones <rjones@redhat.com>
-> Reviewed-by: Alberto Garcia <berto@igalia.com>
-> Reviewed-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
->=20
-> ---
-> v3: fix 59 for vmdk [Max]
+> Paolo Bonzini <pbonzini@redhat.com> writes:
+>
+>> On 11/04/19 16:52, Markus Armbruster wrote:
+>>> char_pty_open() prints a "char device redirected to PTY_NAME (label
+>>> LABEL)" message to the current monitor or else to stderr.  No other
+>>> ChardevClass::open() prints anything on success.  Drop the message.
+>>>=20
+>>> Cc: "Marc-Andr=C3=A9 Lureau" <marcandre.lureau@redhat.com>
+>>> Cc: Paolo Bonzini <pbonzini@redhat.com>
+>>> Signed-off-by: Markus Armbruster <armbru@redhat.com>
+>>> Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+>>> ---
+>>>  chardev/char-pty.c | 2 --
+>>>  1 file changed, 2 deletions(-)
+>>>=20
+>>> diff --git a/chardev/char-pty.c b/chardev/char-pty.c
+>>> index b034332edd..a48d3e5d20 100644
+>>> --- a/chardev/char-pty.c
+>>> +++ b/chardev/char-pty.c
+>>> @@ -211,8 +211,6 @@ static void char_pty_open(Chardev *chr,
+>>>      qemu_set_nonblock(master_fd);
+>>>=20=20
+>>>      chr->filename =3D g_strdup_printf("pty:%s", pty_name);
+>>> -    error_printf("char device redirected to %s (label %s)\n",
+>>> -                 pty_name, chr->label);
+>>>=20=20
+>>>      s =3D PTY_CHARDEV(chr);
+>>>      s->ioc =3D QIO_CHANNEL(qio_channel_file_new_fd(master_fd));
+>>
+>> The reason for the message is that the char device is completely useless
+>> until the user knows the /dev/pts/N path[1].  You can get it with "info
+>> chardev" (aka query-chardev for QMP) but there's an interesting chicken
+>> and egg problem if the pty is for your monitor...
+>>
+>> Paolo
+>
+> During review of v1, I wrote:
+>
+>     If we should decide the message is still useful enough to be worth
+>     keeping, I could direct it to stdout instead of dropping it.
+>
+> No clear conclusion emerged, so I did nothing for v2.  If we conclude to
+> keep the message now, I'll gladly do that.
 
-Tested-by: Max Reitz <mreitz@redhat.com>
+No further comments, no clear conclusion, so let's stick to the status
+quo.  I'll drop this patch and add one to print the message to stdout.
 
-
---evzUGUgenlz3T2Qc3tMFLvCw40aCrowVM
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAly3Z/kACgkQ9AfbAGHV
-z0AGjQf8CR8hVFib6FhaLB3SLLJdOzrUBQ3140xO4NDBs06frNxcqD4KOyyMFLQc
-mEmGcgnsuTgfEPuIfKdXXg7FPAqMyG244dWWpWiXa8fMCbGSq8czlwGcFapIzMNY
-Zv3cNUjMg3S5GzV8TBeMcgUMgg9BqPCui3U49xrv9We7ewiUHvFpK+TrtAKXAGgC
-YCBcCI+j0QgQRkScMDwg+gbS/ZmN2FXaq3BegyfOEGZfPtCHUFJFFgiKRD7jgajQ
-mtQCmiHtpwbJVc5PfFM2WOMq6RhRup7UQx7bg2idk14RQB1i5MnNVBLKNEATVoLv
-rtB6bTqR2wvS0j5IyPYX5JbE3lFgDQ==
-=0/vy
------END PGP SIGNATURE-----
-
---evzUGUgenlz3T2Qc3tMFLvCw40aCrowVM--
+[...]
