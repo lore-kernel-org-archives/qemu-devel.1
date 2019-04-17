@@ -1,31 +1,31 @@
-Received: from eggs.gnu.org ([209.51.188.92]:44017)
+Received: from eggs.gnu.org ([209.51.188.92]:46109)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1hGlQg-0006L0-Kl
-	for qemu-devel@nongnu.org; Wed, 17 Apr 2019 10:20:53 -0400
+	(envelope-from <bounces@canonical.com>) id 1hGlVT-0007lq-Mw
+	for qemu-devel@nongnu.org; Wed, 17 Apr 2019 10:25:49 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1hGlQb-0007II-Nc
-	for qemu-devel@nongnu.org; Wed, 17 Apr 2019 10:20:48 -0400
-Received: from indium.canonical.com ([91.189.90.7]:37500)
+	(envelope-from <bounces@canonical.com>) id 1hGlVR-0004Vf-LP
+	for qemu-devel@nongnu.org; Wed, 17 Apr 2019 10:25:47 -0400
+Received: from indium.canonical.com ([91.189.90.7]:39426)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1hGlQZ-0007Bi-IK
-	for qemu-devel@nongnu.org; Wed, 17 Apr 2019 10:20:44 -0400
+	id 1hGlVR-0004Ua-7q
+	for qemu-devel@nongnu.org; Wed, 17 Apr 2019 10:25:45 -0400
 Received: from loganberry.canonical.com ([91.189.90.37])
 	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1hGlQW-0004nr-OA
-	for <qemu-devel@nongnu.org>; Wed, 17 Apr 2019 14:20:40 +0000
+	id 1hGlVP-0005l3-Ag
+	for <qemu-devel@nongnu.org>; Wed, 17 Apr 2019 14:25:43 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id B3A052E80CB
-	for <qemu-devel@nongnu.org>; Wed, 17 Apr 2019 14:20:40 +0000 (UTC)
+	by loganberry.canonical.com (Postfix) with ESMTP id 026532E80CC
+	for <qemu-devel@nongnu.org>; Wed, 17 Apr 2019 14:25:43 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Wed, 17 Apr 2019 14:15:26 -0000
-From: Thomas Huth <1825002@bugs.launchpad.net>
+Date: Wed, 17 Apr 2019 14:17:19 -0000
+From: Daniel Santos <daniel.santos@pobox.com>
 Reply-To: Bug 1825002 <1825002@bugs.launchpad.net>
 Sender: bounces@canonical.com
 References: <155542675846.7866.6509809085972568558.malonedeb@wampee.canonical.com>
-Message-Id: <155551052683.6687.2881115955716541521.malone@chaenomeles.canonical.com>
+Message-Id: <155551064003.17547.18398864625528309086.malone@soybean.canonical.com>
 Errors-To: bounces@canonical.com
 Subject: [Qemu-devel] [Bug 1825002] Re: "qemu: Unexpected FPU mode" since
  0c1bbedc10e86ea9366b6af8c5520fafa3266b2f
@@ -39,9 +39,12 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-Please send patches to the mailing list for inclusion. QEMU maintainers
-normally don't take patches from the bug tracker. See
-https://wiki.qemu.org/Contribute/SubmitAPatch
+Actually, this is a better patch.  Let's sanitize struct image_info
+interp_info.
+
+** Patch added: "0001-1825002-fix-mips-Unexpected-FPU-mode.patch"
+   https://bugs.launchpad.net/qemu/+bug/1825002/+attachment/5256566/+files/=
+0001-1825002-fix-mips-Unexpected-FPU-mode.patch
 
 -- =
 
