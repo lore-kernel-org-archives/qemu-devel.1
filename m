@@ -6,58 +6,58 @@ X-Spam-Status: No, score=-6.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7D43FC282DA
-	for <qemu-devel@archiver.kernel.org>; Wed, 17 Apr 2019 19:28:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 36167C282DA
+	for <qemu-devel@archiver.kernel.org>; Wed, 17 Apr 2019 19:29:36 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3972C20835
-	for <qemu-devel@archiver.kernel.org>; Wed, 17 Apr 2019 19:28:27 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3972C20835
+	by mail.kernel.org (Postfix) with ESMTPS id F2A3E204FD
+	for <qemu-devel@archiver.kernel.org>; Wed, 17 Apr 2019 19:29:35 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F2A3E204FD
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:58436 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:58442 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hGqEM-0007ym-Ba
-	for qemu-devel@archiver.kernel.org; Wed, 17 Apr 2019 15:28:26 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:34796)
+	id 1hGqFT-0000Qh-4V
+	for qemu-devel@archiver.kernel.org; Wed, 17 Apr 2019 15:29:35 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:34720)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1hGq4Y-0008Up-K9
-	for qemu-devel@nongnu.org; Wed, 17 Apr 2019 15:18:20 -0400
+	(envelope-from <armbru@redhat.com>) id 1hGq4R-0008Ny-8v
+	for qemu-devel@nongnu.org; Wed, 17 Apr 2019 15:18:12 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1hGq4V-00006D-3E
-	for qemu-devel@nongnu.org; Wed, 17 Apr 2019 15:18:17 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:56700)
+	(envelope-from <armbru@redhat.com>) id 1hGq4O-0008NB-Kg
+	for qemu-devel@nongnu.org; Wed, 17 Apr 2019 15:18:10 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:46844)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1hGq4S-0008OQ-QS
-	for qemu-devel@nongnu.org; Wed, 17 Apr 2019 15:18:13 -0400
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
-	[10.5.11.12])
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1hGq4O-0008Ld-3Y
+	for qemu-devel@nongnu.org; Wed, 17 Apr 2019 15:18:08 -0400
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+	[10.5.11.23])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 1470959464
-	for <qemu-devel@nongnu.org>; Wed, 17 Apr 2019 19:18:09 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id 5922530ADBA2
+	for <qemu-devel@nongnu.org>; Wed, 17 Apr 2019 19:18:07 +0000 (UTC)
 Received: from blackfin.pond.sub.org (ovpn-116-116.ams2.redhat.com
 	[10.36.116.116])
-	by smtp.corp.redhat.com (Postfix) with ESMTPS id AFEC560C69;
-	Wed, 17 Apr 2019 19:18:08 +0000 (UTC)
+	by smtp.corp.redhat.com (Postfix) with ESMTPS id F316E19C7B;
+	Wed, 17 Apr 2019 19:18:06 +0000 (UTC)
 Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
-	id 97BD6113298A; Wed, 17 Apr 2019 21:18:05 +0200 (CEST)
+	id 7712E1132B6C; Wed, 17 Apr 2019 21:18:05 +0200 (CEST)
 From: Markus Armbruster <armbru@redhat.com>
 To: qemu-devel@nongnu.org
-Date: Wed, 17 Apr 2019 21:18:00 +0200
-Message-Id: <20190417191805.28198-13-armbru@redhat.com>
+Date: Wed, 17 Apr 2019 21:17:51 +0200
+Message-Id: <20190417191805.28198-4-armbru@redhat.com>
 In-Reply-To: <20190417191805.28198-1-armbru@redhat.com>
 References: <20190417191805.28198-1-armbru@redhat.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.39]);
-	Wed, 17 Apr 2019 19:18:09 +0000 (UTC)
+	(mx1.redhat.com [10.5.110.47]);
+	Wed, 17 Apr 2019 19:18:07 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] [PATCH v2 12/17] qom/cpu: Simplify how
- CPUClass::dump_statistics() prints
+Subject: [Qemu-devel] [PATCH v2 03/17] tcg: Simplify how dump_opcount_info()
+ prints
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -74,148 +74,124 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 Content-Type: text/plain; charset="UTF-8"
-Message-ID: <20190417191800.rarhEVM04U-a7n_BOY8gSX4V86IcP82RIgcaBy4dN1k@z>
+Message-ID: <20190417191751.N1ZwepyXqKVeYm2QQOVZUDoWnZIubgJ0LAJBr7VP204@z>
 
-CPUClass method dump_statistics() takes an fprintf()-like callback and
-a FILE * to pass to it.
+dump_opcount_info() takes an fprintf()-like callback and a FILE * to
+pass to it.
 
-Its only caller hmp_info_cpustats() (via cpu_dump_statistics()) passes
-monitor_fprintf() and the current monitor cast to FILE *.
-monitor_fprintf() casts it right back, and is otherwise identical to
-monitor_printf().  The type-punning is ugly.
+Its only caller hmp_info_opcount() passes monitor_fprintf() and the
+current monitor cast to FILE *.  monitor_fprintf() casts it right
+back, and is otherwise identical to monitor_printf().  The
+type-punning is ugly.
 
 Drop the callback, and call qemu_printf() instead.
 
 Signed-off-by: Markus Armbruster <armbru@redhat.com>
 Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
 ---
- include/qom/cpu.h      | 11 ++++-------
- monitor.c              |  2 +-
- qom/cpu.c              |  5 ++---
- target/ppc/cpu.h       |  3 +--
- target/ppc/translate.c |  9 ++++-----
- 5 files changed, 12 insertions(+), 18 deletions(-)
+ accel/tcg/translate-all.c | 4 ++--
+ include/exec/cpu-all.h    | 2 +-
+ monitor.c                 | 2 +-
+ tcg/tcg.c                 | 9 +++++----
+ tcg/tcg.h                 | 2 +-
+ 5 files changed, 10 insertions(+), 9 deletions(-)
 
-diff --git a/include/qom/cpu.h b/include/qom/cpu.h
-index 1d6099e5d4..31bafee2b1 100644
---- a/include/qom/cpu.h
-+++ b/include/qom/cpu.h
-@@ -184,8 +184,7 @@ typedef struct CPUClass {
-     void (*dump_state)(CPUState *cpu, FILE *f, fprintf_function cpu_fprintf,
-                        int flags);
-     GuestPanicInformation* (*get_crash_info)(CPUState *cpu);
--    void (*dump_statistics)(CPUState *cpu, FILE *f,
--                            fprintf_function cpu_fprintf, int flags);
-+    void (*dump_statistics)(CPUState *cpu, int flags);
-     int64_t (*get_arch_id)(CPUState *cpu);
-     bool (*get_paging_enabled)(const CPUState *cpu);
-     void (*get_memory_mapping)(CPUState *cpu, MemoryMappingList *list,
-@@ -576,14 +575,12 @@ void cpu_dump_state(CPUState *cpu, FILE *f, fprintf_function cpu_fprintf,
- /**
-  * cpu_dump_statistics:
-  * @cpu: The CPU whose state is to be dumped.
-- * @f: File to dump to.
-- * @cpu_fprintf: Function to dump with.
-  * @flags: Flags what to dump.
-  *
-- * Dumps CPU statistics.
-+ * Dump CPU statistics to the current monitor if we have one, else to
-+ * stdout.
-  */
--void cpu_dump_statistics(CPUState *cpu, FILE *f, fprintf_function cpu_fprintf,
--                         int flags);
-+void cpu_dump_statistics(CPUState *cpu, int flags);
+diff --git a/accel/tcg/translate-all.c b/accel/tcg/translate-all.c
+index 8f593b926f..85e80a1fad 100644
+--- a/accel/tcg/translate-all.c
++++ b/accel/tcg/translate-all.c
+@@ -2333,9 +2333,9 @@ void dump_exec_info(FILE *f, fprintf_function cpu_fprintf)
+     tcg_dump_info(f, cpu_fprintf);
+ }
  
- #ifndef CONFIG_USER_ONLY
- /**
+-void dump_opcount_info(FILE *f, fprintf_function cpu_fprintf)
++void dump_opcount_info(void)
+ {
+-    tcg_dump_op_count(f, cpu_fprintf);
++    tcg_dump_op_count();
+ }
+ 
+ #else /* CONFIG_USER_ONLY */
+diff --git a/include/exec/cpu-all.h b/include/exec/cpu-all.h
+index b16c9ec513..40f5edf4dc 100644
+--- a/include/exec/cpu-all.h
++++ b/include/exec/cpu-all.h
+@@ -363,7 +363,7 @@ static inline bool tlb_hit(target_ulong tlb_addr, target_ulong addr)
+ }
+ 
+ void dump_exec_info(FILE *f, fprintf_function cpu_fprintf);
+-void dump_opcount_info(FILE *f, fprintf_function cpu_fprintf);
++void dump_opcount_info(void);
+ #endif /* !CONFIG_USER_ONLY */
+ 
+ int cpu_memory_rw_debug(CPUState *cpu, target_ulong addr,
 diff --git a/monitor.c b/monitor.c
-index 0819b99ef7..fb5b681099 100644
+index a3e66b7159..30a7ffe32b 100644
 --- a/monitor.c
 +++ b/monitor.c
-@@ -1364,7 +1364,7 @@ static void hmp_info_cpustats(Monitor *mon, const QDict *qdict)
-         monitor_printf(mon, "No CPU available\n");
-         return;
-     }
--    cpu_dump_statistics(cs, (FILE *)mon, &monitor_fprintf, 0);
-+    cpu_dump_statistics(cs, 0);
- }
+@@ -1324,7 +1324,7 @@ static void hmp_info_jit(Monitor *mon, const QDict *qdict)
  
- static void hmp_info_trace_events(Monitor *mon, const QDict *qdict)
-diff --git a/qom/cpu.c b/qom/cpu.c
-index a8d2958956..029e7fe9b0 100644
---- a/qom/cpu.c
-+++ b/qom/cpu.c
-@@ -230,13 +230,12 @@ void cpu_dump_state(CPUState *cpu, FILE *f, fprintf_function cpu_fprintf,
-     }
- }
- 
--void cpu_dump_statistics(CPUState *cpu, FILE *f, fprintf_function cpu_fprintf,
--                         int flags)
-+void cpu_dump_statistics(CPUState *cpu, int flags)
+ static void hmp_info_opcount(Monitor *mon, const QDict *qdict)
  {
-     CPUClass *cc = CPU_GET_CLASS(cpu);
+-    dump_opcount_info((FILE *)mon, monitor_fprintf);
++    dump_opcount_info();
+ }
+ #endif
  
-     if (cc->dump_statistics) {
--        cc->dump_statistics(cpu, f, cpu_fprintf, flags);
-+        cc->dump_statistics(cpu, flags);
+diff --git a/tcg/tcg.c b/tcg/tcg.c
+index 9b2bf7f439..cc5f4e2a03 100644
+--- a/tcg/tcg.c
++++ b/tcg/tcg.c
+@@ -33,6 +33,7 @@
+ #include "qemu/error-report.h"
+ #include "qemu/cutils.h"
+ #include "qemu/host-utils.h"
++#include "qemu/qemu-print.h"
+ #include "qemu/timer.h"
+ 
+ /* Note: the long term plan is to reduce the dependencies on the QEMU
+@@ -3768,14 +3769,14 @@ static void tcg_profile_snapshot_table(TCGProfile *prof)
+     tcg_profile_snapshot(prof, false, true);
+ }
+ 
+-void tcg_dump_op_count(FILE *f, fprintf_function cpu_fprintf)
++void tcg_dump_op_count(void)
+ {
+     TCGProfile prof = {};
+     int i;
+ 
+     tcg_profile_snapshot_table(&prof);
+     for (i = 0; i < NB_OPS; i++) {
+-        cpu_fprintf(f, "%s %" PRId64 "\n", tcg_op_defs[i].name,
++        qemu_printf("%s %" PRId64 "\n", tcg_op_defs[i].name,
+                     prof.table_op_count[i]);
      }
  }
- 
-diff --git a/target/ppc/cpu.h b/target/ppc/cpu.h
-index 8572241364..27a36b9605 100644
---- a/target/ppc/cpu.h
-+++ b/target/ppc/cpu.h
-@@ -1270,8 +1270,7 @@ void ppc_cpu_do_interrupt(CPUState *cpu);
- bool ppc_cpu_exec_interrupt(CPUState *cpu, int int_req);
- void ppc_cpu_dump_state(CPUState *cpu, FILE *f, fprintf_function cpu_fprintf,
-                         int flags);
--void ppc_cpu_dump_statistics(CPUState *cpu, FILE *f,
--                             fprintf_function cpu_fprintf, int flags);
-+void ppc_cpu_dump_statistics(CPUState *cpu, int flags);
- hwaddr ppc_cpu_get_phys_page_debug(CPUState *cpu, vaddr addr);
- int ppc_cpu_gdb_read_register(CPUState *cpu, uint8_t *buf, int reg);
- int ppc_cpu_gdb_read_register_apple(CPUState *cpu, uint8_t *buf, int reg);
-diff --git a/target/ppc/translate.c b/target/ppc/translate.c
-index badc1ae1a3..f99f27a134 100644
---- a/target/ppc/translate.c
-+++ b/target/ppc/translate.c
-@@ -7593,8 +7593,7 @@ void ppc_cpu_dump_state(CPUState *cs, FILE *f, fprintf_function cpu_fprintf,
- #undef RFPL
+@@ -3795,9 +3796,9 @@ int64_t tcg_cpu_exec_time(void)
+     return ret;
+ }
+ #else
+-void tcg_dump_op_count(FILE *f, fprintf_function cpu_fprintf)
++void tcg_dump_op_count(void)
+ {
+-    cpu_fprintf(f, "[TCG profiler not compiled]\n");
++    qemu_printf("[TCG profiler not compiled]\n");
  }
  
--void ppc_cpu_dump_statistics(CPUState *cs, FILE*f,
--                             fprintf_function cpu_fprintf, int flags)
-+void ppc_cpu_dump_statistics(CPUState *cs, int flags)
- {
- #if defined(DO_PPC_STATISTICS)
-     PowerPCCPU *cpu = POWERPC_CPU(cs);
-@@ -7614,7 +7613,7 @@ void ppc_cpu_dump_statistics(CPUState *cs, FILE*f,
-                         handler = t3[op3];
-                         if (handler->count == 0)
-                             continue;
--                        cpu_fprintf(f, "%02x %02x %02x (%02x %04d) %16s: "
-+                        qemu_printf("%02x %02x %02x (%02x %04d) %16s: "
-                                     "%016" PRIx64 " %" PRId64 "\n",
-                                     op1, op2, op3, op1, (op3 << 5) | op2,
-                                     handler->oname,
-@@ -7623,7 +7622,7 @@ void ppc_cpu_dump_statistics(CPUState *cs, FILE*f,
-                 } else {
-                     if (handler->count == 0)
-                         continue;
--                    cpu_fprintf(f, "%02x %02x    (%02x %04d) %16s: "
-+                    qemu_printf("%02x %02x    (%02x %04d) %16s: "
-                                 "%016" PRIx64 " %" PRId64 "\n",
-                                 op1, op2, op1, op2, handler->oname,
-                                 handler->count, handler->count);
-@@ -7632,7 +7631,7 @@ void ppc_cpu_dump_statistics(CPUState *cs, FILE*f,
-         } else {
-             if (handler->count == 0)
-                 continue;
--            cpu_fprintf(f, "%02x       (%02x     ) %16s: %016" PRIx64
-+            qemu_printf("%02x       (%02x     ) %16s: %016" PRIx64
-                         " %" PRId64 "\n",
-                         op1, op1, handler->oname,
-                         handler->count, handler->count);
+ int64_t tcg_cpu_exec_time(void)
+diff --git a/tcg/tcg.h b/tcg/tcg.h
+index 32b7cf3489..9f2b03f119 100644
+--- a/tcg/tcg.h
++++ b/tcg/tcg.h
+@@ -1018,7 +1018,7 @@ int tcg_check_temp_count(void);
+ 
+ int64_t tcg_cpu_exec_time(void);
+ void tcg_dump_info(FILE *f, fprintf_function cpu_fprintf);
+-void tcg_dump_op_count(FILE *f, fprintf_function cpu_fprintf);
++void tcg_dump_op_count(void);
+ 
+ #define TCG_CT_ALIAS  0x80
+ #define TCG_CT_IALIAS 0x40
 -- 
 2.17.2
 
