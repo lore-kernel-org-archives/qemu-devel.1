@@ -2,73 +2,70 @@ Return-Path: <SRS0=PAXx=ST=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-5.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_PASS,URIBL_BLOCKED autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CD643C282DA
-	for <qemu-devel@archiver.kernel.org>; Wed, 17 Apr 2019 20:26:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 433E5C282DA
+	for <qemu-devel@archiver.kernel.org>; Wed, 17 Apr 2019 20:28:36 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8D28220693
-	for <qemu-devel@archiver.kernel.org>; Wed, 17 Apr 2019 20:26:49 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8D28220693
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id B0A92205C9
+	for <qemu-devel@archiver.kernel.org>; Wed, 17 Apr 2019 20:28:35 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B0A92205C9
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=patchew.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:59287 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:59294 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hGr8q-0006Fm-Rn
-	for qemu-devel@archiver.kernel.org; Wed, 17 Apr 2019 16:26:48 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:49883)
+	id 1hGrAY-0006un-Jr
+	for qemu-devel@archiver.kernel.org; Wed, 17 Apr 2019 16:28:34 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:50243)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1hGr87-0005up-1e
-	for qemu-devel@nongnu.org; Wed, 17 Apr 2019 16:26:05 -0400
+	(envelope-from <no-reply@patchew.org>) id 1hGr9n-0006br-Jh
+	for qemu-devel@nongnu.org; Wed, 17 Apr 2019 16:27:49 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1hGr83-0005PC-HZ
-	for qemu-devel@nongnu.org; Wed, 17 Apr 2019 16:26:02 -0400
-Received: from indium.canonical.com ([91.189.90.7]:47538)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1hGr81-0005A3-8n
-	for qemu-devel@nongnu.org; Wed, 17 Apr 2019 16:25:57 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1hGr7u-0006tg-KT
-	for <qemu-devel@nongnu.org>; Wed, 17 Apr 2019 20:25:50 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 241912E80E3
-	for <qemu-devel@nongnu.org>; Wed, 17 Apr 2019 20:25:47 +0000 (UTC)
+	(envelope-from <no-reply@patchew.org>) id 1hGr9m-0000yk-5h
+	for qemu-devel@nongnu.org; Wed, 17 Apr 2019 16:27:47 -0400
+Resent-Date: Wed, 17 Apr 2019 16:27:47 -0400
+Resent-Message-Id: <E1hGr9m-0000yk-5h@eggs.gnu.org>
+Received: from sender4-of-o55.zoho.com ([136.143.188.55]:21582)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
+	id 1hGr9l-0000u2-Tv
+	for qemu-devel@nongnu.org; Wed, 17 Apr 2019 16:27:46 -0400
+ARC-Seal: i=1; a=rsa-sha256; t=1555532854; cv=none; d=zoho.com; s=zohoarc; 
+	b=mnamvhXiwkFXlJxBO+RX0kTvIQX9oEp47h+KXlTtpknIVA+onFntRor0H53r7bA2bzFDi9Dlo1jpLRq0yl319TEUEgJpMMpiqn1N2O2Z5dvIZFpxFjnFdZWAMOgCPQvhlM6/vJfrb1gzAbKGSwBros9RFbLxVAglq84zBsxJ8OA=
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zoho.com;
+	s=zohoarc; t=1555532854;
+	h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:Reply-To:Subject:To:ARC-Authentication-Results;
+	bh=4dHnBQeqvUYt4fLm8mldBWe2XQlvJuAPpfQhMZRbV5c=; 
+	b=MKYFHxuPKp0Lo0YQc1HZxsWvW6lxtk/Ri+5DOoAJTd/Kn5Bu0XPxL7mGgC1gBNlunb4BaS5bfOBIBFVYw6gXHZj8bDuys183ehfk9LcCw82WkMF6Sy09YEX/1QutKvbhv+cS5UmP08an0ZWOxtK9qantJmSHhjo+sHYm/1gc0hY=
+ARC-Authentication-Results: i=1; mx.zoho.com; dkim=pass  header.i=patchew.org;
+	spf=pass  smtp.mailfrom=no-reply@patchew.org;
+	dmarc=pass header.from=<no-reply@patchew.org>
+	header.from=<no-reply@patchew.org>
+Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by
+	mx.zohomail.com with SMTPS id 1555532852822678.8103983205767;
+	Wed, 17 Apr 2019 13:27:32 -0700 (PDT)
+Message-ID: <155553285153.17102.7208617684425946486@76452e4e88f2>
+In-Reply-To: <20190417191805.28198-1-armbru@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Wed, 17 Apr 2019 20:19:59 -0000
-From: Peter Maydell <peter.maydell@linaro.org>
-To: qemu-devel@nongnu.org
-X-Launchpad-Notification-Type: bug
-X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
-X-Launchpad-Bug-Information-Type: Public
-X-Launchpad-Bug-Private: no
-X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: daniel-santos pmaydell th-huth
-X-Launchpad-Bug-Reporter: Daniel Santos (daniel-santos)
-X-Launchpad-Bug-Modifier: Peter Maydell (pmaydell)
-References: <155542675846.7866.6509809085972568558.malonedeb@wampee.canonical.com>
-Message-Id:
- <155553239990.13565.7514989283502809784.malone@wampee.canonical.com>
-X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
-X-Launchpad-Message-For: qemu-devel-ml
-Precedence: bulk
-X-Generated-By: Launchpad (canonical.com); Revision="18928";
-	Instance="launchpad-lazr.conf"
-X-Launchpad-Hash: 46d622bcb8e3d09d2bc210df5d75fea48b2e613f
+Content-Transfer-Encoding: base64
+Resent-From: 
+From: no-reply@patchew.org
+To: armbru@redhat.com
+Date: Wed, 17 Apr 2019 13:27:32 -0700 (PDT)
+X-ZohoMailClient: External
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 91.189.90.7
-Subject: [Qemu-devel] [Bug 1825002] Re: "qemu: Unexpected FPU mode" since
- 0c1bbedc10e86ea9366b6af8c5520fafa3266b2f
+X-Received-From: 136.143.188.55
+Subject: Re: [Qemu-devel] [PATCH v2 00/17] Clean up and simplify around
+ fprintf_function
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
+Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -77,266 +74,119 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1825002 <1825002@bugs.launchpad.net>
+Reply-To: qemu-devel@nongnu.org
+Cc: fam@euphon.net, qemu-devel@nongnu.org, dgilbert@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190417201959.MMevEqLD0WH_Co2B12FbPVrsziUAtAvxIDdaI0C0kYY@z>
+Message-ID: <20190417202732.JbDw4nPJokMN_F0N_38MBF7BmV9Mxw7-x1kvxuYr4tY@z>
 
-This is certainly a bug, but it's not a a CVE, ie not a security bug.
-The entire purpose of the linux-user mode is to run the guest ELF file
-and let it perform whatever syscalls it likes -- it doesn't need to
-exploit any kind of bug in the ELF loader to be able to control what the
-process is doing.
+UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDE5MDQxNzE5MTgwNS4yODE5
+OC0xLWFybWJydUByZWRoYXQuY29tLwoKCgpIaSwKClRoaXMgc2VyaWVzIHNlZW1zIHRvIGhhdmUg
+c29tZSBjb2Rpbmcgc3R5bGUgcHJvYmxlbXMuIFNlZSBvdXRwdXQgYmVsb3cgZm9yCm1vcmUgaW5m
+b3JtYXRpb246CgpNZXNzYWdlLWlkOiAyMDE5MDQxNzE5MTgwNS4yODE5OC0xLWFybWJydUByZWRo
+YXQuY29tClN1YmplY3Q6IFtRZW11LWRldmVsXSBbUEFUQ0ggdjIgMDAvMTddIENsZWFuIHVwIGFu
+ZCBzaW1wbGlmeSBhcm91bmQgZnByaW50Zl9mdW5jdGlvbgpUeXBlOiBzZXJpZXMKCj09PSBURVNU
+IFNDUklQVCBCRUdJTiA9PT0KIyEvYmluL2Jhc2gKZ2l0IHJldi1wYXJzZSBiYXNlID4gL2Rldi9u
+dWxsIHx8IGV4aXQgMApnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVsaW1pdCAwCmdpdCBj
+b25maWcgLS1sb2NhbCBkaWZmLnJlbmFtZXMgVHJ1ZQpnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5h
+bGdvcml0aG0gaGlzdG9ncmFtCi4vc2NyaXB0cy9jaGVja3BhdGNoLnBsIC0tbWFpbGJhY2sgYmFz
+ZS4uCj09PSBURVNUIFNDUklQVCBFTkQgPT09CgpVcGRhdGluZyAzYzhjZjVhOWMyMWZmODc4MjE2
+NGQxZGVmN2Y0NGJkODg4NzEzMzg0CkZyb20gaHR0cHM6Ly9naXRodWIuY29tL3BhdGNoZXctcHJv
+amVjdC9xZW11CiB0IFt0YWcgdXBkYXRlXSAgICAgICAgICAgIHBhdGNoZXcvMjAxOTA0MTcxOTE4
+MDUuMjgxOTgtMS1hcm1icnVAcmVkaGF0LmNvbSAtPiBwYXRjaGV3LzIwMTkwNDE3MTkxODA1LjI4
+MTk4LTEtYXJtYnJ1QHJlZGhhdC5jb20KU3dpdGNoZWQgdG8gYSBuZXcgYnJhbmNoICd0ZXN0Jwpk
+YjE5ZTgzNGY4IGluY2x1ZGU6IE1vdmUgZnByaW50Zl9mdW5jdGlvbiB0byBkaXNhcy8KNDQxMzI5
+OWI0ZCBkaXNhczogUmVuYW1lIGluY2x1ZGUvZGlzYXMvYmZkLmggYmFjayB0byBpbmNsdWRlL2Rp
+c2FzL2Rpcy1hc20uaAo0ZGFhNzFiNGJlIG1vbml0b3I6IENsZWFuIHVwIGhvdyBtb25pdG9yX2Rp
+c2FzKCkgZnVubmVscyBvdXRwdXQgdG8gbW9uaXRvcgo4ZGIzMjBmNTUwIHFvbS9jcHU6IFNpbXBs
+aWZ5IGhvdyBDUFVDbGFzczpjcHVfZHVtcF9zdGF0ZSgpIHByaW50cwpiNzExNDdkMGMyIHFlbXUt
+cHJpbnQ6IE5ldyBxZW11X2ZwcmludGYoKSwgcWVtdV92ZnByaW50ZigpCjI3YTVhMjViNjcgcW9t
+L2NwdTogU2ltcGxpZnkgaG93IENQVUNsYXNzOjpkdW1wX3N0YXRpc3RpY3MoKSBwcmludHMKYTgz
+Y2JiODMxZCB0YXJnZXQvaTM4NjogU2ltcGxpZnkgaG93IHg4Nl9jcHVfZHVtcF9sb2NhbF9hcGlj
+X3N0YXRlKCkgcHJpbnRzCjI0NTYxM2NjMWIgdGFyZ2V0OiBDbGVhbiB1cCBob3cgdGhlIGR1bXBf
+bW11KCkgcHJpbnQKMTA5OTgxNDBkNSB0YXJnZXQ6IFNpbXBsaWZ5IGhvdyB0aGUgVEFSR0VUX2Nw
+dV9saXN0KCkgcHJpbnQKMmU3NmJjOWQ3YyBtZW1vcnk6IENsZWFuIHVwIGhvdyBtdHJlZV9pbmZv
+KCkgcHJpbnRzCmZlZjQxM2E5YmMgYmxvY2svcWFwaTogQ2xlYW4gdXAgaG93IHdlIHByaW50IHRv
+IG1vbml0b3Igb3Igc3Rkb3V0CjcyZGU4ODc5YjIgcXNwOiBTaW1wbGlmeSBob3cgcXNwX3JlcG9y
+dCgpIHByaW50cwo4OWIyMzQzODFhIHRjZzogU2ltcGxpZnkgaG93IGR1bXBfZHJpZnRfaW5mbygp
+IHByaW50cwo1MTEwODVhM2Y3IHRjZzogU2ltcGxpZnkgaG93IGR1bXBfZXhlY19pbmZvKCkgcHJp
+bnRzCjhhODliYjNhNTIgdGNnOiBTaW1wbGlmeSBob3cgZHVtcF9vcGNvdW50X2luZm8oKSBwcmlu
+dHMKZDhhMjk0NjliMyB0cmFjZTogU2ltcGxpZnkgaG93IHN0X3ByaW50X3RyYWNlX2ZpbGVfc3Rh
+dHVzKCkgcHJpbnRzCmQxZmZjNTU4YWQgaW5jbHVkZTogSW5jbHVkZSBmcHJpbnRmLWZuLmggb25s
+eSB3aGVyZSBuZWVkZWQKCj09PSBPVVRQVVQgQkVHSU4gPT09CjEvMTcgQ2hlY2tpbmcgY29tbWl0
+IGQxZmZjNTU4YWRhOSAoaW5jbHVkZTogSW5jbHVkZSBmcHJpbnRmLWZuLmggb25seSB3aGVyZSBu
+ZWVkZWQpCjIvMTcgQ2hlY2tpbmcgY29tbWl0IGQ4YTI5NDY5YjM4YiAodHJhY2U6IFNpbXBsaWZ5
+IGhvdyBzdF9wcmludF90cmFjZV9maWxlX3N0YXR1cygpIHByaW50cykKMy8xNyBDaGVja2luZyBj
+b21taXQgOGE4OWJiM2E1MjNhICh0Y2c6IFNpbXBsaWZ5IGhvdyBkdW1wX29wY291bnRfaW5mbygp
+IHByaW50cykKNC8xNyBDaGVja2luZyBjb21taXQgNTExMDg1YTNmNzA0ICh0Y2c6IFNpbXBsaWZ5
+IGhvdyBkdW1wX2V4ZWNfaW5mbygpIHByaW50cykKNS8xNyBDaGVja2luZyBjb21taXQgODliMjM0
+MzgxYWVmICh0Y2c6IFNpbXBsaWZ5IGhvdyBkdW1wX2RyaWZ0X2luZm8oKSBwcmludHMpCjYvMTcg
+Q2hlY2tpbmcgY29tbWl0IDcyZGU4ODc5YjJhNSAocXNwOiBTaW1wbGlmeSBob3cgcXNwX3JlcG9y
+dCgpIHByaW50cykKNy8xNyBDaGVja2luZyBjb21taXQgZmVmNDEzYTliYzM0IChibG9jay9xYXBp
+OiBDbGVhbiB1cCBob3cgd2UgcHJpbnQgdG8gbW9uaXRvciBvciBzdGRvdXQpCjgvMTcgQ2hlY2tp
+bmcgY29tbWl0IDJlNzZiYzlkN2M5MiAobWVtb3J5OiBDbGVhbiB1cCBob3cgbXRyZWVfaW5mbygp
+IHByaW50cykKOS8xNyBDaGVja2luZyBjb21taXQgMTA5OTgxNDBkNTI5ICh0YXJnZXQ6IFNpbXBs
+aWZ5IGhvdyB0aGUgVEFSR0VUX2NwdV9saXN0KCkgcHJpbnQpCjEwLzE3IENoZWNraW5nIGNvbW1p
+dCAyNDU2MTNjYzFiMWUgKHRhcmdldDogQ2xlYW4gdXAgaG93IHRoZSBkdW1wX21tdSgpIHByaW50
+KQpXQVJOSU5HOiBsaW5lIG92ZXIgODAgY2hhcmFjdGVycwojOTUwOiBGSUxFOiB0YXJnZXQveHRl
+bnNhL21tdV9oZWxwZXIuYzo3ODQ6CisgICAgICAgICAgICAgICAgICAgIHFlbXVfcHJpbnRmKCJc
+dFZhZGRyICAgICAgIFBhZGRyICAgICAgIEFTSUQgIEF0dHIgUldYIENhY2hlXG4iCgp0b3RhbDog
+MCBlcnJvcnMsIDEgd2FybmluZ3MsIDg0OCBsaW5lcyBjaGVja2VkCgpQYXRjaCAxMC8xNyBoYXMg
+c3R5bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZpZXcuICBJZiBhbnkgb2YgdGhlc2UgZXJyb3JzCmFy
+ZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1haW50YWluZXIsIHNlZQpDSEVD
+S1BBVENIIGluIE1BSU5UQUlORVJTLgoxMS8xNyBDaGVja2luZyBjb21taXQgYTgzY2JiODMxZGZi
+ICh0YXJnZXQvaTM4NjogU2ltcGxpZnkgaG93IHg4Nl9jcHVfZHVtcF9sb2NhbF9hcGljX3N0YXRl
+KCkgcHJpbnRzKQoxMi8xNyBDaGVja2luZyBjb21taXQgMjdhNWEyNWI2NzczIChxb20vY3B1OiBT
+aW1wbGlmeSBob3cgQ1BVQ2xhc3M6OmR1bXBfc3RhdGlzdGljcygpIHByaW50cykKMTMvMTcgQ2hl
+Y2tpbmcgY29tbWl0IGI3MTE0N2QwYzIwOCAocWVtdS1wcmludDogTmV3IHFlbXVfZnByaW50Zigp
+LCBxZW11X3ZmcHJpbnRmKCkpCjE0LzE3IENoZWNraW5nIGNvbW1pdCA4ZGIzMjBmNTUwMTEgKHFv
+bS9jcHU6IFNpbXBsaWZ5IGhvdyBDUFVDbGFzczpjcHVfZHVtcF9zdGF0ZSgpIHByaW50cykKRVJS
+T1I6IGxpbmUgb3ZlciA5MCBjaGFyYWN0ZXJzCiMxMDUxOiBGSUxFOiB0YXJnZXQvaTM4Ni9oZWxw
+ZXIuYzo0MTk6CisgICAgICAgIHFlbXVfZnByaW50ZihmLCAiUkFYPSUwMTYiIFBSSXg2NCAiIFJC
+WD0lMDE2IiBQUkl4NjQgIiBSQ1g9JTAxNiIgUFJJeDY0ICIgUkRYPSUwMTYiIFBSSXg2NCAiXG4i
+CgpFUlJPUjogbGluZSBvdmVyIDkwIGNoYXJhY3RlcnMKIzEwNTI6IEZJTEU6IHRhcmdldC9pMzg2
+L2hlbHBlci5jOjQyMDoKKyAgICAgICAgICAgICAgICAgICAgICJSU0k9JTAxNiIgUFJJeDY0ICIg
+UkRJPSUwMTYiIFBSSXg2NCAiIFJCUD0lMDE2IiBQUkl4NjQgIiBSU1A9JTAxNiIgUFJJeDY0ICJc
+biIKCkVSUk9SOiBsaW5lIG92ZXIgOTAgY2hhcmFjdGVycwojMTA1MzogRklMRTogdGFyZ2V0L2kz
+ODYvaGVscGVyLmM6NDIxOgorICAgICAgICAgICAgICAgICAgICAgIlI4ID0lMDE2IiBQUkl4NjQg
+IiBSOSA9JTAxNiIgUFJJeDY0ICIgUjEwPSUwMTYiIFBSSXg2NCAiIFIxMT0lMDE2IiBQUkl4NjQg
+IlxuIgoKRVJST1I6IGxpbmUgb3ZlciA5MCBjaGFyYWN0ZXJzCiMxMDU0OiBGSUxFOiB0YXJnZXQv
+aTM4Ni9oZWxwZXIuYzo0MjI6CisgICAgICAgICAgICAgICAgICAgICAiUjEyPSUwMTYiIFBSSXg2
+NCAiIFIxMz0lMDE2IiBQUkl4NjQgIiBSMTQ9JTAxNiIgUFJJeDY0ICIgUjE1PSUwMTYiIFBSSXg2
+NCAiXG4iCgpFUlJPUjogbGluZSBvdmVyIDkwIGNoYXJhY3RlcnMKIzEwNTU6IEZJTEU6IHRhcmdl
+dC9pMzg2L2hlbHBlci5jOjQyMzoKKyAgICAgICAgICAgICAgICAgICAgICJSSVA9JTAxNiIgUFJJ
+eDY0ICIgUkZMPSUwOHggWyVjJWMlYyVjJWMlYyVjXSBDUEw9JWQgSUk9JWQgQTIwPSVkIFNNTT0l
+ZCBITFQ9JWRcbiIsCgpXQVJOSU5HOiBsaW5lIG92ZXIgODAgY2hhcmFjdGVycwojMTE2MzogRklM
+RTogdGFyZ2V0L2kzODYvaGVscGVyLmM6NDk0OgorICAgICAgICBxZW11X2ZwcmludGYoZiwgIkNS
+MD0lMDh4IENSMj0lMDE2IiBQUkl4NjQgIiBDUjM9JTAxNiIgUFJJeDY0ICIgQ1I0PSUwOHhcbiIs
+CgpXQVJOSU5HOiBsaW5lIG92ZXIgODAgY2hhcmFjdGVycwojMTc1MTogRklMRTogdGFyZ2V0L21p
+cHMvdHJhbnNsYXRlLmM6Mjk3OTE6CisgICAgcWVtdV9mcHJpbnRmKGYsICJDUDAgU3RhdHVzICAw
+eCUwOHggQ2F1c2UgICAweCUwOHggRVBDICAgIDB4IiBUQVJHRVRfRk1UX2x4ICJcbiIsCgp0b3Rh
+bDogNSBlcnJvcnMsIDIgd2FybmluZ3MsIDI1NTEgbGluZXMgY2hlY2tlZAoKUGF0Y2ggMTQvMTcg
+aGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVycm9y
+cwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBtYWludGFpbmVyLCBzZWUK
+Q0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KCjE1LzE3IENoZWNraW5nIGNvbW1pdCA0ZGFhNzFi
+NGJlZTkgKG1vbml0b3I6IENsZWFuIHVwIGhvdyBtb25pdG9yX2Rpc2FzKCkgZnVubmVscyBvdXRw
+dXQgdG8gbW9uaXRvcikKMTYvMTcgQ2hlY2tpbmcgY29tbWl0IDQ0MTMyOTliNGQ5YSAoZGlzYXM6
+IFJlbmFtZSBpbmNsdWRlL2Rpc2FzL2JmZC5oIGJhY2sgdG8gaW5jbHVkZS9kaXNhcy9kaXMtYXNt
+LmgpCldBUk5JTkc6IGFkZGVkLCBtb3ZlZCBvciBkZWxldGVkIGZpbGUocyksIGRvZXMgTUFJTlRB
+SU5FUlMgbmVlZCB1cGRhdGluZz8KIzI5NjogCnJlbmFtZSBmcm9tIGluY2x1ZGUvZGlzYXMvYmZk
+LmgKCnRvdGFsOiAwIGVycm9ycywgMSB3YXJuaW5ncywgMTkyIGxpbmVzIGNoZWNrZWQKClBhdGNo
+IDE2LzE3IGhhcyBzdHlsZSBwcm9ibGVtcywgcGxlYXNlIHJldmlldy4gIElmIGFueSBvZiB0aGVz
+ZSBlcnJvcnMKYXJlIGZhbHNlIHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRhaW5l
+ciwgc2VlCkNIRUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMuCjE3LzE3IENoZWNraW5nIGNvbW1pdCBk
+YjE5ZTgzNGY4MjYgKGluY2x1ZGU6IE1vdmUgZnByaW50Zl9mdW5jdGlvbiB0byBkaXNhcy8pCldB
+Uk5JTkc6IGFkZGVkLCBtb3ZlZCBvciBkZWxldGVkIGZpbGUocyksIGRvZXMgTUFJTlRBSU5FUlMg
+bmVlZCB1cGRhdGluZz8KIzQ1OiAKZGVsZXRlZCBmaWxlIG1vZGUgMTAwNjQ0Cgp0b3RhbDogMCBl
+cnJvcnMsIDEgd2FybmluZ3MsIDE3IGxpbmVzIGNoZWNrZWQKClBhdGNoIDE3LzE3IGhhcyBzdHls
+ZSBwcm9ibGVtcywgcGxlYXNlIHJldmlldy4gIElmIGFueSBvZiB0aGVzZSBlcnJvcnMKYXJlIGZh
+bHNlIHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRhaW5lciwgc2VlCkNIRUNLUEFU
+Q0ggaW4gTUFJTlRBSU5FUlMuCj09PSBPVVRQVVQgRU5EID09PQoKVGVzdCBjb21tYW5kIGV4aXRl
+ZCB3aXRoIGNvZGU6IDEKCgpUaGUgZnVsbCBsb2cgaXMgYXZhaWxhYmxlIGF0Cmh0dHA6Ly9wYXRj
+aGV3Lm9yZy9sb2dzLzIwMTkwNDE3MTkxODA1LjI4MTk4LTEtYXJtYnJ1QHJlZGhhdC5jb20vdGVz
+dGluZy5jaGVja3BhdGNoLz90eXBlPW1lc3NhZ2UuCi0tLQpFbWFpbCBnZW5lcmF0ZWQgYXV0b21h
+dGljYWxseSBieSBQYXRjaGV3IFtodHRwczovL3BhdGNoZXcub3JnL10uClBsZWFzZSBzZW5kIHlv
+dXIgZmVlZGJhY2sgdG8gcGF0Y2hldy1kZXZlbEByZWRoYXQuY29t
 
--- =
-
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1825002
-
-Title:
-  "qemu: Unexpected FPU mode" since
-  0c1bbedc10e86ea9366b6af8c5520fafa3266b2f
-
-Status in QEMU:
-  New
-
-Bug description:
-  This happens every time I attempt to chroot into a gentoo-mips image
-  unless I load the executable via ld.so
-
-  /home (root)# chroot gentoo-mips32r2el /bin/sh
-  qemu: Unexpected FPU mode
-  /home (root)# chroot gentoo-mips32r2el /lib/ld-2.19.so /bin/sh
-  sh-4.2# exit
-  /home (root)# =
-
-
-  I don't know the underlying cause, but keep in mind that we may lie
-  and claim to have an FPU when our CPU doesn't because of kernel
-  emulation that may not be present in the host kernel.  Don't know if
-  that's related.
-
-  I get this with various gentoo-mips stage3 tarballs, but not with
-  OpenWRT.  (e.g.,
-  https://gentoo.osuosl.org/experimental/mips/stages/mips32r2el/2014)
-
-
-  # emerge --info app-emulation/qemu
-  Portage 2.3.51 (python 3.6.5-final-0, default/linux/amd64/17.0/desktop/pl=
-asma, gcc-8.2.0, glibc-2.27-r6, 4.14.96-gentoo x86_64)
-  =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-                           System Settings
-  =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-  System uname: Linux-4.14.96-gentoo-x86_64-AMD_Ryzen_7_2700X_Eight-Core_Pr=
-ocessor-with-gentoo-2.6
-  KiB Mem:    32890732 total,   3480024 free
-  KiB Swap:   16777212 total,  10575592 free
-  Timestamp of repository gentoo: Thu, 11 Apr 2019 06:00:01 +0000
-  Head commit of repository gentoo: 66eaaa28926103e690db0699466a274a17ab1979
-  sh bash 4.4_p23-r1
-  ld GNU ld (Gentoo 2.30 p5) 2.30.0
-  distcc 3.3.2 x86_64-pc-linux-gnu [disabled]
-  ccache version 3.3.4 [disabled]
-  app-shells/bash:          4.4_p23-r1::gentoo
-  dev-java/java-config:     2.2.0-r4::gentoo
-  dev-lang/perl:            5.26.2::gentoo
-  dev-lang/python:          2.7.15::gentoo, 3.6.5::gentoo
-  dev-util/ccache:          3.3.4-r1::gentoo
-  dev-util/cmake:           3.9.6::gentoo
-  dev-util/pkgconfig:       0.29.2::gentoo
-  sys-apps/baselayout:      2.6-r1::gentoo
-  sys-apps/openrc:          0.38.3-r1::gentoo
-  sys-apps/sandbox:         2.13::gentoo
-  sys-devel/autoconf:       2.13-r1::gentoo, 2.64-r1::gentoo, 2.69-r4::gent=
-oo
-  sys-devel/automake:       1.11.6-r3::gentoo, 1.13.4-r2::gentoo, 1.15.1-r2=
-::gentoo, 1.16.1-r1::gentoo
-  sys-devel/binutils:       2.30-r4::gentoo
-  sys-devel/gcc:            4.9.4::gentoo, 5.4.0-r6::gentoo, 6.4.0-r5::gent=
-oo, 7.3.0-r6::gentoo, 8.1.0-r3::gentoo, 8.2.0-r6::gentoo, 8.3.0::gentoo
-  sys-devel/gcc-config:     2.0::gentoo
-  sys-devel/libtool:        2.4.6-r3::gentoo
-  sys-devel/make:           4.2.1-r4::gentoo
-  sys-kernel/linux-headers: 4.14-r1::gentoo (virtual/os-headers)
-  sys-libs/glibc:           2.27-r6::gentoo
-  Repositories:
-
-  gentoo
-      location: /usr/portage
-      sync-type: rsync
-      sync-uri: rsync://rsync.gentoo.org/gentoo-portage
-      priority: -1000
-      sync-rsync-verify-jobs: 1
-      sync-rsync-extra-opts: =
-
-      sync-rsync-verify-metamanifest: yes
-      sync-rsync-verify-max-age: 24
-
-  love-local
-      location: /usr/local/portage
-      masters: gentoo
-      priority: 0
-
-  chaoslab
-      location: /var/lib/layman/chaoslab
-      masters: gentoo
-      priority: 50
-
-  java
-      location: /var/lib/layman/java
-      masters: gentoo
-      priority: 50
-
-  steam-overlay
-      location: /var/lib/layman/steam-overlay
-      masters: gentoo
-      priority: 50
-
-  zugaina
-      location: /var/lib/layman/zugaina
-      masters: gentoo
-      priority: 50
-
-  ACCEPT_KEYWORDS=3D"amd64"
-  ACCEPT_LICENSE=3D"* -@EULA"
-  CBUILD=3D"x86_64-pc-linux-gnu"
-  CFLAGS=3D"-march=3Dnative -O2 -ggdb3 -pipe"
-  CHOST=3D"x86_64-pc-linux-gnu"
-  CONFIG_PROTECT=3D"/etc /usr/lib64/libreoffice/program/sofficerc /usr/shar=
-e/config /usr/share/gnupg/qualified.txt"
-  CONFIG_PROTECT_MASK=3D"/etc/ca-certificates.conf /etc/dconf /etc/env.d /e=
-tc/fonts/fonts.conf /etc/gconf /etc/gentoo-release /etc/revdep-rebuild /etc=
-/sandbox.d /etc/splash /etc/terminfo /etc/texmf/language.dat.d /etc/texmf/l=
-anguage.def.d /etc/texmf/updmap.d /etc/texmf/web2c"
-  CXXFLAGS=3D"-march=3Dnative -O2 -ggdb3 -pipe"
-  DISTDIR=3D"/mnt/large/distfiles"
-  EMERGE_DEFAULT_OPTS=3D"-j3 --load-average=3D17.5 --with-bdeps=3Dy --autou=
-nmask=3Dn"
-  ENV_UNSET=3D"DBUS_SESSION_BUS_ADDRESS DISPLAY GOBIN PERL5LIB PERL5OPT PER=
-LPREFIX PERL_CORE PERL_MB_OPT PERL_MM_OPT XAUTHORITY XDG_CACHE_HOME XDG_CON=
-FIG_HOME XDG_DATA_HOME XDG_RUNTIME_DIR"
-  FCFLAGS=3D"-O2 -pipe"
-  FEATURES=3D"assume-digests binpkg-logs buildpkg candy cgroup compress-bui=
-ld-logs compressdebug config-protect-if-modified distlocks ebuild-locks fix=
-lafiles installsources ipc-sandbox merge-sync multilib-strict network-sandb=
-ox news parallel-fetch preserve-libs protect-owned sandbox sfperms split-el=
-og split-log splitdebug strict strict-keepdir unknown-features-warn unmerge=
--logs unmerge-orphans userfetch userpriv usersandbox usersync xattr"
-  FFLAGS=3D"-O2 -pipe"
-  GENTOO_MIRRORS=3D"http://gentoo.mirrors.tds.net/gentoo http://gentoo.mirr=
-ors.easynews.com/linux/gentoo/ http://gentoo.osuosl.org/ http://mirrors.rit=
-.edu/gentoo/ http://gentoo.cs.uni.edu/ http://gentoo.osuosl.org/ "
-  LANG=3D"en_US.utf8"
-  LDFLAGS=3D"-Wl,-O1 -Wl,--as-needed"
-  LINGUAS=3D"en en-US en_US"
-  MAKEOPTS=3D"-j15 --load-average=3D17"
-  PKGDIR=3D"/mnt/large/packages"
-  PORTAGE_COMPRESS=3D"pxz"
-  PORTAGE_COMPRESS_FLAGS=3D"-9e"
-  PORTAGE_CONFIGROOT=3D"/"
-  PORTAGE_RSYNC_OPTS=3D"--recursive --links --safe-links --perms --times --=
-omit-dir-times --compress --force --whole-file --delete --stats --human-rea=
-dable --timeout=3D180 --exclude=3D/distfiles --exclude=3D/local --exclude=
-=3D/packages --exclude=3D/.git"
-  PORTAGE_TMPDIR=3D"/tmp"
-  USE=3D"X a52 aac aacs acl acpi activities aes aio alsa amd64 amr avx avx2=
- bcache berkdb bluetooth bluray branding bzip2 cairo cdda cddb cdio cdr cel=
-t cli consolekit crypt cups cxx d3d9 dbus declarative designer device-mappe=
-r dirac directfb dot dri dts dvd dvdr emboss encode exif f16c fam ffmpeg ff=
-tw flac fluidsynth fma3 fontconfig fortran fuse gdbm geolocation gif git gl=
-amor go gphoto2 gpm gps graphite graphviz gsm gstreamer gtk hardened hddtem=
-p highlight iconv icu ipv6 jpeg jpeg2k kde kerberos kipi kwallet lame latex=
- lcms ldap libass libcaca libnotify libsamplerate libtirpc lm_sensors lto l=
-vm lz4 lzma lzo mad matroska midi mjpeg mmx mmxext mng mono mp3 mp4 mpeg mt=
-p multicall multilib multitarget musepack natspec ncurses netlink networkma=
-nager nfs nls nptl nsplugin ogg openal openexr opengl openh264 openmp opens=
-sl opus osmesa pam pango pcap pch pclmul pcre pdf perl pgo phonon plasma pl=
-aylist png policykit popcnt postgres postproc ppds pulseaudio python qml qt=
-5 rar raw readline samba sasl savedconfig scanner schroedinger sdl seccomp =
-sensors sid smp snappy speex spell spice sqlite sqlite3 squashfs sse sse2 s=
-se3 sse4_1 sse4_2 sse4a ssh ssl ssse3 startup-notification static-libs subv=
-ersion svg syslog systemtap taglib tcpd theora threads tiff timidity tools =
-tremor truetype tty-helpers twolame udev udisks unicode upnp-av upower usb =
-usbredir utils v4l vaapi valgrind vcdx vdpau vim-syntax virt-network virtio=
- vlc vorbis vpx webdav webp widgets wxwidgets x264 x265 xattr xcb xcomposit=
-e xen xine xml xspice xv xvid xvmc zeroconf zlib" ABI_X86=3D"64 32" ALSA_CA=
-RDS=3D"ali5451 als4000 atiixp atiixp-modem bt87x ca0106 cmipci emu10k1x ens=
-1370 ens1371 es1938 es1968 fm801 hda-intel intel8x0 intel8x0m maestro3 trid=
-ent usb-audio via82xx via82xx-modem ymfpci" APACHE2_MODULES=3D"authn_core a=
-uthz_core socache_shmcb unixd actions alias auth_basic authn_alias authn_an=
-on authn_dbm authn_default authn_file authz_dbm authz_default authz_groupfi=
-le authz_host authz_owner authz_user autoindex cache cgi cgid dav dav_fs da=
-v_lock deflate dir disk_cache env expires ext_filter file_cache filter head=
-ers include info log_config logio mem_cache mime mime_magic negotiation rew=
-rite setenvif speling status unique_id userdir usertrack vhost_alias" CALLI=
-GRA_FEATURES=3D"karbon sheets words" COLLECTD_PLUGINS=3D"df interface irq l=
-oad memory rrdtool swap syslog" CPU_FLAGS_X86=3D"aes avx avx2 f16c fma3 mmx=
- mmxext pclmul popcnt sse sse2 sse3 sse4_1 sse4_2 sse4a ssse3" CURL_SSL=3D"=
-openssl" ELIBC=3D"glibc" GPSD_PROTOCOLS=3D"ashtech aivdm earthmate evermore=
- fv18 garmin garmintxt gpsclock isync itrax mtk3301 nmea ntrip navcom ocean=
-server oldstyle oncore rtcm104v2 rtcm104v3 sirf skytraq superstar2 timing t=
-sip tripmate tnt ublox ubx" GRUB_PLATFORMS=3D"efi-64 pc coreboot emu multib=
-oot qemu xen" INPUT_DEVICES=3D"keyboard mouse joystick evdev wacom vmmouse"=
- KERNEL=3D"linux" L10N=3D"en en-US en_US" LCD_DEVICES=3D"bayrad cfontz cfon=
-tz633 glk hd44780 lb216 lcdm001 mtxorb ncurses text" LIBREOFFICE_EXTENSIONS=
-=3D"presenter-console presenter-minimizer" LLVM_TARGETS=3D"AMDGPU ARM BPF N=
-VPTX Mips X86" NETBEANS_MODULES=3D"apisupport cnd groovy gsf harness ide id=
-entity j2ee java mobility nb php profiler soa visualweb webcommon websvccom=
-mon xml" OFFICE_IMPLEMENTATION=3D"libreoffice" PHP_TARGETS=3D"php5-6 php7-1=
-" POSTGRES_TARGETS=3D"postgres9_5 postgres10" PYTHON_SINGLE_TARGET=3D"pytho=
-n3_6" PYTHON_TARGETS=3D"python2_7 python3_6" QEMU_SOFTMMU_TARGETS=3D"aarch6=
-4 arm armeb i386 hppa m68k microblaze microblazeel mips mips64 mips64el mip=
-sel mipsn32 mipsn32el ppc ppc64 ppc64abi32 ppc64le s390x sparc sparc32plus =
-sparc64 x86_64" QEMU_USER_TARGETS=3D"aarch64 arm armeb i386 hppa m68k micro=
-blaze microblazeel mips mips64 mips64el mipsel mipsn32 mipsn32el ppc ppc64 =
-ppc64abi32 ppc64le s390x sparc sparc32plus sparc64 x86_64" RUBY_TARGETS=3D"=
-ruby24" USERLAND=3D"GNU" VIDEO_CARDS=3D"radeon radeonsi vesa qxl vmware amd=
-gpu" XTABLES_ADDONS=3D"quota2 psd pknock lscan length2 ipv4options ipset ip=
-p2p iface geoip fuzzy condition tee tarpit sysrq steal rawnat logmark ipmar=
-k dhcpmac delude chaos account"
-  Unset:  CC, CPPFLAGS, CTARGET, CXX, INSTALL_MASK, LC_ALL, PORTAGE_BINHOST=
-, PORTAGE_BUNZIP2_COMMAND, PORTAGE_RSYNC_EXTRA_OPTS
-
-  =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-                          Package Settings
-  =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-
-  app-emulation/qemu-3.1.0-r4::gentoo was built with the following:
-  USE=3D"aio alsa bzip2 caps curl fdt filecaps gtk jpeg lzo ncurses nfs nls=
- opengl pin-upstream-blobs png pulseaudio python sasl sdl seccomp snappy sp=
-ice ssh static-user systemtap usb usbredir vde vhost-net virtfs vnc vte xat=
-tr xen -accessibility (-capstone) -debug (-glusterfs) -gnutls -infiniband -=
-iscsi -numa -rbd (-selinux) -smartcard (-static) -tci -test -virgl -xfs" AB=
-I_X86=3D"(64)" PYTHON_TARGETS=3D"python2_7 python3_6 -python3_5 (-python3_7=
-)" QEMU_SOFTMMU_TARGETS=3D"aarch64 arm hppa i386 m68k microblaze microblaze=
-el mips mips64 mips64el mipsel ppc ppc64 s390x sparc sparc64 x86_64 -alpha =
--cris -lm32 -moxie -nios2 -or1k -riscv32 -riscv64 -sh4 -sh4eb -tricore -uni=
-core32 -xtensa -xtensaeb" QEMU_USER_TARGETS=3D"aarch64 arm armeb hppa i386 =
-m68k microblaze microblazeel mips mips64 mips64el mipsel mipsn32 mipsn32el =
-ppc ppc64 ppc64abi32 ppc64le s390x sparc sparc32plus sparc64 x86_64 -aarch6=
-4_be -alpha -cris -nios2 -or1k -riscv32 -riscv64 -sh4 -sh4eb -tilegx -xtens=
-a -xtensaeb"
-
-  >>> Attempting to run pkg_info() for 'app-emulation/qemu-3.1.0-r4'
-  Using:
-    app-emulation/spice-protocol-0.12.14
-    sys-firmware/edk2-ovmf-2017_p20180211
-      USE=3Dbinary
-    sys-firmware/ipxe-1.0.0_p20180211
-    sys-firmware/seabios-1.11.0
-      USE=3Dbinary
-    sys-firmware/sgabios-0.1_pre8-r1
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1825002/+subscriptions
 
