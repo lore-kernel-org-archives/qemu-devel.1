@@ -1,25 +1,20 @@
-Received: from eggs.gnu.org ([209.51.188.92]:34522)
+Received: from eggs.gnu.org ([209.51.188.92]:37163)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mateja.marjanovic@rt-rk.com>) id 1hGmZB-0000L8-8n
-	for qemu-devel@nongnu.org; Wed, 17 Apr 2019 11:33:42 -0400
+	(envelope-from <eblake@redhat.com>) id 1hGmfh-0005P9-56
+	for qemu-devel@nongnu.org; Wed, 17 Apr 2019 11:40:26 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mateja.marjanovic@rt-rk.com>) id 1hGmZ9-0004lo-F1
-	for qemu-devel@nongnu.org; Wed, 17 Apr 2019 11:33:41 -0400
-Received: from mx2.rt-rk.com ([89.216.37.149]:34560 helo=mail.rt-rk.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mateja.marjanovic@rt-rk.com>)
-	id 1hGmZ7-0004jT-Em
-	for qemu-devel@nongnu.org; Wed, 17 Apr 2019 11:33:38 -0400
-From: Mateja Marjanovic <mateja.marjanovic@rt-rk.com>
-Date: Wed, 17 Apr 2019 17:33:22 +0200
-Message-Id: <1555515206-9352-3-git-send-email-mateja.marjanovic@rt-rk.com>
-In-Reply-To: <1555515206-9352-1-git-send-email-mateja.marjanovic@rt-rk.com>
-References: <1555515206-9352-1-git-send-email-mateja.marjanovic@rt-rk.com>
+	(envelope-from <eblake@redhat.com>) id 1hGmfe-0008JP-7m
+	for qemu-devel@nongnu.org; Wed, 17 Apr 2019 11:40:24 -0400
+References: <20190417153005.30096-1-mreitz@redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <5897a475-e056-a0d6-f979-5cea490451d1@redhat.com>
+Date: Wed, 17 Apr 2019 10:39:57 -0500
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v7 2/6] target/mips: Optimize ILVEV.<B|H|W|D>
- MSA instructions
+In-Reply-To: <20190417153005.30096-1-mreitz@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="UD44ldDwPNCTgR0vWmaNzV1JDeP8REgSh"
+Subject: Re: [Qemu-devel] [PATCH] iotests: Make 182 do without device_add
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,222 +23,76 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: aurelien@aurel32.net, philmd@redhat.com, richard.henderson@linaro.org, amarkovic@wavecomp.com, arikalo@wavecomp.com
+To: Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org
+Cc: Kevin Wolf <kwolf@redhat.com>, Alberto Garcia <berto@igalia.com>, qemu-devel@nongnu.org
 
-From: Mateja Marjanovic <Mateja.Marjanovic@rt-rk.com>
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--UD44ldDwPNCTgR0vWmaNzV1JDeP8REgSh
+From: Eric Blake <eblake@redhat.com>
+To: Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org
+Cc: Kevin Wolf <kwolf@redhat.com>, Alberto Garcia <berto@igalia.com>,
+ qemu-devel@nongnu.org
+Message-ID: <5897a475-e056-a0d6-f979-5cea490451d1@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH] iotests: Make 182 do without device_add
+References: <20190417153005.30096-1-mreitz@redhat.com>
+In-Reply-To: <20190417153005.30096-1-mreitz@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-Optimize set of MSA instructions ILVEV.<B|H|W|D>, using
-directly tcg registers and performing logic on them
-instead of using helpers.
+On 4/17/19 10:30 AM, Max Reitz wrote:
+> 182 fails if qemu has no support for hotplugging of a virtio-blk device=
+=2E
+> Using an NBD server instead works just as well for the test, even on
+> qemus without hotplugging support.
+>=20
+> Fixes: 6d0a4a0fb5c8f10c8eb68b52cfda0082b00ae963
+> Reported-by: Danilo C. L. de Paula <ddepaula@redhat.com>
+> Signed-off-by: Max Reitz <mreitz@redhat.com>
+> ---
+> To reintroduce the bug for which this test was written, revert the
+> following commits:
+>=20
+> $ git revert -n \
+>     23dece19da41724349809873923e20a48b619cb7 \
+>     6ceabe6f77e4ae5ac2fa3d2ac1be11dc95021941 \
+>     a6aeca0ca530f104b5a5dd6704fca22b2c5edefa \
+>     577a133988c76e4ebf01d050d0d758d207a1baf7
 
-In the following table, the first column is the performance
-before this patch. The second represents the performance
-after converting from helpers to tcg, but without using
-tcg_gen_deposit function. The third one is with using the
-tcg_gen_deposit function and with using a uint64_t constant
-bit mask, and the fourth is with using the tcg_gen_deposit
-function and with a mask which is a tcg constant. The fourth
-is implemented in this patch.
+Useful instructions; with them, I was able to:
 
-Performance measurement is done by executing the
-instructions 10 million times on a computer
-with Intel Core i7-3770 CPU @ 3.40GHz=C3=978.
+Tested-by: Eric Blake <eblake@redhat.com>
 
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-|| instruction ||     1     ||     2    ||     3    ||     4    ||
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-||   ilvev.b   || 126.92 ms || 24.52 ms || 25.19 ms || 23.89 ms ||
-||   ilvev.h   ||  93.67 ms || 23.92 ms || 24.76 ms || 24.31 ms ||
-||   ilvev.w   || 117.86 ms || 23.83 ms || 21.84 ms || 21.99 ms ||
-||   ilvev.d   ||  45.49 ms || 19.74 ms || 20.21 ms || 20.07 ms ||
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-1 - before
-2 - no-deposit-no-mask-as-tcg-constant
-3 - with-deposit-no-mask-as-tcg-constant
-4 - with-deposit-with-mask-as-tcg-constant (final)
+> ---
+>  tests/qemu-iotests/182     | 22 +++++++++++++++++-----
+>  tests/qemu-iotests/182.out |  1 +
+>  2 files changed, 18 insertions(+), 5 deletions(-)
 
-The deposit function is used only in ILVEV.W.
+Reviewed-by: Eric Blake <eblake@redhat.com>
 
-No-deposit version of the ILVEV.W implementation:
+Do you want me to take this through my NBD tree, since it now depends on
+NBD? I'm also fine letting it go through your iotests tree
 
-static inline void gen_ilvev_w(CPUMIPSState *env, uint32_t wd,
-                               uint32_t ws, uint32_t wt)
-{
-    TCGv_i64 t1 =3D tcg_temp_new_i64();
-    TCGv_i64 t2 =3D tcg_temp_new_i64();
-    uint64_t mask =3D 0x00000000ffffffffULL;
-
-    tcg_gen_andi_i64(t1, msa_wr_d[wt * 2], mask);
-    tcg_gen_andi_i64(t2, msa_wr_d[ws * 2], mask);
-    tcg_gen_shli_i64(t2, t2, 32);
-    tcg_gen_or_i64(msa_wr_d[wd * 2], t1, t2);
-
-    tcg_gen_andi_i64(t1, msa_wr_d[wt * 2 + 1], mask);
-    tcg_gen_andi_i64(t2, msa_wr_d[ws * 2 + 1], mask);
-    tcg_gen_shli_i64(t2, t2, 32);
-    tcg_gen_or_i64(msa_wr_d[wd * 2 + 1], t1, t2);
-
-    tcg_temp_free_i64(t1);
-    tcg_temp_free_i64(t2);
-}
-
-Suggested-by: Aleksandar Markovic <amarkovic@wavecomp.com>
-Suggested-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
-Suggested-by: Richard Henderson <richard.henderson@linaro.org>
-Signed-off-by: Mateja Marjanovic <mateja.marjanovic@rt-rk.com>
----
- target/mips/helper.h     |  1 -
- target/mips/msa_helper.c |  9 -----
- target/mips/translate.c  | 87 ++++++++++++++++++++++++++++++++++++++++++=
-+++++-
- 3 files changed, 86 insertions(+), 11 deletions(-)
-
-diff --git a/target/mips/helper.h b/target/mips/helper.h
-index 02e16c7..82f6a40 100644
---- a/target/mips/helper.h
-+++ b/target/mips/helper.h
-@@ -864,7 +864,6 @@ DEF_HELPER_5(msa_pckev_df, void, env, i32, i32, i32, =
-i32)
- DEF_HELPER_5(msa_pckod_df, void, env, i32, i32, i32, i32)
- DEF_HELPER_5(msa_ilvl_df, void, env, i32, i32, i32, i32)
- DEF_HELPER_5(msa_ilvr_df, void, env, i32, i32, i32, i32)
--DEF_HELPER_5(msa_ilvev_df, void, env, i32, i32, i32, i32)
- DEF_HELPER_5(msa_vshf_df, void, env, i32, i32, i32, i32)
- DEF_HELPER_5(msa_srar_df, void, env, i32, i32, i32, i32)
- DEF_HELPER_5(msa_srlr_df, void, env, i32, i32, i32, i32)
-diff --git a/target/mips/msa_helper.c b/target/mips/msa_helper.c
-index a7ea6aa..d5c3842 100644
---- a/target/mips/msa_helper.c
-+++ b/target/mips/msa_helper.c
-@@ -1197,15 +1197,6 @@ MSA_FN_DF(ilvl_df)
-     } while (0)
- MSA_FN_DF(ilvr_df)
- #undef MSA_DO
--
--#define MSA_DO(DF)                      \
--    do {                                \
--        pwx->DF[2*i]   =3D pwt->DF[2*i];  \
--        pwx->DF[2*i+1] =3D pws->DF[2*i];  \
--    } while (0)
--MSA_FN_DF(ilvev_df)
--#undef MSA_DO
--
- #undef MSA_LOOP_COND
-=20
- #define MSA_LOOP_COND(DF) \
-diff --git a/target/mips/translate.c b/target/mips/translate.c
-index 4c8fef0..95bcc65 100644
---- a/target/mips/translate.c
-+++ b/target/mips/translate.c
-@@ -28958,6 +28958,76 @@ static inline void gen_ilvod_d(CPUMIPSState *env=
-, uint32_t wd,
-     tcg_gen_mov_i64(msa_wr_d[wd * 2 + 1], msa_wr_d[ws * 2 + 1]);
- }
-=20
-+
-+/*
-+ * [MSA] ILVEV.<B|H> wd, ws, wt
-+ *
-+ *   Vector Interleave Even (<byte|halfword> data elements)
-+ *
-+ */
-+static inline void gen_ilvev_bh(CPUMIPSState *env, uint32_t wd,
-+                                uint32_t ws, uint32_t wt,
-+                                uint64_t mask, uint32_t shift)
-+{
-+    TCGv_i64 t1 =3D tcg_temp_new_i64();
-+    TCGv_i64 t2 =3D tcg_temp_new_i64();
-+    TCGv_i64 mask_tcg =3D tcg_const_i64(mask);
-+
-+    tcg_gen_and_i64(t1, msa_wr_d[wt * 2], mask_tcg);
-+    tcg_gen_and_i64(t2, msa_wr_d[ws * 2], mask_tcg);
-+    tcg_gen_shli_i64(t2, t2, shift);
-+    tcg_gen_or_i64(msa_wr_d[wd * 2], t1, t2);
-+
-+    tcg_gen_and_i64(t1, msa_wr_d[wt * 2 + 1], mask_tcg);
-+    tcg_gen_and_i64(t2, msa_wr_d[ws * 2 + 1], mask_tcg);
-+    tcg_gen_shli_i64(t2, t2, shift);
-+    tcg_gen_or_i64(msa_wr_d[wd * 2 + 1], t1, t2);
-+
-+    tcg_temp_free_i64(mask_tcg);
-+    tcg_temp_free_i64(t1);
-+    tcg_temp_free_i64(t2);
-+}
-+
-+static inline void gen_ilvev_b(CPUMIPSState *env, uint32_t wd,
-+                               uint32_t ws, uint32_t wt)
-+{
-+    gen_ilvev_bh(env, wd, ws, wt, 0x00ff00ff00ff00ffULL, 8);
-+}
-+
-+static inline void gen_ilvev_h(CPUMIPSState *env, uint32_t wd,
-+                               uint32_t ws, uint32_t wt)
-+{
-+    gen_ilvev_bh(env, wd, ws, wt, 0x0000ffff0000ffffULL, 16);
-+}
-+
-+/*
-+ * [MSA] ILVEV.W wd, ws, wt
-+ *
-+ *   Vector Interleave Even (word data elements)
-+ *
-+ */
-+static inline void gen_ilvev_w(CPUMIPSState *env, uint32_t wd,
-+                               uint32_t ws, uint32_t wt)
-+{
-+    tcg_gen_deposit_i64(msa_wr_d[wd * 2], msa_wr_d[wt * 2],
-+                        msa_wr_d[ws * 2], 32, 32);
-+    tcg_gen_deposit_i64(msa_wr_d[wd * 2 + 1], msa_wr_d[wt * 2 + 1],
-+                        msa_wr_d[ws * 2 + 1], 32, 32);
-+}
-+
-+/*
-+ * [MSA] ILVEV.D wd, ws, wt
-+ *
-+ *   Vector Interleave Even (Doubleword data elements)
-+ *
-+ */
-+static inline void gen_ilvev_d(CPUMIPSState *env, uint32_t wd,
-+                               uint32_t ws, uint32_t wt)
-+{
-+    tcg_gen_mov_i64(msa_wr_d[wd * 2 + 1], msa_wr_d[ws * 2]);
-+    tcg_gen_mov_i64(msa_wr_d[wd * 2], msa_wr_d[wt * 2]);
-+}
-+
- static void gen_msa_3r(CPUMIPSState *env, DisasContext *ctx)
- {
- #define MASK_MSA_3R(op)    (MASK_MSA_MINOR(op) | (op & (0x7 << 23)))
-@@ -29114,7 +29184,22 @@ static void gen_msa_3r(CPUMIPSState *env, DisasC=
-ontext *ctx)
-         gen_helper_msa_mod_s_df(cpu_env, tdf, twd, tws, twt);
-         break;
-     case OPC_ILVEV_df:
--        gen_helper_msa_ilvev_df(cpu_env, tdf, twd, tws, twt);
-+        switch (df) {
-+        case DF_BYTE:
-+            gen_ilvev_b(env, wd, ws, wt);
-+            break;
-+        case DF_HALF:
-+            gen_ilvev_h(env, wd, ws, wt);
-+            break;
-+        case DF_WORD:
-+            gen_ilvev_w(env, wd, ws, wt);
-+            break;
-+        case DF_DOUBLE:
-+            gen_ilvev_d(env, wd, ws, wt);
-+            break;
-+        default:
-+            assert(0);
-+        }
-         break;
-     case OPC_BINSR_df:
-         gen_helper_msa_binsr_df(cpu_env, tdf, twd, tws, twt);
 --=20
-2.7.4
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3226
+Virtualization:  qemu.org | libvirt.org
+
+
+--UD44ldDwPNCTgR0vWmaNzV1JDeP8REgSh
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAly3SM0ACgkQp6FrSiUn
+Q2pPsQgAmFlgPNHkSyLJZXYzjaKmTV9etpHIo1YprNYzXi8RCCnNowveZnZ/qVVn
+6DzCGeYU7O70btDPHR848EhCpfayQVmRH1ooQNeTi4u2PUxv2kYO8ki7b8i/VPEA
+wyz4g9uMXxzvZPDZgFJ1zkW9NRjJgQVXbzX0yM1aOMLdSBGFqGWyx6JK3KwlqNiC
+b99CSobUj8or/Ikvj/4aj8hZFK/AjgAtnhDe2BDoGDOAHJlTvfQOzqAwfxxwgIf9
+6hZ6EAbMJjn8ucs8saY6fGjffoUFDX1l3Dxn9tkw3FW+bqfcCHMtl6EeqPQBiC+/
+RMYWKqYSSxK07hQD0d6NZLTq3KQQIg==
+=QzvC
+-----END PGP SIGNATURE-----
+
+--UD44ldDwPNCTgR0vWmaNzV1JDeP8REgSh--
