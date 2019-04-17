@@ -1,34 +1,34 @@
-Received: from eggs.gnu.org ([209.51.188.92]:50427)
+Received: from eggs.gnu.org ([209.51.188.92]:50918)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1hGozi-0003Q9-Gd
-	for qemu-devel@nongnu.org; Wed, 17 Apr 2019 14:09:15 -0400
+	(envelope-from <armbru@redhat.com>) id 1hGp2R-0004LL-4z
+	for qemu-devel@nongnu.org; Wed, 17 Apr 2019 14:12:04 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1hGozh-0004WZ-Hz
-	for qemu-devel@nongnu.org; Wed, 17 Apr 2019 14:09:14 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:57596)
+	(envelope-from <armbru@redhat.com>) id 1hGp2Q-0005oZ-6t
+	for qemu-devel@nongnu.org; Wed, 17 Apr 2019 14:12:03 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:23804)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1hGozh-0004W2-93
-	for qemu-devel@nongnu.org; Wed, 17 Apr 2019 14:09:13 -0400
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
-	[10.5.11.23])
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1hGp2P-0005oC-Us
+	for qemu-devel@nongnu.org; Wed, 17 Apr 2019 14:12:02 -0400
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+	[10.5.11.22])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id C35B4C057F4C
-	for <qemu-devel@nongnu.org>; Wed, 17 Apr 2019 18:09:11 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id 25396301988C
+	for <qemu-devel@nongnu.org>; Wed, 17 Apr 2019 18:12:01 +0000 (UTC)
+Received: from blackfin.pond.sub.org (ovpn-116-116.ams2.redhat.com
+	[10.36.116.116])
+	by smtp.corp.redhat.com (Postfix) with ESMTPS id E655A1001E8A
+	for <qemu-devel@nongnu.org>; Wed, 17 Apr 2019 18:12:00 +0000 (UTC)
 From: Markus Armbruster <armbru@redhat.com>
 References: <20190411145256.8614-1-armbru@redhat.com>
-	<20190411145256.8614-4-armbru@redhat.com>
-	<0683b00f-1d17-137b-1273-ba063d0d9dba@redhat.com>
-	<87tvf4v9i0.fsf@dusky.pond.sub.org>
-Date: Wed, 17 Apr 2019 20:09:07 +0200
-In-Reply-To: <87tvf4v9i0.fsf@dusky.pond.sub.org> (Markus Armbruster's message
-	of "Thu, 11 Apr 2019 17:37:11 +0200")
-Message-ID: <87zhoov70c.fsf@dusky.pond.sub.org>
+Date: Wed, 17 Apr 2019 20:11:59 +0200
+In-Reply-To: <20190411145256.8614-1-armbru@redhat.com> (Markus Armbruster's
+	message of "Thu, 11 Apr 2019 16:52:41 +0200")
+Message-ID: <87mukov6vk.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v2 03/15] char-pty: Drop "char device
- redirected to" message
+Content-Type: text/plain
+Subject: [Qemu-devel] [PATCH v2 14.5/15] char-pty: Print "char device
+ redirected" message to stdout
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,56 +37,38 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: qemu-devel@nongnu.org, =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>
+To: qemu-devel@nongnu.org
 
-Markus Armbruster <armbru@redhat.com> writes:
+char_pty_open() prints a "char device redirected to PTY_NAME (label
+LABEL)" message to the current monitor or else to stderr.  This is not
+an error, so it shouldn't go to stderr.  Print it to stdout instead.
 
-> Paolo Bonzini <pbonzini@redhat.com> writes:
->
->> On 11/04/19 16:52, Markus Armbruster wrote:
->>> char_pty_open() prints a "char device redirected to PTY_NAME (label
->>> LABEL)" message to the current monitor or else to stderr.  No other
->>> ChardevClass::open() prints anything on success.  Drop the message.
->>>=20
->>> Cc: "Marc-Andr=C3=A9 Lureau" <marcandre.lureau@redhat.com>
->>> Cc: Paolo Bonzini <pbonzini@redhat.com>
->>> Signed-off-by: Markus Armbruster <armbru@redhat.com>
->>> Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
->>> ---
->>>  chardev/char-pty.c | 2 --
->>>  1 file changed, 2 deletions(-)
->>>=20
->>> diff --git a/chardev/char-pty.c b/chardev/char-pty.c
->>> index b034332edd..a48d3e5d20 100644
->>> --- a/chardev/char-pty.c
->>> +++ b/chardev/char-pty.c
->>> @@ -211,8 +211,6 @@ static void char_pty_open(Chardev *chr,
->>>      qemu_set_nonblock(master_fd);
->>>=20=20
->>>      chr->filename =3D g_strdup_printf("pty:%s", pty_name);
->>> -    error_printf("char device redirected to %s (label %s)\n",
->>> -                 pty_name, chr->label);
->>>=20=20
->>>      s =3D PTY_CHARDEV(chr);
->>>      s->ioc =3D QIO_CHANNEL(qio_channel_file_new_fd(master_fd));
->>
->> The reason for the message is that the char device is completely useless
->> until the user knows the /dev/pts/N path[1].  You can get it with "info
->> chardev" (aka query-chardev for QMP) but there's an interesting chicken
->> and egg problem if the pty is for your monitor...
->>
->> Paolo
->
-> During review of v1, I wrote:
->
->     If we should decide the message is still useful enough to be worth
->     keeping, I could direct it to stdout instead of dropping it.
->
-> No clear conclusion emerged, so I did nothing for v2.  If we conclude to
-> keep the message now, I'll gladly do that.
+Why is it even printed?  No other ChardevClass::open() prints anything
+on success.  It's because you need to know PTY_NAME to actually use
+this char device, e.g. like e.g. "socat STDIO,cfmakeraw FILE:PTY_NAME"
+to use the monitor's readline interface.  You can get PTY_NAME with
+"info chardev" (a.k.a. query-chardev for QMP), but only if you already
+have a monitor.
 
-No further comments, no clear conclusion, so let's stick to the status
-quo.  I'll drop this patch and add one to print the message to stdout.
+Signed-off-by: Markus Armbruster <armbru@redhat.com>
+---
+ chardev/char-pty.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-[...]
+diff --git a/chardev/char-pty.c b/chardev/char-pty.c
+index b034332edd..4ff2f328fa 100644
+--- a/chardev/char-pty.c
++++ b/chardev/char-pty.c
+@@ -211,8 +211,8 @@ static void char_pty_open(Chardev *chr,
+     qemu_set_nonblock(master_fd);
+ 
+     chr->filename = g_strdup_printf("pty:%s", pty_name);
+-    error_printf("char device redirected to %s (label %s)\n",
+-                 pty_name, chr->label);
++    qemu_printf("char device redirected to %s (label %s)\n",
++                pty_name, chr->label);
+ 
+     s = PTY_CHARDEV(chr);
+     s->ioc = QIO_CHANNEL(qio_channel_file_new_fd(master_fd));
+-- 
+2.17.2
