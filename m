@@ -1,26 +1,21 @@
-Received: from eggs.gnu.org ([209.51.188.92]:42046)
+Received: from eggs.gnu.org ([209.51.188.92]:42388)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1hGqXQ-00054C-BB
-	for qemu-devel@nongnu.org; Wed, 17 Apr 2019 15:48:09 -0400
+	(envelope-from <daniel.santos@pobox.com>) id 1hGqZ9-0005tf-AM
+	for qemu-devel@nongnu.org; Wed, 17 Apr 2019 15:49:56 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1hGqXO-0003sN-S5
-	for qemu-devel@nongnu.org; Wed, 17 Apr 2019 15:48:08 -0400
-Resent-Message-Id: <E1hGqXO-0003sN-S5@eggs.gnu.org>
-Received: from sender4-of-o55.zoho.com ([136.143.188.55]:21584)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
-	id 1hGqXO-0003rB-IU
-	for qemu-devel@nongnu.org; Wed, 17 Apr 2019 15:48:06 -0400
-Message-ID: <155553047236.17102.7456957824753190305@76452e4e88f2>
-In-Reply-To: <20190417191805.28198-1-armbru@redhat.com>
-Reply-To: <qemu-devel@nongnu.org>
+	(envelope-from <daniel.santos@pobox.com>) id 1hGqZ8-0004qF-Dq
+	for qemu-devel@nongnu.org; Wed, 17 Apr 2019 15:49:55 -0400
+Received: from pb-smtp2.pobox.com ([64.147.108.71]:56351)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <daniel.santos@pobox.com>)
+	id 1hGqZ8-0004pd-5e
+	for qemu-devel@nongnu.org; Wed, 17 Apr 2019 15:49:54 -0400
+From: Daniel Santos <daniel.santos@pobox.com>
+Date: Wed, 17 Apr 2019 14:48:21 -0500
+Message-Id: <20190417194821.23017-1-daniel.santos@pobox.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Wed, 17 Apr 2019 12:47:53 -0700 (PDT)
-Subject: Re: [Qemu-devel] [PATCH v2 00/17] Clean up and simplify around
- fprintf_function
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PATCH] mips: Fix "Unexpected FPU mode"
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,113 +24,50 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: armbru@redhat.com
-Cc: fam@euphon.net, qemu-devel@nongnu.org, dgilbert@redhat.com
+To: qemu-devel <qemu-devel@nongnu.org>
+Cc: Daniel Santos <daniel.santos@pobox.com>
 
-UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDE5MDQxNzE5MTgwNS4yODE5
-OC0xLWFybWJydUByZWRoYXQuY29tLwoKCgpIaSwKClRoaXMgc2VyaWVzIHNlZW1zIHRvIGhhdmUg
-c29tZSBjb2Rpbmcgc3R5bGUgcHJvYmxlbXMuIFNlZSBvdXRwdXQgYmVsb3cgZm9yCm1vcmUgaW5m
-b3JtYXRpb246CgpNZXNzYWdlLWlkOiAyMDE5MDQxNzE5MTgwNS4yODE5OC0xLWFybWJydUByZWRo
-YXQuY29tClN1YmplY3Q6IFtRZW11LWRldmVsXSBbUEFUQ0ggdjIgMDAvMTddIENsZWFuIHVwIGFu
-ZCBzaW1wbGlmeSBhcm91bmQgZnByaW50Zl9mdW5jdGlvbgpUeXBlOiBzZXJpZXMKCj09PSBURVNU
-IFNDUklQVCBCRUdJTiA9PT0KIyEvYmluL2Jhc2gKZ2l0IHJldi1wYXJzZSBiYXNlID4gL2Rldi9u
-dWxsIHx8IGV4aXQgMApnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVsaW1pdCAwCmdpdCBj
-b25maWcgLS1sb2NhbCBkaWZmLnJlbmFtZXMgVHJ1ZQpnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5h
-bGdvcml0aG0gaGlzdG9ncmFtCi4vc2NyaXB0cy9jaGVja3BhdGNoLnBsIC0tbWFpbGJhY2sgYmFz
-ZS4uCj09PSBURVNUIFNDUklQVCBFTkQgPT09CgpVcGRhdGluZyAzYzhjZjVhOWMyMWZmODc4MjE2
-NGQxZGVmN2Y0NGJkODg4NzEzMzg0CkZyb20gaHR0cHM6Ly9naXRodWIuY29tL3BhdGNoZXctcHJv
-amVjdC9xZW11CiB0IFt0YWcgdXBkYXRlXSAgICAgICAgICAgIHBhdGNoZXcvMjAxOTA0MTcxOTE4
-MDUuMjgxOTgtMS1hcm1icnVAcmVkaGF0LmNvbSAtPiBwYXRjaGV3LzIwMTkwNDE3MTkxODA1LjI4
-MTk4LTEtYXJtYnJ1QHJlZGhhdC5jb20KU3dpdGNoZWQgdG8gYSBuZXcgYnJhbmNoICd0ZXN0Jwo4
-YjE0MmZjNzY3IGluY2x1ZGU6IE1vdmUgZnByaW50Zl9mdW5jdGlvbiB0byBkaXNhcy8KZDY5ZjAx
-YjFiMyBkaXNhczogUmVuYW1lIGluY2x1ZGUvZGlzYXMvYmZkLmggYmFjayB0byBpbmNsdWRlL2Rp
-c2FzL2Rpcy1hc20uaAo0NzNhMWM4Nzc5IG1vbml0b3I6IENsZWFuIHVwIGhvdyBtb25pdG9yX2Rp
-c2FzKCkgZnVubmVscyBvdXRwdXQgdG8gbW9uaXRvcgozNjNhOGY5MjU4IHFvbS9jcHU6IFNpbXBs
-aWZ5IGhvdyBDUFVDbGFzczpjcHVfZHVtcF9zdGF0ZSgpIHByaW50cwphMmJlM2MwNWY5IHFlbXUt
-cHJpbnQ6IE5ldyBxZW11X2ZwcmludGYoKSwgcWVtdV92ZnByaW50ZigpCjFmNjM4NmM2NTUgcW9t
-L2NwdTogU2ltcGxpZnkgaG93IENQVUNsYXNzOjpkdW1wX3N0YXRpc3RpY3MoKSBwcmludHMKZmMz
-MzgzNWI2MSB0YXJnZXQvaTM4NjogU2ltcGxpZnkgaG93IHg4Nl9jcHVfZHVtcF9sb2NhbF9hcGlj
-X3N0YXRlKCkgcHJpbnRzCmJlYTNiNzc3ZGIgdGFyZ2V0OiBDbGVhbiB1cCBob3cgdGhlIGR1bXBf
-bW11KCkgcHJpbnQKMGNmMjJiYjhmNCB0YXJnZXQ6IFNpbXBsaWZ5IGhvdyB0aGUgVEFSR0VUX2Nw
-dV9saXN0KCkgcHJpbnQKZWRhZTVmOWMzNiBtZW1vcnk6IENsZWFuIHVwIGhvdyBtdHJlZV9pbmZv
-KCkgcHJpbnRzCjQwOWIwYTllZjYgYmxvY2svcWFwaTogQ2xlYW4gdXAgaG93IHdlIHByaW50IHRv
-IG1vbml0b3Igb3Igc3Rkb3V0CmEyZGIyYzEwOGQgcXNwOiBTaW1wbGlmeSBob3cgcXNwX3JlcG9y
-dCgpIHByaW50cwplZWVmMzgyYzhiIHRjZzogU2ltcGxpZnkgaG93IGR1bXBfZHJpZnRfaW5mbygp
-IHByaW50cwoyNmYwOTQxZjE1IHRjZzogU2ltcGxpZnkgaG93IGR1bXBfZXhlY19pbmZvKCkgcHJp
-bnRzCjFiZWZkNDc4N2EgdGNnOiBTaW1wbGlmeSBob3cgZHVtcF9vcGNvdW50X2luZm8oKSBwcmlu
-dHMKY2E1OTdmMmQ4ZSB0cmFjZTogU2ltcGxpZnkgaG93IHN0X3ByaW50X3RyYWNlX2ZpbGVfc3Rh
-dHVzKCkgcHJpbnRzCjFjNmQ0MzY2OTcgaW5jbHVkZTogSW5jbHVkZSBmcHJpbnRmLWZuLmggb25s
-eSB3aGVyZSBuZWVkZWQKCj09PSBPVVRQVVQgQkVHSU4gPT09CjEvMTcgQ2hlY2tpbmcgY29tbWl0
-IDFjNmQ0MzY2OTc4OSAoaW5jbHVkZTogSW5jbHVkZSBmcHJpbnRmLWZuLmggb25seSB3aGVyZSBu
-ZWVkZWQpCjIvMTcgQ2hlY2tpbmcgY29tbWl0IGNhNTk3ZjJkOGU5NSAodHJhY2U6IFNpbXBsaWZ5
-IGhvdyBzdF9wcmludF90cmFjZV9maWxlX3N0YXR1cygpIHByaW50cykKMy8xNyBDaGVja2luZyBj
-b21taXQgMWJlZmQ0Nzg3YTYxICh0Y2c6IFNpbXBsaWZ5IGhvdyBkdW1wX29wY291bnRfaW5mbygp
-IHByaW50cykKNC8xNyBDaGVja2luZyBjb21taXQgMjZmMDk0MWYxNWRjICh0Y2c6IFNpbXBsaWZ5
-IGhvdyBkdW1wX2V4ZWNfaW5mbygpIHByaW50cykKNS8xNyBDaGVja2luZyBjb21taXQgZWVlZjM4
-MmM4YmRiICh0Y2c6IFNpbXBsaWZ5IGhvdyBkdW1wX2RyaWZ0X2luZm8oKSBwcmludHMpCjYvMTcg
-Q2hlY2tpbmcgY29tbWl0IGEyZGIyYzEwOGQyNSAocXNwOiBTaW1wbGlmeSBob3cgcXNwX3JlcG9y
-dCgpIHByaW50cykKNy8xNyBDaGVja2luZyBjb21taXQgNDA5YjBhOWVmNjQxIChibG9jay9xYXBp
-OiBDbGVhbiB1cCBob3cgd2UgcHJpbnQgdG8gbW9uaXRvciBvciBzdGRvdXQpCjgvMTcgQ2hlY2tp
-bmcgY29tbWl0IGVkYWU1ZjljMzYwYSAobWVtb3J5OiBDbGVhbiB1cCBob3cgbXRyZWVfaW5mbygp
-IHByaW50cykKOS8xNyBDaGVja2luZyBjb21taXQgMGNmMjJiYjhmNDJlICh0YXJnZXQ6IFNpbXBs
-aWZ5IGhvdyB0aGUgVEFSR0VUX2NwdV9saXN0KCkgcHJpbnQpCjEwLzE3IENoZWNraW5nIGNvbW1p
-dCBiZWEzYjc3N2RiZmEgKHRhcmdldDogQ2xlYW4gdXAgaG93IHRoZSBkdW1wX21tdSgpIHByaW50
-KQpXQVJOSU5HOiBsaW5lIG92ZXIgODAgY2hhcmFjdGVycwojOTUwOiBGSUxFOiB0YXJnZXQveHRl
-bnNhL21tdV9oZWxwZXIuYzo3ODQ6CisgICAgICAgICAgICAgICAgICAgIHFlbXVfcHJpbnRmKCJc
-dFZhZGRyICAgICAgIFBhZGRyICAgICAgIEFTSUQgIEF0dHIgUldYIENhY2hlXG4iCgp0b3RhbDog
-MCBlcnJvcnMsIDEgd2FybmluZ3MsIDg0OCBsaW5lcyBjaGVja2VkCgpQYXRjaCAxMC8xNyBoYXMg
-c3R5bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZpZXcuICBJZiBhbnkgb2YgdGhlc2UgZXJyb3JzCmFy
-ZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1haW50YWluZXIsIHNlZQpDSEVD
-S1BBVENIIGluIE1BSU5UQUlORVJTLgoxMS8xNyBDaGVja2luZyBjb21taXQgZmMzMzgzNWI2MTc4
-ICh0YXJnZXQvaTM4NjogU2ltcGxpZnkgaG93IHg4Nl9jcHVfZHVtcF9sb2NhbF9hcGljX3N0YXRl
-KCkgcHJpbnRzKQoxMi8xNyBDaGVja2luZyBjb21taXQgMWY2Mzg2YzY1NWE1IChxb20vY3B1OiBT
-aW1wbGlmeSBob3cgQ1BVQ2xhc3M6OmR1bXBfc3RhdGlzdGljcygpIHByaW50cykKMTMvMTcgQ2hl
-Y2tpbmcgY29tbWl0IGEyYmUzYzA1ZjlmYyAocWVtdS1wcmludDogTmV3IHFlbXVfZnByaW50Zigp
-LCBxZW11X3ZmcHJpbnRmKCkpCjE0LzE3IENoZWNraW5nIGNvbW1pdCAzNjNhOGY5MjU4YTQgKHFv
-bS9jcHU6IFNpbXBsaWZ5IGhvdyBDUFVDbGFzczpjcHVfZHVtcF9zdGF0ZSgpIHByaW50cykKRVJS
-T1I6IGxpbmUgb3ZlciA5MCBjaGFyYWN0ZXJzCiMxMDUxOiBGSUxFOiB0YXJnZXQvaTM4Ni9oZWxw
-ZXIuYzo0MTk6CisgICAgICAgIHFlbXVfZnByaW50ZihmLCAiUkFYPSUwMTYiIFBSSXg2NCAiIFJC
-WD0lMDE2IiBQUkl4NjQgIiBSQ1g9JTAxNiIgUFJJeDY0ICIgUkRYPSUwMTYiIFBSSXg2NCAiXG4i
-CgpFUlJPUjogbGluZSBvdmVyIDkwIGNoYXJhY3RlcnMKIzEwNTI6IEZJTEU6IHRhcmdldC9pMzg2
-L2hlbHBlci5jOjQyMDoKKyAgICAgICAgICAgICAgICAgICAgICJSU0k9JTAxNiIgUFJJeDY0ICIg
-UkRJPSUwMTYiIFBSSXg2NCAiIFJCUD0lMDE2IiBQUkl4NjQgIiBSU1A9JTAxNiIgUFJJeDY0ICJc
-biIKCkVSUk9SOiBsaW5lIG92ZXIgOTAgY2hhcmFjdGVycwojMTA1MzogRklMRTogdGFyZ2V0L2kz
-ODYvaGVscGVyLmM6NDIxOgorICAgICAgICAgICAgICAgICAgICAgIlI4ID0lMDE2IiBQUkl4NjQg
-IiBSOSA9JTAxNiIgUFJJeDY0ICIgUjEwPSUwMTYiIFBSSXg2NCAiIFIxMT0lMDE2IiBQUkl4NjQg
-IlxuIgoKRVJST1I6IGxpbmUgb3ZlciA5MCBjaGFyYWN0ZXJzCiMxMDU0OiBGSUxFOiB0YXJnZXQv
-aTM4Ni9oZWxwZXIuYzo0MjI6CisgICAgICAgICAgICAgICAgICAgICAiUjEyPSUwMTYiIFBSSXg2
-NCAiIFIxMz0lMDE2IiBQUkl4NjQgIiBSMTQ9JTAxNiIgUFJJeDY0ICIgUjE1PSUwMTYiIFBSSXg2
-NCAiXG4iCgpFUlJPUjogbGluZSBvdmVyIDkwIGNoYXJhY3RlcnMKIzEwNTU6IEZJTEU6IHRhcmdl
-dC9pMzg2L2hlbHBlci5jOjQyMzoKKyAgICAgICAgICAgICAgICAgICAgICJSSVA9JTAxNiIgUFJJ
-eDY0ICIgUkZMPSUwOHggWyVjJWMlYyVjJWMlYyVjXSBDUEw9JWQgSUk9JWQgQTIwPSVkIFNNTT0l
-ZCBITFQ9JWRcbiIsCgpXQVJOSU5HOiBsaW5lIG92ZXIgODAgY2hhcmFjdGVycwojMTE2MzogRklM
-RTogdGFyZ2V0L2kzODYvaGVscGVyLmM6NDk0OgorICAgICAgICBxZW11X2ZwcmludGYoZiwgIkNS
-MD0lMDh4IENSMj0lMDE2IiBQUkl4NjQgIiBDUjM9JTAxNiIgUFJJeDY0ICIgQ1I0PSUwOHhcbiIs
-CgpXQVJOSU5HOiBsaW5lIG92ZXIgODAgY2hhcmFjdGVycwojMTc1MTogRklMRTogdGFyZ2V0L21p
-cHMvdHJhbnNsYXRlLmM6Mjk3OTE6CisgICAgcWVtdV9mcHJpbnRmKGYsICJDUDAgU3RhdHVzICAw
-eCUwOHggQ2F1c2UgICAweCUwOHggRVBDICAgIDB4IiBUQVJHRVRfRk1UX2x4ICJcbiIsCgp0b3Rh
-bDogNSBlcnJvcnMsIDIgd2FybmluZ3MsIDI1NTEgbGluZXMgY2hlY2tlZAoKUGF0Y2ggMTQvMTcg
-aGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVycm9y
-cwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBtYWludGFpbmVyLCBzZWUK
-Q0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KCjE1LzE3IENoZWNraW5nIGNvbW1pdCA0NzNhMWM4
-Nzc5MzAgKG1vbml0b3I6IENsZWFuIHVwIGhvdyBtb25pdG9yX2Rpc2FzKCkgZnVubmVscyBvdXRw
-dXQgdG8gbW9uaXRvcikKMTYvMTcgQ2hlY2tpbmcgY29tbWl0IGQ2OWYwMWIxYjMxNSAoZGlzYXM6
-IFJlbmFtZSBpbmNsdWRlL2Rpc2FzL2JmZC5oIGJhY2sgdG8gaW5jbHVkZS9kaXNhcy9kaXMtYXNt
-LmgpCldBUk5JTkc6IGFkZGVkLCBtb3ZlZCBvciBkZWxldGVkIGZpbGUocyksIGRvZXMgTUFJTlRB
-SU5FUlMgbmVlZCB1cGRhdGluZz8KIzI5NjogCnJlbmFtZSBmcm9tIGluY2x1ZGUvZGlzYXMvYmZk
-LmgKCnRvdGFsOiAwIGVycm9ycywgMSB3YXJuaW5ncywgMTkyIGxpbmVzIGNoZWNrZWQKClBhdGNo
-IDE2LzE3IGhhcyBzdHlsZSBwcm9ibGVtcywgcGxlYXNlIHJldmlldy4gIElmIGFueSBvZiB0aGVz
-ZSBlcnJvcnMKYXJlIGZhbHNlIHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRhaW5l
-ciwgc2VlCkNIRUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMuCjE3LzE3IENoZWNraW5nIGNvbW1pdCA4
-YjE0MmZjNzY3NjAgKGluY2x1ZGU6IE1vdmUgZnByaW50Zl9mdW5jdGlvbiB0byBkaXNhcy8pCldB
-Uk5JTkc6IGFkZGVkLCBtb3ZlZCBvciBkZWxldGVkIGZpbGUocyksIGRvZXMgTUFJTlRBSU5FUlMg
-bmVlZCB1cGRhdGluZz8KIzQ1OiAKZGVsZXRlZCBmaWxlIG1vZGUgMTAwNjQ0Cgp0b3RhbDogMCBl
-cnJvcnMsIDEgd2FybmluZ3MsIDE3IGxpbmVzIGNoZWNrZWQKClBhdGNoIDE3LzE3IGhhcyBzdHls
-ZSBwcm9ibGVtcywgcGxlYXNlIHJldmlldy4gIElmIGFueSBvZiB0aGVzZSBlcnJvcnMKYXJlIGZh
-bHNlIHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRhaW5lciwgc2VlCkNIRUNLUEFU
-Q0ggaW4gTUFJTlRBSU5FUlMuCj09PSBPVVRQVVQgRU5EID09PQoKVGVzdCBjb21tYW5kIGV4aXRl
-ZCB3aXRoIGNvZGU6IDEKCgpUaGUgZnVsbCBsb2cgaXMgYXZhaWxhYmxlIGF0Cmh0dHA6Ly9wYXRj
-aGV3Lm9yZy9sb2dzLzIwMTkwNDE3MTkxODA1LjI4MTk4LTEtYXJtYnJ1QHJlZGhhdC5jb20vdGVz
-dGluZy5jaGVja3BhdGNoLz90eXBlPW1lc3NhZ2UuCi0tLQpFbWFpbCBnZW5lcmF0ZWQgYXV0b21h
-dGljYWxseSBieSBQYXRjaGV3IFtodHRwczovL3BhdGNoZXcub3JnL10uClBsZWFzZSBzZW5kIHlv
-dXIgZmVlZGJhY2sgdG8gcGF0Y2hldy1kZXZlbEByZWRoYXQuY29t
+In load_elf_binary, struct image_info interp_info is used without being
+properly initialized.  One result is that when the ELF's program header
+doesn't contain an entry for the ABI flags, then the value of the struct
+image_info's fp_abi field is set to whatever happened to be in stack
+memory at the time.
+
+This patch both sanitizes interp_info and initializes fp_abi for
+TARGET_MIPS to MIPS_ABI_FP_UNKNOWN so that when we don't know the FP
+ABI, we don't just blow up.  Currently, this bug is a complete stopper
+for some MIPS binaries.
+
+***PLEASE NOTE***
+There may be other bugs as a result of struct image_info interp_info
+fields not being properly initialized -- this patch only addresses the
+fp_abi field.  I reccomend somebody who knows the code better than I
+audit this function and the whole of that execution path.
+
+Fixes bug #1825002 and affects 3.1.0 and 4.x, reccomend backporting to
+3.1.0.
+
+Signed-off-by: Daniel Santos <daniel.santos@pobox.com>
+---
+ linux-user/elfload.c | 5 +++++
+ 1 file changed, 5 insertions(+)
+
+diff --git a/linux-user/elfload.c b/linux-user/elfload.c
+index c1a26021f8..7f09d572a2 100644
+--- a/linux-user/elfload.c
++++ b/linux-user/elfload.c
+@@ -2698,6 +2698,11 @@ int load_elf_binary(struct linux_binprm *bprm, str=
+uct image_info *info)
+     char *elf_interpreter =3D NULL;
+     char *scratch;
+=20
++    memset(&interp_info, 0, sizeof(interp_info));
++#ifdef TARGET_MIPS
++    interp_info.fp_abi =3D MIPS_ABI_FP_UNKNOWN;
++#endif
++
+     info->start_mmap =3D (abi_ulong)ELF_START_MMAP;
+=20
+     load_elf_image(bprm->filename, bprm->fd, info,
+--=20
+2.19.2
