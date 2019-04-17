@@ -2,52 +2,48 @@ Return-Path: <SRS0=PAXx=ST=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED autolearn=ham
+X-Spam-Status: No, score=-5.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_PASS autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A543FC10F12
-	for <qemu-devel@archiver.kernel.org>; Wed, 17 Apr 2019 11:07:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C5758C10F12
+	for <qemu-devel@archiver.kernel.org>; Wed, 17 Apr 2019 11:07:47 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7657120645
-	for <qemu-devel@archiver.kernel.org>; Wed, 17 Apr 2019 11:07:01 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7657120645
+	by mail.kernel.org (Postfix) with ESMTPS id 9574820645
+	for <qemu-devel@archiver.kernel.org>; Wed, 17 Apr 2019 11:07:47 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9574820645
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:50629 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:50637 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hGiP6-0003xc-Aj
-	for qemu-devel@archiver.kernel.org; Wed, 17 Apr 2019 07:07:00 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:54908)
+	id 1hGiPq-0004Uf-Qq
+	for qemu-devel@archiver.kernel.org; Wed, 17 Apr 2019 07:07:46 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:55034)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1hGiO0-0003Ui-LS
-	for qemu-devel@nongnu.org; Wed, 17 Apr 2019 07:05:53 -0400
+	(envelope-from <david@redhat.com>) id 1hGiOY-0003nF-Uy
+	for qemu-devel@nongnu.org; Wed, 17 Apr 2019 07:06:27 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1hGiNz-0005HT-NN
-	for qemu-devel@nongnu.org; Wed, 17 Apr 2019 07:05:52 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:39362)
+	(envelope-from <david@redhat.com>) id 1hGiOW-0005jd-J6
+	for qemu-devel@nongnu.org; Wed, 17 Apr 2019 07:06:26 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:55946)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <david@redhat.com>)
-	id 1hGiNz-0005Fk-Aq; Wed, 17 Apr 2019 07:05:51 -0400
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
-	[10.5.11.15])
+	id 1hGiOU-0005hf-SH; Wed, 17 Apr 2019 07:06:24 -0400
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+	[10.5.11.16])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 4A58C3199383;
-	Wed, 17 Apr 2019 11:05:49 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id 4CC8480462;
+	Wed, 17 Apr 2019 11:06:21 +0000 (UTC)
 Received: from [10.36.117.141] (ovpn-117-141.ams2.redhat.com [10.36.117.141])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id BEAFC5D719;
-	Wed, 17 Apr 2019 11:05:47 +0000 (UTC)
-To: Richard Henderson <rth@twiddle.net>,
-	Richard Henderson <richard.henderson@linaro.org>, qemu-devel@nongnu.org
+	by smtp.corp.redhat.com (Postfix) with ESMTP id 0E1975C220;
+	Wed, 17 Apr 2019 11:06:19 +0000 (UTC)
+To: Cornelia Huck <cohuck@redhat.com>
 References: <20190416185301.25344-1-david@redhat.com>
-	<20190416185301.25344-2-david@redhat.com>
-	<7ab7e798-1d68-99f8-acda-873ad94a5fae@linaro.org>
-	<74ad67c6-bd3e-d37f-598a-334d2febcea1@redhat.com>
-	<e80a4dda-5837-4ba3-a14e-dad6a4a5b460@twiddle.net>
+	<20190417095456.741383a7.cohuck@redhat.com>
 From: David Hildenbrand <david@redhat.com>
 Openpgp: preference=signencrypt
 Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
@@ -94,22 +90,23 @@ Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
 	+8Umfre0Xt4713VxMygW0PnQt5aSQdMD58jHFxTk092mU+yIHj5LeYgvwSgZN4airXk5yRXl
 	SE+xAvmumFBY
 Organization: Red Hat GmbH
-Message-ID: <85267b5d-8608-0612-8b7f-3c0820b7eaaa@redhat.com>
-Date: Wed, 17 Apr 2019 13:05:47 +0200
+Message-ID: <44418310-c106-15cd-f4cd-11701f4aa47f@redhat.com>
+Date: Wed, 17 Apr 2019 13:06:19 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
 	Thunderbird/60.6.1
 MIME-Version: 1.0
-In-Reply-To: <e80a4dda-5837-4ba3-a14e-dad6a4a5b460@twiddle.net>
+In-Reply-To: <20190417095456.741383a7.cohuck@redhat.com>
 Content-Type: text/plain; charset="UTF-8"
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.41]);
-	Wed, 17 Apr 2019 11:05:49 +0000 (UTC)
+	(mx1.redhat.com [10.5.110.28]);
+	Wed, 17 Apr 2019 11:06:21 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH v2 01/41] tcg: Implement tcg_gen_gvec_3i()
+Subject: Re: [Qemu-devel] [PATCH v2 00/41] s390x/tcg: Vector Instruction
+ Support Part 2
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -121,52 +118,48 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-s390x@nongnu.org, Cornelia Huck <cohuck@redhat.com>,
-	Thomas Huth <thuth@redhat.com>
+Cc: Thomas Huth <thuth@redhat.com>, qemu-s390x@nongnu.org,
+	qemu-devel@nongnu.org, Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190417110547.OwHmY_yk4aaPEdgwl4xjRkl7cx42ZQD5ZBLtFLgSGyY@z>
+Message-ID: <20190417110619.MyR0TWK8FGBbQHC-bK9seaf6nmX5bXLySEZH0vL-8Kk@z>
 
-On 17.04.19 11:14, Richard Henderson wrote:
-> On 4/16/19 9:42 PM, David Hildenbrand wrote:
->> On 17.04.19 06:30, Richard Henderson wrote:
->>> On 4/16/19 8:52 AM, David Hildenbrand wrote:
->>>> Let's add tcg_gen_gvec_3i(), similar to tcg_gen_gvec_2i(), however
->>>> without introducing "gen_helper_gvec_3i *fnoi", as it isn't needed
->>>> for now.
->>>>
->>>> Signed-off-by: David Hildenbrand <david@redhat.com>
->>>> ---
->>>>  tcg/tcg-op-gvec.c | 139 ++++++++++++++++++++++++++++++++++++++++++++++
->>>>  tcg/tcg-op-gvec.h |  24 ++++++++
->>>>  2 files changed, 163 insertions(+)
->>>
->>> Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
->>>
->>>
->>> r~
->>>
+On 17.04.19 09:54, Cornelia Huck wrote:
+> On Tue, 16 Apr 2019 20:52:20 +0200
+> David Hildenbrand <david@redhat.com> wrote:
+> 
+>> This is the second part of vector instruction support for s390x. It is
+>> based on the series soon to land upstream:
+>>     [PATCH 0/9] tcg: Add tcg_gen_extract2_{i32,i64}
 >>
->> Thanks, can this go via Conny's tree or do you want to include this one
->> in your next TCG pull request?
+>> Part 1: Vector Support Instructions
+>> Part 2: Vector Integer Instructions
+>> Part 3: Vector String Instructions
+>> Part 4: Vector Floating-Point Instructions
 >>
+>> The current state can be found at (kept updated):
+>>     https://github.com/davidhildenbrand/qemu/tree/vx
+>>
+>> With the current state I can boot Linux kernel + user space compiled with
+>> SIMD support. This allows to boot distributions compiled exclusively for
+>> z13, requiring SIMD support. Also, it is now possible to build a complete
+>> kernel using rpmbuild as quite some issues have been sorted out.
+>>
+>> In this part, all Vector Integer Instructions introduced with the
+>> "Vector Facility" are added. Some instructions part of the Vector Extension
+>> Facilities are also added.
+>>
+>> v1 -> v2:
+>> - Many suggestions and fixes as outlined by Richard H.
+>> -- Mostly avoid oom helpers for 128-bit add/sub variants
+>> -- New vector helpers are not considered for now
 > 
-> Hmm.  Lemme take it through my tree, so that I can handle the
-> conflict that's certain to arise with the .opc adjustment.
-> 
-> There's only one patch in this set that depends on this, I think?
+> FWIW, I'd prefer a pull request for that over picking 41 patches :)
+> (I'm unlikely to be able to provide more insightful review anyway ;)
 
-Yes,
-
-[PATCH v2 28/41] s390x/tcg: Implement VECTOR ELEMENT ROTATE AND INSERT
-UNDER MASK
-
-> Connie may be able to take the other 39 in the meantime.
-> 
-
-I'll have to wait for extract2 either way, so I can also wait until this
-patch reaches upstream.
+Will do once the required patches are upstream and you rebased your
+branch. Thanks!
 
 -- 
 
