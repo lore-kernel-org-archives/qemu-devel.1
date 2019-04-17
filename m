@@ -1,19 +1,35 @@
-Received: from eggs.gnu.org ([209.51.188.92]:59954)
+Received: from eggs.gnu.org ([209.51.188.92]:33488)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1hGinT-0001H9-HF
-	for qemu-devel@nongnu.org; Wed, 17 Apr 2019 07:32:12 -0400
+	(envelope-from <bounces@canonical.com>) id 1hGivy-0004BA-3n
+	for qemu-devel@nongnu.org; Wed, 17 Apr 2019 07:40:59 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1hGinR-0001yr-KT
-	for qemu-devel@nongnu.org; Wed, 17 Apr 2019 07:32:11 -0400
-From: David Hildenbrand <david@redhat.com>
-Date: Wed, 17 Apr 2019 13:31:43 +0200
-Message-Id: <20190417113143.5551-3-david@redhat.com>
-In-Reply-To: <20190417113143.5551-1-david@redhat.com>
-References: <20190417113143.5551-1-david@redhat.com>
+	(envelope-from <bounces@canonical.com>) id 1hGivw-0000x0-Na
+	for qemu-devel@nongnu.org; Wed, 17 Apr 2019 07:40:58 -0400
+Received: from indium.canonical.com ([91.189.90.7]:55534)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1hGivs-0000pl-GO
+	for qemu-devel@nongnu.org; Wed, 17 Apr 2019 07:40:53 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1hGivp-0003SB-Cv
+	for <qemu-devel@nongnu.org>; Wed, 17 Apr 2019 11:40:49 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 601552E802D
+	for <qemu-devel@nongnu.org>; Wed, 17 Apr 2019 11:40:49 +0000 (UTC)
 MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v3 2/2] exec: Introduce qemu_maxrampagesize()
- and rename qemu_getrampagesize()
+Date: Wed, 17 Apr 2019 11:26:43 -0000
+From: Roman Zhuykov <1824853@bugs.launchpad.net>
+Reply-To: Bug 1824853 <1824853@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <155534806981.13632.6401186723464432088.malonedeb@gac.canonical.com>
+Message-Id: <155550040337.14372.7682116354119617558.malone@gac.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1824853] Re: 4.0.0-rc3 crashes with
+ tcg/tcg.c:3952: tcg_gen_code: Assertion `s->gen_insn_end_off[num_insns] ==
+ off' failed
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,194 +39,96 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Richard Henderson <rth@twiddle.net>, Cornelia Huck <cohuck@redhat.com>, Halil Pasic <pasic@linux.ibm.com>, Christian Borntraeger <borntraeger@de.ibm.com>, qemu-s390x@nongnu.org, David Gibson <david@gibson.dropbear.id.au>, Igor Mammedov <imammedo@redhat.com>, peter.maydell@linaro.org, pbonzini@redhat.com, Thomas Huth <thuth@redhat.com>, qemu-ppc@nongnu.org, Alex Williamson <alex.williamson@redhat.com>, David Hildenbrand <david@redhat.com>
 
-Rename qemu_getrampagesize() to qemu_minrampagesize(). While at it,
-properly rename find_max_supported_pagesize() to
-find_min_backend_pagesize().
+Richard, thank you for solving this so fast!
+I certainly can confirm attached executables work fine for me on patched ve=
+rsion.
 
-s390x is actually interested into the maximum ram pagesize, so
-introduce and use qemu_maxrampagesize().
+I'll also re-run full gcc regtest a bit later, but it runs for a rather
+long time, not sure this result will be important next week.
 
-Add a TODO, indicating that looking at any mapped memory backends is not
-100% correct in some cases.
+Hopefully, patchset will be included into 4 release.
 
-Signed-off-by: David Hildenbrand <david@redhat.com>
----
- exec.c                     | 44 ++++++++++++++++++++++++++++++++++----
- hw/ppc/spapr_caps.c        |  4 ++--
- hw/s390x/s390-virtio-ccw.c |  2 +-
- hw/vfio/spapr.c            |  2 +-
- include/exec/ram_addr.h    |  3 ++-
- target/ppc/kvm.c           |  2 +-
- 6 files changed, 47 insertions(+), 10 deletions(-)
+-- =
 
-diff --git a/exec.c b/exec.c
-index 6ab62f4eee..f9b834ef82 100644
---- a/exec.c
-+++ b/exec.c
-@@ -1687,7 +1687,7 @@ void ram_block_dump(Monitor *mon)
-  * when we actually open and map them.  Iterate over the file
-  * descriptors instead, and use qemu_fd_getpagesize().
-  */
--static int find_max_supported_pagesize(Object *obj, void *opaque)
-+static int find_min_backend_pagesize(Object *obj, void *opaque)
- {
-     long *hpsize_min =3D opaque;
-=20
-@@ -1703,7 +1703,27 @@ static int find_max_supported_pagesize(Object *obj=
-, void *opaque)
-     return 0;
- }
-=20
--long qemu_getrampagesize(void)
-+static int find_max_backend_pagesize(Object *obj, void *opaque)
-+{
-+    long *hpsize_max =3D opaque;
-+
-+    if (object_dynamic_cast(obj, TYPE_MEMORY_BACKEND)) {
-+        HostMemoryBackend *backend =3D MEMORY_BACKEND(obj);
-+        long hpsize =3D host_memory_backend_pagesize(backend);
-+
-+        if (host_memory_backend_is_mapped(backend) && (hpsize > *hpsize_=
-max)) {
-+            *hpsize_max =3D hpsize;
-+        }
-+    }
-+
-+    return 0;
-+}
-+
-+/*
-+ * TODO: We assume right now that all mapped host memory backends are
-+ * used as RAM, however some might be used for different purposes.
-+ */
-+long qemu_minrampagesize(void)
- {
-     long hpsize =3D LONG_MAX;
-     long mainrampagesize;
-@@ -1723,7 +1743,7 @@ long qemu_getrampagesize(void)
-      */
-     memdev_root =3D object_resolve_path("/objects", NULL);
-     if (memdev_root) {
--        object_child_foreach(memdev_root, find_max_supported_pagesize, &=
-hpsize);
-+        object_child_foreach(memdev_root, find_min_backend_pagesize, &hp=
-size);
-     }
-     if (hpsize =3D=3D LONG_MAX) {
-         /* No additional memory regions found =3D=3D> Report main RAM pa=
-ge size */
-@@ -1746,8 +1766,24 @@ long qemu_getrampagesize(void)
-=20
-     return hpsize;
- }
-+
-+long qemu_maxrampagesize(void)
-+{
-+    long pagesize =3D qemu_mempath_getpagesize(mem_path);
-+    Object *memdev_root =3D object_resolve_path("/objects", NULL);
-+
-+    if (memdev_root) {
-+        object_child_foreach(memdev_root, find_max_backend_pagesize,
-+                             &pagesize);
-+    }
-+    return pagesize;
-+}
- #else
--long qemu_getrampagesize(void)
-+long qemu_minrampagesize(void)
-+{
-+    return getpagesize();
-+}
-+long qemu_maxrampagesize(void)
- {
-     return getpagesize();
- }
-diff --git a/hw/ppc/spapr_caps.c b/hw/ppc/spapr_caps.c
-index edc5ed0e0c..9b1c10baa6 100644
---- a/hw/ppc/spapr_caps.c
-+++ b/hw/ppc/spapr_caps.c
-@@ -347,7 +347,7 @@ static void cap_hpt_maxpagesize_apply(SpaprMachineSta=
-te *spapr,
-         warn_report("Many guests require at least 64kiB hpt-max-page-siz=
-e");
-     }
-=20
--    spapr_check_pagesize(spapr, qemu_getrampagesize(), errp);
-+    spapr_check_pagesize(spapr, qemu_minrampagesize(), errp);
- }
-=20
- static bool spapr_pagesize_cb(void *opaque, uint32_t seg_pshift,
-@@ -609,7 +609,7 @@ static SpaprCapabilities default_caps_with_cpu(SpaprM=
-achineState *spapr,
-         uint8_t mps;
-=20
-         if (kvmppc_hpt_needs_host_contiguous_pages()) {
--            mps =3D ctz64(qemu_getrampagesize());
-+            mps =3D ctz64(qemu_minrampagesize());
-         } else {
-             mps =3D 34; /* allow everything up to 16GiB, i.e. everything=
- */
-         }
-diff --git a/hw/s390x/s390-virtio-ccw.c b/hw/s390x/s390-virtio-ccw.c
-index 3be5679657..7e256d3d31 100644
---- a/hw/s390x/s390-virtio-ccw.c
-+++ b/hw/s390x/s390-virtio-ccw.c
-@@ -188,7 +188,7 @@ static void s390_memory_init(ram_addr_t mem_size)
-      * Configure the maximum page size. As no memory devices were create=
-d
-      * yet, this is the page size of initial memory only.
-      */
--    s390_set_max_pagesize(qemu_getrampagesize(), &local_err);
-+    s390_set_max_pagesize(qemu_maxrampagesize(), &local_err);
-     if (local_err) {
-         error_report_err(local_err);
-         exit(EXIT_FAILURE);
-diff --git a/hw/vfio/spapr.c b/hw/vfio/spapr.c
-index 57fe758e54..96c0ad9d9b 100644
---- a/hw/vfio/spapr.c
-+++ b/hw/vfio/spapr.c
-@@ -148,7 +148,7 @@ int vfio_spapr_create_window(VFIOContainer *container=
-,
-     uint64_t pagesize =3D memory_region_iommu_get_min_page_size(iommu_mr=
-);
-     unsigned entries, bits_total, bits_per_level, max_levels;
-     struct vfio_iommu_spapr_tce_create create =3D { .argsz =3D sizeof(cr=
-eate) };
--    long rampagesize =3D qemu_getrampagesize();
-+    long rampagesize =3D qemu_minrampagesize();
-=20
-     /*
-      * The host might not support the guest supported IOMMU page size,
-diff --git a/include/exec/ram_addr.h b/include/exec/ram_addr.h
-index 9ecd911c3e..139ad79390 100644
---- a/include/exec/ram_addr.h
-+++ b/include/exec/ram_addr.h
-@@ -73,7 +73,8 @@ static inline unsigned long int ramblock_recv_bitmap_of=
-fset(void *host_addr,
-=20
- bool ramblock_is_pmem(RAMBlock *rb);
-=20
--long qemu_getrampagesize(void);
-+long qemu_minrampagesize(void);
-+long qemu_maxrampagesize(void);
-=20
- /**
-  * qemu_ram_alloc_from_file,
-diff --git a/target/ppc/kvm.c b/target/ppc/kvm.c
-index 2427c8ee13..59d92c4275 100644
---- a/target/ppc/kvm.c
-+++ b/target/ppc/kvm.c
-@@ -2136,7 +2136,7 @@ uint64_t kvmppc_rma_size(uint64_t current_size, uns=
-igned int hash_shift)
-     /* Find the largest hardware supported page size that's less than
-      * or equal to the (logical) backing page size of guest RAM */
-     kvm_get_smmu_info(&info, &error_fatal);
--    rampagesize =3D qemu_getrampagesize();
-+    rampagesize =3D qemu_minrampagesize();
-     best_page_shift =3D 0;
-=20
-     for (i =3D 0; i < KVM_PPC_PAGE_SIZES_MAX_SZ; i++) {
---=20
-2.20.1
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1824853
+
+Title:
+  4.0.0-rc3 crashes with tcg/tcg.c:3952: tcg_gen_code: Assertion
+  `s->gen_insn_end_off[num_insns] =3D=3D off' failed
+
+Status in QEMU:
+  In Progress
+
+Bug description:
+  I tried to bootstrap and regtested gcc trunk (gcc svn rev 270278,
+  datestamp 20190411) inside my arm64-gentoo installation under qemu-
+  system-aarch64.
+
+  Qemu version was 4.0.0-rc3 and -cpu cortex-a57. Qemu configured with
+  only --target-list=3Daarch64-softmmu,aarch64-linux-user and compiled
+  using gcc "version 5.5.0 20171010 (Ubuntu 5.5.0-12ubuntu1~16.04)".
+
+  Executable created from gcc/testsuite/gcc.target/aarch64/advsimd-
+  intrinsics/vldX.c compiled with -O2 crashed the whole qemu-system.
+
+  To investigate a bit I also manually run
+  ~/gcc/inst/trunk/bin/gcc ~/gcc/src/trunk/gcc/testsuite/gcc.target/aarch64=
+/advsimd-intrinsics/vldX.c
+  with different options like:
+  -O0 -lm -o d0.exe
+  -O1 -lm -o d1.exe
+  -O2 -lm -o d2.exe
+  -O0 -static -lm -o s0.exe
+  -O1 -static -lm -o s1.exe
+  -O2 -static -lm -o s2.exe
+
+  So, now I have 6 different arm64 executables created with different optim=
+ization levels. O0 and O1 versions run ok.
+  Three sN.exe static executables I've also tried in qemu user mode (with s=
+ame -cpu), no issue in user mode.
+
+  And inside qemu-system I can see that
+  running "d2.exe" (attached) gives:
+  tcg/tcg.c:3952: tcg_gen_code: Assertion `s->gen_insn_end_off[num_insns] =
+=3D=3D off' failed.
+
+  And running "s2.exe" gives:
+  tcg/tcg.c:320: set_jmp_reset_offset: Assertion `s->tb_jmp_reset_offset[wh=
+ich] =3D=3D off' failed.
+
+  It seems like this test is an counter-example for logic that
+  "tcg_ctx->nb_ops < 4000" implies tcg will fit into 16-bit signed size
+  (see tcg_op_buf_full comments).
+
+  Richard's changes in abebf92597186 and 9f754620651d were not enough, tran=
+slation block must be smaller, or we have to find some proper way to bail o=
+ut when buffer overflows.
+  I don't know why this situation is not caught by code_gen_highwater logic=
+ in tcg.c
+
+  I've also tried this "bail out" patch
+
+  diff --git a/tcg/tcg.c b/tcg/tcg.c
+  --- a/tcg/tcg.c
+  +++ b/tcg/tcg.c
+  @@ -3949,7 +3949,8 @@ int tcg_gen_code(TCGContext *s, TranslationBlock *t=
+b)
+                   size_t off =3D tcg_current_code_size(s);
+                   s->gen_insn_end_off[num_insns] =3D off;
+                   /* Assert that we do not overflow our stored offset.  */
+  -                assert(s->gen_insn_end_off[num_insns] =3D=3D off);
+  +                if (s->gen_insn_end_off[num_insns] !=3D off)
+  +                  return -1;
+               }
+               num_insns++;
+               for (i =3D 0; i < TARGET_INSN_START_WORDS; ++i) {
+
+  But then running "d2.exe" just hangs the whole qemu-system. It seems
+  that when tcg_gen_code return -1 (like in highwater logic mentioned
+  before), we just re-call it again and again.
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1824853/+subscriptions
