@@ -1,21 +1,20 @@
-Received: from eggs.gnu.org ([209.51.188.92]:60345)
+Received: from eggs.gnu.org ([209.51.188.92]:60386)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1hGptR-0007fr-8z
+	(envelope-from <armbru@redhat.com>) id 1hGptR-0007gx-UO
 	for qemu-devel@nongnu.org; Wed, 17 Apr 2019 15:06:50 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1hGptQ-0003cU-BD
+	(envelope-from <armbru@redhat.com>) id 1hGptQ-0003dO-Ur
 	for qemu-devel@nongnu.org; Wed, 17 Apr 2019 15:06:49 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:55480)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1hGptQ-0003b6-1d
-	for qemu-devel@nongnu.org; Wed, 17 Apr 2019 15:06:48 -0400
 From: Markus Armbruster <armbru@redhat.com>
-Date: Wed, 17 Apr 2019 21:06:31 +0200
-Message-Id: <20190417190641.26814-6-armbru@redhat.com>
+Date: Wed, 17 Apr 2019 21:06:38 +0200
+Message-Id: <20190417190641.26814-13-armbru@redhat.com>
 In-Reply-To: <20190417190641.26814-1-armbru@redhat.com>
 References: <20190417190641.26814-1-armbru@redhat.com>
-Subject: [Qemu-devel] [PATCH v3 05/15] pci: Report fatal errors with
- error_report(), not error_printf()
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PATCH v3 12/15] blockdev: Make -drive format=help
+ print to stdout
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,28 +24,60 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: "Michael S. Tsirkin" <mst@redhat.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
+Cc: Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org
 
-Cc: "Michael S. Tsirkin" <mst@redhat.com>
-Cc: Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
+Command line help explicitly requested by the user should be printed
+to stdout, not stderr.  We do elsewhere.  Adjust -drive to match: use
+qemu_printf() instead of error_printf().  Plain printf() would be
+wrong because we need to print to the current monitor for "drive_add
+... format=3Dhelp".
+
+Cc: Kevin Wolf <kwolf@redhat.com>
+Cc: Max Reitz <mreitz@redhat.com>
+Cc: qemu-block@nongnu.org
 Signed-off-by: Markus Armbruster <armbru@redhat.com>
-Reviewed-by: Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
+Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+Tested-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
 ---
- hw/pci/pci.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ blockdev.c | 9 +++++----
+ 1 file changed, 5 insertions(+), 4 deletions(-)
 
-diff --git a/hw/pci/pci.c b/hw/pci/pci.c
-index 6d13ef877b..1808b242dd 100644
---- a/hw/pci/pci.c
-+++ b/hw/pci/pci.c
-@@ -951,7 +951,7 @@ static uint16_t pci_req_id_cache_extract(PCIReqIDCache *cache)
-         result = PCI_BUILD_BDF(bus_n, 0);
-         break;
-     default:
--        error_printf("Invalid PCI requester ID cache type: %d\n",
-+        error_report("Invalid PCI requester ID cache type: %d",
-                      cache->type);
-         exit(1);
-         break;
--- 
+diff --git a/blockdev.c b/blockdev.c
+index 4775a07d93..79fbac8450 100644
+--- a/blockdev.c
++++ b/blockdev.c
+@@ -40,6 +40,7 @@
+ #include "monitor/monitor.h"
+ #include "qemu/error-report.h"
+ #include "qemu/option.h"
++#include "qemu/qemu-print.h"
+ #include "qemu/config-file.h"
+ #include "qapi/qapi-commands-block.h"
+ #include "qapi/qapi-commands-transaction.h"
+@@ -301,7 +302,7 @@ DriveInfo *drive_get_next(BlockInterfaceType type)
+=20
+ static void bdrv_format_print(void *opaque, const char *name)
+ {
+-    error_printf(" %s", name);
++    qemu_printf(" %s", name);
+ }
+=20
+ typedef struct {
+@@ -530,11 +531,11 @@ static BlockBackend *blockdev_init(const char *file=
+, QDict *bs_opts,
+=20
+     if ((buf =3D qemu_opt_get(opts, "format")) !=3D NULL) {
+         if (is_help_option(buf)) {
+-            error_printf("Supported formats:");
++            qemu_printf("Supported formats:");
+             bdrv_iterate_format(bdrv_format_print, NULL, false);
+-            error_printf("\nSupported formats (read-only):");
++            qemu_printf("\nSupported formats (read-only):");
+             bdrv_iterate_format(bdrv_format_print, NULL, true);
+-            error_printf("\n");
++            qemu_printf("\n");
+             goto early_err;
+         }
+=20
+--=20
 2.17.2
