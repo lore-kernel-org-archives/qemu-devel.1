@@ -2,129 +2,75 @@ Return-Path: <SRS0=PAXx=ST=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_PASS autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 94260C282DA
-	for <qemu-devel@archiver.kernel.org>; Wed, 17 Apr 2019 12:19:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BCCB6C282DA
+	for <qemu-devel@archiver.kernel.org>; Wed, 17 Apr 2019 12:22:16 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 543E02173C
-	for <qemu-devel@archiver.kernel.org>; Wed, 17 Apr 2019 12:19:03 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 543E02173C
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 8F8462173C
+	for <qemu-devel@archiver.kernel.org>; Wed, 17 Apr 2019 12:22:16 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8F8462173C
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:51766 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:51809 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hGjWo-0002lo-T9
-	for qemu-devel@archiver.kernel.org; Wed, 17 Apr 2019 08:19:02 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:43848)
+	id 1hGjZv-000457-PE
+	for qemu-devel@archiver.kernel.org; Wed, 17 Apr 2019 08:22:15 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:44496)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1hGjVl-0002S3-PI
-	for qemu-devel@nongnu.org; Wed, 17 Apr 2019 08:17:58 -0400
+	(envelope-from <bounces@canonical.com>) id 1hGjYg-0003U2-AG
+	for qemu-devel@nongnu.org; Wed, 17 Apr 2019 08:20:59 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1hGjVk-0006y7-TL
-	for qemu-devel@nongnu.org; Wed, 17 Apr 2019 08:17:57 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:54342)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1hGjVk-0006x8-BX
-	for qemu-devel@nongnu.org; Wed, 17 Apr 2019 08:17:56 -0400
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
-	[10.5.11.16])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 76BD0883A2;
-	Wed, 17 Apr 2019 12:17:55 +0000 (UTC)
-Received: from [10.36.112.44] (ovpn-112-44.ams2.redhat.com [10.36.112.44])
-	by smtp.corp.redhat.com (Postfix) with ESMTPS id 0EC7E5C226;
-	Wed, 17 Apr 2019 12:17:48 +0000 (UTC)
-To: Wei Li <wei.d.li@oracle.com>, Stefan Hajnoczi <stefanha@gmail.com>
-References: <5FF901C1-0AA5-4308-A65C-C448D0A2BA63@oracle.com>
-	<20190305172905.GD13806@stefanha-x1.localdomain>
-	<2D7F11D0-4A02-4A0F-961D-854240376B17@oracle.com>
-	<20190401090724.GA643@stefanha-x1.localdomain>
-	<C0F977FC-A960-4FA5-B2DF-BBD9DA664F8A@oracle.com>
-	<0c0f2d54-2b94-e278-cbce-b7175ba29cc8@redhat.com>
-	<85DF2701-24E2-4159-94F5-CB9C60D333BE@oracle.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Openpgp: preference=signencrypt
-Autocrypt: addr=pbonzini@redhat.com; prefer-encrypt=mutual; keydata=
-	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
-	uUHgL9dKIfvpm+rNXRn9wAwGjk0X/A==
-Message-ID: <5d5049df-655a-8ff1-d8fb-d363d684459b@redhat.com>
-Date: Wed, 17 Apr 2019 14:17:46 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
-	Thunderbird/60.6.1
+	(envelope-from <bounces@canonical.com>) id 1hGjYf-0002WG-5S
+	for qemu-devel@nongnu.org; Wed, 17 Apr 2019 08:20:58 -0400
+Received: from indium.canonical.com ([91.189.90.7]:34796)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1hGjYe-0002So-Sa
+	for qemu-devel@nongnu.org; Wed, 17 Apr 2019 08:20:57 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1hGjYb-0006qx-Hl
+	for <qemu-devel@nongnu.org>; Wed, 17 Apr 2019 12:20:53 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id D00F72E80D5
+	for <qemu-devel@nongnu.org>; Wed, 17 Apr 2019 12:20:52 +0000 (UTC)
 MIME-Version: 1.0
-In-Reply-To: <85DF2701-24E2-4159-94F5-CB9C60D333BE@oracle.com>
 Content-Type: text/plain; charset="UTF-8"
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.26]);
-	Wed, 17 Apr 2019 12:17:55 +0000 (UTC)
+Content-Transfer-Encoding: quoted-printable
+Date: Wed, 17 Apr 2019 12:12:32 -0000
+From: Peter Maydell <peter.maydell@linaro.org>
+To: qemu-devel@nongnu.org
+X-Launchpad-Notification-Type: bug
+X-Launchpad-Bug: product=qemu; status=In Progress; importance=Undecided;
+	assignee=rth@twiddle.net; 
+X-Launchpad-Bug-Information-Type: Public
+X-Launchpad-Bug-Private: no
+X-Launchpad-Bug-Security-Vulnerability: no
+X-Launchpad-Bug-Commenters: pmaydell rth zhroma
+X-Launchpad-Bug-Reporter: Roman Zhuykov (zhroma)
+X-Launchpad-Bug-Modifier: Peter Maydell (pmaydell)
+References: <155534806981.13632.6401186723464432088.malonedeb@gac.canonical.com>
+Message-Id:
+ <155550315295.13229.8649741771076151370.malone@wampee.canonical.com>
+X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
+X-Launchpad-Message-For: qemu-devel-ml
+Precedence: bulk
+X-Generated-By: Launchpad (canonical.com); Revision="18928";
+	Instance="launchpad-lazr.conf"
+X-Launchpad-Hash: 9af5d069910619134579ccaba01e8c137b5c17e2
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] Following up questions related to QEMU and I/O
- Thread
+X-Received-From: 91.189.90.7
+Subject: [Qemu-devel] [Bug 1824853] Re: 4.0.0-rc3 crashes with
+ tcg/tcg.c:3952: tcg_gen_code: Assertion `s->gen_insn_end_off[num_insns] ==
+ off' failed
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
-Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -133,24 +79,96 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Sergio Lopez Pascual <slp@redhat.com>, qemu-devel@nongnu.org,
-	Stefan Hajnoczi <stefanha@redhat.com>
+Reply-To: Bug 1824853 <1824853@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190417121746.FrC3wGeS8RL-2iGPvcshjAi0UcsOzRzSIqgNWK2XL2o@z>
+Message-ID: <20190417121232.k9qUZIDw7JF0i1Bu1HP1mCD7FGt1HlDgO3GUXjcMoKI@z>
 
-On 17/04/19 03:38, Wei Li wrote:
-> Thanks Paolo for your response and clarification.
-> 
-> Btw, is there any rough schedule about when are you planning to start
-> working on the multi queue feature?  Once you start working on the
-> feature, I would like to hear more details about the design and
-> better understand how this feature will benefit the performance of
-> virtio-scsi.
+Unfortunately the fix is too big for this point in the 4.0 release
+cycle; it'll go into 4.1.
 
-I wish I knew... :)  However, hopefully I will share the details soon
-with Sergio and start flushing that queue in 4.1.
+-- =
 
-Paolo
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1824853
+
+Title:
+  4.0.0-rc3 crashes with tcg/tcg.c:3952: tcg_gen_code: Assertion
+  `s->gen_insn_end_off[num_insns] =3D=3D off' failed
+
+Status in QEMU:
+  In Progress
+
+Bug description:
+  I tried to bootstrap and regtested gcc trunk (gcc svn rev 270278,
+  datestamp 20190411) inside my arm64-gentoo installation under qemu-
+  system-aarch64.
+
+  Qemu version was 4.0.0-rc3 and -cpu cortex-a57. Qemu configured with
+  only --target-list=3Daarch64-softmmu,aarch64-linux-user and compiled
+  using gcc "version 5.5.0 20171010 (Ubuntu 5.5.0-12ubuntu1~16.04)".
+
+  Executable created from gcc/testsuite/gcc.target/aarch64/advsimd-
+  intrinsics/vldX.c compiled with -O2 crashed the whole qemu-system.
+
+  To investigate a bit I also manually run
+  ~/gcc/inst/trunk/bin/gcc ~/gcc/src/trunk/gcc/testsuite/gcc.target/aarch64=
+/advsimd-intrinsics/vldX.c
+  with different options like:
+  -O0 -lm -o d0.exe
+  -O1 -lm -o d1.exe
+  -O2 -lm -o d2.exe
+  -O0 -static -lm -o s0.exe
+  -O1 -static -lm -o s1.exe
+  -O2 -static -lm -o s2.exe
+
+  So, now I have 6 different arm64 executables created with different optim=
+ization levels. O0 and O1 versions run ok.
+  Three sN.exe static executables I've also tried in qemu user mode (with s=
+ame -cpu), no issue in user mode.
+
+  And inside qemu-system I can see that
+  running "d2.exe" (attached) gives:
+  tcg/tcg.c:3952: tcg_gen_code: Assertion `s->gen_insn_end_off[num_insns] =
+=3D=3D off' failed.
+
+  And running "s2.exe" gives:
+  tcg/tcg.c:320: set_jmp_reset_offset: Assertion `s->tb_jmp_reset_offset[wh=
+ich] =3D=3D off' failed.
+
+  It seems like this test is an counter-example for logic that
+  "tcg_ctx->nb_ops < 4000" implies tcg will fit into 16-bit signed size
+  (see tcg_op_buf_full comments).
+
+  Richard's changes in abebf92597186 and 9f754620651d were not enough, tran=
+slation block must be smaller, or we have to find some proper way to bail o=
+ut when buffer overflows.
+  I don't know why this situation is not caught by code_gen_highwater logic=
+ in tcg.c
+
+  I've also tried this "bail out" patch
+
+  diff --git a/tcg/tcg.c b/tcg/tcg.c
+  --- a/tcg/tcg.c
+  +++ b/tcg/tcg.c
+  @@ -3949,7 +3949,8 @@ int tcg_gen_code(TCGContext *s, TranslationBlock *t=
+b)
+                   size_t off =3D tcg_current_code_size(s);
+                   s->gen_insn_end_off[num_insns] =3D off;
+                   /* Assert that we do not overflow our stored offset.  */
+  -                assert(s->gen_insn_end_off[num_insns] =3D=3D off);
+  +                if (s->gen_insn_end_off[num_insns] !=3D off)
+  +                  return -1;
+               }
+               num_insns++;
+               for (i =3D 0; i < TARGET_INSN_START_WORDS; ++i) {
+
+  But then running "d2.exe" just hangs the whole qemu-system. It seems
+  that when tcg_gen_code return -1 (like in highwater logic mentioned
+  before), we just re-call it again and again.
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1824853/+subscriptions
 
