@@ -1,23 +1,17 @@
-Received: from eggs.gnu.org ([209.51.188.92]:58095)
+Received: from eggs.gnu.org ([209.51.188.92]:59874)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <npiggin@gmail.com>) id 1hGieL-0007FR-GP
-	for qemu-devel@nongnu.org; Wed, 17 Apr 2019 07:22:46 -0400
+	(envelope-from <david@redhat.com>) id 1hGinF-0001Ax-GF
+	for qemu-devel@nongnu.org; Wed, 17 Apr 2019 07:31:58 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <npiggin@gmail.com>) id 1hGieJ-0001gb-RQ
-	for qemu-devel@nongnu.org; Wed, 17 Apr 2019 07:22:45 -0400
-Date: Wed, 17 Apr 2019 21:22:36 +1000
-From: Nicholas Piggin <npiggin@gmail.com>
-References: <20190412093603.18232-1-npiggin@gmail.com>
-	<20190415041359.GE32705@umbus.fritz.box>
-	<1555302690.7m52mtdllv.astroid@bobo.none>
-	<20190417004721.GG32705@umbus.fritz.box>
-In-Reply-To: <20190417004721.GG32705@umbus.fritz.box>
+	(envelope-from <david@redhat.com>) id 1hGinE-0001of-AT
+	for qemu-devel@nongnu.org; Wed, 17 Apr 2019 07:31:57 -0400
+From: David Hildenbrand <david@redhat.com>
+Date: Wed, 17 Apr 2019 13:31:41 +0200
+Message-Id: <20190417113143.5551-1-david@redhat.com>
 MIME-Version: 1.0
-Message-Id: <1555500026.z0ch7int8l.astroid@bobo.none>
-Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v2] spapr: add splpar hcalls H_JOIN, H_PROD,
- H_CONFER
+Subject: [Qemu-devel] [PATCH v3 0/2] s390x/kvm: Properly detect page size of
+ initial memory
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,41 +20,48 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Gibson <david@gibson.dropbear.id.au>
-Cc: Benjamin Herrenschmidt <benh@kernel.crashing.org>, =?iso-8859-1?q?C=E9dric?= Le Goater <clg@kaod.org>, qemu-devel@nongnu.org, qemu-ppc@nongnu.org
+To: qemu-devel@nongnu.org
+Cc: Richard Henderson <rth@twiddle.net>, Cornelia Huck <cohuck@redhat.com>, Halil Pasic <pasic@linux.ibm.com>, Christian Borntraeger <borntraeger@de.ibm.com>, qemu-s390x@nongnu.org, David Gibson <david@gibson.dropbear.id.au>, Igor Mammedov <imammedo@redhat.com>, peter.maydell@linaro.org, pbonzini@redhat.com, Thomas Huth <thuth@redhat.com>, qemu-ppc@nongnu.org, Alex Williamson <alex.williamson@redhat.com>, David Hildenbrand <david@redhat.com>
 
-David Gibson's on April 17, 2019 10:47 am:
-> On Mon, Apr 15, 2019 at 03:06:43PM +1000, Nicholas Piggin wrote:
->> It needs to be cleared at all vCPU dispatch points to SPEC, not just
->> when calling H_CEDE as Ben's patch had. I think complexity would be
->> significant for questionable benefit. Like the dispatch sequence, it
->> seems like the test is trying to cover some race condition for the
->> client but does not really do it well (and for Linux not necessary).
->>=20
->> prod bit is cleared after vCPU returns from preemption, so it can=20
->> clear at any time and you can't rely on it, unless you look at=20
->> dispatch sequence numbers to decipher if it was reset or not.
->>=20
->> KVM does implement something like the prodded flag as Ben's patch did
->> but that's not to spec AFAIKS.
->=20
-> Hm, ok.  Maybe include this rationale in the comment here.
+While the detection on s390x of the maximum ram pagesize works by pure lu=
+ck,
+we should try to do better. Especially, once "-mem-path" is replaced
+by memory backends, the current approach will break.
 
-Done (hopefully)
+Configure the maximum page size after configuring initital memory. Provid=
+e
+a function to detect the maximum ram pagesize
 
->> > I don't see any sign that H_JOIN is implemented in KVM, although
->> > H_CONFER and H_PROD certainly are.
->>=20
->> H_JOIN is not.
->=20
-> Right, so we shouldn't be trying to enable it.  What will happen if we
-> use a KVM H_CONFGER and H_PROD along with a userspace H_JOIN?
+I think this can be deferred to 4.1 as I don't think anything is actually
+broken right now.
 
-Yeah good question I'll have to test before sending the H_JOIN
-part again.
+v2 -> v3:
+- Fix compile error
+- Tested that hugepages correctly result in an error with
+  "modprobe kvm hpage=3D0", but not with "modprobe kvm hpage=3D1".
 
-May have to modify KVM to make that work properly.
+v1 -> v2:
+- Add a better comment describing that only initial memory is considered
+- Add "exec: Introduce qemu_getmaxrampagesize() and rename
+  qemu_getrampagesize()"
 
-Thanks,
-Nick
-=
+David Hildenbrand (2):
+  s390x/kvm: Configure page size after memory has actually been
+    initialized
+  exec: Introduce qemu_maxrampagesize() and rename qemu_getrampagesize()
+
+ exec.c                     | 44 ++++++++++++++++++++++++++++++++++----
+ hw/ppc/spapr_caps.c        |  4 ++--
+ hw/s390x/s390-virtio-ccw.c | 12 +++++++++++
+ hw/vfio/spapr.c            |  2 +-
+ include/exec/ram_addr.h    |  3 ++-
+ target/ppc/kvm.c           |  2 +-
+ target/s390x/cpu.c         |  7 ++++++
+ target/s390x/cpu.h         |  1 +
+ target/s390x/kvm-stub.c    |  4 ++++
+ target/s390x/kvm.c         | 35 ++++++++++++------------------
+ target/s390x/kvm_s390x.h   |  1 +
+ 11 files changed, 85 insertions(+), 30 deletions(-)
+
+--=20
+2.20.1
