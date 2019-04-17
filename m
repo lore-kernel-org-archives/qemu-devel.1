@@ -1,23 +1,17 @@
-Received: from eggs.gnu.org ([209.51.188.92]:60228)
+Received: from eggs.gnu.org ([209.51.188.92]:60381)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1hGptO-0007dz-U7
-	for qemu-devel@nongnu.org; Wed, 17 Apr 2019 15:06:48 -0400
+	(envelope-from <armbru@redhat.com>) id 1hGptR-0007gs-Rw
+	for qemu-devel@nongnu.org; Wed, 17 Apr 2019 15:06:51 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1hGptN-0003YJ-Fc
-	for qemu-devel@nongnu.org; Wed, 17 Apr 2019 15:06:46 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:53471)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1hGptN-0003Wu-3D
-	for qemu-devel@nongnu.org; Wed, 17 Apr 2019 15:06:45 -0400
+	(envelope-from <armbru@redhat.com>) id 1hGptQ-0003d4-MO
+	for qemu-devel@nongnu.org; Wed, 17 Apr 2019 15:06:49 -0400
 From: Markus Armbruster <armbru@redhat.com>
-Date: Wed, 17 Apr 2019 21:06:29 +0200
-Message-Id: <20190417190641.26814-4-armbru@redhat.com>
+Date: Wed, 17 Apr 2019 21:06:28 +0200
+Message-Id: <20190417190641.26814-3-armbru@redhat.com>
 In-Reply-To: <20190417190641.26814-1-armbru@redhat.com>
 References: <20190417190641.26814-1-armbru@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v3 03/15] loader-fit: Wean off error_printf()
+Subject: [Qemu-devel] [PATCH v3 02/15] block/ssh: Do not report
+ read/write/flush errors to the user
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,263 +21,111 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Paul Burton <pburton@wavecomp.com>, Aleksandar Rikalo <arikalo@wavecomp.com>
+Cc: "Richard W.M. Jones" <rjones@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org
 
-load_fit() reports errors with error_printf() instead of
-error_report().  Worse, it even reports errors it actually recovers
-from, in fit_cfg_compatible() and fit_load_fdt().  Messed up in
-initial commit 51b58561c1d.
+Callbacks ssh_co_readv(), ssh_co_writev(), ssh_co_flush() report
+errors to the user with error_printf().  They shouldn't, it's their
+caller's job.  Replace by a suitable trace point.  While there, drop
+the unreachable !s->sftp case.
 
-Convert the helper functions for load_fit() to Error.  Make sure each
-failure path sets an error.
+Perhaps we should convert this part of the block driver interface to
+Error, so block drivers can pass more detail to their callers.  Not
+today.
 
-Fix fit_cfg_compatible() and fit_load_fdt() not to report errors they
-actually recover from.
-
-Convert load_fit() to error_report().
-
-Cc: Paul Burton <pburton@wavecomp.com>
-Cc: Aleksandar Rikalo <arikalo@wavecomp.com>
+Cc: "Richard W.M. Jones" <rjones@redhat.com>
+Cc: Kevin Wolf <kwolf@redhat.com>
+Cc: Max Reitz <mreitz@redhat.com>
+Cc: qemu-block@nongnu.org
 Signed-off-by: Markus Armbruster <armbru@redhat.com>
-Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+Reviewed-by: Eric Blake <eblake@redhat.com>
 ---
- hw/core/loader-fit.c | 62 +++++++++++++++++++++++++-------------------
- 1 file changed, 36 insertions(+), 26 deletions(-)
+ block/ssh.c        | 38 +++++++++++++-------------------------
+ block/trace-events |  3 +++
+ 2 files changed, 16 insertions(+), 25 deletions(-)
 
-diff --git a/hw/core/loader-fit.c b/hw/core/loader-fit.c
-index 447f60857d..f27b6af942 100644
---- a/hw/core/loader-fit.c
-+++ b/hw/core/loader-fit.c
-@@ -18,6 +18,7 @@
-  */
-=20
- #include "qemu/osdep.h"
-+#include "qapi/error.h"
- #include "qemu/units.h"
- #include "exec/memory.h"
- #include "hw/loader.h"
-@@ -33,7 +34,7 @@
- #define FIT_LOADER_MAX_PATH (128)
-=20
- static const void *fit_load_image_alloc(const void *itb, const char *nam=
-e,
--                                        int *poff, size_t *psz)
-+                                        int *poff, size_t *psz, Error **=
-errp)
+diff --git a/block/ssh.c b/block/ssh.c
+index 190ef95300..859249113d 100644
+--- a/block/ssh.c
++++ b/block/ssh.c
+@@ -159,31 +159,19 @@ sftp_error_setg(Error **errp, BDRVSSHState *s, const char *fs, ...)
+     g_free(msg);
+ }
+ 
+-static void GCC_FMT_ATTR(2, 3)
+-sftp_error_report(BDRVSSHState *s, const char *fs, ...)
++static void sftp_error_trace(BDRVSSHState *s, const char *op)
  {
-     const void *data;
-     const char *comp;
-@@ -46,6 +47,7 @@ static const void *fit_load_image_alloc(const void *itb=
-, const char *name,
-=20
-     off =3D fdt_path_offset(itb, path);
-     if (off < 0) {
-+        error_setg(errp, "can't find node %s", path);
-         return NULL;
-     }
-     if (poff) {
-@@ -54,6 +56,7 @@ static const void *fit_load_image_alloc(const void *itb=
-, const char *name,
-=20
-     data =3D fdt_getprop(itb, off, "data", &sz);
-     if (!data) {
-+        error_setg(errp, "can't get %s/data", path);
-         return NULL;
-     }
-=20
-@@ -73,7 +76,7 @@ static const void *fit_load_image_alloc(const void *itb=
-, const char *name,
-=20
-         uncomp_len =3D gunzip(uncomp_data, uncomp_len, (void *) data, sz=
-);
-         if (uncomp_len < 0) {
--            error_printf("unable to decompress %s image\n", name);
-+            error_setg(errp, "unable to decompress %s image", name);
-             g_free(uncomp_data);
-             return NULL;
+-    va_list args;
++    char *ssh_err;
++    int ssh_err_code;
++    unsigned long sftp_err_code;
+ 
+-    va_start(args, fs);
+-    error_vprintf(fs, args);
++    /* This is not an errno.  See <libssh2.h>. */
++    ssh_err_code = libssh2_session_last_error(s->session,
++                                              &ssh_err, NULL, 0);
++    /* See <libssh2_sftp.h>. */
++    sftp_err_code = libssh2_sftp_last_error((s)->sftp);
+ 
+-    if ((s)->sftp) {
+-        char *ssh_err;
+-        int ssh_err_code;
+-        unsigned long sftp_err_code;
+-
+-        /* This is not an errno.  See <libssh2.h>. */
+-        ssh_err_code = libssh2_session_last_error(s->session,
+-                                                  &ssh_err, NULL, 0);
+-        /* See <libssh2_sftp.h>. */
+-        sftp_err_code = libssh2_sftp_last_error((s)->sftp);
+-
+-        error_printf(": %s (libssh2 error code: %d, sftp error code: %lu)",
+-                     ssh_err, ssh_err_code, sftp_err_code);
+-    }
+-
+-    va_end(args);
+-    error_printf("\n");
++    trace_sftp_error(op, ssh_err, ssh_err_code, sftp_err_code);
+ }
+ 
+ static int parse_uri(const char *filename, QDict *options, Error **errp)
+@@ -1035,7 +1023,7 @@ static coroutine_fn int ssh_read(BDRVSSHState *s, BlockDriverState *bs,
+             goto again;
          }
-@@ -85,18 +88,19 @@ static const void *fit_load_image_alloc(const void *i=
-tb, const char *name,
-         return data;
-     }
-=20
--    error_printf("unknown compression '%s'\n", comp);
-+    error_setg(errp, "unknown compression '%s'", comp);
-     return NULL;
- }
-=20
- static int fit_image_addr(const void *itb, int img, const char *name,
--                          hwaddr *addr)
-+                          hwaddr *addr, Error **errp)
- {
-     const void *prop;
-     int len;
-=20
-     prop =3D fdt_getprop(itb, img, name, &len);
-     if (!prop) {
-+        error_setg(errp, "can't find %s address", name);
-         return -ENOENT;
-     }
-=20
-@@ -108,13 +112,14 @@ static int fit_image_addr(const void *itb, int img,=
- const char *name,
-         *addr =3D fdt64_to_cpu(*(fdt64_t *)prop);
-         return 0;
-     default:
--        error_printf("invalid %s address length %d\n", name, len);
-+        error_setg(errp, "invalid %s address length %d", name, len);
-         return -EINVAL;
-     }
- }
-=20
- static int fit_load_kernel(const struct fit_loader *ldr, const void *itb=
-,
--                           int cfg, void *opaque, hwaddr *pend)
-+                           int cfg, void *opaque, hwaddr *pend,
-+                           Error **errp)
- {
-     const char *name;
-     const void *data;
-@@ -126,26 +131,26 @@ static int fit_load_kernel(const struct fit_loader =
-*ldr, const void *itb,
-=20
-     name =3D fdt_getprop(itb, cfg, "kernel", NULL);
-     if (!name) {
--        error_printf("no kernel specified by FIT configuration\n");
-+        error_setg(errp, "no kernel specified by FIT configuration");
-         return -EINVAL;
-     }
-=20
--    load_data =3D data =3D fit_load_image_alloc(itb, name, &img_off, &sz=
-);
-+    load_data =3D data =3D fit_load_image_alloc(itb, name, &img_off, &sz=
-, errp);
-     if (!data) {
--        error_printf("unable to load kernel image from FIT\n");
-+        error_prepend(errp, "unable to load kernel image from FIT: ");
-         return -EINVAL;
-     }
-=20
--    err =3D fit_image_addr(itb, img_off, "load", &load_addr);
-+    err =3D fit_image_addr(itb, img_off, "load", &load_addr, errp);
-     if (err) {
--        error_printf("unable to read kernel load address from FIT\n");
-+        error_prepend(errp, "unable to read kernel load address from FIT=
-: ");
-         ret =3D err;
-         goto out;
-     }
-=20
--    err =3D fit_image_addr(itb, img_off, "entry", &entry_addr);
-+    err =3D fit_image_addr(itb, img_off, "entry", &entry_addr, errp);
-     if (err) {
--        error_printf("unable to read kernel entry address from FIT\n");
-+        error_prepend(errp, "unable to read kernel entry address from FI=
-T: ");
-         ret =3D err;
-         goto out;
-     }
-@@ -172,7 +177,7 @@ out:
-=20
- static int fit_load_fdt(const struct fit_loader *ldr, const void *itb,
-                         int cfg, void *opaque, const void *match_data,
--                        hwaddr kernel_end)
-+                        hwaddr kernel_end, Error **errp)
- {
-     const char *name;
-     const void *data;
-@@ -187,16 +192,18 @@ static int fit_load_fdt(const struct fit_loader *ld=
-r, const void *itb,
+         if (r < 0) {
+-            sftp_error_report(s, "read failed");
++            sftp_error_trace(s, "read");
+             s->offset = -1;
+             return -EIO;
+         }
+@@ -1105,7 +1093,7 @@ static int ssh_write(BDRVSSHState *s, BlockDriverState *bs,
+             goto again;
+         }
+         if (r < 0) {
+-            sftp_error_report(s, "write failed");
++            sftp_error_trace(s, "write");
+             s->offset = -1;
+             return -EIO;
+         }
+@@ -1188,7 +1176,7 @@ static coroutine_fn int ssh_flush(BDRVSSHState *s, BlockDriverState *bs)
          return 0;
      }
-=20
--    load_data =3D data =3D fit_load_image_alloc(itb, name, &img_off, &sz=
-);
-+    load_data =3D data =3D fit_load_image_alloc(itb, name, &img_off, &sz=
-, errp);
-     if (!data) {
--        error_printf("unable to load FDT image from FIT\n");
-+        error_prepend(errp, "unable to load FDT image from FIT: ");
-         return -EINVAL;
+     if (r < 0) {
+-        sftp_error_report(s, "fsync failed");
++        sftp_error_trace(s, "fsync");
+         return -EIO;
      }
-=20
--    err =3D fit_image_addr(itb, img_off, "load", &load_addr);
-+    err =3D fit_image_addr(itb, img_off, "load", &load_addr, errp);
-     if (err =3D=3D -ENOENT) {
-         load_addr =3D ROUND_UP(kernel_end, 64 * KiB) + (10 * MiB);
-+        error_free(*errp);
-     } else if (err) {
-+        error_prepend(errp, "unable to read FDT load address from FIT: "=
-);
-         ret =3D err;
-         goto out;
-     }
-@@ -229,7 +236,7 @@ static bool fit_cfg_compatible(const void *itb, int c=
-fg, const char *compat)
-         return false;
-     }
-=20
--    fdt =3D fit_load_image_alloc(itb, fdt_name, NULL, NULL);
-+    fdt =3D fit_load_image_alloc(itb, fdt_name, NULL, NULL, NULL);
-     if (!fdt) {
-         return false;
-     }
-@@ -252,11 +259,12 @@ out:
-=20
- int load_fit(const struct fit_loader *ldr, const char *filename, void *o=
-paque)
- {
-+    Error *err =3D NULL;
-     const struct fit_loader_match *match;
-     const void *itb, *match_data =3D NULL;
-     const char *def_cfg_name;
-     char path[FIT_LOADER_MAX_PATH];
--    int itb_size, configs, cfg_off, off, err;
-+    int itb_size, configs, cfg_off, off;
-     hwaddr kernel_end;
-     int ret;
-=20
-@@ -267,6 +275,7 @@ int load_fit(const struct fit_loader *ldr, const char=
- *filename, void *opaque)
-=20
-     configs =3D fdt_path_offset(itb, "/configurations");
-     if (configs < 0) {
-+        error_report("can't find node /configurations");
-         ret =3D configs;
-         goto out;
-     }
-@@ -301,20 +310,21 @@ int load_fit(const struct fit_loader *ldr, const ch=
-ar *filename, void *opaque)
-     }
-=20
-     if (cfg_off < 0) {
--        /* couldn't find a configuration to use */
-+        error_report("can't find configuration");
-         ret =3D cfg_off;
-         goto out;
-     }
-=20
--    err =3D fit_load_kernel(ldr, itb, cfg_off, opaque, &kernel_end);
--    if (err) {
--        ret =3D err;
-+    ret =3D fit_load_kernel(ldr, itb, cfg_off, opaque, &kernel_end, &err=
-);
-+    if (ret) {
-+        error_report_err(err);
-         goto out;
-     }
-=20
--    err =3D fit_load_fdt(ldr, itb, cfg_off, opaque, match_data, kernel_e=
-nd);
--    if (err) {
--        ret =3D err;
-+    ret =3D fit_load_fdt(ldr, itb, cfg_off, opaque, match_data, kernel_e=
-nd,
-+                       &err);
-+    if (ret) {
-+        error_report_err(err);
-         goto out;
-     }
-=20
---=20
+ 
+diff --git a/block/trace-events b/block/trace-events
+index 7335a42540..79ccd8d824 100644
+--- a/block/trace-events
++++ b/block/trace-events
+@@ -208,3 +208,6 @@ sheepdog_co_rw_vector_new(uint64_t oid) "new oid 0x%" PRIx64
+ sheepdog_snapshot_create_info(const char *sn_name, const char *id, const char *name, int64_t size, int is_snapshot) "sn_info: name %s id_str %s s: name %s vm_state_size %" PRId64 " " "is_snapshot %d"
+ sheepdog_snapshot_create(const char *sn_name, const char *id) "%s %s"
+ sheepdog_snapshot_create_inode(const char *name, uint32_t snap, uint32_t vdi) "s->inode: name %s snap_id 0x%" PRIx32 " vdi 0x%" PRIx32
++
++# ssh.c
++sftp_error(const char *op, const char *ssh_err, int ssh_err_code, unsigned long sftp_err_code) "%s failed: %s (libssh2 error code: %d, sftp error code: %lu)"
+-- 
 2.17.2
