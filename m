@@ -2,56 +2,59 @@ Return-Path: <SRS0=PAXx=ST=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 40C47C10F14
-	for <qemu-devel@archiver.kernel.org>; Wed, 17 Apr 2019 03:02:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EE419C10F14
+	for <qemu-devel@archiver.kernel.org>; Wed, 17 Apr 2019 03:02:15 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1321521773
-	for <qemu-devel@archiver.kernel.org>; Wed, 17 Apr 2019 03:02:03 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1321521773
+	by mail.kernel.org (Postfix) with ESMTPS id BDE1D21773
+	for <qemu-devel@archiver.kernel.org>; Wed, 17 Apr 2019 03:02:15 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BDE1D21773
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:45924 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:45926 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hGapm-0003wD-Cf
-	for qemu-devel@archiver.kernel.org; Tue, 16 Apr 2019 23:02:02 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:58046)
+	id 1hGapy-00044S-Sz
+	for qemu-devel@archiver.kernel.org; Tue, 16 Apr 2019 23:02:14 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:58087)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1hGanf-0002k4-Ir
-	for qemu-devel@nongnu.org; Tue, 16 Apr 2019 22:59:52 -0400
+	(envelope-from <ehabkost@redhat.com>) id 1hGank-0002lb-6u
+	for qemu-devel@nongnu.org; Tue, 16 Apr 2019 22:59:57 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1hGane-0007hh-N0
-	for qemu-devel@nongnu.org; Tue, 16 Apr 2019 22:59:51 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:34950)
+	(envelope-from <ehabkost@redhat.com>) id 1hGanh-0007k0-P7
+	for qemu-devel@nongnu.org; Tue, 16 Apr 2019 22:59:55 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:47666)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <ehabkost@redhat.com>)
-	id 1hGane-0007h1-F7; Tue, 16 Apr 2019 22:59:50 -0400
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
-	[10.5.11.22])
+	id 1hGanh-0007jE-I9; Tue, 16 Apr 2019 22:59:53 -0400
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+	[10.5.11.15])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id B70EE36961;
-	Wed, 17 Apr 2019 02:59:48 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id A75813084212;
+	Wed, 17 Apr 2019 02:59:52 +0000 (UTC)
 Received: from localhost (ovpn-116-9.gru2.redhat.com [10.97.116.9])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id BEE0D1001E65;
-	Wed, 17 Apr 2019 02:59:46 +0000 (UTC)
+	by smtp.corp.redhat.com (Postfix) with ESMTP id 330C05D707;
+	Wed, 17 Apr 2019 02:59:52 +0000 (UTC)
 From: Eduardo Habkost <ehabkost@redhat.com>
 To: qemu-devel@nongnu.org
-Date: Tue, 16 Apr 2019 23:59:39 -0300
-Message-Id: <20190417025944.16154-1-ehabkost@redhat.com>
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+Date: Tue, 16 Apr 2019 23:59:41 -0300
+Message-Id: <20190417025944.16154-3-ehabkost@redhat.com>
+In-Reply-To: <20190417025944.16154-1-ehabkost@redhat.com>
+References: <20190417025944.16154-1-ehabkost@redhat.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.30]);
-	Wed, 17 Apr 2019 02:59:49 +0000 (UTC)
+	(mx1.redhat.com [10.5.110.40]);
+	Wed, 17 Apr 2019 02:59:52 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] [PATCH 0/5] Remove qdev_get_machine() call from
- ppc_cpu_parse_featurestr()
+Subject: [Qemu-devel] [PATCH 2/5] cpu: Extract CPU class lookup from
+ parse_cpu_option()
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -76,41 +79,78 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 Content-Type: text/plain; charset="UTF-8"
-Message-ID: <20190417025939.PQusCJryu1mjj-a8QbzdDTOrShw_zFwJpqS4IGuByp8@z>
+Message-ID: <20190417025941.1pXLyavceLnWW5duNt-NWMqBFjS7bBDn8oYZ2URsVdg@z>
 
-My initial goal was simple: removing the qdev_get_machine() call
-from ppc_cpu_parse_featurestr() because I want to make
-qdev_get_machine() available only to softmmu code.
+The new function will be useful in user mode, when we already
+have a CPU model and don't need to parse any extra options.
 
-Before doing this, I had to make *-user not call
-CPUClass::parse_features() anymore (it was pointless to call it,
-anyway).
+Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
+---
+ include/qom/cpu.h |  9 +++++++++
+ exec.c            | 22 ++++++++++++----------
+ 2 files changed, 21 insertions(+), 10 deletions(-)
 
-While doing this, I decided to rename parse_cpu_model() to
-something clearer (parse_cpu_option()).
-
-As a nice side effect, now the dependency between machine object
-creation and parse_cpu_option() is not hidden anymore.
-
-Eduardo Habkost (5):
-  cpu: Rename parse_cpu_model() to parse_cpu_option()
-  cpu: Extract CPU class lookup from parse_cpu_option()
-  linux-user: Use lookup_cpu_class()
-  bsd-user: Use lookup_cpu_class()
-  cpu: Add MachineState parameter to parse_features()
-
- include/qom/cpu.h               | 18 ++++++++++++++----
- target/ppc/cpu-qom.h            |  3 ++-
- bsd-user/main.c                 |  4 +++-
- exec.c                          | 28 +++++++++++++++-------------
- linux-user/main.c               |  4 +++-
- qom/cpu.c                       |  3 ++-
- target/i386/cpu.c               |  3 ++-
- target/ppc/translate_init.inc.c |  7 ++++---
- target/sparc/cpu.c              |  3 ++-
- vl.c                            | 19 ++++++++++---------
- 10 files changed, 57 insertions(+), 35 deletions(-)
-
+diff --git a/include/qom/cpu.h b/include/qom/cpu.h
+index d28c690b27..e11b14d9ac 100644
+--- a/include/qom/cpu.h
++++ b/include/qom/cpu.h
+@@ -699,6 +699,15 @@ CPUState *cpu_create(const char *typename);
+  */
+ const char *parse_cpu_option(const char *cpu_option);
+ 
++/**
++ * lookup_cpu_class:
++ * @cpu_model: CPU model name
++ *
++ * Look up CPU class corresponding to a given CPU model name.
++ */
++CPUClass *lookup_cpu_class(const char *cpu_model, Error **errp);
++
++
+ /**
+  * cpu_has_work:
+  * @cpu: The vCPU to check.
+diff --git a/exec.c b/exec.c
+index 840677f15f..d359e709a6 100644
+--- a/exec.c
++++ b/exec.c
+@@ -982,24 +982,26 @@ void cpu_exec_realizefn(CPUState *cpu, Error **errp)
+ #endif
+ }
+ 
++CPUClass *lookup_cpu_class(const char *cpu_model, Error **errp)
++{
++    ObjectClass *oc = cpu_class_by_name(CPU_RESOLVING_TYPE, cpu_model);
++    if (oc == NULL) {
++        error_setg(errp, "unable to find CPU model '%s'", cpu_model);
++        return NULL;
++    }
++    return CPU_CLASS(oc);
++}
++
+ const char *parse_cpu_option(const char *cpu_option)
+ {
+-    ObjectClass *oc;
+     CPUClass *cc;
+     gchar **model_pieces;
+     const char *cpu_type;
+ 
+     model_pieces = g_strsplit(cpu_option, ",", 2);
+ 
+-    oc = cpu_class_by_name(CPU_RESOLVING_TYPE, model_pieces[0]);
+-    if (oc == NULL) {
+-        error_report("unable to find CPU model '%s'", model_pieces[0]);
+-        g_strfreev(model_pieces);
+-        exit(EXIT_FAILURE);
+-    }
+-
+-    cpu_type = object_class_get_name(oc);
+-    cc = CPU_CLASS(oc);
++    cc = lookup_cpu_class(model_pieces[0], &error_fatal);
++    cpu_type = object_class_get_name(OBJECT_CLASS(cc));
+     cc->parse_features(cpu_type, model_pieces[1], &error_fatal);
+     g_strfreev(model_pieces);
+     return cpu_type;
 -- 
 2.18.0.rc1.1.g3f1ff2140
 
