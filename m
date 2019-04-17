@@ -2,67 +2,80 @@ Return-Path: <SRS0=PAXx=ST=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.7 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D7C21C10F12
-	for <qemu-devel@archiver.kernel.org>; Wed, 17 Apr 2019 05:27:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6CBC5C10F12
+	for <qemu-devel@archiver.kernel.org>; Wed, 17 Apr 2019 05:33:49 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A9DA620674
-	for <qemu-devel@archiver.kernel.org>; Wed, 17 Apr 2019 05:27:07 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A9DA620674
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 349E920872
+	for <qemu-devel@archiver.kernel.org>; Wed, 17 Apr 2019 05:33:49 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="JIkR4/HM"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 349E920872
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:47182 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:47236 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hGd6A-00071J-Uf
-	for qemu-devel@archiver.kernel.org; Wed, 17 Apr 2019 01:27:06 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:50163)
+	id 1hGdCe-0008US-F2
+	for qemu-devel@archiver.kernel.org; Wed, 17 Apr 2019 01:33:48 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:51334)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1hGd5Q-0006i3-LL
-	for qemu-devel@nongnu.org; Wed, 17 Apr 2019 01:26:21 -0400
+	(envelope-from <richard.henderson@linaro.org>) id 1hGdBT-0007vs-Oq
+	for qemu-devel@nongnu.org; Wed, 17 Apr 2019 01:32:37 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1hGd5P-0006Pt-FE
-	for qemu-devel@nongnu.org; Wed, 17 Apr 2019 01:26:20 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:56610)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>)
-	id 1hGd5N-0006Nb-KT; Wed, 17 Apr 2019 01:26:17 -0400
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
-	[10.5.11.13])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 4A205307EA82;
-	Wed, 17 Apr 2019 05:26:16 +0000 (UTC)
-Received: from blackfin.pond.sub.org (ovpn-116-116.ams2.redhat.com
-	[10.36.116.116])
-	by smtp.corp.redhat.com (Postfix) with ESMTPS id EFBFB608C1;
-	Wed, 17 Apr 2019 05:26:15 +0000 (UTC)
-Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
-	id 8375F1138648; Wed, 17 Apr 2019 07:26:14 +0200 (CEST)
-From: Markus Armbruster <armbru@redhat.com>
-To: Like Xu <like.xu@linux.intel.com>
-References: <1555315185-16414-1-git-send-email-like.xu@linux.intel.com>
-	<1555315185-16414-2-git-send-email-like.xu@linux.intel.com>
-Date: Wed, 17 Apr 2019 07:26:14 +0200
-In-Reply-To: <1555315185-16414-2-git-send-email-like.xu@linux.intel.com> (Like
-	Xu's message of "Mon, 15 Apr 2019 15:59:44 +0800")
-Message-ID: <87bm1519u1.fsf@dusky.pond.sub.org>
-User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.1 (gnu/linux)
-MIME-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.44]);
-	Wed, 17 Apr 2019 05:26:16 +0000 (UTC)
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH v3 1/2] vl.c: refactor current_machine as
- non-global variable
+	(envelope-from <richard.henderson@linaro.org>) id 1hGdBR-0002fI-V8
+	for qemu-devel@nongnu.org; Wed, 17 Apr 2019 01:32:35 -0400
+Received: from mail-pg1-x541.google.com ([2607:f8b0:4864:20::541]:46122)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+	id 1hGdBQ-0002cq-3o
+	for qemu-devel@nongnu.org; Wed, 17 Apr 2019 01:32:33 -0400
+Received: by mail-pg1-x541.google.com with SMTP id q1so11432420pgv.13
+	for <qemu-devel@nongnu.org>; Tue, 16 Apr 2019 22:32:30 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+	h=from:to:cc:subject:date:message-id;
+	bh=8DKfZxjPpW90tslKeQhaX6xpSd5ENiccbyes80uD3MI=;
+	b=JIkR4/HMC0fzWasOAhzM23Xy1Wx8mq9EVrcBNzv82iyt8u6lOhDsgDM9xkP3phykVG
+	g3ZzKwozAVSy5rDF+TpeUi1vfqgCl4EYa5BWS9PPrzOSma8rSHuRWf6LWhJJycrd4k+H
+	GO7/1GPU3GX3Kcpvc4UbThjJPjXedKckKlLLSsOHphsW64wtE6LMB2T54yb2D2vDjxZD
+	VSSdVMv0LsEUUv0bxfPGlCzVo+Se4YMChpd0KUV+mRp1MUUD4k1nL3Unn639s0jLLiJK
+	fJalj6K3eSsZZFRWGQXxOEeAL+EQgPuTzMV6b1Q97fzWsfS41v0YpPiJ2zc352nArWk5
+	74Kw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=1e100.net; s=20161025;
+	h=x-gm-message-state:from:to:cc:subject:date:message-id;
+	bh=8DKfZxjPpW90tslKeQhaX6xpSd5ENiccbyes80uD3MI=;
+	b=VjIcwfAihVxi56ocSxxn/ICdcsBYNe3zI2No2KAWFVm+MQqheMiqiBdirWe/cuhEO/
+	E6h83cw+tM0r+aCTVafYR2Iuxj7Vt3kXO6uJDj5LgbwY+7wlvlBCw9vYX1NrJt7hBj64
+	zH40/VR7xjuIR1reMoH3iC4Dx77Mp9i58sYGGnS0636F/WLnzfujB4QnaagHtxc/MZCm
+	kZstgmo9KJHpH3P7/KkX/Ow2bn4osGIj58Kzohb6rLT2gN5RYHWokvTGSnUAulCq8zwe
+	t0zDBaNmath0VVVPC4k0fFjTRqTMM66+AiwYh8/HKVZW4i34gOXRQY61vcZIL6gGvZGx
+	zNew==
+X-Gm-Message-State: APjAAAW/CmCDE+KNlDhIV+M9EQPbyIUUuWuWMK02j8F0L4GMXd10rGnR
+	ggvEf61TVMz13np3290Cq26gQaCBVl4=
+X-Google-Smtp-Source: APXvYqzLIyE9uhWt37O9rQgxQ7/JOggfU1vtYGblXAj9DxR1CfPtnePtIJabhWAnWp3+AqP7BXuUbw==
+X-Received: by 2002:a62:1193:: with SMTP id 19mr85443594pfr.82.1555479148646; 
+	Tue, 16 Apr 2019 22:32:28 -0700 (PDT)
+Received: from localhost.localdomain (rrcs-66-91-136-155.west.biz.rr.com.
+	[66.91.136.155]) by smtp.gmail.com with ESMTPSA id
+	d129sm84513383pfa.142.2019.04.16.22.32.26
+	(version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+	Tue, 16 Apr 2019 22:32:27 -0700 (PDT)
+From: Richard Henderson <richard.henderson@linaro.org>
+To: qemu-devel@nongnu.org
+Date: Tue, 16 Apr 2019 19:32:24 -1000
+Message-Id: <20190417053225.27505-1-richard.henderson@linaro.org>
+X-Mailer: git-send-email 2.17.1
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+	recognized.
+X-Received-From: 2607:f8b0:4864:20::541
+Subject: [Qemu-devel] [PATCH 0/1] util/path: Do not cache all filenames at
+ startup
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -74,43 +87,47 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>, Thomas Huth <thuth@redhat.com>,
-	Eduardo Habkost <ehabkost@redhat.com>, qemu-trivial@nongnu.org,
-	qemu-devel@nongnu.org, like.xu@intel.com,
-	Igor Mammedov <imammedo@redhat.com>
+Cc: peter.maydell@linaro.org, laurent@vivier.eu, evgreen@chromium.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190417052614.QgDZJdUBs7XakLFu3mlx8AYstCUvaMybTHHvYMWDG6s@z>
+Content-Type: text/plain; charset="UTF-8"
+Message-ID: <20190417053224.S4CwpOzMeFBlbJs2mWjFKBsf09QFPrlKGfKtQgDFxZg@z>
 
-Like Xu <like.xu@linux.intel.com> writes:
+This is a third variant attempting to fix the problem of
+the -L interp_prefix handling not coping well pointing to
+a full chroot.
 
-> This patch makes the remaining dozen or so uses of the global
-> current_machine outside vl.c use qdev_get_machine() instead,
-> and then make current_machine local to vl.c instead of global.
->
-> Suggested-by: Peter Maydell <peter.maydell@linaro.org>
-> Signed-off-by: Like Xu <like.xu@linux.intel.com>
+Previous versions include:
+https://lists.gnu.org/archive/html/qemu-devel/2018-05/msg06592.html
+https://lists.gnu.org/archive/html/qemu-devel/2018-05/msg07304.html
 
-I'm afraid I dislike this one, too.
+Both of the other versions keep an open file descriptor to
+the directory that is interp_prefix.  While this seems to be
+efficient, they also leak a file descriptor into the guest.
+This has follow-on effects on the emulation, causing failures
+e.g. within the LTP testsuite.
 
-The patch does not reduce global state, it's merely MICAHI (make it
-complicated and hide it).
+This version uses only string manipulation and access(2).
 
-It does not improve safety, it merely turns dereferences of null
-current_machine into unwanted creation of "/machine" as container (ugh),
-which the next patch then fixes up to assertion failure.
+A plausible criticism of this is the mutex and the cache.
+Are they really needed?  I have no idea.  I can imagine
+removing that is actually more efficient, not needing a
+lock around a shared data structure.
 
-The only benefit I can see is you can't assign to current_machine
-outside vl.c anymore.  Nobody ever did, thus complete non-issue.
+Comments?
 
-If you want to hide global state without actually reducing it, create an
-accessor function.  You can then use that to replace qdev_get_machine(),
-getting rid of its surprising side effect.  *That* would be an
-improvement I could get behind.
 
-Better that *hiding* use of global state would be *eliminating* use of
-global state: pass current_machine around.  This isn't always practical.
-But where it is, the dependence on "machine created" becomes obvious in
-the code.
+r~
+
+
+Richard Henderson (1):
+  util/path: Do not cache all filenames at startup
+
+ util/path.c | 211 ++++++++++++++--------------------------------------
+ 1 file changed, 57 insertions(+), 154 deletions(-)
+
+-- 
+2.17.1
+
 
