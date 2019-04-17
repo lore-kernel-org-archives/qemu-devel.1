@@ -6,55 +6,54 @@ X-Spam-Status: No, score=-6.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 02187C10F14
-	for <qemu-devel@archiver.kernel.org>; Wed, 17 Apr 2019 03:02:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1892CC10F14
+	for <qemu-devel@archiver.kernel.org>; Wed, 17 Apr 2019 03:03:31 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B56C521773
-	for <qemu-devel@archiver.kernel.org>; Wed, 17 Apr 2019 03:02:30 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B56C521773
+	by mail.kernel.org (Postfix) with ESMTPS id CD17C21773
+	for <qemu-devel@archiver.kernel.org>; Wed, 17 Apr 2019 03:03:30 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CD17C21773
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:45928 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:45930 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hGaqE-0004G8-0F
-	for qemu-devel@archiver.kernel.org; Tue, 16 Apr 2019 23:02:30 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:58062)
+	id 1hGarB-0004xL-QX
+	for qemu-devel@archiver.kernel.org; Tue, 16 Apr 2019 23:03:29 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:58106)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1hGanh-0002k9-4y
-	for qemu-devel@nongnu.org; Tue, 16 Apr 2019 22:59:54 -0400
+	(envelope-from <ehabkost@redhat.com>) id 1hGanm-0002nd-6O
+	for qemu-devel@nongnu.org; Tue, 16 Apr 2019 22:59:59 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1hGanf-0007il-Up
-	for qemu-devel@nongnu.org; Tue, 16 Apr 2019 22:59:53 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:14063)
+	(envelope-from <ehabkost@redhat.com>) id 1hGanl-0007lq-CC
+	for qemu-devel@nongnu.org; Tue, 16 Apr 2019 22:59:58 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:51430)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <ehabkost@redhat.com>)
-	id 1hGanf-0007hy-IW; Tue, 16 Apr 2019 22:59:51 -0400
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
-	[10.5.11.22])
+	id 1hGank-0007kX-5S; Tue, 16 Apr 2019 22:59:56 -0400
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+	[10.5.11.15])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id BE5CA3082133;
-	Wed, 17 Apr 2019 02:59:50 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id 88D0A307D910;
+	Wed, 17 Apr 2019 02:59:54 +0000 (UTC)
 Received: from localhost (ovpn-116-9.gru2.redhat.com [10.97.116.9])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id 321D31001E65;
-	Wed, 17 Apr 2019 02:59:50 +0000 (UTC)
+	by smtp.corp.redhat.com (Postfix) with ESMTP id 166E85D707;
+	Wed, 17 Apr 2019 02:59:53 +0000 (UTC)
 From: Eduardo Habkost <ehabkost@redhat.com>
 To: qemu-devel@nongnu.org
-Date: Tue, 16 Apr 2019 23:59:40 -0300
-Message-Id: <20190417025944.16154-2-ehabkost@redhat.com>
+Date: Tue, 16 Apr 2019 23:59:42 -0300
+Message-Id: <20190417025944.16154-4-ehabkost@redhat.com>
 In-Reply-To: <20190417025944.16154-1-ehabkost@redhat.com>
 References: <20190417025944.16154-1-ehabkost@redhat.com>
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.42]);
-	Wed, 17 Apr 2019 02:59:50 +0000 (UTC)
+	(mx1.redhat.com [10.5.110.48]);
+	Wed, 17 Apr 2019 02:59:54 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] [PATCH 1/5] cpu: Rename parse_cpu_model() to
- parse_cpu_option()
+Subject: [Qemu-devel] [PATCH 3/5] linux-user: Use lookup_cpu_class()
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -79,156 +78,39 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 Content-Type: text/plain; charset="UTF-8"
-Message-ID: <20190417025940.DZ4zo3dB23bmCTlNA3EKOYrv2KxRsPs2fvuhpiuOmR4@z>
+Message-ID: <20190417025942.7yX-eftdvYzz644nHO83a7271D6-tzMUqtp0A4xsIdg@z>
 
-The "model[,option...]" string parsed by the function is not just
-a CPU model.  Rename the function and its argument to indicate it
-expects the full "-cpu" option to be provided.
+The return value of cpu_get_model() is just a CPU model name and
+never includes extra options.  We don't need to call
+parse_cpu_option().
 
 Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
 ---
- include/qom/cpu.h |  6 +++---
- bsd-user/main.c   |  2 +-
- exec.c            |  4 ++--
- linux-user/main.c |  2 +-
- vl.c              | 18 +++++++++---------
- 5 files changed, 16 insertions(+), 16 deletions(-)
+ linux-user/main.c | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
 
-diff --git a/include/qom/cpu.h b/include/qom/cpu.h
-index 1d6099e5d4..d28c690b27 100644
---- a/include/qom/cpu.h
-+++ b/include/qom/cpu.h
-@@ -689,15 +689,15 @@ ObjectClass *cpu_class_by_name(const char *typename, const char *cpu_model);
- CPUState *cpu_create(const char *typename);
- 
- /**
-- * parse_cpu_model:
-- * @cpu_model: The model string including optional parameters.
-+ * parse_cpu_option:
-+ * @cpu_option: The -cpu option including optional parameters.
-  *
-  * processes optional parameters and registers them as global properties
-  *
-  * Returns: type of CPU to create or prints error and terminates process
-  *          if an error occurred.
-  */
--const char *parse_cpu_model(const char *cpu_model);
-+const char *parse_cpu_option(const char *cpu_option);
- 
- /**
-  * cpu_has_work:
-diff --git a/bsd-user/main.c b/bsd-user/main.c
-index 0d3156974c..a6c055f5fb 100644
---- a/bsd-user/main.c
-+++ b/bsd-user/main.c
-@@ -903,7 +903,7 @@ int main(int argc, char **argv)
-     /* init tcg before creating CPUs and to get qemu_host_page_size */
-     tcg_exec_init(0);
- 
--    cpu_type = parse_cpu_model(cpu_model);
-+    cpu_type = parse_cpu_option(cpu_model);
-     cpu = cpu_create(cpu_type);
-     env = cpu->env_ptr;
- #if defined(TARGET_SPARC) || defined(TARGET_PPC)
-diff --git a/exec.c b/exec.c
-index 6ab62f4eee..840677f15f 100644
---- a/exec.c
-+++ b/exec.c
-@@ -982,14 +982,14 @@ void cpu_exec_realizefn(CPUState *cpu, Error **errp)
- #endif
- }
- 
--const char *parse_cpu_model(const char *cpu_model)
-+const char *parse_cpu_option(const char *cpu_option)
- {
-     ObjectClass *oc;
-     CPUClass *cc;
-     gchar **model_pieces;
-     const char *cpu_type;
- 
--    model_pieces = g_strsplit(cpu_model, ",", 2);
-+    model_pieces = g_strsplit(cpu_option, ",", 2);
- 
-     oc = cpu_class_by_name(CPU_RESOLVING_TYPE, model_pieces[0]);
-     if (oc == NULL) {
 diff --git a/linux-user/main.c b/linux-user/main.c
-index a0aba9cb1e..20e0f51cfa 100644
+index 20e0f51cfa..d74108e05c 100644
 --- a/linux-user/main.c
 +++ b/linux-user/main.c
-@@ -660,7 +660,7 @@ int main(int argc, char **argv, char **envp)
+@@ -592,6 +592,7 @@ int main(int argc, char **argv, char **envp)
+     TaskState *ts;
+     CPUArchState *env;
+     CPUState *cpu;
++    CPUClass *cc;
+     int optind;
+     char **target_environ, **wrk;
+     char **target_argv;
+@@ -660,7 +661,8 @@ int main(int argc, char **argv, char **envp)
      if (cpu_model == NULL) {
          cpu_model = cpu_get_model(get_elf_eflags(execfd));
      }
--    cpu_type = parse_cpu_model(cpu_model);
-+    cpu_type = parse_cpu_option(cpu_model);
+-    cpu_type = parse_cpu_option(cpu_model);
++    cc = lookup_cpu_class(cpu_model, &error_fatal);
++    cpu_type = object_class_get_name(OBJECT_CLASS(cc));
  
      /* init tcg before creating CPUs and to get qemu_host_page_size */
      tcg_exec_init(0);
-diff --git a/vl.c b/vl.c
-index c696ad2a13..c57e28d1da 100644
---- a/vl.c
-+++ b/vl.c
-@@ -3002,7 +3002,7 @@ int main(int argc, char **argv, char **envp)
-     const char *optarg;
-     const char *loadvm = NULL;
-     MachineClass *machine_class;
--    const char *cpu_model;
-+    const char *cpu_option;
-     const char *vga_model = NULL;
-     const char *qtest_chrdev = NULL;
-     const char *qtest_log = NULL;
-@@ -3081,7 +3081,7 @@ int main(int argc, char **argv, char **envp)
-     QLIST_INIT (&vm_change_state_head);
-     os_setup_early_signal_handling();
- 
--    cpu_model = NULL;
-+    cpu_option = NULL;
-     snapshot = 0;
- 
-     nb_nics = 0;
-@@ -3133,7 +3133,7 @@ int main(int argc, char **argv, char **envp)
-             switch(popt->index) {
-             case QEMU_OPTION_cpu:
-                 /* hw initialization will check this */
--                cpu_model = optarg;
-+                cpu_option = optarg;
-                 break;
-             case QEMU_OPTION_hda:
-             case QEMU_OPTION_hdb:
-@@ -4050,8 +4050,8 @@ int main(int argc, char **argv, char **envp)
-         qemu_set_hw_version(machine_class->hw_version);
-     }
- 
--    if (cpu_model && is_help_option(cpu_model)) {
--        list_cpus(stdout, &fprintf, cpu_model);
-+    if (cpu_option && is_help_option(cpu_option)) {
-+        list_cpus(stdout, &fprintf, cpu_option);
-         exit(0);
-     }
- 
-@@ -4299,9 +4299,9 @@ int main(int argc, char **argv, char **envp)
-      * Global properties get set up by qdev_prop_register_global(),
-      * called from user_register_global_props(), and certain option
-      * desugaring.  Also in CPU feature desugaring (buried in
--     * parse_cpu_model()), which happens below this point, but may
-+     * parse_cpu_option()), which happens below this point, but may
-      * only target the CPU type, which can only be created after
--     * parse_cpu_model() returned the type.
-+     * parse_cpu_option() returned the type.
-      *
-      * Machine compat properties: object_set_machine_compat_props().
-      * Accelerator compat props: object_set_accelerator_compat_props(),
-@@ -4465,8 +4465,8 @@ int main(int argc, char **argv, char **envp)
- 
-     /* parse features once if machine provides default cpu_type */
-     current_machine->cpu_type = machine_class->default_cpu_type;
--    if (cpu_model) {
--        current_machine->cpu_type = parse_cpu_model(cpu_model);
-+    if (cpu_option) {
-+        current_machine->cpu_type = parse_cpu_option(cpu_option);
-     }
-     parse_numa_opts(current_machine);
- 
 -- 
 2.18.0.rc1.1.g3f1ff2140
 
