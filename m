@@ -1,30 +1,28 @@
-Received: from eggs.gnu.org ([209.51.188.92]:51404)
+Received: from eggs.gnu.org ([209.51.188.92]:52815)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <Mateja.Marjanovic@rt-rk.com>) id 1hGfnN-0003J8-3D
-	for qemu-devel@nongnu.org; Wed, 17 Apr 2019 04:19:53 -0400
+	(envelope-from <kraxel@redhat.com>) id 1hGfuZ-0005yE-Ll
+	for qemu-devel@nongnu.org; Wed, 17 Apr 2019 04:27:20 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <Mateja.Marjanovic@rt-rk.com>) id 1hGfnM-0001OF-1I
-	for qemu-devel@nongnu.org; Wed, 17 Apr 2019 04:19:53 -0400
-Received: from mx2.rt-rk.com ([89.216.37.149]:48971 helo=mail.rt-rk.com)
+	(envelope-from <kraxel@redhat.com>) id 1hGfuY-0008B3-OT
+	for qemu-devel@nongnu.org; Wed, 17 Apr 2019 04:27:19 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:48200)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <Mateja.Marjanovic@rt-rk.com>)
-	id 1hGfnL-0000c8-KN
-	for qemu-devel@nongnu.org; Wed, 17 Apr 2019 04:19:51 -0400
-References: <1554383690-28338-1-git-send-email-mateja.marjanovic@rt-rk.com>
-	<1554383690-28338-5-git-send-email-mateja.marjanovic@rt-rk.com>
-	<CAL1e-=i3H+aMaOCqMBkK4r9E4Ezqtyqw=VbwNmJZ6Wnc3in5PA@mail.gmail.com>
-	<bcc405c5-2e96-19a9-123e-bc607c243209@rt-rk.com>
-	<BN6PR2201MB1251458C6A26DEE093C282EEC6240@BN6PR2201MB1251.namprd22.prod.outlook.com>
-From: Mateja Marjanovic <Mateja.Marjanovic@rt-rk.com>
-Message-ID: <e6bd1e28-d0a1-9e86-d249-37ab16bb8de8@rt-rk.com>
-Date: Wed, 17 Apr 2019 10:16:59 +0200
+	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1hGfuY-00088N-GN
+	for qemu-devel@nongnu.org; Wed, 17 Apr 2019 04:27:18 -0400
+Date: Wed, 17 Apr 2019 10:27:12 +0200
+From: Gerd Hoffmann <kraxel@redhat.com>
+Message-ID: <20190417082712.5g5nztxcctembe3z@sirius.home.kraxel.org>
+References: <20190415154503.6758-1-berrange@redhat.com>
+	<CAFEAcA-YpG71aGtTVMafShGyd9uM599Uy_8S3vvvnPzfiKMqnw@mail.gmail.com>
+	<CAFEAcA-kywfUEZARqzH=obD1p3UsAcsNneK-X0BPpoFnV-QK0A@mail.gmail.com>
+	<CAFEAcA_+sf3L5ChBDKEekKb5iTTQZu4mEfF7eiTL78oMDuR16A@mail.gmail.com>
+	<CAFEAcA84DLEGQduvubsKP-2NrdNkzLcihL2WusZiHReupbF1PA@mail.gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <BN6PR2201MB1251458C6A26DEE093C282EEC6240@BN6PR2201MB1251.namprd22.prod.outlook.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
-Content-Language: en-US
-Subject: Re: [Qemu-devel] [PATCH v6 4/4] target/mips: Optimize
- ILVR.<B|H|W|D> MSA instructions
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CAFEAcA84DLEGQduvubsKP-2NrdNkzLcihL2WusZiHReupbF1PA@mail.gmail.com>
+Subject: Re: [Qemu-devel] [PATCH 0/3] usb-mtp: fix ObjectInfo request
+ handling
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,44 +31,24 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Aleksandar Markovic <amarkovic@wavecomp.com>, Aleksandar Markovic <aleksandar.m.mail@gmail.com>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, Aleksandar Rikalo <arikalo@wavecomp.com>, Richard Henderson <richard.henderson@linaro.org>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>, Aurelien Jarno <aurelien@aurel32.net>
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>, Bandan Das <bsd@redhat.com>, Thomas Huth <thuth@redhat.com>, Greg Kurz <groug@kaod.org>, Eric Blake <eblake@redhat.com>
 
+On Tue, Apr 16, 2019 at 11:27:06PM +0100, Peter Maydell wrote:
+> On Tue, 16 Apr 2019 at 20:33, Peter Maydell <peter.maydell@linaro.org> wrote:
+> >
+> > On Tue, 16 Apr 2019 at 18:27, Peter Maydell <peter.maydell@linaro.org> wrote:
+> > > Having thought a bit more I think I'd definitely like to apply
+> > > just patch 2 for 4.0. Could people try to test that and confirm
+> > > that it at least does not make the feature behave any worse?
+> >
+> > I've done a tentative merge test of patch 2, which is OK.
+> > I'd like to push that either today or tomorrow (uk time):
+> > objections?
+> 
+> ...now pushed.
 
-On 16.4.19. 23:20, Aleksandar Markovic wrote:
->> From: Mateja Marjanovic <Mateja.Marjanovic@rt-rk.com>
->>>> +void helper_msa_ilvr_b(CPUMIPSState *env, uint32_t wd,
->>>> +                       uint32_t ws, uint32_t wt)
->>>> +{
->>>> +    wr_t *pwd = &(env->active_fpu.fpr[wd].wr);
->>>> +    wr_t *pws = &(env->active_fpu.fpr[ws].wr);
->>>> +    wr_t *pwt = &(env->active_fpu.fpr[wt].wr);
->>>> +
->>> Why do we use here env->active_fpu.fpr[wd].wr, while for other instructions in
->>> this patch, we access msa_wr_d<b|h|w|d[] directly?
->> With a pointer to wr_t we have an array of bytes, halfwords, words or
->> doublewords
->> and can read from them and change them like an ordinary array. In other
->> cases
->> we use a variable that is TCGv_i64 and would have to use tcg_gen
->> functions to
->> modify the value of the register. Before my changes in ilvr instruction
->> helpers
->> env->active_fpu.fpr[wd].wr was used, so I just copy-pasted that.
->>
-> Your answer touches just surface, and doesn't fully answer my question.
-> I would like you to show deeper understanding of the code you are working
-> with. You can't just copy/paste without thinking.
->
-> Why do majority of MSA helpers use env->active_fpu.fpr[<index>].wr, while
-> your code mostly reference the MSA register directly? Is this the same
-> thing? If yes, why all MSA code doesn't use registers directly, which
-> would certainly be simpler than referencing active_fpu? What is the role
-> of "active_fpu"? Can it be changed? Can you analyze the underlying
-> reasons for referencing "active_fpu", and can you claim that it is safe
-> to circumvent it and reference the MSA registers directly?
-I will look into that, and try to analyze it and understand it.
-Thanks,
-Mateja
-> Thanks,
-> Aleksandar
+Added the other two to the (4.1) usb queue.
+
+thanks,
+  Gerd
