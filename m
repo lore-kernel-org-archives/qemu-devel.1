@@ -3,64 +3,61 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
 X-Spam-Status: No, score=-6.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED
-	autolearn=ham autolearn_force=no version=3.4.0
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C8A0AC282DA
-	for <qemu-devel@archiver.kernel.org>; Wed, 17 Apr 2019 19:08:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CAC19C282DA
+	for <qemu-devel@archiver.kernel.org>; Wed, 17 Apr 2019 19:08:54 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9209F206BA
-	for <qemu-devel@archiver.kernel.org>; Wed, 17 Apr 2019 19:08:52 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9209F206BA
+	by mail.kernel.org (Postfix) with ESMTPS id 9FE92206BA
+	for <qemu-devel@archiver.kernel.org>; Wed, 17 Apr 2019 19:08:54 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9FE92206BA
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:58134 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:58136 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hGpvP-0000S3-Bu
-	for qemu-devel@archiver.kernel.org; Wed, 17 Apr 2019 15:08:51 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:60195)
+	id 1hGpvR-0000Vi-Nu
+	for qemu-devel@archiver.kernel.org; Wed, 17 Apr 2019 15:08:53 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:60259)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1hGptO-0007dw-8O
-	for qemu-devel@nongnu.org; Wed, 17 Apr 2019 15:06:47 -0400
+	(envelope-from <armbru@redhat.com>) id 1hGptP-0007eF-I2
+	for qemu-devel@nongnu.org; Wed, 17 Apr 2019 15:06:48 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1hGptN-0003Xw-Cv
-	for qemu-devel@nongnu.org; Wed, 17 Apr 2019 15:06:46 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:47138)
+	(envelope-from <armbru@redhat.com>) id 1hGptO-0003Zt-JN
+	for qemu-devel@nongnu.org; Wed, 17 Apr 2019 15:06:47 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:56640)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1hGptN-0003Wy-39
-	for qemu-devel@nongnu.org; Wed, 17 Apr 2019 15:06:45 -0400
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
-	[10.5.11.14])
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1hGptO-0003Yk-9a
+	for qemu-devel@nongnu.org; Wed, 17 Apr 2019 15:06:46 -0400
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+	[10.5.11.12])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id D2776307D9D1;
-	Wed, 17 Apr 2019 19:06:43 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id 74DF930031AC
+	for <qemu-devel@nongnu.org>; Wed, 17 Apr 2019 19:06:45 +0000 (UTC)
 Received: from blackfin.pond.sub.org (ovpn-116-116.ams2.redhat.com
 	[10.36.116.116])
-	by smtp.corp.redhat.com (Postfix) with ESMTPS id 9875E5D9E1;
-	Wed, 17 Apr 2019 19:06:43 +0000 (UTC)
+	by smtp.corp.redhat.com (Postfix) with ESMTPS id 447FD60C64
+	for <qemu-devel@nongnu.org>; Wed, 17 Apr 2019 19:06:45 +0000 (UTC)
 Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
-	id DFFD21132B74; Wed, 17 Apr 2019 21:06:41 +0200 (CEST)
+	id 4555911327DB; Wed, 17 Apr 2019 21:06:42 +0200 (CEST)
 From: Markus Armbruster <armbru@redhat.com>
 To: qemu-devel@nongnu.org
-Date: Wed, 17 Apr 2019 21:06:30 +0200
-Message-Id: <20190417190641.26814-5-armbru@redhat.com>
+Date: Wed, 17 Apr 2019 21:06:40 +0200
+Message-Id: <20190417190641.26814-15-armbru@redhat.com>
 In-Reply-To: <20190417190641.26814-1-armbru@redhat.com>
 References: <20190417190641.26814-1-armbru@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.48]);
-	Wed, 17 Apr 2019 19:06:43 +0000 (UTC)
-Content-Transfer-Encoding: quoted-printable
+	(mx1.redhat.com [10.5.110.40]);
+	Wed, 17 Apr 2019 19:06:45 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] [PATCH v3 04/15] mips/boston: Report errors with
- error_report(), not error_printf()
+Subject: [Qemu-devel] [PATCH v3 14/15] char-pty: Print "char device
+ redirected" message to stdout
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -72,54 +69,52 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Aleksandar Rikalo <arikalo@wavecomp.com>,
-	Paul Burton <pburton@wavecomp.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190417190630.QsuQqwl3LRAjzDwuqAbjX47WyMmoO-1skyUhyor59U8@z>
+Content-Type: text/plain; charset="UTF-8"
+Message-ID: <20190417190640.TVM8F9dF057Un2I8zC08kPNNBB8W7lqHZtth1S5n0_0@z>
 
-Cc: Paul Burton <pburton@wavecomp.com>
-Cc: Aleksandar Rikalo <arikalo@wavecomp.com>
+char_pty_open() prints a "char device redirected to PTY_NAME (label
+LABEL)" message to the current monitor or else to stderr.  This is not
+an error, so it shouldn't go to stderr.  Print it to stdout instead.
+
+Why is it even printed?  No other ChardevClass::open() prints anything
+on success.  It's because you need to know PTY_NAME to actually use
+this char device, e.g. like e.g. "socat STDIO,cfmakeraw FILE:PTY_NAME"
+to use the monitor's readline interface.  You can get PTY_NAME with
+"info chardev" (a.k.a. query-chardev for QMP), but only if you already
+have a monitor.
+
 Signed-off-by: Markus Armbruster <armbru@redhat.com>
-Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
 ---
- hw/mips/boston.c | 6 +++---
- 1 file changed, 3 insertions(+), 3 deletions(-)
+ chardev/char-pty.c | 5 +++--
+ 1 file changed, 3 insertions(+), 2 deletions(-)
 
-diff --git a/hw/mips/boston.c b/hw/mips/boston.c
-index e5bab3cadc..a8b29f62f5 100644
---- a/hw/mips/boston.c
-+++ b/hw/mips/boston.c
-@@ -528,21 +528,21 @@ static void boston_mach_init(MachineState *machine)
-         fw_size =3D load_image_targphys(machine->firmware,
-                                       0x1fc00000, 4 * MiB);
-         if (fw_size =3D=3D -1) {
--            error_printf("unable to load firmware image '%s'\n",
-+            error_report("unable to load firmware image '%s'",
-                           machine->firmware);
-             exit(1);
-         }
-     } else if (machine->kernel_filename) {
-         fit_err =3D load_fit(&boston_fit_loader, machine->kernel_filenam=
-e, s);
-         if (fit_err) {
--            error_printf("unable to load FIT image\n");
-+            error_report("unable to load FIT image");
-             exit(1);
-         }
-=20
-         gen_firmware(memory_region_get_ram_ptr(flash) + 0x7c00000,
-                      s->kernel_entry, s->fdt_base, is_64b);
-     } else if (!qtest_enabled()) {
--        error_printf("Please provide either a -kernel or -bios argument\=
-n");
-+        error_report("Please provide either a -kernel or -bios argument"=
-);
-         exit(1);
-     }
- }
---=20
+diff --git a/chardev/char-pty.c b/chardev/char-pty.c
+index b034332edd..04759b0ef9 100644
+--- a/chardev/char-pty.c
++++ b/chardev/char-pty.c
+@@ -28,6 +28,7 @@
+ #include "io/channel-file.h"
+ #include "qemu/sockets.h"
+ #include "qemu/error-report.h"
++#include "qemu/qemu-print.h"
+ 
+ #include "chardev/char-io.h"
+ 
+@@ -211,8 +212,8 @@ static void char_pty_open(Chardev *chr,
+     qemu_set_nonblock(master_fd);
+ 
+     chr->filename = g_strdup_printf("pty:%s", pty_name);
+-    error_printf("char device redirected to %s (label %s)\n",
+-                 pty_name, chr->label);
++    qemu_printf("char device redirected to %s (label %s)\n",
++                pty_name, chr->label);
+ 
+     s = PTY_CHARDEV(chr);
+     s->ioc = QIO_CHANNEL(qio_channel_file_new_fd(master_fd));
+-- 
 2.17.2
 
 
