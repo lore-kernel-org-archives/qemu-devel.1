@@ -1,22 +1,22 @@
-Received: from eggs.gnu.org ([209.51.188.92]:47767)
+Received: from eggs.gnu.org ([209.51.188.92]:53088)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1hGla3-0000lu-4P
-	for qemu-devel@nongnu.org; Wed, 17 Apr 2019 10:30:32 -0400
+	(envelope-from <eblake@redhat.com>) id 1hGlrO-0005FY-Qe
+	for qemu-devel@nongnu.org; Wed, 17 Apr 2019 10:48:27 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1hGla1-0007Oi-9K
-	for qemu-devel@nongnu.org; Wed, 17 Apr 2019 10:30:31 -0400
-Date: Wed, 17 Apr 2019 16:30:03 +0200
-From: Igor Mammedov <imammedo@redhat.com>
-Message-ID: <20190417163003.49d3fca3@redhat.com>
-In-Reply-To: <89ca3a70-066b-e40e-faaf-39a39ec976bf@de.ibm.com>
-References: <1555334842-195718-1-git-send-email-imammedo@redhat.com>
-	<1555334842-195718-6-git-send-email-imammedo@redhat.com>
-	<89ca3a70-066b-e40e-faaf-39a39ec976bf@de.ibm.com>
+	(envelope-from <eblake@redhat.com>) id 1hGlrN-0003pG-PK
+	for qemu-devel@nongnu.org; Wed, 17 Apr 2019 10:48:26 -0400
+References: <20190417100929.39943-1-vsementsov@virtuozzo.com>
+	<20190417100929.39943-2-vsementsov@virtuozzo.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <dd1f30c4-e6ab-6481-ae34-412fa8533a5f@redhat.com>
+Date: Wed, 17 Apr 2019 09:48:17 -0500
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v1 5/5] s390: do not call
- memory_region_allocate_system_memory() multiple times
+In-Reply-To: <20190417100929.39943-2-vsementsov@virtuozzo.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="Il8CR8COfxCetBk0W7SE0XdQMkisZjfL4"
+Subject: Re: [Qemu-devel] [PATCH 1/2] block/io: bdrv_pdiscard: support
+ int64_t bytes parameter
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,92 +25,138 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Christian Borntraeger <borntraeger@de.ibm.com>
-Cc: qemu-devel@nongnu.org, qemu-ppc@nongnu.org, David Hildenbrand <david@redhat.com>, Helge Deller <deller@gmx.de>, Cornelia Huck <cohuck@redhat.com>, Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, Halil Pasic <pasic@linux.ibm.com>, qemu-s390x@nongnu.org, =?UTF-8?B?SGVy?= =?UTF-8?B?dsOp?= Poussineau <hpoussin@reactos.org>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Artyom Tarasenko <atar4qemu@gmail.com>, David Gibson <david@gibson.dropbear.id.au>
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org
+Cc: kwolf@redhat.com, fam@euphon.net, den@virtuozzo.com, mreitz@redhat.com, stefanha@redhat.com
 
-On Tue, 16 Apr 2019 13:09:08 +0200
-Christian Borntraeger <borntraeger@de.ibm.com> wrote:
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--Il8CR8COfxCetBk0W7SE0XdQMkisZjfL4
+From: Eric Blake <eblake@redhat.com>
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
+ qemu-devel@nongnu.org, qemu-block@nongnu.org
+Cc: kwolf@redhat.com, fam@euphon.net, den@virtuozzo.com, mreitz@redhat.com,
+ stefanha@redhat.com
+Message-ID: <dd1f30c4-e6ab-6481-ae34-412fa8533a5f@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH 1/2] block/io: bdrv_pdiscard: support int64_t
+ bytes parameter
+References: <20190417100929.39943-1-vsementsov@virtuozzo.com>
+ <20190417100929.39943-2-vsementsov@virtuozzo.com>
+In-Reply-To: <20190417100929.39943-2-vsementsov@virtuozzo.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-> This fails with more than 8TB, e.g.  "-m 9T "
-> 
-> [pid 231065] ioctl(10, KVM_SET_USER_MEMORY_REGION, {slot=0, flags=0, guest_phys_addr=0, memory_size=0, userspace_addr=0x3ffc8500000}) = 0
-> [pid 231065] ioctl(10, KVM_SET_USER_MEMORY_REGION, {slot=0, flags=0, guest_phys_addr=0, memory_size=9895604649984, userspace_addr=0x3ffc8500000}) = -1 EINVAL (Invalid argument)
-> 
-> seems that the 2nd memslot gets the full size (and not 9TB-size of first slot).
+On 4/17/19 5:09 AM, Vladimir Sementsov-Ogievskiy wrote:
+> This fixes at least one overflow in qcow2_process_discards.
 
-I'm able to simulate issue on s390 host with KVM enabled, it looks like
-memory region aliases are broken on s390 host (aliasing works as expected with
-x86 where where it for splitting RAM on low and high mem).
-I'll try to debug and find out where it goes off on a tangent.
+It's worth calling out how long the problem of passing >2G discard
+requests has been present (my reply to the cover letter tracked down
+0b919fae as tracking a 64-bit discard region but passing it to
+bdrv_discard() which took an int sectors; I'm not sure if later changes
+to byte-based rather than sector-based made a difference).
 
-> 
-> 
-> On 15.04.19 15:27, Igor Mammedov wrote:
-> > s390 was trying to solve limited memslot size issue by abusing
-> > memory_region_allocate_system_memory(), which breaks API contract
-> > where the function might be called only once.
-> > 
-> > s390 should have used memory aliases to fragment inital memory into
-> > smaller chunks to satisfy KVM's memslot limitation. But its a bit
-> > late now, since allocated pieces are transfered in migration stream
-> > separately, so it's not possible to just replace broken layout with
-> > correct one. Previous patch made MemoryRegion alases migratable and
-> > this patch switches to use them to split big initial RAM chunk into
-> > smaller pieces up to KVM_SLOT_MAX_BYTES each and registers aliases
-> > for migration.
-> > 
-> > Signed-off-by: Igor Mammedov <imammedo@redhat.com>
-> > ---
-> > A don't have access to a suitable system to test it, so I've simulated
-> > it with smaller chunks on x84 host. Ping-pong migration between old
-> > and new QEMU worked fine.  KVM part should be fine as memslots
-> > using mapped MemoryRegions (in this case it would be aliases) as
-> > far as I know but is someone could test it on big enough host it
-> > would be nice.
-> > ---
-> >  hw/s390x/s390-virtio-ccw.c | 20 +++++++++++++++-----
-> >  1 file changed, 15 insertions(+), 5 deletions(-)
-> > 
-> > diff --git a/hw/s390x/s390-virtio-ccw.c b/hw/s390x/s390-virtio-ccw.c
-> > index d11069b..12ca3a9 100644
-> > --- a/hw/s390x/s390-virtio-ccw.c
-> > +++ b/hw/s390x/s390-virtio-ccw.c
-> > @@ -161,20 +161,30 @@ static void virtio_ccw_register_hcalls(void)
-> >  static void s390_memory_init(ram_addr_t mem_size)
-> >  {
-> >      MemoryRegion *sysmem = get_system_memory();
-> > +    MemoryRegion *ram = g_new(MemoryRegion, 1);
-> >      ram_addr_t chunk, offset = 0;
-> >      unsigned int number = 0;
-> >      gchar *name;
-> >  
-> >      /* allocate RAM for core */
-> > +    memory_region_allocate_system_memory(ram, NULL, "s390.whole.ram", mem_size);
-> > +    /*
-> > +     * memory_region_allocate_system_memory() registers allocated RAM for
-> > +     * migration, however for compat reasons the RAM should be passed over
-> > +     * as RAMBlocks of the size upto KVM_SLOT_MAX_BYTES. So unregister just
-> > +     * allocated RAM so it won't be migrated directly. Aliases will take
-> > +     * of segmenting RAM into legacy chunks.
-> > +     */
-> > +    vmstate_unregister_ram(ram, NULL);
-> >      name = g_strdup_printf("s390.ram");
-> >      while (mem_size) {
-> > -        MemoryRegion *ram = g_new(MemoryRegion, 1);
-> > -        uint64_t size = mem_size;
-> > +        MemoryRegion *alias = g_new(MemoryRegion, 1);
-> >  
-> >          /* KVM does not allow memslots >= 8 TB */
-> > -        chunk = MIN(size, KVM_SLOT_MAX_BYTES);
-> > -        memory_region_allocate_system_memory(ram, NULL, name, chunk);
-> > -        memory_region_add_subregion(sysmem, offset, ram);
-> > +        chunk = MIN(mem_size, KVM_SLOT_MAX_BYTES);
-> > +        memory_region_init_alias(alias, NULL, name, ram, offset, chunk);
-> > +        vmstate_register_ram_global(alias);
-> > +        memory_region_add_subregion(sysmem, offset, alias);
-> >          mem_size -= chunk;
-> >          offset += chunk;
-> >          g_free(name);
-> >   
-> 
-> 
+
+> @@ -2664,14 +2664,15 @@ static void coroutine_fn bdrv_pdiscard_co_entry=
+(void *opaque)
+>      aio_wait_kick();
+>  }
+> =20
+> -int coroutine_fn bdrv_co_pdiscard(BdrvChild *child, int64_t offset, in=
+t bytes)
+> +int coroutine_fn bdrv_co_pdiscard(BdrvChild *child, int64_t offset,
+> +                                  int64_t bytes)
+>  {
+>      BdrvTrackedRequest req;
+>      int max_pdiscard, ret;
+>      int head, tail, align;
+>      BlockDriverState *bs =3D child->bs;
+> =20
+> -    if (!bs || !bs->drv) {
+> +    if (!bs || !bs->drv || !bdrv_is_inserted(bs)) {
+
+This change seems unrelated? Oh, it's because you are inlining the rest
+of what bdrv_check_byte_request used to do.
+
+>          return -ENOMEDIUM;
+>      }
+> =20
+> @@ -2679,9 +2680,8 @@ int coroutine_fn bdrv_co_pdiscard(BdrvChild *chil=
+d, int64_t offset, int bytes)
+>          return -EPERM;
+>      }
+> =20
+> -    ret =3D bdrv_check_byte_request(bs, offset, bytes);
+> -    if (ret < 0) {
+> -        return ret;
+
+If we keep this call in place, we can flag if there were any other
+callers that were passing truncated 64-bit quantities. But I also agree
+that now that we are switching to a 64-bit interface, we no longer have
+to check whether callers were properly limiting their requests.
+
+Hmm - I just realized that bdrv_check_byte_request() takes a size_t
+(rather than int64_t) size argument - could this result in any other
+truncations on a 32-bit platform that don't affect 64-bit platforms?
+
+> @@ -2711,12 +2711,13 @@ int coroutine_fn bdrv_co_pdiscard(BdrvChild *ch=
+ild, int64_t offset, int bytes)
+>          goto out;
+>      }
+> =20
+> -    max_pdiscard =3D QEMU_ALIGN_DOWN(MIN_NON_ZERO(bs->bl.max_pdiscard,=
+ INT_MAX),
+> +    max_pdiscard =3D QEMU_ALIGN_DOWN(MIN_NON_ZERO(bs->bl.max_pdiscard,=
+
+> +                                                BDRV_REQUEST_MAX_BYTES=
+),
+>                                     align);
+
+This change is a no-op, since BDRV_REQUEST_MAX_BYTES is already INT_MAX
+aligned down to sector size, and align is at least sector size.
+
+>      assert(max_pdiscard >=3D bs->bl.request_alignment);
+> =20
+>      while (bytes > 0) {
+> -        int num =3D bytes;
+> +        int64_t num =3D bytes;
+> =20
+>          if (head) {
+>              /* Make small requests to get to alignment boundaries. */
+> @@ -2778,7 +2779,7 @@ out:
+>      return ret;
+>  }
+> =20
+> -int bdrv_pdiscard(BdrvChild *child, int64_t offset, int bytes)
+> +int bdrv_pdiscard(BdrvChild *child, int64_t offset, int64_t bytes)
+>  {
+>      Coroutine *co;
+>      DiscardCo rwco =3D {
+>=20
+
+I'm not sure the patch is perfect, but I definitely agree that we want
+to support 64-byte discard length (where the block layer fragments the
+request as needed) rather than the current 32-byte discard length (where
+callers have to be careful to not suffer from truncation).
+
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3226
+Virtualization:  qemu.org | libvirt.org
+
+
+--Il8CR8COfxCetBk0W7SE0XdQMkisZjfL4
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAly3PLEACgkQp6FrSiUn
+Q2oy6AgAo5cCga5p/j860/OxocJuLIHml0oQlrDTCx2+WTmJVEEW1gidAfmISRRe
+VOkvSIKSmK9Yur91GOVjL0Oa2Yb2SlnIBxw0kiGuVi11C6JxWDWNPZRvoKwkaXIb
+4wov68M0Elrj9gaPlO5iRIbkJqj4VJuSeyQVPccL+6XmohUroBgTKwgENyOQNAzO
+Pau3zNes/Vy77gUOm6Kro28rEg46GlOOcaPhsxYoERwc2jXSyHGa2IFdLIEoenQ2
+eln1Z4iDQ6DPM5MFKkrVRld2mdnoOTfLvRw8IxQWKzmtnM2FI+BfqOgsxfY/f2xy
+atfXVqPVdI0bKusLeO0guYJnpG8m2A==
+=gbF3
+-----END PGP SIGNATURE-----
+
+--Il8CR8COfxCetBk0W7SE0XdQMkisZjfL4--
