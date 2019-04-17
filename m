@@ -1,17 +1,16 @@
-Received: from eggs.gnu.org ([209.51.188.92]:44212)
+Received: from eggs.gnu.org ([209.51.188.92]:44216)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1hGhVX-00038M-Rg
-	for qemu-devel@nongnu.org; Wed, 17 Apr 2019 06:09:36 -0400
+	(envelope-from <vsementsov@virtuozzo.com>) id 1hGhVY-00038N-1Z
+	for qemu-devel@nongnu.org; Wed, 17 Apr 2019 06:09:37 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1hGhVW-0003tq-Oa
-	for qemu-devel@nongnu.org; Wed, 17 Apr 2019 06:09:35 -0400
+	(envelope-from <vsementsov@virtuozzo.com>) id 1hGhVW-0003u4-Pz
+	for qemu-devel@nongnu.org; Wed, 17 Apr 2019 06:09:36 -0400
 From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Date: Wed, 17 Apr 2019 13:09:28 +0300
-Message-Id: <20190417100929.39943-2-vsementsov@virtuozzo.com>
+Date: Wed, 17 Apr 2019 13:09:29 +0300
+Message-Id: <20190417100929.39943-3-vsementsov@virtuozzo.com>
 In-Reply-To: <20190417100929.39943-1-vsementsov@virtuozzo.com>
 References: <20190417100929.39943-1-vsementsov@virtuozzo.com>
-Subject: [Qemu-devel] [PATCH 1/2] block/io: bdrv_pdiscard: support int64_t
- bytes parameter
+Subject: [Qemu-devel] [PATCH 2/2] iotests: test big qcow2 shrink
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,96 +22,134 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org, qemu-block@nongnu.org
 Cc: kwolf@redhat.com, mreitz@redhat.com, fam@euphon.net, stefanha@redhat.com, vsementsov@virtuozzo.com, den@virtuozzo.com
 
-This fixes at least one overflow in qcow2_process_discards.
-
 Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 ---
- include/block/block.h |  4 ++--
- block/io.c            | 19 ++++++++++---------
- 2 files changed, 12 insertions(+), 11 deletions(-)
+ tests/qemu-iotests/249     | 69 ++++++++++++++++++++++++++++++++++++++
+ tests/qemu-iotests/249.out | 30 +++++++++++++++++
+ tests/qemu-iotests/group   |  1 +
+ 3 files changed, 100 insertions(+)
+ create mode 100755 tests/qemu-iotests/249
+ create mode 100644 tests/qemu-iotests/249.out
 
-diff --git a/include/block/block.h b/include/block/block.h
-index c7a26199aa..69fa18867e 100644
---- a/include/block/block.h
-+++ b/include/block/block.h
-@@ -432,8 +432,8 @@ void bdrv_drain_all(void);
-     AIO_WAIT_WHILE(bdrv_get_aio_context(bs_),              \
-                    cond); })
- 
--int bdrv_pdiscard(BdrvChild *child, int64_t offset, int bytes);
--int bdrv_co_pdiscard(BdrvChild *child, int64_t offset, int bytes);
-+int bdrv_pdiscard(BdrvChild *child, int64_t offset, int64_t bytes);
-+int bdrv_co_pdiscard(BdrvChild *child, int64_t offset, int64_t bytes);
- int bdrv_has_zero_init_1(BlockDriverState *bs);
- int bdrv_has_zero_init(BlockDriverState *bs);
- bool bdrv_unallocated_blocks_are_zero(BlockDriverState *bs);
-diff --git a/block/io.c b/block/io.c
-index dfc153b8d8..c6429380e8 100644
---- a/block/io.c
-+++ b/block/io.c
-@@ -2653,7 +2653,7 @@ int bdrv_flush(BlockDriverState *bs)
- typedef struct DiscardCo {
-     BdrvChild *child;
-     int64_t offset;
--    int bytes;
-+    int64_t bytes;
-     int ret;
- } DiscardCo;
- static void coroutine_fn bdrv_pdiscard_co_entry(void *opaque)
-@@ -2664,14 +2664,15 @@ static void coroutine_fn bdrv_pdiscard_co_entry(void *opaque)
-     aio_wait_kick();
- }
- 
--int coroutine_fn bdrv_co_pdiscard(BdrvChild *child, int64_t offset, int bytes)
-+int coroutine_fn bdrv_co_pdiscard(BdrvChild *child, int64_t offset,
-+                                  int64_t bytes)
- {
-     BdrvTrackedRequest req;
-     int max_pdiscard, ret;
-     int head, tail, align;
-     BlockDriverState *bs = child->bs;
- 
--    if (!bs || !bs->drv) {
-+    if (!bs || !bs->drv || !bdrv_is_inserted(bs)) {
-         return -ENOMEDIUM;
-     }
- 
-@@ -2679,9 +2680,8 @@ int coroutine_fn bdrv_co_pdiscard(BdrvChild *child, int64_t offset, int bytes)
-         return -EPERM;
-     }
- 
--    ret = bdrv_check_byte_request(bs, offset, bytes);
--    if (ret < 0) {
--        return ret;
-+    if (offset < 0) {
-+        return -EIO;
-     }
- 
-     /* Do nothing if disabled.  */
-@@ -2711,12 +2711,13 @@ int coroutine_fn bdrv_co_pdiscard(BdrvChild *child, int64_t offset, int bytes)
-         goto out;
-     }
- 
--    max_pdiscard = QEMU_ALIGN_DOWN(MIN_NON_ZERO(bs->bl.max_pdiscard, INT_MAX),
-+    max_pdiscard = QEMU_ALIGN_DOWN(MIN_NON_ZERO(bs->bl.max_pdiscard,
-+                                                BDRV_REQUEST_MAX_BYTES),
-                                    align);
-     assert(max_pdiscard >= bs->bl.request_alignment);
- 
-     while (bytes > 0) {
--        int num = bytes;
-+        int64_t num = bytes;
- 
-         if (head) {
-             /* Make small requests to get to alignment boundaries. */
-@@ -2778,7 +2779,7 @@ out:
-     return ret;
- }
- 
--int bdrv_pdiscard(BdrvChild *child, int64_t offset, int bytes)
-+int bdrv_pdiscard(BdrvChild *child, int64_t offset, int64_t bytes)
- {
-     Coroutine *co;
-     DiscardCo rwco = {
+diff --git a/tests/qemu-iotests/249 b/tests/qemu-iotests/249
+new file mode 100755
+index 0000000000..f0140461ad
+--- /dev/null
++++ b/tests/qemu-iotests/249
+@@ -0,0 +1,69 @@
++#!/usr/bin/env bash
++#
++# Test big discard in qcow2 shrink
++#
++# Copyright (c) 2019 Virtuozzo International GmbH. All rights reserved.
++#
++# This program is free software; you can redistribute it and/or modify
++# it under the terms of the GNU General Public License as published by
++# the Free Software Foundation; either version 2 of the License, or
++# (at your option) any later version.
++#
++# This program is distributed in the hope that it will be useful,
++# but WITHOUT ANY WARRANTY; without even the implied warranty of
++# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++# GNU General Public License for more details.
++#
++# You should have received a copy of the GNU General Public License
++# along with this program.  If not, see <http://www.gnu.org/licenses/>.
++#
++
++# creator
++owner=vsementsov@virtuozzo.com
++
++seq=`basename $0`
++echo "QA output created by $seq"
++
++status=1	# failure is the default!
++
++_cleanup()
++{
++    _cleanup_test_img
++}
++trap "_cleanup; exit \$status" 0 1 2 3 15
++
++# get standard environment, filters and checks
++. ./common.rc
++. ./common.filter
++
++# Requires backing files and .bdrv_change_backing_file support
++_supported_fmt qcow2
++_supported_proto file
++_supported_os Linux
++
++# This test checks bug in qcow2_process_discards, fixed by previous commit.
++# The problem was that bdrv_pdiscard was called with uint64_t bytes parameter
++# which was cropped to int.
++# To reproduce bug we need to overflow int by one sequential discard, so we
++# need size > 2G, bigger cluster size (as with default 64k we may have maximum
++# of 512M sequential data, corresponding to one L1 entry, and we need to write
++# at offset 0 at last, to prevent bdrv_co_truncate(bs->file) in
++# qcow2_co_truncate to stole the whole effect of failed discard.
++
++size=2300M
++IMGOPTS="cluster_size=1M"
++
++_make_test_img $size
++$QEMU_IO -c 'write 100M 2000M' -c 'write 2100M 200M' \
++    -c 'write 0 100M' "$TEST_IMG" | _filter_qemu_io
++
++$QEMU_IMG info "$TEST_IMG" | _filter_testdir
++
++$QEMU_IMG resize --shrink "$TEST_IMG" 50M
++
++$QEMU_IMG info "$TEST_IMG" | _filter_testdir
++
++# success, all done
++echo "*** done"
++rm -f $seq.full
++status=0
+diff --git a/tests/qemu-iotests/249.out b/tests/qemu-iotests/249.out
+new file mode 100644
+index 0000000000..18bf7b2fb2
+--- /dev/null
++++ b/tests/qemu-iotests/249.out
+@@ -0,0 +1,30 @@
++QA output created by 249
++Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=2411724800
++wrote 2097152000/2097152000 bytes at offset 104857600
++1.953 GiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
++wrote 209715200/209715200 bytes at offset 2202009600
++200 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
++wrote 104857600/104857600 bytes at offset 0
++100 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
++image: TEST_DIR/t.qcow2
++file format: qcow2
++virtual size: 2.2G (2411724800 bytes)
++disk size: 2.3G
++cluster_size: 1048576
++Format specific information:
++    compat: 1.1
++    lazy refcounts: false
++    refcount bits: 16
++    corrupt: false
++Image resized.
++image: TEST_DIR/t.qcow2
++file format: qcow2
++virtual size: 50M (52428800 bytes)
++disk size: 54M
++cluster_size: 1048576
++Format specific information:
++    compat: 1.1
++    lazy refcounts: false
++    refcount bits: 16
++    corrupt: false
++*** done
+diff --git a/tests/qemu-iotests/group b/tests/qemu-iotests/group
+index bae7718380..3a40dbfe69 100644
+--- a/tests/qemu-iotests/group
++++ b/tests/qemu-iotests/group
+@@ -248,3 +248,4 @@
+ 246 rw auto quick
+ 247 rw auto quick
+ 248 rw auto quick
++249 rw auto
 -- 
 2.18.0
