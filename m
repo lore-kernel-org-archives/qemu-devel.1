@@ -1,84 +1,93 @@
-Return-Path: <SRS0=xvb4=SS=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.kernel.org@kernel.org>
+Return-Path: <SRS0=PAXx=ST=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.kernel.org@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.7 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS,URIBL_BLOCKED
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.7 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A295FC10F13
-	for <qemu-devel@archiver.kernel.org>; Tue, 16 Apr 2019 22:28:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 45922C10F14
+	for <qemu-devel@archiver.kernel.org>; Wed, 17 Apr 2019 00:52:22 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 653F22073F
-	for <qemu-devel@archiver.kernel.org>; Tue, 16 Apr 2019 22:28:16 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 00E8C20821
+	for <qemu-devel@archiver.kernel.org>; Wed, 17 Apr 2019 00:52:21 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="GqtdICag"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 653F22073F
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=oberlin-edu.20150623.gappssmtp.com header.i=@oberlin-edu.20150623.gappssmtp.com header.b="Y3orv1Uq"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 00E8C20821
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=oberlin.edu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:43633 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:44823 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hGWYp-0007cJ-EH
-	for qemu-devel@archiver.kernel.org; Tue, 16 Apr 2019 18:28:15 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:47435)
+	id 1hGYoH-0008FN-4S
+	for qemu-devel@archiver.kernel.org; Tue, 16 Apr 2019 20:52:21 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:40759)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1hGWXz-0007KO-Go
-	for qemu-devel@nongnu.org; Tue, 16 Apr 2019 18:27:24 -0400
+	(envelope-from <stephen.checkoway@oberlin.edu>) id 1hGYnT-0007tm-Qs
+	for qemu-devel@nongnu.org; Tue, 16 Apr 2019 20:51:32 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1hGWXx-0005gU-8B
-	for qemu-devel@nongnu.org; Tue, 16 Apr 2019 18:27:23 -0400
-Received: from mail-ot1-x341.google.com ([2607:f8b0:4864:20::341]:38649)
+	(envelope-from <stephen.checkoway@oberlin.edu>) id 1hGYnS-0000M9-Qb
+	for qemu-devel@nongnu.org; Tue, 16 Apr 2019 20:51:31 -0400
+Received: from mail-io1-xd44.google.com ([2607:f8b0:4864:20::d44]:37057)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1hGWXv-0005eX-VU
-	for qemu-devel@nongnu.org; Tue, 16 Apr 2019 18:27:20 -0400
-Received: by mail-ot1-x341.google.com with SMTP id e80so1750076ote.5
-	for <qemu-devel@nongnu.org>; Tue, 16 Apr 2019 15:27:19 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
-	h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-	:cc; bh=1Cb9TYEDwspChYr592GhQ77iVlLvf6ykAuCajVbUDPI=;
-	b=GqtdICag5HCYhvb2mBnBmc074AzuzLr/QwOaxIs5g2ihSzmQM8Rw1u0s2FXP7GG1Dh
-	ZZ9YTouyWH1H3qAsgo0/vvVbhv4YgGaghZIuAykMZZTNZ+IuxIWseMwHxg/4sKlGAvuz
-	uAcVPxQk6ouM+CxScBpE+gYqgNLNt/2odaGyv6hrYD/aD4CQuNpWsLQPkZqPbROR/rjo
-	2erCAlPqSawcW/pdw/Zi5WTqADSdE0q3S76Wh79Mr0GxfSIeND/MsmoR05ejNRlpjL6s
-	n9fmK8v2SrUn+YEqdb7UYLE9pQ1GgThaj+2N2QH0xTUsdAOsO3nGXjW3FjDEuxNVhVXZ
-	ORFw==
+	(Exim 4.71) (envelope-from <stephen.checkoway@oberlin.edu>)
+	id 1hGYnS-0000Lg-EW
+	for qemu-devel@nongnu.org; Tue, 16 Apr 2019 20:51:30 -0400
+Received: by mail-io1-xd44.google.com with SMTP id x7so19221169ioh.4
+	for <qemu-devel@nongnu.org>; Tue, 16 Apr 2019 17:51:29 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=oberlin-edu.20150623.gappssmtp.com; s=20150623;
+	h=from:to:subject:date:message-id:mime-version
+	:content-transfer-encoding;
+	bh=HijM4yMTjQ1ZZzGdGKVOKt668jUCoXfBQGB/vyA6H3k=;
+	b=Y3orv1Uqcv/W81V5SxxxMX7QBuJ3vc6BYLrlsROLh3O2EX26zA1Vr18dY9VG++XmWh
+	PjbSp5EzOONUkO+k3644lrNxK3xQ7N3eg+LMQqyABvc6hqW92VqagtR/VgMrnbRLP2/Z
+	p9XIOyaex167n+pD3ltVSsaQUbwsLpP9vwDNQVORA5VyAHZNf/QyzE48OLBvee+j7usj
+	ZotvVqcjt3ESofWcMcNcjZZO4jQdhIdMy3qTYh4XBkM0NXHF9YZ65jzXrOw2MwRdS8UA
+	WgWbQAkOEh2Rf22FS9i/YW0qfms4BJET834oG4g73XpiLUOgqxcdJzHW4GG7BqBZdfWn
+	jxHw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
 	d=1e100.net; s=20161025;
-	h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-	:message-id:subject:to:cc;
-	bh=1Cb9TYEDwspChYr592GhQ77iVlLvf6ykAuCajVbUDPI=;
-	b=rO5cziEIa326M1nTvpykxxbmryrc7XrSNKhqW4Sd7g8WsaScC5yZur95hmW60Bi1Hk
-	5FK8OO72LggxZenAdoR253S17hyiZfmyNN/lWKPad5a7foJYyzXZxHnKnkg5M8N8C0Tl
-	vqY1BskiTRtfbsQPFZ9QnvTBfHwm4J49tci9Dp30Zol1tyJp4/5WNk8ldiPx4ixOD5Nn
-	GO2VQS5c+NFZQn31MeuAN3BebFyATYRpPyAYS+fkNsfr2LjtItb/mojtbPgx2afg3cdW
-	OcOoSE8g8nBRpj0d4dhTYbeXg1qekN5+mr5fcV2puKYc2NcapyLhMFL8SW1K3QoGcbUj
-	699A==
-X-Gm-Message-State: APjAAAXNmR1hJsM32SnqFb/v+eq+vwqT4JMwR+wajCTHHwkJvRuu7PiQ
-	kZSpCiNwV6ShToM25qGimo5PCiu9jiMgCXQc29kkVQ==
-X-Google-Smtp-Source: APXvYqxAPHw5Co2hEyRhQW0bct+f399ilKvMqxpSFDdZi0XwRl53KZyl37OP0fzfsbXO4PSHHbsaXjNtZ1SMOoK10Cs=
-X-Received: by 2002:a9d:3b44:: with SMTP id z62mr55029914otb.319.1555453638003;
-	Tue, 16 Apr 2019 15:27:18 -0700 (PDT)
+	h=x-gm-message-state:from:to:subject:date:message-id:mime-version
+	:content-transfer-encoding;
+	bh=HijM4yMTjQ1ZZzGdGKVOKt668jUCoXfBQGB/vyA6H3k=;
+	b=Zo7fxz+DAyTYEUdteuVP++rw8gbj4OquEjpKuBQQTJdjLMFLoWILAt9fZm+HworlqJ
+	Rdu2yYPtxVxeIDTPL4J2FQEoXbRSFCNHBF5+po25uZfEhd7GzTwEKrTB4+HMgDbsXfq9
+	yt6KvUCtoxgnADSYn1O0JqGKiCWjuG7vasmDxwjohNZ7nbP9aZvOxP+R8SVw6xN2ahS0
+	1DgBWBj2F3QXguF4YnxZ2vFCqgm2MSblSmcvDg0JcmlHkflANQTTDOWCxcm1fjptgdhl
+	lhIeLgR+4AYoTj8a8zVN2OBUv2Tnsap0A/dP4a1g8Jn6AaHPapyGzJDthM+07ILK+ACn
+	w+gQ==
+X-Gm-Message-State: APjAAAWLhP5QHujQEFnG7VTIDJ4NjifXrujgWVZBN4c2JdcjauEiMKt5
+	zbW/hWxZrWGuQZz3jiV0dxAMgw==
+X-Google-Smtp-Source: APXvYqyrXzAehE74/FUSnTdXtkK+YusILGDJjP1r10QZghXexfEKUfUhzsvMXeLNkQrAouERZ9uCBw==
+X-Received: by 2002:a6b:fd0f:: with SMTP id c15mr59343803ioi.132.1555462287582;
+	Tue, 16 Apr 2019 17:51:27 -0700 (PDT)
+Received: from worksec.oberlin.net (ip-210-181.oberlin.net. [208.66.210.181])
+	by smtp.gmail.com with ESMTPSA id
+	136sm553791itk.28.2019.04.16.17.51.26
+	(version=TLS1_2 cipher=ECDHE-RSA-AES128-SHA bits=128/128);
+	Tue, 16 Apr 2019 17:51:26 -0700 (PDT)
+From: Stephen Checkoway <stephen.checkoway@oberlin.edu>
+To: Paolo Bonzini <pbonzini@redhat.com>,
+	Stephen Checkoway <stephen.checkoway@oberlin.edu>,
+	QEMU Developers <qemu-devel@nongnu.org>,
+	Artyom Tarasenko <atar4qemu@gmail.com>, Laurent Vivier <laurent@vivier.eu>,
+	qemu-trivial@nongnu.org,
+	=?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>,
+	Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+Date: Tue, 16 Apr 2019 20:50:53 -0400
+Message-Id: <20190417005053.885-1-stephen.checkoway@oberlin.edu>
+X-Mailer: git-send-email 2.20.1 (Apple Git-117)
 MIME-Version: 1.0
-References: <20190415154503.6758-1-berrange@redhat.com>
-	<CAFEAcA-YpG71aGtTVMafShGyd9uM599Uy_8S3vvvnPzfiKMqnw@mail.gmail.com>
-	<CAFEAcA-kywfUEZARqzH=obD1p3UsAcsNneK-X0BPpoFnV-QK0A@mail.gmail.com>
-	<CAFEAcA_+sf3L5ChBDKEekKb5iTTQZu4mEfF7eiTL78oMDuR16A@mail.gmail.com>
-In-Reply-To: <CAFEAcA_+sf3L5ChBDKEekKb5iTTQZu4mEfF7eiTL78oMDuR16A@mail.gmail.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 16 Apr 2019 23:27:06 +0100
-Message-ID:
- <CAFEAcA84DLEGQduvubsKP-2NrdNkzLcihL2WusZiHReupbF1PA@mail.gmail.com>
-To: =?UTF-8?Q?Daniel_P=2E_Berrang=C3=A9?= <berrange@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
 	recognized.
-X-Received-From: 2607:f8b0:4864:20::341
-Subject: Re: [Qemu-devel] [PATCH 0/3] usb-mtp: fix ObjectInfo request
- handling
+X-Received-From: 2607:f8b0:4864:20::d44
+Subject: [Qemu-devel] [PATCH v2] hw/char/escc: Lower irq when transmit
+ buffer is filled
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -90,27 +99,61 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Thomas Huth <thuth@redhat.com>, Greg Kurz <groug@kaod.org>,
-	QEMU Developers <qemu-devel@nongnu.org>,
-	Bandan Das <bsd@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190416222706.P9vhlBLkYO-bZmk-ngwGV8BrqjkKYVy9myu6vkobyMo@z>
+Content-Type: text/plain; charset="UTF-8"
+Message-ID: <20190417005053.lKlcsz6wslMbd5Nv1TE8nUiVQm7znEwfZ0Ej144kgRE@z>
 
-On Tue, 16 Apr 2019 at 20:33, Peter Maydell <peter.maydell@linaro.org> wrote:
->
-> On Tue, 16 Apr 2019 at 18:27, Peter Maydell <peter.maydell@linaro.org> wrote:
-> > Having thought a bit more I think I'd definitely like to apply
-> > just patch 2 for 4.0. Could people try to test that and confirm
-> > that it at least does not make the feature behave any worse?
->
-> I've done a tentative merge test of patch 2, which is OK.
-> I'd like to push that either today or tomorrow (uk time):
-> objections?
+The SCC/ESCC will briefly stop asserting an interrupt when the
+transmit FIFO is filled.
 
-...now pushed.
+This code doesn't model the transmit FIFO/shift register so the
+pending transmit interrupt is never deasserted which means that an
+edge-triggered interrupt controller will never see the low-to-high
+transition it needs to raise another interrupt. The practical
+consequence of this is that guest firmware with an interrupt service
+routine for the ESCC that does not send all of the data it has
+immediately will stop sending data if the following sequence of
+events occurs:
+1. Disable processor interrupts
+2. Write a character to the ESCC
+3. Add additional characters to a buffer which is drained by the ISR
+4. Enable processor interrupts
 
-thanks
--- PMM
+In this case, the first character will be sent, the interrupt will
+fire and the ISR will output the second character. Since the pending
+transmit interrupt remains asserted, no additional interrupts will
+ever fire.
+
+This fixes that situation by explicitly lowering the IRQ when a
+character is written to the buffer and no other interrupts are currently
+pending.
+
+Signed-off-by: Stephen Checkoway <stephen.checkoway@oberlin.edu>
+---
+ hw/char/escc.c | 7 +++++++
+ 1 file changed, 7 insertions(+)
+
+diff --git a/hw/char/escc.c b/hw/char/escc.c
+index 628f5f81f7..c5b05a63f1 100644
+--- a/hw/char/escc.c
++++ b/hw/char/escc.c
+@@ -509,6 +509,13 @@ static void escc_mem_write(void *opaque, hwaddr addr,
+         break;
+     case SERIAL_DATA:
+         trace_escc_mem_writeb_data(CHN_C(s), val);
++        /*
++         * Lower the irq when data is written to the Tx buffer and no other
++         * interrupts are currently pending. The irq will be raised again once
++         * the Tx buffer becomes empty below.
++         */
++        s->txint = 0;
++        escc_update_irq(s);
+         s->tx = val;
+         if (s->wregs[W_TXCTRL2] & TXCTRL2_TXEN) { // tx enabled
+             if (qemu_chr_fe_backend_connected(&s->chr)) {
+-- 
+2.20.1 (Apple Git-117)
+
 
