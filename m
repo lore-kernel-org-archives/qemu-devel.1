@@ -1,28 +1,30 @@
-Received: from eggs.gnu.org ([209.51.188.92]:48889)
+Received: from eggs.gnu.org ([209.51.188.92]:51404)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1hGfYw-0000PF-5x
-	for qemu-devel@nongnu.org; Wed, 17 Apr 2019 04:04:59 -0400
+	(envelope-from <Mateja.Marjanovic@rt-rk.com>) id 1hGfnN-0003J8-3D
+	for qemu-devel@nongnu.org; Wed, 17 Apr 2019 04:19:53 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1hGfYv-0005jw-7Q
-	for qemu-devel@nongnu.org; Wed, 17 Apr 2019 04:04:58 -0400
-Date: Wed, 17 Apr 2019 10:04:43 +0200
-From: Kevin Wolf <kwolf@redhat.com>
-Message-ID: <20190417080443.GA8330@localhost.localdomain>
-References: <20190411105025.97397-1-sgarzare@redhat.com>
-	<20190411105025.97397-2-sgarzare@redhat.com>
-	<CA+aFP1AMzNjWtMeGy4MpWBa26qxShgciYkcEZ8mkSmDrtCvfqA@mail.gmail.com>
-	<20190411130245.ltfyp7d2dfe2cr3h@steredhat>
-	<CA+aFP1B7ZZ_xwNOfMbKUzEjYbMH=9dJstLYEyVq4LphPR81u0Q@mail.gmail.com>
-	<20190414132008.uxoia6avdpp4jov6@steredhat.homenet.telecomitalia.it>
-	<CA+aFP1D8VYcnwWpB=4PzAdBKr+YK-r8bSwzKKUCkH7jT3kVvoQ@mail.gmail.com>
-	<20190415080452.GA6031@localhost.localdomain>
-	<20190417073438.r57lemi6emu4x3ld@steredhat>
+	(envelope-from <Mateja.Marjanovic@rt-rk.com>) id 1hGfnM-0001OF-1I
+	for qemu-devel@nongnu.org; Wed, 17 Apr 2019 04:19:53 -0400
+Received: from mx2.rt-rk.com ([89.216.37.149]:48971 helo=mail.rt-rk.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <Mateja.Marjanovic@rt-rk.com>)
+	id 1hGfnL-0000c8-KN
+	for qemu-devel@nongnu.org; Wed, 17 Apr 2019 04:19:51 -0400
+References: <1554383690-28338-1-git-send-email-mateja.marjanovic@rt-rk.com>
+	<1554383690-28338-5-git-send-email-mateja.marjanovic@rt-rk.com>
+	<CAL1e-=i3H+aMaOCqMBkK4r9E4Ezqtyqw=VbwNmJZ6Wnc3in5PA@mail.gmail.com>
+	<bcc405c5-2e96-19a9-123e-bc607c243209@rt-rk.com>
+	<BN6PR2201MB1251458C6A26DEE093C282EEC6240@BN6PR2201MB1251.namprd22.prod.outlook.com>
+From: Mateja Marjanovic <Mateja.Marjanovic@rt-rk.com>
+Message-ID: <e6bd1e28-d0a1-9e86-d249-37ab16bb8de8@rt-rk.com>
+Date: Wed, 17 Apr 2019 10:16:59 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20190417073438.r57lemi6emu4x3ld@steredhat>
-Subject: Re: [Qemu-devel] [PATCH RFC 1/1] block/rbd: increase dynamically
- the image size
+In-Reply-To: <BN6PR2201MB1251458C6A26DEE093C282EEC6240@BN6PR2201MB1251.namprd22.prod.outlook.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
+Content-Language: en-US
+Subject: Re: [Qemu-devel] [PATCH v6 4/4] target/mips: Optimize
+ ILVR.<B|H|W|D> MSA instructions
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,46 +33,44 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefano Garzarella <sgarzare@redhat.com>
-Cc: dillaman@redhat.com, qemu-devel <qemu-devel@nongnu.org>, Josh Durgin <jdurgin@redhat.com>, qemu-block <qemu-block@nongnu.org>, Max Reitz <mreitz@redhat.com>
+To: Aleksandar Markovic <amarkovic@wavecomp.com>, Aleksandar Markovic <aleksandar.m.mail@gmail.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, Aleksandar Rikalo <arikalo@wavecomp.com>, Richard Henderson <richard.henderson@linaro.org>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>, Aurelien Jarno <aurelien@aurel32.net>
 
-Am 17.04.2019 um 09:34 hat Stefano Garzarella geschrieben:
-> On Mon, Apr 15, 2019 at 10:04:52AM +0200, Kevin Wolf wrote:
-> > 
-> > I think a potential actual use case could be persistent dirty bitmaps
-> > for incremental backup. Though maybe that would be better served by
-> > using the rbd image just as a raw external data file and keeping the
-> > qcow2 metadata on a filesystem.
-> 
-> Thanks to point it out! I'll take a look to understand how to keep
-> metadata separated from the data.
 
-I'd consider the feature still experimental, but for local files, it
-works like this:
-
-    qemu-img create -f qcow2 -o data_file=test.raw test.qcow2 4G
-
-And then just use test.qcow2. As long as you can put everything you need
-into an rbd URL, the same approach should work. Otherwise, you may need
-to use QMP blockdev-create on creation and possibly the data-file option
-of the qcow2 driver for opening.
-
-> > How fast is rbd_resize()? Does automatically resizing for every write
-> > request actually work reasonably well in practice? If it does, there is
-> > probably little reason not to allow it, even if the use cases are rather
-> > obscure.
-> 
-> I'll try to measure the percentage of the time spent in the rbd_resize.
-> 
-> Another solution could be to pass to the rbd driver the virtual size of
-> the image and resize it only one time also if the preallocation is
-> disabled, because RBD will not allocate blocks but IIUC it only set the max
-> size.
-> 
-> Do you think make sense? Is it feasible?
-
-In theory yes, though it requires modification of every driver that
-should be usable together with rbd (i.e. ideally all of the drivers). If
-automatic resize works good enough, I'd prefer that.
-
-Kevin
+On 16.4.19. 23:20, Aleksandar Markovic wrote:
+>> From: Mateja Marjanovic <Mateja.Marjanovic@rt-rk.com>
+>>>> +void helper_msa_ilvr_b(CPUMIPSState *env, uint32_t wd,
+>>>> +                       uint32_t ws, uint32_t wt)
+>>>> +{
+>>>> +    wr_t *pwd = &(env->active_fpu.fpr[wd].wr);
+>>>> +    wr_t *pws = &(env->active_fpu.fpr[ws].wr);
+>>>> +    wr_t *pwt = &(env->active_fpu.fpr[wt].wr);
+>>>> +
+>>> Why do we use here env->active_fpu.fpr[wd].wr, while for other instructions in
+>>> this patch, we access msa_wr_d<b|h|w|d[] directly?
+>> With a pointer to wr_t we have an array of bytes, halfwords, words or
+>> doublewords
+>> and can read from them and change them like an ordinary array. In other
+>> cases
+>> we use a variable that is TCGv_i64 and would have to use tcg_gen
+>> functions to
+>> modify the value of the register. Before my changes in ilvr instruction
+>> helpers
+>> env->active_fpu.fpr[wd].wr was used, so I just copy-pasted that.
+>>
+> Your answer touches just surface, and doesn't fully answer my question.
+> I would like you to show deeper understanding of the code you are working
+> with. You can't just copy/paste without thinking.
+>
+> Why do majority of MSA helpers use env->active_fpu.fpr[<index>].wr, while
+> your code mostly reference the MSA register directly? Is this the same
+> thing? If yes, why all MSA code doesn't use registers directly, which
+> would certainly be simpler than referencing active_fpu? What is the role
+> of "active_fpu"? Can it be changed? Can you analyze the underlying
+> reasons for referencing "active_fpu", and can you claim that it is safe
+> to circumvent it and reference the MSA registers directly?
+I will look into that, and try to analyze it and understand it.
+Thanks,
+Mateja
+> Thanks,
+> Aleksandar
