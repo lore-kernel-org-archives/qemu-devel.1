@@ -1,23 +1,16 @@
-Received: from eggs.gnu.org ([209.51.188.92]:59349)
+Received: from eggs.gnu.org ([209.51.188.92]:59388)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1hGo5P-0007TD-TO
-	for qemu-devel@nongnu.org; Wed, 17 Apr 2019 13:11:04 -0400
+	(envelope-from <eblake@redhat.com>) id 1hGo5R-0007V7-Up
+	for qemu-devel@nongnu.org; Wed, 17 Apr 2019 13:11:06 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1hGo5O-0007Nr-Su
-	for qemu-devel@nongnu.org; Wed, 17 Apr 2019 13:11:03 -0400
-Date: Wed, 17 Apr 2019 14:10:59 -0300
-From: Eduardo Habkost <ehabkost@redhat.com>
-Message-ID: <20190417171059.GC25134@habkost.net>
-References: <1555315185-16414-1-git-send-email-like.xu@linux.intel.com>
-	<1555315185-16414-3-git-send-email-like.xu@linux.intel.com>
-	<20190416212003.GB2272@habkost.net>
-	<87ftqh1ae5.fsf@dusky.pond.sub.org>
+	(envelope-from <eblake@redhat.com>) id 1hGo5R-0007Qt-0T
+	for qemu-devel@nongnu.org; Wed, 17 Apr 2019 13:11:05 -0400
+From: Eric Blake <eblake@redhat.com>
+Date: Wed, 17 Apr 2019 12:10:59 -0500
+Message-Id: <20190417171101.1254-1-eblake@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <87ftqh1ae5.fsf@dusky.pond.sub.org>
-Subject: Re: [Qemu-devel] [PATCH v3 2/2] core/qdev: refactor
- qdev_get_machine() with type assertion
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PATCH v3 0/2] Saner printing of large file sizes
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,50 +19,48 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Markus Armbruster <armbru@redhat.com>
-Cc: Like Xu <like.xu@linux.intel.com>, Peter Maydell <peter.maydell@linaro.org>, Thomas Huth <thuth@redhat.com>, qemu-trivial@nongnu.org, qemu-devel@nongnu.org, like.xu@intel.com, Igor Mammedov <imammedo@redhat.com>
+To: qemu-devel@nongnu.org
+Cc: mreitz@redhat.com, kwolf@redhat.com, qemu-block@nongnu.org
 
-On Wed, Apr 17, 2019 at 07:14:10AM +0200, Markus Armbruster wrote:
-> Eduardo Habkost <ehabkost@redhat.com> writes:
-> 
-> > On Mon, Apr 15, 2019 at 03:59:45PM +0800, Like Xu wrote:
-> >> To avoid the misuse of qdev_get_machine() if machine hasn't been created yet,
-> >> this patch uses qdev_get_machine_uncheck() for obj-common (share with user-only
-> >> mode) and adds type assertion to qdev_get_machine() in system-emulation mode.
-> >> 
-> >> Suggested-by: Igor Mammedov <imammedo@redhat.com>
-> >> Signed-off-by: Like Xu <like.xu@linux.intel.com>
-> >
-> > Reviewed-by: Eduardo Habkost <ehabkost@redhat.com>
-> >
-> > I'm queueing the series on machine-next, thanks!
-> 
-> Hold your horses, please.
-> 
-> I dislike the name qdev_get_machine_uncheck().  I could live with
-> qdev_get_machine_unchecked().
-> 
-> However, I doubt this is the right approach.
-> 
-> The issue at hand is undisciplined creation of QOM object /machine.
-> 
-> This patch adds an asseertion "undisciplined creation of /machine didn't
-> create crap", but only in some places.
-> 
-> I think we should never create /machine as (surprising!) side effect of
-> qdev_get_machine().  Create it explicitly instead, and have
-> qdev_get_machine() use object_resolve_path("/machine", NULL) to get it.
-> Look ma, no side effects.
+since v2: Fix problems pointed out by Max:
+vmdk (test 59) output had not actually been tested
+32-bit builds of size_to_str() have been been broken since 2.10
 
-OK, I'm dropping this one while we discuss it.
+Eric Blake (2):
+  cutils: Fix size_to_str() on 32-bit platforms
+  qemu-img: Saner printing of large file sizes
 
-I really miss a good explanation why qdev_get_machine_unchecked()
-needs to exist.  When exactly do we want /machine to exist but
-not be TYPE_MACHINE?  Why?
+ block/qapi.c               | 49 +++++++++-----------------------------
+ util/cutils.c              |  2 +-
+ tests/qemu-iotests/043.out |  6 ++---
+ tests/qemu-iotests/053.out |  2 +-
+ tests/qemu-iotests/059.out | 10 ++++----
+ tests/qemu-iotests/060.out | 10 ++++----
+ tests/qemu-iotests/061.out | 12 +++++-----
+ tests/qemu-iotests/070.out |  2 +-
+ tests/qemu-iotests/082.out | 26 ++++++++++----------
+ tests/qemu-iotests/084.out |  8 +++----
+ tests/qemu-iotests/089.out |  2 +-
+ tests/qemu-iotests/095.out |  4 ++--
+ tests/qemu-iotests/104.out |  6 ++---
+ tests/qemu-iotests/110.out |  6 ++---
+ tests/qemu-iotests/114.out |  2 +-
+ tests/qemu-iotests/126.out |  4 ++--
+ tests/qemu-iotests/130.out | 10 ++++----
+ tests/qemu-iotests/153.out |  2 +-
+ tests/qemu-iotests/191.out |  8 +++----
+ tests/qemu-iotests/195.out |  4 ++--
+ tests/qemu-iotests/198.out |  4 ++--
+ tests/qemu-iotests/206.out | 10 ++++----
+ tests/qemu-iotests/207.out | 12 +++++-----
+ tests/qemu-iotests/210.out |  8 +++----
+ tests/qemu-iotests/211.out | 10 ++++----
+ tests/qemu-iotests/212.out | 10 ++++----
+ tests/qemu-iotests/213.out | 10 ++++----
+ tests/qemu-iotests/233.out |  4 ++--
+ tests/qemu-iotests/237.out | 22 ++++++++---------
+ tests/qemu-iotests/242.out | 10 ++++----
+ 30 files changed, 124 insertions(+), 151 deletions(-)
 
-Once the expectations and use cases are explained, we can choose
-a better name for qdev_get_machine_unchecked() and document it
-properly.
-
--- 
-Eduardo
+--=20
+2.20.1
