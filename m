@@ -6,69 +6,69 @@ X-Spam-Status: No, score=-8.7 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
 	SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 93D55C282DA
-	for <qemu-devel@archiver.kernel.org>; Wed, 17 Apr 2019 22:07:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 42D3DC282DC
+	for <qemu-devel@archiver.kernel.org>; Wed, 17 Apr 2019 22:07:39 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 50848217FA
-	for <qemu-devel@archiver.kernel.org>; Wed, 17 Apr 2019 22:07:07 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id F0B28217FA
+	for <qemu-devel@archiver.kernel.org>; Wed, 17 Apr 2019 22:07:38 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=oberlin-edu.20150623.gappssmtp.com header.i=@oberlin-edu.20150623.gappssmtp.com header.b="dWXmD/fs"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 50848217FA
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=oberlin-edu.20150623.gappssmtp.com header.i=@oberlin-edu.20150623.gappssmtp.com header.b="Fru4gYBC"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F0B28217FA
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=oberlin.edu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:60354 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:60356 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hGshu-000276-Dx
-	for qemu-devel@archiver.kernel.org; Wed, 17 Apr 2019 18:07:06 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:37892)
+	id 1hGsiQ-0002Vf-6j
+	for qemu-devel@archiver.kernel.org; Wed, 17 Apr 2019 18:07:38 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:38054)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stephen.checkoway@oberlin.edu>) id 1hGsdN-00070D-MX
-	for qemu-devel@nongnu.org; Wed, 17 Apr 2019 18:02:27 -0400
+	(envelope-from <stephen.checkoway@oberlin.edu>) id 1hGsdW-00079v-US
+	for qemu-devel@nongnu.org; Wed, 17 Apr 2019 18:02:37 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stephen.checkoway@oberlin.edu>) id 1hGsdL-0004Mb-W8
-	for qemu-devel@nongnu.org; Wed, 17 Apr 2019 18:02:25 -0400
-Received: from mail-it1-x135.google.com ([2607:f8b0:4864:20::135]:50831)
+	(envelope-from <stephen.checkoway@oberlin.edu>) id 1hGsdV-0004db-01
+	for qemu-devel@nongnu.org; Wed, 17 Apr 2019 18:02:34 -0400
+Received: from mail-it1-x144.google.com ([2607:f8b0:4864:20::144]:34451)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <stephen.checkoway@oberlin.edu>)
-	id 1hGsdL-0004LQ-Op
-	for qemu-devel@nongnu.org; Wed, 17 Apr 2019 18:02:23 -0400
-Received: by mail-it1-x135.google.com with SMTP id q14so287389itk.0
-	for <qemu-devel@nongnu.org>; Wed, 17 Apr 2019 15:02:23 -0700 (PDT)
+	id 1hGsdU-0004cy-Q2
+	for qemu-devel@nongnu.org; Wed, 17 Apr 2019 18:02:32 -0400
+Received: by mail-it1-x144.google.com with SMTP id z17so6437762itc.1
+	for <qemu-devel@nongnu.org>; Wed, 17 Apr 2019 15:02:32 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
 	d=oberlin-edu.20150623.gappssmtp.com; s=20150623;
 	h=from:to:cc:subject:date:message-id:in-reply-to:references
 	:mime-version:content-transfer-encoding;
-	bh=7CTUvo3fKEINenVdrG1752SbfzgugkaAe+xZvTGCm38=;
-	b=dWXmD/fsxdZ4ACSQlE5fEXG/1ZtKxsVbirmkiqHu3RwhWElxPthTKNZkZZ79kp7bed
-	7aPT+9ITR02HkMRyNJxe0KlEAFT+gYbooMrwzimf8mjeFycL58vu4BprC7xhvJyRLxS4
-	6N7yVol2r8fY1Ed6CgceeLCNluyznZ8lkzbY1fNn3MK/nKlTXtDGK5qU1kPh7BwEFfve
-	ZIf7gNKe9fLK9RfLf3CxrpGDq0UPeMu40KpZWv3Gh9iQDWZN2VqhBHErNPF+ADHO8fF9
-	D5K1b+n8iwTp4CYZzHisxkyoHt0yGz0FKgrG44Tl5v6l+z7m4BlQQFRsHSzz3lKFDr6D
-	+kxA==
+	bh=yX5ZwDpSj0Y8X44DGrh8m++0+hR79iAPvF+LYpzo/I8=;
+	b=Fru4gYBChAWFY8kHV/oLxFOUQulgRWUWmLHmJHV3zH0NfzZt06+yFRnhntNmD1kXBh
+	QTMmaxvX6VKZLwVZTGQjD16RyPGAzkWOVez8y250R+koTBgWg+N5JtX4941ceC7BxWs9
+	6TU/+NYoib+IOgaZqQwyKbLUuOK76CiCTPs2bL0A/FEPnZMhe8/RyTFvGIe1v2gc9456
+	7kcReooqbtzk1Z1JgrTVQcYk8l6KyPYhTaFTNo7GVJwyOOiub8uMe8BtlTlAlBS8r96w
+	Ip4/oNVwRcjoKd7WSDLPZct1ZjukeNFW2A+DgWAKkR7JPETpQPKHHUE1Zj7JMRS1D70q
+	lDaw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
 	d=1e100.net; s=20161025;
 	h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
 	:references:mime-version:content-transfer-encoding;
-	bh=7CTUvo3fKEINenVdrG1752SbfzgugkaAe+xZvTGCm38=;
-	b=sTPRvsZ7Kwwo/6/tAYiQbRv2Cav4bHM4Fa6NvwCSFqXcNk7mg4wlXXiPxx2MjJlcUC
-	QuCqweerwTvI9r32eBNK6lr1M/f55C6HP2DNgcyYRAbiRzh2s9sOviD5zgIEix/7fdMH
-	oFiXtueZDISmLHw3dWR02ifqSzUqnwjKq6AGgfzJf17elZpFdmjjOoV5hUD0DP7cc7Ug
-	/+P08yIP9rK+enOuyNcDyJV0iTdFIz0YfUH1BLOgN9Hl990tEJ0+Ks9lZRhf4ev7kBkQ
-	Ftv2ToaFvq7dokiGmCaIvWGwzRfeuuJLnk1fadF3CH6L/4kffb7a7brbGnV8X+WflA0x
-	WQ0g==
-X-Gm-Message-State: APjAAAWdqM645UTl8un28ZLsbbtpk+GoGgiQo2oHiTjMHvH11b3lgW5e
-	rhHhSf3X6biCDxCaL+4uvSPy5p8HgIQEZ8eA
-X-Google-Smtp-Source: APXvYqzHKnSwPXYoM+njED6eAQLGUZ0b6Oag6un9dH87usWEPcwPbFq/2k8rntjw32H84zOLJvepGw==
-X-Received: by 2002:a24:68c8:: with SMTP id v191mr684398itb.75.1555538542687; 
-	Wed, 17 Apr 2019 15:02:22 -0700 (PDT)
+	bh=yX5ZwDpSj0Y8X44DGrh8m++0+hR79iAPvF+LYpzo/I8=;
+	b=bY1MudymbdIiL+XF14Y80T5qzpj8WW/eV49ndQ7+8dOEr4tSYzJHHhqknCCZAh5mme
+	2PQyhB3vLBb0auighbTZcJXA2dk0DCs+NMbyhhpKQKIobPha+Q/j93PMqUzgqoz2QDaE
+	4aF7i11iai3sgu1s5eSjwDmh5xc/OiMUgyQNh8OZ4gMRl+nF7fvS0hvT7SpaLIzTRGwa
+	8L9DiiQ2vga/dumMng4CvM1RHXubkRtvJ++vkymeUB+2ZV1lcJNBN5apbqiZUGiXI2BW
+	D6RvAdoDiuB1F56jJ4KM8cYM1LOxYZ4TY9/dweUjuYaxn72kKHeYCwKoGlFEUgaBCOvw
+	U/gQ==
+X-Gm-Message-State: APjAAAVRR3UMAlq0RCICz53ve7veGKmQrQOk8Kk1nRGzXfuf9f85QDbu
+	JNqhMnhdZM8taPGFORQROcZwB0by1sRrbCR8
+X-Google-Smtp-Source: APXvYqwE02F7xBAR7F/Sg6ZMcsoWwlLsqYvUZh7OQiwodX2DB40HQQjGZH0E13HDGIw+UaZlWmOcaw==
+X-Received: by 2002:a24:6110:: with SMTP id s16mr742358itc.169.1555538551979; 
+	Wed, 17 Apr 2019 15:02:31 -0700 (PDT)
 Received: from worksec.wireless.oberlin.edu (ip-70-93.wireless.oberlin.edu.
 	[132.162.70.93])
-	by smtp.gmail.com with ESMTPSA id e81sm147874itc.3.2019.04.17.15.02.21
+	by smtp.gmail.com with ESMTPSA id e81sm147874itc.3.2019.04.17.15.02.30
 	(version=TLS1_2 cipher=ECDHE-RSA-AES128-SHA bits=128/128);
-	Wed, 17 Apr 2019 15:02:22 -0700 (PDT)
+	Wed, 17 Apr 2019 15:02:31 -0700 (PDT)
 From: Stephen Checkoway <stephen.checkoway@oberlin.edu>
 To: QEMU Developers <qemu-devel@nongnu.org>,
 	=?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
@@ -77,8 +77,8 @@ To: QEMU Developers <qemu-devel@nongnu.org>,
 	Stephen Checkoway <stephen.checkoway@oberlin.edu>,
 	Markus Armbruster <armbru@redhat.com>, Laszlo Ersek <lersek@redhat.com>,
 	Laurent Vivier <lvivier@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
-Date: Wed, 17 Apr 2019 18:01:38 -0400
-Message-Id: <20190417220147.67648-2-stephen.checkoway@oberlin.edu>
+Date: Wed, 17 Apr 2019 18:01:45 -0400
+Message-Id: <20190417220147.67648-9-stephen.checkoway@oberlin.edu>
 X-Mailer: git-send-email 2.20.1 (Apple Git-117)
 In-Reply-To: <20190417220147.67648-1-stephen.checkoway@oberlin.edu>
 References: <20190417220147.67648-1-stephen.checkoway@oberlin.edu>
@@ -86,9 +86,9 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
 	recognized.
-X-Received-From: 2607:f8b0:4864:20::135
-Subject: [Qemu-devel] [PATCH v3 01/10] block/pflash_cfi02: Add test for
- supported commands
+X-Received-From: 2607:f8b0:4864:20::144
+Subject: [Qemu-devel] [PATCH v3 08/10] block/pflash_cfi02: Implement
+ multi-sector erase
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -105,279 +105,292 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 Content-Type: text/plain; charset="UTF-8"
-Message-ID: <20190417220138.AH9AlAbb2vgBufPBrt1RemesaHyFt3XJn7cmfoQ6Wpw@z>
+Message-ID: <20190417220145.jGxOWC3aFFifNUJ9S6U07190Jh7vzN5RiVl-yapZMM0@z>
 
-Test the AMD command set for parallel flash chips. This test uses an
-ARM musicpal board with a pflash drive to test the following list of
-currently-supported commands.
-- Autoselect
-- CFI
-- Sector erase
-- Chip erase
-- Program
-- Unlock bypass
-- Reset
+After two unlock cycles and a sector erase command, the AMD flash chips
+start a 50 us erase time out. Any additional sector erase commands add a
+sector to be erased and restart the 50 us timeout. During the timeout,
+status bit DQ3 is cleared. After the time out, DQ3 is asserted during
+erasure.
 
 Signed-off-by: Stephen Checkoway <stephen.checkoway@oberlin.edu>
 ---
- tests/Makefile.include    |   2 +
- tests/pflash-cfi02-test.c | 227 ++++++++++++++++++++++++++++++++++++++
- 2 files changed, 229 insertions(+)
- create mode 100644 tests/pflash-cfi02-test.c
+ hw/block/pflash_cfi02.c   | 94 +++++++++++++++++++++++++++++++--------
+ tests/pflash-cfi02-test.c | 59 ++++++++++++++++++++++--
+ 2 files changed, 131 insertions(+), 22 deletions(-)
 
-diff --git a/tests/Makefile.include b/tests/Makefile.include
-index 6b904d7430..0a26eacce0 100644
---- a/tests/Makefile.include
-+++ b/tests/Makefile.include
-@@ -263,6 +263,7 @@ check-qtest-arm-y += tests/m25p80-test$(EXESUF)
- check-qtest-arm-y += tests/test-arm-mptimer$(EXESUF)
- check-qtest-arm-y += tests/boot-serial-test$(EXESUF)
- check-qtest-arm-y += tests/hexloader-test$(EXESUF)
-+check-qtest-arm-$(CONFIG_PFLASH_CFI02) += tests/pflash-cfi02-test$(EXESUF)
+diff --git a/hw/block/pflash_cfi02.c b/hw/block/pflash_cfi02.c
+index cb1160eb35..21ceb0823b 100644
+--- a/hw/block/pflash_cfi02.c
++++ b/hw/block/pflash_cfi02.c
+@@ -30,7 +30,6 @@
+  *
+  * It does not implement software data protection as found in many real chips
+  * It does not implement erase suspend/resume commands
+- * It does not implement multiple sectors erase
+  */
  
- check-qtest-aarch64-y = tests/numa-test$(EXESUF)
- check-qtest-aarch64-y += tests/boot-serial-test$(EXESUF)
-@@ -773,6 +774,7 @@ tests/device-introspect-test$(EXESUF): tests/device-introspect-test.o
- tests/rtc-test$(EXESUF): tests/rtc-test.o
- tests/m48t59-test$(EXESUF): tests/m48t59-test.o
- tests/hexloader-test$(EXESUF): tests/hexloader-test.o
-+tests/pflash-cfi02$(EXESUF): tests/pflash-cfi02-test.o
- tests/endianness-test$(EXESUF): tests/endianness-test.o
- tests/prom-env-test$(EXESUF): tests/prom-env-test.o $(libqos-obj-y)
- tests/rtas-test$(EXESUF): tests/rtas-test.o $(libqos-spapr-obj-y)
+ #include "qemu/osdep.h"
+@@ -106,6 +105,7 @@ struct PFlashCFI02 {
+     MemoryRegion orig_mem;
+     int rom_mode;
+     int read_counter; /* used for lazy switch-back to rom mode */
++    int sectors_to_erase;
+     char *name;
+     void *storage;
+ };
+@@ -136,6 +136,22 @@ static inline void toggle_dq6(PFlashCFI02 *pfl)
+     pfl->status ^= pfl->interleave_multiplier * 0x40;
+ }
+ 
++/*
++ * Turn on DQ3.
++ */
++static inline void assert_dq3(PFlashCFI02 *pfl)
++{
++    pfl->status |= pfl->interleave_multiplier * 0x08;
++}
++
++/*
++ * Turn off DQ3.
++ */
++static inline void reset_dq3(PFlashCFI02 *pfl)
++{
++    pfl->status &= ~(pfl->interleave_multiplier * 0x08);
++}
++
+ /*
+  * Set up replicated mappings of the same region.
+  */
+@@ -159,11 +175,37 @@ static void pflash_register_memory(PFlashCFI02 *pfl, int rom_mode)
+     pfl->rom_mode = rom_mode;
+ }
+ 
+-static void pflash_timer (void *opaque)
++static void pflash_timer(void *opaque)
+ {
+     PFlashCFI02 *pfl = opaque;
+ 
+     trace_pflash_timer_expired(pfl->cmd);
++    if (pfl->cmd == 0x30) {
++        /*
++         * Sector erase. If DQ3 is 0 when the timer expires, then the 50
++         * us erase timeout has expired so we need to start the timer for the
++         * sector erase algorithm. Otherwise, the erase completed and we should
++         * go back to read array mode.
++         */
++        if ((pfl->status & 0x08) == 0) {
++            assert_dq3(pfl);
++            /*
++             * CFI address 0x21 is "Typical timeout per individual block erase
++             * 2^N ms"
++             */
++            uint64_t timeout = ((1ULL << pfl->cfi_table[0x21]) *
++                                pfl->sectors_to_erase) * 1000000;
++            timer_mod(&pfl->timer,
++                      qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL) + timeout);
++            DPRINTF("%s: erase timeout fired; erasing %d sectors\n",
++                    __func__, pfl->sectors_to_erase);
++            return;
++        }
++        DPRINTF("%s: sector erase complete\n", __func__);
++        pfl->sectors_to_erase = 0;
++        reset_dq3(pfl);
++    }
++
+     /* Reset flash */
+     toggle_dq7(pfl);
+     if (pfl->bypass) {
+@@ -307,13 +349,30 @@ static void pflash_update(PFlashCFI02 *pfl, int offset, int size)
+     }
+ }
+ 
++static void pflash_sector_erase(PFlashCFI02 *pfl, hwaddr offset)
++{
++    uint64_t sector_len = pflash_sector_len(pfl, offset);
++    offset &= ~(sector_len - 1);
++    DPRINTF("%s: start sector erase at %0*" PRIx64 "-%0*" PRIx64 "\n",
++            __func__, pfl->bank_width * 2, offset,
++            pfl->bank_width * 2, offset + sector_len - 1);
++    if (!pfl->ro) {
++        uint8_t *p = pfl->storage;
++        memset(p + offset, 0xFF, sector_len);
++        pflash_update(pfl, offset, sector_len);
++    }
++    set_dq7(pfl, 0x00);
++    ++pfl->sectors_to_erase;
++    /* Set (or reset) the 50 us timer for additional erase commands.  */
++    timer_mod(&pfl->timer, qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL) + 50000);
++}
++
+ static void pflash_write(void *opaque, hwaddr offset, uint64_t value,
+                          unsigned int width)
+ {
+     PFlashCFI02 *pfl = opaque;
+     uint8_t *p;
+     uint8_t cmd;
+-    uint32_t sector_len;
+ 
+     cmd = value;
+     if (pfl->cmd != 0xA0) {
+@@ -486,20 +545,7 @@ static void pflash_write(void *opaque, hwaddr offset, uint64_t value,
+             break;
+         case 0x30:
+             /* Sector erase */
+-            p = pfl->storage;
+-            sector_len = pflash_sector_len(pfl, offset);
+-            offset &= ~(sector_len - 1);
+-            DPRINTF("%s: start sector erase at %0*" PRIx64 "-%0*" PRIx64 "\n",
+-                    __func__, pfl->bank_width * 2, offset,
+-                    pfl->bank_width * 2, offset + sector_len - 1);
+-            if (!pfl->ro) {
+-                memset(p + offset, 0xFF, sector_len);
+-                pflash_update(pfl, offset, sector_len);
+-            }
+-            set_dq7(pfl, 0x00);
+-            /* Let's wait 1/2 second before sector erase is done */
+-            timer_mod(&pfl->timer, qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL) +
+-                      (NANOSECONDS_PER_SECOND / 2));
++            pflash_sector_erase(pfl, offset);
+             break;
+         default:
+             DPRINTF("%s: invalid command %02x (wc 5)\n", __func__, cmd);
+@@ -513,7 +559,19 @@ static void pflash_write(void *opaque, hwaddr offset, uint64_t value,
+             /* Ignore writes during chip erase */
+             return;
+         case 0x30:
+-            /* Ignore writes during sector erase */
++            /*
++             * If DQ3 is 0, additional sector erase commands can be
++             * written and anything else (other than an erase suspend) resets
++             * the device.
++             */
++            if ((pfl->status & 0x08) == 0) {
++                if (cmd == 0x30) {
++                    pflash_sector_erase(pfl, offset);
++                } else {
++                    goto reset_flash;
++                }
++            }
++            /* Ignore writes during the actual erase. */
+             return;
+         default:
+             /* Should never happen */
 diff --git a/tests/pflash-cfi02-test.c b/tests/pflash-cfi02-test.c
-new file mode 100644
-index 0000000000..b113fca5af
---- /dev/null
+index 4039647604..67b6c40ad7 100644
+--- a/tests/pflash-cfi02-test.c
 +++ b/tests/pflash-cfi02-test.c
-@@ -0,0 +1,227 @@
-+/*
-+ * QTest testcase for parallel flash with AMD command set
-+ *
-+ * Copyright (c) 2018 Stephen Checkoway
-+ *
-+ * This work is licensed under the terms of the GNU GPL, version 2 or later.
-+ * See the COPYING file in the top-level directory.
-+ */
+@@ -37,6 +37,7 @@ typedef struct {
+ #define CFI_CMD 0x98
+ #define UNLOCK0_CMD 0xAA
+ #define UNLOCK1_CMD 0x55
++#define SECOND_UNLOCK_CMD 0x80
+ #define AUTOSELECT_CMD 0x90
+ #define RESET_CMD 0xF0
+ #define PROGRAM_CMD 0xA0
+@@ -224,7 +225,7 @@ static void reset(const FlashConfig *c)
+ static void sector_erase(const FlashConfig *c, uint64_t byte_addr)
+ {
+     unlock(c);
+-    flash_cmd(c, UNLOCK0_ADDR, 0x80);
++    flash_cmd(c, UNLOCK0_ADDR, SECOND_UNLOCK_CMD);
+     unlock(c);
+     flash_write(c, byte_addr, replicate(c, SECTOR_ERASE_CMD));
+ }
+@@ -263,7 +264,7 @@ static void program(const FlashConfig *c, uint64_t byte_addr, uint16_t data)
+ static void chip_erase(const FlashConfig *c)
+ {
+     unlock(c);
+-    flash_cmd(c, UNLOCK0_ADDR, 0x80);
++    flash_cmd(c, UNLOCK0_ADDR, SECOND_UNLOCK_CMD);
+     unlock(c);
+     flash_cmd(c, UNLOCK0_ADDR, CHIP_ERASE_CMD);
+ }
+@@ -386,6 +387,7 @@ static void test_geometry(const void *opaque)
+     reset(c);
+     const uint64_t dq7 = replicate(c, 0x80);
+     const uint64_t dq6 = replicate(c, 0x40);
++    const uint64_t dq3 = replicate(c, 0x08);
+ 
+     uint64_t byte_addr = 0;
+     for (int region = 0; region < nb_erase_regions; ++region) {
+@@ -403,18 +405,29 @@ static void test_geometry(const void *opaque)
+         /* Erase and program sector. */
+         for (uint32_t i = 0; i < nb_sectors; ++i) {
+             sector_erase(c, byte_addr);
+-            /* Read toggle. */
 +
-+#include "qemu/osdep.h"
-+#include <err.h>
-+#include <unistd.h>
-+#include "libqtest.h"
++            /* Check that DQ3 is 0. */
++            g_assert_cmpint(flash_read(c, byte_addr) & dq3, ==, 0);
++            qtest_clock_step_next(c->qtest); /* Step over the 50 us timeout. */
 +
-+/*
-+ * To test the pflash_cfi02 device, we run QEMU with the musicpal machine with
-+ * a pflash drive. This enables us to test some flash configurations, but not
-+ * all. In particular, we're limited to a 16-bit wide flash device.
-+ */
++            /* Check that DQ3 is 1. */
+             uint64_t status0 = flash_read(c, byte_addr);
++            g_assert_cmpint(status0 & dq3, ==, dq3);
 +
-+#define MP_FLASH_SIZE_MAX (32 * 1024 * 1024)
-+#define BASE_ADDR (0x100000000ULL - MP_FLASH_SIZE_MAX)
+             /* DQ7 is 0 during an erase. */
+             g_assert_cmpint(status0 & dq7, ==, 0);
+             uint64_t status1 = flash_read(c, byte_addr);
 +
-+#define FLASH_WIDTH 2
-+#define CFI_ADDR (FLASH_WIDTH * 0x55)
-+#define UNLOCK0_ADDR (FLASH_WIDTH * 0x5555)
-+#define UNLOCK1_ADDR (FLASH_WIDTH * 0x2AAA)
+             /* DQ6 toggles during an erase. */
+             g_assert_cmpint(status0 & dq6, ==, ~status1 & dq6);
 +
-+#define CFI_CMD 0x98
-+#define UNLOCK0_CMD 0xAA
-+#define UNLOCK1_CMD 0x55
-+#define AUTOSELECT_CMD 0x90
-+#define RESET_CMD 0xF0
-+#define PROGRAM_CMD 0xA0
-+#define SECTOR_ERASE_CMD 0x30
-+#define CHIP_ERASE_CMD 0x10
-+#define UNLOCK_BYPASS_CMD 0x20
-+#define UNLOCK_BYPASS_RESET_CMD 0x00
+             /* Wait for erase to complete. */
+-            qtest_clock_step_next(c->qtest);
++            wait_for_completion(c, byte_addr);
 +
-+static char image_path[] = "/tmp/qtest.XXXXXX";
+             /* Ensure DQ6 has stopped toggling. */
+             g_assert_cmpint(flash_read(c, byte_addr), ==,
+                             flash_read(c, byte_addr));
 +
-+static inline void flash_write(uint64_t byte_addr, uint16_t data)
-+{
-+    qtest_writew(global_qtest, BASE_ADDR + byte_addr, data);
-+}
-+
-+static inline uint16_t flash_read(uint64_t byte_addr)
-+{
-+    return qtest_readw(global_qtest, BASE_ADDR + byte_addr);
-+}
-+
-+static void unlock(void)
-+{
-+    flash_write(UNLOCK0_ADDR, UNLOCK0_CMD);
-+    flash_write(UNLOCK1_ADDR, UNLOCK1_CMD);
-+}
-+
-+static void reset(void)
-+{
-+    flash_write(0, RESET_CMD);
-+}
-+
-+static void sector_erase(uint64_t byte_addr)
-+{
-+    unlock();
-+    flash_write(UNLOCK0_ADDR, 0x80);
-+    unlock();
-+    flash_write(byte_addr, SECTOR_ERASE_CMD);
-+}
-+
-+static void wait_for_completion(uint64_t byte_addr)
-+{
-+    /* If DQ6 is toggling, step the clock and ensure the toggle stops. */
-+    if ((flash_read(byte_addr) & 0x40) ^ (flash_read(byte_addr) & 0x40)) {
-+        /* Wait for erase or program to finish. */
-+        clock_step_next();
-+        /* Ensure that DQ6 has stopped toggling. */
-+        g_assert_cmpint(flash_read(byte_addr), ==, flash_read(byte_addr));
-+    }
-+}
-+
-+static void bypass_program(uint64_t byte_addr, uint16_t data)
-+{
-+    flash_write(UNLOCK0_ADDR, PROGRAM_CMD);
-+    flash_write(byte_addr, data);
+             /* Now the data should be valid. */
+             g_assert_cmpint(flash_read(c, byte_addr), ==, bank_mask(c));
+ 
+@@ -477,6 +490,44 @@ static void test_geometry(const void *opaque)
+     g_assert_cmpint(flash_query(c, FLASH_ADDR(0)), ==, replicate(c, 0xBF));
+     reset(c);
+ 
 +    /*
-+     * Data isn't valid until DQ6 stops toggling. We don't model this as
-+     * writes are immediate, but if this changes in the future, we can wait
-+     * until the program is complete.
++     * Program a word on each sector, erase one or two sectors per region, and
++     * verify that all of those, and only those, are erased.
 +     */
-+    wait_for_completion(byte_addr);
-+}
-+
-+static void program(uint64_t byte_addr, uint16_t data)
-+{
-+    unlock();
-+    bypass_program(byte_addr, data);
-+}
-+
-+static void chip_erase(void)
-+{
-+    unlock();
-+    flash_write(UNLOCK0_ADDR, 0x80);
-+    unlock();
-+    flash_write(UNLOCK0_ADDR, SECTOR_ERASE_CMD);
-+}
-+
-+static void test_flash(void)
-+{
-+    global_qtest = qtest_initf("-M musicpal,accel=qtest "
-+                               "-drive if=pflash,file=%s,format=raw,copy-on-read",
-+                               image_path);
-+    /* Check the IDs. */
-+    unlock();
-+    flash_write(UNLOCK0_ADDR, AUTOSELECT_CMD);
-+    g_assert_cmpint(flash_read(FLASH_WIDTH * 0x0000), ==, 0x00BF);
-+    g_assert_cmpint(flash_read(FLASH_WIDTH * 0x0001), ==, 0x236D);
-+    reset();
-+
-+    /* Check the erase blocks. */
-+    flash_write(CFI_ADDR, CFI_CMD);
-+    g_assert_cmpint(flash_read(FLASH_WIDTH * 0x10), ==, 'Q');
-+    g_assert_cmpint(flash_read(FLASH_WIDTH * 0x11), ==, 'R');
-+    g_assert_cmpint(flash_read(FLASH_WIDTH * 0x12), ==, 'Y');
-+    /* Num erase regions. */
-+    g_assert_cmpint(flash_read(FLASH_WIDTH * 0x2C), >=, 1);
-+    uint32_t nb_sectors = flash_read(FLASH_WIDTH * 0x2D) +
-+                          (flash_read(FLASH_WIDTH * 0x2E) << 8) + 1;
-+    uint32_t sector_len = (flash_read(FLASH_WIDTH * 0x2F) << 8) +
-+                          (flash_read(FLASH_WIDTH * 0x30) << 16);
-+    reset();
-+
-+    /* Erase and program sector. */
-+    for (uint32_t i = 0; i < nb_sectors; ++i) {
-+        uint64_t byte_addr = i * sector_len;
-+        sector_erase(byte_addr);
-+        /* Read toggle. */
-+        uint16_t status0 = flash_read(byte_addr);
-+        /* DQ7 is 0 during an erase. */
-+        g_assert_cmpint(status0 & 0x80, ==, 0);
-+        uint16_t status1 = flash_read(byte_addr);
-+        /* DQ6 toggles during an erase. */
-+        g_assert_cmpint(status0 & 0x40, !=, status1 & 0x40);
-+        /* Wait for erase to complete. */
-+        clock_step_next();
-+        /* Ensure DQ6 has stopped toggling. */
-+        g_assert_cmpint(flash_read(byte_addr), ==, flash_read(byte_addr));
-+        /* Now the data should be valid. */
-+        g_assert_cmpint(flash_read(byte_addr), ==, 0xFFFF);
-+
-+        /* Program a bit pattern. */
-+        program(byte_addr, 0x5555);
-+        g_assert_cmpint(flash_read(byte_addr), ==, 0x5555);
-+        program(byte_addr, 0xAA55);
-+        g_assert_cmpint(flash_read(byte_addr), ==, 0x0055);
++    byte_addr = 0;
++    for (int region = 0; region < nb_erase_regions; ++region) {
++        for (int i = 0; i < config->nb_blocs[region]; ++i) {
++            program(c, byte_addr, 0);
++            byte_addr += config->sector_len[region];
++        }
++    }
++    unlock(c);
++    flash_cmd(c, UNLOCK0_ADDR, SECOND_UNLOCK_CMD);
++    unlock(c);
++    byte_addr = 0;
++    const uint64_t erase_cmd = replicate(c, SECTOR_ERASE_CMD);
++    for (int region = 0; region < nb_erase_regions; ++region) {
++        flash_write(c, byte_addr, erase_cmd);
++        if (c->nb_blocs[region] > 1) {
++            flash_write(c, byte_addr + c->sector_len[region], erase_cmd);
++        }
++        byte_addr += c->sector_len[region] * c->nb_blocs[region];
 +    }
 +
-+    /* Erase the chip. */
-+    chip_erase();
-+    /* Read toggle. */
-+    uint16_t status0 = flash_read(0);
-+    /* DQ7 is 0 during an erase. */
-+    g_assert_cmpint(status0 & 0x80, ==, 0);
-+    uint16_t status1 = flash_read(0);
-+    /* DQ6 toggles during an erase. */
-+    g_assert_cmpint(status0 & 0x40, !=, status1 & 0x40);
-+    /* Wait for erase to complete. */
-+    clock_step_next();
-+    /* Ensure DQ6 has stopped toggling. */
-+    g_assert_cmpint(flash_read(0), ==, flash_read(0));
-+    /* Now the data should be valid. */
-+    g_assert_cmpint(flash_read(0), ==, 0xFFFF);
-+
-+    /* Unlock bypass */
-+    unlock();
-+    flash_write(UNLOCK0_ADDR, UNLOCK_BYPASS_CMD);
-+    bypass_program(0, 0x0123);
-+    bypass_program(2, 0x4567);
-+    bypass_program(4, 0x89AB);
-+    /*
-+     * Test that bypass programming, unlike normal programming can use any
-+     * address for the PROGRAM_CMD.
-+     */
-+    flash_write(6, PROGRAM_CMD);
-+    flash_write(6, 0xCDEF);
-+    wait_for_completion(6);
-+    flash_write(0, UNLOCK_BYPASS_RESET_CMD);
-+    bypass_program(8, 0x55AA); /* Should fail. */
-+    g_assert_cmpint(flash_read(0), ==, 0x0123);
-+    g_assert_cmpint(flash_read(2), ==, 0x4567);
-+    g_assert_cmpint(flash_read(4), ==, 0x89AB);
-+    g_assert_cmpint(flash_read(6), ==, 0xCDEF);
-+    g_assert_cmpint(flash_read(8), ==, 0xFFFF);
-+
-+    qtest_quit(global_qtest);
-+}
-+
-+static void cleanup(void *opaque)
-+{
-+    unlink(image_path);
-+}
-+
-+int main(int argc, char **argv)
-+{
-+    int fd = mkstemp(image_path);
-+    if (fd == -1) {
-+        err(1, "Failed to create temporary file %s", image_path);
++    qtest_clock_step_next(c->qtest); /* Step over the 50 us timeout. */
++    wait_for_completion(c, 0);
++    byte_addr = 0;
++    for (int region = 0; region < nb_erase_regions; ++region) {
++        for (int i = 0; i < config->nb_blocs[region]; ++i) {
++            if (i < 2) {
++                g_assert_cmpint(flash_read(c, byte_addr), ==, bank_mask(c));
++            } else {
++                g_assert_cmpint(flash_read(c, byte_addr), ==, 0);
++            }
++            byte_addr += config->sector_len[region];
++        }
 +    }
-+    if (ftruncate(fd, 8 * 1024 * 1024) < 0) {
-+        int error_code = errno;
-+        close(fd);
-+        unlink(image_path);
-+        g_printerr("Failed to truncate file %s to 8 MB: %s\n", image_path,
-+                   strerror(error_code));
-+        exit(EXIT_FAILURE);
-+    }
-+    close(fd);
 +
-+    qtest_add_abrt_handler(cleanup, NULL);
-+    g_test_init(&argc, &argv, NULL);
-+    qtest_add_func("pflash-cfi02", test_flash);
-+    int result = g_test_run();
-+    cleanup(NULL);
-+    return result;
-+}
-+
-+/* vim: set sw=4 sts=4 ts=8 et: */
+     qtest_quit(qtest);
+ }
+ 
 -- 
 2.20.1 (Apple Git-117)
 
