@@ -1,34 +1,22 @@
-Received: from eggs.gnu.org ([209.51.188.92]:39337)
+Received: from eggs.gnu.org ([209.51.188.92]:40850)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1hGoci-0005KY-2S
-	for qemu-devel@nongnu.org; Wed, 17 Apr 2019 13:45:29 -0400
+	(envelope-from <mreitz@redhat.com>) id 1hGokR-0007MP-CF
+	for qemu-devel@nongnu.org; Wed, 17 Apr 2019 13:53:28 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1hGocf-0006H7-KK
-	for qemu-devel@nongnu.org; Wed, 17 Apr 2019 13:45:27 -0400
-Received: from indium.canonical.com ([91.189.90.7]:41588)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1hGoce-0006FZ-Ap
-	for qemu-devel@nongnu.org; Wed, 17 Apr 2019 13:45:25 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1hGocc-0004mt-0p
-	for <qemu-devel@nongnu.org>; Wed, 17 Apr 2019 17:45:22 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id F008A2E80C8
-	for <qemu-devel@nongnu.org>; Wed, 17 Apr 2019 17:45:21 +0000 (UTC)
+	(envelope-from <mreitz@redhat.com>) id 1hGokJ-0002W0-GN
+	for qemu-devel@nongnu.org; Wed, 17 Apr 2019 13:53:22 -0400
+References: <20190417171101.1254-1-eblake@redhat.com>
+	<20190417171101.1254-3-eblake@redhat.com>
+From: Max Reitz <mreitz@redhat.com>
+Message-ID: <4ce5d8a7-8fdc-84ec-bb4c-0e7248aad62c@redhat.com>
+Date: Wed, 17 Apr 2019 19:52:57 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Wed, 17 Apr 2019 17:35:12 -0000
-From: Thomas Huth <1484990@bugs.launchpad.net>
-Reply-To: Bug 1484990 <1484990@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <20150814145418.19376.19961.malonedeb@wampee.canonical.com>
-Message-Id: <155552251289.13347.7563768602427723832.malone@wampee.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1484990] Re: fsfreeze-hook script should also
- ignored dpkg generated files
+In-Reply-To: <20190417171101.1254-3-eblake@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="evzUGUgenlz3T2Qc3tMFLvCw40aCrowVM"
+Subject: Re: [Qemu-devel] [PATCH v3 2/2] qemu-img: Saner printing of large
+ file sizes
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,51 +25,75 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org
+Cc: kwolf@redhat.com, qemu-block@nongnu.org, "Richard W . M . Jones" <rjones@redhat.com>, Alberto Garcia <berto@igalia.com>, Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, Markus Armbruster <armbru@redhat.com>
 
-Fix had been included here (in QEMU v3.1 already):
-https://git.qemu.org/?p=3Dqemu.git;a=3Dcommitdiff;h=3D7294e600eb814fd2
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--evzUGUgenlz3T2Qc3tMFLvCw40aCrowVM
+From: Max Reitz <mreitz@redhat.com>
+To: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org
+Cc: kwolf@redhat.com, qemu-block@nongnu.org,
+ "Richard W . M . Jones" <rjones@redhat.com>,
+ Alberto Garcia <berto@igalia.com>,
+ Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
+ Markus Armbruster <armbru@redhat.com>
+Message-ID: <4ce5d8a7-8fdc-84ec-bb4c-0e7248aad62c@redhat.com>
+Subject: Re: [PATCH v3 2/2] qemu-img: Saner printing of large file sizes
+References: <20190417171101.1254-1-eblake@redhat.com>
+ <20190417171101.1254-3-eblake@redhat.com>
+In-Reply-To: <20190417171101.1254-3-eblake@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-** Changed in: qemu
-       Status: New =3D> Fix Released
+On 17.04.19 19:11, Eric Blake wrote:
+> Disk sizes close to INT64_MAX cause overflow, for some pretty
+> ridiculous output:
+>=20
+>   $ ./nbdkit -U - memory size=3D$((2**63 - 512)) --run 'qemu-img info $=
+nbd'
+>   image: nbd+unix://?socket=3D/tmp/nbdkitHSAzNz/socket
+>   file format: raw
+>   virtual size: -8388607T (9223372036854775296 bytes)
+>   disk size: unavailable
+>=20
+> But there's no reason to have two separate implementations of integer
+> to human-readable abbreviation, where one has overflow and stops at
+> 'T', while the other avoids overflow and goes all the way to 'E'. With
+> this patch, the output now claims 8EiB instead of -8388607T, which
+> really is the correct rounding of largest file size supported by qemu
+> (we could go 511 bytes larger if we used byte-accurate sizing instead
+> of rounding up to the next sector boundary, but that wouldn't change
+> the human-readable result).
+>=20
+> Quite a few iotests need updates to expected output to match.
+>=20
+> Reported-by: Richard W.M. Jones <rjones@redhat.com>
+> Signed-off-by: Eric Blake <eblake@redhat.com>
+> Tested-by: Richard W.M. Jones <rjones@redhat.com>
+> Reviewed-by: Alberto Garcia <berto@igalia.com>
+> Reviewed-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+>=20
+> ---
+> v3: fix 59 for vmdk [Max]
 
--- =
+Tested-by: Max Reitz <mreitz@redhat.com>
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1484990
 
-Title:
-  fsfreeze-hook script should also ignored dpkg generated files
+--evzUGUgenlz3T2Qc3tMFLvCw40aCrowVM
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
 
-Status in QEMU:
-  Fix Released
-Status in qemu package in Ubuntu:
-  Fix Released
+-----BEGIN PGP SIGNATURE-----
 
-Bug description:
-  Hello,
+iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAly3Z/kACgkQ9AfbAGHV
+z0AGjQf8CR8hVFib6FhaLB3SLLJdOzrUBQ3140xO4NDBs06frNxcqD4KOyyMFLQc
+mEmGcgnsuTgfEPuIfKdXXg7FPAqMyG244dWWpWiXa8fMCbGSq8czlwGcFapIzMNY
+Zv3cNUjMg3S5GzV8TBeMcgUMgg9BqPCui3U49xrv9We7ewiUHvFpK+TrtAKXAGgC
+YCBcCI+j0QgQRkScMDwg+gbS/ZmN2FXaq3BegyfOEGZfPtCHUFJFFgiKRD7jgajQ
+mtQCmiHtpwbJVc5PfFM2WOMq6RhRup7UQx7bg2idk14RQB1i5MnNVBLKNEATVoLv
+rtB6bTqR2wvS0j5IyPYX5JbE3lFgDQ==
+=0/vy
+-----END PGP SIGNATURE-----
 
-  In the fsfreeze-hook script, the following code check if some of the
-  files should be ignored:
-
-  =
-
-  # Check whether file $1 is a backup or rpm-generated file and should be i=
-gnored
-  is_ignored_file() {
-      case "$1" in
-          *~ | *.bak | *.orig | *.rpmnew | *.rpmorig | *.rpmsave | *.sample)
-              return 0 ;;
-      esac
-      return 1
-  }
-
-  The functions should probably also skip dpkg generated files.
-
-  I've found a list of the different extensions in the systemd source
-  tree:
-  https://github.com/systemd/systemd/blob/master/src/basic/util.c#L1871
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1484990/+subscriptions
+--evzUGUgenlz3T2Qc3tMFLvCw40aCrowVM--
