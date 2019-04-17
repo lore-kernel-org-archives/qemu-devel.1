@@ -2,49 +2,52 @@ Return-Path: <SRS0=PAXx=ST=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-8.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 918D2C10F12
-	for <qemu-devel@archiver.kernel.org>; Wed, 17 Apr 2019 10:10:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EA370C282DA
+	for <qemu-devel@archiver.kernel.org>; Wed, 17 Apr 2019 10:10:55 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5FE1520835
-	for <qemu-devel@archiver.kernel.org>; Wed, 17 Apr 2019 10:10:54 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5FE1520835
+	by mail.kernel.org (Postfix) with ESMTPS id BD79020835
+	for <qemu-devel@archiver.kernel.org>; Wed, 17 Apr 2019 10:10:55 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BD79020835
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:50030 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:50032 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hGhWn-0003qT-59
-	for qemu-devel@archiver.kernel.org; Wed, 17 Apr 2019 06:10:53 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:44210)
+	id 1hGhWo-0003r8-Ve
+	for qemu-devel@archiver.kernel.org; Wed, 17 Apr 2019 06:10:55 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:44212)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1hGhVX-00038L-Nl
+	(envelope-from <vsementsov@virtuozzo.com>) id 1hGhVX-00038M-Rg
 	for qemu-devel@nongnu.org; Wed, 17 Apr 2019 06:09:36 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1hGhVW-0003ty-Ps
+	(envelope-from <vsementsov@virtuozzo.com>) id 1hGhVW-0003tq-Oa
 	for qemu-devel@nongnu.org; Wed, 17 Apr 2019 06:09:35 -0400
-Received: from relay.sw.ru ([185.231.240.75]:47104)
+Received: from relay.sw.ru ([185.231.240.75]:47106)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
-	id 1hGhVW-0003su-Ey; Wed, 17 Apr 2019 06:09:34 -0400
+	id 1hGhVW-0003st-F8; Wed, 17 Apr 2019 06:09:34 -0400
 Received: from [10.28.8.145] (helo=kvm.sw.ru)
 	by relay.sw.ru with esmtp (Exim 4.91)
 	(envelope-from <vsementsov@virtuozzo.com>)
-	id 1hGhVS-0005Kr-BN; Wed, 17 Apr 2019 13:09:30 +0300
+	id 1hGhVS-0005Kr-GB; Wed, 17 Apr 2019 13:09:30 +0300
 From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 To: qemu-devel@nongnu.org,
 	qemu-block@nongnu.org
-Date: Wed, 17 Apr 2019 13:09:27 +0300
-Message-Id: <20190417100929.39943-1-vsementsov@virtuozzo.com>
+Date: Wed, 17 Apr 2019 13:09:28 +0300
+Message-Id: <20190417100929.39943-2-vsementsov@virtuozzo.com>
 X-Mailer: git-send-email 2.18.0
+In-Reply-To: <20190417100929.39943-1-vsementsov@virtuozzo.com>
+References: <20190417100929.39943-1-vsementsov@virtuozzo.com>
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x
 X-Received-From: 185.231.240.75
-Subject: [Qemu-devel] [PATCH for-4.0? 0/2] Fix overflow bug in qcow2 discard
+Subject: [Qemu-devel] [PATCH 1/2] block/io: bdrv_pdiscard: support int64_t
+ bytes parameter
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -62,50 +65,99 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 Content-Type: text/plain; charset="UTF-8"
-Message-ID: <20190417100927.JCgVWC1d2tY3oKQm2V-olO7tSV6h6VFyqPDV02Fc5zI@z>
+Message-ID: <20190417100928.lwhmKzjRh0sYZd_smtEMfdXv7TXwBB5R1sg8ooajQbw@z>
 
-Hi all. We faced an interesting bug, which may be simply reproduced:
+This fixes at least one overflow in qcow2_process_discards.
 
-prepare image:
-./qemu-img create -f qcow2 -o cluster_size=1M /ssd/test 2300M
-./qemu-io -c 'write 100M 2000M' -c 'write 2100M 200M' -c 'write 0 100M' /ssd/test
+Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+---
+ include/block/block.h |  4 ++--
+ block/io.c            | 19 ++++++++++---------
+ 2 files changed, 12 insertions(+), 11 deletions(-)
 
-shrink:
-./qemu-img resize --shrink /ssd/test 50M
-
-bug:
-./qemu-img info /ssd/test
-image: /ssd/test
-file format: qcow2
-virtual size: 50M (52428800 bytes)
-disk size: 2.2G
-cluster_size: 1048576
-Format specific information:
-    compat: 1.1
-    lazy refcounts: false
-    refcount bits: 16
-    corrupt: false
-
-Virtual size is shrunk, but file - not. It is due to the fact,
-that merged qcow2 discard may exceed 2G, and then converting from
-uint64_t to int in qcow2_process_discards when we call bdrv_pdiscard
-make wrong thing.
-
-So, here are proposal of fix and new iotest for it.
-
-Vladimir Sementsov-Ogievskiy (2):
-  block/io: bdrv_pdiscard: support int64_t bytes parameter
-  iotests: test big qcow2 shrink
-
- include/block/block.h      |  4 +--
- block/io.c                 | 19 ++++++-----
- tests/qemu-iotests/249     | 69 ++++++++++++++++++++++++++++++++++++++
- tests/qemu-iotests/249.out | 30 +++++++++++++++++
- tests/qemu-iotests/group   |  1 +
- 5 files changed, 112 insertions(+), 11 deletions(-)
- create mode 100755 tests/qemu-iotests/249
- create mode 100644 tests/qemu-iotests/249.out
-
+diff --git a/include/block/block.h b/include/block/block.h
+index c7a26199aa..69fa18867e 100644
+--- a/include/block/block.h
++++ b/include/block/block.h
+@@ -432,8 +432,8 @@ void bdrv_drain_all(void);
+     AIO_WAIT_WHILE(bdrv_get_aio_context(bs_),              \
+                    cond); })
+ 
+-int bdrv_pdiscard(BdrvChild *child, int64_t offset, int bytes);
+-int bdrv_co_pdiscard(BdrvChild *child, int64_t offset, int bytes);
++int bdrv_pdiscard(BdrvChild *child, int64_t offset, int64_t bytes);
++int bdrv_co_pdiscard(BdrvChild *child, int64_t offset, int64_t bytes);
+ int bdrv_has_zero_init_1(BlockDriverState *bs);
+ int bdrv_has_zero_init(BlockDriverState *bs);
+ bool bdrv_unallocated_blocks_are_zero(BlockDriverState *bs);
+diff --git a/block/io.c b/block/io.c
+index dfc153b8d8..c6429380e8 100644
+--- a/block/io.c
++++ b/block/io.c
+@@ -2653,7 +2653,7 @@ int bdrv_flush(BlockDriverState *bs)
+ typedef struct DiscardCo {
+     BdrvChild *child;
+     int64_t offset;
+-    int bytes;
++    int64_t bytes;
+     int ret;
+ } DiscardCo;
+ static void coroutine_fn bdrv_pdiscard_co_entry(void *opaque)
+@@ -2664,14 +2664,15 @@ static void coroutine_fn bdrv_pdiscard_co_entry(void *opaque)
+     aio_wait_kick();
+ }
+ 
+-int coroutine_fn bdrv_co_pdiscard(BdrvChild *child, int64_t offset, int bytes)
++int coroutine_fn bdrv_co_pdiscard(BdrvChild *child, int64_t offset,
++                                  int64_t bytes)
+ {
+     BdrvTrackedRequest req;
+     int max_pdiscard, ret;
+     int head, tail, align;
+     BlockDriverState *bs = child->bs;
+ 
+-    if (!bs || !bs->drv) {
++    if (!bs || !bs->drv || !bdrv_is_inserted(bs)) {
+         return -ENOMEDIUM;
+     }
+ 
+@@ -2679,9 +2680,8 @@ int coroutine_fn bdrv_co_pdiscard(BdrvChild *child, int64_t offset, int bytes)
+         return -EPERM;
+     }
+ 
+-    ret = bdrv_check_byte_request(bs, offset, bytes);
+-    if (ret < 0) {
+-        return ret;
++    if (offset < 0) {
++        return -EIO;
+     }
+ 
+     /* Do nothing if disabled.  */
+@@ -2711,12 +2711,13 @@ int coroutine_fn bdrv_co_pdiscard(BdrvChild *child, int64_t offset, int bytes)
+         goto out;
+     }
+ 
+-    max_pdiscard = QEMU_ALIGN_DOWN(MIN_NON_ZERO(bs->bl.max_pdiscard, INT_MAX),
++    max_pdiscard = QEMU_ALIGN_DOWN(MIN_NON_ZERO(bs->bl.max_pdiscard,
++                                                BDRV_REQUEST_MAX_BYTES),
+                                    align);
+     assert(max_pdiscard >= bs->bl.request_alignment);
+ 
+     while (bytes > 0) {
+-        int num = bytes;
++        int64_t num = bytes;
+ 
+         if (head) {
+             /* Make small requests to get to alignment boundaries. */
+@@ -2778,7 +2779,7 @@ out:
+     return ret;
+ }
+ 
+-int bdrv_pdiscard(BdrvChild *child, int64_t offset, int bytes)
++int bdrv_pdiscard(BdrvChild *child, int64_t offset, int64_t bytes)
+ {
+     Coroutine *co;
+     DiscardCo rwco = {
 -- 
 2.18.0
 
