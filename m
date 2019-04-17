@@ -1,20 +1,17 @@
-Received: from eggs.gnu.org ([209.51.188.92]:60386)
+Received: from eggs.gnu.org ([209.51.188.92]:60257)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1hGptR-0007gx-UO
-	for qemu-devel@nongnu.org; Wed, 17 Apr 2019 15:06:50 -0400
+	(envelope-from <armbru@redhat.com>) id 1hGptP-0007eE-Hb
+	for qemu-devel@nongnu.org; Wed, 17 Apr 2019 15:06:48 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1hGptQ-0003dO-Ur
-	for qemu-devel@nongnu.org; Wed, 17 Apr 2019 15:06:49 -0400
+	(envelope-from <armbru@redhat.com>) id 1hGptO-0003Zc-E9
+	for qemu-devel@nongnu.org; Wed, 17 Apr 2019 15:06:47 -0400
 From: Markus Armbruster <armbru@redhat.com>
-Date: Wed, 17 Apr 2019 21:06:38 +0200
-Message-Id: <20190417190641.26814-13-armbru@redhat.com>
+Date: Wed, 17 Apr 2019 21:06:34 +0200
+Message-Id: <20190417190641.26814-9-armbru@redhat.com>
 In-Reply-To: <20190417190641.26814-1-armbru@redhat.com>
 References: <20190417190641.26814-1-armbru@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v3 12/15] blockdev: Make -drive format=help
- print to stdout
+Subject: [Qemu-devel] [PATCH v3 08/15] s390x/kvm: Report warnings with
+ warn_report(), not error_printf()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,60 +21,41 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org
+Cc: Thomas Huth <thuth@redhat.com>, qemu-s390x@nongnu.org
 
-Command line help explicitly requested by the user should be printed
-to stdout, not stderr.  We do elsewhere.  Adjust -drive to match: use
-qemu_printf() instead of error_printf().  Plain printf() would be
-wrong because we need to print to the current monitor for "drive_add
-... format=3Dhelp".
+kvm_s390_mem_op() can fail in two ways: when !cap_mem_op, it returns
+-ENOSYS, and when kvm_vcpu_ioctl() fails, it returns -errno set by
+ioctl().  Its caller s390_cpu_virt_mem_rw() recovers from both
+failures.
 
-Cc: Kevin Wolf <kwolf@redhat.com>
-Cc: Max Reitz <mreitz@redhat.com>
-Cc: qemu-block@nongnu.org
+kvm_s390_mem_op() prints "KVM_S390_MEM_OP failed" with error_printf()
+in the latter failure mode.  Since this is obviously a warning, use
+warn_report().
+
+Perhaps the reporting should be left to the caller.  It could warn on
+failure other than -ENOSYS.
+
+Cc: Thomas Huth <thuth@redhat.com>
+Cc: qemu-s390x@nongnu.org
 Signed-off-by: Markus Armbruster <armbru@redhat.com>
-Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
-Tested-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+Reviewed-by: Thomas Huth <thuth@redhat.com>
+Reviewed-by: Cornelia Huck <cohuck@redhat.com>
 ---
- blockdev.c | 9 +++++----
- 1 file changed, 5 insertions(+), 4 deletions(-)
+ target/s390x/kvm.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/blockdev.c b/blockdev.c
-index 4775a07d93..79fbac8450 100644
---- a/blockdev.c
-+++ b/blockdev.c
-@@ -40,6 +40,7 @@
- #include "monitor/monitor.h"
- #include "qemu/error-report.h"
- #include "qemu/option.h"
-+#include "qemu/qemu-print.h"
- #include "qemu/config-file.h"
- #include "qapi/qapi-commands-block.h"
- #include "qapi/qapi-commands-transaction.h"
-@@ -301,7 +302,7 @@ DriveInfo *drive_get_next(BlockInterfaceType type)
-=20
- static void bdrv_format_print(void *opaque, const char *name)
- {
--    error_printf(" %s", name);
-+    qemu_printf(" %s", name);
+diff --git a/target/s390x/kvm.c b/target/s390x/kvm.c
+index 19530fb94e..2c6e35b5aa 100644
+--- a/target/s390x/kvm.c
++++ b/target/s390x/kvm.c
+@@ -782,7 +782,7 @@ int kvm_s390_mem_op(S390CPU *cpu, vaddr addr, uint8_t ar, void *hostbuf,
+ 
+     ret = kvm_vcpu_ioctl(CPU(cpu), KVM_S390_MEM_OP, &mem_op);
+     if (ret < 0) {
+-        error_printf("KVM_S390_MEM_OP failed: %s\n", strerror(-ret));
++        warn_report("KVM_S390_MEM_OP failed: %s", strerror(-ret));
+     }
+     return ret;
  }
-=20
- typedef struct {
-@@ -530,11 +531,11 @@ static BlockBackend *blockdev_init(const char *file=
-, QDict *bs_opts,
-=20
-     if ((buf =3D qemu_opt_get(opts, "format")) !=3D NULL) {
-         if (is_help_option(buf)) {
--            error_printf("Supported formats:");
-+            qemu_printf("Supported formats:");
-             bdrv_iterate_format(bdrv_format_print, NULL, false);
--            error_printf("\nSupported formats (read-only):");
-+            qemu_printf("\nSupported formats (read-only):");
-             bdrv_iterate_format(bdrv_format_print, NULL, true);
--            error_printf("\n");
-+            qemu_printf("\n");
-             goto early_err;
-         }
-=20
---=20
+-- 
 2.17.2
