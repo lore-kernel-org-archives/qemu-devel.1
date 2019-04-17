@@ -1,22 +1,21 @@
-Received: from eggs.gnu.org ([209.51.188.92]:55034)
+Received: from eggs.gnu.org ([209.51.188.92]:57587)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1hGiOY-0003nF-Uy
-	for qemu-devel@nongnu.org; Wed, 17 Apr 2019 07:06:27 -0400
+	(envelope-from <npiggin@gmail.com>) id 1hGibr-0006OZ-U4
+	for qemu-devel@nongnu.org; Wed, 17 Apr 2019 07:20:13 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1hGiOW-0005jd-J6
-	for qemu-devel@nongnu.org; Wed, 17 Apr 2019 07:06:26 -0400
-References: <20190416185301.25344-1-david@redhat.com>
-	<20190417095456.741383a7.cohuck@redhat.com>
-From: David Hildenbrand <david@redhat.com>
-Message-ID: <44418310-c106-15cd-f4cd-11701f4aa47f@redhat.com>
-Date: Wed, 17 Apr 2019 13:06:19 +0200
+	(envelope-from <npiggin@gmail.com>) id 1hGibq-00088Y-OJ
+	for qemu-devel@nongnu.org; Wed, 17 Apr 2019 07:20:11 -0400
+Date: Wed, 17 Apr 2019 21:20:00 +1000
+From: Nicholas Piggin <npiggin@gmail.com>
+References: <20190416045552.24573-1-npiggin@gmail.com>
+	<20190417015934.GH32705@umbus.fritz.box>
+In-Reply-To: <20190417015934.GH32705@umbus.fritz.box>
 MIME-Version: 1.0
-In-Reply-To: <20190417095456.741383a7.cohuck@redhat.com>
+Message-Id: <1555498879.055yucy998.astroid@bobo.none>
 Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v2 00/41] s390x/tcg: Vector Instruction
- Support Part 2
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v3] spapr: add splpar hcalls H_PROD,
+ H_CONFER
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,47 +24,143 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Cornelia Huck <cohuck@redhat.com>
-Cc: qemu-devel@nongnu.org, qemu-s390x@nongnu.org, Thomas Huth <thuth@redhat.com>, Richard Henderson <rth@twiddle.net>
+To: David Gibson <david@gibson.dropbear.id.au>
+Cc: Benjamin Herrenschmidt <benh@kernel.crashing.org>, =?iso-8859-1?q?C=E9dric?= Le Goater <clg@kaod.org>, qemu-devel@nongnu.org, qemu-ppc@nongnu.org
 
-On 17.04.19 09:54, Cornelia Huck wrote:
-> On Tue, 16 Apr 2019 20:52:20 +0200
-> David Hildenbrand <david@redhat.com> wrote:
-> 
->> This is the second part of vector instruction support for s390x. It is
->> based on the series soon to land upstream:
->>     [PATCH 0/9] tcg: Add tcg_gen_extract2_{i32,i64}
->>
->> Part 1: Vector Support Instructions
->> Part 2: Vector Integer Instructions
->> Part 3: Vector String Instructions
->> Part 4: Vector Floating-Point Instructions
->>
->> The current state can be found at (kept updated):
->>     https://github.com/davidhildenbrand/qemu/tree/vx
->>
->> With the current state I can boot Linux kernel + user space compiled with
->> SIMD support. This allows to boot distributions compiled exclusively for
->> z13, requiring SIMD support. Also, it is now possible to build a complete
->> kernel using rpmbuild as quite some issues have been sorted out.
->>
->> In this part, all Vector Integer Instructions introduced with the
->> "Vector Facility" are added. Some instructions part of the Vector Extension
->> Facilities are also added.
->>
->> v1 -> v2:
->> - Many suggestions and fixes as outlined by Richard H.
->> -- Mostly avoid oom helpers for 128-bit add/sub variants
->> -- New vector helpers are not considered for now
-> 
-> FWIW, I'd prefer a pull request for that over picking 41 patches :)
-> (I'm unlikely to be able to provide more insightful review anyway ;)
+David Gibson's on April 17, 2019 11:59 am:
+> On Tue, Apr 16, 2019 at 02:55:52PM +1000, Nicholas Piggin wrote:
+>> These implementations have a few deficiencies that are noted, but are
+>> good enough for Linux to use.
+>>=20
+>> Signed-off-by: Nicholas Piggin <npiggin@gmail.com>
+>> ---
+>>=20
+>> v3: Removed wrong comment about GPR3, drop H_JOIN for now (at least unti=
+l
+>> it is tested some more in Linux/KVM), and expand the comment about not
+>> prod bit.
+>>=20
+>>  hw/ppc/spapr_hcall.c | 71 ++++++++++++++++++++++++++++++++++++++++++++
+>>  1 file changed, 71 insertions(+)
+>>=20
+>> diff --git a/hw/ppc/spapr_hcall.c b/hw/ppc/spapr_hcall.c
+>> index 8a736797b9..8892ad008b 100644
+>> --- a/hw/ppc/spapr_hcall.c
+>> +++ b/hw/ppc/spapr_hcall.c
+>> @@ -1065,6 +1065,74 @@ static target_ulong h_cede(PowerPCCPU *cpu, Spapr=
+MachineState *spapr,
+>>      return H_SUCCESS;
+>>  }
+>> =20
+>> +static target_ulong h_confer(PowerPCCPU *cpu, SpaprMachineState *spapr,
+>> +                           target_ulong opcode, target_ulong *args)
+>> +{
+>> +    target_long target =3D args[0];
+>> +    CPUState *cs =3D CPU(cpu);
+>> +
+>> +    /*
+>> +     * This does not do a targeted yield or confer, but check the param=
+eter
+>> +     * anyway. -1 means confer to all/any other CPUs.
+>> +     */
+>> +    if (target !=3D -1 && !CPU(spapr_find_cpu(target))) {
+>> +        return H_PARAMETER;
+>> +    }
+>> +
+>> +    /*
+>> +     * PAPR calls for waiting until proded in this case (or presumably
+>> +     * an external interrupt if MSR[EE]=3D1, without dispatch sequence =
+count
+>> +     * check.
+>=20
+> Is this comment complete?  It's missing a closing parenthesis at the
+> very least.
 
-Will do once the required patches are upstream and you rebased your
-branch. Thanks!
+Needs closing parenthesis after EE=3D1 AFAIKS. Good catch.
+=20
+>> +static target_ulong h_prod(PowerPCCPU *cpu, SpaprMachineState *spapr,
+>> +                           target_ulong opcode, target_ulong *args)
+>> +{
+>> +    target_long target =3D args[0];
+>> +    CPUState *cs;
+>> +
+>> +    /*
+>> +     * PAPR specifies there should be a prod flag should be associated =
+with
+>> +     * a vCPU, which gets set here, tested by H_CEDE, and cleared any t=
+ime
+>> +     * the vCPU is dispatched, including via preemption.
+>> +     *
+>> +     * We don't implement this because it is not used by Linux. The bit=
+ would
+>> +     * be difficult or impossible to use properly because preemption ca=
+n not
+>> +     * be prevented so dispatch sequence count would have to somehow be=
+ used
+>> +     * to detect it.
+>=20
+> Hm.  AFAIK the dispatch sequence count only exists with KVM, so I
+> don't see how testing it would fit with a userspace implementation of PRO=
+D.
 
--- 
+Right, I think even if you did have it, the prod bit really doesn't
+offer much value. You could perhaps enter CEDE without hard disabling
+interrupts race-free, something like --
+
+  do {
+    seq =3D dispatch_seq;
+    if (work_pending)
+      return;
+  } while (seq !=3D dispatch_seq);
+  hcall(H_CEDE);
+
+  vs
+
+  work_pending =3D 1;
+  hcall(H_PROD);
+
+But Linux certainly doesn't do anything like this, and after the
+barriers needed and added complexity to work out the idle state on
+the producer side, it's unlikely to be worthwhile (and either way
+dwarfed by the hcall cost).
+
+Buut... in theory it does not conform to PAPR exactly. We would need
+to clear it on all guest dispatch, and also implement the dispatch
+counter if we are worried about this.
+
+>=20
+>> +     */
+>> +
+>> +    cs =3D CPU(spapr_find_cpu(target));
+>> +    if (!cs) {
+>> +        return H_PARAMETER;
+>> +    }
+>> +
+>> +    cs->halted =3D 0;
+>> +    qemu_cpu_kick(cs);
+>> +
+>> +    return H_SUCCESS;
+>> +}
+>> +
+>>  static target_ulong h_rtas(PowerPCCPU *cpu, SpaprMachineState *spapr,
+>>                             target_ulong opcode, target_ulong *args)
+>>  {
+>> @@ -1860,6 +1928,9 @@ static void hypercall_register_types(void)
+>>      /* hcall-splpar */
+>>      spapr_register_hypercall(H_REGISTER_VPA, h_register_vpa);
+>>      spapr_register_hypercall(H_CEDE, h_cede);
+>> +    spapr_register_hypercall(H_CONFER, h_confer);
+>> +    spapr_register_hypercall(H_PROD, h_prod);
+>> +
+>>      spapr_register_hypercall(H_SIGNAL_SYS_RESET, h_signal_sys_reset);
+>=20
+> You're no longer enabling the KVM CONFER and PROD hypercalls.  Are
+> they enabled by default, or is that an intentional change?
+
+Oh, it was not intentional, I must not understand how this works. Why
+is this no longer enabling the those hcalls?
 
 Thanks,
+Nick
 
-David / dhildenb
+=
