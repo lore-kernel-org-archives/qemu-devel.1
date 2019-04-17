@@ -1,26 +1,27 @@
-Received: from eggs.gnu.org ([209.51.188.92]:34767)
+Received: from eggs.gnu.org ([209.51.188.92]:34801)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1hGq4U-0008R1-L0
-	for qemu-devel@nongnu.org; Wed, 17 Apr 2019 15:18:15 -0400
+	(envelope-from <armbru@redhat.com>) id 1hGq4Y-0008V3-R8
+	for qemu-devel@nongnu.org; Wed, 17 Apr 2019 15:18:20 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1hGq4R-0008ST-Is
-	for qemu-devel@nongnu.org; Wed, 17 Apr 2019 15:18:13 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:37390)
+	(envelope-from <armbru@redhat.com>) id 1hGq4V-00006Y-5P
+	for qemu-devel@nongnu.org; Wed, 17 Apr 2019 15:18:17 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:41056)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1hGq4Q-0008Nl-1W
-	for qemu-devel@nongnu.org; Wed, 17 Apr 2019 15:18:11 -0400
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
-	[10.5.11.15])
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1hGq4T-0008QV-5L
+	for qemu-devel@nongnu.org; Wed, 17 Apr 2019 15:18:14 -0400
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+	[10.5.11.23])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id DCC753004432
-	for <qemu-devel@nongnu.org>; Wed, 17 Apr 2019 19:18:08 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id 8B4B713A82
+	for <qemu-devel@nongnu.org>; Wed, 17 Apr 2019 19:18:10 +0000 (UTC)
 From: Markus Armbruster <armbru@redhat.com>
-Date: Wed, 17 Apr 2019 21:17:54 +0200
-Message-Id: <20190417191805.28198-7-armbru@redhat.com>
+Date: Wed, 17 Apr 2019 21:18:05 +0200
+Message-Id: <20190417191805.28198-18-armbru@redhat.com>
 In-Reply-To: <20190417191805.28198-1-armbru@redhat.com>
 References: <20190417191805.28198-1-armbru@redhat.com>
-Subject: [Qemu-devel] [PATCH v2 06/17] qsp: Simplify how qsp_report() prints
+Subject: [Qemu-devel] [PATCH v2 17/17] include: Move fprintf_function to
+ disas/
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,148 +33,65 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: dgilbert@redhat.com
 
-qsp_report() takes an fprintf()-like callback and a FILE * to pass to
-it.
+The previous commits have eliminated fprintf_function outside
+disassemblers, simplifying code and cleaning up the ugly type-punning
+fprintf_function seems to attract.  Move fprintf_function to
+include/disas/dis-asm.h to reduce the temptation to abuse it.
 
-Its only caller hmp_sync_profile() passes monitor_fprintf() and the
-current monitor cast to FILE *.  monitor_fprintf() casts it right
-back, and is otherwise identical to monitor_printf().  The
-type-punning is ugly.
-
-Drop the callback, and call qemu_printf() instead.
+I considered renaming it to fprintf_ftype (reverting that part of
+commit 6e2d864edf5, v0.14.0) to get us closer to binutils, but I
+figure the fork is too distant to make this worthwhile.
 
 Signed-off-by: Markus Armbruster <armbru@redhat.com>
 Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
 ---
- include/block/qapi.h |  1 +
- include/qemu/qsp.h   |  6 ++----
- monitor.c            |  2 +-
- util/qsp.c           | 21 +++++++++++----------
- 4 files changed, 15 insertions(+), 15 deletions(-)
+ include/disas/dis-asm.h   |  5 +++--
+ include/qemu/fprintf-fn.h | 14 --------------
+ 2 files changed, 3 insertions(+), 16 deletions(-)
+ delete mode 100644 include/qemu/fprintf-fn.h
 
-diff --git a/include/block/qapi.h b/include/block/qapi.h
-index 83bdb098bd..a891f43b9c 100644
---- a/include/block/qapi.h
-+++ b/include/block/qapi.h
-@@ -27,6 +27,7 @@
- 
- #include "block/block.h"
- #include "block/snapshot.h"
-+#include "qemu/fprintf-fn.h"
- 
- BlockDeviceInfo *bdrv_block_device_info(BlockBackend *blk,
-                                         BlockDriverState *bs, Error **errp);
-diff --git a/include/qemu/qsp.h b/include/qemu/qsp.h
-index a94c464f90..bf36aabfa8 100644
---- a/include/qemu/qsp.h
-+++ b/include/qemu/qsp.h
-@@ -11,15 +11,13 @@
- #ifndef QEMU_QSP_H
- #define QEMU_QSP_H
+diff --git a/include/disas/dis-asm.h b/include/disas/dis-asm.h
+index 41b61c85f9..9240ec32c2 100644
+--- a/include/disas/dis-asm.h
++++ b/include/disas/dis-asm.h
+@@ -9,8 +9,6 @@
+ #ifndef DISAS_BFD_H
+ #define DISAS_BFD_H
  
 -#include "qemu/fprintf-fn.h"
 -
- enum QSPSortBy {
-     QSP_SORT_BY_TOTAL_WAIT_TIME,
-     QSP_SORT_BY_AVG_WAIT_TIME,
- };
+ typedef void *PTR;
+ typedef uint64_t bfd_vma;
+ typedef int64_t bfd_signed_vma;
+@@ -243,6 +241,9 @@ typedef struct symbol_cache_entry
+     } udata;
+ } asymbol;
  
--void qsp_report(FILE *f, fprintf_function cpu_fprintf, size_t max,
--                enum QSPSortBy sort_by, bool callsite_coalesce);
-+void qsp_report(size_t max, enum QSPSortBy sort_by,
-+                bool callsite_coalesce);
- 
- bool qsp_is_enabled(void);
- void qsp_enable(void);
-diff --git a/monitor.c b/monitor.c
-index 7573689585..1650ceec3a 100644
---- a/monitor.c
-+++ b/monitor.c
-@@ -1336,7 +1336,7 @@ static void hmp_info_sync_profile(Monitor *mon, const QDict *qdict)
-     enum QSPSortBy sort_by;
- 
-     sort_by = mean ? QSP_SORT_BY_AVG_WAIT_TIME : QSP_SORT_BY_TOTAL_WAIT_TIME;
--    qsp_report((FILE *)mon, monitor_fprintf, max, sort_by, coalesce);
-+    qsp_report(max, sort_by, coalesce);
- }
- 
- static void hmp_info_history(Monitor *mon, const QDict *qdict)
-diff --git a/util/qsp.c b/util/qsp.c
-index 410f1ba004..5264c97342 100644
---- a/util/qsp.c
-+++ b/util/qsp.c
-@@ -56,7 +56,9 @@
-  *   Critical-Section Execution to Improve the Performance of Multithreaded
-  *   Applications", USENIX ATC'12.
-  */
++typedef int (*fprintf_function)(FILE *f, const char *fmt, ...)
++    GCC_FMT_ATTR(2, 3);
 +
- #include "qemu/osdep.h"
-+#include "qemu/qemu-print.h"
- #include "qemu/thread.h"
- #include "qemu/timer.h"
- #include "qemu/qht.h"
-@@ -678,8 +680,7 @@ static gboolean qsp_tree_report(gpointer key, gpointer value, gpointer udata)
-     return FALSE;
- }
- 
--static void
--pr_report(const QSPReport *rep, FILE *f, fprintf_function pr)
-+static void pr_report(const QSPReport *rep)
- {
-     char *dashes;
-     size_t max_len = 0;
-@@ -702,15 +703,15 @@ pr_report(const QSPReport *rep, FILE *f, fprintf_function pr)
-     /* white space to leave to the right of "Call site" */
-     callsite_rspace = callsite_len - strlen("Call site");
- 
--    pr(f, "Type               Object  Call site%*s  Wait Time (s)  "
--       "       Count  Average (us)\n", callsite_rspace, "");
-+    qemu_printf("Type               Object  Call site%*s  Wait Time (s)  "
-+                "       Count  Average (us)\n", callsite_rspace, "");
- 
-     /* build a horizontal rule with dashes */
-     n_dashes = 79 + callsite_rspace;
-     dashes = g_malloc(n_dashes + 1);
-     memset(dashes, '-', n_dashes);
-     dashes[n_dashes] = '\0';
--    pr(f, "%s\n", dashes);
-+    qemu_printf("%s\n", dashes);
- 
-     for (i = 0; i < rep->n_entries; i++) {
-         const QSPReportEntry *e = &rep->entries[i];
-@@ -726,11 +727,11 @@ pr_report(const QSPReport *rep, FILE *f, fprintf_function pr)
-                                e->callsite_at,
-                                callsite_len - (int)strlen(e->callsite_at), "",
-                                e->time_s, e->n_acqs, e->ns_avg * 1e-3);
--        pr(f, "%s", s->str);
-+        qemu_printf("%s", s->str);
-         g_string_free(s, TRUE);
-     }
- 
--    pr(f, "%s\n", dashes);
-+    qemu_printf("%s\n", dashes);
-     g_free(dashes);
- }
- 
-@@ -746,8 +747,8 @@ static void report_destroy(QSPReport *rep)
-     g_free(rep->entries);
- }
- 
--void qsp_report(FILE *f, fprintf_function cpu_fprintf, size_t max,
--                enum QSPSortBy sort_by, bool callsite_coalesce)
-+void qsp_report(size_t max, enum QSPSortBy sort_by,
-+                bool callsite_coalesce)
- {
-     GTree *tree = g_tree_new_full(qsp_tree_cmp, &sort_by, g_free, NULL);
-     QSPReport rep;
-@@ -762,7 +763,7 @@ void qsp_report(FILE *f, fprintf_function cpu_fprintf, size_t max,
-     g_tree_foreach(tree, qsp_tree_report, &rep);
-     g_tree_destroy(tree);
- 
--    pr_report(&rep, f, cpu_fprintf);
-+    pr_report(&rep);
-     report_destroy(&rep);
- }
- 
+ enum dis_insn_type {
+   dis_noninsn,			/* Not a valid instruction */
+   dis_nonbranch,		/* Not a branch instruction */
+diff --git a/include/qemu/fprintf-fn.h b/include/qemu/fprintf-fn.h
+deleted file mode 100644
+index 9068a960b3..0000000000
+--- a/include/qemu/fprintf-fn.h
++++ /dev/null
+@@ -1,14 +0,0 @@
+-/*
+- * Typedef for fprintf-alike function pointers.
+- *
+- * This work is licensed under the terms of the GNU GPL, version 2 or later.
+- * See the COPYING file in the top-level directory.
+- */
+-
+-#ifndef QEMU_FPRINTF_FN_H
+-#define QEMU_FPRINTF_FN_H
+-
+-typedef int (*fprintf_function)(FILE *f, const char *fmt, ...)
+-    GCC_FMT_ATTR(2, 3);
+-
+-#endif
 -- 
 2.17.2
