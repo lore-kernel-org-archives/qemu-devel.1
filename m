@@ -1,33 +1,25 @@
-Received: from eggs.gnu.org ([209.51.188.92]:50918)
+Received: from eggs.gnu.org ([209.51.188.92]:52677)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1hGp2R-0004LL-4z
-	for qemu-devel@nongnu.org; Wed, 17 Apr 2019 14:12:04 -0400
+	(envelope-from <no-reply@patchew.org>) id 1hGpC5-0006eQ-R4
+	for qemu-devel@nongnu.org; Wed, 17 Apr 2019 14:22:02 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1hGp2Q-0005oZ-6t
-	for qemu-devel@nongnu.org; Wed, 17 Apr 2019 14:12:03 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:23804)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1hGp2P-0005oC-Us
-	for qemu-devel@nongnu.org; Wed, 17 Apr 2019 14:12:02 -0400
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
-	[10.5.11.22])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 25396301988C
-	for <qemu-devel@nongnu.org>; Wed, 17 Apr 2019 18:12:01 +0000 (UTC)
-Received: from blackfin.pond.sub.org (ovpn-116-116.ams2.redhat.com
-	[10.36.116.116])
-	by smtp.corp.redhat.com (Postfix) with ESMTPS id E655A1001E8A
-	for <qemu-devel@nongnu.org>; Wed, 17 Apr 2019 18:12:00 +0000 (UTC)
-From: Markus Armbruster <armbru@redhat.com>
-References: <20190411145256.8614-1-armbru@redhat.com>
-Date: Wed, 17 Apr 2019 20:11:59 +0200
-In-Reply-To: <20190411145256.8614-1-armbru@redhat.com> (Markus Armbruster's
-	message of "Thu, 11 Apr 2019 16:52:41 +0200")
-Message-ID: <87mukov6vk.fsf@dusky.pond.sub.org>
+	(envelope-from <no-reply@patchew.org>) id 1hGpC4-0001mU-Lx
+	for qemu-devel@nongnu.org; Wed, 17 Apr 2019 14:22:01 -0400
+Resent-Message-Id: <E1hGpC4-0001mU-Lx@eggs.gnu.org>
+Received: from sender4-of-o55.zoho.com ([136.143.188.55]:21595)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
+	id 1hGpC4-0001l7-2X
+	for qemu-devel@nongnu.org; Wed, 17 Apr 2019 14:22:00 -0400
+Message-ID: <155552529277.17102.9216298997846682613@76452e4e88f2>
+In-Reply-To: <87mukov6vk.fsf@dusky.pond.sub.org>
+Reply-To: <qemu-devel@nongnu.org>
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: [Qemu-devel] [PATCH v2 14.5/15] char-pty: Print "char device
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+From: no-reply@patchew.org
+Date: Wed, 17 Apr 2019 11:21:33 -0700 (PDT)
+Subject: Re: [Qemu-devel] [PATCH v2 14.5/15] char-pty: Print "char device
  redirected" message to stdout
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
@@ -37,38 +29,26 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: armbru@redhat.com
+Cc: fam@euphon.net, qemu-devel@nongnu.org
 
-char_pty_open() prints a "char device redirected to PTY_NAME (label
-LABEL)" message to the current monitor or else to stderr.  This is not
-an error, so it shouldn't go to stderr.  Print it to stdout instead.
-
-Why is it even printed?  No other ChardevClass::open() prints anything
-on success.  It's because you need to know PTY_NAME to actually use
-this char device, e.g. like e.g. "socat STDIO,cfmakeraw FILE:PTY_NAME"
-to use the monitor's readline interface.  You can get PTY_NAME with
-"info chardev" (a.k.a. query-chardev for QMP), but only if you already
-have a monitor.
-
-Signed-off-by: Markus Armbruster <armbru@redhat.com>
----
- chardev/char-pty.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
-
-diff --git a/chardev/char-pty.c b/chardev/char-pty.c
-index b034332edd..4ff2f328fa 100644
---- a/chardev/char-pty.c
-+++ b/chardev/char-pty.c
-@@ -211,8 +211,8 @@ static void char_pty_open(Chardev *chr,
-     qemu_set_nonblock(master_fd);
- 
-     chr->filename = g_strdup_printf("pty:%s", pty_name);
--    error_printf("char device redirected to %s (label %s)\n",
--                 pty_name, chr->label);
-+    qemu_printf("char device redirected to %s (label %s)\n",
-+                pty_name, chr->label);
- 
-     s = PTY_CHARDEV(chr);
-     s->ioc = QIO_CHANNEL(qio_channel_file_new_fd(master_fd));
--- 
-2.17.2
+UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS84N211a292NnZrLmZzZkBkdXNr
+eS5wb25kLnN1Yi5vcmcvCgoKCkhpLAoKVGhpcyBzZXJpZXMgZmFpbGVkIHRoZSBhc2FuIGJ1aWxk
+IHRlc3QuIFBsZWFzZSBmaW5kIHRoZSB0ZXN0aW5nIGNvbW1hbmRzIGFuZAp0aGVpciBvdXRwdXQg
+YmVsb3cuIElmIHlvdSBoYXZlIERvY2tlciBpbnN0YWxsZWQsIHlvdSBjYW4gcHJvYmFibHkgcmVw
+cm9kdWNlIGl0CmxvY2FsbHkuCgo9PT0gVEVTVCBTQ1JJUFQgQkVHSU4gPT09CiMhL2Jpbi9iYXNo
+CnRpbWUgbWFrZSBkb2NrZXItdGVzdC1kZWJ1Z0BmZWRvcmEgVEFSR0VUX0xJU1Q9eDg2XzY0LXNv
+ZnRtbXUgSj0xNCBORVRXT1JLPTEKPT09IFRFU1QgU0NSSVBUIEVORCA9PT0KCiAgQVIgICAgICBs
+aWJxZW11dXRpbC5hCiAgTElOSyAgICBlbGYyZG1wCiAgQVMgICAgICBvcHRpb25yb20vbXVsdGli
+b290Lm8KL3RtcC9xZW11LXRlc3Qvc3JjL2NoYXJkZXYvY2hhci1wdHkuYzoyMTQ6NTogZXJyb3I6
+IGltcGxpY2l0IGRlY2xhcmF0aW9uIG9mIGZ1bmN0aW9uICdxZW11X3ByaW50ZicgaXMgaW52YWxp
+ZCBpbiBDOTkgWy1XZXJyb3IsLVdpbXBsaWNpdC1mdW5jdGlvbi1kZWNsYXJhdGlvbl0KICAgIHFl
+bXVfcHJpbnRmKCJjaGFyIGRldmljZSByZWRpcmVjdGVkIHRvICVzIChsYWJlbCAlcylcbiIsCiAg
+ICBeCi90bXAvcWVtdS10ZXN0L3NyYy9jaGFyZGV2L2NoYXItcHR5LmM6MjE0OjU6IGVycm9yOiB0
+aGlzIGZ1bmN0aW9uIGRlY2xhcmF0aW9uIGlzIG5vdCBhIHByb3RvdHlwZSBbLVdlcnJvciwtV3N0
+cmljdC1wcm90b3R5cGVzXQoyIGVycm9ycyBnZW5lcmF0ZWQuCiAgTElOSyAgICBpdnNobWVtLWNs
+aWVudAogIExJTksgICAgaXZzaG1lbS1zZXJ2ZXIKCgpUaGUgZnVsbCBsb2cgaXMgYXZhaWxhYmxl
+IGF0Cmh0dHA6Ly9wYXRjaGV3Lm9yZy9sb2dzLzg3bXVrb3Y2dmsuZnNmQGR1c2t5LnBvbmQuc3Vi
+Lm9yZy90ZXN0aW5nLmFzYW4vP3R5cGU9bWVzc2FnZS4KLS0tCkVtYWlsIGdlbmVyYXRlZCBhdXRv
+bWF0aWNhbGx5IGJ5IFBhdGNoZXcgW2h0dHBzOi8vcGF0Y2hldy5vcmcvXS4KUGxlYXNlIHNlbmQg
+eW91ciBmZWVkYmFjayB0byBwYXRjaGV3LWRldmVsQHJlZGhhdC5jb20=
