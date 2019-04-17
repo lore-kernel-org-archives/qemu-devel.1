@@ -1,26 +1,26 @@
-Received: from eggs.gnu.org ([209.51.188.92]:37976)
+Received: from eggs.gnu.org ([209.51.188.92]:37997)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stephen.checkoway@oberlin.edu>) id 1hGsdT-00074N-NY
+	(envelope-from <stephen.checkoway@oberlin.edu>) id 1hGsdU-00075N-Ao
 	for qemu-devel@nongnu.org; Wed, 17 Apr 2019 18:02:33 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stephen.checkoway@oberlin.edu>) id 1hGsdS-0004Yr-7g
-	for qemu-devel@nongnu.org; Wed, 17 Apr 2019 18:02:31 -0400
-Received: from mail-it1-x12e.google.com ([2607:f8b0:4864:20::12e]:37508)
+	(envelope-from <stephen.checkoway@oberlin.edu>) id 1hGsdT-0004aV-8f
+	for qemu-devel@nongnu.org; Wed, 17 Apr 2019 18:02:32 -0400
+Received: from mail-it1-x143.google.com ([2607:f8b0:4864:20::143]:51164)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <stephen.checkoway@oberlin.edu>)
-	id 1hGsdS-0004Y6-22
-	for qemu-devel@nongnu.org; Wed, 17 Apr 2019 18:02:30 -0400
-Received: by mail-it1-x12e.google.com with SMTP id u65so280165itc.2
-	for <qemu-devel@nongnu.org>; Wed, 17 Apr 2019 15:02:30 -0700 (PDT)
+	id 1hGsdT-0004Zn-3B
+	for qemu-devel@nongnu.org; Wed, 17 Apr 2019 18:02:31 -0400
+Received: by mail-it1-x143.google.com with SMTP id q14so287918itk.0
+	for <qemu-devel@nongnu.org>; Wed, 17 Apr 2019 15:02:31 -0700 (PDT)
 From: Stephen Checkoway <stephen.checkoway@oberlin.edu>
-Date: Wed, 17 Apr 2019 18:01:43 -0400
-Message-Id: <20190417220147.67648-7-stephen.checkoway@oberlin.edu>
+Date: Wed, 17 Apr 2019 18:01:44 -0400
+Message-Id: <20190417220147.67648-8-stephen.checkoway@oberlin.edu>
 In-Reply-To: <20190417220147.67648-1-stephen.checkoway@oberlin.edu>
 References: <20190417220147.67648-1-stephen.checkoway@oberlin.edu>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH v3 06/10] block/pflash_cfi02: Fix CFI in
- autoselect mode
+Subject: [Qemu-devel] [PATCH v3 07/10] block/pflash_cfi02: Fix reset command
+ not ignored during erase
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,136 +30,32 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: QEMU Developers <qemu-devel@nongnu.org>, =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, "open list:Block layer core" <qemu-block@nongnu.org>, Stephen Checkoway <stephen.checkoway@oberlin.edu>, Markus Armbruster <armbru@redhat.com>, Laszlo Ersek <lersek@redhat.com>, Laurent Vivier <lvivier@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
-Cc: Thomas Huth <thuth@redhat.com>
 
-After a flash device enters CFI mode from autoselect mode, the reset
-command returns the device to autoselect mode. An additional reset
-command is necessary to return to read array mode.
+When the flash device is performing a chip erase, all commands are
+ignored. When it is performing a sector erase, only the erase suspend
+command is valid, which is currently not supported.
+
+In particular, the reset command should not cause the device to reset to
+read array mode while programming is on going.
 
 Signed-off-by: Stephen Checkoway <stephen.checkoway@oberlin.edu>
 ---
- hw/block/pflash_cfi02.c   | 21 +++++++++++++++++----
- tests/pflash-cfi02-test.c | 39 +++++++++++++++++++++++++++++++++++++++
- 2 files changed, 56 insertions(+), 4 deletions(-)
+ hw/block/pflash_cfi02.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
 
 diff --git a/hw/block/pflash_cfi02.c b/hw/block/pflash_cfi02.c
-index c4efbe8cdf..be10036886 100644
+index be10036886..cb1160eb35 100644
 --- a/hw/block/pflash_cfi02.c
 +++ b/hw/block/pflash_cfi02.c
-@@ -61,8 +61,9 @@ do {                                                       \
-  */
- #define PFLASH_MAX_ERASE_REGIONS 4
- 
--/* Special write cycle for CFI queries. */
-+/* Special write cycles for CFI queries. */
- #define WCYCLE_CFI 7
-+#define WCYCLE_AUTOSELECT_CFI 8
- 
- struct PFlashCFI02 {
-     /*< private >*/
-@@ -325,6 +326,12 @@ static void pflash_write(void *opaque, hwaddr offset, uint64_t value,
+@@ -325,7 +325,8 @@ static void pflash_write(void *opaque, hwaddr offset, uint64_t value,
+                     pfl->bank_width * 2, value);
          }
  
-         if (cmd == 0xF0) {
-+            if (pfl->wcycle == WCYCLE_AUTOSELECT_CFI) {
-+                /* Return to autoselect mode. */
-+                pfl->wcycle = 3;
-+                pfl->cmd = 0x90;
-+                return;
-+            }
-             goto reset_flash;
-         }
-     }
-@@ -350,7 +357,6 @@ static void pflash_write(void *opaque, hwaddr offset, uint64_t value,
-         /* We're in read mode */
-     check_unlock0:
-         if (masked_addr == 0x55 && cmd == 0x98) {
--        enter_CFI_mode:
-             /* Enter CFI query mode */
-             pfl->wcycle = WCYCLE_CFI;
-             pfl->cmd = 0x98;
-@@ -427,9 +433,15 @@ static void pflash_write(void *opaque, hwaddr offset, uint64_t value,
-                 /* Unlock bypass reset */
-                 goto reset_flash;
-             }
--            /* We can enter CFI query mode from autoselect mode */
-+            /*
-+             * We can enter CFI query mode from autoselect mode, but we must
-+             * return to autoselect mode after a reset.
-+             */
-             if (masked_addr == 0x55 && cmd == 0x98) {
--                goto enter_CFI_mode;
-+                /* Enter autoselect CFI query mode */
-+                pfl->wcycle = WCYCLE_AUTOSELECT_CFI;
-+                pfl->cmd = 0x98;
-+                return;
-             }
-             /* No break here */
-         default:
-@@ -510,6 +522,7 @@ static void pflash_write(void *opaque, hwaddr offset, uint64_t value,
-         }
-         break;
-     case WCYCLE_CFI: /* Special value for CFI queries */
-+    case WCYCLE_AUTOSELECT_CFI:
-         DPRINTF("%s: invalid write in CFI query mode\n", __func__);
-         goto reset_flash;
-     default:
-diff --git a/tests/pflash-cfi02-test.c b/tests/pflash-cfi02-test.c
-index 82bc5695e1..4039647604 100644
---- a/tests/pflash-cfi02-test.c
-+++ b/tests/pflash-cfi02-test.c
-@@ -480,6 +480,42 @@ static void test_geometry(const void *opaque)
-     qtest_quit(qtest);
- }
- 
-+/*
-+ * Test that
-+ * 1. enter autoselect mode;
-+ * 2. enter CFI mode; and then
-+ * 3. exit CFI mode
-+ * leaves the flash device in autoselect mode.
-+ */
-+static void test_cfi_in_autoselect(const void *opaque)
-+{
-+    const FlashConfig *config = opaque;
-+    QTestState *qtest = qtest_initf("-M musicpal,accel=qtest"
-+                                    " -drive if=pflash,file=%s,format=raw,"
-+                                    "copy-on-read",
-+                                    image_path);
-+    FlashConfig explicit_config = expand_config_defaults(config);
-+    explicit_config.qtest = qtest;
-+    const FlashConfig *c = &explicit_config;
-+
-+    /* 1. Enter autoselect. */
-+    unlock(c);
-+    flash_cmd(c, UNLOCK0_ADDR, AUTOSELECT_CMD);
-+    g_assert_cmpint(flash_query(c, FLASH_ADDR(0)), ==, replicate(c, 0xBF));
-+
-+    /* 2. Enter CFI. */
-+    flash_cmd(c, CFI_ADDR, CFI_CMD);
-+    g_assert_cmpint(flash_query(c, FLASH_ADDR(0x10)), ==, replicate(c, 'Q'));
-+    g_assert_cmpint(flash_query(c, FLASH_ADDR(0x11)), ==, replicate(c, 'R'));
-+    g_assert_cmpint(flash_query(c, FLASH_ADDR(0x12)), ==, replicate(c, 'Y'));
-+
-+    /* 3. Exit CFI. */
-+    reset(c);
-+    g_assert_cmpint(flash_query(c, FLASH_ADDR(0)), ==, replicate(c, 0xBF));
-+
-+    qtest_quit(qtest);
-+}
-+
- static void cleanup(void *opaque)
- {
-     unlink(image_path);
-@@ -605,6 +641,9 @@ int main(int argc, char **argv)
-         qtest_add_data_func(path, config, test_geometry);
-         g_free(path);
-     }
-+
-+    qtest_add_data_func("pflash-cfi02/cfi-in-autoselect", &configuration[0],
-+                        test_cfi_in_autoselect);
-     int result = g_test_run();
-     cleanup(NULL);
-     return result;
+-        if (cmd == 0xF0) {
++        /* Reset does nothing during chip erase and sector erase. */
++        if (cmd == 0xF0 && pfl->cmd != 0x10 && pfl->cmd != 0x30) {
+             if (pfl->wcycle == WCYCLE_AUTOSELECT_CFI) {
+                 /* Return to autoselect mode. */
+                 pfl->wcycle = 3;
 -- 
 2.20.1 (Apple Git-117)
