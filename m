@@ -1,20 +1,22 @@
-Received: from eggs.gnu.org ([209.51.188.92]:47894)
+Received: from eggs.gnu.org ([209.51.188.92]:49450)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1hHBST-00081E-Eb
-	for qemu-devel@nongnu.org; Thu, 18 Apr 2019 14:08:26 -0400
+	(envelope-from <armbru@redhat.com>) id 1hHBXX-00048N-LQ
+	for qemu-devel@nongnu.org; Thu, 18 Apr 2019 14:13:40 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1hHBSS-0005nc-Gh
-	for qemu-devel@nongnu.org; Thu, 18 Apr 2019 14:08:25 -0400
-From: Thomas Huth <thuth@redhat.com>
-Date: Thu, 18 Apr 2019 20:00:42 +0200
-Message-Id: <20190418180057.3593-15-thuth@redhat.com>
-In-Reply-To: <20190418180057.3593-1-thuth@redhat.com>
-References: <20190418180057.3593-1-thuth@redhat.com>
+	(envelope-from <armbru@redhat.com>) id 1hHBXW-0000LX-Oi
+	for qemu-devel@nongnu.org; Thu, 18 Apr 2019 14:13:39 -0400
+From: Markus Armbruster <armbru@redhat.com>
+References: <20190418145355.21100-1-armbru@redhat.com>
+	<20190418145355.21100-6-armbru@redhat.com>
+	<4aa820cd-bb5e-b891-bd77-42afab8de347@redhat.com>
+Date: Thu, 18 Apr 2019 20:13:35 +0200
+In-Reply-To: <4aa820cd-bb5e-b891-bd77-42afab8de347@redhat.com> (Thomas Huth's
+	message of "Thu, 18 Apr 2019 18:28:05 +0200")
+Message-ID: <87ftqfkwq8.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH for-QEMU-4.1 v5 14/29] hw/arm: Express
- dependencies of collie with Kconfig
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [PATCH 5/6] pc-bios/s390-ccw: Clean up harmless
+ misuse of isdigit()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,69 +25,65 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: yang.zhong@intel.com, Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org, pbonzini@redhat.com
-Cc: Beniamino Galvani <b.galvani@gmail.com>, Jan Kiszka <jan.kiszka@web.de>, Antony Pavlov <antonynpavlov@gmail.com>, Peter Chubb <peter.chubb@nicta.com.au>, qemu-block@nongnu.org, Cedric Le Goater <clg@kaod.org>, "Michael S. Tsirkin" <mst@redhat.com>, Andrew Jeffery <andrew@aj.id.au>, Igor Mitsyanko <i.mitsyanko@gmail.com>, Andrey Smirnov <andrew.smirnov@gmail.com>, Rob Herring <robh@kernel.org>, qemu-arm@nongnu.org, Andrzej Zaborowski <balrogg@gmail.com>, John Snow <jsnow@redhat.com>, Joel Stanley <joel@jms.id.au>, "Edgar E . Iglesias" <edgar.iglesias@gmail.com>, Jean-Christophe Dubois <jcd@tribudubois.net>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, Philippe Mathieu-Daude <f4bug@amsat.org>, Alistair Francis <alistair@alistair23.me>, Subbaraya Sundeep <sundeep.lkml@gmail.com>, Gerd Hoffmann <kraxel@redhat.com>
+To: Thomas Huth <thuth@redhat.com>
+Cc: qemu-devel@nongnu.org, Christian Borntraeger <borntraeger@de.ibm.com>, qemu-s390x@nongnu.org, Cornelia Huck <cohuck@redhat.com>
 
-Add Kconfig dependencies for the Strongarm collie machine.
-This patch is based on earlier work by =C3=81kos Kov=C3=A1cs (i.e.
-his "hw/arm/Kconfig: Add ARM Kconfig" patch).
+Thomas Huth <thuth@redhat.com> writes:
 
-Signed-off-by: Thomas Huth <thuth@redhat.com>
----
- default-configs/arm-softmmu.mak | 3 +--
- hw/arm/Kconfig                  | 7 +++++++
- hw/arm/Makefile.objs            | 2 +-
- 3 files changed, 9 insertions(+), 3 deletions(-)
+> On 18/04/2019 16.53, Markus Armbruster wrote:
+>> atoui() and get_index() pass char values to isdigit().  With a
+>> standard isdigit(), we'd get undefined behavior when the value is
+>> negative.  But we're using isdigit() from pc-bios/s390-ccw/libc.h
+>> here, which behaves nicely.  Clean up anyway, just to avoid setting a
+>> bad example.
+>> 
+>> Cc: Christian Borntraeger <borntraeger@de.ibm.com>
+>> Cc: Thomas Huth <thuth@redhat.com>
+>> Cc: Cornelia Huck <cohuck@redhat.com>
+>> Cc: qemu-s390x@nongnu.org
+>> Signed-off-by: Markus Armbruster <armbru@redhat.com>
+>> ---
+>>  pc-bios/s390-ccw/libc.c | 2 +-
+>>  pc-bios/s390-ccw/menu.c | 2 +-
+>>  2 files changed, 2 insertions(+), 2 deletions(-)
+>> 
+>> diff --git a/pc-bios/s390-ccw/libc.c b/pc-bios/s390-ccw/libc.c
+>> index a786566c4c..3187923950 100644
+>> --- a/pc-bios/s390-ccw/libc.c
+>> +++ b/pc-bios/s390-ccw/libc.c
+>> @@ -38,7 +38,7 @@ uint64_t atoui(const char *str)
+>>      }
+>>  
+>>      while (*str) {
+>> -        if (!isdigit(*str)) {
+>> +        if (!isdigit(*(unsigned char *)str)) {
+>>              break;
+>>          }
+>>          val = val * 10 + *str - '0';
+>> diff --git a/pc-bios/s390-ccw/menu.c b/pc-bios/s390-ccw/menu.c
+>> index 82a4ae6315..ce3815b201 100644
+>> --- a/pc-bios/s390-ccw/menu.c
+>> +++ b/pc-bios/s390-ccw/menu.c
+>> @@ -134,7 +134,7 @@ static int get_index(void)
+>>  
+>>      /* Check for erroneous input */
+>>      for (i = 0; i < len; i++) {
+>> -        if (!isdigit(buf[i])) {
+>> +        if (!isdigit((unsigned char)buf[i])) {
+>>              return -1;
+>>          }
+>>      }
+>
+> FWIW, "char" is unsigned by default on s390x, so this is doing nothing.
 
-diff --git a/default-configs/arm-softmmu.mak b/default-configs/arm-softmm=
-u.mak
-index af78e7c892..25e8f717ac 100644
---- a/default-configs/arm-softmmu.mak
-+++ b/default-configs/arm-softmmu.mak
-@@ -25,6 +25,7 @@ CONFIG_GUMSTIX=3Dy
- CONFIG_SPITZ=3Dy
- CONFIG_TOSA=3Dy
- CONFIG_Z2=3Dy
-+CONFIG_COLLIE=3Dy
-=20
- CONFIG_VGA=3Dy
- CONFIG_TMP421=3Dy
-@@ -97,5 +98,3 @@ CONFIG_GPIO_KEY=3Dy
- CONFIG_MSF2=3Dy
- CONFIG_FW_CFG_DMA=3Dy
- CONFIG_PCI_EXPRESS_DESIGNWARE=3Dy
--
--CONFIG_STRONGARM=3Dy
-diff --git a/hw/arm/Kconfig b/hw/arm/Kconfig
-index 785e383411..325133c129 100644
---- a/hw/arm/Kconfig
-+++ b/hw/arm/Kconfig
-@@ -168,6 +168,13 @@ config STELLARIS
-=20
- config STRONGARM
-     bool
-+    select PXA2XX
-+
-+config COLLIE
-+    bool
-+    select PFLASH_CFI01
-+    select ZAURUS  # scoop
-+    select STRONGARM
-=20
- config SX1
-     bool
-diff --git a/hw/arm/Makefile.objs b/hw/arm/Makefile.objs
-index 00328d1b0b..729e711b87 100644
---- a/hw/arm/Makefile.objs
-+++ b/hw/arm/Makefile.objs
-@@ -17,7 +17,7 @@ obj-$(CONFIG_TOSA) +=3D tosa.o
- obj-$(CONFIG_Z2) +=3D z2.o
- obj-$(CONFIG_REALVIEW) +=3D realview.o
- obj-$(CONFIG_STELLARIS) +=3D stellaris.o
--obj-$(CONFIG_STRONGARM) +=3D collie.o
-+obj-$(CONFIG_COLLIE) +=3D collie.o
- obj-$(CONFIG_VERSATILE) +=3D versatilepb.o
- obj-$(CONFIG_VEXPRESS) +=3D vexpress.o
- obj-$(CONFIG_ZYNQ) +=3D xilinx_zynq.o
---=20
-2.21.0
+I see.
+
+If we decide to keep the patch, the commit message needs tweaking.
+Perhaps:
+
+    atoui() and get_index() pass char values to isdigit().  With a
+    standard isdigit(), we'd get undefined behavior when the value is
+    negative.  Can't happen as char is unsigned on s390x.  Even if it
+    could, we're actually using isdigit() from pc-bios/s390-ccw/libc.h
+    here, which works fine for negative values.  Clean up anyway, just
+    to avoid setting a bad example.
