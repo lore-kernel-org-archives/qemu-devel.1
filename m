@@ -6,107 +6,139 @@ X-Spam-Status: No, score=-6.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9FC50C10F14
-	for <qemu-devel@archiver.kernel.org>; Thu, 18 Apr 2019 12:55:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4A875C10F0E
+	for <qemu-devel@archiver.kernel.org>; Thu, 18 Apr 2019 12:56:31 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 627E420652
-	for <qemu-devel@archiver.kernel.org>; Thu, 18 Apr 2019 12:55:58 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 627E420652
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 0AEBE20652
+	for <qemu-devel@archiver.kernel.org>; Thu, 18 Apr 2019 12:56:31 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0AEBE20652
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=de.ibm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:41155 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:41160 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hH6a5-0001wv-MX
-	for qemu-devel@archiver.kernel.org; Thu, 18 Apr 2019 08:55:57 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:38783)
+	id 1hH6ac-0002HE-AH
+	for qemu-devel@archiver.kernel.org; Thu, 18 Apr 2019 08:56:30 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:38889)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1hH6Yw-0001Lm-K9
-	for qemu-devel@nongnu.org; Thu, 18 Apr 2019 08:54:48 -0400
+	(envelope-from <borntraeger@de.ibm.com>) id 1hH6ZH-0001WL-DH
+	for qemu-devel@nongnu.org; Thu, 18 Apr 2019 08:55:08 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1hH6Yu-0004SO-Th
-	for qemu-devel@nongnu.org; Thu, 18 Apr 2019 08:54:46 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:60104)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <david@redhat.com>)
-	id 1hH6Yu-0004S6-Kw; Thu, 18 Apr 2019 08:54:44 -0400
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
-	[10.5.11.16])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id B8A02319939C;
-	Thu, 18 Apr 2019 12:54:43 +0000 (UTC)
-Received: from [10.36.117.133] (ovpn-117-133.ams2.redhat.com [10.36.117.133])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id DB25C5C205;
-	Thu, 18 Apr 2019 12:54:41 +0000 (UTC)
-To: Christian Borntraeger <borntraeger@de.ibm.com>,
-	Cornelia Huck <cohuck@redhat.com>
+	(envelope-from <borntraeger@de.ibm.com>) id 1hH6ZG-0004aX-8M
+	for qemu-devel@nongnu.org; Thu, 18 Apr 2019 08:55:07 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:38098)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <borntraeger@de.ibm.com>)
+	id 1hH6ZF-0004a9-UD
+	for qemu-devel@nongnu.org; Thu, 18 Apr 2019 08:55:06 -0400
+Received: from pps.filterd (m0098399.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id
+	x3ICrwuY096966
+	for <qemu-devel@nongnu.org>; Thu, 18 Apr 2019 08:55:03 -0400
+Received: from e06smtp07.uk.ibm.com (e06smtp07.uk.ibm.com [195.75.94.103])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2rxq826scy-1
+	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Thu, 18 Apr 2019 08:55:02 -0400
+Received: from localhost
+	by e06smtp07.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	Only! Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <borntraeger@de.ibm.com>;
+	Thu, 18 Apr 2019 13:55:00 +0100
+Received: from b06cxnps3075.portsmouth.uk.ibm.com (9.149.109.195)
+	by e06smtp07.uk.ibm.com (192.168.101.137) with IBM ESMTP SMTP Gateway:
+	Authorized Use Only! Violators will be prosecuted; 
+	(version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
+	Thu, 18 Apr 2019 13:54:57 +0100
+Received: from d06av24.portsmouth.uk.ibm.com (mk.ibm.com [9.149.105.60])
+	by b06cxnps3075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with
+	ESMTP id x3ICsu1560621052
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256
+	verify=OK); Thu, 18 Apr 2019 12:54:56 GMT
+Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 2844642041;
+	Thu, 18 Apr 2019 12:54:56 +0000 (GMT)
+Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id D2F2342042;
+	Thu, 18 Apr 2019 12:54:55 +0000 (GMT)
+Received: from oc7455500831.ibm.com (unknown [9.152.224.131])
+	by d06av24.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+	Thu, 18 Apr 2019 12:54:55 +0000 (GMT)
+To: David Hildenbrand <david@redhat.com>, Cornelia Huck <cohuck@redhat.com>
 References: <20190418113110.160664-1-borntraeger@de.ibm.com>
-	<20190418113110.160664-5-borntraeger@de.ibm.com>
-From: David Hildenbrand <david@redhat.com>
+	<20190418113110.160664-11-borntraeger@de.ibm.com>
+	<e17bf7a1-bd4c-8715-96aa-84b8ad11d99e@redhat.com>
+From: Christian Borntraeger <borntraeger@de.ibm.com>
 Openpgp: preference=signencrypt
-Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
-	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
-	SE+xAvmumFBY
-Organization: Red Hat GmbH
-Message-ID: <f493851a-a723-9982-0342-ea417be0afd2@redhat.com>
-Date: Thu, 18 Apr 2019 14:54:41 +0200
+Autocrypt: addr=borntraeger@de.ibm.com; prefer-encrypt=mutual; keydata=
+	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
+	syiRa+UVlsKmx1hsEg==
+Date: Thu, 18 Apr 2019 14:54:55 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
 	Thunderbird/60.6.1
 MIME-Version: 1.0
-In-Reply-To: <20190418113110.160664-5-borntraeger@de.ibm.com>
+In-Reply-To: <e17bf7a1-bd4c-8715-96aa-84b8ad11d99e@redhat.com>
 Content-Type: text/plain; charset="UTF-8"
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.41]);
-	Thu, 18 Apr 2019 12:54:43 +0000 (UTC)
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH 04/10] s390x/cpumodel: msa9 facility
+X-TM-AS-GCONF: 00
+x-cbid: 19041812-0028-0000-0000-0000036237D1
+X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
+x-cbparentid: 19041812-0029-0000-0000-000024217867
+Message-Id: <9159f68b-fa56-83ef-e9e6-0e79fc1106ac@de.ibm.com>
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:, ,
+	definitions=2019-04-18_06:, , signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+	priorityscore=1501
+	malwarescore=0 suspectscore=0 phishscore=0 bulkscore=0 spamscore=0
+	clxscore=1015 lowpriorityscore=0 mlxscore=0 impostorscore=0
+	mlxlogscore=999 adultscore=0 classifier=spam adjust=0 reason=mlx
+	scancount=1 engine=8.0.1-1810050000 definitions=main-1904180092
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic]
+X-Received-From: 148.163.156.1
+Subject: Re: [Qemu-devel] [PATCH 10/10] s390x/cpumodel: do not claim csske
+ for expanded models in qmp
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -125,192 +157,59 @@ Cc: "Jason J . Herne" <jjherne@linux.ibm.com>,
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190418125441.Pu5kjnvVTPfeY3g2QXyW8qkbEXszfeLajUr9P3ERJyE@z>
+Message-ID: <20190418125455.tAZjGu1tVbg2siBWLKef6N4VZTCjQslWai_KtV6co30@z>
 
-On 18.04.19 13:31, Christian Borntraeger wrote:
-> Provide the MSA9 facility (stfle.155).  This also contains pckmo
-> functions for key wrapping. Keep them in a separate group to allow
-> disabling/enabling those as a block if necessary.
+
+
+On 18.04.19 14:48, David Hildenbrand wrote:
+> On 18.04.19 13:31, Christian Borntraeger wrote:
+>> While we have removed csske and bpb from the default model, the very
+>> common case of "host-model" in libvirt (expanded to a base model
+>> + features) would still contain bpb and csske. This can prevent
+>> migration to a future machine for a host-model machine. Let us fence
+>> bpb and csske when we run on a generation 15. If necessary the
+>> user can still use -cpu 8561,csske=on,bpb=on to force enable these
+>> features.
+>>
+>> Signed-off-by: Christian Borntraeger <borntraeger@de.ibm.com>
+>> ---
+>>  target/s390x/cpu_models.c | 11 +++++++++++
+>>  1 file changed, 11 insertions(+)
+>>
+>> diff --git a/target/s390x/cpu_models.c b/target/s390x/cpu_models.c
+>> index e727519686..03bdca1fb8 100644
+>> --- a/target/s390x/cpu_models.c
+>> +++ b/target/s390x/cpu_models.c
+>> @@ -629,6 +629,17 @@ CpuModelExpansionInfo *qmp_query_cpu_model_expansion(CpuModelExpansionType type,
+>>          return NULL;
+>>      }
+>>  
+>> +    /*
+>> +     * Do not claim CSSKE and BPB if the host model expands to
+>> +     * generation 15 or newer
+>> +     */
+>> +    if (s390_model.def->gen >= 15) {
+>> +        clear_bit(S390_FEAT_CONDITIONAL_SSKE,
+>> +                  (unsigned long *) &s390_model.features);
+>> +        clear_bit(S390_FEAT_BPB,
+>> +                  (unsigned long *) &s390_model.features);
+>> +    }
+>> +
+>>      if (type == CPU_MODEL_EXPANSION_TYPE_STATIC) {
+>>          delta_changes = true;
+>>      } else if (type != CPU_MODEL_EXPANSION_TYPE_FULL) {
+>>
 > 
-> Signed-off-by: Christian Borntraeger <borntraeger@de.ibm.com>
-> ---
->  target/s390x/cpu_features.c     | 32 +++++++++++++++++++++++++
->  target/s390x/cpu_features.h     |  1 +
->  target/s390x/cpu_features_def.h | 31 ++++++++++++++++++++++++
->  target/s390x/cpu_models.c       |  1 +
->  target/s390x/gen-features.c     | 42 +++++++++++++++++++++++++++++++++
->  target/s390x/kvm.c              |  6 +++++
->  6 files changed, 113 insertions(+)
-> 
-> diff --git a/target/s390x/cpu_features.c b/target/s390x/cpu_features.c
-> index bbd8902087..4d624b2256 100644
-> --- a/target/s390x/cpu_features.c
-> +++ b/target/s390x/cpu_features.c
-> @@ -108,6 +108,7 @@ static const S390FeatDef s390_features[] = {
->      FEAT_INIT("irbm", S390_FEAT_TYPE_STFL, 145, "Insert-reference-bits-multiple facility"),
->      FEAT_INIT("msa8-base", S390_FEAT_TYPE_STFL, 146, "Message-security-assist-extension-8 facility (excluding subfunctions)"),
->      FEAT_INIT("cmmnt", S390_FEAT_TYPE_STFL, 147, "CMM: ESSA-enhancement (no translate) facility"),
-> +    FEAT_INIT("msa9-base", S390_FEAT_TYPE_STFL, 155, "Message-security-assist-extension-9 facility (excluding subfunctions)"),
->      FEAT_INIT("etoken", S390_FEAT_TYPE_STFL, 156, "Etoken facility"),
->  
->      /* SCLP SCCB Byte 80 - 98  (bit numbers relative to byte-80) */
-> @@ -242,6 +243,11 @@ static const S390FeatDef s390_features[] = {
->      FEAT_INIT("pckmo-aes-128", S390_FEAT_TYPE_PCKMO, 18, "PCKMO Encrypted-AES-128-Key"),
->      FEAT_INIT("pckmo-aes-192", S390_FEAT_TYPE_PCKMO, 19, "PCKMO Encrypted-AES-192-Key"),
->      FEAT_INIT("pckmo-aes-256", S390_FEAT_TYPE_PCKMO, 20, "PCKMO Encrypted-AES-256-Key"),
-> +    FEAT_INIT("pckmo-ecc-p256", S390_FEAT_TYPE_PCKMO,32, "PCKMO Encrypt-ECC-P256-Key"),
-> +    FEAT_INIT("pckmo-ecc-p384", S390_FEAT_TYPE_PCKMO,33, "PCKMO Encrypt-ECC-P384-Key"),
-> +    FEAT_INIT("pckmo-ecc-p521", S390_FEAT_TYPE_PCKMO,34, "PCKMO Encrypt-ECC-P521-Key"),
-> +    FEAT_INIT("pckmo-ecc-ed25519", S390_FEAT_TYPE_PCKMO,40 , "PCKMO Encrypt-ECC-Ed25519-Key"),
-> +    FEAT_INIT("pckmo-ecc-ed448", S390_FEAT_TYPE_PCKMO,41 , "PCKMO Encrypt-ECC-Ed448-Key"),
->  
->      FEAT_INIT("kmctr-dea", S390_FEAT_TYPE_KMCTR, 1, "KMCTR DEA"),
->      FEAT_INIT("kmctr-tdea-128", S390_FEAT_TYPE_KMCTR, 2, "KMCTR TDEA-128"),
-> @@ -298,6 +304,13 @@ static const S390FeatDef s390_features[] = {
->      FEAT_INIT("pcc-xts-aes-256", S390_FEAT_TYPE_PCC, 52, "PCC Compute-XTS-Parameter-Using-AES-256"),
->      FEAT_INIT("pcc-xts-eaes-128", S390_FEAT_TYPE_PCC, 58, "PCC Compute-XTS-Parameter-Using-Encrypted-AES-128"),
->      FEAT_INIT("pcc-xts-eaes-256", S390_FEAT_TYPE_PCC, 60, "PCC Compute-XTS-Parameter-Using-Encrypted-AES-256"),
-> +    FEAT_INIT("pcc-scalar-mult-p256", S390_FEAT_TYPE_PCC, 64, "PCC Scalar-Multiply-P256"),
-> +    FEAT_INIT("pcc-scalar-mult-p384", S390_FEAT_TYPE_PCC, 65, "PCC Scalar-Multiply-P384"),
-> +    FEAT_INIT("pcc-scalar-mult-p521", S390_FEAT_TYPE_PCC, 66, "PCC Scalar-Multiply-P521"),
-> +    FEAT_INIT("pcc-scalar-mult-ed25519", S390_FEAT_TYPE_PCC, 72, "PCC Scalar-Multiply-Ed25519"),
-> +    FEAT_INIT("pcc-scalar-mult-ed448", S390_FEAT_TYPE_PCC, 73, "PCC Scalar-Multiply-Ed448"),
-> +    FEAT_INIT("pcc-scalar-mult-x25519", S390_FEAT_TYPE_PCC, 80, "PCC Scalar-Multiply-X25519"),
-> +    FEAT_INIT("pcc-scalar-mult-x448", S390_FEAT_TYPE_PCC, 81, "PCC Scalar-Multiply-X448"),
->  
->      FEAT_INIT("ppno-sha-512-drng", S390_FEAT_TYPE_PPNO, 3, "PPNO SHA-512-DRNG"),
->      FEAT_INIT("prno-trng-qrtcr", S390_FEAT_TYPE_PPNO, 112, "PRNO TRNG-Query-Raw-to-Conditioned-Ratio"),
-> @@ -309,6 +322,22 @@ static const S390FeatDef s390_features[] = {
->      FEAT_INIT("kma-gcm-eaes-128", S390_FEAT_TYPE_KMA, 26, "KMA GCM-Encrypted-AES-128"),
->      FEAT_INIT("kma-gcm-eaes-192", S390_FEAT_TYPE_KMA, 27, "KMA GCM-Encrypted-AES-192"),
->      FEAT_INIT("kma-gcm-eaes-256", S390_FEAT_TYPE_KMA, 28, "KMA GCM-Encrypted-AES-256"),
-> +
-> +    FEAT_INIT("kdsa-ecdsa-verify-p256", S390_FEAT_TYPE_KDSA, 1, "KDSA ECDSA-Verify-P256"),
-> +    FEAT_INIT("kdsa-ecdsa-verify-p384", S390_FEAT_TYPE_KDSA, 2, "KDSA ECDSA-Verify-P384"),
-> +    FEAT_INIT("kdsa-ecdsa-verify-p521", S390_FEAT_TYPE_KDSA, 3, "KDSA ECDSA-Verify-P521"),
-> +    FEAT_INIT("kdsa-ecdsa-sign-p256", S390_FEAT_TYPE_KDSA, 9, "KDSA ECDSA-Sign-P256"),
-> +    FEAT_INIT("kdsa-ecdsa-sign-p384", S390_FEAT_TYPE_KDSA, 10, "KDSA ECDSA-Sign-P384"),
-> +    FEAT_INIT("kdsa-ecdsa-sign-p521", S390_FEAT_TYPE_KDSA, 11, "KDSA ECDSA-Sign-P521"),
-> +    FEAT_INIT("kdsa-eecdsa-sign-p256", S390_FEAT_TYPE_KDSA, 17, "KDSA Encrypted-ECDSA-Sign-P256"),
-> +    FEAT_INIT("kdsa-eecdsa-sign-p384", S390_FEAT_TYPE_KDSA, 18, "KDSA Encrypted-ECDSA-Sign-P384"),
-> +    FEAT_INIT("kdsa-eecdsa-sign-p521", S390_FEAT_TYPE_KDSA, 19, "KDSA Encrypted-ECDSA-Sign-P521"),
-> +    FEAT_INIT("kdsa-eddsa-verify-ed25519", S390_FEAT_TYPE_KDSA, 32, "KDSA EdDSA-Verify-Ed25519"),
-> +    FEAT_INIT("kdsa-eddsa-verify-ed448", S390_FEAT_TYPE_KDSA, 36, "KDSA EdDSA-Verify-Ed448"),
-> +    FEAT_INIT("kdsa-eddsa-sign-ed25519", S390_FEAT_TYPE_KDSA, 40, "KDSA EdDSA-Sign-Ed25519"),
-> +    FEAT_INIT("kdsa-eddsa-sign-ed448", S390_FEAT_TYPE_KDSA, 44, "KDSA EdDSA-Sign-Ed448"),
-> +    FEAT_INIT("kdsa-eeddsa-sign-ed25519", S390_FEAT_TYPE_KDSA, 48, "KDSA Encrypted-EdDSA-Sign-Ed25519"),
-> +    FEAT_INIT("kdsa-eeddsa-sign-ed448", S390_FEAT_TYPE_KDSA, 52, "KDSA Encrypted-EdDSA-Sign-Ed448"),
->  };
->  
->  const S390FeatDef *s390_feat_def(S390Feat feat)
-> @@ -371,6 +400,7 @@ void s390_fill_feat_block(const S390FeatBitmap features, S390FeatType type,
->      case S390_FEAT_TYPE_PCC:
->      case S390_FEAT_TYPE_PPNO:
->      case S390_FEAT_TYPE_KMA:
-> +    case S390_FEAT_TYPE_KDSA:
->          set_be_bit(0, data); /* query is always available */
->          break;
->      default:
-> @@ -466,6 +496,8 @@ static S390FeatGroupDef s390_feature_groups[] = {
->      FEAT_GROUP_INIT("msa6", MSA_EXT_6, "Message-security-assist-extension 6 facility"),
->      FEAT_GROUP_INIT("msa7", MSA_EXT_7, "Message-security-assist-extension 7 facility"),
->      FEAT_GROUP_INIT("msa8", MSA_EXT_8, "Message-security-assist-extension 8 facility"),
-> +    FEAT_GROUP_INIT("msa9", MSA_EXT_9, "Message-security-assist-extension 9 facility"),
-> +    FEAT_GROUP_INIT("msa9_pckmo", MSA_EXT_9_PCKMO, "Message-security-assist-extension 9 PCKMO subfunctions"),
->      FEAT_GROUP_INIT("mepochptff", MULTIPLE_EPOCH_PTFF, "PTFF enhancements introduced with Multiple-epoch facility"),
->  };
->  
-> diff --git a/target/s390x/cpu_features.h b/target/s390x/cpu_features.h
-> index effe790271..5ffd3db083 100644
-> --- a/target/s390x/cpu_features.h
-> +++ b/target/s390x/cpu_features.h
-> @@ -39,6 +39,7 @@ typedef enum {
->      S390_FEAT_TYPE_PCC,
->      S390_FEAT_TYPE_PPNO,
->      S390_FEAT_TYPE_KMA,
-> +    S390_FEAT_TYPE_KDSA,
->  } S390FeatType;
->  
->  /* Definition of a CPU feature */
-> diff --git a/target/s390x/cpu_features_def.h b/target/s390x/cpu_features_def.h
-> index 31dd678301..030784811b 100644
-> --- a/target/s390x/cpu_features_def.h
-> +++ b/target/s390x/cpu_features_def.h
-> @@ -96,6 +96,7 @@ typedef enum {
->      S390_FEAT_INSERT_REFERENCE_BITS_MULT,
->      S390_FEAT_MSA_EXT_8,
->      S390_FEAT_CMM_NT,
-> +    S390_FEAT_MSA_EXT_9,
->      S390_FEAT_ETOKEN,
->  
->      /* Sclp Conf Char */
-> @@ -240,6 +241,11 @@ typedef enum {
->      S390_FEAT_PCKMO_AES_128,
->      S390_FEAT_PCKMO_AES_192,
->      S390_FEAT_PCKMO_AES_256,
-> +    S390_FEAT_PCKMO_ECC_P256,
-> +    S390_FEAT_PCKMO_ECC_P384,
-> +    S390_FEAT_PCKMO_ECC_P521,
-> +    S390_FEAT_PCKMO_ECC_ED25519,
-> +    S390_FEAT_PCKMO_ECC_ED448,
->  
->      /* KMCTR */
->      S390_FEAT_KMCTR_DEA,
-> @@ -300,6 +306,13 @@ typedef enum {
->      S390_FEAT_PCC_XTS_AES_256,
->      S390_FEAT_PCC_XTS_EAES_128,
->      S390_FEAT_PCC_XTS_EAES_256,
-> +    S390_FEAT_PCC_SCALAR_MULT_P256,
-> +    S390_FEAT_PCC_SCALAR_MULT_P384,
-> +    S390_FEAT_PCC_SCALAR_MULT_P512,
-> +    S390_FEAT_PCC_SCALAR_MULT_ED25519,
-> +    S390_FEAT_PCC_SCALAR_MULT_ED448,
-> +    S390_FEAT_PCC_SCALAR_MULT_X25519,
-> +    S390_FEAT_PCC_SCALAR_MULT_X448,
->  
->      /* PPNO/PRNO */
->      S390_FEAT_PPNO_SHA_512_DRNG,
-> @@ -313,6 +326,24 @@ typedef enum {
->      S390_FEAT_KMA_GCM_EAES_128,
->      S390_FEAT_KMA_GCM_EAES_192,
->      S390_FEAT_KMA_GCM_EAES_256,
-> +
-> +    /* KDSA */
-> +    S390_FEAT_ECDSA_VERIFY_P256,
-> +    S390_FEAT_ECDSA_VERIFY_P384,
-> +    S390_FEAT_ECDSA_VERIFY_P512,
-> +    S390_FEAT_ECDSA_SIGN_P256,
-> +    S390_FEAT_ECDSA_SIGN_P384,
-> +    S390_FEAT_ECDSA_SIGN_P512,
-> +    S390_FEAT_EECDSA_SIGN_P256,
-> +    S390_FEAT_EECDSA_SIGN_P384,
-> +    S390_FEAT_EECDSA_SIGN_P512,
-> +    S390_FEAT_EDDSA_VERIFY_ED25519,
-> +    S390_FEAT_EDDSA_VERIFY_ED448,
-> +    S390_FEAT_EDDSA_SIGN_ED25519,
-> +    S390_FEAT_EDDSA_SIGN_ED448,
-> +    S390_FEAT_EEDDSA_SIGN_ED25519,
-> +    S390_FEAT_EEDDSA_SIGN_ED448,
-> +
->      S390_FEAT_MAX,
->  } S390Feat;
->  
-> diff --git a/target/s390x/cpu_models.c b/target/s390x/cpu_models.c
-> index 4e5aa879f3..4c355e936e 100644
-> --- a/target/s390x/cpu_models.c
-> +++ b/target/s390x/cpu_models.c
-> @@ -808,6 +808,7 @@ static void check_consistency(const S390CPUModel *model)
->          { S390_FEAT_SIE_CMMA, S390_FEAT_SIE_GSLS },
->          { S390_FEAT_SIE_PFMFI, S390_FEAT_EDAT },
->          { S390_FEAT_MSA_EXT_8, S390_FEAT_MSA_EXT_3 },
-> +        { S390_FEAT_MSA_EXT_9, S390_FEAT_MSA_EXT_3 },
+> The bad thing about it is, it hinders migration *to* this hw generation.
 
-This is sufficient to handle key wrapping, right?
+It does not, at least not with todays libvirt. It will happily ask for
+-cpu z14,bpb=on and the guest will have it. the current checking is done
+by starting a qemu with a "wished" model and then check for success. 
+
+PS: I tested that with managedsave
 
 
--- 
+> Will have to think about this some more. As alternative, simply ignore
+> S390_FEAT_CONDITIONAL_SSKE and S390_FEAT_BPB when baselining/comparing.
 
-Thanks,
-
-David / dhildenb
 
