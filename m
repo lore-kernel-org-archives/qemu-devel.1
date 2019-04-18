@@ -2,66 +2,59 @@ Return-Path: <SRS0=08iY=SU=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.3 required=3.0 tests=FROM_EXCESS_BASE64,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_MUTT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1C2E6C10F0E
-	for <qemu-devel@archiver.kernel.org>; Thu, 18 Apr 2019 11:42:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A820AC10F0E
+	for <qemu-devel@archiver.kernel.org>; Thu, 18 Apr 2019 11:45:50 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id DEC552183E
-	for <qemu-devel@archiver.kernel.org>; Thu, 18 Apr 2019 11:42:42 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DEC552183E
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 6A3592183E
+	for <qemu-devel@archiver.kernel.org>; Thu, 18 Apr 2019 11:45:50 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6A3592183E
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=rt-rk.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:39967 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:40019 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hH5RC-0002dJ-5Z
-	for qemu-devel@archiver.kernel.org; Thu, 18 Apr 2019 07:42:42 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:51165)
+	id 1hH5UD-0004CC-JD
+	for qemu-devel@archiver.kernel.org; Thu, 18 Apr 2019 07:45:49 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:53511)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1hH5Hu-000466-6A
-	for qemu-devel@nongnu.org; Thu, 18 Apr 2019 07:33:08 -0400
+	(envelope-from <mateja.marjanovic@rt-rk.com>) id 1hH5SV-000374-Oe
+	for qemu-devel@nongnu.org; Thu, 18 Apr 2019 07:44:05 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1hH5Ht-0006Zi-2W
-	for qemu-devel@nongnu.org; Thu, 18 Apr 2019 07:33:06 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:48324)
+	(envelope-from <mateja.marjanovic@rt-rk.com>) id 1hH5ST-0006N5-5o
+	for qemu-devel@nongnu.org; Thu, 18 Apr 2019 07:44:03 -0400
+Received: from mx2.rt-rk.com ([89.216.37.149]:45474 helo=mail.rt-rk.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>)
-	id 1hH5Hq-0006Vq-H4; Thu, 18 Apr 2019 07:33:02 -0400
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
-	[10.5.11.22])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 79726306C9FF;
-	Thu, 18 Apr 2019 11:32:56 +0000 (UTC)
-Received: from redhat.com (ovpn-112-59.ams2.redhat.com [10.36.112.59])
-	by smtp.corp.redhat.com (Postfix) with ESMTPS id 9602B1001DC8;
-	Thu, 18 Apr 2019 11:32:52 +0000 (UTC)
-Date: Thu, 18 Apr 2019 12:32:49 +0100
-From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-To: Kevin Wolf <kwolf@redhat.com>
-Message-ID: <20190418113249.GP13773@redhat.com>
-References: <20190417115343.30527-1-pbonzini@redhat.com>
-	<CAJSP0QWtW3L54SC2FuWwc_Eu9DQnHw0eWWM1bUtGRrwwbFTyiQ@mail.gmail.com>
-	<cf51d357-d9c0-3a20-1d23-7f6671d7948a@redhat.com>
-	<20190418104737.GC5242@linux.fritz.box>
+	(Exim 4.71) (envelope-from <mateja.marjanovic@rt-rk.com>)
+	id 1hH5SP-0004tR-Mp
+	for qemu-devel@nongnu.org; Thu, 18 Apr 2019 07:44:01 -0400
+Received: from localhost (localhost [127.0.0.1])
+	by mail.rt-rk.com (Postfix) with ESMTP id D1DBA1A2436;
+	Thu, 18 Apr 2019 13:42:52 +0200 (CEST)
+X-Virus-Scanned: amavisd-new at rt-rk.com
+Received: from rtrkw310-lin.domain.local (rtrkw310-lin.domain.local
+	[10.10.13.97])
+	by mail.rt-rk.com (Postfix) with ESMTPSA id A66C51A2023;
+	Thu, 18 Apr 2019 13:42:52 +0200 (CEST)
+From: Mateja Marjanovic <mateja.marjanovic@rt-rk.com>
+To: qemu-devel@nongnu.org
+Date: Thu, 18 Apr 2019 13:42:41 +0200
+Message-Id: <1555587766-985-2-git-send-email-mateja.marjanovic@rt-rk.com>
+X-Mailer: git-send-email 2.7.4
+In-Reply-To: <1555587766-985-1-git-send-email-mateja.marjanovic@rt-rk.com>
+References: <1555587766-985-1-git-send-email-mateja.marjanovic@rt-rk.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="UTF-8"
-Content-Disposition: inline
-In-Reply-To: <20190418104737.GC5242@linux.fritz.box>
-User-Agent: Mutt/1.11.3 (2019-02-01)
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.43]);
-	Thu, 18 Apr 2019 11:32:56 +0000 (UTC)
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [Qemu-block] [PATCH] scsi-generic: prevent guest
- from exceeding SG_IO limits
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x
+X-Received-From: 89.216.37.149
+Subject: [Qemu-devel] [PATCH v8 1/6] target/mips: Optimize ILVOD.<B|H|W|D>
+ MSA instructions
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -73,59 +66,231 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-Cc: qemu block <qemu-block@nongnu.org>, Stefan Hajnoczi <stefanha@gmail.com>,
-	qemu-stable <qemu-stable@nongnu.org>, qemu-devel <qemu-devel@nongnu.org>,
-	Stefan Hajnoczi <stefanha@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
+Cc: arikalo@wavecomp.com, richard.henderson@linaro.org, philmd@redhat.com,
+	amarkovic@wavecomp.com, aurelien@aurel32.net
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190418113249.-BswL_NFyWSul-7qg92jmMQ61tcbP9xBfC3-qsUBo5g@z>
+Message-ID: <20190418114241.ZdcgTR_gcshW0SpLBT48hilnvbbfYg_lWdo5tmW8PMY@z>
 
-On Thu, Apr 18, 2019 at 12:47:37PM +0200, Kevin Wolf wrote:
-> Am 18.04.2019 um 11:48 hat Paolo Bonzini geschrieben:
-> > On 17/04/19 14:30, Stefan Hajnoczi wrote:
-> > > On Wed, Apr 17, 2019 at 12:54 PM Paolo Bonzini <pbonzini@redhat.com> wrote:
-> > >> Linux places a limit of UIO_MAXIOV pages on SG_IO ioctls (and if the limit
-> > >> is exceeded, a confusing ENOMEM error is returned[1]).  Prevent the guest
-> > >> from exceeding these limits, by capping the maximum transfer length to
-> > >> that value in the block limits VPD page.
-> > >>
-> > >> [1] Oh well, at least it was easier to follow the kernel source knowing
-> > >>     it had to end as ENOMEM...
-> > >>
-> > >> Cc: qemu-stable@nongnu.org
-> > >> Cc: qemu-block@nongnu.org
-> > >> Cc: Stefan Hajnoczi <stefanha@redhat.com>
-> > >> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
-> > >> ---
-> > >>  hw/scsi/scsi-generic.c | 17 +++++++++++++----
-> > >>  1 file changed, 13 insertions(+), 4 deletions(-)
-> > > 
-> > > Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
-> > > 
-> > 
-> > This is acually only an issue with kernels prior to 4.5, so it should be
-> > fixed downstream instead.
-> 
-> I don't think that upstream QEMU has kernels > 4.5 as an official
-> requirement, though? We try to be compatible with quite old libs, so we
-> should stay compatible with old kernels, too.
+From: Mateja Marjanovic <Mateja.Marjanovic@rt-rk.com>
 
-We've not explicitly stated or checked a min kernel version, but our
-min kernel is defined implicitly by our targetted build platforms:
+Optimize set of MSA instructions ILVOD.<B|H|W|D>, using
+directly tcg registers and performing logic on them instead
+of using helpers.
 
-  https://qemu.weilnetz.de/doc/qemu-doc.html#Supported-build-platforms
+In the following table, the first column is the performance
+before this patch. The second represents the performance
+after converting from helpers to tcg, but without using
+tcg_gen_deposit function. The third one is with the deposit
+function and with using a uint64_t constant bit mask, and
+the fourth is with the deposit function and with a mask
+which is a tcg constant. The fourth is implemented in this
+patch.
 
-The oldest Linux distro under those rules is RHEL-7 (3.10.0), since
-Debian Jessie actually updates its kernel version so is already on
-version 4.5
+Performance measurement is done by executing the
+instructions 10 million times on a computer
+with Intel Core i7-3770 CPU @ 3.40GHz=C3=978.
 
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+|| instruction ||     1     ||     2    ||     3    ||     4    ||
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+||   ilvod.b   || 117.50 ms || 24.13 ms || 24.45 ms || 23.24 ms ||
+||   ilvod.h   ||  93.16 ms || 24.21 ms || 24.28 ms || 23.20 ms ||
+||   ilvod.w   || 119.90 ms || 24.15 ms || 23.19 ms || 22.95 ms ||
+||   ilvod.d   ||  43.01 ms || 21.17 ms || 23.07 ms || 22.59 ms ||
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+1 - before
+2 - no-deposit-no-mask-as-tcg-constant
+3 - with-deposit-no-mask-as-tcg-constant
+4 - with-deposit-with-mask-as-tcg-constant (final)
 
-Regards,
-Daniel
--- 
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
+The deposit function is used only in ILVOD.W.
+
+No-deposit version of the ILVOD.W implementation:
+
+static inline void gen_ilvod_w(CPUMIPSState *env, uint32_t wd,
+                               uint32_t ws, uint32_t wt)
+{
+    TCGv_i64 t1 =3D tcg_temp_new_i64();
+    TCGv_i64 t2 =3D tcg_temp_new_i64();
+    TCGv_i64 mask =3D tcg_const_i64(0xffffffff00000000ULL);
+
+    tcg_gen_and_i64(t1, msa_wr_d[wt * 2], mask);
+    tcg_gen_shri_i64(t1, t1, 32);
+    tcg_gen_and_i64(t2, msa_wr_d[ws * 2], mask);
+    tcg_gen_or_i64(msa_wr_d[wd * 2], t1, t2);
+
+    tcg_gen_and_i64(t1, msa_wr_d[wt * 2 + 1], mask);
+    tcg_gen_shri_i64(t1, t1, 32);
+    tcg_gen_and_i64(t2, msa_wr_d[ws * 2 + 1], mask);
+    tcg_gen_or_i64(msa_wr_d[wd * 2 + 1], t1, t2);
+
+    tcg_temp_free_i64(mask);
+    tcg_temp_free_i64(t1);
+    tcg_temp_free_i64(t2);
+}
+
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+Suggested-by: Richard Henderson <richard.henderson@linaro.org>
+Signed-off-by: Mateja Marjanovic <mateja.marjanovic@rt-rk.com>
+---
+ target/mips/helper.h     |  1 -
+ target/mips/msa_helper.c |  7 ----
+ target/mips/translate.c  | 91 ++++++++++++++++++++++++++++++++++++++++++=
++++++-
+ 3 files changed, 90 insertions(+), 9 deletions(-)
+
+diff --git a/target/mips/helper.h b/target/mips/helper.h
+index a6d687e..d162836 100644
+--- a/target/mips/helper.h
++++ b/target/mips/helper.h
+@@ -865,7 +865,6 @@ DEF_HELPER_5(msa_pckod_df, void, env, i32, i32, i32, =
+i32)
+ DEF_HELPER_5(msa_ilvl_df, void, env, i32, i32, i32, i32)
+ DEF_HELPER_5(msa_ilvr_df, void, env, i32, i32, i32, i32)
+ DEF_HELPER_5(msa_ilvev_df, void, env, i32, i32, i32, i32)
+-DEF_HELPER_5(msa_ilvod_df, void, env, i32, i32, i32, i32)
+ DEF_HELPER_5(msa_vshf_df, void, env, i32, i32, i32, i32)
+ DEF_HELPER_5(msa_srar_df, void, env, i32, i32, i32, i32)
+ DEF_HELPER_5(msa_srlr_df, void, env, i32, i32, i32, i32)
+diff --git a/target/mips/msa_helper.c b/target/mips/msa_helper.c
+index c74e3cd..9e52a31 100644
+--- a/target/mips/msa_helper.c
++++ b/target/mips/msa_helper.c
+@@ -1206,13 +1206,6 @@ MSA_FN_DF(ilvr_df)
+ MSA_FN_DF(ilvev_df)
+ #undef MSA_DO
+=20
+-#define MSA_DO(DF)                          \
+-    do {                                    \
+-        pwx->DF[2*i]   =3D pwt->DF[2*i+1];    \
+-        pwx->DF[2*i+1] =3D pws->DF[2*i+1];    \
+-    } while (0)
+-MSA_FN_DF(ilvod_df)
+-#undef MSA_DO
+ #undef MSA_LOOP_COND
+=20
+ #define MSA_LOOP_COND(DF) \
+diff --git a/target/mips/translate.c b/target/mips/translate.c
+index 364bd6d..99bd441 100644
+--- a/target/mips/translate.c
++++ b/target/mips/translate.c
+@@ -28001,6 +28001,80 @@ static void gen_msa_bit(CPUMIPSState *env, Disas=
+Context *ctx)
+     tcg_temp_free_i32(tws);
+ }
+=20
++/*
++ * [MSA] ILVOD.<B|H> wd, ws, wt
++ *
++ *   Vector Interleave Odd (<byte|halfword> data elements)
++ *
++ */
++static inline void gen_ilvod_bh(CPUMIPSState *env, uint32_t wd,
++                                uint32_t ws, uint32_t wt,
++                                uint64_t mask, uint32_t shift)
++{
++    TCGv_i64 t1 =3D tcg_temp_new_i64();
++    TCGv_i64 t2 =3D tcg_temp_new_i64();
++    TCGv_i64 mask_tcg =3D tcg_const_i64(mask);
++
++    tcg_gen_and_i64(t1, msa_wr_d[wt * 2], mask_tcg);
++    tcg_gen_shri_i64(t1, t1, shift);
++    tcg_gen_and_i64(t2, msa_wr_d[ws * 2], mask_tcg);
++    tcg_gen_or_i64(msa_wr_d[wd * 2], t1, t2);
++
++    tcg_gen_and_i64(t1, msa_wr_d[wt * 2 + 1], mask_tcg);
++    tcg_gen_shri_i64(t1, t1, shift);
++    tcg_gen_and_i64(t2, msa_wr_d[ws * 2 + 1], mask_tcg);
++    tcg_gen_or_i64(msa_wr_d[wd * 2 + 1], t1, t2);
++
++    tcg_temp_free_i64(mask_tcg);
++    tcg_temp_free_i64(t1);
++    tcg_temp_free_i64(t2);
++}
++
++static inline void gen_ilvod_b(CPUMIPSState *env, uint32_t wd,
++                               uint32_t ws, uint32_t wt)
++{
++    gen_ilvod_bh(env, wd, ws, wt, 0xff00ff00ff00ff00ULL, 8);
++}
++
++static inline void gen_ilvod_h(CPUMIPSState *env, uint32_t wd,
++                               uint32_t ws, uint32_t wt)
++{
++    gen_ilvod_bh(env, wd, ws, wt, 0xffff0000ffff0000ULL, 16);
++}
++
++/*
++ * [MSA] ILVOD.W wd, ws, wt
++ *
++ *   Vector Interleave Odd (word data elements)
++ *
++ */
++static inline void gen_ilvod_w(CPUMIPSState *env, uint32_t wd,
++                               uint32_t ws, uint32_t wt)
++{
++    TCGv_i64 t1 =3D tcg_temp_new_i64();
++
++    tcg_gen_shri_i64(t1, msa_wr_d[wt * 2], 32);
++    tcg_gen_deposit_i64(msa_wr_d[wd * 2], msa_wr_d[ws * 2], t1, 0, 32);
++
++    tcg_gen_shri_i64(t1, msa_wr_d[wt * 2 + 1], 32);
++    tcg_gen_deposit_i64(msa_wr_d[wd * 2 + 1], msa_wr_d[ws * 2 + 1], t1, =
+0, 32);
++
++    tcg_temp_free_i64(t1);
++}
++
++/*
++ * [MSA] ILVOD.D wd, ws, wt
++ *
++ *   Vector Interleave Odd (doubleword data elements)
++ *
++ */
++static inline void gen_ilvod_d(CPUMIPSState *env, uint32_t wd,
++                               uint32_t ws, uint32_t wt)
++{
++    tcg_gen_mov_i64(msa_wr_d[wd * 2], msa_wr_d[wt * 2 + 1]);
++    tcg_gen_mov_i64(msa_wr_d[wd * 2 + 1], msa_wr_d[ws * 2 + 1]);
++}
++
+ static void gen_msa_3r(CPUMIPSState *env, DisasContext *ctx)
+ {
+ #define MASK_MSA_3R(op)    (MASK_MSA_MINOR(op) | (op & (0x7 << 23)))
+@@ -28172,7 +28246,22 @@ static void gen_msa_3r(CPUMIPSState *env, DisasC=
+ontext *ctx)
+         gen_helper_msa_mod_u_df(cpu_env, tdf, twd, tws, twt);
+         break;
+     case OPC_ILVOD_df:
+-        gen_helper_msa_ilvod_df(cpu_env, tdf, twd, tws, twt);
++        switch (df) {
++        case DF_BYTE:
++            gen_ilvod_b(env, wd, ws, wt);
++            break;
++        case DF_HALF:
++            gen_ilvod_h(env, wd, ws, wt);
++            break;
++        case DF_WORD:
++            gen_ilvod_w(env, wd, ws, wt);
++            break;
++        case DF_DOUBLE:
++            gen_ilvod_d(env, wd, ws, wt);
++            break;
++        default:
++            assert(0);
++        }
+         break;
+=20
+     case OPC_DOTP_S_df:
+--=20
+2.7.4
+
 
