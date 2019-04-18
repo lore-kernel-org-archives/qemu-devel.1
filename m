@@ -1,19 +1,37 @@
-Received: from eggs.gnu.org ([209.51.188.92]:47416)
+Received: from eggs.gnu.org ([209.51.188.92]:47510)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1hHBQb-0006VP-It
-	for qemu-devel@nongnu.org; Thu, 18 Apr 2019 14:06:30 -0400
+	(envelope-from <jo@durchholz.org>) id 1hHBR2-0006oW-OE
+	for qemu-devel@nongnu.org; Thu, 18 Apr 2019 14:06:57 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1hHBQX-0004Ii-PE
-	for qemu-devel@nongnu.org; Thu, 18 Apr 2019 14:06:28 -0400
-From: Thomas Huth <thuth@redhat.com>
-Date: Thu, 18 Apr 2019 20:00:57 +0200
-Message-Id: <20190418180057.3593-30-thuth@redhat.com>
-In-Reply-To: <20190418180057.3593-1-thuth@redhat.com>
-References: <20190418180057.3593-1-thuth@redhat.com>
+	(envelope-from <jo@durchholz.org>) id 1hHBQy-0004pl-VX
+	for qemu-devel@nongnu.org; Thu, 18 Apr 2019 14:06:54 -0400
+Received: from 5.itsy.de ([188.40.84.14]:59843)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <jo@durchholz.org>) id 1hHBQt-0004Yj-RT
+	for qemu-devel@nongnu.org; Thu, 18 Apr 2019 14:06:48 -0400
+Received: from [192.168.178.32] (unknown [195.48.33.209])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+	(No client certificate requested)
+	by 5.itsy.de (Postfix) with ESMTPSA id 8428B2C8C5D
+	for <qemu-devel@nongnu.org>; Thu, 18 Apr 2019 20:06:32 +0200 (CEST)
+References: <874f0f8e-780e-6600-e11b-b97f5b055cf8@durchholz.org>
+	<dbd6541e-5013-d0bc-b23e-a8de4f4cd171@redhat.com>
+	<20190416072430.dp742ehg27drpplb@sirius.home.kraxel.org>
+	<00f0ada2-a68b-2264-ab72-f49fe7d654e7@durchholz.org>
+	<20190417071012.fxedabu3makmoyuz@sirius.home.kraxel.org>
+	<993002d4-28dd-00f0-e8c1-7b0d9ab2de12@durchholz.org>
+	<4ce336d0-6651-286f-07ee-3a5b3236309a@redhat.com>
+	<55326d4f-d7a9-cf38-20ff-846d7d3d64fd@durchholz.org>
+	<388b90ee-cb50-0a2d-3675-e7e8b37adcd4@redhat.com>
+From: Joachim Durchholz <jo@durchholz.org>
+Message-ID: <2c18854c-4728-942b-3a3f-77c0bb88244e@durchholz.org>
+Date: Thu, 18 Apr 2019 20:06:32 +0200
 MIME-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH for-QEMU-4.1 v5 29/29] hw/arm: Remove
- hard-enablement of the remaining PCI devices
+In-Reply-To: <388b90ee-cb50-0a2d-3675-e7e8b37adcd4@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-GB
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] curses.c: "We need a terminal output" ?
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,37 +40,27 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: yang.zhong@intel.com, Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org, pbonzini@redhat.com
-Cc: Beniamino Galvani <b.galvani@gmail.com>, Jan Kiszka <jan.kiszka@web.de>, Antony Pavlov <antonynpavlov@gmail.com>, Peter Chubb <peter.chubb@nicta.com.au>, qemu-block@nongnu.org, Cedric Le Goater <clg@kaod.org>, "Michael S. Tsirkin" <mst@redhat.com>, Andrew Jeffery <andrew@aj.id.au>, Igor Mitsyanko <i.mitsyanko@gmail.com>, Andrey Smirnov <andrew.smirnov@gmail.com>, Rob Herring <robh@kernel.org>, qemu-arm@nongnu.org, Andrzej Zaborowski <balrogg@gmail.com>, John Snow <jsnow@redhat.com>, Joel Stanley <joel@jms.id.au>, "Edgar E . Iglesias" <edgar.iglesias@gmail.com>, Jean-Christophe Dubois <jcd@tribudubois.net>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, Philippe Mathieu-Daude <f4bug@amsat.org>, Alistair Francis <alistair@alistair23.me>, Subbaraya Sundeep <sundeep.lkml@gmail.com>, Gerd Hoffmann <kraxel@redhat.com>
+To: qemu-devel@nongnu.org
 
-The PCI devices should be pulled in by default if PCI_DEVICES
-is set, so there is no need anymore to enforce them in the configs
-file.
+Am 18.04.19 um 13:02 schrieb Laszlo Ersek:
+> On 04/18/19 07:02, Joachim Durchholz wrote:
+>> Am 17.04.19 um 20:27 schrieb Laszlo Ersek:
+>>> So, let's look at your original question again (which was not a problem
+>>> statement):
+>>
+>> So you need an explicit problem statement to know that somebody might
+>> have a problem?
+> 
+> You're on a technical mailing list. An explicit problem statement is
+> instrumental for subscribers to understand the particulars of the
+> problem.
 
-Signed-off-by: Thomas Huth <thuth@redhat.com>
----
- default-configs/arm-softmmu.mak | 8 --------
- 1 file changed, 8 deletions(-)
+Yeah okay, another person who prefers to dismiss points raised on the 
+basis of formalities.
+The technical term for that behaviour is "passive-aggressive behaviour", 
+and I have seen enough of that.
 
-diff --git a/default-configs/arm-softmmu.mak b/default-configs/arm-softmm=
-u.mak
-index 233937f394..f23ecfd5c5 100644
---- a/default-configs/arm-softmmu.mak
-+++ b/default-configs/arm-softmmu.mak
-@@ -36,14 +36,6 @@ CONFIG_DIGIC=3Dy
- CONFIG_SABRELITE=3Dy
- CONFIG_EMCRAFT_SF2=3Dy
- CONFIG_MICROBIT=3Dy
--
--CONFIG_VGA=3Dy
--
- CONFIG_FSL_IMX25=3Dy
- CONFIG_FSL_IMX7=3Dy
- CONFIG_FSL_IMX6UL=3Dy
--
--CONFIG_PCIE_PORT=3Dy
--CONFIG_XIO3130=3Dy
--CONFIG_IOH3420=3Dy
--CONFIG_I82801B11=3Dy
---=20
-2.21.0
+As I said, I have stayed to answer questions that show genuine interest 
+- that's not the case, so I'm off.
+
+/logoff
