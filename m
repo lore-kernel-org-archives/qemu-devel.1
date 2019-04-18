@@ -3,60 +3,64 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
 X-Spam-Status: No, score=-6.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED
-	autolearn=ham autolearn_force=no version=3.4.0
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 81504C10F0E
-	for <qemu-devel@archiver.kernel.org>; Thu, 18 Apr 2019 20:43:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 621F6C10F14
+	for <qemu-devel@archiver.kernel.org>; Thu, 18 Apr 2019 20:43:37 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 56B18214DA
-	for <qemu-devel@archiver.kernel.org>; Thu, 18 Apr 2019 20:43:32 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 56B18214DA
+	by mail.kernel.org (Postfix) with ESMTPS id 22734214DA
+	for <qemu-devel@archiver.kernel.org>; Thu, 18 Apr 2019 20:43:37 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 22734214DA
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:46967 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:46971 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hHDsZ-0000S5-Fx
-	for qemu-devel@archiver.kernel.org; Thu, 18 Apr 2019 16:43:31 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:51243)
+	id 1hHDse-0000XH-Bp
+	for qemu-devel@archiver.kernel.org; Thu, 18 Apr 2019 16:43:36 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:51287)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1hHDnx-0001J3-39
-	for qemu-devel@nongnu.org; Thu, 18 Apr 2019 16:38:47 -0400
+	(envelope-from <armbru@redhat.com>) id 1hHDnz-0001Oy-1w
+	for qemu-devel@nongnu.org; Thu, 18 Apr 2019 16:38:48 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1hHDnv-0002dn-Ls
-	for qemu-devel@nongnu.org; Thu, 18 Apr 2019 16:38:45 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:49230)
+	(envelope-from <armbru@redhat.com>) id 1hHDnw-0002fv-QL
+	for qemu-devel@nongnu.org; Thu, 18 Apr 2019 16:38:46 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:42088)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1hHDnv-0002c4-Dy
-	for qemu-devel@nongnu.org; Thu, 18 Apr 2019 16:38:43 -0400
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
-	[10.5.11.12])
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1hHDnw-0002eF-Hp
+	for qemu-devel@nongnu.org; Thu, 18 Apr 2019 16:38:44 -0400
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+	[10.5.11.23])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 556B53076C60
-	for <qemu-devel@nongnu.org>; Thu, 18 Apr 2019 20:38:42 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id C8568308A10D
+	for <qemu-devel@nongnu.org>; Thu, 18 Apr 2019 20:38:43 +0000 (UTC)
 Received: from blackfin.pond.sub.org (ovpn-116-116.ams2.redhat.com
 	[10.36.116.116])
-	by smtp.corp.redhat.com (Postfix) with ESMTPS id 004A460BEC
-	for <qemu-devel@nongnu.org>; Thu, 18 Apr 2019 20:38:41 +0000 (UTC)
+	by smtp.corp.redhat.com (Postfix) with ESMTPS id 6E1EC19C58
+	for <qemu-devel@nongnu.org>; Thu, 18 Apr 2019 20:38:43 +0000 (UTC)
 Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
-	id 6945D1132BB6; Thu, 18 Apr 2019 22:38:40 +0200 (CEST)
+	id 97E3111329CD; Thu, 18 Apr 2019 22:38:40 +0200 (CEST)
 From: Markus Armbruster <armbru@redhat.com>
 To: qemu-devel@nongnu.org
-Date: Thu, 18 Apr 2019 22:38:32 +0200
-Message-Id: <20190418203840.10528-2-armbru@redhat.com>
+Date: Thu, 18 Apr 2019 22:38:39 +0200
+Message-Id: <20190418203840.10528-9-armbru@redhat.com>
 In-Reply-To: <20190418203840.10528-1-armbru@redhat.com>
 References: <20190418203840.10528-1-armbru@redhat.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+MIME-Version: 1.0
+Content-Type: text/plain; charset="UTF-8"
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.48]);
-	Thu, 18 Apr 2019 20:38:42 +0000 (UTC)
+	(mx1.redhat.com [10.5.110.44]);
+	Thu, 18 Apr 2019 20:38:43 +0000 (UTC)
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] [PULL for-4.1 1/9] Clean up includes
+Subject: [Qemu-devel] [PULL for-4.1 8/9] Normalize header guard symbol
+ definition.
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -71,181 +75,192 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Content-Type: text/plain; charset="UTF-8"
-Message-ID: <20190418203832.i1Ajh7rYqsBfSzH533o9U57eHIwJ6l8TQjwAtQsaXXk@z>
+Message-ID: <20190418203839.aWa9iJqgR-4FtACiNy6jG7Vw43ZrZVW_xGs2eSvd1GM@z>
 
-Clean up includes so that osdep.h is included first and headers
-which it implies are not included manually.
+We commonly define the header guard symbol without an explicit value.
+Normalize the exceptions.
 
-This commit was created with scripts/clean-includes, with the changes
-to the following files manually reverted:
-
-    contrib/libvhost-user/libvhost-user-glib.h
-    contrib/libvhost-user/libvhost-user.c
-    contrib/libvhost-user/libvhost-user.h
-    linux-user/mips64/cpu_loop.c
-    linux-user/mips64/signal.c
-    linux-user/sparc64/cpu_loop.c
-    linux-user/sparc64/signal.c
-    linux-user/x86_64/cpu_loop.c
-    linux-user/x86_64/signal.c
-    slirp/src/*
-    target/s390x/gen-features.c
-    tests/migration/s390x/a-b-bios.c
-    tests/test-rcu-simpleq.c
-    tests/test-rcu-tailq.c
-    tests/uefi-test-tools/UefiTestToolsPkg/BiosTablesTest/BiosTablesTest.c
-
-We're in the process of spinning out slirp/.  tests/uefi-test-tools/
-is guest software.  The remaining reverts are the same as in commit
-b7d89466dde.
+Done with scripts/clean-header-guards.pl.
 
 Signed-off-by: Markus Armbruster <armbru@redhat.com>
-Message-Id: <20190313162812.8885-1-armbru@redhat.com>
-Reviewed-by: Eric Blake <eblake@redhat.com>
+Message-Id: <20190315145123.28030-8-armbru@redhat.com>
+Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
 ---
- contrib/elf2dmp/main.c   | 3 +--
- contrib/elf2dmp/pdb.c    | 3 +--
- hw/display/ati.c         | 1 +
- hw/display/ati_2d.c      | 1 +
- hw/display/ati_dbg.c     | 1 +
- hw/display/ati_int.h     | 1 -
- include/hw/cpu/cluster.h | 1 -
- tests/fp/platform.h      | 1 -
- tests/libqos/qgraph.h    | 4 ----
- tests/qos-test.c         | 2 +-
- 10 files changed, 6 insertions(+), 12 deletions(-)
+ hw/timer/m48t59-internal.h    | 3 ++-
+ include/disas/capstone.h      | 2 +-
+ include/hw/scsi/emulation.h   | 2 +-
+ include/qemu/stats64.h        | 2 +-
+ include/qemu/sys_membarrier.h | 2 +-
+ include/qemu/systemd.h        | 2 +-
+ include/scsi/utils.h          | 2 +-
+ include/ui/kbd-state.h        | 3 ++-
+ scsi/pr-helper.h              | 3 ++-
+ target/i386/hvf/x86.h         | 2 +-
+ target/i386/hvf/x86_decode.h  | 2 +-
+ target/i386/hvf/x86_descr.h   | 2 +-
+ 12 files changed, 15 insertions(+), 12 deletions(-)
 
-diff --git a/contrib/elf2dmp/main.c b/contrib/elf2dmp/main.c
-index 1bfeb89ba7..9a2dbc2902 100644
---- a/contrib/elf2dmp/main.c
-+++ b/contrib/elf2dmp/main.c
-@@ -5,9 +5,8 @@
-  *
+diff --git a/hw/timer/m48t59-internal.h b/hw/timer/m48t59-internal.h
+index d0f0caf3c7..4d4f2a6fed 100644
+--- a/hw/timer/m48t59-internal.h
++++ b/hw/timer/m48t59-internal.h
+@@ -22,8 +22,9 @@
+  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALING=
+S IN
+  * THE SOFTWARE.
   */
- 
--#include <inttypes.h>
--
- #include "qemu/osdep.h"
 +
- #include "err.h"
- #include "addrspace.h"
- #include "pe.h"
-diff --git a/contrib/elf2dmp/pdb.c b/contrib/elf2dmp/pdb.c
-index 64af20f584..a5bd40c99d 100644
---- a/contrib/elf2dmp/pdb.c
-+++ b/contrib/elf2dmp/pdb.c
-@@ -18,9 +18,8 @@
-  * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301, USA
+ #ifndef HW_M48T59_INTERNAL_H
+-#define HW_M48T59_INTERNAL_H 1
++#define HW_M48T59_INTERNAL_H
+=20
+ #define M48T59_DEBUG 0
+=20
+diff --git a/include/disas/capstone.h b/include/disas/capstone.h
+index 84e214956d..e29068dd97 100644
+--- a/include/disas/capstone.h
++++ b/include/disas/capstone.h
+@@ -1,5 +1,5 @@
+ #ifndef QEMU_CAPSTONE_H
+-#define QEMU_CAPSTONE_H 1
++#define QEMU_CAPSTONE_H
+=20
+ #ifdef CONFIG_CAPSTONE
+=20
+diff --git a/include/hw/scsi/emulation.h b/include/hw/scsi/emulation.h
+index 09fba1ff39..9521704326 100644
+--- a/include/hw/scsi/emulation.h
++++ b/include/hw/scsi/emulation.h
+@@ -1,5 +1,5 @@
+ #ifndef HW_SCSI_EMULATION_H
+-#define HW_SCSI_EMULATION_H 1
++#define HW_SCSI_EMULATION_H
+=20
+ typedef struct SCSIBlockLimits {
+     bool wsnz;
+diff --git a/include/qemu/stats64.h b/include/qemu/stats64.h
+index 4a357b3e9d..19a5ac4c56 100644
+--- a/include/qemu/stats64.h
++++ b/include/qemu/stats64.h
+@@ -10,7 +10,7 @@
   */
- 
--#include <inttypes.h>
--
- #include "qemu/osdep.h"
+=20
+ #ifndef QEMU_STATS64_H
+-#define QEMU_STATS64_H 1
++#define QEMU_STATS64_H
+=20
+ #include "qemu/atomic.h"
+=20
+diff --git a/include/qemu/sys_membarrier.h b/include/qemu/sys_membarrier.=
+h
+index 316e3dc4a2..b5bfa21d52 100644
+--- a/include/qemu/sys_membarrier.h
++++ b/include/qemu/sys_membarrier.h
+@@ -7,7 +7,7 @@
+  */
+=20
+ #ifndef QEMU_SYS_MEMBARRIER_H
+-#define QEMU_SYS_MEMBARRIER_H 1
++#define QEMU_SYS_MEMBARRIER_H
+=20
+ #ifdef CONFIG_MEMBARRIER
+ /* Only block reordering at the compiler level in the performance-critic=
+al
+diff --git a/include/qemu/systemd.h b/include/qemu/systemd.h
+index e6a877e5c6..f0ea1266d5 100644
+--- a/include/qemu/systemd.h
++++ b/include/qemu/systemd.h
+@@ -11,7 +11,7 @@
+  */
+=20
+ #ifndef QEMU_SYSTEMD_H
+-#define QEMU_SYSTEMD_H 1
++#define QEMU_SYSTEMD_H
+=20
+ #define FIRST_SOCKET_ACTIVATION_FD 3 /* defined by systemd ABI */
+=20
+diff --git a/include/scsi/utils.h b/include/scsi/utils.h
+index 4b705f5e0f..9351b21ead 100644
+--- a/include/scsi/utils.h
++++ b/include/scsi/utils.h
+@@ -1,5 +1,5 @@
+ #ifndef SCSI_UTILS_H
+-#define SCSI_UTILS_H 1
++#define SCSI_UTILS_H
+=20
+ #ifdef CONFIG_LINUX
+ #include <scsi/sg.h>
+diff --git a/include/ui/kbd-state.h b/include/ui/kbd-state.h
+index d87833553a..eb9067dd53 100644
+--- a/include/ui/kbd-state.h
++++ b/include/ui/kbd-state.h
+@@ -3,8 +3,9 @@
+  * (at your option) any later version.  See the COPYING file in the
+  * top-level directory.
+  */
 +
- #include "pdb.h"
- #include "err.h"
- 
-diff --git a/hw/display/ati.c b/hw/display/ati.c
-index db409be3c9..75716dd944 100644
---- a/hw/display/ati.c
-+++ b/hw/display/ati.c
-@@ -16,6 +16,7 @@
-  * No 3D at all yet (maybe after 2D works, but feel free to improve it)
+ #ifndef QEMU_UI_KBD_STATE_H
+-#define QEMU_UI_KBD_STATE_H 1
++#define QEMU_UI_KBD_STATE_H
+=20
+ #include "qapi/qapi-types-ui.h"
+=20
+diff --git a/scsi/pr-helper.h b/scsi/pr-helper.h
+index 096d1f1df6..e26e104ec7 100644
+--- a/scsi/pr-helper.h
++++ b/scsi/pr-helper.h
+@@ -23,8 +23,9 @@
+  * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER D=
+EALINGS
+  * IN THE SOFTWARE.
   */
- 
-+#include "qemu/osdep.h"
- #include "ati_int.h"
- #include "ati_regs.h"
- #include "vga_regs.h"
-diff --git a/hw/display/ati_2d.c b/hw/display/ati_2d.c
-index bc98ba6eeb..f31b3c27c7 100644
---- a/hw/display/ati_2d.c
-+++ b/hw/display/ati_2d.c
-@@ -7,6 +7,7 @@
-  * This work is licensed under the GNU GPL license version 2 or later.
++
+ #ifndef QEMU_PR_HELPER_H
+-#define QEMU_PR_HELPER_H 1
++#define QEMU_PR_HELPER_H
+=20
+ #define PR_HELPER_CDB_SIZE     16
+ #define PR_HELPER_SENSE_SIZE   96
+diff --git a/target/i386/hvf/x86.h b/target/i386/hvf/x86.h
+index 103ec0976c..c95d5b2116 100644
+--- a/target/i386/hvf/x86.h
++++ b/target/i386/hvf/x86.h
+@@ -17,7 +17,7 @@
   */
- 
-+#include "qemu/osdep.h"
- #include "ati_int.h"
- #include "ati_regs.h"
- #include "qemu/log.h"
-diff --git a/hw/display/ati_dbg.c b/hw/display/ati_dbg.c
-index 1e6c32624e..b045f81d06 100644
---- a/hw/display/ati_dbg.c
-+++ b/hw/display/ati_dbg.c
-@@ -1,3 +1,4 @@
-+#include "qemu/osdep.h"
- #include "ati_int.h"
- 
- #ifdef DEBUG_ATI
-diff --git a/hw/display/ati_int.h b/hw/display/ati_int.h
-index a6f3e20e63..2f426064cf 100644
---- a/hw/display/ati_int.h
-+++ b/hw/display/ati_int.h
-@@ -9,7 +9,6 @@
- #ifndef ATI_INT_H
- #define ATI_INT_H
- 
--#include "qemu/osdep.h"
- #include "hw/pci/pci.h"
- #include "vga_int.h"
- 
-diff --git a/include/hw/cpu/cluster.h b/include/hw/cpu/cluster.h
-index 549c2d31d4..01c1e50cd2 100644
---- a/include/hw/cpu/cluster.h
-+++ b/include/hw/cpu/cluster.h
-@@ -20,7 +20,6 @@
- #ifndef HW_CPU_CLUSTER_H
- #define HW_CPU_CLUSTER_H
- 
--#include "qemu/osdep.h"
- #include "hw/qdev.h"
- 
- /*
-diff --git a/tests/fp/platform.h b/tests/fp/platform.h
-index c20ba70baa..f8c423dde3 100644
---- a/tests/fp/platform.h
-+++ b/tests/fp/platform.h
-@@ -29,7 +29,6 @@
-  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
-  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+=20
+ #ifndef HVF_X86_H
+-#define HVF_X86_H 1
++#define HVF_X86_H
+=20
+ typedef struct x86_register {
+     union {
+diff --git a/target/i386/hvf/x86_decode.h b/target/i386/hvf/x86_decode.h
+index ef4bcab310..bc574a7a44 100644
+--- a/target/i386/hvf/x86_decode.h
++++ b/target/i386/hvf/x86_decode.h
+@@ -16,7 +16,7 @@
   */
--#include "config-host.h"
- 
- #ifndef HOST_WORDS_BIGENDIAN
- #define LITTLEENDIAN 1
-diff --git a/tests/libqos/qgraph.h b/tests/libqos/qgraph.h
-index ef0c73837a..e799095b30 100644
---- a/tests/libqos/qgraph.h
-+++ b/tests/libqos/qgraph.h
-@@ -19,11 +19,7 @@
- #ifndef QGRAPH_H
- #define QGRAPH_H
- 
--#include <stdio.h>
--#include <stdlib.h>
--#include <stdbool.h>
- #include <gmodule.h>
--#include <glib.h>
- #include "qemu/module.h"
- #include "malloc.h"
- 
-diff --git a/tests/qos-test.c b/tests/qos-test.c
-index 6b1145eccc..ae2fb5de1c 100644
---- a/tests/qos-test.c
-+++ b/tests/qos-test.c
-@@ -16,8 +16,8 @@
-  * License along with this library; if not, see <http://www.gnu.org/licenses/>
+=20
+ #ifndef HVF_X86_DECODE_H
+-#define HVF_X86_DECODE_H 1
++#define HVF_X86_DECODE_H
+=20
+ #include "cpu.h"
+ #include "x86.h"
+diff --git a/target/i386/hvf/x86_descr.h b/target/i386/hvf/x86_descr.h
+index 25a2b1731c..049ef9a417 100644
+--- a/target/i386/hvf/x86_descr.h
++++ b/target/i386/hvf/x86_descr.h
+@@ -17,7 +17,7 @@
   */
- 
--#include <getopt.h>
- #include "qemu/osdep.h"
-+#include <getopt.h>
- #include "libqtest.h"
- #include "qapi/qmp/qdict.h"
- #include "qapi/qmp/qbool.h"
--- 
+=20
+ #ifndef HVF_X86_DESCR_H
+-#define HVF_X86_DESCR_H 1
++#define HVF_X86_DESCR_H
+=20
+ #include "x86.h"
+=20
+--=20
 2.17.2
 
 
