@@ -6,58 +6,61 @@ X-Spam-Status: No, score=-6.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B36E1C10F0E
-	for <qemu-devel@archiver.kernel.org>; Thu, 18 Apr 2019 21:06:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 28EC6C10F0E
+	for <qemu-devel@archiver.kernel.org>; Thu, 18 Apr 2019 21:07:44 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8A44920869
-	for <qemu-devel@archiver.kernel.org>; Thu, 18 Apr 2019 21:06:13 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8A44920869
+	by mail.kernel.org (Postfix) with ESMTPS id EA15E217D7
+	for <qemu-devel@archiver.kernel.org>; Thu, 18 Apr 2019 21:07:43 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EA15E217D7
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:47325 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:47327 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hHEEW-000867-Ne
-	for qemu-devel@archiver.kernel.org; Thu, 18 Apr 2019 17:06:12 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:54579)
+	id 1hHEFz-0000m8-4R
+	for qemu-devel@archiver.kernel.org; Thu, 18 Apr 2019 17:07:43 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:54678)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1hHE0V-00056T-LV
-	for qemu-devel@nongnu.org; Thu, 18 Apr 2019 16:51:47 -0400
+	(envelope-from <armbru@redhat.com>) id 1hHE0Z-00057h-Fv
+	for qemu-devel@nongnu.org; Thu, 18 Apr 2019 16:51:48 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1hHE0T-0005EL-TZ
-	for qemu-devel@nongnu.org; Thu, 18 Apr 2019 16:51:43 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:33790)
+	(envelope-from <armbru@redhat.com>) id 1hHE0U-0005Ez-Bw
+	for qemu-devel@nongnu.org; Thu, 18 Apr 2019 16:51:45 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:46336)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1hHE0T-0005Cv-FD
-	for qemu-devel@nongnu.org; Thu, 18 Apr 2019 16:51:41 -0400
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
-	[10.5.11.16])
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1hHE0T-0005D4-OG
+	for qemu-devel@nongnu.org; Thu, 18 Apr 2019 16:51:42 -0400
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+	[10.5.11.23])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id AC86F3003737
+	by mx1.redhat.com (Postfix) with ESMTPS id BE0123084247
 	for <qemu-devel@nongnu.org>; Thu, 18 Apr 2019 20:51:40 +0000 (UTC)
 Received: from blackfin.pond.sub.org (ovpn-116-116.ams2.redhat.com
 	[10.36.116.116])
-	by smtp.corp.redhat.com (Postfix) with ESMTPS id 7FA385C206
-	for <qemu-devel@nongnu.org>; Thu, 18 Apr 2019 20:51:40 +0000 (UTC)
+	by smtp.corp.redhat.com (Postfix) with ESMTPS id 67B2E19C79;
+	Thu, 18 Apr 2019 20:51:40 +0000 (UTC)
 Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
-	id 93D7D1132724; Thu, 18 Apr 2019 22:51:36 +0200 (CEST)
+	id 780231132783; Thu, 18 Apr 2019 22:51:36 +0200 (CEST)
 From: Markus Armbruster <armbru@redhat.com>
 To: qemu-devel@nongnu.org
-Date: Thu, 18 Apr 2019 22:51:17 +0200
-Message-Id: <20190418205135.6686-19-armbru@redhat.com>
+Date: Thu, 18 Apr 2019 22:51:14 +0200
+Message-Id: <20190418205135.6686-16-armbru@redhat.com>
 In-Reply-To: <20190418205135.6686-1-armbru@redhat.com>
 References: <20190418205135.6686-1-armbru@redhat.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+MIME-Version: 1.0
+Content-Type: text/plain; charset="UTF-8"
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.47]);
+	(mx1.redhat.com [10.5.110.40]);
 	Thu, 18 Apr 2019 20:51:40 +0000 (UTC)
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] [PULL for-4.1 18/36] char-pty: Print "char device
- redirected" message to stdout
+Subject: [Qemu-devel] [PULL for-4.1 15/36] qemu-print: New qemu_printf(),
+ qemu_vprintf() etc.
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -69,54 +72,167 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: "Dr . David Alan Gilbert" <dgilbert@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Content-Type: text/plain; charset="UTF-8"
-Message-ID: <20190418205117.Tk7FpfMf8p6dNgTPF7ICpfJTsCvoQiXAbounp_3_gds@z>
+Message-ID: <20190418205114.ljpTviQl8Lzyu90pbxTvE3zcA94i0c1yTEUAEDo6M6M@z>
 
-char_pty_open() prints a "char device redirected to PTY_NAME (label
-LABEL)" message to the current monitor or else to stderr.  This is not
-an error, so it shouldn't go to stderr.  Print it to stdout instead.
+We commonly want to print to the current monitor if we have one, else
+to stdout/stderr.  For stderr, have error_printf().  For stdout, all
+we have is monitor_vfprintf(), which is rather unwieldy.  We often
+print to stderr just because error_printf() is easier.
 
-Why is it even printed?  No other ChardevClass::open() prints anything
-on success.  It's because you need to know PTY_NAME to actually use
-this char device, e.g. like e.g. "socat STDIO,cfmakeraw FILE:PTY_NAME"
-to use the monitor's readline interface.  You can get PTY_NAME with
-"info chardev" (a.k.a. query-chardev for QMP), but only if you already
-have a monitor.
+New qemu_printf() and qemu_vprintf() do exactly what's needed.  The
+next commits will put them to use.
 
+Cc: Dr. David Alan Gilbert <dgilbert@redhat.com>
 Signed-off-by: Markus Armbruster <armbru@redhat.com>
-Message-Id: <20190417190641.26814-15-armbru@redhat.com>
-Reviewed-by: Eric Blake <eblake@redhat.com>
+Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+Message-Id: <20190417190641.26814-12-armbru@redhat.com>
 ---
- chardev/char-pty.c | 5 +++--
- 1 file changed, 3 insertions(+), 2 deletions(-)
+ MAINTAINERS               |  2 ++
+ include/qemu/qemu-print.h | 19 ++++++++++++++++++
+ stubs/monitor.c           |  5 +++++
+ tests/test-util-sockets.c |  1 +
+ util/Makefile.objs        |  1 +
+ util/qemu-print.c         | 42 +++++++++++++++++++++++++++++++++++++++
+ 6 files changed, 70 insertions(+)
+ create mode 100644 include/qemu/qemu-print.h
+ create mode 100644 util/qemu-print.c
 
-diff --git a/chardev/char-pty.c b/chardev/char-pty.c
-index b034332edd..04759b0ef9 100644
---- a/chardev/char-pty.c
-+++ b/chardev/char-pty.c
-@@ -28,6 +28,7 @@
- #include "io/channel-file.h"
- #include "qemu/sockets.h"
- #include "qemu/error-report.h"
+diff --git a/MAINTAINERS b/MAINTAINERS
+index 56139ac8ab..1aa19dc4ef 100644
+--- a/MAINTAINERS
++++ b/MAINTAINERS
+@@ -1895,6 +1895,8 @@ F: hmp.[ch]
+ F: hmp-commands*.hx
+ F: include/monitor/hmp-target.h
+ F: tests/test-hmp.c
++F: include/qemu/qemu-print.h
++F: util/qemu-print.c
+=20
+ Network device backends
+ M: Jason Wang <jasowang@redhat.com>
+diff --git a/include/qemu/qemu-print.h b/include/qemu/qemu-print.h
+new file mode 100644
+index 0000000000..8fed32bf42
+--- /dev/null
++++ b/include/qemu/qemu-print.h
+@@ -0,0 +1,19 @@
++/*
++ * Print to stream or current monitor
++ *
++ * Copyright (C) 2019 Red Hat Inc.
++ *
++ * Authors:
++ *  Markus Armbruster <armbru@redhat.com>,
++ *
++ * This work is licensed under the terms of the GNU GPL, version 2 or la=
+ter.
++ * See the COPYING file in the top-level directory.
++ */
++
++#ifndef QEMU_PRINT_H
++#define QEMU_PRINT_H
++
++int qemu_vprintf(const char *fmt, va_list ap) GCC_FMT_ATTR(1, 0);
++int qemu_printf(const char *fmt, ...) GCC_FMT_ATTR(1, 2);
++
++#endif
+diff --git a/stubs/monitor.c b/stubs/monitor.c
+index b57fe6c32f..b2ea975e40 100644
+--- a/stubs/monitor.c
++++ b/stubs/monitor.c
+@@ -6,6 +6,11 @@
+=20
+ __thread Monitor *cur_mon;
+=20
++int monitor_vprintf(Monitor *mon, const char *fmt, va_list ap)
++{
++    abort();
++}
++
+ int monitor_get_fd(Monitor *mon, const char *name, Error **errp)
+ {
+     error_setg(errp, "only QEMU supports file descriptor passing");
+diff --git a/tests/test-util-sockets.c b/tests/test-util-sockets.c
+index 6195a3ac36..fd1ced058c 100644
+--- a/tests/test-util-sockets.c
++++ b/tests/test-util-sockets.c
+@@ -70,6 +70,7 @@ int monitor_get_fd(Monitor *mon, const char *fdname, Er=
+ror **errp)
+  * otherwise we get duplicate syms at link time.
+  */
+ __thread Monitor *cur_mon;
++int monitor_vprintf(Monitor *mon, const char *fmt, va_list ap) { abort()=
+; }
+ void monitor_init(Chardev *chr, int flags) {}
+=20
+=20
+diff --git a/util/Makefile.objs b/util/Makefile.objs
+index 835fcd69e2..9206878dec 100644
+--- a/util/Makefile.objs
++++ b/util/Makefile.objs
+@@ -23,6 +23,7 @@ util-obj-y +=3D bitmap.o bitops.o hbitmap.o
+ util-obj-y +=3D fifo8.o
+ util-obj-y +=3D cacheinfo.o
+ util-obj-y +=3D error.o qemu-error.o
++util-obj-y +=3D qemu-print.o
+ util-obj-y +=3D id.o
+ util-obj-y +=3D iov.o qemu-config.o qemu-sockets.o uri.o notify.o
+ util-obj-y +=3D qemu-option.o qemu-progress.o
+diff --git a/util/qemu-print.c b/util/qemu-print.c
+new file mode 100644
+index 0000000000..86f9417af8
+--- /dev/null
++++ b/util/qemu-print.c
+@@ -0,0 +1,42 @@
++/*
++ * Print to stream or current monitor
++ *
++ * Copyright (C) 2019 Red Hat Inc.
++ *
++ * Authors:
++ *  Markus Armbruster <armbru@redhat.com>,
++ *
++ * This work is licensed under the terms of the GNU GPL, version 2 or la=
+ter.
++ * See the COPYING file in the top-level directory.
++ */
++
++#include "qemu/osdep.h"
++#include "monitor/monitor.h"
 +#include "qemu/qemu-print.h"
- 
- #include "chardev/char-io.h"
- 
-@@ -211,8 +212,8 @@ static void char_pty_open(Chardev *chr,
-     qemu_set_nonblock(master_fd);
- 
-     chr->filename = g_strdup_printf("pty:%s", pty_name);
--    error_printf("char device redirected to %s (label %s)\n",
--                 pty_name, chr->label);
-+    qemu_printf("char device redirected to %s (label %s)\n",
-+                pty_name, chr->label);
- 
-     s = PTY_CHARDEV(chr);
-     s->ioc = QIO_CHANNEL(qio_channel_file_new_fd(master_fd));
--- 
++
++/*
++ * Print like vprintf().
++ * Print to current monitor if we have one, else to stdout.
++ */
++int qemu_vprintf(const char *fmt, va_list ap)
++{
++    if (cur_mon) {
++        return monitor_vprintf(cur_mon, fmt, ap);
++    }
++    return vprintf(fmt, ap);
++}
++
++/*
++ * Print like printf().
++ * Print to current monitor if we have one, else to stdout.
++ */
++int qemu_printf(const char *fmt, ...)
++{
++    va_list ap;
++    int ret;
++
++    va_start(ap, fmt);
++    ret =3D qemu_vprintf(fmt, ap);
++    va_end(ap);
++    return ret;
++}
+--=20
 2.17.2
 
 
