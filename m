@@ -6,58 +6,59 @@ X-Spam-Status: No, score=-6.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E82F6C10F0E
-	for <qemu-devel@archiver.kernel.org>; Thu, 18 Apr 2019 18:10:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 98D63C10F0E
+	for <qemu-devel@archiver.kernel.org>; Thu, 18 Apr 2019 18:10:44 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id BA50A20675
-	for <qemu-devel@archiver.kernel.org>; Thu, 18 Apr 2019 18:10:06 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BA50A20675
+	by mail.kernel.org (Postfix) with ESMTPS id 69D2F218AE
+	for <qemu-devel@archiver.kernel.org>; Thu, 18 Apr 2019 18:10:44 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 69D2F218AE
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:45153 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:45182 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hHBU5-0000bg-NF
-	for qemu-devel@archiver.kernel.org; Thu, 18 Apr 2019 14:10:05 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:46383)
+	id 1hHBUh-00015h-ID
+	for qemu-devel@archiver.kernel.org; Thu, 18 Apr 2019 14:10:43 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:45667)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1hHBNn-00047B-Es
-	for qemu-devel@nongnu.org; Thu, 18 Apr 2019 14:03:36 -0400
+	(envelope-from <thuth@redhat.com>) id 1hHBMQ-0002xR-0m
+	for qemu-devel@nongnu.org; Thu, 18 Apr 2019 14:02:11 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1hHBNm-0002ac-CP
-	for qemu-devel@nongnu.org; Thu, 18 Apr 2019 14:03:35 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:40210)
+	(envelope-from <thuth@redhat.com>) id 1hHBMN-0001im-RW
+	for qemu-devel@nongnu.org; Thu, 18 Apr 2019 14:02:09 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:38882)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <thuth@redhat.com>)
-	id 1hHBNd-0002VW-Dx; Thu, 18 Apr 2019 14:03:25 -0400
+	id 1hHBMA-0001T2-5l; Thu, 18 Apr 2019 14:01:54 -0400
 Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
 	[10.5.11.22])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 3C6D630A7C97;
-	Thu, 18 Apr 2019 18:03:24 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id DE4C3307CB2F;
+	Thu, 18 Apr 2019 18:01:41 +0000 (UTC)
 Received: from thuth.com (ovpn-116-56.ams2.redhat.com [10.36.116.56])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id 1541E1001DEF;
-	Thu, 18 Apr 2019 18:03:14 +0000 (UTC)
+	by smtp.corp.redhat.com (Postfix) with ESMTP id 4352D1001DEF;
+	Thu, 18 Apr 2019 18:01:35 +0000 (UTC)
 From: Thomas Huth <thuth@redhat.com>
 To: yang.zhong@intel.com, Peter Maydell <peter.maydell@linaro.org>,
 	qemu-devel@nongnu.org, pbonzini@redhat.com
-Date: Thu, 18 Apr 2019 20:00:43 +0200
-Message-Id: <20190418180057.3593-16-thuth@redhat.com>
+Date: Thu, 18 Apr 2019 20:00:32 +0200
+Message-Id: <20190418180057.3593-5-thuth@redhat.com>
 In-Reply-To: <20190418180057.3593-1-thuth@redhat.com>
 References: <20190418180057.3593-1-thuth@redhat.com>
 MIME-Version: 1.0
+Content-Type: text/plain; charset="UTF-8"
 X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.40]);
-	Thu, 18 Apr 2019 18:03:24 +0000 (UTC)
+	(mx1.redhat.com [10.5.110.42]);
+	Thu, 18 Apr 2019 18:01:42 +0000 (UTC)
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] [PATCH for-QEMU-4.1 v5 15/29] hw/arm: Express
- dependencies of the aspeed boards with Kconfig
+Subject: [Qemu-devel] [PATCH for-QEMU-4.1 v5 04/29] hw/arm: Express
+ dependencies of the exynos machines with Kconfig
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -85,68 +86,126 @@ Cc: "Michael S. Tsirkin" <mst@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>,
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Content-Type: text/plain; charset="UTF-8"
-Message-ID: <20190418180043.Q5UInPu2FE9ovV7fwP3UgwN-iubG_PNM-5koyQp_yKg@z>
+Message-ID: <20190418180032.H5q7Q-qsmJYI-tB4wp9knEyqAyEtatnaJAoAERQsuH8@z>
 
-Dependencies have been determined by looking at hw/arm/aspeed.c
+Add Kconfig dependencies for the Exynos-related boards (nuri and
+smdkc210).
+This patch is slightly based on earlier work by =C3=81kos Kov=C3=A1cs (i.=
+e.
+his "hw/arm/Kconfig: Add ARM Kconfig" patch).
 
 Signed-off-by: Thomas Huth <thuth@redhat.com>
 ---
- default-configs/arm-softmmu.mak |  7 +------
+ default-configs/arm-softmmu.mak | 17 ++++++-----------
  hw/arm/Kconfig                  | 10 ++++++++++
- 2 files changed, 11 insertions(+), 6 deletions(-)
+ 2 files changed, 16 insertions(+), 11 deletions(-)
 
 diff --git a/default-configs/arm-softmmu.mak b/default-configs/arm-softmm=
 u.mak
-index 25e8f717ac..2580584281 100644
+index 613d19a06d..2a11e76cc7 100644
 --- a/default-configs/arm-softmmu.mak
 +++ b/default-configs/arm-softmmu.mak
-@@ -26,15 +26,12 @@ CONFIG_SPITZ=3Dy
- CONFIG_TOSA=3Dy
- CONFIG_Z2=3Dy
- CONFIG_COLLIE=3Dy
-+CONFIG_ASPEED_SOC=3Dy
+@@ -1,8 +1,14 @@
+ # Default configuration for arm-softmmu
 =20
++# TODO: ARM_V7M is currently always required - make this more flexible!
++CONFIG_ARM_V7M=3Dy
++
+ CONFIG_PCI=3Dy
+ CONFIG_PCI_DEVICES=3Dy
+ CONFIG_PCI_TESTDEV=3Dy
++
++CONFIG_EXYNOS4=3Dy
++
  CONFIG_VGA=3Dy
--CONFIG_TMP421=3Dy
--CONFIG_PCA9552=3Dy
+ CONFIG_NAND=3Dy
+ CONFIG_ECC=3Dy
+@@ -26,7 +32,6 @@ CONFIG_ADS7846=3Dy
+ CONFIG_MAX111X=3Dy
+ CONFIG_SSI_SD=3Dy
  CONFIG_SSI_M25P80=3Dy
+-CONFIG_LAN9118=3Dy
+ CONFIG_SMC91C111=3Dy
  CONFIG_ALLWINNER_EMAC=3Dy
  CONFIG_IMX_FEC=3Dy
--CONFIG_FTGMAC100=3Dy
--CONFIG_DS1338=3Dy
+@@ -36,21 +41,15 @@ CONFIG_PFLASH_CFI01=3Dy
+ CONFIG_PFLASH_CFI02=3Dy
+ CONFIG_MICRODRIVE=3Dy
+ CONFIG_USB_MUSB=3Dy
+-CONFIG_USB_EHCI_SYSBUS=3Dy
  CONFIG_PLATFORM_BUS=3Dy
  CONFIG_VIRTIO_MMIO=3Dy
 =20
-@@ -92,8 +89,6 @@ CONFIG_I82801B11=3Dy
- CONFIG_ACPI=3Dy
- CONFIG_ARM_VIRT=3Dy
- CONFIG_SMBIOS=3Dy
--CONFIG_ASPEED_SOC=3Dy
--CONFIG_SMBUS_EEPROM=3Dy
- CONFIG_GPIO_KEY=3Dy
- CONFIG_MSF2=3Dy
- CONFIG_FW_CFG_DMA=3Dy
+ CONFIG_ARM11MPCORE=3Dy
+-CONFIG_A9MPCORE=3Dy
+ CONFIG_A15MPCORE=3Dy
+=20
+-CONFIG_ARM_V7M=3Dy
+ CONFIG_NETDUINO2=3Dy
+=20
+-CONFIG_ARM_GIC=3Dy
+ CONFIG_ARM_TIMER=3Dy
+-CONFIG_ARM_MPTIMER=3Dy
+-CONFIG_A9_GTIMER=3Dy
+ CONFIG_PL011=3Dy
+ CONFIG_PL022=3Dy
+ CONFIG_PL031=3Dy
+@@ -61,11 +60,9 @@ CONFIG_PL080=3Dy
+ CONFIG_PL110=3Dy
+ CONFIG_PL181=3Dy
+ CONFIG_PL190=3Dy
+-CONFIG_PL310=3Dy
+ CONFIG_PL330=3Dy
+ CONFIG_CADENCE=3Dy
+ CONFIG_XGMAC=3Dy
+-CONFIG_EXYNOS4=3Dy
+ CONFIG_PXA2XX=3Dy
+ CONFIG_BITBANG_I2C=3Dy
+ CONFIG_FRAMEBUFFER=3Dy
+@@ -73,7 +70,6 @@ CONFIG_XILINX_SPIPS=3Dy
+ CONFIG_ZYNQ_DEVCFG=3Dy
+=20
+ CONFIG_ARM11SCU=3Dy
+-CONFIG_A9SCU=3Dy
+ CONFIG_DIGIC=3Dy
+ CONFIG_MARVELL_88W8618=3Dy
+ CONFIG_OMAP=3Dy
+@@ -123,7 +119,6 @@ CONFIG_VERSATILE_I2C=3Dy
+ CONFIG_PCI_EXPRESS=3Dy
+ CONFIG_PCI_EXPRESS_GENERIC_BRIDGE=3Dy
+=20
+-CONFIG_SDHCI=3Dy
+ CONFIG_INTEGRATOR=3Dy
+ CONFIG_INTEGRATOR_DEBUG=3Dy
+=20
 diff --git a/hw/arm/Kconfig b/hw/arm/Kconfig
-index 325133c129..abeaa54d88 100644
+index d298fbdc89..acd07b2add 100644
 --- a/hw/arm/Kconfig
 +++ b/hw/arm/Kconfig
-@@ -254,6 +254,16 @@ config FSL_IMX6
+@@ -8,7 +8,13 @@ config DIGIC
 =20
- config ASPEED_SOC
+ config EXYNOS4
      bool
-+    select DS1338
-+    select FTGMAC100
++    select A9MPCORE
 +    select I2C
-+    select PCA9552
-+    select SERIAL
-+    select SMBUS_EEPROM
-+    select SSI
-+    select SSI_M25P80
-+    select TMP105
-+    select TMP421
++    select LAN9118
++    select PL310 # cache controller
+     select PTIMER
++    select SDHCI
++    select USB_EHCI_SYSBUS
 =20
- config MPS2
+ config HIGHBANK
+     bool
+@@ -104,6 +110,10 @@ config ZAURUS
+=20
+ config A9MPCORE
+     bool
++    select A9_GTIMER
++    select A9SCU       # snoop control unit
++    select ARM_GIC
++    select ARM_MPTIMER
+=20
+ config A15MPCORE
      bool
 --=20
 2.21.0
