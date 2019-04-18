@@ -1,29 +1,24 @@
-Received: from eggs.gnu.org ([209.51.188.92]:48429)
+Received: from eggs.gnu.org ([209.51.188.92]:48588)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1hH57X-00045D-5P
-	for qemu-devel@nongnu.org; Thu, 18 Apr 2019 07:22:24 -0400
+	(envelope-from <kwolf@redhat.com>) id 1hH58Q-0004k3-QT
+	for qemu-devel@nongnu.org; Thu, 18 Apr 2019 07:23:19 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1hH57W-0003zD-7V
-	for qemu-devel@nongnu.org; Thu, 18 Apr 2019 07:22:23 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:56052)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1hH57W-0003yI-21
-	for qemu-devel@nongnu.org; Thu, 18 Apr 2019 07:22:22 -0400
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
-	[10.5.11.12])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 2DD3C356F5
-	for <qemu-devel@nongnu.org>; Thu, 18 Apr 2019 11:22:21 +0000 (UTC)
-Date: Thu, 18 Apr 2019 13:22:16 +0200
-From: Igor Mammedov <imammedo@redhat.com>
-Message-ID: <20190418132216.7a53f1ce@redhat.com>
-In-Reply-To: <20190418034501.5038-1-ehabkost@redhat.com>
-References: <20190418034501.5038-1-ehabkost@redhat.com>
+	(envelope-from <kwolf@redhat.com>) id 1hH58P-0004hP-UK
+	for qemu-devel@nongnu.org; Thu, 18 Apr 2019 07:23:18 -0400
+Date: Thu, 18 Apr 2019 13:23:08 +0200
+From: Kevin Wolf <kwolf@redhat.com>
+Message-ID: <20190418112308.GD5242@linux.fritz.box>
+References: <20190417115343.30527-1-pbonzini@redhat.com>
+	<CAJSP0QWtW3L54SC2FuWwc_Eu9DQnHw0eWWM1bUtGRrwwbFTyiQ@mail.gmail.com>
+	<cf51d357-d9c0-3a20-1d23-7f6671d7948a@redhat.com>
+	<20190418104737.GC5242@linux.fritz.box>
+	<87b281df-e0a0-6537-0e1a-4c6af28ffc01@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH] cpu: Fix crash with empty -cpu option
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <87b281df-e0a0-6537-0e1a-4c6af28ffc01@redhat.com>
+Subject: Re: [Qemu-devel] [Qemu-block] [PATCH] scsi-generic: prevent guest
+ from exceeding SG_IO limits
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,68 +27,24 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eduardo Habkost <ehabkost@redhat.com>
-Cc: qemu-devel@nongnu.org, Cleber Rosa <crosa@redhat.com>
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: Stefan Hajnoczi <stefanha@gmail.com>, Stefan Hajnoczi <stefanha@redhat.com>, qemu-devel <qemu-devel@nongnu.org>, qemu block <qemu-block@nongnu.org>, qemu-stable <qemu-stable@nongnu.org>
 
-On Thu, 18 Apr 2019 00:45:01 -0300
-Eduardo Habkost <ehabkost@redhat.com> wrote:
+Am 18.04.2019 um 13:01 hat Paolo Bonzini geschrieben:
+> On 18/04/19 12:47, Kevin Wolf wrote:
+> >> This is acually only an issue with kernels prior to 4.5, so it should be
+> >> fixed downstream instead.
+> >
+> > I don't think that upstream QEMU has kernels > 4.5 as an official
+> > requirement, though? We try to be compatible with quite old libs, so we
+> > should stay compatible with old kernels, too.
+> 
+> It is a pretty rare case, where the host must support very large
+> scatter/gather lists (>=1024 elements) and there is a workaround by
+> setting max_sectors_kb to 4096 in the host.  It also makes performance
+> worse.
 
-> Fix the following crash:
-> 
->   $ qemu-system-x86_64 -cpu ''
->   qemu-system-x86_64: qom/cpu.c:291: cpu_class_by_name: \
->       Assertion `cpu_model && cc->class_by_name' failed.
-> 
-> Regression test script included.
-> 
-> Fixes: commit 99193d8f2ef5 ("cpu: drop unnecessary NULL check and cpu_common_class_by_name()")
-> Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
-> ---
->  exec.c                              |  4 ++++
->  tests/acceptance/empty_cpu_model.py | 19 +++++++++++++++++++
->  2 files changed, 23 insertions(+)
->  create mode 100644 tests/acceptance/empty_cpu_model.py
-> 
-> diff --git a/exec.c b/exec.c
-> index 1ca95df9d8..d816b38863 100644
-> --- a/exec.c
-> +++ b/exec.c
-> @@ -999,6 +999,10 @@ const char *parse_cpu_option(MachineState *machine, const char *cpu_option)
->      const char *cpu_type;
->  
->      model_pieces = g_strsplit(cpu_option, ",", 2);
-> +    if (!model_pieces[0]) {
-> +        error_report("-cpu option cannot be empty");
-> +        exit(1);
+Fair enough. I didn't consider that it has a performance impact even on
+newer kernels that don't need the patch.
 
-s/1/EXIT_FAILURE/
-
-> +    }
->  
->      cc = lookup_cpu_class(model_pieces[0], &error_fatal);
->      cpu_type = object_class_get_name(OBJECT_CLASS(cc));
-> diff --git a/tests/acceptance/empty_cpu_model.py b/tests/acceptance/empty_cpu_model.py
-> new file mode 100644
-> index 0000000000..3f4f663582
-> --- /dev/null
-> +++ b/tests/acceptance/empty_cpu_model.py
-> @@ -0,0 +1,19 @@
-> +# Check for crash when using empty -cpu option
-> +#
-> +# Copyright (c) 2019 Red Hat, Inc.
-> +#
-> +# Author:
-> +#  Eduardo Habkost <ehabkost@redhat.com>
-> +#
-> +# This work is licensed under the terms of the GNU GPL, version 2 or
-> +# later.  See the COPYING file in the top-level directory.
-> +import subprocess
-> +from avocado_qemu import Test
-> +
-> +class EmptyCPUModel(Test):
-> +    def test(self):
-> +        cmd = [self.qemu_bin, '-S', '-display', 'none', '-machine', 'none', '-cpu', '']
-> +        r = subprocess.run(cmd, stderr=subprocess.PIPE, stdout=subprocess.PIPE)
-> +        self.assertEquals(r.returncode, 1, "QEMU exit code should be 1")
-> +        self.assertEquals(r.stdout, b'', "QEMU stdout should be empty")
-> +        self.assertNotEquals(r.stderr, b'', "QEMU stderr shouldn't be empty")
+Kevin
