@@ -1,23 +1,25 @@
-Received: from eggs.gnu.org ([209.51.188.92]:56773)
+Received: from eggs.gnu.org ([209.51.188.92]:57870)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.weiyang@gmail.com>) id 1hH7uS-0000Q4-Rp
-	for qemu-devel@nongnu.org; Thu, 18 Apr 2019 10:21:05 -0400
+	(envelope-from <ehabkost@redhat.com>) id 1hH7zg-0003Wo-Vm
+	for qemu-devel@nongnu.org; Thu, 18 Apr 2019 10:26:29 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.weiyang@gmail.com>) id 1hH7uR-000226-LE
-	for qemu-devel@nongnu.org; Thu, 18 Apr 2019 10:21:04 -0400
-Date: Thu, 18 Apr 2019 14:20:58 +0000
-From: Wei Yang <richard.weiyang@gmail.com>
-Message-ID: <20190418142058.qvicrirxfghfosiu@master>
-Reply-To: Wei Yang <richard.weiyang@gmail.com>
-References: <20190417014038.26018-1-richardw.yang@linux.intel.com>
-	<20190417014038.26018-7-richardw.yang@linux.intel.com>
-	<20190418130241.635b2e97@redhat.com>
+	(envelope-from <ehabkost@redhat.com>) id 1hH7zg-0005OK-3n
+	for qemu-devel@nongnu.org; Thu, 18 Apr 2019 10:26:28 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:33752)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1hH7zf-0005Nn-UW
+	for qemu-devel@nongnu.org; Thu, 18 Apr 2019 10:26:28 -0400
+Date: Thu, 18 Apr 2019 11:26:24 -0300
+From: Eduardo Habkost <ehabkost@redhat.com>
+Message-ID: <20190418142624.GH25134@habkost.net>
+References: <20190418064602.24558-1-tao3.xu@intel.com>
+	<20190418064602.24558-2-tao3.xu@intel.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20190418130241.635b2e97@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v3 6/6] acpi: pci: use build_append_foo()
- API to construct MCFG
+In-Reply-To: <20190418064602.24558-2-tao3.xu@intel.com>
+Subject: Re: [Qemu-devel] [PATCH v2 1/3] numa: move numa global variable
+ nb_numa_nodes into MachineState
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,67 +28,32 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Igor Mammedov <imammedo@redhat.com>
-Cc: Wei Yang <richardw.yang@linux.intel.com>, yang.zhong@intel.com, peter.maydell@linaro.org, mst@redhat.com, qemu-devel@nongnu.org, shannon.zhaosl@gmail.com, qemu-arm@nongnu.org, philmd@redhat.com
+To: Tao Xu <tao3.xu@intel.com>
+Cc: imammedo@redhat.com, pbonzini@redhat.com, jingqi.liu@intel.com, qemu-devel@nongnu.org
 
-On Thu, Apr 18, 2019 at 01:02:41PM +0200, Igor Mammedov wrote:
->On Wed, 17 Apr 2019 09:40:38 +0800
->Wei Yang <richardw.yang@linux.intel.com> wrote:
->
->> build_append_foo() API doesn't need explicit endianness conversions
->> which eliminates a source of errors and it makes build_mcfg() look like
->> declarative definition of MCFG table in ACPI spec, which makes it easy
->> to review.
->> 
->> Signed-off-by: Wei Yang <richardw.yang@linux.intel.com>
->> Suggested-by: Igor Mammedov <imammedo@redhat.com>
->Thanks for nice cleanup!
+On Thu, Apr 18, 2019 at 02:46:00PM +0800, Tao Xu wrote:
+> The aim of this patch is to add struct NumaState in MachineState
+> and move existing numa global nb_numa_nodes into NumaState.
+> And add variable numa_support into MachineClass to decide which
+> submachines support NUMA.
+> 
+> Suggested-by: Igor Mammedov <imammedo@redhat.com>
+> Suggested-by: Eduardo Habkost <ehabkost@redhat.com>
+> Signed-off-by: Tao Xu <tao3.xu@intel.com>
+[...]
+> +    int nb_numa_nodes = ms->numa_state ? ms->numa_state->nb_numa_nodes : 0;
 
-Glad you like it. :-)
+I see 17 occurrences of this same pattern in the patch, and I had
+to double-check the ones that didn't check if ms->numa_state is
+NULL.
 
->
->with comment fixed up:
->Reviewed-by: Igor Mammedov <imammedo@redhat.com>
->
->> ---
->>  hw/acpi/pci.c               | 30 ++++++++++++++++++------------
->>  include/hw/acpi/acpi-defs.h | 18 ------------------
->>  2 files changed, 18 insertions(+), 30 deletions(-)
->> 
->> diff --git a/hw/acpi/pci.c b/hw/acpi/pci.c
->> index fa0fa30bb9..05050fa087 100644
->> --- a/hw/acpi/pci.c
->> +++ b/hw/acpi/pci.c
->> @@ -30,17 +30,23 @@
->>  
->>  void build_mcfg(GArray *table_data, BIOSLinker *linker, AcpiMcfgInfo *info)
->>  {
->> -    AcpiTableMcfg *mcfg;
->> -    int len = sizeof(*mcfg) + sizeof(mcfg->allocation[0]);
->> -
->> -    mcfg = acpi_data_push(table_data, len);
->> -    mcfg->allocation[0].address = cpu_to_le64(info->base);
->> -
->> -    /* Only a single allocation so no need to play with segments */
->> -    mcfg->allocation[0].pci_segment = cpu_to_le16(0);
->> -    mcfg->allocation[0].start_bus_number = 0;
->> -    mcfg->allocation[0].end_bus_number = PCIE_MMCFG_BUS(info->size - 1);
->> -
->> -    build_header(linker, table_data, (void *)mcfg, "MCFG", len, 1, NULL, NULL);
->> +    int mcfg_start = table_data->len;
->> +
->> +    acpi_data_push(table_data, sizeof(AcpiTableHeader));
->> +
->> +    /* PCI fw r3.0 MCFG table. */
->It would be better to put spec name as is here so simple search
->could immediately point to it.
->
->like: PCI Firmware Specification, Revision 3.0
->      4.1.2 MCFG Table Description
->
+I think a
+  int machine_num_numa_nodes(MachineState *ms)
+helper would be useful.
 
-Sure, will change to this.
+While at it, I suggest naming the nb_numa_nodes field "num_nodes"
+or "nr_nodes", because it's already inside a struct called
+NumaState.
 
 -- 
-Wei Yang
-Help you, Help me
+Eduardo
