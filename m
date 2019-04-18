@@ -1,34 +1,18 @@
-Received: from eggs.gnu.org ([209.51.188.92]:45267)
+Received: from eggs.gnu.org ([209.51.188.92]:45329)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1hHBLW-0002IP-DU
-	for qemu-devel@nongnu.org; Thu, 18 Apr 2019 14:01:15 -0400
+	(envelope-from <thuth@redhat.com>) id 1hHBLf-0002Of-1H
+	for qemu-devel@nongnu.org; Thu, 18 Apr 2019 14:01:24 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1hHBLV-0001CG-7V
-	for qemu-devel@nongnu.org; Thu, 18 Apr 2019 14:01:14 -0400
-Received: from indium.canonical.com ([91.189.90.7]:48094)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1hHBLV-0001BS-2K
-	for qemu-devel@nongnu.org; Thu, 18 Apr 2019 14:01:13 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1hHBLT-0005QB-Gx
-	for <qemu-devel@nongnu.org>; Thu, 18 Apr 2019 18:01:11 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 7F5552E805D
-	for <qemu-devel@nongnu.org>; Thu, 18 Apr 2019 18:01:11 +0000 (UTC)
+	(envelope-from <thuth@redhat.com>) id 1hHBLb-0001Fx-FJ
+	for qemu-devel@nongnu.org; Thu, 18 Apr 2019 14:01:21 -0400
+From: Thomas Huth <thuth@redhat.com>
+Date: Thu, 18 Apr 2019 20:00:28 +0200
+Message-Id: <20190418180057.3593-1-thuth@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Date: Thu, 18 Apr 2019 17:53:45 -0000
-From: Mark Eichin <eichin@gmail.com>
-Reply-To: Bug 1825207 <1825207@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <155551585261.7051.17290095032881696320.malonedeb@chaenomeles.canonical.com>
-Message-Id: <155561002562.13521.6007779328956908030.malone@gac.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1825207] Re: fw_cfg_machine_reset destroys user
- bootorder setting
+Subject: [Qemu-devel] [PATCH for-QEMU-4.1 v5 00/29] Kconfig dependencies for
+ ARM machines
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,76 +21,95 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: yang.zhong@intel.com, Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org, pbonzini@redhat.com
+Cc: Beniamino Galvani <b.galvani@gmail.com>, Jan Kiszka <jan.kiszka@web.de>, Antony Pavlov <antonynpavlov@gmail.com>, Peter Chubb <peter.chubb@nicta.com.au>, qemu-block@nongnu.org, Cedric Le Goater <clg@kaod.org>, "Michael S. Tsirkin" <mst@redhat.com>, Andrew Jeffery <andrew@aj.id.au>, Igor Mitsyanko <i.mitsyanko@gmail.com>, Andrey Smirnov <andrew.smirnov@gmail.com>, Rob Herring <robh@kernel.org>, qemu-arm@nongnu.org, Andrzej Zaborowski <balrogg@gmail.com>, John Snow <jsnow@redhat.com>, Joel Stanley <joel@jms.id.au>, "Edgar E . Iglesias" <edgar.iglesias@gmail.com>, Jean-Christophe Dubois <jcd@tribudubois.net>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, Philippe Mathieu-Daude <f4bug@amsat.org>, Alistair Francis <alistair@alistair23.me>, Subbaraya Sundeep <sundeep.lkml@gmail.com>, Gerd Hoffmann <kraxel@redhat.com>
 
-Hah! Thanks, I don't know how I missed the existence of bootindex (given
-that it looks like it went in in 2011 and is in the docs once I know the
-name to search for.) I was probably conflating it with the index=3D
-option.
+This series reworks the default-configs/arm-softmmu.mak and
+default-configs/aarch64-softmmu.mak files to use the new Kconfig-style
+dependencies instead.
 
-I did see the warning, and my reaction was "that must apply to other
-uses than actually passing things to seabios, since that'll just stop it
-from looking at them, and isn't that the entire point of the option?"
-Apparently not, but the warning didn't particular suggest otherwise.
+Some of the patches are slightly based on the work by =C3=81kos Kov=C3=A1=
+cs:
 
-Thank you very much for taking the time to respond in detail (bootindex
-entirely solves my problem.)
+ https://lists.nongnu.org/archive/html/qemu-devel/2013-08/msg03730.html
 
--- =
+The other patches have been created by looking at the sources and finding
+out the dependencies the hard way via trial-and-error (i.e. by enabling
+only one machine at a time and checking whether it can be compiled and
+started).
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1825207
+v5:
+ - Rebased the series to the current master branch
+ - Added "hw/usb/hcd-ohci: Move PCI-related code into a separate file"
+   patch and got rid of unneeded dependencies to CONFIG_PCI in the
+   ARM machines that do not have a PCI bus
 
-Title:
-  fw_cfg_machine_reset destroys user bootorder setting
+v4:
+ - Rebased the series to Paolo's latest kconfig tree
 
-Status in QEMU:
-  Invalid
+v3:
+ - Addressed review feedback from v2
+ - Included patches to clean up the PCI dependencies of AHCI and SDHCI
+   (so CONFIG_AHCI and CONFIG_SDHCI do not depend on CONFIG_PCI anymore)
+ - Added an additional patch for the new "musca" machines
 
-Bug description:
-  Demonstrated against 2.11 (ubuntu bionic 1:2.11+dfsg-1ubuntu7.12) and
-  3.1 (as built under bionic from the 1:3.1+dfsg-2ubuntu3 source
-  package) although the code hasn't changed between them and github
-  master also appears to have this same code branch.
+v2: Adressed review-feedback from v1
+ - CONFIG_SDHCI and CONFIG_AHCI now select CONFIG_PCI
+ - Added switches for MICROBIT and EMCRAFT_SF2
 
-  What I was trying to do: select a boot disk using `-fw_cfg
-  name=3Dbootorder,string=3D/pci@i0cf8/*@6` based on the qemu and seabios
-  documentation.  (Why do I want to do that? using qemu for installer
-  testing for a specific kind of real machine and need to match the bios
-  boot order.)
+Thomas Huth (29):
+  hw/pci/pci-stub: Add msi_enabled() and msi_notify() to the pci stubs
+  hw/ide/ahci: Add a Kconfig switch for the AHDI-ICH9 device
+  hw/usb/hcd-ohci: Move PCI-related code into a separate file
+  hw/arm: Express dependencies of the exynos machines with Kconfig
+  hw/arm: Express dependencies of the highbank machines with Kconfig
+  hw/arm: Express dependencies of integratorcp with Kconfig
+  hw/arm: Express dependencies of the fsl-imx31 machine with Kconfig
+  hw/arm: Express dependencies of musicpal with Kconfig
+  hw/arm: Express dependencies of the OMAP machines with Kconfig
+  hw/arm: Express dependencies of stellaris with Kconfig
+  hw/arm: Express dependencies of realview, versatile and vexpress with
+    Kconfig
+  hw/arm: Express dependencies of the PXA2xx machines with Kconfig
+  hw/arm: Express dependencies of xilinx-zynq with Kconfig
+  hw/arm: Express dependencies of collie with Kconfig
+  hw/arm: Express dependencies of the aspeed boards with Kconfig
+  hw/arm: Express dependencies of the virt machine with Kconfig
+  hw/arm: Express dependencies of netduino / stm32f2xx with Kconfig
+  hw/arm: Express dependencies of allwinner / cubieboard with Kconfig
+  hw/arm: Express dependencies of the MPS2 boards with Kconfig
+  hw/arm: Express dependencies of the raspi machines with Kconfig
+  hw/arm: Express dependencies of canon-a1100 with Kconfig
+  hw/arm: Express dependencies of sabrelite with Kconfig
+  hw/arm: Express dependencies of the MSF2 / EMCRAFT_SF2 machine with
+    Kconfig
+  hw/arm: Express dependencies for remaining IMX boards with Kconfig
+  hw/arm: Express dependencies of the microbit / nrf51 machine with
+    Kconfig
+  hw/arm: Express dependencies of the ZynqMP zcu102 machine with Kconfig
+  hw/arm: Express dependencies of the xlnx-versal-virt machine with
+    Kconfig
+  hw/arm: Express dependencies of the musca machines with Kconfig
+  hw/arm: Remove hard-enablement of the remaining PCI devices
 
-  What happened instead: same search-based boot order that I get without
-  that option.  Also, /sys/firmware/qemu_fw_cfg/by_name/bootorder/raw is
-  empty and .../size is "0".
+ default-configs/aarch64-softmmu.mak |   4 -
+ default-configs/arm-softmmu.mak     | 179 +++-------------
+ hw/arm/Kconfig                      | 313 +++++++++++++++++++++++++++-
+ hw/arm/Makefile.objs                |  25 ++-
+ hw/display/Kconfig                  |   3 +
+ hw/i2c/Kconfig                      |   2 +-
+ hw/ide/Kconfig                      |   6 +-
+ hw/ide/Makefile.objs                |   2 +-
+ hw/misc/Kconfig                     |   2 +
+ hw/pci/pci-stub.c                   |  11 +
+ hw/usb/Kconfig                      |   6 +-
+ hw/usb/Makefile.objs                |   1 +
+ hw/usb/hcd-ohci-pci.c               | 166 +++++++++++++++
+ hw/usb/hcd-ohci.c                   | 244 ++--------------------
+ hw/usb/hcd-ohci.h                   | 132 ++++++++++++
+ 15 files changed, 700 insertions(+), 396 deletions(-)
+ create mode 100644 hw/usb/hcd-ohci-pci.c
+ create mode 100644 hw/usb/hcd-ohci.h
 
-  Brutal work around that did a useful thing:
-
-  --- qemu-3.1+dfsg.orig/hw/nvram/fw_cfg.c
-  +++ qemu-3.1+dfsg/hw/nvram/fw_cfg.c
-  @@ -869,8 +869,10 @@ static void fw_cfg_machine_reset(void *o
-       FWCfgState *s =3D opaque;
-       char *bootindex =3D get_boot_devices_list(&len);
-   =
-
-  +#if 0
-       ptr =3D fw_cfg_modify_file(s, "bootorder", (uint8_t *)bootindex, len=
-);
-       g_free(ptr);
-  +#endif
-   }
-
-  This change allowed the boot to work (so my bootorder setting was
-  making it to seabios) and also showed up explicitly in
-  /sys/firmware/qemu_fw_cfg.
-
-  I don't know if fw_cfg_modify_file is intended to append rather than
-  replace, but it doesn't; based on the seabios "Runtime_config" docs
-  which suggest "look at the Searching bootorder for output and paste
-  that into the bootorder file" I'd instead just have it only fill in
-  bootorder if there's *no* existing setting, since a user can read out
-  the defaults and copy them in as described if they want the fallback,
-  but that's just from my interpretation of the docs.
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1825207/+subscriptions
+--=20
+2.21.0
