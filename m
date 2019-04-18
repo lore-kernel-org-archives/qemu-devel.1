@@ -6,45 +6,45 @@ X-Spam-Status: No, score=-6.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 19F4DC10F0E
-	for <qemu-devel@archiver.kernel.org>; Thu, 18 Apr 2019 12:58:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 62542C10F0E
+	for <qemu-devel@archiver.kernel.org>; Thu, 18 Apr 2019 12:58:33 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D0D6F21479
-	for <qemu-devel@archiver.kernel.org>; Thu, 18 Apr 2019 12:58:02 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D0D6F21479
+	by mail.kernel.org (Postfix) with ESMTPS id 2056B21479
+	for <qemu-devel@archiver.kernel.org>; Thu, 18 Apr 2019 12:58:33 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2056B21479
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:41176 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:41178 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hH6c6-0003Os-5k
-	for qemu-devel@archiver.kernel.org; Thu, 18 Apr 2019 08:58:02 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:39342)
+	id 1hH6ca-0003jK-DG
+	for qemu-devel@archiver.kernel.org; Thu, 18 Apr 2019 08:58:32 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:38903)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1hH6ai-0002eG-UA
-	for qemu-devel@nongnu.org; Thu, 18 Apr 2019 08:56:38 -0400
+	(envelope-from <david@redhat.com>) id 1hH6ZL-0001Z8-Ae
+	for qemu-devel@nongnu.org; Thu, 18 Apr 2019 08:55:12 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1hH6ah-0005Jx-P9
-	for qemu-devel@nongnu.org; Thu, 18 Apr 2019 08:56:36 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:44736)
+	(envelope-from <david@redhat.com>) id 1hH6ZK-0004bo-2R
+	for qemu-devel@nongnu.org; Thu, 18 Apr 2019 08:55:11 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:37430)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <david@redhat.com>)
-	id 1hH6ah-0005JV-Ga; Thu, 18 Apr 2019 08:56:35 -0400
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
-	[10.5.11.11])
+	id 1hH6ZJ-0004bU-Ms; Thu, 18 Apr 2019 08:55:09 -0400
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+	[10.5.11.14])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 7BC34C066474;
-	Thu, 18 Apr 2019 12:56:34 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id 0F77764368;
+	Thu, 18 Apr 2019 12:48:42 +0000 (UTC)
 Received: from [10.36.117.133] (ovpn-117-133.ams2.redhat.com [10.36.117.133])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id 1FC01600C2;
-	Thu, 18 Apr 2019 12:56:30 +0000 (UTC)
+	by smtp.corp.redhat.com (Postfix) with ESMTP id 639CD5D9C5;
+	Thu, 18 Apr 2019 12:48:40 +0000 (UTC)
 To: Christian Borntraeger <borntraeger@de.ibm.com>,
 	Cornelia Huck <cohuck@redhat.com>
 References: <20190418113110.160664-1-borntraeger@de.ibm.com>
-	<20190418113110.160664-6-borntraeger@de.ibm.com>
+	<20190418113110.160664-11-borntraeger@de.ibm.com>
 From: David Hildenbrand <david@redhat.com>
 Openpgp: preference=signencrypt
 Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
@@ -91,22 +91,23 @@ Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
 	+8Umfre0Xt4713VxMygW0PnQt5aSQdMD58jHFxTk092mU+yIHj5LeYgvwSgZN4airXk5yRXl
 	SE+xAvmumFBY
 Organization: Red Hat GmbH
-Message-ID: <21fcea12-9893-248b-e38d-850607cc33f0@redhat.com>
-Date: Thu, 18 Apr 2019 14:56:30 +0200
+Message-ID: <e17bf7a1-bd4c-8715-96aa-84b8ad11d99e@redhat.com>
+Date: Thu, 18 Apr 2019 14:48:39 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
 	Thunderbird/60.6.1
 MIME-Version: 1.0
-In-Reply-To: <20190418113110.160664-6-borntraeger@de.ibm.com>
+In-Reply-To: <20190418113110.160664-11-borntraeger@de.ibm.com>
 Content-Type: text/plain; charset="UTF-8"
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.31]);
-	Thu, 18 Apr 2019 12:56:34 +0000 (UTC)
+	(mx1.redhat.com [10.5.110.39]);
+	Thu, 18 Apr 2019 12:48:42 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH 05/10] s390x/cpumodel: vector enhancements
+Subject: Re: [Qemu-devel] [PATCH 10/10] s390x/cpumodel: do not claim csske
+ for expanded models in qmp
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -125,59 +126,49 @@ Cc: "Jason J . Herne" <jjherne@linux.ibm.com>,
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190418125630.pQB3KL3JbqUZ7CAQK6CuB0YJUllVrbPK-2icRrX1NeY@z>
+Message-ID: <20190418124839.yTgW3Ns4B54cR_MT2Or3w7Q5oVteJKwdZRz0V2-KOUg@z>
 
 On 18.04.19 13:31, Christian Borntraeger wrote:
-> Add vector enhancements to the cpu model.
+> While we have removed csske and bpb from the default model, the very
+> common case of "host-model" in libvirt (expanded to a base model
+> + features) would still contain bpb and csske. This can prevent
+> migration to a future machine for a host-model machine. Let us fence
+> bpb and csske when we run on a generation 15. If necessary the
+> user can still use -cpu 8561,csske=on,bpb=on to force enable these
+> features.
 > 
 > Signed-off-by: Christian Borntraeger <borntraeger@de.ibm.com>
 > ---
->  target/s390x/cpu_features.c     | 2 ++
->  target/s390x/cpu_features_def.h | 2 ++
->  2 files changed, 4 insertions(+)
+>  target/s390x/cpu_models.c | 11 +++++++++++
+>  1 file changed, 11 insertions(+)
 > 
-> diff --git a/target/s390x/cpu_features.c b/target/s390x/cpu_features.c
-> index 4d624b2256..ed3f6aa969 100644
-> --- a/target/s390x/cpu_features.c
-> +++ b/target/s390x/cpu_features.c
-> @@ -108,6 +108,8 @@ static const S390FeatDef s390_features[] = {
->      FEAT_INIT("irbm", S390_FEAT_TYPE_STFL, 145, "Insert-reference-bits-multiple facility"),
->      FEAT_INIT("msa8-base", S390_FEAT_TYPE_STFL, 146, "Message-security-assist-extension-8 facility (excluding subfunctions)"),
->      FEAT_INIT("cmmnt", S390_FEAT_TYPE_STFL, 147, "CMM: ESSA-enhancement (no translate) facility"),
-> +    FEAT_INIT("vxeh2", S390_FEAT_TYPE_STFL, 148, "Vector Enhancements facility 2"),
-> +    FEAT_INIT("vxbeh", S390_FEAT_TYPE_STFL, 152, "Vector BCD enhancements facility 1"),
->      FEAT_INIT("msa9-base", S390_FEAT_TYPE_STFL, 155, "Message-security-assist-extension-9 facility (excluding subfunctions)"),
->      FEAT_INIT("etoken", S390_FEAT_TYPE_STFL, 156, "Etoken facility"),
-
-BTW, to make this less error prone I thought about converting this into
-something like
-
-FEAT_INIT(VECTOR_ENH2, "vxeh2", S390_FEAT_TYPE_STFL, 148, "Vector
-Enhancements facility 2"),
-
-and internally use
-
-.[S390_FEAT_##FEAT] = { ...
-
-Or similar. But don't have time for that right now.
-
+> diff --git a/target/s390x/cpu_models.c b/target/s390x/cpu_models.c
+> index e727519686..03bdca1fb8 100644
+> --- a/target/s390x/cpu_models.c
+> +++ b/target/s390x/cpu_models.c
+> @@ -629,6 +629,17 @@ CpuModelExpansionInfo *qmp_query_cpu_model_expansion(CpuModelExpansionType type,
+>          return NULL;
+>      }
 >  
-> diff --git a/target/s390x/cpu_features_def.h b/target/s390x/cpu_features_def.h
-> index 030784811b..ce2223c9d7 100644
-> --- a/target/s390x/cpu_features_def.h
-> +++ b/target/s390x/cpu_features_def.h
-> @@ -96,6 +96,8 @@ typedef enum {
->      S390_FEAT_INSERT_REFERENCE_BITS_MULT,
->      S390_FEAT_MSA_EXT_8,
->      S390_FEAT_CMM_NT,
-> +    S390_FEAT_VECTOR_ENH2,
-> +    S390_FEAT_VECTOR_BCD_ENH,
->      S390_FEAT_MSA_EXT_9,
->      S390_FEAT_ETOKEN,
->  
+> +    /*
+> +     * Do not claim CSSKE and BPB if the host model expands to
+> +     * generation 15 or newer
+> +     */
+> +    if (s390_model.def->gen >= 15) {
+> +        clear_bit(S390_FEAT_CONDITIONAL_SSKE,
+> +                  (unsigned long *) &s390_model.features);
+> +        clear_bit(S390_FEAT_BPB,
+> +                  (unsigned long *) &s390_model.features);
+> +    }
+> +
+>      if (type == CPU_MODEL_EXPANSION_TYPE_STATIC) {
+>          delta_changes = true;
+>      } else if (type != CPU_MODEL_EXPANSION_TYPE_FULL) {
 > 
 
-Reviewed-by: David Hildenbrand <david@redhat.com>
+The bad thing about it is, it hinders migration *to* this hw generation.
+Will have to think about this some more. As alternative, simply ignore
+S390_FEAT_CONDITIONAL_SSKE and S390_FEAT_BPB when baselining/comparing.
 
 -- 
 
