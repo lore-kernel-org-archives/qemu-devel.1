@@ -1,24 +1,25 @@
-Received: from eggs.gnu.org ([209.51.188.92]:43330)
+Received: from eggs.gnu.org ([209.51.188.92]:44366)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1hH6tQ-0001gQ-40
-	for qemu-devel@nongnu.org; Thu, 18 Apr 2019 09:15:58 -0400
+	(envelope-from <no-reply@patchew.org>) id 1hH6ys-0003T1-Oi
+	for qemu-devel@nongnu.org; Thu, 18 Apr 2019 09:21:38 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1hH6tP-0008Fo-3o
-	for qemu-devel@nongnu.org; Thu, 18 Apr 2019 09:15:56 -0400
-References: <20190418113110.160664-1-borntraeger@de.ibm.com>
-	<20190418113110.160664-3-borntraeger@de.ibm.com>
-	<295ae226-a574-00e9-8dd5-6d95e47553ce@redhat.com>
-	<806bf939-6560-1fae-f112-60094bd425e7@de.ibm.com>
-From: David Hildenbrand <david@redhat.com>
-Message-ID: <27a9145b-676d-3f65-0584-8805108ed351@redhat.com>
-Date: Thu, 18 Apr 2019 15:15:50 +0200
+	(envelope-from <no-reply@patchew.org>) id 1hH6yp-00045R-5G
+	for qemu-devel@nongnu.org; Thu, 18 Apr 2019 09:21:34 -0400
+Resent-Message-Id: <E1hH6yp-00045R-5G@eggs.gnu.org>
+Received: from sender4-of-o55.zoho.com ([136.143.188.55]:21538)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
+	id 1hH6yo-00043m-WF
+	for qemu-devel@nongnu.org; Thu, 18 Apr 2019 09:21:31 -0400
+In-Reply-To: <20190418125908.11928-1-marcandre.lureau@redhat.com>
+Message-ID: <155559361280.24.11295918513603991002@c2072b67cc0c>
+Reply-To: <qemu-devel@nongnu.org>
 MIME-Version: 1.0
-In-Reply-To: <806bf939-6560-1fae-f112-60094bd425e7@de.ibm.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 02/10] s390x/cpumodel: remove CSSKE from
- base model
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+From: no-reply@patchew.org
+Date: Thu, 18 Apr 2019 06:20:14 -0700 (PDT)
+Subject: Re: [Qemu-devel] [PATCH 0/2] Memory fixes for slirp tcp_emu()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,60 +28,60 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Christian Borntraeger <borntraeger@de.ibm.com>, Cornelia Huck <cohuck@redhat.com>
-Cc: qemu-devel <qemu-devel@nongnu.org>, qemu-s390x <qemu-s390x@nongnu.org>, Halil Pasic <pasic@linux.ibm.com>, Richard Henderson <rth@twiddle.net>, Collin Walling <walling@linux.ibm.com>, "Jason J . Herne" <jjherne@linux.ibm.com>
+To: marcandre.lureau@redhat.com
+Cc: fam@euphon.net, qemu-devel@nongnu.org, jan.kiszka@siemens.com, samuel.thibault@ens-lyon.org
 
-On 18.04.19 15:00, Christian Borntraeger wrote:
-> 
-> 
-> On 18.04.19 14:45, David Hildenbrand wrote:
->> On 18.04.19 13:31, Christian Borntraeger wrote:
->>> conditional sske is deprecated and a distant future machine (will be one
->>> where the IBC will not allow to fully go back to z14) will remove this
->>> feature. To prepare for this and allow for the z14 and older cpu model
->>> to still run on systems without csske, remove csske from the base (and
->>
->> will csske feature be a default feature for zNext? Or is it not
->> available *at all*.
->>
->> In case it is not available, baselining and cpu model comparison have to
->> be thought about "ignoring csske".
->>
->>> thus the default models for z10..z14). For compat machines we have to
->>> add those back.
->>
->> Base models are machine-independent. That means, changing base models is
->> not supported.
-> 
-> Why is that? for the expansion?
-
-Yes, and baselining. It's what the QAPI interface promises.
-
-> 
->> Once we introduce new models like here, we can set the
->> new base models into stone.
-> 
-> the new model is easy (and yes I could only disable CSSKE in the base
-> model for gen15 but not for gen14. 
-> 
-> The problem is that without some kind of fixup for older base models like
-> z10-z14 expansion will fall back to z9 on anything that no longer has
-> csske. 
-
-I'd prefer to do generate the "right" base models right away and not fix
-them up at runtime. They should never change, so fixing them up at
-runtime feels wrong.
-
->> Luckily, we already have "ignored_base_feat", maybe we can simply add
->> csske there and have it working.
-> 
-> Yes, maybe we could ignore csske. 
-> 
-
-Yes, that should at least avoid falling back to a z9.
-
--- 
-
-Thanks,
-
-David / dhildenb
+UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDE5MDQxODEyNTkwOC4xMTky
+OC0xLW1hcmNhbmRyZS5sdXJlYXVAcmVkaGF0LmNvbS8KCgoKSGksCgpUaGlzIHNlcmllcyBzZWVt
+cyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1zLiBTZWUgb3V0cHV0IGJlbG93IGZv
+cgptb3JlIGluZm9ybWF0aW9uOgoKU3ViamVjdDogW1FlbXUtZGV2ZWxdIFtQQVRDSCAwLzJdIE1l
+bW9yeSBmaXhlcyBmb3Igc2xpcnAgdGNwX2VtdSgpClR5cGU6IHNlcmllcwpNZXNzYWdlLWlkOiAy
+MDE5MDQxODEyNTkwOC4xMTkyOC0xLW1hcmNhbmRyZS5sdXJlYXVAcmVkaGF0LmNvbQoKPT09IFRF
+U1QgU0NSSVBUIEJFR0lOID09PQojIS9iaW4vYmFzaApnaXQgcmV2LXBhcnNlIGJhc2UgPiAvZGV2
+L251bGwgfHwgZXhpdCAwCmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLnJlbmFtZWxpbWl0IDAKZ2l0
+IGNvbmZpZyAtLWxvY2FsIGRpZmYucmVuYW1lcyBUcnVlCmdpdCBjb25maWcgLS1sb2NhbCBkaWZm
+LmFsZ29yaXRobSBoaXN0b2dyYW0KLi9zY3JpcHRzL2NoZWNrcGF0Y2gucGwgLS1tYWlsYmFjayBi
+YXNlLi4KPT09IFRFU1QgU0NSSVBUIEVORCA9PT0KClVwZGF0aW5nIDNjOGNmNWE5YzIxZmY4Nzgy
+MTY0ZDFkZWY3ZjQ0YmQ4ODg3MTMzODQKU3dpdGNoZWQgdG8gYSBuZXcgYnJhbmNoICd0ZXN0Jwo3
+YzZkNmQwIHNsaXJwOiBkb24ndCBtYW5pcHVsYXRlIHNvX3JjdiBpbiB0Y3BfZW11KCkKODRkOGUz
+ZSBzbGlycDogZW5zdXJlIHRoZXJlIGlzIGVub3VnaCBzcGFjZSBpbiBtYnVmIHRvIG51bGwtdGVy
+bWluYXRlCgo9PT0gT1VUUFVUIEJFR0lOID09PQoxLzIgQ2hlY2tpbmcgY29tbWl0IDg0ZDhlM2Vh
+Njg3ZCAoc2xpcnA6IGVuc3VyZSB0aGVyZSBpcyBlbm91Z2ggc3BhY2UgaW4gbWJ1ZiB0byBudWxs
+LXRlcm1pbmF0ZSkKRVJST1I6IGNvZGUgaW5kZW50IHNob3VsZCBuZXZlciB1c2UgdGFicwojMjI6
+IEZJTEU6IHNsaXJwL3NyYy90Y3Bfc3Vici5jOjY0NzoKK15JXkleSW1faW5jKG0sIG0tPm1fbGVu
+ICsgMSk7JAoKRVJST1I6IGNvZGUgaW5kZW50IHNob3VsZCBuZXZlciB1c2UgdGFicwojMzg6IEZJ
+TEU6IHNsaXJwL3NyYy90Y3Bfc3Vici5jOjc3OToKK15JXkltX2luYyhtLCBtLT5tX2xlbiArIDEp
+OyQKCnRvdGFsOiAyIGVycm9ycywgMCB3YXJuaW5ncywgMjEgbGluZXMgY2hlY2tlZAoKUGF0Y2gg
+MS8yIGhhcyBzdHlsZSBwcm9ibGVtcywgcGxlYXNlIHJldmlldy4gIElmIGFueSBvZiB0aGVzZSBl
+cnJvcnMKYXJlIGZhbHNlIHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRhaW5lciwg
+c2VlCkNIRUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMuCgoyLzIgQ2hlY2tpbmcgY29tbWl0IDdjNmQ2
+ZDBlOGM2OCAoc2xpcnA6IGRvbid0IG1hbmlwdWxhdGUgc29fcmN2IGluIHRjcF9lbXUoKSkKRVJS
+T1I6IGNvZGUgaW5kZW50IHNob3VsZCBuZXZlciB1c2UgdGFicwojNDc6IEZJTEU6IHNsaXJwL3Ny
+Yy90Y3Bfc3Vici5jOjYzODoKK15JXkleSWlmIChnX3N0cnN0cl9sZW4obS0+bV9kYXRhLCBtLT5t
+X2xlbiwgIlxyXG4iKSQKCldBUk5JTkc6IGxpbmUgb3ZlciA4MCBjaGFyYWN0ZXJzCiM0ODogRklM
+RTogc2xpcnAvc3JjL3RjcF9zdWJyLmM6NjM5OgorICAgICAgICAgICAgICAgICAgICAgICAgICAg
+ICAgICYmIHNzY2FuZihtLT5tX2RhdGEsICIldSUqWyAsXSV1XHJcbiIsICZuMSwgJm4yKSA9PSAy
+KSB7CgpFUlJPUjogY29kZSBpbmRlbnQgc2hvdWxkIG5ldmVyIHVzZSB0YWJzCiM0ODogRklMRTog
+c2xpcnAvc3JjL3RjcF9zdWJyLmM6NjM5OgorXkleSV5JXkkmJiBzc2NhbmYobS0+bV9kYXRhLCAi
+JXUlKlsgLF0ldVxyXG4iLCAmbjEsICZuMikgPT0gMikgeyQKCldBUk5JTkc6IGxpbmUgb3ZlciA4
+MCBjaGFyYWN0ZXJzCiM2MTogRklMRTogc2xpcnAvc3JjL3RjcF9zdWJyLmM6NjU4OgorICAgICAg
+ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgbS0+bV9sZW4gPSBzbnByaW50ZihtLT5t
+X2RhdGEsIG0tPm1fc2l6ZSwKCkVSUk9SOiBjb2RlIGluZGVudCBzaG91bGQgbmV2ZXIgdXNlIHRh
+YnMKIzYxOiBGSUxFOiBzbGlycC9zcmMvdGNwX3N1YnIuYzo2NTg6CiteSV5JXkleSV5JbS0+bV9s
+ZW4gPSBzbnByaW50ZihtLT5tX2RhdGEsIG0tPm1fc2l6ZSwkCgpFUlJPUjogbGluZSBvdmVyIDkw
+IGNoYXJhY3RlcnMKIzYyOiBGSUxFOiBzbGlycC9zcmMvdGNwX3N1YnIuYzo2NTk6CisgICAgICAg
+ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
+ICAgICAgICAgICAgICAgIiVkLCVkXHJcbiIsIG4xLCBuMik7CgpFUlJPUjogY29kZSBpbmRlbnQg
+c2hvdWxkIG5ldmVyIHVzZSB0YWJzCiM2MjogRklMRTogc2xpcnAvc3JjL3RjcF9zdWJyLmM6NjU5
+OgorXkleSV5JXkleSV5JXkleSV5JXkkiJWQsJWRcclxuIiwgbjEsIG4yKTskCgpFUlJPUjogY29k
+ZSBpbmRlbnQgc2hvdWxkIG5ldmVyIHVzZSB0YWJzCiM2NzogRklMRTogc2xpcnAvc3JjL3RjcF9z
+dWJyLmM6NjYxOgorXkleSV5JcmV0dXJuIDE7JAoKdG90YWw6IDYgZXJyb3JzLCAyIHdhcm5pbmdz
+LCA0MCBsaW5lcyBjaGVja2VkCgpQYXRjaCAyLzIgaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2Ug
+cmV2aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9y
+dCB0aGVtIHRvIHRoZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4K
+Cj09PSBPVVRQVVQgRU5EID09PQoKVGVzdCBjb21tYW5kIGV4aXRlZCB3aXRoIGNvZGU6IDEKCgpU
+aGUgZnVsbCBsb2cgaXMgYXZhaWxhYmxlIGF0Cmh0dHA6Ly9wYXRjaGV3Lm9yZy9sb2dzLzIwMTkw
+NDE4MTI1OTA4LjExOTI4LTEtbWFyY2FuZHJlLmx1cmVhdUByZWRoYXQuY29tL3Rlc3RpbmcuY2hl
+Y2twYXRjaC8/dHlwZT1tZXNzYWdlLgotLS0KRW1haWwgZ2VuZXJhdGVkIGF1dG9tYXRpY2FsbHkg
+YnkgUGF0Y2hldyBbaHR0cHM6Ly9wYXRjaGV3Lm9yZy9dLgpQbGVhc2Ugc2VuZCB5b3VyIGZlZWRi
+YWNrIHRvIHBhdGNoZXctZGV2ZWxAcmVkaGF0LmNvbQ==
