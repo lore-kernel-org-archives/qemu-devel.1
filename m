@@ -3,44 +3,44 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
 X-Spam-Status: No, score=-3.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS autolearn=ham autolearn_force=no
-	version=3.4.0
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B1944C10F0B
-	for <qemu-devel@archiver.kernel.org>; Thu, 18 Apr 2019 04:53:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9009CC10F0B
+	for <qemu-devel@archiver.kernel.org>; Thu, 18 Apr 2019 04:56:05 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 787942183E
-	for <qemu-devel@archiver.kernel.org>; Thu, 18 Apr 2019 04:53:47 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 787942183E
+	by mail.kernel.org (Postfix) with ESMTPS id 540E12183E
+	for <qemu-devel@archiver.kernel.org>; Thu, 18 Apr 2019 04:56:05 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 540E12183E
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:35760 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:35810 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hGz3S-0005Z6-O9
-	for qemu-devel@archiver.kernel.org; Thu, 18 Apr 2019 00:53:46 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:37521)
+	id 1hGz5g-0006oH-NB
+	for qemu-devel@archiver.kernel.org; Thu, 18 Apr 2019 00:56:04 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:38174)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1hGz2H-0004xb-5i
-	for qemu-devel@nongnu.org; Thu, 18 Apr 2019 00:52:34 -0400
+	(envelope-from <thuth@redhat.com>) id 1hGz4m-0006EZ-J6
+	for qemu-devel@nongnu.org; Thu, 18 Apr 2019 00:55:09 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1hGz2D-0002w6-76
-	for qemu-devel@nongnu.org; Thu, 18 Apr 2019 00:52:32 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:38256)
+	(envelope-from <thuth@redhat.com>) id 1hGz4i-0004o5-Er
+	for qemu-devel@nongnu.org; Thu, 18 Apr 2019 00:55:08 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:59726)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <thuth@redhat.com>)
-	id 1hGz26-0002r0-9l; Thu, 18 Apr 2019 00:52:22 -0400
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
-	[10.5.11.16])
+	id 1hGz4X-0004eX-Jz; Thu, 18 Apr 2019 00:54:54 -0400
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+	[10.5.11.23])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 883BC2D81A;
-	Thu, 18 Apr 2019 04:52:21 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id 238F188317;
+	Thu, 18 Apr 2019 04:54:51 +0000 (UTC)
 Received: from thuth.remote.csb (ovpn-116-56.ams2.redhat.com [10.36.116.56])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id 865745C207;
-	Thu, 18 Apr 2019 04:52:17 +0000 (UTC)
+	by smtp.corp.redhat.com (Postfix) with ESMTP id 9C20F19C67;
+	Thu, 18 Apr 2019 04:54:46 +0000 (UTC)
 To: Stephen Checkoway <stephen.checkoway@oberlin.edu>,
 	QEMU Developers <qemu-devel@nongnu.org>,
 	=?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
@@ -49,7 +49,7 @@ To: Stephen Checkoway <stephen.checkoway@oberlin.edu>,
 	Markus Armbruster <armbru@redhat.com>, Laszlo Ersek <lersek@redhat.com>,
 	Laurent Vivier <lvivier@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
 References: <20190417220147.67648-1-stephen.checkoway@oberlin.edu>
-	<20190417220147.67648-9-stephen.checkoway@oberlin.edu>
+	<20190417220147.67648-10-stephen.checkoway@oberlin.edu>
 From: Thomas Huth <thuth@redhat.com>
 Openpgp: preference=signencrypt
 Autocrypt: addr=thuth@redhat.com; keydata=
@@ -95,23 +95,23 @@ Autocrypt: addr=thuth@redhat.com; keydata=
 	rCELuGwT9hsYkUPjVd4lfylN3mzEc6iAv/wwjsc0DRTSQCpXT3v2ymTAsRKrVaEZLibTXaf+
 	WslxWek3xNYRiqwwWAJuL652eAlxUgQ5ZS+fXBRTiQpJ+F26I/2lccScRd9G5w==
 Organization: Red Hat
-Message-ID: <2b6e60dc-9484-ffd4-afb5-6be792ee586d@redhat.com>
-Date: Thu, 18 Apr 2019 06:52:16 +0200
+Message-ID: <c3dba706-c5c9-9cc5-8f00-0291ae630f65@redhat.com>
+Date: Thu, 18 Apr 2019 06:54:45 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
 	Thunderbird/60.6.1
 MIME-Version: 1.0
-In-Reply-To: <20190417220147.67648-9-stephen.checkoway@oberlin.edu>
+In-Reply-To: <20190417220147.67648-10-stephen.checkoway@oberlin.edu>
 Content-Type: text/plain; charset="UTF-8"
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.30]);
-	Thu, 18 Apr 2019 04:52:21 +0000 (UTC)
+	(mx1.redhat.com [10.5.110.28]);
+	Thu, 18 Apr 2019 04:54:51 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH v3 08/10] block/pflash_cfi02: Implement
- multi-sector erase
+Subject: Re: [Qemu-devel] [PATCH v3 09/10] block/pflash_cfi02: Implement
+ erase suspend/resume
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -126,20 +126,24 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190418045216.CbuilRGameFHiYInHxebXpsQ4HGxxKzUsfKnLcY91BM@z>
+Message-ID: <20190418045445.ryP8Yy8kfzGRsvziTa0v5H7JsdnleqqjyEwkLEpdEOI@z>
 
 On 18/04/2019 00.01, Stephen Checkoway wrote:
-> After two unlock cycles and a sector erase command, the AMD flash chips
-> start a 50 us erase time out. Any additional sector erase commands add a
-> sector to be erased and restart the 50 us timeout. During the timeout,
-> status bit DQ3 is cleared. After the time out, DQ3 is asserted during
-> erasure.
+> During a sector erase (but not a chip erase), the embeded erase program
+> can be suspended. Once suspended, the sectors not selected for erasure
+> may be read and programmed. Autoselect mode is allowed during erase
+> suspend mode. Presumably, CFI queries are similarly allowed so this
+> commit allows them as well.
+> 
+> Since guest firmware can use status bits DQ7, DQ6, DQ3, and DQ2 to
+> determine the current state of sector erasure, these bits are properly
+> implemented.
 > 
 > Signed-off-by: Stephen Checkoway <stephen.checkoway@oberlin.edu>
 > ---
->  hw/block/pflash_cfi02.c   | 94 +++++++++++++++++++++++++++++++--------
->  tests/pflash-cfi02-test.c | 59 ++++++++++++++++++++++--
->  2 files changed, 131 insertions(+), 22 deletions(-)
+>  hw/block/pflash_cfi02.c   | 153 ++++++++++++++++++++++++++++++++++----
+>  tests/pflash-cfi02-test.c | 112 ++++++++++++++++++++++++++++
+>  2 files changed, 251 insertions(+), 14 deletions(-)
 
 Acked-by: Thomas Huth <thuth@redhat.com>
 
