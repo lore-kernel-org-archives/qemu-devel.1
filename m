@@ -6,76 +6,107 @@ X-Spam-Status: No, score=-6.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3CD0CC10F0E
-	for <qemu-devel@archiver.kernel.org>; Thu, 18 Apr 2019 15:44:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7DD9DC10F0E
+	for <qemu-devel@archiver.kernel.org>; Thu, 18 Apr 2019 15:47:00 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0751C217D7
-	for <qemu-devel@archiver.kernel.org>; Thu, 18 Apr 2019 15:44:57 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0751C217D7
+	by mail.kernel.org (Postfix) with ESMTPS id 3CD75217D7
+	for <qemu-devel@archiver.kernel.org>; Thu, 18 Apr 2019 15:47:00 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3CD75217D7
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:43242 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:43324 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hH9Dd-0007Ak-8N
-	for qemu-devel@archiver.kernel.org; Thu, 18 Apr 2019 11:44:57 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:43722)
+	id 1hH9Fb-0008WT-GY
+	for qemu-devel@archiver.kernel.org; Thu, 18 Apr 2019 11:46:59 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:44588)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1hH94O-0007d7-CD
-	for qemu-devel@nongnu.org; Thu, 18 Apr 2019 11:35:25 -0400
+	(envelope-from <david@redhat.com>) id 1hH95j-00012S-RI
+	for qemu-devel@nongnu.org; Thu, 18 Apr 2019 11:36:48 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1hH8wC-0002DT-Ud
-	for qemu-devel@nongnu.org; Thu, 18 Apr 2019 11:26:58 -0400
-Received: from mail-wm1-f66.google.com ([209.85.128.66]:35817)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1hH8wC-0002D4-KI
-	for qemu-devel@nongnu.org; Thu, 18 Apr 2019 11:26:56 -0400
-Received: by mail-wm1-f66.google.com with SMTP id y197so3376909wmd.0
-	for <qemu-devel@nongnu.org>; Thu, 18 Apr 2019 08:26:56 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=1e100.net; s=20161025;
-	h=x-gm-message-state:subject:to:references:from:openpgp:message-id
-	:date:user-agent:mime-version:in-reply-to:content-language
-	:content-transfer-encoding;
-	bh=Pa7lLHFNbGvoBlO0A9+FQCbG6c6HG0V1VPl1vzBfrrc=;
-	b=S5UadXhHUmnsUJsSKWxTaFXpgMYlbcnj8XxYSO8LkLm5txH7eGQqnPLIZ3q2QE+Sv8
-	KG9ZLJWYU48D5iJreEXlL/8slSS8vjoeNXU0fr9z5xPLw+rOsSMnb42aRCFhzcsWFdBT
-	5+qNDME1HmdzV9sa09htVC17Kwn6JyP4FcT0Kt/EVcGUvIHpWoyR4LxPljOB63i/DmxU
-	/hS3Pyj72yaDG8fjdLHpx5Qn9RgAW0r3GBvzaaPpD8l1OojVrxQKz7fsgjF+Wr4RA/mQ
-	SX8uO16hFeYNno4QW1Z4CoV6luX8DRQnzBMMYyvQkcUkAXlgvSgR3k1U+0LzwNnb2RWQ
-	CJrw==
-X-Gm-Message-State: APjAAAXCp1h/7UipjGmR0YXHvbenn8GJfqMxEeiYcJvppDEEHIh47iQs
-	s4+ahFc26fYdlYixBU2/4ckMD8xDkuI=
-X-Google-Smtp-Source: APXvYqxF7xNG9SfFA2KtLuZUc0pxZNtoF3ZfLAmD31O8X0p2dOvjbJ/vSODWOBCP6CheygdxkOhyNQ==
-X-Received: by 2002:a1c:4102:: with SMTP id o2mr3392762wma.91.1555601215198;
-	Thu, 18 Apr 2019 08:26:55 -0700 (PDT)
-Received: from [192.168.1.33] (193.red-88-21-103.staticip.rima-tde.net.
-	[88.21.103.193])
-	by smtp.gmail.com with ESMTPSA id z7sm2868486wrt.10.2019.04.18.08.26.54
-	(version=TLS1_3 cipher=AEAD-AES128-GCM-SHA256 bits=128/128);
-	Thu, 18 Apr 2019 08:26:54 -0700 (PDT)
-To: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
-References: <20190418145355.21100-1-armbru@redhat.com>
-	<20190418145355.21100-4-armbru@redhat.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Openpgp: id=89C1E78F601EE86C867495CBA2A3FD6EDEADC0DE;
-	url=http://pgp.mit.edu/pks/lookup?op=get&search=0xA2A3FD6EDEADC0DE
-Message-ID: <78da03ed-2b9f-2357-6f28-44115d8b2955@redhat.com>
-Date: Thu, 18 Apr 2019 17:26:54 +0200
+	(envelope-from <david@redhat.com>) id 1hH95i-0007wW-SI
+	for qemu-devel@nongnu.org; Thu, 18 Apr 2019 11:36:47 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:50392)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <david@redhat.com>)
+	id 1hH95i-0007sx-JH; Thu, 18 Apr 2019 11:36:46 -0400
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+	[10.5.11.22])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id AB68D30BA369;
+	Thu, 18 Apr 2019 15:36:42 +0000 (UTC)
+Received: from [10.36.117.52] (ovpn-117-52.ams2.redhat.com [10.36.117.52])
+	by smtp.corp.redhat.com (Postfix) with ESMTP id 04E2B1001E98;
+	Thu, 18 Apr 2019 15:36:40 +0000 (UTC)
+To: Christian Borntraeger <borntraeger@de.ibm.com>,
+	Cornelia Huck <cohuck@redhat.com>
+References: <20190418113110.160664-1-borntraeger@de.ibm.com>
+	<20190418113110.160664-8-borntraeger@de.ibm.com>
+From: David Hildenbrand <david@redhat.com>
+Openpgp: preference=signencrypt
+Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
+	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
+	SE+xAvmumFBY
+Organization: Red Hat GmbH
+Message-ID: <2a98f8a0-15bc-aa3d-f4ad-71059d65dad8@redhat.com>
+Date: Thu, 18 Apr 2019 17:36:40 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
 	Thunderbird/60.6.1
 MIME-Version: 1.0
-In-Reply-To: <20190418145355.21100-4-armbru@redhat.com>
+In-Reply-To: <20190418113110.160664-8-borntraeger@de.ibm.com>
 Content-Type: text/plain; charset="UTF-8"
 Content-Language: en-US
-Content-Transfer-Encoding: 8bit
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+	(mx1.redhat.com [10.5.110.49]);
+	Thu, 18 Apr 2019 15:36:42 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-	[fuzzy]
-X-Received-From: 209.85.128.66
-Subject: Re: [Qemu-devel] [PATCH 3/6] gdbstub: Reject invalid RLE repeat
- counts
+X-Received-From: 209.132.183.28
+Subject: Re: [Qemu-devel] [PATCH 07/10] s390x/cpumodel: deflate
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -87,48 +118,64 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: "Jason J . Herne" <jjherne@linux.ibm.com>,
+	Collin Walling <walling@linux.ibm.com>, qemu-devel <qemu-devel@nongnu.org>,
+	Halil Pasic <pasic@linux.ibm.com>, qemu-s390x <qemu-s390x@nongnu.org>,
+	Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190418152654.slACDWFVeBgw5zo7vSWhdngPYD1_hLtNKraK1WExE0o@z>
+Message-ID: <20190418153640.BdBVAjzIeKFudmXaXIyE7bwAjdGIZ0CkccoJrjdSJC0@z>
 
-On 4/18/19 4:53 PM, Markus Armbruster wrote:
-> "Debugging with GDB / Appendix E GDB Remote Serial Protocol /
-> Overview" specifies "The printable characters '#' and '$' or with a
-> numeric value greater than 126 must not be used."  gdb_read_byte()
-> only rejects values < 32.  This is wrong.  Impact depends on the caller:
+On 18.04.19 13:31, Christian Borntraeger wrote:
+> add the deflate conversion facility.
+
+Nit:
+
+"s390x/cpumodel: add Deflate-conversion facility"
+
 > 
-> * gdb_handlesig() passes a char.  Incorrectly accepts '#', '$' and
->   '\127'.
-> 
-> * gdb_chr_receive() passes an uint8_t.  Additionally accepts
->   characters with the most-significant bit set.
-> 
-> Correct the validity check to match the specification.
-> 
-> Signed-off-by: Markus Armbruster <armbru@redhat.com>
+> Signed-off-by: Christian Borntraeger <borntraeger@de.ibm.com>
 > ---
->  gdbstub.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
+>  target/s390x/cpu_features.c     |  9 +++++++++
+>  target/s390x/cpu_features.h     |  1 +
+>  target/s390x/cpu_features_def.h |  7 +++++++
+>  target/s390x/gen-features.c     | 12 ++++++++++++
+>  target/s390x/kvm.c              |  6 ++++++
+>  5 files changed, 35 insertions(+)
 > 
-> diff --git a/gdbstub.c b/gdbstub.c
-> index d54abd17cc..a6dce1b027 100644
-> --- a/gdbstub.c
-> +++ b/gdbstub.c
-> @@ -2064,7 +2064,7 @@ static void gdb_read_byte(GDBState *s, int ch)
->              }
->              break;
->          case RS_GETLINE_RLE:
-> -            if (ch < ' ') {
+> diff --git a/target/s390x/cpu_features.c b/target/s390x/cpu_features.c
+> index e0a4769c19..5f37e655fe 100644
+> --- a/target/s390x/cpu_features.c
+> +++ b/target/s390x/cpu_features.c
+> @@ -110,6 +110,7 @@ static const S390FeatDef s390_features[] = {
+>      FEAT_INIT("cmmnt", S390_FEAT_TYPE_STFL, 147, "CMM: ESSA-enhancement (no translate) facility"),
+>      FEAT_INIT("vxeh2", S390_FEAT_TYPE_STFL, 148, "Vector Enhancements facility 2"),
+>      FEAT_INIT("esort-base", S390_FEAT_TYPE_STFL, 150, "Enhanced-sort facility (excluding subfunctions)"),
+> +    FEAT_INIT("deflate-base", S390_FEAT_TYPE_STFL, 151, "Deflate-conversion facility (excluding subfunctions)"),
+>      FEAT_INIT("vxbeh", S390_FEAT_TYPE_STFL, 152, "Vector BCD enhancements facility 1"),
+>      FEAT_INIT("msa9-base", S390_FEAT_TYPE_STFL, 155, "Message-security-assist-extension-9 facility (excluding subfunctions)"),
+>      FEAT_INIT("etoken", S390_FEAT_TYPE_STFL, 156, "Etoken facility"),
+> @@ -347,6 +348,11 @@ static const S390FeatDef s390_features[] = {
+>      FEAT_INIT("sortl-32", S390_FEAT_TYPE_SORTL, 130, "SORTL 32 input lists"),
+>      FEAT_INIT("sortl-128", S390_FEAT_TYPE_SORTL, 132, "SORTL 128 input lists"),
+>      FEAT_INIT("sortl-f0", S390_FEAT_TYPE_SORTL, 192, "SORTL format 0 parameter-block"),
+> +
+> +    FEAT_INIT("dfltcc-gdht", S390_FEAT_TYPE_DFLTCC, 1, "DFLTCC GDHT"),
+> +    FEAT_INIT("dfltcc-cmpr", S390_FEAT_TYPE_DFLTCC, 2, "DFLTCC CMPR"),
+> +    FEAT_INIT("dfltcc-xpnd", S390_FEAT_TYPE_DFLTCC, 4, "DFLTCC XPND"),
+> +    FEAT_INIT("dfltcc-f0", S390_FEAT_TYPE_DFLTCC, 192, "DFLTCC format 0 parameter-block"),
+>  };
 
-Can you add a comment referring to the ""Debugging with GDB / Appendix E
-GDB Remote Serial Protocol / Overview" here?
+Just wonder, "format 0 parameter-block" is actually a feature right,
+like "format 0 can be used". Can we hide format-0, IOW could that be
+like "query" and always supported? (especially due to backwards
+compatibility)
 
-Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
 
-> +            if (ch < ' ' || ch == '#' || ch == '$' || ch > 126) {
->                  /* invalid RLE count encoding */
->                  trace_gdbstub_err_invalid_repeat((uint8_t)ch);
->                  s->state = RS_GETLINE;
-> 
+-- 
+
+Thanks,
+
+David / dhildenb
 
