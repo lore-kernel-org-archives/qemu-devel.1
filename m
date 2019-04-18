@@ -2,75 +2,82 @@ Return-Path: <SRS0=08iY=SU=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_PASS,URIBL_BLOCKED autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BDA7AC10F0E
-	for <qemu-devel@archiver.kernel.org>; Thu, 18 Apr 2019 12:41:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 34D10C10F14
+	for <qemu-devel@archiver.kernel.org>; Thu, 18 Apr 2019 12:45:06 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7F97221479
-	for <qemu-devel@archiver.kernel.org>; Thu, 18 Apr 2019 12:41:41 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7F97221479
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id 07FA020835
+	for <qemu-devel@archiver.kernel.org>; Thu, 18 Apr 2019 12:45:05 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 07FA020835
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:40991 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:41010 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hH6MG-0005aT-Ra
-	for qemu-devel@archiver.kernel.org; Thu, 18 Apr 2019 08:41:40 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:36378)
+	id 1hH6PZ-0006lJ-80
+	for qemu-devel@archiver.kernel.org; Thu, 18 Apr 2019 08:45:05 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:37010)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1hH6LR-0005HT-A5
-	for qemu-devel@nongnu.org; Thu, 18 Apr 2019 08:40:50 -0400
+	(envelope-from <philmd@redhat.com>) id 1hH6Oi-0006Hw-66
+	for qemu-devel@nongnu.org; Thu, 18 Apr 2019 08:44:13 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1hH6LP-0003w7-TB
-	for qemu-devel@nongnu.org; Thu, 18 Apr 2019 08:40:49 -0400
-Received: from indium.canonical.com ([91.189.90.7]:52722)
+	(envelope-from <philmd@redhat.com>) id 1hH6Oh-0007CF-8C
+	for qemu-devel@nongnu.org; Thu, 18 Apr 2019 08:44:12 -0400
+Received: from mail-wr1-f66.google.com ([209.85.221.66]:46510)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1hH6LP-0003uu-NV
-	for qemu-devel@nongnu.org; Thu, 18 Apr 2019 08:40:47 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1hH6LO-00050G-Gd
-	for <qemu-devel@nongnu.org>; Thu, 18 Apr 2019 12:40:46 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 446982E80CB
-	for <qemu-devel@nongnu.org>; Thu, 18 Apr 2019 12:40:46 +0000 (UTC)
+	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1hH6Oh-0007Bl-2Q
+	for qemu-devel@nongnu.org; Thu, 18 Apr 2019 08:44:11 -0400
+Received: by mail-wr1-f66.google.com with SMTP id t17so2778091wrw.13
+	for <qemu-devel@nongnu.org>; Thu, 18 Apr 2019 05:44:11 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=1e100.net; s=20161025;
+	h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
+	:date:user-agent:mime-version:in-reply-to:content-language
+	:content-transfer-encoding;
+	bh=M3UlS4rawRt2jE3EMSwiYOIGr68uUe7U0NU4ND8gLeo=;
+	b=ES/JXEpZ8gb+tQK03P74NLufkOsJyJ+C7IEfj7HPcG8W+4VMSvkwfutxFXyelpwT3n
+	CiPduiRA5gWDhxTggAezckg9OhP9z7pHjtmJ0Uxq/PH0UPDOGeG1sqIKrqgLQBgJRVqc
+	IC2ynqO23D0ZIawHJA1OGv5kiF7AYaabN8xTUIQUj4taXFpcblfJxMN8+0DQcGiyMyYj
+	Vk/yhwwl9dG1e5GWdSRDnfKs3Opu/T06kvWeqOgew/6S6LNMYFOokAdWhAWiyBHN5h3j
+	wBzQT2Tv2u57jk4j0Kh4vTNpGZRzBk5i4FcgS6EQEJgwqKTarG3L/tR71oL8vbBe0KHN
+	Lo5g==
+X-Gm-Message-State: APjAAAVOyoqXb+6TVpVwdLISyJsyP307v7ALXBilYlmCvQAE5zp1KO8D
+	eoZTcu6lMKLedCnPJOXyf5578Q==
+X-Google-Smtp-Source: APXvYqzdGQ+oyTV1YPVDsqxJUOX3Ng8+2liIs+av8/J0gVtaK4qCq4NcSZ7MVRtp7aajkhf0YpflJw==
+X-Received: by 2002:a5d:6b02:: with SMTP id v2mr849110wrw.84.1555591449936;
+	Thu, 18 Apr 2019 05:44:09 -0700 (PDT)
+Received: from [192.168.1.33] (193.red-88-21-103.staticip.rima-tde.net.
+	[88.21.103.193]) by smtp.gmail.com with ESMTPSA id
+	b134sm2894071wmd.26.2019.04.18.05.44.09
+	(version=TLS1_3 cipher=AEAD-AES128-GCM-SHA256 bits=128/128);
+	Thu, 18 Apr 2019 05:44:09 -0700 (PDT)
+To: Eduardo Habkost <ehabkost@redhat.com>, qemu-devel@nongnu.org
+References: <20190418040103.15314-1-ehabkost@redhat.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Openpgp: id=89C1E78F601EE86C867495CBA2A3FD6EDEADC0DE;
+	url=http://pgp.mit.edu/pks/lookup?op=get&search=0xA2A3FD6EDEADC0DE
+Message-ID: <7ffb2830-56e0-2d9f-ea4e-71543fa06ece@redhat.com>
+Date: Thu, 18 Apr 2019 14:44:08 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+	Thunderbird/60.6.1
 MIME-Version: 1.0
+In-Reply-To: <20190418040103.15314-1-ehabkost@redhat.com>
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Thu, 18 Apr 2019 12:31:06 -0000
-From: Peter Maydell <peter.maydell@linaro.org>
-To: qemu-devel@nongnu.org
-X-Launchpad-Notification-Type: bug
-X-Launchpad-Bug: product=qemu; status=Confirmed; importance=Undecided;
-	assignee=None; 
-X-Launchpad-Bug-Tags: fetch mmu mpu
-X-Launchpad-Bug-Information-Type: Public
-X-Launchpad-Bug-Private: no
-X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: pmaydell shahab-vahedi
-X-Launchpad-Bug-Reporter: Shahab Vahedi (shahab-vahedi)
-X-Launchpad-Bug-Modifier: Peter Maydell (pmaydell)
-References: <155558881987.7164.1099557133760519082.malonedeb@chaenomeles.canonical.com>
-Message-Id:
- <155559066657.17431.2368396005886607099.malone@soybean.canonical.com>
-X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
-X-Launchpad-Message-For: qemu-devel-ml
-Precedence: bulk
-X-Generated-By: Launchpad (canonical.com); Revision="18928";
-	Instance="launchpad-lazr.conf"
-X-Launchpad-Hash: 61ad77454268050dbea01cfeebf53552bbf70843
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 91.189.90.7
-Subject: [Qemu-devel] [Bug 1825359] Re: cpu_ld*_code() triggers
- MMU_DATA_LOAD i.s.o. MMU_INST_FETCH
+	[fuzzy]
+X-Received-From: 209.85.221.66
+Subject: Re: [Qemu-devel] [PATCH] hppa: Delete unused hppa_cpu_list()
+ function
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
+Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -79,138 +86,64 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1825359 <1825359@bugs.launchpad.net>
+Cc: Igor Mammedov <imammedo@redhat.com>, Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190418123106.AEqKJ9VYFsOLE0BAzHZoH0S3qqQmNhRYlUmTuIU9P3g@z>
+Message-ID: <20190418124408.iVZD4THb6hvyV0So5IwIBySdSz__hzEZ5qp9Kovy_14@z>
 
-Yeah, this looks like a bug -- we should pass the access_type through
-rather than using MMU_DATA_LOAD.
+Hi Eduardo,
 
+On 4/18/19 6:01 AM, Eduardo Habkost wrote:
+> hppa_cpu_list() is dead code and is never called.  Delete it.
+> 
+> Cc: Richard Henderson <rth@twiddle.net>
+> Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
 
-** Changed in: qemu
-       Status: New =3D> Confirmed
+Tested-by: Philippe Mathieu-Daudé <philmd@redhat.com>
 
--- =
+> ---
+>  target/hppa/cpu.c | 22 ----------------------
+>  1 file changed, 22 deletions(-)
+> 
+> diff --git a/target/hppa/cpu.c b/target/hppa/cpu.c
+> index 00bf444620..b3b1826209 100644
+> --- a/target/hppa/cpu.c
+> +++ b/target/hppa/cpu.c
+> @@ -110,28 +110,6 @@ static void hppa_cpu_realizefn(DeviceState *dev, Error **errp)
+>  #endif
+>  }
+>  
+> -static void hppa_cpu_list_entry(gpointer data, gpointer user_data)
+> -{
+> -    ObjectClass *oc = data;
+> -    CPUListState *s = user_data;
+> -
+> -    (*s->cpu_fprintf)(s->file, "  %s\n", object_class_get_name(oc));
+> -}
+> -
+> -void hppa_cpu_list(FILE *f, fprintf_function cpu_fprintf)
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1825359
+You forgot to remove the declaration in "target/hppa/cpu.h".
 
-Title:
-  cpu_ld*_code() triggers MMU_DATA_LOAD i.s.o. MMU_INST_FETCH
+With this header updated:
+Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
 
-Status in QEMU:
-  Confirmed
-
-Bug description:
-  commit 377b155bde451d5ac545fbdcdfbf6ca17a4228f5
-  Merge: c876180938 328eb60dc1
-  Author: Peter Maydell <peter.x@x.x>        ; masked for anti-spamming pur=
-poses
-  Date:   Mon Mar 11 18:26:37 2019 +0000
-  https://github.com/qemu/qemu/commit/377b155bde451d5ac545fbdcdfbf6ca17a422=
-8f5
-  --------------------------------------------------
-
-  cpu_ld*_code() is used for loading code data as the name suggests. Althou=
-gh, it begins accessing memory with MMU_INST_FETCH access type, somewhere d=
-own
-  the road, when the "io_readx(..., access_type=3DMMU_INST_FETCH, ...)" is
-  called, it is ignoring this "access_type" while calling the "tlb_fill()"
-  with a _hardcoded_ MMU_DATA_LOAD:
-
-  cputlb.c
-  --------
-  static uint64_t io_readx(..., MMUAccessType access_type, ...)
-  {
-
-  =C2=A0=C2=A0=C2=A0=C2=A0if (recheck) {
-  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0CPUTLBEntry *entry;
-  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0target_ulong tlb_addr;
-
-  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0tlb_fill(cpu, addr, size,=
- MMU_DATA_LOAD, mmu_idx, retaddr);
-  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0...
-  }
-  --------
-
-  This is an issue, because there can exist _small_ regions of memory (smal=
-ler
-  than the TARGET_PAGE_SIZE) that are only executable and not readable.
-
-  TL;DR
-
-  What happens is at first, a "tlb_fill(..., access_type=3DMMU_INST_FETCH, =
-...)"
-  is triggered by "tb_lookup_cpu_state()". To be precise, this is the call
-  stack which is good behavior:
-  ---
-  #0  tlb_fill (cs=3D..., vaddr=3D684, size=3D0, access_type=3DMMU_INST_FET=
-CH, mmu_idx=3D0, retaddr=3D0) at target/arc/mmu.c:602
-  #1  get_page_addr_code (env=3D..., addr=3D684) at accel/tcg/cputlb.c:1045
-  #2  tb_htable_lookup (cpu=3D..., pc=3D684, cs_base=3D0, flags=3D0, cf_mas=
-k=3D4278190080) at accel/tcg/cpu-exec.c:337
-  #3  tb_lookup__cpu_state (cpu=3D..., pc=3D..., cs_base=3D..., flags=3D...=
-, cf_mask=3D4278190080) at include/exec/tb-lookup.h:43
-  #4  tb_find (cpu=3D..., last_tb=3D... <code_gen_buffer+17811>, tb_exit=3D=
-0, cf_mask=3D0) at accel/tcg/cpu-exec.c:404
-  #5  cpu_exec (cpu=3D...) at accel/tcg/cpu-exec.c:729
-  #6  tcg_cpu_exec (cpu=3D...) at cpus.c:1430
-  #7  qemu_tcg_rr_cpu_thread_fn (arg=3D...) at cpus.c:1531
-  #8  qemu_thread_start (args=3D...) at util/qemu-thread-posix.c:502
-  ---
-
-  After this call, TLB is filled with an entry that its size field is small,
-  say 32 bytes. This causes a TLB_RECHECK for consequent memory accesses, w=
-hich =
-
-  is logical. However, in our decoder, we use cpu_lduw_code() to read the
-  instructions and decode them. As mentioned, in the beginning, the
-  access_type=3DMMU_INST_FETCH is lost in "io_readx()" while calling tlb_fi=
-ll()",
-  and now THIS CAUSES A GUEST EXCEPTION BECAUSE THAT REGION IS NOT ALLOWED =
-TO
-  BE READ. Here, comes that trace call of the _bad_ behavior:
-  ---
-  #0  tlb_fill (..., access_type=3DMMU_DATA_LOAD, ...) at target/arc/mmu.c:=
-605
-  #1  io_readx (..., access_type=3DMMU_INST_FETCH, size=3D2) at accel/tcg/c=
-putlb.c:881
-  #2  io_readw (..., access_type=3DMMU_INST_FETCH) at accel/tcg/softmmu_tem=
-plate.h:106
-  #3  helper_le_ldw_cmmu (..., oi=3D16, retaddr=3D0) at accel/tcg/softmmu_t=
-emplate.h:146
-  #4  cpu_lduw_code_ra (env=3D..., ptr=3D684, retaddr=3D0) at include/exec/=
-cpu_ldst_template.h:102
-  #5  cpu_lduw_code (env=3D..., ptr=3D684) at include/exec/cpu_ldst_templat=
-e.h:114
-  #6  read_and_decode_context (ctx=3D..., opcode_p=3D...) at target/arc/arc=
--decoder.c:1479
-  #7  arc_decode (ctx=3D...) at target/arc/arc-decoder.c:1736
-  #8  decode_opc (env=3D..., ctx=3D...) at target/arc/translate.c:313
-  #9  arc_tr_translate_insn (dcbase=3D..., cpu=3D...) at target/arc/transla=
-te.c:335
-  #10 translator_loop (.. <code_gen_buffer+18131>) at accel/tcg/translator.=
-c:107
-  #11 gen_intermediate_code (cpu=3D..., tb=3D... <code_gen_buffer+18131>) a=
-t target/arc/translate.c:413
-  #12 tb_gen_code (cpu=3D..., pc=3D684, cs_base=3D0, flags=3D0, cflags=3D-1=
-6711679) at accel/tcg/translate-all.c:1723
-  #13 tb_find (cpu=3D..., last_tb=3D... <code_gen_buffer+17811>, tb_exit=3D=
-0, cf_mask=3D0) at accel/tcg/cpu-exec.c:407
-  #14 cpu_exec (cpu=3D...) at accel/tcg/cpu-exec.c:729
-  #15 tcg_cpu_exec (cpu=3D...) at cpus.c:1430
-
-  ---
-
-  Do you confirm if this is an issue? Maybe there are other ways to read
-  an instruction with MMU_INST_FETCH access that I don't know about.
-
-  Last but not least, although this is not a security issue for QEMU per
-  se, but it is hindering a security feature for the guest.
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1825359/+subscriptions
+> -{
+> -    CPUListState s = {
+> -        .file = f,
+> -        .cpu_fprintf = cpu_fprintf,
+> -    };
+> -    GSList *list;
+> -
+> -    list = object_class_get_list_sorted(TYPE_HPPA_CPU, false);
+> -    (*cpu_fprintf)(f, "Available CPUs:\n");
+> -    g_slist_foreach(list, hppa_cpu_list_entry, &s);
+> -    g_slist_free(list);
+> -}
+> -
+>  static void hppa_cpu_initfn(Object *obj)
+>  {
+>      CPUState *cs = CPU(obj);
+> 
 
