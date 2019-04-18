@@ -1,22 +1,21 @@
-Received: from eggs.gnu.org ([209.51.188.92]:38903)
+Received: from eggs.gnu.org ([209.51.188.92]:39342)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1hH6ZL-0001Z8-Ae
-	for qemu-devel@nongnu.org; Thu, 18 Apr 2019 08:55:12 -0400
+	(envelope-from <david@redhat.com>) id 1hH6ai-0002eG-UA
+	for qemu-devel@nongnu.org; Thu, 18 Apr 2019 08:56:38 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1hH6ZK-0004bo-2R
-	for qemu-devel@nongnu.org; Thu, 18 Apr 2019 08:55:11 -0400
+	(envelope-from <david@redhat.com>) id 1hH6ah-0005Jx-P9
+	for qemu-devel@nongnu.org; Thu, 18 Apr 2019 08:56:36 -0400
 References: <20190418113110.160664-1-borntraeger@de.ibm.com>
-	<20190418113110.160664-11-borntraeger@de.ibm.com>
+	<20190418113110.160664-6-borntraeger@de.ibm.com>
 From: David Hildenbrand <david@redhat.com>
-Message-ID: <e17bf7a1-bd4c-8715-96aa-84b8ad11d99e@redhat.com>
-Date: Thu, 18 Apr 2019 14:48:39 +0200
+Message-ID: <21fcea12-9893-248b-e38d-850607cc33f0@redhat.com>
+Date: Thu, 18 Apr 2019 14:56:30 +0200
 MIME-Version: 1.0
-In-Reply-To: <20190418113110.160664-11-borntraeger@de.ibm.com>
+In-Reply-To: <20190418113110.160664-6-borntraeger@de.ibm.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 10/10] s390x/cpumodel: do not claim csske
- for expanded models in qmp
+Subject: Re: [Qemu-devel] [PATCH 05/10] s390x/cpumodel: vector enhancements
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,46 +28,56 @@ To: Christian Borntraeger <borntraeger@de.ibm.com>, Cornelia Huck <cohuck@redhat
 Cc: qemu-devel <qemu-devel@nongnu.org>, qemu-s390x <qemu-s390x@nongnu.org>, Halil Pasic <pasic@linux.ibm.com>, Richard Henderson <rth@twiddle.net>, Collin Walling <walling@linux.ibm.com>, "Jason J . Herne" <jjherne@linux.ibm.com>
 
 On 18.04.19 13:31, Christian Borntraeger wrote:
-> While we have removed csske and bpb from the default model, the very
-> common case of "host-model" in libvirt (expanded to a base model
-> + features) would still contain bpb and csske. This can prevent
-> migration to a future machine for a host-model machine. Let us fence
-> bpb and csske when we run on a generation 15. If necessary the
-> user can still use -cpu 8561,csske=on,bpb=on to force enable these
-> features.
+> Add vector enhancements to the cpu model.
 > 
 > Signed-off-by: Christian Borntraeger <borntraeger@de.ibm.com>
 > ---
->  target/s390x/cpu_models.c | 11 +++++++++++
->  1 file changed, 11 insertions(+)
+>  target/s390x/cpu_features.c     | 2 ++
+>  target/s390x/cpu_features_def.h | 2 ++
+>  2 files changed, 4 insertions(+)
 > 
-> diff --git a/target/s390x/cpu_models.c b/target/s390x/cpu_models.c
-> index e727519686..03bdca1fb8 100644
-> --- a/target/s390x/cpu_models.c
-> +++ b/target/s390x/cpu_models.c
-> @@ -629,6 +629,17 @@ CpuModelExpansionInfo *qmp_query_cpu_model_expansion(CpuModelExpansionType type,
->          return NULL;
->      }
+> diff --git a/target/s390x/cpu_features.c b/target/s390x/cpu_features.c
+> index 4d624b2256..ed3f6aa969 100644
+> --- a/target/s390x/cpu_features.c
+> +++ b/target/s390x/cpu_features.c
+> @@ -108,6 +108,8 @@ static const S390FeatDef s390_features[] = {
+>      FEAT_INIT("irbm", S390_FEAT_TYPE_STFL, 145, "Insert-reference-bits-multiple facility"),
+>      FEAT_INIT("msa8-base", S390_FEAT_TYPE_STFL, 146, "Message-security-assist-extension-8 facility (excluding subfunctions)"),
+>      FEAT_INIT("cmmnt", S390_FEAT_TYPE_STFL, 147, "CMM: ESSA-enhancement (no translate) facility"),
+> +    FEAT_INIT("vxeh2", S390_FEAT_TYPE_STFL, 148, "Vector Enhancements facility 2"),
+> +    FEAT_INIT("vxbeh", S390_FEAT_TYPE_STFL, 152, "Vector BCD enhancements facility 1"),
+>      FEAT_INIT("msa9-base", S390_FEAT_TYPE_STFL, 155, "Message-security-assist-extension-9 facility (excluding subfunctions)"),
+>      FEAT_INIT("etoken", S390_FEAT_TYPE_STFL, 156, "Etoken facility"),
+
+BTW, to make this less error prone I thought about converting this into
+something like
+
+FEAT_INIT(VECTOR_ENH2, "vxeh2", S390_FEAT_TYPE_STFL, 148, "Vector
+Enhancements facility 2"),
+
+and internally use
+
+.[S390_FEAT_##FEAT] = { ...
+
+Or similar. But don't have time for that right now.
+
 >  
-> +    /*
-> +     * Do not claim CSSKE and BPB if the host model expands to
-> +     * generation 15 or newer
-> +     */
-> +    if (s390_model.def->gen >= 15) {
-> +        clear_bit(S390_FEAT_CONDITIONAL_SSKE,
-> +                  (unsigned long *) &s390_model.features);
-> +        clear_bit(S390_FEAT_BPB,
-> +                  (unsigned long *) &s390_model.features);
-> +    }
-> +
->      if (type == CPU_MODEL_EXPANSION_TYPE_STATIC) {
->          delta_changes = true;
->      } else if (type != CPU_MODEL_EXPANSION_TYPE_FULL) {
+> diff --git a/target/s390x/cpu_features_def.h b/target/s390x/cpu_features_def.h
+> index 030784811b..ce2223c9d7 100644
+> --- a/target/s390x/cpu_features_def.h
+> +++ b/target/s390x/cpu_features_def.h
+> @@ -96,6 +96,8 @@ typedef enum {
+>      S390_FEAT_INSERT_REFERENCE_BITS_MULT,
+>      S390_FEAT_MSA_EXT_8,
+>      S390_FEAT_CMM_NT,
+> +    S390_FEAT_VECTOR_ENH2,
+> +    S390_FEAT_VECTOR_BCD_ENH,
+>      S390_FEAT_MSA_EXT_9,
+>      S390_FEAT_ETOKEN,
+>  
 > 
 
-The bad thing about it is, it hinders migration *to* this hw generation.
-Will have to think about this some more. As alternative, simply ignore
-S390_FEAT_CONDITIONAL_SSKE and S390_FEAT_BPB when baselining/comparing.
+Reviewed-by: David Hildenbrand <david@redhat.com>
 
 -- 
 
