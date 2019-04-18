@@ -6,58 +6,58 @@ X-Spam-Status: No, score=-6.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 04C87C10F14
-	for <qemu-devel@archiver.kernel.org>; Thu, 18 Apr 2019 20:43:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F1EC6C10F0E
+	for <qemu-devel@archiver.kernel.org>; Thu, 18 Apr 2019 20:45:49 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D02D2214DA
-	for <qemu-devel@archiver.kernel.org>; Thu, 18 Apr 2019 20:43:37 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D02D2214DA
+	by mail.kernel.org (Postfix) with ESMTPS id B3756214DA
+	for <qemu-devel@archiver.kernel.org>; Thu, 18 Apr 2019 20:45:49 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B3756214DA
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:46969 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:47030 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hHDsf-0000X6-3C
-	for qemu-devel@archiver.kernel.org; Thu, 18 Apr 2019 16:43:37 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:51266)
+	id 1hHDum-0002Uq-RP
+	for qemu-devel@archiver.kernel.org; Thu, 18 Apr 2019 16:45:48 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:51285)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1hHDny-0001Mp-BY
-	for qemu-devel@nongnu.org; Thu, 18 Apr 2019 16:38:47 -0400
+	(envelope-from <armbru@redhat.com>) id 1hHDnz-0001Ou-1E
+	for qemu-devel@nongnu.org; Thu, 18 Apr 2019 16:38:48 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1hHDnw-0002fj-Op
+	(envelope-from <armbru@redhat.com>) id 1hHDnw-0002g5-UG
 	for qemu-devel@nongnu.org; Thu, 18 Apr 2019 16:38:46 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:44138)
+Received: from mx1.redhat.com ([209.132.183.28]:44726)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1hHDnw-0002e7-G6
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1hHDnw-0002eJ-KN
 	for qemu-devel@nongnu.org; Thu, 18 Apr 2019 16:38:44 -0400
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
-	[10.5.11.15])
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+	[10.5.11.14])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id B8E5FF74B5
+	by mx1.redhat.com (Postfix) with ESMTPS id DF22B753CF
 	for <qemu-devel@nongnu.org>; Thu, 18 Apr 2019 20:38:43 +0000 (UTC)
 Received: from blackfin.pond.sub.org (ovpn-116-116.ams2.redhat.com
 	[10.36.116.116])
-	by smtp.corp.redhat.com (Postfix) with ESMTPS id 64DF75D707
+	by smtp.corp.redhat.com (Postfix) with ESMTPS id 8980C5D9CC
 	for <qemu-devel@nongnu.org>; Thu, 18 Apr 2019 20:38:43 +0000 (UTC)
 Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
-	id 7F6361132B38; Thu, 18 Apr 2019 22:38:40 +0200 (CEST)
+	id A161A11329CF; Thu, 18 Apr 2019 22:38:40 +0200 (CEST)
 From: Markus Armbruster <armbru@redhat.com>
 To: qemu-devel@nongnu.org
-Date: Thu, 18 Apr 2019 22:38:36 +0200
-Message-Id: <20190418203840.10528-6-armbru@redhat.com>
+Date: Thu, 18 Apr 2019 22:38:40 +0200
+Message-Id: <20190418203840.10528-10-armbru@redhat.com>
 In-Reply-To: <20190418203840.10528-1-armbru@redhat.com>
 References: <20190418203840.10528-1-armbru@redhat.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.38]);
+	(mx1.redhat.com [10.5.110.39]);
 	Thu, 18 Apr 2019 20:38:43 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] [PULL for-4.1 5/9] target/xtensa: Clean up core-isa.h
- header guards
+Subject: [Qemu-devel] [PULL for-4.1 9/9] Clean up decorations and whitespace
+ around header guards
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -73,119 +73,164 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 Content-Type: text/plain; charset="UTF-8"
-Message-ID: <20190418203836.bm1UgN4-IDQgRjiVlSBws-9IxJkuXiY4hHafH9TM3mo@z>
+Message-ID: <20190418203840.LaYc1QOBcTGY7hnQC0XtWPS8Dr40HORsBPHGb8LQSes@z>
 
-scripts/clean-header-guards.pl warns these headers use reserved
-identifier _XTENSA_CORE_CONFIGURATION_H as header guard symbol.  It
-additionally warns the guard doesn't match the file name.
-
-Reuse of the same guard symbol in multiple headers is okay as long as
-they cannot be included together.
-
-Since we can avoid guard symbol reuse easily, do so: use the guard
-symbol scripts/clean-header-guards.pl picks, less the TARGET_ prefix.
+Cleaned up with scripts/clean-header-guards.pl.
 
 Signed-off-by: Markus Armbruster <armbru@redhat.com>
-Message-Id: <20190315145123.28030-5-armbru@redhat.com>
+Message-Id: <20190315145123.28030-9-armbru@redhat.com>
 ---
- target/xtensa/core-de212/core-isa.h             | 8 +++-----
- target/xtensa/core-sample_controller/core-isa.h | 8 +++-----
- target/xtensa/core-test_kc705_be/core-isa.h     | 8 +++-----
- target/xtensa/core-test_mmuhifi_c3/core-isa.h   | 8 +++-----
- 4 files changed, 12 insertions(+), 20 deletions(-)
+ hw/ide/ahci_internal.h              | 2 +-
+ include/block/aio-wait.h            | 2 +-
+ include/exec/translator.h           | 2 +-
+ include/hw/arm/nrf51_soc.h          | 1 -
+ include/hw/arm/smmu-common.h        | 2 +-
+ include/hw/misc/imx2_wdt.h          | 2 +-
+ include/hw/misc/nrf51_rng.h         | 3 ++-
+ include/hw/pci-host/designware.h    | 2 +-
+ include/hw/riscv/sifive_plic.h      | 1 -
+ include/qemu/pmem.h                 | 2 +-
+ target/xtensa/xtensa-isa-internal.h | 2 +-
+ tests/acpi-utils.h                  | 2 +-
+ tests/tpm-emu.h                     | 2 +-
+ 13 files changed, 12 insertions(+), 13 deletions(-)
 
-diff --git a/target/xtensa/core-de212/core-isa.h b/target/xtensa/core-de212/core-isa.h
-index 78e7f38310..90ac329230 100644
---- a/target/xtensa/core-de212/core-isa.h
-+++ b/target/xtensa/core-de212/core-isa.h
-@@ -28,9 +28,8 @@
-    TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
-    SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.  */
+diff --git a/hw/ide/ahci_internal.h b/hw/ide/ahci_internal.h
+index 9b7fa8fc7d..95ecddcd3c 100644
+--- a/hw/ide/ahci_internal.h
++++ b/hw/ide/ahci_internal.h
+@@ -394,4 +394,4 @@ void ahci_reset(AHCIState *s);
  
--#ifndef _XTENSA_CORE_CONFIGURATION_H
--#define _XTENSA_CORE_CONFIGURATION_H
--
-+#ifndef XTENSA_CORE_DE212_CORE_ISA_H
-+#define XTENSA_CORE_DE212_CORE_ISA_H
+ #define SYSBUS_AHCI(obj) OBJECT_CHECK(SysbusAHCIState, (obj), TYPE_SYSBUS_AHCI)
  
- /****************************************************************************
- 	    Parameters Useful for Any Code, USER or PRIVILEGED
-@@ -618,5 +617,4 @@
- #endif /* !XTENSA_HAL_NON_PRIVILEGED_ONLY */
- 
- 
--#endif /* _XTENSA_CORE_CONFIGURATION_H */
--
-+#endif /* XTENSA_CORE_DE212_CORE_ISA_H */
-diff --git a/target/xtensa/core-sample_controller/core-isa.h b/target/xtensa/core-sample_controller/core-isa.h
-index e681e43209..d53dca8665 100644
---- a/target/xtensa/core-sample_controller/core-isa.h
-+++ b/target/xtensa/core-sample_controller/core-isa.h
-@@ -28,9 +28,8 @@
-    TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
-    SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.  */
- 
--#ifndef _XTENSA_CORE_CONFIGURATION_H
--#define _XTENSA_CORE_CONFIGURATION_H
--
-+#ifndef XTENSA_CORE_SAMPLE_CONTROLLER_CORE_ISA_H
-+#define XTENSA_CORE_SAMPLE_CONTROLLER_CORE_ISA_H
- 
- /****************************************************************************
- 	    Parameters Useful for Any Code, USER or PRIVILEGED
-@@ -640,5 +639,4 @@
- #endif /* !XTENSA_HAL_NON_PRIVILEGED_ONLY */
- 
- 
--#endif /* _XTENSA_CORE_CONFIGURATION_H */
--
-+#endif /* XTENSA_CORE_SAMPLE_CONTROLLER_CORE_ISA_H */
-diff --git a/target/xtensa/core-test_kc705_be/core-isa.h b/target/xtensa/core-test_kc705_be/core-isa.h
-index a4ebdf7197..408fed871d 100644
---- a/target/xtensa/core-test_kc705_be/core-isa.h
-+++ b/target/xtensa/core-test_kc705_be/core-isa.h
-@@ -28,9 +28,8 @@
-    TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
-    SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.  */
- 
--#ifndef _XTENSA_CORE_CONFIGURATION_H
--#define _XTENSA_CORE_CONFIGURATION_H
--
-+#ifndef XTENSA_CORE_TEST_KC705_BE_CORE_ISA_H
-+#define XTENSA_CORE_TEST_KC705_BE_CORE_ISA_H
- 
- /****************************************************************************
- 	    Parameters Useful for Any Code, USER or PRIVILEGED
-@@ -571,5 +570,4 @@
- #endif /* !XTENSA_HAL_NON_PRIVILEGED_ONLY */
- 
- 
--#endif /* _XTENSA_CORE_CONFIGURATION_H */
--
-+#endif /* XTENSA_CORE_TEST_KC705_BE_CORE_ISA_H */
-diff --git a/target/xtensa/core-test_mmuhifi_c3/core-isa.h b/target/xtensa/core-test_mmuhifi_c3/core-isa.h
-index 309caa1a32..704a31f7c8 100644
---- a/target/xtensa/core-test_mmuhifi_c3/core-isa.h
-+++ b/target/xtensa/core-test_mmuhifi_c3/core-isa.h
-@@ -7,9 +7,8 @@
-  * Copyright (c) 1999-2009 Tensilica Inc.
+-#endif /* HW_IDE_AHCI_H */
++#endif /* HW_IDE_AHCI_INTERNAL_H */
+diff --git a/include/block/aio-wait.h b/include/block/aio-wait.h
+index afd0ff7eb8..afeeb18f95 100644
+--- a/include/block/aio-wait.h
++++ b/include/block/aio-wait.h
+@@ -124,4 +124,4 @@ void aio_wait_kick(void);
   */
+ void aio_wait_bh_oneshot(AioContext *ctx, QEMUBHFunc *cb, void *opaque);
  
--#ifndef _XTENSA_CORE_CONFIGURATION_H
--#define _XTENSA_CORE_CONFIGURATION_H
+-#endif /* QEMU_AIO_WAIT */
++#endif /* QEMU_AIO_WAIT_H */
+diff --git a/include/exec/translator.h b/include/exec/translator.h
+index 71e7b2c347..f327242576 100644
+--- a/include/exec/translator.h
++++ b/include/exec/translator.h
+@@ -141,4 +141,4 @@ void translator_loop(const TranslatorOps *ops, DisasContextBase *db,
+ 
+ void translator_loop_temp_check(DisasContextBase *db);
+ 
+-#endif  /* EXEC__TRANSLATOR_H */
++#endif /* EXEC__TRANSLATOR_H */
+diff --git a/include/hw/arm/nrf51_soc.h b/include/hw/arm/nrf51_soc.h
+index fd7fcc71a5..0cb78aafea 100644
+--- a/include/hw/arm/nrf51_soc.h
++++ b/include/hw/arm/nrf51_soc.h
+@@ -53,4 +53,3 @@ typedef struct NRF51State {
+ } NRF51State;
+ 
+ #endif
 -
-+#ifndef XTENSA_CORE_TEST_MMUHIFI_C3_CORE_ISA_H
-+#define XTENSA_CORE_TEST_MMUHIFI_C3_CORE_ISA_H
+diff --git a/include/hw/arm/smmu-common.h b/include/hw/arm/smmu-common.h
+index b07cadd0ef..9a6ac64c97 100644
+--- a/include/hw/arm/smmu-common.h
++++ b/include/hw/arm/smmu-common.h
+@@ -167,4 +167,4 @@ void smmu_inv_notifiers_all(SMMUState *s);
+ /* Unmap the range of all the notifiers registered to @mr */
+ void smmu_inv_notifiers_mr(IOMMUMemoryRegion *mr);
  
- /****************************************************************************
- 	    Parameters Useful for Any Code, USER or PRIVILEGED
-@@ -380,5 +379,4 @@
- #endif /* !XTENSA_HAL_NON_PRIVILEGED_ONLY */
+-#endif  /* HW_ARM_SMMU_COMMON */
++#endif /* HW_ARM_SMMU_COMMON_H */
+diff --git a/include/hw/misc/imx2_wdt.h b/include/hw/misc/imx2_wdt.h
+index 8afc99a10e..b91b002528 100644
+--- a/include/hw/misc/imx2_wdt.h
++++ b/include/hw/misc/imx2_wdt.h
+@@ -30,4 +30,4 @@ typedef struct IMX2WdtState {
+     MemoryRegion mmio;
+ } IMX2WdtState;
+ 
+-#endif /* IMX7_SNVS_H */
++#endif /* IMX2_WDT_H */
+diff --git a/include/hw/misc/nrf51_rng.h b/include/hw/misc/nrf51_rng.h
+index 3d6bf79997..b0133bf665 100644
+--- a/include/hw/misc/nrf51_rng.h
++++ b/include/hw/misc/nrf51_rng.h
+@@ -30,6 +30,7 @@
+  * the COPYING file in the top-level directory.
+  *
+  */
++
+ #ifndef NRF51_RNG_H
+ #define NRF51_RNG_H
+ 
+@@ -80,4 +81,4 @@ typedef struct {
+ } NRF51RNGState;
  
  
--#endif /* _XTENSA_CORE_CONFIGURATION_H */
+-#endif /* NRF51_RNG_H_ */
++#endif /* NRF51_RNG_H */
+diff --git a/include/hw/pci-host/designware.h b/include/hw/pci-host/designware.h
+index a4f2c0695b..186bb36238 100644
+--- a/include/hw/pci-host/designware.h
++++ b/include/hw/pci-host/designware.h
+@@ -99,4 +99,4 @@ typedef struct DesignwarePCIEHost {
+     MemoryRegion mmio;
+ } DesignwarePCIEHost;
+ 
+-#endif  /* DESIGNWARE_H */
++#endif /* DESIGNWARE_H */
+diff --git a/include/hw/riscv/sifive_plic.h b/include/hw/riscv/sifive_plic.h
+index 688cd97f82..ce8907f6aa 100644
+--- a/include/hw/riscv/sifive_plic.h
++++ b/include/hw/riscv/sifive_plic.h
+@@ -80,4 +80,3 @@ DeviceState *sifive_plic_create(hwaddr addr, char *hart_config,
+     uint32_t aperture_size);
+ 
+ #endif
 -
-+#endif /* XTENSA_CORE_TEST_MMUHIFI_C3_CORE_ISA_H */
+diff --git a/include/qemu/pmem.h b/include/qemu/pmem.h
+index dfb6d0da62..d2d7ad085c 100644
+--- a/include/qemu/pmem.h
++++ b/include/qemu/pmem.h
+@@ -33,4 +33,4 @@ pmem_persist(const void *addr, size_t len)
+ 
+ #endif /* CONFIG_LIBPMEM */
+ 
+-#endif /* !QEMU_PMEM_H */
++#endif /* QEMU_PMEM_H */
+diff --git a/target/xtensa/xtensa-isa-internal.h b/target/xtensa/xtensa-isa-internal.h
+index c29295ff96..40dd8bac96 100644
+--- a/target/xtensa/xtensa-isa-internal.h
++++ b/target/xtensa/xtensa-isa-internal.h
+@@ -228,4 +228,4 @@ int xtensa_isa_name_compare(const void *, const void *);
+ extern xtensa_isa_status xtisa_errno;
+ extern char xtisa_error_msg[];
+ 
+-#endif /* !XTENSA_ISA_INTERNAL_H */
++#endif /* XTENSA_ISA_INTERNAL_H */
+diff --git a/tests/acpi-utils.h b/tests/acpi-utils.h
+index ef388bbf12..73fe24f044 100644
+--- a/tests/acpi-utils.h
++++ b/tests/acpi-utils.h
+@@ -52,4 +52,4 @@ void acpi_fetch_table(QTestState *qts, uint8_t **aml, uint32_t *aml_len,
+                       const uint8_t *addr_ptr, const char *sig,
+                       bool verify_checksum);
+ 
+-#endif  /* TEST_ACPI_UTILS_H */
++#endif /* TEST_ACPI_UTILS_H */
+diff --git a/tests/tpm-emu.h b/tests/tpm-emu.h
+index 8eb802a79e..a4f1d64226 100644
+--- a/tests/tpm-emu.h
++++ b/tests/tpm-emu.h
+@@ -36,4 +36,4 @@ typedef struct TestState {
+ void tpm_emu_test_wait_cond(TestState *s);
+ void *tpm_emu_ctrl_thread(void *data);
+ 
+-#endif /* TEST_TPM_EMU_H */
++#endif /* TESTS_TPM_EMU_H */
 -- 
 2.17.2
 
