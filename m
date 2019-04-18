@@ -6,45 +6,45 @@ X-Spam-Status: No, score=-6.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6078FC10F0E
-	for <qemu-devel@archiver.kernel.org>; Thu, 18 Apr 2019 12:47:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7DF10C10F14
+	for <qemu-devel@archiver.kernel.org>; Thu, 18 Apr 2019 12:54:28 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 23C862183E
-	for <qemu-devel@archiver.kernel.org>; Thu, 18 Apr 2019 12:47:13 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 23C862183E
+	by mail.kernel.org (Postfix) with ESMTPS id 408C220652
+	for <qemu-devel@archiver.kernel.org>; Thu, 18 Apr 2019 12:54:28 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 408C220652
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:41053 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:41111 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hH6Rc-0007f0-CN
-	for qemu-devel@archiver.kernel.org; Thu, 18 Apr 2019 08:47:12 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:37343)
+	id 1hH6Yd-00014L-87
+	for qemu-devel@archiver.kernel.org; Thu, 18 Apr 2019 08:54:27 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:38430)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1hH6QW-0007IU-MA
-	for qemu-devel@nongnu.org; Thu, 18 Apr 2019 08:46:05 -0400
+	(envelope-from <david@redhat.com>) id 1hH6Xb-0000fX-Jz
+	for qemu-devel@nongnu.org; Thu, 18 Apr 2019 08:53:24 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1hH6QV-0000a5-G3
-	for qemu-devel@nongnu.org; Thu, 18 Apr 2019 08:46:04 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:50834)
+	(envelope-from <david@redhat.com>) id 1hH6Xa-0003x9-HD
+	for qemu-devel@nongnu.org; Thu, 18 Apr 2019 08:53:23 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:34138)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <david@redhat.com>)
-	id 1hH6QT-0000Yl-Oj; Thu, 18 Apr 2019 08:46:03 -0400
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
-	[10.5.11.11])
+	id 1hH6Xa-0003wY-96; Thu, 18 Apr 2019 08:53:22 -0400
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+	[10.5.11.12])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id D3E1188ABB;
-	Thu, 18 Apr 2019 12:46:00 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id 9C3E570D77;
+	Thu, 18 Apr 2019 12:53:20 +0000 (UTC)
 Received: from [10.36.117.133] (ovpn-117-133.ams2.redhat.com [10.36.117.133])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id 2FCC8600C5;
-	Thu, 18 Apr 2019 12:45:59 +0000 (UTC)
+	by smtp.corp.redhat.com (Postfix) with ESMTP id 6BE9360C61;
+	Thu, 18 Apr 2019 12:53:17 +0000 (UTC)
 To: Christian Borntraeger <borntraeger@de.ibm.com>,
 	Cornelia Huck <cohuck@redhat.com>
 References: <20190418113110.160664-1-borntraeger@de.ibm.com>
-	<20190418113110.160664-3-borntraeger@de.ibm.com>
+	<20190418113110.160664-4-borntraeger@de.ibm.com>
 From: David Hildenbrand <david@redhat.com>
 Openpgp: preference=signencrypt
 Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
@@ -91,23 +91,23 @@ Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
 	+8Umfre0Xt4713VxMygW0PnQt5aSQdMD58jHFxTk092mU+yIHj5LeYgvwSgZN4airXk5yRXl
 	SE+xAvmumFBY
 Organization: Red Hat GmbH
-Message-ID: <295ae226-a574-00e9-8dd5-6d95e47553ce@redhat.com>
-Date: Thu, 18 Apr 2019 14:45:58 +0200
+Message-ID: <93c7c457-e6dc-c033-db71-bce4f39c0a10@redhat.com>
+Date: Thu, 18 Apr 2019 14:53:16 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
 	Thunderbird/60.6.1
 MIME-Version: 1.0
-In-Reply-To: <20190418113110.160664-3-borntraeger@de.ibm.com>
+In-Reply-To: <20190418113110.160664-4-borntraeger@de.ibm.com>
 Content-Type: text/plain; charset="UTF-8"
 Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.26]);
-	Thu, 18 Apr 2019 12:46:00 +0000 (UTC)
-Content-Transfer-Encoding: quoted-printable
+	(mx1.redhat.com [10.5.110.28]);
+	Thu, 18 Apr 2019 12:53:20 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH 02/10] s390x/cpumodel: remove CSSKE from
- base model
+Subject: Re: [Qemu-devel] [PATCH 03/10] s390x/cpumodel:
+ Miscellaneous-Instruction-Extensions Facility 3
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -126,136 +126,47 @@ Cc: "Jason J . Herne" <jjherne@linux.ibm.com>,
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190418124558.egt2yaibRlY9oWfgOEI2C8g8u0Rp9GlCiUtVER4LMxM@z>
+Message-ID: <20190418125316.WT5T6xS2Dug52PxhgN39gTsKX55KVgqYLkvppCjc8rE@z>
 
 On 18.04.19 13:31, Christian Borntraeger wrote:
-> conditional sske is deprecated and a distant future machine (will be on=
-e
-> where the IBC will not allow to fully go back to z14) will remove this
-> feature. To prepare for this and allow for the z14 and older cpu model
-> to still run on systems without csske, remove csske from the base (and
-
-will csske feature be a default feature for zNext? Or is it not
-available *at all*.
-
-In case it is not available, baselining and cpu model comparison have to
-be thought about "ignoring csske".
-
-> thus the default models for z10..z14). For compat machines we have to
-> add those back.
-
-Base models are machine-independent. That means, changing base models is
-not supported. Once we introduce new models like here, we can set the
-new base models into stone.
-
->=20
+> Provide the "Miscellaneous-Instruction-Extensions Facility 3" via
+> stfle.61.
+> 
 > Signed-off-by: Christian Borntraeger <borntraeger@de.ibm.com>
 > ---
->  hw/s390x/s390-virtio-ccw.c  |  2 ++
->  target/s390x/cpu_models.c   | 21 +++++++++++++++++++++
->  target/s390x/cpu_models.h   |  1 +
->  target/s390x/gen-features.c |  1 -
->  4 files changed, 24 insertions(+), 1 deletion(-)
->=20
-> diff --git a/hw/s390x/s390-virtio-ccw.c b/hw/s390x/s390-virtio-ccw.c
-> index d11069b860..3415948b2c 100644
-> --- a/hw/s390x/s390-virtio-ccw.c
-> +++ b/hw/s390x/s390-virtio-ccw.c
-> @@ -648,6 +648,8 @@ bool css_migration_enabled(void)
-> =20
->  static void ccw_machine_4_0_instance_options(MachineState *machine)
->  {
-> +    /* re-enable csske for compat machines in the base model */
-> +    s390_cpumodel_fixup_csske();
->  }
-> =20
->  static void ccw_machine_4_0_class_options(MachineClass *mc)
-> diff --git a/target/s390x/cpu_models.c b/target/s390x/cpu_models.c
-> index eb125d4d0d..4e5aa879f3 100644
-> --- a/target/s390x/cpu_models.c
-> +++ b/target/s390x/cpu_models.c
-> @@ -93,6 +93,27 @@ static S390FeatBitmap qemu_max_cpu_feat;
->  /* features part of a base model but not relevant for finding a base m=
-odel */
->  S390FeatBitmap ignored_base_feat;
-> =20
-> +/*
-> + * We removed CSSKE from the base features. This is a hook for compat =
-machines
-> + * to put this back for gen10..gen14. As the base model is also part o=
-f the
-> + * default model to have to fixup both bitfields
-> + */
-> +void s390_cpumodel_fixup_csske(void)
-> +{
-> +    int i;
-> +
-> +    for (i =3D 0; i < ARRAY_SIZE(s390_cpu_defs); i++) {
-> +        const S390CPUDef *def =3D &s390_cpu_defs[i];
-> +
-> +        if (def->gen < 10 || def->gen > 14) {
-> +            continue;
-> +        }
-> +
-> +        set_bit(S390_FEAT_CONDITIONAL_SSKE, (unsigned long *)&def->bas=
-e_feat);
-> +        set_bit(S390_FEAT_CONDITIONAL_SSKE, (unsigned long *)&def->def=
-ault_feat);
-> +    }
-> +}
+>  target/s390x/cpu_features.c     | 1 +
+>  target/s390x/cpu_features_def.h | 1 +
+>  2 files changed, 2 insertions(+)
+> 
+> diff --git a/target/s390x/cpu_features.c b/target/s390x/cpu_features.c
+> index 1843c84aaa..bbd8902087 100644
+> --- a/target/s390x/cpu_features.c
+> +++ b/target/s390x/cpu_features.c
+> @@ -83,6 +83,7 @@ static const S390FeatDef s390_features[] = {
+>      FEAT_INIT("minste2", S390_FEAT_TYPE_STFL, 58, "Miscellaneous-instruction-extensions facility 2"),
+>      FEAT_INIT("sema", S390_FEAT_TYPE_STFL, 59, "Semaphore-assist facility"),
+>      FEAT_INIT("tsi", S390_FEAT_TYPE_STFL, 60, "Time-slice Instrumentation facility"),
+> +    FEAT_INIT("minste3", S390_FEAT_TYPE_STFL, 61, "Miscellaneous-Instruction-Extensions Facility 3"),
+>      FEAT_INIT("ri", S390_FEAT_TYPE_STFL, 64, "CPU runtime-instrumentation facility"),
+>      FEAT_INIT("zpci", S390_FEAT_TYPE_STFL, 69, "z/PCI facility"),
+>      FEAT_INIT("aen", S390_FEAT_TYPE_STFL, 71, "General-purpose-adapter-event-notification facility"),
+> diff --git a/target/s390x/cpu_features_def.h b/target/s390x/cpu_features_def.h
+> index 5fc7e7bf01..31dd678301 100644
+> --- a/target/s390x/cpu_features_def.h
+> +++ b/target/s390x/cpu_features_def.h
+> @@ -71,6 +71,7 @@ typedef enum {
+>      S390_FEAT_MISC_INSTRUCTION_EXT,
+>      S390_FEAT_SEMAPHORE_ASSIST,
+>      S390_FEAT_TIME_SLICE_INSTRUMENTATION,
+> +    S390_FEAT_MISC_INSTRUCTION_EXT3,
+>      S390_FEAT_RUNTIME_INSTRUMENTATION,
+>      S390_FEAT_ZPCI,
+>      S390_FEAT_ADAPTER_EVENT_NOTIFICATION,
+> 
 
-I think that can be avoided by smarter generation of the models, which I
-would prefer.
+Reviewed-by: David Hildenbrand <david@redhat.com>
 
-> +
->  void s390_cpudef_featoff(uint8_t gen, uint8_t ec_ga, S390Feat feat)
->  {
->      const S390CPUDef *def;
-> diff --git a/target/s390x/cpu_models.h b/target/s390x/cpu_models.h
-> index 174a99e561..b2e37bc8cf 100644
-> --- a/target/s390x/cpu_models.h
-> +++ b/target/s390x/cpu_models.h
-> @@ -73,6 +73,7 @@ struct S390CPUModel {
->  #define ibc_gen(x)        (x =3D=3D 0 ? 0 : ((x >> 4) + S390_GEN_Z10))
->  #define ibc_ec_ga(x)      (x & 0xf)
-> =20
-> +void s390_cpumodel_fixup_csske(void);
->  void s390_cpudef_featoff(uint8_t gen, uint8_t ec_ga, S390Feat feat);
->  void s390_cpudef_featoff_greater(uint8_t gen, uint8_t ec_ga, S390Feat =
-feat);
->  void s390_cpudef_group_featoff_greater(uint8_t gen, uint8_t ec_ga,
-> diff --git a/target/s390x/gen-features.c b/target/s390x/gen-features.c
-> index e4739a6b9f..bea2f80c49 100644
-> --- a/target/s390x/gen-features.c
-> +++ b/target/s390x/gen-features.c
-> @@ -301,7 +301,6 @@ static uint16_t base_GEN9_GA1[] =3D {
->  #define base_GEN9_GA3 EmptyFeat
-> =20
->  static uint16_t base_GEN10_GA1[] =3D {
-> -    S390_FEAT_CONDITIONAL_SSKE,
->      S390_FEAT_PARSING_ENH,
->      S390_FEAT_MOVE_WITH_OPTIONAL_SPEC,
->      S390_FEAT_EXTRACT_CPU_TIME,
->=20
-
-Instead of doing that, can we rather start generating the next
-generation "fresh", listing all base model features it contains instead
-of doing it incrementally? Could end up "nicer"
-
-
-In target/s390x/cpu_models.c we have:
-
-"... For now, base features of a following release are always a subset
-of base features of the previous release. Same is correct for the other
-feature sets."
-
-This is especially relevant for "s390_find_cpu_def", and goes into the
-direction of baselining, as previously mentioned.
-
-Luckily, we already have "ignored_base_feat", maybe we can simply add
-csske there and have it working.
-
---=20
+-- 
 
 Thanks,
 
