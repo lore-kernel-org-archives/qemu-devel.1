@@ -6,61 +6,77 @@ X-Spam-Status: No, score=-6.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DCD79C10F14
-	for <qemu-devel@archiver.kernel.org>; Thu, 18 Apr 2019 21:18:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 39C74C10F0E
+	for <qemu-devel@archiver.kernel.org>; Thu, 18 Apr 2019 21:21:10 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id AD784214C6
-	for <qemu-devel@archiver.kernel.org>; Thu, 18 Apr 2019 21:18:37 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AD784214C6
+	by mail.kernel.org (Postfix) with ESMTPS id 029EC214C6
+	for <qemu-devel@archiver.kernel.org>; Thu, 18 Apr 2019 21:21:10 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 029EC214C6
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:47495 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:47551 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hHEQW-0001B2-OS
-	for qemu-devel@archiver.kernel.org; Thu, 18 Apr 2019 17:18:36 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:54787)
+	id 1hHESz-00030s-AM
+	for qemu-devel@archiver.kernel.org; Thu, 18 Apr 2019 17:21:09 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:57329)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1hHE0e-0005ER-WF
-	for qemu-devel@nongnu.org; Thu, 18 Apr 2019 16:51:54 -0400
+	(envelope-from <philmd@redhat.com>) id 1hHE9o-0004m5-Az
+	for qemu-devel@nongnu.org; Thu, 18 Apr 2019 17:01:21 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1hHE0b-0005LC-0S
-	for qemu-devel@nongnu.org; Thu, 18 Apr 2019 16:51:51 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:33802)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1hHE0V-0005Fz-Ni
-	for qemu-devel@nongnu.org; Thu, 18 Apr 2019 16:51:45 -0400
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
-	[10.5.11.11])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id A77CC3003737
-	for <qemu-devel@nongnu.org>; Thu, 18 Apr 2019 20:51:42 +0000 (UTC)
-Received: from blackfin.pond.sub.org (ovpn-116-116.ams2.redhat.com
-	[10.36.116.116])
-	by smtp.corp.redhat.com (Postfix) with ESMTPS id 79C1D600C5;
-	Thu, 18 Apr 2019 20:51:40 +0000 (UTC)
-Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
-	id 8C4AD113279E; Thu, 18 Apr 2019 22:51:36 +0200 (CEST)
-From: Markus Armbruster <armbru@redhat.com>
-To: qemu-devel@nongnu.org
-Date: Thu, 18 Apr 2019 22:51:16 +0200
-Message-Id: <20190418205135.6686-18-armbru@redhat.com>
-In-Reply-To: <20190418205135.6686-1-armbru@redhat.com>
-References: <20190418205135.6686-1-armbru@redhat.com>
+	(envelope-from <philmd@redhat.com>) id 1hHE9n-0003i6-Bd
+	for qemu-devel@nongnu.org; Thu, 18 Apr 2019 17:01:20 -0400
+Received: from mail-wr1-f65.google.com ([209.85.221.65]:45118)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1hHE9n-0003hZ-5K
+	for qemu-devel@nongnu.org; Thu, 18 Apr 2019 17:01:19 -0400
+Received: by mail-wr1-f65.google.com with SMTP id s15so4558204wra.12
+	for <qemu-devel@nongnu.org>; Thu, 18 Apr 2019 14:01:19 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=1e100.net; s=20161025;
+	h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
+	:date:user-agent:mime-version:in-reply-to:content-language
+	:content-transfer-encoding;
+	bh=f+V1aHf6tKPLnOrBAYzUxErnfZMtoLyytP6De/m1qyQ=;
+	b=b1bVtPVquraGY1DLD3T4HzlMU3Cs21aEDGbm25tSHtkyMKe5b5qhFEAVcSgz57dG7D
+	LxWeUggUZ8bGXQ6CXpQ+rcIIUC5rELmzgGp9wE0M3XGmAdxE4Mhr89HcoEjF+FznwaWI
+	JuEB/2EbiQBuVC92oVB1VvZISlwq8rKFGB20dtqDtkDhPgnMDit9zMUSci68oOjX3/ur
+	ADR15GvBpYyjlGqAUUNA8KDrOnJDA0YaKc5ecEtChIAqTC6XtGhD+jWWPQP+xggLxJ72
+	mDUxdWq+YM5Dy8TFssEU5XtqjrCmaDANgrRWX8H+leJICG9NqswJL5kK8ZUPjh0+2CWt
+	bdQQ==
+X-Gm-Message-State: APjAAAVY8kwRfxv6F2a4BrBBmIsvgfa4ssOxb9FNPxvNPg6gN5lpD9Ou
+	CQXu+ifZ+Md9yxvWnxWjtEcnFQ==
+X-Google-Smtp-Source: APXvYqx1H2/9VW44JtwWRCJFdtifkuDcVFTLk5qYiu08cpR52pQbD8D4ye1i5NGL9c/+dOMyzCqJjw==
+X-Received: by 2002:adf:fd04:: with SMTP id e4mr173983wrr.190.1555621278075;
+	Thu, 18 Apr 2019 14:01:18 -0700 (PDT)
+Received: from [192.168.1.33] (193.red-88-21-103.staticip.rima-tde.net.
+	[88.21.103.193])
+	by smtp.gmail.com with ESMTPSA id t15sm3738370wmt.2.2019.04.18.14.01.16
+	(version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+	Thu, 18 Apr 2019 14:01:17 -0700 (PDT)
+To: Li Qiang <liq3ea@163.com>, thuth@redhat.com, lvivier@redhat.com,
+	pbonzini@redhat.com, lersek@redhat.com, kraxel@redhat.com
+References: <20190319023030.947-1-liq3ea@163.com>
+	<20190319023030.947-3-liq3ea@163.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Openpgp: id=89C1E78F601EE86C867495CBA2A3FD6EDEADC0DE;
+	url=http://pgp.mit.edu/pks/lookup?op=get&search=0xA2A3FD6EDEADC0DE
+Message-ID: <979370c0-99ec-aff1-7cf5-350caa6ac773@redhat.com>
+Date: Thu, 18 Apr 2019 23:01:16 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+	Thunderbird/60.6.1
 MIME-Version: 1.0
+In-Reply-To: <20190319023030.947-3-liq3ea@163.com>
 Content-Type: text/plain; charset="UTF-8"
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.47]);
-	Thu, 18 Apr 2019 20:51:42 +0000 (UTC)
-Content-Transfer-Encoding: quoted-printable
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] [PULL for-4.1 17/36] char: Make -chardev help print to
- stdout
+	[fuzzy]
+X-Received-From: 209.85.221.65
+Subject: Re: [Qemu-devel] [PATCH 2/2] tests: fw_cfg: add reboot_timeout test
+ case
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -72,53 +88,69 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>,
-	Paolo Bonzini <pbonzini@redhat.com>
+Cc: liq3ea@gmail.com, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190418205116.4ORaT1a4y66hvs8w7WdS76vF82f1TVzkYED5hTgtN4w@z>
+Message-ID: <20190418210116.m9qsKOJI-5qQadqHurtoDKzISs9oL9MOUvc3X4GDhrI@z>
 
-Command line help explicitly requested by the user should be printed
-to stdout, not stderr.  We do elsewhere.  Adjust -chardev to match:
-use qemu_printf() instead of error_printf().  Plain printf() would be
-wrong because we need to print to the current monitor for "chardev-add
-help".
+Hi Li,
 
-Cc: "Marc-Andr=C3=A9 Lureau" <marcandre.lureau@redhat.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>
-Signed-off-by: Markus Armbruster <armbru@redhat.com>
-Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
-Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
-Tested-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
-Message-Id: <20190417190641.26814-14-armbru@redhat.com>
----
- chardev/char.c | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
+On 3/19/19 3:30 AM, Li Qiang wrote:
+> Signed-off-by: Li Qiang <liq3ea@163.com>
+> ---
+>  tests/fw_cfg-test.c | 15 ++++++++++++++-
+>  1 file changed, 14 insertions(+), 1 deletion(-)
+> 
+> diff --git a/tests/fw_cfg-test.c b/tests/fw_cfg-test.c
+> index 1c5103fe1c..551b51e38f 100644
+> --- a/tests/fw_cfg-test.c
+> +++ b/tests/fw_cfg-test.c
+> @@ -99,6 +99,17 @@ static void test_fw_cfg_boot_menu(void)
+>      g_assert_cmpint(qfw_cfg_get_u16(fw_cfg, FW_CFG_BOOT_MENU), ==, boot_menu);
+>  }
+>  
+> +static void test_fw_cfg_reboot_timeout(void)
+> +{
+> +    uint32_t reboot_timeout = 0;
+> +    size_t filesize;
+> +
+> +    filesize = qfw_cfg_get_file(fw_cfg, "etc/boot-fail-wait",
+> +                     &reboot_timeout, sizeof(reboot_timeout));
+> +    g_assert_cmpint(filesize, ==, sizeof(reboot_timeout));
+> +    g_assert_cmpint(reboot_timeout, ==, 15);
+> +}
+> +
+>  int main(int argc, char **argv)
+>  {
+>      QTestState *s;
+> @@ -106,7 +117,8 @@ int main(int argc, char **argv)
+>  
+>      g_test_init(&argc, &argv, NULL);
+>  
+> -    s = qtest_init("-uuid 4600cb32-38ec-4b2f-8acb-81c6ea54f2d8");
+> +    s = qtest_init("-uuid 4600cb32-38ec-4b2f-8acb-81c6ea54f2d8 "
+> +                   "-boot reboot-timeout=15");
 
-diff --git a/chardev/char.c b/chardev/char.c
-index 514cd6b0c3..54724a56b1 100644
---- a/chardev/char.c
-+++ b/chardev/char.c
-@@ -28,6 +28,7 @@
- #include "sysemu/sysemu.h"
- #include "qemu/config-file.h"
- #include "qemu/error-report.h"
-+#include "qemu/qemu-print.h"
- #include "chardev/char.h"
- #include "qapi/error.h"
- #include "qapi/qapi-commands-char.h"
-@@ -651,7 +652,7 @@ Chardev *qemu_chr_new_from_opts(QemuOpts *opts, GMain=
-Context *context,
-=20
-         chardev_name_foreach(help_string_append, str);
-=20
--        error_printf("Available chardev backend types: %s\n", str->str);
-+        qemu_printf("Available chardev backend types: %s\n", str->str);
-         g_string_free(str, true);
-         return NULL;
-     }
---=20
-2.17.2
+This modify all tests. I'd rather add a specific test with this option.
+Doing so, we can easily modify the timeout and add the <0 and >0xffff cases.
 
+Can you think of a 'splash-time' test (for commit 6912bb0b3d3b1)?
+
+Regards,
+
+Phil.
+
+>  
+>      fw_cfg = pc_fw_cfg_init(s);
+>  
+> @@ -125,6 +137,7 @@ int main(int argc, char **argv)
+>      qtest_add_func("fw_cfg/max_cpus", test_fw_cfg_max_cpus);
+>      qtest_add_func("fw_cfg/numa", test_fw_cfg_numa);
+>      qtest_add_func("fw_cfg/boot_menu", test_fw_cfg_boot_menu);
+> +    qtest_add_func("fw_cfg/reboot_timeout", test_fw_cfg_reboot_timeout);
+>  
+>      ret = g_test_run();
+>  
+> 
 
