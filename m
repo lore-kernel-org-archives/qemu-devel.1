@@ -1,22 +1,22 @@
-Received: from eggs.gnu.org ([209.51.188.92]:61000)
+Received: from eggs.gnu.org ([209.51.188.92]:33201)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1hGyaN-0006X6-7f
-	for qemu-devel@nongnu.org; Thu, 18 Apr 2019 00:23:44 -0400
+	(envelope-from <thuth@redhat.com>) id 1hGyco-0007fR-W2
+	for qemu-devel@nongnu.org; Thu, 18 Apr 2019 00:26:16 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1hGyaH-0003IQ-Cy
-	for qemu-devel@nongnu.org; Thu, 18 Apr 2019 00:23:39 -0400
+	(envelope-from <thuth@redhat.com>) id 1hGyce-0004Cy-M5
+	for qemu-devel@nongnu.org; Thu, 18 Apr 2019 00:26:10 -0400
 References: <20190417220147.67648-1-stephen.checkoway@oberlin.edu>
-	<20190417220147.67648-5-stephen.checkoway@oberlin.edu>
+	<20190417220147.67648-6-stephen.checkoway@oberlin.edu>
 From: Thomas Huth <thuth@redhat.com>
-Message-ID: <0d2705ba-edea-7922-d812-69cc5fe5b870@redhat.com>
-Date: Thu, 18 Apr 2019 06:23:03 +0200
+Message-ID: <9e1b8e19-a40a-5070-0815-9e783435d542@redhat.com>
+Date: Thu, 18 Apr 2019 06:25:29 +0200
 MIME-Version: 1.0
-In-Reply-To: <20190417220147.67648-5-stephen.checkoway@oberlin.edu>
+In-Reply-To: <20190417220147.67648-6-stephen.checkoway@oberlin.edu>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v3 04/10] block/pflash_cfi02: Implement
- intereleaved flash devices
+Subject: Re: [Qemu-devel] [PATCH v3 05/10] block/pflash_cfi02: Implement
+ nonuniform sector sizes
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,43 +28,30 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: Stephen Checkoway <stephen.checkoway@oberlin.edu>, QEMU Developers <qemu-devel@nongnu.org>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, "open list:Block layer core" <qemu-block@nongnu.org>, Markus Armbruster <armbru@redhat.com>, Laszlo Ersek <lersek@redhat.com>, Laurent Vivier <lvivier@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
 
 On 18/04/2019 00.01, Stephen Checkoway wrote:
-> It's common for multiple narrow flash chips to be hooked up in parallel
-> to support wider buses. For example, four 8-bit wide flash chips (x8)
-> may be combined in parallel to produce a 32-bit wide device. Similarly,
-> two 16-bit wide chips (x16) may be combined.
+> Some flash chips support sectors of different sizes. For example, the
+> AMD AM29LV160DT has 31 64 kB sectors, one 32 kB sector, two 8 kB
+> sectors, and a 16 kB sector, in that order. The AM29LV160DB has those in
+> the reverse order.
 > 
-> This commit introduces `device-width` and `max-device-width` properties,
-> similar to pflash_cfi01, with the following meanings:
-> - `width`: The width of the logical, qemu device (same as before);
-> - `device-width`: The width of an individual flash chip, defaulting to
->   `width`; and
-> - `max-device-width`: The maximum width of an individual flash chip,
->   defaulting to `device-width`.
+> The `num-blocks` and `sector-length` properties work exactly as they did
+> before: a flash device with uniform sector lengths. To get non-uniform
+> sector lengths for up to four regions, the following properties may be
+> set
+> - region 0. `num-blocks0` and `sector-length0`;
+> - region 1. `num-blocks1` and `sector-length1`;
+> - region 2. `num-blocks2` and `sector-length2`; and
+> - region 3. `num-blocks3` and `sector-length3`.
 > 
-> Nothing needs to change to support reading such interleaved devices but
-> commands (e.g., erase and programming) must be sent to all devices at
-> the same time or else the various chips will be in different states.
+> If the uniform and nonuniform properties are set, then both must specify
+> a flash device with the same total size. It would be better to disallow
+> both being set, or make `num-blocks0` and `sector-length0` alias
+> `num-blocks` and `sector-length`, but that would make testing currently
+> impossible.
 > 
-> For example, a 4-byte wide logical device can be composed of four x8/x16
-> devices in x8 mode. That is, each device supports both x8 or x16 and
-> they're being used in the byte, rather than word, mode. This
-> configuration would have `width=4`, `device-width=1`, and
-> `max-device-width=2`.
-> 
-> In addition to commands being sent to all devices, guest firmware
-> expects the status and CFI queries to be replicated for each device.
-> (The one exception to the response replication is that each device gets
-> to report its own status bit DQ7 while programming because its value
-> depends on the value being programmed which will usually differ for each
-> device.)
-> 
-> Testing is limited to 16-bit wide devices due to the current inability
-> to override the properties set by `pflash_cfi02_register`, but multiple
-> configurations are tested.
-> 
-> Stop using global_qtest. Instead, package the qtest variable inside the
-> FlashConfig structure.
-
-Thanks for doing that change wrt global_qtest!
+> Signed-off-by: Stephen Checkoway <stephen.checkoway@oberlin.edu>
+> ---
+>  hw/block/pflash_cfi02.c   | 177 +++++++++++++++++++++++++-----------
+>  tests/pflash-cfi02-test.c | 185 ++++++++++++++++++++++++++++----------
+>  2 files changed, 265 insertions(+), 97 deletions(-)
 
 Acked-by: Thomas Huth <thuth@redhat.com>
