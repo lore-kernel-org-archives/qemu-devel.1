@@ -1,19 +1,19 @@
-Received: from eggs.gnu.org ([209.51.188.92]:47203)
+Received: from eggs.gnu.org ([209.51.188.92]:47258)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1hHBPu-0005uX-VN
-	for qemu-devel@nongnu.org; Thu, 18 Apr 2019 14:05:47 -0400
+	(envelope-from <thuth@redhat.com>) id 1hHBQ1-000613-0z
+	for qemu-devel@nongnu.org; Thu, 18 Apr 2019 14:05:56 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1hHBPu-0003td-0A
-	for qemu-devel@nongnu.org; Thu, 18 Apr 2019 14:05:46 -0400
+	(envelope-from <thuth@redhat.com>) id 1hHBPz-0003wg-Fo
+	for qemu-devel@nongnu.org; Thu, 18 Apr 2019 14:05:52 -0400
 From: Thomas Huth <thuth@redhat.com>
-Date: Thu, 18 Apr 2019 20:00:54 +0200
-Message-Id: <20190418180057.3593-27-thuth@redhat.com>
+Date: Thu, 18 Apr 2019 20:00:55 +0200
+Message-Id: <20190418180057.3593-28-thuth@redhat.com>
 In-Reply-To: <20190418180057.3593-1-thuth@redhat.com>
 References: <20190418180057.3593-1-thuth@redhat.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH for-QEMU-4.1 v5 26/29] hw/arm: Express
- dependencies of the ZynqMP zcu102 machine with Kconfig
+Subject: [Qemu-devel] [PATCH for-QEMU-4.1 v5 27/29] hw/arm: Express
+ dependencies of the xlnx-versal-virt machine with Kconfig
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,64 +25,28 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: yang.zhong@intel.com, Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org, pbonzini@redhat.com
 Cc: Beniamino Galvani <b.galvani@gmail.com>, Jan Kiszka <jan.kiszka@web.de>, Antony Pavlov <antonynpavlov@gmail.com>, Peter Chubb <peter.chubb@nicta.com.au>, qemu-block@nongnu.org, Cedric Le Goater <clg@kaod.org>, "Michael S. Tsirkin" <mst@redhat.com>, Andrew Jeffery <andrew@aj.id.au>, Igor Mitsyanko <i.mitsyanko@gmail.com>, Andrey Smirnov <andrew.smirnov@gmail.com>, Rob Herring <robh@kernel.org>, qemu-arm@nongnu.org, Andrzej Zaborowski <balrogg@gmail.com>, John Snow <jsnow@redhat.com>, Joel Stanley <joel@jms.id.au>, "Edgar E . Iglesias" <edgar.iglesias@gmail.com>, Jean-Christophe Dubois <jcd@tribudubois.net>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, Philippe Mathieu-Daude <f4bug@amsat.org>, Alistair Francis <alistair@alistair23.me>, Subbaraya Sundeep <sundeep.lkml@gmail.com>, Gerd Hoffmann <kraxel@redhat.com>
 
-This cleans up most settings in default-configs/aarch64-softmmu.mak.
+Dependencies have been determined with trial-and-error and by
+looking at the xlnx-versal.c source file.
 
 Signed-off-by: Thomas Huth <thuth@redhat.com>
 ---
- default-configs/aarch64-softmmu.mak |  4 ----
- hw/arm/Kconfig                      | 11 +++++++++++
- hw/display/Kconfig                  |  1 +
- 3 files changed, 12 insertions(+), 4 deletions(-)
+ hw/arm/Kconfig | 4 ++++
+ 1 file changed, 4 insertions(+)
 
-diff --git a/default-configs/aarch64-softmmu.mak b/default-configs/aarch6=
-4-softmmu.mak
-index 4ea9add003..3a4b15e7e8 100644
---- a/default-configs/aarch64-softmmu.mak
-+++ b/default-configs/aarch64-softmmu.mak
-@@ -3,10 +3,6 @@
- # We support all the 32 bit boards so need all their config
- include arm-softmmu.mak
-=20
--CONFIG_AUX=3Dy
--CONFIG_DDC=3Dy
--CONFIG_DPCD=3Dy
--CONFIG_XLNX_ZYNQMP=3Dy
- CONFIG_XLNX_ZYNQMP_ARM=3Dy
- CONFIG_XLNX_VERSAL=3Dy
- CONFIG_ARM_SMMUV3=3Dy
 diff --git a/hw/arm/Kconfig b/hw/arm/Kconfig
-index 708eae19e5..32e4cc50e5 100644
+index 32e4cc50e5..22be1e1231 100644
 --- a/hw/arm/Kconfig
 +++ b/hw/arm/Kconfig
-@@ -277,6 +277,17 @@ config STM32F205_SOC
-=20
- config XLNX_ZYNQMP_ARM
-     bool
-+    select AHCI
-+    select ARM_GIC
-+    select CADENCE
-+    select DDC
-+    select DPCD
-+    select SDHCI
-+    select SSI
-+    select SSI_M25P80
-+    select XILINX_AXI
-+    select XILINX_SPIPS
-+    select XLNX_ZYNQMP
+@@ -291,6 +291,10 @@ config XLNX_ZYNQMP_ARM
 =20
  config XLNX_VERSAL
      bool
-diff --git a/hw/display/Kconfig b/hw/display/Kconfig
-index 0577e68c8e..bb95f8d6a4 100644
---- a/hw/display/Kconfig
-+++ b/hw/display/Kconfig
-@@ -108,6 +108,7 @@ config VIRTIO_VGA
++    select ARM_GIC
++    select PL011
++    select CADENCE
++    select VIRTIO_MMIO
 =20
- config DPCD
-     bool
-+    select AUX
-=20
- config ATI_VGA
+ config FSL_IMX25
      bool
 --=20
 2.21.0
