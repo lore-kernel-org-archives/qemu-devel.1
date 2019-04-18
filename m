@@ -1,22 +1,24 @@
-Received: from eggs.gnu.org ([209.51.188.92]:40953)
+Received: from eggs.gnu.org ([209.51.188.92]:42471)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1hH4aD-0003oX-2p
-	for qemu-devel@nongnu.org; Thu, 18 Apr 2019 06:48:00 -0400
+	(envelope-from <Dave.Martin@arm.com>) id 1hH4eK-0004zL-9f
+	for qemu-devel@nongnu.org; Thu, 18 Apr 2019 06:52:13 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1hH4a9-0003QT-Aa
-	for qemu-devel@nongnu.org; Thu, 18 Apr 2019 06:47:55 -0400
-Date: Thu, 18 Apr 2019 12:47:37 +0200
-From: Kevin Wolf <kwolf@redhat.com>
-Message-ID: <20190418104737.GC5242@linux.fritz.box>
-References: <20190417115343.30527-1-pbonzini@redhat.com>
-	<CAJSP0QWtW3L54SC2FuWwc_Eu9DQnHw0eWWM1bUtGRrwwbFTyiQ@mail.gmail.com>
-	<cf51d357-d9c0-3a20-1d23-7f6671d7948a@redhat.com>
+	(envelope-from <Dave.Martin@arm.com>) id 1hH4eJ-0005y7-5x
+	for qemu-devel@nongnu.org; Thu, 18 Apr 2019 06:52:12 -0400
+Received: from foss.arm.com ([217.140.101.70]:55888)
+	by eggs.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <Dave.Martin@arm.com>) id 1hH4eI-0005wy-Oc
+	for qemu-devel@nongnu.org; Thu, 18 Apr 2019 06:52:11 -0400
+Date: Thu, 18 Apr 2019 11:52:04 +0100
+From: Dave Martin <Dave.Martin@arm.com>
+Message-ID: <20190418105204.GF3567@e103592.cambridge.arm.com>
+References: <20190418092841.fzrcegkbal7dpfcy@kamzik.brq.redhat.com>
+	<20190418094634.sr4s4qkzceqftque@kamzik.brq.redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <cf51d357-d9c0-3a20-1d23-7f6671d7948a@redhat.com>
-Subject: Re: [Qemu-devel] [Qemu-block] [PATCH] scsi-generic: prevent guest
- from exceeding SG_IO limits
+In-Reply-To: <20190418094634.sr4s4qkzceqftque@kamzik.brq.redhat.com>
+Subject: Re: [Qemu-devel] How do we do user input bitmap properties?
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,36 +27,90 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: Stefan Hajnoczi <stefanha@gmail.com>, Stefan Hajnoczi <stefanha@redhat.com>, qemu-devel <qemu-devel@nongnu.org>, qemu block <qemu-block@nongnu.org>, qemu-stable <qemu-stable@nongnu.org>
+To: Andrew Jones <drjones@redhat.com>
+Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "armbru@redhat.com" <armbru@redhat.com>, "dgilbert@redhat.com" <dgilbert@redhat.com>, "peter.maydell@linaro.org" <peter.maydell@linaro.org>, "imammedo@redhat.com" <imammedo@redhat.com>
 
-Am 18.04.2019 um 11:48 hat Paolo Bonzini geschrieben:
-> On 17/04/19 14:30, Stefan Hajnoczi wrote:
-> > On Wed, Apr 17, 2019 at 12:54 PM Paolo Bonzini <pbonzini@redhat.com> wrote:
-> >> Linux places a limit of UIO_MAXIOV pages on SG_IO ioctls (and if the limit
-> >> is exceeded, a confusing ENOMEM error is returned[1]).  Prevent the guest
-> >> from exceeding these limits, by capping the maximum transfer length to
-> >> that value in the block limits VPD page.
-> >>
-> >> [1] Oh well, at least it was easier to follow the kernel source knowing
-> >>     it had to end as ENOMEM...
-> >>
-> >> Cc: qemu-stable@nongnu.org
-> >> Cc: qemu-block@nongnu.org
-> >> Cc: Stefan Hajnoczi <stefanha@redhat.com>
-> >> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
-> >> ---
-> >>  hw/scsi/scsi-generic.c | 17 +++++++++++++----
-> >>  1 file changed, 13 insertions(+), 4 deletions(-)
+On Thu, Apr 18, 2019 at 10:46:34AM +0100, Andrew Jones wrote:
+> On Thu, Apr 18, 2019 at 11:28:41AM +0200, Andrew Jones wrote:
+> > Hi all,
 > > 
-> > Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
+> > First some background:
 > > 
+> > For the userspace side of AArch64 guest SVE support we need to
+> > expose KVM's allowed vector lengths bitmap to the user and allow
+> > the user to choose a subset of that bitmap. Since bitmaps are a
+> > bit awkward to work with then we'll likely want to expose it as
+> > an array of vector lengths instead. Also, assuming we want to
+> > expose the lengths as number-of-quadwords (quadword == 128 bits
+> > for AArch64 and vector lengths must be multiples of quadwords)
+> > rather than number-of-bits, then an example array (which will
+> > always be a sequence) might be
+> > 
+> >  [ 8, 16, 32 ]
+> > 
+> > The user may choose a subsequence, but only through truncation,
+> > i.e. [ 8, 32 ] is not valid, but [ 8, 16 ] is.
+> > 
+> > Furthermore, different hosts may support different sequences
+> > which have the same maximum. For example, if the above sequence
+> > is for Host_A, then Host_B could be
+> > 
+> >  [ 8, 16, 24, 32 ]
 > 
-> This is acually only an issue with kernels prior to 4.5, so it should be
-> fixed downstream instead.
+> It doesn't really matter for this discussion, but I just realized
+> that I picked bogus numbers for these examples. 32 would be too
+> big. The largest supported is 16. I probably should have just used
+> the simple [ 1, 2, 4 ] and [ 1, 2, 3, 4 ] arrays, corresponding to
+> vector lengths (in bits) 128, 256, 512 and 128, 256, 384, 512.
 
-I don't think that upstream QEMU has kernels > 4.5 as an official
-requirement, though? We try to be compatible with quite old libs, so we
-should stay compatible with old kernels, too.
+I'd argue differently from the ABI perspective.
 
-Kevin
+If the host supports vq = [ 1,2,3,4 ], then it is entirely valid to ask
+for [ 1,2,4 ].  KVM will fail the KVM_REG_ARM64_SVE_VLS write with
+EINVAL, but I don't distinguish between a set that is not satisfiable on
+this hardware and a set that is not valid at all.  The kernel basically
+doesn't check for the latter: an architecturally invalid set will always
+not be satisfiable on the hardware.
+
+Ideally, userspace should not preempt this decision, in case the
+architecture becomes more flexible someday in what it can virtualise.
+
+> > The host must support all lengths in the sequence, which means
+> > that while Host_A supports 32, since it doesn't support 24 and
+> > we can only truncate sequences, we must use either [ 8 ] or
+> > [ 8, 16 ] for a compatible sequence if we intend to migrate
+> > between the hosts.
+> > 
+> > Now to the $SUBJECT question:
+> > 
+> > My feeling is that we should require the sequence to be
+> > provided on the command line as a cpu property. Something
+> > like
+> > 
+> >   -cpu host,sve-vl-list=8:16
+
+I can't decide whether it's more or less user-friendly to denote VL in
+terms of bytes in this kind of context.
+
+Usually when I say "VL" in the kernel ABI I try to mean this.
+(KVM_REG_ARM64_SVE_VLS is a special case: here the lengths are fancily
+encoded rather than being passed as integers, so the precise unit used
+is a more abstract concept here ... or anyway, that's my excuse.
+_SVE_VQS felt odd here.)
+
+For kvmtool I went with quadwords on the command line, but only as a
+quick hack to simplify the parser slightly.
+
+OTOH, specifying 1,2,4 on the command line is clearly less annoying and
+error-prone than 16,32,64.
+
+Naming the option with "vq" instead of "vl" is another option, though
+"vq" is Linux terminology not endorsed by the architecture.
+
+For kvmtool I've considered a range / filtering syntax, but I didn't
+implement it yet.
+
+[...]
+
+Cheers
+---Dave
