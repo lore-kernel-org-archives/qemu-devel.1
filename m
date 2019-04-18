@@ -1,31 +1,31 @@
-Received: from eggs.gnu.org ([209.51.188.92]:51247)
+Received: from eggs.gnu.org ([209.51.188.92]:51285)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1hHDnx-0001J6-4U
-	for qemu-devel@nongnu.org; Thu, 18 Apr 2019 16:38:47 -0400
+	(envelope-from <armbru@redhat.com>) id 1hHDnz-0001Ou-1E
+	for qemu-devel@nongnu.org; Thu, 18 Apr 2019 16:38:48 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1hHDnv-0002dS-HK
-	for qemu-devel@nongnu.org; Thu, 18 Apr 2019 16:38:45 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:54040)
+	(envelope-from <armbru@redhat.com>) id 1hHDnw-0002g5-UG
+	for qemu-devel@nongnu.org; Thu, 18 Apr 2019 16:38:46 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:44726)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1hHDnv-0002c5-8z
-	for qemu-devel@nongnu.org; Thu, 18 Apr 2019 16:38:43 -0400
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
-	[10.5.11.13])
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1hHDnw-0002eJ-KN
+	for qemu-devel@nongnu.org; Thu, 18 Apr 2019 16:38:44 -0400
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+	[10.5.11.14])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 579DEC05681F
-	for <qemu-devel@nongnu.org>; Thu, 18 Apr 2019 20:38:42 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id DF22B753CF
+	for <qemu-devel@nongnu.org>; Thu, 18 Apr 2019 20:38:43 +0000 (UTC)
 Received: from blackfin.pond.sub.org (ovpn-116-116.ams2.redhat.com
 	[10.36.116.116])
-	by smtp.corp.redhat.com (Postfix) with ESMTPS id 004EC60851
-	for <qemu-devel@nongnu.org>; Thu, 18 Apr 2019 20:38:41 +0000 (UTC)
+	by smtp.corp.redhat.com (Postfix) with ESMTPS id 8980C5D9CC
+	for <qemu-devel@nongnu.org>; Thu, 18 Apr 2019 20:38:43 +0000 (UTC)
 From: Markus Armbruster <armbru@redhat.com>
-Date: Thu, 18 Apr 2019 22:38:31 +0200
-Message-Id: <20190418203840.10528-1-armbru@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL for-4.1 0/9] Miscellaneous patches for 2019-04-18
+Date: Thu, 18 Apr 2019 22:38:40 +0200
+Message-Id: <20190418203840.10528-10-armbru@redhat.com>
+In-Reply-To: <20190418203840.10528-1-armbru@redhat.com>
+References: <20190418203840.10528-1-armbru@redhat.com>
+Subject: [Qemu-devel] [PULL for-4.1 9/9] Clean up decorations and whitespace
+ around header guards
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,162 +36,161 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-Early pull request because I'll be on vacation when 4.1 opens.  Hope
-that's okay.
+Cleaned up with scripts/clean-header-guards.pl.
 
-The following changes since commit eeba63fc7fface36f438bcbc0d3b02e7dcb599=
-83:
+Signed-off-by: Markus Armbruster <armbru@redhat.com>
+Message-Id: <20190315145123.28030-9-armbru@redhat.com>
+---
+ hw/ide/ahci_internal.h              | 2 +-
+ include/block/aio-wait.h            | 2 +-
+ include/exec/translator.h           | 2 +-
+ include/hw/arm/nrf51_soc.h          | 1 -
+ include/hw/arm/smmu-common.h        | 2 +-
+ include/hw/misc/imx2_wdt.h          | 2 +-
+ include/hw/misc/nrf51_rng.h         | 3 ++-
+ include/hw/pci-host/designware.h    | 2 +-
+ include/hw/riscv/sifive_plic.h      | 1 -
+ include/qemu/pmem.h                 | 2 +-
+ target/xtensa/xtensa-isa-internal.h | 2 +-
+ tests/acpi-utils.h                  | 2 +-
+ tests/tpm-emu.h                     | 2 +-
+ 13 files changed, 12 insertions(+), 13 deletions(-)
 
-  Update version for v4.0.0-rc4 release (2019-04-16 21:53:00 +0100)
-
-are available in the Git repository at:
-
-  git://repo.or.cz/qemu/armbru.git tags/pull-misc-2019-04-18
-
-for you to fetch changes up to 15136db27efaf0bdcf1131d41ad57832a2acadcc:
-
-  Clean up decorations and whitespace around header guards (2019-04-17 19=
-:20:46 +0200)
-
-----------------------------------------------------------------
-Miscellaneous patches for 2019-04-18
-
-----------------------------------------------------------------
-Markus Armbruster (9):
-      Clean up includes
-      Use #include "..." for our own headers, <...> for others
-      authz: Normalize #include "authz/trace.h" to "trace.h"
-      linux-user/nios2 linux-user/riscv: Clean up header guards
-      target/xtensa: Clean up core-isa.h header guards
-      Clean up header guards that don't match their file name
-      Clean up ill-advised or unusual header guards
-      Normalize header guard symbol definition.
-      Clean up decorations and whitespace around header guards
-
- authz/base.c                                    |  2 +-
- authz/list.c                                    |  2 +-
- authz/listfile.c                                |  2 +-
- authz/pamacct.c                                 |  2 +-
- authz/simple.c                                  |  2 +-
- block/crypto.h                                  |  6 +++---
- contrib/elf2dmp/main.c                          |  3 +--
- contrib/elf2dmp/pdb.c                           |  3 +--
- contrib/elf2dmp/qemu_elf.h                      |  6 +++---
- contrib/rdmacm-mux/main.c                       | 18 +++++++++---------
- contrib/rdmacm-mux/rdmacm-mux.h                 |  6 +++---
- disas/nanomips.h                                |  4 ++--
- fsdev/qemu-fsdev-throttle.h                     |  7 ++++---
- hw/arm/smmuv3-internal.h                        |  4 ++--
- hw/display/ati.c                                |  1 +
- hw/display/ati_2d.c                             |  1 +
- hw/display/ati_dbg.c                            |  1 +
- hw/display/ati_int.h                            |  1 -
- hw/display/vga_regs.h                           |  6 +++---
- hw/i386/amd_iommu.h                             |  4 ++--
- hw/ide/ahci_internal.h                          |  2 +-
- hw/rdma/rdma_utils.h                            |  1 -
- hw/rdma/vmw/pvrdma_qp_ops.h                     |  4 ++--
- hw/sd/sdmmc-internal.h                          |  5 +++--
- hw/timer/m48t59-internal.h                      |  3 ++-
- hw/tpm/tpm_ioctl.h                              |  7 ++++---
- hw/xtensa/xtensa_memory.h                       |  4 ++--
- include/authz/base.h                            |  7 +++----
- include/authz/list.h                            |  7 +++----
- include/authz/listfile.h                        |  8 +++-----
- include/authz/pamacct.h                         |  7 +++----
- include/authz/simple.h                          |  7 +++----
- include/block/aio-wait.h                        |  2 +-
- include/chardev/spice.h                         |  4 ++--
- include/disas/capstone.h                        |  2 +-
- include/exec/translator.h                       |  2 +-
- include/hw/arm/nrf51_soc.h                      |  1 -
- include/hw/arm/smmu-common.h                    |  2 +-
- include/hw/audio/soundhw.h                      |  4 ++--
- include/hw/cpu/cluster.h                        |  1 -
- include/hw/i386/x86-iommu.h                     |  4 ++--
- include/hw/intc/heathrow_pic.h                  |  6 +++---
- include/hw/intc/xlnx-pmu-iomod-intc.h           |  6 +++---
- include/hw/misc/armsse-mhu.h                    |  4 ++--
- include/hw/misc/imx2_wdt.h                      |  2 +-
- include/hw/misc/nrf51_rng.h                     |  3 ++-
- include/hw/pci-host/designware.h                |  2 +-
- include/hw/pci-host/sabre.h                     |  4 ++--
- include/hw/ppc/pnv.h                            |  7 ++++---
- include/hw/ppc/pnv_core.h                       |  7 ++++---
- include/hw/ppc/pnv_lpc.h                        |  7 ++++---
- include/hw/ppc/pnv_occ.h                        |  7 ++++---
- include/hw/ppc/pnv_psi.h                        |  7 ++++---
- include/hw/ppc/pnv_xscom.h                      |  7 ++++---
- include/hw/ppc/spapr_ovec.h                     |  7 ++++---
- include/hw/riscv/sifive_plic.h                  |  1 -
- include/hw/scsi/emulation.h                     |  2 +-
- include/hw/timer/pl031.h                        |  4 ++--
- include/hw/virtio/vhost-vsock.h                 |  6 +++---
- include/hw/virtio/virtio-crypto.h               |  6 +++---
- include/hw/watchdog/wdt_aspeed.h                |  7 ++++---
- include/hw/xen/start_info.h                     |  6 +++---
- include/hw/xen/xen-legacy-backend.h             |  6 +++---
- include/hw/xtensa/mx_pic.h                      |  4 ++--
- include/hw/xtensa/xtensa-isa.h                  |  6 +++---
- include/migration/qemu-file-types.h             |  4 ++--
- include/qemu/drm.h                              |  4 ++--
- include/qemu/filemonitor.h                      |  6 +++---
- include/qemu/jhash.h                            |  6 +++---
- include/qemu/pmem.h                             |  2 +-
- include/qemu/stats64.h                          |  2 +-
- include/qemu/sys_membarrier.h                   |  2 +-
- include/qemu/systemd.h                          |  2 +-
- include/scsi/constants.h                        |  4 ++--
- include/scsi/utils.h                            |  2 +-
- include/sysemu/hvf.h                            |  5 +++--
- include/ui/kbd-state.h                          |  3 ++-
- linux-user/nios2/target_cpu.h                   |  4 ++--
- linux-user/nios2/target_signal.h                |  6 +++---
- linux-user/nios2/target_structs.h               |  4 ++--
- linux-user/nios2/target_syscall.h               |  6 +++---
- linux-user/riscv/target_cpu.h                   |  4 ++--
- linux-user/riscv/target_signal.h                |  6 +++---
- linux-user/riscv/target_structs.h               |  4 ++--
- linux-user/xtensa/syscall_nr.h                  |  6 +++---
- linux-user/xtensa/target_structs.h              |  4 ++--
- linux-user/xtensa/termbits.h                    |  6 +++---
- net/colo.h                                      |  6 +++---
- qga/vss-win32/vss-handles.h                     |  4 ++--
- scsi/pr-helper.h                                |  3 ++-
- target/i386/hax-i386.h                          |  4 ++--
- target/i386/hax-interface.h                     |  4 ++--
- target/i386/hax-posix.h                         |  6 +++---
- target/i386/hvf/hvf-i386.h                      |  4 ++--
- target/i386/hvf/vmcs.h                          |  4 ++--
- target/i386/hvf/x86.h                           |  2 +-
- target/i386/hvf/x86_decode.h                    |  2 +-
- target/i386/hvf/x86_descr.h                     |  2 +-
- target/i386/hvf/x86_emu.h                       |  5 +++--
- target/i386/hvf/x86_flags.h                     |  7 ++++---
- target/i386/hvf/x86_mmu.h                       |  7 ++++---
- target/i386/hvf/x86_task.h                      |  6 ++++--
- target/i386/whp-dispatch.h                      |  2 +-
- target/i386/whpx-all.c                          |  1 -
- target/nios2/cpu.h                              |  7 ++++---
- target/nios2/mmu.h                              |  7 ++++---
- target/ppc/mmu-book3s-v3.h                      |  6 +++---
- target/riscv/pmp.h                              |  4 ++--
- target/sparc/asi.h                              |  6 +++---
- target/xtensa/core-de212/core-isa.h             |  8 +++-----
- target/xtensa/core-sample_controller/core-isa.h |  8 +++-----
- target/xtensa/core-test_kc705_be/core-isa.h     |  8 +++-----
- target/xtensa/core-test_mmuhifi_c3/core-isa.h   |  8 +++-----
- target/xtensa/xtensa-isa-internal.h             |  2 +-
- tests/acpi-utils.h                              |  2 +-
- tests/fp/platform.h                             |  1 -
- tests/libqos/e1000e.h                           |  4 ++--
- tests/libqos/qgraph.h                           |  4 ----
- tests/libqos/qgraph_internal.h                  |  4 ++--
- tests/libqos/sdhci.h                            |  4 ++--
- tests/migration/migration-test.h                |  7 ++++---
- tests/qos-test.c                                |  2 +-
- tests/tpm-emu.h                                 |  2 +-
- 123 files changed, 272 insertions(+), 272 deletions(-)
-
---=20
+diff --git a/hw/ide/ahci_internal.h b/hw/ide/ahci_internal.h
+index 9b7fa8fc7d..95ecddcd3c 100644
+--- a/hw/ide/ahci_internal.h
++++ b/hw/ide/ahci_internal.h
+@@ -394,4 +394,4 @@ void ahci_reset(AHCIState *s);
+ 
+ #define SYSBUS_AHCI(obj) OBJECT_CHECK(SysbusAHCIState, (obj), TYPE_SYSBUS_AHCI)
+ 
+-#endif /* HW_IDE_AHCI_H */
++#endif /* HW_IDE_AHCI_INTERNAL_H */
+diff --git a/include/block/aio-wait.h b/include/block/aio-wait.h
+index afd0ff7eb8..afeeb18f95 100644
+--- a/include/block/aio-wait.h
++++ b/include/block/aio-wait.h
+@@ -124,4 +124,4 @@ void aio_wait_kick(void);
+  */
+ void aio_wait_bh_oneshot(AioContext *ctx, QEMUBHFunc *cb, void *opaque);
+ 
+-#endif /* QEMU_AIO_WAIT */
++#endif /* QEMU_AIO_WAIT_H */
+diff --git a/include/exec/translator.h b/include/exec/translator.h
+index 71e7b2c347..f327242576 100644
+--- a/include/exec/translator.h
++++ b/include/exec/translator.h
+@@ -141,4 +141,4 @@ void translator_loop(const TranslatorOps *ops, DisasContextBase *db,
+ 
+ void translator_loop_temp_check(DisasContextBase *db);
+ 
+-#endif  /* EXEC__TRANSLATOR_H */
++#endif /* EXEC__TRANSLATOR_H */
+diff --git a/include/hw/arm/nrf51_soc.h b/include/hw/arm/nrf51_soc.h
+index fd7fcc71a5..0cb78aafea 100644
+--- a/include/hw/arm/nrf51_soc.h
++++ b/include/hw/arm/nrf51_soc.h
+@@ -53,4 +53,3 @@ typedef struct NRF51State {
+ } NRF51State;
+ 
+ #endif
+-
+diff --git a/include/hw/arm/smmu-common.h b/include/hw/arm/smmu-common.h
+index b07cadd0ef..9a6ac64c97 100644
+--- a/include/hw/arm/smmu-common.h
++++ b/include/hw/arm/smmu-common.h
+@@ -167,4 +167,4 @@ void smmu_inv_notifiers_all(SMMUState *s);
+ /* Unmap the range of all the notifiers registered to @mr */
+ void smmu_inv_notifiers_mr(IOMMUMemoryRegion *mr);
+ 
+-#endif  /* HW_ARM_SMMU_COMMON */
++#endif /* HW_ARM_SMMU_COMMON_H */
+diff --git a/include/hw/misc/imx2_wdt.h b/include/hw/misc/imx2_wdt.h
+index 8afc99a10e..b91b002528 100644
+--- a/include/hw/misc/imx2_wdt.h
++++ b/include/hw/misc/imx2_wdt.h
+@@ -30,4 +30,4 @@ typedef struct IMX2WdtState {
+     MemoryRegion mmio;
+ } IMX2WdtState;
+ 
+-#endif /* IMX7_SNVS_H */
++#endif /* IMX2_WDT_H */
+diff --git a/include/hw/misc/nrf51_rng.h b/include/hw/misc/nrf51_rng.h
+index 3d6bf79997..b0133bf665 100644
+--- a/include/hw/misc/nrf51_rng.h
++++ b/include/hw/misc/nrf51_rng.h
+@@ -30,6 +30,7 @@
+  * the COPYING file in the top-level directory.
+  *
+  */
++
+ #ifndef NRF51_RNG_H
+ #define NRF51_RNG_H
+ 
+@@ -80,4 +81,4 @@ typedef struct {
+ } NRF51RNGState;
+ 
+ 
+-#endif /* NRF51_RNG_H_ */
++#endif /* NRF51_RNG_H */
+diff --git a/include/hw/pci-host/designware.h b/include/hw/pci-host/designware.h
+index a4f2c0695b..186bb36238 100644
+--- a/include/hw/pci-host/designware.h
++++ b/include/hw/pci-host/designware.h
+@@ -99,4 +99,4 @@ typedef struct DesignwarePCIEHost {
+     MemoryRegion mmio;
+ } DesignwarePCIEHost;
+ 
+-#endif  /* DESIGNWARE_H */
++#endif /* DESIGNWARE_H */
+diff --git a/include/hw/riscv/sifive_plic.h b/include/hw/riscv/sifive_plic.h
+index 688cd97f82..ce8907f6aa 100644
+--- a/include/hw/riscv/sifive_plic.h
++++ b/include/hw/riscv/sifive_plic.h
+@@ -80,4 +80,3 @@ DeviceState *sifive_plic_create(hwaddr addr, char *hart_config,
+     uint32_t aperture_size);
+ 
+ #endif
+-
+diff --git a/include/qemu/pmem.h b/include/qemu/pmem.h
+index dfb6d0da62..d2d7ad085c 100644
+--- a/include/qemu/pmem.h
++++ b/include/qemu/pmem.h
+@@ -33,4 +33,4 @@ pmem_persist(const void *addr, size_t len)
+ 
+ #endif /* CONFIG_LIBPMEM */
+ 
+-#endif /* !QEMU_PMEM_H */
++#endif /* QEMU_PMEM_H */
+diff --git a/target/xtensa/xtensa-isa-internal.h b/target/xtensa/xtensa-isa-internal.h
+index c29295ff96..40dd8bac96 100644
+--- a/target/xtensa/xtensa-isa-internal.h
++++ b/target/xtensa/xtensa-isa-internal.h
+@@ -228,4 +228,4 @@ int xtensa_isa_name_compare(const void *, const void *);
+ extern xtensa_isa_status xtisa_errno;
+ extern char xtisa_error_msg[];
+ 
+-#endif /* !XTENSA_ISA_INTERNAL_H */
++#endif /* XTENSA_ISA_INTERNAL_H */
+diff --git a/tests/acpi-utils.h b/tests/acpi-utils.h
+index ef388bbf12..73fe24f044 100644
+--- a/tests/acpi-utils.h
++++ b/tests/acpi-utils.h
+@@ -52,4 +52,4 @@ void acpi_fetch_table(QTestState *qts, uint8_t **aml, uint32_t *aml_len,
+                       const uint8_t *addr_ptr, const char *sig,
+                       bool verify_checksum);
+ 
+-#endif  /* TEST_ACPI_UTILS_H */
++#endif /* TEST_ACPI_UTILS_H */
+diff --git a/tests/tpm-emu.h b/tests/tpm-emu.h
+index 8eb802a79e..a4f1d64226 100644
+--- a/tests/tpm-emu.h
++++ b/tests/tpm-emu.h
+@@ -36,4 +36,4 @@ typedef struct TestState {
+ void tpm_emu_test_wait_cond(TestState *s);
+ void *tpm_emu_ctrl_thread(void *data);
+ 
+-#endif /* TEST_TPM_EMU_H */
++#endif /* TESTS_TPM_EMU_H */
+-- 
 2.17.2
