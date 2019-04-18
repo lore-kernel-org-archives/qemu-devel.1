@@ -6,82 +6,81 @@ X-Spam-Status: No, score=-8.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,USER_AGENT_GIT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8DC15C10F0E
-	for <qemu-devel@archiver.kernel.org>; Thu, 18 Apr 2019 11:38:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CC20AC10F0E
+	for <qemu-devel@archiver.kernel.org>; Thu, 18 Apr 2019 11:40:29 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 51CF2217FA
-	for <qemu-devel@archiver.kernel.org>; Thu, 18 Apr 2019 11:38:53 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 51CF2217FA
+	by mail.kernel.org (Postfix) with ESMTPS id 90899217D7
+	for <qemu-devel@archiver.kernel.org>; Thu, 18 Apr 2019 11:40:29 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 90899217D7
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=de.ibm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:39893 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:39936 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hH5NU-0008BB-Iv
-	for qemu-devel@archiver.kernel.org; Thu, 18 Apr 2019 07:38:52 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:50756)
+	id 1hH5P2-0000ud-Os
+	for qemu-devel@archiver.kernel.org; Thu, 18 Apr 2019 07:40:28 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:50683)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <borntraeger@de.ibm.com>) id 1hH5GJ-0002mC-Es
-	for qemu-devel@nongnu.org; Thu, 18 Apr 2019 07:31:29 -0400
+	(envelope-from <borntraeger@de.ibm.com>) id 1hH5GH-0002kZ-RG
+	for qemu-devel@nongnu.org; Thu, 18 Apr 2019 07:31:28 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <borntraeger@de.ibm.com>) id 1hH5GF-0004XK-UV
-	for qemu-devel@nongnu.org; Thu, 18 Apr 2019 07:31:27 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:45196
-	helo=mx0a-001b2d01.pphosted.com)
+	(envelope-from <borntraeger@de.ibm.com>) id 1hH5GF-0004WI-LI
+	for qemu-devel@nongnu.org; Thu, 18 Apr 2019 07:31:25 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:37664)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <borntraeger@de.ibm.com>)
-	id 1hH5GF-0004Om-FF
+	id 1hH5GF-0004TZ-43
 	for qemu-devel@nongnu.org; Thu, 18 Apr 2019 07:31:23 -0400
-Received: from pps.filterd (m0098417.ppops.net [127.0.0.1])
+Received: from pps.filterd (m0098409.ppops.net [127.0.0.1])
 	by mx0a-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id
-	x3IBTTh3033227
-	for <qemu-devel@nongnu.org>; Thu, 18 Apr 2019 07:31:18 -0400
-Received: from e06smtp04.uk.ibm.com (e06smtp04.uk.ibm.com [195.75.94.100])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2rxq86368w-1
+	x3IBUVGE130071
+	for <qemu-devel@nongnu.org>; Thu, 18 Apr 2019 07:31:20 -0400
+Received: from e06smtp05.uk.ibm.com (e06smtp05.uk.ibm.com [195.75.94.101])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2rxqjrtc4g-1
 	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Thu, 18 Apr 2019 07:31:17 -0400
+	for <qemu-devel@nongnu.org>; Thu, 18 Apr 2019 07:31:19 -0400
 Received: from localhost
-	by e06smtp04.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	by e06smtp05.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
 	Only! Violators will be prosecuted
 	for <qemu-devel@nongnu.org> from <borntraeger@de.ibm.com>;
-	Thu, 18 Apr 2019 12:31:15 +0100
+	Thu, 18 Apr 2019 12:31:17 +0100
 Received: from b06cxnps4074.portsmouth.uk.ibm.com (9.149.109.196)
-	by e06smtp04.uk.ibm.com (192.168.101.134) with IBM ESMTP SMTP Gateway:
+	by e06smtp05.uk.ibm.com (192.168.101.135) with IBM ESMTP SMTP Gateway:
 	Authorized Use Only! Violators will be prosecuted; 
 	(version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
-	Thu, 18 Apr 2019 12:31:13 +0100
-Received: from d06av24.portsmouth.uk.ibm.com (d06av24.portsmouth.uk.ibm.com
-	[9.149.105.60])
+	Thu, 18 Apr 2019 12:31:14 +0100
+Received: from d06av25.portsmouth.uk.ibm.com (d06av25.portsmouth.uk.ibm.com
+	[9.149.105.61])
 	by b06cxnps4074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with
-	ESMTP id x3IBVC0x46465146
+	ESMTP id x3IBVD7w49414398
 	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256
-	verify=OK); Thu, 18 Apr 2019 11:31:12 GMT
-Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 210EA4204D;
-	Thu, 18 Apr 2019 11:31:12 +0000 (GMT)
-Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 0CF9D42045;
-	Thu, 18 Apr 2019 11:31:12 +0000 (GMT)
+	verify=OK); Thu, 18 Apr 2019 11:31:13 GMT
+Received: from d06av25.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 2713911C06F;
+	Thu, 18 Apr 2019 11:31:13 +0000 (GMT)
+Received: from d06av25.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 1576611C064;
+	Thu, 18 Apr 2019 11:31:13 +0000 (GMT)
 Received: from tuxmaker.boeblingen.de.ibm.com (unknown [9.152.85.9])
-	by d06av24.portsmouth.uk.ibm.com (Postfix) with ESMTPS;
-	Thu, 18 Apr 2019 11:31:12 +0000 (GMT)
+	by d06av25.portsmouth.uk.ibm.com (Postfix) with ESMTPS;
+	Thu, 18 Apr 2019 11:31:13 +0000 (GMT)
 Received: by tuxmaker.boeblingen.de.ibm.com (Postfix, from userid 25651)
-	id B2B2920F639; Thu, 18 Apr 2019 13:31:11 +0200 (CEST)
+	id C8D0420F639; Thu, 18 Apr 2019 13:31:12 +0200 (CEST)
 From: Christian Borntraeger <borntraeger@de.ibm.com>
 To: Cornelia Huck <cohuck@redhat.com>
-Date: Thu, 18 Apr 2019 13:31:02 +0200
+Date: Thu, 18 Apr 2019 13:31:06 +0200
 X-Mailer: git-send-email 2.19.1
 In-Reply-To: <20190418113110.160664-1-borntraeger@de.ibm.com>
 References: <20190418113110.160664-1-borntraeger@de.ibm.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-TM-AS-GCONF: 00
-x-cbid: 19041811-0016-0000-0000-0000027035EA
+x-cbid: 19041811-0020-0000-0000-0000033130D8
 X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
-x-cbparentid: 19041811-0017-0000-0000-000032CC8CE9
-Message-Id: <20190418113110.160664-3-borntraeger@de.ibm.com>
+x-cbparentid: 19041811-0021-0000-0000-00002183810C
+Message-Id: <20190418113110.160664-7-borntraeger@de.ibm.com>
 X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:, ,
 	definitions=2019-04-18_06:, , signatures=0
 X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
@@ -91,9 +90,8 @@ X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
 	mlxlogscore=999 adultscore=0 classifier=spam adjust=0 reason=mlx
 	scancount=1 engine=8.0.1-1810050000 definitions=main-1904180082
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic]
-X-Received-From: 148.163.158.5
-Subject: [Qemu-devel] [PATCH 02/10] s390x/cpumodel: remove CSSKE from base
- model
+X-Received-From: 148.163.156.1
+Subject: [Qemu-devel] [PATCH 06/10] s390x/cpumodel: enhanced sort facility
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -115,92 +113,169 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 Content-Type: text/plain; charset="UTF-8"
-Message-ID: <20190418113102.KrdmCiawYvLVeYdg0TFhzse364yfh4WCP5gWQHnKHmA@z>
+Message-ID: <20190418113106.PfH1mqgTJ04y_bACU49OdLxTmqx2MXLwBr5jAW7ohRU@z>
 
-conditional sske is deprecated and a distant future machine (will be one
-where the IBC will not allow to fully go back to z14) will remove this
-feature. To prepare for this and allow for the z14 and older cpu model
-to still run on systems without csske, remove csske from the base (and
-thus the default models for z10..z14). For compat machines we have to
-add those back.
+add the enhanced sort facility.
 
 Signed-off-by: Christian Borntraeger <borntraeger@de.ibm.com>
 ---
- hw/s390x/s390-virtio-ccw.c  |  2 ++
- target/s390x/cpu_models.c   | 21 +++++++++++++++++++++
- target/s390x/cpu_models.h   |  1 +
- target/s390x/gen-features.c |  1 -
- 4 files changed, 24 insertions(+), 1 deletion(-)
+ target/s390x/cpu_features.c     | 10 ++++++++++
+ target/s390x/cpu_features.h     |  1 +
+ target/s390x/cpu_features_def.h |  8 ++++++++
+ target/s390x/gen-features.c     | 14 ++++++++++++++
+ target/s390x/kvm.c              |  6 ++++++
+ 5 files changed, 39 insertions(+)
 
-diff --git a/hw/s390x/s390-virtio-ccw.c b/hw/s390x/s390-virtio-ccw.c
-index d11069b860..3415948b2c 100644
---- a/hw/s390x/s390-virtio-ccw.c
-+++ b/hw/s390x/s390-virtio-ccw.c
-@@ -648,6 +648,8 @@ bool css_migration_enabled(void)
- 
- static void ccw_machine_4_0_instance_options(MachineState *machine)
- {
-+    /* re-enable csske for compat machines in the base model */
-+    s390_cpumodel_fixup_csske();
- }
- 
- static void ccw_machine_4_0_class_options(MachineClass *mc)
-diff --git a/target/s390x/cpu_models.c b/target/s390x/cpu_models.c
-index eb125d4d0d..4e5aa879f3 100644
---- a/target/s390x/cpu_models.c
-+++ b/target/s390x/cpu_models.c
-@@ -93,6 +93,27 @@ static S390FeatBitmap qemu_max_cpu_feat;
- /* features part of a base model but not relevant for finding a base model */
- S390FeatBitmap ignored_base_feat;
- 
-+/*
-+ * We removed CSSKE from the base features. This is a hook for compat machines
-+ * to put this back for gen10..gen14. As the base model is also part of the
-+ * default model to have to fixup both bitfields
-+ */
-+void s390_cpumodel_fixup_csske(void)
-+{
-+    int i;
+diff --git a/target/s390x/cpu_features.c b/target/s390x/cpu_features.c
+index ed3f6aa969..e0a4769c19 100644
+--- a/target/s390x/cpu_features.c
++++ b/target/s390x/cpu_features.c
+@@ -109,6 +109,7 @@ static const S390FeatDef s390_features[] = {
+     FEAT_INIT("msa8-base", S390_FEAT_TYPE_STFL, 146, "Message-security-assist-extension-8 facility (excluding subfunctions)"),
+     FEAT_INIT("cmmnt", S390_FEAT_TYPE_STFL, 147, "CMM: ESSA-enhancement (no translate) facility"),
+     FEAT_INIT("vxeh2", S390_FEAT_TYPE_STFL, 148, "Vector Enhancements facility 2"),
++    FEAT_INIT("esort-base", S390_FEAT_TYPE_STFL, 150, "Enhanced-sort facility (excluding subfunctions)"),
+     FEAT_INIT("vxbeh", S390_FEAT_TYPE_STFL, 152, "Vector BCD enhancements facility 1"),
+     FEAT_INIT("msa9-base", S390_FEAT_TYPE_STFL, 155, "Message-security-assist-extension-9 facility (excluding subfunctions)"),
+     FEAT_INIT("etoken", S390_FEAT_TYPE_STFL, 156, "Etoken facility"),
+@@ -340,6 +341,12 @@ static const S390FeatDef s390_features[] = {
+     FEAT_INIT("kdsa-eddsa-sign-ed448", S390_FEAT_TYPE_KDSA, 44, "KDSA EdDSA-Sign-Ed448"),
+     FEAT_INIT("kdsa-eeddsa-sign-ed25519", S390_FEAT_TYPE_KDSA, 48, "KDSA Encrypted-EdDSA-Sign-Ed25519"),
+     FEAT_INIT("kdsa-eeddsa-sign-ed448", S390_FEAT_TYPE_KDSA, 52, "KDSA Encrypted-EdDSA-Sign-Ed448"),
 +
-+    for (i = 0; i < ARRAY_SIZE(s390_cpu_defs); i++) {
-+        const S390CPUDef *def = &s390_cpu_defs[i];
-+
-+        if (def->gen < 10 || def->gen > 14) {
-+            continue;
-+        }
-+
-+        set_bit(S390_FEAT_CONDITIONAL_SSKE, (unsigned long *)&def->base_feat);
-+        set_bit(S390_FEAT_CONDITIONAL_SSKE, (unsigned long *)&def->default_feat);
-+    }
-+}
-+
- void s390_cpudef_featoff(uint8_t gen, uint8_t ec_ga, S390Feat feat)
- {
-     const S390CPUDef *def;
-diff --git a/target/s390x/cpu_models.h b/target/s390x/cpu_models.h
-index 174a99e561..b2e37bc8cf 100644
---- a/target/s390x/cpu_models.h
-+++ b/target/s390x/cpu_models.h
-@@ -73,6 +73,7 @@ struct S390CPUModel {
- #define ibc_gen(x)        (x == 0 ? 0 : ((x >> 4) + S390_GEN_Z10))
- #define ibc_ec_ga(x)      (x & 0xf)
++    FEAT_INIT("sortl-sflr", S390_FEAT_TYPE_SORTL, 1, "SORTL SFLR"),
++    FEAT_INIT("sortl-svlr", S390_FEAT_TYPE_SORTL, 2, "SORTL SVLR"),
++    FEAT_INIT("sortl-32", S390_FEAT_TYPE_SORTL, 130, "SORTL 32 input lists"),
++    FEAT_INIT("sortl-128", S390_FEAT_TYPE_SORTL, 132, "SORTL 128 input lists"),
++    FEAT_INIT("sortl-f0", S390_FEAT_TYPE_SORTL, 192, "SORTL format 0 parameter-block"),
+ };
  
-+void s390_cpumodel_fixup_csske(void);
- void s390_cpudef_featoff(uint8_t gen, uint8_t ec_ga, S390Feat feat);
- void s390_cpudef_featoff_greater(uint8_t gen, uint8_t ec_ga, S390Feat feat);
- void s390_cpudef_group_featoff_greater(uint8_t gen, uint8_t ec_ga,
+ const S390FeatDef *s390_feat_def(S390Feat feat)
+@@ -403,6 +410,7 @@ void s390_fill_feat_block(const S390FeatBitmap features, S390FeatType type,
+     case S390_FEAT_TYPE_PPNO:
+     case S390_FEAT_TYPE_KMA:
+     case S390_FEAT_TYPE_KDSA:
++    case S390_FEAT_TYPE_SORTL:
+         set_be_bit(0, data); /* query is always available */
+         break;
+     default:
+@@ -430,6 +438,7 @@ void s390_add_from_feat_block(S390FeatBitmap features, S390FeatType type,
+        nr_bits = 16384;
+        break;
+     case S390_FEAT_TYPE_PLO:
++    case S390_FEAT_TYPE_SORTL:
+        nr_bits = 256;
+        break;
+     default:
+@@ -501,6 +510,7 @@ static S390FeatGroupDef s390_feature_groups[] = {
+     FEAT_GROUP_INIT("msa9", MSA_EXT_9, "Message-security-assist-extension 9 facility"),
+     FEAT_GROUP_INIT("msa9_pckmo", MSA_EXT_9_PCKMO, "Message-security-assist-extension 9 PCKMO subfunctions"),
+     FEAT_GROUP_INIT("mepochptff", MULTIPLE_EPOCH_PTFF, "PTFF enhancements introduced with Multiple-epoch facility"),
++    FEAT_GROUP_INIT("esort", ENH_SORT, "Enhanced-sort facility"),
+ };
+ 
+ const S390FeatGroupDef *s390_feat_group_def(S390FeatGroup group)
+diff --git a/target/s390x/cpu_features.h b/target/s390x/cpu_features.h
+index 5ffd3db083..3b8c5b25dd 100644
+--- a/target/s390x/cpu_features.h
++++ b/target/s390x/cpu_features.h
+@@ -40,6 +40,7 @@ typedef enum {
+     S390_FEAT_TYPE_PPNO,
+     S390_FEAT_TYPE_KMA,
+     S390_FEAT_TYPE_KDSA,
++    S390_FEAT_TYPE_SORTL,
+ } S390FeatType;
+ 
+ /* Definition of a CPU feature */
+diff --git a/target/s390x/cpu_features_def.h b/target/s390x/cpu_features_def.h
+index ce2223c9d7..bb8585847f 100644
+--- a/target/s390x/cpu_features_def.h
++++ b/target/s390x/cpu_features_def.h
+@@ -97,6 +97,7 @@ typedef enum {
+     S390_FEAT_MSA_EXT_8,
+     S390_FEAT_CMM_NT,
+     S390_FEAT_VECTOR_ENH2,
++    S390_FEAT_ESORT_BASE,
+     S390_FEAT_VECTOR_BCD_ENH,
+     S390_FEAT_MSA_EXT_9,
+     S390_FEAT_ETOKEN,
+@@ -346,6 +347,13 @@ typedef enum {
+     S390_FEAT_EEDDSA_SIGN_ED25519,
+     S390_FEAT_EEDDSA_SIGN_ED448,
+ 
++    /* SORTL */
++    S390_FEAT_SORTL_SFLR,
++    S390_FEAT_SORTL_SVLR,
++    S390_FEAT_SORTL_32,
++    S390_FEAT_SORTL_128,
++    S390_FEAT_SORTL_F0,
++
+     S390_FEAT_MAX,
+ } S390Feat;
+ 
 diff --git a/target/s390x/gen-features.c b/target/s390x/gen-features.c
-index e4739a6b9f..bea2f80c49 100644
+index 64fe850ff2..3db323fc0c 100644
 --- a/target/s390x/gen-features.c
 +++ b/target/s390x/gen-features.c
-@@ -301,7 +301,6 @@ static uint16_t base_GEN9_GA1[] = {
- #define base_GEN9_GA3 EmptyFeat
+@@ -245,6 +245,15 @@
+     S390_FEAT_PCKMO_ECC_ED25519, \
+     S390_FEAT_PCKMO_ECC_ED448
  
- static uint16_t base_GEN10_GA1[] = {
--    S390_FEAT_CONDITIONAL_SSKE,
-     S390_FEAT_PARSING_ENH,
-     S390_FEAT_MOVE_WITH_OPTIONAL_SPEC,
-     S390_FEAT_EXTRACT_CPU_TIME,
++#define S390_FEAT_GROUP_ENH_SORT \
++    S390_FEAT_ESORT_BASE, \
++    S390_FEAT_SORTL_SFLR, \
++    S390_FEAT_SORTL_SVLR, \
++    S390_FEAT_SORTL_32, \
++    S390_FEAT_SORTL_128, \
++    S390_FEAT_SORTL_F0
++
++
+ /* cpu feature groups */
+ static uint16_t group_PLO[] = {
+     S390_FEAT_GROUP_PLO,
+@@ -294,6 +303,10 @@ static uint16_t group_MSA_EXT_9_PCKMO[] = {
+     S390_FEAT_GROUP_MSA_EXT_9_PCKMO,
+ };
+ 
++static uint16_t group_ENH_SORT[] = {
++    S390_FEAT_GROUP_ENH_SORT,
++};
++
+ /* Base features (in order of release)
+  * Only non-hypervisor managed features belong here.
+  * Base feature sets are static meaning they do not change in future QEMU
+@@ -751,6 +764,7 @@ static FeatGroupDefSpec FeatGroupDef[] = {
+     FEAT_GROUP_INITIALIZER(MSA_EXT_9),
+     FEAT_GROUP_INITIALIZER(MSA_EXT_9_PCKMO),
+     FEAT_GROUP_INITIALIZER(MULTIPLE_EPOCH_PTFF),
++    FEAT_GROUP_INITIALIZER(ENH_SORT),
+ };
+ 
+ #define QEMU_FEAT_INITIALIZER(_name)                   \
+diff --git a/target/s390x/kvm.c b/target/s390x/kvm.c
+index 88cef3476c..7681492c41 100644
+--- a/target/s390x/kvm.c
++++ b/target/s390x/kvm.c
+@@ -2083,6 +2083,9 @@ static int query_cpu_subfunc(S390FeatBitmap features)
+     if (test_bit(S390_FEAT_MSA_EXT_9, features)) {
+         s390_add_from_feat_block(features, S390_FEAT_TYPE_KDSA, prop.kdsa);
+     }
++    if (test_bit(S390_FEAT_ESORT_BASE, features)) {
++        s390_add_from_feat_block(features, S390_FEAT_TYPE_SORTL, prop.sortl);
++    }
+     return 0;
+ }
+ 
+@@ -2130,6 +2133,9 @@ static int configure_cpu_subfunc(const S390FeatBitmap features)
+     if (test_bit(S390_FEAT_MSA_EXT_9, features)) {
+         s390_fill_feat_block(features, S390_FEAT_TYPE_KDSA, prop.kdsa);
+     }
++    if (test_bit(S390_FEAT_ESORT_BASE, features)) {
++        s390_fill_feat_block(features, S390_FEAT_TYPE_SORTL, prop.sortl);
++    }
+     return kvm_vm_ioctl(kvm_state, KVM_SET_DEVICE_ATTR, &attr);
+ }
+ 
 -- 
 2.19.1
 
