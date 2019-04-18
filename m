@@ -1,28 +1,36 @@
-Received: from eggs.gnu.org ([209.51.188.92]:60420)
+Received: from eggs.gnu.org ([209.51.188.92]:37979)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <phrdina@redhat.com>) id 1hH3pY-0003qn-OE
-	for qemu-devel@nongnu.org; Thu, 18 Apr 2019 05:59:45 -0400
+	(envelope-from <bounces@canonical.com>) id 1hH4QD-0000ch-EW
+	for qemu-devel@nongnu.org; Thu, 18 Apr 2019 06:37:38 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <phrdina@redhat.com>) id 1hH3pX-0005uY-Gj
-	for qemu-devel@nongnu.org; Thu, 18 Apr 2019 05:59:44 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:40480)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <phrdina@redhat.com>) id 1hH3pX-0005uK-83
-	for qemu-devel@nongnu.org; Thu, 18 Apr 2019 05:59:43 -0400
-Date: Thu, 18 Apr 2019 11:59:35 +0200
-From: Pavel Hrdina <phrdina@redhat.com>
-Message-ID: <20190418095935.GS18986@antique-laptop>
-References: <1555416373-28690-1-git-send-email-puwen@hygon.cn>
-	<20190416141700.GR18986@antique-laptop>
-	<e7abd74f-61bb-fc34-0b3a-08c635d9f78c@hygon.cn>
-	<20190417192610.GC19065@antique-laptop>
-	<20190418084825.GC13773@redhat.com>
+	(envelope-from <bounces@canonical.com>) id 1hH4OF-00057X-AP
+	for qemu-devel@nongnu.org; Thu, 18 Apr 2019 06:35:36 -0400
+Received: from indium.canonical.com ([91.189.90.7]:48338)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1hH4OF-000577-5E
+	for qemu-devel@nongnu.org; Thu, 18 Apr 2019 06:35:35 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1hH4OD-0006vh-Mp
+	for <qemu-devel@nongnu.org>; Thu, 18 Apr 2019 10:35:33 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 9C85E2E80C9
+	for <qemu-devel@nongnu.org>; Thu, 18 Apr 2019 10:35:33 +0000 (UTC)
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="ixDgnS8AC6zwmyK0"
-Content-Disposition: inline
-In-Reply-To: <20190418084825.GC13773@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v3] i386: Add new Hygon 'Dhyana' CPU model
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Thu, 18 Apr 2019 10:21:45 -0000
+From: Daniel Berrange <1824528@bugs.launchpad.net>
+Reply-To: Bug 1824528 <1824528@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <155507354518.20682.14175680260454866144.malonedeb@soybean.canonical.com>
+Message-Id: <155558290608.6930.7720463120506539507.malone@chaenomeles.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] =?utf-8?q?=5BBug_1824528=5D_Re=3A_qemu_fails_to_comp?=
+ =?utf-8?q?ile_on_gcc_9_=60error=3A_taking_address_of_packed_member_of_?=
+ =?utf-8?q?=E2=80=98struct_=3Canonymous=3E=E2=80=99_may_result_in_an_unali?=
+ =?utf-8?q?gned_pointer_value_=5B-Werror=3Daddress-of-packed-member=5D=60?=
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,116 +39,51 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-Cc: Pu Wen <puwen@hygon.cn>, pbonzini@redhat.com, mst@redhat.com, qemu-devel@nongnu.org, ehabkost@redhat.com, rth@twiddle.net
+To: qemu-devel@nongnu.org
 
+Fixed in
 
---ixDgnS8AC6zwmyK0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+https://lists.gnu.org/archive/html/qemu-devel/2019-04/msg02524.html
 
-On Thu, Apr 18, 2019 at 09:48:25AM +0100, Daniel P. Berrang=C3=A9 wrote:
-> On Wed, Apr 17, 2019 at 09:26:10PM +0200, Pavel Hrdina wrote:
-> > On Wed, Apr 17, 2019 at 10:53:04PM +0800, Pu Wen wrote:
-> > > On 2019/4/16 22:17, Pavel Hrdina wrote:
-> > > > On Tue, Apr 16, 2019 at 08:06:13PM +0800, Pu Wen wrote:
-> > > > > Add a new base CPU model called 'Dhyana' to model processors from=
- Hygon
-> > > > > Dhyana(family 18h), which derived from AMD EPYC(family 17h).
-> > > > >=20
-> > > > > The following features bits have been removed compare to AMD EPYC:
-> > > > > aes, pclmulqdq, sha_ni
-> > > > >=20
-> > > > > The Hygon Dhyana support to KVM in Linux is already accepted upst=
-ream[1].
-> > > > > So add Hygon Dhyana support to Qemu is necessary to create Hygon'=
-s own
-> > > > > CPU model.
-> > > >=20
-> > > > I have once question that we will have to solve for EPYC CPUs as we=
-ll.
-> > > > The name should not be based on the Product name or Model name as t=
-hat
-> > > > usually doesn't change with introduction of new microarchitecture.
-> > > >=20
-> > > > With EPYC we made a mistake to name the CPU like that, luckily with
-> > > > Intel we already use the microarchitecture name, so the EPYC CPU sh=
-ould
-> > > > have been named ZEN-Server and for Ryzen CPUs there should be ZEN-C=
-lient
-> > > > if there is any difference or otherwise we can simply use ZEN.
-> > > >=20
-> > > > The issue here is what happens once the ZEN2 microarchitecture is o=
-ut
-> > > > wihch introduces new features and we will have to come up with a CPU
-> > > > name.
-> > > >=20
-> > > > Obviously we cannot change/remove the EPYC models so the question is
-> > > > what is the difference between the AMD EPYC CPU and this new Dhyana=
- CPU
-> > > > if they are both based on the ZEN microarchitecture?
-> > >=20
-> > > Right now there's no much difference between Dhyana and EPYC from the
-> > > software's view. Dhyana removed the instructions aes, pclmulqdq, sha_=
-ni
-> > > compared to EPYC, but will have it's own implementation such as for a=
-es in
-> > > future CPU models. Hygon also will implement something different from=
- AMD in
-> > > the future.
-> > >=20
-> > > > In addition is there any way how we can introduce ZEN-Server &
-> > > > ZEN-Client or simply ZEN, if there is no difference, as an alias or=
- a
-> > > > new model next to the EPYC?
-> > >=20
-> > > Also as Eduardo mentioned that there's no CPU model alias or inherita=
-nce
-> > > system in x86, so I think it's worthwhile to keep a separate CPU mode=
-l for
-> > > Hygon.
-> >=20
-> > So what happens once Zen2 is out and there are new Dhyana CPUs based on
-> > the Zen2 microarchitecture with some new features, what CPU models we
-> > will introduce, EPYC-G2 and Dhyana-G2, but that will not correspond to
-> > the CPU model anymore.
-> >=20
-> > My idea was that we should probably introduce CPU model Zen-Server which
-> > could cover both EPYC and Dhyana as they are both based on the Zen
-> > microarchitecture.  The fact that Dhyana doesn't support all the
-> > features is not an issue as QEMU will not use them if they are not
-> > available on the host.
->=20
-> I don't think this is a good idea. AFAICT, Dhyana and EPYC should not be
-> thought of as the same microarchitecture. Dhyana is a fork of the Zen
-> microarchitecture as illustrated by the dropping of a number of CPU
-> features. The Dhyana SEV patches show that it has had other significant
-> changes, which are likely to require extra work in QEMU to support too.
+** Changed in: qemu
+       Status: New =3D> In Progress
 
-Fair enough, still the point stands that we should use the name of the
-microarchitecture.
+-- =
 
-Pavel
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1824528
 
---ixDgnS8AC6zwmyK0
-Content-Type: application/pgp-signature; name="signature.asc"
+Title:
+  qemu fails to compile on gcc 9 `error: taking address of packed member
+  of =E2=80=98struct <anonymous>=E2=80=99 may result in an unaligned pointe=
+r value
+  [-Werror=3Daddress-of-packed-member]`
 
------BEGIN PGP SIGNATURE-----
+Status in QEMU:
+  In Progress
 
-iQIzBAEBCAAdFiEEcbzs91ho/coWWY7aUi1kczAH4YwFAly4SocACgkQUi1kczAH
-4YzLeg//aknXHTND/2BS7LqqGzOk8Gu4eq9JwcWdnX3wcYg3fzmNzrdVQMd91DjH
-UTxVojyklrjC1ln6ZtifW2th/WJk9QG5zpgkd7Efx4lLvdnKx+15GuL66H+yOrt6
-wn3lIZjWZpXiR2I3IhU03U6Lo0CvtLfIjv5dhUgY03O6wq7nr+kV5YsEbnSf492u
-trn19seduCOA3VIujH+NAZs8JXkpehxp9VqRmRjuWVG9CpyZ5aWx83e+cOTCekfb
-Zko9zR4zhtzMp6wTopdcgpUm52fBAesuuzuVMG12KW8BnXySuRri2h8x5jLmX6Ro
-4DNe7rw1ECv4NHFZEj+hpEf6XOfHOpvZ1+CcLo2YANUhUTGBUFP8oiLR10ab0mgn
-1IfYJl3xYQO/qq6i3kk1DLkGbxEp8BDVTIpwvOH5Fo7pn527hEQFbHIIPemvpdWC
-5SSxrIIpN6h6I4YJfflqpDnwjV+6BNEnAzSOsoTo8fZsHNccpEzFX37X1TD35tvm
-P8RKb5Ano9CANcNvhPuVD75DHxQUYttb3hDcN4QJqDkeKJ23ikRAPA9COa0RykIs
-hZBqBLkexHynU5Mb3hCrf+3/q4ckwjvp2Ta4QejevXptFapM4cOu2uZ1bMaMgcz+
-rso1S9oBVGVl2zy/y063rRQ60V8ZMqP5WQR5GV7hcPQ2O2B21As=
-=gozU
------END PGP SIGNATURE-----
+Bug description:
+  Qemu compilation fails with below error on ppc64le host with gcc 9(9.0.1 =
+20190328)
+  repo: https://github.com/qemu/qemu.git
+  branch: master
+  commit e1be98540ee672ef93292b65a986055512237c35
 
---ixDgnS8AC6zwmyK0--
+  =
+
+    CC      net/dump.o
+  hw/usb/dev-mtp.c: In function =E2=80=98usb_mtp_write_metadata=E2=80=99:
+  hw/usb/dev-mtp.c:1708:36: error: taking address of packed member of =E2=
+=80=98struct <anonymous>=E2=80=99 may result in an unaligned pointer value =
+[-Werror=3Daddress-of-packed-member]
+   1708 |                             dataset->filename);
+        |                             ~~~~~~~^~~~~~~~~~
+  cc1: all warnings being treated as errors
+    CC      net/eth.o
+  make: *** [/home/kvmci/qemu-main/rules.mak:69: hw/usb/dev-mtp.o] Error 1
+  make: *** Waiting for unfinished jobs....
+    CC      net/announce.o
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1824528/+subscriptions
