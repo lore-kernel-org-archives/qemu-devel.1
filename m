@@ -2,64 +2,76 @@ Return-Path: <SRS0=08iY=SU=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 70EF8C10F0E
-	for <qemu-devel@archiver.kernel.org>; Thu, 18 Apr 2019 09:40:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 059F1C10F0E
+	for <qemu-devel@archiver.kernel.org>; Thu, 18 Apr 2019 09:41:54 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 44314214DA
-	for <qemu-devel@archiver.kernel.org>; Thu, 18 Apr 2019 09:40:07 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 44314214DA
+	by mail.kernel.org (Postfix) with ESMTPS id C1DC7214DA
+	for <qemu-devel@archiver.kernel.org>; Thu, 18 Apr 2019 09:41:53 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C1DC7214DA
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:38534 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:38575 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hH3WY-0005Fk-GH
-	for qemu-devel@archiver.kernel.org; Thu, 18 Apr 2019 05:40:06 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:56630)
+	id 1hH3YG-0006N2-Vq
+	for qemu-devel@archiver.kernel.org; Thu, 18 Apr 2019 05:41:53 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:56935)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1hH3Vi-0004uu-5v
-	for qemu-devel@nongnu.org; Thu, 18 Apr 2019 05:39:15 -0400
+	(envelope-from <pbonzini@redhat.com>) id 1hH3Wu-0005Zi-Fy
+	for qemu-devel@nongnu.org; Thu, 18 Apr 2019 05:40:29 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1hH3Vh-0004Nh-1K
-	for qemu-devel@nongnu.org; Thu, 18 Apr 2019 05:39:14 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:56700)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <imammedo@redhat.com>)
-	id 1hH3Vg-0004N7-PS; Thu, 18 Apr 2019 05:39:12 -0400
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
-	[10.5.11.23])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 9781AC069B41;
-	Thu, 18 Apr 2019 09:39:11 +0000 (UTC)
-Received: from localhost (unknown [10.43.2.182])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id F3F7F19C79;
-	Thu, 18 Apr 2019 09:39:03 +0000 (UTC)
-Date: Thu, 18 Apr 2019 11:38:59 +0200
-From: Igor Mammedov <imammedo@redhat.com>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <20190418113859.00248d07@redhat.com>
-In-Reply-To: <89ca3a70-066b-e40e-faaf-39a39ec976bf@de.ibm.com>
-References: <1555334842-195718-1-git-send-email-imammedo@redhat.com>
-	<1555334842-195718-6-git-send-email-imammedo@redhat.com>
-	<89ca3a70-066b-e40e-faaf-39a39ec976bf@de.ibm.com>
+	(envelope-from <pbonzini@redhat.com>) id 1hH3Ws-00055l-Ag
+	for qemu-devel@nongnu.org; Thu, 18 Apr 2019 05:40:28 -0400
+Received: from mail-wm1-f42.google.com ([209.85.128.42]:36067)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1hH3Ws-00054l-4U
+	for qemu-devel@nongnu.org; Thu, 18 Apr 2019 05:40:26 -0400
+Received: by mail-wm1-f42.google.com with SMTP id h18so2100698wml.1
+	for <qemu-devel@nongnu.org>; Thu, 18 Apr 2019 02:40:25 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=1e100.net; s=20161025;
+	h=x-gm-message-state:subject:to:references:from:message-id:date
+	:user-agent:mime-version:in-reply-to:content-language
+	:content-transfer-encoding;
+	bh=QA0DhC1HRtcwAmd80K3MuoV05EMEnRCrHgszvLiSkSM=;
+	b=pcMomRfoxza6BUjCihCjxSuBOqC2JchC7rcXrSx/yxAdF5EzLK6sAXgP6LkhVCoDan
+	mXvP8GMjASrsJ6RqY0No555fGqFxdXMzXcUhSPJ0rQpagfxyJ+hlZTUumfd+DRXWz4FZ
+	VVzs8vciYkDUbGlvk+VNPnlFucqwMCspToiCm8np9YpvDobC9Hx1fkleZTyTBY3yfbkX
+	ZEnT46Qzz9ABNxNpitfE5ZEPYYHztNejOOXerF98qQWXhrrfCQkBLb4i1lZDIn6Plw50
+	XR0KT/ikqZOvxHxi/ajb8Yfyljh1FZ6MZC2d3MxABpWughiWT2mVG+4IFv3zlbMVoGpU
+	rI1Q==
+X-Gm-Message-State: APjAAAXEjv58LZuzgYssdWmHJ7bdj24UfrGNriyjoUj2EFwOeb2FnpbK
+	bE8HjbdOHGN1V21Gl/uYp0Vmj+usUbg=
+X-Google-Smtp-Source: APXvYqwXKEbhBSLeHrBsjCLbeucoKCBWMcZ2B4LUVvTBmCIkMradluA+WqKNJtQ+zpsFta32Lh+sAA==
+X-Received: by 2002:a1c:b189:: with SMTP id a131mr2278848wmf.107.1555580423923;
+	Thu, 18 Apr 2019 02:40:23 -0700 (PDT)
+Received: from ?IPv6:2001:b07:6468:f312:49bf:c33a:2074:ab2?
+	([2001:b07:6468:f312:49bf:c33a:2074:ab2])
+	by smtp.gmail.com with ESMTPSA id
+	t14sm1540473wmi.16.2019.04.18.02.40.23
+	(version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+	Thu, 18 Apr 2019 02:40:23 -0700 (PDT)
+To: Frank Yang <lfy@google.com>, qemu-devel <qemu-devel@nongnu.org>
+References: <CAEkmjvU2chrbUnbV9GHidwrVb5roP+XCu0CmygaQnaFQAw8ALQ@mail.gmail.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <32307490-982c-055b-c521-16b754c46fdc@redhat.com>
+Date: Thu, 18 Apr 2019 11:40:21 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+	Thunderbird/60.6.1
 MIME-Version: 1.0
+In-Reply-To: <CAEkmjvU2chrbUnbV9GHidwrVb5roP+XCu0CmygaQnaFQAw8ALQ@mail.gmail.com>
 Content-Type: text/plain; charset="UTF-8"
+Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.31]);
-	Thu, 18 Apr 2019 09:39:11 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH v1 5/5] s390: do not call
- memory_region_allocate_system_memory() multiple times
+	[fuzzy]
+X-Received-From: 209.85.128.42
+Subject: Re: [Qemu-devel] tsan: many race conditions involving mmio
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -71,112 +83,92 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Halil Pasic <pasic@linux.ibm.com>, qemu-s390x@nongnu.org,
-	Cornelia Huck <cohuck@redhat.com>, qemu-devel@nongnu.org,
-	David Hildenbrand <david@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190418093859.dAO3YhRa4tgEmxzk9GVTMwvbbdWk8RdXMjQI4NBdvPA@z>
+Message-ID: <20190418094021.ZLXJs0UoKKrlLOEqbqNxJDJC_od6u7GkO6jSWx1aAks@z>
 
-On Tue, 16 Apr 2019 13:09:08 +0200
-Christian Borntraeger <borntraeger@de.ibm.com> wrote:
+On 17/04/19 21:50, Frank Yang via Qemu-devel wrote:
+> What's a quick fix for stuff like this?
 
-> This fails with more than 8TB, e.g.  "-m 9T "
+It's a false positive.  The access in T14 is protected via
+rcu_read_lock/rcu_read_unlock.
+
+Paolo
+
+> WARNING: ThreadSanitizer: data race (pid=168036)
+>   Write of size 8 at 0x7b900017a100 by thread T1 (mutexes: write M2141):
+>     #0 free
+> /toolchain/llvm/projects/compiler-rt/lib/tsan/rtl/tsan_interceptors.cc:715:3
+> (qemu-system-x86_64+0x484028)
+>     #1 phys_sections_free
+> /usr/local/google/home/lfy/emu/external/qemu/objs/../exec.c:1455:5
+> (qemu-system-x86_64+0x523608)
+>     #2 address_space_dispatch_free
+> /usr/local/google/home/lfy/emu/external/qemu/objs/../exec.c:3236
+> (qemu-system-x86_64+0x523608)
+>     #3 flatview_destroy
+> /usr/local/google/home/lfy/emu/external/qemu/objs/../memory.c:290:9
+> (qemu-system-x86_64+0x5bfcd1)
+>     #4 call_rcu_thread
+> /usr/local/google/home/lfy/emu/external/qemu/objs/../util/rcu.c:284:13
+> (qemu-system-x86_64+0xb23274)
+>     #5 qemu_thread_trampoline
+> /usr/local/google/home/lfy/emu/external/qemu/objs/../util/qemu-thread-posix.c:551:17
+> (qemu-system-x86_64+0xb033c6)
 > 
-> [pid 231065] ioctl(10, KVM_SET_USER_MEMORY_REGION, {slot=0, flags=0, guest_phys_addr=0, memory_size=0, userspace_addr=0x3ffc8500000}) = 0
-> [pid 231065] ioctl(10, KVM_SET_USER_MEMORY_REGION, {slot=0, flags=0, guest_phys_addr=0, memory_size=9895604649984, userspace_addr=0x3ffc8500000}) = -1 EINVAL (Invalid argument)
-> 
-> seems that the 2nd memslot gets the full size (and not 9TB-size of first slot).
-
-it turns out MemoryRegions is rendered correctly in to 2 parts (one per alias),
-but follow up flatview_simplify() collapses adjacent ranges back
-into big one.
-
-I see 2 ways how to approach it:
- 1. 'improve' memory region API, so we could disable merging for
-     a specific memory region (i.e. RAM providing memory region)
-     (I don't in particular like the idea of twisting this API to serve KVM specific purpose)
-
- 2. hide KVMism in kvm code. Move KVM_SLOT_MAX_BYTES out of s390 machine
-    code and handle splitting big chunk into several (upto KVM_SLOT_MAX_BYTES)
-    in kvm_set_phys_mem().
-    We could add KVMState::max_slot_size which is set only by s390,
-    so it won't affect other targets.
-
-Paolo,
- I'd like to get your opinion/suggestion which direction I should look into?
-     
-
- 
-> On 15.04.19 15:27, Igor Mammedov wrote:
-> > s390 was trying to solve limited memslot size issue by abusing
-> > memory_region_allocate_system_memory(), which breaks API contract
-> > where the function might be called only once.
-> > 
-> > s390 should have used memory aliases to fragment inital memory into
-> > smaller chunks to satisfy KVM's memslot limitation. But its a bit
-> > late now, since allocated pieces are transfered in migration stream
-> > separately, so it's not possible to just replace broken layout with
-> > correct one. Previous patch made MemoryRegion alases migratable and
-> > this patch switches to use them to split big initial RAM chunk into
-> > smaller pieces up to KVM_SLOT_MAX_BYTES each and registers aliases
-> > for migration.
-> > 
-> > Signed-off-by: Igor Mammedov <imammedo@redhat.com>
-> > ---
-> > A don't have access to a suitable system to test it, so I've simulated
-> > it with smaller chunks on x84 host. Ping-pong migration between old
-> > and new QEMU worked fine.  KVM part should be fine as memslots
-> > using mapped MemoryRegions (in this case it would be aliases) as
-> > far as I know but is someone could test it on big enough host it
-> > would be nice.
-> > ---
-> >  hw/s390x/s390-virtio-ccw.c | 20 +++++++++++++++-----
-> >  1 file changed, 15 insertions(+), 5 deletions(-)
-> > 
-> > diff --git a/hw/s390x/s390-virtio-ccw.c b/hw/s390x/s390-virtio-ccw.c
-> > index d11069b..12ca3a9 100644
-> > --- a/hw/s390x/s390-virtio-ccw.c
-> > +++ b/hw/s390x/s390-virtio-ccw.c
-> > @@ -161,20 +161,30 @@ static void virtio_ccw_register_hcalls(void)
-> >  static void s390_memory_init(ram_addr_t mem_size)
-> >  {
-> >      MemoryRegion *sysmem = get_system_memory();
-> > +    MemoryRegion *ram = g_new(MemoryRegion, 1);
-> >      ram_addr_t chunk, offset = 0;
-> >      unsigned int number = 0;
-> >      gchar *name;
-> >  
-> >      /* allocate RAM for core */
-> > +    memory_region_allocate_system_memory(ram, NULL, "s390.whole.ram", mem_size);
-> > +    /*
-> > +     * memory_region_allocate_system_memory() registers allocated RAM for
-> > +     * migration, however for compat reasons the RAM should be passed over
-> > +     * as RAMBlocks of the size upto KVM_SLOT_MAX_BYTES. So unregister just
-> > +     * allocated RAM so it won't be migrated directly. Aliases will take
-> > +     * of segmenting RAM into legacy chunks.
-> > +     */
-> > +    vmstate_unregister_ram(ram, NULL);
-> >      name = g_strdup_printf("s390.ram");
-> >      while (mem_size) {
-> > -        MemoryRegion *ram = g_new(MemoryRegion, 1);
-> > -        uint64_t size = mem_size;
-> > +        MemoryRegion *alias = g_new(MemoryRegion, 1);
-> >  
-> >          /* KVM does not allow memslots >= 8 TB */
-> > -        chunk = MIN(size, KVM_SLOT_MAX_BYTES);
-> > -        memory_region_allocate_system_memory(ram, NULL, name, chunk);
-> > -        memory_region_add_subregion(sysmem, offset, ram);
-> > +        chunk = MIN(mem_size, KVM_SLOT_MAX_BYTES);
-> > +        memory_region_init_alias(alias, NULL, name, ram, offset, chunk);
-> > +        vmstate_register_ram_global(alias);
-> > +        memory_region_add_subregion(sysmem, offset, alias);
-> >          mem_size -= chunk;
-> >          offset += chunk;
-> >          g_free(name);
-> >   
-> 
+>   Previous read of size 8 at 0x7b900017a100 by thread T14:
+>     #0 address_space_lookup_region
+> /usr/local/google/home/lfy/emu/external/qemu/objs/../exec.c:431:37
+> (qemu-system-x86_64+0x51b9b8)
+>     #1 address_space_translate_internal
+> /usr/local/google/home/lfy/emu/external/qemu/objs/../exec.c:447
+> (qemu-system-x86_64+0x51b9b8)
+>     #2 flatview_do_translate
+> /usr/local/google/home/lfy/emu/external/qemu/objs/../exec.c:616:15
+> (qemu-system-x86_64+0x51b318)
+>     #3 flatview_translate
+> /usr/local/google/home/lfy/emu/external/qemu/objs/../exec.c:680:15
+> (qemu-system-x86_64+0x52bf20)
+>     #4 address_space_translate
+> /usr/local/google/home/lfy/emu/external/qemu/objs/../include/exec/memory.h:1896
+> (qemu-system-x86_64+0x52bf20)
+>     #5 address_space_lduw_internal_cached
+> /usr/local/google/home/lfy/emu/external/qemu/objs/../memory_ldst.inc.c:264
+> (qemu-system-x86_64+0x52bf20)
+>     #6 address_space_lduw_le_cached
+> /usr/local/google/home/lfy/emu/external/qemu/objs/../memory_ldst.inc.c:315:12
+> (qemu-system-x86_64+0x52c44b)
+>     #7 lduw_le_phys_cached
+> /usr/local/google/home/lfy/emu/external/qemu/objs/../memory_ldst.inc.c:334
+> (qemu-system-x86_64+0x52c44b)
+>     #8 virtio_lduw_phys_cached
+> /usr/local/google/home/lfy/emu/external/qemu/objs/../include/hw/virtio/virtio-access.h:166:12
+> (qemu-system-x86_64+0x65c97b)
+>     #9 vring_avail_idx
+> /usr/local/google/home/lfy/emu/external/qemu/objs/../hw/virtio/virtio.c:240
+> (qemu-system-x86_64+0x65c97b)
+>     #10 virtio_queue_empty
+> /usr/local/google/home/lfy/emu/external/qemu/objs/../hw/virtio/virtio.c:392
+> (qemu-system-x86_64+0x65c97b)
+>     #11 virtio_queue_host_notifier_aio_poll
+> /usr/local/google/home/lfy/emu/external/qemu/objs/../hw/virtio/virtio.c:2427
+> (qemu-system-x86_64+0x65c97b)
+>     #12 run_poll_handlers_once
+> /usr/local/google/home/lfy/emu/external/qemu/objs/../util/aio-posix.c:502:13
+> (qemu-system-x86_64+0xaffd63)
+>     #13 try_poll_mode
+> /usr/local/google/home/lfy/emu/external/qemu/objs/../util/aio-posix.c:587
+> (qemu-system-x86_64+0xaffd63)
+>     #14 aio_poll
+> /usr/local/google/home/lfy/emu/external/qemu/objs/../util/aio-posix.c:618
+> (qemu-system-x86_64+0xaffd63)
+>     #15 iothread_run
+> /usr/local/google/home/lfy/emu/external/qemu/objs/../iothread.c:64:9
+> (qemu-system-x86_64+0xa53344)
+>     #16 qemu_thread_trampoline
+> /usr/local/google/home/lfy/emu/external/qemu/objs/../util/qemu-thread-posix.c:551:17
+> (qemu-system-x86_64+0xb033c6)
 > 
 
 
