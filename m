@@ -1,22 +1,22 @@
-Received: from eggs.gnu.org ([209.51.188.92]:35622)
+Received: from eggs.gnu.org ([209.51.188.92]:36547)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1hGyr4-0001r2-Bu
-	for qemu-devel@nongnu.org; Thu, 18 Apr 2019 00:41:02 -0400
+	(envelope-from <thuth@redhat.com>) id 1hGyy1-0003Ec-6n
+	for qemu-devel@nongnu.org; Thu, 18 Apr 2019 00:48:10 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1hGyqz-0004jl-QX
-	for qemu-devel@nongnu.org; Thu, 18 Apr 2019 00:40:58 -0400
-Date: Thu, 18 Apr 2019 14:40:38 +1000
-From: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20190418044038.GB6873@umbus.fritz.box>
-References: <20190417113143.5551-1-david@redhat.com>
-	<20190417113143.5551-3-david@redhat.com>
+	(envelope-from <thuth@redhat.com>) id 1hGyxz-0000Uu-90
+	for qemu-devel@nongnu.org; Thu, 18 Apr 2019 00:48:09 -0400
+References: <20190417220147.67648-1-stephen.checkoway@oberlin.edu>
+	<20190417220147.67648-2-stephen.checkoway@oberlin.edu>
+From: Thomas Huth <thuth@redhat.com>
+Message-ID: <3ffacb2c-2459-fb45-ca9c-7b59b10a1c76@redhat.com>
+Date: Thu, 18 Apr 2019 06:47:56 +0200
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="gatW/ieO32f1wygP"
-Content-Disposition: inline
-In-Reply-To: <20190417113143.5551-3-david@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v3 2/2] exec: Introduce
- qemu_maxrampagesize() and rename qemu_getrampagesize()
+In-Reply-To: <20190417220147.67648-2-stephen.checkoway@oberlin.edu>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v3 01/10] block/pflash_cfi02: Add test for
+ supported commands
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,229 +25,290 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Hildenbrand <david@redhat.com>
-Cc: qemu-devel@nongnu.org, Richard Henderson <rth@twiddle.net>, Cornelia Huck <cohuck@redhat.com>, Halil Pasic <pasic@linux.ibm.com>, Christian Borntraeger <borntraeger@de.ibm.com>, qemu-s390x@nongnu.org, Igor Mammedov <imammedo@redhat.com>, peter.maydell@linaro.org, pbonzini@redhat.com, Thomas Huth <thuth@redhat.com>, qemu-ppc@nongnu.org, Alex Williamson <alex.williamson@redhat.com>
+To: Stephen Checkoway <stephen.checkoway@oberlin.edu>, QEMU Developers <qemu-devel@nongnu.org>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, "open list:Block layer core" <qemu-block@nongnu.org>, Markus Armbruster <armbru@redhat.com>, Laszlo Ersek <lersek@redhat.com>, Laurent Vivier <lvivier@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
 
-
---gatW/ieO32f1wygP
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
-
-On Wed, Apr 17, 2019 at 01:31:43PM +0200, David Hildenbrand wrote:
-> Rename qemu_getrampagesize() to qemu_minrampagesize(). While at it,
-> properly rename find_max_supported_pagesize() to
-> find_min_backend_pagesize().
+On 18/04/2019 00.01, Stephen Checkoway wrote:
+> Test the AMD command set for parallel flash chips. This test uses an
+> ARM musicpal board with a pflash drive to test the following list of
+> currently-supported commands.
+> - Autoselect
+> - CFI
+> - Sector erase
+> - Chip erase
+> - Program
+> - Unlock bypass
+> - Reset
 >=20
-> s390x is actually interested into the maximum ram pagesize, so
-> introduce and use qemu_maxrampagesize().
->=20
-> Add a TODO, indicating that looking at any mapped memory backends is not
-> 100% correct in some cases.
->=20
-> Signed-off-by: David Hildenbrand <david@redhat.com>
-
-Reviewed-by: David Gibson <david@gibson.dropbear.id.au>
-
+> Signed-off-by: Stephen Checkoway <stephen.checkoway@oberlin.edu>
 > ---
->  exec.c                     | 44 ++++++++++++++++++++++++++++++++++----
->  hw/ppc/spapr_caps.c        |  4 ++--
->  hw/s390x/s390-virtio-ccw.c |  2 +-
->  hw/vfio/spapr.c            |  2 +-
->  include/exec/ram_addr.h    |  3 ++-
->  target/ppc/kvm.c           |  2 +-
->  6 files changed, 47 insertions(+), 10 deletions(-)
->=20
-> diff --git a/exec.c b/exec.c
-> index 6ab62f4eee..f9b834ef82 100644
-> --- a/exec.c
-> +++ b/exec.c
-> @@ -1687,7 +1687,7 @@ void ram_block_dump(Monitor *mon)
->   * when we actually open and map them.  Iterate over the file
->   * descriptors instead, and use qemu_fd_getpagesize().
->   */
-> -static int find_max_supported_pagesize(Object *obj, void *opaque)
-> +static int find_min_backend_pagesize(Object *obj, void *opaque)
->  {
->      long *hpsize_min =3D opaque;
-> =20
-> @@ -1703,7 +1703,27 @@ static int find_max_supported_pagesize(Object *obj=
-, void *opaque)
->      return 0;
->  }
-> =20
-> -long qemu_getrampagesize(void)
-> +static int find_max_backend_pagesize(Object *obj, void *opaque)
-> +{
-> +    long *hpsize_max =3D opaque;
+>  tests/Makefile.include    |   2 +
+>  tests/pflash-cfi02-test.c | 227 ++++++++++++++++++++++++++++++++++++++
+>  2 files changed, 229 insertions(+)
+>  create mode 100644 tests/pflash-cfi02-test.c
+[...]
+> new file mode 100644
+> index 0000000000..b113fca5af
+> --- /dev/null
+> +++ b/tests/pflash-cfi02-test.c
+> @@ -0,0 +1,227 @@
+> +/*
+> + * QTest testcase for parallel flash with AMD command set
+> + *
+> + * Copyright (c) 2018 Stephen Checkoway
+
+Do you maybe want to update that to 2019?
+
+> + * This work is licensed under the terms of the GNU GPL, version 2 or =
+later.
+> + * See the COPYING file in the top-level directory.
+> + */
 > +
-> +    if (object_dynamic_cast(obj, TYPE_MEMORY_BACKEND)) {
-> +        HostMemoryBackend *backend =3D MEMORY_BACKEND(obj);
-> +        long hpsize =3D host_memory_backend_pagesize(backend);
-> +
-> +        if (host_memory_backend_is_mapped(backend) && (hpsize > *hpsize_=
-max)) {
-> +            *hpsize_max =3D hpsize;
-> +        }
-> +    }
-> +
-> +    return 0;
-> +}
+> +#include "qemu/osdep.h"
+> +#include <err.h>
+
+We generally don't use err.h in QEMU ... could you please use the
+standard functions from glib instead?
+
+> +#include <unistd.h>
+
+unistd.h is already provided by osdep.h, so you don't need to include it
+here again. (and the scripts/clean-includes script will barf at this
+later, so better fix it right from the start)
+
+> +#include "libqtest.h"
 > +
 > +/*
-> + * TODO: We assume right now that all mapped host memory backends are
-> + * used as RAM, however some might be used for different purposes.
+> + * To test the pflash_cfi02 device, we run QEMU with the musicpal mach=
+ine with
+> + * a pflash drive. This enables us to test some flash configurations, =
+but not
+> + * all. In particular, we're limited to a 16-bit wide flash device.
 > + */
-> +long qemu_minrampagesize(void)
->  {
->      long hpsize =3D LONG_MAX;
->      long mainrampagesize;
-> @@ -1723,7 +1743,7 @@ long qemu_getrampagesize(void)
->       */
->      memdev_root =3D object_resolve_path("/objects", NULL);
->      if (memdev_root) {
-> -        object_child_foreach(memdev_root, find_max_supported_pagesize, &=
-hpsize);
-> +        object_child_foreach(memdev_root, find_min_backend_pagesize, &hp=
-size);
->      }
->      if (hpsize =3D=3D LONG_MAX) {
->          /* No additional memory regions found =3D=3D> Report main RAM pa=
-ge size */
-> @@ -1746,8 +1766,24 @@ long qemu_getrampagesize(void)
-> =20
->      return hpsize;
->  }
 > +
-> +long qemu_maxrampagesize(void)
-> +{
-> +    long pagesize =3D qemu_mempath_getpagesize(mem_path);
-> +    Object *memdev_root =3D object_resolve_path("/objects", NULL);
+> +#define MP_FLASH_SIZE_MAX (32 * 1024 * 1024)
+> +#define BASE_ADDR (0x100000000ULL - MP_FLASH_SIZE_MAX)
 > +
-> +    if (memdev_root) {
-> +        object_child_foreach(memdev_root, find_max_backend_pagesize,
-> +                             &pagesize);
-> +    }
-> +    return pagesize;
-> +}
->  #else
-> -long qemu_getrampagesize(void)
-> +long qemu_minrampagesize(void)
+> +#define FLASH_WIDTH 2
+> +#define CFI_ADDR (FLASH_WIDTH * 0x55)
+> +#define UNLOCK0_ADDR (FLASH_WIDTH * 0x5555)
+> +#define UNLOCK1_ADDR (FLASH_WIDTH * 0x2AAA)
+> +
+> +#define CFI_CMD 0x98
+> +#define UNLOCK0_CMD 0xAA
+> +#define UNLOCK1_CMD 0x55
+> +#define AUTOSELECT_CMD 0x90
+> +#define RESET_CMD 0xF0
+> +#define PROGRAM_CMD 0xA0
+> +#define SECTOR_ERASE_CMD 0x30
+> +#define CHIP_ERASE_CMD 0x10
+> +#define UNLOCK_BYPASS_CMD 0x20
+> +#define UNLOCK_BYPASS_RESET_CMD 0x00
+> +
+> +static char image_path[] =3D "/tmp/qtest.XXXXXX";
+> +
+> +static inline void flash_write(uint64_t byte_addr, uint16_t data)
 > +{
-> +    return getpagesize();
+> +    qtest_writew(global_qtest, BASE_ADDR + byte_addr, data);
 > +}
-> +long qemu_maxrampagesize(void)
->  {
->      return getpagesize();
->  }
-> diff --git a/hw/ppc/spapr_caps.c b/hw/ppc/spapr_caps.c
-> index edc5ed0e0c..9b1c10baa6 100644
-> --- a/hw/ppc/spapr_caps.c
-> +++ b/hw/ppc/spapr_caps.c
-> @@ -347,7 +347,7 @@ static void cap_hpt_maxpagesize_apply(SpaprMachineSta=
-te *spapr,
->          warn_report("Many guests require at least 64kiB hpt-max-page-siz=
-e");
->      }
-> =20
-> -    spapr_check_pagesize(spapr, qemu_getrampagesize(), errp);
-> +    spapr_check_pagesize(spapr, qemu_minrampagesize(), errp);
->  }
-> =20
->  static bool spapr_pagesize_cb(void *opaque, uint32_t seg_pshift,
-> @@ -609,7 +609,7 @@ static SpaprCapabilities default_caps_with_cpu(SpaprM=
-achineState *spapr,
->          uint8_t mps;
-> =20
->          if (kvmppc_hpt_needs_host_contiguous_pages()) {
-> -            mps =3D ctz64(qemu_getrampagesize());
-> +            mps =3D ctz64(qemu_minrampagesize());
->          } else {
->              mps =3D 34; /* allow everything up to 16GiB, i.e. everything=
+> +
+> +static inline uint16_t flash_read(uint64_t byte_addr)
+> +{
+> +    return qtest_readw(global_qtest, BASE_ADDR + byte_addr);
+> +}
+> +
+> +static void unlock(void)
+> +{
+> +    flash_write(UNLOCK0_ADDR, UNLOCK0_CMD);
+> +    flash_write(UNLOCK1_ADDR, UNLOCK1_CMD);
+> +}
+> +
+> +static void reset(void)
+> +{
+> +    flash_write(0, RESET_CMD);
+> +}
+> +
+> +static void sector_erase(uint64_t byte_addr)
+> +{
+> +    unlock();
+> +    flash_write(UNLOCK0_ADDR, 0x80);
+> +    unlock();
+> +    flash_write(byte_addr, SECTOR_ERASE_CMD);
+> +}
+> +
+> +static void wait_for_completion(uint64_t byte_addr)
+> +{
+> +    /* If DQ6 is toggling, step the clock and ensure the toggle stops.=
  */
->          }
-> diff --git a/hw/s390x/s390-virtio-ccw.c b/hw/s390x/s390-virtio-ccw.c
-> index 3be5679657..7e256d3d31 100644
-> --- a/hw/s390x/s390-virtio-ccw.c
-> +++ b/hw/s390x/s390-virtio-ccw.c
-> @@ -188,7 +188,7 @@ static void s390_memory_init(ram_addr_t mem_size)
->       * Configure the maximum page size. As no memory devices were created
->       * yet, this is the page size of initial memory only.
->       */
-> -    s390_set_max_pagesize(qemu_getrampagesize(), &local_err);
-> +    s390_set_max_pagesize(qemu_maxrampagesize(), &local_err);
->      if (local_err) {
->          error_report_err(local_err);
->          exit(EXIT_FAILURE);
-> diff --git a/hw/vfio/spapr.c b/hw/vfio/spapr.c
-> index 57fe758e54..96c0ad9d9b 100644
-> --- a/hw/vfio/spapr.c
-> +++ b/hw/vfio/spapr.c
-> @@ -148,7 +148,7 @@ int vfio_spapr_create_window(VFIOContainer *container,
->      uint64_t pagesize =3D memory_region_iommu_get_min_page_size(iommu_mr=
-);
->      unsigned entries, bits_total, bits_per_level, max_levels;
->      struct vfio_iommu_spapr_tce_create create =3D { .argsz =3D sizeof(cr=
-eate) };
-> -    long rampagesize =3D qemu_getrampagesize();
-> +    long rampagesize =3D qemu_minrampagesize();
-> =20
->      /*
->       * The host might not support the guest supported IOMMU page size,
-> diff --git a/include/exec/ram_addr.h b/include/exec/ram_addr.h
-> index 9ecd911c3e..139ad79390 100644
-> --- a/include/exec/ram_addr.h
-> +++ b/include/exec/ram_addr.h
-> @@ -73,7 +73,8 @@ static inline unsigned long int ramblock_recv_bitmap_of=
-fset(void *host_addr,
-> =20
->  bool ramblock_is_pmem(RAMBlock *rb);
-> =20
-> -long qemu_getrampagesize(void);
-> +long qemu_minrampagesize(void);
-> +long qemu_maxrampagesize(void);
-> =20
->  /**
->   * qemu_ram_alloc_from_file,
-> diff --git a/target/ppc/kvm.c b/target/ppc/kvm.c
-> index 2427c8ee13..59d92c4275 100644
-> --- a/target/ppc/kvm.c
-> +++ b/target/ppc/kvm.c
-> @@ -2136,7 +2136,7 @@ uint64_t kvmppc_rma_size(uint64_t current_size, uns=
-igned int hash_shift)
->      /* Find the largest hardware supported page size that's less than
->       * or equal to the (logical) backing page size of guest RAM */
->      kvm_get_smmu_info(&info, &error_fatal);
-> -    rampagesize =3D qemu_getrampagesize();
-> +    rampagesize =3D qemu_minrampagesize();
->      best_page_shift =3D 0;
-> =20
->      for (i =3D 0; i < KVM_PPC_PAGE_SIZES_MAX_SZ; i++) {
+> +    if ((flash_read(byte_addr) & 0x40) ^ (flash_read(byte_addr) & 0x40=
+)) {
+> +        /* Wait for erase or program to finish. */
+> +        clock_step_next();
+> +        /* Ensure that DQ6 has stopped toggling. */
+> +        g_assert_cmpint(flash_read(byte_addr), =3D=3D, flash_read(byte=
+_addr));
+> +    }
+> +}
+> +
+> +static void bypass_program(uint64_t byte_addr, uint16_t data)
+> +{
+> +    flash_write(UNLOCK0_ADDR, PROGRAM_CMD);
+> +    flash_write(byte_addr, data);
+> +    /*
+> +     * Data isn't valid until DQ6 stops toggling. We don't model this =
+as
+> +     * writes are immediate, but if this changes in the future, we can=
+ wait
+> +     * until the program is complete.
+> +     */
+> +    wait_for_completion(byte_addr);
+> +}
+> +
+> +static void program(uint64_t byte_addr, uint16_t data)
+> +{
+> +    unlock();
+> +    bypass_program(byte_addr, data);
+> +}
+> +
+> +static void chip_erase(void)
+> +{
+> +    unlock();
+> +    flash_write(UNLOCK0_ADDR, 0x80);
+> +    unlock();
+> +    flash_write(UNLOCK0_ADDR, SECTOR_ERASE_CMD);
+> +}
+> +
+> +static void test_flash(void)
+> +{
+> +    global_qtest =3D qtest_initf("-M musicpal,accel=3Dqtest "
+> +                               "-drive if=3Dpflash,file=3D%s,format=3D=
+raw,copy-on-read",
+> +                               image_path);
+> +    /* Check the IDs. */
+> +    unlock();
+> +    flash_write(UNLOCK0_ADDR, AUTOSELECT_CMD);
+> +    g_assert_cmpint(flash_read(FLASH_WIDTH * 0x0000), =3D=3D, 0x00BF);
+> +    g_assert_cmpint(flash_read(FLASH_WIDTH * 0x0001), =3D=3D, 0x236D);
+> +    reset();
+> +
+> +    /* Check the erase blocks. */
+> +    flash_write(CFI_ADDR, CFI_CMD);
+> +    g_assert_cmpint(flash_read(FLASH_WIDTH * 0x10), =3D=3D, 'Q');
+> +    g_assert_cmpint(flash_read(FLASH_WIDTH * 0x11), =3D=3D, 'R');
+> +    g_assert_cmpint(flash_read(FLASH_WIDTH * 0x12), =3D=3D, 'Y');
+> +    /* Num erase regions. */
+> +    g_assert_cmpint(flash_read(FLASH_WIDTH * 0x2C), >=3D, 1);
+> +    uint32_t nb_sectors =3D flash_read(FLASH_WIDTH * 0x2D) +
+> +                          (flash_read(FLASH_WIDTH * 0x2E) << 8) + 1;
+> +    uint32_t sector_len =3D (flash_read(FLASH_WIDTH * 0x2F) << 8) +
+> +                          (flash_read(FLASH_WIDTH * 0x30) << 16);
+> +    reset();
+> +
+> +    /* Erase and program sector. */
+> +    for (uint32_t i =3D 0; i < nb_sectors; ++i) {
+> +        uint64_t byte_addr =3D i * sector_len;
+> +        sector_erase(byte_addr);
+> +        /* Read toggle. */
+> +        uint16_t status0 =3D flash_read(byte_addr);
+> +        /* DQ7 is 0 during an erase. */
+> +        g_assert_cmpint(status0 & 0x80, =3D=3D, 0);
+> +        uint16_t status1 =3D flash_read(byte_addr);
+> +        /* DQ6 toggles during an erase. */
+> +        g_assert_cmpint(status0 & 0x40, !=3D, status1 & 0x40);
+> +        /* Wait for erase to complete. */
+> +        clock_step_next();
+> +        /* Ensure DQ6 has stopped toggling. */
+> +        g_assert_cmpint(flash_read(byte_addr), =3D=3D, flash_read(byte=
+_addr));
+> +        /* Now the data should be valid. */
+> +        g_assert_cmpint(flash_read(byte_addr), =3D=3D, 0xFFFF);
+> +
+> +        /* Program a bit pattern. */
+> +        program(byte_addr, 0x5555);
+> +        g_assert_cmpint(flash_read(byte_addr), =3D=3D, 0x5555);
+> +        program(byte_addr, 0xAA55);
+> +        g_assert_cmpint(flash_read(byte_addr), =3D=3D, 0x0055);
+> +    }
+> +
+> +    /* Erase the chip. */
+> +    chip_erase();
+> +    /* Read toggle. */
+> +    uint16_t status0 =3D flash_read(0);
+> +    /* DQ7 is 0 during an erase. */
+> +    g_assert_cmpint(status0 & 0x80, =3D=3D, 0);
+> +    uint16_t status1 =3D flash_read(0);
+> +    /* DQ6 toggles during an erase. */
+> +    g_assert_cmpint(status0 & 0x40, !=3D, status1 & 0x40);
+> +    /* Wait for erase to complete. */
+> +    clock_step_next();
+> +    /* Ensure DQ6 has stopped toggling. */
+> +    g_assert_cmpint(flash_read(0), =3D=3D, flash_read(0));
+> +    /* Now the data should be valid. */
+> +    g_assert_cmpint(flash_read(0), =3D=3D, 0xFFFF);
+> +
+> +    /* Unlock bypass */
+> +    unlock();
+> +    flash_write(UNLOCK0_ADDR, UNLOCK_BYPASS_CMD);
+> +    bypass_program(0, 0x0123);
+> +    bypass_program(2, 0x4567);
+> +    bypass_program(4, 0x89AB);
+> +    /*
+> +     * Test that bypass programming, unlike normal programming can use=
+ any
+> +     * address for the PROGRAM_CMD.
+> +     */
+> +    flash_write(6, PROGRAM_CMD);
+> +    flash_write(6, 0xCDEF);
+> +    wait_for_completion(6);
+> +    flash_write(0, UNLOCK_BYPASS_RESET_CMD);
+> +    bypass_program(8, 0x55AA); /* Should fail. */
+> +    g_assert_cmpint(flash_read(0), =3D=3D, 0x0123);
+> +    g_assert_cmpint(flash_read(2), =3D=3D, 0x4567);
+> +    g_assert_cmpint(flash_read(4), =3D=3D, 0x89AB);
+> +    g_assert_cmpint(flash_read(6), =3D=3D, 0xCDEF);
+> +    g_assert_cmpint(flash_read(8), =3D=3D, 0xFFFF);
+> +
+> +    qtest_quit(global_qtest);
+> +}
+> +
+> +static void cleanup(void *opaque)
+> +{
+> +    unlink(image_path);
+> +}
+> +
+> +int main(int argc, char **argv)
+> +{
+> +    int fd =3D mkstemp(image_path);
+> +    if (fd =3D=3D -1) {
+> +        err(1, "Failed to create temporary file %s", image_path);
 
---=20
-David Gibson			| I'll have my music baroque, and my code
-david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
-				| _way_ _around_!
-http://www.ozlabs.org/~dgibson
+g_printerr() ?
 
---gatW/ieO32f1wygP
-Content-Type: application/pgp-signature; name="signature.asc"
+or maybe simply use a g_assert_cmpint(ret, !=3D, -1) like we do it in a
+couple of other places already.
 
------BEGIN PGP SIGNATURE-----
+> +    }
+> +    if (ftruncate(fd, 8 * 1024 * 1024) < 0) {
+> +        int error_code =3D errno;
+> +        close(fd);
+> +        unlink(image_path);
+> +        g_printerr("Failed to truncate file %s to 8 MB: %s\n", image_p=
+ath,
+> +                   strerror(error_code));
+> +        exit(EXIT_FAILURE);
+> +    }
+> +    close(fd);
+> +
+> +    qtest_add_abrt_handler(cleanup, NULL);
+> +    g_test_init(&argc, &argv, NULL);
+> +    qtest_add_func("pflash-cfi02", test_flash);
+> +    int result =3D g_test_run();
+> +    cleanup(NULL);
+> +    return result;
+> +}
+> +
+> +/* vim: set sw=3D4 sts=3D4 ts=3D8 et: */
 
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAly3/8MACgkQbDjKyiDZ
-s5L52w/7BoGbtk7O52v/KzlmZZ0ACiyEcWTzyCEk2YnTq+Z2WIIyA28ZKHGAcoLS
-daGHjk3fNuHKsh9dva3OR4NEVRKB8v/Vz31H9SPpQleFkSM0Gp4eyuWLLet6yw5/
-V306u+VdjIdUkbswkTkyjWggApXm2X1Xdg1v28DdAcbLUi9/Pmr6zlPLyv7huzyn
-7sTR83GNvymtzAmyJGw3a64zwjUkhRR6wZUe6CuMCfVZb2oC8u4Buo8AKwBZYffR
-jjekjmzi8DhqNaJIHycnwvRzluV+CC3+bArltLTh9dWYXBb1Gla9tkd1MjKRkhpD
-jo7leC4lwzycBcUf65napF6rcarlKyBX2YnsdEFZZzNiR7uSzKcrjotDvjlMOioj
-OwhulZCe63dMsVmoArITcuAc2oR9SnCPC/fxzmb2RVsh+2VWKmfRL7P+9NRUGXA3
-kBTEkYP+gTJEdaPTtV43gcIpXlC7nZpQ5bvEt3UYud8E/jGajrY+P1RxfeR02WI5
-0mTTB0dV/lDpLd6mi9QGk709E+/3/WQLGHIaZhpT6pU9mCDubAXKoR5RDB5tLL8j
-AXawL7y8vZfV1pJzZDuQ0ZmzBMmHhdg/6NR+CEXxGq3aDlgipkruYksW4668cLLP
-N5YCxVRdWE3P11PKPjkC9R2NPMkjSWGSixWWnNCuapd3MG8LMYA=
-=SNLy
------END PGP SIGNATURE-----
+IMHO the vim line should not be necessary (and we hardly do that in any
+of the other files).
 
---gatW/ieO32f1wygP--
+ Thomas
