@@ -6,58 +6,58 @@ X-Spam-Status: No, score=-6.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 78E3BC10F0E
-	for <qemu-devel@archiver.kernel.org>; Thu, 18 Apr 2019 18:24:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9FD45C282DD
+	for <qemu-devel@archiver.kernel.org>; Thu, 18 Apr 2019 18:26:37 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 501FB20643
-	for <qemu-devel@archiver.kernel.org>; Thu, 18 Apr 2019 18:24:54 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 501FB20643
+	by mail.kernel.org (Postfix) with ESMTPS id 72B6A2064A
+	for <qemu-devel@archiver.kernel.org>; Thu, 18 Apr 2019 18:26:37 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 72B6A2064A
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:45430 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:45483 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hHBiP-0004hM-Fm
-	for qemu-devel@archiver.kernel.org; Thu, 18 Apr 2019 14:24:53 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:47178)
+	id 1hHBk4-0006JL-Mx
+	for qemu-devel@archiver.kernel.org; Thu, 18 Apr 2019 14:26:36 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:46948)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1hHBPt-0005sw-Hd
-	for qemu-devel@nongnu.org; Thu, 18 Apr 2019 14:05:46 -0400
+	(envelope-from <thuth@redhat.com>) id 1hHBOz-0005AB-KU
+	for qemu-devel@nongnu.org; Thu, 18 Apr 2019 14:04:54 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1hHBPs-0003sr-HK
-	for qemu-devel@nongnu.org; Thu, 18 Apr 2019 14:05:45 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:41516)
+	(envelope-from <thuth@redhat.com>) id 1hHBOy-0003Ok-I9
+	for qemu-devel@nongnu.org; Thu, 18 Apr 2019 14:04:49 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:40666)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <thuth@redhat.com>)
-	id 1hHBPg-0003gO-GQ; Thu, 18 Apr 2019 14:05:32 -0400
+	id 1hHBOp-0003Dp-L5; Thu, 18 Apr 2019 14:04:41 -0400
 Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
 	[10.5.11.22])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id A0BB5308A121;
-	Thu, 18 Apr 2019 18:05:26 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id E891A30944B6;
+	Thu, 18 Apr 2019 18:04:36 +0000 (UTC)
 Received: from thuth.com (ovpn-116-56.ams2.redhat.com [10.36.116.56])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id E25711001DC8;
-	Thu, 18 Apr 2019 18:05:20 +0000 (UTC)
+	by smtp.corp.redhat.com (Postfix) with ESMTP id 42BE51001DC8;
+	Thu, 18 Apr 2019 18:04:27 +0000 (UTC)
 From: Thomas Huth <thuth@redhat.com>
 To: yang.zhong@intel.com, Peter Maydell <peter.maydell@linaro.org>,
 	qemu-devel@nongnu.org, pbonzini@redhat.com
-Date: Thu, 18 Apr 2019 20:00:53 +0200
-Message-Id: <20190418180057.3593-26-thuth@redhat.com>
+Date: Thu, 18 Apr 2019 20:00:50 +0200
+Message-Id: <20190418180057.3593-23-thuth@redhat.com>
 In-Reply-To: <20190418180057.3593-1-thuth@redhat.com>
 References: <20190418180057.3593-1-thuth@redhat.com>
 MIME-Version: 1.0
 X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.44]);
-	Thu, 18 Apr 2019 18:05:26 +0000 (UTC)
+	(mx1.redhat.com [10.5.110.40]);
+	Thu, 18 Apr 2019 18:04:37 +0000 (UTC)
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] [PATCH for-QEMU-4.1 v5 25/29] hw/arm: Express
- dependencies of the microbit / nrf51 machine with Kconfig
+Subject: [Qemu-devel] [PATCH for-QEMU-4.1 v5 22/29] hw/arm: Express
+ dependencies of sabrelite with Kconfig
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -86,72 +86,91 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 Content-Type: text/plain; charset="UTF-8"
-Message-ID: <20190418180053.Cpl6PDDyZkA7OqobQQx-G6zkR4clitl7Xq2jcLYW1iI@z>
+Message-ID: <20190418180050.KVo8tYgNyyW6JHyZtYn0DZ_R7KpoFNTqfKlaz0g5kfk@z>
 
-Add Kconfig dependencies for the NRF51 / microbit machine.
+Add Kconfig dependencies for the Sabrelite / iMX6 machine.
 
 Signed-off-by: Thomas Huth <thuth@redhat.com>
 ---
- default-configs/arm-softmmu.mak | 3 +--
- hw/arm/Kconfig                  | 6 ++++++
+ default-configs/arm-softmmu.mak | 4 +---
+ hw/arm/Kconfig                  | 7 +++++++
  hw/arm/Makefile.objs            | 3 ++-
- 3 files changed, 9 insertions(+), 3 deletions(-)
+ 3 files changed, 10 insertions(+), 4 deletions(-)
 
 diff --git a/default-configs/arm-softmmu.mak b/default-configs/arm-softmm=
 u.mak
-index 6dc388c43e..233937f394 100644
+index 76508e3910..ef7dd7156a 100644
 --- a/default-configs/arm-softmmu.mak
 +++ b/default-configs/arm-softmmu.mak
-@@ -35,11 +35,10 @@ CONFIG_RASPI=3Dy
+@@ -33,6 +33,7 @@ CONFIG_NETDUINO2=3Dy
+ CONFIG_MPS2=3Dy
+ CONFIG_RASPI=3Dy
  CONFIG_DIGIC=3Dy
- CONFIG_SABRELITE=3Dy
- CONFIG_EMCRAFT_SF2=3Dy
-+CONFIG_MICROBIT=3Dy
++CONFIG_SABRELITE=3Dy
 =20
  CONFIG_VGA=3Dy
+ CONFIG_SSI_M25P80=3Dy
+@@ -40,13 +41,10 @@ CONFIG_IMX_FEC=3Dy
 =20
--CONFIG_NRF51_SOC=3Dy
--
+ CONFIG_NRF51_SOC=3Dy
+=20
+-CONFIG_FSL_IMX6=3Dy
  CONFIG_FSL_IMX25=3Dy
  CONFIG_FSL_IMX7=3Dy
  CONFIG_FSL_IMX6UL=3Dy
+=20
+-CONFIG_IMX_I2C=3Dy
+-
+ CONFIG_PCIE_PORT=3Dy
+ CONFIG_XIO3130=3Dy
+ CONFIG_IOH3420=3Dy
 diff --git a/hw/arm/Kconfig b/hw/arm/Kconfig
-index 58439c492a..708eae19e5 100644
+index 059fb8282c..065c7acf1b 100644
 --- a/hw/arm/Kconfig
 +++ b/hw/arm/Kconfig
-@@ -347,8 +347,14 @@ config FSL_IMX6UL
-     select IMX_I2C
-     select SDHCI
+@@ -177,6 +177,10 @@ config REALVIEW
+     select DS1338 # I2C RTC+NVRAM
+     select USB_OHCI
 =20
-+config MICROBIT
++config SABRELITE
 +    bool
-+    select NRF51_SOC
++    select FSL_IMX6
 +
- config NRF51_SOC
+ config STELLARIS
      bool
-+    select I2C
-+    select ARM_V7M
+     select ARM_V7M
+@@ -289,6 +293,9 @@ config FSL_IMX31
 =20
- config EMCRAFT_SF2
+ config FSL_IMX6
+     bool
++    select A9MPCORE
++    select IMX
++    select IMX_I2C
+=20
+ config ASPEED_SOC
      bool
 diff --git a/hw/arm/Makefile.objs b/hw/arm/Makefile.objs
-index eae9f6c442..994e67dd0d 100644
+index 4f591ca487..fadd69882c 100644
 --- a/hw/arm/Makefile.objs
 +++ b/hw/arm/Makefile.objs
-@@ -8,6 +8,7 @@ obj-$(CONFIG_EMCRAFT_SF2) +=3D msf2-som.o
- obj-$(CONFIG_HIGHBANK) +=3D highbank.o
- obj-$(CONFIG_INTEGRATOR) +=3D integratorcp.o
- obj-$(CONFIG_MAINSTONE) +=3D mainstone.o
-+obj-$(CONFIG_MICROBIT) +=3D microbit.o
- obj-$(CONFIG_MUSICPAL) +=3D musicpal.o
- obj-$(CONFIG_NETDUINO2) +=3D netduino2.o
- obj-$(CONFIG_NSERIES) +=3D nseries.o
-@@ -48,4 +49,4 @@ obj-$(CONFIG_ARMSSE) +=3D armsse.o
- obj-$(CONFIG_FSL_IMX7) +=3D fsl-imx7.o mcimx7d-sabre.o
- obj-$(CONFIG_ARM_SMMUV3) +=3D smmu-common.o smmuv3.o
- obj-$(CONFIG_FSL_IMX6UL) +=3D fsl-imx6ul.o mcimx6ul-evk.o
--obj-$(CONFIG_NRF51_SOC) +=3D nrf51_soc.o microbit.o
-+obj-$(CONFIG_NRF51_SOC) +=3D nrf51_soc.o
+@@ -22,6 +22,7 @@ obj-$(CONFIG_COLLIE) +=3D collie.o
+ obj-$(CONFIG_VERSATILE) +=3D versatilepb.o
+ obj-$(CONFIG_VEXPRESS) +=3D vexpress.o
+ obj-$(CONFIG_ZYNQ) +=3D xilinx_zynq.o
++obj-$(CONFIG_SABRELITE) +=3D sabrelite.o
+=20
+ obj-$(CONFIG_ARM_V7M) +=3D armv7m.o
+ obj-$(CONFIG_EXYNOS4) +=3D exynos4210.o
+@@ -36,7 +37,7 @@ obj-$(CONFIG_XLNX_ZYNQMP_ARM) +=3D xlnx-zynqmp.o xlnx-z=
+cu102.o
+ obj-$(CONFIG_XLNX_VERSAL) +=3D xlnx-versal.o xlnx-versal-virt.o
+ obj-$(CONFIG_FSL_IMX25) +=3D fsl-imx25.o imx25_pdk.o
+ obj-$(CONFIG_FSL_IMX31) +=3D fsl-imx31.o kzm.o
+-obj-$(CONFIG_FSL_IMX6) +=3D fsl-imx6.o sabrelite.o
++obj-$(CONFIG_FSL_IMX6) +=3D fsl-imx6.o
+ obj-$(CONFIG_ASPEED_SOC) +=3D aspeed_soc.o aspeed.o
+ obj-$(CONFIG_MPS2) +=3D mps2.o
+ obj-$(CONFIG_MPS2) +=3D mps2-tz.o
 --=20
 2.21.0
 
