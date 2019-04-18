@@ -2,111 +2,66 @@ Return-Path: <SRS0=08iY=SU=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7DD9DC10F0E
-	for <qemu-devel@archiver.kernel.org>; Thu, 18 Apr 2019 15:47:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 131B6C10F0E
+	for <qemu-devel@archiver.kernel.org>; Thu, 18 Apr 2019 15:51:01 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3CD75217D7
-	for <qemu-devel@archiver.kernel.org>; Thu, 18 Apr 2019 15:47:00 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3CD75217D7
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id DB49F21479
+	for <qemu-devel@archiver.kernel.org>; Thu, 18 Apr 2019 15:51:00 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DB49F21479
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=patchew.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:43324 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:43385 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hH9Fb-0008WT-GY
-	for qemu-devel@archiver.kernel.org; Thu, 18 Apr 2019 11:46:59 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:44588)
+	id 1hH9JU-0001L6-1S
+	for qemu-devel@archiver.kernel.org; Thu, 18 Apr 2019 11:51:00 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:48032)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1hH95j-00012S-RI
-	for qemu-devel@nongnu.org; Thu, 18 Apr 2019 11:36:48 -0400
+	(envelope-from <no-reply@patchew.org>) id 1hH9IS-0000w8-Re
+	for qemu-devel@nongnu.org; Thu, 18 Apr 2019 11:49:57 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1hH95i-0007wW-SI
-	for qemu-devel@nongnu.org; Thu, 18 Apr 2019 11:36:47 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:50392)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <david@redhat.com>)
-	id 1hH95i-0007sx-JH; Thu, 18 Apr 2019 11:36:46 -0400
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
-	[10.5.11.22])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id AB68D30BA369;
-	Thu, 18 Apr 2019 15:36:42 +0000 (UTC)
-Received: from [10.36.117.52] (ovpn-117-52.ams2.redhat.com [10.36.117.52])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id 04E2B1001E98;
-	Thu, 18 Apr 2019 15:36:40 +0000 (UTC)
-To: Christian Borntraeger <borntraeger@de.ibm.com>,
-	Cornelia Huck <cohuck@redhat.com>
-References: <20190418113110.160664-1-borntraeger@de.ibm.com>
-	<20190418113110.160664-8-borntraeger@de.ibm.com>
-From: David Hildenbrand <david@redhat.com>
-Openpgp: preference=signencrypt
-Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
-	xsFNBFXLn5EBEAC+zYvAFJxCBY9Tr1xZgcESmxVNI/0ffzE/ZQOiHJl6mGkmA1R7/uUpiCjJ
-	dBrn+lhhOYjjNefFQou6478faXE6o2AhmebqT4KiQoUQFV4R7y1KMEKoSyy8hQaK1umALTdL
-	QZLQMzNE74ap+GDK0wnacPQFpcG1AE9RMq3aeErY5tujekBS32jfC/7AnH7I0v1v1TbbK3Gp
-	XNeiN4QroO+5qaSr0ID2sz5jtBLRb15RMre27E1ImpaIv2Jw8NJgW0k/D1RyKCwaTsgRdwuK
-	Kx/Y91XuSBdz0uOyU/S8kM1+ag0wvsGlpBVxRR/xw/E8M7TEwuCZQArqqTCmkG6HGcXFT0V9
-	PXFNNgV5jXMQRwU0O/ztJIQqsE5LsUomE//bLwzj9IVsaQpKDqW6TAPjcdBDPLHvriq7kGjt
-	WhVhdl0qEYB8lkBEU7V2Yb+SYhmhpDrti9Fq1EsmhiHSkxJcGREoMK/63r9WLZYI3+4W2rAc
-	UucZa4OT27U5ZISjNg3Ev0rxU5UH2/pT4wJCfxwocmqaRr6UYmrtZmND89X0KigoFD/XSeVv
-	jwBRNjPAubK9/k5NoRrYqztM9W6sJqrH8+UWZ1Idd/DdmogJh0gNC0+N42Za9yBRURfIdKSb
-	B3JfpUqcWwE7vUaYrHG1nw54pLUoPG6sAA7Mehl3nd4pZUALHwARAQABzSREYXZpZCBIaWxk
-	ZW5icmFuZCA8ZGF2aWRAcmVkaGF0LmNvbT7CwX4EEwECACgFAljj9eoCGwMFCQlmAYAGCwkI
-	BwMCBhUIAgkKCwQWAgMBAh4BAheAAAoJEE3eEPcA/4Na5IIP/3T/FIQMxIfNzZshIq687qgG
-	8UbspuE/YSUDdv7r5szYTK6KPTlqN8NAcSfheywbuYD9A4ZeSBWD3/NAVUdrCaRP2IvFyELj
-	xoMvfJccbq45BxzgEspg/bVahNbyuBpLBVjVWwRtFCUEXkyazksSv8pdTMAs9IucChvFmmq3
-	jJ2vlaz9lYt/lxN246fIVceckPMiUveimngvXZw21VOAhfQ+/sofXF8JCFv2mFcBDoa7eYob
-	s0FLpmqFaeNRHAlzMWgSsP80qx5nWWEvRLdKWi533N2vC/EyunN3HcBwVrXH4hxRBMco3jvM
-	m8VKLKao9wKj82qSivUnkPIwsAGNPdFoPbgghCQiBjBe6A75Z2xHFrzo7t1jg7nQfIyNC7ez
-	MZBJ59sqA9EDMEJPlLNIeJmqslXPjmMFnE7Mby/+335WJYDulsRybN+W5rLT5aMvhC6x6POK
-	z55fMNKrMASCzBJum2Fwjf/VnuGRYkhKCqqZ8gJ3OvmR50tInDV2jZ1DQgc3i550T5JDpToh
-	dPBxZocIhzg+MBSRDXcJmHOx/7nQm3iQ6iLuwmXsRC6f5FbFefk9EjuTKcLMvBsEx+2DEx0E
-	UnmJ4hVg7u1PQ+2Oy+Lh/opK/BDiqlQ8Pz2jiXv5xkECvr/3Sv59hlOCZMOaiLTTjtOIU7Tq
-	7ut6OL64oAq+zsFNBFXLn5EBEADn1959INH2cwYJv0tsxf5MUCghCj/CA/lc/LMthqQ773ga
-	uB9mN+F1rE9cyyXb6jyOGn+GUjMbnq1o121Vm0+neKHUCBtHyseBfDXHA6m4B3mUTWo13nid
-	0e4AM71r0DS8+KYh6zvweLX/LL5kQS9GQeT+QNroXcC1NzWbitts6TZ+IrPOwT1hfB4WNC+X
-	2n4AzDqp3+ILiVST2DT4VBc11Gz6jijpC/KI5Al8ZDhRwG47LUiuQmt3yqrmN63V9wzaPhC+
-	xbwIsNZlLUvuRnmBPkTJwwrFRZvwu5GPHNndBjVpAfaSTOfppyKBTccu2AXJXWAE1Xjh6GOC
-	8mlFjZwLxWFqdPHR1n2aPVgoiTLk34LR/bXO+e0GpzFXT7enwyvFFFyAS0Nk1q/7EChPcbRb
-	hJqEBpRNZemxmg55zC3GLvgLKd5A09MOM2BrMea+l0FUR+PuTenh2YmnmLRTro6eZ/qYwWkC
-	u8FFIw4pT0OUDMyLgi+GI1aMpVogTZJ70FgV0pUAlpmrzk/bLbRkF3TwgucpyPtcpmQtTkWS
-	gDS50QG9DR/1As3LLLcNkwJBZzBG6PWbvcOyrwMQUF1nl4SSPV0LLH63+BrrHasfJzxKXzqg
-	rW28CTAE2x8qi7e/6M/+XXhrsMYG+uaViM7n2je3qKe7ofum3s4vq7oFCPsOgwARAQABwsFl
-	BBgBAgAPBQJVy5+RAhsMBQkJZgGAAAoJEE3eEPcA/4NagOsP/jPoIBb/iXVbM+fmSHOjEshl
-	KMwEl/m5iLj3iHnHPVLBUWrXPdS7iQijJA/VLxjnFknhaS60hkUNWexDMxVVP/6lbOrs4bDZ
-	NEWDMktAeqJaFtxackPszlcpRVkAs6Msn9tu8hlvB517pyUgvuD7ZS9gGOMmYwFQDyytpepo
-	YApVV00P0u3AaE0Cj/o71STqGJKZxcVhPaZ+LR+UCBZOyKfEyq+ZN311VpOJZ1IvTExf+S/5
-	lqnciDtbO3I4Wq0ArLX1gs1q1XlXLaVaA3yVqeC8E7kOchDNinD3hJS4OX0e1gdsx/e6COvy
-	qNg5aL5n0Kl4fcVqM0LdIhsubVs4eiNCa5XMSYpXmVi3HAuFyg9dN+x8thSwI836FoMASwOl
-	C7tHsTjnSGufB+D7F7ZBT61BffNBBIm1KdMxcxqLUVXpBQHHlGkbwI+3Ye+nE6HmZH7IwLwV
-	W+Ajl7oYF+jeKaH4DZFtgLYGLtZ1LDwKPjX7VAsa4Yx7S5+EBAaZGxK510MjIx6SGrZWBrrV
-	TEvdV00F2MnQoeXKzD7O4WFbL55hhyGgfWTHwZ457iN9SgYi1JLPqWkZB0JRXIEtjd4JEQcx
-	+8Umfre0Xt4713VxMygW0PnQt5aSQdMD58jHFxTk092mU+yIHj5LeYgvwSgZN4airXk5yRXl
-	SE+xAvmumFBY
-Organization: Red Hat GmbH
-Message-ID: <2a98f8a0-15bc-aa3d-f4ad-71059d65dad8@redhat.com>
-Date: Thu, 18 Apr 2019 17:36:40 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
-	Thunderbird/60.6.1
+	(envelope-from <no-reply@patchew.org>) id 1hH9IR-0005KK-Ju
+	for qemu-devel@nongnu.org; Thu, 18 Apr 2019 11:49:56 -0400
+Resent-Date: Thu, 18 Apr 2019 11:49:56 -0400
+Resent-Message-Id: <E1hH9IR-0005KK-Ju@eggs.gnu.org>
+Received: from sender4-of-o55.zoho.com ([136.143.188.55]:21541)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
+	id 1hH9IR-0005DY-Bt
+	for qemu-devel@nongnu.org; Thu, 18 Apr 2019 11:49:55 -0400
+ARC-Seal: i=1; a=rsa-sha256; t=1555602528; cv=none; d=zoho.com; s=zohoarc; 
+	b=N4N0U7Rce5o3Olq1DAsXf4NskSAHIjMctZxkDMWWK+uMHBlWdyIh6GjyGNfveWesF4wKjZtutEaq1bRf/YgEcpekKcjmBVuvVkGMk5BIW3NuM+IVrH8T2Ua6qNzGKasGNqDza8AG+5J1dPlQ91yL8A2GyUFkNjILLr18EpJp0M4=
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zoho.com;
+	s=zohoarc; t=1555602528;
+	h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:Reply-To:Subject:To:ARC-Authentication-Results;
+	bh=W5rWYorZlklgJtLmHSw+zJReJGirG4IB3yi9sFfbRd0=; 
+	b=ZE1rGOAp87dk5z+B94K47zq0I6lqle5YKCRcndIoivYplZ7Z33Fvqg7HTwuhu7N7ulnP2WMlCeg8uR8d2Tyu62suR3ERlpVWehdqxdFTL8Ceh59S3WA6xeTs1y5cJw1NIon8+Q2u5Ciwe2fHj1DsWlGBL+nonRN/ILJG6T3X7uQ=
+ARC-Authentication-Results: i=1; mx.zoho.com; dkim=pass  header.i=patchew.org;
+	spf=pass  smtp.mailfrom=no-reply@patchew.org;
+	dmarc=pass header.from=<no-reply@patchew.org>
+	header.from=<no-reply@patchew.org>
+Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by
+	mx.zohomail.com with SMTPS id 15556025250459.929907457052536;
+	Thu, 18 Apr 2019 08:48:45 -0700 (PDT)
+In-Reply-To: <1555601350-4176-1-git-send-email-mateja.marjanovic@rt-rk.com>
+Message-ID: <155560252334.24.10698968104516947211@c2072b67cc0c>
 MIME-Version: 1.0
-In-Reply-To: <20190418113110.160664-8-borntraeger@de.ibm.com>
 Content-Type: text/plain; charset="UTF-8"
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.49]);
-	Thu, 18 Apr 2019 15:36:42 +0000 (UTC)
+Content-Transfer-Encoding: base64
+Resent-From: 
+From: no-reply@patchew.org
+To: mateja.marjanovic@rt-rk.com
+Date: Thu, 18 Apr 2019 08:48:45 -0700 (PDT)
+X-ZohoMailClient: External
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH 07/10] s390x/cpumodel: deflate
+X-Received-From: 136.143.188.55
+Subject: Re: [Qemu-devel] [PATCH v9 0/6] target/mips: Optimize MSA
+ interleave instructions
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -118,64 +73,27 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "Jason J . Herne" <jjherne@linux.ibm.com>,
-	Collin Walling <walling@linux.ibm.com>, qemu-devel <qemu-devel@nongnu.org>,
-	Halil Pasic <pasic@linux.ibm.com>, qemu-s390x <qemu-s390x@nongnu.org>,
-	Richard Henderson <rth@twiddle.net>
+Reply-To: qemu-devel@nongnu.org
+Cc: fam@euphon.net, arikalo@wavecomp.com, richard.henderson@linaro.org,
+	qemu-devel@nongnu.org, amarkovic@wavecomp.com, philmd@redhat.com,
+	aurelien@aurel32.net
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190418153640.BdBVAjzIeKFudmXaXIyE7bwAjdGIZ0CkccoJrjdSJC0@z>
+Message-ID: <20190418154845.aI6K5oSKhZkNQrOCEWXvuVnwrL54g-2TJ7oKz2s9dpg@z>
 
-On 18.04.19 13:31, Christian Borntraeger wrote:
-> add the deflate conversion facility.
+UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8xNTU1NjAxMzUwLTQxNzYtMS1n
+aXQtc2VuZC1lbWFpbC1tYXRlamEubWFyamFub3ZpY0BydC1yay5jb20vCgoKCkhpLAoKVGhpcyBz
+ZXJpZXMgZmFpbGVkIHRoZSBkb2NrZXItbWluZ3dAZmVkb3JhIGJ1aWxkIHRlc3QuIFBsZWFzZSBm
+aW5kIHRoZSB0ZXN0aW5nIGNvbW1hbmRzIGFuZAp0aGVpciBvdXRwdXQgYmVsb3cuIElmIHlvdSBo
+YXZlIERvY2tlciBpbnN0YWxsZWQsIHlvdSBjYW4gcHJvYmFibHkgcmVwcm9kdWNlIGl0CmxvY2Fs
+bHkuCgo9PT0gVEVTVCBTQ1JJUFQgQkVHSU4gPT09CiMhL2Jpbi9iYXNoCnRpbWUgbWFrZSBkb2Nr
+ZXItdGVzdC1taW5nd0BmZWRvcmEgU0hPV19FTlY9MSBKPTE0IE5FVFdPUks9MQo9PT0gVEVTVCBT
+Q1JJUFQgRU5EID09PQoKCgoKVGhlIGZ1bGwgbG9nIGlzIGF2YWlsYWJsZSBhdApodHRwOi8vcGF0
+Y2hldy5vcmcvbG9ncy8xNTU1NjAxMzUwLTQxNzYtMS1naXQtc2VuZC1lbWFpbC1tYXRlamEubWFy
+amFub3ZpY0BydC1yay5jb20vdGVzdGluZy5kb2NrZXItbWluZ3dAZmVkb3JhLz90eXBlPW1lc3Nh
+Z2UuCi0tLQpFbWFpbCBnZW5lcmF0ZWQgYXV0b21hdGljYWxseSBieSBQYXRjaGV3IFtodHRwczov
+L3BhdGNoZXcub3JnL10uClBsZWFzZSBzZW5kIHlvdXIgZmVlZGJhY2sgdG8gcGF0Y2hldy1kZXZl
+bEByZWRoYXQuY29t
 
-Nit:
-
-"s390x/cpumodel: add Deflate-conversion facility"
-
-> 
-> Signed-off-by: Christian Borntraeger <borntraeger@de.ibm.com>
-> ---
->  target/s390x/cpu_features.c     |  9 +++++++++
->  target/s390x/cpu_features.h     |  1 +
->  target/s390x/cpu_features_def.h |  7 +++++++
->  target/s390x/gen-features.c     | 12 ++++++++++++
->  target/s390x/kvm.c              |  6 ++++++
->  5 files changed, 35 insertions(+)
-> 
-> diff --git a/target/s390x/cpu_features.c b/target/s390x/cpu_features.c
-> index e0a4769c19..5f37e655fe 100644
-> --- a/target/s390x/cpu_features.c
-> +++ b/target/s390x/cpu_features.c
-> @@ -110,6 +110,7 @@ static const S390FeatDef s390_features[] = {
->      FEAT_INIT("cmmnt", S390_FEAT_TYPE_STFL, 147, "CMM: ESSA-enhancement (no translate) facility"),
->      FEAT_INIT("vxeh2", S390_FEAT_TYPE_STFL, 148, "Vector Enhancements facility 2"),
->      FEAT_INIT("esort-base", S390_FEAT_TYPE_STFL, 150, "Enhanced-sort facility (excluding subfunctions)"),
-> +    FEAT_INIT("deflate-base", S390_FEAT_TYPE_STFL, 151, "Deflate-conversion facility (excluding subfunctions)"),
->      FEAT_INIT("vxbeh", S390_FEAT_TYPE_STFL, 152, "Vector BCD enhancements facility 1"),
->      FEAT_INIT("msa9-base", S390_FEAT_TYPE_STFL, 155, "Message-security-assist-extension-9 facility (excluding subfunctions)"),
->      FEAT_INIT("etoken", S390_FEAT_TYPE_STFL, 156, "Etoken facility"),
-> @@ -347,6 +348,11 @@ static const S390FeatDef s390_features[] = {
->      FEAT_INIT("sortl-32", S390_FEAT_TYPE_SORTL, 130, "SORTL 32 input lists"),
->      FEAT_INIT("sortl-128", S390_FEAT_TYPE_SORTL, 132, "SORTL 128 input lists"),
->      FEAT_INIT("sortl-f0", S390_FEAT_TYPE_SORTL, 192, "SORTL format 0 parameter-block"),
-> +
-> +    FEAT_INIT("dfltcc-gdht", S390_FEAT_TYPE_DFLTCC, 1, "DFLTCC GDHT"),
-> +    FEAT_INIT("dfltcc-cmpr", S390_FEAT_TYPE_DFLTCC, 2, "DFLTCC CMPR"),
-> +    FEAT_INIT("dfltcc-xpnd", S390_FEAT_TYPE_DFLTCC, 4, "DFLTCC XPND"),
-> +    FEAT_INIT("dfltcc-f0", S390_FEAT_TYPE_DFLTCC, 192, "DFLTCC format 0 parameter-block"),
->  };
-
-Just wonder, "format 0 parameter-block" is actually a feature right,
-like "format 0 can be used". Can we hide format-0, IOW could that be
-like "query" and always supported? (especially due to backwards
-compatibility)
-
-
--- 
-
-Thanks,
-
-David / dhildenb
 
