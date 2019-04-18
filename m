@@ -1,18 +1,21 @@
-Received: from eggs.gnu.org ([209.51.188.92]:57184)
+Received: from eggs.gnu.org ([209.51.188.92]:57871)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1hGyEd-0000wp-Kp
-	for qemu-devel@nongnu.org; Thu, 18 Apr 2019 00:01:16 -0400
+	(envelope-from <hongbo.zhang@linaro.org>) id 1hGyIV-00021r-75
+	for qemu-devel@nongnu.org; Thu, 18 Apr 2019 00:05:17 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1hGyEc-0007lg-6M
-	for qemu-devel@nongnu.org; Thu, 18 Apr 2019 00:01:15 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:46386)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1hGyEa-0007hh-3C
-	for qemu-devel@nongnu.org; Thu, 18 Apr 2019 00:01:14 -0400
-From: Eduardo Habkost <ehabkost@redhat.com>
-Date: Thu, 18 Apr 2019 01:01:03 -0300
-Message-Id: <20190418040103.15314-1-ehabkost@redhat.com>
-Subject: [Qemu-devel] [PATCH] hppa: Delete unused hppa_cpu_list() function
+	(envelope-from <hongbo.zhang@linaro.org>) id 1hGyIS-0001q1-Da
+	for qemu-devel@nongnu.org; Thu, 18 Apr 2019 00:05:15 -0400
+Received: from mail-pg1-x541.google.com ([2607:f8b0:4864:20::541]:44243)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <hongbo.zhang@linaro.org>)
+	id 1hGyIS-0001mF-7W
+	for qemu-devel@nongnu.org; Thu, 18 Apr 2019 00:05:12 -0400
+Received: by mail-pg1-x541.google.com with SMTP id i2so530494pgj.11
+	for <qemu-devel@nongnu.org>; Wed, 17 Apr 2019 21:05:10 -0700 (PDT)
+From: Hongbo Zhang <hongbo.zhang@linaro.org>
+Date: Thu, 18 Apr 2019 12:04:49 +0800
+Message-Id: <1555560291-3415-1-git-send-email-hongbo.zhang@linaro.org>
+Subject: [Qemu-devel] [PATCH v7 0/2] Add Arm SBSA Reference Machine
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -21,49 +24,80 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Richard Henderson <rth@twiddle.net>, Igor Mammedov <imammedo@redhat.com>
+To: peter.maydell@linaro.org, qemu-devel@nongnu.org, qemu-arm@nongnu.org
+Cc: ard.biesheuvel@linaro.org, leif.lindholm@linaro.org, radoslaw.biernacki@linaro.org, Hongbo Zhang <hongbo.zhang@linaro.org>
 
-hppa_cpu_list() is dead code and is never called.  Delete it.
+For the Aarch64, there is one machine 'virt', it is primarily meant to
+run on KVM and execute virtualization workloads, but we need an
+environment as faithful as possible to physical hardware,  to support
+firmware and OS development for pysical Aarch64 machines.
 
-Cc: Richard Henderson <rth@twiddle.net>
-Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
----
- target/hppa/cpu.c | 22 ----------------------
- 1 file changed, 22 deletions(-)
+This machine comes with:
+ - Re-designed memory map.
+ - CPU cortex-a57.
+ - EL2 and EL3 enabled.
+ - GIC version 3.
+ - System bus AHCI controller.
+ - System bus XHCI controller.
+ - CDROM and hard disc on AHCI bus.
+ - E1000E ethernet card on PCIE bus.
+ - VGA display adaptor on PCIE bus.
+ - Only minimal device tree nodes.
+And without:
+ - virtio deivces.
+ - fw_cfg device.
+ - ACPI tables.
 
-diff --git a/target/hppa/cpu.c b/target/hppa/cpu.c
-index 00bf444620..b3b1826209 100644
---- a/target/hppa/cpu.c
-+++ b/target/hppa/cpu.c
-@@ -110,28 +110,6 @@ static void hppa_cpu_realizefn(DeviceState *dev, Error **errp)
- #endif
- }
- 
--static void hppa_cpu_list_entry(gpointer data, gpointer user_data)
--{
--    ObjectClass *oc = data;
--    CPUListState *s = user_data;
--
--    (*s->cpu_fprintf)(s->file, "  %s\n", object_class_get_name(oc));
--}
--
--void hppa_cpu_list(FILE *f, fprintf_function cpu_fprintf)
--{
--    CPUListState s = {
--        .file = f,
--        .cpu_fprintf = cpu_fprintf,
--    };
--    GSList *list;
--
--    list = object_class_get_list_sorted(TYPE_HPPA_CPU, false);
--    (*cpu_fprintf)(f, "Available CPUs:\n");
--    g_slist_foreach(list, hppa_cpu_list_entry, &s);
--    g_slist_free(list);
--}
--
- static void hppa_cpu_initfn(Object *obj)
- {
-     CPUState *cs = CPU(obj);
+Arm Trusted Firmware and UEFI porting to this are done accordingly, and
+it should supply ACPI tables to load OS, the minimal device tree nodes
+supplied from this platform are only to pass the dynamic info reflecting
+command line input to firmware, not for loading OS.
+
+v7 changes:
+ - edit memory map for PCIE slightly
+ - add another secure UART which can be used for RAS and MM from EL0.
+
+v6 changes:
+ - rebased to the latest QEMU tree
+ - rechecked all the header files included
+ - added the newly introduced system bus EHCI controller
+ - removed the machine_done callback due to commit 5614ca80
+ - updated block comments styles according to checkpatch.pl
+ - use Kconfig to add new file
+ - use private SBSA* types defination instead of VIRT* in virt.h
+   since nobody else using them so they are in the .c file instead
+   of a new .h file
+
+v5 changes:
+ - removed more lines derived from virt.c
+ - designed a new memory map
+ - splitted former one patch into two for easier review
+ - cancled previous EHCI and new HXCI coming later separately
+
+V4 changes:
+ - rebased to v3.0.0
+ - removed timer, uart, rtc, *hci device tree nodes
+   (others were removerd in v3)
+ - other minore codes clean up, mainly unsed header files, comments etc.
+
+V3 changes:
+ - rename the platform 'sbsa-ref'
+ - move all the codes to a separate file sbsa-ref.c
+ - remove paravirtualized fw_cfg device
+ - do not supply ACPI tables, since firmware will do it
+ - supply only necessary DT nodes
+ - and other minor code clean up
+
+Hongbo Zhang (2):
+  hw/arm: Add arm SBSA reference machine, skeleton part
+  hw/arm: Add arm SBSA reference machine, devices part
+
+ default-configs/arm-softmmu.mak |   1 +
+ hw/arm/Kconfig                  |   3 +
+ hw/arm/Makefile.objs            |   1 +
+ hw/arm/sbsa-ref.c               | 757 ++++++++++++++++++++++++++++++++++++++++
+ 4 files changed, 762 insertions(+)
+ create mode 100644 hw/arm/sbsa-ref.c
+
 -- 
-2.18.0.rc1.1.g3f1ff2140
+2.7.4
