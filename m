@@ -1,27 +1,26 @@
-Received: from eggs.gnu.org ([209.51.188.92]:59695)
+Received: from eggs.gnu.org ([209.51.188.92]:60163)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1hH5vg-0005mZ-Cn
-	for qemu-devel@nongnu.org; Thu, 18 Apr 2019 08:14:13 -0400
+	(envelope-from <philmd@redhat.com>) id 1hH5yQ-0006qz-GJ
+	for qemu-devel@nongnu.org; Thu, 18 Apr 2019 08:17:03 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1hH5vf-0004Xh-Ag
-	for qemu-devel@nongnu.org; Thu, 18 Apr 2019 08:14:12 -0400
-Received: from mail-wr1-f65.google.com ([209.85.221.65]:44589)
+	(envelope-from <philmd@redhat.com>) id 1hH5yP-0007E4-3s
+	for qemu-devel@nongnu.org; Thu, 18 Apr 2019 08:17:02 -0400
+Received: from mail-wr1-f67.google.com ([209.85.221.67]:46561)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1hH5vf-0004Ga-3q
-	for qemu-devel@nongnu.org; Thu, 18 Apr 2019 08:14:11 -0400
-Received: by mail-wr1-f65.google.com with SMTP id w18so2665368wrv.11
-	for <qemu-devel@nongnu.org>; Thu, 18 Apr 2019 05:13:54 -0700 (PDT)
-References: <20190417005053.885-1-stephen.checkoway@oberlin.edu>
+	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1hH5yO-0007Ch-At
+	for qemu-devel@nongnu.org; Thu, 18 Apr 2019 08:17:00 -0400
+Received: by mail-wr1-f67.google.com with SMTP id t17so2673964wrw.13
+	for <qemu-devel@nongnu.org>; Thu, 18 Apr 2019 05:16:59 -0700 (PDT)
+References: <CAAxVKALOPZiBG3u6Co6vXuA5_WWJrOdDUsk=3n4gTOhkuV23rw@mail.gmail.com>
 From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Message-ID: <aaa450c5-0446-b4b3-40ac-ef87b5522545@redhat.com>
-Date: Thu, 18 Apr 2019 14:13:52 +0200
+Message-ID: <a5b19003-6c63-df5d-ce44-2d681103d447@redhat.com>
+Date: Thu, 18 Apr 2019 14:16:52 +0200
 MIME-Version: 1.0
-In-Reply-To: <20190417005053.885-1-stephen.checkoway@oberlin.edu>
+In-Reply-To: <CAAxVKALOPZiBG3u6Co6vXuA5_WWJrOdDUsk=3n4gTOhkuV23rw@mail.gmail.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH v2] hw/char/escc: Lower irq when transmit
- buffer is filled
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] Virtio based IEEE 802.11 device support
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,69 +29,56 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stephen Checkoway <stephen.checkoway@oberlin.edu>, Paolo Bonzini <pbonzini@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>, Artyom Tarasenko <atar4qemu@gmail.com>, Laurent Vivier <laurent@vivier.eu>, qemu-trivial@nongnu.org, =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>, Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+To: Ratnaraj Mirgal <ratnaraj.mirgal@gmail.com>, qemu-devel@nongnu.org
 
-On 4/17/19 2:50 AM, Stephen Checkoway wrote:
-> The SCC/ESCC will briefly stop asserting an interrupt when the
-> transmit FIFO is filled.
+On 4/17/19 12:00 PM, Ratnaraj Mirgal wrote:
+> Hi All,
 > 
-> This code doesn't model the transmit FIFO/shift register so the
-> pending transmit interrupt is never deasserted which means that an
-> edge-triggered interrupt controller will never see the low-to-high
-> transition it needs to raise another interrupt. The practical
-> consequence of this is that guest firmware with an interrupt service
-> routine for the ESCC that does not send all of the data it has
-> immediately will stop sending data if the following sequence of
-> events occurs:
-> 1. Disable processor interrupts
-> 2. Write a character to the ESCC
-> 3. Add additional characters to a buffer which is drained by the ISR
-> 4. Enable processor interrupts
+> At the outset, I do understand there is no mainstream requirement for
+> having virtual wireless NIC, if et all there is any, mac80211_hwsim (part
+> of Linux) is more than sufficient.
 > 
-> In this case, the first character will be sent, the interrupt will
-> fire and the ISR will output the second character. Since the pending
-> transmit interrupt remains asserted, no additional interrupts will
-> ever fire.
-
-You might want to add a line expliciting the chipset model which forced
-you to do that patch (Z85C30).
-
-> This fixes that situation by explicitly lowering the IRQ when a
-> character is written to the buffer and no other interrupts are currently
-> pending.
-
+> So this is purely an academic attempt.
 > 
-> Signed-off-by: Stephen Checkoway <stephen.checkoway@oberlin.edu>
-> ---
->  hw/char/escc.c | 7 +++++++
->  1 file changed, 7 insertions(+)
+> In order to support following topology,
 > 
-> diff --git a/hw/char/escc.c b/hw/char/escc.c
-> index 628f5f81f7..c5b05a63f1 100644
-> --- a/hw/char/escc.c
-> +++ b/hw/char/escc.c
-> @@ -509,6 +509,13 @@ static void escc_mem_write(void *opaque, hwaddr addr,
->          break;
->      case SERIAL_DATA:
->          trace_escc_mem_writeb_data(CHN_C(s), val);
-> +        /*
-> +         * Lower the irq when data is written to the Tx buffer and no other
-> +         * interrupts are currently pending. The irq will be raised again once
-> +         * the Tx buffer becomes empty below.
-> +         */
-> +        s->txint = 0;
-> +        escc_update_irq(s);
+> [image: qemu-wifi-topology.png]
 
-Way better, thanks :)
+I never thought of sending a picture of an ASCII schema =)
 
-Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
-
-Note: the Z85C30 has a 1-byte transmit FIFO and 3-byte receive FIFO.
-Our model default is the ESCC, and we use ESCC_SERIO_QUEUE_SIZE=256 byte
-for rx FIFO... If needed we can add properties and use a white list of
-chipset with their tx/rx FIFO size.
-
->          s->tx = val;
->          if (s->wregs[W_TXCTRL2] & TXCTRL2_TXEN) { // tx enabled
->              if (qemu_chr_fe_backend_connected(&s->chr)) {
+> I am implementing IEEE 802.11 softmac device based on virtio driver. I
+> wanted to use existing netdev trasport like socket, however due to lack of
+> better understanding of internals I have added new netdev (airport), which
+> is very similar to VDE transport implementation. On frontend side, I have
+> combined virtio-net and mac80211_hwsim to form frontend wireless driver.
+> 
+> As of now all driver are loading, and further working on correcting queue
+> implementation.
+> 
+> 00:03.0 Network controller [0280]: Red Hat, Inc Device [1af4:100a]
+> 	Subsystem: Red Hat, Inc Device [1af4:000a]
+> 	Kernel driver in use: virtio-pci
+> 
+> # lsmod
+> Module                  Size  Used by    Tainted: G
+> arc4                   16384  2
+> virtio_mac80211        24576  0
+> mac80211              356352  1 virtio_mac80211
+> sha256_generic         24576  0
+> cfg80211              221184  1 mac80211
+> 
+> 4: wlan0: <BROADCAST,MULTICAST> mtu 1500 qdisc noop state DOWN group
+> default qlen 1000
+>     link/ether 52:55:00:d1:55:01 brd ff:ff:ff:ff:ff:ff
+> 
+> 
+> I have kept the repository at,
+> https://github.com/ra7narajm/virtio-mac80211
+> 
+> So if possible, do go through and let me know any mistakes.
+> 
+> Thank You.
+> 
+> -
+> Ratnaraj
 > 
