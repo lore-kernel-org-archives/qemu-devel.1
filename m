@@ -1,31 +1,31 @@
-Received: from eggs.gnu.org ([209.51.188.92]:56703)
+Received: from eggs.gnu.org ([209.51.188.92]:56706)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1hH7uD-0000GM-1j
+	(envelope-from <bounces@canonical.com>) id 1hH7uD-0000Gh-Gu
 	for qemu-devel@nongnu.org; Thu, 18 Apr 2019 10:20:50 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1hH7uB-0001kU-Gl
+	(envelope-from <bounces@canonical.com>) id 1hH7uC-0001lO-2i
 	for qemu-devel@nongnu.org; Thu, 18 Apr 2019 10:20:49 -0400
-Received: from indium.canonical.com ([91.189.90.7]:53054)
+Received: from indium.canonical.com ([91.189.90.7]:53082)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1hH7uB-0001im-B2
-	for qemu-devel@nongnu.org; Thu, 18 Apr 2019 10:20:47 -0400
+	id 1hH7uB-0001kI-SW
+	for qemu-devel@nongnu.org; Thu, 18 Apr 2019 10:20:48 -0400
 Received: from loganberry.canonical.com ([91.189.90.37])
 	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1hH7uA-00013W-24
-	for <qemu-devel@nongnu.org>; Thu, 18 Apr 2019 14:20:46 +0000
+	id 1hH7uB-00014a-5N
+	for <qemu-devel@nongnu.org>; Thu, 18 Apr 2019 14:20:47 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 078E52E80CB
-	for <qemu-devel@nongnu.org>; Thu, 18 Apr 2019 14:20:46 +0000 (UTC)
+	by loganberry.canonical.com (Postfix) with ESMTP id 2190A2E80C9
+	for <qemu-devel@nongnu.org>; Thu, 18 Apr 2019 14:20:47 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Thu, 18 Apr 2019 14:09:38 -0000
-From: Shahab Vahedi <1825359@bugs.launchpad.net>
+Date: Thu, 18 Apr 2019 14:11:48 -0000
+From: Peter Maydell <peter.maydell@linaro.org>
 Reply-To: Bug 1825359 <1825359@bugs.launchpad.net>
 Sender: bounces@canonical.com
 References: <155558881987.7164.1099557133760519082.malonedeb@chaenomeles.canonical.com>
-Message-Id: <155559657895.6414.8767794573070268894.malone@chaenomeles.canonical.com>
+Message-Id: <155559670891.14041.18397736934674738145.malone@wampee.canonical.com>
 Errors-To: bounces@canonical.com
 Subject: [Qemu-devel] [Bug 1825359] Re: cpu_ld*_code() triggers
  MMU_DATA_LOAD i.s.o. MMU_INST_FETCH
@@ -39,49 +39,10 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-I have to say, after applying this patch, my test still fails while
-fetching the instructions from this _small_ region. Although there is no
-MMU_DATA_LOAD anymore, a few iterations later (while guest code has just
-jumped to the beginning of the executable region), QEmu segfaults (call
-stack is attached):
-
-memory.c
---------
-static MemTxResult
-memory_region_read_with_attrs_accessor(MemoryRegion *mr,
-                                       ...)
-{
-    uint64_t tmp =3D 0;
-    MemTxResult r;
-
-    r =3D mr->ops->read_with_attrs(mr->opaque, addr, &tmp, size, attrs);
-    ...
-}
---------
-
-Here, "read_with_attrs" is null. The call stack looks like:
----
-#0  memory_region_read_with_attrs_accessor at memory.c:465
-#1  access_with_adjusted_size at memory.c:568
-#2  memory_region_dispatch_read1 at memory.c:1425
-#3  memory_region_dispatch_read at memory.c:1446
-#4  io_readx at accel/tcg/cputlb.c:909
-#5  io_readw at accel/tcg/softmmu_template.h:106
-#6  helper_le_ldw_cmmu at accel/tcg/softmmu_template.h:146
-#7  cpu_lduw_code_ra at include/exec/cpu_ldst_template.h:102
-#8  cpu_lduw_code at include/exec/cpu_ldst_template.h:114
-#9  read_and_decode_context at target/arc/arc-decoder.c:1479
-#10 arc_decode at target/arc/arc-decoder.c:1736
-#11 decode_opc at target/arc/translate.c:313
-#12 arc_tr_translate_insn at target/arc/translate.c:335
-#13 translator_loop at accel/tcg/translator.c:107
-#14 gen_intermediate_code at target/arc/translate.c:413
-#15 tb_gen_code at accel/tcg/translate-all.c:1723
-#16 tb_find at accel/tcg/cpu-exec.c:407
-#17 cpu_exec at accel/tcg/cpu-exec.c:729
-#18 tcg_cpu_exec at cpus.c:1430
----
-more detailed call stack is attached.
+That should not happen unless you have some device that is incorrectly
+not providing a suitable read function in its MemoryRegionOps. If you
+look at 'mr' in the debugger you should be able to figure out which
+device is the problem.
 
 -- =
 
