@@ -1,20 +1,17 @@
-Received: from eggs.gnu.org ([209.51.188.92]:59310)
+Received: from eggs.gnu.org ([209.51.188.92]:35014)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1hH87Y-00065X-L9
-	for qemu-devel@nongnu.org; Thu, 18 Apr 2019 10:34:37 -0400
+	(envelope-from <armbru@redhat.com>) id 1hH8UN-0002P9-TF
+	for qemu-devel@nongnu.org; Thu, 18 Apr 2019 10:58:12 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1hH87X-0001fe-MM
-	for qemu-devel@nongnu.org; Thu, 18 Apr 2019 10:34:36 -0400
-Date: Thu, 18 Apr 2019 16:34:18 +0200
-From: Cornelia Huck <cohuck@redhat.com>
-Message-ID: <20190418163418.12d6148b.cohuck@redhat.com>
-In-Reply-To: <20190417113143.5551-1-david@redhat.com>
-References: <20190417113143.5551-1-david@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v3 0/2] s390x/kvm: Properly detect page
- size of initial memory
+	(envelope-from <armbru@redhat.com>) id 1hH8QM-0002CB-3k
+	for qemu-devel@nongnu.org; Thu, 18 Apr 2019 10:54:03 -0400
+From: Markus Armbruster <armbru@redhat.com>
+Date: Thu, 18 Apr 2019 16:53:54 +0200
+Message-Id: <20190418145355.21100-6-armbru@redhat.com>
+In-Reply-To: <20190418145355.21100-1-armbru@redhat.com>
+References: <20190418145355.21100-1-armbru@redhat.com>
+Subject: [Qemu-devel] [PATCH 5/6] pc-bios/s390-ccw: Clean up harmless misuse
+ of isdigit()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,53 +20,50 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Hildenbrand <david@redhat.com>
-Cc: qemu-devel@nongnu.org, Richard Henderson <rth@twiddle.net>, Halil Pasic <pasic@linux.ibm.com>, Christian Borntraeger <borntraeger@de.ibm.com>, qemu-s390x@nongnu.org, David Gibson <david@gibson.dropbear.id.au>, Igor Mammedov <imammedo@redhat.com>, peter.maydell@linaro.org, pbonzini@redhat.com, Thomas Huth <thuth@redhat.com>, qemu-ppc@nongnu.org, Alex Williamson <alex.williamson@redhat.com>
+To: qemu-devel@nongnu.org
+Cc: Christian Borntraeger <borntraeger@de.ibm.com>, Thomas Huth <thuth@redhat.com>, Cornelia Huck <cohuck@redhat.com>, qemu-s390x@nongnu.org
 
-On Wed, 17 Apr 2019 13:31:41 +0200
-David Hildenbrand <david@redhat.com> wrote:
+atoui() and get_index() pass char values to isdigit().  With a
+standard isdigit(), we'd get undefined behavior when the value is
+negative.  But we're using isdigit() from pc-bios/s390-ccw/libc.h
+here, which behaves nicely.  Clean up anyway, just to avoid setting a
+bad example.
 
-> While the detection on s390x of the maximum ram pagesize works by pure luck,
-> we should try to do better. Especially, once "-mem-path" is replaced
-> by memory backends, the current approach will break.
-> 
-> Configure the maximum page size after configuring initital memory. Provide
-> a function to detect the maximum ram pagesize
-> 
-> I think this can be deferred to 4.1 as I don't think anything is actually
-> broken right now.
+Cc: Christian Borntraeger <borntraeger@de.ibm.com>
+Cc: Thomas Huth <thuth@redhat.com>
+Cc: Cornelia Huck <cohuck@redhat.com>
+Cc: qemu-s390x@nongnu.org
+Signed-off-by: Markus Armbruster <armbru@redhat.com>
+---
+ pc-bios/s390-ccw/libc.c | 2 +-
+ pc-bios/s390-ccw/menu.c | 2 +-
+ 2 files changed, 2 insertions(+), 2 deletions(-)
 
-I think it is certainly 4.1 at that point in time ;)
-
-Who is going to queue this? If not me, I'll try to find some time to
-review this next week.
-
-> 
-> v2 -> v3:
-> - Fix compile error
-> - Tested that hugepages correctly result in an error with
->   "modprobe kvm hpage=0", but not with "modprobe kvm hpage=1".
-> 
-> v1 -> v2:
-> - Add a better comment describing that only initial memory is considered
-> - Add "exec: Introduce qemu_getmaxrampagesize() and rename
->   qemu_getrampagesize()"
-> 
-> David Hildenbrand (2):
->   s390x/kvm: Configure page size after memory has actually been
->     initialized
->   exec: Introduce qemu_maxrampagesize() and rename qemu_getrampagesize()
-> 
->  exec.c                     | 44 ++++++++++++++++++++++++++++++++++----
->  hw/ppc/spapr_caps.c        |  4 ++--
->  hw/s390x/s390-virtio-ccw.c | 12 +++++++++++
->  hw/vfio/spapr.c            |  2 +-
->  include/exec/ram_addr.h    |  3 ++-
->  target/ppc/kvm.c           |  2 +-
->  target/s390x/cpu.c         |  7 ++++++
->  target/s390x/cpu.h         |  1 +
->  target/s390x/kvm-stub.c    |  4 ++++
->  target/s390x/kvm.c         | 35 ++++++++++++------------------
->  target/s390x/kvm_s390x.h   |  1 +
->  11 files changed, 85 insertions(+), 30 deletions(-)
-> 
+diff --git a/pc-bios/s390-ccw/libc.c b/pc-bios/s390-ccw/libc.c
+index a786566c4c..3187923950 100644
+--- a/pc-bios/s390-ccw/libc.c
++++ b/pc-bios/s390-ccw/libc.c
+@@ -38,7 +38,7 @@ uint64_t atoui(const char *str)
+     }
+ 
+     while (*str) {
+-        if (!isdigit(*str)) {
++        if (!isdigit(*(unsigned char *)str)) {
+             break;
+         }
+         val = val * 10 + *str - '0';
+diff --git a/pc-bios/s390-ccw/menu.c b/pc-bios/s390-ccw/menu.c
+index 82a4ae6315..ce3815b201 100644
+--- a/pc-bios/s390-ccw/menu.c
++++ b/pc-bios/s390-ccw/menu.c
+@@ -134,7 +134,7 @@ static int get_index(void)
+ 
+     /* Check for erroneous input */
+     for (i = 0; i < len; i++) {
+-        if (!isdigit(buf[i])) {
++        if (!isdigit((unsigned char)buf[i])) {
+             return -1;
+         }
+     }
+-- 
+2.17.2
