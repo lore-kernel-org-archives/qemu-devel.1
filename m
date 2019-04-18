@@ -1,26 +1,28 @@
-Received: from eggs.gnu.org ([209.51.188.92]:59271)
+Received: from eggs.gnu.org ([209.51.188.92]:60420)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1hH3jm-0002L5-8u
-	for qemu-devel@nongnu.org; Thu, 18 Apr 2019 05:53:49 -0400
+	(envelope-from <phrdina@redhat.com>) id 1hH3pY-0003qn-OE
+	for qemu-devel@nongnu.org; Thu, 18 Apr 2019 05:59:45 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1hH3ji-0003bn-Gx
-	for qemu-devel@nongnu.org; Thu, 18 Apr 2019 05:53:46 -0400
-Received: from mail-wr1-x443.google.com ([2a00:1450:4864:20::443]:40087)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1hH3je-0003Yz-AH
-	for qemu-devel@nongnu.org; Thu, 18 Apr 2019 05:53:42 -0400
-Received: by mail-wr1-x443.google.com with SMTP id h4so2168384wre.7
-	for <qemu-devel@nongnu.org>; Thu, 18 Apr 2019 02:53:36 -0700 (PDT)
-Date: Thu, 18 Apr 2019 10:52:44 +0100
-From: Stefan Hajnoczi <stefanha@gmail.com>
-Message-ID: <20190418095244.GB23876@stefanha-x1.localdomain>
-References: <6021647b-20c7-2801-4f3e-a91a297f36e2@arrikto.com>
+	(envelope-from <phrdina@redhat.com>) id 1hH3pX-0005uY-Gj
+	for qemu-devel@nongnu.org; Thu, 18 Apr 2019 05:59:44 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:40480)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <phrdina@redhat.com>) id 1hH3pX-0005uK-83
+	for qemu-devel@nongnu.org; Thu, 18 Apr 2019 05:59:43 -0400
+Date: Thu, 18 Apr 2019 11:59:35 +0200
+From: Pavel Hrdina <phrdina@redhat.com>
+Message-ID: <20190418095935.GS18986@antique-laptop>
+References: <1555416373-28690-1-git-send-email-puwen@hygon.cn>
+	<20190416141700.GR18986@antique-laptop>
+	<e7abd74f-61bb-fc34-0b3a-08c635d9f78c@hygon.cn>
+	<20190417192610.GC19065@antique-laptop>
+	<20190418084825.GC13773@redhat.com>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="kXdP64Ggrk/fb43R"
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature"; boundary="ixDgnS8AC6zwmyK0"
 Content-Disposition: inline
-In-Reply-To: <6021647b-20c7-2801-4f3e-a91a297f36e2@arrikto.com>
-Subject: Re: [Qemu-devel] revising virtio-vhost-user device
+In-Reply-To: <20190418084825.GC13773@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v3] i386: Add new Hygon 'Dhyana' CPU model
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,111 +31,116 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Nikos Dragazis <ndragazis@arrikto.com>
-Cc: qemu-devel@nongnu.org, Vangelis Koukis <vkoukis@arrikto.com>, "Stojaczyk, Dariusz" <dariusz.stojaczyk@intel.com>, Stefan Hajnoczi <stefanha@redhat.com>
+To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+Cc: Pu Wen <puwen@hygon.cn>, pbonzini@redhat.com, mst@redhat.com, qemu-devel@nongnu.org, ehabkost@redhat.com, rth@twiddle.net
 
 
---kXdP64Ggrk/fb43R
+--ixDgnS8AC6zwmyK0
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Wed, Apr 17, 2019 at 05:05:31PM +0300, Nikos Dragazis wrote:
-> Hi everyone,
+On Thu, Apr 18, 2019 at 09:48:25AM +0100, Daniel P. Berrang=C3=A9 wrote:
+> On Wed, Apr 17, 2019 at 09:26:10PM +0200, Pavel Hrdina wrote:
+> > On Wed, Apr 17, 2019 at 10:53:04PM +0800, Pu Wen wrote:
+> > > On 2019/4/16 22:17, Pavel Hrdina wrote:
+> > > > On Tue, Apr 16, 2019 at 08:06:13PM +0800, Pu Wen wrote:
+> > > > > Add a new base CPU model called 'Dhyana' to model processors from=
+ Hygon
+> > > > > Dhyana(family 18h), which derived from AMD EPYC(family 17h).
+> > > > >=20
+> > > > > The following features bits have been removed compare to AMD EPYC:
+> > > > > aes, pclmulqdq, sha_ni
+> > > > >=20
+> > > > > The Hygon Dhyana support to KVM in Linux is already accepted upst=
+ream[1].
+> > > > > So add Hygon Dhyana support to Qemu is necessary to create Hygon'=
+s own
+> > > > > CPU model.
+> > > >=20
+> > > > I have once question that we will have to solve for EPYC CPUs as we=
+ll.
+> > > > The name should not be based on the Product name or Model name as t=
+hat
+> > > > usually doesn't change with introduction of new microarchitecture.
+> > > >=20
+> > > > With EPYC we made a mistake to name the CPU like that, luckily with
+> > > > Intel we already use the microarchitecture name, so the EPYC CPU sh=
+ould
+> > > > have been named ZEN-Server and for Ryzen CPUs there should be ZEN-C=
+lient
+> > > > if there is any difference or otherwise we can simply use ZEN.
+> > > >=20
+> > > > The issue here is what happens once the ZEN2 microarchitecture is o=
+ut
+> > > > wihch introduces new features and we will have to come up with a CPU
+> > > > name.
+> > > >=20
+> > > > Obviously we cannot change/remove the EPYC models so the question is
+> > > > what is the difference between the AMD EPYC CPU and this new Dhyana=
+ CPU
+> > > > if they are both based on the ZEN microarchitecture?
+> > >=20
+> > > Right now there's no much difference between Dhyana and EPYC from the
+> > > software's view. Dhyana removed the instructions aes, pclmulqdq, sha_=
+ni
+> > > compared to EPYC, but will have it's own implementation such as for a=
+es in
+> > > future CPU models. Hygon also will implement something different from=
+ AMD in
+> > > the future.
+> > >=20
+> > > > In addition is there any way how we can introduce ZEN-Server &
+> > > > ZEN-Client or simply ZEN, if there is no difference, as an alias or=
+ a
+> > > > new model next to the EPYC?
+> > >=20
+> > > Also as Eduardo mentioned that there's no CPU model alias or inherita=
+nce
+> > > system in x86, so I think it's worthwhile to keep a separate CPU mode=
+l for
+> > > Hygon.
+> >=20
+> > So what happens once Zen2 is out and there are new Dhyana CPUs based on
+> > the Zen2 microarchitecture with some new features, what CPU models we
+> > will introduce, EPYC-G2 and Dhyana-G2, but that will not correspond to
+> > the CPU model anymore.
+> >=20
+> > My idea was that we should probably introduce CPU model Zen-Server which
+> > could cover both EPYC and Dhyana as they are both based on the Zen
+> > microarchitecture.  The fact that Dhyana doesn't support all the
+> > features is not an issue as QEMU will not use them if they are not
+> > available on the host.
 >=20
-> as you may already know, there is an experimental feature in QEMU wiki
-> page called =E2=80=9Cvirtio-vhost-user=E2=80=9D [1]. Stefan Hajnoczi laun=
-ched this
-> feature a year ago. He even wrote an RFC implementation [2]. However,
-> this feature is still a WIP.
->=20
-> At present, I am working with Dariusz Stojaczyk from Intel in order to
-> integrate the virtio-vhost-user device with SPDK/DPDK. Part of the plan
-> is to finish up and merge the virtio-vhost-user device with the latest
-> QEMU. Thereby, I have been working on Stefan=E2=80=99s device code [3] ov=
-er the
-> last few weeks. Stefan has already made a TODO list [2] with all the
-> missing parts.
->=20
-> The updated device code is here [4]. In short, I have done the following
-> things so far:
->=20
-> - implement the virtio PCI capabilities for the additional device
-> =C2=A0 resources
->=20
-> - add support for guest notifications in response to master virtqueue
-> =C2=A0 kicks
->=20
-> - use ioeventfd mechanism for the callfds in order to avoid entering
-> =C2=A0 QEMU
->=20
-> - add UUID configuration field
->=20
-> - rebase on top of latest qemu:master
->=20
-> - update the virtio device spec [5][6]
->=20
-> I have deliberately kept the commits separate in order to clearly
-> demonstrate the above changes.
->=20
-> There is still some work to be done. However, given the fact that I am
-> not familiar with QEMU code and development process, I thought about
-> sharing this with the community at an early stage. Hopefully, I could
-> receive from you some reviews/pointers/comments/suggestions.
->=20
-> Looking forward to your feedback.
+> I don't think this is a good idea. AFAICT, Dhyana and EPYC should not be
+> thought of as the same microarchitecture. Dhyana is a fork of the Zen
+> microarchitecture as illustrated by the dropping of a number of CPU
+> features. The Dhyana SEV patches show that it has had other significant
+> changes, which are likely to require extra work in QEMU to support too.
 
-Hi Nikos,
-Nice to see your progress on this feature!
+Fair enough, still the point stands that we should use the name of the
+microarchitecture.
 
-Please send the VIRTIO specification changes to
-virtio-dev@lists.oasis-open.org.  For more info, see
-https://www.oasis-open.org/committees/tc_home.php?wg_abbrev=3Dvirtio#feedba=
-ck.
+Pavel
 
-Getting the specification approved is important so that QEMU can merge
-the device implementation.  SPDK may be willing to merge code before it
-is an official VIRTIO spec, but this will lead to problems with
-non-compliant implementations and confusion for users when devices don't
-work due to version mismatches.  I suggest focussing on getting
-agreement on the spec.
-
-Guidelines for submitting QEMU patches are here:
-https://wiki.qemu.org/Contribute/SubmitAPatch
-
-Please CC me on the VIRTIO and QEMU patches.  I'll be happy to review
-them.
-
-Note that David Gilbert has posted a shared memory resources patch for
-the VIRTIO specification.  virtio-vhost-vsock should use this mechanism:
-https://lists.oasis-open.org/archives/virtio-dev/201902/msg00142.html
-
-Thanks,
-Stefan
-
-> Best regards,
-> Nikos
->=20
-> [1] https://wiki.qemu.org/Features/VirtioVhostUser
-> [2] http://lists.nongnu.org/archive/html/qemu-devel/2018-01/msg04806.html
-> [3] https://github.com/stefanha/qemu/tree/virtio-vhost-user
-> [4] https://github.com/arrikto/qemu-qemu/commits/virtio-vhost-user
-> [5] https://github.com/ndragazis/virtio/commits
-> [6] https://ndragazis.github.io/virtio-v1.0-cs04.html#x1-2830007
->=20
-
---kXdP64Ggrk/fb43R
+--ixDgnS8AC6zwmyK0
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQEcBAEBAgAGBQJcuEjsAAoJEJykq7OBq3PIaaUH/0YsCNA8tNFbZRhqFeusnWMo
-ejkKTje3pBxkPveN5dV7H8IZn4GGyWbmcYtPqDkLc35TfIBt/z+AvfOTBknwEdfF
-W03z44mk+x90HwMXSM+2qnHMDwP7cuekDPiaYuYQ1ipG0B1DuaJHwNeVFejWfzrf
-z8pHSgNSFqJxiNUycMXTJMhR/5Ylza43uDea37iI+IF/0taKZ9WBwfRm9edwASeo
-lp+4GA/nzbG/fjrGT7BaAc1+bBseCJE3Jkr7U5I8mNb8Uq/W/8pk4u9oHdIo3VK1
-Rj9eUqQIsB9vuEZbQ7FaQOHHJPmIDvdVK4/ID4+bs9yon6XLFXtyj2OOm5fPLCU=
-=nuMm
+iQIzBAEBCAAdFiEEcbzs91ho/coWWY7aUi1kczAH4YwFAly4SocACgkQUi1kczAH
+4YzLeg//aknXHTND/2BS7LqqGzOk8Gu4eq9JwcWdnX3wcYg3fzmNzrdVQMd91DjH
+UTxVojyklrjC1ln6ZtifW2th/WJk9QG5zpgkd7Efx4lLvdnKx+15GuL66H+yOrt6
+wn3lIZjWZpXiR2I3IhU03U6Lo0CvtLfIjv5dhUgY03O6wq7nr+kV5YsEbnSf492u
+trn19seduCOA3VIujH+NAZs8JXkpehxp9VqRmRjuWVG9CpyZ5aWx83e+cOTCekfb
+Zko9zR4zhtzMp6wTopdcgpUm52fBAesuuzuVMG12KW8BnXySuRri2h8x5jLmX6Ro
+4DNe7rw1ECv4NHFZEj+hpEf6XOfHOpvZ1+CcLo2YANUhUTGBUFP8oiLR10ab0mgn
+1IfYJl3xYQO/qq6i3kk1DLkGbxEp8BDVTIpwvOH5Fo7pn527hEQFbHIIPemvpdWC
+5SSxrIIpN6h6I4YJfflqpDnwjV+6BNEnAzSOsoTo8fZsHNccpEzFX37X1TD35tvm
+P8RKb5Ano9CANcNvhPuVD75DHxQUYttb3hDcN4QJqDkeKJ23ikRAPA9COa0RykIs
+hZBqBLkexHynU5Mb3hCrf+3/q4ckwjvp2Ta4QejevXptFapM4cOu2uZ1bMaMgcz+
+rso1S9oBVGVl2zy/y063rRQ60V8ZMqP5WQR5GV7hcPQ2O2B21As=
+=gozU
 -----END PGP SIGNATURE-----
 
---kXdP64Ggrk/fb43R--
+--ixDgnS8AC6zwmyK0--
