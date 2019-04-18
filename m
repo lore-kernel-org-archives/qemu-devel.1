@@ -2,78 +2,116 @@ Return-Path: <SRS0=08iY=SU=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.5 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 21650C10F0E
-	for <qemu-devel@archiver.kernel.org>; Thu, 18 Apr 2019 04:22:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AFC24C10F0E
+	for <qemu-devel@archiver.kernel.org>; Thu, 18 Apr 2019 04:23:38 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id CC0F52083D
-	for <qemu-devel@archiver.kernel.org>; Thu, 18 Apr 2019 04:22:31 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="TpRkcXdf"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CC0F52083D
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	by mail.kernel.org (Postfix) with ESMTPS id 7FC5F2083D
+	for <qemu-devel@archiver.kernel.org>; Thu, 18 Apr 2019 04:23:38 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7FC5F2083D
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:35387 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:35400 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hGyZC-0005eq-RL
-	for qemu-devel@archiver.kernel.org; Thu, 18 Apr 2019 00:22:30 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:60624)
+	id 1hGyaH-0006OC-Nf
+	for qemu-devel@archiver.kernel.org; Thu, 18 Apr 2019 00:23:37 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:60752)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <gsuryacse7k@gmail.com>) id 1hGyYL-0005Np-7a
-	for qemu-devel@nongnu.org; Thu, 18 Apr 2019 00:21:38 -0400
+	(envelope-from <thuth@redhat.com>) id 1hGyZM-0005sc-4l
+	for qemu-devel@nongnu.org; Thu, 18 Apr 2019 00:22:41 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <gsuryacse7k@gmail.com>) id 1hGyYI-0001uf-5d
-	for qemu-devel@nongnu.org; Thu, 18 Apr 2019 00:21:36 -0400
-Received: from mail-it1-x131.google.com ([2607:f8b0:4864:20::131]:56141)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <gsuryacse7k@gmail.com>)
-	id 1hGyYF-0001sT-OB
-	for qemu-devel@nongnu.org; Thu, 18 Apr 2019 00:21:33 -0400
-Received: by mail-it1-x131.google.com with SMTP id y134so1300480itc.5
-	for <qemu-devel@nongnu.org>; Wed, 17 Apr 2019 21:21:29 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
-	h=mime-version:from:date:message-id:subject:to;
-	bh=wF8jGICAtmnxWt+A1VweqI1UTtqMiOs8SiRChT6czME=;
-	b=TpRkcXdfP5QTf4WISEzxVnZsA9IqC1/2zTpGbTHzNIBA2Tt6fqj6LRehP2KwWLDGkm
-	mzzFDYT15YUOc5kXsVRiCRuefMJ+eDHSPfUEQj8uQZqpmH2iZsj1GacXk8YN2hM6VPtn
-	DCc9ePq6kBzKRzWJnsSjkugSaO10kGSZxLMg9cLNFCDzxYGRWJVlnOEVpbWgj+N0SGVs
-	R9TJTy/rQSAZIQqavjoJCBavOHVTZDdlLGzRxzHyW2ML/zo/CeC1YUUOGyrB8Rk1x2Yb
-	zDk8QWLIdtroywDtHiaNf84KU1S5u6soOw9lWekFQoMsDh1HIkGfHcnzwN29Og6rIZ1l
-	OIDw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=1e100.net; s=20161025;
-	h=x-gm-message-state:mime-version:from:date:message-id:subject:to;
-	bh=wF8jGICAtmnxWt+A1VweqI1UTtqMiOs8SiRChT6czME=;
-	b=JS9hZuat2iPqyRkYORJVB7m3nYB6QuGOuKJ3tvxGq0nRc2K1fs2K3i8dMnLL6gnpSt
-	xaSdVQBMgmnrTbnt32C9ERxSN0Asc8MLWP4PGfo2mn2K8VssR2IpJq9MT9EPml4NTOO1
-	smGFaMRtr0fID66kvvoKiUVxWZRPnWgmBdiV+c38ib67Lq5AXBIIEZLvNTUeox9HwWRn
-	rfW5V/h1HLgnT52JSiaYP/HjRTIs9k1nWOzxB3LszKY1BsYYSCfR2GzLf2cm0xigiQWh
-	SSkyd4uYB1GWmFnhGcYsWGrBUdA4bdy92xPzMpMtXxgDRttr92Tvd6seGTfdbIvXjWgB
-	guZQ==
-X-Gm-Message-State: APjAAAUdlvBcTTC6saiR5xjBLdl0uhPvvybmPbbUB6jdSXVTlcL/q9Mo
-	PWhIRjjLw1No0dPSo/15mUwJscQlYAgRbBvT5m9L9NswD/E=
-X-Google-Smtp-Source: APXvYqxTfJqJpqshPU1/fQ6t2nvpz3bQkt2+st2MbrcPzdaCPrzKweXCabYKfdHV96ZtJ7ChIUqAfD9GBXLgSB9tsz0=
-X-Received: by 2002:a02:828c:: with SMTP id t12mr13015466jag.18.1555561287588; 
-	Wed, 17 Apr 2019 21:21:27 -0700 (PDT)
+	(envelope-from <thuth@redhat.com>) id 1hGyZJ-0002WL-Su
+	for qemu-devel@nongnu.org; Thu, 18 Apr 2019 00:22:39 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:44310)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <thuth@redhat.com>)
+	id 1hGyYz-0002GK-QE; Thu, 18 Apr 2019 00:22:19 -0400
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+	[10.5.11.14])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 86096308A106;
+	Thu, 18 Apr 2019 04:22:14 +0000 (UTC)
+Received: from thuth.remote.csb (ovpn-116-56.ams2.redhat.com [10.36.116.56])
+	by smtp.corp.redhat.com (Postfix) with ESMTP id DD43D5D9CC;
+	Thu, 18 Apr 2019 04:22:09 +0000 (UTC)
+To: Stephen Checkoway <stephen.checkoway@oberlin.edu>,
+	QEMU Developers <qemu-devel@nongnu.org>,
+	=?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
+	Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>,
+	"open list:Block layer core" <qemu-block@nongnu.org>,
+	Markus Armbruster <armbru@redhat.com>, Laszlo Ersek <lersek@redhat.com>,
+	Laurent Vivier <lvivier@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
+References: <20190417220147.67648-1-stephen.checkoway@oberlin.edu>
+	<20190417220147.67648-4-stephen.checkoway@oberlin.edu>
+From: Thomas Huth <thuth@redhat.com>
+Openpgp: preference=signencrypt
+Autocrypt: addr=thuth@redhat.com; keydata=
+	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
+Organization: Red Hat
+Message-ID: <d6aedf1f-0928-8385-4c8b-4e20fc21f2b4@redhat.com>
+Date: Thu, 18 Apr 2019 06:22:08 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+	Thunderbird/60.6.1
 MIME-Version: 1.0
-From: suresh gumpula <gsuryacse7k@gmail.com>
-Date: Wed, 17 Apr 2019 21:21:16 -0700
-Message-ID:
- <CAJOqHmgt6+FCWkunf9sch03QEw5_eHKeLjHvFeonFOVysHiJCA@mail.gmail.com>
-To: qemu-devel@nongnu.org
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
-	recognized.
-X-Received-From: 2607:f8b0:4864:20::131
+In-Reply-To: <20190417220147.67648-4-stephen.checkoway@oberlin.edu>
 Content-Type: text/plain; charset="UTF-8"
-X-Content-Filtered-By: Mailman/MimeDel 2.1.21
-Subject: [Qemu-devel] Live migration fails with all 8 memslots used
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+	(mx1.redhat.com [10.5.110.44]);
+	Thu, 18 Apr 2019 04:22:14 +0000 (UTC)
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 209.132.183.28
+Subject: Re: [Qemu-devel] [PATCH v3 03/10] block/pflash_cfi02: Fix command
+ address comparison
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -88,182 +126,19 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190418042116.-z6sWMkXZhWRxFgPPoWDxVf2Wqd2enCTDqx35nXqBlU@z>
+Message-ID: <20190418042208.XLncHeSC6S-cprLtYoR7He24kIww5iJCWOb-YDV52Hg@z>
+
+On 18/04/2019 00.01, Stephen Checkoway wrote:
+> Most AMD commands only examine 11 bits of the address. This masks the
+> addresses used in the comparison to 11 bits. The exceptions are word or
+> sector addresses which use offset directly rather than the shifted
+> offset, boff.
+> 
+> Signed-off-by: Stephen Checkoway <stephen.checkoway@oberlin.edu>
+> ---
+>  hw/block/pflash_cfi02.c   |  8 +++++++-
+>  tests/pflash-cfi02-test.c | 12 ++++++++++--
+>  2 files changed, 17 insertions(+), 3 deletions(-)
+
+Acked-by: Thomas Huth <thuth@redhat.com>
 
-Hi,
-I was trying to migrate a VM(CentOS7) which  started with 4G memory and hot
-plugged 5 memslots with 1G each.  So the VM has total of 9G memory and
-trying to migrate fails in vhost_dev_init() on destination host
-
-
-    if (used_memslots >
-hdev->vhost_ops->vhost_backend_memslots_limit(hdev)) {
-
-        error_report("vhost backend memory slots limit is less"
-
-                     " than current number of present memory slots");
-
-        r = -1;
-
-        if (busyloop_timeout) {
-
-            goto fail_busyloop;
-
-        } else {
-
-            goto fail;
-
-        }
-
-    }
-
-
-Debugged more into this and understood that, after vhost_dev_init()
-used_memslots are 4
-
-
-(gdb) show-vhost-dev-memory-regions 0x555556d27000
-
-n_mem_sections:4
-
-n_regions:4
-
-Region0:
-
-$101 = {
-
-  guest_phys_addr = 0x100000000,        ; 1G above 4G
-
-  memory_size = 0x40000000,
-
-  userspace_addr = 0x7fffb4600000,
-
-  flags_padding = 0x0
-
-}
-
-Region1:
-
-$102 = {
-
-  guest_phys_addr = 0xc0000,     ; 768k-896k
-
-  memory_size = 0x20000,
-
-  userspace_addr = 0x7ffef4200000,
-
-  flags_padding = 0x0
-
-}
-
-Region2:
-
-$103 = {
-
-  guest_phys_addr = 0x100000,             ;;3G from 1M
-
-  memory_size = 0xbff00000,
-
-  userspace_addr = 0x7ffef4700000,
-
-  flags_padding = 0x0
-
-}
-
-Region3:
-
-$104 = {
-
-  guest_phys_addr = 0x0,
-
-  memory_size = 0xa0000,              ;   First 640K;   0 - 640k;
-
-  userspace_addr = 0x7ffef4600000,
-
-  flags_padding = 0x0
-
-}
-
-(gdb) p used_memslots
-
-$150 = 4
-
-
-And later on it coalesced the VGA region of 128k at 0xc0000( 768-896k) upon
-guest config write
-
-with  i440fx_update_memory_mappings(d);
-
-(gdb) f 5
-
-#5  0x000055555595b920 in i440fx_write_config (dev=0x5555572b8000,
-address=90, val=51, len=1) at hw/pci-host/piix.c:168
-
-168             i440fx_update_memory_mappings(d);
-
-(gdb) l
-
-163
-
-164         /* XXX: implement SMRAM.D_LOCK */
-
-165         pci_default_write_config(dev, address, val, len);
-
-166         if (ranges_overlap(address, len, I440FX_PAM, I440FX_PAM_SIZE) ||
-
-167             range_covers_byte(address, len, I440FX_SMRAM)) {
-
-168             i440fx_update_memory_mappings(d);
-
-169         }
-
-170     }
-
-
-
-(gdb) p used_memslots
-
-$150 = 3
-
-
-Since the destination QEMU does not know that the source host coalesced one
-region,  vhost_dev_init for kernel started with 4 slots and  hot plugged 5
-slots and then the vhost_dev_init for user fails since 9>8 is true.
-
-
-    if (used_memslots >
-hdev->vhost_ops->vhost_backend_memslots_limit(hdev)) {
-
-        error_report("vhost backend memory slots limit is less"
-
-                     " than current number of present memory slots");
-
-        r = -1;
-
-        if (busyloop_timeout) {
-
-            goto fail_busyloop;
-
-        } else {
-
-            goto fail;
-
-        }
-
-    }
-
-
-Can you guys please answer my questions here:
-
-1)  Why is the VGA region of 128k coalesced on guest vcpu execution with
-pci config write?
-
-2)  We have memslots limit of 8 and 3 are pre occupied with initial memory
-and we can only use 4 memslots for hotplug instead of 5 to migrate a VM.
-Is there any reason for this?  We cannot hotplug 5 slots and migrate the VM.
-
-
-
-Thanks much
-
-Suresh.G
