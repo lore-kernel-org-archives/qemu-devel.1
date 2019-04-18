@@ -1,23 +1,22 @@
-Received: from eggs.gnu.org ([209.51.188.92]:60624)
+Received: from eggs.gnu.org ([209.51.188.92]:60752)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <gsuryacse7k@gmail.com>) id 1hGyYL-0005Np-7a
-	for qemu-devel@nongnu.org; Thu, 18 Apr 2019 00:21:38 -0400
+	(envelope-from <thuth@redhat.com>) id 1hGyZM-0005sc-4l
+	for qemu-devel@nongnu.org; Thu, 18 Apr 2019 00:22:41 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <gsuryacse7k@gmail.com>) id 1hGyYI-0001uf-5d
-	for qemu-devel@nongnu.org; Thu, 18 Apr 2019 00:21:36 -0400
-Received: from mail-it1-x131.google.com ([2607:f8b0:4864:20::131]:56141)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <gsuryacse7k@gmail.com>)
-	id 1hGyYF-0001sT-OB
-	for qemu-devel@nongnu.org; Thu, 18 Apr 2019 00:21:33 -0400
-Received: by mail-it1-x131.google.com with SMTP id y134so1300480itc.5
-	for <qemu-devel@nongnu.org>; Wed, 17 Apr 2019 21:21:29 -0700 (PDT)
+	(envelope-from <thuth@redhat.com>) id 1hGyZJ-0002WL-Su
+	for qemu-devel@nongnu.org; Thu, 18 Apr 2019 00:22:39 -0400
+References: <20190417220147.67648-1-stephen.checkoway@oberlin.edu>
+	<20190417220147.67648-4-stephen.checkoway@oberlin.edu>
+From: Thomas Huth <thuth@redhat.com>
+Message-ID: <d6aedf1f-0928-8385-4c8b-4e20fc21f2b4@redhat.com>
+Date: Thu, 18 Apr 2019 06:22:08 +0200
 MIME-Version: 1.0
-From: suresh gumpula <gsuryacse7k@gmail.com>
-Date: Wed, 17 Apr 2019 21:21:16 -0700
-Message-ID: <CAJOqHmgt6+FCWkunf9sch03QEw5_eHKeLjHvFeonFOVysHiJCA@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: [Qemu-devel] Live migration fails with all 8 memslots used
+In-Reply-To: <20190417220147.67648-4-stephen.checkoway@oberlin.edu>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v3 03/10] block/pflash_cfi02: Fix command
+ address comparison
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,182 +25,18 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-
-Hi,
-I was trying to migrate a VM(CentOS7) which  started with 4G memory and hot
-plugged 5 memslots with 1G each.  So the VM has total of 9G memory and
-trying to migrate fails in vhost_dev_init() on destination host
-
-
-    if (used_memslots >
-hdev->vhost_ops->vhost_backend_memslots_limit(hdev)) {
-
-        error_report("vhost backend memory slots limit is less"
-
-                     " than current number of present memory slots");
-
-        r = -1;
-
-        if (busyloop_timeout) {
-
-            goto fail_busyloop;
-
-        } else {
-
-            goto fail;
-
-        }
-
-    }
-
-
-Debugged more into this and understood that, after vhost_dev_init()
-used_memslots are 4
-
-
-(gdb) show-vhost-dev-memory-regions 0x555556d27000
-
-n_mem_sections:4
-
-n_regions:4
-
-Region0:
-
-$101 = {
-
-  guest_phys_addr = 0x100000000,        ; 1G above 4G
-
-  memory_size = 0x40000000,
-
-  userspace_addr = 0x7fffb4600000,
-
-  flags_padding = 0x0
-
-}
-
-Region1:
-
-$102 = {
-
-  guest_phys_addr = 0xc0000,     ; 768k-896k
-
-  memory_size = 0x20000,
-
-  userspace_addr = 0x7ffef4200000,
-
-  flags_padding = 0x0
-
-}
-
-Region2:
-
-$103 = {
-
-  guest_phys_addr = 0x100000,             ;;3G from 1M
-
-  memory_size = 0xbff00000,
-
-  userspace_addr = 0x7ffef4700000,
-
-  flags_padding = 0x0
-
-}
-
-Region3:
-
-$104 = {
-
-  guest_phys_addr = 0x0,
-
-  memory_size = 0xa0000,              ;   First 640K;   0 - 640k;
-
-  userspace_addr = 0x7ffef4600000,
-
-  flags_padding = 0x0
-
-}
-
-(gdb) p used_memslots
-
-$150 = 4
-
-
-And later on it coalesced the VGA region of 128k at 0xc0000( 768-896k) upon
-guest config write
-
-with  i440fx_update_memory_mappings(d);
-
-(gdb) f 5
-
-#5  0x000055555595b920 in i440fx_write_config (dev=0x5555572b8000,
-address=90, val=51, len=1) at hw/pci-host/piix.c:168
-
-168             i440fx_update_memory_mappings(d);
-
-(gdb) l
-
-163
-
-164         /* XXX: implement SMRAM.D_LOCK */
-
-165         pci_default_write_config(dev, address, val, len);
-
-166         if (ranges_overlap(address, len, I440FX_PAM, I440FX_PAM_SIZE) ||
-
-167             range_covers_byte(address, len, I440FX_SMRAM)) {
-
-168             i440fx_update_memory_mappings(d);
-
-169         }
-
-170     }
-
-
-
-(gdb) p used_memslots
-
-$150 = 3
-
-
-Since the destination QEMU does not know that the source host coalesced one
-region,  vhost_dev_init for kernel started with 4 slots and  hot plugged 5
-slots and then the vhost_dev_init for user fails since 9>8 is true.
-
-
-    if (used_memslots >
-hdev->vhost_ops->vhost_backend_memslots_limit(hdev)) {
-
-        error_report("vhost backend memory slots limit is less"
-
-                     " than current number of present memory slots");
-
-        r = -1;
-
-        if (busyloop_timeout) {
-
-            goto fail_busyloop;
-
-        } else {
-
-            goto fail;
-
-        }
-
-    }
-
-
-Can you guys please answer my questions here:
-
-1)  Why is the VGA region of 128k coalesced on guest vcpu execution with
-pci config write?
-
-2)  We have memslots limit of 8 and 3 are pre occupied with initial memory
-and we can only use 4 memslots for hotplug instead of 5 to migrate a VM.
-Is there any reason for this?  We cannot hotplug 5 slots and migrate the VM.
-
-
-
-Thanks much
-
-Suresh.G
+To: Stephen Checkoway <stephen.checkoway@oberlin.edu>, QEMU Developers <qemu-devel@nongnu.org>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, "open list:Block layer core" <qemu-block@nongnu.org>, Markus Armbruster <armbru@redhat.com>, Laszlo Ersek <lersek@redhat.com>, Laurent Vivier <lvivier@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
+
+On 18/04/2019 00.01, Stephen Checkoway wrote:
+> Most AMD commands only examine 11 bits of the address. This masks the
+> addresses used in the comparison to 11 bits. The exceptions are word or
+> sector addresses which use offset directly rather than the shifted
+> offset, boff.
+> 
+> Signed-off-by: Stephen Checkoway <stephen.checkoway@oberlin.edu>
+> ---
+>  hw/block/pflash_cfi02.c   |  8 +++++++-
+>  tests/pflash-cfi02-test.c | 12 ++++++++++--
+>  2 files changed, 17 insertions(+), 3 deletions(-)
+
+Acked-by: Thomas Huth <thuth@redhat.com>
