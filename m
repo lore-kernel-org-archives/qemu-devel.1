@@ -1,25 +1,28 @@
 Received: from eggs.gnu.org ([209.51.188.92]:43722)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mateja.marjanovic@rt-rk.com>) id 1hH942-0007d7-AK
-	for qemu-devel@nongnu.org; Thu, 18 Apr 2019 11:35:03 -0400
+	(envelope-from <philmd@redhat.com>) id 1hH94O-0007d7-CD
+	for qemu-devel@nongnu.org; Thu, 18 Apr 2019 11:35:25 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mateja.marjanovic@rt-rk.com>) id 1hH8yW-00033U-Kl
-	for qemu-devel@nongnu.org; Thu, 18 Apr 2019 11:29:22 -0400
-Received: from mx2.rt-rk.com ([89.216.37.149]:36787 helo=mail.rt-rk.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mateja.marjanovic@rt-rk.com>)
-	id 1hH8yW-00032M-8P
-	for qemu-devel@nongnu.org; Thu, 18 Apr 2019 11:29:20 -0400
-From: Mateja Marjanovic <mateja.marjanovic@rt-rk.com>
-Date: Thu, 18 Apr 2019 17:29:06 +0200
-Message-Id: <1555601350-4176-3-git-send-email-mateja.marjanovic@rt-rk.com>
-In-Reply-To: <1555601350-4176-1-git-send-email-mateja.marjanovic@rt-rk.com>
-References: <1555601350-4176-1-git-send-email-mateja.marjanovic@rt-rk.com>
+	(envelope-from <philmd@redhat.com>) id 1hH8wC-0002DT-Ud
+	for qemu-devel@nongnu.org; Thu, 18 Apr 2019 11:26:58 -0400
+Received: from mail-wm1-f66.google.com ([209.85.128.66]:35817)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1hH8wC-0002D4-KI
+	for qemu-devel@nongnu.org; Thu, 18 Apr 2019 11:26:56 -0400
+Received: by mail-wm1-f66.google.com with SMTP id y197so3376909wmd.0
+	for <qemu-devel@nongnu.org>; Thu, 18 Apr 2019 08:26:56 -0700 (PDT)
+References: <20190418145355.21100-1-armbru@redhat.com>
+	<20190418145355.21100-4-armbru@redhat.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Message-ID: <78da03ed-2b9f-2357-6f28-44115d8b2955@redhat.com>
+Date: Thu, 18 Apr 2019 17:26:54 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v9 2/6] target/mips: Optimize ILVEV.<B|H|W|D>
- MSA instructions
+In-Reply-To: <20190418145355.21100-4-armbru@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH 3/6] gdbstub: Reject invalid RLE repeat
+ counts
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,223 +31,44 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: aurelien@aurel32.net, philmd@redhat.com, richard.henderson@linaro.org, amarkovic@wavecomp.com, arikalo@wavecomp.com
+To: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
 
-From: Mateja Marjanovic <Mateja.Marjanovic@rt-rk.com>
+On 4/18/19 4:53 PM, Markus Armbruster wrote:
+> "Debugging with GDB / Appendix E GDB Remote Serial Protocol /
+> Overview" specifies "The printable characters '#' and '$' or with a
+> numeric value greater than 126 must not be used."  gdb_read_byte()
+> only rejects values < 32.  This is wrong.  Impact depends on the caller:
+> 
+> * gdb_handlesig() passes a char.  Incorrectly accepts '#', '$' and
+>   '\127'.
+> 
+> * gdb_chr_receive() passes an uint8_t.  Additionally accepts
+>   characters with the most-significant bit set.
+> 
+> Correct the validity check to match the specification.
+> 
+> Signed-off-by: Markus Armbruster <armbru@redhat.com>
+> ---
+>  gdbstub.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+> diff --git a/gdbstub.c b/gdbstub.c
+> index d54abd17cc..a6dce1b027 100644
+> --- a/gdbstub.c
+> +++ b/gdbstub.c
+> @@ -2064,7 +2064,7 @@ static void gdb_read_byte(GDBState *s, int ch)
+>              }
+>              break;
+>          case RS_GETLINE_RLE:
+> -            if (ch < ' ') {
 
-Optimize set of MSA instructions ILVEV.<B|H|W|D>, using
-directly tcg registers and performing logic on them
-instead of using helpers.
+Can you add a comment referring to the ""Debugging with GDB / Appendix E
+GDB Remote Serial Protocol / Overview" here?
 
-In the following table, the first column is the performance
-before this patch. The second represents the performance
-after converting from helpers to tcg, but without using
-tcg_gen_deposit function. The third one is with using the
-tcg_gen_deposit function and with using a uint64_t constant
-bit mask, and the fourth is with using the tcg_gen_deposit
-function and with a mask which is a tcg constant. The fourth
-is implemented in this patch.
+Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
 
-Performance measurement is done by executing the
-instructions 10 million times on a computer
-with Intel Core i7-3770 CPU @ 3.40GHz=C3=978.
-
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-|| instruction ||      1     ||     2    ||     3    ||     4    ||
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-||   ilvev.b   || 107.592 ms || 2.432 ms || 2.381 ms || 2.599 ms ||
-||   ilvev.h   ||  83.422 ms || 2.352 ms || 2.623 ms || 2.532 ms ||
-||   ilvev.w   || 109.300 ms || 2.342 ms || 2.329 ms || 2.266 ms ||
-||   ilvev.d   ||  30.915 ms || 1.926 ms || 2.002 ms || 1.976 ms ||
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
- 1 - before
- 2 - no-deposit-no-mask-as-tcg-constant
- 3 - with-deposit-no-mask-as-tcg-constant
- 4 - with-deposit-with-mask-as-tcg-constant (final)
-
-The deposit function is used only in ILVEV.W.
-
-No-deposit version of the ILVEV.W implementation:
-
-static inline void gen_ilvev_w(CPUMIPSState *env, uint32_t wd,
-                               uint32_t ws, uint32_t wt)
-{
-    TCGv_i64 t1 =3D tcg_temp_new_i64();
-    TCGv_i64 t2 =3D tcg_temp_new_i64();
-    uint64_t mask =3D 0x00000000ffffffffULL;
-
-    tcg_gen_andi_i64(t1, msa_wr_d[wt * 2], mask);
-    tcg_gen_andi_i64(t2, msa_wr_d[ws * 2], mask);
-    tcg_gen_shli_i64(t2, t2, 32);
-    tcg_gen_or_i64(msa_wr_d[wd * 2], t1, t2);
-
-    tcg_gen_andi_i64(t1, msa_wr_d[wt * 2 + 1], mask);
-    tcg_gen_andi_i64(t2, msa_wr_d[ws * 2 + 1], mask);
-    tcg_gen_shli_i64(t2, t2, 32);
-    tcg_gen_or_i64(msa_wr_d[wd * 2 + 1], t1, t2);
-
-    tcg_temp_free_i64(t1);
-    tcg_temp_free_i64(t2);
-}
-
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
-Suggested-by: Aleksandar Markovic <amarkovic@wavecomp.com>
-Suggested-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
-Suggested-by: Richard Henderson <richard.henderson@linaro.org>
-Signed-off-by: Mateja Marjanovic <mateja.marjanovic@rt-rk.com>
----
- target/mips/helper.h     |  1 -
- target/mips/msa_helper.c |  9 -----
- target/mips/translate.c  | 87 ++++++++++++++++++++++++++++++++++++++++++=
-+++++-
- 3 files changed, 86 insertions(+), 11 deletions(-)
-
-diff --git a/target/mips/helper.h b/target/mips/helper.h
-index d162836..2f23b0d 100644
---- a/target/mips/helper.h
-+++ b/target/mips/helper.h
-@@ -864,7 +864,6 @@ DEF_HELPER_5(msa_pckev_df, void, env, i32, i32, i32, =
-i32)
- DEF_HELPER_5(msa_pckod_df, void, env, i32, i32, i32, i32)
- DEF_HELPER_5(msa_ilvl_df, void, env, i32, i32, i32, i32)
- DEF_HELPER_5(msa_ilvr_df, void, env, i32, i32, i32, i32)
--DEF_HELPER_5(msa_ilvev_df, void, env, i32, i32, i32, i32)
- DEF_HELPER_5(msa_vshf_df, void, env, i32, i32, i32, i32)
- DEF_HELPER_5(msa_srar_df, void, env, i32, i32, i32, i32)
- DEF_HELPER_5(msa_srlr_df, void, env, i32, i32, i32, i32)
-diff --git a/target/mips/msa_helper.c b/target/mips/msa_helper.c
-index 9e52a31..a500c59 100644
---- a/target/mips/msa_helper.c
-+++ b/target/mips/msa_helper.c
-@@ -1197,15 +1197,6 @@ MSA_FN_DF(ilvl_df)
-     } while (0)
- MSA_FN_DF(ilvr_df)
- #undef MSA_DO
--
--#define MSA_DO(DF)                      \
--    do {                                \
--        pwx->DF[2*i]   =3D pwt->DF[2*i];  \
--        pwx->DF[2*i+1] =3D pws->DF[2*i];  \
--    } while (0)
--MSA_FN_DF(ilvev_df)
--#undef MSA_DO
--
- #undef MSA_LOOP_COND
-=20
- #define MSA_LOOP_COND(DF) \
-diff --git a/target/mips/translate.c b/target/mips/translate.c
-index 99bd441..930ef3a 100644
---- a/target/mips/translate.c
-+++ b/target/mips/translate.c
-@@ -28075,6 +28075,76 @@ static inline void gen_ilvod_d(CPUMIPSState *env=
-, uint32_t wd,
-     tcg_gen_mov_i64(msa_wr_d[wd * 2 + 1], msa_wr_d[ws * 2 + 1]);
- }
-=20
-+
-+/*
-+ * [MSA] ILVEV.<B|H> wd, ws, wt
-+ *
-+ *   Vector Interleave Even (<byte|halfword> data elements)
-+ *
-+ */
-+static inline void gen_ilvev_bh(CPUMIPSState *env, uint32_t wd,
-+                                uint32_t ws, uint32_t wt,
-+                                uint64_t mask, uint32_t shift)
-+{
-+    TCGv_i64 t1 =3D tcg_temp_new_i64();
-+    TCGv_i64 t2 =3D tcg_temp_new_i64();
-+    TCGv_i64 mask_tcg =3D tcg_const_i64(mask);
-+
-+    tcg_gen_and_i64(t1, msa_wr_d[wt * 2], mask_tcg);
-+    tcg_gen_and_i64(t2, msa_wr_d[ws * 2], mask_tcg);
-+    tcg_gen_shli_i64(t2, t2, shift);
-+    tcg_gen_or_i64(msa_wr_d[wd * 2], t1, t2);
-+
-+    tcg_gen_and_i64(t1, msa_wr_d[wt * 2 + 1], mask_tcg);
-+    tcg_gen_and_i64(t2, msa_wr_d[ws * 2 + 1], mask_tcg);
-+    tcg_gen_shli_i64(t2, t2, shift);
-+    tcg_gen_or_i64(msa_wr_d[wd * 2 + 1], t1, t2);
-+
-+    tcg_temp_free_i64(mask_tcg);
-+    tcg_temp_free_i64(t1);
-+    tcg_temp_free_i64(t2);
-+}
-+
-+static inline void gen_ilvev_b(CPUMIPSState *env, uint32_t wd,
-+                               uint32_t ws, uint32_t wt)
-+{
-+    gen_ilvev_bh(env, wd, ws, wt, 0x00ff00ff00ff00ffULL, 8);
-+}
-+
-+static inline void gen_ilvev_h(CPUMIPSState *env, uint32_t wd,
-+                               uint32_t ws, uint32_t wt)
-+{
-+    gen_ilvev_bh(env, wd, ws, wt, 0x0000ffff0000ffffULL, 16);
-+}
-+
-+/*
-+ * [MSA] ILVEV.W wd, ws, wt
-+ *
-+ *   Vector Interleave Even (word data elements)
-+ *
-+ */
-+static inline void gen_ilvev_w(CPUMIPSState *env, uint32_t wd,
-+                               uint32_t ws, uint32_t wt)
-+{
-+    tcg_gen_deposit_i64(msa_wr_d[wd * 2], msa_wr_d[wt * 2],
-+                        msa_wr_d[ws * 2], 32, 32);
-+    tcg_gen_deposit_i64(msa_wr_d[wd * 2 + 1], msa_wr_d[wt * 2 + 1],
-+                        msa_wr_d[ws * 2 + 1], 32, 32);
-+}
-+
-+/*
-+ * [MSA] ILVEV.D wd, ws, wt
-+ *
-+ *   Vector Interleave Even (Doubleword data elements)
-+ *
-+ */
-+static inline void gen_ilvev_d(CPUMIPSState *env, uint32_t wd,
-+                               uint32_t ws, uint32_t wt)
-+{
-+    tcg_gen_mov_i64(msa_wr_d[wd * 2 + 1], msa_wr_d[ws * 2]);
-+    tcg_gen_mov_i64(msa_wr_d[wd * 2], msa_wr_d[wt * 2]);
-+}
-+
- static void gen_msa_3r(CPUMIPSState *env, DisasContext *ctx)
- {
- #define MASK_MSA_3R(op)    (MASK_MSA_MINOR(op) | (op & (0x7 << 23)))
-@@ -28231,7 +28301,22 @@ static void gen_msa_3r(CPUMIPSState *env, DisasC=
-ontext *ctx)
-         gen_helper_msa_mod_s_df(cpu_env, tdf, twd, tws, twt);
-         break;
-     case OPC_ILVEV_df:
--        gen_helper_msa_ilvev_df(cpu_env, tdf, twd, tws, twt);
-+        switch (df) {
-+        case DF_BYTE:
-+            gen_ilvev_b(env, wd, ws, wt);
-+            break;
-+        case DF_HALF:
-+            gen_ilvev_h(env, wd, ws, wt);
-+            break;
-+        case DF_WORD:
-+            gen_ilvev_w(env, wd, ws, wt);
-+            break;
-+        case DF_DOUBLE:
-+            gen_ilvev_d(env, wd, ws, wt);
-+            break;
-+        default:
-+            assert(0);
-+        }
-         break;
-     case OPC_BINSR_df:
-         gen_helper_msa_binsr_df(cpu_env, tdf, twd, tws, twt);
---=20
-2.7.4
+> +            if (ch < ' ' || ch == '#' || ch == '$' || ch > 126) {
+>                  /* invalid RLE count encoding */
+>                  trace_gdbstub_err_invalid_repeat((uint8_t)ch);
+>                  s->state = RS_GETLINE;
+> 
