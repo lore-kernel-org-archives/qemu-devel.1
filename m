@@ -2,71 +2,74 @@ Return-Path: <SRS0=08iY=SU=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.4 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_PASS,USER_AGENT_MUTT autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-8.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 60E32C10F0E
-	for <qemu-devel@archiver.kernel.org>; Thu, 18 Apr 2019 14:06:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 53D0BC10F0E
+	for <qemu-devel@archiver.kernel.org>; Thu, 18 Apr 2019 14:11:59 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 220492083D
-	for <qemu-devel@archiver.kernel.org>; Thu, 18 Apr 2019 14:06:24 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 220492083D
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 1125D21479
+	for <qemu-devel@archiver.kernel.org>; Thu, 18 Apr 2019 14:11:58 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1125D21479
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:41971 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:42039 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hH7gF-0005LD-BX
-	for qemu-devel@archiver.kernel.org; Thu, 18 Apr 2019 10:06:23 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:53732)
+	id 1hH7le-0006eZ-8a
+	for qemu-devel@archiver.kernel.org; Thu, 18 Apr 2019 10:11:58 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:54871)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1hH7fP-0004xl-M5
-	for qemu-devel@nongnu.org; Thu, 18 Apr 2019 10:05:32 -0400
+	(envelope-from <bounces@canonical.com>) id 1hH7ka-0006Dc-SM
+	for qemu-devel@nongnu.org; Thu, 18 Apr 2019 10:10:54 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1hH7fO-0005I4-Do
-	for qemu-devel@nongnu.org; Thu, 18 Apr 2019 10:05:31 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:40368)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1hH7fO-0005Eq-5W
-	for qemu-devel@nongnu.org; Thu, 18 Apr 2019 10:05:30 -0400
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
-	[10.5.11.16])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id A4A48307D78B;
-	Thu, 18 Apr 2019 14:05:27 +0000 (UTC)
-Received: from localhost (ovpn-116-9.gru2.redhat.com [10.97.116.9])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id F3C895C205;
-	Thu, 18 Apr 2019 14:05:22 +0000 (UTC)
-Date: Thu, 18 Apr 2019 11:05:20 -0300
-From: Eduardo Habkost <ehabkost@redhat.com>
-To: Pavel Hrdina <phrdina@redhat.com>
-Message-ID: <20190418140520.GG25134@habkost.net>
-References: <1555416373-28690-1-git-send-email-puwen@hygon.cn>
-	<20190416141700.GR18986@antique-laptop>
-	<e7abd74f-61bb-fc34-0b3a-08c635d9f78c@hygon.cn>
-	<20190417192610.GC19065@antique-laptop>
-	<20190418084825.GC13773@redhat.com>
-	<20190418095935.GS18986@antique-laptop>
+	(envelope-from <bounces@canonical.com>) id 1hH7kZ-0002N9-Cw
+	for qemu-devel@nongnu.org; Thu, 18 Apr 2019 10:10:52 -0400
+Received: from indium.canonical.com ([91.189.90.7]:50816)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1hH7kZ-0002Mc-7O
+	for qemu-devel@nongnu.org; Thu, 18 Apr 2019 10:10:51 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1hH7kX-0008A7-Pf
+	for <qemu-devel@nongnu.org>; Thu, 18 Apr 2019 14:10:49 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id C0FEF2E80C7
+	for <qemu-devel@nongnu.org>; Thu, 18 Apr 2019 14:10:49 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="UTF-8"
-Content-Disposition: inline
-In-Reply-To: <20190418095935.GS18986@antique-laptop>
-User-Agent: Mutt/1.10.1 (2018-07-13)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.45]);
-	Thu, 18 Apr 2019 14:05:28 +0000 (UTC)
 Content-Transfer-Encoding: quoted-printable
+Date: Thu, 18 Apr 2019 13:57:17 -0000
+From: Peter Maydell <peter.maydell@linaro.org>
+To: qemu-devel@nongnu.org
+X-Launchpad-Notification-Type: bug
+X-Launchpad-Bug: product=qemu; status=Confirmed; importance=Undecided;
+	assignee=None; 
+X-Launchpad-Bug-Tags: fetch mmu mpu
+X-Launchpad-Bug-Information-Type: Public
+X-Launchpad-Bug-Private: no
+X-Launchpad-Bug-Security-Vulnerability: no
+X-Launchpad-Bug-Commenters: pmaydell shahab-vahedi
+X-Launchpad-Bug-Reporter: Shahab Vahedi (shahab-vahedi)
+X-Launchpad-Bug-Modifier: Peter Maydell (pmaydell)
+References: <155558881987.7164.1099557133760519082.malonedeb@chaenomeles.canonical.com>
+Message-Id: <155559583796.13663.2699453179469163573.malone@gac.canonical.com>
+X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
+X-Launchpad-Message-For: qemu-devel-ml
+Precedence: bulk
+X-Generated-By: Launchpad (canonical.com); Revision="18928";
+	Instance="launchpad-lazr.conf"
+X-Launchpad-Hash: e10aa327f37fd40c56d5f0ca7a813102929b2b8e
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH v3] i386: Add new Hygon 'Dhyana' CPU model
+X-Received-From: 91.189.90.7
+Subject: [Qemu-devel] [Bug 1825359] Re: cpu_ld*_code() triggers
+ MMU_DATA_LOAD i.s.o. MMU_INST_FETCH
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
-Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -75,134 +78,138 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: mst@redhat.com, Pu Wen <puwen@hygon.cn>, qemu-devel@nongnu.org,
-	pbonzini@redhat.com, rth@twiddle.net
+Reply-To: Bug 1825359 <1825359@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190418140520.PkvWEyUxeLHkDRRrbRrEtdbewQx8BXDgc7pVvbBLhBQ@z>
+Message-ID: <20190418135717.AMbWab2orKst-6amlEbIS97mmcgTifQ_lITlyh6UMLA@z>
 
-On Thu, Apr 18, 2019 at 11:59:35AM +0200, Pavel Hrdina wrote:
-> On Thu, Apr 18, 2019 at 09:48:25AM +0100, Daniel P. Berrang=E9 wrote:
-> > On Wed, Apr 17, 2019 at 09:26:10PM +0200, Pavel Hrdina wrote:
-> > > On Wed, Apr 17, 2019 at 10:53:04PM +0800, Pu Wen wrote:
-> > > > On 2019/4/16 22:17, Pavel Hrdina wrote:
-> > > > > On Tue, Apr 16, 2019 at 08:06:13PM +0800, Pu Wen wrote:
-> > > > > > Add a new base CPU model called 'Dhyana' to model processors =
-from Hygon
-> > > > > > Dhyana(family 18h), which derived from AMD EPYC(family 17h).
-> > > > > >=20
-> > > > > > The following features bits have been removed compare to AMD =
-EPYC:
-> > > > > > aes, pclmulqdq, sha_ni
-> > > > > >=20
-> > > > > > The Hygon Dhyana support to KVM in Linux is already accepted =
-upstream[1].
-> > > > > > So add Hygon Dhyana support to Qemu is necessary to create Hy=
-gon's own
-> > > > > > CPU model.
-> > > > >=20
-> > > > > I have once question that we will have to solve for EPYC CPUs a=
-s well.
-> > > > > The name should not be based on the Product name or Model name =
-as that
-> > > > > usually doesn't change with introduction of new microarchitectu=
-re.
-> > > > >=20
-> > > > > With EPYC we made a mistake to name the CPU like that, luckily =
-with
-> > > > > Intel we already use the microarchitecture name, so the EPYC CP=
-U should
-> > > > > have been named ZEN-Server and for Ryzen CPUs there should be Z=
-EN-Client
-> > > > > if there is any difference or otherwise we can simply use ZEN.
-> > > > >=20
-> > > > > The issue here is what happens once the ZEN2 microarchitecture =
-is out
-> > > > > wihch introduces new features and we will have to come up with =
-a CPU
-> > > > > name.
-> > > > >=20
-> > > > > Obviously we cannot change/remove the EPYC models so the questi=
-on is
-> > > > > what is the difference between the AMD EPYC CPU and this new Dh=
-yana CPU
-> > > > > if they are both based on the ZEN microarchitecture?
-> > > >=20
-> > > > Right now there's no much difference between Dhyana and EPYC from=
- the
-> > > > software's view. Dhyana removed the instructions aes, pclmulqdq, =
-sha_ni
-> > > > compared to EPYC, but will have it's own implementation such as f=
-or aes in
-> > > > future CPU models. Hygon also will implement something different =
-from AMD in
-> > > > the future.
-> > > >=20
-> > > > > In addition is there any way how we can introduce ZEN-Server &
-> > > > > ZEN-Client or simply ZEN, if there is no difference, as an alia=
-s or a
-> > > > > new model next to the EPYC?
-> > > >=20
-> > > > Also as Eduardo mentioned that there's no CPU model alias or inhe=
-ritance
-> > > > system in x86, so I think it's worthwhile to keep a separate CPU =
-model for
-> > > > Hygon.
-> > >=20
-> > > So what happens once Zen2 is out and there are new Dhyana CPUs base=
-d on
-> > > the Zen2 microarchitecture with some new features, what CPU models =
-we
-> > > will introduce, EPYC-G2 and Dhyana-G2, but that will not correspond=
- to
-> > > the CPU model anymore.
-> > >=20
-> > > My idea was that we should probably introduce CPU model Zen-Server =
-which
-> > > could cover both EPYC and Dhyana as they are both based on the Zen
-> > > microarchitecture.  The fact that Dhyana doesn't support all the
-> > > features is not an issue as QEMU will not use them if they are not
-> > > available on the host.
+The patch looks OK code-wise, but could you submit it to the mailing list, =
+please?
+https://wiki.qemu.org/Contribute/SubmitAPatch has the details, but the most=
+ important part is that it needs a Signed-off-by: line from you that says y=
+ou have the legal right and are willing to contribute it to QEMU under our =
+license. Otherwise we can't use the patch.
 
-It is an issue.  The fact that features are missing has huge
-importance for most virtualization management software that
-supports live migration.
+-- =
 
-Not having the "enforce" flag enabled by default was a mistake,
-but it's hard to fix because we don't want to break backwards
-compatibility.
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1825359
 
-> >=20
-> > I don't think this is a good idea. AFAICT, Dhyana and EPYC should not=
- be
-> > thought of as the same microarchitecture. Dhyana is a fork of the Zen
-> > microarchitecture as illustrated by the dropping of a number of CPU
-> > features. The Dhyana SEV patches show that it has had other significa=
-nt
-> > changes, which are likely to require extra work in QEMU to support to=
-o.
->=20
-> Fair enough, still the point stands that we should use the name of the
-> microarchitecture.
+Title:
+  cpu_ld*_code() triggers MMU_DATA_LOAD i.s.o. MMU_INST_FETCH
 
-Note that using "microarchitecture[-variant]" is likely to be
-necessary if there's variation inside the same microarchitecture.
-We absolutely need to use different names for different sets of
-CPU features if we want to support them out of the box.
+Status in QEMU:
+  Confirmed
 
-Note that we can't (and don't need to) enumerate all possible
-combinations of features that exist in the world.  I let CPU
-vendors who submit patches decide which combinations of features
-are important to be supported out of the box.
+Bug description:
+  commit 377b155bde451d5ac545fbdcdfbf6ca17a4228f5
+  Merge: c876180938 328eb60dc1
+  Author: Peter Maydell <peter.x@x.x>        ; masked for anti-spamming pur=
+poses
+  Date:   Mon Mar 11 18:26:37 2019 +0000
+  https://github.com/qemu/qemu/commit/377b155bde451d5ac545fbdcdfbf6ca17a422=
+8f5
+  --------------------------------------------------
 
-Dhyana adds to the complexity, because of the new CPU vendor ID.
-Different vendor IDs require different CPU models because the CPU
-model contains family/model/stepping/model_id values that make
-sense only in conjunction with the vendor ID.  Should we call it
-Zen-Dhyana?  Dhyana_G1?  I think I'll just let the Hygon
-developers decide.
+  cpu_ld*_code() is used for loading code data as the name suggests. Althou=
+gh, it begins accessing memory with MMU_INST_FETCH access type, somewhere d=
+own
+  the road, when the "io_readx(..., access_type=3DMMU_INST_FETCH, ...)" is
+  called, it is ignoring this "access_type" while calling the "tlb_fill()"
+  with a _hardcoded_ MMU_DATA_LOAD:
 
---=20
-Eduardo
+  cputlb.c
+  --------
+  static uint64_t io_readx(..., MMUAccessType access_type, ...)
+  {
+
+  =C2=A0=C2=A0=C2=A0=C2=A0if (recheck) {
+  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0CPUTLBEntry *entry;
+  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0target_ulong tlb_addr;
+
+  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0tlb_fill(cpu, addr, size,=
+ MMU_DATA_LOAD, mmu_idx, retaddr);
+  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0...
+  }
+  --------
+
+  This is an issue, because there can exist _small_ regions of memory (smal=
+ler
+  than the TARGET_PAGE_SIZE) that are only executable and not readable.
+
+  TL;DR
+
+  What happens is at first, a "tlb_fill(..., access_type=3DMMU_INST_FETCH, =
+...)"
+  is triggered by "tb_lookup_cpu_state()". To be precise, this is the call
+  stack which is good behavior:
+  ---
+  #0  tlb_fill (cs=3D..., vaddr=3D684, size=3D0, access_type=3DMMU_INST_FET=
+CH, mmu_idx=3D0, retaddr=3D0) at target/arc/mmu.c:602
+  #1  get_page_addr_code (env=3D..., addr=3D684) at accel/tcg/cputlb.c:1045
+  #2  tb_htable_lookup (cpu=3D..., pc=3D684, cs_base=3D0, flags=3D0, cf_mas=
+k=3D4278190080) at accel/tcg/cpu-exec.c:337
+  #3  tb_lookup__cpu_state (cpu=3D..., pc=3D..., cs_base=3D..., flags=3D...=
+, cf_mask=3D4278190080) at include/exec/tb-lookup.h:43
+  #4  tb_find (cpu=3D..., last_tb=3D... <code_gen_buffer+17811>, tb_exit=3D=
+0, cf_mask=3D0) at accel/tcg/cpu-exec.c:404
+  #5  cpu_exec (cpu=3D...) at accel/tcg/cpu-exec.c:729
+  #6  tcg_cpu_exec (cpu=3D...) at cpus.c:1430
+  #7  qemu_tcg_rr_cpu_thread_fn (arg=3D...) at cpus.c:1531
+  #8  qemu_thread_start (args=3D...) at util/qemu-thread-posix.c:502
+  ---
+
+  After this call, TLB is filled with an entry that its size field is small,
+  say 32 bytes. This causes a TLB_RECHECK for consequent memory accesses, w=
+hich =
+
+  is logical. However, in our decoder, we use cpu_lduw_code() to read the
+  instructions and decode them. As mentioned, in the beginning, the
+  access_type=3DMMU_INST_FETCH is lost in "io_readx()" while calling tlb_fi=
+ll()",
+  and now THIS CAUSES A GUEST EXCEPTION BECAUSE THAT REGION IS NOT ALLOWED =
+TO
+  BE READ. Here, comes that trace call of the _bad_ behavior:
+  ---
+  #0  tlb_fill (..., access_type=3DMMU_DATA_LOAD, ...) at target/arc/mmu.c:=
+605
+  #1  io_readx (..., access_type=3DMMU_INST_FETCH, size=3D2) at accel/tcg/c=
+putlb.c:881
+  #2  io_readw (..., access_type=3DMMU_INST_FETCH) at accel/tcg/softmmu_tem=
+plate.h:106
+  #3  helper_le_ldw_cmmu (..., oi=3D16, retaddr=3D0) at accel/tcg/softmmu_t=
+emplate.h:146
+  #4  cpu_lduw_code_ra (env=3D..., ptr=3D684, retaddr=3D0) at include/exec/=
+cpu_ldst_template.h:102
+  #5  cpu_lduw_code (env=3D..., ptr=3D684) at include/exec/cpu_ldst_templat=
+e.h:114
+  #6  read_and_decode_context (ctx=3D..., opcode_p=3D...) at target/arc/arc=
+-decoder.c:1479
+  #7  arc_decode (ctx=3D...) at target/arc/arc-decoder.c:1736
+  #8  decode_opc (env=3D..., ctx=3D...) at target/arc/translate.c:313
+  #9  arc_tr_translate_insn (dcbase=3D..., cpu=3D...) at target/arc/transla=
+te.c:335
+  #10 translator_loop (.. <code_gen_buffer+18131>) at accel/tcg/translator.=
+c:107
+  #11 gen_intermediate_code (cpu=3D..., tb=3D... <code_gen_buffer+18131>) a=
+t target/arc/translate.c:413
+  #12 tb_gen_code (cpu=3D..., pc=3D684, cs_base=3D0, flags=3D0, cflags=3D-1=
+6711679) at accel/tcg/translate-all.c:1723
+  #13 tb_find (cpu=3D..., last_tb=3D... <code_gen_buffer+17811>, tb_exit=3D=
+0, cf_mask=3D0) at accel/tcg/cpu-exec.c:407
+  #14 cpu_exec (cpu=3D...) at accel/tcg/cpu-exec.c:729
+  #15 tcg_cpu_exec (cpu=3D...) at cpus.c:1430
+
+  ---
+
+  Do you confirm if this is an issue? Maybe there are other ways to read
+  an instruction with MMU_INST_FETCH access that I don't know about.
+
+  Last but not least, although this is not a security issue for QEMU per
+  se, but it is hindering a security feature for the guest.
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1825359/+subscriptions
 
