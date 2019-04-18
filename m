@@ -2,75 +2,93 @@ Return-Path: <SRS0=08iY=SU=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_PASS,URIBL_BLOCKED autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.5 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_PASS,URIBL_BLOCKED,USER_AGENT_NEOMUTT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 28405C10F0E
-	for <qemu-devel@archiver.kernel.org>; Thu, 18 Apr 2019 14:23:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 46040C10F0E
+	for <qemu-devel@archiver.kernel.org>; Thu, 18 Apr 2019 14:24:14 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id DF50F20675
-	for <qemu-devel@archiver.kernel.org>; Thu, 18 Apr 2019 14:23:08 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DF50F20675
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
+	by mail.kernel.org (Postfix) with ESMTPS id 0F2202054F
+	for <qemu-devel@archiver.kernel.org>; Thu, 18 Apr 2019 14:24:13 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="t9p+yXED"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0F2202054F
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:42155 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:42166 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hH7wS-0001jJ-55
-	for qemu-devel@archiver.kernel.org; Thu, 18 Apr 2019 10:23:08 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:56703)
+	id 1hH7xV-0002QJ-8R
+	for qemu-devel@archiver.kernel.org; Thu, 18 Apr 2019 10:24:13 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:56773)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1hH7uD-0000GM-1j
-	for qemu-devel@nongnu.org; Thu, 18 Apr 2019 10:20:50 -0400
+	(envelope-from <richard.weiyang@gmail.com>) id 1hH7uS-0000Q4-Rp
+	for qemu-devel@nongnu.org; Thu, 18 Apr 2019 10:21:05 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1hH7uB-0001kU-Gl
-	for qemu-devel@nongnu.org; Thu, 18 Apr 2019 10:20:49 -0400
-Received: from indium.canonical.com ([91.189.90.7]:53054)
+	(envelope-from <richard.weiyang@gmail.com>) id 1hH7uR-000226-LE
+	for qemu-devel@nongnu.org; Thu, 18 Apr 2019 10:21:04 -0400
+Received: from mail-ed1-x544.google.com ([2a00:1450:4864:20::544]:33733)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1hH7uB-0001im-B2
-	for qemu-devel@nongnu.org; Thu, 18 Apr 2019 10:20:47 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1hH7uA-00013W-24
-	for <qemu-devel@nongnu.org>; Thu, 18 Apr 2019 14:20:46 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 078E52E80CB
-	for <qemu-devel@nongnu.org>; Thu, 18 Apr 2019 14:20:46 +0000 (UTC)
+	(Exim 4.71) (envelope-from <richard.weiyang@gmail.com>)
+	id 1hH7uR-0001yJ-Dk; Thu, 18 Apr 2019 10:21:03 -0400
+Received: by mail-ed1-x544.google.com with SMTP id d55so1980174ede.0;
+	Thu, 18 Apr 2019 07:21:01 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+	h=date:from:to:cc:subject:message-id:reply-to:references:mime-version
+	:content-disposition:in-reply-to:user-agent;
+	bh=4t/tUbXeb0HNo/GKit+uYhjPkXxvM3ccBoXJFKT8Cm0=;
+	b=t9p+yXEDLELaxdtqC/8l59Bxmjed0qB00eYjHQQTYhZlzLsjKBuGhTz3tukxkdA4Tf
+	1GCO//rUATlA/EqpeQOcicuoDpKnntmSMCg98F1yv/6w+NsjctcbWi0hOMDmuJI7qJVZ
+	aypmD0c3FfGvY63LMvxLPulCnukhRlswRTTe60SYcdTnt7nsfCHEMbPaBWMXMMcyFUI+
+	Dc2CwUELr8yEAiDU9zrwOkEFx6QwwjkMBmPdVZ650ABsUbZUGt7hF/tGfkjz9BnK4KC7
+	grDdv39Hv8Tsbf8E2T6FxWGm2MiYOJEUDl2I+6f2xTAr2Bblxcl42fRjl1iQn0g1oR1b
+	MI+w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=1e100.net; s=20161025;
+	h=x-gm-message-state:date:from:to:cc:subject:message-id:reply-to
+	:references:mime-version:content-disposition:in-reply-to:user-agent;
+	bh=4t/tUbXeb0HNo/GKit+uYhjPkXxvM3ccBoXJFKT8Cm0=;
+	b=k+LrlKF3gYgo+XIMhncEczm5j+zsBNDxh1VFzJWziZJHuvLoJXymIBoEGOwn/gECBg
+	H+woiXj69qM0oDWLeK0xp03B60Mdogn2SwdEfntc16D9GY3nw+ij26HMjIABM9ipE3vK
+	qLHUt5YmS4uGe6PJ4hHZzx2cuzt8iFRmUaFNrflrmOtW1wVDSqpWYMQOM6dA9z5w4Ypv
+	UYJf96qmZmMjJpvyPt+/+7CkvZA1W7YfP2zyY/gYkGz8Twmi1TlyFy6xbc8vIUHwv8v9
+	D5ITIcqaVqb2XqK/WtIF5sDkYuv1XjVjghjay9QzOPdlIKTJ2sBCnB53ubTBacrEdB3k
+	Ijog==
+X-Gm-Message-State: APjAAAXnjiA9fc/WemxP0gyNqntxJwB9TsJwTelrtbBJZfx+0Z2qbcFO
+	77w7fzoQ117zNly6ZK6ri3g=
+X-Google-Smtp-Source: APXvYqyi7knMdkdzazeZd+5fEpb2u0OXCP33YBx9IMlNyirFKidBdQ8jGVSV5XBvYh1N3B5wrecvEA==
+X-Received: by 2002:a17:906:a4b:: with SMTP id
+	x11mr52110173ejf.200.1555597260140; 
+	Thu, 18 Apr 2019 07:21:00 -0700 (PDT)
+Received: from localhost ([185.92.221.13])
+	by smtp.gmail.com with ESMTPSA id r29sm547358eda.37.2019.04.18.07.20.59
+	(version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
+	Thu, 18 Apr 2019 07:20:59 -0700 (PDT)
+Date: Thu, 18 Apr 2019 14:20:58 +0000
+From: Wei Yang <richard.weiyang@gmail.com>
+To: Igor Mammedov <imammedo@redhat.com>
+Message-ID: <20190418142058.qvicrirxfghfosiu@master>
+References: <20190417014038.26018-1-richardw.yang@linux.intel.com>
+	<20190417014038.26018-7-richardw.yang@linux.intel.com>
+	<20190418130241.635b2e97@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Thu, 18 Apr 2019 14:09:38 -0000
-From: Shahab Vahedi <1825359@bugs.launchpad.net>
-To: qemu-devel@nongnu.org
-X-Launchpad-Notification-Type: bug
-X-Launchpad-Bug: product=qemu; status=Confirmed; importance=Undecided;
-	assignee=None; 
-X-Launchpad-Bug-Tags: fetch mmu mpu
-X-Launchpad-Bug-Information-Type: Public
-X-Launchpad-Bug-Private: no
-X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: pmaydell shahab-vahedi
-X-Launchpad-Bug-Reporter: Shahab Vahedi (shahab-vahedi)
-X-Launchpad-Bug-Modifier: Shahab Vahedi (shahab-vahedi)
-References: <155558881987.7164.1099557133760519082.malonedeb@chaenomeles.canonical.com>
-Message-Id:
- <155559657895.6414.8767794573070268894.malone@chaenomeles.canonical.com>
-X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
-X-Launchpad-Message-For: qemu-devel-ml
-Precedence: bulk
-X-Generated-By: Launchpad (canonical.com); Revision="18928";
-	Instance="launchpad-lazr.conf"
-X-Launchpad-Hash: fb63ca726915e55c51decb3771ed44cb53543b5d
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 91.189.90.7
-Subject: [Qemu-devel] [Bug 1825359] Re: cpu_ld*_code() triggers
- MMU_DATA_LOAD i.s.o. MMU_INST_FETCH
+Content-Disposition: inline
+In-Reply-To: <20190418130241.635b2e97@redhat.com>
+User-Agent: NeoMutt/20170113 (1.7.2)
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+	recognized.
+X-Received-From: 2a00:1450:4864:20::544
+Subject: Re: [Qemu-devel] [PATCH v3 6/6] acpi: pci: use build_append_foo()
+ API to construct MCFG
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
+Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -79,175 +97,75 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1825359 <1825359@bugs.launchpad.net>
+Reply-To: Wei Yang <richard.weiyang@gmail.com>
+Cc: yang.zhong@intel.com, peter.maydell@linaro.org, mst@redhat.com,
+	qemu-devel@nongnu.org, shannon.zhaosl@gmail.com,
+	qemu-arm@nongnu.org, Wei Yang <richardw.yang@linux.intel.com>,
+	philmd@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190418140938.3k9FCAs-fqIODF6hDzaOMlY8WvAKyvq6GPN1Vj000rM@z>
+Message-ID: <20190418142058.yiZsKrXsauXNWCiLoVnVJOxxt607UIIvPIfYM2zuC10@z>
 
-I have to say, after applying this patch, my test still fails while
-fetching the instructions from this _small_ region. Although there is no
-MMU_DATA_LOAD anymore, a few iterations later (while guest code has just
-jumped to the beginning of the executable region), QEmu segfaults (call
-stack is attached):
+On Thu, Apr 18, 2019 at 01:02:41PM +0200, Igor Mammedov wrote:
+>On Wed, 17 Apr 2019 09:40:38 +0800
+>Wei Yang <richardw.yang@linux.intel.com> wrote:
+>
+>> build_append_foo() API doesn't need explicit endianness conversions
+>> which eliminates a source of errors and it makes build_mcfg() look like
+>> declarative definition of MCFG table in ACPI spec, which makes it easy
+>> to review.
+>> 
+>> Signed-off-by: Wei Yang <richardw.yang@linux.intel.com>
+>> Suggested-by: Igor Mammedov <imammedo@redhat.com>
+>Thanks for nice cleanup!
 
-memory.c
---------
-static MemTxResult
-memory_region_read_with_attrs_accessor(MemoryRegion *mr,
-                                       ...)
-{
-    uint64_t tmp =3D 0;
-    MemTxResult r;
+Glad you like it. :-)
 
-    r =3D mr->ops->read_with_attrs(mr->opaque, addr, &tmp, size, attrs);
-    ...
-}
---------
+>
+>with comment fixed up:
+>Reviewed-by: Igor Mammedov <imammedo@redhat.com>
+>
+>> ---
+>>  hw/acpi/pci.c               | 30 ++++++++++++++++++------------
+>>  include/hw/acpi/acpi-defs.h | 18 ------------------
+>>  2 files changed, 18 insertions(+), 30 deletions(-)
+>> 
+>> diff --git a/hw/acpi/pci.c b/hw/acpi/pci.c
+>> index fa0fa30bb9..05050fa087 100644
+>> --- a/hw/acpi/pci.c
+>> +++ b/hw/acpi/pci.c
+>> @@ -30,17 +30,23 @@
+>>  
+>>  void build_mcfg(GArray *table_data, BIOSLinker *linker, AcpiMcfgInfo *info)
+>>  {
+>> -    AcpiTableMcfg *mcfg;
+>> -    int len = sizeof(*mcfg) + sizeof(mcfg->allocation[0]);
+>> -
+>> -    mcfg = acpi_data_push(table_data, len);
+>> -    mcfg->allocation[0].address = cpu_to_le64(info->base);
+>> -
+>> -    /* Only a single allocation so no need to play with segments */
+>> -    mcfg->allocation[0].pci_segment = cpu_to_le16(0);
+>> -    mcfg->allocation[0].start_bus_number = 0;
+>> -    mcfg->allocation[0].end_bus_number = PCIE_MMCFG_BUS(info->size - 1);
+>> -
+>> -    build_header(linker, table_data, (void *)mcfg, "MCFG", len, 1, NULL, NULL);
+>> +    int mcfg_start = table_data->len;
+>> +
+>> +    acpi_data_push(table_data, sizeof(AcpiTableHeader));
+>> +
+>> +    /* PCI fw r3.0 MCFG table. */
+>It would be better to put spec name as is here so simple search
+>could immediately point to it.
+>
+>like: PCI Firmware Specification, Revision 3.0
+>      4.1.2 MCFG Table Description
+>
 
-Here, "read_with_attrs" is null. The call stack looks like:
----
-#0  memory_region_read_with_attrs_accessor at memory.c:465
-#1  access_with_adjusted_size at memory.c:568
-#2  memory_region_dispatch_read1 at memory.c:1425
-#3  memory_region_dispatch_read at memory.c:1446
-#4  io_readx at accel/tcg/cputlb.c:909
-#5  io_readw at accel/tcg/softmmu_template.h:106
-#6  helper_le_ldw_cmmu at accel/tcg/softmmu_template.h:146
-#7  cpu_lduw_code_ra at include/exec/cpu_ldst_template.h:102
-#8  cpu_lduw_code at include/exec/cpu_ldst_template.h:114
-#9  read_and_decode_context at target/arc/arc-decoder.c:1479
-#10 arc_decode at target/arc/arc-decoder.c:1736
-#11 decode_opc at target/arc/translate.c:313
-#12 arc_tr_translate_insn at target/arc/translate.c:335
-#13 translator_loop at accel/tcg/translator.c:107
-#14 gen_intermediate_code at target/arc/translate.c:413
-#15 tb_gen_code at accel/tcg/translate-all.c:1723
-#16 tb_find at accel/tcg/cpu-exec.c:407
-#17 cpu_exec at accel/tcg/cpu-exec.c:729
-#18 tcg_cpu_exec at cpus.c:1430
----
-more detailed call stack is attached.
+Sure, will change to this.
 
--- =
-
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1825359
-
-Title:
-  cpu_ld*_code() triggers MMU_DATA_LOAD i.s.o. MMU_INST_FETCH
-
-Status in QEMU:
-  Confirmed
-
-Bug description:
-  commit 377b155bde451d5ac545fbdcdfbf6ca17a4228f5
-  Merge: c876180938 328eb60dc1
-  Author: Peter Maydell <peter.x@x.x>        ; masked for anti-spamming pur=
-poses
-  Date:   Mon Mar 11 18:26:37 2019 +0000
-  https://github.com/qemu/qemu/commit/377b155bde451d5ac545fbdcdfbf6ca17a422=
-8f5
-  --------------------------------------------------
-
-  cpu_ld*_code() is used for loading code data as the name suggests. Althou=
-gh, it begins accessing memory with MMU_INST_FETCH access type, somewhere d=
-own
-  the road, when the "io_readx(..., access_type=3DMMU_INST_FETCH, ...)" is
-  called, it is ignoring this "access_type" while calling the "tlb_fill()"
-  with a _hardcoded_ MMU_DATA_LOAD:
-
-  cputlb.c
-  --------
-  static uint64_t io_readx(..., MMUAccessType access_type, ...)
-  {
-
-  =C2=A0=C2=A0=C2=A0=C2=A0if (recheck) {
-  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0CPUTLBEntry *entry;
-  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0target_ulong tlb_addr;
-
-  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0tlb_fill(cpu, addr, size,=
- MMU_DATA_LOAD, mmu_idx, retaddr);
-  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0...
-  }
-  --------
-
-  This is an issue, because there can exist _small_ regions of memory (smal=
-ler
-  than the TARGET_PAGE_SIZE) that are only executable and not readable.
-
-  TL;DR
-
-  What happens is at first, a "tlb_fill(..., access_type=3DMMU_INST_FETCH, =
-...)"
-  is triggered by "tb_lookup_cpu_state()". To be precise, this is the call
-  stack which is good behavior:
-  ---
-  #0  tlb_fill (cs=3D..., vaddr=3D684, size=3D0, access_type=3DMMU_INST_FET=
-CH, mmu_idx=3D0, retaddr=3D0) at target/arc/mmu.c:602
-  #1  get_page_addr_code (env=3D..., addr=3D684) at accel/tcg/cputlb.c:1045
-  #2  tb_htable_lookup (cpu=3D..., pc=3D684, cs_base=3D0, flags=3D0, cf_mas=
-k=3D4278190080) at accel/tcg/cpu-exec.c:337
-  #3  tb_lookup__cpu_state (cpu=3D..., pc=3D..., cs_base=3D..., flags=3D...=
-, cf_mask=3D4278190080) at include/exec/tb-lookup.h:43
-  #4  tb_find (cpu=3D..., last_tb=3D... <code_gen_buffer+17811>, tb_exit=3D=
-0, cf_mask=3D0) at accel/tcg/cpu-exec.c:404
-  #5  cpu_exec (cpu=3D...) at accel/tcg/cpu-exec.c:729
-  #6  tcg_cpu_exec (cpu=3D...) at cpus.c:1430
-  #7  qemu_tcg_rr_cpu_thread_fn (arg=3D...) at cpus.c:1531
-  #8  qemu_thread_start (args=3D...) at util/qemu-thread-posix.c:502
-  ---
-
-  After this call, TLB is filled with an entry that its size field is small,
-  say 32 bytes. This causes a TLB_RECHECK for consequent memory accesses, w=
-hich =
-
-  is logical. However, in our decoder, we use cpu_lduw_code() to read the
-  instructions and decode them. As mentioned, in the beginning, the
-  access_type=3DMMU_INST_FETCH is lost in "io_readx()" while calling tlb_fi=
-ll()",
-  and now THIS CAUSES A GUEST EXCEPTION BECAUSE THAT REGION IS NOT ALLOWED =
-TO
-  BE READ. Here, comes that trace call of the _bad_ behavior:
-  ---
-  #0  tlb_fill (..., access_type=3DMMU_DATA_LOAD, ...) at target/arc/mmu.c:=
-605
-  #1  io_readx (..., access_type=3DMMU_INST_FETCH, size=3D2) at accel/tcg/c=
-putlb.c:881
-  #2  io_readw (..., access_type=3DMMU_INST_FETCH) at accel/tcg/softmmu_tem=
-plate.h:106
-  #3  helper_le_ldw_cmmu (..., oi=3D16, retaddr=3D0) at accel/tcg/softmmu_t=
-emplate.h:146
-  #4  cpu_lduw_code_ra (env=3D..., ptr=3D684, retaddr=3D0) at include/exec/=
-cpu_ldst_template.h:102
-  #5  cpu_lduw_code (env=3D..., ptr=3D684) at include/exec/cpu_ldst_templat=
-e.h:114
-  #6  read_and_decode_context (ctx=3D..., opcode_p=3D...) at target/arc/arc=
--decoder.c:1479
-  #7  arc_decode (ctx=3D...) at target/arc/arc-decoder.c:1736
-  #8  decode_opc (env=3D..., ctx=3D...) at target/arc/translate.c:313
-  #9  arc_tr_translate_insn (dcbase=3D..., cpu=3D...) at target/arc/transla=
-te.c:335
-  #10 translator_loop (.. <code_gen_buffer+18131>) at accel/tcg/translator.=
-c:107
-  #11 gen_intermediate_code (cpu=3D..., tb=3D... <code_gen_buffer+18131>) a=
-t target/arc/translate.c:413
-  #12 tb_gen_code (cpu=3D..., pc=3D684, cs_base=3D0, flags=3D0, cflags=3D-1=
-6711679) at accel/tcg/translate-all.c:1723
-  #13 tb_find (cpu=3D..., last_tb=3D... <code_gen_buffer+17811>, tb_exit=3D=
-0, cf_mask=3D0) at accel/tcg/cpu-exec.c:407
-  #14 cpu_exec (cpu=3D...) at accel/tcg/cpu-exec.c:729
-  #15 tcg_cpu_exec (cpu=3D...) at cpus.c:1430
-
-  ---
-
-  Do you confirm if this is an issue? Maybe there are other ways to read
-  an instruction with MMU_INST_FETCH access that I don't know about.
-
-  Last but not least, although this is not a security issue for QEMU per
-  se, but it is hindering a security feature for the guest.
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1825359/+subscriptions
+-- 
+Wei Yang
+Help you, Help me
 
