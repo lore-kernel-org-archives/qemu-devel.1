@@ -1,31 +1,31 @@
-Received: from eggs.gnu.org ([209.51.188.92]:54738)
+Received: from eggs.gnu.org ([209.51.188.92]:54744)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1hHE0d-0005CH-3b
-	for qemu-devel@nongnu.org; Thu, 18 Apr 2019 16:51:53 -0400
+	(envelope-from <armbru@redhat.com>) id 1hHE0d-0005CS-4G
+	for qemu-devel@nongnu.org; Thu, 18 Apr 2019 16:51:54 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1hHE0U-0005FA-EE
+	(envelope-from <armbru@redhat.com>) id 1hHE0V-0005HI-Jo
 	for qemu-devel@nongnu.org; Thu, 18 Apr 2019 16:51:47 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:55346)
+Received: from mx1.redhat.com ([209.132.183.28]:52862)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1hHE0T-0005DZ-R2
-	for qemu-devel@nongnu.org; Thu, 18 Apr 2019 16:51:42 -0400
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1hHE0V-0005Df-2K
+	for qemu-devel@nongnu.org; Thu, 18 Apr 2019 16:51:43 -0400
 Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
 	[10.5.11.13])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 00AF581E19
+	by mx1.redhat.com (Postfix) with ESMTPS id 21F0EC04B94F
 	for <qemu-devel@nongnu.org>; Thu, 18 Apr 2019 20:51:41 +0000 (UTC)
 Received: from blackfin.pond.sub.org (ovpn-116-116.ams2.redhat.com
 	[10.36.116.116])
-	by smtp.corp.redhat.com (Postfix) with ESMTPS id 9DC1160852
+	by smtp.corp.redhat.com (Postfix) with ESMTPS id BB69660857
 	for <qemu-devel@nongnu.org>; Thu, 18 Apr 2019 20:51:40 +0000 (UTC)
 From: Markus Armbruster <armbru@redhat.com>
-Date: Thu, 18 Apr 2019 22:51:22 +0200
-Message-Id: <20190418205135.6686-24-armbru@redhat.com>
+Date: Thu, 18 Apr 2019 22:51:24 +0200
+Message-Id: <20190418205135.6686-26-armbru@redhat.com>
 In-Reply-To: <20190418205135.6686-1-armbru@redhat.com>
 References: <20190418205135.6686-1-armbru@redhat.com>
-Subject: [Qemu-devel] [PULL for-4.1 23/36] tcg: Simplify how
- dump_exec_info() prints
+Subject: [Qemu-devel] [PULL for-4.1 25/36] qsp: Simplify how qsp_report()
+ prints
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,10 +36,10 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-dump_exec_info() takes an fprintf()-like callback and a FILE * to pass
-to it.
+qsp_report() takes an fprintf()-like callback and a FILE * to pass to
+it.
 
-Its only caller hmp_info_jit() passes monitor_fprintf() and the
+Its only caller hmp_sync_profile() passes monitor_fprintf() and the
 current monitor cast to FILE *.  monitor_fprintf() casts it right
 back, and is otherwise identical to monitor_printf().  The
 type-punning is ugly.
@@ -48,258 +48,137 @@ Drop the callback, and call qemu_printf() instead.
 
 Signed-off-by: Markus Armbruster <armbru@redhat.com>
 Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
-Message-Id: <20190417191805.28198-5-armbru@redhat.com>
+Message-Id: <20190417191805.28198-7-armbru@redhat.com>
 ---
- accel/tcg/translate-all.c | 45 ++++++++++++++++++++-------------------
- include/exec/cpu-all.h    |  2 +-
- monitor.c                 |  2 +-
- tcg/tcg.c                 | 41 ++++++++++++++++++-----------------
- tcg/tcg.h                 |  2 +-
- 5 files changed, 47 insertions(+), 45 deletions(-)
+ include/block/qapi.h |  1 +
+ include/qemu/qsp.h   |  6 ++----
+ monitor.c            |  2 +-
+ util/qsp.c           | 21 +++++++++++----------
+ 4 files changed, 15 insertions(+), 15 deletions(-)
 
-diff --git a/accel/tcg/translate-all.c b/accel/tcg/translate-all.c
-index 85e80a1fad..75a6cf49f1 100644
---- a/accel/tcg/translate-all.c
-+++ b/accel/tcg/translate-all.c
-@@ -50,6 +50,7 @@
- #include "translate-all.h"
- #include "qemu/bitmap.h"
- #include "qemu/error-report.h"
-+#include "qemu/qemu-print.h"
- #include "qemu/timer.h"
- #include "qemu/main-loop.h"
- #include "exec/log.h"
-@@ -2214,8 +2215,7 @@ void tb_flush_jmp_cache(CPUState *cpu, target_ulong addr)
-     tb_jmp_cache_clear_page(cpu, addr);
- }
+diff --git a/include/block/qapi.h b/include/block/qapi.h
+index 83bdb098bd..a891f43b9c 100644
+--- a/include/block/qapi.h
++++ b/include/block/qapi.h
+@@ -27,6 +27,7 @@
  
--static void print_qht_statistics(FILE *f, fprintf_function cpu_fprintf,
--                                 struct qht_stats hst)
-+static void print_qht_statistics(struct qht_stats hst)
- {
-     uint32_t hgram_opts;
-     size_t hgram_bins;
-@@ -2224,7 +2224,7 @@ static void print_qht_statistics(FILE *f, fprintf_function cpu_fprintf,
-     if (!hst.head_buckets) {
-         return;
-     }
--    cpu_fprintf(f, "TB hash buckets     %zu/%zu (%0.2f%% head buckets used)\n",
-+    qemu_printf("TB hash buckets     %zu/%zu (%0.2f%% head buckets used)\n",
-                 hst.used_head_buckets, hst.head_buckets,
-                 (double)hst.used_head_buckets / hst.head_buckets * 100);
+ #include "block/block.h"
+ #include "block/snapshot.h"
++#include "qemu/fprintf-fn.h"
  
-@@ -2234,7 +2234,7 @@ static void print_qht_statistics(FILE *f, fprintf_function cpu_fprintf,
-         hgram_opts |= QDIST_PR_NODECIMAL;
-     }
-     hgram = qdist_pr(&hst.occupancy, 10, hgram_opts);
--    cpu_fprintf(f, "TB hash occupancy   %0.2f%% avg chain occ. Histogram: %s\n",
-+    qemu_printf("TB hash occupancy   %0.2f%% avg chain occ. Histogram: %s\n",
-                 qdist_avg(&hst.occupancy) * 100, hgram);
-     g_free(hgram);
+ BlockDeviceInfo *bdrv_block_device_info(BlockBackend *blk,
+                                         BlockDriverState *bs, Error **errp);
+diff --git a/include/qemu/qsp.h b/include/qemu/qsp.h
+index a94c464f90..bf36aabfa8 100644
+--- a/include/qemu/qsp.h
++++ b/include/qemu/qsp.h
+@@ -11,15 +11,13 @@
+ #ifndef QEMU_QSP_H
+ #define QEMU_QSP_H
  
-@@ -2247,7 +2247,7 @@ static void print_qht_statistics(FILE *f, fprintf_function cpu_fprintf,
-         hgram_opts |= QDIST_PR_NODECIMAL | QDIST_PR_NOBINRANGE;
-     }
-     hgram = qdist_pr(&hst.chain, hgram_bins, hgram_opts);
--    cpu_fprintf(f, "TB hash avg chain   %0.3f buckets. Histogram: %s\n",
-+    qemu_printf("TB hash avg chain   %0.3f buckets. Histogram: %s\n",
-                 qdist_avg(&hst.chain), hgram);
-     g_free(hgram);
- }
-@@ -2285,7 +2285,7 @@ static gboolean tb_tree_stats_iter(gpointer key, gpointer value, gpointer data)
-     return false;
- }
+-#include "qemu/fprintf-fn.h"
+-
+ enum QSPSortBy {
+     QSP_SORT_BY_TOTAL_WAIT_TIME,
+     QSP_SORT_BY_AVG_WAIT_TIME,
+ };
  
--void dump_exec_info(FILE *f, fprintf_function cpu_fprintf)
-+void dump_exec_info(void)
- {
-     struct tb_tree_stats tst = {};
-     struct qht_stats hst;
-@@ -2294,43 +2294,44 @@ void dump_exec_info(FILE *f, fprintf_function cpu_fprintf)
-     tcg_tb_foreach(tb_tree_stats_iter, &tst);
-     nb_tbs = tst.nb_tbs;
-     /* XXX: avoid using doubles ? */
--    cpu_fprintf(f, "Translation buffer state:\n");
-+    qemu_printf("Translation buffer state:\n");
-     /*
-      * Report total code size including the padding and TB structs;
-      * otherwise users might think "-tb-size" is not honoured.
-      * For avg host size we use the precise numbers from tb_tree_stats though.
-      */
--    cpu_fprintf(f, "gen code size       %zu/%zu\n",
-+    qemu_printf("gen code size       %zu/%zu\n",
-                 tcg_code_size(), tcg_code_capacity());
--    cpu_fprintf(f, "TB count            %zu\n", nb_tbs);
--    cpu_fprintf(f, "TB avg target size  %zu max=%zu bytes\n",
-+    qemu_printf("TB count            %zu\n", nb_tbs);
-+    qemu_printf("TB avg target size  %zu max=%zu bytes\n",
-                 nb_tbs ? tst.target_size / nb_tbs : 0,
-                 tst.max_target_size);
--    cpu_fprintf(f, "TB avg host size    %zu bytes (expansion ratio: %0.1f)\n",
-+    qemu_printf("TB avg host size    %zu bytes (expansion ratio: %0.1f)\n",
-                 nb_tbs ? tst.host_size / nb_tbs : 0,
-                 tst.target_size ? (double)tst.host_size / tst.target_size : 0);
--    cpu_fprintf(f, "cross page TB count %zu (%zu%%)\n", tst.cross_page,
--            nb_tbs ? (tst.cross_page * 100) / nb_tbs : 0);
--    cpu_fprintf(f, "direct jump count   %zu (%zu%%) (2 jumps=%zu %zu%%)\n",
-+    qemu_printf("cross page TB count %zu (%zu%%)\n", tst.cross_page,
-+                nb_tbs ? (tst.cross_page * 100) / nb_tbs : 0);
-+    qemu_printf("direct jump count   %zu (%zu%%) (2 jumps=%zu %zu%%)\n",
-                 tst.direct_jmp_count,
-                 nb_tbs ? (tst.direct_jmp_count * 100) / nb_tbs : 0,
-                 tst.direct_jmp2_count,
-                 nb_tbs ? (tst.direct_jmp2_count * 100) / nb_tbs : 0);
+-void qsp_report(FILE *f, fprintf_function cpu_fprintf, size_t max,
+-                enum QSPSortBy sort_by, bool callsite_coalesce);
++void qsp_report(size_t max, enum QSPSortBy sort_by,
++                bool callsite_coalesce);
  
-     qht_statistics_init(&tb_ctx.htable, &hst);
--    print_qht_statistics(f, cpu_fprintf, hst);
-+    print_qht_statistics(hst);
-     qht_statistics_destroy(&hst);
- 
--    cpu_fprintf(f, "\nStatistics:\n");
--    cpu_fprintf(f, "TB flush count      %u\n",
-+    qemu_printf("\nStatistics:\n");
-+    qemu_printf("TB flush count      %u\n",
-                 atomic_read(&tb_ctx.tb_flush_count));
--    cpu_fprintf(f, "TB invalidate count %zu\n", tcg_tb_phys_invalidate_count());
-+    qemu_printf("TB invalidate count %zu\n",
-+                tcg_tb_phys_invalidate_count());
- 
-     tlb_flush_counts(&flush_full, &flush_part, &flush_elide);
--    cpu_fprintf(f, "TLB full flushes    %zu\n", flush_full);
--    cpu_fprintf(f, "TLB partial flushes %zu\n", flush_part);
--    cpu_fprintf(f, "TLB elided flushes  %zu\n", flush_elide);
--    tcg_dump_info(f, cpu_fprintf);
-+    qemu_printf("TLB full flushes    %zu\n", flush_full);
-+    qemu_printf("TLB partial flushes %zu\n", flush_part);
-+    qemu_printf("TLB elided flushes  %zu\n", flush_elide);
-+    tcg_dump_info();
- }
- 
- void dump_opcount_info(void)
-diff --git a/include/exec/cpu-all.h b/include/exec/cpu-all.h
-index 40f5edf4dc..da07ce311f 100644
---- a/include/exec/cpu-all.h
-+++ b/include/exec/cpu-all.h
-@@ -362,7 +362,7 @@ static inline bool tlb_hit(target_ulong tlb_addr, target_ulong addr)
-     return tlb_hit_page(tlb_addr, addr & TARGET_PAGE_MASK);
- }
- 
--void dump_exec_info(FILE *f, fprintf_function cpu_fprintf);
-+void dump_exec_info(void);
- void dump_opcount_info(void);
- #endif /* !CONFIG_USER_ONLY */
- 
+ bool qsp_is_enabled(void);
+ void qsp_enable(void);
 diff --git a/monitor.c b/monitor.c
-index 30a7ffe32b..24e4d49d11 100644
+index 7573689585..1650ceec3a 100644
 --- a/monitor.c
 +++ b/monitor.c
-@@ -1318,7 +1318,7 @@ static void hmp_info_jit(Monitor *mon, const QDict *qdict)
-         return;
+@@ -1336,7 +1336,7 @@ static void hmp_info_sync_profile(Monitor *mon, const QDict *qdict)
+     enum QSPSortBy sort_by;
+ 
+     sort_by = mean ? QSP_SORT_BY_AVG_WAIT_TIME : QSP_SORT_BY_TOTAL_WAIT_TIME;
+-    qsp_report((FILE *)mon, monitor_fprintf, max, sort_by, coalesce);
++    qsp_report(max, sort_by, coalesce);
+ }
+ 
+ static void hmp_info_history(Monitor *mon, const QDict *qdict)
+diff --git a/util/qsp.c b/util/qsp.c
+index 410f1ba004..5264c97342 100644
+--- a/util/qsp.c
++++ b/util/qsp.c
+@@ -56,7 +56,9 @@
+  *   Critical-Section Execution to Improve the Performance of Multithreaded
+  *   Applications", USENIX ATC'12.
+  */
++
+ #include "qemu/osdep.h"
++#include "qemu/qemu-print.h"
+ #include "qemu/thread.h"
+ #include "qemu/timer.h"
+ #include "qemu/qht.h"
+@@ -678,8 +680,7 @@ static gboolean qsp_tree_report(gpointer key, gpointer value, gpointer udata)
+     return FALSE;
+ }
+ 
+-static void
+-pr_report(const QSPReport *rep, FILE *f, fprintf_function pr)
++static void pr_report(const QSPReport *rep)
+ {
+     char *dashes;
+     size_t max_len = 0;
+@@ -702,15 +703,15 @@ pr_report(const QSPReport *rep, FILE *f, fprintf_function pr)
+     /* white space to leave to the right of "Call site" */
+     callsite_rspace = callsite_len - strlen("Call site");
+ 
+-    pr(f, "Type               Object  Call site%*s  Wait Time (s)  "
+-       "       Count  Average (us)\n", callsite_rspace, "");
++    qemu_printf("Type               Object  Call site%*s  Wait Time (s)  "
++                "       Count  Average (us)\n", callsite_rspace, "");
+ 
+     /* build a horizontal rule with dashes */
+     n_dashes = 79 + callsite_rspace;
+     dashes = g_malloc(n_dashes + 1);
+     memset(dashes, '-', n_dashes);
+     dashes[n_dashes] = '\0';
+-    pr(f, "%s\n", dashes);
++    qemu_printf("%s\n", dashes);
+ 
+     for (i = 0; i < rep->n_entries; i++) {
+         const QSPReportEntry *e = &rep->entries[i];
+@@ -726,11 +727,11 @@ pr_report(const QSPReport *rep, FILE *f, fprintf_function pr)
+                                e->callsite_at,
+                                callsite_len - (int)strlen(e->callsite_at), "",
+                                e->time_s, e->n_acqs, e->ns_avg * 1e-3);
+-        pr(f, "%s", s->str);
++        qemu_printf("%s", s->str);
+         g_string_free(s, TRUE);
      }
  
--    dump_exec_info((FILE *)mon, monitor_fprintf);
-+    dump_exec_info();
-     dump_drift_info((FILE *)mon, monitor_fprintf);
+-    pr(f, "%s\n", dashes);
++    qemu_printf("%s\n", dashes);
+     g_free(dashes);
  }
  
-diff --git a/tcg/tcg.c b/tcg/tcg.c
-index cc5f4e2a03..6a22c8746c 100644
---- a/tcg/tcg.c
-+++ b/tcg/tcg.c
-@@ -4015,7 +4015,7 @@ int tcg_gen_code(TCGContext *s, TranslationBlock *tb)
+@@ -746,8 +747,8 @@ static void report_destroy(QSPReport *rep)
+     g_free(rep->entries);
  }
  
- #ifdef CONFIG_PROFILER
--void tcg_dump_info(FILE *f, fprintf_function cpu_fprintf)
-+void tcg_dump_info(void)
+-void qsp_report(FILE *f, fprintf_function cpu_fprintf, size_t max,
+-                enum QSPSortBy sort_by, bool callsite_coalesce)
++void qsp_report(size_t max, enum QSPSortBy sort_by,
++                bool callsite_coalesce)
  {
-     TCGProfile prof = {};
-     const TCGProfile *s;
-@@ -4029,52 +4029,53 @@ void tcg_dump_info(FILE *f, fprintf_function cpu_fprintf)
-     tb_div_count = tb_count ? tb_count : 1;
-     tot = s->interm_time + s->code_time;
+     GTree *tree = g_tree_new_full(qsp_tree_cmp, &sort_by, g_free, NULL);
+     QSPReport rep;
+@@ -762,7 +763,7 @@ void qsp_report(FILE *f, fprintf_function cpu_fprintf, size_t max,
+     g_tree_foreach(tree, qsp_tree_report, &rep);
+     g_tree_destroy(tree);
  
--    cpu_fprintf(f, "JIT cycles          %" PRId64 " (%0.3f s at 2.4 GHz)\n",
-+    qemu_printf("JIT cycles          %" PRId64 " (%0.3f s at 2.4 GHz)\n",
-                 tot, tot / 2.4e9);
--    cpu_fprintf(f, "translated TBs      %" PRId64 " (aborted=%" PRId64 " %0.1f%%)\n", 
-+    qemu_printf("translated TBs      %" PRId64 " (aborted=%" PRId64
-+                " %0.1f%%)\n",
-                 tb_count, s->tb_count1 - tb_count,
-                 (double)(s->tb_count1 - s->tb_count)
-                 / (s->tb_count1 ? s->tb_count1 : 1) * 100.0);
--    cpu_fprintf(f, "avg ops/TB          %0.1f max=%d\n", 
-+    qemu_printf("avg ops/TB          %0.1f max=%d\n",
-                 (double)s->op_count / tb_div_count, s->op_count_max);
--    cpu_fprintf(f, "deleted ops/TB      %0.2f\n",
-+    qemu_printf("deleted ops/TB      %0.2f\n",
-                 (double)s->del_op_count / tb_div_count);
--    cpu_fprintf(f, "avg temps/TB        %0.2f max=%d\n",
-+    qemu_printf("avg temps/TB        %0.2f max=%d\n",
-                 (double)s->temp_count / tb_div_count, s->temp_count_max);
--    cpu_fprintf(f, "avg host code/TB    %0.1f\n",
-+    qemu_printf("avg host code/TB    %0.1f\n",
-                 (double)s->code_out_len / tb_div_count);
--    cpu_fprintf(f, "avg search data/TB  %0.1f\n",
-+    qemu_printf("avg search data/TB  %0.1f\n",
-                 (double)s->search_out_len / tb_div_count);
-     
--    cpu_fprintf(f, "cycles/op           %0.1f\n", 
-+    qemu_printf("cycles/op           %0.1f\n",
-                 s->op_count ? (double)tot / s->op_count : 0);
--    cpu_fprintf(f, "cycles/in byte      %0.1f\n", 
-+    qemu_printf("cycles/in byte      %0.1f\n",
-                 s->code_in_len ? (double)tot / s->code_in_len : 0);
--    cpu_fprintf(f, "cycles/out byte     %0.1f\n", 
-+    qemu_printf("cycles/out byte     %0.1f\n",
-                 s->code_out_len ? (double)tot / s->code_out_len : 0);
--    cpu_fprintf(f, "cycles/search byte     %0.1f\n",
-+    qemu_printf("cycles/search byte     %0.1f\n",
-                 s->search_out_len ? (double)tot / s->search_out_len : 0);
-     if (tot == 0) {
-         tot = 1;
-     }
--    cpu_fprintf(f, "  gen_interm time   %0.1f%%\n", 
-+    qemu_printf("  gen_interm time   %0.1f%%\n",
-                 (double)s->interm_time / tot * 100.0);
--    cpu_fprintf(f, "  gen_code time     %0.1f%%\n", 
-+    qemu_printf("  gen_code time     %0.1f%%\n",
-                 (double)s->code_time / tot * 100.0);
--    cpu_fprintf(f, "optim./code time    %0.1f%%\n",
-+    qemu_printf("optim./code time    %0.1f%%\n",
-                 (double)s->opt_time / (s->code_time ? s->code_time : 1)
-                 * 100.0);
--    cpu_fprintf(f, "liveness/code time  %0.1f%%\n", 
-+    qemu_printf("liveness/code time  %0.1f%%\n",
-                 (double)s->la_time / (s->code_time ? s->code_time : 1) * 100.0);
--    cpu_fprintf(f, "cpu_restore count   %" PRId64 "\n",
-+    qemu_printf("cpu_restore count   %" PRId64 "\n",
-                 s->restore_count);
--    cpu_fprintf(f, "  avg cycles        %0.1f\n",
-+    qemu_printf("  avg cycles        %0.1f\n",
-                 s->restore_count ? (double)s->restore_time / s->restore_count : 0);
+-    pr_report(&rep, f, cpu_fprintf);
++    pr_report(&rep);
+     report_destroy(&rep);
  }
- #else
--void tcg_dump_info(FILE *f, fprintf_function cpu_fprintf)
-+void tcg_dump_info(void)
- {
--    cpu_fprintf(f, "[TCG profiler not compiled]\n");
-+    qemu_printf("[TCG profiler not compiled]\n");
- }
- #endif
  
-diff --git a/tcg/tcg.h b/tcg/tcg.h
-index 9f2b03f119..a394d78237 100644
---- a/tcg/tcg.h
-+++ b/tcg/tcg.h
-@@ -1017,7 +1017,7 @@ int tcg_check_temp_count(void);
- #endif
- 
- int64_t tcg_cpu_exec_time(void);
--void tcg_dump_info(FILE *f, fprintf_function cpu_fprintf);
-+void tcg_dump_info(void);
- void tcg_dump_op_count(void);
- 
- #define TCG_CT_ALIAS  0x80
 -- 
 2.17.2
