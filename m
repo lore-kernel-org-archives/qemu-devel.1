@@ -2,72 +2,71 @@ Return-Path: <SRS0=08iY=SU=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 53D0BC10F0E
-	for <qemu-devel@archiver.kernel.org>; Thu, 18 Apr 2019 14:11:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F0CC9C10F0E
+	for <qemu-devel@archiver.kernel.org>; Thu, 18 Apr 2019 14:12:38 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1125D21479
-	for <qemu-devel@archiver.kernel.org>; Thu, 18 Apr 2019 14:11:58 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1125D21479
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id A3BE420675
+	for <qemu-devel@archiver.kernel.org>; Thu, 18 Apr 2019 14:12:38 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A3BE420675
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=canonical.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:42039 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:42045 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hH7le-0006eZ-8a
-	for qemu-devel@archiver.kernel.org; Thu, 18 Apr 2019 10:11:58 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:54871)
+	id 1hH7mH-000766-U4
+	for qemu-devel@archiver.kernel.org; Thu, 18 Apr 2019 10:12:37 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:54927)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1hH7ka-0006Dc-SM
-	for qemu-devel@nongnu.org; Thu, 18 Apr 2019 10:10:54 -0400
+	(envelope-from <bounces@canonical.com>) id 1hH7l0-0006Qu-4q
+	for qemu-devel@nongnu.org; Thu, 18 Apr 2019 10:11:20 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1hH7kZ-0002N9-Cw
-	for qemu-devel@nongnu.org; Thu, 18 Apr 2019 10:10:52 -0400
-Received: from indium.canonical.com ([91.189.90.7]:50816)
+	(envelope-from <bounces@canonical.com>) id 1hH7kw-0002Wk-EK
+	for qemu-devel@nongnu.org; Thu, 18 Apr 2019 10:11:18 -0400
+Received: from indium.canonical.com ([91.189.90.7]:51740)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1hH7kZ-0002Mc-7O
-	for qemu-devel@nongnu.org; Thu, 18 Apr 2019 10:10:51 -0400
+	id 1hH7kw-0002WK-5I
+	for qemu-devel@nongnu.org; Thu, 18 Apr 2019 10:11:14 -0400
 Received: from loganberry.canonical.com ([91.189.90.37])
 	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1hH7kX-0008A7-Pf
-	for <qemu-devel@nongnu.org>; Thu, 18 Apr 2019 14:10:49 +0000
+	id 1hH7kv-00007S-BD
+	for <qemu-devel@nongnu.org>; Thu, 18 Apr 2019 14:11:13 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id C0FEF2E80C7
-	for <qemu-devel@nongnu.org>; Thu, 18 Apr 2019 14:10:49 +0000 (UTC)
+	by loganberry.canonical.com (Postfix) with ESMTP id 52CFE2E8058
+	for <qemu-devel@nongnu.org>; Thu, 18 Apr 2019 14:11:13 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Thu, 18 Apr 2019 13:57:17 -0000
-From: Peter Maydell <peter.maydell@linaro.org>
+Date: Thu, 18 Apr 2019 13:57:02 -0000
+From: =?utf-8?q?Jos=C3=A9_Pekkarinen?= <jose.pekkarinen@canonical.com>
 To: qemu-devel@nongnu.org
 X-Launchpad-Notification-Type: bug
-X-Launchpad-Bug: product=qemu; status=Confirmed; importance=Undecided;
-	assignee=None; 
-X-Launchpad-Bug-Tags: fetch mmu mpu
+X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
 X-Launchpad-Bug-Information-Type: Public
 X-Launchpad-Bug-Private: no
 X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: pmaydell shahab-vahedi
-X-Launchpad-Bug-Reporter: Shahab Vahedi (shahab-vahedi)
-X-Launchpad-Bug-Modifier: Peter Maydell (pmaydell)
-References: <155558881987.7164.1099557133760519082.malonedeb@chaenomeles.canonical.com>
-Message-Id: <155559583796.13663.2699453179469163573.malone@gac.canonical.com>
+X-Launchpad-Bug-Commenters: koalinux
+X-Launchpad-Bug-Reporter: =?utf-8?q?Jos=C3=A9_Pekkarinen_=28koalinux=29?=
+X-Launchpad-Bug-Modifier: =?utf-8?q?Jos=C3=A9_Pekkarinen_=28koalinux=29?=
+References: <155156252741.17588.3363806743942119527.malonedeb@gac.canonical.com>
+Message-Id:
+ <155559582214.13953.17958690867416423547.malone@wampee.canonical.com>
 X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
 X-Launchpad-Message-For: qemu-devel-ml
 Precedence: bulk
 X-Generated-By: Launchpad (canonical.com); Revision="18928";
 	Instance="launchpad-lazr.conf"
-X-Launchpad-Hash: e10aa327f37fd40c56d5f0ca7a813102929b2b8e
+X-Launchpad-Hash: 3baa9df181b89c15cafcf762e3864230f1281b59
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 91.189.90.7
-Subject: [Qemu-devel] [Bug 1825359] Re: cpu_ld*_code() triggers
- MMU_DATA_LOAD i.s.o. MMU_INST_FETCH
+Subject: [Qemu-devel] [Bug 1818367] Re: Initialization of device
+ cfi.pflash01 failed: Block node is read-only
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 List-Id: <qemu-devel.nongnu.org>
@@ -78,138 +77,435 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1825359 <1825359@bugs.launchpad.net>
+Reply-To: Bug 1818367 <1818367@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190418135717.AMbWab2orKst-6amlEbIS97mmcgTifQ_lITlyh6UMLA@z>
+Message-ID: <20190418135702._EJmDPy2U2VhWx50wIOj6KykYIXxZX2E28wlp8_v6B8@z>
 
-The patch looks OK code-wise, but could you submit it to the mailing list, =
-please?
-https://wiki.qemu.org/Contribute/SubmitAPatch has the details, but the most=
- important part is that it needs a Signed-off-by: line from you that says y=
-ou have the legal right and are willing to contribute it to QEMU under our =
-license. Otherwise we can't use the patch.
+The uncommented piece of my /etc/libvirt/qemu.conf.
+
+vnc_listen =3D "192.168.0.61"
+
+user =3D "root"
+
+group =3D "root"
+
+dynamic_ownership =3D 0
+
+nvram =3D [
+   "/usr/share/edk2-ovmf/OVMF_CODE.fd:/usr/share/edk2-ovmf/OVMF_VARS.fd",
+]
+
+For some reason, emails directly from mailing list are not hitting my inbox
+so I managed to miss this:
+
+https://www.mail-archive.com/qemu-devel@nongnu.org/msg600959.html
+
+Please ensure it's sent to my email when answering.
+
+Thanks!
+
+Jos=C3=A9.
 
 -- =
 
 You received this bug notification because you are a member of qemu-
 devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1825359
+https://bugs.launchpad.net/bugs/1818367
 
 Title:
-  cpu_ld*_code() triggers MMU_DATA_LOAD i.s.o. MMU_INST_FETCH
+  Initialization of device cfi.pflash01 failed: Block node is read-only
 
 Status in QEMU:
-  Confirmed
+  New
 
 Bug description:
-  commit 377b155bde451d5ac545fbdcdfbf6ca17a4228f5
-  Merge: c876180938 328eb60dc1
-  Author: Peter Maydell <peter.x@x.x>        ; masked for anti-spamming pur=
-poses
-  Date:   Mon Mar 11 18:26:37 2019 +0000
-  https://github.com/qemu/qemu/commit/377b155bde451d5ac545fbdcdfbf6ca17a422=
-8f5
-  --------------------------------------------------
+  Hi,
 
-  cpu_ld*_code() is used for loading code data as the name suggests. Althou=
-gh, it begins accessing memory with MMU_INST_FETCH access type, somewhere d=
-own
-  the road, when the "io_readx(..., access_type=3DMMU_INST_FETCH, ...)" is
-  called, it is ignoring this "access_type" while calling the "tlb_fill()"
-  with a _hardcoded_ MMU_DATA_LOAD:
+  I have several vms defined in libvirt using ovmf for uefi, since a later
+  update of my server I'm unable to start any of the domains defined. This =
+is
+  an example of the output given:
 
-  cputlb.c
-  --------
-  static uint64_t io_readx(..., MMUAccessType access_type, ...)
-  {
+  # virsh start os-1
+  error: Failed to start domain os-1
+  error: internal error: qemu unexpectedly closed the monitor: 2019-03-02T2=
+1:23:51.726446Z qemu-system-x86_64: Initialization of device cfi.pflash01 f=
+ailed: Block node is read-only
 
-  =C2=A0=C2=A0=C2=A0=C2=A0if (recheck) {
-  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0CPUTLBEntry *entry;
-  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0target_ulong tlb_addr;
+  an example of domain is like this:
 
-  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0tlb_fill(cpu, addr, size,=
- MMU_DATA_LOAD, mmu_idx, retaddr);
-  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0...
-  }
-  --------
+  <domain type=3D'kvm'>                                                    =
+                                                                           =
+                                                                           =
+                                                  =
 
-  This is an issue, because there can exist _small_ regions of memory (smal=
-ler
-  than the TARGET_PAGE_SIZE) that are only executable and not readable.
+    <name>os-1</name>                                                      =
+                                                                           =
+                                                                           =
+                                                =
 
-  TL;DR
+    <uuid>34c41008-ab91-483b-959c-81a7a12ae9be</uuid>                      =
+                                                                           =
+                                                                           =
+                                                =
 
-  What happens is at first, a "tlb_fill(..., access_type=3DMMU_INST_FETCH, =
-...)"
-  is triggered by "tb_lookup_cpu_state()". To be precise, this is the call
-  stack which is good behavior:
-  ---
-  #0  tlb_fill (cs=3D..., vaddr=3D684, size=3D0, access_type=3DMMU_INST_FET=
-CH, mmu_idx=3D0, retaddr=3D0) at target/arc/mmu.c:602
-  #1  get_page_addr_code (env=3D..., addr=3D684) at accel/tcg/cputlb.c:1045
-  #2  tb_htable_lookup (cpu=3D..., pc=3D684, cs_base=3D0, flags=3D0, cf_mas=
-k=3D4278190080) at accel/tcg/cpu-exec.c:337
-  #3  tb_lookup__cpu_state (cpu=3D..., pc=3D..., cs_base=3D..., flags=3D...=
-, cf_mask=3D4278190080) at include/exec/tb-lookup.h:43
-  #4  tb_find (cpu=3D..., last_tb=3D... <code_gen_buffer+17811>, tb_exit=3D=
-0, cf_mask=3D0) at accel/tcg/cpu-exec.c:404
-  #5  cpu_exec (cpu=3D...) at accel/tcg/cpu-exec.c:729
-  #6  tcg_cpu_exec (cpu=3D...) at cpus.c:1430
-  #7  qemu_tcg_rr_cpu_thread_fn (arg=3D...) at cpus.c:1531
-  #8  qemu_thread_start (args=3D...) at util/qemu-thread-posix.c:502
-  ---
+    <memory unit=3D'KiB'>8388608</memory>                                  =
+                                                                           =
+                                                                           =
+                                                  =
 
-  After this call, TLB is filled with an entry that its size field is small,
-  say 32 bytes. This causes a TLB_RECHECK for consequent memory accesses, w=
-hich =
+    <currentMemory unit=3D'KiB'>8388608</currentMemory>                    =
+                                                                           =
+                                                                           =
+                                                  =
 
-  is logical. However, in our decoder, we use cpu_lduw_code() to read the
-  instructions and decode them. As mentioned, in the beginning, the
-  access_type=3DMMU_INST_FETCH is lost in "io_readx()" while calling tlb_fi=
-ll()",
-  and now THIS CAUSES A GUEST EXCEPTION BECAUSE THAT REGION IS NOT ALLOWED =
-TO
-  BE READ. Here, comes that trace call of the _bad_ behavior:
-  ---
-  #0  tlb_fill (..., access_type=3DMMU_DATA_LOAD, ...) at target/arc/mmu.c:=
-605
-  #1  io_readx (..., access_type=3DMMU_INST_FETCH, size=3D2) at accel/tcg/c=
-putlb.c:881
-  #2  io_readw (..., access_type=3DMMU_INST_FETCH) at accel/tcg/softmmu_tem=
-plate.h:106
-  #3  helper_le_ldw_cmmu (..., oi=3D16, retaddr=3D0) at accel/tcg/softmmu_t=
-emplate.h:146
-  #4  cpu_lduw_code_ra (env=3D..., ptr=3D684, retaddr=3D0) at include/exec/=
-cpu_ldst_template.h:102
-  #5  cpu_lduw_code (env=3D..., ptr=3D684) at include/exec/cpu_ldst_templat=
-e.h:114
-  #6  read_and_decode_context (ctx=3D..., opcode_p=3D...) at target/arc/arc=
--decoder.c:1479
-  #7  arc_decode (ctx=3D...) at target/arc/arc-decoder.c:1736
-  #8  decode_opc (env=3D..., ctx=3D...) at target/arc/translate.c:313
-  #9  arc_tr_translate_insn (dcbase=3D..., cpu=3D...) at target/arc/transla=
-te.c:335
-  #10 translator_loop (.. <code_gen_buffer+18131>) at accel/tcg/translator.=
-c:107
-  #11 gen_intermediate_code (cpu=3D..., tb=3D... <code_gen_buffer+18131>) a=
-t target/arc/translate.c:413
-  #12 tb_gen_code (cpu=3D..., pc=3D684, cs_base=3D0, flags=3D0, cflags=3D-1=
-6711679) at accel/tcg/translate-all.c:1723
-  #13 tb_find (cpu=3D..., last_tb=3D... <code_gen_buffer+17811>, tb_exit=3D=
-0, cf_mask=3D0) at accel/tcg/cpu-exec.c:407
-  #14 cpu_exec (cpu=3D...) at accel/tcg/cpu-exec.c:729
-  #15 tcg_cpu_exec (cpu=3D...) at cpus.c:1430
+    <memoryBacking>                                                        =
+                                                                           =
+                                                                           =
+                                                =
 
-  ---
+      <hugepages/>                                                         =
+                                                                           =
+                                                                           =
+                                                =
 
-  Do you confirm if this is an issue? Maybe there are other ways to read
-  an instruction with MMU_INST_FETCH access that I don't know about.
+    </memoryBacking>                                                       =
+                                                                           =
+                                                                           =
+                                                =
 
-  Last but not least, although this is not a security issue for QEMU per
-  se, but it is hindering a security feature for the guest.
+    <vcpu placement=3D'static' cpuset=3D'10-11,34-35'>4</vcpu>             =
+                                                                           =
+                                                                           =
+                                                    =
+
+    <os>                                                                   =
+                                                                           =
+                                                                           =
+                                                =
+
+      <type arch=3D'x86_64' machine=3D'pc-i440fx-2.12'>hvm</type>          =
+                                                                           =
+                                                                           =
+                                                    =
+
+      <loader type=3D'pflash'>/var/lib/libvirt/qemu/nvram/os-1-ovmf.fd</loa=
+der>                                                                       =
+                                                                           =
+                                                  =
+
+      <boot dev=3D'network'/>                                              =
+                                                                           =
+                                                                           =
+                                                  =
+
+      <boot dev=3D'hd'/>                                                   =
+                                                                           =
+                                                                           =
+                                                  =
+
+    </os>                                                                  =
+                                                                           =
+                                                                           =
+                                                =
+
+    <features>                                                             =
+                                                                           =
+                                                                           =
+                                                =
+
+      <acpi/>                                                              =
+                                                                           =
+                                                                           =
+                                                =
+
+      <apic/>                                                              =
+                                                                           =
+                                                                           =
+                                                =
+
+    </features>                                                            =
+                                                                           =
+                                                                           =
+                                                =
+
+    <cpu mode=3D'host-passthrough' check=3D'partial'/>                     =
+                                                                           =
+                                                                           =
+                                                    =
+
+    <clock offset=3D'utc'>                                                 =
+                                                                           =
+                                                                           =
+                                                  =
+
+      <timer name=3D'rtc' tickpolicy=3D'catchup'/>                         =
+                                                                           =
+                                                                           =
+                                                    =
+
+      <timer name=3D'pit' tickpolicy=3D'delay'/>                           =
+                                                                           =
+                                                                           =
+                                                    =
+
+      <timer name=3D'hpet' present=3D'no'/>                                =
+                                                                           =
+                                                                           =
+                                                    =
+
+    </clock>                                                               =
+                                                                           =
+                                                                           =
+                                                =
+
+    <on_poweroff>destroy</on_poweroff>                                     =
+                                                                           =
+                                                                           =
+                                                =
+
+    <on_reboot>restart</on_reboot>                                         =
+                                                                           =
+                                                                           =
+                                                =
+
+    <on_crash>destroy</on_crash>                                           =
+                                                                           =
+                                                                           =
+                                                =
+
+    <pm>                                                                   =
+                                                                           =
+                                                                           =
+                                                =
+
+      <suspend-to-mem enabled=3D'no'/>                                     =
+                                                                           =
+                                                                           =
+                                                  =
+
+      <suspend-to-disk enabled=3D'no'/>                                    =
+                                                                           =
+                                                                           =
+                                                  =
+
+    </pm>                                                                  =
+                                                                           =
+                                                                           =
+                                                =
+
+    <devices>                                                              =
+                                                                           =
+                                                                           =
+                                                =
+
+      <emulator>/usr/bin/qemu-system-x86_64</emulator>                     =
+                                                                           =
+                                                                           =
+                                                =
+
+      <disk type=3D'block' device=3D'disk'>                                =
+                                                                           =
+                                                                           =
+                                                    =
+
+        <driver name=3D'qemu' type=3D'raw' cache=3D'none' io=3D'native'/>  =
+                                                                           =
+                                                                           =
+                                                        =
+
+        <source dev=3D'/dev/vg0/os-1-vda'/>                                =
+                                                                           =
+                                                                           =
+                                             =
+
+        <target dev=3D'vda' bus=3D'virtio'/>                               =
+                                                                           =
+                                                                           =
+                                                    =
+
+        <address type=3D'pci' domain=3D'0x0000' bus=3D'0x00' slot=3D'0x06' =
+function=3D'0x0'/>                                                         =
+                                                                           =
+                                                          =
+
+      </disk>                                                              =
+                                                                           =
+                                                                           =
+                                                =
+
+      <disk type=3D'block' device=3D'disk'>
+        <driver name=3D'qemu' type=3D'raw' cache=3D'none' io=3D'native'/>
+        <source dev=3D'/dev/vg0/os-1-vdb'/>
+        <target dev=3D'vdb' bus=3D'virtio'/>
+        <address type=3D'pci' domain=3D'0x0000' bus=3D'0x00' slot=3D'0x07' =
+function=3D'0x0'/>
+      </disk>
+      <controller type=3D'usb' index=3D'0' model=3D'ich9-ehci1'>
+        <address type=3D'pci' domain=3D'0x0000' bus=3D'0x00' slot=3D'0x05' =
+function=3D'0x7'/>
+      </controller>
+      <controller type=3D'usb' index=3D'0' model=3D'ich9-uhci1'>
+        <master startport=3D'0'/>
+        <address type=3D'pci' domain=3D'0x0000' bus=3D'0x00' slot=3D'0x05' =
+function=3D'0x0' multifunction=3D'on'/>
+      </controller>
+      <controller type=3D'usb' index=3D'0' model=3D'ich9-uhci2'>
+        <master startport=3D'2'/>
+        <address type=3D'pci' domain=3D'0x0000' bus=3D'0x00' slot=3D'0x05' =
+function=3D'0x1'/>
+      </controller>
+      <controller type=3D'usb' index=3D'0' model=3D'ich9-uhci3'>
+        <master startport=3D'4'/>
+        <address type=3D'pci' domain=3D'0x0000' bus=3D'0x00' slot=3D'0x05' =
+function=3D'0x2'/>
+      </controller>
+      <controller type=3D'pci' index=3D'0' model=3D'pci-root'/>
+      <controller type=3D'ide' index=3D'0'>
+        <address type=3D'pci' domain=3D'0x0000' bus=3D'0x00' slot=3D'0x01' =
+function=3D'0x1'/>
+      </controller>
+      <interface type=3D'bridge'>
+        <mac address=3D'52:54:00:78:cb:97'/>
+        <source bridge=3D'virbr0'/>
+        <model type=3D'rtl8139'/>
+        <address type=3D'pci' domain=3D'0x0000' bus=3D'0x00' slot=3D'0x04' =
+function=3D'0x0'/>
+      </interface>
+      <interface type=3D'bridge'>
+        <mac address=3D'52:54:00:1c:4f:22'/>
+        <source bridge=3D'virbr1'/>
+        <model type=3D'rtl8139'/>
+        <address type=3D'pci' domain=3D'0x0000' bus=3D'0x00' slot=3D'0x03' =
+function=3D'0x0'/>
+      </interface>
+      <serial type=3D'pty'>
+        <target type=3D'isa-serial' port=3D'0'>
+          <model name=3D'isa-serial'/>
+        </target>
+      </serial>
+      <console type=3D'pty'>
+        <target type=3D'serial' port=3D'0'/>
+      </console>
+      <input type=3D'mouse' bus=3D'ps2'/>
+      <input type=3D'keyboard' bus=3D'ps2'/>
+      <graphics type=3D'vnc' port=3D'-1' autoport=3D'yes'>
+        <listen type=3D'address'/>
+      </graphics>
+      <video>
+        <model type=3D'cirrus' vram=3D'16384' heads=3D'1' primary=3D'yes'/>
+        <address type=3D'pci' domain=3D'0x0000' bus=3D'0x00' slot=3D'0x02' =
+function=3D'0x0'/>
+      </video>
+      <memballoon model=3D'virtio'>
+        <address type=3D'pci' domain=3D'0x0000' bus=3D'0x00' slot=3D'0x09' =
+function=3D'0x0'/>
+      </memballoon>
+    </devices>
+  </domain>
+
+  where /var/lib/libvirt/qemu/nvram/os-1-ovmf.fd is a copy of
+  /usr/share/edk2-ovmf/OVMF_VARS.fd. An the extract from my
+  /etc/libvirt/qemu.conf to define ovmf:
+
+  ...
+  # Location of master nvram file                                          =
+                                                                           =
+                                                                           =
+                                                =
+
+  #                                                                        =
+                                                                           =
+                                                                           =
+                                                =
+
+  # When a domain is configured to use UEFI instead of standard            =
+                                                                           =
+                                                                           =
+                                                =
+
+  # BIOS it may use a separate storage for UEFI variables. If              =
+                                                                           =
+                                                                           =
+                                                =
+
+  # that's the case libvirt creates the variable store per domain          =
+                                                                           =
+                                                                           =
+                                                =
+
+  # using this master file as image. Each UEFI firmware can,               =
+                                                                           =
+                                                                           =
+                                                =
+
+  # however, have different variables store. Therefore the nvram is        =
+                                                                           =
+                                                                           =
+                                                =
+
+  # a list of strings when a single item is in form of:                    =
+                                                                           =
+                                                                           =
+                                                =
+
+  #   ${PATH_TO_UEFI_FW}:${PATH_TO_UEFI_VARS}.                             =
+                                                                           =
+                                                                           =
+                                                =
+
+  # Later, when libvirt creates per domain variable store, this list is    =
+                                                                           =
+                                                                           =
+                                                =
+
+  # searched for the master image. The UEFI firmware can be called         =
+                                                                           =
+                                                                           =
+                                                =
+
+  # differently for different guest architectures. For instance, it's OVMF =
+                                                                           =
+                                                                           =
+                                                =
+
+  # for x86_64 and i686, but it's AAVMF for aarch64. The libvirt default   =
+                                                                           =
+                                                                           =
+                                                =
+
+  # follows this scheme.                                                   =
+                                                                           =
+                                                                           =
+                                                =
+
+  nvram =3D [                                                              =
+                                                                           =
+                                                                           =
+                                                  =
+
+     "/usr/share/edk2-ovmf/OVMF_CODE.fd:/usr/share/edk2-ovmf/OVMF_VARS.fd",=
+                                                                           =
+                                                                           =
+                                                =
+
+  ]
+  ...
+
+  This setup used to work one month ago, now it's setup with:
+
+  QEMU emulator version 3.1.0
+  libvirt-5.0.0
+  linux-4.19.20
+
+  Any help appreciated.
+
+  Best regards.
+
+  Jos=C3=A9
 
 To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1825359/+subscriptions
+https://bugs.launchpad.net/qemu/+bug/1818367/+subscriptions
 
