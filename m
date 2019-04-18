@@ -2,74 +2,95 @@ Return-Path: <SRS0=08iY=SU=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_PASS,URIBL_BLOCKED autolearn=ham
+X-Spam-Status: No, score=-3.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A300AC10F0E
-	for <qemu-devel@archiver.kernel.org>; Thu, 18 Apr 2019 18:56:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 027A6C10F0E
+	for <qemu-devel@archiver.kernel.org>; Thu, 18 Apr 2019 19:00:44 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 65E13217F9
-	for <qemu-devel@archiver.kernel.org>; Thu, 18 Apr 2019 18:56:32 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 65E13217F9
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
+	by mail.kernel.org (Postfix) with ESMTPS id CE292214DA
+	for <qemu-devel@archiver.kernel.org>; Thu, 18 Apr 2019 19:00:43 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CE292214DA
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:45873 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:45922 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hHCD1-0007xd-Ml
-	for qemu-devel@archiver.kernel.org; Thu, 18 Apr 2019 14:56:31 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:58631)
+	id 1hHCH5-0000TY-3B
+	for qemu-devel@archiver.kernel.org; Thu, 18 Apr 2019 15:00:43 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:59523)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1hHCC9-0007dH-Jn
-	for qemu-devel@nongnu.org; Thu, 18 Apr 2019 14:55:39 -0400
+	(envelope-from <eblake@redhat.com>) id 1hHCG9-0008U8-Fd
+	for qemu-devel@nongnu.org; Thu, 18 Apr 2019 14:59:46 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1hHCC8-00059R-7b
-	for qemu-devel@nongnu.org; Thu, 18 Apr 2019 14:55:37 -0400
-Received: from indium.canonical.com ([91.189.90.7]:33062)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1hHCC8-00058w-1H
-	for qemu-devel@nongnu.org; Thu, 18 Apr 2019 14:55:36 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1hHCC6-0002sO-OQ
-	for <qemu-devel@nongnu.org>; Thu, 18 Apr 2019 18:55:34 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id A31262E804F
-	for <qemu-devel@nongnu.org>; Thu, 18 Apr 2019 18:55:34 +0000 (UTC)
+	(envelope-from <eblake@redhat.com>) id 1hHCG8-0007Tm-Hv
+	for qemu-devel@nongnu.org; Thu, 18 Apr 2019 14:59:45 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:37256)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <eblake@redhat.com>)
+	id 1hHCG6-0007SL-Ez; Thu, 18 Apr 2019 14:59:42 -0400
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+	[10.5.11.23])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id B789A308A112;
+	Thu, 18 Apr 2019 18:59:41 +0000 (UTC)
+Received: from [10.3.116.103] (ovpn-116-103.phx2.redhat.com [10.3.116.103])
+	by smtp.corp.redhat.com (Postfix) with ESMTPS id 3ACBA19C58;
+	Thu, 18 Apr 2019 18:59:41 +0000 (UTC)
+To: Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org
+References: <20180713111424.23670-1-mreitz@redhat.com>
+	<20180713111424.23670-3-mreitz@redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Openpgp: preference=signencrypt
+Autocrypt: addr=eblake@redhat.com; keydata=
+	xsBNBEvHyWwBCACw7DwsQIh0kAbUXyqhfiKAKOTVu6OiMGffw2w90Ggrp4bdVKmCaEXlrVLU
+	xphBM8mb+wsFkU+pq9YR621WXo9REYVIl0FxKeQo9dyQBZ/XvmUMka4NOmHtFg74nvkpJFCD
+	TUNzmqfcjdKhfFV0d7P/ixKQeZr2WP1xMcjmAQY5YvQ2lUoHP43m8TtpB1LkjyYBCodd+LkV
+	GmCx2Bop1LSblbvbrOm2bKpZdBPjncRNob73eTpIXEutvEaHH72LzpzksfcKM+M18cyRH+nP
+	sAd98xIbVjm3Jm4k4d5oQyE2HwOur+trk2EcxTgdp17QapuWPwMfhaNq3runaX7x34zhABEB
+	AAHNHkVyaWMgQmxha2UgPGVibGFrZUByZWRoYXQuY29tPsLAegQTAQgAJAIbAwULCQgHAwUV
+	CgkICwUWAgMBAAIeAQIXgAUCS8fL9QIZAQAKCRCnoWtKJSdDahBHCACbl/5FGkUqJ89GAjeX
+	RjpAeJtdKhujir0iS4CMSIng7fCiGZ0fNJCpL5RpViSo03Q7l37ss+No+dJI8KtAp6ID+PMz
+	wTJe5Egtv/KGUKSDvOLYJ9WIIbftEObekP+GBpWP2+KbpADsc7EsNd70sYxExD3liwVJYqLc
+	Rw7so1PEIFp+Ni9A1DrBR5NaJBnno2PHzHPTS9nmZVYm/4I32qkLXOcdX0XElO8VPDoVobG6
+	gELf4v/vIImdmxLh/w5WctUpBhWWIfQDvSOW2VZDOihm7pzhQodr3QP/GDLfpK6wI7exeu3P
+	pfPtqwa06s1pae3ad13mZGzkBdNKs1HEm8x6zsBNBEvHyWwBCADGkMFzFjmmyqAEn5D+Mt4P
+	zPdO8NatsDw8Qit3Rmzu+kUygxyYbz52ZO40WUu7EgQ5kDTOeRPnTOd7awWDQcl1gGBXgrkR
+	pAlQ0l0ReO57Q0eglFydLMi5bkwYhfY+TwDPMh3aOP5qBXkm4qIYSsxb8A+i00P72AqFb9Q7
+	3weG/flxSPApLYQE5qWGSXjOkXJv42NGS6o6gd4RmD6Ap5e8ACo1lSMPfTpGzXlt4aRkBfvb
+	NCfNsQikLZzFYDLbQgKBA33BDeV6vNJ9Cj0SgEGOkYyed4I6AbU0kIy1hHAm1r6+sAnEdIKj
+	cHi3xWH/UPrZW5flM8Kqo14OTDkI9EtlABEBAAHCwF8EGAEIAAkFAkvHyWwCGwwACgkQp6Fr
+	SiUnQ2q03wgAmRFGDeXzc58NX0NrDijUu0zx3Lns/qZ9VrkSWbNZBFjpWKaeL1fdVeE4TDGm
+	I5mRRIsStjQzc2R9b+2VBUhlAqY1nAiBDv0Qnt+9cLiuEICeUwlyl42YdwpmY0ELcy5+u6wz
+	mK/jxrYOpzXKDwLq5k4X+hmGuSNWWAN3gHiJqmJZPkhFPUIozZUCeEc76pS/IUN72NfprZmF
+	Dp6/QDjDFtfS39bHSWXKVZUbqaMPqlj/z6Ugk027/3GUjHHr8WkeL1ezWepYDY7WSoXwfoAL
+	2UXYsMAr/uUncSKlfjvArhsej0S4zbqim2ZY6S8aRWw94J3bSvJR+Nwbs34GPTD4Pg==
+Organization: Red Hat, Inc.
+Message-ID: <cec09e49-6702-cb66-e668-42d728800a75@redhat.com>
+Date: Thu, 18 Apr 2019 13:59:40 -0500
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+	Thunderbird/60.6.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Thu, 18 Apr 2019 18:46:01 -0000
-From: Shahab Vahedi <1825359@bugs.launchpad.net>
-To: qemu-devel@nongnu.org
-X-Launchpad-Notification-Type: bug
-X-Launchpad-Bug: product=qemu; status=Confirmed; importance=Undecided;
-	assignee=shahab.vahedi@gmail.com; 
-X-Launchpad-Bug-Tags: fetch mmu mpu
-X-Launchpad-Bug-Information-Type: Public
-X-Launchpad-Bug-Private: no
-X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: pmaydell shahab-vahedi
-X-Launchpad-Bug-Reporter: Shahab Vahedi (shahab-vahedi)
-X-Launchpad-Bug-Modifier: Shahab Vahedi (shahab-vahedi)
-References: <155558881987.7164.1099557133760519082.malonedeb@chaenomeles.canonical.com>
-Message-Id: <155561316136.14336.9762366049725475623.malone@gac.canonical.com>
-X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
-X-Launchpad-Message-For: qemu-devel-ml
-Precedence: bulk
-X-Generated-By: Launchpad (canonical.com); Revision="18928";
-	Instance="launchpad-lazr.conf"
-X-Launchpad-Hash: 2facf14269c78c9844b08e197fc5da4f0a0fc9f3
+In-Reply-To: <20180713111424.23670-3-mreitz@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="6tsdUPzkgeRjZ90Oe2fB5opuWAPBvXaPT"
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+	(mx1.redhat.com [10.5.110.44]);
+	Thu, 18 Apr 2019 18:59:41 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 91.189.90.7
-Subject: [Qemu-devel] [Bug 1825359] Re: cpu_ld*_code() triggers
- MMU_DATA_LOAD i.s.o. MMU_INST_FETCH
+X-Received-From: 209.132.183.28
+X-Content-Filtered-By: Mailman/MimeDel 2.1.21
+Subject: Re: [Qemu-devel] [PATCH 2/3] qemu-img: Use zero writes after source
+ backing EOF
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
+Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -78,141 +99,78 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1825359 <1825359@bugs.launchpad.net>
+Cc: Kevin Wolf <kwolf@redhat.com>, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190418184601.7Cce9Nlc6EiMYdl3xWS6OKAHS1aMXLNlfri2jEZS9IA@z>
+Message-ID: <20190418185940.jHbZym539JnKc15mfrCpNOzNZ3Oh4Amv43_X0QMYVZs@z>
 
-This patch has fixed for me both issues. Although I am not very proud of
-the changes in the second hunk. Please let me know if there is a better
-way.
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--6tsdUPzkgeRjZ90Oe2fB5opuWAPBvXaPT
+From: Eric Blake <eblake@redhat.com>
+To: Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org
+Cc: Kevin Wolf <kwolf@redhat.com>, qemu-devel@nongnu.org
+Message-ID: <cec09e49-6702-cb66-e668-42d728800a75@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH 2/3] qemu-img: Use zero writes after source
+ backing EOF
+References: <20180713111424.23670-1-mreitz@redhat.com>
+ <20180713111424.23670-3-mreitz@redhat.com>
+In-Reply-To: <20180713111424.23670-3-mreitz@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+
+On 7/13/18 6:14 AM, Max Reitz wrote:
+> Past the end of the source backing file, we memset() buf_old to zero, s=
+o
+> it is clearly easy to use blk_pwrite_zeroes() instead of blk_pwrite()
+> then.
+>=20
+> Signed-off-by: Max Reitz <mreitz@redhat.com>
+> ---
+>  qemu-img.c | 11 +++++++++--
+>  1 file changed, 9 insertions(+), 2 deletions(-)
+>=20
+
+> @@ -3458,8 +3461,12 @@ static int img_rebase(int argc, char **argv)
+>                  if (compare_buffers(buf_old + written, buf_new + writt=
+en,
+>                                      n - written, &pnum))
+>                  {
+> -                    ret =3D blk_pwrite(blk, offset + written,
+> -                                     buf_old + written, pnum, 0);
+> +                    if (buf_old_is_zero) {
+> +                        ret =3D blk_pwrite_zeroes(blk, offset + writte=
+n, pnum, 0);
+
+Should we allow BDRV_REQ_MAY_UNMAP here, either unconditionally, or
+based on a command line knob that told us whether the user is more
+interested in a sparse result (that still reads as zero) vs. a
+fully-allocated result?
+
+Reviewed-by: Eric Blake <eblake@redhat.com>
+
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3226
+Virtualization:  qemu.org | libvirt.org
 
 
-** Patch added: "respect address type for tlb_fill() and while using the ad=
-dress from "tlb_entry""
-   https://bugs.launchpad.net/qemu/+bug/1825359/+attachment/5256796/+files/=
-bug1825359_io_readx.patch
+--6tsdUPzkgeRjZ90Oe2fB5opuWAPBvXaPT
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
 
--- =
+-----BEGIN PGP SIGNATURE-----
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1825359
+iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAly4yRwACgkQp6FrSiUn
+Q2rDrgf+LBdI8qFj1fcFP6aiBfUoHlkGctRdYHjzAOSTE7pfYFNOMED0KpA+0obj
+9F9jZlqG9r5tbhbe1iXVKSYY5fGsNYwN7SfOIxnsdhFuYMon9LwCvKeECA8bVIb2
+N6AG8/zsrnsZB6iBjlDZVhBcNQ0oJDCQL4nY8oqGvmHM+2eSdNtZexD7v0DWbgRT
+1j8ZBTILl+un9ZLPiwq5Fik/HQKsxkrTSHiBOH/Pq83o2v/+X1RbqWooOxfj+mvx
+zaH57gfgMlKivnydxLa4N93sgD+rDrYltawy1RhTpOR+P2nAK27I5TRBo0qnIbz6
++R+xneAMdfUcm4UD9Yl2IuAhcYxswg==
+=ud4M
+-----END PGP SIGNATURE-----
 
-Title:
-  cpu_ld*_code() triggers MMU_DATA_LOAD i.s.o. MMU_INST_FETCH
-
-Status in QEMU:
-  Confirmed
-
-Bug description:
-  commit 377b155bde451d5ac545fbdcdfbf6ca17a4228f5
-  Merge: c876180938 328eb60dc1
-  Author: Peter Maydell <peter.x@x.x>        ; masked for anti-spamming pur=
-poses
-  Date:   Mon Mar 11 18:26:37 2019 +0000
-  https://github.com/qemu/qemu/commit/377b155bde451d5ac545fbdcdfbf6ca17a422=
-8f5
-  --------------------------------------------------
-
-  cpu_ld*_code() is used for loading code data as the name suggests. Althou=
-gh, it begins accessing memory with MMU_INST_FETCH access type, somewhere d=
-own
-  the road, when the "io_readx(..., access_type=3DMMU_INST_FETCH, ...)" is
-  called, it is ignoring this "access_type" while calling the "tlb_fill()"
-  with a _hardcoded_ MMU_DATA_LOAD:
-
-  cputlb.c
-  --------
-  static uint64_t io_readx(..., MMUAccessType access_type, ...)
-  {
-
-  =C2=A0=C2=A0=C2=A0=C2=A0if (recheck) {
-  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0CPUTLBEntry *entry;
-  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0target_ulong tlb_addr;
-
-  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0tlb_fill(cpu, addr, size,=
- MMU_DATA_LOAD, mmu_idx, retaddr);
-  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0...
-  }
-  --------
-
-  This is an issue, because there can exist _small_ regions of memory (smal=
-ler
-  than the TARGET_PAGE_SIZE) that are only executable and not readable.
-
-  TL;DR
-
-  What happens is at first, a "tlb_fill(..., access_type=3DMMU_INST_FETCH, =
-...)"
-  is triggered by "tb_lookup_cpu_state()". To be precise, this is the call
-  stack which is good behavior:
-  ---
-  #0  tlb_fill (cs=3D..., vaddr=3D684, size=3D0, access_type=3DMMU_INST_FET=
-CH, mmu_idx=3D0, retaddr=3D0) at target/arc/mmu.c:602
-  #1  get_page_addr_code (env=3D..., addr=3D684) at accel/tcg/cputlb.c:1045
-  #2  tb_htable_lookup (cpu=3D..., pc=3D684, cs_base=3D0, flags=3D0, cf_mas=
-k=3D4278190080) at accel/tcg/cpu-exec.c:337
-  #3  tb_lookup__cpu_state (cpu=3D..., pc=3D..., cs_base=3D..., flags=3D...=
-, cf_mask=3D4278190080) at include/exec/tb-lookup.h:43
-  #4  tb_find (cpu=3D..., last_tb=3D... <code_gen_buffer+17811>, tb_exit=3D=
-0, cf_mask=3D0) at accel/tcg/cpu-exec.c:404
-  #5  cpu_exec (cpu=3D...) at accel/tcg/cpu-exec.c:729
-  #6  tcg_cpu_exec (cpu=3D...) at cpus.c:1430
-  #7  qemu_tcg_rr_cpu_thread_fn (arg=3D...) at cpus.c:1531
-  #8  qemu_thread_start (args=3D...) at util/qemu-thread-posix.c:502
-  ---
-
-  After this call, TLB is filled with an entry that its size field is small,
-  say 32 bytes. This causes a TLB_RECHECK for consequent memory accesses, w=
-hich =
-
-  is logical. However, in our decoder, we use cpu_lduw_code() to read the
-  instructions and decode them. As mentioned, in the beginning, the
-  access_type=3DMMU_INST_FETCH is lost in "io_readx()" while calling tlb_fi=
-ll()",
-  and now THIS CAUSES A GUEST EXCEPTION BECAUSE THAT REGION IS NOT ALLOWED =
-TO
-  BE READ. Here, comes that trace call of the _bad_ behavior:
-  ---
-  #0  tlb_fill (..., access_type=3DMMU_DATA_LOAD, ...) at target/arc/mmu.c:=
-605
-  #1  io_readx (..., access_type=3DMMU_INST_FETCH, size=3D2) at accel/tcg/c=
-putlb.c:881
-  #2  io_readw (..., access_type=3DMMU_INST_FETCH) at accel/tcg/softmmu_tem=
-plate.h:106
-  #3  helper_le_ldw_cmmu (..., oi=3D16, retaddr=3D0) at accel/tcg/softmmu_t=
-emplate.h:146
-  #4  cpu_lduw_code_ra (env=3D..., ptr=3D684, retaddr=3D0) at include/exec/=
-cpu_ldst_template.h:102
-  #5  cpu_lduw_code (env=3D..., ptr=3D684) at include/exec/cpu_ldst_templat=
-e.h:114
-  #6  read_and_decode_context (ctx=3D..., opcode_p=3D...) at target/arc/arc=
--decoder.c:1479
-  #7  arc_decode (ctx=3D...) at target/arc/arc-decoder.c:1736
-  #8  decode_opc (env=3D..., ctx=3D...) at target/arc/translate.c:313
-  #9  arc_tr_translate_insn (dcbase=3D..., cpu=3D...) at target/arc/transla=
-te.c:335
-  #10 translator_loop (.. <code_gen_buffer+18131>) at accel/tcg/translator.=
-c:107
-  #11 gen_intermediate_code (cpu=3D..., tb=3D... <code_gen_buffer+18131>) a=
-t target/arc/translate.c:413
-  #12 tb_gen_code (cpu=3D..., pc=3D684, cs_base=3D0, flags=3D0, cflags=3D-1=
-6711679) at accel/tcg/translate-all.c:1723
-  #13 tb_find (cpu=3D..., last_tb=3D... <code_gen_buffer+17811>, tb_exit=3D=
-0, cf_mask=3D0) at accel/tcg/cpu-exec.c:407
-  #14 cpu_exec (cpu=3D...) at accel/tcg/cpu-exec.c:729
-  #15 tcg_cpu_exec (cpu=3D...) at cpus.c:1430
-
-  ---
-
-  Do you confirm if this is an issue? Maybe there are other ways to read
-  an instruction with MMU_INST_FETCH access that I don't know about.
-
-  Last but not least, although this is not a security issue for QEMU per
-  se, but it is hindering a security feature for the guest.
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1825359/+subscriptions
+--6tsdUPzkgeRjZ90Oe2fB5opuWAPBvXaPT--
 
