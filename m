@@ -1,28 +1,28 @@
-Received: from eggs.gnu.org ([209.51.188.92]:35030)
+Received: from eggs.gnu.org ([209.51.188.92]:35331)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1hH8V2-0002PV-JZ
-	for qemu-devel@nongnu.org; Thu, 18 Apr 2019 10:58:53 -0400
+	(envelope-from <Dave.Martin@arm.com>) id 1hH8VH-00031g-L4
+	for qemu-devel@nongnu.org; Thu, 18 Apr 2019 10:59:08 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1hH8QM-0002Bx-2M
-	for qemu-devel@nongnu.org; Thu, 18 Apr 2019 10:54:02 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:40762)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1hH8QL-0002Ao-Rf
-	for qemu-devel@nongnu.org; Thu, 18 Apr 2019 10:54:01 -0400
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
-	[10.5.11.14])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 929EA30254A2
-	for <qemu-devel@nongnu.org>; Thu, 18 Apr 2019 14:53:57 +0000 (UTC)
-Received: from blackfin.pond.sub.org (ovpn-116-116.ams2.redhat.com
-	[10.36.116.116])
-	by smtp.corp.redhat.com (Postfix) with ESMTPS id 641D55D9C5
-	for <qemu-devel@nongnu.org>; Thu, 18 Apr 2019 14:53:57 +0000 (UTC)
-From: Markus Armbruster <armbru@redhat.com>
-Date: Thu, 18 Apr 2019 16:53:49 +0200
-Message-Id: <20190418145355.21100-1-armbru@redhat.com>
-Subject: [Qemu-devel] [PATCH 0/6] Fix misuse of ctype.h functions
+	(envelope-from <Dave.Martin@arm.com>) id 1hH8It-0007f6-KW
+	for qemu-devel@nongnu.org; Thu, 18 Apr 2019 10:46:21 -0400
+Received: from foss.arm.com ([217.140.101.70]:59538)
+	by eggs.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <Dave.Martin@arm.com>) id 1hH8Ir-0007e0-M4
+	for qemu-devel@nongnu.org; Thu, 18 Apr 2019 10:46:18 -0400
+Date: Thu, 18 Apr 2019 15:46:11 +0100
+From: Dave Martin <Dave.Martin@arm.com>
+Message-ID: <20190418144611.GJ3567@e103592.cambridge.arm.com>
+References: <20190418092841.fzrcegkbal7dpfcy@kamzik.brq.redhat.com>
+	<20190418094634.sr4s4qkzceqftque@kamzik.brq.redhat.com>
+	<20190418105204.GF3567@e103592.cambridge.arm.com>
+	<20190418112847.4hnafafcxlp4vuou@kamzik.brq.redhat.com>
+	<20190418140302.GI3567@e103592.cambridge.arm.com>
+	<20190418144306.5sxrbcjbkw2tzslj@kamzik.brq.redhat.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20190418144306.5sxrbcjbkw2tzslj@kamzik.brq.redhat.com>
+Subject: Re: [Qemu-devel] How do we do user input bitmap properties?
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,23 +31,41 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Andrew Jones <drjones@redhat.com>
+Cc: "peter.maydell@linaro.org" <peter.maydell@linaro.org>, "armbru@redhat.com" <armbru@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "dgilbert@redhat.com" <dgilbert@redhat.com>, "imammedo@redhat.com" <imammedo@redhat.com>
 
-Markus Armbruster (6):
-  qemu-bridge-helper: Fix misuse of isspace()
-  tests/vhost-user-bridge: Fix misuse of isdigit()
-  gdbstub: Reject invalid RLE repeat counts
-  gdbstub: Fix misuse of isxdigit()
-  pc-bios/s390-ccw: Clean up harmless misuse of isdigit()
-  cutils: Simplify how parse_uint() checks for whitespace
+On Thu, Apr 18, 2019 at 03:43:06PM +0100, Andrew Jones wrote:
+> On Thu, Apr 18, 2019 at 03:03:02PM +0100, Dave Martin wrote:
 
- gdbstub.c                 | 16 ++++++++--------
- pc-bios/s390-ccw/libc.c   |  2 +-
- pc-bios/s390-ccw/menu.c   |  2 +-
- qemu-bridge-helper.c      |  7 ++++---
- tests/vhost-user-bridge.c |  2 +-
- util/cutils.c             |  2 +-
- 6 files changed, 16 insertions(+), 15 deletions(-)
+[...]
 
--- 
-2.17.2
+> > It's worth nothing that there are two problems to be solved here: one is
+> > to specify an exact set unambiguously, which is important for migration
+> > scenarios.
+> > 
+> > The other is to be able to clamp the vector length for user convenience,
+> > but without particularly considering migration.  There's no direct way
+> > for the user to know the set of vector lengths supported by KVM today,
+> > so cooking up the right magic to go on the command line is non-trivial:
+> > you have to create a dummy vcpu and read KVM_REG_ARM64_SVE_VLS to find
+> > the host's supported set.  Or you just have to know.
+> 
+> Right, we'll have to query first to know what's available. libvirt will
+> do that and tools built on libvirt should help provide the user with
+> sane defaults or a relatively painless selection process. The QEMU command
+> line is primarily for developers, so they'll likely just know what they
+> want.
+> 
+> > 
+> > A separate max-vl option (or whatever) might be a useful alternative.
+> 
+> Yeah, we could offer this to be nicer to QEMU command line users that
+> don't intend to migrate, or don't care if a migration can fail. This
+> would be analogous to '-cpu max' which enables all available cpu
+> features. Bad for migration, but a nice shorthand if you want your
+> guest to have everything.
+
+Sounds reasonable.
+
+Cheers
+---Dave
