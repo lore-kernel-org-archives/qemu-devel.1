@@ -6,55 +6,64 @@ X-Spam-Status: No, score=-2.4 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	MAILING_LIST_MULTI,SPF_PASS,USER_AGENT_MUTT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4D0E1C10F0E
-	for <qemu-devel@archiver.kernel.org>; Thu, 18 Apr 2019 14:04:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 60E32C10F0E
+	for <qemu-devel@archiver.kernel.org>; Thu, 18 Apr 2019 14:06:24 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0DB2E2083D
-	for <qemu-devel@archiver.kernel.org>; Thu, 18 Apr 2019 14:04:06 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0DB2E2083D
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=arm.com
+	by mail.kernel.org (Postfix) with ESMTPS id 220492083D
+	for <qemu-devel@archiver.kernel.org>; Thu, 18 Apr 2019 14:06:24 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 220492083D
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:41918 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:41971 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hH7e2-0004Tx-At
-	for qemu-devel@archiver.kernel.org; Thu, 18 Apr 2019 10:04:06 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:53134)
+	id 1hH7gF-0005LD-BX
+	for qemu-devel@archiver.kernel.org; Thu, 18 Apr 2019 10:06:23 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:53732)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <Dave.Martin@arm.com>) id 1hH7d7-00043v-M6
-	for qemu-devel@nongnu.org; Thu, 18 Apr 2019 10:03:11 -0400
+	(envelope-from <ehabkost@redhat.com>) id 1hH7fP-0004xl-M5
+	for qemu-devel@nongnu.org; Thu, 18 Apr 2019 10:05:32 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <Dave.Martin@arm.com>) id 1hH7d6-0003oT-6R
-	for qemu-devel@nongnu.org; Thu, 18 Apr 2019 10:03:09 -0400
-Received: from foss.arm.com ([217.140.101.70]:58936)
-	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <Dave.Martin@arm.com>) id 1hH7d5-0003nh-Tk
-	for qemu-devel@nongnu.org; Thu, 18 Apr 2019 10:03:08 -0400
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.72.51.249])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 35CC280D;
-	Thu, 18 Apr 2019 07:03:06 -0700 (PDT)
-Received: from e103592.cambridge.arm.com (usa-sjc-imap-foss1.foss.arm.com
-	[10.72.51.249])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 023293F5AF;
-	Thu, 18 Apr 2019 07:03:04 -0700 (PDT)
-Date: Thu, 18 Apr 2019 15:03:02 +0100
-From: Dave Martin <Dave.Martin@arm.com>
-To: Andrew Jones <drjones@redhat.com>
-Message-ID: <20190418140302.GI3567@e103592.cambridge.arm.com>
-References: <20190418092841.fzrcegkbal7dpfcy@kamzik.brq.redhat.com>
-	<20190418094634.sr4s4qkzceqftque@kamzik.brq.redhat.com>
-	<20190418105204.GF3567@e103592.cambridge.arm.com>
-	<20190418112847.4hnafafcxlp4vuou@kamzik.brq.redhat.com>
+	(envelope-from <ehabkost@redhat.com>) id 1hH7fO-0005I4-Do
+	for qemu-devel@nongnu.org; Thu, 18 Apr 2019 10:05:31 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:40368)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1hH7fO-0005Eq-5W
+	for qemu-devel@nongnu.org; Thu, 18 Apr 2019 10:05:30 -0400
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+	[10.5.11.16])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id A4A48307D78B;
+	Thu, 18 Apr 2019 14:05:27 +0000 (UTC)
+Received: from localhost (ovpn-116-9.gru2.redhat.com [10.97.116.9])
+	by smtp.corp.redhat.com (Postfix) with ESMTP id F3C895C205;
+	Thu, 18 Apr 2019 14:05:22 +0000 (UTC)
+Date: Thu, 18 Apr 2019 11:05:20 -0300
+From: Eduardo Habkost <ehabkost@redhat.com>
+To: Pavel Hrdina <phrdina@redhat.com>
+Message-ID: <20190418140520.GG25134@habkost.net>
+References: <1555416373-28690-1-git-send-email-puwen@hygon.cn>
+	<20190416141700.GR18986@antique-laptop>
+	<e7abd74f-61bb-fc34-0b3a-08c635d9f78c@hygon.cn>
+	<20190417192610.GC19065@antique-laptop>
+	<20190418084825.GC13773@redhat.com>
+	<20190418095935.GS18986@antique-laptop>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="UTF-8"
 Content-Disposition: inline
-In-Reply-To: <20190418112847.4hnafafcxlp4vuou@kamzik.brq.redhat.com>
-User-Agent: Mutt/1.5.23 (2014-03-12)
+In-Reply-To: <20190418095935.GS18986@antique-laptop>
+User-Agent: Mutt/1.10.1 (2018-07-13)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+	(mx1.redhat.com [10.5.110.45]);
+	Thu, 18 Apr 2019 14:05:28 +0000 (UTC)
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 217.140.101.70
-Subject: Re: [Qemu-devel] How do we do user input bitmap properties?
+X-Received-From: 209.132.183.28
+Subject: Re: [Qemu-devel] [PATCH v3] i386: Add new Hygon 'Dhyana' CPU model
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -66,147 +75,134 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "peter.maydell@linaro.org" <peter.maydell@linaro.org>,
-	"armbru@redhat.com" <armbru@redhat.com>,
-	"qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
-	"dgilbert@redhat.com" <dgilbert@redhat.com>,
-	"imammedo@redhat.com" <imammedo@redhat.com>
+Cc: mst@redhat.com, Pu Wen <puwen@hygon.cn>, qemu-devel@nongnu.org,
+	pbonzini@redhat.com, rth@twiddle.net
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190418140302.dacAsQ6zvmE-gzPIgGbOP5EcTvbIr68QMzqQqnANCL0@z>
+Message-ID: <20190418140520.PkvWEyUxeLHkDRRrbRrEtdbewQx8BXDgc7pVvbBLhBQ@z>
 
-On Thu, Apr 18, 2019 at 12:28:47PM +0100, Andrew Jones wrote:
-> On Thu, Apr 18, 2019 at 11:52:04AM +0100, Dave Martin wrote:
-> > On Thu, Apr 18, 2019 at 10:46:34AM +0100, Andrew Jones wrote:
-> > > On Thu, Apr 18, 2019 at 11:28:41AM +0200, Andrew Jones wrote:
-> > > > Hi all,
-> > > > 
-> > > > First some background:
-> > > > 
-> > > > For the userspace side of AArch64 guest SVE support we need to
-> > > > expose KVM's allowed vector lengths bitmap to the user and allow
-> > > > the user to choose a subset of that bitmap. Since bitmaps are a
-> > > > bit awkward to work with then we'll likely want to expose it as
-> > > > an array of vector lengths instead. Also, assuming we want to
-> > > > expose the lengths as number-of-quadwords (quadword == 128 bits
-> > > > for AArch64 and vector lengths must be multiples of quadwords)
-> > > > rather than number-of-bits, then an example array (which will
-> > > > always be a sequence) might be
-> > > > 
-> > > >  [ 8, 16, 32 ]
-> > > > 
-> > > > The user may choose a subsequence, but only through truncation,
-> > > > i.e. [ 8, 32 ] is not valid, but [ 8, 16 ] is.
-> > > > 
-> > > > Furthermore, different hosts may support different sequences
-> > > > which have the same maximum. For example, if the above sequence
-> > > > is for Host_A, then Host_B could be
-> > > > 
-> > > >  [ 8, 16, 24, 32 ]
-> > > 
-> > > It doesn't really matter for this discussion, but I just realized
-> > > that I picked bogus numbers for these examples. 32 would be too
-> > > big. The largest supported is 16. I probably should have just used
-> > > the simple [ 1, 2, 4 ] and [ 1, 2, 3, 4 ] arrays, corresponding to
-> > > vector lengths (in bits) 128, 256, 512 and 128, 256, 384, 512.
-> > 
-> > I'd argue differently from the ABI perspective.
-> > 
-> > If the host supports vq = [ 1,2,3,4 ], then it is entirely valid to ask
-> > for [ 1,2,4 ].  KVM will fail the KVM_REG_ARM64_SVE_VLS write with
-> > EINVAL, but I don't distinguish between a set that is not satisfiable on
-> > this hardware and a set that is not valid at all.  The kernel basically
-> > doesn't check for the latter: an architecturally invalid set will always
-> > not be satisfiable on the hardware.
-> 
-> I agree that 1,2,4 should be a valid set, but how do we avoid the user
-> attempting to select it on a platform that supports 1,2,3,4 now? Until
-> the hardware and KVM will allow it, then I don't think we should try
-> to "support" it in any way. Maybe we should name the property such that
-> it's clear we need to use truncation when constructing a subset now.
-> This would allow us to add another, more generally named, property later
-> when we can select nearly arbitrary subsets.
-> 
-> > 
-> > Ideally, userspace should not preempt this decision, in case the
-> > architecture becomes more flexible someday in what it can virtualise.
-> > 
-> > > > The host must support all lengths in the sequence, which means
-> > > > that while Host_A supports 32, since it doesn't support 24 and
-> > > > we can only truncate sequences, we must use either [ 8 ] or
-> > > > [ 8, 16 ] for a compatible sequence if we intend to migrate
-> > > > between the hosts.
-> > > > 
-> > > > Now to the $SUBJECT question:
-> > > > 
-> > > > My feeling is that we should require the sequence to be
-> > > > provided on the command line as a cpu property. Something
-> > > > like
-> > > > 
-> > > >   -cpu host,sve-vl-list=8:16
-> > 
-> > I can't decide whether it's more or less user-friendly to denote VL in
-> > terms of bytes in this kind of context.
-> 
-> I'm not sure either. Switching to my second take at quadwords this should
-> have been '1:2'. In bytes [ 1, 2 ] would be '16:32'.
-> 
-> > 
-> > Usually when I say "VL" in the kernel ABI I try to mean this.
-> > (KVM_REG_ARM64_SVE_VLS is a special case: here the lengths are fancily
-> > encoded rather than being passed as integers, so the precise unit used
-> > is a more abstract concept here ... or anyway, that's my excuse.
-> > _SVE_VQS felt odd here.)
-> 
-> My thinking is that using the number of quadwords keeps the numbers
-> smaller. But, if people are mostly going to want to think about vector
-> lengths in terms of bits, like the specification does, then maybe we
-> should just let the numbers be bigger: [ 128, 256, 512 ]
-> 
-> > 
-> > For kvmtool I went with quadwords on the command line, but only as a
-> > quick hack to simplify the parser slightly.
-> > 
-> > OTOH, specifying 1,2,4 on the command line is clearly less annoying and
-> > error-prone than 16,32,64.
-> > 
-> > Naming the option with "vq" instead of "vl" is another option, though
-> > "vq" is Linux terminology not endorsed by the architecture.
-> 
-> I think VL is OK as long we document the unit.
+On Thu, Apr 18, 2019 at 11:59:35AM +0200, Pavel Hrdina wrote:
+> On Thu, Apr 18, 2019 at 09:48:25AM +0100, Daniel P. Berrang=E9 wrote:
+> > On Wed, Apr 17, 2019 at 09:26:10PM +0200, Pavel Hrdina wrote:
+> > > On Wed, Apr 17, 2019 at 10:53:04PM +0800, Pu Wen wrote:
+> > > > On 2019/4/16 22:17, Pavel Hrdina wrote:
+> > > > > On Tue, Apr 16, 2019 at 08:06:13PM +0800, Pu Wen wrote:
+> > > > > > Add a new base CPU model called 'Dhyana' to model processors =
+from Hygon
+> > > > > > Dhyana(family 18h), which derived from AMD EPYC(family 17h).
+> > > > > >=20
+> > > > > > The following features bits have been removed compare to AMD =
+EPYC:
+> > > > > > aes, pclmulqdq, sha_ni
+> > > > > >=20
+> > > > > > The Hygon Dhyana support to KVM in Linux is already accepted =
+upstream[1].
+> > > > > > So add Hygon Dhyana support to Qemu is necessary to create Hy=
+gon's own
+> > > > > > CPU model.
+> > > > >=20
+> > > > > I have once question that we will have to solve for EPYC CPUs a=
+s well.
+> > > > > The name should not be based on the Product name or Model name =
+as that
+> > > > > usually doesn't change with introduction of new microarchitectu=
+re.
+> > > > >=20
+> > > > > With EPYC we made a mistake to name the CPU like that, luckily =
+with
+> > > > > Intel we already use the microarchitecture name, so the EPYC CP=
+U should
+> > > > > have been named ZEN-Server and for Ryzen CPUs there should be Z=
+EN-Client
+> > > > > if there is any difference or otherwise we can simply use ZEN.
+> > > > >=20
+> > > > > The issue here is what happens once the ZEN2 microarchitecture =
+is out
+> > > > > wihch introduces new features and we will have to come up with =
+a CPU
+> > > > > name.
+> > > > >=20
+> > > > > Obviously we cannot change/remove the EPYC models so the questi=
+on is
+> > > > > what is the difference between the AMD EPYC CPU and this new Dh=
+yana CPU
+> > > > > if they are both based on the ZEN microarchitecture?
+> > > >=20
+> > > > Right now there's no much difference between Dhyana and EPYC from=
+ the
+> > > > software's view. Dhyana removed the instructions aes, pclmulqdq, =
+sha_ni
+> > > > compared to EPYC, but will have it's own implementation such as f=
+or aes in
+> > > > future CPU models. Hygon also will implement something different =
+from AMD in
+> > > > the future.
+> > > >=20
+> > > > > In addition is there any way how we can introduce ZEN-Server &
+> > > > > ZEN-Client or simply ZEN, if there is no difference, as an alia=
+s or a
+> > > > > new model next to the EPYC?
+> > > >=20
+> > > > Also as Eduardo mentioned that there's no CPU model alias or inhe=
+ritance
+> > > > system in x86, so I think it's worthwhile to keep a separate CPU =
+model for
+> > > > Hygon.
+> > >=20
+> > > So what happens once Zen2 is out and there are new Dhyana CPUs base=
+d on
+> > > the Zen2 microarchitecture with some new features, what CPU models =
+we
+> > > will introduce, EPYC-G2 and Dhyana-G2, but that will not correspond=
+ to
+> > > the CPU model anymore.
+> > >=20
+> > > My idea was that we should probably introduce CPU model Zen-Server =
+which
+> > > could cover both EPYC and Dhyana as they are both based on the Zen
+> > > microarchitecture.  The fact that Dhyana doesn't support all the
+> > > features is not an issue as QEMU will not use them if they are not
+> > > available on the host.
 
-As you wish (and that's basically where I ended up for now with kvmtool).
+It is an issue.  The fact that features are missing has huge
+importance for most virtualization management software that
+supports live migration.
 
-> > 
-> > For kvmtool I've considered a range / filtering syntax, but I didn't
-> > implement it yet.
-> 
-> I think we want each VL to be explicitly listed on the command line
-> for the compatibility issue described above. On one host the range
-> [1,4] can be different than the range [1,4] on anther host, depending
-> on whether '3' is in there. And syntax like 1-4:-3 would be overly
-> complicated, IMO. So I'm inclined to just require all of them to be
-> listed, but of course order wouldn't matter.
+Not having the "enforce" flag enabled by default was a mistake,
+but it's hard to fix because we don't want to break backwards
+compatibility.
 
-Probably reasonable.  For now (and quite likely forever) the length of
-the list is at most 16 elements.  To avoid overengineering I stuck with
-a flat comma-separated list for now.
+> >=20
+> > I don't think this is a good idea. AFAICT, Dhyana and EPYC should not=
+ be
+> > thought of as the same microarchitecture. Dhyana is a fork of the Zen
+> > microarchitecture as illustrated by the dropping of a number of CPU
+> > features. The Dhyana SEV patches show that it has had other significa=
+nt
+> > changes, which are likely to require extra work in QEMU to support to=
+o.
+>=20
+> Fair enough, still the point stands that we should use the name of the
+> microarchitecture.
 
+Note that using "microarchitecture[-variant]" is likely to be
+necessary if there's variation inside the same microarchitecture.
+We absolutely need to use different names for different sets of
+CPU features if we want to support them out of the box.
 
-It's worth nothing that there are two problems to be solved here: one is
-to specify an exact set unambiguously, which is important for migration
-scenarios.
+Note that we can't (and don't need to) enumerate all possible
+combinations of features that exist in the world.  I let CPU
+vendors who submit patches decide which combinations of features
+are important to be supported out of the box.
 
-The other is to be able to clamp the vector length for user convenience,
-but without particularly considering migration.  There's no direct way
-for the user to know the set of vector lengths supported by KVM today,
-so cooking up the right magic to go on the command line is non-trivial:
-you have to create a dummy vcpu and read KVM_REG_ARM64_SVE_VLS to find
-the host's supported set.  Or you just have to know.
+Dhyana adds to the complexity, because of the new CPU vendor ID.
+Different vendor IDs require different CPU models because the CPU
+model contains family/model/stepping/model_id values that make
+sense only in conjunction with the vendor ID.  Should we call it
+Zen-Dhyana?  Dhyana_G1?  I think I'll just let the Hygon
+developers decide.
 
-A separate max-vl option (or whatever) might be a useful alternative.
-
-Cheers
----Dave
+--=20
+Eduardo
 
