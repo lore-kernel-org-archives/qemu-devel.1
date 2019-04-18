@@ -6,44 +6,44 @@ X-Spam-Status: No, score=-5.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_PASS,URIBL_BLOCKED autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 35CC9C10F0E
-	for <qemu-devel@archiver.kernel.org>; Thu, 18 Apr 2019 14:22:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 28405C10F0E
+	for <qemu-devel@archiver.kernel.org>; Thu, 18 Apr 2019 14:23:09 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D62C520675
-	for <qemu-devel@archiver.kernel.org>; Thu, 18 Apr 2019 14:22:23 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D62C520675
+	by mail.kernel.org (Postfix) with ESMTPS id DF50F20675
+	for <qemu-devel@archiver.kernel.org>; Thu, 18 Apr 2019 14:23:08 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DF50F20675
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:42151 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:42155 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hH7vj-0001AM-4V
-	for qemu-devel@archiver.kernel.org; Thu, 18 Apr 2019 10:22:23 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:56702)
+	id 1hH7wS-0001jJ-55
+	for qemu-devel@archiver.kernel.org; Thu, 18 Apr 2019 10:23:08 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:56703)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1hH7uD-0000GK-1O
+	(envelope-from <bounces@canonical.com>) id 1hH7uD-0000GM-1j
 	for qemu-devel@nongnu.org; Thu, 18 Apr 2019 10:20:50 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1hH7uB-0001kk-Lc
-	for qemu-devel@nongnu.org; Thu, 18 Apr 2019 10:20:48 -0400
-Received: from indium.canonical.com ([91.189.90.7]:53060)
+	(envelope-from <bounces@canonical.com>) id 1hH7uB-0001kU-Gl
+	for qemu-devel@nongnu.org; Thu, 18 Apr 2019 10:20:49 -0400
+Received: from indium.canonical.com ([91.189.90.7]:53054)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1hH7uB-0001jQ-Fq
+	id 1hH7uB-0001im-B2
 	for qemu-devel@nongnu.org; Thu, 18 Apr 2019 10:20:47 -0400
 Received: from loganberry.canonical.com ([91.189.90.37])
 	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1hH7uA-0000zR-Jw
+	id 1hH7uA-00013W-24
 	for <qemu-devel@nongnu.org>; Thu, 18 Apr 2019 14:20:46 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 950042E80C7
+	by loganberry.canonical.com (Postfix) with ESMTP id 078E52E80CB
 	for <qemu-devel@nongnu.org>; Thu, 18 Apr 2019 14:20:46 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Thu, 18 Apr 2019 14:11:20 -0000
+Date: Thu, 18 Apr 2019 14:09:38 -0000
 From: Shahab Vahedi <1825359@bugs.launchpad.net>
 To: qemu-devel@nongnu.org
 X-Launchpad-Notification-Type: bug
@@ -58,13 +58,13 @@ X-Launchpad-Bug-Reporter: Shahab Vahedi (shahab-vahedi)
 X-Launchpad-Bug-Modifier: Shahab Vahedi (shahab-vahedi)
 References: <155558881987.7164.1099557133760519082.malonedeb@chaenomeles.canonical.com>
 Message-Id:
- <155559668052.17204.8976877996814326212.malone@soybean.canonical.com>
+ <155559657895.6414.8767794573070268894.malone@chaenomeles.canonical.com>
 X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
 X-Launchpad-Message-For: qemu-devel-ml
 Precedence: bulk
 X-Generated-By: Launchpad (canonical.com); Revision="18928";
 	Instance="launchpad-lazr.conf"
-X-Launchpad-Hash: 38a158d17c714861857fdbe31981501b95d1fdc1
+X-Launchpad-Hash: fb63ca726915e55c51decb3771ed44cb53543b5d
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 91.189.90.7
 Subject: [Qemu-devel] [Bug 1825359] Re: cpu_ld*_code() triggers
@@ -83,15 +83,51 @@ Reply-To: Bug 1825359 <1825359@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190418141120.ecKkfWJ5VCCcb0ay305uI8U5okxgnFAEtxgpvPprIiQ@z>
+Message-ID: <20190418140938.3k9FCAs-fqIODF6hDzaOMlY8WvAKyvq6GPN1Vj000rM@z>
 
-call stack for SEGFAULT that happens during the execution of small
-region. This will go away IF THE ENTRY ADDED TO TLB FOR THIS REGION IS
-OF SIZE TARGET_PAGE_SIZE. However, that would not be correct behavior.
+I have to say, after applying this patch, my test still fails while
+fetching the instructions from this _small_ region. Although there is no
+MMU_DATA_LOAD anymore, a few iterations later (while guest code has just
+jumped to the beginning of the executable region), QEmu segfaults (call
+stack is attached):
 
-** Attachment added: "segfault_bt.txt"
-   https://bugs.launchpad.net/qemu/+bug/1825359/+attachment/5256726/+files/=
-segfault_bt.txt
+memory.c
+--------
+static MemTxResult
+memory_region_read_with_attrs_accessor(MemoryRegion *mr,
+                                       ...)
+{
+    uint64_t tmp =3D 0;
+    MemTxResult r;
+
+    r =3D mr->ops->read_with_attrs(mr->opaque, addr, &tmp, size, attrs);
+    ...
+}
+--------
+
+Here, "read_with_attrs" is null. The call stack looks like:
+---
+#0  memory_region_read_with_attrs_accessor at memory.c:465
+#1  access_with_adjusted_size at memory.c:568
+#2  memory_region_dispatch_read1 at memory.c:1425
+#3  memory_region_dispatch_read at memory.c:1446
+#4  io_readx at accel/tcg/cputlb.c:909
+#5  io_readw at accel/tcg/softmmu_template.h:106
+#6  helper_le_ldw_cmmu at accel/tcg/softmmu_template.h:146
+#7  cpu_lduw_code_ra at include/exec/cpu_ldst_template.h:102
+#8  cpu_lduw_code at include/exec/cpu_ldst_template.h:114
+#9  read_and_decode_context at target/arc/arc-decoder.c:1479
+#10 arc_decode at target/arc/arc-decoder.c:1736
+#11 decode_opc at target/arc/translate.c:313
+#12 arc_tr_translate_insn at target/arc/translate.c:335
+#13 translator_loop at accel/tcg/translator.c:107
+#14 gen_intermediate_code at target/arc/translate.c:413
+#15 tb_gen_code at accel/tcg/translate-all.c:1723
+#16 tb_find at accel/tcg/cpu-exec.c:407
+#17 cpu_exec at accel/tcg/cpu-exec.c:729
+#18 tcg_cpu_exec at cpus.c:1430
+---
+more detailed call stack is attached.
 
 -- =
 
