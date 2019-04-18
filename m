@@ -2,95 +2,75 @@ Return-Path: <SRS0=08iY=SU=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0C0A0C10F0E
-	for <qemu-devel@archiver.kernel.org>; Thu, 18 Apr 2019 19:01:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0CE46C10F0E
+	for <qemu-devel@archiver.kernel.org>; Thu, 18 Apr 2019 19:56:28 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B0689214DA
-	for <qemu-devel@archiver.kernel.org>; Thu, 18 Apr 2019 19:01:44 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B0689214DA
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id AEB6A20643
+	for <qemu-devel@archiver.kernel.org>; Thu, 18 Apr 2019 19:56:27 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AEB6A20643
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=canonical.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:45932 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:46498 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hHCI4-0001BD-2x
-	for qemu-devel@archiver.kernel.org; Thu, 18 Apr 2019 15:01:44 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:59761)
+	id 1hHD90-0003IQ-QY
+	for qemu-devel@archiver.kernel.org; Thu, 18 Apr 2019 15:56:26 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:42498)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1hHCGt-0000Z8-G8
-	for qemu-devel@nongnu.org; Thu, 18 Apr 2019 15:00:35 -0400
+	(envelope-from <bounces@canonical.com>) id 1hHD8F-0002xv-0C
+	for qemu-devel@nongnu.org; Thu, 18 Apr 2019 15:55:40 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1hHCGr-0007uQ-De
-	for qemu-devel@nongnu.org; Thu, 18 Apr 2019 15:00:31 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:39968)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>)
-	id 1hHCBy-00052W-Qo; Thu, 18 Apr 2019 14:55:27 -0400
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
-	[10.5.11.15])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 5B08EC02490F;
-	Thu, 18 Apr 2019 18:55:25 +0000 (UTC)
-Received: from [10.3.116.103] (ovpn-116-103.phx2.redhat.com [10.3.116.103])
-	by smtp.corp.redhat.com (Postfix) with ESMTPS id CE8BF5D70A;
-	Thu, 18 Apr 2019 18:55:24 +0000 (UTC)
-To: Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org
-References: <20180713111424.23670-1-mreitz@redhat.com>
-	<20180713111424.23670-2-mreitz@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Openpgp: preference=signencrypt
-Autocrypt: addr=eblake@redhat.com; keydata=
-	xsBNBEvHyWwBCACw7DwsQIh0kAbUXyqhfiKAKOTVu6OiMGffw2w90Ggrp4bdVKmCaEXlrVLU
-	xphBM8mb+wsFkU+pq9YR621WXo9REYVIl0FxKeQo9dyQBZ/XvmUMka4NOmHtFg74nvkpJFCD
-	TUNzmqfcjdKhfFV0d7P/ixKQeZr2WP1xMcjmAQY5YvQ2lUoHP43m8TtpB1LkjyYBCodd+LkV
-	GmCx2Bop1LSblbvbrOm2bKpZdBPjncRNob73eTpIXEutvEaHH72LzpzksfcKM+M18cyRH+nP
-	sAd98xIbVjm3Jm4k4d5oQyE2HwOur+trk2EcxTgdp17QapuWPwMfhaNq3runaX7x34zhABEB
-	AAHNHkVyaWMgQmxha2UgPGVibGFrZUByZWRoYXQuY29tPsLAegQTAQgAJAIbAwULCQgHAwUV
-	CgkICwUWAgMBAAIeAQIXgAUCS8fL9QIZAQAKCRCnoWtKJSdDahBHCACbl/5FGkUqJ89GAjeX
-	RjpAeJtdKhujir0iS4CMSIng7fCiGZ0fNJCpL5RpViSo03Q7l37ss+No+dJI8KtAp6ID+PMz
-	wTJe5Egtv/KGUKSDvOLYJ9WIIbftEObekP+GBpWP2+KbpADsc7EsNd70sYxExD3liwVJYqLc
-	Rw7so1PEIFp+Ni9A1DrBR5NaJBnno2PHzHPTS9nmZVYm/4I32qkLXOcdX0XElO8VPDoVobG6
-	gELf4v/vIImdmxLh/w5WctUpBhWWIfQDvSOW2VZDOihm7pzhQodr3QP/GDLfpK6wI7exeu3P
-	pfPtqwa06s1pae3ad13mZGzkBdNKs1HEm8x6zsBNBEvHyWwBCADGkMFzFjmmyqAEn5D+Mt4P
-	zPdO8NatsDw8Qit3Rmzu+kUygxyYbz52ZO40WUu7EgQ5kDTOeRPnTOd7awWDQcl1gGBXgrkR
-	pAlQ0l0ReO57Q0eglFydLMi5bkwYhfY+TwDPMh3aOP5qBXkm4qIYSsxb8A+i00P72AqFb9Q7
-	3weG/flxSPApLYQE5qWGSXjOkXJv42NGS6o6gd4RmD6Ap5e8ACo1lSMPfTpGzXlt4aRkBfvb
-	NCfNsQikLZzFYDLbQgKBA33BDeV6vNJ9Cj0SgEGOkYyed4I6AbU0kIy1hHAm1r6+sAnEdIKj
-	cHi3xWH/UPrZW5flM8Kqo14OTDkI9EtlABEBAAHCwF8EGAEIAAkFAkvHyWwCGwwACgkQp6Fr
-	SiUnQ2q03wgAmRFGDeXzc58NX0NrDijUu0zx3Lns/qZ9VrkSWbNZBFjpWKaeL1fdVeE4TDGm
-	I5mRRIsStjQzc2R9b+2VBUhlAqY1nAiBDv0Qnt+9cLiuEICeUwlyl42YdwpmY0ELcy5+u6wz
-	mK/jxrYOpzXKDwLq5k4X+hmGuSNWWAN3gHiJqmJZPkhFPUIozZUCeEc76pS/IUN72NfprZmF
-	Dp6/QDjDFtfS39bHSWXKVZUbqaMPqlj/z6Ugk027/3GUjHHr8WkeL1ezWepYDY7WSoXwfoAL
-	2UXYsMAr/uUncSKlfjvArhsej0S4zbqim2ZY6S8aRWw94J3bSvJR+Nwbs34GPTD4Pg==
-Organization: Red Hat, Inc.
-Message-ID: <a36f26f1-61b3-799f-5cee-281257cba123@redhat.com>
-Date: Thu, 18 Apr 2019 13:55:23 -0500
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
-	Thunderbird/60.6.1
+	(envelope-from <bounces@canonical.com>) id 1hHD8D-0007NI-8r
+	for qemu-devel@nongnu.org; Thu, 18 Apr 2019 15:55:38 -0400
+Received: from indium.canonical.com ([91.189.90.7]:51452)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1hHD8C-0007LA-VL
+	for qemu-devel@nongnu.org; Thu, 18 Apr 2019 15:55:37 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1hHD8B-00033x-ID
+	for <qemu-devel@nongnu.org>; Thu, 18 Apr 2019 19:55:35 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 8447B2E806F
+	for <qemu-devel@nongnu.org>; Thu, 18 Apr 2019 19:55:35 +0000 (UTC)
 MIME-Version: 1.0
-In-Reply-To: <20180713111424.23670-2-mreitz@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="JSxaEokpMAphqXSFNOxFcydsU20fsIL31"
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.32]);
-	Thu, 18 Apr 2019 18:55:25 +0000 (UTC)
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Thu, 18 Apr 2019 19:45:29 -0000
+From: =?utf-8?q?Jos=C3=A9_Pekkarinen?= <jose.pekkarinen@canonical.com>
+To: qemu-devel@nongnu.org
+X-Launchpad-Notification-Type: bug
+X-Launchpad-Bug: product=libvirt; status=New; importance=Undecided;
+	assignee=None; 
+X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
+X-Launchpad-Bug-Information-Type: Public
+X-Launchpad-Bug-Private: no
+X-Launchpad-Bug-Security-Vulnerability: no
+X-Launchpad-Bug-Commenters: koalinux
+X-Launchpad-Bug-Reporter: =?utf-8?q?Jos=C3=A9_Pekkarinen_=28koalinux=29?=
+X-Launchpad-Bug-Modifier: =?utf-8?q?Jos=C3=A9_Pekkarinen_=28koalinux=29?=
+References: <155156252741.17588.3363806743942119527.malonedeb@gac.canonical.com>
+Message-Id:
+ <155561672922.13864.18025749262863812444.malone@wampee.canonical.com>
+X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
+X-Launchpad-Message-For: qemu-devel-ml
+Precedence: bulk
+X-Generated-By: Launchpad (canonical.com); Revision="18928";
+	Instance="launchpad-lazr.conf"
+X-Launchpad-Hash: 73cda2e4283acf2aa25ae96104344e01d349857c
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-X-Content-Filtered-By: Mailman/MimeDel 2.1.21
-Subject: Re: [Qemu-devel] [PATCH 1/3] qemu-img: Allow rebase with no input
- base
+X-Received-From: 91.189.90.7
+Subject: [Qemu-devel] [Bug 1818367] Re: Initialization of device
+ cfi.pflash01 failed: Block node is read-only
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
-Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -99,70 +79,434 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, qemu-devel@nongnu.org
+Reply-To: Bug 1818367 <1818367@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190418185523.6Oud98eT7fygwRvvOXCsnYxRhF_9nJJYTnUEH1sAst0@z>
+Message-ID: <20190418194529.8thsrPNo4yPyrSC6cKiJbSNlHKP6bulS5L18hq7kUPs@z>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---JSxaEokpMAphqXSFNOxFcydsU20fsIL31
-From: Eric Blake <eblake@redhat.com>
-To: Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org
-Cc: Kevin Wolf <kwolf@redhat.com>, qemu-devel@nongnu.org
-Message-ID: <a36f26f1-61b3-799f-5cee-281257cba123@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH 1/3] qemu-img: Allow rebase with no input
- base
-References: <20180713111424.23670-1-mreitz@redhat.com>
- <20180713111424.23670-2-mreitz@redhat.com>
-In-Reply-To: <20180713111424.23670-2-mreitz@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+seems to be piece of true on Phil's comments, as extracting the command
+on the log and executing it manually the result is the following:
 
-On 7/13/18 6:14 AM, Max Reitz wrote:
-> Currently, you cannot add a backing file to an image when it currently
-> has none.  It is really simple to allow this, though (effectively by
-> setting old_backing_size to 0), so this patch does just that.
+2019-04-18T19:37:49.685841Z qemu-system-x86_64: -object
+secret,id=3DmasterKey0,format=3Draw,file=3D/var/lib/libvirt/qemu/domain-6-o=
+s-1
+/master-key.aes: Unable to read /var/lib/libvirt/qemu/domain-6-os-1
+/master-key.aes: Failed to open file
+=E2=80=9C/var/lib/libvirt/qemu/domain-6-os-1/master-key.aes=E2=80=9D: No su=
+ch file or
+directory
 
-Can't you do that with 'rebase -u'? I guess the point of this patch is
-to make 'rebase' without -u also able to add a backing file?  A bit more
-clarity in the commit message, such as a sample command line (and
-possibly even the error it issued pre-patch) would help.
+unless those folders with master keys are dinamically genreated and
+trashed after execution it would be worthy to involve here libvirt
+project as well.
 
->=20
-> Signed-off-by: Max Reitz <mreitz@redhat.com>
-> ---
->  qemu-img.c | 61 ++++++++++++++++++++++++++++++------------------------=
+Jos=C3=A9.
 
->  1 file changed, 34 insertions(+), 27 deletions(-)
+** Also affects: libvirt
+   Importance: Undecided
+       Status: New
 
-At any rate, the code looks fine, even if the diff is harder to read
-because of added indentation.
+-- =
 
-Reviewed-by: Eric Blake <eblake@redhat.com>
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1818367
 
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3226
-Virtualization:  qemu.org | libvirt.org
+Title:
+  Initialization of device cfi.pflash01 failed: Block node is read-only
 
+Status in libvirt:
+  New
+Status in QEMU:
+  New
 
---JSxaEokpMAphqXSFNOxFcydsU20fsIL31
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
+Bug description:
+  Hi,
 
------BEGIN PGP SIGNATURE-----
+  I have several vms defined in libvirt using ovmf for uefi, since a later
+  update of my server I'm unable to start any of the domains defined. This =
+is
+  an example of the output given:
 
-iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAly4yBsACgkQp6FrSiUn
-Q2rUmwf9Gb7c8svGiKLSFr+WF7arBQnJ2OaQmTneU1Kp3wZPpoU+ZssRgCkJz4TZ
-Zvsa23cg+Dm1VMlPMGRp2/lkh/cjNTnH8rBR/CxYYLE6UfJ/ixR/m4/t6C0G/mt+
-iMffyQPbPBwpFNgQoJ/pR8hfbbYKNGSWdpZRg5ARKhPPktPHXuZMq58D+/c+fMuh
-zms/HfWcyrmktgnGWYbZ/CGa0yFVsIym2Q/Ti0hLNOFhP5KukoEzCzrC36CjcaJ+
-NLgJo6JsH1M0b9lJf1s4LL+Db2w0nD6N84eqGqRlOANeRO5eUmX9SB5lrvQ1KOaf
-rFCbVXiSbkOooBbVcabQXTW6It9OUg==
-=4Kqp
------END PGP SIGNATURE-----
+  # virsh start os-1
+  error: Failed to start domain os-1
+  error: internal error: qemu unexpectedly closed the monitor: 2019-03-02T2=
+1:23:51.726446Z qemu-system-x86_64: Initialization of device cfi.pflash01 f=
+ailed: Block node is read-only
 
---JSxaEokpMAphqXSFNOxFcydsU20fsIL31--
+  an example of domain is like this:
+
+  <domain type=3D'kvm'>                                                    =
+                                                                           =
+                                                                           =
+                                                  =
+
+    <name>os-1</name>                                                      =
+                                                                           =
+                                                                           =
+                                                =
+
+    <uuid>34c41008-ab91-483b-959c-81a7a12ae9be</uuid>                      =
+                                                                           =
+                                                                           =
+                                                =
+
+    <memory unit=3D'KiB'>8388608</memory>                                  =
+                                                                           =
+                                                                           =
+                                                  =
+
+    <currentMemory unit=3D'KiB'>8388608</currentMemory>                    =
+                                                                           =
+                                                                           =
+                                                  =
+
+    <memoryBacking>                                                        =
+                                                                           =
+                                                                           =
+                                                =
+
+      <hugepages/>                                                         =
+                                                                           =
+                                                                           =
+                                                =
+
+    </memoryBacking>                                                       =
+                                                                           =
+                                                                           =
+                                                =
+
+    <vcpu placement=3D'static' cpuset=3D'10-11,34-35'>4</vcpu>             =
+                                                                           =
+                                                                           =
+                                                    =
+
+    <os>                                                                   =
+                                                                           =
+                                                                           =
+                                                =
+
+      <type arch=3D'x86_64' machine=3D'pc-i440fx-2.12'>hvm</type>          =
+                                                                           =
+                                                                           =
+                                                    =
+
+      <loader type=3D'pflash'>/var/lib/libvirt/qemu/nvram/os-1-ovmf.fd</loa=
+der>                                                                       =
+                                                                           =
+                                                  =
+
+      <boot dev=3D'network'/>                                              =
+                                                                           =
+                                                                           =
+                                                  =
+
+      <boot dev=3D'hd'/>                                                   =
+                                                                           =
+                                                                           =
+                                                  =
+
+    </os>                                                                  =
+                                                                           =
+                                                                           =
+                                                =
+
+    <features>                                                             =
+                                                                           =
+                                                                           =
+                                                =
+
+      <acpi/>                                                              =
+                                                                           =
+                                                                           =
+                                                =
+
+      <apic/>                                                              =
+                                                                           =
+                                                                           =
+                                                =
+
+    </features>                                                            =
+                                                                           =
+                                                                           =
+                                                =
+
+    <cpu mode=3D'host-passthrough' check=3D'partial'/>                     =
+                                                                           =
+                                                                           =
+                                                    =
+
+    <clock offset=3D'utc'>                                                 =
+                                                                           =
+                                                                           =
+                                                  =
+
+      <timer name=3D'rtc' tickpolicy=3D'catchup'/>                         =
+                                                                           =
+                                                                           =
+                                                    =
+
+      <timer name=3D'pit' tickpolicy=3D'delay'/>                           =
+                                                                           =
+                                                                           =
+                                                    =
+
+      <timer name=3D'hpet' present=3D'no'/>                                =
+                                                                           =
+                                                                           =
+                                                    =
+
+    </clock>                                                               =
+                                                                           =
+                                                                           =
+                                                =
+
+    <on_poweroff>destroy</on_poweroff>                                     =
+                                                                           =
+                                                                           =
+                                                =
+
+    <on_reboot>restart</on_reboot>                                         =
+                                                                           =
+                                                                           =
+                                                =
+
+    <on_crash>destroy</on_crash>                                           =
+                                                                           =
+                                                                           =
+                                                =
+
+    <pm>                                                                   =
+                                                                           =
+                                                                           =
+                                                =
+
+      <suspend-to-mem enabled=3D'no'/>                                     =
+                                                                           =
+                                                                           =
+                                                  =
+
+      <suspend-to-disk enabled=3D'no'/>                                    =
+                                                                           =
+                                                                           =
+                                                  =
+
+    </pm>                                                                  =
+                                                                           =
+                                                                           =
+                                                =
+
+    <devices>                                                              =
+                                                                           =
+                                                                           =
+                                                =
+
+      <emulator>/usr/bin/qemu-system-x86_64</emulator>                     =
+                                                                           =
+                                                                           =
+                                                =
+
+      <disk type=3D'block' device=3D'disk'>                                =
+                                                                           =
+                                                                           =
+                                                    =
+
+        <driver name=3D'qemu' type=3D'raw' cache=3D'none' io=3D'native'/>  =
+                                                                           =
+                                                                           =
+                                                        =
+
+        <source dev=3D'/dev/vg0/os-1-vda'/>                                =
+                                                                           =
+                                                                           =
+                                             =
+
+        <target dev=3D'vda' bus=3D'virtio'/>                               =
+                                                                           =
+                                                                           =
+                                                    =
+
+        <address type=3D'pci' domain=3D'0x0000' bus=3D'0x00' slot=3D'0x06' =
+function=3D'0x0'/>                                                         =
+                                                                           =
+                                                          =
+
+      </disk>                                                              =
+                                                                           =
+                                                                           =
+                                                =
+
+      <disk type=3D'block' device=3D'disk'>
+        <driver name=3D'qemu' type=3D'raw' cache=3D'none' io=3D'native'/>
+        <source dev=3D'/dev/vg0/os-1-vdb'/>
+        <target dev=3D'vdb' bus=3D'virtio'/>
+        <address type=3D'pci' domain=3D'0x0000' bus=3D'0x00' slot=3D'0x07' =
+function=3D'0x0'/>
+      </disk>
+      <controller type=3D'usb' index=3D'0' model=3D'ich9-ehci1'>
+        <address type=3D'pci' domain=3D'0x0000' bus=3D'0x00' slot=3D'0x05' =
+function=3D'0x7'/>
+      </controller>
+      <controller type=3D'usb' index=3D'0' model=3D'ich9-uhci1'>
+        <master startport=3D'0'/>
+        <address type=3D'pci' domain=3D'0x0000' bus=3D'0x00' slot=3D'0x05' =
+function=3D'0x0' multifunction=3D'on'/>
+      </controller>
+      <controller type=3D'usb' index=3D'0' model=3D'ich9-uhci2'>
+        <master startport=3D'2'/>
+        <address type=3D'pci' domain=3D'0x0000' bus=3D'0x00' slot=3D'0x05' =
+function=3D'0x1'/>
+      </controller>
+      <controller type=3D'usb' index=3D'0' model=3D'ich9-uhci3'>
+        <master startport=3D'4'/>
+        <address type=3D'pci' domain=3D'0x0000' bus=3D'0x00' slot=3D'0x05' =
+function=3D'0x2'/>
+      </controller>
+      <controller type=3D'pci' index=3D'0' model=3D'pci-root'/>
+      <controller type=3D'ide' index=3D'0'>
+        <address type=3D'pci' domain=3D'0x0000' bus=3D'0x00' slot=3D'0x01' =
+function=3D'0x1'/>
+      </controller>
+      <interface type=3D'bridge'>
+        <mac address=3D'52:54:00:78:cb:97'/>
+        <source bridge=3D'virbr0'/>
+        <model type=3D'rtl8139'/>
+        <address type=3D'pci' domain=3D'0x0000' bus=3D'0x00' slot=3D'0x04' =
+function=3D'0x0'/>
+      </interface>
+      <interface type=3D'bridge'>
+        <mac address=3D'52:54:00:1c:4f:22'/>
+        <source bridge=3D'virbr1'/>
+        <model type=3D'rtl8139'/>
+        <address type=3D'pci' domain=3D'0x0000' bus=3D'0x00' slot=3D'0x03' =
+function=3D'0x0'/>
+      </interface>
+      <serial type=3D'pty'>
+        <target type=3D'isa-serial' port=3D'0'>
+          <model name=3D'isa-serial'/>
+        </target>
+      </serial>
+      <console type=3D'pty'>
+        <target type=3D'serial' port=3D'0'/>
+      </console>
+      <input type=3D'mouse' bus=3D'ps2'/>
+      <input type=3D'keyboard' bus=3D'ps2'/>
+      <graphics type=3D'vnc' port=3D'-1' autoport=3D'yes'>
+        <listen type=3D'address'/>
+      </graphics>
+      <video>
+        <model type=3D'cirrus' vram=3D'16384' heads=3D'1' primary=3D'yes'/>
+        <address type=3D'pci' domain=3D'0x0000' bus=3D'0x00' slot=3D'0x02' =
+function=3D'0x0'/>
+      </video>
+      <memballoon model=3D'virtio'>
+        <address type=3D'pci' domain=3D'0x0000' bus=3D'0x00' slot=3D'0x09' =
+function=3D'0x0'/>
+      </memballoon>
+    </devices>
+  </domain>
+
+  where /var/lib/libvirt/qemu/nvram/os-1-ovmf.fd is a copy of
+  /usr/share/edk2-ovmf/OVMF_VARS.fd. An the extract from my
+  /etc/libvirt/qemu.conf to define ovmf:
+
+  ...
+  # Location of master nvram file                                          =
+                                                                           =
+                                                                           =
+                                                =
+
+  #                                                                        =
+                                                                           =
+                                                                           =
+                                                =
+
+  # When a domain is configured to use UEFI instead of standard            =
+                                                                           =
+                                                                           =
+                                                =
+
+  # BIOS it may use a separate storage for UEFI variables. If              =
+                                                                           =
+                                                                           =
+                                                =
+
+  # that's the case libvirt creates the variable store per domain          =
+                                                                           =
+                                                                           =
+                                                =
+
+  # using this master file as image. Each UEFI firmware can,               =
+                                                                           =
+                                                                           =
+                                                =
+
+  # however, have different variables store. Therefore the nvram is        =
+                                                                           =
+                                                                           =
+                                                =
+
+  # a list of strings when a single item is in form of:                    =
+                                                                           =
+                                                                           =
+                                                =
+
+  #   ${PATH_TO_UEFI_FW}:${PATH_TO_UEFI_VARS}.                             =
+                                                                           =
+                                                                           =
+                                                =
+
+  # Later, when libvirt creates per domain variable store, this list is    =
+                                                                           =
+                                                                           =
+                                                =
+
+  # searched for the master image. The UEFI firmware can be called         =
+                                                                           =
+                                                                           =
+                                                =
+
+  # differently for different guest architectures. For instance, it's OVMF =
+                                                                           =
+                                                                           =
+                                                =
+
+  # for x86_64 and i686, but it's AAVMF for aarch64. The libvirt default   =
+                                                                           =
+                                                                           =
+                                                =
+
+  # follows this scheme.                                                   =
+                                                                           =
+                                                                           =
+                                                =
+
+  nvram =3D [                                                              =
+                                                                           =
+                                                                           =
+                                                  =
+
+     "/usr/share/edk2-ovmf/OVMF_CODE.fd:/usr/share/edk2-ovmf/OVMF_VARS.fd",=
+                                                                           =
+                                                                           =
+                                                =
+
+  ]
+  ...
+
+  This setup used to work one month ago, now it's setup with:
+
+  QEMU emulator version 3.1.0
+  libvirt-5.0.0
+  linux-4.19.20
+
+  Any help appreciated.
+
+  Best regards.
+
+  Jos=C3=A9
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/libvirt/+bug/1818367/+subscriptions
 
