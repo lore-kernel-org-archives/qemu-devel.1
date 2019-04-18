@@ -2,76 +2,86 @@ Return-Path: <SRS0=08iY=SU=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS,USER_AGENT_MUTT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 059F1C10F0E
-	for <qemu-devel@archiver.kernel.org>; Thu, 18 Apr 2019 09:41:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1ACF6C10F0E
+	for <qemu-devel@archiver.kernel.org>; Thu, 18 Apr 2019 09:42:37 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C1DC7214DA
-	for <qemu-devel@archiver.kernel.org>; Thu, 18 Apr 2019 09:41:53 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C1DC7214DA
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id D7C51206B6
+	for <qemu-devel@archiver.kernel.org>; Thu, 18 Apr 2019 09:42:36 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="I7qDZo9v"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D7C51206B6
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:38575 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:38579 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hH3YG-0006N2-Vq
-	for qemu-devel@archiver.kernel.org; Thu, 18 Apr 2019 05:41:53 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:56935)
+	id 1hH3Yy-0006x6-4S
+	for qemu-devel@archiver.kernel.org; Thu, 18 Apr 2019 05:42:36 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:57133)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1hH3Wu-0005Zi-Fy
-	for qemu-devel@nongnu.org; Thu, 18 Apr 2019 05:40:29 -0400
+	(envelope-from <stefanha@gmail.com>) id 1hH3Xc-00069R-PS
+	for qemu-devel@nongnu.org; Thu, 18 Apr 2019 05:41:13 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1hH3Ws-00055l-Ag
-	for qemu-devel@nongnu.org; Thu, 18 Apr 2019 05:40:28 -0400
-Received: from mail-wm1-f42.google.com ([209.85.128.42]:36067)
+	(envelope-from <stefanha@gmail.com>) id 1hH3Xa-0005cb-OF
+	for qemu-devel@nongnu.org; Thu, 18 Apr 2019 05:41:12 -0400
+Received: from mail-wm1-x342.google.com ([2a00:1450:4864:20::342]:51348)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1hH3Ws-00054l-4U
-	for qemu-devel@nongnu.org; Thu, 18 Apr 2019 05:40:26 -0400
-Received: by mail-wm1-f42.google.com with SMTP id h18so2100698wml.1
-	for <qemu-devel@nongnu.org>; Thu, 18 Apr 2019 02:40:25 -0700 (PDT)
+	(Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1hH3XW-0005Z9-Ut
+	for qemu-devel@nongnu.org; Thu, 18 Apr 2019 05:41:08 -0400
+Received: by mail-wm1-x342.google.com with SMTP id 4so2012385wmf.1
+	for <qemu-devel@nongnu.org>; Thu, 18 Apr 2019 02:41:05 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+	h=date:from:to:cc:subject:message-id:references:mime-version
+	:content-disposition:in-reply-to:user-agent;
+	bh=r8eoLVxI9eYB71LA7KSPdof1ihMqouhtTRhuqukfoF0=;
+	b=I7qDZo9vv5k46mrNjCh1HzFT8v0MaFiHErOMXmmvCXlY6ge5K/ysIHMgQ8/WNH3b6P
+	P0J70wuaBJtXhBNeOlbJmcZ8ITk89ZZTlaCFda8sSaTGosZG7Qzr3A/ob+WBWCQ5kdEb
+	gSxiA7vq0QyG24gI5mJ/NZ75gGVdDYHQF6FQvrLbLSUEOo4S5qRr8gjnw1Di9BQ7oDuH
+	0FKIaab9V1Lc+FgBYd9xk/tJWK4RM9VFoCSXFiqIpP/I9HF7uS3NjgdEe310cP4iRIV7
+	VZImJy9kOKwMelo/TiSztk11R8RxITaIWP1xFdjYYn1vPJdVh6bxt+jdCFdHtHUc7Vem
+	tvyg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
 	d=1e100.net; s=20161025;
-	h=x-gm-message-state:subject:to:references:from:message-id:date
-	:user-agent:mime-version:in-reply-to:content-language
-	:content-transfer-encoding;
-	bh=QA0DhC1HRtcwAmd80K3MuoV05EMEnRCrHgszvLiSkSM=;
-	b=pcMomRfoxza6BUjCihCjxSuBOqC2JchC7rcXrSx/yxAdF5EzLK6sAXgP6LkhVCoDan
-	mXvP8GMjASrsJ6RqY0No555fGqFxdXMzXcUhSPJ0rQpagfxyJ+hlZTUumfd+DRXWz4FZ
-	VVzs8vciYkDUbGlvk+VNPnlFucqwMCspToiCm8np9YpvDobC9Hx1fkleZTyTBY3yfbkX
-	ZEnT46Qzz9ABNxNpitfE5ZEPYYHztNejOOXerF98qQWXhrrfCQkBLb4i1lZDIn6Plw50
-	XR0KT/ikqZOvxHxi/ajb8Yfyljh1FZ6MZC2d3MxABpWughiWT2mVG+4IFv3zlbMVoGpU
-	rI1Q==
-X-Gm-Message-State: APjAAAXEjv58LZuzgYssdWmHJ7bdj24UfrGNriyjoUj2EFwOeb2FnpbK
-	bE8HjbdOHGN1V21Gl/uYp0Vmj+usUbg=
-X-Google-Smtp-Source: APXvYqwXKEbhBSLeHrBsjCLbeucoKCBWMcZ2B4LUVvTBmCIkMradluA+WqKNJtQ+zpsFta32Lh+sAA==
-X-Received: by 2002:a1c:b189:: with SMTP id a131mr2278848wmf.107.1555580423923;
-	Thu, 18 Apr 2019 02:40:23 -0700 (PDT)
-Received: from ?IPv6:2001:b07:6468:f312:49bf:c33a:2074:ab2?
-	([2001:b07:6468:f312:49bf:c33a:2074:ab2])
-	by smtp.gmail.com with ESMTPSA id
-	t14sm1540473wmi.16.2019.04.18.02.40.23
-	(version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-	Thu, 18 Apr 2019 02:40:23 -0700 (PDT)
-To: Frank Yang <lfy@google.com>, qemu-devel <qemu-devel@nongnu.org>
-References: <CAEkmjvU2chrbUnbV9GHidwrVb5roP+XCu0CmygaQnaFQAw8ALQ@mail.gmail.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <32307490-982c-055b-c521-16b754c46fdc@redhat.com>
-Date: Thu, 18 Apr 2019 11:40:21 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
-	Thunderbird/60.6.1
+	h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+	:mime-version:content-disposition:in-reply-to:user-agent;
+	bh=r8eoLVxI9eYB71LA7KSPdof1ihMqouhtTRhuqukfoF0=;
+	b=i+QMRVpqHPq/LI23b9TpCW7/6SutofR7v+voKkjOdlWe3IgITXjKevgIYqVz+JHROU
+	ix+XaFbzBWLUuA2m7W6+EQ5Q1pwI9DLjwwS+28OzzYWZZZLpFCLhzJtDMxAXrA5RgYeN
+	Fp9bXj/VW8wYIRqIlUnVIcCxGPhzvT1YjWGzl5laKkJn0jZP/nAjwPx3zoMt0WJDivY8
+	U6QYPtiVYOhoP2xqCMBb/uXGMWvNhcqcNKlJbXYvwNYfd3vlE96lxVYZuDnxTrxGd1Dm
+	Qboi3HabPW5g4Sv1YsihrsGWifMwMDGR4iiUP438vtkIImnsBuzl4MxUwwaFhspj8/4/
+	C5hA==
+X-Gm-Message-State: APjAAAWX3k1ddigDZeRGXoCUrvQHKiolfsETMLmqtu47MXeQTdbQSINs
+	CTaAtPXbrp3AGH9YawrHem8=
+X-Google-Smtp-Source: APXvYqzJ7PGvlBUnhNE4o+AhMkF3QWRLFn8eHuPOv68WM6LUrcCX6D1Kr51IbK94Ogxy2OuhGGW/1A==
+X-Received: by 2002:a1c:43c2:: with SMTP id q185mr2382283wma.53.1555580464003; 
+	Thu, 18 Apr 2019 02:41:04 -0700 (PDT)
+Received: from localhost ([51.15.41.238])
+	by smtp.gmail.com with ESMTPSA id z14sm792701wro.81.2019.04.18.02.41.02
+	(version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
+	Thu, 18 Apr 2019 02:41:02 -0700 (PDT)
+Date: Thu, 18 Apr 2019 10:41:01 +0100
+From: Stefan Hajnoczi <stefanha@gmail.com>
+To: Liran Alon <liran.alon@oracle.com>
+Message-ID: <20190418094101.GA23876@stefanha-x1.localdomain>
+References: <20190416125912.44001-1-liran.alon@oracle.com>
 MIME-Version: 1.0
-In-Reply-To: <CAEkmjvU2chrbUnbV9GHidwrVb5roP+XCu0CmygaQnaFQAw8ALQ@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-	[fuzzy]
-X-Received-From: 209.85.128.42
-Subject: Re: [Qemu-devel] tsan: many race conditions involving mmio
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="u3/rZRmxL6MmkK24"
+Content-Disposition: inline
+In-Reply-To: <20190416125912.44001-1-liran.alon@oracle.com>
+User-Agent: Mutt/1.11.3 (2019-02-01)
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+	recognized.
+X-Received-From: 2a00:1450:4864:20::342
+Subject: Re: [Qemu-devel] [PATCH v2 0/3] vhost-scsi: Support migration
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -83,92 +93,60 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: ehabkost@redhat.com, mtosatti@redhat.com, qemu-devel@nongnu.org,
+	bijan.mottahedeh@oracle.com, pbonzini@redhat.com,
+	nir.weiner@oracle.com, rth@twiddle.net
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190418094021.ZLXJs0UoKKrlLOEqbqNxJDJC_od6u7GkO6jSWx1aAks@z>
+Message-ID: <20190418094101.CymI8Q__187rO0FHmFaUV7lkWJanvtrSN5ulUwbg3GU@z>
 
-On 17/04/19 21:50, Frank Yang via Qemu-devel wrote:
-> What's a quick fix for stuff like this?
 
-It's a false positive.  The access in T14 is protected via
-rcu_read_lock/rcu_read_unlock.
+--u3/rZRmxL6MmkK24
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-Paolo
+On Tue, Apr 16, 2019 at 03:59:09PM +0300, Liran Alon wrote:
+> Hi,
+>=20
+> This patch series aims to add supprot to migrate a VM with a vhost-scsi d=
+evice.
+>=20
+> The 1st patch fixes a bug of mistakenly not stopping vhost-scsi backend w=
+hen a
+> VM is stopped (As happens on migratino pre-copy completion).
+>=20
+> The 2nd patch adds ability to save/load vhost-scsi device state in VMStat=
+e.
+>=20
+> The 3rd and final paqtch adds a flag to vhost-scsi which allows admin to =
+specify
+> it's setup supports vhost-scsi migratino. For more detailed information o=
+n why
+> this is valid, see commit message of specific patch.
+>=20
+> Regards,
+> -Liran
 
-> WARNING: ThreadSanitizer: data race (pid=168036)
->   Write of size 8 at 0x7b900017a100 by thread T1 (mutexes: write M2141):
->     #0 free
-> /toolchain/llvm/projects/compiler-rt/lib/tsan/rtl/tsan_interceptors.cc:715:3
-> (qemu-system-x86_64+0x484028)
->     #1 phys_sections_free
-> /usr/local/google/home/lfy/emu/external/qemu/objs/../exec.c:1455:5
-> (qemu-system-x86_64+0x523608)
->     #2 address_space_dispatch_free
-> /usr/local/google/home/lfy/emu/external/qemu/objs/../exec.c:3236
-> (qemu-system-x86_64+0x523608)
->     #3 flatview_destroy
-> /usr/local/google/home/lfy/emu/external/qemu/objs/../memory.c:290:9
-> (qemu-system-x86_64+0x5bfcd1)
->     #4 call_rcu_thread
-> /usr/local/google/home/lfy/emu/external/qemu/objs/../util/rcu.c:284:13
-> (qemu-system-x86_64+0xb23274)
->     #5 qemu_thread_trampoline
-> /usr/local/google/home/lfy/emu/external/qemu/objs/../util/qemu-thread-posix.c:551:17
-> (qemu-system-x86_64+0xb033c6)
-> 
->   Previous read of size 8 at 0x7b900017a100 by thread T14:
->     #0 address_space_lookup_region
-> /usr/local/google/home/lfy/emu/external/qemu/objs/../exec.c:431:37
-> (qemu-system-x86_64+0x51b9b8)
->     #1 address_space_translate_internal
-> /usr/local/google/home/lfy/emu/external/qemu/objs/../exec.c:447
-> (qemu-system-x86_64+0x51b9b8)
->     #2 flatview_do_translate
-> /usr/local/google/home/lfy/emu/external/qemu/objs/../exec.c:616:15
-> (qemu-system-x86_64+0x51b318)
->     #3 flatview_translate
-> /usr/local/google/home/lfy/emu/external/qemu/objs/../exec.c:680:15
-> (qemu-system-x86_64+0x52bf20)
->     #4 address_space_translate
-> /usr/local/google/home/lfy/emu/external/qemu/objs/../include/exec/memory.h:1896
-> (qemu-system-x86_64+0x52bf20)
->     #5 address_space_lduw_internal_cached
-> /usr/local/google/home/lfy/emu/external/qemu/objs/../memory_ldst.inc.c:264
-> (qemu-system-x86_64+0x52bf20)
->     #6 address_space_lduw_le_cached
-> /usr/local/google/home/lfy/emu/external/qemu/objs/../memory_ldst.inc.c:315:12
-> (qemu-system-x86_64+0x52c44b)
->     #7 lduw_le_phys_cached
-> /usr/local/google/home/lfy/emu/external/qemu/objs/../memory_ldst.inc.c:334
-> (qemu-system-x86_64+0x52c44b)
->     #8 virtio_lduw_phys_cached
-> /usr/local/google/home/lfy/emu/external/qemu/objs/../include/hw/virtio/virtio-access.h:166:12
-> (qemu-system-x86_64+0x65c97b)
->     #9 vring_avail_idx
-> /usr/local/google/home/lfy/emu/external/qemu/objs/../hw/virtio/virtio.c:240
-> (qemu-system-x86_64+0x65c97b)
->     #10 virtio_queue_empty
-> /usr/local/google/home/lfy/emu/external/qemu/objs/../hw/virtio/virtio.c:392
-> (qemu-system-x86_64+0x65c97b)
->     #11 virtio_queue_host_notifier_aio_poll
-> /usr/local/google/home/lfy/emu/external/qemu/objs/../hw/virtio/virtio.c:2427
-> (qemu-system-x86_64+0x65c97b)
->     #12 run_poll_handlers_once
-> /usr/local/google/home/lfy/emu/external/qemu/objs/../util/aio-posix.c:502:13
-> (qemu-system-x86_64+0xaffd63)
->     #13 try_poll_mode
-> /usr/local/google/home/lfy/emu/external/qemu/objs/../util/aio-posix.c:587
-> (qemu-system-x86_64+0xaffd63)
->     #14 aio_poll
-> /usr/local/google/home/lfy/emu/external/qemu/objs/../util/aio-posix.c:618
-> (qemu-system-x86_64+0xaffd63)
->     #15 iothread_run
-> /usr/local/google/home/lfy/emu/external/qemu/objs/../iothread.c:64:9
-> (qemu-system-x86_64+0xa53344)
->     #16 qemu_thread_trampoline
-> /usr/local/google/home/lfy/emu/external/qemu/objs/../util/qemu-thread-posix.c:551:17
-> (qemu-system-x86_64+0xb033c6)
-> 
+Looks fine for vhost_scsi.ko.  I have not checked how this interacts
+with vhost-user-scsi.
 
+Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
+
+--u3/rZRmxL6MmkK24
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEcBAEBAgAGBQJcuEYtAAoJEJykq7OBq3PIEcsH/1vNqde/oYQpzqgvf2wJ4rJz
+b6w+NN8o/o25fA3j6+2K6rRhuYwvH5FVb2cZyKEc1bD267NMsx9KmgBwNBk6+Mqc
+Q7d0DFxJZILudDOvgp0AQUcSXZxlwPhsFY2lQkKAPccqHNoVGASPrhOGzXLnkZGx
+Hjh7MhhiWD6OS6TTkTmzVLM+5DVjSjFystwZuB3u/dVnXIjbIkKwXSCDBr0zDWlF
+ON2ieQVwqcKzgrOfDPdgDytAKeIJcnASgn1xv7X7U+YDzjq7jMJceww9SdGSRsgT
+QU5DK5wJL344qnP2lmM4tGzSu9IhMiqeLy0wPle4kak5YcpDdqDKMi+pGeW2MHE=
+=ZRen
+-----END PGP SIGNATURE-----
+
+--u3/rZRmxL6MmkK24--
 
