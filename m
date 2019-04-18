@@ -1,33 +1,27 @@
-Received: from eggs.gnu.org ([209.51.188.92]:58932)
+Received: from eggs.gnu.org ([209.51.188.92]:59695)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1hH5sP-0004T1-5V
-	for qemu-devel@nongnu.org; Thu, 18 Apr 2019 08:10:51 -0400
+	(envelope-from <philmd@redhat.com>) id 1hH5vg-0005mZ-Cn
+	for qemu-devel@nongnu.org; Thu, 18 Apr 2019 08:14:13 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1hH5sN-0001PH-4O
-	for qemu-devel@nongnu.org; Thu, 18 Apr 2019 08:10:49 -0400
-Received: from indium.canonical.com ([91.189.90.7]:47274)
+	(envelope-from <philmd@redhat.com>) id 1hH5vf-0004Xh-Ag
+	for qemu-devel@nongnu.org; Thu, 18 Apr 2019 08:14:12 -0400
+Received: from mail-wr1-f65.google.com ([209.85.221.65]:44589)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1hH5sM-0001Oh-RK
-	for qemu-devel@nongnu.org; Thu, 18 Apr 2019 08:10:47 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1hH5sL-0001oI-Li
-	for <qemu-devel@nongnu.org>; Thu, 18 Apr 2019 12:10:45 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 9A2A72E80C8
-	for <qemu-devel@nongnu.org>; Thu, 18 Apr 2019 12:10:45 +0000 (UTC)
+	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1hH5vf-0004Ga-3q
+	for qemu-devel@nongnu.org; Thu, 18 Apr 2019 08:14:11 -0400
+Received: by mail-wr1-f65.google.com with SMTP id w18so2665368wrv.11
+	for <qemu-devel@nongnu.org>; Thu, 18 Apr 2019 05:13:54 -0700 (PDT)
+References: <20190417005053.885-1-stephen.checkoway@oberlin.edu>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Message-ID: <aaa450c5-0446-b4b3-40ac-ef87b5522545@redhat.com>
+Date: Thu, 18 Apr 2019 14:13:52 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Thu, 18 Apr 2019 12:00:19 -0000
-From: Shahab Vahedi <1825359@bugs.launchpad.net>
-Reply-To: Bug 1825359 <1825359@bugs.launchpad.net>
-Sender: bounces@canonical.com
-Message-Id: <155558881987.7164.1099557133760519082.malonedeb@chaenomeles.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1825359] [NEW] cpu_ld*_code() triggers
- MMU_DATA_LOAD i.s.o. MMU_INST_FETCH
+In-Reply-To: <20190417005053.885-1-stephen.checkoway@oberlin.edu>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH v2] hw/char/escc: Lower irq when transmit
+ buffer is filled
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,397 +30,69 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Stephen Checkoway <stephen.checkoway@oberlin.edu>, Paolo Bonzini <pbonzini@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>, Artyom Tarasenko <atar4qemu@gmail.com>, Laurent Vivier <laurent@vivier.eu>, qemu-trivial@nongnu.org, =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>, Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
 
-Public bug reported:
+On 4/17/19 2:50 AM, Stephen Checkoway wrote:
+> The SCC/ESCC will briefly stop asserting an interrupt when the
+> transmit FIFO is filled.
+> 
+> This code doesn't model the transmit FIFO/shift register so the
+> pending transmit interrupt is never deasserted which means that an
+> edge-triggered interrupt controller will never see the low-to-high
+> transition it needs to raise another interrupt. The practical
+> consequence of this is that guest firmware with an interrupt service
+> routine for the ESCC that does not send all of the data it has
+> immediately will stop sending data if the following sequence of
+> events occurs:
+> 1. Disable processor interrupts
+> 2. Write a character to the ESCC
+> 3. Add additional characters to a buffer which is drained by the ISR
+> 4. Enable processor interrupts
+> 
+> In this case, the first character will be sent, the interrupt will
+> fire and the ISR will output the second character. Since the pending
+> transmit interrupt remains asserted, no additional interrupts will
+> ever fire.
 
-commit 377b155bde451d5ac545fbdcdfbf6ca17a4228f5
-Merge: c876180938 328eb60dc1
-Author: Peter Maydell <peter.x@x.x>        ; masked for anti-spamming purpo=
-ses
-Date:   Mon Mar 11 18:26:37 2019 +0000
-https://github.com/qemu/qemu/commit/377b155bde451d5ac545fbdcdfbf6ca17a4228f5
---------------------------------------------------
+You might want to add a line expliciting the chipset model which forced
+you to do that patch (Z85C30).
 
-cpu_ld*_code() is used for loading code data as the name suggests. Although=
-, it begins accessing memory with MMU_INST_FETCH access type, somewhere down
-the road, when the "io_readx(..., access_type=3DMMU_INST_FETCH, ...)" is
-called, it is ignoring this "access_type" while calling the "tlb_fill()"
-with a _hardcoded_ MMU_DATA_LOAD:
+> This fixes that situation by explicitly lowering the IRQ when a
+> character is written to the buffer and no other interrupts are currently
+> pending.
 
-cputlb.c
---------
-static uint64_t io_readx(..., MMUAccessType access_type, ...)
-{
+> 
+> Signed-off-by: Stephen Checkoway <stephen.checkoway@oberlin.edu>
+> ---
+>  hw/char/escc.c | 7 +++++++
+>  1 file changed, 7 insertions(+)
+> 
+> diff --git a/hw/char/escc.c b/hw/char/escc.c
+> index 628f5f81f7..c5b05a63f1 100644
+> --- a/hw/char/escc.c
+> +++ b/hw/char/escc.c
+> @@ -509,6 +509,13 @@ static void escc_mem_write(void *opaque, hwaddr addr,
+>          break;
+>      case SERIAL_DATA:
+>          trace_escc_mem_writeb_data(CHN_C(s), val);
+> +        /*
+> +         * Lower the irq when data is written to the Tx buffer and no other
+> +         * interrupts are currently pending. The irq will be raised again once
+> +         * the Tx buffer becomes empty below.
+> +         */
+> +        s->txint = 0;
+> +        escc_update_irq(s);
 
-=C2=A0=C2=A0=C2=A0=C2=A0if (recheck) {
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0CPUTLBEntry *entry;
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0target_ulong tlb_addr;
+Way better, thanks :)
 
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0tlb_fill(cpu, addr, size, M=
-MU_DATA_LOAD, mmu_idx, retaddr);
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0...
-}
---------
+Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
 
-This is an issue, because there can exist _small_ regions of memory (smaller
-than the TARGET_PAGE_SIZE) that are only executable and not readable.
+Note: the Z85C30 has a 1-byte transmit FIFO and 3-byte receive FIFO.
+Our model default is the ESCC, and we use ESCC_SERIO_QUEUE_SIZE=256 byte
+for rx FIFO... If needed we can add properties and use a white list of
+chipset with their tx/rx FIFO size.
 
-TL;DR
-
-What happens is at first, a "tlb_fill(..., access_type=3DMMU_INST_FETCH, ..=
-.)"
-is triggered by "tb_lookup_cpu_state()". To be precise, this is the call
-stack which is good behavior:
----
-#0  tlb_fill (cs=3D..., vaddr=3D684, size=3D0, access_type=3DMMU_INST_FETCH=
-, mmu_idx=3D0, retaddr=3D0) at target/arc/mmu.c:602
-#1  get_page_addr_code (env=3D..., addr=3D684) at accel/tcg/cputlb.c:1045
-#2  tb_htable_lookup (cpu=3D..., pc=3D684, cs_base=3D0, flags=3D0, cf_mask=
-=3D4278190080) at accel/tcg/cpu-exec.c:337
-#3  tb_lookup__cpu_state (cpu=3D..., pc=3D..., cs_base=3D..., flags=3D..., =
-cf_mask=3D4278190080) at include/exec/tb-lookup.h:43
-#4  tb_find (cpu=3D..., last_tb=3D... <code_gen_buffer+17811>, tb_exit=3D0,=
- cf_mask=3D0) at accel/tcg/cpu-exec.c:404
-#5  cpu_exec (cpu=3D...) at accel/tcg/cpu-exec.c:729
-#6  tcg_cpu_exec (cpu=3D...) at cpus.c:1430
-#7  qemu_tcg_rr_cpu_thread_fn (arg=3D...) at cpus.c:1531
-#8  qemu_thread_start (args=3D...) at util/qemu-thread-posix.c:502
----
-
-After this call, TLB is filled with an entry that its size field is small,
-say 32 bytes. This causes a TLB_RECHECK for consequent memory accesses, whi=
-ch =
-
-is logical. However, in our decoder, we use cpu_lduw_code() to read the
-instructions and decode them. As mentioned, in the beginning, the
-access_type=3DMMU_INST_FETCH is lost in "io_readx()" while calling tlb_fill=
-()",
-and now THIS CAUSES A GUEST EXCEPTION BECAUSE THAT REGION IS NOT ALLOWED TO
-BE READ. Here, comes that trace call of the _bad_ behavior:
----
-#0  tlb_fill (..., access_type=3DMMU_DATA_LOAD, ...) at target/arc/mmu.c:605
-#1  io_readx (..., access_type=3DMMU_INST_FETCH, size=3D2) at accel/tcg/cpu=
-tlb.c:881
-#2  io_readw (..., access_type=3DMMU_INST_FETCH) at accel/tcg/softmmu_templ=
-ate.h:106
-#3  helper_le_ldw_cmmu (..., oi=3D16, retaddr=3D0) at accel/tcg/softmmu_tem=
-plate.h:146
-#4  cpu_lduw_code_ra (env=3D..., ptr=3D684, retaddr=3D0) at include/exec/cp=
-u_ldst_template.h:102
-#5  cpu_lduw_code (env=3D..., ptr=3D684) at include/exec/cpu_ldst_template.=
-h:114
-#6  read_and_decode_context (ctx=3D..., opcode_p=3D...) at target/arc/arc-d=
-ecoder.c:1479
-#7  arc_decode (ctx=3D...) at target/arc/arc-decoder.c:1736
-#8  decode_opc (env=3D..., ctx=3D...) at target/arc/translate.c:313
-#9  arc_tr_translate_insn (dcbase=3D..., cpu=3D...) at target/arc/translate=
-.c:335
-#10 translator_loop (.. <code_gen_buffer+18131>) at accel/tcg/translator.c:=
-107
-#11 gen_intermediate_code (cpu=3D..., tb=3D... <code_gen_buffer+18131>) at =
-target/arc/translate.c:413
-#12 tb_gen_code (cpu=3D..., pc=3D684, cs_base=3D0, flags=3D0, cflags=3D-167=
-11679) at accel/tcg/translate-all.c:1723
-#13 tb_find (cpu=3D..., last_tb=3D... <code_gen_buffer+17811>, tb_exit=3D0,=
- cf_mask=3D0) at accel/tcg/cpu-exec.c:407
-#14 cpu_exec (cpu=3D...) at accel/tcg/cpu-exec.c:729
-#15 tcg_cpu_exec (cpu=3D...) at cpus.c:1430
-
----
-
-Do you confirm if this is an issue? Maybe there are other ways to read
-an instruction with MMU_INST_FETCH access that I don't know about.
-
-Last but not least, although this is not a security issue for QEMU per
-se, but it is hindering a security feature for the guest.
-
-** Affects: qemu
-     Importance: Undecided
-         Status: New
-
-
-** Tags: fetch mmu mpu
-
-** Description changed:
-
-  commit 377b155bde451d5ac545fbdcdfbf6ca17a4228f5
-  Merge: c876180938 328eb60dc1
-  Author: Peter Maydell <peter.x@x.x>        ; masked for anti-spamming pur=
-poses
-  Date:   Mon Mar 11 18:26:37 2019 +0000
-  https://github.com/qemu/qemu/commit/377b155bde451d5ac545fbdcdfbf6ca17a422=
-8f5
-  --------------------------------------------------
-  =
-
-- cpu_ld*_code() is used for loading code data as the name suggests. Althou=
-gh, it begins
-- accessing memory with MMU_INST_FETCH access type, somewhere down the road=
-, when the
-- "io_readx(..., access_type=3DMMU_INST_FETCH, ...)" is called, it is ignor=
-ing this "access_type"
-- while calling the "tlb_fill()" with a _hardcoded_ MMU_DATA_LOAD:
-+ cpu_ld*_code() is used for loading code data as the name suggests. Althou=
-gh, it begins accessing memory with MMU_INST_FETCH access type, somewhere d=
-own
-+ the road, when the "io_readx(..., access_type=3DMMU_INST_FETCH, ...)" is
-+ called, it is ignoring this "access_type" while calling the "tlb_fill()"
-+ with a _hardcoded_ MMU_DATA_LOAD:
-  =
-
-  cputlb.c
-  --------
-  static uint64_t io_readx(..., MMUAccessType access_type, ...)
-  {
-  =
-
--     if (recheck) {
--         CPUTLBEntry *entry;
--         target_ulong tlb_addr;
--     =
-
--         tlb_fill(cpu, addr, size, MMU_DATA_LOAD, mmu_idx, retaddr);
--         ...
-+ =C2=A0=C2=A0=C2=A0=C2=A0if (recheck) {
-+ =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0CPUTLBEntry *entry;
-+ =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0target_ulong tlb_addr;
-+ =
-
-+ =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0tlb_fill(cpu, addr, size,=
- MMU_DATA_LOAD, mmu_idx, retaddr);
-+ =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0...
-  }
-  --------
-  =
-
-- This is an issue, because there can exist _small_ regions of memory (smal=
-ler than the
-- TARGET_PAGE_SIZE) that are only executable and not readable.
-+ This is an issue, because there can exist _small_ regions of memory (smal=
-ler
-+ than the TARGET_PAGE_SIZE) that are only executable and not readable.
-  =
-
-  TL;DR
-  =
-
-- What happens is at first, a "tlb_fill(..., access_type=3DMMU_INST_FETCH, =
-...)" is
-- triggered by "tb_lookup_cpu_state()". To be precise, this is the call sta=
-ck which is good behavior:
-+ What happens is at first, a "tlb_fill(..., access_type=3DMMU_INST_FETCH, =
-...)"
-+ is triggered by "tb_lookup_cpu_state()". To be precise, this is the call
-+ stack which is good behavior:
-  ---
-  #0  tlb_fill (cs=3D..., vaddr=3D684, size=3D0, access_type=3DMMU_INST_FET=
-CH, mmu_idx=3D0, retaddr=3D0) at target/arc/mmu.c:602
-  #1  get_page_addr_code (env=3D..., addr=3D684) at accel/tcg/cputlb.c:1045
-  #2  tb_htable_lookup (cpu=3D..., pc=3D684, cs_base=3D0, flags=3D0, cf_mas=
-k=3D4278190080) at accel/tcg/cpu-exec.c:337
-  #3  tb_lookup__cpu_state (cpu=3D..., pc=3D..., cs_base=3D..., flags=3D...=
-, cf_mask=3D4278190080) at include/exec/tb-lookup.h:43
-  #4  tb_find (cpu=3D..., last_tb=3D... <code_gen_buffer+17811>, tb_exit=3D=
-0, cf_mask=3D0) at accel/tcg/cpu-exec.c:404
-  #5  cpu_exec (cpu=3D...) at accel/tcg/cpu-exec.c:729
-  #6  tcg_cpu_exec (cpu=3D...) at cpus.c:1430
-  #7  qemu_tcg_rr_cpu_thread_fn (arg=3D...) at cpus.c:1531
-  #8  qemu_thread_start (args=3D...) at util/qemu-thread-posix.c:502
-  ---
-  =
-
-- After this call, TLB is filled with an entry that its size field is small=
-, say 32 bytes.
-- This causes a TLB_RECHECK for consequent memory accesses, which is logica=
-l. However,
-- in our decoder, we use cpu_lduw_code() to read the instructions and decod=
-e them. As mentioned,
-- in the beginning, the access_type=3DMMU_INST_FETCH is lost in "io_readx()=
-" while calling "tlb_fill()",
-- and now THIS CAUSES A GUEST EXCEPTION BECAUSE THAT REGION IS NOT ALLOWED =
-TO BE READ. Here,
-- comes that trace call of the _bad_ behavior:
-+ After this call, TLB is filled with an entry that its size field is small,
-+ say 32 bytes. This causes a TLB_RECHECK for consequent memory accesses, w=
-hich =
-
-+ is logical. However, in our decoder, we use cpu_lduw_code() to read the
-+ instructions and decode them. As mentioned, in the beginning, the
-+ access_type=3DMMU_INST_FETCH is lost in "io_readx()" while calling tlb_fi=
-ll()",
-+ and now THIS CAUSES A GUEST EXCEPTION BECAUSE THAT REGION IS NOT ALLOWED =
-TO
-+ BE READ. Here, comes that trace call of the _bad_ behavior:
-  ---
-  #0  tlb_fill (..., access_type=3DMMU_DATA_LOAD, ...) at target/arc/mmu.c:=
-605
-  #1  io_readx (..., access_type=3DMMU_INST_FETCH, size=3D2) at accel/tcg/c=
-putlb.c:881
-  #2  io_readw (..., access_type=3DMMU_INST_FETCH) at accel/tcg/softmmu_tem=
-plate.h:106
-  #3  helper_le_ldw_cmmu (..., oi=3D16, retaddr=3D0) at accel/tcg/softmmu_t=
-emplate.h:146
-  #4  cpu_lduw_code_ra (env=3D..., ptr=3D684, retaddr=3D0) at include/exec/=
-cpu_ldst_template.h:102
-  #5  cpu_lduw_code (env=3D..., ptr=3D684) at include/exec/cpu_ldst_templat=
-e.h:114
-  #6  read_and_decode_context (ctx=3D..., opcode_p=3D...) at target/arc/arc=
--decoder.c:1479
-- #7  arc_decode (ctx=3D...) at target/arc/arc-decoder.c:1736              =
-
-+ #7  arc_decode (ctx=3D...) at target/arc/arc-decoder.c:1736
-  #8  decode_opc (env=3D..., ctx=3D...) at target/arc/translate.c:313
-  #9  arc_tr_translate_insn (dcbase=3D..., cpu=3D...) at target/arc/transla=
-te.c:335
-  #10 translator_loop (.. <code_gen_buffer+18131>) at accel/tcg/translator.=
-c:107
-  #11 gen_intermediate_code (cpu=3D..., tb=3D... <code_gen_buffer+18131>) a=
-t target/arc/translate.c:413
-  #12 tb_gen_code (cpu=3D..., pc=3D684, cs_base=3D0, flags=3D0, cflags=3D-1=
-6711679) at accel/tcg/translate-all.c:1723
-  #13 tb_find (cpu=3D..., last_tb=3D... <code_gen_buffer+17811>, tb_exit=3D=
-0, cf_mask=3D0) at accel/tcg/cpu-exec.c:407
-- #14 cpu_exec (cpu=3D...) at accel/tcg/cpu-exec.c:729                     =
-
-+ #14 cpu_exec (cpu=3D...) at accel/tcg/cpu-exec.c:729
-  #15 tcg_cpu_exec (cpu=3D...) at cpus.c:1430
-  =
-
-  ---
-  =
-
-- Do you confirm if this is an issue? Maybe there are other ways to read an=
- instruction with
-- MMU_INST_FETCH access that I don't know about.
-+ Do you confirm if this is an issue? Maybe there are other ways to read
-+ an instruction with MMU_INST_FETCH access that I don't know about.
-  =
-
-- Last but not least, although this is not a security issue for QEMU per se=
-, but it is hindering a
-- security feature for the guest.
-+ Last but not least, although this is not a security issue for QEMU per
-+ se, but it is hindering a security feature for the guest.
-
--- =
-
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1825359
-
-Title:
-  cpu_ld*_code() triggers MMU_DATA_LOAD i.s.o. MMU_INST_FETCH
-
-Status in QEMU:
-  New
-
-Bug description:
-  commit 377b155bde451d5ac545fbdcdfbf6ca17a4228f5
-  Merge: c876180938 328eb60dc1
-  Author: Peter Maydell <peter.x@x.x>        ; masked for anti-spamming pur=
-poses
-  Date:   Mon Mar 11 18:26:37 2019 +0000
-  https://github.com/qemu/qemu/commit/377b155bde451d5ac545fbdcdfbf6ca17a422=
-8f5
-  --------------------------------------------------
-
-  cpu_ld*_code() is used for loading code data as the name suggests. Althou=
-gh, it begins accessing memory with MMU_INST_FETCH access type, somewhere d=
-own
-  the road, when the "io_readx(..., access_type=3DMMU_INST_FETCH, ...)" is
-  called, it is ignoring this "access_type" while calling the "tlb_fill()"
-  with a _hardcoded_ MMU_DATA_LOAD:
-
-  cputlb.c
-  --------
-  static uint64_t io_readx(..., MMUAccessType access_type, ...)
-  {
-
-  =C2=A0=C2=A0=C2=A0=C2=A0if (recheck) {
-  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0CPUTLBEntry *entry;
-  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0target_ulong tlb_addr;
-
-  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0tlb_fill(cpu, addr, size,=
- MMU_DATA_LOAD, mmu_idx, retaddr);
-  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0...
-  }
-  --------
-
-  This is an issue, because there can exist _small_ regions of memory (smal=
-ler
-  than the TARGET_PAGE_SIZE) that are only executable and not readable.
-
-  TL;DR
-
-  What happens is at first, a "tlb_fill(..., access_type=3DMMU_INST_FETCH, =
-...)"
-  is triggered by "tb_lookup_cpu_state()". To be precise, this is the call
-  stack which is good behavior:
-  ---
-  #0  tlb_fill (cs=3D..., vaddr=3D684, size=3D0, access_type=3DMMU_INST_FET=
-CH, mmu_idx=3D0, retaddr=3D0) at target/arc/mmu.c:602
-  #1  get_page_addr_code (env=3D..., addr=3D684) at accel/tcg/cputlb.c:1045
-  #2  tb_htable_lookup (cpu=3D..., pc=3D684, cs_base=3D0, flags=3D0, cf_mas=
-k=3D4278190080) at accel/tcg/cpu-exec.c:337
-  #3  tb_lookup__cpu_state (cpu=3D..., pc=3D..., cs_base=3D..., flags=3D...=
-, cf_mask=3D4278190080) at include/exec/tb-lookup.h:43
-  #4  tb_find (cpu=3D..., last_tb=3D... <code_gen_buffer+17811>, tb_exit=3D=
-0, cf_mask=3D0) at accel/tcg/cpu-exec.c:404
-  #5  cpu_exec (cpu=3D...) at accel/tcg/cpu-exec.c:729
-  #6  tcg_cpu_exec (cpu=3D...) at cpus.c:1430
-  #7  qemu_tcg_rr_cpu_thread_fn (arg=3D...) at cpus.c:1531
-  #8  qemu_thread_start (args=3D...) at util/qemu-thread-posix.c:502
-  ---
-
-  After this call, TLB is filled with an entry that its size field is small,
-  say 32 bytes. This causes a TLB_RECHECK for consequent memory accesses, w=
-hich =
-
-  is logical. However, in our decoder, we use cpu_lduw_code() to read the
-  instructions and decode them. As mentioned, in the beginning, the
-  access_type=3DMMU_INST_FETCH is lost in "io_readx()" while calling tlb_fi=
-ll()",
-  and now THIS CAUSES A GUEST EXCEPTION BECAUSE THAT REGION IS NOT ALLOWED =
-TO
-  BE READ. Here, comes that trace call of the _bad_ behavior:
-  ---
-  #0  tlb_fill (..., access_type=3DMMU_DATA_LOAD, ...) at target/arc/mmu.c:=
-605
-  #1  io_readx (..., access_type=3DMMU_INST_FETCH, size=3D2) at accel/tcg/c=
-putlb.c:881
-  #2  io_readw (..., access_type=3DMMU_INST_FETCH) at accel/tcg/softmmu_tem=
-plate.h:106
-  #3  helper_le_ldw_cmmu (..., oi=3D16, retaddr=3D0) at accel/tcg/softmmu_t=
-emplate.h:146
-  #4  cpu_lduw_code_ra (env=3D..., ptr=3D684, retaddr=3D0) at include/exec/=
-cpu_ldst_template.h:102
-  #5  cpu_lduw_code (env=3D..., ptr=3D684) at include/exec/cpu_ldst_templat=
-e.h:114
-  #6  read_and_decode_context (ctx=3D..., opcode_p=3D...) at target/arc/arc=
--decoder.c:1479
-  #7  arc_decode (ctx=3D...) at target/arc/arc-decoder.c:1736
-  #8  decode_opc (env=3D..., ctx=3D...) at target/arc/translate.c:313
-  #9  arc_tr_translate_insn (dcbase=3D..., cpu=3D...) at target/arc/transla=
-te.c:335
-  #10 translator_loop (.. <code_gen_buffer+18131>) at accel/tcg/translator.=
-c:107
-  #11 gen_intermediate_code (cpu=3D..., tb=3D... <code_gen_buffer+18131>) a=
-t target/arc/translate.c:413
-  #12 tb_gen_code (cpu=3D..., pc=3D684, cs_base=3D0, flags=3D0, cflags=3D-1=
-6711679) at accel/tcg/translate-all.c:1723
-  #13 tb_find (cpu=3D..., last_tb=3D... <code_gen_buffer+17811>, tb_exit=3D=
-0, cf_mask=3D0) at accel/tcg/cpu-exec.c:407
-  #14 cpu_exec (cpu=3D...) at accel/tcg/cpu-exec.c:729
-  #15 tcg_cpu_exec (cpu=3D...) at cpus.c:1430
-
-  ---
-
-  Do you confirm if this is an issue? Maybe there are other ways to read
-  an instruction with MMU_INST_FETCH access that I don't know about.
-
-  Last but not least, although this is not a security issue for QEMU per
-  se, but it is hindering a security feature for the guest.
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1825359/+subscriptions
+>          s->tx = val;
+>          if (s->wregs[W_TXCTRL2] & TXCTRL2_TXEN) { // tx enabled
+>              if (qemu_chr_fe_backend_connected(&s->chr)) {
+> 
