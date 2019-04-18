@@ -1,31 +1,21 @@
-Received: from eggs.gnu.org ([209.51.188.92]:46847)
+Received: from eggs.gnu.org ([209.51.188.92]:46679)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <lersek@redhat.com>) id 1hH52h-0008Mr-NL
+	(envelope-from <imammedo@redhat.com>) id 1hH52i-0008C7-AN
 	for qemu-devel@nongnu.org; Thu, 18 Apr 2019 07:17:25 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <lersek@redhat.com>) id 1hH4oj-0002zZ-L7
-	for qemu-devel@nongnu.org; Thu, 18 Apr 2019 07:03:00 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:50428)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <lersek@redhat.com>) id 1hH4oj-0002zG-Cc
+	(envelope-from <imammedo@redhat.com>) id 1hH4oh-0002z4-V9
 	for qemu-devel@nongnu.org; Thu, 18 Apr 2019 07:02:57 -0400
-References: <874f0f8e-780e-6600-e11b-b97f5b055cf8@durchholz.org>
-	<dbd6541e-5013-d0bc-b23e-a8de4f4cd171@redhat.com>
-	<20190416072430.dp742ehg27drpplb@sirius.home.kraxel.org>
-	<00f0ada2-a68b-2264-ab72-f49fe7d654e7@durchholz.org>
-	<20190417071012.fxedabu3makmoyuz@sirius.home.kraxel.org>
-	<993002d4-28dd-00f0-e8c1-7b0d9ab2de12@durchholz.org>
-	<4ce336d0-6651-286f-07ee-3a5b3236309a@redhat.com>
-	<55326d4f-d7a9-cf38-20ff-846d7d3d64fd@durchholz.org>
-From: Laszlo Ersek <lersek@redhat.com>
-Message-ID: <388b90ee-cb50-0a2d-3675-e7e8b37adcd4@redhat.com>
-Date: Thu, 18 Apr 2019 13:02:54 +0200
+Date: Thu, 18 Apr 2019 13:02:41 +0200
+From: Igor Mammedov <imammedo@redhat.com>
+Message-ID: <20190418130241.635b2e97@redhat.com>
+In-Reply-To: <20190417014038.26018-7-richardw.yang@linux.intel.com>
+References: <20190417014038.26018-1-richardw.yang@linux.intel.com>
+	<20190417014038.26018-7-richardw.yang@linux.intel.com>
 MIME-Version: 1.0
-In-Reply-To: <55326d4f-d7a9-cf38-20ff-846d7d3d64fd@durchholz.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] curses.c: "We need a terminal output" ?
+Subject: Re: [Qemu-devel] [PATCH v3 6/6] acpi: pci: use build_append_foo()
+ API to construct MCFG
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,128 +24,101 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Joachim Durchholz <jo@durchholz.org>, qemu-devel@nongnu.org
+To: Wei Yang <richardw.yang@linux.intel.com>
+Cc: qemu-devel@nongnu.org, qemu-arm@nongnu.org, mst@redhat.com, shannon.zhaosl@gmail.com, peter.maydell@linaro.org, marcel.apfelbaum@gmail.com, yang.zhong@intel.com, philmd@redhat.com
 
-On 04/18/19 07:02, Joachim Durchholz wrote:
-> Am 17.04.19 um 20:27 schrieb Laszlo Ersek:
->> So, let's look at your original question again (which was not a problem
->> statement):
+On Wed, 17 Apr 2019 09:40:38 +0800
+Wei Yang <richardw.yang@linux.intel.com> wrote:
+
+> build_append_foo() API doesn't need explicit endianness conversions
+> which eliminates a source of errors and it makes build_mcfg() look like
+> declarative definition of MCFG table in ACPI spec, which makes it easy
+> to review.
 > 
-> So you need an explicit problem statement to know that somebody might
-> have a problem?
+> Signed-off-by: Wei Yang <richardw.yang@linux.intel.com>
+> Suggested-by: Igor Mammedov <imammedo@redhat.com>
+Thanks for nice cleanup!
 
-You're on a technical mailing list. An explicit problem statement is
-instrumental for subscribers to understand the particulars of the
-problem. "Somebody might have a problem" is a yes/no question and is
-basically devoid of information.
+with comment fixed up:
+Reviewed-by: Igor Mammedov <imammedo@redhat.com>
 
->>> what's the reasoning behind "We need a terminal output" in curses.c?
->>
->> The reasoning is that "curses.c" is a QEMU display backend written in
->> terms of the Curses [XCURSES] interface specification, and that
->> interface specification is inherently based on terminals, as defined by
->> the General Terminal Interface of the Single Unix Specification.
+> ---
+>  hw/acpi/pci.c               | 30 ++++++++++++++++++------------
+>  include/hw/acpi/acpi-defs.h | 18 ------------------
+>  2 files changed, 18 insertions(+), 30 deletions(-)
 > 
-> Sure.
-> 
->> If you tell us what you want to achieve in the end (i.e. you state the
->> problem),
-> 
-> I described three use cases. I mentioned which of them was mine.
-> Problem statement: my use case doesn't work. D'oh.
+> diff --git a/hw/acpi/pci.c b/hw/acpi/pci.c
+> index fa0fa30bb9..05050fa087 100644
+> --- a/hw/acpi/pci.c
+> +++ b/hw/acpi/pci.c
+> @@ -30,17 +30,23 @@
+>  
+>  void build_mcfg(GArray *table_data, BIOSLinker *linker, AcpiMcfgInfo *info)
+>  {
+> -    AcpiTableMcfg *mcfg;
+> -    int len = sizeof(*mcfg) + sizeof(mcfg->allocation[0]);
+> -
+> -    mcfg = acpi_data_push(table_data, len);
+> -    mcfg->allocation[0].address = cpu_to_le64(info->base);
+> -
+> -    /* Only a single allocation so no need to play with segments */
+> -    mcfg->allocation[0].pci_segment = cpu_to_le16(0);
+> -    mcfg->allocation[0].start_bus_number = 0;
+> -    mcfg->allocation[0].end_bus_number = PCIE_MMCFG_BUS(info->size - 1);
+> -
+> -    build_header(linker, table_data, (void *)mcfg, "MCFG", len, 1, NULL, NULL);
+> +    int mcfg_start = table_data->len;
+> +
+> +    acpi_data_push(table_data, sizeof(AcpiTableHeader));
+> +
+> +    /* PCI fw r3.0 MCFG table. */
+It would be better to put spec name as is here so simple search
+could immediately point to it.
 
-I've now re-read your original post again. I certainly wouldn't call it
-"d'oh".
+like: PCI Firmware Specification, Revision 3.0
+      4.1.2 MCFG Table Description
 
-Protip: it's always best to insult the people that try to help you. The
-more abrasive you are the more willingly they will spend their
-nonexistent free time to help you. This is how a development mailing
-list works. /s
-
->> Let me speculate a bit. You mentioned wanting to connect "ui/curses.c"
->> to a pipe, possibly to transfer the output elsewhere. This is a common
->> use case -- it's what terminal emulators such as "xterm" do, also what
->> "ssh" does (when you log in interactively with it). "screen" and "tmux"
->> are other programs in this class.
->>
->> The way they all work is, they set up a pseudo-terminal (pty). The pty
->> has a master end and a slave end.
-> 
-> I know expect, and yeah it works. It's just that TCL is too old-school
-> to cleanly handle all edge cases, and I don't have the time budget to
-> really learn all the ins and outs of TCL.
-> pexpect doesn't work, because it would insist on line buffering (try
-> doing a login or responding to a prompt).
-
-https://pexpect.readthedocs.io/en/stable/FAQ.html
-
-> Q: Can I do screen scraping with this thing?
->
-> A: That depends. If your application just does line-oriented output
-> then this is easy. If a program emits many terminal sequences, from
-> video attributes to screen addressing, such as programs using curses,
-> then it may become very difficult to ascertain what text is displayed
-> on a screen.
->
-> We suggest using the pyte library to screen-scrape. The module
-> pexpect.ANSI released with previous versions of pexpect is now marked
-> deprecated and may be removed in the future.
-
-Have you tried pyte <https://pyte.readthedocs.io/en/latest/>?
-
-On 04/18/19 07:02, Joachim Durchholz wrote:
-> expectit doesn't work, because it simply opens a pipe. It's otherwise
-> the best-maintained, best-structured API. Being Java, it's a bit
-> difficult to interface to C, besides opening ptys is pretty nonportable
-> so it would have been a biggish project to give the maintainer a patch
-> that is useful to him.
-> 
-> So the workaround is to use expect anyway. So happy :-(
-> 
->> (pexpect)
->> Then you can read the master-end (pexpect should let you do that as
->> well) -- the master-end will indeed read similarly to pipe.
-> 
-> Sure, it fails due to line buffering. Can't wait for the login prompt
-> because it isn't sending an eoln.
-> 
->> Just be
->> aware that all the terminal output goo, such as cursor positioning,
->> color change sequences, beeps, screen resolution changes, etc, will show
->> up as binary garbage in the stream.
-> 
-> It's just escape sequences, and while they're a bit of a pain, they can
-> be filtered out.
-> If TCL were a sane language, I could do that with a bit of code, but it
-> isn't, so I'm doing that mentally - it's a pain, but it works.
-> 
-> 
-> I'm still wondering why there's such a stiff opposition to giving that
-> with qemu.
-
-Because "ui/curses.c" is a display backend written on top of the Curses
-API, and that API was *designed* (and so QEMU's display backend was
-*designed*) for use on a terminal. That's why the isatty() call is
-there, and has been there ever since the introduction of the curses
-display backend (commit 4d3b6f6e1265, "Add an ncurses UI.", 2008-02-10).
-
-> Note that I do agree that it's not what qemu should do by default,
-> switching that check off should be an option.
-
-Yes, it's also an "option" to ride a bycicle on a busy street at dusk,
-without a visibility vest, a helmet, and bike lights. The bike will
-still roll, steer and brake.
-
-> I just never got around to making that suggestion because Gerd was so
-> insistent on brushing the use cases aside.
-
-Removing the isatty() check, conditionally or unconditionally, is a
-suggestion that is counter to the design & purpose of "ui/curses.c", in
-my opinion. To me it's a suggestion that is definitely inferior to using
-a terminal emulator that works for your purpose.
-
-Adding a different display backend to QEMU, such that it isn't based on
-Curses but on a pipe, might make sense. I'm not sure.
-
-Thanks
-Laszlo
+> +    /* Base address, processor-relative */
+> +    build_append_int_noprefix(table_data, info->base, 8);
+> +    /* PCI segment group number */
+> +    build_append_int_noprefix(table_data, 0, 2);
+> +    /* Starting PCI Bus number */
+> +    build_append_int_noprefix(table_data, 0, 1);
+> +    /* Final PCI Bus number */
+> +    build_append_int_noprefix(table_data, PCIE_MMCFG_BUS(info->size - 1), 1);
+> +    /* Reserved */
+> +    build_append_int_noprefix(table_data, 0, 4);
+> +
+> +    build_header(linker, table_data, (void *)(table_data->data + mcfg_start),
+> +                 "MCFG", table_data->len - mcfg_start, 1, NULL, NULL);
+>  }
+>  
+> diff --git a/include/hw/acpi/acpi-defs.h b/include/hw/acpi/acpi-defs.h
+> index f9aa4bd398..57a3f58b0c 100644
+> --- a/include/hw/acpi/acpi-defs.h
+> +++ b/include/hw/acpi/acpi-defs.h
+> @@ -449,24 +449,6 @@ struct AcpiSratProcessorGiccAffinity {
+>  
+>  typedef struct AcpiSratProcessorGiccAffinity AcpiSratProcessorGiccAffinity;
+>  
+> -/* PCI fw r3.0 MCFG table. */
+> -/* Subtable */
+> -struct AcpiMcfgAllocation {
+> -    uint64_t address;                /* Base address, processor-relative */
+> -    uint16_t pci_segment;            /* PCI segment group number */
+> -    uint8_t start_bus_number;       /* Starting PCI Bus number */
+> -    uint8_t end_bus_number;         /* Final PCI Bus number */
+> -    uint32_t reserved;
+> -} QEMU_PACKED;
+> -typedef struct AcpiMcfgAllocation AcpiMcfgAllocation;
+> -
+> -struct AcpiTableMcfg {
+> -    ACPI_TABLE_HEADER_DEF;
+> -    uint8_t reserved[8];
+> -    AcpiMcfgAllocation allocation[0];
+> -} QEMU_PACKED;
+> -typedef struct AcpiTableMcfg AcpiTableMcfg;
+> -
+>  /*
+>   * TCPA Description Table
+>   *
