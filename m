@@ -2,59 +2,80 @@ Return-Path: <SRS0=08iY=SU=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 81020C282DD
-	for <qemu-devel@archiver.kernel.org>; Thu, 18 Apr 2019 15:43:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3CD0CC10F0E
+	for <qemu-devel@archiver.kernel.org>; Thu, 18 Apr 2019 15:44:58 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 43D812083D
-	for <qemu-devel@archiver.kernel.org>; Thu, 18 Apr 2019 15:43:12 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 43D812083D
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=rt-rk.com
+	by mail.kernel.org (Postfix) with ESMTPS id 0751C217D7
+	for <qemu-devel@archiver.kernel.org>; Thu, 18 Apr 2019 15:44:57 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0751C217D7
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:43225 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:43242 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hH9Bv-0005yM-J0
-	for qemu-devel@archiver.kernel.org; Thu, 18 Apr 2019 11:43:11 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:43724)
+	id 1hH9Dd-0007Ak-8N
+	for qemu-devel@archiver.kernel.org; Thu, 18 Apr 2019 11:44:57 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:43722)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mateja.marjanovic@rt-rk.com>) id 1hH943-0007d8-Cg
-	for qemu-devel@nongnu.org; Thu, 18 Apr 2019 11:35:04 -0400
+	(envelope-from <philmd@redhat.com>) id 1hH94O-0007d7-CD
+	for qemu-devel@nongnu.org; Thu, 18 Apr 2019 11:35:25 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mateja.marjanovic@rt-rk.com>) id 1hH8yW-00033I-IC
-	for qemu-devel@nongnu.org; Thu, 18 Apr 2019 11:29:22 -0400
-Received: from mx2.rt-rk.com ([89.216.37.149]:36809 helo=mail.rt-rk.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mateja.marjanovic@rt-rk.com>)
-	id 1hH8yW-00032Z-71
-	for qemu-devel@nongnu.org; Thu, 18 Apr 2019 11:29:20 -0400
-Received: from localhost (localhost [127.0.0.1])
-	by mail.rt-rk.com (Postfix) with ESMTP id 2AC391A2472;
-	Thu, 18 Apr 2019 17:29:18 +0200 (CEST)
-X-Virus-Scanned: amavisd-new at rt-rk.com
-Received: from rtrkw310-lin.domain.local (rtrkw310-lin.domain.local
-	[10.10.13.97])
-	by mail.rt-rk.com (Postfix) with ESMTPSA id 038421A2435;
-	Thu, 18 Apr 2019 17:29:18 +0200 (CEST)
-From: Mateja Marjanovic <mateja.marjanovic@rt-rk.com>
-To: qemu-devel@nongnu.org
-Date: Thu, 18 Apr 2019 17:29:08 +0200
-Message-Id: <1555601350-4176-5-git-send-email-mateja.marjanovic@rt-rk.com>
-X-Mailer: git-send-email 2.7.4
-In-Reply-To: <1555601350-4176-1-git-send-email-mateja.marjanovic@rt-rk.com>
-References: <1555601350-4176-1-git-send-email-mateja.marjanovic@rt-rk.com>
+	(envelope-from <philmd@redhat.com>) id 1hH8wC-0002DT-Ud
+	for qemu-devel@nongnu.org; Thu, 18 Apr 2019 11:26:58 -0400
+Received: from mail-wm1-f66.google.com ([209.85.128.66]:35817)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1hH8wC-0002D4-KI
+	for qemu-devel@nongnu.org; Thu, 18 Apr 2019 11:26:56 -0400
+Received: by mail-wm1-f66.google.com with SMTP id y197so3376909wmd.0
+	for <qemu-devel@nongnu.org>; Thu, 18 Apr 2019 08:26:56 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=1e100.net; s=20161025;
+	h=x-gm-message-state:subject:to:references:from:openpgp:message-id
+	:date:user-agent:mime-version:in-reply-to:content-language
+	:content-transfer-encoding;
+	bh=Pa7lLHFNbGvoBlO0A9+FQCbG6c6HG0V1VPl1vzBfrrc=;
+	b=S5UadXhHUmnsUJsSKWxTaFXpgMYlbcnj8XxYSO8LkLm5txH7eGQqnPLIZ3q2QE+Sv8
+	KG9ZLJWYU48D5iJreEXlL/8slSS8vjoeNXU0fr9z5xPLw+rOsSMnb42aRCFhzcsWFdBT
+	5+qNDME1HmdzV9sa09htVC17Kwn6JyP4FcT0Kt/EVcGUvIHpWoyR4LxPljOB63i/DmxU
+	/hS3Pyj72yaDG8fjdLHpx5Qn9RgAW0r3GBvzaaPpD8l1OojVrxQKz7fsgjF+Wr4RA/mQ
+	SX8uO16hFeYNno4QW1Z4CoV6luX8DRQnzBMMYyvQkcUkAXlgvSgR3k1U+0LzwNnb2RWQ
+	CJrw==
+X-Gm-Message-State: APjAAAXCp1h/7UipjGmR0YXHvbenn8GJfqMxEeiYcJvppDEEHIh47iQs
+	s4+ahFc26fYdlYixBU2/4ckMD8xDkuI=
+X-Google-Smtp-Source: APXvYqxF7xNG9SfFA2KtLuZUc0pxZNtoF3ZfLAmD31O8X0p2dOvjbJ/vSODWOBCP6CheygdxkOhyNQ==
+X-Received: by 2002:a1c:4102:: with SMTP id o2mr3392762wma.91.1555601215198;
+	Thu, 18 Apr 2019 08:26:55 -0700 (PDT)
+Received: from [192.168.1.33] (193.red-88-21-103.staticip.rima-tde.net.
+	[88.21.103.193])
+	by smtp.gmail.com with ESMTPSA id z7sm2868486wrt.10.2019.04.18.08.26.54
+	(version=TLS1_3 cipher=AEAD-AES128-GCM-SHA256 bits=128/128);
+	Thu, 18 Apr 2019 08:26:54 -0700 (PDT)
+To: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
+References: <20190418145355.21100-1-armbru@redhat.com>
+	<20190418145355.21100-4-armbru@redhat.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Openpgp: id=89C1E78F601EE86C867495CBA2A3FD6EDEADC0DE;
+	url=http://pgp.mit.edu/pks/lookup?op=get&search=0xA2A3FD6EDEADC0DE
+Message-ID: <78da03ed-2b9f-2357-6f28-44115d8b2955@redhat.com>
+Date: Thu, 18 Apr 2019 17:26:54 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+	Thunderbird/60.6.1
 MIME-Version: 1.0
+In-Reply-To: <20190418145355.21100-4-armbru@redhat.com>
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x
-X-Received-From: 89.216.37.149
-Subject: [Qemu-devel] [PATCH v9 4/6] target/mips: Optimize ILVR.<B|H|W|D>
- MSA instructions
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+	[fuzzy]
+X-Received-From: 209.85.128.66
+Subject: Re: [Qemu-devel] [PATCH 3/6] gdbstub: Reject invalid RLE repeat
+ counts
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -66,287 +87,48 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: arikalo@wavecomp.com, richard.henderson@linaro.org, philmd@redhat.com,
-	amarkovic@wavecomp.com, aurelien@aurel32.net
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190418152908.ilNy1vytQzwlcpp59a8Yyy7qqdJB-prUOM8plhFu8Hk@z>
+Message-ID: <20190418152654.slACDWFVeBgw5zo7vSWhdngPYD1_hLtNKraK1WExE0o@z>
 
-From: Mateja Marjanovic <Mateja.Marjanovic@rt-rk.com>
+On 4/18/19 4:53 PM, Markus Armbruster wrote:
+> "Debugging with GDB / Appendix E GDB Remote Serial Protocol /
+> Overview" specifies "The printable characters '#' and '$' or with a
+> numeric value greater than 126 must not be used."  gdb_read_byte()
+> only rejects values < 32.  This is wrong.  Impact depends on the caller:
+> 
+> * gdb_handlesig() passes a char.  Incorrectly accepts '#', '$' and
+>   '\127'.
+> 
+> * gdb_chr_receive() passes an uint8_t.  Additionally accepts
+>   characters with the most-significant bit set.
+> 
+> Correct the validity check to match the specification.
+> 
+> Signed-off-by: Markus Armbruster <armbru@redhat.com>
+> ---
+>  gdbstub.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+> diff --git a/gdbstub.c b/gdbstub.c
+> index d54abd17cc..a6dce1b027 100644
+> --- a/gdbstub.c
+> +++ b/gdbstub.c
+> @@ -2064,7 +2064,7 @@ static void gdb_read_byte(GDBState *s, int ch)
+>              }
+>              break;
+>          case RS_GETLINE_RLE:
+> -            if (ch < ' ') {
 
-Optimize ILVR.<B|H|W|D> instructions, using
-directly tcg registers and logic performed on
-them, and instead of shifting the bit mask or
-assigning a new tcg constant to the bit mask,
-assign a new (shifted) uint64_t value to the
-bit mask.
+Can you add a comment referring to the ""Debugging with GDB / Appendix E
+GDB Remote Serial Protocol / Overview" here?
 
-Performance measurement is done by executing the
-instructions 10 million times on a computer
-with Intel Core i7-3770 CPU @ 3.40GHz=C3=978.
+Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
 
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D
-|| instruction ||   BEFORE    || LOOP UNROLL ||    TCG   ||
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D
-||   ilvr.b    || 106.461 ms  ||  52.131 ms  || 7.813 ms ||
-||   ilvr.h    ||  82.962 ms  ||  36.222 ms  || 3.622 ms ||
-||   ilvr.w    || 109.451 ms  ||  33.042 ms  || 2.331 ms ||
-||   ilvr.d    ||  32.270 ms  ||  27.328 ms  || 2.025 ms ||
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D
-
-Suggested-by: Aleksandar Markovic <amarkovic@wavecomp.com>
-Signed-off-by: Mateja Marjanovic <mateja.marjanovic@rt-rk.com>
----
- target/mips/helper.h     |   1 -
- target/mips/msa_helper.c |   8 ---
- target/mips/translate.c  | 184 +++++++++++++++++++++++++++++++++++++++++=
-+++++-
- 3 files changed, 183 insertions(+), 10 deletions(-)
-
-diff --git a/target/mips/helper.h b/target/mips/helper.h
-index 85c8b17..c1681da 100644
---- a/target/mips/helper.h
-+++ b/target/mips/helper.h
-@@ -862,7 +862,6 @@ DEF_HELPER_5(msa_sld_df, void, env, i32, i32, i32, i3=
-2)
- DEF_HELPER_5(msa_splat_df, void, env, i32, i32, i32, i32)
- DEF_HELPER_5(msa_pckev_df, void, env, i32, i32, i32, i32)
- DEF_HELPER_5(msa_pckod_df, void, env, i32, i32, i32, i32)
--DEF_HELPER_5(msa_ilvr_df, void, env, i32, i32, i32, i32)
- DEF_HELPER_5(msa_vshf_df, void, env, i32, i32, i32, i32)
- DEF_HELPER_5(msa_srar_df, void, env, i32, i32, i32, i32)
- DEF_HELPER_5(msa_srlr_df, void, env, i32, i32, i32, i32)
-diff --git a/target/mips/msa_helper.c b/target/mips/msa_helper.c
-index f9b85fc..4cb0929 100644
---- a/target/mips/msa_helper.c
-+++ b/target/mips/msa_helper.c
-@@ -1181,14 +1181,6 @@ MSA_FN_DF(pckev_df)
-     } while (0)
- MSA_FN_DF(pckod_df)
- #undef MSA_DO
--
--#define MSA_DO(DF)                      \
--    do {                                \
--        pwx->DF[2*i]   =3D R##DF(pwt, i); \
--        pwx->DF[2*i+1] =3D R##DF(pws, i); \
--    } while (0)
--MSA_FN_DF(ilvr_df)
--#undef MSA_DO
- #undef MSA_LOOP_COND
-=20
- #define MSA_LOOP_COND(DF) \
-diff --git a/target/mips/translate.c b/target/mips/translate.c
-index d9aef77..214736c 100644
---- a/target/mips/translate.c
-+++ b/target/mips/translate.c
-@@ -28002,6 +28002,173 @@ static void gen_msa_bit(CPUMIPSState *env, Disa=
-sContext *ctx)
- }
-=20
- /*
-+ * [MSA] ILVR.B wd, ws, wt
-+ *
-+ *   Vector Interleave Right (byte data elements)
-+ *
-+ */
-+static inline void gen_ilvr_b(CPUMIPSState *env, uint32_t wd,
-+                              uint32_t ws, uint32_t wt)
-+{
-+    TCGv_i64 t1 =3D tcg_temp_new_i64();
-+    TCGv_i64 t2 =3D tcg_temp_new_i64();
-+    uint64_t mask =3D 0x00000000000000ffULL;
-+
-+    tcg_gen_andi_i64(t1, msa_wr_d[wt * 2], mask);
-+    tcg_gen_mov_i64(t2, t1);
-+    tcg_gen_andi_i64(t1, msa_wr_d[ws * 2], mask);
-+    tcg_gen_shli_i64(t1, t1, 8);
-+    tcg_gen_or_i64(t2, t2, t1);
-+
-+    mask =3D 0x000000000000ff00ULL;
-+    tcg_gen_andi_i64(t1, msa_wr_d[wt * 2], mask);
-+    tcg_gen_shli_i64(t1, t1, 8);
-+    tcg_gen_or_i64(t2, t2, t1);
-+    tcg_gen_andi_i64(t1, msa_wr_d[ws * 2], mask);
-+    tcg_gen_shli_i64(t1, t1, 16);
-+    tcg_gen_or_i64(t2, t2, t1);
-+
-+    mask =3D 0x0000000000ff0000ULL;
-+    tcg_gen_andi_i64(t1, msa_wr_d[wt * 2], mask);
-+    tcg_gen_shli_i64(t1, t1, 16);
-+    tcg_gen_or_i64(t2, t2, t1);
-+    tcg_gen_andi_i64(t1, msa_wr_d[ws * 2], mask);
-+    tcg_gen_shli_i64(t1, t1, 24);
-+    tcg_gen_or_i64(t2, t2, t1);
-+
-+    mask =3D 0x00000000ff000000ULL;
-+    tcg_gen_andi_i64(t1, msa_wr_d[wt * 2], mask);
-+    tcg_gen_shli_i64(t1, t1, 24);
-+    tcg_gen_or_i64(t2, t2, t1);
-+    tcg_gen_andi_i64(t1, msa_wr_d[ws * 2], mask);
-+    tcg_gen_shli_i64(t1, t1, 32);
-+    tcg_gen_or_i64(msa_wr_d[wd * 2], t2, t1);
-+
-+    mask =3D 0x000000ff00000000ULL;
-+    tcg_gen_andi_i64(t1, msa_wr_d[wt * 2], mask);
-+    tcg_gen_shri_i64(t1, t1, 32);
-+    tcg_gen_mov_i64(t2, t1);
-+    tcg_gen_andi_i64(t1, msa_wr_d[ws * 2], mask);
-+    tcg_gen_shri_i64(t1, t1, 24);
-+    tcg_gen_or_i64(t2, t2, t1);
-+
-+    mask =3D 0x0000ff0000000000ULL;
-+    tcg_gen_andi_i64(t1, msa_wr_d[wt * 2], mask);
-+    tcg_gen_shri_i64(t1, t1, 24);
-+    tcg_gen_or_i64(t2, t2, t1);
-+    tcg_gen_andi_i64(t1, msa_wr_d[ws * 2], mask);
-+    tcg_gen_shri_i64(t1, t1, 16);
-+    tcg_gen_or_i64(t2, t2, t1);
-+
-+    mask =3D 0x00ff000000000000ULL;
-+    tcg_gen_andi_i64(t1, msa_wr_d[wt * 2], mask);
-+    tcg_gen_shri_i64(t1, t1, 16);
-+    tcg_gen_or_i64(t2, t2, t1);
-+    tcg_gen_andi_i64(t1, msa_wr_d[ws * 2], mask);
-+    tcg_gen_shri_i64(t1, t1, 8);
-+    tcg_gen_or_i64(t2, t2, t1);
-+
-+    mask =3D 0xff00000000000000ULL;
-+    tcg_gen_andi_i64(t1, msa_wr_d[wt * 2], mask);
-+    tcg_gen_shri_i64(t1, t1, 8);
-+    tcg_gen_or_i64(t2, t2, t1);
-+    tcg_gen_andi_i64(t1, msa_wr_d[ws * 2], mask);
-+    tcg_gen_or_i64(msa_wr_d[wd * 2 + 1], t2, t1);
-+
-+    tcg_temp_free_i64(t1);
-+    tcg_temp_free_i64(t2);
-+}
-+
-+/*
-+ * [MSA] ILVR.H wd, ws, wt
-+ *
-+ *   Vector Interleave Right (halfword data elements)
-+ *
-+ */
-+static inline void gen_ilvr_h(CPUMIPSState *env, uint32_t wd,
-+                              uint32_t ws, uint32_t wt)
-+{
-+    TCGv_i64 t1 =3D tcg_temp_new_i64();
-+    TCGv_i64 t2 =3D tcg_temp_new_i64();
-+    uint64_t mask =3D 0x000000000000ffffULL;
-+
-+    tcg_gen_andi_i64(t1, msa_wr_d[wt * 2], mask);
-+    tcg_gen_mov_i64(t2, t1);
-+    tcg_gen_andi_i64(t1, msa_wr_d[ws * 2], mask);
-+    tcg_gen_shli_i64(t1, t1, 16);
-+    tcg_gen_or_i64(t2, t2, t1);
-+
-+    mask =3D 0x00000000ffff0000ULL;
-+    tcg_gen_andi_i64(t1, msa_wr_d[wt * 2], mask);
-+    tcg_gen_shli_i64(t1, t1, 16);
-+    tcg_gen_or_i64(t2, t2, t1);
-+    tcg_gen_andi_i64(t1, msa_wr_d[ws * 2], mask);
-+    tcg_gen_shli_i64(t1, t1, 32);
-+    tcg_gen_or_i64(msa_wr_d[wd * 2], t2, t1);
-+
-+    mask =3D 0x0000ffff00000000ULL;
-+    tcg_gen_andi_i64(t1, msa_wr_d[wt * 2], mask);
-+    tcg_gen_shri_i64(t1, t1, 32);
-+    tcg_gen_mov_i64(t2, t1);
-+    tcg_gen_andi_i64(t1, msa_wr_d[ws * 2], mask);
-+    tcg_gen_shri_i64(t1, t1, 16);
-+    tcg_gen_or_i64(t2, t2, t1);
-+
-+    mask =3D 0xffff000000000000ULL;
-+    tcg_gen_andi_i64(t1, msa_wr_d[wt * 2], mask);
-+    tcg_gen_shri_i64(t1, t1, 16);
-+    tcg_gen_or_i64(t2, t2, t1);
-+    tcg_gen_andi_i64(t1, msa_wr_d[ws * 2], mask);
-+    tcg_gen_or_i64(msa_wr_d[wd * 2 + 1], t2, t1);
-+
-+    tcg_temp_free_i64(t1);
-+    tcg_temp_free_i64(t2);
-+}
-+
-+/*
-+ * [MSA] ILVR.W wd, ws, wt
-+ *
-+ *   Vector Interleave Right (word data elements)
-+ *
-+ */
-+static inline void gen_ilvr_w(CPUMIPSState *env, uint32_t wd,
-+                              uint32_t ws, uint32_t wt)
-+{
-+    TCGv_i64 t1 =3D tcg_temp_new_i64();
-+    TCGv_i64 t2 =3D tcg_temp_new_i64();
-+    uint64_t mask =3D 0x00000000ffffffffULL;
-+
-+    tcg_gen_andi_i64(t1, msa_wr_d[wt * 2], mask);
-+    tcg_gen_mov_i64(t2, t1);
-+    tcg_gen_andi_i64(t1, msa_wr_d[ws * 2], mask);
-+    tcg_gen_shli_i64(t1, t1, 32);
-+    tcg_gen_or_i64(msa_wr_d[wd * 2], t2, t1);
-+
-+    mask =3D 0xffffffff00000000ULL;
-+    tcg_gen_andi_i64(t1, msa_wr_d[wt * 2], mask);
-+    tcg_gen_shri_i64(t1, t1, 32);
-+    tcg_gen_mov_i64(t2, t1);
-+    tcg_gen_andi_i64(t1, msa_wr_d[ws * 2], mask);
-+    tcg_gen_or_i64(msa_wr_d[wd * 2 + 1], t2, t1);
-+
-+    tcg_temp_free_i64(t1);
-+    tcg_temp_free_i64(t2);
-+}
-+
-+/*
-+ * [MSA] ILVR.D wd, ws, wt
-+ *
-+ *   Vector Interleave Right (doubleword data elements)
-+ *
-+ */
-+static inline void gen_ilvr_d(CPUMIPSState *env, uint32_t wd,
-+                              uint32_t ws, uint32_t wt)
-+{
-+    tcg_gen_mov_i64(msa_wr_d[wd * 2 + 1], msa_wr_d[ws * 2]);
-+    tcg_gen_mov_i64(msa_wr_d[wd * 2], msa_wr_d[wt * 2]);
-+}
-+
-+/*
-  * [MSA] ILVL.B wd, ws, wt
-  *
-  *   Vector Interleave Left (byte data elements)
-@@ -28468,7 +28635,22 @@ static void gen_msa_3r(CPUMIPSState *env, DisasC=
-ontext *ctx)
-         gen_helper_msa_div_u_df(cpu_env, tdf, twd, tws, twt);
-         break;
-     case OPC_ILVR_df:
--        gen_helper_msa_ilvr_df(cpu_env, tdf, twd, tws, twt);
-+        switch (df) {
-+        case DF_BYTE:
-+            gen_ilvr_b(env, wd, ws, wt);
-+            break;
-+        case DF_HALF:
-+            gen_ilvr_h(env, wd, ws, wt);
-+            break;
-+        case DF_WORD:
-+            gen_ilvr_w(env, wd, ws, wt);
-+            break;
-+        case DF_DOUBLE:
-+            gen_ilvr_d(env, wd, ws, wt);
-+            break;
-+        default:
-+            assert(0);
-+        }
-         break;
-     case OPC_BINSL_df:
-         gen_helper_msa_binsl_df(cpu_env, tdf, twd, tws, twt);
---=20
-2.7.4
-
+> +            if (ch < ' ' || ch == '#' || ch == '$' || ch > 126) {
+>                  /* invalid RLE count encoding */
+>                  trace_gdbstub_err_invalid_repeat((uint8_t)ch);
+>                  s->state = RS_GETLINE;
+> 
 
