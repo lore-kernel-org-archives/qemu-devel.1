@@ -1,28 +1,23 @@
-Received: from eggs.gnu.org ([209.51.188.92]:36637)
+Received: from eggs.gnu.org ([209.51.188.92]:36901)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1hH8Y6-0005bH-Dr
-	for qemu-devel@nongnu.org; Thu, 18 Apr 2019 11:02:03 -0400
+	(envelope-from <gsuryacse7k@gmail.com>) id 1hH8YX-0005xw-Hp
+	for qemu-devel@nongnu.org; Thu, 18 Apr 2019 11:02:31 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1hH8Y5-0005sF-99
-	for qemu-devel@nongnu.org; Thu, 18 Apr 2019 11:02:02 -0400
-References: <1555334842-195718-1-git-send-email-imammedo@redhat.com>
-	<1555334842-195718-6-git-send-email-imammedo@redhat.com>
-	<89ca3a70-066b-e40e-faaf-39a39ec976bf@de.ibm.com>
-	<20190418113859.00248d07@redhat.com>
-	<93d242cb-dcc4-a65d-a7c7-7232dd16a2f2@redhat.com>
-	<20190418140116.19596c6d@redhat.com>
-	<55880acf-9a61-9ed7-2ddd-9778b78540ee@redhat.com>
-	<20190418165630.5a3cc493@redhat.com>
-From: David Hildenbrand <david@redhat.com>
-Message-ID: <2675f1b1-fa05-ade3-9e0d-58e65e422251@redhat.com>
-Date: Thu, 18 Apr 2019 17:01:55 +0200
+	(envelope-from <gsuryacse7k@gmail.com>) id 1hH8YT-0006Am-BG
+	for qemu-devel@nongnu.org; Thu, 18 Apr 2019 11:02:29 -0400
+Received: from mail-it1-x133.google.com ([2607:f8b0:4864:20::133]:37712)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <gsuryacse7k@gmail.com>)
+	id 1hH8YN-00068Z-Tx
+	for qemu-devel@nongnu.org; Thu, 18 Apr 2019 11:02:21 -0400
+Received: by mail-it1-x133.google.com with SMTP id u65so3793624itc.2
+	for <qemu-devel@nongnu.org>; Thu, 18 Apr 2019 08:02:19 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20190418165630.5a3cc493@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v1 5/5] s390: do not call
- memory_region_allocate_system_memory() multiple times
+From: suresh gumpula <gsuryacse7k@gmail.com>
+Date: Thu, 18 Apr 2019 08:02:07 -0700
+Message-ID: <CAJOqHmiHMKcDiwzCFR0QDr1U59_8GwXUFDZGj=1yyjKmT=uwkQ@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: [Qemu-devel]  Live migration fails with all 8 memslots used
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,71 +26,182 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Igor Mammedov <imammedo@redhat.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org, Cornelia Huck <cohuck@redhat.com>, Halil Pasic <pasic@linux.ibm.com>, qemu-s390x@nongnu.org
+To: qemu-devel@nongnu.org
 
-On 18.04.19 16:56, Igor Mammedov wrote:
-> On Thu, 18 Apr 2019 14:06:25 +0200
-> David Hildenbrand <david@redhat.com> wrote:
-> 
->> On 18.04.19 14:01, Igor Mammedov wrote:
->>> On Thu, 18 Apr 2019 13:24:43 +0200
->>> David Hildenbrand <david@redhat.com> wrote:
->>>   
->>>> On 18.04.19 11:38, Igor Mammedov wrote:  
->>>>> On Tue, 16 Apr 2019 13:09:08 +0200
->>>>> Christian Borntraeger <borntraeger@de.ibm.com> wrote:
->>>>>     
->>>>>> This fails with more than 8TB, e.g.  "-m 9T "
->>>>>>
->>>>>> [pid 231065] ioctl(10, KVM_SET_USER_MEMORY_REGION, {slot=0, flags=0, guest_phys_addr=0, memory_size=0, userspace_addr=0x3ffc8500000}) = 0
->>>>>> [pid 231065] ioctl(10, KVM_SET_USER_MEMORY_REGION, {slot=0, flags=0, guest_phys_addr=0, memory_size=9895604649984, userspace_addr=0x3ffc8500000}) = -1 EINVAL (Invalid argument)
->>>>>>
->>>>>> seems that the 2nd memslot gets the full size (and not 9TB-size of first slot).    
->>>>>
->>>>> it turns out MemoryRegions is rendered correctly in to 2 parts (one per alias),
->>>>> but follow up flatview_simplify() collapses adjacent ranges back
->>>>> into big one.    
->>>>
->>>> That sounds dangerous. Imagine doing that at runtime (e.g. hotplugging a
->>>> DIMM), the kvm memory slot would temporarily be deleted to insert the
->>>> new, bigger one. Guest would crash. This could happen if backing memory
->>>> of two DIMMs would by pure luck be allocated side by side in user space.
->>>>  
->>>
->>> not sure I fully get your concerns, but if you look at can_merge()
->>> it ensures that ranges belong to the same MemoryRegion.
->>>
->>> It's hard for me to say if flatview_simplify() works as designed,
->>> MemoryRegion code is quite complicated so I'd deffer to Paolo's
->>> opinion.
->>>   
->>
->> What I had in mind:
->>
->> We have the Memory Region for memory devices (m->device_memory).
->>
->> Assume The first DIMM is created, allocating memory in the user space
->> process:
->>
->> [0x100000000 .. 0x20000000]. It is placed at offset 0 in m->device_memory.
->>
->> Guests starts to run, a second DIMM is hotplugged. Memory in user space
->> process is allocated (by pure luck) at:
->>
->> [0x200000000 .. 0x30000000]. It is placed at offset 0x100000000 in
->> m->device_memory.
->>
->> Without looking at the code, I could imagine that both might be merged
->> into a single memory slot. That is my concern. Maybe it is not valid.
-> it's not. As far as I see ranges are merged only if they belong to
-> the same 'mr'. So to dimms will result in 2 memory sections -> 2 KVMSlots.
+Hi,
+I was trying to migrate a VM(CentOS7) which  started with 4G memory and hot
+plugged 5 memslots with 1G each.  So the VM has total of 9G memory and
+trying to migrate fails in vhost_dev_init() on destination host
 
-Okay, so a shared "parent memory region" is not enough to result in a
-merge, only aliases.
 
--- 
+    if (used_memslots >
+hdev->vhost_ops->vhost_backend_memslots_limit(hdev)) {
 
-Thanks,
+        error_report("vhost backend memory slots limit is less"
 
-David / dhildenb
+                     " than current number of present memory slots");
+
+        r = -1;
+
+        if (busyloop_timeout) {
+
+            goto fail_busyloop;
+
+        } else {
+
+            goto fail;
+
+        }
+
+    }
+
+
+Debugged more into this and understood that, after vhost_dev_init()
+used_memslots are 4
+
+
+(gdb) show-vhost-dev-memory-regions 0x555556d27000
+
+n_mem_sections:4
+
+n_regions:4
+
+Region0:
+
+$101 = {
+
+  guest_phys_addr = 0x100000000,        ; 1G above 4G
+
+  memory_size = 0x40000000,
+
+  userspace_addr = 0x7fffb4600000,
+
+  flags_padding = 0x0
+
+}
+
+Region1:
+
+$102 = {
+
+  guest_phys_addr = 0xc0000,     ; 768k-896k
+
+  memory_size = 0x20000,
+
+  userspace_addr = 0x7ffef4200000,
+
+  flags_padding = 0x0
+
+}
+
+Region2:
+
+$103 = {
+
+  guest_phys_addr = 0x100000,             ;;3G from 1M
+
+  memory_size = 0xbff00000,
+
+  userspace_addr = 0x7ffef4700000,
+
+  flags_padding = 0x0
+
+}
+
+Region3:
+
+$104 = {
+
+  guest_phys_addr = 0x0,
+
+  memory_size = 0xa0000,              ;   First 640K;   0 - 640k;
+
+  userspace_addr = 0x7ffef4600000,
+
+  flags_padding = 0x0
+
+}
+
+(gdb) p used_memslots
+
+$150 = 4
+
+
+And later on it coalesced the VGA region of 128k at 0xc0000( 768-896k) upon
+guest config write
+
+with  i440fx_update_memory_mappings(d);
+
+(gdb) f 5
+
+#5  0x000055555595b920 in i440fx_write_config (dev=0x5555572b8000,
+address=90, val=51, len=1) at hw/pci-host/piix.c:168
+
+168             i440fx_update_memory_mappings(d);
+
+(gdb) l
+
+163
+
+164         /* XXX: implement SMRAM.D_LOCK */
+
+165         pci_default_write_config(dev, address, val, len);
+
+166         if (ranges_overlap(address, len, I440FX_PAM, I440FX_PAM_SIZE) ||
+
+167             range_covers_byte(address, len, I440FX_SMRAM)) {
+
+168             i440fx_update_memory_mappings(d);
+
+169         }
+
+170     }
+
+
+
+(gdb) p used_memslots
+
+$150 = 3
+
+
+Since the destination QEMU does not know that the source host coalesced one
+region,  vhost_dev_init for kernel started with 4 slots and  hot plugged 5
+slots and then the vhost_dev_init for user fails since 9>8 is true.
+
+
+    if (used_memslots >
+hdev->vhost_ops->vhost_backend_memslots_limit(hdev)) {
+
+        error_report("vhost backend memory slots limit is less"
+
+                     " than current number of present memory slots");
+
+        r = -1;
+
+        if (busyloop_timeout) {
+
+            goto fail_busyloop;
+
+        } else {
+
+            goto fail;
+
+        }
+
+    }
+
+
+Can you guys please answer my questions here:
+
+1)  Why is the VGA region of 128k coalesced on guest vcpu execution with
+pci config write?
+
+2)  We have memslots limit of 8 and 3 are pre occupied with initial memory
+and we can only use 4 memslots for hotplug instead of 5 to migrate a VM.
+Is there any reason for this?  We cannot hotplug 5 slots and migrate the VM.
+
+
+
+Thanks much
+
+Suresh.G
