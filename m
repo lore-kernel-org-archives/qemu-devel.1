@@ -6,58 +6,58 @@ X-Spam-Status: No, score=-6.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4C2C4C10F14
-	for <qemu-devel@archiver.kernel.org>; Thu, 18 Apr 2019 18:24:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 78E3BC10F0E
+	for <qemu-devel@archiver.kernel.org>; Thu, 18 Apr 2019 18:24:54 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 207D220643
-	for <qemu-devel@archiver.kernel.org>; Thu, 18 Apr 2019 18:24:27 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 207D220643
+	by mail.kernel.org (Postfix) with ESMTPS id 501FB20643
+	for <qemu-devel@archiver.kernel.org>; Thu, 18 Apr 2019 18:24:54 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 501FB20643
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:45426 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:45430 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hHBhy-0004Ho-77
-	for qemu-devel@archiver.kernel.org; Thu, 18 Apr 2019 14:24:26 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:46566)
+	id 1hHBiP-0004hM-Fm
+	for qemu-devel@archiver.kernel.org; Thu, 18 Apr 2019 14:24:53 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:47178)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1hHBOQ-0004f5-Vo
-	for qemu-devel@nongnu.org; Thu, 18 Apr 2019 14:04:16 -0400
+	(envelope-from <thuth@redhat.com>) id 1hHBPt-0005sw-Hd
+	for qemu-devel@nongnu.org; Thu, 18 Apr 2019 14:05:46 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1hHBON-0002s3-3T
-	for qemu-devel@nongnu.org; Thu, 18 Apr 2019 14:04:12 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:49942)
+	(envelope-from <thuth@redhat.com>) id 1hHBPs-0003sr-HK
+	for qemu-devel@nongnu.org; Thu, 18 Apr 2019 14:05:45 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:41516)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <thuth@redhat.com>)
-	id 1hHBO3-0002gF-KM; Thu, 18 Apr 2019 14:03:52 -0400
+	id 1hHBPg-0003gO-GQ; Thu, 18 Apr 2019 14:05:32 -0400
 Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
 	[10.5.11.22])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 4AA6E300250C;
-	Thu, 18 Apr 2019 18:03:50 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id A0BB5308A121;
+	Thu, 18 Apr 2019 18:05:26 +0000 (UTC)
 Received: from thuth.com (ovpn-116-56.ams2.redhat.com [10.36.116.56])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id 8BA0C1001F52;
-	Thu, 18 Apr 2019 18:03:44 +0000 (UTC)
+	by smtp.corp.redhat.com (Postfix) with ESMTP id E25711001DC8;
+	Thu, 18 Apr 2019 18:05:20 +0000 (UTC)
 From: Thomas Huth <thuth@redhat.com>
 To: yang.zhong@intel.com, Peter Maydell <peter.maydell@linaro.org>,
 	qemu-devel@nongnu.org, pbonzini@redhat.com
-Date: Thu, 18 Apr 2019 20:00:46 +0200
-Message-Id: <20190418180057.3593-19-thuth@redhat.com>
+Date: Thu, 18 Apr 2019 20:00:53 +0200
+Message-Id: <20190418180057.3593-26-thuth@redhat.com>
 In-Reply-To: <20190418180057.3593-1-thuth@redhat.com>
 References: <20190418180057.3593-1-thuth@redhat.com>
 MIME-Version: 1.0
 X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.45]);
-	Thu, 18 Apr 2019 18:03:50 +0000 (UTC)
+	(mx1.redhat.com [10.5.110.44]);
+	Thu, 18 Apr 2019 18:05:26 +0000 (UTC)
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] [PATCH for-QEMU-4.1 v5 18/29] hw/arm: Express
- dependencies of allwinner / cubieboard with Kconfig
+Subject: [Qemu-devel] [PATCH for-QEMU-4.1 v5 25/29] hw/arm: Express
+ dependencies of the microbit / nrf51 machine with Kconfig
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -86,75 +86,72 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 Content-Type: text/plain; charset="UTF-8"
-Message-ID: <20190418180046.Zf_xKMxRgvAfeWyK4QZCocPFC7Lb8-viNn7_NqJQjU8@z>
+Message-ID: <20190418180053.Cpl6PDDyZkA7OqobQQx-G6zkR4clitl7Xq2jcLYW1iI@z>
 
-Add dependencies for the Cubitech Cubieboard.
+Add Kconfig dependencies for the NRF51 / microbit machine.
 
 Signed-off-by: Thomas Huth <thuth@redhat.com>
 ---
- default-configs/arm-softmmu.mak | 6 +-----
- hw/arm/Kconfig                  | 9 +++++++++
- 2 files changed, 10 insertions(+), 5 deletions(-)
+ default-configs/arm-softmmu.mak | 3 +--
+ hw/arm/Kconfig                  | 6 ++++++
+ hw/arm/Makefile.objs            | 3 ++-
+ 3 files changed, 9 insertions(+), 3 deletions(-)
 
 diff --git a/default-configs/arm-softmmu.mak b/default-configs/arm-softmm=
 u.mak
-index c86a9f5427..a0b9016e3a 100644
+index 6dc388c43e..233937f394 100644
 --- a/default-configs/arm-softmmu.mak
 +++ b/default-configs/arm-softmmu.mak
-@@ -7,6 +7,7 @@ CONFIG_ARM_V7M=3Dy
- # CONFIG_TEST_DEVICES=3Dn
-=20
- CONFIG_ARM_VIRT=3Dy
-+CONFIG_CUBIEBOARD=3Dy
- CONFIG_EXYNOS4=3Dy
- CONFIG_HIGHBANK=3Dy
- CONFIG_INTEGRATOR=3Dy
-@@ -32,7 +33,6 @@ CONFIG_NETDUINO2=3Dy
+@@ -35,11 +35,10 @@ CONFIG_RASPI=3Dy
+ CONFIG_DIGIC=3Dy
+ CONFIG_SABRELITE=3Dy
+ CONFIG_EMCRAFT_SF2=3Dy
++CONFIG_MICROBIT=3Dy
 =20
  CONFIG_VGA=3Dy
- CONFIG_SSI_M25P80=3Dy
--CONFIG_ALLWINNER_EMAC=3Dy
- CONFIG_IMX_FEC=3Dy
 =20
- CONFIG_FRAMEBUFFER=3Dy
-@@ -60,10 +60,6 @@ CONFIG_IOTKIT_SYSINFO=3Dy
- CONFIG_ARMSSE_CPUID=3Dy
- CONFIG_ARMSSE_MHU=3Dy
-=20
--CONFIG_ALLWINNER_A10_PIT=3Dy
--CONFIG_ALLWINNER_A10_PIC=3Dy
--CONFIG_ALLWINNER_A10=3Dy
+-CONFIG_NRF51_SOC=3Dy
 -
- CONFIG_FSL_IMX6=3Dy
  CONFIG_FSL_IMX25=3Dy
  CONFIG_FSL_IMX7=3Dy
+ CONFIG_FSL_IMX6UL=3Dy
 diff --git a/hw/arm/Kconfig b/hw/arm/Kconfig
-index 49306d6419..2ef5696900 100644
+index 58439c492a..708eae19e5 100644
 --- a/hw/arm/Kconfig
 +++ b/hw/arm/Kconfig
-@@ -25,6 +25,10 @@ config CHEETAH
-     select OMAP
-     select TSC210X
+@@ -347,8 +347,14 @@ config FSL_IMX6UL
+     select IMX_I2C
+     select SDHCI
 =20
-+config CUBIEBOARD
++config MICROBIT
 +    bool
-+    select ALLWINNER_A10
++    select NRF51_SOC
 +
- config DIGIC
+ config NRF51_SOC
      bool
-     select PTIMER
-@@ -245,6 +249,11 @@ config ARM_V7M
++    select I2C
++    select ARM_V7M
 =20
- config ALLWINNER_A10
+ config EMCRAFT_SF2
      bool
-+    select AHCI
-+    select ALLWINNER_A10_PIT
-+    select ALLWINNER_A10_PIC
-+    select ALLWINNER_EMAC
-+    select SERIAL
-=20
- config RASPI
-     bool
+diff --git a/hw/arm/Makefile.objs b/hw/arm/Makefile.objs
+index eae9f6c442..994e67dd0d 100644
+--- a/hw/arm/Makefile.objs
++++ b/hw/arm/Makefile.objs
+@@ -8,6 +8,7 @@ obj-$(CONFIG_EMCRAFT_SF2) +=3D msf2-som.o
+ obj-$(CONFIG_HIGHBANK) +=3D highbank.o
+ obj-$(CONFIG_INTEGRATOR) +=3D integratorcp.o
+ obj-$(CONFIG_MAINSTONE) +=3D mainstone.o
++obj-$(CONFIG_MICROBIT) +=3D microbit.o
+ obj-$(CONFIG_MUSICPAL) +=3D musicpal.o
+ obj-$(CONFIG_NETDUINO2) +=3D netduino2.o
+ obj-$(CONFIG_NSERIES) +=3D nseries.o
+@@ -48,4 +49,4 @@ obj-$(CONFIG_ARMSSE) +=3D armsse.o
+ obj-$(CONFIG_FSL_IMX7) +=3D fsl-imx7.o mcimx7d-sabre.o
+ obj-$(CONFIG_ARM_SMMUV3) +=3D smmu-common.o smmuv3.o
+ obj-$(CONFIG_FSL_IMX6UL) +=3D fsl-imx6ul.o mcimx6ul-evk.o
+-obj-$(CONFIG_NRF51_SOC) +=3D nrf51_soc.o microbit.o
++obj-$(CONFIG_NRF51_SOC) +=3D nrf51_soc.o
 --=20
 2.21.0
 
