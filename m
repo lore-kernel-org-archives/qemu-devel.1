@@ -5,110 +5,62 @@ X-Spam-Level:
 X-Spam-Status: No, score=-0.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	MAILING_LIST_MULTI,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 57B8BC10F0E
-	for <qemu-devel@archiver.kernel.org>; Thu, 18 Apr 2019 13:17:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C958EC10F0E
+	for <qemu-devel@archiver.kernel.org>; Thu, 18 Apr 2019 13:22:28 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 12033217D7
-	for <qemu-devel@archiver.kernel.org>; Thu, 18 Apr 2019 13:17:19 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 12033217D7
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 929FE217D7
+	for <qemu-devel@archiver.kernel.org>; Thu, 18 Apr 2019 13:22:28 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 929FE217D7
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=patchew.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:41448 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:41507 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hH6uk-0002O0-Rp
-	for qemu-devel@archiver.kernel.org; Thu, 18 Apr 2019 09:17:18 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:43330)
+	id 1hH6zj-0003mQ-BN
+	for qemu-devel@archiver.kernel.org; Thu, 18 Apr 2019 09:22:27 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:44366)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1hH6tQ-0001gQ-40
-	for qemu-devel@nongnu.org; Thu, 18 Apr 2019 09:15:58 -0400
+	(envelope-from <no-reply@patchew.org>) id 1hH6ys-0003T1-Oi
+	for qemu-devel@nongnu.org; Thu, 18 Apr 2019 09:21:38 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1hH6tP-0008Fo-3o
-	for qemu-devel@nongnu.org; Thu, 18 Apr 2019 09:15:56 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:50680)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <david@redhat.com>)
-	id 1hH6tO-0008Eb-Mx; Thu, 18 Apr 2019 09:15:55 -0400
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
-	[10.5.11.22])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 05228970E7;
-	Thu, 18 Apr 2019 13:15:53 +0000 (UTC)
-Received: from [10.36.116.16] (ovpn-116-16.ams2.redhat.com [10.36.116.16])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id 0F8EE1001E65;
-	Thu, 18 Apr 2019 13:15:50 +0000 (UTC)
-To: Christian Borntraeger <borntraeger@de.ibm.com>,
-	Cornelia Huck <cohuck@redhat.com>
-References: <20190418113110.160664-1-borntraeger@de.ibm.com>
-	<20190418113110.160664-3-borntraeger@de.ibm.com>
-	<295ae226-a574-00e9-8dd5-6d95e47553ce@redhat.com>
-	<806bf939-6560-1fae-f112-60094bd425e7@de.ibm.com>
-From: David Hildenbrand <david@redhat.com>
-Openpgp: preference=signencrypt
-Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
-	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
-	SE+xAvmumFBY
-Organization: Red Hat GmbH
-Message-ID: <27a9145b-676d-3f65-0584-8805108ed351@redhat.com>
-Date: Thu, 18 Apr 2019 15:15:50 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
-	Thunderbird/60.6.1
+	(envelope-from <no-reply@patchew.org>) id 1hH6yp-00045R-5G
+	for qemu-devel@nongnu.org; Thu, 18 Apr 2019 09:21:34 -0400
+Resent-Date: Thu, 18 Apr 2019 09:21:34 -0400
+Resent-Message-Id: <E1hH6yp-00045R-5G@eggs.gnu.org>
+Received: from sender4-of-o55.zoho.com ([136.143.188.55]:21538)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
+	id 1hH6yo-00043m-WF
+	for qemu-devel@nongnu.org; Thu, 18 Apr 2019 09:21:31 -0400
+ARC-Seal: i=1; a=rsa-sha256; t=1555593617; cv=none; d=zoho.com; s=zohoarc; 
+	b=b1gleAFHO3NNdoi6aIw07qKbUYUkTbW0oul/vma5k7KLk1ZT2Q3hDSxW7Z4uq7OiiJ/0KiMBBS/EnWRPdZE6Hk+slByCSQZYo+HuLjgqJcOHUzP4nDR2BmhW0qiYG1gmj/3xU+0kmZdMTn8F7OeffzxBX9bOS2FIS2iDhPFHxEA=
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zoho.com;
+	s=zohoarc; t=1555593617;
+	h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:Reply-To:Subject:To:ARC-Authentication-Results;
+	bh=YSOV/fdNC0KeiFlooTvdqI4/0RDFXhWjhYxAo/vPwEE=; 
+	b=gG+1nUY3cvMgCiml0pa2E1+ImV/fr3Whoxl0C14OofvUB9gvKac7AQu5c197Iaqnncnb3lKpFtxC/fIRz7OFC0iuKhLM1KhpTCWt8JOld9ECyKGWrMUFIBOjiC0jkfr9eZSZTex2xfzClPIs3GrfibyIOaRfNPJK1AiH+KwAE5A=
+ARC-Authentication-Results: i=1; mx.zoho.com; dkim=pass  header.i=patchew.org;
+	spf=pass  smtp.mailfrom=no-reply@patchew.org;
+	dmarc=pass header.from=<no-reply@patchew.org>
+	header.from=<no-reply@patchew.org>
+Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by
+	mx.zohomail.com with SMTPS id 1555593614413269.4287260903302;
+	Thu, 18 Apr 2019 06:20:14 -0700 (PDT)
+In-Reply-To: <20190418125908.11928-1-marcandre.lureau@redhat.com>
+Message-ID: <155559361280.24.11295918513603991002@c2072b67cc0c>
 MIME-Version: 1.0
-In-Reply-To: <806bf939-6560-1fae-f112-60094bd425e7@de.ibm.com>
 Content-Type: text/plain; charset="UTF-8"
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.39]);
-	Thu, 18 Apr 2019 13:15:53 +0000 (UTC)
+Content-Transfer-Encoding: base64
+Resent-From: 
+From: no-reply@patchew.org
+To: marcandre.lureau@redhat.com
+Date: Thu, 18 Apr 2019 06:20:14 -0700 (PDT)
+X-ZohoMailClient: External
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH 02/10] s390x/cpumodel: remove CSSKE from
- base model
+X-Received-From: 136.143.188.55
+Subject: Re: [Qemu-devel] [PATCH 0/2] Memory fixes for slirp tcp_emu()
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -120,67 +72,67 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "Jason J . Herne" <jjherne@linux.ibm.com>,
-	Collin Walling <walling@linux.ibm.com>, qemu-devel <qemu-devel@nongnu.org>,
-	Halil Pasic <pasic@linux.ibm.com>, qemu-s390x <qemu-s390x@nongnu.org>,
-	Richard Henderson <rth@twiddle.net>
+Reply-To: qemu-devel@nongnu.org
+Cc: fam@euphon.net, jan.kiszka@siemens.com, qemu-devel@nongnu.org,
+	samuel.thibault@ens-lyon.org, marcandre.lureau@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190418131550.25SIYthyekVkVLC1xZEydrApOj2_UiDp_I0e0Fn4VXE@z>
+Message-ID: <20190418132014.wXwXc5H3CtoXQzLWT1BbL_922qL-snZOVVmT21LtocI@z>
 
-On 18.04.19 15:00, Christian Borntraeger wrote:
-> 
-> 
-> On 18.04.19 14:45, David Hildenbrand wrote:
->> On 18.04.19 13:31, Christian Borntraeger wrote:
->>> conditional sske is deprecated and a distant future machine (will be one
->>> where the IBC will not allow to fully go back to z14) will remove this
->>> feature. To prepare for this and allow for the z14 and older cpu model
->>> to still run on systems without csske, remove csske from the base (and
->>
->> will csske feature be a default feature for zNext? Or is it not
->> available *at all*.
->>
->> In case it is not available, baselining and cpu model comparison have to
->> be thought about "ignoring csske".
->>
->>> thus the default models for z10..z14). For compat machines we have to
->>> add those back.
->>
->> Base models are machine-independent. That means, changing base models is
->> not supported.
-> 
-> Why is that? for the expansion?
+UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDE5MDQxODEyNTkwOC4xMTky
+OC0xLW1hcmNhbmRyZS5sdXJlYXVAcmVkaGF0LmNvbS8KCgoKSGksCgpUaGlzIHNlcmllcyBzZWVt
+cyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1zLiBTZWUgb3V0cHV0IGJlbG93IGZv
+cgptb3JlIGluZm9ybWF0aW9uOgoKU3ViamVjdDogW1FlbXUtZGV2ZWxdIFtQQVRDSCAwLzJdIE1l
+bW9yeSBmaXhlcyBmb3Igc2xpcnAgdGNwX2VtdSgpClR5cGU6IHNlcmllcwpNZXNzYWdlLWlkOiAy
+MDE5MDQxODEyNTkwOC4xMTkyOC0xLW1hcmNhbmRyZS5sdXJlYXVAcmVkaGF0LmNvbQoKPT09IFRF
+U1QgU0NSSVBUIEJFR0lOID09PQojIS9iaW4vYmFzaApnaXQgcmV2LXBhcnNlIGJhc2UgPiAvZGV2
+L251bGwgfHwgZXhpdCAwCmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLnJlbmFtZWxpbWl0IDAKZ2l0
+IGNvbmZpZyAtLWxvY2FsIGRpZmYucmVuYW1lcyBUcnVlCmdpdCBjb25maWcgLS1sb2NhbCBkaWZm
+LmFsZ29yaXRobSBoaXN0b2dyYW0KLi9zY3JpcHRzL2NoZWNrcGF0Y2gucGwgLS1tYWlsYmFjayBi
+YXNlLi4KPT09IFRFU1QgU0NSSVBUIEVORCA9PT0KClVwZGF0aW5nIDNjOGNmNWE5YzIxZmY4Nzgy
+MTY0ZDFkZWY3ZjQ0YmQ4ODg3MTMzODQKU3dpdGNoZWQgdG8gYSBuZXcgYnJhbmNoICd0ZXN0Jwo3
+YzZkNmQwIHNsaXJwOiBkb24ndCBtYW5pcHVsYXRlIHNvX3JjdiBpbiB0Y3BfZW11KCkKODRkOGUz
+ZSBzbGlycDogZW5zdXJlIHRoZXJlIGlzIGVub3VnaCBzcGFjZSBpbiBtYnVmIHRvIG51bGwtdGVy
+bWluYXRlCgo9PT0gT1VUUFVUIEJFR0lOID09PQoxLzIgQ2hlY2tpbmcgY29tbWl0IDg0ZDhlM2Vh
+Njg3ZCAoc2xpcnA6IGVuc3VyZSB0aGVyZSBpcyBlbm91Z2ggc3BhY2UgaW4gbWJ1ZiB0byBudWxs
+LXRlcm1pbmF0ZSkKRVJST1I6IGNvZGUgaW5kZW50IHNob3VsZCBuZXZlciB1c2UgdGFicwojMjI6
+IEZJTEU6IHNsaXJwL3NyYy90Y3Bfc3Vici5jOjY0NzoKK15JXkleSW1faW5jKG0sIG0tPm1fbGVu
+ICsgMSk7JAoKRVJST1I6IGNvZGUgaW5kZW50IHNob3VsZCBuZXZlciB1c2UgdGFicwojMzg6IEZJ
+TEU6IHNsaXJwL3NyYy90Y3Bfc3Vici5jOjc3OToKK15JXkltX2luYyhtLCBtLT5tX2xlbiArIDEp
+OyQKCnRvdGFsOiAyIGVycm9ycywgMCB3YXJuaW5ncywgMjEgbGluZXMgY2hlY2tlZAoKUGF0Y2gg
+MS8yIGhhcyBzdHlsZSBwcm9ibGVtcywgcGxlYXNlIHJldmlldy4gIElmIGFueSBvZiB0aGVzZSBl
+cnJvcnMKYXJlIGZhbHNlIHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRhaW5lciwg
+c2VlCkNIRUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMuCgoyLzIgQ2hlY2tpbmcgY29tbWl0IDdjNmQ2
+ZDBlOGM2OCAoc2xpcnA6IGRvbid0IG1hbmlwdWxhdGUgc29fcmN2IGluIHRjcF9lbXUoKSkKRVJS
+T1I6IGNvZGUgaW5kZW50IHNob3VsZCBuZXZlciB1c2UgdGFicwojNDc6IEZJTEU6IHNsaXJwL3Ny
+Yy90Y3Bfc3Vici5jOjYzODoKK15JXkleSWlmIChnX3N0cnN0cl9sZW4obS0+bV9kYXRhLCBtLT5t
+X2xlbiwgIlxyXG4iKSQKCldBUk5JTkc6IGxpbmUgb3ZlciA4MCBjaGFyYWN0ZXJzCiM0ODogRklM
+RTogc2xpcnAvc3JjL3RjcF9zdWJyLmM6NjM5OgorICAgICAgICAgICAgICAgICAgICAgICAgICAg
+ICAgICYmIHNzY2FuZihtLT5tX2RhdGEsICIldSUqWyAsXSV1XHJcbiIsICZuMSwgJm4yKSA9PSAy
+KSB7CgpFUlJPUjogY29kZSBpbmRlbnQgc2hvdWxkIG5ldmVyIHVzZSB0YWJzCiM0ODogRklMRTog
+c2xpcnAvc3JjL3RjcF9zdWJyLmM6NjM5OgorXkleSV5JXkkmJiBzc2NhbmYobS0+bV9kYXRhLCAi
+JXUlKlsgLF0ldVxyXG4iLCAmbjEsICZuMikgPT0gMikgeyQKCldBUk5JTkc6IGxpbmUgb3ZlciA4
+MCBjaGFyYWN0ZXJzCiM2MTogRklMRTogc2xpcnAvc3JjL3RjcF9zdWJyLmM6NjU4OgorICAgICAg
+ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgbS0+bV9sZW4gPSBzbnByaW50ZihtLT5t
+X2RhdGEsIG0tPm1fc2l6ZSwKCkVSUk9SOiBjb2RlIGluZGVudCBzaG91bGQgbmV2ZXIgdXNlIHRh
+YnMKIzYxOiBGSUxFOiBzbGlycC9zcmMvdGNwX3N1YnIuYzo2NTg6CiteSV5JXkleSV5JbS0+bV9s
+ZW4gPSBzbnByaW50ZihtLT5tX2RhdGEsIG0tPm1fc2l6ZSwkCgpFUlJPUjogbGluZSBvdmVyIDkw
+IGNoYXJhY3RlcnMKIzYyOiBGSUxFOiBzbGlycC9zcmMvdGNwX3N1YnIuYzo2NTk6CisgICAgICAg
+ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
+ICAgICAgICAgICAgICAgIiVkLCVkXHJcbiIsIG4xLCBuMik7CgpFUlJPUjogY29kZSBpbmRlbnQg
+c2hvdWxkIG5ldmVyIHVzZSB0YWJzCiM2MjogRklMRTogc2xpcnAvc3JjL3RjcF9zdWJyLmM6NjU5
+OgorXkleSV5JXkleSV5JXkleSV5JXkkiJWQsJWRcclxuIiwgbjEsIG4yKTskCgpFUlJPUjogY29k
+ZSBpbmRlbnQgc2hvdWxkIG5ldmVyIHVzZSB0YWJzCiM2NzogRklMRTogc2xpcnAvc3JjL3RjcF9z
+dWJyLmM6NjYxOgorXkleSV5JcmV0dXJuIDE7JAoKdG90YWw6IDYgZXJyb3JzLCAyIHdhcm5pbmdz
+LCA0MCBsaW5lcyBjaGVja2VkCgpQYXRjaCAyLzIgaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2Ug
+cmV2aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9y
+dCB0aGVtIHRvIHRoZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4K
+Cj09PSBPVVRQVVQgRU5EID09PQoKVGVzdCBjb21tYW5kIGV4aXRlZCB3aXRoIGNvZGU6IDEKCgpU
+aGUgZnVsbCBsb2cgaXMgYXZhaWxhYmxlIGF0Cmh0dHA6Ly9wYXRjaGV3Lm9yZy9sb2dzLzIwMTkw
+NDE4MTI1OTA4LjExOTI4LTEtbWFyY2FuZHJlLmx1cmVhdUByZWRoYXQuY29tL3Rlc3RpbmcuY2hl
+Y2twYXRjaC8/dHlwZT1tZXNzYWdlLgotLS0KRW1haWwgZ2VuZXJhdGVkIGF1dG9tYXRpY2FsbHkg
+YnkgUGF0Y2hldyBbaHR0cHM6Ly9wYXRjaGV3Lm9yZy9dLgpQbGVhc2Ugc2VuZCB5b3VyIGZlZWRi
+YWNrIHRvIHBhdGNoZXctZGV2ZWxAcmVkaGF0LmNvbQ==
 
-Yes, and baselining. It's what the QAPI interface promises.
-
-> 
->> Once we introduce new models like here, we can set the
->> new base models into stone.
-> 
-> the new model is easy (and yes I could only disable CSSKE in the base
-> model for gen15 but not for gen14. 
-> 
-> The problem is that without some kind of fixup for older base models like
-> z10-z14 expansion will fall back to z9 on anything that no longer has
-> csske. 
-
-I'd prefer to do generate the "right" base models right away and not fix
-them up at runtime. They should never change, so fixing them up at
-runtime feels wrong.
-
->> Luckily, we already have "ignored_base_feat", maybe we can simply add
->> csske there and have it working.
-> 
-> Yes, maybe we could ignore csske. 
-> 
-
-Yes, that should at least avoid falling back to a z9.
-
--- 
-
-Thanks,
-
-David / dhildenb
 
