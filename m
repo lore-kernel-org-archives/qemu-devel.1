@@ -6,55 +6,52 @@ X-Spam-Status: No, score=-8.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED,
 	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 012C8C10F0E
-	for <qemu-devel@archiver.kernel.org>; Thu, 18 Apr 2019 11:46:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CDFECC10F0E
+	for <qemu-devel@archiver.kernel.org>; Thu, 18 Apr 2019 11:48:32 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id BA12A2183E
-	for <qemu-devel@archiver.kernel.org>; Thu, 18 Apr 2019 11:45:59 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BA12A2183E
+	by mail.kernel.org (Postfix) with ESMTPS id 9CACE2183E
+	for <qemu-devel@archiver.kernel.org>; Thu, 18 Apr 2019 11:48:32 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9CACE2183E
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=rt-rk.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:40029 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:40055 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hH5UM-0004Qs-Uz
-	for qemu-devel@archiver.kernel.org; Thu, 18 Apr 2019 07:45:59 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:53562)
+	id 1hH5Wp-0006fE-Of
+	for qemu-devel@archiver.kernel.org; Thu, 18 Apr 2019 07:48:31 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:53568)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mateja.marjanovic@rt-rk.com>) id 1hH5Sa-00038H-Kc
-	for qemu-devel@nongnu.org; Thu, 18 Apr 2019 07:44:10 -0400
+	(envelope-from <mateja.marjanovic@rt-rk.com>) id 1hH5Sd-0003An-E5
+	for qemu-devel@nongnu.org; Thu, 18 Apr 2019 07:44:12 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mateja.marjanovic@rt-rk.com>) id 1hH5SV-0006QG-GS
-	for qemu-devel@nongnu.org; Thu, 18 Apr 2019 07:44:06 -0400
-Received: from mx2.rt-rk.com ([89.216.37.149]:45593 helo=mail.rt-rk.com)
+	(envelope-from <mateja.marjanovic@rt-rk.com>) id 1hH5SY-0006Th-Op
+	for qemu-devel@nongnu.org; Thu, 18 Apr 2019 07:44:10 -0400
+Received: from mx2.rt-rk.com ([89.216.37.149]:50792 helo=mail.rt-rk.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <mateja.marjanovic@rt-rk.com>)
-	id 1hH5ST-0004u1-2h
-	for qemu-devel@nongnu.org; Thu, 18 Apr 2019 07:44:01 -0400
+	id 1hH5SV-0006NO-HP
+	for qemu-devel@nongnu.org; Thu, 18 Apr 2019 07:44:04 -0400
 Received: from localhost (localhost [127.0.0.1])
-	by mail.rt-rk.com (Postfix) with ESMTP id 03A8D1A39CF;
+	by mail.rt-rk.com (Postfix) with ESMTP id 184A01A1DF9;
 	Thu, 18 Apr 2019 13:42:53 +0200 (CEST)
 X-Virus-Scanned: amavisd-new at rt-rk.com
 Received: from rtrkw310-lin.domain.local (rtrkw310-lin.domain.local
 	[10.10.13.97])
-	by mail.rt-rk.com (Postfix) with ESMTPSA id C02C11A22B4;
+	by mail.rt-rk.com (Postfix) with ESMTPSA id E51901A246A;
 	Thu, 18 Apr 2019 13:42:52 +0200 (CEST)
 From: Mateja Marjanovic <mateja.marjanovic@rt-rk.com>
 To: qemu-devel@nongnu.org
-Date: Thu, 18 Apr 2019 13:42:43 +0200
-Message-Id: <1555587766-985-4-git-send-email-mateja.marjanovic@rt-rk.com>
+Date: Thu, 18 Apr 2019 13:42:46 +0200
+Message-Id: <1555587766-985-7-git-send-email-mateja.marjanovic@rt-rk.com>
 X-Mailer: git-send-email 2.7.4
 In-Reply-To: <1555587766-985-1-git-send-email-mateja.marjanovic@rt-rk.com>
 References: <1555587766-985-1-git-send-email-mateja.marjanovic@rt-rk.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x
 X-Received-From: 89.216.37.149
-Subject: [Qemu-devel] [PATCH v8 3/6] target/mips: Optimize ILVL.<B|H|W|D>
- MSA instructions
+Subject: [Qemu-devel] [PATCH v8 6/6] target/mips: Merge implementation of
+ ILVOD.D and ILVL.D
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -71,245 +68,81 @@ Cc: arikalo@wavecomp.com, richard.henderson@linaro.org, philmd@redhat.com,
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190418114243.yxKrYcY3-49aVaLnNK3oTPreAeHXBb7fCZPl2S4EHJM@z>
+Content-Type: text/plain; charset="UTF-8"
+Message-ID: <20190418114246.u-S2TArjuAgAZh39b9pTaJ44tbT8_S6AhfVjIfV1Uxs@z>
 
 From: Mateja Marjanovic <Mateja.Marjanovic@rt-rk.com>
 
-Optimize ILVL.<B|H|W|D> instructions, using a hybrid
-approach. For byte data elements, use a helper with an
-unrolled loop (having much better performance than
-direct tcg translation), for halfword, word and
-doubleword data elements use directly tcg registers
-and logic performed on them.
-
-Performance measurement is done by executing the
-instructions 10 million times on a computer
-with Intel Core i7-3770 CPU @ 3.40GHz=C3=978.
-
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-||instruction||  helper  ||   tcg    ||      hybrid       ||
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-||  ilvl.b   || 59.91 ms || 74.41 ms || 60.50 ms (helper) ||
-||  ilvl.h   || 41.33 ms || 33.08 ms || 33.34 ms (tcg)    ||
-||  ilvl.w   || 30.99 ms || 22.87 ms || 23.19 ms (tcg)    ||
-||  ilvl.d   || 26.40 ms || 19.64 ms || 20.49 ms (tcg)    ||
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+The implementation for ILVOD.D and ILVL.D instructions
+is equivalent, so use a single handler for both of them.
 
 Suggested-by: Aleksandar Markovic <amarkovic@wavecomp.com>
 Signed-off-by: Mateja Marjanovic <mateja.marjanovic@rt-rk.com>
 ---
- target/mips/helper.h     |   3 +-
- target/mips/msa_helper.c |  33 +++++++++++----
- target/mips/translate.c  | 106 +++++++++++++++++++++++++++++++++++++++++=
-+++++-
- 3 files changed, 132 insertions(+), 10 deletions(-)
+ target/mips/translate.c | 27 ++++++++++-----------------
+ 1 file changed, 10 insertions(+), 17 deletions(-)
 
-diff --git a/target/mips/helper.h b/target/mips/helper.h
-index 2f23b0d..ba2af87 100644
---- a/target/mips/helper.h
-+++ b/target/mips/helper.h
-@@ -862,7 +862,6 @@ DEF_HELPER_5(msa_sld_df, void, env, i32, i32, i32, i3=
-2)
- DEF_HELPER_5(msa_splat_df, void, env, i32, i32, i32, i32)
- DEF_HELPER_5(msa_pckev_df, void, env, i32, i32, i32, i32)
- DEF_HELPER_5(msa_pckod_df, void, env, i32, i32, i32, i32)
--DEF_HELPER_5(msa_ilvl_df, void, env, i32, i32, i32, i32)
- DEF_HELPER_5(msa_ilvr_df, void, env, i32, i32, i32, i32)
- DEF_HELPER_5(msa_vshf_df, void, env, i32, i32, i32, i32)
- DEF_HELPER_5(msa_srar_df, void, env, i32, i32, i32, i32)
-@@ -936,6 +935,8 @@ DEF_HELPER_4(msa_pcnt_df, void, env, i32, i32, i32)
- DEF_HELPER_4(msa_nloc_df, void, env, i32, i32, i32)
- DEF_HELPER_4(msa_nlzc_df, void, env, i32, i32, i32)
-=20
-+DEF_HELPER_4(msa_ilvl_b, void, env, i32, i32, i32)
-+
- DEF_HELPER_4(msa_fclass_df, void, env, i32, i32, i32)
- DEF_HELPER_4(msa_ftrunc_s_df, void, env, i32, i32, i32)
- DEF_HELPER_4(msa_ftrunc_u_df, void, env, i32, i32, i32)
-diff --git a/target/mips/msa_helper.c b/target/mips/msa_helper.c
-index a500c59..91beb1a 100644
---- a/target/mips/msa_helper.c
-+++ b/target/mips/msa_helper.c
-@@ -1184,14 +1184,6 @@ MSA_FN_DF(pckod_df)
-=20
- #define MSA_DO(DF)                      \
-     do {                                \
--        pwx->DF[2*i]   =3D L##DF(pwt, i); \
--        pwx->DF[2*i+1] =3D L##DF(pws, i); \
--    } while (0)
--MSA_FN_DF(ilvl_df)
--#undef MSA_DO
--
--#define MSA_DO(DF)                      \
--    do {                                \
-         pwx->DF[2*i]   =3D R##DF(pwt, i); \
-         pwx->DF[2*i+1] =3D R##DF(pws, i); \
-     } while (0)
-@@ -1214,6 +1206,31 @@ MSA_FN_DF(vshf_df)
- #undef MSA_LOOP_COND
- #undef MSA_FN_DF
-=20
-+void helper_msa_ilvl_b(CPUMIPSState *env, uint32_t wd,
-+                       uint32_t ws, uint32_t wt)
-+{
-+    wr_t *pwd =3D &(env->active_fpu.fpr[wd].wr);
-+    wr_t *pws =3D &(env->active_fpu.fpr[ws].wr);
-+    wr_t *pwt =3D &(env->active_fpu.fpr[wt].wr);
-+
-+    pwd->b[0]  =3D pwt->b[8];
-+    pwd->b[1]  =3D pws->b[8];
-+    pwd->b[2]  =3D pwt->b[9];
-+    pwd->b[3]  =3D pws->b[9];
-+    pwd->b[4]  =3D pwt->b[10];
-+    pwd->b[5]  =3D pws->b[10];
-+    pwd->b[6]  =3D pwt->b[11];
-+    pwd->b[7]  =3D pws->b[11];
-+    pwd->b[8]  =3D pwt->b[12];
-+    pwd->b[9]  =3D pws->b[12];
-+    pwd->b[10] =3D pwt->b[13];
-+    pwd->b[11] =3D pws->b[13];
-+    pwd->b[12] =3D pwt->b[14];
-+    pwd->b[13] =3D pws->b[14];
-+    pwd->b[14] =3D pwt->b[15];
-+    pwd->b[15] =3D pws->b[15];
-+}
-+
- void helper_msa_sldi_df(CPUMIPSState *env, uint32_t df, uint32_t wd,
-                         uint32_t ws, uint32_t n)
- {
 diff --git a/target/mips/translate.c b/target/mips/translate.c
-index 930ef3a..ce5c240 100644
+index c6aa995..4837c43 100644
 --- a/target/mips/translate.c
 +++ b/target/mips/translate.c
-@@ -28002,6 +28002,95 @@ static void gen_msa_bit(CPUMIPSState *env, Disas=
-Context *ctx)
+@@ -28154,19 +28154,6 @@ static inline void gen_ilvl_w(CPUMIPSState *env, uint32_t wd,
  }
-=20
+ 
  /*
-+ * [MSA] ILVL.H wd, ws, wt
-+ *
-+ *   Vector Interleave Left (halfword data elements)
-+ *
-+ */
-+static inline void gen_ilvl_h(CPUMIPSState *env, uint32_t wd,
-+                              uint32_t ws, uint32_t wt)
-+{
-+    TCGv_i64 t1 =3D tcg_temp_new_i64();
-+    TCGv_i64 t2 =3D tcg_temp_new_i64();
-+    uint64_t mask =3D 0x000000000000ffffULL;
-+
-+    tcg_gen_andi_i64(t1, msa_wr_d[wt * 2 + 1], mask);
-+    tcg_gen_mov_i64(t2, t1);
-+    tcg_gen_andi_i64(t1, msa_wr_d[ws * 2 + 1], mask);
-+    tcg_gen_shli_i64(t1, t1, 16);
-+    tcg_gen_or_i64(t2, t2, t1);
-+
-+    mask =3D 0x00000000ffff0000ULL;
-+    tcg_gen_andi_i64(t1, msa_wr_d[wt * 2 + 1], mask);
-+    tcg_gen_shli_i64(t1, t1, 16);
-+    tcg_gen_or_i64(t2, t2, t1);
-+    tcg_gen_andi_i64(t1, msa_wr_d[ws * 2 + 1], mask);
-+    tcg_gen_shli_i64(t1, t1, 32);
-+    tcg_gen_or_i64(msa_wr_d[wd * 2], t2, t1);
-+
-+    mask =3D 0x0000ffff00000000ULL;
-+    tcg_gen_andi_i64(t1, msa_wr_d[wt * 2 + 1], mask);
-+    tcg_gen_shri_i64(t1, t1, 32);
-+    tcg_gen_mov_i64(t2, t1);
-+    tcg_gen_andi_i64(t1, msa_wr_d[ws * 2 + 1], mask);
-+    tcg_gen_shri_i64(t1, t1, 16);
-+    tcg_gen_or_i64(t2, t2, t1);
-+
-+    mask =3D 0xffff000000000000ULL;
-+    tcg_gen_andi_i64(t1, msa_wr_d[wt * 2 + 1], mask);
-+    tcg_gen_shri_i64(t1, t1, 16);
-+    tcg_gen_or_i64(t2, t2, t1);
-+    tcg_gen_andi_i64(t1, msa_wr_d[ws * 2 + 1], mask);
-+    tcg_gen_or_i64(msa_wr_d[wd * 2 + 1], t2, t1);
-+
-+    tcg_temp_free_i64(t1);
-+    tcg_temp_free_i64(t2);
-+}
-+
-+/*
-+ * [MSA] ILVL.W wd, ws, wt
-+ *
-+ *   Vector Interleave Left (word data elements)
-+ *
-+ */
-+static inline void gen_ilvl_w(CPUMIPSState *env, uint32_t wd,
-+                              uint32_t ws, uint32_t wt)
-+{
-+    TCGv_i64 t1 =3D tcg_temp_new_i64();
-+    TCGv_i64 t2 =3D tcg_temp_new_i64();
-+    uint64_t mask =3D 0x00000000ffffffffULL;
-+
-+    tcg_gen_andi_i64(t1, msa_wr_d[wt * 2 + 1], mask);
-+    tcg_gen_mov_i64(t2, t1);
-+    tcg_gen_andi_i64(t1, msa_wr_d[ws * 2 + 1], mask);
-+    tcg_gen_shli_i64(t1, t1, 32);
-+    tcg_gen_or_i64(msa_wr_d[wd * 2], t2, t1);
-+
-+    mask =3D 0xffffffff00000000ULL;
-+    tcg_gen_andi_i64(t1, msa_wr_d[wt * 2 + 1], mask);
-+    tcg_gen_shri_i64(t1, t1, 32);
-+    tcg_gen_mov_i64(t2, t1);
-+    tcg_gen_andi_i64(t1, msa_wr_d[ws * 2 + 1], mask);
-+    tcg_gen_or_i64(msa_wr_d[wd * 2 + 1], t2, t1);
-+
-+    tcg_temp_free_i64(t1);
-+    tcg_temp_free_i64(t2);
-+}
-+
-+/*
+- * [MSA] ILVL.D wd, ws, wt
+- *
+- *   Vector Interleave Left (doubleword data elements)
+- *
+- */
+-static inline void gen_ilvl_d(CPUMIPSState *env, uint32_t wd,
+-                              uint32_t ws, uint32_t wt)
+-{
+-    tcg_gen_mov_i64(msa_wr_d[wd * 2], msa_wr_d[wt * 2 + 1]);
+-    tcg_gen_mov_i64(msa_wr_d[wd * 2 + 1], msa_wr_d[ws * 2 + 1]);
+-}
+-
+-/*
+  * [MSA] ILVOD.<B|H> wd, ws, wt
+  *
+  *   Vector Interleave Odd (<byte|halfword> data elements)
+@@ -28232,9 +28219,15 @@ static inline void gen_ilvod_w(CPUMIPSState *env, uint32_t wd,
+  *
+  *   Vector Interleave Odd (doubleword data elements)
+  *
 + * [MSA] ILVL.D wd, ws, wt
 + *
 + *   Vector Interleave Left (doubleword data elements)
 + *
-+ */
-+static inline void gen_ilvl_d(CPUMIPSState *env, uint32_t wd,
-+                              uint32_t ws, uint32_t wt)
-+{
-+    tcg_gen_mov_i64(msa_wr_d[wd * 2], msa_wr_d[wt * 2 + 1]);
-+    tcg_gen_mov_i64(msa_wr_d[wd * 2 + 1], msa_wr_d[ws * 2 + 1]);
-+}
-+
-+/*
-  * [MSA] ILVOD.<B|H> wd, ws, wt
-  *
-  *   Vector Interleave Odd (<byte|halfword> data elements)
-@@ -28265,7 +28354,22 @@ static void gen_msa_3r(CPUMIPSState *env, DisasC=
-ontext *ctx)
-         gen_helper_msa_div_s_df(cpu_env, tdf, twd, tws, twt);
-         break;
-     case OPC_ILVL_df:
--        gen_helper_msa_ilvl_df(cpu_env, tdf, twd, tws, twt);
-+        switch (df) {
-+        case DF_BYTE:
-+            gen_helper_msa_ilvl_b(cpu_env, twd, tws, twt);
-+            break;
-+        case DF_HALF:
-+            gen_ilvl_h(env, wd, ws, wt);
-+            break;
-+        case DF_WORD:
-+            gen_ilvl_w(env, wd, ws, wt);
-+            break;
-+        case DF_DOUBLE:
-+            gen_ilvl_d(env, wd, ws, wt);
-+            break;
-+        default:
-+            assert(0);
-+        }
-         break;
-     case OPC_BNEG_df:
-         gen_helper_msa_bneg_df(cpu_env, tdf, twd, tws, twt);
---=20
++ *  These two instructions are functionally equivalent.
++ *
+  */
+-static inline void gen_ilvod_d(CPUMIPSState *env, uint32_t wd,
+-                               uint32_t ws, uint32_t wt)
++static inline void gen_ilvod_ilvl_d(CPUMIPSState *env, uint32_t wd,
++                                    uint32_t ws, uint32_t wt)
+ {
+     tcg_gen_mov_i64(msa_wr_d[wd * 2], msa_wr_d[wt * 2 + 1]);
+     tcg_gen_mov_i64(msa_wr_d[wd * 2 + 1], msa_wr_d[ws * 2 + 1]);
+@@ -28447,7 +28440,7 @@ static void gen_msa_3r(CPUMIPSState *env, DisasContext *ctx)
+             gen_ilvl_w(env, wd, ws, wt);
+             break;
+         case DF_DOUBLE:
+-            gen_ilvl_d(env, wd, ws, wt);
++            gen_ilvod_ilvl_d(env, wd, ws, wt);
+             break;
+         default:
+             assert(0);
+@@ -28543,7 +28536,7 @@ static void gen_msa_3r(CPUMIPSState *env, DisasContext *ctx)
+             gen_ilvod_w(env, wd, ws, wt);
+             break;
+         case DF_DOUBLE:
+-            gen_ilvod_d(env, wd, ws, wt);
++            gen_ilvod_ilvl_d(env, wd, ws, wt);
+             break;
+         default:
+             assert(0);
+-- 
 2.7.4
 
 
