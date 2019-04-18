@@ -1,20 +1,22 @@
-Received: from eggs.gnu.org ([209.51.188.92]:37464)
+Received: from eggs.gnu.org ([209.51.188.92]:37521)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1hGz1x-0004lq-N1
-	for qemu-devel@nongnu.org; Thu, 18 Apr 2019 00:52:14 -0400
+	(envelope-from <thuth@redhat.com>) id 1hGz2H-0004xb-5i
+	for qemu-devel@nongnu.org; Thu, 18 Apr 2019 00:52:34 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1hGz1w-0002jn-Nw
-	for qemu-devel@nongnu.org; Thu, 18 Apr 2019 00:52:13 -0400
-Date: Thu, 18 Apr 2019 01:52:08 -0300
-From: Eduardo Habkost <ehabkost@redhat.com>
-Message-ID: <20190418045208.GE25134@habkost.net>
-References: <20190417025944.16154-1-ehabkost@redhat.com>
-	<20190417025944.16154-4-ehabkost@redhat.com>
+	(envelope-from <thuth@redhat.com>) id 1hGz2D-0002w6-76
+	for qemu-devel@nongnu.org; Thu, 18 Apr 2019 00:52:32 -0400
+References: <20190417220147.67648-1-stephen.checkoway@oberlin.edu>
+	<20190417220147.67648-9-stephen.checkoway@oberlin.edu>
+From: Thomas Huth <thuth@redhat.com>
+Message-ID: <2b6e60dc-9484-ffd4-afb5-6be792ee586d@redhat.com>
+Date: Thu, 18 Apr 2019 06:52:16 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20190417025944.16154-4-ehabkost@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH 3/5] linux-user: Use lookup_cpu_class()
+In-Reply-To: <20190417220147.67648-9-stephen.checkoway@oberlin.edu>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v3 08/10] block/pflash_cfi02: Implement
+ multi-sector erase
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,27 +25,19 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Laurent Vivier <laurent@vivier.eu>, Paolo Bonzini <pbonzini@redhat.com>, Riku Voipio <riku.voipio@iki.fi>, Like Xu <like.xu@linux.intel.com>, Richard Henderson <rth@twiddle.net>, David Gibson <david@gibson.dropbear.id.au>, Thomas Huth <thuth@redhat.com>, Igor Mammedov <imammedo@redhat.com>, qemu-ppc@nongnu.org, Markus Armbruster <armbru@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, Artyom Tarasenko <atar4qemu@gmail.com>, Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+To: Stephen Checkoway <stephen.checkoway@oberlin.edu>, QEMU Developers <qemu-devel@nongnu.org>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, "open list:Block layer core" <qemu-block@nongnu.org>, Markus Armbruster <armbru@redhat.com>, Laszlo Ersek <lersek@redhat.com>, Laurent Vivier <lvivier@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
 
-On Tue, Apr 16, 2019 at 11:59:42PM -0300, Eduardo Habkost wrote:
-> The return value of cpu_get_model() is just a CPU model name and
-> never includes extra options.  We don't need to call
-> parse_cpu_option().
+On 18/04/2019 00.01, Stephen Checkoway wrote:
+> After two unlock cycles and a sector erase command, the AMD flash chips
+> start a 50 us erase time out. Any additional sector erase commands add a
+> sector to be erased and restart the 50 us timeout. During the timeout,
+> status bit DQ3 is cleared. After the time out, DQ3 is asserted during
+> erasure.
+> 
+> Signed-off-by: Stephen Checkoway <stephen.checkoway@oberlin.edu>
+> ---
+>  hw/block/pflash_cfi02.c   | 94 +++++++++++++++++++++++++++++++--------
+>  tests/pflash-cfi02-test.c | 59 ++++++++++++++++++++++--
+>  2 files changed, 131 insertions(+), 22 deletions(-)
 
-Oops.  I was wrong.  linux-user also supports extra features in
-the "-cpu" option, so we do need to call parse_cpu_option().
-
-e.g.: this worked before:
-
-  $ qemu-x86_64 -cpu Nehalem,+popcnt /bin/true
-
-and now this is broken:
-
-  $ qemu-x86_64 -cpu Nehalem,+popcnt /bin/true
-  unable to find CPU model 'Nehalem,+popcnt'
-
-I will drop patches 2-5 from my queue.  Sorry for the noise.
-
--- 
-Eduardo
+Acked-by: Thomas Huth <thuth@redhat.com>
