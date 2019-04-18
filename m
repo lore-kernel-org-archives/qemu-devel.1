@@ -2,117 +2,73 @@ Return-Path: <SRS0=08iY=SU=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 507DFC10F0E
-	for <qemu-devel@archiver.kernel.org>; Thu, 18 Apr 2019 12:07:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 47FA3C10F0E
+	for <qemu-devel@archiver.kernel.org>; Thu, 18 Apr 2019 12:11:41 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id F242A2183E
-	for <qemu-devel@archiver.kernel.org>; Thu, 18 Apr 2019 12:07:29 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F242A2183E
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id EC4B52183E
+	for <qemu-devel@archiver.kernel.org>; Thu, 18 Apr 2019 12:11:40 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EC4B52183E
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:40607 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:40658 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hH5pB-0003lE-0H
-	for qemu-devel@archiver.kernel.org; Thu, 18 Apr 2019 08:07:29 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:58199)
+	id 1hH5tE-0004qv-2z
+	for qemu-devel@archiver.kernel.org; Thu, 18 Apr 2019 08:11:40 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:58932)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1hH5oO-0003Sc-7e
-	for qemu-devel@nongnu.org; Thu, 18 Apr 2019 08:06:41 -0400
+	(envelope-from <bounces@canonical.com>) id 1hH5sP-0004T1-5V
+	for qemu-devel@nongnu.org; Thu, 18 Apr 2019 08:10:51 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1hH5oN-0005Io-7M
-	for qemu-devel@nongnu.org; Thu, 18 Apr 2019 08:06:40 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:33122)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <david@redhat.com>)
-	id 1hH5oM-0005Gu-V0; Thu, 18 Apr 2019 08:06:39 -0400
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
-	[10.5.11.11])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id B027F81F12;
-	Thu, 18 Apr 2019 12:06:32 +0000 (UTC)
-Received: from [10.36.117.133] (ovpn-117-133.ams2.redhat.com [10.36.117.133])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id 5B96E600C2;
-	Thu, 18 Apr 2019 12:06:31 +0000 (UTC)
-To: Igor Mammedov <imammedo@redhat.com>
-References: <1555334842-195718-1-git-send-email-imammedo@redhat.com>
-	<1555334842-195718-6-git-send-email-imammedo@redhat.com>
-	<89ca3a70-066b-e40e-faaf-39a39ec976bf@de.ibm.com>
-	<20190418113859.00248d07@redhat.com>
-	<93d242cb-dcc4-a65d-a7c7-7232dd16a2f2@redhat.com>
-	<20190418140116.19596c6d@redhat.com>
-From: David Hildenbrand <david@redhat.com>
-Openpgp: preference=signencrypt
-Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
-	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
-	SE+xAvmumFBY
-Organization: Red Hat GmbH
-Message-ID: <55880acf-9a61-9ed7-2ddd-9778b78540ee@redhat.com>
-Date: Thu, 18 Apr 2019 14:06:25 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
-	Thunderbird/60.6.1
+	(envelope-from <bounces@canonical.com>) id 1hH5sN-0001PH-4O
+	for qemu-devel@nongnu.org; Thu, 18 Apr 2019 08:10:49 -0400
+Received: from indium.canonical.com ([91.189.90.7]:47274)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1hH5sM-0001Oh-RK
+	for qemu-devel@nongnu.org; Thu, 18 Apr 2019 08:10:47 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1hH5sL-0001oI-Li
+	for <qemu-devel@nongnu.org>; Thu, 18 Apr 2019 12:10:45 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 9A2A72E80C8
+	for <qemu-devel@nongnu.org>; Thu, 18 Apr 2019 12:10:45 +0000 (UTC)
 MIME-Version: 1.0
-In-Reply-To: <20190418140116.19596c6d@redhat.com>
 Content-Type: text/plain; charset="UTF-8"
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.25]);
-	Thu, 18 Apr 2019 12:06:32 +0000 (UTC)
+Content-Transfer-Encoding: quoted-printable
+Date: Thu, 18 Apr 2019 12:00:19 -0000
+From: Shahab Vahedi <1825359@bugs.launchpad.net>
+To: qemu-devel@nongnu.org
+X-Launchpad-Notification-Type: bug
+X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
+X-Launchpad-Bug-Tags: fetch mmu mpu
+X-Launchpad-Bug-Information-Type: Public
+X-Launchpad-Bug-Private: no
+X-Launchpad-Bug-Security-Vulnerability: no
+X-Launchpad-Bug-Commenters: shahab-vahedi
+X-Launchpad-Bug-Reporter: Shahab Vahedi (shahab-vahedi)
+X-Launchpad-Bug-Modifier: Shahab Vahedi (shahab-vahedi)
+Message-Id:
+ <155558881987.7164.1099557133760519082.malonedeb@chaenomeles.canonical.com>
+X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
+X-Launchpad-Message-For: qemu-devel-ml
+Precedence: bulk
+X-Generated-By: Launchpad (canonical.com); Revision="18928";
+	Instance="launchpad-lazr.conf"
+X-Launchpad-Hash: 9a43c3fa4803e1d1b84c6ac577248d187a742e0a
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH v1 5/5] s390: do not call
- memory_region_allocate_system_memory() multiple times
+X-Received-From: 91.189.90.7
+Subject: [Qemu-devel] [Bug 1825359] [NEW] cpu_ld*_code() triggers
+ MMU_DATA_LOAD i.s.o. MMU_INST_FETCH
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
-Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -121,68 +77,402 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Halil Pasic <pasic@linux.ibm.com>, Paolo Bonzini <pbonzini@redhat.com>,
-	qemu-s390x@nongnu.org, Cornelia Huck <cohuck@redhat.com>,
-	qemu-devel@nongnu.org
+Reply-To: Bug 1825359 <1825359@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190418120625.KDvnxQHtKkHXVXXDRT9TvhxS3GvEalTCuzDdd58irlc@z>
+Message-ID: <20190418120019.6Na1MMUFOkf3Ic5IWW602fDKQIth82UOU8b7nu2yQxs@z>
 
-On 18.04.19 14:01, Igor Mammedov wrote:
-> On Thu, 18 Apr 2019 13:24:43 +0200
-> David Hildenbrand <david@redhat.com> wrote:
-> 
->> On 18.04.19 11:38, Igor Mammedov wrote:
->>> On Tue, 16 Apr 2019 13:09:08 +0200
->>> Christian Borntraeger <borntraeger@de.ibm.com> wrote:
->>>   
->>>> This fails with more than 8TB, e.g.  "-m 9T "
->>>>
->>>> [pid 231065] ioctl(10, KVM_SET_USER_MEMORY_REGION, {slot=0, flags=0, guest_phys_addr=0, memory_size=0, userspace_addr=0x3ffc8500000}) = 0
->>>> [pid 231065] ioctl(10, KVM_SET_USER_MEMORY_REGION, {slot=0, flags=0, guest_phys_addr=0, memory_size=9895604649984, userspace_addr=0x3ffc8500000}) = -1 EINVAL (Invalid argument)
->>>>
->>>> seems that the 2nd memslot gets the full size (and not 9TB-size of first slot).  
->>>
->>> it turns out MemoryRegions is rendered correctly in to 2 parts (one per alias),
->>> but follow up flatview_simplify() collapses adjacent ranges back
->>> into big one.  
->>
->> That sounds dangerous. Imagine doing that at runtime (e.g. hotplugging a
->> DIMM), the kvm memory slot would temporarily be deleted to insert the
->> new, bigger one. Guest would crash. This could happen if backing memory
->> of two DIMMs would by pure luck be allocated side by side in user space.
->>
-> 
-> not sure I fully get your concerns, but if you look at can_merge()
-> it ensures that ranges belong to the same MemoryRegion.
-> 
-> It's hard for me to say if flatview_simplify() works as designed,
-> MemoryRegion code is quite complicated so I'd deffer to Paolo's
-> opinion.
-> 
+Public bug reported:
 
-What I had in mind:
+commit 377b155bde451d5ac545fbdcdfbf6ca17a4228f5
+Merge: c876180938 328eb60dc1
+Author: Peter Maydell <peter.x@x.x>        ; masked for anti-spamming purpo=
+ses
+Date:   Mon Mar 11 18:26:37 2019 +0000
+https://github.com/qemu/qemu/commit/377b155bde451d5ac545fbdcdfbf6ca17a4228f5
+--------------------------------------------------
 
-We have the Memory Region for memory devices (m->device_memory).
+cpu_ld*_code() is used for loading code data as the name suggests. Although=
+, it begins accessing memory with MMU_INST_FETCH access type, somewhere down
+the road, when the "io_readx(..., access_type=3DMMU_INST_FETCH, ...)" is
+called, it is ignoring this "access_type" while calling the "tlb_fill()"
+with a _hardcoded_ MMU_DATA_LOAD:
 
-Assume The first DIMM is created, allocating memory in the user space
-process:
+cputlb.c
+--------
+static uint64_t io_readx(..., MMUAccessType access_type, ...)
+{
 
-[0x100000000 .. 0x20000000]. It is placed at offset 0 in m->device_memory.
+=C2=A0=C2=A0=C2=A0=C2=A0if (recheck) {
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0CPUTLBEntry *entry;
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0target_ulong tlb_addr;
 
-Guests starts to run, a second DIMM is hotplugged. Memory in user space
-process is allocated (by pure luck) at:
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0tlb_fill(cpu, addr, size, M=
+MU_DATA_LOAD, mmu_idx, retaddr);
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0...
+}
+--------
 
-[0x200000000 .. 0x30000000]. It is placed at offset 0x100000000 in
-m->device_memory.
+This is an issue, because there can exist _small_ regions of memory (smaller
+than the TARGET_PAGE_SIZE) that are only executable and not readable.
 
-Without looking at the code, I could imagine that both might be merged
-into a single memory slot. That is my concern. Maybe it is not valid.
+TL;DR
 
--- 
+What happens is at first, a "tlb_fill(..., access_type=3DMMU_INST_FETCH, ..=
+.)"
+is triggered by "tb_lookup_cpu_state()". To be precise, this is the call
+stack which is good behavior:
+---
+#0  tlb_fill (cs=3D..., vaddr=3D684, size=3D0, access_type=3DMMU_INST_FETCH=
+, mmu_idx=3D0, retaddr=3D0) at target/arc/mmu.c:602
+#1  get_page_addr_code (env=3D..., addr=3D684) at accel/tcg/cputlb.c:1045
+#2  tb_htable_lookup (cpu=3D..., pc=3D684, cs_base=3D0, flags=3D0, cf_mask=
+=3D4278190080) at accel/tcg/cpu-exec.c:337
+#3  tb_lookup__cpu_state (cpu=3D..., pc=3D..., cs_base=3D..., flags=3D..., =
+cf_mask=3D4278190080) at include/exec/tb-lookup.h:43
+#4  tb_find (cpu=3D..., last_tb=3D... <code_gen_buffer+17811>, tb_exit=3D0,=
+ cf_mask=3D0) at accel/tcg/cpu-exec.c:404
+#5  cpu_exec (cpu=3D...) at accel/tcg/cpu-exec.c:729
+#6  tcg_cpu_exec (cpu=3D...) at cpus.c:1430
+#7  qemu_tcg_rr_cpu_thread_fn (arg=3D...) at cpus.c:1531
+#8  qemu_thread_start (args=3D...) at util/qemu-thread-posix.c:502
+---
 
-Thanks,
+After this call, TLB is filled with an entry that its size field is small,
+say 32 bytes. This causes a TLB_RECHECK for consequent memory accesses, whi=
+ch =
 
-David / dhildenb
+is logical. However, in our decoder, we use cpu_lduw_code() to read the
+instructions and decode them. As mentioned, in the beginning, the
+access_type=3DMMU_INST_FETCH is lost in "io_readx()" while calling tlb_fill=
+()",
+and now THIS CAUSES A GUEST EXCEPTION BECAUSE THAT REGION IS NOT ALLOWED TO
+BE READ. Here, comes that trace call of the _bad_ behavior:
+---
+#0  tlb_fill (..., access_type=3DMMU_DATA_LOAD, ...) at target/arc/mmu.c:605
+#1  io_readx (..., access_type=3DMMU_INST_FETCH, size=3D2) at accel/tcg/cpu=
+tlb.c:881
+#2  io_readw (..., access_type=3DMMU_INST_FETCH) at accel/tcg/softmmu_templ=
+ate.h:106
+#3  helper_le_ldw_cmmu (..., oi=3D16, retaddr=3D0) at accel/tcg/softmmu_tem=
+plate.h:146
+#4  cpu_lduw_code_ra (env=3D..., ptr=3D684, retaddr=3D0) at include/exec/cp=
+u_ldst_template.h:102
+#5  cpu_lduw_code (env=3D..., ptr=3D684) at include/exec/cpu_ldst_template.=
+h:114
+#6  read_and_decode_context (ctx=3D..., opcode_p=3D...) at target/arc/arc-d=
+ecoder.c:1479
+#7  arc_decode (ctx=3D...) at target/arc/arc-decoder.c:1736
+#8  decode_opc (env=3D..., ctx=3D...) at target/arc/translate.c:313
+#9  arc_tr_translate_insn (dcbase=3D..., cpu=3D...) at target/arc/translate=
+.c:335
+#10 translator_loop (.. <code_gen_buffer+18131>) at accel/tcg/translator.c:=
+107
+#11 gen_intermediate_code (cpu=3D..., tb=3D... <code_gen_buffer+18131>) at =
+target/arc/translate.c:413
+#12 tb_gen_code (cpu=3D..., pc=3D684, cs_base=3D0, flags=3D0, cflags=3D-167=
+11679) at accel/tcg/translate-all.c:1723
+#13 tb_find (cpu=3D..., last_tb=3D... <code_gen_buffer+17811>, tb_exit=3D0,=
+ cf_mask=3D0) at accel/tcg/cpu-exec.c:407
+#14 cpu_exec (cpu=3D...) at accel/tcg/cpu-exec.c:729
+#15 tcg_cpu_exec (cpu=3D...) at cpus.c:1430
+
+---
+
+Do you confirm if this is an issue? Maybe there are other ways to read
+an instruction with MMU_INST_FETCH access that I don't know about.
+
+Last but not least, although this is not a security issue for QEMU per
+se, but it is hindering a security feature for the guest.
+
+** Affects: qemu
+     Importance: Undecided
+         Status: New
+
+
+** Tags: fetch mmu mpu
+
+** Description changed:
+
+  commit 377b155bde451d5ac545fbdcdfbf6ca17a4228f5
+  Merge: c876180938 328eb60dc1
+  Author: Peter Maydell <peter.x@x.x>        ; masked for anti-spamming pur=
+poses
+  Date:   Mon Mar 11 18:26:37 2019 +0000
+  https://github.com/qemu/qemu/commit/377b155bde451d5ac545fbdcdfbf6ca17a422=
+8f5
+  --------------------------------------------------
+  =
+
+- cpu_ld*_code() is used for loading code data as the name suggests. Althou=
+gh, it begins
+- accessing memory with MMU_INST_FETCH access type, somewhere down the road=
+, when the
+- "io_readx(..., access_type=3DMMU_INST_FETCH, ...)" is called, it is ignor=
+ing this "access_type"
+- while calling the "tlb_fill()" with a _hardcoded_ MMU_DATA_LOAD:
++ cpu_ld*_code() is used for loading code data as the name suggests. Althou=
+gh, it begins accessing memory with MMU_INST_FETCH access type, somewhere d=
+own
++ the road, when the "io_readx(..., access_type=3DMMU_INST_FETCH, ...)" is
++ called, it is ignoring this "access_type" while calling the "tlb_fill()"
++ with a _hardcoded_ MMU_DATA_LOAD:
+  =
+
+  cputlb.c
+  --------
+  static uint64_t io_readx(..., MMUAccessType access_type, ...)
+  {
+  =
+
+-     if (recheck) {
+-         CPUTLBEntry *entry;
+-         target_ulong tlb_addr;
+-     =
+
+-         tlb_fill(cpu, addr, size, MMU_DATA_LOAD, mmu_idx, retaddr);
+-         ...
++ =C2=A0=C2=A0=C2=A0=C2=A0if (recheck) {
++ =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0CPUTLBEntry *entry;
++ =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0target_ulong tlb_addr;
++ =
+
++ =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0tlb_fill(cpu, addr, size,=
+ MMU_DATA_LOAD, mmu_idx, retaddr);
++ =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0...
+  }
+  --------
+  =
+
+- This is an issue, because there can exist _small_ regions of memory (smal=
+ler than the
+- TARGET_PAGE_SIZE) that are only executable and not readable.
++ This is an issue, because there can exist _small_ regions of memory (smal=
+ler
++ than the TARGET_PAGE_SIZE) that are only executable and not readable.
+  =
+
+  TL;DR
+  =
+
+- What happens is at first, a "tlb_fill(..., access_type=3DMMU_INST_FETCH, =
+...)" is
+- triggered by "tb_lookup_cpu_state()". To be precise, this is the call sta=
+ck which is good behavior:
++ What happens is at first, a "tlb_fill(..., access_type=3DMMU_INST_FETCH, =
+...)"
++ is triggered by "tb_lookup_cpu_state()". To be precise, this is the call
++ stack which is good behavior:
+  ---
+  #0  tlb_fill (cs=3D..., vaddr=3D684, size=3D0, access_type=3DMMU_INST_FET=
+CH, mmu_idx=3D0, retaddr=3D0) at target/arc/mmu.c:602
+  #1  get_page_addr_code (env=3D..., addr=3D684) at accel/tcg/cputlb.c:1045
+  #2  tb_htable_lookup (cpu=3D..., pc=3D684, cs_base=3D0, flags=3D0, cf_mas=
+k=3D4278190080) at accel/tcg/cpu-exec.c:337
+  #3  tb_lookup__cpu_state (cpu=3D..., pc=3D..., cs_base=3D..., flags=3D...=
+, cf_mask=3D4278190080) at include/exec/tb-lookup.h:43
+  #4  tb_find (cpu=3D..., last_tb=3D... <code_gen_buffer+17811>, tb_exit=3D=
+0, cf_mask=3D0) at accel/tcg/cpu-exec.c:404
+  #5  cpu_exec (cpu=3D...) at accel/tcg/cpu-exec.c:729
+  #6  tcg_cpu_exec (cpu=3D...) at cpus.c:1430
+  #7  qemu_tcg_rr_cpu_thread_fn (arg=3D...) at cpus.c:1531
+  #8  qemu_thread_start (args=3D...) at util/qemu-thread-posix.c:502
+  ---
+  =
+
+- After this call, TLB is filled with an entry that its size field is small=
+, say 32 bytes.
+- This causes a TLB_RECHECK for consequent memory accesses, which is logica=
+l. However,
+- in our decoder, we use cpu_lduw_code() to read the instructions and decod=
+e them. As mentioned,
+- in the beginning, the access_type=3DMMU_INST_FETCH is lost in "io_readx()=
+" while calling "tlb_fill()",
+- and now THIS CAUSES A GUEST EXCEPTION BECAUSE THAT REGION IS NOT ALLOWED =
+TO BE READ. Here,
+- comes that trace call of the _bad_ behavior:
++ After this call, TLB is filled with an entry that its size field is small,
++ say 32 bytes. This causes a TLB_RECHECK for consequent memory accesses, w=
+hich =
+
++ is logical. However, in our decoder, we use cpu_lduw_code() to read the
++ instructions and decode them. As mentioned, in the beginning, the
++ access_type=3DMMU_INST_FETCH is lost in "io_readx()" while calling tlb_fi=
+ll()",
++ and now THIS CAUSES A GUEST EXCEPTION BECAUSE THAT REGION IS NOT ALLOWED =
+TO
++ BE READ. Here, comes that trace call of the _bad_ behavior:
+  ---
+  #0  tlb_fill (..., access_type=3DMMU_DATA_LOAD, ...) at target/arc/mmu.c:=
+605
+  #1  io_readx (..., access_type=3DMMU_INST_FETCH, size=3D2) at accel/tcg/c=
+putlb.c:881
+  #2  io_readw (..., access_type=3DMMU_INST_FETCH) at accel/tcg/softmmu_tem=
+plate.h:106
+  #3  helper_le_ldw_cmmu (..., oi=3D16, retaddr=3D0) at accel/tcg/softmmu_t=
+emplate.h:146
+  #4  cpu_lduw_code_ra (env=3D..., ptr=3D684, retaddr=3D0) at include/exec/=
+cpu_ldst_template.h:102
+  #5  cpu_lduw_code (env=3D..., ptr=3D684) at include/exec/cpu_ldst_templat=
+e.h:114
+  #6  read_and_decode_context (ctx=3D..., opcode_p=3D...) at target/arc/arc=
+-decoder.c:1479
+- #7  arc_decode (ctx=3D...) at target/arc/arc-decoder.c:1736              =
+
++ #7  arc_decode (ctx=3D...) at target/arc/arc-decoder.c:1736
+  #8  decode_opc (env=3D..., ctx=3D...) at target/arc/translate.c:313
+  #9  arc_tr_translate_insn (dcbase=3D..., cpu=3D...) at target/arc/transla=
+te.c:335
+  #10 translator_loop (.. <code_gen_buffer+18131>) at accel/tcg/translator.=
+c:107
+  #11 gen_intermediate_code (cpu=3D..., tb=3D... <code_gen_buffer+18131>) a=
+t target/arc/translate.c:413
+  #12 tb_gen_code (cpu=3D..., pc=3D684, cs_base=3D0, flags=3D0, cflags=3D-1=
+6711679) at accel/tcg/translate-all.c:1723
+  #13 tb_find (cpu=3D..., last_tb=3D... <code_gen_buffer+17811>, tb_exit=3D=
+0, cf_mask=3D0) at accel/tcg/cpu-exec.c:407
+- #14 cpu_exec (cpu=3D...) at accel/tcg/cpu-exec.c:729                     =
+
++ #14 cpu_exec (cpu=3D...) at accel/tcg/cpu-exec.c:729
+  #15 tcg_cpu_exec (cpu=3D...) at cpus.c:1430
+  =
+
+  ---
+  =
+
+- Do you confirm if this is an issue? Maybe there are other ways to read an=
+ instruction with
+- MMU_INST_FETCH access that I don't know about.
++ Do you confirm if this is an issue? Maybe there are other ways to read
++ an instruction with MMU_INST_FETCH access that I don't know about.
+  =
+
+- Last but not least, although this is not a security issue for QEMU per se=
+, but it is hindering a
+- security feature for the guest.
++ Last but not least, although this is not a security issue for QEMU per
++ se, but it is hindering a security feature for the guest.
+
+-- =
+
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1825359
+
+Title:
+  cpu_ld*_code() triggers MMU_DATA_LOAD i.s.o. MMU_INST_FETCH
+
+Status in QEMU:
+  New
+
+Bug description:
+  commit 377b155bde451d5ac545fbdcdfbf6ca17a4228f5
+  Merge: c876180938 328eb60dc1
+  Author: Peter Maydell <peter.x@x.x>        ; masked for anti-spamming pur=
+poses
+  Date:   Mon Mar 11 18:26:37 2019 +0000
+  https://github.com/qemu/qemu/commit/377b155bde451d5ac545fbdcdfbf6ca17a422=
+8f5
+  --------------------------------------------------
+
+  cpu_ld*_code() is used for loading code data as the name suggests. Althou=
+gh, it begins accessing memory with MMU_INST_FETCH access type, somewhere d=
+own
+  the road, when the "io_readx(..., access_type=3DMMU_INST_FETCH, ...)" is
+  called, it is ignoring this "access_type" while calling the "tlb_fill()"
+  with a _hardcoded_ MMU_DATA_LOAD:
+
+  cputlb.c
+  --------
+  static uint64_t io_readx(..., MMUAccessType access_type, ...)
+  {
+
+  =C2=A0=C2=A0=C2=A0=C2=A0if (recheck) {
+  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0CPUTLBEntry *entry;
+  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0target_ulong tlb_addr;
+
+  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0tlb_fill(cpu, addr, size,=
+ MMU_DATA_LOAD, mmu_idx, retaddr);
+  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0...
+  }
+  --------
+
+  This is an issue, because there can exist _small_ regions of memory (smal=
+ler
+  than the TARGET_PAGE_SIZE) that are only executable and not readable.
+
+  TL;DR
+
+  What happens is at first, a "tlb_fill(..., access_type=3DMMU_INST_FETCH, =
+...)"
+  is triggered by "tb_lookup_cpu_state()". To be precise, this is the call
+  stack which is good behavior:
+  ---
+  #0  tlb_fill (cs=3D..., vaddr=3D684, size=3D0, access_type=3DMMU_INST_FET=
+CH, mmu_idx=3D0, retaddr=3D0) at target/arc/mmu.c:602
+  #1  get_page_addr_code (env=3D..., addr=3D684) at accel/tcg/cputlb.c:1045
+  #2  tb_htable_lookup (cpu=3D..., pc=3D684, cs_base=3D0, flags=3D0, cf_mas=
+k=3D4278190080) at accel/tcg/cpu-exec.c:337
+  #3  tb_lookup__cpu_state (cpu=3D..., pc=3D..., cs_base=3D..., flags=3D...=
+, cf_mask=3D4278190080) at include/exec/tb-lookup.h:43
+  #4  tb_find (cpu=3D..., last_tb=3D... <code_gen_buffer+17811>, tb_exit=3D=
+0, cf_mask=3D0) at accel/tcg/cpu-exec.c:404
+  #5  cpu_exec (cpu=3D...) at accel/tcg/cpu-exec.c:729
+  #6  tcg_cpu_exec (cpu=3D...) at cpus.c:1430
+  #7  qemu_tcg_rr_cpu_thread_fn (arg=3D...) at cpus.c:1531
+  #8  qemu_thread_start (args=3D...) at util/qemu-thread-posix.c:502
+  ---
+
+  After this call, TLB is filled with an entry that its size field is small,
+  say 32 bytes. This causes a TLB_RECHECK for consequent memory accesses, w=
+hich =
+
+  is logical. However, in our decoder, we use cpu_lduw_code() to read the
+  instructions and decode them. As mentioned, in the beginning, the
+  access_type=3DMMU_INST_FETCH is lost in "io_readx()" while calling tlb_fi=
+ll()",
+  and now THIS CAUSES A GUEST EXCEPTION BECAUSE THAT REGION IS NOT ALLOWED =
+TO
+  BE READ. Here, comes that trace call of the _bad_ behavior:
+  ---
+  #0  tlb_fill (..., access_type=3DMMU_DATA_LOAD, ...) at target/arc/mmu.c:=
+605
+  #1  io_readx (..., access_type=3DMMU_INST_FETCH, size=3D2) at accel/tcg/c=
+putlb.c:881
+  #2  io_readw (..., access_type=3DMMU_INST_FETCH) at accel/tcg/softmmu_tem=
+plate.h:106
+  #3  helper_le_ldw_cmmu (..., oi=3D16, retaddr=3D0) at accel/tcg/softmmu_t=
+emplate.h:146
+  #4  cpu_lduw_code_ra (env=3D..., ptr=3D684, retaddr=3D0) at include/exec/=
+cpu_ldst_template.h:102
+  #5  cpu_lduw_code (env=3D..., ptr=3D684) at include/exec/cpu_ldst_templat=
+e.h:114
+  #6  read_and_decode_context (ctx=3D..., opcode_p=3D...) at target/arc/arc=
+-decoder.c:1479
+  #7  arc_decode (ctx=3D...) at target/arc/arc-decoder.c:1736
+  #8  decode_opc (env=3D..., ctx=3D...) at target/arc/translate.c:313
+  #9  arc_tr_translate_insn (dcbase=3D..., cpu=3D...) at target/arc/transla=
+te.c:335
+  #10 translator_loop (.. <code_gen_buffer+18131>) at accel/tcg/translator.=
+c:107
+  #11 gen_intermediate_code (cpu=3D..., tb=3D... <code_gen_buffer+18131>) a=
+t target/arc/translate.c:413
+  #12 tb_gen_code (cpu=3D..., pc=3D684, cs_base=3D0, flags=3D0, cflags=3D-1=
+6711679) at accel/tcg/translate-all.c:1723
+  #13 tb_find (cpu=3D..., last_tb=3D... <code_gen_buffer+17811>, tb_exit=3D=
+0, cf_mask=3D0) at accel/tcg/cpu-exec.c:407
+  #14 cpu_exec (cpu=3D...) at accel/tcg/cpu-exec.c:729
+  #15 tcg_cpu_exec (cpu=3D...) at cpus.c:1430
+
+  ---
+
+  Do you confirm if this is an issue? Maybe there are other ways to read
+  an instruction with MMU_INST_FETCH access that I don't know about.
+
+  Last but not least, although this is not a security issue for QEMU per
+  se, but it is hindering a security feature for the guest.
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1825359/+subscriptions
 
