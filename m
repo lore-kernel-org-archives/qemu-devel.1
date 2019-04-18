@@ -2,74 +2,65 @@ Return-Path: <SRS0=08iY=SU=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.7 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-6.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 91E06C10F14
-	for <qemu-devel@archiver.kernel.org>; Thu, 18 Apr 2019 18:03:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E6255C282DD
+	for <qemu-devel@archiver.kernel.org>; Thu, 18 Apr 2019 18:03:38 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 673702186A
-	for <qemu-devel@archiver.kernel.org>; Thu, 18 Apr 2019 18:03:03 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 673702186A
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	by mail.kernel.org (Postfix) with ESMTPS id BAAE72186A
+	for <qemu-devel@archiver.kernel.org>; Thu, 18 Apr 2019 18:03:38 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BAAE72186A
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:45023 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:45029 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hHBNG-0003GC-G2
-	for qemu-devel@archiver.kernel.org; Thu, 18 Apr 2019 14:03:02 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:45267)
+	id 1hHBNp-0003hi-W1
+	for qemu-devel@archiver.kernel.org; Thu, 18 Apr 2019 14:03:38 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:45367)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1hHBLW-0002IP-DU
-	for qemu-devel@nongnu.org; Thu, 18 Apr 2019 14:01:15 -0400
+	(envelope-from <thuth@redhat.com>) id 1hHBLh-0002SZ-7J
+	for qemu-devel@nongnu.org; Thu, 18 Apr 2019 14:01:26 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1hHBLV-0001CG-7V
-	for qemu-devel@nongnu.org; Thu, 18 Apr 2019 14:01:14 -0400
-Received: from indium.canonical.com ([91.189.90.7]:48094)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1hHBLV-0001BS-2K
-	for qemu-devel@nongnu.org; Thu, 18 Apr 2019 14:01:13 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1hHBLT-0005QB-Gx
-	for <qemu-devel@nongnu.org>; Thu, 18 Apr 2019 18:01:11 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 7F5552E805D
-	for <qemu-devel@nongnu.org>; Thu, 18 Apr 2019 18:01:11 +0000 (UTC)
+	(envelope-from <thuth@redhat.com>) id 1hHBLg-0001Ih-7H
+	for qemu-devel@nongnu.org; Thu, 18 Apr 2019 14:01:25 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:56278)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <thuth@redhat.com>)
+	id 1hHBLY-0001E6-WC; Thu, 18 Apr 2019 14:01:17 -0400
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+	[10.5.11.22])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id E17D23019880;
+	Thu, 18 Apr 2019 18:01:15 +0000 (UTC)
+Received: from thuth.com (ovpn-116-56.ams2.redhat.com [10.36.116.56])
+	by smtp.corp.redhat.com (Postfix) with ESMTP id 0EFF61018A0E;
+	Thu, 18 Apr 2019 18:01:10 +0000 (UTC)
+From: Thomas Huth <thuth@redhat.com>
+To: yang.zhong@intel.com, Peter Maydell <peter.maydell@linaro.org>,
+	qemu-devel@nongnu.org, pbonzini@redhat.com
+Date: Thu, 18 Apr 2019 20:00:29 +0200
+Message-Id: <20190418180057.3593-2-thuth@redhat.com>
+In-Reply-To: <20190418180057.3593-1-thuth@redhat.com>
+References: <20190418180057.3593-1-thuth@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+	(mx1.redhat.com [10.5.110.47]);
+	Thu, 18 Apr 2019 18:01:16 +0000 (UTC)
 Content-Transfer-Encoding: quoted-printable
-Date: Thu, 18 Apr 2019 17:53:45 -0000
-From: Mark Eichin <eichin@gmail.com>
-To: qemu-devel@nongnu.org
-X-Launchpad-Notification-Type: bug
-X-Launchpad-Bug: product=qemu; status=Invalid; importance=Undecided;
-	assignee=None; 
-X-Launchpad-Bug-Information-Type: Public
-X-Launchpad-Bug-Private: no
-X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: eichin-gmail lersek
-X-Launchpad-Bug-Reporter: Mark Eichin (eichin-gmail)
-X-Launchpad-Bug-Modifier: Mark Eichin (eichin-gmail)
-References: <155551585261.7051.17290095032881696320.malonedeb@chaenomeles.canonical.com>
-Message-Id: <155561002562.13521.6007779328956908030.malone@gac.canonical.com>
-X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
-X-Launchpad-Message-For: qemu-devel-ml
-Precedence: bulk
-X-Generated-By: Launchpad (canonical.com); Revision="18928";
-	Instance="launchpad-lazr.conf"
-X-Launchpad-Hash: dd2e26c38088988908096839956613e695f75675
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 91.189.90.7
-Subject: [Qemu-devel] [Bug 1825207] Re: fw_cfg_machine_reset destroys user
- bootorder setting
+X-Received-From: 209.132.183.28
+Subject: [Qemu-devel] [PATCH for-QEMU-4.1 v5 01/29] hw/pci/pci-stub: Add
+ msi_enabled() and msi_notify() to the pci stubs
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
+Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -78,81 +69,58 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1825207 <1825207@bugs.launchpad.net>
+Cc: "Michael S. Tsirkin" <mst@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>,
+	"Edgar E . Iglesias" <edgar.iglesias@gmail.com>,
+	Jean-Christophe Dubois <jcd@tribudubois.net>,
+	Rob Herring <robh@kernel.org>, qemu-block@nongnu.org,
+	Andrey Smirnov <andrew.smirnov@gmail.com>, Joel Stanley <joel@jms.id.au>,
+	Antony Pavlov <antonynpavlov@gmail.com>,
+	Alistair Francis <alistair@alistair23.me>,
+	Beniamino Galvani <b.galvani@gmail.com>, qemu-arm@nongnu.org,
+	Peter Chubb <peter.chubb@nicta.com.au>,
+	Cedric Le Goater <clg@kaod.org>, John Snow <jsnow@redhat.com>,
+	Andrew Jeffery <andrew@aj.id.au>, Philippe Mathieu-Daude <f4bug@amsat.org>,
+	Subbaraya Sundeep <sundeep.lkml@gmail.com>,
+	Igor Mitsyanko <i.mitsyanko@gmail.com>, Jan Kiszka <jan.kiszka@web.de>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190418175345.JKoTUs-pxERKoxHEYJamDjPZxvfPnMHhuRk4hbimdAU@z>
+Content-Type: text/plain; charset="UTF-8"
+Message-ID: <20190418180029.ybZXvwlhFo2aTCsuq88yY7m6Wm2Rmrn4j31RdYpFtJY@z>
 
-Hah! Thanks, I don't know how I missed the existence of bootindex (given
-that it looks like it went in in 2011 and is in the docs once I know the
-name to search for.) I was probably conflating it with the index=3D
-option.
+Some machines have an AHCI adapter, but no PCI. To be able to
+compile hw/ide/ahci.c without CONFIG_PCI, we still need the two
+functions msi_enabled() and msi_notify() for linking.
+This is required for the new Kconfig-like build system, if a user
+wants to compile a QEMU binary with just one machine that has AHCI,
+but no PCI, like the ARM "cubieboard" for example.
 
-I did see the warning, and my reaction was "that must apply to other
-uses than actually passing things to seabios, since that'll just stop it
-from looking at them, and isn't that the entire point of the option?"
-Apparently not, but the warning didn't particular suggest otherwise.
+Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
+Signed-off-by: Thomas Huth <thuth@redhat.com>
+---
+ hw/pci/pci-stub.c | 11 +++++++++++
+ 1 file changed, 11 insertions(+)
 
-Thank you very much for taking the time to respond in detail (bootindex
-entirely solves my problem.)
+diff --git a/hw/pci/pci-stub.c b/hw/pci/pci-stub.c
+index b941a0e842..c04a5df651 100644
+--- a/hw/pci/pci-stub.c
++++ b/hw/pci/pci-stub.c
+@@ -53,3 +53,14 @@ uint16_t pci_requester_id(PCIDevice *dev)
+     g_assert(false);
+     return 0;
+ }
++
++/* Required by ahci.c */
++bool msi_enabled(const PCIDevice *dev)
++{
++    return false;
++}
++
++void msi_notify(PCIDevice *dev, unsigned int vector)
++{
++    g_assert_not_reached();
++}
+--=20
+2.21.0
 
--- =
-
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1825207
-
-Title:
-  fw_cfg_machine_reset destroys user bootorder setting
-
-Status in QEMU:
-  Invalid
-
-Bug description:
-  Demonstrated against 2.11 (ubuntu bionic 1:2.11+dfsg-1ubuntu7.12) and
-  3.1 (as built under bionic from the 1:3.1+dfsg-2ubuntu3 source
-  package) although the code hasn't changed between them and github
-  master also appears to have this same code branch.
-
-  What I was trying to do: select a boot disk using `-fw_cfg
-  name=3Dbootorder,string=3D/pci@i0cf8/*@6` based on the qemu and seabios
-  documentation.  (Why do I want to do that? using qemu for installer
-  testing for a specific kind of real machine and need to match the bios
-  boot order.)
-
-  What happened instead: same search-based boot order that I get without
-  that option.  Also, /sys/firmware/qemu_fw_cfg/by_name/bootorder/raw is
-  empty and .../size is "0".
-
-  Brutal work around that did a useful thing:
-
-  --- qemu-3.1+dfsg.orig/hw/nvram/fw_cfg.c
-  +++ qemu-3.1+dfsg/hw/nvram/fw_cfg.c
-  @@ -869,8 +869,10 @@ static void fw_cfg_machine_reset(void *o
-       FWCfgState *s =3D opaque;
-       char *bootindex =3D get_boot_devices_list(&len);
-   =
-
-  +#if 0
-       ptr =3D fw_cfg_modify_file(s, "bootorder", (uint8_t *)bootindex, len=
-);
-       g_free(ptr);
-  +#endif
-   }
-
-  This change allowed the boot to work (so my bootorder setting was
-  making it to seabios) and also showed up explicitly in
-  /sys/firmware/qemu_fw_cfg.
-
-  I don't know if fw_cfg_modify_file is intended to append rather than
-  replace, but it doesn't; based on the seabios "Runtime_config" docs
-  which suggest "look at the Searching bootorder for output and paste
-  that into the bootorder file" I'd instead just have it only fill in
-  bootorder if there's *no* existing setting, since a user can read out
-  the defaults and copy them in as described if they want the fallback,
-  but that's just from my interpretation of the docs.
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1825207/+subscriptions
 
