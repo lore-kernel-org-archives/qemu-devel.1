@@ -1,28 +1,21 @@
-Received: from eggs.gnu.org ([209.51.188.92]:44246)
+Received: from eggs.gnu.org ([209.51.188.92]:44588)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1hH94h-0008Q5-5o
-	for qemu-devel@nongnu.org; Thu, 18 Apr 2019 11:35:44 -0400
+	(envelope-from <david@redhat.com>) id 1hH95j-00012S-RI
+	for qemu-devel@nongnu.org; Thu, 18 Apr 2019 11:36:48 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1hH8pM-0006YH-PG
-	for qemu-devel@nongnu.org; Thu, 18 Apr 2019 11:19:53 -0400
-Received: from mail-wr1-f65.google.com ([209.85.221.65]:40943)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1hH8pM-0006Hb-ID
-	for qemu-devel@nongnu.org; Thu, 18 Apr 2019 11:19:52 -0400
-Received: by mail-wr1-f65.google.com with SMTP id h4so3424640wre.7
-	for <qemu-devel@nongnu.org>; Thu, 18 Apr 2019 08:19:47 -0700 (PDT)
-References: <20190418145355.21100-1-armbru@redhat.com>
-	<20190418145355.21100-2-armbru@redhat.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Message-ID: <2679829b-cc1d-83ce-9949-2b80d970ddec@redhat.com>
-Date: Thu, 18 Apr 2019 17:19:45 +0200
+	(envelope-from <david@redhat.com>) id 1hH95i-0007wW-SI
+	for qemu-devel@nongnu.org; Thu, 18 Apr 2019 11:36:47 -0400
+References: <20190418113110.160664-1-borntraeger@de.ibm.com>
+	<20190418113110.160664-8-borntraeger@de.ibm.com>
+From: David Hildenbrand <david@redhat.com>
+Message-ID: <2a98f8a0-15bc-aa3d-f4ad-71059d65dad8@redhat.com>
+Date: Thu, 18 Apr 2019 17:36:40 +0200
 MIME-Version: 1.0
-In-Reply-To: <20190418145355.21100-2-armbru@redhat.com>
+In-Reply-To: <20190418113110.160664-8-borntraeger@de.ibm.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 1/6] qemu-bridge-helper: Fix misuse of
- isspace()
+Subject: Re: [Qemu-devel] [PATCH 07/10] s390x/cpumodel: deflate
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,57 +24,57 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
+To: Christian Borntraeger <borntraeger@de.ibm.com>, Cornelia Huck <cohuck@redhat.com>
+Cc: qemu-devel <qemu-devel@nongnu.org>, qemu-s390x <qemu-s390x@nongnu.org>, Halil Pasic <pasic@linux.ibm.com>, Richard Henderson <rth@twiddle.net>, Collin Walling <walling@linux.ibm.com>, "Jason J . Herne" <jjherne@linux.ibm.com>
 
-On 4/18/19 4:53 PM, Markus Armbruster wrote:
-> parse_acl_file() passes char values to isspace().  Undefined behavior
-> when the value is negative.  Not a security issue, because the
-> characters come from trusted $prefix/etc/qemu/bridge.conf and the
-> files it includes.
+On 18.04.19 13:31, Christian Borntraeger wrote:
+> add the deflate conversion facility.
+
+Nit:
+
+"s390x/cpumodel: add Deflate-conversion facility"
+
 > 
-> Fix by using qemu_isspace() instead.
-
-Can we use g_ascii_isspace() and remove qemu_isspace()?
-
-> Signed-off-by: Markus Armbruster <armbru@redhat.com>
+> Signed-off-by: Christian Borntraeger <borntraeger@de.ibm.com>
 > ---
->  qemu-bridge-helper.c | 7 ++++---
->  1 file changed, 4 insertions(+), 3 deletions(-)
+>  target/s390x/cpu_features.c     |  9 +++++++++
+>  target/s390x/cpu_features.h     |  1 +
+>  target/s390x/cpu_features_def.h |  7 +++++++
+>  target/s390x/gen-features.c     | 12 ++++++++++++
+>  target/s390x/kvm.c              |  6 ++++++
+>  5 files changed, 35 insertions(+)
 > 
-> diff --git a/qemu-bridge-helper.c b/qemu-bridge-helper.c
-> index 5396fbfbb6..0d60c07655 100644
-> --- a/qemu-bridge-helper.c
-> +++ b/qemu-bridge-helper.c
-> @@ -29,6 +29,7 @@
->  #include <linux/if_bridge.h>
->  #endif
->  
-> +#include "qemu-common.h"
->  #include "qemu/queue.h"
->  
->  #include "net/tap-linux.h"
-> @@ -75,7 +76,7 @@ static int parse_acl_file(const char *filename, ACLList *acl_list)
->          char *ptr = line;
->          char *cmd, *arg, *argend;
->  
-> -        while (isspace(*ptr)) {
-> +        while (qemu_isspace(*ptr)) {
->              ptr++;
->          }
->  
-> @@ -99,12 +100,12 @@ static int parse_acl_file(const char *filename, ACLList *acl_list)
->  
->          *arg = 0;
->          arg++;
-> -        while (isspace(*arg)) {
-> +        while (qemu_isspace(*arg)) {
->              arg++;
->          }
->  
->          argend = arg + strlen(arg);
-> -        while (arg != argend && isspace(*(argend - 1))) {
-> +        while (arg != argend && qemu_isspace(*(argend - 1))) {
->              argend--;
->          }
->          *argend = 0;
-> 
+> diff --git a/target/s390x/cpu_features.c b/target/s390x/cpu_features.c
+> index e0a4769c19..5f37e655fe 100644
+> --- a/target/s390x/cpu_features.c
+> +++ b/target/s390x/cpu_features.c
+> @@ -110,6 +110,7 @@ static const S390FeatDef s390_features[] = {
+>      FEAT_INIT("cmmnt", S390_FEAT_TYPE_STFL, 147, "CMM: ESSA-enhancement (no translate) facility"),
+>      FEAT_INIT("vxeh2", S390_FEAT_TYPE_STFL, 148, "Vector Enhancements facility 2"),
+>      FEAT_INIT("esort-base", S390_FEAT_TYPE_STFL, 150, "Enhanced-sort facility (excluding subfunctions)"),
+> +    FEAT_INIT("deflate-base", S390_FEAT_TYPE_STFL, 151, "Deflate-conversion facility (excluding subfunctions)"),
+>      FEAT_INIT("vxbeh", S390_FEAT_TYPE_STFL, 152, "Vector BCD enhancements facility 1"),
+>      FEAT_INIT("msa9-base", S390_FEAT_TYPE_STFL, 155, "Message-security-assist-extension-9 facility (excluding subfunctions)"),
+>      FEAT_INIT("etoken", S390_FEAT_TYPE_STFL, 156, "Etoken facility"),
+> @@ -347,6 +348,11 @@ static const S390FeatDef s390_features[] = {
+>      FEAT_INIT("sortl-32", S390_FEAT_TYPE_SORTL, 130, "SORTL 32 input lists"),
+>      FEAT_INIT("sortl-128", S390_FEAT_TYPE_SORTL, 132, "SORTL 128 input lists"),
+>      FEAT_INIT("sortl-f0", S390_FEAT_TYPE_SORTL, 192, "SORTL format 0 parameter-block"),
+> +
+> +    FEAT_INIT("dfltcc-gdht", S390_FEAT_TYPE_DFLTCC, 1, "DFLTCC GDHT"),
+> +    FEAT_INIT("dfltcc-cmpr", S390_FEAT_TYPE_DFLTCC, 2, "DFLTCC CMPR"),
+> +    FEAT_INIT("dfltcc-xpnd", S390_FEAT_TYPE_DFLTCC, 4, "DFLTCC XPND"),
+> +    FEAT_INIT("dfltcc-f0", S390_FEAT_TYPE_DFLTCC, 192, "DFLTCC format 0 parameter-block"),
+>  };
+
+Just wonder, "format 0 parameter-block" is actually a feature right,
+like "format 0 can be used". Can we hide format-0, IOW could that be
+like "query" and always supported? (especially due to backwards
+compatibility)
+
+
+-- 
+
+Thanks,
+
+David / dhildenb
