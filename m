@@ -1,26 +1,31 @@
-Received: from eggs.gnu.org ([209.51.188.92]:50168)
+Received: from eggs.gnu.org ([209.51.188.92]:51086)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1hH9R1-0003HQ-HV
-	for qemu-devel@nongnu.org; Thu, 18 Apr 2019 11:58:48 -0400
+	(envelope-from <dgilbert@redhat.com>) id 1hH9VN-0006Dn-1V
+	for qemu-devel@nongnu.org; Thu, 18 Apr 2019 12:03:18 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1hH9Qz-0000qA-Od
-	for qemu-devel@nongnu.org; Thu, 18 Apr 2019 11:58:47 -0400
-Resent-Message-Id: <E1hH9Qz-0000qA-Od@eggs.gnu.org>
-Received: from sender-of-o52.zoho.com ([135.84.80.217]:21489)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
-	id 1hH9Qy-0000om-FW
-	for qemu-devel@nongnu.org; Thu, 18 Apr 2019 11:58:45 -0400
-In-Reply-To: <1555601350-4176-1-git-send-email-mateja.marjanovic@rt-rk.com>
-Message-ID: <155560307223.24.4258448109214289536@c2072b67cc0c>
-Reply-To: <qemu-devel@nongnu.org>
+	(envelope-from <dgilbert@redhat.com>) id 1hH9VL-00033R-Cl
+	for qemu-devel@nongnu.org; Thu, 18 Apr 2019 12:03:16 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:53220)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1hH9VL-00032r-4b
+	for qemu-devel@nongnu.org; Thu, 18 Apr 2019 12:03:15 -0400
+Date: Thu, 18 Apr 2019 17:03:00 +0100
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Message-ID: <20190418160300.GI2984@work-vm>
+References: <251681555323421@vla1-1374b6242101.qloud-c.yandex.net>
+	<20190415102520.GG5718@redhat.com>
+	<259551555324396@vla1-1374b6242101.qloud-c.yandex.net>
+	<20190415104725.GI5718@redhat.com> <20190415111511.GG2852@work-vm>
+	<20190415111911.GK5718@redhat.com> <20190415113045.GI2852@work-vm>
+	<612681555412465@iva6-8a76e93b6298.qloud-c.yandex.net>
+	<20190418141956.GF2984@work-vm>
+	<1285061555601789@iva6-8a76e93b6298.qloud-c.yandex.net>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Thu, 18 Apr 2019 08:57:53 -0700 (PDT)
-Subject: Re: [Qemu-devel] [PATCH v9 0/6] target/mips: Optimize MSA
- interleave instructions
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+In-Reply-To: <1285061555601789@iva6-8a76e93b6298.qloud-c.yandex.net>
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH] migration: Fix handling fd protocol
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,26 +34,180 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: mateja.marjanovic@rt-rk.com
-Cc: fam@euphon.net, qemu-devel@nongnu.org, arikalo@wavecomp.com, richard.henderson@linaro.org, philmd@redhat.com, amarkovic@wavecomp.com, aurelien@aurel32.net
+To: Yury Kotov <yury-kotov@yandex-team.ru>
+Cc: Daniel =?iso-8859-1?Q?P=2E_Berrang=E9?= <berrange@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "yc-core@yandex-team.ru" <yc-core@yandex-team.ru>, Juan Quintela <quintela@redhat.com>
 
-UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8xNTU1NjAxMzUwLTQxNzYtMS1n
-aXQtc2VuZC1lbWFpbC1tYXRlamEubWFyamFub3ZpY0BydC1yay5jb20vCgoKCkhpLAoKVGhpcyBz
-ZXJpZXMgZmFpbGVkIHRoZSBkb2NrZXItbWluZ3dAZmVkb3JhIGJ1aWxkIHRlc3QuIFBsZWFzZSBm
-aW5kIHRoZSB0ZXN0aW5nIGNvbW1hbmRzIGFuZAp0aGVpciBvdXRwdXQgYmVsb3cuIElmIHlvdSBo
-YXZlIERvY2tlciBpbnN0YWxsZWQsIHlvdSBjYW4gcHJvYmFibHkgcmVwcm9kdWNlIGl0CmxvY2Fs
-bHkuCgo9PT0gVEVTVCBTQ1JJUFQgQkVHSU4gPT09CiMhL2Jpbi9iYXNoCnRpbWUgbWFrZSBkb2Nr
-ZXItdGVzdC1taW5nd0BmZWRvcmEgU0hPV19FTlY9MSBKPTE0IE5FVFdPUks9MQo9PT0gVEVTVCBT
-Q1JJUFQgRU5EID09PQoKU3VibW9kdWxlICdkdGMnIChodHRwczovL2dpdC5xZW11Lm9yZy9naXQv
-ZHRjLmdpdCkgcmVnaXN0ZXJlZCBmb3IgcGF0aCAnZHRjJwpDbG9uaW5nIGludG8gJ2R0YycuLi4K
-cmVtb3RlOiBDb3VudGluZyBvYmplY3RzOiA0OTMwLCBkb25lLiAgICAgICAgCmVycm9yOiBSUEMg
-ZmFpbGVkOyByZXN1bHQ9MTgsIEhUVFAgY29kZSA9IDIwMApmYXRhbDogVGhlIHJlbW90ZSBlbmQg
-aHVuZyB1cCB1bmV4cGVjdGVkbHkKZmF0YWw6IHByb3RvY29sIGVycm9yOiBiYWQgcGFjayBoZWFk
-ZXIKQ2xvbmUgb2YgJ2h0dHBzOi8vZ2l0LnFlbXUub3JnL2dpdC9kdGMuZ2l0JyBpbnRvIHN1Ym1v
-ZHVsZSBwYXRoICdkdGMnIGZhaWxlZApmYWlsZWQgdG8gaW5pdCBzdWJtb2R1bGUgZHRjCiAgQ09Q
-WSAgICBSVU5ORVIKCgpUaGUgZnVsbCBsb2cgaXMgYXZhaWxhYmxlIGF0Cmh0dHA6Ly9wYXRjaGV3
-Lm9yZy9sb2dzLzE1NTU2MDEzNTAtNDE3Ni0xLWdpdC1zZW5kLWVtYWlsLW1hdGVqYS5tYXJqYW5v
-dmljQHJ0LXJrLmNvbS90ZXN0aW5nLmRvY2tlci1taW5nd0BmZWRvcmEvP3R5cGU9bWVzc2FnZS4K
-LS0tCkVtYWlsIGdlbmVyYXRlZCBhdXRvbWF0aWNhbGx5IGJ5IFBhdGNoZXcgW2h0dHBzOi8vcGF0
-Y2hldy5vcmcvXS4KUGxlYXNlIHNlbmQgeW91ciBmZWVkYmFjayB0byBwYXRjaGV3LWRldmVsQHJl
-ZGhhdC5jb20=
+* Yury Kotov (yury-kotov@yandex-team.ru) wrote:
+> 18.04.2019, 17:20, "Dr. David Alan Gilbert" <dgilbert@redhat.com>:
+> > * Yury Kotov (yury-kotov@yandex-team.ru) wrote:
+> >> =A015.04.2019, 14:30, "Dr. David Alan Gilbert" <dgilbert@redhat.com>=
+:
+> >> =A0> * Daniel P. Berrang=E9 (berrange@redhat.com) wrote:
+> >> =A0>> =A0On Mon, Apr 15, 2019 at 12:15:12PM +0100, Dr. David Alan Gi=
+lbert wrote:
+> >> =A0>> =A0> * Daniel P. Berrang=E9 (berrange@redhat.com) wrote:
+> >> =A0>> =A0> > On Mon, Apr 15, 2019 at 01:33:21PM +0300, Yury Kotov wr=
+ote:
+> >> =A0>> =A0> > > 15.04.2019, 13:25, "Daniel P. Berrang=E9" <berrange@r=
+edhat.com>:
+> >> =A0>> =A0> > > > On Mon, Apr 15, 2019 at 01:17:06PM +0300, Yury Koto=
+v wrote:
+> >> =A0>> =A0> > > >> =A015.04.2019, 13:11, "Daniel P. Berrang=E9" <berr=
+ange@redhat.com>:
+> >> =A0>> =A0> > > >> =A0> On Mon, Apr 15, 2019 at 12:50:08PM +0300, Yur=
+y Kotov wrote:
+> >> =A0>> =A0> > > >> =A0>> =A0Hi,
+> >> =A0>> =A0> > > >> =A0>>
+> >> =A0>> =A0> > > >> =A0>> =A0Just to clarify. I see two possible solut=
+ions:
+> >> =A0>> =A0> > > >> =A0>>
+> >> =A0>> =A0> > > >> =A0>> =A01) Since the migration code doesn't recei=
+ve fd, it isn't responsible for
+> >> =A0>> =A0> > > >> =A0>> =A0closing it. So, it may be better to use m=
+igrate_fd_param for both
+> >> =A0>> =A0> > > >> =A0>> =A0incoming/outgoing and add dupping for mig=
+rate_fd_param. Thus, clients must
+> >> =A0>> =A0> > > >> =A0>> =A0close the fd themselves. But existing cli=
+ents will have a leak.
+> >> =A0>> =A0> > > >> =A0>
+> >> =A0>> =A0> > > >> =A0> We can't break existing clients in this way a=
+s they are correctly
+> >> =A0>> =A0> > > >> =A0> using the monitor with its current semantics.
+> >> =A0>> =A0> > > >> =A0>
+> >> =A0>> =A0> > > >> =A0>> =A02) If we don't duplicate fd, then at leas=
+t we should remove fd from
+> >> =A0>> =A0> > > >> =A0>> =A0the corresponding list. Therefore, the so=
+lution is to fix qemu_close to find
+> >> =A0>> =A0> > > >> =A0>> =A0the list and remove fd from it. But qemu_=
+close is currently consistent with
+> >> =A0>> =A0> > > >> =A0>> =A0qemu_open (which opens/dups fd), so addin=
+g additional logic might not be
+> >> =A0>> =A0> > > >> =A0>> =A0a very good idea.
+> >> =A0>> =A0> > > >> =A0>
+> >> =A0>> =A0> > > >> =A0> qemu_close is not appropriate place to deal w=
+ith something speciifc
+> >> =A0>> =A0> > > >> =A0> to the montor.
+> >> =A0>> =A0> > > >> =A0>
+> >> =A0>> =A0> > > >> =A0>> =A0I don't see any other solution, but I mig=
+ht miss something.
+> >> =A0>> =A0> > > >> =A0>> =A0What do you think?
+> >> =A0>> =A0> > > >> =A0>
+> >> =A0>> =A0> > > >> =A0> All callers of monitor_get_fd() will close() =
+the FD they get back.
+> >> =A0>> =A0> > > >> =A0> Thus monitor_get_fd() should remove it from t=
+he list when it returns
+> >> =A0>> =A0> > > >> =A0> it, and we should add API docs to monitor_get=
+_fd() to explain this.
+> >> =A0>> =A0> > > >> =A0>
+> >> =A0>> =A0> > > >> =A0Ok, it sounds reasonable. But monitor_get_fd is=
+ only about outgoing migration.
+> >> =A0>> =A0> > > >> =A0But what about the incoming migration? It doesn=
+'t use monitor_get_fd but just
+> >> =A0>> =A0> > > >> =A0converts input string to int and use it as fd.
+> >> =A0>> =A0> > > >
+> >> =A0>> =A0> > > > The incoming migration expects the FD to be passed =
+into QEMU by the mgmt
+> >> =A0>> =A0> > > > app when it is exec'ing the QEMU binary. It doesn't=
+ interact with the
+> >> =A0>> =A0> > > > monitor at all AFAIR.
+> >> =A0>> =A0> > > >
+> >> =A0>> =A0> > >
+> >> =A0>> =A0> > > Oh, sorry. This use case is not obvious. We used add-=
+fd to pass fd for
+> >> =A0>> =A0> > > migrate-incoming and such way has described problems.
+> >> =A0>> =A0> >
+> >> =A0>> =A0> > That's a bug in your usage of QEMU IMHO, as the incomin=
+g code is not
+> >> =A0>> =A0> > designed to use add-fd.
+> >> =A0>> =A0>
+> >> =A0>> =A0> Hmm, that's true - although:
+> >> =A0>> =A0> a) It's very non-obvious
+> >> =A0>> =A0> b) Unfortunate, since it would go well with -incoming def=
+er
+> >> =A0>>
+> >> =A0>> =A0Yeah I think this is a screw up on QMEU's part when introdu=
+cing 'defer'.
+> >> =A0>>
+> >> =A0>> =A0We should have mandated use of 'add-fd' when using 'defer',=
+ since FD
+> >> =A0>> =A0inheritance-over-execve() should only be used for command l=
+ine args,
+> >> =A0>> =A0not monitor commands.
+> >> =A0>>
+> >> =A0>> =A0Not sure how to best fix this is QEMU though without breaki=
+ng back
+> >> =A0>> =A0compat for apps using 'defer' already.
+> >> =A0>
+> >> =A0> We could add mon-fd: transports that has the same behaviour as =
+now for
+> >> =A0> outgoing, and for incoming uses the add-fd stash.
+> >> =A0>
+> >>
+> >> =A0Oh, I'm sorry again. I think my suggestion about monitor_fd_param=
+ wasn't
+> >> =A0relevant to this issue. If migrate-incoming + "fd:" + add-fd is a=
+n invalid use
+> >> =A0case, should we disallow this?
+> >> =A0I may add a check to fd_start_incoming_migration if fd is in mon =
+fds list.
+> >> =A0But I'm afraid there are users like me who are already using this=
+ wrong use case.
+> >> =A0Because currently nothing in QEMU's docs disallow this.
+> >>
+> >> =A0So which solution is better in your opinion?
+> >> =A01) Disallow fd's from mon fds list in fd_start_incoming_migration
+> >
+> > I'm surprised anything could be doing that - how would a user know wh=
+at
+> > the correct fd index was?
+> >
+>=20
+> Hmm, add-fd returns correct fd value. Maybe I din't catch you question.=
+..
+
+I don't understand, where does it return it?
+
+> >> =A02) Allow these fds, but dup them or close them correctly
+> >
+> > I think I'd leave the current (confusing) fd: as it is, maybe put a n=
+ote
+> > in the manual.
+> >
+>=20
+> So, using fd from fdset will be an undefined behavior, right?
+
+For incoming, yes.
+
+> >> =A0And how to migrate-incoming defer through fd correctly?
+> >> =A01) Add "mon-fd:" protocol to work with fds passed by "add-fd/remo=
+ve-fd" commands
+> >> =A0as suggested by Dave
+> >
+> > That's my preference; it's explicitly named and consistent, and it
+> > doesn't touch the existing fd code.
+> >
+>=20
+> Ok, but please tell me what you think of my suggestion (2) about using =
+fd added
+> by the "getfd" command for incoming migration. It doesn't requires intr=
+oducing
+> new protocol and will be consistent with outgoing migration through fd.
+
+I worry how qemu knows whether the command means it comes from the getfd
+command or is actually a normal fd like now?
+Can you give an example.
+
+Dave
+
+> >
+> >> =A02) My suggestion about monitor_fd_param and make "fd:" for
+> >> =A0migrate/migrate-incoming consistent. So user will be able to use
+> >> =A0getfd + migrate-incoming
+> >> =A03) Both of them or something else
+> >>
+>=20
+> Regards,
+> Yury
+>=20
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
