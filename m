@@ -1,19 +1,20 @@
-Received: from eggs.gnu.org ([209.51.188.92]:45367)
+Received: from eggs.gnu.org ([209.51.188.92]:45667)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1hHBLh-0002SZ-7J
-	for qemu-devel@nongnu.org; Thu, 18 Apr 2019 14:01:26 -0400
+	(envelope-from <thuth@redhat.com>) id 1hHBMQ-0002xR-0m
+	for qemu-devel@nongnu.org; Thu, 18 Apr 2019 14:02:11 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1hHBLg-0001Ih-7H
-	for qemu-devel@nongnu.org; Thu, 18 Apr 2019 14:01:25 -0400
+	(envelope-from <thuth@redhat.com>) id 1hHBMN-0001im-RW
+	for qemu-devel@nongnu.org; Thu, 18 Apr 2019 14:02:09 -0400
 From: Thomas Huth <thuth@redhat.com>
-Date: Thu, 18 Apr 2019 20:00:29 +0200
-Message-Id: <20190418180057.3593-2-thuth@redhat.com>
+Date: Thu, 18 Apr 2019 20:00:32 +0200
+Message-Id: <20190418180057.3593-5-thuth@redhat.com>
 In-Reply-To: <20190418180057.3593-1-thuth@redhat.com>
 References: <20190418180057.3593-1-thuth@redhat.com>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH for-QEMU-4.1 v5 01/29] hw/pci/pci-stub: Add
- msi_enabled() and msi_notify() to the pci stubs
+Subject: [Qemu-devel] [PATCH for-QEMU-4.1 v5 04/29] hw/arm: Express
+ dependencies of the exynos machines with Kconfig
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,37 +26,124 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: yang.zhong@intel.com, Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org, pbonzini@redhat.com
 Cc: Beniamino Galvani <b.galvani@gmail.com>, Jan Kiszka <jan.kiszka@web.de>, Antony Pavlov <antonynpavlov@gmail.com>, Peter Chubb <peter.chubb@nicta.com.au>, qemu-block@nongnu.org, Cedric Le Goater <clg@kaod.org>, "Michael S. Tsirkin" <mst@redhat.com>, Andrew Jeffery <andrew@aj.id.au>, Igor Mitsyanko <i.mitsyanko@gmail.com>, Andrey Smirnov <andrew.smirnov@gmail.com>, Rob Herring <robh@kernel.org>, qemu-arm@nongnu.org, Andrzej Zaborowski <balrogg@gmail.com>, John Snow <jsnow@redhat.com>, Joel Stanley <joel@jms.id.au>, "Edgar E . Iglesias" <edgar.iglesias@gmail.com>, Jean-Christophe Dubois <jcd@tribudubois.net>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, Philippe Mathieu-Daude <f4bug@amsat.org>, Alistair Francis <alistair@alistair23.me>, Subbaraya Sundeep <sundeep.lkml@gmail.com>, Gerd Hoffmann <kraxel@redhat.com>
 
-Some machines have an AHCI adapter, but no PCI. To be able to
-compile hw/ide/ahci.c without CONFIG_PCI, we still need the two
-functions msi_enabled() and msi_notify() for linking.
-This is required for the new Kconfig-like build system, if a user
-wants to compile a QEMU binary with just one machine that has AHCI,
-but no PCI, like the ARM "cubieboard" for example.
+Add Kconfig dependencies for the Exynos-related boards (nuri and
+smdkc210).
+This patch is slightly based on earlier work by =C3=81kos Kov=C3=A1cs (i.=
+e.
+his "hw/arm/Kconfig: Add ARM Kconfig" patch).
 
-Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
 Signed-off-by: Thomas Huth <thuth@redhat.com>
 ---
- hw/pci/pci-stub.c | 11 +++++++++++
- 1 file changed, 11 insertions(+)
+ default-configs/arm-softmmu.mak | 17 ++++++-----------
+ hw/arm/Kconfig                  | 10 ++++++++++
+ 2 files changed, 16 insertions(+), 11 deletions(-)
 
-diff --git a/hw/pci/pci-stub.c b/hw/pci/pci-stub.c
-index b941a0e842..c04a5df651 100644
---- a/hw/pci/pci-stub.c
-+++ b/hw/pci/pci-stub.c
-@@ -53,3 +53,14 @@ uint16_t pci_requester_id(PCIDevice *dev)
-     g_assert(false);
-     return 0;
- }
+diff --git a/default-configs/arm-softmmu.mak b/default-configs/arm-softmm=
+u.mak
+index 613d19a06d..2a11e76cc7 100644
+--- a/default-configs/arm-softmmu.mak
++++ b/default-configs/arm-softmmu.mak
+@@ -1,8 +1,14 @@
+ # Default configuration for arm-softmmu
+=20
++# TODO: ARM_V7M is currently always required - make this more flexible!
++CONFIG_ARM_V7M=3Dy
 +
-+/* Required by ahci.c */
-+bool msi_enabled(const PCIDevice *dev)
-+{
-+    return false;
-+}
+ CONFIG_PCI=3Dy
+ CONFIG_PCI_DEVICES=3Dy
+ CONFIG_PCI_TESTDEV=3Dy
 +
-+void msi_notify(PCIDevice *dev, unsigned int vector)
-+{
-+    g_assert_not_reached();
-+}
++CONFIG_EXYNOS4=3Dy
++
+ CONFIG_VGA=3Dy
+ CONFIG_NAND=3Dy
+ CONFIG_ECC=3Dy
+@@ -26,7 +32,6 @@ CONFIG_ADS7846=3Dy
+ CONFIG_MAX111X=3Dy
+ CONFIG_SSI_SD=3Dy
+ CONFIG_SSI_M25P80=3Dy
+-CONFIG_LAN9118=3Dy
+ CONFIG_SMC91C111=3Dy
+ CONFIG_ALLWINNER_EMAC=3Dy
+ CONFIG_IMX_FEC=3Dy
+@@ -36,21 +41,15 @@ CONFIG_PFLASH_CFI01=3Dy
+ CONFIG_PFLASH_CFI02=3Dy
+ CONFIG_MICRODRIVE=3Dy
+ CONFIG_USB_MUSB=3Dy
+-CONFIG_USB_EHCI_SYSBUS=3Dy
+ CONFIG_PLATFORM_BUS=3Dy
+ CONFIG_VIRTIO_MMIO=3Dy
+=20
+ CONFIG_ARM11MPCORE=3Dy
+-CONFIG_A9MPCORE=3Dy
+ CONFIG_A15MPCORE=3Dy
+=20
+-CONFIG_ARM_V7M=3Dy
+ CONFIG_NETDUINO2=3Dy
+=20
+-CONFIG_ARM_GIC=3Dy
+ CONFIG_ARM_TIMER=3Dy
+-CONFIG_ARM_MPTIMER=3Dy
+-CONFIG_A9_GTIMER=3Dy
+ CONFIG_PL011=3Dy
+ CONFIG_PL022=3Dy
+ CONFIG_PL031=3Dy
+@@ -61,11 +60,9 @@ CONFIG_PL080=3Dy
+ CONFIG_PL110=3Dy
+ CONFIG_PL181=3Dy
+ CONFIG_PL190=3Dy
+-CONFIG_PL310=3Dy
+ CONFIG_PL330=3Dy
+ CONFIG_CADENCE=3Dy
+ CONFIG_XGMAC=3Dy
+-CONFIG_EXYNOS4=3Dy
+ CONFIG_PXA2XX=3Dy
+ CONFIG_BITBANG_I2C=3Dy
+ CONFIG_FRAMEBUFFER=3Dy
+@@ -73,7 +70,6 @@ CONFIG_XILINX_SPIPS=3Dy
+ CONFIG_ZYNQ_DEVCFG=3Dy
+=20
+ CONFIG_ARM11SCU=3Dy
+-CONFIG_A9SCU=3Dy
+ CONFIG_DIGIC=3Dy
+ CONFIG_MARVELL_88W8618=3Dy
+ CONFIG_OMAP=3Dy
+@@ -123,7 +119,6 @@ CONFIG_VERSATILE_I2C=3Dy
+ CONFIG_PCI_EXPRESS=3Dy
+ CONFIG_PCI_EXPRESS_GENERIC_BRIDGE=3Dy
+=20
+-CONFIG_SDHCI=3Dy
+ CONFIG_INTEGRATOR=3Dy
+ CONFIG_INTEGRATOR_DEBUG=3Dy
+=20
+diff --git a/hw/arm/Kconfig b/hw/arm/Kconfig
+index d298fbdc89..acd07b2add 100644
+--- a/hw/arm/Kconfig
++++ b/hw/arm/Kconfig
+@@ -8,7 +8,13 @@ config DIGIC
+=20
+ config EXYNOS4
+     bool
++    select A9MPCORE
++    select I2C
++    select LAN9118
++    select PL310 # cache controller
+     select PTIMER
++    select SDHCI
++    select USB_EHCI_SYSBUS
+=20
+ config HIGHBANK
+     bool
+@@ -104,6 +110,10 @@ config ZAURUS
+=20
+ config A9MPCORE
+     bool
++    select A9_GTIMER
++    select A9SCU       # snoop control unit
++    select ARM_GIC
++    select ARM_MPTIMER
+=20
+ config A15MPCORE
+     bool
 --=20
 2.21.0
