@@ -2,83 +2,69 @@ Return-Path: <SRS0=08iY=SU=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.7 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS,URIBL_BLOCKED
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_PASS,URIBL_BLOCKED autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 56985C10F0E
-	for <qemu-devel@archiver.kernel.org>; Thu, 18 Apr 2019 16:06:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 03ADAC10F0E
+	for <qemu-devel@archiver.kernel.org>; Thu, 18 Apr 2019 16:12:57 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 17CF321479
-	for <qemu-devel@archiver.kernel.org>; Thu, 18 Apr 2019 16:06:26 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=intel-com.20150623.gappssmtp.com header.i=@intel-com.20150623.gappssmtp.com header.b="ATWDxkO+"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 17CF321479
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=intel.com
+	by mail.kernel.org (Postfix) with ESMTPS id C5A8820835
+	for <qemu-devel@archiver.kernel.org>; Thu, 18 Apr 2019 16:12:56 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C5A8820835
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:43785 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:43840 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hH9YP-0007sA-Dm
-	for qemu-devel@archiver.kernel.org; Thu, 18 Apr 2019 12:06:25 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:51644)
+	id 1hH9eh-0001QM-Dw
+	for qemu-devel@archiver.kernel.org; Thu, 18 Apr 2019 12:12:55 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:52703)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dan.j.williams@intel.com>) id 1hH9Xb-0007Z6-Sd
-	for qemu-devel@nongnu.org; Thu, 18 Apr 2019 12:05:37 -0400
+	(envelope-from <jmoyer@redhat.com>) id 1hH9ct-0000K1-Mq
+	for qemu-devel@nongnu.org; Thu, 18 Apr 2019 12:11:04 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dan.j.williams@intel.com>) id 1hH9Xa-0004Vu-BS
-	for qemu-devel@nongnu.org; Thu, 18 Apr 2019 12:05:35 -0400
-Received: from mail-oi1-x243.google.com ([2607:f8b0:4864:20::243]:40889)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <dan.j.williams@intel.com>)
-	id 1hH9XZ-0004Ht-Uu
-	for qemu-devel@nongnu.org; Thu, 18 Apr 2019 12:05:34 -0400
-Received: by mail-oi1-x243.google.com with SMTP id f196so2005835oib.7
-	for <qemu-devel@nongnu.org>; Thu, 18 Apr 2019 09:05:18 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=intel-com.20150623.gappssmtp.com; s=20150623;
-	h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-	:cc; bh=9656FNKKp4cUVga3XUcreKMqWUBjOMnkCExkfsBvcE0=;
-	b=ATWDxkO+EzohN5YWedA5OnfOl7z0C5wosAmTrDF5hxxtYtjNdCK/9PHgnZhYETJJ8t
-	vacr+rHkJxxNGOmeI1vTif1Vl4SIwdCSz21szdtTalMtQ8a/1Obxe+VdKwZnY8xrFtd+
-	ciBIJxCm9FZlAQVPiOTKZr8Xdghbnp/hQTXS/ucudKTmB79U11kjETh4fqNlfW3T1gK0
-	Zu87he2RHQTC+AM19urSAzmn3PITVUqT2oXHTybHWlpO7u1bFfMxyXZLHVTzCvZ6mXjc
-	bD19cp4gsnL0R2s/7Y3bFqcAI2a5/xvDNGJEJYE3ed3iSmhC+ui2TozfrYHnQqDdah3m
-	ZD3A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=1e100.net; s=20161025;
-	h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-	:message-id:subject:to:cc;
-	bh=9656FNKKp4cUVga3XUcreKMqWUBjOMnkCExkfsBvcE0=;
-	b=oGbgiyewMExVmzhXa4aRoKzdMd0XIoCJkwyUlh/R2uZhRzQAeSRdP0GULwrgs46eYr
-	Y8DDunm4iZvG3Ry/7/i+cCw01E1E8e1dZJdFFB8BnR3RcUnprbZxAbCalsLqW5Lx9o4g
-	tybikKIGyL1i5DVjswc/yNm0W0Rx40W75iW4QMAi62XONCbIsSdCgXsWxiYpoDSQk1+o
-	KEcsovVQ2EAPB2632GTWjop6b+EZL633edmSRV6RtqIrHtQPPcbA0Wrjz1IHnWaxW/HC
-	8VYWaF/3mjYPW4hBEpeSvxX60fcG74x+WbfmElIH7VRzYxhXsBNy8JRuNj1+C+YuTGwM
-	8o8A==
-X-Gm-Message-State: APjAAAX/Zi3DecZDXWM8vJB7jevwSSISfyTGzTPh7eQ+o/c5+6um5XRp
-	bHTWGS8y4WmYgFMo1Iu3Kem3Hj2Bp0+l8uGWlPFbew==
-X-Google-Smtp-Source: APXvYqzTGVz9ejtUV0liyJEyYqaIHrUyuHEbCYPG5pgMNrA7E3qjZWVF7XUM3SvNiTSOlLSiE2pi4l5w04d9dnUuvxA=
-X-Received: by 2002:aca:ed88:: with SMTP id l130mr2422676oih.70.1555603517276; 
-	Thu, 18 Apr 2019 09:05:17 -0700 (PDT)
-MIME-Version: 1.0
+	(envelope-from <jmoyer@redhat.com>) id 1hH9cs-0007vn-Mq
+	for qemu-devel@nongnu.org; Thu, 18 Apr 2019 12:11:03 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:42759)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <jmoyer@redhat.com>) id 1hH9cs-0007uq-Ey
+	for qemu-devel@nongnu.org; Thu, 18 Apr 2019 12:11:02 -0400
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+	[10.5.11.16])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 042CB306C3EC;
+	Thu, 18 Apr 2019 16:11:00 +0000 (UTC)
+Received: from segfault.boston.devel.redhat.com
+	(segfault.boston.devel.redhat.com [10.19.60.26])
+	by smtp.corp.redhat.com (Postfix) with ESMTPS id 024235C206;
+	Thu, 18 Apr 2019 16:10:45 +0000 (UTC)
+From: Jeff Moyer <jmoyer@redhat.com>
+To: Dan Williams <dan.j.williams@intel.com>
 References: <20190410040826.24371-1-pagupta@redhat.com>
 	<20190410040826.24371-2-pagupta@redhat.com>
 	<CAPcyv4i1FjBzfcWtzeCvj-giHa9xaX0dMQ==q4LZC_L8VEqkHg@mail.gmail.com>
 	<20190412083230.GA29850@quack2.suse.cz>
 	<x494l73z7th.fsf@segfault.boston.devel.redhat.com>
-In-Reply-To: <x494l73z7th.fsf@segfault.boston.devel.redhat.com>
-From: Dan Williams <dan.j.williams@intel.com>
-Date: Thu, 18 Apr 2019 09:05:05 -0700
-Message-ID:
- <CAPcyv4jrNHqW3FuGkeo==ZoJr7LKahCv4_esnokfy7enek8=2Q@mail.gmail.com>
-To: Jeff Moyer <jmoyer@redhat.com>
+	<CAPcyv4jrNHqW3FuGkeo==ZoJr7LKahCv4_esnokfy7enek8=2Q@mail.gmail.com>
+X-PGP-KeyID: 1F78E1B4
+X-PGP-CertKey: F6FE 280D 8293 F72C 65FD  5A58 1FF8 A7CA 1F78 E1B4
+Date: Thu, 18 Apr 2019 12:10:44 -0400
+In-Reply-To: <CAPcyv4jrNHqW3FuGkeo==ZoJr7LKahCv4_esnokfy7enek8=2Q@mail.gmail.com>
+	(Dan Williams's message of "Thu, 18 Apr 2019 09:05:05 -0700")
+Message-ID: <x49lg07cn0b.fsf@segfault.boston.devel.redhat.com>
+User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.1 (gnu/linux)
+MIME-Version: 1.0
 Content-Type: text/plain; charset="UTF-8"
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
-	recognized.
-X-Received-From: 2607:f8b0:4864:20::243
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+	(mx1.redhat.com [10.5.110.45]);
+	Thu, 18 Apr 2019 16:11:00 +0000 (UTC)
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 209.132.183.28
 Subject: Re: [Qemu-devel] [PATCH v5 1/6] libnvdimm: nd_region flush callback
  support
 X-BeenThere: qemu-devel@nongnu.org
@@ -113,9 +99,8 @@ Cc: Pankaj Gupta <pagupta@redhat.com>, cohuck@redhat.com,
 	Paolo Bonzini <pbonzini@redhat.com>, lcapitulino@redhat.com,
 	Kevin Wolf <kwolf@redhat.com>, Nitesh Narayan Lal <nilal@redhat.com>,
 	Theodore Ts'o <tytso@mit.edu>,
-	Xiao Guangrong <xiaoguangrong.eric@gmail.com>,
-	"Darrick J. Wong" <darrick.wong@oracle.com>,
-	"Rafael J. Wysocki" <rjw@rjwysocki.net>,
+	Xiao Guangrong <xiaoguangrong.eric@gmail.com>, "Darrick J.
+	Wong" <darrick.wong@oracle.com>, "Rafael J. Wysocki" <rjw@rjwysocki.net>,
 	Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
 	linux-xfs <linux-xfs@vger.kernel.org>,
 	linux-fsdevel <linux-fsdevel@vger.kernel.org>,
@@ -123,34 +108,42 @@ Cc: Pankaj Gupta <pagupta@redhat.com>, cohuck@redhat.com,
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190418160505.wJI5qaiqpt2ngX1T_nzzA-SzY0rDe1ajUvKTp8OlkNg@z>
+Message-ID: <20190418161044.esjDyxXdOQiIV5PdwB2X_2itSThnjSRMpOqvJsj9O8A@z>
 
-On Fri, Apr 12, 2019 at 6:12 AM Jeff Moyer <jmoyer@redhat.com> wrote:
->
-> Jan Kara <jack@suse.cz> writes:
->
-> > On Thu 11-04-19 07:51:48, Dan Williams wrote:
-> >> On Tue, Apr 9, 2019 at 9:09 PM Pankaj Gupta <pagupta@redhat.com> wrote:
-> >> > +       } else {
-> >> > +               if (nd_region->flush(nd_region))
-> >> > +                       rc = -EIO;
-> >>
-> >> Given the common case wants to be fast and synchronous I think we
-> >> should try to avoid retpoline overhead by default. So something like
-> >> this:
-> >>
-> >> if (nd_region->flush == generic_nvdimm_flush)
-> >>     rc = generic_nvdimm_flush(...);
-> >
-> > I'd either add a comment about avoiding retpoline overhead here or just
-> > make ->flush == NULL mean generic_nvdimm_flush(). Just so that people don't
-> > get confused by the code.
->
-> Isn't this premature optimization?  I really don't like adding things
-> like this without some numbers to show it's worth it.
+Dan Williams <dan.j.williams@intel.com> writes:
 
-I don't think it's premature given this optimization technique is
-already being deployed elsewhere, see:
+> On Fri, Apr 12, 2019 at 6:12 AM Jeff Moyer <jmoyer@redhat.com> wrote:
+>>
+>> Jan Kara <jack@suse.cz> writes:
+>>
+>> > On Thu 11-04-19 07:51:48, Dan Williams wrote:
+>> >> On Tue, Apr 9, 2019 at 9:09 PM Pankaj Gupta <pagupta@redhat.com> wrote:
+>> >> > +       } else {
+>> >> > +               if (nd_region->flush(nd_region))
+>> >> > +                       rc = -EIO;
+>> >>
+>> >> Given the common case wants to be fast and synchronous I think we
+>> >> should try to avoid retpoline overhead by default. So something like
+>> >> this:
+>> >>
+>> >> if (nd_region->flush == generic_nvdimm_flush)
+>> >>     rc = generic_nvdimm_flush(...);
+>> >
+>> > I'd either add a comment about avoiding retpoline overhead here or just
+>> > make ->flush == NULL mean generic_nvdimm_flush(). Just so that people don't
+>> > get confused by the code.
+>>
+>> Isn't this premature optimization?  I really don't like adding things
+>> like this without some numbers to show it's worth it.
+>
+> I don't think it's premature given this optimization technique is
+> already being deployed elsewhere, see:
+>
+> https://lwn.net/Articles/774347/
 
-https://lwn.net/Articles/774347/
+The technique is fine, but that doesn't mean it should be applied
+everywhere.  Is *this* code path really going to benefit from the
+optimization?
+
+-Jeff
 
