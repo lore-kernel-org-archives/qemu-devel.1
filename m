@@ -2,45 +2,44 @@ Return-Path: <SRS0=08iY=SU=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-0.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AFC24C10F0E
-	for <qemu-devel@archiver.kernel.org>; Thu, 18 Apr 2019 04:23:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C9ADAC10F0B
+	for <qemu-devel@archiver.kernel.org>; Thu, 18 Apr 2019 04:24:47 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7FC5F2083D
-	for <qemu-devel@archiver.kernel.org>; Thu, 18 Apr 2019 04:23:38 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7FC5F2083D
+	by mail.kernel.org (Postfix) with ESMTPS id 873ED20821
+	for <qemu-devel@archiver.kernel.org>; Thu, 18 Apr 2019 04:24:47 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 873ED20821
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:35400 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:35430 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hGyaH-0006OC-Nf
-	for qemu-devel@archiver.kernel.org; Thu, 18 Apr 2019 00:23:37 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:60752)
+	id 1hGybO-00073t-Sd
+	for qemu-devel@archiver.kernel.org; Thu, 18 Apr 2019 00:24:46 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:61000)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1hGyZM-0005sc-4l
-	for qemu-devel@nongnu.org; Thu, 18 Apr 2019 00:22:41 -0400
+	(envelope-from <thuth@redhat.com>) id 1hGyaN-0006X6-7f
+	for qemu-devel@nongnu.org; Thu, 18 Apr 2019 00:23:44 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1hGyZJ-0002WL-Su
-	for qemu-devel@nongnu.org; Thu, 18 Apr 2019 00:22:39 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:44310)
+	(envelope-from <thuth@redhat.com>) id 1hGyaH-0003IQ-Cy
+	for qemu-devel@nongnu.org; Thu, 18 Apr 2019 00:23:39 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:35064)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <thuth@redhat.com>)
-	id 1hGyYz-0002GK-QE; Thu, 18 Apr 2019 00:22:19 -0400
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
-	[10.5.11.14])
+	id 1hGya7-00035w-FD; Thu, 18 Apr 2019 00:23:28 -0400
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+	[10.5.11.22])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 86096308A106;
-	Thu, 18 Apr 2019 04:22:14 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id BAC7EC065104;
+	Thu, 18 Apr 2019 04:23:10 +0000 (UTC)
 Received: from thuth.remote.csb (ovpn-116-56.ams2.redhat.com [10.36.116.56])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id DD43D5D9CC;
-	Thu, 18 Apr 2019 04:22:09 +0000 (UTC)
+	by smtp.corp.redhat.com (Postfix) with ESMTP id 3C81D1001DF1;
+	Thu, 18 Apr 2019 04:23:04 +0000 (UTC)
 To: Stephen Checkoway <stephen.checkoway@oberlin.edu>,
 	QEMU Developers <qemu-devel@nongnu.org>,
 	=?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
@@ -49,7 +48,7 @@ To: Stephen Checkoway <stephen.checkoway@oberlin.edu>,
 	Markus Armbruster <armbru@redhat.com>, Laszlo Ersek <lersek@redhat.com>,
 	Laurent Vivier <lvivier@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
 References: <20190417220147.67648-1-stephen.checkoway@oberlin.edu>
-	<20190417220147.67648-4-stephen.checkoway@oberlin.edu>
+	<20190417220147.67648-5-stephen.checkoway@oberlin.edu>
 From: Thomas Huth <thuth@redhat.com>
 Openpgp: preference=signencrypt
 Autocrypt: addr=thuth@redhat.com; keydata=
@@ -95,23 +94,23 @@ Autocrypt: addr=thuth@redhat.com; keydata=
 	rCELuGwT9hsYkUPjVd4lfylN3mzEc6iAv/wwjsc0DRTSQCpXT3v2ymTAsRKrVaEZLibTXaf+
 	WslxWek3xNYRiqwwWAJuL652eAlxUgQ5ZS+fXBRTiQpJ+F26I/2lccScRd9G5w==
 Organization: Red Hat
-Message-ID: <d6aedf1f-0928-8385-4c8b-4e20fc21f2b4@redhat.com>
-Date: Thu, 18 Apr 2019 06:22:08 +0200
+Message-ID: <0d2705ba-edea-7922-d812-69cc5fe5b870@redhat.com>
+Date: Thu, 18 Apr 2019 06:23:03 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
 	Thunderbird/60.6.1
 MIME-Version: 1.0
-In-Reply-To: <20190417220147.67648-4-stephen.checkoway@oberlin.edu>
+In-Reply-To: <20190417220147.67648-5-stephen.checkoway@oberlin.edu>
 Content-Type: text/plain; charset="UTF-8"
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.44]);
-	Thu, 18 Apr 2019 04:22:14 +0000 (UTC)
+	(mx1.redhat.com [10.5.110.31]);
+	Thu, 18 Apr 2019 04:23:10 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH v3 03/10] block/pflash_cfi02: Fix command
- address comparison
+Subject: Re: [Qemu-devel] [PATCH v3 04/10] block/pflash_cfi02: Implement
+ intereleaved flash devices
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -126,19 +125,47 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190418042208.XLncHeSC6S-cprLtYoR7He24kIww5iJCWOb-YDV52Hg@z>
+Message-ID: <20190418042303.5ZovimIV30zRUoLj1Y7Z3DOgem73BfRGsTLVzIIlZD0@z>
 
 On 18/04/2019 00.01, Stephen Checkoway wrote:
-> Most AMD commands only examine 11 bits of the address. This masks the
-> addresses used in the comparison to 11 bits. The exceptions are word or
-> sector addresses which use offset directly rather than the shifted
-> offset, boff.
+> It's common for multiple narrow flash chips to be hooked up in parallel
+> to support wider buses. For example, four 8-bit wide flash chips (x8)
+> may be combined in parallel to produce a 32-bit wide device. Similarly,
+> two 16-bit wide chips (x16) may be combined.
 > 
-> Signed-off-by: Stephen Checkoway <stephen.checkoway@oberlin.edu>
-> ---
->  hw/block/pflash_cfi02.c   |  8 +++++++-
->  tests/pflash-cfi02-test.c | 12 ++++++++++--
->  2 files changed, 17 insertions(+), 3 deletions(-)
+> This commit introduces `device-width` and `max-device-width` properties,
+> similar to pflash_cfi01, with the following meanings:
+> - `width`: The width of the logical, qemu device (same as before);
+> - `device-width`: The width of an individual flash chip, defaulting to
+>   `width`; and
+> - `max-device-width`: The maximum width of an individual flash chip,
+>   defaulting to `device-width`.
+> 
+> Nothing needs to change to support reading such interleaved devices but
+> commands (e.g., erase and programming) must be sent to all devices at
+> the same time or else the various chips will be in different states.
+> 
+> For example, a 4-byte wide logical device can be composed of four x8/x16
+> devices in x8 mode. That is, each device supports both x8 or x16 and
+> they're being used in the byte, rather than word, mode. This
+> configuration would have `width=4`, `device-width=1`, and
+> `max-device-width=2`.
+> 
+> In addition to commands being sent to all devices, guest firmware
+> expects the status and CFI queries to be replicated for each device.
+> (The one exception to the response replication is that each device gets
+> to report its own status bit DQ7 while programming because its value
+> depends on the value being programmed which will usually differ for each
+> device.)
+> 
+> Testing is limited to 16-bit wide devices due to the current inability
+> to override the properties set by `pflash_cfi02_register`, but multiple
+> configurations are tested.
+> 
+> Stop using global_qtest. Instead, package the qtest variable inside the
+> FlashConfig structure.
+
+Thanks for doing that change wrt global_qtest!
 
 Acked-by: Thomas Huth <thuth@redhat.com>
 
