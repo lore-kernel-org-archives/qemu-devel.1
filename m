@@ -1,23 +1,28 @@
-Received: from eggs.gnu.org ([209.51.188.92]:57855)
+Received: from eggs.gnu.org ([209.51.188.92]:58232)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <drjones@redhat.com>) id 1hH3dA-0008Ni-MD
-	for qemu-devel@nongnu.org; Thu, 18 Apr 2019 05:46:59 -0400
+	(envelope-from <pbonzini@redhat.com>) id 1hH3ec-0000lZ-8q
+	for qemu-devel@nongnu.org; Thu, 18 Apr 2019 05:48:27 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <drjones@redhat.com>) id 1hH3d5-0007lg-TU
-	for qemu-devel@nongnu.org; Thu, 18 Apr 2019 05:46:56 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:49210)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <drjones@redhat.com>) id 1hH3d5-0007lO-LB
-	for qemu-devel@nongnu.org; Thu, 18 Apr 2019 05:46:51 -0400
-Date: Thu, 18 Apr 2019 11:46:34 +0200
-From: Andrew Jones <drjones@redhat.com>
-Message-ID: <20190418094634.sr4s4qkzceqftque@kamzik.brq.redhat.com>
-References: <20190418092841.fzrcegkbal7dpfcy@kamzik.brq.redhat.com>
+	(envelope-from <pbonzini@redhat.com>) id 1hH3eb-0008Ou-4X
+	for qemu-devel@nongnu.org; Thu, 18 Apr 2019 05:48:26 -0400
+Received: from mail-wm1-f68.google.com ([209.85.128.68]:35264)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1hH3ea-0008O4-TZ
+	for qemu-devel@nongnu.org; Thu, 18 Apr 2019 05:48:25 -0400
+Received: by mail-wm1-f68.google.com with SMTP id y197so2137841wmd.0
+	for <qemu-devel@nongnu.org>; Thu, 18 Apr 2019 02:48:24 -0700 (PDT)
+References: <20190417115343.30527-1-pbonzini@redhat.com>
+	<CAJSP0QWtW3L54SC2FuWwc_Eu9DQnHw0eWWM1bUtGRrwwbFTyiQ@mail.gmail.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <cf51d357-d9c0-3a20-1d23-7f6671d7948a@redhat.com>
+Date: Thu, 18 Apr 2019 11:48:21 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20190418092841.fzrcegkbal7dpfcy@kamzik.brq.redhat.com>
-Subject: Re: [Qemu-devel] How do we do user input bitmap properties?
+In-Reply-To: <CAJSP0QWtW3L54SC2FuWwc_Eu9DQnHw0eWWM1bUtGRrwwbFTyiQ@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [Qemu-block] [PATCH] scsi-generic: prevent guest
+ from exceeding SG_IO limits
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,69 +31,31 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: armbru@redhat.com, dgilbert@redhat.com, peter.maydell@linaro.org, Dave.Martin@arm.com, imammedo@redhat.com
+To: Stefan Hajnoczi <stefanha@gmail.com>
+Cc: qemu block <qemu-block@nongnu.org>, qemu-devel <qemu-devel@nongnu.org>, Stefan Hajnoczi <stefanha@redhat.com>, qemu-stable <qemu-stable@nongnu.org>
 
-On Thu, Apr 18, 2019 at 11:28:41AM +0200, Andrew Jones wrote:
-> Hi all,
+On 17/04/19 14:30, Stefan Hajnoczi wrote:
+> On Wed, Apr 17, 2019 at 12:54 PM Paolo Bonzini <pbonzini@redhat.com> wrote:
+>> Linux places a limit of UIO_MAXIOV pages on SG_IO ioctls (and if the limit
+>> is exceeded, a confusing ENOMEM error is returned[1]).  Prevent the guest
+>> from exceeding these limits, by capping the maximum transfer length to
+>> that value in the block limits VPD page.
+>>
+>> [1] Oh well, at least it was easier to follow the kernel source knowing
+>>     it had to end as ENOMEM...
+>>
+>> Cc: qemu-stable@nongnu.org
+>> Cc: qemu-block@nongnu.org
+>> Cc: Stefan Hajnoczi <stefanha@redhat.com>
+>> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+>> ---
+>>  hw/scsi/scsi-generic.c | 17 +++++++++++++----
+>>  1 file changed, 13 insertions(+), 4 deletions(-)
 > 
-> First some background:
+> Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
 > 
-> For the userspace side of AArch64 guest SVE support we need to
-> expose KVM's allowed vector lengths bitmap to the user and allow
-> the user to choose a subset of that bitmap. Since bitmaps are a
-> bit awkward to work with then we'll likely want to expose it as
-> an array of vector lengths instead. Also, assuming we want to
-> expose the lengths as number-of-quadwords (quadword == 128 bits
-> for AArch64 and vector lengths must be multiples of quadwords)
-> rather than number-of-bits, then an example array (which will
-> always be a sequence) might be
-> 
->  [ 8, 16, 32 ]
-> 
-> The user may choose a subsequence, but only through truncation,
-> i.e. [ 8, 32 ] is not valid, but [ 8, 16 ] is.
-> 
-> Furthermore, different hosts may support different sequences
-> which have the same maximum. For example, if the above sequence
-> is for Host_A, then Host_B could be
-> 
->  [ 8, 16, 24, 32 ]
 
-It doesn't really matter for this discussion, but I just realized
-that I picked bogus numbers for these examples. 32 would be too
-big. The largest supported is 16. I probably should have just used
-the simple [ 1, 2, 4 ] and [ 1, 2, 3, 4 ] arrays, corresponding to
-vector lengths (in bits) 128, 256, 512 and 128, 256, 384, 512.
+This is acually only an issue with kernels prior to 4.5, so it should be
+fixed downstream instead.
 
-> 
-> The host must support all lengths in the sequence, which means
-> that while Host_A supports 32, since it doesn't support 24 and
-> we can only truncate sequences, we must use either [ 8 ] or
-> [ 8, 16 ] for a compatible sequence if we intend to migrate
-> between the hosts.
-> 
-> Now to the $SUBJECT question:
-> 
-> My feeling is that we should require the sequence to be
-> provided on the command line as a cpu property. Something
-> like
-> 
->   -cpu host,sve-vl-list=8:16
-> 
-> (I chose ':' for the delimiter because ',' can't work, but
-> if there's a better choice, then that's fine by me.)
-> 
-> Afaict a property list like this will require a new parser,
-> which feels a bit funny since it seems we should already
-> have support for this type of thing somewhere in QEMU. So,
-> the question is: do we? I see we have array properties, but
-> I don't believe that works with the command line. Should we
-> only use QMP for this? We already want some QMP in order to
-> query the supported vector lengths. Maybe we should use QMP
-> to set the selection too? But then what about command line
-> support for developers? And if the property is on the command
-> line then we don't have to add it to the migration stream.
-> 
-> Thanks,
-> drew
+Paolo
