@@ -6,61 +6,58 @@ X-Spam-Status: No, score=-6.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 28EC6C10F0E
-	for <qemu-devel@archiver.kernel.org>; Thu, 18 Apr 2019 21:07:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id ECEF8C10F0E
+	for <qemu-devel@archiver.kernel.org>; Thu, 18 Apr 2019 21:09:14 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id EA15E217D7
-	for <qemu-devel@archiver.kernel.org>; Thu, 18 Apr 2019 21:07:43 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EA15E217D7
+	by mail.kernel.org (Postfix) with ESMTPS id BA93A204EC
+	for <qemu-devel@archiver.kernel.org>; Thu, 18 Apr 2019 21:09:14 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BA93A204EC
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:47327 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:47343 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hHEFz-0000m8-4R
-	for qemu-devel@archiver.kernel.org; Thu, 18 Apr 2019 17:07:43 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:54678)
+	id 1hHEHR-00021R-Sb
+	for qemu-devel@archiver.kernel.org; Thu, 18 Apr 2019 17:09:13 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:54735)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1hHE0Z-00057h-Fv
-	for qemu-devel@nongnu.org; Thu, 18 Apr 2019 16:51:48 -0400
+	(envelope-from <armbru@redhat.com>) id 1hHE0d-0005CF-2z
+	for qemu-devel@nongnu.org; Thu, 18 Apr 2019 16:51:53 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1hHE0U-0005Ez-Bw
-	for qemu-devel@nongnu.org; Thu, 18 Apr 2019 16:51:45 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:46336)
+	(envelope-from <armbru@redhat.com>) id 1hHE0V-0005HW-L6
+	for qemu-devel@nongnu.org; Thu, 18 Apr 2019 16:51:47 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:55352)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1hHE0T-0005D4-OG
-	for qemu-devel@nongnu.org; Thu, 18 Apr 2019 16:51:42 -0400
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
-	[10.5.11.23])
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1hHE0V-0005F3-1v
+	for qemu-devel@nongnu.org; Thu, 18 Apr 2019 16:51:43 -0400
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+	[10.5.11.16])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id BE0123084247
-	for <qemu-devel@nongnu.org>; Thu, 18 Apr 2019 20:51:40 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id 3422281233
+	for <qemu-devel@nongnu.org>; Thu, 18 Apr 2019 20:51:42 +0000 (UTC)
 Received: from blackfin.pond.sub.org (ovpn-116-116.ams2.redhat.com
 	[10.36.116.116])
-	by smtp.corp.redhat.com (Postfix) with ESMTPS id 67B2E19C79;
-	Thu, 18 Apr 2019 20:51:40 +0000 (UTC)
+	by smtp.corp.redhat.com (Postfix) with ESMTPS id 0592F5C206
+	for <qemu-devel@nongnu.org>; Thu, 18 Apr 2019 20:51:42 +0000 (UTC)
 Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
-	id 780231132783; Thu, 18 Apr 2019 22:51:36 +0200 (CEST)
+	id 1C30C110CFDC; Thu, 18 Apr 2019 22:51:37 +0200 (CEST)
 From: Markus Armbruster <armbru@redhat.com>
 To: qemu-devel@nongnu.org
-Date: Thu, 18 Apr 2019 22:51:14 +0200
-Message-Id: <20190418205135.6686-16-armbru@redhat.com>
+Date: Thu, 18 Apr 2019 22:51:33 +0200
+Message-Id: <20190418205135.6686-35-armbru@redhat.com>
 In-Reply-To: <20190418205135.6686-1-armbru@redhat.com>
 References: <20190418205135.6686-1-armbru@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.40]);
-	Thu, 18 Apr 2019 20:51:40 +0000 (UTC)
-Content-Transfer-Encoding: quoted-printable
+	(mx1.redhat.com [10.5.110.25]);
+	Thu, 18 Apr 2019 20:51:42 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] [PULL for-4.1 15/36] qemu-print: New qemu_printf(),
- qemu_vprintf() etc.
+Subject: [Qemu-devel] [PULL for-4.1 34/36] monitor: Clean up how
+ monitor_disas() funnels output to monitor
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -72,167 +69,88 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "Dr . David Alan Gilbert" <dgilbert@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190418205114.ljpTviQl8Lzyu90pbxTvE3zcA94i0c1yTEUAEDo6M6M@z>
+Content-Type: text/plain; charset="UTF-8"
+Message-ID: <20190418205133.McfwtCB0e32aoeD0w5Wviwy8fuLbofweWyiIbLmCTvk@z>
 
-We commonly want to print to the current monitor if we have one, else
-to stdout/stderr.  For stderr, have error_printf().  For stdout, all
-we have is monitor_vfprintf(), which is rather unwieldy.  We often
-print to stderr just because error_printf() is easier.
+INIT_DISASSEMBLE_INFO() takes an fprintf()-like callback and a FILE *
+to pass to it.  monitor_disas() passes monitor_fprintf() and the
+current monitor cast to FILE *.  monitor_fprintf() casts it right
+back, and is otherwise identical to monitor_printf().  The
+type-punning is ugly.
 
-New qemu_printf() and qemu_vprintf() do exactly what's needed.  The
-next commits will put them to use.
+Pass qemu_fprintf() and NULL instead.
 
-Cc: Dr. David Alan Gilbert <dgilbert@redhat.com>
+monitor_fprintf() is now unused; delete it.
+
 Signed-off-by: Markus Armbruster <armbru@redhat.com>
-Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
 Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
-Message-Id: <20190417190641.26814-12-armbru@redhat.com>
+Message-Id: <20190417191805.28198-16-armbru@redhat.com>
+[Commit message typo corrected]
 ---
- MAINTAINERS               |  2 ++
- include/qemu/qemu-print.h | 19 ++++++++++++++++++
- stubs/monitor.c           |  5 +++++
- tests/test-util-sockets.c |  1 +
- util/Makefile.objs        |  1 +
- util/qemu-print.c         | 42 +++++++++++++++++++++++++++++++++++++++
- 6 files changed, 70 insertions(+)
- create mode 100644 include/qemu/qemu-print.h
- create mode 100644 util/qemu-print.c
+ disas.c                   |  3 ++-
+ include/monitor/monitor.h |  1 -
+ monitor.c                 | 11 -----------
+ 3 files changed, 2 insertions(+), 13 deletions(-)
 
-diff --git a/MAINTAINERS b/MAINTAINERS
-index 56139ac8ab..1aa19dc4ef 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -1895,6 +1895,8 @@ F: hmp.[ch]
- F: hmp-commands*.hx
- F: include/monitor/hmp-target.h
- F: tests/test-hmp.c
-+F: include/qemu/qemu-print.h
-+F: util/qemu-print.c
-=20
- Network device backends
- M: Jason Wang <jasowang@redhat.com>
-diff --git a/include/qemu/qemu-print.h b/include/qemu/qemu-print.h
-new file mode 100644
-index 0000000000..8fed32bf42
---- /dev/null
-+++ b/include/qemu/qemu-print.h
-@@ -0,0 +1,19 @@
-+/*
-+ * Print to stream or current monitor
-+ *
-+ * Copyright (C) 2019 Red Hat Inc.
-+ *
-+ * Authors:
-+ *  Markus Armbruster <armbru@redhat.com>,
-+ *
-+ * This work is licensed under the terms of the GNU GPL, version 2 or la=
-ter.
-+ * See the COPYING file in the top-level directory.
-+ */
-+
-+#ifndef QEMU_PRINT_H
-+#define QEMU_PRINT_H
-+
-+int qemu_vprintf(const char *fmt, va_list ap) GCC_FMT_ATTR(1, 0);
-+int qemu_printf(const char *fmt, ...) GCC_FMT_ATTR(1, 2);
-+
-+#endif
-diff --git a/stubs/monitor.c b/stubs/monitor.c
-index b57fe6c32f..b2ea975e40 100644
---- a/stubs/monitor.c
-+++ b/stubs/monitor.c
-@@ -6,6 +6,11 @@
-=20
- __thread Monitor *cur_mon;
-=20
-+int monitor_vprintf(Monitor *mon, const char *fmt, va_list ap)
-+{
-+    abort();
-+}
-+
- int monitor_get_fd(Monitor *mon, const char *name, Error **errp)
- {
-     error_setg(errp, "only QEMU supports file descriptor passing");
-diff --git a/tests/test-util-sockets.c b/tests/test-util-sockets.c
-index 6195a3ac36..fd1ced058c 100644
---- a/tests/test-util-sockets.c
-+++ b/tests/test-util-sockets.c
-@@ -70,6 +70,7 @@ int monitor_get_fd(Monitor *mon, const char *fdname, Er=
-ror **errp)
-  * otherwise we get duplicate syms at link time.
-  */
- __thread Monitor *cur_mon;
-+int monitor_vprintf(Monitor *mon, const char *fmt, va_list ap) { abort()=
-; }
- void monitor_init(Chardev *chr, int flags) {}
-=20
-=20
-diff --git a/util/Makefile.objs b/util/Makefile.objs
-index 835fcd69e2..9206878dec 100644
---- a/util/Makefile.objs
-+++ b/util/Makefile.objs
-@@ -23,6 +23,7 @@ util-obj-y +=3D bitmap.o bitops.o hbitmap.o
- util-obj-y +=3D fifo8.o
- util-obj-y +=3D cacheinfo.o
- util-obj-y +=3D error.o qemu-error.o
-+util-obj-y +=3D qemu-print.o
- util-obj-y +=3D id.o
- util-obj-y +=3D iov.o qemu-config.o qemu-sockets.o uri.o notify.o
- util-obj-y +=3D qemu-option.o qemu-progress.o
-diff --git a/util/qemu-print.c b/util/qemu-print.c
-new file mode 100644
-index 0000000000..86f9417af8
---- /dev/null
-+++ b/util/qemu-print.c
-@@ -0,0 +1,42 @@
-+/*
-+ * Print to stream or current monitor
-+ *
-+ * Copyright (C) 2019 Red Hat Inc.
-+ *
-+ * Authors:
-+ *  Markus Armbruster <armbru@redhat.com>,
-+ *
-+ * This work is licensed under the terms of the GNU GPL, version 2 or la=
-ter.
-+ * See the COPYING file in the top-level directory.
-+ */
-+
-+#include "qemu/osdep.h"
-+#include "monitor/monitor.h"
+diff --git a/disas.c b/disas.c
+index d9aa713a40..d15cceb863 100644
+--- a/disas.c
++++ b/disas.c
+@@ -3,6 +3,7 @@
+ #include "qemu-common.h"
+ #include "disas/bfd.h"
+ #include "elf.h"
 +#include "qemu/qemu-print.h"
-+
-+/*
-+ * Print like vprintf().
-+ * Print to current monitor if we have one, else to stdout.
-+ */
-+int qemu_vprintf(const char *fmt, va_list ap)
-+{
-+    if (cur_mon) {
-+        return monitor_vprintf(cur_mon, fmt, ap);
-+    }
-+    return vprintf(fmt, ap);
-+}
-+
-+/*
-+ * Print like printf().
-+ * Print to current monitor if we have one, else to stdout.
-+ */
-+int qemu_printf(const char *fmt, ...)
-+{
-+    va_list ap;
-+    int ret;
-+
-+    va_start(ap, fmt);
-+    ret =3D qemu_vprintf(fmt, ap);
-+    va_end(ap);
-+    return ret;
-+}
---=20
+ 
+ #include "cpu.h"
+ #include "disas/disas.h"
+@@ -609,7 +610,7 @@ void monitor_disas(Monitor *mon, CPUState *cpu,
+     int count, i;
+     CPUDebug s;
+ 
+-    INIT_DISASSEMBLE_INFO(s.info, (FILE *)mon, monitor_fprintf);
++    INIT_DISASSEMBLE_INFO(s.info, NULL, qemu_fprintf);
+ 
+     s.cpu = cpu;
+     s.info.read_memory_func
+diff --git a/include/monitor/monitor.h b/include/monitor/monitor.h
+index 316a168c41..86656297f1 100644
+--- a/include/monitor/monitor.h
++++ b/include/monitor/monitor.h
+@@ -31,7 +31,6 @@ int monitor_fd_param(Monitor *mon, const char *fdname, Error **errp);
+ int monitor_vprintf(Monitor *mon, const char *fmt, va_list ap)
+     GCC_FMT_ATTR(2, 0);
+ int monitor_printf(Monitor *mon, const char *fmt, ...) GCC_FMT_ATTR(2, 3);
+-int monitor_fprintf(FILE *stream, const char *fmt, ...) GCC_FMT_ATTR(2, 3);
+ void monitor_flush(Monitor *mon);
+ int monitor_set_cpu(int cpu_index);
+ int monitor_get_cpu_index(void);
+diff --git a/monitor.c b/monitor.c
+index ad6cec54a1..9b5f10b475 100644
+--- a/monitor.c
++++ b/monitor.c
+@@ -480,17 +480,6 @@ int monitor_printf(Monitor *mon, const char *fmt, ...)
+     return ret;
+ }
+ 
+-int monitor_fprintf(FILE *stream, const char *fmt, ...)
+-{
+-    int ret;
+-
+-    va_list ap;
+-    va_start(ap, fmt);
+-    ret = monitor_vprintf((Monitor *)stream, fmt, ap);
+-    va_end(ap);
+-    return ret;
+-}
+-
+ static void qmp_send_response(Monitor *mon, const QDict *rsp)
+ {
+     const QObject *data = QOBJECT(rsp);
+-- 
 2.17.2
 
 
