@@ -6,58 +6,58 @@ X-Spam-Status: No, score=-6.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 63DBCC10F0E
-	for <qemu-devel@archiver.kernel.org>; Thu, 18 Apr 2019 20:56:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9F80CC10F0E
+	for <qemu-devel@archiver.kernel.org>; Thu, 18 Apr 2019 20:57:02 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 38A3D2054F
-	for <qemu-devel@archiver.kernel.org>; Thu, 18 Apr 2019 20:56:53 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 38A3D2054F
+	by mail.kernel.org (Postfix) with ESMTPS id 747982054F
+	for <qemu-devel@archiver.kernel.org>; Thu, 18 Apr 2019 20:57:02 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 747982054F
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:47172 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:47174 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hHE5U-0000Uf-C8
-	for qemu-devel@archiver.kernel.org; Thu, 18 Apr 2019 16:56:52 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:54515)
+	id 1hHE5d-0000fc-MG
+	for qemu-devel@archiver.kernel.org; Thu, 18 Apr 2019 16:57:01 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:54434)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1hHE0U-00056N-4F
+	(envelope-from <armbru@redhat.com>) id 1hHE0S-00055a-8B
 	for qemu-devel@nongnu.org; Thu, 18 Apr 2019 16:51:43 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1hHE0S-0005Ci-MV
-	for qemu-devel@nongnu.org; Thu, 18 Apr 2019 16:51:41 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:45230)
+	(envelope-from <armbru@redhat.com>) id 1hHE0R-0005A0-3P
+	for qemu-devel@nongnu.org; Thu, 18 Apr 2019 16:51:40 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:55330)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>)
-	id 1hHE0S-0005B0-EB; Thu, 18 Apr 2019 16:51:40 -0400
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
-	[10.5.11.13])
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1hHE0Q-00059H-SI
+	for qemu-devel@nongnu.org; Thu, 18 Apr 2019 16:51:38 -0400
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+	[10.5.11.12])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id A1EF889C41;
-	Thu, 18 Apr 2019 20:51:39 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id B67FC81DFE
+	for <qemu-devel@nongnu.org>; Thu, 18 Apr 2019 20:51:37 +0000 (UTC)
 Received: from blackfin.pond.sub.org (ovpn-116-116.ams2.redhat.com
 	[10.36.116.116])
-	by smtp.corp.redhat.com (Postfix) with ESMTPS id 7124E60852;
-	Thu, 18 Apr 2019 20:51:39 +0000 (UTC)
+	by smtp.corp.redhat.com (Postfix) with ESMTPS id 887CF60BE5;
+	Thu, 18 Apr 2019 20:51:37 +0000 (UTC)
 Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
-	id 5EF77113298A; Thu, 18 Apr 2019 22:51:36 +0200 (CEST)
+	id 0B60A1132B6C; Thu, 18 Apr 2019 22:51:36 +0200 (CEST)
 From: Markus Armbruster <armbru@redhat.com>
 To: qemu-devel@nongnu.org
-Date: Thu, 18 Apr 2019 22:51:11 +0200
-Message-Id: <20190418205135.6686-13-armbru@redhat.com>
+Date: Thu, 18 Apr 2019 22:51:02 +0200
+Message-Id: <20190418205135.6686-4-armbru@redhat.com>
 In-Reply-To: <20190418205135.6686-1-armbru@redhat.com>
 References: <20190418205135.6686-1-armbru@redhat.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.27]);
-	Thu, 18 Apr 2019 20:51:39 +0000 (UTC)
+	(mx1.redhat.com [10.5.110.25]);
+	Thu, 18 Apr 2019 20:51:37 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] [PULL for-4.1 12/36] s390x/kvm: Report warnings with
- warn_report(), not error_printf()
+Subject: [Qemu-devel] [PULL for-4.1 03/36] error: Fix error_report_err(),
+ warn_report_err() hint printing
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -69,47 +69,87 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Thomas Huth <thuth@redhat.com>, qemu-s390x@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 Content-Type: text/plain; charset="UTF-8"
-Message-ID: <20190418205111.P_sOrATmhNYP9Hb5PU78ZhSYQ5vSJfeLYU8W8ob5Hxg@z>
+Message-ID: <20190418205102.7n4exJFCiNWq6nbUDQKBTZXfoZbd3_ILRbQC6nsHkOo@z>
 
-kvm_s390_mem_op() can fail in two ways: when !cap_mem_op, it returns
--ENOSYS, and when kvm_vcpu_ioctl() fails, it returns -errno set by
-ioctl().  Its caller s390_cpu_virt_mem_rw() recovers from both
-failures.
+Before the from qerror_report() to error_setg(), hints looked like
+this:
 
-kvm_s390_mem_op() prints "KVM_S390_MEM_OP failed" with error_printf()
-in the latter failure mode.  Since this is obviously a warning, use
-warn_report().
+    qerror_report(QERR_MACRO, ... arguments ...);
+    error_printf_unless_qmp(... hint ...);
 
-Perhaps the reporting should be left to the caller.  It could warn on
-failure other than -ENOSYS.
+error_printf_unless_qmp() made perfect sense: it printed exactly when
+qerror_report() did.
 
-Cc: Thomas Huth <thuth@redhat.com>
-Cc: qemu-s390x@nongnu.org
-Signed-off-by: Markus Armbruster <armbru@redhat.com>
-Reviewed-by: Thomas Huth <thuth@redhat.com>
-Reviewed-by: Cornelia Huck <cohuck@redhat.com>
-Message-Id: <20190417190641.26814-9-armbru@redhat.com>
----
- target/s390x/kvm.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+After the conversion to error_setg():
 
-diff --git a/target/s390x/kvm.c b/target/s390x/kvm.c
-index 19530fb94e..2c6e35b5aa 100644
---- a/target/s390x/kvm.c
-+++ b/target/s390x/kvm.c
-@@ -782,7 +782,7 @@ int kvm_s390_mem_op(S390CPU *cpu, vaddr addr, uint8_t ar, void *hostbuf,
- 
-     ret = kvm_vcpu_ioctl(CPU(cpu), KVM_S390_MEM_OP, &mem_op);
-     if (ret < 0) {
--        error_printf("KVM_S390_MEM_OP failed: %s\n", strerror(-ret));
-+        warn_report("KVM_S390_MEM_OP failed: %s", strerror(-ret));
+    error_setg(errp, QERR_MACRO, ... arguments ...);
+    error_printf_unless_qmp(... hint ...);
+
+The "unless QMP part" still made some sense; in QMP context, the
+caller generally uses the error as QMP response instead of printing
+it.
+
+However, everything else is wrong.  If the caller handles the error,
+the hint gets printed anyway (unless QMP).  If the caller reports the
+error, the hint gets printed *before* the report (unless QMP) or not
+at all (if QMP).
+
+Commit 50b7b000c91 fixed this by making hints a member of Error.  It
+kept printing hints with error_printf_unless_qmp():
+
+     void error_report_err(Error *err)
+     {
+	 error_report("%s", error_get_pretty(err));
+    +    if (err->hint) {
+    +        error_printf_unless_qmp("%s\n", err->hint->str);
+    +    }
+	 error_free(err);
      }
-     return ret;
+
+This is wrong.  We should (and now can) print the hint exactly when we
+print the error.
+
+The mistake has since been copied to warn_report_err() in commit
+e43ead1d0b9.
+
+Fix both to use error_printf().
+
+Reported-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Cc: Eric Blake <eblake@redhat.com>
+Signed-off-by: Markus Armbruster <armbru@redhat.com>
+Message-Id: <20190416153850.5186-1-armbru@redhat.com>
+Reviewed-by: Eric Blake <eblake@redhat.com>
+Reviewed-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+[Commit message tweaked]
+---
+ util/error.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/util/error.c b/util/error.c
+index 934a78e1b1..712b4d4b5d 100644
+--- a/util/error.c
++++ b/util/error.c
+@@ -223,7 +223,7 @@ void error_report_err(Error *err)
+ {
+     error_report("%s", error_get_pretty(err));
+     if (err->hint) {
+-        error_printf_unless_qmp("%s", err->hint->str);
++        error_printf("%s", err->hint->str);
+     }
+     error_free(err);
+ }
+@@ -232,7 +232,7 @@ void warn_report_err(Error *err)
+ {
+     warn_report("%s", error_get_pretty(err));
+     if (err->hint) {
+-        error_printf_unless_qmp("%s", err->hint->str);
++        error_printf("%s", err->hint->str);
+     }
+     error_free(err);
  }
 -- 
 2.17.2
