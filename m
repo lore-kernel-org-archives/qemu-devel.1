@@ -6,58 +6,58 @@ X-Spam-Status: No, score=-6.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 06761C10F0E
-	for <qemu-devel@archiver.kernel.org>; Thu, 18 Apr 2019 18:17:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 06945C282DD
+	for <qemu-devel@archiver.kernel.org>; Thu, 18 Apr 2019 18:17:36 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id CD008206B6
-	for <qemu-devel@archiver.kernel.org>; Thu, 18 Apr 2019 18:16:59 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CD008206B6
+	by mail.kernel.org (Postfix) with ESMTPS id CC9452186A
+	for <qemu-devel@archiver.kernel.org>; Thu, 18 Apr 2019 18:17:35 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CC9452186A
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:45281 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:45285 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hHBak-0006Xy-WA
-	for qemu-devel@archiver.kernel.org; Thu, 18 Apr 2019 14:16:59 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:46677)
+	id 1hHBbK-00072L-Vk
+	for qemu-devel@archiver.kernel.org; Thu, 18 Apr 2019 14:17:35 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:47203)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1hHBOX-0004kV-OI
-	for qemu-devel@nongnu.org; Thu, 18 Apr 2019 14:04:22 -0400
+	(envelope-from <thuth@redhat.com>) id 1hHBPu-0005uX-VN
+	for qemu-devel@nongnu.org; Thu, 18 Apr 2019 14:05:47 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1hHBOV-0002xA-9c
-	for qemu-devel@nongnu.org; Thu, 18 Apr 2019 14:04:21 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:28747)
+	(envelope-from <thuth@redhat.com>) id 1hHBPu-0003td-0A
+	for qemu-devel@nongnu.org; Thu, 18 Apr 2019 14:05:46 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:46174)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <thuth@redhat.com>)
-	id 1hHBOK-0002jV-DL; Thu, 18 Apr 2019 14:04:09 -0400
+	id 1hHBPl-0003pA-Dv; Thu, 18 Apr 2019 14:05:38 -0400
 Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
 	[10.5.11.22])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 747083D945;
-	Thu, 18 Apr 2019 18:03:59 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id CF349C05FF80;
+	Thu, 18 Apr 2019 18:05:35 +0000 (UTC)
 Received: from thuth.com (ovpn-116-56.ams2.redhat.com [10.36.116.56])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id 9CF2110816BC;
-	Thu, 18 Apr 2019 18:03:50 +0000 (UTC)
+	by smtp.corp.redhat.com (Postfix) with ESMTP id DBA751001E66;
+	Thu, 18 Apr 2019 18:05:26 +0000 (UTC)
 From: Thomas Huth <thuth@redhat.com>
 To: yang.zhong@intel.com, Peter Maydell <peter.maydell@linaro.org>,
 	qemu-devel@nongnu.org, pbonzini@redhat.com
-Date: Thu, 18 Apr 2019 20:00:47 +0200
-Message-Id: <20190418180057.3593-20-thuth@redhat.com>
+Date: Thu, 18 Apr 2019 20:00:54 +0200
+Message-Id: <20190418180057.3593-27-thuth@redhat.com>
 In-Reply-To: <20190418180057.3593-1-thuth@redhat.com>
 References: <20190418180057.3593-1-thuth@redhat.com>
 MIME-Version: 1.0
 X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.30]);
-	Thu, 18 Apr 2019 18:03:59 +0000 (UTC)
+	(mx1.redhat.com [10.5.110.31]);
+	Thu, 18 Apr 2019 18:05:36 +0000 (UTC)
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] [PATCH for-QEMU-4.1 v5 19/29] hw/arm: Express
- dependencies of the MPS2 boards with Kconfig
+Subject: [Qemu-devel] [PATCH for-QEMU-4.1 v5 26/29] hw/arm: Express
+ dependencies of the ZynqMP zcu102 machine with Kconfig
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -86,93 +86,66 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 Content-Type: text/plain; charset="UTF-8"
-Message-ID: <20190418180047.G9h4MSvQFnrAYLz9825M_ysX62P4oK-ikPirVPkO3XQ@z>
+Message-ID: <20190418180054.mz28cS5H4vvSGIWRt16uMin4XXgfbhSnhFS3O8jvUyg@z>
 
-Add Kconfig dependencies for the mps2-an* machines.
+This cleans up most settings in default-configs/aarch64-softmmu.mak.
 
 Signed-off-by: Thomas Huth <thuth@redhat.com>
 ---
- default-configs/arm-softmmu.mak | 20 +-------------------
- hw/arm/Kconfig                  | 18 ++++++++++++++++++
- 2 files changed, 19 insertions(+), 19 deletions(-)
+ default-configs/aarch64-softmmu.mak |  4 ----
+ hw/arm/Kconfig                      | 11 +++++++++++
+ hw/display/Kconfig                  |  1 +
+ 3 files changed, 12 insertions(+), 4 deletions(-)
 
-diff --git a/default-configs/arm-softmmu.mak b/default-configs/arm-softmm=
-u.mak
-index a0b9016e3a..31d31d3f4a 100644
---- a/default-configs/arm-softmmu.mak
-+++ b/default-configs/arm-softmmu.mak
-@@ -30,6 +30,7 @@ CONFIG_Z2=3Dy
- CONFIG_COLLIE=3Dy
- CONFIG_ASPEED_SOC=3Dy
- CONFIG_NETDUINO2=3Dy
-+CONFIG_MPS2=3Dy
+diff --git a/default-configs/aarch64-softmmu.mak b/default-configs/aarch6=
+4-softmmu.mak
+index 4ea9add003..3a4b15e7e8 100644
+--- a/default-configs/aarch64-softmmu.mak
++++ b/default-configs/aarch64-softmmu.mak
+@@ -3,10 +3,6 @@
+ # We support all the 32 bit boards so need all their config
+ include arm-softmmu.mak
 =20
- CONFIG_VGA=3Dy
- CONFIG_SSI_M25P80=3Dy
-@@ -38,28 +39,9 @@ CONFIG_IMX_FEC=3Dy
- CONFIG_FRAMEBUFFER=3Dy
-=20
- CONFIG_DIGIC=3Dy
--CONFIG_MPS2=3Dy
- CONFIG_RASPI=3Dy
- CONFIG_NRF51_SOC=3Dy
-=20
--CONFIG_CMSDK_APB_TIMER=3Dy
--CONFIG_CMSDK_APB_DUALTIMER=3Dy
--CONFIG_CMSDK_APB_UART=3Dy
--CONFIG_CMSDK_APB_WATCHDOG=3Dy
--
--CONFIG_MPS2_FPGAIO=3Dy
--CONFIG_MPS2_SCC=3Dy
--
--CONFIG_TZ_MPC=3Dy
--CONFIG_TZ_MSC=3Dy
--CONFIG_TZ_PPC=3Dy
--CONFIG_ARMSSE=3Dy
--CONFIG_IOTKIT_SECCTL=3Dy
--CONFIG_IOTKIT_SYSCTL=3Dy
--CONFIG_IOTKIT_SYSINFO=3Dy
--CONFIG_ARMSSE_CPUID=3Dy
--CONFIG_ARMSSE_MHU=3Dy
--
- CONFIG_FSL_IMX6=3Dy
- CONFIG_FSL_IMX25=3Dy
- CONFIG_FSL_IMX7=3Dy
+-CONFIG_AUX=3Dy
+-CONFIG_DDC=3Dy
+-CONFIG_DPCD=3Dy
+-CONFIG_XLNX_ZYNQMP=3Dy
+ CONFIG_XLNX_ZYNQMP_ARM=3Dy
+ CONFIG_XLNX_VERSAL=3Dy
+ CONFIG_ARM_SMMUV3=3Dy
 diff --git a/hw/arm/Kconfig b/hw/arm/Kconfig
-index 2ef5696900..466b143fdf 100644
+index 708eae19e5..32e4cc50e5 100644
 --- a/hw/arm/Kconfig
 +++ b/hw/arm/Kconfig
-@@ -301,6 +301,12 @@ config ASPEED_SOC
+@@ -277,6 +277,17 @@ config STM32F205_SOC
 =20
- config MPS2
+ config XLNX_ZYNQMP_ARM
      bool
-+    select ARMSSE
-+    select LAN9118
-+    select MPS2_FPGAIO
-+    select MPS2_SCC
-+    select PL022    # Serial port
-+    select PL080    # DMA controller
++    select AHCI
++    select ARM_GIC
++    select CADENCE
++    select DDC
++    select DPCD
++    select SDHCI
++    select SSI
++    select SSI_M25P80
++    select XILINX_AXI
++    select XILINX_SPIPS
++    select XLNX_ZYNQMP
 =20
- config FSL_IMX7
+ config XLNX_VERSAL
      bool
-@@ -340,6 +346,18 @@ config ARM11MPCORE
+diff --git a/hw/display/Kconfig b/hw/display/Kconfig
+index 0577e68c8e..bb95f8d6a4 100644
+--- a/hw/display/Kconfig
++++ b/hw/display/Kconfig
+@@ -108,6 +108,7 @@ config VIRTIO_VGA
 =20
- config ARMSSE
+ config DPCD
      bool
-+    select ARMSSE_CPUID
-+    select ARMSSE_MHU
-+    select CMSDK_APB_TIMER
-+    select CMSDK_APB_DUALTIMER
-+    select CMSDK_APB_UART
-+    select CMSDK_APB_WATCHDOG
-+    select IOTKIT_SECCTL
-+    select IOTKIT_SYSCTL
-+    select IOTKIT_SYSINFO
-+    select TZ_MPC
-+    select TZ_MSC
-+    select TZ_PPC
++    select AUX
 =20
- config ARMSSE_CPUID
+ config ATI_VGA
      bool
 --=20
 2.21.0
