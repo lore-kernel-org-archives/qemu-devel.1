@@ -2,45 +2,45 @@ Return-Path: <SRS0=08iY=SU=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 76E82C10F0B
-	for <qemu-devel@archiver.kernel.org>; Thu, 18 Apr 2019 04:27:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7EFE0C10F0B
+	for <qemu-devel@archiver.kernel.org>; Thu, 18 Apr 2019 04:30:07 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id ECB7720821
-	for <qemu-devel@archiver.kernel.org>; Thu, 18 Apr 2019 04:27:10 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org ECB7720821
+	by mail.kernel.org (Postfix) with ESMTPS id 4E518217D7
+	for <qemu-devel@archiver.kernel.org>; Thu, 18 Apr 2019 04:30:07 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4E518217D7
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:35493 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:35512 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hGydi-0007yc-0v
-	for qemu-devel@archiver.kernel.org; Thu, 18 Apr 2019 00:27:10 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:33201)
+	id 1hGygY-0000I7-L3
+	for qemu-devel@archiver.kernel.org; Thu, 18 Apr 2019 00:30:06 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:33707)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1hGyco-0007fR-W2
-	for qemu-devel@nongnu.org; Thu, 18 Apr 2019 00:26:16 -0400
+	(envelope-from <thuth@redhat.com>) id 1hGyfi-0008PJ-RH
+	for qemu-devel@nongnu.org; Thu, 18 Apr 2019 00:29:17 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1hGyce-0004Cy-M5
-	for qemu-devel@nongnu.org; Thu, 18 Apr 2019 00:26:10 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:49924)
+	(envelope-from <thuth@redhat.com>) id 1hGyfe-0005l6-U0
+	for qemu-devel@nongnu.org; Thu, 18 Apr 2019 00:29:12 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:53800)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <thuth@redhat.com>)
-	id 1hGycJ-000476-An; Thu, 18 Apr 2019 00:25:44 -0400
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
-	[10.5.11.16])
+	id 1hGyfa-0005jX-Ei; Thu, 18 Apr 2019 00:29:06 -0400
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+	[10.5.11.14])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 10D673002F52;
-	Thu, 18 Apr 2019 04:25:36 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id 707C33DE0E;
+	Thu, 18 Apr 2019 04:29:04 +0000 (UTC)
 Received: from thuth.remote.csb (ovpn-116-56.ams2.redhat.com [10.36.116.56])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id 705C45C207;
-	Thu, 18 Apr 2019 04:25:29 +0000 (UTC)
+	by smtp.corp.redhat.com (Postfix) with ESMTP id C8ABB5D9D6;
+	Thu, 18 Apr 2019 04:28:59 +0000 (UTC)
 To: Stephen Checkoway <stephen.checkoway@oberlin.edu>,
 	QEMU Developers <qemu-devel@nongnu.org>,
 	=?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
@@ -49,7 +49,7 @@ To: Stephen Checkoway <stephen.checkoway@oberlin.edu>,
 	Markus Armbruster <armbru@redhat.com>, Laszlo Ersek <lersek@redhat.com>,
 	Laurent Vivier <lvivier@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
 References: <20190417220147.67648-1-stephen.checkoway@oberlin.edu>
-	<20190417220147.67648-6-stephen.checkoway@oberlin.edu>
+	<20190417220147.67648-7-stephen.checkoway@oberlin.edu>
 From: Thomas Huth <thuth@redhat.com>
 Openpgp: preference=signencrypt
 Autocrypt: addr=thuth@redhat.com; keydata=
@@ -95,23 +95,23 @@ Autocrypt: addr=thuth@redhat.com; keydata=
 	rCELuGwT9hsYkUPjVd4lfylN3mzEc6iAv/wwjsc0DRTSQCpXT3v2ymTAsRKrVaEZLibTXaf+
 	WslxWek3xNYRiqwwWAJuL652eAlxUgQ5ZS+fXBRTiQpJ+F26I/2lccScRd9G5w==
 Organization: Red Hat
-Message-ID: <9e1b8e19-a40a-5070-0815-9e783435d542@redhat.com>
-Date: Thu, 18 Apr 2019 06:25:29 +0200
+Message-ID: <68f7c64a-263b-78a2-39fc-8b79a833f9ae@redhat.com>
+Date: Thu, 18 Apr 2019 06:28:58 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
 	Thunderbird/60.6.1
 MIME-Version: 1.0
-In-Reply-To: <20190417220147.67648-6-stephen.checkoway@oberlin.edu>
+In-Reply-To: <20190417220147.67648-7-stephen.checkoway@oberlin.edu>
 Content-Type: text/plain; charset="UTF-8"
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.40]);
-	Thu, 18 Apr 2019 04:25:36 +0000 (UTC)
+	(mx1.redhat.com [10.5.110.29]);
+	Thu, 18 Apr 2019 04:29:04 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH v3 05/10] block/pflash_cfi02: Implement
- nonuniform sector sizes
+Subject: Re: [Qemu-devel] [PATCH v3 06/10] block/pflash_cfi02: Fix CFI in
+ autoselect mode
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -126,34 +126,44 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190418042529.uyy1mjERRSMjNn3rXwdsTeTrQhDssg0oSd3HUOSVWCQ@z>
+Message-ID: <20190418042858.9x9N1cO18m4kMqwwvYMsQ7lx4qb40sSuVsIQjq8JzHw@z>
 
 On 18/04/2019 00.01, Stephen Checkoway wrote:
-> Some flash chips support sectors of different sizes. For example, the
-> AMD AM29LV160DT has 31 64 kB sectors, one 32 kB sector, two 8 kB
-> sectors, and a 16 kB sector, in that order. The AM29LV160DB has those in
-> the reverse order.
-> 
-> The `num-blocks` and `sector-length` properties work exactly as they did
-> before: a flash device with uniform sector lengths. To get non-uniform
-> sector lengths for up to four regions, the following properties may be
-> set
-> - region 0. `num-blocks0` and `sector-length0`;
-> - region 1. `num-blocks1` and `sector-length1`;
-> - region 2. `num-blocks2` and `sector-length2`; and
-> - region 3. `num-blocks3` and `sector-length3`.
-> 
-> If the uniform and nonuniform properties are set, then both must specify
-> a flash device with the same total size. It would be better to disallow
-> both being set, or make `num-blocks0` and `sector-length0` alias
-> `num-blocks` and `sector-length`, but that would make testing currently
-> impossible.
+> After a flash device enters CFI mode from autoselect mode, the reset
+> command returns the device to autoselect mode. An additional reset
+> command is necessary to return to read array mode.
 > 
 > Signed-off-by: Stephen Checkoway <stephen.checkoway@oberlin.edu>
 > ---
->  hw/block/pflash_cfi02.c   | 177 +++++++++++++++++++++++++-----------
->  tests/pflash-cfi02-test.c | 185 ++++++++++++++++++++++++++++----------
->  2 files changed, 265 insertions(+), 97 deletions(-)
+[...]
+> diff --git a/tests/pflash-cfi02-test.c b/tests/pflash-cfi02-test.c
+> index 82bc5695e1..4039647604 100644
+> --- a/tests/pflash-cfi02-test.c
+> +++ b/tests/pflash-cfi02-test.c
+> @@ -480,6 +480,42 @@ static void test_geometry(const void *opaque)
+>      qtest_quit(qtest);
+>  }
+>  
+> +/*
+> + * Test that
+> + * 1. enter autoselect mode;
+> + * 2. enter CFI mode; and then
+> + * 3. exit CFI mode
+> + * leaves the flash device in autoselect mode.
+> + */
+> +static void test_cfi_in_autoselect(const void *opaque)
+> +{
+> +    const FlashConfig *config = opaque;
+> +    QTestState *qtest = qtest_initf("-M musicpal,accel=qtest"
+> +                                    " -drive if=pflash,file=%s,format=raw,"
+> +                                    "copy-on-read",
+> +                                    image_path);
+
+Just a matter of taste, but I think here I'd declare the variable first,
+and do the qtest_initf on a separate line, so you don't have to break
+the string between "format=raw," and "copy-on-read".
+
+Anyway, it's just a nit, so still:
 
 Acked-by: Thomas Huth <thuth@redhat.com>
 
