@@ -2,123 +2,63 @@ Return-Path: <SRS0=08iY=SU=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 21D3FC10F0E
-	for <qemu-devel@archiver.kernel.org>; Thu, 18 Apr 2019 11:21:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D831AC10F0E
+	for <qemu-devel@archiver.kernel.org>; Thu, 18 Apr 2019 11:23:26 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D90B921850
-	for <qemu-devel@archiver.kernel.org>; Thu, 18 Apr 2019 11:21:55 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D90B921850
+	by mail.kernel.org (Postfix) with ESMTPS id 946F0214DA
+	for <qemu-devel@archiver.kernel.org>; Thu, 18 Apr 2019 11:23:26 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 946F0214DA
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:39632 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:39646 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hH575-0003jS-6s
-	for qemu-devel@archiver.kernel.org; Thu, 18 Apr 2019 07:21:55 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:47053)
+	id 1hH58X-0004bf-Js
+	for qemu-devel@archiver.kernel.org; Thu, 18 Apr 2019 07:23:25 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:47667)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1hH52j-00008N-E2
-	for qemu-devel@nongnu.org; Thu, 18 Apr 2019 07:17:26 -0400
+	(envelope-from <imammedo@redhat.com>) id 1hH558-0002Bj-SU
+	for qemu-devel@nongnu.org; Thu, 18 Apr 2019 07:19:56 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1hH4nT-0002TQ-A0
-	for qemu-devel@nongnu.org; Thu, 18 Apr 2019 07:01:46 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:39739)
+	(envelope-from <imammedo@redhat.com>) id 1hH557-0002ZI-Kk
+	for qemu-devel@nongnu.org; Thu, 18 Apr 2019 07:19:54 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:45576)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>)
-	id 1hH4nP-0002SB-Aq; Thu, 18 Apr 2019 07:01:36 -0400
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
-	[10.5.11.16])
+	(Exim 4.71) (envelope-from <imammedo@redhat.com>)
+	id 1hH556-0002Yb-TF; Thu, 18 Apr 2019 07:19:53 -0400
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+	[10.5.11.11])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 41BD1D400F;
-	Thu, 18 Apr 2019 11:01:27 +0000 (UTC)
-Received: from [10.36.112.46] (ovpn-112-46.ams2.redhat.com [10.36.112.46])
-	by smtp.corp.redhat.com (Postfix) with ESMTPS id 212095C206;
-	Thu, 18 Apr 2019 11:01:19 +0000 (UTC)
-To: Kevin Wolf <kwolf@redhat.com>
-References: <20190417115343.30527-1-pbonzini@redhat.com>
-	<CAJSP0QWtW3L54SC2FuWwc_Eu9DQnHw0eWWM1bUtGRrwwbFTyiQ@mail.gmail.com>
-	<cf51d357-d9c0-3a20-1d23-7f6671d7948a@redhat.com>
-	<20190418104737.GC5242@linux.fritz.box>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Openpgp: preference=signencrypt
-Autocrypt: addr=pbonzini@redhat.com; prefer-encrypt=mutual; keydata=
-	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
-	uUHgL9dKIfvpm+rNXRn9wAwGjk0X/A==
-Message-ID: <87b281df-e0a0-6537-0e1a-4c6af28ffc01@redhat.com>
-Date: Thu, 18 Apr 2019 13:01:17 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
-	Thunderbird/60.6.1
+	by mx1.redhat.com (Postfix) with ESMTPS id 062CB81E19;
+	Thu, 18 Apr 2019 11:19:51 +0000 (UTC)
+Received: from localhost (unknown [10.43.2.182])
+	by smtp.corp.redhat.com (Postfix) with ESMTP id 9414C600C5;
+	Thu, 18 Apr 2019 11:19:44 +0000 (UTC)
+Date: Thu, 18 Apr 2019 13:19:40 +0200
+From: Igor Mammedov <imammedo@redhat.com>
+To: David Hildenbrand <david@redhat.com>
+Message-ID: <20190418131940.38df1a91@redhat.com>
+In-Reply-To: <20190417113143.5551-3-david@redhat.com>
+References: <20190417113143.5551-1-david@redhat.com>
+	<20190417113143.5551-3-david@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20190418104737.GC5242@linux.fritz.box>
 Content-Type: text/plain; charset="UTF-8"
-Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.38]);
-	Thu, 18 Apr 2019 11:01:27 +0000 (UTC)
+	(mx1.redhat.com [10.5.110.25]);
+	Thu, 18 Apr 2019 11:19:51 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [Qemu-block] [PATCH] scsi-generic: prevent guest
- from exceeding SG_IO limits
+Subject: Re: [Qemu-devel] [PATCH v3 2/2] exec: Introduce
+ qemu_maxrampagesize() and rename qemu_getrampagesize()
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -130,31 +70,196 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Stefan Hajnoczi <stefanha@gmail.com>, qemu block <qemu-block@nongnu.org>,
-	qemu-devel <qemu-devel@nongnu.org>, Stefan Hajnoczi <stefanha@redhat.com>,
-	qemu-stable <qemu-stable@nongnu.org>
+Cc: peter.maydell@linaro.org, Thomas Huth <thuth@redhat.com>,
+	qemu-s390x@nongnu.org, Cornelia Huck <cohuck@redhat.com>,
+	qemu-devel@nongnu.org, Halil Pasic <pasic@linux.ibm.com>,
+	Christian Borntraeger <borntraeger@de.ibm.com>,
+	Alex Williamson <alex.williamson@redhat.com>,
+	qemu-ppc@nongnu.org, pbonzini@redhat.com,
+	David Gibson <david@gibson.dropbear.id.au>,
+	Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190418110117.P1mg-BajG40L6hqB188S2rMXTNuW-AIZQB1WMZmJ_rw@z>
+Message-ID: <20190418111940.jr08YeNyiw8aphv1xr1JHcsWw0ZzeiEVl5HHd1hpGF8@z>
 
-On 18/04/19 12:47, Kevin Wolf wrote:
->> This is acually only an issue with kernels prior to 4.5, so it should be
->> fixed downstream instead.
->
-> I don't think that upstream QEMU has kernels > 4.5 as an official
-> requirement, though? We try to be compatible with quite old libs, so we
-> should stay compatible with old kernels, too.
+On Wed, 17 Apr 2019 13:31:43 +0200
+David Hildenbrand <david@redhat.com> wrote:
 
-It is a pretty rare case, where the host must support very large
-scatter/gather lists (>=1024 elements) and there is a workaround by
-setting max_sectors_kb to 4096 in the host.  It also makes performance
-worse.
+> Rename qemu_getrampagesize() to qemu_minrampagesize(). While at it,
+> properly rename find_max_supported_pagesize() to
+> find_min_backend_pagesize().
+> 
+> s390x is actually interested into the maximum ram pagesize, so
+> introduce and use qemu_maxrampagesize().
+> 
+> Add a TODO, indicating that looking at any mapped memory backends is not
+> 100% correct in some cases.
+> 
+> Signed-off-by: David Hildenbrand <david@redhat.com>
 
-Having already written and posted the patch, I can of course apply it
-too, but I'm not sure it's a good idea.  4.4 is already a pretty old
-kernel and whoever is using it likely will not get the fix for free by
-using a very new QEMU.
+Reviewed-by: Igor Mammedov <imammedo@redhat.com>
 
-Paolo
+> ---
+>  exec.c                     | 44 ++++++++++++++++++++++++++++++++++----
+>  hw/ppc/spapr_caps.c        |  4 ++--
+>  hw/s390x/s390-virtio-ccw.c |  2 +-
+>  hw/vfio/spapr.c            |  2 +-
+>  include/exec/ram_addr.h    |  3 ++-
+>  target/ppc/kvm.c           |  2 +-
+>  6 files changed, 47 insertions(+), 10 deletions(-)
+> 
+> diff --git a/exec.c b/exec.c
+> index 6ab62f4eee..f9b834ef82 100644
+> --- a/exec.c
+> +++ b/exec.c
+> @@ -1687,7 +1687,7 @@ void ram_block_dump(Monitor *mon)
+>   * when we actually open and map them.  Iterate over the file
+>   * descriptors instead, and use qemu_fd_getpagesize().
+>   */
+> -static int find_max_supported_pagesize(Object *obj, void *opaque)
+> +static int find_min_backend_pagesize(Object *obj, void *opaque)
+>  {
+>      long *hpsize_min = opaque;
+>  
+> @@ -1703,7 +1703,27 @@ static int find_max_supported_pagesize(Object *obj, void *opaque)
+>      return 0;
+>  }
+>  
+> -long qemu_getrampagesize(void)
+> +static int find_max_backend_pagesize(Object *obj, void *opaque)
+> +{
+> +    long *hpsize_max = opaque;
+> +
+> +    if (object_dynamic_cast(obj, TYPE_MEMORY_BACKEND)) {
+> +        HostMemoryBackend *backend = MEMORY_BACKEND(obj);
+> +        long hpsize = host_memory_backend_pagesize(backend);
+> +
+> +        if (host_memory_backend_is_mapped(backend) && (hpsize > *hpsize_max)) {
+> +            *hpsize_max = hpsize;
+> +        }
+> +    }
+> +
+> +    return 0;
+> +}
+> +
+> +/*
+> + * TODO: We assume right now that all mapped host memory backends are
+> + * used as RAM, however some might be used for different purposes.
+> + */
+> +long qemu_minrampagesize(void)
+>  {
+>      long hpsize = LONG_MAX;
+>      long mainrampagesize;
+> @@ -1723,7 +1743,7 @@ long qemu_getrampagesize(void)
+>       */
+>      memdev_root = object_resolve_path("/objects", NULL);
+>      if (memdev_root) {
+> -        object_child_foreach(memdev_root, find_max_supported_pagesize, &hpsize);
+> +        object_child_foreach(memdev_root, find_min_backend_pagesize, &hpsize);
+>      }
+>      if (hpsize == LONG_MAX) {
+>          /* No additional memory regions found ==> Report main RAM page size */
+> @@ -1746,8 +1766,24 @@ long qemu_getrampagesize(void)
+>  
+>      return hpsize;
+>  }
+> +
+> +long qemu_maxrampagesize(void)
+> +{
+> +    long pagesize = qemu_mempath_getpagesize(mem_path);
+> +    Object *memdev_root = object_resolve_path("/objects", NULL);
+> +
+> +    if (memdev_root) {
+> +        object_child_foreach(memdev_root, find_max_backend_pagesize,
+> +                             &pagesize);
+> +    }
+> +    return pagesize;
+> +}
+>  #else
+> -long qemu_getrampagesize(void)
+> +long qemu_minrampagesize(void)
+> +{
+> +    return getpagesize();
+> +}
+> +long qemu_maxrampagesize(void)
+>  {
+>      return getpagesize();
+>  }
+> diff --git a/hw/ppc/spapr_caps.c b/hw/ppc/spapr_caps.c
+> index edc5ed0e0c..9b1c10baa6 100644
+> --- a/hw/ppc/spapr_caps.c
+> +++ b/hw/ppc/spapr_caps.c
+> @@ -347,7 +347,7 @@ static void cap_hpt_maxpagesize_apply(SpaprMachineState *spapr,
+>          warn_report("Many guests require at least 64kiB hpt-max-page-size");
+>      }
+>  
+> -    spapr_check_pagesize(spapr, qemu_getrampagesize(), errp);
+> +    spapr_check_pagesize(spapr, qemu_minrampagesize(), errp);
+>  }
+>  
+>  static bool spapr_pagesize_cb(void *opaque, uint32_t seg_pshift,
+> @@ -609,7 +609,7 @@ static SpaprCapabilities default_caps_with_cpu(SpaprMachineState *spapr,
+>          uint8_t mps;
+>  
+>          if (kvmppc_hpt_needs_host_contiguous_pages()) {
+> -            mps = ctz64(qemu_getrampagesize());
+> +            mps = ctz64(qemu_minrampagesize());
+>          } else {
+>              mps = 34; /* allow everything up to 16GiB, i.e. everything */
+>          }
+> diff --git a/hw/s390x/s390-virtio-ccw.c b/hw/s390x/s390-virtio-ccw.c
+> index 3be5679657..7e256d3d31 100644
+> --- a/hw/s390x/s390-virtio-ccw.c
+> +++ b/hw/s390x/s390-virtio-ccw.c
+> @@ -188,7 +188,7 @@ static void s390_memory_init(ram_addr_t mem_size)
+>       * Configure the maximum page size. As no memory devices were created
+>       * yet, this is the page size of initial memory only.
+>       */
+> -    s390_set_max_pagesize(qemu_getrampagesize(), &local_err);
+> +    s390_set_max_pagesize(qemu_maxrampagesize(), &local_err);
+>      if (local_err) {
+>          error_report_err(local_err);
+>          exit(EXIT_FAILURE);
+> diff --git a/hw/vfio/spapr.c b/hw/vfio/spapr.c
+> index 57fe758e54..96c0ad9d9b 100644
+> --- a/hw/vfio/spapr.c
+> +++ b/hw/vfio/spapr.c
+> @@ -148,7 +148,7 @@ int vfio_spapr_create_window(VFIOContainer *container,
+>      uint64_t pagesize = memory_region_iommu_get_min_page_size(iommu_mr);
+>      unsigned entries, bits_total, bits_per_level, max_levels;
+>      struct vfio_iommu_spapr_tce_create create = { .argsz = sizeof(create) };
+> -    long rampagesize = qemu_getrampagesize();
+> +    long rampagesize = qemu_minrampagesize();
+>  
+>      /*
+>       * The host might not support the guest supported IOMMU page size,
+> diff --git a/include/exec/ram_addr.h b/include/exec/ram_addr.h
+> index 9ecd911c3e..139ad79390 100644
+> --- a/include/exec/ram_addr.h
+> +++ b/include/exec/ram_addr.h
+> @@ -73,7 +73,8 @@ static inline unsigned long int ramblock_recv_bitmap_offset(void *host_addr,
+>  
+>  bool ramblock_is_pmem(RAMBlock *rb);
+>  
+> -long qemu_getrampagesize(void);
+> +long qemu_minrampagesize(void);
+> +long qemu_maxrampagesize(void);
+>  
+>  /**
+>   * qemu_ram_alloc_from_file,
+> diff --git a/target/ppc/kvm.c b/target/ppc/kvm.c
+> index 2427c8ee13..59d92c4275 100644
+> --- a/target/ppc/kvm.c
+> +++ b/target/ppc/kvm.c
+> @@ -2136,7 +2136,7 @@ uint64_t kvmppc_rma_size(uint64_t current_size, unsigned int hash_shift)
+>      /* Find the largest hardware supported page size that's less than
+>       * or equal to the (logical) backing page size of guest RAM */
+>      kvm_get_smmu_info(&info, &error_fatal);
+> -    rampagesize = qemu_getrampagesize();
+> +    rampagesize = qemu_minrampagesize();
+>      best_page_shift = 0;
+>  
+>      for (i = 0; i < KVM_PPC_PAGE_SIZES_MAX_SZ; i++) {
+
 
