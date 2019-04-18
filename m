@@ -1,22 +1,32 @@
-Received: from eggs.gnu.org ([209.51.188.92]:49450)
+Received: from eggs.gnu.org ([209.51.188.92]:49830)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1hHBXX-00048N-LQ
-	for qemu-devel@nongnu.org; Thu, 18 Apr 2019 14:13:40 -0400
+	(envelope-from <dan.j.williams@intel.com>) id 1hHBZ6-0005Yq-N2
+	for qemu-devel@nongnu.org; Thu, 18 Apr 2019 14:15:17 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1hHBXW-0000LX-Oi
-	for qemu-devel@nongnu.org; Thu, 18 Apr 2019 14:13:39 -0400
-From: Markus Armbruster <armbru@redhat.com>
-References: <20190418145355.21100-1-armbru@redhat.com>
-	<20190418145355.21100-6-armbru@redhat.com>
-	<4aa820cd-bb5e-b891-bd77-42afab8de347@redhat.com>
-Date: Thu, 18 Apr 2019 20:13:35 +0200
-In-Reply-To: <4aa820cd-bb5e-b891-bd77-42afab8de347@redhat.com> (Thomas Huth's
-	message of "Thu, 18 Apr 2019 18:28:05 +0200")
-Message-ID: <87ftqfkwq8.fsf@dusky.pond.sub.org>
+	(envelope-from <dan.j.williams@intel.com>) id 1hHBZ5-000131-Hm
+	for qemu-devel@nongnu.org; Thu, 18 Apr 2019 14:15:16 -0400
+Received: from mail-ot1-x344.google.com ([2607:f8b0:4864:20::344]:39366)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <dan.j.williams@intel.com>)
+	id 1hHBZ5-00011w-3u
+	for qemu-devel@nongnu.org; Thu, 18 Apr 2019 14:15:15 -0400
+Received: by mail-ot1-x344.google.com with SMTP id f10so2474782otb.6
+	for <qemu-devel@nongnu.org>; Thu, 18 Apr 2019 11:15:13 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PATCH 5/6] pc-bios/s390-ccw: Clean up harmless
- misuse of isdigit()
+References: <20190410040826.24371-1-pagupta@redhat.com>
+	<20190410040826.24371-2-pagupta@redhat.com>
+	<CAPcyv4i1FjBzfcWtzeCvj-giHa9xaX0dMQ==q4LZC_L8VEqkHg@mail.gmail.com>
+	<20190412083230.GA29850@quack2.suse.cz>
+	<x494l73z7th.fsf@segfault.boston.devel.redhat.com>
+	<CAPcyv4jrNHqW3FuGkeo==ZoJr7LKahCv4_esnokfy7enek8=2Q@mail.gmail.com>
+	<20190418161833.GA22970@infradead.org>
+In-Reply-To: <20190418161833.GA22970@infradead.org>
+From: Dan Williams <dan.j.williams@intel.com>
+Date: Thu, 18 Apr 2019 11:14:59 -0700
+Message-ID: <CAPcyv4jPOF_+R6U17J_+88+X8LC-LSPCugA6gbKxuphuuFB2gg@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH v5 1/6] libnvdimm: nd_region flush callback
+ support
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,65 +35,38 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Thomas Huth <thuth@redhat.com>
-Cc: qemu-devel@nongnu.org, Christian Borntraeger <borntraeger@de.ibm.com>, qemu-s390x@nongnu.org, Cornelia Huck <cohuck@redhat.com>
+To: Christoph Hellwig <hch@infradead.org>
+Cc: Jeff Moyer <jmoyer@redhat.com>, Jan Kara <jack@suse.cz>, Pankaj Gupta <pagupta@redhat.com>, linux-nvdimm <linux-nvdimm@lists.01.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, virtualization@lists.linux-foundation.org, KVM list <kvm@vger.kernel.org>, linux-fsdevel <linux-fsdevel@vger.kernel.org>, Linux ACPI <linux-acpi@vger.kernel.org>, Qemu Developers <qemu-devel@nongnu.org>, linux-ext4 <linux-ext4@vger.kernel.org>, linux-xfs <linux-xfs@vger.kernel.org>, Ross Zwisler <zwisler@kernel.org>, Vishal L Verma <vishal.l.verma@intel.com>, Dave Jiang <dave.jiang@intel.com>, "Michael S. Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>, Matthew Wilcox <willy@infradead.org>, "Rafael J. Wysocki" <rjw@rjwysocki.net>, Len Brown <lenb@kernel.org>, Theodore Ts'o <tytso@mit.edu>, Andreas Dilger <adilger.kernel@dilger.ca>, "Darrick J. Wong" <darrick.wong@oracle.com>, lcapitulino@redhat.com, Kevin Wolf <kwolf@redhat.com>, Igor Mammedov <imammedo@redhat.com>, Nitesh Narayan Lal <nilal@redhat.com>, Rik van Riel <riel@surriel.com>, Stefan Hajnoczi <stefanha@redhat.com>, Andrea Arcangeli <aarcange@redhat.com>, David Hildenbrand <david@redhat.com>, david <david@fromorbit.com>, cohuck@redhat.com, Xiao Guangrong <xiaoguangrong.eric@gmail.com>, Paolo Bonzini <pbonzini@redhat.com>, kilobyte@angband.pl, yuval shaia <yuval.shaia@oracle.com>
 
-Thomas Huth <thuth@redhat.com> writes:
-
-> On 18/04/2019 16.53, Markus Armbruster wrote:
->> atoui() and get_index() pass char values to isdigit().  With a
->> standard isdigit(), we'd get undefined behavior when the value is
->> negative.  But we're using isdigit() from pc-bios/s390-ccw/libc.h
->> here, which behaves nicely.  Clean up anyway, just to avoid setting a
->> bad example.
->> 
->> Cc: Christian Borntraeger <borntraeger@de.ibm.com>
->> Cc: Thomas Huth <thuth@redhat.com>
->> Cc: Cornelia Huck <cohuck@redhat.com>
->> Cc: qemu-s390x@nongnu.org
->> Signed-off-by: Markus Armbruster <armbru@redhat.com>
->> ---
->>  pc-bios/s390-ccw/libc.c | 2 +-
->>  pc-bios/s390-ccw/menu.c | 2 +-
->>  2 files changed, 2 insertions(+), 2 deletions(-)
->> 
->> diff --git a/pc-bios/s390-ccw/libc.c b/pc-bios/s390-ccw/libc.c
->> index a786566c4c..3187923950 100644
->> --- a/pc-bios/s390-ccw/libc.c
->> +++ b/pc-bios/s390-ccw/libc.c
->> @@ -38,7 +38,7 @@ uint64_t atoui(const char *str)
->>      }
->>  
->>      while (*str) {
->> -        if (!isdigit(*str)) {
->> +        if (!isdigit(*(unsigned char *)str)) {
->>              break;
->>          }
->>          val = val * 10 + *str - '0';
->> diff --git a/pc-bios/s390-ccw/menu.c b/pc-bios/s390-ccw/menu.c
->> index 82a4ae6315..ce3815b201 100644
->> --- a/pc-bios/s390-ccw/menu.c
->> +++ b/pc-bios/s390-ccw/menu.c
->> @@ -134,7 +134,7 @@ static int get_index(void)
->>  
->>      /* Check for erroneous input */
->>      for (i = 0; i < len; i++) {
->> -        if (!isdigit(buf[i])) {
->> +        if (!isdigit((unsigned char)buf[i])) {
->>              return -1;
->>          }
->>      }
+On Thu, Apr 18, 2019 at 9:18 AM Christoph Hellwig <hch@infradead.org> wrote:
 >
-> FWIW, "char" is unsigned by default on s390x, so this is doing nothing.
+> On Thu, Apr 18, 2019 at 09:05:05AM -0700, Dan Williams wrote:
+> > > > I'd either add a comment about avoiding retpoline overhead here or just
+> > > > make ->flush == NULL mean generic_nvdimm_flush(). Just so that people don't
+> > > > get confused by the code.
+> > >
+> > > Isn't this premature optimization?  I really don't like adding things
+> > > like this without some numbers to show it's worth it.
+> >
+> > I don't think it's premature given this optimization technique is
+> > already being deployed elsewhere, see:
+> >
+> > https://lwn.net/Articles/774347/
+>
+> For one this one was backed by numbers, and second after feedback
+> from Linux we switched to the NULL pointer check instead.
 
-I see.
+Ok I should have noticed the switch to NULL pointer check. However,
+the question still stands do we want everyone to run numbers to
+justify this optimization, or make it a new common kernel coding
+practice to do:
 
-If we decide to keep the patch, the commit message needs tweaking.
-Perhaps:
+    if (!object->op)
+        generic_op(object);
+    else
+        object->op(object);
 
-    atoui() and get_index() pass char values to isdigit().  With a
-    standard isdigit(), we'd get undefined behavior when the value is
-    negative.  Can't happen as char is unsigned on s390x.  Even if it
-    could, we're actually using isdigit() from pc-bios/s390-ccw/libc.h
-    here, which works fine for negative values.  Clean up anyway, just
-    to avoid setting a bad example.
+...in hot paths? I agree with not doing premature optimization in
+principle, but this hack is minimally intrusive from a readability
+perspective similar to likely()/unlikely() usage which also don't come
+with numbers on a per patch basis.
