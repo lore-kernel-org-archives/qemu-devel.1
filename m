@@ -1,28 +1,26 @@
 Received: from eggs.gnu.org ([209.51.188.92]:35014)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1hH8US-0002P9-JZ
-	for qemu-devel@nongnu.org; Thu, 18 Apr 2019 10:58:20 -0400
+	(envelope-from <imammedo@redhat.com>) id 1hH8Ub-0002P9-6V
+	for qemu-devel@nongnu.org; Thu, 18 Apr 2019 10:58:26 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1hH8Td-0003gA-1J
-	for qemu-devel@nongnu.org; Thu, 18 Apr 2019 10:57:26 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:37076)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1hH8Tc-0003g0-P2
-	for qemu-devel@nongnu.org; Thu, 18 Apr 2019 10:57:24 -0400
-Date: Thu, 18 Apr 2019 15:57:16 +0100
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20190418145716.GH2984@work-vm>
-References: <20190418092841.fzrcegkbal7dpfcy@kamzik.brq.redhat.com>
-	<20190418094634.sr4s4qkzceqftque@kamzik.brq.redhat.com>
-	<20190418105204.GF3567@e103592.cambridge.arm.com>
-	<20190418112847.4hnafafcxlp4vuou@kamzik.brq.redhat.com>
-	<20190418140302.GI3567@e103592.cambridge.arm.com>
-	<20190418144306.5sxrbcjbkw2tzslj@kamzik.brq.redhat.com>
+	(envelope-from <imammedo@redhat.com>) id 1hH8Su-0003XL-EM
+	for qemu-devel@nongnu.org; Thu, 18 Apr 2019 10:56:41 -0400
+Date: Thu, 18 Apr 2019 16:56:30 +0200
+From: Igor Mammedov <imammedo@redhat.com>
+Message-ID: <20190418165630.5a3cc493@redhat.com>
+In-Reply-To: <55880acf-9a61-9ed7-2ddd-9778b78540ee@redhat.com>
+References: <1555334842-195718-1-git-send-email-imammedo@redhat.com>
+	<1555334842-195718-6-git-send-email-imammedo@redhat.com>
+	<89ca3a70-066b-e40e-faaf-39a39ec976bf@de.ibm.com>
+	<20190418113859.00248d07@redhat.com>
+	<93d242cb-dcc4-a65d-a7c7-7232dd16a2f2@redhat.com>
+	<20190418140116.19596c6d@redhat.com>
+	<55880acf-9a61-9ed7-2ddd-9778b78540ee@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20190418144306.5sxrbcjbkw2tzslj@kamzik.brq.redhat.com>
-Subject: Re: [Qemu-devel] How do we do user input bitmap properties?
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v1 5/5] s390: do not call
+ memory_region_allocate_system_memory() multiple times
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,162 +29,61 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Andrew Jones <drjones@redhat.com>
-Cc: Dave Martin <Dave.Martin@arm.com>, "peter.maydell@linaro.org" <peter.maydell@linaro.org>, "armbru@redhat.com" <armbru@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "imammedo@redhat.com" <imammedo@redhat.com>
+To: David Hildenbrand <david@redhat.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org, Cornelia Huck <cohuck@redhat.com>, Halil Pasic <pasic@linux.ibm.com>, qemu-s390x@nongnu.org
 
-* Andrew Jones (drjones@redhat.com) wrote:
-> On Thu, Apr 18, 2019 at 03:03:02PM +0100, Dave Martin wrote:
-> > On Thu, Apr 18, 2019 at 12:28:47PM +0100, Andrew Jones wrote:
-> > > On Thu, Apr 18, 2019 at 11:52:04AM +0100, Dave Martin wrote:
-> > > > On Thu, Apr 18, 2019 at 10:46:34AM +0100, Andrew Jones wrote:
-> > > > > On Thu, Apr 18, 2019 at 11:28:41AM +0200, Andrew Jones wrote:
-> > > > > > Hi all,
-> > > > > > 
-> > > > > > First some background:
-> > > > > > 
-> > > > > > For the userspace side of AArch64 guest SVE support we need to
-> > > > > > expose KVM's allowed vector lengths bitmap to the user and allow
-> > > > > > the user to choose a subset of that bitmap. Since bitmaps are a
-> > > > > > bit awkward to work with then we'll likely want to expose it as
-> > > > > > an array of vector lengths instead. Also, assuming we want to
-> > > > > > expose the lengths as number-of-quadwords (quadword == 128 bits
-> > > > > > for AArch64 and vector lengths must be multiples of quadwords)
-> > > > > > rather than number-of-bits, then an example array (which will
-> > > > > > always be a sequence) might be
-> > > > > > 
-> > > > > >  [ 8, 16, 32 ]
-> > > > > > 
-> > > > > > The user may choose a subsequence, but only through truncation,
-> > > > > > i.e. [ 8, 32 ] is not valid, but [ 8, 16 ] is.
-> > > > > > 
-> > > > > > Furthermore, different hosts may support different sequences
-> > > > > > which have the same maximum. For example, if the above sequence
-> > > > > > is for Host_A, then Host_B could be
-> > > > > > 
-> > > > > >  [ 8, 16, 24, 32 ]
-> > > > > 
-> > > > > It doesn't really matter for this discussion, but I just realized
-> > > > > that I picked bogus numbers for these examples. 32 would be too
-> > > > > big. The largest supported is 16. I probably should have just used
-> > > > > the simple [ 1, 2, 4 ] and [ 1, 2, 3, 4 ] arrays, corresponding to
-> > > > > vector lengths (in bits) 128, 256, 512 and 128, 256, 384, 512.
-> > > > 
-> > > > I'd argue differently from the ABI perspective.
-> > > > 
-> > > > If the host supports vq = [ 1,2,3,4 ], then it is entirely valid to ask
-> > > > for [ 1,2,4 ].  KVM will fail the KVM_REG_ARM64_SVE_VLS write with
-> > > > EINVAL, but I don't distinguish between a set that is not satisfiable on
-> > > > this hardware and a set that is not valid at all.  The kernel basically
-> > > > doesn't check for the latter: an architecturally invalid set will always
-> > > > not be satisfiable on the hardware.
-> > > 
-> > > I agree that 1,2,4 should be a valid set, but how do we avoid the user
-> > > attempting to select it on a platform that supports 1,2,3,4 now? Until
-> > > the hardware and KVM will allow it, then I don't think we should try
-> > > to "support" it in any way. Maybe we should name the property such that
-> > > it's clear we need to use truncation when constructing a subset now.
-> > > This would allow us to add another, more generally named, property later
-> > > when we can select nearly arbitrary subsets.
-> > > 
-> > > > 
-> > > > Ideally, userspace should not preempt this decision, in case the
-> > > > architecture becomes more flexible someday in what it can virtualise.
-> > > > 
-> > > > > > The host must support all lengths in the sequence, which means
-> > > > > > that while Host_A supports 32, since it doesn't support 24 and
-> > > > > > we can only truncate sequences, we must use either [ 8 ] or
-> > > > > > [ 8, 16 ] for a compatible sequence if we intend to migrate
-> > > > > > between the hosts.
-> > > > > > 
-> > > > > > Now to the $SUBJECT question:
-> > > > > > 
-> > > > > > My feeling is that we should require the sequence to be
-> > > > > > provided on the command line as a cpu property. Something
-> > > > > > like
-> > > > > > 
-> > > > > >   -cpu host,sve-vl-list=8:16
-> > > > 
-> > > > I can't decide whether it's more or less user-friendly to denote VL in
-> > > > terms of bytes in this kind of context.
-> > > 
-> > > I'm not sure either. Switching to my second take at quadwords this should
-> > > have been '1:2'. In bytes [ 1, 2 ] would be '16:32'.
-> > > 
-> > > > 
-> > > > Usually when I say "VL" in the kernel ABI I try to mean this.
-> > > > (KVM_REG_ARM64_SVE_VLS is a special case: here the lengths are fancily
-> > > > encoded rather than being passed as integers, so the precise unit used
-> > > > is a more abstract concept here ... or anyway, that's my excuse.
-> > > > _SVE_VQS felt odd here.)
-> > > 
-> > > My thinking is that using the number of quadwords keeps the numbers
-> > > smaller. But, if people are mostly going to want to think about vector
-> > > lengths in terms of bits, like the specification does, then maybe we
-> > > should just let the numbers be bigger: [ 128, 256, 512 ]
-> > > 
-> > > > 
-> > > > For kvmtool I went with quadwords on the command line, but only as a
-> > > > quick hack to simplify the parser slightly.
-> > > > 
-> > > > OTOH, specifying 1,2,4 on the command line is clearly less annoying and
-> > > > error-prone than 16,32,64.
-> > > > 
-> > > > Naming the option with "vq" instead of "vl" is another option, though
-> > > > "vq" is Linux terminology not endorsed by the architecture.
-> > > 
-> > > I think VL is OK as long we document the unit.
+On Thu, 18 Apr 2019 14:06:25 +0200
+David Hildenbrand <david@redhat.com> wrote:
+
+> On 18.04.19 14:01, Igor Mammedov wrote:
+> > On Thu, 18 Apr 2019 13:24:43 +0200
+> > David Hildenbrand <david@redhat.com> wrote:
+> >   
+> >> On 18.04.19 11:38, Igor Mammedov wrote:  
+> >>> On Tue, 16 Apr 2019 13:09:08 +0200
+> >>> Christian Borntraeger <borntraeger@de.ibm.com> wrote:
+> >>>     
+> >>>> This fails with more than 8TB, e.g.  "-m 9T "
+> >>>>
+> >>>> [pid 231065] ioctl(10, KVM_SET_USER_MEMORY_REGION, {slot=0, flags=0, guest_phys_addr=0, memory_size=0, userspace_addr=0x3ffc8500000}) = 0
+> >>>> [pid 231065] ioctl(10, KVM_SET_USER_MEMORY_REGION, {slot=0, flags=0, guest_phys_addr=0, memory_size=9895604649984, userspace_addr=0x3ffc8500000}) = -1 EINVAL (Invalid argument)
+> >>>>
+> >>>> seems that the 2nd memslot gets the full size (and not 9TB-size of first slot).    
+> >>>
+> >>> it turns out MemoryRegions is rendered correctly in to 2 parts (one per alias),
+> >>> but follow up flatview_simplify() collapses adjacent ranges back
+> >>> into big one.    
+> >>
+> >> That sounds dangerous. Imagine doing that at runtime (e.g. hotplugging a
+> >> DIMM), the kvm memory slot would temporarily be deleted to insert the
+> >> new, bigger one. Guest would crash. This could happen if backing memory
+> >> of two DIMMs would by pure luck be allocated side by side in user space.
+> >>  
 > > 
-> > As you wish (and that's basically where I ended up for now with kvmtool).
+> > not sure I fully get your concerns, but if you look at can_merge()
+> > it ensures that ranges belong to the same MemoryRegion.
 > > 
-> > > > 
-> > > > For kvmtool I've considered a range / filtering syntax, but I didn't
-> > > > implement it yet.
-> > > 
-> > > I think we want each VL to be explicitly listed on the command line
-> > > for the compatibility issue described above. On one host the range
-> > > [1,4] can be different than the range [1,4] on anther host, depending
-> > > on whether '3' is in there. And syntax like 1-4:-3 would be overly
-> > > complicated, IMO. So I'm inclined to just require all of them to be
-> > > listed, but of course order wouldn't matter.
-> > 
-> > Probably reasonable.  For now (and quite likely forever) the length of
-> > the list is at most 16 elements.  To avoid overengineering I stuck with
-> > a flat comma-separated list for now.
-> > 
-> > 
-> > It's worth nothing that there are two problems to be solved here: one is
-> > to specify an exact set unambiguously, which is important for migration
-> > scenarios.
-> > 
-> > The other is to be able to clamp the vector length for user convenience,
-> > but without particularly considering migration.  There's no direct way
-> > for the user to know the set of vector lengths supported by KVM today,
-> > so cooking up the right magic to go on the command line is non-trivial:
-> > you have to create a dummy vcpu and read KVM_REG_ARM64_SVE_VLS to find
-> > the host's supported set.  Or you just have to know.
+> > It's hard for me to say if flatview_simplify() works as designed,
+> > MemoryRegion code is quite complicated so I'd deffer to Paolo's
+> > opinion.
+> >   
 > 
-> Right, we'll have to query first to know what's available. libvirt will
-> do that and tools built on libvirt should help provide the user with
-> sane defaults or a relatively painless selection process. The QEMU command
-> line is primarily for developers, so they'll likely just know what they
-> want.
+> What I had in mind:
 > 
-> > 
-> > A separate max-vl option (or whatever) might be a useful alternative.
+> We have the Memory Region for memory devices (m->device_memory).
 > 
-> Yeah, we could offer this to be nicer to QEMU command line users that
-> don't intend to migrate, or don't care if a migration can fail. This
-> would be analogous to '-cpu max' which enables all available cpu
-> features. Bad for migration, but a nice shorthand if you want your
-> guest to have everything.
-
-One that printed out what was available on that host might be nice
-(and/or via a qmp query- command) for when you're trying to figure out
-what's going.
-
-Dave
-
-> Thanks,
-> drew
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+> Assume The first DIMM is created, allocating memory in the user space
+> process:
+> 
+> [0x100000000 .. 0x20000000]. It is placed at offset 0 in m->device_memory.
+> 
+> Guests starts to run, a second DIMM is hotplugged. Memory in user space
+> process is allocated (by pure luck) at:
+> 
+> [0x200000000 .. 0x30000000]. It is placed at offset 0x100000000 in
+> m->device_memory.
+> 
+> Without looking at the code, I could imagine that both might be merged
+> into a single memory slot. That is my concern. Maybe it is not valid.
+it's not. As far as I see ranges are merged only if they belong to
+the same 'mr'. So to dimms will result in 2 memory sections -> 2 KVMSlots.
