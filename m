@@ -1,31 +1,25 @@
-Received: from eggs.gnu.org ([209.51.188.92]:37826)
+Received: from eggs.gnu.org ([209.51.188.92]:39175)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1hH8bH-00087m-Sd
-	for qemu-devel@nongnu.org; Thu, 18 Apr 2019 11:05:20 -0400
+	(envelope-from <drjones@redhat.com>) id 1hH8fQ-0002w9-ED
+	for qemu-devel@nongnu.org; Thu, 18 Apr 2019 11:09:37 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1hH8bF-0007SC-KF
-	for qemu-devel@nongnu.org; Thu, 18 Apr 2019 11:05:19 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:48816)
+	(envelope-from <drjones@redhat.com>) id 1hH8fP-000148-EJ
+	for qemu-devel@nongnu.org; Thu, 18 Apr 2019 11:09:36 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:46120)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1hH8bD-0007Qe-HB
-	for qemu-devel@nongnu.org; Thu, 18 Apr 2019 11:05:15 -0400
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
-	[10.5.11.11])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id F1AD33005127
-	for <qemu-devel@nongnu.org>; Thu, 18 Apr 2019 15:05:12 +0000 (UTC)
-Date: Thu, 18 Apr 2019 17:05:07 +0200
-From: Igor Mammedov <imammedo@redhat.com>
-Message-ID: <20190418170507.7675f7e5@redhat.com>
-In-Reply-To: <20190418132329.GF25134@habkost.net>
-References: <20190418034501.5038-1-ehabkost@redhat.com>
-	<20190418132216.7a53f1ce@redhat.com>
-	<20190418132329.GF25134@habkost.net>
+	(Exim 4.71) (envelope-from <drjones@redhat.com>) id 1hH8fP-00013F-6T
+	for qemu-devel@nongnu.org; Thu, 18 Apr 2019 11:09:35 -0400
+Date: Thu, 18 Apr 2019 17:09:28 +0200
+From: Andrew Jones <drjones@redhat.com>
+Message-ID: <20190418150928.33dsbdz5m5oxvsdm@kamzik.brq.redhat.com>
+References: <20190418092841.fzrcegkbal7dpfcy@kamzik.brq.redhat.com>
+	<20190418112610.GO13773@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH] cpu: Fix crash with empty -cpu option
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+In-Reply-To: <20190418112610.GO13773@redhat.com>
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] How do we do user input bitmap properties?
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,50 +28,78 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eduardo Habkost <ehabkost@redhat.com>
-Cc: qemu-devel@nongnu.org, Cleber Rosa <crosa@redhat.com>
+To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+Cc: qemu-devel@nongnu.org, peter.maydell@linaro.org, imammedo@redhat.com, Dave.Martin@arm.com, armbru@redhat.com, dgilbert@redhat.com
 
-On Thu, 18 Apr 2019 10:23:29 -0300
-Eduardo Habkost <ehabkost@redhat.com> wrote:
+On Thu, Apr 18, 2019 at 12:26:10PM +0100, Daniel P. Berrang=E9 wrote:
+> On Thu, Apr 18, 2019 at 11:28:41AM +0200, Andrew Jones wrote:
+> > Hi all,
+> >=20
+> > First some background:
+> >=20
+> > For the userspace side of AArch64 guest SVE support we need to
+> > expose KVM's allowed vector lengths bitmap to the user and allow
+> > the user to choose a subset of that bitmap. Since bitmaps are a
+> > bit awkward to work with then we'll likely want to expose it as
+> > an array of vector lengths instead. Also, assuming we want to
+> > expose the lengths as number-of-quadwords (quadword =3D=3D 128 bits
+> > for AArch64 and vector lengths must be multiples of quadwords)
+> > rather than number-of-bits, then an example array (which will
+> > always be a sequence) might be
+> >=20
+> >  [ 8, 16, 32 ]
+> >=20
+> > The user may choose a subsequence, but only through truncation,
+> > i.e. [ 8, 32 ] is not valid, but [ 8, 16 ] is.
+> >=20
+> > Furthermore, different hosts may support different sequences
+> > which have the same maximum. For example, if the above sequence
+> > is for Host_A, then Host_B could be
+> >=20
+> >  [ 8, 16, 24, 32 ]
+> >=20
+> > The host must support all lengths in the sequence, which means
+> > that while Host_A supports 32, since it doesn't support 24 and
+> > we can only truncate sequences, we must use either [ 8 ] or
+> > [ 8, 16 ] for a compatible sequence if we intend to migrate
+> > between the hosts.
+> >=20
+> > Now to the $SUBJECT question:
+> >=20
+> > My feeling is that we should require the sequence to be
+> > provided on the command line as a cpu property. Something
+> > like
+> >=20
+> >   -cpu host,sve-vl-list=3D8:16
+> >=20
+> > (I chose ':' for the delimiter because ',' can't work, but
+> > if there's a better choice, then that's fine by me.)
+> >=20
+> > Afaict a property list like this will require a new parser,
+> > which feels a bit funny since it seems we should already
+> > have support for this type of thing somewhere in QEMU. So,
+> > the question is: do we? I see we have array properties, but
+> > I don't believe that works with the command line. Should we
+> > only use QMP for this? We already want some QMP in order to
+> > query the supported vector lengths. Maybe we should use QMP
+> > to set the selection too? But then what about command line
+> > support for developers? And if the property is on the command
+> > line then we don't have to add it to the migration stream.
+>=20
+> You should be able to use arrays from the CLI with QemuOpts by repeatin=
+g
+> the same option name many times, though I can't say it is a very
+> nice approach if you have many values to list as it gets very repetativ=
+e.
+> That's the curse of not having a good CLI syntax for non-scalar data in
+> QemuOpts & why Markus believes we should switch to JSON for the CLI too
+>=20
+>      -cpu host,sve-vl=3D8,sve-vl=3D16
 
-> On Thu, Apr 18, 2019 at 01:22:16PM +0200, Igor Mammedov wrote:
-> > On Thu, 18 Apr 2019 00:45:01 -0300
-> > Eduardo Habkost <ehabkost@redhat.com> wrote:
-> >   
-> > > Fix the following crash:
-> > > 
-> > >   $ qemu-system-x86_64 -cpu ''
-> > >   qemu-system-x86_64: qom/cpu.c:291: cpu_class_by_name: \
-> > >       Assertion `cpu_model && cc->class_by_name' failed.
-> > > 
-> > > Regression test script included.
-> > > 
-> > > Fixes: commit 99193d8f2ef5 ("cpu: drop unnecessary NULL check and cpu_common_class_by_name()")
-> > > Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
-> > > ---
-> > >  exec.c                              |  4 ++++
-> > >  tests/acceptance/empty_cpu_model.py | 19 +++++++++++++++++++
-> > >  2 files changed, 23 insertions(+)
-> > >  create mode 100644 tests/acceptance/empty_cpu_model.py
-> > > 
-> > > diff --git a/exec.c b/exec.c
-> > > index 1ca95df9d8..d816b38863 100644
-> > > --- a/exec.c
-> > > +++ b/exec.c
-> > > @@ -999,6 +999,10 @@ const char *parse_cpu_option(MachineState *machine, const char *cpu_option)
-> > >      const char *cpu_type;
-> > >  
-> > >      model_pieces = g_strsplit(cpu_option, ",", 2);
-> > > +    if (!model_pieces[0]) {
-> > > +        error_report("-cpu option cannot be empty");
-> > > +        exit(1);  
-> > 
-> > s/1/EXIT_FAILURE/  
-> 
-> Why?
-it's more descriptive in general
+This might be OK if it integrates nicely with QMP, etc, as the need for
+a more verbose command line may be better than adding another parser,
+etc. that Markus will have to rework someday :) Can you point me to a
+property that needs/uses this already so I can look at its code?
 
-> There are 753 instances of "exit(1)" in the tree, and 171
-> instances of "exit(EXIT_FAILURE)".
-Bad example in past is probably not a good justification,
-especially when adding new code (but I'm not going to argue about it).
+Thanks,
+drew
