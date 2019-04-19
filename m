@@ -2,117 +2,53 @@ Return-Path: <SRS0=rbQy=SV=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.7 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS autolearn=ham
+X-Spam-Status: No, score=-2.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A3F63C282E0
-	for <qemu-devel@archiver.kernel.org>; Fri, 19 Apr 2019 18:23:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 06927C282DA
+	for <qemu-devel@archiver.kernel.org>; Fri, 19 Apr 2019 18:41:20 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6F863222D2
-	for <qemu-devel@archiver.kernel.org>; Fri, 19 Apr 2019 18:23:10 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="NeduNxOb"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6F863222D2
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=twiddle.net
+	by mail.kernel.org (Postfix) with ESMTPS id BDA4E204FD
+	for <qemu-devel@archiver.kernel.org>; Fri, 19 Apr 2019 18:41:19 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BDA4E204FD
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=rt-rk.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:59843 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:59996 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hHYAH-0004LY-36
-	for qemu-devel@archiver.kernel.org; Fri, 19 Apr 2019 14:23:09 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:48735)
+	id 1hHYRq-0007hs-FV
+	for qemu-devel@archiver.kernel.org; Fri, 19 Apr 2019 14:41:18 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:51191)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <rth7680@gmail.com>) id 1hHY9Q-00042O-JN
-	for qemu-devel@nongnu.org; Fri, 19 Apr 2019 14:22:17 -0400
+	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1hHYQ5-0006Sj-TK
+	for qemu-devel@nongnu.org; Fri, 19 Apr 2019 14:39:31 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <rth7680@gmail.com>) id 1hHY9P-0002dT-PR
-	for qemu-devel@nongnu.org; Fri, 19 Apr 2019 14:22:16 -0400
-Received: from mail-pg1-x52c.google.com ([2607:f8b0:4864:20::52c]:46470)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <rth7680@gmail.com>) id 1hHY9P-0002ck-Gu
-	for qemu-devel@nongnu.org; Fri, 19 Apr 2019 14:22:15 -0400
-Received: by mail-pg1-x52c.google.com with SMTP id v2so559649pge.13
-	for <qemu-devel@nongnu.org>; Fri, 19 Apr 2019 11:22:14 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
-	h=sender:subject:to:cc:references:from:openpgp:autocrypt:message-id
-	:date:user-agent:mime-version:in-reply-to:content-language
-	:content-transfer-encoding;
-	bh=/Tm501/g3SBXAd2rUTgHxex51H6wSOc5e63Dn2ZJ7vM=;
-	b=NeduNxOboazOR4t/lwfdUExCyt4GD6gzpI1q3PAqqLPlb3zJJmYI0/cCxXukkn3f9R
-	Dhqem53Qo0WSJcYRLLic4r6Zvs+JuO0Txjb5Fn5G8KSU02otJMFJrE0I1ww6aLQ9aJCr
-	53peI1gIUhqhBizzvW5Ay4ZUBgN6moKadb8T66CJ5fIxi2KMxHgG0n52a4aAqibg9qHF
-	JqAQJ5y6okQpkpIFPrYRtwP314jxBFSEAUc9arwR5WY10iGXVtytfSAg/ZhFFu37Isyt
-	WaEo17RUCAtoT67bSw7hFTkF97AwfmiqkOIB7BZocfaBVem3WVOt6gJ0m17Z3JKvVq/N
-	/OOA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=1e100.net; s=20161025;
-	h=x-gm-message-state:sender:subject:to:cc:references:from:openpgp
-	:autocrypt:message-id:date:user-agent:mime-version:in-reply-to
-	:content-language:content-transfer-encoding;
-	bh=/Tm501/g3SBXAd2rUTgHxex51H6wSOc5e63Dn2ZJ7vM=;
-	b=TbMs9VrVzf5LgdAMB7FWAxJdzzk2pitIOyrbS4w3XDyZQefaolMXuBVocP3nQhop3x
-	+ILt1vSFCPIPq5YLGmUH3Jsn/e2Mm61738MC8zsVWNt5VdRVZovaZwGT9gzlYlSHXXsN
-	4TpQ2id0lG3asHPJbFISK/JgFPrIdQ2+sHGkWhqTvs0bFSsDWSy72VU83thGAqSqVuXf
-	QNW2960VgdNjcVbOv/Jtp4K6xQGHDJ//CuXUWufSkhEg6J1S+tPnk7EkCBpX7A1imXlW
-	ifjT9sT4Mj3F6xf7MAjAOa3w4Zf1quwqfS8I4MYkSMMmaWE5m2c5ZJZV8h7Gfnl6dp7r
-	ui0Q==
-X-Gm-Message-State: APjAAAXV9uHLFriCvOMWCiWeE8wUkWg7qZBJ3u88+aEFD6EylRQly1Nk
-	fYhRBgVxi7lCMyQyGseSJyE=
-X-Google-Smtp-Source: APXvYqz7Kx00FvckzFclS3oY03m81h9r0WKOMpd5CZILAn35EWMnNWP7h04lrtH5S/a1lMNkyA9ADg==
-X-Received: by 2002:a62:12d0:: with SMTP id 77mr5494465pfs.15.1555698133244;
-	Fri, 19 Apr 2019 11:22:13 -0700 (PDT)
-Received: from [172.20.101.138] (rrcs-66-91-136-155.west.biz.rr.com.
-	[66.91.136.155]) by smtp.googlemail.com with ESMTPSA id
-	y19sm8110935pfn.164.2019.04.19.11.22.10
-	(version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-	Fri, 19 Apr 2019 11:22:11 -0700 (PDT)
-To: G 3 <programmingkidx@gmail.com>, Thomas Huth <thuth@redhat.com>
-References: <20190418224706.14014-1-programmingkidx@gmail.com>
-	<723372ae-a37a-d7cd-098f-452c7513ce8a@redhat.com>
-	<4B73E5E6-2129-43B8-A35E-0CF7DCAE163B@gmail.com>
-From: Richard Henderson <rth@twiddle.net>
-Openpgp: preference=signencrypt
-Autocrypt: addr=rth@twiddle.net; prefer-encrypt=mutual; keydata=
-	mQENBFGuLC8BCADcAoWcnW9lTsDMzbO3MBU+KbiGaj5JPatEUscRDkQYM2fyNjJp2tIWDK5a
-	n4yngeXB3eX61WbYR3QraRK8mlYLGxyAdHMEQfPipbqf3TmN043fssT2bc82ApJcs1zvLYgI
-	rhMht7Dck7A0wNC1jo+ZjVVFig5gDTN7gOzaAdBtV8tVNUddwkLzzaGpfihhSD6U46NdqKOG
-	Wlnn6TrkMy0QGdQ5NaXHkRlUjnnUTSW/nKfoxD+EI+A9V4sYOd8mc/TL4aJh/i/AiU57eLbo
-	n17uQI6/VTWDUWl8USiz4x9c8vmqlywLx00tAFxxoRWqk4KVJlj+Sh0up/D/sJ+vPpgBABEB
-	AAG0I1JpY2hhcmQgSGVuZGVyc29uIDxydGhAdHdpZGRsZS5uZXQ+iQFBBBMBAgArAhsDBgsJ
-	CAcDAgYVCAIJCgsEFgIDAQIeAQIXgAUJC7UHogUCWaDNVgIZAQAKCRCtEnDMTdAnm9N5CADO
-	cB8F/SudJ72IupxQf40hbJdBK176+gb3sHMsixyLtrU59lee+lIM1OZmlNjsnCYmiSnbA5ks
-	Q7p0HfO7DgdmfLzcK6xsHZukqSZy5LByw348Y913ZyjOrJZFdPP7kDg1MnqRqH4+3ZdzxV4y
-	eYBWFU9GYMIF06JbUubossOOO4ArNVZbnIPu8Vn2tDZVVqsCBqkoCSBMj519xrvyOu5z4mHS
-	LkCglXmVDOXMbqLuNAC3rfNXSnyM4hYkLUyfALJlAAy1Ro+jUqYhu7XUFV/MiwRuFMh5GbtY
-	Urkx7tqsWQXLT3GeDk/LqvpWJQwk4cHHckYjRih+70CHIenm81PVuQENBFGuLC8BCACyEx3x
-	94HIkTX0CHu2sA0w75+h9wuoA8ggJ7+S4ri0y2YsijWad5TTt6z6MMiqxk9kSA5bppaj4HXh
-	86hBF/dWCtMpNr3Rb8FNOKyeA/qkYHVD6HiAiw9c6D8Dr9hWmOk3/HSmGrNURxeUFOckDXsv
-	I+yGGKBNshj59j7QZr7ZiuIi2rWlBL8dFN/OWa/o3x7HKsE4k6K8ngwvCKP/QbDLwLLBOWH+
-	VEUtpyeyxTr3OJ47ECTxdYvXoAV2iJaKr+6doVQiiR5eVFiMYrUPUECJeolOCwqc/JlWE18L
-	+PCAFaW1H+/mpPVfSpN4wnkJ5cQiQVB41IaCM4p20iRzx7ZJABEBAAGJASUEGAECAA8CGwwF
-	AlmgzYEFCQu1CEoACgkQrRJwzE3QJ5s7rggAwABzDAGrZ6uWsMxg5PeiiAYPy6LBnCBJSpB5
-	Tfy5jH8QTmLfXW+u4Ib4sWXG7PYNR7sIrtqUHjRqXLVXrSnBX9ASGcYw/Xil45khW6LsRpO1
-	prHv9gkwQfa6fTiWXVfSfm2Nant6u02q+MaYtQpCVTiz/9ki4FfftUwUHFLU0MhIQogjd11y
-	/E08RJsqBwaHQdt14PwU1HphDOzSkhOXRXQLSd3ysyeGUXvL+gqQoXl5XYdvk8IId4PoJRo4
-	jcyJ4VbnldvXh5gdGhFA/f9JgkLk9tPW+C3wNtNWyRUq8azR9hF2fg2HJUf4IXQlIu8OOgh1
-	VcROBqvtH3ecaIL9iw==
-Message-ID: <58c00451-f216-610d-4c9c-7437fc07c5bc@twiddle.net>
-Date: Fri, 19 Apr 2019 08:22:08 -1000
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
-	Thunderbird/60.6.1
-MIME-Version: 1.0
-In-Reply-To: <4B73E5E6-2129-43B8-A35E-0CF7DCAE163B@gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
-	recognized.
-X-Received-From: 2607:f8b0:4864:20::52c
-Subject: Re: [Qemu-devel] [PATCH] configure: Change capstone's default state
- to disabled
+	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1hHYPt-0003wx-AY
+	for qemu-devel@nongnu.org; Fri, 19 Apr 2019 14:39:19 -0400
+Received: from mx2.rt-rk.com ([89.216.37.149]:56042 helo=mail.rt-rk.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <aleksandar.markovic@rt-rk.com>)
+	id 1hHYPp-0003Lo-DO
+	for qemu-devel@nongnu.org; Fri, 19 Apr 2019 14:39:15 -0400
+Received: from localhost (localhost [127.0.0.1])
+	by mail.rt-rk.com (Postfix) with ESMTP id 6EBB61A416F;
+	Fri, 19 Apr 2019 20:38:09 +0200 (CEST)
+X-Virus-Scanned: amavisd-new at rt-rk.com
+Received: from rtrkw774-lin.domain.local (rtrkw774-lin.domain.local
+	[10.10.13.43])
+	by mail.rt-rk.com (Postfix) with ESMTPSA id 48B8D1A241E;
+	Fri, 19 Apr 2019 20:38:09 +0200 (CEST)
+From: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>
+To: qemu-devel@nongnu.org
+Date: Fri, 19 Apr 2019 20:37:56 +0200
+Message-Id: <1555699081-24577-1-git-send-email-aleksandar.markovic@rt-rk.com>
+X-Mailer: git-send-email 2.7.4
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x
+X-Received-From: 89.216.37.149
+Subject: [Qemu-devel] [PATCH 0/5] target/mips: Consolidate MIPS TCG tests
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -124,29 +60,237 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: peter.maydell@linaro.org, qemu-devel@nongnu.org
+Cc: arikalo@wavecomp.com, amarkovic@wavecomp.com, aurelien@aurel32.net
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190419182208.AHRR1WaKV7E7KyBsqZueML79wKyTjya6b43EgxU-hBs@z>
+Content-Type: text/plain; charset="UTF-8"
+Message-ID: <20190419183756.pXWiUiW9ktd5RJQR8ZXFIbylkH-_CEo083WTngESnnI@z>
 
-On 4/19/19 3:44 AM, G 3 wrote:
-> 
-> Here is the error message I see when compiling QEMU:
-> 
-> CHK version_gen.h
-> make[1]: *** No rule to make target
-> `/Users/John/qemu-git/capstone/libcapstone.a'.  Stop.
-> make: *** [subdir-capstone] Error 2
+From: Aleksandar Markovic <amarkovic@wavecomp.com>
 
-You are configuring with --static?
+This series contains a number of fixes, improvements and amendments
+related to MIPS TCG tests. It is focused on improving existing tests,
+even though some small number of tests are added.
 
-I've seen this before myself -- IMO it's broken distro packaging, in that the
-shipped pkgconfig/capstone.pc claims static library support, but the static
-library itself wasn't shipped.
+Aleksandar Markovic (3):
+  target/mips: Amend and cleanup MSA TCG tests
+  tests/tcg: target/mips: Add tests for MSA bit set instructions
+  tests/tcg: target/mips: Add README for MSA tests
 
-We should probably work around this in configure, and report the packaging bug.
+Mateja Marjanovic (2):
+  target/mips: Make the results of DIV_<U|S>.<B|H|W|D> the same as on
+    hardware
+  target/mips: Make the results of MOD_<U|S>.<B|H|W|D> the same as on
+    hardware
 
+ target/mips/msa_helper.c                           |   9 +-
+ tests/tcg/mips/include/test_utils_128.h            |   2 +-
+ tests/tcg/mips/include/wrappers_msa.h              | 147 ++++-
+ tests/tcg/mips/user/ase/msa/README                 | 639 +++++++++++++++++++++
+ .../mips/user/ase/msa/bit-set/test_msa_bclr_b.c    | 153 +++++
+ .../mips/user/ase/msa/bit-set/test_msa_bclr_d.c    | 153 +++++
+ .../mips/user/ase/msa/bit-set/test_msa_bclr_h.c    | 153 +++++
+ .../mips/user/ase/msa/bit-set/test_msa_bclr_w.c    | 153 +++++
+ .../mips/user/ase/msa/bit-set/test_msa_bneg_b.c    | 153 +++++
+ .../mips/user/ase/msa/bit-set/test_msa_bneg_d.c    | 153 +++++
+ .../mips/user/ase/msa/bit-set/test_msa_bneg_h.c    | 153 +++++
+ .../mips/user/ase/msa/bit-set/test_msa_bneg_w.c    | 153 +++++
+ .../mips/user/ase/msa/bit-set/test_msa_bset_b.c    | 153 +++++
+ .../mips/user/ase/msa/bit-set/test_msa_bset_d.c    | 153 +++++
+ .../mips/user/ase/msa/bit-set/test_msa_bset_h.c    | 153 +++++
+ .../mips/user/ase/msa/bit-set/test_msa_bset_w.c    | 153 +++++
+ .../mips/user/ase/msa/int-add/test_msa_add_a_b.c   |   4 +
+ .../mips/user/ase/msa/int-add/test_msa_add_a_d.c   |   4 +
+ .../mips/user/ase/msa/int-add/test_msa_add_a_h.c   |   4 +
+ .../mips/user/ase/msa/int-add/test_msa_add_a_w.c   |   4 +
+ .../mips/user/ase/msa/int-add/test_msa_adds_a_b.c  |   4 +
+ .../mips/user/ase/msa/int-add/test_msa_adds_a_d.c  |   4 +
+ .../mips/user/ase/msa/int-add/test_msa_adds_a_h.c  |   4 +
+ .../mips/user/ase/msa/int-add/test_msa_adds_a_w.c  |   4 +
+ .../mips/user/ase/msa/int-add/test_msa_adds_s_b.c  |   4 +
+ .../mips/user/ase/msa/int-add/test_msa_adds_s_d.c  |   4 +
+ .../mips/user/ase/msa/int-add/test_msa_adds_s_h.c  |   4 +
+ .../mips/user/ase/msa/int-add/test_msa_adds_s_w.c  |   4 +
+ .../mips/user/ase/msa/int-add/test_msa_adds_u_b.c  |   4 +
+ .../mips/user/ase/msa/int-add/test_msa_adds_u_d.c  |   4 +
+ .../mips/user/ase/msa/int-add/test_msa_adds_u_h.c  |   4 +
+ .../mips/user/ase/msa/int-add/test_msa_adds_u_w.c  |   4 +
+ .../mips/user/ase/msa/int-add/test_msa_addv_b.c    |   4 +
+ .../mips/user/ase/msa/int-add/test_msa_addv_d.c    |   4 +
+ .../mips/user/ase/msa/int-add/test_msa_addv_h.c    |   4 +
+ .../mips/user/ase/msa/int-add/test_msa_addv_w.c    |   4 +
+ .../mips/user/ase/msa/int-add/test_msa_hadd_s_d.c  |   4 +
+ .../mips/user/ase/msa/int-add/test_msa_hadd_s_h.c  |   4 +
+ .../mips/user/ase/msa/int-add/test_msa_hadd_s_w.c  |   4 +
+ .../mips/user/ase/msa/int-add/test_msa_hadd_u_d.c  |   4 +
+ .../mips/user/ase/msa/int-add/test_msa_hadd_u_h.c  |   4 +
+ .../mips/user/ase/msa/int-add/test_msa_hadd_u_w.c  |   4 +
+ .../user/ase/msa/int-average/test_msa_ave_s_b.c    |  12 +-
+ .../user/ase/msa/int-average/test_msa_ave_s_d.c    |  12 +-
+ .../user/ase/msa/int-average/test_msa_ave_s_h.c    |  12 +-
+ .../user/ase/msa/int-average/test_msa_ave_s_w.c    |  12 +-
+ .../user/ase/msa/int-average/test_msa_ave_u_b.c    |  12 +-
+ .../user/ase/msa/int-average/test_msa_ave_u_d.c    |  12 +-
+ .../user/ase/msa/int-average/test_msa_ave_u_h.c    |  12 +-
+ .../user/ase/msa/int-average/test_msa_ave_u_w.c    |  12 +-
+ .../user/ase/msa/int-average/test_msa_aver_s_b.c   |  12 +-
+ .../user/ase/msa/int-average/test_msa_aver_s_d.c   |  12 +-
+ .../user/ase/msa/int-average/test_msa_aver_s_h.c   |  12 +-
+ .../user/ase/msa/int-average/test_msa_aver_s_w.c   |  12 +-
+ .../user/ase/msa/int-average/test_msa_aver_u_b.c   |  12 +-
+ .../user/ase/msa/int-average/test_msa_aver_u_d.c   |  12 +-
+ .../user/ase/msa/int-average/test_msa_aver_u_h.c   |  12 +-
+ .../user/ase/msa/int-average/test_msa_aver_u_w.c   |  12 +-
+ .../mips/user/ase/msa/int-compare/test_msa_ceq_b.c |   2 +
+ .../mips/user/ase/msa/int-compare/test_msa_ceq_d.c |   2 +
+ .../mips/user/ase/msa/int-compare/test_msa_ceq_h.c |   2 +
+ .../mips/user/ase/msa/int-compare/test_msa_ceq_w.c |   2 +
+ .../user/ase/msa/int-compare/test_msa_cle_s_b.c    |   2 +
+ .../user/ase/msa/int-compare/test_msa_cle_s_d.c    |   2 +
+ .../user/ase/msa/int-compare/test_msa_cle_s_h.c    |   2 +
+ .../user/ase/msa/int-compare/test_msa_cle_s_w.c    |   2 +
+ .../user/ase/msa/int-compare/test_msa_cle_u_b.c    |   2 +
+ .../user/ase/msa/int-compare/test_msa_cle_u_d.c    |   2 +
+ .../user/ase/msa/int-compare/test_msa_cle_u_h.c    |   2 +
+ .../user/ase/msa/int-compare/test_msa_cle_u_w.c    |   2 +
+ .../user/ase/msa/int-compare/test_msa_clt_s_b.c    |   2 +
+ .../user/ase/msa/int-compare/test_msa_clt_s_d.c    |   2 +
+ .../user/ase/msa/int-compare/test_msa_clt_s_h.c    |   2 +
+ .../user/ase/msa/int-compare/test_msa_clt_s_w.c    |   2 +
+ .../user/ase/msa/int-compare/test_msa_clt_u_b.c    |   2 +
+ .../user/ase/msa/int-compare/test_msa_clt_u_d.c    |   2 +
+ .../user/ase/msa/int-compare/test_msa_clt_u_h.c    |   2 +
+ .../user/ase/msa/int-compare/test_msa_clt_u_w.c    |   2 +
+ .../user/ase/msa/int-divide/test_msa_div_s_b.c     |  12 +-
+ .../user/ase/msa/int-divide/test_msa_div_s_d.c     |  12 +-
+ .../user/ase/msa/int-divide/test_msa_div_s_h.c     |  12 +-
+ .../user/ase/msa/int-divide/test_msa_div_s_w.c     |  12 +-
+ .../user/ase/msa/int-divide/test_msa_div_u_b.c     |  12 +-
+ .../user/ase/msa/int-divide/test_msa_div_u_d.c     |  12 +-
+ .../user/ase/msa/int-divide/test_msa_div_u_h.c     |  12 +-
+ .../user/ase/msa/int-divide/test_msa_div_u_w.c     |  12 +-
+ .../ase/msa/int-dot-product/test_msa_dotp_s_d.c    |  12 +-
+ .../ase/msa/int-dot-product/test_msa_dotp_s_h.c    |  12 +-
+ .../ase/msa/int-dot-product/test_msa_dotp_s_w.c    |  12 +-
+ .../ase/msa/int-dot-product/test_msa_dotp_u_d.c    |  12 +-
+ .../ase/msa/int-dot-product/test_msa_dotp_u_h.c    |  12 +-
+ .../ase/msa/int-dot-product/test_msa_dotp_u_w.c    |  12 +-
+ .../user/ase/msa/int-max-min/test_msa_max_a_b.c    |   2 +
+ .../user/ase/msa/int-max-min/test_msa_max_a_d.c    |   2 +
+ .../user/ase/msa/int-max-min/test_msa_max_a_h.c    |   2 +
+ .../user/ase/msa/int-max-min/test_msa_max_a_w.c    |   2 +
+ .../user/ase/msa/int-max-min/test_msa_max_s_b.c    |   2 +
+ .../user/ase/msa/int-max-min/test_msa_max_s_d.c    |   2 +
+ .../user/ase/msa/int-max-min/test_msa_max_s_h.c    |   2 +
+ .../user/ase/msa/int-max-min/test_msa_max_s_w.c    |   2 +
+ .../user/ase/msa/int-max-min/test_msa_max_u_b.c    |   2 +
+ .../user/ase/msa/int-max-min/test_msa_max_u_d.c    |   2 +
+ .../user/ase/msa/int-max-min/test_msa_max_u_h.c    |   2 +
+ .../user/ase/msa/int-max-min/test_msa_max_u_w.c    |   2 +
+ .../user/ase/msa/int-max-min/test_msa_min_a_b.c    |   2 +
+ .../user/ase/msa/int-max-min/test_msa_min_a_d.c    |   2 +
+ .../user/ase/msa/int-max-min/test_msa_min_a_h.c    |   2 +
+ .../user/ase/msa/int-max-min/test_msa_min_a_w.c    |   2 +
+ .../user/ase/msa/int-max-min/test_msa_min_s_b.c    |   2 +
+ .../user/ase/msa/int-max-min/test_msa_min_s_d.c    |   2 +
+ .../user/ase/msa/int-max-min/test_msa_min_s_h.c    |   2 +
+ .../user/ase/msa/int-max-min/test_msa_min_s_w.c    |   2 +
+ .../user/ase/msa/int-max-min/test_msa_min_u_b.c    |   2 +
+ .../user/ase/msa/int-max-min/test_msa_min_u_d.c    |   2 +
+ .../user/ase/msa/int-max-min/test_msa_min_u_h.c    |   2 +
+ .../user/ase/msa/int-max-min/test_msa_min_u_w.c    |   2 +
+ .../user/ase/msa/int-modulo/test_msa_mod_s_b.c     | 155 +++++
+ .../user/ase/msa/int-modulo/test_msa_mod_s_d.c     | 155 +++++
+ .../user/ase/msa/int-modulo/test_msa_mod_s_h.c     | 155 +++++
+ .../user/ase/msa/int-modulo/test_msa_mod_s_w.c     | 155 +++++
+ .../user/ase/msa/int-modulo/test_msa_mod_u_b.c     | 155 +++++
+ .../user/ase/msa/int-modulo/test_msa_mod_u_d.c     | 155 +++++
+ .../user/ase/msa/int-modulo/test_msa_mod_u_h.c     | 155 +++++
+ .../user/ase/msa/int-modulo/test_msa_mod_u_w.c     | 155 +++++
+ .../user/ase/msa/int-multiply/test_msa_mul_q_h.c   |  12 +-
+ .../user/ase/msa/int-multiply/test_msa_mul_q_w.c   |  12 +-
+ .../user/ase/msa/int-multiply/test_msa_mulr_q_h.c  |  12 +-
+ .../user/ase/msa/int-multiply/test_msa_mulr_q_w.c  |  12 +-
+ .../user/ase/msa/int-multiply/test_msa_mulv_b.c    |  12 +-
+ .../user/ase/msa/int-multiply/test_msa_mulv_d.c    |  12 +-
+ .../user/ase/msa/int-multiply/test_msa_mulv_h.c    |  12 +-
+ .../user/ase/msa/int-multiply/test_msa_mulv_w.c    |  12 +-
+ .../user/ase/msa/int-subtract/test_msa_asub_s_b.c  | 155 +++++
+ .../user/ase/msa/int-subtract/test_msa_asub_s_d.c  | 155 +++++
+ .../user/ase/msa/int-subtract/test_msa_asub_s_h.c  | 155 +++++
+ .../user/ase/msa/int-subtract/test_msa_asub_s_w.c  | 155 +++++
+ .../user/ase/msa/int-subtract/test_msa_asub_u_b.c  | 155 +++++
+ .../user/ase/msa/int-subtract/test_msa_asub_u_d.c  | 155 +++++
+ .../user/ase/msa/int-subtract/test_msa_asub_u_h.c  | 155 +++++
+ .../user/ase/msa/int-subtract/test_msa_asub_u_w.c  | 155 +++++
+ .../user/ase/msa/int-subtract/test_msa_hsub_s_d.c  | 155 +++++
+ .../user/ase/msa/int-subtract/test_msa_hsub_s_h.c  | 155 +++++
+ .../user/ase/msa/int-subtract/test_msa_hsub_s_w.c  | 155 +++++
+ .../user/ase/msa/int-subtract/test_msa_hsub_u_d.c  | 155 +++++
+ .../user/ase/msa/int-subtract/test_msa_hsub_u_h.c  | 155 +++++
+ .../user/ase/msa/int-subtract/test_msa_hsub_u_w.c  | 155 +++++
+ .../user/ase/msa/int-subtract/test_msa_subs_s_b.c  |  12 +-
+ .../user/ase/msa/int-subtract/test_msa_subs_s_d.c  |  12 +-
+ .../user/ase/msa/int-subtract/test_msa_subs_s_h.c  |  12 +-
+ .../user/ase/msa/int-subtract/test_msa_subs_s_w.c  |  12 +-
+ .../user/ase/msa/int-subtract/test_msa_subs_u_b.c  |  12 +-
+ .../user/ase/msa/int-subtract/test_msa_subs_u_d.c  |  12 +-
+ .../user/ase/msa/int-subtract/test_msa_subs_u_h.c  |  12 +-
+ .../user/ase/msa/int-subtract/test_msa_subs_u_w.c  |  12 +-
+ .../ase/msa/int-subtract/test_msa_subsus_u_b.c     |  12 +-
+ .../ase/msa/int-subtract/test_msa_subsus_u_d.c     |  12 +-
+ .../ase/msa/int-subtract/test_msa_subsus_u_h.c     |  12 +-
+ .../ase/msa/int-subtract/test_msa_subsus_u_w.c     |  12 +-
+ .../ase/msa/int-subtract/test_msa_subsuu_s_b.c     |  12 +-
+ .../ase/msa/int-subtract/test_msa_subsuu_s_d.c     |  12 +-
+ .../ase/msa/int-subtract/test_msa_subsuu_s_h.c     |  12 +-
+ .../ase/msa/int-subtract/test_msa_subsuu_s_w.c     |  12 +-
+ .../user/ase/msa/int-subtract/test_msa_subv_b.c    |  12 +-
+ .../user/ase/msa/int-subtract/test_msa_subv_d.c    |  12 +-
+ .../user/ase/msa/int-subtract/test_msa_subv_h.c    |  12 +-
+ .../user/ase/msa/int-subtract/test_msa_subv_w.c    |  10 +-
+ .../user/ase/msa/interleave/test_msa_ilvev_b.c     |   2 +-
+ .../user/ase/msa/interleave/test_msa_ilvev_d.c     |   2 +-
+ .../user/ase/msa/interleave/test_msa_ilvev_h.c     |   2 +-
+ 169 files changed, 6691 insertions(+), 244 deletions(-)
+ create mode 100644 tests/tcg/mips/user/ase/msa/README
+ create mode 100644 tests/tcg/mips/user/ase/msa/bit-set/test_msa_bclr_b.c
+ create mode 100644 tests/tcg/mips/user/ase/msa/bit-set/test_msa_bclr_d.c
+ create mode 100644 tests/tcg/mips/user/ase/msa/bit-set/test_msa_bclr_h.c
+ create mode 100644 tests/tcg/mips/user/ase/msa/bit-set/test_msa_bclr_w.c
+ create mode 100644 tests/tcg/mips/user/ase/msa/bit-set/test_msa_bneg_b.c
+ create mode 100644 tests/tcg/mips/user/ase/msa/bit-set/test_msa_bneg_d.c
+ create mode 100644 tests/tcg/mips/user/ase/msa/bit-set/test_msa_bneg_h.c
+ create mode 100644 tests/tcg/mips/user/ase/msa/bit-set/test_msa_bneg_w.c
+ create mode 100644 tests/tcg/mips/user/ase/msa/bit-set/test_msa_bset_b.c
+ create mode 100644 tests/tcg/mips/user/ase/msa/bit-set/test_msa_bset_d.c
+ create mode 100644 tests/tcg/mips/user/ase/msa/bit-set/test_msa_bset_h.c
+ create mode 100644 tests/tcg/mips/user/ase/msa/bit-set/test_msa_bset_w.c
+ create mode 100644 tests/tcg/mips/user/ase/msa/int-modulo/test_msa_mod_s_b.c
+ create mode 100644 tests/tcg/mips/user/ase/msa/int-modulo/test_msa_mod_s_d.c
+ create mode 100644 tests/tcg/mips/user/ase/msa/int-modulo/test_msa_mod_s_h.c
+ create mode 100644 tests/tcg/mips/user/ase/msa/int-modulo/test_msa_mod_s_w.c
+ create mode 100644 tests/tcg/mips/user/ase/msa/int-modulo/test_msa_mod_u_b.c
+ create mode 100644 tests/tcg/mips/user/ase/msa/int-modulo/test_msa_mod_u_d.c
+ create mode 100644 tests/tcg/mips/user/ase/msa/int-modulo/test_msa_mod_u_h.c
+ create mode 100644 tests/tcg/mips/user/ase/msa/int-modulo/test_msa_mod_u_w.c
+ create mode 100644 tests/tcg/mips/user/ase/msa/int-subtract/test_msa_asub_s_b.c
+ create mode 100644 tests/tcg/mips/user/ase/msa/int-subtract/test_msa_asub_s_d.c
+ create mode 100644 tests/tcg/mips/user/ase/msa/int-subtract/test_msa_asub_s_h.c
+ create mode 100644 tests/tcg/mips/user/ase/msa/int-subtract/test_msa_asub_s_w.c
+ create mode 100644 tests/tcg/mips/user/ase/msa/int-subtract/test_msa_asub_u_b.c
+ create mode 100644 tests/tcg/mips/user/ase/msa/int-subtract/test_msa_asub_u_d.c
+ create mode 100644 tests/tcg/mips/user/ase/msa/int-subtract/test_msa_asub_u_h.c
+ create mode 100644 tests/tcg/mips/user/ase/msa/int-subtract/test_msa_asub_u_w.c
+ create mode 100644 tests/tcg/mips/user/ase/msa/int-subtract/test_msa_hsub_s_d.c
+ create mode 100644 tests/tcg/mips/user/ase/msa/int-subtract/test_msa_hsub_s_h.c
+ create mode 100644 tests/tcg/mips/user/ase/msa/int-subtract/test_msa_hsub_s_w.c
+ create mode 100644 tests/tcg/mips/user/ase/msa/int-subtract/test_msa_hsub_u_d.c
+ create mode 100644 tests/tcg/mips/user/ase/msa/int-subtract/test_msa_hsub_u_h.c
+ create mode 100644 tests/tcg/mips/user/ase/msa/int-subtract/test_msa_hsub_u_w.c
 
-r~
+-- 
+2.7.4
+
 
