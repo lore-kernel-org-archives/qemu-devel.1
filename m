@@ -1,22 +1,25 @@
-Received: from eggs.gnu.org ([209.51.188.92]:45439)
+Received: from eggs.gnu.org ([209.51.188.92]:46762)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1hHNb4-00051n-Ma
-	for qemu-devel@nongnu.org; Fri, 19 Apr 2019 03:06:07 -0400
+	(envelope-from <thuth@redhat.com>) id 1hHNff-00062e-Ff
+	for qemu-devel@nongnu.org; Fri, 19 Apr 2019 03:10:52 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1hHNb3-00081A-PE
-	for qemu-devel@nongnu.org; Fri, 19 Apr 2019 03:06:06 -0400
-References: <20190418111019.4080-1-thuth@redhat.com>
-	<6bd7dd96-cd2c-22aa-5533-ae341f942a5c@redhat.com>
+	(envelope-from <thuth@redhat.com>) id 1hHNfe-0001ho-Gd
+	for qemu-devel@nongnu.org; Fri, 19 Apr 2019 03:10:51 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:55500)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1hHNfe-0001hQ-7Z
+	for qemu-devel@nongnu.org; Fri, 19 Apr 2019 03:10:50 -0400
+References: <20190418224706.14014-1-programmingkidx@gmail.com>
 From: Thomas Huth <thuth@redhat.com>
-Message-ID: <0294bc60-d221-653b-ed28-c8392a767e41@redhat.com>
-Date: Fri, 19 Apr 2019 09:05:54 +0200
+Message-ID: <723372ae-a37a-d7cd-098f-452c7513ce8a@redhat.com>
+Date: Fri, 19 Apr 2019 09:10:46 +0200
 MIME-Version: 1.0
-In-Reply-To: <6bd7dd96-cd2c-22aa-5533-ae341f942a5c@redhat.com>
+In-Reply-To: <20190418224706.14014-1-programmingkidx@gmail.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH for-4.1] hw/usb/hcd-ohci: Move PCI-related
- code into a separate file
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH] configure: Change capstone's default state
+ to disabled
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,33 +28,38 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>, qemu-devel@nongnu.org, Gerd Hoffmann <kraxel@redhat.com>
-Cc: qemu-arm@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Yang Zhong <yang.zhong@intel.com>
+To: John Arbuckle <programmingkidx@gmail.com>, qemu-devel@nongnu.org
+Cc: peter.maydell@linaro.org, Richard Henderson <rth@twiddle.net>
 
-On 18/04/2019 14.35, Philippe Mathieu-Daud=C3=A9 wrote:
-> Hi Thomas,
->=20
-> On 4/18/19 1:10 PM, Thomas Huth wrote:
->> Some machines (like the pxa2xx-based ARM machines) only have a sysbus
->> OHCI controller, but no PCI. With the new Kconfig-style build system,
->> it will soon be possible to create QEMU binaries that only contain
->> such PCI-less machines. However, the two OHCI controllers, for sysbus
->> and for PCI, are currently both located in one file, so the PCI code
->> is still required for linking here. Move the OHCI-PCI device code
->> into a separate file, so that it is possible to use the sysbus OHCI
->> device also without the PCI dependency.
->>
->> Apart from moving code to a new file (and a new header), this patch
->> might also fix one subtle bug: The ohci_die() function always assumed
->> to be running with a OHCI-PCI controller and called some PCI-specific
->> functions - but if I got the code right, ohci_die() might also get
->> called for the sysbus-OHCI device, so it likely failed in that case.
->> I've changed this part of the code now, so that there are two ohci_die=
-()
->> implementations now, one for sysbus and one for PCI.
->=20
-> Can this be done in 2 patches?
+On 19/04/2019 00.47, John Arbuckle wrote:
+> Capstone is not necessary in order to use QEMU. Disable it by default.
+> This will save the user the pain of having to figure why QEMU isn't
+> building when this library is missing.
+> 
+> Signed-off-by: John Arbuckle <programmingkidx@gmail.com>
+> ---
+>  configure | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+> diff --git a/configure b/configure
+> index 1c563a7027..77d7967f92 100755
+> --- a/configure
+> +++ b/configure
+> @@ -433,7 +433,7 @@ opengl_dmabuf="no"
+>  cpuid_h="no"
+>  avx2_opt=""
+>  zlib="yes"
+> -capstone=""
+> +capstone="no"
+>  lzo=""
+>  snappy=""
+>  bzip2=""
 
-Yeah, maybe that's cleaner... I'll send a v2...
+AFAIK we ship capstone as a submodule, so how can this be missing? Also,
+our philosophy is to keep everything enabled by default if possible, so
+that the code paths don't bitrot. Thus I don't think that disabling this
+by default is a good idea. ... so if you've got a problem here, there
+must be another solution (e.g. is the system capstone detection not
+working right on your system?).
 
  Thomas
