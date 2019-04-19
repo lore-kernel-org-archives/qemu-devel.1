@@ -1,31 +1,31 @@
-Received: from eggs.gnu.org ([209.51.188.92]:41340)
+Received: from eggs.gnu.org ([209.51.188.92]:41342)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1hHI89-0006yO-P9
+	(envelope-from <bounces@canonical.com>) id 1hHI8A-0006yQ-1T
 	for qemu-devel@nongnu.org; Thu, 18 Apr 2019 21:15:55 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1hHI88-000134-Cv
-	for qemu-devel@nongnu.org; Thu, 18 Apr 2019 21:15:53 -0400
-Received: from indium.canonical.com ([91.189.90.7]:60110)
+	(envelope-from <bounces@canonical.com>) id 1hHI88-000139-DA
+	for qemu-devel@nongnu.org; Thu, 18 Apr 2019 21:15:54 -0400
+Received: from indium.canonical.com ([91.189.90.7]:60082)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1hHI87-00011j-P0
+	id 1hHI87-000113-P1
 	for qemu-devel@nongnu.org; Thu, 18 Apr 2019 21:15:52 -0400
 Received: from loganberry.canonical.com ([91.189.90.37])
 	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1hHI85-0007p5-TA
-	for <qemu-devel@nongnu.org>; Fri, 19 Apr 2019 01:15:49 +0000
+	id 1hHI84-0007yP-PH
+	for <qemu-devel@nongnu.org>; Fri, 19 Apr 2019 01:15:48 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id D9EB22E802D
-	for <qemu-devel@nongnu.org>; Fri, 19 Apr 2019 01:15:49 +0000 (UTC)
+	by loganberry.canonical.com (Postfix) with ESMTP id BB5232E802D
+	for <qemu-devel@nongnu.org>; Fri, 19 Apr 2019 01:15:48 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Fri, 19 Apr 2019 01:01:16 -0000
+Date: Fri, 19 Apr 2019 00:57:17 -0000
 From: "Laszlo Ersek \(Red Hat\)" <lersek@redhat.com>
 Reply-To: Bug 1818367 <1818367@bugs.launchpad.net>
 Sender: bounces@canonical.com
 References: <155156252741.17588.3363806743942119527.malonedeb@gac.canonical.com>
-Message-Id: <155563567660.17354.2422657916962464157.malone@soybean.canonical.com>
+Message-Id: <155563543713.17294.12493676754152594612.malone@soybean.canonical.com>
 Errors-To: bounces@canonical.com
 Subject: [Qemu-devel] [Bug 1818367] Re: Initialization of device
  cfi.pflash01 failed: Block node is read-only
@@ -39,9 +39,50 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-(more precisely, the nvram element will be auto-generated when you exit
-"virsh edit", and the nvram file will be created (copied) from the
-varstore template when you launch the domain)
+Hi Jos=C3=A9,
+
+your domain XML is bogus with regard to the firmware configuration. You
+have:
+
+     <loader
+type=3D'pflash'>/var/lib/libvirt/qemu/nvram/os-1-ovmf.fd</loader>
+
+and no <nvram> element, and you write that "os-1-ovmf.fd" is a copy of
+"OVMF_VARS.fd".
+
+The <loader> element, with @type=3D'pflash', no other attributes, and then
+no <nvram> sibling element either, happens to be valid, but it is an
+extremely niche use case. It is used when you have a unified, writeable,
+OVMF.fd file that contains both the firmware executable and the live
+variable store.
+
+Most distros don't provide such unified "OVMF.fd" files, and even if
+yours does, you are not passing a full such "OVMF.fd" to the guest, but
+just a variable store -- there is no firmware binary at all that the
+guest could *execute*.
+
+So please do the following:
+
+- power down the domain
+
+- delete "/var/lib/libvirt/qemu/nvram/os-1-ovmf.fd" for starters
+
+- modify the domain XML as follows, with "virsh edit":
+
+    <loader readonly=3D'yes'
+type=3D'pflash'>/usr/share/edk2-ovmf/OVMF_CODE.fd</loader>
+
+When you exit your editor, libvirtd will:
+
+- create the <nvram> element, and auto-generate the pathname for the
+  <nvram> element
+
+- create the varstore file, pointed-to by the pathname above, from the
+  template at "/usr/share/edk2-ovmf/OVMF_VARS.fd".
+
+
+** Changed in: qemu
+       Status: New =3D> Invalid
 
 -- =
 
