@@ -2,89 +2,83 @@ Return-Path: <SRS0=rbQy=SV=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.7 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A1569C282DA
-	for <qemu-devel@archiver.kernel.org>; Fri, 19 Apr 2019 15:43:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 09A12C282DA
+	for <qemu-devel@archiver.kernel.org>; Fri, 19 Apr 2019 17:39:18 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6F94B222C7
-	for <qemu-devel@archiver.kernel.org>; Fri, 19 Apr 2019 15:43:10 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=oberlin-edu.20150623.gappssmtp.com header.i=@oberlin-edu.20150623.gappssmtp.com header.b="JxAFjXok"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6F94B222C7
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=oberlin.edu
+	by mail.kernel.org (Postfix) with ESMTPS id D26E3222A8
+	for <qemu-devel@archiver.kernel.org>; Fri, 19 Apr 2019 17:39:17 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D26E3222A8
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=intel.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:58073 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:59445 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hHVfR-000239-LQ
-	for qemu-devel@archiver.kernel.org; Fri, 19 Apr 2019 11:43:09 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:44152)
+	id 1hHXTp-0004VX-2g
+	for qemu-devel@archiver.kernel.org; Fri, 19 Apr 2019 13:39:17 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:38883)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stephen.checkoway@oberlin.edu>) id 1hHVeQ-0001TT-3P
-	for qemu-devel@nongnu.org; Fri, 19 Apr 2019 11:42:06 -0400
+	(envelope-from <chen.zhang@intel.com>) id 1hHXT0-0004CV-VL
+	for qemu-devel@nongnu.org; Fri, 19 Apr 2019 13:38:28 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stephen.checkoway@oberlin.edu>) id 1hHVeP-0002KG-5r
-	for qemu-devel@nongnu.org; Fri, 19 Apr 2019 11:42:06 -0400
-Received: from mail-it1-x144.google.com ([2607:f8b0:4864:20::144]:52399)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <stephen.checkoway@oberlin.edu>)
-	id 1hHVeP-0002Jx-1B
-	for qemu-devel@nongnu.org; Fri, 19 Apr 2019 11:42:05 -0400
-Received: by mail-it1-x144.google.com with SMTP id x132so8796769itf.2
-	for <qemu-devel@nongnu.org>; Fri, 19 Apr 2019 08:42:04 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=oberlin-edu.20150623.gappssmtp.com; s=20150623;
-	h=mime-version:subject:from:in-reply-to:date:cc
-	:content-transfer-encoding:message-id:references:to;
-	bh=rXRhStdQCc3dQU4S4qg2Ze2crnUdsX7Qa2mruJ/qLHY=;
-	b=JxAFjXokAg1r75PA0j1k346zQWF6+3JJgwj4wqDXY1Mx8osZZEPTj0TPXkU/82BkjW
-	rLUkIHFP7CNEHcIjVadH6CNL5jsq3/Z1onEbnF5/FfX1R4u6isMzF6R4FIncn4QCWMJq
-	aIfcZL7T4Hfduf2DVfX1lAdOHVchPt40Gr5jKdcY/af2uNVsckGdc7LMAQgZ8urAGLrP
-	1r9+H2PEzLVi8Ch5iJ1b1Fz+U0lLnGmM6St4zxin3SwkeGZKgIHYVA7NqD9S6iTI/yDc
-	715HW7gLFsjmITa9CnWkTJnI/pAEHiicrSjoFnmqX1KvivvNjEgNNSSj4pQoj/aNtz2d
-	/vOw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=1e100.net; s=20161025;
-	h=x-gm-message-state:mime-version:subject:from:in-reply-to:date:cc
-	:content-transfer-encoding:message-id:references:to;
-	bh=rXRhStdQCc3dQU4S4qg2Ze2crnUdsX7Qa2mruJ/qLHY=;
-	b=id9IS4uoWC1YRKtTSV3uZXA3GbF59mT3e3gi/O4syyOVhOQWXj1ctx/iGjwbtRleEm
-	uRSmqvvSRenOLhAkAHYIz5wiB/K8n1tQv7V6vIWJX6AaHQl8yB1056qT3hhX4E7+fuGc
-	/Crc2MSxZpGSdIv3MJYYmncJTYeJMCIzojqQKhP+OQaLvQjnlrjaefMKp/Sj4q8Nmam7
-	JMlSe+yj5yud9HqZ6ZK2rn32K0iTOQs/YamTGFTdL42pnIAs91EUWBlhPT7xEXhgaxS/
-	rM+n5dwxBbEfUGpbWk+maJ4ZW/Gt7PJ71Aqbb0r8Zi1fsY9raXHEi7t346vLCQqw10CM
-	IcnA==
-X-Gm-Message-State: APjAAAXv/lC0Ws6a8z7AUU3+t2tCQf1s94PpmEBEF1A0PH20uvVM4cH1
-	EJWABsyWI2K74+2bG2R7h/KeVw==
-X-Google-Smtp-Source: APXvYqxi/hZCPGgSPaVvRYY4y8KHYZHHd5RsNTkPYEYg8nRTJsKiuWnZ9dmS3Ki8QOjxHXjFJE8pQA==
-X-Received: by 2002:a24:e14b:: with SMTP id n72mr3183599ith.34.1555688524303; 
-	Fri, 19 Apr 2019 08:42:04 -0700 (PDT)
-Received: from ip-70-93.wireless.oberlin.edu (ip-70-93.wireless.oberlin.edu.
-	[132.162.70.93]) by smtp.gmail.com with ESMTPSA id
-	v126sm2429234itb.30.2019.04.19.08.42.03
-	(version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-	Fri, 19 Apr 2019 08:42:03 -0700 (PDT)
+	(envelope-from <chen.zhang@intel.com>) id 1hHXSz-0007V9-NM
+	for qemu-devel@nongnu.org; Fri, 19 Apr 2019 13:38:26 -0400
+Received: from mga11.intel.com ([192.55.52.93]:48271)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <chen.zhang@intel.com>)
+	id 1hHXSx-0007Tp-51
+	for qemu-devel@nongnu.org; Fri, 19 Apr 2019 13:38:25 -0400
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from orsmga007.jf.intel.com ([10.7.209.58])
+	by fmsmga102.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384;
+	19 Apr 2019 10:38:19 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.60,370,1549958400"; d="scan'208";a="132773265"
+Received: from fmsmsx104.amr.corp.intel.com ([10.18.124.202])
+	by orsmga007.jf.intel.com with ESMTP; 19 Apr 2019 10:38:18 -0700
+Received: from fmsmsx112.amr.corp.intel.com (10.18.116.6) by
+	fmsmsx104.amr.corp.intel.com (10.18.124.202) with Microsoft SMTP Server
+	(TLS) id 14.3.408.0; Fri, 19 Apr 2019 10:38:12 -0700
+Received: from shsmsx154.ccr.corp.intel.com (10.239.6.54) by
+	FMSMSX112.amr.corp.intel.com (10.18.116.6) with Microsoft SMTP Server
+	(TLS) id 14.3.408.0; Fri, 19 Apr 2019 10:38:12 -0700
+Received: from shsmsx102.ccr.corp.intel.com ([169.254.2.206]) by
+	SHSMSX154.ccr.corp.intel.com ([169.254.7.149]) with mapi id
+	14.03.0415.000; Sat, 20 Apr 2019 01:38:10 +0800
+From: "Zhang, Chen" <chen.zhang@intel.com>
+To: Lukas Straub <lukasstraub2@web.de>, "qemu-devel@nongnu.org"
+	<qemu-devel@nongnu.org>
+Thread-Topic: [PATCH] net/colo-compare.c: Fix a crash in COLO Primary.
+Thread-Index: AQHU9renT4s6UsnJzEKAqQaH2DVJn6ZDvT4w
+Date: Fri, 19 Apr 2019 17:38:10 +0000
+Message-ID:
+ <9CFF81C0F6B98A43A459C9EDAD400D78060D262F@shsmsx102.ccr.corp.intel.com>
+References: <20190419155605.5349857a@luklap>
+In-Reply-To: <20190419155605.5349857a@luklap>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+dlp-product: dlpe-windows
+dlp-version: 11.0.600.7
+dlp-reaction: no-action
+x-ctpclassification: CTP_NT
+x-titus-metadata-40: eyJDYXRlZ29yeUxhYmVscyI6IiIsIk1ldGFkYXRhIjp7Im5zIjoiaHR0cDpcL1wvd3d3LnRpdHVzLmNvbVwvbnNcL0ludGVsMyIsImlkIjoiZDU0NzU1OWYtOTA5Ny00YzM5LTgzZDMtYjYyMDI3MzNmOTIzIiwicHJvcHMiOlt7Im4iOiJDVFBDbGFzc2lmaWNhdGlvbiIsInZhbHMiOlt7InZhbHVlIjoiQ1RQX05UIn1dfV19LCJTdWJqZWN0TGFiZWxzIjpbXSwiVE1DVmVyc2lvbiI6IjE3LjEwLjE4MDQuNDkiLCJUcnVzdGVkTGFiZWxIYXNoIjoiNHMrR1lwU2hvdGpRaFwvczJmanJ6NzZHOURyUTl1TEQ0d0hqcFptOFRcL2o4dUN1TndVVFB0c3BGXC9mME1WMzBrRiJ9
+x-originating-ip: [10.239.127.40]
 Content-Type: text/plain; charset="UTF-8"
-Mime-Version: 1.0 (Mac OS X Mail 12.2 \(3445.102.3\))
-From: Stephen Checkoway <stephen.checkoway@oberlin.edu>
-In-Reply-To: <aaa450c5-0446-b4b3-40ac-ef87b5522545@redhat.com>
-Date: Fri, 19 Apr 2019 11:42:02 -0400
 Content-Transfer-Encoding: quoted-printable
-Message-Id: <05AF5CE1-3A71-4D78-B35B-C443BE310985@oberlin.edu>
-References: <20190417005053.885-1-stephen.checkoway@oberlin.edu>
-	<aaa450c5-0446-b4b3-40ac-ef87b5522545@redhat.com>
-To: =?utf-8?Q?Philippe_Mathieu-Daud=C3=A9?= <philmd@redhat.com>
-X-Mailer: Apple Mail (2.3445.102.3)
+MIME-Version: 1.0
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
 	recognized.
-X-Received-From: 2607:f8b0:4864:20::144
-Subject: Re: [Qemu-devel] [PATCH v2] hw/char/escc: Lower irq when transmit
- buffer is filled
+X-Received-From: 192.55.52.93
+Subject: Re: [Qemu-devel] [PATCH] net/colo-compare.c: Fix a crash in COLO
+ Primary.
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -96,56 +90,54 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-trivial@nongnu.org, Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>,
-	QEMU Developers <qemu-devel@nongnu.org>,
-	Laurent Vivier <laurent@vivier.eu>,
-	=?utf-8?Q?Marc-Andr=C3=A9_Lureau?= <marcandre.lureau@redhat.com>,
-	Paolo Bonzini <pbonzini@redhat.com>, Artyom Tarasenko <atar4qemu@gmail.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190419154202.k1rTvO8u-0ri5eouz_jjNL4LOKMXRO-5OcLof-lXfBg@z>
+Message-ID: <20190419173810.FhmHlniW4xwltbLaroL0eebbWhkkgT9Q-AAyWWAnDHc@z>
 
 
 
-> On Apr 18, 2019, at 08:13, Philippe Mathieu-Daud=C3=A9 =
-<philmd@redhat.com> wrote:
+
+> -----Original Message-----
+> From: Lukas Straub [mailto:lukasstraub2@web.de]
+> Sent: Friday, April 19, 2019 9:56 PM
+> To: qemu-devel@nongnu.org
+> Cc: Zhang, Chen <chen.zhang@intel.com>
+> Subject: [PATCH] net/colo-compare.c: Fix a crash in COLO Primary.
 >=20
-> On 4/17/19 2:50 AM, Stephen Checkoway wrote:
->> The SCC/ESCC will briefly stop asserting an interrupt when the
->> transmit FIFO is filled.
->>=20
->> This code doesn't model the transmit FIFO/shift register so the
->> pending transmit interrupt is never deasserted which means that an
->> edge-triggered interrupt controller will never see the low-to-high
->> transition it needs to raise another interrupt. The practical
->> consequence of this is that guest firmware with an interrupt service
->> routine for the ESCC that does not send all of the data it has
->> immediately will stop sending data if the following sequence of
->> events occurs:
->> 1. Disable processor interrupts
->> 2. Write a character to the ESCC
->> 3. Add additional characters to a buffer which is drained by the ISR
->> 4. Enable processor interrupts
->>=20
->> In this case, the first character will be sent, the interrupt will
->> fire and the ISR will output the second character. Since the pending
->> transmit interrupt remains asserted, no additional interrupts will
->> ever fire.
+> From: Lukas Straub <lukasstraub2@web.de> Fixes the following bug:
+> https://bugs.launchpad.net/qemu/+bug/1824622
+
+It looks good for me, but I think you need add more comments in commit mess=
+age,
+For example what situation will trigger this bug and why it will occur.
+After that, I think you can close the bug in Launchpad.
+
+Thanks
+Zhang Chen
+
 >=20
-> You might want to add a line expliciting the chipset model which =
-forced
-> you to do that patch (Z85C30).
-
-Done.
-
-Thanks for looking at this.
-
---=20
-Stephen Checkoway
-
-
-
-
+> Signed-off-by: Lukas Straub <lukasstraub2@web.de>
+> ---
+>  net/colo-compare.c | 3 +--
+>  1 file changed, 1 insertion(+), 2 deletions(-)
+>=20
+> diff --git a/net/colo-compare.c b/net/colo-compare.c index
+> bf10526f05..fcb491121b 100644
+> --- a/net/colo-compare.c
+> +++ b/net/colo-compare.c
+> @@ -813,9 +813,8 @@ static void colo_compare_handle_event(void *opaque)
+>          break;
+>      }
+>=20
+> -    assert(event_unhandled_count > 0);
+> -
+>      qemu_mutex_lock(&event_mtx);
+> +    assert(event_unhandled_count > 0);
+>      event_unhandled_count--;
+>      qemu_cond_broadcast(&event_complete_cond);
+>      qemu_mutex_unlock(&event_mtx);
+> --
+> 2.20.1
 
 
