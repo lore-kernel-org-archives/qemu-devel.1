@@ -6,44 +6,44 @@ X-Spam-Status: No, score=-0.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	MAILING_LIST_MULTI,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CC009C10F14
-	for <qemu-devel@archiver.kernel.org>; Fri, 19 Apr 2019 01:17:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0B971C282DD
+	for <qemu-devel@archiver.kernel.org>; Fri, 19 Apr 2019 01:17:23 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 777772171F
-	for <qemu-devel@archiver.kernel.org>; Fri, 19 Apr 2019 01:17:21 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 777772171F
+	by mail.kernel.org (Postfix) with ESMTPS id AA7832171F
+	for <qemu-devel@archiver.kernel.org>; Fri, 19 Apr 2019 01:17:22 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AA7832171F
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:49618 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:49620 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hHI9Y-0007jr-IF
-	for qemu-devel@archiver.kernel.org; Thu, 18 Apr 2019 21:17:20 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:41340)
+	id 1hHI9Z-0007kr-ST
+	for qemu-devel@archiver.kernel.org; Thu, 18 Apr 2019 21:17:21 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:41342)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1hHI89-0006yO-P9
+	(envelope-from <bounces@canonical.com>) id 1hHI8A-0006yQ-1T
 	for qemu-devel@nongnu.org; Thu, 18 Apr 2019 21:15:55 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1hHI88-000134-Cv
-	for qemu-devel@nongnu.org; Thu, 18 Apr 2019 21:15:53 -0400
-Received: from indium.canonical.com ([91.189.90.7]:60110)
+	(envelope-from <bounces@canonical.com>) id 1hHI88-000139-DA
+	for qemu-devel@nongnu.org; Thu, 18 Apr 2019 21:15:54 -0400
+Received: from indium.canonical.com ([91.189.90.7]:60082)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1hHI87-00011j-P0
+	id 1hHI87-000113-P1
 	for qemu-devel@nongnu.org; Thu, 18 Apr 2019 21:15:52 -0400
 Received: from loganberry.canonical.com ([91.189.90.37])
 	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1hHI85-0007p5-TA
-	for <qemu-devel@nongnu.org>; Fri, 19 Apr 2019 01:15:49 +0000
+	id 1hHI84-0007yP-PH
+	for <qemu-devel@nongnu.org>; Fri, 19 Apr 2019 01:15:48 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id D9EB22E802D
-	for <qemu-devel@nongnu.org>; Fri, 19 Apr 2019 01:15:49 +0000 (UTC)
+	by loganberry.canonical.com (Postfix) with ESMTP id BB5232E802D
+	for <qemu-devel@nongnu.org>; Fri, 19 Apr 2019 01:15:48 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Fri, 19 Apr 2019 01:01:16 -0000
+Date: Fri, 19 Apr 2019 00:57:17 -0000
 From: "Laszlo Ersek \(Red Hat\)" <lersek@redhat.com>
 To: qemu-devel@nongnu.org
 X-Launchpad-Notification-Type: bug
@@ -59,13 +59,13 @@ X-Launchpad-Bug-Reporter: =?utf-8?q?Jos=C3=A9_Pekkarinen_=28koalinux=29?=
 X-Launchpad-Bug-Modifier: Laszlo Ersek (Red Hat) (lersek)
 References: <155156252741.17588.3363806743942119527.malonedeb@gac.canonical.com>
 Message-Id:
- <155563567660.17354.2422657916962464157.malone@soybean.canonical.com>
+ <155563543713.17294.12493676754152594612.malone@soybean.canonical.com>
 X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
 X-Launchpad-Message-For: qemu-devel-ml
 Precedence: bulk
 X-Generated-By: Launchpad (canonical.com); Revision="18928";
 	Instance="launchpad-lazr.conf"
-X-Launchpad-Hash: 6f2a4029c9697334d23e181fd1dca52c8297e972
+X-Launchpad-Hash: a77a65fa1deadc2244814acee0d5944624527de1
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 91.189.90.7
 Subject: [Qemu-devel] [Bug 1818367] Re: Initialization of device
@@ -84,11 +84,52 @@ Reply-To: Bug 1818367 <1818367@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190419010116.TVy8-f5vnyW6lGwSD7p_r5uLiQxm3ON6eu_iZaOjxOA@z>
+Message-ID: <20190419005717.EOGL8pxDCV1FLbnnSreSBI0LUf-Z9W5vZ8BOvoTgeN4@z>
 
-(more precisely, the nvram element will be auto-generated when you exit
-"virsh edit", and the nvram file will be created (copied) from the
-varstore template when you launch the domain)
+Hi Jos=C3=A9,
+
+your domain XML is bogus with regard to the firmware configuration. You
+have:
+
+     <loader
+type=3D'pflash'>/var/lib/libvirt/qemu/nvram/os-1-ovmf.fd</loader>
+
+and no <nvram> element, and you write that "os-1-ovmf.fd" is a copy of
+"OVMF_VARS.fd".
+
+The <loader> element, with @type=3D'pflash', no other attributes, and then
+no <nvram> sibling element either, happens to be valid, but it is an
+extremely niche use case. It is used when you have a unified, writeable,
+OVMF.fd file that contains both the firmware executable and the live
+variable store.
+
+Most distros don't provide such unified "OVMF.fd" files, and even if
+yours does, you are not passing a full such "OVMF.fd" to the guest, but
+just a variable store -- there is no firmware binary at all that the
+guest could *execute*.
+
+So please do the following:
+
+- power down the domain
+
+- delete "/var/lib/libvirt/qemu/nvram/os-1-ovmf.fd" for starters
+
+- modify the domain XML as follows, with "virsh edit":
+
+    <loader readonly=3D'yes'
+type=3D'pflash'>/usr/share/edk2-ovmf/OVMF_CODE.fd</loader>
+
+When you exit your editor, libvirtd will:
+
+- create the <nvram> element, and auto-generate the pathname for the
+  <nvram> element
+
+- create the varstore file, pointed-to by the pathname above, from the
+  template at "/usr/share/edk2-ovmf/OVMF_VARS.fd".
+
+
+** Changed in: qemu
+       Status: New =3D> Invalid
 
 -- =
 
