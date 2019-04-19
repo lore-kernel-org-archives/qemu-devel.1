@@ -2,76 +2,115 @@ Return-Path: <SRS0=rbQy=SV=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-7.0 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B6810C282DA
-	for <qemu-devel@archiver.kernel.org>; Fri, 19 Apr 2019 10:22:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3C65BC282DA
+	for <qemu-devel@archiver.kernel.org>; Fri, 19 Apr 2019 10:24:33 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5D114217FA
-	for <qemu-devel@archiver.kernel.org>; Fri, 19 Apr 2019 10:22:47 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5D114217FA
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=canonical.com
+	by mail.kernel.org (Postfix) with ESMTPS id A96A9217FA
+	for <qemu-devel@archiver.kernel.org>; Fri, 19 Apr 2019 10:24:32 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="dT3k0Pv+"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A96A9217FA
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:54368 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:54395 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hHQfO-0006Iy-LP
-	for qemu-devel@archiver.kernel.org; Fri, 19 Apr 2019 06:22:46 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:51232)
+	id 1hHQh5-000758-QU
+	for qemu-devel@archiver.kernel.org; Fri, 19 Apr 2019 06:24:31 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:51926)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1hHQdP-0004u1-Ua
-	for qemu-devel@nongnu.org; Fri, 19 Apr 2019 06:20:45 -0400
+	(envelope-from <vsementsov@virtuozzo.com>) id 1hHQgB-0006fR-7Y
+	for qemu-devel@nongnu.org; Fri, 19 Apr 2019 06:23:37 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1hHQdN-0003va-R8
-	for qemu-devel@nongnu.org; Fri, 19 Apr 2019 06:20:43 -0400
-Received: from indium.canonical.com ([91.189.90.7]:44622)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1hHQdN-0003tL-Ha
-	for qemu-devel@nongnu.org; Fri, 19 Apr 2019 06:20:41 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1hHQdL-0005Ew-I4
-	for <qemu-devel@nongnu.org>; Fri, 19 Apr 2019 10:20:39 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 7287E2E80CB
-	for <qemu-devel@nongnu.org>; Fri, 19 Apr 2019 10:20:39 +0000 (UTC)
-MIME-Version: 1.0
+	(envelope-from <vsementsov@virtuozzo.com>) id 1hHQg9-0005ap-BT
+	for qemu-devel@nongnu.org; Fri, 19 Apr 2019 06:23:35 -0400
+Received: from mail-am5eur03on070e.outbound.protection.outlook.com
+	([2a01:111:f400:fe08::70e]:12702
+	helo=EUR03-AM5-obe.outbound.protection.outlook.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
+	id 1hHQg6-0005Wx-6u; Fri, 19 Apr 2019 06:23:32 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=virtuozzo.com;
+	s=selector1;
+	h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+	bh=kFEOCGsID4H91KC4O8ZLE94PXr5loWfVOJb5+ItWnLU=;
+	b=dT3k0Pv+FNmUOE2dXjgDifFj7XOxA+gTNN4/lvSg9SP0W2bAF183+UYSOpWkrx3lkfDFm7NjOB4P3Z98894SxkhBFzgE1ZM2ZMyQZvPTVBUqTIf4M9kIcvgBR4QdFzz+qhJDSIfo8Rv6/QsLFUbrZkvSDPbgO+KOGgp0ZJn87LU=
+Received: from DB7PR08MB3851.eurprd08.prod.outlook.com (20.178.46.222) by
+	DB7PR08MB3561.eurprd08.prod.outlook.com (20.177.120.87) with Microsoft
+	SMTP
+	Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+	15.20.1813.11; Fri, 19 Apr 2019 10:23:24 +0000
+Received: from DB7PR08MB3851.eurprd08.prod.outlook.com
+	([fe80::3c82:5da0:1633:f949]) by
+	DB7PR08MB3851.eurprd08.prod.outlook.com
+	([fe80::3c82:5da0:1633:f949%3]) with mapi id 15.20.1813.013;
+	Fri, 19 Apr 2019 10:23:24 +0000
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+To: Max Reitz <mreitz@redhat.com>, "qemu-block@nongnu.org"
+	<qemu-block@nongnu.org>
+Thread-Topic: [Qemu-devel] [PATCH v4 02/11] block: Filtered children access
+	functions
+Thread-Index: AQHU79wA05VKR7zfGUSKIteegCD/haY+l2mAgAH8Q4CAAsBvgA==
+Date: Fri, 19 Apr 2019 10:23:24 +0000
+Message-ID: <495b2cb1-4a99-59d7-b7af-97bb3b9a55c1@virtuozzo.com>
+References: <20190410202033.28617-1-mreitz@redhat.com>
+	<20190410202033.28617-3-mreitz@redhat.com>
+	<5a335159-8a98-5c60-657d-920e1eb81065@virtuozzo.com>
+	<f7fa24d8-7608-ecc8-475c-42e3d58ba272@redhat.com>
+In-Reply-To: <f7fa24d8-7608-ecc8-475c-42e3d58ba272@redhat.com>
+Accept-Language: ru-RU, en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-clientproxiedby: HE1PR05CA0332.eurprd05.prod.outlook.com
+	(2603:10a6:7:92::27) To DB7PR08MB3851.eurprd08.prod.outlook.com
+	(2603:10a6:10:7b::30)
+authentication-results: spf=none (sender IP is )
+	smtp.mailfrom=vsementsov@virtuozzo.com; 
+x-ms-exchange-messagesentrepresentingtype: 1
+x-tagtoolbar-keys: D20190419132321328
+x-originating-ip: [185.231.240.5]
+x-ms-publictraffictype: Email
+x-ms-office365-filtering-correlation-id: 9c7bccae-bee2-4702-b308-08d6c4b10db0
+x-microsoft-antispam: BCL:0; PCL:0;
+	RULEID:(2390118)(7020095)(4652040)(8989299)(4534185)(4627221)(201703031133081)(201702281549075)(8990200)(5600141)(711020)(4605104)(2017052603328)(7193020);
+	SRVR:DB7PR08MB3561; 
+x-ms-traffictypediagnostic: DB7PR08MB3561:
+x-microsoft-antispam-prvs: <DB7PR08MB35613708EB35165E5BFFC1D2C1270@DB7PR08MB3561.eurprd08.prod.outlook.com>
+x-forefront-prvs: 0012E6D357
+x-forefront-antispam-report: SFV:NSPM;
+	SFS:(10019020)(366004)(376002)(136003)(396003)(39840400004)(346002)(189003)(199004)(2501003)(14454004)(6116002)(3846002)(71200400001)(71190400001)(478600001)(5660300002)(31686004)(8936002)(76176011)(6246003)(93886005)(30864003)(36756003)(305945005)(7736002)(31696002)(86362001)(66476007)(73956011)(66556008)(64756008)(66446008)(66946007)(14444005)(256004)(486006)(26005)(2616005)(476003)(2906002)(11346002)(6512007)(6486002)(386003)(6506007)(53936002)(229853002)(316002)(102836004)(446003)(53546011)(68736007)(99286004)(186003)(8676002)(6436002)(66066001)(54906003)(110136005)(97736004)(81166006)(25786009)(81156014)(52116002)(4326008);
+	DIR:OUT; SFP:1102; SCL:1; SRVR:DB7PR08MB3561;
+	H:DB7PR08MB3851.eurprd08.prod.outlook.com; FPR:; SPF:None;
+	LANG:en; PTR:InfoNoRecords; MX:1; A:1; 
+received-spf: None (protection.outlook.com: virtuozzo.com does not designate
+	permitted sender hosts)
+x-ms-exchange-senderadcheck: 1
+x-microsoft-antispam-message-info: tej9D1GjIfcWVHLNvDl8m6mzqzm0nEl5OLP4p9Kw1D6mAqIPt07C0v6tvfZc9nnu68zJngZ0xy5fAdCsL/p+uJiXWQ7HVAe3S2periLkg9wZWlaICTdUFQ1KL61O/yhZpNGN0IvZh+5gY4P/+21Obp+YHR4BLu8rvMJSAzATcW1ZImml4qRl6LAKFl4xxHJP3iQpp/TMmqX5xNXwqmC9stGNn8aREjeC6VSTqgWKzJy08N8YIr3kAIq/O6quVdnx6muZy63zrRQdgTULWeHRy8etRKSTmFEFCf4q5cNO39IGjyyjOiStOlN8XpsIRof2mJzuRq/o9lejeYOH6fRGjyQX5qy9F7iXK8xgufs+jSy9DyefEnpxnASdcWJqtTUMqJHXaazXpKghgd9G+0MB5zB/8snKJXEO8r5nYkqSSis=
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Fri, 19 Apr 2019 10:14:08 -0000
-From: =?utf-8?q?Jos=C3=A9_Pekkarinen?= <jose.pekkarinen@canonical.com>
-To: qemu-devel@nongnu.org
-X-Launchpad-Notification-Type: bug
-X-Launchpad-Bug: product=libvirt; status=New; importance=Undecided;
-	assignee=None; 
-X-Launchpad-Bug: product=qemu; status=Invalid; importance=Undecided;
-	assignee=None; 
-X-Launchpad-Bug-Information-Type: Public
-X-Launchpad-Bug-Private: no
-X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: koalinux lersek
-X-Launchpad-Bug-Reporter: =?utf-8?q?Jos=C3=A9_Pekkarinen_=28koalinux=29?=
-X-Launchpad-Bug-Modifier: =?utf-8?q?Jos=C3=A9_Pekkarinen_=28koalinux=29?=
-References: <155156252741.17588.3363806743942119527.malonedeb@gac.canonical.com>
-Message-Id:
- <155566884856.13521.11853993565719476166.malone@gac.canonical.com>
-X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
-X-Launchpad-Message-For: qemu-devel-ml
-Precedence: bulk
-X-Generated-By: Launchpad (canonical.com); Revision="18928";
-	Instance="launchpad-lazr.conf"
-X-Launchpad-Hash: e4ed90519793c8f2bdf2783218e5f8b743510f3c
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 91.189.90.7
-Subject: [Qemu-devel] [Bug 1818367] Re: Initialization of device
- cfi.pflash01 failed: Block node is read-only
+Content-ID: <DF5C21BEC5A0D04389481D55EAABD060@eurprd08.prod.outlook.com>
+Content-Transfer-Encoding: base64
+MIME-Version: 1.0
+X-OriginatorOrg: virtuozzo.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 9c7bccae-bee2-4702-b308-08d6c4b10db0
+X-MS-Exchange-CrossTenant-originalarrivaltime: 19 Apr 2019 10:23:24.1976 (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 0bc7f26d-0264-416e-a6fc-8352af79c58f
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DB7PR08MB3561
+X-detected-operating-system: by eggs.gnu.org: Windows 7 or 8 [fuzzy]
+X-Received-From: 2a01:111:f400:fe08::70e
+Subject: Re: [Qemu-devel] [PATCH v4 02/11] block: Filtered children access
+ functions
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
+Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -80,575 +119,231 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1818367 <1818367@bugs.launchpad.net>
+Cc: Kevin Wolf <kwolf@redhat.com>,
+	"qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190419101408.s7G0GYyiM91pBFVPGt0eltqG4EfSX0azIkmEvW7N5VY@z>
-
-oh well, it turns out to be actually related, it turns out
-virt-aa-helper is skipping the code file of ovmf:
-
-2019-04-19 10:06:43.576+0000: 9272: error : AppArmorGenSecurityLabel:469 : =
-internal error: cannot load AppArmor profile 'libvirt-34c41008-ab91-483b-95=
-9c-81a7a12ae9be'
-2019-04-19 10:09:25.751+0000: 9270: error : virCommandWait:2636 : internal =
-error: Child process (LIBVIRT_LOG_OUTPUTS=3D3:stderr /usr/libexec/virt-aa-h=
-elper -c -u libvirt-34c41008-ab91-483b-959c-81a7a12ae9be) unexpected exit s=
-tatus 1: 2019-04-19 10:09:25.750+0000: 13797: info : libvirt version: 5.2.0
-2019-04-19 10:09:25.750+0000: 13797: info : hostname: mole
-2019-04-19 10:09:25.750+0000: 13797: error : virStorageFileBackendFileRead:=
-129 : Failed to open file '/dev/mole-vg0/os-1-vda': Permission denied
-2019-04-19 10:09:25.750+0000: 13797: error : virStorageFileBackendFileRead:=
-129 : Failed to open file '/dev/mole-vg0/os-1-vdb': Permission denied
-virt-aa-helper: error: /usr/share/edk2-ovmf/OVMF_CODE.fd
-virt-aa-helper: error: skipped restricted file
-virt-aa-helper: error: invalid VM definition
-
-The domain now looks like:
-
-<domain type=3D'kvm'>                                                      =
-                                                                           =
-                                                                           =
-                                        [40/100]
-  <name>os-1</name>
-  <uuid>34c41008-ab91-483b-959c-81a7a12ae9be</uuid>    =
-
-  <memory unit=3D'KiB'>8388608</memory>
-  <currentMemory unit=3D'KiB'>8388608</currentMemory>                      =
-        =
-
-  <memoryBacking>
-    <hugepages/>             =
-
-  </memoryBacking>                      =
-
-  <vcpu placement=3D'static' cpuset=3D'10-11,34-35'>4</vcpu>
-  <os>                       =
-
-    <type arch=3D'x86_64' machine=3D'pc-i440fx-2.12'>hvm</type>            =
-          =
-
-    <loader readonly=3D'yes' type=3D'pflash'>/usr/share/edk2-ovmf/OVMF_CODE=
-.fd</loader>
-    <nvram>/var/lib/libvirt/qemu/nvram/os-1_VARS.fd</nvram>
-    <boot dev=3D'network'/>               =
-
-    <boot dev=3D'hd'/>           =
-
-  </os>                      =
-
-  <features>                                                               =
-      =
-
-    <acpi/>     =
-
-    <apic/>            =
-
-  </features>                            =
-
-  <cpu mode=3D'host-passthrough' check=3D'partial'/>
-  <clock offset=3D'utc'>
-    <timer name=3D'rtc' tickpolicy=3D'catchup'/>
-    <timer name=3D'pit' tickpolicy=3D'delay'/>
-    <timer name=3D'hpet' present=3D'no'/> =
-
-  </clock>    =
-
-  <on_poweroff>destroy</on_poweroff>
-  <on_reboot>restart</on_reboot>      =
-
-  <on_crash>destroy</on_crash>                    =
-
-  <pm>                        =
-
-    <suspend-to-mem enabled=3D'no'/>
-    <suspend-to-disk enabled=3D'no'/>
-  </pm>                                                          =
-
-  <devices>                                                                =
-      =
-
-    <emulator>/usr/bin/qemu-system-x86_64</emulator>
-    <disk type=3D'block' device=3D'disk'>
-      <driver name=3D'qemu' type=3D'raw' cache=3D'none' io=3D'native'/>    =
-              =
-
-      <source dev=3D'/dev/mole-vg0/os-1-vda'/>
-      <target dev=3D'vda' bus=3D'virtio'/>
-      <address type=3D'pci' domain=3D'0x0000' bus=3D'0x00' slot=3D'0x06' fu=
-nction=3D'0x0'/>
-    </disk>
-    <disk type=3D'block' device=3D'disk'>
-      <driver name=3D'qemu' type=3D'raw' cache=3D'none' io=3D'native'/>
-      <source dev=3D'/dev/mole-vg0/os-1-vdb'/>
-      <target dev=3D'vdb' bus=3D'virtio'/>
-      <address type=3D'pci' domain=3D'0x0000' bus=3D'0x00' slot=3D'0x07' fu=
-nction=3D'0x0'/>
-    </disk>
-    <controller type=3D'usb' index=3D'0' model=3D'ich9-ehci1'>
-      <address type=3D'pci' domain=3D'0x0000' bus=3D'0x00' slot=3D'0x05' fu=
-nction=3D'0x7'/>
-    </controller>
-    <controller type=3D'usb' index=3D'0' model=3D'ich9-uhci1'>
-      <master startport=3D'0'/>
-      <address type=3D'pci' domain=3D'0x0000' bus=3D'0x00' slot=3D'0x05' fu=
-nction=3D'0x0' multifunction=3D'on'/>
-    </controller>
-    <controller type=3D'usb' index=3D'0' model=3D'ich9-uhci2'>
-      <master startport=3D'2'/>
-      <address type=3D'pci' domain=3D'0x0000' bus=3D'0x00' slot=3D'0x05' fu=
-nction=3D'0x1'/>
-    </controller>
-    <controller type=3D'usb' index=3D'0' model=3D'ich9-uhci3'>
-      <master startport=3D'4'/>
-      <address type=3D'pci' domain=3D'0x0000' bus=3D'0x00' slot=3D'0x05' fu=
-nction=3D'0x2'/>
-    </controller>
-    <controller type=3D'pci' index=3D'0' model=3D'pci-root'/>
-    <controller type=3D'ide' index=3D'0'>
-      <address type=3D'pci' domain=3D'0x0000' bus=3D'0x00' slot=3D'0x01' fu=
-nction=3D'0x1'/>
-    </controller>
-    <interface type=3D'bridge'>
-      <mac address=3D'52:54:00:78:cb:97'/>
-      <source bridge=3D'virbr0'/>
-      <model type=3D'rtl8139'/>
-      <address type=3D'pci' domain=3D'0x0000' bus=3D'0x00' slot=3D'0x04' fu=
-nction=3D'0x0'/>
-    </interface>
-    <interface type=3D'bridge'>
-      <mac address=3D'52:54:00:1c:4f:22'/>
-      <source bridge=3D'virbr1'/>
-      <model type=3D'rtl8139'/>
-      <address type=3D'pci' domain=3D'0x0000' bus=3D'0x00' slot=3D'0x03' fu=
-nction=3D'0x0'/>
-    </interface>
-    <serial type=3D'pty'>
-      <target type=3D'isa-serial' port=3D'0'>
-        <model name=3D'isa-serial'/>
-      </target>
-    </serial>
-    <console type=3D'pty'>
-      <target type=3D'serial' port=3D'0'/>
-    </console>
-    <input type=3D'mouse' bus=3D'ps2'/>
-    <input type=3D'keyboard' bus=3D'ps2'/>
-    <graphics type=3D'vnc' port=3D'-1' autoport=3D'yes'>
-      <listen type=3D'address'/>
-    </graphics>
-    <video>
-      <model type=3D'cirrus' vram=3D'16384' heads=3D'1' primary=3D'yes'/>
-      <address type=3D'pci' domain=3D'0x0000' bus=3D'0x00' slot=3D'0x02' fu=
-nction=3D'0x0'/>
-    </video>
-    <memballoon model=3D'virtio'>
-      <address type=3D'pci' domain=3D'0x0000' bus=3D'0x00' slot=3D'0x09' fu=
-nction=3D'0x0'/>
-    </memballoon>
-  </devices>
-</domain>
-
--- =
-
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1818367
-
-Title:
-  Initialization of device cfi.pflash01 failed: Block node is read-only
-
-Status in libvirt:
-  New
-Status in QEMU:
-  Invalid
-
-Bug description:
-  Hi,
-
-  I have several vms defined in libvirt using ovmf for uefi, since a later
-  update of my server I'm unable to start any of the domains defined. This =
-is
-  an example of the output given:
-
-  # virsh start os-1
-  error: Failed to start domain os-1
-  error: internal error: qemu unexpectedly closed the monitor: 2019-03-02T2=
-1:23:51.726446Z qemu-system-x86_64: Initialization of device cfi.pflash01 f=
-ailed: Block node is read-only
-
-  an example of domain is like this:
-
-  <domain type=3D'kvm'>                                                    =
-                                                                           =
-                                                                           =
-                                                  =
-
-    <name>os-1</name>                                                      =
-                                                                           =
-                                                                           =
-                                                =
-
-    <uuid>34c41008-ab91-483b-959c-81a7a12ae9be</uuid>                      =
-                                                                           =
-                                                                           =
-                                                =
-
-    <memory unit=3D'KiB'>8388608</memory>                                  =
-                                                                           =
-                                                                           =
-                                                  =
-
-    <currentMemory unit=3D'KiB'>8388608</currentMemory>                    =
-                                                                           =
-                                                                           =
-                                                  =
-
-    <memoryBacking>                                                        =
-                                                                           =
-                                                                           =
-                                                =
-
-      <hugepages/>                                                         =
-                                                                           =
-                                                                           =
-                                                =
-
-    </memoryBacking>                                                       =
-                                                                           =
-                                                                           =
-                                                =
-
-    <vcpu placement=3D'static' cpuset=3D'10-11,34-35'>4</vcpu>             =
-                                                                           =
-                                                                           =
-                                                    =
-
-    <os>                                                                   =
-                                                                           =
-                                                                           =
-                                                =
-
-      <type arch=3D'x86_64' machine=3D'pc-i440fx-2.12'>hvm</type>          =
-                                                                           =
-                                                                           =
-                                                    =
-
-      <loader type=3D'pflash'>/var/lib/libvirt/qemu/nvram/os-1-ovmf.fd</loa=
-der>                                                                       =
-                                                                           =
-                                                  =
-
-      <boot dev=3D'network'/>                                              =
-                                                                           =
-                                                                           =
-                                                  =
-
-      <boot dev=3D'hd'/>                                                   =
-                                                                           =
-                                                                           =
-                                                  =
-
-    </os>                                                                  =
-                                                                           =
-                                                                           =
-                                                =
-
-    <features>                                                             =
-                                                                           =
-                                                                           =
-                                                =
-
-      <acpi/>                                                              =
-                                                                           =
-                                                                           =
-                                                =
-
-      <apic/>                                                              =
-                                                                           =
-                                                                           =
-                                                =
-
-    </features>                                                            =
-                                                                           =
-                                                                           =
-                                                =
-
-    <cpu mode=3D'host-passthrough' check=3D'partial'/>                     =
-                                                                           =
-                                                                           =
-                                                    =
-
-    <clock offset=3D'utc'>                                                 =
-                                                                           =
-                                                                           =
-                                                  =
-
-      <timer name=3D'rtc' tickpolicy=3D'catchup'/>                         =
-                                                                           =
-                                                                           =
-                                                    =
-
-      <timer name=3D'pit' tickpolicy=3D'delay'/>                           =
-                                                                           =
-                                                                           =
-                                                    =
-
-      <timer name=3D'hpet' present=3D'no'/>                                =
-                                                                           =
-                                                                           =
-                                                    =
-
-    </clock>                                                               =
-                                                                           =
-                                                                           =
-                                                =
-
-    <on_poweroff>destroy</on_poweroff>                                     =
-                                                                           =
-                                                                           =
-                                                =
-
-    <on_reboot>restart</on_reboot>                                         =
-                                                                           =
-                                                                           =
-                                                =
-
-    <on_crash>destroy</on_crash>                                           =
-                                                                           =
-                                                                           =
-                                                =
-
-    <pm>                                                                   =
-                                                                           =
-                                                                           =
-                                                =
-
-      <suspend-to-mem enabled=3D'no'/>                                     =
-                                                                           =
-                                                                           =
-                                                  =
-
-      <suspend-to-disk enabled=3D'no'/>                                    =
-                                                                           =
-                                                                           =
-                                                  =
-
-    </pm>                                                                  =
-                                                                           =
-                                                                           =
-                                                =
-
-    <devices>                                                              =
-                                                                           =
-                                                                           =
-                                                =
-
-      <emulator>/usr/bin/qemu-system-x86_64</emulator>                     =
-                                                                           =
-                                                                           =
-                                                =
-
-      <disk type=3D'block' device=3D'disk'>                                =
-                                                                           =
-                                                                           =
-                                                    =
-
-        <driver name=3D'qemu' type=3D'raw' cache=3D'none' io=3D'native'/>  =
-                                                                           =
-                                                                           =
-                                                        =
-
-        <source dev=3D'/dev/vg0/os-1-vda'/>                                =
-                                                                           =
-                                                                           =
-                                             =
-
-        <target dev=3D'vda' bus=3D'virtio'/>                               =
-                                                                           =
-                                                                           =
-                                                    =
-
-        <address type=3D'pci' domain=3D'0x0000' bus=3D'0x00' slot=3D'0x06' =
-function=3D'0x0'/>                                                         =
-                                                                           =
-                                                          =
-
-      </disk>                                                              =
-                                                                           =
-                                                                           =
-                                                =
-
-      <disk type=3D'block' device=3D'disk'>
-        <driver name=3D'qemu' type=3D'raw' cache=3D'none' io=3D'native'/>
-        <source dev=3D'/dev/vg0/os-1-vdb'/>
-        <target dev=3D'vdb' bus=3D'virtio'/>
-        <address type=3D'pci' domain=3D'0x0000' bus=3D'0x00' slot=3D'0x07' =
-function=3D'0x0'/>
-      </disk>
-      <controller type=3D'usb' index=3D'0' model=3D'ich9-ehci1'>
-        <address type=3D'pci' domain=3D'0x0000' bus=3D'0x00' slot=3D'0x05' =
-function=3D'0x7'/>
-      </controller>
-      <controller type=3D'usb' index=3D'0' model=3D'ich9-uhci1'>
-        <master startport=3D'0'/>
-        <address type=3D'pci' domain=3D'0x0000' bus=3D'0x00' slot=3D'0x05' =
-function=3D'0x0' multifunction=3D'on'/>
-      </controller>
-      <controller type=3D'usb' index=3D'0' model=3D'ich9-uhci2'>
-        <master startport=3D'2'/>
-        <address type=3D'pci' domain=3D'0x0000' bus=3D'0x00' slot=3D'0x05' =
-function=3D'0x1'/>
-      </controller>
-      <controller type=3D'usb' index=3D'0' model=3D'ich9-uhci3'>
-        <master startport=3D'4'/>
-        <address type=3D'pci' domain=3D'0x0000' bus=3D'0x00' slot=3D'0x05' =
-function=3D'0x2'/>
-      </controller>
-      <controller type=3D'pci' index=3D'0' model=3D'pci-root'/>
-      <controller type=3D'ide' index=3D'0'>
-        <address type=3D'pci' domain=3D'0x0000' bus=3D'0x00' slot=3D'0x01' =
-function=3D'0x1'/>
-      </controller>
-      <interface type=3D'bridge'>
-        <mac address=3D'52:54:00:78:cb:97'/>
-        <source bridge=3D'virbr0'/>
-        <model type=3D'rtl8139'/>
-        <address type=3D'pci' domain=3D'0x0000' bus=3D'0x00' slot=3D'0x04' =
-function=3D'0x0'/>
-      </interface>
-      <interface type=3D'bridge'>
-        <mac address=3D'52:54:00:1c:4f:22'/>
-        <source bridge=3D'virbr1'/>
-        <model type=3D'rtl8139'/>
-        <address type=3D'pci' domain=3D'0x0000' bus=3D'0x00' slot=3D'0x03' =
-function=3D'0x0'/>
-      </interface>
-      <serial type=3D'pty'>
-        <target type=3D'isa-serial' port=3D'0'>
-          <model name=3D'isa-serial'/>
-        </target>
-      </serial>
-      <console type=3D'pty'>
-        <target type=3D'serial' port=3D'0'/>
-      </console>
-      <input type=3D'mouse' bus=3D'ps2'/>
-      <input type=3D'keyboard' bus=3D'ps2'/>
-      <graphics type=3D'vnc' port=3D'-1' autoport=3D'yes'>
-        <listen type=3D'address'/>
-      </graphics>
-      <video>
-        <model type=3D'cirrus' vram=3D'16384' heads=3D'1' primary=3D'yes'/>
-        <address type=3D'pci' domain=3D'0x0000' bus=3D'0x00' slot=3D'0x02' =
-function=3D'0x0'/>
-      </video>
-      <memballoon model=3D'virtio'>
-        <address type=3D'pci' domain=3D'0x0000' bus=3D'0x00' slot=3D'0x09' =
-function=3D'0x0'/>
-      </memballoon>
-    </devices>
-  </domain>
-
-  where /var/lib/libvirt/qemu/nvram/os-1-ovmf.fd is a copy of
-  /usr/share/edk2-ovmf/OVMF_VARS.fd. An the extract from my
-  /etc/libvirt/qemu.conf to define ovmf:
-
-  ...
-  # Location of master nvram file                                          =
-                                                                           =
-                                                                           =
-                                                =
-
-  #                                                                        =
-                                                                           =
-                                                                           =
-                                                =
-
-  # When a domain is configured to use UEFI instead of standard            =
-                                                                           =
-                                                                           =
-                                                =
-
-  # BIOS it may use a separate storage for UEFI variables. If              =
-                                                                           =
-                                                                           =
-                                                =
-
-  # that's the case libvirt creates the variable store per domain          =
-                                                                           =
-                                                                           =
-                                                =
-
-  # using this master file as image. Each UEFI firmware can,               =
-                                                                           =
-                                                                           =
-                                                =
-
-  # however, have different variables store. Therefore the nvram is        =
-                                                                           =
-                                                                           =
-                                                =
-
-  # a list of strings when a single item is in form of:                    =
-                                                                           =
-                                                                           =
-                                                =
-
-  #   ${PATH_TO_UEFI_FW}:${PATH_TO_UEFI_VARS}.                             =
-                                                                           =
-                                                                           =
-                                                =
-
-  # Later, when libvirt creates per domain variable store, this list is    =
-                                                                           =
-                                                                           =
-                                                =
-
-  # searched for the master image. The UEFI firmware can be called         =
-                                                                           =
-                                                                           =
-                                                =
-
-  # differently for different guest architectures. For instance, it's OVMF =
-                                                                           =
-                                                                           =
-                                                =
-
-  # for x86_64 and i686, but it's AAVMF for aarch64. The libvirt default   =
-                                                                           =
-                                                                           =
-                                                =
-
-  # follows this scheme.                                                   =
-                                                                           =
-                                                                           =
-                                                =
-
-  nvram =3D [                                                              =
-                                                                           =
-                                                                           =
-                                                  =
-
-     "/usr/share/edk2-ovmf/OVMF_CODE.fd:/usr/share/edk2-ovmf/OVMF_VARS.fd",=
-                                                                           =
-                                                                           =
-                                                =
-
-  ]
-  ...
-
-  This setup used to work one month ago, now it's setup with:
-
-  QEMU emulator version 3.1.0
-  libvirt-5.0.0
-  linux-4.19.20
-
-  Any help appreciated.
-
-  Best regards.
-
-  Jos=C3=A9
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/libvirt/+bug/1818367/+subscriptions
+Message-ID: <20190419102324.svmyeufsgUiVykPm2auyo1uXsVL0aHdQyWmQZ3Wso-8@z>
+
+MTcuMDQuMjAxOSAxOToyMiwgTWF4IFJlaXR6IHdyb3RlOg0KPiBPbiAxNi4wNC4xOSAxMjowMiwg
+VmxhZGltaXIgU2VtZW50c292LU9naWV2c2tpeSB3cm90ZToNCj4+IDEwLjA0LjIwMTkgMjM6MjAs
+IE1heCBSZWl0eiB3cm90ZToNCj4+PiBXaGF0IGJzLT5maWxlIGFuZCBicy0+YmFja2luZyBtZWFu
+IGRlcGVuZHMgb24gdGhlIG5vZGUuICBGb3IgZmlsdGVyDQo+Pj4gbm9kZXMsIGJvdGggc2lnbmlm
+eSBhIG5vZGUgdGhhdCB3aWxsIGV2ZW50dWFsbHkgcmVjZWl2ZSBhbGwgUi9XDQo+Pj4gYWNjZXNz
+ZXMuICBGb3IgZm9ybWF0IG5vZGVzLCBicy0+ZmlsZSBjb250YWlucyBtZXRhZGF0YSBhbmQgZGF0
+YSwgYW5kDQo+Pj4gYnMtPmJhY2tpbmcgd2lsbCBub3QgcmVjZWl2ZSB3cml0ZXMgLS0gaW5zdGVh
+ZCwgd3JpdGVzIGFyZSBDT1dlZCB0bw0KPj4+IGJzLT5maWxlLiAgVXN1YWxseS4NCj4+Pg0KPj4+
+IEluIGFueSBjYXNlLCBpdCBpcyBub3QgdHJpdmlhbCB0byBndWVzcyB3aGF0IGEgY2hpbGQgbWVh
+bnMgZXhhY3RseSB3aXRoDQo+Pj4gb3VyIGN1cnJlbnRseSBsaW1pdGVkIGZvcm0gb2YgZXhwcmVz
+c2lvbi4gIEl0IGlzIGJldHRlciB0byBpbnRyb2R1Y2UNCj4+PiBzb21lIGZ1bmN0aW9ucyB0aGF0
+IGFjdHVhbGx5IGd1YXJhbnRlZSBhIG1lYW5pbmc6DQo+Pj4NCj4+PiAtIGJkcnZfZmlsdGVyZWRf
+Y293X2NoaWxkKCkgd2lsbCByZXR1cm4gdGhlIGNoaWxkIHRoYXQgcmVjZWl2ZXMgcmVxdWVzdHMN
+Cj4+PiAgICAgZmlsdGVyZWQgdGhyb3VnaCBDT1cuICBUaGF0IGlzLCByZWFkcyBtYXkgb3IgbWF5
+IG5vdCBiZSBmb3J3YXJkZWQNCj4+PiAgICAgKGRlcGVuZGluZyBvbiB0aGUgb3ZlcmxheSdzIGFs
+bG9jYXRpb24gc3RhdHVzKSwgYnV0IHdyaXRlcyBuZXZlciBnbyB0bw0KPj4+ICAgICB0aGlzIGNo
+aWxkLg0KPj4+DQo+Pj4gLSBiZHJ2X2ZpbHRlcmVkX3J3X2NoaWxkKCkgd2lsbCByZXR1cm4gdGhl
+IGNoaWxkIHRoYXQgcmVjZWl2ZXMgcmVxdWVzdHMNCj4+PiAgICAgZmlsdGVyZWQgdGhyb3VnaCBz
+b21lIHZlcnkgcGxhaW4gcHJvY2Vzcy4gIFJlYWRzIGFuZCB3cml0ZXMgaXNzdWVkIHRvDQo+Pj4g
+ICAgIHRoZSBwYXJlbnQgd2lsbCBnbyB0byB0aGUgY2hpbGQgYXMgd2VsbCAoYWx0aG91Z2ggdGlt
+aW5nLCBldGMuIG1heSBiZQ0KPj4+ICAgICBtb2RpZmllZCkuDQo+Pj4NCj4+PiAtIEFsbCBkcml2
+ZXJzIGJ1dCBxdW9ydW0gKGJ1dCBxdW9ydW0gaXMgcHJldHR5IG9wYXF1ZSB0byB0aGUgZ2VuZXJh
+bA0KPj4+ICAgICBibG9jayBsYXllciBhbnl3YXkpIGFsd2F5cyBvbmx5IGhhdmUgb25lIG9mIHRo
+ZXNlIGNoaWxkcmVuOiBBbGwgcmVhZA0KPj4+ICAgICByZXF1ZXN0cyBtdXN0IGJlIHNlcnZlZCBm
+cm9tIHRoZSBmaWx0ZXJlZF9yd19jaGlsZCAoaWYgaXQgZXhpc3RzKSwgc28NCj4+PiAgICAgaWYg
+dGhlcmUgd2FzIGEgZmlsdGVyZWRfY293X2NoaWxkIGluIGFkZGl0aW9uLCBpdCB3b3VsZCBub3Qg
+cmVjZWl2ZQ0KPj4+ICAgICBhbnkgcmVxdWVzdHMgYXQgYWxsLg0KPj4+ICAgICAoVGhlIGNsb3Nl
+c3QgaGVyZSBpcyBtaXJyb3IsIHdoZXJlIGFsbCByZXF1ZXN0cyBhcmUgcGFzc2VkIG9uIHRvIHRo
+ZQ0KPj4+ICAgICBzb3VyY2UsIGJ1dCB3aXRoIHdyaXRlLWJsb2NraW5nLCB3cml0ZSByZXF1ZXN0
+cyBhcmUgIkNPV2VkIiB0byB0aGUNCj4+PiAgICAgdGFyZ2V0LiAgQnV0IHRoYXQganVzdCBtZWFu
+cyB0aGF0IHRoZSB0YXJnZXQgaXMgYSBzcGVjaWFsIGNoaWxkIHRoYXQNCj4+PiAgICAgY2Fubm90
+IGJlIGludHJvc3BlY3RlZCBieSB0aGUgZ2VuZXJpYyBibG9jayBsYXllciBmdW5jdGlvbnMsIGFu
+ZCB0aGF0DQo+Pj4gICAgIHNvdXJjZSBpcyBhIGZpbHRlcmVkX3J3X2NoaWxkLikNCj4+PiAgICAg
+VGhlcmVmb3JlLCB3ZSBjYW4gYWxzbyBhZGQgYmRydl9maWx0ZXJlZF9jaGlsZCgpIHdoaWNoIHJl
+dHVybnMgdGhhdA0KPj4+ICAgICBvbmUgY2hpbGQgKG9yIE5VTEwsIGlmIHRoZXJlIGlzIG5vIGZp
+bHRlcmVkIGNoaWxkKS4NCj4+Pg0KPj4+IEFsc28sIG1hbnkgcGxhY2VzIGluIHRoZSBjdXJyZW50
+IGJsb2NrIGxheWVyIHNob3VsZCBiZSBza2lwcGluZyBmaWx0ZXJzDQo+Pj4gKGFsbCBmaWx0ZXJz
+IG9yIGp1c3QgdGhlIG9uZXMgYWRkZWQgaW1wbGljaXRseSwgaXQgZGVwZW5kcykgd2hlbiBnb2lu
+Zw0KPj4+IHRocm91Z2ggYSBibG9jayBub2RlIGNoYWluLiAgVGhleSBkbyBub3QgZG8gdGhhdCBj
+dXJyZW50bHksIGJ1dCB0aGlzDQo+Pj4gcGF0Y2ggbWFrZXMgdGhlbS4NCj4+Pg0KPj4+IE9uZSBl
+eGFtcGxlIGZvciB0aGlzIGlzIHFlbXUtaW1nIG1hcCwgd2hpY2ggc2hvdWxkIHNraXAgZmlsdGVy
+cyBhbmQgb25seQ0KPj4+IGxvb2sgYXQgdGhlIENPVyBlbGVtZW50cyBpbiB0aGUgZ3JhcGguICBU
+aGUgY2hhbmdlIHRvIGlvdGVzdCAyMDQncw0KPj4+IHJlZmVyZW5jZSBvdXRwdXQgc2hvd3MgaG93
+IHVzaW5nIGJsa2RlYnVnIG9uIHRvcCBvZiBhIENPVyBub2RlIHVzZWQgdG8NCj4+PiBtYWtlIHFl
+bXUtaW1nIG1hcCBkaXNyZWdhcmQgdGhlIHJlc3Qgb2YgdGhlIGJhY2tpbmcgY2hhaW4sIGJ1dCB3
+aXRoIHRoaXMNCj4+PiBwYXRjaCwgdGhlIGFsbG9jYXRpb24gaW4gdGhlIGJhc2UgaW1hZ2UgaXMg
+cmVwb3J0ZWQgY29ycmVjdGx5Lg0KPj4+DQo+Pj4gRnVydGhlcm1vcmUsIGEgbm90ZSBzaG91bGQg
+YmUgbWFkZSB0aGF0IHNvbWV0aW1lcyB3ZSBkbyB3YW50IHRvIGFjY2Vzcw0KPj4+IGJzLT5iYWNr
+aW5nIGRpcmVjdGx5LiAgVGhpcyBpcyB3aGVuZXZlciB0aGUgb3BlcmF0aW9uIGluIHF1ZXN0aW9u
+IGlzIG5vdA0KPj4+IGFib3V0IGFjY2Vzc2luZyB0aGUgQ09XIGNoaWxkLCBidXQgdGhlICJiYWNr
+aW5nIiBjaGlsZCwgYmUgaXQgQ09XIG9yDQo+Pj4gbm90LiAgVGhpcyBpcyB0aGUgY2FzZSBpbiBm
+dW5jdGlvbnMgc3VjaCBhcyBiZHJ2X29wZW5fYmFja2luZ19maWxlKCkgb3INCj4+PiB3aGVuZXZl
+ciB3ZSBoYXZlIHRvIGRlYWwgd2l0aCB0aGUgc3BlY2lhbCBiZWhhdmlvciBvZiBAYmFja2luZyBh
+cyBhDQo+Pj4gYmxvY2tkZXYgb3B0aW9uLCB3aGljaCBpcyB0aGF0IGl0IGRvZXMgbm90IGRlZmF1
+bHQgdG8gbnVsbCBsaWtlIGFsbA0KPj4+IG90aGVyIGNoaWxkIHJlZmVyZW5jZXMgZG8uDQo+Pj4N
+Cj4+PiBGaW5hbGx5LCB0aGUgcXVlcnkgZnVuY3Rpb25zIChxdWVyeS1ibG9jayBhbmQgcXVlcnkt
+bmFtZWQtYmxvY2stbm9kZXMpDQo+Pj4gYXJlIG1vZGlmaWVkIHRvIHJldHVybiBhbnkgZmlsdGVy
+ZWQgY2hpbGQgdW5kZXIgImJhY2tpbmciLCBub3QganVzdA0KPj4+IGJzLT5iYWNraW5nIG9yIENP
+VyBjaGlsZHJlbi4gIFRoaXMgaXMgc28gdGhhdCBmaWx0ZXJzIGRvIG5vdCBpbnRlcnJ1cHQNCj4+
+PiB0aGUgcmVwb3J0ZWQgYmFja2luZyBjaGFpbi4gIFRoaXMgY2hhbmdlcyB0aGUgb3V0cHV0IG9m
+IGlvdGVzdCAxODQsIGFzDQo+Pj4gdGhlIHRocm90dGxlZCBub2RlIG5vdyBhcHBlYXJzIGFzIGEg
+YmFja2luZyBjaGlsZC4NCj4+Pg0KPj4+IFNpZ25lZC1vZmYtYnk6IE1heCBSZWl0eiA8bXJlaXR6
+QHJlZGhhdC5jb20+DQo+Pj4gLS0tDQo+Pj4gICAgcWFwaS9ibG9jay1jb3JlLmpzb24gICAgICAg
+ICAgIHwgICA0ICsNCj4+PiAgICBpbmNsdWRlL2Jsb2NrL2Jsb2NrLmggICAgICAgICAgfCAgIDEg
+Kw0KPj4+ICAgIGluY2x1ZGUvYmxvY2svYmxvY2tfaW50LmggICAgICB8ICA0MCArKysrKy0tDQo+
+Pj4gICAgYmxvY2suYyAgICAgICAgICAgICAgICAgICAgICAgIHwgMjEwICsrKysrKysrKysrKysr
+KysrKysrKysrKysrKy0tLS0tLQ0KPj4+ICAgIGJsb2NrL2JhY2t1cC5jICAgICAgICAgICAgICAg
+ICB8ICAgOCArLQ0KPj4+ICAgIGJsb2NrL2Jsb2NrLWJhY2tlbmQuYyAgICAgICAgICB8ICAxNiAr
+Ky0NCj4+PiAgICBibG9jay9jb21taXQuYyAgICAgICAgICAgICAgICAgfCAgMzMgKysrLS0tDQo+
+Pj4gICAgYmxvY2svaW8uYyAgICAgICAgICAgICAgICAgICAgIHwgIDQ1ICsrKystLS0NCj4+PiAg
+ICBibG9jay9taXJyb3IuYyAgICAgICAgICAgICAgICAgfCAgMjEgKystLQ0KPj4+ICAgIGJsb2Nr
+L3FhcGkuYyAgICAgICAgICAgICAgICAgICB8ICAzMCArKystLQ0KPj4+ICAgIGJsb2NrL3N0cmVh
+bS5jICAgICAgICAgICAgICAgICB8ICAxMyArLQ0KPj4+ICAgIGJsb2NrZGV2LmMgICAgICAgICAg
+ICAgICAgICAgICB8ICA4OCArKysrKysrKysrKy0tLQ0KPj4+ICAgIG1pZ3JhdGlvbi9ibG9jay1k
+aXJ0eS1iaXRtYXAuYyB8ICAgNCArLQ0KPj4+ICAgIG5iZC9zZXJ2ZXIuYyAgICAgICAgICAgICAg
+ICAgICB8ICAgNiArLQ0KPj4+ICAgIHFlbXUtaW1nLmMgICAgICAgICAgICAgICAgICAgICB8ICAy
+OSArKy0tLQ0KPj4+ICAgIHRlc3RzL3FlbXUtaW90ZXN0cy8xODQub3V0ICAgICB8ICAgNyArLQ0K
+Pj4+ICAgIHRlc3RzL3FlbXUtaW90ZXN0cy8yMDQub3V0ICAgICB8ICAgMSArDQo+Pj4gICAgMTcg
+ZmlsZXMgY2hhbmdlZCwgNDExIGluc2VydGlvbnMoKyksIDE0NSBkZWxldGlvbnMoLSkNCj4+DQo+
+PiByZWFsbHkgaHVnZS4uLiBkaWRuJ3QgeW91IGNvbnNpZGVyIGNvbnZlcnNpb24gZmlsZS1ieS1m
+aWxlPw0KPiANCj4gRnJhbmtseSwgbm8sIEkganVzdCBkaWRu4oCZdCBjb25zaWRlciBpdC4NCj4g
+DQo+IEhtLiAgSSBkb27igJl0IGtub3csIDMwLXBhdGNoIHNlcmllcyBhbHdheXMgbG9vayBzbyBm
+cmlnaHRlbmluZy4NCj4gDQo+Pj4gZGlmZiAtLWdpdCBhL2Jsb2NrLmMgYi9ibG9jay5jDQo+Pj4g
+aW5kZXggMTY2MTViYzg3Ni4uZThmNmZlYmRhMCAxMDA2NDQNCj4+PiAtLS0gYS9ibG9jay5jDQo+
+Pj4gKysrIGIvYmxvY2suYw0KPj4NCj4+IFsuLl0NCj4+DQo+Pj4gICAgDQo+Pj4gQEAgLTM0Njcs
+MTQgKzM0NjksMTcgQEAgc3RhdGljIGludCBiZHJ2X3Jlb3Blbl9wYXJzZV9iYWNraW5nKEJEUlZS
+ZW9wZW5TdGF0ZSAqcmVvcGVuX3N0YXRlLA0KPj4+ICAgICAgICAvKg0KPj4+ICAgICAgICAgKiBG
+aW5kIHRoZSAiYWN0dWFsIiBiYWNraW5nIGZpbGUgYnkgc2tpcHBpbmcgYWxsIGxpbmtzIHRoYXQg
+cG9pbnQNCj4+PiAgICAgICAgICogdG8gYW4gaW1wbGljaXQgbm9kZSwgaWYgYW55IChlLmcuIGEg
+Y29tbWl0IGZpbHRlciBub2RlKS4NCj4+PiArICAgICAqIFdlIGNhbm5vdCB1c2UgYW55IG9mIHRo
+ZSBiZHJ2X3NraXBfKigpIGZ1bmN0aW9ucyBoZXJlIGJlY2F1c2UNCj4+PiArICAgICAqIHRob3Nl
+IHJldHVybiB0aGUgZmlyc3QgZXhwbGljaXQgbm9kZSwgd2hpbGUgd2UgYXJlIGxvb2tpbmcgZm9y
+DQo+Pj4gKyAgICAgKiBpdHMgb3ZlcmxheSBoZXJlLg0KPj4+ICAgICAgICAgKi8NCj4+PiAgICAg
+ICAgb3ZlcmxheV9icyA9IGJzOw0KPj4+IC0gICAgd2hpbGUgKGJhY2tpbmdfYnMob3ZlcmxheV9i
+cykgJiYgYmFja2luZ19icyhvdmVybGF5X2JzKS0+aW1wbGljaXQpIHsNCj4+PiAtICAgICAgICBv
+dmVybGF5X2JzID0gYmFja2luZ19icyhvdmVybGF5X2JzKTsNCj4+PiArICAgIHdoaWxlIChvdmVy
+bGF5X2JzLT5iYWNraW5nICYmIGJkcnZfZmlsdGVyZWRfYnMob3ZlcmxheV9icyktPmltcGxpY2l0
+KSB7DQo+Pg0KPj4gU28sIHlvdSBkb24ndCB3YW50IHRvIHNraXAgaW1wbGljaXQgZmlsdGVycyB3
+aXRoICdmaWxlJyBjaGlsZD8gVGhlbiwgd2h5IG5vdCB0byB1c2UNCj4+IGNoaWxkX2JzKG92ZXJs
+YXlfYnMtPmJhY2tpbmcpLCBsaWtlIGluIGZvbGxvd2luZyBpZiBjb25kaXRpb24/DQo+IA0KPiBJ
+IHRoaW5rIGl0IHdhcyBhbiBhcnRpZmFjdCBvZiB3cml0aW5nIHRoZSBwYXRjaC4gIEkgc3RhcnRl
+ZCB3aXRoDQo+IGJkcnZfZmlsdGVyZWRfYnMoKSBhbmQgdGhlbiByZWFsaXplZCB0aGlzIGRlcGVu
+ZHMgb24gLT5iYWNraW5nLA0KPiBhY3R1YWxseS4gIFRoZXJlIHdhcyBubyBmdW5jdGlvbmFsIGRp
+ZmZlcmVuY2Ugc28gSSBsZWZ0IGl0IGFzIGl0IHdhcy4NCj4gDQo+IEJ1dCB5b3XigJlyZSByaWdo
+dCwgaXQgaXMgbW9yZSBjbGVhciB0byB1c2UgY2hpbGRfYnMob3ZlcmxheV9icy0+YmFja2luZykN
+Cj4gaXNudGVhZC4NCj4gDQo+PiBDb3VsZCB3ZSBpbnN0ZWFkIG1ha2UgYmFja2luZy1iYXNlZCBm
+aWx0ZXJzIGVxdWFsIHRvIGZpbGUtYmFzZWQsIHRvIG1ha2UgaXQgcG9zc2libGUNCj4+IHRvIHVz
+ZSBmaWxlLWJhc2VkIGZpbHRlcnMgaW4gYmFja2luZy1jaGFpbiByZWxhdGVkIHNjZW5hcmlvcyAo
+bGlrZSB1cGNvbWluZyBjb3B5LW9uLXJlYWQNCj4+IGZpbHRlciBmb3Igc3RyZWFtKT8gU28sIHRv
+IGV4cGFuZCBiYWNraW5nLWNoYWluIGNvbmNlcHQgdG8gaW5jbHVkZSBmaWx0ZXJzIHdpdGggZmls
+ZSBjaGlsZD8NCj4gDQo+IElmIEkgdW5kZXJzdGFuZCB5b3UgY29ycmVjdGx5LCB0aGF04oCZcyBi
+YXNpY2FsbHkgdGhlIHB1cnBvc2Ugb2YgdGhpcw0KPiBzZXJpZXMgYW5kIGVzcGVjaWFsbHkgdGhp
+cyBwYXRjaCBoZXJlLiAgQXMgZmFyIGFzIGl0IGlzIHBvc3NpYmxlIGFuZA0KPiByZWFzb25hYmxl
+LCBJIHdhbnQgZmlsdGVycyB0aGF0IHVzZSBicy0+YmFja2luZyBhbmQgYnMtPmZpbGUgYmVoYXZl
+IHRoZQ0KPiBzYW1lLg0KPiANCj4gSG93ZXZlciwgdGhlcmUgYXJlIGNhc2VzIHdoZXJlIHRoaXMg
+aXMgbm90IHBvc3NpYmxlIGFuZA0KPiBiZHJ2X3Jlb3Blbl9wYXJzZV9iYWNraW5nKCkgaXMgb25l
+IHN1Y2ggY2FzZS4gIGJzLT5iYWNraW5nIGFuZCBicy0+ZmlsZQ0KPiBjb3JyZXNwb25kIHRvIFFB
+UEkgbmFtZXMsIG5hbWVseSAnYmFja2luZycgYW5kICdmaWxlJy4gIElmIHRoYXQNCj4gZGlzdGlu
+Y3Rpb24gd2FzIGFscmVhZHkgdmlzaWJsZSB0byB0aGUgdXNlciwgd2UgY2Fubm90IGNoYW5nZSBp
+dCBub3cuDQo+IA0KPiBXZSBkZWZpbml0ZWx5IGNhbm5vdCBtYWtlIGZpbGUtYmFzZWQgZmlsdGVy
+cyB1c2UgYnMtPmJhY2tpbmcgbm93IGJlY2F1c2UNCj4geW91IGNhbiBjcmVhdGUgdGhlbSBvdmVy
+IFFBUEkgYW5kIHRoZXkgdXNlICdmaWxlJyBhcyB0aGVpciBjaGlsZCBuYW1lLg0KPiBDYW4gd2Ug
+bWFrZSBiYWNraW5nLWJhc2VkIGZpbHRlcnMgdXNlIGJzLT5maWxlPyAgU2VlbXMgbW9yZSBsaWtl
+bHksDQo+IGJlY2F1c2UgYWxsIG9mIHRoZW0gYXJlIGltcGxpY2l0IG5vZGVzLCBzbyB0aGUgdXNl
+ciB1c3VhbGx5IGRvZXNu4oCZdCBzZWUNCj4gdGhlbS4gIEJ1dCB1c3VhbGx5IGlzbuKAmXQgYWx3
+YXlzOyB0aGV5IGRvIGJlY29tZSB1c2VyLXZpc2libGUgb25jZSB0aGUNCj4gdXNlciBzcGVjaWZp
+ZXMgYSBub2RlLW5hbWUgZm9yIG1pcnJvciBvciBjb21taXQuDQo+IA0KPiBJIGZvdW5kIGl0IG1v
+cmUgcmVhc29uYWJsZSB0byBpbnRyb2R1Y2UgbmV3IGZ1bmN0aW9ucyB0aGF0IGV4cGxpY2l0bHkN
+Cj4gZXhwcmVzcyB3aGF0IGtpbmQgb2YgY2hpbGQgdGhleSBleHBlY3QgYW5kIHRoZW4gYXBwbHkg
+dGhlbSBldmVyeXdoZXJlIGFzDQo+IEkgc2F3IGZpdCwgaW5zdGVhZCBvZiBtYWtpbmcgdGhlIG1p
+cnJvci9jb21taXQgZmlsdGVyIGRyaXZlcnMgdXNlDQo+IGJzLT5maWxlIGFuZCBob3BlIGl0IHdv
+cmtzOyBub3QgbGVhc3QgYmVjYXVzZSBJ4oCZZCBzdGlsbCBoYXZlIHRvIGdvDQo+IHRocm91Z2gg
+dGhlIHdob2xlIGJsb2NrIGxheWVyIGFuZCBjaGVjayBldmVyeSBpbnN0YW5jZSBvZiBicy0+YmFj
+a2luZyB0bw0KPiBzZWUgd2hldGhlciBpdCByZWFsbHkgbmVlZHMgYnMtPmJhY2tpbmcgb3Igd2hl
+dGhlciBpdCBzaG91bGQgdXNlIGVpdGhlcg0KPiBvZiBicy0+YmFja2luZyBvciBicy0+ZmlsZS4N
+Cj4gDQo+Pj4gKyAgICAgICAgb3ZlcmxheV9icyA9IGJkcnZfZmlsdGVyZWRfYnMob3ZlcmxheV9i
+cyk7DQo+Pj4gICAgICAgIH0NCj4+PiAgICANCj4+PiAgICAgICAgLyogSWYgd2Ugd2FudCB0byBy
+ZXBsYWNlIHRoZSBiYWNraW5nIGZpbGUgd2UgbmVlZCBzb21lIGV4dHJhIGNoZWNrcyAqLw0KPj4+
+IC0gICAgaWYgKG5ld19iYWNraW5nX2JzICE9IGJhY2tpbmdfYnMob3ZlcmxheV9icykpIHsNCj4+
+PiArICAgIGlmIChuZXdfYmFja2luZ19icyAhPSBjaGlsZF9icyhvdmVybGF5X2JzLT5iYWNraW5n
+KSkgeyA+ICAgICAgICAgICAvKiBDaGVjayBmb3IgaW1wbGljaXQgbm9kZXMgYmV0d2VlbiBicyBh
+bmQgaXRzIGJhY2tpbmcgZmlsZSAqLw0KPj4+ICAgICAgICAgICAgaWYgKGJzICE9IG92ZXJsYXlf
+YnMpIHsNCj4+PiAgICAgICAgICAgICAgICBlcnJvcl9zZXRnKGVycnAsICJDYW5ub3QgY2hhbmdl
+IGJhY2tpbmcgbGluayBpZiAnJXMnIGhhcyAiDQo+Pg0KPj4gWy4uXQ0KPj4NCj4+PiBAQCAtNDIw
+Myw4ICs0MjA4LDggQEAgaW50IGJkcnZfY2hhbmdlX2JhY2tpbmdfZmlsZShCbG9ja0RyaXZlclN0
+YXRlICpicywNCj4+PiAgICBCbG9ja0RyaXZlclN0YXRlICpiZHJ2X2ZpbmRfb3ZlcmxheShCbG9j
+a0RyaXZlclN0YXRlICphY3RpdmUsDQo+Pj4gICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
+ICAgICAgICAgQmxvY2tEcml2ZXJTdGF0ZSAqYnMpDQo+Pj4gICAgew0KPj4+IC0gICAgd2hpbGUg
+KGFjdGl2ZSAmJiBicyAhPSBiYWNraW5nX2JzKGFjdGl2ZSkpIHsNCj4+PiAtICAgICAgICBhY3Rp
+dmUgPSBiYWNraW5nX2JzKGFjdGl2ZSk7DQo+Pj4gKyAgICB3aGlsZSAoYWN0aXZlICYmIGJzICE9
+IGJkcnZfZmlsdGVyZWRfYnMoYWN0aXZlKSkgew0KPj4NCj4+IGhtbSBhbmQgaGVyZSB5b3UgYWN0
+dWFsbHkgc3VwcG9ydCBiYWNraW5nLWNoYWluIHdpdGggZmlsZS1jaGlsZC1iYXNlZCBmaWx0ZXJz
+IGluIGl0Li4NCj4gDQo+IFllcywgYmVjYXVzZSB0aGlzIGlzIG5vdCBhYm91dCB0aGUgUUFQSSAn
+YmFja2luZycgbGluay4gIFRoaXMgZnVuY3Rpb24NCj4gc2hvdWxkIGNvbnRpbnVlIHRvIHdvcmsg
+ZXZlbiBpZiB0aGVyZSBhcmUgZmlsdGVycyBpbiB0aGUgYmFja2luZyBjaGFpbi4NCg0KdGhpcyBp
+cyBhIGdlbmVyaWMgZnVuY3Rpb24gdG8gZmluZCBvdmVybGF5IGluIGJhY2tpbmcgY2hhaW4gYW5k
+IGl0IG1heSBiZSB1c2VkIGZyb20gZGlmZmVyZW50IHBsYWNlcywNCmZvciBleGFtcGxlIGl0IGlz
+IHVzZWQgaW4gQW5kcmV5J3Mgc2VyaWVzIGFib3V0IGZpbHRlciBmb3IgYmxvY2stc3RyZWFtLg0K
+DQpJdCBpcyB1c2VkIGZyb20gcW1wX2Jsb2NrX2NvbW1pdCwgaXNuJ3QgaXQgYWJvdXQgUUFQST8N
+Cg0KPiANCj4+PiArICAgICAgICBhY3RpdmUgPSBiZHJ2X2ZpbHRlcmVkX2JzKGFjdGl2ZSk7DQo+
+Pj4gICAgICAgIH0NCj4+PiAgICANCj4+PiAgICAgICAgcmV0dXJuIGFjdGl2ZTsNCj4+PiBAQCAt
+NDIyNiwxMSArNDIzMSwxMSBAQCBib29sIGJkcnZfaXNfYmFja2luZ19jaGFpbl9mcm96ZW4oQmxv
+Y2tEcml2ZXJTdGF0ZSAqYnMsIEJsb2NrRHJpdmVyU3RhdGUgKmJhc2UsDQo+Pj4gICAgew0KPj4+
+ICAgICAgICBCbG9ja0RyaXZlclN0YXRlICppOw0KPj4+ICAgIA0KPj4+IC0gICAgZm9yIChpID0g
+YnM7IGkgIT0gYmFzZTsgaSA9IGJhY2tpbmdfYnMoaSkpIHsNCj4+PiArICAgIGZvciAoaSA9IGJz
+OyBpICE9IGJhc2U7IGkgPSBjaGlsZF9icyhpLT5iYWNraW5nKSkgew0KPj4NCj4+IGFuZCBoZXJl
+IGRvbid0Li4NCj4gDQo+IFllcywgYmVjYXVzZSB0aGlzIGZ1bmN0aW9uIGlzIGFib3V0IHRoZSBR
+QVBJICdiYWNraW5nJyBsaW5rLg0KDQpBbmQgdGhpcyBhZ2FpbiBhIGdlbmVyaWMgdGhpbmcsIHRo
+YXQgbWF5IGJlIHVzZWQgaW4gc2FtZSBwbGFjZXMgYXMgYmRydl9maW5kX292ZXJsYXksDQphbmQg
+aXQgaXMgdXNlZCBpbiBzZXJpZXMgYWJvdXQgYmxvY2stc3RyZWFtIGZpbHRlciB0b28uIFNvLCBm
+b3IgZnVydGhlciBkZXZlbG9wbWVudHMNCndlJ2xsIGhhdmUgdG8ga2VlcCBpbiBtaW5kIGFsbCB0
+aGVzZSBkaWZmZXJlbmNlcyBiZXR3ZWVuIGdlbmVyaWMgYmxvY2sgbGF5ZXIgZnVuY3Rpb25zLA0K
+d2hpY2ggc3VwcG9ydHMgLmZpbGUgY2hpbGRyZW4gaW5zaWRlIGJhY2tpbmcgY2hhaW4gYW5kIHdo
+aWNoIGFyZSBub3QuLi4NCg0KPiANCj4+PiAgICAgICAgICAgIGlmIChpLT5iYWNraW5nICYmIGkt
+PmJhY2tpbmctPmZyb3plbikgew0KPj4+ICAgICAgICAgICAgICAgIGVycm9yX3NldGcoZXJycCwg
+IkNhbm5vdCBjaGFuZ2UgJyVzJyBsaW5rIGZyb20gJyVzJyB0byAnJXMnIiwNCj4+PiAgICAgICAg
+ICAgICAgICAgICAgICAgICAgIGktPmJhY2tpbmctPm5hbWUsIGktPm5vZGVfbmFtZSwNCj4+PiAt
+ICAgICAgICAgICAgICAgICAgICAgICBiYWNraW5nX2JzKGkpLT5ub2RlX25hbWUpOw0KPj4+ICsg
+ICAgICAgICAgICAgICAgICAgICAgIGktPmJhY2tpbmctPmJzLT5ub2RlX25hbWUpOw0KPj4+ICAg
+ICAgICAgICAgICAgIHJldHVybiB0cnVlOw0KPj4+ICAgICAgICAgICAgfQ0KPj4+ICAgICAgICB9
+DQo+Pg0KPj4gWy4uXQ0KPj4NCj4+PiArc3RhdGljIEJsb2NrRHJpdmVyU3RhdGUgKmJkcnZfc2tp
+cF9maWx0ZXJzKEJsb2NrRHJpdmVyU3RhdGUgKmJzLA0KPj4+ICsgICAgICAgICAgICAgICAgICAg
+ICAgICAgICAgICAgICAgICAgICAgICAgYm9vbCBzdG9wX29uX2V4cGxpY2l0X2ZpbHRlcikNCj4+
+PiArew0KPj4+ICsgICAgQmRydkNoaWxkICpmaWx0ZXJlZDsNCj4+PiArDQo+Pj4gKyAgICBpZiAo
+IWJzKSB7DQo+Pj4gKyAgICAgICAgcmV0dXJuIE5VTEw7DQo+Pj4gKyAgICB9DQo+Pj4gKw0KPj4+
+ICsgICAgd2hpbGUgKCEoc3RvcF9vbl9leHBsaWNpdF9maWx0ZXIgJiYgIWJzLT5pbXBsaWNpdCkp
+IHsNCj4+DQo+PiB5b3UgbWF5IHNhdmUgc29tZSBjaGFyYWN0ZXJzIGFuZCBleHRyYSBvcGVyYXRv
+cnMgYnkNCj4+DQo+PiBib29sIHNraXBfZXhwbGljaXQNCj4+IC4uLg0KPj4gd2hpbGUgKHNraXBf
+ZXhwbGljaXQgfHwgYnMtPmltcGxpY2l0KSB7DQo+IA0KPiBCdXQgaXMgaXQgcmVhbGx5IHNpbXBs
+ZXI/DQo+IA0KPj4+ICsgICAgICAgIGZpbHRlcmVkID0gYmRydl9maWx0ZXJlZF9yd19jaGlsZChi
+cyk7DQo+Pj4gKyAgICAgICAgaWYgKCFmaWx0ZXJlZCkgew0KPj4+ICsgICAgICAgICAgICBicmVh
+azsNCj4+PiArICAgICAgICB9DQo+Pj4gKyAgICAgICAgYnMgPSBmaWx0ZXJlZC0+YnM7DQo+Pj4g
+KyAgICB9DQo+Pj4gKyAgICAvKg0KPj4+ICsgICAgICogTm90ZSB0aGF0IHRoaXMgdHJlYXRzIG5v
+ZGVzIHdpdGggYnMtPmRydiA9PSBOVUxMIGFzIG5vdCBiZWluZw0KPj4+ICsgICAgICogUi9XIGZp
+bHRlcnMgKGJzLT5kcnYgPT0gTlVMTCBzaG91bGQgYmUgcmVwbGFjZWQgYnkgc29tZXRoaW5nDQo+
+Pj4gKyAgICAgKiBlbHNlIGFueXdheSkuDQo+Pj4gKyAgICAgKiBUaGUgYWR2YW50YWdlIG9mIHRo
+aXMgYmVoYXZpb3IgaXMgdGhhdCB0aGlzIGZ1bmN0aW9uIHdpbGwgdGh1cw0KPj4+ICsgICAgICog
+YWx3YXlzIHJldHVybiBhIG5vbi1OVUxMIHZhbHVlIChnaXZlbiBhIG5vbi1OVUxMIEBicykuDQo+
+Pj4gKyAgICAgKi8NCj4+PiArDQo+Pj4gKyAgICByZXR1cm4gYnM7DQo+Pj4gK30NCj4+PiArDQo+
+Pj4gKy8qDQo+Pj4gKyAqIFJldHVybiB0aGUgZmlyc3QgQkRTIHRoYXQgaGFzIG5vdCBiZWVuIGFk
+ZGVkIGltcGxpY2l0bHkgb3IgdGhhdA0KPj4+ICsgKiBkb2VzIG5vdCBoYXZlIGFuIFJXLWZpbHRl
+cmVkIGNoaWxkIGRvd24gdGhlIGNoYWluIHN0YXJ0aW5nIGZyb20gQGJzDQo+Pj4gKyAqIChpbmNs
+dWRpbmcgQGJzIGl0c2VsZikuDQo+Pj4gKyAqLw0KPj4+ICtCbG9ja0RyaXZlclN0YXRlICpiZHJ2
+X3NraXBfaW1wbGljaXRfZmlsdGVycyhCbG9ja0RyaXZlclN0YXRlICpicykNCj4+PiArew0KPj4+
+ICsgICAgcmV0dXJuIGJkcnZfc2tpcF9maWx0ZXJzKGJzLCB0cnVlKTsNCj4+PiArfQ0KPj4+ICsN
+Cj4+PiArLyoNCj4+PiArICogUmV0dXJuIHRoZSBmaXJzdCBCRFMgdGhhdCBkb2VzIG5vdCBoYXZl
+IGFuIFJXLWZpbHRlcmVkIGNoaWxkIGRvd24NCj4+PiArICogdGhlIGNoYWluIHN0YXJ0aW5nIGZy
+b20gQGJzIChpbmNsdWRpbmcgQGJzIGl0c2VsZikuDQo+Pj4gKyAqLw0KPj4+ICtCbG9ja0RyaXZl
+clN0YXRlICpiZHJ2X3NraXBfcndfZmlsdGVycyhCbG9ja0RyaXZlclN0YXRlICpicykNCj4+PiAr
+ew0KPj4+ICsgICAgcmV0dXJuIGJkcnZfc2tpcF9maWx0ZXJzKGJzLCBmYWxzZSk7DQo+Pj4gK30N
+Cj4+PiArDQo+Pj4gKy8qDQo+Pj4gKyAqIEZvciBhIGJhY2tpbmcgY2hhaW4sIHJldHVybiB0aGUg
+Zmlyc3Qgbm9uLWZpbHRlciBiYWNraW5nIGltYWdlLg0KPj4NCj4+IG9yIHNlY29uZCwgaWYgd2Ug
+c3RhcnQgZnJvbSBmaWx0ZXINCj4gDQo+IEhtLCBpbiBhIHNlbnNlLiAgTWF5YmU6DQo+IA0KPj4g
+Rm9yIGEgYmFja2luZyBjaGFpbiwgcmV0dXJuIHRoZSBmaXJzdCBub24tZmlsdGVyIGJhY2tpbmcg
+aW1hZ2Ugb2YgdGhlDQo+PiBmaXJzdCBub24tZmlsdGVyIGltYWdlLg0KPiANCj4gPw0KPiANCj4+
+PiArICovDQo+Pj4gK0Jsb2NrRHJpdmVyU3RhdGUgKmJkcnZfYmFja2luZ19jaGFpbl9uZXh0KEJs
+b2NrRHJpdmVyU3RhdGUgKmJzKQ0KPj4+ICt7DQo+Pj4gKyAgICByZXR1cm4gYmRydl9za2lwX3J3
+X2ZpbHRlcnMoYmRydl9maWx0ZXJlZF9jb3dfYnMoYmRydl9za2lwX3J3X2ZpbHRlcnMoYnMpKSk7
+DQo+Pj4gK30NCj4+DQo+Pg0KPj4NCj4gDQo+IA0KDQoNCi0tIA0KQmVzdCByZWdhcmRzLA0KVmxh
+ZGltaXINCg==
 
