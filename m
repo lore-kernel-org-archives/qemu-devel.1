@@ -2,52 +2,117 @@ Return-Path: <SRS0=rbQy=SV=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.7 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 33C56C282DA
-	for <qemu-devel@archiver.kernel.org>; Fri, 19 Apr 2019 17:51:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A3F63C282E0
+	for <qemu-devel@archiver.kernel.org>; Fri, 19 Apr 2019 18:23:10 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0B5E3222E3
-	for <qemu-devel@archiver.kernel.org>; Fri, 19 Apr 2019 17:51:49 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0B5E3222E3
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
+	by mail.kernel.org (Postfix) with ESMTPS id 6F863222D2
+	for <qemu-devel@archiver.kernel.org>; Fri, 19 Apr 2019 18:23:10 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="NeduNxOb"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6F863222D2
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=twiddle.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:59592 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:59843 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hHXfw-00081K-Cy
-	for qemu-devel@archiver.kernel.org; Fri, 19 Apr 2019 13:51:48 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:40700)
+	id 1hHYAH-0004LY-36
+	for qemu-devel@archiver.kernel.org; Fri, 19 Apr 2019 14:23:09 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:48735)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1hHXcs-00067p-WC
-	for qemu-devel@nongnu.org; Fri, 19 Apr 2019 13:48:39 -0400
+	(envelope-from <rth7680@gmail.com>) id 1hHY9Q-00042O-JN
+	for qemu-devel@nongnu.org; Fri, 19 Apr 2019 14:22:17 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1hHXcq-0003xy-K8
-	for qemu-devel@nongnu.org; Fri, 19 Apr 2019 13:48:38 -0400
-Received: from relay.sw.ru ([185.231.240.75]:42184)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
-	id 1hHXcq-0003wx-CY; Fri, 19 Apr 2019 13:48:36 -0400
-Received: from [10.28.8.145] (helo=kvm.sw.ru)
-	by relay.sw.ru with esmtp (Exim 4.91)
-	(envelope-from <vsementsov@virtuozzo.com>)
-	id 1hHXcn-0001Mc-55; Fri, 19 Apr 2019 20:48:33 +0300
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-To: qemu-devel@nongnu.org,
-	qemu-block@nongnu.org
-Date: Fri, 19 Apr 2019 20:48:32 +0300
-Message-Id: <20190419174832.146377-3-vsementsov@virtuozzo.com>
-X-Mailer: git-send-email 2.18.0
-In-Reply-To: <20190419174832.146377-1-vsementsov@virtuozzo.com>
-References: <20190419174832.146377-1-vsementsov@virtuozzo.com>
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x
-X-Received-From: 185.231.240.75
-Subject: [Qemu-devel] [PATCH 2/2] blockjob: use blk_new_pinned in
- block_job_create
+	(envelope-from <rth7680@gmail.com>) id 1hHY9P-0002dT-PR
+	for qemu-devel@nongnu.org; Fri, 19 Apr 2019 14:22:16 -0400
+Received: from mail-pg1-x52c.google.com ([2607:f8b0:4864:20::52c]:46470)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <rth7680@gmail.com>) id 1hHY9P-0002ck-Gu
+	for qemu-devel@nongnu.org; Fri, 19 Apr 2019 14:22:15 -0400
+Received: by mail-pg1-x52c.google.com with SMTP id v2so559649pge.13
+	for <qemu-devel@nongnu.org>; Fri, 19 Apr 2019 11:22:14 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+	h=sender:subject:to:cc:references:from:openpgp:autocrypt:message-id
+	:date:user-agent:mime-version:in-reply-to:content-language
+	:content-transfer-encoding;
+	bh=/Tm501/g3SBXAd2rUTgHxex51H6wSOc5e63Dn2ZJ7vM=;
+	b=NeduNxOboazOR4t/lwfdUExCyt4GD6gzpI1q3PAqqLPlb3zJJmYI0/cCxXukkn3f9R
+	Dhqem53Qo0WSJcYRLLic4r6Zvs+JuO0Txjb5Fn5G8KSU02otJMFJrE0I1ww6aLQ9aJCr
+	53peI1gIUhqhBizzvW5Ay4ZUBgN6moKadb8T66CJ5fIxi2KMxHgG0n52a4aAqibg9qHF
+	JqAQJ5y6okQpkpIFPrYRtwP314jxBFSEAUc9arwR5WY10iGXVtytfSAg/ZhFFu37Isyt
+	WaEo17RUCAtoT67bSw7hFTkF97AwfmiqkOIB7BZocfaBVem3WVOt6gJ0m17Z3JKvVq/N
+	/OOA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=1e100.net; s=20161025;
+	h=x-gm-message-state:sender:subject:to:cc:references:from:openpgp
+	:autocrypt:message-id:date:user-agent:mime-version:in-reply-to
+	:content-language:content-transfer-encoding;
+	bh=/Tm501/g3SBXAd2rUTgHxex51H6wSOc5e63Dn2ZJ7vM=;
+	b=TbMs9VrVzf5LgdAMB7FWAxJdzzk2pitIOyrbS4w3XDyZQefaolMXuBVocP3nQhop3x
+	+ILt1vSFCPIPq5YLGmUH3Jsn/e2Mm61738MC8zsVWNt5VdRVZovaZwGT9gzlYlSHXXsN
+	4TpQ2id0lG3asHPJbFISK/JgFPrIdQ2+sHGkWhqTvs0bFSsDWSy72VU83thGAqSqVuXf
+	QNW2960VgdNjcVbOv/Jtp4K6xQGHDJ//CuXUWufSkhEg6J1S+tPnk7EkCBpX7A1imXlW
+	ifjT9sT4Mj3F6xf7MAjAOa3w4Zf1quwqfS8I4MYkSMMmaWE5m2c5ZJZV8h7Gfnl6dp7r
+	ui0Q==
+X-Gm-Message-State: APjAAAXV9uHLFriCvOMWCiWeE8wUkWg7qZBJ3u88+aEFD6EylRQly1Nk
+	fYhRBgVxi7lCMyQyGseSJyE=
+X-Google-Smtp-Source: APXvYqz7Kx00FvckzFclS3oY03m81h9r0WKOMpd5CZILAn35EWMnNWP7h04lrtH5S/a1lMNkyA9ADg==
+X-Received: by 2002:a62:12d0:: with SMTP id 77mr5494465pfs.15.1555698133244;
+	Fri, 19 Apr 2019 11:22:13 -0700 (PDT)
+Received: from [172.20.101.138] (rrcs-66-91-136-155.west.biz.rr.com.
+	[66.91.136.155]) by smtp.googlemail.com with ESMTPSA id
+	y19sm8110935pfn.164.2019.04.19.11.22.10
+	(version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+	Fri, 19 Apr 2019 11:22:11 -0700 (PDT)
+To: G 3 <programmingkidx@gmail.com>, Thomas Huth <thuth@redhat.com>
+References: <20190418224706.14014-1-programmingkidx@gmail.com>
+	<723372ae-a37a-d7cd-098f-452c7513ce8a@redhat.com>
+	<4B73E5E6-2129-43B8-A35E-0CF7DCAE163B@gmail.com>
+From: Richard Henderson <rth@twiddle.net>
+Openpgp: preference=signencrypt
+Autocrypt: addr=rth@twiddle.net; prefer-encrypt=mutual; keydata=
+	mQENBFGuLC8BCADcAoWcnW9lTsDMzbO3MBU+KbiGaj5JPatEUscRDkQYM2fyNjJp2tIWDK5a
+	n4yngeXB3eX61WbYR3QraRK8mlYLGxyAdHMEQfPipbqf3TmN043fssT2bc82ApJcs1zvLYgI
+	rhMht7Dck7A0wNC1jo+ZjVVFig5gDTN7gOzaAdBtV8tVNUddwkLzzaGpfihhSD6U46NdqKOG
+	Wlnn6TrkMy0QGdQ5NaXHkRlUjnnUTSW/nKfoxD+EI+A9V4sYOd8mc/TL4aJh/i/AiU57eLbo
+	n17uQI6/VTWDUWl8USiz4x9c8vmqlywLx00tAFxxoRWqk4KVJlj+Sh0up/D/sJ+vPpgBABEB
+	AAG0I1JpY2hhcmQgSGVuZGVyc29uIDxydGhAdHdpZGRsZS5uZXQ+iQFBBBMBAgArAhsDBgsJ
+	CAcDAgYVCAIJCgsEFgIDAQIeAQIXgAUJC7UHogUCWaDNVgIZAQAKCRCtEnDMTdAnm9N5CADO
+	cB8F/SudJ72IupxQf40hbJdBK176+gb3sHMsixyLtrU59lee+lIM1OZmlNjsnCYmiSnbA5ks
+	Q7p0HfO7DgdmfLzcK6xsHZukqSZy5LByw348Y913ZyjOrJZFdPP7kDg1MnqRqH4+3ZdzxV4y
+	eYBWFU9GYMIF06JbUubossOOO4ArNVZbnIPu8Vn2tDZVVqsCBqkoCSBMj519xrvyOu5z4mHS
+	LkCglXmVDOXMbqLuNAC3rfNXSnyM4hYkLUyfALJlAAy1Ro+jUqYhu7XUFV/MiwRuFMh5GbtY
+	Urkx7tqsWQXLT3GeDk/LqvpWJQwk4cHHckYjRih+70CHIenm81PVuQENBFGuLC8BCACyEx3x
+	94HIkTX0CHu2sA0w75+h9wuoA8ggJ7+S4ri0y2YsijWad5TTt6z6MMiqxk9kSA5bppaj4HXh
+	86hBF/dWCtMpNr3Rb8FNOKyeA/qkYHVD6HiAiw9c6D8Dr9hWmOk3/HSmGrNURxeUFOckDXsv
+	I+yGGKBNshj59j7QZr7ZiuIi2rWlBL8dFN/OWa/o3x7HKsE4k6K8ngwvCKP/QbDLwLLBOWH+
+	VEUtpyeyxTr3OJ47ECTxdYvXoAV2iJaKr+6doVQiiR5eVFiMYrUPUECJeolOCwqc/JlWE18L
+	+PCAFaW1H+/mpPVfSpN4wnkJ5cQiQVB41IaCM4p20iRzx7ZJABEBAAGJASUEGAECAA8CGwwF
+	AlmgzYEFCQu1CEoACgkQrRJwzE3QJ5s7rggAwABzDAGrZ6uWsMxg5PeiiAYPy6LBnCBJSpB5
+	Tfy5jH8QTmLfXW+u4Ib4sWXG7PYNR7sIrtqUHjRqXLVXrSnBX9ASGcYw/Xil45khW6LsRpO1
+	prHv9gkwQfa6fTiWXVfSfm2Nant6u02q+MaYtQpCVTiz/9ki4FfftUwUHFLU0MhIQogjd11y
+	/E08RJsqBwaHQdt14PwU1HphDOzSkhOXRXQLSd3ysyeGUXvL+gqQoXl5XYdvk8IId4PoJRo4
+	jcyJ4VbnldvXh5gdGhFA/f9JgkLk9tPW+C3wNtNWyRUq8azR9hF2fg2HJUf4IXQlIu8OOgh1
+	VcROBqvtH3ecaIL9iw==
+Message-ID: <58c00451-f216-610d-4c9c-7437fc07c5bc@twiddle.net>
+Date: Fri, 19 Apr 2019 08:22:08 -1000
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+	Thunderbird/60.6.1
+MIME-Version: 1.0
+In-Reply-To: <4B73E5E6-2129-43B8-A35E-0CF7DCAE163B@gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+	recognized.
+X-Received-From: 2607:f8b0:4864:20::52c
+Subject: Re: [Qemu-devel] [PATCH] configure: Change capstone's default state
+ to disabled
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -59,57 +124,29 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: kwolf@redhat.com, vsementsov@virtuozzo.com, jsnow@redhat.com,
-	mreitz@redhat.com
+Cc: peter.maydell@linaro.org, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Content-Type: text/plain; charset="UTF-8"
-Message-ID: <20190419174832.Jd_SF9BCOFVJxXb8mzpRQ6c6yt-0jnBdCrnLnz8xksg@z>
+Message-ID: <20190419182208.AHRR1WaKV7E7KyBsqZueML79wKyTjya6b43EgxU-hBs@z>
 
-child_role job already has .stay_at_node=true, so on bdrv_replace_node
-operation these child are unchanged. Make block job blk behave in same
-manner, to avoid inconsistent intermediate graph states and workarounds
-like in mirror.
+On 4/19/19 3:44 AM, G 3 wrote:
+> 
+> Here is the error message I see when compiling QEMU:
+> 
+> CHK version_gen.h
+> make[1]: *** No rule to make target
+> `/Users/John/qemu-git/capstone/libcapstone.a'.  Stop.
+> make: *** [subdir-capstone] Error 2
 
-Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
----
- block/mirror.c | 6 +-----
- blockjob.c     | 2 +-
- 2 files changed, 2 insertions(+), 6 deletions(-)
+You are configuring with --static?
 
-diff --git a/block/mirror.c b/block/mirror.c
-index ff15cfb197..c2cb6bccff 100644
---- a/block/mirror.c
-+++ b/block/mirror.c
-@@ -713,12 +713,8 @@ static int mirror_exit_common(Job *job)
-                             &error_abort);
-     bdrv_replace_node(mirror_top_bs, backing_bs(mirror_top_bs), &error_abort);
- 
--    /* We just changed the BDS the job BB refers to (with either or both of the
--     * bdrv_replace_node() calls), so switch the BB back so the cleanup does
--     * the right thing. We don't need any permissions any more now. */
--    blk_remove_bs(bjob->blk);
-+    /* We don't need any permissions any more now. */
-     blk_set_perm(bjob->blk, 0, BLK_PERM_ALL, &error_abort);
--    blk_insert_bs(bjob->blk, mirror_top_bs, &error_abort);
- 
-     bs_opaque->job = NULL;
- 
-diff --git a/blockjob.c b/blockjob.c
-index 730101d282..47466bdfcf 100644
---- a/blockjob.c
-+++ b/blockjob.c
-@@ -396,7 +396,7 @@ void *block_job_create(const char *job_id, const BlockJobDriver *driver,
-         job_id = bdrv_get_device_name(bs);
-     }
- 
--    blk = blk_new(perm, shared_perm);
-+    blk = blk_new_pinned(perm, shared_perm);
-     ret = blk_insert_bs(blk, bs, errp);
-     if (ret < 0) {
-         blk_unref(blk);
--- 
-2.18.0
+I've seen this before myself -- IMO it's broken distro packaging, in that the
+shipped pkgconfig/capstone.pc claims static library support, but the static
+library itself wasn't shipped.
 
+We should probably work around this in configure, and report the packaging bug.
+
+
+r~
 
