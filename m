@@ -1,23 +1,19 @@
-Received: from eggs.gnu.org ([209.51.188.92]:49764)
+Received: from eggs.gnu.org ([209.51.188.92]:49838)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <nick.hudson@gmx.co.uk>) id 1hHacY-00020F-FO
-	for qemu-devel@nongnu.org; Fri, 19 Apr 2019 17:00:31 -0400
+	(envelope-from <alistair23@gmail.com>) id 1hHacp-0002NF-QV
+	for qemu-devel@nongnu.org; Fri, 19 Apr 2019 17:00:48 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <nick.hudson@gmx.co.uk>) id 1hHacX-0002fY-MJ
-	for qemu-devel@nongnu.org; Fri, 19 Apr 2019 17:00:30 -0400
-Received: from mout.gmx.net ([212.227.15.18]:59883)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <nick.hudson@gmx.co.uk>)
-	id 1hHacX-0002eu-Ce
-	for qemu-devel@nongnu.org; Fri, 19 Apr 2019 17:00:29 -0400
-From: Nick Hudson <nick.hudson@gmx.co.uk>
-Message-ID: <b148c658-09ed-15a5-02e6-42e1c544e847@gmx.co.uk>
-Date: Fri, 19 Apr 2019 22:00:03 +0100
+	(envelope-from <alistair23@gmail.com>) id 1hHaco-0002od-QC
+	for qemu-devel@nongnu.org; Fri, 19 Apr 2019 17:00:47 -0400
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-GB
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v1 0/2] HPPA fixes for NetBSD/hppa emulation
+References: <20190419061429.17695-1-ehabkost@redhat.com>
+	<20190419061429.17695-3-ehabkost@redhat.com>
+In-Reply-To: <20190419061429.17695-3-ehabkost@redhat.com>
+From: Alistair Francis <alistair23@gmail.com>
+Date: Fri, 19 Apr 2019 14:00:18 -0700
+Message-ID: <CAKmqyKO-djrG6QWXKeEMPNPvdXaVx14iWE7Cgq9TVh8C5_Ytpw@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH 2/7] riscv: Don't split CPU model string
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,23 +22,50 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Richard Henderson <rth@twiddle.net>
+To: Eduardo Habkost <ehabkost@redhat.com>
+Cc: "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>, Peter Maydell <peter.maydell@linaro.org>, "open list:RISC-V" <qemu-riscv@nongnu.org>, Sagar Karandikar <sagark@eecs.berkeley.edu>, Bastian Koppelmann <kbastian@mail.uni-paderborn.de>, Palmer Dabbelt <palmer@sifive.com>, Alistair Francis <Alistair.Francis@wdc.com>, Igor Mammedov <imammedo@redhat.com>, Richard Henderson <rth@twiddle.net>
 
-Hi,
+On Thu, Apr 18, 2019 at 11:20 PM Eduardo Habkost <ehabkost@redhat.com> wrote:
+>
+> CPUClass::class_by_name is called after the CPU model name and
+> options were already split, there's no need to split the string
+> again.
+>
+> Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
 
-Here are the required changes to allow qemu to emulate NetBSD/hppa.
+Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
 
-Nick Hudson (2):
-   Implement the pcxl and pcxl2 Fast TLB Insert instructions as used by
-     NetBSD (and OpenBSD)
-   Always return EXCP_DMAR for protection id trap as EXCP_DMP is
-     considered legacy.
+Alistair
 
-  target/hppa/insns.decode |  3 +++
-  target/hppa/mem_helper.c |  3 +--
-  target/hppa/translate.c  | 54 ++++++++++++++++++++++++++++++++++++++++
-  3 files changed, 58 insertions(+), 2 deletions(-)
-
-=2D-
-2.17.1
+> ---
+> Cc: Palmer Dabbelt <palmer@sifive.com>
+> Cc: Alistair Francis <Alistair.Francis@wdc.com>
+> Cc: Sagar Karandikar <sagark@eecs.berkeley.edu>
+> Cc: Bastian Koppelmann <kbastian@mail.uni-paderborn.de>
+> Cc: qemu-riscv@nongnu.org
+> ---
+>  target/riscv/cpu.c | 5 +----
+>  1 file changed, 1 insertion(+), 4 deletions(-)
+>
+> diff --git a/target/riscv/cpu.c b/target/riscv/cpu.c
+> index d61bce6d55..5e97a83c80 100644
+> --- a/target/riscv/cpu.c
+> +++ b/target/riscv/cpu.c
+> @@ -179,12 +179,9 @@ static ObjectClass *riscv_cpu_class_by_name(const char *cpu_model)
+>  {
+>      ObjectClass *oc;
+>      char *typename;
+> -    char **cpuname;
+>
+> -    cpuname = g_strsplit(cpu_model, ",", 1);
+> -    typename = g_strdup_printf(RISCV_CPU_TYPE_NAME("%s"), cpuname[0]);
+> +    typename = g_strdup_printf(RISCV_CPU_TYPE_NAME("%s"), cpu_model);
+>      oc = object_class_by_name(typename);
+> -    g_strfreev(cpuname);
+>      g_free(typename);
+>      if (!oc || !object_class_dynamic_cast(oc, TYPE_RISCV_CPU) ||
+>          object_class_is_abstract(oc)) {
+> --
+> 2.18.0.rc1.1.g3f1ff2140
+>
+>
