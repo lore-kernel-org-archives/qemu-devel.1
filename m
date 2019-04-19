@@ -1,25 +1,23 @@
-Received: from eggs.gnu.org ([209.51.188.92]:35884)
+Received: from eggs.gnu.org ([209.51.188.92]:36409)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1hHRv5-0001TF-DL
-	for qemu-devel@nongnu.org; Fri, 19 Apr 2019 07:43:04 -0400
+	(envelope-from <shahab.vahedi@gmail.com>) id 1hHRxR-0002jc-Mc
+	for qemu-devel@nongnu.org; Fri, 19 Apr 2019 07:45:30 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1hHRfu-0003FK-HZ
-	for qemu-devel@nongnu.org; Fri, 19 Apr 2019 07:27:23 -0400
-Resent-Message-Id: <E1hHRfu-0003FK-HZ@eggs.gnu.org>
-Received: from sender4-of-o55.zoho.com ([136.143.188.55]:21598)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
-	id 1hHRfu-0003Co-8X
-	for qemu-devel@nongnu.org; Fri, 19 Apr 2019 07:27:22 -0400
-In-Reply-To: <20190419103722.17062-1-shahab.vahedi@gmail.com>
-Message-ID: <155567048223.24.9366683312010640413@c2072b67cc0c>
-Reply-To: <qemu-devel@nongnu.org>
+	(envelope-from <shahab.vahedi@gmail.com>) id 1hHRxI-0000Wj-9E
+	for qemu-devel@nongnu.org; Fri, 19 Apr 2019 07:45:24 -0400
+Received: from mail-ed1-x541.google.com ([2a00:1450:4864:20::541]:39760)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <shahab.vahedi@gmail.com>)
+	id 1hHRxA-0000Pa-Sn
+	for qemu-devel@nongnu.org; Fri, 19 Apr 2019 07:45:14 -0400
+Received: by mail-ed1-x541.google.com with SMTP id k45so4236909edb.6
+	for <qemu-devel@nongnu.org>; Fri, 19 Apr 2019 04:45:10 -0700 (PDT)
+From: Shahab Vahedi <shahab.vahedi@gmail.com>
+Date: Fri, 19 Apr 2019 13:45:02 +0200
+Message-Id: <20190419114502.20388-1-shahab.vahedi@gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Fri, 19 Apr 2019 03:41:23 -0700 (PDT)
-Subject: Re: [Qemu-devel] [PATCH] cputlb: Fix io_readx() to respect the
+Content-Transfer-Encoding: 8bit
+Subject: [Qemu-devel] [PATCH] cputlb: Fix io_readx() to respect the
  access_type
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
@@ -29,36 +27,45 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: shahab.vahedi@gmail.com
-Cc: fam@euphon.net, qemu-devel@nongnu.org, pbonzini@redhat.com, rth@twiddle.net
+To: "open list:Overall" <qemu-devel@nongnu.org>
+Cc: Richard Henderson <rth@twiddle.net>, Paolo Bonzini <pbonzini@redhat.com>, Shahab Vahedi <shahab.vahedi@gmail.com>
 
-UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDE5MDQxOTEwMzcyMi4xNzA2
-Mi0xLXNoYWhhYi52YWhlZGlAZ21haWwuY29tLwoKCgpIaSwKClRoaXMgc2VyaWVzIHNlZW1zIHRv
-IGhhdmUgc29tZSBjb2Rpbmcgc3R5bGUgcHJvYmxlbXMuIFNlZSBvdXRwdXQgYmVsb3cgZm9yCm1v
-cmUgaW5mb3JtYXRpb246CgpUeXBlOiBzZXJpZXMKTWVzc2FnZS1pZDogMjAxOTA0MTkxMDM3MjIu
-MTcwNjItMS1zaGFoYWIudmFoZWRpQGdtYWlsLmNvbQpTdWJqZWN0OiBbUWVtdS1kZXZlbF0gW1BB
-VENIXSBjcHV0bGI6IEZpeCBpb19yZWFkeCgpIHRvIHJlc3BlY3QgdGhlIGFjY2Vzc190eXBlCgo9
-PT0gVEVTVCBTQ1JJUFQgQkVHSU4gPT09CiMhL2Jpbi9iYXNoCmdpdCByZXYtcGFyc2UgYmFzZSA+
-IC9kZXYvbnVsbCB8fCBleGl0IDAKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYucmVuYW1lbGltaXQg
-MApnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVzIFRydWUKZ2l0IGNvbmZpZyAtLWxvY2Fs
-IGRpZmYuYWxnb3JpdGhtIGhpc3RvZ3JhbQouL3NjcmlwdHMvY2hlY2twYXRjaC5wbCAtLW1haWxi
-YWNrIGJhc2UuLgo9PT0gVEVTVCBTQ1JJUFQgRU5EID09PQoKVXBkYXRpbmcgM2M4Y2Y1YTljMjFm
-Zjg3ODIxNjRkMWRlZjdmNDRiZDg4ODcxMzM4NApGcm9tIGh0dHBzOi8vZ2l0aHViLmNvbS9wYXRj
-aGV3LXByb2plY3QvcWVtdQogKiBbbmV3IHRhZ10gICAgICAgICAgICAgICBwYXRjaGV3LzIwMTkw
-NDE5MTAzNzIyLjE3MDYyLTEtc2hhaGFiLnZhaGVkaUBnbWFpbC5jb20gLT4gcGF0Y2hldy8yMDE5
-MDQxOTEwMzcyMi4xNzA2Mi0xLXNoYWhhYi52YWhlZGlAZ21haWwuY29tClN3aXRjaGVkIHRvIGEg
-bmV3IGJyYW5jaCAndGVzdCcKZjQ0NDY5NzZlYyBjcHV0bGI6IEZpeCBpb19yZWFkeCgpIHRvIHJl
-c3BlY3QgdGhlIGFjY2Vzc190eXBlCgo9PT0gT1VUUFVUIEJFR0lOID09PQpFUlJPUjogc3BhY2Ug
-cHJvaGliaXRlZCBiZWZvcmUgdGhhdCBjbG9zZSBwYXJlbnRoZXNpcyAnKScKIzMzOiBGSUxFOiBh
-Y2NlbC90Y2cvY3B1dGxiLmM6ODg1OgorICAgICAgICAgICAgKGFjY2Vzc190eXBlID09IE1NVV9E
-QVRBX0xPQUQgKSA/IGVudHJ5LT5hZGRyX3JlYWQgIDoKCnRvdGFsOiAxIGVycm9ycywgMCB3YXJu
-aW5ncywgMTUgbGluZXMgY2hlY2tlZAoKQ29tbWl0IGY0NDQ2OTc2ZWMyMyAoY3B1dGxiOiBGaXgg
-aW9fcmVhZHgoKSB0byByZXNwZWN0IHRoZSBhY2Nlc3NfdHlwZSkgaGFzIHN0eWxlIHByb2JsZW1z
-LCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRp
-dmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlO
-VEFJTkVSUy4KPT09IE9VVFBVVCBFTkQgPT09CgpUZXN0IGNvbW1hbmQgZXhpdGVkIHdpdGggY29k
-ZTogMQoKClRoZSBmdWxsIGxvZyBpcyBhdmFpbGFibGUgYXQKaHR0cDovL3BhdGNoZXcub3JnL2xv
-Z3MvMjAxOTA0MTkxMDM3MjIuMTcwNjItMS1zaGFoYWIudmFoZWRpQGdtYWlsLmNvbS90ZXN0aW5n
-LmNoZWNrcGF0Y2gvP3R5cGU9bWVzc2FnZS4KLS0tCkVtYWlsIGdlbmVyYXRlZCBhdXRvbWF0aWNh
-bGx5IGJ5IFBhdGNoZXcgW2h0dHBzOi8vcGF0Y2hldy5vcmcvXS4KUGxlYXNlIHNlbmQgeW91ciBm
-ZWVkYmFjayB0byBwYXRjaGV3LWRldmVsQHJlZGhhdC5jb20=
+This change adapts io_readx() to its input access_type. Currently
+io_readx() treats any memory access as a read, although it has an
+input argument "MMUAccessType access_type". This results in:
+
+1) Calling the tlb_fill() only with MMU_DATA_LOAD
+2) Considering only entry->addr_read as the tlb_addr
+
+Buglink: https://bugs.launchpad.net/qemu/+bug/1825359
+
+Signed-off-by: Shahab Vahedi <shahab.vahedi@gmail.com>
+---
+Changelog:
+- Extra space before closing parenthesis is removed
+
+ accel/tcg/cputlb.c | 7 +++++--
+ 1 file changed, 5 insertions(+), 2 deletions(-)
+
+diff --git a/accel/tcg/cputlb.c b/accel/tcg/cputlb.c
+index 88cc8389e9..4a305ac942 100644
+--- a/accel/tcg/cputlb.c
++++ b/accel/tcg/cputlb.c
+@@ -878,10 +878,13 @@ static uint64_t io_readx(CPUArchState *env, CPUIOTLBEntry *iotlbentry,
+         CPUTLBEntry *entry;
+         target_ulong tlb_addr;
+ 
+-        tlb_fill(cpu, addr, size, MMU_DATA_LOAD, mmu_idx, retaddr);
++        tlb_fill(cpu, addr, size, access_type, mmu_idx, retaddr);
+ 
+         entry = tlb_entry(env, mmu_idx, addr);
+-        tlb_addr = entry->addr_read;
++        tlb_addr =
++            (access_type == MMU_DATA_LOAD)  ? entry->addr_read  :
++            (access_type == MMU_DATA_STORE) ? entry->addr_write :
++            entry->addr_code;
+         if (!(tlb_addr & ~(TARGET_PAGE_MASK | TLB_RECHECK))) {
+             /* RAM access */
+             uintptr_t haddr = addr + entry->addend;
+-- 
+2.21.0
