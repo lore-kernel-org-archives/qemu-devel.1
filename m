@@ -2,106 +2,84 @@ Return-Path: <SRS0=rbQy=SV=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.7 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5A705C282DA
-	for <qemu-devel@archiver.kernel.org>; Fri, 19 Apr 2019 18:48:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F13CDC282E0
+	for <qemu-devel@archiver.kernel.org>; Fri, 19 Apr 2019 20:57:07 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 22DAD205F4
-	for <qemu-devel@archiver.kernel.org>; Fri, 19 Apr 2019 18:48:38 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id A305F20821
+	for <qemu-devel@archiver.kernel.org>; Fri, 19 Apr 2019 20:57:07 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=wavesemi.onmicrosoft.com header.i=@wavesemi.onmicrosoft.com header.b="nqftBpqg"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 22DAD205F4
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=wavecomp.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="eTZwKawP"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A305F20821
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:60113 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:33079 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hHYYv-0004gw-Cr
-	for qemu-devel@archiver.kernel.org; Fri, 19 Apr 2019 14:48:37 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:52245)
+	id 1hHaZG-0000FV-J5
+	for qemu-devel@archiver.kernel.org; Fri, 19 Apr 2019 16:57:06 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:48310)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <amarkovic@wavecomp.com>) id 1hHYSq-0000OA-Pl
-	for qemu-devel@nongnu.org; Fri, 19 Apr 2019 14:42:21 -0400
+	(envelope-from <alistair23@gmail.com>) id 1hHaXt-0007qV-97
+	for qemu-devel@nongnu.org; Fri, 19 Apr 2019 16:55:42 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <amarkovic@wavecomp.com>) id 1hHYSp-0005jD-GV
-	for qemu-devel@nongnu.org; Fri, 19 Apr 2019 14:42:20 -0400
-Received: from mail-eopbgr810135.outbound.protection.outlook.com
-	([40.107.81.135]:49408
-	helo=NAM01-BY2-obe.outbound.protection.outlook.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <amarkovic@wavecomp.com>)
-	id 1hHYSp-0005h0-3K
-	for qemu-devel@nongnu.org; Fri, 19 Apr 2019 14:42:19 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=wavesemi.onmicrosoft.com; s=selector1-wavecomp-com;
-	h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
-	bh=42LBseW4KjX49lw8ruzHUDGOiZDvOSHjay2Rr/kxnKU=;
-	b=nqftBpqg5NPvnjVAvxXZxTW5fE75XRBGgD3U1CAL6zRHPxHur596C8binFJz29krM9hF9xvi1WjOZ3pXTUy7eq2Numl/pvV4/QGTThTOa7VGf27B4h9DmUTVWv1hzS9c9sLEGG13BbWY/G+rldivnxLdR9xpjQQ+7kFBYXsgVXM=
-Received: from BN6PR2201MB1251.namprd22.prod.outlook.com (10.174.81.139) by
-	BN6PR2201MB1700.namprd22.prod.outlook.com (10.161.152.144) with
-	Microsoft SMTP Server (version=TLS1_2,
-	cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
-	15.20.1813.12; Fri, 19 Apr 2019 18:42:14 +0000
-Received: from BN6PR2201MB1251.namprd22.prod.outlook.com
-	([fe80::3c70:1ca4:2aa:9e81]) by
-	BN6PR2201MB1251.namprd22.prod.outlook.com
-	([fe80::3c70:1ca4:2aa:9e81%2]) with mapi id 15.20.1813.013;
-	Fri, 19 Apr 2019 18:42:13 +0000
-From: Aleksandar Markovic <amarkovic@wavecomp.com>
-To: Jules Irenge <jbi.octave@gmail.com>, "qemu-devel@nongnu.org"
-	<qemu-devel@nongnu.org>
-Thread-Topic: [PATCH v5 1/2] target/mips: add or remove space to fix
-	checkpatch errors
-Thread-Index: AQHU8jeGT4sE0P9dT0ipzK/tVd7J+6ZD2p8H
-Date: Fri, 19 Apr 2019 18:42:13 +0000
+	(envelope-from <alistair23@gmail.com>) id 1hHaXr-0000zz-Ow
+	for qemu-devel@nongnu.org; Fri, 19 Apr 2019 16:55:41 -0400
+Received: from mail-lj1-x241.google.com ([2a00:1450:4864:20::241]:38400)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <alistair23@gmail.com>)
+	id 1hHaXr-0000zg-Gv; Fri, 19 Apr 2019 16:55:39 -0400
+Received: by mail-lj1-x241.google.com with SMTP id p14so5560041ljg.5;
+	Fri, 19 Apr 2019 13:55:38 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+	h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+	:cc:content-transfer-encoding;
+	bh=gdNTKMb1snBA9Chv55OnPKVzpje3CA+MN1CVxZsQhq4=;
+	b=eTZwKawPfnAS9R4nZc2hThYITc5zIXcpFmM+d/lKv4ek0IUOR0iU5IZ6dvf+a2232D
+	HDUpVcIlEM/ueDfD2wlEvCANoYk82EbKc1AtZv1qnnNlYkKCR8bHhrHeJ2yhuqYzuJtq
+	x+S3uSqRQbscXCqr5FwLE5fYYHl7BUDHvMz2ktieVSRYP54ONwkguDvO93OaU6foQ0Q+
+	CQLPPcTYN91wde3EKC1XruT0OmVJij98ONecOo68A2xjxbComkRBw2Tuf4dS/UoIMOHR
+	7tW1nf6i4JHdb1qGVnPJJz3vLb8VLoSR65iCbMmgVxfP9GdH+ey39kH93xVNhiTVfl0C
+	FO0A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=1e100.net; s=20161025;
+	h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+	:message-id:subject:to:cc:content-transfer-encoding;
+	bh=gdNTKMb1snBA9Chv55OnPKVzpje3CA+MN1CVxZsQhq4=;
+	b=kF0NQRrcOi+fe0jcYwJg/sxwvYxVZ43xhO2Yn7MEpv9h7rFux8kcWMdgGuNK8znOPd
+	ZVdrEdieLm2+9K76YhCSiyNdhKakovXM+aswrzBvQtRK5hqzrLFwLs5aucaWbQWgapES
+	s2o3oM555SW5fprxeYA6J5FmCfcSNzg/dRGwig9SkQj999Jq3RlIeZjxxQpVuPtNn5Xi
+	Gi+8xNO2VaKDXIqECygCPgkD5bpwOR18p/XRrKHQOhtOPgvq4jndEGYf0QO62vK9UpqM
+	xpzcMG24bvkhMWpbweSU5dq6gYoSLWLnP6ERFXM+JEv3Ya6zD0qmQUFNPWLBGds1/DXC
+	EPYg==
+X-Gm-Message-State: APjAAAUnfpPu8lmo7WRXsNajLHccgmEb+sN3livdGRnSco50dCEHKYIH
+	8d9y2DOIQ/5dr9sGIz9OwtYE+/sIvo3rUTERO/Y=
+X-Google-Smtp-Source: APXvYqwxclMpQSCWT2hXSK9csB7NEpFAKdn6bwBJz71Og9pLdZ0I3+CV9zb7VPDyAyBam7eOqhxPOR1ynw6bVtCR2gc=
+X-Received: by 2002:a2e:9ed3:: with SMTP id h19mr3345600ljk.129.1555707337269; 
+	Fri, 19 Apr 2019 13:55:37 -0700 (PDT)
+MIME-Version: 1.0
+References: <cover.1554937288.git.alistair.francis@wdc.com>
+	<efb2140df508fc04be96c5dc0f989923bfcb7424.1554937288.git.alistair.francis@wdc.com>
+	<20190416132337.GN31311@redhat.com>
+In-Reply-To: <20190416132337.GN31311@redhat.com>
+From: Alistair Francis <alistair23@gmail.com>
+Date: Fri, 19 Apr 2019 13:55:10 -0700
 Message-ID:
- <BN6PR2201MB125169BA5494784ED0AFB208C6270@BN6PR2201MB1251.namprd22.prod.outlook.com>
-References: <20190413202818.13622-1-jbi.octave@gmail.com>,
-	<20190413202818.13622-2-jbi.octave@gmail.com>
-In-Reply-To: <20190413202818.13622-2-jbi.octave@gmail.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-authentication-results: spf=none (sender IP is )
-	smtp.mailfrom=amarkovic@wavecomp.com; 
-x-originating-ip: [82.117.201.26]
-x-ms-publictraffictype: Email
-x-ms-office365-filtering-correlation-id: bc3a5499-d953-43be-8e00-08d6c4f6bd76
-x-microsoft-antispam: BCL:0; PCL:0;
-	RULEID:(2390118)(7020095)(4652040)(8989299)(4534185)(7168020)(4627221)(201703031133081)(201702281549075)(8990200)(5600141)(711020)(4605104)(2017052603328)(7193020);
-	SRVR:BN6PR2201MB1700; 
-x-ms-traffictypediagnostic: BN6PR2201MB1700:
-x-microsoft-antispam-prvs: <BN6PR2201MB1700BF84E392205D92F2779EC6270@BN6PR2201MB1700.namprd22.prod.outlook.com>
-x-forefront-prvs: 0012E6D357
-x-forefront-antispam-report: SFV:NSPM;
-	SFS:(10019020)(396003)(346002)(376002)(39840400004)(366004)(136003)(189003)(199004)(186003)(446003)(9686003)(14454004)(6436002)(33656002)(558084003)(6246003)(26005)(97736004)(66946007)(316002)(102836004)(229853002)(52536014)(53936002)(91956017)(73956011)(478600001)(6116002)(25786009)(110136005)(55236004)(3846002)(8936002)(6506007)(54906003)(68736007)(5660300002)(81156014)(11346002)(8676002)(55016002)(81166006)(256004)(476003)(486006)(7696005)(74316002)(4326008)(71190400001)(76176011)(305945005)(99286004)(86362001)(71200400001)(2906002)(7736002)(66446008)(64756008)(66476007)(66066001)(66556008)(2501003)(76116006);
-	DIR:OUT; SFP:1102; SCL:1; SRVR:BN6PR2201MB1700;
-	H:BN6PR2201MB1251.namprd22.prod.outlook.com; FPR:; SPF:None;
-	LANG:en; PTR:InfoNoRecords; MX:1; A:1; 
-received-spf: None (protection.outlook.com: wavecomp.com does not designate
-	permitted sender hosts)
-x-ms-exchange-senderadcheck: 1
-x-microsoft-antispam-message-info: PqnbM6IZbRzHVpm3f7DPPua99J69olT8BKHrPwETslcc3IvZKq61FNwHE7MAO0A5EtKSCOpGF1iGVzxTFXX1UosbEbirmidPp4Ku5IpkT8P5Y0KVHbQYDOiXrkOuApANN1bDZPmdf4Ie2sJTPgkyNBitI8aUXqCyETGSSK43dXU/3gfOGP1RRIReMY4ikKPJJmkBTy8q/t8ltDRXlKOOkXuKgcwncSh+fKWBOaBzeS8YUd0uxvwhX0FKZsPC+wlZKMGDjR+SegUrQHCkZAIiw1yB56BtQ0lfHbgsV56y8LUCYORLorrwVQGQRVwXEsml1BsHeX2Umzp6JDJN0BJkxjn/vGzorPgPCf1ceTirqYhoxV6KJVUrCY0qTdIZW9T/ZGme9ryzeu+RZBVch46ypa4YsYZnNXBO2g9YjlLnqZ4=
+ <CAKmqyKPNNVGuH4veQKLuNQ3PFAko9eDeqdmF-zHmDG_9Kp_tDA@mail.gmail.com>
+To: =?UTF-8?Q?Daniel_P=2E_Berrang=C3=A9?= <berrange@redhat.com>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-MIME-Version: 1.0
-X-OriginatorOrg: wavecomp.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: bc3a5499-d953-43be-8e00-08d6c4f6bd76
-X-MS-Exchange-CrossTenant-originalarrivaltime: 19 Apr 2019 18:42:13.6764 (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 463607d3-1db3-40a0-8a29-970c56230104
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: BN6PR2201MB1700
-X-detected-operating-system: by eggs.gnu.org: Windows 7 or 8 [fuzzy]
-X-Received-From: 40.107.81.135
-Subject: Re: [Qemu-devel] [PATCH v5 1/2] target/mips: add or remove space to
- fix checkpatch errors
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+	recognized.
+X-Received-From: 2a00:1450:4864:20::241
+Subject: Re: [Qemu-devel] [PATCH for 4.1 v3 2/6] target/riscv: Fall back to
+ generating a RISC-V CPU
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -113,16 +91,195 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Aleksandar Rikalo <arikalo@wavecomp.com>,
-	"aurelien@aurel32.net" <aurelien@aurel32.net>
+Cc: "qemu-riscv@nongnu.org" <qemu-riscv@nongnu.org>,
+	"palmer@sifive.com" <palmer@sifive.com>,
+	Alistair Francis <Alistair.Francis@wdc.com>,
+	"qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
+	"ijc@hellion.org.uk" <ijc@hellion.org.uk>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190419184213.-C7PflK-gvmQR0eOVD19-ZohWWBwOVDPzYeaLyP4CSk@z>
+Message-ID: <20190419205510.m0VHt4Tm7huvxEMrJ_a8cTn_gHQfJDEs19U8OiZc4Xw@z>
 
-> From: Jules Irenge <jbi.octave@gmail.com>
-> Subject: [PATCH v5 1/2] target/mips: add or remove space to fix checkpatc=
-h errors
+On Tue, Apr 16, 2019 at 6:23 AM Daniel P. Berrang=C3=A9 <berrange@redhat.co=
+m> wrote:
+>
+> On Wed, Apr 10, 2019 at 11:10:25PM +0000, Alistair Francis wrote:
+> > If a user specifies a CPU that we don't understand then we want to fall
+> > back to a CPU generated from the ISA string.
+> >
+> > At the moment the generated CPU is assumed to be a privledge spec
+> > version 1.10 CPU with an MMU. This can be changed in the future.
+> >
+> > Signed-off-by: Alistair Francis <alistair.francis@wdc.com>
+> > ---
+> > v3:
+> >  - Ensure a minimal length so we don't run off the end of the string.
+> >  - Don't parse the rv32/rv64 in the loop
+> >  target/riscv/cpu.c | 101 ++++++++++++++++++++++++++++++++++++++++++++-
+> >  target/riscv/cpu.h |   2 +
+> >  2 files changed, 102 insertions(+), 1 deletion(-)
+> >
+> > diff --git a/target/riscv/cpu.c b/target/riscv/cpu.c
+> > index d61bce6d55..27be9e412a 100644
+> > --- a/target/riscv/cpu.c
+> > +++ b/target/riscv/cpu.c
+> > @@ -19,6 +19,7 @@
+> >
+> >  #include "qemu/osdep.h"
+> >  #include "qemu/log.h"
+> > +#include "qemu/error-report.h"
+> >  #include "cpu.h"
+> >  #include "exec/exec-all.h"
+> >  #include "qapi/error.h"
+> > @@ -103,6 +104,99 @@ static void set_resetvec(CPURISCVState *env, int r=
+esetvec)
+> >  #endif
+> >  }
+> >
+> > +static void riscv_generate_cpu_init(Object *obj)
+> > +{
+> > +    RISCVCPU *cpu =3D RISCV_CPU(obj);
+> > +    CPURISCVState *env =3D &cpu->env;
+> > +    RISCVCPUClass *mcc =3D RISCV_CPU_GET_CLASS(cpu);
+> > +    const char *riscv_cpu =3D mcc->isa_str;
+> > +    target_ulong target_misa =3D 0;
+> > +    target_ulong rvxlen =3D 0;
+> > +    int i;
+> > +    bool valid =3D false;
+> > +
+> > +    /*
+> > +     * We need at least 5 charecters for the string to be valid. Check=
+ that
+> > +     * now so we can be lazier later.
+> > +     */
+> > +    if (strlen(riscv_cpu) < 5) {
+> > +        error_report("'%s' does not appear to be a valid RISC-V ISA st=
+ring",
+> > +                     riscv_cpu);
+> > +        exit(1);
+> > +    }
+> > +
+> > +    if (riscv_cpu[0] =3D=3D 'r' && riscv_cpu[1] =3D=3D 'v') {
+> > +        /* Starts with "rv" */
+> > +        if (riscv_cpu[2] =3D=3D '3' && riscv_cpu[3] =3D=3D '2') {
+> > +            valid =3D true;
+> > +            rvxlen =3D RV32;
+> > +        }
+> > +        if (riscv_cpu[2] =3D=3D '6' && riscv_cpu[3] =3D=3D '4') {
+> > +            valid =3D true;
+> > +            rvxlen =3D RV64;
+> > +        }
+> > +    }
+> > +
+> > +    if (!valid) {
+> > +        error_report("'%s' does not appear to be a valid RISC-V CPU",
+> > +                     riscv_cpu);
+> > +        exit(1);
+> > +    }
+> > +
+> > +    for (i =3D 4; i < strlen(riscv_cpu); i++) {
+> > +        switch (riscv_cpu[i]) {
+> > +        case 'i':
+> > +            if (target_misa & RVE) {
+> > +                error_report("I and E extensions are incompatible");
+> > +                exit(1);
+> > +            }
+> > +            target_misa |=3D RVI;
+> > +            continue;
+> > +        case 'e':
+> > +            if (target_misa & RVI) {
+> > +                error_report("I and E extensions are incompatible");
+> > +                exit(1);
+> > +            }
+> > +            target_misa |=3D RVE;
+> > +            continue;
+> > +        case 'g':
+> > +            target_misa |=3D RVI | RVM | RVA | RVF | RVD;
+> > +            continue;
+> > +        case 'm':
+> > +            target_misa |=3D RVM;
+> > +            continue;
+> > +        case 'a':
+> > +            target_misa |=3D RVA;
+> > +            continue;
+> > +        case 'f':
+> > +            target_misa |=3D RVF;
+> > +            continue;
+> > +        case 'd':
+> > +            target_misa |=3D RVD;
+> > +            continue;
+> > +        case 'c':
+> > +            target_misa |=3D RVC;
+> > +            continue;
+> > +        case 's':
+> > +            target_misa |=3D RVS;
+> > +            continue;
+> > +        case 'u':
+> > +            target_misa |=3D RVU;
+> > +            continue;
+> > +        default:
+> > +            warn_report("QEMU does not support the %c extension",
+> > +                        riscv_cpu[i]);
+> > +            continue;
+> > +        }
+> > +    }
+> > +
+> > +    set_misa(env, rvxlen | target_misa);
+> > +    set_versions(env, USER_VERSION_2_02_0, PRIV_VERSION_1_10_0);
+> > +    set_resetvec(env, DEFAULT_RSTVEC);
+> > +    set_feature(env, RISCV_FEATURE_MMU);
+> > +    set_feature(env, RISCV_FEATURE_PMP);
+> > +}
+>
+> This whole approach feels undesirable to me, as it is quite different to
+> way CPUs are represented in the other architectures in QEMU and as a resu=
+lt
+> does not fit in the QAPI commands we've been building in QEMU for dealing
+> with CPU model representation. This will make for increased maint burden
+> in both QEMU and apps managing QEMU
+>
+> IIUC, this code is taking an arbitrary CPU model string and looking
+> at individual characters in that string & turning on individual features
+> according to what characters it sees. There's several problems with this
+>
+>  - There's no way to enumerate valid CPU model names
+>
+>  - There can be many different names that all result
+>    in the same CPU model. eg "fdcs", "scdf", a"ffddccss"
+>    all result in the same features getting enabled
+>    by this loop above.
+>
+>  - There's no way to check compatibility between CPUs
+>
+>  - There will be no way to version the CPUs if we need
+>    to tie them to machine types for back compatibility.
+>
+> If we have a base CPU model, with a bunch of features that can optionally
+> be enabled, then IMHO we should represent that the same way was we do
+> on x86, whre we have a CPU model name, and then a comma sepaprated list
+> of features.
+>
+> If on the other hand we don't want to support the combinatorial matrix
+> of all possible feature flags, then we should just list all the expected
+> named CPU models that are required explicitly.
 
-Reviewed-by: Aleksandar Markovic <amarkovic@wavecomp.com>=
+Ok, I'm about to send out a new series that is based on this series.
+The new series is called "RISC-V: Add properties to the CPUs". It has
+dropped the ISA string part (this patch) and just adds some standard
+CPU properties. If everyone is happy with that approach I'll continue
+to expand it to add the extensions as CPU properties.
+
+Alistair
+
+>
+> Regards,
+> Daniel
+> --
+> |: https://berrange.com      -o-    https://www.flickr.com/photos/dberran=
+ge :|
+> |: https://libvirt.org         -o-            https://fstop138.berrange.c=
+om :|
+> |: https://entangle-photo.org    -o-    https://www.instagram.com/dberran=
+ge :|
 
