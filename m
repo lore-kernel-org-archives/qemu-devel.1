@@ -2,49 +2,48 @@ Return-Path: <SRS0=rbQy=SV=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D4FE5C282DA
-	for <qemu-devel@archiver.kernel.org>; Fri, 19 Apr 2019 07:05:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 56AD0C282DA
+	for <qemu-devel@archiver.kernel.org>; Fri, 19 Apr 2019 07:06:59 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8D964217FA
-	for <qemu-devel@archiver.kernel.org>; Fri, 19 Apr 2019 07:05:05 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8D964217FA
+	by mail.kernel.org (Postfix) with ESMTPS id 29F85217FA
+	for <qemu-devel@archiver.kernel.org>; Fri, 19 Apr 2019 07:06:59 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 29F85217FA
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:52459 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:52501 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hHNa4-0004YV-Lg
-	for qemu-devel@archiver.kernel.org; Fri, 19 Apr 2019 03:05:04 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:45048)
+	id 1hHNbu-0005PV-BR
+	for qemu-devel@archiver.kernel.org; Fri, 19 Apr 2019 03:06:58 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:45439)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1hHNZB-0004F9-Pz
-	for qemu-devel@nongnu.org; Fri, 19 Apr 2019 03:04:10 -0400
+	(envelope-from <thuth@redhat.com>) id 1hHNb4-00051n-Ma
+	for qemu-devel@nongnu.org; Fri, 19 Apr 2019 03:06:07 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1hHNZA-0007Fj-PS
-	for qemu-devel@nongnu.org; Fri, 19 Apr 2019 03:04:09 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:55184)
+	(envelope-from <thuth@redhat.com>) id 1hHNb3-00081A-PE
+	for qemu-devel@nongnu.org; Fri, 19 Apr 2019 03:06:06 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:44160)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1hHNZA-0007FH-AK
-	for qemu-devel@nongnu.org; Fri, 19 Apr 2019 03:04:08 -0400
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
-	[10.5.11.23])
+	(Exim 4.71) (envelope-from <thuth@redhat.com>)
+	id 1hHNb1-0007zv-GB; Fri, 19 Apr 2019 03:06:03 -0400
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+	[10.5.11.11])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 9C12C8553F;
-	Fri, 19 Apr 2019 07:04:05 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id 9289D300744E;
+	Fri, 19 Apr 2019 07:06:02 +0000 (UTC)
 Received: from thuth.remote.csb (ovpn-116-62.ams2.redhat.com [10.36.116.62])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id 7087819C65;
-	Fri, 19 Apr 2019 07:03:59 +0000 (UTC)
-To: Li Qiang <liq3ea@163.com>, lvivier@redhat.com, pbonzini@redhat.com,
-	philmd@redhat.com, lersek@redhat.com, kraxel@redhat.com
-References: <20190319023030.947-1-liq3ea@163.com>
-	<20190319023030.947-2-liq3ea@163.com>
+	by smtp.corp.redhat.com (Postfix) with ESMTP id 552A8600C1;
+	Fri, 19 Apr 2019 07:05:55 +0000 (UTC)
+To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
+	qemu-devel@nongnu.org, Gerd Hoffmann <kraxel@redhat.com>
+References: <20190418111019.4080-1-thuth@redhat.com>
+	<6bd7dd96-cd2c-22aa-5533-ae341f942a5c@redhat.com>
 From: Thomas Huth <thuth@redhat.com>
 Openpgp: preference=signencrypt
 Autocrypt: addr=thuth@redhat.com; keydata=
@@ -90,23 +89,23 @@ Autocrypt: addr=thuth@redhat.com; keydata=
 	rCELuGwT9hsYkUPjVd4lfylN3mzEc6iAv/wwjsc0DRTSQCpXT3v2ymTAsRKrVaEZLibTXaf+
 	WslxWek3xNYRiqwwWAJuL652eAlxUgQ5ZS+fXBRTiQpJ+F26I/2lccScRd9G5w==
 Organization: Red Hat
-Message-ID: <27424fa0-0fed-c292-2321-069d725fd57d@redhat.com>
-Date: Fri, 19 Apr 2019 09:03:58 +0200
+Message-ID: <0294bc60-d221-653b-ed28-c8392a767e41@redhat.com>
+Date: Fri, 19 Apr 2019 09:05:54 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
 	Thunderbird/60.6.1
 MIME-Version: 1.0
-In-Reply-To: <20190319023030.947-2-liq3ea@163.com>
+In-Reply-To: <6bd7dd96-cd2c-22aa-5533-ae341f942a5c@redhat.com>
 Content-Type: text/plain; charset="UTF-8"
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.28]);
-	Fri, 19 Apr 2019 07:04:05 +0000 (UTC)
+	(mx1.redhat.com [10.5.110.43]);
+	Fri, 19 Apr 2019 07:06:02 +0000 (UTC)
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH 1/2] tests: fw_cfg: add a function to get
- the fw_cfg file
+Subject: Re: [Qemu-devel] [PATCH for-4.1] hw/usb/hcd-ohci: Move PCI-related
+ code into a separate file
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -118,67 +117,38 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: liq3ea@gmail.com, qemu-devel@nongnu.org
+Cc: Yang Zhong <yang.zhong@intel.com>, Paolo Bonzini <pbonzini@redhat.com>,
+	qemu-arm@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190419070358.LwYP2e6qp7nZQk8QRg5OJRuAXagE3PXBboWAlidmMxY@z>
+Message-ID: <20190419070554.taNomY3MHbXyNq8KYkeiGnf7gaaGAPRxOmnIJGB-lfk@z>
 
-On 19/03/2019 03.30, Li Qiang wrote:
-> This is useful to write qtest about fw_cfg file entry.
-> 
-> Signed-off-by: Li Qiang <liq3ea@163.com>
-> ---
->  tests/libqos/fw_cfg.c | 45 +++++++++++++++++++++++++++++++++++++++++++
->  tests/libqos/fw_cfg.h |  2 ++
->  2 files changed, 47 insertions(+)
-> 
-> diff --git a/tests/libqos/fw_cfg.c b/tests/libqos/fw_cfg.c
-> index d0889d1e22..2df33df859 100644
-> --- a/tests/libqos/fw_cfg.c
-> +++ b/tests/libqos/fw_cfg.c
-> @@ -16,12 +16,57 @@
->  #include "libqos/fw_cfg.h"
->  #include "libqtest.h"
->  #include "qemu/bswap.h"
-> +#include "hw/nvram/fw_cfg.h"
->  
->  void qfw_cfg_select(QFWCFG *fw_cfg, uint16_t key)
->  {
->      fw_cfg->select(fw_cfg, key);
->  }
->  
-> +/*
-> + * The caller need check the return value. When the return value is
-> + * nonzero, it means that some bytes have been transferred.
-> + *
-> + * If the fw_cfg file in question is smaller than the allocated & passed-in
-> + * buffer, then the buffer has been populated only in part.
-> + *
-> + * If the fw_cfg file in question is larger than the passed-in
-> + * buffer, then the return value explains how much room would have been
-> + * necessary in total. And, while the caller's buffer has been fully
-> + * populated, it has received only a starting slice of the fw_cfg file.
-> + */
-> +size_t qfw_cfg_get_file(QFWCFG *fw_cfg, const char *filename,
-> +                      void *data, size_t buflen)
-> +{
-> +    uint32_t count;
-> +    uint32_t i;
-> +    unsigned char *filesbuf = NULL;
-> +    size_t dsize;
-> +    FWCfgFile *pdir_entry;
-> +    size_t filesize = 0;
-> +
-> +    qfw_cfg_get(fw_cfg, FW_CFG_FILE_DIR, &count, sizeof(count));
-> +    count = be32_to_cpu(count);
-> +    dsize = sizeof(uint32_t) + count * sizeof(struct fw_cfg_file);
-> +    filesbuf = g_malloc0(dsize);
-> +    qfw_cfg_get(fw_cfg, FW_CFG_FILE_DIR, filesbuf, dsize);
+On 18/04/2019 14.35, Philippe Mathieu-Daud=C3=A9 wrote:
+> Hi Thomas,
+>=20
+> On 4/18/19 1:10 PM, Thomas Huth wrote:
+>> Some machines (like the pxa2xx-based ARM machines) only have a sysbus
+>> OHCI controller, but no PCI. With the new Kconfig-style build system,
+>> it will soon be possible to create QEMU binaries that only contain
+>> such PCI-less machines. However, the two OHCI controllers, for sysbus
+>> and for PCI, are currently both located in one file, so the PCI code
+>> is still required for linking here. Move the OHCI-PCI device code
+>> into a separate file, so that it is possible to use the sysbus OHCI
+>> device also without the PCI dependency.
+>>
+>> Apart from moving code to a new file (and a new header), this patch
+>> might also fix one subtle bug: The ohci_die() function always assumed
+>> to be running with a OHCI-PCI controller and called some PCI-specific
+>> functions - but if I got the code right, ohci_die() might also get
+>> called for the sysbus-OHCI device, so it likely failed in that case.
+>> I've changed this part of the code now, so that there are two ohci_die=
+()
+>> implementations now, one for sysbus and one for PCI.
+>=20
+> Can this be done in 2 patches?
 
-If I get the code right,  qfw_cfg_get() fills the whole buffer here...
-in that case, g_malloc() should be sufficient, so you don't need
-g_malloc0() here.
+Yeah, maybe that's cleaner... I'll send a v2...
 
  Thomas
 
