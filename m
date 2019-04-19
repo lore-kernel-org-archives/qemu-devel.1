@@ -2,89 +2,84 @@ Return-Path: <SRS0=rbQy=SV=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.0 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AA35BC282E0
-	for <qemu-devel@archiver.kernel.org>; Fri, 19 Apr 2019 23:05:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 38E8CC282E0
+	for <qemu-devel@archiver.kernel.org>; Fri, 19 Apr 2019 23:07:27 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6885721736
-	for <qemu-devel@archiver.kernel.org>; Fri, 19 Apr 2019 23:05:48 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id D925F2183F
+	for <qemu-devel@archiver.kernel.org>; Fri, 19 Apr 2019 23:07:26 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="j0WvHOAI"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6885721736
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="cx0GJiVA"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D925F2183F
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:34211 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:34223 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hHcZn-0006Af-MY
-	for qemu-devel@archiver.kernel.org; Fri, 19 Apr 2019 19:05:47 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:43019)
+	id 1hHcbO-00077q-0p
+	for qemu-devel@archiver.kernel.org; Fri, 19 Apr 2019 19:07:26 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:43346)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1hHcYu-0005mp-T2
-	for qemu-devel@nongnu.org; Fri, 19 Apr 2019 19:04:53 -0400
+	(envelope-from <alistair23@gmail.com>) id 1hHcaH-0006am-0h
+	for qemu-devel@nongnu.org; Fri, 19 Apr 2019 19:06:18 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1hHcYt-0005Ec-Oj
-	for qemu-devel@nongnu.org; Fri, 19 Apr 2019 19:04:52 -0400
-Received: from mail-wm1-x344.google.com ([2a00:1450:4864:20::344]:56153)
+	(envelope-from <alistair23@gmail.com>) id 1hHcaF-0005i3-4V
+	for qemu-devel@nongnu.org; Fri, 19 Apr 2019 19:06:16 -0400
+Received: from mail-lj1-x242.google.com ([2a00:1450:4864:20::242]:36366)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1hHcYt-0005EH-BS
-	for qemu-devel@nongnu.org; Fri, 19 Apr 2019 19:04:51 -0400
-Received: by mail-wm1-x344.google.com with SMTP id o25so7555223wmf.5
-	for <qemu-devel@nongnu.org>; Fri, 19 Apr 2019 16:04:51 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
-	h=references:user-agent:from:to:cc:subject:in-reply-to:date
-	:message-id:mime-version:content-transfer-encoding;
-	bh=6b6QBh4a0Aa0Dodgd0cQnG8CkcAuFjw9/y4l12Y6NWI=;
-	b=j0WvHOAIInuz2oiDfb2yGvAo5CO3NpIuRQtQ8Fn3cHbU8OKMGDZ9HmN1IMd3MT0wTN
-	E4mSBxz0rkIoyRN8VHzwkEFKynnrTyfg2miljiX2YV21S2tNkPVs48F12GlX8lCbIHPx
-	OzxVoDHfvDInmQmdmi0IWwt5uBPbCuoi9nn9OSMJbt32VxHjTC+zVqEvM0XykjHx2zlB
-	sIfrv0y7tXudE8TTziDj3qNo/J9qMaZkLq8e3P2XVldtv0gJiJUZlbLBY8qR0JuKnSaM
-	LuwYECAZ8kONTGYuzG3u9yGyozrXuri1T77oUOIQk6t4T5I9C5T+FCdob8djvzHhfUZM
-	y5RA==
+	(Exim 4.71) (envelope-from <alistair23@gmail.com>)
+	id 1hHcaE-0005dt-Pm; Fri, 19 Apr 2019 19:06:15 -0400
+Received: by mail-lj1-x242.google.com with SMTP id r24so5742297ljg.3;
+	Fri, 19 Apr 2019 16:06:03 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+	h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+	:cc:content-transfer-encoding;
+	bh=UsHaQzQmEb+869mpwz2lIz/Iyj03aaGow594ag9rLkM=;
+	b=cx0GJiVAarXYvWG6YiFzO5/bEZ8vR84GO5hf58zJ0fgYZJzqf7QDc4NQoA13iJiuzU
+	WL+j63WHVfr5OKCTFNUfbP2YiS3V9fhEMNi+vcJ4GZRCTMaix1Vau612V4AQLIiicn5v
+	DHyh7pBk1TJIGQBarY0gyQW2mEW1Tovm5Cnecu6o2Jk096tyY5NqgqX45xS7B4fYCcOr
+	pKb6/14xOEvfGDpoK+uMvxoRCeYCrrm7eQqrVgg22M0d1d7mIcOp60nvVkDtv8zV0263
+	Z2eEedCNbMGmmdaRz+BL1W2Pd8w0H36jJofM8jN7rtLL1Qxy0elr1g5kwnOs/8fEq+RF
+	LJgA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
 	d=1e100.net; s=20161025;
-	h=x-gm-message-state:references:user-agent:from:to:cc:subject
-	:in-reply-to:date:message-id:mime-version:content-transfer-encoding;
-	bh=6b6QBh4a0Aa0Dodgd0cQnG8CkcAuFjw9/y4l12Y6NWI=;
-	b=Nan35GHTK7V/vzFr8UdesI9e8xFEinyumqriC156m3NfnBYnigDa+ayRvq8pb/Eqj6
-	z9ZiW/RRA6YZFxeFniYPUufAflXDXz9sHkPxE4bKqj9tBiWnAcaXYBoeZQorZORYG21q
-	W2wT3qoMOFC2W8ybHoQNpJOh9sLGDNuHrGeqyRksU8LXvCK0gZcrsfMy2dw81H4wNDwI
-	AkIpPUwp1A5XDYzKdb2xlRRSbrHJXcY+weXG57DYAkVdzjULGePMHhGafTPYhHggmDA4
-	b+tiWjAmvyBoZJwoM4uK6/sucPv8Kkfp9lofV5tPrf74hSQped4R4xZtBB3vg5DRExWE
-	dIqQ==
-X-Gm-Message-State: APjAAAWKCCtKnzL9Xwt5Sv67SMarJ47xEPYkFgg/04YSLbsIkFbUSk44
-	uLi1CZltJecA2+urRT9f3xAlng==
-X-Google-Smtp-Source: APXvYqwnhGpuHYz6sMpeGT6sBdkRlPWQ0BaYhvf1PAJlfTtn8ju/aSjknhuXZPO815iUoFfXwgWnEQ==
-X-Received: by 2002:a1c:ca06:: with SMTP id a6mr4088133wmg.14.1555715089748;
-	Fri, 19 Apr 2019 16:04:49 -0700 (PDT)
-Received: from zen.linaroharston ([81.128.185.34])
-	by smtp.gmail.com with ESMTPSA id r6sm4613902wmc.11.2019.04.19.16.04.48
-	(version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
-	Fri, 19 Apr 2019 16:04:49 -0700 (PDT)
-Received: from zen (localhost [127.0.0.1])
-	by zen.linaroharston (Postfix) with ESMTP id A915E1FF87;
-	Fri, 19 Apr 2019 23:04:48 +0000 (UTC)
-References: <20190419103722.17062-1-shahab.vahedi@gmail.com>
-User-agent: mu4e 1.3.1; emacs 26.1
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-To: qemu-devel@nongnu.org
-In-reply-to: <20190419103722.17062-1-shahab.vahedi@gmail.com>
-Date: Fri, 19 Apr 2019 23:04:48 +0000
-Message-ID: <871s1xha0f.fsf@zen.linaroharston>
+	h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+	:message-id:subject:to:cc:content-transfer-encoding;
+	bh=UsHaQzQmEb+869mpwz2lIz/Iyj03aaGow594ag9rLkM=;
+	b=VLXRPba1kebMr28YKEgyQEAcaiL2ao0eZmpzUfGrN0PAaHl415rV49fG6859OKtg0i
+	0YFB0/LJJ8jK1xH5HdOHr8Z55VLqRk+9BAdj41ew0AhUnEoLXx2n3dAjyupklSy1ZIP2
+	gnGBgwWW1FUIoY9WKVhrqr8rAxmGJ5ooPx9V+j79Q3HMsIMv7LbhEQm768H+He0Demm0
+	Z3iedAnF6Bvgw8sGQm1kdu4fTao1W6/O0Wdygu7xW219de9eNdchD1rL7Hf08wV/TZxZ
+	It6DBsid7L0jxpjqmvsl4BLWOhruQH73K9Z+cJr0wBhEvJ5/Fgaio4vQNL42HRUwtEOo
+	8+sQ==
+X-Gm-Message-State: APjAAAUWMHRYT/TX6X99BkEJKOG4XGhX+EoHGQ/oJbnQx9iQN+Qy3pJ0
+	3rQox2RAqBYpqfdfUxK0kVgP47fkyj/7dsW19nU=
+X-Google-Smtp-Source: APXvYqwNZkxbaiRo40+wCSM5L5rmVoDu7tpggq2HoxC0/GWIS7o1DID62EbPDW3hzEJgJnI604Mmh7Opw5QsPvsbmLg=
+X-Received: by 2002:a2e:1257:: with SMTP id t84mr3771966lje.115.1555715162053; 
+	Fri, 19 Apr 2019 16:06:02 -0700 (PDT)
 MIME-Version: 1.0
+References: <CANnJOVEkpkBAOo566s1BJk9YQBVeNkf2kpbS_kdjkn9j=3i1VA@mail.gmail.com>
+	<CAKmqyKPM=XUyF+KweO2CLBQ3bEuu_BTU2fu+R7R09rV-1O9TkQ@mail.gmail.com>
+	<CANnJOVFOq4-kQASRMiFhAQrAdm5tL6fZf1VofDO=s2_yrEU63w@mail.gmail.com>
+In-Reply-To: <CANnJOVFOq4-kQASRMiFhAQrAdm5tL6fZf1VofDO=s2_yrEU63w@mail.gmail.com>
+From: Alistair Francis <alistair23@gmail.com>
+Date: Fri, 19 Apr 2019 16:05:35 -0700
+Message-ID:
+ <CAKmqyKOZ2Dfhk1HgnJqG1hSHHSpm0bpuE-MK8A0aHNjmcT9=ug@mail.gmail.com>
+To: Jonathan Behrens <fintelia@gmail.com>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
 	recognized.
-X-Received-From: 2a00:1450:4864:20::344
-Subject: Re: [Qemu-devel] [PATCH] cputlb: Fix io_readx() to respect the
- access_type
+X-Received-From: 2a00:1450:4864:20::242
+Subject: Re: [Qemu-devel] [PATCH] target/riscv: Expose time CSRs when
+ allowed by [m|s]counteren
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -96,65 +91,235 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Shahab Vahedi <shahab.vahedi@gmail.com>,
-	Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>
+Cc: "open list:RISC-V" <qemu-riscv@nongnu.org>,
+	Sagar Karandikar <sagark@eecs.berkeley.edu>,
+	Bastian Koppelmann <kbastian@mail.uni-paderborn.de>,
+	Palmer Dabbelt <palmer@sifive.com>,
+	"qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>,
+	Alistair Francis <Alistair.Francis@wdc.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190419230448.XslGDPzbzkP7WiLssQSoKTBM7dm4bqz2t3a3wLW6ksc@z>
+Message-ID: <20190419230535.o9RfaZ4pt-Zqb7YJoWU1sHaxD-vJRBeT-M0iK-2aD6Q@z>
 
-
-Shahab Vahedi <shahab.vahedi@gmail.com> writes:
-
-> This change adapts io_readx() to its input access_type. Currently
-> io_readx() treats any memory access as a read, although it has an
-> input argument "MMUAccessType access_type". This results in:
+On Mon, Apr 15, 2019 at 5:46 PM Jonathan Behrens <fintelia@gmail.com> wrote=
+:
 >
-> 1) Calling the tlb_fill() only with MMU_DATA_LOAD
-> 2) Considering only entry->addr_read as the tlb_addr
+> For any chip that has a CLINT, we want the frequency of the time register=
+ and the frequency of the CLINT to match. That frequency, SIFIVE_CLINT_TIME=
+BASE_FREQ (=3D10MHz) is currently defined in hw/riscv/sifive_clint.h and so=
+ isn't visible to target/riscv/cpu.c where the CPURISCVState is first creat=
+ed. Instead, I first initialize the frequency to a reasonable default (1GHz=
+) and then let the CLINT override the value if one is attached. Phrased dif=
+ferently, the values produced by the `sifive_clint.c: cpu_riscv_read_rtc()`=
+ and `csr.c: read_time()` must match, and this is one way of doing that.
+
+Ah that seems fine. Can you add a comment in the code to indicate that
+it will be overwritten later?
+
+Alistair
+
 >
-> Buglink: https://bugs.launchpad.net/qemu/+bug/1825359
-
-This bug talks about the distinction between DATA_LOAD and INST_FETCH but...
-
+> I'd be open to other suggestions.
 >
-> Signed-off-by: Shahab Vahedi <shahab.vahedi@gmail.com>
-> ---
->  accel/tcg/cputlb.c | 7 +++++--
->  1 file changed, 5 insertions(+), 2 deletions(-)
+> Jonathan
 >
-> diff --git a/accel/tcg/cputlb.c b/accel/tcg/cputlb.c
-> index 88cc8389e9..0daac0e806 100644
-> --- a/accel/tcg/cputlb.c
-> +++ b/accel/tcg/cputlb.c
-> @@ -878,10 +878,13 @@ static uint64_t io_readx(CPUArchState *env, CPUIOTL=
-BEntry *iotlbentry,
->          CPUTLBEntry *entry;
->          target_ulong tlb_addr;
->
-> -        tlb_fill(cpu, addr, size, MMU_DATA_LOAD, mmu_idx, retaddr);
-> +        tlb_fill(cpu, addr, size, access_type, mmu_idx, retaddr);
->
->          entry =3D tlb_entry(env, mmu_idx, addr);
-> -        tlb_addr =3D entry->addr_read;
-> +        tlb_addr =3D
-> +            (access_type =3D=3D MMU_DATA_LOAD ) ? entry->addr_read  :
-> +            (access_type =3D=3D MMU_DATA_STORE) ? entry->addr_write :
-> +            entry->addr_code;
-
-...why do we care here about MMU_DATA_STORE?
-
-We could just assert (access_type =3D=3D MMU_DATA_LOAD || access_type =3D=3D
-MMU_INST_FETCH) and then have:
-
-  (access_type =3D=3D MMU_DATA_LOAD ) ? entry->addr_read  : entry->addr_code
-
-
->          if (!(tlb_addr & ~(TARGET_PAGE_MASK | TLB_RECHECK))) {
->              /* RAM access */
->              uintptr_t haddr =3D addr + entry->addend;
-
-
---
-Alex Benn=C3=A9e
+> On Mon, Apr 15, 2019 at 8:23 PM Alistair Francis <alistair23@gmail.com> w=
+rote:
+>>
+>> On Fri, Apr 12, 2019 at 12:04 PM Jonathan Behrens <fintelia@gmail.com> w=
+rote:
+>> >
+>> > Currently mcounteren.TM acts as though it is hardwired to zero, even t=
+hough
+>> > QEMU
+>> > allows it to be set. This change resolves the issue by allowing reads =
+to the
+>> > time and timeh control registers when running in a privileged mode whe=
+re
+>> > such
+>> > accesses are allowed.
+>> >
+>> > Signed-off-by: Jonathan Behrens <fintelia@gmail.com>
+>> > ---
+>> >  hw/riscv/sifive_clint.c |  1 +
+>> >  target/riscv/cpu.c      | 14 ++++++++++++++
+>> >  target/riscv/cpu.h      |  2 ++
+>> >  target/riscv/csr.c      | 17 +++++++++++------
+>> >  4 files changed, 28 insertions(+), 6 deletions(-)
+>> >
+>> > diff --git a/hw/riscv/sifive_clint.c b/hw/riscv/sifive_clint.c
+>> > index d4c159e937..3ad4fe6139 100644
+>> > --- a/hw/riscv/sifive_clint.c
+>> > +++ b/hw/riscv/sifive_clint.c
+>> > @@ -237,6 +237,7 @@ DeviceState *sifive_clint_create(hwaddr addr, hwad=
+dr
+>> > size, uint32_t num_harts,
+>> >          env->timer =3D timer_new_ns(QEMU_CLOCK_VIRTUAL,
+>> >                                    &sifive_clint_timer_cb, cpu);
+>> >          env->timecmp =3D 0;
+>> > +        env->time_freq =3D SIFIVE_CLINT_TIMEBASE_FREQ;
+>>
+>> Why do you need to set this here?
+>>
+>> Alistair
+>>
+>> >      }
+>> >
+>> >      DeviceState *dev =3D qdev_create(NULL, TYPE_SIFIVE_CLINT);
+>> > diff --git a/target/riscv/cpu.c b/target/riscv/cpu.c
+>> > index d61bce6d55..ff17d54691 100644
+>> > --- a/target/riscv/cpu.c
+>> > +++ b/target/riscv/cpu.c
+>> > @@ -103,12 +103,20 @@ static void set_resetvec(CPURISCVState *env, int
+>> > resetvec)
+>> >  #endif
+>> >  }
+>> >
+>> > +static void set_time_freq(CPURISCVState *env, uint64_t freq)
+>> > +{
+>> > +#ifndef CONFIG_USER_ONLY
+>> > +    env->time_freq =3D freq;
+>> > +#endif
+>> > +}
+>> > +
+>> >  static void riscv_any_cpu_init(Object *obj)
+>> >  {
+>> >      CPURISCVState *env =3D &RISCV_CPU(obj)->env;
+>> >      set_misa(env, RVXLEN | RVI | RVM | RVA | RVF | RVD | RVC | RVU);
+>> >      set_versions(env, USER_VERSION_2_02_0, PRIV_VERSION_1_10_0);
+>> >      set_resetvec(env, DEFAULT_RSTVEC);
+>> > +    set_time_freq(env, NANOSECONDS_PER_SECOND);
+>> >  }
+>> >
+>> >  #if defined(TARGET_RISCV32)
+>> > @@ -121,6 +129,7 @@ static void rv32gcsu_priv1_09_1_cpu_init(Object *o=
+bj)
+>> >      set_resetvec(env, DEFAULT_RSTVEC);
+>> >      set_feature(env, RISCV_FEATURE_MMU);
+>> >      set_feature(env, RISCV_FEATURE_PMP);
+>> > +    set_time_freq(env, NANOSECONDS_PER_SECOND);
+>> >  }
+>> >
+>> >  static void rv32gcsu_priv1_10_0_cpu_init(Object *obj)
+>> > @@ -131,6 +140,7 @@ static void rv32gcsu_priv1_10_0_cpu_init(Object *o=
+bj)
+>> >      set_resetvec(env, DEFAULT_RSTVEC);
+>> >      set_feature(env, RISCV_FEATURE_MMU);
+>> >      set_feature(env, RISCV_FEATURE_PMP);
+>> > +    set_time_freq(env, NANOSECONDS_PER_SECOND);
+>> >  }
+>> >
+>> >  static void rv32imacu_nommu_cpu_init(Object *obj)
+>> > @@ -140,6 +150,7 @@ static void rv32imacu_nommu_cpu_init(Object *obj)
+>> >      set_versions(env, USER_VERSION_2_02_0, PRIV_VERSION_1_10_0);
+>> >      set_resetvec(env, DEFAULT_RSTVEC);
+>> >      set_feature(env, RISCV_FEATURE_PMP);
+>> > +    set_time_freq(env, NANOSECONDS_PER_SECOND);
+>> >  }
+>> >
+>> >  #elif defined(TARGET_RISCV64)
+>> > @@ -152,6 +163,7 @@ static void rv64gcsu_priv1_09_1_cpu_init(Object *o=
+bj)
+>> >      set_resetvec(env, DEFAULT_RSTVEC);
+>> >      set_feature(env, RISCV_FEATURE_MMU);
+>> >      set_feature(env, RISCV_FEATURE_PMP);
+>> > +    set_time_freq(env, NANOSECONDS_PER_SECOND);
+>> >  }
+>> >
+>> >  static void rv64gcsu_priv1_10_0_cpu_init(Object *obj)
+>> > @@ -162,6 +174,7 @@ static void rv64gcsu_priv1_10_0_cpu_init(Object *o=
+bj)
+>> >      set_resetvec(env, DEFAULT_RSTVEC);
+>> >      set_feature(env, RISCV_FEATURE_MMU);
+>> >      set_feature(env, RISCV_FEATURE_PMP);
+>> > +    set_time_freq(env, NANOSECONDS_PER_SECOND);
+>> >  }
+>> >
+>> >  static void rv64imacu_nommu_cpu_init(Object *obj)
+>> > @@ -171,6 +184,7 @@ static void rv64imacu_nommu_cpu_init(Object *obj)
+>> >      set_versions(env, USER_VERSION_2_02_0, PRIV_VERSION_1_10_0);
+>> >      set_resetvec(env, DEFAULT_RSTVEC);
+>> >      set_feature(env, RISCV_FEATURE_PMP);
+>> > +    set_time_freq(env, NANOSECONDS_PER_SECOND);
+>> >  }
+>> >
+>> >  #endif
+>> > diff --git a/target/riscv/cpu.h b/target/riscv/cpu.h
+>> > index 20bce8742e..67b1769ad3 100644
+>> > --- a/target/riscv/cpu.h
+>> > +++ b/target/riscv/cpu.h
+>> > @@ -173,7 +173,9 @@ struct CPURISCVState {
+>> >      /* temporary htif regs */
+>> >      uint64_t mfromhost;
+>> >      uint64_t mtohost;
+>> > +
+>> >      uint64_t timecmp;
+>> > +    uint64_t time_freq;
+>> >
+>> >      /* physical memory protection */
+>> >      pmp_table_t pmp_state;
+>> > diff --git a/target/riscv/csr.c b/target/riscv/csr.c
+>> > index e1d91b6c60..6083c782a1 100644
+>> > --- a/target/riscv/csr.c
+>> > +++ b/target/riscv/csr.c
+>> > @@ -191,22 +191,31 @@ static int read_instreth(CPURISCVState *env, int
+>> > csrno, target_ulong *val)
+>> >  }
+>> >  #endif /* TARGET_RISCV32 */
+>> >
+>> > -#if defined(CONFIG_USER_ONLY)
+>> >  static int read_time(CPURISCVState *env, int csrno, target_ulong *val=
+)
+>> >  {
+>> > +#if !defined(CONFIG_USER_ONLY)
+>> > +    *val =3D muldiv64(qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL),
+>> > +                    env->time_freq, NANOSECONDS_PER_SECOND);
+>> > +#else
+>> >      *val =3D cpu_get_host_ticks();
+>> > +#endif
+>> >      return 0;
+>> >  }
+>> >
+>> >  #if defined(TARGET_RISCV32)
+>> >  static int read_timeh(CPURISCVState *env, int csrno, target_ulong *va=
+l)
+>> >  {
+>> > +#if !defined(CONFIG_USER_ONLY)
+>> > +    *val =3D muldiv64(qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL),
+>> > +                    env->time_freq, NANOSECONDS_PER_SECOND) >> 32;
+>> > +#else
+>> >      *val =3D cpu_get_host_ticks() >> 32;
+>> > +#endif
+>> >      return 0;
+>> >  }
+>> >  #endif
+>> >
+>> > -#else /* CONFIG_USER_ONLY */
+>> > +#if !defined(CONFIG_USER_ONLY)
+>> >
+>> >  /* Machine constants */
+>> >
+>> > @@ -854,14 +863,10 @@ static riscv_csr_operations csr_ops[CSR_TABLE_SI=
+ZE] =3D
+>> > {
+>> >      [CSR_INSTRETH] =3D            { ctr,
+>> > read_instreth                       },
+>> >  #endif
+>> >
+>> > -    /* User-level time CSRs are only available in linux-user
+>> > -     * In privileged mode, the monitor emulates these CSRs */
+>> > -#if defined(CONFIG_USER_ONLY)
+>> >      [CSR_TIME] =3D                { ctr,
+>> > read_time                           },
+>> >  #if defined(TARGET_RISCV32)
+>> >      [CSR_TIMEH] =3D               { ctr,
+>> > read_timeh                          },
+>> >  #endif
+>> > -#endif
+>> >
+>> >  #if !defined(CONFIG_USER_ONLY)
+>> >      /* Machine Timers and Counters */
+>> > --
+>> > 2.20.1
 
