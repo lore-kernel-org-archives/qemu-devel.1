@@ -2,83 +2,89 @@ Return-Path: <SRS0=rbQy=SV=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_PASS,USER_AGENT_NEOMUTT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 99F24C282DA
-	for <qemu-devel@archiver.kernel.org>; Fri, 19 Apr 2019 12:25:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B3348C282DA
+	for <qemu-devel@archiver.kernel.org>; Fri, 19 Apr 2019 13:45:10 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 64F9E21929
-	for <qemu-devel@archiver.kernel.org>; Fri, 19 Apr 2019 12:25:21 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 64F9E21929
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 7D630222B2
+	for <qemu-devel@archiver.kernel.org>; Fri, 19 Apr 2019 13:45:10 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="QNneNbkU"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7D630222B2
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:56068 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:56804 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hHSa0-0001UC-J7
-	for qemu-devel@archiver.kernel.org; Fri, 19 Apr 2019 08:25:20 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:41517)
+	id 1hHTpF-0001UO-Dm
+	for qemu-devel@archiver.kernel.org; Fri, 19 Apr 2019 09:45:09 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:52779)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <sgarzare@redhat.com>) id 1hHSYm-0000mn-GF
-	for qemu-devel@nongnu.org; Fri, 19 Apr 2019 08:24:05 -0400
+	(envelope-from <programmingkidx@gmail.com>) id 1hHToS-0001Ba-EK
+	for qemu-devel@nongnu.org; Fri, 19 Apr 2019 09:44:21 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <sgarzare@redhat.com>) id 1hHSYl-0002UA-Er
-	for qemu-devel@nongnu.org; Fri, 19 Apr 2019 08:24:04 -0400
-Received: from mail-wr1-f67.google.com ([209.85.221.67]:45485)
+	(envelope-from <programmingkidx@gmail.com>) id 1hHToR-0001jJ-GD
+	for qemu-devel@nongnu.org; Fri, 19 Apr 2019 09:44:20 -0400
+Received: from mail-it1-x143.google.com ([2607:f8b0:4864:20::143]:53082)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <sgarzare@redhat.com>) id 1hHSYk-0002P1-L1
-	for qemu-devel@nongnu.org; Fri, 19 Apr 2019 08:24:02 -0400
-Received: by mail-wr1-f67.google.com with SMTP id s15so6738724wra.12
-	for <qemu-devel@nongnu.org>; Fri, 19 Apr 2019 05:24:00 -0700 (PDT)
+	(Exim 4.71) (envelope-from <programmingkidx@gmail.com>)
+	id 1hHToR-0001id-Bc
+	for qemu-devel@nongnu.org; Fri, 19 Apr 2019 09:44:19 -0400
+Received: by mail-it1-x143.google.com with SMTP id x132so8324040itf.2
+	for <qemu-devel@nongnu.org>; Fri, 19 Apr 2019 06:44:19 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+	h=in-reply-to:references:mime-version:message-id:cc
+	:content-transfer-encoding:from:subject:date:to;
+	bh=riDh5nUDTq+lsJ1OHfkJH++AJwaxRVW+r7UHKMUMLG8=;
+	b=QNneNbkUI0roUHeUhTYZG9AIxKPJakV+mIMDw97JP0R4kHV2EJpADMD0AIVsBMaDt5
+	AWGP9Xa4a7apuXrlRoDm9eiMl5arFifdYD5TfrCZagL6BQ2EPtQmzKi4c1PCnXK0TU4z
+	auYwbSPTs+KxKwMvN/guC4IPtS74BowASt4FRq5TOXHr2qrVwpyUPzka9JdJn1pVLhre
+	wz9maaW8CslzsaGOBtsuJwBvwzimO2benRukiHJmbjLOV83NUrxYwVKUZFDEItm9VOMJ
+	A6n5W1STIUTktHGg6kugrVcWd2lhZkHRwkh6KYy5ErwQtCJBX5GMf4tfgl8aQl3i+nDv
+	vznQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
 	d=1e100.net; s=20161025;
-	h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-	:mime-version:content-disposition:in-reply-to:user-agent;
-	bh=ptQpz8we1ujwI55yyQQ6lZ+vJdjxDaoNUgTFKEV0mJQ=;
-	b=T3G6xhgn1WcZd8sv38zNsu5U86Sg7EMrVZTuME0PAM1yNt2IJkVViGujvKEIlxISww
-	GDGMPnfDM0QcdF/4ENMervRCs6M4JiWs/orZEptMfWbIIj0vNnCyh/nOmOoJevjdHySF
-	vb5K2Y3ih+edfME2+zlRlam4CFhDHxrZ/BAQNZT7Sv1fnWKWKh2H8W674sALpzo+f54u
-	KiXhIMVN0Vm6XrLHOB0Y52FZyYFFcp6lNP/JJUOTXc0+s5CssSc0+Z88UuKtOFPst4Z3
-	9dxkGb43ZoB6oU+zkO3DE+snQQGai4DmekQr5dkcp+tNlhPnuCi5vHRKX7HhJCItxtuA
-	ZQvQ==
-X-Gm-Message-State: APjAAAV6GLVYdG+MZvqrJih85vdxhQUmVUDkk9qjK2YflYk5XQJrop05
-	6zGUI3hFsDXWMEX2e41sND0qFQ==
-X-Google-Smtp-Source: APXvYqwMNUMoyi2Q0O6Mblj1b7MsGjyLHO7y9GHVQIjKMsw78Rs3kPgkkFsuQlMkMG2iB9zgIM0zkA==
-X-Received: by 2002:adf:e443:: with SMTP id t3mr2924189wrm.257.1555676639850; 
-	Fri, 19 Apr 2019 05:23:59 -0700 (PDT)
-Received: from steredhat (host35-203-static.12-87-b.business.telecomitalia.it.
-	[87.12.203.35])
-	by smtp.gmail.com with ESMTPSA id a6sm5660023wrp.49.2019.04.19.05.23.58
-	(version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
-	Fri, 19 Apr 2019 05:23:59 -0700 (PDT)
-Date: Fri, 19 Apr 2019 14:23:56 +0200
-From: Stefano Garzarella <sgarzare@redhat.com>
-To: Kevin Wolf <kwolf@redhat.com>
-Message-ID: <20190419122356.7dmwwdbtnzgimydw@steredhat>
-References: <20190411105025.97397-1-sgarzare@redhat.com>
-	<20190411105025.97397-2-sgarzare@redhat.com>
-	<CA+aFP1AMzNjWtMeGy4MpWBa26qxShgciYkcEZ8mkSmDrtCvfqA@mail.gmail.com>
-	<20190411130245.ltfyp7d2dfe2cr3h@steredhat>
-	<CA+aFP1B7ZZ_xwNOfMbKUzEjYbMH=9dJstLYEyVq4LphPR81u0Q@mail.gmail.com>
-	<20190414132008.uxoia6avdpp4jov6@steredhat.homenet.telecomitalia.it>
-	<CA+aFP1D8VYcnwWpB=4PzAdBKr+YK-r8bSwzKKUCkH7jT3kVvoQ@mail.gmail.com>
-	<20190415080452.GA6031@localhost.localdomain>
-	<20190417073438.r57lemi6emu4x3ld@steredhat>
-	<20190417080443.GA8330@localhost.localdomain>
-MIME-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
-Content-Disposition: inline
-In-Reply-To: <20190417080443.GA8330@localhost.localdomain>
-User-Agent: NeoMutt/20180716
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-	[fuzzy]
-X-Received-From: 209.85.221.67
-Subject: Re: [Qemu-devel] [PATCH RFC 1/1] block/rbd: increase dynamically
- the image size
+	h=x-gm-message-state:in-reply-to:references:mime-version:message-id
+	:cc:content-transfer-encoding:from:subject:date:to;
+	bh=riDh5nUDTq+lsJ1OHfkJH++AJwaxRVW+r7UHKMUMLG8=;
+	b=uYEJka5tQf6GsdsB96DI1cP/hZdZCA6TCR9IfWbJ31qi7eJpJ+aa9tYEA93ApdTUbg
+	gbXOsqPVkK5vEwu51QktlaOsRxy7u1mX53brIvhgjaJ0XXXFV/39MaYIPKzkVA93b2Wz
+	7JKdmUBOB7Zjt+iEv9Qs6R0SE6uCv5sVpCw+WIShj8XYxf7BPr85Y30BoASPm7DDv/1+
+	hlieM7OSBUvVny3Ab6W7rcVdP0ebg18CJk9JiRxjSSV0p89prf5GMgsV/L+T3HEWYO8S
+	c9y0hC8QKyQ2fwOHAgpCvEA+JILJeARzMjP+AV4whMxSND3hA12L6tuUwSZT1Xeosg0T
+	8IQg==
+X-Gm-Message-State: APjAAAUFkhx5eBzPzFv573/Qm/PQ0C5fEWXPnhW0kgmcWHPrQukrfO4g
+	jOFmzbPAZrk3H9aCTetgaGF5D564
+X-Google-Smtp-Source: APXvYqznPewbg7sKjfF2JKxbaFud9Qh3zXoryFeJBNxR2Kot19iwpuS7ioFulxhkaCUHnxFwaCplcA==
+X-Received: by 2002:a24:5dc8:: with SMTP id w191mr2898196ita.136.1555681458366;
+	Fri, 19 Apr 2019 06:44:18 -0700 (PDT)
+Received: from [192.168.0.11] (d14-69-20-184.try.wideopenwest.com.
+	[69.14.184.20])
+	by smtp.gmail.com with ESMTPSA id n7sm2691583itc.19.2019.04.19.06.44.17
+	(version=TLS1 cipher=AES128-SHA bits=128/128);
+	Fri, 19 Apr 2019 06:44:17 -0700 (PDT)
+In-Reply-To: <723372ae-a37a-d7cd-098f-452c7513ce8a@redhat.com>
+References: <20190418224706.14014-1-programmingkidx@gmail.com>
+	<723372ae-a37a-d7cd-098f-452c7513ce8a@redhat.com>
+Mime-Version: 1.0 (Apple Message framework v753.1)
+Content-Type: text/plain; charset="UTF-8"; delsp="yes"; format="flowed"
+Message-Id: <4B73E5E6-2129-43B8-A35E-0CF7DCAE163B@gmail.com>
+Content-Transfer-Encoding: 7bit
+From: G 3 <programmingkidx@gmail.com>
+Date: Fri, 19 Apr 2019 09:44:15 -0400
+To: Thomas Huth <thuth@redhat.com>
+X-Mailer: Apple Mail (2.753.1)
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+	recognized.
+X-Received-From: 2607:f8b0:4864:20::143
+Subject: Re: [Qemu-devel] [PATCH] configure: Change capstone's default state
+ to disabled
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -90,72 +96,63 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Josh Durgin <jdurgin@redhat.com>, dillaman@redhat.com,
-	qemu-devel <qemu-devel@nongnu.org>, qemu-block <qemu-block@nongnu.org>,
-	Max Reitz <mreitz@redhat.com>
+Cc: peter.maydell@linaro.org, qemu-devel@nongnu.org,
+	Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190419122356.5GdLHiUYJTsO4a4cqjFKWMeGQfVF2qjrW3dIGJrzlKQ@z>
+Message-ID: <20190419134415.WtPhdKir1DyKwivQ_dDNcNFEPA2ekGrVbMJrVvm1Z1Y@z>
 
-Hi Kevin,
 
-On Wed, Apr 17, 2019 at 10:04:43AM +0200, Kevin Wolf wrote:
-> Am 17.04.2019 um 09:34 hat Stefano Garzarella geschrieben:
-> > On Mon, Apr 15, 2019 at 10:04:52AM +0200, Kevin Wolf wrote:
-> > > 
-> > > I think a potential actual use case could be persistent dirty bitmaps
-> > > for incremental backup. Though maybe that would be better served by
-> > > using the rbd image just as a raw external data file and keeping the
-> > > qcow2 metadata on a filesystem.
-> > 
-> > Thanks to point it out! I'll take a look to understand how to keep
-> > metadata separated from the data.
-> 
-> I'd consider the feature still experimental, but for local files, it
-> works like this:
-> 
->     qemu-img create -f qcow2 -o data_file=test.raw test.qcow2 4G
-> 
-> And then just use test.qcow2. As long as you can put everything you need
-> into an rbd URL, the same approach should work. Otherwise, you may need
-> to use QMP blockdev-create on creation and possibly the data-file option
-> of the qcow2 driver for opening.
+On Apr 19, 2019, at 3:10 AM, Thomas Huth wrote:
+
+> On 19/04/2019 00.47, John Arbuckle wrote:
+>> Capstone is not necessary in order to use QEMU. Disable it by  
+>> default.
+>> This will save the user the pain of having to figure why QEMU isn't
+>> building when this library is missing.
+>>
+>> Signed-off-by: John Arbuckle <programmingkidx@gmail.com>
+>> ---
+>>  configure | 2 +-
+>>  1 file changed, 1 insertion(+), 1 deletion(-)
+>>
+>> diff --git a/configure b/configure
+>> index 1c563a7027..77d7967f92 100755
+>> --- a/configure
+>> +++ b/configure
+>> @@ -433,7 +433,7 @@ opengl_dmabuf="no"
+>>  cpuid_h="no"
+>>  avx2_opt=""
+>>  zlib="yes"
+>> -capstone=""
+>> +capstone="no"
+>>  lzo=""
+>>  snappy=""
+>>  bzip2=""
 >
+> AFAIK we ship capstone as a submodule, so how can this be missing?  
+> Also,
+> our philosophy is to keep everything enabled by default if  
+> possible, so
+> that the code paths don't bitrot. Thus I don't think that disabling  
+> this
+> by default is a good idea. ... so if you've got a problem here, there
+> must be another solution (e.g. is the system capstone detection not
+> working right on your system?).
+>
+>  Thomas
 
-Very interesting, I'll try to add this support also in the rbd driver.
+Thank you for replying. Capstone comes with QEMU? Every time I try to  
+compile QEMU I see an error relating to Capstone not being on my  
+system. Why do you feel that disabling Capstone by default is not a  
+good idea?
 
-> > > How fast is rbd_resize()? Does automatically resizing for every write
-> > > request actually work reasonably well in practice? If it does, there is
-> > > probably little reason not to allow it, even if the use cases are rather
-> > > obscure.
-> > 
-> > I'll try to measure the percentage of the time spent in the rbd_resize.
-> > 
-> > Another solution could be to pass to the rbd driver the virtual size of
-> > the image and resize it only one time also if the preallocation is
-> > disabled, because RBD will not allocate blocks but IIUC it only set the max
-> > size.
-> > 
-> > Do you think make sense? Is it feasible?
-> 
-> In theory yes, though it requires modification of every driver that
-> should be usable together with rbd (i.e. ideally all of the drivers). If
-> automatic resize works good enough, I'd prefer that
+Here is the error message I see when compiling QEMU:
 
-I did some tests and it seems that the cost of rbd_resize() is
-negligible. IIUC it only updates the metadata without allocating any
-blocks (if we are growing, like that case).
+CHK version_gen.h
+make[1]: *** No rule to make target `/Users/John/qemu-git/capstone/ 
+libcapstone.a'.  Stop.
+make: *** [subdir-capstone] Error 2
 
-Anyway the automatic resize will not affect the current use-case (raw
-images on rbd), where the file size is set during the creation, so I
-think there should not be side effects with this patch.
-
-I'm also adding the support for preallocation (i.e. full) in the rbd
-driver that can be useful for qcow2 images.
-
-If you prefer I can resend this patch with the preallocation series.
-
-Thanks,
-Stefano
 
