@@ -1,16 +1,17 @@
-Received: from eggs.gnu.org ([209.51.188.92]:40682)
+Received: from eggs.gnu.org ([209.51.188.92]:40700)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1hHXcs-00067o-5G
+	(envelope-from <vsementsov@virtuozzo.com>) id 1hHXcs-00067p-WC
 	for qemu-devel@nongnu.org; Fri, 19 Apr 2019 13:48:39 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1hHXcq-0003xp-Gb
+	(envelope-from <vsementsov@virtuozzo.com>) id 1hHXcq-0003xy-K8
 	for qemu-devel@nongnu.org; Fri, 19 Apr 2019 13:48:38 -0400
 From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Date: Fri, 19 Apr 2019 20:48:31 +0300
-Message-Id: <20190419174832.146377-2-vsementsov@virtuozzo.com>
+Date: Fri, 19 Apr 2019 20:48:32 +0300
+Message-Id: <20190419174832.146377-3-vsementsov@virtuozzo.com>
 In-Reply-To: <20190419174832.146377-1-vsementsov@virtuozzo.com>
 References: <20190419174832.146377-1-vsementsov@virtuozzo.com>
-Subject: [Qemu-devel] [PATCH 1/2] block: introduce pinned blk
+Subject: [Qemu-devel] [PATCH 2/2] blockjob: use blk_new_pinned in
+ block_job_create
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,123 +23,47 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org, qemu-block@nongnu.org
 Cc: jsnow@redhat.com, mreitz@redhat.com, kwolf@redhat.com, vsementsov@virtuozzo.com
 
-Add stay_at_node fields to BlockBackend and BdrvChild, for the same
-behavior as stay_at_node field of BdrvChildRole. It will be used for
-block-job blk.
+child_role job already has .stay_at_node=true, so on bdrv_replace_node
+operation these child are unchanged. Make block job blk behave in same
+manner, to avoid inconsistent intermediate graph states and workarounds
+like in mirror.
 
 Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 ---
- include/block/block_int.h      |  6 ++++++
- include/sysemu/block-backend.h |  1 +
- block.c                        |  2 +-
- block/block-backend.c          | 23 ++++++++++++++++++++++-
- 4 files changed, 30 insertions(+), 2 deletions(-)
+ block/mirror.c | 6 +-----
+ blockjob.c     | 2 +-
+ 2 files changed, 2 insertions(+), 6 deletions(-)
 
-diff --git a/include/block/block_int.h b/include/block/block_int.h
-index 01e855a066..ae8fc3a580 100644
---- a/include/block/block_int.h
-+++ b/include/block/block_int.h
-@@ -725,6 +725,12 @@ struct BdrvChild {
-      */
-     bool frozen;
+diff --git a/block/mirror.c b/block/mirror.c
+index ff15cfb197..c2cb6bccff 100644
+--- a/block/mirror.c
++++ b/block/mirror.c
+@@ -713,12 +713,8 @@ static int mirror_exit_common(Job *job)
+                             &error_abort);
+     bdrv_replace_node(mirror_top_bs, backing_bs(mirror_top_bs), &error_abort);
  
-+    /*
-+     * This link should not be modified in bdrv_replace_node process. Used by
-+     * should_update_child()
-+     */
-+    bool stay_at_node;
-+
-     QLIST_ENTRY(BdrvChild) next;
-     QLIST_ENTRY(BdrvChild) next_parent;
- };
-diff --git a/include/sysemu/block-backend.h b/include/sysemu/block-backend.h
-index 3be05c2d68..d9c7b9f86a 100644
---- a/include/sysemu/block-backend.h
-+++ b/include/sysemu/block-backend.h
-@@ -77,6 +77,7 @@ typedef struct BlockBackendPublic {
- } BlockBackendPublic;
+-    /* We just changed the BDS the job BB refers to (with either or both of the
+-     * bdrv_replace_node() calls), so switch the BB back so the cleanup does
+-     * the right thing. We don't need any permissions any more now. */
+-    blk_remove_bs(bjob->blk);
++    /* We don't need any permissions any more now. */
+     blk_set_perm(bjob->blk, 0, BLK_PERM_ALL, &error_abort);
+-    blk_insert_bs(bjob->blk, mirror_top_bs, &error_abort);
  
- BlockBackend *blk_new(uint64_t perm, uint64_t shared_perm);
-+BlockBackend *blk_new_pinned(uint64_t perm, uint64_t shared_perm);
- BlockBackend *blk_new_open(const char *filename, const char *reference,
-                            QDict *options, int flags, Error **errp);
- int blk_get_refcnt(BlockBackend *blk);
-diff --git a/block.c b/block.c
-index 16615bc876..5069515976 100644
---- a/block.c
-+++ b/block.c
-@@ -3905,7 +3905,7 @@ static bool should_update_child(BdrvChild *c, BlockDriverState *to)
-     GHashTable *found;
-     bool ret;
+     bs_opaque->job = NULL;
  
--    if (c->role->stay_at_node) {
-+    if (c->stay_at_node || c->role->stay_at_node) {
-         return false;
+diff --git a/blockjob.c b/blockjob.c
+index 730101d282..47466bdfcf 100644
+--- a/blockjob.c
++++ b/blockjob.c
+@@ -396,7 +396,7 @@ void *block_job_create(const char *job_id, const BlockJobDriver *driver,
+         job_id = bdrv_get_device_name(bs);
      }
  
-diff --git a/block/block-backend.c b/block/block-backend.c
-index f78e82a707..b2de911383 100644
---- a/block/block-backend.c
-+++ b/block/block-backend.c
-@@ -86,6 +86,11 @@ struct BlockBackend {
-      * Accessed with atomic ops.
-      */
-     unsigned int in_flight;
-+
-+    /*
-+     * On blk_insert_bs() new child will inherit  @stay_at_node.
-+     */
-+    bool stay_at_node;
- };
- 
- typedef struct BlockBackendAIOCB {
-@@ -311,9 +316,13 @@ static const BdrvChildRole child_root = {
-  * to other users of the attached node.
-  * Both sets of permissions can be changed later using blk_set_perm().
-  *
-+ * @stay_at_node is used to set stay_at_node field of child, attached in
-+ * blk_insert_bs(). If true, child bs will not be updated on bdrv_replace_node.
-+ *
-  * Return the new BlockBackend on success, null on failure.
-  */
--BlockBackend *blk_new(uint64_t perm, uint64_t shared_perm)
-+static BlockBackend *blk_new_common(uint64_t perm, uint64_t shared_perm,
-+                                    bool stay_at_node)
- {
-     BlockBackend *blk;
- 
-@@ -321,6 +330,7 @@ BlockBackend *blk_new(uint64_t perm, uint64_t shared_perm)
-     blk->refcnt = 1;
-     blk->perm = perm;
-     blk->shared_perm = shared_perm;
-+    blk->stay_at_node = stay_at_node;
-     blk_set_enable_write_cache(blk, true);
- 
-     blk->on_read_error = BLOCKDEV_ON_ERROR_REPORT;
-@@ -336,6 +346,16 @@ BlockBackend *blk_new(uint64_t perm, uint64_t shared_perm)
-     return blk;
- }
- 
-+BlockBackend *blk_new(uint64_t perm, uint64_t shared_perm)
-+{
-+    return blk_new_common(perm, shared_perm, false);
-+}
-+
-+BlockBackend *blk_new_pinned(uint64_t perm, uint64_t shared_perm)
-+{
-+    return blk_new_common(perm, shared_perm, true);
-+}
-+
- /*
-  * Creates a new BlockBackend, opens a new BlockDriverState, and connects both.
-  *
-@@ -796,6 +816,7 @@ int blk_insert_bs(BlockBackend *blk, BlockDriverState *bs, Error **errp)
-     if (blk->root == NULL) {
-         return -EPERM;
-     }
-+    blk->root->stay_at_node = blk->stay_at_node;
-     bdrv_ref(bs);
- 
-     notifier_list_notify(&blk->insert_bs_notifiers, blk);
+-    blk = blk_new(perm, shared_perm);
++    blk = blk_new_pinned(perm, shared_perm);
+     ret = blk_insert_bs(blk, bs, errp);
+     if (ret < 0) {
+         blk_unref(blk);
 -- 
 2.18.0
