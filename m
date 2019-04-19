@@ -7,78 +7,76 @@ X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
 	SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6A786C282E0
-	for <qemu-devel@archiver.kernel.org>; Fri, 19 Apr 2019 21:10:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EFB6BC282E0
+	for <qemu-devel@archiver.kernel.org>; Fri, 19 Apr 2019 21:28:53 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2BE392171F
-	for <qemu-devel@archiver.kernel.org>; Fri, 19 Apr 2019 21:10:54 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id A725F21736
+	for <qemu-devel@archiver.kernel.org>; Fri, 19 Apr 2019 21:28:53 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="LZjpbA6f"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2BE392171F
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="LpUvNhUm"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A725F21736
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:33292 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:33459 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hHamb-00074X-Af
-	for qemu-devel@archiver.kernel.org; Fri, 19 Apr 2019 17:10:53 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:51971)
+	id 1hHb40-0001hI-ND
+	for qemu-devel@archiver.kernel.org; Fri, 19 Apr 2019 17:28:52 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:54615)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alistair23@gmail.com>) id 1hHalo-0006fr-4l
-	for qemu-devel@nongnu.org; Fri, 19 Apr 2019 17:10:05 -0400
+	(envelope-from <alistair23@gmail.com>) id 1hHb2R-0000ba-Pm
+	for qemu-devel@nongnu.org; Fri, 19 Apr 2019 17:27:16 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alistair23@gmail.com>) id 1hHaln-0006ad-4v
-	for qemu-devel@nongnu.org; Fri, 19 Apr 2019 17:10:04 -0400
-Received: from mail-lj1-x244.google.com ([2a00:1450:4864:20::244]:42289)
+	(envelope-from <alistair23@gmail.com>) id 1hHaq4-0008Jt-Fj
+	for qemu-devel@nongnu.org; Fri, 19 Apr 2019 17:14:29 -0400
+Received: from mail-lj1-x241.google.com ([2a00:1450:4864:20::241]:38475)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <alistair23@gmail.com>)
-	id 1hHalm-0006aA-Tn; Fri, 19 Apr 2019 17:10:03 -0400
-Received: by mail-lj1-x244.google.com with SMTP id v22so5559562lje.9;
-	Fri, 19 Apr 2019 14:10:02 -0700 (PDT)
+	id 1hHaq4-0008JL-5y; Fri, 19 Apr 2019 17:14:28 -0400
+Received: by mail-lj1-x241.google.com with SMTP id p14so5587217ljg.5;
+	Fri, 19 Apr 2019 14:14:27 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
 	h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-	:cc:content-transfer-encoding;
-	bh=8y3JnOn2sysVarRFf8sASNkXiG0BxOMAm2gvZWbagI0=;
-	b=LZjpbA6f062KcgcjmSdk853IYlk071eXrP37ONYNMvqGCPsg00bRd9lG99WV+iyaSn
-	0fcz8TPCFrxfmYqqfW/uP18wdYgcJEGZKiFzISgrYxDqmw9JEsnWPY61mO/X4kZ3Sl5G
-	/otapp+3jI5QLPinz74i3PQXpeTwQ81WEmrsy1Smzp6bEz+MEGHg8f7iXZBhpGBpidrV
-	VyJxnrmWiCuVmH/ZXTd4Xaos8xfu24lMR1+Gor99+QnS12Qb0qZhLUgElkkHYONKoJJ8
-	fFz79ShQCp2jPt+k+eo44An5Kmo0K9yyG3TBfd9MnhiT2FBL/+TSLyyFkQQ0yut0Tne9
-	qRbQ==
+	:cc; bh=2tubYGVGC+zztlt6H1UAeONkKsPTLRYswJfNrPrC5Zc=;
+	b=LpUvNhUmOQX3fz46wwSsfI9LqQRXqt2Je5AW90smgfQ2bc20skwxySvSvMZIcD7HwX
+	p0cxPaNUzIkTGI48kxmCgRpGCMI0leEhqy84JT2floiTBO3l4dBdy9nwF6qXl8qk83mY
+	kR0ojbgsxX0RtB+hNI9+DtzmYXI/ItFiKXjYDE4p+ZgK7clTAhAMGWFbk/WCYTq5KFFd
+	emMPmQcn6GekW0FkwKo+3nrp6VpvqyeT9Rc6ajcTrNskiIhPWBYTqDtKLAiH9iPyvjfj
+	nBHdmfHdscfAc3ylt7FI0MoOQufsLodwOhAN3v7cqPdYXEdXLCYQ+EwUJKCjDk77bAC2
+	SB/Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
 	d=1e100.net; s=20161025;
 	h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-	:message-id:subject:to:cc:content-transfer-encoding;
-	bh=8y3JnOn2sysVarRFf8sASNkXiG0BxOMAm2gvZWbagI0=;
-	b=nos08m/L4A5nx9Bze+mSTzgZ8acQOd0kpavNiayy1Gryfljrz8ljDGtmjL9fwHcJHF
-	KFwYJTux2Z2PClNPfLX7n/g5iII2HsGkpk7+3vXW5fJE+uPgZKnEZhTOdZcaH87oqWXs
-	ClhhTZNfdEEI1vDW4PkfYAyXvdgooi/OQZhFshcpzyelc7cQfzZnmx69tPxM7v5n9379
-	nLrO7CjH0oIP3MoA6TcjbKZhAH6TeI1AYLPNEaon79JhF1+8UywEw0Ox7iVRUQSlF+c4
-	ImqISsZTYMAfeYLHg638IuwJm5FQxpLeISku2CSHtawR2tc/Oun+ens5vnEvEwHFK5AJ
-	L/sQ==
-X-Gm-Message-State: APjAAAXgzo72/IcVFQ8TbPI0/sRwzYSGXmWom7U/ozm547YiSmkrJ75E
-	YcRnZydhFhmO6GpOx+VmOYab6DJocmPl1bNT0I8=
-X-Google-Smtp-Source: APXvYqzNRmuU2ID0z1fzLXX+LsTLnDQu4gAOW70825ALsK/fjSfZSWhrJyuxPof2o/vyasBaJhD6/Tdb+STtE2Lg0zs=
-X-Received: by 2002:a2e:895a:: with SMTP id b26mr3259208ljk.89.1555708201361; 
-	Fri, 19 Apr 2019 14:10:01 -0700 (PDT)
+	:message-id:subject:to:cc;
+	bh=2tubYGVGC+zztlt6H1UAeONkKsPTLRYswJfNrPrC5Zc=;
+	b=j8z3ocq7v2AiLdF9AgQgST36p+2nf14RRYYyu6xOZipiy5P1A9vzPHgk8tZTsjogc1
+	MJ8rn2/Jt6JIbVd2xhanbcI6Dj5wR5C85DtNwHfPlNANsL1XMlvovBrFQfxpAeqPQuLE
+	I3DUfikWL2M7r/rGmcOtPsnOPYNPadEHHbrQ9V9mfbPRl2CHDJg00HDrKIlSNrPhkPXQ
+	TdvzjcfooJar+nIoJyU8H9HfH4OsV8oEiDLD9uX7fbMYwTIwj5fw/mU57mn7sh5K6flt
+	5Yb6uOzl1T9YmTbOSaL+K47XpwCOZHfrkLIwxU7qJFM3tB5Z658AB5nhTG/nlVwGJ8Jz
+	/o+Q==
+X-Gm-Message-State: APjAAAWoXdcgqoKcqIUSUmObmN+WnzrViG9ud8dTGEY9sJNyWcsmb7Vl
+	Sm4xnTSjrXUieLBoIJ7pWNf4VrtQ1qRFu8t25qM=
+X-Google-Smtp-Source: APXvYqwNNqKthg3dDQIQc8yQcPziQzkNf/21OOrqalz70x8XJqJrVbHb8kdm32CkL1C4h5b0Wzuf5sHWx0QrPutHkg4=
+X-Received: by 2002:a2e:974d:: with SMTP id f13mr3377594ljj.140.1555708466431; 
+	Fri, 19 Apr 2019 14:14:26 -0700 (PDT)
 MIME-Version: 1.0
 References: <20190418180057.3593-1-thuth@redhat.com>
-	<20190418180057.3593-14-thuth@redhat.com>
-In-Reply-To: <20190418180057.3593-14-thuth@redhat.com>
+	<20190418180057.3593-26-thuth@redhat.com>
+In-Reply-To: <20190418180057.3593-26-thuth@redhat.com>
 From: Alistair Francis <alistair23@gmail.com>
-Date: Fri, 19 Apr 2019 14:09:34 -0700
+Date: Fri, 19 Apr 2019 14:13:59 -0700
 Message-ID:
- <CAKmqyKObGO3+s6QsF7TQBTxEx4DRm-GjM9gorv+tvJzC=YsTqQ@mail.gmail.com>
+ <CAKmqyKM4ZtUmT6U-9Nv=S_3KMVnPzogOkNPrtyqvKz=b+u1AYQ@mail.gmail.com>
 To: Thomas Huth <thuth@redhat.com>
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
 	recognized.
-X-Received-From: 2a00:1450:4864:20::244
-Subject: Re: [Qemu-devel] [PATCH for-QEMU-4.1 v5 13/29] hw/arm: Express
- dependencies of xilinx-zynq with Kconfig
+X-Received-From: 2a00:1450:4864:20::241
+Subject: Re: [Qemu-devel] [PATCH for-QEMU-4.1 v5 25/29] hw/arm: Express
+ dependencies of the microbit / nrf51 machine with Kconfig
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -110,13 +108,11 @@ Cc: Peter Maydell <peter.maydell@linaro.org>, Jan Kiszka <jan.kiszka@web.de>,
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190419210934.t6-YiVXNlaKHXZHcPZqfCcLokfdJIWULWuiaXRPnW2g@z>
+Message-ID: <20190419211359.exeHUyBfQCjdBYLHQk5kYBwN3TXpSfkM9ADxl8e4IHo@z>
 
-On Thu, Apr 18, 2019 at 11:18 AM Thomas Huth <thuth@redhat.com> wrote:
+On Thu, Apr 18, 2019 at 11:23 AM Thomas Huth <thuth@redhat.com> wrote:
 >
-> Add Kconfig dependencies for the xilinx-zynq-a9 board.
-> This patch is based on earlier work by =C3=81kos Kov=C3=A1cs (i.e.
-> his "hw/arm/Kconfig: Add ARM Kconfig" patch).
+> Add Kconfig dependencies for the NRF51 / microbit machine.
 >
 > Signed-off-by: Thomas Huth <thuth@redhat.com>
 
@@ -125,71 +121,65 @@ Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
 Alistair
 
 > ---
->  default-configs/arm-softmmu.mak |  7 +------
->  hw/arm/Kconfig                  | 12 ++++++++++++
->  2 files changed, 13 insertions(+), 6 deletions(-)
+>  default-configs/arm-softmmu.mak | 3 +--
+>  hw/arm/Kconfig                  | 6 ++++++
+>  hw/arm/Makefile.objs            | 3 ++-
+>  3 files changed, 9 insertions(+), 3 deletions(-)
 >
-> diff --git a/default-configs/arm-softmmu.mak b/default-configs/arm-softmm=
-u.mak
-> index f39a854f2e..af78e7c892 100644
+> diff --git a/default-configs/arm-softmmu.mak b/default-configs/arm-softmmu.mak
+> index 6dc388c43e..233937f394 100644
 > --- a/default-configs/arm-softmmu.mak
 > +++ b/default-configs/arm-softmmu.mak
-> @@ -19,6 +19,7 @@ CONFIG_STELLARIS=3Dy
->  CONFIG_REALVIEW=3Dy
->  CONFIG_VERSATILE=3Dy
->  CONFIG_VEXPRESS=3Dy
-> +CONFIG_ZYNQ=3Dy
->  CONFIG_MAINSTONE=3Dy
->  CONFIG_GUMSTIX=3Dy
->  CONFIG_SPITZ=3Dy
-> @@ -38,16 +39,11 @@ CONFIG_VIRTIO_MMIO=3Dy
+> @@ -35,11 +35,10 @@ CONFIG_RASPI=y
+>  CONFIG_DIGIC=y
+>  CONFIG_SABRELITE=y
+>  CONFIG_EMCRAFT_SF2=y
+> +CONFIG_MICROBIT=y
 >
->  CONFIG_NETDUINO2=3Dy
+>  CONFIG_VGA=y
 >
-> -CONFIG_PL330=3Dy
-> -CONFIG_CADENCE=3Dy
->  CONFIG_FRAMEBUFFER=3Dy
-> -CONFIG_XILINX_SPIPS=3Dy
-> -CONFIG_ZYNQ_DEVCFG=3Dy
->
->  CONFIG_DIGIC=3Dy
->  CONFIG_MPS2=3Dy
->  CONFIG_RASPI=3Dy
-> -CONFIG_ZYNQ=3Dy
->  CONFIG_STM32F2XX_TIMER=3Dy
->  CONFIG_STM32F2XX_USART=3Dy
->  CONFIG_STM32F2XX_SYSCFG=3Dy
-> @@ -100,7 +96,6 @@ CONFIG_SMBUS_EEPROM=3Dy
->  CONFIG_GPIO_KEY=3Dy
->  CONFIG_MSF2=3Dy
->  CONFIG_FW_CFG_DMA=3Dy
-> -CONFIG_XILINX_AXI=3Dy
->  CONFIG_PCI_EXPRESS_DESIGNWARE=3Dy
->
->  CONFIG_STRONGARM=3Dy
+> -CONFIG_NRF51_SOC=y
+> -
+>  CONFIG_FSL_IMX25=y
+>  CONFIG_FSL_IMX7=y
+>  CONFIG_FSL_IMX6UL=y
 > diff --git a/hw/arm/Kconfig b/hw/arm/Kconfig
-> index 101de74260..785e383411 100644
+> index 58439c492a..708eae19e5 100644
 > --- a/hw/arm/Kconfig
 > +++ b/hw/arm/Kconfig
-> @@ -201,6 +201,18 @@ config VEXPRESS
+> @@ -347,8 +347,14 @@ config FSL_IMX6UL
+>      select IMX_I2C
+>      select SDHCI
 >
->  config ZYNQ
+> +config MICROBIT
+> +    bool
+> +    select NRF51_SOC
+> +
+>  config NRF51_SOC
 >      bool
-> +    select A9MPCORE
-> +    select CADENCE # UART
-> +    select PFLASH_CFI02
-> +    select PL330
-> +    select SDHCI
-> +    select SSI_M25P80
-> +    select USB_EHCI_SYSBUS
-> +    select XILINX # UART
-> +    select XILINX_AXI
-> +    select XILINX_SPI
-> +    select XILINX_SPIPS
-> +    select ZYNQ_DEVCFG
+> +    select I2C
+> +    select ARM_V7M
 >
->  config ARM_V7M
+>  config EMCRAFT_SF2
 >      bool
+> diff --git a/hw/arm/Makefile.objs b/hw/arm/Makefile.objs
+> index eae9f6c442..994e67dd0d 100644
+> --- a/hw/arm/Makefile.objs
+> +++ b/hw/arm/Makefile.objs
+> @@ -8,6 +8,7 @@ obj-$(CONFIG_EMCRAFT_SF2) += msf2-som.o
+>  obj-$(CONFIG_HIGHBANK) += highbank.o
+>  obj-$(CONFIG_INTEGRATOR) += integratorcp.o
+>  obj-$(CONFIG_MAINSTONE) += mainstone.o
+> +obj-$(CONFIG_MICROBIT) += microbit.o
+>  obj-$(CONFIG_MUSICPAL) += musicpal.o
+>  obj-$(CONFIG_NETDUINO2) += netduino2.o
+>  obj-$(CONFIG_NSERIES) += nseries.o
+> @@ -48,4 +49,4 @@ obj-$(CONFIG_ARMSSE) += armsse.o
+>  obj-$(CONFIG_FSL_IMX7) += fsl-imx7.o mcimx7d-sabre.o
+>  obj-$(CONFIG_ARM_SMMUV3) += smmu-common.o smmuv3.o
+>  obj-$(CONFIG_FSL_IMX6UL) += fsl-imx6ul.o mcimx6ul-evk.o
+> -obj-$(CONFIG_NRF51_SOC) += nrf51_soc.o microbit.o
+> +obj-$(CONFIG_NRF51_SOC) += nrf51_soc.o
 > --
 > 2.21.0
 >
