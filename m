@@ -2,83 +2,80 @@ Return-Path: <SRS0=rbQy=SV=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.7 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4890BC282E0
-	for <qemu-devel@archiver.kernel.org>; Fri, 19 Apr 2019 21:02:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C7027C282E0
+	for <qemu-devel@archiver.kernel.org>; Fri, 19 Apr 2019 21:02:35 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0BF972171F
-	for <qemu-devel@archiver.kernel.org>; Fri, 19 Apr 2019 21:02:10 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 8672C2171F
+	for <qemu-devel@archiver.kernel.org>; Fri, 19 Apr 2019 21:02:35 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gmx.net header.i=@gmx.net header.b="f+oa7lrZ"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0BF972171F
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gmx.co.uk
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="LdRnoUGN"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8672C2171F
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:33161 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:33164 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hHae9-00030t-Bv
-	for qemu-devel@archiver.kernel.org; Fri, 19 Apr 2019 17:02:09 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:49764)
+	id 1hHaeY-0003GO-Nv
+	for qemu-devel@archiver.kernel.org; Fri, 19 Apr 2019 17:02:34 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:49838)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <nick.hudson@gmx.co.uk>) id 1hHacY-00020F-FO
-	for qemu-devel@nongnu.org; Fri, 19 Apr 2019 17:00:31 -0400
+	(envelope-from <alistair23@gmail.com>) id 1hHacp-0002NF-QV
+	for qemu-devel@nongnu.org; Fri, 19 Apr 2019 17:00:48 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <nick.hudson@gmx.co.uk>) id 1hHacX-0002fY-MJ
-	for qemu-devel@nongnu.org; Fri, 19 Apr 2019 17:00:30 -0400
-Received: from mout.gmx.net ([212.227.15.18]:59883)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <nick.hudson@gmx.co.uk>)
-	id 1hHacX-0002eu-Ce
-	for qemu-devel@nongnu.org; Fri, 19 Apr 2019 17:00:29 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=gmx.net;
-	s=badeba3b8450; t=1555707614;
-	bh=eTH1PvFvm8bIVTMMgDNj8G3jPQ0P7SiNunJIbD2I0EE=;
-	h=X-UI-Sender-Class:From:Subject:To:Cc:Date;
-	b=f+oa7lrZ4CkV2WXyfcvWanLs9oYALpdLQjVL1rKtjZ1TBtHGnYLBgxb4tnStjeZUp
-	BFhpcikRsrAHCVBc8DZoFiXYRfiXmqLjdYawXucEf1iYtVcEI8YAWC8BlKaP7Ba/73
-	Yi2RtxaFZ79OiWqNA8lRHh30CR/aDV1iuKVgFlVA=
-X-UI-Sender-Class: 01bb95c1-4bf8-414a-932a-4f6e2808ef9c
-Received: from [192.168.0.96] ([90.214.132.136]) by mail.gmx.com (mrgmx001
-	[212.227.17.184]) with ESMTPSA (Nemesis) id 0M8m7Q-1h7ezp3YiK-00C90a;
-	Fri, 19 Apr 2019 23:00:14 +0200
-From: Nick Hudson <nick.hudson@gmx.co.uk>
-To: qemu-devel@nongnu.org
-X-Mozilla-News-Host: news://news.gmane.org
-Message-ID: <b148c658-09ed-15a5-02e6-42e1c544e847@gmx.co.uk>
-Date: Fri, 19 Apr 2019 22:00:03 +0100
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
-	Thunderbird/60.6.1
+	(envelope-from <alistair23@gmail.com>) id 1hHaco-0002od-QC
+	for qemu-devel@nongnu.org; Fri, 19 Apr 2019 17:00:47 -0400
+Received: from mail-lf1-x143.google.com ([2a00:1450:4864:20::143]:45298)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <alistair23@gmail.com>)
+	id 1hHaco-0002oA-J4; Fri, 19 Apr 2019 17:00:46 -0400
+Received: by mail-lf1-x143.google.com with SMTP id t11so4783651lfl.12;
+	Fri, 19 Apr 2019 14:00:46 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+	h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+	:cc; bh=Mz1bCypkezkmEmclBAnq3+wYam+9PGnTBmgR/1AT72g=;
+	b=LdRnoUGNfEzU+8RINjnWqqkSyHzpwB2x9WeDT+0hiCrG1ZscSP3gUlTfkZ+b+BG3BX
+	pgdhMay9NYFyBB2ENhRS4gKavNFIXd3Wd1QDKeuhfI5eRxCquptAf4eztDaUWypY7Q6u
+	T2lnH5tabOKhAd5IFEqY0gS2SXdRh2YAFJNqkC+xr5TLYYjqtoHgmcAupJlYKZOnuyUW
+	tJMcEVjw3sgYAdcfrA8H5rkyWBZDCzsyT47j5EAWI5fKhP8Br8coNi6UOGlSivNWItH5
+	7hXu9dGnud6Du13ZPHmaOFAFQo7FUFH8gB6uX9VTU24q1ab3RvC5CbkhY9DMDFZYnobG
+	0m1w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=1e100.net; s=20161025;
+	h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+	:message-id:subject:to:cc;
+	bh=Mz1bCypkezkmEmclBAnq3+wYam+9PGnTBmgR/1AT72g=;
+	b=gvhA+IajD5HwFowEtoWz63JnlsjqpaN576V/9LSSUfV72pFDj8NUJxNhr3RYIgW0DO
+	BrnRnjbmfk5d15xnu2hqLCezQGD9Ss8CGSCLVHfLcbVTgUJzn5h6YyVFqpZuKWgOHWf5
+	WDvOBzC7RKmTrzhiUbvCPqdr4s5hbWeZuE6wtzD1Jh37S6UM5+1aiz72bxiJAdPfBM42
+	g5FEqPWx8sTw9Qq5E0jX3PvKGCGndbMoK+OrPTGZ9eqa/feU8Tl93Tn3gmns8/geeayx
+	YDx8SDhY5IYSpwA6mkum3QatxB2RH1PMuxq0Vd/b3QNZ4k9ScoyTZDXpuk5T2TVa38DS
+	breQ==
+X-Gm-Message-State: APjAAAWDTpuY/w3Q6YhQMKtTdyM2JxB/vfjk+gUBt9lxdFC++PDWRwA/
+	Z8+ViFPHCnNu1kAJsXF+47cFP1opJvE9f865Ejs=
+X-Google-Smtp-Source: APXvYqyRR6DzW1qCvhOHMR6P6dXSYES6461ojp+1YylifXf7nPtGHZ8/hgQ+URHgyxld4nETg5I2ZzmzTf1zJdY7FXM=
+X-Received: by 2002:a19:a40f:: with SMTP id q15mr1581220lfc.121.1555707645301; 
+	Fri, 19 Apr 2019 14:00:45 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"; format="flowed"
-Content-Language: en-GB
-Content-Transfer-Encoding: quoted-printable
-X-Provags-ID: V03:K1:SMvZq/qW+EtGDWccc+q8+MTSLPotkhvI1mk6G9hA7wXgQiJZ4Cq
-	Io0gnqG1TWwsHcozYUd20yluwEyMFUWjkILt6gBN287KAf8dhdtHfaS1rrp6wiw+IfhqQRj
-	dtIXcp5UnD7h2iVGZMCDqj3OG0nuNDiySBuHOWCBQlvshLe4nD3qa45ZRxgMJc55vvDBMlI
-	sPdWyxRWwKdEVA3Ts4CvQ==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:qxPwaTDGsZ8=:8Tw7JEY4agbrQzhyICuHP4
-	qv8Bn/dPiAKiScKRlftjRj/YE4D+5NaRJCSC9XL/Dv8nI1+vxYgVnvYiLJO1obDCCE60jKfM5
-	y5bts81R+yMeNO0srbevn/gf7l7XX0t4Jr1YuQ+O+K+HL1VRj5Se++JGSs9MiwfogMw/J2iev
-	D/xEc0jGqzO02vzG5Axc9/50LG/ITG7muGpca2LUv+12L9VgD9mPlUdEnftA9cZSAQE/SL1WB
-	bWc3ZLfUL5U1kMiDi2atUiwg982YOVSQbqBrw+N/MbLaB3A9CTEamoqTNpCcNSAAZjRra3xsN
-	YNYvMmBZ3cRHB6QoJGfvk7eo/r/PSIxtqqjgnyn96+hSFPKFH1lq6Q8MBMKyD51w6GC23ykae
-	N2/s1uhZCmz3S9tmaRBHf+GdgDW4kimsmi9jja4J4MF8Fa+OfEb6TqQENjqU5A3V+plNfRQY4
-	LuZoFHZogl3XmMXQA7qQbPx3KsMd2ADLBcd0h4V1gvJj4SyhIiO9K91XnSNxU6yqzCxWUxgIb
-	siBjXyqS+P7BCtZax8oDz4yWfUIQItiL4SDWfH2eIoo2J2BUGw4H1IAmuL+AZSzFr/qZBA+4u
-	JyjfuOmkvpKKzDhOVaLE0GEwFgoKxjPc+PraTbbnBhwaEK/Df3vu2HKuFtmZDHQyw/tIVBOOU
-	WHXGIyGaYnXR85xjcsAEySPq322/4h0Tu34HLBp6uqG8ttNCaIVFkZySKmCfi2i4nRhzlFX14
-	Q6t1fMwC96VUXOF3lteYy+C5aT/D9YkfwRXgn88U0M4wMKPbvgpylQdw786NqthC5zipUEZkf
-	xOXOelNa8Smw16rpY34omy+NAMPGwvl8g83PU8AU0+PKrdOUDdLDQfAsrOrn6uq8eeCkqvo81
-	j33Kx7DfF8dsdaLFySwBbggi33Y1herIL+/JGq5bz10wDm7fdCM3EhelqEByJaL9JbZtwwm3j
-	fRzbK/OW4sA==
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 212.227.15.18
-Subject: [Qemu-devel] [PATCH v1 0/2] HPPA fixes for NetBSD/hppa emulation
+References: <20190419061429.17695-1-ehabkost@redhat.com>
+	<20190419061429.17695-3-ehabkost@redhat.com>
+In-Reply-To: <20190419061429.17695-3-ehabkost@redhat.com>
+From: Alistair Francis <alistair23@gmail.com>
+Date: Fri, 19 Apr 2019 14:00:18 -0700
+Message-ID:
+ <CAKmqyKO-djrG6QWXKeEMPNPvdXaVx14iWE7Cgq9TVh8C5_Ytpw@mail.gmail.com>
+To: Eduardo Habkost <ehabkost@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+	recognized.
+X-Received-From: 2a00:1450:4864:20::143
+Subject: Re: [Qemu-devel] [PATCH 2/7] riscv: Don't split CPU model string
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -90,30 +87,61 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Richard Henderson <rth@twiddle.net>
+Cc: Peter Maydell <peter.maydell@linaro.org>,
+	"open list:RISC-V" <qemu-riscv@nongnu.org>,
+	Sagar Karandikar <sagark@eecs.berkeley.edu>,
+	Bastian Koppelmann <kbastian@mail.uni-paderborn.de>,
+	Palmer Dabbelt <palmer@sifive.com>,
+	"qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>,
+	Alistair Francis <Alistair.Francis@wdc.com>,
+	Igor Mammedov <imammedo@redhat.com>, Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190419210003.lnfc0QBp6wWl4LyJanQy7PC0gRdGUI0wo2LjJUA5D14@z>
+Message-ID: <20190419210018.1m-K90BvxFK3_FiZPAAyg0kjmvxEvDr3uvb7KxgvV-E@z>
 
-Hi,
+On Thu, Apr 18, 2019 at 11:20 PM Eduardo Habkost <ehabkost@redhat.com> wrote:
+>
+> CPUClass::class_by_name is called after the CPU model name and
+> options were already split, there's no need to split the string
+> again.
+>
+> Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
 
-Here are the required changes to allow qemu to emulate NetBSD/hppa.
+Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
 
-Nick Hudson (2):
-   Implement the pcxl and pcxl2 Fast TLB Insert instructions as used by
-     NetBSD (and OpenBSD)
-   Always return EXCP_DMAR for protection id trap as EXCP_DMP is
-     considered legacy.
+Alistair
 
-  target/hppa/insns.decode |  3 +++
-  target/hppa/mem_helper.c |  3 +--
-  target/hppa/translate.c  | 54 ++++++++++++++++++++++++++++++++++++++++
-  3 files changed, 58 insertions(+), 2 deletions(-)
-
-=2D-
-2.17.1
-
-
-
+> ---
+> Cc: Palmer Dabbelt <palmer@sifive.com>
+> Cc: Alistair Francis <Alistair.Francis@wdc.com>
+> Cc: Sagar Karandikar <sagark@eecs.berkeley.edu>
+> Cc: Bastian Koppelmann <kbastian@mail.uni-paderborn.de>
+> Cc: qemu-riscv@nongnu.org
+> ---
+>  target/riscv/cpu.c | 5 +----
+>  1 file changed, 1 insertion(+), 4 deletions(-)
+>
+> diff --git a/target/riscv/cpu.c b/target/riscv/cpu.c
+> index d61bce6d55..5e97a83c80 100644
+> --- a/target/riscv/cpu.c
+> +++ b/target/riscv/cpu.c
+> @@ -179,12 +179,9 @@ static ObjectClass *riscv_cpu_class_by_name(const char *cpu_model)
+>  {
+>      ObjectClass *oc;
+>      char *typename;
+> -    char **cpuname;
+>
+> -    cpuname = g_strsplit(cpu_model, ",", 1);
+> -    typename = g_strdup_printf(RISCV_CPU_TYPE_NAME("%s"), cpuname[0]);
+> +    typename = g_strdup_printf(RISCV_CPU_TYPE_NAME("%s"), cpu_model);
+>      oc = object_class_by_name(typename);
+> -    g_strfreev(cpuname);
+>      g_free(typename);
+>      if (!oc || !object_class_dynamic_cast(oc, TYPE_RISCV_CPU) ||
+>          object_class_is_abstract(oc)) {
+> --
+> 2.18.0.rc1.1.g3f1ff2140
+>
+>
 
