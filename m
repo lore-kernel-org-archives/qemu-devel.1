@@ -3,110 +3,55 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
 X-Spam-Status: No, score=-0.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+	MAILING_LIST_MULTI,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D57E2C282DA
-	for <qemu-devel@archiver.kernel.org>; Fri, 19 Apr 2019 06:04:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C00EEC282DA
+	for <qemu-devel@archiver.kernel.org>; Fri, 19 Apr 2019 06:15:43 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9A34D21736
-	for <qemu-devel@archiver.kernel.org>; Fri, 19 Apr 2019 06:04:05 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9A34D21736
+	by mail.kernel.org (Postfix) with ESMTPS id 8CFBB217F9
+	for <qemu-devel@archiver.kernel.org>; Fri, 19 Apr 2019 06:15:43 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8CFBB217F9
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:51750 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:51859 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hHMd2-0003ze-S7
-	for qemu-devel@archiver.kernel.org; Fri, 19 Apr 2019 02:04:04 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:57255)
+	id 1hHMoI-0006IG-77
+	for qemu-devel@archiver.kernel.org; Fri, 19 Apr 2019 02:15:42 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:59217)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1hHMcG-0003gq-9v
-	for qemu-devel@nongnu.org; Fri, 19 Apr 2019 02:03:17 -0400
+	(envelope-from <ehabkost@redhat.com>) id 1hHMmZ-00055X-HV
+	for qemu-devel@nongnu.org; Fri, 19 Apr 2019 02:13:56 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1hHMcE-0007Yz-FF
-	for qemu-devel@nongnu.org; Fri, 19 Apr 2019 02:03:16 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:59392)
+	(envelope-from <ehabkost@redhat.com>) id 1hHMmY-0004k3-Hu
+	for qemu-devel@nongnu.org; Fri, 19 Apr 2019 02:13:55 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:38192)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <thuth@redhat.com>)
-	id 1hHMXK-0006NA-1Y; Fri, 19 Apr 2019 01:58:10 -0400
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
-	[10.5.11.16])
+	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1hHMmY-0004jc-A8
+	for qemu-devel@nongnu.org; Fri, 19 Apr 2019 02:13:54 -0400
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+	[10.5.11.12])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 1901B3082E57;
-	Fri, 19 Apr 2019 05:58:06 +0000 (UTC)
-Received: from thuth.remote.csb (ovpn-116-62.ams2.redhat.com [10.36.116.62])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id D84315C21F;
-	Fri, 19 Apr 2019 05:58:00 +0000 (UTC)
-To: Stephen Checkoway <stephen.checkoway@oberlin.edu>
-References: <20190417220147.67648-1-stephen.checkoway@oberlin.edu>
-	<20190417220147.67648-2-stephen.checkoway@oberlin.edu>
-	<3ffacb2c-2459-fb45-ca9c-7b59b10a1c76@redhat.com>
-	<223E9F59-BF08-4441-B82F-1EC6B9FA8B85@oberlin.edu>
-From: Thomas Huth <thuth@redhat.com>
-Openpgp: preference=signencrypt
-Autocrypt: addr=thuth@redhat.com; keydata=
-	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
-Organization: Red Hat
-Message-ID: <2ed82112-afc0-ecd4-e8ae-358a7e1cdc4a@redhat.com>
-Date: Fri, 19 Apr 2019 07:57:59 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
-	Thunderbird/60.6.1
-MIME-Version: 1.0
-In-Reply-To: <223E9F59-BF08-4441-B82F-1EC6B9FA8B85@oberlin.edu>
-Content-Type: text/plain; charset="UTF-8"
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+	by mx1.redhat.com (Postfix) with ESMTPS id 5880B3003737;
+	Fri, 19 Apr 2019 06:13:52 +0000 (UTC)
+Received: from localhost (ovpn-116-9.gru2.redhat.com [10.97.116.9])
+	by smtp.corp.redhat.com (Postfix) with ESMTP id D58BA60BE0;
+	Fri, 19 Apr 2019 06:13:51 +0000 (UTC)
+From: Eduardo Habkost <ehabkost@redhat.com>
+To: qemu-devel@nongnu.org
+Date: Fri, 19 Apr 2019 03:13:32 -0300
+Message-Id: <20190419061349.17094-1-ehabkost@redhat.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.46]);
-	Fri, 19 Apr 2019 05:58:06 +0000 (UTC)
-Content-Transfer-Encoding: quoted-printable
+	(mx1.redhat.com [10.5.110.47]);
+	Fri, 19 Apr 2019 06:13:52 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH v3 01/10] block/pflash_cfi02: Add test for
- supported commands
+Subject: [Qemu-devel] [PATCH 00/17] Delete 16 *_cpu_class_by_name() functions
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -118,47 +63,105 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, Laurent Vivier <lvivier@redhat.com>,
-	"open list:Block layer core" <qemu-block@nongnu.org>,
-	Laszlo Ersek <lersek@redhat.com>, Markus Armbruster <armbru@redhat.com>,
-	QEMU Developers <qemu-devel@nongnu.org>,
-	Paolo Bonzini <pbonzini@redhat.com>, Max Reitz <mreitz@redhat.com>,
-	=?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>,
+	Igor Mammedov <imammedo@redhat.com>, Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190419055759.5azMOPEwYJh2vW_Q0yCQplhzFMdy_hG8GfwnDOH3wsE@z>
+Content-Type: text/plain; charset="UTF-8"
+Message-ID: <20190419061332.O7rqhLzxwIGHs7qu-wd5vkU6hOvdJIjY7gb0yysRHp4@z>
 
- Hi,
+This series adds a new CPUClass::class_name_format field, which
+allows us to delete 16 of the 21 *_cpu_class_by_name() functions
+that exist today.
 
-On 18/04/2019 22.43, Stephen Checkoway wrote:
-[...]
-> I'm new to contributing to QEMU and I have a two procedural questions:
->=20
-> 1. When should I send version 4 of this patch series? I don't want to b=
-ombard everyone with another 11 emails after fixing every review comment,=
- but I also don't want to let the patch linger without addressing comment=
-s.
+Cornelia Huck (1):
+  hw: add compat machines for 4.1
 
-There is no hard rule ... I normally wait for a day or two before
-sending another iteration, to see whether there are any further comments.
+Eduardo Habkost (9):
+  cpu: Rename parse_cpu_model() to parse_cpu_option()
+  cpu: Fix crash with empty -cpu option
+  cpu: Change return type of cpu_class_by_name() to CPUClass
+  riscv: Don't split CPU model string
+  arm: Don't split CPU model string
+  arm: Remove special case for "any" CPU model
+  cpu: Let architectures set CPU class name format
+  cpu: Set class name format for some architectures
+  cpu: Set fixed class name on some architectures
 
-> 2. I'm not familiar with the "Acked-by" convention. I read <https://www=
-.kernel.org/doc/html/v4.16/process/submitting-patches.html#when-to-use-ac=
-ked-by-and-cc>. Am I supposed to add those to the commit messages or do t=
-hose get added by whomever actually includes the patch in the main QEMU r=
-epo?
+Markus Armbruster (2):
+  vl: Clean up after previous commit
+  vl: Simplify machine_parse()
 
-I assume that the patches will go in via the block tree (or another
-one), so I used Acked-by here to say that I've seen the patches and I'm
-basically fine with them from the qtests perspective (since I'm listed
-as qtests maintainer).
+Wei Yang (2):
+  vl.c: make find_default_machine() local
+  vl.c: allocate TYPE_MACHINE list once during bootup
 
-When you send another iteration, you should add the "Acked-by" lines on
-your own, so that the information does not get lost in v4. (But when you
-sent the final iteration, and there are more Acked-by/Reviewed-by reply
-mails to that series, it's up to the maintainers to pick up these lines
-when including the patches to their tree.)
+Zhang Yi (3):
+  util/mmap-alloc: Add a 'is_pmem' parameter to qemu_ram_mmap
+  scripts/update-linux-headers: add linux/mman.h
+  linux-headers: add linux/mman.h.
 
-  Thomas
+ include/hw/boards.h                        |   4 +-
+ include/hw/i386/pc.h                       |   3 +
+ include/qemu/mmap-alloc.h                  |  21 +++-
+ include/qom/cpu.h                          |  20 +++-
+ linux-headers/asm-arm/mman.h               |   4 +
+ linux-headers/asm-arm64/mman.h             |   1 +
+ linux-headers/asm-generic/hugetlb_encode.h |  36 +++++++
+ linux-headers/asm-generic/mman-common.h    |  77 +++++++++++++++
+ linux-headers/asm-generic/mman.h           |  24 +++++
+ linux-headers/asm-mips/mman.h              | 108 +++++++++++++++++++++
+ linux-headers/asm-powerpc/mman.h           |  39 ++++++++
+ linux-headers/asm-s390/mman.h              |   1 +
+ linux-headers/asm-x86/mman.h               |  31 ++++++
+ linux-headers/linux/mman.h                 |  38 ++++++++
+ target/s390x/internal.h                    |   1 -
+ bsd-user/main.c                            |   2 +-
+ exec.c                                     |  18 ++--
+ hw/arm/virt.c                              |   9 +-
+ hw/core/machine.c                          |   3 +
+ hw/i386/pc.c                               |   3 +
+ hw/i386/pc_piix.c                          |  14 ++-
+ hw/i386/pc_q35.c                           |  13 ++-
+ hw/ppc/spapr.c                             |  15 ++-
+ hw/s390x/s390-virtio-ccw.c                 |  14 ++-
+ linux-user/main.c                          |   2 +-
+ qom/cpu.c                                  |  20 +++-
+ target/arm/cpu.c                           |  30 +-----
+ target/hppa/cpu.c                          |   8 +-
+ target/i386/cpu.c                          |  11 +--
+ target/lm32/cpu.c                          |  17 +---
+ target/m68k/cpu.c                          |  17 +---
+ target/microblaze/cpu.c                    |   8 +-
+ target/mips/cpu.c                          |  13 +--
+ target/moxie/cpu.c                         |  17 +---
+ target/nios2/cpu.c                         |   8 +-
+ target/openrisc/cpu.c                      |  17 +---
+ target/riscv/cpu.c                         |  20 +---
+ target/s390x/cpu.c                         |   2 +-
+ target/s390x/cpu_models.c                  |  20 +---
+ target/tilegx/cpu.c                        |   8 +-
+ target/tricore/cpu.c                       |  17 +---
+ target/unicore32/cpu.c                     |  17 +---
+ target/xtensa/cpu.c                        |  17 +---
+ util/mmap-alloc.c                          |   6 +-
+ util/oslib-posix.c                         |   2 +-
+ vl.c                                       |  87 +++++++----------
+ scripts/update-linux-headers.sh            |   6 +-
+ 47 files changed, 566 insertions(+), 303 deletions(-)
+ create mode 100644 linux-headers/asm-arm/mman.h
+ create mode 100644 linux-headers/asm-arm64/mman.h
+ create mode 100644 linux-headers/asm-generic/hugetlb_encode.h
+ create mode 100644 linux-headers/asm-generic/mman-common.h
+ create mode 100644 linux-headers/asm-generic/mman.h
+ create mode 100644 linux-headers/asm-mips/mman.h
+ create mode 100644 linux-headers/asm-powerpc/mman.h
+ create mode 100644 linux-headers/asm-s390/mman.h
+ create mode 100644 linux-headers/asm-x86/mman.h
+ create mode 100644 linux-headers/linux/mman.h
+
+-- 
+2.18.0.rc1.1.g3f1ff2140
+
 
