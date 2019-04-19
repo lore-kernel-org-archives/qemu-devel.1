@@ -2,83 +2,51 @@ Return-Path: <SRS0=rbQy=SV=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 09A12C282DA
-	for <qemu-devel@archiver.kernel.org>; Fri, 19 Apr 2019 17:39:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B0FA8C282DA
+	for <qemu-devel@archiver.kernel.org>; Fri, 19 Apr 2019 17:50:10 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D26E3222A8
-	for <qemu-devel@archiver.kernel.org>; Fri, 19 Apr 2019 17:39:17 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D26E3222A8
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=intel.com
+	by mail.kernel.org (Postfix) with ESMTPS id 81DD7222E3
+	for <qemu-devel@archiver.kernel.org>; Fri, 19 Apr 2019 17:50:10 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 81DD7222E3
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:59445 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:59550 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hHXTp-0004VX-2g
-	for qemu-devel@archiver.kernel.org; Fri, 19 Apr 2019 13:39:17 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:38883)
+	id 1hHXeL-0006qd-Iw
+	for qemu-devel@archiver.kernel.org; Fri, 19 Apr 2019 13:50:09 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:40682)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <chen.zhang@intel.com>) id 1hHXT0-0004CV-VL
-	for qemu-devel@nongnu.org; Fri, 19 Apr 2019 13:38:28 -0400
+	(envelope-from <vsementsov@virtuozzo.com>) id 1hHXcs-00067o-5G
+	for qemu-devel@nongnu.org; Fri, 19 Apr 2019 13:48:39 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <chen.zhang@intel.com>) id 1hHXSz-0007V9-NM
-	for qemu-devel@nongnu.org; Fri, 19 Apr 2019 13:38:26 -0400
-Received: from mga11.intel.com ([192.55.52.93]:48271)
+	(envelope-from <vsementsov@virtuozzo.com>) id 1hHXcq-0003xp-Gb
+	for qemu-devel@nongnu.org; Fri, 19 Apr 2019 13:48:38 -0400
+Received: from relay.sw.ru ([185.231.240.75]:42182)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <chen.zhang@intel.com>)
-	id 1hHXSx-0007Tp-51
-	for qemu-devel@nongnu.org; Fri, 19 Apr 2019 13:38:25 -0400
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from orsmga007.jf.intel.com ([10.7.209.58])
-	by fmsmga102.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384;
-	19 Apr 2019 10:38:19 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.60,370,1549958400"; d="scan'208";a="132773265"
-Received: from fmsmsx104.amr.corp.intel.com ([10.18.124.202])
-	by orsmga007.jf.intel.com with ESMTP; 19 Apr 2019 10:38:18 -0700
-Received: from fmsmsx112.amr.corp.intel.com (10.18.116.6) by
-	fmsmsx104.amr.corp.intel.com (10.18.124.202) with Microsoft SMTP Server
-	(TLS) id 14.3.408.0; Fri, 19 Apr 2019 10:38:12 -0700
-Received: from shsmsx154.ccr.corp.intel.com (10.239.6.54) by
-	FMSMSX112.amr.corp.intel.com (10.18.116.6) with Microsoft SMTP Server
-	(TLS) id 14.3.408.0; Fri, 19 Apr 2019 10:38:12 -0700
-Received: from shsmsx102.ccr.corp.intel.com ([169.254.2.206]) by
-	SHSMSX154.ccr.corp.intel.com ([169.254.7.149]) with mapi id
-	14.03.0415.000; Sat, 20 Apr 2019 01:38:10 +0800
-From: "Zhang, Chen" <chen.zhang@intel.com>
-To: Lukas Straub <lukasstraub2@web.de>, "qemu-devel@nongnu.org"
-	<qemu-devel@nongnu.org>
-Thread-Topic: [PATCH] net/colo-compare.c: Fix a crash in COLO Primary.
-Thread-Index: AQHU9renT4s6UsnJzEKAqQaH2DVJn6ZDvT4w
-Date: Fri, 19 Apr 2019 17:38:10 +0000
-Message-ID:
- <9CFF81C0F6B98A43A459C9EDAD400D78060D262F@shsmsx102.ccr.corp.intel.com>
-References: <20190419155605.5349857a@luklap>
-In-Reply-To: <20190419155605.5349857a@luklap>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-dlp-product: dlpe-windows
-dlp-version: 11.0.600.7
-dlp-reaction: no-action
-x-ctpclassification: CTP_NT
-x-titus-metadata-40: eyJDYXRlZ29yeUxhYmVscyI6IiIsIk1ldGFkYXRhIjp7Im5zIjoiaHR0cDpcL1wvd3d3LnRpdHVzLmNvbVwvbnNcL0ludGVsMyIsImlkIjoiZDU0NzU1OWYtOTA5Ny00YzM5LTgzZDMtYjYyMDI3MzNmOTIzIiwicHJvcHMiOlt7Im4iOiJDVFBDbGFzc2lmaWNhdGlvbiIsInZhbHMiOlt7InZhbHVlIjoiQ1RQX05UIn1dfV19LCJTdWJqZWN0TGFiZWxzIjpbXSwiVE1DVmVyc2lvbiI6IjE3LjEwLjE4MDQuNDkiLCJUcnVzdGVkTGFiZWxIYXNoIjoiNHMrR1lwU2hvdGpRaFwvczJmanJ6NzZHOURyUTl1TEQ0d0hqcFptOFRcL2o4dUN1TndVVFB0c3BGXC9mME1WMzBrRiJ9
-x-originating-ip: [10.239.127.40]
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-MIME-Version: 1.0
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
-	recognized.
-X-Received-From: 192.55.52.93
-Subject: Re: [Qemu-devel] [PATCH] net/colo-compare.c: Fix a crash in COLO
- Primary.
+	(Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
+	id 1hHXcq-0003wy-9Q; Fri, 19 Apr 2019 13:48:36 -0400
+Received: from [10.28.8.145] (helo=kvm.sw.ru)
+	by relay.sw.ru with esmtp (Exim 4.91)
+	(envelope-from <vsementsov@virtuozzo.com>)
+	id 1hHXcn-0001Mc-0R; Fri, 19 Apr 2019 20:48:33 +0300
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+To: qemu-devel@nongnu.org,
+	qemu-block@nongnu.org
+Date: Fri, 19 Apr 2019 20:48:31 +0300
+Message-Id: <20190419174832.146377-2-vsementsov@virtuozzo.com>
+X-Mailer: git-send-email 2.18.0
+In-Reply-To: <20190419174832.146377-1-vsementsov@virtuozzo.com>
+References: <20190419174832.146377-1-vsementsov@virtuozzo.com>
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x
+X-Received-From: 185.231.240.75
+Subject: [Qemu-devel] [PATCH 1/2] block: introduce pinned blk
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -90,54 +58,133 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: kwolf@redhat.com, vsementsov@virtuozzo.com, jsnow@redhat.com,
+	mreitz@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190419173810.FhmHlniW4xwltbLaroL0eebbWhkkgT9Q-AAyWWAnDHc@z>
+Content-Type: text/plain; charset="UTF-8"
+Message-ID: <20190419174831.UpGuQJdvkJ8tpLwxGrf9NMQ3jlxUB2-qqgOQi8b5RHw@z>
 
+Add stay_at_node fields to BlockBackend and BdrvChild, for the same
+behavior as stay_at_node field of BdrvChildRole. It will be used for
+block-job blk.
 
+Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+---
+ include/block/block_int.h      |  6 ++++++
+ include/sysemu/block-backend.h |  1 +
+ block.c                        |  2 +-
+ block/block-backend.c          | 23 ++++++++++++++++++++++-
+ 4 files changed, 30 insertions(+), 2 deletions(-)
 
-
-> -----Original Message-----
-> From: Lukas Straub [mailto:lukasstraub2@web.de]
-> Sent: Friday, April 19, 2019 9:56 PM
-> To: qemu-devel@nongnu.org
-> Cc: Zhang, Chen <chen.zhang@intel.com>
-> Subject: [PATCH] net/colo-compare.c: Fix a crash in COLO Primary.
->=20
-> From: Lukas Straub <lukasstraub2@web.de> Fixes the following bug:
-> https://bugs.launchpad.net/qemu/+bug/1824622
-
-It looks good for me, but I think you need add more comments in commit mess=
-age,
-For example what situation will trigger this bug and why it will occur.
-After that, I think you can close the bug in Launchpad.
-
-Thanks
-Zhang Chen
-
->=20
-> Signed-off-by: Lukas Straub <lukasstraub2@web.de>
-> ---
->  net/colo-compare.c | 3 +--
->  1 file changed, 1 insertion(+), 2 deletions(-)
->=20
-> diff --git a/net/colo-compare.c b/net/colo-compare.c index
-> bf10526f05..fcb491121b 100644
-> --- a/net/colo-compare.c
-> +++ b/net/colo-compare.c
-> @@ -813,9 +813,8 @@ static void colo_compare_handle_event(void *opaque)
->          break;
->      }
->=20
-> -    assert(event_unhandled_count > 0);
-> -
->      qemu_mutex_lock(&event_mtx);
-> +    assert(event_unhandled_count > 0);
->      event_unhandled_count--;
->      qemu_cond_broadcast(&event_complete_cond);
->      qemu_mutex_unlock(&event_mtx);
-> --
-> 2.20.1
+diff --git a/include/block/block_int.h b/include/block/block_int.h
+index 01e855a066..ae8fc3a580 100644
+--- a/include/block/block_int.h
++++ b/include/block/block_int.h
+@@ -725,6 +725,12 @@ struct BdrvChild {
+      */
+     bool frozen;
+ 
++    /*
++     * This link should not be modified in bdrv_replace_node process. Used by
++     * should_update_child()
++     */
++    bool stay_at_node;
++
+     QLIST_ENTRY(BdrvChild) next;
+     QLIST_ENTRY(BdrvChild) next_parent;
+ };
+diff --git a/include/sysemu/block-backend.h b/include/sysemu/block-backend.h
+index 3be05c2d68..d9c7b9f86a 100644
+--- a/include/sysemu/block-backend.h
++++ b/include/sysemu/block-backend.h
+@@ -77,6 +77,7 @@ typedef struct BlockBackendPublic {
+ } BlockBackendPublic;
+ 
+ BlockBackend *blk_new(uint64_t perm, uint64_t shared_perm);
++BlockBackend *blk_new_pinned(uint64_t perm, uint64_t shared_perm);
+ BlockBackend *blk_new_open(const char *filename, const char *reference,
+                            QDict *options, int flags, Error **errp);
+ int blk_get_refcnt(BlockBackend *blk);
+diff --git a/block.c b/block.c
+index 16615bc876..5069515976 100644
+--- a/block.c
++++ b/block.c
+@@ -3905,7 +3905,7 @@ static bool should_update_child(BdrvChild *c, BlockDriverState *to)
+     GHashTable *found;
+     bool ret;
+ 
+-    if (c->role->stay_at_node) {
++    if (c->stay_at_node || c->role->stay_at_node) {
+         return false;
+     }
+ 
+diff --git a/block/block-backend.c b/block/block-backend.c
+index f78e82a707..b2de911383 100644
+--- a/block/block-backend.c
++++ b/block/block-backend.c
+@@ -86,6 +86,11 @@ struct BlockBackend {
+      * Accessed with atomic ops.
+      */
+     unsigned int in_flight;
++
++    /*
++     * On blk_insert_bs() new child will inherit  @stay_at_node.
++     */
++    bool stay_at_node;
+ };
+ 
+ typedef struct BlockBackendAIOCB {
+@@ -311,9 +316,13 @@ static const BdrvChildRole child_root = {
+  * to other users of the attached node.
+  * Both sets of permissions can be changed later using blk_set_perm().
+  *
++ * @stay_at_node is used to set stay_at_node field of child, attached in
++ * blk_insert_bs(). If true, child bs will not be updated on bdrv_replace_node.
++ *
+  * Return the new BlockBackend on success, null on failure.
+  */
+-BlockBackend *blk_new(uint64_t perm, uint64_t shared_perm)
++static BlockBackend *blk_new_common(uint64_t perm, uint64_t shared_perm,
++                                    bool stay_at_node)
+ {
+     BlockBackend *blk;
+ 
+@@ -321,6 +330,7 @@ BlockBackend *blk_new(uint64_t perm, uint64_t shared_perm)
+     blk->refcnt = 1;
+     blk->perm = perm;
+     blk->shared_perm = shared_perm;
++    blk->stay_at_node = stay_at_node;
+     blk_set_enable_write_cache(blk, true);
+ 
+     blk->on_read_error = BLOCKDEV_ON_ERROR_REPORT;
+@@ -336,6 +346,16 @@ BlockBackend *blk_new(uint64_t perm, uint64_t shared_perm)
+     return blk;
+ }
+ 
++BlockBackend *blk_new(uint64_t perm, uint64_t shared_perm)
++{
++    return blk_new_common(perm, shared_perm, false);
++}
++
++BlockBackend *blk_new_pinned(uint64_t perm, uint64_t shared_perm)
++{
++    return blk_new_common(perm, shared_perm, true);
++}
++
+ /*
+  * Creates a new BlockBackend, opens a new BlockDriverState, and connects both.
+  *
+@@ -796,6 +816,7 @@ int blk_insert_bs(BlockBackend *blk, BlockDriverState *bs, Error **errp)
+     if (blk->root == NULL) {
+         return -EPERM;
+     }
++    blk->root->stay_at_node = blk->stay_at_node;
+     bdrv_ref(bs);
+ 
+     notifier_list_notify(&blk->insert_bs_notifiers, blk);
+-- 
+2.18.0
 
 
