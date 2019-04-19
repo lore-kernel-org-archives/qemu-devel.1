@@ -1,35 +1,28 @@
-Received: from eggs.gnu.org ([209.51.188.92]:41517)
+Received: from eggs.gnu.org ([209.51.188.92]:52779)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <sgarzare@redhat.com>) id 1hHSYm-0000mn-GF
-	for qemu-devel@nongnu.org; Fri, 19 Apr 2019 08:24:05 -0400
+	(envelope-from <programmingkidx@gmail.com>) id 1hHToS-0001Ba-EK
+	for qemu-devel@nongnu.org; Fri, 19 Apr 2019 09:44:21 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <sgarzare@redhat.com>) id 1hHSYl-0002UA-Er
-	for qemu-devel@nongnu.org; Fri, 19 Apr 2019 08:24:04 -0400
-Received: from mail-wr1-f67.google.com ([209.85.221.67]:45485)
+	(envelope-from <programmingkidx@gmail.com>) id 1hHToR-0001jJ-GD
+	for qemu-devel@nongnu.org; Fri, 19 Apr 2019 09:44:20 -0400
+Received: from mail-it1-x143.google.com ([2607:f8b0:4864:20::143]:53082)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <sgarzare@redhat.com>) id 1hHSYk-0002P1-L1
-	for qemu-devel@nongnu.org; Fri, 19 Apr 2019 08:24:02 -0400
-Received: by mail-wr1-f67.google.com with SMTP id s15so6738724wra.12
-	for <qemu-devel@nongnu.org>; Fri, 19 Apr 2019 05:24:00 -0700 (PDT)
-Date: Fri, 19 Apr 2019 14:23:56 +0200
-From: Stefano Garzarella <sgarzare@redhat.com>
-Message-ID: <20190419122356.7dmwwdbtnzgimydw@steredhat>
-References: <20190411105025.97397-1-sgarzare@redhat.com>
-	<20190411105025.97397-2-sgarzare@redhat.com>
-	<CA+aFP1AMzNjWtMeGy4MpWBa26qxShgciYkcEZ8mkSmDrtCvfqA@mail.gmail.com>
-	<20190411130245.ltfyp7d2dfe2cr3h@steredhat>
-	<CA+aFP1B7ZZ_xwNOfMbKUzEjYbMH=9dJstLYEyVq4LphPR81u0Q@mail.gmail.com>
-	<20190414132008.uxoia6avdpp4jov6@steredhat.homenet.telecomitalia.it>
-	<CA+aFP1D8VYcnwWpB=4PzAdBKr+YK-r8bSwzKKUCkH7jT3kVvoQ@mail.gmail.com>
-	<20190415080452.GA6031@localhost.localdomain>
-	<20190417073438.r57lemi6emu4x3ld@steredhat>
-	<20190417080443.GA8330@localhost.localdomain>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20190417080443.GA8330@localhost.localdomain>
-Subject: Re: [Qemu-devel] [PATCH RFC 1/1] block/rbd: increase dynamically
- the image size
+	(Exim 4.71) (envelope-from <programmingkidx@gmail.com>)
+	id 1hHToR-0001id-Bc
+	for qemu-devel@nongnu.org; Fri, 19 Apr 2019 09:44:19 -0400
+Received: by mail-it1-x143.google.com with SMTP id x132so8324040itf.2
+	for <qemu-devel@nongnu.org>; Fri, 19 Apr 2019 06:44:19 -0700 (PDT)
+In-Reply-To: <723372ae-a37a-d7cd-098f-452c7513ce8a@redhat.com>
+References: <20190418224706.14014-1-programmingkidx@gmail.com>
+	<723372ae-a37a-d7cd-098f-452c7513ce8a@redhat.com>
+Mime-Version: 1.0 (Apple Message framework v753.1)
+Content-Type: text/plain; charset=US-ASCII; delsp=yes; format=flowed
+Message-Id: <4B73E5E6-2129-43B8-A35E-0CF7DCAE163B@gmail.com>
+Content-Transfer-Encoding: 7bit
+From: G 3 <programmingkidx@gmail.com>
+Date: Fri, 19 Apr 2019 09:44:15 -0400
+Subject: Re: [Qemu-devel] [PATCH] configure: Change capstone's default state
+ to disabled
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -38,66 +31,57 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Kevin Wolf <kwolf@redhat.com>
-Cc: dillaman@redhat.com, qemu-devel <qemu-devel@nongnu.org>, Josh Durgin <jdurgin@redhat.com>, qemu-block <qemu-block@nongnu.org>, Max Reitz <mreitz@redhat.com>
+To: Thomas Huth <thuth@redhat.com>
+Cc: qemu-devel@nongnu.org, peter.maydell@linaro.org, Richard Henderson <rth@twiddle.net>
 
-Hi Kevin,
 
-On Wed, Apr 17, 2019 at 10:04:43AM +0200, Kevin Wolf wrote:
-> Am 17.04.2019 um 09:34 hat Stefano Garzarella geschrieben:
-> > On Mon, Apr 15, 2019 at 10:04:52AM +0200, Kevin Wolf wrote:
-> > > 
-> > > I think a potential actual use case could be persistent dirty bitmaps
-> > > for incremental backup. Though maybe that would be better served by
-> > > using the rbd image just as a raw external data file and keeping the
-> > > qcow2 metadata on a filesystem.
-> > 
-> > Thanks to point it out! I'll take a look to understand how to keep
-> > metadata separated from the data.
-> 
-> I'd consider the feature still experimental, but for local files, it
-> works like this:
-> 
->     qemu-img create -f qcow2 -o data_file=test.raw test.qcow2 4G
-> 
-> And then just use test.qcow2. As long as you can put everything you need
-> into an rbd URL, the same approach should work. Otherwise, you may need
-> to use QMP blockdev-create on creation and possibly the data-file option
-> of the qcow2 driver for opening.
+On Apr 19, 2019, at 3:10 AM, Thomas Huth wrote:
+
+> On 19/04/2019 00.47, John Arbuckle wrote:
+>> Capstone is not necessary in order to use QEMU. Disable it by  
+>> default.
+>> This will save the user the pain of having to figure why QEMU isn't
+>> building when this library is missing.
+>>
+>> Signed-off-by: John Arbuckle <programmingkidx@gmail.com>
+>> ---
+>>  configure | 2 +-
+>>  1 file changed, 1 insertion(+), 1 deletion(-)
+>>
+>> diff --git a/configure b/configure
+>> index 1c563a7027..77d7967f92 100755
+>> --- a/configure
+>> +++ b/configure
+>> @@ -433,7 +433,7 @@ opengl_dmabuf="no"
+>>  cpuid_h="no"
+>>  avx2_opt=""
+>>  zlib="yes"
+>> -capstone=""
+>> +capstone="no"
+>>  lzo=""
+>>  snappy=""
+>>  bzip2=""
 >
+> AFAIK we ship capstone as a submodule, so how can this be missing?  
+> Also,
+> our philosophy is to keep everything enabled by default if  
+> possible, so
+> that the code paths don't bitrot. Thus I don't think that disabling  
+> this
+> by default is a good idea. ... so if you've got a problem here, there
+> must be another solution (e.g. is the system capstone detection not
+> working right on your system?).
+>
+>  Thomas
 
-Very interesting, I'll try to add this support also in the rbd driver.
+Thank you for replying. Capstone comes with QEMU? Every time I try to  
+compile QEMU I see an error relating to Capstone not being on my  
+system. Why do you feel that disabling Capstone by default is not a  
+good idea?
 
-> > > How fast is rbd_resize()? Does automatically resizing for every write
-> > > request actually work reasonably well in practice? If it does, there is
-> > > probably little reason not to allow it, even if the use cases are rather
-> > > obscure.
-> > 
-> > I'll try to measure the percentage of the time spent in the rbd_resize.
-> > 
-> > Another solution could be to pass to the rbd driver the virtual size of
-> > the image and resize it only one time also if the preallocation is
-> > disabled, because RBD will not allocate blocks but IIUC it only set the max
-> > size.
-> > 
-> > Do you think make sense? Is it feasible?
-> 
-> In theory yes, though it requires modification of every driver that
-> should be usable together with rbd (i.e. ideally all of the drivers). If
-> automatic resize works good enough, I'd prefer that
+Here is the error message I see when compiling QEMU:
 
-I did some tests and it seems that the cost of rbd_resize() is
-negligible. IIUC it only updates the metadata without allocating any
-blocks (if we are growing, like that case).
-
-Anyway the automatic resize will not affect the current use-case (raw
-images on rbd), where the file size is set during the creation, so I
-think there should not be side effects with this patch.
-
-I'm also adding the support for preallocation (i.e. full) in the rbd
-driver that can be useful for qcow2 images.
-
-If you prefer I can resend this patch with the preallocation series.
-
-Thanks,
-Stefano
+CHK version_gen.h
+make[1]: *** No rule to make target `/Users/John/qemu-git/capstone/ 
+libcapstone.a'.  Stop.
+make: *** [subdir-capstone] Error 2
