@@ -1,23 +1,34 @@
-Received: from eggs.gnu.org ([209.51.188.92]:50780)
+Received: from eggs.gnu.org ([209.51.188.92]:51232)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <frederic.konrad@adacore.com>) id 1hHQbS-0003C2-L7
-	for qemu-devel@nongnu.org; Fri, 19 Apr 2019 06:18:45 -0400
+	(envelope-from <bounces@canonical.com>) id 1hHQdP-0004u1-Ua
+	for qemu-devel@nongnu.org; Fri, 19 Apr 2019 06:20:45 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <frederic.konrad@adacore.com>) id 1hHQbQ-0002v6-9V
-	for qemu-devel@nongnu.org; Fri, 19 Apr 2019 06:18:42 -0400
-Received: from mel.act-europe.fr ([194.98.77.210]:50026
-	helo=smtp.eu.adacore.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <frederic.konrad@adacore.com>)
-	id 1hHQbP-0002ty-Uz
-	for qemu-devel@nongnu.org; Fri, 19 Apr 2019 06:18:40 -0400
-From: KONRAD Frederic <frederic.konrad@adacore.com>
-Date: Fri, 19 Apr 2019 12:18:11 +0200
-Message-Id: <1555669092-10351-3-git-send-email-frederic.konrad@adacore.com>
-In-Reply-To: <1555669092-10351-1-git-send-email-frederic.konrad@adacore.com>
-References: <1555669092-10351-1-git-send-email-frederic.konrad@adacore.com>
-Subject: [Qemu-devel] [PATCH V1 2/3] leon3: introduce the plug and play
- mecanism
+	(envelope-from <bounces@canonical.com>) id 1hHQdN-0003va-R8
+	for qemu-devel@nongnu.org; Fri, 19 Apr 2019 06:20:43 -0400
+Received: from indium.canonical.com ([91.189.90.7]:44622)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1hHQdN-0003tL-Ha
+	for qemu-devel@nongnu.org; Fri, 19 Apr 2019 06:20:41 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1hHQdL-0005Ew-I4
+	for <qemu-devel@nongnu.org>; Fri, 19 Apr 2019 10:20:39 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 7287E2E80CB
+	for <qemu-devel@nongnu.org>; Fri, 19 Apr 2019 10:20:39 +0000 (UTC)
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Fri, 19 Apr 2019 10:14:08 -0000
+From: =?utf-8?q?Jos=C3=A9_Pekkarinen?= <jose.pekkarinen@canonical.com>
+Reply-To: Bug 1818367 <1818367@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <155156252741.17588.3363806743942119527.malonedeb@gac.canonical.com>
+Message-Id: <155566884856.13521.11853993565719476166.malone@gac.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1818367] Re: Initialization of device
+ cfi.pflash01 failed: Block node is read-only
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,528 +38,569 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: peter.maydell@linaro.org, mark.cave-ayland@ilande.co.uk, atar4qemu@gmail.com, philmd@redhat.com, chouteau@adacore.com, frederic.konrad@adacore.com
 
-This adds the AHB and APB plug and play devices.
-They are scanned during the linux boot to discover the various peripheral.
+oh well, it turns out to be actually related, it turns out
+virt-aa-helper is skipping the code file of ovmf:
 
-Signed-off-by: KONRAD Frederic <frederic.konrad@adacore.com>
----
- hw/misc/Makefile.objs               |   2 +
- hw/misc/grlib_ahb_apb_pnp.c         | 269 ++++++++++++++++++++++++++++++++++++
- hw/sparc/leon3.c                    |  34 ++++-
- include/hw/misc/grlib_ahb_apb_pnp.h |  60 ++++++++
- include/hw/sparc/grlib.h            |  35 +++--
- 5 files changed, 382 insertions(+), 18 deletions(-)
- create mode 100644 hw/misc/grlib_ahb_apb_pnp.c
- create mode 100644 include/hw/misc/grlib_ahb_apb_pnp.h
+2019-04-19 10:06:43.576+0000: 9272: error : AppArmorGenSecurityLabel:469 : =
+internal error: cannot load AppArmor profile 'libvirt-34c41008-ab91-483b-95=
+9c-81a7a12ae9be'
+2019-04-19 10:09:25.751+0000: 9270: error : virCommandWait:2636 : internal =
+error: Child process (LIBVIRT_LOG_OUTPUTS=3D3:stderr /usr/libexec/virt-aa-h=
+elper -c -u libvirt-34c41008-ab91-483b-959c-81a7a12ae9be) unexpected exit s=
+tatus 1: 2019-04-19 10:09:25.750+0000: 13797: info : libvirt version: 5.2.0
+2019-04-19 10:09:25.750+0000: 13797: info : hostname: mole
+2019-04-19 10:09:25.750+0000: 13797: error : virStorageFileBackendFileRead:=
+129 : Failed to open file '/dev/mole-vg0/os-1-vda': Permission denied
+2019-04-19 10:09:25.750+0000: 13797: error : virStorageFileBackendFileRead:=
+129 : Failed to open file '/dev/mole-vg0/os-1-vdb': Permission denied
+virt-aa-helper: error: /usr/share/edk2-ovmf/OVMF_CODE.fd
+virt-aa-helper: error: skipped restricted file
+virt-aa-helper: error: invalid VM definition
 
-diff --git a/hw/misc/Makefile.objs b/hw/misc/Makefile.objs
-index c71e07a..77b9df9 100644
---- a/hw/misc/Makefile.objs
-+++ b/hw/misc/Makefile.objs
-@@ -77,3 +77,5 @@ obj-$(CONFIG_AUX) += auxbus.o
- obj-$(CONFIG_ASPEED_SOC) += aspeed_scu.o aspeed_sdmc.o
- obj-$(CONFIG_MSF2) += msf2-sysreg.o
- obj-$(CONFIG_NRF51_SOC) += nrf51_rng.o
-+
-+obj-$(CONFIG_GRLIB) += grlib_ahb_apb_pnp.o
-diff --git a/hw/misc/grlib_ahb_apb_pnp.c b/hw/misc/grlib_ahb_apb_pnp.c
-new file mode 100644
-index 0000000..90d5f6e
---- /dev/null
-+++ b/hw/misc/grlib_ahb_apb_pnp.c
-@@ -0,0 +1,269 @@
-+/*
-+ * GRLIB AHB APB PNP
-+ *
-+ *  Copyright (C) 2019 AdaCore
-+ *
-+ *  Developed by :
-+ *  Frederic Konrad   <frederic.konrad@adacore.com>
-+ *
-+ * This program is free software; you can redistribute it and/or modify
-+ * it under the terms of the GNU General Public License as published by
-+ * the Free Software Foundation, either version 2 of the License, or
-+ * (at your option) any later version.
-+ *
-+ * This program is distributed in the hope that it will be useful,
-+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+ * GNU General Public License for more details.
-+ *
-+ * You should have received a copy of the GNU General Public License along
-+ * with this program; if not, see <http://www.gnu.org/licenses/>.
-+ *
-+ */
-+
-+#include "qemu/osdep.h"
-+#include "hw/sysbus.h"
-+#include "hw/misc/grlib_ahb_apb_pnp.h"
-+
-+#define GRLIB_PNP_VENDOR_SHIFT (24)
-+#define GRLIB_PNP_VENDOR_SIZE   (8)
-+#define GRLIB_PNP_DEV_SHIFT    (12)
-+#define GRLIB_PNP_DEV_SIZE     (12)
-+#define GRLIB_PNP_VER_SHIFT     (5)
-+#define GRLIB_PNP_VER_SIZE      (5)
-+#define GRLIB_PNP_IRQ_SHIFT     (0)
-+#define GRLIB_PNP_IRQ_SIZE      (5)
-+#define GRLIB_PNP_ADDR_SHIFT   (20)
-+#define GRLIB_PNP_ADDR_SIZE    (12)
-+#define GRLIB_PNP_MASK_SHIFT    (4)
-+#define GRLIB_PNP_MASK_SIZE    (12)
-+
-+#define GRLIB_AHB_DEV_ADDR_SHIFT   (20)
-+#define GRLIB_AHB_DEV_ADDR_SIZE    (12)
-+#define GRLIB_AHB_ENTRY_SIZE       (0x20)
-+#define GRLIB_AHB_MAX_DEV          (64)
-+#define GRLIB_AHB_SLAVE_OFFSET     (0x800)
-+
-+#define GRLIB_APB_DEV_ADDR_SHIFT   (8)
-+#define GRLIB_APB_DEV_ADDR_SIZE    (12)
-+#define GRLIB_APB_ENTRY_SIZE       (0x08)
-+#define GRLIB_APB_MAX_DEV          (512)
-+
-+#define GRLIB_PNP_MAX_REGS         (0x1000)
-+
-+typedef struct AHBPnp {
-+    SysBusDevice parent_obj;
-+    MemoryRegion iomem;
-+
-+    uint32_t regs[GRLIB_PNP_MAX_REGS >> 2];
-+    uint8_t master_count;
-+    uint8_t slave_count;
-+} AHBPnp;
-+
-+void grlib_ahb_pnp_add_entry(AHBPnp *dev, uint32_t address, uint32_t mask,
-+                             uint8_t vendor, uint16_t device, int slave,
-+                             int type)
-+{
-+    unsigned int reg_start;
-+
-+    /*
-+     * AHB entries look like this:
-+     *
-+     * 31 -------- 23 -------- 11 ----- 9 -------- 4 --- 0
-+     *  | VENDOR ID | DEVICE ID | IRQ ? | VERSION  | IRQ |
-+     *  --------------------------------------------------
-+     *  |                      USER                      |
-+     *  --------------------------------------------------
-+     *  |                      USER                      |
-+     *  --------------------------------------------------
-+     *  |                      USER                      |
-+     *  --------------------------------------------------
-+     *  |                      USER                      |
-+     *  --------------------------------------------------
-+     * 31 ----------- 20 --- 15 ----------------- 3 ---- 0
-+     *  | ADDR[31..12] | 00PC |        MASK       | TYPE |
-+     *  --------------------------------------------------
-+     * 31 ----------- 20 --- 15 ----------------- 3 ---- 0
-+     *  | ADDR[31..12] | 00PC |        MASK       | TYPE |
-+     *  --------------------------------------------------
-+     * 31 ----------- 20 --- 15 ----------------- 3 ---- 0
-+     *  | ADDR[31..12] | 00PC |        MASK       | TYPE |
-+     *  --------------------------------------------------
-+     * 31 ----------- 20 --- 15 ----------------- 3 ---- 0
-+     *  | ADDR[31..12] | 00PC |        MASK       | TYPE |
-+     *  --------------------------------------------------
-+     */
-+
-+    if (slave) {
-+        assert(dev->slave_count < GRLIB_AHB_MAX_DEV);
-+        reg_start = (GRLIB_AHB_SLAVE_OFFSET
-+                  + (dev->slave_count * GRLIB_AHB_ENTRY_SIZE)) >> 2;
-+        dev->slave_count++;
-+    } else {
-+        assert(dev->master_count < GRLIB_AHB_MAX_DEV);
-+        reg_start = (dev->master_count * GRLIB_AHB_ENTRY_SIZE) >> 2;
-+        dev->master_count++;
-+    }
-+
-+    dev->regs[reg_start] = deposit32(dev->regs[reg_start],
-+                                     GRLIB_PNP_VENDOR_SHIFT,
-+                                     GRLIB_PNP_VENDOR_SIZE,
-+                                     vendor);
-+    dev->regs[reg_start] = deposit32(dev->regs[reg_start],
-+                                     GRLIB_PNP_DEV_SHIFT,
-+                                     GRLIB_PNP_DEV_SIZE,
-+                                     device);
-+    reg_start += 4;
-+    /* AHB Memory Space */
-+    dev->regs[reg_start] = type;
-+    dev->regs[reg_start] = deposit32(dev->regs[reg_start],
-+                                     GRLIB_PNP_ADDR_SHIFT,
-+                                     GRLIB_PNP_ADDR_SIZE,
-+                                     extract32(address,
-+                                               GRLIB_AHB_DEV_ADDR_SHIFT,
-+                                               GRLIB_AHB_DEV_ADDR_SIZE));
-+    dev->regs[reg_start] = deposit32(dev->regs[reg_start],
-+                                     GRLIB_PNP_MASK_SHIFT,
-+                                     GRLIB_PNP_MASK_SIZE,
-+                                     mask);
-+}
-+
-+static uint64_t grlib_ahb_pnp_read(void *opaque, hwaddr offset, unsigned size)
-+{
-+    AHBPnp *ahb_pnp = GRLIB_AHB_PNP(opaque);
-+
-+    return ahb_pnp->regs[offset >> 2];
-+}
-+
-+static const MemoryRegionOps grlib_ahb_pnp_ops = {
-+    .read       = grlib_ahb_pnp_read,
-+    .endianness = DEVICE_NATIVE_ENDIAN,
-+};
-+
-+static void grlib_ahb_pnp_realize(DeviceState *dev, Error **errp)
-+{
-+    AHBPnp *ahb_pnp = GRLIB_AHB_PNP(dev);
-+    SysBusDevice *sbd = SYS_BUS_DEVICE(dev);
-+
-+    memory_region_init_io(&ahb_pnp->iomem, OBJECT(dev), &grlib_ahb_pnp_ops,
-+                          ahb_pnp, TYPE_GRLIB_AHB_PNP, GRLIB_PNP_MAX_REGS);
-+    sysbus_init_mmio(sbd, &ahb_pnp->iomem);
-+}
-+
-+static void grlib_ahb_pnp_class_init(ObjectClass *klass, void *data)
-+{
-+    DeviceClass *dc = DEVICE_CLASS(klass);
-+
-+    dc->realize = grlib_ahb_pnp_realize;
-+}
-+
-+static const TypeInfo grlib_ahb_pnp_info = {
-+    .name          = TYPE_GRLIB_AHB_PNP,
-+    .parent        = TYPE_SYS_BUS_DEVICE,
-+    .instance_size = sizeof(AHBPnp),
-+    .class_init    = grlib_ahb_pnp_class_init,
-+};
-+
-+/* APBPnp */
-+
-+typedef struct APBPnp {
-+    SysBusDevice parent_obj;
-+    MemoryRegion iomem;
-+
-+    uint32_t regs[GRLIB_PNP_MAX_REGS >> 2];
-+    uint32_t entry_count;
-+} APBPnp;
-+
-+void grlib_apb_pnp_add_entry(APBPnp *dev, uint32_t address, uint32_t mask,
-+                             uint8_t vendor, uint16_t device, uint8_t version,
-+                             uint8_t irq, int type)
-+{
-+    unsigned int reg_start;
-+
-+    /*
-+     * APB entries look like this:
-+     *
-+     * 31 -------- 23 -------- 11 ----- 9 ------- 4 --- 0
-+     *  | VENDOR ID | DEVICE ID | IRQ ? | VERSION | IRQ |
-+     *
-+     * 31 ---------- 20 --- 15 ----------------- 3 ---- 0
-+     *  | ADDR[20..8] | 0000 |        MASK       | TYPE |
-+     */
-+
-+    assert(dev->entry_count < GRLIB_APB_MAX_DEV);
-+    reg_start = (dev->entry_count * GRLIB_APB_ENTRY_SIZE) >> 2;
-+    dev->entry_count++;
-+
-+    dev->regs[reg_start] = deposit32(dev->regs[reg_start],
-+                                     GRLIB_PNP_VENDOR_SHIFT,
-+                                     GRLIB_PNP_VENDOR_SIZE,
-+                                     vendor);
-+    dev->regs[reg_start] = deposit32(dev->regs[reg_start],
-+                                     GRLIB_PNP_DEV_SHIFT,
-+                                     GRLIB_PNP_DEV_SIZE,
-+                                     device);
-+    dev->regs[reg_start] = deposit32(dev->regs[reg_start],
-+                                     GRLIB_PNP_VER_SHIFT,
-+                                     GRLIB_PNP_VER_SIZE,
-+                                     version);
-+    dev->regs[reg_start] = deposit32(dev->regs[reg_start],
-+                                     GRLIB_PNP_IRQ_SHIFT,
-+                                     GRLIB_PNP_IRQ_SIZE,
-+                                     irq);
-+    reg_start += 1;
-+    dev->regs[reg_start] = type;
-+    dev->regs[reg_start] = deposit32(dev->regs[reg_start],
-+                                     GRLIB_PNP_ADDR_SHIFT,
-+                                     GRLIB_PNP_ADDR_SIZE,
-+                                     extract32(address,
-+                                               GRLIB_APB_DEV_ADDR_SHIFT,
-+                                               GRLIB_APB_DEV_ADDR_SIZE));
-+    dev->regs[reg_start] = deposit32(dev->regs[reg_start],
-+                                     GRLIB_PNP_MASK_SHIFT,
-+                                     GRLIB_PNP_MASK_SIZE,
-+                                     mask);
-+}
-+
-+static uint64_t grlib_apb_pnp_read(void *opaque, hwaddr offset, unsigned size)
-+{
-+    APBPnp *apb_pnp = GRLIB_APB_PNP(opaque);
-+
-+    return apb_pnp->regs[offset >> 2];
-+}
-+
-+static const MemoryRegionOps grlib_apb_pnp_ops = {
-+    .read       = grlib_apb_pnp_read,
-+    .endianness = DEVICE_NATIVE_ENDIAN,
-+};
-+
-+static void grlib_apb_pnp_realize(DeviceState *dev, Error **errp)
-+{
-+    APBPnp *apb_pnp = GRLIB_APB_PNP(dev);
-+    SysBusDevice *sbd = SYS_BUS_DEVICE(dev);
-+
-+    memory_region_init_io(&apb_pnp->iomem, OBJECT(dev), &grlib_apb_pnp_ops,
-+                          apb_pnp, TYPE_GRLIB_APB_PNP, GRLIB_PNP_MAX_REGS);
-+    sysbus_init_mmio(sbd, &apb_pnp->iomem);
-+}
-+
-+static void grlib_apb_pnp_class_init(ObjectClass *klass, void *data)
-+{
-+    DeviceClass *dc = DEVICE_CLASS(klass);
-+
-+    dc->realize = grlib_apb_pnp_realize;
-+}
-+
-+static const TypeInfo grlib_apb_pnp_info = {
-+    .name          = TYPE_GRLIB_APB_PNP,
-+    .parent        = TYPE_SYS_BUS_DEVICE,
-+    .instance_size = sizeof(APBPnp),
-+    .class_init    = grlib_apb_pnp_class_init,
-+};
-+
-+static void grlib_ahb_apb_pnp_register_types(void)
-+{
-+    type_register_static(&grlib_ahb_pnp_info);
-+    type_register_static(&grlib_apb_pnp_info);
-+}
-+
-+type_init(grlib_ahb_apb_pnp_register_types)
-diff --git a/hw/sparc/leon3.c b/hw/sparc/leon3.c
-index 2c6f486..74364a1 100644
---- a/hw/sparc/leon3.c
-+++ b/hw/sparc/leon3.c
-@@ -46,6 +46,13 @@
- #define PROM_FILENAME        "u-boot.bin"
- #define LEON3_PROM_OFFSET    (0x00000000)
- #define LEON3_RAM_OFFSET     (0x40000000)
-+#define LEON3_APBUART_OFFSET (0x80000100)
-+#define LEON3_APBUART_IRQ    (0x3)
-+#define LEON3_IRQMP_OFFSET   (0x80000200)
-+#define LEON3_GPTIMER_OFFSET (0x80000300)
-+#define LEON3_GPTIMER_IRQ    (0x6)
-+#define LEON3_APB_PNP_OFFSET (0x800FF000)
-+#define LEON3_AHB_PNP_OFFSET (0xFFFFF000)
- 
- #define MAX_PILS 16
- 
-@@ -172,6 +179,8 @@ static void leon3_generic_hw_init(MachineState *machine)
-     int         bios_size;
-     int         prom_size;
-     ResetData  *reset_info;
-+    AHBPnp *ahb_pnp;
-+    APBPnp *apb_pnp;
- 
-     /* Init CPU */
-     cpu = SPARC_CPU(cpu_create(machine->cpu_type));
-@@ -185,9 +194,23 @@ static void leon3_generic_hw_init(MachineState *machine)
-     reset_info->sp    = LEON3_RAM_OFFSET + ram_size;
-     qemu_register_reset(main_cpu_reset, reset_info);
- 
-+    ahb_pnp = GRLIB_AHB_PNP(object_new(TYPE_GRLIB_AHB_PNP));
-+    object_property_set_bool(OBJECT(ahb_pnp), true, "realized", &error_fatal);
-+    sysbus_mmio_map(SYS_BUS_DEVICE(ahb_pnp), 0, LEON3_AHB_PNP_OFFSET);
-+    grlib_ahb_pnp_add_entry(ahb_pnp, 0, 0, GRLIB_VENDOR_GAISLER,
-+                            GRLIB_LEON3_DEV, GRLIB_AHB_MASTER,
-+                            GRLIB_CPU_AREA);
-+
-+    apb_pnp = GRLIB_APB_PNP(object_new(TYPE_GRLIB_APB_PNP));
-+    object_property_set_bool(OBJECT(apb_pnp), true, "realized", &error_fatal);
-+    sysbus_mmio_map(SYS_BUS_DEVICE(apb_pnp), 0, LEON3_APB_PNP_OFFSET);
-+    grlib_ahb_pnp_add_entry(ahb_pnp, LEON3_APB_PNP_OFFSET, 0xFFF,
-+                            GRLIB_VENDOR_GAISLER, GRLIB_APBMST_DEV,
-+                            GRLIB_AHB_SLAVE, GRLIB_AHBMEM_AREA);
-+
-     /* Allocate IRQ manager */
--    grlib_irqmp_create(0x80000200, env, &cpu_irqs, MAX_PILS,
--                       &leon3_set_pil_in);
-+    grlib_irqmp_create(LEON3_IRQMP_OFFSET, env, &cpu_irqs, MAX_PILS,
-+                       &leon3_set_pil_in, apb_pnp);
- 
-     env->qemu_irq_ack = leon3_irq_manager;
- 
-@@ -266,11 +289,14 @@ static void leon3_generic_hw_init(MachineState *machine)
-     }
- 
-     /* Allocate timers */
--    grlib_gptimer_create(0x80000300, 2, CPU_CLK, cpu_irqs, 6);
-+    grlib_gptimer_create(LEON3_GPTIMER_OFFSET, 2, CPU_CLK, cpu_irqs,
-+                         LEON3_GPTIMER_IRQ,
-+                         apb_pnp);
- 
-     /* Allocate uart */
-     if (serial_hd(0)) {
--        grlib_apbuart_create(0x80000100, serial_hd(0), cpu_irqs[3]);
-+        grlib_apbuart_create(LEON3_APBUART_OFFSET, serial_hd(0), cpu_irqs,
-+                             LEON3_APBUART_IRQ, apb_pnp);
-     }
- }
- 
-diff --git a/include/hw/misc/grlib_ahb_apb_pnp.h b/include/hw/misc/grlib_ahb_apb_pnp.h
-new file mode 100644
-index 0000000..a0f6dcf
---- /dev/null
-+++ b/include/hw/misc/grlib_ahb_apb_pnp.h
-@@ -0,0 +1,60 @@
-+/*
-+ * GRLIB AHB APB PNP
-+ *
-+ *  Copyright (C) 2019 AdaCore
-+ *
-+ *  Developed by :
-+ *  Frederic Konrad   <frederic.konrad@adacore.com>
-+ *
-+ * This program is free software; you can redistribute it and/or modify
-+ * it under the terms of the GNU General Public License as published by
-+ * the Free Software Foundation, either version 2 of the License, or
-+ * (at your option) any later version.
-+ *
-+ * This program is distributed in the hope that it will be useful,
-+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+ * GNU General Public License for more details.
-+ *
-+ * You should have received a copy of the GNU General Public License along
-+ * with this program; if not, see <http://www.gnu.org/licenses/>.
-+ *
-+ */
-+
-+#ifndef GRLIB_AHB_APB_PNP_H
-+#define GRLIB_AHB_APB_PNP_H
-+
-+#define TYPE_GRLIB_AHB_PNP "grlib,ahbpnp"
-+#define GRLIB_AHB_PNP(obj) \
-+    OBJECT_CHECK(AHBPnp, (obj), TYPE_GRLIB_AHB_PNP)
-+typedef struct AHBPnp AHBPnp;
-+
-+#define TYPE_GRLIB_APB_PNP "grlib,apbpnp"
-+#define GRLIB_APB_PNP(obj) \
-+    OBJECT_CHECK(APBPnp, (obj), TYPE_GRLIB_APB_PNP)
-+typedef struct APBPnp APBPnp;
-+
-+void grlib_ahb_pnp_add_entry(AHBPnp *dev, uint32_t address, uint32_t mask,
-+                             uint8_t vendor, uint16_t device, int slave,
-+                             int type);
-+void grlib_apb_pnp_add_entry(APBPnp *dev, uint32_t address, uint32_t mask,
-+                             uint8_t vendor, uint16_t device, uint8_t version,
-+                             uint8_t irq, int type);
-+
-+/* VENDORS */
-+#define GRLIB_VENDOR_GAISLER (0x01)
-+/* DEVICES */
-+#define GRLIB_LEON3_DEV      (0x03)
-+#define GRLIB_APBMST_DEV     (0x06)
-+#define GRLIB_APBUART_DEV    (0x0C)
-+#define GRLIB_IRQMP_DEV      (0x0D)
-+#define GRLIB_GPTIMER_DEV    (0x11)
-+/* TYPE */
-+#define GRLIB_CPU_AREA       (0x00)
-+#define GRLIB_APBIO_AREA     (0x01)
-+#define GRLIB_AHBMEM_AREA    (0x02)
-+
-+#define GRLIB_AHB_MASTER     (0x00)
-+#define GRLIB_AHB_SLAVE      (0x01)
-+
-+#endif /* GRLIB_AHB_APB_PNP_H */
-diff --git a/include/hw/sparc/grlib.h b/include/hw/sparc/grlib.h
-index 61a345c..28320ab 100644
---- a/include/hw/sparc/grlib.h
-+++ b/include/hw/sparc/grlib.h
-@@ -27,6 +27,7 @@
- 
- #include "hw/qdev.h"
- #include "hw/sysbus.h"
-+#include "hw/misc/grlib_ahb_apb_pnp.h"
- 
- /* Emulation of GrLib device is base on the GRLIB IP Core User's Manual:
-  * http://www.gaisler.com/products/grlib/grip.pdf
-@@ -41,11 +42,9 @@ void grlib_irqmp_set_irq(void *opaque, int irq, int level);
- void grlib_irqmp_ack(DeviceState *dev, int intno);
- 
- static inline
--DeviceState *grlib_irqmp_create(hwaddr   base,
--                                CPUSPARCState            *env,
--                                qemu_irq           **cpu_irqs,
--                                uint32_t             nr_irqs,
--                                set_pil_in_fn        set_pil_in)
-+DeviceState *grlib_irqmp_create(hwaddr base, CPUSPARCState *env,
-+                                qemu_irq **cpu_irqs, uint32_t nr_irqs,
-+                                set_pil_in_fn set_pil_in, APBPnp *apb_pnp)
- {
-     DeviceState *dev;
- 
-@@ -65,17 +64,18 @@ DeviceState *grlib_irqmp_create(hwaddr   base,
-                                    dev,
-                                    nr_irqs);
- 
-+    /* Register this device in the APB PNP device */
-+    grlib_apb_pnp_add_entry(apb_pnp, base, 0xFFF, GRLIB_VENDOR_GAISLER,
-+                            GRLIB_IRQMP_DEV, 2, 0, GRLIB_APBIO_AREA);
-     return dev;
- }
- 
- /* GPTimer */
- 
- static inline
--DeviceState *grlib_gptimer_create(hwaddr  base,
--                                  uint32_t            nr_timers,
--                                  uint32_t            freq,
--                                  qemu_irq           *cpu_irqs,
--                                  int                 base_irq)
-+DeviceState *grlib_gptimer_create(hwaddr base, uint32_t nr_timers,
-+                                  uint32_t freq, qemu_irq *cpu_irqs,
-+                                  int base_irq, APBPnp *apb_pnp)
- {
-     DeviceState *dev;
-     int i;
-@@ -93,15 +93,18 @@ DeviceState *grlib_gptimer_create(hwaddr  base,
-         sysbus_connect_irq(SYS_BUS_DEVICE(dev), i, cpu_irqs[base_irq + i]);
-     }
- 
-+    /* Register this device in the APB PNP device */
-+    grlib_apb_pnp_add_entry(apb_pnp, base, 0xFFF, GRLIB_VENDOR_GAISLER,
-+                            GRLIB_GPTIMER_DEV, 0, base_irq, GRLIB_APBIO_AREA);
-     return dev;
- }
- 
- /* APB UART */
- 
- static inline
--DeviceState *grlib_apbuart_create(hwaddr  base,
--                                  Chardev    *serial,
--                                  qemu_irq            irq)
-+DeviceState *grlib_apbuart_create(hwaddr base, Chardev *serial,
-+                                  qemu_irq *cpu_irqs, int base_irq,
-+                                  APBPnp *apb_pnp)
- {
-     DeviceState *dev;
- 
-@@ -112,7 +115,11 @@ DeviceState *grlib_apbuart_create(hwaddr  base,
- 
-     sysbus_mmio_map(SYS_BUS_DEVICE(dev), 0, base);
- 
--    sysbus_connect_irq(SYS_BUS_DEVICE(dev), 0, irq);
-+    sysbus_connect_irq(SYS_BUS_DEVICE(dev), 0, cpu_irqs[base_irq]);
-+
-+    /* Register this device in the APB PNP device */
-+    grlib_apb_pnp_add_entry(apb_pnp, base, 0xFFF, GRLIB_VENDOR_GAISLER,
-+                            GRLIB_APBUART_DEV, 1, base_irq, GRLIB_APBIO_AREA);
- 
-     return dev;
- }
--- 
-1.8.3.1
+The domain now looks like:
+
+<domain type=3D'kvm'>                                                      =
+                                                                           =
+                                                                           =
+                                        [40/100]
+  <name>os-1</name>
+  <uuid>34c41008-ab91-483b-959c-81a7a12ae9be</uuid>    =
+
+  <memory unit=3D'KiB'>8388608</memory>
+  <currentMemory unit=3D'KiB'>8388608</currentMemory>                      =
+        =
+
+  <memoryBacking>
+    <hugepages/>             =
+
+  </memoryBacking>                      =
+
+  <vcpu placement=3D'static' cpuset=3D'10-11,34-35'>4</vcpu>
+  <os>                       =
+
+    <type arch=3D'x86_64' machine=3D'pc-i440fx-2.12'>hvm</type>            =
+          =
+
+    <loader readonly=3D'yes' type=3D'pflash'>/usr/share/edk2-ovmf/OVMF_CODE=
+.fd</loader>
+    <nvram>/var/lib/libvirt/qemu/nvram/os-1_VARS.fd</nvram>
+    <boot dev=3D'network'/>               =
+
+    <boot dev=3D'hd'/>           =
+
+  </os>                      =
+
+  <features>                                                               =
+      =
+
+    <acpi/>     =
+
+    <apic/>            =
+
+  </features>                            =
+
+  <cpu mode=3D'host-passthrough' check=3D'partial'/>
+  <clock offset=3D'utc'>
+    <timer name=3D'rtc' tickpolicy=3D'catchup'/>
+    <timer name=3D'pit' tickpolicy=3D'delay'/>
+    <timer name=3D'hpet' present=3D'no'/> =
+
+  </clock>    =
+
+  <on_poweroff>destroy</on_poweroff>
+  <on_reboot>restart</on_reboot>      =
+
+  <on_crash>destroy</on_crash>                    =
+
+  <pm>                        =
+
+    <suspend-to-mem enabled=3D'no'/>
+    <suspend-to-disk enabled=3D'no'/>
+  </pm>                                                          =
+
+  <devices>                                                                =
+      =
+
+    <emulator>/usr/bin/qemu-system-x86_64</emulator>
+    <disk type=3D'block' device=3D'disk'>
+      <driver name=3D'qemu' type=3D'raw' cache=3D'none' io=3D'native'/>    =
+              =
+
+      <source dev=3D'/dev/mole-vg0/os-1-vda'/>
+      <target dev=3D'vda' bus=3D'virtio'/>
+      <address type=3D'pci' domain=3D'0x0000' bus=3D'0x00' slot=3D'0x06' fu=
+nction=3D'0x0'/>
+    </disk>
+    <disk type=3D'block' device=3D'disk'>
+      <driver name=3D'qemu' type=3D'raw' cache=3D'none' io=3D'native'/>
+      <source dev=3D'/dev/mole-vg0/os-1-vdb'/>
+      <target dev=3D'vdb' bus=3D'virtio'/>
+      <address type=3D'pci' domain=3D'0x0000' bus=3D'0x00' slot=3D'0x07' fu=
+nction=3D'0x0'/>
+    </disk>
+    <controller type=3D'usb' index=3D'0' model=3D'ich9-ehci1'>
+      <address type=3D'pci' domain=3D'0x0000' bus=3D'0x00' slot=3D'0x05' fu=
+nction=3D'0x7'/>
+    </controller>
+    <controller type=3D'usb' index=3D'0' model=3D'ich9-uhci1'>
+      <master startport=3D'0'/>
+      <address type=3D'pci' domain=3D'0x0000' bus=3D'0x00' slot=3D'0x05' fu=
+nction=3D'0x0' multifunction=3D'on'/>
+    </controller>
+    <controller type=3D'usb' index=3D'0' model=3D'ich9-uhci2'>
+      <master startport=3D'2'/>
+      <address type=3D'pci' domain=3D'0x0000' bus=3D'0x00' slot=3D'0x05' fu=
+nction=3D'0x1'/>
+    </controller>
+    <controller type=3D'usb' index=3D'0' model=3D'ich9-uhci3'>
+      <master startport=3D'4'/>
+      <address type=3D'pci' domain=3D'0x0000' bus=3D'0x00' slot=3D'0x05' fu=
+nction=3D'0x2'/>
+    </controller>
+    <controller type=3D'pci' index=3D'0' model=3D'pci-root'/>
+    <controller type=3D'ide' index=3D'0'>
+      <address type=3D'pci' domain=3D'0x0000' bus=3D'0x00' slot=3D'0x01' fu=
+nction=3D'0x1'/>
+    </controller>
+    <interface type=3D'bridge'>
+      <mac address=3D'52:54:00:78:cb:97'/>
+      <source bridge=3D'virbr0'/>
+      <model type=3D'rtl8139'/>
+      <address type=3D'pci' domain=3D'0x0000' bus=3D'0x00' slot=3D'0x04' fu=
+nction=3D'0x0'/>
+    </interface>
+    <interface type=3D'bridge'>
+      <mac address=3D'52:54:00:1c:4f:22'/>
+      <source bridge=3D'virbr1'/>
+      <model type=3D'rtl8139'/>
+      <address type=3D'pci' domain=3D'0x0000' bus=3D'0x00' slot=3D'0x03' fu=
+nction=3D'0x0'/>
+    </interface>
+    <serial type=3D'pty'>
+      <target type=3D'isa-serial' port=3D'0'>
+        <model name=3D'isa-serial'/>
+      </target>
+    </serial>
+    <console type=3D'pty'>
+      <target type=3D'serial' port=3D'0'/>
+    </console>
+    <input type=3D'mouse' bus=3D'ps2'/>
+    <input type=3D'keyboard' bus=3D'ps2'/>
+    <graphics type=3D'vnc' port=3D'-1' autoport=3D'yes'>
+      <listen type=3D'address'/>
+    </graphics>
+    <video>
+      <model type=3D'cirrus' vram=3D'16384' heads=3D'1' primary=3D'yes'/>
+      <address type=3D'pci' domain=3D'0x0000' bus=3D'0x00' slot=3D'0x02' fu=
+nction=3D'0x0'/>
+    </video>
+    <memballoon model=3D'virtio'>
+      <address type=3D'pci' domain=3D'0x0000' bus=3D'0x00' slot=3D'0x09' fu=
+nction=3D'0x0'/>
+    </memballoon>
+  </devices>
+</domain>
+
+-- =
+
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1818367
+
+Title:
+  Initialization of device cfi.pflash01 failed: Block node is read-only
+
+Status in libvirt:
+  New
+Status in QEMU:
+  Invalid
+
+Bug description:
+  Hi,
+
+  I have several vms defined in libvirt using ovmf for uefi, since a later
+  update of my server I'm unable to start any of the domains defined. This =
+is
+  an example of the output given:
+
+  # virsh start os-1
+  error: Failed to start domain os-1
+  error: internal error: qemu unexpectedly closed the monitor: 2019-03-02T2=
+1:23:51.726446Z qemu-system-x86_64: Initialization of device cfi.pflash01 f=
+ailed: Block node is read-only
+
+  an example of domain is like this:
+
+  <domain type=3D'kvm'>                                                    =
+                                                                           =
+                                                                           =
+                                                  =
+
+    <name>os-1</name>                                                      =
+                                                                           =
+                                                                           =
+                                                =
+
+    <uuid>34c41008-ab91-483b-959c-81a7a12ae9be</uuid>                      =
+                                                                           =
+                                                                           =
+                                                =
+
+    <memory unit=3D'KiB'>8388608</memory>                                  =
+                                                                           =
+                                                                           =
+                                                  =
+
+    <currentMemory unit=3D'KiB'>8388608</currentMemory>                    =
+                                                                           =
+                                                                           =
+                                                  =
+
+    <memoryBacking>                                                        =
+                                                                           =
+                                                                           =
+                                                =
+
+      <hugepages/>                                                         =
+                                                                           =
+                                                                           =
+                                                =
+
+    </memoryBacking>                                                       =
+                                                                           =
+                                                                           =
+                                                =
+
+    <vcpu placement=3D'static' cpuset=3D'10-11,34-35'>4</vcpu>             =
+                                                                           =
+                                                                           =
+                                                    =
+
+    <os>                                                                   =
+                                                                           =
+                                                                           =
+                                                =
+
+      <type arch=3D'x86_64' machine=3D'pc-i440fx-2.12'>hvm</type>          =
+                                                                           =
+                                                                           =
+                                                    =
+
+      <loader type=3D'pflash'>/var/lib/libvirt/qemu/nvram/os-1-ovmf.fd</loa=
+der>                                                                       =
+                                                                           =
+                                                  =
+
+      <boot dev=3D'network'/>                                              =
+                                                                           =
+                                                                           =
+                                                  =
+
+      <boot dev=3D'hd'/>                                                   =
+                                                                           =
+                                                                           =
+                                                  =
+
+    </os>                                                                  =
+                                                                           =
+                                                                           =
+                                                =
+
+    <features>                                                             =
+                                                                           =
+                                                                           =
+                                                =
+
+      <acpi/>                                                              =
+                                                                           =
+                                                                           =
+                                                =
+
+      <apic/>                                                              =
+                                                                           =
+                                                                           =
+                                                =
+
+    </features>                                                            =
+                                                                           =
+                                                                           =
+                                                =
+
+    <cpu mode=3D'host-passthrough' check=3D'partial'/>                     =
+                                                                           =
+                                                                           =
+                                                    =
+
+    <clock offset=3D'utc'>                                                 =
+                                                                           =
+                                                                           =
+                                                  =
+
+      <timer name=3D'rtc' tickpolicy=3D'catchup'/>                         =
+                                                                           =
+                                                                           =
+                                                    =
+
+      <timer name=3D'pit' tickpolicy=3D'delay'/>                           =
+                                                                           =
+                                                                           =
+                                                    =
+
+      <timer name=3D'hpet' present=3D'no'/>                                =
+                                                                           =
+                                                                           =
+                                                    =
+
+    </clock>                                                               =
+                                                                           =
+                                                                           =
+                                                =
+
+    <on_poweroff>destroy</on_poweroff>                                     =
+                                                                           =
+                                                                           =
+                                                =
+
+    <on_reboot>restart</on_reboot>                                         =
+                                                                           =
+                                                                           =
+                                                =
+
+    <on_crash>destroy</on_crash>                                           =
+                                                                           =
+                                                                           =
+                                                =
+
+    <pm>                                                                   =
+                                                                           =
+                                                                           =
+                                                =
+
+      <suspend-to-mem enabled=3D'no'/>                                     =
+                                                                           =
+                                                                           =
+                                                  =
+
+      <suspend-to-disk enabled=3D'no'/>                                    =
+                                                                           =
+                                                                           =
+                                                  =
+
+    </pm>                                                                  =
+                                                                           =
+                                                                           =
+                                                =
+
+    <devices>                                                              =
+                                                                           =
+                                                                           =
+                                                =
+
+      <emulator>/usr/bin/qemu-system-x86_64</emulator>                     =
+                                                                           =
+                                                                           =
+                                                =
+
+      <disk type=3D'block' device=3D'disk'>                                =
+                                                                           =
+                                                                           =
+                                                    =
+
+        <driver name=3D'qemu' type=3D'raw' cache=3D'none' io=3D'native'/>  =
+                                                                           =
+                                                                           =
+                                                        =
+
+        <source dev=3D'/dev/vg0/os-1-vda'/>                                =
+                                                                           =
+                                                                           =
+                                             =
+
+        <target dev=3D'vda' bus=3D'virtio'/>                               =
+                                                                           =
+                                                                           =
+                                                    =
+
+        <address type=3D'pci' domain=3D'0x0000' bus=3D'0x00' slot=3D'0x06' =
+function=3D'0x0'/>                                                         =
+                                                                           =
+                                                          =
+
+      </disk>                                                              =
+                                                                           =
+                                                                           =
+                                                =
+
+      <disk type=3D'block' device=3D'disk'>
+        <driver name=3D'qemu' type=3D'raw' cache=3D'none' io=3D'native'/>
+        <source dev=3D'/dev/vg0/os-1-vdb'/>
+        <target dev=3D'vdb' bus=3D'virtio'/>
+        <address type=3D'pci' domain=3D'0x0000' bus=3D'0x00' slot=3D'0x07' =
+function=3D'0x0'/>
+      </disk>
+      <controller type=3D'usb' index=3D'0' model=3D'ich9-ehci1'>
+        <address type=3D'pci' domain=3D'0x0000' bus=3D'0x00' slot=3D'0x05' =
+function=3D'0x7'/>
+      </controller>
+      <controller type=3D'usb' index=3D'0' model=3D'ich9-uhci1'>
+        <master startport=3D'0'/>
+        <address type=3D'pci' domain=3D'0x0000' bus=3D'0x00' slot=3D'0x05' =
+function=3D'0x0' multifunction=3D'on'/>
+      </controller>
+      <controller type=3D'usb' index=3D'0' model=3D'ich9-uhci2'>
+        <master startport=3D'2'/>
+        <address type=3D'pci' domain=3D'0x0000' bus=3D'0x00' slot=3D'0x05' =
+function=3D'0x1'/>
+      </controller>
+      <controller type=3D'usb' index=3D'0' model=3D'ich9-uhci3'>
+        <master startport=3D'4'/>
+        <address type=3D'pci' domain=3D'0x0000' bus=3D'0x00' slot=3D'0x05' =
+function=3D'0x2'/>
+      </controller>
+      <controller type=3D'pci' index=3D'0' model=3D'pci-root'/>
+      <controller type=3D'ide' index=3D'0'>
+        <address type=3D'pci' domain=3D'0x0000' bus=3D'0x00' slot=3D'0x01' =
+function=3D'0x1'/>
+      </controller>
+      <interface type=3D'bridge'>
+        <mac address=3D'52:54:00:78:cb:97'/>
+        <source bridge=3D'virbr0'/>
+        <model type=3D'rtl8139'/>
+        <address type=3D'pci' domain=3D'0x0000' bus=3D'0x00' slot=3D'0x04' =
+function=3D'0x0'/>
+      </interface>
+      <interface type=3D'bridge'>
+        <mac address=3D'52:54:00:1c:4f:22'/>
+        <source bridge=3D'virbr1'/>
+        <model type=3D'rtl8139'/>
+        <address type=3D'pci' domain=3D'0x0000' bus=3D'0x00' slot=3D'0x03' =
+function=3D'0x0'/>
+      </interface>
+      <serial type=3D'pty'>
+        <target type=3D'isa-serial' port=3D'0'>
+          <model name=3D'isa-serial'/>
+        </target>
+      </serial>
+      <console type=3D'pty'>
+        <target type=3D'serial' port=3D'0'/>
+      </console>
+      <input type=3D'mouse' bus=3D'ps2'/>
+      <input type=3D'keyboard' bus=3D'ps2'/>
+      <graphics type=3D'vnc' port=3D'-1' autoport=3D'yes'>
+        <listen type=3D'address'/>
+      </graphics>
+      <video>
+        <model type=3D'cirrus' vram=3D'16384' heads=3D'1' primary=3D'yes'/>
+        <address type=3D'pci' domain=3D'0x0000' bus=3D'0x00' slot=3D'0x02' =
+function=3D'0x0'/>
+      </video>
+      <memballoon model=3D'virtio'>
+        <address type=3D'pci' domain=3D'0x0000' bus=3D'0x00' slot=3D'0x09' =
+function=3D'0x0'/>
+      </memballoon>
+    </devices>
+  </domain>
+
+  where /var/lib/libvirt/qemu/nvram/os-1-ovmf.fd is a copy of
+  /usr/share/edk2-ovmf/OVMF_VARS.fd. An the extract from my
+  /etc/libvirt/qemu.conf to define ovmf:
+
+  ...
+  # Location of master nvram file                                          =
+                                                                           =
+                                                                           =
+                                                =
+
+  #                                                                        =
+                                                                           =
+                                                                           =
+                                                =
+
+  # When a domain is configured to use UEFI instead of standard            =
+                                                                           =
+                                                                           =
+                                                =
+
+  # BIOS it may use a separate storage for UEFI variables. If              =
+                                                                           =
+                                                                           =
+                                                =
+
+  # that's the case libvirt creates the variable store per domain          =
+                                                                           =
+                                                                           =
+                                                =
+
+  # using this master file as image. Each UEFI firmware can,               =
+                                                                           =
+                                                                           =
+                                                =
+
+  # however, have different variables store. Therefore the nvram is        =
+                                                                           =
+                                                                           =
+                                                =
+
+  # a list of strings when a single item is in form of:                    =
+                                                                           =
+                                                                           =
+                                                =
+
+  #   ${PATH_TO_UEFI_FW}:${PATH_TO_UEFI_VARS}.                             =
+                                                                           =
+                                                                           =
+                                                =
+
+  # Later, when libvirt creates per domain variable store, this list is    =
+                                                                           =
+                                                                           =
+                                                =
+
+  # searched for the master image. The UEFI firmware can be called         =
+                                                                           =
+                                                                           =
+                                                =
+
+  # differently for different guest architectures. For instance, it's OVMF =
+                                                                           =
+                                                                           =
+                                                =
+
+  # for x86_64 and i686, but it's AAVMF for aarch64. The libvirt default   =
+                                                                           =
+                                                                           =
+                                                =
+
+  # follows this scheme.                                                   =
+                                                                           =
+                                                                           =
+                                                =
+
+  nvram =3D [                                                              =
+                                                                           =
+                                                                           =
+                                                  =
+
+     "/usr/share/edk2-ovmf/OVMF_CODE.fd:/usr/share/edk2-ovmf/OVMF_VARS.fd",=
+                                                                           =
+                                                                           =
+                                                =
+
+  ]
+  ...
+
+  This setup used to work one month ago, now it's setup with:
+
+  QEMU emulator version 3.1.0
+  libvirt-5.0.0
+  linux-4.19.20
+
+  Any help appreciated.
+
+  Best regards.
+
+  Jos=C3=A9
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/libvirt/+bug/1818367/+subscriptions
