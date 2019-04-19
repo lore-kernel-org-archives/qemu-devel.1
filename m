@@ -1,24 +1,26 @@
-Received: from eggs.gnu.org ([209.51.188.92]:54380)
+Received: from eggs.gnu.org ([209.51.188.92]:59535)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <shahab.vahedi@gmail.com>) id 1hHQtv-00017G-4B
-	for qemu-devel@nongnu.org; Fri, 19 Apr 2019 06:37:48 -0400
+	(envelope-from <hare@suse.de>) id 1hHRV6-0004pn-CG
+	for qemu-devel@nongnu.org; Fri, 19 Apr 2019 07:16:13 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <shahab.vahedi@gmail.com>) id 1hHQtu-0006F7-0J
-	for qemu-devel@nongnu.org; Fri, 19 Apr 2019 06:37:47 -0400
-Received: from mail-ed1-x543.google.com ([2a00:1450:4864:20::543]:33864)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <shahab.vahedi@gmail.com>)
-	id 1hHQtr-0006DO-2D
-	for qemu-devel@nongnu.org; Fri, 19 Apr 2019 06:37:44 -0400
-Received: by mail-ed1-x543.google.com with SMTP id a6so4151366edv.1
-	for <qemu-devel@nongnu.org>; Fri, 19 Apr 2019 03:37:41 -0700 (PDT)
-From: Shahab Vahedi <shahab.vahedi@gmail.com>
-Date: Fri, 19 Apr 2019 12:37:22 +0200
-Message-Id: <20190419103722.17062-1-shahab.vahedi@gmail.com>
+	(envelope-from <hare@suse.de>) id 1hHRV5-0003w3-5K
+	for qemu-devel@nongnu.org; Fri, 19 Apr 2019 07:16:12 -0400
+Received: from mx2.suse.de ([195.135.220.15]:55398 helo=mx1.suse.de)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <hare@suse.de>) id 1hHRV4-0003ux-Sz
+	for qemu-devel@nongnu.org; Fri, 19 Apr 2019 07:16:11 -0400
+References: <20190411110157.14252-1-yuval.shaia@oracle.com>
+	<20190411190215.2163572e.cohuck@redhat.com>
+	<20190415103546.GA6854@lap1>
+From: Hannes Reinecke <hare@suse.de>
+Message-ID: <e73e03c2-ea2b-6ffc-cd23-e8e44d42ce80@suse.de>
+Date: Fri, 19 Apr 2019 13:16:06 +0200
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH] cputlb: Fix io_readx() to respect the
- access_type
+In-Reply-To: <20190415103546.GA6854@lap1>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [RFC 0/3] VirtIO RDMA
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,42 +29,110 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "open list:Overall" <qemu-devel@nongnu.org>
-Cc: Richard Henderson <rth@twiddle.net>, Paolo Bonzini <pbonzini@redhat.com>, Shahab Vahedi <shahab.vahedi@gmail.com>
+To: Yuval Shaia <yuval.shaia@oracle.com>, Cornelia Huck <cohuck@redhat.com>
+Cc: mst@redhat.com, linux-rdma@vger.kernel.org, qemu-devel@nongnu.org, virtualization@lists.linux-foundation.org, jgg@mellanox.com
 
-This change adapts io_readx() to its input access_type. Currently
-io_readx() treats any memory access as a read, although it has an
-input argument "MMUAccessType access_type". This results in:
+On 4/15/19 12:35 PM, Yuval Shaia wrote:
+> On Thu, Apr 11, 2019 at 07:02:15PM +0200, Cornelia Huck wrote:
+>> On Thu, 11 Apr 2019 14:01:54 +0300
+>> Yuval Shaia <yuval.shaia@oracle.com> wrote:
+>>
+>>> Data center backends use more and more RDMA or RoCE devices and more =
+and
+>>> more software runs in virtualized environment.
+>>> There is a need for a standard to enable RDMA/RoCE on Virtual Machine=
+s.
+>>>
+>>> Virtio is the optimal solution since is the de-facto para-virtualizat=
+on
+>>> technology and also because the Virtio specification
+>>> allows Hardware Vendors to support Virtio protocol natively in order =
+to
+>>> achieve bare metal performance.
+>>>
+>>> This RFC is an effort to addresses challenges in defining the RDMA/Ro=
+CE
+>>> Virtio Specification and a look forward on possible implementation
+>>> techniques.
+>>>
+>>> Open issues/Todo list:
+>>> List is huge, this is only start point of the project.
+>>> Anyway, here is one example of item in the list:
+>>> - Multi VirtQ: Every QP has two rings and every CQ has one. This mean=
+s that
+>>>    in order to support for example 32K QPs we will need 64K VirtQ. No=
+t sure
+>>>    that this is reasonable so one option is to have one for all and
+>>>    multiplex the traffic on it. This is not good approach as by desig=
+n it
+>>>    introducing an optional starvation. Another approach would be mult=
+i
+>>>    queues and round-robin (for example) between them.
+>>>
+Typically there will be a one-to-one mapping between QPs and CPUs (on=20
+the guest). So while one would need to be prepared to support quite some=20
+QPs, the expectation is that the actual number of QPs used will be=20
+rather low.
+In a similar vein, multiplexing QPs would be defeating the purpose, as=20
+the overall idea was to have _independent_ QPs to enhance parallelism.
 
-1) Calling the tlb_fill() only with MMU_DATA_LOAD
-2) Considering only entry->addr_read as the tlb_addr
+>>> Expectations from this posting:
+>>> In general, any comment is welcome, starting from hey, drop this as i=
+t is a
+>>> very bad idea, to yeah, go ahead, we really want it.
+>>> Idea here is that since it is not a minor effort i first want to know=
+ if
+>>> there is some sort interest in the community for such device.
+>>
+>> My first reaction is: Sounds sensible, but it would be good to have a
+>> spec for this :)
+>>
+>> You'll need a spec if you want this to go forward anyway, so at least =
+a
+>> sketch would be good to answer questions such as how many virtqueues
+>> you use for which purpose, what is actually put on the virtqueues,
+>> whether there are negotiable features, and what the expectations for
+>> the device and the driver are. It also makes it easier to understand
+>> how this is supposed to work in practice.
+>>
+>> If folks agree that this sounds useful, the next step would be to
+>> reserve an id for the device type.
+>=20
+> Thanks for the tips, will sure do that, it is that first i wanted to ma=
+ke
+> sure there is a use case here.
+>=20
+> Waiting for any feedback from the community.
+>=20
+I really do like the ides; in fact, it saved me from coding a similar=20
+thing myself :-)
 
-Buglink: https://bugs.launchpad.net/qemu/+bug/1825359
+However, I'm still curious about the overall intent of this driver.=20
+Where would the I/O be routed _to_ ?
+It's nice that we have a virtualized driver, but this driver is
+intended to do I/O (even if it doesn't _do_ any I/O ATM :-)
+And this I/O needs to be send to (and possibly received from)
+something.
 
-Signed-off-by: Shahab Vahedi <shahab.vahedi@gmail.com>
----
- accel/tcg/cputlb.c | 7 +++++--
- 1 file changed, 5 insertions(+), 2 deletions(-)
+So what exactly is this something?
+An existing piece of HW on the host?
+If so, wouldn't it be more efficient to use vfio, either by using SR-IOV=20
+or by using virtio-mdev?
 
-diff --git a/accel/tcg/cputlb.c b/accel/tcg/cputlb.c
-index 88cc8389e9..0daac0e806 100644
---- a/accel/tcg/cputlb.c
-+++ b/accel/tcg/cputlb.c
-@@ -878,10 +878,13 @@ static uint64_t io_readx(CPUArchState *env, CPUIOTLBEntry *iotlbentry,
-         CPUTLBEntry *entry;
-         target_ulong tlb_addr;
- 
--        tlb_fill(cpu, addr, size, MMU_DATA_LOAD, mmu_idx, retaddr);
-+        tlb_fill(cpu, addr, size, access_type, mmu_idx, retaddr);
- 
-         entry = tlb_entry(env, mmu_idx, addr);
--        tlb_addr = entry->addr_read;
-+        tlb_addr =
-+            (access_type == MMU_DATA_LOAD ) ? entry->addr_read  :
-+            (access_type == MMU_DATA_STORE) ? entry->addr_write :
-+            entry->addr_code;
-         if (!(tlb_addr & ~(TARGET_PAGE_MASK | TLB_RECHECK))) {
-             /* RAM access */
-             uintptr_t haddr = addr + entry->addend;
--- 
-2.21.0
+Another guest?
+If so, how would we route the I/O from one guest to the other?
+Shared memory? Implementing a full-blown RDMA switch in qemu?
+
+Oh, and I would _love_ to have a discussion about this at KVM Forum.
+Maybe I'll manage to whip up guest-to-guest RDMA connection using=20
+ivshmem ... let's see.
+
+Cheers,
+
+Hannes
+--=20
+Dr. Hannes Reinecke            Teamlead Storage & Networking
+hare@suse.de                              +49 911 74053 688
+SUSE LINUX GmbH, Maxfeldstr. 5, 90409 N=C3=BCrnberg
+GF: Felix Imend=C3=B6rffer, Mary Higgins, Sri Rasiah
+HRB 21284 (AG N=C3=BCrnberg)
