@@ -1,25 +1,24 @@
-Received: from eggs.gnu.org ([209.51.188.92]:37861)
+Received: from eggs.gnu.org ([209.51.188.92]:57255)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <prvs=005e97291=Peter.Chubb@data61.csiro.au>)
-	id 1hHKph-0001Pb-Jn
-	for qemu-devel@nongnu.org; Fri, 19 Apr 2019 00:09:29 -0400
+	(envelope-from <thuth@redhat.com>) id 1hHMcG-0003gq-9v
+	for qemu-devel@nongnu.org; Fri, 19 Apr 2019 02:03:17 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <prvs=005e97291=Peter.Chubb@data61.csiro.au>)
-	id 1hHKfb-0000h0-48
-	for qemu-devel@nongnu.org; Thu, 18 Apr 2019 23:58:36 -0400
-From: "Chubb, Peter (Data61, Kensington NSW)" <Peter.Chubb@data61.csiro.au>
-Date: Fri, 19 Apr 2019 03:58:17 +0000
-Message-ID: <8436melk89.wl-Peter.Chubb@data61.csiro.au>
-References: <20190418180057.3593-1-thuth@redhat.com>
-	<20190418180057.3593-8-thuth@redhat.com>
-In-Reply-To: <20190418180057.3593-8-thuth@redhat.com>
-Content-Language: en-US
-Content-Type: text/plain; charset="iso-8859-1"
-Content-ID: <D4F06FF565C66F488BAC81E136EC975E@ausprd01.prod.outlook.com>
-Content-Transfer-Encoding: quoted-printable
+	(envelope-from <thuth@redhat.com>) id 1hHMcE-0007Yz-FF
+	for qemu-devel@nongnu.org; Fri, 19 Apr 2019 02:03:16 -0400
+References: <20190417220147.67648-1-stephen.checkoway@oberlin.edu>
+	<20190417220147.67648-2-stephen.checkoway@oberlin.edu>
+	<3ffacb2c-2459-fb45-ca9c-7b59b10a1c76@redhat.com>
+	<223E9F59-BF08-4441-B82F-1EC6B9FA8B85@oberlin.edu>
+From: Thomas Huth <thuth@redhat.com>
+Message-ID: <2ed82112-afc0-ecd4-e8ae-358a7e1cdc4a@redhat.com>
+Date: Fri, 19 Apr 2019 07:57:59 +0200
 MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [PATCH for-QEMU-4.1 v5 07/29] hw/arm: Express
- dependencies of the fsl-imx31 machine with Kconfig
+In-Reply-To: <223E9F59-BF08-4441-B82F-1EC6B9FA8B85@oberlin.edu>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v3 01/10] block/pflash_cfi02: Add test for
+ supported commands
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,18 +27,38 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Thomas Huth <thuth@redhat.com>
-Cc: "yang.zhong@intel.com" <yang.zhong@intel.com>, Peter Maydell <peter.maydell@linaro.org>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "pbonzini@redhat.com" <pbonzini@redhat.com>, Beniamino Galvani <b.galvani@gmail.com>, Jan Kiszka <jan.kiszka@web.de>, Antony Pavlov <antonynpavlov@gmail.com>, Peter Chubb <peter.chubb@nicta.com.au>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>, Cedric Le Goater <clg@kaod.org>, "Michael S. Tsirkin" <mst@redhat.com>, Andrew Jeffery <andrew@aj.id.au>, Igor Mitsyanko <i.mitsyanko@gmail.com>, Andrey Smirnov <andrew.smirnov@gmail.com>, Rob Herring <robh@kernel.org>, "qemu-arm@nongnu.org" <qemu-arm@nongnu.org>, Andrzej Zaborowski <balrogg@gmail.com>, John Snow <jsnow@redhat.com>, Joel Stanley <joel@jms.id.au>, "Edgar E . Iglesias" <edgar.iglesias@gmail.com>, Jean-Christophe Dubois <jcd@tribudubois.net>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, Philippe Mathieu-Daude <f4bug@amsat.org>, Alistair Francis <alistair@alistair23.me>, Subbaraya Sundeep <sundeep.lkml@gmail.com>, Gerd Hoffmann <kraxel@redhat.com>
+To: Stephen Checkoway <stephen.checkoway@oberlin.edu>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, "open list:Block layer core" <qemu-block@nongnu.org>, Markus Armbruster <armbru@redhat.com>, Laszlo Ersek <lersek@redhat.com>, Laurent Vivier <lvivier@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
 
->>>>> "Thomas" =3D=3D Thomas Huth <thuth@redhat.com> writes:
+ Hi,
 
-Thomas> Add Kconfig dependencies for the fsl-imx31 / kzm machine.
-Thomas> This patch is slightly based on earlier work by =C1kos Kov=E1cs
-Thomas> (i.e.  his "hw/arm/Kconfig: Add ARM Kconfig" patch).
+On 18/04/2019 22.43, Stephen Checkoway wrote:
+[...]
+> I'm new to contributing to QEMU and I have a two procedural questions:
+>=20
+> 1. When should I send version 4 of this patch series? I don't want to b=
+ombard everyone with another 11 emails after fixing every review comment,=
+ but I also don't want to let the patch linger without addressing comment=
+s.
 
-Thomas> Signed-off-by: Thomas Huth <thuth@redhat.com>=20
-Reviewed-by: Peter Chubb <peter.chubb@data61.csiro.au>
---
-Dr Peter Chubb         Tel: +61 2 9490 5852      http://ts.data61.csiro.au/
-Trustworthy Systems Group                     Data61, CSIRO (formerly NICTA=
-)=
+There is no hard rule ... I normally wait for a day or two before
+sending another iteration, to see whether there are any further comments.
+
+> 2. I'm not familiar with the "Acked-by" convention. I read <https://www=
+.kernel.org/doc/html/v4.16/process/submitting-patches.html#when-to-use-ac=
+ked-by-and-cc>. Am I supposed to add those to the commit messages or do t=
+hose get added by whomever actually includes the patch in the main QEMU r=
+epo?
+
+I assume that the patches will go in via the block tree (or another
+one), so I used Acked-by here to say that I've seen the patches and I'm
+basically fine with them from the qtests perspective (since I'm listed
+as qtests maintainer).
+
+When you send another iteration, you should add the "Acked-by" lines on
+your own, so that the information does not get lost in v4. (But when you
+sent the final iteration, and there are more Acked-by/Reviewed-by reply
+mails to that series, it's up to the maintainers to pick up these lines
+when including the patches to their tree.)
+
+  Thomas
