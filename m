@@ -2,88 +2,83 @@ Return-Path: <SRS0=rbQy=SV=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.5 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-2.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_PASS,USER_AGENT_NEOMUTT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 27132C282DA
-	for <qemu-devel@archiver.kernel.org>; Fri, 19 Apr 2019 11:46:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 99F24C282DA
+	for <qemu-devel@archiver.kernel.org>; Fri, 19 Apr 2019 12:25:21 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D669421908
-	for <qemu-devel@archiver.kernel.org>; Fri, 19 Apr 2019 11:46:19 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="IyBtjCkf"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D669421908
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	by mail.kernel.org (Postfix) with ESMTPS id 64F9E21929
+	for <qemu-devel@archiver.kernel.org>; Fri, 19 Apr 2019 12:25:21 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 64F9E21929
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:55309 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:56068 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hHRyF-00032G-7M
-	for qemu-devel@archiver.kernel.org; Fri, 19 Apr 2019 07:46:19 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:36409)
+	id 1hHSa0-0001UC-J7
+	for qemu-devel@archiver.kernel.org; Fri, 19 Apr 2019 08:25:20 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:41517)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <shahab.vahedi@gmail.com>) id 1hHRxR-0002jc-Mc
-	for qemu-devel@nongnu.org; Fri, 19 Apr 2019 07:45:30 -0400
+	(envelope-from <sgarzare@redhat.com>) id 1hHSYm-0000mn-GF
+	for qemu-devel@nongnu.org; Fri, 19 Apr 2019 08:24:05 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <shahab.vahedi@gmail.com>) id 1hHRxI-0000Wj-9E
-	for qemu-devel@nongnu.org; Fri, 19 Apr 2019 07:45:24 -0400
-Received: from mail-ed1-x541.google.com ([2a00:1450:4864:20::541]:39760)
+	(envelope-from <sgarzare@redhat.com>) id 1hHSYl-0002UA-Er
+	for qemu-devel@nongnu.org; Fri, 19 Apr 2019 08:24:04 -0400
+Received: from mail-wr1-f67.google.com ([209.85.221.67]:45485)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <shahab.vahedi@gmail.com>)
-	id 1hHRxA-0000Pa-Sn
-	for qemu-devel@nongnu.org; Fri, 19 Apr 2019 07:45:14 -0400
-Received: by mail-ed1-x541.google.com with SMTP id k45so4236909edb.6
-	for <qemu-devel@nongnu.org>; Fri, 19 Apr 2019 04:45:10 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
-	h=from:to:cc:subject:date:message-id:mime-version
-	:content-transfer-encoding;
-	bh=98Qq3AiP3cHkjukBYMOl1co3En5Y7L9TEWuFbqscQ+c=;
-	b=IyBtjCkfYpS46xZqh+sJFea61fJk5By84j/Wcz0SmClhm/vPih2oG4kMMHFCun2flE
-	F1CkjWvHirVsG5IPkKtpTw5Fj50mZCPOLMYTvObm1dyIPTxwrMktWtm10ejbaDGL+k6T
-	K/bHxNE4Uw5XLMMRW6F0brB1AOClrMrIG++taWmqY/MGZWBpbHl1BzVH2P4bw3hWUSII
-	66BMR7j6yyBBi9CTnV4kxg8DIejd2J4MT2jbPbo1bPCct5ZNPR8q339iZhkLJ+N0Cu4C
-	sS9nJEcny4Sw/+1U7fon5geh8xBX1isvVPQKDI3ok7HU6bLaLjGQi+erB33XbQD2e4Qt
-	rJGw==
+	(Exim 4.71) (envelope-from <sgarzare@redhat.com>) id 1hHSYk-0002P1-L1
+	for qemu-devel@nongnu.org; Fri, 19 Apr 2019 08:24:02 -0400
+Received: by mail-wr1-f67.google.com with SMTP id s15so6738724wra.12
+	for <qemu-devel@nongnu.org>; Fri, 19 Apr 2019 05:24:00 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
 	d=1e100.net; s=20161025;
-	h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
-	:content-transfer-encoding;
-	bh=98Qq3AiP3cHkjukBYMOl1co3En5Y7L9TEWuFbqscQ+c=;
-	b=a6H7zVOLzS8J8xrAgTi8U5NwzwfOeT/G3Cya7JyPYE8lR1PDrtdyezha1hWV27eMzG
-	FDnyK1mkFnesyFb5vtngWqtEQqqCw/4mWf56DCDraODuLlnOy0+YI8k6ThKthgd7Pq3w
-	fVSwF8n6os73Lkvk23CCwEx+qOD09iFnmeIMFXK3JoLP3CyeaURI8maYpwPJQ/ojt7Z9
-	DBXwg9XSup+oINO4YHMStNEP0F/ZiLgtnNyFziztnY8e5SWZNIaXxGJad5cEj2MAAaGm
-	tFXS9bVDc52kxHLQiYtw7YbLj+FEnHsslC2Jl4O6Pa8rnlxwZ47Ehz6HbANaTuNS1+xb
-	jU7A==
-X-Gm-Message-State: APjAAAWedVv10Xd6Kl0+O72f0+Wg6R3+gupbRK6jrpd2hGrbdY1naLbA
-	mA/ZO+dDfk4CxQl3j/lkWPaXfQGMXlRxQQ==
-X-Google-Smtp-Source: APXvYqyU/9C6pdHDEcJo2Shr+Qr1pMYwT9cDdl/0kfFRViZLmKgAVH/MGUFtqL08SilQbqFyx+ry2A==
-X-Received: by 2002:a17:906:4c91:: with SMTP id
-	q17mr1737752eju.3.1555674309000; 
-	Fri, 19 Apr 2019 04:45:09 -0700 (PDT)
-Received: from localhost.localdomain
-	(ip-217-103-128-141.ip.prioritytelecom.net. [217.103.128.141])
-	by smtp.gmail.com with ESMTPSA id
-	i35sm1291840eda.55.2019.04.19.04.45.07
-	(version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
-	Fri, 19 Apr 2019 04:45:08 -0700 (PDT)
-From: Shahab Vahedi <shahab.vahedi@gmail.com>
-To: qemu-devel@nongnu.org (open list:Overall)
-Date: Fri, 19 Apr 2019 13:45:02 +0200
-Message-Id: <20190419114502.20388-1-shahab.vahedi@gmail.com>
-X-Mailer: git-send-email 2.21.0
+	h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+	:mime-version:content-disposition:in-reply-to:user-agent;
+	bh=ptQpz8we1ujwI55yyQQ6lZ+vJdjxDaoNUgTFKEV0mJQ=;
+	b=T3G6xhgn1WcZd8sv38zNsu5U86Sg7EMrVZTuME0PAM1yNt2IJkVViGujvKEIlxISww
+	GDGMPnfDM0QcdF/4ENMervRCs6M4JiWs/orZEptMfWbIIj0vNnCyh/nOmOoJevjdHySF
+	vb5K2Y3ih+edfME2+zlRlam4CFhDHxrZ/BAQNZT7Sv1fnWKWKh2H8W674sALpzo+f54u
+	KiXhIMVN0Vm6XrLHOB0Y52FZyYFFcp6lNP/JJUOTXc0+s5CssSc0+Z88UuKtOFPst4Z3
+	9dxkGb43ZoB6oU+zkO3DE+snQQGai4DmekQr5dkcp+tNlhPnuCi5vHRKX7HhJCItxtuA
+	ZQvQ==
+X-Gm-Message-State: APjAAAV6GLVYdG+MZvqrJih85vdxhQUmVUDkk9qjK2YflYk5XQJrop05
+	6zGUI3hFsDXWMEX2e41sND0qFQ==
+X-Google-Smtp-Source: APXvYqwMNUMoyi2Q0O6Mblj1b7MsGjyLHO7y9GHVQIjKMsw78Rs3kPgkkFsuQlMkMG2iB9zgIM0zkA==
+X-Received: by 2002:adf:e443:: with SMTP id t3mr2924189wrm.257.1555676639850; 
+	Fri, 19 Apr 2019 05:23:59 -0700 (PDT)
+Received: from steredhat (host35-203-static.12-87-b.business.telecomitalia.it.
+	[87.12.203.35])
+	by smtp.gmail.com with ESMTPSA id a6sm5660023wrp.49.2019.04.19.05.23.58
+	(version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
+	Fri, 19 Apr 2019 05:23:59 -0700 (PDT)
+Date: Fri, 19 Apr 2019 14:23:56 +0200
+From: Stefano Garzarella <sgarzare@redhat.com>
+To: Kevin Wolf <kwolf@redhat.com>
+Message-ID: <20190419122356.7dmwwdbtnzgimydw@steredhat>
+References: <20190411105025.97397-1-sgarzare@redhat.com>
+	<20190411105025.97397-2-sgarzare@redhat.com>
+	<CA+aFP1AMzNjWtMeGy4MpWBa26qxShgciYkcEZ8mkSmDrtCvfqA@mail.gmail.com>
+	<20190411130245.ltfyp7d2dfe2cr3h@steredhat>
+	<CA+aFP1B7ZZ_xwNOfMbKUzEjYbMH=9dJstLYEyVq4LphPR81u0Q@mail.gmail.com>
+	<20190414132008.uxoia6avdpp4jov6@steredhat.homenet.telecomitalia.it>
+	<CA+aFP1D8VYcnwWpB=4PzAdBKr+YK-r8bSwzKKUCkH7jT3kVvoQ@mail.gmail.com>
+	<20190415080452.GA6031@localhost.localdomain>
+	<20190417073438.r57lemi6emu4x3ld@steredhat>
+	<20190417080443.GA8330@localhost.localdomain>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
-	recognized.
-X-Received-From: 2a00:1450:4864:20::541
-Subject: [Qemu-devel] [PATCH] cputlb: Fix io_readx() to respect the
- access_type
+Content-Type: text/plain; charset="UTF-8"
+Content-Disposition: inline
+In-Reply-To: <20190417080443.GA8330@localhost.localdomain>
+User-Agent: NeoMutt/20180716
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+	[fuzzy]
+X-Received-From: 209.85.221.67
+Subject: Re: [Qemu-devel] [PATCH RFC 1/1] block/rbd: increase dynamically
+ the image size
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -95,52 +90,72 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Shahab Vahedi <shahab.vahedi@gmail.com>,
-	Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>
+Cc: Josh Durgin <jdurgin@redhat.com>, dillaman@redhat.com,
+	qemu-devel <qemu-devel@nongnu.org>, qemu-block <qemu-block@nongnu.org>,
+	Max Reitz <mreitz@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Content-Type: text/plain; charset="UTF-8"
-Message-ID: <20190419114502.jhdhV9xN95YhS8CVE6ZFkSIKBFZRaETjTqLvn3eIfso@z>
+Message-ID: <20190419122356.5GdLHiUYJTsO4a4cqjFKWMeGQfVF2qjrW3dIGJrzlKQ@z>
 
-This change adapts io_readx() to its input access_type. Currently
-io_readx() treats any memory access as a read, although it has an
-input argument "MMUAccessType access_type". This results in:
+Hi Kevin,
 
-1) Calling the tlb_fill() only with MMU_DATA_LOAD
-2) Considering only entry->addr_read as the tlb_addr
+On Wed, Apr 17, 2019 at 10:04:43AM +0200, Kevin Wolf wrote:
+> Am 17.04.2019 um 09:34 hat Stefano Garzarella geschrieben:
+> > On Mon, Apr 15, 2019 at 10:04:52AM +0200, Kevin Wolf wrote:
+> > > 
+> > > I think a potential actual use case could be persistent dirty bitmaps
+> > > for incremental backup. Though maybe that would be better served by
+> > > using the rbd image just as a raw external data file and keeping the
+> > > qcow2 metadata on a filesystem.
+> > 
+> > Thanks to point it out! I'll take a look to understand how to keep
+> > metadata separated from the data.
+> 
+> I'd consider the feature still experimental, but for local files, it
+> works like this:
+> 
+>     qemu-img create -f qcow2 -o data_file=test.raw test.qcow2 4G
+> 
+> And then just use test.qcow2. As long as you can put everything you need
+> into an rbd URL, the same approach should work. Otherwise, you may need
+> to use QMP blockdev-create on creation and possibly the data-file option
+> of the qcow2 driver for opening.
+>
 
-Buglink: https://bugs.launchpad.net/qemu/+bug/1825359
+Very interesting, I'll try to add this support also in the rbd driver.
 
-Signed-off-by: Shahab Vahedi <shahab.vahedi@gmail.com>
----
-Changelog:
-- Extra space before closing parenthesis is removed
+> > > How fast is rbd_resize()? Does automatically resizing for every write
+> > > request actually work reasonably well in practice? If it does, there is
+> > > probably little reason not to allow it, even if the use cases are rather
+> > > obscure.
+> > 
+> > I'll try to measure the percentage of the time spent in the rbd_resize.
+> > 
+> > Another solution could be to pass to the rbd driver the virtual size of
+> > the image and resize it only one time also if the preallocation is
+> > disabled, because RBD will not allocate blocks but IIUC it only set the max
+> > size.
+> > 
+> > Do you think make sense? Is it feasible?
+> 
+> In theory yes, though it requires modification of every driver that
+> should be usable together with rbd (i.e. ideally all of the drivers). If
+> automatic resize works good enough, I'd prefer that
 
- accel/tcg/cputlb.c | 7 +++++--
- 1 file changed, 5 insertions(+), 2 deletions(-)
+I did some tests and it seems that the cost of rbd_resize() is
+negligible. IIUC it only updates the metadata without allocating any
+blocks (if we are growing, like that case).
 
-diff --git a/accel/tcg/cputlb.c b/accel/tcg/cputlb.c
-index 88cc8389e9..4a305ac942 100644
---- a/accel/tcg/cputlb.c
-+++ b/accel/tcg/cputlb.c
-@@ -878,10 +878,13 @@ static uint64_t io_readx(CPUArchState *env, CPUIOTLBEntry *iotlbentry,
-         CPUTLBEntry *entry;
-         target_ulong tlb_addr;
- 
--        tlb_fill(cpu, addr, size, MMU_DATA_LOAD, mmu_idx, retaddr);
-+        tlb_fill(cpu, addr, size, access_type, mmu_idx, retaddr);
- 
-         entry = tlb_entry(env, mmu_idx, addr);
--        tlb_addr = entry->addr_read;
-+        tlb_addr =
-+            (access_type == MMU_DATA_LOAD)  ? entry->addr_read  :
-+            (access_type == MMU_DATA_STORE) ? entry->addr_write :
-+            entry->addr_code;
-         if (!(tlb_addr & ~(TARGET_PAGE_MASK | TLB_RECHECK))) {
-             /* RAM access */
-             uintptr_t haddr = addr + entry->addend;
--- 
-2.21.0
+Anyway the automatic resize will not affect the current use-case (raw
+images on rbd), where the file size is set during the creation, so I
+think there should not be side effects with this patch.
 
+I'm also adding the support for preallocation (i.e. full) in the rbd
+driver that can be useful for qcow2 images.
+
+If you prefer I can resend this patch with the preallocation series.
+
+Thanks,
+Stefano
 
