@@ -2,84 +2,146 @@ Return-Path: <SRS0=rbQy=SV=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.7 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,
+	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2479DC10F14
-	for <qemu-devel@archiver.kernel.org>; Fri, 19 Apr 2019 02:25:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0D93BC282DA
+	for <qemu-devel@archiver.kernel.org>; Fri, 19 Apr 2019 04:10:29 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id DA99521736
-	for <qemu-devel@archiver.kernel.org>; Fri, 19 Apr 2019 02:25:16 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id AE72220869
+	for <qemu-devel@archiver.kernel.org>; Fri, 19 Apr 2019 04:10:28 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="boiRaHkH"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DA99521736
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=data61.csiro.au header.i=@data61.csiro.au header.b="oebltQu8";
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=CSIROAU.onmicrosoft.com header.i=@CSIROAU.onmicrosoft.com header.b="uPV2JB+J"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AE72220869
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=data61.csiro.au
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:50149 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:50944 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hHJDI-0000HO-69
-	for qemu-devel@archiver.kernel.org; Thu, 18 Apr 2019 22:25:16 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:50449)
+	id 1hHKr5-0002DY-HS
+	for qemu-devel@archiver.kernel.org; Fri, 19 Apr 2019 00:10:27 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:37861)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <liq3ea@gmail.com>) id 1hHJCU-0008RV-D0
-	for qemu-devel@nongnu.org; Thu, 18 Apr 2019 22:24:27 -0400
+	(envelope-from <prvs=005e97291=Peter.Chubb@data61.csiro.au>)
+	id 1hHKph-0001Pb-Jn
+	for qemu-devel@nongnu.org; Fri, 19 Apr 2019 00:09:29 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <liq3ea@gmail.com>) id 1hHJCT-0007oN-6V
-	for qemu-devel@nongnu.org; Thu, 18 Apr 2019 22:24:26 -0400
-Received: from mail-ot1-x343.google.com ([2607:f8b0:4864:20::343]:43622)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <liq3ea@gmail.com>) id 1hHJCS-0007o4-UE
-	for qemu-devel@nongnu.org; Thu, 18 Apr 2019 22:24:25 -0400
-Received: by mail-ot1-x343.google.com with SMTP id u15so3321186otq.10
-	for <qemu-devel@nongnu.org>; Thu, 18 Apr 2019 19:24:24 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
-	h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-	:cc; bh=JrLNGAPmFtMkdlNSCqDrWRRgLBwxv6Bct7XEmGHLYYM=;
-	b=boiRaHkHnd1qk9bFx+ngViGk4FML5qZrJicrcmPBKdHdos+bTL1iwwX3HbaCMYtEjX
-	c8c1aF9dw6HoFCYuyguWqTobKVn/PIRf6RcCSID/dCBZRUixIGX8CML/Rx1XqEhYq1FF
-	rHZtuhPHj3t9HvsDDRIbiG1baqhS9+GHC9Uizs1fkMmwzqPtVjeUPSlgjYc91W9xrwbb
-	cFArN6wyCpU61yzcLlQK/D5PKEiFFRROi9FqJoOn/zVKjmEnzp3x5PZG7+bCI5yigcrF
-	qzywOzubo7qfVU8nLs8FG1qSJpaOviHmQ3rOUus6KzEEmYyipVUIEnhgqV6oIb8Fh4MQ
-	Ro4Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=1e100.net; s=20161025;
-	h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-	:message-id:subject:to:cc;
-	bh=JrLNGAPmFtMkdlNSCqDrWRRgLBwxv6Bct7XEmGHLYYM=;
-	b=lMOvZ/ZGl6+S7FSs+GHJvQ9QfMvSeicvqC/WqT+oMQ1ZEaMKJ2JQ/E18hWkitiNnj5
-	EZm3JtRI76HJDQ5SAFbdkJiDP6kpZUbBBpeuQ1okIfJAe8DidcJhakIU2tlWRjRhTNAy
-	yQyoR4R9bSibTvPvQJcz3s17kFIvVk0tugWjnlSpumk1tQ0oAx5jY3nU+LB47mReMc5c
-	KftRaOMCvkBcfWnIle19OkKazeudfe+TKkoXs5CtE8vISQ07pLykGuZ6G3tcACC2n8Gj
-	FGyt/7WrBFvXQZLs9e7y0DOhfBT1M+4wlQ9240z7XNJHXu9qU77FAhMqNcatWt15uL+9
-	RUpw==
-X-Gm-Message-State: APjAAAXE1FPKW1DkcfE0rlu3vHLo2DZ5xjGdr1boEk80a3OYmyoaHmNt
-	qRISrGC6MkFohXdyn8TNEBvOnXR8cr8tUyPcZ/4=
-X-Google-Smtp-Source: APXvYqykDcB5ILjrBs+yo/+LAlpEyUliVdbmk8McVC1XuEM4pd7Sgmsw7YuNn8QwEMf/YcHb3ThzTN5BuVAvPEY8Xbc=
-X-Received: by 2002:a9d:d66:: with SMTP id 93mr669462oti.25.1555640663371;
-	Thu, 18 Apr 2019 19:24:23 -0700 (PDT)
+	(envelope-from <prvs=005e97291=Peter.Chubb@data61.csiro.au>)
+	id 1hHKfb-0000h0-48
+	for qemu-devel@nongnu.org; Thu, 18 Apr 2019 23:58:36 -0400
+Received: from act-mtaout4.csiro.au ([2405:b000:e00:257::7:41]:8391)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71)
+	(envelope-from <prvs=005e97291=Peter.Chubb@data61.csiro.au>)
+	id 1hHKfX-0000aa-Rm; Thu, 18 Apr 2019 23:58:35 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
+	d=data61.csiro.au; i=@data61.csiro.au; q=dns/txt;
+	s=dkim; t=1555646311; x=1587182311;
+	h=from:to:cc:subject:date:message-id:references:
+	in-reply-to:content-id:content-transfer-encoding: mime-version;
+	bh=KNTIRV2KeUddD45ESVK//XYwfqeyqxBcrZ+UhmXqFYs=;
+	b=oebltQu8Zrg2Va54Z524A8B9lnGcr8cpBUioW9Afb9gk78hQDhBgDtTv
+	vxGflr1n1vfk4fXBRXIgO4EZ5TNkmAt2nHF0WaOGm5gG4tAi1ylubNqe+
+	jvCqsIUAo59TTBnVO8zxYHuZ/l6NxHDfY7kH9XqU1yFDdTzDpIUQiS2Un g=;
+X-SBRS: 4.0
+IronPort-PHdr: =?us-ascii?q?9a23=3ALkZ5tBA0zhEF8DmpsMaGUyQJPHJ1sqjoPgMT9p?=
+	=?us-ascii?q?ssgq5PdaLm5Zn5IUjD/qo13kTRU9Dd7PRJw6rNvqbsVHZIwK7JsWtKMfkuHw?=
+	=?us-ascii?q?QAld1QmgUhBMCfDkiuFPP2YjZ8N8RfXlVN83inOBYMXs3lZkfV5HSvvnYf?=
+X-IronPort-Anti-Spam-Filtered: true
+X-IronPort-Anti-Spam-Result: =?us-ascii?q?A+FTAQAGR7lcjACwBSSYiIBxAISUgiR?=
+	=?us-ascii?q?mHgEGBwaBUQkLAYE9UFoRVSAEMwqHSwOPFUqaV4E/PA8BHw4CgQKCFIEoAoY?=
+	=?us-ascii?q?aIzQJDgEDAQEFAQEBAQICAhABAQEmTAyDRTkxAQEBAQEBAQEBAQEBAQEBAQE?=
+	=?us-ascii?q?BAQEBAQEBAQEBAQEBAQEBAQEBAQUCMwU5AwNAAQE3AQ8CAQgOLQsQIiUCBA4?=
+	=?us-ascii?q?FgyIBgWkDGwEBAgKcewKKFIIggnkBAQV1hA4Ygg0JCQGBKAGLSYIWEn+DEj6?=
+	=?us-ascii?q?ERIVhjQKFVpN4BwEBAoIGhg6MGhuBe5MPkjOKMYNLAgQCBAUCDgEBBYFPN4F?=
+	=?us-ascii?q?YHU+DQAmCBRodgXKBRopTcgGBKI4oAYEgAQE?=
+X-IPAS-Result: =?us-ascii?q?A+FTAQAGR7lcjACwBSSYiIBxAISUgiRmHgEGBwaBUQkLA?=
+	=?us-ascii?q?YE9UFoRVSAEMwqHSwOPFUqaV4E/PA8BHw4CgQKCFIEoAoYaIzQJDgEDAQEFA?=
+	=?us-ascii?q?QEBAQICAhABAQEmTAyDRTkxAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBA?=
+	=?us-ascii?q?QEBAQEBAQEBAQUCMwU5AwNAAQE3AQ8CAQgOLQsQIiUCBA4FgyIBgWkDGwEBA?=
+	=?us-ascii?q?gKcewKKFIIggnkBAQV1hA4Ygg0JCQGBKAGLSYIWEn+DEj6ERIVhjQKFVpN4B?=
+	=?us-ascii?q?wEBAoIGhg6MGhuBe5MPkjOKMYNLAgQCBAUCDgEBBYFPN4FYHU+DQAmCBRodg?=
+	=?us-ascii?q?XKBRopTcgGBKI4oAYEgAQE?=
+Received: from exch4-mel.nexus.csiro.au ([IPv6:2405:b000:302:71::85:124])
+	by act-ironport-int.csiro.au with ESMTP/TLS/AES256-SHA;
+	19 Apr 2019 13:58:19 +1000
+Received: from exch1-mel.nexus.csiro.au (2405:b000:302:71::85:121) by
+	exch4-mel.nexus.csiro.au (2405:b000:302:71::85:124) with Microsoft SMTP
+	Server (TLS) id 15.0.1395.4; Fri, 19 Apr 2019 13:58:19 +1000
+Received: from exedge2.csiro.au (150.229.64.34) by exch1-mel.nexus.csiro.au
+	(138.194.85.121) with Microsoft SMTP Server (TLS) id 15.0.1395.4 via
+	Frontend Transport; Fri, 19 Apr 2019 13:58:19 +1000
+Received: from AUS01-SY3-obe.outbound.protection.outlook.com (104.47.117.55)
+	by exedge2.csiro.au (150.229.64.34) with Microsoft SMTP Server (TLS) id
+	15.0.1395.4; Fri, 19 Apr 2019 13:58:11 +1000
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=CSIROAU.onmicrosoft.com; s=selector1-data61-csiro-au;
+	h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+	bh=47TcUOXX+GQ2jL0Vio6fMmM9NZP1iOctFD5d/FVYB2c=;
+	b=uPV2JB+JoIvGcChkR0EWFZGxnFM1fAHNiMwMfN+CaGHcQl0fc+ySTvK3g/Tw0SNdg2yoLZP443Hs6biPtAGlXNL4FlCRgXqlux0JKQUWwn2AGKhiy/8jgoPeprccH315tSl/YEAEU7YAHjccF8+c6OlSRUKFC67voqz5W1Q6crI=
+Received: from MEAPR01MB3734.ausprd01.prod.outlook.com (52.134.217.84) by
+	MEASPR01MB0009.ausprd01.prod.outlook.com (20.178.177.215) with
+	Microsoft SMTP
+	Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+	15.20.1813.12; Fri, 19 Apr 2019 03:58:18 +0000
+Received: from MEAPR01MB3734.ausprd01.prod.outlook.com
+	([fe80::7c08:1847:9eed:49e4]) by
+	MEAPR01MB3734.ausprd01.prod.outlook.com
+	([fe80::7c08:1847:9eed:49e4%4]) with mapi id 15.20.1813.011;
+	Fri, 19 Apr 2019 03:58:18 +0000
+From: "Chubb, Peter (Data61, Kensington NSW)" <Peter.Chubb@data61.csiro.au>
+To: Thomas Huth <thuth@redhat.com>
+Thread-Topic: [PATCH for-QEMU-4.1 v5 07/29] hw/arm: Express dependencies of
+	the fsl-imx31 machine with Kconfig
+Thread-Index: AQHU9hDfK3IokJEEzkKHsws0zFJQiqZC3BcA
+Date: Fri, 19 Apr 2019 03:58:17 +0000
+Message-ID: <8436melk89.wl-Peter.Chubb@data61.csiro.au>
+References: <20190418180057.3593-1-thuth@redhat.com>
+	<20190418180057.3593-8-thuth@redhat.com>
+In-Reply-To: <20190418180057.3593-8-thuth@redhat.com>
+Accept-Language: en-AU, en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+authentication-results: spf=none (sender IP is )
+	smtp.mailfrom=Peter.Chubb@data61.csiro.au; 
+x-originating-ip: [221.199.209.40]
+x-ms-publictraffictype: Email
+x-ms-office365-filtering-correlation-id: ccad084c-937c-4cde-2031-08d6c47b41a4
+x-microsoft-antispam: BCL:0; PCL:0;
+	RULEID:(2390118)(7020095)(4652040)(8989299)(4534185)(4627221)(201703031133081)(201702281549075)(8990200)(5600141)(711020)(4605104)(2017052603328)(7193020);
+	SRVR:MEASPR01MB0009; 
+x-ms-traffictypediagnostic: MEASPR01MB0009:
+x-ms-exchange-purlcount: 1
+x-microsoft-antispam-prvs: <MEASPR01MB0009169E06D4264C234B4AE5BB270@MEASPR01MB0009.ausprd01.prod.outlook.com>
+x-forefront-prvs: 0012E6D357
+x-forefront-antispam-report: SFV:NSPM;
+	SFS:(10009020)(366004)(136003)(376002)(346002)(396003)(39850400004)(199004)(189003)(6246003)(186003)(966005)(7736002)(478600001)(53936002)(6306002)(99286004)(8936002)(68736007)(6512007)(7416002)(5660300002)(229853002)(72206003)(76116006)(66946007)(4744005)(305945005)(2906002)(54906003)(4326008)(14454004)(6116002)(102836004)(86372001)(86362001)(316002)(97736004)(8676002)(446003)(71190400001)(81166006)(6916009)(25786009)(81156014)(71200400001)(6486002)(74482002)(76176011)(26005)(256004)(3846002)(6506007)(66066001)(66476007)(6436002)(64756008)(11346002)(2616005)(73956011)(476003)(486006)(66556008)(66446008)(91956017);
+	DIR:OUT; SFP:1101; SCL:1; SRVR:MEASPR01MB0009;
+	H:MEAPR01MB3734.ausprd01.prod.outlook.com; FPR:; SPF:None;
+	LANG:en; PTR:InfoNoRecords; A:1; MX:1; 
+x-ms-exchange-senderadcheck: 1
+x-microsoft-antispam-message-info: SnjnOnC0tfQERfsS56t0dHQjuXii5SgahkFpSy/2SkznhFTmbsn7TC6r2J4sU3miukgHfR6DS2tRe5a05CCdqLAgQQ4lnwmvuQj2vvcpQJGAndtjCMktb7s+RR1DVjYYhd2zSg0r1BCI2ZwJK54SYJt+ujWWJxDvKd0hhlD96q8TD+ZpjtsoocOB6rN89FsQFT7611kPER9I3yDeaWO4Np8529zCivnVm1J3/0W73aroitPn7qRCG7IfXIGWGAGQTACW04lT084ehU5jLPWpTtXa1uI3s/uMpJC0au0SN1AZoP3Xe1T5t/lVs/zeLY6VqOlXhhUSGILN//xdonfbIkrpTVRe9OqtE3vEtNpY3tTaEZ+Mr2xhYpJjrCBEqcxeJsof8IclNIYXCnxsxI9QKQgct0wIYn29+YDIp9Krn88=
+Content-Type: text/plain; charset="UTF-8"
+Content-ID: <D4F06FF565C66F488BAC81E136EC975E@ausprd01.prod.outlook.com>
+Content-Transfer-Encoding: quoted-printable
 MIME-Version: 1.0
-References: <20190319023030.947-1-liq3ea@163.com>
-	<20190319023030.947-3-liq3ea@163.com>
-	<979370c0-99ec-aff1-7cf5-350caa6ac773@redhat.com>
-In-Reply-To: <979370c0-99ec-aff1-7cf5-350caa6ac773@redhat.com>
-From: Li Qiang <liq3ea@gmail.com>
-Date: Fri, 19 Apr 2019 10:23:47 +0800
-Message-ID:
- <CAKXe6SJyd=4PoJyZ=k5g52TV67wxQDjQamOOsodR7RYvKH9izQ@mail.gmail.com>
-To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>
+X-MS-Exchange-CrossTenant-Network-Message-Id: ccad084c-937c-4cde-2031-08d6c47b41a4
+X-MS-Exchange-CrossTenant-originalarrivaltime: 19 Apr 2019 03:58:17.9579 (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 0fe05593-19ac-4f98-adbf-0375fce7f160
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: MEASPR01MB0009
+X-OriginatorOrg: data61.csiro.au
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
 	recognized.
-X-Received-From: 2607:f8b0:4864:20::343
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Content-Filtered-By: Mailman/MimeDel 2.1.21
-Subject: Re: [Qemu-devel] [PATCH 2/2] tests: fw_cfg: add reboot_timeout test
- case
+X-Received-From: 2405:b000:e00:257::7:41
+Subject: Re: [Qemu-devel] [PATCH for-QEMU-4.1 v5 07/29] hw/arm: Express
+ dependencies of the fsl-imx31 machine with Kconfig
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -91,93 +153,42 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: lvivier@redhat.com, Thomas Huth <thuth@redhat.com>,
-	Li Qiang <liq3ea@163.com>, Qemu Developers <qemu-devel@nongnu.org>,
-	Gerd Hoffmann <kraxel@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
-	Laszlo Ersek <lersek@redhat.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>,
+	"Michael S. Tsirkin" <mst@redhat.com>,
+	"qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
+	Gerd Hoffmann <kraxel@redhat.com>,
+	"Edgar E . Iglesias" <edgar.iglesias@gmail.com>,
+	Subbaraya Sundeep <sundeep.lkml@gmail.com>,
+	"yang.zhong@intel.com" <yang.zhong@intel.com>,
+	Rob Herring <robh@kernel.org>,
+	"qemu-block@nongnu.org" <qemu-block@nongnu.org>,
+	Andrey Smirnov <andrew.smirnov@gmail.com>,
+	Peter Chubb <peter.chubb@nicta.com.au>, Joel Stanley <joel@jms.id.au>,
+	Antony Pavlov <antonynpavlov@gmail.com>,
+	Alistair Francis <alistair@alistair23.me>,
+	Beniamino Galvani <b.galvani@gmail.com>,
+	"qemu-arm@nongnu.org" <qemu-arm@nongnu.org>,
+	Jan Kiszka <jan.kiszka@web.de>, Cedric Le Goater <clg@kaod.org>,
+	John Snow <jsnow@redhat.com>, Andrew Jeffery <andrew@aj.id.au>,
+	Philippe Mathieu-Daude <f4bug@amsat.org>,
+	Jean-Christophe Dubois <jcd@tribudubois.net>,
+	Igor Mitsyanko <i.mitsyanko@gmail.com>,
+	"pbonzini@redhat.com" <pbonzini@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190419022347.13Y_PNLe1W1uG2ICJgazLYmKrPm258Oqjyiqk02yNMU@z>
+Message-ID: <20190419035817.jEGq_tEFytTxgK9YVG0CmRgA4vnqWFZyIzz-oaF7GJg@z>
 
-Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com> =E4=BA=8E2019=E5=B9=B44=E6=
-=9C=8819=E6=97=A5=E5=91=A8=E4=BA=94 =E4=B8=8A=E5=8D=885:01=E5=86=99=E9=81=
-=93=EF=BC=9A
+>>>>> "Thomas" =3D=3D Thomas Huth <thuth@redhat.com> writes:
 
-> Hi Li,
->
-> On 3/19/19 3:30 AM, Li Qiang wrote:
-> > Signed-off-by: Li Qiang <liq3ea@163.com>
-> > ---
-> >  tests/fw_cfg-test.c | 15 ++++++++++++++-
-> >  1 file changed, 14 insertions(+), 1 deletion(-)
-> >
-> > diff --git a/tests/fw_cfg-test.c b/tests/fw_cfg-test.c
-> > index 1c5103fe1c..551b51e38f 100644
-> > --- a/tests/fw_cfg-test.c
-> > +++ b/tests/fw_cfg-test.c
-> > @@ -99,6 +99,17 @@ static void test_fw_cfg_boot_menu(void)
-> >      g_assert_cmpint(qfw_cfg_get_u16(fw_cfg, FW_CFG_BOOT_MENU), =3D=3D,
-> boot_menu);
-> >  }
-> >
-> > +static void test_fw_cfg_reboot_timeout(void)
-> > +{
-> > +    uint32_t reboot_timeout =3D 0;
-> > +    size_t filesize;
-> > +
-> > +    filesize =3D qfw_cfg_get_file(fw_cfg, "etc/boot-fail-wait",
-> > +                     &reboot_timeout, sizeof(reboot_timeout));
-> > +    g_assert_cmpint(filesize, =3D=3D, sizeof(reboot_timeout));
-> > +    g_assert_cmpint(reboot_timeout, =3D=3D, 15);
-> > +}
-> > +
-> >  int main(int argc, char **argv)
-> >  {
-> >      QTestState *s;
-> > @@ -106,7 +117,8 @@ int main(int argc, char **argv)
-> >
-> >      g_test_init(&argc, &argv, NULL);
-> >
-> > -    s =3D qtest_init("-uuid 4600cb32-38ec-4b2f-8acb-81c6ea54f2d8");
-> > +    s =3D qtest_init("-uuid 4600cb32-38ec-4b2f-8acb-81c6ea54f2d8 "
-> > +                   "-boot reboot-timeout=3D15");
->
-> This modify all tests. I'd rather add a specific test with this option.
-> Doing so, we can easily modify the timeout and add the <0 and >0xffff
-> cases.
->
->
-Ok, will do in the next revision.
+Thomas> Add Kconfig dependencies for the fsl-imx31 / kzm machine.
+Thomas> This patch is slightly based on earlier work by =C1kos Kov=E1cs
+Thomas> (i.e.  his "hw/arm/Kconfig: Add ARM Kconfig" patch).
 
+Thomas> Signed-off-by: Thomas Huth <thuth@redhat.com>=20
+Reviewed-by: Peter Chubb <peter.chubb@data61.csiro.au>
+--
+Dr Peter Chubb         Tel: +61 2 9490 5852      http://ts.data61.csiro.au/
+Trustworthy Systems Group                     Data61, CSIRO (formerly NICTA=
+)=
 
-> Can you think of a 'splash-time' test (for commit 6912bb0b3d3b1)?
-
-
-Ok.
-
-PS: any comments in the first patch.
-
-Thanks,
-Li Qiang
-
-
->
-> Regards,
->
-> Phil.
->
-> >
-> >      fw_cfg =3D pc_fw_cfg_init(s);
-> >
-> > @@ -125,6 +137,7 @@ int main(int argc, char **argv)
-> >      qtest_add_func("fw_cfg/max_cpus", test_fw_cfg_max_cpus);
-> >      qtest_add_func("fw_cfg/numa", test_fw_cfg_numa);
-> >      qtest_add_func("fw_cfg/boot_menu", test_fw_cfg_boot_menu);
-> > +    qtest_add_func("fw_cfg/reboot_timeout", test_fw_cfg_reboot_timeout=
-);
-> >
-> >      ret =3D g_test_run();
-> >
-> >
->
