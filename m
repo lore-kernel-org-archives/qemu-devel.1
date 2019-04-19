@@ -1,29 +1,26 @@
-Received: from eggs.gnu.org ([209.51.188.92]:44152)
+Received: from eggs.gnu.org ([209.51.188.92]:38883)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stephen.checkoway@oberlin.edu>) id 1hHVeQ-0001TT-3P
-	for qemu-devel@nongnu.org; Fri, 19 Apr 2019 11:42:06 -0400
+	(envelope-from <chen.zhang@intel.com>) id 1hHXT0-0004CV-VL
+	for qemu-devel@nongnu.org; Fri, 19 Apr 2019 13:38:28 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stephen.checkoway@oberlin.edu>) id 1hHVeP-0002KG-5r
-	for qemu-devel@nongnu.org; Fri, 19 Apr 2019 11:42:06 -0400
-Received: from mail-it1-x144.google.com ([2607:f8b0:4864:20::144]:52399)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <stephen.checkoway@oberlin.edu>)
-	id 1hHVeP-0002Jx-1B
-	for qemu-devel@nongnu.org; Fri, 19 Apr 2019 11:42:05 -0400
-Received: by mail-it1-x144.google.com with SMTP id x132so8796769itf.2
-	for <qemu-devel@nongnu.org>; Fri, 19 Apr 2019 08:42:04 -0700 (PDT)
-Content-Type: text/plain;
-	charset=utf-8
-Mime-Version: 1.0 (Mac OS X Mail 12.2 \(3445.102.3\))
-From: Stephen Checkoway <stephen.checkoway@oberlin.edu>
-In-Reply-To: <aaa450c5-0446-b4b3-40ac-ef87b5522545@redhat.com>
-Date: Fri, 19 Apr 2019 11:42:02 -0400
+	(envelope-from <chen.zhang@intel.com>) id 1hHXSz-0007V9-NM
+	for qemu-devel@nongnu.org; Fri, 19 Apr 2019 13:38:26 -0400
+Received: from mga11.intel.com ([192.55.52.93]:48271)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <chen.zhang@intel.com>)
+	id 1hHXSx-0007Tp-51
+	for qemu-devel@nongnu.org; Fri, 19 Apr 2019 13:38:25 -0400
+From: "Zhang, Chen" <chen.zhang@intel.com>
+Date: Fri, 19 Apr 2019 17:38:10 +0000
+Message-ID: <9CFF81C0F6B98A43A459C9EDAD400D78060D262F@shsmsx102.ccr.corp.intel.com>
+References: <20190419155605.5349857a@luklap>
+In-Reply-To: <20190419155605.5349857a@luklap>
+Content-Language: en-US
+Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: quoted-printable
-Message-Id: <05AF5CE1-3A71-4D78-B35B-C443BE310985@oberlin.edu>
-References: <20190417005053.885-1-stephen.checkoway@oberlin.edu>
-	<aaa450c5-0446-b4b3-40ac-ef87b5522545@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v2] hw/char/escc: Lower irq when transmit
- buffer is filled
+MIME-Version: 1.0
+Subject: Re: [Qemu-devel] [PATCH] net/colo-compare.c: Fix a crash in COLO
+ Primary.
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,43 +29,49 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?utf-8?Q?Philippe_Mathieu-Daud=C3=A9?= <philmd@redhat.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>, Artyom Tarasenko <atar4qemu@gmail.com>, Laurent Vivier <laurent@vivier.eu>, qemu-trivial@nongnu.org, =?utf-8?Q?Marc-Andr=C3=A9_Lureau?= <marcandre.lureau@redhat.com>, Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+To: Lukas Straub <lukasstraub2@web.de>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
 
 
 
-> On Apr 18, 2019, at 08:13, Philippe Mathieu-Daud=C3=A9 =
-<philmd@redhat.com> wrote:
+
+> -----Original Message-----
+> From: Lukas Straub [mailto:lukasstraub2@web.de]
+> Sent: Friday, April 19, 2019 9:56 PM
+> To: qemu-devel@nongnu.org
+> Cc: Zhang, Chen <chen.zhang@intel.com>
+> Subject: [PATCH] net/colo-compare.c: Fix a crash in COLO Primary.
 >=20
-> On 4/17/19 2:50 AM, Stephen Checkoway wrote:
->> The SCC/ESCC will briefly stop asserting an interrupt when the
->> transmit FIFO is filled.
->>=20
->> This code doesn't model the transmit FIFO/shift register so the
->> pending transmit interrupt is never deasserted which means that an
->> edge-triggered interrupt controller will never see the low-to-high
->> transition it needs to raise another interrupt. The practical
->> consequence of this is that guest firmware with an interrupt service
->> routine for the ESCC that does not send all of the data it has
->> immediately will stop sending data if the following sequence of
->> events occurs:
->> 1. Disable processor interrupts
->> 2. Write a character to the ESCC
->> 3. Add additional characters to a buffer which is drained by the ISR
->> 4. Enable processor interrupts
->>=20
->> In this case, the first character will be sent, the interrupt will
->> fire and the ISR will output the second character. Since the pending
->> transmit interrupt remains asserted, no additional interrupts will
->> ever fire.
+> From: Lukas Straub <lukasstraub2@web.de> Fixes the following bug:
+> https://bugs.launchpad.net/qemu/+bug/1824622
+
+It looks good for me, but I think you need add more comments in commit mess=
+age,
+For example what situation will trigger this bug and why it will occur.
+After that, I think you can close the bug in Launchpad.
+
+Thanks
+Zhang Chen
+
 >=20
-> You might want to add a line expliciting the chipset model which =
-forced
-> you to do that patch (Z85C30).
-
-Done.
-
-Thanks for looking at this.
-
---=20
-Stephen Checkoway
+> Signed-off-by: Lukas Straub <lukasstraub2@web.de>
+> ---
+>  net/colo-compare.c | 3 +--
+>  1 file changed, 1 insertion(+), 2 deletions(-)
+>=20
+> diff --git a/net/colo-compare.c b/net/colo-compare.c index
+> bf10526f05..fcb491121b 100644
+> --- a/net/colo-compare.c
+> +++ b/net/colo-compare.c
+> @@ -813,9 +813,8 @@ static void colo_compare_handle_event(void *opaque)
+>          break;
+>      }
+>=20
+> -    assert(event_unhandled_count > 0);
+> -
+>      qemu_mutex_lock(&event_mtx);
+> +    assert(event_unhandled_count > 0);
+>      event_unhandled_count--;
+>      qemu_cond_broadcast(&event_complete_cond);
+>      qemu_mutex_unlock(&event_mtx);
+> --
+> 2.20.1
