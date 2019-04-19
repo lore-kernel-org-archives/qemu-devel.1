@@ -2,83 +2,83 @@ Return-Path: <SRS0=rbQy=SV=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.7 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
 	SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 78044C282E0
-	for <qemu-devel@archiver.kernel.org>; Fri, 19 Apr 2019 21:06:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6A786C282E0
+	for <qemu-devel@archiver.kernel.org>; Fri, 19 Apr 2019 21:10:54 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id EB5102171F
-	for <qemu-devel@archiver.kernel.org>; Fri, 19 Apr 2019 21:06:11 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 2BE392171F
+	for <qemu-devel@archiver.kernel.org>; Fri, 19 Apr 2019 21:10:54 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gmx.net header.i=@gmx.net header.b="D1VUC5aB"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EB5102171F
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gmx.co.uk
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="LZjpbA6f"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2BE392171F
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:33238 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:33292 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hHai3-0005hu-1W
-	for qemu-devel@archiver.kernel.org; Fri, 19 Apr 2019 17:06:11 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:50593)
+	id 1hHamb-00074X-Af
+	for qemu-devel@archiver.kernel.org; Fri, 19 Apr 2019 17:10:53 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:51971)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <nick.hudson@gmx.co.uk>) id 1hHafM-0004BD-Uh
-	for qemu-devel@nongnu.org; Fri, 19 Apr 2019 17:03:27 -0400
+	(envelope-from <alistair23@gmail.com>) id 1hHalo-0006fr-4l
+	for qemu-devel@nongnu.org; Fri, 19 Apr 2019 17:10:05 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <nick.hudson@gmx.co.uk>) id 1hHafL-0003po-IA
-	for qemu-devel@nongnu.org; Fri, 19 Apr 2019 17:03:24 -0400
-Received: from mout.gmx.net ([212.227.15.15]:38277)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <nick.hudson@gmx.co.uk>)
-	id 1hHafL-0003pP-83
-	for qemu-devel@nongnu.org; Fri, 19 Apr 2019 17:03:23 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=gmx.net;
-	s=badeba3b8450; t=1555707798;
-	bh=3KaVlh88FX6Q8sq3QL4dnddPyHR4V6q2P/4djUCR4xM=;
-	h=X-UI-Sender-Class:From:Subject:To:Cc:Date;
-	b=D1VUC5aBsd0REkTCx+FoxG19ViY4iKx464ushan/hNHvHztsgH1PFo3JaY6z21azc
-	KogJcZbmML8iqJ8F1QTI0RJuzTYdmrcd7yLQBPsqsvBaF1NQLRRkEd5afFNMh0GGyA
-	ZQ0qmv4fBQ2XF/I4FDBsI/aY9SD2/tXb2aYu/+lY=
-X-UI-Sender-Class: 01bb95c1-4bf8-414a-932a-4f6e2808ef9c
-Received: from [192.168.0.96] ([90.214.132.136]) by mail.gmx.com (mrgmx005
-	[212.227.17.184]) with ESMTPSA (Nemesis) id 1M2O6e-1hFwVP0cAA-003vpv;
-	Fri, 19 Apr 2019 23:03:18 +0200
-From: Nick Hudson <nick.hudson@gmx.co.uk>
-To: QEMU Developers <qemu-devel@nongnu.org>
-Message-ID: <fd03477a-f688-c2ab-72c6-bca9a53fa291@gmx.co.uk>
-Date: Fri, 19 Apr 2019 22:03:10 +0100
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
-	Thunderbird/60.6.1
+	(envelope-from <alistair23@gmail.com>) id 1hHaln-0006ad-4v
+	for qemu-devel@nongnu.org; Fri, 19 Apr 2019 17:10:04 -0400
+Received: from mail-lj1-x244.google.com ([2a00:1450:4864:20::244]:42289)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <alistair23@gmail.com>)
+	id 1hHalm-0006aA-Tn; Fri, 19 Apr 2019 17:10:03 -0400
+Received: by mail-lj1-x244.google.com with SMTP id v22so5559562lje.9;
+	Fri, 19 Apr 2019 14:10:02 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+	h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+	:cc:content-transfer-encoding;
+	bh=8y3JnOn2sysVarRFf8sASNkXiG0BxOMAm2gvZWbagI0=;
+	b=LZjpbA6f062KcgcjmSdk853IYlk071eXrP37ONYNMvqGCPsg00bRd9lG99WV+iyaSn
+	0fcz8TPCFrxfmYqqfW/uP18wdYgcJEGZKiFzISgrYxDqmw9JEsnWPY61mO/X4kZ3Sl5G
+	/otapp+3jI5QLPinz74i3PQXpeTwQ81WEmrsy1Smzp6bEz+MEGHg8f7iXZBhpGBpidrV
+	VyJxnrmWiCuVmH/ZXTd4Xaos8xfu24lMR1+Gor99+QnS12Qb0qZhLUgElkkHYONKoJJ8
+	fFz79ShQCp2jPt+k+eo44An5Kmo0K9yyG3TBfd9MnhiT2FBL/+TSLyyFkQQ0yut0Tne9
+	qRbQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=1e100.net; s=20161025;
+	h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+	:message-id:subject:to:cc:content-transfer-encoding;
+	bh=8y3JnOn2sysVarRFf8sASNkXiG0BxOMAm2gvZWbagI0=;
+	b=nos08m/L4A5nx9Bze+mSTzgZ8acQOd0kpavNiayy1Gryfljrz8ljDGtmjL9fwHcJHF
+	KFwYJTux2Z2PClNPfLX7n/g5iII2HsGkpk7+3vXW5fJE+uPgZKnEZhTOdZcaH87oqWXs
+	ClhhTZNfdEEI1vDW4PkfYAyXvdgooi/OQZhFshcpzyelc7cQfzZnmx69tPxM7v5n9379
+	nLrO7CjH0oIP3MoA6TcjbKZhAH6TeI1AYLPNEaon79JhF1+8UywEw0Ox7iVRUQSlF+c4
+	ImqISsZTYMAfeYLHg638IuwJm5FQxpLeISku2CSHtawR2tc/Oun+ens5vnEvEwHFK5AJ
+	L/sQ==
+X-Gm-Message-State: APjAAAXgzo72/IcVFQ8TbPI0/sRwzYSGXmWom7U/ozm547YiSmkrJ75E
+	YcRnZydhFhmO6GpOx+VmOYab6DJocmPl1bNT0I8=
+X-Google-Smtp-Source: APXvYqzNRmuU2ID0z1fzLXX+LsTLnDQu4gAOW70825ALsK/fjSfZSWhrJyuxPof2o/vyasBaJhD6/Tdb+STtE2Lg0zs=
+X-Received: by 2002:a2e:895a:: with SMTP id b26mr3259208ljk.89.1555708201361; 
+	Fri, 19 Apr 2019 14:10:01 -0700 (PDT)
 MIME-Version: 1.0
+References: <20190418180057.3593-1-thuth@redhat.com>
+	<20190418180057.3593-14-thuth@redhat.com>
+In-Reply-To: <20190418180057.3593-14-thuth@redhat.com>
+From: Alistair Francis <alistair23@gmail.com>
+Date: Fri, 19 Apr 2019 14:09:34 -0700
+Message-ID:
+ <CAKmqyKObGO3+s6QsF7TQBTxEx4DRm-GjM9gorv+tvJzC=YsTqQ@mail.gmail.com>
+To: Thomas Huth <thuth@redhat.com>
 Content-Type: text/plain; charset="UTF-8"
-Content-Language: en-GB
 Content-Transfer-Encoding: quoted-printable
-X-Provags-ID: V03:K1:dS0giBq+53b/m2UW+COMEFexmf6i4h8TN9xd5ZUL7ytkwa8eaLN
-	cnIVNrgxUokKxlR/0MGE/cygLoF8GZYLL7gYH8PSJL8ne/6kq20kL64lEMwWK/7YP38ZByL
-	jtDsV98ei4jXD2ctDOXaP+gwYi/6wquyG4z0PyKN97SnH/mcIydeAX/TjPN4y92aWYrNAun
-	+iuKFYeS++yWuzys7vReQ==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:zcKO0MYqsqA=:3i4CXbFhBsT6mD6cgwRDx5
-	THWIFo32Iyu31RbcLEmVALDffWlRGtHGThBeaz1B2KenkJxXRKsrDruJ5NM2AtHO1R2Mx/Cu/
-	Ky/nlov4WXDgrlGPNRi2Fvn0Ntct+pJPowg8fnCS0/QaFD5aVsJmYKEhqKWjDqV/hCZofvnIX
-	yW/70Xn4F40etB/qGc6HTRJ3UHj3MQB2aDp77Yr08jdyb4F+GjtbgXojoOVSzpA986mlKBcAK
-	+doOQ4AolswLBs7415ZdAuAx7PaliyHMCZLk+Nqjy8EE0jMNYNL+CjylS/R7CgLLChDZoxK/K
-	m99L3EXHwioTjNiv/0nqJ39ETH3rBVkAdEVIDyNVndbVZWrEuE7TPLZFlgEjfaoMtXMVHd/Vv
-	ErDeXTh/eARBX3WMENzt9rNfpPsrEdN4wToPEDtZn/6NdGI/eYvJwXFQUVid41Xf+X4G1jWuJ
-	X2MAxwzlsgazaqE1oL5zBd79ONo7RMsYcaXmn0aSgTteMucIic0+aQHFqFSg1D4Z7vS5mrge9
-	NA3jTzIO2LzAgbr4dPxQJIc8EGidVgpcxMe/71jqVOHZWwNbd1No2ynOnBdQYjBBqi2SyYoAQ
-	5tbefYaSw/h8bSyOdtad6xTcr9xiYrtyWGTWthjr6roFKS6LEkmhmjaGnav7UMa56wNAhPWuv
-	OFgficxn4r2+TsjXmTAbQ95u1AeUtysmoI0KHWdktVfr3dEnRkGejd0s8XujHifb3k3ZNUwLG
-	nHYY9mnw7NOUHXyCn5T+G5fRflBBfbgbZlVFMt53WdB6xwT8xWMr23b+qCcPTAK5HyLqwgS6F
-	CjHPoBzD06s8HjaUJwlMJ+Jmw1r6ntogEJfPs4q2z9LHah+eHzrhwpRPDqpAyDb3puqTjRvDp
-	fceQnia8WMC5xwIbCXafsLmuiSRkgU7aLqyex3TDPL39+xzFzAUVBgf9gITpReOU9AlO/fdLI
-	7c0P4NCYYcA==
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 212.227.15.15
-Subject: [Qemu-devel] [PATCH v1 1/2] Implement the pcxl and pcxl2 Fast TLB
- Insert, instructions as used by NetBSD (and OpenBSD)
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+	recognized.
+X-Received-From: 2a00:1450:4864:20::244
+Subject: Re: [Qemu-devel] [PATCH for-QEMU-4.1 v5 13/29] hw/arm: Express
+ dependencies of xilinx-zynq with Kconfig
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -90,109 +90,108 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Richard Henderson <rth@twiddle.net>
+Cc: Peter Maydell <peter.maydell@linaro.org>, Jan Kiszka <jan.kiszka@web.de>,
+	"Michael S. Tsirkin" <mst@redhat.com>,
+	"qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>,
+	Gerd Hoffmann <kraxel@redhat.com>,
+	"Edgar E . Iglesias" <edgar.iglesias@gmail.com>,
+	Subbaraya Sundeep <sundeep.lkml@gmail.com>,
+	Yang Zhong <yang.zhong@intel.com>, Rob Herring <robh@kernel.org>,
+	Qemu-block <qemu-block@nongnu.org>,
+	Andrey Smirnov <andrew.smirnov@gmail.com>,
+	Antony Pavlov <antonynpavlov@gmail.com>, Joel Stanley <joel@jms.id.au>,
+	Alistair Francis <alistair@alistair23.me>,
+	Beniamino Galvani <b.galvani@gmail.com>, qemu-arm <qemu-arm@nongnu.org>,
+	Peter Chubb <peter.chubb@nicta.com.au>,
+	Cedric Le Goater <clg@kaod.org>, John Snow <jsnow@redhat.com>,
+	Andrew Jeffery <andrew@aj.id.au>, Philippe Mathieu-Daude <f4bug@amsat.org>,
+	Jean-Christophe Dubois <jcd@tribudubois.net>,
+	Igor Mitsyanko <i.mitsyanko@gmail.com>, Paolo Bonzini <pbonzini@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190419210310.gmxP2zop4_e4LiH7xolStV48LhFZ8qiFotyGLoLCnfU@z>
+Message-ID: <20190419210934.t6-YiVXNlaKHXZHcPZqfCcLokfdJIWULWuiaXRPnW2g@z>
 
-Implement the pcxl and pcxl2 Fast TLB Insert instructions as used by NetBS=
-D (and OpenBSD)
+On Thu, Apr 18, 2019 at 11:18 AM Thomas Huth <thuth@redhat.com> wrote:
+>
+> Add Kconfig dependencies for the xilinx-zynq-a9 board.
+> This patch is based on earlier work by =C3=81kos Kov=C3=A1cs (i.e.
+> his "hw/arm/Kconfig: Add ARM Kconfig" patch).
+>
+> Signed-off-by: Thomas Huth <thuth@redhat.com>
 
-See
-     https://parisc.wiki.kernel.org/images-parisc/a/a9/Pcxl2_ers.pdf
-     page 13-9 (195/206)
+Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
 
-Signed-off-by: Nick Hudson <skrll@netbsd.org>
-=2D--
- target/hppa/insns.decode |  3 +++
- target/hppa/translate.c  | 54 ++++++++++++++++++++++++++++++++++++++++
- 2 files changed, 57 insertions(+)
+Alistair
 
-diff --git a/target/hppa/insns.decode b/target/hppa/insns.decode
-index 098370c2f0..f0dd71dd08 100644
-=2D-- a/target/hppa/insns.decode
-+++ b/target/hppa/insns.decode
-@@ -133,6 +133,9 @@ ixtlbx          000001 b:5 r:5 sp:2 0100000 addr:1 0 0=
-0000      data=3D1
- ixtlbx          000001 b:5 r:5 ... 000000 addr:1 0 00000        \
-                 sp=3D%assemble_sr3x data=3D0
- +# pcxl and pcxl2 Fast TLB Insert instructions
-+ixtlbxf         000001 00000 r:5 00 0 data:1 01000 addr:1 0 00000
-+
- pxtlbx          000001 b:5 x:5 sp:2 0100100 local:1 m:1 -----   data=3D1
- pxtlbx          000001 b:5 x:5 ... 000100 local:1 m:1 -----     \
-                 sp=3D%assemble_sr3x data=3D0
-diff --git a/target/hppa/translate.c b/target/hppa/translate.c
-index 43b74367ea..860a659818 100644
-=2D-- a/target/hppa/translate.c
-+++ b/target/hppa/translate.c
-@@ -2518,6 +2518,60 @@ static bool trans_pxtlbx(DisasContext *ctx, arg_pxt=
-lbx *a)
- #endif
- }
- +/* Implement the pcxl and pcxl2 Fast TLB Insert instructions.
-+ * See
-+ *     https://parisc.wiki.kernel.org/images-parisc/a/a9/Pcxl2_ers.pdf
-+ *     page 13-9 (195/206) */
-+static bool trans_ixtlbxf(DisasContext *ctx, arg_ixtlbxf *a)
-+{
-+    CHECK_MOST_PRIVILEGED(EXCP_PRIV_OPR);
-+#ifndef CONFIG_USER_ONLY
-+    TCGv_tl addr;
-+    TCGv_reg reg;
-+    TCGv_reg ar, sr;
-+    TCGv_tl atl, stl;
-+
-+    nullify_over(ctx);
-+
-+//    if (not (pcx or pcxl2))
-+//        return gen_illegal(ctx);
-+
-+    ar =3D get_temp(ctx);
-+    sr =3D get_temp(ctx);
-+    atl =3D get_temp_tl(ctx);
-+    stl =3D get_temp_tl(ctx);
-+    addr =3D get_temp_tl(ctx);
-+
-+
-+    if (a->data) {
-+        gen_helper_ixtlbxf_d(cpu_env);
-+        tcg_gen_ld_reg(sr, cpu_env, offsetof(CPUHPPAState, cr[CR_ISR]));
-+        tcg_gen_ld_reg(ar, cpu_env, offsetof(CPUHPPAState, cr[CR_IOR]));
-+    } else {
-+        gen_helper_ixtlbxf_i(cpu_env);
-+        tcg_gen_ld_reg(sr, cpu_env, offsetof(CPUHPPAState, cr[CR_IIASQ]))=
-;
-+        tcg_gen_ld_reg(ar, cpu_env, offsetof(CPUHPPAState, cr[CR_IIAOQ]))=
-;
-+    }
-+
-+    tcg_gen_extu_reg_tl(atl, ar);
-+    tcg_gen_extu_reg_tl(stl, sr);
-+    tcg_gen_shli_i64(stl, stl, 32);
-+    tcg_gen_or_tl(addr, atl, stl);
-+    reg =3D load_gpr(ctx, a->r);
-+    if (a->addr) {
-+        gen_helper_itlba(cpu_env, addr, reg);
-+    } else {
-+        gen_helper_itlbp(cpu_env, addr, reg);
-+    }
-+
-+    /* Exit TB for TLB change if mmu is enabled.  */
-+    if (ctx->tb_flags & PSW_C) {
-+        ctx->base.is_jmp =3D DISAS_IAQ_N_STALE;
-+    }
-+    return nullify_end(ctx);
-+#endif
-+}
-+
- static bool trans_lpa(DisasContext *ctx, arg_ldst *a)
- {
-     CHECK_MOST_PRIVILEGED(EXCP_PRIV_OPR);
-=2D-
-2.17.1
-
-
-
+> ---
+>  default-configs/arm-softmmu.mak |  7 +------
+>  hw/arm/Kconfig                  | 12 ++++++++++++
+>  2 files changed, 13 insertions(+), 6 deletions(-)
+>
+> diff --git a/default-configs/arm-softmmu.mak b/default-configs/arm-softmm=
+u.mak
+> index f39a854f2e..af78e7c892 100644
+> --- a/default-configs/arm-softmmu.mak
+> +++ b/default-configs/arm-softmmu.mak
+> @@ -19,6 +19,7 @@ CONFIG_STELLARIS=3Dy
+>  CONFIG_REALVIEW=3Dy
+>  CONFIG_VERSATILE=3Dy
+>  CONFIG_VEXPRESS=3Dy
+> +CONFIG_ZYNQ=3Dy
+>  CONFIG_MAINSTONE=3Dy
+>  CONFIG_GUMSTIX=3Dy
+>  CONFIG_SPITZ=3Dy
+> @@ -38,16 +39,11 @@ CONFIG_VIRTIO_MMIO=3Dy
+>
+>  CONFIG_NETDUINO2=3Dy
+>
+> -CONFIG_PL330=3Dy
+> -CONFIG_CADENCE=3Dy
+>  CONFIG_FRAMEBUFFER=3Dy
+> -CONFIG_XILINX_SPIPS=3Dy
+> -CONFIG_ZYNQ_DEVCFG=3Dy
+>
+>  CONFIG_DIGIC=3Dy
+>  CONFIG_MPS2=3Dy
+>  CONFIG_RASPI=3Dy
+> -CONFIG_ZYNQ=3Dy
+>  CONFIG_STM32F2XX_TIMER=3Dy
+>  CONFIG_STM32F2XX_USART=3Dy
+>  CONFIG_STM32F2XX_SYSCFG=3Dy
+> @@ -100,7 +96,6 @@ CONFIG_SMBUS_EEPROM=3Dy
+>  CONFIG_GPIO_KEY=3Dy
+>  CONFIG_MSF2=3Dy
+>  CONFIG_FW_CFG_DMA=3Dy
+> -CONFIG_XILINX_AXI=3Dy
+>  CONFIG_PCI_EXPRESS_DESIGNWARE=3Dy
+>
+>  CONFIG_STRONGARM=3Dy
+> diff --git a/hw/arm/Kconfig b/hw/arm/Kconfig
+> index 101de74260..785e383411 100644
+> --- a/hw/arm/Kconfig
+> +++ b/hw/arm/Kconfig
+> @@ -201,6 +201,18 @@ config VEXPRESS
+>
+>  config ZYNQ
+>      bool
+> +    select A9MPCORE
+> +    select CADENCE # UART
+> +    select PFLASH_CFI02
+> +    select PL330
+> +    select SDHCI
+> +    select SSI_M25P80
+> +    select USB_EHCI_SYSBUS
+> +    select XILINX # UART
+> +    select XILINX_AXI
+> +    select XILINX_SPI
+> +    select XILINX_SPIPS
+> +    select ZYNQ_DEVCFG
+>
+>  config ARM_V7M
+>      bool
+> --
+> 2.21.0
+>
+>
 
