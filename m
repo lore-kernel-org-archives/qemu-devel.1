@@ -7,76 +7,76 @@ X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
 	SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EFB6BC282E0
-	for <qemu-devel@archiver.kernel.org>; Fri, 19 Apr 2019 21:28:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 05FFAC282E0
+	for <qemu-devel@archiver.kernel.org>; Fri, 19 Apr 2019 21:30:16 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A725F21736
-	for <qemu-devel@archiver.kernel.org>; Fri, 19 Apr 2019 21:28:53 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id B524C21736
+	for <qemu-devel@archiver.kernel.org>; Fri, 19 Apr 2019 21:30:15 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="LpUvNhUm"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A725F21736
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Zls6RsCz"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B524C21736
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:33459 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:33469 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hHb40-0001hI-ND
-	for qemu-devel@archiver.kernel.org; Fri, 19 Apr 2019 17:28:52 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:54615)
+	id 1hHb5K-0002Kp-TO
+	for qemu-devel@archiver.kernel.org; Fri, 19 Apr 2019 17:30:14 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:54776)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alistair23@gmail.com>) id 1hHb2R-0000ba-Pm
-	for qemu-devel@nongnu.org; Fri, 19 Apr 2019 17:27:16 -0400
+	(envelope-from <alistair23@gmail.com>) id 1hHb2T-0000hW-CF
+	for qemu-devel@nongnu.org; Fri, 19 Apr 2019 17:27:18 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alistair23@gmail.com>) id 1hHaq4-0008Jt-Fj
-	for qemu-devel@nongnu.org; Fri, 19 Apr 2019 17:14:29 -0400
-Received: from mail-lj1-x241.google.com ([2a00:1450:4864:20::241]:38475)
+	(envelope-from <alistair23@gmail.com>) id 1hHap4-0007vF-P6
+	for qemu-devel@nongnu.org; Fri, 19 Apr 2019 17:13:27 -0400
+Received: from mail-lf1-x143.google.com ([2a00:1450:4864:20::143]:36821)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <alistair23@gmail.com>)
-	id 1hHaq4-0008JL-5y; Fri, 19 Apr 2019 17:14:28 -0400
-Received: by mail-lj1-x241.google.com with SMTP id p14so5587217ljg.5;
-	Fri, 19 Apr 2019 14:14:27 -0700 (PDT)
+	id 1hHap4-0007uk-HO; Fri, 19 Apr 2019 17:13:26 -0400
+Received: by mail-lf1-x143.google.com with SMTP id u17so4835259lfi.3;
+	Fri, 19 Apr 2019 14:13:26 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
 	h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-	:cc; bh=2tubYGVGC+zztlt6H1UAeONkKsPTLRYswJfNrPrC5Zc=;
-	b=LpUvNhUmOQX3fz46wwSsfI9LqQRXqt2Je5AW90smgfQ2bc20skwxySvSvMZIcD7HwX
-	p0cxPaNUzIkTGI48kxmCgRpGCMI0leEhqy84JT2floiTBO3l4dBdy9nwF6qXl8qk83mY
-	kR0ojbgsxX0RtB+hNI9+DtzmYXI/ItFiKXjYDE4p+ZgK7clTAhAMGWFbk/WCYTq5KFFd
-	emMPmQcn6GekW0FkwKo+3nrp6VpvqyeT9Rc6ajcTrNskiIhPWBYTqDtKLAiH9iPyvjfj
-	nBHdmfHdscfAc3ylt7FI0MoOQufsLodwOhAN3v7cqPdYXEdXLCYQ+EwUJKCjDk77bAC2
-	SB/Q==
+	:cc; bh=+aKxKnKb7ZcgKc8QDdoeGMCgP5CFxqd0kerv4gVEqc4=;
+	b=Zls6RsCz2fsfOm8bhOEj61sRoISMZu6Mi9Inwnr8h06LUpsT66+Hiwb2trywOKeJnT
+	J71YyF+s0KKK5hxN0rm91MU8MY8U2+lmriE3962TpXLmu930Slcdpr87dbtJ8lT470fi
+	+hl1gdyElJz0/mQifPu0zNq6+XqHHebkt+pB6A9PNZZruIpWCrTXGg/b3lE1kn++JWvG
+	65Km28mL/lHWkVV5j2SVnd4FfxeCL4vLScQfcUJi/oifgW67o1ux9hNVFB2a2bQ8BU9B
+	OYjPHKwp1sAXngpsbaq0L/6nGLUex0FLiouhtiJ1YG/iIIeqwK+wFiVY91KydGQ47glG
+	33hg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
 	d=1e100.net; s=20161025;
 	h=x-gm-message-state:mime-version:references:in-reply-to:from:date
 	:message-id:subject:to:cc;
-	bh=2tubYGVGC+zztlt6H1UAeONkKsPTLRYswJfNrPrC5Zc=;
-	b=j8z3ocq7v2AiLdF9AgQgST36p+2nf14RRYYyu6xOZipiy5P1A9vzPHgk8tZTsjogc1
-	MJ8rn2/Jt6JIbVd2xhanbcI6Dj5wR5C85DtNwHfPlNANsL1XMlvovBrFQfxpAeqPQuLE
-	I3DUfikWL2M7r/rGmcOtPsnOPYNPadEHHbrQ9V9mfbPRl2CHDJg00HDrKIlSNrPhkPXQ
-	TdvzjcfooJar+nIoJyU8H9HfH4OsV8oEiDLD9uX7fbMYwTIwj5fw/mU57mn7sh5K6flt
-	5Yb6uOzl1T9YmTbOSaL+K47XpwCOZHfrkLIwxU7qJFM3tB5Z658AB5nhTG/nlVwGJ8Jz
-	/o+Q==
-X-Gm-Message-State: APjAAAWoXdcgqoKcqIUSUmObmN+WnzrViG9ud8dTGEY9sJNyWcsmb7Vl
-	Sm4xnTSjrXUieLBoIJ7pWNf4VrtQ1qRFu8t25qM=
-X-Google-Smtp-Source: APXvYqwNNqKthg3dDQIQc8yQcPziQzkNf/21OOrqalz70x8XJqJrVbHb8kdm32CkL1C4h5b0Wzuf5sHWx0QrPutHkg4=
-X-Received: by 2002:a2e:974d:: with SMTP id f13mr3377594ljj.140.1555708466431; 
-	Fri, 19 Apr 2019 14:14:26 -0700 (PDT)
+	bh=+aKxKnKb7ZcgKc8QDdoeGMCgP5CFxqd0kerv4gVEqc4=;
+	b=YsyxIZrhueX77GPYU0/plwYQwQA4fnALxbpM0v95yqtUN70wSUz5kReaulCKRRqzF6
+	wh3s9r56C6G+GHM/ys3VXnN09ILxlIDEC1OnfEmBvz/EwFlLnYOxOfeI7A9VHKM8nqr+
+	A6Lps4SDV68YDiuzhwO1bgjYoWwAuCnrBopAsvPoFwMhVBi9uxChKZIPoLHbCtUBhFfJ
+	Xe42y5iTnP1BeKFlH7Gl0nEiCcelScefTSlO9U5DbIcmgipWfbZEab2+h/TSWTOuPvqw
+	Ma0glwQmRs4YnMRStPz5R58Y+YGavzj7foPtdEat4vLHvnKKNG/XgWAv3+pK0tSWnmOB
+	9gLw==
+X-Gm-Message-State: APjAAAVMg+Kq+ikILF0hmxlfEYtHQYa244vgK8+pqUEKSqXasPtlPVpP
+	EHNbIUWL/G7RCsc9sIBjbr1zQ9aDbz5vxgz5e25vRb/R9w8=
+X-Google-Smtp-Source: APXvYqyF5D7NmA3QKtltRLXkBru7aEZto0h8lh+ZipqI50Y0ZyLbIDWCqPMO0xPUOUEFHsj+Xz/s/mG4pum/BhUl0oY=
+X-Received: by 2002:a19:4b84:: with SMTP id y126mr3258572lfa.15.1555708405250; 
+	Fri, 19 Apr 2019 14:13:25 -0700 (PDT)
 MIME-Version: 1.0
 References: <20190418180057.3593-1-thuth@redhat.com>
-	<20190418180057.3593-26-thuth@redhat.com>
-In-Reply-To: <20190418180057.3593-26-thuth@redhat.com>
+	<20190418180057.3593-21-thuth@redhat.com>
+In-Reply-To: <20190418180057.3593-21-thuth@redhat.com>
 From: Alistair Francis <alistair23@gmail.com>
-Date: Fri, 19 Apr 2019 14:13:59 -0700
+Date: Fri, 19 Apr 2019 14:12:58 -0700
 Message-ID:
- <CAKmqyKM4ZtUmT6U-9Nv=S_3KMVnPzogOkNPrtyqvKz=b+u1AYQ@mail.gmail.com>
+ <CAKmqyKMk-346_m5=9Tbk7e_WFHkMe5EdiBX2efGASoQcsWBpTw@mail.gmail.com>
 To: Thomas Huth <thuth@redhat.com>
 Content-Type: text/plain; charset="UTF-8"
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
 	recognized.
-X-Received-From: 2a00:1450:4864:20::241
-Subject: Re: [Qemu-devel] [PATCH for-QEMU-4.1 v5 25/29] hw/arm: Express
- dependencies of the microbit / nrf51 machine with Kconfig
+X-Received-From: 2a00:1450:4864:20::143
+Subject: Re: [Qemu-devel] [PATCH for-QEMU-4.1 v5 20/29] hw/arm: Express
+ dependencies of the raspi machines with Kconfig
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -108,11 +108,12 @@ Cc: Peter Maydell <peter.maydell@linaro.org>, Jan Kiszka <jan.kiszka@web.de>,
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190419211359.exeHUyBfQCjdBYLHQk5kYBwN3TXpSfkM9ADxl8e4IHo@z>
+Message-ID: <20190419211258.wPvtOFmlKiyp01wy1PE8sRSFCEEBscTHvf0RSaYGiXo@z>
 
-On Thu, Apr 18, 2019 at 11:23 AM Thomas Huth <thuth@redhat.com> wrote:
+On Thu, Apr 18, 2019 at 11:25 AM Thomas Huth <thuth@redhat.com> wrote:
 >
-> Add Kconfig dependencies for the NRF51 / microbit machine.
+> Most of the code is directly controlled by the CONFIG_RASPI switch,
+> so not much to add here additionally.
 >
 > Signed-off-by: Thomas Huth <thuth@redhat.com>
 
@@ -121,65 +122,45 @@ Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
 Alistair
 
 > ---
->  default-configs/arm-softmmu.mak | 3 +--
->  hw/arm/Kconfig                  | 6 ++++++
->  hw/arm/Makefile.objs            | 3 ++-
->  3 files changed, 9 insertions(+), 3 deletions(-)
+>  default-configs/arm-softmmu.mak | 4 +---
+>  hw/arm/Kconfig                  | 3 +++
+>  2 files changed, 4 insertions(+), 3 deletions(-)
 >
 > diff --git a/default-configs/arm-softmmu.mak b/default-configs/arm-softmmu.mak
-> index 6dc388c43e..233937f394 100644
+> index 31d31d3f4a..22bff20b32 100644
 > --- a/default-configs/arm-softmmu.mak
 > +++ b/default-configs/arm-softmmu.mak
-> @@ -35,11 +35,10 @@ CONFIG_RASPI=y
->  CONFIG_DIGIC=y
->  CONFIG_SABRELITE=y
->  CONFIG_EMCRAFT_SF2=y
-> +CONFIG_MICROBIT=y
+> @@ -31,15 +31,13 @@ CONFIG_COLLIE=y
+>  CONFIG_ASPEED_SOC=y
+>  CONFIG_NETDUINO2=y
+>  CONFIG_MPS2=y
+> +CONFIG_RASPI=y
 >
 >  CONFIG_VGA=y
+>  CONFIG_SSI_M25P80=y
+>  CONFIG_IMX_FEC=y
 >
-> -CONFIG_NRF51_SOC=y
+> -CONFIG_FRAMEBUFFER=y
 > -
->  CONFIG_FSL_IMX25=y
->  CONFIG_FSL_IMX7=y
->  CONFIG_FSL_IMX6UL=y
+>  CONFIG_DIGIC=y
+> -CONFIG_RASPI=y
+>  CONFIG_NRF51_SOC=y
+>
+>  CONFIG_FSL_IMX6=y
 > diff --git a/hw/arm/Kconfig b/hw/arm/Kconfig
-> index 58439c492a..708eae19e5 100644
+> index 466b143fdf..e68a29ca2b 100644
 > --- a/hw/arm/Kconfig
 > +++ b/hw/arm/Kconfig
-> @@ -347,8 +347,14 @@ config FSL_IMX6UL
->      select IMX_I2C
->      select SDHCI
+> @@ -257,6 +257,9 @@ config ALLWINNER_A10
 >
-> +config MICROBIT
-> +    bool
-> +    select NRF51_SOC
-> +
->  config NRF51_SOC
+>  config RASPI
 >      bool
-> +    select I2C
-> +    select ARM_V7M
+> +    select FRAMEBUFFER
+> +    select PL011 # UART
+> +    select SDHCI
 >
->  config EMCRAFT_SF2
+>  config STM32F205_SOC
 >      bool
-> diff --git a/hw/arm/Makefile.objs b/hw/arm/Makefile.objs
-> index eae9f6c442..994e67dd0d 100644
-> --- a/hw/arm/Makefile.objs
-> +++ b/hw/arm/Makefile.objs
-> @@ -8,6 +8,7 @@ obj-$(CONFIG_EMCRAFT_SF2) += msf2-som.o
->  obj-$(CONFIG_HIGHBANK) += highbank.o
->  obj-$(CONFIG_INTEGRATOR) += integratorcp.o
->  obj-$(CONFIG_MAINSTONE) += mainstone.o
-> +obj-$(CONFIG_MICROBIT) += microbit.o
->  obj-$(CONFIG_MUSICPAL) += musicpal.o
->  obj-$(CONFIG_NETDUINO2) += netduino2.o
->  obj-$(CONFIG_NSERIES) += nseries.o
-> @@ -48,4 +49,4 @@ obj-$(CONFIG_ARMSSE) += armsse.o
->  obj-$(CONFIG_FSL_IMX7) += fsl-imx7.o mcimx7d-sabre.o
->  obj-$(CONFIG_ARM_SMMUV3) += smmu-common.o smmuv3.o
->  obj-$(CONFIG_FSL_IMX6UL) += fsl-imx6ul.o mcimx6ul-evk.o
-> -obj-$(CONFIG_NRF51_SOC) += nrf51_soc.o microbit.o
-> +obj-$(CONFIG_NRF51_SOC) += nrf51_soc.o
 > --
 > 2.21.0
 >
