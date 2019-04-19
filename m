@@ -1,26 +1,24 @@
 Received: from eggs.gnu.org ([209.51.188.92]:59535)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <hare@suse.de>) id 1hHRV6-0004pn-CG
-	for qemu-devel@nongnu.org; Fri, 19 Apr 2019 07:16:13 -0400
+	(envelope-from <vsementsov@virtuozzo.com>) id 1hHRV7-0004pn-K5
+	for qemu-devel@nongnu.org; Fri, 19 Apr 2019 07:16:16 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <hare@suse.de>) id 1hHRV5-0003w3-5K
-	for qemu-devel@nongnu.org; Fri, 19 Apr 2019 07:16:12 -0400
-Received: from mx2.suse.de ([195.135.220.15]:55398 helo=mx1.suse.de)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <hare@suse.de>) id 1hHRV4-0003ux-Sz
-	for qemu-devel@nongnu.org; Fri, 19 Apr 2019 07:16:11 -0400
-References: <20190411110157.14252-1-yuval.shaia@oracle.com>
-	<20190411190215.2163572e.cohuck@redhat.com>
-	<20190415103546.GA6854@lap1>
-From: Hannes Reinecke <hare@suse.de>
-Message-ID: <e73e03c2-ea2b-6ffc-cd23-e8e44d42ce80@suse.de>
-Date: Fri, 19 Apr 2019 13:16:06 +0200
-MIME-Version: 1.0
-In-Reply-To: <20190415103546.GA6854@lap1>
-Content-Type: text/plain; charset=utf-8; format=flowed
+	(envelope-from <vsementsov@virtuozzo.com>) id 1hHRTw-0003Ht-4v
+	for qemu-devel@nongnu.org; Fri, 19 Apr 2019 07:15:01 -0400
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Date: Fri, 19 Apr 2019 11:14:54 +0000
+Message-ID: <a99918ba-d077-90d3-ee6d-fd5c95090b63@virtuozzo.com>
+References: <20190417100929.39943-1-vsementsov@virtuozzo.com>
+	<20190417100929.39943-2-vsementsov@virtuozzo.com>
+	<dd1f30c4-e6ab-6481-ae34-412fa8533a5f@redhat.com>
+In-Reply-To: <dd1f30c4-e6ab-6481-ae34-412fa8533a5f@redhat.com>
 Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [RFC 0/3] VirtIO RDMA
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <04A5FFE82F20464688018A4C36C65EBE@eurprd08.prod.outlook.com>
+Content-Transfer-Encoding: base64
+MIME-Version: 1.0
+Subject: Re: [Qemu-devel] [PATCH 1/2] block/io: bdrv_pdiscard: support
+ int64_t bytes parameter
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,110 +27,71 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Yuval Shaia <yuval.shaia@oracle.com>, Cornelia Huck <cohuck@redhat.com>
-Cc: mst@redhat.com, linux-rdma@vger.kernel.org, qemu-devel@nongnu.org, virtualization@lists.linux-foundation.org, jgg@mellanox.com
+To: Eric Blake <eblake@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>
+Cc: "kwolf@redhat.com" <kwolf@redhat.com>, "fam@euphon.net" <fam@euphon.net>, Denis Lunev <den@virtuozzo.com>, "mreitz@redhat.com" <mreitz@redhat.com>, "stefanha@redhat.com" <stefanha@redhat.com>
 
-On 4/15/19 12:35 PM, Yuval Shaia wrote:
-> On Thu, Apr 11, 2019 at 07:02:15PM +0200, Cornelia Huck wrote:
->> On Thu, 11 Apr 2019 14:01:54 +0300
->> Yuval Shaia <yuval.shaia@oracle.com> wrote:
->>
->>> Data center backends use more and more RDMA or RoCE devices and more =
-and
->>> more software runs in virtualized environment.
->>> There is a need for a standard to enable RDMA/RoCE on Virtual Machine=
-s.
->>>
->>> Virtio is the optimal solution since is the de-facto para-virtualizat=
-on
->>> technology and also because the Virtio specification
->>> allows Hardware Vendors to support Virtio protocol natively in order =
-to
->>> achieve bare metal performance.
->>>
->>> This RFC is an effort to addresses challenges in defining the RDMA/Ro=
-CE
->>> Virtio Specification and a look forward on possible implementation
->>> techniques.
->>>
->>> Open issues/Todo list:
->>> List is huge, this is only start point of the project.
->>> Anyway, here is one example of item in the list:
->>> - Multi VirtQ: Every QP has two rings and every CQ has one. This mean=
-s that
->>>    in order to support for example 32K QPs we will need 64K VirtQ. No=
-t sure
->>>    that this is reasonable so one option is to have one for all and
->>>    multiplex the traffic on it. This is not good approach as by desig=
-n it
->>>    introducing an optional starvation. Another approach would be mult=
-i
->>>    queues and round-robin (for example) between them.
->>>
-Typically there will be a one-to-one mapping between QPs and CPUs (on=20
-the guest). So while one would need to be prepared to support quite some=20
-QPs, the expectation is that the actual number of QPs used will be=20
-rather low.
-In a similar vein, multiplexing QPs would be defeating the purpose, as=20
-the overall idea was to have _independent_ QPs to enhance parallelism.
-
->>> Expectations from this posting:
->>> In general, any comment is welcome, starting from hey, drop this as i=
-t is a
->>> very bad idea, to yeah, go ahead, we really want it.
->>> Idea here is that since it is not a minor effort i first want to know=
- if
->>> there is some sort interest in the community for such device.
->>
->> My first reaction is: Sounds sensible, but it would be good to have a
->> spec for this :)
->>
->> You'll need a spec if you want this to go forward anyway, so at least =
-a
->> sketch would be good to answer questions such as how many virtqueues
->> you use for which purpose, what is actually put on the virtqueues,
->> whether there are negotiable features, and what the expectations for
->> the device and the driver are. It also makes it easier to understand
->> how this is supposed to work in practice.
->>
->> If folks agree that this sounds useful, the next step would be to
->> reserve an id for the device type.
->=20
-> Thanks for the tips, will sure do that, it is that first i wanted to ma=
-ke
-> sure there is a use case here.
->=20
-> Waiting for any feedback from the community.
->=20
-I really do like the ides; in fact, it saved me from coding a similar=20
-thing myself :-)
-
-However, I'm still curious about the overall intent of this driver.=20
-Where would the I/O be routed _to_ ?
-It's nice that we have a virtualized driver, but this driver is
-intended to do I/O (even if it doesn't _do_ any I/O ATM :-)
-And this I/O needs to be send to (and possibly received from)
-something.
-
-So what exactly is this something?
-An existing piece of HW on the host?
-If so, wouldn't it be more efficient to use vfio, either by using SR-IOV=20
-or by using virtio-mdev?
-
-Another guest?
-If so, how would we route the I/O from one guest to the other?
-Shared memory? Implementing a full-blown RDMA switch in qemu?
-
-Oh, and I would _love_ to have a discussion about this at KVM Forum.
-Maybe I'll manage to whip up guest-to-guest RDMA connection using=20
-ivshmem ... let's see.
-
-Cheers,
-
-Hannes
---=20
-Dr. Hannes Reinecke            Teamlead Storage & Networking
-hare@suse.de                              +49 911 74053 688
-SUSE LINUX GmbH, Maxfeldstr. 5, 90409 N=C3=BCrnberg
-GF: Felix Imend=C3=B6rffer, Mary Higgins, Sri Rasiah
-HRB 21284 (AG N=C3=BCrnberg)
+MTcuMDQuMjAxOSAxNzo0OCwgRXJpYyBCbGFrZSB3cm90ZToNCj4gT24gNC8xNy8xOSA1OjA5IEFN
+LCBWbGFkaW1pciBTZW1lbnRzb3YtT2dpZXZza2l5IHdyb3RlOg0KPj4gVGhpcyBmaXhlcyBhdCBs
+ZWFzdCBvbmUgb3ZlcmZsb3cgaW4gcWNvdzJfcHJvY2Vzc19kaXNjYXJkcy4NCj4gDQo+IEl0J3Mg
+d29ydGggY2FsbGluZyBvdXQgaG93IGxvbmcgdGhlIHByb2JsZW0gb2YgcGFzc2luZyA+MkcgZGlz
+Y2FyZA0KPiByZXF1ZXN0cyBoYXMgYmVlbiBwcmVzZW50IChteSByZXBseSB0byB0aGUgY292ZXIg
+bGV0dGVyIHRyYWNrZWQgZG93bg0KPiAwYjkxOWZhZSBhcyB0cmFja2luZyBhIDY0LWJpdCBkaXNj
+YXJkIHJlZ2lvbiBidXQgcGFzc2luZyBpdCB0bw0KPiBiZHJ2X2Rpc2NhcmQoKSB3aGljaCB0b29r
+IGFuIGludCBzZWN0b3JzOyBJJ20gbm90IHN1cmUgaWYgbGF0ZXIgY2hhbmdlcw0KPiB0byBieXRl
+LWJhc2VkIHJhdGhlciB0aGFuIHNlY3Rvci1iYXNlZCBtYWRlIGEgZGlmZmVyZW5jZSkuDQo+IA0K
+PiANCj4+IEBAIC0yNjY0LDE0ICsyNjY0LDE1IEBAIHN0YXRpYyB2b2lkIGNvcm91dGluZV9mbiBi
+ZHJ2X3BkaXNjYXJkX2NvX2VudHJ5KHZvaWQgKm9wYXF1ZSkNCj4+ICAgICAgIGFpb193YWl0X2tp
+Y2soKTsNCj4+ICAgfQ0KPj4gICANCj4+IC1pbnQgY29yb3V0aW5lX2ZuIGJkcnZfY29fcGRpc2Nh
+cmQoQmRydkNoaWxkICpjaGlsZCwgaW50NjRfdCBvZmZzZXQsIGludCBieXRlcykNCj4+ICtpbnQg
+Y29yb3V0aW5lX2ZuIGJkcnZfY29fcGRpc2NhcmQoQmRydkNoaWxkICpjaGlsZCwgaW50NjRfdCBv
+ZmZzZXQsDQo+PiArICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIGludDY0X3QgYnl0
+ZXMpDQo+PiAgIHsNCj4+ICAgICAgIEJkcnZUcmFja2VkUmVxdWVzdCByZXE7DQo+PiAgICAgICBp
+bnQgbWF4X3BkaXNjYXJkLCByZXQ7DQo+PiAgICAgICBpbnQgaGVhZCwgdGFpbCwgYWxpZ247DQo+
+PiAgICAgICBCbG9ja0RyaXZlclN0YXRlICpicyA9IGNoaWxkLT5iczsNCj4+ICAgDQo+PiAtICAg
+IGlmICghYnMgfHwgIWJzLT5kcnYpIHsNCj4+ICsgICAgaWYgKCFicyB8fCAhYnMtPmRydiB8fCAh
+YmRydl9pc19pbnNlcnRlZChicykpIHsNCj4gDQo+IFRoaXMgY2hhbmdlIHNlZW1zIHVucmVsYXRl
+ZD8gT2gsIGl0J3MgYmVjYXVzZSB5b3UgYXJlIGlubGluaW5nIHRoZSByZXN0DQo+IG9mIHdoYXQg
+YmRydl9jaGVja19ieXRlX3JlcXVlc3QgdXNlZCB0byBkby4NCj4gDQo+PiAgICAgICAgICAgcmV0
+dXJuIC1FTk9NRURJVU07DQo+PiAgICAgICB9DQo+PiAgIA0KPj4gQEAgLTI2NzksOSArMjY4MCw4
+IEBAIGludCBjb3JvdXRpbmVfZm4gYmRydl9jb19wZGlzY2FyZChCZHJ2Q2hpbGQgKmNoaWxkLCBp
+bnQ2NF90IG9mZnNldCwgaW50IGJ5dGVzKQ0KPj4gICAgICAgICAgIHJldHVybiAtRVBFUk07DQo+
+PiAgICAgICB9DQo+PiAgIA0KPj4gLSAgICByZXQgPSBiZHJ2X2NoZWNrX2J5dGVfcmVxdWVzdChi
+cywgb2Zmc2V0LCBieXRlcyk7DQo+PiAtICAgIGlmIChyZXQgPCAwKSB7DQo+PiAtICAgICAgICBy
+ZXR1cm4gcmV0Ow0KPiANCj4gSWYgd2Uga2VlcCB0aGlzIGNhbGwgaW4gcGxhY2UsIHdlIGNhbiBm
+bGFnIGlmIHRoZXJlIHdlcmUgYW55IG90aGVyDQo+IGNhbGxlcnMgdGhhdCB3ZXJlIHBhc3Npbmcg
+dHJ1bmNhdGVkIDY0LWJpdCBxdWFudGl0aWVzLiBCdXQgSSBhbHNvIGFncmVlDQo+IHRoYXQgbm93
+IHRoYXQgd2UgYXJlIHN3aXRjaGluZyB0byBhIDY0LWJpdCBpbnRlcmZhY2UsIHdlIG5vIGxvbmdl
+ciBoYXZlDQo+IHRvIGNoZWNrIHdoZXRoZXIgY2FsbGVycyB3ZXJlIHByb3Blcmx5IGxpbWl0aW5n
+IHRoZWlyIHJlcXVlc3RzLg0KPiANCj4gSG1tIC0gSSBqdXN0IHJlYWxpemVkIHRoYXQgYmRydl9j
+aGVja19ieXRlX3JlcXVlc3QoKSB0YWtlcyBhIHNpemVfdA0KPiAocmF0aGVyIHRoYW4gaW50NjRf
+dCkgc2l6ZSBhcmd1bWVudCAtIGNvdWxkIHRoaXMgcmVzdWx0IGluIGFueSBvdGhlcg0KPiB0cnVu
+Y2F0aW9ucyBvbiBhIDMyLWJpdCBwbGF0Zm9ybSB0aGF0IGRvbid0IGFmZmVjdCA2NC1iaXQgcGxh
+dGZvcm1zPw0KPiANCj4+IEBAIC0yNzExLDEyICsyNzExLDEzIEBAIGludCBjb3JvdXRpbmVfZm4g
+YmRydl9jb19wZGlzY2FyZChCZHJ2Q2hpbGQgKmNoaWxkLCBpbnQ2NF90IG9mZnNldCwgaW50IGJ5
+dGVzKQ0KPj4gICAgICAgICAgIGdvdG8gb3V0Ow0KPj4gICAgICAgfQ0KPj4gICANCj4+IC0gICAg
+bWF4X3BkaXNjYXJkID0gUUVNVV9BTElHTl9ET1dOKE1JTl9OT05fWkVSTyhicy0+YmwubWF4X3Bk
+aXNjYXJkLCBJTlRfTUFYKSwNCj4+ICsgICAgbWF4X3BkaXNjYXJkID0gUUVNVV9BTElHTl9ET1dO
+KE1JTl9OT05fWkVSTyhicy0+YmwubWF4X3BkaXNjYXJkLA0KPj4gKyAgICAgICAgICAgICAgICAg
+ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIEJEUlZfUkVRVUVTVF9NQVhfQllURVMpLA0K
+Pj4gICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIGFsaWduKTsNCj4gDQo+IFRo
+aXMgY2hhbmdlIGlzIGEgbm8tb3AsIHNpbmNlIEJEUlZfUkVRVUVTVF9NQVhfQllURVMgaXMgYWxy
+ZWFkeSBJTlRfTUFYDQo+IGFsaWduZWQgZG93biB0byBzZWN0b3Igc2l6ZSwgYW5kIGFsaWduIGlz
+IGF0IGxlYXN0IHNlY3RvciBzaXplLg0KDQpJdCdzIGEgcGFydCBvZiBpbmxpbmluZyBiZHJ2X2No
+ZWNrX2J5dGVfcmVxdWVzdCB0b28uDQpJdCdzIE1JTihTSVpFX01BWCwgSU5UX01BWCkuLiBpcyBp
+dCBwb3NzaWJsZSBmb3Igc2l6ZSB0byBsZXNzIHRoYW4gaW50PyBzZWVtcyBub3QNCg0KPiANCj4+
+ICAgICAgIGFzc2VydChtYXhfcGRpc2NhcmQgPj0gYnMtPmJsLnJlcXVlc3RfYWxpZ25tZW50KTsN
+Cj4+ICAgDQo+PiAgICAgICB3aGlsZSAoYnl0ZXMgPiAwKSB7DQo+PiAtICAgICAgICBpbnQgbnVt
+ID0gYnl0ZXM7DQo+PiArICAgICAgICBpbnQ2NF90IG51bSA9IGJ5dGVzOw0KPj4gICANCj4+ICAg
+ICAgICAgICBpZiAoaGVhZCkgew0KPj4gICAgICAgICAgICAgICAvKiBNYWtlIHNtYWxsIHJlcXVl
+c3RzIHRvIGdldCB0byBhbGlnbm1lbnQgYm91bmRhcmllcy4gKi8NCj4+IEBAIC0yNzc4LDcgKzI3
+NzksNyBAQCBvdXQ6DQo+PiAgICAgICByZXR1cm4gcmV0Ow0KPj4gICB9DQo+PiAgIA0KPj4gLWlu
+dCBiZHJ2X3BkaXNjYXJkKEJkcnZDaGlsZCAqY2hpbGQsIGludDY0X3Qgb2Zmc2V0LCBpbnQgYnl0
+ZXMpDQo+PiAraW50IGJkcnZfcGRpc2NhcmQoQmRydkNoaWxkICpjaGlsZCwgaW50NjRfdCBvZmZz
+ZXQsIGludDY0X3QgYnl0ZXMpDQo+PiAgIHsNCj4+ICAgICAgIENvcm91dGluZSAqY287DQo+PiAg
+ICAgICBEaXNjYXJkQ28gcndjbyA9IHsNCj4+DQo+IA0KPiBJJ20gbm90IHN1cmUgdGhlIHBhdGNo
+IGlzIHBlcmZlY3QsIGJ1dCBJIGRlZmluaXRlbHkgYWdyZWUgdGhhdCB3ZSB3YW50DQo+IHRvIHN1
+cHBvcnQgNjQtYnl0ZSBkaXNjYXJkIGxlbmd0aCAod2hlcmUgdGhlIGJsb2NrIGxheWVyIGZyYWdt
+ZW50cyB0aGUNCj4gcmVxdWVzdCBhcyBuZWVkZWQpIHJhdGhlciB0aGFuIHRoZSBjdXJyZW50IDMy
+LWJ5dGUgZGlzY2FyZCBsZW5ndGggKHdoZXJlDQo+IGNhbGxlcnMgaGF2ZSB0byBiZSBjYXJlZnVs
+IHRvIG5vdCBzdWZmZXIgZnJvbSB0cnVuY2F0aW9uKS4NCj4gDQoNCg0KLS0gDQpCZXN0IHJlZ2Fy
+ZHMsDQpWbGFkaW1pcg0K
