@@ -2,48 +2,47 @@ Return-Path: <SRS0=rbQy=SV=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 56AD0C282DA
-	for <qemu-devel@archiver.kernel.org>; Fri, 19 Apr 2019 07:06:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 96B01C282DA
+	for <qemu-devel@archiver.kernel.org>; Fri, 19 Apr 2019 07:11:37 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 29F85217FA
-	for <qemu-devel@archiver.kernel.org>; Fri, 19 Apr 2019 07:06:59 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 29F85217FA
+	by mail.kernel.org (Postfix) with ESMTPS id 633C320869
+	for <qemu-devel@archiver.kernel.org>; Fri, 19 Apr 2019 07:11:37 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 633C320869
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:52501 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:52547 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hHNbu-0005PV-BR
-	for qemu-devel@archiver.kernel.org; Fri, 19 Apr 2019 03:06:58 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:45439)
+	id 1hHNgO-0006JV-Hq
+	for qemu-devel@archiver.kernel.org; Fri, 19 Apr 2019 03:11:36 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:46762)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1hHNb4-00051n-Ma
-	for qemu-devel@nongnu.org; Fri, 19 Apr 2019 03:06:07 -0400
+	(envelope-from <thuth@redhat.com>) id 1hHNff-00062e-Ff
+	for qemu-devel@nongnu.org; Fri, 19 Apr 2019 03:10:52 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1hHNb3-00081A-PE
-	for qemu-devel@nongnu.org; Fri, 19 Apr 2019 03:06:06 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:44160)
+	(envelope-from <thuth@redhat.com>) id 1hHNfe-0001ho-Gd
+	for qemu-devel@nongnu.org; Fri, 19 Apr 2019 03:10:51 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:55500)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <thuth@redhat.com>)
-	id 1hHNb1-0007zv-GB; Fri, 19 Apr 2019 03:06:03 -0400
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
-	[10.5.11.11])
+	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1hHNfe-0001hQ-7Z
+	for qemu-devel@nongnu.org; Fri, 19 Apr 2019 03:10:50 -0400
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+	[10.5.11.14])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 9289D300744E;
-	Fri, 19 Apr 2019 07:06:02 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id 333EF368E6;
+	Fri, 19 Apr 2019 07:10:49 +0000 (UTC)
 Received: from thuth.remote.csb (ovpn-116-62.ams2.redhat.com [10.36.116.62])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id 552A8600C1;
-	Fri, 19 Apr 2019 07:05:55 +0000 (UTC)
-To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
-	qemu-devel@nongnu.org, Gerd Hoffmann <kraxel@redhat.com>
-References: <20190418111019.4080-1-thuth@redhat.com>
-	<6bd7dd96-cd2c-22aa-5533-ae341f942a5c@redhat.com>
+	by smtp.corp.redhat.com (Postfix) with ESMTP id CD4F15D9C5;
+	Fri, 19 Apr 2019 07:10:47 +0000 (UTC)
+To: John Arbuckle <programmingkidx@gmail.com>, qemu-devel@nongnu.org
+References: <20190418224706.14014-1-programmingkidx@gmail.com>
 From: Thomas Huth <thuth@redhat.com>
 Openpgp: preference=signencrypt
 Autocrypt: addr=thuth@redhat.com; keydata=
@@ -89,23 +88,23 @@ Autocrypt: addr=thuth@redhat.com; keydata=
 	rCELuGwT9hsYkUPjVd4lfylN3mzEc6iAv/wwjsc0DRTSQCpXT3v2ymTAsRKrVaEZLibTXaf+
 	WslxWek3xNYRiqwwWAJuL652eAlxUgQ5ZS+fXBRTiQpJ+F26I/2lccScRd9G5w==
 Organization: Red Hat
-Message-ID: <0294bc60-d221-653b-ed28-c8392a767e41@redhat.com>
-Date: Fri, 19 Apr 2019 09:05:54 +0200
+Message-ID: <723372ae-a37a-d7cd-098f-452c7513ce8a@redhat.com>
+Date: Fri, 19 Apr 2019 09:10:46 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
 	Thunderbird/60.6.1
 MIME-Version: 1.0
-In-Reply-To: <6bd7dd96-cd2c-22aa-5533-ae341f942a5c@redhat.com>
+In-Reply-To: <20190418224706.14014-1-programmingkidx@gmail.com>
 Content-Type: text/plain; charset="UTF-8"
 Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.43]);
-	Fri, 19 Apr 2019 07:06:02 +0000 (UTC)
-Content-Transfer-Encoding: quoted-printable
+	(mx1.redhat.com [10.5.110.30]);
+	Fri, 19 Apr 2019 07:10:49 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH for-4.1] hw/usb/hcd-ohci: Move PCI-related
- code into a separate file
+Subject: Re: [Qemu-devel] [PATCH] configure: Change capstone's default state
+ to disabled
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -117,38 +116,42 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Yang Zhong <yang.zhong@intel.com>, Paolo Bonzini <pbonzini@redhat.com>,
-	qemu-arm@nongnu.org
+Cc: peter.maydell@linaro.org, Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190419070554.taNomY3MHbXyNq8KYkeiGnf7gaaGAPRxOmnIJGB-lfk@z>
+Message-ID: <20190419071046.mt45czO2ROUf2ENRArftZdLBtWbfEte7oTnpyniSnAg@z>
 
-On 18/04/2019 14.35, Philippe Mathieu-Daud=C3=A9 wrote:
-> Hi Thomas,
->=20
-> On 4/18/19 1:10 PM, Thomas Huth wrote:
->> Some machines (like the pxa2xx-based ARM machines) only have a sysbus
->> OHCI controller, but no PCI. With the new Kconfig-style build system,
->> it will soon be possible to create QEMU binaries that only contain
->> such PCI-less machines. However, the two OHCI controllers, for sysbus
->> and for PCI, are currently both located in one file, so the PCI code
->> is still required for linking here. Move the OHCI-PCI device code
->> into a separate file, so that it is possible to use the sysbus OHCI
->> device also without the PCI dependency.
->>
->> Apart from moving code to a new file (and a new header), this patch
->> might also fix one subtle bug: The ohci_die() function always assumed
->> to be running with a OHCI-PCI controller and called some PCI-specific
->> functions - but if I got the code right, ohci_die() might also get
->> called for the sysbus-OHCI device, so it likely failed in that case.
->> I've changed this part of the code now, so that there are two ohci_die=
-()
->> implementations now, one for sysbus and one for PCI.
->=20
-> Can this be done in 2 patches?
+On 19/04/2019 00.47, John Arbuckle wrote:
+> Capstone is not necessary in order to use QEMU. Disable it by default.
+> This will save the user the pain of having to figure why QEMU isn't
+> building when this library is missing.
+> 
+> Signed-off-by: John Arbuckle <programmingkidx@gmail.com>
+> ---
+>  configure | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+> diff --git a/configure b/configure
+> index 1c563a7027..77d7967f92 100755
+> --- a/configure
+> +++ b/configure
+> @@ -433,7 +433,7 @@ opengl_dmabuf="no"
+>  cpuid_h="no"
+>  avx2_opt=""
+>  zlib="yes"
+> -capstone=""
+> +capstone="no"
+>  lzo=""
+>  snappy=""
+>  bzip2=""
 
-Yeah, maybe that's cleaner... I'll send a v2...
+AFAIK we ship capstone as a submodule, so how can this be missing? Also,
+our philosophy is to keep everything enabled by default if possible, so
+that the code paths don't bitrot. Thus I don't think that disabling this
+by default is a good idea. ... so if you've got a problem here, there
+must be another solution (e.g. is the system capstone detection not
+working right on your system?).
 
  Thomas
 
