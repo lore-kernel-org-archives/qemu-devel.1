@@ -2,81 +2,89 @@ Return-Path: <SRS0=rbQy=SV=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.0 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 275A9C282E0
-	for <qemu-devel@archiver.kernel.org>; Fri, 19 Apr 2019 21:31:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AA35BC282E0
+	for <qemu-devel@archiver.kernel.org>; Fri, 19 Apr 2019 23:05:48 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D73D421736
-	for <qemu-devel@archiver.kernel.org>; Fri, 19 Apr 2019 21:31:44 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 6885721736
+	for <qemu-devel@archiver.kernel.org>; Fri, 19 Apr 2019 23:05:48 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="eroCTibE"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D73D421736
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="j0WvHOAI"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6885721736
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:33511 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:34211 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hHb6m-0003BV-5k
-	for qemu-devel@archiver.kernel.org; Fri, 19 Apr 2019 17:31:44 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:54615)
+	id 1hHcZn-0006Af-MY
+	for qemu-devel@archiver.kernel.org; Fri, 19 Apr 2019 19:05:47 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:43019)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alistair23@gmail.com>) id 1hHb2U-0000ba-25
-	for qemu-devel@nongnu.org; Fri, 19 Apr 2019 17:27:19 -0400
+	(envelope-from <alex.bennee@linaro.org>) id 1hHcYu-0005mp-T2
+	for qemu-devel@nongnu.org; Fri, 19 Apr 2019 19:04:53 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alistair23@gmail.com>) id 1hHaoR-0007gV-Dk
-	for qemu-devel@nongnu.org; Fri, 19 Apr 2019 17:12:48 -0400
-Received: from mail-lj1-x244.google.com ([2a00:1450:4864:20::244]:38470)
+	(envelope-from <alex.bennee@linaro.org>) id 1hHcYt-0005Ec-Oj
+	for qemu-devel@nongnu.org; Fri, 19 Apr 2019 19:04:52 -0400
+Received: from mail-wm1-x344.google.com ([2a00:1450:4864:20::344]:56153)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <alistair23@gmail.com>)
-	id 1hHaoR-0007gF-58; Fri, 19 Apr 2019 17:12:47 -0400
-Received: by mail-lj1-x244.google.com with SMTP id p14so5585175ljg.5;
-	Fri, 19 Apr 2019 14:12:47 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
-	h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-	:cc; bh=eb5DEXGoCSsZ7cnYJcHMgq+7a4adPduEpTVlJLKF0ZE=;
-	b=eroCTibEcr5RzSXC6xFT6ttJsSa+N3NwR4MAMpnr80ZvOlHt+KWSsqxwpFNe2tl6M3
-	JY0L41odnroutgDJ8uADcD6Zk7EqPmQMu+Z2QsRhTnBQOWIFfwSVcRWJ5cxb4fwe8h5T
-	ZkU4qakDNTiR7Gkgs/gkzKo0otpL8Iggjm6WeRiuU9AXbp+XGB7rUU7DoBuqd1lQkSRA
-	H+MMtdiFIJEZ83xnmm1llowjSoMdcRATsUoyLmZGlhTCmD4ApjdLXcJVEsNqXnD2gnZ0
-	+H94LqDdkPoXqeUcbvAtBK+NoKb6pYXrpnw0+NybJD+dVRXNesj6K3wCjzrZajFfD0rj
-	kJog==
+	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+	id 1hHcYt-0005EH-BS
+	for qemu-devel@nongnu.org; Fri, 19 Apr 2019 19:04:51 -0400
+Received: by mail-wm1-x344.google.com with SMTP id o25so7555223wmf.5
+	for <qemu-devel@nongnu.org>; Fri, 19 Apr 2019 16:04:51 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+	h=references:user-agent:from:to:cc:subject:in-reply-to:date
+	:message-id:mime-version:content-transfer-encoding;
+	bh=6b6QBh4a0Aa0Dodgd0cQnG8CkcAuFjw9/y4l12Y6NWI=;
+	b=j0WvHOAIInuz2oiDfb2yGvAo5CO3NpIuRQtQ8Fn3cHbU8OKMGDZ9HmN1IMd3MT0wTN
+	E4mSBxz0rkIoyRN8VHzwkEFKynnrTyfg2miljiX2YV21S2tNkPVs48F12GlX8lCbIHPx
+	OzxVoDHfvDInmQmdmi0IWwt5uBPbCuoi9nn9OSMJbt32VxHjTC+zVqEvM0XykjHx2zlB
+	sIfrv0y7tXudE8TTziDj3qNo/J9qMaZkLq8e3P2XVldtv0gJiJUZlbLBY8qR0JuKnSaM
+	LuwYECAZ8kONTGYuzG3u9yGyozrXuri1T77oUOIQk6t4T5I9C5T+FCdob8djvzHhfUZM
+	y5RA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
 	d=1e100.net; s=20161025;
-	h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-	:message-id:subject:to:cc;
-	bh=eb5DEXGoCSsZ7cnYJcHMgq+7a4adPduEpTVlJLKF0ZE=;
-	b=QR6zmR4air5GP70gagu4RfarxTyk+abOZuEQUNYh+bYzEhQw6cna19z3bKlyanegvS
-	ZUdtkhp/xWRoSvJTx76HEMYeLWI8lTdFZdGo5/jB8E7XDDqgvAznrV/r0xIGWOo1njg7
-	Ac2ydSvMRGN+y/7GQMbkrbolTm851lY4udCCKYSN9G0ghC6bGCPGppZCgdV/ltOG8gYx
-	KlanrTW45h/FK2ne2m3sLpfQymVqTjwy296m3G3wSBzsdln/JUIv0j6aajROueeKEisH
-	ZtqIJRrmV1jwWOaniVefqbhrq6gFeCYgJdRgCF5gPHqFlsnQgfmlRaqj8CrOq/9zDArC
-	U2kQ==
-X-Gm-Message-State: APjAAAUd9t22Vi0/omG7MxJdshHIRn3T8lXIoAqw+y216ulWEa6wiPel
-	17iVfXS9KgxCY74/akI8uAoyqy+gVNgG+PdlK0Y=
-X-Google-Smtp-Source: APXvYqyLvyVEHNMTYhj3Ux6FwUoHBEtz/YO1Ne1dtsCudABpfJHoajH/tVAnlp6Yqz7JIVhyEe7QGAfT3I+6Siqd5OI=
-X-Received: by 2002:a2e:9ed3:: with SMTP id h19mr3375143ljk.129.1555708366068; 
-	Fri, 19 Apr 2019 14:12:46 -0700 (PDT)
+	h=x-gm-message-state:references:user-agent:from:to:cc:subject
+	:in-reply-to:date:message-id:mime-version:content-transfer-encoding;
+	bh=6b6QBh4a0Aa0Dodgd0cQnG8CkcAuFjw9/y4l12Y6NWI=;
+	b=Nan35GHTK7V/vzFr8UdesI9e8xFEinyumqriC156m3NfnBYnigDa+ayRvq8pb/Eqj6
+	z9ZiW/RRA6YZFxeFniYPUufAflXDXz9sHkPxE4bKqj9tBiWnAcaXYBoeZQorZORYG21q
+	W2wT3qoMOFC2W8ybHoQNpJOh9sLGDNuHrGeqyRksU8LXvCK0gZcrsfMy2dw81H4wNDwI
+	AkIpPUwp1A5XDYzKdb2xlRRSbrHJXcY+weXG57DYAkVdzjULGePMHhGafTPYhHggmDA4
+	b+tiWjAmvyBoZJwoM4uK6/sucPv8Kkfp9lofV5tPrf74hSQped4R4xZtBB3vg5DRExWE
+	dIqQ==
+X-Gm-Message-State: APjAAAWKCCtKnzL9Xwt5Sv67SMarJ47xEPYkFgg/04YSLbsIkFbUSk44
+	uLi1CZltJecA2+urRT9f3xAlng==
+X-Google-Smtp-Source: APXvYqwnhGpuHYz6sMpeGT6sBdkRlPWQ0BaYhvf1PAJlfTtn8ju/aSjknhuXZPO815iUoFfXwgWnEQ==
+X-Received: by 2002:a1c:ca06:: with SMTP id a6mr4088133wmg.14.1555715089748;
+	Fri, 19 Apr 2019 16:04:49 -0700 (PDT)
+Received: from zen.linaroharston ([81.128.185.34])
+	by smtp.gmail.com with ESMTPSA id r6sm4613902wmc.11.2019.04.19.16.04.48
+	(version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
+	Fri, 19 Apr 2019 16:04:49 -0700 (PDT)
+Received: from zen (localhost [127.0.0.1])
+	by zen.linaroharston (Postfix) with ESMTP id A915E1FF87;
+	Fri, 19 Apr 2019 23:04:48 +0000 (UTC)
+References: <20190419103722.17062-1-shahab.vahedi@gmail.com>
+User-agent: mu4e 1.3.1; emacs 26.1
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+To: qemu-devel@nongnu.org
+In-reply-to: <20190419103722.17062-1-shahab.vahedi@gmail.com>
+Date: Fri, 19 Apr 2019 23:04:48 +0000
+Message-ID: <871s1xha0f.fsf@zen.linaroharston>
 MIME-Version: 1.0
-References: <20190418180057.3593-1-thuth@redhat.com>
-	<20190418180057.3593-27-thuth@redhat.com>
-In-Reply-To: <20190418180057.3593-27-thuth@redhat.com>
-From: Alistair Francis <alistair23@gmail.com>
-Date: Fri, 19 Apr 2019 14:12:19 -0700
-Message-ID:
- <CAKmqyKM-G06FAJ1AJ4Cp0MRV+0oYPbpAbLtZPM9xWFuZ9MBQQA@mail.gmail.com>
-To: Thomas Huth <thuth@redhat.com>
 Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
 	recognized.
-X-Received-From: 2a00:1450:4864:20::244
-Subject: Re: [Qemu-devel] [PATCH for-QEMU-4.1 v5 26/29] hw/arm: Express
- dependencies of the ZynqMP zcu102 machine with Kconfig
+X-Received-From: 2a00:1450:4864:20::344
+Subject: Re: [Qemu-devel] [PATCH] cputlb: Fix io_readx() to respect the
+ access_type
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -88,95 +96,65 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>, Jan Kiszka <jan.kiszka@web.de>,
-	"Michael S. Tsirkin" <mst@redhat.com>,
-	"qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>,
-	Gerd Hoffmann <kraxel@redhat.com>,
-	"Edgar E . Iglesias" <edgar.iglesias@gmail.com>,
-	Subbaraya Sundeep <sundeep.lkml@gmail.com>,
-	Yang Zhong <yang.zhong@intel.com>, Rob Herring <robh@kernel.org>,
-	Qemu-block <qemu-block@nongnu.org>,
-	Andrey Smirnov <andrew.smirnov@gmail.com>,
-	Antony Pavlov <antonynpavlov@gmail.com>, Joel Stanley <joel@jms.id.au>,
-	Alistair Francis <alistair@alistair23.me>,
-	Beniamino Galvani <b.galvani@gmail.com>, qemu-arm <qemu-arm@nongnu.org>,
-	Peter Chubb <peter.chubb@nicta.com.au>,
-	Cedric Le Goater <clg@kaod.org>, John Snow <jsnow@redhat.com>,
-	Andrew Jeffery <andrew@aj.id.au>, Philippe Mathieu-Daude <f4bug@amsat.org>,
-	Jean-Christophe Dubois <jcd@tribudubois.net>,
-	Igor Mitsyanko <i.mitsyanko@gmail.com>, Paolo Bonzini <pbonzini@redhat.com>
+Cc: Shahab Vahedi <shahab.vahedi@gmail.com>,
+	Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190419211219.yA3oOv3Abk1NSPOQ-VTikKw4B5MMprBY-w-Qobn1mrs@z>
+Message-ID: <20190419230448.XslGDPzbzkP7WiLssQSoKTBM7dm4bqz2t3a3wLW6ksc@z>
 
-On Thu, Apr 18, 2019 at 11:15 AM Thomas Huth <thuth@redhat.com> wrote:
+
+Shahab Vahedi <shahab.vahedi@gmail.com> writes:
+
+> This change adapts io_readx() to its input access_type. Currently
+> io_readx() treats any memory access as a read, although it has an
+> input argument "MMUAccessType access_type". This results in:
 >
-> This cleans up most settings in default-configs/aarch64-softmmu.mak.
+> 1) Calling the tlb_fill() only with MMU_DATA_LOAD
+> 2) Considering only entry->addr_read as the tlb_addr
 >
-> Signed-off-by: Thomas Huth <thuth@redhat.com>
+> Buglink: https://bugs.launchpad.net/qemu/+bug/1825359
 
-Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
+This bug talks about the distinction between DATA_LOAD and INST_FETCH but...
 
-Alistair
-
+>
+> Signed-off-by: Shahab Vahedi <shahab.vahedi@gmail.com>
 > ---
->  default-configs/aarch64-softmmu.mak |  4 ----
->  hw/arm/Kconfig                      | 11 +++++++++++
->  hw/display/Kconfig                  |  1 +
->  3 files changed, 12 insertions(+), 4 deletions(-)
+>  accel/tcg/cputlb.c | 7 +++++--
+>  1 file changed, 5 insertions(+), 2 deletions(-)
 >
-> diff --git a/default-configs/aarch64-softmmu.mak b/default-configs/aarch64-softmmu.mak
-> index 4ea9add003..3a4b15e7e8 100644
-> --- a/default-configs/aarch64-softmmu.mak
-> +++ b/default-configs/aarch64-softmmu.mak
-> @@ -3,10 +3,6 @@
->  # We support all the 32 bit boards so need all their config
->  include arm-softmmu.mak
+> diff --git a/accel/tcg/cputlb.c b/accel/tcg/cputlb.c
+> index 88cc8389e9..0daac0e806 100644
+> --- a/accel/tcg/cputlb.c
+> +++ b/accel/tcg/cputlb.c
+> @@ -878,10 +878,13 @@ static uint64_t io_readx(CPUArchState *env, CPUIOTL=
+BEntry *iotlbentry,
+>          CPUTLBEntry *entry;
+>          target_ulong tlb_addr;
 >
-> -CONFIG_AUX=y
-> -CONFIG_DDC=y
-> -CONFIG_DPCD=y
-> -CONFIG_XLNX_ZYNQMP=y
->  CONFIG_XLNX_ZYNQMP_ARM=y
->  CONFIG_XLNX_VERSAL=y
->  CONFIG_ARM_SMMUV3=y
-> diff --git a/hw/arm/Kconfig b/hw/arm/Kconfig
-> index 708eae19e5..32e4cc50e5 100644
-> --- a/hw/arm/Kconfig
-> +++ b/hw/arm/Kconfig
-> @@ -277,6 +277,17 @@ config STM32F205_SOC
+> -        tlb_fill(cpu, addr, size, MMU_DATA_LOAD, mmu_idx, retaddr);
+> +        tlb_fill(cpu, addr, size, access_type, mmu_idx, retaddr);
 >
->  config XLNX_ZYNQMP_ARM
->      bool
-> +    select AHCI
-> +    select ARM_GIC
-> +    select CADENCE
-> +    select DDC
-> +    select DPCD
-> +    select SDHCI
-> +    select SSI
-> +    select SSI_M25P80
-> +    select XILINX_AXI
-> +    select XILINX_SPIPS
-> +    select XLNX_ZYNQMP
->
->  config XLNX_VERSAL
->      bool
-> diff --git a/hw/display/Kconfig b/hw/display/Kconfig
-> index 0577e68c8e..bb95f8d6a4 100644
-> --- a/hw/display/Kconfig
-> +++ b/hw/display/Kconfig
-> @@ -108,6 +108,7 @@ config VIRTIO_VGA
->
->  config DPCD
->      bool
-> +    select AUX
->
->  config ATI_VGA
->      bool
-> --
-> 2.21.0
->
->
+>          entry =3D tlb_entry(env, mmu_idx, addr);
+> -        tlb_addr =3D entry->addr_read;
+> +        tlb_addr =3D
+> +            (access_type =3D=3D MMU_DATA_LOAD ) ? entry->addr_read  :
+> +            (access_type =3D=3D MMU_DATA_STORE) ? entry->addr_write :
+> +            entry->addr_code;
+
+...why do we care here about MMU_DATA_STORE?
+
+We could just assert (access_type =3D=3D MMU_DATA_LOAD || access_type =3D=3D
+MMU_INST_FETCH) and then have:
+
+  (access_type =3D=3D MMU_DATA_LOAD ) ? entry->addr_read  : entry->addr_code
+
+
+>          if (!(tlb_addr & ~(TARGET_PAGE_MASK | TLB_RECHECK))) {
+>              /* RAM access */
+>              uintptr_t haddr =3D addr + entry->addend;
+
+
+--
+Alex Benn=C3=A9e
 
