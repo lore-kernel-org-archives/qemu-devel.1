@@ -1,20 +1,20 @@
 Received: from eggs.gnu.org ([209.51.188.92]:35712)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richardw.yang@linux.intel.com>) id 1hHHc0-0007cN-20
-	for qemu-devel@nongnu.org; Thu, 18 Apr 2019 20:42:41 -0400
+	(envelope-from <richardw.yang@linux.intel.com>) id 1hHHc3-0007cN-RH
+	for qemu-devel@nongnu.org; Thu, 18 Apr 2019 20:42:45 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richardw.yang@linux.intel.com>) id 1hHHRL-0005wl-Dy
-	for qemu-devel@nongnu.org; Thu, 18 Apr 2019 20:31:40 -0400
+	(envelope-from <richardw.yang@linux.intel.com>) id 1hHHRI-0005ui-OK
+	for qemu-devel@nongnu.org; Thu, 18 Apr 2019 20:31:38 -0400
 From: Wei Yang <richardw.yang@linux.intel.com>
-Date: Fri, 19 Apr 2019 08:30:53 +0800
-Message-Id: <20190419003053.8260-7-richardw.yang@linux.intel.com>
+Date: Fri, 19 Apr 2019 08:30:51 +0800
+Message-Id: <20190419003053.8260-5-richardw.yang@linux.intel.com>
 In-Reply-To: <20190419003053.8260-1-richardw.yang@linux.intel.com>
 References: <20190419003053.8260-1-richardw.yang@linux.intel.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH v4 6/6] acpi: pci: use build_append_foo() API
- to construct MCFG
+Subject: [Qemu-devel] [PATCH v4 4/6] hw/arm/virt-acpi-build: pass
+ AcpiMcfgInfo to build_mcfg()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,91 +26,144 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org, qemu-arm@nongnu.org
 Cc: mst@redhat.com, imammedo@redhat.com, shannon.zhaosl@gmail.com, peter.maydell@linaro.org, marcel.apfelbaum@gmail.com, yang.zhong@intel.com, philmd@redhat.com, Wei Yang <richardw.yang@linux.intel.com>
 
-build_append_foo() API doesn't need explicit endianness conversions
-which eliminates a source of errors and it makes build_mcfg() look like
-declarative definition of MCFG table in ACPI spec, which makes it easy
-to review.
+To build MCFG, two information is necessary:
+
+    * bus number
+    * base address
+
+Abstract these two information to AcpiMcfgInfo so that build_mcfg and
+build_mcfg_q35 will have the same declaration.
 
 Signed-off-by: Wei Yang <richardw.yang@linux.intel.com>
-Suggested-by: Igor Mammedov <imammedo@redhat.com>
-Reviewed-by: Igor Mammedov <imammedo@redhat.com>
 Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
----
- hw/acpi/pci.c               | 33 +++++++++++++++++++++------------
- include/hw/acpi/acpi-defs.h | 18 ------------------
- 2 files changed, 21 insertions(+), 30 deletions(-)
+Reviewed-by: Igor Mammedov <imammedo@redhat.com>
 
-diff --git a/hw/acpi/pci.c b/hw/acpi/pci.c
-index fa0fa30bb9..341805e786 100644
---- a/hw/acpi/pci.c
-+++ b/hw/acpi/pci.c
-@@ -30,17 +30,26 @@
- 
- void build_mcfg(GArray *table_data, BIOSLinker *linker, AcpiMcfgInfo *info)
- {
--    AcpiTableMcfg *mcfg;
--    int len = sizeof(*mcfg) + sizeof(mcfg->allocation[0]);
--
--    mcfg = acpi_data_push(table_data, len);
--    mcfg->allocation[0].address = cpu_to_le64(info->base);
--
--    /* Only a single allocation so no need to play with segments */
--    mcfg->allocation[0].pci_segment = cpu_to_le16(0);
--    mcfg->allocation[0].start_bus_number = 0;
--    mcfg->allocation[0].end_bus_number = PCIE_MMCFG_BUS(info->size - 1);
--
--    build_header(linker, table_data, (void *)mcfg, "MCFG", len, 1, NULL, NULL);
-+    int mcfg_start = table_data->len;
-+
-+    acpi_data_push(table_data, sizeof(AcpiTableHeader));
-+
-+    /*
-+     * PCI Firmware Specification, Revision 3.0
-+     * 4.1.2 MCFG Table Description.
-+     */
-+    /* Base address, processor-relative */
-+    build_append_int_noprefix(table_data, info->base, 8);
-+    /* PCI segment group number */
-+    build_append_int_noprefix(table_data, 0, 2);
-+    /* Starting PCI Bus number */
-+    build_append_int_noprefix(table_data, 0, 1);
-+    /* Final PCI Bus number */
-+    build_append_int_noprefix(table_data, PCIE_MMCFG_BUS(info->size - 1), 1);
-+    /* Reserved */
-+    build_append_int_noprefix(table_data, 0, 4);
-+
-+    build_header(linker, table_data, (void *)(table_data->data + mcfg_start),
-+                 "MCFG", table_data->len - mcfg_start, 1, NULL, NULL);
+---
+v3:
+  * move AcpiMcfgInfo to pci.h
+v2:
+  * for arm platform, construct a AcpiMcfgInfo directly
+---
+ hw/arm/virt-acpi-build.c | 18 +++++++++++-------
+ hw/i386/acpi-build.c     |  6 +-----
+ include/hw/acpi/pci.h    | 33 +++++++++++++++++++++++++++++++++
+ 3 files changed, 45 insertions(+), 12 deletions(-)
+ create mode 100644 include/hw/acpi/pci.h
+
+diff --git a/hw/arm/virt-acpi-build.c b/hw/arm/virt-acpi-build.c
+index e09e7eff8d..ebddcde596 100644
+--- a/hw/arm/virt-acpi-build.c
++++ b/hw/arm/virt-acpi-build.c
+@@ -40,6 +40,7 @@
+ #include "hw/hw.h"
+ #include "hw/acpi/aml-build.h"
+ #include "hw/acpi/utils.h"
++#include "hw/acpi/pci.h"
+ #include "hw/pci/pcie_host.h"
+ #include "hw/pci/pci.h"
+ #include "hw/arm/virt.h"
+@@ -546,21 +547,18 @@ build_srat(GArray *table_data, BIOSLinker *linker, VirtMachineState *vms)
  }
  
-diff --git a/include/hw/acpi/acpi-defs.h b/include/hw/acpi/acpi-defs.h
-index f9aa4bd398..57a3f58b0c 100644
---- a/include/hw/acpi/acpi-defs.h
-+++ b/include/hw/acpi/acpi-defs.h
-@@ -449,24 +449,6 @@ struct AcpiSratProcessorGiccAffinity {
+ static void
+-build_mcfg(GArray *table_data, BIOSLinker *linker, VirtMachineState *vms)
++build_mcfg(GArray *table_data, BIOSLinker *linker, AcpiMcfgInfo *info)
+ {
+     AcpiTableMcfg *mcfg;
+-    const MemMapEntry *memmap = vms->memmap;
+-    int ecam_id = VIRT_ECAM_ID(vms->highmem_ecam);
+     int len = sizeof(*mcfg) + sizeof(mcfg->allocation[0]);
  
- typedef struct AcpiSratProcessorGiccAffinity AcpiSratProcessorGiccAffinity;
+     mcfg = acpi_data_push(table_data, len);
+-    mcfg->allocation[0].address = cpu_to_le64(memmap[ecam_id].base);
++    mcfg->allocation[0].address = cpu_to_le64(info->base);
  
--/* PCI fw r3.0 MCFG table. */
--/* Subtable */
--struct AcpiMcfgAllocation {
--    uint64_t address;                /* Base address, processor-relative */
--    uint16_t pci_segment;            /* PCI segment group number */
--    uint8_t start_bus_number;       /* Starting PCI Bus number */
--    uint8_t end_bus_number;         /* Final PCI Bus number */
--    uint32_t reserved;
--} QEMU_PACKED;
--typedef struct AcpiMcfgAllocation AcpiMcfgAllocation;
+     /* Only a single allocation so no need to play with segments */
+     mcfg->allocation[0].pci_segment = cpu_to_le16(0);
+     mcfg->allocation[0].start_bus_number = 0;
+-    mcfg->allocation[0].end_bus_number =
+-        PCIE_MMCFG_BUS(memmap[ecam_id].size - 1);
++    mcfg->allocation[0].end_bus_number = PCIE_MMCFG_BUS(info->size - 1);
+ 
+     build_header(linker, table_data, (void *)mcfg, "MCFG", len, 1, NULL, NULL);
+ }
+@@ -801,7 +799,13 @@ void virt_acpi_build(VirtMachineState *vms, AcpiBuildTables *tables)
+     build_gtdt(tables_blob, tables->linker, vms);
+ 
+     acpi_add_table(table_offsets, tables_blob);
+-    build_mcfg(tables_blob, tables->linker, vms);
++    {
++        AcpiMcfgInfo mcfg = {
++           .base = vms->memmap[VIRT_ECAM_ID(vms->highmem_ecam)].base,
++           .size = vms->memmap[VIRT_ECAM_ID(vms->highmem_ecam)].size,
++        };
++        build_mcfg(tables_blob, tables->linker, &mcfg);
++    }
+ 
+     acpi_add_table(table_offsets, tables_blob);
+     build_spcr(tables_blob, tables->linker, vms);
+diff --git a/hw/i386/acpi-build.c b/hw/i386/acpi-build.c
+index f0d27bffd6..c2de7f4b01 100644
+--- a/hw/i386/acpi-build.c
++++ b/hw/i386/acpi-build.c
+@@ -58,6 +58,7 @@
+ 
+ #include "hw/acpi/aml-build.h"
+ #include "hw/acpi/utils.h"
++#include "hw/acpi/pci.h"
+ 
+ #include "qom/qom-qobject.h"
+ #include "hw/i386/amd_iommu.h"
+@@ -86,11 +87,6 @@
+ /* Default IOAPIC ID */
+ #define ACPI_BUILD_IOAPIC_ID 0x0
+ 
+-typedef struct AcpiMcfgInfo {
+-    uint64_t base;
+-    uint32_t size;
+-} AcpiMcfgInfo;
 -
--struct AcpiTableMcfg {
--    ACPI_TABLE_HEADER_DEF;
--    uint8_t reserved[8];
--    AcpiMcfgAllocation allocation[0];
--} QEMU_PACKED;
--typedef struct AcpiTableMcfg AcpiTableMcfg;
--
- /*
-  * TCPA Description Table
-  *
+ typedef struct AcpiPmInfo {
+     bool s3_disabled;
+     bool s4_disabled;
+diff --git a/include/hw/acpi/pci.h b/include/hw/acpi/pci.h
+new file mode 100644
+index 0000000000..124af7d32a
+--- /dev/null
++++ b/include/hw/acpi/pci.h
+@@ -0,0 +1,33 @@
++/*
++ * Support for generating PCI related ACPI tables and passing them to Guests
++ *
++ * Copyright (C) 2006 Fabrice Bellard
++ * Copyright (C) 2008-2010  Kevin O'Connor <kevin@koconnor.net>
++ * Copyright (C) 2013-2019 Red Hat Inc
++ * Copyright (C) 2019 Intel Corporation
++ *
++ * Author: Wei Yang <richardw.yang@linux.intel.com>
++ * Author: Michael S. Tsirkin <mst@redhat.com>
++ *
++ * This program is free software; you can redistribute it and/or modify
++ * it under the terms of the GNU General Public License as published by
++ * the Free Software Foundation; either version 2 of the License, or
++ * (at your option) any later version.
++
++ * This program is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ * GNU General Public License for more details.
++
++ * You should have received a copy of the GNU General Public License along
++ * with this program; if not, see <http://www.gnu.org/licenses/>.
++ */
++#ifndef HW_ACPI_PCI_H
++#define HW_ACPI_PCI_H
++
++typedef struct AcpiMcfgInfo {
++    uint64_t base;
++    uint32_t size;
++} AcpiMcfgInfo;
++
++#endif
 -- 
 2.19.1
