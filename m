@@ -7,61 +7,61 @@ X-Spam-Status: No, score=-8.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,USER_AGENT_GIT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 14C75C282DD
-	for <qemu-devel@archiver.kernel.org>; Sat, 20 Apr 2019 16:05:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 90380C282DD
+	for <qemu-devel@archiver.kernel.org>; Sat, 20 Apr 2019 16:16:46 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D311720675
-	for <qemu-devel@archiver.kernel.org>; Sat, 20 Apr 2019 16:05:29 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 4F8BE20854
+	for <qemu-devel@archiver.kernel.org>; Sat, 20 Apr 2019 16:16:46 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=163.com header.i=@163.com header.b="pmQVPwGu"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D311720675
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=163.com header.i=@163.com header.b="PmVsKnFn"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4F8BE20854
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=163.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:42910 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:43110 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hHsUb-0001JP-1C
-	for qemu-devel@archiver.kernel.org; Sat, 20 Apr 2019 12:05:29 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:54876)
+	id 1hHsfV-0005tL-Bb
+	for qemu-devel@archiver.kernel.org; Sat, 20 Apr 2019 12:16:45 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:57509)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <liq3ea@163.com>) id 1hHsPL-0005wh-Ce
-	for qemu-devel@nongnu.org; Sat, 20 Apr 2019 12:00:04 -0400
+	(envelope-from <liq3ea@163.com>) id 1hHsdm-0004qC-1r
+	for qemu-devel@nongnu.org; Sat, 20 Apr 2019 12:14:58 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <liq3ea@163.com>) id 1hHsPK-0008Hy-Eb
-	for qemu-devel@nongnu.org; Sat, 20 Apr 2019 12:00:03 -0400
-Received: from m12-11.163.com ([220.181.12.11]:33987)
+	(envelope-from <liq3ea@163.com>) id 1hHsdj-0001r0-Jd
+	for qemu-devel@nongnu.org; Sat, 20 Apr 2019 12:14:56 -0400
+Received: from m12-13.163.com ([220.181.12.13]:43449)
 	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <liq3ea@163.com>) id 1hHsPI-0008Ef-5R
-	for qemu-devel@nongnu.org; Sat, 20 Apr 2019 12:00:02 -0400
+	(envelope-from <liq3ea@163.com>) id 1hHsdh-0001oH-Vz
+	for qemu-devel@nongnu.org; Sat, 20 Apr 2019 12:14:54 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=163.com;
 	s=s110527; h=From:Subject:Date:Message-Id; bh=iRFD+zpf5l7TX1uoBr
-	2sBdhb6Xv5dDZq2CEa09rVSBg=; b=pmQVPwGu0D3ehnmkzB+0Z/Fouoj5iGXIjH
-	oxpm+9nXmz8lgLhU+WeVh4+dtKI80ps5vaFjVAoSJvolkewfWFdLCUXz3BMhN0A2
-	q2hk1SxNQccnPXHUjVjDak4OOdFqdpP/NlLxo/0OAMnvNa5jbes3wJv1v3EEj8Rk
-	X+dEItyKw=
+	2sBdhb6Xv5dDZq2CEa09rVSBg=; b=PmVsKnFn85DR6Q4Xw2D3SB4rjmw99iErzd
+	tfNVkK2wcCX5p8qB2fjMigN672Sb8/tfELIqEKejTtKNy5ML3PVStxZ4touPThoH
+	fZGqpLfF0eIj5cFXncM6BNzf85TzbAHl2T67zEGt3MPrZuJkCmyxrNpgLERMdtVe
+	OiceUEdeA=
 Received: from localhost.localdomain (unknown [183.159.69.175])
-	by smtp7 (Coremail) with SMTP id C8CowACX_I34QbtcELxpBQ--.29437S4;
-	Sat, 20 Apr 2019 23:59:57 +0800 (CST)
+	by smtp9 (Coremail) with SMTP id DcCowAAXzKN4RbtcjaXHAg--.9660S3;
+	Sun, 21 Apr 2019 00:14:51 +0800 (CST)
 From: Li Qiang <liq3ea@163.com>
 To: jslaby@suse.cz,
 	pbonzini@redhat.com
-Date: Sat, 20 Apr 2019 08:59:48 -0700
-Message-Id: <20190420155949.130968-3-liq3ea@163.com>
+Date: Sat, 20 Apr 2019 09:14:44 -0700
+Message-Id: <20190420161446.2274-2-liq3ea@163.com>
 X-Mailer: git-send-email 2.17.1
-In-Reply-To: <20190420155949.130968-1-liq3ea@163.com>
-References: <20190420155949.130968-1-liq3ea@163.com>
-X-CM-TRANSID: C8CowACX_I34QbtcELxpBQ--.29437S4
+In-Reply-To: <20190420161446.2274-1-liq3ea@163.com>
+References: <20190420161446.2274-1-liq3ea@163.com>
+X-CM-TRANSID: DcCowAAXzKN4RbtcjaXHAg--.9660S3
 X-Coremail-Antispam: 1Uf129KBjvdXoWruFyfZF15Wr4kKr43AF18Zrb_yoW3tFX_Xw
 	1xKFZ7GrW5XFyayF90q3W5uryxW3yrAF1rCrs3Gr43Ja4fGr98Z3s2qrnxXr47Gw47Kwn5
-	AaykZFy5trnFgjkaLaAFLSUrUUUUUb8apTn2vfkv8UJUUUU8Yxn0WfASr-VFAUDa7-sFnT
-	9fnUUvcSsGvfC2KfnxnUUI43ZEXa7IUbCzutUUUUU==
+	AaykZFy5trnFgjkaLaAFLSUrUUUUbb8apTn2vfkv8UJUUUU8Yxn0WfASr-VFAUDa7-sFnT
+	9fnUUvcSsGvfC2KfnxnUUI43ZEXa7IUjIPfJUUUUU==
 X-Originating-IP: [183.159.69.175]
-X-CM-SenderInfo: 5oltjvrd6rljoofrz/xtbBax2cbVetu+co+QAAsw
+X-CM-SenderInfo: 5oltjvrd6rljoofrz/xtbBLxucbVUMI5lrJAAAsp
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x
-X-Received-From: 220.181.12.11
-Subject: [Qemu-devel] [PATCH v2 2/3] edu: mmio: set 'max_access_size' to 8
+X-Received-From: 220.181.12.13
+Subject: [Qemu-devel] [PATCH v2 1/3] edu: mmio: set 'max_access_size' to 8
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -78,7 +78,7 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 Content-Type: text/plain; charset="UTF-8"
-Message-ID: <20190420155948.3OtUHVSFEuXlnN-JiDTowdrHKsEWAaEJUbjR1RtZOUg@z>
+Message-ID: <20190420161444.x-YbLa7Je4hirU17SC1-dzaZRWkqx6nB_uaR3U9Wpk8@z>
 
 The edu spec said, the MMIO area can be accessed by 8 bytes.
 However currently the 'max_access_size' is not so the MMIO
