@@ -7,60 +7,61 @@ X-Spam-Status: No, score=-8.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,USER_AGENT_GIT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 66FC0C282E2
-	for <qemu-devel@archiver.kernel.org>; Sat, 20 Apr 2019 16:16:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E51A6C282DD
+	for <qemu-devel@archiver.kernel.org>; Sat, 20 Apr 2019 16:16:52 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2EE3820854
-	for <qemu-devel@archiver.kernel.org>; Sat, 20 Apr 2019 16:16:47 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id ADB3220854
+	for <qemu-devel@archiver.kernel.org>; Sat, 20 Apr 2019 16:16:52 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=163.com header.i=@163.com header.b="H6VeRnKJ"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2EE3820854
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=163.com header.i=@163.com header.b="B3IEMdO3"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org ADB3220854
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=163.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:43108 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:43112 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hHsfW-0005tH-A2
-	for qemu-devel@archiver.kernel.org; Sat, 20 Apr 2019 12:16:46 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:57511)
+	id 1hHsfc-0005zt-0O
+	for qemu-devel@archiver.kernel.org; Sat, 20 Apr 2019 12:16:52 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:57544)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <liq3ea@163.com>) id 1hHsdm-0004qD-2g
-	for qemu-devel@nongnu.org; Sat, 20 Apr 2019 12:14:58 -0400
+	(envelope-from <liq3ea@163.com>) id 1hHsdr-0004st-5r
+	for qemu-devel@nongnu.org; Sat, 20 Apr 2019 12:15:04 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <liq3ea@163.com>) id 1hHsdl-0001sT-9U
-	for qemu-devel@nongnu.org; Sat, 20 Apr 2019 12:14:58 -0400
-Received: from m12-13.163.com ([220.181.12.13]:43525)
+	(envelope-from <liq3ea@163.com>) id 1hHsdo-0001vE-Az
+	for qemu-devel@nongnu.org; Sat, 20 Apr 2019 12:15:02 -0400
+Received: from m12-13.163.com ([220.181.12.13]:43634)
 	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <liq3ea@163.com>) id 1hHsdj-0001pk-Qo
-	for qemu-devel@nongnu.org; Sat, 20 Apr 2019 12:14:56 -0400
+	(envelope-from <liq3ea@163.com>) id 1hHsdk-0001qd-AW
+	for qemu-devel@nongnu.org; Sat, 20 Apr 2019 12:15:00 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=163.com;
-	s=s110527; h=From:Subject:Date:Message-Id; bh=nto7dRdt8+6HlFMrTC
-	L4RjigEIgC4k8QVhUb2RlYSSc=; b=H6VeRnKJG0WJgylteVj/2p0YduTNT3XSSK
-	3Z6Zu9QkpVQyJXgOZXToFbBGKhICWY2GuiI4WvnaLOFaSJgZaGG5SEoQFsKICJ0D
-	qEnWEhIpdjMP9iVpiUoxv7XgiDj9O8fuNBxoiiy80UMUXGMNNf7KJ7uWJ4lBvfUS
-	6AL9880ao=
+	s=s110527; h=From:Subject:Date:Message-Id; bh=r3Jtft8lSmafyHvM/Q
+	IfK3f6RiL1dgUnclr6+lM0mBM=; b=B3IEMdO3a0MwLoe5xqRDrCw704vRWs38+5
+	Y0DXK2m896fDbz5QbWmXUEqPQvr3OzAzOEqT2ccyWs7BCohUFssDpP0hzyYuuDpi
+	6IBI14W3V4JKbfwD6LPSR+vz1QR9Myi/96SrZVrWqlHI1wiJT//KKpcht48lxQ0z
+	XeyV2X25U=
 Received: from localhost.localdomain (unknown [183.159.69.175])
-	by smtp9 (Coremail) with SMTP id DcCowAAXzKN4RbtcjaXHAg--.9660S4;
-	Sun, 21 Apr 2019 00:14:52 +0800 (CST)
+	by smtp9 (Coremail) with SMTP id DcCowAAXzKN4RbtcjaXHAg--.9660S5;
+	Sun, 21 Apr 2019 00:14:53 +0800 (CST)
 From: Li Qiang <liq3ea@163.com>
 To: jslaby@suse.cz,
 	pbonzini@redhat.com
-Date: Sat, 20 Apr 2019 09:14:45 -0700
-Message-Id: <20190420161446.2274-3-liq3ea@163.com>
+Date: Sat, 20 Apr 2019 09:14:46 -0700
+Message-Id: <20190420161446.2274-4-liq3ea@163.com>
 X-Mailer: git-send-email 2.17.1
 In-Reply-To: <20190420161446.2274-1-liq3ea@163.com>
 References: <20190420161446.2274-1-liq3ea@163.com>
-X-CM-TRANSID: DcCowAAXzKN4RbtcjaXHAg--.9660S4
-X-Coremail-Antispam: 1Uf129KBjDUn29KB7ZKAUJUUUUU529EdanIXcx71UUUUU7v73
-	VFW2AGmfu7bjvjm3AaLaJ3UbIYCTnIWIevJa73UjIFyTuYvjxUcj2NDUUUU
+X-CM-TRANSID: DcCowAAXzKN4RbtcjaXHAg--.9660S5
+X-Coremail-Antispam: 1Uf129KBjvJXoW7tF43CF1UGr48tw15Zr43Wrg_yoW8Zr1Dp3
+	45Grn3XF4FgFyfJryjyw4DXFn5Grn8JFWrK3y8CwsY9ayrWFs7CFyUC3429ryxWryIvr1f
+	uFZYqF43uF42vrJanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+	9KBjDUYxBIdaVFxhVjvjDU0xZFpf9x07j52-nUUUUU=
 X-Originating-IP: [183.159.69.175]
-X-CM-SenderInfo: 5oltjvrd6rljoofrz/xtbBLxycbVUMI5lrMAAAs6
+X-CM-SenderInfo: 5oltjvrd6rljoofrz/1tbiFAucbVaD0UJ5bwAAs+
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x
 X-Received-From: 220.181.12.13
-Subject: [Qemu-devel] [PATCH v2 2/3] edu: mmio: allow mmio read dispatch
- accept 8 bytes
+Subject: [Qemu-devel] [PATCH v2 3/3] edu: uses uint64_t in dma operation
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -77,31 +78,70 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 Content-Type: text/plain; charset="UTF-8"
-Message-ID: <20190420161445.I_6NLxWgyQQWrhhNfE9ubmdHKd7pg0EXWudIx8yLSWs@z>
+Message-ID: <20190420161446.w3DagdrrqMftBwfR_Qflq5gSJxLau7hC1DNJHbDWmtM@z>
 
-The edu spec said when address >= 0x80, the MMIO area can
-be accessed by 8 bytes.
+The dma related variable is dma_addr_t, it is uint64_t in
+x64 platform. Change these usage from uint32_to uint64_t to
+avoid trancation.
 
 Signed-off-by: Li Qiang <liq3ea@163.com>
 ---
- hw/misc/edu.c | 4 ++++
- 1 file changed, 4 insertions(+)
+Change since v1:
+Fix format compile error on Windows
+
+ hw/misc/edu.c | 15 ++++++++-------
+ 1 file changed, 8 insertions(+), 7 deletions(-)
 
 diff --git a/hw/misc/edu.c b/hw/misc/edu.c
-index 65fc32b928..4018dddcb8 100644
+index 4018dddcb8..f4a6d5f1c5 100644
 --- a/hw/misc/edu.c
 +++ b/hw/misc/edu.c
-@@ -189,6 +189,10 @@ static uint64_t edu_mmio_read(void *opaque, hwaddr addr, unsigned size)
-         return val;
+@@ -98,23 +98,24 @@ static void edu_lower_irq(EduState *edu, uint32_t val)
+     }
+ }
+ 
+-static bool within(uint32_t addr, uint32_t start, uint32_t end)
++static bool within(uint64_t addr, uint64_t start, uint64_t end)
+ {
+     return start <= addr && addr < end;
+ }
+ 
+-static void edu_check_range(uint32_t addr, uint32_t size1, uint32_t start,
++static void edu_check_range(uint64_t addr, uint64_t size1, uint64_t start,
+                 uint32_t size2)
+ {
+-    uint32_t end1 = addr + size1;
+-    uint32_t end2 = start + size2;
++    uint64_t end1 = addr + size1;
++    uint64_t end2 = start + size2;
+ 
+     if (within(addr, start, end2) &&
+             end1 > addr && within(end1, start, end2)) {
+         return;
      }
  
-+    if (addr >= 0x80 && size != 4 && size != 8) {
-+        return val;
-+    }
-+
-     switch (addr) {
-     case 0x00:
-         val = 0x010000edu;
+-    hw_error("EDU: DMA range 0x%.8x-0x%.8x out of bounds (0x%.8x-0x%.8x)!",
++    hw_error("EDU: DMA range 0x%016"PRIx64"-0x%016"PRIx64
++             " out of bounds (0x%016"PRIx64"-0x%016"PRIx64")!",
+             addr, end1 - 1, start, end2 - 1);
+ }
+ 
+@@ -139,13 +140,13 @@ static void edu_dma_timer(void *opaque)
+     }
+ 
+     if (EDU_DMA_DIR(edu->dma.cmd) == EDU_DMA_FROM_PCI) {
+-        uint32_t dst = edu->dma.dst;
++        uint64_t dst = edu->dma.dst;
+         edu_check_range(dst, edu->dma.cnt, DMA_START, DMA_SIZE);
+         dst -= DMA_START;
+         pci_dma_read(&edu->pdev, edu_clamp_addr(edu, edu->dma.src),
+                 edu->dma_buf + dst, edu->dma.cnt);
+     } else {
+-        uint32_t src = edu->dma.src;
++        uint64_t src = edu->dma.src;
+         edu_check_range(src, edu->dma.cnt, DMA_START, DMA_SIZE);
+         src -= DMA_START;
+         pci_dma_write(&edu->pdev, edu_clamp_addr(edu, edu->dma.dst),
 -- 
 2.17.1
 
