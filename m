@@ -1,34 +1,23 @@
-Received: from eggs.gnu.org ([209.51.188.92]:46116)
+Received: from eggs.gnu.org ([209.51.188.92]:49351)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1hHfGt-0007qt-Jv
-	for qemu-devel@nongnu.org; Fri, 19 Apr 2019 21:58:28 -0400
+	(envelope-from <prvs=0062c52f7=Alistair.Francis@wdc.com>)
+	id 1hHffx-0003O2-Qj
+	for qemu-devel@nongnu.org; Fri, 19 Apr 2019 22:24:22 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1hHfEE-0005fc-NI
-	for qemu-devel@nongnu.org; Fri, 19 Apr 2019 21:55:43 -0400
-Received: from indium.canonical.com ([91.189.90.7]:52274)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1hHfEE-0005dk-HP
-	for qemu-devel@nongnu.org; Fri, 19 Apr 2019 21:55:42 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1hHfEC-0007kG-Q3
-	for <qemu-devel@nongnu.org>; Sat, 20 Apr 2019 01:55:40 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id C1C9D2E80C7
-	for <qemu-devel@nongnu.org>; Sat, 20 Apr 2019 01:55:40 +0000 (UTC)
-MIME-Version: 1.0
+	(envelope-from <prvs=0062c52f7=Alistair.Francis@wdc.com>)
+	id 1hHffj-0002MV-B7
+	for qemu-devel@nongnu.org; Fri, 19 Apr 2019 22:24:08 -0400
+From: Alistair Francis <Alistair.Francis@wdc.com>
+Date: Sat, 20 Apr 2019 02:24:01 +0000
+Message-ID: <ba45fab51cb3d73f872c7070dc988c5e441b3930.1555726824.git.alistair.francis@wdc.com>
+References: <cover.1555726824.git.alistair.francis@wdc.com>
+In-Reply-To: <cover.1555726824.git.alistair.francis@wdc.com>
+Content-Language: en-US
 Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Sat, 20 Apr 2019 01:46:59 -0000
-From: =?utf-8?b?6LSe6LS15p2O?= <1824053@bugs.launchpad.net>
-Reply-To: Bug 1824053 <1824053@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <155486495593.20543.13567634487304856304.malonedeb@chaenomeles.canonical.com>
-Message-Id: <155572482105.16887.16306481647202878247.launchpad@soybean.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1824053] Re: Qemu-img convert appears to be stuck
- on aarch64 host with low probability
+Content-Transfer-Encoding: base64
+MIME-Version: 1.0
+Subject: [Qemu-devel] [PATCH v1 3/6] target/riscv: Create settable CPU
+ properties
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,74 +26,70 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "qemu-riscv@nongnu.org" <qemu-riscv@nongnu.org>
+Cc: "palmer@sifive.com" <palmer@sifive.com>, Alistair Francis <Alistair.Francis@wdc.com>, "alistair23@gmail.com" <alistair23@gmail.com>, "imammedo@redhat.com" <imammedo@redhat.com>
 
-** Changed in: qemu
-       Status: Fix Released =3D> Confirmed
-
--- =
-
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1824053
-
-Title:
-  Qemu-img convert appears to be stuck on aarch64 host with low
-  probability
-
-Status in QEMU:
-  Confirmed
-
-Bug description:
-  Hi,  I found a problem that qemu-img convert appears to be stuck on
-  aarch64 host with low probability.
-
-  The convert command  line is  "qemu-img convert -f qcow2 -O raw
-  disk.qcow2 disk.raw ".
-
-  The bt is below:
-
-  Thread 2 (Thread 0x40000b776e50 (LWP 27215)):
-  #0  0x000040000a3f2994 in sigtimedwait () from /lib64/libc.so.6
-  #1  0x000040000a39c60c in sigwait () from /lib64/libpthread.so.0
-  #2  0x0000aaaaaae82610 in sigwait_compat (opaque=3D0xaaaac5163b00) at uti=
-l/compatfd.c:37
-  #3  0x0000aaaaaae85038 in qemu_thread_start (args=3Dargs@entry=3D0xaaaac5=
-163b90) at util/qemu_thread_posix.c:496
-  #4  0x000040000a3918bc in start_thread () from /lib64/libpthread.so.0
-  #5  0x000040000a492b2c in thread_start () from /lib64/libc.so.6
-
-  Thread 1 (Thread 0x40000b573370 (LWP 27214)):
-  #0  0x000040000a489020 in ppoll () from /lib64/libc.so.6
-  #1  0x0000aaaaaadaefc0 in ppoll (__ss=3D0x0, __timeout=3D0x0, __nfds=3D<o=
-ptimized out>, __fds=3D<optimized out>) at /usr/include/bits/poll2.h:77
-  #2  qemu_poll_ns (fds=3D<optimized out>, nfds=3D<optimized out>, timeout=
-=3D<optimized out>) at qemu_timer.c:391
-  #3  0x0000aaaaaadae014 in os_host_main_loop_wait (timeout=3D<optimized ou=
-t>) at main_loop.c:272
-  #4  0x0000aaaaaadae190 in main_loop_wait (nonblocking=3D<optimized out>) =
-at main_loop.c:534
-  #5  0x0000aaaaaad97be0 in convert_do_copy (s=3D0xffffdc32eb48) at qemu-im=
-g.c:1923
-  #6  0x0000aaaaaada2d70 in img_convert (argc=3D<optimized out>, argv=3D<op=
-timized out>) at qemu-img.c:2414
-  #7  0x0000aaaaaad99ac4 in main (argc=3D7, argv=3D<optimized out>) at qemu=
--img.c:5305
-
-  =
-
-  The problem seems to be very similar to the phenomenon described by this =
-patch (https://resources.ovirt.org/pub/ovirt-4.1/src/qemu-kvm-ev/0025-aio_n=
-otify-force-main-loop-wakeup-with-SIGIO-aarch64.patch), =
-
-
-  which force main loop wakeup with SIGIO.  But this patch was reverted
-  by the patch (http://ovirt.repo.nfrance.com/src/qemu-kvm-ev/kvm-
-  Revert-aio_notify-force-main-loop-wakeup-with-SIGIO-.patch).
-
-  The problem still seems to exist in aarch64 host. The qemu version I used=
- is 2.8.1. The host version is 4.19.28-1.2.108.aarch64.
-   Do you have any solutions to fix it?  Thanks for your reply !
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1824053/+subscriptions
+U2lnbmVkLW9mZi1ieTogQWxpc3RhaXIgRnJhbmNpcyA8YWxpc3RhaXIuZnJhbmNpc0B3ZGMuY29t
+Pg0KLS0tDQogdGFyZ2V0L3Jpc2N2L2NwdS5jIHwgNDkgKysrKysrKysrKysrKysrKysrKysrKysr
+KysrKysrKysrKysrKysrKysrKysrKw0KIHRhcmdldC9yaXNjdi9jcHUuaCB8ICA4ICsrKysrKysr
+DQogMiBmaWxlcyBjaGFuZ2VkLCA1NyBpbnNlcnRpb25zKCspDQoNCmRpZmYgLS1naXQgYS90YXJn
+ZXQvcmlzY3YvY3B1LmMgYi90YXJnZXQvcmlzY3YvY3B1LmMNCmluZGV4IGQ2MWJjZTZkNTUuLjhm
+MTRmYjhhMWYgMTAwNjQ0DQotLS0gYS90YXJnZXQvcmlzY3YvY3B1LmMNCisrKyBiL3RhcmdldC9y
+aXNjdi9jcHUuYw0KQEAgLTIyLDYgKzIyLDcgQEANCiAjaW5jbHVkZSAiY3B1LmgiDQogI2luY2x1
+ZGUgImV4ZWMvZXhlYy1hbGwuaCINCiAjaW5jbHVkZSAicWFwaS9lcnJvci5oIg0KKyNpbmNsdWRl
+ICJody9xZGV2LXByb3BlcnRpZXMuaCINCiAjaW5jbHVkZSAibWlncmF0aW9uL3Ztc3RhdGUuaCIN
+CiANCiAvKiBSSVNDLVYgQ1BVIGRlZmluaXRpb25zICovDQpAQCAtMjk2LDcgKzI5NywxMSBAQCBz
+dGF0aWMgdm9pZCByaXNjdl9jcHVfZGlzYXNfc2V0X2luZm8oQ1BVU3RhdGUgKnMsIGRpc2Fzc2Vt
+YmxlX2luZm8gKmluZm8pDQogc3RhdGljIHZvaWQgcmlzY3ZfY3B1X3JlYWxpemUoRGV2aWNlU3Rh
+dGUgKmRldiwgRXJyb3IgKiplcnJwKQ0KIHsNCiAgICAgQ1BVU3RhdGUgKmNzID0gQ1BVKGRldik7
+DQorICAgIFJJU0NWQ1BVICpjcHUgPSBSSVNDVl9DUFUoZGV2KTsNCisgICAgQ1BVUklTQ1ZTdGF0
+ZSAqZW52ID0gJmNwdS0+ZW52Ow0KICAgICBSSVNDVkNQVUNsYXNzICptY2MgPSBSSVNDVl9DUFVf
+R0VUX0NMQVNTKGRldik7DQorICAgIGludCBwcml2X3ZlcnNpb24gPSBQUklWX1ZFUlNJT05fMV8x
+MF8wOw0KKyAgICBpbnQgdXNlcl92ZXJzaW9uID0gVVNFUl9WRVJTSU9OXzJfMDJfMDsNCiAgICAg
+RXJyb3IgKmxvY2FsX2VyciA9IE5VTEw7DQogDQogICAgIGNwdV9leGVjX3JlYWxpemVmbihjcywg
+JmxvY2FsX2Vycik7DQpAQCAtMzA1LDYgKzMxMCw0MSBAQCBzdGF0aWMgdm9pZCByaXNjdl9jcHVf
+cmVhbGl6ZShEZXZpY2VTdGF0ZSAqZGV2LCBFcnJvciAqKmVycnApDQogICAgICAgICByZXR1cm47
+DQogICAgIH0NCiANCisgICAgaWYgKGNwdS0+Y2ZnLnByaXZfc3BlYykgew0KKyAgICAgICAgaWYg
+KCFnX3N0cmNtcDAoY3B1LT5jZmcucHJpdl9zcGVjLCAidjEuMTAuMCIpKSB7DQorICAgICAgICAg
+ICAgcHJpdl92ZXJzaW9uID0gUFJJVl9WRVJTSU9OXzFfMTBfMDsNCisgICAgICAgIH0gZWxzZSBp
+ZiAoIWdfc3RyY21wMChjcHUtPmNmZy5wcml2X3NwZWMsICJ2MS45LjEiKSkgew0KKyAgICAgICAg
+ICAgIHByaXZfdmVyc2lvbiA9IFBSSVZfVkVSU0lPTl8xXzA5XzE7DQorICAgICAgICB9IGVsc2Ug
+ew0KKyAgICAgICAgICAgIGVycm9yX3NldGcoZXJycCwNCisgICAgICAgICAgICAgICAgICAgICAg
+ICJVbnN1cHBvcnRlZCBwcml2aWxlZ2Ugc3BlYyB2ZXJzaW9uICclcyciLA0KKyAgICAgICAgICAg
+ICAgICAgICAgICAgY3B1LT5jZmcucHJpdl9zcGVjKTsNCisgICAgICAgICAgICByZXR1cm47DQor
+ICAgICAgICB9DQorICAgIH0NCisNCisgICAgaWYgKGNwdS0+Y2ZnLnVzZXJfc3BlYykgew0KKyAg
+ICAgICAgaWYgKCFnX3N0cmNtcDAoY3B1LT5jZmcudXNlcl9zcGVjLCAidjIuMDIuMCIpKSB7DQor
+ICAgICAgICAgICAgdXNlcl92ZXJzaW9uID0gVVNFUl9WRVJTSU9OXzJfMDJfMDsNCisgICAgICAg
+IH0gZWxzZSB7DQorICAgICAgICAgICAgZXJyb3Jfc2V0ZyhlcnJwLA0KKyAgICAgICAgICAgICAg
+ICAgICAgICAgIlVuc3VwcG9ydGVkIHVzZXIgc3BlYyB2ZXJzaW9uICclcyciLA0KKyAgICAgICAg
+ICAgICAgICAgICAgICAgY3B1LT5jZmcudXNlcl9zcGVjKTsNCisgICAgICAgICAgICByZXR1cm47
+DQorICAgICAgICB9DQorICAgIH0NCisNCisgICAgc2V0X3ZlcnNpb25zKGVudiwgdXNlcl92ZXJz
+aW9uLCBwcml2X3ZlcnNpb24pOw0KKyAgICBzZXRfcmVzZXR2ZWMoZW52LCBERUZBVUxUX1JTVFZF
+Qyk7DQorDQorICAgIGlmIChjcHUtPmNmZy5tbXUpIHsNCisgICAgICAgIHNldF9mZWF0dXJlKGVu
+diwgUklTQ1ZfRkVBVFVSRV9NTVUpOw0KKyAgICB9DQorDQorICAgIGlmIChjcHUtPmNmZy5wbXAp
+IHsNCisgICAgICAgIHNldF9mZWF0dXJlKGVudiwgUklTQ1ZfRkVBVFVSRV9QTVApOw0KKyAgICB9
+DQorDQogICAgIHJpc2N2X2NwdV9yZWdpc3Rlcl9nZGJfcmVnc19mb3JfZmVhdHVyZXMoY3MpOw0K
+IA0KICAgICBxZW11X2luaXRfdmNwdShjcyk7DQpAQCAtMzI2LDYgKzM2NiwxNCBAQCBzdGF0aWMg
+Y29uc3QgVk1TdGF0ZURlc2NyaXB0aW9uIHZtc3RhdGVfcmlzY3ZfY3B1ID0gew0KICAgICAudW5t
+aWdyYXRhYmxlID0gMSwNCiB9Ow0KIA0KK3N0YXRpYyBQcm9wZXJ0eSByaXNjdl9jcHVfcHJvcGVy
+dGllc1tdID0gew0KKyAgICBERUZJTkVfUFJPUF9TVFJJTkcoInByaXZfc3BlYyIsIFJJU0NWQ1BV
+LCBjZmcucHJpdl9zcGVjKSwNCisgICAgREVGSU5FX1BST1BfU1RSSU5HKCJ1c2VyX3NwZWMiLCBS
+SVNDVkNQVSwgY2ZnLnVzZXJfc3BlYyksDQorICAgIERFRklORV9QUk9QX0JPT0woIm1tdSIsIFJJ
+U0NWQ1BVLCBjZmcubW11LCB0cnVlKSwNCisgICAgREVGSU5FX1BST1BfQk9PTCgicG1wIiwgUklT
+Q1ZDUFUsIGNmZy5wbXAsIHRydWUpLA0KKyAgICBERUZJTkVfUFJPUF9FTkRfT0ZfTElTVCgpLA0K
+K307DQorDQogc3RhdGljIHZvaWQgcmlzY3ZfY3B1X2NsYXNzX2luaXQoT2JqZWN0Q2xhc3MgKmMs
+IHZvaWQgKmRhdGEpDQogew0KICAgICBSSVNDVkNQVUNsYXNzICptY2MgPSBSSVNDVl9DUFVfQ0xB
+U1MoYyk7DQpAQCAtMzY2LDYgKzQxNCw3IEBAIHN0YXRpYyB2b2lkIHJpc2N2X2NwdV9jbGFzc19p
+bml0KE9iamVjdENsYXNzICpjLCB2b2lkICpkYXRhKQ0KICNlbmRpZg0KICAgICAvKiBGb3Igbm93
+LCBtYXJrIHVubWlncmF0YWJsZTogKi8NCiAgICAgY2MtPnZtc2QgPSAmdm1zdGF0ZV9yaXNjdl9j
+cHU7DQorICAgIGRjLT5wcm9wcyA9IHJpc2N2X2NwdV9wcm9wZXJ0aWVzOw0KIH0NCiANCiBjaGFy
+ICpyaXNjdl9pc2Ffc3RyaW5nKFJJU0NWQ1BVICpjcHUpDQpkaWZmIC0tZ2l0IGEvdGFyZ2V0L3Jp
+c2N2L2NwdS5oIGIvdGFyZ2V0L3Jpc2N2L2NwdS5oDQppbmRleCAyMGJjZTg3NDJlLi42MzIxOTgz
+NTg0IDEwMDY0NA0KLS0tIGEvdGFyZ2V0L3Jpc2N2L2NwdS5oDQorKysgYi90YXJnZXQvcmlzY3Yv
+Y3B1LmgNCkBAIC0yMjQsNiArMjI0LDE0IEBAIHR5cGVkZWYgc3RydWN0IFJJU0NWQ1BVIHsNCiAg
+ICAgQ1BVU3RhdGUgcGFyZW50X29iajsNCiAgICAgLyo8IHB1YmxpYyA+Ki8NCiAgICAgQ1BVUklT
+Q1ZTdGF0ZSBlbnY7DQorDQorICAgIC8qIENvbmZpZ3VyYXRpb24gU2V0dGluZ3MgKi8NCisgICAg
+c3RydWN0IHsNCisgICAgICAgIGNoYXIgKnByaXZfc3BlYzsNCisgICAgICAgIGNoYXIgKnVzZXJf
+c3BlYzsNCisgICAgICAgIGJvb2wgbW11Ow0KKyAgICAgICAgYm9vbCBwbXA7DQorICAgIH0gY2Zn
+Ow0KIH0gUklTQ1ZDUFU7DQogDQogc3RhdGljIGlubGluZSBSSVNDVkNQVSAqcmlzY3ZfZW52X2dl
+dF9jcHUoQ1BVUklTQ1ZTdGF0ZSAqZW52KQ0KLS0gDQoyLjIxLjANCg0K
