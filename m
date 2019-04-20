@@ -4,82 +4,82 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-8.7 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+	SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9F20BC282DD
-	for <qemu-devel@archiver.kernel.org>; Sat, 20 Apr 2019 08:00:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1AA60C282DD
+	for <qemu-devel@archiver.kernel.org>; Sat, 20 Apr 2019 08:01:57 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 540F62087F
-	for <qemu-devel@archiver.kernel.org>; Sat, 20 Apr 2019 08:00:57 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id BEBB42087F
+	for <qemu-devel@archiver.kernel.org>; Sat, 20 Apr 2019 08:01:56 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="du+z4gqO"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 540F62087F
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="eEyK3olj"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BEBB42087F
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:38438 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:38444 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hHkvg-00059a-Hv
-	for qemu-devel@archiver.kernel.org; Sat, 20 Apr 2019 04:00:56 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:40550)
+	id 1hHkwe-0006EM-1v
+	for qemu-devel@archiver.kernel.org; Sat, 20 Apr 2019 04:01:56 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:40508)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1hHkXY-00012Z-9F
-	for qemu-devel@nongnu.org; Sat, 20 Apr 2019 03:36:02 -0400
-Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1hHkXW-0000mz-8o
+	(envelope-from <richard.henderson@linaro.org>) id 1hHkXX-00011Q-8W
 	for qemu-devel@nongnu.org; Sat, 20 Apr 2019 03:36:00 -0400
-Received: from mail-pg1-x534.google.com ([2607:f8b0:4864:20::534]:33293)
+Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
+	(envelope-from <richard.henderson@linaro.org>) id 1hHkXV-0000mF-V1
+	for qemu-devel@nongnu.org; Sat, 20 Apr 2019 03:35:59 -0400
+Received: from mail-pl1-x644.google.com ([2607:f8b0:4864:20::644]:38608)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1hHkXV-0000AK-UL
-	for qemu-devel@nongnu.org; Sat, 20 Apr 2019 03:35:58 -0400
-Received: by mail-pg1-x534.google.com with SMTP id k19so3604839pgh.0
-	for <qemu-devel@nongnu.org>; Sat, 20 Apr 2019 00:35:31 -0700 (PDT)
+	id 1hHkXU-0000Mw-AD
+	for qemu-devel@nongnu.org; Sat, 20 Apr 2019 03:35:56 -0400
+Received: by mail-pl1-x644.google.com with SMTP id f36so3539289plb.5
+	for <qemu-devel@nongnu.org>; Sat, 20 Apr 2019 00:35:42 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
 	h=from:to:cc:subject:date:message-id:in-reply-to:references;
-	bh=pLJ/jEUEC0kAS1hVRK9AblNcf3gsii98OZW+A7GlfOQ=;
-	b=du+z4gqOhqEQ0Rpi83vlAznGWlhJYA/wYMPZkc7mp92s+m7Cwd+cMrJvqm2FKhYrue
-	UwBwyrMyfOhm9uKip8bl0NGmVyb5yUXmgX5q5HELqw/6jy/gWcwdV/i+3NK1ka7W0x4a
-	K1rgl2/+48jXUNUTTCD2YDsX3X9pbAoVQerM1JNpGPbobfIWpHk8JR0q0Pb07i1JYcGt
-	RWZXAat2kE8GYWCeUs30mA9a9/LMycbLRHoZyBbLJZdM0yVqitS9TdQaozTr0ReHWTiv
-	LG2LTA2FRbK99XsJw0dQ1823XHRXAPim9+ibOw6OGS0diyipamZVoShq4+YSYsHhgBhE
-	O/tA==
+	bh=lRGQ2wNmavOUPa4H3gsQKIdLCd5xhIibGFq5wA+mFqQ=;
+	b=eEyK3olj9pgynR5TsnKROTz1B68RnDbqagojfxN7iUkdy4rws/aE7WVVKHbudPeCF/
+	yHmO5C3IBVDeT5gndOlpTnr0fonX9PfseZqbJtoDAT0/Oojpjh7xBQP63jDDQubBae6+
+	6ZBRdKtRPfjRCvvuhqiwFX56DLFBCQvYNi7eoJWLVN1CLmYEOHjLlWlF7UFGCOmajcqu
+	3J1AQ7GbUScp5qX+FL+bWUVS5XfV5Bt9KuGPIPzSgnqc80TSJUPJfBMSB6PuZmKiowBf
+	G9PPcbWR558Tbi1wEsPmUOnoTE5IJ5u1AFhwtIfPbFP9qdJIIYhAE9Q+S4MDxKLtPY+g
+	yeKw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
 	d=1e100.net; s=20161025;
 	h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
 	:references;
-	bh=pLJ/jEUEC0kAS1hVRK9AblNcf3gsii98OZW+A7GlfOQ=;
-	b=DtBpDeOaDWeY/fhkr/lXrv5lWjf0VAAawmkTcRMlwf25YJJtVxiSClJ9kh4t5jFJh5
-	2GlswqEzzWgH06LPQ9faaZHbweHZ2eU5ad/fC2USxT2AtKOfjjRPgxuYw05fAMGf9X+n
-	ruG0lz/W57V9NewbVQF3wmgD6j82aKFhFNFDMBZDXNIhfktG2aroMW0ASETKt6aGlQsG
-	QLDaw3e+CON9GUodS1Bos346gJigACb0MNoJYDSHUikU/kx5eguc0tS18pQ1qIvGYp8m
-	1ssUY8ZQo4QnKUHTn7GP8yyWwZuhFNufBrJlrhBoZi8O/xPMKCTpzXNGPzvDHrLHQrlx
-	/vLw==
-X-Gm-Message-State: APjAAAV7VRC80aSNTFdQQOb7EbZEO4pK/aQFiDta/9o4zb4xqulzMlFv
-	es0I6bPwK/byGFDcipwfTAFjZkyLBRA=
-X-Google-Smtp-Source: APXvYqwP1xr/YFir9OL02PUkTcxbIAcX5TTvDxmqJASiun23qbLaZvhSROztDY/G3bhMAqr+Tn0T6Q==
-X-Received: by 2002:a63:3287:: with SMTP id y129mr8215796pgy.9.1555745730533; 
-	Sat, 20 Apr 2019 00:35:30 -0700 (PDT)
+	bh=lRGQ2wNmavOUPa4H3gsQKIdLCd5xhIibGFq5wA+mFqQ=;
+	b=BzjYEFlmWw+uQx+gfLTgajQ32EmLlP70M2/aJrX9NZ1WtYSZsbGZnfEvNhYQCeiPcF
+	OeNMGwtCHs/nqE5I+/pjUQ3ayF1DkZTObVj3VjGufV7sTTYkltqJ6KVx4rpo4Easv2yh
+	/ql8+qeM+7tGziaTgdMwiiBCxxaxxZ3pk96y/an3Kp+UDia217ET3DEYdPJxN69lJ26A
+	gNB0glutsqi/5VW1pCAu646EiYrJr7zQSgB1OMLGy2NA9JSTAfLpUSLBy8dZIxFhc6+H
+	S6x7+LNHLL/oSV9Xhszfu+cWe9N5n2vOeQBeKxX/S1QakESlsHod8dtlDCcx/+g7KJMd
+	GwxA==
+X-Gm-Message-State: APjAAAWN5IYHaJl5d639jzJDQJNwajIliP5eApPXrgFQLjnPyC+KPFfd
+	RW3oE+bXTngGv2W7YkzHQA9WgyJhFts=
+X-Google-Smtp-Source: APXvYqz+gnFlO6NLLKsZVUMjmtlIGsEfkRDTQdH282Hgz2ToA50mR3fzjUgFon343Teb2q8QEB005A==
+X-Received: by 2002:a17:902:2b88:: with SMTP id
+	l8mr8225061plb.262.1555745741032; 
+	Sat, 20 Apr 2019 00:35:41 -0700 (PDT)
 Received: from localhost.localdomain (rrcs-66-91-136-155.west.biz.rr.com.
 	[66.91.136.155]) by smtp.gmail.com with ESMTPSA id
-	z22sm7025492pgv.23.2019.04.20.00.35.29
+	z22sm7025492pgv.23.2019.04.20.00.35.39
 	(version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-	Sat, 20 Apr 2019 00:35:29 -0700 (PDT)
+	Sat, 20 Apr 2019 00:35:40 -0700 (PDT)
 From: Richard Henderson <richard.henderson@linaro.org>
 To: qemu-devel@nongnu.org
-Date: Fri, 19 Apr 2019 21:34:32 -1000
-Message-Id: <20190420073442.7488-29-richard.henderson@linaro.org>
+Date: Fri, 19 Apr 2019 21:34:39 -1000
+Message-Id: <20190420073442.7488-36-richard.henderson@linaro.org>
 X-Mailer: git-send-email 2.17.1
 In-Reply-To: <20190420073442.7488-1-richard.henderson@linaro.org>
 References: <20190420073442.7488-1-richard.henderson@linaro.org>
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
 	recognized.
-X-Received-From: 2607:f8b0:4864:20::534
-Subject: [Qemu-devel] [PATCH 28/38] tcg: Add support for vector comparison
- select
+X-Received-From: 2607:f8b0:4864:20::644
+Subject: [Qemu-devel] [PATCH 35/38] tcg: Introduce do_op3_nofail for vector
+ expansion
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -96,182 +96,146 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 Content-Type: text/plain; charset="UTF-8"
-Message-ID: <20190420073432.WLM-0jphH1C-x-gcaBawTwzJOzkHiCNiTitj2hfRQXU@z>
+Message-ID: <20190420073439.mq8FOEtH-p18QT3QCspJG6V4Upzpt2eMzUnSt1KvEbA@z>
 
-At present, only tcg_gen_cmpsel_vec added, which can be used by
-other target-specific vector expanders.  It is not clear whether
-a full gvec expander would be worthwhile, given the unspecified
-nature of the selector.
+This makes do_op3 match do_op2 in allowing for failure,
+and thus fall back expansions.
 
 Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- tcg/aarch64/tcg-target.h |  1 +
- tcg/i386/tcg-target.h    |  1 +
- tcg/tcg-op.h             |  2 ++
- tcg/tcg-opc.h            |  1 +
- tcg/tcg.h                |  1 +
- tcg/tcg-op-gvec.c        |  3 +++
- tcg/tcg-op-vec.c         | 37 +++++++++++++++++++++++++++++++++++++
- tcg/tcg.c                |  2 ++
- tcg/README               | 12 ++++++++++++
- 9 files changed, 60 insertions(+)
+ tcg/tcg-op-vec.c | 45 +++++++++++++++++++++++++++------------------
+ 1 file changed, 27 insertions(+), 18 deletions(-)
 
-diff --git a/tcg/aarch64/tcg-target.h b/tcg/aarch64/tcg-target.h
-index e43554c3c7..e1135e930a 100644
---- a/tcg/aarch64/tcg-target.h
-+++ b/tcg/aarch64/tcg-target.h
-@@ -140,6 +140,7 @@ typedef enum {
- #define TCG_TARGET_HAS_mul_vec          1
- #define TCG_TARGET_HAS_sat_vec          1
- #define TCG_TARGET_HAS_minmax_vec       1
-+#define TCG_TARGET_HAS_cmpsel_vec       0
- 
- #define TCG_TARGET_DEFAULT_MO (0)
- #define TCG_TARGET_HAS_MEMORY_BSWAP     1
-diff --git a/tcg/i386/tcg-target.h b/tcg/i386/tcg-target.h
-index 66f16fbe3c..683e029980 100644
---- a/tcg/i386/tcg-target.h
-+++ b/tcg/i386/tcg-target.h
-@@ -190,6 +190,7 @@ extern bool have_avx2;
- #define TCG_TARGET_HAS_mul_vec          1
- #define TCG_TARGET_HAS_sat_vec          1
- #define TCG_TARGET_HAS_minmax_vec       1
-+#define TCG_TARGET_HAS_cmpsel_vec       0
- 
- #define TCG_TARGET_deposit_i32_valid(ofs, len) \
-     (((ofs) == 0 && (len) == 8) || ((ofs) == 8 && (len) == 8) || \
-diff --git a/tcg/tcg-op.h b/tcg/tcg-op.h
-index 660fe205d0..6c4cd0aa14 100644
---- a/tcg/tcg-op.h
-+++ b/tcg/tcg-op.h
-@@ -999,6 +999,8 @@ void tcg_gen_sarv_vec(unsigned vece, TCGv_vec r, TCGv_vec a, TCGv_vec s);
- 
- void tcg_gen_cmp_vec(TCGCond cond, unsigned vece, TCGv_vec r,
-                      TCGv_vec a, TCGv_vec b);
-+void tcg_gen_cmpsel_vec(unsigned vece, TCGv_vec r, TCGv_vec s,
-+                        TCGv_vec a, TCGv_vec b);
- 
- void tcg_gen_ld_vec(TCGv_vec r, TCGv_ptr base, TCGArg offset);
- void tcg_gen_st_vec(TCGv_vec r, TCGv_ptr base, TCGArg offset);
-diff --git a/tcg/tcg-opc.h b/tcg/tcg-opc.h
-index 4a2dd116eb..05fb9e3f37 100644
---- a/tcg/tcg-opc.h
-+++ b/tcg/tcg-opc.h
-@@ -255,6 +255,7 @@ DEF(shrv_vec, 1, 2, 0, IMPLVEC | IMPL(TCG_TARGET_HAS_shv_vec))
- DEF(sarv_vec, 1, 2, 0, IMPLVEC | IMPL(TCG_TARGET_HAS_shv_vec))
- 
- DEF(cmp_vec, 1, 2, 1, IMPLVEC)
-+DEF(cmpsel_vec, 1, 3, 0, IMPLVEC | IMPL(TCG_TARGET_HAS_cmpsel_vec))
- 
- DEF(last_generic, 0, 0, 0, TCG_OPF_NOT_PRESENT)
- 
-diff --git a/tcg/tcg.h b/tcg/tcg.h
-index 986055fdfa..1abee6cbe5 100644
---- a/tcg/tcg.h
-+++ b/tcg/tcg.h
-@@ -187,6 +187,7 @@ typedef uint64_t TCGRegSet;
- #define TCG_TARGET_HAS_mul_vec          0
- #define TCG_TARGET_HAS_sat_vec          0
- #define TCG_TARGET_HAS_minmax_vec       0
-+#define TCG_TARGET_HAS_cmpsel_vec       0
- #else
- #define TCG_TARGET_MAYBE_vec            1
- #endif
-diff --git a/tcg/tcg-op-gvec.c b/tcg/tcg-op-gvec.c
-index 87d5a01cc9..e7029d26f4 100644
---- a/tcg/tcg-op-gvec.c
-+++ b/tcg/tcg-op-gvec.c
-@@ -96,6 +96,9 @@ static bool tcg_can_emit_vecop_list(const TCGOpcode *list,
-                 continue;
-             }
-             break;
-+        case INDEX_op_cmpsel_vec:
-+            /* Fallback expansion uses only required logial ops.  */
-+            continue;
-         default:
-             break;
-         }
 diff --git a/tcg/tcg-op-vec.c b/tcg/tcg-op-vec.c
-index b7f21145bb..7d8f7b490a 100644
+index 7d8f7b490a..5868a51270 100644
 --- a/tcg/tcg-op-vec.c
 +++ b/tcg/tcg-op-vec.c
-@@ -599,3 +599,40 @@ void tcg_gen_sars_vec(unsigned vece, TCGv_vec r, TCGv_vec a, TCGv_i32 b)
- {
-     do_shifts(vece, r, a, b, INDEX_op_sars_vec, INDEX_op_sarv_vec);
+@@ -450,7 +450,7 @@ void tcg_gen_cmp_vec(TCGCond cond, unsigned vece,
+     }
  }
-+
-+void tcg_gen_cmpsel_vec(unsigned vece, TCGv_vec r, TCGv_vec s,
-+                        TCGv_vec a, TCGv_vec b)
-+{
-+    TCGTemp *rt = tcgv_vec_temp(r);
-+    TCGTemp *st = tcgv_vec_temp(s);
-+    TCGTemp *at = tcgv_vec_temp(a);
-+    TCGTemp *bt = tcgv_vec_temp(b);
-+    TCGArg ri = temp_arg(rt);
-+    TCGArg si = temp_arg(st);
-+    TCGArg ai = temp_arg(at);
-+    TCGArg bi = temp_arg(bt);
-+    TCGType type = rt->base_type;
-+    const TCGOpcode *hold_list;
-+    int can;
-+
-+    tcg_debug_assert(st->base_type >= type);
-+    tcg_debug_assert(at->base_type >= type);
-+    tcg_debug_assert(bt->base_type >= type);
-+    tcg_assert_listed_vecop(INDEX_op_cmpsel_vec);
-+    hold_list = tcg_swap_vecop_list(NULL);
-+
-+    can = tcg_can_emit_vec_op(INDEX_op_cmpsel_vec, type, vece);
-+    if (can > 0) {
-+        vec_gen_4(INDEX_op_cmpsel_vec, type, vece, ri, si, ai, bi);
+ 
+-static void do_op3(unsigned vece, TCGv_vec r, TCGv_vec a,
++static bool do_op3(unsigned vece, TCGv_vec r, TCGv_vec a,
+                    TCGv_vec b, TCGOpcode opc)
+ {
+     TCGTemp *rt = tcgv_vec_temp(r);
+@@ -468,82 +468,91 @@ static void do_op3(unsigned vece, TCGv_vec r, TCGv_vec a,
+     can = tcg_can_emit_vec_op(opc, type, vece);
+     if (can > 0) {
+         vec_gen_3(opc, type, vece, ri, ai, bi);
+-    } else {
 +    } else if (can < 0) {
-+        tcg_expand_vec_op(INDEX_op_cmpsel_vec, type, vece, ri, si, ai, bi);
+         const TCGOpcode *hold_list = tcg_swap_vecop_list(NULL);
+-        tcg_debug_assert(can < 0);
+         tcg_expand_vec_op(opc, type, vece, ri, ai, bi);
+         tcg_swap_vecop_list(hold_list);
 +    } else {
-+        TCGv_vec t = tcg_temp_new_vec(type);
-+
-+        tcg_gen_and_vec(vece, t, a, s);
-+        tcg_gen_andc_vec(vece, r, b, s);
-+        tcg_gen_or_vec(vece, r, r, t);
-+        tcg_temp_free_vec(t);
-+    }
-+    tcg_swap_vecop_list(hold_list);
++        return false;
+     }
++    return true;
 +}
-diff --git a/tcg/tcg.c b/tcg/tcg.c
-index 86a95a636b..0c68bd5cf5 100644
---- a/tcg/tcg.c
-+++ b/tcg/tcg.c
-@@ -1651,6 +1651,8 @@ bool tcg_op_supported(TCGOpcode op)
-     case INDEX_op_smax_vec:
-     case INDEX_op_umax_vec:
-         return have_vec && TCG_TARGET_HAS_minmax_vec;
-+    case INDEX_op_cmpsel_vec:
-+        return have_vec && TCG_TARGET_HAS_cmpsel_vec;
- 
-     default:
-         tcg_debug_assert(op > INDEX_op_last_generic && op < NB_OPS);
-diff --git a/tcg/README b/tcg/README
-index cbdfd3b6bc..16977a8d62 100644
---- a/tcg/README
-+++ b/tcg/README
-@@ -627,6 +627,18 @@ E.g. VECL=1 -> 64 << 1 -> v128, and VECE=2 -> 1 << 2 -> i32.
- 
-   Compare vectors by element, storing -1 for true and 0 for false.
- 
-+* cmpsel_vec v0, v1, v2, v3
 +
-+  If an element in v1 is "true", select the corresponding element
-+  from v2, else select the corresponding element from v3, storing
-+  the result in v0.  Nominally, this can be implemented as
-+
-+    v0 = (v2 & v1) | (v3 & ~v1)
-+
-+  HOWEVER, it is unspecified which bits of v1 are significant.
-+  Thus each element of v1 must be -1 or 0, as if by the result
-+  of cmp_vec.
-+
- *********
++static void do_op3_nofail(unsigned vece, TCGv_vec r, TCGv_vec a,
++                          TCGv_vec b, TCGOpcode opc)
++{
++    bool ok = do_op3(vece, r, a, b, opc);
++    tcg_debug_assert(ok);
+ }
  
- Note 1: Some shortcuts are defined when the last operand is known to be
+ void tcg_gen_add_vec(unsigned vece, TCGv_vec r, TCGv_vec a, TCGv_vec b)
+ {
+-    do_op3(vece, r, a, b, INDEX_op_add_vec);
++    do_op3_nofail(vece, r, a, b, INDEX_op_add_vec);
+ }
+ 
+ void tcg_gen_sub_vec(unsigned vece, TCGv_vec r, TCGv_vec a, TCGv_vec b)
+ {
+-    do_op3(vece, r, a, b, INDEX_op_sub_vec);
++    do_op3_nofail(vece, r, a, b, INDEX_op_sub_vec);
+ }
+ 
+ void tcg_gen_mul_vec(unsigned vece, TCGv_vec r, TCGv_vec a, TCGv_vec b)
+ {
+-    do_op3(vece, r, a, b, INDEX_op_mul_vec);
++    do_op3_nofail(vece, r, a, b, INDEX_op_mul_vec);
+ }
+ 
+ void tcg_gen_ssadd_vec(unsigned vece, TCGv_vec r, TCGv_vec a, TCGv_vec b)
+ {
+-    do_op3(vece, r, a, b, INDEX_op_ssadd_vec);
++    do_op3_nofail(vece, r, a, b, INDEX_op_ssadd_vec);
+ }
+ 
+ void tcg_gen_usadd_vec(unsigned vece, TCGv_vec r, TCGv_vec a, TCGv_vec b)
+ {
+-    do_op3(vece, r, a, b, INDEX_op_usadd_vec);
++    do_op3_nofail(vece, r, a, b, INDEX_op_usadd_vec);
+ }
+ 
+ void tcg_gen_sssub_vec(unsigned vece, TCGv_vec r, TCGv_vec a, TCGv_vec b)
+ {
+-    do_op3(vece, r, a, b, INDEX_op_sssub_vec);
++    do_op3_nofail(vece, r, a, b, INDEX_op_sssub_vec);
+ }
+ 
+ void tcg_gen_ussub_vec(unsigned vece, TCGv_vec r, TCGv_vec a, TCGv_vec b)
+ {
+-    do_op3(vece, r, a, b, INDEX_op_ussub_vec);
++    do_op3_nofail(vece, r, a, b, INDEX_op_ussub_vec);
+ }
+ 
+ void tcg_gen_smin_vec(unsigned vece, TCGv_vec r, TCGv_vec a, TCGv_vec b)
+ {
+-    do_op3(vece, r, a, b, INDEX_op_smin_vec);
++    do_op3_nofail(vece, r, a, b, INDEX_op_smin_vec);
+ }
+ 
+ void tcg_gen_umin_vec(unsigned vece, TCGv_vec r, TCGv_vec a, TCGv_vec b)
+ {
+-    do_op3(vece, r, a, b, INDEX_op_umin_vec);
++    do_op3_nofail(vece, r, a, b, INDEX_op_umin_vec);
+ }
+ 
+ void tcg_gen_smax_vec(unsigned vece, TCGv_vec r, TCGv_vec a, TCGv_vec b)
+ {
+-    do_op3(vece, r, a, b, INDEX_op_smax_vec);
++    do_op3_nofail(vece, r, a, b, INDEX_op_smax_vec);
+ }
+ 
+ void tcg_gen_umax_vec(unsigned vece, TCGv_vec r, TCGv_vec a, TCGv_vec b)
+ {
+-    do_op3(vece, r, a, b, INDEX_op_umax_vec);
++    do_op3_nofail(vece, r, a, b, INDEX_op_umax_vec);
+ }
+ 
+ void tcg_gen_shlv_vec(unsigned vece, TCGv_vec r, TCGv_vec a, TCGv_vec b)
+ {
+-    do_op3(vece, r, a, b, INDEX_op_shlv_vec);
++    do_op3_nofail(vece, r, a, b, INDEX_op_shlv_vec);
+ }
+ 
+ void tcg_gen_shrv_vec(unsigned vece, TCGv_vec r, TCGv_vec a, TCGv_vec b)
+ {
+-    do_op3(vece, r, a, b, INDEX_op_shrv_vec);
++    do_op3_nofail(vece, r, a, b, INDEX_op_shrv_vec);
+ }
+ 
+ void tcg_gen_sarv_vec(unsigned vece, TCGv_vec r, TCGv_vec a, TCGv_vec b)
+ {
+-    do_op3(vece, r, a, b, INDEX_op_sarv_vec);
++    do_op3_nofail(vece, r, a, b, INDEX_op_sarv_vec);
+ }
+ 
+ static void do_shifts(unsigned vece, TCGv_vec r, TCGv_vec a,
+@@ -579,7 +588,7 @@ static void do_shifts(unsigned vece, TCGv_vec r, TCGv_vec a,
+         } else {
+             tcg_gen_dup_i32_vec(vece, vec_s, s);
+         }
+-        do_op3(vece, r, a, vec_s, opc_v);
++        do_op3_nofail(vece, r, a, vec_s, opc_v);
+         tcg_temp_free_vec(vec_s);
+     }
+     tcg_swap_vecop_list(hold_list);
 -- 
 2.17.1
 
