@@ -1,20 +1,21 @@
 Received: from eggs.gnu.org ([209.51.188.92]:34755)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <liq3ea@163.com>) id 1hHmrK-000119-56
-	for qemu-devel@nongnu.org; Sat, 20 Apr 2019 06:04:37 -0400
+	(envelope-from <liq3ea@163.com>) id 1hHmrN-000119-BH
+	for qemu-devel@nongnu.org; Sat, 20 Apr 2019 06:04:38 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <liq3ea@163.com>) id 1hHmoD-000586-F0
-	for qemu-devel@nongnu.org; Sat, 20 Apr 2019 06:01:22 -0400
-Received: from m12-14.163.com ([220.181.12.14]:59714)
-	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <liq3ea@163.com>) id 1hHmoC-00056s-Th
+	(envelope-from <liq3ea@163.com>) id 1hHmoC-00057s-OV
 	for qemu-devel@nongnu.org; Sat, 20 Apr 2019 06:01:21 -0400
+Received: from m12-14.163.com ([220.181.12.14]:59446)
+	by eggs.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <liq3ea@163.com>) id 1hHmoC-000567-5q
+	for qemu-devel@nongnu.org; Sat, 20 Apr 2019 06:01:20 -0400
 From: Li Qiang <liq3ea@163.com>
-Date: Sat, 20 Apr 2019 03:00:56 -0700
-Message-Id: <20190420100056.116305-5-liq3ea@163.com>
+Date: Sat, 20 Apr 2019 03:00:54 -0700
+Message-Id: <20190420100056.116305-3-liq3ea@163.com>
 In-Reply-To: <20190420100056.116305-1-liq3ea@163.com>
 References: <20190420100056.116305-1-liq3ea@163.com>
-Subject: [Qemu-devel] [PATCH 4/4] tests: fw_cfg: add splash time test case
+Subject: [Qemu-devel] [PATCH 2/4] tests: fw_cfg: add a function to get the
+ fw_cfg file
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,47 +27,89 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: thuth@redhat.com, lvivier@redhat.com, pbonzini@redhat.com, philmd@redhat.com, lersek@redhat.com, kraxel@redhat.com
 Cc: qemu-devel@nongnu.org, liq3ea@gmail.com, Li Qiang <liq3ea@163.com>
 
+This is useful to write qtest about fw_cfg file entry.
+
 Signed-off-by: Li Qiang <liq3ea@163.com>
 ---
- tests/fw_cfg-test.c | 19 +++++++++++++++++++
- 1 file changed, 19 insertions(+)
+ tests/libqos/fw_cfg.c | 45 +++++++++++++++++++++++++++++++++++++++++++
+ tests/libqos/fw_cfg.h |  2 ++
+ 2 files changed, 47 insertions(+)
 
-diff --git a/tests/fw_cfg-test.c b/tests/fw_cfg-test.c
-index 9f75dbb5f4..de8e81ea9d 100644
---- a/tests/fw_cfg-test.c
-+++ b/tests/fw_cfg-test.c
-@@ -192,6 +192,24 @@ static void test_fw_cfg_reboot_timeout(void)
-     qtest_quit(s);
+diff --git a/tests/libqos/fw_cfg.c b/tests/libqos/fw_cfg.c
+index c6839c53c8..1f46258f96 100644
+--- a/tests/libqos/fw_cfg.c
++++ b/tests/libqos/fw_cfg.c
+@@ -16,6 +16,7 @@
+ #include "libqos/fw_cfg.h"
+ #include "libqtest.h"
+ #include "qemu/bswap.h"
++#include "hw/nvram/fw_cfg.h"
+ 
+ void qfw_cfg_select(QFWCFG *fw_cfg, uint16_t key)
+ {
+@@ -59,6 +60,50 @@ static void mm_fw_cfg_select(QFWCFG *fw_cfg, uint16_t key)
+     qtest_writew(fw_cfg->qts, fw_cfg->base, key);
  }
  
-+static void test_fw_cfg_splash_time(void)
++/*
++ * The caller need check the return value. When the return value is
++ * nonzero, it means that some bytes have been transferred.
++ *
++ * If the fw_cfg file in question is smaller than the allocated & passed-in
++ * buffer, then the buffer has been populated only in part.
++ *
++ * If the fw_cfg file in question is larger than the passed-in
++ * buffer, then the return value explains how much room would have been
++ * necessary in total. And, while the caller's buffer has been fully
++ * populated, it has received only a starting slice of the fw_cfg file.
++ */
++size_t qfw_cfg_get_file(QFWCFG *fw_cfg, const char *filename,
++                      void *data, size_t buflen)
 +{
-+    QFWCFG *fw_cfg;
-+    QTestState *s;
-+    uint16_t splash_time = 0;
-+    size_t filesize;
++    uint32_t count;
++    uint32_t i;
++    unsigned char *filesbuf = NULL;
++    size_t dsize;
++    FWCfgFile *pdir_entry;
++    size_t filesize = 0;
 +
-+    s = qtest_init("-boot splash-time=12");
-+    fw_cfg = pc_fw_cfg_init(s);
-+
-+    filesize = qfw_cfg_get_file(fw_cfg, "etc/boot-menu-wait",
-+                     &splash_time, sizeof(splash_time));
-+    g_assert_cmpint(filesize, ==, sizeof(splash_time));
-+    g_assert_cmpint(splash_time, ==, 12);
-+    pc_fw_cfg_uninit(fw_cfg);
-+    qtest_quit(s);
++    qfw_cfg_get(fw_cfg, FW_CFG_FILE_DIR, &count, sizeof(count));
++    count = be32_to_cpu(count);
++    dsize = sizeof(uint32_t) + count * sizeof(struct fw_cfg_file);
++    filesbuf = g_malloc(dsize);
++    qfw_cfg_get(fw_cfg, FW_CFG_FILE_DIR, filesbuf, dsize);
++    pdir_entry = (FWCfgFile *)(filesbuf + sizeof(uint32_t));
++    for (i = 0; i < count; ++i, ++pdir_entry) {
++        if (!strcmp(pdir_entry->name, filename)) {
++            uint32_t len = be32_to_cpu(pdir_entry->size);
++            uint16_t sel = be16_to_cpu(pdir_entry->select);
++            filesize = len;
++            if (len > buflen) {
++                len = buflen;
++            }
++            qfw_cfg_get(fw_cfg, sel, data, len);
++            break;
++        }
++    }
++    g_free(filesbuf);
++    return filesize;
 +}
 +
- int main(int argc, char **argv)
+ static void mm_fw_cfg_read(QFWCFG *fw_cfg, void *data, size_t len)
  {
-     int ret;
-@@ -214,6 +232,7 @@ int main(int argc, char **argv)
-     qtest_add_func("fw_cfg/numa", test_fw_cfg_numa);
-     qtest_add_func("fw_cfg/boot_menu", test_fw_cfg_boot_menu);
-     qtest_add_func("fw_cfg/reboot_timeout", test_fw_cfg_reboot_timeout);
-+    qtest_add_func("fw_cfg/splash_time", test_fw_cfg_splash_time);
+     uint8_t *ptr = data;
+diff --git a/tests/libqos/fw_cfg.h b/tests/libqos/fw_cfg.h
+index 60de81e863..13325cc4ff 100644
+--- a/tests/libqos/fw_cfg.h
++++ b/tests/libqos/fw_cfg.h
+@@ -31,6 +31,8 @@ void qfw_cfg_get(QFWCFG *fw_cfg, uint16_t key, void *data, size_t len);
+ uint16_t qfw_cfg_get_u16(QFWCFG *fw_cfg, uint16_t key);
+ uint32_t qfw_cfg_get_u32(QFWCFG *fw_cfg, uint16_t key);
+ uint64_t qfw_cfg_get_u64(QFWCFG *fw_cfg, uint16_t key);
++size_t qfw_cfg_get_file(QFWCFG *fw_cfg, const char *filename,
++                        void *data, size_t buflen);
  
-     ret = g_test_run();
- 
+ QFWCFG *mm_fw_cfg_init(QTestState *qts, uint64_t base);
+ void mm_fw_cfg_uninit(QFWCFG *fw_cfg);
 -- 
 2.17.1
