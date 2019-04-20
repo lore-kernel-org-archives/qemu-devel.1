@@ -1,21 +1,30 @@
 Received: from eggs.gnu.org ([209.51.188.92]:34755)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <liq3ea@163.com>) id 1hHmrN-000119-BH
-	for qemu-devel@nongnu.org; Sat, 20 Apr 2019 06:04:38 -0400
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1hHmrm-000119-FZ
+	for qemu-devel@nongnu.org; Sat, 20 Apr 2019 06:05:03 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <liq3ea@163.com>) id 1hHmoC-00057s-OV
-	for qemu-devel@nongnu.org; Sat, 20 Apr 2019 06:01:21 -0400
-Received: from m12-14.163.com ([220.181.12.14]:59446)
-	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <liq3ea@163.com>) id 1hHmoC-000567-5q
-	for qemu-devel@nongnu.org; Sat, 20 Apr 2019 06:01:20 -0400
-From: Li Qiang <liq3ea@163.com>
-Date: Sat, 20 Apr 2019 03:00:54 -0700
-Message-Id: <20190420100056.116305-3-liq3ea@163.com>
-In-Reply-To: <20190420100056.116305-1-liq3ea@163.com>
-References: <20190420100056.116305-1-liq3ea@163.com>
-Subject: [Qemu-devel] [PATCH 2/4] tests: fw_cfg: add a function to get the
- fw_cfg file
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1hHmdG-0005HP-Qj
+	for qemu-devel@nongnu.org; Sat, 20 Apr 2019 05:50:04 -0400
+Received: from mail-yw1-f68.google.com ([209.85.161.68]:37654)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1hHmdG-0005GV-M6
+	for qemu-devel@nongnu.org; Sat, 20 Apr 2019 05:50:02 -0400
+Received: by mail-yw1-f68.google.com with SMTP id w66so2646097ywd.4
+	for <qemu-devel@nongnu.org>; Sat, 20 Apr 2019 02:50:01 -0700 (PDT)
+MIME-Version: 1.0
+References: <20190419103722.17062-1-shahab.vahedi@gmail.com>
+	<871s1xha0f.fsf@zen.linaroharston>
+In-Reply-To: <871s1xha0f.fsf@zen.linaroharston>
+From: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>
+Date: Sat, 20 Apr 2019 11:49:48 +0200
+Message-ID: <CAAdtpL5yj3dDoxQ+_V32MDPE3bYa15wGHKSBOEgGdDSujPxgxw@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH] cputlb: Fix io_readx() to respect the
+ access_type
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,92 +33,74 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: thuth@redhat.com, lvivier@redhat.com, pbonzini@redhat.com, philmd@redhat.com, lersek@redhat.com, kraxel@redhat.com
-Cc: qemu-devel@nongnu.org, liq3ea@gmail.com, Li Qiang <liq3ea@163.com>
+To: =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>
+Cc: "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>, Shahab Vahedi <shahab.vahedi@gmail.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>
 
-This is useful to write qtest about fw_cfg file entry.
+Hi Alex,
 
-Signed-off-by: Li Qiang <liq3ea@163.com>
----
- tests/libqos/fw_cfg.c | 45 +++++++++++++++++++++++++++++++++++++++++++
- tests/libqos/fw_cfg.h |  2 ++
- 2 files changed, 47 insertions(+)
+Le sam. 20 avr. 2019 01:05, Alex Benn=C3=A9e <alex.bennee@linaro.org> a =C3=
+=A9crit :
 
-diff --git a/tests/libqos/fw_cfg.c b/tests/libqos/fw_cfg.c
-index c6839c53c8..1f46258f96 100644
---- a/tests/libqos/fw_cfg.c
-+++ b/tests/libqos/fw_cfg.c
-@@ -16,6 +16,7 @@
- #include "libqos/fw_cfg.h"
- #include "libqtest.h"
- #include "qemu/bswap.h"
-+#include "hw/nvram/fw_cfg.h"
- 
- void qfw_cfg_select(QFWCFG *fw_cfg, uint16_t key)
- {
-@@ -59,6 +60,50 @@ static void mm_fw_cfg_select(QFWCFG *fw_cfg, uint16_t key)
-     qtest_writew(fw_cfg->qts, fw_cfg->base, key);
- }
- 
-+/*
-+ * The caller need check the return value. When the return value is
-+ * nonzero, it means that some bytes have been transferred.
-+ *
-+ * If the fw_cfg file in question is smaller than the allocated & passed-in
-+ * buffer, then the buffer has been populated only in part.
-+ *
-+ * If the fw_cfg file in question is larger than the passed-in
-+ * buffer, then the return value explains how much room would have been
-+ * necessary in total. And, while the caller's buffer has been fully
-+ * populated, it has received only a starting slice of the fw_cfg file.
-+ */
-+size_t qfw_cfg_get_file(QFWCFG *fw_cfg, const char *filename,
-+                      void *data, size_t buflen)
-+{
-+    uint32_t count;
-+    uint32_t i;
-+    unsigned char *filesbuf = NULL;
-+    size_t dsize;
-+    FWCfgFile *pdir_entry;
-+    size_t filesize = 0;
-+
-+    qfw_cfg_get(fw_cfg, FW_CFG_FILE_DIR, &count, sizeof(count));
-+    count = be32_to_cpu(count);
-+    dsize = sizeof(uint32_t) + count * sizeof(struct fw_cfg_file);
-+    filesbuf = g_malloc(dsize);
-+    qfw_cfg_get(fw_cfg, FW_CFG_FILE_DIR, filesbuf, dsize);
-+    pdir_entry = (FWCfgFile *)(filesbuf + sizeof(uint32_t));
-+    for (i = 0; i < count; ++i, ++pdir_entry) {
-+        if (!strcmp(pdir_entry->name, filename)) {
-+            uint32_t len = be32_to_cpu(pdir_entry->size);
-+            uint16_t sel = be16_to_cpu(pdir_entry->select);
-+            filesize = len;
-+            if (len > buflen) {
-+                len = buflen;
-+            }
-+            qfw_cfg_get(fw_cfg, sel, data, len);
-+            break;
-+        }
-+    }
-+    g_free(filesbuf);
-+    return filesize;
-+}
-+
- static void mm_fw_cfg_read(QFWCFG *fw_cfg, void *data, size_t len)
- {
-     uint8_t *ptr = data;
-diff --git a/tests/libqos/fw_cfg.h b/tests/libqos/fw_cfg.h
-index 60de81e863..13325cc4ff 100644
---- a/tests/libqos/fw_cfg.h
-+++ b/tests/libqos/fw_cfg.h
-@@ -31,6 +31,8 @@ void qfw_cfg_get(QFWCFG *fw_cfg, uint16_t key, void *data, size_t len);
- uint16_t qfw_cfg_get_u16(QFWCFG *fw_cfg, uint16_t key);
- uint32_t qfw_cfg_get_u32(QFWCFG *fw_cfg, uint16_t key);
- uint64_t qfw_cfg_get_u64(QFWCFG *fw_cfg, uint16_t key);
-+size_t qfw_cfg_get_file(QFWCFG *fw_cfg, const char *filename,
-+                        void *data, size_t buflen);
- 
- QFWCFG *mm_fw_cfg_init(QTestState *qts, uint64_t base);
- void mm_fw_cfg_uninit(QFWCFG *fw_cfg);
--- 
-2.17.1
+>
+> Shahab Vahedi <shahab.vahedi@gmail.com> writes:
+>
+> > This change adapts io_readx() to its input access_type. Currently
+> > io_readx() treats any memory access as a read, although it has an
+> > input argument "MMUAccessType access_type". This results in:
+> >
+> > 1) Calling the tlb_fill() only with MMU_DATA_LOAD
+> > 2) Considering only entry->addr_read as the tlb_addr
+> >
+> > Buglink: https://bugs.launchpad.net/qemu/+bug/1825359
+>
+> This bug talks about the distinction between DATA_LOAD and INST_FETCH
+> but...
+>
+> >
+> > Signed-off-by: Shahab Vahedi <shahab.vahedi@gmail.com>
+> > ---
+> >  accel/tcg/cputlb.c | 7 +++++--
+> >  1 file changed, 5 insertions(+), 2 deletions(-)
+> >
+> > diff --git a/accel/tcg/cputlb.c b/accel/tcg/cputlb.c
+> > index 88cc8389e9..0daac0e806 100644
+> > --- a/accel/tcg/cputlb.c
+> > +++ b/accel/tcg/cputlb.c
+> > @@ -878,10 +878,13 @@ static uint64_t io_readx(CPUArchState *env,
+> CPUIOTLBEntry *iotlbentry,
+> >          CPUTLBEntry *entry;
+> >          target_ulong tlb_addr;
+> >
+> > -        tlb_fill(cpu, addr, size, MMU_DATA_LOAD, mmu_idx, retaddr);
+> > +        tlb_fill(cpu, addr, size, access_type, mmu_idx, retaddr);
+> >
+> >          entry =3D tlb_entry(env, mmu_idx, addr);
+> > -        tlb_addr =3D entry->addr_read;
+> > +        tlb_addr =3D
+> > +            (access_type =3D=3D MMU_DATA_LOAD ) ? entry->addr_read  :
+> > +            (access_type =3D=3D MMU_DATA_STORE) ? entry->addr_write :
+> > +            entry->addr_code;
+>
+> ...why do we care here about MMU_DATA_STORE?
+>
+> We could just assert (access_type =3D=3D MMU_DATA_LOAD || access_type =3D=
+=3D
+> MMU_INST_FETCH) and then have:
+>
+
+Is asserting the best we can do here?
+
+
+>   (access_type =3D=3D MMU_DATA_LOAD ) ? entry->addr_read  : entry->addr_c=
+ode
+>
+>
+> >          if (!(tlb_addr & ~(TARGET_PAGE_MASK | TLB_RECHECK))) {
+> >              /* RAM access */
+> >              uintptr_t haddr =3D addr + entry->addend;
+>
+>
+> --
+> Alex Benn=C3=A9e
+>
+>
