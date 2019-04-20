@@ -1,25 +1,20 @@
-Received: from eggs.gnu.org ([209.51.188.92]:45991)
+Received: from eggs.gnu.org ([209.51.188.92]:54846)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1hHrY7-0006FH-SP
-	for qemu-devel@nongnu.org; Sat, 20 Apr 2019 11:05:04 -0400
+	(envelope-from <liq3ea@163.com>) id 1hHsPK-0005w9-73
+	for qemu-devel@nongnu.org; Sat, 20 Apr 2019 12:00:03 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1hHrY6-0001bi-Go
-	for qemu-devel@nongnu.org; Sat, 20 Apr 2019 11:05:03 -0400
-Resent-Message-Id: <E1hHrY6-0001bi-Go@eggs.gnu.org>
-Received: from sender4-of-o55.zoho.com ([136.143.188.55]:21590)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
-	id 1hHrY5-0001Sb-HY
-	for qemu-devel@nongnu.org; Sat, 20 Apr 2019 11:05:01 -0400
-In-Reply-To: <20190420145120.122847-1-liq3ea@163.com>
-Message-ID: <155577264895.24.17186415958917619032@c2072b67cc0c>
-Reply-To: <qemu-devel@nongnu.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Sat, 20 Apr 2019 08:04:10 -0700 (PDT)
-Subject: Re: [Qemu-devel] [PATCH 0/3] hw: edu: some fixes
+	(envelope-from <liq3ea@163.com>) id 1hHsPJ-0008Fy-A8
+	for qemu-devel@nongnu.org; Sat, 20 Apr 2019 12:00:02 -0400
+Received: from m12-11.163.com ([220.181.12.11]:33864)
+	by eggs.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <liq3ea@163.com>) id 1hHsPI-0008F3-4s
+	for qemu-devel@nongnu.org; Sat, 20 Apr 2019 12:00:01 -0400
+From: Li Qiang <liq3ea@163.com>
+Date: Sat, 20 Apr 2019 08:59:47 -0700
+Message-Id: <20190420155949.130968-2-liq3ea@163.com>
+In-Reply-To: <20190420155949.130968-1-liq3ea@163.com>
+References: <20190420155949.130968-1-liq3ea@163.com>
+Subject: [Qemu-devel] [PATCH v2 1/3] tests: fw_cfg: add splash time test case
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,52 +23,50 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: liq3ea@163.com
-Cc: fam@euphon.net, jslaby@suse.cz, pbonzini@redhat.com, liq3ea@gmail.com, qemu-devel@nongnu.org
+To: jslaby@suse.cz, pbonzini@redhat.com
+Cc: qemu-devel@nongnu.org, liq3ea@gmail.com, Li Qiang <liq3ea@163.com>
 
-UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDE5MDQyMDE0NTEyMC4xMjI4
-NDctMS1saXEzZWFAMTYzLmNvbS8KCgoKSGksCgpUaGlzIHNlcmllcyBmYWlsZWQgdGhlIGRvY2tl
-ci1taW5nd0BmZWRvcmEgYnVpbGQgdGVzdC4gUGxlYXNlIGZpbmQgdGhlIHRlc3RpbmcgY29tbWFu
-ZHMgYW5kCnRoZWlyIG91dHB1dCBiZWxvdy4gSWYgeW91IGhhdmUgRG9ja2VyIGluc3RhbGxlZCwg
-eW91IGNhbiBwcm9iYWJseSByZXByb2R1Y2UgaXQKbG9jYWxseS4KCj09PSBURVNUIFNDUklQVCBC
-RUdJTiA9PT0KIyEvYmluL2Jhc2gKdGltZSBtYWtlIGRvY2tlci10ZXN0LW1pbmd3QGZlZG9yYSBT
-SE9XX0VOVj0xIEo9MTQgTkVUV09SSz0xCj09PSBURVNUIFNDUklQVCBFTkQgPT09CgogIFNJR04g
-ICAgb3B0aW9ucm9tL211bHRpYm9vdC5iaW4KICBMSU5LICAgIHFlbXUtZWRpZC5leGUKL3RtcC9x
-ZW11LXRlc3Qvc3JjL2h3L21pc2MvZWR1LmM6IEluIGZ1bmN0aW9uICdlZHVfY2hlY2tfcmFuZ2Un
-OgovdG1wL3FlbXUtdGVzdC9zcmMvaHcvbWlzYy9lZHUuYzoxMTc6MzY6IGVycm9yOiBmb3JtYXQg
-JyVseCcgZXhwZWN0cyBhcmd1bWVudCBvZiB0eXBlICdsb25nIHVuc2lnbmVkIGludCcsIGJ1dCBh
-cmd1bWVudCAyIGhhcyB0eXBlICd1aW50NjRfdCcge2FrYSAnbG9uZyBsb25nIHVuc2lnbmVkIGlu
-dCd9IFstV2Vycm9yPWZvcm1hdD1dCiAgICAgaHdfZXJyb3IoIkVEVTogRE1BIHJhbmdlIDB4JS44
-bHgtMHglLjhseCBvdXQgb2YgYm91bmRzICgweCUuOGx4LTB4JS44bHgpISIsCiAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgfn5+fl4KICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAlLjhsbHgKICAgICAgICAgICAgIGFkZHIsIGVuZDEgLSAxLCBzdGFydCwgZW5kMiAtIDEpOwog
-ICAgICAgICAgICAgfn5+fiAgICAgICAgICAgICAgICAgICAgCi90bXAvcWVtdS10ZXN0L3NyYy9o
-dy9taXNjL2VkdS5jOjExNzo0NDogZXJyb3I6IGZvcm1hdCAnJWx4JyBleHBlY3RzIGFyZ3VtZW50
-IG9mIHR5cGUgJ2xvbmcgdW5zaWduZWQgaW50JywgYnV0IGFyZ3VtZW50IDMgaGFzIHR5cGUgJ3Vp
-bnQ2NF90JyB7YWthICdsb25nIGxvbmcgdW5zaWduZWQgaW50J30gWy1XZXJyb3I9Zm9ybWF0PV0K
-ICAgICBod19lcnJvcigiRURVOiBETUEgcmFuZ2UgMHglLjhseC0weCUuOGx4IG91dCBvZiBib3Vu
-ZHMgKDB4JS44bHgtMHglLjhseCkhIiwKICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgIH5+fn5eCiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAlLjhs
-bHgKICAgICAgICAgICAgIGFkZHIsIGVuZDEgLSAxLCBzdGFydCwgZW5kMiAtIDEpOwogICAgICAg
-ICAgICAgICAgICAgfn5+fn5+fn4gICAgICAgICAgICAgICAgICAKL3RtcC9xZW11LXRlc3Qvc3Jj
-L2h3L21pc2MvZWR1LmM6MTE3OjY3OiBlcnJvcjogZm9ybWF0ICclbHgnIGV4cGVjdHMgYXJndW1l
-bnQgb2YgdHlwZSAnbG9uZyB1bnNpZ25lZCBpbnQnLCBidXQgYXJndW1lbnQgNCBoYXMgdHlwZSAn
-dWludDY0X3QnIHtha2EgJ2xvbmcgbG9uZyB1bnNpZ25lZCBpbnQnfSBbLVdlcnJvcj1mb3JtYXQ9
-XQogICAgIGh3X2Vycm9yKCJFRFU6IERNQSByYW5nZSAweCUuOGx4LTB4JS44bHggb3V0IG9mIGJv
-dW5kcyAoMHglLjhseC0weCUuOGx4KSEiLAogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICB+fn5+XgogICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAlLjhsbHgKICAgICAg
-ICAgICAgIGFkZHIsIGVuZDEgLSAxLCBzdGFydCwgZW5kMiAtIDEpOwogICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgIH5+fn5+ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIAovdG1w
-L3FlbXUtdGVzdC9zcmMvaHcvbWlzYy9lZHUuYzoxMTc6NzU6IGVycm9yOiBmb3JtYXQgJyVseCcg
-ZXhwZWN0cyBhcmd1bWVudCBvZiB0eXBlICdsb25nIHVuc2lnbmVkIGludCcsIGJ1dCBhcmd1bWVu
-dCA1IGhhcyB0eXBlICd1aW50NjRfdCcge2FrYSAnbG9uZyBsb25nIHVuc2lnbmVkIGludCd9IFst
-V2Vycm9yPWZvcm1hdD1dCiAgICAgaHdfZXJyb3IoIkVEVTogRE1BIHJhbmdlIDB4JS44bHgtMHgl
-LjhseCBvdXQgb2YgYm91bmRzICgweCUuOGx4LTB4JS44bHgpISIsCiAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgfn5+
-fl4KICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAlLjhsbHgKCgpUaGUgZnVsbCBsb2cgaXMgYXZhaWxhYmxlIGF0Cmh0
-dHA6Ly9wYXRjaGV3Lm9yZy9sb2dzLzIwMTkwNDIwMTQ1MTIwLjEyMjg0Ny0xLWxpcTNlYUAxNjMu
-Y29tL3Rlc3RpbmcuZG9ja2VyLW1pbmd3QGZlZG9yYS8/dHlwZT1tZXNzYWdlLgotLS0KRW1haWwg
-Z2VuZXJhdGVkIGF1dG9tYXRpY2FsbHkgYnkgUGF0Y2hldyBbaHR0cHM6Ly9wYXRjaGV3Lm9yZy9d
-LgpQbGVhc2Ugc2VuZCB5b3VyIGZlZWRiYWNrIHRvIHBhdGNoZXctZGV2ZWxAcmVkaGF0LmNvbQ==
+Signed-off-by: Li Qiang <liq3ea@163.com>
+---
+ tests/fw_cfg-test.c | 19 +++++++++++++++++++
+ 1 file changed, 19 insertions(+)
+
+diff --git a/tests/fw_cfg-test.c b/tests/fw_cfg-test.c
+index 9f75dbb5f4..de8e81ea9d 100644
+--- a/tests/fw_cfg-test.c
++++ b/tests/fw_cfg-test.c
+@@ -192,6 +192,24 @@ static void test_fw_cfg_reboot_timeout(void)
+     qtest_quit(s);
+ }
+ 
++static void test_fw_cfg_splash_time(void)
++{
++    QFWCFG *fw_cfg;
++    QTestState *s;
++    uint16_t splash_time = 0;
++    size_t filesize;
++
++    s = qtest_init("-boot splash-time=12");
++    fw_cfg = pc_fw_cfg_init(s);
++
++    filesize = qfw_cfg_get_file(fw_cfg, "etc/boot-menu-wait",
++                     &splash_time, sizeof(splash_time));
++    g_assert_cmpint(filesize, ==, sizeof(splash_time));
++    g_assert_cmpint(splash_time, ==, 12);
++    pc_fw_cfg_uninit(fw_cfg);
++    qtest_quit(s);
++}
++
+ int main(int argc, char **argv)
+ {
+     int ret;
+@@ -214,6 +232,7 @@ int main(int argc, char **argv)
+     qtest_add_func("fw_cfg/numa", test_fw_cfg_numa);
+     qtest_add_func("fw_cfg/boot_menu", test_fw_cfg_boot_menu);
+     qtest_add_func("fw_cfg/reboot_timeout", test_fw_cfg_reboot_timeout);
++    qtest_add_func("fw_cfg/splash_time", test_fw_cfg_splash_time);
+ 
+     ret = g_test_run();
+ 
+-- 
+2.17.1
