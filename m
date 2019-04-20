@@ -2,66 +2,66 @@ Return-Path: <SRS0=TjK1=SW=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8F92CC282DD
-	for <qemu-devel@archiver.kernel.org>; Sat, 20 Apr 2019 14:57:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 05691C282DD
+	for <qemu-devel@archiver.kernel.org>; Sat, 20 Apr 2019 15:05:57 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5780B20833
-	for <qemu-devel@archiver.kernel.org>; Sat, 20 Apr 2019 14:57:40 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=163.com header.i=@163.com header.b="kyvqRbox"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5780B20833
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=163.com
+	by mail.kernel.org (Postfix) with ESMTPS id C36D220833
+	for <qemu-devel@archiver.kernel.org>; Sat, 20 Apr 2019 15:05:56 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C36D220833
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=patchew.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:42220 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:42319 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hHrQx-0004jO-LI
-	for qemu-devel@archiver.kernel.org; Sat, 20 Apr 2019 10:57:39 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:43784)
+	id 1hHrYy-0006la-3e
+	for qemu-devel@archiver.kernel.org; Sat, 20 Apr 2019 11:05:56 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:45991)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <liq3ea@163.com>) id 1hHrNi-0002CZ-Sk
-	for qemu-devel@nongnu.org; Sat, 20 Apr 2019 10:54:19 -0400
+	(envelope-from <no-reply@patchew.org>) id 1hHrY7-0006FH-SP
+	for qemu-devel@nongnu.org; Sat, 20 Apr 2019 11:05:04 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <liq3ea@163.com>) id 1hHrL6-00019W-3A
-	for qemu-devel@nongnu.org; Sat, 20 Apr 2019 10:51:36 -0400
-Received: from m12-13.163.com ([220.181.12.13]:58461)
-	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <liq3ea@163.com>) id 1hHrL5-00018V-0M
-	for qemu-devel@nongnu.org; Sat, 20 Apr 2019 10:51:36 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=163.com;
-	s=s110527; h=From:Subject:Date:Message-Id; bh=lgkdDMul6cYmcPejZ/
-	UePeaPFgmTCIP83JKHfVUUsqY=; b=kyvqRbox3EZxQNuPmuCchOwtfyFf4Vpg0r
-	a4gDyAH1HtCHqrt/QbOKrwUJGPuPydf/jLUyCNuSfiovJ/anVDuTRdiRCwzpuCCX
-	a6WFDmg7lCAx+eWbj2qjsZsXrov5I0b8pwPzRI/d2WPKAE7neI3dwAtxOF1nho8s
-	SO9XE2fr0=
-Received: from localhost.localdomain (unknown [183.159.69.175])
-	by smtp9 (Coremail) with SMTP id DcCowABXKKbvMbtc5Pi_Ag--.9861S5;
-	Sat, 20 Apr 2019 22:51:33 +0800 (CST)
-From: Li Qiang <liq3ea@163.com>
-To: jslaby@suse.cz,
-	pbonzini@redhat.com
-Date: Sat, 20 Apr 2019 07:51:20 -0700
-Message-Id: <20190420145120.122847-4-liq3ea@163.com>
-X-Mailer: git-send-email 2.17.1
+	(envelope-from <no-reply@patchew.org>) id 1hHrY6-0001bi-Go
+	for qemu-devel@nongnu.org; Sat, 20 Apr 2019 11:05:03 -0400
+Resent-Date: Sat, 20 Apr 2019 11:05:03 -0400
+Resent-Message-Id: <E1hHrY6-0001bi-Go@eggs.gnu.org>
+Received: from sender4-of-o55.zoho.com ([136.143.188.55]:21590)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
+	id 1hHrY5-0001Sb-HY
+	for qemu-devel@nongnu.org; Sat, 20 Apr 2019 11:05:01 -0400
+ARC-Seal: i=1; a=rsa-sha256; t=1555772652; cv=none; d=zoho.com; s=zohoarc; 
+	b=K2M/ryuw/SwyA9qlZS0v5+XjWV5Wk31vl8s2F/ur22q/ccvZ29TRhDFv55G0Zimqzvk4EXmjdOEJGko7DFBU5iW714poVpZgLt3Eu+w0fM9SLflZ//V7pex3qfAQWBOG8da9k1koBwONnqWDCKOM5j1dXKaYwDMQYD9gZAknaPc=
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zoho.com;
+	s=zohoarc; t=1555772652;
+	h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:Reply-To:Subject:To:ARC-Authentication-Results;
+	bh=aTkkZ8jiFmFjylbqKVWtYziAoea4G5QCGIHEeAvzPKM=; 
+	b=HX8PAWJU5wGhqu26XvScJ2RHfanJSM68Ldhb7EGI500LgKwv/INDY6QwfrJXzn0vjTASXn7PvASVYzrqrBvATzdRQj46tnuuXl62l2j7JoKfVc3v04KjeEzB1oknoRHQkWJs69ZzM/NFPedQxf8+34L/RK48GdQMHNoFaqU2jUQ=
+ARC-Authentication-Results: i=1; mx.zoho.com; dkim=pass  header.i=patchew.org;
+	spf=pass  smtp.mailfrom=no-reply@patchew.org;
+	dmarc=pass header.from=<no-reply@patchew.org>
+	header.from=<no-reply@patchew.org>
+Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by
+	mx.zohomail.com with SMTPS id 1555772650705244.84447414168903;
+	Sat, 20 Apr 2019 08:04:10 -0700 (PDT)
 In-Reply-To: <20190420145120.122847-1-liq3ea@163.com>
-References: <20190420145120.122847-1-liq3ea@163.com>
-X-CM-TRANSID: DcCowABXKKbvMbtc5Pi_Ag--.9861S5
-X-Coremail-Antispam: 1Uf129KBjvJXoW7tF43CF1UGr48KryDXF1rXrb_yoW8CrW7p3
-	45Grn3XF4FgFyfJ34Yyw4DXrn5GrnxtFWrK348CrsY9ay5WFs7CryDC34I9ryxWrySyr13
-	uFZYgF43uF4IvrJanT9S1TB71UUUUUUqnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-	9KBjDUYxBIdaVFxhVjvjDU0xZFpf9x07j7TmfUUUUU=
-X-Originating-IP: [183.159.69.175]
-X-CM-SenderInfo: 5oltjvrd6rljoofrz/1tbiFBWcbVaD0UGUEwAAsy
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x
-X-Received-From: 220.181.12.13
-Subject: [Qemu-devel] [PATCH 3/3] edu: uses uint64_t in dma operation
+Message-ID: <155577264895.24.17186415958917619032@c2072b67cc0c>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: base64
+Resent-From: 
+From: no-reply@patchew.org
+To: liq3ea@163.com
+Date: Sat, 20 Apr 2019 08:04:10 -0700 (PDT)
+X-ZohoMailClient: External
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 136.143.188.55
+Subject: Re: [Qemu-devel] [PATCH 0/3] hw: edu: some fixes
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -73,73 +73,59 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Li Qiang <liq3ea@163.com>, liq3ea@gmail.com, qemu-devel@nongnu.org
+Reply-To: qemu-devel@nongnu.org
+Cc: fam@euphon.net, liq3ea@163.com, liq3ea@gmail.com, qemu-devel@nongnu.org,
+	pbonzini@redhat.com, jslaby@suse.cz
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Content-Type: text/plain; charset="UTF-8"
-Message-ID: <20190420145120.XmapHpDHI6QkskbZGy__I19ckdXKSCoJmOK81jV4l-M@z>
+Message-ID: <20190420150410.79tUyr2UE4kX4-aWcmpm_7jEObEkE0Eb8r3mlMr5AB4@z>
 
-The dma related variable is dma_addr_t, it is uint64_t in
-x64 platform. Change these usage from uint32_to uint64_t to
-avoid trancation.
-
-Signed-off-by: Li Qiang <liq3ea@163.com>
----
- hw/misc/edu.c | 14 +++++++-------
- 1 file changed, 7 insertions(+), 7 deletions(-)
-
-diff --git a/hw/misc/edu.c b/hw/misc/edu.c
-index 4018dddcb8..b93a679adf 100644
---- a/hw/misc/edu.c
-+++ b/hw/misc/edu.c
-@@ -98,23 +98,23 @@ static void edu_lower_irq(EduState *edu, uint32_t val)
-     }
- }
- 
--static bool within(uint32_t addr, uint32_t start, uint32_t end)
-+static bool within(uint64_t addr, uint64_t start, uint64_t end)
- {
-     return start <= addr && addr < end;
- }
- 
--static void edu_check_range(uint32_t addr, uint32_t size1, uint32_t start,
-+static void edu_check_range(uint64_t addr, uint64_t size1, uint64_t start,
-                 uint32_t size2)
- {
--    uint32_t end1 = addr + size1;
--    uint32_t end2 = start + size2;
-+    uint64_t end1 = addr + size1;
-+    uint64_t end2 = start + size2;
- 
-     if (within(addr, start, end2) &&
-             end1 > addr && within(end1, start, end2)) {
-         return;
-     }
- 
--    hw_error("EDU: DMA range 0x%.8x-0x%.8x out of bounds (0x%.8x-0x%.8x)!",
-+    hw_error("EDU: DMA range 0x%.8lx-0x%.8lx out of bounds (0x%.8lx-0x%.8lx)!",
-             addr, end1 - 1, start, end2 - 1);
- }
- 
-@@ -139,13 +139,13 @@ static void edu_dma_timer(void *opaque)
-     }
- 
-     if (EDU_DMA_DIR(edu->dma.cmd) == EDU_DMA_FROM_PCI) {
--        uint32_t dst = edu->dma.dst;
-+        uint64_t dst = edu->dma.dst;
-         edu_check_range(dst, edu->dma.cnt, DMA_START, DMA_SIZE);
-         dst -= DMA_START;
-         pci_dma_read(&edu->pdev, edu_clamp_addr(edu, edu->dma.src),
-                 edu->dma_buf + dst, edu->dma.cnt);
-     } else {
--        uint32_t src = edu->dma.src;
-+        uint64_t src = edu->dma.src;
-         edu_check_range(src, edu->dma.cnt, DMA_START, DMA_SIZE);
-         src -= DMA_START;
-         pci_dma_write(&edu->pdev, edu_clamp_addr(edu, edu->dma.dst),
--- 
-2.17.1
-
+UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDE5MDQyMDE0NTEyMC4xMjI4
+NDctMS1saXEzZWFAMTYzLmNvbS8KCgoKSGksCgpUaGlzIHNlcmllcyBmYWlsZWQgdGhlIGRvY2tl
+ci1taW5nd0BmZWRvcmEgYnVpbGQgdGVzdC4gUGxlYXNlIGZpbmQgdGhlIHRlc3RpbmcgY29tbWFu
+ZHMgYW5kCnRoZWlyIG91dHB1dCBiZWxvdy4gSWYgeW91IGhhdmUgRG9ja2VyIGluc3RhbGxlZCwg
+eW91IGNhbiBwcm9iYWJseSByZXByb2R1Y2UgaXQKbG9jYWxseS4KCj09PSBURVNUIFNDUklQVCBC
+RUdJTiA9PT0KIyEvYmluL2Jhc2gKdGltZSBtYWtlIGRvY2tlci10ZXN0LW1pbmd3QGZlZG9yYSBT
+SE9XX0VOVj0xIEo9MTQgTkVUV09SSz0xCj09PSBURVNUIFNDUklQVCBFTkQgPT09CgogIFNJR04g
+ICAgb3B0aW9ucm9tL211bHRpYm9vdC5iaW4KICBMSU5LICAgIHFlbXUtZWRpZC5leGUKL3RtcC9x
+ZW11LXRlc3Qvc3JjL2h3L21pc2MvZWR1LmM6IEluIGZ1bmN0aW9uICdlZHVfY2hlY2tfcmFuZ2Un
+OgovdG1wL3FlbXUtdGVzdC9zcmMvaHcvbWlzYy9lZHUuYzoxMTc6MzY6IGVycm9yOiBmb3JtYXQg
+JyVseCcgZXhwZWN0cyBhcmd1bWVudCBvZiB0eXBlICdsb25nIHVuc2lnbmVkIGludCcsIGJ1dCBh
+cmd1bWVudCAyIGhhcyB0eXBlICd1aW50NjRfdCcge2FrYSAnbG9uZyBsb25nIHVuc2lnbmVkIGlu
+dCd9IFstV2Vycm9yPWZvcm1hdD1dCiAgICAgaHdfZXJyb3IoIkVEVTogRE1BIHJhbmdlIDB4JS44
+bHgtMHglLjhseCBvdXQgb2YgYm91bmRzICgweCUuOGx4LTB4JS44bHgpISIsCiAgICAgICAgICAg
+ICAgICAgICAgICAgICAgICAgICAgfn5+fl4KICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
+ICAlLjhsbHgKICAgICAgICAgICAgIGFkZHIsIGVuZDEgLSAxLCBzdGFydCwgZW5kMiAtIDEpOwog
+ICAgICAgICAgICAgfn5+fiAgICAgICAgICAgICAgICAgICAgCi90bXAvcWVtdS10ZXN0L3NyYy9o
+dy9taXNjL2VkdS5jOjExNzo0NDogZXJyb3I6IGZvcm1hdCAnJWx4JyBleHBlY3RzIGFyZ3VtZW50
+IG9mIHR5cGUgJ2xvbmcgdW5zaWduZWQgaW50JywgYnV0IGFyZ3VtZW50IDMgaGFzIHR5cGUgJ3Vp
+bnQ2NF90JyB7YWthICdsb25nIGxvbmcgdW5zaWduZWQgaW50J30gWy1XZXJyb3I9Zm9ybWF0PV0K
+ICAgICBod19lcnJvcigiRURVOiBETUEgcmFuZ2UgMHglLjhseC0weCUuOGx4IG91dCBvZiBib3Vu
+ZHMgKDB4JS44bHgtMHglLjhseCkhIiwKICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
+ICAgICAgIH5+fn5eCiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAlLjhs
+bHgKICAgICAgICAgICAgIGFkZHIsIGVuZDEgLSAxLCBzdGFydCwgZW5kMiAtIDEpOwogICAgICAg
+ICAgICAgICAgICAgfn5+fn5+fn4gICAgICAgICAgICAgICAgICAKL3RtcC9xZW11LXRlc3Qvc3Jj
+L2h3L21pc2MvZWR1LmM6MTE3OjY3OiBlcnJvcjogZm9ybWF0ICclbHgnIGV4cGVjdHMgYXJndW1l
+bnQgb2YgdHlwZSAnbG9uZyB1bnNpZ25lZCBpbnQnLCBidXQgYXJndW1lbnQgNCBoYXMgdHlwZSAn
+dWludDY0X3QnIHtha2EgJ2xvbmcgbG9uZyB1bnNpZ25lZCBpbnQnfSBbLVdlcnJvcj1mb3JtYXQ9
+XQogICAgIGh3X2Vycm9yKCJFRFU6IERNQSByYW5nZSAweCUuOGx4LTB4JS44bHggb3V0IG9mIGJv
+dW5kcyAoMHglLjhseC0weCUuOGx4KSEiLAogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
+ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICB+fn5+XgogICAgICAgICAgICAgICAgICAg
+ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAlLjhsbHgKICAgICAg
+ICAgICAgIGFkZHIsIGVuZDEgLSAxLCBzdGFydCwgZW5kMiAtIDEpOwogICAgICAgICAgICAgICAg
+ICAgICAgICAgICAgIH5+fn5+ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIAovdG1w
+L3FlbXUtdGVzdC9zcmMvaHcvbWlzYy9lZHUuYzoxMTc6NzU6IGVycm9yOiBmb3JtYXQgJyVseCcg
+ZXhwZWN0cyBhcmd1bWVudCBvZiB0eXBlICdsb25nIHVuc2lnbmVkIGludCcsIGJ1dCBhcmd1bWVu
+dCA1IGhhcyB0eXBlICd1aW50NjRfdCcge2FrYSAnbG9uZyBsb25nIHVuc2lnbmVkIGludCd9IFst
+V2Vycm9yPWZvcm1hdD1dCiAgICAgaHdfZXJyb3IoIkVEVTogRE1BIHJhbmdlIDB4JS44bHgtMHgl
+LjhseCBvdXQgb2YgYm91bmRzICgweCUuOGx4LTB4JS44bHgpISIsCiAgICAgICAgICAgICAgICAg
+ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgfn5+
+fl4KICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
+ICAgICAgICAgICAgICAgICAlLjhsbHgKCgpUaGUgZnVsbCBsb2cgaXMgYXZhaWxhYmxlIGF0Cmh0
+dHA6Ly9wYXRjaGV3Lm9yZy9sb2dzLzIwMTkwNDIwMTQ1MTIwLjEyMjg0Ny0xLWxpcTNlYUAxNjMu
+Y29tL3Rlc3RpbmcuZG9ja2VyLW1pbmd3QGZlZG9yYS8/dHlwZT1tZXNzYWdlLgotLS0KRW1haWwg
+Z2VuZXJhdGVkIGF1dG9tYXRpY2FsbHkgYnkgUGF0Y2hldyBbaHR0cHM6Ly9wYXRjaGV3Lm9yZy9d
+LgpQbGVhc2Ugc2VuZCB5b3VyIGZlZWRiYWNrIHRvIHBhdGNoZXctZGV2ZWxAcmVkaGF0LmNvbQ==
 
 
