@@ -1,18 +1,20 @@
-Received: from eggs.gnu.org ([209.51.188.92]:54869)
+Received: from eggs.gnu.org ([209.51.188.92]:57509)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <liq3ea@163.com>) id 1hHsPL-0005wJ-1c
-	for qemu-devel@nongnu.org; Sat, 20 Apr 2019 12:00:03 -0400
+	(envelope-from <liq3ea@163.com>) id 1hHsdm-0004qC-1r
+	for qemu-devel@nongnu.org; Sat, 20 Apr 2019 12:14:58 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <liq3ea@163.com>) id 1hHsPK-0008HT-0I
-	for qemu-devel@nongnu.org; Sat, 20 Apr 2019 12:00:02 -0400
-Received: from m12-11.163.com ([220.181.12.11]:33734)
+	(envelope-from <liq3ea@163.com>) id 1hHsdj-0001r0-Jd
+	for qemu-devel@nongnu.org; Sat, 20 Apr 2019 12:14:56 -0400
+Received: from m12-13.163.com ([220.181.12.13]:43449)
 	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <liq3ea@163.com>) id 1hHsPI-0008Dq-Pw
-	for qemu-devel@nongnu.org; Sat, 20 Apr 2019 12:00:01 -0400
+	(envelope-from <liq3ea@163.com>) id 1hHsdh-0001oH-Vz
+	for qemu-devel@nongnu.org; Sat, 20 Apr 2019 12:14:54 -0400
 From: Li Qiang <liq3ea@163.com>
-Date: Sat, 20 Apr 2019 08:59:46 -0700
-Message-Id: <20190420155949.130968-1-liq3ea@163.com>
-Subject: [Qemu-devel] [PATCH v2 0/3] hw: edu: some fixes
+Date: Sat, 20 Apr 2019 09:14:44 -0700
+Message-Id: <20190420161446.2274-2-liq3ea@163.com>
+In-Reply-To: <20190420161446.2274-1-liq3ea@163.com>
+References: <20190420161446.2274-1-liq3ea@163.com>
+Subject: [Qemu-devel] [PATCH v2 1/3] edu: mmio: set 'max_access_size' to 8
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,22 +26,38 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: jslaby@suse.cz, pbonzini@redhat.com
 Cc: qemu-devel@nongnu.org, liq3ea@gmail.com, Li Qiang <liq3ea@163.com>
 
-Recently I am considering write a driver for edu device.
-After reading the spec, I found these three small issue.
-Two first two related the MMIO access and the third is
-related the DMA operation.
+The edu spec said, the MMIO area can be accessed by 8 bytes.
+However currently the 'max_access_size' is not so the MMIO
+access dispatch can only access 4 bytes one time. This patch
+fixes this to respect the spec.
 
-Change since v1:
-Fix format compile error on Windows
+Notice: here the 'min_access_size' is not a must, I set this
+for completement.
 
-Li Qiang (3):
-  tests: fw_cfg: add splash time test case
-  edu: mmio: set 'max_access_size' to 8
-  edu: mmio: allow mmio read dispatch accept 8 bytes
+Signed-off-by: Li Qiang <liq3ea@163.com>
+---
+ hw/misc/edu.c | 9 +++++++++
+ 1 file changed, 9 insertions(+)
 
- hw/misc/edu.c       | 13 +++++++++++++
- tests/fw_cfg-test.c | 19 +++++++++++++++++++
- 2 files changed, 32 insertions(+)
-
+diff --git a/hw/misc/edu.c b/hw/misc/edu.c
+index 91af452c9e..65fc32b928 100644
+--- a/hw/misc/edu.c
++++ b/hw/misc/edu.c
+@@ -289,6 +289,15 @@ static const MemoryRegionOps edu_mmio_ops = {
+     .read = edu_mmio_read,
+     .write = edu_mmio_write,
+     .endianness = DEVICE_NATIVE_ENDIAN,
++    .valid = {
++        .min_access_size = 4,
++        .max_access_size = 8,
++    },
++    .impl = {
++        .min_access_size = 4,
++        .max_access_size = 8,
++    },
++
+ };
+ 
+ /*
 -- 
 2.17.1
