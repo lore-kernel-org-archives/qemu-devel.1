@@ -1,26 +1,25 @@
-Received: from eggs.gnu.org ([209.51.188.92]:56135)
+Received: from eggs.gnu.org ([209.51.188.92]:57717)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1hHvBM-0001lG-Ci
-	for qemu-devel@nongnu.org; Sat, 20 Apr 2019 14:57:49 -0400
+	(envelope-from <qemu_oss@crudebyte.com>) id 1hHyv1-0005VC-5i
+	for qemu-devel@nongnu.org; Sat, 20 Apr 2019 18:57:12 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1hHvBL-0006PV-8K
-	for qemu-devel@nongnu.org; Sat, 20 Apr 2019 14:57:48 -0400
-Received: from mail-ot1-x341.google.com ([2607:f8b0:4864:20::341]:45440)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1hHvBL-0006OL-2W
-	for qemu-devel@nongnu.org; Sat, 20 Apr 2019 14:57:47 -0400
-Received: by mail-ot1-x341.google.com with SMTP id e5so6646002otk.12
-	for <qemu-devel@nongnu.org>; Sat, 20 Apr 2019 11:57:44 -0700 (PDT)
+	(envelope-from <qemu_oss@crudebyte.com>) id 1hHyfg-0000mT-DL
+	for qemu-devel@nongnu.org; Sat, 20 Apr 2019 18:41:22 -0400
+Received: from lizzy.crudebyte.com ([91.194.90.13]:52915)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <qemu_oss@crudebyte.com>)
+	id 1hHyfg-0000l6-0j
+	for qemu-devel@nongnu.org; Sat, 20 Apr 2019 18:41:20 -0400
+From: Christian Schoenebeck <qemu_oss@crudebyte.com>
+Date: Sun, 21 Apr 2019 00:41:01 +0200
+Message-ID: <1736754.y8mDa9Bjs0@silver>
+In-Reply-To: <3754934.J2WuGLFlGG@silver>
+References: <3205397.r2gctG0f81@silver> <20190330174751.1eb8e298@bahia.lan>
+	<3754934.J2WuGLFlGG@silver>
 MIME-Version: 1.0
-References: <20190419114502.20388-1-shahab.vahedi@gmail.com>
-In-Reply-To: <20190419114502.20388-1-shahab.vahedi@gmail.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Sat, 20 Apr 2019 19:57:31 +0100
-Message-ID: <CAFEAcA_2aNt10Ti8HCTbCvHrgFYt7Uw2z=pNWBWyWMsbR6kjoQ@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH] cputlb: Fix io_readx() to respect the
- access_type
+Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset="iso-8859-1"
+Subject: Re: [Qemu-devel] virtfs/9p duplicate inodes
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,66 +28,33 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Shahab Vahedi <shahab.vahedi@gmail.com>
-Cc: "open list:Overall" <qemu-devel@nongnu.org>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>
+To: qemu-devel@nongnu.org
+Cc: Antonios Motakis <antonios.motakis@huawei.com>, Greg Kurz <groug@kaod.org>
 
-On Fri, 19 Apr 2019 at 12:46, Shahab Vahedi <shahab.vahedi@gmail.com> wrote:
->
-> This change adapts io_readx() to its input access_type. Currently
-> io_readx() treats any memory access as a read, although it has an
-> input argument "MMUAccessType access_type". This results in:
->
-> 1) Calling the tlb_fill() only with MMU_DATA_LOAD
-> 2) Considering only entry->addr_read as the tlb_addr
->
-> Buglink: https://bugs.launchpad.net/qemu/+bug/1825359
->
-> Signed-off-by: Shahab Vahedi <shahab.vahedi@gmail.com>
-> ---
-> Changelog:
-> - Extra space before closing parenthesis is removed
->
->  accel/tcg/cputlb.c | 7 +++++--
->  1 file changed, 5 insertions(+), 2 deletions(-)
+On Samstag, 30. M=E4rz 2019 21:01:28 CEST Christian Schoenebeck wrote:
+> On Samstag, 30. M=E4rz 2019 17:47:51 CET Greg Kurz wrote:
+> > Maybe have a look at this tentative to fix QID collisions:
+> >=20
+> > https://lists.gnu.org/archive/html/qemu-devel/2018-02/msg02283.html
+[snip]
+> Question: so far I just had a look at that patch set, but haven't tried it
+> yet. Am I correct that the inode numbers (of the same file) would actually
+> change on guest side with every reboot (i.e. depending on the precise
+> sequence individual files would be accessed by guest after each reboot)?
 
-Hi; this patch mostly looks good; thanks for submitting it.
+I intended to extend Antonios' patch set regarding 9p QID collisions with t=
+he=20
+goal to make the ids constant beyond reboots by storing the qpp_table as fs=
+=20
+xattr.
 
-> diff --git a/accel/tcg/cputlb.c b/accel/tcg/cputlb.c
-> index 88cc8389e9..4a305ac942 100644
-> --- a/accel/tcg/cputlb.c
-> +++ b/accel/tcg/cputlb.c
-> @@ -878,10 +878,13 @@ static uint64_t io_readx(CPUArchState *env, CPUIOTLBEntry *iotlbentry,
->          CPUTLBEntry *entry;
->          target_ulong tlb_addr;
->
-> -        tlb_fill(cpu, addr, size, MMU_DATA_LOAD, mmu_idx, retaddr);
-> +        tlb_fill(cpu, addr, size, access_type, mmu_idx, retaddr);
->
->          entry = tlb_entry(env, mmu_idx, addr);
-> -        tlb_addr = entry->addr_read;
-> +        tlb_addr =
-> +            (access_type == MMU_DATA_LOAD)  ? entry->addr_read  :
-> +            (access_type == MMU_DATA_STORE) ? entry->addr_write :
-> +            entry->addr_code;
+My plan was to load the qpp_table in v9fs_device_realize_common() and save =
+the=20
+table only once in v9fs_device_unrealize_common(), instead of storing the=20
+table on every new insertion. The problem though is that none of the 9p=20
+unrealize functions is called on guest shutdowns.
 
-Here you don't need to handle MMU_DATA_STORE, because
-we're in io_readx -- stores will go to io_writex, not here.
+Is there any callback that is guaranteed to be called on guest shutdowns?
 
-Style-wise it's probably better just to use an
-  if (...) {
-      tlb_addr = ...;
-  } else {
-      tlb_addr = ...;
-  }
-
-rather than a multi-line ?: expression.
-
->          if (!(tlb_addr & ~(TARGET_PAGE_MASK | TLB_RECHECK))) {
->              /* RAM access */
->              uintptr_t haddr = addr + entry->addend;
-> --
-> 2.21.0
->
-
-thanks
--- PMM
+Best regards,
+Christian Schoenebeck
