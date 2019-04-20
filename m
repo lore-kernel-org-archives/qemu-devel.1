@@ -7,61 +7,60 @@ X-Spam-Status: No, score=-8.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,USER_AGENT_GIT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 90380C282DD
-	for <qemu-devel@archiver.kernel.org>; Sat, 20 Apr 2019 16:16:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 66FC0C282E2
+	for <qemu-devel@archiver.kernel.org>; Sat, 20 Apr 2019 16:16:47 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4F8BE20854
-	for <qemu-devel@archiver.kernel.org>; Sat, 20 Apr 2019 16:16:46 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 2EE3820854
+	for <qemu-devel@archiver.kernel.org>; Sat, 20 Apr 2019 16:16:47 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=163.com header.i=@163.com header.b="PmVsKnFn"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4F8BE20854
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=163.com header.i=@163.com header.b="H6VeRnKJ"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2EE3820854
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=163.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:43110 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:43108 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hHsfV-0005tL-Bb
-	for qemu-devel@archiver.kernel.org; Sat, 20 Apr 2019 12:16:45 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:57509)
+	id 1hHsfW-0005tH-A2
+	for qemu-devel@archiver.kernel.org; Sat, 20 Apr 2019 12:16:46 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:57511)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <liq3ea@163.com>) id 1hHsdm-0004qC-1r
+	(envelope-from <liq3ea@163.com>) id 1hHsdm-0004qD-2g
 	for qemu-devel@nongnu.org; Sat, 20 Apr 2019 12:14:58 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <liq3ea@163.com>) id 1hHsdj-0001r0-Jd
-	for qemu-devel@nongnu.org; Sat, 20 Apr 2019 12:14:56 -0400
-Received: from m12-13.163.com ([220.181.12.13]:43449)
+	(envelope-from <liq3ea@163.com>) id 1hHsdl-0001sT-9U
+	for qemu-devel@nongnu.org; Sat, 20 Apr 2019 12:14:58 -0400
+Received: from m12-13.163.com ([220.181.12.13]:43525)
 	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <liq3ea@163.com>) id 1hHsdh-0001oH-Vz
-	for qemu-devel@nongnu.org; Sat, 20 Apr 2019 12:14:54 -0400
+	(envelope-from <liq3ea@163.com>) id 1hHsdj-0001pk-Qo
+	for qemu-devel@nongnu.org; Sat, 20 Apr 2019 12:14:56 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=163.com;
-	s=s110527; h=From:Subject:Date:Message-Id; bh=iRFD+zpf5l7TX1uoBr
-	2sBdhb6Xv5dDZq2CEa09rVSBg=; b=PmVsKnFn85DR6Q4Xw2D3SB4rjmw99iErzd
-	tfNVkK2wcCX5p8qB2fjMigN672Sb8/tfELIqEKejTtKNy5ML3PVStxZ4touPThoH
-	fZGqpLfF0eIj5cFXncM6BNzf85TzbAHl2T67zEGt3MPrZuJkCmyxrNpgLERMdtVe
-	OiceUEdeA=
+	s=s110527; h=From:Subject:Date:Message-Id; bh=nto7dRdt8+6HlFMrTC
+	L4RjigEIgC4k8QVhUb2RlYSSc=; b=H6VeRnKJG0WJgylteVj/2p0YduTNT3XSSK
+	3Z6Zu9QkpVQyJXgOZXToFbBGKhICWY2GuiI4WvnaLOFaSJgZaGG5SEoQFsKICJ0D
+	qEnWEhIpdjMP9iVpiUoxv7XgiDj9O8fuNBxoiiy80UMUXGMNNf7KJ7uWJ4lBvfUS
+	6AL9880ao=
 Received: from localhost.localdomain (unknown [183.159.69.175])
-	by smtp9 (Coremail) with SMTP id DcCowAAXzKN4RbtcjaXHAg--.9660S3;
-	Sun, 21 Apr 2019 00:14:51 +0800 (CST)
+	by smtp9 (Coremail) with SMTP id DcCowAAXzKN4RbtcjaXHAg--.9660S4;
+	Sun, 21 Apr 2019 00:14:52 +0800 (CST)
 From: Li Qiang <liq3ea@163.com>
 To: jslaby@suse.cz,
 	pbonzini@redhat.com
-Date: Sat, 20 Apr 2019 09:14:44 -0700
-Message-Id: <20190420161446.2274-2-liq3ea@163.com>
+Date: Sat, 20 Apr 2019 09:14:45 -0700
+Message-Id: <20190420161446.2274-3-liq3ea@163.com>
 X-Mailer: git-send-email 2.17.1
 In-Reply-To: <20190420161446.2274-1-liq3ea@163.com>
 References: <20190420161446.2274-1-liq3ea@163.com>
-X-CM-TRANSID: DcCowAAXzKN4RbtcjaXHAg--.9660S3
-X-Coremail-Antispam: 1Uf129KBjvdXoWruFyfZF15Wr4kKr43AF18Zrb_yoW3tFX_Xw
-	1xKFZ7GrW5XFyayF90q3W5uryxW3yrAF1rCrs3Gr43Ja4fGr98Z3s2qrnxXr47Gw47Kwn5
-	AaykZFy5trnFgjkaLaAFLSUrUUUUbb8apTn2vfkv8UJUUUU8Yxn0WfASr-VFAUDa7-sFnT
-	9fnUUvcSsGvfC2KfnxnUUI43ZEXa7IUjIPfJUUUUU==
+X-CM-TRANSID: DcCowAAXzKN4RbtcjaXHAg--.9660S4
+X-Coremail-Antispam: 1Uf129KBjDUn29KB7ZKAUJUUUUU529EdanIXcx71UUUUU7v73
+	VFW2AGmfu7bjvjm3AaLaJ3UbIYCTnIWIevJa73UjIFyTuYvjxUcj2NDUUUU
 X-Originating-IP: [183.159.69.175]
-X-CM-SenderInfo: 5oltjvrd6rljoofrz/xtbBLxucbVUMI5lrJAAAsp
+X-CM-SenderInfo: 5oltjvrd6rljoofrz/xtbBLxycbVUMI5lrMAAAs6
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x
 X-Received-From: 220.181.12.13
-Subject: [Qemu-devel] [PATCH v2 1/3] edu: mmio: set 'max_access_size' to 8
+Subject: [Qemu-devel] [PATCH v2 2/3] edu: mmio: allow mmio read dispatch
+ accept 8 bytes
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -78,41 +77,31 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 Content-Type: text/plain; charset="UTF-8"
-Message-ID: <20190420161444.x-YbLa7Je4hirU17SC1-dzaZRWkqx6nB_uaR3U9Wpk8@z>
+Message-ID: <20190420161445.I_6NLxWgyQQWrhhNfE9ubmdHKd7pg0EXWudIx8yLSWs@z>
 
-The edu spec said, the MMIO area can be accessed by 8 bytes.
-However currently the 'max_access_size' is not so the MMIO
-access dispatch can only access 4 bytes one time. This patch
-fixes this to respect the spec.
-
-Notice: here the 'min_access_size' is not a must, I set this
-for completement.
+The edu spec said when address >= 0x80, the MMIO area can
+be accessed by 8 bytes.
 
 Signed-off-by: Li Qiang <liq3ea@163.com>
 ---
- hw/misc/edu.c | 9 +++++++++
- 1 file changed, 9 insertions(+)
+ hw/misc/edu.c | 4 ++++
+ 1 file changed, 4 insertions(+)
 
 diff --git a/hw/misc/edu.c b/hw/misc/edu.c
-index 91af452c9e..65fc32b928 100644
+index 65fc32b928..4018dddcb8 100644
 --- a/hw/misc/edu.c
 +++ b/hw/misc/edu.c
-@@ -289,6 +289,15 @@ static const MemoryRegionOps edu_mmio_ops = {
-     .read = edu_mmio_read,
-     .write = edu_mmio_write,
-     .endianness = DEVICE_NATIVE_ENDIAN,
-+    .valid = {
-+        .min_access_size = 4,
-+        .max_access_size = 8,
-+    },
-+    .impl = {
-+        .min_access_size = 4,
-+        .max_access_size = 8,
-+    },
-+
- };
+@@ -189,6 +189,10 @@ static uint64_t edu_mmio_read(void *opaque, hwaddr addr, unsigned size)
+         return val;
+     }
  
- /*
++    if (addr >= 0x80 && size != 4 && size != 8) {
++        return val;
++    }
++
+     switch (addr) {
+     case 0x00:
+         val = 0x010000edu;
 -- 
 2.17.1
 
