@@ -1,58 +1,94 @@
-Return-Path: <SRS0=rbQy=SV=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.kernel.org@kernel.org>
+Return-Path: <SRS0=TjK1=SW=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.kernel.org@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-1.0 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 58C2DC282E0
-	for <qemu-devel@archiver.kernel.org>; Fri, 19 Apr 2019 23:53:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 26BF2C282E1
+	for <qemu-devel@archiver.kernel.org>; Sat, 20 Apr 2019 01:40:06 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2DD0020859
-	for <qemu-devel@archiver.kernel.org>; Fri, 19 Apr 2019 23:53:15 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2DD0020859
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=fennosys.fi
+	by mail.kernel.org (Postfix) with ESMTPS id DC0B62183F
+	for <qemu-devel@archiver.kernel.org>; Sat, 20 Apr 2019 01:40:05 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="wZv47wji"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DC0B62183F
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:34558 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:35412 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hHdJi-0006lo-EY
-	for qemu-devel@archiver.kernel.org; Fri, 19 Apr 2019 19:53:14 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:53201)
+	id 1hHez6-0005qj-Vq
+	for qemu-devel@archiver.kernel.org; Fri, 19 Apr 2019 21:40:05 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:43255)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <reader@fennosys.fi>) id 1hHdIW-000642-Cp
-	for qemu-devel@nongnu.org; Fri, 19 Apr 2019 19:52:01 -0400
+	(envelope-from <richard.henderson@linaro.org>) id 1hHeyE-0005WG-UR
+	for qemu-devel@nongnu.org; Fri, 19 Apr 2019 21:39:11 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <reader@fennosys.fi>) id 1hHd8Q-0005Qm-EJ
-	for qemu-devel@nongnu.org; Fri, 19 Apr 2019 19:41:35 -0400
-Received: from smtp.fennosys.fi ([62.241.241.27]:45058 helo=mail.fennosys.fi)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <reader@fennosys.fi>) id 1hHd8O-0005P3-K5
-	for qemu-devel@nongnu.org; Fri, 19 Apr 2019 19:41:34 -0400
-Received: (qmail 16256 invoked by uid 210); 19 Apr 2019 23:41:27 -0000
-Received: from 49.158.119.22 (antti@fennosys.fi@49.158.119.22) by
-	mail01-fennosys (envelope-from <reader@fennosys.fi>,
-	uid 201) with qmail-scanner-2.08st 
-	(clamdscan: 0.98.7/25423. spamassassin: 3.4.0. perlscan: 2.08st.  
-	Clear:RC:1(49.158.119.22):. 
-	Processed in 0.142091 secs); 19 Apr 2019 23:41:27 -0000
-Received: from unknown (HELO gail) (antti@fennosys.fi@49.158.119.22)
-	by 10.200.232.5 with ESMTPA; 19 Apr 2019 23:41:26 -0000
-Date: Sat, 20 Apr 2019 07:41:17 +0800
-From: Antti Antinoja <reader@fennosys.fi>
-To: qemu-devel@nongnu.org
-Message-Id: <20190420074117.e4f4e200b576b0e9b034b0f4@fennosys.fi>
-X-Mailer: Sylpheed 3.7.0 (GTK+ 2.24.32; x86_64-pc-linux-gnu)
-Mime-Version: 1.0
+	(envelope-from <richard.henderson@linaro.org>) id 1hHeyD-0006Lo-H4
+	for qemu-devel@nongnu.org; Fri, 19 Apr 2019 21:39:10 -0400
+Received: from mail-pl1-x642.google.com ([2607:f8b0:4864:20::642]:40788)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+	id 1hHeyA-0006F0-Ta
+	for qemu-devel@nongnu.org; Fri, 19 Apr 2019 21:39:07 -0400
+Received: by mail-pl1-x642.google.com with SMTP id b3so3271069plr.7
+	for <qemu-devel@nongnu.org>; Fri, 19 Apr 2019 18:39:05 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+	h=subject:to:cc:references:from:openpgp:message-id:date:user-agent
+	:mime-version:in-reply-to:content-language:content-transfer-encoding;
+	bh=lG/yh66FA9yQ7vHc1mdl5yepKiF7EK1XzUZp4kT6vZU=;
+	b=wZv47wjiL/7yOUJNJSqLp82OIlS7Z1RDr141I9M2TjD4d06xsf5l6r8M2Nrvqz5IB3
+	B44I/wvxoF3F9umc/rbx/SXVWEZL3/a+y2T4HYfp3PGF+ejK07wQxlVCdUQHzbbnAf66
+	3y/GDYbq9QSoDIZd5d4K/9nOxmsoxS5fy4fT1RopNlkKCagnpkDh97G59LlstdVxPUAL
+	SoPRlmdCJvgMthnw+IwfL/mZqwLtk5MmorOFyKKzCRYNOQDZjuhyagjtTWQit2PwDfjd
+	zEvigiRv2Ngws33mS2uWmI2lH0mpEbkAhHo8yOQlkSLmw/ORDEC7OuJE7TY3UgIE05i7
+	KoaQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=1e100.net; s=20161025;
+	h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
+	:date:user-agent:mime-version:in-reply-to:content-language
+	:content-transfer-encoding;
+	bh=lG/yh66FA9yQ7vHc1mdl5yepKiF7EK1XzUZp4kT6vZU=;
+	b=Kv4XyIZHlKaNBVzFYLD8tcnh9ioPGMn/FxUR88SvZVHEnJVb+yIoxXbnTXX4BfFEbs
+	3L+7hmTmHrWwARajN8KWtOGkvMiKoZdmIHQftz+Ycpw5/Xpg3qxUd9iGgDTcgmAxRhRy
+	w6K7kcSZyTmZ2fRIMZ19Ur9TETUbCzH5Uz5Is8otzajT/wkxA1skp2puGKm4KY8SrA8o
+	C9abfgGxkdraZUsNDn/49LZxQa+F/BWAD83tBYWkop2nYhIktVsRUkxmZpR4yBEh3zdB
+	D1Ds2npEZX43EGtZMb9MWlQgqzIgRW0mxvq2bHC8gbbVgyCNfM1YXr+I/sFfwhqT75+a
+	8Ihw==
+X-Gm-Message-State: APjAAAVR4T+z2EWZsoHVV4JN33u+feBHDi9x8efcZq4Pc+NtdByraPfh
+	nl8585jq6Evp8m/fGwnq0P4+vQ==
+X-Google-Smtp-Source: APXvYqw8ts588Gi9zgg2Enoe3BWzvaqcwhUrovCTE9nqH1MAQ9aCd0UgHF5tTDz/5Eaq/cO1XMh4lg==
+X-Received: by 2002:a17:902:b713:: with SMTP id
+	d19mr7224529pls.54.1555724343812; 
+	Fri, 19 Apr 2019 18:39:03 -0700 (PDT)
+Received: from [172.20.101.138] (rrcs-66-91-136-155.west.biz.rr.com.
+	[66.91.136.155]) by smtp.gmail.com with ESMTPSA id
+	o81sm9816068pfa.156.2019.04.19.18.39.01
+	(version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+	Fri, 19 Apr 2019 18:39:02 -0700 (PDT)
+To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>,
+	qemu-devel@nongnu.org
+References: <20190416083150.19649-1-richard.henderson@linaro.org>
+	<87zholfvcb.fsf@zen.linaroharston>
+From: Richard Henderson <richard.henderson@linaro.org>
+Openpgp: preference=signencrypt
+Message-ID: <b0d8bc0a-cd4a-ed3a-a1ce-aeb8d5ce5ec0@linaro.org>
+Date: Fri, 19 Apr 2019 15:38:59 -1000
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+	Thunderbird/60.6.1
+MIME-Version: 1.0
+In-Reply-To: <87zholfvcb.fsf@zen.linaroharston>
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 7bit
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 62.241.241.27
-Subject: [Qemu-devel] Using --enable-kvm fails with WindowsXP guest on an
- AMD host (works on Intel host)
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+	recognized.
+X-Received-From: 2607:f8b0:4864:20::642
+Subject: Re: [Qemu-devel] [PATCH 0/2] tcg: Fix launchpad 1824853
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -64,46 +100,31 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: peter.maydell@linaro.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190419234117.cCxBUlA5eWiCEY1t_FBiyBLLFcR0hjtK91EIV8qTw1g@z>
+Message-ID: <20190420013859.0cYQBKJLDbx5OPVf80vZjpwMGKweUYlk4tiouiAhydw@z>
 
-Hi,
+On 4/19/19 1:07 PM, Alex Bennée wrote:
+> 
+> Richard Henderson <richard.henderson@linaro.org> writes:
+> 
+>> This is a case where we generate more than 64k code for a mere 231
+>> guest instructions.
+> 
+> I would like to know more! Are these unrolled vector ops or something else?
 
-After upgrading host (Gentoo Linux) a Windows XP guest can't boot anymore.
+Yes.  E.g.
 
-Some findings while testing:
+  ld4  { v0.16b - v3.16b }, [x0]
 
-* XP image boots & works OK on an Intel machine (Gentoo Linux)
-** qemu: 3.1.0-r4
-** kernel: 5.0.7
-** CPU: Intel(R) Core(TM) i7-6500U CPU @ 2.50GHz
+will generate 64 guest byte loads.  Given the size of the code
+generated for each guest memory operation, we should probably
+change this to use 64-bit loads and dole out the bytes manually.
 
-* XP image FAILS to boot on an AMD machine (Gentoo Linux)
-** qemu: 3.1.0-r4
-** kernel: 4.19.34
-** CPU: AMD FX-6300 Six-Core Processor
-** image boots OK if NOT using --enable-kvm
+Even for linux-user, with direct host memory ops this converts
+to 1k code.
 
-* XP image FAILS to boot on an AMD machine (Gentoo Linux)
-** qemu: 3.1.0-r4 & 3.1.0-r1
-** kernel: 4.19.34 & 5.0.7
-** CPU: AMD Opteron(tm) Processor 4170 HE
-** image boots OK if NOT using --enable-kvm
-** The image worked OK on this machine with Qemu 2.12.1 & Kernel 4.18.20
-
-Booting to Safe Mode fails too (on mentioned AMD machines with --enbale-kvm). 
-
-Trying various -cpu options on the AMD machines didn't seem to help either (qemu64, pentium3, etc).
-
-There are no errors visible on the host (kernel logs etc clean). The guest boot just interrupts on very early state and Windows safe mode menu will loop forever.
-
-All Linux VM's are working without issues.
-
-Cheers,
-Antti
-
--- 
-Antti Antinoja <reader@fennosys.fi>
+r~
 
