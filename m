@@ -1,23 +1,23 @@
-Received: from eggs.gnu.org ([209.51.188.92]:40042)
+Received: from eggs.gnu.org ([209.51.188.92]:40059)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1hHkWP-0008K8-Rg
-	for qemu-devel@nongnu.org; Sat, 20 Apr 2019 03:34:50 -0400
+	(envelope-from <richard.henderson@linaro.org>) id 1hHkWR-0008KO-Ur
+	for qemu-devel@nongnu.org; Sat, 20 Apr 2019 03:34:53 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1hHkWP-0007dk-0C
-	for qemu-devel@nongnu.org; Sat, 20 Apr 2019 03:34:49 -0400
-Received: from mail-pg1-x544.google.com ([2607:f8b0:4864:20::544]:38416)
+	(envelope-from <richard.henderson@linaro.org>) id 1hHkWQ-0007em-HA
+	for qemu-devel@nongnu.org; Sat, 20 Apr 2019 03:34:51 -0400
+Received: from mail-pg1-x544.google.com ([2607:f8b0:4864:20::544]:39734)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1hHkWO-0007d9-Qo
-	for qemu-devel@nongnu.org; Sat, 20 Apr 2019 03:34:48 -0400
-Received: by mail-pg1-x544.google.com with SMTP id j26so3592082pgl.5
-	for <qemu-devel@nongnu.org>; Sat, 20 Apr 2019 00:34:48 -0700 (PDT)
+	id 1hHkWQ-0007eQ-B4
+	for qemu-devel@nongnu.org; Sat, 20 Apr 2019 03:34:50 -0400
+Received: by mail-pg1-x544.google.com with SMTP id l18so3459315pgj.6
+	for <qemu-devel@nongnu.org>; Sat, 20 Apr 2019 00:34:50 -0700 (PDT)
 From: Richard Henderson <richard.henderson@linaro.org>
-Date: Fri, 19 Apr 2019 21:34:05 -1000
-Message-Id: <20190420073442.7488-2-richard.henderson@linaro.org>
+Date: Fri, 19 Apr 2019 21:34:06 -1000
+Message-Id: <20190420073442.7488-3-richard.henderson@linaro.org>
 In-Reply-To: <20190420073442.7488-1-richard.henderson@linaro.org>
 References: <20190420073442.7488-1-richard.henderson@linaro.org>
-Subject: [Qemu-devel] [PATCH 01/38] target/arm: Fill in .opc for cmtst_op
+Subject: [Qemu-devel] [PATCH 02/38] tcg: Assert fixed_reg is read-only
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,38 +29,166 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: david@redhat.com
 
-This allows us to fall back to integers if the tcg backend
-does not support comparisons in the given vece.
+The only fixed_reg is cpu_env, and it should not be modified
+during any TB.  Therefore code that tries to special-case moves
+into a fixed_reg is dead.  Remove it.
 
 Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- target/arm/translate.c | 4 ++++
- 1 file changed, 4 insertions(+)
+ tcg/tcg.c | 85 +++++++++++++++++++++++++------------------------------
+ 1 file changed, 38 insertions(+), 47 deletions(-)
 
-diff --git a/target/arm/translate.c b/target/arm/translate.c
-index d408e4d7ef..13e2dc6562 100644
---- a/target/arm/translate.c
-+++ b/target/arm/translate.c
-@@ -6140,16 +6140,20 @@ static void gen_cmtst_vec(unsigned vece, TCGv_vec d, TCGv_vec a, TCGv_vec b)
- const GVecGen3 cmtst_op[4] = {
-     { .fni4 = gen_helper_neon_tst_u8,
-       .fniv = gen_cmtst_vec,
-+      .opc = INDEX_op_cmp_vec,
-       .vece = MO_8 },
-     { .fni4 = gen_helper_neon_tst_u16,
-       .fniv = gen_cmtst_vec,
-+      .opc = INDEX_op_cmp_vec,
-       .vece = MO_16 },
-     { .fni4 = gen_cmtst_i32,
-       .fniv = gen_cmtst_vec,
-+      .opc = INDEX_op_cmp_vec,
-       .vece = MO_32 },
-     { .fni8 = gen_cmtst_i64,
-       .fniv = gen_cmtst_vec,
-       .prefer_i64 = TCG_TARGET_REG_BITS == 64,
-+      .opc = INDEX_op_cmp_vec,
-       .vece = MO_64 },
- };
+diff --git a/tcg/tcg.c b/tcg/tcg.c
+index ade6050982..4f77a957b0 100644
+--- a/tcg/tcg.c
++++ b/tcg/tcg.c
+@@ -3279,11 +3279,8 @@ static void tcg_reg_alloc_do_movi(TCGContext *s, TCGTemp *ots,
+                                   tcg_target_ulong val, TCGLifeData arg_life,
+                                   TCGRegSet preferred_regs)
+ {
+-    if (ots->fixed_reg) {
+-        /* For fixed registers, we do not do any constant propagation.  */
+-        tcg_out_movi(s, ots->type, ots->reg, val);
+-        return;
+-    }
++    /* ENV should not be modified.  */
++    tcg_debug_assert(!ots->fixed_reg);
  
+     /* The movi is not explicitly generated here.  */
+     if (ots->val_type == TEMP_VAL_REG) {
+@@ -3319,6 +3316,9 @@ static void tcg_reg_alloc_mov(TCGContext *s, const TCGOp *op)
+     ots = arg_temp(op->args[0]);
+     ts = arg_temp(op->args[1]);
+ 
++    /* ENV should not be modified.  */
++    tcg_debug_assert(!ots->fixed_reg);
++
+     /* Note that otype != itype for no-op truncation.  */
+     otype = ots->type;
+     itype = ts->type;
+@@ -3343,7 +3343,7 @@ static void tcg_reg_alloc_mov(TCGContext *s, const TCGOp *op)
+     }
+ 
+     tcg_debug_assert(ts->val_type == TEMP_VAL_REG);
+-    if (IS_DEAD_ARG(0) && !ots->fixed_reg) {
++    if (IS_DEAD_ARG(0)) {
+         /* mov to a non-saved dead register makes no sense (even with
+            liveness analysis disabled). */
+         tcg_debug_assert(NEED_SYNC_ARG(0));
+@@ -3356,7 +3356,7 @@ static void tcg_reg_alloc_mov(TCGContext *s, const TCGOp *op)
+         }
+         temp_dead(s, ots);
+     } else {
+-        if (IS_DEAD_ARG(1) && !ts->fixed_reg && !ots->fixed_reg) {
++        if (IS_DEAD_ARG(1) && !ts->fixed_reg) {
+             /* the mov can be suppressed */
+             if (ots->val_type == TEMP_VAL_REG) {
+                 s->reg_to_temp[ots->reg] = NULL;
+@@ -3509,6 +3509,10 @@ static void tcg_reg_alloc_op(TCGContext *s, const TCGOp *op)
+             arg = op->args[i];
+             arg_ct = &def->args_ct[i];
+             ts = arg_temp(arg);
++
++            /* ENV should not be modified.  */
++            tcg_debug_assert(!ts->fixed_reg);
++
+             if ((arg_ct->ct & TCG_CT_ALIAS)
+                 && !const_args[arg_ct->alias_index]) {
+                 reg = new_args[arg_ct->alias_index];
+@@ -3517,29 +3521,19 @@ static void tcg_reg_alloc_op(TCGContext *s, const TCGOp *op)
+                                     i_allocated_regs | o_allocated_regs,
+                                     op->output_pref[k], ts->indirect_base);
+             } else {
+-                /* if fixed register, we try to use it */
+-                reg = ts->reg;
+-                if (ts->fixed_reg &&
+-                    tcg_regset_test_reg(arg_ct->u.regs, reg)) {
+-                    goto oarg_end;
+-                }
+                 reg = tcg_reg_alloc(s, arg_ct->u.regs, o_allocated_regs,
+                                     op->output_pref[k], ts->indirect_base);
+             }
+             tcg_regset_set_reg(o_allocated_regs, reg);
+-            /* if a fixed register is used, then a move will be done afterwards */
+-            if (!ts->fixed_reg) {
+-                if (ts->val_type == TEMP_VAL_REG) {
+-                    s->reg_to_temp[ts->reg] = NULL;
+-                }
+-                ts->val_type = TEMP_VAL_REG;
+-                ts->reg = reg;
+-                /* temp value is modified, so the value kept in memory is
+-                   potentially not the same */
+-                ts->mem_coherent = 0;
+-                s->reg_to_temp[reg] = ts;
++            if (ts->val_type == TEMP_VAL_REG) {
++                s->reg_to_temp[ts->reg] = NULL;
+             }
+-        oarg_end:
++            ts->val_type = TEMP_VAL_REG;
++            ts->reg = reg;
++            /* temp value is modified, so the value kept in memory is
++               potentially not the same */
++            ts->mem_coherent = 0;
++            s->reg_to_temp[reg] = ts;
+             new_args[i] = reg;
+         }
+     }
+@@ -3555,10 +3549,10 @@ static void tcg_reg_alloc_op(TCGContext *s, const TCGOp *op)
+     /* move the outputs in the correct register if needed */
+     for(i = 0; i < nb_oargs; i++) {
+         ts = arg_temp(op->args[i]);
+-        reg = new_args[i];
+-        if (ts->fixed_reg && ts->reg != reg) {
+-            tcg_out_mov(s, ts->type, ts->reg, reg);
+-        }
++
++        /* ENV should not be modified.  */
++        tcg_debug_assert(!ts->fixed_reg);
++
+         if (NEED_SYNC_ARG(i)) {
+             temp_sync(s, ts, o_allocated_regs, 0, IS_DEAD_ARG(i));
+         } else if (IS_DEAD_ARG(i)) {
+@@ -3679,26 +3673,23 @@ static void tcg_reg_alloc_call(TCGContext *s, TCGOp *op)
+     for(i = 0; i < nb_oargs; i++) {
+         arg = op->args[i];
+         ts = arg_temp(arg);
++
++        /* ENV should not be modified.  */
++        tcg_debug_assert(!ts->fixed_reg);
++
+         reg = tcg_target_call_oarg_regs[i];
+         tcg_debug_assert(s->reg_to_temp[reg] == NULL);
+-
+-        if (ts->fixed_reg) {
+-            if (ts->reg != reg) {
+-                tcg_out_mov(s, ts->type, ts->reg, reg);
+-            }
+-        } else {
+-            if (ts->val_type == TEMP_VAL_REG) {
+-                s->reg_to_temp[ts->reg] = NULL;
+-            }
+-            ts->val_type = TEMP_VAL_REG;
+-            ts->reg = reg;
+-            ts->mem_coherent = 0;
+-            s->reg_to_temp[reg] = ts;
+-            if (NEED_SYNC_ARG(i)) {
+-                temp_sync(s, ts, allocated_regs, 0, IS_DEAD_ARG(i));
+-            } else if (IS_DEAD_ARG(i)) {
+-                temp_dead(s, ts);
+-            }
++        if (ts->val_type == TEMP_VAL_REG) {
++            s->reg_to_temp[ts->reg] = NULL;
++        }
++        ts->val_type = TEMP_VAL_REG;
++        ts->reg = reg;
++        ts->mem_coherent = 0;
++        s->reg_to_temp[reg] = ts;
++        if (NEED_SYNC_ARG(i)) {
++            temp_sync(s, ts, allocated_regs, 0, IS_DEAD_ARG(i));
++        } else if (IS_DEAD_ARG(i)) {
++            temp_dead(s, ts);
+         }
+     }
+ }
 -- 
 2.17.1
