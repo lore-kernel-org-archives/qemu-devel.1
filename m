@@ -1,24 +1,24 @@
-Received: from eggs.gnu.org ([209.51.188.92]:40125)
+Received: from eggs.gnu.org ([209.51.188.92]:40147)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1hHkWY-0008Q6-Dg
-	for qemu-devel@nongnu.org; Sat, 20 Apr 2019 03:34:59 -0400
+	(envelope-from <richard.henderson@linaro.org>) id 1hHkWa-0008Sh-W4
+	for qemu-devel@nongnu.org; Sat, 20 Apr 2019 03:35:02 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1hHkWX-0007qX-91
-	for qemu-devel@nongnu.org; Sat, 20 Apr 2019 03:34:58 -0400
-Received: from mail-pg1-x541.google.com ([2607:f8b0:4864:20::541]:33399)
+	(envelope-from <richard.henderson@linaro.org>) id 1hHkWa-0007tf-00
+	for qemu-devel@nongnu.org; Sat, 20 Apr 2019 03:35:00 -0400
+Received: from mail-pg1-x544.google.com ([2607:f8b0:4864:20::544]:35514)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1hHkWX-0007pt-2f
-	for qemu-devel@nongnu.org; Sat, 20 Apr 2019 03:34:57 -0400
-Received: by mail-pg1-x541.google.com with SMTP id k19so3604414pgh.0
-	for <qemu-devel@nongnu.org>; Sat, 20 Apr 2019 00:34:57 -0700 (PDT)
+	id 1hHkWZ-0007tJ-Qa
+	for qemu-devel@nongnu.org; Sat, 20 Apr 2019 03:34:59 -0400
+Received: by mail-pg1-x544.google.com with SMTP id g8so3601647pgf.2
+	for <qemu-devel@nongnu.org>; Sat, 20 Apr 2019 00:34:59 -0700 (PDT)
 From: Richard Henderson <richard.henderson@linaro.org>
-Date: Fri, 19 Apr 2019 21:34:10 -1000
-Message-Id: <20190420073442.7488-7-richard.henderson@linaro.org>
+Date: Fri, 19 Apr 2019 21:34:12 -1000
+Message-Id: <20190420073442.7488-9-richard.henderson@linaro.org>
 In-Reply-To: <20190420073442.7488-1-richard.henderson@linaro.org>
 References: <20190420073442.7488-1-richard.henderson@linaro.org>
-Subject: [Qemu-devel] [PATCH 06/38] tcg: Promote tcg_out_{dup,
- dupi}_vec to backend interface
+Subject: [Qemu-devel] [PATCH 08/38] tcg: Add tcg_out_dupm_vec to the backend
+ interface
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,104 +30,100 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: david@redhat.com
 
-The i386 backend already has these functions, and the aarch64
-backend could easily split out one.  Nothing is done with these
-functions yet, but this will aid register allocation of
-INDEX_op_dup_vec in a later patch.
+Currently stubbed out in all backends that support vectors.
 
 Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- tcg/aarch64/tcg-target.inc.c | 12 ++++++++++--
- tcg/i386/tcg-target.inc.c    |  3 ++-
- tcg/tcg.c                    | 14 ++++++++++++++
- 3 files changed, 26 insertions(+), 3 deletions(-)
+ tcg/aarch64/tcg-target.inc.c |  6 ++++++
+ tcg/i386/tcg-target.inc.c    |  7 +++++++
+ tcg/tcg.c                    | 19 ++++++++++++++++++-
+ 3 files changed, 31 insertions(+), 1 deletion(-)
 
 diff --git a/tcg/aarch64/tcg-target.inc.c b/tcg/aarch64/tcg-target.inc.c
-index b2d3f9c0a5..116ebd8c1a 100644
+index b272822969..3f95930e88 100644
 --- a/tcg/aarch64/tcg-target.inc.c
 +++ b/tcg/aarch64/tcg-target.inc.c
-@@ -799,7 +799,7 @@ static void tcg_out_logicali(TCGContext *s, AArch64Insn insn, TCGType ext,
+@@ -822,6 +822,12 @@ static bool tcg_out_dup_vec(TCGContext *s, TCGType type, unsigned vece,
+     return true;
  }
  
- static void tcg_out_dupi_vec(TCGContext *s, TCGType type,
--                             TCGReg rd, uint64_t v64)
-+                             TCGReg rd, tcg_target_long v64)
- {
-     int op, cmode, imm8;
- 
-@@ -814,6 +814,14 @@ static void tcg_out_dupi_vec(TCGContext *s, TCGType type,
-     }
- }
- 
-+static bool tcg_out_dup_vec(TCGContext *s, TCGType type, unsigned vece,
-+                            TCGReg rd, TCGReg rs)
++static bool tcg_out_dupm_vec(TCGContext *s, TCGType type, unsigned vece,
++                             TCGReg r, TCGReg base, intptr_t offset)
 +{
-+    int is_q = type - TCG_TYPE_V64;
-+    tcg_out_insn(s, 3605, DUP, is_q, rd, rs, 1 << vece, 0);
-+    return true;
++    return false;
 +}
 +
  static void tcg_out_movi(TCGContext *s, TCGType type, TCGReg rd,
                           tcg_target_long value)
  {
-@@ -2197,7 +2205,7 @@ static void tcg_out_vec_op(TCGContext *s, TCGOpcode opc,
-         tcg_out_insn(s, 3617, NOT, is_q, 0, a0, a1);
-         break;
-     case INDEX_op_dup_vec:
--        tcg_out_insn(s, 3605, DUP, is_q, a0, a1, 1 << vece, 0);
-+        tcg_out_dup_vec(s, type, vece, a0, a1);
-         break;
-     case INDEX_op_shli_vec:
-         tcg_out_insn(s, 3614, SHL, is_q, a0, a1, a2 + (8 << vece));
 diff --git a/tcg/i386/tcg-target.inc.c b/tcg/i386/tcg-target.inc.c
-index 817a167767..04e3d37b05 100644
+index 49691c4f56..0be7d8f589 100644
 --- a/tcg/i386/tcg-target.inc.c
 +++ b/tcg/i386/tcg-target.inc.c
-@@ -855,7 +855,7 @@ static bool tcg_out_mov(TCGContext *s, TCGType type, TCGReg ret, TCGReg arg)
+@@ -891,6 +891,13 @@ static bool tcg_out_dup_vec(TCGContext *s, TCGType type, unsigned vece,
      return true;
  }
  
--static void tcg_out_dup_vec(TCGContext *s, TCGType type, unsigned vece,
-+static bool tcg_out_dup_vec(TCGContext *s, TCGType type, unsigned vece,
-                             TCGReg r, TCGReg a)
- {
-     if (have_avx2) {
-@@ -888,6 +888,7 @@ static void tcg_out_dup_vec(TCGContext *s, TCGType type, unsigned vece,
-             g_assert_not_reached();
-         }
-     }
-+    return true;
- }
- 
++static bool tcg_out_dupm_vec(TCGContext *s, TCGType type, unsigned vece,
++                             TCGReg r, TCGReg base, intptr_t offset)
++{
++    return false;
++}
++
++
  static void tcg_out_dupi_vec(TCGContext *s, TCGType type,
+                              TCGReg ret, tcg_target_long arg)
+ {
 diff --git a/tcg/tcg.c b/tcg/tcg.c
-index d3dcfe3dca..5ed9c7bee5 100644
+index 55498b63d7..1c34c08791 100644
 --- a/tcg/tcg.c
 +++ b/tcg/tcg.c
-@@ -108,10 +108,24 @@ static void tcg_out_movi(TCGContext *s, TCGType type,
- static void tcg_out_op(TCGContext *s, TCGOpcode opc, const TCGArg *args,
-                        const int *const_args);
+@@ -110,6 +110,8 @@ static void tcg_out_op(TCGContext *s, TCGOpcode opc, const TCGArg *args,
  #if TCG_TARGET_MAYBE_vec
-+static bool tcg_out_dup_vec(TCGContext *s, TCGType type, unsigned vece,
-+                            TCGReg dst, TCGReg src);
-+static void tcg_out_dupi_vec(TCGContext *s, TCGType type,
-+                             TCGReg dst, tcg_target_long arg);
+ static bool tcg_out_dup_vec(TCGContext *s, TCGType type, unsigned vece,
+                             TCGReg dst, TCGReg src);
++static bool tcg_out_dupm_vec(TCGContext *s, TCGType type, unsigned vece,
++                             TCGReg dst, TCGReg base, intptr_t offset);
+ static void tcg_out_dupi_vec(TCGContext *s, TCGType type,
+                              TCGReg dst, tcg_target_long arg);
  static void tcg_out_vec_op(TCGContext *s, TCGOpcode opc, unsigned vecl,
-                            unsigned vece, const TCGArg *args,
-                            const int *const_args);
- #else
-+static inline bool tcg_out_dup_vec(TCGContext *s, TCGType type, unsigned vece,
-+                                   TCGReg dst, TCGReg src)
+@@ -121,6 +123,11 @@ static inline bool tcg_out_dup_vec(TCGContext *s, TCGType type, unsigned vece,
+ {
+     g_assert_not_reached();
+ }
++static inline bool tcg_out_dupm_vec(TCGContext *s, TCGType type, unsigned vece,
++                                    TCGReg dst, TCGReg base, intptr_t offset)
 +{
 +    g_assert_not_reached();
 +}
-+static inline void tcg_out_dupi_vec(TCGContext *s, TCGType type,
-+                                    TCGReg dst, tcg_target_long arg)
-+{
-+    g_assert_not_reached();
-+}
- static inline void tcg_out_vec_op(TCGContext *s, TCGOpcode opc, unsigned vecl,
-                                   unsigned vece, const TCGArg *args,
-                                   const int *const_args)
+ static inline void tcg_out_dupi_vec(TCGContext *s, TCGType type,
+                                     TCGReg dst, tcg_target_long arg)
+ {
+@@ -3416,6 +3423,7 @@ static void tcg_reg_alloc_dup(TCGContext *s, const TCGOp *op)
+     TCGRegSet dup_out_regs, dup_in_regs;
+     TCGTemp *its, *ots;
+     TCGType itype, vtype;
++    intptr_t endian_fixup;
+     unsigned vece;
+     bool ok;
+ 
+@@ -3485,7 +3493,16 @@ static void tcg_reg_alloc_dup(TCGContext *s, const TCGOp *op)
+         /* fall through */
+ 
+     case TEMP_VAL_MEM:
+-        /* TODO: dup from memory */
++#ifdef HOST_WORDS_BIGENDIAN
++        endian_fixup = itype == TCG_TYPE_I32 ? 4 : 8;
++        endian_fixup -= 1 << vece;
++#else
++        endian_fixup = 0;
++#endif
++        if (tcg_out_dupm_vec(s, vtype, vece, ots->reg, its->mem_base->reg,
++                             its->mem_offset + endian_fixup)) {
++            goto done;
++        }
+         tcg_out_ld(s, itype, ots->reg, its->mem_base->reg, its->mem_offset);
+         break;
+ 
 -- 
 2.17.1
