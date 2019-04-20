@@ -2,66 +2,74 @@ Return-Path: <SRS0=TjK1=SW=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,USER_AGENT_GIT
+X-Spam-Status: No, score=-6.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 44318C282DD
-	for <qemu-devel@archiver.kernel.org>; Sat, 20 Apr 2019 10:08:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D70F7C282DD
+	for <qemu-devel@archiver.kernel.org>; Sat, 20 Apr 2019 10:08:51 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 054C220675
-	for <qemu-devel@archiver.kernel.org>; Sat, 20 Apr 2019 10:08:49 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=163.com header.i=@163.com header.b="RSMQ0VpR"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 054C220675
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=163.com
+	by mail.kernel.org (Postfix) with ESMTPS id AB0D620675
+	for <qemu-devel@archiver.kernel.org>; Sat, 20 Apr 2019 10:08:51 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AB0D620675
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=amsat.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:39460 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:39462 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hHmvQ-0004Il-95
-	for qemu-devel@archiver.kernel.org; Sat, 20 Apr 2019 06:08:48 -0400
+	id 1hHmvS-0004KH-Si
+	for qemu-devel@archiver.kernel.org; Sat, 20 Apr 2019 06:08:50 -0400
 Received: from eggs.gnu.org ([209.51.188.92]:34755)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <liq3ea@163.com>) id 1hHmrK-000119-56
-	for qemu-devel@nongnu.org; Sat, 20 Apr 2019 06:04:37 -0400
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1hHmrm-000119-FZ
+	for qemu-devel@nongnu.org; Sat, 20 Apr 2019 06:05:03 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <liq3ea@163.com>) id 1hHmoD-000586-F0
-	for qemu-devel@nongnu.org; Sat, 20 Apr 2019 06:01:22 -0400
-Received: from m12-14.163.com ([220.181.12.14]:59714)
-	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <liq3ea@163.com>) id 1hHmoC-00056s-Th
-	for qemu-devel@nongnu.org; Sat, 20 Apr 2019 06:01:21 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=163.com;
-	s=s110527; h=From:Subject:Date:Message-Id; bh=w4ygKr81NYHHj0JHeC
-	mMA9n1b8fxsPI3UkzRPp2GlvU=; b=RSMQ0VpRKsI0u/18CJHFF4q51jt9TpRgJ/
-	oZr6TOQOV5V9YIVX1zABR5V4ChBTdKd/hf3+C0VRjlEp7OukLxB/P8j9gMGeG6ff
-	ea1yRiZe7h9ZL04px0mArK2M1TPikz/r3hRyKQv4lpU7s42iccwaKbHiZ/IsWI0h
-	DmCITqxGw=
-Received: from localhost.localdomain (unknown [183.159.69.175])
-	by smtp10 (Coremail) with SMTP id DsCowACHzxnk7bpcMStGBQ--.39886S6;
-	Sat, 20 Apr 2019 18:01:17 +0800 (CST)
-From: Li Qiang <liq3ea@163.com>
-To: thuth@redhat.com, lvivier@redhat.com, pbonzini@redhat.com,
-	philmd@redhat.com, lersek@redhat.com, kraxel@redhat.com
-Date: Sat, 20 Apr 2019 03:00:56 -0700
-Message-Id: <20190420100056.116305-5-liq3ea@163.com>
-X-Mailer: git-send-email 2.17.1
-In-Reply-To: <20190420100056.116305-1-liq3ea@163.com>
-References: <20190420100056.116305-1-liq3ea@163.com>
-X-CM-TRANSID: DsCowACHzxnk7bpcMStGBQ--.39886S6
-X-Coremail-Antispam: 1Uf129KBjvJXoWrZF48CF17GFyxAFW3Ar1xuFg_yoW8JF13pF
-	1Uu3WYkrZ5JFZFqr13Gr1qqr1ftr97Cw18JrZxXFWjyw48Xr1DKa10ka4Fgrn8JF48Xanx
-	Z3ZYqF43KF1DXaDanT9S1TB71UUUUUUqnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-	9KBjDUYxBIdaVFxhVjvjDU0xZFpf9x07jUHUDUUUUU=
-X-Originating-IP: [183.159.69.175]
-X-CM-SenderInfo: 5oltjvrd6rljoofrz/xtbBoQWcbVQHEkbMwQAAsf
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x
-X-Received-From: 220.181.12.14
-Subject: [Qemu-devel] [PATCH 4/4] tests: fw_cfg: add splash time test case
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1hHmdG-0005HP-Qj
+	for qemu-devel@nongnu.org; Sat, 20 Apr 2019 05:50:04 -0400
+Received: from mail-yw1-f68.google.com ([209.85.161.68]:37654)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1hHmdG-0005GV-M6
+	for qemu-devel@nongnu.org; Sat, 20 Apr 2019 05:50:02 -0400
+Received: by mail-yw1-f68.google.com with SMTP id w66so2646097ywd.4
+	for <qemu-devel@nongnu.org>; Sat, 20 Apr 2019 02:50:01 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=1e100.net; s=20161025;
+	h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+	:message-id:subject:to:cc;
+	bh=uPZMuDMlGaCp2rapKSCjbRyYcNHndAfiGIXs+jwZ4Vg=;
+	b=lpe2cNjkR4rAUNSsGLxJtqvRe0S7IHX+kY/qgpGVTAMprX1SPbXpLd5SgKtRwEU38d
+	V+Ixwk4JO3e5GUT7uWsrGj0p4kEWlKEg9LF6n6Jk1WnHQ+eUcVoJFD+c4OOVKIevLDfM
+	higIcQtG1OeClj1QIckUxZW1ZE2+GLs+r5ItVv8+vl7TwyWtzT2I+MlPeQQPMI5z98Qe
+	FcZ0CWLdE3d/5v/B2nAa2rjjZ1wYhLG331Y04juKZ0dC02SMnzLMwlKRDJFszkTtKODE
+	ETISln851uNARtZ68Tv746wxSpJusLnkQMDeMiE4d2qsari0vZKe3i3NG/EOvI1H/N9t
+	TDlA==
+X-Gm-Message-State: APjAAAXuJRqAMzjE4+nkTCmgKa9TksosRMgonfc+n3yF5zvD8nbKqqNS
+	W5juFU/BSwUbnCGhs31mJJYVPt2V1iIqlnmap54=
+X-Google-Smtp-Source: APXvYqwDRgjT5X0NEudKMnJlFCkuPTy6RwevvI7fcvRf7ghPW6oKTZBd/XWB/boGqXcJSBpsoJfGlkiL7jwxm+u6T+Y=
+X-Received: by 2002:a81:a312:: with SMTP id a18mr6849770ywh.370.1555753801018; 
+	Sat, 20 Apr 2019 02:50:01 -0700 (PDT)
+MIME-Version: 1.0
+References: <20190419103722.17062-1-shahab.vahedi@gmail.com>
+	<871s1xha0f.fsf@zen.linaroharston>
+In-Reply-To: <871s1xha0f.fsf@zen.linaroharston>
+From: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>
+Date: Sat, 20 Apr 2019 11:49:48 +0200
+Message-ID:
+ <CAAdtpL5yj3dDoxQ+_V32MDPE3bYa15wGHKSBOEgGdDSujPxgxw@mail.gmail.com>
+To: =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+	[fuzzy]
+X-Received-From: 209.85.161.68
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Content-Filtered-By: Mailman/MimeDel 2.1.21
+Subject: Re: [Qemu-devel] [PATCH] cputlb: Fix io_readx() to respect the
+ access_type
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -73,57 +81,80 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Li Qiang <liq3ea@163.com>, liq3ea@gmail.com, qemu-devel@nongnu.org
+Cc: Shahab Vahedi <shahab.vahedi@gmail.com>,
+	Paolo Bonzini <pbonzini@redhat.com>,
+	"qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>,
+	Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Content-Type: text/plain; charset="UTF-8"
-Message-ID: <20190420100056.YOuAoZOrm1Q_EgJvhVneY5EydLlIOrIq7l4IxmBtDqo@z>
+Message-ID: <20190420094948.LhCJNqmOIbQr-fxavHmLB3h2cqVrteVH7ICEcEBhsWg@z>
 
-Signed-off-by: Li Qiang <liq3ea@163.com>
----
- tests/fw_cfg-test.c | 19 +++++++++++++++++++
- 1 file changed, 19 insertions(+)
+Hi Alex,
 
-diff --git a/tests/fw_cfg-test.c b/tests/fw_cfg-test.c
-index 9f75dbb5f4..de8e81ea9d 100644
---- a/tests/fw_cfg-test.c
-+++ b/tests/fw_cfg-test.c
-@@ -192,6 +192,24 @@ static void test_fw_cfg_reboot_timeout(void)
-     qtest_quit(s);
- }
- 
-+static void test_fw_cfg_splash_time(void)
-+{
-+    QFWCFG *fw_cfg;
-+    QTestState *s;
-+    uint16_t splash_time = 0;
-+    size_t filesize;
-+
-+    s = qtest_init("-boot splash-time=12");
-+    fw_cfg = pc_fw_cfg_init(s);
-+
-+    filesize = qfw_cfg_get_file(fw_cfg, "etc/boot-menu-wait",
-+                     &splash_time, sizeof(splash_time));
-+    g_assert_cmpint(filesize, ==, sizeof(splash_time));
-+    g_assert_cmpint(splash_time, ==, 12);
-+    pc_fw_cfg_uninit(fw_cfg);
-+    qtest_quit(s);
-+}
-+
- int main(int argc, char **argv)
- {
-     int ret;
-@@ -214,6 +232,7 @@ int main(int argc, char **argv)
-     qtest_add_func("fw_cfg/numa", test_fw_cfg_numa);
-     qtest_add_func("fw_cfg/boot_menu", test_fw_cfg_boot_menu);
-     qtest_add_func("fw_cfg/reboot_timeout", test_fw_cfg_reboot_timeout);
-+    qtest_add_func("fw_cfg/splash_time", test_fw_cfg_splash_time);
- 
-     ret = g_test_run();
- 
--- 
-2.17.1
+Le sam. 20 avr. 2019 01:05, Alex Benn=C3=A9e <alex.bennee@linaro.org> a =C3=
+=A9crit :
+
+>
+> Shahab Vahedi <shahab.vahedi@gmail.com> writes:
+>
+> > This change adapts io_readx() to its input access_type. Currently
+> > io_readx() treats any memory access as a read, although it has an
+> > input argument "MMUAccessType access_type". This results in:
+> >
+> > 1) Calling the tlb_fill() only with MMU_DATA_LOAD
+> > 2) Considering only entry->addr_read as the tlb_addr
+> >
+> > Buglink: https://bugs.launchpad.net/qemu/+bug/1825359
+>
+> This bug talks about the distinction between DATA_LOAD and INST_FETCH
+> but...
+>
+> >
+> > Signed-off-by: Shahab Vahedi <shahab.vahedi@gmail.com>
+> > ---
+> >  accel/tcg/cputlb.c | 7 +++++--
+> >  1 file changed, 5 insertions(+), 2 deletions(-)
+> >
+> > diff --git a/accel/tcg/cputlb.c b/accel/tcg/cputlb.c
+> > index 88cc8389e9..0daac0e806 100644
+> > --- a/accel/tcg/cputlb.c
+> > +++ b/accel/tcg/cputlb.c
+> > @@ -878,10 +878,13 @@ static uint64_t io_readx(CPUArchState *env,
+> CPUIOTLBEntry *iotlbentry,
+> >          CPUTLBEntry *entry;
+> >          target_ulong tlb_addr;
+> >
+> > -        tlb_fill(cpu, addr, size, MMU_DATA_LOAD, mmu_idx, retaddr);
+> > +        tlb_fill(cpu, addr, size, access_type, mmu_idx, retaddr);
+> >
+> >          entry =3D tlb_entry(env, mmu_idx, addr);
+> > -        tlb_addr =3D entry->addr_read;
+> > +        tlb_addr =3D
+> > +            (access_type =3D=3D MMU_DATA_LOAD ) ? entry->addr_read  :
+> > +            (access_type =3D=3D MMU_DATA_STORE) ? entry->addr_write :
+> > +            entry->addr_code;
+>
+> ...why do we care here about MMU_DATA_STORE?
+>
+> We could just assert (access_type =3D=3D MMU_DATA_LOAD || access_type =3D=
+=3D
+> MMU_INST_FETCH) and then have:
+>
+
+Is asserting the best we can do here?
 
 
-
+>   (access_type =3D=3D MMU_DATA_LOAD ) ? entry->addr_read  : entry->addr_c=
+ode
+>
+>
+> >          if (!(tlb_addr & ~(TARGET_PAGE_MASK | TLB_RECHECK))) {
+> >              /* RAM access */
+> >              uintptr_t haddr =3D addr + entry->addend;
+>
+>
+> --
+> Alex Benn=C3=A9e
+>
+>
