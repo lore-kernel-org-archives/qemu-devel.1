@@ -1,24 +1,24 @@
-Received: from eggs.gnu.org ([209.51.188.92]:40465)
+Received: from eggs.gnu.org ([209.51.188.92]:40463)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1hHkXW-00010D-5X
+	(envelope-from <richard.henderson@linaro.org>) id 1hHkXW-00010C-5A
 	for qemu-devel@nongnu.org; Sat, 20 Apr 2019 03:35:59 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1hHkXU-0000kq-CU
+	(envelope-from <richard.henderson@linaro.org>) id 1hHkXU-0000kk-Ar
 	for qemu-devel@nongnu.org; Sat, 20 Apr 2019 03:35:57 -0400
-Received: from mail-pg1-x543.google.com ([2607:f8b0:4864:20::543]:45866)
+Received: from mail-pf1-x443.google.com ([2607:f8b0:4864:20::443]:38052)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1hHkXT-0000CP-Hn
-	for qemu-devel@nongnu.org; Sat, 20 Apr 2019 03:35:56 -0400
-Received: by mail-pg1-x543.google.com with SMTP id y3so3581595pgk.12
-	for <qemu-devel@nongnu.org>; Sat, 20 Apr 2019 00:35:33 -0700 (PDT)
+	id 1hHkXT-0000Vm-Er
+	for qemu-devel@nongnu.org; Sat, 20 Apr 2019 03:35:55 -0400
+Received: by mail-pf1-x443.google.com with SMTP id 10so3469439pfo.5
+	for <qemu-devel@nongnu.org>; Sat, 20 Apr 2019 00:35:46 -0700 (PDT)
 From: Richard Henderson <richard.henderson@linaro.org>
-Date: Fri, 19 Apr 2019 21:34:33 -1000
-Message-Id: <20190420073442.7488-30-richard.henderson@linaro.org>
+Date: Fri, 19 Apr 2019 21:34:42 -1000
+Message-Id: <20190420073442.7488-39-richard.henderson@linaro.org>
 In-Reply-To: <20190420073442.7488-1-richard.henderson@linaro.org>
 References: <20190420073442.7488-1-richard.henderson@linaro.org>
-Subject: [Qemu-devel] [PATCH 29/38] tcg/i386: Support vector comparison
- select value
+Subject: [Qemu-devel] [PATCH 38/38] tcg/aarch64: Use ORRI and BICI for
+ vector logical operations
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,90 +30,161 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: david@redhat.com
 
-We already had backend support for this feature, but with a
-backend-specific opcode.  Remove the old name, and reorder
-the arguments to match the generic opcode.
-
 Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- tcg/i386/tcg-target.h     |  2 +-
- tcg/i386/tcg-target.opc.h |  1 -
- tcg/i386/tcg-target.inc.c | 13 ++++++-------
- 3 files changed, 7 insertions(+), 9 deletions(-)
+ tcg/aarch64/tcg-target.inc.c | 77 ++++++++++++++++++++++++++++++------
+ 1 file changed, 65 insertions(+), 12 deletions(-)
 
-diff --git a/tcg/i386/tcg-target.h b/tcg/i386/tcg-target.h
-index 683e029980..acdf96b99d 100644
---- a/tcg/i386/tcg-target.h
-+++ b/tcg/i386/tcg-target.h
-@@ -190,7 +190,7 @@ extern bool have_avx2;
- #define TCG_TARGET_HAS_mul_vec          1
- #define TCG_TARGET_HAS_sat_vec          1
- #define TCG_TARGET_HAS_minmax_vec       1
--#define TCG_TARGET_HAS_cmpsel_vec       0
-+#define TCG_TARGET_HAS_cmpsel_vec       1
+diff --git a/tcg/aarch64/tcg-target.inc.c b/tcg/aarch64/tcg-target.inc.c
+index 20c8699f79..1e79a60fb2 100644
+--- a/tcg/aarch64/tcg-target.inc.c
++++ b/tcg/aarch64/tcg-target.inc.c
+@@ -119,6 +119,8 @@ static inline bool patch_reloc(tcg_insn_unit *code_ptr, int type,
+ #define TCG_CT_CONST_LIMM 0x200
+ #define TCG_CT_CONST_ZERO 0x400
+ #define TCG_CT_CONST_MONE 0x800
++#define TCG_CT_CONST_PVI  0x1000
++#define TCG_CT_CONST_IVI  0x2000
  
- #define TCG_TARGET_deposit_i32_valid(ofs, len) \
-     (((ofs) == 0 && (len) == 8) || ((ofs) == 8 && (len) == 8) || \
-diff --git a/tcg/i386/tcg-target.opc.h b/tcg/i386/tcg-target.opc.h
-index e5fa88ba25..d761cca0cd 100644
---- a/tcg/i386/tcg-target.opc.h
-+++ b/tcg/i386/tcg-target.opc.h
-@@ -3,7 +3,6 @@
-    consider these to be UNSPEC with names.  */
- 
- DEF(x86_shufps_vec, 1, 2, 1, IMPLVEC)
--DEF(x86_vpblendvb_vec, 1, 3, 0, IMPLVEC)
- DEF(x86_blend_vec, 1, 2, 1, IMPLVEC)
- DEF(x86_packss_vec, 1, 2, 0, IMPLVEC)
- DEF(x86_packus_vec, 1, 2, 0, IMPLVEC)
-diff --git a/tcg/i386/tcg-target.inc.c b/tcg/i386/tcg-target.inc.c
-index 3dae0bf0c5..50296b4b2f 100644
---- a/tcg/i386/tcg-target.inc.c
-+++ b/tcg/i386/tcg-target.inc.c
-@@ -2921,13 +2921,13 @@ static void tcg_out_vec_op(TCGContext *s, TCGOpcode opc,
-         tcg_out8(s, sub);
+ /* parse target specific constraints */
+ static const char *target_parse_constraint(TCGArgConstraint *ct,
+@@ -154,6 +156,12 @@ static const char *target_parse_constraint(TCGArgConstraint *ct,
+     case 'M': /* minus one */
+         ct->ct |= TCG_CT_CONST_MONE;
          break;
- 
--    case INDEX_op_x86_vpblendvb_vec:
-+    case INDEX_op_cmpsel_vec:
-         insn = OPC_VPBLENDVB;
-         if (type == TCG_TYPE_V256) {
-             insn |= P_VEXL;
-         }
--        tcg_out_vex_modrm(s, insn, a0, a1, a2);
--        tcg_out8(s, args[3] << 4);
-+        tcg_out_vex_modrm(s, insn, a0, a2, args[3]);
-+        tcg_out8(s, a1 << 4);
++    case 'P': /* vector positive immediate */
++        ct->ct |= TCG_CT_CONST_PVI;
++        break;
++    case 'I': /* vector inverted immediate */
++        ct->ct |= TCG_CT_CONST_IVI;
++        break;
+     case 'Z': /* zero */
+         ct->ct |= TCG_CT_CONST_ZERO;
          break;
+@@ -294,6 +302,7 @@ static int tcg_target_const_match(tcg_target_long val, TCGType type,
+                                   const TCGArgConstraint *arg_ct)
+ {
+     int ct = arg_ct->ct;
++    int op, cmode, imm8;
  
-     case INDEX_op_x86_psrldq_vec:
-@@ -3223,7 +3223,7 @@ static const TCGTargetOpDef *tcg_target_op_def(TCGOpcode op)
-     case INDEX_op_sari_vec:
-     case INDEX_op_x86_psrldq_vec:
-         return &x_x;
--    case INDEX_op_x86_vpblendvb_vec:
-+    case INDEX_op_cmpsel_vec:
-         return &x_x_x_x;
- 
-     default:
-@@ -3241,6 +3241,7 @@ int tcg_can_emit_vec_op(TCGOpcode opc, TCGType type, unsigned vece)
-     case INDEX_op_or_vec:
-     case INDEX_op_xor_vec:
-     case INDEX_op_andc_vec:
-+    case INDEX_op_cmpsel_vec:
+     if (ct & TCG_CT_CONST) {
          return 1;
-     case INDEX_op_cmp_vec:
-         return -1;
-@@ -3537,9 +3538,7 @@ static void expand_vec_minmax(TCGType type, unsigned vece,
-         TCGv_vec t2;
-         t2 = v1, v1 = v2, v2 = t2;
+@@ -313,6 +322,16 @@ static int tcg_target_const_match(tcg_target_long val, TCGType type,
+     if ((ct & TCG_CT_CONST_MONE) && val == -1) {
+         return 1;
      }
--    vec_gen_4(INDEX_op_x86_vpblendvb_vec, type, vece,
--              tcgv_vec_arg(v0), tcgv_vec_arg(v1),
--              tcgv_vec_arg(v2), tcgv_vec_arg(t1));
-+    tcg_gen_cmpsel_vec(vece, v0, t1, v1, v2);
-     tcg_temp_free_vec(t1);
- }
++    if ((ct & TCG_CT_CONST_PVI) &&
++        is_fimm(val, &op, &cmode, &imm8) &&
++        op == 0 && ((1 << cmode) & 0x555)) {
++        return 1;
++    }
++    if ((ct & TCG_CT_CONST_IVI) &&
++        is_fimm(~val, &op, &cmode, &imm8) &&
++        op == 0 && ((1 << cmode) & 0x555)) {
++        return 1;
++    }
  
+     return 0;
+ }
+@@ -514,6 +533,8 @@ typedef enum {
+     /* AdvSIMD modified immediate */
+     I3606_MOVI      = 0x0f000400,
+     I3606_MVNI      = 0x2f000400,
++    I3606_ORRI      = 0x0f001400,
++    I3606_BICI      = 0x2f001400,
+ 
+     /* AdvSIMD shift by immediate */
+     I3614_SSHR      = 0x0f000400,
+@@ -2217,20 +2238,48 @@ static void tcg_out_vec_op(TCGContext *s, TCGOpcode opc,
+         tcg_out_insn(s, 3617, ABS, is_q, vece, a0, a1);
+         break;
+     case INDEX_op_and_vec:
+-        tcg_out_insn(s, 3616, AND, is_q, 0, a0, a1, a2);
++        if (const_args[2]) {
++            int op, cmode, imm8;
++            is_fimm(~a2, &op, &cmode, &imm8);
++            tcg_out_mov(s, type, a0, a1);
++            tcg_out_insn(s, 3606, BICI, is_q, a0, 0, cmode, imm8);
++        } else {
++            tcg_out_insn(s, 3616, AND, is_q, 0, a0, a1, a2);
++        }
+         break;
+     case INDEX_op_or_vec:
+-        tcg_out_insn(s, 3616, ORR, is_q, 0, a0, a1, a2);
++        if (const_args[2]) {
++            int op, cmode, imm8;
++            is_fimm(a2, &op, &cmode, &imm8);
++            tcg_out_mov(s, type, a0, a1);
++            tcg_out_insn(s, 3606, ORRI, is_q, a0, 0, cmode, imm8);
++        } else {
++            tcg_out_insn(s, 3616, ORR, is_q, 0, a0, a1, a2);
++        }
++        break;
++    case INDEX_op_andc_vec:
++        if (const_args[2]) {
++            int op, cmode, imm8;
++            is_fimm(a2, &op, &cmode, &imm8);
++            tcg_out_mov(s, type, a0, a1);
++            tcg_out_insn(s, 3606, BICI, is_q, a0, 0, cmode, imm8);
++        } else {
++            tcg_out_insn(s, 3616, BIC, is_q, 0, a0, a1, a2);
++        }
++        break;
++    case INDEX_op_orc_vec:
++        if (const_args[2]) {
++            int op, cmode, imm8;
++            is_fimm(~a2, &op, &cmode, &imm8);
++            tcg_out_mov(s, type, a0, a1);
++            tcg_out_insn(s, 3606, ORRI, is_q, a0, 0, cmode, imm8);
++        } else {
++            tcg_out_insn(s, 3616, ORN, is_q, 0, a0, a1, a2);
++        }
+         break;
+     case INDEX_op_xor_vec:
+         tcg_out_insn(s, 3616, EOR, is_q, 0, a0, a1, a2);
+         break;
+-    case INDEX_op_andc_vec:
+-        tcg_out_insn(s, 3616, BIC, is_q, 0, a0, a1, a2);
+-        break;
+-    case INDEX_op_orc_vec:
+-        tcg_out_insn(s, 3616, ORN, is_q, 0, a0, a1, a2);
+-        break;
+     case INDEX_op_ssadd_vec:
+         tcg_out_insn(s, 3616, SQADD, is_q, vece, a0, a1, a2);
+         break;
+@@ -2413,6 +2462,8 @@ static const TCGTargetOpDef *tcg_target_op_def(TCGOpcode op)
+     static const TCGTargetOpDef lZ_l = { .args_ct_str = { "lZ", "l" } };
+     static const TCGTargetOpDef r_r_r = { .args_ct_str = { "r", "r", "r" } };
+     static const TCGTargetOpDef w_w_w = { .args_ct_str = { "w", "w", "w" } };
++    static const TCGTargetOpDef w_w_wI = { .args_ct_str = { "w", "w", "wI" } };
++    static const TCGTargetOpDef w_w_wP = { .args_ct_str = { "w", "w", "wP" } };
+     static const TCGTargetOpDef w_w_wZ = { .args_ct_str = { "w", "w", "wZ" } };
+     static const TCGTargetOpDef r_r_ri = { .args_ct_str = { "r", "r", "ri" } };
+     static const TCGTargetOpDef r_r_rA = { .args_ct_str = { "r", "r", "rA" } };
+@@ -2568,11 +2619,7 @@ static const TCGTargetOpDef *tcg_target_op_def(TCGOpcode op)
+     case INDEX_op_add_vec:
+     case INDEX_op_sub_vec:
+     case INDEX_op_mul_vec:
+-    case INDEX_op_and_vec:
+-    case INDEX_op_or_vec:
+     case INDEX_op_xor_vec:
+-    case INDEX_op_andc_vec:
+-    case INDEX_op_orc_vec:
+     case INDEX_op_ssadd_vec:
+     case INDEX_op_sssub_vec:
+     case INDEX_op_usadd_vec:
+@@ -2586,6 +2633,12 @@ static const TCGTargetOpDef *tcg_target_op_def(TCGOpcode op)
+     case INDEX_op_sarv_vec:
+     case INDEX_op_aa64_sshl_vec:
+         return &w_w_w;
++    case INDEX_op_or_vec:
++    case INDEX_op_andc_vec:
++        return &w_w_wP;
++    case INDEX_op_and_vec:
++    case INDEX_op_orc_vec:
++        return &w_w_wI;
+     case INDEX_op_not_vec:
+     case INDEX_op_neg_vec:
+     case INDEX_op_abs_vec:
 -- 
 2.17.1
