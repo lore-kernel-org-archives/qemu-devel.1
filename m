@@ -1,22 +1,28 @@
-Received: from eggs.gnu.org ([209.51.188.92]:53201)
+Received: from eggs.gnu.org ([209.51.188.92]:43255)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <reader@fennosys.fi>) id 1hHdIW-000642-Cp
-	for qemu-devel@nongnu.org; Fri, 19 Apr 2019 19:52:01 -0400
+	(envelope-from <richard.henderson@linaro.org>) id 1hHeyE-0005WG-UR
+	for qemu-devel@nongnu.org; Fri, 19 Apr 2019 21:39:11 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <reader@fennosys.fi>) id 1hHd8Q-0005Qm-EJ
-	for qemu-devel@nongnu.org; Fri, 19 Apr 2019 19:41:35 -0400
-Received: from smtp.fennosys.fi ([62.241.241.27]:45058 helo=mail.fennosys.fi)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <reader@fennosys.fi>) id 1hHd8O-0005P3-K5
-	for qemu-devel@nongnu.org; Fri, 19 Apr 2019 19:41:34 -0400
-Date: Sat, 20 Apr 2019 07:41:17 +0800
-From: Antti Antinoja <reader@fennosys.fi>
-Message-Id: <20190420074117.e4f4e200b576b0e9b034b0f4@fennosys.fi>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: [Qemu-devel] Using --enable-kvm fails with WindowsXP guest on an
- AMD host (works on Intel host)
+	(envelope-from <richard.henderson@linaro.org>) id 1hHeyD-0006Lo-H4
+	for qemu-devel@nongnu.org; Fri, 19 Apr 2019 21:39:10 -0400
+Received: from mail-pl1-x642.google.com ([2607:f8b0:4864:20::642]:40788)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+	id 1hHeyA-0006F0-Ta
+	for qemu-devel@nongnu.org; Fri, 19 Apr 2019 21:39:07 -0400
+Received: by mail-pl1-x642.google.com with SMTP id b3so3271069plr.7
+	for <qemu-devel@nongnu.org>; Fri, 19 Apr 2019 18:39:05 -0700 (PDT)
+References: <20190416083150.19649-1-richard.henderson@linaro.org>
+	<87zholfvcb.fsf@zen.linaroharston>
+From: Richard Henderson <richard.henderson@linaro.org>
+Message-ID: <b0d8bc0a-cd4a-ed3a-a1ce-aeb8d5ce5ec0@linaro.org>
+Date: Fri, 19 Apr 2019 15:38:59 -1000
+MIME-Version: 1.0
+In-Reply-To: <87zholfvcb.fsf@zen.linaroharston>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH 0/2] tcg: Fix launchpad 1824853
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,42 +31,27 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>, qemu-devel@nongnu.org
+Cc: peter.maydell@linaro.org
 
-Hi,
+On 4/19/19 1:07 PM, Alex Bennée wrote:
+> 
+> Richard Henderson <richard.henderson@linaro.org> writes:
+> 
+>> This is a case where we generate more than 64k code for a mere 231
+>> guest instructions.
+> 
+> I would like to know more! Are these unrolled vector ops or something else?
 
-After upgrading host (Gentoo Linux) a Windows XP guest can't boot anymore.
+Yes.  E.g.
 
-Some findings while testing:
+  ld4  { v0.16b - v3.16b }, [x0]
 
-* XP image boots & works OK on an Intel machine (Gentoo Linux)
-** qemu: 3.1.0-r4
-** kernel: 5.0.7
-** CPU: Intel(R) Core(TM) i7-6500U CPU @ 2.50GHz
+will generate 64 guest byte loads.  Given the size of the code
+generated for each guest memory operation, we should probably
+change this to use 64-bit loads and dole out the bytes manually.
 
-* XP image FAILS to boot on an AMD machine (Gentoo Linux)
-** qemu: 3.1.0-r4
-** kernel: 4.19.34
-** CPU: AMD FX-6300 Six-Core Processor
-** image boots OK if NOT using --enable-kvm
+Even for linux-user, with direct host memory ops this converts
+to 1k code.
 
-* XP image FAILS to boot on an AMD machine (Gentoo Linux)
-** qemu: 3.1.0-r4 & 3.1.0-r1
-** kernel: 4.19.34 & 5.0.7
-** CPU: AMD Opteron(tm) Processor 4170 HE
-** image boots OK if NOT using --enable-kvm
-** The image worked OK on this machine with Qemu 2.12.1 & Kernel 4.18.20
-
-Booting to Safe Mode fails too (on mentioned AMD machines with --enbale-kvm). 
-
-Trying various -cpu options on the AMD machines didn't seem to help either (qemu64, pentium3, etc).
-
-There are no errors visible on the host (kernel logs etc clean). The guest boot just interrupts on very early state and Windows safe mode menu will loop forever.
-
-All Linux VM's are working without issues.
-
-Cheers,
-Antti
-
--- 
-Antti Antinoja <reader@fennosys.fi>
+r~
