@@ -1,28 +1,27 @@
-Received: from eggs.gnu.org ([209.51.188.92]:59717)
+Received: from eggs.gnu.org ([209.51.188.92]:60553)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1hI9iI-0004N9-Un
-	for qemu-devel@nongnu.org; Sun, 21 Apr 2019 06:28:47 -0400
+	(envelope-from <philmd@redhat.com>) id 1hI9lv-0005ev-MZ
+	for qemu-devel@nongnu.org; Sun, 21 Apr 2019 06:32:32 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1hI9iI-0007Ea-36
-	for qemu-devel@nongnu.org; Sun, 21 Apr 2019 06:28:46 -0400
-Received: from mail-wm1-f68.google.com ([209.85.128.68]:50857)
+	(envelope-from <philmd@redhat.com>) id 1hI9lu-0001NH-N7
+	for qemu-devel@nongnu.org; Sun, 21 Apr 2019 06:32:31 -0400
+Received: from mail-wr1-f65.google.com ([209.85.221.65]:40046)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1hI9iH-0007Dw-TC
-	for qemu-devel@nongnu.org; Sun, 21 Apr 2019 06:28:46 -0400
-Received: by mail-wm1-f68.google.com with SMTP id z11so11283779wmi.0
-	for <qemu-devel@nongnu.org>; Sun, 21 Apr 2019 03:28:45 -0700 (PDT)
+	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1hI9lu-0001LW-HW
+	for qemu-devel@nongnu.org; Sun, 21 Apr 2019 06:32:30 -0400
+Received: by mail-wr1-f65.google.com with SMTP id h4so12457564wre.7
+	for <qemu-devel@nongnu.org>; Sun, 21 Apr 2019 03:32:28 -0700 (PDT)
 References: <20190420161446.2274-1-liq3ea@163.com>
-	<20190420161446.2274-2-liq3ea@163.com>
+	<20190420161446.2274-4-liq3ea@163.com>
 From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Message-ID: <46a216be-0898-2d52-485d-fd07428c8b76@redhat.com>
-Date: Sun, 21 Apr 2019 12:28:42 +0200
+Message-ID: <4eb444fe-7e45-1072-770b-17f0db493b6d@redhat.com>
+Date: Sun, 21 Apr 2019 12:32:25 +0200
 MIME-Version: 1.0
-In-Reply-To: <20190420161446.2274-2-liq3ea@163.com>
+In-Reply-To: <20190420161446.2274-4-liq3ea@163.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH v2 1/3] edu: mmio: set 'max_access_size' to
- 8
+Subject: Re: [Qemu-devel] [PATCH v2 3/3] edu: uses uint64_t in dma operation
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,68 +33,79 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: Li Qiang <liq3ea@163.com>, jslaby@suse.cz, pbonzini@redhat.com
 Cc: liq3ea@gmail.com, qemu-devel@nongnu.org
 
-Hi Li,
-
-The patch title is not very descriptive, maybe "allow 64-bit access"
-
-
 On 4/20/19 6:14 PM, Li Qiang wrote:
-> The edu spec said, the MMIO area can be accessed by 8 bytes.
+> The dma related variable is dma_addr_t, it is uint64_t in
+> x64 platform. Change these usage from uint32_to uint64_t to
+> avoid trancation.
 
-or 64-bit...
-
-> However currently the 'max_access_size' is not so the MMIO
-> access dispatch can only access 4 bytes one time. This patch
-
-32-bit
-
-> fixes this to respect the spec.
-> 
-> Notice: here the 'min_access_size' is not a must, I set this
-> for completement.
-
-Which one? valid/impl? I think you can drop this comment from the commit
-description.
+"to avoid address truncation"?
 
 > 
 > Signed-off-by: Li Qiang <liq3ea@163.com>
 > ---
->  hw/misc/edu.c | 9 +++++++++
->  1 file changed, 9 insertions(+)
+> Change since v1:
+> Fix format compile error on Windows
+> 
+>  hw/misc/edu.c | 15 ++++++++-------
+>  1 file changed, 8 insertions(+), 7 deletions(-)
 > 
 > diff --git a/hw/misc/edu.c b/hw/misc/edu.c
-> index 91af452c9e..65fc32b928 100644
+> index 4018dddcb8..f4a6d5f1c5 100644
 > --- a/hw/misc/edu.c
 > +++ b/hw/misc/edu.c
-> @@ -289,6 +289,15 @@ static const MemoryRegionOps edu_mmio_ops = {
->      .read = edu_mmio_read,
->      .write = edu_mmio_write,
->      .endianness = DEVICE_NATIVE_ENDIAN,
-> +    .valid = {
-> +        .min_access_size = 4,
-
-Per the spec, this is correct.
-
-> +        .max_access_size = 8,
-
-Correct.
-
-> +    },
-> +    .impl = {
-> +        .min_access_size = 4,
+> @@ -98,23 +98,24 @@ static void edu_lower_irq(EduState *edu, uint32_t val)
+>      }
+>  }
+>  
+> -static bool within(uint32_t addr, uint32_t start, uint32_t end)
+> +static bool within(uint64_t addr, uint64_t start, uint64_t end)
 
 OK.
 
-> +        .max_access_size = 8,
-
-Correct.
-
-> +    },
-> +
->  };
+>  {
+>      return start <= addr && addr < end;
+>  }
 >  
->  /*
-> 
+> -static void edu_check_range(uint32_t addr, uint32_t size1, uint32_t start,
+> +static void edu_check_range(uint64_t addr, uint64_t size1, uint64_t start,
+>                  uint32_t size2)
 
-With title/description updated:
+OK for addr. MMIO range is 1MiB so you can keep uint32_t for
+size1/size2. Up to the maintainer (personally I'd prefer keep u32).
+
 Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+
+>  {
+> -    uint32_t end1 = addr + size1;
+> -    uint32_t end2 = start + size2;
+> +    uint64_t end1 = addr + size1;
+> +    uint64_t end2 = start + size2;
+>  
+>      if (within(addr, start, end2) &&
+>              end1 > addr && within(end1, start, end2)) {
+>          return;
+>      }
+>  
+> -    hw_error("EDU: DMA range 0x%.8x-0x%.8x out of bounds (0x%.8x-0x%.8x)!",
+> +    hw_error("EDU: DMA range 0x%016"PRIx64"-0x%016"PRIx64
+> +             " out of bounds (0x%016"PRIx64"-0x%016"PRIx64")!",
+>              addr, end1 - 1, start, end2 - 1);
+>  }
+>  
+> @@ -139,13 +140,13 @@ static void edu_dma_timer(void *opaque)
+>      }
+>  
+>      if (EDU_DMA_DIR(edu->dma.cmd) == EDU_DMA_FROM_PCI) {
+> -        uint32_t dst = edu->dma.dst;
+> +        uint64_t dst = edu->dma.dst;
+>          edu_check_range(dst, edu->dma.cnt, DMA_START, DMA_SIZE);
+>          dst -= DMA_START;
+>          pci_dma_read(&edu->pdev, edu_clamp_addr(edu, edu->dma.src),
+>                  edu->dma_buf + dst, edu->dma.cnt);
+>      } else {
+> -        uint32_t src = edu->dma.src;
+> +        uint64_t src = edu->dma.src;
+>          edu_check_range(src, edu->dma.cnt, DMA_START, DMA_SIZE);
+>          src -= DMA_START;
+>          pci_dma_write(&edu->pdev, edu_clamp_addr(edu, edu->dma.dst),
+> 
