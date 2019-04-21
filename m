@@ -6,69 +6,69 @@ X-Spam-Status: No, score=-0.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	MAILING_LIST_MULTI,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 152DAC282DD
-	for <qemu-devel@archiver.kernel.org>; Sun, 21 Apr 2019 02:09:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3525EC10F14
+	for <qemu-devel@archiver.kernel.org>; Sun, 21 Apr 2019 07:21:44 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D20A720869
-	for <qemu-devel@archiver.kernel.org>; Sun, 21 Apr 2019 02:09:55 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D20A720869
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id F08EF20869
+	for <qemu-devel@archiver.kernel.org>; Sun, 21 Apr 2019 07:21:43 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F08EF20869
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:47729 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:49913 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hI1vW-0001eu-QO
-	for qemu-devel@archiver.kernel.org; Sat, 20 Apr 2019 22:09:54 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:52276)
+	id 1hI6nG-0004B2-Ly
+	for qemu-devel@archiver.kernel.org; Sun, 21 Apr 2019 03:21:42 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:34267)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1hI1uW-00015q-Pu
-	for qemu-devel@nongnu.org; Sat, 20 Apr 2019 22:08:53 -0400
+	(envelope-from <bounces@canonical.com>) id 1hI6mF-0003bv-8O
+	for qemu-devel@nongnu.org; Sun, 21 Apr 2019 03:20:40 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1hI1uV-00078D-TF
-	for qemu-devel@nongnu.org; Sat, 20 Apr 2019 22:08:52 -0400
-Received: from mail-qt1-f195.google.com ([209.85.160.195]:39954)
+	(envelope-from <bounces@canonical.com>) id 1hI6mE-00019B-7o
+	for qemu-devel@nongnu.org; Sun, 21 Apr 2019 03:20:39 -0400
+Received: from indium.canonical.com ([91.189.90.7]:40370)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1hI1uV-00076Z-Pg
-	for qemu-devel@nongnu.org; Sat, 20 Apr 2019 22:08:51 -0400
-Received: by mail-qt1-f195.google.com with SMTP id v7so5442235qti.7
-	for <qemu-devel@nongnu.org>; Sat, 20 Apr 2019 19:08:50 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=1e100.net; s=20161025;
-	h=x-gm-message-state:date:from:to:cc:subject:message-id:mime-version
-	:content-disposition;
-	bh=QKRi83dIUkSMEPKXrLXNF1z1GM5jOZq7T86fjdaAqgk=;
-	b=UT+vPkY9bukLkW5fOkV5eoUffaX/GInVhJ9qDMN6nU19Cjv23AK5yrHYAG8VO9jBGb
-	TSgemtIVTFXltGk6gs1gn6B1jqw6WZXsI1eU1FFA2tz90sLkI7ZbmC0kb9olcszPt8T4
-	vn7andEXVxtHU8ZByAcn2p71Vgf/PLZaxHSCV5l6aWNx13SF7Juqq5yuXWrvUT6JoMxG
-	0UKDUvA9sQSE72e8PkmmmO0GZabRoWm83+2AFJH91psmfA0Q2yuGzGTuMyvJ/T9fJ9rP
-	31XJmi3XFMVXEmv3Z9X4oW19DxSCjdsC1HaR40kPWQaCB99FYeJG+z3YINJ+jBOOsr+r
-	fLcg==
-X-Gm-Message-State: APjAAAWrxRkdcKvj8Ic/9s0c9AkIT9vujakeOJftCNKxY+cGov0SupgW
-	TC7EOdXMJ26AAN+gVCg/f6Pkgw==
-X-Google-Smtp-Source: APXvYqy9+5is13MCbUGTr3h0Gnsv6PrtXKlYA07pcJBwFDpGVCysVUCJuRztuUBKWkmMiosZYVnaQA==
-X-Received: by 2002:ad4:45ae:: with SMTP id y14mr917377qvu.129.1555812529854; 
-	Sat, 20 Apr 2019 19:08:49 -0700 (PDT)
-Received: from redhat.com (pool-173-76-246-42.bstnma.fios.verizon.net.
-	[173.76.246.42]) by smtp.gmail.com with ESMTPSA id
-	j93sm5468065qtd.82.2019.04.20.19.08.47
-	(version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
-	Sat, 20 Apr 2019 19:08:48 -0700 (PDT)
-Date: Sat, 20 Apr 2019 22:08:45 -0400
-From: "Michael S. Tsirkin" <mst@redhat.com>
-To: "Longpeng (Mike)" <longpeng2@huawei.com>
-Message-ID: <20190420220659-mutt-send-email-mst@kernel.org>
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1hI6mE-000181-2L
+	for qemu-devel@nongnu.org; Sun, 21 Apr 2019 03:20:38 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1hI6mC-0004FF-BU
+	for <qemu-devel@nongnu.org>; Sun, 21 Apr 2019 07:20:36 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 392E52E80CB
+	for <qemu-devel@nongnu.org>; Sun, 21 Apr 2019 07:20:36 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="UTF-8"
-Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
+Date: Sun, 21 Apr 2019 07:12:02 -0000
+From: Lukas Straub <1824622@bugs.launchpad.net>
+To: qemu-devel@nongnu.org
+X-Launchpad-Notification-Type: bug
+X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
+X-Launchpad-Bug-Information-Type: Public
+X-Launchpad-Bug-Private: no
+X-Launchpad-Bug-Security-Vulnerability: no
+X-Launchpad-Bug-Commenters: lukey3332
+X-Launchpad-Bug-Reporter: Lukas Straub (lukey3332)
+X-Launchpad-Bug-Modifier: Lukas Straub (lukey3332)
+References: <155515766892.14199.10108123306728671913.malonedeb@gac.canonical.com>
+Message-Id:
+ <155583072247.17585.4814317714413821339.malone@soybean.canonical.com>
+X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
+X-Launchpad-Message-For: qemu-devel-ml
+Precedence: bulk
+X-Generated-By: Launchpad (canonical.com); Revision="18928";
+	Instance="launchpad-lazr.conf"
+X-Launchpad-Hash: 520b308cc01b5f7deb7ab53495218262d18faf70
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-	[fuzzy]
-X-Received-From: 209.85.160.195
-Subject: [Qemu-devel] some comments on virtio crypto device specification
+X-Received-From: 91.189.90.7
+Subject: [Qemu-devel] [Bug 1824622] Re: Qemu 4.0.0-rc3 COLO Primary Crashes
+ with "Assertion `event_unhandled_count > 0' failed."
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
-Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -77,31 +77,44 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: virtio-dev@lists.oasis-open.org, pasic@linux.vnet.ibm.com,
-	Ola.Liljedahl@arm.com, brian.a.keating@intel.com,
-	wangxinxin.wang@huawei.com, liang.j.ma@intel.com,
-	jasowang@redhat.com, cohuck@redhat.com, xin.zeng@intel.com,
-	qemu-devel@nongnu.org, john.griffin@intel.com, agraf@suse.de,
-	arei.gonglei@huawei.com, stefanha@redhat.com,
-	jianjay.zhou@huawei.com, Varun.Sethi@freescale.com,
-	Jani.Kokkonen@huawei.com, vincent.jardin@6wind.com,
-	denglingli@chinamobile.com, weidong.huang@huawei.com
+Reply-To: Bug 1824622 <1824622@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190421020845.Q0dKcs2iMswcz19NdpqmsA9op9hHIXy62TqBYJ_bqTA@z>
+Message-ID: <20190421071202.TfyItx101frChGZx--DBJCQ1HNY_maxViANb5Uyo24I@z>
 
-Hi guys!
-Some comments about things to improve in the virtio
-crypto device part of the spec:
-https://news.ycombinator.com/item?id=19698399#19706987
+There is a Patch available which fixes this bug:
+https://lists.nongnu.org/archive/html/qemu-devel/2019-04/msg03497.html
 
-It would be great if someone translated this to
-github issues and tried to improve the spec by
-addressing them.
+-- =
 
-Thanks!
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1824622
 
--- 
-MST
+Title:
+  Qemu 4.0.0-rc3 COLO Primary Crashes with "Assertion
+  `event_unhandled_count > 0' failed."
+
+Status in QEMU:
+  New
+
+Bug description:
+  Hello Everyone,
+  Now with Qemu 4.0.0-rc3, COLO is finally working so I gave it a try, but =
+the Primary is always crashing during Network use. Typing fast in ssh or ru=
+nning "top" with 0.1 second delay (change with 'd') reliably trigger the cr=
+ash for me. I use the attached scripts to run Qemu, in my case both primary=
+ and secondary run on the same Host for testing purposes. See the files in =
+the attached .tar.bz2 for more Info, they also contain a Coredump.
+
+  Regards,
+  Lukas Straub
+
+  Configure CMDline:
+  ./configure --target-list=3Dx86_64-softmmu,i386-softmmu --enable-debug-in=
+fo
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1824622/+subscriptions
 
