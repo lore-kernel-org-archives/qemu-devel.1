@@ -2,78 +2,64 @@ Return-Path: <SRS0=5Zkg=SY=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.4 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_PASS,USER_AGENT_MUTT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9DEDFC10F11
-	for <qemu-devel@archiver.kernel.org>; Mon, 22 Apr 2019 22:04:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3AE3CC10F11
+	for <qemu-devel@archiver.kernel.org>; Mon, 22 Apr 2019 22:09:12 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 54E0520684
-	for <qemu-devel@archiver.kernel.org>; Mon, 22 Apr 2019 22:04:27 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 54E0520684
+	by mail.kernel.org (Postfix) with ESMTPS id 0CB61206A3
+	for <qemu-devel@archiver.kernel.org>; Mon, 22 Apr 2019 22:09:11 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0CB61206A3
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:44842 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:44895 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hIh34-0000Zf-Dk
-	for qemu-devel@archiver.kernel.org; Mon, 22 Apr 2019 18:04:26 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:56525)
+	id 1hIh7f-0001vF-A6
+	for qemu-devel@archiver.kernel.org; Mon, 22 Apr 2019 18:09:11 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:57764)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1hIh1R-0007z7-Qm
-	for qemu-devel@nongnu.org; Mon, 22 Apr 2019 18:02:49 -0400
+	(envelope-from <ehabkost@redhat.com>) id 1hIh6t-0001cQ-17
+	for qemu-devel@nongnu.org; Mon, 22 Apr 2019 18:08:23 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1hIgvG-0003AD-Fe
-	for qemu-devel@nongnu.org; Mon, 22 Apr 2019 17:56:23 -0400
-Received: from mail-wr1-f65.google.com ([209.85.221.65]:43724)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1hIgvG-00039e-9W
-	for qemu-devel@nongnu.org; Mon, 22 Apr 2019 17:56:22 -0400
-Received: by mail-wr1-f65.google.com with SMTP id k17so17377936wrx.10
-	for <qemu-devel@nongnu.org>; Mon, 22 Apr 2019 14:56:21 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=1e100.net; s=20161025;
-	h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
-	:date:user-agent:mime-version:in-reply-to:content-language
-	:content-transfer-encoding;
-	bh=jhLGy9yi6uq+0x/DhNkHptnD3ckL/ss1ntMqvqlRh+8=;
-	b=OoBNrwa4xSw1O/gGDUzlcbVwwvdBPq3ARReLoJs9xHNtQ8nznzaiyIorNzXxo8eRsc
-	2lkIOxW3CTNLzjpKtiC0mFtqZBIxGtS/bNtYcecUY8w68FTWOMaDnzpcsuwVSH9P35MH
-	iGCss3vcXJQb+Rd9QtYwmPjD98vsZ1UPSpsu22VNficXTHWjxvZqUnEJCwdFF9o98dvS
-	HRFF3N81DgRhzg9v2Q1hH4EJl7+i0Q2wYwEWDVU+Wvd3xGwAmzTgjLBNe9EPNcZQVdez
-	q400WBzegU+S8gQ1gl85+xzkqivCFwAYbroD9zBTDcQeCiBeXcju/yFY2sUeo8Zwugsx
-	k8QA==
-X-Gm-Message-State: APjAAAVHZig44e4K0Lw2BGyTP1JyWzx5pDt4n6+nqIUs3LRw6l5Yj8RK
-	FC0jMhlw9HXyUCxK08qKE3F/uA==
-X-Google-Smtp-Source: APXvYqzix91mjvwWhD0GeJaI+ldDZrIqxaNpTO0AUmUuby4DOg+q1U67oEtUIWsgksTTrxnkgaLbdQ==
-X-Received: by 2002:a5d:6b10:: with SMTP id v16mr14428769wrw.294.1555970180635;
-	Mon, 22 Apr 2019 14:56:20 -0700 (PDT)
-Received: from [192.168.1.25] (atoulouse-656-1-803-163.w86-221.abo.wanadoo.fr.
-	[86.221.12.163]) by smtp.gmail.com with ESMTPSA id
-	q4sm15904854wrx.25.2019.04.22.14.56.19
-	(version=TLS1_3 cipher=AEAD-AES128-GCM-SHA256 bits=128/128);
-	Mon, 22 Apr 2019 14:56:20 -0700 (PDT)
-To: Eduardo Habkost <ehabkost@redhat.com>, qemu-devel@nongnu.org
+	(envelope-from <ehabkost@redhat.com>) id 1hIh6s-0001jn-4Z
+	for qemu-devel@nongnu.org; Mon, 22 Apr 2019 18:08:22 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:49856)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1hIh6r-0001jH-Ur
+	for qemu-devel@nongnu.org; Mon, 22 Apr 2019 18:08:22 -0400
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+	[10.5.11.12])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id DE20F308FE9A
+	for <qemu-devel@nongnu.org>; Mon, 22 Apr 2019 22:08:20 +0000 (UTC)
+Received: from localhost (ovpn-116-9.gru2.redhat.com [10.97.116.9])
+	by smtp.corp.redhat.com (Postfix) with ESMTP id 5A80A60C9A;
+	Mon, 22 Apr 2019 22:08:15 +0000 (UTC)
+Date: Mon, 22 Apr 2019 19:08:14 -0300
+From: Eduardo Habkost <ehabkost@redhat.com>
+To: Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <philmd@redhat.com>
+Message-ID: <20190422220814.GA25134@habkost.net>
 References: <20190422210448.2488-1-ehabkost@redhat.com>
 	<20190422210448.2488-2-ehabkost@redhat.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Openpgp: id=89C1E78F601EE86C867495CBA2A3FD6EDEADC0DE;
-	url=http://pgp.mit.edu/pks/lookup?op=get&search=0xA2A3FD6EDEADC0DE
-Message-ID: <edbaa0c1-d7ae-11a7-2ada-e3c5f4ca7c8a@redhat.com>
-Date: Mon, 22 Apr 2019 23:56:18 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
-	Thunderbird/60.6.1
+	<edbaa0c1-d7ae-11a7-2ada-e3c5f4ca7c8a@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20190422210448.2488-2-ehabkost@redhat.com>
 Content-Type: text/plain; charset="UTF-8"
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
+Content-Disposition: inline
+In-Reply-To: <edbaa0c1-d7ae-11a7-2ada-e3c5f4ca7c8a@redhat.com>
+User-Agent: Mutt/1.10.1 (2018-07-13)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+	(mx1.redhat.com [10.5.110.49]);
+	Mon, 22 Apr 2019 22:08:20 +0000 (UTC)
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-	[fuzzy]
-X-Received-From: 209.85.221.65
+X-Received-From: 209.132.183.28
 Subject: Re: [Qemu-devel] [PATCH 1/3] qtest: Move accel code to accel/qtest.c
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
@@ -87,156 +73,41 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 Cc: Laurent Vivier <lvivier@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
-	Thomas Huth <thuth@redhat.com>
+	Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190422215618.oe4liywwnFQW5Kt8IMPQArCKZTaodGhPY0xdG2I29eU@z>
+Message-ID: <20190422220814.hLmG70O125NoENbImKQYMsRfdg5NpDi9cqnNnYzWsKM@z>
 
-Hi Eduardo,
+On Mon, Apr 22, 2019 at 11:56:18PM +0200, Philippe Mathieu-Daud=E9 wrote:
+> Hi Eduardo,
+>=20
+> On 4/22/19 11:04 PM, Eduardo Habkost wrote:
+> > QTest has two parts: the server (-qtest) and the accelerator
+> > (-machine accel=3Dqtest).  The accelerator depends on CONFIG_POSIX
+> > due to its usage of sigwait(), but the server doesn't.
+> >=20
+> > Move the accel code to accel/qtest.c.  Later we will disable
+> > compilation of accel/qtest.c on non-POSIX systems.
+> >=20
+[...]
+> > +#include "qemu/module.h"
+>=20
+> Why include "qemu/module.h"?
+> I guess you don't need it.
 
-On 4/22/19 11:04 PM, Eduardo Habkost wrote:
-> QTest has two parts: the server (-qtest) and the accelerator
-> (-machine accel=qtest).  The accelerator depends on CONFIG_POSIX
-> due to its usage of sigwait(), but the server doesn't.
-> 
-> Move the accel code to accel/qtest.c.  Later we will disable
-> compilation of accel/qtest.c on non-POSIX systems.
-> 
-> Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
-> ---
->  accel/qtest.c       | 55 +++++++++++++++++++++++++++++++++++++++++++++
->  qtest.c             | 34 ----------------------------
->  accel/Makefile.objs |  1 +
->  3 files changed, 56 insertions(+), 34 deletions(-)
->  create mode 100644 accel/qtest.c
-> 
-> diff --git a/accel/qtest.c b/accel/qtest.c
-> new file mode 100644
-> index 0000000000..a02b3c26c7
-> --- /dev/null
-> +++ b/accel/qtest.c
-> @@ -0,0 +1,55 @@
-> +/*
-> + * QTest accelerator code
-> + *
-> + * Copyright IBM, Corp. 2011
-> + *
-> + * Authors:
-> + *  Anthony Liguori   <aliguori@us.ibm.com>
-> + *
-> + * This work is licensed under the terms of the GNU GPL, version 2 or later.
-> + * See the COPYING file in the top-level directory.
-> + *
-> + */
-> +
-> +#include "qemu/osdep.h"
-> +#include "qapi/error.h"
-> +#include "qemu/module.h"
+That's where the type_init() macro is defined.
 
-Why include "qemu/module.h"?
-I guess you don't need it.
 
-> +#include "qemu/option.h"
-> +#include "qemu/config-file.h"
-> +#include "sysemu/accel.h"
-> +#include "sysemu/qtest.h"
-> +#include "sysemu/cpus.h"
-> +
-> +static int qtest_init_accel(MachineState *ms)
-> +{
-> +    QemuOpts *opts = qemu_opts_create(qemu_find_opts("icount"), NULL, 0,
-> +                                      &error_abort);
-> +    qemu_opt_set(opts, "shift", "0", &error_abort);
-> +    configure_icount(opts, &error_abort);
-> +    qemu_opts_del(opts);
-> +    return 0;
-> +}
-> +
-> +static void qtest_accel_class_init(ObjectClass *oc, void *data)
-> +{
-> +    AccelClass *ac = ACCEL_CLASS(oc);
-> +    ac->name = "QTest";
-> +    ac->available = qtest_available;
-> +    ac->init_machine = qtest_init_accel;
-> +    ac->allowed = &qtest_allowed;
-> +}
-> +
-> +#define TYPE_QTEST_ACCEL ACCEL_CLASS_NAME("qtest")
-> +
-> +static const TypeInfo qtest_accel_type = {
-> +    .name = TYPE_QTEST_ACCEL,
-> +    .parent = TYPE_ACCEL,
-> +    .class_init = qtest_accel_class_init,
-> +};
-> +
-> +static void qtest_type_init(void)
-> +{
-> +    type_register_static(&qtest_accel_type);
-> +}
-> +
-> +type_init(qtest_type_init);
-> diff --git a/qtest.c b/qtest.c
-> index 527141785f..f2e2f27778 100644
-> --- a/qtest.c
-> +++ b/qtest.c
-> @@ -749,16 +749,6 @@ static void qtest_event(void *opaque, int event)
->      }
->  }
->  
-> -static int qtest_init_accel(MachineState *ms)
-> -{
-> -    QemuOpts *opts = qemu_opts_create(qemu_find_opts("icount"), NULL, 0,
-> -                                      &error_abort);
-> -    qemu_opt_set(opts, "shift", "0", &error_abort);
-> -    configure_icount(opts, &error_abort);
-> -    qemu_opts_del(opts);
-> -    return 0;
-> -}
-> -
->  void qtest_init(const char *qtest_chrdev, const char *qtest_log, Error **errp)
->  {
->      Chardev *chr;
-> @@ -791,27 +781,3 @@ bool qtest_driver(void)
->  {
->      return qtest_chr.chr != NULL;
->  }
-> -
-> -static void qtest_accel_class_init(ObjectClass *oc, void *data)
-> -{
-> -    AccelClass *ac = ACCEL_CLASS(oc);
-> -    ac->name = "QTest";
-> -    ac->available = qtest_available;
-> -    ac->init_machine = qtest_init_accel;
-> -    ac->allowed = &qtest_allowed;
-> -}
-> -
-> -#define TYPE_QTEST_ACCEL ACCEL_CLASS_NAME("qtest")
-> -
-> -static const TypeInfo qtest_accel_type = {
-> -    .name = TYPE_QTEST_ACCEL,
-> -    .parent = TYPE_ACCEL,
-> -    .class_init = qtest_accel_class_init,
-> -};
-> -
-> -static void qtest_type_init(void)
-> -{
-> -    type_register_static(&qtest_accel_type);
-> -}
-> -
-> -type_init(qtest_type_init);
-> diff --git a/accel/Makefile.objs b/accel/Makefile.objs
-> index c3718a10c5..2a5ed46940 100644
-> --- a/accel/Makefile.objs
-> +++ b/accel/Makefile.objs
-> @@ -1,4 +1,5 @@
->  obj-$(CONFIG_SOFTMMU) += accel.o
-> +obj-$(CONFIG_SOFTMMU) += qtest.o
->  obj-$(CONFIG_KVM) += kvm/
->  obj-$(CONFIG_TCG) += tcg/
->  obj-y += stubs/
-> 
+> > +type_init(qtest_type_init);
+[...]
 
-Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
-Tested-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+
+> Reviewed-by: Philippe Mathieu-Daud=E9 <philmd@redhat.com>
+> Tested-by: Philippe Mathieu-Daud=E9 <philmd@redhat.com>
+
+Thanks!
+
+--=20
+Eduardo
 
