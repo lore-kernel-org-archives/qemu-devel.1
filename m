@@ -6,47 +6,47 @@ X-Spam-Status: No, score=-8.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED,
 	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 16F48C10F11
-	for <qemu-devel@archiver.kernel.org>; Mon, 22 Apr 2019 15:03:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B07AAC10F11
+	for <qemu-devel@archiver.kernel.org>; Mon, 22 Apr 2019 15:03:48 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id DDA0420656
-	for <qemu-devel@archiver.kernel.org>; Mon, 22 Apr 2019 15:03:46 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DDA0420656
+	by mail.kernel.org (Postfix) with ESMTPS id 80E9320656
+	for <qemu-devel@archiver.kernel.org>; Mon, 22 Apr 2019 15:03:48 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 80E9320656
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:38487 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:38489 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hIaTy-0004ny-5n
-	for qemu-devel@archiver.kernel.org; Mon, 22 Apr 2019 11:03:46 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:51096)
+	id 1hIaTz-0004pM-EO
+	for qemu-devel@archiver.kernel.org; Mon, 22 Apr 2019 11:03:47 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:51093)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1hIaP6-0000nq-0D
-	for qemu-devel@nongnu.org; Mon, 22 Apr 2019 10:58:45 -0400
+	(envelope-from <vsementsov@virtuozzo.com>) id 1hIaP5-0000np-Su
+	for qemu-devel@nongnu.org; Mon, 22 Apr 2019 10:58:44 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1hIaP4-00037a-GF
+	(envelope-from <vsementsov@virtuozzo.com>) id 1hIaP4-00037r-KS
 	for qemu-devel@nongnu.org; Mon, 22 Apr 2019 10:58:43 -0400
-Received: from relay.sw.ru ([185.231.240.75]:55312)
+Received: from relay.sw.ru ([185.231.240.75]:55306)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
-	id 1hIaP4-00036I-9J; Mon, 22 Apr 2019 10:58:42 -0400
+	id 1hIaP4-00036L-BO; Mon, 22 Apr 2019 10:58:42 -0400
 Received: from [10.28.8.145] (helo=kvm.sw.ru)
 	by relay.sw.ru with esmtp (Exim 4.91)
 	(envelope-from <vsementsov@virtuozzo.com>)
-	id 1hIaP1-0003k3-HT; Mon, 22 Apr 2019 17:58:39 +0300
+	id 1hIaP1-0003k3-9p; Mon, 22 Apr 2019 17:58:39 +0300
 From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 To: qemu-devel@nongnu.org,
 	qemu-block@nongnu.org
-Date: Mon, 22 Apr 2019 17:58:32 +0300
-Message-Id: <20190422145838.70903-4-vsementsov@virtuozzo.com>
+Date: Mon, 22 Apr 2019 17:58:30 +0300
+Message-Id: <20190422145838.70903-2-vsementsov@virtuozzo.com>
 X-Mailer: git-send-email 2.18.0
 In-Reply-To: <20190422145838.70903-1-vsementsov@virtuozzo.com>
 References: <20190422145838.70903-1-vsementsov@virtuozzo.com>
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x
 X-Received-From: 185.231.240.75
-Subject: [Qemu-devel] [PATCH 3/9] block/qcow: use buffer-based io
+Subject: [Qemu-devel] [PATCH 1/9] block: introduce byte-based io helpers
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -64,93 +64,71 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 Content-Type: text/plain; charset="UTF-8"
-Message-ID: <20190422145832.eYUfL7Q5aJ1ukDVbGQNIg3bvR7K--Dl0B8iEVm17bDw@z>
+Message-ID: <20190422145830.IAw19vYbdTh3iVKDdT4ab5XcY0_x3OT_Wib032tgZWE@z>
 
 Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 ---
- block/qcow.c | 19 ++++++-------------
- 1 file changed, 6 insertions(+), 13 deletions(-)
+ include/block/block_int.h      | 16 ++++++++++++++++
+ include/sysemu/block-backend.h | 19 +++++++++++++++++++
+ 2 files changed, 35 insertions(+)
 
-diff --git a/block/qcow.c b/block/qcow.c
-index 10d2cf14b3..1bb8fd05e2 100644
---- a/block/qcow.c
-+++ b/block/qcow.c
-@@ -631,7 +631,6 @@ static coroutine_fn int qcow_co_preadv(BlockDriverState *bs, uint64_t offset,
-     int offset_in_cluster;
-     int ret = 0, n;
-     uint64_t cluster_offset;
--    QEMUIOVector hd_qiov;
-     uint8_t *buf;
-     void *orig_buf;
+diff --git a/include/block/block_int.h b/include/block/block_int.h
+index 01e855a066..94d45c9708 100644
+--- a/include/block/block_int.h
++++ b/include/block/block_int.h
+@@ -925,6 +925,22 @@ int coroutine_fn bdrv_co_pwritev(BdrvChild *child,
+     int64_t offset, unsigned int bytes, QEMUIOVector *qiov,
+     BdrvRequestFlags flags);
  
-@@ -663,11 +662,10 @@ static coroutine_fn int qcow_co_preadv(BlockDriverState *bs, uint64_t offset,
-         if (!cluster_offset) {
-             if (bs->backing) {
-                 /* read from the base image */
--                qemu_iovec_init_buf(&hd_qiov, buf, n);
-                 qemu_co_mutex_unlock(&s->lock);
-                 /* qcow2 emits this on bs->file instead of bs->backing */
-                 BLKDBG_EVENT(bs->file, BLKDBG_READ_BACKING_AIO);
--                ret = bdrv_co_preadv(bs->backing, offset, n, &hd_qiov, 0);
-+                ret = bdrv_co_pread(bs->backing, offset, n, buf, 0);
-                 qemu_co_mutex_lock(&s->lock);
-                 if (ret < 0) {
-                     break;
-@@ -688,11 +686,10 @@ static coroutine_fn int qcow_co_preadv(BlockDriverState *bs, uint64_t offset,
-                 ret = -EIO;
-                 break;
-             }
--            qemu_iovec_init_buf(&hd_qiov, buf, n);
-             qemu_co_mutex_unlock(&s->lock);
-             BLKDBG_EVENT(bs->file, BLKDBG_READ_AIO);
--            ret = bdrv_co_preadv(bs->file, cluster_offset + offset_in_cluster,
--                                 n, &hd_qiov, 0);
-+            ret = bdrv_co_pread(bs->file, cluster_offset + offset_in_cluster,
-+                                n, buf, 0);
-             qemu_co_mutex_lock(&s->lock);
-             if (ret < 0) {
-                 break;
-@@ -731,7 +728,6 @@ static coroutine_fn int qcow_co_pwritev(BlockDriverState *bs, uint64_t offset,
-     int offset_in_cluster;
-     uint64_t cluster_offset;
-     int ret = 0, n;
--    QEMUIOVector hd_qiov;
-     uint8_t *buf;
-     void *orig_buf;
- 
-@@ -776,11 +772,10 @@ static coroutine_fn int qcow_co_pwritev(BlockDriverState *bs, uint64_t offset,
-             }
-         }
- 
--        qemu_iovec_init_buf(&hd_qiov, buf, n);
-         qemu_co_mutex_unlock(&s->lock);
-         BLKDBG_EVENT(bs->file, BLKDBG_WRITE_AIO);
--        ret = bdrv_co_pwritev(bs->file, cluster_offset + offset_in_cluster,
--                              n, &hd_qiov, 0);
-+        ret = bdrv_co_pwrite(bs->file, cluster_offset + offset_in_cluster,
-+                             n, buf, 0);
-         qemu_co_mutex_lock(&s->lock);
-         if (ret < 0) {
-             break;
-@@ -1056,7 +1051,6 @@ qcow_co_pwritev_compressed(BlockDriverState *bs, uint64_t offset,
-                            uint64_t bytes, QEMUIOVector *qiov)
- {
-     BDRVQcowState *s = bs->opaque;
--    QEMUIOVector hd_qiov;
-     z_stream strm;
-     int ret, out_len;
-     uint8_t *buf, *out_buf;
-@@ -1122,9 +1116,8 @@ qcow_co_pwritev_compressed(BlockDriverState *bs, uint64_t offset,
-     }
-     cluster_offset &= s->cluster_offset_mask;
- 
--    qemu_iovec_init_buf(&hd_qiov, out_buf, out_len);
-     BLKDBG_EVENT(bs->file, BLKDBG_WRITE_COMPRESSED);
--    ret = bdrv_co_pwritev(bs->file, cluster_offset, out_len, &hd_qiov, 0);
-+    ret = bdrv_co_pwrite(bs->file, cluster_offset, out_len, out_buf, 0);
-     if (ret < 0) {
-         goto fail;
-     }
++static inline int coroutine_fn bdrv_co_pread(BdrvChild *child,
++    int64_t offset, unsigned int bytes, void *buf, BdrvRequestFlags flags)
++{
++    QEMUIOVector qiov = QEMU_IOVEC_INIT_BUF(qiov, buf, bytes);
++
++    return bdrv_co_preadv(child, offset, bytes, &qiov, flags);
++}
++
++static inline int coroutine_fn bdrv_co_pwrite(BdrvChild *child,
++    int64_t offset, unsigned int bytes, void *buf, BdrvRequestFlags flags)
++{
++    QEMUIOVector qiov = QEMU_IOVEC_INIT_BUF(qiov, buf, bytes);
++
++    return bdrv_co_pwritev(child, offset, bytes, &qiov, flags);
++}
++
+ extern unsigned int bdrv_drain_all_count;
+ void bdrv_apply_subtree_drain(BdrvChild *child, BlockDriverState *new_parent);
+ void bdrv_unapply_subtree_drain(BdrvChild *child, BlockDriverState *old_parent);
+diff --git a/include/sysemu/block-backend.h b/include/sysemu/block-backend.h
+index 3be05c2d68..5be6224226 100644
+--- a/include/sysemu/block-backend.h
++++ b/include/sysemu/block-backend.h
+@@ -124,6 +124,25 @@ int coroutine_fn blk_co_preadv(BlockBackend *blk, int64_t offset,
+ int coroutine_fn blk_co_pwritev(BlockBackend *blk, int64_t offset,
+                                unsigned int bytes, QEMUIOVector *qiov,
+                                BdrvRequestFlags flags);
++
++static inline int coroutine_fn blk_co_pread(BlockBackend *blk, int64_t offset,
++                                            unsigned int bytes, void *buf,
++                                            BdrvRequestFlags flags)
++{
++    QEMUIOVector qiov = QEMU_IOVEC_INIT_BUF(qiov, buf, bytes);
++
++    return blk_co_preadv(blk, offset, bytes, &qiov, flags);
++}
++
++static inline int coroutine_fn blk_co_pwrite(BlockBackend *blk, int64_t offset,
++                                             unsigned int bytes, void *buf,
++                                             BdrvRequestFlags flags)
++{
++    QEMUIOVector qiov = QEMU_IOVEC_INIT_BUF(qiov, buf, bytes);
++
++    return blk_co_pwritev(blk, offset, bytes, &qiov, flags);
++}
++
+ int blk_pwrite_zeroes(BlockBackend *blk, int64_t offset,
+                       int bytes, BdrvRequestFlags flags);
+ BlockAIOCB *blk_aio_pwrite_zeroes(BlockBackend *blk, int64_t offset,
 -- 
 2.18.0
 
