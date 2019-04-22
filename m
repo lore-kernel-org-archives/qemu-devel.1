@@ -1,33 +1,27 @@
-Received: from eggs.gnu.org ([209.51.188.92]:39823)
+Received: from eggs.gnu.org ([209.51.188.92]:44482)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dan.streetman@canonical.com>) id 1hIfpQ-0002vr-Qs
-	for qemu-devel@nongnu.org; Mon, 22 Apr 2019 16:46:17 -0400
+	(envelope-from <ehabkost@redhat.com>) id 1hIgEC-0002Td-OY
+	for qemu-devel@nongnu.org; Mon, 22 Apr 2019 17:11:53 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dan.streetman@canonical.com>) id 1hIfbz-0003FQ-Ed
-	for qemu-devel@nongnu.org; Mon, 22 Apr 2019 16:32:24 -0400
-Received: from youngberry.canonical.com ([91.189.89.112]:54127)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dan.streetman@canonical.com>)
-	id 1hIfbz-0003Cz-9d
-	for qemu-devel@nongnu.org; Mon, 22 Apr 2019 16:32:23 -0400
-Received: from mail-it1-f197.google.com ([209.85.166.197])
-	by youngberry.canonical.com with esmtps
-	(TLS1.0:RSA_AES_128_CBC_SHA1:16) (Exim 4.76)
-	(envelope-from <dan.streetman@canonical.com>) id 1hIfbw-00065n-1K
-	for qemu-devel@nongnu.org; Mon, 22 Apr 2019 20:32:20 +0000
-Received: by mail-it1-f197.google.com with SMTP id s1so13672032itl.1
-	for <qemu-devel@nongnu.org>; Mon, 22 Apr 2019 13:32:19 -0700 (PDT)
-MIME-Version: 1.0
-References: <20190416184624.15397-1-dan.streetman@canonical.com>
-	<20190416184624.15397-2-dan.streetman@canonical.com>
-	<20190419191328-mutt-send-email-mst@kernel.org>
-In-Reply-To: <20190419191328-mutt-send-email-mst@kernel.org>
-From: Dan Streetman <dan.streetman@canonical.com>
-Date: Mon, 22 Apr 2019 16:31:42 -0400
-Message-ID: <CAOZ2QJMvPj1VPoiezHjiQpU3m7HMk_i6G=LEUvmi3m_QWM=e8A@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH 1/2] add VirtIONet vhost_stopped flag to
- prevent multiple stops
+	(envelope-from <ehabkost@redhat.com>) id 1hIg7V-0000Id-Ad
+	for qemu-devel@nongnu.org; Mon, 22 Apr 2019 17:04:58 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:35346)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1hIg7V-0000II-5N
+	for qemu-devel@nongnu.org; Mon, 22 Apr 2019 17:04:57 -0400
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+	[10.5.11.14])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 76DF537F43
+	for <qemu-devel@nongnu.org>; Mon, 22 Apr 2019 21:04:56 +0000 (UTC)
+From: Eduardo Habkost <ehabkost@redhat.com>
+Date: Mon, 22 Apr 2019 18:04:48 -0300
+Message-Id: <20190422210448.2488-4-ehabkost@redhat.com>
+In-Reply-To: <20190422210448.2488-1-ehabkost@redhat.com>
+References: <20190422210448.2488-1-ehabkost@redhat.com>
+Subject: [Qemu-devel] [PATCH 3/3] accel: Remove unused AccelClass::available
+ field
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,88 +30,44 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Michael S. Tsirkin" <mst@redhat.com>
-Cc: Jason Wang <jasowang@redhat.com>, qemu-devel@nongnu.org, qemu-stable@nongnu.org
+To: qemu-devel@nongnu.org
+Cc: Thomas Huth <thuth@redhat.com>, Laurent Vivier <lvivier@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
 
-On Fri, Apr 19, 2019 at 7:14 PM Michael S. Tsirkin <mst@redhat.com> wrote:
->
-> On Tue, Apr 16, 2019 at 02:46:23PM -0400, Dan Streetman wrote:
-> > From: Dan Streetman <ddstreet@canonical.com>
-> >
-> > Buglink: https://launchpad.net/bugs/1823458
-> >
-> > There is a race condition when using the vhost-user driver, between a guest
-> > shutdown and the vhost-user interface being closed.  This is explained in
-> > more detail at the bug link above; the short explanation is the vhost-user
-> > device can be closed while the main thread is in the middle of stopping
-> > the vhost_net.  In this case, the main thread handling shutdown will
-> > enter virtio_net_vhost_status() and move into the n->vhost_started (else)
-> > block, and call vhost_net_stop(); while it is running that function,
-> > another thread is notified that the vhost-user device has been closed,
-> > and (indirectly) calls into virtio_net_vhost_status() also.  Since the
-> > vhost_net status hasn't yet changed, the second thread also enters
-> > the n->vhost_started block, and also calls vhost_net_stop().  This
-> > causes problems for the second thread when it tries to stop the network
-> > that's already been stopped.
-> >
-> > This adds a flag to the struct that's atomically set to prevent more than
-> > one thread from calling vhost_net_stop().  The atomic_fetch_inc() is likely
-> > overkill and probably could be done with a simple check-and-set, but
-> > since it's a race condition there would still be a (very, very) small
-> > window without using an atomic to set it.
->
-> How? Isn't all this under the BQL?
+The field is not used anymore, we can remove it.
 
-I don't think so, although I'm not deeply familiar with the code.
-Note the code path listed in my last email, run from
-aio_bh_schedule_oneshot() - does that hold the bql while running?
+Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
+---
+ include/sysemu/accel.h | 1 -
+ accel/accel.c          | 5 -----
+ 2 files changed, 6 deletions(-)
 
->
-> >
-> > Signed-off-by: Dan Streetman <ddstreet@canonical.com>
-> > ---
-> >  hw/net/virtio-net.c            | 3 ++-
-> >  include/hw/virtio/virtio-net.h | 1 +
-> >  2 files changed, 3 insertions(+), 1 deletion(-)
-> >
-> > diff --git a/hw/net/virtio-net.c b/hw/net/virtio-net.c
-> > index ffe0872fff..d36f50d5dd 100644
-> > --- a/hw/net/virtio-net.c
-> > +++ b/hw/net/virtio-net.c
-> > @@ -13,6 +13,7 @@
-> >
-> >  #include "qemu/osdep.h"
-> >  #include "qemu/iov.h"
-> > +#include "qemu/atomic.h"
-> >  #include "hw/virtio/virtio.h"
-> >  #include "net/net.h"
-> >  #include "net/checksum.h"
-> > @@ -240,7 +241,7 @@ static void virtio_net_vhost_status(VirtIONet *n, uint8_t status)
-> >                           "falling back on userspace virtio", -r);
-> >              n->vhost_started = 0;
-> >          }
-> > -    } else {
-> > +    } else if (atomic_fetch_inc(&n->vhost_stopped) == 0) {
-> >          vhost_net_stop(vdev, n->nic->ncs, queues);
-> >          n->vhost_started = 0;
-> >      }
-> > diff --git a/include/hw/virtio/virtio-net.h b/include/hw/virtio/virtio-net.h
-> > index b96f0c643f..d03fd933d0 100644
-> > --- a/include/hw/virtio/virtio-net.h
-> > +++ b/include/hw/virtio/virtio-net.h
-> > @@ -164,6 +164,7 @@ struct VirtIONet {
-> >      uint8_t nouni;
-> >      uint8_t nobcast;
-> >      uint8_t vhost_started;
-> > +    int vhost_stopped;
-> >      struct {
-> >          uint32_t in_use;
-> >          uint32_t first_multi;
->
-> OK questions same as any state:
->
-> - do we need to migrate this?
-> - reset it on device reset?
->
-> > --
-> > 2.20.1
+diff --git a/include/sysemu/accel.h b/include/sysemu/accel.h
+index 5565e00a96..70e9e2f2a1 100644
+--- a/include/sysemu/accel.h
++++ b/include/sysemu/accel.h
+@@ -38,7 +38,6 @@ typedef struct AccelClass {
+ 
+     const char *opt_name;
+     const char *name;
+-    int (*available)(void);
+     int (*init_machine)(MachineState *ms);
+     void (*setup_post)(MachineState *ms, AccelState *accel);
+     bool *allowed;
+diff --git a/accel/accel.c b/accel/accel.c
+index 454fef9d92..5fa31717b4 100644
+--- a/accel/accel.c
++++ b/accel/accel.c
+@@ -107,11 +107,6 @@ void configure_accelerator(MachineState *ms, const char *progname)
+         if (!acc) {
+             continue;
+         }
+-        if (acc->available && !acc->available()) {
+-            printf("%s not supported for this target\n",
+-                   acc->name);
+-            continue;
+-        }
+         ret = accel_init_machine(acc, ms);
+         if (ret < 0) {
+             init_failed = true;
+-- 
+2.18.0.rc1.1.g3f1ff2140
