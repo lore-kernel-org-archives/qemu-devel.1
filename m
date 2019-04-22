@@ -1,24 +1,26 @@
-Received: from eggs.gnu.org ([209.51.188.92]:40610)
+Received: from eggs.gnu.org ([209.51.188.92]:54087)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pavel.dovgaluk@gmail.com>) id 1hIX1R-0001RR-9b
-	for qemu-devel@nongnu.org; Mon, 22 Apr 2019 07:22:06 -0400
+	(envelope-from <mst@redhat.com>) id 1hIYJq-0004eN-TZ
+	for qemu-devel@nongnu.org; Mon, 22 Apr 2019 08:45:12 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pavel.dovgaluk@gmail.com>) id 1hIX1O-0002gC-LR
-	for qemu-devel@nongnu.org; Mon, 22 Apr 2019 07:22:04 -0400
-Received: from mail.ispras.ru ([83.149.199.45]:47408)
-	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pavel.dovgaluk@gmail.com>) id 1hIX1M-0002dX-EW
-	for qemu-devel@nongnu.org; Mon, 22 Apr 2019 07:22:01 -0400
-From: Pavel Dovgalyuk <pavel.dovgaluk@gmail.com>
-Date: Mon, 22 Apr 2019 14:21:55 +0300
-Message-ID: <155593211539.21079.18009501411293484959.stgit@pasha-Precision-3630-Tower>
-In-Reply-To: <155593197705.21079.8238359471765771689.stgit@pasha-Precision-3630-Tower>
-References: <155593197705.21079.8238359471765771689.stgit@pasha-Precision-3630-Tower>
+	(envelope-from <mst@redhat.com>) id 1hIY9x-0005e4-Q0
+	for qemu-devel@nongnu.org; Mon, 22 Apr 2019 08:34:59 -0400
+Received: from mail-qk1-f195.google.com ([209.85.222.195]:33942)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1hIY9w-0005ch-NP
+	for qemu-devel@nongnu.org; Mon, 22 Apr 2019 08:34:57 -0400
+Received: by mail-qk1-f195.google.com with SMTP id n68so6293725qka.1
+	for <qemu-devel@nongnu.org>; Mon, 22 Apr 2019 05:34:55 -0700 (PDT)
+Date: Mon, 22 Apr 2019 08:34:51 -0400
+From: "Michael S. Tsirkin" <mst@redhat.com>
+Message-ID: <20190422083013-mutt-send-email-mst@kernel.org>
+References: <20190422004849.26463-1-richardw.yang@linux.intel.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Subject: [Qemu-devel] [PATCH for-4.1 24/24] icount: clean up cpu_can_io
- before jumping to the next block
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20190422004849.26463-1-richardw.yang@linux.intel.com>
+Subject: Re: [Qemu-devel] [PATCH v14 0/2] support MAP_SYNC for
+ memory-backend-file
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,33 +29,168 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: kwolf@redhat.com, peter.maydell@linaro.org, war2jordan@live.com, crosthwaite.peter@gmail.com, boost.lists@gmail.com, artem.k.pisarenko@gmail.com, quintela@redhat.com, ciro.santilli@gmail.com, jasowang@redhat.com, mst@redhat.com, armbru@redhat.com, mreitz@redhat.com, maria.klimushenkova@ispras.ru, dovgaluk@ispras.ru, kraxel@redhat.com, pavel.dovgaluk@ispras.ru, thomas.dullien@googlemail.com, pbonzini@redhat.com, alex.bennee@linaro.org, dgilbert@redhat.com, rth@twiddle.net
+To: Wei Yang <richardw.yang@linux.intel.com>
+Cc: qemu-devel@nongnu.org, xiaoguangrong.eric@gmail.com, stefanha@redhat.com, pbonzini@redhat.com, pagupta@redhat.com, yu.c.zhang@linux.intel.com, ehabkost@redhat.com, imammedo@redhat.com, dan.j.williams@intel.com, yi.z.zhang@linux.intel.com
 
-From: Pavel Dovgalyuk <Pavel.Dovgaluk@ispras.ru>
+On Mon, Apr 22, 2019 at 08:48:47AM +0800, Wei Yang wrote:
+> Linux 4.15 introduces a new mmap flag MAP_SYNC, which can be used to
+> guarantee the write persistence to mmap'ed files supporting DAX (e.g.,
+> files on ext4/xfs file system mounted with '-o dax').
+> 
+> A description of MAP_SYNC and MAP_SHARED_VALIDATE can be found at
+>     https://patchwork.kernel.org/patch/10028151/
+> 
+> In order to make sure that the file metadata is in sync after a fault 
+> while we are writing a shared DAX supporting backend files, this
+> patch-set enables QEMU to use MAP_SYNC flag for memory-backend-dax-file.
+> 
+> As the DAX vs DMA truncated issue was solved, we refined the code and
+> send out this feature for the v5 version.
+> 
+> We will pass MAP_SYNC to mmap(2); if MAP_SYNC is supported and
+> 'share=on' & 'pmem=on'. 
+> Or QEMU will not pass this flag to mmap(2)
 
-Most of IO instructions can be executed only at the end of the block in
-icount mode. Therefore translator can set cpu_can_io flag when translating
-the last instruction.
-But when the blocks are chained, then this flag is not reset and may
-remain set at the beginning of the next block.
-This patch resets the flag before "chaining" the translation blocks.
+OK this is in a good shape. As we are in freeze anyway,
+there's still a bit more time to polish it. I have a couple of
+suggestions:
 
-Signed-off-by: Pavel Dovgalyuk <Pavel.Dovgaluk@ispras.ru>
----
- accel/tcg/tcg-runtime.c |    2 ++
- 1 file changed, 2 insertions(+)
+- squash docs in same patch with code, no need for two patches
+- mmap errors are not silently ignored as the doc says,
+  a warning is produced
 
-diff --git a/accel/tcg/tcg-runtime.c b/accel/tcg/tcg-runtime.c
-index d0d4484406..5871f5aba2 100644
---- a/accel/tcg/tcg-runtime.c
-+++ b/accel/tcg/tcg-runtime.c
-@@ -151,6 +151,8 @@ void *HELPER(lookup_tb_ptr)(CPUArchState *env)
-     target_ulong cs_base, pc;
-     uint32_t flags;
- 
-+    /* We are going to jump to the next block. can_do_io should be reset */
-+    cpu->can_do_io = !use_icount;
-     tb = tb_lookup__cpu_state(cpu, &pc, &cs_base, &flags, curr_cflags());
-     if (tb == NULL) {
-         return tcg_ctx->code_gen_epilogue;
+Also, it might make sense to send the warnings to an errp object and not stderr.
+I would leave that to a follow-up patch.
+
+
+> Test with below cases:
+> 1. pmem=on is set, shared=on is set, MAP_SYNC supported:
+>    a: backend is a dax supporting file.
+>    1) start VM1 with options:
+>    -object memory-backend-file,id=nv_be4,share,mem-path=${DAX_FILE_1},size=${DAX_FILE_SIZE_1},align=128M,pmem=on,share=on
+>    -device nvdimm,id=nv4,memdev=nv_be4,label-size=2M.
+>    
+>    2) start VM2 with options:
+>    -object memory-backend-file,id=nv_be4,share,mem-path=${DAX_FILE_2,size=${DAX_FILE_SIZE_2},align=128M,pmem=on,share=on
+>    -device nvdimm,id=nv4,memdev=nv_be4,label-size=2M.
+> 
+>    3) live migrate from VM1 to VM2.
+>    
+>    4) Suddenly let Host crash or power failure.
+> 
+>    5) check DAX_FILE_1 and DAX_FILE_2, no corrupt.
+> 
+>    b: backend is a regular file.
+>    1) start with options
+>    -object memory-backend-file,id=nv_be4,share,mem-path=${REG_FILE},size=${REG_FILE_SIZE},align=128M,pmem=on,share=on
+>    -device nvdimm,id=nv4,memdev=nv_be4,label-size=2M.
+> 
+>    will warning "failed to validate with mapping flags: Operation not supported"
+>    FILE_1 and FILE_2 random corrupt.
+> 
+> 2. Other cases:
+>    FILE_1 and FILE_2 random corrupt.
+> 
+> Changes in V14:
+>  * 1/2 rebase on top of current upstream and tested
+> 
+> Changes in V13:
+>  * 4/5 Micheal: move the inlcude to mmap_alloc.c.
+>  * 4/5 Micheal: refine the warning message.
+>  * 5/5 Micheal: refine the Documentations.
+> 
+> Changes in V12:
+>  * 2/5: Micheal: Update update-linux-headers.sh
+>  * 3/5: Micheal: Use script update add linux/mman.h
+>  * 4/5: Pankaj,Micheal: 1) fallback to mmap without
+>         MAP_SYNC & MAP_SHARED_VALIDATE if sync not supported or failed
+> 	2) Replace the include with 3/5 added linux/mman.h
+>  * 5/5: Micheal: Refine the Documentations.
+> 
+> Changes in V11:
+>  * 1/3: Micheal: Change to just add a bool is_pmem in qemu_ram_mmap.
+>  * 2/3: Micheal: Fix the compatibility for old kernel.
+>  * 2/3&3/3: Micheal&Eduardo :Update the behavior below: 
+>    Waning at no-dax and continue without MAP_SYNC.
+>    Test if fails again for compatibility, then remove the MAP_VALIDATE and
+>    silently proceed.
+> 
+> Changes in V10:
+>  * 4/4: refine the document.
+>  * 3/4: Reviewed-by: Stefano Garzarella <sgarzare@redhat.com>
+>  * 2/4: refine the commit message, Added MAP_SHARED_VALIDATE.
+>  * 2/4: Fix the wrong include header
+> 
+> Changes in V9:
+>  * 1/6: Reviewed-by: Eduardo Habkost <ehabkost@redhat.com>
+>  * 2/6: New Added: Micheal: use sparse feature define RAM_FLAG. 
+>  since I don't have much knowledge about the sparse feature, @Micheal Could you 
+>  add some documentation/commit message on this patch? Thank you very much.
+>  * 3/6: from 2/5: Eduardo: updated the commit message. 
+>  * 4/6: from 3/5: Micheal: don't ignore MAP_SYNC failures silently.
+>  * 5/6: from 4/5: Eduardo: updated the commit message.
+>  * 6/6: from 5/5: Micheal: Drop the sync option, document the MAP_SYNC.
+> 
+> Changes in v8:
+>  * Micheal: 3/5, remove the duplicated define in the os_dep.h
+>  * Micheal: 2/5, make type define safety.
+>  * Micheal: 2/5, fixed the incorrect define MAP_SHARE on qemu_anon_ram_alloc.
+>  * 4/6 removed, we remove the on/off/auto define of sync,  as by now,
+>    MAP_SYNC only worked with pmem=on.
+>  * @Micheal, I still reuse the RAM_SYNC flag, it is much straightforward to parse 
+>    all the flags in one parameter.
+> 
+> Changes in v7:
+>  * Micheal: [3,4,6]/6 limited the "sync" flag only on a nvdimm backend.(pmem=on)
+> 
+> Changes in v6:
+>  * Pankaj: 3/7 are squashed with 2/7
+>  * Pankaj: 7/7 update comments to "consistent filesystem metadata".
+>  * Pankaj, Igor: 1/7 Added Reviewed-by in patch-1/7
+>  * Stefan, 4/7 move the include header from "/linux/mman.h" to "osdep.h"
+>  * Stefan, 5/7 Add missing "munmap"
+>  * Stefan, 2/7 refine the shared/flag.
+> 
+> Changes in v5:
+>  * Add patch 1 to fix a memory leak issue.
+>  * Refine the patch 4-6
+>  * Remove the patch 3 as we already change the parameter from "shared" to
+>    "flags"
+> 
+> Changes in v4:
+>  * Add patch 1-3 to switch some functions to a single 'flags'
+>    parameters. (Michael S. Tsirkin)
+>  * v3 patch 1-3 become v4 patch 4-6.
+>  * Patch 4: move definitions of MAP_SYNC and MAP_SHARED_VALIDATE to a
+>    new header file under include/standard-headers/linux/. (Michael S. Tsirkin)
+>  * Patch 6: refine the description of the 'sync' option. (Michael S. Tsirkin)
+> 
+> Changes in v3:
+>  * Patch 1: add MAP_SHARED_VALIDATE in both sync=on and sync=auto
+>    cases, and add back the retry mechanism. MAP_SYNC will be ignored
+>    by Linux kernel 4.15 if MAP_SHARED_VALIDATE is missed.
+>  * Patch 1: define MAP_SYNC and MAP_SHARED_VALIDATE as 0 on non-Linux
+>    platforms in order to make qemu_ram_mmap() compile on those platforms.
+>  * Patch 2&3: include more information in error messages of
+>    memory-backend in hope to help user to identify the error.
+>    (Dr. David Alan Gilbert)
+>  * Patch 3: fix typo in the commit message. (Dr. David Alan Gilbert)
+> 
+> Changes in v2:
+>  * Add 'sync' option to control the use of MAP_SYNC. (Eduardo Habkost)
+>  * Remove the unnecessary set of MAP_SHARED_VALIDATE in some cases and
+>    the retry mechanism in qemu_ram_mmap(). (Michael S. Tsirkin)
+>  * Move OS dependent definitions of MAP_SYNC and MAP_SHARED_VALIDATE
+>    to osdep.h. (Michael S. Tsirkin)
+> 
+> Zhang Yi (2):
+>   util/mmap-alloc: support MAP_SYNC in qemu_ram_mmap()
+>   docs: Added MAP_SYNC documentation
+> 
+>  docs/nvdimm.txt   | 22 +++++++++++++++++++---
+>  qemu-options.hx   |  5 +++++
+>  util/mmap-alloc.c | 41 ++++++++++++++++++++++++++++++++++++++++-
+>  3 files changed, 64 insertions(+), 4 deletions(-)
+> 
+> -- 
+> 2.19.1
