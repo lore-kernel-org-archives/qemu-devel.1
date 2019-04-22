@@ -1,26 +1,36 @@
-Received: from eggs.gnu.org ([209.51.188.92]:47765)
+Received: from eggs.gnu.org ([209.51.188.92]:57557)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <leon@kernel.org>) id 1hIS0e-0000f3-RK
-	for qemu-devel@nongnu.org; Mon, 22 Apr 2019 02:01:01 -0400
+	(envelope-from <aravinda@linux.vnet.ibm.com>) id 1hISyj-0006Te-Oz
+	for qemu-devel@nongnu.org; Mon, 22 Apr 2019 03:03:02 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <leon@kernel.org>) id 1hIS0R-0006VD-1k
-	for qemu-devel@nongnu.org; Mon, 22 Apr 2019 02:00:48 -0400
-Received: from mail.kernel.org ([198.145.29.99]:35648)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <leon@kernel.org>) id 1hIS0Q-0006TZ-5M
-	for qemu-devel@nongnu.org; Mon, 22 Apr 2019 02:00:42 -0400
-Date: Mon, 22 Apr 2019 09:00:34 +0300
-From: Leon Romanovsky <leon@kernel.org>
-Message-ID: <20190422060034.GA27901@mtr-leonro.mtl.com>
-References: <20190411110157.14252-1-yuval.shaia@oracle.com>
-	<20190411190215.2163572e.cohuck@redhat.com>
-	<20190415103546.GA6854@lap1>
-	<e73e03c2-ea2b-6ffc-cd23-e8e44d42ce80@suse.de>
+	(envelope-from <aravinda@linux.vnet.ibm.com>) id 1hISyi-00051R-Iy
+	for qemu-devel@nongnu.org; Mon, 22 Apr 2019 03:03:01 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:57180)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <aravinda@linux.vnet.ibm.com>)
+	id 1hISyi-0004zY-7W
+	for qemu-devel@nongnu.org; Mon, 22 Apr 2019 03:03:00 -0400
+Received: from pps.filterd (m0098394.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id
+	x3M6rnDJ084695
+	for <qemu-devel@nongnu.org>; Mon, 22 Apr 2019 03:02:57 -0400
+Received: from e34.co.us.ibm.com (e34.co.us.ibm.com [32.97.110.152])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2s14j4ffwq-1
+	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Mon, 22 Apr 2019 03:02:57 -0400
+Received: from localhost
+	by e34.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+	Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <aravinda@linux.vnet.ibm.com>;
+	Mon, 22 Apr 2019 08:02:56 +0100
+From: Aravinda Prasad <aravinda@linux.vnet.ibm.com>
+Date: Mon, 22 Apr 2019 12:32:48 +0530
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <e73e03c2-ea2b-6ffc-cd23-e8e44d42ce80@suse.de>
-Subject: Re: [Qemu-devel] [RFC 0/3] VirtIO RDMA
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+Message-Id: <155591636364.20338.844048953355207313.stgit@aravinda>
+Subject: [Qemu-devel] [PATCH v8 0/6] target-ppc/spapr: Add FWNMI support in
+ QEMU for PowerKVM guests
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,113 +39,65 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Hannes Reinecke <hare@suse.de>
-Cc: Yuval Shaia <yuval.shaia@oracle.com>, Cornelia Huck <cohuck@redhat.com>, mst@redhat.com, linux-rdma@vger.kernel.org, qemu-devel@nongnu.org, virtualization@lists.linux-foundation.org, jgg@mellanox.com
+To: aik@au1.ibm.com, qemu-ppc@nongnu.org, qemu-devel@nongnu.org, david@gibson.dropbear.id.au
+Cc: paulus@ozlabs.org, aravinda@linux.vnet.ibm.com, mahesh@linux.vnet.ibm.com
 
-On Fri, Apr 19, 2019 at 01:16:06PM +0200, Hannes Reinecke wrote:
-> On 4/15/19 12:35 PM, Yuval Shaia wrote:
-> > On Thu, Apr 11, 2019 at 07:02:15PM +0200, Cornelia Huck wrote:
-> > > On Thu, 11 Apr 2019 14:01:54 +0300
-> > > Yuval Shaia <yuval.shaia@oracle.com> wrote:
-> > >
-> > > > Data center backends use more and more RDMA or RoCE devices and more and
-> > > > more software runs in virtualized environment.
-> > > > There is a need for a standard to enable RDMA/RoCE on Virtual Machines.
-> > > >
-> > > > Virtio is the optimal solution since is the de-facto para-virtualizaton
-> > > > technology and also because the Virtio specification
-> > > > allows Hardware Vendors to support Virtio protocol natively in order to
-> > > > achieve bare metal performance.
-> > > >
-> > > > This RFC is an effort to addresses challenges in defining the RDMA/RoCE
-> > > > Virtio Specification and a look forward on possible implementation
-> > > > techniques.
-> > > >
-> > > > Open issues/Todo list:
-> > > > List is huge, this is only start point of the project.
-> > > > Anyway, here is one example of item in the list:
-> > > > - Multi VirtQ: Every QP has two rings and every CQ has one. This means that
-> > > >    in order to support for example 32K QPs we will need 64K VirtQ. Not sure
-> > > >    that this is reasonable so one option is to have one for all and
-> > > >    multiplex the traffic on it. This is not good approach as by design it
-> > > >    introducing an optional starvation. Another approach would be multi
-> > > >    queues and round-robin (for example) between them.
-> > > >
-> Typically there will be a one-to-one mapping between QPs and CPUs (on the
-> guest). So while one would need to be prepared to support quite some QPs,
-> the expectation is that the actual number of QPs used will be rather low.
-> In a similar vein, multiplexing QPs would be defeating the purpose, as the
-> overall idea was to have _independent_ QPs to enhance parallelism.
->
-> > > > Expectations from this posting:
-> > > > In general, any comment is welcome, starting from hey, drop this as it is a
-> > > > very bad idea, to yeah, go ahead, we really want it.
-> > > > Idea here is that since it is not a minor effort i first want to know if
-> > > > there is some sort interest in the community for such device.
-> > >
-> > > My first reaction is: Sounds sensible, but it would be good to have a
-> > > spec for this :)
-> > >
-> > > You'll need a spec if you want this to go forward anyway, so at least a
-> > > sketch would be good to answer questions such as how many virtqueues
-> > > you use for which purpose, what is actually put on the virtqueues,
-> > > whether there are negotiable features, and what the expectations for
-> > > the device and the driver are. It also makes it easier to understand
-> > > how this is supposed to work in practice.
-> > >
-> > > If folks agree that this sounds useful, the next step would be to
-> > > reserve an id for the device type.
-> >
-> > Thanks for the tips, will sure do that, it is that first i wanted to make
-> > sure there is a use case here.
-> >
-> > Waiting for any feedback from the community.
-> >
-> I really do like the ides; in fact, it saved me from coding a similar thing
-> myself :-)
->
-> However, I'm still curious about the overall intent of this driver. Where
-> would the I/O be routed _to_ ?
-> It's nice that we have a virtualized driver, but this driver is
-> intended to do I/O (even if it doesn't _do_ any I/O ATM :-)
-> And this I/O needs to be send to (and possibly received from)
-> something.
->
-> So what exactly is this something?
-> An existing piece of HW on the host?
-> If so, wouldn't it be more efficient to use vfio, either by using SR-IOV or
-> by using virtio-mdev?
->
-> Another guest?
-> If so, how would we route the I/O from one guest to the other?
-> Shared memory? Implementing a full-blown RDMA switch in qemu?
->
-> Oh, and I would _love_ to have a discussion about this at KVM Forum.
-> Maybe I'll manage to whip up guest-to-guest RDMA connection using ivshmem
-> ... let's see.
+This patch set adds support for FWNMI in PowerKVM guests.
 
-Following success in previous years to transfer ideas into code,
-we started to prepare RDMA miniconference in LPC 2019, which will
-be co-located with Kernel Summit and networking track.
+System errors such as SLB multihit and memory errors
+that cannot be corrected by hardware is passed on to
+the kernel for handling by raising machine check
+exception (an NMI). Upon such machine check exceptions,
+if the address in error belongs to guest then KVM
+invokes guests' 0x200 interrupt vector if the guest
+is not FWNMI capable. For FWNMI capable guest
+KVM passes the control to QEMU by exiting the guest.
 
-I'm confident that such broad audience of kernel developers
-will be good fit for such discussion.
+This patch series adds functionality to QEMU to pass
+on such machine check exceptions to the FWNMI capable
+guest kernel by building an error log and invoking
+the guest registered machine check handling routine.
 
-Previous years:
-2016: https://www.spinics.net/lists/linux-rdma/msg43074.html
-2017: https://lwn.net/Articles/734163/
-2018: It was so full in audience and intensive that I failed to
-summarize it :(
+The KVM changes are now part of the upstream kernel
+(commit e20bbd3d). This series contain QEMU changes.
 
-Thanks
+Change Log v8:
+  - Added functionality to check FWNMI capability during
+    VM migration
 
->
-> Cheers,
->
-> Hannes
-> --
-> Dr. Hannes Reinecke            Teamlead Storage & Networking
-> hare@suse.de                              +49 911 74053 688
-> SUSE LINUX GmbH, Maxfeldstr. 5, 90409 N??rnberg
-> GF: Felix Imend??rffer, Mary Higgins, Sri Rasiah
-> HRB 21284 (AG N??rnberg)
+Change Log v7:
+  - Rebased to 4.1
+
+Change Log v6:
+  - Fetches rtas_addr from fdt
+  - Handles all error conditions (earlier it was only UEs)
+
+Change Log v5:
+  - Handled VM migrations by including rtas_addr in VMSTATE.
+  - Migration is blocked while a machine check is in progress.
+
+---
+
+Aravinda Prasad (6):
+      ppc: spapr: Handle "ibm,nmi-register" and "ibm,nmi-interlock" RTAS calls
+      Wrapper function to wait on condition for the main loop mutex
+      target/ppc: Handle NMI guest exit
+      target/ppc: Build rtas error log upon an MCE
+      ppc: spapr: Enable FWNMI capability
+      migration: Block migration while handling machine check
+
+
+ cpus.c                   |    5 +
+ hw/ppc/spapr.c           |   26 ++++
+ hw/ppc/spapr_caps.c      |   26 ++++
+ hw/ppc/spapr_events.c    |  284 ++++++++++++++++++++++++++++++++++++++++++++++
+ hw/ppc/spapr_rtas.c      |   84 ++++++++++++++
+ include/hw/ppc/spapr.h   |   26 ++++
+ include/qemu/main-loop.h |    8 +
+ target/ppc/kvm.c         |   30 +++++
+ target/ppc/kvm_ppc.h     |    8 +
+ target/ppc/trace-events  |    2 
+ 10 files changed, 497 insertions(+), 2 deletions(-)
+
+--
+Aravinda
