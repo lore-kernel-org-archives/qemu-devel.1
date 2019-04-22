@@ -1,28 +1,27 @@
-Received: from eggs.gnu.org ([209.51.188.92]:45784)
+Received: from eggs.gnu.org ([209.51.188.92]:46274)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <liq3ea@gmail.com>) id 1hINad-0004Yw-3a
-	for qemu-devel@nongnu.org; Sun, 21 Apr 2019 21:17:48 -0400
+	(envelope-from <liq3ea@gmail.com>) id 1hINeM-0005oi-GV
+	for qemu-devel@nongnu.org; Sun, 21 Apr 2019 21:21:39 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <liq3ea@gmail.com>) id 1hINab-0000EF-W0
-	for qemu-devel@nongnu.org; Sun, 21 Apr 2019 21:17:47 -0400
-Received: from mail-oi1-x243.google.com ([2607:f8b0:4864:20::243]:45132)
+	(envelope-from <liq3ea@gmail.com>) id 1hINeL-0003EH-83
+	for qemu-devel@nongnu.org; Sun, 21 Apr 2019 21:21:38 -0400
+Received: from mail-oi1-x22b.google.com ([2607:f8b0:4864:20::22b]:43960)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <liq3ea@gmail.com>) id 1hINab-0000Cx-Lt
-	for qemu-devel@nongnu.org; Sun, 21 Apr 2019 21:17:45 -0400
-Received: by mail-oi1-x243.google.com with SMTP id y84so7421572oia.12
-	for <qemu-devel@nongnu.org>; Sun, 21 Apr 2019 18:17:45 -0700 (PDT)
+	(Exim 4.71) (envelope-from <liq3ea@gmail.com>) id 1hINeL-0003Dp-1T
+	for qemu-devel@nongnu.org; Sun, 21 Apr 2019 21:21:37 -0400
+Received: by mail-oi1-x22b.google.com with SMTP id t81so7435727oig.10
+	for <qemu-devel@nongnu.org>; Sun, 21 Apr 2019 18:21:36 -0700 (PDT)
 MIME-Version: 1.0
 References: <20190420161446.2274-1-liq3ea@163.com>
-	<20190420161446.2274-2-liq3ea@163.com>
-	<46a216be-0898-2d52-485d-fd07428c8b76@redhat.com>
-In-Reply-To: <46a216be-0898-2d52-485d-fd07428c8b76@redhat.com>
+	<20190420161446.2274-4-liq3ea@163.com>
+	<4eb444fe-7e45-1072-770b-17f0db493b6d@redhat.com>
+In-Reply-To: <4eb444fe-7e45-1072-770b-17f0db493b6d@redhat.com>
 From: Li Qiang <liq3ea@gmail.com>
-Date: Mon, 22 Apr 2019 09:17:07 +0800
-Message-ID: <CAKXe6S+5TTO3Czxsx98rd3d5UvyCnd5gMeWE6RW8b_eeE_b+3Q@mail.gmail.com>
+Date: Mon, 22 Apr 2019 09:21:00 +0800
+Message-ID: <CAKXe6SKKkao0gnGdvDWXbs9AG6uXLkeMybLH-7AP2-CiP7EEdQ@mail.gmail.com>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v2 1/3] edu: mmio: set 'max_access_size' to
- 8
+Subject: Re: [Qemu-devel] [PATCH v2 3/3] edu: uses uint64_t in dma operation
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,99 +34,101 @@ To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>
 Cc: Li Qiang <liq3ea@163.com>, Jiri Slaby <jslaby@suse.cz>, Paolo Bonzini <pbonzini@redhat.com>, Qemu Developers <qemu-devel@nongnu.org>
 
 Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com> =E4=BA=8E2019=E5=B9=B44=E6=
-=9C=8821=E6=97=A5=E5=91=A8=E6=97=A5 =E4=B8=8B=E5=8D=886:28=E5=86=99=E9=81=
+=9C=8821=E6=97=A5=E5=91=A8=E6=97=A5 =E4=B8=8B=E5=8D=886:32=E5=86=99=E9=81=
 =93=EF=BC=9A
 
-> Hi Li,
->
-> The patch title is not very descriptive, maybe "allow 64-bit access"
->
->
 > On 4/20/19 6:14 PM, Li Qiang wrote:
-> > The edu spec said, the MMIO area can be accessed by 8 bytes.
+> > The dma related variable is dma_addr_t, it is uint64_t in
+> > x64 platform. Change these usage from uint32_to uint64_t to
+> > avoid trancation.
 >
-> or 64-bit...
->
-> > However currently the 'max_access_size' is not so the MMIO
-> > access dispatch can only access 4 bytes one time. This patch
->
-> 32-bit
->
-> > fixes this to respect the spec.
-> >
-> > Notice: here the 'min_access_size' is not a must, I set this
-> > for completement.
->
-> Which one? valid/impl? I think you can drop this comment from the commit
-> description.
+> "to avoid address truncation"?
 >
 >
-Both needed. from memory_access_size, if we has no valid.max_access_size,
-this function will set it to 4.
 
-static int memory_access_size(MemoryRegion *mr, unsigned l, hwaddr addr)
-{
-    unsigned access_size_max =3D mr->ops->valid.max_access_size;
+The dma.dst/src/cnt..is from guest and is 64-bits. But in 'edu_dma_timer',
+it is assigned to uint32_t, If it is 0xffffffff 00000000, it will be ok by
+the check
+but it is of course not allowed.
 
-    /* Regions are assumed to support 1-4 byte accesses unless
-       otherwise specified.  */
-    if (access_size_max =3D=3D 0) {
-        access_size_max =3D 4;
-    }
-   ...
-}
-
->From access_with_adjusted_size, if we has no impl.max_access_size,
-this function will set it to 4.
-
-ps: I will appreciate if anyone can explain what's the meaning of valid and
-impl's min/max_access_size
-and how it affects the behavior.
+Though this is just an edu device, I think we should avoid this.
 
 Thanks,
 Li Qiang
 
->
+
+
+> >
 > > Signed-off-by: Li Qiang <liq3ea@163.com>
 > > ---
-> >  hw/misc/edu.c | 9 +++++++++
-> >  1 file changed, 9 insertions(+)
+> > Change since v1:
+> > Fix format compile error on Windows
+> >
+> >  hw/misc/edu.c | 15 ++++++++-------
+> >  1 file changed, 8 insertions(+), 7 deletions(-)
 > >
 > > diff --git a/hw/misc/edu.c b/hw/misc/edu.c
-> > index 91af452c9e..65fc32b928 100644
+> > index 4018dddcb8..f4a6d5f1c5 100644
 > > --- a/hw/misc/edu.c
 > > +++ b/hw/misc/edu.c
-> > @@ -289,6 +289,15 @@ static const MemoryRegionOps edu_mmio_ops =3D {
-> >      .read =3D edu_mmio_read,
-> >      .write =3D edu_mmio_write,
-> >      .endianness =3D DEVICE_NATIVE_ENDIAN,
-> > +    .valid =3D {
-> > +        .min_access_size =3D 4,
->
-> Per the spec, this is correct.
->
-> > +        .max_access_size =3D 8,
->
-> Correct.
->
-> > +    },
-> > +    .impl =3D {
-> > +        .min_access_size =3D 4,
+> > @@ -98,23 +98,24 @@ static void edu_lower_irq(EduState *edu, uint32_t
+> val)
+> >      }
+> >  }
+> >
+> > -static bool within(uint32_t addr, uint32_t start, uint32_t end)
+> > +static bool within(uint64_t addr, uint64_t start, uint64_t end)
 >
 > OK.
 >
-> > +        .max_access_size =3D 8,
->
-> Correct.
->
-> > +    },
-> > +
-> >  };
+> >  {
+> >      return start <=3D addr && addr < end;
+> >  }
 > >
-> >  /*
-> >
+> > -static void edu_check_range(uint32_t addr, uint32_t size1, uint32_t
+> start,
+> > +static void edu_check_range(uint64_t addr, uint64_t size1, uint64_t
+> start,
+> >                  uint32_t size2)
 >
-> With title/description updated:
+> OK for addr. MMIO range is 1MiB so you can keep uint32_t for
+> size1/size2. Up to the maintainer (personally I'd prefer keep u32).
+>
 > Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
 >
+> >  {
+> > -    uint32_t end1 =3D addr + size1;
+> > -    uint32_t end2 =3D start + size2;
+> > +    uint64_t end1 =3D addr + size1;
+> > +    uint64_t end2 =3D start + size2;
+> >
+> >      if (within(addr, start, end2) &&
+> >              end1 > addr && within(end1, start, end2)) {
+> >          return;
+> >      }
+> >
+> > -    hw_error("EDU: DMA range 0x%.8x-0x%.8x out of bounds
+> (0x%.8x-0x%.8x)!",
+> > +    hw_error("EDU: DMA range 0x%016"PRIx64"-0x%016"PRIx64
+> > +             " out of bounds (0x%016"PRIx64"-0x%016"PRIx64")!",
+> >              addr, end1 - 1, start, end2 - 1);
+> >  }
+> >
+> > @@ -139,13 +140,13 @@ static void edu_dma_timer(void *opaque)
+> >      }
+> >
+> >      if (EDU_DMA_DIR(edu->dma.cmd) =3D=3D EDU_DMA_FROM_PCI) {
+> > -        uint32_t dst =3D edu->dma.dst;
+> > +        uint64_t dst =3D edu->dma.dst;
+> >          edu_check_range(dst, edu->dma.cnt, DMA_START, DMA_SIZE);
+> >          dst -=3D DMA_START;
+> >          pci_dma_read(&edu->pdev, edu_clamp_addr(edu, edu->dma.src),
+> >                  edu->dma_buf + dst, edu->dma.cnt);
+> >      } else {
+> > -        uint32_t src =3D edu->dma.src;
+> > +        uint64_t src =3D edu->dma.src;
+> >          edu_check_range(src, edu->dma.cnt, DMA_START, DMA_SIZE);
+> >          src -=3D DMA_START;
+> >          pci_dma_write(&edu->pdev, edu_clamp_addr(edu, edu->dma.dst),
+> >
 >
