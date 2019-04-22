@@ -1,34 +1,17 @@
-Received: from eggs.gnu.org ([209.51.188.92]:57614)
+Received: from eggs.gnu.org ([209.51.188.92]:58574)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dan.j.williams@intel.com>) id 1hIeru-0002nz-Go
-	for qemu-devel@nongnu.org; Mon, 22 Apr 2019 15:44:47 -0400
+	(envelope-from <philmd@redhat.com>) id 1hIexa-000472-U2
+	for qemu-devel@nongnu.org; Mon, 22 Apr 2019 15:50:40 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dan.j.williams@intel.com>) id 1hIers-0004hS-S0
-	for qemu-devel@nongnu.org; Mon, 22 Apr 2019 15:44:46 -0400
-Received: from mail-oi1-x241.google.com ([2607:f8b0:4864:20::241]:33808)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <dan.j.williams@intel.com>)
-	id 1hIero-0004bk-RV
-	for qemu-devel@nongnu.org; Mon, 22 Apr 2019 15:44:44 -0400
-Received: by mail-oi1-x241.google.com with SMTP id v10so9389108oib.1
-	for <qemu-devel@nongnu.org>; Mon, 22 Apr 2019 12:44:33 -0700 (PDT)
+	(envelope-from <philmd@redhat.com>) id 1hIexZ-00080P-QM
+	for qemu-devel@nongnu.org; Mon, 22 Apr 2019 15:50:38 -0400
+From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
+Date: Mon, 22 Apr 2019 21:50:13 +0200
+Message-Id: <20190422195020.1494-1-philmd@redhat.com>
 MIME-Version: 1.0
-References: <20190410040826.24371-1-pagupta@redhat.com>
-	<20190410040826.24371-2-pagupta@redhat.com>
-	<CAPcyv4i1FjBzfcWtzeCvj-giHa9xaX0dMQ==q4LZC_L8VEqkHg@mail.gmail.com>
-	<20190412083230.GA29850@quack2.suse.cz>
-	<x494l73z7th.fsf@segfault.boston.devel.redhat.com>
-	<CAPcyv4jrNHqW3FuGkeo==ZoJr7LKahCv4_esnokfy7enek8=2Q@mail.gmail.com>
-	<20190418161833.GA22970@infradead.org>
-	<CAPcyv4jPOF_+R6U17J_+88+X8LC-LSPCugA6gbKxuphuuFB2gg@mail.gmail.com>
-	<x497ebm82d4.fsf@segfault.boston.devel.redhat.com>
-In-Reply-To: <x497ebm82d4.fsf@segfault.boston.devel.redhat.com>
-From: Dan Williams <dan.j.williams@intel.com>
-Date: Mon, 22 Apr 2019 12:44:21 -0700
-Message-ID: <CAPcyv4gGmN2LLMPy6BzWpYhRyV7fFNVgh=xAWSAdnnAWu5APtg@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH v5 1/6] libnvdimm: nd_region flush callback
- support
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PATCH v3 0/7] fw_cfg: Improve tracing
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,47 +20,51 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Jeff Moyer <jmoyer@redhat.com>
-Cc: Christoph Hellwig <hch@infradead.org>, Jan Kara <jack@suse.cz>, Pankaj Gupta <pagupta@redhat.com>, linux-nvdimm <linux-nvdimm@lists.01.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, virtualization@lists.linux-foundation.org, KVM list <kvm@vger.kernel.org>, linux-fsdevel <linux-fsdevel@vger.kernel.org>, Linux ACPI <linux-acpi@vger.kernel.org>, Qemu Developers <qemu-devel@nongnu.org>, linux-ext4 <linux-ext4@vger.kernel.org>, linux-xfs <linux-xfs@vger.kernel.org>, Ross Zwisler <zwisler@kernel.org>, Vishal L Verma <vishal.l.verma@intel.com>, Dave Jiang <dave.jiang@intel.com>, "Michael S. Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>, Matthew Wilcox <willy@infradead.org>, "Rafael J. Wysocki" <rjw@rjwysocki.net>, Len Brown <lenb@kernel.org>, Theodore Ts'o <tytso@mit.edu>, Andreas Dilger <adilger.kernel@dilger.ca>, "Darrick J. Wong" <darrick.wong@oracle.com>, lcapitulino@redhat.com, Kevin Wolf <kwolf@redhat.com>, Igor Mammedov <imammedo@redhat.com>, Nitesh Narayan Lal <nilal@redhat.com>, Rik van Riel <riel@surriel.com>, Stefan Hajnoczi <stefanha@redhat.com>, Andrea Arcangeli <aarcange@redhat.com>, David Hildenbrand <david@redhat.com>, david <david@fromorbit.com>, cohuck@redhat.com, Xiao Guangrong <xiaoguangrong.eric@gmail.com>, Paolo Bonzini <pbonzini@redhat.com>, kilobyte@angband.pl, yuval shaia <yuval.shaia@oracle.com>
+To: qemu-devel@nongnu.org
+Cc: Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, "Michael S. Tsirkin" <mst@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, David Gibson <david@gibson.dropbear.id.au>, Artyom Tarasenko <atar4qemu@gmail.com>, Richard Henderson <rth@twiddle.net>, Laszlo Ersek <lersek@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>, Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, qemu-ppc@nongnu.org, =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
 
-On Mon, Apr 22, 2019 at 8:59 AM Jeff Moyer <jmoyer@redhat.com> wrote:
->
-> Dan Williams <dan.j.williams@intel.com> writes:
->
-> > On Thu, Apr 18, 2019 at 9:18 AM Christoph Hellwig <hch@infradead.org> wrote:
-> >>
-> >> On Thu, Apr 18, 2019 at 09:05:05AM -0700, Dan Williams wrote:
-> >> > > > I'd either add a comment about avoiding retpoline overhead here or just
-> >> > > > make ->flush == NULL mean generic_nvdimm_flush(). Just so that people don't
-> >> > > > get confused by the code.
-> >> > >
-> >> > > Isn't this premature optimization?  I really don't like adding things
-> >> > > like this without some numbers to show it's worth it.
-> >> >
-> >> > I don't think it's premature given this optimization technique is
-> >> > already being deployed elsewhere, see:
-> >> >
-> >> > https://lwn.net/Articles/774347/
-> >>
-> >> For one this one was backed by numbers, and second after feedback
-> >> from Linux we switched to the NULL pointer check instead.
-> >
-> > Ok I should have noticed the switch to NULL pointer check. However,
-> > the question still stands do we want everyone to run numbers to
-> > justify this optimization, or make it a new common kernel coding
-> > practice to do:
-> >
-> >     if (!object->op)
-> >         generic_op(object);
-> >     else
-> >         object->op(object);
-> >
-> > ...in hot paths?
->
-> I don't think nvdimm_flush is a hot path.  Numbers of some
-> representative workload would prove one of us right.
+Trivial series to improve fw_cfg tracing.
 
-I'd rather say that the if "if (!op) do_generic()" pattern is more
-readable in the general case, saves grepping for who set the op in the
-common case. The fact that it has the potential to be faster is gravy
-at that point.
+Regards,
+
+Phil.
+
+Since v2: https://lists.gnu.org/archive/html/qemu-devel/2019-03/msg02522.=
+html
+- Split arch-specific code (1 patch per arch) (requested by Laszlo)
+
+Since v1: https://lists.gnu.org/archive/html/qemu-devel/2018-12/msg01598.=
+html
+- Added arch-specific keys
+
+Philippe Mathieu-Daud=C3=A9 (7):
+  hw/nvram/fw_cfg: Add trace events
+  hw/nvram/fw_cfg: Add fw_cfg_arch_key_name()
+  hw/i386: Extract fw_cfg definitions to local "fw_cfg.h"
+  hw/i386: Implement fw_cfg_arch_key_name()
+  hw/ppc: Implement fw_cfg_arch_key_name()
+  hw/sparc: Implement fw_cfg_arch_key_name()
+  hw/sparc64: Implement fw_cfg_arch_key_name()
+
+ MAINTAINERS               |  1 +
+ hw/i386/Makefile.objs     |  2 +-
+ hw/i386/fw_cfg.c          | 38 +++++++++++++++++++++++
+ hw/i386/fw_cfg.h          | 20 +++++++++++++
+ hw/i386/pc.c              |  7 +----
+ hw/nvram/fw_cfg.c         | 63 ++++++++++++++++++++++++++++++++++++++-
+ hw/nvram/trace-events     |  7 ++++-
+ hw/ppc/Makefile.objs      |  2 +-
+ hw/ppc/fw_cfg.c           | 45 ++++++++++++++++++++++++++++
+ hw/sparc/sun4m.c          | 19 ++++++++++++
+ hw/sparc64/sun4u.c        | 19 ++++++++++++
+ include/hw/nvram/fw_cfg.h | 11 +++++++
+ stubs/Makefile.objs       |  1 +
+ stubs/fw_cfg.c            | 21 +++++++++++++
+ 14 files changed, 246 insertions(+), 10 deletions(-)
+ create mode 100644 hw/i386/fw_cfg.c
+ create mode 100644 hw/i386/fw_cfg.h
+ create mode 100644 hw/ppc/fw_cfg.c
+ create mode 100644 stubs/fw_cfg.c
+
+--=20
+2.20.1
