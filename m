@@ -4,43 +4,43 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-6.7 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
 	FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.0
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 03322C10F11
-	for <qemu-devel@archiver.kernel.org>; Mon, 22 Apr 2019 11:32:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5FDF3C10F11
+	for <qemu-devel@archiver.kernel.org>; Mon, 22 Apr 2019 11:33:56 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B9DC4204EC
-	for <qemu-devel@archiver.kernel.org>; Mon, 22 Apr 2019 11:32:37 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B9DC4204EC
+	by mail.kernel.org (Postfix) with ESMTPS id 19581204EC
+	for <qemu-devel@archiver.kernel.org>; Mon, 22 Apr 2019 11:33:56 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 19581204EC
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:35930 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:35936 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hIXBc-0002E5-Vm
-	for qemu-devel@archiver.kernel.org; Mon, 22 Apr 2019 07:32:37 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:40247)
+	id 1hIXCt-0003Co-76
+	for qemu-devel@archiver.kernel.org; Mon, 22 Apr 2019 07:33:55 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:40303)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pavel.dovgaluk@gmail.com>) id 1hIX0L-0000Wm-VN
-	for qemu-devel@nongnu.org; Mon, 22 Apr 2019 07:20:59 -0400
+	(envelope-from <pavel.dovgaluk@gmail.com>) id 1hIX0a-0000jY-WC
+	for qemu-devel@nongnu.org; Mon, 22 Apr 2019 07:21:14 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pavel.dovgaluk@gmail.com>) id 1hIX0J-00026y-Vl
-	for qemu-devel@nongnu.org; Mon, 22 Apr 2019 07:20:57 -0400
-Received: from mail.ispras.ru ([83.149.199.45]:47110)
+	(envelope-from <pavel.dovgaluk@gmail.com>) id 1hIX0Z-0002Fe-MT
+	for qemu-devel@nongnu.org; Mon, 22 Apr 2019 07:21:12 -0400
+Received: from mail.ispras.ru ([83.149.199.45]:47204)
 	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pavel.dovgaluk@gmail.com>) id 1hIX0I-000260-BL
-	for qemu-devel@nongnu.org; Mon, 22 Apr 2019 07:20:54 -0400
+	(envelope-from <pavel.dovgaluk@gmail.com>) id 1hIX0Z-0002FR-B1
+	for qemu-devel@nongnu.org; Mon, 22 Apr 2019 07:21:11 -0400
 Received: from [127.0.1.1] (unknown [85.142.117.226])
-	by mail.ispras.ru (Postfix) with ESMTPSA id 721AD5400A9;
-	Mon, 22 Apr 2019 14:20:53 +0300 (MSK)
+	by mail.ispras.ru (Postfix) with ESMTPSA id 7BA545400A9;
+	Mon, 22 Apr 2019 14:21:10 +0300 (MSK)
 From: Pavel Dovgalyuk <pavel.dovgaluk@gmail.com>
 To: qemu-devel@nongnu.org
-Date: Mon, 22 Apr 2019 14:20:53 +0300
+Date: Mon, 22 Apr 2019 14:21:10 +0300
 Message-ID:
- <155593205323.21079.896262494235573420.stgit@pasha-Precision-3630-Tower>
+ <155593207024.21079.1974694932736554249.stgit@pasha-Precision-3630-Tower>
 In-Reply-To: <155593197705.21079.8238359471765771689.stgit@pasha-Precision-3630-Tower>
 References: <155593197705.21079.8238359471765771689.stgit@pasha-Precision-3630-Tower>
 User-Agent: StGit/0.17.1-dirty
@@ -49,8 +49,8 @@ Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: 7bit
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x
 X-Received-From: 83.149.199.45
-Subject: [Qemu-devel] [PATCH for-4.1 13/24] replay: implement replay-seek
- command
+Subject: [Qemu-devel] [PATCH for-4.1 16/24] gdbstub: add reverse step
+ support in replay mode
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -74,213 +74,261 @@ Cc: kwolf@redhat.com, peter.maydell@linaro.org, war2jordan@live.com,
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190422112053.tC0973bosZH_yE9QJSqmOn9YDqtseORGi2crhwb95us@z>
+Message-ID: <20190422112110.yzGF4a0StSgPZf8L1yXILtlrvPsO-TgbvrYt3AwUO7A@z>
 
 From: Pavel Dovgalyuk <Pavel.Dovgaluk@ispras.ru>
 
-This patch adds hmp/qmp commands replay_seek/replay-seek that proceed
-the execution to the specified instruction count.
-The command automatically loads nearest snapshot and replays the execution
-to find the desired instruction count.
+GDB remote protocol supports two reverse debugging commands:
+reverse step and reverse continue.
+This patch adds support of the first one to the gdbstub.
+Reverse step is intended to step one instruction in the backwards
+direction. This is not possible in regular execution.
+But replayed execution is deterministic, therefore we can load one of
+the prior snapshots and proceed to the desired step. It is equivalent
+to stepping one instruction back.
+There should be at least one snapshot preceding the debugged part of
+the replay log.
 
 Signed-off-by: Pavel Dovgalyuk <Pavel.Dovgaluk@ispras.ru>
-Acked-by: Markus Armbruster <armbru@redhat.com>
-
---
-
-v2:
- - renamed replay_seek qmp command into replay-seek
-   (suggested by Eric Blake)
-v7:
- - small fixes related to Markus Armbruster's review
-v9:
- - changed 'step' parameter name to 'icount'
- - moved json stuff to replay.json and updated the description
-   (suggested by Markus Armbruster)
-v10:
- - updated the descriptions
 ---
- hmp-commands.hx           |   19 +++++++++
- hmp.h                     |    1 
- qapi/replay.json          |   20 ++++++++++
- replay/replay-debugging.c |   92 +++++++++++++++++++++++++++++++++++++++++++++
- 4 files changed, 132 insertions(+)
+ accel/tcg/translator.c    |    1 +
+ cpus.c                    |   14 +++++++++++---
+ exec.c                    |    7 +++++++
+ gdbstub.c                 |   44 +++++++++++++++++++++++++++++++++++++++++---
+ include/sysemu/replay.h   |   11 +++++++++++
+ replay/replay-debugging.c |   33 +++++++++++++++++++++++++++++++++
+ stubs/replay.c            |    5 +++++
+ 7 files changed, 109 insertions(+), 6 deletions(-)
 
-diff --git a/hmp-commands.hx b/hmp-commands.hx
-index 1eb07e7bcc..88a2d32110 100644
---- a/hmp-commands.hx
-+++ b/hmp-commands.hx
-@@ -1945,6 +1945,25 @@ STEXI
- @findex replay_delete_break
- Remove replay breakpoint which was previously set with replay_break.
- The command is ignored when there are no replay breakpoints.
-+ETEXI
-+
-+    {
-+        .name       = "replay_seek",
-+        .args_type  = "icount:i",
-+        .params     = "icount",
-+        .help       = "replay execution to the specified instruction count",
-+        .cmd        = hmp_replay_seek,
-+    },
-+
-+STEXI
-+@item replay_seek @var{icount}
-+@findex replay_seek
-+Automatically proceed to the instruction count @var{icount}, when
-+replaying the execution. The command automatically loads nearest
-+snapshot and replays the execution to find the desired instruction.
-+When there is no preceding snapshot or the execution is not replayed,
-+then the command fails.
-+icount for the reference may be observed with 'info replay' command.
- ETEXI
+diff --git a/accel/tcg/translator.c b/accel/tcg/translator.c
+index afd0a49ea6..33a543e82f 100644
+--- a/accel/tcg/translator.c
++++ b/accel/tcg/translator.c
+@@ -17,6 +17,7 @@
+ #include "exec/gen-icount.h"
+ #include "exec/log.h"
+ #include "exec/translator.h"
++#include "sysemu/replay.h"
  
-     {
-diff --git a/hmp.h b/hmp.h
-index c3e7354dd3..c67a911f2e 100644
---- a/hmp.h
-+++ b/hmp.h
-@@ -153,5 +153,6 @@ void hmp_info_sev(Monitor *mon, const QDict *qdict);
- void hmp_info_replay(Monitor *mon, const QDict *qdict);
- void hmp_replay_break(Monitor *mon, const QDict *qdict);
- void hmp_replay_delete_break(Monitor *mon, const QDict *qdict);
-+void hmp_replay_seek(Monitor *mon, const QDict *qdict);
+ /* Pairs with tcg_clear_temp_count.
+    To be called by #TranslatorOps.{translate_insn,tb_stop} if
+diff --git a/cpus.c b/cpus.c
+index 5ff61fbf53..44d0b23435 100644
+--- a/cpus.c
++++ b/cpus.c
+@@ -1104,9 +1104,17 @@ static bool cpu_can_run(CPUState *cpu)
  
- #endif
-diff --git a/qapi/replay.json b/qapi/replay.json
-index 425e053e4d..aa768d496c 100644
---- a/qapi/replay.json
-+++ b/qapi/replay.json
-@@ -99,3 +99,23 @@
- #
- ##
- { 'command': 'replay-delete-break' }
+ static void cpu_handle_guest_debug(CPUState *cpu)
+ {
+-    gdb_set_stop_cpu(cpu);
+-    qemu_system_debug_request();
+-    cpu->stopped = true;
++    if (!replay_running_debug()) {
++        gdb_set_stop_cpu(cpu);
++        qemu_system_debug_request();
++        cpu->stopped = true;
++    } else {
++        if (!cpu->singlestep_enabled) {
++            cpu_single_step(cpu, SSTEP_ENABLE);
++        } else {
++            cpu_single_step(cpu, 0);
++        }
++    }
+ }
+ 
+ #ifdef CONFIG_LINUX
+diff --git a/exec.c b/exec.c
+index 6ab62f4eee..4f0d24214e 100644
+--- a/exec.c
++++ b/exec.c
+@@ -2772,6 +2772,13 @@ static void check_watchpoint(int offset, int len, MemTxAttrs attrs, int flags)
+     QTAILQ_FOREACH(wp, &cpu->watchpoints, entry) {
+         if (cpu_watchpoint_address_matches(wp, vaddr, len)
+             && (wp->flags & flags)) {
++            if (replay_running_debug()) {
++                /*
++                 * Don't process the watchpoints when we are
++                 * in a reverse debugging operation.
++                 */
++                return;
++            }
+             if (flags == BP_MEM_READ) {
+                 wp->flags |= BP_WATCHPOINT_HIT_READ;
+             } else {
+diff --git a/gdbstub.c b/gdbstub.c
+index d54abd17cc..e49e0f6c65 100644
+--- a/gdbstub.c
++++ b/gdbstub.c
+@@ -39,6 +39,7 @@
+ #include "sysemu/kvm.h"
+ #include "exec/semihost.h"
+ #include "exec/exec-all.h"
++#include "sysemu/replay.h"
+ 
+ #ifdef CONFIG_USER_ONLY
+ #define GDB_ATTACHED "0"
+@@ -344,6 +345,20 @@ typedef struct GDBState {
+  */
+ static int sstep_flags = SSTEP_ENABLE|SSTEP_NOIRQ|SSTEP_NOTIMER;
+ 
++/* Retrieves flags for single step mode. */
++static int get_sstep_flags(void)
++{
++    /*
++     * In replay mode all events written into the log should be replayed.
++     * That is why NOIRQ flag is removed in this mode.
++     */
++    if (replay_mode != REPLAY_MODE_NONE) {
++        return SSTEP_ENABLE;
++    } else {
++        return sstep_flags;
++    }
++}
 +
-+##
-+# @replay-seek:
-+#
-+# Automatically proceed to the instruction count @icount, when
-+# replaying the execution. The command automatically loads nearest
-+# snapshot and replays the execution to find the desired instruction.
-+# When there is no preceding snapshot or the execution is not replayed,
-+# then the command fails.
-+# icount for the reference may be obtained with @query-replay command.
-+#
-+# @icount: target instruction count
-+#
-+# Since: 4.1
-+#
-+# Example:
-+#
-+# -> { "execute": "replay-seek", "data": { "icount": 220414 } }
-+##
-+{ 'command': 'replay-seek', 'data': { 'icount': 'int' } }
+ static GDBState *gdbserver_state;
+ 
+ bool gdb_has_xml;
+@@ -434,7 +449,7 @@ static int gdb_continue_partial(GDBState *s, char *newstates)
+     CPU_FOREACH(cpu) {
+         if (newstates[cpu->cpu_index] == 's') {
+             trace_gdbstub_op_stepping(cpu->cpu_index);
+-            cpu_single_step(cpu, sstep_flags);
++            cpu_single_step(cpu, get_sstep_flags());
+         }
+     }
+     s->running_state = 1;
+@@ -453,7 +468,7 @@ static int gdb_continue_partial(GDBState *s, char *newstates)
+                 break; /* nothing to do here */
+             case 's':
+                 trace_gdbstub_op_stepping(cpu->cpu_index);
+-                cpu_single_step(cpu, sstep_flags);
++                cpu_single_step(cpu, get_sstep_flags());
+                 cpu_resume(cpu);
+                 flag = 1;
+                 break;
+@@ -1424,9 +1439,28 @@ static int gdb_handle_packet(GDBState *s, const char *line_buf)
+             addr = strtoull(p, (char **)&p, 16);
+             gdb_set_cpu_pc(s, addr);
+         }
+-        cpu_single_step(s->c_cpu, sstep_flags);
++        cpu_single_step(s->c_cpu, get_sstep_flags());
+         gdb_continue(s);
+         return RS_IDLE;
++    case 'b':
++        /* Backward debugging commands */
++        if (replay_mode == REPLAY_MODE_PLAY) {
++            switch (*p) {
++            case 's':
++                if (replay_reverse_step()) {
++                    gdb_continue(s);
++                    return RS_IDLE;
++                } else {
++                    put_packet(s, "E14");
++                    break;
++                }
++            default:
++                goto unknown_command;
++            }
++        } else {
++            put_packet(s, "E22");
++        }
++        goto unknown_command;
+     case 'F':
+         {
+             target_ulong ret;
+@@ -1729,6 +1763,10 @@ static int gdb_handle_packet(GDBState *s, const char *line_buf)
+             }
+             pstrcat(buf, sizeof(buf), ";multiprocess+");
+ 
++            if (replay_mode == REPLAY_MODE_PLAY) {
++                pstrcat(buf, sizeof(buf), ";ReverseStep+");
++            }
++
+             put_packet(s, buf);
+             break;
+         }
+diff --git a/include/sysemu/replay.h b/include/sysemu/replay.h
+index d7e859d915..533003f2b0 100644
+--- a/include/sysemu/replay.h
++++ b/include/sysemu/replay.h
+@@ -73,6 +73,17 @@ void replay_finish(void);
+ void replay_add_blocker(Error *reason);
+ /* Returns name of the replay log file */
+ const char *replay_get_filename(void);
++/*
++ * Start making one step in backward direction.
++ * Used by gdbstub for backwards debugging.
++ * Returns true on success.
++ */
++bool replay_reverse_step(void);
++/*
++ * Returns true if replay module is processing
++ * reverse_continue or reverse_step request
++ */
++bool replay_running_debug(void);
+ 
+ /* Processing the instructions */
+ 
 diff --git a/replay/replay-debugging.c b/replay/replay-debugging.c
-index a94685e437..e3821ab1ba 100644
+index e3821ab1ba..3d94859b8f 100644
 --- a/replay/replay-debugging.c
 +++ b/replay/replay-debugging.c
-@@ -18,6 +18,8 @@
- #include "qapi/qapi-commands-replay.h"
- #include "qapi/qmp/qdict.h"
- #include "qemu/timer.h"
-+#include "block/snapshot.h"
-+#include "migration/snapshot.h"
+@@ -21,6 +21,13 @@
+ #include "block/snapshot.h"
+ #include "migration/snapshot.h"
  
++static bool replay_is_debugging;
++
++bool replay_running_debug(void)
++{
++    return replay_is_debugging;
++}
++
  void hmp_info_replay(Monitor *mon, const QDict *qdict)
  {
-@@ -127,3 +129,93 @@ void hmp_replay_delete_break(Monitor *mon, const QDict *qdict)
+     if (replay_mode == REPLAY_MODE_NONE) {
+@@ -219,3 +226,29 @@ void hmp_replay_seek(Monitor *mon, const QDict *qdict)
          return;
      }
  }
 +
-+static char *replay_find_nearest_snapshot(int64_t icount,
-+                                          int64_t *snapshot_icount)
++static void replay_stop_vm_debug(void *opaque)
 +{
-+    BlockDriverState *bs;
-+    QEMUSnapshotInfo *sn_tab;
-+    QEMUSnapshotInfo *nearest = NULL;
-+    char *ret = NULL;
-+    int nb_sns, i;
-+    AioContext *aio_context;
-+
-+    *snapshot_icount = -1;
-+
-+    bs = bdrv_all_find_vmstate_bs();
-+    if (!bs) {
-+        goto fail;
-+    }
-+    aio_context = bdrv_get_aio_context(bs);
-+
-+    aio_context_acquire(aio_context);
-+    nb_sns = bdrv_snapshot_list(bs, &sn_tab);
-+    aio_context_release(aio_context);
-+
-+    for (i = 0; i < nb_sns; i++) {
-+        if (bdrv_all_find_snapshot(sn_tab[i].name, &bs) == 0) {
-+            if (sn_tab[i].icount != -1ULL
-+                && sn_tab[i].icount <= icount
-+                && (!nearest || nearest->icount < sn_tab[i].icount)) {
-+                nearest = &sn_tab[i];
-+            }
-+        }
-+    }
-+    if (nearest) {
-+        ret = g_strdup(nearest->name);
-+        *snapshot_icount = nearest->icount;
-+    }
-+    g_free(sn_tab);
-+
-+fail:
-+    return ret;
++    replay_is_debugging = false;
++    vm_stop(RUN_STATE_DEBUG);
++    replay_delete_break();
 +}
 +
-+static void replay_seek(int64_t icount, QEMUTimerCB callback, Error **errp)
++bool replay_reverse_step(void)
 +{
-+    char *snapshot = NULL;
-+    int64_t snapshot_icount;
-+
-+    if (replay_mode != REPLAY_MODE_PLAY) {
-+        error_setg(errp, "replay must be enabled to seek");
-+        return;
-+    }
-+    if (!replay_snapshot) {
-+        error_setg(errp, "snapshotting is disabled");
-+        return;
-+    }
-+
-+    snapshot = replay_find_nearest_snapshot(icount, &snapshot_icount);
-+    if (snapshot) {
-+        if (icount < replay_get_current_step()
-+            || replay_get_current_step() < snapshot_icount) {
-+            vm_stop(RUN_STATE_RESTORE_VM);
-+            load_snapshot(snapshot, errp);
-+        }
-+        g_free(snapshot);
-+    }
-+    if (replay_get_current_step() <= icount) {
-+        replay_break(icount, callback, NULL);
-+        vm_start();
-+    } else {
-+        error_setg(errp, "cannot seek to the specified instruction count");
-+    }
-+}
-+
-+void qmp_replay_seek(int64_t icount, Error **errp)
-+{
-+    replay_seek(icount, replay_stop_vm, errp);
-+}
-+
-+void hmp_replay_seek(Monitor *mon, const QDict *qdict)
-+{
-+    int64_t icount = qdict_get_try_int(qdict, "icount", -1LL);
 +    Error *err = NULL;
 +
-+    qmp_replay_seek(icount, &err);
-+    if (err) {
-+        error_report_err(err);
-+        error_free(err);
-+        return;
++    assert(replay_mode == REPLAY_MODE_PLAY);
++
++    if (replay_get_current_step() != 0) {
++        replay_seek(replay_get_current_step() - 1, replay_stop_vm_debug, &err);
++        if (err) {
++            error_free(err);
++            return false;
++        }
++        replay_is_debugging = true;
++        return true;
 +    }
++
++    return false;
++}
+diff --git a/stubs/replay.c b/stubs/replay.c
+index 4ac607895d..521552fa83 100644
+--- a/stubs/replay.c
++++ b/stubs/replay.c
+@@ -80,3 +80,8 @@ void replay_mutex_lock(void)
+ void replay_mutex_unlock(void)
+ {
+ }
++
++bool replay_reverse_step(void)
++{
++    return false;
 +}
 
 
