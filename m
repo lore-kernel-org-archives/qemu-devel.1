@@ -1,24 +1,23 @@
-Received: from eggs.gnu.org ([209.51.188.92]:40496)
+Received: from eggs.gnu.org ([209.51.188.92]:40541)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pavel.dovgaluk@gmail.com>) id 1hIX15-0001C9-Tk
-	for qemu-devel@nongnu.org; Mon, 22 Apr 2019 07:21:45 -0400
+	(envelope-from <pavel.dovgaluk@gmail.com>) id 1hIX18-0001EQ-Ea
+	for qemu-devel@nongnu.org; Mon, 22 Apr 2019 07:21:48 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pavel.dovgaluk@gmail.com>) id 1hIX14-0002UY-7v
-	for qemu-devel@nongnu.org; Mon, 22 Apr 2019 07:21:43 -0400
-Received: from mail.ispras.ru ([83.149.199.45]:47338)
+	(envelope-from <pavel.dovgaluk@gmail.com>) id 1hIX17-0002Y4-EA
+	for qemu-devel@nongnu.org; Mon, 22 Apr 2019 07:21:46 -0400
+Received: from mail.ispras.ru ([83.149.199.45]:47370)
 	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pavel.dovgaluk@gmail.com>) id 1hIX12-0002TT-5p
-	for qemu-devel@nongnu.org; Mon, 22 Apr 2019 07:21:40 -0400
+	(envelope-from <pavel.dovgaluk@gmail.com>) id 1hIX17-0002XF-67
+	for qemu-devel@nongnu.org; Mon, 22 Apr 2019 07:21:45 -0400
 From: Pavel Dovgalyuk <pavel.dovgaluk@gmail.com>
-Date: Mon, 22 Apr 2019 14:21:38 +0300
-Message-ID: <155593209847.21079.6576936958039534505.stgit@pasha-Precision-3630-Tower>
+Date: Mon, 22 Apr 2019 14:21:44 +0300
+Message-ID: <155593210405.21079.6037420893828751573.stgit@pasha-Precision-3630-Tower>
 In-Reply-To: <155593197705.21079.8238359471765771689.stgit@pasha-Precision-3630-Tower>
 References: <155593197705.21079.8238359471765771689.stgit@pasha-Precision-3630-Tower>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Subject: [Qemu-devel] [PATCH for-4.1 21/24] util/qemu-timer: refactor
- deadline calculation for external timers
+Subject: [Qemu-devel] [PATCH for-4.1 22/24] replay: fix replay shutdown
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,208 +31,36 @@ Cc: kwolf@redhat.com, peter.maydell@linaro.org, war2jordan@live.com, crosthwaite
 
 From: Pavel Dovgalyuk <Pavel.Dovgaluk@ispras.ru>
 
-icount-based record/replay uses qemu_clock_deadline_ns_all to measure
-the period until vCPU may be interrupted.
-This function takes in account the virtual timers, because they belong
-to the virtual devices that may generate interrupt request or affect
-the virtual machine state.
-However, there are a subset of virtual timers, that are marked with
-'external' flag. These do not change the virtual machine state and
-only based on virtual clock. Calculating the deadling using the external
-timers breaks the determinism, because they do not belong to the replayed
-part of the virtual machine.
-This patch fixes the deadline calculation for this case.
+This patch fixes shutdown of the replay process, which is terminated with
+the assert when shutdown event is read from the log.
+replay_finish_event reads new data_kind and therefore the value of data_kind
+should be preserved to be valid at qemu_system_shutdown_request call.
 
 Signed-off-by: Pavel Dovgalyuk <Pavel.Dovgaluk@ispras.ru>
-
---
-
-v15 changes:
- - fixed misprint in the test
 ---
- cpus.c                    |    9 ++++-----
- include/qemu/timer.h      |    7 +++----
- qtest.c                   |    2 +-
- tests/ptimer-test-stubs.c |    4 ++--
- tests/ptimer-test.c       |    4 ++--
- util/qemu-timer.c         |   41 +++++++++++++++++++++++++++++++++--------
- 6 files changed, 45 insertions(+), 22 deletions(-)
+ replay/replay.c |    8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
 
-diff --git a/cpus.c b/cpus.c
-index ba4849861d..2cad26f96c 100644
---- a/cpus.c
-+++ b/cpus.c
-@@ -550,7 +550,7 @@ void qtest_clock_warp(int64_t dest)
-     assert(qtest_enabled());
-     aio_context = qemu_get_aio_context();
-     while (clock < dest) {
--        int64_t deadline = qemu_clock_deadline_ns_all(QEMU_CLOCK_VIRTUAL);
-+        int64_t deadline = virtual_clock_deadline_ns();
-         int64_t warp = qemu_soonest_timeout(dest - clock, deadline);
+diff --git a/replay/replay.c b/replay/replay.c
+index e578958659..8f2e17c8cb 100644
+--- a/replay/replay.c
++++ b/replay/replay.c
+@@ -49,14 +49,14 @@ bool replay_next_event_is(int event)
+     }
  
-         seqlock_write_lock(&timers_state.vm_clock_seqlock,
-@@ -610,7 +610,7 @@ void qemu_start_warp_timer(void)
- 
-     /* We want to use the earliest deadline from ALL vm_clocks */
-     clock = qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL_RT);
--    deadline = qemu_clock_deadline_ns_all(QEMU_CLOCK_VIRTUAL);
-+    deadline = virtual_clock_deadline_ns();
-     if (deadline < 0) {
-         static bool notified;
-         if (!icount_sleep && !notified) {
-@@ -1356,7 +1356,7 @@ static int64_t tcg_get_icount_limit(void)
-     int64_t deadline;
- 
-     if (replay_mode != REPLAY_MODE_PLAY) {
--        deadline = qemu_clock_deadline_ns_all(QEMU_CLOCK_VIRTUAL);
-+        deadline = virtual_clock_deadline_ns();
- 
-         /* Maintain prior (possibly buggy) behaviour where if no deadline
-          * was set (as there is no QEMU_CLOCK_VIRTUAL timer) or it is more than
-@@ -1377,8 +1377,7 @@ static void handle_icount_deadline(void)
- {
-     assert(qemu_in_vcpu_thread());
-     if (use_icount) {
--        int64_t deadline =
--            qemu_clock_deadline_ns_all(QEMU_CLOCK_VIRTUAL);
-+        int64_t deadline = virtual_clock_deadline_ns();
- 
-         if (deadline == 0) {
-             /* Wake up other AioContexts.  */
-diff --git a/include/qemu/timer.h b/include/qemu/timer.h
-index a86330c987..cfc77450f2 100644
---- a/include/qemu/timer.h
-+++ b/include/qemu/timer.h
-@@ -176,16 +176,15 @@ bool qemu_clock_expired(QEMUClockType type);
- bool qemu_clock_use_for_deadline(QEMUClockType type);
- 
- /**
-- * qemu_clock_deadline_ns_all:
-- * @type: the clock type
-+ * virtual_clock_deadline_ns:
-  *
-  * Calculate the deadline across all timer lists associated
-- * with a clock (as opposed to just the default one)
-+ * with virtual clock (excluding external timers)
-  * in nanoseconds, or -1 if no timer is set to expire.
-  *
-  * Returns: time until expiry in nanoseconds or -1
-  */
--int64_t qemu_clock_deadline_ns_all(QEMUClockType type);
-+int64_t virtual_clock_deadline_ns(void);
- 
- /**
-  * qemu_clock_get_main_loop_timerlist:
-diff --git a/qtest.c b/qtest.c
-index 527141785f..8000ee0714 100644
---- a/qtest.c
-+++ b/qtest.c
-@@ -655,7 +655,7 @@ static void qtest_process_command(CharBackend *chr, gchar **words)
-             int ret = qemu_strtoi64(words[1], NULL, 0, &ns);
-             g_assert(ret == 0);
-         } else {
--            ns = qemu_clock_deadline_ns_all(QEMU_CLOCK_VIRTUAL);
-+            ns = virtual_clock_deadline_ns();
+     while (true) {
+-        if (event == replay_state.data_kind) {
++        unsigned int data_kind = replay_state.data_kind;
++        if (event == data_kind) {
+             res = true;
          }
-         qtest_clock_warp(qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL) + ns);
-         qtest_send_prefix(chr);
-diff --git a/tests/ptimer-test-stubs.c b/tests/ptimer-test-stubs.c
-index 54b3fd26f6..49acfed76f 100644
---- a/tests/ptimer-test-stubs.c
-+++ b/tests/ptimer-test-stubs.c
-@@ -88,9 +88,9 @@ int64_t qemu_clock_get_ns(QEMUClockType type)
-     return ptimer_test_time_ns;
- }
- 
--int64_t qemu_clock_deadline_ns_all(QEMUClockType type)
-+int64_t virtual_clock_deadline_ns(void)
- {
--    QEMUTimerList *timer_list = main_loop_tlg.tl[type];
-+    QEMUTimerList *timer_list = main_loop_tlg.tl[QEMU_CLOCK_VIRTUAL];
-     QEMUTimer *t = timer_list->active_timers.next;
-     int64_t deadline = -1;
- 
-diff --git a/tests/ptimer-test.c b/tests/ptimer-test.c
-index b30aad0737..338a4e0c10 100644
---- a/tests/ptimer-test.c
-+++ b/tests/ptimer-test.c
-@@ -50,13 +50,13 @@ static void ptimer_test_set_qemu_time_ns(int64_t ns)
- 
- static void qemu_clock_step(uint64_t ns)
- {
--    int64_t deadline = qemu_clock_deadline_ns_all(QEMU_CLOCK_VIRTUAL);
-+    int64_t deadline = virtual_clock_deadline_ns();
-     int64_t advanced_time = qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL) + ns;
- 
-     while (deadline != -1 && deadline <= advanced_time) {
-         ptimer_test_set_qemu_time_ns(deadline);
-         ptimer_test_expire_qemu_timers(deadline, QEMU_CLOCK_VIRTUAL);
--        deadline = qemu_clock_deadline_ns_all(QEMU_CLOCK_VIRTUAL);
-+        deadline = virtual_clock_deadline_ns();
-     }
- 
-     ptimer_test_set_qemu_time_ns(advanced_time);
-diff --git a/util/qemu-timer.c b/util/qemu-timer.c
-index 1cc1b2f2c3..88fbf04469 100644
---- a/util/qemu-timer.c
-+++ b/util/qemu-timer.c
-@@ -236,6 +236,7 @@ int64_t timerlist_deadline_ns(QEMUTimerList *timer_list)
-         qemu_mutex_unlock(&timer_list->active_timers_lock);
-         return -1;
-     }
-+
-     expire_time = timer_list->active_timers->expire_time;
-     qemu_mutex_unlock(&timer_list->active_timers_lock);
- 
-@@ -248,19 +249,43 @@ int64_t timerlist_deadline_ns(QEMUTimerList *timer_list)
-     return delta;
- }
- 
--/* Calculate the soonest deadline across all timerlists attached
-- * to the clock. This is used for the icount timeout so we
-- * ignore whether or not the clock should be used in deadline
-- * calculations.
-+/*
-+ * Calculate the soonest deadline across all timerlists attached
-+ * to the virtual clock (excluding the external timers that do not affect
-+ * the replayed guest state.
-  */
--int64_t qemu_clock_deadline_ns_all(QEMUClockType type)
-+int64_t virtual_clock_deadline_ns(void)
- {
-     int64_t deadline = -1;
-+    int64_t delta;
-+    int64_t expire_time;
-+    QEMUTimer *ts;
-     QEMUTimerList *timer_list;
--    QEMUClock *clock = qemu_clock_ptr(type);
-+    QEMUClock *clock = qemu_clock_ptr(QEMU_CLOCK_VIRTUAL);
-+
-+    if (!clock->enabled) {
-+        return -1;
-+    }
-+
-     QLIST_FOREACH(timer_list, &clock->timerlists, list) {
--        deadline = qemu_soonest_timeout(deadline,
--                                        timerlist_deadline_ns(timer_list));
-+        qemu_mutex_lock(&timer_list->active_timers_lock);
-+        ts = timer_list->active_timers;
-+        /* Skip all external timers */
-+        while (ts && (ts->attributes & QEMU_TIMER_ATTR_EXTERNAL)) {
-+            ts = ts->next;
-+        }
-+        if (!ts) {
-+            qemu_mutex_unlock(&timer_list->active_timers_lock);
-+            continue;
-+        }
-+        expire_time = ts->expire_time;
-+        qemu_mutex_unlock(&timer_list->active_timers_lock);
-+
-+        delta = expire_time - qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL);
-+        if (delta <= 0) {
-+            delta = 0;
-+        }
-+        deadline = qemu_soonest_timeout(deadline, delta);
-     }
-     return deadline;
- }
+-        switch (replay_state.data_kind) {
++        switch (data_kind) {
+         case EVENT_SHUTDOWN ... EVENT_SHUTDOWN_LAST:
+             replay_finish_event();
+-            qemu_system_shutdown_request(replay_state.data_kind -
+-                                         EVENT_SHUTDOWN);
++            qemu_system_shutdown_request(data_kind - EVENT_SHUTDOWN);
+             break;
+         default:
+             /* clock, time_t, checkpoint and other events */
