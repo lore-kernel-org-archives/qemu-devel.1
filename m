@@ -1,36 +1,38 @@
-Received: from eggs.gnu.org ([209.51.188.92]:57557)
+Received: from eggs.gnu.org ([209.51.188.92]:57608)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <aravinda@linux.vnet.ibm.com>) id 1hISyj-0006Te-Oz
-	for qemu-devel@nongnu.org; Mon, 22 Apr 2019 03:03:02 -0400
+	(envelope-from <aravinda@linux.vnet.ibm.com>) id 1hISyz-0006cV-Gs
+	for qemu-devel@nongnu.org; Mon, 22 Apr 2019 03:03:18 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <aravinda@linux.vnet.ibm.com>) id 1hISyi-00051R-Iy
-	for qemu-devel@nongnu.org; Mon, 22 Apr 2019 03:03:01 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:57180)
+	(envelope-from <aravinda@linux.vnet.ibm.com>) id 1hISyx-0005BD-M9
+	for qemu-devel@nongnu.org; Mon, 22 Apr 2019 03:03:17 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:51854)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <aravinda@linux.vnet.ibm.com>)
-	id 1hISyi-0004zY-7W
-	for qemu-devel@nongnu.org; Mon, 22 Apr 2019 03:03:00 -0400
-Received: from pps.filterd (m0098394.ppops.net [127.0.0.1])
+	id 1hISyw-00056b-MN
+	for qemu-devel@nongnu.org; Mon, 22 Apr 2019 03:03:15 -0400
+Received: from pps.filterd (m0098404.ppops.net [127.0.0.1])
 	by mx0a-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id
-	x3M6rnDJ084695
-	for <qemu-devel@nongnu.org>; Mon, 22 Apr 2019 03:02:57 -0400
-Received: from e34.co.us.ibm.com (e34.co.us.ibm.com [32.97.110.152])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2s14j4ffwq-1
+	x3M6rmLX020347
+	for <qemu-devel@nongnu.org>; Mon, 22 Apr 2019 03:03:07 -0400
+Received: from e13.ny.us.ibm.com (e13.ny.us.ibm.com [129.33.205.203])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2s188ts797-1
 	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Mon, 22 Apr 2019 03:02:57 -0400
+	for <qemu-devel@nongnu.org>; Mon, 22 Apr 2019 03:03:06 -0400
 Received: from localhost
-	by e34.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+	by e13.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
 	Violators will be prosecuted
 	for <qemu-devel@nongnu.org> from <aravinda@linux.vnet.ibm.com>;
-	Mon, 22 Apr 2019 08:02:56 +0100
+	Mon, 22 Apr 2019 08:03:05 +0100
 From: Aravinda Prasad <aravinda@linux.vnet.ibm.com>
-Date: Mon, 22 Apr 2019 12:32:48 +0530
+Date: Mon, 22 Apr 2019 12:32:58 +0530
+In-Reply-To: <155591636364.20338.844048953355207313.stgit@aravinda>
+References: <155591636364.20338.844048953355207313.stgit@aravinda>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Message-Id: <155591636364.20338.844048953355207313.stgit@aravinda>
-Subject: [Qemu-devel] [PATCH v8 0/6] target-ppc/spapr: Add FWNMI support in
- QEMU for PowerKVM guests
+Message-Id: <155591657807.20338.12115795588476734752.stgit@aravinda>
+Subject: [Qemu-devel] [PATCH v8 1/6] ppc: spapr: Handle "ibm,
+ nmi-register" and "ibm, nmi-interlock" RTAS calls
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -42,62 +44,197 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: aik@au1.ibm.com, qemu-ppc@nongnu.org, qemu-devel@nongnu.org, david@gibson.dropbear.id.au
 Cc: paulus@ozlabs.org, aravinda@linux.vnet.ibm.com, mahesh@linux.vnet.ibm.com
 
-This patch set adds support for FWNMI in PowerKVM guests.
+This patch adds support in QEMU to handle "ibm,nmi-register"
+and "ibm,nmi-interlock" RTAS calls.
 
-System errors such as SLB multihit and memory errors
-that cannot be corrected by hardware is passed on to
-the kernel for handling by raising machine check
-exception (an NMI). Upon such machine check exceptions,
-if the address in error belongs to guest then KVM
-invokes guests' 0x200 interrupt vector if the guest
-is not FWNMI capable. For FWNMI capable guest
-KVM passes the control to QEMU by exiting the guest.
+The machine check notification address is saved when the
+OS issues "ibm,nmi-register" RTAS call.
 
-This patch series adds functionality to QEMU to pass
-on such machine check exceptions to the FWNMI capable
-guest kernel by building an error log and invoking
-the guest registered machine check handling routine.
+This patch also handles the case when multiple processors
+experience machine check at or about the same time by
+handling "ibm,nmi-interlock" call. In such cases, as per
+PAPR, subsequent processors serialize waiting for the first
+processor to issue the "ibm,nmi-interlock" call. The second
+processor that also received a machine check error waits
+till the first processor is done reading the error log.
+The first processor issues "ibm,nmi-interlock" call
+when the error log is consumed. This patch implements the
+releasing part of the error-log while subsequent patch
+(which builds error log) handles the locking part.
 
-The KVM changes are now part of the upstream kernel
-(commit e20bbd3d). This series contain QEMU changes.
-
-Change Log v8:
-  - Added functionality to check FWNMI capability during
-    VM migration
-
-Change Log v7:
-  - Rebased to 4.1
-
-Change Log v6:
-  - Fetches rtas_addr from fdt
-  - Handles all error conditions (earlier it was only UEs)
-
-Change Log v5:
-  - Handled VM migrations by including rtas_addr in VMSTATE.
-  - Migration is blocked while a machine check is in progress.
-
+Signed-off-by: Aravinda Prasad <aravinda@linux.vnet.ibm.com>
 ---
+ hw/ppc/spapr.c         |   18 ++++++++++++++
+ hw/ppc/spapr_rtas.c    |   61 ++++++++++++++++++++++++++++++++++++++++++++++++
+ include/hw/ppc/spapr.h |    9 ++++++-
+ 3 files changed, 87 insertions(+), 1 deletion(-)
 
-Aravinda Prasad (6):
-      ppc: spapr: Handle "ibm,nmi-register" and "ibm,nmi-interlock" RTAS calls
-      Wrapper function to wait on condition for the main loop mutex
-      target/ppc: Handle NMI guest exit
-      target/ppc: Build rtas error log upon an MCE
-      ppc: spapr: Enable FWNMI capability
-      migration: Block migration while handling machine check
-
-
- cpus.c                   |    5 +
- hw/ppc/spapr.c           |   26 ++++
- hw/ppc/spapr_caps.c      |   26 ++++
- hw/ppc/spapr_events.c    |  284 ++++++++++++++++++++++++++++++++++++++++++++++
- hw/ppc/spapr_rtas.c      |   84 ++++++++++++++
- include/hw/ppc/spapr.h   |   26 ++++
- include/qemu/main-loop.h |    8 +
- target/ppc/kvm.c         |   30 +++++
- target/ppc/kvm_ppc.h     |    8 +
- target/ppc/trace-events  |    2 
- 10 files changed, 497 insertions(+), 2 deletions(-)
-
---
-Aravinda
+diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
+index c56939a..6642cb5 100644
+--- a/hw/ppc/spapr.c
++++ b/hw/ppc/spapr.c
+@@ -1805,6 +1805,11 @@ static void spapr_machine_reset(void)
+     first_ppc_cpu->env.gpr[5] = 0;
+ 
+     spapr->cas_reboot = false;
++
++    spapr->guest_machine_check_addr = -1;
++
++    /* Signal all vCPUs waiting on this condition */
++    qemu_cond_broadcast(&spapr->mc_delivery_cond);
+ }
+ 
+ static void spapr_create_nvram(SpaprMachineState *spapr)
+@@ -2095,6 +2100,16 @@ static const VMStateDescription vmstate_spapr_dtb = {
+     },
+ };
+ 
++static const VMStateDescription vmstate_spapr_machine_check = {
++    .name = "spapr_machine_check",
++    .version_id = 1,
++    .minimum_version_id = 1,
++    .fields = (VMStateField[]) {
++        VMSTATE_UINT64(guest_machine_check_addr, SpaprMachineState),
++        VMSTATE_END_OF_LIST()
++    },
++};
++
+ static const VMStateDescription vmstate_spapr = {
+     .name = "spapr",
+     .version_id = 3,
+@@ -2127,6 +2142,7 @@ static const VMStateDescription vmstate_spapr = {
+         &vmstate_spapr_dtb,
+         &vmstate_spapr_cap_large_decr,
+         &vmstate_spapr_cap_ccf_assist,
++        &vmstate_spapr_machine_check,
+         NULL
+     }
+ };
+@@ -3068,6 +3084,8 @@ static void spapr_machine_init(MachineState *machine)
+ 
+         kvmppc_spapr_enable_inkernel_multitce();
+     }
++
++    qemu_cond_init(&spapr->mc_delivery_cond);
+ }
+ 
+ static int spapr_kvm_type(MachineState *machine, const char *vm_type)
+diff --git a/hw/ppc/spapr_rtas.c b/hw/ppc/spapr_rtas.c
+index ee24212..c2f3991 100644
+--- a/hw/ppc/spapr_rtas.c
++++ b/hw/ppc/spapr_rtas.c
+@@ -348,6 +348,39 @@ static void rtas_get_power_level(PowerPCCPU *cpu, SpaprMachineState *spapr,
+     rtas_st(rets, 1, 100);
+ }
+ 
++static void rtas_ibm_nmi_register(PowerPCCPU *cpu,
++                                  SpaprMachineState *spapr,
++                                  uint32_t token, uint32_t nargs,
++                                  target_ulong args,
++                                  uint32_t nret, target_ulong rets)
++{
++    uint64_t rtas_addr = spapr_get_rtas_addr();
++
++    if (!rtas_addr) {
++        rtas_st(rets, 0, RTAS_OUT_NOT_SUPPORTED);
++        return;
++    }
++
++    spapr->guest_machine_check_addr = rtas_ld(args, 1);
++    rtas_st(rets, 0, RTAS_OUT_SUCCESS);
++}
++
++static void rtas_ibm_nmi_interlock(PowerPCCPU *cpu,
++                                   SpaprMachineState *spapr,
++                                   uint32_t token, uint32_t nargs,
++                                   target_ulong args,
++                                   uint32_t nret, target_ulong rets)
++{
++    if (!spapr->guest_machine_check_addr) {
++        /* NMI register not called */
++        rtas_st(rets, 0, RTAS_OUT_PARAM_ERROR);
++    } else {
++        qemu_cond_signal(&spapr->mc_delivery_cond);
++        rtas_st(rets, 0, RTAS_OUT_SUCCESS);
++    }
++}
++
++
+ static struct rtas_call {
+     const char *name;
+     spapr_rtas_fn fn;
+@@ -466,6 +499,30 @@ void spapr_load_rtas(SpaprMachineState *spapr, void *fdt, hwaddr addr)
+     }
+ }
+ 
++uint64_t spapr_get_rtas_addr(void)
++{
++    SpaprMachineState *spapr = SPAPR_MACHINE(qdev_get_machine());
++    int rtas_node;
++    const struct fdt_property *rtas_addr_prop;
++    void *fdt = spapr->fdt_blob;
++    uint32_t rtas_addr;
++
++    /* fetch rtas addr from fdt */
++    rtas_node = fdt_path_offset(fdt, "/rtas");
++    if (rtas_node == 0) {
++        return 0;
++    }
++
++    rtas_addr_prop = fdt_get_property(fdt, rtas_node, "linux,rtas-base", NULL);
++    if (!rtas_addr_prop) {
++        return 0;
++    }
++
++    rtas_addr = fdt32_to_cpu(*(uint32_t *)rtas_addr_prop->data);
++    return (uint64_t)rtas_addr;
++}
++
++
+ static void core_rtas_register_types(void)
+ {
+     spapr_rtas_register(RTAS_DISPLAY_CHARACTER, "display-character",
+@@ -489,6 +546,10 @@ static void core_rtas_register_types(void)
+                         rtas_set_power_level);
+     spapr_rtas_register(RTAS_GET_POWER_LEVEL, "get-power-level",
+                         rtas_get_power_level);
++    spapr_rtas_register(RTAS_IBM_NMI_REGISTER, "ibm,nmi-register",
++                        rtas_ibm_nmi_register);
++    spapr_rtas_register(RTAS_IBM_NMI_INTERLOCK, "ibm,nmi-interlock",
++                        rtas_ibm_nmi_interlock);
+ }
+ 
+ type_init(core_rtas_register_types)
+diff --git a/include/hw/ppc/spapr.h b/include/hw/ppc/spapr.h
+index 7e32f30..ec6f33e 100644
+--- a/include/hw/ppc/spapr.h
++++ b/include/hw/ppc/spapr.h
+@@ -187,6 +187,10 @@ struct SpaprMachineState {
+      * occurs during the unplug process. */
+     QTAILQ_HEAD(, SpaprDimmState) pending_dimm_unplugs;
+ 
++    /* State related to "ibm,nmi-register" and "ibm,nmi-interlock" calls */
++    target_ulong guest_machine_check_addr;
++    QemuCond mc_delivery_cond;
++
+     /*< public >*/
+     char *kvm_type;
+     char *host_model;
+@@ -623,8 +627,10 @@ target_ulong spapr_hypercall(PowerPCCPU *cpu, target_ulong opcode,
+ #define RTAS_IBM_CREATE_PE_DMA_WINDOW           (RTAS_TOKEN_BASE + 0x27)
+ #define RTAS_IBM_REMOVE_PE_DMA_WINDOW           (RTAS_TOKEN_BASE + 0x28)
+ #define RTAS_IBM_RESET_PE_DMA_WINDOW            (RTAS_TOKEN_BASE + 0x29)
++#define RTAS_IBM_NMI_REGISTER                   (RTAS_TOKEN_BASE + 0x2A)
++#define RTAS_IBM_NMI_INTERLOCK                  (RTAS_TOKEN_BASE + 0x2B)
+ 
+-#define RTAS_TOKEN_MAX                          (RTAS_TOKEN_BASE + 0x2A)
++#define RTAS_TOKEN_MAX                          (RTAS_TOKEN_BASE + 0x2C)
+ 
+ /* RTAS ibm,get-system-parameter token values */
+ #define RTAS_SYSPARM_SPLPAR_CHARACTERISTICS      20
+@@ -874,4 +880,5 @@ void spapr_check_pagesize(SpaprMachineState *spapr, hwaddr pagesize,
+ #define SPAPR_OV5_XIVE_BOTH     0x80 /* Only to advertise on the platform */
+ 
+ void spapr_set_all_lpcrs(target_ulong value, target_ulong mask);
++uint64_t spapr_get_rtas_addr(void);
+ #endif /* HW_SPAPR_H */
