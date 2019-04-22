@@ -1,16 +1,16 @@
-Received: from eggs.gnu.org ([209.51.188.92]:51134)
+Received: from eggs.gnu.org ([209.51.188.92]:51133)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1hIaP6-0000ns-Ko
+	(envelope-from <vsementsov@virtuozzo.com>) id 1hIaP6-0000nr-Kq
 	for qemu-devel@nongnu.org; Mon, 22 Apr 2019 10:58:45 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1hIaP4-00038k-ON
+	(envelope-from <vsementsov@virtuozzo.com>) id 1hIaP4-00038Q-NA
 	for qemu-devel@nongnu.org; Mon, 22 Apr 2019 10:58:44 -0400
 From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Date: Mon, 22 Apr 2019 17:58:36 +0300
-Message-Id: <20190422145838.70903-8-vsementsov@virtuozzo.com>
+Date: Mon, 22 Apr 2019 17:58:38 +0300
+Message-Id: <20190422145838.70903-10-vsementsov@virtuozzo.com>
 In-Reply-To: <20190422145838.70903-1-vsementsov@virtuozzo.com>
 References: <20190422145838.70903-1-vsementsov@virtuozzo.com>
-Subject: [Qemu-devel] [PATCH 7/9] block/commit: use buffer-based io
+Subject: [Qemu-devel] [PATCH 9/9] qemu-img: use buffer-based io
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,31 +24,55 @@ Cc: jsnow@redhat.com, kwolf@redhat.com, mreitz@redhat.com, stefanha@redhat.com, 
 
 Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 ---
- block/commit.c | 5 ++---
- 1 file changed, 2 insertions(+), 3 deletions(-)
+ qemu-img.c | 13 ++++---------
+ 1 file changed, 4 insertions(+), 9 deletions(-)
 
-diff --git a/block/commit.c b/block/commit.c
-index ba60fef58a..08204fa6f8 100644
---- a/block/commit.c
-+++ b/block/commit.c
-@@ -48,16 +48,15 @@ static int coroutine_fn commit_populate(BlockBackend *bs, BlockBackend *base,
-                                         void *buf)
+diff --git a/qemu-img.c b/qemu-img.c
+index aa6f81f1ea..c40a4e8b83 100644
+--- a/qemu-img.c
++++ b/qemu-img.c
+@@ -1671,7 +1671,6 @@ static int coroutine_fn convert_co_read(ImgConvertState *s, int64_t sector_num,
+                                         int nb_sectors, uint8_t *buf)
  {
-     int ret = 0;
--    QEMUIOVector qiov = QEMU_IOVEC_INIT_BUF(qiov, buf, bytes);
+     int n, ret;
+-    QEMUIOVector qiov;
  
-     assert(bytes < SIZE_MAX);
+     assert(nb_sectors <= s->buf_sectors);
+     while (nb_sectors > 0) {
+@@ -1687,11 +1686,10 @@ static int coroutine_fn convert_co_read(ImgConvertState *s, int64_t sector_num,
+         bs_sectors = s->src_sectors[src_cur];
  
--    ret = blk_co_preadv(bs, offset, qiov.size, &qiov, 0);
-+    ret = blk_co_pread(bs, offset, bytes, buf, 0);
-     if (ret < 0) {
-         return ret;
-     }
+         n = MIN(nb_sectors, bs_sectors - (sector_num - src_cur_offset));
+-        qemu_iovec_init_buf(&qiov, buf, n << BDRV_SECTOR_BITS);
  
--    ret = blk_co_pwritev(base, offset, qiov.size, &qiov, 0);
-+    ret = blk_co_pwrite(base, offset, bytes, buf, 0);
-     if (ret < 0) {
-         return ret;
-     }
+-        ret = blk_co_preadv(
++        ret = blk_co_pread(
+                 blk, (sector_num - src_cur_offset) << BDRV_SECTOR_BITS,
+-                n << BDRV_SECTOR_BITS, &qiov, 0);
++                n << BDRV_SECTOR_BITS, buf, 0);
+         if (ret < 0) {
+             return ret;
+         }
+@@ -1710,7 +1708,6 @@ static int coroutine_fn convert_co_write(ImgConvertState *s, int64_t sector_num,
+                                          enum ImgConvertBlockStatus status)
+ {
+     int ret;
+-    QEMUIOVector qiov;
+ 
+     while (nb_sectors > 0) {
+         int n = nb_sectors;
+@@ -1738,10 +1735,8 @@ static int coroutine_fn convert_co_write(ImgConvertState *s, int64_t sector_num,
+                 (s->compressed &&
+                  !buffer_is_zero(buf, n * BDRV_SECTOR_SIZE)))
+             {
+-                qemu_iovec_init_buf(&qiov, buf, n << BDRV_SECTOR_BITS);
+-
+-                ret = blk_co_pwritev(s->target, sector_num << BDRV_SECTOR_BITS,
+-                                     n << BDRV_SECTOR_BITS, &qiov, flags);
++                ret = blk_co_pwrite(s->target, sector_num << BDRV_SECTOR_BITS,
++                                    n << BDRV_SECTOR_BITS, buf, flags);
+                 if (ret < 0) {
+                     return ret;
+                 }
 -- 
 2.18.0
