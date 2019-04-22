@@ -1,28 +1,32 @@
-Received: from eggs.gnu.org ([209.51.188.92]:46450)
+Received: from eggs.gnu.org ([209.51.188.92]:48875)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <liq3ea@gmail.com>) id 1hINfu-0006Pr-J4
-	for qemu-devel@nongnu.org; Sun, 21 Apr 2019 21:23:15 -0400
+	(envelope-from <zhengxiang9@huawei.com>) id 1hIO3d-0000yQ-0n
+	for qemu-devel@nongnu.org; Sun, 21 Apr 2019 21:47:46 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <liq3ea@gmail.com>) id 1hINft-0004XS-F4
-	for qemu-devel@nongnu.org; Sun, 21 Apr 2019 21:23:14 -0400
-Received: from mail-oi1-x22b.google.com ([2607:f8b0:4864:20::22b]:35800)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <liq3ea@gmail.com>) id 1hINft-0004Wu-9r
-	for qemu-devel@nongnu.org; Sun, 21 Apr 2019 21:23:13 -0400
-Received: by mail-oi1-x22b.google.com with SMTP id j132so7474011oib.2
-	for <qemu-devel@nongnu.org>; Sun, 21 Apr 2019 18:23:12 -0700 (PDT)
+	(envelope-from <zhengxiang9@huawei.com>) id 1hINv5-0008FU-57
+	for qemu-devel@nongnu.org; Sun, 21 Apr 2019 21:38:56 -0400
+From: Xiang Zheng <zhengxiang9@huawei.com>
+References: <bf2decd3-b3cb-08eb-3449-b66f023b084a@huawei.com>
+	<c57135ae-41a9-ed7b-976b-bf8fe43596a2@redhat.com>
+	<b107e0c0-1c4c-3f0f-eb78-8929c315ce28@huawei.com>
+	<a8144a1f-364e-cea5-b0a7-05342bdab936@redhat.com>
+	<87bm1fiuo8.fsf@dusky.pond.sub.org>
+	<20190409082852.GB6610@localhost.localdomain>
+	<c03c51a7-1bb0-b05b-9027-2364ab00517c@huawei.com>
+	<20190411122246.GB5694@linux.fritz.box>
+	<0c6c32b7-46f8-cf80-b7a6-1b48995b84e4@huawei.com>
+	<355cd139-2084-e282-9a60-3574fe0746bd@huawei.com>
+	<20190412105737.GC4522@linux.fritz.box>
+	<a6affbbb-ab69-7ebd-13ba-a42dbf1ed78e@huawei.com>
+Message-ID: <14accbba-6885-3b6a-2a03-169bfdc2f5d4@huawei.com>
+Date: Mon, 22 Apr 2019 09:37:56 +0800
 MIME-Version: 1.0
-References: <20190420161446.2274-1-liq3ea@163.com>
-	<20190420161446.2274-3-liq3ea@163.com>
-	<51d2ae28-267a-2710-8401-bad769e2d2c0@redhat.com>
-In-Reply-To: <51d2ae28-267a-2710-8401-bad769e2d2c0@redhat.com>
-From: Li Qiang <liq3ea@gmail.com>
-Date: Mon, 22 Apr 2019 09:22:35 +0800
-Message-ID: <CAKXe6SJLyUwLOQhmkoWENwLE-bFrVmUYxbRgh7pmYKtS5C9d8A@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v2 2/3] edu: mmio: allow mmio read dispatch
- accept 8 bytes
+In-Reply-To: <a6affbbb-ab69-7ebd-13ba-a42dbf1ed78e@huawei.com>
+Content-Type: text/plain; charset="utf-8"
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [RFC PATCH] hw/arm/virt: use variable size of
+ flash device to save memory
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,90 +35,212 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>
-Cc: Li Qiang <liq3ea@163.com>, Jiri Slaby <jslaby@suse.cz>, Paolo Bonzini <pbonzini@redhat.com>, Qemu Developers <qemu-devel@nongnu.org>
+To: Kevin Wolf <kwolf@redhat.com>
+Cc: Markus Armbruster <armbru@redhat.com>, Laszlo Ersek <lersek@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, QEMU Developers <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>, Heyi Guo <guoheyi@huawei.com>, wanghaibin.wang@huawei.com, qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>
 
-Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com> =E4=BA=8E2019=E5=B9=B44=E6=
-=9C=8821=E6=97=A5=E5=91=A8=E6=97=A5 =E4=B8=8B=E5=8D=886:44=E5=86=99=E9=81=
-=93=EF=BC=9A
+Ping?
 
-> Hi Li,
->
-> On 4/20/19 6:14 PM, Li Qiang wrote:
-> > The edu spec said when address >=3D 0x80, the MMIO area can
->
-> "says"
->
-> > be accessed by 8 bytes.
-> >
-> > Signed-off-by: Li Qiang <liq3ea@163.com>
-> > ---
-> >  hw/misc/edu.c | 4 ++++
-> >  1 file changed, 4 insertions(+)
-> >
-> > diff --git a/hw/misc/edu.c b/hw/misc/edu.c
-> > index 65fc32b928..4018dddcb8 100644
-> > --- a/hw/misc/edu.c
-> > +++ b/hw/misc/edu.c
-> > @@ -189,6 +189,10 @@ static uint64_t edu_mmio_read(void *opaque, hwaddr
-> addr, unsigned size)
->
-> Completing the diff ...:
->
->        if (size !=3D 4) {
->
-> >          return val;
-> >      }
-> >
-> > +    if (addr >=3D 0x80 && size !=3D 4 && size !=3D 8) {
->
-> ... to show this code is unreachable for size =3D=3D 8.
->
->
-Ohhh, yes
-
-
-
-> > +        return val;
-> > +    }
-> > +
-> >      switch (addr) {
-> >      case 0x00:
-> >          val =3D 0x010000edu;
-> >
->
-> I think the change you wanted is:
->
-> -- >8 --
-> @@ -185,7 +185,11 @@ static uint64_t edu_mmio_read(void *opaque, hwaddr
-> addr, unsigned size)
->      EduState *edu =3D opaque;
->      uint64_t val =3D ~0ULL;
->
-> -    if (size !=3D 4) {
-> +    if (addr < 0x80 && size !=3D 4) {
-> +        return val;
+On 2019/4/15 10:39, Xiang Zheng wrote:
+> On 2019/4/12 18:57, Kevin Wolf wrote:
+>> Am 12.04.2019 um 11:50 hat Xiang Zheng geschrieben:
+>>>
+>>> On 2019/4/12 9:52, Xiang Zheng wrote:
+>>>> On 2019/4/11 20:22, Kevin Wolf wrote:
+>>>>> Okay, so your problem is that blk_pread() writes to the whole buffer,
+>>>>> writing explicit zeroes for unallocated parts of the image, while you
+>>>>> would like to leave those parts of the buffer untouched so that we don't
+>>>>> actually allocate the memory, but can just use the shared zero page.
+>>>>>
+>>>>> If you just want to read the non-zero parts of the image, that can be
+>>>>> done by using a loop that calls bdrv_block_status() and only reads from
+>>>>> the image if the BDRV_BLOCK_ZERO bit is clear.
+>>>>>
+>>>>> Would this solve your problem?
+>>>>
+>>>> Sounds good! What if guest tried to read/write the zero parts?
+>>>>
+>>>
+>>> I wrote the below patch (refer to bdrv_make_zero()) for test, it seems
+>>> that everything is OK and the memory is also exactly allocated on demand.
+>>>
+>>> This requires pflash devices to use sparse files backend. Thus I have to
+>>> create images like:
+>>>
+>>>    dd of="QEMU_EFI-pflash.raw" if="/dev/zero" bs=1M seek=64 count=0
+>>>    dd of="QEMU_EFI-pflash.raw" if="QEMU_EFI.fd" conv=notrunc
+>>>
+>>>    dd of="empty_VARS.fd" if="/dev/zero" bs=1M seek=64 count=0
+>>>
+>>>
+>>> ---8>---
+>>>
+>>> diff --git a/block/block-backend.c b/block/block-backend.c
+>>> index f78e82a..ed8ca87 100644
+>>> --- a/block/block-backend.c
+>>> +++ b/block/block-backend.c
+>>> @@ -1379,6 +1379,12 @@ BlockAIOCB *blk_aio_pwrite_zeroes(BlockBackend *blk, int64_t offset,
+>>>                          flags | BDRV_REQ_ZERO_WRITE, cb, opaque);
+>>>  }
+>>>
+>>> +int blk_pread_nonzeroes(BlockBackend *blk, void *buf)
+>>> +{
+>>> +    int ret = bdrv_pread_nonzeroes(blk->root, buf);
+>>> +    return ret;
+>>> +}
+>>
+>> I don't think this deserves a place in the public block layer interface,
+>> as it's only a single device that makes use of it.
+>>
+>> Maybe you wrote things this way because there is no blk_block_status(),
+>> but you can get the BlockDriverState with blk_bs(blk) and then implement
+>> everything inside hw/block/block.c.
+> 
+> Yes, you are right.
+> 
+>>
+>>>  int blk_pread(BlockBackend *blk, int64_t offset, void *buf, int count)
+>>>  {
+>>>      int ret = blk_prw(blk, offset, buf, count, blk_read_entry, 0);
+>>> diff --git a/block/io.c b/block/io.c
+>>> index dfc153b..83e5ea7 100644
+>>> --- a/block/io.c
+>>> +++ b/block/io.c
+>>> @@ -882,6 +882,38 @@ int bdrv_pwrite_zeroes(BdrvChild *child, int64_t offset,
+>>>                          BDRV_REQ_ZERO_WRITE | flags);
+>>>  }
+>>>
+>>> +int bdrv_pread_nonzeroes(BdrvChild *child, void *buf)
+>>> +{
+>>> +    int ret;
+>>> +    int64_t target_size, bytes, offset = 0;
+>>> +    BlockDriverState *bs = child->bs;
+>>> +
+>>> +    target_size = bdrv_getlength(bs);
+>>> +    if (target_size < 0) {
+>>> +        return target_size;
+>>> +    }
+>>> +
+>>> +    for (;;) {
+>>> +        bytes = MIN(target_size - offset, BDRV_REQUEST_MAX_BYTES);
+>>> +        if (bytes <= 0) {
+>>> +            return 0;
+>>> +        }
+>>> +        ret = bdrv_block_status(bs, offset, bytes, &bytes, NULL, NULL);
+>>> +        if (ret < 0) {
+>>> +            return ret;
+>>> +        }
+>>> +        if (ret & BDRV_BLOCK_ZERO) {
+>>> +            offset += bytes;
+>>> +            continue;
+>>> +        }
+>>> +        ret = bdrv_pread(child, offset, buf, bytes);
+>>> +        if (ret < 0) {
+>>> +            return ret;
+>>> +        }
+>>> +        offset += bytes;
+>>
+>> I think the code becomes simpler the other way round:
+>>
+>>     if (!(ret & BDRV_BLOCK_ZERO)) {
+>>         ret = bdrv_pread(child, offset, buf, bytes);
+>>         if (ret < 0) {
+>>             return ret;
+>>         }
+>>     }
+>>     offset += bytes;
+>>
+>> You don't increment buf, so if you have a hole in the file, this will
+>> corrupt the buffer. You need to either increment buf, too, or use
+>> (uint8_t*) buf + offset for the bdrv_pread() call.
+>>
+> 
+> Yes, I didn't notice it. I think the latter is better. Does *BDRV_BLOCK_ZERO*
+> mean that there are all-zeroes data or a hole in the sector? But if I use an
+> image filled with zeroes, it will not set BDRV_BLOCK_ZERO bit on return.
+> 
+> Should I resend a patch?
+> 
+> ---8>---
+> 
+>>From 4dbfe4955aa9fe23404cbe1890fbe148be2ff10e Mon Sep 17 00:00:00 2001
+> From: Xiang Zheng <zhengxiang9@huawei.com>
+> Date: Sat, 13 Apr 2019 02:27:03 +0800
+> Subject: [PATCH] pflash: Only read non-zero parts of backend image
+> 
+> Currently we fill the VIRT_FLASH memory space with two 64MB NOR images
+> when using persistent UEFI variables on virt board. Actually we only use
+> a very small(non-zero) part of the memory while the rest significant
+> large(zero) part of memory is wasted.
+> 
+> So this patch checks the block status and only writes the non-zero part
+> into memory. This requires pflash devices to use sparse files for
+> backends.
+> 
+> Signed-off-by: Xiang Zheng <zhengxiang9@huawei.com>
+> ---
+>  hw/block/block.c | 40 +++++++++++++++++++++++++++++++++++++++-
+>  1 file changed, 39 insertions(+), 1 deletion(-)
+> 
+> diff --git a/hw/block/block.c b/hw/block/block.c
+> index bf56c76..3cb9d4c 100644
+> --- a/hw/block/block.c
+> +++ b/hw/block/block.c
+> @@ -15,6 +15,44 @@
+>  #include "qapi/qapi-types-block.h"
+> 
+>  /*
+> + * Read the non-zeroes parts of @blk into @buf
+> + * Reading all of the @blk is expensive if the zeroes parts of @blk
+> + * is large enough. Therefore check the block status and only write
+> + * the non-zeroes block into @buf.
+> + *
+> + * Return 0 on success, non-zero on error.
+> + */
+> +static int blk_pread_nonzeroes(BlockBackend *blk, void *buf)
+> +{
+> +    int ret;
+> +    int64_t target_size, bytes, offset = 0;
+> +    BlockDriverState *bs = blk_bs(blk);
+> +
+> +    target_size = bdrv_getlength(bs);
+> +    if (target_size < 0) {
+> +        return target_size;
 > +    }
 > +
-> +    if (addr >=3D 0x80 && size !=3D 4 && size !=3D 8) {
->          return val;
->      }
->
->
-
-Yes, this is what I want. Thanks, will change to this in next revision.
+> +    for (;;) {
+> +        bytes = MIN(target_size - offset, BDRV_REQUEST_MAX_SECTORS);
+> +        if (bytes <= 0) {
+> +            return 0;
+> +        }
+> +        ret = bdrv_block_status(bs, offset, bytes, &bytes, NULL, NULL);
+> +        if (ret < 0) {
+> +            return ret;
+> +        }
+> +        if (!(ret & BDRV_BLOCK_ZERO)) {
+> +            ret = bdrv_pread(bs->file, offset, (uint8_t *) buf + offset, bytes);
+> +            if (ret < 0) {
+> +                return ret;
+> +            }
+> +        }
+> +        offset += bytes;
+> +    }
+> +}
+> +
+> +/*
+>   * Read the entire contents of @blk into @buf.
+>   * @blk's contents must be @size bytes, and @size must be at most
+>   * BDRV_REQUEST_MAX_BYTES.
+> @@ -53,7 +91,7 @@ bool blk_check_size_and_read_all(BlockBackend *blk, void *buf, hwaddr size,
+>       * block device and read only on demand.
+>       */
+>      assert(size <= BDRV_REQUEST_MAX_BYTES);
+> -    ret = blk_pread(blk, 0, buf, size);
+> +    ret = blk_pread_nonzeroes(blk, buf);
+>      if (ret < 0) {
+>          error_setg_errno(errp, -ret, "can't read block backend");
+>          return false;
+> 
+-- 
 
 Thanks,
-Li Qiang
-
-
-
-> ---
->
-> Another cleaner way to solve this is use 2 MemoryRegionOps, one for the
-> first 0x80 addresses and another for the rest.
->
-> Regards,
->
-> Phil.
->
+Xiang
