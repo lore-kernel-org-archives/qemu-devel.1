@@ -7,40 +7,40 @@ X-Spam-Status: No, score=-6.7 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0D4B1C282CE
-	for <qemu-devel@archiver.kernel.org>; Mon, 22 Apr 2019 11:30:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 89326C10F11
+	for <qemu-devel@archiver.kernel.org>; Mon, 22 Apr 2019 11:31:27 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D5E1B204EC
-	for <qemu-devel@archiver.kernel.org>; Mon, 22 Apr 2019 11:30:50 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D5E1B204EC
+	by mail.kernel.org (Postfix) with ESMTPS id 4E119204EC
+	for <qemu-devel@archiver.kernel.org>; Mon, 22 Apr 2019 11:31:27 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4E119204EC
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:35911 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:35920 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hIX9u-0000NX-5L
-	for qemu-devel@archiver.kernel.org; Mon, 22 Apr 2019 07:30:50 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:40264)
+	id 1hIXAU-0001IM-I8
+	for qemu-devel@archiver.kernel.org; Mon, 22 Apr 2019 07:31:26 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:40432)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pavel.dovgaluk@gmail.com>) id 1hIX0R-0000cc-Rk
-	for qemu-devel@nongnu.org; Mon, 22 Apr 2019 07:21:04 -0400
+	(envelope-from <pavel.dovgaluk@gmail.com>) id 1hIX0v-0000zu-CV
+	for qemu-devel@nongnu.org; Mon, 22 Apr 2019 07:21:35 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pavel.dovgaluk@gmail.com>) id 1hIX0Q-0002AX-0H
-	for qemu-devel@nongnu.org; Mon, 22 Apr 2019 07:21:03 -0400
-Received: from mail.ispras.ru ([83.149.199.45]:47134)
+	(envelope-from <pavel.dovgaluk@gmail.com>) id 1hIX0s-0002Py-Vu
+	for qemu-devel@nongnu.org; Mon, 22 Apr 2019 07:21:32 -0400
+Received: from mail.ispras.ru ([83.149.199.45]:47286)
 	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pavel.dovgaluk@gmail.com>) id 1hIX0O-00028a-0G
-	for qemu-devel@nongnu.org; Mon, 22 Apr 2019 07:21:01 -0400
+	(envelope-from <pavel.dovgaluk@gmail.com>) id 1hIX0r-0002Oj-1r
+	for qemu-devel@nongnu.org; Mon, 22 Apr 2019 07:21:30 -0400
 Received: from [127.0.1.1] (unknown [85.142.117.226])
-	by mail.ispras.ru (Postfix) with ESMTPSA id 1DF2E5400A9;
-	Mon, 22 Apr 2019 14:20:59 +0300 (MSK)
+	by mail.ispras.ru (Postfix) with ESMTPSA id 62C645400A9;
+	Mon, 22 Apr 2019 14:21:27 +0300 (MSK)
 From: Pavel Dovgalyuk <pavel.dovgaluk@gmail.com>
 To: qemu-devel@nongnu.org
-Date: Mon, 22 Apr 2019 14:20:58 +0300
+Date: Mon, 22 Apr 2019 14:21:27 +0300
 Message-ID:
- <155593205889.21079.14799791777208991110.stgit@pasha-Precision-3630-Tower>
+ <155593208717.21079.1165750101247148451.stgit@pasha-Precision-3630-Tower>
 In-Reply-To: <155593197705.21079.8238359471765771689.stgit@pasha-Precision-3630-Tower>
 References: <155593197705.21079.8238359471765771689.stgit@pasha-Precision-3630-Tower>
 User-Agent: StGit/0.17.1-dirty
@@ -49,7 +49,8 @@ Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: 7bit
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x
 X-Received-From: 83.149.199.45
-Subject: [Qemu-devel] [PATCH for-4.1 14/24] replay: refine replay-time module
+Subject: [Qemu-devel] [PATCH for-4.1 19/24] replay: add BH oneshot event for
+ block layer
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -73,76 +74,349 @@ Cc: kwolf@redhat.com, peter.maydell@linaro.org, war2jordan@live.com,
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190422112058.E_LUcsxnjP51k6ZWjhsti1I8LIFwBm9vph6wjwvLj0M@z>
+Message-ID: <20190422112127.xRR2Y3Wso9fqHZktfIcnH44UxaabqilH1mxvGI6vGZE@z>
 
 From: Pavel Dovgalyuk <Pavel.Dovgaluk@ispras.ru>
 
-This patch removes refactoring artifacts from the replay/replay-time.c
+Replay is capable of recording normal BH events, but sometimes
+there are single use callbacks scheduled with aio_bh_schedule_oneshot
+function. This patch enables recording and replaying such callbacks.
+Block layer uses these events for calling the completion function.
+Replaying these calls makes the execution deterministic.
 
 Signed-off-by: Pavel Dovgalyuk <Pavel.Dovgaluk@ispras.ru>
----
- replay/replay-time.c |   36 ++++++++++++++++--------------------
- 1 file changed, 16 insertions(+), 20 deletions(-)
+Acked-by: Kevin Wolf <kwolf@redhat.com>
 
-diff --git a/replay/replay-time.c b/replay/replay-time.c
-index 0df1693337..60f47b73a7 100644
---- a/replay/replay-time.c
-+++ b/replay/replay-time.c
-@@ -15,18 +15,19 @@
- #include "replay-internal.h"
- #include "qemu/error-report.h"
+--
+
+v6:
+ - moved stub function to the separate file for fixing linux-user build
+v10:
+ - replaced all block layer aio_bh_schedule_oneshot calls
+---
+ block/block-backend.c    |    8 +++++---
+ block/io.c               |    4 ++--
+ block/iscsi.c            |    5 +++--
+ block/nfs.c              |    5 +++--
+ block/null.c             |    4 +++-
+ block/nvme.c             |    6 ++++--
+ block/rbd.c              |    5 +++--
+ block/vxhs.c             |    5 +++--
+ include/sysemu/replay.h  |    3 +++
+ replay/replay-events.c   |   16 ++++++++++++++++
+ replay/replay-internal.h |    1 +
+ replay/replay.c          |    2 +-
+ stubs/Makefile.objs      |    1 +
+ stubs/replay-user.c      |    9 +++++++++
+ 14 files changed, 57 insertions(+), 17 deletions(-)
+ create mode 100644 stubs/replay-user.c
+
+diff --git a/block/block-backend.c b/block/block-backend.c
+index f78e82a707..3e479aecca 100644
+--- a/block/block-backend.c
++++ b/block/block-backend.c
+@@ -17,6 +17,7 @@
+ #include "block/throttle-groups.h"
+ #include "sysemu/blockdev.h"
+ #include "sysemu/sysemu.h"
++#include "sysemu/replay.h"
+ #include "qapi/error.h"
+ #include "qapi/qapi-events-block.h"
+ #include "qemu/id.h"
+@@ -1284,7 +1285,8 @@ BlockAIOCB *blk_abort_aio_request(BlockBackend *blk,
+     acb->blk = blk;
+     acb->ret = ret;
  
--int64_t replay_save_clock(ReplayClockKind kind, int64_t clock, int64_t raw_icount)
-+int64_t replay_save_clock(ReplayClockKind kind, int64_t clock,
-+                          int64_t raw_icount)
- {
--    if (replay_file) {
--        g_assert(replay_mutex_locked());
-+    g_assert(replay_file);
-+    g_assert(replay_mutex_locked());
- 
--        /* Due to the caller's locking requirements we get the icount from it
--         * instead of using replay_save_instructions().
--         */
--        replay_advance_current_step(raw_icount);
--        replay_put_event(EVENT_CLOCK + kind);
--        replay_put_qword(clock);
--    }
-+    /*
-+     * Due to the caller's locking requirements we get the icount from it
-+     * instead of using replay_save_instructions().
-+     */
-+    replay_advance_current_step(raw_icount);
-+    replay_put_event(EVENT_CLOCK + kind);
-+    replay_put_qword(clock);
- 
-     return clock;
+-    aio_bh_schedule_oneshot(blk_get_aio_context(blk), error_callback_bh, acb);
++    replay_bh_schedule_oneshot_event(blk_get_aio_context(blk),
++                                     error_callback_bh, acb);
+     return &acb->common;
  }
-@@ -48,20 +49,15 @@ void replay_read_next_clock(ReplayClockKind kind)
- /*! Reads next clock event from the input. */
- int64_t replay_read_clock(ReplayClockKind kind)
- {
-+    int64_t ret;
-     g_assert(replay_file && replay_mutex_locked());
  
-     replay_account_executed_instructions();
+@@ -1340,8 +1342,8 @@ static BlockAIOCB *blk_aio_prwv(BlockBackend *blk, int64_t offset, int bytes,
  
--    if (replay_file) {
--        int64_t ret;
--        if (replay_next_event_is(EVENT_CLOCK + kind)) {
--            replay_read_next_clock(kind);
--        }
--        ret = replay_state.cached_clock[kind];
--
--        return ret;
-+    if (replay_next_event_is(EVENT_CLOCK + kind)) {
-+        replay_read_next_clock(kind);
+     acb->has_returned = true;
+     if (acb->rwco.ret != NOT_DONE) {
+-        aio_bh_schedule_oneshot(blk_get_aio_context(blk),
+-                                blk_aio_complete_bh, acb);
++        replay_bh_schedule_oneshot_event(blk_get_aio_context(blk),
++                                         blk_aio_complete_bh, acb);
      }
-+    ret = replay_state.cached_clock[kind];
  
--    error_report("REPLAY INTERNAL ERROR %d", __LINE__);
--    exit(1);
-+    return ret;
+     return &acb->common;
+diff --git a/block/io.c b/block/io.c
+index fe189a4238..86d84b68a3 100644
+--- a/block/io.c
++++ b/block/io.c
+@@ -340,8 +340,8 @@ static void coroutine_fn bdrv_co_yield_to_drain(BlockDriverState *bs,
+     if (bs) {
+         bdrv_inc_in_flight(bs);
+     }
+-    aio_bh_schedule_oneshot(bdrv_get_aio_context(bs),
+-                            bdrv_co_drain_bh_cb, &data);
++    replay_bh_schedule_oneshot_event(bdrv_get_aio_context(bs),
++                                     bdrv_co_drain_bh_cb, &data);
+ 
+     qemu_coroutine_yield();
+     /* If we are resumed from some other event (such as an aio completion or a
+diff --git a/block/iscsi.c b/block/iscsi.c
+index f31c612d53..f896793a57 100644
+--- a/block/iscsi.c
++++ b/block/iscsi.c
+@@ -38,6 +38,7 @@
+ #include "qemu/iov.h"
+ #include "qemu/option.h"
+ #include "qemu/uuid.h"
++#include "sysemu/replay.h"
+ #include "qapi/error.h"
+ #include "qapi/qapi-commands-misc.h"
+ #include "qapi/qmp/qdict.h"
+@@ -279,8 +280,8 @@ iscsi_co_generic_cb(struct iscsi_context *iscsi, int status,
+ 
+ out:
+     if (iTask->co) {
+-        aio_bh_schedule_oneshot(iTask->iscsilun->aio_context,
+-                                 iscsi_co_generic_bh_cb, iTask);
++        replay_bh_schedule_oneshot_event(iTask->iscsilun->aio_context,
++                                         iscsi_co_generic_bh_cb, iTask);
+     } else {
+         iTask->complete = 1;
+     }
+diff --git a/block/nfs.c b/block/nfs.c
+index 531903610b..f9b5eafa9c 100644
+--- a/block/nfs.c
++++ b/block/nfs.c
+@@ -36,6 +36,7 @@
+ #include "qemu/uri.h"
+ #include "qemu/cutils.h"
+ #include "sysemu/sysemu.h"
++#include "sysemu/replay.h"
+ #include "qapi/qapi-visit-block-core.h"
+ #include "qapi/qmp/qdict.h"
+ #include "qapi/qmp/qstring.h"
+@@ -256,8 +257,8 @@ nfs_co_generic_cb(int ret, struct nfs_context *nfs, void *data,
+     if (task->ret < 0) {
+         error_report("NFS Error: %s", nfs_get_error(nfs));
+     }
+-    aio_bh_schedule_oneshot(task->client->aio_context,
+-                            nfs_co_generic_bh_cb, task);
++    replay_bh_schedule_oneshot_event(task->client->aio_context,
++                                     nfs_co_generic_bh_cb, task);
  }
+ 
+ static int coroutine_fn nfs_co_preadv(BlockDriverState *bs, uint64_t offset,
+diff --git a/block/null.c b/block/null.c
+index a322929478..5701b4b945 100644
+--- a/block/null.c
++++ b/block/null.c
+@@ -16,6 +16,7 @@
+ #include "qapi/qmp/qstring.h"
+ #include "qemu/option.h"
+ #include "block/block_int.h"
++#include "sysemu/replay.h"
+ 
+ #define NULL_OPT_LATENCY "latency-ns"
+ #define NULL_OPT_ZEROES  "read-zeroes"
+@@ -178,7 +179,8 @@ static inline BlockAIOCB *null_aio_common(BlockDriverState *bs,
+         timer_mod_ns(&acb->timer,
+                      qemu_clock_get_ns(QEMU_CLOCK_REALTIME) + s->latency_ns);
+     } else {
+-        aio_bh_schedule_oneshot(bdrv_get_aio_context(bs), null_bh_cb, acb);
++        replay_bh_schedule_oneshot_event(bdrv_get_aio_context(bs),
++                                         null_bh_cb, acb);
+     }
+     return &acb->common;
+ }
+diff --git a/block/nvme.c b/block/nvme.c
+index 0684bbd077..baccb7aee2 100644
+--- a/block/nvme.c
++++ b/block/nvme.c
+@@ -21,6 +21,7 @@
+ #include "qemu/option.h"
+ #include "qemu/vfio-helpers.h"
+ #include "block/block_int.h"
++#include "sysemu/replay.h"
+ #include "trace.h"
+ 
+ #include "block/nvme.h"
+@@ -349,7 +350,8 @@ static bool nvme_process_completion(BDRVNVMeState *s, NVMeQueuePair *q)
+         smp_mb_release();
+         *q->cq.doorbell = cpu_to_le32(q->cq.head);
+         if (!qemu_co_queue_empty(&q->free_req_queue)) {
+-            aio_bh_schedule_oneshot(s->aio_context, nvme_free_req_queue_cb, q);
++            replay_bh_schedule_oneshot_event(s->aio_context,
++                                             nvme_free_req_queue_cb, q);
+         }
+     }
+     q->busy = false;
+@@ -903,7 +905,7 @@ static void nvme_rw_cb(void *opaque, int ret)
+         /* The rw coroutine hasn't yielded, don't try to enter. */
+         return;
+     }
+-    aio_bh_schedule_oneshot(data->ctx, nvme_rw_cb_bh, data);
++    replay_bh_schedule_oneshot_event(data->ctx, nvme_rw_cb_bh, data);
+ }
+ 
+ static coroutine_fn int nvme_co_prw_aligned(BlockDriverState *bs,
+diff --git a/block/rbd.c b/block/rbd.c
+index 0c549c9935..75865d1fce 100644
+--- a/block/rbd.c
++++ b/block/rbd.c
+@@ -21,6 +21,7 @@
+ #include "block/qdict.h"
+ #include "crypto/secret.h"
+ #include "qemu/cutils.h"
++#include "sysemu/replay.h"
+ #include "qapi/qmp/qstring.h"
+ #include "qapi/qmp/qdict.h"
+ #include "qapi/qmp/qjson.h"
+@@ -858,8 +859,8 @@ static void rbd_finish_aiocb(rbd_completion_t c, RADOSCB *rcb)
+     rcb->ret = rbd_aio_get_return_value(c);
+     rbd_aio_release(c);
+ 
+-    aio_bh_schedule_oneshot(bdrv_get_aio_context(acb->common.bs),
+-                            rbd_finish_bh, rcb);
++    replay_bh_schedule_oneshot_event(bdrv_get_aio_context(acb->common.bs),
++                                     rbd_finish_bh, rcb);
+ }
+ 
+ static int rbd_aio_discard_wrapper(rbd_image_t image,
+diff --git a/block/vxhs.c b/block/vxhs.c
+index 2e18229ba4..649b45de82 100644
+--- a/block/vxhs.c
++++ b/block/vxhs.c
+@@ -21,6 +21,7 @@
+ #include "qapi/error.h"
+ #include "qemu/uuid.h"
+ #include "crypto/tlscredsx509.h"
++#include "sysemu/replay.h"
+ 
+ #define VXHS_OPT_FILENAME           "filename"
+ #define VXHS_OPT_VDISK_ID           "vdisk-id"
+@@ -104,8 +105,8 @@ static void vxhs_iio_callback(void *ctx, uint32_t opcode, uint32_t error)
+             trace_vxhs_iio_callback(error);
+         }
+ 
+-        aio_bh_schedule_oneshot(bdrv_get_aio_context(acb->common.bs),
+-                                vxhs_complete_aio_bh, acb);
++        replay_bh_schedule_oneshot_event(bdrv_get_aio_context(acb->common.bs),
++                                         vxhs_complete_aio_bh, acb);
+         break;
+ 
+     default:
+diff --git a/include/sysemu/replay.h b/include/sysemu/replay.h
+index 1d18c9b6ea..b7394a1f5c 100644
+--- a/include/sysemu/replay.h
++++ b/include/sysemu/replay.h
+@@ -163,6 +163,9 @@ bool replay_events_enabled(void);
+ void replay_flush_events(void);
+ /*! Adds bottom half event to the queue */
+ void replay_bh_schedule_event(QEMUBH *bh);
++/* Adds oneshot bottom half event to the queue */
++void replay_bh_schedule_oneshot_event(AioContext *ctx,
++    QEMUBHFunc *cb, void *opaque);
+ /*! Adds input event to the queue */
+ void replay_input_event(QemuConsole *src, InputEvent *evt);
+ /*! Adds input sync event to the queue */
+diff --git a/replay/replay-events.c b/replay/replay-events.c
+index d9a2d495b9..fc9b08225d 100644
+--- a/replay/replay-events.c
++++ b/replay/replay-events.c
+@@ -37,6 +37,9 @@ static void replay_run_event(Event *event)
+     case REPLAY_ASYNC_EVENT_BH:
+         aio_bh_call(event->opaque);
+         break;
++    case REPLAY_ASYNC_EVENT_BH_ONESHOT:
++        ((QEMUBHFunc *)event->opaque)(event->opaque2);
++        break;
+     case REPLAY_ASYNC_EVENT_INPUT:
+         qemu_input_event_send_impl(NULL, (InputEvent *)event->opaque);
+         qapi_free_InputEvent((InputEvent *)event->opaque);
+@@ -132,6 +135,17 @@ void replay_bh_schedule_event(QEMUBH *bh)
+     }
+ }
+ 
++void replay_bh_schedule_oneshot_event(AioContext *ctx,
++    QEMUBHFunc *cb, void *opaque)
++{
++    if (events_enabled) {
++        uint64_t id = replay_get_current_step();
++        replay_add_event(REPLAY_ASYNC_EVENT_BH_ONESHOT, cb, opaque, id);
++    } else {
++        aio_bh_schedule_oneshot(ctx, cb, opaque);
++    }
++}
++
+ void replay_add_input_event(struct InputEvent *event)
+ {
+     replay_add_event(REPLAY_ASYNC_EVENT_INPUT, event, NULL, 0);
+@@ -162,6 +176,7 @@ static void replay_save_event(Event *event, int checkpoint)
+         /* save event-specific data */
+         switch (event->event_kind) {
+         case REPLAY_ASYNC_EVENT_BH:
++        case REPLAY_ASYNC_EVENT_BH_ONESHOT:
+             replay_put_qword(event->id);
+             break;
+         case REPLAY_ASYNC_EVENT_INPUT:
+@@ -217,6 +232,7 @@ static Event *replay_read_event(int checkpoint)
+     /* Events that has not to be in the queue */
+     switch (replay_state.read_event_kind) {
+     case REPLAY_ASYNC_EVENT_BH:
++    case REPLAY_ASYNC_EVENT_BH_ONESHOT:
+         if (replay_state.read_event_id == -1) {
+             replay_state.read_event_id = replay_get_qword();
+         }
+diff --git a/replay/replay-internal.h b/replay/replay-internal.h
+index 945802361b..e9786b2377 100644
+--- a/replay/replay-internal.h
++++ b/replay/replay-internal.h
+@@ -51,6 +51,7 @@ enum ReplayEvents {
+ 
+ enum ReplayAsyncEventKind {
+     REPLAY_ASYNC_EVENT_BH,
++    REPLAY_ASYNC_EVENT_BH_ONESHOT,
+     REPLAY_ASYNC_EVENT_INPUT,
+     REPLAY_ASYNC_EVENT_INPUT_SYNC,
+     REPLAY_ASYNC_EVENT_CHAR_READ,
+diff --git a/replay/replay.c b/replay/replay.c
+index 1be34aa824..e578958659 100644
+--- a/replay/replay.c
++++ b/replay/replay.c
+@@ -22,7 +22,7 @@
+ 
+ /* Current version of the replay mechanism.
+    Increase it when file format changes. */
+-#define REPLAY_VERSION              0xe02007
++#define REPLAY_VERSION              0xe02008
+ /* Size of replay log header */
+ #define HEADER_SIZE                 (sizeof(uint32_t) + sizeof(uint64_t))
+ 
+diff --git a/stubs/Makefile.objs b/stubs/Makefile.objs
+index 269dfa5832..72351de769 100644
+--- a/stubs/Makefile.objs
++++ b/stubs/Makefile.objs
+@@ -20,6 +20,7 @@ stub-obj-y += monitor.o
+ stub-obj-y += notify-event.o
+ stub-obj-y += qtest.o
+ stub-obj-y += replay.o
++stub-obj-y += replay-user.o
+ stub-obj-y += runstate-check.o
+ stub-obj-y += set-fd-handler.o
+ stub-obj-y += sysbus.o
+diff --git a/stubs/replay-user.c b/stubs/replay-user.c
+new file mode 100644
+index 0000000000..2ad9e27203
+--- /dev/null
++++ b/stubs/replay-user.c
+@@ -0,0 +1,9 @@
++#include "qemu/osdep.h"
++#include "sysemu/replay.h"
++#include "sysemu/sysemu.h"
++
++void replay_bh_schedule_oneshot_event(AioContext *ctx,
++    QEMUBHFunc *cb, void *opaque)
++{
++    aio_bh_schedule_oneshot(ctx, cb, opaque);
++}
 
 
