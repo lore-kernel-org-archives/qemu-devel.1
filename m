@@ -6,48 +6,47 @@ X-Spam-Status: No, score=-8.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED,
 	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C98F2C10F11
-	for <qemu-devel@archiver.kernel.org>; Mon, 22 Apr 2019 10:20:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 09DB7C10F11
+	for <qemu-devel@archiver.kernel.org>; Mon, 22 Apr 2019 10:20:56 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9AECB206A3
-	for <qemu-devel@archiver.kernel.org>; Mon, 22 Apr 2019 10:20:54 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9AECB206A3
+	by mail.kernel.org (Postfix) with ESMTPS id C16DC206A3
+	for <qemu-devel@archiver.kernel.org>; Mon, 22 Apr 2019 10:20:55 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C16DC206A3
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:35148 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:35150 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hIW4D-0003qd-MS
-	for qemu-devel@archiver.kernel.org; Mon, 22 Apr 2019 06:20:53 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:57995)
+	id 1hIW4E-0003rI-VI
+	for qemu-devel@archiver.kernel.org; Mon, 22 Apr 2019 06:20:55 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:58013)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1hIW2Y-0002xf-7x
+	(envelope-from <vsementsov@virtuozzo.com>) id 1hIW2Y-0002xq-TB
 	for qemu-devel@nongnu.org; Mon, 22 Apr 2019 06:19:13 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1hIW2W-0006Y9-RP
+	(envelope-from <vsementsov@virtuozzo.com>) id 1hIW2X-0006Yc-4F
 	for qemu-devel@nongnu.org; Mon, 22 Apr 2019 06:19:10 -0400
-Received: from relay.sw.ru ([185.231.240.75]:44546)
+Received: from relay.sw.ru ([185.231.240.75]:44552)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
-	id 1hIW2W-0006Wg-Jd; Mon, 22 Apr 2019 06:19:08 -0400
+	id 1hIW2W-0006Wi-RZ; Mon, 22 Apr 2019 06:19:09 -0400
 Received: from [10.28.8.145] (helo=kvm.sw.ru)
 	by relay.sw.ru with esmtp (Exim 4.91)
 	(envelope-from <vsementsov@virtuozzo.com>)
-	id 1hIW2P-00029b-P8; Mon, 22 Apr 2019 13:19:02 +0300
+	id 1hIW2Q-00029b-AS; Mon, 22 Apr 2019 13:19:02 +0300
 From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 To: qemu-devel@nongnu.org,
 	qemu-block@nongnu.org
-Date: Mon, 22 Apr 2019 13:18:59 +0300
-Message-Id: <20190422101900.13897-3-vsementsov@virtuozzo.com>
+Date: Mon, 22 Apr 2019 13:19:00 +0300
+Message-Id: <20190422101900.13897-4-vsementsov@virtuozzo.com>
 X-Mailer: git-send-email 2.18.0
 In-Reply-To: <20190422101900.13897-1-vsementsov@virtuozzo.com>
 References: <20190422101900.13897-1-vsementsov@virtuozzo.com>
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x
 X-Received-From: 185.231.240.75
-Subject: [Qemu-devel] [PATCH v5 2/3] block/stream: refactor stream_run: drop
- goto
+Subject: [Qemu-devel] [PATCH v5 3/3] block/stream: introduce a bottom node
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -67,56 +66,179 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 Content-Type: text/plain; charset="UTF-8"
-Message-ID: <20190422101859.nLCgRwrcrmpcKs93oMNa5C8G0jDMHoQkj6VxTcXuqUw@z>
+Message-ID: <20190422101900.4NVr2D9l8OUEQYTF-Fm4gs_xehoTEqq0GNjjqyLPC4g@z>
 
-The goto is unnecessary in the stream_run() since the common exit
-code was removed in the commit eb23654dbe43b549ea2a9ebff9d8e:
-"jobs: utilize job_exit shim".
+From: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>
 
-Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+The bottom node is the intermediate block device that has the base as its
+backing image. It is used instead of the base node while a block stream
+job is running to avoid dependency on the base that may change due to the
+parallel jobs. The change may take place due to a filter node as well that
+is inserted between the base and the intermediate bottom node. It occurs
+when the base node is the top one for another commit or stream job.
+After the introduction of the bottom node, don't freeze its backing child,
+that's the base, anymore.
+
+Suggested-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 Signed-off-by: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>
+Reviewed-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 Reviewed-by: Alberto Garcia <berto@igalia.com>
 ---
- block/stream.c | 13 ++++---------
- 1 file changed, 4 insertions(+), 9 deletions(-)
+ block/stream.c         | 49 +++++++++++++++++++++---------------------
+ tests/qemu-iotests/245 |  4 ++--
+ 2 files changed, 27 insertions(+), 26 deletions(-)
 
 diff --git a/block/stream.c b/block/stream.c
-index 0920092ed2..e73a3201c8 100644
+index e73a3201c8..c39212eb3c 100644
 --- a/block/stream.c
 +++ b/block/stream.c
-@@ -122,13 +122,12 @@ static int coroutine_fn stream_run(Job *job, Error **errp)
+@@ -31,7 +31,7 @@ enum {
+ 
+ typedef struct StreamBlockJob {
+     BlockJob common;
+-    BlockDriverState *base;
++    BlockDriverState *bottom;
+     BlockdevOnError on_error;
+     char *backing_file_str;
+     bool bs_read_only;
+@@ -56,7 +56,7 @@ static void stream_abort(Job *job)
+ 
+     if (s->chain_frozen) {
+         BlockJob *bjob = &s->common;
+-        bdrv_unfreeze_backing_chain(blk_bs(bjob->blk), s->base);
++        bdrv_unfreeze_backing_chain(blk_bs(bjob->blk), s->bottom);
+     }
+ }
+ 
+@@ -65,11 +65,11 @@ static int stream_prepare(Job *job)
+     StreamBlockJob *s = container_of(job, StreamBlockJob, common.job);
+     BlockJob *bjob = &s->common;
+     BlockDriverState *bs = blk_bs(bjob->blk);
+-    BlockDriverState *base = s->base;
++    BlockDriverState *base = backing_bs(s->bottom);
+     Error *local_err = NULL;
+     int ret = 0;
+ 
+-    bdrv_unfreeze_backing_chain(bs, base);
++    bdrv_unfreeze_backing_chain(bs, s->bottom);
+     s->chain_frozen = false;
+ 
+     if (bs->backing) {
+@@ -112,7 +112,7 @@ static int coroutine_fn stream_run(Job *job, Error **errp)
+     StreamBlockJob *s = container_of(job, StreamBlockJob, common.job);
+     BlockBackend *blk = s->common.blk;
+     BlockDriverState *bs = blk_bs(blk);
+-    BlockDriverState *base = s->base;
++    bool enable_cor = !backing_bs(s->bottom);
+     int64_t len;
+     int64_t offset = 0;
+     uint64_t delay_ns = 0;
+@@ -121,7 +121,8 @@ static int coroutine_fn stream_run(Job *job, Error **errp)
+     int64_t n = 0; /* bytes */
      void *buf;
  
-     if (!bs->backing) {
--        goto out;
-+        return 0;
+-    if (!bs->backing) {
++    if (bs == s->bottom) {
++        /* Nothing to stream */
+         return 0;
      }
  
-     len = bdrv_getlength(bs);
-     if (len < 0) {
--        ret = len;
--        goto out;
-+        return len;
+@@ -138,7 +139,7 @@ static int coroutine_fn stream_run(Job *job, Error **errp)
+      * backing chain since the copy-on-read operation does not take base into
+      * account.
+      */
+-    if (!base) {
++    if (enable_cor) {
+         bdrv_enable_copy_on_read(bs);
      }
-     job_progress_set_remaining(&s->common.job, len);
  
-@@ -205,14 +204,10 @@ static int coroutine_fn stream_run(Job *job, Error **errp)
+@@ -161,9 +162,8 @@ static int coroutine_fn stream_run(Job *job, Error **errp)
+         } else if (ret >= 0) {
+             /* Copy if allocated in the intermediate images.  Limit to the
+              * known-unallocated area [offset, offset+n*BDRV_SECTOR_SIZE).  */
+-            ret = bdrv_is_allocated_above(backing_bs(bs), base, false,
++            ret = bdrv_is_allocated_above(backing_bs(bs), s->bottom, true,
+                                           offset, n, &n);
+-
+             /* Finish early if end of backing file has been reached */
+             if (ret == 0 && n == 0) {
+                 n = len - offset;
+@@ -200,7 +200,7 @@ static int coroutine_fn stream_run(Job *job, Error **errp)
+         }
+     }
+ 
+-    if (!base) {
++    if (enable_cor) {
          bdrv_disable_copy_on_read(bs);
      }
  
--    /* Do not remove the backing file if an error was there but ignored.  */
--    ret = error;
--
-     qemu_vfree(buf);
+@@ -232,8 +232,10 @@ void stream_start(const char *job_id, BlockDriverState *bs,
+     StreamBlockJob *s;
+     BlockDriverState *iter;
+     bool bs_read_only;
++    int basic_flags = BLK_PERM_CONSISTENT_READ | BLK_PERM_WRITE_UNCHANGED;
++    BlockDriverState *bottom = bdrv_find_overlay(bs, base);
  
--out:
--    /* Modify backing chain and close BDSes in main loop */
--    return ret;
-+    /* Do not remove the backing file if an error was there but ignored. */
-+    return error;
- }
+-    if (bdrv_freeze_backing_chain(bs, base, errp) < 0) {
++    if (bdrv_freeze_backing_chain(bs, bottom, errp) < 0) {
+         return;
+     }
  
- static const BlockJobDriver stream_job_driver = {
+@@ -250,26 +252,25 @@ void stream_start(const char *job_id, BlockDriverState *bs,
+      * already have our own plans. Also don't allow resize as the image size is
+      * queried only at the job start and then cached. */
+     s = block_job_create(job_id, &stream_job_driver, NULL, bs,
+-                         BLK_PERM_CONSISTENT_READ | BLK_PERM_WRITE_UNCHANGED |
+-                         BLK_PERM_GRAPH_MOD,
+-                         BLK_PERM_CONSISTENT_READ | BLK_PERM_WRITE_UNCHANGED |
+-                         BLK_PERM_WRITE,
++                         basic_flags | BLK_PERM_GRAPH_MOD,
++                         basic_flags | BLK_PERM_WRITE,
+                          speed, creation_flags, NULL, NULL, errp);
+     if (!s) {
+         goto fail;
+     }
+ 
+-    /* Block all intermediate nodes between bs and base, because they will
+-     * disappear from the chain after this operation. The streaming job reads
+-     * every block only once, assuming that it doesn't change, so block writes
+-     * and resizes. */
+-    for (iter = backing_bs(bs); iter && iter != base; iter = backing_bs(iter)) {
+-        block_job_add_bdrv(&s->common, "intermediate node", iter, 0,
+-                           BLK_PERM_CONSISTENT_READ | BLK_PERM_WRITE_UNCHANGED,
+-                           &error_abort);
++    /*
++     * Block all intermediate nodes between bs and bottom (inclusive), because
++     * they will disappear from the chain after this operation. The streaming
++     * job reads every block only once, assuming that it doesn't change, so
++     * forbid writes and resizes.
++     */
++    for (iter = bs; iter != bottom; iter = backing_bs(iter)) {
++        block_job_add_bdrv(&s->common, "intermediate node", backing_bs(iter),
++                           0, basic_flags, &error_abort);
+     }
+ 
+-    s->base = base;
++    s->bottom = bottom;
+     s->backing_file_str = g_strdup(backing_file_str);
+     s->bs_read_only = bs_read_only;
+     s->chain_frozen = true;
+diff --git a/tests/qemu-iotests/245 b/tests/qemu-iotests/245
+index a04c6235c1..006f9f72f0 100644
+--- a/tests/qemu-iotests/245
++++ b/tests/qemu-iotests/245
+@@ -865,9 +865,9 @@ class TestBlockdevReopen(iotests.QMPTestCase):
+                              device = 'hd0', base_node = 'hd2', speed = 512 * 1024)
+         self.assert_qmp(result, 'return', {})
+ 
+-        # We can't remove hd2 while the stream job is ongoing
++        # We can remove hd2 while the stream job is ongoing
+         opts['backing']['backing'] = None
+-        self.reopen(opts, {}, "Cannot change 'backing' link from 'hd1' to 'hd2'")
++        self.reopen(opts, {})
+ 
+         # We can't remove hd1 while the stream job is ongoing
+         opts['backing'] = None
 -- 
 2.18.0
 
