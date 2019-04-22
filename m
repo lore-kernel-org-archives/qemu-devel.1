@@ -7,40 +7,40 @@ X-Spam-Status: No, score=-6.7 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 25EE8C282CE
-	for <qemu-devel@archiver.kernel.org>; Mon, 22 Apr 2019 11:24:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D99AAC10F11
+	for <qemu-devel@archiver.kernel.org>; Mon, 22 Apr 2019 11:25:23 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id EE2D3206A3
-	for <qemu-devel@archiver.kernel.org>; Mon, 22 Apr 2019 11:24:17 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EE2D3206A3
+	by mail.kernel.org (Postfix) with ESMTPS id 584C5206A3
+	for <qemu-devel@archiver.kernel.org>; Mon, 22 Apr 2019 11:25:23 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 584C5206A3
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:35796 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:35802 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hIX3Z-0002rB-3F
-	for qemu-devel@archiver.kernel.org; Mon, 22 Apr 2019 07:24:17 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:39922)
+	id 1hIX4c-0003m7-5l
+	for qemu-devel@archiver.kernel.org; Mon, 22 Apr 2019 07:25:22 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:40162)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pavel.dovgaluk@gmail.com>) id 1hIWzJ-0007sk-1H
-	for qemu-devel@nongnu.org; Mon, 22 Apr 2019 07:19:53 -0400
+	(envelope-from <pavel.dovgaluk@gmail.com>) id 1hIX06-00006v-0g
+	for qemu-devel@nongnu.org; Mon, 22 Apr 2019 07:20:43 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pavel.dovgaluk@gmail.com>) id 1hIWzI-0001RK-6I
-	for qemu-devel@nongnu.org; Mon, 22 Apr 2019 07:19:53 -0400
-Received: from mail.ispras.ru ([83.149.199.45]:46812)
+	(envelope-from <pavel.dovgaluk@gmail.com>) id 1hIX04-0001q1-Q4
+	for qemu-devel@nongnu.org; Mon, 22 Apr 2019 07:20:42 -0400
+Received: from mail.ispras.ru ([83.149.199.45]:47046)
 	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pavel.dovgaluk@gmail.com>) id 1hIWzH-0001R9-VE
-	for qemu-devel@nongnu.org; Mon, 22 Apr 2019 07:19:52 -0400
+	(envelope-from <pavel.dovgaluk@gmail.com>) id 1hIX02-0001n7-Tz
+	for qemu-devel@nongnu.org; Mon, 22 Apr 2019 07:20:40 -0400
 Received: from [127.0.1.1] (unknown [85.142.117.226])
-	by mail.ispras.ru (Postfix) with ESMTPSA id 184905400A9;
-	Mon, 22 Apr 2019 14:19:51 +0300 (MSK)
+	by mail.ispras.ru (Postfix) with ESMTPSA id 446F05400A9;
+	Mon, 22 Apr 2019 14:20:36 +0300 (MSK)
 From: Pavel Dovgalyuk <pavel.dovgaluk@gmail.com>
 To: qemu-devel@nongnu.org
-Date: Mon, 22 Apr 2019 14:19:50 +0300
+Date: Mon, 22 Apr 2019 14:20:36 +0300
 Message-ID:
- <155593199090.21079.10732123392374470125.stgit@pasha-Precision-3630-Tower>
+ <155593203604.21079.11971935831323852288.stgit@pasha-Precision-3630-Tower>
 In-Reply-To: <155593197705.21079.8238359471765771689.stgit@pasha-Precision-3630-Tower>
 References: <155593197705.21079.8238359471765771689.stgit@pasha-Precision-3630-Tower>
 User-Agent: StGit/0.17.1-dirty
@@ -49,8 +49,8 @@ Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: 7bit
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x
 X-Received-From: 83.149.199.45
-Subject: [Qemu-devel] [PATCH for-4.1 02/24] block: implement
- bdrv_snapshot_goto for blkreplay
+Subject: [Qemu-devel] [PATCH for-4.1 10/24] qapi: introduce replay.json for
+ record/replay-related stuff
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -74,46 +74,142 @@ Cc: kwolf@redhat.com, peter.maydell@linaro.org, war2jordan@live.com,
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190422111950.ZqTSRI9AL948TF_RFkmUOBCx5c8uh3uCxkNctA2HGyw@z>
+Message-ID: <20190422112036.vFRgrLIC5u34LgDfpJVXa-hmKMpCSCpr7wdy-WVrEcc@z>
 
-From: Pavel Dovgalyuk <pavel.dovgaluk@ispras.ru>
+From: Pavel Dovgalyuk <Pavel.Dovgaluk@ispras.ru>
 
-This patch enables making snapshots with blkreplay used in
-block devices.
-This function is required to make bdrv_snapshot_goto without
-calling .bdrv_open which is not implemented.
+This patch adds replay.json file. It will be
+used for adding record/replay-related data structures and commands.
 
 Signed-off-by: Pavel Dovgalyuk <pavel.dovgaluk@ispras.ru>
-Acked-by: Kevin Wolf <kwolf@redhat.com>
----
- block/blkreplay.c |    8 ++++++++
- 1 file changed, 8 insertions(+)
+Reviewed-by: Markus Armbruster <armbru@redhat.com>
 
-diff --git a/block/blkreplay.c b/block/blkreplay.c
-index b5d9efdeca..142dfe3157 100644
---- a/block/blkreplay.c
-+++ b/block/blkreplay.c
-@@ -126,6 +126,12 @@ static int coroutine_fn blkreplay_co_flush(BlockDriverState *bs)
-     return ret;
- }
+--
+
+v10:
+ - minor changes
+v13:
+ - rebased to the new QAPI files
+---
+ MAINTAINERS             |    1 +
+ include/sysemu/replay.h |    2 +-
+ qapi/Makefile.objs      |    2 +-
+ qapi/misc.json          |   18 ------------------
+ qapi/qapi-schema.json   |    1 +
+ qapi/replay.json        |   26 ++++++++++++++++++++++++++
+ 6 files changed, 30 insertions(+), 20 deletions(-)
+ create mode 100644 qapi/replay.json
+
+diff --git a/MAINTAINERS b/MAINTAINERS
+index 56139ac8ab..e1bf9a72ff 100644
+--- a/MAINTAINERS
++++ b/MAINTAINERS
+@@ -2198,6 +2198,7 @@ F: net/filter-replay.c
+ F: include/sysemu/replay.h
+ F: docs/replay.txt
+ F: stubs/replay.c
++F: qapi/replay.json
  
-+static int blkreplay_snapshot_goto(BlockDriverState *bs,
-+                                   const char *snapshot_id)
-+{
-+    return bdrv_snapshot_goto(bs->file->bs, snapshot_id, NULL);
-+}
-+
- static BlockDriver bdrv_blkreplay = {
-     .format_name            = "blkreplay",
-     .instance_size          = 0,
-@@ -140,6 +146,8 @@ static BlockDriver bdrv_blkreplay = {
-     .bdrv_co_pwrite_zeroes  = blkreplay_co_pwrite_zeroes,
-     .bdrv_co_pdiscard       = blkreplay_co_pdiscard,
-     .bdrv_co_flush          = blkreplay_co_flush,
-+
-+    .bdrv_snapshot_goto     = blkreplay_snapshot_goto,
- };
+ IOVA Tree
+ M: Peter Xu <peterx@redhat.com>
+diff --git a/include/sysemu/replay.h b/include/sysemu/replay.h
+index b3f593f2f0..3fe14b5f57 100644
+--- a/include/sysemu/replay.h
++++ b/include/sysemu/replay.h
+@@ -13,7 +13,7 @@
+  */
  
- static void bdrv_blkreplay_init(void)
+ #include "sysemu.h"
+-#include "qapi/qapi-types-misc.h"
++#include "qapi/qapi-types-replay.h"
+ #include "qapi/qapi-types-ui.h"
+ 
+ /* replay clock kinds */
+diff --git a/qapi/Makefile.objs b/qapi/Makefile.objs
+index 729e5185c5..ee77aac9b9 100644
+--- a/qapi/Makefile.objs
++++ b/qapi/Makefile.objs
+@@ -6,7 +6,7 @@ util-obj-y += qmp-event.o
+ util-obj-y += qapi-util.o
+ 
+ QAPI_COMMON_MODULES = audio authz block-core block char common crypto
+-QAPI_COMMON_MODULES += introspect job migration misc net rdma rocker
++QAPI_COMMON_MODULES += introspect job migration misc net rdma replay rocker
+ QAPI_COMMON_MODULES += run-state sockets tpm trace transaction ui
+ QAPI_TARGET_MODULES = target
+ QAPI_MODULES = $(QAPI_COMMON_MODULES) $(QAPI_TARGET_MODULES)
+diff --git a/qapi/misc.json b/qapi/misc.json
+index 8b3ca4fdd3..00cf0e0bba 100644
+--- a/qapi/misc.json
++++ b/qapi/misc.json
+@@ -2876,24 +2876,6 @@
+ { 'event': 'ACPI_DEVICE_OST',
+      'data': { 'info': 'ACPIOSTInfo' } }
+ 
+-##
+-# @ReplayMode:
+-#
+-# Mode of the replay subsystem.
+-#
+-# @none: normal execution mode. Replay or record are not enabled.
+-#
+-# @record: record mode. All non-deterministic data is written into the
+-#          replay log.
+-#
+-# @play: replay mode. Non-deterministic data required for system execution
+-#        is read from the log.
+-#
+-# Since: 2.5
+-##
+-{ 'enum': 'ReplayMode',
+-  'data': [ 'none', 'record', 'play' ] }
+-
+ ##
+ # @xen-load-devices-state:
+ #
+diff --git a/qapi/qapi-schema.json b/qapi/qapi-schema.json
+index 4bd1223637..3bd5bc1320 100644
+--- a/qapi/qapi-schema.json
++++ b/qapi/qapi-schema.json
+@@ -97,6 +97,7 @@
+ { 'include': 'transaction.json' }
+ { 'include': 'trace.json' }
+ { 'include': 'introspect.json' }
++{ 'include': 'replay.json' }
+ { 'include': 'misc.json' }
+ { 'include': 'target.json' }
+ { 'include': 'audio.json' }
+diff --git a/qapi/replay.json b/qapi/replay.json
+new file mode 100644
+index 0000000000..9e13551d20
+--- /dev/null
++++ b/qapi/replay.json
+@@ -0,0 +1,26 @@
++# -*- Mode: Python -*-
++#
++
++##
++# = Record/replay
++##
++
++{ 'include': 'common.json' }
++
++##
++# @ReplayMode:
++#
++# Mode of the replay subsystem.
++#
++# @none: normal execution mode. Replay or record are not enabled.
++#
++# @record: record mode. All non-deterministic data is written into the
++#          replay log.
++#
++# @play: replay mode. Non-deterministic data required for system execution
++#        is read from the log.
++#
++# Since: 2.5
++##
++{ 'enum': 'ReplayMode',
++  'data': [ 'none', 'record', 'play' ] }
 
 
