@@ -7,61 +7,62 @@ X-Spam-Status: No, score=-8.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,USER_AGENT_GIT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E86B9C10F11
-	for <qemu-devel@archiver.kernel.org>; Mon, 22 Apr 2019 14:30:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 91964C10F11
+	for <qemu-devel@archiver.kernel.org>; Mon, 22 Apr 2019 14:31:48 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B58DD20685
-	for <qemu-devel@archiver.kernel.org>; Mon, 22 Apr 2019 14:30:30 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 5988D20685
+	for <qemu-devel@archiver.kernel.org>; Mon, 22 Apr 2019 14:31:48 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=163.com header.i=@163.com header.b="ToT4qNoB"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B58DD20685
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=163.com header.i=@163.com header.b="jEblY0WW"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5988D20685
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=163.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:38108 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:38140 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hIZxl-0000fg-UQ
-	for qemu-devel@archiver.kernel.org; Mon, 22 Apr 2019 10:30:29 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:45082)
+	id 1hIZz1-00026a-MZ
+	for qemu-devel@archiver.kernel.org; Mon, 22 Apr 2019 10:31:47 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:45127)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <liq3ea@163.com>) id 1hIZwF-0007um-Q5
-	for qemu-devel@nongnu.org; Mon, 22 Apr 2019 10:28:56 -0400
+	(envelope-from <liq3ea@163.com>) id 1hIZwF-0007vk-TN
+	for qemu-devel@nongnu.org; Mon, 22 Apr 2019 10:28:57 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <liq3ea@163.com>) id 1hIZgs-0005Ld-S8
-	for qemu-devel@nongnu.org; Mon, 22 Apr 2019 10:13:03 -0400
-Received: from m12-12.163.com ([220.181.12.12]:59543)
+	(envelope-from <liq3ea@163.com>) id 1hIZgs-0005LK-6y
+	for qemu-devel@nongnu.org; Mon, 22 Apr 2019 10:13:02 -0400
+Received: from m12-12.163.com ([220.181.12.12]:58458)
 	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <liq3ea@163.com>) id 1hIZgs-0005Kp-8C
+	(envelope-from <liq3ea@163.com>) id 1hIZgr-0005J2-J8
 	for qemu-devel@nongnu.org; Mon, 22 Apr 2019 10:13:02 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=163.com;
-	s=s110527; h=From:Subject:Date:Message-Id; bh=TAkAEQslBT4X+Y5eAh
-	5OCFU79u6ALGBYynB4L5pLfks=; b=ToT4qNoBSUnsG2QmkIen2Kbf9sJ1t6//kl
-	RwjLLvl3BjMm2LbhjQvrGUCBDr+iPjIxwAj1tn3GP4ncSNR1UE90PP0AC+jNsEUu
-	nlICqGmLy75a0URFJxHl6d9FjHd80F/nyXHBN9R5qO8h82FeKnZSiANP+bOAqMj9
-	Vo5JQSiMY=
+	s=s110527; h=From:Subject:Date:Message-Id; bh=ocpxbx74syTndxPAzj
+	CBgtsjTGrKulmkE9I+7Wjy7y8=; b=jEblY0WWsbJd32TqMq9FfXfXlz1M/C5uFR
+	zkcq0fcoxGYEvBPn0zxxKR4sSciaciZ4TdNDg+3PkkwYQogI+G3nfzoqNH43cR7c
+	ttpfalnQaQojET6OkgIx4fIZvt28FDzTyL/PeJuV8UPjtBC9kb48cP+VkBcPv2UC
+	vSxul3U4w=
 Received: from localhost.localdomain (unknown [183.159.69.175])
-	by smtp8 (Coremail) with SMTP id DMCowACXUzO0y71cvQ2cBg--.39054S3;
-	Mon, 22 Apr 2019 22:12:07 +0800 (CST)
+	by smtp8 (Coremail) with SMTP id DMCowACXUzO0y71cvQ2cBg--.39054S4;
+	Mon, 22 Apr 2019 22:12:08 +0800 (CST)
 From: Li Qiang <liq3ea@163.com>
 To: jslaby@suse.cz,
 	pbonzini@redhat.com
-Date: Mon, 22 Apr 2019 07:11:54 -0700
-Message-Id: <20190422141156.15746-2-liq3ea@163.com>
+Date: Mon, 22 Apr 2019 07:11:55 -0700
+Message-Id: <20190422141156.15746-3-liq3ea@163.com>
 X-Mailer: git-send-email 2.17.1
 In-Reply-To: <20190422141156.15746-1-liq3ea@163.com>
 References: <20190422141156.15746-1-liq3ea@163.com>
-X-CM-TRANSID: DMCowACXUzO0y71cvQ2cBg--.39054S3
-X-Coremail-Antispam: 1Uf129KBjvdXoWrZF4xJFWUXF4UurW3Kr4rKrg_yoW3urg_Jw
-	1xGFZ7urW5Wry3AF9YqF13ur1xW3yrAFn5uFnagr4fJa4rCF98Z3sagrnxXw47Gw1fCwn5
-	ZaykZFy5Kr9rWjkaLaAFLSUrUUUUUb8apTn2vfkv8UJUUUU8Yxn0WfASr-VFAUDa7-sFnT
-	9fnUUvcSsGvfC2KfnxnUUI43ZEXa7IUjxnY3UUUUU==
+X-CM-TRANSID: DMCowACXUzO0y71cvQ2cBg--.39054S4
+X-Coremail-Antispam: 1Uf129KBjvdXoWrJryrCw15Zr4UAr13CryxAFb_yoWxArc_X3
+	yjka93ZrWq9Fyak3WqvFn5Zr17tw4rZrZxZw4Iqrs7ArZ0krWrA34v9FnrGr4SqrZxWryU
+	Z3yDuF92kr9IgjkaLaAFLSUrUUUUUb8apTn2vfkv8UJUUUU8Yxn0WfASr-VFAUDa7-sFnT
+	9fnUUvcSsGvfC2KfnxnUUI43ZEXa7IU8t5r7UUUUU==
 X-Originating-IP: [183.159.69.175]
-X-CM-SenderInfo: 5oltjvrd6rljoofrz/1tbiKReebVXlqxQeaQAAs1
+X-CM-SenderInfo: 5oltjvrd6rljoofrz/1tbitByebVSIbq8CGwAAsf
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x
 X-Received-From: 220.181.12.12
-Subject: [Qemu-devel] [PATCH v3 1/3] edu: mmio: allow 64-bit access
+Subject: [Qemu-devel] [PATCH v3 2/3] edu: mmio: allow 64-bit access in read
+ dispatch
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -79,39 +80,36 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 Content-Type: text/plain; charset="UTF-8"
-Message-ID: <20190422141154.prMX9Fg-ZU0GrolG7vJyX_2Cf6Kyq9DSKNtn94yfaCs@z>
+Message-ID: <20190422141155.gkF0PEbtx_GQgMdf83qyN9Htzs8yFWyWgp-EgCsamOc@z>
 
-The edu spec says the MMIO area can be accessed by 64-bit.
-However currently the 'max_access_size' is not so the MMIO
-access dispatch can only access 32-bit one time. This patch fixes
-this to respect the spec.
+The edu spec says when address >= 0x80, the MMIO area can
+be accessed by 64-bit.
 
 Signed-off-by: Li Qiang <liq3ea@163.com>
-Reviewed-by: Philippe Mathieu-Daude <philmd@redhat.com>
 ---
- hw/misc/edu.c | 9 +++++++++
- 1 file changed, 9 insertions(+)
+Change since v2:
+Fix an error per Phillippe's advice
+
+ hw/misc/edu.c | 6 +++++-
+ 1 file changed, 5 insertions(+), 1 deletion(-)
 
 diff --git a/hw/misc/edu.c b/hw/misc/edu.c
-index 91af452c9e..65fc32b928 100644
+index 65fc32b928..33de05141f 100644
 --- a/hw/misc/edu.c
 +++ b/hw/misc/edu.c
-@@ -289,6 +289,15 @@ static const MemoryRegionOps edu_mmio_ops = {
-     .read = edu_mmio_read,
-     .write = edu_mmio_write,
-     .endianness = DEVICE_NATIVE_ENDIAN,
-+    .valid = {
-+        .min_access_size = 4,
-+        .max_access_size = 8,
-+    },
-+    .impl = {
-+        .min_access_size = 4,
-+        .max_access_size = 8,
-+    },
-+
- };
+@@ -185,7 +185,11 @@ static uint64_t edu_mmio_read(void *opaque, hwaddr addr, unsigned size)
+     EduState *edu = opaque;
+     uint64_t val = ~0ULL;
  
- /*
+-    if (size != 4) {
++    if (addr < 0x80 && size != 4) {
++        return val;
++    }
++
++    if (addr >= 0x80 && size != 4 && size != 8) {
+         return val;
+     }
+ 
 -- 
 2.17.1
 
