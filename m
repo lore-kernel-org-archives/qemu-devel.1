@@ -2,66 +2,99 @@ Return-Path: <SRS0=5Zkg=SY=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.3 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	MAILING_LIST_MULTI,SPF_PASS,USER_AGENT_MUTT autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-0.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 516B7C282E1
-	for <qemu-devel@archiver.kernel.org>; Mon, 22 Apr 2019 06:02:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EE473C282E1
+	for <qemu-devel@archiver.kernel.org>; Mon, 22 Apr 2019 07:04:31 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1983F20811
-	for <qemu-devel@archiver.kernel.org>; Mon, 22 Apr 2019 06:02:05 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=kernel.org header.i=@kernel.org header.b="qiEa/cjH"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1983F20811
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
+	by mail.kernel.org (Postfix) with ESMTPS id BA42D20857
+	for <qemu-devel@archiver.kernel.org>; Mon, 22 Apr 2019 07:04:31 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BA42D20857
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.vnet.ibm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:32842 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:33383 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hIS1k-0001A0-1c
-	for qemu-devel@archiver.kernel.org; Mon, 22 Apr 2019 02:02:04 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:47765)
+	id 1hIT0A-0007H0-QV
+	for qemu-devel@archiver.kernel.org; Mon, 22 Apr 2019 03:04:30 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:57557)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <leon@kernel.org>) id 1hIS0e-0000f3-RK
-	for qemu-devel@nongnu.org; Mon, 22 Apr 2019 02:01:01 -0400
+	(envelope-from <aravinda@linux.vnet.ibm.com>) id 1hISyj-0006Te-Oz
+	for qemu-devel@nongnu.org; Mon, 22 Apr 2019 03:03:02 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <leon@kernel.org>) id 1hIS0R-0006VD-1k
-	for qemu-devel@nongnu.org; Mon, 22 Apr 2019 02:00:48 -0400
-Received: from mail.kernel.org ([198.145.29.99]:35648)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <leon@kernel.org>) id 1hIS0Q-0006TZ-5M
-	for qemu-devel@nongnu.org; Mon, 22 Apr 2019 02:00:42 -0400
-Received: from localhost (unknown [77.138.135.184])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPSA id E33C220811;
-	Mon, 22 Apr 2019 06:00:38 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1555912839;
-	bh=NIDetymJ85EI2jGq8QnvX4wyY4wtl6QtqgYnOgeyMRU=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=qiEa/cjHFkVw+tBR+nEKsShBLHImm2YhFvKxwlzMxfmno9At6fEob4NU8RY/VDnQl
-	BUuF1y4atX+BmHnzn+Oq6nf5PPiAJGanaZiOPS+XMuIWrbaFGR4nSBV7ri0jl6wvWy
-	2J4LCJCooUxIcQ+JKQtVluVjEdEZFH/chbjyWLxk=
-Date: Mon, 22 Apr 2019 09:00:34 +0300
-From: Leon Romanovsky <leon@kernel.org>
-To: Hannes Reinecke <hare@suse.de>
-Message-ID: <20190422060034.GA27901@mtr-leonro.mtl.com>
-References: <20190411110157.14252-1-yuval.shaia@oracle.com>
-	<20190411190215.2163572e.cohuck@redhat.com>
-	<20190415103546.GA6854@lap1>
-	<e73e03c2-ea2b-6ffc-cd23-e8e44d42ce80@suse.de>
+	(envelope-from <aravinda@linux.vnet.ibm.com>) id 1hISyi-00051R-Iy
+	for qemu-devel@nongnu.org; Mon, 22 Apr 2019 03:03:01 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:57180)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <aravinda@linux.vnet.ibm.com>)
+	id 1hISyi-0004zY-7W
+	for qemu-devel@nongnu.org; Mon, 22 Apr 2019 03:03:00 -0400
+Received: from pps.filterd (m0098394.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id
+	x3M6rnDJ084695
+	for <qemu-devel@nongnu.org>; Mon, 22 Apr 2019 03:02:57 -0400
+Received: from e34.co.us.ibm.com (e34.co.us.ibm.com [32.97.110.152])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2s14j4ffwq-1
+	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Mon, 22 Apr 2019 03:02:57 -0400
+Received: from localhost
+	by e34.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+	Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <aravinda@linux.vnet.ibm.com>;
+	Mon, 22 Apr 2019 08:02:56 +0100
+Received: from b03cxnp08028.gho.boulder.ibm.com (9.17.130.20)
+	by e34.co.us.ibm.com (192.168.1.134) with IBM ESMTP SMTP Gateway:
+	Authorized Use Only! Violators will be prosecuted; 
+	(version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
+	Mon, 22 Apr 2019 08:02:53 +0100
+Received: from b03ledav003.gho.boulder.ibm.com
+	(b03ledav003.gho.boulder.ibm.com [9.17.130.234])
+	by b03cxnp08028.gho.boulder.ibm.com (8.14.9/8.14.9/NCO v10.0) with
+	ESMTP id x3M72qQl31457464
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256
+	verify=OK); Mon, 22 Apr 2019 07:02:52 GMT
+Received: from b03ledav003.gho.boulder.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 9E3416A047;
+	Mon, 22 Apr 2019 07:02:52 +0000 (GMT)
+Received: from b03ledav003.gho.boulder.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 113C86A04D;
+	Mon, 22 Apr 2019 07:02:49 +0000 (GMT)
+Received: from [127.0.1.1] (unknown [9.199.63.199])
+	by b03ledav003.gho.boulder.ibm.com (Postfix) with ESMTP;
+	Mon, 22 Apr 2019 07:02:49 +0000 (GMT)
+From: Aravinda Prasad <aravinda@linux.vnet.ibm.com>
+To: aik@au1.ibm.com, qemu-ppc@nongnu.org, qemu-devel@nongnu.org,
+	david@gibson.dropbear.id.au
+Date: Mon, 22 Apr 2019 12:32:48 +0530
+User-Agent: StGit/0.17.1-dirty
 MIME-Version: 1.0
 Content-Type: text/plain; charset="UTF-8"
-Content-Disposition: inline
-In-Reply-To: <e73e03c2-ea2b-6ffc-cd23-e8e44d42ce80@suse.de>
-User-Agent: Mutt/1.11.3 (2019-02-01)
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 198.145.29.99
-Subject: Re: [Qemu-devel] [RFC 0/3] VirtIO RDMA
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+x-cbid: 19042207-0016-0000-0000-000009A37CD4
+X-IBM-SpamModules-Scores: 
+X-IBM-SpamModules-Versions: BY=3.00010972; HX=3.00000242; KW=3.00000007;
+	PH=3.00000004; SC=3.00000285; SDB=6.01192628; UDB=6.00625138;
+	IPR=6.00973446; 
+	MB=3.00026542; MTD=3.00000008; XFM=3.00000015; UTC=2019-04-22 07:02:55
+X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
+x-cbparentid: 19042207-0017-0000-0000-000042E8492A
+Message-Id: <155591636364.20338.844048953355207313.stgit@aravinda>
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:, ,
+	definitions=2019-04-21_08:, , signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+	priorityscore=1501
+	malwarescore=0 suspectscore=0 phishscore=0 bulkscore=0 spamscore=0
+	clxscore=1015 lowpriorityscore=0 mlxscore=0 impostorscore=0
+	mlxlogscore=543 adultscore=0 classifier=spam adjust=0 reason=mlx
+	scancount=1 engine=8.0.1-1810050000 definitions=main-1904220052
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic]
+X-Received-From: 148.163.156.1
+Subject: [Qemu-devel] [PATCH v8 0/6] target-ppc/spapr: Add FWNMI support in
+ QEMU for PowerKVM guests
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -73,120 +106,70 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: mst@redhat.com, linux-rdma@vger.kernel.org,
-	Cornelia Huck <cohuck@redhat.com>, qemu-devel@nongnu.org,
-	Yuval Shaia <yuval.shaia@oracle.com>,
-	virtualization@lists.linux-foundation.org, jgg@mellanox.com
+Cc: paulus@ozlabs.org, aravinda@linux.vnet.ibm.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190422060034.44N2fuGtsfiHWx6Y9XgoXYZJMZ5sO_8ty0bMVB-3Ojw@z>
+Message-ID: <20190422070248.0-xhggS6DnCl-Q9PB0A9VCxrt1CW9Ghi8oVP-nv71q0@z>
 
-On Fri, Apr 19, 2019 at 01:16:06PM +0200, Hannes Reinecke wrote:
-> On 4/15/19 12:35 PM, Yuval Shaia wrote:
-> > On Thu, Apr 11, 2019 at 07:02:15PM +0200, Cornelia Huck wrote:
-> > > On Thu, 11 Apr 2019 14:01:54 +0300
-> > > Yuval Shaia <yuval.shaia@oracle.com> wrote:
-> > >
-> > > > Data center backends use more and more RDMA or RoCE devices and more and
-> > > > more software runs in virtualized environment.
-> > > > There is a need for a standard to enable RDMA/RoCE on Virtual Machines.
-> > > >
-> > > > Virtio is the optimal solution since is the de-facto para-virtualizaton
-> > > > technology and also because the Virtio specification
-> > > > allows Hardware Vendors to support Virtio protocol natively in order to
-> > > > achieve bare metal performance.
-> > > >
-> > > > This RFC is an effort to addresses challenges in defining the RDMA/RoCE
-> > > > Virtio Specification and a look forward on possible implementation
-> > > > techniques.
-> > > >
-> > > > Open issues/Todo list:
-> > > > List is huge, this is only start point of the project.
-> > > > Anyway, here is one example of item in the list:
-> > > > - Multi VirtQ: Every QP has two rings and every CQ has one. This means that
-> > > >    in order to support for example 32K QPs we will need 64K VirtQ. Not sure
-> > > >    that this is reasonable so one option is to have one for all and
-> > > >    multiplex the traffic on it. This is not good approach as by design it
-> > > >    introducing an optional starvation. Another approach would be multi
-> > > >    queues and round-robin (for example) between them.
-> > > >
-> Typically there will be a one-to-one mapping between QPs and CPUs (on the
-> guest). So while one would need to be prepared to support quite some QPs,
-> the expectation is that the actual number of QPs used will be rather low.
-> In a similar vein, multiplexing QPs would be defeating the purpose, as the
-> overall idea was to have _independent_ QPs to enhance parallelism.
->
-> > > > Expectations from this posting:
-> > > > In general, any comment is welcome, starting from hey, drop this as it is a
-> > > > very bad idea, to yeah, go ahead, we really want it.
-> > > > Idea here is that since it is not a minor effort i first want to know if
-> > > > there is some sort interest in the community for such device.
-> > >
-> > > My first reaction is: Sounds sensible, but it would be good to have a
-> > > spec for this :)
-> > >
-> > > You'll need a spec if you want this to go forward anyway, so at least a
-> > > sketch would be good to answer questions such as how many virtqueues
-> > > you use for which purpose, what is actually put on the virtqueues,
-> > > whether there are negotiable features, and what the expectations for
-> > > the device and the driver are. It also makes it easier to understand
-> > > how this is supposed to work in practice.
-> > >
-> > > If folks agree that this sounds useful, the next step would be to
-> > > reserve an id for the device type.
-> >
-> > Thanks for the tips, will sure do that, it is that first i wanted to make
-> > sure there is a use case here.
-> >
-> > Waiting for any feedback from the community.
-> >
-> I really do like the ides; in fact, it saved me from coding a similar thing
-> myself :-)
->
-> However, I'm still curious about the overall intent of this driver. Where
-> would the I/O be routed _to_ ?
-> It's nice that we have a virtualized driver, but this driver is
-> intended to do I/O (even if it doesn't _do_ any I/O ATM :-)
-> And this I/O needs to be send to (and possibly received from)
-> something.
->
-> So what exactly is this something?
-> An existing piece of HW on the host?
-> If so, wouldn't it be more efficient to use vfio, either by using SR-IOV or
-> by using virtio-mdev?
->
-> Another guest?
-> If so, how would we route the I/O from one guest to the other?
-> Shared memory? Implementing a full-blown RDMA switch in qemu?
->
-> Oh, and I would _love_ to have a discussion about this at KVM Forum.
-> Maybe I'll manage to whip up guest-to-guest RDMA connection using ivshmem
-> ... let's see.
+This patch set adds support for FWNMI in PowerKVM guests.
 
-Following success in previous years to transfer ideas into code,
-we started to prepare RDMA miniconference in LPC 2019, which will
-be co-located with Kernel Summit and networking track.
+System errors such as SLB multihit and memory errors
+that cannot be corrected by hardware is passed on to
+the kernel for handling by raising machine check
+exception (an NMI). Upon such machine check exceptions,
+if the address in error belongs to guest then KVM
+invokes guests' 0x200 interrupt vector if the guest
+is not FWNMI capable. For FWNMI capable guest
+KVM passes the control to QEMU by exiting the guest.
 
-I'm confident that such broad audience of kernel developers
-will be good fit for such discussion.
+This patch series adds functionality to QEMU to pass
+on such machine check exceptions to the FWNMI capable
+guest kernel by building an error log and invoking
+the guest registered machine check handling routine.
 
-Previous years:
-2016: https://www.spinics.net/lists/linux-rdma/msg43074.html
-2017: https://lwn.net/Articles/734163/
-2018: It was so full in audience and intensive that I failed to
-summarize it :(
+The KVM changes are now part of the upstream kernel
+(commit e20bbd3d). This series contain QEMU changes.
 
-Thanks
+Change Log v8:
+  - Added functionality to check FWNMI capability during
+    VM migration
 
->
-> Cheers,
->
-> Hannes
-> --
-> Dr. Hannes Reinecke            Teamlead Storage & Networking
-> hare@suse.de                              +49 911 74053 688
-> SUSE LINUX GmbH, Maxfeldstr. 5, 90409 N??rnberg
-> GF: Felix Imend??rffer, Mary Higgins, Sri Rasiah
-> HRB 21284 (AG N??rnberg)
+Change Log v7:
+  - Rebased to 4.1
+
+Change Log v6:
+  - Fetches rtas_addr from fdt
+  - Handles all error conditions (earlier it was only UEs)
+
+Change Log v5:
+  - Handled VM migrations by including rtas_addr in VMSTATE.
+  - Migration is blocked while a machine check is in progress.
+
+---
+
+Aravinda Prasad (6):
+      ppc: spapr: Handle "ibm,nmi-register" and "ibm,nmi-interlock" RTAS calls
+      Wrapper function to wait on condition for the main loop mutex
+      target/ppc: Handle NMI guest exit
+      target/ppc: Build rtas error log upon an MCE
+      ppc: spapr: Enable FWNMI capability
+      migration: Block migration while handling machine check
+
+
+ cpus.c                   |    5 +
+ hw/ppc/spapr.c           |   26 ++++
+ hw/ppc/spapr_caps.c      |   26 ++++
+ hw/ppc/spapr_events.c    |  284 ++++++++++++++++++++++++++++++++++++++++++++++
+ hw/ppc/spapr_rtas.c      |   84 ++++++++++++++
+ include/hw/ppc/spapr.h   |   26 ++++
+ include/qemu/main-loop.h |    8 +
+ target/ppc/kvm.c         |   30 +++++
+ target/ppc/kvm_ppc.h     |    8 +
+ target/ppc/trace-events  |    2 
+ 10 files changed, 497 insertions(+), 2 deletions(-)
+
+--
+Aravinda
+
 
