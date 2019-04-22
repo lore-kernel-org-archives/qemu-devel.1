@@ -6,55 +6,55 @@ X-Spam-Status: No, score=-6.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5907FC10F11
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BC838C282CE
 	for <qemu-devel@archiver.kernel.org>; Mon, 22 Apr 2019 21:13:12 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 286BE20896
+	by mail.kernel.org (Postfix) with ESMTPS id 8837920896
 	for <qemu-devel@archiver.kernel.org>; Mon, 22 Apr 2019 21:13:12 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 286BE20896
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8837920896
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:44303 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:44305 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hIgFT-0003Lk-Ae
+	id 1hIgFT-0003Lz-PL
 	for qemu-devel@archiver.kernel.org; Mon, 22 Apr 2019 17:13:11 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:44482)
+Received: from eggs.gnu.org ([209.51.188.92]:44519)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1hIgEC-0002Td-OY
+	(envelope-from <ehabkost@redhat.com>) id 1hIgEC-0002UV-Ts
 	for qemu-devel@nongnu.org; Mon, 22 Apr 2019 17:11:53 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1hIg7V-0000Id-Ad
-	for qemu-devel@nongnu.org; Mon, 22 Apr 2019 17:04:58 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:35346)
+	(envelope-from <ehabkost@redhat.com>) id 1hIg7T-0000HY-Ax
+	for qemu-devel@nongnu.org; Mon, 22 Apr 2019 17:04:56 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:38054)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1hIg7V-0000II-5N
-	for qemu-devel@nongnu.org; Mon, 22 Apr 2019 17:04:57 -0400
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
-	[10.5.11.14])
+	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1hIg7T-0000H8-5K
+	for qemu-devel@nongnu.org; Mon, 22 Apr 2019 17:04:55 -0400
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+	[10.5.11.12])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 76DF537F43
-	for <qemu-devel@nongnu.org>; Mon, 22 Apr 2019 21:04:56 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id 752D83082A27
+	for <qemu-devel@nongnu.org>; Mon, 22 Apr 2019 21:04:54 +0000 (UTC)
 Received: from localhost (ovpn-116-9.gru2.redhat.com [10.97.116.9])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id 0AFE25D9C8;
-	Mon, 22 Apr 2019 21:04:55 +0000 (UTC)
+	by smtp.corp.redhat.com (Postfix) with ESMTP id 0B3EA60C64;
+	Mon, 22 Apr 2019 21:04:53 +0000 (UTC)
 From: Eduardo Habkost <ehabkost@redhat.com>
 To: qemu-devel@nongnu.org
-Date: Mon, 22 Apr 2019 18:04:48 -0300
-Message-Id: <20190422210448.2488-4-ehabkost@redhat.com>
+Date: Mon, 22 Apr 2019 18:04:47 -0300
+Message-Id: <20190422210448.2488-3-ehabkost@redhat.com>
 In-Reply-To: <20190422210448.2488-1-ehabkost@redhat.com>
 References: <20190422210448.2488-1-ehabkost@redhat.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.29]);
-	Mon, 22 Apr 2019 21:04:56 +0000 (UTC)
+	(mx1.redhat.com [10.5.110.45]);
+	Mon, 22 Apr 2019 21:04:54 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] [PATCH 3/3] accel: Remove unused AccelClass::available
- field
+Subject: [Qemu-devel] [PATCH 2/3] qtest: Don't compile qtest accel on
+ non-POSIX systems
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -72,44 +72,60 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 Content-Type: text/plain; charset="UTF-8"
-Message-ID: <20190422210448.Cvv-SnobmqwrS-C_SnZWDZlLVZi6lxgrxTG6RvSw-v4@z>
+Message-ID: <20190422210447.Xou9ly3VJ9dxgACOdARJmhOTIM7zCW8qflVjnK69W8U@z>
 
-The field is not used anymore, we can remove it.
+qtest_available() will always return 0 on non-POSIX systems.
+It's simpler to just not compile the accelerator code on those
+systems instead of relying on the AccelClass::available function.
 
 Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
 ---
- include/sysemu/accel.h | 1 -
- accel/accel.c          | 5 -----
- 2 files changed, 6 deletions(-)
+ include/sysemu/qtest.h | 9 ---------
+ accel/qtest.c          | 1 -
+ accel/Makefile.objs    | 2 +-
+ 3 files changed, 1 insertion(+), 11 deletions(-)
 
-diff --git a/include/sysemu/accel.h b/include/sysemu/accel.h
-index 5565e00a96..70e9e2f2a1 100644
---- a/include/sysemu/accel.h
-+++ b/include/sysemu/accel.h
-@@ -38,7 +38,6 @@ typedef struct AccelClass {
+diff --git a/include/sysemu/qtest.h b/include/sysemu/qtest.h
+index 70aa40aa72..096ddfc20c 100644
+--- a/include/sysemu/qtest.h
++++ b/include/sysemu/qtest.h
+@@ -27,13 +27,4 @@ bool qtest_driver(void);
  
-     const char *opt_name;
-     const char *name;
--    int (*available)(void);
-     int (*init_machine)(MachineState *ms);
-     void (*setup_post)(MachineState *ms, AccelState *accel);
-     bool *allowed;
-diff --git a/accel/accel.c b/accel/accel.c
-index 454fef9d92..5fa31717b4 100644
---- a/accel/accel.c
-+++ b/accel/accel.c
-@@ -107,11 +107,6 @@ void configure_accelerator(MachineState *ms, const char *progname)
-         if (!acc) {
-             continue;
-         }
--        if (acc->available && !acc->available()) {
--            printf("%s not supported for this target\n",
--                   acc->name);
--            continue;
--        }
-         ret = accel_init_machine(acc, ms);
-         if (ret < 0) {
-             init_failed = true;
+ void qtest_init(const char *qtest_chrdev, const char *qtest_log, Error **errp);
+ 
+-static inline int qtest_available(void)
+-{
+-#ifdef CONFIG_POSIX
+-    return 1;
+-#else
+-    return 0;
+-#endif
+-}
+-
+ #endif
+diff --git a/accel/qtest.c b/accel/qtest.c
+index a02b3c26c7..5b88f55921 100644
+--- a/accel/qtest.c
++++ b/accel/qtest.c
+@@ -34,7 +34,6 @@ static void qtest_accel_class_init(ObjectClass *oc, void *data)
+ {
+     AccelClass *ac = ACCEL_CLASS(oc);
+     ac->name = "QTest";
+-    ac->available = qtest_available;
+     ac->init_machine = qtest_init_accel;
+     ac->allowed = &qtest_allowed;
+ }
+diff --git a/accel/Makefile.objs b/accel/Makefile.objs
+index 2a5ed46940..8b498d39d8 100644
+--- a/accel/Makefile.objs
++++ b/accel/Makefile.objs
+@@ -1,5 +1,5 @@
+ obj-$(CONFIG_SOFTMMU) += accel.o
+-obj-$(CONFIG_SOFTMMU) += qtest.o
++obj-$(call land,$(CONFIG_SOFTMMU),$(CONFIG_POSIX)) += qtest.o
+ obj-$(CONFIG_KVM) += kvm/
+ obj-$(CONFIG_TCG) += tcg/
+ obj-y += stubs/
 -- 
 2.18.0.rc1.1.g3f1ff2140
 
