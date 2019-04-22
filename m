@@ -1,17 +1,14 @@
-Received: from eggs.gnu.org ([209.51.188.92]:56316)
+Received: from eggs.gnu.org ([209.51.188.92]:56320)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1hIamv-0005LZ-8n
+	(envelope-from <vsementsov@virtuozzo.com>) id 1hIamv-0005Lc-Ef
 	for qemu-devel@nongnu.org; Mon, 22 Apr 2019 11:23:22 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1hIamu-0006GK-2f
+	(envelope-from <vsementsov@virtuozzo.com>) id 1hIamu-0006GX-5H
 	for qemu-devel@nongnu.org; Mon, 22 Apr 2019 11:23:21 -0400
 From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Date: Mon, 22 Apr 2019 18:23:14 +0300
-Message-Id: <20190422152315.74361-3-vsementsov@virtuozzo.com>
-In-Reply-To: <20190422152315.74361-1-vsementsov@virtuozzo.com>
-References: <20190422152315.74361-1-vsementsov@virtuozzo.com>
-Subject: [Qemu-devel] [PATCH v4 2/3] block/io: bdrv_pdiscard: support
- int64_t bytes parameter
+Date: Mon, 22 Apr 2019 18:23:12 +0300
+Message-Id: <20190422152315.74361-1-vsementsov@virtuozzo.com>
+Subject: [Qemu-devel] [PATCH v4 0/3] Fix overflow bug in qcow2 discard
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,92 +20,47 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org, qemu-block@nongnu.org
 Cc: kwolf@redhat.com, mreitz@redhat.com, fam@euphon.net, stefanha@redhat.com, vsementsov@virtuozzo.com, den@virtuozzo.com, eblake@redhat.com
 
-This fixes at least one overflow in qcow2_process_discards, which
-passes 64bit region length to bdrv_pdiscard where bytes (or sectors in
-the past) parameter is int since its introduction in 0b919fae.
+v4: now based on Kevin's block-next
+01: add Eric's r-b
+02: - s/which/where/ [Eric, hope, I fixed correct one which from two:)]
+    - s/it's/its
+    add Eric's r-b
+03: - r-b and t-b by Eric
+    - grammar
+    - drop trace from test
 
-Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Reviewed-by: Eric Blake <eblake@redhat.com>
----
- include/block/block.h |  4 ++--
- block/io.c            | 16 ++++++++--------
- 2 files changed, 10 insertions(+), 10 deletions(-)
+v3: don't filter mapping info from qemu-img map output, otherwise
+    it don't show what I try to check [sorry for extra noise in list]
 
-diff --git a/include/block/block.h b/include/block/block.h
-index c7a26199aa..69fa18867e 100644
---- a/include/block/block.h
-+++ b/include/block/block.h
-@@ -432,8 +432,8 @@ void bdrv_drain_all(void);
-     AIO_WAIT_WHILE(bdrv_get_aio_context(bs_),              \
-                    cond); })
- 
--int bdrv_pdiscard(BdrvChild *child, int64_t offset, int bytes);
--int bdrv_co_pdiscard(BdrvChild *child, int64_t offset, int bytes);
-+int bdrv_pdiscard(BdrvChild *child, int64_t offset, int64_t bytes);
-+int bdrv_co_pdiscard(BdrvChild *child, int64_t offset, int64_t bytes);
- int bdrv_has_zero_init_1(BlockDriverState *bs);
- int bdrv_has_zero_init(BlockDriverState *bs);
- bool bdrv_unallocated_blocks_are_zero(BlockDriverState *bs);
-diff --git a/block/io.c b/block/io.c
-index dfc153b8d8..35c4157669 100644
---- a/block/io.c
-+++ b/block/io.c
-@@ -2653,7 +2653,7 @@ int bdrv_flush(BlockDriverState *bs)
- typedef struct DiscardCo {
-     BdrvChild *child;
-     int64_t offset;
--    int bytes;
-+    int64_t bytes;
-     int ret;
- } DiscardCo;
- static void coroutine_fn bdrv_pdiscard_co_entry(void *opaque)
-@@ -2664,14 +2664,15 @@ static void coroutine_fn bdrv_pdiscard_co_entry(void *opaque)
-     aio_wait_kick();
- }
- 
--int coroutine_fn bdrv_co_pdiscard(BdrvChild *child, int64_t offset, int bytes)
-+int coroutine_fn bdrv_co_pdiscard(BdrvChild *child, int64_t offset,
-+                                  int64_t bytes)
- {
-     BdrvTrackedRequest req;
-     int max_pdiscard, ret;
-     int head, tail, align;
-     BlockDriverState *bs = child->bs;
- 
--    if (!bs || !bs->drv) {
-+    if (!bs || !bs->drv || !bdrv_is_inserted(bs)) {
-         return -ENOMEDIUM;
-     }
- 
-@@ -2679,9 +2680,8 @@ int coroutine_fn bdrv_co_pdiscard(BdrvChild *child, int64_t offset, int bytes)
-         return -EPERM;
-     }
- 
--    ret = bdrv_check_byte_request(bs, offset, bytes);
--    if (ret < 0) {
--        return ret;
-+    if (offset < 0) {
-+        return -EIO;
-     }
- 
-     /* Do nothing if disabled.  */
-@@ -2716,7 +2716,7 @@ int coroutine_fn bdrv_co_pdiscard(BdrvChild *child, int64_t offset, int bytes)
-     assert(max_pdiscard >= bs->bl.request_alignment);
- 
-     while (bytes > 0) {
--        int num = bytes;
-+        int64_t num = bytes;
- 
-         if (head) {
-             /* Make small requests to get to alignment boundaries. */
-@@ -2778,7 +2778,7 @@ out:
-     return ret;
- }
- 
--int bdrv_pdiscard(BdrvChild *child, int64_t offset, int bytes)
-+int bdrv_pdiscard(BdrvChild *child, int64_t offset, int64_t bytes)
- {
-     Coroutine *co;
-     DiscardCo rwco = {
+v2: [mostly by Eric's review]
+01: new
+02: point to bug introducing commit in cover letter [Eric]
+     [but I failed to compile it, to check]
+    drop s/INT_MAX/BDRV_REQUEST_MAX_BYTES/ chunk
+03: - improve wording
+    - cheating with preallocation=metadata and discards
+      to make test quick and not eating disk space
+    - use new trace-point
+    - move it to be 250 iotest
+    - filter out extra qemu-img info output
+
+Based-on: git://repo.or.cz/qemu/kevin.git block-next
+
+Vladimir Sementsov-Ogievskiy (3):
+  block/qcow2-refcount: add trace-point to qcow2_process_discards
+  block/io: bdrv_pdiscard: support int64_t bytes parameter
+  iotests: test big qcow2 shrink
+
+ include/block/block.h      |  4 +--
+ block/io.c                 | 16 ++++-----
+ block/qcow2-refcount.c     |  7 +++-
+ block/trace-events         |  3 ++
+ tests/qemu-iotests/250     | 72 ++++++++++++++++++++++++++++++++++++++
+ tests/qemu-iotests/250.out | 21 +++++++++++
+ tests/qemu-iotests/group   |  1 +
+ 7 files changed, 113 insertions(+), 11 deletions(-)
+ create mode 100755 tests/qemu-iotests/250
+ create mode 100644 tests/qemu-iotests/250.out
+
 -- 
 2.18.0
