@@ -6,77 +6,79 @@ X-Spam-Status: No, score=-6.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 24EF1C10F11
-	for <qemu-devel@archiver.kernel.org>; Mon, 22 Apr 2019 16:37:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D1864C10F11
+	for <qemu-devel@archiver.kernel.org>; Mon, 22 Apr 2019 16:37:09 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E7292214AE
-	for <qemu-devel@archiver.kernel.org>; Mon, 22 Apr 2019 16:36:59 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E7292214AE
+	by mail.kernel.org (Postfix) with ESMTPS id A5894214AE
+	for <qemu-devel@archiver.kernel.org>; Mon, 22 Apr 2019 16:37:09 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A5894214AE
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:39875 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:39877 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hIbwB-0004cC-24
-	for qemu-devel@archiver.kernel.org; Mon, 22 Apr 2019 12:36:59 -0400
+	id 1hIbwK-0004lD-Na
+	for qemu-devel@archiver.kernel.org; Mon, 22 Apr 2019 12:37:08 -0400
 Received: from eggs.gnu.org ([209.51.188.92]:41152)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1hIbuV-00037f-O2
-	for qemu-devel@nongnu.org; Mon, 22 Apr 2019 12:35:16 -0400
+	(envelope-from <philmd@redhat.com>) id 1hIbua-00037f-TR
+	for qemu-devel@nongnu.org; Mon, 22 Apr 2019 12:35:21 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1hIbpS-0007uE-AL
-	for qemu-devel@nongnu.org; Mon, 22 Apr 2019 12:30:03 -0400
-Received: from mail-wm1-f67.google.com ([209.85.128.67]:38671)
+	(envelope-from <philmd@redhat.com>) id 1hIbnd-00072O-4s
+	for qemu-devel@nongnu.org; Mon, 22 Apr 2019 12:28:11 -0400
+Received: from mail-wm1-f66.google.com ([209.85.128.66]:39597)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1hIbpS-0007tZ-3F
-	for qemu-devel@nongnu.org; Mon, 22 Apr 2019 12:30:02 -0400
-Received: by mail-wm1-f67.google.com with SMTP id w15so15086532wmc.3
-	for <qemu-devel@nongnu.org>; Mon, 22 Apr 2019 09:30:02 -0700 (PDT)
+	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1hIbnX-0006yj-Ej
+	for qemu-devel@nongnu.org; Mon, 22 Apr 2019 12:28:05 -0400
+Received: by mail-wm1-f66.google.com with SMTP id n25so15052690wmk.4
+	for <qemu-devel@nongnu.org>; Mon, 22 Apr 2019 09:28:02 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
 	d=1e100.net; s=20161025;
 	h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
 	:date:user-agent:mime-version:in-reply-to:content-language
 	:content-transfer-encoding;
-	bh=rekENEXr49yQmesagg6Od3D4OkDhe+yrEOJOyHEeTQM=;
-	b=NoOE3D7v2TzumMaUq9DEyOrVu29VKZ0elT9zegyIWdvOIvtLwAajZlwA9y6zFpoOkp
-	sNhQbSQt1rOAdpjK9dSMACJb7SljBOFDP4GT2RyKsT/ZERO2vm4e4r1zdxzooukTpHuS
-	vX+i0i43OjQXpH0b24NaNx2pbmXiCF859DNr4ikQdmb4zlaG7FmsInq25Bkb+Acxf7Ti
-	pGff4laWWy39LMPRUIAGpaoJro3hB0Qg83QQT1B5IEJBZa+0fUxMXAXIarcWdeTSlaD1
-	5C1f61G+Z4R4In81HjLaqGJXkx7lfd74cRNKQH1cwaMYJ0ICX4ef6EeB/w5mXQak9Su8
-	KYgA==
-X-Gm-Message-State: APjAAAU5JzhiXiwBshMezDRmLyX8LYJcJKhqMhInZv+N6NNEPSk1vyz+
-	cqDk6/NQMp07rQWX5uV6R/VrXA==
-X-Google-Smtp-Source: APXvYqwpi7v/9kaBWbmMgAcODEroBJcI41GIQHBvJ1rdHkkg5OEzQkbL1WAlOwGnIKRitkRbS9sfwg==
-X-Received: by 2002:a1c:a9d4:: with SMTP id
-	s203mr13288480wme.117.1555950601120; 
-	Mon, 22 Apr 2019 09:30:01 -0700 (PDT)
+	bh=tbo3lvT6di9+ns0khXTKA2QoC/BUksB/Vvba9a+5L+k=;
+	b=mj76f5ZfHsth7kHLLMC6NDLLiUMjvBxOEWQCPWz3hdPnnCkBYW/YUZFdjnIis8z2R9
+	aEdTHpiQlbKxkQtlQoSEfnJ3ULKoq5ad80aQTFOPnRK+usiA/T9tbwjLIYFxRImsnqiT
+	Dd1NkWu1AaD6oJhVZSUV995Zx6CK3/skLwDW2Rv9nPCbFok2hIxWHdQEKsHsWgekkGkF
+	gNJet/fa7/gKDo74lO7F55FWVpGmhHPYBZiMPXUYZCmWxxHNnoLYt9zt1luQMyljrh8G
+	62Scy+OkVOdiXkI4Ce/BHNXcerbTpSwG5Y3wH12iO1wgpos6cpK3cAjeEVGbgDgRnltX
+	yEqw==
+X-Gm-Message-State: APjAAAXCT/HoQKqe6sLo581PaoJjNs1j5M3Kq1marL+lVOj5BvZbnEdg
+	4SwuS0ZZnpdgc50C/0wj8mBPJ6pyYVhIcQ==
+X-Google-Smtp-Source: APXvYqyNGr9ry7J87Fxw392plQWNLS1LTS68RLa5uxfVJeO2ceBukNrZHf1XKhxsAJhxq7R6UUmyZg==
+X-Received: by 2002:a1c:1d97:: with SMTP id
+	d145mr12313979wmd.136.1555950480779; 
+	Mon, 22 Apr 2019 09:28:00 -0700 (PDT)
 Received: from [192.168.1.25] (atoulouse-656-1-803-163.w86-221.abo.wanadoo.fr.
-	[86.221.12.163])
-	by smtp.gmail.com with ESMTPSA id c1sm3606465wrp.69.2019.04.22.09.30.00
+	[86.221.12.163]) by smtp.gmail.com with ESMTPSA id
+	i28sm31601189wrc.32.2019.04.22.09.27.59
 	(version=TLS1_3 cipher=AEAD-AES128-GCM-SHA256 bits=128/128);
-	Mon, 22 Apr 2019 09:30:00 -0700 (PDT)
-To: Li Qiang <liq3ea@163.com>, jslaby@suse.cz, pbonzini@redhat.com
-References: <20190422141156.15746-1-liq3ea@163.com>
-	<20190422141156.15746-3-liq3ea@163.com>
+	Mon, 22 Apr 2019 09:27:59 -0700 (PDT)
+To: Li Qiang <liq3ea@gmail.com>
+References: <20190420161446.2274-1-liq3ea@163.com>
+	<20190420161446.2274-2-liq3ea@163.com>
+	<46a216be-0898-2d52-485d-fd07428c8b76@redhat.com>
+	<CAKXe6S+5TTO3Czxsx98rd3d5UvyCnd5gMeWE6RW8b_eeE_b+3Q@mail.gmail.com>
 From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
 Openpgp: id=89C1E78F601EE86C867495CBA2A3FD6EDEADC0DE;
 	url=http://pgp.mit.edu/pks/lookup?op=get&search=0xA2A3FD6EDEADC0DE
-Message-ID: <0033c7fe-f9d5-223d-b5c2-6835041b7281@redhat.com>
-Date: Mon, 22 Apr 2019 18:29:59 +0200
+Message-ID: <6538e063-8710-3ad1-cb88-cda110d57212@redhat.com>
+Date: Mon, 22 Apr 2019 18:27:58 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
 	Thunderbird/60.6.1
 MIME-Version: 1.0
-In-Reply-To: <20190422141156.15746-3-liq3ea@163.com>
+In-Reply-To: <CAKXe6S+5TTO3Czxsx98rd3d5UvyCnd5gMeWE6RW8b_eeE_b+3Q@mail.gmail.com>
 Content-Type: text/plain; charset="UTF-8"
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 	[fuzzy]
-X-Received-From: 209.85.128.67
-Subject: Re: [Qemu-devel] [PATCH v3 2/3] edu: mmio: allow 64-bit access in
- read dispatch
+X-Received-From: 209.85.128.66
+Subject: Re: [Qemu-devel] [PATCH v2 1/3] edu: mmio: set 'max_access_size' to
+ 8
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -88,43 +90,133 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: liq3ea@gmail.com, qemu-devel@nongnu.org
+Cc: Jiri Slaby <jslaby@suse.cz>, Li Qiang <liq3ea@163.com>,
+	Qemu Developers <qemu-devel@nongnu.org>,
+	Paolo Bonzini <pbonzini@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190422162959.SFnepRM_cNYeqX40tNjXYtCWcmSGYBXe8YgJNgt2OzQ@z>
+Message-ID: <20190422162758.qnGdd5u66LS91BkXBgVRBSN-dP4WfLKNkA9eKwX90P4@z>
 
-On 4/22/19 4:11 PM, Li Qiang wrote:
-> The edu spec says when address >= 0x80, the MMIO area can
-> be accessed by 64-bit.
+On 4/22/19 3:17 AM, Li Qiang wrote:
 > 
-> Signed-off-by: Li Qiang <liq3ea@163.com>
+> 
+> Philippe Mathieu-Daudé <philmd@redhat.com <mailto:philmd@redhat.com>> 于
+> 2019年4月21日周日 下午6:28写道：
+> 
+>     Hi Li,
+> 
+>     The patch title is not very descriptive, maybe "allow 64-bit access"
+> 
+> 
+>     On 4/20/19 6:14 PM, Li Qiang wrote:
+>     > The edu spec said, the MMIO area can be accessed by 8 bytes.
+> 
+>     or 64-bit...
+> 
+>     > However currently the 'max_access_size' is not so the MMIO
+>     > access dispatch can only access 4 bytes one time. This patch
+> 
+>     32-bit
+> 
+>     > fixes this to respect the spec.
+>     >
+>     > Notice: here the 'min_access_size' is not a must, I set this
+>     > for completement.
+> 
+>     Which one? valid/impl? I think you can drop this comment from the commit
+>     description.
+> 
+> 
+> Both needed. from memory_access_size, if we has no valid.max_access_size,
+> this function will set it to 4.
+> 
+> static int memory_access_size(MemoryRegion *mr, unsigned l, hwaddr addr)
+> {
+>     unsigned access_size_max = mr->ops->valid.max_access_size;
+> 
+>     /* Regions are assumed to support 1-4 byte accesses unless
+>        otherwise specified.  */
+>     if (access_size_max == 0) {
+>         access_size_max = 4;
+>     }
+>    ...
+> } 
+> 
+> From access_with_adjusted_size, if we has no impl.max_access_size,
+> this function will set it to 4.
+> 
+> ps: I will appreciate if anyone can explain what's the meaning of valid
+> and impl's min/max_access_size
+> and how it affects the behavior.
 
-Reviewed-by: Philippe Mathieu-Daude <philmd@redhat.com>
+"valid" describes the valid access from the bus to the device.
 
-> ---
-> Change since v2:
-> Fix an error per Phillippe's advice
+Indeed in the EDU case those are 4 and 8.
+
+"impl" describes the accesses implemented by the QEMU device model.
+The developper who writes the device is free to choose the accesses he
+will model.
+
+If valid/impl accesses don't match, the function
+access_with_adjusted_size() from memory.c will adjust the bus access to
+the device implementation.
+
+For example, if the device only implements 1 and 2 bytes accesses, with
+a 1-4 valid access, if the CPU executes a 32-bit access, this function
+will do 2x 16-bit access to the device (incrementing the address by 2)
+and returns a 32-bit result.
+
+Similarly, if the CPU does a 8-bit access on a 32-bit impl device,
+access_with_adjusted_size() will execute a single 32-bit access to the
+device, then mask/shift the returned value and returns a 8-bit result to
+the caller.
+
+> Thanks,
+> Li Qiang
 > 
->  hw/misc/edu.c | 6 +++++-
->  1 file changed, 5 insertions(+), 1 deletion(-)
+>     >
+>     > Signed-off-by: Li Qiang <liq3ea@163.com <mailto:liq3ea@163.com>>
+>     > ---
+>     >  hw/misc/edu.c | 9 +++++++++
+>     >  1 file changed, 9 insertions(+)
+>     >
+>     > diff --git a/hw/misc/edu.c b/hw/misc/edu.c
+>     > index 91af452c9e..65fc32b928 100644
+>     > --- a/hw/misc/edu.c
+>     > +++ b/hw/misc/edu.c
+>     > @@ -289,6 +289,15 @@ static const MemoryRegionOps edu_mmio_ops = {
+>     >      .read = edu_mmio_read,
+>     >      .write = edu_mmio_write,
+>     >      .endianness = DEVICE_NATIVE_ENDIAN,
+>     > +    .valid = {
+>     > +        .min_access_size = 4,
 > 
-> diff --git a/hw/misc/edu.c b/hw/misc/edu.c
-> index 65fc32b928..33de05141f 100644
-> --- a/hw/misc/edu.c
-> +++ b/hw/misc/edu.c
-> @@ -185,7 +185,11 @@ static uint64_t edu_mmio_read(void *opaque, hwaddr addr, unsigned size)
->      EduState *edu = opaque;
->      uint64_t val = ~0ULL;
->  
-> -    if (size != 4) {
-> +    if (addr < 0x80 && size != 4) {
-> +        return val;
-> +    }
-> +
-> +    if (addr >= 0x80 && size != 4 && size != 8) {
->          return val;
->      }
->  
+>     Per the spec, this is correct.
+> 
+>     > +        .max_access_size = 8,
+> 
+>     Correct.
+> 
+>     > +    },
+>     > +    .impl = {
+>     > +        .min_access_size = 4,
+> 
+>     OK.
+> 
+>     > +        .max_access_size = 8,
+> 
+>     Correct.
+> 
+>     > +    },
+>     > +
+>     >  };
+>     > 
+>     >  /*
+>     >
+> 
+>     With title/description updated:
+>     Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com
+>     <mailto:philmd@redhat.com>>
 > 
 
