@@ -4,43 +4,43 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-6.7 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
 	FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.0
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EB525C10F11
-	for <qemu-devel@archiver.kernel.org>; Mon, 22 Apr 2019 11:30:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0D4B1C282CE
+	for <qemu-devel@archiver.kernel.org>; Mon, 22 Apr 2019 11:30:51 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id AAA88204EC
-	for <qemu-devel@archiver.kernel.org>; Mon, 22 Apr 2019 11:30:49 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AAA88204EC
+	by mail.kernel.org (Postfix) with ESMTPS id D5E1B204EC
+	for <qemu-devel@archiver.kernel.org>; Mon, 22 Apr 2019 11:30:50 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D5E1B204EC
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:35909 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:35911 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hIX9s-0000LL-QD
-	for qemu-devel@archiver.kernel.org; Mon, 22 Apr 2019 07:30:48 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:39973)
+	id 1hIX9u-0000NX-5L
+	for qemu-devel@archiver.kernel.org; Mon, 22 Apr 2019 07:30:50 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:40264)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pavel.dovgaluk@gmail.com>) id 1hIWza-00084A-BQ
-	for qemu-devel@nongnu.org; Mon, 22 Apr 2019 07:20:13 -0400
+	(envelope-from <pavel.dovgaluk@gmail.com>) id 1hIX0R-0000cc-Rk
+	for qemu-devel@nongnu.org; Mon, 22 Apr 2019 07:21:04 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pavel.dovgaluk@gmail.com>) id 1hIWzZ-0001XI-9R
-	for qemu-devel@nongnu.org; Mon, 22 Apr 2019 07:20:10 -0400
-Received: from mail.ispras.ru ([83.149.199.45]:46910)
+	(envelope-from <pavel.dovgaluk@gmail.com>) id 1hIX0Q-0002AX-0H
+	for qemu-devel@nongnu.org; Mon, 22 Apr 2019 07:21:03 -0400
+Received: from mail.ispras.ru ([83.149.199.45]:47134)
 	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pavel.dovgaluk@gmail.com>) id 1hIWzY-0001X7-UH
-	for qemu-devel@nongnu.org; Mon, 22 Apr 2019 07:20:09 -0400
+	(envelope-from <pavel.dovgaluk@gmail.com>) id 1hIX0O-00028a-0G
+	for qemu-devel@nongnu.org; Mon, 22 Apr 2019 07:21:01 -0400
 Received: from [127.0.1.1] (unknown [85.142.117.226])
-	by mail.ispras.ru (Postfix) with ESMTPSA id 1389C5400A9;
-	Mon, 22 Apr 2019 14:20:08 +0300 (MSK)
+	by mail.ispras.ru (Postfix) with ESMTPSA id 1DF2E5400A9;
+	Mon, 22 Apr 2019 14:20:59 +0300 (MSK)
 From: Pavel Dovgalyuk <pavel.dovgaluk@gmail.com>
 To: qemu-devel@nongnu.org
-Date: Mon, 22 Apr 2019 14:20:07 +0300
+Date: Mon, 22 Apr 2019 14:20:58 +0300
 Message-ID:
- <155593200785.21079.10270664368681344263.stgit@pasha-Precision-3630-Tower>
+ <155593205889.21079.14799791777208991110.stgit@pasha-Precision-3630-Tower>
 In-Reply-To: <155593197705.21079.8238359471765771689.stgit@pasha-Precision-3630-Tower>
 References: <155593197705.21079.8238359471765771689.stgit@pasha-Precision-3630-Tower>
 User-Agent: StGit/0.17.1-dirty
@@ -49,8 +49,7 @@ Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: 7bit
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x
 X-Received-From: 83.149.199.45
-Subject: [Qemu-devel] [PATCH for-4.1 05/24] replay: don't drain/flush bdrv
- queue while RR is working
+Subject: [Qemu-devel] [PATCH for-4.1 14/24] replay: refine replay-time module
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -74,109 +73,76 @@ Cc: kwolf@redhat.com, peter.maydell@linaro.org, war2jordan@live.com,
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190422112007.Nym-pmDXDi7t_Pvb-DnGIghI5X5zRI-gjldT4hukLrw@z>
+Message-ID: <20190422112058.E_LUcsxnjP51k6ZWjhsti1I8LIFwBm9vph6wjwvLj0M@z>
 
 From: Pavel Dovgalyuk <Pavel.Dovgaluk@ispras.ru>
 
-In record/replay mode bdrv queue is controlled by replay mechanism.
-It does not allow saving or loading the snapshots
-when bdrv queue is not empty. Stopping the VM is not blocked by nonempty
-queue, but flushing the queue is still impossible there,
-because it may cause deadlocks in replay mode.
-This patch disables bdrv_drain_all and bdrv_flush_all in
-record/replay mode.
+This patch removes refactoring artifacts from the replay/replay-time.c
 
-Stopping the machine when the IO requests are not finished is needed
-for the debugging. E.g., breakpoint may be set at the specified step,
-and forcing the IO requests to finish may break the determinism
-of the execution.
-
-Signed-off-by: Pavel Dovgalyuk <pavel.dovgaluk@ispras.ru>
-Acked-by: Kevin Wolf <kwolf@redhat.com>
+Signed-off-by: Pavel Dovgalyuk <Pavel.Dovgaluk@ispras.ru>
 ---
- block/io.c |   28 ++++++++++++++++++++++++++++
- cpus.c     |    2 --
- 2 files changed, 28 insertions(+), 2 deletions(-)
+ replay/replay-time.c |   36 ++++++++++++++++--------------------
+ 1 file changed, 16 insertions(+), 20 deletions(-)
 
-diff --git a/block/io.c b/block/io.c
-index dfc153b8d8..fe189a4238 100644
---- a/block/io.c
-+++ b/block/io.c
-@@ -32,6 +32,7 @@
- #include "qemu/cutils.h"
- #include "qapi/error.h"
+diff --git a/replay/replay-time.c b/replay/replay-time.c
+index 0df1693337..60f47b73a7 100644
+--- a/replay/replay-time.c
++++ b/replay/replay-time.c
+@@ -15,18 +15,19 @@
+ #include "replay-internal.h"
  #include "qemu/error-report.h"
-+#include "sysemu/replay.h"
  
- #define NOT_DONE 0x7fffffff /* used while emulated sync operation in progress */
- 
-@@ -538,6 +539,15 @@ void bdrv_drain_all_begin(void)
-         return;
-     }
- 
-+    /*
-+     * bdrv queue is managed by record/replay,
-+     * waiting for finishing the I/O requests may
-+     * be infinite
-+     */
-+    if (replay_events_enabled()) {
-+        return;
-+    }
-+
-     /* AIO_WAIT_WHILE() with a NULL context can only be called from the main
-      * loop AioContext, so make sure we're in the main context. */
-     assert(qemu_get_current_aio_context() == qemu_get_aio_context());
-@@ -566,6 +576,15 @@ void bdrv_drain_all_end(void)
+-int64_t replay_save_clock(ReplayClockKind kind, int64_t clock, int64_t raw_icount)
++int64_t replay_save_clock(ReplayClockKind kind, int64_t clock,
++                          int64_t raw_icount)
  {
-     BlockDriverState *bs = NULL;
+-    if (replay_file) {
+-        g_assert(replay_mutex_locked());
++    g_assert(replay_file);
++    g_assert(replay_mutex_locked());
  
+-        /* Due to the caller's locking requirements we get the icount from it
+-         * instead of using replay_save_instructions().
+-         */
+-        replay_advance_current_step(raw_icount);
+-        replay_put_event(EVENT_CLOCK + kind);
+-        replay_put_qword(clock);
+-    }
 +    /*
-+     * bdrv queue is managed by record/replay,
-+     * waiting for finishing the I/O requests may
-+     * be endless
++     * Due to the caller's locking requirements we get the icount from it
++     * instead of using replay_save_instructions().
 +     */
-+    if (replay_events_enabled()) {
-+        return;
-+    }
-+
-     while ((bs = bdrv_next_all_states(bs))) {
-         AioContext *aio_context = bdrv_get_aio_context(bs);
++    replay_advance_current_step(raw_icount);
++    replay_put_event(EVENT_CLOCK + kind);
++    replay_put_qword(clock);
  
-@@ -1962,6 +1981,15 @@ int bdrv_flush_all(void)
-     BlockDriverState *bs = NULL;
-     int result = 0;
+     return clock;
+ }
+@@ -48,20 +49,15 @@ void replay_read_next_clock(ReplayClockKind kind)
+ /*! Reads next clock event from the input. */
+ int64_t replay_read_clock(ReplayClockKind kind)
+ {
++    int64_t ret;
+     g_assert(replay_file && replay_mutex_locked());
  
-+    /*
-+     * bdrv queue is managed by record/replay,
-+     * creating new flush request for stopping
-+     * the VM may break the determinism
-+     */
-+    if (replay_events_enabled()) {
-+        return result;
-+    }
-+
-     for (bs = bdrv_first(&it); bs; bs = bdrv_next(&it)) {
-         AioContext *aio_context = bdrv_get_aio_context(bs);
-         int ret;
-diff --git a/cpus.c b/cpus.c
-index e83f72b48b..5ff61fbf53 100644
---- a/cpus.c
-+++ b/cpus.c
-@@ -1078,7 +1078,6 @@ static int do_vm_stop(RunState state, bool send_stop)
+     replay_account_executed_instructions();
+ 
+-    if (replay_file) {
+-        int64_t ret;
+-        if (replay_next_event_is(EVENT_CLOCK + kind)) {
+-            replay_read_next_clock(kind);
+-        }
+-        ret = replay_state.cached_clock[kind];
+-
+-        return ret;
++    if (replay_next_event_is(EVENT_CLOCK + kind)) {
++        replay_read_next_clock(kind);
      }
++    ret = replay_state.cached_clock[kind];
  
-     bdrv_drain_all();
--    replay_disable_events();
-     ret = bdrv_flush_all();
- 
-     return ret;
-@@ -2150,7 +2149,6 @@ int vm_prepare_start(void)
-     /* We are sending this now, but the CPUs will be resumed shortly later */
-     qapi_event_send_resume();
- 
--    replay_enable_events();
-     cpu_enable_ticks();
-     runstate_set(RUN_STATE_RUNNING);
-     vm_state_notify(1, RUN_STATE_RUNNING);
+-    error_report("REPLAY INTERNAL ERROR %d", __LINE__);
+-    exit(1);
++    return ret;
+ }
 
 
