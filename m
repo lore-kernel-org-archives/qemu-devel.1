@@ -1,25 +1,22 @@
-Received: from eggs.gnu.org ([209.51.188.92]:59068)
+Received: from eggs.gnu.org ([209.51.188.92]:35987)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1hIYgG-000570-AV
-	for qemu-devel@nongnu.org; Mon, 22 Apr 2019 09:08:21 -0400
+	(envelope-from <eblake@redhat.com>) id 1hIZ7w-00041H-Vw
+	for qemu-devel@nongnu.org; Mon, 22 Apr 2019 09:36:57 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1hIYgE-0002LK-Tr
-	for qemu-devel@nongnu.org; Mon, 22 Apr 2019 09:08:20 -0400
-Resent-Message-Id: <E1hIYgE-0002LK-Tr@eggs.gnu.org>
-Received: from sender-of-o52.zoho.com ([135.84.80.217]:21404)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
-	id 1hIYgE-0002Jg-Ls
-	for qemu-devel@nongnu.org; Mon, 22 Apr 2019 09:08:18 -0400
-In-Reply-To: <20190422123411.5178-1-nick.hudson@gmx.co.uk>
-Message-ID: <155593750659.24.15823809012178809432@c2072b67cc0c>
-Reply-To: <qemu-devel@nongnu.org>
+	(envelope-from <eblake@redhat.com>) id 1hIZ7v-0005Mu-UZ
+	for qemu-devel@nongnu.org; Mon, 22 Apr 2019 09:36:56 -0400
+References: <20190419140557.102725-1-vsementsov@virtuozzo.com>
+	<20190419140557.102725-2-vsementsov@virtuozzo.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <0eaf7740-a524-1ef4-27f7-7a0bf0be3222@redhat.com>
+Date: Mon, 22 Apr 2019 08:36:37 -0500
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Mon, 22 Apr 2019 05:51:48 -0700 (PDT)
-Subject: Re: [Qemu-devel] [PATCH v2 0/2] HPPA fixes for NetBSD/hppa emulation
+In-Reply-To: <20190419140557.102725-2-vsementsov@virtuozzo.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="MJaTfULaTlGZFCQw2jQCLiBJdAl5qvxqv"
+Subject: Re: [Qemu-devel] [PATCH v3 1/3] block/qcow2-refcount: add
+ trace-point to qcow2_process_discards
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,47 +25,106 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: nick.hudson@gmx.co.uk
-Cc: fam@euphon.net, rth@twiddle.net, skrll@netbsd.org, kamil@netbsd.org, qemu-devel@nongnu.org
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org
+Cc: kwolf@redhat.com, mreitz@redhat.com, fam@euphon.net, stefanha@redhat.com, den@virtuozzo.com
 
-UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDE5MDQyMjEyMzQxMS41MTc4
-LTEtbmljay5odWRzb25AZ214LmNvLnVrLwoKCgpIaSwKClRoaXMgc2VyaWVzIHNlZW1zIHRvIGhh
-dmUgc29tZSBjb2Rpbmcgc3R5bGUgcHJvYmxlbXMuIFNlZSBvdXRwdXQgYmVsb3cgZm9yCm1vcmUg
-aW5mb3JtYXRpb246CgpUeXBlOiBzZXJpZXMKTWVzc2FnZS1pZDogMjAxOTA0MjIxMjM0MTEuNTE3
-OC0xLW5pY2suaHVkc29uQGdteC5jby51awpTdWJqZWN0OiBbUWVtdS1kZXZlbF0gW1BBVENIIHYy
-IDAvMl0gSFBQQSBmaXhlcyBmb3IgTmV0QlNEL2hwcGEgZW11bGF0aW9uCgo9PT0gVEVTVCBTQ1JJ
-UFQgQkVHSU4gPT09CiMhL2Jpbi9iYXNoCmdpdCByZXYtcGFyc2UgYmFzZSA+IC9kZXYvbnVsbCB8
-fCBleGl0IDAKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYucmVuYW1lbGltaXQgMApnaXQgY29uZmln
-IC0tbG9jYWwgZGlmZi5yZW5hbWVzIFRydWUKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYuYWxnb3Jp
-dGhtIGhpc3RvZ3JhbQouL3NjcmlwdHMvY2hlY2twYXRjaC5wbCAtLW1haWxiYWNrIGJhc2UuLgo9
-PT0gVEVTVCBTQ1JJUFQgRU5EID09PQoKVXBkYXRpbmcgM2M4Y2Y1YTljMjFmZjg3ODIxNjRkMWRl
-ZjdmNDRiZDg4ODcxMzM4NApGcm9tIGh0dHBzOi8vZ2l0aHViLmNvbS9wYXRjaGV3LXByb2plY3Qv
-cWVtdQogKiBbbmV3IHRhZ10gICAgICAgICAgICAgICBwYXRjaGV3LzIwMTkwNDIyMTIzNDExLjUx
-NzgtMS1uaWNrLmh1ZHNvbkBnbXguY28udWsgLT4gcGF0Y2hldy8yMDE5MDQyMjEyMzQxMS41MTc4
-LTEtbmljay5odWRzb25AZ214LmNvLnVrClN3aXRjaGVkIHRvIGEgbmV3IGJyYW5jaCAndGVzdCcK
-YTZiNDFhNjVmNCBBbHdheXMgcmV0dXJuIEVYQ1BfRE1BUiBmb3IgcHJvdGVjdGlvbiBpZCB0cmFw
-IGFzIEVYQ1BfRE1QIGlzIGNvbnNpZGVyZWQgbGVnYWN5Lgo1ODk0ZDYxNjQxIEltcGxlbWVudCB0
-aGUgcGN4bCBhbmQgcGN4bDIgRmFzdCBUTEIgSW5zZXJ0IGluc3RydWN0aW9ucyBhcyB1c2VkIGJ5
-IE5ldEJTRCAoYW5kIE9wZW5CU0QpCgo9PT0gT1VUUFVUIEJFR0lOID09PQoxLzIgQ2hlY2tpbmcg
-Y29tbWl0IDU4OTRkNjE2NDEwOSAoSW1wbGVtZW50IHRoZSBwY3hsIGFuZCBwY3hsMiBGYXN0IFRM
-QiBJbnNlcnQgaW5zdHJ1Y3Rpb25zIGFzIHVzZWQgYnkgTmV0QlNEIChhbmQgT3BlbkJTRCkpCldB
-Uk5JTkc6IEJsb2NrIGNvbW1lbnRzIHVzZSBhIGxlYWRpbmcgLyogb24gYSBzZXBhcmF0ZSBsaW5l
-CiMzNjogRklMRTogdGFyZ2V0L2hwcGEvdHJhbnNsYXRlLmM6MjUyMToKKy8qIEltcGxlbWVudCB0
-aGUgcGN4bCBhbmQgcGN4bDIgRmFzdCBUTEIgSW5zZXJ0IGluc3RydWN0aW9ucy4KCldBUk5JTkc6
-IEJsb2NrIGNvbW1lbnRzIHVzZSBhIHRyYWlsaW5nICovIG9uIGEgc2VwYXJhdGUgbGluZQojMzk6
-IEZJTEU6IHRhcmdldC9ocHBhL3RyYW5zbGF0ZS5jOjI1MjQ6CisgKiAgICAgcGFnZSAxMy05ICgx
-OTUvMjA2KSAqLwoKRVJST1I6IGRvIG5vdCB1c2UgQzk5IC8vIGNvbW1lbnRzCiM1MTogRklMRTog
-dGFyZ2V0L2hwcGEvdHJhbnNsYXRlLmM6MjUzNjoKKy8vICAgIGlmIChub3QgKHBjeCBvciBwY3hs
-MikpCgpFUlJPUjogZG8gbm90IHVzZSBDOTkgLy8gY29tbWVudHMKIzUyOiBGSUxFOiB0YXJnZXQv
-aHBwYS90cmFuc2xhdGUuYzoyNTM3OgorLy8gICAgICAgIHJldHVybiBnZW5faWxsZWdhbChjdHgp
-OwoKdG90YWw6IDIgZXJyb3JzLCAyIHdhcm5pbmdzLCA2NyBsaW5lcyBjaGVja2VkCgpQYXRjaCAx
-LzIgaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVy
-cm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBtYWludGFpbmVyLCBz
-ZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KCjIvMiBDaGVja2luZyBjb21taXQgYTZiNDFh
-NjVmNGQzIChBbHdheXMgcmV0dXJuIEVYQ1BfRE1BUiBmb3IgcHJvdGVjdGlvbiBpZCB0cmFwIGFz
-IEVYQ1BfRE1QIGlzIGNvbnNpZGVyZWQgbGVnYWN5LikKPT09IE9VVFBVVCBFTkQgPT09CgpUZXN0
-IGNvbW1hbmQgZXhpdGVkIHdpdGggY29kZTogMQoKClRoZSBmdWxsIGxvZyBpcyBhdmFpbGFibGUg
-YXQKaHR0cDovL3BhdGNoZXcub3JnL2xvZ3MvMjAxOTA0MjIxMjM0MTEuNTE3OC0xLW5pY2suaHVk
-c29uQGdteC5jby51ay90ZXN0aW5nLmNoZWNrcGF0Y2gvP3R5cGU9bWVzc2FnZS4KLS0tCkVtYWls
-IGdlbmVyYXRlZCBhdXRvbWF0aWNhbGx5IGJ5IFBhdGNoZXcgW2h0dHBzOi8vcGF0Y2hldy5vcmcv
-XS4KUGxlYXNlIHNlbmQgeW91ciBmZWVkYmFjayB0byBwYXRjaGV3LWRldmVsQHJlZGhhdC5jb20=
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--MJaTfULaTlGZFCQw2jQCLiBJdAl5qvxqv
+From: Eric Blake <eblake@redhat.com>
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
+ qemu-devel@nongnu.org, qemu-block@nongnu.org
+Cc: kwolf@redhat.com, mreitz@redhat.com, fam@euphon.net, stefanha@redhat.com,
+ den@virtuozzo.com
+Message-ID: <0eaf7740-a524-1ef4-27f7-7a0bf0be3222@redhat.com>
+Subject: Re: [PATCH v3 1/3] block/qcow2-refcount: add trace-point to
+ qcow2_process_discards
+References: <20190419140557.102725-1-vsementsov@virtuozzo.com>
+ <20190419140557.102725-2-vsementsov@virtuozzo.com>
+In-Reply-To: <20190419140557.102725-2-vsementsov@virtuozzo.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+
+On 4/19/19 9:05 AM, Vladimir Sementsov-Ogievskiy wrote:
+> Let's at least trace ignored failure.
+>=20
+> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+> ---
+>  block/qcow2-refcount.c | 7 ++++++-
+>  block/trace-events     | 3 +++
+>  2 files changed, 9 insertions(+), 1 deletion(-)
+
+Reviewed-by: Eric Blake <eblake@redhat.com>
+
+>=20
+> diff --git a/block/qcow2-refcount.c b/block/qcow2-refcount.c
+> index e0fe322500..60284bcaac 100644
+> --- a/block/qcow2-refcount.c
+> +++ b/block/qcow2-refcount.c
+> @@ -30,6 +30,7 @@
+>  #include "qemu/range.h"
+>  #include "qemu/bswap.h"
+>  #include "qemu/cutils.h"
+> +#include "trace.h"
+> =20
+>  static int64_t alloc_clusters_noref(BlockDriverState *bs, uint64_t siz=
+e,
+>                                      uint64_t max);
+> @@ -738,7 +739,11 @@ void qcow2_process_discards(BlockDriverState *bs, =
+int ret)
+> =20
+>          /* Discard is optional, ignore the return value */
+>          if (ret >=3D 0) {
+> -            bdrv_pdiscard(bs->file, d->offset, d->bytes);
+> +            int r2 =3D bdrv_pdiscard(bs->file, d->offset, d->bytes);
+> +            if (r2 < 0) {
+> +                trace_qcow2_process_discards_failed_region(d->offset, =
+d->bytes,
+> +                                                           r2);
+> +            }
+>          }
+> =20
+>          g_free(d);
+> diff --git a/block/trace-events b/block/trace-events
+> index 7335a42540..ea508f637e 100644
+> --- a/block/trace-events
+> +++ b/block/trace-events
+> @@ -91,6 +91,9 @@ qcow2_cache_get_done(void *co, int c, int i) "co %p i=
+s_l2_cache %d index %d"
+>  qcow2_cache_flush(void *co, int c) "co %p is_l2_cache %d"
+>  qcow2_cache_entry_flush(void *co, int c, int i) "co %p is_l2_cache %d =
+index %d"
+> =20
+> +# qcow2-refcount.c
+> +qcow2_process_discards_failed_region(uint64_t offset, uint64_t bytes, =
+int ret) "offset 0x%" PRIx64 " bytes 0x%" PRIx64 " ret %d"
+> +
+>  # qed-l2-cache.c
+>  qed_alloc_l2_cache_entry(void *l2_cache, void *entry) "l2_cache %p ent=
+ry %p"
+>  qed_unref_l2_cache_entry(void *entry, int ref) "entry %p ref %d"
+>=20
+
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3226
+Virtualization:  qemu.org | libvirt.org
+
+
+--MJaTfULaTlGZFCQw2jQCLiBJdAl5qvxqv
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAly9w2UACgkQp6FrSiUn
+Q2q7Iwf/fWLturOvOTdkP+eLJV/SyPQbpiXUfVtBltkOIyZDadNpwCue4RNO838i
+OlCsvNjXpZhaMaJjBdVdnleQ+c1n+NVQnUEPfnOyd0+VW8paxaKkmjoXsZ4j1DAe
+vTo6vsVmSB9Xiw9ZdzIra/BH1HWsD1C1fb6r8NP/iLzkgZYX9Xs2LJeR8acP+Una
+nx/SuvOhyWV8baOiYsPyet88E7xTVu+8YTqXxCwCBPRXdBr/L3Y54usCgwZ5tdzR
+jVAGblbPGbtVXH4R7b5btJBsBwm475eZlwtZ32ONwNJPUwB3SI2Qf5atOEfV12xy
++os7K3aKkVspuMVyt10Fi0XmMLk80w==
+=FUdT
+-----END PGP SIGNATURE-----
+
+--MJaTfULaTlGZFCQw2jQCLiBJdAl5qvxqv--
