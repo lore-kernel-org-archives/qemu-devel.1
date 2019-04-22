@@ -1,29 +1,30 @@
-Received: from eggs.gnu.org ([209.51.188.92]:41251)
+Received: from eggs.gnu.org ([209.51.188.92]:41152)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1hIbuY-0003Ac-Kw
-	for qemu-devel@nongnu.org; Mon, 22 Apr 2019 12:35:19 -0400
+	(envelope-from <philmd@redhat.com>) id 1hIbua-00037f-TR
+	for qemu-devel@nongnu.org; Mon, 22 Apr 2019 12:35:21 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1hIboj-0007ZC-Q5
-	for qemu-devel@nongnu.org; Mon, 22 Apr 2019 12:29:18 -0400
-Received: from mail-wr1-f67.google.com ([209.85.221.67]:36622)
+	(envelope-from <philmd@redhat.com>) id 1hIbnd-00072O-4s
+	for qemu-devel@nongnu.org; Mon, 22 Apr 2019 12:28:11 -0400
+Received: from mail-wm1-f66.google.com ([209.85.128.66]:39597)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1hIboj-0007Yp-K9
-	for qemu-devel@nongnu.org; Mon, 22 Apr 2019 12:29:17 -0400
-Received: by mail-wr1-f67.google.com with SMTP id b1so5050479wru.3
-	for <qemu-devel@nongnu.org>; Mon, 22 Apr 2019 09:29:17 -0700 (PDT)
+	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1hIbnX-0006yj-Ej
+	for qemu-devel@nongnu.org; Mon, 22 Apr 2019 12:28:05 -0400
+Received: by mail-wm1-f66.google.com with SMTP id n25so15052690wmk.4
+	for <qemu-devel@nongnu.org>; Mon, 22 Apr 2019 09:28:02 -0700 (PDT)
 References: <20190420161446.2274-1-liq3ea@163.com>
-	<20190420161446.2274-4-liq3ea@163.com>
-	<4eb444fe-7e45-1072-770b-17f0db493b6d@redhat.com>
-	<CAKXe6SKKkao0gnGdvDWXbs9AG6uXLkeMybLH-7AP2-CiP7EEdQ@mail.gmail.com>
+	<20190420161446.2274-2-liq3ea@163.com>
+	<46a216be-0898-2d52-485d-fd07428c8b76@redhat.com>
+	<CAKXe6S+5TTO3Czxsx98rd3d5UvyCnd5gMeWE6RW8b_eeE_b+3Q@mail.gmail.com>
 From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Message-ID: <c82b3a97-b4ad-b202-3676-67a6198951d1@redhat.com>
-Date: Mon, 22 Apr 2019 18:29:14 +0200
+Message-ID: <6538e063-8710-3ad1-cb88-cda110d57212@redhat.com>
+Date: Mon, 22 Apr 2019 18:27:58 +0200
 MIME-Version: 1.0
-In-Reply-To: <CAKXe6SKKkao0gnGdvDWXbs9AG6uXLkeMybLH-7AP2-CiP7EEdQ@mail.gmail.com>
+In-Reply-To: <CAKXe6S+5TTO3Czxsx98rd3d5UvyCnd5gMeWE6RW8b_eeE_b+3Q@mail.gmail.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH v2 3/3] edu: uses uint64_t in dma operation
+Subject: Re: [Qemu-devel] [PATCH v2 1/3] edu: mmio: set 'max_access_size' to
+ 8
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,107 +36,124 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: Li Qiang <liq3ea@gmail.com>
 Cc: Li Qiang <liq3ea@163.com>, Jiri Slaby <jslaby@suse.cz>, Paolo Bonzini <pbonzini@redhat.com>, Qemu Developers <qemu-devel@nongnu.org>
 
-On 4/22/19 3:21 AM, Li Qiang wrote:
+On 4/22/19 3:17 AM, Li Qiang wrote:
 > 
 > 
 > Philippe Mathieu-Daudé <philmd@redhat.com <mailto:philmd@redhat.com>> 于
-> 2019年4月21日周日 下午6:32写道：
+> 2019年4月21日周日 下午6:28写道：
+> 
+>     Hi Li,
+> 
+>     The patch title is not very descriptive, maybe "allow 64-bit access"
+> 
 > 
 >     On 4/20/19 6:14 PM, Li Qiang wrote:
->     > The dma related variable is dma_addr_t, it is uint64_t in
->     > x64 platform. Change these usage from uint32_to uint64_t to
->     > avoid trancation.
+>     > The edu spec said, the MMIO area can be accessed by 8 bytes.
 > 
->     "to avoid address truncation"?
+>     or 64-bit...
+> 
+>     > However currently the 'max_access_size' is not so the MMIO
+>     > access dispatch can only access 4 bytes one time. This patch
+> 
+>     32-bit
+> 
+>     > fixes this to respect the spec.
+>     >
+>     > Notice: here the 'min_access_size' is not a must, I set this
+>     > for completement.
+> 
+>     Which one? valid/impl? I think you can drop this comment from the commit
+>     description.
 > 
 > 
+> Both needed. from memory_access_size, if we has no valid.max_access_size,
+> this function will set it to 4.
 > 
-> The dma.dst/src/cnt..is from guest and is 64-bits. But in 'edu_dma_timer',
-> it is assigned to uint32_t, If it is 0xffffffff 00000000, it will be ok
-> by the check
-> but it is of course not allowed. 
+> static int memory_access_size(MemoryRegion *mr, unsigned l, hwaddr addr)
+> {
+>     unsigned access_size_max = mr->ops->valid.max_access_size;
 > 
-> Though this is just an edu device, I think we should avoid this. 
+>     /* Regions are assumed to support 1-4 byte accesses unless
+>        otherwise specified.  */
+>     if (access_size_max == 0) {
+>         access_size_max = 4;
+>     }
+>    ...
+> } 
+> 
+> From access_with_adjusted_size, if we has no impl.max_access_size,
+> this function will set it to 4.
+> 
+> ps: I will appreciate if anyone can explain what's the meaning of valid
+> and impl's min/max_access_size
+> and how it affects the behavior.
 
-I agree with you, I was just trying to correct your English ;)
+"valid" describes the valid access from the bus to the device.
+
+Indeed in the EDU case those are 4 and 8.
+
+"impl" describes the accesses implemented by the QEMU device model.
+The developper who writes the device is free to choose the accesses he
+will model.
+
+If valid/impl accesses don't match, the function
+access_with_adjusted_size() from memory.c will adjust the bus access to
+the device implementation.
+
+For example, if the device only implements 1 and 2 bytes accesses, with
+a 1-4 valid access, if the CPU executes a 32-bit access, this function
+will do 2x 16-bit access to the device (incrementing the address by 2)
+and returns a 32-bit result.
+
+Similarly, if the CPU does a 8-bit access on a 32-bit impl device,
+access_with_adjusted_size() will execute a single 32-bit access to the
+device, then mask/shift the returned value and returns a 8-bit result to
+the caller.
 
 > Thanks,
 > Li Qiang
 > 
->  
-> 
 >     >
 >     > Signed-off-by: Li Qiang <liq3ea@163.com <mailto:liq3ea@163.com>>
 >     > ---
->     > Change since v1:
->     > Fix format compile error on Windows
->     >
->     >  hw/misc/edu.c | 15 ++++++++-------
->     >  1 file changed, 8 insertions(+), 7 deletions(-)
+>     >  hw/misc/edu.c | 9 +++++++++
+>     >  1 file changed, 9 insertions(+)
 >     >
 >     > diff --git a/hw/misc/edu.c b/hw/misc/edu.c
->     > index 4018dddcb8..f4a6d5f1c5 100644
+>     > index 91af452c9e..65fc32b928 100644
 >     > --- a/hw/misc/edu.c
 >     > +++ b/hw/misc/edu.c
->     > @@ -98,23 +98,24 @@ static void edu_lower_irq(EduState *edu,
->     uint32_t val)
->     >      }
->     >  }
->     > 
->     > -static bool within(uint32_t addr, uint32_t start, uint32_t end)
->     > +static bool within(uint64_t addr, uint64_t start, uint64_t end)
+>     > @@ -289,6 +289,15 @@ static const MemoryRegionOps edu_mmio_ops = {
+>     >      .read = edu_mmio_read,
+>     >      .write = edu_mmio_write,
+>     >      .endianness = DEVICE_NATIVE_ENDIAN,
+>     > +    .valid = {
+>     > +        .min_access_size = 4,
+> 
+>     Per the spec, this is correct.
+> 
+>     > +        .max_access_size = 8,
+> 
+>     Correct.
+> 
+>     > +    },
+>     > +    .impl = {
+>     > +        .min_access_size = 4,
 > 
 >     OK.
 > 
->     >  {
->     >      return start <= addr && addr < end;
->     >  }
+>     > +        .max_access_size = 8,
+> 
+>     Correct.
+> 
+>     > +    },
+>     > +
+>     >  };
 >     > 
->     > -static void edu_check_range(uint32_t addr, uint32_t size1,
->     uint32_t start,
->     > +static void edu_check_range(uint64_t addr, uint64_t size1,
->     uint64_t start,
->     >                  uint32_t size2)
+>     >  /*
+>     >
 > 
->     OK for addr. MMIO range is 1MiB so you can keep uint32_t for
->     size1/size2. Up to the maintainer (personally I'd prefer keep u32).
-> 
+>     With title/description updated:
 >     Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com
 >     <mailto:philmd@redhat.com>>
-> 
->     >  {
->     > -    uint32_t end1 = addr + size1;
->     > -    uint32_t end2 = start + size2;
->     > +    uint64_t end1 = addr + size1;
->     > +    uint64_t end2 = start + size2;
->     > 
->     >      if (within(addr, start, end2) &&
->     >              end1 > addr && within(end1, start, end2)) {
->     >          return;
->     >      }
->     > 
->     > -    hw_error("EDU: DMA range 0x%.8x-0x%.8x out of bounds
->     (0x%.8x-0x%.8x)!",
->     > +    hw_error("EDU: DMA range 0x%016"PRIx64"-0x%016"PRIx64
->     > +             " out of bounds (0x%016"PRIx64"-0x%016"PRIx64")!",
->     >              addr, end1 - 1, start, end2 - 1);
->     >  }
->     > 
->     > @@ -139,13 +140,13 @@ static void edu_dma_timer(void *opaque)
->     >      }
->     > 
->     >      if (EDU_DMA_DIR(edu->dma.cmd) == EDU_DMA_FROM_PCI) {
->     > -        uint32_t dst = edu->dma.dst;
->     > +        uint64_t dst = edu->dma.dst;
->     >          edu_check_range(dst, edu->dma.cnt, DMA_START, DMA_SIZE);
->     >          dst -= DMA_START;
->     >          pci_dma_read(&edu->pdev, edu_clamp_addr(edu, edu->dma.src),
->     >                  edu->dma_buf + dst, edu->dma.cnt);
->     >      } else {
->     > -        uint32_t src = edu->dma.src;
->     > +        uint64_t src = edu->dma.src;
->     >          edu_check_range(src, edu->dma.cnt, DMA_START, DMA_SIZE);
->     >          src -= DMA_START;
->     >          pci_dma_write(&edu->pdev, edu_clamp_addr(edu, edu->dma.dst),
->     >
 > 
