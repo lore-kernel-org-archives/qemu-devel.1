@@ -1,28 +1,34 @@
-Received: from eggs.gnu.org ([209.51.188.92]:45144)
+Received: from eggs.gnu.org ([209.51.188.92]:35770)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jgg@ziepe.ca>) id 1hIcDp-00019C-1f
-	for qemu-devel@nongnu.org; Mon, 22 Apr 2019 12:55:16 -0400
+	(envelope-from <dan.streetman@canonical.com>) id 1hIfPs-0005wn-V2
+	for qemu-devel@nongnu.org; Mon, 22 Apr 2019 16:19:54 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jgg@ziepe.ca>) id 1hIc4R-0000eN-Mj
-	for qemu-devel@nongnu.org; Mon, 22 Apr 2019 12:45:32 -0400
-Received: from mail-qt1-x844.google.com ([2607:f8b0:4864:20::844]:44099)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <jgg@ziepe.ca>) id 1hIc4R-0000cQ-Dt
-	for qemu-devel@nongnu.org; Mon, 22 Apr 2019 12:45:31 -0400
-Received: by mail-qt1-x844.google.com with SMTP id s10so2003947qtc.11
-	for <qemu-devel@nongnu.org>; Mon, 22 Apr 2019 09:45:30 -0700 (PDT)
-Date: Mon, 22 Apr 2019 13:45:27 -0300
-From: Jason Gunthorpe <jgg@ziepe.ca>
-Message-ID: <20190422164527.GF21588@ziepe.ca>
-References: <20190411110157.14252-1-yuval.shaia@oracle.com>
-	<20190411190215.2163572e.cohuck@redhat.com>
-	<20190415103546.GA6854@lap1>
-	<e73e03c2-ea2b-6ffc-cd23-e8e44d42ce80@suse.de>
+	(envelope-from <dan.streetman@canonical.com>) id 1hIfLE-0006TY-Lt
+	for qemu-devel@nongnu.org; Mon, 22 Apr 2019 16:15:05 -0400
+Received: from youngberry.canonical.com ([91.189.89.112]:53848)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <dan.streetman@canonical.com>)
+	id 1hIfLE-0006So-FO
+	for qemu-devel@nongnu.org; Mon, 22 Apr 2019 16:15:04 -0400
+Received: from mail-it1-f200.google.com ([209.85.166.200])
+	by youngberry.canonical.com with esmtps
+	(TLS1.0:RSA_AES_128_CBC_SHA1:16) (Exim 4.76)
+	(envelope-from <dan.streetman@canonical.com>) id 1hIfLC-0004Ta-Tb
+	for qemu-devel@nongnu.org; Mon, 22 Apr 2019 20:15:03 +0000
+Received: by mail-it1-f200.google.com with SMTP id m128so13600852itm.6
+	for <qemu-devel@nongnu.org>; Mon, 22 Apr 2019 13:15:02 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <e73e03c2-ea2b-6ffc-cd23-e8e44d42ce80@suse.de>
-Subject: Re: [Qemu-devel] [RFC 0/3] VirtIO RDMA
+References: <20190416184624.15397-1-dan.streetman@canonical.com>
+	<20190416184624.15397-2-dan.streetman@canonical.com>
+	<9f3dac2a-15fe-8463-6aee-f6916b8d5e1c@redhat.com>
+In-Reply-To: <9f3dac2a-15fe-8463-6aee-f6916b8d5e1c@redhat.com>
+From: Dan Streetman <dan.streetman@canonical.com>
+Date: Mon, 22 Apr 2019 16:14:25 -0400
+Message-ID: <CAOZ2QJO5-V4xydkVxKTC-1qnhqhUEMck04D=6+PFkhP9Z9+vmA@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH 1/2] add VirtIONet vhost_stopped flag to
+ prevent multiple stops
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,74 +37,111 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Hannes Reinecke <hare@suse.de>
-Cc: Yuval Shaia <yuval.shaia@oracle.com>, Cornelia Huck <cohuck@redhat.com>, mst@redhat.com, linux-rdma@vger.kernel.org, qemu-devel@nongnu.org, virtualization@lists.linux-foundation.org
+To: Jason Wang <jasowang@redhat.com>
+Cc: "Michael S. Tsirkin" <mst@redhat.com>, qemu-devel@nongnu.org, qemu-stable@nongnu.org
 
-On Fri, Apr 19, 2019 at 01:16:06PM +0200, Hannes Reinecke wrote:
-> On 4/15/19 12:35 PM, Yuval Shaia wrote:
-> > On Thu, Apr 11, 2019 at 07:02:15PM +0200, Cornelia Huck wrote:
-> > > On Thu, 11 Apr 2019 14:01:54 +0300
-> > > Yuval Shaia <yuval.shaia@oracle.com> wrote:
-> > > 
-> > > > Data center backends use more and more RDMA or RoCE devices and more and
-> > > > more software runs in virtualized environment.
-> > > > There is a need for a standard to enable RDMA/RoCE on Virtual Machines.
-> > > > 
-> > > > Virtio is the optimal solution since is the de-facto para-virtualizaton
-> > > > technology and also because the Virtio specification
-> > > > allows Hardware Vendors to support Virtio protocol natively in order to
-> > > > achieve bare metal performance.
-> > > > 
-> > > > This RFC is an effort to addresses challenges in defining the RDMA/RoCE
-> > > > Virtio Specification and a look forward on possible implementation
-> > > > techniques.
-> > > > 
-> > > > Open issues/Todo list:
-> > > > List is huge, this is only start point of the project.
-> > > > Anyway, here is one example of item in the list:
-> > > > - Multi VirtQ: Every QP has two rings and every CQ has one. This means that
-> > > >    in order to support for example 32K QPs we will need 64K VirtQ. Not sure
-> > > >    that this is reasonable so one option is to have one for all and
-> > > >    multiplex the traffic on it. This is not good approach as by design it
-> > > >    introducing an optional starvation. Another approach would be multi
-> > > >    queues and round-robin (for example) between them.
-> > > > 
-> Typically there will be a one-to-one mapping between QPs and CPUs (on the
-> guest). 
+On Sun, Apr 21, 2019 at 10:50 PM Jason Wang <jasowang@redhat.com> wrote:
+>
+>
+> On 2019/4/17 =E4=B8=8A=E5=8D=882:46, Dan Streetman wrote:
+> > From: Dan Streetman <ddstreet@canonical.com>
+> >
+> > Buglink: https://launchpad.net/bugs/1823458
+> >
+> > There is a race condition when using the vhost-user driver, between a g=
+uest
+> > shutdown and the vhost-user interface being closed.  This is explained =
+in
+> > more detail at the bug link above; the short explanation is the vhost-u=
+ser
+> > device can be closed while the main thread is in the middle of stopping
+> > the vhost_net.  In this case, the main thread handling shutdown will
+> > enter virtio_net_vhost_status() and move into the n->vhost_started (els=
+e)
+> > block, and call vhost_net_stop(); while it is running that function,
+> > another thread is notified that the vhost-user device has been closed,
+> > and (indirectly) calls into virtio_net_vhost_status() also.
+>
+>
+> I think we need figure out why there are multiple vhost_net_stop() calls
+> simultaneously. E.g vhost-user register fd handlers like:
+>
+>          qemu_chr_fe_set_handlers(&s->chr, NULL, NULL,
+>                                   net_vhost_user_event, NULL, nc0->name,
+> NULL,
+>                                   true);
+>
+> which uses default main context, so it should only be called only in
+> main thread.
 
-Er we are really overloading words here.. The typical expectation is
-that a 'RDMA QP' will have thousands and thousands of instances on a
-system.
+net_vhost_user_event() schedules chr_closed_bh() to do its bottom half
+work; does aio_bh_schedule_oneshot() execute its events from the main
+thread?
 
-Most likely I think mapping 1:1 a virtio queue to a 'RDMA QP, CQ, SRQ,
-etc' is a bad idea...
+For reference, the call chain is:
 
-> However, I'm still curious about the overall intent of this driver. Where
-> would the I/O be routed _to_ ?
-> It's nice that we have a virtualized driver, but this driver is
-> intended to do I/O (even if it doesn't _do_ any I/O ATM :-)
-> And this I/O needs to be send to (and possibly received from)
-> something.
+chr_closed_bh()
+  qmp_set_link()
+    nc->info->link_status_changed() -> virtio_net_set_link_status()
+      virtio_net_set_status()
+        virtio_net_vhost_status()
 
-As yet I have never heard of public RDMA HW that could be coupled to a
-virtio scheme. All HW defines their own queue ring buffer formats
-without standardization.
-
-> If so, wouldn't it be more efficient to use vfio, either by using SR-IOV or
-> by using virtio-mdev?
-
-Using PCI pass through means the guest has to have drivers for the
-device. A generic, perhaps slower, virtio path has some appeal in some
-cases.
-
-> If so, how would we route the I/O from one guest to the other?
-> Shared memory? Implementing a full-blown RDMA switch in qemu?
-
-RoCE rides over the existing ethernet switching layer quemu plugs
-into
-
-So if you built a shared memory, local host only, virtio-rdma then
-you'd probably run through the ethernet switch upon connection
-establishment to match the participating VMs.
-
-Jason
+>
+> Thanks
+>
+>
+> >   Since the
+> > vhost_net status hasn't yet changed, the second thread also enters
+> > the n->vhost_started block, and also calls vhost_net_stop().  This
+> > causes problems for the second thread when it tries to stop the network
+> > that's already been stopped.
+> >
+> > This adds a flag to the struct that's atomically set to prevent more th=
+an
+> > one thread from calling vhost_net_stop().  The atomic_fetch_inc() is li=
+kely
+> > overkill and probably could be done with a simple check-and-set, but
+> > since it's a race condition there would still be a (very, very) small
+> > window without using an atomic to set it.
+> >
+> > Signed-off-by: Dan Streetman <ddstreet@canonical.com>
+> > ---
+> >   hw/net/virtio-net.c            | 3 ++-
+> >   include/hw/virtio/virtio-net.h | 1 +
+> >   2 files changed, 3 insertions(+), 1 deletion(-)
+> >
+> > diff --git a/hw/net/virtio-net.c b/hw/net/virtio-net.c
+> > index ffe0872fff..d36f50d5dd 100644
+> > --- a/hw/net/virtio-net.c
+> > +++ b/hw/net/virtio-net.c
+> > @@ -13,6 +13,7 @@
+> >
+> >   #include "qemu/osdep.h"
+> >   #include "qemu/iov.h"
+> > +#include "qemu/atomic.h"
+> >   #include "hw/virtio/virtio.h"
+> >   #include "net/net.h"
+> >   #include "net/checksum.h"
+> > @@ -240,7 +241,7 @@ static void virtio_net_vhost_status(VirtIONet *n, u=
+int8_t status)
+> >                            "falling back on userspace virtio", -r);
+> >               n->vhost_started =3D 0;
+> >           }
+> > -    } else {
+> > +    } else if (atomic_fetch_inc(&n->vhost_stopped) =3D=3D 0) {
+> >           vhost_net_stop(vdev, n->nic->ncs, queues);
+> >           n->vhost_started =3D 0;
+> >       }
+> > diff --git a/include/hw/virtio/virtio-net.h b/include/hw/virtio/virtio-=
+net.h
+> > index b96f0c643f..d03fd933d0 100644
+> > --- a/include/hw/virtio/virtio-net.h
+> > +++ b/include/hw/virtio/virtio-net.h
+> > @@ -164,6 +164,7 @@ struct VirtIONet {
+> >       uint8_t nouni;
+> >       uint8_t nobcast;
+> >       uint8_t vhost_started;
+> > +    int vhost_stopped;
+> >       struct {
+> >           uint32_t in_use;
+> >           uint32_t first_multi;
