@@ -1,23 +1,17 @@
-Received: from eggs.gnu.org ([209.51.188.92]:52326)
+Received: from eggs.gnu.org ([209.51.188.92]:56316)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1hIaTP-0004ko-B0
-	for qemu-devel@nongnu.org; Mon, 22 Apr 2019 11:03:12 -0400
+	(envelope-from <vsementsov@virtuozzo.com>) id 1hIamv-0005LZ-8n
+	for qemu-devel@nongnu.org; Mon, 22 Apr 2019 11:23:22 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1hIaTO-0005Uu-4D
-	for qemu-devel@nongnu.org; Mon, 22 Apr 2019 11:03:11 -0400
+	(envelope-from <vsementsov@virtuozzo.com>) id 1hIamu-0006GK-2f
+	for qemu-devel@nongnu.org; Mon, 22 Apr 2019 11:23:21 -0400
 From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Date: Mon, 22 Apr 2019 15:03:01 +0000
-Message-ID: <d264e5bb-cf20-f152-d4f4-09fdb85802e3@virtuozzo.com>
-References: <20190419140557.102725-1-vsementsov@virtuozzo.com>
-	<20190419140557.102725-4-vsementsov@virtuozzo.com>
-	<f8e6bdca-cc46-c721-4534-1741530a1215@redhat.com>
-In-Reply-To: <f8e6bdca-cc46-c721-4534-1741530a1215@redhat.com>
-Content-Language: en-US
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <B4DA8555643E434CA7A78C8B59EDA7B4@eurprd08.prod.outlook.com>
-Content-Transfer-Encoding: base64
-MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [PATCH v3 3/3] iotests: test big qcow2 shrink
+Date: Mon, 22 Apr 2019 18:23:14 +0300
+Message-Id: <20190422152315.74361-3-vsementsov@virtuozzo.com>
+In-Reply-To: <20190422152315.74361-1-vsementsov@virtuozzo.com>
+References: <20190422152315.74361-1-vsementsov@virtuozzo.com>
+Subject: [Qemu-devel] [PATCH v4 2/3] block/io: bdrv_pdiscard: support
+ int64_t bytes parameter
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,80 +20,95 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>
-Cc: "kwolf@redhat.com" <kwolf@redhat.com>, "mreitz@redhat.com" <mreitz@redhat.com>, "fam@euphon.net" <fam@euphon.net>, "stefanha@redhat.com" <stefanha@redhat.com>, Denis Lunev <den@virtuozzo.com>
+To: qemu-devel@nongnu.org, qemu-block@nongnu.org
+Cc: kwolf@redhat.com, mreitz@redhat.com, fam@euphon.net, stefanha@redhat.com, vsementsov@virtuozzo.com, den@virtuozzo.com, eblake@redhat.com
 
-MjIuMDQuMjAxOSAxNjo1OSwgRXJpYyBCbGFrZSB3cm90ZToNCj4gT24gNC8xOS8xOSA5OjA1IEFN
-LCBWbGFkaW1pciBTZW1lbnRzb3YtT2dpZXZza2l5IHdyb3RlOg0KPj4gVGhpcyB0ZXN0IGNoZWNr
-cyBidWcgaW4gcWNvdzJfcHJvY2Vzc19kaXNjYXJkcywgZml4ZWQgYnkgcHJldmlvdXMNCj4+IGNv
-bW1pdC4NCj4+DQo+PiBTaWduZWQtb2ZmLWJ5OiBWbGFkaW1pciBTZW1lbnRzb3YtT2dpZXZza2l5
-IDx2c2VtZW50c292QHZpcnR1b3p6by5jb20+DQo+PiAtLS0NCj4gDQo+PiArIyBUaGlzIHRlc3Qg
-Y2hlY2tzIHRoYXQgcWNvdzJfcHJvY2Vzc19kaXNjYXJkcyBkb2VzIG5vdCB0cnVuY2F0ZSBhIGRp
-c2NhcmQNCj4+ICsjIHJlcXVlc3QgPiAyRy4NCj4+ICsjIFRvIHJlcHJvZHVjZSBidWcgd2UgbmVl
-ZCB0byBvdmVyZmxvdyBpbnQgYnkgb25lIHNlcXVlbnRpYWwgZGlzY2FyZCwgc28gd2UNCj4+ICsj
-IG5lZWQgc2l6ZSA+IDJHLCBiaWdnZXIgY2x1c3RlciBzaXplIChhcyB3aXRoIGRlZmF1bHQgNjRr
-IHdlIG1heSBoYXZlIG1heGltdW0NCj4+ICsjIG9mIDUxMk0gc2VxdWVudGlhbCBkYXRhLCBjb3Jy
-ZXNwb25kaW5nIHRvIG9uZSBMMSBlbnRyeSksIGFuZCB3ZSBuZWVkIHNvbWUNCj4+ICsjIGRhdGEg
-b2YgdGhlIGJlZ2lubmluZyBvZiB0aGUgZGlzayBtYXBwZWQgdG8gdGhlIGVuZCBvZiBmaWxlIHRv
-IHByZXZlbnQNCj4+ICsjIGJkcnZfY29fdHJ1bmNhdGUoYnMtPmZpbGUpIGNhbGwgaW4gcWNvdzJf
-Y29fdHJ1bmNhdGUoKSwgd2hpY2ggbWF5IHN1Y2Nlc3MNCj4gDQo+IHMvbWF5IHN1Y2Nlc3MvbWln
-aHQgc3VjY2VlZC8NCj4gDQo+PiArIyBhbnl3YXkuDQo+PiArDQo+PiArc2l6ZT0yMTAwTQ0KPj4g
-K0lNR09QVFM9ImNsdXN0ZXJfc2l6ZT0xTSxwcmVhbGxvY2F0aW9uPW1ldGFkYXRhIg0KPj4gKw0K
-Pj4gK19tYWtlX3Rlc3RfaW1nICRzaXplDQo+PiArJFFFTVVfSU8gLWMgJ2Rpc2NhcmQgMCAxME0n
-IC1jICdkaXNjYXJkIDIwOTBNIDEwTScgXA0KPj4gKyAgICAgICAgIC1jICd3cml0ZSAyMDkwTSAx
-ME0nIC1jICd3cml0ZSAwIDEwTScgIiRURVNUX0lNRyIgfCBfZmlsdGVyX3FlbXVfaW8NCj4+ICsN
-Cj4+ICsjIENoZWNrIHRoYXQgb3VyIHRyaWNrIHdpdGggc3dhcHBpbmcgZmlyc3QgYW5kIGxhc3Qg
-MTBNIGNodW5rcyBzdWNjZWVkZWQuDQo+PiArIyBPdGhlcndpc2UgdGVzdCB3aWxsIG1heSBwYXNz
-IGV2ZW4gaWYgYmRydl9wZGlzY2FyZCgpIGZhaWxzIGluDQo+PiArIyBxY293Ml9wcm9jZXNzX2Rp
-c2NhcmRzKCkNCj4+ICskUUVNVV9JTUcgbWFwICIkVEVTVF9JTUciIHwgX2ZpbHRlcl90ZXN0ZGly
-DQo+PiArJFFFTVVfSU1HIGluZm8gIiRURVNUX0lNRyIgfCBncmVwIHNpemUgfCAgX2ZpbHRlcl90
-ZXN0ZGlyDQo+IA0KPiBOaWNlIC0gdGhhdCdzIGEgbG90IGZhc3RlciB0aGFuIHYxISBBbmQgbWFr
-ZXMgdGhlIHRlc3QgZml0IGluIHRoZSBxdWljaw0KPiBncm91cCBhZnRlciBhbGwuDQo+IA0KPj4g
-Kw0KPj4gKyRRRU1VX0lNRyAtVCAncWNvdzJfcHJvY2Vzc19kaXNjYXJkc19mYWlsZWQqJyByZXNp
-emUgLS1zaHJpbmsgIiRURVNUX0lNRyIgNU0NCj4gDQo+IEhvd2V2ZXIsIEknbSBxdWl0ZSBjZXJ0
-YWluIHRoYXQgdHJhY2Ugb3V0cHV0IGlzIG5vdCByZWxpYWJsZSBpbiBpb3Rlc3RzLg0KPiBEZXBl
-bmRpbmcgb24gY29uZmlndXJlIG9wdGlvbnMsIHRyYWNlcyBtaWdodCBub3QgYmUgZW5hYmxlZCBh
-dCBhbGwsIG9yDQo+IG1pZ2h0IG5vdCBnbyB0byBzdGRlcnIuIERyb3AgdGhlIC1UICcuLi4nLiAg
-RXZlbiB3aXRob3V0IHRoZSB0cmFjZSBsaW5lLA0KPiANCj4+ICsNCj4+ICskUUVNVV9JTUcgaW5m
-byAiJFRFU1RfSU1HIiB8IGdyZXAgc2l6ZSB8IF9maWx0ZXJfdGVzdGRpcg0KPiANCj4gdGhpcyBz
-ZWNvbmQgaW1hZ2UgaW5mbyBpcyBzdWZmaWNpZW50IHRvIHByb3ZlIHdoZXRoZXIgdGhlIHJlc2l6
-ZSBoYWQgYW4NCj4gZWZmZWN0IChwb3N0LXBhdGNoKSBvciBleHBvc2VzIHRoZSBidWcgKHdpdGhv
-dXQgcGF0Y2ggMi8zKS4gVGhhdCBpcywNCj4gYXBwbHlpbmcgdGhpcyBwYXRjaCBidXQgbm90IDIv
-MywgSSBzZWUgdGhpcyAod2l0aCBteSBjbGVhbnVwcyB0bw0KPiBxZW11LWltZyBpbmZvIGluIHBs
-YWNlLCBmcm9tIEtldmluJ3MgYmxvY2stbmV4dCBicmFuY2gpOg0KPiANCj4gKysrIC9ob21lL2Vi
-bGFrZS9xZW11L3Rlc3RzL3FlbXUtaW90ZXN0cy8yNTAub3V0LmJhZAkyMDE5LTA0LTIyDQo+IDA4
-OjUyOjI2LjA3Mjk2ODczMSAtMDUwMA0KPiBAQCAtMTQsOCArMTQsOSBAQA0KPiAgIHZpcnR1YWwg
-c2l6ZTogMi4wNSBHaUIgKDIyMDIwMDk2MDAgYnl0ZXMpDQo+ICAgZGlzayBzaXplOiAyNCBNaUIN
-Cj4gICBjbHVzdGVyX3NpemU6IDEwNDg1NzYNCj4gKzE4Mjc0QDE1NTU5NDExNDUuOTk5MTk1OnFj
-b3cyX3Byb2Nlc3NfZGlzY2FyZHNfZmFpbGVkX3JlZ2lvbiBvZmZzZXQNCj4gMHg1MDAwMDAgYnl0
-ZXMgMHg4MmEwMDAwMCByZXQgLTUNCj4gICBJbWFnZSByZXNpemVkLg0KPiAgIHZpcnR1YWwgc2l6
-ZTogNSBNaUIgKDUyNDI4ODAgYnl0ZXMpDQo+IC1kaXNrIHNpemU6IDkuMDEgTWlCDQo+ICtkaXNr
-IHNpemU6IDE5IE1pQg0KPiANCj4gd2hlcmUgdGhlIHRyYWNlIGRpZCBpbmRlZWQgc2hvdyBzaG93
-IHRoYXQgd2UgaGFkIGEgYnVnLCBidXQgd2hlcmUgZXZlbg0KPiB3aXRob3V0IHRoZSB0cmFjZSwg
-dGhlIGRpZmZlcmVuY2UgaW4gc2l6ZSBiZXR3ZWVuIDE5TSB3aXRoIGluY29tcGxldGUNCj4gZGlz
-Y2FyZHMgdnMuIDlNIHdpdGggcGF0Y2ggMi8zIGlzIGVub3VnaCB0byBzaG93IHRoYXQgcGF0Y2gg
-Mi8zIGZpeGVzIGEgYnVnLg0KPiANCj4+ICt2aXJ0dWFsIHNpemU6IDIuMUcgKDIyMDIwMDk2MDAg
-Ynl0ZXMpDQo+PiArZGlzayBzaXplOiAyNE0NCj4+ICtjbHVzdGVyX3NpemU6IDEwNDg1NzYNCj4+
-ICtJbWFnZSByZXNpemVkLg0KPj4gK3ZpcnR1YWwgc2l6ZTogNS4wTSAoNTI0Mjg4MCBieXRlcykN
-Cj4+ICtkaXNrIHNpemU6IDkuME0NCj4+ICtjbHVzdGVyX3NpemU6IDEwNDg1NzYNCj4gDQo+IFdo
-ZW4gS2V2aW4ncyBibG9jay1uZXh0IGJyYW5jaCBpcyBhcHBsaWVkLCB5b3UnbGwgbmVlZCB0aGlz
-IHNxdWFzaGVkIGluOg0KPiANCj4gZGlmZiAtLWdpdCBhL3Rlc3RzL3FlbXUtaW90ZXN0cy8yNTAu
-b3V0IGIvdGVzdHMvcWVtdS1pb3Rlc3RzLzI1MC5vdXQNCj4gaW5kZXggMzdlMzdmMGM5ZTcuLmQx
-YzFjNzE4MGI1IDEwMDY0NA0KPiAtLS0gYS90ZXN0cy9xZW11LWlvdGVzdHMvMjUwLm91dA0KPiAr
-KysgYi90ZXN0cy9xZW11LWlvdGVzdHMvMjUwLm91dA0KPiBAQCAtMTEsMTEgKzExLDExIEBAIHdy
-b3RlIDEwNDg1NzYwLzEwNDg1NzYwIGJ5dGVzIGF0IG9mZnNldCAwDQo+ICAgT2Zmc2V0ICAgICAg
-ICAgIExlbmd0aCAgICAgICAgICBNYXBwZWQgdG8gICAgICAgRmlsZQ0KPiAgIDAgICAgICAgICAg
-ICAgICAweGEwMDAwMCAgICAgICAgMHg4MmYwMDAwMCAgICAgIFRFU1RfRElSL3QucWNvdzINCj4g
-ICAweDgyYTAwMDAwICAgICAgMHhhMDAwMDAgICAgICAgIDB4NTAwMDAwICAgICAgICBURVNUX0RJ
-Ui90LnFjb3cyDQo+IC12aXJ0dWFsIHNpemU6IDIuMUcgKDIyMDIwMDk2MDAgYnl0ZXMpDQo+IC1k
-aXNrIHNpemU6IDI0TQ0KPiArdmlydHVhbCBzaXplOiAyLjA1IEdpQiAoMjIwMjAwOTYwMCBieXRl
-cykNCj4gK2Rpc2sgc2l6ZTogMjQgTWlCDQo+ICAgY2x1c3Rlcl9zaXplOiAxMDQ4NTc2DQo+ICAg
-SW1hZ2UgcmVzaXplZC4NCj4gLXZpcnR1YWwgc2l6ZTogNS4wTSAoNTI0Mjg4MCBieXRlcykNCj4g
-LWRpc2sgc2l6ZTogOS4wTQ0KPiArdmlydHVhbCBzaXplOiA1IE1pQiAoNTI0Mjg4MCBieXRlcykN
-Cj4gK2Rpc2sgc2l6ZTogOS4wMSBNaUINCj4gICBjbHVzdGVyX3NpemU6IDEwNDg1NzYNCj4gICAq
-KiogZG9uZQ0KPiANCj4gV2l0aCB0aGUgdXBkYXRlZCBvdXRwdXQgdG8gbWF0Y2ggY2hhbmdlcyB0
-byBxZW11LWltZyBvdXRwdXQsIHRoZSBncmFtbWFyDQo+IGZpeGVzLCBhbmQgd2l0aCB0aGUgLVQg
-b3B0aW9uIHJlbW92ZWQsDQo+IA0KPiBSZXZpZXdlZC1ieTogRXJpYyBCbGFrZSA8ZWJsYWtlQHJl
-ZGhhdC5jb20+DQo+IFRlc3RlZC1ieTogRXJpYyBCbGFrZSA8ZWJsYWtlQHJlZGhhdC5jb20+DQo+
-IA0KDQpUaGFuayB5b3UhDQoNCkknbGwgcmVzZW5kIHNvb24uDQoNCi0tIA0KQmVzdCByZWdhcmRz
-LA0KVmxhZGltaXINCg==
+This fixes at least one overflow in qcow2_process_discards, which
+passes 64bit region length to bdrv_pdiscard where bytes (or sectors in
+the past) parameter is int since its introduction in 0b919fae.
+
+Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Reviewed-by: Eric Blake <eblake@redhat.com>
+---
+ include/block/block.h |  4 ++--
+ block/io.c            | 16 ++++++++--------
+ 2 files changed, 10 insertions(+), 10 deletions(-)
+
+diff --git a/include/block/block.h b/include/block/block.h
+index c7a26199aa..69fa18867e 100644
+--- a/include/block/block.h
++++ b/include/block/block.h
+@@ -432,8 +432,8 @@ void bdrv_drain_all(void);
+     AIO_WAIT_WHILE(bdrv_get_aio_context(bs_),              \
+                    cond); })
+ 
+-int bdrv_pdiscard(BdrvChild *child, int64_t offset, int bytes);
+-int bdrv_co_pdiscard(BdrvChild *child, int64_t offset, int bytes);
++int bdrv_pdiscard(BdrvChild *child, int64_t offset, int64_t bytes);
++int bdrv_co_pdiscard(BdrvChild *child, int64_t offset, int64_t bytes);
+ int bdrv_has_zero_init_1(BlockDriverState *bs);
+ int bdrv_has_zero_init(BlockDriverState *bs);
+ bool bdrv_unallocated_blocks_are_zero(BlockDriverState *bs);
+diff --git a/block/io.c b/block/io.c
+index dfc153b8d8..35c4157669 100644
+--- a/block/io.c
++++ b/block/io.c
+@@ -2653,7 +2653,7 @@ int bdrv_flush(BlockDriverState *bs)
+ typedef struct DiscardCo {
+     BdrvChild *child;
+     int64_t offset;
+-    int bytes;
++    int64_t bytes;
+     int ret;
+ } DiscardCo;
+ static void coroutine_fn bdrv_pdiscard_co_entry(void *opaque)
+@@ -2664,14 +2664,15 @@ static void coroutine_fn bdrv_pdiscard_co_entry(void *opaque)
+     aio_wait_kick();
+ }
+ 
+-int coroutine_fn bdrv_co_pdiscard(BdrvChild *child, int64_t offset, int bytes)
++int coroutine_fn bdrv_co_pdiscard(BdrvChild *child, int64_t offset,
++                                  int64_t bytes)
+ {
+     BdrvTrackedRequest req;
+     int max_pdiscard, ret;
+     int head, tail, align;
+     BlockDriverState *bs = child->bs;
+ 
+-    if (!bs || !bs->drv) {
++    if (!bs || !bs->drv || !bdrv_is_inserted(bs)) {
+         return -ENOMEDIUM;
+     }
+ 
+@@ -2679,9 +2680,8 @@ int coroutine_fn bdrv_co_pdiscard(BdrvChild *child, int64_t offset, int bytes)
+         return -EPERM;
+     }
+ 
+-    ret = bdrv_check_byte_request(bs, offset, bytes);
+-    if (ret < 0) {
+-        return ret;
++    if (offset < 0) {
++        return -EIO;
+     }
+ 
+     /* Do nothing if disabled.  */
+@@ -2716,7 +2716,7 @@ int coroutine_fn bdrv_co_pdiscard(BdrvChild *child, int64_t offset, int bytes)
+     assert(max_pdiscard >= bs->bl.request_alignment);
+ 
+     while (bytes > 0) {
+-        int num = bytes;
++        int64_t num = bytes;
+ 
+         if (head) {
+             /* Make small requests to get to alignment boundaries. */
+@@ -2778,7 +2778,7 @@ out:
+     return ret;
+ }
+ 
+-int bdrv_pdiscard(BdrvChild *child, int64_t offset, int bytes)
++int bdrv_pdiscard(BdrvChild *child, int64_t offset, int64_t bytes)
+ {
+     Coroutine *co;
+     DiscardCo rwco = {
+-- 
+2.18.0
