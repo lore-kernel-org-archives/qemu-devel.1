@@ -2,80 +2,59 @@ Return-Path: <SRS0=5Zkg=SY=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 505BCC10F11
-	for <qemu-devel@archiver.kernel.org>; Mon, 22 Apr 2019 22:22:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AFB9EC10F11
+	for <qemu-devel@archiver.kernel.org>; Mon, 22 Apr 2019 22:23:22 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 109CD205F4
-	for <qemu-devel@archiver.kernel.org>; Mon, 22 Apr 2019 22:22:20 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 109CD205F4
+	by mail.kernel.org (Postfix) with ESMTPS id 7D14B205F4
+	for <qemu-devel@archiver.kernel.org>; Mon, 22 Apr 2019 22:23:22 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7D14B205F4
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:45052 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:45063 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hIhKO-0006xH-3Q
-	for qemu-devel@archiver.kernel.org; Mon, 22 Apr 2019 18:22:20 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:59812)
+	id 1hIhLN-0007p6-OF
+	for qemu-devel@archiver.kernel.org; Mon, 22 Apr 2019 18:23:21 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:58960)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1hIhIk-0005eV-MC
-	for qemu-devel@nongnu.org; Mon, 22 Apr 2019 18:20:39 -0400
+	(envelope-from <jsnow@redhat.com>) id 1hIhFd-0003Pl-D1
+	for qemu-devel@nongnu.org; Mon, 22 Apr 2019 18:17:26 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1hIhIj-0000Fa-QB
-	for qemu-devel@nongnu.org; Mon, 22 Apr 2019 18:20:38 -0400
-Received: from mail-wr1-f68.google.com ([209.85.221.68]:44928)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1hIhIj-0000F1-KR
-	for qemu-devel@nongnu.org; Mon, 22 Apr 2019 18:20:37 -0400
-Received: by mail-wr1-f68.google.com with SMTP id c5so8605481wrs.11
-	for <qemu-devel@nongnu.org>; Mon, 22 Apr 2019 15:20:37 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=1e100.net; s=20161025;
-	h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
-	:date:user-agent:mime-version:in-reply-to:content-language
-	:content-transfer-encoding;
-	bh=0grNEupLi0LznXGJWK3xOvSKsCfdUeSsH3oFVBNe3KA=;
-	b=RuTjVyJJFRL12evm4jfwi9q3DuQ+y7nDVzx8/pWWZ3BIPDxsjmaFTTsvV11Hipzi8A
-	w1CY+KynOlVR238ApF2Lhhd/Vvb1vSejLSm5F4aH4f5VOfQZaj/4QvUaa1qXJKVqw76O
-	hQdGI+lVxfX4d4GzlhLfAqvAAbTyVuGKOHKBLIq6OG1OMjYfvsKxUpqBuBTxvjG8nuwK
-	/eE1K/t1e4Rts0bzq09C6/S1KEX76iZDn+8ZHu/0AvdvSwGE8E4AqbtkIRHFnk/qROV1
-	5HA+lnqps2YvIsDA6jMGyZwiZcRFtaxlOI3ZcmBaVmJK/QeSXItKoe5mLIf/aBoluuJ4
-	S7pg==
-X-Gm-Message-State: APjAAAWcmBwCBdBBZc4REgCZUB7yj+o1L267XAnB7F9mcaTuiR820HmF
-	8MvTqVx2RQlXADBtDt++An2p0Q==
-X-Google-Smtp-Source: APXvYqyTYjL6vAki/8Ze7SD0TC/sN5VLtDYhi3i3MEJW6vt52LcxKfHqgF5L3A33205x3Uxx4QZEgA==
-X-Received: by 2002:adf:e2c3:: with SMTP id d3mr6585281wrj.189.1555971636717; 
-	Mon, 22 Apr 2019 15:20:36 -0700 (PDT)
-Received: from [192.168.1.25] (atoulouse-656-1-803-163.w86-221.abo.wanadoo.fr.
-	[86.221.12.163]) by smtp.gmail.com with ESMTPSA id
-	s189sm27371096wmf.45.2019.04.22.15.20.35
-	(version=TLS1_3 cipher=AEAD-AES128-GCM-SHA256 bits=128/128);
-	Mon, 22 Apr 2019 15:20:36 -0700 (PDT)
-To: Eduardo Habkost <ehabkost@redhat.com>, qemu-devel@nongnu.org
-References: <20190422210448.2488-1-ehabkost@redhat.com>
-	<20190422210448.2488-4-ehabkost@redhat.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Openpgp: id=89C1E78F601EE86C867495CBA2A3FD6EDEADC0DE;
-	url=http://pgp.mit.edu/pks/lookup?op=get&search=0xA2A3FD6EDEADC0DE
-Message-ID: <c1aa85de-849d-fe69-2059-244c2bb3e197@redhat.com>
-Date: Tue, 23 Apr 2019 00:20:35 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
-	Thunderbird/60.6.1
+	(envelope-from <jsnow@redhat.com>) id 1hIhFc-0006zW-DU
+	for qemu-devel@nongnu.org; Mon, 22 Apr 2019 18:17:25 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:40654)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <jsnow@redhat.com>)
+	id 1hIhFZ-0006uz-3u; Mon, 22 Apr 2019 18:17:21 -0400
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+	[10.5.11.16])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 9978B3082129;
+	Mon, 22 Apr 2019 22:17:18 +0000 (UTC)
+Received: from probe.bos.redhat.com (dhcp-17-206.bos.redhat.com [10.18.17.206])
+	by smtp.corp.redhat.com (Postfix) with ESMTP id 447195C28D;
+	Mon, 22 Apr 2019 22:17:15 +0000 (UTC)
+From: John Snow <jsnow@redhat.com>
+To: qemu-block@nongnu.org,
+	qemu-devel@nongnu.org
+Date: Mon, 22 Apr 2019 18:17:12 -0400
+Message-Id: <20190422221714.7630-1-jsnow@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20190422210448.2488-4-ehabkost@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+	(mx1.redhat.com [10.5.110.42]);
+	Mon, 22 Apr 2019 22:17:18 +0000 (UTC)
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-	[fuzzy]
-X-Received-From: 209.85.221.68
-Subject: Re: [Qemu-devel] [PATCH 3/3] accel: Remove unused
- AccelClass::available field
+X-Received-From: 209.132.183.28
+Subject: [Qemu-devel] [PATCH v2 0/2] docs/interop/bitmaps: rewrite and
+ modernize doc
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -87,54 +66,59 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Laurent Vivier <lvivier@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
-	Thomas Huth <thuth@redhat.com>
+Cc: Fam Zheng <fam@euphon.net>, vsementsov@virtuozzo.com, aliang@redhat.com,
+	kchamart@redhat.com, John Snow <jsnow@redhat.com>,
+	qemu-stable@nongnu.org, armbru@redhat.com, nsoffer@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190422222035.xt4whmFM4wazpUI9o9q7xXc0Ii7M_ZytBoFWDxi3piY@z>
+Content-Type: text/plain; charset="UTF-8"
+Message-ID: <20190422221712.2Qaxjcwqk865NGh3nmfoyMTNjXj7f2q4UrvG-CTUifo@z>
 
-On 4/22/19 11:04 PM, Eduardo Habkost wrote:
-> The field is not used anymore, we can remove it.
-> 
-> Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
+The documentation as written in the 4.0 release is not quite correct as
+of the 4.0 release; though thanks to backwards compatibility it's not
+quite wrong either. It is suitable for inclusion in 4.0.1, or any
+downstream that packages 4.0.
 
-Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
-mingw64:
-Tested-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+This patch is an attempt at a nearly full rewrite that revitalizes this
+document to address frequent questions I encounter when discussing the
+API.
 
-> ---
->  include/sysemu/accel.h | 1 -
->  accel/accel.c          | 5 -----
->  2 files changed, 6 deletions(-)
-> 
-> diff --git a/include/sysemu/accel.h b/include/sysemu/accel.h
-> index 5565e00a96..70e9e2f2a1 100644
-> --- a/include/sysemu/accel.h
-> +++ b/include/sysemu/accel.h
-> @@ -38,7 +38,6 @@ typedef struct AccelClass {
->  
->      const char *opt_name;
->      const char *name;
-> -    int (*available)(void);
->      int (*init_machine)(MachineState *ms);
->      void (*setup_post)(MachineState *ms, AccelState *accel);
->      bool *allowed;
-> diff --git a/accel/accel.c b/accel/accel.c
-> index 454fef9d92..5fa31717b4 100644
-> --- a/accel/accel.c
-> +++ b/accel/accel.c
-> @@ -107,11 +107,6 @@ void configure_accelerator(MachineState *ms, const char *progname)
->          if (!acc) {
->              continue;
->          }
-> -        if (acc->available && !acc->available()) {
-> -            printf("%s not supported for this target\n",
-> -                   acc->name);
-> -            continue;
-> -        }
->          ret = accel_init_machine(acc, ms);
->          if (ret < 0) {
->              init_failed = true;
-> 
+V2:
+  - Split off makefile change into its own little patch.
+
+  - Addressed (almost) all comments from Vladimir.
+    - Example styling was not reworked.
+  - Renamed all filenames to be consistent throughout the document,
+    fixing a few more file extensions in the process
+  - Reflowed almost all paragraphs to 78 columns for consistency.
+  - Changed a few bulleted lists to paragraphs instead
+  - Changed the big ascii text diagram to a more compact version
+    and clarified its language
+  - While in general I prefer to use en_US spellings, I have
+    replaced "canceled" with "cancelled" so it does not look
+    out of place juxtaposed with BLOCK_JOB_CANCELLED...
+
+Future work that remains to be done:
+
+- Paying heed to blockdev-backup workflows
+- Adding a small migration section explaining the options there
+- Possibly reworking some of the sections that all make their own
+  repeated attempts to clarify time interval discretization and adding
+  a proper treatment of the idea start to finish; this may be neccessary
+  to explain the two below items properly:
+- Differential Backups
+- Pull Backups and NBD
+
+John Snow (2):
+  Makefile: add nit-picky mode to sphinx-build
+  docs/interop/bitmaps: rewrite and modernize doc
+
+ docs/interop/bitmaps.rst | 1600 ++++++++++++++++++++++++++++++--------
+ Makefile                 |    2 +-
+ 2 files changed, 1266 insertions(+), 336 deletions(-)
+
+--=20
+2.20.1
+
 
