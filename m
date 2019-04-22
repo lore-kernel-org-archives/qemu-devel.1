@@ -1,34 +1,31 @@
-Received: from eggs.gnu.org ([209.51.188.92]:56911)
+Received: from eggs.gnu.org ([209.51.188.92]:33409)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1hIapD-0007bf-HW
-	for qemu-devel@nongnu.org; Mon, 22 Apr 2019 11:25:44 -0400
+	(envelope-from <jmoyer@redhat.com>) id 1hIbEW-0007i3-Rg
+	for qemu-devel@nongnu.org; Mon, 22 Apr 2019 11:51:53 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1hIapC-00006b-A0
-	for qemu-devel@nongnu.org; Mon, 22 Apr 2019 11:25:43 -0400
-Received: from indium.canonical.com ([91.189.90.7]:46430)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1hIapC-0008Vf-4w
-	for qemu-devel@nongnu.org; Mon, 22 Apr 2019 11:25:42 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1hIap8-0005fD-Qb
-	for <qemu-devel@nongnu.org>; Mon, 22 Apr 2019 15:25:38 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id C2D5E2E804F
-	for <qemu-devel@nongnu.org>; Mon, 22 Apr 2019 15:25:38 +0000 (UTC)
+	(envelope-from <jmoyer@redhat.com>) id 1hIbEV-0007Kq-Pl
+	for qemu-devel@nongnu.org; Mon, 22 Apr 2019 11:51:52 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:59192)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <jmoyer@redhat.com>) id 1hIbEV-0007J7-IM
+	for qemu-devel@nongnu.org; Mon, 22 Apr 2019 11:51:51 -0400
+From: Jeff Moyer <jmoyer@redhat.com>
+References: <20190410040826.24371-1-pagupta@redhat.com>
+	<20190410040826.24371-2-pagupta@redhat.com>
+	<CAPcyv4i1FjBzfcWtzeCvj-giHa9xaX0dMQ==q4LZC_L8VEqkHg@mail.gmail.com>
+	<20190412083230.GA29850@quack2.suse.cz>
+	<x494l73z7th.fsf@segfault.boston.devel.redhat.com>
+	<CAPcyv4jrNHqW3FuGkeo==ZoJr7LKahCv4_esnokfy7enek8=2Q@mail.gmail.com>
+	<20190418161833.GA22970@infradead.org>
+	<CAPcyv4jPOF_+R6U17J_+88+X8LC-LSPCugA6gbKxuphuuFB2gg@mail.gmail.com>
+Date: Mon, 22 Apr 2019 11:51:35 -0400
+In-Reply-To: <CAPcyv4jPOF_+R6U17J_+88+X8LC-LSPCugA6gbKxuphuuFB2gg@mail.gmail.com>
+	(Dan Williams's message of "Thu, 18 Apr 2019 11:14:59 -0700")
+Message-ID: <x497ebm82d4.fsf@segfault.boston.devel.redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Mon, 22 Apr 2019 15:18:27 -0000
-From: TimeMaster <timemaster@trillinis.com>
-Reply-To: Bug 1824768 <1824768@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <155531602468.14046.8896369782282114161.malonedeb@gac.canonical.com>
-Message-Id: <155594630727.13658.11371645770469576454.malone@wampee.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1824768] Re: Qemu ARMv7 TCG MultiThreading for
- i386 guest doesn't work
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [PATCH v5 1/6] libnvdimm: nd_region flush callback
+ support
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,69 +34,42 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Dan Williams <dan.j.williams@intel.com>
+Cc: Christoph Hellwig <hch@infradead.org>, Jan Kara <jack@suse.cz>, Pankaj Gupta <pagupta@redhat.com>, linux-nvdimm <linux-nvdimm@lists.01.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, virtualization@lists.linux-foundation.org, KVM list <kvm@vger.kernel.org>, linux-fsdevel <linux-fsdevel@vger.kernel.org>, Linux ACPI <linux-acpi@vger.kernel.org>, Qemu Developers <qemu-devel@nongnu.org>, linux-ext4 <linux-ext4@vger.kernel.org>, linux-xfs <linux-xfs@vger.kernel.org>, Ross Zwisler <zwisler@kernel.org>, Vishal L Verma <vishal.l.verma@intel.com>, Dave Jiang <dave.jiang@intel.com>, "Michael S. Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>, Matthew Wilcox <willy@infradead.org>, "Rafael J. Wysocki" <rjw@rjwysocki.net>, Len Brown <lenb@kernel.org>, Theodore Ts'o <tytso@mit.edu>, Andreas Dilger <adilger.kernel@dilger.ca>, "Darrick J. Wong" <darrick.wong@oracle.com>, lcapitulino@redhat.com, Kevin Wolf <kwolf@redhat.com>, Igor Mammedov <imammedo@redhat.com>, Nitesh Narayan Lal <nilal@redhat.com>, Rik van Riel <riel@surriel.com>, Stefan Hajnoczi <stefanha@redhat.com>, Andrea Arcangeli <aarcange@redhat.com>, David Hildenbrand <david@redhat.com>, david <david@fromorbit.com>, cohuck@redhat.com, Xiao Guangrong <xiaoguangrong.eric@gmail.com>, Paolo Bonzini <pbonzini@redhat.com>, kilobyte@angband.pl, yuval shaia <yuval.shaia@oracle.com>
 
->> ./qemu-system-i386 -cdrom alpine.iso --accel tcg,thread=3Dmulti
+Dan Williams <dan.j.williams@intel.com> writes:
 
-I tried both, with -smp 4 and without..
+> On Thu, Apr 18, 2019 at 9:18 AM Christoph Hellwig <hch@infradead.org> wrote:
+>>
+>> On Thu, Apr 18, 2019 at 09:05:05AM -0700, Dan Williams wrote:
+>> > > > I'd either add a comment about avoiding retpoline overhead here or just
+>> > > > make ->flush == NULL mean generic_nvdimm_flush(). Just so that people don't
+>> > > > get confused by the code.
+>> > >
+>> > > Isn't this premature optimization?  I really don't like adding things
+>> > > like this without some numbers to show it's worth it.
+>> >
+>> > I don't think it's premature given this optimization technique is
+>> > already being deployed elsewhere, see:
+>> >
+>> > https://lwn.net/Articles/774347/
+>>
+>> For one this one was backed by numbers, and second after feedback
+>> from Linux we switched to the NULL pointer check instead.
+>
+> Ok I should have noticed the switch to NULL pointer check. However,
+> the question still stands do we want everyone to run numbers to
+> justify this optimization, or make it a new common kernel coding
+> practice to do:
+>
+>     if (!object->op)
+>         generic_op(object);
+>     else
+>         object->op(object);
+>
+> ...in hot paths?
 
-In stable Qemu release, there is just a guest kernel panic, in
-v4.0.0-rc3-dirty, there is also Illegal instruction error reported
+I don't think nvdimm_flush is a hot path.  Numbers of some
+representative workload would prove one of us right.
 
-> on an x-gene system, compiled for aarch32.
-Yes, this should be Raspberry Pi 3, but I am not sure. Anyway, I can test t=
-his in one week when I receive one of those boards.
-
->Just so we're clear, which raspberry pi revision are you using?
->Based on comments I'm assuming pi 2, with the 4 core cortex-a7.
-
-I am using Raspberry Pi 2, 4 cores, not sure where is the difference
-between cortex-a7 and ARMv7, in my case it is just ARMv7.
-
--- =
-
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1824768
-
-Title:
-  Qemu ARMv7 TCG MultiThreading for i386 guest doesn't work
-
-Status in QEMU:
-  Incomplete
-
-Bug description:
-  Using any Linux image (in this case Alpine Linux iso) I want to
-  utilise all cores of my Raspberry with --accel,thread=3Dmulti. I know
-  there is a probably still problem with memory ordering of the host,
-  but I have also seen some very old commits which could potentially
-  help with it.
-
-  But anyway, with version qemu-i386 version 3.1.0 (Debian 1:3.1+dfsg-7)
-  I can see OpenRC starting up services and then the kernel crash.
-
-  With version QEMU emulator version 3.1.93 (v4.0.0-rc3-dirty)
-  The whole machine crash with this error:
-  Illegal instruction
-
-  Using command:
-  ./qemu-system-i386 -cdrom alpine.iso --accel tcg,thread=3Dmulti
-
-  Full Console Output:
-  qemu-system-i386: warning: Guest expects a stronger memory ordering than =
-the host provides
-  This may cause strange/hard to debug errors
-  Illegal instruction
-
-  Kernel:
-  Linux raspberrypi 4.14.98-v7+ #1200 SMP Tue Feb 12 20:27:48 GMT 2019 armv=
-7l GNU/Linux
-
-  CPU:
-  ARMv7 Processor rev 5 (v7l)
-  Features: half thumb fastmult vfp edsp neon vfpv3 tls vfpv4 idiva idivt v=
-fpd32 lpae evtstrm
-  4 cores
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1824768/+subscriptions
+-Jeff
