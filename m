@@ -2,78 +2,87 @@ Return-Path: <SRS0=5Zkg=SY=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS autolearn=ham
+X-Spam-Status: No, score=-0.5 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C8448C10F11
-	for <qemu-devel@archiver.kernel.org>; Mon, 22 Apr 2019 20:48:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8B0E9C10F11
+	for <qemu-devel@archiver.kernel.org>; Mon, 22 Apr 2019 20:50:56 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9C7EC206A3
-	for <qemu-devel@archiver.kernel.org>; Mon, 22 Apr 2019 20:48:20 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9C7EC206A3
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=canonical.com
+	by mail.kernel.org (Postfix) with ESMTPS id 502EF206A3
+	for <qemu-devel@archiver.kernel.org>; Mon, 22 Apr 2019 20:50:56 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="SESZG6xh"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 502EF206A3
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:44046 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:44127 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hIfrP-0004U0-BM
-	for qemu-devel@archiver.kernel.org; Mon, 22 Apr 2019 16:48:19 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:39823)
+	id 1hIftv-0006SW-L9
+	for qemu-devel@archiver.kernel.org; Mon, 22 Apr 2019 16:50:55 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:39971)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dan.streetman@canonical.com>) id 1hIfpQ-0002vr-Qs
-	for qemu-devel@nongnu.org; Mon, 22 Apr 2019 16:46:17 -0400
+	(envelope-from <amitkumarrathore07@gmail.com>) id 1hIfpO-0003EF-M8
+	for qemu-devel@nongnu.org; Mon, 22 Apr 2019 16:46:15 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dan.streetman@canonical.com>) id 1hIfbz-0003FQ-Ed
-	for qemu-devel@nongnu.org; Mon, 22 Apr 2019 16:32:24 -0400
-Received: from youngberry.canonical.com ([91.189.89.112]:54127)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dan.streetman@canonical.com>)
-	id 1hIfbz-0003Cz-9d
-	for qemu-devel@nongnu.org; Mon, 22 Apr 2019 16:32:23 -0400
-Received: from mail-it1-f197.google.com ([209.85.166.197])
-	by youngberry.canonical.com with esmtps
-	(TLS1.0:RSA_AES_128_CBC_SHA1:16) (Exim 4.76)
-	(envelope-from <dan.streetman@canonical.com>) id 1hIfbw-00065n-1K
-	for qemu-devel@nongnu.org; Mon, 22 Apr 2019 20:32:20 +0000
-Received: by mail-it1-f197.google.com with SMTP id s1so13672032itl.1
-	for <qemu-devel@nongnu.org>; Mon, 22 Apr 2019 13:32:19 -0700 (PDT)
+	(envelope-from <amitkumarrathore07@gmail.com>) id 1hIfga-00066D-NS
+	for qemu-devel@nongnu.org; Mon, 22 Apr 2019 16:37:09 -0400
+Received: from mail-pl1-x62c.google.com ([2607:f8b0:4864:20::62c]:41108)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <amitkumarrathore07@gmail.com>)
+	id 1hIfga-000656-HG
+	for qemu-devel@nongnu.org; Mon, 22 Apr 2019 16:37:08 -0400
+Received: by mail-pl1-x62c.google.com with SMTP id d9so404795pls.8
+	for <qemu-devel@nongnu.org>; Mon, 22 Apr 2019 13:37:07 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+	h=message-id:mime-version:to:from:subject:date:importance;
+	bh=tpXMig1LX0Un8qPtGVtaL5uFOQXqxVOXr784jTvlx50=;
+	b=SESZG6xhXZfeBIyoM1UfFid3PBhTDflyqNkO4eo42M7pGN963S040awmdM6/G77Is4
+	ezyEV21ME0pDvXeqAEw6FezurxBWUg/L6gd0a+q2Cf1ErC8iAfvjfmFavEN8dK0vRpyH
+	h4s/7lGYoA1dKTDpEx+A5mEhGMbPeFPpDv3yvgIJTJM7CTMj3vAp0CdMeNR4l30VzLR5
+	odV8CzZSbCxwk7iJ9TLdrVnwYtkdRjVTagMwLdClhwqTSEDo4tTK5hwIY1sznCsdQfBo
+	hCgyySPy4FnfGgd3NGgM13yOLfbwRa12Ymkzx9JSWFbwun9qolSECSW96e/rRLze5HHy
+	lb0w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
 	d=1e100.net; s=20161025;
-	h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-	:message-id:subject:to:cc;
-	bh=UzO3LqHsETKbE6+oQmQ4qXvpjgRr5BoI69iUGjCkedc=;
-	b=snwp7upaQMg5I++RJtuKBUO8nKhvRxHlvt80NRQbcC+9FVArMDO27uDH5m9VWXXQG9
-	mx/EhsJoNO13tF3N/OroFc9Ry4BRCsPBv20bLki+XAZHOsQ6hlB5hWcTTREX4Nb3/FL2
-	L9f91Z2fpOTniJBgl+nnbUUF+56FscOPFQlAqzT1ech5hHfizb5EPt76xapPP04B+6ni
-	rkl66eMrnjGHPp9ZMrvdiJ4HmULOgmy/08qZOzO8rXExc9yY5rihq3vkbRa4c5iyuCJg
-	zSEGiwKPH91flhN7kW93889h81fgqYC7u1QoHjWyX1hy2Gpx316vn+JVtOCAT7YXNOUS
-	UPfA==
-X-Gm-Message-State: APjAAAXBFpRyBuJhxmX8O+Ku7A9gznljiKUXRaV5H5POtFJdM40Ud3RU
-	DgEw74gBQD02RCuOPhZHn6KvraoN9TFN4GEtB7z7HQ0VIfFbDs0lE+cte6KxlWF4GAoswjLpJHb
-	sfcCPHlKwM0NjcTJmVeVarsTitAkmy1WumRiirS00Dl9PgUrX
-X-Received: by 2002:a02:1142:: with SMTP id 63mr9099469jaf.19.1555965139058;
-	Mon, 22 Apr 2019 13:32:19 -0700 (PDT)
-X-Google-Smtp-Source: APXvYqw4mKHTJN4+URRdSsWJKCwnLj8ecWwNZ025jkRBUeV+5Q7Y04GHOtfC1m4baP4sCKz/Ce0AIZ2MQFXDoOjeN0Y=
-X-Received: by 2002:a02:1142:: with SMTP id 63mr9099456jaf.19.1555965138822;
-	Mon, 22 Apr 2019 13:32:18 -0700 (PDT)
+	h=x-gm-message-state:message-id:mime-version:to:from:subject:date
+	:importance;
+	bh=tpXMig1LX0Un8qPtGVtaL5uFOQXqxVOXr784jTvlx50=;
+	b=rak1xfkpLj17LPAsNuPYcHKXqEYeWAGvicf7cihQuXEyIkymmUdRQ7mXLXFbgKRxyi
+	V8uviSqs37ToS23yI41mu/jvRJjwyyK8Db7kC8OVS7VceNqdQK3A7ptSAOFFjoRDyT9L
+	yqLfJNLZXIozpRVRb2v6TN3B28iyTwSP95iUdqApyNHgrOkH71w4Agvx+ZUP151loySF
+	M6cWMcVth052h2ZuJCeDVFK2/8daJoHMDZ5bMky3Ic0c0DiR8M6MrkjACWp9nm2zjWdF
+	yv6ZbtdfM6U3PO3AH49ayScBe5EAngM+PPZVlUWa5z7vughXWHXW22HGfoeypnP6JxUj
+	WLTw==
+X-Gm-Message-State: APjAAAUMTe7QVEgWtDrL/kjJdy+UV0Dr03aAPcKRzrH1qUaMpys3x+NK
+	qrSRKNLhbGYXpyat0tAsCUpFJbZpTV0=
+X-Google-Smtp-Source: APXvYqxs2zSqnp8QwbD/MPf5az2hlc93H5+G2xf1NzTzUmSGS5IRnjYQipdbpzN9F/cZcGx9XVs20g==
+X-Received: by 2002:a17:902:2ec5:: with SMTP id
+	r63mr22368183plb.139.1555965425653; 
+	Mon, 22 Apr 2019 13:37:05 -0700 (PDT)
+Received: from ?IPv6:::ffff:192.168.43.173? ([27.97.105.34])
+	by smtp.gmail.com with ESMTPSA id
+	75sm21615207pfr.55.2019.04.22.13.37.02 for <qemu-devel@nongnu.org>
+	(version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+	Mon, 22 Apr 2019 13:37:04 -0700 (PDT)
+Message-ID: <5cbe25f0.1c69fb81.e0425.9c3b@mx.google.com>
 MIME-Version: 1.0
-References: <20190416184624.15397-1-dan.streetman@canonical.com>
-	<20190416184624.15397-2-dan.streetman@canonical.com>
-	<20190419191328-mutt-send-email-mst@kernel.org>
-In-Reply-To: <20190419191328-mutt-send-email-mst@kernel.org>
-From: Dan Streetman <dan.streetman@canonical.com>
-Date: Mon, 22 Apr 2019 16:31:42 -0400
-Message-ID:
- <CAOZ2QJMvPj1VPoiezHjiQpU3m7HMk_i6G=LEUvmi3m_QWM=e8A@mail.gmail.com>
-To: "Michael S. Tsirkin" <mst@redhat.com>
+To: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+From: amit kumar rathore <amitkumarrathore07@gmail.com>
+Date: Tue, 23 Apr 2019 02:07:03 +0530
+Importance: normal
+X-Priority: 3
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+	recognized.
+X-Received-From: 2607:f8b0:4864:20::62c
 Content-Type: text/plain; charset="UTF-8"
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x
-X-Received-From: 91.189.89.112
-Subject: Re: [Qemu-devel] [PATCH 1/2] add VirtIONet vhost_stopped flag to
- prevent multiple stops
+Content-Transfer-Encoding: quoted-printable
+X-Content-Filtered-By: Mailman/MimeDel 2.1.21
+Subject: [Qemu-devel] Review my proposal
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -85,93 +94,15 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Jason Wang <jasowang@redhat.com>, qemu-devel@nongnu.org,
-	qemu-stable@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190422203142.HNXJTjtIlx7aOjilenLzQ7g3d25FzSatPpIsJTQ9CEs@z>
+Message-ID: <20190422203703.GWFG1eczdR69uVfwYPpOLLVc5qI-6OA7DF2lQ7BhX_0@z>
 
-On Fri, Apr 19, 2019 at 7:14 PM Michael S. Tsirkin <mst@redhat.com> wrote:
->
-> On Tue, Apr 16, 2019 at 02:46:23PM -0400, Dan Streetman wrote:
-> > From: Dan Streetman <ddstreet@canonical.com>
-> >
-> > Buglink: https://launchpad.net/bugs/1823458
-> >
-> > There is a race condition when using the vhost-user driver, between a guest
-> > shutdown and the vhost-user interface being closed.  This is explained in
-> > more detail at the bug link above; the short explanation is the vhost-user
-> > device can be closed while the main thread is in the middle of stopping
-> > the vhost_net.  In this case, the main thread handling shutdown will
-> > enter virtio_net_vhost_status() and move into the n->vhost_started (else)
-> > block, and call vhost_net_stop(); while it is running that function,
-> > another thread is notified that the vhost-user device has been closed,
-> > and (indirectly) calls into virtio_net_vhost_status() also.  Since the
-> > vhost_net status hasn't yet changed, the second thread also enters
-> > the n->vhost_started block, and also calls vhost_net_stop().  This
-> > causes problems for the second thread when it tries to stop the network
-> > that's already been stopped.
-> >
-> > This adds a flag to the struct that's atomically set to prevent more than
-> > one thread from calling vhost_net_stop().  The atomic_fetch_inc() is likely
-> > overkill and probably could be done with a simple check-and-set, but
-> > since it's a race condition there would still be a (very, very) small
-> > window without using an atomic to set it.
->
-> How? Isn't all this under the BQL?
+Sir,
+My proposal is still not review by my mentor. My mentor is JAN KISZKA .I al=
+ready mail him but he not responding me. What I do now? How can I know my p=
+roposal is view or not.
 
-I don't think so, although I'm not deeply familiar with the code.
-Note the code path listed in my last email, run from
-aio_bh_schedule_oneshot() - does that hold the bql while running?
-
->
-> >
-> > Signed-off-by: Dan Streetman <ddstreet@canonical.com>
-> > ---
-> >  hw/net/virtio-net.c            | 3 ++-
-> >  include/hw/virtio/virtio-net.h | 1 +
-> >  2 files changed, 3 insertions(+), 1 deletion(-)
-> >
-> > diff --git a/hw/net/virtio-net.c b/hw/net/virtio-net.c
-> > index ffe0872fff..d36f50d5dd 100644
-> > --- a/hw/net/virtio-net.c
-> > +++ b/hw/net/virtio-net.c
-> > @@ -13,6 +13,7 @@
-> >
-> >  #include "qemu/osdep.h"
-> >  #include "qemu/iov.h"
-> > +#include "qemu/atomic.h"
-> >  #include "hw/virtio/virtio.h"
-> >  #include "net/net.h"
-> >  #include "net/checksum.h"
-> > @@ -240,7 +241,7 @@ static void virtio_net_vhost_status(VirtIONet *n, uint8_t status)
-> >                           "falling back on userspace virtio", -r);
-> >              n->vhost_started = 0;
-> >          }
-> > -    } else {
-> > +    } else if (atomic_fetch_inc(&n->vhost_stopped) == 0) {
-> >          vhost_net_stop(vdev, n->nic->ncs, queues);
-> >          n->vhost_started = 0;
-> >      }
-> > diff --git a/include/hw/virtio/virtio-net.h b/include/hw/virtio/virtio-net.h
-> > index b96f0c643f..d03fd933d0 100644
-> > --- a/include/hw/virtio/virtio-net.h
-> > +++ b/include/hw/virtio/virtio-net.h
-> > @@ -164,6 +164,7 @@ struct VirtIONet {
-> >      uint8_t nouni;
-> >      uint8_t nobcast;
-> >      uint8_t vhost_started;
-> > +    int vhost_stopped;
-> >      struct {
-> >          uint32_t in_use;
-> >          uint32_t first_multi;
->
-> OK questions same as any state:
->
-> - do we need to migrate this?
-> - reset it on device reset?
->
-> > --
-> > 2.20.1
+Sent from Mail for Windows 10
 
