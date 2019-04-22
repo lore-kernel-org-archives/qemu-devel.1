@@ -2,68 +2,68 @@ Return-Path: <SRS0=5Zkg=SY=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.7 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 69EFAC10F14
-	for <qemu-devel@archiver.kernel.org>; Mon, 22 Apr 2019 03:02:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 824A4C10F14
+	for <qemu-devel@archiver.kernel.org>; Mon, 22 Apr 2019 03:43:27 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 353D120833
-	for <qemu-devel@archiver.kernel.org>; Mon, 22 Apr 2019 03:02:36 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 353D120833
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 424EB20833
+	for <qemu-devel@archiver.kernel.org>; Mon, 22 Apr 2019 03:43:27 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=me.com header.i=@me.com header.b="YVctx1dg"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 424EB20833
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=nongnu.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:59819 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:60095 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hIPE3-0002sy-4a
-	for qemu-devel@archiver.kernel.org; Sun, 21 Apr 2019 23:02:35 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:56280)
+	id 1hIPra-0007p8-7P
+	for qemu-devel@archiver.kernel.org; Sun, 21 Apr 2019 23:43:26 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:60726)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jasowang@redhat.com>) id 1hIPD9-0002Ws-VU
-	for qemu-devel@nongnu.org; Sun, 21 Apr 2019 23:01:41 -0400
+	(envelope-from <tgfbeta@me.com>) id 1hIPql-0007YS-Kx
+	for qemu-devel@nongnu.org; Sun, 21 Apr 2019 23:42:36 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jasowang@redhat.com>) id 1hIP2G-0007nI-Do
-	for qemu-devel@nongnu.org; Sun, 21 Apr 2019 22:50:25 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:53898)
+	(envelope-from <tgfbeta@me.com>) id 1hIPqk-0003kT-Of
+	for qemu-devel@nongnu.org; Sun, 21 Apr 2019 23:42:35 -0400
+Received: from pv50p00im-ztdg10011301.me.com ([17.58.6.40]:54072)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <jasowang@redhat.com>)
-	id 1hIP2G-0007ja-5t; Sun, 21 Apr 2019 22:50:24 -0400
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
-	[10.5.11.16])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 6F87D3DE0B;
-	Mon, 22 Apr 2019 02:50:21 +0000 (UTC)
-Received: from [10.72.12.161] (ovpn-12-161.pek2.redhat.com [10.72.12.161])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id 9C75A5C28D;
-	Mon, 22 Apr 2019 02:50:16 +0000 (UTC)
-To: Dan Streetman <dan.streetman@canonical.com>,
-	"Michael S. Tsirkin" <mst@redhat.com>, qemu-devel@nongnu.org,
-	qemu-stable@nongnu.org
-References: <20190416184624.15397-1-dan.streetman@canonical.com>
-	<20190416184624.15397-2-dan.streetman@canonical.com>
-From: Jason Wang <jasowang@redhat.com>
-Message-ID: <9f3dac2a-15fe-8463-6aee-f6916b8d5e1c@redhat.com>
-Date: Mon, 22 Apr 2019 10:50:15 +0800
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
-	Thunderbird/60.6.1
-MIME-Version: 1.0
-In-Reply-To: <20190416184624.15397-2-dan.streetman@canonical.com>
-Content-Type: text/plain; charset="UTF-8"; format="flowed"
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.29]);
-	Mon, 22 Apr 2019 02:50:21 +0000 (UTC)
+	(Exim 4.71) (envelope-from <tgfbeta@me.com>) id 1hIPqk-0003kA-Io
+	for qemu-devel@nongnu.org; Sun, 21 Apr 2019 23:42:34 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=me.com; s=04042017;
+	t=1555904552; bh=q0jctMQZFKKqPnqr0q44tB9DYOQ48pyAL+pluOJjiNQ=;
+	h=From:Content-Type:Mime-Version:Subject:Message-Id:Date:To;
+	b=YVctx1dgHavsIiqY9bianXPBN6iCggJspKUvlVEmAs4n12k5F53nT7JXoylBLzbvh
+	NIcZpllI3rXYQFz+qV/FTOgHIfLEQC7W6CgZvcfT70swdF3hajbSZew3z5V9AXGqzq
+	Ykw5OcK3psbEFD0/ity8q7Q9L4B+KZo2NMiNHXbBmPIGYoZHADTBRsSpq52palLt+V
+	hhyB/x0qC9P9scqVtAKGtEtdXWGJS6YxizyREN/EydzzQ5rCKKX86Pjnpd4UzRvVec
+	iR0wUUsrvmEb6rLt9C3r0diKuz2MfLmEUaX9mSJnseZay3CODdHNWVKx5QEX0WM5BB
+	mh2GwF573+6+A==
+Received: from [172.18.2.102] (unknown [36.106.167.46])
+	by pv50p00im-ztdg10011301.me.com (Postfix) with ESMTPSA id 638F4640054; 
+	Mon, 22 Apr 2019 03:42:31 +0000 (UTC)
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
+Mime-Version: 1.0 (Mac OS X Mail 12.2 \(3445.102.3\))
+Message-Id: <087F1D9C-109D-41D1-BE2C-CE5D840C981B@me.com>
+Date: Mon, 22 Apr 2019 11:42:25 +0800
+To: Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>,
+	Eduardo Habkost <ehabkost@redhat.com>
+X-Mailer: Apple Mail (2.3445.102.3)
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:, ,
+	definitions=2019-04-21_08:, , signatures=0
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=0
+	malwarescore=0
+	phishscore=0 bulkscore=0 spamscore=0 clxscore=1011 mlxscore=0
+	mlxlogscore=682 adultscore=0 classifier=spam adjust=0 reason=mlx
+	scancount=1 engine=8.0.1-1812120000 definitions=main-1904220025
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH 1/2] add VirtIONet vhost_stopped flag to
- prevent multiple stops
+X-Received-From: 17.58.6.40
+Subject: [Qemu-devel] [PATCH] hvf: Add missing break statement
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -75,105 +75,37 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+From: Chen Zhang via Qemu-devel <qemu-devel@nongnu.org>
+Reply-To: Chen Zhang <tgfbeta@me.com>
+Cc: qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190422025015.hp-MCVsOCN8tCOBFe5nMJyZn75kiC2IqWZlZWWObfYw@z>
+Message-ID: <20190422034225.wfndZcROVm2vYQzBX8CRtRswJB2OmBfs_Zn7ask0dkE@z>
 
+In target/i386/hvf/hvf.c, a break statement was probably missing in =
+`hvf_vcpu_exec()`, in handling EXIT_REASON_HLT.
 
-On 2019/4/17 =E4=B8=8A=E5=8D=882:46, Dan Streetman wrote:
-> From: Dan Streetman <ddstreet@canonical.com>
->
-> Buglink: https://launchpad.net/bugs/1823458
->
-> There is a race condition when using the vhost-user driver, between a g=
-uest
-> shutdown and the vhost-user interface being closed.  This is explained =
-in
-> more detail at the bug link above; the short explanation is the vhost-u=
-ser
-> device can be closed while the main thread is in the middle of stopping
-> the vhost_net.  In this case, the main thread handling shutdown will
-> enter virtio_net_vhost_status() and move into the n->vhost_started (els=
-e)
-> block, and call vhost_net_stop(); while it is running that function,
-> another thread is notified that the vhost-user device has been closed,
-> and (indirectly) calls into virtio_net_vhost_status() also.
+These lines seemed to be equivalent to `kvm_handle_halt()`.
 
+Signed-off-by: Chen Zhang <tgfbeta@me.com>
+---
+ target/i386/hvf/hvf.c | 1 +
+ 1 file changed, 1 insertion(+)
 
-I think we need figure out why there are multiple vhost_net_stop() calls=20
-simultaneously. E.g vhost-user register fd handlers like:
+diff --git a/target/i386/hvf/hvf.c b/target/i386/hvf/hvf.c
+index 42f9447303..2751c8125c 100644
+--- a/target/i386/hvf/hvf.c
++++ b/target/i386/hvf/hvf.c
+@@ -708,6 +708,7 @@ int hvf_vcpu_exec(CPUState *cpu)
+                 !(idtvec_info & VMCS_IDT_VEC_VALID)) {
+                 cpu->halted =3D 1;
+                 ret =3D EXCP_HLT;
++                break;
+             }
+             ret =3D EXCP_INTERRUPT;
+             break;
+--=20
+2.21.0
 
- =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 qemu_chr_fe_set_handlers(&s->=
-chr, NULL, NULL,
- =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 net_vhost_user_event, NULL,=
- nc0->name,=20
-NULL,
- =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 true);
-
-which uses default main context, so it should only be called only in=20
-main thread.
-
-Thanks
-
-
->   Since the
-> vhost_net status hasn't yet changed, the second thread also enters
-> the n->vhost_started block, and also calls vhost_net_stop().  This
-> causes problems for the second thread when it tries to stop the network
-> that's already been stopped.
->
-> This adds a flag to the struct that's atomically set to prevent more th=
-an
-> one thread from calling vhost_net_stop().  The atomic_fetch_inc() is li=
-kely
-> overkill and probably could be done with a simple check-and-set, but
-> since it's a race condition there would still be a (very, very) small
-> window without using an atomic to set it.
->
-> Signed-off-by: Dan Streetman <ddstreet@canonical.com>
-> ---
->   hw/net/virtio-net.c            | 3 ++-
->   include/hw/virtio/virtio-net.h | 1 +
->   2 files changed, 3 insertions(+), 1 deletion(-)
->
-> diff --git a/hw/net/virtio-net.c b/hw/net/virtio-net.c
-> index ffe0872fff..d36f50d5dd 100644
-> --- a/hw/net/virtio-net.c
-> +++ b/hw/net/virtio-net.c
-> @@ -13,6 +13,7 @@
->  =20
->   #include "qemu/osdep.h"
->   #include "qemu/iov.h"
-> +#include "qemu/atomic.h"
->   #include "hw/virtio/virtio.h"
->   #include "net/net.h"
->   #include "net/checksum.h"
-> @@ -240,7 +241,7 @@ static void virtio_net_vhost_status(VirtIONet *n, u=
-int8_t status)
->                            "falling back on userspace virtio", -r);
->               n->vhost_started =3D 0;
->           }
-> -    } else {
-> +    } else if (atomic_fetch_inc(&n->vhost_stopped) =3D=3D 0) {
->           vhost_net_stop(vdev, n->nic->ncs, queues);
->           n->vhost_started =3D 0;
->       }
-> diff --git a/include/hw/virtio/virtio-net.h b/include/hw/virtio/virtio-=
-net.h
-> index b96f0c643f..d03fd933d0 100644
-> --- a/include/hw/virtio/virtio-net.h
-> +++ b/include/hw/virtio/virtio-net.h
-> @@ -164,6 +164,7 @@ struct VirtIONet {
->       uint8_t nouni;
->       uint8_t nobcast;
->       uint8_t vhost_started;
-> +    int vhost_stopped;
->       struct {
->           uint32_t in_use;
->           uint32_t first_multi;
 
