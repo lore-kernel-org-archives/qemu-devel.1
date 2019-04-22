@@ -1,16 +1,23 @@
-Received: from eggs.gnu.org ([209.51.188.92]:51153)
+Received: from eggs.gnu.org ([209.51.188.92]:52326)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1hIaP7-0000oH-35
-	for qemu-devel@nongnu.org; Mon, 22 Apr 2019 10:58:46 -0400
+	(envelope-from <vsementsov@virtuozzo.com>) id 1hIaTP-0004ko-B0
+	for qemu-devel@nongnu.org; Mon, 22 Apr 2019 11:03:12 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1hIaP4-00038c-Nc
-	for qemu-devel@nongnu.org; Mon, 22 Apr 2019 10:58:45 -0400
+	(envelope-from <vsementsov@virtuozzo.com>) id 1hIaTO-0005Uu-4D
+	for qemu-devel@nongnu.org; Mon, 22 Apr 2019 11:03:11 -0400
 From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Date: Mon, 22 Apr 2019 17:58:33 +0300
-Message-Id: <20190422145838.70903-5-vsementsov@virtuozzo.com>
-In-Reply-To: <20190422145838.70903-1-vsementsov@virtuozzo.com>
-References: <20190422145838.70903-1-vsementsov@virtuozzo.com>
-Subject: [Qemu-devel] [PATCH 4/9] block/qed: use buffer-based io
+Date: Mon, 22 Apr 2019 15:03:01 +0000
+Message-ID: <d264e5bb-cf20-f152-d4f4-09fdb85802e3@virtuozzo.com>
+References: <20190419140557.102725-1-vsementsov@virtuozzo.com>
+	<20190419140557.102725-4-vsementsov@virtuozzo.com>
+	<f8e6bdca-cc46-c721-4534-1741530a1215@redhat.com>
+In-Reply-To: <f8e6bdca-cc46-c721-4534-1741530a1215@redhat.com>
+Content-Language: en-US
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <B4DA8555643E434CA7A78C8B59EDA7B4@eurprd08.prod.outlook.com>
+Content-Transfer-Encoding: base64
+MIME-Version: 1.0
+Subject: Re: [Qemu-devel] [PATCH v3 3/3] iotests: test big qcow2 shrink
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -19,104 +26,80 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org, qemu-block@nongnu.org
-Cc: jsnow@redhat.com, kwolf@redhat.com, mreitz@redhat.com, stefanha@redhat.com, den@openvz.org, vsementsov@virtuozzo.com
+To: Eric Blake <eblake@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>
+Cc: "kwolf@redhat.com" <kwolf@redhat.com>, "mreitz@redhat.com" <mreitz@redhat.com>, "fam@euphon.net" <fam@euphon.net>, "stefanha@redhat.com" <stefanha@redhat.com>, Denis Lunev <den@virtuozzo.com>
 
-Move to _co_ versions of io functions qed_read_table() and
-qed_write_table(), as we use qemu_co_mutex_unlock()
-anyway.
-
-Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
----
- block/qed-table.c | 12 +++++-------
- block/qed.c       |  6 ++----
- 2 files changed, 7 insertions(+), 11 deletions(-)
-
-diff --git a/block/qed-table.c b/block/qed-table.c
-index c497bd4aec..cf30edd977 100644
---- a/block/qed-table.c
-+++ b/block/qed-table.c
-@@ -21,22 +21,22 @@
- /* Called with table_lock held.  */
- static int qed_read_table(BDRVQEDState *s, uint64_t offset, QEDTable *table)
- {
--    QEMUIOVector qiov = QEMU_IOVEC_INIT_BUF(
--        qiov, table->offsets, s->header.cluster_size * s->header.table_size);
-+    unsigned int bytes = s->header.cluster_size * s->header.table_size;
-+
-     int noffsets;
-     int i, ret;
- 
-     trace_qed_read_table(s, offset, table);
- 
-     qemu_co_mutex_unlock(&s->table_lock);
--    ret = bdrv_preadv(s->bs->file, offset, &qiov);
-+    ret = bdrv_co_pread(s->bs->file, offset, bytes, table->offsets, 0);
-     qemu_co_mutex_lock(&s->table_lock);
-     if (ret < 0) {
-         goto out;
-     }
- 
-     /* Byteswap offsets */
--    noffsets = qiov.size / sizeof(uint64_t);
-+    noffsets = bytes / sizeof(uint64_t);
-     for (i = 0; i < noffsets; i++) {
-         table->offsets[i] = le64_to_cpu(table->offsets[i]);
-     }
-@@ -66,7 +66,6 @@ static int qed_write_table(BDRVQEDState *s, uint64_t offset, QEDTable *table,
-     unsigned int sector_mask = BDRV_SECTOR_SIZE / sizeof(uint64_t) - 1;
-     unsigned int start, end, i;
-     QEDTable *new_table;
--    QEMUIOVector qiov;
-     size_t len_bytes;
-     int ret;
- 
-@@ -79,7 +78,6 @@ static int qed_write_table(BDRVQEDState *s, uint64_t offset, QEDTable *table,
-     len_bytes = (end - start) * sizeof(uint64_t);
- 
-     new_table = qemu_blockalign(s->bs, len_bytes);
--    qemu_iovec_init_buf(&qiov, new_table->offsets, len_bytes);
- 
-     /* Byteswap table */
-     for (i = start; i < end; i++) {
-@@ -91,7 +89,7 @@ static int qed_write_table(BDRVQEDState *s, uint64_t offset, QEDTable *table,
-     offset += start * sizeof(uint64_t);
- 
-     qemu_co_mutex_unlock(&s->table_lock);
--    ret = bdrv_pwritev(s->bs->file, offset, &qiov);
-+    ret = bdrv_co_pwrite(s->bs->file, offset, len_bytes, new_table->offsets, 0);
-     qemu_co_mutex_lock(&s->table_lock);
-     trace_qed_write_table_cb(s, table, flush, ret);
-     if (ret < 0) {
-diff --git a/block/qed.c b/block/qed.c
-index 89af05d524..912edaf56a 100644
---- a/block/qed.c
-+++ b/block/qed.c
-@@ -113,15 +113,13 @@ static int coroutine_fn qed_write_header(BDRVQEDState *s)
-     int nsectors = DIV_ROUND_UP(sizeof(QEDHeader), BDRV_SECTOR_SIZE);
-     size_t len = nsectors * BDRV_SECTOR_SIZE;
-     uint8_t *buf;
--    QEMUIOVector qiov;
-     int ret;
- 
-     assert(s->allocating_acb || s->allocating_write_reqs_plugged);
- 
-     buf = qemu_blockalign(s->bs, len);
--    qemu_iovec_init_buf(&qiov, buf, len);
- 
--    ret = bdrv_co_preadv(s->bs->file, 0, qiov.size, &qiov, 0);
-+    ret = bdrv_co_pread(s->bs->file, 0, len, buf, 0);
-     if (ret < 0) {
-         goto out;
-     }
-@@ -129,7 +127,7 @@ static int coroutine_fn qed_write_header(BDRVQEDState *s)
-     /* Update header */
-     qed_header_cpu_to_le(&s->header, (QEDHeader *) buf);
- 
--    ret = bdrv_co_pwritev(s->bs->file, 0, qiov.size,  &qiov, 0);
-+    ret = bdrv_co_pwrite(s->bs->file, 0, len,  buf, 0);
-     if (ret < 0) {
-         goto out;
-     }
--- 
-2.18.0
+MjIuMDQuMjAxOSAxNjo1OSwgRXJpYyBCbGFrZSB3cm90ZToNCj4gT24gNC8xOS8xOSA5OjA1IEFN
+LCBWbGFkaW1pciBTZW1lbnRzb3YtT2dpZXZza2l5IHdyb3RlOg0KPj4gVGhpcyB0ZXN0IGNoZWNr
+cyBidWcgaW4gcWNvdzJfcHJvY2Vzc19kaXNjYXJkcywgZml4ZWQgYnkgcHJldmlvdXMNCj4+IGNv
+bW1pdC4NCj4+DQo+PiBTaWduZWQtb2ZmLWJ5OiBWbGFkaW1pciBTZW1lbnRzb3YtT2dpZXZza2l5
+IDx2c2VtZW50c292QHZpcnR1b3p6by5jb20+DQo+PiAtLS0NCj4gDQo+PiArIyBUaGlzIHRlc3Qg
+Y2hlY2tzIHRoYXQgcWNvdzJfcHJvY2Vzc19kaXNjYXJkcyBkb2VzIG5vdCB0cnVuY2F0ZSBhIGRp
+c2NhcmQNCj4+ICsjIHJlcXVlc3QgPiAyRy4NCj4+ICsjIFRvIHJlcHJvZHVjZSBidWcgd2UgbmVl
+ZCB0byBvdmVyZmxvdyBpbnQgYnkgb25lIHNlcXVlbnRpYWwgZGlzY2FyZCwgc28gd2UNCj4+ICsj
+IG5lZWQgc2l6ZSA+IDJHLCBiaWdnZXIgY2x1c3RlciBzaXplIChhcyB3aXRoIGRlZmF1bHQgNjRr
+IHdlIG1heSBoYXZlIG1heGltdW0NCj4+ICsjIG9mIDUxMk0gc2VxdWVudGlhbCBkYXRhLCBjb3Jy
+ZXNwb25kaW5nIHRvIG9uZSBMMSBlbnRyeSksIGFuZCB3ZSBuZWVkIHNvbWUNCj4+ICsjIGRhdGEg
+b2YgdGhlIGJlZ2lubmluZyBvZiB0aGUgZGlzayBtYXBwZWQgdG8gdGhlIGVuZCBvZiBmaWxlIHRv
+IHByZXZlbnQNCj4+ICsjIGJkcnZfY29fdHJ1bmNhdGUoYnMtPmZpbGUpIGNhbGwgaW4gcWNvdzJf
+Y29fdHJ1bmNhdGUoKSwgd2hpY2ggbWF5IHN1Y2Nlc3MNCj4gDQo+IHMvbWF5IHN1Y2Nlc3MvbWln
+aHQgc3VjY2VlZC8NCj4gDQo+PiArIyBhbnl3YXkuDQo+PiArDQo+PiArc2l6ZT0yMTAwTQ0KPj4g
+K0lNR09QVFM9ImNsdXN0ZXJfc2l6ZT0xTSxwcmVhbGxvY2F0aW9uPW1ldGFkYXRhIg0KPj4gKw0K
+Pj4gK19tYWtlX3Rlc3RfaW1nICRzaXplDQo+PiArJFFFTVVfSU8gLWMgJ2Rpc2NhcmQgMCAxME0n
+IC1jICdkaXNjYXJkIDIwOTBNIDEwTScgXA0KPj4gKyAgICAgICAgIC1jICd3cml0ZSAyMDkwTSAx
+ME0nIC1jICd3cml0ZSAwIDEwTScgIiRURVNUX0lNRyIgfCBfZmlsdGVyX3FlbXVfaW8NCj4+ICsN
+Cj4+ICsjIENoZWNrIHRoYXQgb3VyIHRyaWNrIHdpdGggc3dhcHBpbmcgZmlyc3QgYW5kIGxhc3Qg
+MTBNIGNodW5rcyBzdWNjZWVkZWQuDQo+PiArIyBPdGhlcndpc2UgdGVzdCB3aWxsIG1heSBwYXNz
+IGV2ZW4gaWYgYmRydl9wZGlzY2FyZCgpIGZhaWxzIGluDQo+PiArIyBxY293Ml9wcm9jZXNzX2Rp
+c2NhcmRzKCkNCj4+ICskUUVNVV9JTUcgbWFwICIkVEVTVF9JTUciIHwgX2ZpbHRlcl90ZXN0ZGly
+DQo+PiArJFFFTVVfSU1HIGluZm8gIiRURVNUX0lNRyIgfCBncmVwIHNpemUgfCAgX2ZpbHRlcl90
+ZXN0ZGlyDQo+IA0KPiBOaWNlIC0gdGhhdCdzIGEgbG90IGZhc3RlciB0aGFuIHYxISBBbmQgbWFr
+ZXMgdGhlIHRlc3QgZml0IGluIHRoZSBxdWljaw0KPiBncm91cCBhZnRlciBhbGwuDQo+IA0KPj4g
+Kw0KPj4gKyRRRU1VX0lNRyAtVCAncWNvdzJfcHJvY2Vzc19kaXNjYXJkc19mYWlsZWQqJyByZXNp
+emUgLS1zaHJpbmsgIiRURVNUX0lNRyIgNU0NCj4gDQo+IEhvd2V2ZXIsIEknbSBxdWl0ZSBjZXJ0
+YWluIHRoYXQgdHJhY2Ugb3V0cHV0IGlzIG5vdCByZWxpYWJsZSBpbiBpb3Rlc3RzLg0KPiBEZXBl
+bmRpbmcgb24gY29uZmlndXJlIG9wdGlvbnMsIHRyYWNlcyBtaWdodCBub3QgYmUgZW5hYmxlZCBh
+dCBhbGwsIG9yDQo+IG1pZ2h0IG5vdCBnbyB0byBzdGRlcnIuIERyb3AgdGhlIC1UICcuLi4nLiAg
+RXZlbiB3aXRob3V0IHRoZSB0cmFjZSBsaW5lLA0KPiANCj4+ICsNCj4+ICskUUVNVV9JTUcgaW5m
+byAiJFRFU1RfSU1HIiB8IGdyZXAgc2l6ZSB8IF9maWx0ZXJfdGVzdGRpcg0KPiANCj4gdGhpcyBz
+ZWNvbmQgaW1hZ2UgaW5mbyBpcyBzdWZmaWNpZW50IHRvIHByb3ZlIHdoZXRoZXIgdGhlIHJlc2l6
+ZSBoYWQgYW4NCj4gZWZmZWN0IChwb3N0LXBhdGNoKSBvciBleHBvc2VzIHRoZSBidWcgKHdpdGhv
+dXQgcGF0Y2ggMi8zKS4gVGhhdCBpcywNCj4gYXBwbHlpbmcgdGhpcyBwYXRjaCBidXQgbm90IDIv
+MywgSSBzZWUgdGhpcyAod2l0aCBteSBjbGVhbnVwcyB0bw0KPiBxZW11LWltZyBpbmZvIGluIHBs
+YWNlLCBmcm9tIEtldmluJ3MgYmxvY2stbmV4dCBicmFuY2gpOg0KPiANCj4gKysrIC9ob21lL2Vi
+bGFrZS9xZW11L3Rlc3RzL3FlbXUtaW90ZXN0cy8yNTAub3V0LmJhZAkyMDE5LTA0LTIyDQo+IDA4
+OjUyOjI2LjA3Mjk2ODczMSAtMDUwMA0KPiBAQCAtMTQsOCArMTQsOSBAQA0KPiAgIHZpcnR1YWwg
+c2l6ZTogMi4wNSBHaUIgKDIyMDIwMDk2MDAgYnl0ZXMpDQo+ICAgZGlzayBzaXplOiAyNCBNaUIN
+Cj4gICBjbHVzdGVyX3NpemU6IDEwNDg1NzYNCj4gKzE4Mjc0QDE1NTU5NDExNDUuOTk5MTk1OnFj
+b3cyX3Byb2Nlc3NfZGlzY2FyZHNfZmFpbGVkX3JlZ2lvbiBvZmZzZXQNCj4gMHg1MDAwMDAgYnl0
+ZXMgMHg4MmEwMDAwMCByZXQgLTUNCj4gICBJbWFnZSByZXNpemVkLg0KPiAgIHZpcnR1YWwgc2l6
+ZTogNSBNaUIgKDUyNDI4ODAgYnl0ZXMpDQo+IC1kaXNrIHNpemU6IDkuMDEgTWlCDQo+ICtkaXNr
+IHNpemU6IDE5IE1pQg0KPiANCj4gd2hlcmUgdGhlIHRyYWNlIGRpZCBpbmRlZWQgc2hvdyBzaG93
+IHRoYXQgd2UgaGFkIGEgYnVnLCBidXQgd2hlcmUgZXZlbg0KPiB3aXRob3V0IHRoZSB0cmFjZSwg
+dGhlIGRpZmZlcmVuY2UgaW4gc2l6ZSBiZXR3ZWVuIDE5TSB3aXRoIGluY29tcGxldGUNCj4gZGlz
+Y2FyZHMgdnMuIDlNIHdpdGggcGF0Y2ggMi8zIGlzIGVub3VnaCB0byBzaG93IHRoYXQgcGF0Y2gg
+Mi8zIGZpeGVzIGEgYnVnLg0KPiANCj4+ICt2aXJ0dWFsIHNpemU6IDIuMUcgKDIyMDIwMDk2MDAg
+Ynl0ZXMpDQo+PiArZGlzayBzaXplOiAyNE0NCj4+ICtjbHVzdGVyX3NpemU6IDEwNDg1NzYNCj4+
+ICtJbWFnZSByZXNpemVkLg0KPj4gK3ZpcnR1YWwgc2l6ZTogNS4wTSAoNTI0Mjg4MCBieXRlcykN
+Cj4+ICtkaXNrIHNpemU6IDkuME0NCj4+ICtjbHVzdGVyX3NpemU6IDEwNDg1NzYNCj4gDQo+IFdo
+ZW4gS2V2aW4ncyBibG9jay1uZXh0IGJyYW5jaCBpcyBhcHBsaWVkLCB5b3UnbGwgbmVlZCB0aGlz
+IHNxdWFzaGVkIGluOg0KPiANCj4gZGlmZiAtLWdpdCBhL3Rlc3RzL3FlbXUtaW90ZXN0cy8yNTAu
+b3V0IGIvdGVzdHMvcWVtdS1pb3Rlc3RzLzI1MC5vdXQNCj4gaW5kZXggMzdlMzdmMGM5ZTcuLmQx
+YzFjNzE4MGI1IDEwMDY0NA0KPiAtLS0gYS90ZXN0cy9xZW11LWlvdGVzdHMvMjUwLm91dA0KPiAr
+KysgYi90ZXN0cy9xZW11LWlvdGVzdHMvMjUwLm91dA0KPiBAQCAtMTEsMTEgKzExLDExIEBAIHdy
+b3RlIDEwNDg1NzYwLzEwNDg1NzYwIGJ5dGVzIGF0IG9mZnNldCAwDQo+ICAgT2Zmc2V0ICAgICAg
+ICAgIExlbmd0aCAgICAgICAgICBNYXBwZWQgdG8gICAgICAgRmlsZQ0KPiAgIDAgICAgICAgICAg
+ICAgICAweGEwMDAwMCAgICAgICAgMHg4MmYwMDAwMCAgICAgIFRFU1RfRElSL3QucWNvdzINCj4g
+ICAweDgyYTAwMDAwICAgICAgMHhhMDAwMDAgICAgICAgIDB4NTAwMDAwICAgICAgICBURVNUX0RJ
+Ui90LnFjb3cyDQo+IC12aXJ0dWFsIHNpemU6IDIuMUcgKDIyMDIwMDk2MDAgYnl0ZXMpDQo+IC1k
+aXNrIHNpemU6IDI0TQ0KPiArdmlydHVhbCBzaXplOiAyLjA1IEdpQiAoMjIwMjAwOTYwMCBieXRl
+cykNCj4gK2Rpc2sgc2l6ZTogMjQgTWlCDQo+ICAgY2x1c3Rlcl9zaXplOiAxMDQ4NTc2DQo+ICAg
+SW1hZ2UgcmVzaXplZC4NCj4gLXZpcnR1YWwgc2l6ZTogNS4wTSAoNTI0Mjg4MCBieXRlcykNCj4g
+LWRpc2sgc2l6ZTogOS4wTQ0KPiArdmlydHVhbCBzaXplOiA1IE1pQiAoNTI0Mjg4MCBieXRlcykN
+Cj4gK2Rpc2sgc2l6ZTogOS4wMSBNaUINCj4gICBjbHVzdGVyX3NpemU6IDEwNDg1NzYNCj4gICAq
+KiogZG9uZQ0KPiANCj4gV2l0aCB0aGUgdXBkYXRlZCBvdXRwdXQgdG8gbWF0Y2ggY2hhbmdlcyB0
+byBxZW11LWltZyBvdXRwdXQsIHRoZSBncmFtbWFyDQo+IGZpeGVzLCBhbmQgd2l0aCB0aGUgLVQg
+b3B0aW9uIHJlbW92ZWQsDQo+IA0KPiBSZXZpZXdlZC1ieTogRXJpYyBCbGFrZSA8ZWJsYWtlQHJl
+ZGhhdC5jb20+DQo+IFRlc3RlZC1ieTogRXJpYyBCbGFrZSA8ZWJsYWtlQHJlZGhhdC5jb20+DQo+
+IA0KDQpUaGFuayB5b3UhDQoNCkknbGwgcmVzZW5kIHNvb24uDQoNCi0tIA0KQmVzdCByZWdhcmRz
+LA0KVmxhZGltaXINCg==
