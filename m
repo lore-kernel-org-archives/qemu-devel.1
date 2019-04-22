@@ -1,24 +1,23 @@
-Received: from eggs.gnu.org ([209.51.188.92]:40247)
+Received: from eggs.gnu.org ([209.51.188.92]:40264)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pavel.dovgaluk@gmail.com>) id 1hIX0L-0000Wm-VN
-	for qemu-devel@nongnu.org; Mon, 22 Apr 2019 07:20:59 -0400
+	(envelope-from <pavel.dovgaluk@gmail.com>) id 1hIX0R-0000cc-Rk
+	for qemu-devel@nongnu.org; Mon, 22 Apr 2019 07:21:04 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pavel.dovgaluk@gmail.com>) id 1hIX0J-00026y-Vl
-	for qemu-devel@nongnu.org; Mon, 22 Apr 2019 07:20:57 -0400
-Received: from mail.ispras.ru ([83.149.199.45]:47110)
+	(envelope-from <pavel.dovgaluk@gmail.com>) id 1hIX0Q-0002AX-0H
+	for qemu-devel@nongnu.org; Mon, 22 Apr 2019 07:21:03 -0400
+Received: from mail.ispras.ru ([83.149.199.45]:47134)
 	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pavel.dovgaluk@gmail.com>) id 1hIX0I-000260-BL
-	for qemu-devel@nongnu.org; Mon, 22 Apr 2019 07:20:54 -0400
+	(envelope-from <pavel.dovgaluk@gmail.com>) id 1hIX0O-00028a-0G
+	for qemu-devel@nongnu.org; Mon, 22 Apr 2019 07:21:01 -0400
 From: Pavel Dovgalyuk <pavel.dovgaluk@gmail.com>
-Date: Mon, 22 Apr 2019 14:20:53 +0300
-Message-ID: <155593205323.21079.896262494235573420.stgit@pasha-Precision-3630-Tower>
+Date: Mon, 22 Apr 2019 14:20:58 +0300
+Message-ID: <155593205889.21079.14799791777208991110.stgit@pasha-Precision-3630-Tower>
 In-Reply-To: <155593197705.21079.8238359471765771689.stgit@pasha-Precision-3630-Tower>
 References: <155593197705.21079.8238359471765771689.stgit@pasha-Precision-3630-Tower>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Subject: [Qemu-devel] [PATCH for-4.1 13/24] replay: implement replay-seek
- command
+Subject: [Qemu-devel] [PATCH for-4.1 14/24] replay: refine replay-time module
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,207 +31,70 @@ Cc: kwolf@redhat.com, peter.maydell@linaro.org, war2jordan@live.com, crosthwaite
 
 From: Pavel Dovgalyuk <Pavel.Dovgaluk@ispras.ru>
 
-This patch adds hmp/qmp commands replay_seek/replay-seek that proceed
-the execution to the specified instruction count.
-The command automatically loads nearest snapshot and replays the execution
-to find the desired instruction count.
+This patch removes refactoring artifacts from the replay/replay-time.c
 
 Signed-off-by: Pavel Dovgalyuk <Pavel.Dovgaluk@ispras.ru>
-Acked-by: Markus Armbruster <armbru@redhat.com>
-
---
-
-v2:
- - renamed replay_seek qmp command into replay-seek
-   (suggested by Eric Blake)
-v7:
- - small fixes related to Markus Armbruster's review
-v9:
- - changed 'step' parameter name to 'icount'
- - moved json stuff to replay.json and updated the description
-   (suggested by Markus Armbruster)
-v10:
- - updated the descriptions
 ---
- hmp-commands.hx           |   19 +++++++++
- hmp.h                     |    1 
- qapi/replay.json          |   20 ++++++++++
- replay/replay-debugging.c |   92 +++++++++++++++++++++++++++++++++++++++++++++
- 4 files changed, 132 insertions(+)
+ replay/replay-time.c |   36 ++++++++++++++++--------------------
+ 1 file changed, 16 insertions(+), 20 deletions(-)
 
-diff --git a/hmp-commands.hx b/hmp-commands.hx
-index 1eb07e7bcc..88a2d32110 100644
---- a/hmp-commands.hx
-+++ b/hmp-commands.hx
-@@ -1945,6 +1945,25 @@ STEXI
- @findex replay_delete_break
- Remove replay breakpoint which was previously set with replay_break.
- The command is ignored when there are no replay breakpoints.
-+ETEXI
-+
-+    {
-+        .name       = "replay_seek",
-+        .args_type  = "icount:i",
-+        .params     = "icount",
-+        .help       = "replay execution to the specified instruction count",
-+        .cmd        = hmp_replay_seek,
-+    },
-+
-+STEXI
-+@item replay_seek @var{icount}
-+@findex replay_seek
-+Automatically proceed to the instruction count @var{icount}, when
-+replaying the execution. The command automatically loads nearest
-+snapshot and replays the execution to find the desired instruction.
-+When there is no preceding snapshot or the execution is not replayed,
-+then the command fails.
-+icount for the reference may be observed with 'info replay' command.
- ETEXI
+diff --git a/replay/replay-time.c b/replay/replay-time.c
+index 0df1693337..60f47b73a7 100644
+--- a/replay/replay-time.c
++++ b/replay/replay-time.c
+@@ -15,18 +15,19 @@
+ #include "replay-internal.h"
+ #include "qemu/error-report.h"
  
-     {
-diff --git a/hmp.h b/hmp.h
-index c3e7354dd3..c67a911f2e 100644
---- a/hmp.h
-+++ b/hmp.h
-@@ -153,5 +153,6 @@ void hmp_info_sev(Monitor *mon, const QDict *qdict);
- void hmp_info_replay(Monitor *mon, const QDict *qdict);
- void hmp_replay_break(Monitor *mon, const QDict *qdict);
- void hmp_replay_delete_break(Monitor *mon, const QDict *qdict);
-+void hmp_replay_seek(Monitor *mon, const QDict *qdict);
- 
- #endif
-diff --git a/qapi/replay.json b/qapi/replay.json
-index 425e053e4d..aa768d496c 100644
---- a/qapi/replay.json
-+++ b/qapi/replay.json
-@@ -99,3 +99,23 @@
- #
- ##
- { 'command': 'replay-delete-break' }
-+
-+##
-+# @replay-seek:
-+#
-+# Automatically proceed to the instruction count @icount, when
-+# replaying the execution. The command automatically loads nearest
-+# snapshot and replays the execution to find the desired instruction.
-+# When there is no preceding snapshot or the execution is not replayed,
-+# then the command fails.
-+# icount for the reference may be obtained with @query-replay command.
-+#
-+# @icount: target instruction count
-+#
-+# Since: 4.1
-+#
-+# Example:
-+#
-+# -> { "execute": "replay-seek", "data": { "icount": 220414 } }
-+##
-+{ 'command': 'replay-seek', 'data': { 'icount': 'int' } }
-diff --git a/replay/replay-debugging.c b/replay/replay-debugging.c
-index a94685e437..e3821ab1ba 100644
---- a/replay/replay-debugging.c
-+++ b/replay/replay-debugging.c
-@@ -18,6 +18,8 @@
- #include "qapi/qapi-commands-replay.h"
- #include "qapi/qmp/qdict.h"
- #include "qemu/timer.h"
-+#include "block/snapshot.h"
-+#include "migration/snapshot.h"
- 
- void hmp_info_replay(Monitor *mon, const QDict *qdict)
+-int64_t replay_save_clock(ReplayClockKind kind, int64_t clock, int64_t raw_icount)
++int64_t replay_save_clock(ReplayClockKind kind, int64_t clock,
++                          int64_t raw_icount)
  {
-@@ -127,3 +129,93 @@ void hmp_replay_delete_break(Monitor *mon, const QDict *qdict)
-         return;
-     }
+-    if (replay_file) {
+-        g_assert(replay_mutex_locked());
++    g_assert(replay_file);
++    g_assert(replay_mutex_locked());
+ 
+-        /* Due to the caller's locking requirements we get the icount from it
+-         * instead of using replay_save_instructions().
+-         */
+-        replay_advance_current_step(raw_icount);
+-        replay_put_event(EVENT_CLOCK + kind);
+-        replay_put_qword(clock);
+-    }
++    /*
++     * Due to the caller's locking requirements we get the icount from it
++     * instead of using replay_save_instructions().
++     */
++    replay_advance_current_step(raw_icount);
++    replay_put_event(EVENT_CLOCK + kind);
++    replay_put_qword(clock);
+ 
+     return clock;
  }
-+
-+static char *replay_find_nearest_snapshot(int64_t icount,
-+                                          int64_t *snapshot_icount)
-+{
-+    BlockDriverState *bs;
-+    QEMUSnapshotInfo *sn_tab;
-+    QEMUSnapshotInfo *nearest = NULL;
-+    char *ret = NULL;
-+    int nb_sns, i;
-+    AioContext *aio_context;
-+
-+    *snapshot_icount = -1;
-+
-+    bs = bdrv_all_find_vmstate_bs();
-+    if (!bs) {
-+        goto fail;
-+    }
-+    aio_context = bdrv_get_aio_context(bs);
-+
-+    aio_context_acquire(aio_context);
-+    nb_sns = bdrv_snapshot_list(bs, &sn_tab);
-+    aio_context_release(aio_context);
-+
-+    for (i = 0; i < nb_sns; i++) {
-+        if (bdrv_all_find_snapshot(sn_tab[i].name, &bs) == 0) {
-+            if (sn_tab[i].icount != -1ULL
-+                && sn_tab[i].icount <= icount
-+                && (!nearest || nearest->icount < sn_tab[i].icount)) {
-+                nearest = &sn_tab[i];
-+            }
-+        }
-+    }
-+    if (nearest) {
-+        ret = g_strdup(nearest->name);
-+        *snapshot_icount = nearest->icount;
-+    }
-+    g_free(sn_tab);
-+
-+fail:
+@@ -48,20 +49,15 @@ void replay_read_next_clock(ReplayClockKind kind)
+ /*! Reads next clock event from the input. */
+ int64_t replay_read_clock(ReplayClockKind kind)
+ {
++    int64_t ret;
+     g_assert(replay_file && replay_mutex_locked());
+ 
+     replay_account_executed_instructions();
+ 
+-    if (replay_file) {
+-        int64_t ret;
+-        if (replay_next_event_is(EVENT_CLOCK + kind)) {
+-            replay_read_next_clock(kind);
+-        }
+-        ret = replay_state.cached_clock[kind];
+-
+-        return ret;
++    if (replay_next_event_is(EVENT_CLOCK + kind)) {
++        replay_read_next_clock(kind);
+     }
++    ret = replay_state.cached_clock[kind];
+ 
+-    error_report("REPLAY INTERNAL ERROR %d", __LINE__);
+-    exit(1);
 +    return ret;
-+}
-+
-+static void replay_seek(int64_t icount, QEMUTimerCB callback, Error **errp)
-+{
-+    char *snapshot = NULL;
-+    int64_t snapshot_icount;
-+
-+    if (replay_mode != REPLAY_MODE_PLAY) {
-+        error_setg(errp, "replay must be enabled to seek");
-+        return;
-+    }
-+    if (!replay_snapshot) {
-+        error_setg(errp, "snapshotting is disabled");
-+        return;
-+    }
-+
-+    snapshot = replay_find_nearest_snapshot(icount, &snapshot_icount);
-+    if (snapshot) {
-+        if (icount < replay_get_current_step()
-+            || replay_get_current_step() < snapshot_icount) {
-+            vm_stop(RUN_STATE_RESTORE_VM);
-+            load_snapshot(snapshot, errp);
-+        }
-+        g_free(snapshot);
-+    }
-+    if (replay_get_current_step() <= icount) {
-+        replay_break(icount, callback, NULL);
-+        vm_start();
-+    } else {
-+        error_setg(errp, "cannot seek to the specified instruction count");
-+    }
-+}
-+
-+void qmp_replay_seek(int64_t icount, Error **errp)
-+{
-+    replay_seek(icount, replay_stop_vm, errp);
-+}
-+
-+void hmp_replay_seek(Monitor *mon, const QDict *qdict)
-+{
-+    int64_t icount = qdict_get_try_int(qdict, "icount", -1LL);
-+    Error *err = NULL;
-+
-+    qmp_replay_seek(icount, &err);
-+    if (err) {
-+        error_report_err(err);
-+        error_free(err);
-+        return;
-+    }
-+}
+ }
