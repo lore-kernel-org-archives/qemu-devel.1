@@ -1,25 +1,26 @@
-Received: from eggs.gnu.org ([209.51.188.92]:33816)
+Received: from eggs.gnu.org ([209.51.188.92]:47765)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1hIQ6r-000193-5p
-	for qemu-devel@nongnu.org; Sun, 21 Apr 2019 23:59:14 -0400
+	(envelope-from <leon@kernel.org>) id 1hIS0e-0000f3-RK
+	for qemu-devel@nongnu.org; Mon, 22 Apr 2019 02:01:01 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1hIPwS-0007qc-5y
-	for qemu-devel@nongnu.org; Sun, 21 Apr 2019 23:48:31 -0400
-Resent-Message-Id: <E1hIPwS-0007qc-5y@eggs.gnu.org>
-Received: from sender-of-o52.zoho.com ([135.84.80.217]:21447)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
-	id 1hIPwR-0007fL-R1
-	for qemu-devel@nongnu.org; Sun, 21 Apr 2019 23:48:28 -0400
-In-Reply-To: <087F1D9C-109D-41D1-BE2C-CE5D840C981B@me.com>
-Message-ID: <155590486009.24.10885425548462800415@c2072b67cc0c>
-Reply-To: <qemu-devel@nongnu.org>
+	(envelope-from <leon@kernel.org>) id 1hIS0R-0006VD-1k
+	for qemu-devel@nongnu.org; Mon, 22 Apr 2019 02:00:48 -0400
+Received: from mail.kernel.org ([198.145.29.99]:35648)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <leon@kernel.org>) id 1hIS0Q-0006TZ-5M
+	for qemu-devel@nongnu.org; Mon, 22 Apr 2019 02:00:42 -0400
+Date: Mon, 22 Apr 2019 09:00:34 +0300
+From: Leon Romanovsky <leon@kernel.org>
+Message-ID: <20190422060034.GA27901@mtr-leonro.mtl.com>
+References: <20190411110157.14252-1-yuval.shaia@oracle.com>
+	<20190411190215.2163572e.cohuck@redhat.com>
+	<20190415103546.GA6854@lap1>
+	<e73e03c2-ea2b-6ffc-cd23-e8e44d42ce80@suse.de>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Sun, 21 Apr 2019 20:47:41 -0700 (PDT)
-Subject: Re: [Qemu-devel] [PATCH] hvf: Add missing break statement
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <e73e03c2-ea2b-6ffc-cd23-e8e44d42ce80@suse.de>
+Subject: Re: [Qemu-devel] [RFC 0/3] VirtIO RDMA
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,41 +29,113 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: fam@euphon.net, pbonzini@redhat.com, rth@twiddle.net, ehabkost@redhat.com
+To: Hannes Reinecke <hare@suse.de>
+Cc: Yuval Shaia <yuval.shaia@oracle.com>, Cornelia Huck <cohuck@redhat.com>, mst@redhat.com, linux-rdma@vger.kernel.org, qemu-devel@nongnu.org, virtualization@lists.linux-foundation.org, jgg@mellanox.com
 
-UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8wODdGMUQ5Qy0xMDlELTQxRDEt
-QkUyQy1DRTVEODQwQzk4MUJAbWUuY29tLwoKCgpIaSwKClRoaXMgc2VyaWVzIHNlZW1zIHRvIGhh
-dmUgc29tZSBjb2Rpbmcgc3R5bGUgcHJvYmxlbXMuIFNlZSBvdXRwdXQgYmVsb3cgZm9yCm1vcmUg
-aW5mb3JtYXRpb246CgpUeXBlOiBzZXJpZXMKTWVzc2FnZS1pZDogMDg3RjFEOUMtMTA5RC00MUQx
-LUJFMkMtQ0U1RDg0MEM5ODFCQG1lLmNvbQpTdWJqZWN0OiBbUWVtdS1kZXZlbF0gW1BBVENIXSBo
-dmY6IEFkZCBtaXNzaW5nIGJyZWFrIHN0YXRlbWVudAoKPT09IFRFU1QgU0NSSVBUIEJFR0lOID09
-PQojIS9iaW4vYmFzaApnaXQgcmV2LXBhcnNlIGJhc2UgPiAvZGV2L251bGwgfHwgZXhpdCAwCmdp
-dCBjb25maWcgLS1sb2NhbCBkaWZmLnJlbmFtZWxpbWl0IDAKZ2l0IGNvbmZpZyAtLWxvY2FsIGRp
-ZmYucmVuYW1lcyBUcnVlCmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLmFsZ29yaXRobSBoaXN0b2dy
-YW0KLi9zY3JpcHRzL2NoZWNrcGF0Y2gucGwgLS1tYWlsYmFjayBiYXNlLi4KPT09IFRFU1QgU0NS
-SVBUIEVORCA9PT0KClVwZGF0aW5nIDNjOGNmNWE5YzIxZmY4NzgyMTY0ZDFkZWY3ZjQ0YmQ4ODg3
-MTMzODQKRnJvbSBodHRwczovL2dpdGh1Yi5jb20vcGF0Y2hldy1wcm9qZWN0L3FlbXUKICogW25l
-dyB0YWddICAgICAgICAgICAgICAgcGF0Y2hldy8wODdGMUQ5Qy0xMDlELTQxRDEtQkUyQy1DRTVE
-ODQwQzk4MUJAbWUuY29tIC0+IHBhdGNoZXcvMDg3RjFEOUMtMTA5RC00MUQxLUJFMkMtQ0U1RDg0
-MEM5ODFCQG1lLmNvbQogdCBbdGFnIHVwZGF0ZV0gICAgICAgICAgICBwYXRjaGV3LzIwMTkwNDIw
-MDkxMDE2LjIxMzE2MC0xLWZlbmdsaUBzbWFydHguY29tIC0+IHBhdGNoZXcvMjAxOTA0MjAwOTEw
-MTYuMjEzMTYwLTEtZmVuZ2xpQHNtYXJ0eC5jb20KIHQgW3RhZyB1cGRhdGVdICAgICAgICAgICAg
-cGF0Y2hldy8yMDE5MDQyMDE2MTQ0Ni4yMjc0LTEtbGlxM2VhQDE2My5jb20gLT4gcGF0Y2hldy8y
-MDE5MDQyMDE2MTQ0Ni4yMjc0LTEtbGlxM2VhQDE2My5jb20KIHQgW3RhZyB1cGRhdGVdICAgICAg
-ICAgICAgcGF0Y2hldy8yMDE5MDQyMDE5MTQyNS43ZDFkYWI4MkBsdWtsYXAgLT4gcGF0Y2hldy8y
-MDE5MDQyMDE5MTQyNS43ZDFkYWI4MkBsdWtsYXAKU3dpdGNoZWQgdG8gYSBuZXcgYnJhbmNoICd0
-ZXN0Jwo5Njg4M2I5ZjJiIGh2ZjogQWRkIG1pc3NpbmcgYnJlYWsgc3RhdGVtZW50Cgo9PT0gT1VU
-UFVUIEJFR0lOID09PQpFUlJPUjogQXV0aG9yIGVtYWlsIGFkZHJlc3MgaXMgbWFuZ2xlZCBieSB0
-aGUgbWFpbGluZyBsaXN0CiMyOiAKQXV0aG9yOiBDaGVuIFpoYW5nIHZpYSBRZW11LWRldmVsIDxx
-ZW11LWRldmVsQG5vbmdudS5vcmc+Cgp0b3RhbDogMSBlcnJvcnMsIDAgd2FybmluZ3MsIDcgbGlu
-ZXMgY2hlY2tlZAoKQ29tbWl0IDk2ODgzYjlmMmI4ZSAoaHZmOiBBZGQgbWlzc2luZyBicmVhayBz
-dGF0ZW1lbnQpIGhhcyBzdHlsZSBwcm9ibGVtcywgcGxlYXNlIHJldmlldy4gIElmIGFueSBvZiB0
-aGVzZSBlcnJvcnMKYXJlIGZhbHNlIHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRh
-aW5lciwgc2VlCkNIRUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMuCj09PSBPVVRQVVQgRU5EID09PQoK
-VGVzdCBjb21tYW5kIGV4aXRlZCB3aXRoIGNvZGU6IDEKCgpUaGUgZnVsbCBsb2cgaXMgYXZhaWxh
-YmxlIGF0Cmh0dHA6Ly9wYXRjaGV3Lm9yZy9sb2dzLzA4N0YxRDlDLTEwOUQtNDFEMS1CRTJDLUNF
-NUQ4NDBDOTgxQkBtZS5jb20vdGVzdGluZy5jaGVja3BhdGNoLz90eXBlPW1lc3NhZ2UuCi0tLQpF
-bWFpbCBnZW5lcmF0ZWQgYXV0b21hdGljYWxseSBieSBQYXRjaGV3IFtodHRwczovL3BhdGNoZXcu
-b3JnL10uClBsZWFzZSBzZW5kIHlvdXIgZmVlZGJhY2sgdG8gcGF0Y2hldy1kZXZlbEByZWRoYXQu
-Y29t
+On Fri, Apr 19, 2019 at 01:16:06PM +0200, Hannes Reinecke wrote:
+> On 4/15/19 12:35 PM, Yuval Shaia wrote:
+> > On Thu, Apr 11, 2019 at 07:02:15PM +0200, Cornelia Huck wrote:
+> > > On Thu, 11 Apr 2019 14:01:54 +0300
+> > > Yuval Shaia <yuval.shaia@oracle.com> wrote:
+> > >
+> > > > Data center backends use more and more RDMA or RoCE devices and more and
+> > > > more software runs in virtualized environment.
+> > > > There is a need for a standard to enable RDMA/RoCE on Virtual Machines.
+> > > >
+> > > > Virtio is the optimal solution since is the de-facto para-virtualizaton
+> > > > technology and also because the Virtio specification
+> > > > allows Hardware Vendors to support Virtio protocol natively in order to
+> > > > achieve bare metal performance.
+> > > >
+> > > > This RFC is an effort to addresses challenges in defining the RDMA/RoCE
+> > > > Virtio Specification and a look forward on possible implementation
+> > > > techniques.
+> > > >
+> > > > Open issues/Todo list:
+> > > > List is huge, this is only start point of the project.
+> > > > Anyway, here is one example of item in the list:
+> > > > - Multi VirtQ: Every QP has two rings and every CQ has one. This means that
+> > > >    in order to support for example 32K QPs we will need 64K VirtQ. Not sure
+> > > >    that this is reasonable so one option is to have one for all and
+> > > >    multiplex the traffic on it. This is not good approach as by design it
+> > > >    introducing an optional starvation. Another approach would be multi
+> > > >    queues and round-robin (for example) between them.
+> > > >
+> Typically there will be a one-to-one mapping between QPs and CPUs (on the
+> guest). So while one would need to be prepared to support quite some QPs,
+> the expectation is that the actual number of QPs used will be rather low.
+> In a similar vein, multiplexing QPs would be defeating the purpose, as the
+> overall idea was to have _independent_ QPs to enhance parallelism.
+>
+> > > > Expectations from this posting:
+> > > > In general, any comment is welcome, starting from hey, drop this as it is a
+> > > > very bad idea, to yeah, go ahead, we really want it.
+> > > > Idea here is that since it is not a minor effort i first want to know if
+> > > > there is some sort interest in the community for such device.
+> > >
+> > > My first reaction is: Sounds sensible, but it would be good to have a
+> > > spec for this :)
+> > >
+> > > You'll need a spec if you want this to go forward anyway, so at least a
+> > > sketch would be good to answer questions such as how many virtqueues
+> > > you use for which purpose, what is actually put on the virtqueues,
+> > > whether there are negotiable features, and what the expectations for
+> > > the device and the driver are. It also makes it easier to understand
+> > > how this is supposed to work in practice.
+> > >
+> > > If folks agree that this sounds useful, the next step would be to
+> > > reserve an id for the device type.
+> >
+> > Thanks for the tips, will sure do that, it is that first i wanted to make
+> > sure there is a use case here.
+> >
+> > Waiting for any feedback from the community.
+> >
+> I really do like the ides; in fact, it saved me from coding a similar thing
+> myself :-)
+>
+> However, I'm still curious about the overall intent of this driver. Where
+> would the I/O be routed _to_ ?
+> It's nice that we have a virtualized driver, but this driver is
+> intended to do I/O (even if it doesn't _do_ any I/O ATM :-)
+> And this I/O needs to be send to (and possibly received from)
+> something.
+>
+> So what exactly is this something?
+> An existing piece of HW on the host?
+> If so, wouldn't it be more efficient to use vfio, either by using SR-IOV or
+> by using virtio-mdev?
+>
+> Another guest?
+> If so, how would we route the I/O from one guest to the other?
+> Shared memory? Implementing a full-blown RDMA switch in qemu?
+>
+> Oh, and I would _love_ to have a discussion about this at KVM Forum.
+> Maybe I'll manage to whip up guest-to-guest RDMA connection using ivshmem
+> ... let's see.
+
+Following success in previous years to transfer ideas into code,
+we started to prepare RDMA miniconference in LPC 2019, which will
+be co-located with Kernel Summit and networking track.
+
+I'm confident that such broad audience of kernel developers
+will be good fit for such discussion.
+
+Previous years:
+2016: https://www.spinics.net/lists/linux-rdma/msg43074.html
+2017: https://lwn.net/Articles/734163/
+2018: It was so full in audience and intensive that I failed to
+summarize it :(
+
+Thanks
+
+>
+> Cheers,
+>
+> Hannes
+> --
+> Dr. Hannes Reinecke            Teamlead Storage & Networking
+> hare@suse.de                              +49 911 74053 688
+> SUSE LINUX GmbH, Maxfeldstr. 5, 90409 N??rnberg
+> GF: Felix Imend??rffer, Mary Higgins, Sri Rasiah
+> HRB 21284 (AG N??rnberg)
