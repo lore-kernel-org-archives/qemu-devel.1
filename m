@@ -2,49 +2,49 @@ Return-Path: <SRS0=5Zkg=SY=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 854A7C10F11
-	for <qemu-devel@archiver.kernel.org>; Mon, 22 Apr 2019 13:37:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 60C23C10F11
+	for <qemu-devel@archiver.kernel.org>; Mon, 22 Apr 2019 13:46:29 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 484E92064A
-	for <qemu-devel@archiver.kernel.org>; Mon, 22 Apr 2019 13:37:53 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 484E92064A
+	by mail.kernel.org (Postfix) with ESMTPS id 3818620685
+	for <qemu-devel@archiver.kernel.org>; Mon, 22 Apr 2019 13:46:29 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3818620685
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:37581 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:37690 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hIZ8q-0004Mp-0a
-	for qemu-devel@archiver.kernel.org; Mon, 22 Apr 2019 09:37:52 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:35987)
+	id 1hIZHA-0006ee-F0
+	for qemu-devel@archiver.kernel.org; Mon, 22 Apr 2019 09:46:28 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:37118)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1hIZ7w-00041H-Vw
-	for qemu-devel@nongnu.org; Mon, 22 Apr 2019 09:36:57 -0400
+	(envelope-from <eblake@redhat.com>) id 1hIZFw-00062f-9O
+	for qemu-devel@nongnu.org; Mon, 22 Apr 2019 09:45:13 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1hIZ7v-0005Mu-UZ
-	for qemu-devel@nongnu.org; Mon, 22 Apr 2019 09:36:56 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:43656)
+	(envelope-from <eblake@redhat.com>) id 1hIZFv-0001Jo-C6
+	for qemu-devel@nongnu.org; Mon, 22 Apr 2019 09:45:12 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:40994)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <eblake@redhat.com>)
-	id 1hIZ7r-0005Hm-CH; Mon, 22 Apr 2019 09:36:53 -0400
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
-	[10.5.11.15])
+	id 1hIZB3-0006lk-6p; Mon, 22 Apr 2019 09:40:09 -0400
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+	[10.5.11.12])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id C67033091753;
-	Mon, 22 Apr 2019 13:36:46 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id 437A883F51;
+	Mon, 22 Apr 2019 13:40:08 +0000 (UTC)
 Received: from [10.3.116.149] (ovpn-116-149.phx2.redhat.com [10.3.116.149])
-	by smtp.corp.redhat.com (Postfix) with ESMTPS id 8979A5D723;
-	Mon, 22 Apr 2019 13:36:38 +0000 (UTC)
+	by smtp.corp.redhat.com (Postfix) with ESMTPS id D66F160C9A;
+	Mon, 22 Apr 2019 13:39:59 +0000 (UTC)
 To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
 	qemu-devel@nongnu.org, qemu-block@nongnu.org
 References: <20190419140557.102725-1-vsementsov@virtuozzo.com>
-	<20190419140557.102725-2-vsementsov@virtuozzo.com>
+	<20190419140557.102725-3-vsementsov@virtuozzo.com>
 From: Eric Blake <eblake@redhat.com>
 Openpgp: preference=signencrypt
 Autocrypt: addr=eblake@redhat.com; keydata=
@@ -71,24 +71,24 @@ Autocrypt: addr=eblake@redhat.com; keydata=
 	Dp6/QDjDFtfS39bHSWXKVZUbqaMPqlj/z6Ugk027/3GUjHHr8WkeL1ezWepYDY7WSoXwfoAL
 	2UXYsMAr/uUncSKlfjvArhsej0S4zbqim2ZY6S8aRWw94J3bSvJR+Nwbs34GPTD4Pg==
 Organization: Red Hat, Inc.
-Message-ID: <0eaf7740-a524-1ef4-27f7-7a0bf0be3222@redhat.com>
-Date: Mon, 22 Apr 2019 08:36:37 -0500
+Message-ID: <9065c20c-d9bb-d84f-b5ca-16e929ca4d3a@redhat.com>
+Date: Mon, 22 Apr 2019 08:39:58 -0500
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
 	Thunderbird/60.6.1
 MIME-Version: 1.0
-In-Reply-To: <20190419140557.102725-2-vsementsov@virtuozzo.com>
+In-Reply-To: <20190419140557.102725-3-vsementsov@virtuozzo.com>
 Content-Type: multipart/signed; micalg=pgp-sha256;
 	protocol="application/pgp-signature";
-	boundary="MJaTfULaTlGZFCQw2jQCLiBJdAl5qvxqv"
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+	boundary="FPOw857kGdLrocd9cZ1H1E2jYmPRj4kuw"
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.41]);
-	Mon, 22 Apr 2019 13:36:47 +0000 (UTC)
+	(mx1.redhat.com [10.5.110.27]);
+	Mon, 22 Apr 2019 13:40:08 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
 X-Content-Filtered-By: Mailman/MimeDel 2.1.21
-Subject: Re: [Qemu-devel] [PATCH v3 1/3] block/qcow2-refcount: add
- trace-point to qcow2_process_discards
+Subject: Re: [Qemu-devel] [PATCH v3 2/3] block/io: bdrv_pdiscard: support
+ int64_t bytes parameter
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -105,83 +105,43 @@ Cc: kwolf@redhat.com, fam@euphon.net, den@virtuozzo.com, stefanha@redhat.com,
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190422133637.zT7yxU3yHdHuuq0Ak_dII1sdb346XMn5l2L_Svjv9Yg@z>
+Message-ID: <20190422133958.sijTJ4hQKJsRHA85PBNI6aW3wJxMcon49x_ogR3jm7Y@z>
 
 This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---MJaTfULaTlGZFCQw2jQCLiBJdAl5qvxqv
+--FPOw857kGdLrocd9cZ1H1E2jYmPRj4kuw
 From: Eric Blake <eblake@redhat.com>
 To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
  qemu-devel@nongnu.org, qemu-block@nongnu.org
 Cc: kwolf@redhat.com, mreitz@redhat.com, fam@euphon.net, stefanha@redhat.com,
  den@virtuozzo.com
-Message-ID: <0eaf7740-a524-1ef4-27f7-7a0bf0be3222@redhat.com>
-Subject: Re: [PATCH v3 1/3] block/qcow2-refcount: add trace-point to
- qcow2_process_discards
+Message-ID: <9065c20c-d9bb-d84f-b5ca-16e929ca4d3a@redhat.com>
+Subject: Re: [PATCH v3 2/3] block/io: bdrv_pdiscard: support int64_t bytes
+ parameter
 References: <20190419140557.102725-1-vsementsov@virtuozzo.com>
- <20190419140557.102725-2-vsementsov@virtuozzo.com>
-In-Reply-To: <20190419140557.102725-2-vsementsov@virtuozzo.com>
+ <20190419140557.102725-3-vsementsov@virtuozzo.com>
+In-Reply-To: <20190419140557.102725-3-vsementsov@virtuozzo.com>
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
 
 On 4/19/19 9:05 AM, Vladimir Sementsov-Ogievskiy wrote:
-> Let's at least trace ignored failure.
+> This fixes at least one overflow in qcow2_process_discards, which
+> passes 64bit region length to bdrv_pdiscard which bytes (or sectors in
+
+s/which/where/
+
+> the past) parameter is int since it's introduction in 0b919fae.
+
+s/it's/its/
+
 >=20
 > Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 > ---
->  block/qcow2-refcount.c | 7 ++++++-
->  block/trace-events     | 3 +++
->  2 files changed, 9 insertions(+), 1 deletion(-)
+>  include/block/block.h |  4 ++--
+>  block/io.c            | 16 ++++++++--------
+>  2 files changed, 10 insertions(+), 10 deletions(-)
+>=20
 
 Reviewed-by: Eric Blake <eblake@redhat.com>
-
->=20
-> diff --git a/block/qcow2-refcount.c b/block/qcow2-refcount.c
-> index e0fe322500..60284bcaac 100644
-> --- a/block/qcow2-refcount.c
-> +++ b/block/qcow2-refcount.c
-> @@ -30,6 +30,7 @@
->  #include "qemu/range.h"
->  #include "qemu/bswap.h"
->  #include "qemu/cutils.h"
-> +#include "trace.h"
-> =20
->  static int64_t alloc_clusters_noref(BlockDriverState *bs, uint64_t siz=
-e,
->                                      uint64_t max);
-> @@ -738,7 +739,11 @@ void qcow2_process_discards(BlockDriverState *bs, =
-int ret)
-> =20
->          /* Discard is optional, ignore the return value */
->          if (ret >=3D 0) {
-> -            bdrv_pdiscard(bs->file, d->offset, d->bytes);
-> +            int r2 =3D bdrv_pdiscard(bs->file, d->offset, d->bytes);
-> +            if (r2 < 0) {
-> +                trace_qcow2_process_discards_failed_region(d->offset, =
-d->bytes,
-> +                                                           r2);
-> +            }
->          }
-> =20
->          g_free(d);
-> diff --git a/block/trace-events b/block/trace-events
-> index 7335a42540..ea508f637e 100644
-> --- a/block/trace-events
-> +++ b/block/trace-events
-> @@ -91,6 +91,9 @@ qcow2_cache_get_done(void *co, int c, int i) "co %p i=
-s_l2_cache %d index %d"
->  qcow2_cache_flush(void *co, int c) "co %p is_l2_cache %d"
->  qcow2_cache_entry_flush(void *co, int c, int i) "co %p is_l2_cache %d =
-index %d"
-> =20
-> +# qcow2-refcount.c
-> +qcow2_process_discards_failed_region(uint64_t offset, uint64_t bytes, =
-int ret) "offset 0x%" PRIx64 " bytes 0x%" PRIx64 " ret %d"
-> +
->  # qed-l2-cache.c
->  qed_alloc_l2_cache_entry(void *l2_cache, void *entry) "l2_cache %p ent=
-ry %p"
->  qed_unref_l2_cache_entry(void *entry, int ref) "entry %p ref %d"
->=20
 
 --=20
 Eric Blake, Principal Software Engineer
@@ -189,22 +149,22 @@ Red Hat, Inc.           +1-919-301-3226
 Virtualization:  qemu.org | libvirt.org
 
 
---MJaTfULaTlGZFCQw2jQCLiBJdAl5qvxqv
+--FPOw857kGdLrocd9cZ1H1E2jYmPRj4kuw
 Content-Type: application/pgp-signature; name="signature.asc"
 Content-Description: OpenPGP digital signature
 Content-Disposition: attachment; filename="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAly9w2UACgkQp6FrSiUn
-Q2q7Iwf/fWLturOvOTdkP+eLJV/SyPQbpiXUfVtBltkOIyZDadNpwCue4RNO838i
-OlCsvNjXpZhaMaJjBdVdnleQ+c1n+NVQnUEPfnOyd0+VW8paxaKkmjoXsZ4j1DAe
-vTo6vsVmSB9Xiw9ZdzIra/BH1HWsD1C1fb6r8NP/iLzkgZYX9Xs2LJeR8acP+Una
-nx/SuvOhyWV8baOiYsPyet88E7xTVu+8YTqXxCwCBPRXdBr/L3Y54usCgwZ5tdzR
-jVAGblbPGbtVXH4R7b5btJBsBwm475eZlwtZ32ONwNJPUwB3SI2Qf5atOEfV12xy
-+os7K3aKkVspuMVyt10Fi0XmMLk80w==
-=FUdT
+iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAly9xC4ACgkQp6FrSiUn
+Q2rCKQf8CTj0kTk+LK6zavtyGvXLbOH0OlhaEe93ptRrcgD2TdLHsQpczwhpZ3Dw
+B5pejDggFQYHkgW11v67O/NH1YstYkRVsOBd9uphhjCkGUYayFvRHHC0egjGGEB+
+3NaXH1MIVGMMfu99VD7WeSR+gStsYj8MGCRNx98xyDFvsbdYanKrID6ahS8UuyuX
+otiszxOi/HUL23WFdSmPdegVWxv7nfmzdSlPuA0g+/JjXmMwjOv+jmWdR5LdfUf1
+KmFjEGoH226p/NQsxCh0puI1JwquNJmTBYB5cbWA49lySLNsUQcFq5R9Xha0CBcc
+kr7x94RQ4wxdP98mW+E7DnMo02RxRA==
+=4lXO
 -----END PGP SIGNATURE-----
 
---MJaTfULaTlGZFCQw2jQCLiBJdAl5qvxqv--
+--FPOw857kGdLrocd9cZ1H1E2jYmPRj4kuw--
 
