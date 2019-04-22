@@ -2,73 +2,79 @@ Return-Path: <SRS0=5Zkg=SY=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-2.7 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id ABC71C10F11
-	for <qemu-devel@archiver.kernel.org>; Mon, 22 Apr 2019 12:46:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6E430C10F11
+	for <qemu-devel@archiver.kernel.org>; Mon, 22 Apr 2019 12:46:53 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 63D892077C
-	for <qemu-devel@archiver.kernel.org>; Mon, 22 Apr 2019 12:46:39 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 63D892077C
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 3A93F2077C
+	for <qemu-devel@archiver.kernel.org>; Mon, 22 Apr 2019 12:46:53 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gmx.net header.i=@gmx.net header.b="Qit/0hIj"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3A93F2077C
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gmx.co.uk
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:36987 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:36989 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hIYLE-0005Zz-RE
-	for qemu-devel@archiver.kernel.org; Mon, 22 Apr 2019 08:46:36 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:54087)
+	id 1hIYLU-0005ks-DU
+	for qemu-devel@archiver.kernel.org; Mon, 22 Apr 2019 08:46:52 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:54301)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1hIYJq-0004eN-TZ
-	for qemu-devel@nongnu.org; Mon, 22 Apr 2019 08:45:12 -0400
+	(envelope-from <nick.hudson@gmx.co.uk>) id 1hIYJz-0004m0-Ld
+	for qemu-devel@nongnu.org; Mon, 22 Apr 2019 08:45:20 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1hIY9x-0005e4-Q0
-	for qemu-devel@nongnu.org; Mon, 22 Apr 2019 08:34:59 -0400
-Received: from mail-qk1-f195.google.com ([209.85.222.195]:33942)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1hIY9w-0005ch-NP
-	for qemu-devel@nongnu.org; Mon, 22 Apr 2019 08:34:57 -0400
-Received: by mail-qk1-f195.google.com with SMTP id n68so6293725qka.1
-	for <qemu-devel@nongnu.org>; Mon, 22 Apr 2019 05:34:55 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=1e100.net; s=20161025;
-	h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-	:mime-version:content-disposition:in-reply-to;
-	bh=zbFgRkyt/92ufTwtJUu3DlbhUPCirB07s64LybcSNg4=;
-	b=CEaul6CH3xQOK6UGvlLxh6YagacCs4anqgpKEy6hgtRdWYSc8wqN5I1kjgyGJ9sXEV
-	s4G6a2FXv8LIXIgsIWEXL0V7fmVoi+lL63TQ/tLtgjMxnSn3447ADi2TXxRlo+16cb/n
-	AQSeygZpwU/myyaNE60iOoCgPBqqOELy0BEuWzGFPlm6u09+kaesttPustH5yeCXqr8d
-	OZ45IbpzzOtvl0ojYbtSgiHc+MXkeyY71ELrlRGtbaz3JgVodtJiXxPOhHd/ni8Hqx7V
-	9di7r1A3rVB76CwoH2n4FuX2XSE1fPnVcPo2cIbDT/v+3/CpWQWaS2uCjKRnkcAUFmX8
-	efUw==
-X-Gm-Message-State: APjAAAUYxfQUHfONiBbZKqPLylB7H4kIRbzzzJ6JKpCvZq8KtwikoYSV
-	R8z6UTtT0N6BGgrbxqrHV094lw==
-X-Google-Smtp-Source: APXvYqy65zEiUPqzyH8IX7LOi3O1/3pdpBAhEEAzGnotluQRoA0zEPRMrT3aiht8pamc9Of9EH56EQ==
-X-Received: by 2002:a37:bca:: with SMTP id 193mr913966qkl.17.1555936494577;
-	Mon, 22 Apr 2019 05:34:54 -0700 (PDT)
-Received: from redhat.com (pool-173-76-246-42.bstnma.fios.verizon.net.
-	[173.76.246.42])
-	by smtp.gmail.com with ESMTPSA id o9sm735997qtq.84.2019.04.22.05.34.52
-	(version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
-	Mon, 22 Apr 2019 05:34:53 -0700 (PDT)
-Date: Mon, 22 Apr 2019 08:34:51 -0400
-From: "Michael S. Tsirkin" <mst@redhat.com>
-To: Wei Yang <richardw.yang@linux.intel.com>
-Message-ID: <20190422083013-mutt-send-email-mst@kernel.org>
-References: <20190422004849.26463-1-richardw.yang@linux.intel.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
-Content-Disposition: inline
-In-Reply-To: <20190422004849.26463-1-richardw.yang@linux.intel.com>
+	(envelope-from <nick.hudson@gmx.co.uk>) id 1hIY9R-0005Ji-Ss
+	for qemu-devel@nongnu.org; Mon, 22 Apr 2019 08:34:26 -0400
+Received: from mout.gmx.net ([212.227.17.22]:38087)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <nick.hudson@gmx.co.uk>)
+	id 1hIY9R-00059c-KE
+	for qemu-devel@nongnu.org; Mon, 22 Apr 2019 08:34:25 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=gmx.net;
+	s=badeba3b8450; t=1555936456;
+	bh=VaMhRSxj+537iqqNgUhEHxLdK2XOhGoS1xig8vRc9BQ=;
+	h=X-UI-Sender-Class:From:To:Cc:Subject:Date;
+	b=Qit/0hIjmzVdw4R1bNTmX4QEUbl+/8vkREK5cPZ0jZE2hlaAIsr8Br/XnDIc3GecR
+	awxDO2sUJ1bi/IPBzxQztsw1FRIXjWTo8sTcjUOadBR0GtHA8MNXBxfr+hWHJC9zHl
+	tUtYOqgjtfu7UmLD408rFgsQgaxEvdRvWz+fSVzY=
+X-UI-Sender-Class: 01bb95c1-4bf8-414a-932a-4f6e2808ef9c
+Received: from zoom.local ([2.122.11.66]) by mail.gmx.com (mrgmx102
+	[212.227.17.174]) with ESMTPSA (Nemesis) id 0LinyL-1gfe1q3jKP-00czsH;
+	Mon, 22 Apr 2019 14:34:16 +0200
+Received: by zoom.local (Postfix, from userid 1000)
+	id 7F3C69C5570; Mon, 22 Apr 2019 13:34:13 +0100 (BST)
+From: Nick Hudson <nick.hudson@gmx.co.uk>
+To: Richard Henderson <rth@twiddle.net>
+Date: Mon, 22 Apr 2019 13:34:09 +0100
+Message-Id: <20190422123411.5178-1-nick.hudson@gmx.co.uk>
+X-Mailer: git-send-email 2.17.1
+X-Provags-ID: V03:K1:WCYgYxYwSHOJ+IWvHWsXV4M2cVdw+n4SDgJaGJHUrBb00eNjW/l
+	K6AFcghs7vTUHwUnmOOVDHMFf5tRUcWNDgBFhUsN04D7ponKThco396GnuTT0ZfhuvK4tEt
+	1yR7o0v+WcSXDHajaDoK3w8PySGXr8O7VIU0A7abIAdARUjQMNe9Pi01nkaIzoO1eM345os
+	GXlpuwcg6U212NkA416PA==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:CG/ykNzVpKE=:WYkajCAEI7Sjne60IdY+tR
+	cQIas/zS0GLfxgtjA2VnBUoobJMjRRx5KNRiKPm8xTbZEAMWlFb/eZx4nNdhm0EvLjKtpZ2hp
+	4QOko/hAKy6BQeKS0oVpRnuBql23CaNBWIms+eHupoUZMDbgV5MQd289waa355WQfnsEKEri8
+	4hmi3UbCUej80Vs0Opa6JrCWFKPHoEOR4DKNCnUzHwK4PTb7LjLlapCdVZ+XWz0KkyTD6ddLW
+	0rRgTZYx4ZqJMz9Q9/b2SOzeh7BouLX2F9zC0xaRHPk4UBXW5ofRwVSoOjUEr5Q+CltYfkQ0u
+	Qhjl75XW99w7ywnmaGCuUDi5b92Vu2S6jkcLoDdyFNB5jE0Il38H4afbVzD3rKEkPSGUrOyvD
+	aS8ku2ZExKo66uU+0cY42RhUUeKg2in9PRcd+e5dSC3MrTY2VNxWLHSfJSE8OtsQLNi/NsvsL
+	w4d6R1Xot7/x7i4SksJaK7/The2mouHtzifOinsW2Gp/l9SdP/vrDSY0yMwfZPp125B+7zV/d
+	TpfvymmDiSA9IpjBinksmFRcDD3GH60zpQ7gfdpVuJvN/7xrYns6+iTYO6NJOW6QC+fy+3veL
+	EkjeJm/flvCQ/cd5dBHOUmwp2rGBMKESPAw2qJeClsHtX9p4teQhvTqWIRc74jAcnl6Brz4Le
+	BU2BcMieVBL72uwThye7AD9Op0jSdVqdJeBBQ6n9JC9zjR1oQ8S13Vr3t6wNFBEm2EhN4dbBU
+	9WN51Vi9c7JvVHAR7C0Su3lUXLQbeeyyhmfPL9sM/BPcaDrkI1+UcI9TD0kRo1e8YWuqTjf9X
+	qDtlPrnaFb4PQdPNYcH0XAZnQeB1jAr93XngpX+OEkyPp4zoRRuEIJqW7bQZ+mKoIj2+hLciv
+	F3ERfDlJdkugkub1rK6qX/CGnYrGioWt7LrFlBmjrl0zSIKJjgHnsJgFw62Bun
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-	[fuzzy]
-X-Received-From: 209.85.222.195
-Subject: Re: [Qemu-devel] [PATCH v14 0/2] support MAP_SYNC for
- memory-backend-file
+X-Received-From: 212.227.17.22
+Subject: [Qemu-devel] [PATCH v2 0/2] HPPA fixes for NetBSD/hppa emulation
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -80,175 +86,33 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: pagupta@redhat.com, xiaoguangrong.eric@gmail.com, qemu-devel@nongnu.org,
-	yi.z.zhang@linux.intel.com, yu.c.zhang@linux.intel.com,
-	stefanha@redhat.com, imammedo@redhat.com, pbonzini@redhat.com,
-	dan.j.williams@intel.com, ehabkost@redhat.com
+Cc: Nick Hudson <skrll@netbsd.org>, Kamil Rytarowski <kamil@netbsd.org>,
+	"open list:NETBSD" <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190422123451.hOnsPouPJSadHZInD2Gc3d8sl74PFvvvZFZ1Gz2Xv0g@z>
+Content-Type: text/plain; charset="UTF-8"
+Message-ID: <20190422123409.nX5KANslIrcyom2Gyyf28AU4i4Bvir9tmmUyxy4Eyu8@z>
 
-On Mon, Apr 22, 2019 at 08:48:47AM +0800, Wei Yang wrote:
-> Linux 4.15 introduces a new mmap flag MAP_SYNC, which can be used to
-> guarantee the write persistence to mmap'ed files supporting DAX (e.g.,
-> files on ext4/xfs file system mounted with '-o dax').
-> 
-> A description of MAP_SYNC and MAP_SHARED_VALIDATE can be found at
->     https://patchwork.kernel.org/patch/10028151/
-> 
-> In order to make sure that the file metadata is in sync after a fault 
-> while we are writing a shared DAX supporting backend files, this
-> patch-set enables QEMU to use MAP_SYNC flag for memory-backend-dax-file.
-> 
-> As the DAX vs DMA truncated issue was solved, we refined the code and
-> send out this feature for the v5 version.
-> 
-> We will pass MAP_SYNC to mmap(2); if MAP_SYNC is supported and
-> 'share=on' & 'pmem=on'. 
-> Or QEMU will not pass this flag to mmap(2)
+From: Nick Hudson <skrll@netbsd.org>
 
-OK this is in a good shape. As we are in freeze anyway,
-there's still a bit more time to polish it. I have a couple of
-suggestions:
+Here are the required changes to allow qemu to emulate NetBSD/hppa.
 
-- squash docs in same patch with code, no need for two patches
-- mmap errors are not silently ignored as the doc says,
-  a warning is produced
+v2 changes:
+ - remove old debug code
 
-Also, it might make sense to send the warnings to an errp object and not stderr.
-I would leave that to a follow-up patch.
+Nick Hudson (2):
+  Implement the pcxl and pcxl2 Fast TLB Insert instructions as used by
+    NetBSD (and OpenBSD)
+  Always return EXCP_DMAR for protection id trap as EXCP_DMP is
+    considered legacy.
 
+ target/hppa/insns.decode |  3 +++
+ target/hppa/mem_helper.c |  3 +--
+ target/hppa/translate.c  | 52 ++++++++++++++++++++++++++++++++++++++++
+ 3 files changed, 56 insertions(+), 2 deletions(-)
 
-> Test with below cases:
-> 1. pmem=on is set, shared=on is set, MAP_SYNC supported:
->    a: backend is a dax supporting file.
->    1) start VM1 with options:
->    -object memory-backend-file,id=nv_be4,share,mem-path=${DAX_FILE_1},size=${DAX_FILE_SIZE_1},align=128M,pmem=on,share=on
->    -device nvdimm,id=nv4,memdev=nv_be4,label-size=2M.
->    
->    2) start VM2 with options:
->    -object memory-backend-file,id=nv_be4,share,mem-path=${DAX_FILE_2,size=${DAX_FILE_SIZE_2},align=128M,pmem=on,share=on
->    -device nvdimm,id=nv4,memdev=nv_be4,label-size=2M.
-> 
->    3) live migrate from VM1 to VM2.
->    
->    4) Suddenly let Host crash or power failure.
-> 
->    5) check DAX_FILE_1 and DAX_FILE_2, no corrupt.
-> 
->    b: backend is a regular file.
->    1) start with options
->    -object memory-backend-file,id=nv_be4,share,mem-path=${REG_FILE},size=${REG_FILE_SIZE},align=128M,pmem=on,share=on
->    -device nvdimm,id=nv4,memdev=nv_be4,label-size=2M.
-> 
->    will warning "failed to validate with mapping flags: Operation not supported"
->    FILE_1 and FILE_2 random corrupt.
-> 
-> 2. Other cases:
->    FILE_1 and FILE_2 random corrupt.
-> 
-> Changes in V14:
->  * 1/2 rebase on top of current upstream and tested
-> 
-> Changes in V13:
->  * 4/5 Micheal: move the inlcude to mmap_alloc.c.
->  * 4/5 Micheal: refine the warning message.
->  * 5/5 Micheal: refine the Documentations.
-> 
-> Changes in V12:
->  * 2/5: Micheal: Update update-linux-headers.sh
->  * 3/5: Micheal: Use script update add linux/mman.h
->  * 4/5: Pankaj,Micheal: 1) fallback to mmap without
->         MAP_SYNC & MAP_SHARED_VALIDATE if sync not supported or failed
-> 	2) Replace the include with 3/5 added linux/mman.h
->  * 5/5: Micheal: Refine the Documentations.
-> 
-> Changes in V11:
->  * 1/3: Micheal: Change to just add a bool is_pmem in qemu_ram_mmap.
->  * 2/3: Micheal: Fix the compatibility for old kernel.
->  * 2/3&3/3: Micheal&Eduardo :Update the behavior below: 
->    Waning at no-dax and continue without MAP_SYNC.
->    Test if fails again for compatibility, then remove the MAP_VALIDATE and
->    silently proceed.
-> 
-> Changes in V10:
->  * 4/4: refine the document.
->  * 3/4: Reviewed-by: Stefano Garzarella <sgarzare@redhat.com>
->  * 2/4: refine the commit message, Added MAP_SHARED_VALIDATE.
->  * 2/4: Fix the wrong include header
-> 
-> Changes in V9:
->  * 1/6: Reviewed-by: Eduardo Habkost <ehabkost@redhat.com>
->  * 2/6: New Added: Micheal: use sparse feature define RAM_FLAG. 
->  since I don't have much knowledge about the sparse feature, @Micheal Could you 
->  add some documentation/commit message on this patch? Thank you very much.
->  * 3/6: from 2/5: Eduardo: updated the commit message. 
->  * 4/6: from 3/5: Micheal: don't ignore MAP_SYNC failures silently.
->  * 5/6: from 4/5: Eduardo: updated the commit message.
->  * 6/6: from 5/5: Micheal: Drop the sync option, document the MAP_SYNC.
-> 
-> Changes in v8:
->  * Micheal: 3/5, remove the duplicated define in the os_dep.h
->  * Micheal: 2/5, make type define safety.
->  * Micheal: 2/5, fixed the incorrect define MAP_SHARE on qemu_anon_ram_alloc.
->  * 4/6 removed, we remove the on/off/auto define of sync,  as by now,
->    MAP_SYNC only worked with pmem=on.
->  * @Micheal, I still reuse the RAM_SYNC flag, it is much straightforward to parse 
->    all the flags in one parameter.
-> 
-> Changes in v7:
->  * Micheal: [3,4,6]/6 limited the "sync" flag only on a nvdimm backend.(pmem=on)
-> 
-> Changes in v6:
->  * Pankaj: 3/7 are squashed with 2/7
->  * Pankaj: 7/7 update comments to "consistent filesystem metadata".
->  * Pankaj, Igor: 1/7 Added Reviewed-by in patch-1/7
->  * Stefan, 4/7 move the include header from "/linux/mman.h" to "osdep.h"
->  * Stefan, 5/7 Add missing "munmap"
->  * Stefan, 2/7 refine the shared/flag.
-> 
-> Changes in v5:
->  * Add patch 1 to fix a memory leak issue.
->  * Refine the patch 4-6
->  * Remove the patch 3 as we already change the parameter from "shared" to
->    "flags"
-> 
-> Changes in v4:
->  * Add patch 1-3 to switch some functions to a single 'flags'
->    parameters. (Michael S. Tsirkin)
->  * v3 patch 1-3 become v4 patch 4-6.
->  * Patch 4: move definitions of MAP_SYNC and MAP_SHARED_VALIDATE to a
->    new header file under include/standard-headers/linux/. (Michael S. Tsirkin)
->  * Patch 6: refine the description of the 'sync' option. (Michael S. Tsirkin)
-> 
-> Changes in v3:
->  * Patch 1: add MAP_SHARED_VALIDATE in both sync=on and sync=auto
->    cases, and add back the retry mechanism. MAP_SYNC will be ignored
->    by Linux kernel 4.15 if MAP_SHARED_VALIDATE is missed.
->  * Patch 1: define MAP_SYNC and MAP_SHARED_VALIDATE as 0 on non-Linux
->    platforms in order to make qemu_ram_mmap() compile on those platforms.
->  * Patch 2&3: include more information in error messages of
->    memory-backend in hope to help user to identify the error.
->    (Dr. David Alan Gilbert)
->  * Patch 3: fix typo in the commit message. (Dr. David Alan Gilbert)
-> 
-> Changes in v2:
->  * Add 'sync' option to control the use of MAP_SYNC. (Eduardo Habkost)
->  * Remove the unnecessary set of MAP_SHARED_VALIDATE in some cases and
->    the retry mechanism in qemu_ram_mmap(). (Michael S. Tsirkin)
->  * Move OS dependent definitions of MAP_SYNC and MAP_SHARED_VALIDATE
->    to osdep.h. (Michael S. Tsirkin)
-> 
-> Zhang Yi (2):
->   util/mmap-alloc: support MAP_SYNC in qemu_ram_mmap()
->   docs: Added MAP_SYNC documentation
-> 
->  docs/nvdimm.txt   | 22 +++++++++++++++++++---
->  qemu-options.hx   |  5 +++++
->  util/mmap-alloc.c | 41 ++++++++++++++++++++++++++++++++++++++++-
->  3 files changed, 64 insertions(+), 4 deletions(-)
-> 
-> -- 
-> 2.19.1
+=2D-
+2.17.1
+
 
