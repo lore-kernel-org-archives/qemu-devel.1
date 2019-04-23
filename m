@@ -5,46 +5,46 @@ X-Spam-Level:
 X-Spam-Status: No, score=-0.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	MAILING_LIST_MULTI,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 49283C10F03
-	for <qemu-devel@archiver.kernel.org>; Tue, 23 Apr 2019 21:19:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A9608C10F03
+	for <qemu-devel@archiver.kernel.org>; Tue, 23 Apr 2019 21:20:19 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0370D218B0
-	for <qemu-devel@archiver.kernel.org>; Tue, 23 Apr 2019 21:19:56 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0370D218B0
+	by mail.kernel.org (Postfix) with ESMTPS id 7329B218B0
+	for <qemu-devel@archiver.kernel.org>; Tue, 23 Apr 2019 21:20:19 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7329B218B0
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:59591 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:59593 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hJ2pY-00027r-2F
-	for qemu-devel@archiver.kernel.org; Tue, 23 Apr 2019 17:19:56 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:41921)
+	id 1hJ2pu-0002Sy-H8
+	for qemu-devel@archiver.kernel.org; Tue, 23 Apr 2019 17:20:18 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:42168)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1hJ2ng-0000Nb-OH
-	for qemu-devel@nongnu.org; Tue, 23 Apr 2019 17:18:03 -0400
+	(envelope-from <david@redhat.com>) id 1hJ2nk-0000XT-PV
+	for qemu-devel@nongnu.org; Tue, 23 Apr 2019 17:18:05 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1hJ2bi-0000Y0-Ih
-	for qemu-devel@nongnu.org; Tue, 23 Apr 2019 17:05:39 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:50136)
+	(envelope-from <david@redhat.com>) id 1hJ2Yv-0006QE-AV
+	for qemu-devel@nongnu.org; Tue, 23 Apr 2019 17:02:46 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:38360)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <david@redhat.com>) id 1hJ2bg-0000NA-BU
-	for qemu-devel@nongnu.org; Tue, 23 Apr 2019 17:05:37 -0400
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
-	[10.5.11.22])
+	(Exim 4.71) (envelope-from <david@redhat.com>) id 1hJ2Yv-0006MQ-1W
+	for qemu-devel@nongnu.org; Tue, 23 Apr 2019 17:02:45 -0400
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+	[10.5.11.15])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id F3DF53078AAC;
-	Tue, 23 Apr 2019 21:05:26 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id 8779130BA373;
+	Tue, 23 Apr 2019 21:02:43 +0000 (UTC)
 Received: from [10.36.116.61] (ovpn-116-61.ams2.redhat.com [10.36.116.61])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id 4C4EF1001DD2;
-	Tue, 23 Apr 2019 21:05:26 +0000 (UTC)
+	by smtp.corp.redhat.com (Postfix) with ESMTP id D0F8F5D705;
+	Tue, 23 Apr 2019 21:02:42 +0000 (UTC)
 To: Richard Henderson <richard.henderson@linaro.org>, qemu-devel@nongnu.org
 References: <20190420073442.7488-1-richard.henderson@linaro.org>
-	<20190420073442.7488-18-richard.henderson@linaro.org>
-	<0d4f60b4-84b7-6d36-b8d6-8107675200ff@redhat.com>
-	<6824abca-a913-540d-55fe-c05823cc8c06@linaro.org>
+	<20190420073442.7488-13-richard.henderson@linaro.org>
+	<ab0269a3-c0fd-44c4-f939-e3f073e8e2dd@redhat.com>
+	<a32e78bf-e4e4-a808-0c42-95e3b64ed1cf@linaro.org>
 From: David Hildenbrand <david@redhat.com>
 Openpgp: preference=signencrypt
 Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
@@ -91,23 +91,23 @@ Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
 	+8Umfre0Xt4713VxMygW0PnQt5aSQdMD58jHFxTk092mU+yIHj5LeYgvwSgZN4airXk5yRXl
 	SE+xAvmumFBY
 Organization: Red Hat GmbH
-Message-ID: <a9131918-6503-a2be-fa9f-4bfc8a6c7ca6@redhat.com>
-Date: Tue, 23 Apr 2019 23:05:25 +0200
+Message-ID: <a2cca8a8-24ca-679e-22ce-500bf111ac8f@redhat.com>
+Date: Tue, 23 Apr 2019 23:02:42 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
 	Thunderbird/60.6.1
 MIME-Version: 1.0
-In-Reply-To: <6824abca-a913-540d-55fe-c05823cc8c06@linaro.org>
+In-Reply-To: <a32e78bf-e4e4-a808-0c42-95e3b64ed1cf@linaro.org>
 Content-Type: text/plain; charset="UTF-8"
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.48]);
-	Tue, 23 Apr 2019 21:05:27 +0000 (UTC)
+	(mx1.redhat.com [10.5.110.49]);
+	Tue, 23 Apr 2019 21:02:43 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH 17/38] tcg: Add gvec expanders for vector
- shift by scalar
+Subject: Re: [Qemu-devel] [PATCH 12/38] tcg: Add gvec expanders for variable
+ shift
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -122,79 +122,50 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190423210525.ZcJDYYh04FPMlBW9PoAo7ZivImciB0_HLv36aPxoejU@z>
+Message-ID: <20190423210242.MxqBV0dqhV0ZBgjvldO9qGSkVYo59r5NY5O0tksM25o@z>
 
-On 23.04.19 21:21, Richard Henderson wrote:
-> On 4/23/19 11:58 AM, David Hildenbrand wrote:
->>> +void tcg_gen_gvec_shls(unsigned vece, uint32_t dofs, uint32_t aofs,
->>> +                       TCGv_i32 shift, uint32_t oprsz, uint32_t maxsz);
->>> +void tcg_gen_gvec_shrs(unsigned vece, uint32_t dofs, uint32_t aofs,
->>> +                       TCGv_i32 shift, uint32_t oprsz, uint32_t maxsz);
->>> +void tcg_gen_gvec_sars(unsigned vece, uint32_t dofs, uint32_t aofs,
->>> +                       TCGv_i32 shift, uint32_t oprsz, uint32_t maxsz);
+On 23.04.19 21:28, Richard Henderson wrote:
+> On 4/23/19 12:04 PM, David Hildenbrand wrote:
+>> In order to use this on s390x for VECTOR ELEMENT SHIFT, like
 >>
->> I assume all irrelevant bits of the shift have to be masked off by the
->> caller, right?
-> 
-> Correct, just like for integers.
-> 
->>
->> On s390x, I would use it for (one variant of) VECTOR ELEMENT SHIFT like
->> this:
->>
->>
->> +static DisasJumpType op_ves(DisasContext *s, DisasOps *o)
+>> +static DisasJumpType op_vesv(DisasContext *s, DisasOps *o)
 >> +{
 >> +    const uint8_t es = get_field(s->fields, m4);
->> +    const uint8_t d2 = get_field(s->fields, d2) &
->> +                       (NUM_VEC_ELEMENT_BITS(es) - 1);
 >> +    const uint8_t v1 = get_field(s->fields, v1);
+>> +    const uint8_t v2 = get_field(s->fields, v2);
 >> +    const uint8_t v3 = get_field(s->fields, v3);
->> +    TCGv_i32 shift;
 >> +
 >> +    if (es > ES_64) {
 >> +        gen_program_exception(s, PGM_SPECIFICATION);
 >> +        return DISAS_NORETURN;
 >> +    }
 >> +
->> +    shift = tcg_temp_new_i32();
->> +    tcg_gen_extrl_i64_i32(shift, o->addr1);
->> +    tcg_gen_andi_i32(shift, shift, NUM_VEC_ELEMENT_BITS(es) - 1);
->> +
 >> +    switch (s->fields->op2) {
->> +    case 0x30:
->> +        if (likely(!get_field(s->fields, b2))) {
->> +            gen_gvec_fn_2i(shli, es, v1, v3, d2);
->> +        } else {
->> +            gen_gvec_fn_2s(shls, es, v1, v3, shift);
->> +        }
+>> +    case 0x70:
+>> +        gen_gvec_fn_3(shlv, es, v1, v2, v3);
 >> +        break;
->> +    case 0x3a:
->> +        if (likely(!get_field(s->fields, b2))) {
->> +            gen_gvec_fn_2i(sari, es, v1, v3, d2);
->> +        } else {
->> +            gen_gvec_fn_2s(sars, es, v1, v3, shift);
->> +        }
+>> +    case 0x7a:
+>> +        gen_gvec_fn_3(sarv, es, v1, v2, v3);
 >> +        break;
->> +    case 0x38:
->> +        if (likely(!get_field(s->fields, b2))) {
->> +            gen_gvec_fn_2i(shri, es, v1, v3, d2);
->> +        } else {
->> +            gen_gvec_fn_2s(shrs, es, v1, v3, shift);
->> +        }
+>> +    case 0x78:
+>> +        gen_gvec_fn_3(shrv, es, v1, v2, v3);
 >> +        break;
 >> +    default:
 >> +        g_assert_not_reached();
 >> +    }
->> +    tcg_temp_free_i32(shift);
+>> +
 >> +    return DISAS_NEXT;
 >> +}
+>>
+>> We need to mask of invalid bits from the shift. Can that be added?
 > 
-> Looks plausible.  I might have hoisted the b2 == 0 check,
-> and avoid the other tcg arithmetic when unused.
+> Yes, I do exactly this in patch 31 for target/ppc.
+> 
+> 
+> r~
+> 
 
-Makes sense, will do. Thanks!
-
+Got it, so not via a generic gvec expansion. Thanks!
 
 -- 
 
