@@ -1,26 +1,31 @@
-Received: from eggs.gnu.org ([209.51.188.92]:43995)
+Received: from eggs.gnu.org ([209.51.188.92]:44583)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1hJ45f-0004iA-S7
-	for qemu-devel@nongnu.org; Tue, 23 Apr 2019 18:40:41 -0400
+	(envelope-from <richard.henderson@linaro.org>) id 1hJ45t-0005Ez-5d
+	for qemu-devel@nongnu.org; Tue, 23 Apr 2019 18:40:57 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1hJ3xI-00019H-6U
-	for qemu-devel@nongnu.org; Tue, 23 Apr 2019 18:32:02 -0400
-Resent-Message-Id: <E1hJ3xI-00019H-6U@eggs.gnu.org>
-Received: from sender4-of-o55.zoho.com ([136.143.188.55]:21510)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
-	id 1hJ3xA-00015C-Cl
-	for qemu-devel@nongnu.org; Tue, 23 Apr 2019 18:31:55 -0400
-In-Reply-To: <20190423222005.246981-1-ek@google.com>
-Message-ID: <155605868672.26689.361609451910466337@c2072b67cc0c>
-Reply-To: <qemu-devel@nongnu.org>
+	(envelope-from <richard.henderson@linaro.org>) id 1hJ3uU-00061Z-3P
+	for qemu-devel@nongnu.org; Tue, 23 Apr 2019 18:29:07 -0400
+Received: from mail-pl1-x643.google.com ([2607:f8b0:4864:20::643]:35089)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+	id 1hJ3uT-0005z4-IO
+	for qemu-devel@nongnu.org; Tue, 23 Apr 2019 18:29:06 -0400
+Received: by mail-pl1-x643.google.com with SMTP id w24so8212717plp.2
+	for <qemu-devel@nongnu.org>; Tue, 23 Apr 2019 15:29:05 -0700 (PDT)
+References: <20190420073442.7488-1-richard.henderson@linaro.org>
+	<20190420073442.7488-20-richard.henderson@linaro.org>
+	<e10e5627-25b2-0563-e971-2864256727d6@redhat.com>
+	<0bd7fd6a-1fcb-ac0c-b4bf-7b04ada4443c@redhat.com>
+From: Richard Henderson <richard.henderson@linaro.org>
+Message-ID: <eebc0218-4334-2b68-9081-a3a4d2d12172@linaro.org>
+Date: Tue, 23 Apr 2019 15:29:01 -0700
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Tue, 23 Apr 2019 15:31:28 -0700 (PDT)
-Subject: Re: [Qemu-devel] [PATCH] The ioctl(SIOCGIFNAME) call requires a
- struct ifreq.
+In-Reply-To: <0bd7fd6a-1fcb-ac0c-b4bf-7b04ada4443c@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH 19/38] tcg: Add support for integer
+ absolute value
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,42 +34,133 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: fam@euphon.net, ek@google.com, ek@loon.com
+To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>, David Hildenbrand <david@redhat.com>, qemu-devel@nongnu.org, "Edgar E. Iglesias" <edgar.iglesias@gmail.com>
 
-UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDE5MDQyMzIyMjAwNS4yNDY5
-ODEtMS1la0Bnb29nbGUuY29tLwoKCgpIaSwKClRoaXMgc2VyaWVzIHNlZW1zIHRvIGhhdmUgc29t
-ZSBjb2Rpbmcgc3R5bGUgcHJvYmxlbXMuIFNlZSBvdXRwdXQgYmVsb3cgZm9yCm1vcmUgaW5mb3Jt
-YXRpb246CgpUeXBlOiBzZXJpZXMKTWVzc2FnZS1pZDogMjAxOTA0MjMyMjIwMDUuMjQ2OTgxLTEt
-ZWtAZ29vZ2xlLmNvbQpTdWJqZWN0OiBbUWVtdS1kZXZlbF0gW1BBVENIXSBUaGUgaW9jdGwoU0lP
-Q0dJRk5BTUUpIGNhbGwgcmVxdWlyZXMgYSBzdHJ1Y3QgaWZyZXEuCgo9PT0gVEVTVCBTQ1JJUFQg
-QkVHSU4gPT09CiMhL2Jpbi9iYXNoCmdpdCByZXYtcGFyc2UgYmFzZSA+IC9kZXYvbnVsbCB8fCBl
-eGl0IDAKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYucmVuYW1lbGltaXQgMApnaXQgY29uZmlnIC0t
-bG9jYWwgZGlmZi5yZW5hbWVzIFRydWUKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYuYWxnb3JpdGht
-IGhpc3RvZ3JhbQouL3NjcmlwdHMvY2hlY2twYXRjaC5wbCAtLW1haWxiYWNrIGJhc2UuLgo9PT0g
-VEVTVCBTQ1JJUFQgRU5EID09PQoKVXBkYXRpbmcgM2M4Y2Y1YTljMjFmZjg3ODIxNjRkMWRlZjdm
-NDRiZDg4ODcxMzM4NApGcm9tIGh0dHBzOi8vZ2l0aHViLmNvbS9wYXRjaGV3LXByb2plY3QvcWVt
-dQogdCBbdGFnIHVwZGF0ZV0gICAgICAgICAgICBwYXRjaGV3LzIwMTkwNDE2MTI1NzQ0LjI3Nzcw
-LTEtcGV0ZXIubWF5ZGVsbEBsaW5hcm8ub3JnIC0+IHBhdGNoZXcvMjAxOTA0MTYxMjU3NDQuMjc3
-NzAtMS1wZXRlci5tYXlkZWxsQGxpbmFyby5vcmcKIHQgW3RhZyB1cGRhdGVdICAgICAgICAgICAg
-cGF0Y2hldy8yMDE5MDQyMDA3MzQ0Mi43NDg4LTEtcmljaGFyZC5oZW5kZXJzb25AbGluYXJvLm9y
-ZyAtPiBwYXRjaGV3LzIwMTkwNDIwMDczNDQyLjc0ODgtMS1yaWNoYXJkLmhlbmRlcnNvbkBsaW5h
-cm8ub3JnCiB0IFt0YWcgdXBkYXRlXSAgICAgICAgICAgIHBhdGNoZXcvMjAxOTA0MjMyMTIyNDYu
-MzU0Mi0xLWVoYWJrb3N0QHJlZGhhdC5jb20gLT4gcGF0Y2hldy8yMDE5MDQyMzIxMjI0Ni4zNTQy
-LTEtZWhhYmtvc3RAcmVkaGF0LmNvbQogKiBbbmV3IHRhZ10gICAgICAgICAgICAgICBwYXRjaGV3
-LzIwMTkwNDIzMjIyMDA1LjI0Njk4MS0xLWVrQGdvb2dsZS5jb20gLT4gcGF0Y2hldy8yMDE5MDQy
-MzIyMjAwNS4yNDY5ODEtMS1la0Bnb29nbGUuY29tClN3aXRjaGVkIHRvIGEgbmV3IGJyYW5jaCAn
-dGVzdCcKZWVhOGM4MDYwOSBUaGUgaW9jdGwoU0lPQ0dJRk5BTUUpIGNhbGwgcmVxdWlyZXMgYSBz
-dHJ1Y3QgaWZyZXEuCgo9PT0gT1VUUFVUIEJFR0lOID09PQpFUlJPUjogQXV0aG9yIGVtYWlsIGFk
-ZHJlc3MgaXMgbWFuZ2xlZCBieSB0aGUgbWFpbGluZyBsaXN0CiMyOiAKQXV0aG9yOiBFcmlrIEts
-aW5lIHZpYSBRZW11LWRldmVsIDxxZW11LWRldmVsQG5vbmdudS5vcmc+Cgp0b3RhbDogMSBlcnJv
-cnMsIDAgd2FybmluZ3MsIDggbGluZXMgY2hlY2tlZAoKQ29tbWl0IGVlYThjODA2MDk4MiAoVGhl
-IGlvY3RsKFNJT0NHSUZOQU1FKSBjYWxsIHJlcXVpcmVzIGEgc3RydWN0IGlmcmVxLikgaGFzIHN0
-eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVycm9ycwphcmUg
-ZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQ
-QVRDSCBpbiBNQUlOVEFJTkVSUy4KPT09IE9VVFBVVCBFTkQgPT09CgpUZXN0IGNvbW1hbmQgZXhp
-dGVkIHdpdGggY29kZTogMQoKClRoZSBmdWxsIGxvZyBpcyBhdmFpbGFibGUgYXQKaHR0cDovL3Bh
-dGNoZXcub3JnL2xvZ3MvMjAxOTA0MjMyMjIwMDUuMjQ2OTgxLTEtZWtAZ29vZ2xlLmNvbS90ZXN0
-aW5nLmNoZWNrcGF0Y2gvP3R5cGU9bWVzc2FnZS4KLS0tCkVtYWlsIGdlbmVyYXRlZCBhdXRvbWF0
-aWNhbGx5IGJ5IFBhdGNoZXcgW2h0dHBzOi8vcGF0Y2hldy5vcmcvXS4KUGxlYXNlIHNlbmQgeW91
-ciBmZWVkYmFjayB0byBwYXRjaGV3LWRldmVsQHJlZGhhdC5jb20=
+On 4/23/19 3:09 PM, Philippe Mathieu-Daudé wrote:
+> On 4/23/19 8:37 PM, David Hildenbrand wrote:
+>> On 20.04.19 09:34, Richard Henderson wrote:
+>>> Remove a function of the same name from target/arm/.
+>>> Use a branchless implementation of abs that gcc uses for x86.
+>>>
+>>> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+>>> ---
+>>>  tcg/tcg-op.h           |  5 +++++
+>>>  target/arm/translate.c | 10 ----------
+>>>  tcg/tcg-op.c           | 20 ++++++++++++++++++++
+>>>  3 files changed, 25 insertions(+), 10 deletions(-)
+>>>
+>>> diff --git a/tcg/tcg-op.h b/tcg/tcg-op.h
+>>> index 472b73cb38..660fe205d0 100644
+>>> --- a/tcg/tcg-op.h
+>>> +++ b/tcg/tcg-op.h
+>>> @@ -335,6 +335,7 @@ void tcg_gen_smin_i32(TCGv_i32, TCGv_i32 arg1, TCGv_i32 arg2);
+>>>  void tcg_gen_smax_i32(TCGv_i32, TCGv_i32 arg1, TCGv_i32 arg2);
+>>>  void tcg_gen_umin_i32(TCGv_i32, TCGv_i32 arg1, TCGv_i32 arg2);
+>>>  void tcg_gen_umax_i32(TCGv_i32, TCGv_i32 arg1, TCGv_i32 arg2);
+>>> +void tcg_gen_abs_i32(TCGv_i32, TCGv_i32);
+>>>  
+>>>  static inline void tcg_gen_discard_i32(TCGv_i32 arg)
+>>>  {
+>>> @@ -534,6 +535,7 @@ void tcg_gen_smin_i64(TCGv_i64, TCGv_i64 arg1, TCGv_i64 arg2);
+>>>  void tcg_gen_smax_i64(TCGv_i64, TCGv_i64 arg1, TCGv_i64 arg2);
+>>>  void tcg_gen_umin_i64(TCGv_i64, TCGv_i64 arg1, TCGv_i64 arg2);
+>>>  void tcg_gen_umax_i64(TCGv_i64, TCGv_i64 arg1, TCGv_i64 arg2);
+>>> +void tcg_gen_abs_i64(TCGv_i64, TCGv_i64);
+>>>  
+>>>  #if TCG_TARGET_REG_BITS == 64
+>>>  static inline void tcg_gen_discard_i64(TCGv_i64 arg)
+>>> @@ -973,6 +975,7 @@ void tcg_gen_nor_vec(unsigned vece, TCGv_vec r, TCGv_vec a, TCGv_vec b);
+>>>  void tcg_gen_eqv_vec(unsigned vece, TCGv_vec r, TCGv_vec a, TCGv_vec b);
+>>>  void tcg_gen_not_vec(unsigned vece, TCGv_vec r, TCGv_vec a);
+>>>  void tcg_gen_neg_vec(unsigned vece, TCGv_vec r, TCGv_vec a);
+>>> +void tcg_gen_abs_vec(unsigned vece, TCGv_vec r, TCGv_vec a);
+>>>  void tcg_gen_ssadd_vec(unsigned vece, TCGv_vec r, TCGv_vec a, TCGv_vec b);
+>>>  void tcg_gen_usadd_vec(unsigned vece, TCGv_vec r, TCGv_vec a, TCGv_vec b);
+>>>  void tcg_gen_sssub_vec(unsigned vece, TCGv_vec r, TCGv_vec a, TCGv_vec b);
+>>> @@ -1019,6 +1022,7 @@ void tcg_gen_stl_vec(TCGv_vec r, TCGv_ptr base, TCGArg offset, TCGType t);
+>>>  #define tcg_gen_addi_tl tcg_gen_addi_i64
+>>>  #define tcg_gen_sub_tl tcg_gen_sub_i64
+>>>  #define tcg_gen_neg_tl tcg_gen_neg_i64
+>>> +#define tcg_gen_abs_tl tcg_gen_abs_i64
+>>>  #define tcg_gen_subfi_tl tcg_gen_subfi_i64
+>>>  #define tcg_gen_subi_tl tcg_gen_subi_i64
+>>>  #define tcg_gen_and_tl tcg_gen_and_i64
+>>> @@ -1131,6 +1135,7 @@ void tcg_gen_stl_vec(TCGv_vec r, TCGv_ptr base, TCGArg offset, TCGType t);
+>>>  #define tcg_gen_addi_tl tcg_gen_addi_i32
+>>>  #define tcg_gen_sub_tl tcg_gen_sub_i32
+>>>  #define tcg_gen_neg_tl tcg_gen_neg_i32
+>>> +#define tcg_gen_abs_tl tcg_gen_abs_i32
+>>>  #define tcg_gen_subfi_tl tcg_gen_subfi_i32
+>>>  #define tcg_gen_subi_tl tcg_gen_subi_i32
+>>>  #define tcg_gen_and_tl tcg_gen_and_i32
+>>> diff --git a/target/arm/translate.c b/target/arm/translate.c
+>>> index 83a008e945..721171794d 100644
+>>> --- a/target/arm/translate.c
+>>> +++ b/target/arm/translate.c
+>>> @@ -603,16 +603,6 @@ static void gen_sar(TCGv_i32 dest, TCGv_i32 t0, TCGv_i32 t1)
+>>>      tcg_temp_free_i32(tmp1);
+>>>  }
+>>>  
+>>> -static void tcg_gen_abs_i32(TCGv_i32 dest, TCGv_i32 src)
+>>> -{
+>>> -    TCGv_i32 c0 = tcg_const_i32(0);
+>>> -    TCGv_i32 tmp = tcg_temp_new_i32();
+>>> -    tcg_gen_neg_i32(tmp, src);
+>>> -    tcg_gen_movcond_i32(TCG_COND_GT, dest, src, c0, src, tmp);
+>>> -    tcg_temp_free_i32(c0);
+>>> -    tcg_temp_free_i32(tmp);
+>>> -}
+>>> -
+>>>  static void shifter_out_im(TCGv_i32 var, int shift)
+>>>  {
+>>>      if (shift == 0) {
+>>> diff --git a/tcg/tcg-op.c b/tcg/tcg-op.c
+>>> index a00d1df37e..0ac291f1c4 100644
+>>> --- a/tcg/tcg-op.c
+>>> +++ b/tcg/tcg-op.c
+>>> @@ -1091,6 +1091,16 @@ void tcg_gen_umax_i32(TCGv_i32 ret, TCGv_i32 a, TCGv_i32 b)
+>>>      tcg_gen_movcond_i32(TCG_COND_LTU, ret, a, b, b, a);
+>>>  }
+>>>  
+>>> +void tcg_gen_abs_i32(TCGv_i32 ret, TCGv_i32 a)
+>>> +{
+>>> +    TCGv_i32 t = tcg_temp_new_i32();
+>>> +
+>>> +    tcg_gen_sari_i32(t, a, 31);
+>>> +    tcg_gen_xor_i32(ret, a, t);
+>>> +    tcg_gen_sub_i32(ret, ret, t);
+>>> +    tcg_temp_free_i32(t);
+>>> +}
+>>> +
+>>>  /* 64-bit ops */
+>>>  
+>>>  #if TCG_TARGET_REG_BITS == 32
+>>> @@ -2548,6 +2558,16 @@ void tcg_gen_umax_i64(TCGv_i64 ret, TCGv_i64 a, TCGv_i64 b)
+>>>      tcg_gen_movcond_i64(TCG_COND_LTU, ret, a, b, b, a);
+>>>  }
+>>>  
+>>> +void tcg_gen_abs_i64(TCGv_i64 ret, TCGv_i64 a)
+>>> +{
+>>> +    TCGv_i64 t = tcg_temp_new_i64();
+>>> +
+>>> +    tcg_gen_sari_i64(t, a, 63);
+>>> +    tcg_gen_xor_i64(ret, a, t);
+>>> +    tcg_gen_sub_i64(ret, ret, t);
+>>> +    tcg_temp_free_i64(t);
+>>> +}
+>>> +
+>>>  /* Size changing operations.  */
+>>>  
+>>>  void tcg_gen_extrl_i64_i32(TCGv_i32 ret, TCGv_i64 arg)
+>>>
+>>
+>> Nice trick
+> 
+> Per commit 7dcfb0897b99, I think it's worth a:
+> 
+> Inspired-by: Edgar E. Iglesias <edgar.iglesias@gmail.com>
+
+*shrug* As per the comment, I got the sequence from gcc -O2 -S.
+
+
+r~
