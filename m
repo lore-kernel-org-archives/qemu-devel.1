@@ -1,34 +1,30 @@
-Received: from eggs.gnu.org ([209.51.188.92]:54493)
+Received: from eggs.gnu.org ([209.51.188.92]:55208)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1hIwv4-0006MA-Mq
-	for qemu-devel@nongnu.org; Tue, 23 Apr 2019 11:01:15 -0400
+	(envelope-from <alex.williamson@redhat.com>) id 1hIwx2-0007Og-J8
+	for qemu-devel@nongnu.org; Tue, 23 Apr 2019 11:03:19 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1hIwuy-0003iu-Fb
-	for qemu-devel@nongnu.org; Tue, 23 Apr 2019 11:01:12 -0400
-Received: from indium.canonical.com ([91.189.90.7]:60876)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1hIwuy-0003hd-8e
-	for qemu-devel@nongnu.org; Tue, 23 Apr 2019 11:01:08 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1hIwut-0001hF-Tv
-	for <qemu-devel@nongnu.org>; Tue, 23 Apr 2019 15:01:04 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id CA84F2E817A
-	for <qemu-devel@nongnu.org>; Tue, 23 Apr 2019 15:01:02 +0000 (UTC)
+	(envelope-from <alex.williamson@redhat.com>) id 1hIwwx-0004o5-Lq
+	for qemu-devel@nongnu.org; Tue, 23 Apr 2019 11:03:15 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:45566)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <alex.williamson@redhat.com>)
+	id 1hIwwu-0004lC-0j
+	for qemu-devel@nongnu.org; Tue, 23 Apr 2019 11:03:09 -0400
+Date: Tue, 23 Apr 2019 09:02:56 -0600
+From: Alex Williamson <alex.williamson@redhat.com>
+Message-ID: <20190423090256.662d5907@x1.home>
+In-Reply-To: <20190423054157.GA26190@joy-OptiPlex-7040>
+References: <20190419083258.19580-1-yan.y.zhao@intel.com>
+	<20190419083505.19654-1-yan.y.zhao@intel.com>
+	<20190422083950.25eb9e7c@x1.home>
+	<20190423010152.GC32217@joy-OptiPlex-7040>
+	<20190422192100.4d577e4b@x1.home>
+	<20190423054157.GA26190@joy-OptiPlex-7040>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Tue, 23 Apr 2019 14:48:44 -0000
-From: Jakub Jermar <1825311@bugs.launchpad.net>
-Reply-To: Bug 1825311 <1825311@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <155557460746.17507.17649109204793492383.malonedeb@soybean.canonical.com>
-Message-Id: <155603092465.6530.17158756071412067771.malone@chaenomeles.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1825311] Re: mips_cpu_handle_mmu_fault renders
- all accessed pages executable
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH 1/2] vfio/mdev: add version field as
+ mandatory attribute for mdev device
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,79 +33,360 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Yan Zhao <yan.y.zhao@intel.com>
+Cc: "cjia@nvidia.com" <cjia@nvidia.com>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>, "aik@ozlabs.ru" <aik@ozlabs.ru>, "Zhengxiao.zx@alibaba-inc.com" <Zhengxiao.zx@alibaba-inc.com>, "shuangtai.tst@alibaba-inc.com" <shuangtai.tst@alibaba-inc.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "kwankhede@nvidia.com" <kwankhede@nvidia.com>, "eauger@redhat.com" <eauger@redhat.com>, "Liu, Yi
+	L" <yi.l.liu@intel.com>, "eskultet@redhat.com" <eskultet@redhat.com>, "Yang, Ziye" <ziye.yang@intel.com>, "mlevitsk@redhat.com" <mlevitsk@redhat.com>, "pasic@linux.ibm.com" <pasic@linux.ibm.com>, "libvir-list@redhat.com" <libvir-list@redhat.com>, "arei.gonglei@huawei.com" <arei.gonglei@huawei.com>, "felipe@nutanix.com" <felipe@nutanix.com>, "Ken.Xue@amd.com" <Ken.Xue@amd.com>, "Tian, Kevin" <kevin.tian@intel.com>, "dgilbert@redhat.com" <dgilbert@redhat.com>, "zhenyuw@linux.intel.com" <zhenyuw@linux.intel.com>, "intel-gvt-dev@lists.freedesktop.org" <intel-gvt-dev@lists.freedesktop.org>, "Liu, Changpeng" <changpeng.liu@intel.com>, "cohuck@redhat.com" <cohuck@redhat.com>, "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, "Wang, Zhi
+	A" <zhi.a.wang@intel.com>, "jonathan.davies@nutanix.com" <jonathan.davies@nutanix.com>, "He, Shaopeng" <shaopeng.he@intel.com>
 
-I am attaching a reproducer image and script.
+On Tue, 23 Apr 2019 01:41:57 -0400
+Yan Zhao <yan.y.zhao@intel.com> wrote:
 
-Unpatched execution ends like this:
+> On Tue, Apr 23, 2019 at 09:21:00AM +0800, Alex Williamson wrote:
+> > On Mon, 22 Apr 2019 21:01:52 -0400
+> > Yan Zhao <yan.y.zhao@intel.com> wrote:
+> >   
+> > > On Mon, Apr 22, 2019 at 10:39:50PM +0800, Alex Williamson wrote:  
+> > > > On Fri, 19 Apr 2019 04:35:04 -0400
+> > > > Yan Zhao <yan.y.zhao@intel.com> wrote:
+> > > >     
+> > > > > device version attribute in mdev sysfs is used by user space software
+> > > > > (e.g. libvirt) to query device compatibility for live migration of VFIO
+> > > > > mdev devices. This attribute is mandatory if a mdev device supports live
+> > > > > migration.    
+> > > > 
+> > > > The Subject: doesn't quite match what's being proposed here.
+> > > >      
+> > > > > It consists of two parts: common part and vendor proprietary part.
+> > > > > common part: 32 bit. lower 16 bits is vendor id and higher 16 bits
+> > > > >              identifies device type. e.g., for pci device, it is
+> > > > >              "pci vendor id" | (VFIO_DEVICE_FLAGS_PCI << 16).    
+> > > > 
+> > > > What purpose does this serve?  If it's intended as some sort of
+> > > > namespace feature, shouldn't we first assume that we can only support
+> > > > migration to devices of the same type?  Therefore each type would
+> > > > already have its own namespace.  Also that would make the trailing bit
+> > > > of the version string listed below in the example redundant.  A vendor
+> > > > is still welcome to include this in their version string if they wish,
+> > > > but I think the string should be entirely vendor defined.
+> > > >    
+> > > hi Alex,
+> > > This common part is a kind of namespace.
+> > > Because if version string is entirely defined by vendors, I'm worried about
+> > > if there is a case that one vendor's version string happens to deceive and
+> > > interfere with another vendor's version checking?
+> > > e.g.
+> > > vendor A has a version string like: vendor id + device id + mdev type
+> > > vendor B has a version string like: device id + vendor id + mdev type
+> > > but vendor A's vendor id is 0x8086, device id is 0x1217
+> > > vendor B's vendor id is 0x1217, device id is 0x8086.
+> > > 
+> > > In this corner case, the two vendors may regard the two device is
+> > > migratable but actually they are not.
+> > > 
+> > > That's the reason for this common part that serve as a kind of namespace
+> > > that all vendors will comply with to avoid overlap.  
+> > 
+> > If we assume that migration can only occur between matching mdev types,
+> > this is redundant, each type already has their own namespace.
+> >  
+> hi Alex,
+> do you mean user space software like libvirt needs to first check whether
+> mdev type is matching and then check whether version is matching?
 
-...
-TAP TEST START
-1..2
-not ok 1 NonExecutable::ElfDataIsNotExecutable
-# Assertion failed /home/jermar/Kernkonzept/software/l4/pkg/l4re-core/test/=
-moe/test_nx.cc:103
-# Expected: -(L4_EIPC_LO + l4_ipc_error(tag, l4_utcb())) >=3D 0
-# Actual: -2003 (Receive timeout)
-# There was no IPC error.
-# Assertion failed /home/jermar/Kernkonzept/software/l4/pkg/l4re-core/test/=
-moe/test_nx.cc:125
-# Expected equality of these values:
-#   pfa
-#     Which is: 360
-#   (l4_addr_t)execute_data
-#     Which is: 17633344
-# The page fault occured at the expected location.
-not ok 2 NonExecutable::StackIsNotExecutable
-# Assertion failed /home/jermar/Kernkonzept/software/l4/pkg/l4re-core/test/=
-moe/test_nx.cc:103
-# Expected: -(L4_EIPC_LO + l4_ipc_error(tag, l4_utcb())) >=3D 0
-# Actual: -2003 (Receive timeout)
-# There was no IPC error.
-# Assertion failed /home/jermar/Kernkonzept/software/l4/pkg/l4re-core/test/=
-moe/test_nx.cc:144
-# Expected equality of these values:
-#   pfa
-#     Which is: 4358144
-#   stack_func
-#     Which is: 4276000
-# The page fault occured at the expected location.
-TAP TEST FINISHED
+Yes.
+ 
+> if user space software only checks version for migration, it means vendor
+> driver has to include mdev type in their vendor proprietary part string,
+> right?
 
+Userspace attempting to migrate an nvidia-64 to an i915-GVT_V5_4 would
+be a failure on the part of the user.
 
-With the proposed patch applied, the execution should end with something
-like this:
+> Another thing is that could there be any future mdev parent driver that
+> applies to all mdev devices, just like vfio-pci? like Yi's vfio-pci-mdev
+> driver (https://lkml.org/lkml/2019/3/13/114)?
 
-...
-TAP TEST START
-1..2
-ok 1 NonExecutable::ElfDataIsNotExecutable
-ok 2 NonExecutable::StackIsNotExecutable
-TAP TEST FINISHED
+For starters, this is just a sample driver from which vendor specific
+mdev drivers could be forked to support these features, but
+additionally, the type is defined by the vendor driver, so even a meta
+driver like vfio-pci-mdev could create types like
+"vfio-pci-mdev-8086_10c9_abcdef" if it wanted to provide that specific
+device.  The "vfio-pci-mdev-type1" is just a sample implementation to
+say "the native type of the thing bound to me" and it's going to have
+limited usefulness for any sort of persistence to userspace.  Thus,
+it's a sample driver.  Thanks,
 
+Alex
 
-** Attachment added: "Image and script for reproducing this bug."
-   https://bugs.launchpad.net/qemu/+bug/1825311/+attachment/5258264/+files/=
-reproducer.tar.xz
-
--- =
-
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1825311
-
-Title:
-  mips_cpu_handle_mmu_fault renders all accessed pages executable
-
-Status in QEMU:
-  New
-
-Bug description:
-  On MIPS, data accesses to pages mapped in the TLB result in
-  mips_cpu_handle_mmu_fault() marking the page unconditionally
-  executable, even if the TLB entry has the XI bit set. Later on, when
-  there is an attempt to execute this page, no exception is generated,
-  even though TLBXI is expected.
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1825311/+subscriptions
+> > > > > vendor proprietary part: this part is varied in length. vendor driver can
+> > > > >              specify any string to identify a device.
+> > > > > 
+> > > > > When reading this attribute, it should show device version string of the
+> > > > > device of type <type-id>. If a device does not support live migration, it
+> > > > > should return errno.
+> > > > > When writing a string to this attribute, it returns errno for
+> > > > > incompatibility or returns written string length in compatibility case.
+> > > > > If a device does not support live migration, it always returns errno.
+> > > > > 
+> > > > > For user space software to use:
+> > > > > 1.
+> > > > > Before starting live migration, user space software first reads source side
+> > > > > mdev device's version. e.g.
+> > > > > "#cat \
+> > > > > /sys/bus/pci/devices/0000\:00\:02.0/5ac1fb20-2bbf-4842-bb7e-36c58c3be9cd/mdev_type/version"
+> > > > > 00028086-193b-i915-GVTg_V5_4
+> > > > > 
+> > > > > 2.
+> > > > > Then, user space software writes the source side returned version string
+> > > > > to device version attribute in target side, and checks the return value.
+> > > > > If a negative errno is returned in the target side, then mdev devices in
+> > > > > source and target sides are not compatible;
+> > > > > If a positive number is returned and it equals to the length of written
+> > > > > string, then the two mdev devices in source and target side are compatible.
+> > > > > e.g.
+> > > > > (a) compatibility case
+> > > > > "# echo 00028086-193b-i915-GVTg_V5_4 >
+> > > > > /sys/bus/pci/devices/0000\:00\:02.0/882cc4da-dede-11e7-9180-078a62063ab1/mdev_type/version"
+> > > > > 
+> > > > > (b) incompatibility case
+> > > > > "#echo 00028086-193b-i915-GVTg_V5_1 >
+> > > > > /sys/bus/pci/devices/0000\:00\:02.0/882cc4da-dede-11e7-9180-078a62063ab1/mdev_type/version"
+> > > > > -bash: echo: write error: Invalid argument
+> > > > > 
+> > > > > 3. if two mdev devices are compatible, user space software can start
+> > > > > live migration, and vice versa.
+> > > > > 
+> > > > > Note: if a mdev device does not support live migration, it either does
+> > > > > not provide a version attribute, or always returns errno when its version
+> > > > > attribute is read/written.    
+> > > > 
+> > > > I think it would be cleaner to do the former, not supply the
+> > > > attribute.  This seems to do the latter in the sample drivers.  Thanks,    
+> > > Ok. you are right!
+> > > what about just keep one sample driver to show how to do the latter,
+> > > and let the others do the former?  
+> > 
+> > I'd rather that if a vendor driver doesn't support features requiring
+> > the version attribute that they don't implement it.  It's confusing to
+> > developers looking at the sample driver for guidance if we have
+> > different implementations.  Of course if you'd like to add migration
+> > support to one of the sample drivers, that'd be very welcome.  Thanks,
+> >  
+> Got it:)
+> 
+> Thanks!
+> Yan
+> 
+> >   
+> > > > > Cc: Alex Williamson <alex.williamson@redhat.com>
+> > > > > Cc: Erik Skultety <eskultet@redhat.com>
+> > > > > Cc: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+> > > > > Cc: Cornelia Huck <cohuck@redhat.com>
+> > > > > Cc: "Tian, Kevin" <kevin.tian@intel.com>
+> > > > > Cc: Zhenyu Wang <zhenyuw@linux.intel.com>
+> > > > > Cc: "Wang, Zhi A" <zhi.a.wang@intel.com>
+> > > > > Cc: Neo Jia <cjia@nvidia.com>
+> > > > > Cc: Kirti Wankhede <kwankhede@nvidia.com>
+> > > > > 
+> > > > > Signed-off-by: Yan Zhao <yan.y.zhao@intel.com>
+> > > > > ---
+> > > > >  Documentation/vfio-mediated-device.txt | 36 ++++++++++++++++++++++++++
+> > > > >  samples/vfio-mdev/mbochs.c             | 17 ++++++++++++
+> > > > >  samples/vfio-mdev/mdpy.c               | 16 ++++++++++++
+> > > > >  samples/vfio-mdev/mtty.c               | 16 ++++++++++++
+> > > > >  4 files changed, 85 insertions(+)
+> > > > > 
+> > > > > diff --git a/Documentation/vfio-mediated-device.txt b/Documentation/vfio-mediated-device.txt
+> > > > > index c3f69bcaf96e..bc28471c0667 100644
+> > > > > --- a/Documentation/vfio-mediated-device.txt
+> > > > > +++ b/Documentation/vfio-mediated-device.txt
+> > > > > @@ -202,6 +202,7 @@ Directories and files under the sysfs for Each Physical Device
+> > > > >    |     |   |--- available_instances
+> > > > >    |     |   |--- device_api
+> > > > >    |     |   |--- description
+> > > > > +  |     |   |--- version
+> > > > >    |     |   |--- [devices]
+> > > > >    |     |--- [<type-id>]
+> > > > >    |     |   |--- create
+> > > > > @@ -209,6 +210,7 @@ Directories and files under the sysfs for Each Physical Device
+> > > > >    |     |   |--- available_instances
+> > > > >    |     |   |--- device_api
+> > > > >    |     |   |--- description
+> > > > > +  |     |   |--- version
+> > > > >    |     |   |--- [devices]
+> > > > >    |     |--- [<type-id>]
+> > > > >    |          |--- create
+> > > > > @@ -216,6 +218,7 @@ Directories and files under the sysfs for Each Physical Device
+> > > > >    |          |--- available_instances
+> > > > >    |          |--- device_api
+> > > > >    |          |--- description
+> > > > > +  |          |--- version
+> > > > >    |          |--- [devices]
+> > > > >  
+> > > > >  * [mdev_supported_types]
+> > > > > @@ -225,6 +228,8 @@ Directories and files under the sysfs for Each Physical Device
+> > > > >    [<type-id>], device_api, and available_instances are mandatory attributes
+> > > > >    that should be provided by vendor driver.
+> > > > >  
+> > > > > +  version is a mandatory attribute if a mdev device supports live migration.
+> > > > > +
+> > > > >  * [<type-id>]
+> > > > >  
+> > > > >    The [<type-id>] name is created by adding the device driver string as a prefix
+> > > > > @@ -246,6 +251,35 @@ Directories and files under the sysfs for Each Physical Device
+> > > > >    This attribute should show the number of devices of type <type-id> that can be
+> > > > >    created.
+> > > > >  
+> > > > > +* version
+> > > > > +
+> > > > > +  This attribute is rw. It is used to check whether two devices are compatible
+> > > > > +  for live migration. If this attribute is missing, then the corresponding mdev
+> > > > > +  device is regarded as not supporting live migration.
+> > > > > +
+> > > > > +  It consists of two parts: common part and vendor proprietary part.
+> > > > > +  common part: 32 bit. lower 16 bits is vendor id and higher 16 bits identifies
+> > > > > +               device type. e.g., for pci device, it is
+> > > > > +               "pci vendor id" | (VFIO_DEVICE_FLAGS_PCI << 16).
+> > > > > +  vendor proprietary part: this part is varied in length. vendor driver can
+> > > > > +               specify any string to identify a device.
+> > > > > +
+> > > > > +  When reading this attribute, it should show device version string of the device
+> > > > > +  of type <type-id>. If a device does not support live migration, it should
+> > > > > +  return errno.
+> > > > > +  When writing a string to this attribute, it returns errno for incompatibility
+> > > > > +  or returns written string length in compatibility case. If a device does not
+> > > > > +  support live migration, it always returns errno.
+> > > > > +
+> > > > > +  for example.
+> > > > > +  # cat \
+> > > > > + /sys/bus/pci/devices/0000\:00\:02.0/mdev_supported_types/i915-GVTg_V5_2/version
+> > > > > +  00028086-193b-i915-GVTg_V5_2
+> > > > > +
+> > > > > +  #echo 00028086-193b-i915-GVTg_V5_2 > \
+> > > > > + /sys/bus/pci/devices/0000\:00\:02.0/mdev_supported_types/i915-GVTg_V5_4/version
+> > > > > + -bash: echo: write error: Invalid argument
+> > > > > +
+> > > > >  * [device]
+> > > > >  
+> > > > >    This directory contains links to the devices of type <type-id> that have been
+> > > > > @@ -327,12 +361,14 @@ card.
+> > > > >          |   |   |-- available_instances
+> > > > >          |   |   |-- create
+> > > > >          |   |   |-- device_api
+> > > > > +        |   |   |-- version
+> > > > >          |   |   |-- devices
+> > > > >          |   |   `-- name
+> > > > >          |   `-- mtty-2
+> > > > >          |       |-- available_instances
+> > > > >          |       |-- create
+> > > > >          |       |-- device_api
+> > > > > +        |       |-- version
+> > > > >          |       |-- devices
+> > > > >          |       `-- name
+> > > > >          |-- mtty_dev
+> > > > > diff --git a/samples/vfio-mdev/mbochs.c b/samples/vfio-mdev/mbochs.c
+> > > > > index b038aa9f5a70..2f5ba96b91a2 100644
+> > > > > --- a/samples/vfio-mdev/mbochs.c
+> > > > > +++ b/samples/vfio-mdev/mbochs.c
+> > > > > @@ -1391,11 +1391,28 @@ static ssize_t device_api_show(struct kobject *kobj, struct device *dev,
+> > > > >  }
+> > > > >  MDEV_TYPE_ATTR_RO(device_api);
+> > > > >  
+> > > > > +static ssize_t version_show(struct kobject *kobj, struct device *dev,
+> > > > > +		char *buf)
+> > > > > +{
+> > > > > +	/* do not support live migration */
+> > > > > +	return -EINVAL;
+> > > > > +}
+> > > > > +
+> > > > > +static ssize_t version_store(struct kobject *kobj, struct device *dev,
+> > > > > +		const char *buf, size_t count)
+> > > > > +{
+> > > > > +	/* do not support live migration */
+> > > > > +	return -EINVAL;
+> > > > > +}
+> > > > > +
+> > > > > +static MDEV_TYPE_ATTR_RW(version);
+> > > > > +
+> > > > >  static struct attribute *mdev_types_attrs[] = {
+> > > > >  	&mdev_type_attr_name.attr,
+> > > > >  	&mdev_type_attr_description.attr,
+> > > > >  	&mdev_type_attr_device_api.attr,
+> > > > >  	&mdev_type_attr_available_instances.attr,
+> > > > > +	&mdev_type_attr_version.attr,
+> > > > >  	NULL,
+> > > > >  };
+> > > > >  
+> > > > > diff --git a/samples/vfio-mdev/mdpy.c b/samples/vfio-mdev/mdpy.c
+> > > > > index cc86bf6566e4..ff15fdfc7d46 100644
+> > > > > --- a/samples/vfio-mdev/mdpy.c
+> > > > > +++ b/samples/vfio-mdev/mdpy.c
+> > > > > @@ -695,11 +695,27 @@ static ssize_t device_api_show(struct kobject *kobj, struct device *dev,
+> > > > >  }
+> > > > >  MDEV_TYPE_ATTR_RO(device_api);
+> > > > >  
+> > > > > +static ssize_t version_show(struct kobject *kobj, struct device *dev,
+> > > > > +		char *buf)
+> > > > > +{
+> > > > > +	/* do not support live migration */
+> > > > > +	return -EINVAL;
+> > > > > +}
+> > > > > +
+> > > > > +static ssize_t version_store(struct kobject *kobj, struct device *dev,
+> > > > > +		const char *buf, size_t count)
+> > > > > +{
+> > > > > +	/* do not support live migration */
+> > > > > +	return -EINVAL;
+> > > > > +}
+> > > > > +static MDEV_TYPE_ATTR_RW(version);
+> > > > > +
+> > > > >  static struct attribute *mdev_types_attrs[] = {
+> > > > >  	&mdev_type_attr_name.attr,
+> > > > >  	&mdev_type_attr_description.attr,
+> > > > >  	&mdev_type_attr_device_api.attr,
+> > > > >  	&mdev_type_attr_available_instances.attr,
+> > > > > +	&mdev_type_attr_version.attr,
+> > > > >  	NULL,
+> > > > >  };
+> > > > >  
+> > > > > diff --git a/samples/vfio-mdev/mtty.c b/samples/vfio-mdev/mtty.c
+> > > > > index 1c77c370c92f..4ae3aad3474d 100644
+> > > > > --- a/samples/vfio-mdev/mtty.c
+> > > > > +++ b/samples/vfio-mdev/mtty.c
+> > > > > @@ -1390,10 +1390,26 @@ static ssize_t device_api_show(struct kobject *kobj, struct device *dev,
+> > > > >  
+> > > > >  MDEV_TYPE_ATTR_RO(device_api);
+> > > > >  
+> > > > > +static ssize_t version_show(struct kobject *kobj, struct device *dev,
+> > > > > +		char *buf)
+> > > > > +{
+> > > > > +	/* do not support live migration */
+> > > > > +	return -EINVAL;
+> > > > > +}
+> > > > > +
+> > > > > +static ssize_t version_store(struct kobject *kobj, struct device *dev,
+> > > > > +		const char *buf, size_t count)
+> > > > > +{
+> > > > > +	/* do not support live migration */
+> > > > > +	return -EINVAL;
+> > > > > +}
+> > > > > +
+> > > > > +static MDEV_TYPE_ATTR_RW(version);
+> > > > >  static struct attribute *mdev_types_attrs[] = {
+> > > > >  	&mdev_type_attr_name.attr,
+> > > > >  	&mdev_type_attr_device_api.attr,
+> > > > >  	&mdev_type_attr_available_instances.attr,
+> > > > > +	&mdev_type_attr_version.attr,
+> > > > >  	NULL,
+> > > > >  };
+> > > > >      
+> > > > 
+> > > > _______________________________________________
+> > > > intel-gvt-dev mailing list
+> > > > intel-gvt-dev@lists.freedesktop.org
+> > > > https://lists.freedesktop.org/mailman/listinfo/intel-gvt-dev    
+> > 
+> > _______________________________________________
+> > intel-gvt-dev mailing list
+> > intel-gvt-dev@lists.freedesktop.org
+> > https://lists.freedesktop.org/mailman/listinfo/intel-gvt-dev  
