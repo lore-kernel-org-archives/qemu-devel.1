@@ -1,25 +1,22 @@
-Received: from eggs.gnu.org ([209.51.188.92]:39087)
+Received: from eggs.gnu.org ([209.51.188.92]:59656)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1hJ0LZ-0001hY-Gv
-	for qemu-devel@nongnu.org; Tue, 23 Apr 2019 14:40:50 -0400
+	(envelope-from <lersek@redhat.com>) id 1hJ0ne-0000FQ-8L
+	for qemu-devel@nongnu.org; Tue, 23 Apr 2019 15:09:51 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1hJ0LX-0002OP-GQ
-	for qemu-devel@nongnu.org; Tue, 23 Apr 2019 14:40:49 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:49486)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <david@redhat.com>) id 1hJ0LX-0002Mr-7d
-	for qemu-devel@nongnu.org; Tue, 23 Apr 2019 14:40:47 -0400
-References: <20190420073442.7488-1-richard.henderson@linaro.org>
-	<20190420073442.7488-25-richard.henderson@linaro.org>
-From: David Hildenbrand <david@redhat.com>
-Message-ID: <dbba8b1e-b108-cd66-f49d-1519158f1462@redhat.com>
-Date: Tue, 23 Apr 2019 20:40:44 +0200
+	(envelope-from <lersek@redhat.com>) id 1hJ0l5-0004CQ-L1
+	for qemu-devel@nongnu.org; Tue, 23 Apr 2019 15:07:12 -0400
+References: <20190422195020.1494-1-philmd@redhat.com>
+	<20190422195020.1494-8-philmd@redhat.com>
+From: Laszlo Ersek <lersek@redhat.com>
+Message-ID: <499877a9-e657-d071-c7b7-5db5e8e82017@redhat.com>
+Date: Tue, 23 Apr 2019 21:06:58 +0200
 MIME-Version: 1.0
-In-Reply-To: <20190420073442.7488-25-richard.henderson@linaro.org>
+In-Reply-To: <20190422195020.1494-8-philmd@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 24/38] target/s390x: Use tcg_gen_abs_i64
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v3 7/7] hw/sparc64: Implement
+ fw_cfg_arch_key_name()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,39 +25,54 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Richard Henderson <richard.henderson@linaro.org>, qemu-devel@nongnu.org
+To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>, qemu-devel@nongnu.org
+Cc: Eduardo Habkost <ehabkost@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, qemu-ppc@nongnu.org, Gerd Hoffmann <kraxel@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Artyom Tarasenko <atar4qemu@gmail.com>, David Gibson <david@gibson.dropbear.id.au>
 
-On 20.04.19 09:34, Richard Henderson wrote:
-> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+On 04/22/19 21:50, Philippe Mathieu-Daud=C3=A9 wrote:
+> Implement fw_cfg_arch_key_name(), which returns the name of a
+> sparc64-specific key.
+>=20
+> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
 > ---
->  target/s390x/translate.c | 8 +-------
->  1 file changed, 1 insertion(+), 7 deletions(-)
-> 
-> diff --git a/target/s390x/translate.c b/target/s390x/translate.c
-> index 0afa8f7ca5..030129acbb 100644
-> --- a/target/s390x/translate.c
-> +++ b/target/s390x/translate.c
-> @@ -1407,13 +1407,7 @@ static DisasJumpType help_branch(DisasContext *s, DisasCompare *c,
->  
->  static DisasJumpType op_abs(DisasContext *s, DisasOps *o)
+>  hw/sparc64/sun4u.c | 19 +++++++++++++++++++
+>  1 file changed, 19 insertions(+)
+>=20
+> diff --git a/hw/sparc64/sun4u.c b/hw/sparc64/sun4u.c
+> index 399f2d73c81..4230b17b873 100644
+> --- a/hw/sparc64/sun4u.c
+> +++ b/hw/sparc64/sun4u.c
+> @@ -91,6 +91,25 @@ typedef struct EbusState {
+>  #define TYPE_EBUS "ebus"
+>  #define EBUS(obj) OBJECT_CHECK(EbusState, (obj), TYPE_EBUS)
+> =20
+> +const char *fw_cfg_arch_key_name(uint16_t key)
+> +{
+> +    static const struct {
+> +        uint16_t key;
+> +        const char *name;
+> +    } fw_cfg_arch_wellknown_keys[] =3D {
+> +        {FW_CFG_SPARC64_WIDTH, "width"},
+> +        {FW_CFG_SPARC64_HEIGHT, "height"},
+> +        {FW_CFG_SPARC64_DEPTH, "depth"},
+> +    };
+> +
+> +    for (size_t i =3D 0; i < ARRAY_SIZE(fw_cfg_arch_wellknown_keys); i=
+++) {
+> +        if (fw_cfg_arch_wellknown_keys[i].key =3D=3D key) {
+> +            return fw_cfg_arch_wellknown_keys[i].name;
+> +        }
+> +    }
+> +    return NULL;
+> +}
+> +
+>  static void fw_cfg_boot_set(void *opaque, const char *boot_device,
+>                              Error **errp)
 >  {
-> -    TCGv_i64 z, n;
-> -    z = tcg_const_i64(0);
-> -    n = tcg_temp_new_i64();
-> -    tcg_gen_neg_i64(n, o->in2);
-> -    tcg_gen_movcond_i64(TCG_COND_LT, o->out, o->in2, z, n, o->in2);
-> -    tcg_temp_free_i64(n);
-> -    tcg_temp_free_i64(z);
-> +    tcg_gen_abs_i64(o->out, o->in2);
->      return DISAS_NEXT;
->  }
->  
-> 
+>=20
 
-Reviewed-by: David Hildenbrand <david@redhat.com>
+Same questions. From my POV:
 
--- 
+Reviewed-by: Laszlo Ersek <lersek@redhat.com>
 
-Thanks,
-
-David / dhildenb
+Thanks
+Laszlo
