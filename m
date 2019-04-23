@@ -2,100 +2,94 @@ Return-Path: <SRS0=zUjA=SZ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.7 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 046BDC10F14
-	for <qemu-devel@archiver.kernel.org>; Tue, 23 Apr 2019 14:40:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0F729C282DD
+	for <qemu-devel@archiver.kernel.org>; Tue, 23 Apr 2019 14:42:03 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C7C9E20685
-	for <qemu-devel@archiver.kernel.org>; Tue, 23 Apr 2019 14:40:33 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C7C9E20685
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.ibm.com
+	by mail.kernel.org (Postfix) with ESMTPS id D1D6020685
+	for <qemu-devel@archiver.kernel.org>; Tue, 23 Apr 2019 14:42:02 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (4096-bit key) header.d=crudebyte.com header.i=@crudebyte.com header.b="POcFD8DV"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D1D6020685
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=nongnu.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:54815 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:54833 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hIwb3-0006dx-5S
-	for qemu-devel@archiver.kernel.org; Tue, 23 Apr 2019 10:40:33 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:47957)
+	id 1hIwcU-0008De-30
+	for qemu-devel@archiver.kernel.org; Tue, 23 Apr 2019 10:42:02 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:48435)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <farosas@linux.ibm.com>) id 1hIwZY-0005j0-99
-	for qemu-devel@nongnu.org; Tue, 23 Apr 2019 10:39:01 -0400
+	(envelope-from <qemu_oss@crudebyte.com>) id 1hIwba-0007Cc-VR
+	for qemu-devel@nongnu.org; Tue, 23 Apr 2019 10:41:08 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <farosas@linux.ibm.com>) id 1hIwZX-0006jl-70
-	for qemu-devel@nongnu.org; Tue, 23 Apr 2019 10:39:00 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:51710
-	helo=mx0a-001b2d01.pphosted.com)
+	(envelope-from <qemu_oss@crudebyte.com>) id 1hIwbZ-0007uZ-Dr
+	for qemu-devel@nongnu.org; Tue, 23 Apr 2019 10:41:06 -0400
+Received: from kylie.crudebyte.com ([5.189.157.229]:44557)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <farosas@linux.ibm.com>)
-	id 1hIwZX-0006iv-2U
-	for qemu-devel@nongnu.org; Tue, 23 Apr 2019 10:38:59 -0400
-Received: from pps.filterd (m0098414.ppops.net [127.0.0.1])
-	by mx0b-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id
-	x3NEcilr137706
-	for <qemu-devel@nongnu.org>; Tue, 23 Apr 2019 10:38:56 -0400
-Received: from e13.ny.us.ibm.com (e13.ny.us.ibm.com [129.33.205.203])
-	by mx0b-001b2d01.pphosted.com with ESMTP id 2s221nyxww-1
-	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Tue, 23 Apr 2019 10:38:56 -0400
-Received: from localhost
-	by e13.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
-	Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <farosas@linux.ibm.com>;
-	Tue, 23 Apr 2019 15:38:55 +0100
-Received: from b01cxnp23034.gho.pok.ibm.com (9.57.198.29)
-	by e13.ny.us.ibm.com (146.89.104.200) with IBM ESMTP SMTP Gateway:
-	Authorized Use Only! Violators will be prosecuted; 
-	(version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
-	Tue, 23 Apr 2019 15:38:52 +0100
-Received: from b01ledav004.gho.pok.ibm.com (b01ledav004.gho.pok.ibm.com
-	[9.57.199.109])
-	by b01cxnp23034.gho.pok.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
-	x3NEcpVl32964690
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256
-	verify=OK); Tue, 23 Apr 2019 14:38:51 GMT
-Received: from b01ledav004.gho.pok.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 78C35112061;
-	Tue, 23 Apr 2019 14:38:51 +0000 (GMT)
-Received: from b01ledav004.gho.pok.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 48D4A112062;
-	Tue, 23 Apr 2019 14:38:51 +0000 (GMT)
-Received: from localhost (unknown [9.86.27.3])
-	by b01ledav004.gho.pok.ibm.com (Postfix) with ESMTPS;
-	Tue, 23 Apr 2019 14:38:51 +0000 (GMT)
-From: Fabiano Rosas <farosas@linux.ibm.com>
-To: Aravinda Prasad <aravinda@linux.vnet.ibm.com>
-In-Reply-To: <155591660602.20338.9804738040071843715.stgit@aravinda>
-References: <155591636364.20338.844048953355207313.stgit@aravinda>
-	<155591660602.20338.9804738040071843715.stgit@aravinda>
-Date: Tue, 23 Apr 2019 11:38:48 -0300
+	(Exim 4.71) (envelope-from <qemu_oss@crudebyte.com>)
+	id 1hIwbY-0007r2-DT
+	for qemu-devel@nongnu.org; Tue, 23 Apr 2019 10:41:05 -0400
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=crudebyte.com; s=kylie; h=Content-Type:Content-Transfer-Encoding:
+	MIME-Version:References:In-Reply-To:Message-ID:Date:Subject:Cc:To:From:Sender
+	:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:
+	Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:
+	List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=lTwAhPYs1k6FeyM2Vjmta7vwxEp6q8oU6csJ33B9fio=;
+	b=POcFD8DVOze2QU2wWpVriODAbz
+	kDsqq3NAuJm6Q+IaHJbEBHavYGnphhVvy9ItXz6S5jOOc27v733GQRlWLHpPt518/ariGMnY6mk4E
+	d0+TV5o6Z2ujG19Gblxpd0Ja5JhXYei/PeeUPebRBYTVuGClCwVtI7QG1bI9/qUSWxHqmvQ0U0cd7
+	SkS4GRaDa82jSu+UDpjb169y5HuwkuaYRx+T3K86nH5xxIBQvqkwIXPBBFwYgf0lxacdUATns0jGX
+	Y1W35Z4fOh7QJLSlmdEbk8pMU/t9mUNYqQBB6PwAxkEM5otAA+/JnToQQUgn52BhU9bhr7YWEl9GR
+	Ybkw3wb2hOUza7ImSx5nXC5ah1n/s8SMg6iywj7E78whB5Ifz/t9zBUSL8Yd8FlyRBhHA+PRp4X8f
+	fyPP/axEZxgbcopUUmn74qN7AkImq7EW7KPEf05xdn612pTurqOoPbLtmGMkxyn3hNaJzFpeAEEca
+	eWA8yiEvn6ueIpv40+uPlZMVCo1ZjAqLWKrTfrGrUkhP+JmftZ6eS5Q/Ag/Yr5cn8SxQl7pjqFKhi
+	bGYE0hfjJA63SfXogXfhlkYZSXiEYZ7YNbB90MzwzEXqQm2VksYZYFHIPN9loHSw++uYUUqqEuFtS
+	NQI7Bf7L50ScXnRHQPHGbLyTc0IyKYrKcCiuTwG9E=;
+To: qemu-devel@nongnu.org
+Date: Tue, 23 Apr 2019 16:40:57 +0200
+Message-ID: <7519361.8GXJqb1B4Y@silver>
+In-Reply-To: <20190423134442.0549f427@bahia.lan>
+References: <3205397.r2gctG0f81@silver> <1736754.y8mDa9Bjs0@silver>
+	<20190423134442.0549f427@bahia.lan>
 MIME-Version: 1.0
+Content-Transfer-Encoding: 7Bit
 Content-Type: text/plain; charset="UTF-8"
-X-TM-AS-GCONF: 00
-x-cbid: 19042314-0064-0000-0000-000003CEDAD1
-X-IBM-SpamModules-Scores: 
-X-IBM-SpamModules-Versions: BY=3.00010981; HX=3.00000242; KW=3.00000007;
-	PH=3.00000004; SC=3.00000285; SDB=6.01193257; UDB=6.00625517;
-	IPR=6.00974077; 
-	MB=3.00026557; MTD=3.00000008; XFM=3.00000015; UTC=2019-04-23 14:38:54
-X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
-x-cbparentid: 19042314-0065-0000-0000-00003D2BCAAA
-Message-Id: <875zr43hxj.fsf@linux.ibm.com>
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:, ,
-	definitions=2019-04-23_04:, , signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
-	priorityscore=1501
-	malwarescore=0 suspectscore=1 phishscore=0 bulkscore=0 spamscore=0
-	clxscore=1015 lowpriorityscore=0 mlxscore=0 impostorscore=0
-	mlxlogscore=542 adultscore=0 classifier=spam adjust=0 reason=mlx
-	scancount=1 engine=8.0.1-1810050000 definitions=main-1904230099
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic]
-X-Received-From: 148.163.158.5
-Subject: Re: [Qemu-devel] [PATCH v8 4/6] target/ppc: Build rtas error log
- upon an MCE
+X-Spam_score: -0.0
+X-Spam_score_int: 0
+X-Spam_bar: /
+X-Spam_report: Spam detection software,
+	running on the system "kylie.crudebyte.com", 
+	has NOT identified this incoming email as spam.  The original
+	message has been attached to this so you can view it or label
+	similar future email.  If you have any questions, see
+	the administrator of that system for details.
+	Content preview:  On Dienstag,
+	23. April 2019 13:44:42 CEST Greg Kurz wrote:
+	> Hi Christian, > > Sorry for the late response. I'm quite busy on other
+	topics these days... Absolutely no problem. We probably all share the
+	same
+	fate of constant work load on endless battle fields popping up
+	everywhere. :-) 
+	Content analysis details:   (-0.0 points, 5.0 required)
+	pts rule name              description
+	---- ----------------------
+	--------------------------------------------------
+	0.0 URIBL_BLOCKED ADMINISTRATOR NOTICE: The query to URIBL was
+	blocked.  See
+	http://wiki.apache.org/spamassassin/DnsBlocklists#dnsbl-block
+	for more information. [URIs: gnu.org]
+	-0.0 NO_RELAYS Informational: message was not relayed via SMTP
+	-0.0 NO_RECEIVED Informational: message has no Received headers
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 5.189.157.229
+Subject: Re: [Qemu-devel] virtfs/9p duplicate inodes
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -107,28 +101,37 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: aik@au1.ibm.com, qemu-devel@nongnu.org, paulus@ozlabs.org,
-	qemu-ppc@nongnu.org, david@gibson.dropbear.id.au
+From: Christian Schoenebeck via Qemu-devel <qemu-devel@nongnu.org>
+Reply-To: Christian Schoenebeck <qemu_oss@crudebyte.com>
+Cc: Greg Kurz <groug@kaod.org>, Antonios Motakis <antonios.motakis@huawei.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190423143848.C0_BGVc1ddsr-A_we1NNxsB3bkuqANWW4HjIu2ZsHUI@z>
+Message-ID: <20190423144057.EYa3O2OeECcH9dzsEtxNy73Gy0LXDpStS9d2kBXCpT4@z>
 
-Aravinda Prasad <aravinda@linux.vnet.ibm.com> writes:
+On Dienstag, 23. April 2019 13:44:42 CEST Greg Kurz wrote:
+> Hi Christian,
+> 
+> Sorry for the late response. I'm quite busy on other topics these days...
 
-> +    /*
-> +     * Properly set bits in MSR before we invoke the handler.
-> +     * SRR0/1, DAR and DSISR are properly set by KVM
-> +     */
-> +    if (!(*pcc->interrupts_big_endian)(cpu)) {
-> +        msr |= (1ULL << MSR_LE);
-> +    }
-> +
-> +    if (env->msr && (1ULL << MSR_SF)) {
+Absolutely no problem. We probably all share the same fate of constant work 
+load on endless battle fields popping up everywhere. :-)
 
-Don't you mean & instead of &&?
+> > I intended to extend Antonios' patch set regarding 9p QID collisions with
+> > the goal to make the ids constant beyond reboots by storing the qpp_table
+> > as fs xattr.
+> 
+> Hmm... why would you do that ? Even if some filesystems do have persistant
+> inode numbers, it isn't mandatory AFAIK.
 
-> +        msr |= (1ULL << MSR_SF);
-> +    }
+Mja, unfortunately I found that necessary, see my comment in patch 3 for the 
+background / reason:
 
+https://lists.gnu.org/archive/html/qemu-devel/2019-04/msg03755.html
+
+And sorry that my patch set did not go out as one thread today. I vow 
+emendation. ;-)
+
+Best regards,
+Christian Schoenebeck
 
