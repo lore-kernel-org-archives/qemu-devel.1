@@ -6,49 +6,49 @@ X-Spam-Status: No, score=-6.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0E7E5C282DD
-	for <qemu-devel@archiver.kernel.org>; Tue, 23 Apr 2019 17:27:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9EAC1C10F03
+	for <qemu-devel@archiver.kernel.org>; Tue, 23 Apr 2019 17:28:53 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D5DC4206A3
-	for <qemu-devel@archiver.kernel.org>; Tue, 23 Apr 2019 17:27:32 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D5DC4206A3
+	by mail.kernel.org (Postfix) with ESMTPS id 6A170206A3
+	for <qemu-devel@archiver.kernel.org>; Tue, 23 Apr 2019 17:28:53 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6A170206A3
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:57133 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:57143 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hIzCe-0005N5-4i
-	for qemu-devel@archiver.kernel.org; Tue, 23 Apr 2019 13:27:32 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:37127)
+	id 1hIzDw-0006Aa-L6
+	for qemu-devel@archiver.kernel.org; Tue, 23 Apr 2019 13:28:52 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:37382)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <lersek@redhat.com>) id 1hIz1u-0005Kc-1y
-	for qemu-devel@nongnu.org; Tue, 23 Apr 2019 13:16:28 -0400
+	(envelope-from <lersek@redhat.com>) id 1hIz2S-0005kR-JR
+	for qemu-devel@nongnu.org; Tue, 23 Apr 2019 13:17:01 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <lersek@redhat.com>) id 1hIz1s-0005wf-4L
-	for qemu-devel@nongnu.org; Tue, 23 Apr 2019 13:16:25 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:54334)
+	(envelope-from <lersek@redhat.com>) id 1hIz2O-0006Nl-QB
+	for qemu-devel@nongnu.org; Tue, 23 Apr 2019 13:16:58 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:54524)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <lersek@redhat.com>) id 1hIz1r-0005ui-U2
-	for qemu-devel@nongnu.org; Tue, 23 Apr 2019 13:16:24 -0400
+	(Exim 4.71) (envelope-from <lersek@redhat.com>) id 1hIz2H-0006Fj-4p
+	for qemu-devel@nongnu.org; Tue, 23 Apr 2019 13:16:50 -0400
 Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
 	[10.5.11.23])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 795C6821DE;
-	Tue, 23 Apr 2019 17:16:21 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id A72FF70D71;
+	Tue, 23 Apr 2019 17:16:43 +0000 (UTC)
 Received: from lacos-laptop-7.usersys.redhat.com (ovpn-125-214.rdu2.redhat.com
 	[10.10.125.214])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id D874E19729;
-	Tue, 23 Apr 2019 17:16:18 +0000 (UTC)
+	by smtp.corp.redhat.com (Postfix) with ESMTP id 09ACA16599;
+	Tue, 23 Apr 2019 17:16:40 +0000 (UTC)
 From: Laszlo Ersek <lersek@redhat.com>
 To: berrange@redhat.com, eblake@redhat.com, f4bug@amsat.org,
 	imammedo@redhat.com, kraxel@redhat.com, mprivozn@redhat.com,
 	mst@redhat.com, peter.maydell@linaro.org, philmd@redhat.com,
 	qemu-devel@nongnu.org
-Date: Tue, 23 Apr 2019 19:15:14 +0200
-Message-Id: <20190423171520.4511-7-lersek@redhat.com>
+Date: Tue, 23 Apr 2019 19:15:18 +0200
+Message-Id: <20190423171520.4511-11-lersek@redhat.com>
 In-Reply-To: <20190423171520.4511-1-lersek@redhat.com>
 References: <20190423171520.4511-1-lersek@redhat.com>
 MIME-Version: 1.0
@@ -56,12 +56,12 @@ Content-Type: text/plain; charset="UTF-8"
 X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
 	(mx1.redhat.com [10.5.110.28]);
-	Tue, 23 Apr 2019 17:16:21 +0000 (UTC)
+	Tue, 23 Apr 2019 17:16:43 +0000 (UTC)
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] [PULL 06/12] roms/Makefile: replace the $(EDK2_EFIROM)
- target with "edk2-basetools"
+Subject: [Qemu-devel] [PULL 10/12] tests: add missing dependency to build
+ QTEST_QEMU_BINARY, round 2
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -76,20 +76,29 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190423171514.bNmJGr_TIxngKl8CVoGcFpNokL5UFyp9jlpRpqsgkP0@z>
+Message-ID: <20190423171518.SseIg-2572X19HWzQotqRzvwgB8xFCrdF3w61Dz7hZI@z>
 
-We don't (can't) have a recipe for building just $(EDK2_EFIROM);
-therefore, while we call the target $(EDK2_EFIROM), we actually build all
-of the edk2 BaseTools. Rename the target to edk2-basetools, and update th=
-e
-iPXE prerequisite accordingly. This will let other targets depend on
-"edk2-basetools", where an $(EDK2_EFIROM) pre-requisite would be
-misleading.
+In commit b94b330e2333 ("tests: add missing dependency to build
+QTEST_QEMU_BINARY", 2017-07-31), Phil fixed the dependency list of make
+target "check-qtest-%". Namely, the recipe would set QTEST_QEMU_BINARY to
+the softmmu emulator for the emulation target, but the prerequisites
+didn't include the emulator.
+
+The same issue affects the "check-report-qtest-%.tap" make target, which
+is the other make target whose recipe sets QTEST_QEMU_BINARY:
+
+> $ make -j4 check-report-qtest-aarch64.tap
+>   TAP     check-report-qtest-aarch64.tap
+> sh: /.../aarch64-softmmu/qemu-system-aarch64: No such file or directory
+
+Apply Phil's fix to this make target too.
 
 Signed-off-by: Laszlo Ersek <lersek@redhat.com>
+Reviewed-by: Michal Privoznik <mprivozn@redhat.com>
+Tested-by: Igor Mammedov <imammedo@redhat.com>
+Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
 Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
 Tested-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
-Acked-by: Michael S. Tsirkin <mst@redhat.com>
 Reviewed-by: Igor Mammedov <imammedo@redhat.com>
 ---
 
@@ -98,66 +107,42 @@ Notes:
    =20
     - pick up Phil's R-b / T-b
    =20
-    - pick up Michael's A-b
-   =20
     - pick up Igor's R-b
    =20
     v4:
    =20
-    - rebase: resolve conflicts with
-   =20
-      - commit d912e795e029 ("roms: Rename the EFIROM variable to avoid
-        clashing with iPXE", 2019-04-09)
-   =20
-      - commit 1cab464136b4 ("roms: Allow passing configure options to th=
-e
-        EDK2 build tools", 2019-04-09)
-   =20
-    - refresh commit message accordingly: replace EFIROM references with
-      EDK2_EFIROM references
-   =20
-    - drop all previous feedback tags, consequently :(
-   =20
-      - Phil's R-b / T-b
-      - Michal's R-b
-      - Michael's R-b
-      - Igor's T-b
+    - no change
    =20
     v3:
    =20
+    - pick up Michal's R-b
+   =20
     - pick up Igor's T-b
+   =20
+    - pick up Michael's R-b
    =20
     v2:
    =20
-    - pick up Phil's R-b / T-b
-   =20
-    - pick up Michal's and Michael's R-b's
+    - new patch, relied upon by the next patch
 
- roms/Makefile | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+ tests/Makefile.include | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/roms/Makefile b/roms/Makefile
-index 1ff78b63bb3a..93c3d467be14 100644
---- a/roms/Makefile
-+++ b/roms/Makefile
-@@ -102,7 +102,7 @@ pxe-rom-%: build-pxe-roms
+diff --git a/tests/Makefile.include b/tests/Makefile.include
+index 36fc73fef55a..e2432d5e7712 100644
+--- a/tests/Makefile.include
++++ b/tests/Makefile.include
+@@ -912,7 +912,7 @@ check-speed: $(check-speed-y)
 =20
- efirom: $(patsubst %,efi-rom-%,$(pxerom_variants))
+ # gtester tests with TAP output
 =20
--efi-rom-%: build-pxe-roms build-efi-roms $(EDK2_EFIROM)
-+efi-rom-%: build-pxe-roms build-efi-roms edk2-basetools
- 	$(EDK2_EFIROM) -f "0x$(VID)" -i "0x$(DID)" -l 0x02 \
- 		-b ipxe/src/bin/$(VID)$(DID).rom \
- 		-ec ipxe/src/bin-i386-efi/$(VID)$(DID).efidrv \
-@@ -131,7 +131,7 @@ build-efi-roms: build-pxe-roms
- #    EDK2_BASETOOLS_LDFLAGS=3D'...' \
- #    efirom
- #
--$(EDK2_EFIROM):
-+edk2-basetools:
- 	$(MAKE) -C edk2/BaseTools \
- 		EXTRA_OPTFLAGS=3D'$(EDK2_BASETOOLS_OPTFLAGS)' \
- 		EXTRA_LDFLAGS=3D'$(EDK2_BASETOOLS_LDFLAGS)'
+-$(patsubst %, check-report-qtest-%.tap, $(QTEST_TARGETS)): check-report-=
+qtest-%.tap: $(check-qtest-y)
++$(patsubst %, check-report-qtest-%.tap, $(QTEST_TARGETS)): check-report-=
+qtest-%.tap: subdir-%-softmmu $(check-qtest-y)
+ 	$(call do_test_tap, $(check-qtest-$*-y) $(check-qtest-generic-y), \
+ 	  QTEST_QEMU_BINARY=3D$*-softmmu/qemu-system-$* \
+ 	  QTEST_QEMU_IMG=3Dqemu-img$(EXESUF))
 --=20
 2.19.1.3.g30247aa5d201
 
