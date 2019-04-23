@@ -1,32 +1,34 @@
-Received: from eggs.gnu.org ([209.51.188.92]:36399)
+Received: from eggs.gnu.org ([209.51.188.92]:40720)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1hIngT-0002GN-HZ
-	for qemu-devel@nongnu.org; Tue, 23 Apr 2019 01:09:34 -0400
+	(envelope-from <bounces@canonical.com>) id 1hIo9g-0007FF-QP
+	for qemu-devel@nongnu.org; Tue, 23 Apr 2019 01:39:50 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1hIngS-00074K-O3
-	for qemu-devel@nongnu.org; Tue, 23 Apr 2019 01:09:33 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:45926)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1hIngS-00073d-Fc
-	for qemu-devel@nongnu.org; Tue, 23 Apr 2019 01:09:32 -0400
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
-	[10.5.11.23])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id C0864C05D3E6
-	for <qemu-devel@nongnu.org>; Tue, 23 Apr 2019 05:09:31 +0000 (UTC)
-References: <20190422210448.2488-1-ehabkost@redhat.com>
-	<20190422210448.2488-4-ehabkost@redhat.com>
-From: Thomas Huth <thuth@redhat.com>
-Message-ID: <068d46fa-424d-933d-c7d3-868c7265406d@redhat.com>
-Date: Tue, 23 Apr 2019 07:09:29 +0200
+	(envelope-from <bounces@canonical.com>) id 1hIo0J-0007ak-KJ
+	for qemu-devel@nongnu.org; Tue, 23 Apr 2019 01:30:05 -0400
+Received: from indium.canonical.com ([91.189.90.7]:47716)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1hIo0H-0007Xb-UO
+	for qemu-devel@nongnu.org; Tue, 23 Apr 2019 01:30:02 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1hIo0F-0006XX-H6
+	for <qemu-devel@nongnu.org>; Tue, 23 Apr 2019 05:29:59 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 782442E806D
+	for <qemu-devel@nongnu.org>; Tue, 23 Apr 2019 05:29:59 +0000 (UTC)
 MIME-Version: 1.0
-In-Reply-To: <20190422210448.2488-4-ehabkost@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 3/3] accel: Remove unused
- AccelClass::available field
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Tue, 23 Apr 2019 05:15:47 -0000
+From: Thomas Huth <1615079@bugs.launchpad.net>
+Reply-To: Bug 1615079 <1615079@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <20160819182404.11358.22174.malonedeb@soybean.canonical.com>
+Message-Id: <155599654722.16959.17041950424430486409.malone@soybean.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1615079] Re: GTK+ UI virtual consoles scrolling
+ broken
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,16 +37,30 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eduardo Habkost <ehabkost@redhat.com>, qemu-devel@nongnu.org
-Cc: Laurent Vivier <lvivier@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
+To: qemu-devel@nongnu.org
 
-On 22/04/2019 23.04, Eduardo Habkost wrote:
-> The field is not used anymore, we can remove it.
-> 
-> Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
-> ---
->  include/sysemu/accel.h | 1 -
->  accel/accel.c          | 5 -----
->  2 files changed, 6 deletions(-)
+Are you talking about serial console? Or graphical (VGA) console? Which
+QEMU target (x86? ... and which machine?)? How did you start QEMU? ...
+this bug report clearly lacks some more information...
 
-Reviewed-by: Thomas Huth <thuth@redhat.com>
+** Changed in: qemu
+       Status: New =3D> Incomplete
+
+-- =
+
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1615079
+
+Title:
+  GTK+ UI virtual consoles scrolling broken
+
+Status in QEMU:
+  Incomplete
+
+Bug description:
+  "In the virtual consoles, you can use Ctrl-Up, Ctrl-Down, Ctrl-PageUp
+  and Ctrl-PageDown to move in the back log."
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1615079/+subscriptions
