@@ -1,24 +1,25 @@
-Received: from eggs.gnu.org ([209.51.188.92]:36479)
+Received: from eggs.gnu.org ([209.51.188.92]:36713)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <like.xu@linux.intel.com>) id 1hIqL6-0006X9-Vn
-	for qemu-devel@nongnu.org; Tue, 23 Apr 2019 03:59:42 -0400
+	(envelope-from <david@redhat.com>) id 1hIqMJ-0007Z5-4H
+	for qemu-devel@nongnu.org; Tue, 23 Apr 2019 04:00:57 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <like.xu@linux.intel.com>) id 1hIqL5-0000kp-QY
-	for qemu-devel@nongnu.org; Tue, 23 Apr 2019 03:59:40 -0400
-References: <1555315185-16414-1-git-send-email-like.xu@linux.intel.com>
-	<1555315185-16414-3-git-send-email-like.xu@linux.intel.com>
-	<20190416212003.GB2272@habkost.net> <87ftqh1ae5.fsf@dusky.pond.sub.org>
-	<20190417171059.GC25134@habkost.net>
-From: Like Xu <like.xu@linux.intel.com>
-Message-ID: <3fc39df9-9c4e-219c-e7dc-c93754fd1315@linux.intel.com>
-Date: Tue, 23 Apr 2019 15:59:31 +0800
+	(envelope-from <david@redhat.com>) id 1hIqMI-0001X7-1p
+	for qemu-devel@nongnu.org; Tue, 23 Apr 2019 04:00:55 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:53854)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <david@redhat.com>) id 1hIqMH-0001Uw-Pe
+	for qemu-devel@nongnu.org; Tue, 23 Apr 2019 04:00:53 -0400
+References: <20190420073442.7488-1-richard.henderson@linaro.org>
+	<20190420073442.7488-2-richard.henderson@linaro.org>
+From: David Hildenbrand <david@redhat.com>
+Message-ID: <606d1286-b0e0-b84b-afc4-9757eb70c417@redhat.com>
+Date: Tue, 23 Apr 2019 10:00:47 +0200
 MIME-Version: 1.0
-In-Reply-To: <20190417171059.GC25134@habkost.net>
-Content-Type: text/plain; charset=utf-8; format=flowed
+In-Reply-To: <20190420073442.7488-2-richard.henderson@linaro.org>
+Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v3 2/2] core/qdev: refactor
- qdev_get_machine() with type assertion
+Subject: Re: [Qemu-devel] [PATCH 01/38] target/arm: Fill in .opc for cmtst_op
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,75 +28,48 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eduardo Habkost <ehabkost@redhat.com>, Markus Armbruster <armbru@redhat.com>
-Cc: Peter Maydell <peter.maydell@linaro.org>, Thomas Huth <thuth@redhat.com>, qemu-trivial@nongnu.org, qemu-devel@nongnu.org, like.xu@intel.com, Igor Mammedov <imammedo@redhat.com>
+To: Richard Henderson <richard.henderson@linaro.org>, qemu-devel@nongnu.org
 
-On 2019/4/18 1:10, Eduardo Habkost wrote:
-> On Wed, Apr 17, 2019 at 07:14:10AM +0200, Markus Armbruster wrote:
->> Eduardo Habkost <ehabkost@redhat.com> writes:
->>
->>> On Mon, Apr 15, 2019 at 03:59:45PM +0800, Like Xu wrote:
->>>> To avoid the misuse of qdev_get_machine() if machine hasn't been created yet,
->>>> this patch uses qdev_get_machine_uncheck() for obj-common (share with user-only
->>>> mode) and adds type assertion to qdev_get_machine() in system-emulation mode.
->>>>
->>>> Suggested-by: Igor Mammedov <imammedo@redhat.com>
->>>> Signed-off-by: Like Xu <like.xu@linux.intel.com>
->>>
->>> Reviewed-by: Eduardo Habkost <ehabkost@redhat.com>
->>>
->>> I'm queueing the series on machine-next, thanks!
->>
->> Hold your horses, please.
->>
->> I dislike the name qdev_get_machine_uncheck().  I could live with
->> qdev_get_machine_unchecked().
->>
->> However, I doubt this is the right approach.
->>
->> The issue at hand is undisciplined creation of QOM object /machine.
->>
->> This patch adds an asseertion "undisciplined creation of /machine didn't
->> create crap", but only in some places.
->>
->> I think we should never create /machine as (surprising!) side effect of
->> qdev_get_machine().  Create it explicitly instead, and have
->> qdev_get_machine() use object_resolve_path("/machine", NULL) to get it.
->> Look ma, no side effects.
+On 20.04.19 09:34, Richard Henderson wrote:
+> This allows us to fall back to integers if the tcg backend
+> does not support comparisons in the given vece.
 > 
-> OK, I'm dropping this one while we discuss it.
+> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+> ---
+>  target/arm/translate.c | 4 ++++
+>  1 file changed, 4 insertions(+)
 > 
-> I really miss a good explanation why qdev_get_machine_unchecked()
-> needs to exist.  When exactly do we want /machine to exist but
-> not be TYPE_MACHINE?  Why?
-
-AFAICT, there is no such "/machine" that is not of type TYPE_MACHINE.
-
-The original qdev_get_machine() would always return a "/container" 
-object in user-only mode and there is none TYPE_MACHINE object.
-
-In system emulation mode, it returns the same "/container" object at the 
-beginning, until we initialize and add a TYPE_MACHINE object to the 
-"/container" as a child and it would return OBJECT(current_machine)
-for later usages.
-
-The starting point is to avoid using the legacy qdev_get_machine()
-in system emulation mode when we haven't added the "/machine" object.
-As a result, we introduced type checking assertions to avoid premature 
-invocations.
-
-In this proposal, the qdev_get_machine_unchecked() is only used
-in user-only mode, part of which shares with system emulation mode
-(such as device_set_realized, cpu_common_realizefn). The new 
-qdev_get_machine() is only used in system emulation mode and type 
-checking assertion does reduce the irrational use of this function (if 
-any in the future).
-
-We all agree to use this qdev_get_machine() as little as possible
-and this patch could make future clean up work easier.
-
+> diff --git a/target/arm/translate.c b/target/arm/translate.c
+> index d408e4d7ef..13e2dc6562 100644
+> --- a/target/arm/translate.c
+> +++ b/target/arm/translate.c
+> @@ -6140,16 +6140,20 @@ static void gen_cmtst_vec(unsigned vece, TCGv_vec d, TCGv_vec a, TCGv_vec b)
+>  const GVecGen3 cmtst_op[4] = {
+>      { .fni4 = gen_helper_neon_tst_u8,
+>        .fniv = gen_cmtst_vec,
+> +      .opc = INDEX_op_cmp_vec,
+>        .vece = MO_8 },
+>      { .fni4 = gen_helper_neon_tst_u16,
+>        .fniv = gen_cmtst_vec,
+> +      .opc = INDEX_op_cmp_vec,
+>        .vece = MO_16 },
+>      { .fni4 = gen_cmtst_i32,
+>        .fniv = gen_cmtst_vec,
+> +      .opc = INDEX_op_cmp_vec,
+>        .vece = MO_32 },
+>      { .fni8 = gen_cmtst_i64,
+>        .fniv = gen_cmtst_vec,
+>        .prefer_i64 = TCG_TARGET_REG_BITS == 64,
+> +      .opc = INDEX_op_cmp_vec,
+>        .vece = MO_64 },
+>  };
+>  
 > 
-> Once the expectations and use cases are explained, we can choose
-> a better name for qdev_get_machine_unchecked() and document it
-> properly.
-> 
+
+Reviewed-by: David Hildenbrand <david@redhat.com>
+
+-- 
+
+Thanks,
+
+David / dhildenb
