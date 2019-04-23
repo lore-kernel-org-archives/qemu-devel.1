@@ -2,70 +2,75 @@ Return-Path: <SRS0=zUjA=SZ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_PASS,URIBL_BLOCKED autolearn=ham
+X-Spam-Status: No, score=-3.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_PASS,URIBL_BLOCKED autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C043DC10F03
-	for <qemu-devel@archiver.kernel.org>; Tue, 23 Apr 2019 22:42:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A8D02C10F03
+	for <qemu-devel@archiver.kernel.org>; Tue, 23 Apr 2019 22:43:17 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8D4E5218D3
-	for <qemu-devel@archiver.kernel.org>; Tue, 23 Apr 2019 22:42:53 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8D4E5218D3
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=patchew.org
+	by mail.kernel.org (Postfix) with ESMTPS id 78E84218D3
+	for <qemu-devel@archiver.kernel.org>; Tue, 23 Apr 2019 22:43:17 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 78E84218D3
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:60552 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:60554 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hJ47o-0006Ws-LY
-	for qemu-devel@archiver.kernel.org; Tue, 23 Apr 2019 18:42:52 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:43995)
+	id 1hJ48C-0006qy-Md
+	for qemu-devel@archiver.kernel.org; Tue, 23 Apr 2019 18:43:16 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:45220)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1hJ45f-0004iA-S7
-	for qemu-devel@nongnu.org; Tue, 23 Apr 2019 18:40:41 -0400
+	(envelope-from <bounces@canonical.com>) id 1hJ46K-0005gR-CP
+	for qemu-devel@nongnu.org; Tue, 23 Apr 2019 18:41:21 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1hJ3xI-00019H-6U
-	for qemu-devel@nongnu.org; Tue, 23 Apr 2019 18:32:02 -0400
-Resent-Date: Tue, 23 Apr 2019 18:32:01 -0400
-Resent-Message-Id: <E1hJ3xI-00019H-6U@eggs.gnu.org>
-Received: from sender4-of-o55.zoho.com ([136.143.188.55]:21510)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
-	id 1hJ3xA-00015C-Cl
-	for qemu-devel@nongnu.org; Tue, 23 Apr 2019 18:31:55 -0400
-ARC-Seal: i=1; a=rsa-sha256; t=1556058692; cv=none; d=zoho.com; s=zohoarc; 
-	b=mXBISfMI1/zGpnh8fMXI+lAtwU74SmH4UZA1x4wpbcl+TvLM3PI1pzTQKT2qz1EoziXjATJulqX4AXXQ6uckX+AO2JiMFBlcUIs0aO1IaB9pvFDsXtuwiU01fKBUTdGjSY3rlrHaT4lvegU/oghirf74TREmjxKuckEwE4TR7ZI=
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zoho.com;
-	s=zohoarc; t=1556058692;
-	h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:Reply-To:Subject:To:ARC-Authentication-Results;
-	bh=gR/1NA0iXLb4DGKbI3VWZL0+X0So/CHlLa71R7StknA=; 
-	b=QMt1UsDoFcsPugTIoUBekSH868yY4j2+Y7zt8gZpTKcLri0wYpEJ6Smj637kdkJHI0Xu2MsboW4w5gnStXaihNRVetXXjazElMYwl9fyDB13R2t2Ij/jqXkjcupMDthqfVluPpU2HBGnbYN47sB+QIjLWFj6+rnZCgt1JOWmVjw=
-ARC-Authentication-Results: i=1; mx.zoho.com; dkim=pass  header.i=patchew.org;
-	spf=pass  smtp.mailfrom=no-reply@patchew.org;
-	dmarc=pass header.from=<no-reply@patchew.org>
-	header.from=<no-reply@patchew.org>
-Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by
-	mx.zohomail.com with SMTPS id 1556058688031355.8886172831019;
-	Tue, 23 Apr 2019 15:31:28 -0700 (PDT)
-In-Reply-To: <20190423222005.246981-1-ek@google.com>
-Message-ID: <155605868672.26689.361609451910466337@c2072b67cc0c>
+	(envelope-from <bounces@canonical.com>) id 1hJ46I-0003Nc-Pq
+	for qemu-devel@nongnu.org; Tue, 23 Apr 2019 18:41:20 -0400
+Received: from indium.canonical.com ([91.189.90.7]:47344)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1hJ46I-0003HR-Fs
+	for qemu-devel@nongnu.org; Tue, 23 Apr 2019 18:41:18 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1hJ46E-00050C-P1
+	for <qemu-devel@nongnu.org>; Tue, 23 Apr 2019 22:41:15 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 65EEF2E8196
+	for <qemu-devel@nongnu.org>; Tue, 23 Apr 2019 22:41:09 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: base64
-Resent-From: 
-From: no-reply@patchew.org
+Content-Transfer-Encoding: quoted-printable
+Date: Tue, 23 Apr 2019 22:31:37 -0000
+From: Erik Kline <1814352@bugs.launchpad.net>
 To: qemu-devel@nongnu.org
-Date: Tue, 23 Apr 2019 15:31:28 -0700 (PDT)
-X-ZohoMailClient: External
+X-Launchpad-Notification-Type: bug
+X-Launchpad-Bug: product=qemu; status=Confirmed; importance=Undecided;
+	assignee=None; 
+X-Launchpad-Bug-Tags: linux-user
+X-Launchpad-Bug-Information-Type: Public
+X-Launchpad-Bug-Private: no
+X-Launchpad-Bug-Security-Vulnerability: no
+X-Launchpad-Bug-Commenters: ekline pmaydell
+X-Launchpad-Bug-Reporter: Erik Kline (ekline)
+X-Launchpad-Bug-Modifier: Erik Kline (ekline)
+References: <154907151753.31178.12938166708527410326.malonedeb@gac.canonical.com>
+Message-Id:
+ <155605869747.6483.11709055267790106875.malone@chaenomeles.canonical.com>
+X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
+X-Launchpad-Message-For: qemu-devel-ml
+Precedence: bulk
+X-Generated-By: Launchpad (canonical.com); Revision="18928";
+	Instance="launchpad-lazr.conf"
+X-Launchpad-Hash: 58a5a1858d5949abc7773e4f5a3ce328ba00913a
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 136.143.188.55
-Subject: Re: [Qemu-devel] [PATCH] The ioctl(SIOCGIFNAME) call requires a
- struct ifreq.
+X-Received-From: 91.189.90.7
+Subject: [Qemu-devel] [Bug 1814352] Re: SIOCGIFNAME takes a struct ifreq not
+ an integer
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
-Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -74,48 +79,56 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: qemu-devel@nongnu.org
-Cc: fam@euphon.net, ek@google.com, ek@loon.com, qemu-devel@nongnu.org
+Reply-To: Bug 1814352 <1814352@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190423223128.jWlaZxGaBHK7wqBREeBymW6-8BWvwweFvIt76eCYyuE@z>
+Message-ID: <20190423223137.w8R4iO7WvHbq8hhLmai2Wx9DYWNt68Ne_r6uJk7c_fU@z>
 
-UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDE5MDQyMzIyMjAwNS4yNDY5
-ODEtMS1la0Bnb29nbGUuY29tLwoKCgpIaSwKClRoaXMgc2VyaWVzIHNlZW1zIHRvIGhhdmUgc29t
-ZSBjb2Rpbmcgc3R5bGUgcHJvYmxlbXMuIFNlZSBvdXRwdXQgYmVsb3cgZm9yCm1vcmUgaW5mb3Jt
-YXRpb246CgpUeXBlOiBzZXJpZXMKTWVzc2FnZS1pZDogMjAxOTA0MjMyMjIwMDUuMjQ2OTgxLTEt
-ZWtAZ29vZ2xlLmNvbQpTdWJqZWN0OiBbUWVtdS1kZXZlbF0gW1BBVENIXSBUaGUgaW9jdGwoU0lP
-Q0dJRk5BTUUpIGNhbGwgcmVxdWlyZXMgYSBzdHJ1Y3QgaWZyZXEuCgo9PT0gVEVTVCBTQ1JJUFQg
-QkVHSU4gPT09CiMhL2Jpbi9iYXNoCmdpdCByZXYtcGFyc2UgYmFzZSA+IC9kZXYvbnVsbCB8fCBl
-eGl0IDAKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYucmVuYW1lbGltaXQgMApnaXQgY29uZmlnIC0t
-bG9jYWwgZGlmZi5yZW5hbWVzIFRydWUKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYuYWxnb3JpdGht
-IGhpc3RvZ3JhbQouL3NjcmlwdHMvY2hlY2twYXRjaC5wbCAtLW1haWxiYWNrIGJhc2UuLgo9PT0g
-VEVTVCBTQ1JJUFQgRU5EID09PQoKVXBkYXRpbmcgM2M4Y2Y1YTljMjFmZjg3ODIxNjRkMWRlZjdm
-NDRiZDg4ODcxMzM4NApGcm9tIGh0dHBzOi8vZ2l0aHViLmNvbS9wYXRjaGV3LXByb2plY3QvcWVt
-dQogdCBbdGFnIHVwZGF0ZV0gICAgICAgICAgICBwYXRjaGV3LzIwMTkwNDE2MTI1NzQ0LjI3Nzcw
-LTEtcGV0ZXIubWF5ZGVsbEBsaW5hcm8ub3JnIC0+IHBhdGNoZXcvMjAxOTA0MTYxMjU3NDQuMjc3
-NzAtMS1wZXRlci5tYXlkZWxsQGxpbmFyby5vcmcKIHQgW3RhZyB1cGRhdGVdICAgICAgICAgICAg
-cGF0Y2hldy8yMDE5MDQyMDA3MzQ0Mi43NDg4LTEtcmljaGFyZC5oZW5kZXJzb25AbGluYXJvLm9y
-ZyAtPiBwYXRjaGV3LzIwMTkwNDIwMDczNDQyLjc0ODgtMS1yaWNoYXJkLmhlbmRlcnNvbkBsaW5h
-cm8ub3JnCiB0IFt0YWcgdXBkYXRlXSAgICAgICAgICAgIHBhdGNoZXcvMjAxOTA0MjMyMTIyNDYu
-MzU0Mi0xLWVoYWJrb3N0QHJlZGhhdC5jb20gLT4gcGF0Y2hldy8yMDE5MDQyMzIxMjI0Ni4zNTQy
-LTEtZWhhYmtvc3RAcmVkaGF0LmNvbQogKiBbbmV3IHRhZ10gICAgICAgICAgICAgICBwYXRjaGV3
-LzIwMTkwNDIzMjIyMDA1LjI0Njk4MS0xLWVrQGdvb2dsZS5jb20gLT4gcGF0Y2hldy8yMDE5MDQy
-MzIyMjAwNS4yNDY5ODEtMS1la0Bnb29nbGUuY29tClN3aXRjaGVkIHRvIGEgbmV3IGJyYW5jaCAn
-dGVzdCcKZWVhOGM4MDYwOSBUaGUgaW9jdGwoU0lPQ0dJRk5BTUUpIGNhbGwgcmVxdWlyZXMgYSBz
-dHJ1Y3QgaWZyZXEuCgo9PT0gT1VUUFVUIEJFR0lOID09PQpFUlJPUjogQXV0aG9yIGVtYWlsIGFk
-ZHJlc3MgaXMgbWFuZ2xlZCBieSB0aGUgbWFpbGluZyBsaXN0CiMyOiAKQXV0aG9yOiBFcmlrIEts
-aW5lIHZpYSBRZW11LWRldmVsIDxxZW11LWRldmVsQG5vbmdudS5vcmc+Cgp0b3RhbDogMSBlcnJv
-cnMsIDAgd2FybmluZ3MsIDggbGluZXMgY2hlY2tlZAoKQ29tbWl0IGVlYThjODA2MDk4MiAoVGhl
-IGlvY3RsKFNJT0NHSUZOQU1FKSBjYWxsIHJlcXVpcmVzIGEgc3RydWN0IGlmcmVxLikgaGFzIHN0
-eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVycm9ycwphcmUg
-ZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQ
-QVRDSCBpbiBNQUlOVEFJTkVSUy4KPT09IE9VVFBVVCBFTkQgPT09CgpUZXN0IGNvbW1hbmQgZXhp
-dGVkIHdpdGggY29kZTogMQoKClRoZSBmdWxsIGxvZyBpcyBhdmFpbGFibGUgYXQKaHR0cDovL3Bh
-dGNoZXcub3JnL2xvZ3MvMjAxOTA0MjMyMjIwMDUuMjQ2OTgxLTEtZWtAZ29vZ2xlLmNvbS90ZXN0
-aW5nLmNoZWNrcGF0Y2gvP3R5cGU9bWVzc2FnZS4KLS0tCkVtYWlsIGdlbmVyYXRlZCBhdXRvbWF0
-aWNhbGx5IGJ5IFBhdGNoZXcgW2h0dHBzOi8vcGF0Y2hldy5vcmcvXS4KUGxlYXNlIHNlbmQgeW91
-ciBmZWVkYmFjayB0byBwYXRjaGV3LWRldmVsQHJlZGhhdC5jb20=
+Patch sent to the list.  Apologies for the delay.
 
+-- =
+
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1814352
+
+Title:
+  SIOCGIFNAME takes a struct ifreq not an integer
+
+Status in QEMU:
+  Confirmed
+
+Bug description:
+  The ioctl SIOCGIFNAME takes a pointer to a struct ifreq, not an
+  integer.  This leads to if_indextoname() not correctly returning
+  interface names (well, not if they're longer than 4 characters
+  including the trailing NULL ;-).
+
+  This is observed on v3.1.0.
+
+  The following one-line patch will be sent to the qemu-devel mailing
+  list:
+
+  """
+  diff --git a/linux-user/ioctls.h b/linux-user/ioctls.h
+  index ae8951625f..37501f575c 100644
+  --- a/linux-user/ioctls.h
+  +++ b/linux-user/ioctls.h
+  @@ -178,7 +178,7 @@
+   #endif /* CONFIG_USBFS */
+   =
+
+     IOCTL(SIOCATMARK, IOC_R, MK_PTR(TYPE_INT))
+  -  IOCTL(SIOCGIFNAME, IOC_RW, MK_PTR(TYPE_INT))
+  +  IOCTL(SIOCGIFNAME, IOC_RW, MK_PTR(MK_STRUCT(STRUCT_int_ifreq)))
+     IOCTL(SIOCGIFFLAGS, IOC_W | IOC_R, MK_PTR(MK_STRUCT(STRUCT_short_ifreq=
+)))
+     IOCTL(SIOCSIFFLAGS, IOC_W, MK_PTR(MK_STRUCT(STRUCT_short_ifreq)))
+     IOCTL(SIOCGIFADDR, IOC_W | IOC_R, MK_PTR(MK_STRUCT(STRUCT_sockaddr_ifr=
+eq)))
+  """
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1814352/+subscriptions
 
