@@ -1,21 +1,35 @@
-Received: from eggs.gnu.org ([209.51.188.92]:40573)
+Received: from eggs.gnu.org ([209.51.188.92]:42300)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pagupta@redhat.com>) id 1hIqhF-0004wt-7s
-	for qemu-devel@nongnu.org; Tue, 23 Apr 2019 04:22:34 -0400
+	(envelope-from <sgarzare@redhat.com>) id 1hIqle-0000Z9-Gz
+	for qemu-devel@nongnu.org; Tue, 23 Apr 2019 04:27:07 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pagupta@redhat.com>) id 1hIqRz-0004rz-Ih
-	for qemu-devel@nongnu.org; Tue, 23 Apr 2019 04:06:49 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:43558)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pagupta@redhat.com>) id 1hIqRx-0004qa-Vk
-	for qemu-devel@nongnu.org; Tue, 23 Apr 2019 04:06:47 -0400
-From: Pankaj Gupta <pagupta@redhat.com>
-Date: Tue, 23 Apr 2019 13:36:07 +0530
-Message-Id: <20190423080612.15361-2-pagupta@redhat.com>
-In-Reply-To: <20190423080612.15361-1-pagupta@redhat.com>
-References: <20190423080612.15361-1-pagupta@redhat.com>
-Subject: [Qemu-devel] [PATCH v6 1/6] libnvdimm: nd_region flush callback
- support
+	(envelope-from <sgarzare@redhat.com>) id 1hIqld-00079f-9V
+	for qemu-devel@nongnu.org; Tue, 23 Apr 2019 04:27:06 -0400
+Received: from mail-wm1-f66.google.com ([209.85.128.66]:52064)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <sgarzare@redhat.com>) id 1hIqld-00078O-2O
+	for qemu-devel@nongnu.org; Tue, 23 Apr 2019 04:27:05 -0400
+Received: by mail-wm1-f66.google.com with SMTP id 4so17521846wmf.1
+	for <qemu-devel@nongnu.org>; Tue, 23 Apr 2019 01:27:03 -0700 (PDT)
+Date: Tue, 23 Apr 2019 10:26:57 +0200
+From: Stefano Garzarella <sgarzare@redhat.com>
+Message-ID: <20190423082657.mzulhihpv6rhgiww@steredhat>
+References: <CA+aFP1AMzNjWtMeGy4MpWBa26qxShgciYkcEZ8mkSmDrtCvfqA@mail.gmail.com>
+	<20190411130245.ltfyp7d2dfe2cr3h@steredhat>
+	<CA+aFP1B7ZZ_xwNOfMbKUzEjYbMH=9dJstLYEyVq4LphPR81u0Q@mail.gmail.com>
+	<20190414132008.uxoia6avdpp4jov6@steredhat.homenet.telecomitalia.it>
+	<CA+aFP1D8VYcnwWpB=4PzAdBKr+YK-r8bSwzKKUCkH7jT3kVvoQ@mail.gmail.com>
+	<20190415080452.GA6031@localhost.localdomain>
+	<20190417073438.r57lemi6emu4x3ld@steredhat>
+	<20190417080443.GA8330@localhost.localdomain>
+	<20190419122356.7dmwwdbtnzgimydw@steredhat>
+	<20190423075619.GB9041@localhost.localdomain>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20190423075619.GB9041@localhost.localdomain>
+Subject: Re: [Qemu-devel] [PATCH RFC 1/1] block/rbd: increase dynamically
+ the image size
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,243 +38,84 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: linux-nvdimm@lists.01.org, linux-kernel@vger.kernel.org, virtualization@lists.linux-foundation.org, kvm@vger.kernel.org, linux-fsdevel@vger.kernel.org, linux-acpi@vger.kernel.org, qemu-devel@nongnu.org, linux-ext4@vger.kernel.org, linux-xfs@vger.kernel.org
-Cc: dan.j.williams@intel.com, zwisler@kernel.org, vishal.l.verma@intel.com, dave.jiang@intel.com, mst@redhat.com, jasowang@redhat.com, willy@infradead.org, rjw@rjwysocki.net, hch@infradead.org, lenb@kernel.org, jack@suse.cz, tytso@mit.edu, adilger.kernel@dilger.ca, darrick.wong@oracle.com, lcapitulino@redhat.com, kwolf@redhat.com, imammedo@redhat.com, jmoyer@redhat.com, nilal@redhat.com, riel@surriel.com, stefanha@redhat.com, aarcange@redhat.com, david@redhat.com, david@fromorbit.com, cohuck@redhat.com, xiaoguangrong.eric@gmail.com, pagupta@redhat.com, pbonzini@redhat.com, yuval.shaia@oracle.com, kilobyte@angband.pl
+To: Kevin Wolf <kwolf@redhat.com>
+Cc: dillaman@redhat.com, qemu-devel <qemu-devel@nongnu.org>, Josh Durgin <jdurgin@redhat.com>, qemu-block <qemu-block@nongnu.org>, Max Reitz <mreitz@redhat.com>
 
-This patch adds functionality to perform flush from guest
-to host over VIRTIO. We are registering a callback based
-on 'nd_region' type. virtio_pmem driver requires this special
-flush function. For rest of the region types we are registering
-existing flush function. Report error returned by host fsync
-failure to userspace.
+On Tue, Apr 23, 2019 at 09:56:19AM +0200, Kevin Wolf wrote:
+> Am 19.04.2019 um 14:23 hat Stefano Garzarella geschrieben:
+> > Hi Kevin,
+> > 
+> > On Wed, Apr 17, 2019 at 10:04:43AM +0200, Kevin Wolf wrote:
+> > > Am 17.04.2019 um 09:34 hat Stefano Garzarella geschrieben:
+> > > > On Mon, Apr 15, 2019 at 10:04:52AM +0200, Kevin Wolf wrote:
+> > > > > 
+> > > > > I think a potential actual use case could be persistent dirty bitmaps
+> > > > > for incremental backup. Though maybe that would be better served by
+> > > > > using the rbd image just as a raw external data file and keeping the
+> > > > > qcow2 metadata on a filesystem.
+> > > > 
+> > > > Thanks to point it out! I'll take a look to understand how to keep
+> > > > metadata separated from the data.
+> > > 
+> > > I'd consider the feature still experimental, but for local files, it
+> > > works like this:
+> > > 
+> > >     qemu-img create -f qcow2 -o data_file=test.raw test.qcow2 4G
+> > > 
+> > > And then just use test.qcow2. As long as you can put everything you need
+> > > into an rbd URL, the same approach should work. Otherwise, you may need
+> > > to use QMP blockdev-create on creation and possibly the data-file option
+> > > of the qcow2 driver for opening.
+> > 
+> > Very interesting, I'll try to add this support also in the rbd driver.
+> 
+> I don't understand - what is the thing you want to add to the rbd driver?
+> qcow2 doesn't need special protocol driver support for doing this, and I
+> don't think the QEMU rbd driver has any metadata that could be split off.
+> 
 
-Signed-off-by: Pankaj Gupta <pagupta@redhat.com>
----
- drivers/acpi/nfit/core.c     |  4 ++--
- drivers/nvdimm/claim.c       |  6 ++++--
- drivers/nvdimm/nd.h          |  1 +
- drivers/nvdimm/pmem.c        | 13 ++++++++-----
- drivers/nvdimm/region_devs.c | 26 ++++++++++++++++++++++++--
- include/linux/libnvdimm.h    |  8 +++++++-
- 6 files changed, 46 insertions(+), 12 deletions(-)
+Oh sorry, I didn't understand that was completely independent from the
+protocol.
 
-diff --git a/drivers/acpi/nfit/core.c b/drivers/acpi/nfit/core.c
-index 5a389a4f4f65..08dde76cf459 100644
---- a/drivers/acpi/nfit/core.c
-+++ b/drivers/acpi/nfit/core.c
-@@ -2434,7 +2434,7 @@ static void write_blk_ctl(struct nfit_blk *nfit_blk, unsigned int bw,
- 		offset = to_interleave_offset(offset, mmio);
- 
- 	writeq(cmd, mmio->addr.base + offset);
--	nvdimm_flush(nfit_blk->nd_region);
-+	nvdimm_flush(nfit_blk->nd_region, NULL);
- 
- 	if (nfit_blk->dimm_flags & NFIT_BLK_DCR_LATCH)
- 		readq(mmio->addr.base + offset);
-@@ -2483,7 +2483,7 @@ static int acpi_nfit_blk_single_io(struct nfit_blk *nfit_blk,
- 	}
- 
- 	if (rw)
--		nvdimm_flush(nfit_blk->nd_region);
-+		nvdimm_flush(nfit_blk->nd_region, NULL);
- 
- 	rc = read_blk_stat(nfit_blk, lane) ? -EIO : 0;
- 	return rc;
-diff --git a/drivers/nvdimm/claim.c b/drivers/nvdimm/claim.c
-index fb667bf469c7..13510bae1e6f 100644
---- a/drivers/nvdimm/claim.c
-+++ b/drivers/nvdimm/claim.c
-@@ -263,7 +263,7 @@ static int nsio_rw_bytes(struct nd_namespace_common *ndns,
- 	struct nd_namespace_io *nsio = to_nd_namespace_io(&ndns->dev);
- 	unsigned int sz_align = ALIGN(size + (offset & (512 - 1)), 512);
- 	sector_t sector = offset >> 9;
--	int rc = 0;
-+	int rc = 0, ret = 0;
- 
- 	if (unlikely(!size))
- 		return 0;
-@@ -301,7 +301,9 @@ static int nsio_rw_bytes(struct nd_namespace_common *ndns,
- 	}
- 
- 	memcpy_flushcache(nsio->addr + offset, buf, size);
--	nvdimm_flush(to_nd_region(ndns->dev.parent));
-+	ret = nvdimm_flush(to_nd_region(ndns->dev.parent), NULL);
-+	if (ret)
-+		rc = ret;
- 
- 	return rc;
- }
-diff --git a/drivers/nvdimm/nd.h b/drivers/nvdimm/nd.h
-index a5ac3b240293..0c74d2428bd7 100644
---- a/drivers/nvdimm/nd.h
-+++ b/drivers/nvdimm/nd.h
-@@ -159,6 +159,7 @@ struct nd_region {
- 	struct badblocks bb;
- 	struct nd_interleave_set *nd_set;
- 	struct nd_percpu_lane __percpu *lane;
-+	int (*flush)(struct nd_region *nd_region, struct bio *bio);
- 	struct nd_mapping mapping[0];
- };
- 
-diff --git a/drivers/nvdimm/pmem.c b/drivers/nvdimm/pmem.c
-index bc2f700feef8..f719245da170 100644
---- a/drivers/nvdimm/pmem.c
-+++ b/drivers/nvdimm/pmem.c
-@@ -192,6 +192,7 @@ static blk_status_t pmem_do_bvec(struct pmem_device *pmem, struct page *page,
- 
- static blk_qc_t pmem_make_request(struct request_queue *q, struct bio *bio)
- {
-+	int ret = 0;
- 	blk_status_t rc = 0;
- 	bool do_acct;
- 	unsigned long start;
-@@ -201,7 +202,7 @@ static blk_qc_t pmem_make_request(struct request_queue *q, struct bio *bio)
- 	struct nd_region *nd_region = to_region(pmem);
- 
- 	if (bio->bi_opf & REQ_PREFLUSH)
--		nvdimm_flush(nd_region);
-+		ret = nvdimm_flush(nd_region, bio);
- 
- 	do_acct = nd_iostat_start(bio, &start);
- 	bio_for_each_segment(bvec, bio, iter) {
-@@ -216,7 +217,10 @@ static blk_qc_t pmem_make_request(struct request_queue *q, struct bio *bio)
- 		nd_iostat_end(bio, start);
- 
- 	if (bio->bi_opf & REQ_FUA)
--		nvdimm_flush(nd_region);
-+		ret = nvdimm_flush(nd_region, bio);
-+
-+	if (ret)
-+		bio->bi_status = errno_to_blk_status(ret);
- 
- 	bio_endio(bio);
- 	return BLK_QC_T_NONE;
-@@ -469,7 +473,6 @@ static int pmem_attach_disk(struct device *dev,
- 	}
- 	dax_write_cache(dax_dev, nvdimm_has_cache(nd_region));
- 	pmem->dax_dev = dax_dev;
--
- 	gendev = disk_to_dev(disk);
- 	gendev->groups = pmem_attribute_groups;
- 
-@@ -527,14 +530,14 @@ static int nd_pmem_remove(struct device *dev)
- 		sysfs_put(pmem->bb_state);
- 		pmem->bb_state = NULL;
- 	}
--	nvdimm_flush(to_nd_region(dev->parent));
-+	nvdimm_flush(to_nd_region(dev->parent), NULL);
- 
- 	return 0;
- }
- 
- static void nd_pmem_shutdown(struct device *dev)
- {
--	nvdimm_flush(to_nd_region(dev->parent));
-+	nvdimm_flush(to_nd_region(dev->parent), NULL);
- }
- 
- static void nd_pmem_notify(struct device *dev, enum nvdimm_event event)
-diff --git a/drivers/nvdimm/region_devs.c b/drivers/nvdimm/region_devs.c
-index b4ef7d9ff22e..e5b59708865e 100644
---- a/drivers/nvdimm/region_devs.c
-+++ b/drivers/nvdimm/region_devs.c
-@@ -295,7 +295,9 @@ static ssize_t deep_flush_store(struct device *dev, struct device_attribute *att
- 		return rc;
- 	if (!flush)
- 		return -EINVAL;
--	nvdimm_flush(nd_region);
-+	rc = nvdimm_flush(nd_region, NULL);
-+	if (rc)
-+		return rc;
- 
- 	return len;
- }
-@@ -1085,6 +1087,11 @@ static struct nd_region *nd_region_create(struct nvdimm_bus *nvdimm_bus,
- 	dev->of_node = ndr_desc->of_node;
- 	nd_region->ndr_size = resource_size(ndr_desc->res);
- 	nd_region->ndr_start = ndr_desc->res->start;
-+	if (ndr_desc->flush)
-+		nd_region->flush = ndr_desc->flush;
-+	else
-+		nd_region->flush = NULL;
-+
- 	nd_device_register(dev);
- 
- 	return nd_region;
-@@ -1125,11 +1132,24 @@ struct nd_region *nvdimm_volatile_region_create(struct nvdimm_bus *nvdimm_bus,
- }
- EXPORT_SYMBOL_GPL(nvdimm_volatile_region_create);
- 
-+int nvdimm_flush(struct nd_region *nd_region, struct bio *bio)
-+{
-+	int rc = 0;
-+
-+	if (!nd_region->flush)
-+		rc = generic_nvdimm_flush(nd_region);
-+	else {
-+		if (nd_region->flush(nd_region, bio))
-+			rc = -EIO;
-+	}
-+
-+	return rc;
-+}
- /**
-  * nvdimm_flush - flush any posted write queues between the cpu and pmem media
-  * @nd_region: blk or interleaved pmem region
-  */
--void nvdimm_flush(struct nd_region *nd_region)
-+int generic_nvdimm_flush(struct nd_region *nd_region)
- {
- 	struct nd_region_data *ndrd = dev_get_drvdata(&nd_region->dev);
- 	int i, idx;
-@@ -1153,6 +1173,8 @@ void nvdimm_flush(struct nd_region *nd_region)
- 		if (ndrd_get_flush_wpq(ndrd, i, 0))
- 			writeq(1, ndrd_get_flush_wpq(ndrd, i, idx));
- 	wmb();
-+
-+	return 0;
- }
- EXPORT_SYMBOL_GPL(nvdimm_flush);
- 
-diff --git a/include/linux/libnvdimm.h b/include/linux/libnvdimm.h
-index feb342d026f2..a5f369ec3726 100644
---- a/include/linux/libnvdimm.h
-+++ b/include/linux/libnvdimm.h
-@@ -65,6 +65,9 @@ enum {
- 	 */
- 	ND_REGION_PERSIST_MEMCTRL = 2,
- 
-+	/* Platform provides asynchronous flush mechanism */
-+	ND_REGION_ASYNC = 3,
-+
- 	/* mark newly adjusted resources as requiring a label update */
- 	DPA_RESOURCE_ADJUSTED = 1 << 0,
- };
-@@ -121,6 +124,7 @@ struct nd_mapping_desc {
- 	int position;
- };
- 
-+struct nd_region;
- struct nd_region_desc {
- 	struct resource *res;
- 	struct nd_mapping_desc *mapping;
-@@ -133,6 +137,7 @@ struct nd_region_desc {
- 	int target_node;
- 	unsigned long flags;
- 	struct device_node *of_node;
-+	int (*flush)(struct nd_region *nd_region, struct bio *bio);
- };
- 
- struct device;
-@@ -260,7 +265,8 @@ unsigned long nd_blk_memremap_flags(struct nd_blk_region *ndbr);
- unsigned int nd_region_acquire_lane(struct nd_region *nd_region);
- void nd_region_release_lane(struct nd_region *nd_region, unsigned int lane);
- u64 nd_fletcher64(void *addr, size_t len, bool le);
--void nvdimm_flush(struct nd_region *nd_region);
-+int nvdimm_flush(struct nd_region *nd_region, struct bio *bio);
-+int generic_nvdimm_flush(struct nd_region *nd_region);
- int nvdimm_has_flush(struct nd_region *nd_region);
- int nvdimm_has_cache(struct nd_region *nd_region);
- int nvdimm_in_overwrite(struct nvdimm *nvdimm);
--- 
-2.20.1
+> > > > > How fast is rbd_resize()? Does automatically resizing for every write
+> > > > > request actually work reasonably well in practice? If it does, there is
+> > > > > probably little reason not to allow it, even if the use cases are rather
+> > > > > obscure.
+> > > > 
+> > > > I'll try to measure the percentage of the time spent in the rbd_resize.
+> > > > 
+> > > > Another solution could be to pass to the rbd driver the virtual size of
+> > > > the image and resize it only one time also if the preallocation is
+> > > > disabled, because RBD will not allocate blocks but IIUC it only set the max
+> > > > size.
+> > > > 
+> > > > Do you think make sense? Is it feasible?
+> > > 
+> > > In theory yes, though it requires modification of every driver that
+> > > should be usable together with rbd (i.e. ideally all of the drivers). If
+> > > automatic resize works good enough, I'd prefer that
+> > 
+> > I did some tests and it seems that the cost of rbd_resize() is
+> > negligible. IIUC it only updates the metadata without allocating any
+> > blocks (if we are growing, like that case).
+> > 
+> > Anyway the automatic resize will not affect the current use-case (raw
+> > images on rbd), where the file size is set during the creation, so I
+> > think there should not be side effects with this patch.
+> 
+> Okay, sounds good.
+> 
+> > I'm also adding the support for preallocation (i.e. full) in the rbd
+> > driver that can be useful for qcow2 images.
+> > 
+> > If you prefer I can resend this patch with the preallocation series.
+> 
+> Let's keep seperate things separate. Huge patch series are always harder
+> to handle.
+
+Okay, thanks for the suggestion!
+
+Should this patch go through your tree?
+
+Thanks,
+Stefano
