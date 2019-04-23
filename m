@@ -1,27 +1,24 @@
-Received: from eggs.gnu.org ([209.51.188.92]:35497)
+Received: from eggs.gnu.org ([209.51.188.92]:35500)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1hIxVe-00018b-JC
-	for qemu-devel@nongnu.org; Tue, 23 Apr 2019 11:39:05 -0400
+	(envelope-from <richard.henderson@linaro.org>) id 1hIxVe-00018m-PK
+	for qemu-devel@nongnu.org; Tue, 23 Apr 2019 11:39:04 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1hIxVb-0006vy-TY
+	(envelope-from <richard.henderson@linaro.org>) id 1hIxVd-0006wp-Hm
 	for qemu-devel@nongnu.org; Tue, 23 Apr 2019 11:39:02 -0400
-Received: from mail-pf1-x441.google.com ([2607:f8b0:4864:20::441]:43284)
+Received: from mail-pf1-x444.google.com ([2607:f8b0:4864:20::444]:36111)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1hIxVb-0006vO-Jb
-	for qemu-devel@nongnu.org; Tue, 23 Apr 2019 11:38:59 -0400
-Received: by mail-pf1-x441.google.com with SMTP id w26so864238pfj.10
-	for <qemu-devel@nongnu.org>; Tue, 23 Apr 2019 08:38:59 -0700 (PDT)
+	id 1hIxVd-0006wR-BX
+	for qemu-devel@nongnu.org; Tue, 23 Apr 2019 11:39:01 -0400
+Received: by mail-pf1-x444.google.com with SMTP id z5so7691981pfn.3
+	for <qemu-devel@nongnu.org>; Tue, 23 Apr 2019 08:39:01 -0700 (PDT)
 From: Richard Henderson <richard.henderson@linaro.org>
-Date: Tue, 23 Apr 2019 08:38:47 -0700
-Message-Id: <20190423153853.19790-2-richard.henderson@linaro.org>
+Date: Tue, 23 Apr 2019 08:38:49 -0700
+Message-Id: <20190423153853.19790-4-richard.henderson@linaro.org>
 In-Reply-To: <20190423153853.19790-1-richard.henderson@linaro.org>
 References: <20190423153853.19790-1-richard.henderson@linaro.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH v2 1/7] tcg: Hoist max_insns computation to
- tb_gen_code
+Subject: [Qemu-devel] [PATCH v2 3/7] tcg: Restart TB generation after
+ relocation overflow
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,667 +30,176 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: alistair23@gmail.com
 
-In order to handle TB's that translate to too much code, we
-need to place the control of the length of the translation
-in the hands of the code gen master loop.
+If the TB generates too much code, such that backend relocations
+overflow, try again with a smaller TB.  In support of this, move
+relocation processing from a random place within tcg_out_op, in
+the handling of branch opcodes, to a new function at the end of
+tcg_gen_code.
 
-Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
-Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+This is not a complete solution, as there are additional relocs
+generated for out-of-line ldst handling and constant pools.
+
 Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- include/exec/exec-all.h       |  4 ++--
- include/exec/translator.h     |  3 ++-
- accel/tcg/translate-all.c     | 15 +++++++++++++--
- accel/tcg/translator.c        | 15 ++-------------
- target/alpha/translate.c      |  4 ++--
- target/arm/translate.c        |  4 ++--
- target/cris/translate.c       | 10 +---------
- target/hppa/translate.c       |  5 ++---
- target/i386/translate.c       |  4 ++--
- target/lm32/translate.c       | 10 +---------
- target/m68k/translate.c       |  4 ++--
- target/microblaze/translate.c | 10 +---------
- target/mips/translate.c       |  4 ++--
- target/moxie/translate.c      | 11 ++---------
- target/nios2/translate.c      | 14 ++------------
- target/openrisc/translate.c   |  4 ++--
- target/ppc/translate.c        |  4 ++--
- target/riscv/translate.c      |  4 ++--
- target/s390x/translate.c      |  4 ++--
- target/sh4/translate.c        |  4 ++--
- target/sparc/translate.c      |  4 ++--
- target/tilegx/translate.c     | 12 +-----------
- target/tricore/translate.c    | 16 ++--------------
- target/unicore32/translate.c  | 10 +---------
- target/xtensa/translate.c     |  4 ++--
- 25 files changed, 56 insertions(+), 127 deletions(-)
+ tcg/tcg.h | 15 +++++++-------
+ tcg/tcg.c | 61 ++++++++++++++++++++++++++-----------------------------
+ 2 files changed, 36 insertions(+), 40 deletions(-)
 
-diff --git a/include/exec/exec-all.h b/include/exec/exec-all.h
-index 97b90cb0db..58e988b3b1 100644
---- a/include/exec/exec-all.h
-+++ b/include/exec/exec-all.h
-@@ -40,8 +40,8 @@ typedef ram_addr_t tb_page_addr_t;
- 
- #include "qemu/log.h"
- 
--void gen_intermediate_code(CPUState *cpu, struct TranslationBlock *tb);
--void restore_state_to_opc(CPUArchState *env, struct TranslationBlock *tb,
-+void gen_intermediate_code(CPUState *cpu, TranslationBlock *tb, int max_insns);
-+void restore_state_to_opc(CPUArchState *env, TranslationBlock *tb,
-                           target_ulong *data);
- 
- void cpu_gen_init(void);
-diff --git a/include/exec/translator.h b/include/exec/translator.h
-index 71e7b2c347..66dfe906c4 100644
---- a/include/exec/translator.h
-+++ b/include/exec/translator.h
-@@ -123,6 +123,7 @@ typedef struct TranslatorOps {
-  * @db: Disassembly context.
-  * @cpu: Target vCPU.
-  * @tb: Translation block.
-+ * @max_insns: Maximum number of insns to translate.
-  *
-  * Generic translator loop.
-  *
-@@ -137,7 +138,7 @@ typedef struct TranslatorOps {
-  * - When too many instructions have been translated.
-  */
- void translator_loop(const TranslatorOps *ops, DisasContextBase *db,
--                     CPUState *cpu, TranslationBlock *tb);
-+                     CPUState *cpu, TranslationBlock *tb, int max_insns);
- 
- void translator_loop_temp_check(DisasContextBase *db);
- 
-diff --git a/accel/tcg/translate-all.c b/accel/tcg/translate-all.c
-index 8f593b926f..fcdfe6c0ec 100644
---- a/accel/tcg/translate-all.c
-+++ b/accel/tcg/translate-all.c
-@@ -1673,7 +1673,7 @@ TranslationBlock *tb_gen_code(CPUState *cpu,
-     tb_page_addr_t phys_pc, phys_page2;
-     target_ulong virt_page2;
-     tcg_insn_unit *gen_code_buf;
--    int gen_code_size, search_size;
-+    int gen_code_size, search_size, max_insns;
- #ifdef CONFIG_PROFILER
-     TCGProfile *prof = &tcg_ctx->prof;
-     int64_t ti;
-@@ -1691,6 +1691,17 @@ TranslationBlock *tb_gen_code(CPUState *cpu,
-     cflags &= ~CF_CLUSTER_MASK;
-     cflags |= cpu->cluster_index << CF_CLUSTER_SHIFT;
- 
-+    max_insns = cflags & CF_COUNT_MASK;
-+    if (max_insns == 0) {
-+        max_insns = CF_COUNT_MASK;
-+    }
-+    if (max_insns > TCG_MAX_INSNS) {
-+        max_insns = TCG_MAX_INSNS;
-+    }
-+    if (cpu->singlestep_enabled || singlestep) {
-+        max_insns = 1;
-+    }
-+
-  buffer_overflow:
-     tb = tb_alloc(pc);
-     if (unlikely(!tb)) {
-@@ -1720,7 +1731,7 @@ TranslationBlock *tb_gen_code(CPUState *cpu,
-     tcg_func_start(tcg_ctx);
- 
-     tcg_ctx->cpu = ENV_GET_CPU(env);
--    gen_intermediate_code(cpu, tb);
-+    gen_intermediate_code(cpu, tb, max_insns);
-     tcg_ctx->cpu = NULL;
- 
-     trace_translate_block(tb, tb->pc, tb->tc.ptr);
-diff --git a/accel/tcg/translator.c b/accel/tcg/translator.c
-index afd0a49ea6..8d65ead708 100644
---- a/accel/tcg/translator.c
-+++ b/accel/tcg/translator.c
-@@ -32,7 +32,7 @@ void translator_loop_temp_check(DisasContextBase *db)
- }
- 
- void translator_loop(const TranslatorOps *ops, DisasContextBase *db,
--                     CPUState *cpu, TranslationBlock *tb)
-+                     CPUState *cpu, TranslationBlock *tb, int max_insns)
- {
-     int bp_insn = 0;
- 
-@@ -42,20 +42,9 @@ void translator_loop(const TranslatorOps *ops, DisasContextBase *db,
-     db->pc_next = db->pc_first;
-     db->is_jmp = DISAS_NEXT;
-     db->num_insns = 0;
-+    db->max_insns = max_insns;
-     db->singlestep_enabled = cpu->singlestep_enabled;
- 
--    /* Instruction counting */
--    db->max_insns = tb_cflags(db->tb) & CF_COUNT_MASK;
--    if (db->max_insns == 0) {
--        db->max_insns = CF_COUNT_MASK;
--    }
--    if (db->max_insns > TCG_MAX_INSNS) {
--        db->max_insns = TCG_MAX_INSNS;
--    }
--    if (db->singlestep_enabled || singlestep) {
--        db->max_insns = 1;
--    }
--
-     ops->init_disas_context(db, cpu);
-     tcg_debug_assert(db->is_jmp == DISAS_NEXT);  /* no early exit */
- 
-diff --git a/target/alpha/translate.c b/target/alpha/translate.c
-index 9d8f9b3eea..2c9cccf6c1 100644
---- a/target/alpha/translate.c
-+++ b/target/alpha/translate.c
-@@ -3049,10 +3049,10 @@ static const TranslatorOps alpha_tr_ops = {
-     .disas_log          = alpha_tr_disas_log,
- };
- 
--void gen_intermediate_code(CPUState *cpu, TranslationBlock *tb)
-+void gen_intermediate_code(CPUState *cpu, TranslationBlock *tb, int max_insns)
- {
-     DisasContext dc;
--    translator_loop(&alpha_tr_ops, &dc.base, cpu, tb);
-+    translator_loop(&alpha_tr_ops, &dc.base, cpu, tb, max_insns);
- }
- 
- void restore_state_to_opc(CPUAlphaState *env, TranslationBlock *tb,
-diff --git a/target/arm/translate.c b/target/arm/translate.c
-index d408e4d7ef..b6b65ca360 100644
---- a/target/arm/translate.c
-+++ b/target/arm/translate.c
-@@ -13755,7 +13755,7 @@ static const TranslatorOps thumb_translator_ops = {
- };
- 
- /* generate intermediate code for basic block 'tb'.  */
--void gen_intermediate_code(CPUState *cpu, TranslationBlock *tb)
-+void gen_intermediate_code(CPUState *cpu, TranslationBlock *tb, int max_insns)
- {
-     DisasContext dc;
-     const TranslatorOps *ops = &arm_translator_ops;
-@@ -13769,7 +13769,7 @@ void gen_intermediate_code(CPUState *cpu, TranslationBlock *tb)
-     }
+diff --git a/tcg/tcg.h b/tcg/tcg.h
+index 32b7cf3489..d2f86174a3 100644
+--- a/tcg/tcg.h
++++ b/tcg/tcg.h
+@@ -237,12 +237,13 @@ typedef uint64_t tcg_insn_unit;
+     do { if (!(X)) { __builtin_unreachable(); } } while (0)
  #endif
  
--    translator_loop(ops, &dc.base, cpu, tb);
-+    translator_loop(ops, &dc.base, cpu, tb, max_insns);
- }
+-typedef struct TCGRelocation {
+-    struct TCGRelocation *next;
+-    int type;
++typedef struct TCGRelocation TCGRelocation;
++struct TCGRelocation {
++    QSIMPLEQ_ENTRY(TCGRelocation) next;
+     tcg_insn_unit *ptr;
+     intptr_t addend;
+-} TCGRelocation; 
++    int type;
++}; 
  
- void arm_cpu_dump_state(CPUState *cs, FILE *f, fprintf_function cpu_fprintf,
-diff --git a/target/cris/translate.c b/target/cris/translate.c
-index 11b2c11174..777810452d 100644
---- a/target/cris/translate.c
-+++ b/target/cris/translate.c
-@@ -3080,7 +3080,7 @@ static unsigned int crisv32_decoder(CPUCRISState *env, DisasContext *dc)
-  */
- 
- /* generate intermediate code for basic block 'tb'.  */
--void gen_intermediate_code(CPUState *cs, struct TranslationBlock *tb)
-+void gen_intermediate_code(CPUState *cs, TranslationBlock *tb, int max_insns)
- {
-     CPUCRISState *env = cs->env_ptr;
-     uint32_t pc_start;
-@@ -3090,7 +3090,6 @@ void gen_intermediate_code(CPUState *cs, struct TranslationBlock *tb)
-     uint32_t page_start;
-     target_ulong npc;
-     int num_insns;
--    int max_insns;
- 
-     if (env->pregs[PR_VR] == 32) {
-         dc->decoder = crisv32_decoder;
-@@ -3136,13 +3135,6 @@ void gen_intermediate_code(CPUState *cs, struct TranslationBlock *tb)
- 
-     page_start = pc_start & TARGET_PAGE_MASK;
-     num_insns = 0;
--    max_insns = tb_cflags(tb) & CF_COUNT_MASK;
--    if (max_insns == 0) {
--        max_insns = CF_COUNT_MASK;
--    }
--    if (max_insns > TCG_MAX_INSNS) {
--        max_insns = TCG_MAX_INSNS;
--    }
- 
-     gen_tb_start(tb);
-     do {
-diff --git a/target/hppa/translate.c b/target/hppa/translate.c
-index 43b74367ea..7c03c62768 100644
---- a/target/hppa/translate.c
-+++ b/target/hppa/translate.c
-@@ -4312,11 +4312,10 @@ static const TranslatorOps hppa_tr_ops = {
-     .disas_log          = hppa_tr_disas_log,
+ typedef struct TCGLabel TCGLabel;
+ struct TCGLabel {
+@@ -253,11 +254,9 @@ struct TCGLabel {
+     union {
+         uintptr_t value;
+         tcg_insn_unit *value_ptr;
+-        TCGRelocation *first_reloc;
+     } u;
+-#ifdef CONFIG_DEBUG_TCG
++    QSIMPLEQ_HEAD(, TCGRelocation) relocs;
+     QSIMPLEQ_ENTRY(TCGLabel) next;
+-#endif
  };
  
--void gen_intermediate_code(CPUState *cs, struct TranslationBlock *tb)
--
-+void gen_intermediate_code(CPUState *cs, TranslationBlock *tb, int max_insns)
+ typedef struct TCGPool {
+@@ -690,7 +689,6 @@ struct TCGContext {
+ #endif
+ 
+ #ifdef CONFIG_DEBUG_TCG
+-    QSIMPLEQ_HEAD(, TCGLabel) labels;
+     int temps_in_use;
+     int goto_tb_issue_mask;
+ #endif
+@@ -728,6 +726,7 @@ struct TCGContext {
+     TCGTemp temps[TCG_MAX_TEMPS]; /* globals first, temps after */
+ 
+     QTAILQ_HEAD(, TCGOp) ops, free_ops;
++    QSIMPLEQ_HEAD(, TCGLabel) labels;
+ 
+     /* Tells which temporary holds a given register.
+        It does not take into account fixed registers */
+diff --git a/tcg/tcg.c b/tcg/tcg.c
+index aa0e94521b..ab11235c42 100644
+--- a/tcg/tcg.c
++++ b/tcg/tcg.c
+@@ -262,37 +262,17 @@ static __attribute__((unused)) inline void tcg_patch64(tcg_insn_unit *p,
+ static void tcg_out_reloc(TCGContext *s, tcg_insn_unit *code_ptr, int type,
+                           TCGLabel *l, intptr_t addend)
  {
-     DisasContext ctx;
--    translator_loop(&hppa_tr_ops, &ctx.base, cs, tb);
-+    translator_loop(&hppa_tr_ops, &ctx.base, cs, tb, max_insns);
- }
+-    TCGRelocation *r;
++    TCGRelocation *r = tcg_malloc(sizeof(TCGRelocation));
  
- void restore_state_to_opc(CPUHPPAState *env, TranslationBlock *tb,
-diff --git a/target/i386/translate.c b/target/i386/translate.c
-index b725bec37c..77d6b73e42 100644
---- a/target/i386/translate.c
-+++ b/target/i386/translate.c
-@@ -8590,11 +8590,11 @@ static const TranslatorOps i386_tr_ops = {
- };
- 
- /* generate intermediate code for basic block 'tb'.  */
--void gen_intermediate_code(CPUState *cpu, TranslationBlock *tb)
-+void gen_intermediate_code(CPUState *cpu, TranslationBlock *tb, int max_insns)
- {
-     DisasContext dc;
- 
--    translator_loop(&i386_tr_ops, &dc.base, cpu, tb);
-+    translator_loop(&i386_tr_ops, &dc.base, cpu, tb, max_insns);
- }
- 
- void restore_state_to_opc(CPUX86State *env, TranslationBlock *tb,
-diff --git a/target/lm32/translate.c b/target/lm32/translate.c
-index b32feb7564..ac5169c4e7 100644
---- a/target/lm32/translate.c
-+++ b/target/lm32/translate.c
-@@ -1049,7 +1049,7 @@ static inline void decode(DisasContext *dc, uint32_t ir)
- }
- 
- /* generate intermediate code for basic block 'tb'.  */
--void gen_intermediate_code(CPUState *cs, struct TranslationBlock *tb)
-+void gen_intermediate_code(CPUState *cs, TranslationBlock *tb, int max_insns)
- {
-     CPULM32State *env = cs->env_ptr;
-     LM32CPU *cpu = lm32_env_get_cpu(env);
-@@ -1057,7 +1057,6 @@ void gen_intermediate_code(CPUState *cs, struct TranslationBlock *tb)
-     uint32_t pc_start;
-     uint32_t page_start;
-     int num_insns;
--    int max_insns;
- 
-     pc_start = tb->pc;
-     dc->features = cpu->features;
-@@ -1077,13 +1076,6 @@ void gen_intermediate_code(CPUState *cs, struct TranslationBlock *tb)
- 
-     page_start = pc_start & TARGET_PAGE_MASK;
-     num_insns = 0;
--    max_insns = tb_cflags(tb) & CF_COUNT_MASK;
--    if (max_insns == 0) {
--        max_insns = CF_COUNT_MASK;
--    }
--    if (max_insns > TCG_MAX_INSNS) {
--        max_insns = TCG_MAX_INSNS;
--    }
- 
-     gen_tb_start(tb);
-     do {
-diff --git a/target/m68k/translate.c b/target/m68k/translate.c
-index 6217a683f1..838ff64875 100644
---- a/target/m68k/translate.c
-+++ b/target/m68k/translate.c
-@@ -6169,10 +6169,10 @@ static const TranslatorOps m68k_tr_ops = {
-     .disas_log          = m68k_tr_disas_log,
- };
- 
--void gen_intermediate_code(CPUState *cpu, TranslationBlock *tb)
-+void gen_intermediate_code(CPUState *cpu, TranslationBlock *tb, int max_insns)
- {
-     DisasContext dc;
--    translator_loop(&m68k_tr_ops, &dc.base, cpu, tb);
-+    translator_loop(&m68k_tr_ops, &dc.base, cpu, tb, max_insns);
- }
- 
- static double floatx80_to_double(CPUM68KState *env, uint16_t high, uint64_t low)
-diff --git a/target/microblaze/translate.c b/target/microblaze/translate.c
-index 78ca265b04..efdea5b635 100644
---- a/target/microblaze/translate.c
-+++ b/target/microblaze/translate.c
-@@ -1600,7 +1600,7 @@ static inline void decode(DisasContext *dc, uint32_t ir)
- }
- 
- /* generate intermediate code for basic block 'tb'.  */
--void gen_intermediate_code(CPUState *cs, struct TranslationBlock *tb)
-+void gen_intermediate_code(CPUState *cs, TranslationBlock *tb, int max_insns)
- {
-     CPUMBState *env = cs->env_ptr;
-     MicroBlazeCPU *cpu = mb_env_get_cpu(env);
-@@ -1610,7 +1610,6 @@ void gen_intermediate_code(CPUState *cs, struct TranslationBlock *tb)
-     uint32_t page_start, org_flags;
-     uint32_t npc;
-     int num_insns;
--    int max_insns;
- 
-     pc_start = tb->pc;
-     dc->cpu = cpu;
-@@ -1634,13 +1633,6 @@ void gen_intermediate_code(CPUState *cs, struct TranslationBlock *tb)
- 
-     page_start = pc_start & TARGET_PAGE_MASK;
-     num_insns = 0;
--    max_insns = tb_cflags(tb) & CF_COUNT_MASK;
--    if (max_insns == 0) {
--        max_insns = CF_COUNT_MASK;
--    }
--    if (max_insns > TCG_MAX_INSNS) {
--        max_insns = TCG_MAX_INSNS;
--    }
- 
-     gen_tb_start(tb);
-     do
-diff --git a/target/mips/translate.c b/target/mips/translate.c
-index 364bd6dc4f..ee630e1c5d 100644
---- a/target/mips/translate.c
-+++ b/target/mips/translate.c
-@@ -29720,11 +29720,11 @@ static const TranslatorOps mips_tr_ops = {
-     .disas_log          = mips_tr_disas_log,
- };
- 
--void gen_intermediate_code(CPUState *cs, struct TranslationBlock *tb)
-+void gen_intermediate_code(CPUState *cs, TranslationBlock *tb, int max_insns)
- {
-     DisasContext ctx;
- 
--    translator_loop(&mips_tr_ops, &ctx.base, cs, tb);
-+    translator_loop(&mips_tr_ops, &ctx.base, cs, tb, max_insns);
- }
- 
- static void fpu_dump_state(CPUMIPSState *env, FILE *f, fprintf_function fpu_fprintf,
-diff --git a/target/moxie/translate.c b/target/moxie/translate.c
-index 68ca223e22..d6eebf527f 100644
---- a/target/moxie/translate.c
-+++ b/target/moxie/translate.c
-@@ -813,13 +813,13 @@ static int decode_opc(MoxieCPU *cpu, DisasContext *ctx)
- }
- 
- /* generate intermediate code for basic block 'tb'.  */
--void gen_intermediate_code(CPUState *cs, struct TranslationBlock *tb)
-+void gen_intermediate_code(CPUState *cs, TranslationBlock *tb, int max_insns)
- {
-     CPUMoxieState *env = cs->env_ptr;
-     MoxieCPU *cpu = moxie_env_get_cpu(env);
-     DisasContext ctx;
-     target_ulong pc_start;
--    int num_insns, max_insns;
-+    int num_insns;
- 
-     pc_start = tb->pc;
-     ctx.pc = pc_start;
-@@ -829,13 +829,6 @@ void gen_intermediate_code(CPUState *cs, struct TranslationBlock *tb)
-     ctx.singlestep_enabled = 0;
-     ctx.bstate = BS_NONE;
-     num_insns = 0;
--    max_insns = tb_cflags(tb) & CF_COUNT_MASK;
--    if (max_insns == 0) {
--        max_insns = CF_COUNT_MASK;
--    }
--    if (max_insns > TCG_MAX_INSNS) {
--        max_insns = TCG_MAX_INSNS;
--    }
- 
-     gen_tb_start(tb);
-     do {
-diff --git a/target/nios2/translate.c b/target/nios2/translate.c
-index 7fa03ed05a..a402e572df 100644
---- a/target/nios2/translate.c
-+++ b/target/nios2/translate.c
-@@ -805,12 +805,11 @@ static void gen_exception(DisasContext *dc, uint32_t excp)
- }
- 
- /* generate intermediate code for basic block 'tb'.  */
--void gen_intermediate_code(CPUState *cs, TranslationBlock *tb)
-+void gen_intermediate_code(CPUState *cs, TranslationBlock *tb, int max_insns)
- {
-     CPUNios2State *env = cs->env_ptr;
-     DisasContext dc1, *dc = &dc1;
-     int num_insns;
--    int max_insns;
- 
-     /* Initialize DC */
-     dc->cpu_env = cpu_env;
-@@ -823,20 +822,11 @@ void gen_intermediate_code(CPUState *cs, TranslationBlock *tb)
- 
-     /* Set up instruction counts */
-     num_insns = 0;
--    if (cs->singlestep_enabled || singlestep) {
--        max_insns = 1;
+-    if (l->has_value) {
+-        /* FIXME: This may break relocations on RISC targets that
+-           modify instruction fields in place.  The caller may not have 
+-           written the initial value.  */
+-        bool ok = patch_reloc(code_ptr, type, l->u.value, addend);
+-        tcg_debug_assert(ok);
 -    } else {
-+    if (max_insns > 1) {
-         int page_insns = (TARGET_PAGE_SIZE - (tb->pc & TARGET_PAGE_MASK)) / 4;
--        max_insns = tb_cflags(tb) & CF_COUNT_MASK;
--        if (max_insns == 0) {
--            max_insns = CF_COUNT_MASK;
--        }
-         if (max_insns > page_insns) {
-             max_insns = page_insns;
-         }
--        if (max_insns > TCG_MAX_INSNS) {
--            max_insns = TCG_MAX_INSNS;
--        }
-     }
- 
-     gen_tb_start(tb);
-diff --git a/target/openrisc/translate.c b/target/openrisc/translate.c
-index 89680f882d..92a2b99f9a 100644
---- a/target/openrisc/translate.c
-+++ b/target/openrisc/translate.c
-@@ -1408,11 +1408,11 @@ static const TranslatorOps openrisc_tr_ops = {
-     .disas_log          = openrisc_tr_disas_log,
- };
- 
--void gen_intermediate_code(CPUState *cs, struct TranslationBlock *tb)
-+void gen_intermediate_code(CPUState *cs, TranslationBlock *tb, int max_insns)
- {
-     DisasContext ctx;
- 
--    translator_loop(&openrisc_tr_ops, &ctx.base, cs, tb);
-+    translator_loop(&openrisc_tr_ops, &ctx.base, cs, tb, max_insns);
- }
- 
- void openrisc_cpu_dump_state(CPUState *cs, FILE *f,
-diff --git a/target/ppc/translate.c b/target/ppc/translate.c
-index badc1ae1a3..d625687910 100644
---- a/target/ppc/translate.c
-+++ b/target/ppc/translate.c
-@@ -7864,11 +7864,11 @@ static const TranslatorOps ppc_tr_ops = {
-     .disas_log          = ppc_tr_disas_log,
- };
- 
--void gen_intermediate_code(CPUState *cs, struct TranslationBlock *tb)
-+void gen_intermediate_code(CPUState *cs, TranslationBlock *tb, int max_insns)
- {
-     DisasContext ctx;
- 
--    translator_loop(&ppc_tr_ops, &ctx.base, cs, tb);
-+    translator_loop(&ppc_tr_ops, &ctx.base, cs, tb, max_insns);
- }
- 
- void restore_state_to_opc(CPUPPCState *env, TranslationBlock *tb,
-diff --git a/target/riscv/translate.c b/target/riscv/translate.c
-index dd763647ea..967eac7bc3 100644
---- a/target/riscv/translate.c
-+++ b/target/riscv/translate.c
-@@ -783,11 +783,11 @@ static const TranslatorOps riscv_tr_ops = {
-     .disas_log          = riscv_tr_disas_log,
- };
- 
--void gen_intermediate_code(CPUState *cs, TranslationBlock *tb)
-+void gen_intermediate_code(CPUState *cs, TranslationBlock *tb, int max_insns)
- {
-     DisasContext ctx;
- 
--    translator_loop(&riscv_tr_ops, &ctx.base, cs, tb);
-+    translator_loop(&riscv_tr_ops, &ctx.base, cs, tb, max_insns);
- }
- 
- void riscv_translate_init(void)
-diff --git a/target/s390x/translate.c b/target/s390x/translate.c
-index 0afa8f7ca5..d4951836ad 100644
---- a/target/s390x/translate.c
-+++ b/target/s390x/translate.c
-@@ -6552,11 +6552,11 @@ static const TranslatorOps s390x_tr_ops = {
-     .disas_log          = s390x_tr_disas_log,
- };
- 
--void gen_intermediate_code(CPUState *cs, TranslationBlock *tb)
-+void gen_intermediate_code(CPUState *cs, TranslationBlock *tb, int max_insns)
- {
-     DisasContext dc;
- 
--    translator_loop(&s390x_tr_ops, &dc.base, cs, tb);
-+    translator_loop(&s390x_tr_ops, &dc.base, cs, tb, max_insns);
- }
- 
- void restore_state_to_opc(CPUS390XState *env, TranslationBlock *tb,
-diff --git a/target/sh4/translate.c b/target/sh4/translate.c
-index ab254b0e8d..34d3438250 100644
---- a/target/sh4/translate.c
-+++ b/target/sh4/translate.c
-@@ -2382,11 +2382,11 @@ static const TranslatorOps sh4_tr_ops = {
-     .disas_log          = sh4_tr_disas_log,
- };
- 
--void gen_intermediate_code(CPUState *cs, TranslationBlock *tb)
-+void gen_intermediate_code(CPUState *cs, TranslationBlock *tb, int max_insns)
- {
-     DisasContext ctx;
- 
--    translator_loop(&sh4_tr_ops, &ctx.base, cs, tb);
-+    translator_loop(&sh4_tr_ops, &ctx.base, cs, tb, max_insns);
- }
- 
- void restore_state_to_opc(CPUSH4State *env, TranslationBlock *tb,
-diff --git a/target/sparc/translate.c b/target/sparc/translate.c
-index 74315cdf09..091bab53af 100644
---- a/target/sparc/translate.c
-+++ b/target/sparc/translate.c
-@@ -5962,11 +5962,11 @@ static const TranslatorOps sparc_tr_ops = {
-     .disas_log          = sparc_tr_disas_log,
- };
- 
--void gen_intermediate_code(CPUState *cs, TranslationBlock *tb)
-+void gen_intermediate_code(CPUState *cs, TranslationBlock *tb, int max_insns)
- {
-     DisasContext dc = {};
- 
--    translator_loop(&sparc_tr_ops, &dc.base, cs, tb);
-+    translator_loop(&sparc_tr_ops, &dc.base, cs, tb, max_insns);
- }
- 
- void sparc_tcg_init(void)
-diff --git a/target/tilegx/translate.c b/target/tilegx/translate.c
-index df1e4d0fef..c46a4ab151 100644
---- a/target/tilegx/translate.c
-+++ b/target/tilegx/translate.c
-@@ -2369,7 +2369,7 @@ static void translate_one_bundle(DisasContext *dc, uint64_t bundle)
-     }
- }
- 
--void gen_intermediate_code(CPUState *cs, struct TranslationBlock *tb)
-+void gen_intermediate_code(CPUState *cs, TranslationBlock *tb, int max_insns)
- {
-     CPUTLGState *env = cs->env_ptr;
-     DisasContext ctx;
-@@ -2377,7 +2377,6 @@ void gen_intermediate_code(CPUState *cs, struct TranslationBlock *tb)
-     uint64_t pc_start = tb->pc;
-     uint64_t page_start = pc_start & TARGET_PAGE_MASK;
-     int num_insns = 0;
--    int max_insns = tb_cflags(tb) & CF_COUNT_MASK;
- 
-     dc->pc = pc_start;
-     dc->mmuidx = 0;
-@@ -2392,15 +2391,6 @@ void gen_intermediate_code(CPUState *cs, struct TranslationBlock *tb)
-         qemu_log_lock();
-         qemu_log("IN: %s\n", lookup_symbol(pc_start));
-     }
--    if (!max_insns) {
--        max_insns = CF_COUNT_MASK;
+-        /* add a new relocation entry */
+-        r = tcg_malloc(sizeof(TCGRelocation));
+-        r->type = type;
+-        r->ptr = code_ptr;
+-        r->addend = addend;
+-        r->next = l->u.first_reloc;
+-        l->u.first_reloc = r;
 -    }
--    if (cs->singlestep_enabled || singlestep) {
--        max_insns = 1;
--    }
--    if (max_insns > TCG_MAX_INSNS) {
--        max_insns = TCG_MAX_INSNS;
--    }
-     gen_tb_start(tb);
- 
-     while (1) {
-diff --git a/target/tricore/translate.c b/target/tricore/translate.c
-index b12c391be5..30d3ff77f5 100644
---- a/target/tricore/translate.c
-+++ b/target/tricore/translate.c
-@@ -8807,24 +8807,12 @@ static void decode_opc(CPUTriCoreState *env, DisasContext *ctx, int *is_branch)
-     }
++    r->type = type;
++    r->ptr = code_ptr;
++    r->addend = addend;
++    QSIMPLEQ_INSERT_TAIL(&l->relocs, r, next);
  }
  
--void gen_intermediate_code(CPUState *cs, struct TranslationBlock *tb)
-+void gen_intermediate_code(CPUState *cs, TranslationBlock *tb, int max_insns)
+ static void tcg_out_label(TCGContext *s, TCGLabel *l, tcg_insn_unit *ptr)
  {
-     CPUTriCoreState *env = cs->env_ptr;
-     DisasContext ctx;
-     target_ulong pc_start;
--    int num_insns, max_insns;
+-    intptr_t value = (intptr_t)ptr;
+-    TCGRelocation *r;
 -
--    num_insns = 0;
--    max_insns = tb_cflags(tb) & CF_COUNT_MASK;
--    if (max_insns == 0) {
--        max_insns = CF_COUNT_MASK;
+     tcg_debug_assert(!l->has_value);
+-
+-    for (r = l->u.first_reloc; r != NULL; r = r->next) {
+-        bool ok = patch_reloc(r->ptr, r->type, value, r->addend);
+-        tcg_debug_assert(ok);
 -    }
--    if (singlestep) {
--        max_insns = 1;
--    }
--    if (max_insns > TCG_MAX_INSNS) {
--        max_insns = TCG_MAX_INSNS;
--    }
-+    int num_insns = 0;
+-
+     l->has_value = 1;
+     l->u.value_ptr = ptr;
+ }
+@@ -302,16 +282,32 @@ TCGLabel *gen_new_label(void)
+     TCGContext *s = tcg_ctx;
+     TCGLabel *l = tcg_malloc(sizeof(TCGLabel));
  
-     pc_start = tb->pc;
-     ctx.pc = pc_start;
-diff --git a/target/unicore32/translate.c b/target/unicore32/translate.c
-index 002569ff3b..8547164e47 100644
---- a/target/unicore32/translate.c
-+++ b/target/unicore32/translate.c
-@@ -1870,14 +1870,13 @@ static void disas_uc32_insn(CPUUniCore32State *env, DisasContext *s)
+-    *l = (TCGLabel){
+-        .id = s->nb_labels++
+-    };
+-#ifdef CONFIG_DEBUG_TCG
++    memset(l, 0, sizeof(TCGLabel));
++    l->id = s->nb_labels++;
++    QSIMPLEQ_INIT(&l->relocs);
++
+     QSIMPLEQ_INSERT_TAIL(&s->labels, l, next);
+-#endif
+ 
+     return l;
  }
  
- /* generate intermediate code for basic block 'tb'.  */
--void gen_intermediate_code(CPUState *cs, TranslationBlock *tb)
-+void gen_intermediate_code(CPUState *cs, TranslationBlock *tb, int max_insns)
++static bool tcg_resolve_relocs(TCGContext *s)
++{
++    TCGLabel *l;
++
++    QSIMPLEQ_FOREACH(l, &s->labels, next) {
++        TCGRelocation *r;
++        uintptr_t value = l->u.value;
++
++        QSIMPLEQ_FOREACH(r, &l->relocs, next) {
++            if (!patch_reloc(r->ptr, r->type, value, r->addend)) {
++                return false;
++            }
++        }
++    }
++    return true;
++}
++
+ static void set_jmp_reset_offset(TCGContext *s, int which)
  {
-     CPUUniCore32State *env = cs->env_ptr;
-     DisasContext dc1, *dc = &dc1;
-     target_ulong pc_start;
-     uint32_t page_start;
-     int num_insns;
--    int max_insns;
+     size_t off = tcg_current_code_size(s);
+@@ -1095,9 +1091,7 @@ void tcg_func_start(TCGContext *s)
  
-     /* generate intermediate code */
-     num_temps = 0;
-@@ -1896,13 +1895,6 @@ void gen_intermediate_code(CPUState *cs, TranslationBlock *tb)
-     cpu_F1d = tcg_temp_new_i64();
-     page_start = pc_start & TARGET_PAGE_MASK;
-     num_insns = 0;
--    max_insns = tb_cflags(tb) & CF_COUNT_MASK;
--    if (max_insns == 0) {
--        max_insns = CF_COUNT_MASK;
--    }
--    if (max_insns > TCG_MAX_INSNS) {
--        max_insns = TCG_MAX_INSNS;
--    }
- 
- #ifndef CONFIG_USER_ONLY
-     if ((env->uncached_asr & ASR_M) == ASR_MODE_USER) {
-diff --git a/target/xtensa/translate.c b/target/xtensa/translate.c
-index 65561d2c49..435955dab0 100644
---- a/target/xtensa/translate.c
-+++ b/target/xtensa/translate.c
-@@ -1634,10 +1634,10 @@ static const TranslatorOps xtensa_translator_ops = {
-     .disas_log          = xtensa_tr_disas_log,
- };
- 
--void gen_intermediate_code(CPUState *cpu, TranslationBlock *tb)
-+void gen_intermediate_code(CPUState *cpu, TranslationBlock *tb, int max_insns)
- {
-     DisasContext dc = {};
--    translator_loop(&xtensa_translator_ops, &dc.base, cpu, tb);
-+    translator_loop(&xtensa_translator_ops, &dc.base, cpu, tb, max_insns);
+     QTAILQ_INIT(&s->ops);
+     QTAILQ_INIT(&s->free_ops);
+-#ifdef CONFIG_DEBUG_TCG
+     QSIMPLEQ_INIT(&s->labels);
+-#endif
  }
  
- void xtensa_cpu_dump_state(CPUState *cs, FILE *f,
+ static inline TCGTemp *tcg_temp_alloc(TCGContext *s)
+@@ -4010,6 +4004,9 @@ int tcg_gen_code(TCGContext *s, TranslationBlock *tb)
+         return -1;
+     }
+ #endif
++    if (!tcg_resolve_relocs(s)) {
++        return -2;
++    }
+ 
+     /* flush instruction cache */
+     flush_icache_range((uintptr_t)s->code_buf, (uintptr_t)s->code_ptr);
 -- 
 2.17.1
