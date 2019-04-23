@@ -2,63 +2,53 @@ Return-Path: <SRS0=zUjA=SZ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.4 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_PASS,USER_AGENT_MUTT autolearn=ham autolearn_force=no
+X-Spam-Status: No, score=-2.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 43028C10F14
-	for <qemu-devel@archiver.kernel.org>; Tue, 23 Apr 2019 11:32:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1C888C10F14
+	for <qemu-devel@archiver.kernel.org>; Tue, 23 Apr 2019 11:33:09 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id F253F2077C
-	for <qemu-devel@archiver.kernel.org>; Tue, 23 Apr 2019 11:32:18 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F253F2077C
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id E2D5A2077C
+	for <qemu-devel@archiver.kernel.org>; Tue, 23 Apr 2019 11:33:08 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E2D5A2077C
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=rt-rk.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:52072 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:52074 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hIteq-00028A-P8
-	for qemu-devel@archiver.kernel.org; Tue, 23 Apr 2019 07:32:16 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:36328)
+	id 1hItfg-0002lf-1x
+	for qemu-devel@archiver.kernel.org; Tue, 23 Apr 2019 07:33:08 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:36425)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mkletzan@redhat.com>) id 1hItdB-00012m-NG
-	for qemu-devel@nongnu.org; Tue, 23 Apr 2019 07:30:34 -0400
+	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1hItda-0001cr-35
+	for qemu-devel@nongnu.org; Tue, 23 Apr 2019 07:30:59 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mkletzan@redhat.com>) id 1hItdA-00051W-FD
-	for qemu-devel@nongnu.org; Tue, 23 Apr 2019 07:30:33 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:59786)
+	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1hItdZ-0005W2-5G
+	for qemu-devel@nongnu.org; Tue, 23 Apr 2019 07:30:58 -0400
+Received: from mx2.rt-rk.com ([89.216.37.149]:41149 helo=mail.rt-rk.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mkletzan@redhat.com>) id 1hItdA-0004yl-5j
-	for qemu-devel@nongnu.org; Tue, 23 Apr 2019 07:30:32 -0400
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
-	[10.5.11.15])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 27E8387623
-	for <qemu-devel@nongnu.org>; Tue, 23 Apr 2019 11:30:30 +0000 (UTC)
-Received: from caroline (unknown [10.43.2.67])
-	by smtp.corp.redhat.com (Postfix) with ESMTPS id C071C5D719;
-	Tue, 23 Apr 2019 11:30:29 +0000 (UTC)
-Received: by caroline (Postfix, from userid 1000)
-	id 7F6051206F3; Tue, 23 Apr 2019 13:30:28 +0200 (CEST)
-Date: Tue, 23 Apr 2019 13:30:28 +0200
-From: Martin Kletzander <mkletzan@redhat.com>
+	(Exim 4.71) (envelope-from <aleksandar.markovic@rt-rk.com>)
+	id 1hItdY-0004AY-TO
+	for qemu-devel@nongnu.org; Tue, 23 Apr 2019 07:30:57 -0400
+Received: from localhost (localhost [127.0.0.1])
+	by mail.rt-rk.com (Postfix) with ESMTP id 433F61A2438;
+	Tue, 23 Apr 2019 13:29:53 +0200 (CEST)
+X-Virus-Scanned: amavisd-new at rt-rk.com
+Received: from rtrkw774-lin.domain.local (rtrkw774-lin.domain.local
+	[10.10.13.43])
+	by mail.rt-rk.com (Postfix) with ESMTPSA id 28FB41A1E4D;
+	Tue, 23 Apr 2019 13:29:53 +0200 (CEST)
+From: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>
 To: qemu-devel@nongnu.org
-Message-ID: <20190423113028.GD30014@wheatley>
-MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="NklN7DEeGtkPCoo3"
-Content-Disposition: inline
-User-Agent: Mutt/1.11.4 (2019-03-13)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.26]);
-	Tue, 23 Apr 2019 11:30:30 +0000 (UTC)
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] Possibly incorrect data sparsification by qemu-img
+Date: Tue, 23 Apr 2019 13:29:34 +0200
+Message-Id: <1556018982-3715-1-git-send-email-aleksandar.markovic@rt-rk.com>
+X-Mailer: git-send-email 2.7.4
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x
+X-Received-From: 89.216.37.149
+Subject: [Qemu-devel] [PATCH 0/8] target/mips: Clean up misc code segments
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -70,132 +60,40 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, Richard Jones <rjones@redhat.com>
+Cc: arikalo@wavecomp.com, amarkovic@wavecomp.com, aurelien@aurel32.net
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190423113028.kPNAHf0M1VOJt1eC1-p_5_ZUGLF7vytmEmqlXE6Ymbs@z>
+Content-Type: text/plain; charset="UTF-8"
+Message-ID: <20190423112934.koRBlwMSUayj-5MYNIUbVwHoDrMps6EtR0iZ4bBPv2w@z>
 
+From: Aleksandar Markovic <amarkovic@wavecomp.com>
 
---NklN7DEeGtkPCoo3
-Content-Type: text/plain; charset=us-ascii; format=flowed
-Content-Disposition: inline
+This series removes a number of checkpatch errors and warnings
+to improve code readibility and maintainability.
 
-Hi,
+Aleksandar Markovic (4):
+  target/mips: Clean up dsp_helper.c
+  target/mips: Clean up lmi_helper.c
+  target/mips: Fix some space checkpatch errors in translate.c
+  target/mips: Fix if-else arms checkpatch errors in translate.c
 
-I am using qemu-img with nbdkit to transfer a disk image and the update it with
-extra data from newer snapshots.  The end image cannot be transferred because
-the snapshots will be created later than the first transfer and we want to save
-some time up front.  You might think of it as a continuous synchronisation.  It
-looks something like this:
+Jules Irenge (4):
+  target/mips: Add or remove space to fix checkpatch errors
+  target/mips: Realign comments to fix checkpatch warnings
+  target/mips: Remove a space before open parenthesis to fix checkpatch
+    errors
+  target/mips: Add * to comments and realign them to fix checkpatch
+    warnings
 
-I first transfer the whole image:
+ target/mips/cp0_timer.c  |  26 +++---
+ target/mips/cpu.h        | 211 ++++++++++++++++++++++-------------------
+ target/mips/dsp_helper.c |  40 +++++---
+ target/mips/lmi_helper.c |   8 +-
+ target/mips/translate.c  | 238 +++++++++++++++++++++++++++--------------------
+ 5 files changed, 301 insertions(+), 222 deletions(-)
 
-  qemu-img convert -p $nbd disk.raw
+-- 
+2.7.4
 
-Where `$nbd` is something along the lines of `nbd+unix:///?socket=nbdkit.sock`
-
-Then, after the next snapshot is created, I can update it thanks to the `-n`
-parameter (the $nbd now points to the newer snapshot with unchanged data looking
-like holes in the file):
-
-  qemu-img convert -p -n $nbd disk.raw
-
-This is fast and efficient as it uses block status nbd extension, so it only
-transfers new data.  This can be done over and over again to keep the local
-`disk.raw` image up to date with the latest remote snapshot.
-
-However, when the guest OS zeroes some of the data and it gets written into the
-snapshot, qemu-img scans for those zeros and does not write them to the
-destination image.  Checking the output of `qemu-img map --output=json $nbd`
-shows that the zeroed data is properly marked as `data: true`.
-
-Using `-S 0` would write zeros even where the holes are, effectively overwriting
-the data from the last snapshot even though they should not be changed.
-
-Having gone through some workarounds I would like there to be another way.  I
-know this is far from the typical usage of qemu-img, but is this really the
-expected behaviour or is this just something nobody really needed before?  If it
-is the former, would it be possible to have a parameter that would control this
-behaviour?  If the latter is the case, can that behaviour be changed so that it
-properly replicates the data when `-n` parameter is used?
-
-Basically the only thing we need is to either:
-
- 1) write zeros where they actually are or
-
- 2) turn off explicit sparsification without requesting dense image (basically
-    sparsify only the par that is reported as hole on the source) or
-
- 3) ideally, just FALLOC_FL_PUNCH_HOLE in places where source did report data,
-    but qemu-img found they are all zeros (or source reported HOLE+ZERO which, I
-    believe, is effectively the same)
-
-If you want to try this out, I found the easiest reproducible way is using
-nbdkit's data plugin, which can simulate whatever source image you like.
-
-The first iteration, which transfers the whole image can be simulated like this:
-
-  nbdkit --run 'qemu-img convert -p $nbd output.raw' data data="1" size=2M
-
-That command will expose an artificial disk with the size of 2MB which has first
-byte '1' and the rest is zeros/holes and runs the specified qemu-img command on
-that ($nbd is supplied by nbdkit, so the string needs to be enclosed in single
-parentheses).
-
-You can see how that data is exposed by running:
-
-  nbdkit --run 'qemu-img map --output=json $nbd' data data="1" size=2M
-
-For completeness I get this output:
-
-  [{ "start": 0, "length": 32768, "depth": 0, "zero": false, "data": true},
-   { "start": 32768, "length": 2064384, "depth": 0, "zero": true, "data": false}]
-
-Consequent update from a snapshot (with the first block explicitly zeroed) could
-be simulated by running:
-
-  nbdkit --run 'qemu-img convert -n -p $nbd output.raw' data data="0" size=2M
-
-Again, the mapping exposed by nbdkit can be seen by running:
-
-  nbdkit --run 'qemu-img map --output=json $nbd' data data="0" size=2M
-
-For completeness I get this output:
-
-  [{ "start": 0, "length": 32768, "depth": 0, "zero": true, "data": true},
-   { "start": 32768, "length": 2064384, "depth": 0, "zero": true, "data": false}]
-
-The resulting image still has `1` as its first byte (following is the output of
-`hexdump -C output.raw`):
-
-  00000000  01 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00  |................|
-  00000010  00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00  |................|
-  *
-  00200000
-
-Have a nice day,
-Martin
-
---NklN7DEeGtkPCoo3
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAABCAAdFiEEiXAnXDYdKAaCyvS1CB/CnyQXht0FAly+91QACgkQCB/CnyQX
-ht1/rA/+PYHjRwk3FUBbuLp8CsygdL3Ub0//rAhHOr3xk7l8EjKxRYt7RQ5fpxne
-zSTg5+euDsmG/glhuY/JHUEW9dZ59Hi+21Vb/yTHCZV9jri0uZayKlSfUdklzbuQ
-h0zbeB+v2aMyCuLfX7/TAnKScvqmDUadLIqxn0b08uahB1ZoSH65w/n2Yu9J6GNb
-zgUujS7FN0WdI8EvFeOsSff5LqAdd3n2hjIfcOVbMgqr1W7giACvqGcvZECf7qHL
-xL1Wu6k4NS4jnz0670damAQ54S7Eey12mZJ9f5CBk9R1bmC6vtChkWKwppkge9UT
-WwlaXCZj6RD3/Qd0rIFHWkawby1gu4YBdl2PPG9BCksjh4NUks3g1NvgrmFHw84/
-L3DvbdsMuWMbEHw8L356kmAS9CVXhGq0ODnVRXssj3DF8+/06QkBpG8JyaMUQq00
-CTE4Ea46g35QrUkp4VB19EpqgTkPm8gQeh7kfBpGlvacX2qUvxIZufz6GkJTmM3Y
-ATd+wc/QzbSxs7F95iUUKe4bC7e5ITpfVYo0EnF9n7cmIORw8c6UKlkeI6EJMIlR
-nK+kGuZsLptCSub0IRWuOW2YRf/T5N+AkRGSAtpxsP0JX+EBtuL5jEeUkYPEqWq6
-7c0N/zgV8sif0jm0/Mn6pdv/w9AB0KCbOUiIKsnjCVujTvJ3Zv4=
-=ImKk
------END PGP SIGNATURE-----
-
---NklN7DEeGtkPCoo3--
 
