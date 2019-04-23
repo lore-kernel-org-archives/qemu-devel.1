@@ -1,29 +1,27 @@
-Received: from eggs.gnu.org ([209.51.188.92]:52653)
+Received: from eggs.gnu.org ([209.51.188.92]:53782)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1hJ3bl-0003iA-RY
-	for qemu-devel@nongnu.org; Tue, 23 Apr 2019 18:09:47 -0400
+	(envelope-from <darrick.wong@oracle.com>) id 1hJ3dC-0004wF-8c
+	for qemu-devel@nongnu.org; Tue, 23 Apr 2019 18:11:15 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1hJ3bj-000203-HA
-	for qemu-devel@nongnu.org; Tue, 23 Apr 2019 18:09:44 -0400
-Received: from mail-wr1-f68.google.com ([209.85.221.68]:34906)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1hJ3bh-0001uL-VJ
-	for qemu-devel@nongnu.org; Tue, 23 Apr 2019 18:09:42 -0400
-Received: by mail-wr1-f68.google.com with SMTP id o12so18863241wrn.2
-	for <qemu-devel@nongnu.org>; Tue, 23 Apr 2019 15:09:41 -0700 (PDT)
-References: <20190420073442.7488-1-richard.henderson@linaro.org>
-	<20190420073442.7488-20-richard.henderson@linaro.org>
-	<e10e5627-25b2-0563-e971-2864256727d6@redhat.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Message-ID: <0bd7fd6a-1fcb-ac0c-b4bf-7b04ada4443c@redhat.com>
-Date: Wed, 24 Apr 2019 00:09:38 +0200
+	(envelope-from <darrick.wong@oracle.com>) id 1hJ3d5-0003lN-DX
+	for qemu-devel@nongnu.org; Tue, 23 Apr 2019 18:11:09 -0400
+Received: from userp2120.oracle.com ([156.151.31.85]:35308)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <darrick.wong@oracle.com>)
+	id 1hJ3d0-0003c1-Ps
+	for qemu-devel@nongnu.org; Tue, 23 Apr 2019 18:11:03 -0400
+Date: Tue, 23 Apr 2019 15:10:11 -0700
+From: "Darrick J. Wong" <darrick.wong@oracle.com>
+Message-ID: <20190423221011.GD178290@magnolia>
+References: <20190423080612.15361-1-pagupta@redhat.com>
+	<20190423080612.15361-7-pagupta@redhat.com>
+	<20190423220217.GA29573@dread.disaster.area>
 MIME-Version: 1.0
-In-Reply-To: <e10e5627-25b2-0563-e971-2864256727d6@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 19/38] tcg: Add support for integer
- absolute value
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20190423220217.GA29573@dread.disaster.area>
+Subject: Re: [Qemu-devel] [PATCH v6 6/6] xfs: disable map_sync for async
+ flush
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,131 +30,61 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Hildenbrand <david@redhat.com>, Richard Henderson <richard.henderson@linaro.org>, qemu-devel@nongnu.org, "Edgar E. Iglesias" <edgar.iglesias@gmail.com>
+To: Pankaj Gupta <pagupta@redhat.com>
+Cc: Dave Chinner <david@fromorbit.com>, linux-nvdimm@lists.01.org, linux-kernel@vger.kernel.org, virtualization@lists.linux-foundation.org, kvm@vger.kernel.org, linux-fsdevel@vger.kernel.org, linux-acpi@vger.kernel.org, qemu-devel@nongnu.org, linux-ext4@vger.kernel.org, linux-xfs@vger.kernel.org, dan.j.williams@intel.com, zwisler@kernel.org, vishal.l.verma@intel.com, dave.jiang@intel.com, mst@redhat.com, jasowang@redhat.com, willy@infradead.org, rjw@rjwysocki.net, hch@infradead.org, lenb@kernel.org, jack@suse.cz, tytso@mit.edu, adilger.kernel@dilger.ca, lcapitulino@redhat.com, kwolf@redhat.com, imammedo@redhat.com, jmoyer@redhat.com, nilal@redhat.com, riel@surriel.com, stefanha@redhat.com, aarcange@redhat.com, david@redhat.com, cohuck@redhat.com, xiaoguangrong.eric@gmail.com, pbonzini@redhat.com, yuval.shaia@oracle.com, kilobyte@angband.pl
 
-On 4/23/19 8:37 PM, David Hildenbrand wrote:
-> On 20.04.19 09:34, Richard Henderson wrote:
->> Remove a function of the same name from target/arm/.
->> Use a branchless implementation of abs that gcc uses for x86.
->>
->> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
->> ---
->>  tcg/tcg-op.h           |  5 +++++
->>  target/arm/translate.c | 10 ----------
->>  tcg/tcg-op.c           | 20 ++++++++++++++++++++
->>  3 files changed, 25 insertions(+), 10 deletions(-)
->>
->> diff --git a/tcg/tcg-op.h b/tcg/tcg-op.h
->> index 472b73cb38..660fe205d0 100644
->> --- a/tcg/tcg-op.h
->> +++ b/tcg/tcg-op.h
->> @@ -335,6 +335,7 @@ void tcg_gen_smin_i32(TCGv_i32, TCGv_i32 arg1, TCGv_i32 arg2);
->>  void tcg_gen_smax_i32(TCGv_i32, TCGv_i32 arg1, TCGv_i32 arg2);
->>  void tcg_gen_umin_i32(TCGv_i32, TCGv_i32 arg1, TCGv_i32 arg2);
->>  void tcg_gen_umax_i32(TCGv_i32, TCGv_i32 arg1, TCGv_i32 arg2);
->> +void tcg_gen_abs_i32(TCGv_i32, TCGv_i32);
->>  
->>  static inline void tcg_gen_discard_i32(TCGv_i32 arg)
->>  {
->> @@ -534,6 +535,7 @@ void tcg_gen_smin_i64(TCGv_i64, TCGv_i64 arg1, TCGv_i64 arg2);
->>  void tcg_gen_smax_i64(TCGv_i64, TCGv_i64 arg1, TCGv_i64 arg2);
->>  void tcg_gen_umin_i64(TCGv_i64, TCGv_i64 arg1, TCGv_i64 arg2);
->>  void tcg_gen_umax_i64(TCGv_i64, TCGv_i64 arg1, TCGv_i64 arg2);
->> +void tcg_gen_abs_i64(TCGv_i64, TCGv_i64);
->>  
->>  #if TCG_TARGET_REG_BITS == 64
->>  static inline void tcg_gen_discard_i64(TCGv_i64 arg)
->> @@ -973,6 +975,7 @@ void tcg_gen_nor_vec(unsigned vece, TCGv_vec r, TCGv_vec a, TCGv_vec b);
->>  void tcg_gen_eqv_vec(unsigned vece, TCGv_vec r, TCGv_vec a, TCGv_vec b);
->>  void tcg_gen_not_vec(unsigned vece, TCGv_vec r, TCGv_vec a);
->>  void tcg_gen_neg_vec(unsigned vece, TCGv_vec r, TCGv_vec a);
->> +void tcg_gen_abs_vec(unsigned vece, TCGv_vec r, TCGv_vec a);
->>  void tcg_gen_ssadd_vec(unsigned vece, TCGv_vec r, TCGv_vec a, TCGv_vec b);
->>  void tcg_gen_usadd_vec(unsigned vece, TCGv_vec r, TCGv_vec a, TCGv_vec b);
->>  void tcg_gen_sssub_vec(unsigned vece, TCGv_vec r, TCGv_vec a, TCGv_vec b);
->> @@ -1019,6 +1022,7 @@ void tcg_gen_stl_vec(TCGv_vec r, TCGv_ptr base, TCGArg offset, TCGType t);
->>  #define tcg_gen_addi_tl tcg_gen_addi_i64
->>  #define tcg_gen_sub_tl tcg_gen_sub_i64
->>  #define tcg_gen_neg_tl tcg_gen_neg_i64
->> +#define tcg_gen_abs_tl tcg_gen_abs_i64
->>  #define tcg_gen_subfi_tl tcg_gen_subfi_i64
->>  #define tcg_gen_subi_tl tcg_gen_subi_i64
->>  #define tcg_gen_and_tl tcg_gen_and_i64
->> @@ -1131,6 +1135,7 @@ void tcg_gen_stl_vec(TCGv_vec r, TCGv_ptr base, TCGArg offset, TCGType t);
->>  #define tcg_gen_addi_tl tcg_gen_addi_i32
->>  #define tcg_gen_sub_tl tcg_gen_sub_i32
->>  #define tcg_gen_neg_tl tcg_gen_neg_i32
->> +#define tcg_gen_abs_tl tcg_gen_abs_i32
->>  #define tcg_gen_subfi_tl tcg_gen_subfi_i32
->>  #define tcg_gen_subi_tl tcg_gen_subi_i32
->>  #define tcg_gen_and_tl tcg_gen_and_i32
->> diff --git a/target/arm/translate.c b/target/arm/translate.c
->> index 83a008e945..721171794d 100644
->> --- a/target/arm/translate.c
->> +++ b/target/arm/translate.c
->> @@ -603,16 +603,6 @@ static void gen_sar(TCGv_i32 dest, TCGv_i32 t0, TCGv_i32 t1)
->>      tcg_temp_free_i32(tmp1);
->>  }
->>  
->> -static void tcg_gen_abs_i32(TCGv_i32 dest, TCGv_i32 src)
->> -{
->> -    TCGv_i32 c0 = tcg_const_i32(0);
->> -    TCGv_i32 tmp = tcg_temp_new_i32();
->> -    tcg_gen_neg_i32(tmp, src);
->> -    tcg_gen_movcond_i32(TCG_COND_GT, dest, src, c0, src, tmp);
->> -    tcg_temp_free_i32(c0);
->> -    tcg_temp_free_i32(tmp);
->> -}
->> -
->>  static void shifter_out_im(TCGv_i32 var, int shift)
->>  {
->>      if (shift == 0) {
->> diff --git a/tcg/tcg-op.c b/tcg/tcg-op.c
->> index a00d1df37e..0ac291f1c4 100644
->> --- a/tcg/tcg-op.c
->> +++ b/tcg/tcg-op.c
->> @@ -1091,6 +1091,16 @@ void tcg_gen_umax_i32(TCGv_i32 ret, TCGv_i32 a, TCGv_i32 b)
->>      tcg_gen_movcond_i32(TCG_COND_LTU, ret, a, b, b, a);
->>  }
->>  
->> +void tcg_gen_abs_i32(TCGv_i32 ret, TCGv_i32 a)
->> +{
->> +    TCGv_i32 t = tcg_temp_new_i32();
->> +
->> +    tcg_gen_sari_i32(t, a, 31);
->> +    tcg_gen_xor_i32(ret, a, t);
->> +    tcg_gen_sub_i32(ret, ret, t);
->> +    tcg_temp_free_i32(t);
->> +}
->> +
->>  /* 64-bit ops */
->>  
->>  #if TCG_TARGET_REG_BITS == 32
->> @@ -2548,6 +2558,16 @@ void tcg_gen_umax_i64(TCGv_i64 ret, TCGv_i64 a, TCGv_i64 b)
->>      tcg_gen_movcond_i64(TCG_COND_LTU, ret, a, b, b, a);
->>  }
->>  
->> +void tcg_gen_abs_i64(TCGv_i64 ret, TCGv_i64 a)
->> +{
->> +    TCGv_i64 t = tcg_temp_new_i64();
->> +
->> +    tcg_gen_sari_i64(t, a, 63);
->> +    tcg_gen_xor_i64(ret, a, t);
->> +    tcg_gen_sub_i64(ret, ret, t);
->> +    tcg_temp_free_i64(t);
->> +}
->> +
->>  /* Size changing operations.  */
->>  
->>  void tcg_gen_extrl_i64_i32(TCGv_i32 ret, TCGv_i64 arg)
->>
+On Wed, Apr 24, 2019 at 08:02:17AM +1000, Dave Chinner wrote:
+> On Tue, Apr 23, 2019 at 01:36:12PM +0530, Pankaj Gupta wrote:
+> > Dont support 'MAP_SYNC' with non-DAX files and DAX files
+> > with asynchronous dax_device. Virtio pmem provides
+> > asynchronous host page cache flush mechanism. We don't
+> > support 'MAP_SYNC' with virtio pmem and xfs.
+> > 
+> > Signed-off-by: Pankaj Gupta <pagupta@redhat.com>
+> > ---
+> >  fs/xfs/xfs_file.c | 10 ++++++----
+> >  1 file changed, 6 insertions(+), 4 deletions(-)
+> > 
+> > diff --git a/fs/xfs/xfs_file.c b/fs/xfs/xfs_file.c
+> > index 1f2e2845eb76..0e59be018511 100644
+> > --- a/fs/xfs/xfs_file.c
+> > +++ b/fs/xfs/xfs_file.c
+> > @@ -1196,11 +1196,13 @@ xfs_file_mmap(
+> >  	struct file	*filp,
+> >  	struct vm_area_struct *vma)
+> >  {
+> > -	/*
+> > -	 * We don't support synchronous mappings for non-DAX files. At least
+> > -	 * until someone comes with a sensible use case.
+> > +	struct dax_device *dax_dev = xfs_find_daxdev_for_inode
+> > +						(file_inode(filp));
+
+    tab separation here ^^^                   ^^^^ and cut
+                                                       down the indent
+                                             while you're at
+						    it, please:
+
+	struct dax_device	*dax_dev;
+
+	dax_dev = xfs_find_daxdev_for_inode(file_inode(filp));
+	if (!dax_is_frobbed(dax))
+		return -EMEWANTCOOKIE;
+
+--D
+
+> > +
+> > +	/* We don't support synchronous mappings for non-DAX files and
+> > +	 * for DAX files if underneath dax_device is not synchronous.
+> >  	 */
 > 
-> Nice trick
-
-Per commit 7dcfb0897b99, I think it's worth a:
-
-Inspired-by: Edgar E. Iglesias <edgar.iglesias@gmail.com>
-
+> 	/*
+> 	 * This is the correct multi-line comment format. Please
+> 	 * update the patch to maintain the existing comment format.
+> 	 */
 > 
-> Reviewed-by: David Hildenbrand <david@redhat.com>
+> Cheers,
 > 
+> Dave.
+> -- 
+> Dave Chinner
+> david@fromorbit.com
