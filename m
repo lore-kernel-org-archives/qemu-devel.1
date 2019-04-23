@@ -2,114 +2,68 @@ Return-Path: <SRS0=zUjA=SZ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED autolearn=ham
+X-Spam-Status: No, score=-6.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 16573C10F03
-	for <qemu-devel@archiver.kernel.org>; Tue, 23 Apr 2019 18:32:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1CCB5C10F03
+	for <qemu-devel@archiver.kernel.org>; Tue, 23 Apr 2019 18:34:00 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id CFDA520693
-	for <qemu-devel@archiver.kernel.org>; Tue, 23 Apr 2019 18:32:19 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CFDA520693
+	by mail.kernel.org (Postfix) with ESMTPS id E211C20693
+	for <qemu-devel@archiver.kernel.org>; Tue, 23 Apr 2019 18:33:59 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E211C20693
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:58000 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:58012 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hJ0DK-0005HR-Qm
-	for qemu-devel@archiver.kernel.org; Tue, 23 Apr 2019 14:32:18 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:32954)
+	id 1hJ0Ex-0006ED-2W
+	for qemu-devel@archiver.kernel.org; Tue, 23 Apr 2019 14:33:59 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:34002)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1hJ0CH-0004VQ-RB
-	for qemu-devel@nongnu.org; Tue, 23 Apr 2019 14:31:15 -0400
+	(envelope-from <lersek@redhat.com>) id 1hJ0Dr-0005cB-GW
+	for qemu-devel@nongnu.org; Tue, 23 Apr 2019 14:32:52 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1hJ0CF-0002Gz-Ab
-	for qemu-devel@nongnu.org; Tue, 23 Apr 2019 14:31:13 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:43030)
+	(envelope-from <lersek@redhat.com>) id 1hJ0Dn-0003fU-JG
+	for qemu-devel@nongnu.org; Tue, 23 Apr 2019 14:32:50 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:35694)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <david@redhat.com>) id 1hJ0CF-0002DQ-1n
-	for qemu-devel@nongnu.org; Tue, 23 Apr 2019 14:31:11 -0400
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
-	[10.5.11.15])
+	(Exim 4.71) (envelope-from <lersek@redhat.com>)
+	id 1hJ0Dk-0003av-B5; Tue, 23 Apr 2019 14:32:45 -0400
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+	[10.5.11.13])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id ACB91307EA9D;
-	Tue, 23 Apr 2019 18:31:07 +0000 (UTC)
-Received: from [10.36.116.61] (ovpn-116-61.ams2.redhat.com [10.36.116.61])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id 66D625D706;
-	Tue, 23 Apr 2019 18:30:56 +0000 (UTC)
-To: =?UTF-8?Q?Daniel_P=2e_Berrang=c3=a9?= <berrange@redhat.com>,
-	=?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-References: <20190417053225.27505-1-richard.henderson@linaro.org>
-	<20190417053225.27505-2-richard.henderson@linaro.org>
-	<fb4917eb-4ff3-7a93-cbcd-39d1800827e8@redhat.com>
-	<20190423100101.GD6022@redhat.com>
-From: David Hildenbrand <david@redhat.com>
-Openpgp: preference=signencrypt
-Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
-	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
-	SE+xAvmumFBY
-Organization: Red Hat GmbH
-Message-ID: <cc1481bc-5f80-2792-2a36-a31a42357825@redhat.com>
-Date: Tue, 23 Apr 2019 20:30:55 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
-	Thunderbird/60.6.1
+	by mx1.redhat.com (Postfix) with ESMTPS id 32687308621E;
+	Tue, 23 Apr 2019 18:32:39 +0000 (UTC)
+Received: from lacos-laptop-7.usersys.redhat.com (ovpn-125-214.rdu2.redhat.com
+	[10.10.125.214])
+	by smtp.corp.redhat.com (Postfix) with ESMTP id 11545608C2;
+	Tue, 23 Apr 2019 18:32:25 +0000 (UTC)
+To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
+	qemu-devel@nongnu.org
+References: <20190422195020.1494-1-philmd@redhat.com>
+	<20190422195020.1494-3-philmd@redhat.com>
+From: Laszlo Ersek <lersek@redhat.com>
+Message-ID: <00f90419-6e5b-ff37-276f-c37ebc017dae@redhat.com>
+Date: Tue, 23 Apr 2019 20:32:24 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:52.0) Gecko/20100101
+	Thunderbird/52.9.1
 MIME-Version: 1.0
-In-Reply-To: <20190423100101.GD6022@redhat.com>
+In-Reply-To: <20190422195020.1494-3-philmd@redhat.com>
 Content-Type: text/plain; charset="UTF-8"
 Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.44]);
-	Tue, 23 Apr 2019 18:31:07 +0000 (UTC)
+	(mx1.redhat.com [10.5.110.42]);
+	Tue, 23 Apr 2019 18:32:39 +0000 (UTC)
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH 1/1] util/path: Do not cache all filenames
- at startup
+Subject: Re: [Qemu-devel] [PATCH v3 2/7] hw/nvram/fw_cfg: Add
+ fw_cfg_arch_key_name()
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -121,187 +75,124 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: peter.maydell@linaro.org, Richard Henderson <richard.henderson@linaro.org>,
-	qemu-devel@nongnu.org, evgreen@chromium.org, laurent@vivier.eu,
-	=?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>
+Cc: Eduardo Habkost <ehabkost@redhat.com>,
+	"Michael S. Tsirkin" <mst@redhat.com>,
+	Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>,
+	qemu-ppc@nongnu.org, Gerd Hoffmann <kraxel@redhat.com>,
+	Paolo Bonzini <pbonzini@redhat.com>,
+	David Gibson <david@gibson.dropbear.id.au>,
+	Artyom Tarasenko <atar4qemu@gmail.com>, Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190423183055.k4ikWUWXbLqhbM5T5utWAjt3EAfdn6wBLIZ71Zm4gb0@z>
+Message-ID: <20190423183224.UqIGGRNbkcuJwF267Tp3nIhCAbg1YTdDgwTcLYPjWPE@z>
 
-On 23.04.19 12:01, Daniel P. Berrang=C3=A9 wrote:
-> On Tue, Apr 23, 2019 at 11:54:53AM +0200, Philippe Mathieu-Daud=C3=A9 w=
-rote:
->> Hi Richard, Daniel,
->>
->> On 4/17/19 7:32 AM, Richard Henderson wrote:
->>> If one uses -L $PATH to point to a full chroot, the startup time
->>> is significant.  In addition, the existing probing algorithm fails
->>> to handle symlink loops.
->>>
->>> Instead, probe individual paths on demand.  Cache both positive
->>> and negative results within $PATH, so that any one filename is
->>> probed only once.
->>>
->>> Use glib filename functions for clarity.
->>>
->>> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
->>> ---
->>>  util/path.c | 211 ++++++++++++++------------------------------------=
---
->>>  1 file changed, 57 insertions(+), 154 deletions(-)
+On 04/22/19 21:50, Philippe Mathieu-Daud=C3=A9 wrote:
+> Add fw_cfg_arch_key_name() which returns the name of
+> an architecture-specific key.
 >=20
+> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+> ---
+>  MAINTAINERS               |  1 +
+>  hw/nvram/fw_cfg.c         |  2 +-
+>  include/hw/nvram/fw_cfg.h | 11 +++++++++++
+>  stubs/Makefile.objs       |  1 +
+>  stubs/fw_cfg.c            | 21 +++++++++++++++++++++
+>  5 files changed, 35 insertions(+), 1 deletion(-)
+>  create mode 100644 stubs/fw_cfg.c
 >=20
->>> +#if GLIB_CHECK_VERSION(2, 58, 0)
->>
->> Should we raise GLIB_VERSION_MAX_ALLOWED in "glib-compat.h"?
->>
->> Currently it is:
->>
->>   /* Ask for warnings if code tries to use function that did not
->>    * exist in the defined version. These risk breaking builds
->>    */
->>   #define GLIB_VERSION_MAX_ALLOWED GLIB_VERSION_2_40
->=20
-> Use of 2.40 is set in accordance with our targetted platform support
-> policy. If Peter has stopped using the Ubuntu 14.04 build host, we
-> could bump it to 2.42. Once our dev tree opens up we could in fact
-> drop Jessie since we'll be supporting Buster by the time next QEMU
-> is released. That would still only take us upto perhaps Glib 2.48
->=20
-> Glib 2.58 is waaaay to new to rely on.
->=20
-> commit e7b3af81597db1a6b55f2c15d030d703c6b2c6ac
-> Author: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
-> Date:   Fri May 4 15:34:46 2018 +0100
->=20
->     glib: bump min required glib library version to 2.40
->    =20
->     Per supported platforms doc[1], the various min glib on relevant di=
-stros is:
->    =20
->       RHEL-7: 2.50.3
->       Debian (Stretch): 2.50.3
->       Debian (Jessie): 2.42.1
->       OpenBSD (Ports): 2.54.3
->       FreeBSD (Ports): 2.50.3
->       OpenSUSE Leap 15: 2.54.3
->       SLE12-SP2: 2.48.2
->       Ubuntu (Xenial): 2.48.0
->       macOS (Homebrew): 2.56.0
->    =20
->     This suggests that a minimum glib of 2.42 is a reasonable target.
->    =20
->     The GLibC compile farm, however, uses Ubuntu 14.04 (Trusty) which o=
-nly
->     has glib 2.40.0, and this is needed for testing during merge. Thus =
-an
->     exception is made to the documented platform support policy to allo=
-w for
->     all three current LTS releases to be supported.
->    =20
->     Docker jobs that not longer satisfy this new min version are remove=
-d.
->    =20
->     [1] https://qemu.weilnetz.de/doc/qemu-doc.html#Supported-build-plat=
-forms
->    =20
->     Reviewed-by: Thomas Huth <thuth@redhat.com>
->     Signed-off-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
->=20
->=20
->>
->> From commit e71e8cc035558eabd6b3e19f6d3254c754c027ef:
->>
->>  glib: enforce the minimum required version and warn about old APIs
->>
->>  There are two useful macros that can be defined before including
->>  glib.h that are related to the min required glib version
->>
->>   - GLIB_VERSION_MIN_REQUIRED
->>
->>     When this is defined, if code uses an API that was deprecated
->>     in this version, or older, a compiler warning will be emitted.
->>     This alerts maintainers to update their code to whatever new
->>     replacement API is now recommended best practice.
->>
->>   - GLIB_VERSION_MAX_ALLOWED
->>
->>     When this is defined, if code uses an API that was introduced
->>     in a version that is newer than the declared version, a compiler
->>     warning will be emitted. This alerts maintainers if new code
->>     accidentally uses functionality that won't be available on some
->>     supported platforms.
->>
->>  The GLIB_VERSION_MAX_ALLOWED constant makes it a bit harder to opt
->>  in to using specific new APIs with a GLIB_CHECK_VERSION conditional.
->>  To workaround this Pragmas can be used to temporarily turn off the
->>  -Wdeprecated-declarations compiler warning, while a static inline
->>  compat function is implemented. This workaround is illustrated with t=
-he
->>  implementation of the g_strv_contains method to satisfy the test suit=
-e.
->>
->>> +    base =3D g_canonicalize_filename(prefix, NULL);
->>> +#else
->>> +    if (prefix[0] !=3D '/') {
->>> +        char *cwd =3D g_get_current_dir();
->>> +        base =3D g_build_filename(cwd, prefix, NULL);
->>> +        g_free(cwd);
->>> +    } else {
->>> +        base =3D g_strdup(prefix);
->>> +    }
->>> +#endif
->=20
-> To use functionality from newer glib releases we can't put the #ifdef
-> conditionals inline in the main source files.
->=20
-> They have to be put into glib-compat.h instead. There's a detailed
-> comment in that file illustrating how todo this without triggering
-> the compile warnings about deprecations.
->=20
->=20
-> Regards,
-> Daniel
+> diff --git a/MAINTAINERS b/MAINTAINERS
+> index 56139ac8ab0..444783bb652 100644
+> --- a/MAINTAINERS
+> +++ b/MAINTAINERS
+> @@ -1675,6 +1675,7 @@ R: Gerd Hoffmann <kraxel@redhat.com>
+>  S: Supported
+>  F: docs/specs/fw_cfg.txt
+>  F: hw/nvram/fw_cfg.c
+> +F: stubs/fw_cfg.c
+>  F: include/hw/nvram/fw_cfg.h
+>  F: include/standard-headers/linux/qemu_fw_cfg.h
+>  F: tests/libqos/fw_cfg.c
+> diff --git a/hw/nvram/fw_cfg.c b/hw/nvram/fw_cfg.c
+> index d374a970fea..b2dc0a80cbc 100644
+> --- a/hw/nvram/fw_cfg.c
+> +++ b/hw/nvram/fw_cfg.c
+> @@ -100,7 +100,7 @@ static const char *key_name(uint16_t key)
+>      };
+> =20
+>      if (key & FW_CFG_ARCH_LOCAL) {
+> -        return NULL;
+> +        return fw_cfg_arch_key_name(key);
+>      }
+>      if (key < FW_CFG_FILE_FIRST) {
+>          return fw_cfg_wellknown_keys[key];
+> diff --git a/include/hw/nvram/fw_cfg.h b/include/hw/nvram/fw_cfg.h
+> index f5a6895a740..828ad9dedc6 100644
+> --- a/include/hw/nvram/fw_cfg.h
+> +++ b/include/hw/nvram/fw_cfg.h
+> @@ -226,4 +226,15 @@ FWCfgState *fw_cfg_init_mem_wide(hwaddr ctl_addr,
+>  FWCfgState *fw_cfg_find(void);
+>  bool fw_cfg_dma_enabled(void *opaque);
+> =20
+> +/**
+> + * fw_cfg_arch_key_name:
+> + *
+> + * @key: The uint16 selector key.
+> + *
+> + * Returns: The stringified architecture-specific name if the selector
+> + *          refers to a well-known numerically defined item, or NULL o=
+n
+> + *          key lookup failure.
+> + */
+
+We might want to document that we expect FW_CFG_ARCH_LOCAL to be set in
+"key", but I really don't insist.
+
+Reviewed-by: Laszlo Ersek <lersek@redhat.com>
+
+Thanks
+Laszlo
+
+> +const char *fw_cfg_arch_key_name(uint16_t key);
+> +
+>  #endif
+> diff --git a/stubs/Makefile.objs b/stubs/Makefile.objs
+> index 269dfa58326..73452ad2657 100644
+> --- a/stubs/Makefile.objs
+> +++ b/stubs/Makefile.objs
+> @@ -39,3 +39,4 @@ stub-obj-y +=3D xen-hvm.o
+>  stub-obj-y +=3D pci-host-piix.o
+>  stub-obj-y +=3D ram-block.o
+>  stub-obj-y +=3D ramfb.o
+> +stub-obj-y +=3D fw_cfg.o
+> diff --git a/stubs/fw_cfg.c b/stubs/fw_cfg.c
+> new file mode 100644
+> index 00000000000..bb1e3c8aa95
+> --- /dev/null
+> +++ b/stubs/fw_cfg.c
+> @@ -0,0 +1,21 @@
+> +/*
+> + * fw_cfg stubs
+> + *
+> + * Copyright (c) 2019 Red Hat, Inc.
+> + *
+> + * Author:
+> + *   Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+> + *
+> + * SPDX-License-Identifier: GPL-2.0-or-later
+> + *
+> + * This work is licensed under the terms of the GNU GPL, version 2 or =
+later.
+> + * See the COPYING file in the top-level directory.
+> + */
+> +
+> +#include "qemu/osdep.h"
+> +#include "hw/nvram/fw_cfg.h"
+> +
+> +const char *fw_cfg_arch_key_name(uint16_t key)
+> +{
+> +    return NULL;
+> +}
 >=20
 
-Trying to build (Richard's tcg-vec-next branch) on Fedora29 I get
-
-util/path.c: In function 'init_paths':
-util/path.c:24:5: error: 'g_canonicalize_filename' is deprecated: Not
-available before 2.58 [-Werror=3Ddeprecated-declarations]
-     base =3D g_canonicalize_filename(prefix, NULL);
-     ^~~~
-In file included from /usr/include/glib-2.0/glib.h:48,
-                 from /home/dhildenb/git/qemu/include/glib-compat.h:32,
-                 from /home/dhildenb/git/qemu/include/qemu/osdep.h:140,
-                 from util/path.c:6:
-/usr/include/glib-2.0/glib/gfileutils.h:176:8: note: declared here
- gchar *g_canonicalize_filename (const gchar *filename,
-        ^~~~~~~~~~~~~~~~~~~~~~~
-util/path.c: In function 'path':
-util/path.c:60:9: error: 'g_canonicalize_filename' is deprecated: Not
-available before 2.58 [-Werror=3Ddeprecated-declarations]
-         full_name =3D g_canonicalize_filename(g_path_skip_root(name), ba=
-se);
-         ^~~~~~~~~
-In file included from /usr/include/glib-2.0/glib.h:48,
-                 from /home/dhildenb/git/qemu/include/glib-compat.h:32,
-                 from /home/dhildenb/git/qemu/include/qemu/osdep.h:140,
-                 from util/path.c:6:
-/usr/include/glib-2.0/glib/gfileutils.h:176:8: note: declared here
- gchar *g_canonicalize_filename (const gchar *filename,
-        ^~~~~~~~~~~~~~~~~~~~~~~
-cc1: all warnings being treated as errors
-  CC      backends/rng-egd.o
-make: *** [/home/dhildenb/git/qemu/rules.mak:69: util/path.o] Error 1
-make: *** Waiting for unfinished jobs....
-  CC      backends/rng-random.o
-
-
---=20
-
-Thanks,
-
-David / dhildenb
 
