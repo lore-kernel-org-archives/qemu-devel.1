@@ -2,110 +2,115 @@ Return-Path: <SRS0=zUjA=SZ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-0.7 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6493EC282DD
-	for <qemu-devel@archiver.kernel.org>; Tue, 23 Apr 2019 16:35:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2918EC10F03
+	for <qemu-devel@archiver.kernel.org>; Tue, 23 Apr 2019 16:39:57 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3C52520643
-	for <qemu-devel@archiver.kernel.org>; Tue, 23 Apr 2019 16:35:04 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3C52520643
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id E436C20645
+	for <qemu-devel@archiver.kernel.org>; Tue, 23 Apr 2019 16:39:56 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="cdvlcT6z"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E436C20645
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=twiddle.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:56481 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:56585 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hIyNr-0008KW-GZ
-	for qemu-devel@archiver.kernel.org; Tue, 23 Apr 2019 12:35:03 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:48350)
+	id 1hIySZ-0002rB-Ph
+	for qemu-devel@archiver.kernel.org; Tue, 23 Apr 2019 12:39:55 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:51177)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1hIyIe-0004OC-5Q
-	for qemu-devel@nongnu.org; Tue, 23 Apr 2019 12:29:41 -0400
+	(envelope-from <rth7680@gmail.com>) id 1hIyRX-0002Hy-0p
+	for qemu-devel@nongnu.org; Tue, 23 Apr 2019 12:38:51 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1hIyEK-0003YA-9O
-	for qemu-devel@nongnu.org; Tue, 23 Apr 2019 12:25:13 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:34416)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1hIyEK-0003XX-1h
-	for qemu-devel@nongnu.org; Tue, 23 Apr 2019 12:25:12 -0400
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
-	[10.5.11.22])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 346B99D0F7;
-	Tue, 23 Apr 2019 16:25:11 +0000 (UTC)
-Received: from thuth.remote.csb (ovpn-116-87.ams2.redhat.com [10.36.116.87])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id 0C45B1001E71;
-	Tue, 23 Apr 2019 16:25:04 +0000 (UTC)
-To: Li Qiang <liq3ea@163.com>, lvivier@redhat.com, pbonzini@redhat.com,
-	philmd@redhat.com, lersek@redhat.com, kraxel@redhat.com
-References: <20190420100056.116305-1-liq3ea@163.com>
-	<20190420100056.116305-2-liq3ea@163.com>
-From: Thomas Huth <thuth@redhat.com>
+	(envelope-from <rth7680@gmail.com>) id 1hIyRW-0005QP-1H
+	for qemu-devel@nongnu.org; Tue, 23 Apr 2019 12:38:50 -0400
+Received: from mail-pl1-x643.google.com ([2607:f8b0:4864:20::643]:32930)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <rth7680@gmail.com>) id 1hIyRV-0005NW-Ri
+	for qemu-devel@nongnu.org; Tue, 23 Apr 2019 12:38:49 -0400
+Received: by mail-pl1-x643.google.com with SMTP id t16so7813579plo.0
+	for <qemu-devel@nongnu.org>; Tue, 23 Apr 2019 09:38:46 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+	h=sender:subject:to:cc:references:from:openpgp:autocrypt:message-id
+	:date:user-agent:mime-version:in-reply-to:content-language
+	:content-transfer-encoding;
+	bh=DNlB8nXuDLwYBdQ31fNJgCXkUj+N2x+k9hgzmhw+4SA=;
+	b=cdvlcT6zmwYSXfV5aOcyA6rMhhgqtrGKFeZP5zTEAejlu0H8mIproSWk4p4jOXXhtH
+	9nFtxZWQ1PZYx2DblZFzqxxMBrF0VwVvl2S7PtCIst+vL0REDnArRhxc97jZxW6sKMND
+	2YHPSPHPTzVWDXqjWzhKMFwK0ulE5hStF+frTQ06cElUjMqpVyiXPWWKgcGr2Hs/DdsP
+	CQMHgm8PlkSi5GOgMKKZekvFVrsoPDfdTs5fllIyG157+ZP2Bz2iffeWcIZgF8BE1Flr
+	4ca6Lof0fZ9YqtC/Vr3u2j94Yde4g28Srd0WYVhQ2R5bRPKDcOtEMTdrCw8kdZSJsr7e
+	B3Cw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=1e100.net; s=20161025;
+	h=x-gm-message-state:sender:subject:to:cc:references:from:openpgp
+	:autocrypt:message-id:date:user-agent:mime-version:in-reply-to
+	:content-language:content-transfer-encoding;
+	bh=DNlB8nXuDLwYBdQ31fNJgCXkUj+N2x+k9hgzmhw+4SA=;
+	b=aLdKsQG0a9buDv1R8hTEPI0V5Cap5XFY0E8XZQ6Gj02EQh3ew/J+pisYeLo/mLB0sd
+	RLqZnQzoGZNkj0HAlDLloxHQL8mpiD3ExODzVzTUAHdlrRjqnE//0+0/UM+JDD7GGGxu
+	OriEhN0z2kihk+fSo44ayUfIF22BTbZvlxf0LnjScp4UKcxIkhk4XnNzxqgun1eYj6Hw
+	8Ki3UX3yKOX6IlJ5XpN+a5fTVC6y4hmYL0HDnaVafZQV9MCT/H49iJWruBqSp7CWVkxK
+	Kt2JeArep3MKLct2YUa09EJPZPGdIB4vYtUzK7X6/f6zzA43v56Obm7ASHro33wEfl1y
+	KilA==
+X-Gm-Message-State: APjAAAVs6t6pMP8dQbJrro7Bzcr1YPpxt/dpLLqLrXVGJcTOHVSSlrlu
+	c17Gt+SqLrPXOxyvSg/dRIvCACYq
+X-Google-Smtp-Source: APXvYqyTdBxBCbob8RFT0GVN9BAU2uquklXy+NvO8pqLEypTxhqhB+pkmS27yL3Q4u6MRpfbLeiwlA==
+X-Received: by 2002:a17:902:f094:: with SMTP id
+	go20mr27228387plb.159.1556037525080; 
+	Tue, 23 Apr 2019 09:38:45 -0700 (PDT)
+Received: from [192.168.1.11] (97-113-179-147.tukw.qwest.net. [97.113.179.147])
+	by smtp.googlemail.com with ESMTPSA id
+	i20sm420026pgb.90.2019.04.23.09.38.43
+	(version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+	Tue, 23 Apr 2019 09:38:44 -0700 (PDT)
+To: Nick Hudson <nick.hudson@gmx.co.uk>
+References: <20190423063621.8203-1-nick.hudson@gmx.co.uk>
+From: Richard Henderson <rth@twiddle.net>
 Openpgp: preference=signencrypt
-Autocrypt: addr=thuth@redhat.com; keydata=
-	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
-Organization: Red Hat
-Message-ID: <8cb7159d-8517-65f0-a117-81e03097f4f1@redhat.com>
-Date: Tue, 23 Apr 2019 18:25:04 +0200
+Autocrypt: addr=rth@twiddle.net; prefer-encrypt=mutual; keydata=
+	mQENBFGuLC8BCADcAoWcnW9lTsDMzbO3MBU+KbiGaj5JPatEUscRDkQYM2fyNjJp2tIWDK5a
+	n4yngeXB3eX61WbYR3QraRK8mlYLGxyAdHMEQfPipbqf3TmN043fssT2bc82ApJcs1zvLYgI
+	rhMht7Dck7A0wNC1jo+ZjVVFig5gDTN7gOzaAdBtV8tVNUddwkLzzaGpfihhSD6U46NdqKOG
+	Wlnn6TrkMy0QGdQ5NaXHkRlUjnnUTSW/nKfoxD+EI+A9V4sYOd8mc/TL4aJh/i/AiU57eLbo
+	n17uQI6/VTWDUWl8USiz4x9c8vmqlywLx00tAFxxoRWqk4KVJlj+Sh0up/D/sJ+vPpgBABEB
+	AAG0I1JpY2hhcmQgSGVuZGVyc29uIDxydGhAdHdpZGRsZS5uZXQ+iQFBBBMBAgArAhsDBgsJ
+	CAcDAgYVCAIJCgsEFgIDAQIeAQIXgAUJC7UHogUCWaDNVgIZAQAKCRCtEnDMTdAnm9N5CADO
+	cB8F/SudJ72IupxQf40hbJdBK176+gb3sHMsixyLtrU59lee+lIM1OZmlNjsnCYmiSnbA5ks
+	Q7p0HfO7DgdmfLzcK6xsHZukqSZy5LByw348Y913ZyjOrJZFdPP7kDg1MnqRqH4+3ZdzxV4y
+	eYBWFU9GYMIF06JbUubossOOO4ArNVZbnIPu8Vn2tDZVVqsCBqkoCSBMj519xrvyOu5z4mHS
+	LkCglXmVDOXMbqLuNAC3rfNXSnyM4hYkLUyfALJlAAy1Ro+jUqYhu7XUFV/MiwRuFMh5GbtY
+	Urkx7tqsWQXLT3GeDk/LqvpWJQwk4cHHckYjRih+70CHIenm81PVuQENBFGuLC8BCACyEx3x
+	94HIkTX0CHu2sA0w75+h9wuoA8ggJ7+S4ri0y2YsijWad5TTt6z6MMiqxk9kSA5bppaj4HXh
+	86hBF/dWCtMpNr3Rb8FNOKyeA/qkYHVD6HiAiw9c6D8Dr9hWmOk3/HSmGrNURxeUFOckDXsv
+	I+yGGKBNshj59j7QZr7ZiuIi2rWlBL8dFN/OWa/o3x7HKsE4k6K8ngwvCKP/QbDLwLLBOWH+
+	VEUtpyeyxTr3OJ47ECTxdYvXoAV2iJaKr+6doVQiiR5eVFiMYrUPUECJeolOCwqc/JlWE18L
+	+PCAFaW1H+/mpPVfSpN4wnkJ5cQiQVB41IaCM4p20iRzx7ZJABEBAAGJASUEGAECAA8CGwwF
+	AlmgzYEFCQu1CEoACgkQrRJwzE3QJ5s7rggAwABzDAGrZ6uWsMxg5PeiiAYPy6LBnCBJSpB5
+	Tfy5jH8QTmLfXW+u4Ib4sWXG7PYNR7sIrtqUHjRqXLVXrSnBX9ASGcYw/Xil45khW6LsRpO1
+	prHv9gkwQfa6fTiWXVfSfm2Nant6u02q+MaYtQpCVTiz/9ki4FfftUwUHFLU0MhIQogjd11y
+	/E08RJsqBwaHQdt14PwU1HphDOzSkhOXRXQLSd3ysyeGUXvL+gqQoXl5XYdvk8IId4PoJRo4
+	jcyJ4VbnldvXh5gdGhFA/f9JgkLk9tPW+C3wNtNWyRUq8azR9hF2fg2HJUf4IXQlIu8OOgh1
+	VcROBqvtH3ecaIL9iw==
+Message-ID: <ef95d1db-8fca-db17-2343-565e814905fd@twiddle.net>
+Date: Tue, 23 Apr 2019 09:38:42 -0700
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
 	Thunderbird/60.6.1
 MIME-Version: 1.0
-In-Reply-To: <20190420100056.116305-2-liq3ea@163.com>
+In-Reply-To: <20190423063621.8203-1-nick.hudson@gmx.co.uk>
 Content-Type: text/plain; charset="UTF-8"
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.39]);
-	Tue, 23 Apr 2019 16:25:11 +0000 (UTC)
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH 1/4] tests: refactor fw_cfg_test
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+	recognized.
+X-Received-From: 2607:f8b0:4864:20::643
+Subject: Re: [Qemu-devel] [PATCH v3 0/2] HPPA fixes for NetBSD/hppa emulation
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -117,34 +122,22 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: liq3ea@gmail.com, qemu-devel@nongnu.org
+Cc: Kamil Rytarowski <kamil@netbsd.org>,
+	"open list:NETBSD" <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190423162504.boSqIVvCSm1MShyT30a7Le__AS5ZD5oJBGo1IjNfp0A@z>
+Message-ID: <20190423163842.uMU5sUCRRoXjx8PZbGyXd05RvvwKDJUvz1u42u0Suvw@z>
 
-On 20/04/2019 12.00, Li Qiang wrote:
-> Currently, fw_cfg_test uses one QTestState for every test case.
-> This will add all command lines for every test case and
-> this is unnecessary. This patch split the test cases and for
-> every test case it uses his own QTestState. This patch does following
-> things:
+On 4/22/19 11:36 PM, Nick Hudson wrote:
+> v3 changes:
+>  - Don't use C99 comments and fix a typo in the comment
 > 
-> 1. Get rid of the global 'fw_cfg', this need add a uninit function
-> 
-> 2. Convert every test case in a separate QTestState
-> 
-> After this patch, we can add fw_cfg test case freely and will not
-> have efect other test cases.
-> 
-> Signed-off-by: Li Qiang <liq3ea@163.com>
-> ---
->  tests/fw_cfg-test.c   | 86 ++++++++++++++++++++++++++++++++++++++-----
->  tests/libqos/fw_cfg.c | 10 +++++
->  tests/libqos/fw_cfg.h |  7 ++++
->  3 files changed, 94 insertions(+), 9 deletions(-)
+> v2 changes:
+>  - remove old debug code
 
-Sounds like a good idea.
+Thanks, queued.
 
-Acked-by: Thomas Huth <thuth@redhat.com>
+
+r~
 
