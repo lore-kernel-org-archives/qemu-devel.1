@@ -2,103 +2,79 @@ Return-Path: <SRS0=zUjA=SZ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.2 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_PASS,UNPARSEABLE_RELAY,URIBL_BLOCKED,USER_AGENT_MUTT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C90C7C10F03
-	for <qemu-devel@archiver.kernel.org>; Tue, 23 Apr 2019 22:12:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 58651C10F03
+	for <qemu-devel@archiver.kernel.org>; Tue, 23 Apr 2019 22:13:19 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 905D9218D3
-	for <qemu-devel@archiver.kernel.org>; Tue, 23 Apr 2019 22:12:05 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="AhdCKmBV"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 905D9218D3
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=oracle.com
+	by mail.kernel.org (Postfix) with ESMTPS id 2B92321738
+	for <qemu-devel@archiver.kernel.org>; Tue, 23 Apr 2019 22:13:19 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2B92321738
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:60209 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:60215 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hJ3e0-0005GZ-RC
-	for qemu-devel@archiver.kernel.org; Tue, 23 Apr 2019 18:12:04 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:53782)
+	id 1hJ3fC-0005s2-Cj
+	for qemu-devel@archiver.kernel.org; Tue, 23 Apr 2019 18:13:18 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:54398)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <darrick.wong@oracle.com>) id 1hJ3dC-0004wF-8c
-	for qemu-devel@nongnu.org; Tue, 23 Apr 2019 18:11:15 -0400
+	(envelope-from <philmd@redhat.com>) id 1hJ3eH-0005Tk-3H
+	for qemu-devel@nongnu.org; Tue, 23 Apr 2019 18:12:21 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <darrick.wong@oracle.com>) id 1hJ3d5-0003lN-DX
-	for qemu-devel@nongnu.org; Tue, 23 Apr 2019 18:11:09 -0400
-Received: from userp2120.oracle.com ([156.151.31.85]:35308)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <darrick.wong@oracle.com>)
-	id 1hJ3d0-0003c1-Ps
-	for qemu-devel@nongnu.org; Tue, 23 Apr 2019 18:11:03 -0400
-Received: from pps.filterd (userp2120.oracle.com [127.0.0.1])
-	by userp2120.oracle.com (8.16.0.27/8.16.0.27) with SMTP id
-	x3NM4iVc124778; Tue, 23 Apr 2019 22:10:24 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com;
-	h=date : from : to : cc
-	: subject : message-id : references : mime-version : content-type :
-	in-reply-to; s=corp-2018-07-02;
-	bh=l0VzuwK7fWj7U7YTxx4jiGO26nwCCDX522qiPNeC+/Y=;
-	b=AhdCKmBVc8BIdraythvZytA3kVTqYzt3V1UvkKa8Xfe7HC6YDSnfPPTDrmy/WFLKpdLi
-	ybqnDXcxozLtDQZSJb/CyE/DswT9j6XDoINpoqLbd6fOf2weWsI9t9Vt+ibJCOhqPJzw
-	zGO2+HapNtynOsBUnzXoIU6Pc/S2ZpFJ3nH0vY8pOzQxRYNAIzglWCXbOjBv1lu+6J+7
-	ySjy/HIHmQFoQfRXMyTRrFIvGvIeczjvrUJP4emcLz7EwfM87kUd7rVf3KgiZCVQFjSy
-	FjbRSFpgfPWnPRLuDOYrsPj2Y3KqDGi6HU6LDXE9hYrQP/SLd8jpFIC+4tXpBOwTFwR3
-	Qw== 
-Received: from userp3020.oracle.com (userp3020.oracle.com [156.151.31.79])
-	by userp2120.oracle.com with ESMTP id 2ryv2q6uyp-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Tue, 23 Apr 2019 22:10:24 +0000
-Received: from pps.filterd (userp3020.oracle.com [127.0.0.1])
-	by userp3020.oracle.com (8.16.0.27/8.16.0.27) with SMTP id
-	x3NM8hPQ066650; Tue, 23 Apr 2019 22:10:24 GMT
-Received: from userv0121.oracle.com (userv0121.oracle.com [156.151.31.72])
-	by userp3020.oracle.com with ESMTP id 2s0dwegm54-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Tue, 23 Apr 2019 22:10:24 +0000
-Received: from abhmp0018.oracle.com (abhmp0018.oracle.com [141.146.116.24])
-	by userv0121.oracle.com (8.14.4/8.13.8) with ESMTP id x3NMAFaf014717;
-	Tue, 23 Apr 2019 22:10:15 GMT
-Received: from localhost (/10.145.179.89)
-	by default (Oracle Beehive Gateway v4.0)
-	with ESMTP ; Tue, 23 Apr 2019 15:10:15 -0700
-Date: Tue, 23 Apr 2019 15:10:11 -0700
-From: "Darrick J. Wong" <darrick.wong@oracle.com>
-To: Pankaj Gupta <pagupta@redhat.com>
-Message-ID: <20190423221011.GD178290@magnolia>
-References: <20190423080612.15361-1-pagupta@redhat.com>
-	<20190423080612.15361-7-pagupta@redhat.com>
-	<20190423220217.GA29573@dread.disaster.area>
+	(envelope-from <philmd@redhat.com>) id 1hJ3eF-0004pn-VH
+	for qemu-devel@nongnu.org; Tue, 23 Apr 2019 18:12:21 -0400
+Received: from mail-wm1-f65.google.com ([209.85.128.65]:53471)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1hJ3eB-0004k9-Rv
+	for qemu-devel@nongnu.org; Tue, 23 Apr 2019 18:12:19 -0400
+Received: by mail-wm1-f65.google.com with SMTP id q16so1948921wmj.3
+	for <qemu-devel@nongnu.org>; Tue, 23 Apr 2019 15:12:13 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=1e100.net; s=20161025;
+	h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
+	:date:user-agent:mime-version:in-reply-to:content-language
+	:content-transfer-encoding;
+	bh=XJE/CEMO//27MEW6cH1n/Mun7DSEEUO+GMGa1tCo5DI=;
+	b=a8Y9AwKNwFPmOinDlJ3egGPb811kyDMxCZEUyS4k4DVD28Kg9l8D9/5gti+AVQ5303
+	qAvVnQoVirfFToDJVflI53nx2svNHX+EmaTZUqkXBgP8tmZAbbR2/aQozM/4sPWwtxRb
+	cs7Gj4sglf/O/R5z/SRxfFIUZZTSHPv/tTOcYuwJPru3rEx5XvMUtEAU8HFDwaHLZBvZ
+	fl2m1a8YPZ0lwi71vTCOWyS0SG/VJ5WBWYXNcgGD+zTi+5LzoDqjUwYDhLtaAL3fhFxN
+	HzKQC6Hf7G6J047tYqjuGEUlftb2GfOkcWHGI3zj3rWvR3eZIoSzJu20hX3I0G4m5Gnp
+	HnLA==
+X-Gm-Message-State: APjAAAVNjUnjoYJlANfpEL3hSbqJRDnvceBC/EOOtacoLHkEHISHOe6z
+	Ce62I/+4QpFQj6JvA6Ukl4pYBQ==
+X-Google-Smtp-Source: APXvYqz2dEOP3lF1yV3IBIxi+2mtEOwYOJlZW3j2U3AT4p6YOEYhckD8NkIND4fBTXa38uUqPC8D+A==
+X-Received: by 2002:a1c:9c97:: with SMTP id f145mr4081190wme.139.1556057532102;
+	Tue, 23 Apr 2019 15:12:12 -0700 (PDT)
+Received: from [192.168.1.25] (atoulouse-656-1-803-163.w86-221.abo.wanadoo.fr.
+	[86.221.12.163]) by smtp.gmail.com with ESMTPSA id
+	c139sm1146471wmd.26.2019.04.23.15.12.11
+	(version=TLS1_3 cipher=AEAD-AES128-GCM-SHA256 bits=128/128);
+	Tue, 23 Apr 2019 15:12:11 -0700 (PDT)
+To: Richard Henderson <richard.henderson@linaro.org>, qemu-devel@nongnu.org
+References: <20190420073442.7488-1-richard.henderson@linaro.org>
+	<20190420073442.7488-25-richard.henderson@linaro.org>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Openpgp: id=89C1E78F601EE86C867495CBA2A3FD6EDEADC0DE;
+	url=http://pgp.mit.edu/pks/lookup?op=get&search=0xA2A3FD6EDEADC0DE
+Message-ID: <a08047bc-7157-49e9-6584-41331dc3b9b4@redhat.com>
+Date: Wed, 24 Apr 2019 00:12:10 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+	Thunderbird/60.6.1
 MIME-Version: 1.0
+In-Reply-To: <20190420073442.7488-25-richard.henderson@linaro.org>
 Content-Type: text/plain; charset="UTF-8"
-Content-Disposition: inline
-In-Reply-To: <20190423220217.GA29573@dread.disaster.area>
-User-Agent: Mutt/1.9.4 (2018-02-28)
-X-Proofpoint-Virus-Version: vendor=nai engine=5900 definitions=9236
-	signatures=668685
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=0
-	malwarescore=0
-	phishscore=0 bulkscore=0 spamscore=0 mlxscore=0 mlxlogscore=999
-	adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
-	engine=8.0.1-1810050000 definitions=main-1904230157
-X-Proofpoint-Virus-Version: vendor=nai engine=5900 definitions=9236
-	signatures=668685
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0
-	priorityscore=1501 malwarescore=0
-	suspectscore=0 phishscore=0 bulkscore=0 spamscore=0 clxscore=1011
-	lowpriorityscore=0 mlxscore=0 impostorscore=0 mlxlogscore=999
-	adultscore=0
-	classifier=spam adjust=0 reason=mlx scancount=1 engine=8.0.1-1810050000
-	definitions=main-1904230157
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic]
-X-Received-From: 156.151.31.85
-Subject: Re: [Qemu-devel] [PATCH v6 6/6] xfs: disable map_sync for async
- flush
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+	[fuzzy]
+X-Received-From: 209.85.128.65
+Subject: Re: [Qemu-devel] [PATCH 24/38] target/s390x: Use tcg_gen_abs_i64
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -110,80 +86,38 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: jack@suse.cz, kvm@vger.kernel.org, mst@redhat.com, jasowang@redhat.com,
-	Dave Chinner <david@fromorbit.com>, qemu-devel@nongnu.org,
-	virtualization@lists.linux-foundation.org,
-	adilger.kernel@dilger.ca, zwisler@kernel.org,
-	aarcange@redhat.com, dave.jiang@intel.com,
-	linux-nvdimm@lists.01.org, vishal.l.verma@intel.com,
-	david@redhat.com, willy@infradead.org, hch@infradead.org,
-	linux-acpi@vger.kernel.org, jmoyer@redhat.com,
-	linux-ext4@vger.kernel.org, lenb@kernel.org, kilobyte@angband.pl,
-	riel@surriel.com, yuval.shaia@oracle.com, stefanha@redhat.com,
-	pbonzini@redhat.com, dan.j.williams@intel.com,
-	lcapitulino@redhat.com, kwolf@redhat.com, nilal@redhat.com,
-	tytso@mit.edu, xiaoguangrong.eric@gmail.com, cohuck@redhat.com,
-	rjw@rjwysocki.net, linux-kernel@vger.kernel.org,
-	linux-xfs@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-	imammedo@redhat.com
+Cc: david@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190423221011.bX8a8gHmX7S_v-nIDmBotikFIsKJMr1oDPk1TlFIPp0@z>
+Message-ID: <20190423221210.g0pAZW-5Sk8su6TlSYFfgfogdUYCJmzs0STLtN7H9nU@z>
 
-On Wed, Apr 24, 2019 at 08:02:17AM +1000, Dave Chinner wrote:
-> On Tue, Apr 23, 2019 at 01:36:12PM +0530, Pankaj Gupta wrote:
-> > Dont support 'MAP_SYNC' with non-DAX files and DAX files
-> > with asynchronous dax_device. Virtio pmem provides
-> > asynchronous host page cache flush mechanism. We don't
-> > support 'MAP_SYNC' with virtio pmem and xfs.
-> > 
-> > Signed-off-by: Pankaj Gupta <pagupta@redhat.com>
-> > ---
-> >  fs/xfs/xfs_file.c | 10 ++++++----
-> >  1 file changed, 6 insertions(+), 4 deletions(-)
-> > 
-> > diff --git a/fs/xfs/xfs_file.c b/fs/xfs/xfs_file.c
-> > index 1f2e2845eb76..0e59be018511 100644
-> > --- a/fs/xfs/xfs_file.c
-> > +++ b/fs/xfs/xfs_file.c
-> > @@ -1196,11 +1196,13 @@ xfs_file_mmap(
-> >  	struct file	*filp,
-> >  	struct vm_area_struct *vma)
-> >  {
-> > -	/*
-> > -	 * We don't support synchronous mappings for non-DAX files. At least
-> > -	 * until someone comes with a sensible use case.
-> > +	struct dax_device *dax_dev = xfs_find_daxdev_for_inode
-> > +						(file_inode(filp));
-
-    tab separation here ^^^                   ^^^^ and cut
-                                                       down the indent
-                                             while you're at
-						    it, please:
-
-	struct dax_device	*dax_dev;
-
-	dax_dev = xfs_find_daxdev_for_inode(file_inode(filp));
-	if (!dax_is_frobbed(dax))
-		return -EMEWANTCOOKIE;
-
---D
-
-> > +
-> > +	/* We don't support synchronous mappings for non-DAX files and
-> > +	 * for DAX files if underneath dax_device is not synchronous.
-> >  	 */
+On 4/20/19 9:34 AM, Richard Henderson wrote:
+> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+> ---
+>  target/s390x/translate.c | 8 +-------
+>  1 file changed, 1 insertion(+), 7 deletions(-)
 > 
-> 	/*
-> 	 * This is the correct multi-line comment format. Please
-> 	 * update the patch to maintain the existing comment format.
-> 	 */
+> diff --git a/target/s390x/translate.c b/target/s390x/translate.c
+> index 0afa8f7ca5..030129acbb 100644
+> --- a/target/s390x/translate.c
+> +++ b/target/s390x/translate.c
+> @@ -1407,13 +1407,7 @@ static DisasJumpType help_branch(DisasContext *s, DisasCompare *c,
+>  
+>  static DisasJumpType op_abs(DisasContext *s, DisasOps *o)
+>  {
+> -    TCGv_i64 z, n;
+> -    z = tcg_const_i64(0);
+> -    n = tcg_temp_new_i64();
+> -    tcg_gen_neg_i64(n, o->in2);
+> -    tcg_gen_movcond_i64(TCG_COND_LT, o->out, o->in2, z, n, o->in2);
+> -    tcg_temp_free_i64(n);
+> -    tcg_temp_free_i64(z);
+> +    tcg_gen_abs_i64(o->out, o->in2);
+>      return DISAS_NEXT;
+>  }
+>  
 > 
-> Cheers,
-> 
-> Dave.
-> -- 
-> Dave Chinner
-> david@fromorbit.com
+
+Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
 
