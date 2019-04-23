@@ -7,39 +7,39 @@ X-Spam-Status: No, score=-4.6 required=3.0 tests=DATE_IN_PAST_96_XX,
 	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7A216C04A6B
-	for <qemu-devel@archiver.kernel.org>; Mon,  6 May 2019 15:25:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 79909C04A6B
+	for <qemu-devel@archiver.kernel.org>; Mon,  6 May 2019 15:26:51 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 363F6205ED
-	for <qemu-devel@archiver.kernel.org>; Mon,  6 May 2019 15:25:29 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 3593B205ED
+	for <qemu-devel@archiver.kernel.org>; Mon,  6 May 2019 15:26:51 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=crudebyte.com header.i=@crudebyte.com header.b="JUs87eq6"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 363F6205ED
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=crudebyte.com header.i=@crudebyte.com header.b="eNUdIWym"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3593B205ED
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=nongnu.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:58200 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:58208 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hNfUe-0002Bp-FB
-	for qemu-devel@archiver.kernel.org; Mon, 06 May 2019 11:25:28 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:34938)
+	id 1hNfVy-0003O1-CQ
+	for qemu-devel@archiver.kernel.org; Mon, 06 May 2019 11:26:50 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:35694)
 	by lists.gnu.org with esmtp (Exim 4.71) (envelope-from
-	<5b5c005fbf4e31c07273468cb022d25a8907bc87@lizzy.crudebyte.com>)
-	id 1hNfSn-0000M9-QD
-	for qemu-devel@nongnu.org; Mon, 06 May 2019 11:23:35 -0400
+	<d2aedb16fdb7119768bc71f68c43df51dc77d154@lizzy.crudebyte.com>)
+	id 1hNfUo-0002gY-P0
+	for qemu-devel@nongnu.org; Mon, 06 May 2019 11:25:40 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
 	(envelope-from
-	<5b5c005fbf4e31c07273468cb022d25a8907bc87@lizzy.crudebyte.com>)
-	id 1hNfSl-0004zU-Vx
-	for qemu-devel@nongnu.org; Mon, 06 May 2019 11:23:33 -0400
-Received: from lizzy.crudebyte.com ([91.194.90.13]:42569)
+	<d2aedb16fdb7119768bc71f68c43df51dc77d154@lizzy.crudebyte.com>)
+	id 1hNfUl-0006zq-SB
+	for qemu-devel@nongnu.org; Mon, 06 May 2019 11:25:38 -0400
+Received: from lizzy.crudebyte.com ([91.194.90.13]:38465)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from
-	<5b5c005fbf4e31c07273468cb022d25a8907bc87@lizzy.crudebyte.com>)
-	id 1hNfSl-0004TO-Lp
-	for qemu-devel@nongnu.org; Mon, 06 May 2019 11:23:31 -0400
+	<d2aedb16fdb7119768bc71f68c43df51dc77d154@lizzy.crudebyte.com>)
+	id 1hNfUl-0005hP-IA
+	for qemu-devel@nongnu.org; Mon, 06 May 2019 11:25:35 -0400
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
 	d=crudebyte.com; s=lizzy;
 	h=Subject:Date:Cc:To:From:References:In-Reply-To:
@@ -47,21 +47,22 @@ DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
 	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
 	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
 	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=VcHf/aXB2PmmNC7U8rWx6EOyUZunnos54EojPHbZ6Fc=;
-	b=JUs87eq6X1lyUvsAloXme97dh
-	vA0wp9P4tEdmK60O45FRdniwecAs2unQ1jHmRMB4Jt0P4GK0FcW4jpab4IXtjBXUfP0WNoicDFw//
-	EY6iWJGhKFTTrkVAZTFf6VQBZQbAIbcoqmYY/YFtdqgeIwAYA0wfjur27CB08lBSri3FBohBFNuVm
-	2w1m+b5J9aCYOrqklcy64Po0xl/nnQJzpSgVzCZwif7cYOECnqNX/he8+OSIfKiBnc1WIMcxphGDy
-	Q/Qyyi9Y1GrZ2Vr4k9cp4abvtqq7RNLrlGxVjDsDQIv2Zwn/+DdRzWxirCdiCjJs1/UkNe5G2jPqE
-	PJZRTefeQ==;
-Message-Id: <5b5c005fbf4e31c07273468cb022d25a8907bc87.1557093245.git.qemu_oss@crudebyte.com>
+	bh=jmzD717GLRuwmyta9m8n6QZG8VJl/tG9CHlxJQmsXmY=;
+	b=eNUdIWym8PzXjnY3fjbqfdeMU
+	B+GBTth4SW+ntB+p1/2jG9WuUjLx6OwWWUQ67pR1y+0jh+Lz1WTLazEO2TiuBbNUNeBw5T/wyYacG
+	JeC8B9snmd1odBN6ehu8BdfXE6pybtLwpG51v6fMCZV7dTs8VU8ESMgw04hNQXOxskkUX+kYQpnPE
+	0hW5lkBkcoj2TbgFyrfnEM+ioTOHQ5WBsCN/+cm26nQGdRAsu2TQRV3UgsuXis/ug+V3lg3MNxRci
+	aLZ/xDIoQzJ8LiL2fCeIm6CYK4DDjrqFHtoFZfXnB7s4qG6dr4DO514g2TOnWj4EbH2IIpx0avo75
+	74qss8WVA==;
+Message-Id: <d2aedb16fdb7119768bc71f68c43df51dc77d154.1557093245.git.qemu_oss@crudebyte.com>
 In-Reply-To: <cover.1557093245.git.qemu_oss@crudebyte.com>
 References: <cover.1557093245.git.qemu_oss@crudebyte.com>
 To: qemu-devel@nongnu.org
-Date: Tue, 23 Apr 2019 13:30:03 +0200
+Date: Tue, 23 Apr 2019 13:41:46 +0200
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 91.194.90.13
-Subject: [Qemu-devel] [PATCH v3 1/5] 9p: mitigates most QID path collisions
+Subject: [Qemu-devel] [PATCH v3 3/5] 9p: persistency of QID path beyond
+ reboots / suspensions
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -80,423 +81,460 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This first patch here is an updated version of Antonios Motakis'
-original 4-patch set (using fixed length 16 bit prefixes), merged to one
-patch:
+This patch aims to keep QID path identical beyond the scope of reboots and
+guest suspensions. With the 1st patch alone the QID path of the same files
+might change after reboots / suspensions, since 9p would restart with
+empty qpp_table and the resulting QID path depends on the precise sequence
+of files being accessed on guest.
 
-https://lists.gnu.org/archive/html/qemu-devel/2018-02/msg02283.html
+The first patch should already avoid the vast majority of potential QID
+path collisions. However especially network services running on guest
+would still be prone to QID path issues when just using the 1st patch.
+For instance Samba is exporting file IDs to clients in the network and
+SMB cliens in the network will use those IDs to access and request
+changes on the file server. If guest is now interrupted in between, like
+it commonly happens on maintenance, e.g. software updates on host, then
+SMB clients in the network will continue working with old file IDs, which
+in turn leads to data corruption and data loss on the file server.
+Furthermore on SMB client side I also encountered severe misbehaviours in
+this case, for instance Macs accessing the file server would either
+start to hang or die with a kernel panic within seconds, since the smbx
+implementation on macOS heavily relies on file IDs being unique (within
+the context of a connection that is).
 
-* Updated to latest git master, specifically to new qht interface.
+So this patch here mitigates the remaining problem described above by
+storing the qpp_table persistently as extended attribute(s) on the
+exported root of the file system and automatically tries to restore the
+qpp_table i.e. after reboots / resumptions.
 
-* Merged the original 4 patches to this single patch.
+This patch is aimed at real world scenarios, in which qpp_table will only
+ever get few dozens of entries (and none ever in qpf_table). So it is e.g.
+intentionally limited to only store qpp_table, not qpf_table; and so far
+I have not made optimizations, since in practice the qpf_table is really
+just tiny.
+
+Since there is currently no callback in qemu yet that would reliably be
+called on guest shutdowns, the table is stored on every new insertion for
+now.
 
 Signed-off-by: Christian Schoenebeck <qemu_oss@crudebyte.com>
 ---
- fsdev/9p-marshal.h |   4 +-
- hw/9pfs/9p.c       | 200 ++++++++++++++++++++++++++++++++++++++++++++++++-----
- hw/9pfs/9p.h       |  21 ++++++
- 3 files changed, 204 insertions(+), 21 deletions(-)
+ hw/9pfs/9p.c | 315 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++-
+ hw/9pfs/9p.h |  33 +++++++
+ 2 files changed, 343 insertions(+), 5 deletions(-)
 
-diff --git a/fsdev/9p-marshal.h b/fsdev/9p-marshal.h
-index c8823d878f..d1ad3645c4 100644
---- a/fsdev/9p-marshal.h
-+++ b/fsdev/9p-marshal.h
-@@ -10,8 +10,8 @@ typedef struct V9fsString
- typedef struct V9fsQID
- {
-     int8_t type;
--    int32_t version;
--    int64_t path;
-+    uint32_t version;
-+    uint64_t path;
- } V9fsQID;
- 
- typedef struct V9fsStat
 diff --git a/hw/9pfs/9p.c b/hw/9pfs/9p.c
-index 55821343e5..b9bbdcbaee 100644
+index 2b893e25a1..29c6dfc68a 100644
 --- a/hw/9pfs/9p.c
 +++ b/hw/9pfs/9p.c
-@@ -25,6 +25,7 @@
- #include "trace.h"
+@@ -26,6 +26,19 @@
  #include "migration/blocker.h"
  #include "sysemu/qtest.h"
-+#include "qemu/xxhash.h"
+ #include "qemu/xxhash.h"
++#include "qemu/crc32c.h"
++#if defined(__linux__) /* TODO: This should probably go into osdep.h instead */
++# include <linux/limits.h> /* for XATTR_SIZE_MAX */
++#endif
++
++/*
++ * How many bytes may we store to fs per extended attribute value?
++ */
++#ifdef XATTR_SIZE_MAX
++# define ATTR_MAX_SIZE XATTR_SIZE_MAX /* Linux only: 64kB limit in kernel */
++#else
++# define ATTR_MAX_SIZE 65536 /* Most systems allow a bit more, so we take this as basis.  */
++#endif
  
  int open_fd_hw;
  int total_open_fd;
-@@ -571,14 +572,135 @@ static void coroutine_fn virtfs_reset(V9fsPDU *pdu)
-                                 P9_STAT_MODE_NAMED_PIPE |   \
-                                 P9_STAT_MODE_SOCKET)
- 
--/* This is the algorithm from ufs in spfs */
--static void stat_to_qid(const struct stat *stbuf, V9fsQID *qidp)
-+
-+/* creative abuse of qemu_xxhash7, which is based on xxhash */
-+static uint32_t qpp_hash(QppEntry e)
- {
--    size_t size;
-+    return qemu_xxhash7(e.ino_prefix, e.dev, 0, 0, 0);
-+}
-+
-+static uint32_t qpf_hash(QpfEntry e)
-+{
-+    return qemu_xxhash7(e.ino, e.dev, 0, 0, 0);
-+}
-+
-+static bool qpp_cmp_func(const void *obj, const void *userp)
-+{
-+    const QppEntry *e1 = obj, *e2 = userp;
-+    return (e1->dev == e2->dev) && (e1->ino_prefix == e2->ino_prefix);
-+}
-+
-+static bool qpf_cmp_func(const void *obj, const void *userp)
-+{
-+    const QpfEntry *e1 = obj, *e2 = userp;
-+    return (e1->dev == e2->dev) && (e1->ino == e2->ino);
-+}
-+
-+static void qp_table_remove(void *p, uint32_t h, void *up)
-+{
-+    g_free(p);
-+}
-+
-+static void qp_table_destroy(struct qht *ht)
-+{
-+    qht_iter(ht, qp_table_remove, NULL);
-+    qht_destroy(ht);
-+}
-+
-+static int qid_path_fullmap(V9fsPDU *pdu, const struct stat *stbuf,
-+                            uint64_t *path)
-+{
-+    QpfEntry lookup = {
-+        .dev = stbuf->st_dev,
-+        .ino = stbuf->st_ino
-+    }, *val;
-+    uint32_t hash = qpf_hash(lookup);
-+
-+    /* most users won't need the fullmap, so init the table lazily */
-+    if (!pdu->s->qpf_table.map) {
-+        qht_init(&pdu->s->qpf_table, qpf_cmp_func, 1 << 16, QHT_MODE_AUTO_RESIZE);
-+    }
-+
-+    val = qht_lookup(&pdu->s->qpf_table, &lookup, hash);
-+
-+    if (!val) {
-+        if (pdu->s->qp_fullpath_next == 0) {
-+            /* no more files can be mapped :'( */
-+            return -ENFILE;
-+        }
-+
-+        val = g_malloc0(sizeof(QppEntry));
-+        if (!val) {
-+            return -ENOMEM;
-+        }
-+        *val = lookup;
-+
-+        /* new unique inode and device combo */
-+        val->path = pdu->s->qp_fullpath_next++;
-+        pdu->s->qp_fullpath_next &= QPATH_INO_MASK;
-+        qht_insert(&pdu->s->qpf_table, val, hash, NULL);
-+    }
-+
-+    *path = val->path;
-+    return 0;
-+}
-+
-+/* stat_to_qid needs to map inode number (64 bits) and device id (32 bits)
-+ * to a unique QID path (64 bits). To avoid having to map and keep track
-+ * of up to 2^64 objects, we map only the 16 highest bits of the inode plus
-+ * the device id to the 16 highest bits of the QID path. The 48 lowest bits
-+ * of the QID path equal to the lowest bits of the inode number.
-+ *
-+ * This takes advantage of the fact that inode number are usually not
-+ * random but allocated sequentially, so we have fewer items to keep
-+ * track of.
-+ */
-+static int qid_path_prefixmap(V9fsPDU *pdu, const struct stat *stbuf,
-+                                uint64_t *path)
-+{
-+    QppEntry lookup = {
-+        .dev = stbuf->st_dev,
-+        .ino_prefix = (uint16_t) (stbuf->st_ino >> 48)
-+    }, *val;
-+    uint32_t hash = qpp_hash(lookup);
-+
-+    val = qht_lookup(&pdu->s->qpp_table, &lookup, hash);
-+
-+    if (!val) {
-+        if (pdu->s->qp_prefix_next == 0) {
-+            /* we ran out of prefixes */
-+            return -ENFILE;
-+        }
-+
-+        val = g_malloc0(sizeof(QppEntry));
-+        if (!val) {
-+            return -ENOMEM;
-+        }
-+        *val = lookup;
-+
-+        /* new unique inode prefix and device combo */
-+        val->qp_prefix = pdu->s->qp_prefix_next++;
-+        qht_insert(&pdu->s->qpp_table, val, hash, NULL);
-+    }
-+
-+    *path = ((uint64_t)val->qp_prefix << 48) | (stbuf->st_ino & QPATH_INO_MASK);
-+    return 0;
-+}
-+
-+static int stat_to_qid(V9fsPDU *pdu, const struct stat *stbuf, V9fsQID *qidp)
-+{
-+    int err;
-+
-+    /* map inode+device to qid path (fast path) */
-+    err = qid_path_prefixmap(pdu, stbuf, &qidp->path);
-+    if (err == -ENFILE) {
-+        /* fast path didn't work, fal back to full map */
-+        err = qid_path_fullmap(pdu, stbuf, &qidp->path);
-+    }
-+    if (err) {
-+        return err;
-+    }
- 
--    memset(&qidp->path, 0, sizeof(qidp->path));
--    size = MIN(sizeof(stbuf->st_ino), sizeof(qidp->path));
--    memcpy(&qidp->path, &stbuf->st_ino, size);
-     qidp->version = stbuf->st_mtime ^ (stbuf->st_size << 8);
-     qidp->type = 0;
-     if (S_ISDIR(stbuf->st_mode)) {
-@@ -587,6 +709,8 @@ static void stat_to_qid(const struct stat *stbuf, V9fsQID *qidp)
-     if (S_ISLNK(stbuf->st_mode)) {
-         qidp->type |= P9_QID_TYPE_SYMLINK;
-     }
-+
-+    return 0;
- }
- 
- static int coroutine_fn fid_to_qid(V9fsPDU *pdu, V9fsFidState *fidp,
-@@ -599,7 +723,10 @@ static int coroutine_fn fid_to_qid(V9fsPDU *pdu, V9fsFidState *fidp,
-     if (err < 0) {
-         return err;
-     }
--    stat_to_qid(&stbuf, qidp);
-+    err = stat_to_qid(pdu, &stbuf, qidp);
-+    if (err < 0) {
-+        return err;
-+    }
+@@ -642,6 +655,285 @@ static int qid_path_fullmap(V9fsPDU *pdu, const struct stat *stbuf,
      return 0;
  }
  
-@@ -830,7 +957,10 @@ static int coroutine_fn stat_to_v9stat(V9fsPDU *pdu, V9fsPath *path,
- 
-     memset(v9stat, 0, sizeof(*v9stat));
- 
--    stat_to_qid(stbuf, &v9stat->qid);
-+    err = stat_to_qid(pdu, stbuf, &v9stat->qid);
-+    if (err < 0) {
-+        return err;
++static inline bool is_ro_export(FsContext *ctx)
++{
++    return ctx->export_flags & V9FS_RDONLY;
++}
++
++/*
++ * Once qpp_table size exceeds this value, we no longer save
++ * the table persistently. See comment in v9fs_store_qpp_table()
++ */
++#define QPP_TABLE_PERSISTENCY_LIMIT 32768
++
++/* Remove all user.virtfs.system.qidp.* xattrs from export root. */
++static void remove_qidp_xattr(FsContext *ctx)
++{
++    V9fsString name;
++    int i;
++
++    /* just for a paranoid endless recursion sanity check */
++    const ssize_t max_size =
++        sizeof(QppSrlzHeader) +
++        QPP_TABLE_PERSISTENCY_LIMIT * sizeof(QppEntryS);
++
++    v9fs_string_init(&name);
++    for (i = 0; i * ATTR_MAX_SIZE < max_size; ++i) {
++        v9fs_string_sprintf(&name, "user.virtfs.system.qidp.%d", i);
++        if (lremovexattr(ctx->fs_root, name.data) < 0)
++            break;
 +    }
-     v9stat->mode = stat_to_v9mode(stbuf);
-     v9stat->atime = stbuf->st_atime;
-     v9stat->mtime = stbuf->st_mtime;
-@@ -891,7 +1021,7 @@ static int coroutine_fn stat_to_v9stat(V9fsPDU *pdu, V9fsPath *path,
- #define P9_STATS_ALL           0x00003fffULL /* Mask for All fields above */
++    v9fs_string_free(&name);
++}
++
++/* Used to convert qpp hash table into continuous stream. */
++static void qpp_table_serialize(void *p, uint32_t h, void *up)
++{
++    const QppEntry *entry = (const QppEntry*) p;
++    QppSerialize *ser = (QppSerialize*) up;
++
++    if (ser->error)
++        return;
++
++    /* safety first */
++    if (entry->qp_prefix - 1 >= ser->count) {
++        ser->error = -1;
++        return;
++    }
++
++    ser->elements[entry->qp_prefix - 1] = (QppEntryS) {
++        .dev = entry->dev,
++        .ino_prefix = entry->ino_prefix
++    };
++    ser->done++;
++}
++
++/*
++ * Tries to store the current qpp_table as extended attribute(s) on the
++ * exported file system root with the goal to preserve identical qids
++ * beyond the scope of reboots.
++ */
++static void v9fs_store_qpp_table(V9fsState *s)
++{
++    FsContext *ctx = &s->ctx;
++    V9fsString name;
++    int i, res;
++    size_t size;
++    QppSrlzStream* stream;
++    QppSerialize ser;
++
++    if (is_ro_export(ctx))
++        return;
++
++    /*
++     * Whenever we exceeded some certain (arbitrary) high qpp_table size we
++     * delete the stored table from the file system to get rid of old device
++     * ids / inodes that might no longer exist with the goal to potentially
++     * yield in a smaller table size after next reboot.
++     */
++    if (!s->qp_prefix_next || s->qp_prefix_next >= QPP_TABLE_PERSISTENCY_LIMIT) {
++        if (s->qp_prefix_next == QPP_TABLE_PERSISTENCY_LIMIT) {
++            remove_qidp_xattr(ctx);
++        }
++        return;
++    }
++
++    /* Convert qpp hash table into continuous array. */
++    size = sizeof(QppSrlzHeader) +
++           ( (s->qp_prefix_next - 1) /* qpp_table entry count */ * sizeof(QppEntryS) );
++    stream = g_malloc0(size);
++    ser = (QppSerialize) {
++        .elements = &stream->elements[0],
++        .count = s->qp_prefix_next - 1,
++        .done  = 0,
++        .error = 0,
++    };
++    qht_iter(&s->qpp_table, qpp_table_serialize, &ser);
++    if (ser.error || ser.done != ser.count)
++        goto out;
++
++    /* initialize header and calculate CRC32 checksum */
++    stream->header = (QppSrlzHeader) {
++        .version = 1,
++        .reserved = 0,
++        .crc32 = crc32c(
++            0xffffffff,
++            (const uint8_t*) &stream->elements[0],
++            (ser.count * sizeof(QppEntryS))
++        ),
++    };
++
++    /*
++     * Actually just required if the qpp_table size decreased, or if the
++     * previous xattr size limit increased on OS (kernel/fs) level.
++     */
++    remove_qidp_xattr(ctx);
++
++    /*
++     * Subdivide (if required) the data stream into individual xattrs
++     * to cope with the system's max. supported xattr value size.
++     */
++    v9fs_string_init(&name);
++    for (i = 0; size > (i * ATTR_MAX_SIZE); ++i) {
++        v9fs_string_sprintf(&name, "user.virtfs.system.qidp.%d", i);
++        res = lsetxattr(
++            ctx->fs_root,
++            name.data,
++            ((const uint8_t*)stream) + i * ATTR_MAX_SIZE,
++            MIN(ATTR_MAX_SIZE, size - i * ATTR_MAX_SIZE),
++            0/*flags*/
++        );
++        if (res < 0) {
++            if (i > 0)
++                remove_qidp_xattr(ctx);
++            break;
++        }
++    }
++    v9fs_string_free(&name);
++out:
++    g_free(stream);
++}
++
++/* Frees the entire chain of passed nodes from memory. */
++static void destroy_xattr_nodes(XAttrNode **first)
++{
++    XAttrNode *prev;
++    if (!first)
++        return;
++    while (*first) {
++        if ((*first)->value)
++            g_free((*first)->value);
++        prev = *first;
++        *first = (*first)->next;
++        g_free(prev);
++    }
++}
++
++/*
++ * Loads all user.virtfs.system.qidp.* xattrs from exported fs root and
++ * returns a linked list with one node per xattr.
++ */
++static XAttrNode* v9fs_load_qidp_xattr_nodes(V9fsState *s)
++{
++    FsContext *ctx = &s->ctx;
++    XAttrNode *first = NULL, *current = NULL;
++    V9fsString name;
++    ssize_t size;
++    int i;
++
++    const ssize_t max_size =
++        sizeof(QppSrlzHeader) +
++        QPP_TABLE_PERSISTENCY_LIMIT * sizeof(QppEntryS);
++
++    v9fs_string_init(&name);
++
++    for (i = 0; i * ATTR_MAX_SIZE < max_size; ++i) {
++        v9fs_string_sprintf(&name, "user.virtfs.system.qidp.%d", i);
++        size = lgetxattr(ctx->fs_root, name.data, NULL, 0);
++        if (size <= 0)
++            break;
++        if (!first) {
++            first = current = g_malloc0(sizeof(XAttrNode));
++        } else {
++            current = current->next = g_malloc0(sizeof(XAttrNode));
++        }
++        current->value = g_malloc0(size);
++        current->length = lgetxattr(
++            ctx->fs_root, name.data, current->value, size
++        );
++        if (current->length <= 0) {
++            goto out_w_err;
++        }
++    }
++    goto out;
++
++out_w_err:
++    destroy_xattr_nodes(&first);
++out:
++    v9fs_string_free(&name);
++    return first;
++}
++
++/*
++ * Try to load previously stored qpp_table from file system. Calling this
++ * function assumes that qpp_table is yet empty.
++ *
++ * @see v9fs_store_qpp_table()
++ */
++static void v9fs_load_qpp_table(V9fsState *s)
++{
++    ssize_t size, count;
++    XAttrNode *current, *first;
++    QppSrlzStream* stream = NULL;
++    uint32_t crc32;
++    int i;
++    QppEntry *val;
++    uint32_t hash;
++
++    if (s->qp_prefix_next != 1)
++        return;
++
++    first = v9fs_load_qidp_xattr_nodes(s);
++    if (!first)
++        return;
++
++    /* convert nodes into continuous stream */
++    size = 0;
++    for (current = first; current; current = current->next) {
++        size += current->length;
++    }
++    if (size <= 0) {
++        goto out;
++    }
++    stream = g_malloc0(size);
++    size = 0;
++    for (current = first; current; current = current->next) {
++        memcpy(((uint8_t*)stream) + size, current->value, current->length);
++        size += current->length;
++    }
++
++    if (stream->header.version != 1) {
++        goto out;
++    }
++
++    count = (size - sizeof(QppSrlzHeader)) / sizeof(QppEntryS);
++    if (count <= 0) {
++        goto out;
++    }
++
++    /* verify CRC32 checksum of stream */
++    crc32 = crc32c(
++        0xffffffff,
++        (const uint8_t*) &stream->elements[0],
++        (count * sizeof(QppEntryS))
++    );
++    if (crc32 != stream->header.crc32) {
++        goto out;
++    }
++
++    /* fill qpp_table with the retrieved elements */
++    for (i = 0; i < count; ++i) {
++        val = g_malloc0(sizeof(QppEntry));
++        *val = (QppEntry) {
++            .dev = stream->elements[i].dev,
++            .ino_prefix = stream->elements[i].ino_prefix,
++        };
++        hash = qpp_hash(*val);
++        if (qht_lookup(&s->qpp_table, val, hash)) {
++            /* should never happen: duplicate entry detected */
++            g_free(val);
++            goto out;
++        }
++        val->qp_prefix = s->qp_prefix_next++;
++        qht_insert(&s->qpp_table, val, hash, NULL);
++    }
++
++out:
++    destroy_xattr_nodes(&first);
++    if (stream)
++        g_free(stream);
++}
++
+ /* stat_to_qid needs to map inode number (64 bits) and device id (32 bits)
+  * to a unique QID path (64 bits). To avoid having to map and keep track
+  * of up to 2^64 objects, we map only the 16 highest bits of the inode plus
+@@ -675,6 +967,14 @@ static int qid_path_prefixmap(V9fsPDU *pdu, const struct stat *stbuf,
+         /* new unique inode prefix and device combo */
+         val->qp_prefix = pdu->s->qp_prefix_next++;
+         qht_insert(&pdu->s->qpp_table, val, hash, NULL);
++
++        /*
++         * Store qpp_table as extended attribute(s) to file system.
++         *
++         * TODO: This should better only be called from a guest shutdown and
++         * suspend handler.
++         */
++        v9fs_store_qpp_table(pdu->s);
+     }
  
- 
--static void stat_to_v9stat_dotl(V9fsState *s, const struct stat *stbuf,
-+static int stat_to_v9stat_dotl(V9fsPDU *pdu, const struct stat *stbuf,
-                                 V9fsStatDotl *v9lstat)
- {
-     memset(v9lstat, 0, sizeof(*v9lstat));
-@@ -913,7 +1043,7 @@ static void stat_to_v9stat_dotl(V9fsState *s, const struct stat *stbuf,
-     /* Currently we only support BASIC fields in stat */
-     v9lstat->st_result_mask = P9_STATS_BASIC;
- 
--    stat_to_qid(stbuf, &v9lstat->qid);
-+    return stat_to_qid(pdu, stbuf, &v9lstat->qid);
+     *path = ((uint64_t)val->qp_prefix << 48) | (stbuf->st_ino & QPATH_INO_MASK);
+@@ -1064,11 +1364,6 @@ static void v9fs_fix_path(V9fsPath *dst, V9fsPath *src, int len)
+     v9fs_path_free(&str);
  }
  
- static void print_sg(struct iovec *sg, int cnt)
-@@ -1115,7 +1245,6 @@ static void coroutine_fn v9fs_getattr(void *opaque)
-     uint64_t request_mask;
-     V9fsStatDotl v9stat_dotl;
-     V9fsPDU *pdu = opaque;
--    V9fsState *s = pdu->s;
+-static inline bool is_ro_export(FsContext *ctx)
+-{
+-    return ctx->export_flags & V9FS_RDONLY;
+-}
+-
+ static void coroutine_fn v9fs_version(void *opaque)
+ {
+     ssize_t err;
+@@ -3784,6 +4079,8 @@ int v9fs_device_realize_common(V9fsState *s, const V9fsTransport *t,
+     qht_init(&s->qpp_table, qpp_cmp_func, 1, QHT_MODE_AUTO_RESIZE);
+     s->qp_prefix_next = 1; /* reserve 0 to detect overflow */
+     s->qp_fullpath_next = 1;
++    /* try to load and restore previous qpp_table */
++    v9fs_load_qpp_table(s);
  
-     retval = pdu_unmarshal(pdu, offset, "dq", &fid, &request_mask);
-     if (retval < 0) {
-@@ -1136,7 +1265,10 @@ static void coroutine_fn v9fs_getattr(void *opaque)
-     if (retval < 0) {
-         goto out;
-     }
--    stat_to_v9stat_dotl(s, &stbuf, &v9stat_dotl);
-+    retval = stat_to_v9stat_dotl(pdu, &stbuf, &v9stat_dotl);
-+    if (retval < 0) {
-+        goto out;
-+    }
- 
-     /*  fill st_gen if requested and supported by underlying fs */
-     if (request_mask & P9_STATS_GEN) {
-@@ -1381,7 +1513,10 @@ static void coroutine_fn v9fs_walk(void *opaque)
-             if (err < 0) {
-                 goto out;
-             }
--            stat_to_qid(&stbuf, &qid);
-+            err = stat_to_qid(pdu, &stbuf, &qid);
-+            if (err < 0) {
-+                goto out;
-+            }
-             v9fs_path_copy(&dpath, &path);
-         }
-         memcpy(&qids[name_idx], &qid, sizeof(qid));
-@@ -1483,7 +1618,10 @@ static void coroutine_fn v9fs_open(void *opaque)
-     if (err < 0) {
-         goto out;
-     }
--    stat_to_qid(&stbuf, &qid);
-+    err = stat_to_qid(pdu, &stbuf, &qid);
-+    if (err < 0) {
-+        goto out;
-+    }
-     if (S_ISDIR(stbuf.st_mode)) {
-         err = v9fs_co_opendir(pdu, fidp);
-         if (err < 0) {
-@@ -1593,7 +1731,10 @@ static void coroutine_fn v9fs_lcreate(void *opaque)
-         fidp->flags |= FID_NON_RECLAIMABLE;
-     }
-     iounit =  get_iounit(pdu, &fidp->path);
--    stat_to_qid(&stbuf, &qid);
-+    err = stat_to_qid(pdu, &stbuf, &qid);
-+    if (err < 0) {
-+        goto out;
-+    }
-     err = pdu_marshal(pdu, offset, "Qd", &qid, iounit);
-     if (err < 0) {
-         goto out;
-@@ -2327,7 +2468,10 @@ static void coroutine_fn v9fs_create(void *opaque)
-         }
-     }
-     iounit = get_iounit(pdu, &fidp->path);
--    stat_to_qid(&stbuf, &qid);
-+    err = stat_to_qid(pdu, &stbuf, &qid);
-+    if (err < 0) {
-+        goto out;
-+    }
-     err = pdu_marshal(pdu, offset, "Qd", &qid, iounit);
-     if (err < 0) {
-         goto out;
-@@ -2384,7 +2528,10 @@ static void coroutine_fn v9fs_symlink(void *opaque)
-     if (err < 0) {
-         goto out;
-     }
--    stat_to_qid(&stbuf, &qid);
-+    err = stat_to_qid(pdu, &stbuf, &qid);
-+    if (err < 0) {
-+        goto out;
-+    }
-     err =  pdu_marshal(pdu, offset, "Q", &qid);
-     if (err < 0) {
-         goto out;
-@@ -3064,7 +3211,10 @@ static void coroutine_fn v9fs_mknod(void *opaque)
-     if (err < 0) {
-         goto out;
-     }
--    stat_to_qid(&stbuf, &qid);
-+    err = stat_to_qid(pdu, &stbuf, &qid);
-+    if (err < 0) {
-+        goto out;
-+    }
-     err = pdu_marshal(pdu, offset, "Q", &qid);
-     if (err < 0) {
-         goto out;
-@@ -3222,7 +3372,10 @@ static void coroutine_fn v9fs_mkdir(void *opaque)
-     if (err < 0) {
-         goto out;
-     }
--    stat_to_qid(&stbuf, &qid);
-+    err = stat_to_qid(pdu, &stbuf, &qid);
-+    if (err < 0) {
-+        goto out;
-+    }
-     err = pdu_marshal(pdu, offset, "Q", &qid);
-     if (err < 0) {
-         goto out;
-@@ -3633,6 +3786,11 @@ int v9fs_device_realize_common(V9fsState *s, const V9fsTransport *t,
-         goto out;
-     }
- 
-+    /* QID path hash table. 1 entry ought to be enough for anybody ;) */
-+    qht_init(&s->qpp_table, qpp_cmp_func, 1, QHT_MODE_AUTO_RESIZE);
-+    s->qp_prefix_next = 1; /* reserve 0 to detect overflow */
-+    s->qp_fullpath_next = 1;
-+
      s->ctx.fst = &fse->fst;
      fsdev_throttle_init(s->ctx.fst);
+@@ -3807,6 +4104,14 @@ out:
  
-@@ -3646,6 +3804,8 @@ out:
-         }
-         g_free(s->tag);
-         g_free(s->ctx.fs_root);
-+        qp_table_destroy(&s->qpp_table);
-+        qp_table_destroy(&s->qpf_table);
-         v9fs_path_free(&path);
+ void v9fs_device_unrealize_common(V9fsState *s, Error **errp)
+ {
++    /*
++     * Store qpp_table as extended attribute(s) to file system.
++     *
++     * This was actually plan A, but unfortunately unserialize is not called
++     * reliably on guest shutdowns and suspensions.
++     */
++    v9fs_store_qpp_table(s);
++
+     if (s->ops->cleanup) {
+         s->ops->cleanup(&s->ctx);
      }
-     return rc;
-@@ -3658,6 +3818,8 @@ void v9fs_device_unrealize_common(V9fsState *s, Error **errp)
-     }
-     fsdev_throttle_cleanup(s->ctx.fst);
-     g_free(s->tag);
-+    qp_table_destroy(&s->qpp_table);
-+    qp_table_destroy(&s->qpf_table);
-     g_free(s->ctx.fs_root);
- }
- 
 diff --git a/hw/9pfs/9p.h b/hw/9pfs/9p.h
-index 8883761b2c..44112ea97f 100644
+index 44112ea97f..54ce039969 100644
 --- a/hw/9pfs/9p.h
 +++ b/hw/9pfs/9p.h
-@@ -8,6 +8,7 @@
- #include "fsdev/9p-iov-marshal.h"
- #include "qemu/thread.h"
- #include "qemu/coroutine.h"
-+#include "qemu/qht.h"
+@@ -245,6 +245,13 @@ typedef struct {
+     uint16_t qp_prefix;
+ } QppEntry;
  
- enum {
-     P9_TLERROR = 6,
-@@ -235,6 +236,22 @@ struct V9fsFidState
-     V9fsFidState *rclm_lst;
- };
- 
-+#define QPATH_INO_MASK        (((unsigned long)1 << 48) - 1)
-+
-+/* QID path prefix entry, see stat_to_qid */
-+typedef struct {
++/* Small version of QppEntry for serialization as xattr. */
++struct QppEntryS {
 +    dev_t dev;
 +    uint16_t ino_prefix;
-+    uint16_t qp_prefix;
-+} QppEntry;
++} __attribute__((packed));
++typedef struct QppEntryS QppEntryS;
 +
-+/* QID path full entry, as above */
+ /* QID path full entry, as above */
+ typedef struct {
+     dev_t dev;
+@@ -252,6 +259,32 @@ typedef struct {
+     uint64_t path;
+ } QpfEntry;
+ 
 +typedef struct {
-+    dev_t dev;
-+    ino_t ino;
-+    uint64_t path;
-+} QpfEntry;
++    QppEntryS *elements;
++    uint count; /* In: QppEntryS count in @a elements */
++    uint done; /* Out: how many QppEntryS did we actually fill in @a elements */
++    int error; /* Out: zero on success */
++} QppSerialize;
++
++struct QppSrlzHeader {
++    uint16_t version;
++    uint16_t reserved; /* might be used e.g. for flags in future */
++    uint32_t crc32;
++} __attribute__((packed));
++typedef struct QppSrlzHeader QppSrlzHeader;
++
++struct QppSrlzStream {
++    QppSrlzHeader header;
++    QppEntryS elements[0];
++} __attribute__((packed));
++typedef struct QppSrlzStream QppSrlzStream;
++
++typedef struct XAttrNode {
++    uint8_t* value;
++    ssize_t length;
++    struct XAttrNode* next;
++} XAttrNode;
 +
  struct V9fsState
  {
      QLIST_HEAD(, V9fsPDU) free_list;
-@@ -256,6 +273,10 @@ struct V9fsState
-     Error *migration_blocker;
-     V9fsConf fsconf;
-     V9fsQID root_qid;
-+    struct qht qpp_table;
-+    struct qht qpf_table;
-+    uint16_t qp_prefix_next;
-+    uint64_t qp_fullpath_next;
- };
- 
- /* 9p2000.L open flags */
 -- 
 2.11.0
 
