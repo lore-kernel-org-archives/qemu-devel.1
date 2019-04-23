@@ -2,65 +2,55 @@ Return-Path: <SRS0=zUjA=SZ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.3 required=3.0 tests=FROM_EXCESS_BASE64,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_PASS,URIBL_BLOCKED,USER_AGENT_MUTT autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 94306C10F14
-	for <qemu-devel@archiver.kernel.org>; Tue, 23 Apr 2019 10:40:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EEA52C10F14
+	for <qemu-devel@archiver.kernel.org>; Tue, 23 Apr 2019 10:41:40 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5856221773
-	for <qemu-devel@archiver.kernel.org>; Tue, 23 Apr 2019 10:40:56 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5856221773
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id BC8E4214AE
+	for <qemu-devel@archiver.kernel.org>; Tue, 23 Apr 2019 10:41:40 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BC8E4214AE
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kernkonzept.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:51536 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:51538 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hIsr9-00036K-5e
-	for qemu-devel@archiver.kernel.org; Tue, 23 Apr 2019 06:40:55 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:53729)
+	id 1hIsrs-0003aM-19
+	for qemu-devel@archiver.kernel.org; Tue, 23 Apr 2019 06:41:40 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:53827)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1hIsqF-0002gb-Bl
-	for qemu-devel@nongnu.org; Tue, 23 Apr 2019 06:40:01 -0400
+	(envelope-from <jermar@gorgo>) id 1hIsqc-0002wt-N1
+	for qemu-devel@nongnu.org; Tue, 23 Apr 2019 06:40:23 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1hIsqD-0001t5-M0
-	for qemu-devel@nongnu.org; Tue, 23 Apr 2019 06:39:59 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:47560)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1hIsqD-0001qR-CX
-	for qemu-devel@nongnu.org; Tue, 23 Apr 2019 06:39:57 -0400
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
-	[10.5.11.13])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 9C1A630ADBBD;
-	Tue, 23 Apr 2019 10:39:55 +0000 (UTC)
-Received: from redhat.com (ovpn-112-50.ams2.redhat.com [10.36.112.50])
-	by smtp.corp.redhat.com (Postfix) with ESMTPS id 8A713226FF;
-	Tue, 23 Apr 2019 10:39:42 +0000 (UTC)
-Date: Tue, 23 Apr 2019 11:39:39 +0100
-From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-To: Yan Zhao <yan.y.zhao@intel.com>
-Message-ID: <20190423103939.GF6022@redhat.com>
-References: <20190419083258.19580-1-yan.y.zhao@intel.com>
-	<20190419083505.19654-1-yan.y.zhao@intel.com>
+	(envelope-from <jermar@gorgo>) id 1hIsqb-0002A2-JW
+	for qemu-devel@nongnu.org; Tue, 23 Apr 2019 06:40:22 -0400
+Received: from [93.153.64.87] (port=41040 helo=gorgo)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <jermar@gorgo>) id 1hIsqb-00026k-9L
+	for qemu-devel@nongnu.org; Tue, 23 Apr 2019 06:40:21 -0400
+Received: from gorgo (localhost.localdomain [127.0.0.1])
+	by gorgo (8.15.2/8.15.2) with ESMTPS id x3NAdxNT1258059
+	(version=TLSv1.3 cipher=TLS_AES_256_GCM_SHA384 bits=256 verify=NOT);
+	Tue, 23 Apr 2019 12:39:59 +0200
+Received: (from jermar@localhost)
+	by gorgo (8.15.2/8.15.2/Submit) id x3NAdxLD1258015;
+	Tue, 23 Apr 2019 12:39:59 +0200
+From: =?UTF-8?q?Jakub=20Jerm=C3=A1=C5=99?= <jakub.jermar@kernkonzept.com>
+To: qemu-devel@nongnu.org
+Date: Tue, 23 Apr 2019 12:38:55 +0200
+Message-Id: <20190423103855.1257968-1-jakub.jermar@kernkonzept.com>
+X-Mailer: git-send-email 2.20.1
 MIME-Version: 1.0
 Content-Type: text/plain; charset="UTF-8"
-Content-Disposition: inline
-In-Reply-To: <20190419083505.19654-1-yan.y.zhao@intel.com>
-User-Agent: Mutt/1.11.3 (2019-02-01)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.47]);
-	Tue, 23 Apr 2019 10:39:56 +0000 (UTC)
+Content-Transfer-Encoding: quoted-printable
+X-MIME-Autoconverted: from 8bit to quoted-printable by gorgo id x3NAdxNT1258059
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH 1/2] vfio/mdev: add version field as
- mandatory attribute for mdev device
+X-Received-From: 93.153.64.87
+Subject: [Qemu-devel] [PATCH] mips: Decide to map PAGE_EXEC in map_address
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -72,209 +62,102 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-Cc: cjia@nvidia.com, kvm@vger.kernel.org, aik@ozlabs.ru,
-	Zhengxiao.zx@alibaba-inc.com, shuangtai.tst@alibaba-inc.com,
-	qemu-devel@nongnu.org, kwankhede@nvidia.com, eauger@redhat.com,
-	yi.l.liu@intel.com, eskultet@redhat.com, ziye.yang@intel.com,
-	mlevitsk@redhat.com, pasic@linux.ibm.com, libvir-list@redhat.com,
-	arei.gonglei@huawei.com, felipe@nutanix.com, Ken.Xue@amd.com,
-	kevin.tian@intel.com, dgilbert@redhat.com,
-	zhenyuw@linux.intel.com, alex.williamson@redhat.com,
-	intel-gvt-dev@lists.freedesktop.org, changpeng.liu@intel.com,
-	cohuck@redhat.com, linux-kernel@vger.kernel.org,
-	zhi.a.wang@intel.com, jonathan.davies@nutanix.com, shaopeng.he@intel.com
+Cc: =?UTF-8?q?Jakub=20Jerm=C3=A1=C5=99?= <jakub.jermar@kernkonzept.com>,
+	Aleksandar Rikalo <arikalo@wavecomp.com>,
+	Aleksandar Markovic <amarkovic@wavecomp.com>,
+	Aurelien Jarno <aurelien@aurel32.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190423103939.CwEGLjzWBb5kyNIbZ5S9PGwlVRI4PCWcgPxvGS9z6Yg@z>
+Message-ID: <20190423103855.01L7Qjw2qxDOJfsW0acz02onbLWO-OIL3wPQyqHj27U@z>
 
-On Fri, Apr 19, 2019 at 04:35:04AM -0400, Yan Zhao wrote:
-> device version attribute in mdev sysfs is used by user space software
-> (e.g. libvirt) to query device compatibility for live migration of VFIO
-> mdev devices. This attribute is mandatory if a mdev device supports live
-> migration.
-> 
-> It consists of two parts: common part and vendor proprietary part.
-> common part: 32 bit. lower 16 bits is vendor id and higher 16 bits
->              identifies device type. e.g., for pci device, it is
->              "pci vendor id" | (VFIO_DEVICE_FLAGS_PCI << 16).
-> vendor proprietary part: this part is varied in length. vendor driver can
->              specify any string to identify a device.
-> 
-> When reading this attribute, it should show device version string of the
-> device of type <type-id>. If a device does not support live migration, it
-> should return errno.
-> When writing a string to this attribute, it returns errno for
-> incompatibility or returns written string length in compatibility case.
-> If a device does not support live migration, it always returns errno.
-> 
-> For user space software to use:
-> 1.
-> Before starting live migration, user space software first reads source side
-> mdev device's version. e.g.
-> "#cat \
-> /sys/bus/pci/devices/0000\:00\:02.0/5ac1fb20-2bbf-4842-bb7e-36c58c3be9cd/mdev_type/version"
-> 00028086-193b-i915-GVTg_V5_4
-> 
-> 2.
-> Then, user space software writes the source side returned version string
-> to device version attribute in target side, and checks the return value.
-> If a negative errno is returned in the target side, then mdev devices in
-> source and target sides are not compatible;
-> If a positive number is returned and it equals to the length of written
-> string, then the two mdev devices in source and target side are compatible.
-> e.g.
-> (a) compatibility case
-> "# echo 00028086-193b-i915-GVTg_V5_4 >
-> /sys/bus/pci/devices/0000\:00\:02.0/882cc4da-dede-11e7-9180-078a62063ab1/mdev_type/version"
-> 
-> (b) incompatibility case
-> "#echo 00028086-193b-i915-GVTg_V5_1 >
-> /sys/bus/pci/devices/0000\:00\:02.0/882cc4da-dede-11e7-9180-078a62063ab1/mdev_type/version"
-> -bash: echo: write error: Invalid argument
+This commit addresses QEMU Bug #1825311:
 
-What you have written here seems to imply that each mdev type is able to
-support many different versions at the same time. Writing a version into
-this sysfs file then chooses which of the many versions to actually use.
+  mips_cpu_handle_mmu_fault renders all accessed pages executable
 
-This is good as it allows for live migration across driver software upgrades.
+It allows finer-grained control over whether the accessed page should be
+executable by moving the decision to the underlying map_address
+function, which has more information for this.
 
-A mgmt application may well want to know what versions are supported for an
-mdev type *before* starting a migration. A mgmt app can query all the 100's
-of hosts it knows and thus figure out which are valid to use as the target
-of a migration.
+As a result, pages that have the XI bit set in the TLB and are accessed
+for read/write, don't suddenly end up being executable.
 
-IOW, we want to avoid the ever hitting the incompatibility case in the
-first place, by only choosing to migrate to a host that we know is going
-to be compatible.
+Signed-off-by: Jakub Jerm=C3=A1=C5=99 <jakub.jermar@kernkonzept.com>
+---
+ target/mips/helper.c | 16 +++++++++-------
+ 1 file changed, 9 insertions(+), 7 deletions(-)
 
-This would need some kind of way to report the full list of supported
-versions against the mdev supported types on the host.
+diff --git a/target/mips/helper.c b/target/mips/helper.c
+index c44cdca3b5..f182935fcf 100644
+--- a/target/mips/helper.c
++++ b/target/mips/helper.c
+@@ -43,7 +43,7 @@ int no_mmu_map_address (CPUMIPSState *env, hwaddr *phys=
+ical, int *prot,
+                         target_ulong address, int rw, int access_type)
+ {
+     *physical =3D address;
+-    *prot =3D PAGE_READ | PAGE_WRITE;
++    *prot =3D PAGE_READ | PAGE_WRITE | PAGE_EXEC;
+     return TLBRET_MATCH;
+ }
+=20
+@@ -61,7 +61,7 @@ int fixed_mmu_map_address (CPUMIPSState *env, hwaddr *p=
+hysical, int *prot,
+     else
+         *physical =3D address;
+=20
+-    *prot =3D PAGE_READ | PAGE_WRITE;
++    *prot =3D PAGE_READ | PAGE_WRITE | PAGE_EXEC;
+     return TLBRET_MATCH;
+ }
+=20
+@@ -101,6 +101,8 @@ int r4k_map_address (CPUMIPSState *env, hwaddr *physi=
+cal, int *prot,
+                 *prot =3D PAGE_READ;
+                 if (n ? tlb->D1 : tlb->D0)
+                     *prot |=3D PAGE_WRITE;
++                if (!(n ? tlb->XI1 : tlb->XI0))
++                    *prot |=3D PAGE_EXEC;
+                 return TLBRET_MATCH;
+             }
+             return TLBRET_DIRTY;
+@@ -182,7 +184,7 @@ static int get_seg_physical_address(CPUMIPSState *env=
+, hwaddr *physical,
+     } else {
+         /* The segment is unmapped */
+         *physical =3D physical_base | (real_address & segmask);
+-        *prot =3D PAGE_READ | PAGE_WRITE;
++        *prot =3D PAGE_READ | PAGE_WRITE | PAGE_EXEC;
+         return TLBRET_MATCH;
+     }
+ }
+@@ -913,8 +915,8 @@ int mips_cpu_handle_mmu_fault(CPUState *cs, vaddr add=
+ress, int size, int rw,
+     }
+     if (ret =3D=3D TLBRET_MATCH) {
+         tlb_set_page(cs, address & TARGET_PAGE_MASK,
+-                     physical & TARGET_PAGE_MASK, prot | PAGE_EXEC,
+-                     mmu_idx, TARGET_PAGE_SIZE);
++                     physical & TARGET_PAGE_MASK, prot, mmu_idx,
++                     TARGET_PAGE_SIZE);
+         ret =3D 0;
+     } else if (ret < 0)
+ #endif
+@@ -936,8 +938,8 @@ int mips_cpu_handle_mmu_fault(CPUState *cs, vaddr add=
+ress, int size, int rw,
+                                            address, rw, access_type, mmu=
+_idx);
+                 if (ret =3D=3D TLBRET_MATCH) {
+                     tlb_set_page(cs, address & TARGET_PAGE_MASK,
+-                            physical & TARGET_PAGE_MASK, prot | PAGE_EXE=
+C,
+-                            mmu_idx, TARGET_PAGE_SIZE);
++                            physical & TARGET_PAGE_MASK, prot, mmu_idx,
++                            TARGET_PAGE_SIZE);
+                     ret =3D 0;
+                     return ret;
+                 }
+--=20
+2.20.1
 
-
-> 3. if two mdev devices are compatible, user space software can start
-> live migration, and vice versa.
-> 
-> Note: if a mdev device does not support live migration, it either does
-> not provide a version attribute, or always returns errno when its version
-> attribute is read/written.
-> 
-> Cc: Alex Williamson <alex.williamson@redhat.com>
-> Cc: Erik Skultety <eskultet@redhat.com>
-> Cc: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-> Cc: Cornelia Huck <cohuck@redhat.com>
-> Cc: "Tian, Kevin" <kevin.tian@intel.com>
-> Cc: Zhenyu Wang <zhenyuw@linux.intel.com>
-> Cc: "Wang, Zhi A" <zhi.a.wang@intel.com>
-> Cc: Neo Jia <cjia@nvidia.com>
-> Cc: Kirti Wankhede <kwankhede@nvidia.com>
-> 
-> Signed-off-by: Yan Zhao <yan.y.zhao@intel.com>
-> ---
->  Documentation/vfio-mediated-device.txt | 36 ++++++++++++++++++++++++++
->  samples/vfio-mdev/mbochs.c             | 17 ++++++++++++
->  samples/vfio-mdev/mdpy.c               | 16 ++++++++++++
->  samples/vfio-mdev/mtty.c               | 16 ++++++++++++
->  4 files changed, 85 insertions(+)
-> 
-> diff --git a/Documentation/vfio-mediated-device.txt b/Documentation/vfio-mediated-device.txt
-> index c3f69bcaf96e..bc28471c0667 100644
-> --- a/Documentation/vfio-mediated-device.txt
-> +++ b/Documentation/vfio-mediated-device.txt
-> @@ -202,6 +202,7 @@ Directories and files under the sysfs for Each Physical Device
->    |     |   |--- available_instances
->    |     |   |--- device_api
->    |     |   |--- description
-> +  |     |   |--- version
->    |     |   |--- [devices]
->    |     |--- [<type-id>]
->    |     |   |--- create
-> @@ -209,6 +210,7 @@ Directories and files under the sysfs for Each Physical Device
->    |     |   |--- available_instances
->    |     |   |--- device_api
->    |     |   |--- description
-> +  |     |   |--- version
->    |     |   |--- [devices]
->    |     |--- [<type-id>]
->    |          |--- create
-> @@ -216,6 +218,7 @@ Directories and files under the sysfs for Each Physical Device
->    |          |--- available_instances
->    |          |--- device_api
->    |          |--- description
-> +  |          |--- version
->    |          |--- [devices]
->  
->  * [mdev_supported_types]
-> @@ -225,6 +228,8 @@ Directories and files under the sysfs for Each Physical Device
->    [<type-id>], device_api, and available_instances are mandatory attributes
->    that should be provided by vendor driver.
->  
-> +  version is a mandatory attribute if a mdev device supports live migration.
-> +
->  * [<type-id>]
->  
->    The [<type-id>] name is created by adding the device driver string as a prefix
-> @@ -246,6 +251,35 @@ Directories and files under the sysfs for Each Physical Device
->    This attribute should show the number of devices of type <type-id> that can be
->    created.
->  
-> +* version
-> +
-> +  This attribute is rw. It is used to check whether two devices are compatible
-> +  for live migration. If this attribute is missing, then the corresponding mdev
-> +  device is regarded as not supporting live migration.
-> +
-> +  It consists of two parts: common part and vendor proprietary part.
-> +  common part: 32 bit. lower 16 bits is vendor id and higher 16 bits identifies
-> +               device type. e.g., for pci device, it is
-> +               "pci vendor id" | (VFIO_DEVICE_FLAGS_PCI << 16).
-> +  vendor proprietary part: this part is varied in length. vendor driver can
-> +               specify any string to identify a device.
-> +
-> +  When reading this attribute, it should show device version string of the device
-> +  of type <type-id>. If a device does not support live migration, it should
-> +  return errno.
-> +  When writing a string to this attribute, it returns errno for incompatibility
-> +  or returns written string length in compatibility case. If a device does not
-> +  support live migration, it always returns errno.
-> +
-> +  for example.
-> +  # cat \
-> + /sys/bus/pci/devices/0000\:00\:02.0/mdev_supported_types/i915-GVTg_V5_2/version
-> +  00028086-193b-i915-GVTg_V5_2
-> +
-> +  #echo 00028086-193b-i915-GVTg_V5_2 > \
-> + /sys/bus/pci/devices/0000\:00\:02.0/mdev_supported_types/i915-GVTg_V5_4/version
-> + -bash: echo: write error: Invalid argument
-> +
-
-IIUC this path is against the physical device. IOW, the mgmt app would have
-to first write to the "version" file to choose a version, and then write to
-the "create" file to actually create an virtual device. This has the obvious
-concurrency problem if multiple devices are being created at the same time
-and distinct versions for each device are required. There would need to be
-a locking scheme defined to ensure safety.
-
-Wouldn't it be better if we can pass the desired version when we write to
-the "create" file, so that we avoid any concurrent usage problems. "version"
-could be just a read-only file with a *list* of supported versions.
-
-eg
-
-  $ cat /sys/bus/pci/devices/0000\:00\:02.0/mdev_supported_types/i915-GVTg_V5_4/version
-  5.0
-  5.1
-  5.2
-
-  $ echo "83b8f4f2-509f-382f-3c1e-e6bfe0fa1001;version=5.2" >
-      /sys/devices/virtual/mtty/mtty/mdev_supported_types/mtty-2/create
-
-
-Regards,
-Daniel
--- 
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
 
