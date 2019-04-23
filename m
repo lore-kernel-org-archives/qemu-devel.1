@@ -2,91 +2,63 @@ Return-Path: <SRS0=zUjA=SZ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.7 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-10.9 required=3.0
+	tests=HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DD39BC282E1
-	for <qemu-devel@archiver.kernel.org>; Tue, 23 Apr 2019 17:02:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DF528C10F03
+	for <qemu-devel@archiver.kernel.org>; Tue, 23 Apr 2019 17:17:31 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A6AF62148D
-	for <qemu-devel@archiver.kernel.org>; Tue, 23 Apr 2019 17:02:19 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="gHN9R1xl"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A6AF62148D
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id B1B9B21738
+	for <qemu-devel@archiver.kernel.org>; Tue, 23 Apr 2019 17:17:31 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B1B9B21738
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:56837 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:56992 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hIyoE-0000TT-I8
-	for qemu-devel@archiver.kernel.org; Tue, 23 Apr 2019 13:02:18 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:57262)
+	id 1hIz2w-0005gx-Qm
+	for qemu-devel@archiver.kernel.org; Tue, 23 Apr 2019 13:17:30 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:36560)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1hIymx-0008Eo-NT
-	for qemu-devel@nongnu.org; Tue, 23 Apr 2019 13:01:00 -0400
+	(envelope-from <lersek@redhat.com>) id 1hIz1F-00052u-Q3
+	for qemu-devel@nongnu.org; Tue, 23 Apr 2019 13:15:47 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1hIymw-0007Py-SZ
-	for qemu-devel@nongnu.org; Tue, 23 Apr 2019 13:00:59 -0400
-Received: from mail-pf1-x429.google.com ([2607:f8b0:4864:20::429]:33223)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1hIymw-0007Ou-LY
-	for qemu-devel@nongnu.org; Tue, 23 Apr 2019 13:00:58 -0400
-Received: by mail-pf1-x429.google.com with SMTP id h5so7804624pfo.0
-	for <qemu-devel@nongnu.org>; Tue, 23 Apr 2019 10:00:58 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
-	h=subject:to:cc:references:from:openpgp:message-id:date:user-agent
-	:mime-version:in-reply-to:content-language:content-transfer-encoding;
-	bh=Rs7tr5dHvFZsr5x/Cpg6JFvLu9Pu4xPc51f7CuCvXtk=;
-	b=gHN9R1xl3mU36yUhkQ8Qb87cnO5H+ccHjUVivxPNJrHEs9pRMXuBOyTw8JQI72fsER
-	0UgCvlh7ya4S2INulgXllauXDUUncOSzr8u12U1oyUAUjQ9iJW4g3nUe4Y2zBqUrtrVB
-	UTOKaJu1bkajxbKh/3fxoBdhghVeGGkAmGtSZk5vtGYIyxz0PljWLZbjNE2laiEe6s8S
-	7YoVdw3AjkJBzedUjeHNp/oBlVs1DM4v4hY+6uVcZASb+D6jW2W8id+HOMAfvLOZEso0
-	lNuWWtVg2pjP3nXPO/vLetLcue/zPq8+sGo7/OVnYlQEq0HaDkcgc5lEJYCSV5TujWJf
-	RFxg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=1e100.net; s=20161025;
-	h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
-	:date:user-agent:mime-version:in-reply-to:content-language
-	:content-transfer-encoding;
-	bh=Rs7tr5dHvFZsr5x/Cpg6JFvLu9Pu4xPc51f7CuCvXtk=;
-	b=qnjkjd4qtL15/pRNlyJUyJuRWaQqt/TAcmixl3zAJ/IMMPpYRcCRIfZQgoyvJRQC/T
-	uJDfvQ6sXuMtfPv74edovkU38eiPboaYcaG+Q3OqaJrjkA2qY8YV8QdXl53GRyq1Mfm4
-	mCsZbZozRJlwgHHWDc8YhHVDYQA3s5UVCfok+6AIAYBGdEcaNkDp5UMx2wPdd5cYhML8
-	5DmKHS1CyIhwf7S/BMg4ctbyOfXjLDyZDNW1cjdKXIsNfm3hxw8zPZLVHIEpFKvFL6zs
-	MlOIepv7xkMkSFKGHQgJxjY8Mg+vqbZQ8E8OvDXZHYt4sVn8DUIm+jawB047//ZzzasJ
-	+TWw==
-X-Gm-Message-State: APjAAAUdhz1ZG1CMKsRzaaRkBrSp8mCqgrqGcpctNGMtNMVRqHxvH/PE
-	NvBoPy5l/DULvx5WSRdbh20ofA==
-X-Google-Smtp-Source: APXvYqxqNm30WEzSzwSSTbm6iMvpKYiktqMATB1UdSGs2QJGDnuBuzMAQVPhln5ASMhQ6oJmvTS/KQ==
-X-Received: by 2002:a62:a515:: with SMTP id v21mr28428524pfm.41.1556038857563; 
-	Tue, 23 Apr 2019 10:00:57 -0700 (PDT)
-Received: from [192.168.1.11] (97-113-179-147.tukw.qwest.net. [97.113.179.147])
-	by smtp.gmail.com with ESMTPSA id
-	a17sm29657974pfj.123.2019.04.23.10.00.55
-	(version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-	Tue, 23 Apr 2019 10:00:56 -0700 (PDT)
-To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>,
+	(envelope-from <lersek@redhat.com>) id 1hIz1D-0005GS-Um
+	for qemu-devel@nongnu.org; Tue, 23 Apr 2019 13:15:45 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:26652)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <lersek@redhat.com>) id 1hIz1C-0005DH-1K
+	for qemu-devel@nongnu.org; Tue, 23 Apr 2019 13:15:42 -0400
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+	[10.5.11.23])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 0BFC2F74AF;
+	Tue, 23 Apr 2019 17:15:39 +0000 (UTC)
+Received: from lacos-laptop-7.usersys.redhat.com (ovpn-125-214.rdu2.redhat.com
+	[10.10.125.214])
+	by smtp.corp.redhat.com (Postfix) with ESMTP id 30AFE19936;
+	Tue, 23 Apr 2019 17:15:22 +0000 (UTC)
+From: Laszlo Ersek <lersek@redhat.com>
+To: berrange@redhat.com, eblake@redhat.com, f4bug@amsat.org,
+	imammedo@redhat.com, kraxel@redhat.com, mprivozn@redhat.com,
+	mst@redhat.com, peter.maydell@linaro.org, philmd@redhat.com,
 	qemu-devel@nongnu.org
-References: <20190423102145.14812-1-f4bug@amsat.org>
-From: Richard Henderson <richard.henderson@linaro.org>
-Openpgp: preference=signencrypt
-Message-ID: <0ccf7480-4f78-14af-c03e-8c28e41b1e32@linaro.org>
-Date: Tue, 23 Apr 2019 10:00:54 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
-	Thunderbird/60.6.1
+Date: Tue, 23 Apr 2019 19:15:08 +0200
+Message-Id: <20190423171520.4511-1-lersek@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20190423102145.14812-1-f4bug@amsat.org>
 Content-Type: text/plain; charset="UTF-8"
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
-	recognized.
-X-Received-From: 2607:f8b0:4864:20::429
-Subject: Re: [Qemu-devel] [PATCH 0/2] tcg: more tcg_gen_abs() uses
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+	(mx1.redhat.com [10.5.110.38]);
+	Tue, 23 Apr 2019 17:15:39 +0000 (UTC)
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 209.132.183.28
+Subject: [Qemu-devel] [PULL 00/12] bundle edk2 platform firmware with QEMU
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -98,21 +70,103 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Bastian Koppelmann <kbastian@mail.uni-paderborn.de>,
-	David Hildenbrand <david@redhat.com>, qemu-ppc@nongnu.org,
-	David Gibson <david@gibson.dropbear.id.au>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190423170054.Y8qHJDmlQt2J7735_-Y5fnDXHXA3QLTsn0FV2wZ2d6g@z>
+Message-ID: <20190423171508.s2KoNJxVZw9GGR3M2y0_nLWmSclOMdCedEUxCirgFvw@z>
 
-On 4/23/19 3:21 AM, Philippe Mathieu-Daudé wrote:
-> Philippe Mathieu-Daudé (2):
->   target/ppc: Use tcg_gen_abs_i32
->   target/tricore: Use tcg_gen_abs_tl
+Picked up the new feedback tags from the v4 thread, which had been
+posted at:
+- https://lists.gnu.org/archive/html/qemu-devel/2019-04/msg01549.html
+- http://mid.mail-archive.com/20190409230022.6462-1-lersek@redhat.com
 
-Queued onto tcg-vec-next.
+The following changes since commit eeba63fc7fface36f438bcbc0d3b02e7dcb599=
+83:
 
+  Update version for v4.0.0-rc4 release (2019-04-16 21:53:00 +0100)
 
-r~
+are available in the Git repository at:
+
+  https://github.com/lersek/qemu.git tags/edk2-pull-2019-04-22
+
+for you to fetch changes up to 6739df3fafaa3e2ec37af23fd77d2119869f4a4f:
+
+  MAINTAINERS: add the "EDK2 Firmware" subsystem (2019-04-17 15:38:35 +02=
+00)
+
+----------------------------------------------------------------
+Advance the roms/edk2 submodule to the "edk2-stable201903" release, and
+build and capture platform firmware binaries from that release. The
+binaries are meant to be used by both end-users and by the "BIOS tables"
+unit tests in qtest ("make check").
+
+----------------------------------------------------------------
+Laszlo Ersek (12):
+      roms: lift "edk2-funcs.sh" from "tests/uefi-test-tools/build.sh"
+      roms/edk2-funcs.sh: require gcc-4.8+ for building i386 and x86_64
+      tests/uefi-test-tools/build.sh: work around TianoCore#1607
+      roms/edk2: advance to tag edk2-stable201903
+      roms/edk2-funcs.sh: add the qemu_edk2_get_thread_count() function
+      roms/Makefile: replace the $(EDK2_EFIROM) target with "edk2-basetoo=
+ls"
+      roms: build edk2 firmware binaries and variable store templates
+      pc-bios: add edk2 firmware binaries and variable store templates
+      pc-bios: document the edk2 firmware images; add firmware descriptor=
+s
+      tests: add missing dependency to build QTEST_QEMU_BINARY, round 2
+      Makefile: install the edk2 firmware images and their descriptors
+      MAINTAINERS: add the "EDK2 Firmware" subsystem
+
+ .gitignore                                     |   1 +
+ MAINTAINERS                                    |  12 ++
+ Makefile                                       |  29 ++-
+ configure                                      |   1 +
+ pc-bios/README                                 |  11 ++
+ pc-bios/descriptors/50-edk2-i386-secure.json   |  34 ++++
+ pc-bios/descriptors/50-edk2-x86_64-secure.json |  35 ++++
+ pc-bios/descriptors/60-edk2-aarch64.json       |  31 +++
+ pc-bios/descriptors/60-edk2-arm.json           |  31 +++
+ pc-bios/descriptors/60-edk2-i386.json          |  33 ++++
+ pc-bios/descriptors/60-edk2-x86_64.json        |  34 ++++
+ pc-bios/edk2-aarch64-code.fd.bz2               | Bin 0 -> 1177603 bytes
+ pc-bios/edk2-arm-code.fd.bz2                   | Bin 0 -> 1173662 bytes
+ pc-bios/edk2-arm-vars.fd.bz2                   | Bin 0 -> 263 bytes
+ pc-bios/edk2-i386-code.fd.bz2                  | Bin 0 -> 1688659 bytes
+ pc-bios/edk2-i386-secure-code.fd.bz2           | Bin 0 -> 1881979 bytes
+ pc-bios/edk2-i386-vars.fd.bz2                  | Bin 0 -> 190 bytes
+ pc-bios/edk2-licenses.txt                      | 209 +++++++++++++++++++=
++
+ pc-bios/edk2-x86_64-code.fd.bz2                | Bin 0 -> 1669280 bytes
+ pc-bios/edk2-x86_64-secure-code.fd.bz2         | Bin 0 -> 1901210 bytes
+ roms/Makefile                                  |   9 +-
+ roms/Makefile.edk2                             | 148 +++++++++++++++
+ roms/edk2                                      |   2 +-
+ roms/edk2-build.sh                             |  55 ++++++
+ roms/edk2-funcs.sh                             | 253 +++++++++++++++++++=
+++++++
+ tests/Makefile.include                         |   2 +-
+ tests/uefi-test-tools/build.sh                 | 100 +---------
+ 27 files changed, 934 insertions(+), 96 deletions(-)
+ create mode 100644 pc-bios/descriptors/50-edk2-i386-secure.json
+ create mode 100644 pc-bios/descriptors/50-edk2-x86_64-secure.json
+ create mode 100644 pc-bios/descriptors/60-edk2-aarch64.json
+ create mode 100644 pc-bios/descriptors/60-edk2-arm.json
+ create mode 100644 pc-bios/descriptors/60-edk2-i386.json
+ create mode 100644 pc-bios/descriptors/60-edk2-x86_64.json
+ create mode 100644 pc-bios/edk2-aarch64-code.fd.bz2
+ create mode 100644 pc-bios/edk2-arm-code.fd.bz2
+ create mode 100644 pc-bios/edk2-arm-vars.fd.bz2
+ create mode 100644 pc-bios/edk2-i386-code.fd.bz2
+ create mode 100644 pc-bios/edk2-i386-secure-code.fd.bz2
+ create mode 100644 pc-bios/edk2-i386-vars.fd.bz2
+ create mode 100644 pc-bios/edk2-licenses.txt
+ create mode 100644 pc-bios/edk2-x86_64-code.fd.bz2
+ create mode 100644 pc-bios/edk2-x86_64-secure-code.fd.bz2
+ create mode 100644 roms/Makefile.edk2
+ create mode 100755 roms/edk2-build.sh
+ create mode 100644 roms/edk2-funcs.sh
+
+--=20
+2.19.1.3.g30247aa5d201
+
 
