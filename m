@@ -2,90 +2,79 @@ Return-Path: <SRS0=zUjA=SZ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.7 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2C79AC10F14
-	for <qemu-devel@archiver.kernel.org>; Tue, 23 Apr 2019 14:08:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 20717C10F14
+	for <qemu-devel@archiver.kernel.org>; Tue, 23 Apr 2019 14:10:08 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D6C2220645
-	for <qemu-devel@archiver.kernel.org>; Tue, 23 Apr 2019 14:08:55 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (4096-bit key) header.d=crudebyte.com header.i=@crudebyte.com header.b="hgoFmFfp"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D6C2220645
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=nongnu.org
+	by mail.kernel.org (Postfix) with ESMTPS id E1ECE20645
+	for <qemu-devel@archiver.kernel.org>; Tue, 23 Apr 2019 14:10:07 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E1ECE20645
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:54375 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:54385 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hIw6R-0001cH-4A
-	for qemu-devel@archiver.kernel.org; Tue, 23 Apr 2019 10:08:55 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:40485)
+	id 1hIw7b-0002eF-4O
+	for qemu-devel@archiver.kernel.org; Tue, 23 Apr 2019 10:10:07 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:40650)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <qemu_oss@crudebyte.com>) id 1hIw2W-00074J-6j
-	for qemu-devel@nongnu.org; Tue, 23 Apr 2019 10:04:54 -0400
+	(envelope-from <philmd@redhat.com>) id 1hIw2m-0007E0-NS
+	for qemu-devel@nongnu.org; Tue, 23 Apr 2019 10:05:11 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <qemu_oss@crudebyte.com>) id 1hIvuW-0000Tk-1Y
-	for qemu-devel@nongnu.org; Tue, 23 Apr 2019 09:56:37 -0400
-Received: from kylie.crudebyte.com ([5.189.157.229]:59567)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <qemu_oss@crudebyte.com>)
-	id 1hIvuV-0000R3-Jt
-	for qemu-devel@nongnu.org; Tue, 23 Apr 2019 09:56:35 -0400
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=crudebyte.com; s=kylie; h=Content-Type:Content-Transfer-Encoding:
-	MIME-Version:Message-ID:Date:Subject:Cc:To:From:Sender:Reply-To:Content-ID:
-	Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
-	:Resent-Message-ID:In-Reply-To:References:List-Id:List-Help:List-Unsubscribe:
-	List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=jmzD717GLRuwmyta9m8n6QZG8VJl/tG9CHlxJQmsXmY=;
-	b=hgoFmFfpp2a4lC6VCjlxpah3Yk
-	sgTydufPxwxTcujlJClMlLtachiurdYPt6FM/wrwoy5JBrHqejHyj11yVV3x6QckSE/0hO6mGoCHz
-	nWXPIT0iRpwFzh4xNITZBTikBUoG2095dvlFyai4C+125NCcewC+Fi4yXMQYBucuvAi3GaUAHby9X
-	r0HkSYe1/5Yl5dQRxhwH1fTVt/sf5EfrT1DBaFoEs41SQIVDussXwg+JMGYVKOkN14v5oW1y1YL4L
-	Qcxgugr7nVbjmTXzWGodDZFkrN5tAkFZ/SimwX/C6B+DkluqOGcXb8c8WOYC4ygqcqJSj4lsjmoKF
-	G6KUJEUptVb4QeovN4wybnvYq/c/ZR/XD1J/45VPonNEO2MQ+8Hs+PaG2YfH/zAxqQEhCOiEOKVZs
-	8bzPi4ziVUCCW2XBmaCAkBwVkr9GR4rOelNQE0/q4PNB4Ps4wkmrWGWMFwAgFyH/OBEPiFgeOLtiK
-	BsYaCVMtuLWAReAlPtF2SIuo+s5ohh+0mhxM2qLz+GO25lHNQnJ5Q3Dxt6aHok/+tDhAnoXXDK88X
-	glW8h+yx+bPkJSQnGCn5o4xbBaK8GxVUWj9DBFLyZQH6mRMYPcYLG2undKralLAxyeviWIOw39FU5
-	js61Y4XrBFsZESp7FXo1R7spMx8ME329y4BEtQRcA=;
-To: qemu-devel@nongnu.org
-Date: Tue, 23 Apr 2019 15:56:33 +0200
-Message-ID: <2736976.mc3WPJycmO@silver>
+	(envelope-from <philmd@redhat.com>) id 1hIvpO-0004gr-6M
+	for qemu-devel@nongnu.org; Tue, 23 Apr 2019 09:51:19 -0400
+Received: from mail-wm1-f65.google.com ([209.85.128.65]:36841)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1hIvpM-0004bm-6N
+	for qemu-devel@nongnu.org; Tue, 23 Apr 2019 09:51:18 -0400
+Received: by mail-wm1-f65.google.com with SMTP id h18so176732wml.1
+	for <qemu-devel@nongnu.org>; Tue, 23 Apr 2019 06:51:14 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=1e100.net; s=20161025;
+	h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
+	:date:user-agent:mime-version:in-reply-to:content-language
+	:content-transfer-encoding;
+	bh=UJKWD47nqM2wGkGsmDBqG8dfOJ5VfNgoqcVJ9KPcEEY=;
+	b=Q65meZHtMbTtAGDlLBjqxsBKURntGF0wk8zcRB1ytUHB81saGy5G3rbnNjw36FMOq1
+	zIvXOZBLNuZ7O38wu5sonNnuW2ndQdPY+E4qoyZXMHTt9yqZy99enSG7QVQqauSzVaKa
+	n0JCBYfprU3coKaoIeviw9QlEZ3gBUzo61Q6Ya9k1h/CqW7WLsBumO/ZgejfbdTfHC1I
+	T19mUwvSZf5XGB9htDVPX2IlhPnOPJB+G+dj1q+lkOESQEyv2PwLSnO9gDe5vllaZmyN
+	ReKuB434VFP44tLqwyTeqh4iYa+99fXSJSZZzcnzclNYA8Yt+u++PbPQluiQ3R1rljm7
+	yA2w==
+X-Gm-Message-State: APjAAAUxd9w/ie1RsdLsA9lpELsKn2d5ljxBuKkjsaMqQQ4n72QlChd9
+	YpkaYz6LinVVkcwg/rS31p7mKw==
+X-Google-Smtp-Source: APXvYqw1SAPmb5sLQDKx598xHowsFhZr0TyOl3S5YUJHSLrdeRiGhzbW74cC4GxjOQ2B8/788vSXlw==
+X-Received: by 2002:a1c:a9cb:: with SMTP id s194mr2242031wme.62.1556027473842; 
+	Tue, 23 Apr 2019 06:51:13 -0700 (PDT)
+Received: from [192.168.1.25] (atoulouse-656-1-803-163.w86-221.abo.wanadoo.fr.
+	[86.221.12.163])
+	by smtp.gmail.com with ESMTPSA id d6sm15001292wrp.9.2019.04.23.06.51.12
+	(version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+	Tue, 23 Apr 2019 06:51:13 -0700 (PDT)
+To: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>, qemu-devel@nongnu.org
+References: <1556018982-3715-1-git-send-email-aleksandar.markovic@rt-rk.com>
+	<1556018982-3715-7-git-send-email-aleksandar.markovic@rt-rk.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Openpgp: id=89C1E78F601EE86C867495CBA2A3FD6EDEADC0DE;
+	url=http://pgp.mit.edu/pks/lookup?op=get&search=0xA2A3FD6EDEADC0DE
+Message-ID: <eee78a60-109c-6604-7f12-046ccc34d25b@redhat.com>
+Date: Tue, 23 Apr 2019 15:51:12 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+	Thunderbird/60.6.1
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7Bit
+In-Reply-To: <1556018982-3715-7-git-send-email-aleksandar.markovic@rt-rk.com>
 Content-Type: text/plain; charset="UTF-8"
-X-Spam_score: -0.0
-X-Spam_score_int: 0
-X-Spam_bar: /
-X-Spam_report: Spam detection software,
-	running on the system "kylie.crudebyte.com", 
-	has NOT identified this incoming email as spam.  The original
-	message has been attached to this so you can view it or label
-	similar future email.  If you have any questions, see
-	the administrator of that system for details.
-	Content preview: This patch aims to keep QID path identical beyond the
-	scope
-	of reboots and guest suspensions. With the 1st patch alone the QID path
-	of
-	the same files might change after reboots / suspensions, since 9p [...] 
-	Content analysis details:   (-0.0 points, 5.0 required)
-	pts rule name              description
-	---- ----------------------
-	--------------------------------------------------
-	0.0 URIBL_BLOCKED ADMINISTRATOR NOTICE: The query to URIBL was
-	blocked.  See
-	http://wiki.apache.org/spamassassin/DnsBlocklists#dnsbl-block
-	for more information. [URIs: crudebyte.com]
-	-0.0 NO_RELAYS Informational: message was not relayed via SMTP
-	-0.0 NO_RECEIVED Informational: message has no Received headers
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 5.189.157.229
-Subject: [Qemu-devel] [PATCH 3/3] 9p: persistency of QID path beyond reboots
- / suspensions
+	[fuzzy]
+X-Received-From: 209.85.128.65
+Subject: Re: [Qemu-devel] [PATCH 6/8] target/mips: Clean up lmi_helper.c
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -97,470 +86,42 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-From: Christian Schoenebeck via Qemu-devel <qemu-devel@nongnu.org>
-Reply-To: Christian Schoenebeck <qemu_oss@crudebyte.com>
-Cc: Greg Kurz <groug@kaod.org>, Antonios Motakis <antonios.motakis@huawei.com>
+Cc: arikalo@wavecomp.com, aurelien@aurel32.net, amarkovic@wavecomp.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190423135633.B0qTfFVItNMzl443jgAZ-fUaT82i1nmjg9nQNFcZviA@z>
+Message-ID: <20190423135112.Ut8SQwk8MUG9W2ZZysdXVrv8YZ8Y2Mr-30QAp6Da9OA@z>
 
-This patch aims to keep QID path identical beyond the scope of reboots and
-guest suspensions. With the 1st patch alone the QID path of the same files
-might change after reboots / suspensions, since 9p would restart with
-empty qpp_table and the resulting QID path depends on the precise sequence
-of files being accessed on guest.
+On 4/23/19 1:29 PM, Aleksandar Markovic wrote:
+> From: Aleksandar Markovic <amarkovic@wavecomp.com>
+> 
+> Remove several minor checkpatch warnings and errors.
+> 
+> Signed-off-by: Aleksandar Markovic <amarkovic@wavecomp.com>
+> ---
+>  target/mips/lmi_helper.c | 8 +++++---
+>  1 file changed, 5 insertions(+), 3 deletions(-)
+> 
+> diff --git a/target/mips/lmi_helper.c b/target/mips/lmi_helper.c
+> index fb1245b..6c645cf 100644
+> --- a/target/mips/lmi_helper.c
+> +++ b/target/mips/lmi_helper.c
+> @@ -21,9 +21,11 @@
+>  #include "cpu.h"
+>  #include "exec/helper-proto.h"
+>  
+> -/* If the byte ordering doesn't matter, i.e. all columns are treated
+> -   identically, then this union can be used directly.  If byte ordering
+> -   does matter, we generally ignore dumping to memory.  */
+> +/*
+> + * If the byte ordering doesn't matter, i.e. all columns are treated
+> + * identically, then this union can be used directly.  If byte ordering
+> + * does matter, we generally ignore dumping to memory.
+> + */
+>  typedef union {
+>      uint8_t  ub[8];
+>      int8_t   sb[8];
+> 
 
-The first patch should already avoid the vast majority of potential QID
-path collisions. However especially network services running on guest
-would still be prone to QID path issues when just using the 1st patch.
-For instance Samba is exporting file IDs to clients in the network and
-SMB cliens in the network will use those IDs to access and request
-changes on the file server. If guest is now interrupted in between, like
-it commonly happens on maintenance, e.g. software updates on host, then
-SMB clients in the network will continue working with old file IDs, which
-in turn leads to data corruption and data loss on the file server.
-Furthermore on SMB client side I also encountered severe misbehaviours in
-this case, for instance Macs accessing the file server would either
-start to hang or die with a kernel panic within seconds, since the smbx
-implementation on macOS heavily relies on file IDs being unique (within
-the context of a connection that is).
-
-So this patch here mitigates the remaining problem described above by
-storing the qpp_table persistently as extended attribute(s) on the
-exported root of the file system and automatically tries to restore the
-qpp_table i.e. after reboots / resumptions.
-
-This patch is aimed at real world scenarios, in which qpp_table will only
-ever get few dozens of entries (and none ever in qpf_table). So it is e.g.
-intentionally limited to only store qpp_table, not qpf_table; and so far
-I have not made optimizations, since in practice the qpf_table is really
-just tiny.
-
-Since there is currently no callback in qemu yet that would reliably be
-called on guest shutdowns, the table is stored on every new insertion for
-now.
-
-Signed-off-by: Christian Schoenebeck <qemu_oss@crudebyte.com>
----
- hw/9pfs/9p.c | 315 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++-
- hw/9pfs/9p.h |  33 +++++++
- 2 files changed, 343 insertions(+), 5 deletions(-)
-
-diff --git a/hw/9pfs/9p.c b/hw/9pfs/9p.c
-index 2b893e25a1..29c6dfc68a 100644
---- a/hw/9pfs/9p.c
-+++ b/hw/9pfs/9p.c
-@@ -26,6 +26,19 @@
- #include "migration/blocker.h"
- #include "sysemu/qtest.h"
- #include "qemu/xxhash.h"
-+#include "qemu/crc32c.h"
-+#if defined(__linux__) /* TODO: This should probably go into osdep.h instead */
-+# include <linux/limits.h> /* for XATTR_SIZE_MAX */
-+#endif
-+
-+/*
-+ * How many bytes may we store to fs per extended attribute value?
-+ */
-+#ifdef XATTR_SIZE_MAX
-+# define ATTR_MAX_SIZE XATTR_SIZE_MAX /* Linux only: 64kB limit in kernel */
-+#else
-+# define ATTR_MAX_SIZE 65536 /* Most systems allow a bit more, so we take this as basis.  */
-+#endif
- 
- int open_fd_hw;
- int total_open_fd;
-@@ -642,6 +655,285 @@ static int qid_path_fullmap(V9fsPDU *pdu, const struct stat *stbuf,
-     return 0;
- }
- 
-+static inline bool is_ro_export(FsContext *ctx)
-+{
-+    return ctx->export_flags & V9FS_RDONLY;
-+}
-+
-+/*
-+ * Once qpp_table size exceeds this value, we no longer save
-+ * the table persistently. See comment in v9fs_store_qpp_table()
-+ */
-+#define QPP_TABLE_PERSISTENCY_LIMIT 32768
-+
-+/* Remove all user.virtfs.system.qidp.* xattrs from export root. */
-+static void remove_qidp_xattr(FsContext *ctx)
-+{
-+    V9fsString name;
-+    int i;
-+
-+    /* just for a paranoid endless recursion sanity check */
-+    const ssize_t max_size =
-+        sizeof(QppSrlzHeader) +
-+        QPP_TABLE_PERSISTENCY_LIMIT * sizeof(QppEntryS);
-+
-+    v9fs_string_init(&name);
-+    for (i = 0; i * ATTR_MAX_SIZE < max_size; ++i) {
-+        v9fs_string_sprintf(&name, "user.virtfs.system.qidp.%d", i);
-+        if (lremovexattr(ctx->fs_root, name.data) < 0)
-+            break;
-+    }
-+    v9fs_string_free(&name);
-+}
-+
-+/* Used to convert qpp hash table into continuous stream. */
-+static void qpp_table_serialize(void *p, uint32_t h, void *up)
-+{
-+    const QppEntry *entry = (const QppEntry*) p;
-+    QppSerialize *ser = (QppSerialize*) up;
-+
-+    if (ser->error)
-+        return;
-+
-+    /* safety first */
-+    if (entry->qp_prefix - 1 >= ser->count) {
-+        ser->error = -1;
-+        return;
-+    }
-+
-+    ser->elements[entry->qp_prefix - 1] = (QppEntryS) {
-+        .dev = entry->dev,
-+        .ino_prefix = entry->ino_prefix
-+    };
-+    ser->done++;
-+}
-+
-+/*
-+ * Tries to store the current qpp_table as extended attribute(s) on the
-+ * exported file system root with the goal to preserve identical qids
-+ * beyond the scope of reboots.
-+ */
-+static void v9fs_store_qpp_table(V9fsState *s)
-+{
-+    FsContext *ctx = &s->ctx;
-+    V9fsString name;
-+    int i, res;
-+    size_t size;
-+    QppSrlzStream* stream;
-+    QppSerialize ser;
-+
-+    if (is_ro_export(ctx))
-+        return;
-+
-+    /*
-+     * Whenever we exceeded some certain (arbitrary) high qpp_table size we
-+     * delete the stored table from the file system to get rid of old device
-+     * ids / inodes that might no longer exist with the goal to potentially
-+     * yield in a smaller table size after next reboot.
-+     */
-+    if (!s->qp_prefix_next || s->qp_prefix_next >= QPP_TABLE_PERSISTENCY_LIMIT) {
-+        if (s->qp_prefix_next == QPP_TABLE_PERSISTENCY_LIMIT) {
-+            remove_qidp_xattr(ctx);
-+        }
-+        return;
-+    }
-+
-+    /* Convert qpp hash table into continuous array. */
-+    size = sizeof(QppSrlzHeader) +
-+           ( (s->qp_prefix_next - 1) /* qpp_table entry count */ * sizeof(QppEntryS) );
-+    stream = g_malloc0(size);
-+    ser = (QppSerialize) {
-+        .elements = &stream->elements[0],
-+        .count = s->qp_prefix_next - 1,
-+        .done  = 0,
-+        .error = 0,
-+    };
-+    qht_iter(&s->qpp_table, qpp_table_serialize, &ser);
-+    if (ser.error || ser.done != ser.count)
-+        goto out;
-+
-+    /* initialize header and calculate CRC32 checksum */
-+    stream->header = (QppSrlzHeader) {
-+        .version = 1,
-+        .reserved = 0,
-+        .crc32 = crc32c(
-+            0xffffffff,
-+            (const uint8_t*) &stream->elements[0],
-+            (ser.count * sizeof(QppEntryS))
-+        ),
-+    };
-+
-+    /*
-+     * Actually just required if the qpp_table size decreased, or if the
-+     * previous xattr size limit increased on OS (kernel/fs) level.
-+     */
-+    remove_qidp_xattr(ctx);
-+
-+    /*
-+     * Subdivide (if required) the data stream into individual xattrs
-+     * to cope with the system's max. supported xattr value size.
-+     */
-+    v9fs_string_init(&name);
-+    for (i = 0; size > (i * ATTR_MAX_SIZE); ++i) {
-+        v9fs_string_sprintf(&name, "user.virtfs.system.qidp.%d", i);
-+        res = lsetxattr(
-+            ctx->fs_root,
-+            name.data,
-+            ((const uint8_t*)stream) + i * ATTR_MAX_SIZE,
-+            MIN(ATTR_MAX_SIZE, size - i * ATTR_MAX_SIZE),
-+            0/*flags*/
-+        );
-+        if (res < 0) {
-+            if (i > 0)
-+                remove_qidp_xattr(ctx);
-+            break;
-+        }
-+    }
-+    v9fs_string_free(&name);
-+out:
-+    g_free(stream);
-+}
-+
-+/* Frees the entire chain of passed nodes from memory. */
-+static void destroy_xattr_nodes(XAttrNode **first)
-+{
-+    XAttrNode *prev;
-+    if (!first)
-+        return;
-+    while (*first) {
-+        if ((*first)->value)
-+            g_free((*first)->value);
-+        prev = *first;
-+        *first = (*first)->next;
-+        g_free(prev);
-+    }
-+}
-+
-+/*
-+ * Loads all user.virtfs.system.qidp.* xattrs from exported fs root and
-+ * returns a linked list with one node per xattr.
-+ */
-+static XAttrNode* v9fs_load_qidp_xattr_nodes(V9fsState *s)
-+{
-+    FsContext *ctx = &s->ctx;
-+    XAttrNode *first = NULL, *current = NULL;
-+    V9fsString name;
-+    ssize_t size;
-+    int i;
-+
-+    const ssize_t max_size =
-+        sizeof(QppSrlzHeader) +
-+        QPP_TABLE_PERSISTENCY_LIMIT * sizeof(QppEntryS);
-+
-+    v9fs_string_init(&name);
-+
-+    for (i = 0; i * ATTR_MAX_SIZE < max_size; ++i) {
-+        v9fs_string_sprintf(&name, "user.virtfs.system.qidp.%d", i);
-+        size = lgetxattr(ctx->fs_root, name.data, NULL, 0);
-+        if (size <= 0)
-+            break;
-+        if (!first) {
-+            first = current = g_malloc0(sizeof(XAttrNode));
-+        } else {
-+            current = current->next = g_malloc0(sizeof(XAttrNode));
-+        }
-+        current->value = g_malloc0(size);
-+        current->length = lgetxattr(
-+            ctx->fs_root, name.data, current->value, size
-+        );
-+        if (current->length <= 0) {
-+            goto out_w_err;
-+        }
-+    }
-+    goto out;
-+
-+out_w_err:
-+    destroy_xattr_nodes(&first);
-+out:
-+    v9fs_string_free(&name);
-+    return first;
-+}
-+
-+/*
-+ * Try to load previously stored qpp_table from file system. Calling this
-+ * function assumes that qpp_table is yet empty.
-+ *
-+ * @see v9fs_store_qpp_table()
-+ */
-+static void v9fs_load_qpp_table(V9fsState *s)
-+{
-+    ssize_t size, count;
-+    XAttrNode *current, *first;
-+    QppSrlzStream* stream = NULL;
-+    uint32_t crc32;
-+    int i;
-+    QppEntry *val;
-+    uint32_t hash;
-+
-+    if (s->qp_prefix_next != 1)
-+        return;
-+
-+    first = v9fs_load_qidp_xattr_nodes(s);
-+    if (!first)
-+        return;
-+
-+    /* convert nodes into continuous stream */
-+    size = 0;
-+    for (current = first; current; current = current->next) {
-+        size += current->length;
-+    }
-+    if (size <= 0) {
-+        goto out;
-+    }
-+    stream = g_malloc0(size);
-+    size = 0;
-+    for (current = first; current; current = current->next) {
-+        memcpy(((uint8_t*)stream) + size, current->value, current->length);
-+        size += current->length;
-+    }
-+
-+    if (stream->header.version != 1) {
-+        goto out;
-+    }
-+
-+    count = (size - sizeof(QppSrlzHeader)) / sizeof(QppEntryS);
-+    if (count <= 0) {
-+        goto out;
-+    }
-+
-+    /* verify CRC32 checksum of stream */
-+    crc32 = crc32c(
-+        0xffffffff,
-+        (const uint8_t*) &stream->elements[0],
-+        (count * sizeof(QppEntryS))
-+    );
-+    if (crc32 != stream->header.crc32) {
-+        goto out;
-+    }
-+
-+    /* fill qpp_table with the retrieved elements */
-+    for (i = 0; i < count; ++i) {
-+        val = g_malloc0(sizeof(QppEntry));
-+        *val = (QppEntry) {
-+            .dev = stream->elements[i].dev,
-+            .ino_prefix = stream->elements[i].ino_prefix,
-+        };
-+        hash = qpp_hash(*val);
-+        if (qht_lookup(&s->qpp_table, val, hash)) {
-+            /* should never happen: duplicate entry detected */
-+            g_free(val);
-+            goto out;
-+        }
-+        val->qp_prefix = s->qp_prefix_next++;
-+        qht_insert(&s->qpp_table, val, hash, NULL);
-+    }
-+
-+out:
-+    destroy_xattr_nodes(&first);
-+    if (stream)
-+        g_free(stream);
-+}
-+
- /* stat_to_qid needs to map inode number (64 bits) and device id (32 bits)
-  * to a unique QID path (64 bits). To avoid having to map and keep track
-  * of up to 2^64 objects, we map only the 16 highest bits of the inode plus
-@@ -675,6 +967,14 @@ static int qid_path_prefixmap(V9fsPDU *pdu, const struct stat *stbuf,
-         /* new unique inode prefix and device combo */
-         val->qp_prefix = pdu->s->qp_prefix_next++;
-         qht_insert(&pdu->s->qpp_table, val, hash, NULL);
-+
-+        /*
-+         * Store qpp_table as extended attribute(s) to file system.
-+         *
-+         * TODO: This should better only be called from a guest shutdown and
-+         * suspend handler.
-+         */
-+        v9fs_store_qpp_table(pdu->s);
-     }
- 
-     *path = ((uint64_t)val->qp_prefix << 48) | (stbuf->st_ino & QPATH_INO_MASK);
-@@ -1064,11 +1364,6 @@ static void v9fs_fix_path(V9fsPath *dst, V9fsPath *src, int len)
-     v9fs_path_free(&str);
- }
- 
--static inline bool is_ro_export(FsContext *ctx)
--{
--    return ctx->export_flags & V9FS_RDONLY;
--}
--
- static void coroutine_fn v9fs_version(void *opaque)
- {
-     ssize_t err;
-@@ -3784,6 +4079,8 @@ int v9fs_device_realize_common(V9fsState *s, const V9fsTransport *t,
-     qht_init(&s->qpp_table, qpp_cmp_func, 1, QHT_MODE_AUTO_RESIZE);
-     s->qp_prefix_next = 1; /* reserve 0 to detect overflow */
-     s->qp_fullpath_next = 1;
-+    /* try to load and restore previous qpp_table */
-+    v9fs_load_qpp_table(s);
- 
-     s->ctx.fst = &fse->fst;
-     fsdev_throttle_init(s->ctx.fst);
-@@ -3807,6 +4104,14 @@ out:
- 
- void v9fs_device_unrealize_common(V9fsState *s, Error **errp)
- {
-+    /*
-+     * Store qpp_table as extended attribute(s) to file system.
-+     *
-+     * This was actually plan A, but unfortunately unserialize is not called
-+     * reliably on guest shutdowns and suspensions.
-+     */
-+    v9fs_store_qpp_table(s);
-+
-     if (s->ops->cleanup) {
-         s->ops->cleanup(&s->ctx);
-     }
-diff --git a/hw/9pfs/9p.h b/hw/9pfs/9p.h
-index 44112ea97f..54ce039969 100644
---- a/hw/9pfs/9p.h
-+++ b/hw/9pfs/9p.h
-@@ -245,6 +245,13 @@ typedef struct {
-     uint16_t qp_prefix;
- } QppEntry;
- 
-+/* Small version of QppEntry for serialization as xattr. */
-+struct QppEntryS {
-+    dev_t dev;
-+    uint16_t ino_prefix;
-+} __attribute__((packed));
-+typedef struct QppEntryS QppEntryS;
-+
- /* QID path full entry, as above */
- typedef struct {
-     dev_t dev;
-@@ -252,6 +259,32 @@ typedef struct {
-     uint64_t path;
- } QpfEntry;
- 
-+typedef struct {
-+    QppEntryS *elements;
-+    uint count; /* In: QppEntryS count in @a elements */
-+    uint done; /* Out: how many QppEntryS did we actually fill in @a elements */
-+    int error; /* Out: zero on success */
-+} QppSerialize;
-+
-+struct QppSrlzHeader {
-+    uint16_t version;
-+    uint16_t reserved; /* might be used e.g. for flags in future */
-+    uint32_t crc32;
-+} __attribute__((packed));
-+typedef struct QppSrlzHeader QppSrlzHeader;
-+
-+struct QppSrlzStream {
-+    QppSrlzHeader header;
-+    QppEntryS elements[0];
-+} __attribute__((packed));
-+typedef struct QppSrlzStream QppSrlzStream;
-+
-+typedef struct XAttrNode {
-+    uint8_t* value;
-+    ssize_t length;
-+    struct XAttrNode* next;
-+} XAttrNode;
-+
- struct V9fsState
- {
-     QLIST_HEAD(, V9fsPDU) free_list;
--- 
-2.11.0
-
-
+Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
 
