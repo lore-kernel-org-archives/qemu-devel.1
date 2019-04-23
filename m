@@ -1,27 +1,25 @@
-Received: from eggs.gnu.org ([209.51.188.92]:51177)
+Received: from eggs.gnu.org ([209.51.188.92]:54377)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <rth7680@gmail.com>) id 1hIyRX-0002Hy-0p
-	for qemu-devel@nongnu.org; Tue, 23 Apr 2019 12:38:51 -0400
+	(envelope-from <berrange@redhat.com>) id 1hIyhR-00061k-AM
+	for qemu-devel@nongnu.org; Tue, 23 Apr 2019 12:55:18 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <rth7680@gmail.com>) id 1hIyRW-0005QP-1H
-	for qemu-devel@nongnu.org; Tue, 23 Apr 2019 12:38:50 -0400
-Received: from mail-pl1-x643.google.com ([2607:f8b0:4864:20::643]:32930)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <rth7680@gmail.com>) id 1hIyRV-0005NW-Ri
-	for qemu-devel@nongnu.org; Tue, 23 Apr 2019 12:38:49 -0400
-Received: by mail-pl1-x643.google.com with SMTP id t16so7813579plo.0
-	for <qemu-devel@nongnu.org>; Tue, 23 Apr 2019 09:38:46 -0700 (PDT)
-Sender: Richard Henderson <rth7680@gmail.com>
-References: <20190423063621.8203-1-nick.hudson@gmx.co.uk>
-From: Richard Henderson <rth@twiddle.net>
-Message-ID: <ef95d1db-8fca-db17-2343-565e814905fd@twiddle.net>
-Date: Tue, 23 Apr 2019 09:38:42 -0700
+	(envelope-from <berrange@redhat.com>) id 1hIyhQ-0000Bd-5M
+	for qemu-devel@nongnu.org; Tue, 23 Apr 2019 12:55:17 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:32116)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1hIyhP-0000AX-Ts
+	for qemu-devel@nongnu.org; Tue, 23 Apr 2019 12:55:16 -0400
+Date: Tue, 23 Apr 2019 17:55:01 +0100
+From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+Message-ID: <20190423165501.GA27867@redhat.com>
+Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+References: <cover.1550842915.git.berto@igalia.com>
 MIME-Version: 1.0
-In-Reply-To: <20190423063621.8203-1-nick.hudson@gmx.co.uk>
 Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v3 0/2] HPPA fixes for NetBSD/hppa emulation
+Content-Disposition: inline
+In-Reply-To: <cover.1550842915.git.berto@igalia.com>
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v3 0/3] char-socket: Fix race condition
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,17 +28,57 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Nick Hudson <nick.hudson@gmx.co.uk>
-Cc: Kamil Rytarowski <kamil@netbsd.org>, "open list:NETBSD" <qemu-devel@nongnu.org>
+To: Alberto Garcia <berto@igalia.com>
+Cc: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>
 
-On 4/22/19 11:36 PM, Nick Hudson wrote:
-> v3 changes:
->  - Don't use C99 comments and fix a typo in the comment
-> 
-> v2 changes:
->  - remove old debug code
+ping - paolo/marc-andr=C3=A9 - unless I'm missing something, it looks lik=
+e
+this chardev series slipped through the cracks and missed 4.0
 
-Thanks, queued.
+On Fri, Feb 22, 2019 at 03:46:23PM +0200, Alberto Garcia wrote:
+> This fixes a race condition in which the tcp_chr_read() ioc handler
+> can close a connection that is being written to from another thread.
+>=20
+> Note: vhost-user-test still fails if QTEST_VHOST_USER_FIXME is set.
+>=20
+> Berto
+>=20
+> RFC: https://lists.gnu.org/archive/html/qemu-devel/2019-02/msg01510.htm=
+l
+>=20
+> v1: https://lists.gnu.org/archive/html/qemu-devel/2019-02/msg01834.html
+> - Fixes memory leaks and adds a qemu_idle_add() function
+>=20
+> v2: https://lists.gnu.org/archive/html/qemu-devel/2019-02/msg06137.html
+> - Rebased on top of the current master (fc3dbb90f2eb069801bfb4cfe9cbc)
+> - Patches 1 and 2: Remove the changes in char-pty.c, they're not
+>                    needed after the rebase.
+> - Patch 3: Fix conflicts after the rebase.
+>=20
+> v3:
+> - Patch 3: Add tcp_chr_disconnect_locked() [Daniel]
+>=20
+> Alberto Garcia (3):
+>   main-loop: Fix GSource leak in qio_task_thread_worker()
+>   main-loop: Add qemu_idle_add()
+>   char-socket: Lock tcp_chr_disconnect() and socket_reconnect_timeout()
+>=20
+>  chardev/char-socket.c    | 25 +++++++++++++++++++++----
+>  include/qemu/main-loop.h | 12 ++++++++++++
+>  io/task.c                |  9 +++------
+>  util/main-loop.c         |  9 +++++++++
+>  4 files changed, 45 insertions(+), 10 deletions(-)
+>=20
+> --=20
+> 2.11.0
+>=20
 
-
-r~
+Regards,
+Daniel
+--=20
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberran=
+ge :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.c=
+om :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberran=
+ge :|
