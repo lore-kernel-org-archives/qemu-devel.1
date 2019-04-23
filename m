@@ -2,67 +2,80 @@ Return-Path: <SRS0=zUjA=SZ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.3 required=3.0 tests=FROM_EXCESS_BASE64,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_MUTT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 53E28C10F14
-	for <qemu-devel@archiver.kernel.org>; Tue, 23 Apr 2019 13:45:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 713BBC10F14
+	for <qemu-devel@archiver.kernel.org>; Tue, 23 Apr 2019 13:49:46 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1580621738
-	for <qemu-devel@archiver.kernel.org>; Tue, 23 Apr 2019 13:45:58 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1580621738
+	by mail.kernel.org (Postfix) with ESMTPS id 45AB1217D9
+	for <qemu-devel@archiver.kernel.org>; Tue, 23 Apr 2019 13:49:46 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 45AB1217D9
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:54158 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:54192 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hIvkE-00034r-4H
-	for qemu-devel@archiver.kernel.org; Tue, 23 Apr 2019 09:45:58 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:37211)
+	id 1hIvnt-00049i-KE
+	for qemu-devel@archiver.kernel.org; Tue, 23 Apr 2019 09:49:45 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:38253)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1hIvif-000263-R0
-	for qemu-devel@nongnu.org; Tue, 23 Apr 2019 09:44:23 -0400
+	(envelope-from <philmd@redhat.com>) id 1hIvn2-0003qg-KF
+	for qemu-devel@nongnu.org; Tue, 23 Apr 2019 09:48:54 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1hIvie-0006uX-Br
-	for qemu-devel@nongnu.org; Tue, 23 Apr 2019 09:44:21 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:43106)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1hIvie-0006tb-2a
-	for qemu-devel@nongnu.org; Tue, 23 Apr 2019 09:44:20 -0400
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
-	[10.5.11.16])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 63B323086212;
-	Tue, 23 Apr 2019 13:44:18 +0000 (UTC)
-Received: from redhat.com (ovpn-112-50.ams2.redhat.com [10.36.112.50])
-	by smtp.corp.redhat.com (Postfix) with ESMTPS id 2B6D45C220;
-	Tue, 23 Apr 2019 13:44:02 +0000 (UTC)
-Date: Tue, 23 Apr 2019 14:44:00 +0100
-From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-To: Alex Williamson <alex.williamson@redhat.com>
-Message-ID: <20190423134400.GL6022@redhat.com>
-References: <20190419083258.19580-1-yan.y.zhao@intel.com>
-	<20190419083505.19654-1-yan.y.zhao@intel.com>
-	<20190423103939.GF6022@redhat.com>
-	<20190423063540.7ec83c31@x1.home>
+	(envelope-from <philmd@redhat.com>) id 1hIvn0-0002n8-LN
+	for qemu-devel@nongnu.org; Tue, 23 Apr 2019 09:48:52 -0400
+Received: from mail-wr1-f65.google.com ([209.85.221.65]:42927)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1hIvmy-0002eQ-Mq
+	for qemu-devel@nongnu.org; Tue, 23 Apr 2019 09:48:50 -0400
+Received: by mail-wr1-f65.google.com with SMTP id g3so20300669wrx.9
+	for <qemu-devel@nongnu.org>; Tue, 23 Apr 2019 06:48:46 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=1e100.net; s=20161025;
+	h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
+	:date:user-agent:mime-version:in-reply-to:content-language
+	:content-transfer-encoding;
+	bh=kVtNZHAyAwB03XbZKrCkIsN1cZrETKy44BQ9Zv6u5T8=;
+	b=dOHRt8qqKeldgtpvCLPksDsl3OQJxLjsNz+J3sWkzCySaoMcee62tSUv2COna13t3K
+	YXTHMdB1HgvJpHwdxpoHvzUkZ6B/W3VwcTe1xCymC5EFkl54bhF0qX42s/TS6489Pyz4
+	QUpt9NcDhnJzKpmcUtLVAJH0WE/oE8emCECCRHamSBKrQAprWya3vadUTngWVCagb8ca
+	ZPQzE2CmndumuyeN0UOOPJIi1B8qTOssKQJTV/vpdyOS/7IuZQotL1RFGRprqWlIpuRM
+	lebyWicH1b9cdmIcFnC2x9RvIF4WKux08Ur4ku0hSdaTPSGCS4JjJ+LKtNvQVfyEmkbo
+	CzRg==
+X-Gm-Message-State: APjAAAW0pCg2sCboKGykWiVxyVGlJ2c9+7dlb24zrVtCqlKEYe2JofJx
+	ge50KoFJzF9pPQgX2Prd5n9qnA==
+X-Google-Smtp-Source: APXvYqxQ9LFbXl24Lr05+ZR0Hxly/B0JOpnoTUn3jUFLtuJ0mNXtsAjQll7kNITAXxkwVol1h21G0Q==
+X-Received: by 2002:adf:d850:: with SMTP id k16mr10902747wrl.35.1556027324970; 
+	Tue, 23 Apr 2019 06:48:44 -0700 (PDT)
+Received: from [192.168.1.25] (atoulouse-656-1-803-163.w86-221.abo.wanadoo.fr.
+	[86.221.12.163]) by smtp.gmail.com with ESMTPSA id
+	w11sm31298550wre.15.2019.04.23.06.48.43
+	(version=TLS1_3 cipher=AEAD-AES128-GCM-SHA256 bits=128/128);
+	Tue, 23 Apr 2019 06:48:44 -0700 (PDT)
+To: =?UTF-8?B?SmFrdWIgSmVybcOhxZk=?= <jakub.jermar@kernkonzept.com>,
+	qemu-devel@nongnu.org
+References: <20190423110034.1260142-1-jakub.jermar@kernkonzept.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Openpgp: id=89C1E78F601EE86C867495CBA2A3FD6EDEADC0DE;
+	url=http://pgp.mit.edu/pks/lookup?op=get&search=0xA2A3FD6EDEADC0DE
+Message-ID: <ab4b6d04-74f9-2f12-829d-9df8c1b1c4ca@redhat.com>
+Date: Tue, 23 Apr 2019 15:48:42 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+	Thunderbird/60.6.1
 MIME-Version: 1.0
+In-Reply-To: <20190423110034.1260142-1-jakub.jermar@kernkonzept.com>
 Content-Type: text/plain; charset="UTF-8"
-Content-Disposition: inline
-In-Reply-To: <20190423063540.7ec83c31@x1.home>
-User-Agent: Mutt/1.11.3 (2019-02-01)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.42]);
-	Tue, 23 Apr 2019 13:44:19 +0000 (UTC)
-Content-Transfer-Encoding: quoted-printable
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH 1/2] vfio/mdev: add version field as
- mandatory attribute for mdev device
+	[fuzzy]
+X-Received-From: 209.85.221.65
+Subject: Re: [Qemu-devel] [PATCH v2] mips: Decide to map PAGE_EXEC in
+ map_address
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -74,133 +87,109 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-Cc: cjia@nvidia.com, kvm@vger.kernel.org, aik@ozlabs.ru,
-	Zhengxiao.zx@alibaba-inc.com, shuangtai.tst@alibaba-inc.com,
-	qemu-devel@nongnu.org, kwankhede@nvidia.com, eauger@redhat.com,
-	yi.l.liu@intel.com, eskultet@redhat.com, ziye.yang@intel.com,
-	mlevitsk@redhat.com, pasic@linux.ibm.com, libvir-list@redhat.com,
-	arei.gonglei@huawei.com, felipe@nutanix.com, Ken.Xue@amd.com,
-	kevin.tian@intel.com, Yan Zhao <yan.y.zhao@intel.com>,
-	dgilbert@redhat.com, zhenyuw@linux.intel.com,
-	intel-gvt-dev@lists.freedesktop.org, changpeng.liu@intel.com,
-	cohuck@redhat.com, linux-kernel@vger.kernel.org,
-	zhi.a.wang@intel.com, jonathan.davies@nutanix.com, shaopeng.he@intel.com
+Cc: Aleksandar Rikalo <arikalo@wavecomp.com>,
+	Leon Alrae <leon.alrae@imgtec.com>, Aurelien Jarno <aurelien@aurel32.net>,
+	Aleksandar Markovic <amarkovic@wavecomp.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190423134400.JgNWwXyL8l1LvfYOxW11S3KAzlZg9n47Ab5mHNvYDv8@z>
+Message-ID: <20190423134842.A5ARwvduHp2qLvyj3VbOzn1uWfHu9xIQtW-L_NR-yiA@z>
 
-On Tue, Apr 23, 2019 at 06:35:40AM -0600, Alex Williamson wrote:
-> On Tue, 23 Apr 2019 11:39:39 +0100
-> Daniel P. Berrang=C3=A9 <berrange@redhat.com> wrote:
->=20
-> > On Fri, Apr 19, 2019 at 04:35:04AM -0400, Yan Zhao wrote:
-> > > +* version
-> > > +
-> > > +  This attribute is rw. It is used to check whether two devices ar=
-e compatible
-> > > +  for live migration. If this attribute is missing, then the corre=
-sponding mdev
-> > > +  device is regarded as not supporting live migration.
-> > > +
-> > > +  It consists of two parts: common part and vendor proprietary par=
-t.
-> > > +  common part: 32 bit. lower 16 bits is vendor id and higher 16 bi=
-ts identifies
-> > > +               device type. e.g., for pci device, it is
-> > > +               "pci vendor id" | (VFIO_DEVICE_FLAGS_PCI << 16).
-> > > +  vendor proprietary part: this part is varied in length. vendor d=
-river can
-> > > +               specify any string to identify a device.
-> > > +
-> > > +  When reading this attribute, it should show device version strin=
-g of the device
-> > > +  of type <type-id>. If a device does not support live migration, =
-it should
-> > > +  return errno.
-> > > +  When writing a string to this attribute, it returns errno for in=
-compatibility
-> > > +  or returns written string length in compatibility case. If a dev=
-ice does not
-> > > +  support live migration, it always returns errno.
-> > > +
-> > > +  for example.
-> > > +  # cat \
-> > > + /sys/bus/pci/devices/0000\:00\:02.0/mdev_supported_types/i915-GVT=
-g_V5_2/version
-> > > +  00028086-193b-i915-GVTg_V5_2
-> > > +
-> > > +  #echo 00028086-193b-i915-GVTg_V5_2 > \
-> > > + /sys/bus/pci/devices/0000\:00\:02.0/mdev_supported_types/i915-GVT=
-g_V5_4/version
-> > > + -bash: echo: write error: Invalid argument
-> > > + =20
-> >=20
-> > IIUC this path is against the physical device. IOW, the mgmt app woul=
-d have
-> > to first write to the "version" file to choose a version, and then wr=
-ite to
-> > the "create" file to actually create an virtual device. This has the =
-obvious
-> > concurrency problem if multiple devices are being created at the same=
- time
-> > and distinct versions for each device are required. There would need =
-to be
-> > a locking scheme defined to ensure safety.
->=20
-> "Create a device of a given version" is not an intended feature of this
-> interface aiui.  Writing the version attribute only indicates
-> migration compatibility with a binary result.
-> =20
-> > Wouldn't it be better if we can pass the desired version when we writ=
-e to
-> > the "create" file, so that we avoid any concurrent usage problems. "v=
-ersion"
-> > could be just a read-only file with a *list* of supported versions.
-> >=20
-> > eg
-> >=20
-> >   $ cat /sys/bus/pci/devices/0000\:00\:02.0/mdev_supported_types/i915=
--GVTg_V5_4/version
-> >   5.0
-> >   5.1
-> >   5.2
-> >=20
-> >   $ echo "83b8f4f2-509f-382f-3c1e-e6bfe0fa1001;version=3D5.2" >
-> >       /sys/devices/virtual/mtty/mtty/mdev_supported_types/mtty-2/crea=
-te
->=20
-> This is reminiscent of the proposed aggregation support, but again,
-> this sort of feature is not intended here.  It's no expected that any
-> vendor driver would support creating device types of different
-> versions, but they may support migration from different versions.
+Hi Jakub,
 
-Hmm, that's a subtle distinction I wasn't seeing the patch series.
-IIUC from what you're saying, a device can be created with version
-"C", but for an incoming migration it can (potentially) accept
-serialized state matching any of versions "A", "B" or "C".
+On 4/23/19 1:00 PM, Jakub Jermář wrote:
+> This commit addresses QEMU Bug #1825311:
+> 
+>   mips_cpu_handle_mmu_fault renders all accessed pages executable
+> 
+> It allows finer-grained control over whether the accessed page should be
+> executable by moving the decision to the underlying map_address
+> function, which has more information for this.
+> 
+> As a result, pages that have the XI bit set in the TLB and are accessed
+> for read/write, don't suddenly end up being executable.
+> 
 
-That is sufficient if migration is being used as a host upgrade
-tool, to move from OS release N to N + 1.
+Fixes: https://bugs.launchpad.net/qemu/+bug/1825311
 
-It wouldn't cover the case where you need to support backwards
-migration too. eg if you have a mixture of hosts with release
-N and N + 1 and want to make sure that VMs can always move
-betweeen any host.  That would require that you can create
-mdevs with the lowest common denominator version, not solely
-the most recent.
+> Signed-off-by: Jakub Jermář <jakub.jermar@kernkonzept.com>
+> ---
+>  target/mips/helper.c | 17 ++++++++++-------
+>  1 file changed, 10 insertions(+), 7 deletions(-)
+> 
+> diff --git a/target/mips/helper.c b/target/mips/helper.c
+> index c44cdca3b5..132d073fbe 100644
+> --- a/target/mips/helper.c
+> +++ b/target/mips/helper.c
+> @@ -43,7 +43,7 @@ int no_mmu_map_address (CPUMIPSState *env, hwaddr *physical, int *prot,
+>                          target_ulong address, int rw, int access_type)
+>  {
+>      *physical = address;
+> -    *prot = PAGE_READ | PAGE_WRITE;
+> +    *prot = PAGE_READ | PAGE_WRITE | PAGE_EXEC;
+>      return TLBRET_MATCH;
+>  }
+>  
+> @@ -61,7 +61,7 @@ int fixed_mmu_map_address (CPUMIPSState *env, hwaddr *physical, int *prot,
+>      else
+>          *physical = address;
+>  
+> -    *prot = PAGE_READ | PAGE_WRITE;
+> +    *prot = PAGE_READ | PAGE_WRITE | PAGE_EXEC;
+>      return TLBRET_MATCH;
+>  }
+>  
+> @@ -101,6 +101,9 @@ int r4k_map_address (CPUMIPSState *env, hwaddr *physical, int *prot,
+>                  *prot = PAGE_READ;
+>                  if (n ? tlb->D1 : tlb->D0)
+>                      *prot |= PAGE_WRITE;
+> +                if (!(n ? tlb->XI1 : tlb->XI0)) {
+> +                    *prot |= PAGE_EXEC;
+> +                }
 
-In QEMU this is done by mgmt applications picking a versioned
-machine type for QEMU that is older than most recent.
+This was indeed missed in commit 2fb58b73746e.
 
-Regards,
-Daniel
---=20
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberran=
-ge :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.c=
-om :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberran=
-ge :|
+>                  return TLBRET_MATCH;
+>              }
+>              return TLBRET_DIRTY;
+> @@ -182,7 +185,7 @@ static int get_seg_physical_address(CPUMIPSState *env, hwaddr *physical,
+>      } else {
+>          /* The segment is unmapped */
+>          *physical = physical_base | (real_address & segmask);
+> -        *prot = PAGE_READ | PAGE_WRITE;
+> +        *prot = PAGE_READ | PAGE_WRITE | PAGE_EXEC;
+>          return TLBRET_MATCH;
+>      }
+>  }
+> @@ -913,8 +916,8 @@ int mips_cpu_handle_mmu_fault(CPUState *cs, vaddr address, int size, int rw,
+>      }
+>      if (ret == TLBRET_MATCH) {
+>          tlb_set_page(cs, address & TARGET_PAGE_MASK,
+> -                     physical & TARGET_PAGE_MASK, prot | PAGE_EXEC,
+> -                     mmu_idx, TARGET_PAGE_SIZE);
+> +                     physical & TARGET_PAGE_MASK, prot, mmu_idx,
+> +                     TARGET_PAGE_SIZE);
+>          ret = 0;
+>      } else if (ret < 0)
+>  #endif
+> @@ -936,8 +939,8 @@ int mips_cpu_handle_mmu_fault(CPUState *cs, vaddr address, int size, int rw,
+>                                             address, rw, access_type, mmu_idx);
+>                  if (ret == TLBRET_MATCH) {
+>                      tlb_set_page(cs, address & TARGET_PAGE_MASK,
+> -                            physical & TARGET_PAGE_MASK, prot | PAGE_EXEC,
+> -                            mmu_idx, TARGET_PAGE_SIZE);
+> +                            physical & TARGET_PAGE_MASK, prot, mmu_idx,
+> +                            TARGET_PAGE_SIZE);
+>                      ret = 0;
+>                      return ret;
+>                  }
+> 
+
+Your patch looks correct, but I'd like to test it.
+Do you have a reproducer?
+Can you describe the command line you used?
+
+Thanks,
+
+Phil.
 
