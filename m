@@ -2,83 +2,103 @@ Return-Path: <SRS0=zUjA=SZ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.2 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_PASS,UNPARSEABLE_RELAY,URIBL_BLOCKED,USER_AGENT_MUTT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4DEC4C10F03
-	for <qemu-devel@archiver.kernel.org>; Tue, 23 Apr 2019 22:10:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C90C7C10F03
+	for <qemu-devel@archiver.kernel.org>; Tue, 23 Apr 2019 22:12:05 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0FD3921738
-	for <qemu-devel@archiver.kernel.org>; Tue, 23 Apr 2019 22:10:50 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0FD3921738
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 905D9218D3
+	for <qemu-devel@archiver.kernel.org>; Tue, 23 Apr 2019 22:12:05 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="AhdCKmBV"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 905D9218D3
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=oracle.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:60203 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:60209 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hJ3cn-0004Gc-QM
-	for qemu-devel@archiver.kernel.org; Tue, 23 Apr 2019 18:10:49 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:52653)
+	id 1hJ3e0-0005GZ-RC
+	for qemu-devel@archiver.kernel.org; Tue, 23 Apr 2019 18:12:04 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:53782)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1hJ3bl-0003iA-RY
-	for qemu-devel@nongnu.org; Tue, 23 Apr 2019 18:09:47 -0400
+	(envelope-from <darrick.wong@oracle.com>) id 1hJ3dC-0004wF-8c
+	for qemu-devel@nongnu.org; Tue, 23 Apr 2019 18:11:15 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1hJ3bj-000203-HA
-	for qemu-devel@nongnu.org; Tue, 23 Apr 2019 18:09:44 -0400
-Received: from mail-wr1-f68.google.com ([209.85.221.68]:34906)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1hJ3bh-0001uL-VJ
-	for qemu-devel@nongnu.org; Tue, 23 Apr 2019 18:09:42 -0400
-Received: by mail-wr1-f68.google.com with SMTP id o12so18863241wrn.2
-	for <qemu-devel@nongnu.org>; Tue, 23 Apr 2019 15:09:41 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=1e100.net; s=20161025;
-	h=x-gm-message-state:subject:to:references:from:openpgp:message-id
-	:date:user-agent:mime-version:in-reply-to:content-language
-	:content-transfer-encoding;
-	bh=uafa97J/iXakrG/6ytI+1QxH75Gg+PVDF53BAKS5Sn4=;
-	b=Tm9u8uNo2ICexrUEHfSJlRK8IFUDDk89ItS1xjshlrS6tMNY89p3W0KWtq5jl4wsjg
-	n/ACBlF+5pYKYUqUtpI3anfBZbUo0f8Y22PLwgUJay5423W9boXgWLFmFAYLrBryuY00
-	NkWcFukwWx7dYWujywYfOTXVwJtkXueHQz6HT8rdyzBtKjQyzSrLUou16bvD95+8RBQi
-	uzXKkfukqCkpyi9A1NfyGwL9XGxwlAGCVGaaUJeuTrr8Z6NH81UVmlxD7CJ+RRwdD+zQ
-	Gk1BUPpj7Jn1GnE2xxAha3qdtQXjx3BFLBKBiaLDApJJH/U+h2kDZFjDlLX5z138ftyr
-	8eLQ==
-X-Gm-Message-State: APjAAAWfJEut0R4JN0Dc21pQCWRppzhxRvsiwJiAnjLsuSpNTs/iTPhJ
-	wVbSWJVpPiUQAs+nQD6AaEmjgw==
-X-Google-Smtp-Source: APXvYqwnhdWCgXgz4Ju/hRfLuZ+Sa5nlRFzxQOAlZLre1a17qyDqaNAuspsqfW9ALFXStrwjjXQGLA==
-X-Received: by 2002:a5d:4049:: with SMTP id w9mr7677609wrp.151.1556057380376; 
-	Tue, 23 Apr 2019 15:09:40 -0700 (PDT)
-Received: from [192.168.1.25] (atoulouse-656-1-803-163.w86-221.abo.wanadoo.fr.
-	[86.221.12.163]) by smtp.gmail.com with ESMTPSA id
-	t13sm4475871wru.70.2019.04.23.15.09.38
-	(version=TLS1_3 cipher=AEAD-AES128-GCM-SHA256 bits=128/128);
-	Tue, 23 Apr 2019 15:09:39 -0700 (PDT)
-To: David Hildenbrand <david@redhat.com>,
-	Richard Henderson <richard.henderson@linaro.org>, qemu-devel@nongnu.org,
-	"Edgar E. Iglesias" <edgar.iglesias@gmail.com>
-References: <20190420073442.7488-1-richard.henderson@linaro.org>
-	<20190420073442.7488-20-richard.henderson@linaro.org>
-	<e10e5627-25b2-0563-e971-2864256727d6@redhat.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Openpgp: id=89C1E78F601EE86C867495CBA2A3FD6EDEADC0DE;
-	url=http://pgp.mit.edu/pks/lookup?op=get&search=0xA2A3FD6EDEADC0DE
-Message-ID: <0bd7fd6a-1fcb-ac0c-b4bf-7b04ada4443c@redhat.com>
-Date: Wed, 24 Apr 2019 00:09:38 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
-	Thunderbird/60.6.1
+	(envelope-from <darrick.wong@oracle.com>) id 1hJ3d5-0003lN-DX
+	for qemu-devel@nongnu.org; Tue, 23 Apr 2019 18:11:09 -0400
+Received: from userp2120.oracle.com ([156.151.31.85]:35308)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <darrick.wong@oracle.com>)
+	id 1hJ3d0-0003c1-Ps
+	for qemu-devel@nongnu.org; Tue, 23 Apr 2019 18:11:03 -0400
+Received: from pps.filterd (userp2120.oracle.com [127.0.0.1])
+	by userp2120.oracle.com (8.16.0.27/8.16.0.27) with SMTP id
+	x3NM4iVc124778; Tue, 23 Apr 2019 22:10:24 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com;
+	h=date : from : to : cc
+	: subject : message-id : references : mime-version : content-type :
+	in-reply-to; s=corp-2018-07-02;
+	bh=l0VzuwK7fWj7U7YTxx4jiGO26nwCCDX522qiPNeC+/Y=;
+	b=AhdCKmBVc8BIdraythvZytA3kVTqYzt3V1UvkKa8Xfe7HC6YDSnfPPTDrmy/WFLKpdLi
+	ybqnDXcxozLtDQZSJb/CyE/DswT9j6XDoINpoqLbd6fOf2weWsI9t9Vt+ibJCOhqPJzw
+	zGO2+HapNtynOsBUnzXoIU6Pc/S2ZpFJ3nH0vY8pOzQxRYNAIzglWCXbOjBv1lu+6J+7
+	ySjy/HIHmQFoQfRXMyTRrFIvGvIeczjvrUJP4emcLz7EwfM87kUd7rVf3KgiZCVQFjSy
+	FjbRSFpgfPWnPRLuDOYrsPj2Y3KqDGi6HU6LDXE9hYrQP/SLd8jpFIC+4tXpBOwTFwR3
+	Qw== 
+Received: from userp3020.oracle.com (userp3020.oracle.com [156.151.31.79])
+	by userp2120.oracle.com with ESMTP id 2ryv2q6uyp-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Tue, 23 Apr 2019 22:10:24 +0000
+Received: from pps.filterd (userp3020.oracle.com [127.0.0.1])
+	by userp3020.oracle.com (8.16.0.27/8.16.0.27) with SMTP id
+	x3NM8hPQ066650; Tue, 23 Apr 2019 22:10:24 GMT
+Received: from userv0121.oracle.com (userv0121.oracle.com [156.151.31.72])
+	by userp3020.oracle.com with ESMTP id 2s0dwegm54-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Tue, 23 Apr 2019 22:10:24 +0000
+Received: from abhmp0018.oracle.com (abhmp0018.oracle.com [141.146.116.24])
+	by userv0121.oracle.com (8.14.4/8.13.8) with ESMTP id x3NMAFaf014717;
+	Tue, 23 Apr 2019 22:10:15 GMT
+Received: from localhost (/10.145.179.89)
+	by default (Oracle Beehive Gateway v4.0)
+	with ESMTP ; Tue, 23 Apr 2019 15:10:15 -0700
+Date: Tue, 23 Apr 2019 15:10:11 -0700
+From: "Darrick J. Wong" <darrick.wong@oracle.com>
+To: Pankaj Gupta <pagupta@redhat.com>
+Message-ID: <20190423221011.GD178290@magnolia>
+References: <20190423080612.15361-1-pagupta@redhat.com>
+	<20190423080612.15361-7-pagupta@redhat.com>
+	<20190423220217.GA29573@dread.disaster.area>
 MIME-Version: 1.0
-In-Reply-To: <e10e5627-25b2-0563-e971-2864256727d6@redhat.com>
 Content-Type: text/plain; charset="UTF-8"
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-	[fuzzy]
-X-Received-From: 209.85.221.68
-Subject: Re: [Qemu-devel] [PATCH 19/38] tcg: Add support for integer
- absolute value
+Content-Disposition: inline
+In-Reply-To: <20190423220217.GA29573@dread.disaster.area>
+User-Agent: Mutt/1.9.4 (2018-02-28)
+X-Proofpoint-Virus-Version: vendor=nai engine=5900 definitions=9236
+	signatures=668685
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=0
+	malwarescore=0
+	phishscore=0 bulkscore=0 spamscore=0 mlxscore=0 mlxlogscore=999
+	adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+	engine=8.0.1-1810050000 definitions=main-1904230157
+X-Proofpoint-Virus-Version: vendor=nai engine=5900 definitions=9236
+	signatures=668685
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0
+	priorityscore=1501 malwarescore=0
+	suspectscore=0 phishscore=0 bulkscore=0 spamscore=0 clxscore=1011
+	lowpriorityscore=0 mlxscore=0 impostorscore=0 mlxlogscore=999
+	adultscore=0
+	classifier=spam adjust=0 reason=mlx scancount=1 engine=8.0.1-1810050000
+	definitions=main-1904230157
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic]
+X-Received-From: 156.151.31.85
+Subject: Re: [Qemu-devel] [PATCH v6 6/6] xfs: disable map_sync for async
+ flush
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -90,135 +110,80 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: jack@suse.cz, kvm@vger.kernel.org, mst@redhat.com, jasowang@redhat.com,
+	Dave Chinner <david@fromorbit.com>, qemu-devel@nongnu.org,
+	virtualization@lists.linux-foundation.org,
+	adilger.kernel@dilger.ca, zwisler@kernel.org,
+	aarcange@redhat.com, dave.jiang@intel.com,
+	linux-nvdimm@lists.01.org, vishal.l.verma@intel.com,
+	david@redhat.com, willy@infradead.org, hch@infradead.org,
+	linux-acpi@vger.kernel.org, jmoyer@redhat.com,
+	linux-ext4@vger.kernel.org, lenb@kernel.org, kilobyte@angband.pl,
+	riel@surriel.com, yuval.shaia@oracle.com, stefanha@redhat.com,
+	pbonzini@redhat.com, dan.j.williams@intel.com,
+	lcapitulino@redhat.com, kwolf@redhat.com, nilal@redhat.com,
+	tytso@mit.edu, xiaoguangrong.eric@gmail.com, cohuck@redhat.com,
+	rjw@rjwysocki.net, linux-kernel@vger.kernel.org,
+	linux-xfs@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+	imammedo@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190423220938.1c1FToqqA7mUKeSMJVVwDXW9dRPKlMrVXGp7Tv-ElUI@z>
+Message-ID: <20190423221011.bX8a8gHmX7S_v-nIDmBotikFIsKJMr1oDPk1TlFIPp0@z>
 
-On 4/23/19 8:37 PM, David Hildenbrand wrote:
-> On 20.04.19 09:34, Richard Henderson wrote:
->> Remove a function of the same name from target/arm/.
->> Use a branchless implementation of abs that gcc uses for x86.
->>
->> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
->> ---
->>  tcg/tcg-op.h           |  5 +++++
->>  target/arm/translate.c | 10 ----------
->>  tcg/tcg-op.c           | 20 ++++++++++++++++++++
->>  3 files changed, 25 insertions(+), 10 deletions(-)
->>
->> diff --git a/tcg/tcg-op.h b/tcg/tcg-op.h
->> index 472b73cb38..660fe205d0 100644
->> --- a/tcg/tcg-op.h
->> +++ b/tcg/tcg-op.h
->> @@ -335,6 +335,7 @@ void tcg_gen_smin_i32(TCGv_i32, TCGv_i32 arg1, TCGv_i32 arg2);
->>  void tcg_gen_smax_i32(TCGv_i32, TCGv_i32 arg1, TCGv_i32 arg2);
->>  void tcg_gen_umin_i32(TCGv_i32, TCGv_i32 arg1, TCGv_i32 arg2);
->>  void tcg_gen_umax_i32(TCGv_i32, TCGv_i32 arg1, TCGv_i32 arg2);
->> +void tcg_gen_abs_i32(TCGv_i32, TCGv_i32);
->>  
->>  static inline void tcg_gen_discard_i32(TCGv_i32 arg)
->>  {
->> @@ -534,6 +535,7 @@ void tcg_gen_smin_i64(TCGv_i64, TCGv_i64 arg1, TCGv_i64 arg2);
->>  void tcg_gen_smax_i64(TCGv_i64, TCGv_i64 arg1, TCGv_i64 arg2);
->>  void tcg_gen_umin_i64(TCGv_i64, TCGv_i64 arg1, TCGv_i64 arg2);
->>  void tcg_gen_umax_i64(TCGv_i64, TCGv_i64 arg1, TCGv_i64 arg2);
->> +void tcg_gen_abs_i64(TCGv_i64, TCGv_i64);
->>  
->>  #if TCG_TARGET_REG_BITS == 64
->>  static inline void tcg_gen_discard_i64(TCGv_i64 arg)
->> @@ -973,6 +975,7 @@ void tcg_gen_nor_vec(unsigned vece, TCGv_vec r, TCGv_vec a, TCGv_vec b);
->>  void tcg_gen_eqv_vec(unsigned vece, TCGv_vec r, TCGv_vec a, TCGv_vec b);
->>  void tcg_gen_not_vec(unsigned vece, TCGv_vec r, TCGv_vec a);
->>  void tcg_gen_neg_vec(unsigned vece, TCGv_vec r, TCGv_vec a);
->> +void tcg_gen_abs_vec(unsigned vece, TCGv_vec r, TCGv_vec a);
->>  void tcg_gen_ssadd_vec(unsigned vece, TCGv_vec r, TCGv_vec a, TCGv_vec b);
->>  void tcg_gen_usadd_vec(unsigned vece, TCGv_vec r, TCGv_vec a, TCGv_vec b);
->>  void tcg_gen_sssub_vec(unsigned vece, TCGv_vec r, TCGv_vec a, TCGv_vec b);
->> @@ -1019,6 +1022,7 @@ void tcg_gen_stl_vec(TCGv_vec r, TCGv_ptr base, TCGArg offset, TCGType t);
->>  #define tcg_gen_addi_tl tcg_gen_addi_i64
->>  #define tcg_gen_sub_tl tcg_gen_sub_i64
->>  #define tcg_gen_neg_tl tcg_gen_neg_i64
->> +#define tcg_gen_abs_tl tcg_gen_abs_i64
->>  #define tcg_gen_subfi_tl tcg_gen_subfi_i64
->>  #define tcg_gen_subi_tl tcg_gen_subi_i64
->>  #define tcg_gen_and_tl tcg_gen_and_i64
->> @@ -1131,6 +1135,7 @@ void tcg_gen_stl_vec(TCGv_vec r, TCGv_ptr base, TCGArg offset, TCGType t);
->>  #define tcg_gen_addi_tl tcg_gen_addi_i32
->>  #define tcg_gen_sub_tl tcg_gen_sub_i32
->>  #define tcg_gen_neg_tl tcg_gen_neg_i32
->> +#define tcg_gen_abs_tl tcg_gen_abs_i32
->>  #define tcg_gen_subfi_tl tcg_gen_subfi_i32
->>  #define tcg_gen_subi_tl tcg_gen_subi_i32
->>  #define tcg_gen_and_tl tcg_gen_and_i32
->> diff --git a/target/arm/translate.c b/target/arm/translate.c
->> index 83a008e945..721171794d 100644
->> --- a/target/arm/translate.c
->> +++ b/target/arm/translate.c
->> @@ -603,16 +603,6 @@ static void gen_sar(TCGv_i32 dest, TCGv_i32 t0, TCGv_i32 t1)
->>      tcg_temp_free_i32(tmp1);
->>  }
->>  
->> -static void tcg_gen_abs_i32(TCGv_i32 dest, TCGv_i32 src)
->> -{
->> -    TCGv_i32 c0 = tcg_const_i32(0);
->> -    TCGv_i32 tmp = tcg_temp_new_i32();
->> -    tcg_gen_neg_i32(tmp, src);
->> -    tcg_gen_movcond_i32(TCG_COND_GT, dest, src, c0, src, tmp);
->> -    tcg_temp_free_i32(c0);
->> -    tcg_temp_free_i32(tmp);
->> -}
->> -
->>  static void shifter_out_im(TCGv_i32 var, int shift)
->>  {
->>      if (shift == 0) {
->> diff --git a/tcg/tcg-op.c b/tcg/tcg-op.c
->> index a00d1df37e..0ac291f1c4 100644
->> --- a/tcg/tcg-op.c
->> +++ b/tcg/tcg-op.c
->> @@ -1091,6 +1091,16 @@ void tcg_gen_umax_i32(TCGv_i32 ret, TCGv_i32 a, TCGv_i32 b)
->>      tcg_gen_movcond_i32(TCG_COND_LTU, ret, a, b, b, a);
->>  }
->>  
->> +void tcg_gen_abs_i32(TCGv_i32 ret, TCGv_i32 a)
->> +{
->> +    TCGv_i32 t = tcg_temp_new_i32();
->> +
->> +    tcg_gen_sari_i32(t, a, 31);
->> +    tcg_gen_xor_i32(ret, a, t);
->> +    tcg_gen_sub_i32(ret, ret, t);
->> +    tcg_temp_free_i32(t);
->> +}
->> +
->>  /* 64-bit ops */
->>  
->>  #if TCG_TARGET_REG_BITS == 32
->> @@ -2548,6 +2558,16 @@ void tcg_gen_umax_i64(TCGv_i64 ret, TCGv_i64 a, TCGv_i64 b)
->>      tcg_gen_movcond_i64(TCG_COND_LTU, ret, a, b, b, a);
->>  }
->>  
->> +void tcg_gen_abs_i64(TCGv_i64 ret, TCGv_i64 a)
->> +{
->> +    TCGv_i64 t = tcg_temp_new_i64();
->> +
->> +    tcg_gen_sari_i64(t, a, 63);
->> +    tcg_gen_xor_i64(ret, a, t);
->> +    tcg_gen_sub_i64(ret, ret, t);
->> +    tcg_temp_free_i64(t);
->> +}
->> +
->>  /* Size changing operations.  */
->>  
->>  void tcg_gen_extrl_i64_i32(TCGv_i32 ret, TCGv_i64 arg)
->>
+On Wed, Apr 24, 2019 at 08:02:17AM +1000, Dave Chinner wrote:
+> On Tue, Apr 23, 2019 at 01:36:12PM +0530, Pankaj Gupta wrote:
+> > Dont support 'MAP_SYNC' with non-DAX files and DAX files
+> > with asynchronous dax_device. Virtio pmem provides
+> > asynchronous host page cache flush mechanism. We don't
+> > support 'MAP_SYNC' with virtio pmem and xfs.
+> > 
+> > Signed-off-by: Pankaj Gupta <pagupta@redhat.com>
+> > ---
+> >  fs/xfs/xfs_file.c | 10 ++++++----
+> >  1 file changed, 6 insertions(+), 4 deletions(-)
+> > 
+> > diff --git a/fs/xfs/xfs_file.c b/fs/xfs/xfs_file.c
+> > index 1f2e2845eb76..0e59be018511 100644
+> > --- a/fs/xfs/xfs_file.c
+> > +++ b/fs/xfs/xfs_file.c
+> > @@ -1196,11 +1196,13 @@ xfs_file_mmap(
+> >  	struct file	*filp,
+> >  	struct vm_area_struct *vma)
+> >  {
+> > -	/*
+> > -	 * We don't support synchronous mappings for non-DAX files. At least
+> > -	 * until someone comes with a sensible use case.
+> > +	struct dax_device *dax_dev = xfs_find_daxdev_for_inode
+> > +						(file_inode(filp));
+
+    tab separation here ^^^                   ^^^^ and cut
+                                                       down the indent
+                                             while you're at
+						    it, please:
+
+	struct dax_device	*dax_dev;
+
+	dax_dev = xfs_find_daxdev_for_inode(file_inode(filp));
+	if (!dax_is_frobbed(dax))
+		return -EMEWANTCOOKIE;
+
+--D
+
+> > +
+> > +	/* We don't support synchronous mappings for non-DAX files and
+> > +	 * for DAX files if underneath dax_device is not synchronous.
+> >  	 */
 > 
-> Nice trick
-
-Per commit 7dcfb0897b99, I think it's worth a:
-
-Inspired-by: Edgar E. Iglesias <edgar.iglesias@gmail.com>
-
+> 	/*
+> 	 * This is the correct multi-line comment format. Please
+> 	 * update the patch to maintain the existing comment format.
+> 	 */
 > 
-> Reviewed-by: David Hildenbrand <david@redhat.com>
+> Cheers,
 > 
+> Dave.
+> -- 
+> Dave Chinner
+> david@fromorbit.com
 
