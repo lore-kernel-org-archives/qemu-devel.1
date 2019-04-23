@@ -1,31 +1,28 @@
-Received: from eggs.gnu.org ([209.51.188.92]:44583)
+Received: from eggs.gnu.org ([209.51.188.92]:44569)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1hJ45t-0005Ez-5d
-	for qemu-devel@nongnu.org; Tue, 23 Apr 2019 18:40:57 -0400
+	(envelope-from <philmd@redhat.com>) id 1hJ466-0005CC-4D
+	for qemu-devel@nongnu.org; Tue, 23 Apr 2019 18:41:07 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1hJ3uU-00061Z-3P
-	for qemu-devel@nongnu.org; Tue, 23 Apr 2019 18:29:07 -0400
-Received: from mail-pl1-x643.google.com ([2607:f8b0:4864:20::643]:35089)
+	(envelope-from <philmd@redhat.com>) id 1hJ3sK-0003Wg-0D
+	for qemu-devel@nongnu.org; Tue, 23 Apr 2019 18:26:53 -0400
+Received: from mail-wm1-f66.google.com ([209.85.128.66]:53540)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1hJ3uT-0005z4-IO
-	for qemu-devel@nongnu.org; Tue, 23 Apr 2019 18:29:06 -0400
-Received: by mail-pl1-x643.google.com with SMTP id w24so8212717plp.2
-	for <qemu-devel@nongnu.org>; Tue, 23 Apr 2019 15:29:05 -0700 (PDT)
-References: <20190420073442.7488-1-richard.henderson@linaro.org>
-	<20190420073442.7488-20-richard.henderson@linaro.org>
-	<e10e5627-25b2-0563-e971-2864256727d6@redhat.com>
-	<0bd7fd6a-1fcb-ac0c-b4bf-7b04ada4443c@redhat.com>
-From: Richard Henderson <richard.henderson@linaro.org>
-Message-ID: <eebc0218-4334-2b68-9081-a3a4d2d12172@linaro.org>
-Date: Tue, 23 Apr 2019 15:29:01 -0700
+	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1hJ3sG-0002w0-VR
+	for qemu-devel@nongnu.org; Tue, 23 Apr 2019 18:26:50 -0400
+Received: by mail-wm1-f66.google.com with SMTP id q16so1980167wmj.3
+	for <qemu-devel@nongnu.org>; Tue, 23 Apr 2019 15:26:32 -0700 (PDT)
+References: <20190423212246.3542-1-ehabkost@redhat.com>
+	<20190423212246.3542-3-ehabkost@redhat.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Message-ID: <20d39506-8b43-29f5-7b9e-881c94de16e8@redhat.com>
+Date: Wed, 24 Apr 2019 00:26:29 +0200
 MIME-Version: 1.0
-In-Reply-To: <0bd7fd6a-1fcb-ac0c-b4bf-7b04ada4443c@redhat.com>
+In-Reply-To: <20190423212246.3542-3-ehabkost@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH 19/38] tcg: Add support for integer
- absolute value
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH 2/3] machine: Use SupportStatusInfo for
+ deprecation info
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,133 +31,120 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>, David Hildenbrand <david@redhat.com>, qemu-devel@nongnu.org, "Edgar E. Iglesias" <edgar.iglesias@gmail.com>
+To: Eduardo Habkost <ehabkost@redhat.com>, qemu-devel@nongnu.org
+Cc: "Michael S. Tsirkin" <mst@redhat.com>, mprivozn@redhat.com, Markus Armbruster <armbru@redhat.com>, =?UTF-8?Q?Herv=c3=a9_Poussineau?= <hpoussin@reactos.org>, qemu-ppc@nongnu.org, David Gibson <david@gibson.dropbear.id.au>
 
-On 4/23/19 3:09 PM, Philippe Mathieu-Daudé wrote:
-> On 4/23/19 8:37 PM, David Hildenbrand wrote:
->> On 20.04.19 09:34, Richard Henderson wrote:
->>> Remove a function of the same name from target/arm/.
->>> Use a branchless implementation of abs that gcc uses for x86.
->>>
->>> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
->>> ---
->>>  tcg/tcg-op.h           |  5 +++++
->>>  target/arm/translate.c | 10 ----------
->>>  tcg/tcg-op.c           | 20 ++++++++++++++++++++
->>>  3 files changed, 25 insertions(+), 10 deletions(-)
->>>
->>> diff --git a/tcg/tcg-op.h b/tcg/tcg-op.h
->>> index 472b73cb38..660fe205d0 100644
->>> --- a/tcg/tcg-op.h
->>> +++ b/tcg/tcg-op.h
->>> @@ -335,6 +335,7 @@ void tcg_gen_smin_i32(TCGv_i32, TCGv_i32 arg1, TCGv_i32 arg2);
->>>  void tcg_gen_smax_i32(TCGv_i32, TCGv_i32 arg1, TCGv_i32 arg2);
->>>  void tcg_gen_umin_i32(TCGv_i32, TCGv_i32 arg1, TCGv_i32 arg2);
->>>  void tcg_gen_umax_i32(TCGv_i32, TCGv_i32 arg1, TCGv_i32 arg2);
->>> +void tcg_gen_abs_i32(TCGv_i32, TCGv_i32);
->>>  
->>>  static inline void tcg_gen_discard_i32(TCGv_i32 arg)
->>>  {
->>> @@ -534,6 +535,7 @@ void tcg_gen_smin_i64(TCGv_i64, TCGv_i64 arg1, TCGv_i64 arg2);
->>>  void tcg_gen_smax_i64(TCGv_i64, TCGv_i64 arg1, TCGv_i64 arg2);
->>>  void tcg_gen_umin_i64(TCGv_i64, TCGv_i64 arg1, TCGv_i64 arg2);
->>>  void tcg_gen_umax_i64(TCGv_i64, TCGv_i64 arg1, TCGv_i64 arg2);
->>> +void tcg_gen_abs_i64(TCGv_i64, TCGv_i64);
->>>  
->>>  #if TCG_TARGET_REG_BITS == 64
->>>  static inline void tcg_gen_discard_i64(TCGv_i64 arg)
->>> @@ -973,6 +975,7 @@ void tcg_gen_nor_vec(unsigned vece, TCGv_vec r, TCGv_vec a, TCGv_vec b);
->>>  void tcg_gen_eqv_vec(unsigned vece, TCGv_vec r, TCGv_vec a, TCGv_vec b);
->>>  void tcg_gen_not_vec(unsigned vece, TCGv_vec r, TCGv_vec a);
->>>  void tcg_gen_neg_vec(unsigned vece, TCGv_vec r, TCGv_vec a);
->>> +void tcg_gen_abs_vec(unsigned vece, TCGv_vec r, TCGv_vec a);
->>>  void tcg_gen_ssadd_vec(unsigned vece, TCGv_vec r, TCGv_vec a, TCGv_vec b);
->>>  void tcg_gen_usadd_vec(unsigned vece, TCGv_vec r, TCGv_vec a, TCGv_vec b);
->>>  void tcg_gen_sssub_vec(unsigned vece, TCGv_vec r, TCGv_vec a, TCGv_vec b);
->>> @@ -1019,6 +1022,7 @@ void tcg_gen_stl_vec(TCGv_vec r, TCGv_ptr base, TCGArg offset, TCGType t);
->>>  #define tcg_gen_addi_tl tcg_gen_addi_i64
->>>  #define tcg_gen_sub_tl tcg_gen_sub_i64
->>>  #define tcg_gen_neg_tl tcg_gen_neg_i64
->>> +#define tcg_gen_abs_tl tcg_gen_abs_i64
->>>  #define tcg_gen_subfi_tl tcg_gen_subfi_i64
->>>  #define tcg_gen_subi_tl tcg_gen_subi_i64
->>>  #define tcg_gen_and_tl tcg_gen_and_i64
->>> @@ -1131,6 +1135,7 @@ void tcg_gen_stl_vec(TCGv_vec r, TCGv_ptr base, TCGArg offset, TCGType t);
->>>  #define tcg_gen_addi_tl tcg_gen_addi_i32
->>>  #define tcg_gen_sub_tl tcg_gen_sub_i32
->>>  #define tcg_gen_neg_tl tcg_gen_neg_i32
->>> +#define tcg_gen_abs_tl tcg_gen_abs_i32
->>>  #define tcg_gen_subfi_tl tcg_gen_subfi_i32
->>>  #define tcg_gen_subi_tl tcg_gen_subi_i32
->>>  #define tcg_gen_and_tl tcg_gen_and_i32
->>> diff --git a/target/arm/translate.c b/target/arm/translate.c
->>> index 83a008e945..721171794d 100644
->>> --- a/target/arm/translate.c
->>> +++ b/target/arm/translate.c
->>> @@ -603,16 +603,6 @@ static void gen_sar(TCGv_i32 dest, TCGv_i32 t0, TCGv_i32 t1)
->>>      tcg_temp_free_i32(tmp1);
->>>  }
->>>  
->>> -static void tcg_gen_abs_i32(TCGv_i32 dest, TCGv_i32 src)
->>> -{
->>> -    TCGv_i32 c0 = tcg_const_i32(0);
->>> -    TCGv_i32 tmp = tcg_temp_new_i32();
->>> -    tcg_gen_neg_i32(tmp, src);
->>> -    tcg_gen_movcond_i32(TCG_COND_GT, dest, src, c0, src, tmp);
->>> -    tcg_temp_free_i32(c0);
->>> -    tcg_temp_free_i32(tmp);
->>> -}
->>> -
->>>  static void shifter_out_im(TCGv_i32 var, int shift)
->>>  {
->>>      if (shift == 0) {
->>> diff --git a/tcg/tcg-op.c b/tcg/tcg-op.c
->>> index a00d1df37e..0ac291f1c4 100644
->>> --- a/tcg/tcg-op.c
->>> +++ b/tcg/tcg-op.c
->>> @@ -1091,6 +1091,16 @@ void tcg_gen_umax_i32(TCGv_i32 ret, TCGv_i32 a, TCGv_i32 b)
->>>      tcg_gen_movcond_i32(TCG_COND_LTU, ret, a, b, b, a);
->>>  }
->>>  
->>> +void tcg_gen_abs_i32(TCGv_i32 ret, TCGv_i32 a)
->>> +{
->>> +    TCGv_i32 t = tcg_temp_new_i32();
->>> +
->>> +    tcg_gen_sari_i32(t, a, 31);
->>> +    tcg_gen_xor_i32(ret, a, t);
->>> +    tcg_gen_sub_i32(ret, ret, t);
->>> +    tcg_temp_free_i32(t);
->>> +}
->>> +
->>>  /* 64-bit ops */
->>>  
->>>  #if TCG_TARGET_REG_BITS == 32
->>> @@ -2548,6 +2558,16 @@ void tcg_gen_umax_i64(TCGv_i64 ret, TCGv_i64 a, TCGv_i64 b)
->>>      tcg_gen_movcond_i64(TCG_COND_LTU, ret, a, b, b, a);
->>>  }
->>>  
->>> +void tcg_gen_abs_i64(TCGv_i64 ret, TCGv_i64 a)
->>> +{
->>> +    TCGv_i64 t = tcg_temp_new_i64();
->>> +
->>> +    tcg_gen_sari_i64(t, a, 63);
->>> +    tcg_gen_xor_i64(ret, a, t);
->>> +    tcg_gen_sub_i64(ret, ret, t);
->>> +    tcg_temp_free_i64(t);
->>> +}
->>> +
->>>  /* Size changing operations.  */
->>>  
->>>  void tcg_gen_extrl_i64_i32(TCGv_i32 ret, TCGv_i64 arg)
->>>
->>
->> Nice trick
+On 4/23/19 11:22 PM, Eduardo Habkost wrote:
+> Use SupportStatusInfo to represent deprecation information of
+> machine types.
 > 
-> Per commit 7dcfb0897b99, I think it's worth a:
+> Instead of using a generic "use XXX instead" message for humans,
+> encode the suggested alternative in a machine-friendly way at the
+> 'suggested_alternatives' field.
 > 
-> Inspired-by: Edgar E. Iglesias <edgar.iglesias@gmail.com>
+> Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
+> ---
+>  include/hw/boards.h |  7 ++++---
+>  hw/i386/pc_piix.c   |  4 +++-
+>  hw/ppc/prep.c       |  4 +++-
+>  vl.c                | 13 +++++++++----
+>  4 files changed, 19 insertions(+), 9 deletions(-)
+> 
+> diff --git a/include/hw/boards.h b/include/hw/boards.h
+> index e231860666..243bf3c7ce 100644
+> --- a/include/hw/boards.h
+> +++ b/include/hw/boards.h
+> @@ -8,6 +8,8 @@
+>  #include "hw/qdev.h"
+>  #include "qom/object.h"
+>  #include "qom/cpu.h"
+> +#include "qapi/qapi-types-common.h"
+> +
+>  
+>  /**
+>   * memory_region_allocate_system_memory - Allocate a board's main memory
+> @@ -105,8 +107,7 @@ typedef struct {
+>  
+>  /**
+>   * MachineClass:
+> - * @deprecation_reason: If set, the machine is marked as deprecated. The
+> - *    string should provide some clear information about what to use instead.
+> + * @support_status: Support and deprecation status of machine type.
+>   * @max_cpus: maximum number of CPUs supported. Default: 1
+>   * @min_cpus: minimum number of CPUs supported. Default: 1
+>   * @default_cpus: number of CPUs instantiated if none are specified. Default: 1
+> @@ -169,7 +170,7 @@ struct MachineClass {
+>      char *name;
+>      const char *alias;
+>      const char *desc;
+> -    const char *deprecation_reason;
+> +    SupportStatusInfo support_status;
+>  
+>      void (*init)(MachineState *state);
+>      void (*reset)(void);
+> diff --git a/hw/i386/pc_piix.c b/hw/i386/pc_piix.c
+> index 8ad8e885c6..97bd401618 100644
+> --- a/hw/i386/pc_piix.c
+> +++ b/hw/i386/pc_piix.c
+> @@ -781,7 +781,9 @@ static void pc_i440fx_0_15_machine_options(MachineClass *m)
+>  
+>      pc_i440fx_1_0_machine_options(m);
+>      m->hw_version = "0.15";
+> -    m->deprecation_reason = "use a newer machine type instead";
+> +    m->support_status.deprecated = true;
+> +    m->support_status.has_suggested_alternative = true;
+> +    m->support_status.suggested_alternative = g_strdup("pc");
+>      compat_props_add(m->compat_props, compat, G_N_ELEMENTS(compat));
+>  }
+>  
+> diff --git a/hw/ppc/prep.c b/hw/ppc/prep.c
+> index 847d320465..9a02b0eec4 100644
+> --- a/hw/ppc/prep.c
+> +++ b/hw/ppc/prep.c
+> @@ -587,7 +587,9 @@ static void ppc_prep_init(MachineState *machine)
+>  
+>  static void prep_machine_init(MachineClass *mc)
+>  {
+> -    mc->deprecation_reason = "use 40p machine type instead";
+> +    mc->support_status.deprecated = true;
+> +    mc->support_status.has_suggested_alternative = true;
+> +    mc->support_status.suggested_alternative = g_strdup("40p");
+>      mc->desc = "PowerPC PREP platform";
+>      mc->init = ppc_prep_init;
+>      mc->block_default_type = IF_IDE;
+> diff --git a/vl.c b/vl.c
+> index c696ad2a13..99b857ed2a 100644
+> --- a/vl.c
+> +++ b/vl.c
+> @@ -2610,7 +2610,7 @@ static gint machine_class_cmp(gconstpointer a, gconstpointer b)
+>              }
+>              printf("%-20s %s%s%s\n", mc->name, mc->desc,
+>                     mc->is_default ? " (default)" : "",
+> -                   mc->deprecation_reason ? " (deprecated)" : "");
+> +                   mc->support_status.deprecated ? " (deprecated)" : "");
+>          }
+>      }
+>  
+> @@ -4308,9 +4308,14 @@ int main(int argc, char **argv, char **envp)
+>       * called from configure_accelerator().
+>       */
+>  
+> -    if (!qtest_enabled() && machine_class->deprecation_reason) {
+> -        error_report("Machine type '%s' is deprecated: %s",
+> -                     machine_class->name, machine_class->deprecation_reason);
+> +    if (!qtest_enabled() && machine_class->support_status.deprecated) {
+> +        error_report("Machine type '%s' is deprecated%s%s", machine_class->name,
+> +                     machine_class->support_status.status_message ? ": " : "",
+> +                     machine_class->support_status.status_message ?: "");
+> +        if (machine_class->support_status.suggested_alternative) {
+> +            error_report("Suggested solution: use '%s' machine type instead",
 
-*shrug* As per the comment, I got the sequence from gcc -O2 -S.
+Maybe "Recommended alternative:"?
+(Also consider renaming the SupportStatusInfo.suggested_alternative field).
 
-
-r~
+> +                         machine_class->support_status.suggested_alternative);
+> +        }
+>      }
+>  
+>      /*
+> 
