@@ -1,21 +1,21 @@
-Received: from eggs.gnu.org ([209.51.188.92]:40672)
+Received: from eggs.gnu.org ([209.51.188.92]:42736)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1hIzlj-0003qk-BE
-	for qemu-devel@nongnu.org; Tue, 23 Apr 2019 14:03:48 -0400
+	(envelope-from <jsnow@redhat.com>) id 1hIzoR-0005Q4-Lq
+	for qemu-devel@nongnu.org; Tue, 23 Apr 2019 14:06:38 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1hIzlh-0001CY-91
-	for qemu-devel@nongnu.org; Tue, 23 Apr 2019 14:03:47 -0400
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Date: Tue, 23 Apr 2019 18:03:36 +0000
-Message-ID: <eaa73eb3-a84f-a263-13b2-e25588f00fd7@virtuozzo.com>
+	(envelope-from <jsnow@redhat.com>) id 1hIzoE-0003jC-UX
+	for qemu-devel@nongnu.org; Tue, 23 Apr 2019 14:06:31 -0400
 References: <20190422221714.7630-1-jsnow@redhat.com>
 	<20190422221714.7630-2-jsnow@redhat.com>
-In-Reply-To: <20190422221714.7630-2-jsnow@redhat.com>
-Content-Language: en-US
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <901CD8BD2C0B1143BCDE519EE0ED55E7@eurprd08.prod.outlook.com>
-Content-Transfer-Encoding: base64
+	<eaa73eb3-a84f-a263-13b2-e25588f00fd7@virtuozzo.com>
+From: John Snow <jsnow@redhat.com>
+Message-ID: <91bbd108-4ac4-7e07-6d7f-03efb536ba14@redhat.com>
+Date: Tue, 23 Apr 2019 14:06:02 -0400
 MIME-Version: 1.0
+In-Reply-To: <eaa73eb3-a84f-a263-13b2-e25588f00fd7@virtuozzo.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
 Subject: Re: [Qemu-devel] [PATCH v2 1/2] Makefile: add nit-picky mode to
  sphinx-build
 List-Id: <qemu-devel.nongnu.org>
@@ -26,32 +26,57 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: John Snow <jsnow@redhat.com>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
 Cc: "aliang@redhat.com" <aliang@redhat.com>, "kchamart@redhat.com" <kchamart@redhat.com>, "eblake@redhat.com" <eblake@redhat.com>, Fam Zheng <fam@euphon.net>, "nsoffer@redhat.com" <nsoffer@redhat.com>, "qemu-stable@nongnu.org" <qemu-stable@nongnu.org>, "armbru@redhat.com" <armbru@redhat.com>
 
-MjMuMDQuMjAxOSAxOjE3LCBKb2huIFNub3cgd3JvdGU6DQo+IElmIHdlIGFkZCByZWZlcmVuY2Vz
-IHRoYXQgZG9uJ3QgcmVzb2x2ZSAob3IgYWNjaWRlbnRhbGx5IHJlbW92ZSB0aGVtKSwNCj4gaXQg
-d2lsbCBiZSBoZWxwZnVsIHRvIGhhdmUgYW4gZXJyb3IgbWVzc2FnZSBhbGVydGluZyB1cyB0byB0
-aGF0Lg0KDQphY2NvcmRpbmdseSB0byBkb2NzIEkndmUgZm91bmQsIG5vdCBlcnJvciBidXQgd2Fy
-bmluZy4NCg0KPiANCj4gU2lnbmVkLW9mZi1ieTogSm9obiBTbm93IDxqc25vd0ByZWRoYXQuY29t
-Pg0KDQpSZXZpZXdlZC1ieTogVmxhZGltaXIgU2VtZW50c292LU9naWV2c2tpeSA8dnNlbWVudHNv
-dkB2aXJ0dW96em8uY29tPg0KDQo+IC0tLQ0KPiAgIE1ha2VmaWxlIHwgMiArLQ0KPiAgIDEgZmls
-ZSBjaGFuZ2VkLCAxIGluc2VydGlvbigrKSwgMSBkZWxldGlvbigtKQ0KPiANCj4gZGlmZiAtLWdp
-dCBhL01ha2VmaWxlIGIvTWFrZWZpbGUNCj4gaW5kZXggMDRhMGQ0NTA1MC4uZmY5Y2UyZWQ0YyAx
-MDA2NDQNCj4gLS0tIGEvTWFrZWZpbGUNCj4gKysrIGIvTWFrZWZpbGUNCj4gQEAgLTg5OSw3ICs4
-OTksNyBAQCBkb2NzL3ZlcnNpb24udGV4aTogJChTUkNfUEFUSCkvVkVSU0lPTg0KPiAgIHNwaGlu
-eGRvY3M6ICQoTUFOVUFMX0JVSUxERElSKS9kZXZlbC9pbmRleC5odG1sICQoTUFOVUFMX0JVSUxE
-RElSKS9pbnRlcm9wL2luZGV4Lmh0bWwNCj4gICANCj4gICAjIENhbm5lZCBjb21tYW5kIHRvIGJ1
-aWxkIGEgc2luZ2xlIG1hbnVhbA0KPiAtYnVpbGQtbWFudWFsID0gJChjYWxsIHF1aWV0LWNvbW1h
-bmQsc3BoaW54LWJ1aWxkICQoaWYgJChWKSwsLXEpIC1iIGh0bWwgLUQgdmVyc2lvbj0kKFZFUlNJ
-T04pIC1EIHJlbGVhc2U9IiQoRlVMTF9WRVJTSU9OKSIgLWQgLmRvY3RyZWVzLyQxICQoU1JDX1BB
-VEgpL2RvY3MvJDEgJChNQU5VQUxfQlVJTERESVIpLyQxICwiU1BISU5YIiwiJChNQU5VQUxfQlVJ
-TERESVIpLyQxIikNCj4gK2J1aWxkLW1hbnVhbCA9ICQoY2FsbCBxdWlldC1jb21tYW5kLHNwaGlu
-eC1idWlsZCAkKGlmICQoViksLC1xKSAtbiAtYiBodG1sIC1EIHZlcnNpb249JChWRVJTSU9OKSAt
-RCByZWxlYXNlPSIkKEZVTExfVkVSU0lPTikiIC1kIC5kb2N0cmVlcy8kMSAkKFNSQ19QQVRIKS9k
-b2NzLyQxICQoTUFOVUFMX0JVSUxERElSKS8kMSAsIlNQSElOWCIsIiQoTUFOVUFMX0JVSUxERElS
-KS8kMSIpDQo+ICAgIyBXZSBhc3N1bWUgYWxsIFJTVCBmaWxlcyBpbiB0aGUgbWFudWFsJ3MgZGly
-ZWN0b3J5IGFyZSB1c2VkIGluIGl0DQo+ICAgbWFudWFsLWRlcHMgPSAkKHdpbGRjYXJkICQoU1JD
-X1BBVEgpL2RvY3MvJDEvKi5yc3QpICQoU1JDX1BBVEgpL2RvY3MvJDEvY29uZi5weSAkKFNSQ19Q
-QVRIKS9kb2NzL2NvbmYucHkNCj4gICANCj4gDQoNCg0KLS0gDQpCZXN0IHJlZ2FyZHMsDQpWbGFk
-aW1pcg0K
+
+
+On 4/23/19 2:03 PM, Vladimir Sementsov-Ogievskiy wrote:
+> 23.04.2019 1:17, John Snow wrote:
+>> If we add references that don't resolve (or accidentally remove them),
+>> it will be helpful to have an error message alerting us to that.
+>=20
+> accordingly to docs I've found, not error but warning.
+>=20
+Oh, true. I have to revise the document anyway, so I'll change my
+phrasing here -- it won't cause the build to fail, but you will be able
+to see the error when you build. I think it's helpful to have as a
+mechanical check -- especially if we succeed in building generated ReST
+documentation (eventually?...)
+
+>>
+>> Signed-off-by: John Snow <jsnow@redhat.com>
+>=20
+> Reviewed-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+>=20
+>> ---
+>>   Makefile | 2 +-
+>>   1 file changed, 1 insertion(+), 1 deletion(-)
+>>
+>> diff --git a/Makefile b/Makefile
+>> index 04a0d45050..ff9ce2ed4c 100644
+>> --- a/Makefile
+>> +++ b/Makefile
+>> @@ -899,7 +899,7 @@ docs/version.texi: $(SRC_PATH)/VERSION
+>>   sphinxdocs: $(MANUAL_BUILDDIR)/devel/index.html $(MANUAL_BUILDDIR)/i=
+nterop/index.html
+>>  =20
+>>   # Canned command to build a single manual
+>> -build-manual =3D $(call quiet-command,sphinx-build $(if $(V),,-q) -b =
+html -D version=3D$(VERSION) -D release=3D"$(FULL_VERSION)" -d .doctrees/=
+$1 $(SRC_PATH)/docs/$1 $(MANUAL_BUILDDIR)/$1 ,"SPHINX","$(MANUAL_BUILDDIR=
+)/$1")
+>> +build-manual =3D $(call quiet-command,sphinx-build $(if $(V),,-q) -n =
+-b html -D version=3D$(VERSION) -D release=3D"$(FULL_VERSION)" -d .doctre=
+es/$1 $(SRC_PATH)/docs/$1 $(MANUAL_BUILDDIR)/$1 ,"SPHINX","$(MANUAL_BUILD=
+DIR)/$1")
+>>   # We assume all RST files in the manual's directory are used in it
+>>   manual-deps =3D $(wildcard $(SRC_PATH)/docs/$1/*.rst) $(SRC_PATH)/do=
+cs/$1/conf.py $(SRC_PATH)/docs/conf.py
+>>  =20
+>>
+>=20
+>=20
+
+--=20
+=E2=80=94js
