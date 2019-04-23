@@ -2,83 +2,81 @@ Return-Path: <SRS0=zUjA=SZ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.7 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-6.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EB464C10F03
-	for <qemu-devel@archiver.kernel.org>; Tue, 23 Apr 2019 22:28:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7DE00C10F03
+	for <qemu-devel@archiver.kernel.org>; Tue, 23 Apr 2019 22:42:32 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id ACDEC218D2
-	for <qemu-devel@archiver.kernel.org>; Tue, 23 Apr 2019 22:28:59 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=google.com header.i=@google.com header.b="VRf1xOj7"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org ACDEC218D2
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=nongnu.org
+	by mail.kernel.org (Postfix) with ESMTPS id 4B402218D3
+	for <qemu-devel@archiver.kernel.org>; Tue, 23 Apr 2019 22:42:32 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4B402218D3
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:60377 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:60550 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hJ3uM-0002Yj-UV
-	for qemu-devel@archiver.kernel.org; Tue, 23 Apr 2019 18:28:58 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:60226)
-	by lists.gnu.org with esmtp (Exim 4.71) (envelope-from
-	<3oI-_XAIKCqkNTPXXPUN.LXVZNVd-MNeNUWXWPWd.XaP@flex--ek.bounces.google.com>)
-	id 1hJ3mX-0007jb-Uy
-	for qemu-devel@nongnu.org; Tue, 23 Apr 2019 18:20:54 -0400
+	id 1hJ47T-0006FB-FI
+	for qemu-devel@archiver.kernel.org; Tue, 23 Apr 2019 18:42:31 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:43995)
+	by lists.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <philmd@redhat.com>) id 1hJ45a-0004iA-LN
+	for qemu-devel@nongnu.org; Tue, 23 Apr 2019 18:40:35 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from
-	<3oI-_XAIKCqkNTPXXPUN.LXVZNVd-MNeNUWXWPWd.XaP@flex--ek.bounces.google.com>)
-	id 1hJ3mQ-0005cz-Gc
-	for qemu-devel@nongnu.org; Tue, 23 Apr 2019 18:20:50 -0400
-Received: from mail-pg1-x54a.google.com ([2607:f8b0:4864:20::54a]:48289)
+	(envelope-from <philmd@redhat.com>) id 1hJ3zo-0004ER-D4
+	for qemu-devel@nongnu.org; Tue, 23 Apr 2019 18:34:37 -0400
+Received: from mail-wr1-f67.google.com ([209.85.221.67]:45633)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from
-	<3oI-_XAIKCqkNTPXXPUN.LXVZNVd-MNeNUWXWPWd.XaP@flex--ek.bounces.google.com>)
-	id 1hJ3mO-0005Sf-Cn
-	for qemu-devel@nongnu.org; Tue, 23 Apr 2019 18:20:46 -0400
-Received: by mail-pg1-x54a.google.com with SMTP id o1so10835250pgv.15
-	for <qemu-devel@nongnu.org>; Tue, 23 Apr 2019 15:20:18 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20161025;
-	h=date:message-id:mime-version:subject:from:to:cc;
-	bh=G7+dfKJloFPbILTvvf6aGmjJBsYOILBOFQc4/5QimiM=;
-	b=VRf1xOj7d2tOFLuCMSviOux/vfFy9CnA5TVpqWvP16aF/IASpVp3k89wNJbbwgqrpk
-	4wtvdvt/r85Gu8KXoPnLkpOe5zAry+HXm09BSsauWqzdQauFqyQ1jIxQXbeRlronKkUy
-	DgvKkKTIM03bfunz2bvDE1wRVFZ0rYHU5F8l/YbXX5941x9K1H/MkrR7BWgfabIYWBF6
-	/apeIric+GQq3Z82Nvfm789L/MiZYFrBogbAWZk7qcRMImUzQXHAILfS1SaxlWwJtorc
-	kufDOWlzV/WDbd75AqoMcGRbxvzurtI8ntXNmlQQZshDx0TDJ2B0zU0A7E8Tjky8SZ7L
-	HBTw==
+	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1hJ3zo-0004DD-66
+	for qemu-devel@nongnu.org; Tue, 23 Apr 2019 18:34:36 -0400
+Received: by mail-wr1-f67.google.com with SMTP id s15so22188258wra.12
+	for <qemu-devel@nongnu.org>; Tue, 23 Apr 2019 15:34:36 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
 	d=1e100.net; s=20161025;
-	h=x-gm-message-state:date:message-id:mime-version:subject:from:to:cc;
-	bh=G7+dfKJloFPbILTvvf6aGmjJBsYOILBOFQc4/5QimiM=;
-	b=Jl+12Zu6F7xFSl0Km/WQKxr4mzQrI2eBsi7jUnO7HoVMkIzWp0Ruy/wijmX5VGsye9
-	uflvX/ausHsPutpDEK1kxvhLiRCaq0WfWXSEChKApx69ATmdRtcSV0w6VN4xSKvFOXZq
-	jWLLqkWZlv6MTxelDIAg3TJl2H9GGA7dZWpc0sWYt8PC2I65oUakjkG55AYAcIU9TYFo
-	1hINKufM0cKfwmuzJhoKIwTePOplghWyko3B9lUbDSNWZxsY3DmR+4rFDooKqYAIHScB
-	5wLi1vD8PHXp0OrsQMeUXAugWPj9iTtwLgYjdXq+K4+a6w5O6J9Wkp5T0N59c6ZoJe42
-	pInw==
-X-Gm-Message-State: APjAAAUFsBBu5ZNjeon+XdKgmxO0I1qn17u22Qzq8LZ/bIXqBw073CTg
-	pb45GY2AetukttIol14wbvGvVf55t4mL1Jey3+oSw8vwGU6ikQBo2nRXiIp7gfheCx9wCAB4xIU
-	WgDM8B/thzuYovORTbKzn6ROFpyraUIThNG4MfglGcB1ZdRM2tA==
-X-Google-Smtp-Source: APXvYqwKZdHy3mL27tNmki6N3e56VQADasNQaZcWr+/7V387BOQHf2vKajg90LkvV2VpMz2S0WA5gA==
-X-Received: by 2002:a63:5b4d:: with SMTP id l13mr26812926pgm.160.1556058016828;
-	Tue, 23 Apr 2019 15:20:16 -0700 (PDT)
-Date: Tue, 23 Apr 2019 15:20:05 -0700
-Message-Id: <20190423222005.246981-1-ek@google.com>
-Mime-Version: 1.0
-X-Mailer: git-send-email 2.21.0.593.g511ec345e18-goog
-To: qemu-devel@nongnu.org
+	h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
+	:date:user-agent:mime-version:in-reply-to:content-language
+	:content-transfer-encoding;
+	bh=QunzcbZ8nTWCmoiv3jqVBQGDo7+nt4uraJUdNozr4Zs=;
+	b=CJ+p3LzYltSFYOBAia8D/fdJLeBt1IuPn8RmnWKGtFjeJMMGeYhBiyo9myU1PGdZft
+	ZYGgc/H8F8Wv2gOaRKSeISunhXEAH2RsC8kgtCT2R3Ashuu68dlRvnnoIw04ZKJCNeTV
+	udXpCvb4nX9wAce1xSBOega+Xcss+Tp2eQAedfvyd41LNtngn//lJ6dfrMbzH6cBG3dM
+	9KTLPKitBU39pHecsNsoz11cAIzZ52CXIU3dXyA+P9/NFWweN5fs2DXUbLi+8L5Pnfti
+	Ea2KKVCuNK0JJlsX2hHiQeykjz3MQTgoFMMrcvwnEYwCtNeXGWjt4TkqJVNvYQlJ5cMZ
+	knbw==
+X-Gm-Message-State: APjAAAXsz5cV9hMlGOonqAgBZs3H8gFAZRD6cArdya40B0d+KICMAr+f
+	hTKyGvjsxayqIGBRguLrDcalpQ==
+X-Google-Smtp-Source: APXvYqwMiEPsQF9zoXmt7WNqFkrbKOAjYf+Mg07gPUqo7QsEcbdTfVpCR8ebtDj48Dt5+uNiT7FF0w==
+X-Received: by 2002:a05:6000:11cf:: with SMTP id
+	i15mr18182693wrx.287.1556058875239; 
+	Tue, 23 Apr 2019 15:34:35 -0700 (PDT)
+Received: from [192.168.1.25] (atoulouse-656-1-803-163.w86-221.abo.wanadoo.fr.
+	[86.221.12.163]) by smtp.gmail.com with ESMTPSA id
+	t15sm15469016wrx.22.2019.04.23.15.34.34
+	(version=TLS1_3 cipher=AEAD-AES128-GCM-SHA256 bits=128/128);
+	Tue, 23 Apr 2019 15:34:34 -0700 (PDT)
+To: Thomas Huth <thuth@redhat.com>, Jason Wang <jasowang@redhat.com>,
+	qemu-devel@nongnu.org
+References: <20190423160608.7519-1-thuth@redhat.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Openpgp: id=89C1E78F601EE86C867495CBA2A3FD6EDEADC0DE;
+	url=http://pgp.mit.edu/pks/lookup?op=get&search=0xA2A3FD6EDEADC0DE
+Message-ID: <319f3544-a107-416f-ff8a-3501943f1821@redhat.com>
+Date: Wed, 24 Apr 2019 00:34:33 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+	Thunderbird/60.6.1
+MIME-Version: 1.0
+In-Reply-To: <20190423160608.7519-1-thuth@redhat.com>
 Content-Type: text/plain; charset="UTF-8"
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
-	recognized.
-X-Received-From: 2607:f8b0:4864:20::54a
-X-Mailman-Approved-At: Tue, 23 Apr 2019 18:28:10 -0400
-Subject: [Qemu-devel] [PATCH] The ioctl(SIOCGIFNAME) call requires a struct
- ifreq.
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+	[fuzzy]
+X-Received-From: 209.85.221.67
+Subject: Re: [Qemu-devel] [PATCH] net: Print output of "-net nic,
+ model=help" to stdout instead of stderr
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -90,34 +88,44 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-From: Erik Kline via Qemu-devel <qemu-devel@nongnu.org>
-Reply-To: Erik Kline <ek@google.com>
-Cc: Erik Kline <ek@google.com>, ek@loon.com
+Cc: qemu-trivial@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190423222005.zR6vB7fu2MNu3NdFj_I7uCyFR_MAfIjKZilILonjQw0@z>
+Message-ID: <20190423223433.H1ACw87h2kD1MIwbrogA0HmH-DKa9zy5KLJQrbmH9QI@z>
 
-Signed-off-by: Erik Kline <ek@google.com>
-Buglink: https://bugs.launchpad.net/qemu/+bug/1814352
----
- linux-user/ioctls.h | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+On 4/23/19 6:06 PM, Thomas Huth wrote:
+> We are printing all other help output to stdout already (e.g. "-help",
+> "-cpu help" and "-machine help" output). So the "-net nic,model=help"
+> output should go to stdout instead of stderr, too. And while we're at
+> it, also print the NICs line by line, like we do it e.g. with the
+> "-cpu help" or "-M help" output, too.
+> 
+> Buglink: https://bugs.launchpad.net/qemu/+bug/1574327
+> Signed-off-by: Thomas Huth <thuth@redhat.com>
+> ---
+>  net/net.c | 7 ++++---
+>  1 file changed, 4 insertions(+), 3 deletions(-)
+> 
+> diff --git a/net/net.c b/net/net.c
+> index f3a3c5444c..2cf5e76469 100644
+> --- a/net/net.c
+> +++ b/net/net.c
+> @@ -837,9 +837,10 @@ int qemu_show_nic_models(const char *arg, const char *const *models)
+>          return 0;
+>      }
+>  
+> -    fprintf(stderr, "qemu: Supported NIC models: ");
+> -    for (i = 0 ; models[i]; i++)
+> -        fprintf(stderr, "%s%c", models[i], models[i+1] ? ',' : '\n');
+> +    printf("Supported NIC models:\n");
+> +    for (i = 0 ; models[i]; i++) {
+> +        printf("%s\n", models[i]);
+> +    }
+>      return 1;
+>  }
+>  
+> 
 
-diff --git a/linux-user/ioctls.h b/linux-user/ioctls.h
-index ae8951625f..37501f575c 100644
---- a/linux-user/ioctls.h
-+++ b/linux-user/ioctls.h
-@@ -178,7 +178,7 @@
- #endif /* CONFIG_USBFS */
- 
-   IOCTL(SIOCATMARK, IOC_R, MK_PTR(TYPE_INT))
--  IOCTL(SIOCGIFNAME, IOC_RW, MK_PTR(TYPE_INT))
-+  IOCTL(SIOCGIFNAME, IOC_RW, MK_PTR(MK_STRUCT(STRUCT_int_ifreq)))
-   IOCTL(SIOCGIFFLAGS, IOC_W | IOC_R, MK_PTR(MK_STRUCT(STRUCT_short_ifreq)))
-   IOCTL(SIOCSIFFLAGS, IOC_W, MK_PTR(MK_STRUCT(STRUCT_short_ifreq)))
-   IOCTL(SIOCGIFADDR, IOC_W | IOC_R, MK_PTR(MK_STRUCT(STRUCT_sockaddr_ifreq)))
--- 
-2.21.0.593.g511ec345e18-goog
-
+Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
 
