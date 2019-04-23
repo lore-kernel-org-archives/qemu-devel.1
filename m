@@ -1,27 +1,26 @@
-Received: from eggs.gnu.org ([209.51.188.92]:56832)
+Received: from eggs.gnu.org ([209.51.188.92]:33970)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eric.auger@redhat.com>) id 1hIx4x-0002Ff-Pk
-	for qemu-devel@nongnu.org; Tue, 23 Apr 2019 11:11:28 -0400
+	(envelope-from <no-reply@patchew.org>) id 1hIxPg-0007Jx-BJ
+	for qemu-devel@nongnu.org; Tue, 23 Apr 2019 11:32:53 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eric.auger@redhat.com>) id 1hIx4w-0000zt-TX
-	for qemu-devel@nongnu.org; Tue, 23 Apr 2019 11:11:27 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:36038)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eric.auger@redhat.com>)
-	id 1hIx4w-0000yo-Mq
-	for qemu-devel@nongnu.org; Tue, 23 Apr 2019 11:11:26 -0400
-References: <20190409155831.18764-1-eric.auger@redhat.com>
-	<20190412133111.028a9c6d.cohuck@redhat.com>
-From: Auger Eric <eric.auger@redhat.com>
-Message-ID: <e4e20c42-5b6e-7072-8105-486650aaf95b@redhat.com>
-Date: Tue, 23 Apr 2019 17:11:19 +0200
+	(envelope-from <no-reply@patchew.org>) id 1hIxPe-00044w-VE
+	for qemu-devel@nongnu.org; Tue, 23 Apr 2019 11:32:52 -0400
+Resent-Message-Id: <E1hIxPe-00044w-VE@eggs.gnu.org>
+Received: from sender4-of-o55.zoho.com ([136.143.188.55]:21544)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
+	id 1hIxPe-00043l-M7
+	for qemu-devel@nongnu.org; Tue, 23 Apr 2019 11:32:50 -0400
+In-Reply-To: <20190423092602.1254515-1-jakub.jermar@kernkonzept.com>
+Message-ID: <155603351531.26689.4854613420813662203@c2072b67cc0c>
+Reply-To: <qemu-devel@nongnu.org>
 MIME-Version: 1.0
-In-Reply-To: <20190412133111.028a9c6d.cohuck@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH for-4.1] vfio/common: Introduce
- vfio_set_irq_signaling helper
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+From: no-reply@patchew.org
+Date: Tue, 23 Apr 2019 08:31:56 -0700 (PDT)
+Subject: Re: [Qemu-devel] [PATCH] mips: Decide to map PAGE_EXEC in
+ map_address
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,45 +29,50 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Cornelia Huck <cohuck@redhat.com>
-Cc: aik@ozlabs.ru, alex.williamson@redhat.com, qemu-devel@nongnu.org, eric.auger.pro@gmail.com
+To: jakub.jermar@kernkonzept.com
+Cc: fam@euphon.net, qemu-devel@nongnu.org, arikalo@wavecomp.com, amarkovic@wavecomp.com, aurelien@aurel32.net
 
-Hi Cornelia
-
-On 4/12/19 1:31 PM, Cornelia Huck wrote:
-> On Tue,  9 Apr 2019 17:58:31 +0200
-> Eric Auger <eric.auger@redhat.com> wrote:
-> 
->> The code used to assign an interrupt index/subindex to an
->> eventfd is duplicated many times. Let's introduce an helper that
->> allows to set/unset the signaling for an ACTION_TRIGGER or
->> ACTION_UNMASK action.
-> 
-> I like that, and it looks like ccw can use the new function as well. (I
-> can do a patch on top.)
-
-Thanks! Yes, feel free to proceed with the ccw patch once this gets
-merged.
-> 
->>
->> Signed-off-by: Eric Auger <eric.auger@redhat.com>
->>
->> ---
->>
->> This is a follow-up to
->> [PATCH v2 0/2] vfio-pci: Introduce vfio_set_event_handler().
->> It looks to me that introducing vfio_set_irq_signaling() has more
->> benefits in term of code reduction and the helper abstraction
->> looks cleaner.
->> ---
->>  hw/vfio/common.c              |  61 +++++++++
->>  hw/vfio/pci.c                 | 224 ++++++++--------------------------
->>  hw/vfio/platform.c            |  55 +++------
->>  include/hw/vfio/vfio-common.h |   2 +
->>  4 files changed, 134 insertions(+), 208 deletions(-)
-> 
-> Reviewed-by: Cornelia Huck <cohuck@redhat.com>
-Thanks
-
-Eric
-> 
+UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDE5MDQyMzA5MjYwMi4xMjU0
+NTE1LTEtamFrdWIuamVybWFyQGtlcm5rb256ZXB0LmNvbS8KCgoKSGksCgpUaGlzIHNlcmllcyBz
+ZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1zLiBTZWUgb3V0cHV0IGJlbG93
+IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKVHlwZTogc2VyaWVzCk1lc3NhZ2UtaWQ6IDIwMTkwNDIz
+MDkyNjAyLjEyNTQ1MTUtMS1qYWt1Yi5qZXJtYXJAa2VybmtvbnplcHQuY29tClN1YmplY3Q6IFtR
+ZW11LWRldmVsXSBbUEFUQ0hdIG1pcHM6IERlY2lkZSB0byBtYXAgUEFHRV9FWEVDIGluIG1hcF9h
+ZGRyZXNzCgo9PT0gVEVTVCBTQ1JJUFQgQkVHSU4gPT09CiMhL2Jpbi9iYXNoCmdpdCByZXYtcGFy
+c2UgYmFzZSA+IC9kZXYvbnVsbCB8fCBleGl0IDAKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYucmVu
+YW1lbGltaXQgMApnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVzIFRydWUKZ2l0IGNvbmZp
+ZyAtLWxvY2FsIGRpZmYuYWxnb3JpdGhtIGhpc3RvZ3JhbQouL3NjcmlwdHMvY2hlY2twYXRjaC5w
+bCAtLW1haWxiYWNrIGJhc2UuLgo9PT0gVEVTVCBTQ1JJUFQgRU5EID09PQoKVXBkYXRpbmcgM2M4
+Y2Y1YTljMjFmZjg3ODIxNjRkMWRlZjdmNDRiZDg4ODcxMzM4NApGcm9tIGh0dHBzOi8vZ2l0aHVi
+LmNvbS9wYXRjaGV3LXByb2plY3QvcWVtdQogdCBbdGFnIHVwZGF0ZV0gICAgICAgICAgICBwYXRj
+aGV3LzE1NTU2NjkwOTItMTAzNTEtMS1naXQtc2VuZC1lbWFpbC1mcmVkZXJpYy5rb25yYWRAYWRh
+Y29yZS5jb20gLT4gcGF0Y2hldy8xNTU1NjY5MDkyLTEwMzUxLTEtZ2l0LXNlbmQtZW1haWwtZnJl
+ZGVyaWMua29ucmFkQGFkYWNvcmUuY29tCiB0IFt0YWcgdXBkYXRlXSAgICAgICAgICAgIHBhdGNo
+ZXcvMTU1NjAxODk4Mi0zNzE1LTEtZ2l0LXNlbmQtZW1haWwtYWxla3NhbmRhci5tYXJrb3ZpY0By
+dC1yay5jb20gLT4gcGF0Y2hldy8xNTU2MDE4OTgyLTM3MTUtMS1naXQtc2VuZC1lbWFpbC1hbGVr
+c2FuZGFyLm1hcmtvdmljQHJ0LXJrLmNvbQogdCBbdGFnIHVwZGF0ZV0gICAgICAgICAgICBwYXRj
+aGV3LzIwMTkwNDIyMTQ1ODM4LjcwOTAzLTEtdnNlbWVudHNvdkB2aXJ0dW96em8uY29tIC0+IHBh
+dGNoZXcvMjAxOTA0MjIxNDU4MzguNzA5MDMtMS12c2VtZW50c292QHZpcnR1b3p6by5jb20KICog
+W25ldyB0YWddICAgICAgICAgICAgICAgcGF0Y2hldy8yMDE5MDQyMzA5MjYwMi4xMjU0NTE1LTEt
+amFrdWIuamVybWFyQGtlcm5rb256ZXB0LmNvbSAtPiBwYXRjaGV3LzIwMTkwNDIzMDkyNjAyLjEy
+NTQ1MTUtMS1qYWt1Yi5qZXJtYXJAa2VybmtvbnplcHQuY29tCiB0IFt0YWcgdXBkYXRlXSAgICAg
+ICAgICAgIHBhdGNoZXcvMjAxOTA0MjMxMDIxNDUuMTQ4MTItMS1mNGJ1Z0BhbXNhdC5vcmcgLT4g
+cGF0Y2hldy8yMDE5MDQyMzEwMjE0NS4xNDgxMi0xLWY0YnVnQGFtc2F0Lm9yZwogKiBbbmV3IHRh
+Z10gICAgICAgICAgICAgICBwYXRjaGV3LzIwMTkwNDIzMTMyMDA0LjEzNzI1LTEtbWFyY2FuZHJl
+Lmx1cmVhdUByZWRoYXQuY29tIC0+IHBhdGNoZXcvMjAxOTA0MjMxMzIwMDQuMTM3MjUtMS1tYXJj
+YW5kcmUubHVyZWF1QHJlZGhhdC5jb20KU3dpdGNoZWQgdG8gYSBuZXcgYnJhbmNoICd0ZXN0Jwo1
+YjYwZjAyNjU4IG1pcHM6IERlY2lkZSB0byBtYXAgUEFHRV9FWEVDIGluIG1hcF9hZGRyZXNzCgo9
+PT0gT1VUUFVUIEJFR0lOID09PQpFUlJPUjogYnJhY2VzIHt9IGFyZSBuZWNlc3NhcnkgZm9yIGFs
+bCBhcm1zIG9mIHRoaXMgc3RhdGVtZW50CiM0NzogRklMRTogdGFyZ2V0L21pcHMvaGVscGVyLmM6
+MTA0OgorICAgICAgICAgICAgICAgIGlmICghKG4gPyB0bGItPlhJMSA6IHRsYi0+WEkwKSkKWy4u
+Ll0KCnRvdGFsOiAxIGVycm9ycywgMCB3YXJuaW5ncywgNTIgbGluZXMgY2hlY2tlZAoKQ29tbWl0
+IDViNjBmMDI2NThiYiAobWlwczogRGVjaWRlIHRvIG1hcCBQQUdFX0VYRUMgaW4gbWFwX2FkZHJl
+c3MpIGhhcyBzdHlsZSBwcm9ibGVtcywgcGxlYXNlIHJldmlldy4gIElmIGFueSBvZiB0aGVzZSBl
+cnJvcnMKYXJlIGZhbHNlIHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRhaW5lciwg
+c2VlCkNIRUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMuCj09PSBPVVRQVVQgRU5EID09PQoKVGVzdCBj
+b21tYW5kIGV4aXRlZCB3aXRoIGNvZGU6IDEKCgpUaGUgZnVsbCBsb2cgaXMgYXZhaWxhYmxlIGF0
+Cmh0dHA6Ly9wYXRjaGV3Lm9yZy9sb2dzLzIwMTkwNDIzMDkyNjAyLjEyNTQ1MTUtMS1qYWt1Yi5q
+ZXJtYXJAa2VybmtvbnplcHQuY29tL3Rlc3RpbmcuY2hlY2twYXRjaC8/dHlwZT1tZXNzYWdlLgot
+LS0KRW1haWwgZ2VuZXJhdGVkIGF1dG9tYXRpY2FsbHkgYnkgUGF0Y2hldyBbaHR0cHM6Ly9wYXRj
+aGV3Lm9yZy9dLgpQbGVhc2Ugc2VuZCB5b3VyIGZlZWRiYWNrIHRvIHBhdGNoZXctZGV2ZWxAcmVk
+aGF0LmNvbQ==
