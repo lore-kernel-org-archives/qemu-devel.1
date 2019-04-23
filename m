@@ -1,29 +1,27 @@
-Received: from eggs.gnu.org ([209.51.188.92]:50442)
+Received: from eggs.gnu.org ([209.51.188.92]:52718)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.williamson@redhat.com>) id 1hIwjR-00011e-KU
-	for qemu-devel@nongnu.org; Tue, 23 Apr 2019 10:49:14 -0400
+	(envelope-from <richard.henderson@linaro.org>) id 1hIwrJ-0003ln-Mt
+	for qemu-devel@nongnu.org; Tue, 23 Apr 2019 10:57:22 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.williamson@redhat.com>) id 1hIwjQ-0003lY-3C
-	for qemu-devel@nongnu.org; Tue, 23 Apr 2019 10:49:13 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:44728)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <alex.williamson@redhat.com>)
-	id 1hIwjP-0003ko-RV
-	for qemu-devel@nongnu.org; Tue, 23 Apr 2019 10:49:12 -0400
-Date: Tue, 23 Apr 2019 08:48:52 -0600
-From: Alex Williamson <alex.williamson@redhat.com>
-Message-ID: <20190423084852.62168bb2@x1.home>
-In-Reply-To: <20190423134400.GL6022@redhat.com>
-References: <20190419083258.19580-1-yan.y.zhao@intel.com>
-	<20190419083505.19654-1-yan.y.zhao@intel.com>
-	<20190423103939.GF6022@redhat.com>
-	<20190423063540.7ec83c31@x1.home>
-	<20190423134400.GL6022@redhat.com>
+	(envelope-from <richard.henderson@linaro.org>) id 1hIwrI-0008Lc-H0
+	for qemu-devel@nongnu.org; Tue, 23 Apr 2019 10:57:21 -0400
+Received: from mail-pg1-x533.google.com ([2607:f8b0:4864:20::533]:33638)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+	id 1hIwrI-0008JK-7R
+	for qemu-devel@nongnu.org; Tue, 23 Apr 2019 10:57:20 -0400
+Received: by mail-pg1-x533.google.com with SMTP id k19so7747325pgh.0
+	for <qemu-devel@nongnu.org>; Tue, 23 Apr 2019 07:57:19 -0700 (PDT)
+References: <20190423102145.14812-1-f4bug@amsat.org>
+From: Richard Henderson <richard.henderson@linaro.org>
+Message-ID: <7319f017-da46-a2ec-ff9d-29987c2d0999@linaro.org>
+Date: Tue, 23 Apr 2019 07:57:15 -0700
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH 1/2] vfio/mdev: add version field as
- mandatory attribute for mdev device
+In-Reply-To: <20190423102145.14812-1-f4bug@amsat.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH 0/2] tcg: more tcg_gen_abs() uses
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,130 +30,22 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Daniel P. =?UTF-8?B?QmVycmFuZ8Op?=" <berrange@redhat.com>
-Cc: Yan Zhao <yan.y.zhao@intel.com>, intel-gvt-dev@lists.freedesktop.org, cjia@nvidia.com, kvm@vger.kernel.org, aik@ozlabs.ru, Zhengxiao.zx@alibaba-inc.com, shuangtai.tst@alibaba-inc.com, qemu-devel@nongnu.org, kwankhede@nvidia.com, eauger@redhat.com, yi.l.liu@intel.com, eskultet@redhat.com, ziye.yang@intel.com, mlevitsk@redhat.com, pasic@linux.ibm.com, libvir-list@redhat.com, arei.gonglei@huawei.com, felipe@nutanix.com, Ken.Xue@amd.com, kevin.tian@intel.com, dgilbert@redhat.com, zhenyuw@linux.intel.com, changpeng.liu@intel.com, cohuck@redhat.com, linux-kernel@vger.kernel.org, zhi.a.wang@intel.com, jonathan.davies@nutanix.com, shaopeng.he@intel.com
+To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>, qemu-devel@nongnu.org
+Cc: David Gibson <david@gibson.dropbear.id.au>, David Hildenbrand <david@redhat.com>, Bastian Koppelmann <kbastian@mail.uni-paderborn.de>, qemu-ppc@nongnu.org
 
-On Tue, 23 Apr 2019 14:44:00 +0100
-Daniel P. Berrang=C3=A9 <berrange@redhat.com> wrote:
+On 4/23/19 3:21 AM, Philippe Mathieu-Daudé wrote:
+> Hi Richard, 2 patches to complete your series.
+> 
+> Based on Richard's "tcg vector improvements" series:
+> https://lists.gnu.org/archive/html/qemu-devel/2019-04/msg03430.html
+> 
+> Regards,
+> 
+> Phil.
+> 
+> Based-on: <20190420073442.7488-1-richard.henderson@linaro.org>
 
-> On Tue, Apr 23, 2019 at 06:35:40AM -0600, Alex Williamson wrote:
-> > On Tue, 23 Apr 2019 11:39:39 +0100
-> > Daniel P. Berrang=C3=A9 <berrange@redhat.com> wrote:
-> >  =20
-> > > On Fri, Apr 19, 2019 at 04:35:04AM -0400, Yan Zhao wrote: =20
-> > > > +* version
-> > > > +
-> > > > +  This attribute is rw. It is used to check whether two devices ar=
-e compatible
-> > > > +  for live migration. If this attribute is missing, then the corre=
-sponding mdev
-> > > > +  device is regarded as not supporting live migration.
-> > > > +
-> > > > +  It consists of two parts: common part and vendor proprietary par=
-t.
-> > > > +  common part: 32 bit. lower 16 bits is vendor id and higher 16 bi=
-ts identifies
-> > > > +               device type. e.g., for pci device, it is
-> > > > +               "pci vendor id" | (VFIO_DEVICE_FLAGS_PCI << 16).
-> > > > +  vendor proprietary part: this part is varied in length. vendor d=
-river can
-> > > > +               specify any string to identify a device.
-> > > > +
-> > > > +  When reading this attribute, it should show device version strin=
-g of the device
-> > > > +  of type <type-id>. If a device does not support live migration, =
-it should
-> > > > +  return errno.
-> > > > +  When writing a string to this attribute, it returns errno for in=
-compatibility
-> > > > +  or returns written string length in compatibility case. If a dev=
-ice does not
-> > > > +  support live migration, it always returns errno.
-> > > > +
-> > > > +  for example.
-> > > > +  # cat \
-> > > > + /sys/bus/pci/devices/0000\:00\:02.0/mdev_supported_types/i915-GVT=
-g_V5_2/version
-> > > > +  00028086-193b-i915-GVTg_V5_2
-> > > > +
-> > > > +  #echo 00028086-193b-i915-GVTg_V5_2 > \
-> > > > + /sys/bus/pci/devices/0000\:00\:02.0/mdev_supported_types/i915-GVT=
-g_V5_4/version
-> > > > + -bash: echo: write error: Invalid argument
-> > > > +   =20
-> > >=20
-> > > IIUC this path is against the physical device. IOW, the mgmt app woul=
-d have
-> > > to first write to the "version" file to choose a version, and then wr=
-ite to
-> > > the "create" file to actually create an virtual device. This has the =
-obvious
-> > > concurrency problem if multiple devices are being created at the same=
- time
-> > > and distinct versions for each device are required. There would need =
-to be
-> > > a locking scheme defined to ensure safety. =20
-> >=20
-> > "Create a device of a given version" is not an intended feature of this
-> > interface aiui.  Writing the version attribute only indicates
-> > migration compatibility with a binary result.
-> >   =20
-> > > Wouldn't it be better if we can pass the desired version when we writ=
-e to
-> > > the "create" file, so that we avoid any concurrent usage problems. "v=
-ersion"
-> > > could be just a read-only file with a *list* of supported versions.
-> > >=20
-> > > eg
-> > >=20
-> > >   $ cat /sys/bus/pci/devices/0000\:00\:02.0/mdev_supported_types/i915=
--GVTg_V5_4/version
-> > >   5.0
-> > >   5.1
-> > >   5.2
-> > >=20
-> > >   $ echo "83b8f4f2-509f-382f-3c1e-e6bfe0fa1001;version=3D5.2" >
-> > >       /sys/devices/virtual/mtty/mtty/mdev_supported_types/mtty-2/crea=
-te =20
-> >=20
-> > This is reminiscent of the proposed aggregation support, but again,
-> > this sort of feature is not intended here.  It's no expected that any
-> > vendor driver would support creating device types of different
-> > versions, but they may support migration from different versions. =20
->=20
-> Hmm, that's a subtle distinction I wasn't seeing the patch series.
-> IIUC from what you're saying, a device can be created with version
-> "C", but for an incoming migration it can (potentially) accept
-> serialized state matching any of versions "A", "B" or "C".
->=20
-> That is sufficient if migration is being used as a host upgrade
-> tool, to move from OS release N to N + 1.
->=20
-> It wouldn't cover the case where you need to support backwards
-> migration too. eg if you have a mixture of hosts with release
-> N and N + 1 and want to make sure that VMs can always move
-> betweeen any host.  That would require that you can create
-> mdevs with the lowest common denominator version, not solely
-> the most recent.
->=20
-> In QEMU this is done by mgmt applications picking a versioned
-> machine type for QEMU that is older than most recent.
+Thanks!  It's hard to track down all uses like this.  ;-)
 
-I suppose we'd need to determine how important that is, this is just a
-device after all, there are always fallback mechanisms via hotplug.
-There are a lot of pieces that need to line up for backwards migration
-including support for it at the individual vendor driver.  Nothing we
-design into the API is going to require vendor drivers to support
-backwards migration and we already have some vendors requiring host and
-guest driver alignment.  Specifying a version with a create syntax as
-you've provided is reasonable, but this also balloons into whole
-tangential interface providing information regarding what versions a
-vendor driver is able to create, because presumably management tools
-wouldn't prefer a try-and-see type interface.  I believe an intentional
-aspect of the proposal here is that we don't need to provide a list of
-compatible versions, that's handled internally to the vendor driver.
 
-I don't know if we could start with the proposal here and later add
-these sorts of features.  Ideas?  Thanks,
-
-Alex
+r~
