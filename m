@@ -2,56 +2,53 @@ Return-Path: <SRS0=zUjA=SZ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1370AC10F03
-	for <qemu-devel@archiver.kernel.org>; Tue, 23 Apr 2019 17:39:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9F978C10F03
+	for <qemu-devel@archiver.kernel.org>; Tue, 23 Apr 2019 17:42:22 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D9A8B21738
-	for <qemu-devel@archiver.kernel.org>; Tue, 23 Apr 2019 17:39:58 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D9A8B21738
+	by mail.kernel.org (Postfix) with ESMTPS id 6EFDD208E4
+	for <qemu-devel@archiver.kernel.org>; Tue, 23 Apr 2019 17:42:22 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6EFDD208E4
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=rt-rk.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:57245 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:57347 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hIzOg-0001Km-2T
-	for qemu-devel@archiver.kernel.org; Tue, 23 Apr 2019 13:39:58 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:51422)
+	id 1hIzQz-0003gt-JD
+	for qemu-devel@archiver.kernel.org; Tue, 23 Apr 2019 13:42:21 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:51414)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1hIzMJ-00081U-Cu
+	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1hIzMJ-00081S-BM
 	for qemu-devel@nongnu.org; Tue, 23 Apr 2019 13:37:32 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1hIzKX-00084s-1f
-	for qemu-devel@nongnu.org; Tue, 23 Apr 2019 13:35:42 -0400
-Received: from mx2.rt-rk.com ([89.216.37.149]:49613 helo=mail.rt-rk.com)
+	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1hIzKY-00086S-Vv
+	for qemu-devel@nongnu.org; Tue, 23 Apr 2019 13:35:44 -0400
+Received: from mx2.rt-rk.com ([89.216.37.149]:49603 helo=mail.rt-rk.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <aleksandar.markovic@rt-rk.com>)
-	id 1hIzKW-00080P-Q5
-	for qemu-devel@nongnu.org; Tue, 23 Apr 2019 13:35:40 -0400
+	id 1hIzKW-00080M-Ug
+	for qemu-devel@nongnu.org; Tue, 23 Apr 2019 13:35:42 -0400
 Received: from localhost (localhost [127.0.0.1])
-	by mail.rt-rk.com (Postfix) with ESMTP id 8CB861A414A;
+	by mail.rt-rk.com (Postfix) with ESMTP id 7A1811A4145;
 	Tue, 23 Apr 2019 19:35:32 +0200 (CEST)
 X-Virus-Scanned: amavisd-new at rt-rk.com
 Received: from rtrkw774-lin.domain.local (rtrkw774-lin.domain.local
 	[10.10.13.43])
-	by mail.rt-rk.com (Postfix) with ESMTPSA id 6AE2D1A4144;
+	by mail.rt-rk.com (Postfix) with ESMTPSA id 5DA7E1A241A;
 	Tue, 23 Apr 2019 19:35:32 +0200 (CEST)
 From: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>
 To: qemu-devel@nongnu.org
-Date: Tue, 23 Apr 2019 19:35:23 +0200
-Message-Id: <1556040926-23931-2-git-send-email-aleksandar.markovic@rt-rk.com>
+Date: Tue, 23 Apr 2019 19:35:22 +0200
+Message-Id: <1556040926-23931-1-git-send-email-aleksandar.markovic@rt-rk.com>
 X-Mailer: git-send-email 2.7.4
-In-Reply-To: <1556040926-23931-1-git-send-email-aleksandar.markovic@rt-rk.com>
-References: <1556040926-23931-1-git-send-email-aleksandar.markovic@rt-rk.com>
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x
 X-Received-From: 89.216.37.149
-Subject: [Qemu-devel] [PATCH 1/4] linux-user: Fix support for the SIOCATMARK
- and SIOCGPGRP ioctls for eXtensa
+Subject: [Qemu-devel] [PATCH 0/4] linux-user: A set of misc patches for 4.1
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -70,57 +67,31 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 Content-Type: text/plain; charset="UTF-8"
-Message-ID: <20190423173523.MkECe7I9Zs5ACFX4uulsHwJ_hHCAYaQc2YQZOkD5COQ@z>
+Message-ID: <20190423173522.ss5flsB-r08UZNBexFkZOzR75cpegqVqJQyG2U9j5NM@z>
 
 From: Aleksandar Markovic <amarkovic@wavecomp.com>
 
-Fix support for the SIOCATMARK and SIOCGPGRP ioctls for eXtensa by
-correcting corresponding macro definition.
+This is a collection of misc patches for kinux user that I recently
+collected. Most of them originate from problems observed on target
+mips. However, all of them actually fix problems on multiple
+targets.
 
-Values for TARGET_SIOCATMARK and TARGET_SIOCGPGRP are determined by
-Linux kernel. Following relevant lines are from kernel source tree:
+Aleksandar Markovic (2):
+  linux-user: Fix support for the SIOCATMARK and SIOCGPGRP ioctls for
+    eXtensa
+  linux-user: Add support for the SIOCSPGRP ioctl
 
-arch/ia64/include/uapi/asm/sockios.h:#define SIOCATMARK    0x8905
-arch/mips/include/uapi/asm/sockios.h:#define SIOCATMARK    _IOR('s', 7, int)
-arch/parisc/include/uapi/asm/sockios.h:#define SIOCATMARK  0x8905
-arch/sh/include/uapi/asm/sockios.h:#define SIOCATMARK      _IOR('s', 7, int)
-arch/xtensa/include/uapi/asm/sockios.h:#define SIOCATMARK  _IOR('s', 7, int)
-arch/alpha/include/uapi/asm/sockios.h:#define SIOCATMARK   _IOR('s', 7, int)
-arch/sparc/include/uapi/asm/sockios.h:#define SIOCATMARK   0x8905
-include/uapi/asm-generic/sockios.h:#define SIOCATMARK	   0x8905
+Daniel Santos (1):
+  linux-user: Sanitize interp_info and, for mips only, init field fp_abi
 
-arch/ia64/include/uapi/asm/sockios.h:#define SIOCGPGRP     0x8904
-arch/mips/include/uapi/asm/sockios.h:#define SIOCGPGRP     _IOR('s', 9, pid_t)
-arch/parisc/include/uapi/asm/sockios.h:#define SIOCGPGRP   0x8904
-arch/sh/include/uapi/asm/sockios.h:#define SIOCGPGRP       _IOR('s', 9, pid_t)
-arch/xtensa/include/uapi/asm/sockios.h:#define SIOCGPGRP   _IOR('s', 9, pid_t)
-arch/alpha/include/uapi/asm/sockios.h:#define SIOCGPGRP    _IOR('s', 9, pid_t)
-arch/sparc/include/uapi/asm/sockios.h:#define SIOCGPGRP    0x8904
-include/uapi/asm-generic/sockios.h:#define SIOCGPGRP       0x8904
+Neng Chen (1):
+  linux-user: Add support the SIOCSIFPFLAGS and SIOCGIFPFLAGS ioctls
 
-It is visible that eXtensa should have the same definitions as
-alpha, mips and sh4 already do. This patch brings that to the
-accurate state.
+ linux-user/elfload.c      | 5 +++++
+ linux-user/ioctls.h       | 3 +++
+ linux-user/syscall_defs.h | 8 +++++++-
+ 3 files changed, 15 insertions(+), 1 deletion(-)
 
-Signed-off-by: Aleksandar Markovic <amarkovic@wavecomp.com>
----
- linux-user/syscall_defs.h | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
-
-diff --git a/linux-user/syscall_defs.h b/linux-user/syscall_defs.h
-index 12c8407..1e86fb9 100644
---- a/linux-user/syscall_defs.h
-+++ b/linux-user/syscall_defs.h
-@@ -736,7 +736,8 @@ struct target_pollfd {
- #define TARGET_KDSETLED        0x4B32	/* set led state [lights, not flags] */
- #define TARGET_KDSIGACCEPT     0x4B4E
- 
--#if defined(TARGET_ALPHA) || defined(TARGET_MIPS) || defined(TARGET_SH4)
-+#if defined(TARGET_ALPHA) || defined(TARGET_MIPS) || defined(TARGET_SH4) ||    \
-+       defined(TARGET_XTENSA)
- #define TARGET_SIOCATMARK      TARGET_IOR('s', 7, int)
- #define TARGET_SIOCGPGRP       TARGET_IOR('s', 9, pid_t)
- #else
 -- 
 2.7.4
 
