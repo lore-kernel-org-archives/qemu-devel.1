@@ -1,29 +1,29 @@
-Received: from eggs.gnu.org ([209.51.188.92]:42638)
+Received: from eggs.gnu.org ([209.51.188.92]:42608)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1hJ5Nd-0001DV-CJ
-	for qemu-devel@nongnu.org; Tue, 23 Apr 2019 20:03:18 -0400
+	(envelope-from <richard.henderson@linaro.org>) id 1hJ5No-0001DK-54
+	for qemu-devel@nongnu.org; Tue, 23 Apr 2019 20:03:28 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1hJ5Km-0004Ib-81
-	for qemu-devel@nongnu.org; Tue, 23 Apr 2019 20:00:21 -0400
-Received: from mail-pl1-x634.google.com ([2607:f8b0:4864:20::634]:43713)
+	(envelope-from <richard.henderson@linaro.org>) id 1hJ5Cc-0007SK-2S
+	for qemu-devel@nongnu.org; Tue, 23 Apr 2019 19:51:54 -0400
+Received: from mail-pg1-x529.google.com ([2607:f8b0:4864:20::529]:45430)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1hJ5Kl-0004Ht-Vi
-	for qemu-devel@nongnu.org; Tue, 23 Apr 2019 20:00:20 -0400
-Received: by mail-pl1-x634.google.com with SMTP id n8so8289698plp.10
-	for <qemu-devel@nongnu.org>; Tue, 23 Apr 2019 17:00:19 -0700 (PDT)
+	id 1hJ5Cb-0007Rn-Rt
+	for qemu-devel@nongnu.org; Tue, 23 Apr 2019 19:51:54 -0400
+Received: by mail-pg1-x529.google.com with SMTP id y3so8381678pgk.12
+	for <qemu-devel@nongnu.org>; Tue, 23 Apr 2019 16:51:53 -0700 (PDT)
 References: <20190416125744.27770-1-peter.maydell@linaro.org>
-	<20190416125744.27770-19-peter.maydell@linaro.org>
+	<20190416125744.27770-18-peter.maydell@linaro.org>
 From: Richard Henderson <richard.henderson@linaro.org>
-Message-ID: <6b4ad736-36eb-a459-1510-09fb50b2afb6@linaro.org>
-Date: Tue, 23 Apr 2019 17:00:15 -0700
+Message-ID: <f32055b7-e698-9130-0949-825f27938692@linaro.org>
+Date: Tue, 23 Apr 2019 16:51:49 -0700
 MIME-Version: 1.0
-In-Reply-To: <20190416125744.27770-19-peter.maydell@linaro.org>
+In-Reply-To: <20190416125744.27770-18-peter.maydell@linaro.org>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 18/26] target/arm: Set FPCCR.S when
- executing M-profile floating point insns
+Subject: Re: [Qemu-devel] [PATCH 17/26] target/arm: Overlap VECSTRIDE and
+ XSCALE_CPAR TB flags
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,27 +35,19 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: Peter Maydell <peter.maydell@linaro.org>, qemu-arm@nongnu.org, qemu-devel@nongnu.org
 
 On 4/16/19 5:57 AM, Peter Maydell wrote:
-> The M-profile FPCCR.S bit indicates the security status of
-> the floating point context. In the pseudocode ExecuteFPCheck()
-> function it is unconditionally set to match the current
-> security state whenever a floating point instruction is
-> executed.
-> 
-> Implement this by adding a new TB flag which tracks whether
-> FPCCR.S is different from the current security state, so
-> that we only need to emit the code to update it in the
-> less-common case when it is not already set correctly.
-> 
-> Note that we will add the handling for the other work done
-> by ExecuteFPCheck() in later commits.
+> We are close to running out of TB flags for AArch32; we could
+> start using the cs_base word, but before we do that we can
+> economise on our usage by sharing the same bits for the VFP
+> VECSTRIDE field and the XScale XSCALE_CPAR field. This
+> works because no XScale CPU ever had VFP.
 > 
 > Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 > ---
->  target/arm/cpu.h       |  2 ++
->  target/arm/translate.h |  1 +
->  target/arm/helper.c    |  5 +++++
->  target/arm/translate.c | 20 ++++++++++++++++++++
->  4 files changed, 28 insertions(+)
+>  target/arm/cpu.h       | 10 ++++++----
+>  target/arm/cpu.c       |  7 +++++++
+>  target/arm/helper.c    |  6 +++++-
+>  target/arm/translate.c |  9 +++++++--
+>  4 files changed, 25 insertions(+), 7 deletions(-)
 
 Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 
