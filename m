@@ -2,53 +2,56 @@ Return-Path: <SRS0=zUjA=SZ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-8.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1C888C10F14
-	for <qemu-devel@archiver.kernel.org>; Tue, 23 Apr 2019 11:33:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7B0D3C10F14
+	for <qemu-devel@archiver.kernel.org>; Tue, 23 Apr 2019 11:33:14 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E2D5A2077C
-	for <qemu-devel@archiver.kernel.org>; Tue, 23 Apr 2019 11:33:08 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E2D5A2077C
+	by mail.kernel.org (Postfix) with ESMTPS id 3E9722077C
+	for <qemu-devel@archiver.kernel.org>; Tue, 23 Apr 2019 11:33:14 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3E9722077C
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=rt-rk.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:52074 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:52076 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hItfg-0002lf-1x
-	for qemu-devel@archiver.kernel.org; Tue, 23 Apr 2019 07:33:08 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:36425)
+	id 1hItfl-0002pY-9G
+	for qemu-devel@archiver.kernel.org; Tue, 23 Apr 2019 07:33:13 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:36494)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1hItda-0001cr-35
-	for qemu-devel@nongnu.org; Tue, 23 Apr 2019 07:30:59 -0400
+	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1hItdc-0001eN-CR
+	for qemu-devel@nongnu.org; Tue, 23 Apr 2019 07:31:02 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1hItdZ-0005W2-5G
-	for qemu-devel@nongnu.org; Tue, 23 Apr 2019 07:30:58 -0400
-Received: from mx2.rt-rk.com ([89.216.37.149]:41149 helo=mail.rt-rk.com)
+	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1hItda-0005YT-Gn
+	for qemu-devel@nongnu.org; Tue, 23 Apr 2019 07:31:00 -0400
+Received: from mx2.rt-rk.com ([89.216.37.149]:45024 helo=mail.rt-rk.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <aleksandar.markovic@rt-rk.com>)
-	id 1hItdY-0004AY-TO
-	for qemu-devel@nongnu.org; Tue, 23 Apr 2019 07:30:57 -0400
+	id 1hItda-0005WV-4c
+	for qemu-devel@nongnu.org; Tue, 23 Apr 2019 07:30:58 -0400
 Received: from localhost (localhost [127.0.0.1])
-	by mail.rt-rk.com (Postfix) with ESMTP id 433F61A2438;
+	by mail.rt-rk.com (Postfix) with ESMTP id ABFC61A242D;
 	Tue, 23 Apr 2019 13:29:53 +0200 (CEST)
 X-Virus-Scanned: amavisd-new at rt-rk.com
 Received: from rtrkw774-lin.domain.local (rtrkw774-lin.domain.local
 	[10.10.13.43])
-	by mail.rt-rk.com (Postfix) with ESMTPSA id 28FB41A1E4D;
+	by mail.rt-rk.com (Postfix) with ESMTPSA id 7F2D61A2454;
 	Tue, 23 Apr 2019 13:29:53 +0200 (CEST)
 From: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>
 To: qemu-devel@nongnu.org
-Date: Tue, 23 Apr 2019 13:29:34 +0200
-Message-Id: <1556018982-3715-1-git-send-email-aleksandar.markovic@rt-rk.com>
+Date: Tue, 23 Apr 2019 13:29:42 +0200
+Message-Id: <1556018982-3715-9-git-send-email-aleksandar.markovic@rt-rk.com>
 X-Mailer: git-send-email 2.7.4
+In-Reply-To: <1556018982-3715-1-git-send-email-aleksandar.markovic@rt-rk.com>
+References: <1556018982-3715-1-git-send-email-aleksandar.markovic@rt-rk.com>
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x
 X-Received-From: 89.216.37.149
-Subject: [Qemu-devel] [PATCH 0/8] target/mips: Clean up misc code segments
+Subject: [Qemu-devel] [PATCH 8/8] target/mips: Fix if-else arms checkpatch
+ errors in translate.c
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -65,34 +68,361 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 Content-Type: text/plain; charset="UTF-8"
-Message-ID: <20190423112934.koRBlwMSUayj-5MYNIUbVwHoDrMps6EtR0iZ4bBPv2w@z>
+Message-ID: <20190423112942.DF_iaym2ykb9wMU0mTv7XZVsoIYetGmePKLud7ypjN0@z>
 
 From: Aleksandar Markovic <amarkovic@wavecomp.com>
 
-This series removes a number of checkpatch errors and warnings
-to improve code readibility and maintainability.
+Remove if-else-arms-related checkpatch errors.
 
-Aleksandar Markovic (4):
-  target/mips: Clean up dsp_helper.c
-  target/mips: Clean up lmi_helper.c
-  target/mips: Fix some space checkpatch errors in translate.c
-  target/mips: Fix if-else arms checkpatch errors in translate.c
+Signed-off-by: Aleksandar Markovic <amarkovic@wavecomp.com>
+---
+ target/mips/translate.c | 112 ++++++++++++++++++++++++++++++------------------
+ 1 file changed, 70 insertions(+), 42 deletions(-)
 
-Jules Irenge (4):
-  target/mips: Add or remove space to fix checkpatch errors
-  target/mips: Realign comments to fix checkpatch warnings
-  target/mips: Remove a space before open parenthesis to fix checkpatch
-    errors
-  target/mips: Add * to comments and realign them to fix checkpatch
-    warnings
-
- target/mips/cp0_timer.c  |  26 +++---
- target/mips/cpu.h        | 211 ++++++++++++++++++++++-------------------
- target/mips/dsp_helper.c |  40 +++++---
- target/mips/lmi_helper.c |   8 +-
- target/mips/translate.c  | 238 +++++++++++++++++++++++++++--------------------
- 5 files changed, 301 insertions(+), 222 deletions(-)
-
+diff --git a/target/mips/translate.c b/target/mips/translate.c
+index fb4ff0b..35007eb 100644
+--- a/target/mips/translate.c
++++ b/target/mips/translate.c
+@@ -2618,16 +2618,18 @@ static const char * const mxuregnames[] = {
+ /* General purpose registers moves. */
+ static inline void gen_load_gpr(TCGv t, int reg)
+ {
+-    if (reg == 0)
++    if (reg == 0) {
+         tcg_gen_movi_tl(t, 0);
+-    else
++    } else {
+         tcg_gen_mov_tl(t, cpu_gpr[reg]);
++    }
+ }
+ 
+ static inline void gen_store_gpr(TCGv t, int reg)
+ {
+-    if (reg != 0)
++    if (reg != 0) {
+         tcg_gen_mov_tl(cpu_gpr[reg], t);
++    }
+ }
+ 
+ /* Moves to/from shadow registers. */
+@@ -2635,9 +2637,9 @@ static inline void gen_load_srsgpr(int from, int to)
+ {
+     TCGv t0 = tcg_temp_new();
+ 
+-    if (from == 0)
++    if (from == 0) {
+         tcg_gen_movi_tl(t0, 0);
+-    else {
++    } else {
+         TCGv_i32 t2 = tcg_temp_new_i32();
+         TCGv_ptr addr = tcg_temp_new_ptr();
+ 
+@@ -2840,10 +2842,11 @@ static void gen_store_fpr64(DisasContext *ctx, TCGv_i64 t, int reg)
+ 
+ static inline int get_fp_bit(int cc)
+ {
+-    if (cc)
++    if (cc) {
+         return 24 + cc;
+-    else
++    } else {
+         return 23;
++    }
+ }
+ 
+ /* Addresses computation */
+@@ -2907,14 +2910,16 @@ static inline void gen_move_high32(TCGv ret, TCGv_i64 arg)
+ 
+ static inline void check_cp0_enabled(DisasContext *ctx)
+ {
+-    if (unlikely(!(ctx->hflags & MIPS_HFLAG_CP0)))
++    if (unlikely(!(ctx->hflags & MIPS_HFLAG_CP0))) {
+         generate_exception_err(ctx, EXCP_CpU, 0);
++    }
+ }
+ 
+ static inline void check_cp1_enabled(DisasContext *ctx)
+ {
+-    if (unlikely(!(ctx->hflags & MIPS_HFLAG_FPU)))
++    if (unlikely(!(ctx->hflags & MIPS_HFLAG_FPU))) {
+         generate_exception_err(ctx, EXCP_CpU, 1);
++    }
+ }
+ 
+ /* Verify that the processor is running with COP1X instructions enabled.
+@@ -2923,8 +2928,9 @@ static inline void check_cp1_enabled(DisasContext *ctx)
+ 
+ static inline void check_cop1x(DisasContext *ctx)
+ {
+-    if (unlikely(!(ctx->hflags & MIPS_HFLAG_COP1X)))
++    if (unlikely(!(ctx->hflags & MIPS_HFLAG_COP1X))) {
+         generate_exception_end(ctx, EXCP_RI);
++    }
+ }
+ 
+ /* Verify that the processor is running with 64-bit floating-point
+@@ -2932,8 +2938,9 @@ static inline void check_cop1x(DisasContext *ctx)
+ 
+ static inline void check_cp1_64bitmode(DisasContext *ctx)
+ {
+-    if (unlikely(~ctx->hflags & (MIPS_HFLAG_F64 | MIPS_HFLAG_COP1X)))
++    if (unlikely(~ctx->hflags & (MIPS_HFLAG_F64 | MIPS_HFLAG_COP1X))) {
+         generate_exception_end(ctx, EXCP_RI);
++    }
+ }
+ 
+ /*
+@@ -2949,8 +2956,9 @@ static inline void check_cp1_64bitmode(DisasContext *ctx)
+  */
+ static inline void check_cp1_registers(DisasContext *ctx, int regs)
+ {
+-    if (unlikely(!(ctx->hflags & MIPS_HFLAG_F64) && (regs & 1)))
++    if (unlikely(!(ctx->hflags & MIPS_HFLAG_F64) && (regs & 1))) {
+         generate_exception_end(ctx, EXCP_RI);
++    }
+ }
+ 
+ /* Verify that the processor is running with DSP instructions enabled.
+@@ -3039,8 +3047,9 @@ static inline void check_ps(DisasContext *ctx)
+    instructions are not enabled. */
+ static inline void check_mips_64(DisasContext *ctx)
+ {
+-    if (unlikely(!(ctx->hflags & MIPS_HFLAG_64)))
++    if (unlikely(!(ctx->hflags & MIPS_HFLAG_64))) {
+         generate_exception_end(ctx, EXCP_RI);
++    }
+ }
+ #endif
+ 
+@@ -3130,8 +3139,7 @@ static inline void check_nms_dl_il_sl_tl_l2c(DisasContext *ctx)
+         !(ctx->CP0_Config1 & (1 << CP0C1_IL)) &&
+         !(ctx->CP0_Config2 & (1 << CP0C2_SL)) &&
+         !(ctx->CP0_Config2 & (1 << CP0C2_TL)) &&
+-        !(ctx->CP0_Config5 & (1 << CP0C5_L2C)))
+-    {
++        !(ctx->CP0_Config5 & (1 << CP0C5_L2C))) {
+         generate_exception_end(ctx, EXCP_RI);
+     }
+ }
+@@ -3881,22 +3889,25 @@ static void gen_logic_imm(DisasContext *ctx, uint32_t opc,
+     uimm = (uint16_t)imm;
+     switch (opc) {
+     case OPC_ANDI:
+-        if (likely(rs != 0))
++        if (likely(rs != 0)) {
+             tcg_gen_andi_tl(cpu_gpr[rt], cpu_gpr[rs], uimm);
+-        else
++        } else {
+             tcg_gen_movi_tl(cpu_gpr[rt], 0);
++        }
+         break;
+     case OPC_ORI:
+-        if (rs != 0)
++        if (rs != 0) {
+             tcg_gen_ori_tl(cpu_gpr[rt], cpu_gpr[rs], uimm);
+-        else
++        } else {
+             tcg_gen_movi_tl(cpu_gpr[rt], uimm);
++        }
+         break;
+     case OPC_XORI:
+-        if (likely(rs != 0))
++        if (likely(rs != 0)) {
+             tcg_gen_xori_tl(cpu_gpr[rt], cpu_gpr[rs], uimm);
+-        else
++        } else {
+             tcg_gen_movi_tl(cpu_gpr[rt], uimm);
++        }
+         break;
+     case OPC_LUI:
+         if (rs != 0 && (ctx->insn_flags & ISA_MIPS32R6)) {
+@@ -6059,8 +6070,9 @@ static void gen_compute_branch (DisasContext *ctx, uint32_t opc,
+     }
+ 
+  out:
+-    if (insn_bytes == 2)
++    if (insn_bytes == 2) {
+         ctx->hflags |= MIPS_HFLAG_B16;
++    }
+     tcg_temp_free(t0);
+     tcg_temp_free(t1);
+ }
+@@ -6707,8 +6719,9 @@ static void gen_mfc0(DisasContext *ctx, TCGv arg, int reg, int sel)
+ {
+     const char *register_name = "invalid";
+ 
+-    if (sel != 0)
++    if (sel != 0) {
+         check_insn(ctx, ISA_MIPS32);
++    }
+ 
+     switch (reg) {
+     case CP0_REGISTER_00:
+@@ -7463,8 +7476,9 @@ static void gen_mtc0(DisasContext *ctx, TCGv arg, int reg, int sel)
+ {
+     const char *register_name = "invalid";
+ 
+-    if (sel != 0)
++    if (sel != 0) {
+         check_insn(ctx, ISA_MIPS32);
++    }
+ 
+     if (tb_cflags(ctx->base.tb) & CF_USE_ICOUNT) {
+         gen_io_start();
+@@ -8209,8 +8223,9 @@ static void gen_dmfc0(DisasContext *ctx, TCGv arg, int reg, int sel)
+ {
+     const char *register_name = "invalid";
+ 
+-    if (sel != 0)
++    if (sel != 0) {
+         check_insn(ctx, ISA_MIPS64);
++    }
+ 
+     switch (reg) {
+     case CP0_REGISTER_00:
+@@ -8919,8 +8934,9 @@ static void gen_dmtc0(DisasContext *ctx, TCGv arg, int reg, int sel)
+ {
+     const char *register_name = "invalid";
+ 
+-    if (sel != 0)
++    if (sel != 0) {
+         check_insn(ctx, ISA_MIPS64);
++    }
+ 
+     if (tb_cflags(ctx->base.tb) & CF_USE_ICOUNT) {
+         gen_io_start();
+@@ -10161,8 +10177,9 @@ static void gen_cp0(CPUMIPSState *env, DisasContext *ctx, uint32_t opc,
+         break;
+     case OPC_TLBWI:
+         opn = "tlbwi";
+-        if (!env->tlb->helper_tlbwi)
++        if (!env->tlb->helper_tlbwi) {
+             goto die;
++        }
+         gen_helper_tlbwi(cpu_env);
+         break;
+     case OPC_TLBINV:
+@@ -10185,20 +10202,23 @@ static void gen_cp0(CPUMIPSState *env, DisasContext *ctx, uint32_t opc,
+         break;
+     case OPC_TLBWR:
+         opn = "tlbwr";
+-        if (!env->tlb->helper_tlbwr)
++        if (!env->tlb->helper_tlbwr) {
+             goto die;
++        }
+         gen_helper_tlbwr(cpu_env);
+         break;
+     case OPC_TLBP:
+         opn = "tlbp";
+-        if (!env->tlb->helper_tlbp)
++        if (!env->tlb->helper_tlbp) {
+             goto die;
++        }
+         gen_helper_tlbp(cpu_env);
+         break;
+     case OPC_TLBR:
+         opn = "tlbr";
+-        if (!env->tlb->helper_tlbr)
++        if (!env->tlb->helper_tlbr) {
+             goto die;
++        }
+         gen_helper_tlbr(cpu_env);
+         break;
+     case OPC_ERET: /* OPC_ERETNC */
+@@ -10272,8 +10292,9 @@ static void gen_compute_branch1(DisasContext *ctx, uint32_t op,
+         goto out;
+     }
+ 
+-    if (cc != 0)
++    if (cc != 0) {
+         check_insn(ctx, ISA_MIPS4 | ISA_MIPS32);
++    }
+ 
+     btarget = ctx->base.pc_next + 4 + offset;
+ 
+@@ -10727,10 +10748,11 @@ static void gen_movci(DisasContext *ctx, int rd, int rs, int cc, int tf)
+         return;
+     }
+ 
+-    if (tf)
++    if (tf) {
+         cond = TCG_COND_EQ;
+-    else
++    } else {
+         cond = TCG_COND_NE;
++    }
+ 
+     l1 = gen_new_label();
+     t0 = tcg_temp_new_i32();
+@@ -10752,10 +10774,11 @@ static inline void gen_movcf_s(DisasContext *ctx, int fs, int fd, int cc,
+     TCGv_i32 t0 = tcg_temp_new_i32();
+     TCGLabel *l1 = gen_new_label();
+ 
+-    if (tf)
++    if (tf) {
+         cond = TCG_COND_EQ;
+-    else
++    } else {
+         cond = TCG_COND_NE;
++    }
+ 
+     tcg_gen_andi_i32(t0, fpu_fcr31, 1 << get_fp_bit(cc));
+     tcg_gen_brcondi_i32(cond, t0, 0, l1);
+@@ -10773,10 +10796,11 @@ static inline void gen_movcf_d(DisasContext *ctx, int fs, int fd, int cc,
+     TCGv_i64 fp0;
+     TCGLabel *l1 = gen_new_label();
+ 
+-    if (tf)
++    if (tf) {
+         cond = TCG_COND_EQ;
+-    else
++    } else {
+         cond = TCG_COND_NE;
++    }
+ 
+     tcg_gen_andi_i32(t0, fpu_fcr31, 1 << get_fp_bit(cc));
+     tcg_gen_brcondi_i32(cond, t0, 0, l1);
+@@ -10796,10 +10820,11 @@ static inline void gen_movcf_ps(DisasContext *ctx, int fs, int fd,
+     TCGLabel *l1 = gen_new_label();
+     TCGLabel *l2 = gen_new_label();
+ 
+-    if (tf)
++    if (tf) {
+         cond = TCG_COND_EQ;
+-    else
++    } else {
+         cond = TCG_COND_NE;
++    }
+ 
+     tcg_gen_andi_i32(t0, fpu_fcr31, 1 << get_fp_bit(cc));
+     tcg_gen_brcondi_i32(cond, t0, 0, l1);
+@@ -12095,8 +12120,9 @@ static void gen_farith(DisasContext *ctx, enum fopcode op1,
+             TCGLabel *l1 = gen_new_label();
+             TCGv_i64 fp0;
+ 
+-            if (ft != 0)
++            if (ft != 0) {
+                 tcg_gen_brcondi_tl(TCG_COND_NE, cpu_gpr[ft], 0, l1);
++            }
+             fp0 = tcg_temp_new_i64();
+             gen_load_fpr64(ctx, fp0, fs);
+             gen_store_fpr64(ctx, fp0, fd);
+@@ -29837,11 +29863,13 @@ void mips_cpu_dump_state(CPUState *cs, FILE *f, fprintf_function cpu_fprintf,
+                 env->active_tc.PC, env->active_tc.HI[0], env->active_tc.LO[0],
+                 env->hflags, env->btarget, env->bcond);
+     for (i = 0; i < 32; i++) {
+-        if ((i & 3) == 0)
++        if ((i & 3) == 0) {
+             cpu_fprintf(f, "GPR%02d:", i);
++        }
+         cpu_fprintf(f, " %s " TARGET_FMT_lx, regnames[i], env->active_tc.gpr[i]);
+-        if ((i & 3) == 3)
++        if ((i & 3) == 3) {
+             cpu_fprintf(f, "\n");
++        }
+     }
+ 
+     cpu_fprintf(f, "CP0 Status  0x%08x Cause   0x%08x EPC    0x" TARGET_FMT_lx "\n",
 -- 
 2.7.4
 
