@@ -2,83 +2,59 @@ Return-Path: <SRS0=zUjA=SZ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 73B0CC10F14
-	for <qemu-devel@archiver.kernel.org>; Tue, 23 Apr 2019 07:46:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1DF57C10F14
+	for <qemu-devel@archiver.kernel.org>; Tue, 23 Apr 2019 07:48:34 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 462D920645
-	for <qemu-devel@archiver.kernel.org>; Tue, 23 Apr 2019 07:46:43 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 462D920645
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id E0C2420645
+	for <qemu-devel@archiver.kernel.org>; Tue, 23 Apr 2019 07:48:33 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E0C2420645
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=intel.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:49562 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:49577 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hIq8Y-0001eA-By
-	for qemu-devel@archiver.kernel.org; Tue, 23 Apr 2019 03:46:42 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:60802)
+	id 1hIqAL-00030t-2S
+	for qemu-devel@archiver.kernel.org; Tue, 23 Apr 2019 03:48:33 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:34121)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1hIq6y-0000TF-Um
-	for qemu-devel@nongnu.org; Tue, 23 Apr 2019 03:45:05 -0400
+	(envelope-from <tao3.xu@intel.com>) id 1hIq8V-0001iY-7E
+	for qemu-devel@nongnu.org; Tue, 23 Apr 2019 03:46:40 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1hIptn-00020n-Ue
-	for qemu-devel@nongnu.org; Tue, 23 Apr 2019 03:31:28 -0400
-Received: from mail-wr1-f68.google.com ([209.85.221.68]:34428)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1hIptn-00020W-ON
-	for qemu-devel@nongnu.org; Tue, 23 Apr 2019 03:31:27 -0400
-Received: by mail-wr1-f68.google.com with SMTP id c6so13085558wrm.1
-	for <qemu-devel@nongnu.org>; Tue, 23 Apr 2019 00:31:27 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=1e100.net; s=20161025;
-	h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
-	:date:user-agent:mime-version:in-reply-to:content-language
-	:content-transfer-encoding;
-	bh=wwbqD8/+JqWm8fYTbt5Ab/iL8mhFjzUWiDzvbNlUmY4=;
-	b=rsyXnDlwDbwh/458DZA/DW9qEC+HgwfFhdxoFRhOiNkVXBC+hjPQQsNu31pAiG0CBU
-	DlzLPpjYDtQGNS4m+iJjb6C5BV1wp2aK8ceSdg3uXXYhxUAWk7Fmyu/izUzX/t8FlWFi
-	lm9gPalpRIw/5A/AX5vcwerxeYucGkg+AiFJOF7ihpS/+q4Y1y4eLiMDZK7dgbgKEGdv
-	ZqlTFhyG7mY/OI4I+OmlP8qPhrHbTild8M6J8/7E64RW8ymdCQwnjcKIhRwHj+RpuJ2a
-	fSIOL19f2T1WWWnPWthpTFzA81+dg+zxpCXwrj/qDUPTFYPF7hhz/c4cv6jfu6M6gyVn
-	HaHg==
-X-Gm-Message-State: APjAAAWlRnhHLz3OrvYWWruiu1hJZJ9jA7MyjjCVlOEpnKurqTHytyCH
-	wy6JRqXbxN1mVBx17k1+hAO2Nw==
-X-Google-Smtp-Source: APXvYqwfGOGXogURWBUERG4DdhOkZX2nWfCi+5H6oj7wliZnKeNF9sE2VaphAQ+A6S8i6MZh0lHWgg==
-X-Received: by 2002:adf:dc11:: with SMTP id t17mr766033wri.324.1556004686781; 
-	Tue, 23 Apr 2019 00:31:26 -0700 (PDT)
-Received: from [192.168.1.25] (atoulouse-656-1-803-163.w86-221.abo.wanadoo.fr.
-	[86.221.12.163]) by smtp.gmail.com with ESMTPSA id
-	x205sm19677850wmg.9.2019.04.23.00.31.14
-	(version=TLS1_3 cipher=AEAD-AES128-GCM-SHA256 bits=128/128);
-	Tue, 23 Apr 2019 00:31:26 -0700 (PDT)
-To: David Gibson <david@gibson.dropbear.id.au>,
-	Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>,
-	=?UTF-8?Q?Herv=c3=a9_Poussineau?= <hpoussin@reactos.org>
-References: <20190422195020.1494-1-philmd@redhat.com>
-	<20190422195020.1494-6-philmd@redhat.com>
-	<20190423012057.GA31496@umbus.fritz.box>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Openpgp: id=89C1E78F601EE86C867495CBA2A3FD6EDEADC0DE;
-	url=http://pgp.mit.edu/pks/lookup?op=get&search=0xA2A3FD6EDEADC0DE
-Message-ID: <c082036d-9bac-8c4c-ddf8-02f3852ebb99@redhat.com>
-Date: Tue, 23 Apr 2019 09:31:08 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
-	Thunderbird/60.6.1
-MIME-Version: 1.0
-In-Reply-To: <20190423012057.GA31496@umbus.fritz.box>
-Content-Type: text/plain; charset="UTF-8"
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-	[fuzzy]
-X-Received-From: 209.85.221.68
-Subject: Re: [Qemu-devel] [PATCH v3 5/7] hw/ppc: Implement
- fw_cfg_arch_key_name()
+	(envelope-from <tao3.xu@intel.com>) id 1hIq8U-0002qP-0x
+	for qemu-devel@nongnu.org; Tue, 23 Apr 2019 03:46:39 -0400
+Received: from mga11.intel.com ([192.55.52.93]:31627)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <tao3.xu@intel.com>) id 1hIq8T-0002p2-NX
+	for qemu-devel@nongnu.org; Tue, 23 Apr 2019 03:46:37 -0400
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from fmsmga002.fm.intel.com ([10.253.24.26])
+	by fmsmga102.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384;
+	23 Apr 2019 00:46:36 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.60,385,1549958400"; d="scan'208";a="163990248"
+Received: from tao-optiplex-7060.sh.intel.com ([10.239.13.92])
+	by fmsmga002.fm.intel.com with ESMTP; 23 Apr 2019 00:46:35 -0700
+From: Tao Xu <tao3.xu@intel.com>
+To: ehabkost@redhat.com,
+	imammedo@redhat.com,
+	pbonzini@redhat.com
+Date: Tue, 23 Apr 2019 15:44:27 +0800
+Message-Id: <20190423074428.23031-3-tao3.xu@intel.com>
+X-Mailer: git-send-email 2.17.1
+In-Reply-To: <20190423074428.23031-1-tao3.xu@intel.com>
+References: <20190423074428.23031-1-tao3.xu@intel.com>
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+	recognized.
+X-Received-From: 192.55.52.93
+Subject: [Qemu-devel] [PATCH v3 2/3] numa: move numa global variable
+ have_numa_distance into MachineState
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -90,103 +66,124 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Eduardo Habkost <ehabkost@redhat.com>,
-	"Michael S. Tsirkin" <mst@redhat.com>, qemu-devel@nongnu.org,
-	qemu-ppc@nongnu.org, Gerd Hoffmann <kraxel@redhat.com>,
-	Paolo Bonzini <pbonzini@redhat.com>, Laszlo Ersek <lersek@redhat.com>,
-	Artyom Tarasenko <atar4qemu@gmail.com>, Richard Henderson <rth@twiddle.net>
+Cc: jingqi.liu@intel.com, tao3.xu@intel.com, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190423073108.HVdMhR07wAyeL3hAymLa2Ty8hyumIKBCDtJ4mv9kX7Y@z>
+Content-Type: text/plain; charset="UTF-8"
+Message-ID: <20190423074427.inYNlvYqR6QQgG-t1NO8ZphMIxvmVCZURhO5edA5Yg8@z>
 
-Hi David,
+The aim of this patch is to move existing numa global have_numa_distance
+into NumaState.
 
-On 4/23/19 3:20 AM, David Gibson wrote:
-> On Mon, Apr 22, 2019 at 09:50:18PM +0200, Philippe Mathieu-Daudé wrote:
->> Implement fw_cfg_arch_key_name(), which returns the name of a
->> ppc-specific key.
->>
->> Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
-> 
-> What ppc machines actually use fw_cfg?  I know pseries and powernv
-> don't.
+Suggested-by: Igor Mammedov <imammedo@redhat.com>
+Suggested-by: Eduardo Habkost <ehabkost@redhat.com>
+Signed-off-by: Tao Xu <tao3.xu@intel.com>
+---
+ hw/arm/virt-acpi-build.c | 2 +-
+ hw/arm/virt.c            | 2 +-
+ hw/i386/acpi-build.c     | 2 +-
+ include/hw/boards.h      | 2 ++
+ include/sysemu/numa.h    | 2 --
+ numa.c                   | 5 ++---
+ 6 files changed, 7 insertions(+), 8 deletions(-)
 
-I see:
+diff --git a/hw/arm/virt-acpi-build.c b/hw/arm/virt-acpi-build.c
+index 6805b4de51..65f070843c 100644
+--- a/hw/arm/virt-acpi-build.c
++++ b/hw/arm/virt-acpi-build.c
+@@ -815,7 +815,7 @@ void virt_acpi_build(VirtMachineState *vms, AcpiBuildTables *tables)
+     if (nb_numa_nodes > 0) {
+         acpi_add_table(table_offsets, tables_blob);
+         build_srat(tables_blob, tables->linker, vms);
+-        if (have_numa_distance) {
++        if (ms->numa_state->have_numa_distance) {
+             acpi_add_table(table_offsets, tables_blob);
+             build_slit(tables_blob, tables->linker, ms);
+         }
+diff --git a/hw/arm/virt.c b/hw/arm/virt.c
+index 280174b1b7..6cd5e13eb9 100644
+--- a/hw/arm/virt.c
++++ b/hw/arm/virt.c
+@@ -228,7 +228,7 @@ static void create_fdt(VirtMachineState *vms)
+                                 "clk24mhz");
+     qemu_fdt_setprop_cell(fdt, "/apb-pclk", "phandle", vms->clock_phandle);
+ 
+-    if (have_numa_distance) {
++    if (nb_numa_nodes > 0 && ms->numa_state->have_numa_distance) {
+         int size = nb_numa_nodes * nb_numa_nodes * 3 * sizeof(uint32_t);
+         uint32_t *matrix = g_malloc0(size);
+         int idx, i, j;
+diff --git a/hw/i386/acpi-build.c b/hw/i386/acpi-build.c
+index 7d9bc88ac9..43a807c483 100644
+--- a/hw/i386/acpi-build.c
++++ b/hw/i386/acpi-build.c
+@@ -2685,7 +2685,7 @@ void acpi_build(AcpiBuildTables *tables, MachineState *machine)
+     if (pcms->numa_nodes) {
+         acpi_add_table(table_offsets, tables_blob);
+         build_srat(tables_blob, tables->linker, machine);
+-        if (have_numa_distance) {
++        if (machine->numa_state->have_numa_distance) {
+             acpi_add_table(table_offsets, tables_blob);
+             build_slit(tables_blob, tables->linker, machine);
+         }
+diff --git a/include/hw/boards.h b/include/hw/boards.h
+index 579d73f6c4..c3ff2dbd4a 100644
+--- a/include/hw/boards.h
++++ b/include/hw/boards.h
+@@ -238,6 +238,8 @@ typedef struct NumaState {
+     /* Number of NUMA nodes */
+     int num_nodes;
+ 
++    /* Allow setting NUMA distance for different NUMA nodes */
++    bool have_numa_distance;
+ } NumaState;
+ 
+ /**
+diff --git a/include/sysemu/numa.h b/include/sysemu/numa.h
+index a55e2be563..1a29408db9 100644
+--- a/include/sysemu/numa.h
++++ b/include/sysemu/numa.h
+@@ -6,8 +6,6 @@
+ #include "sysemu/hostmem.h"
+ #include "hw/boards.h"
+ 
+-extern bool have_numa_distance;
+-
+ struct NodeInfo {
+     uint64_t node_mem;
+     struct HostMemoryBackend *node_memdev;
+diff --git a/numa.c b/numa.c
+index 343fcaf13f..d4f5ff5193 100644
+--- a/numa.c
++++ b/numa.c
+@@ -52,7 +52,6 @@ static int have_memdevs = -1;
+ static int max_numa_nodeid; /* Highest specified NUMA node ID, plus one.
+                              * For all nodes, nodeid < max_numa_nodeid
+                              */
+-bool have_numa_distance;
+ NodeInfo numa_info[MAX_NODES];
+ 
+ 
+@@ -171,7 +170,7 @@ void parse_numa_distance(MachineState *ms, NumaDistOptions *dist, Error **errp)
+     }
+ 
+     numa_info[src].distance[dst] = val;
+-    have_numa_distance = true;
++    ms->numa_state->have_numa_distance = true;
+ }
+ 
+ static
+@@ -442,7 +441,7 @@ void numa_complete_configuration(MachineState *ms)
+          * asymmetric. In this case, the distances for both directions
+          * of all node pairs are required.
+          */
+-        if (have_numa_distance) {
++        if (ms->numa_state->have_numa_distance) {
+             /* Validate enough NUMA distance information was provided. */
+             validate_numa_distance(ms);
+ 
+-- 
+2.17.1
 
-- 40p
-- g3beige (newworld)
-- mac99 (oldworld)
-
-I guess it is because they use OpenBIOS.
-
->> ---
->>  hw/ppc/Makefile.objs |  2 +-
->>  hw/ppc/fw_cfg.c      | 45 ++++++++++++++++++++++++++++++++++++++++++++
->>  2 files changed, 46 insertions(+), 1 deletion(-)
->>  create mode 100644 hw/ppc/fw_cfg.c
->>
->> diff --git a/hw/ppc/Makefile.objs b/hw/ppc/Makefile.objs
->> index 1111b218a04..ae940981553 100644
->> --- a/hw/ppc/Makefile.objs
->> +++ b/hw/ppc/Makefile.objs
->> @@ -1,5 +1,5 @@
->>  # shared objects
->> -obj-y += ppc.o ppc_booke.o fdt.o
->> +obj-y += ppc.o ppc_booke.o fdt.o fw_cfg.o
->>  # IBM pSeries (sPAPR)
->>  obj-$(CONFIG_PSERIES) += spapr.o spapr_caps.o spapr_vio.o spapr_events.o
->>  obj-$(CONFIG_PSERIES) += spapr_hcall.o spapr_iommu.o spapr_rtas.o
->> diff --git a/hw/ppc/fw_cfg.c b/hw/ppc/fw_cfg.c
->> new file mode 100644
->> index 00000000000..a88b5c4bde2
->> --- /dev/null
->> +++ b/hw/ppc/fw_cfg.c
->> @@ -0,0 +1,45 @@
->> +/*
->> + * fw_cfg helpers (PPC specific)
->> + *
->> + * Copyright (c) 2019 Red Hat, Inc.
->> + *
->> + * Author:
->> + *   Philippe Mathieu-Daudé <philmd@redhat.com>
->> + *
->> + * SPDX-License-Identifier: GPL-2.0-or-later
->> + *
->> + * This work is licensed under the terms of the GNU GPL, version 2 or later.
->> + * See the COPYING file in the top-level directory.
->> + */
->> +
->> +#include "qemu/osdep.h"
->> +#include "hw/ppc/ppc.h"
->> +#include "hw/nvram/fw_cfg.h"
->> +
->> +const char *fw_cfg_arch_key_name(uint16_t key)
->> +{
->> +    static const struct {
->> +        uint16_t key;
->> +        const char *name;
->> +    } fw_cfg_arch_wellknown_keys[] = {
->> +        {FW_CFG_PPC_WIDTH, "width"},
->> +        {FW_CFG_PPC_HEIGHT, "height"},
->> +        {FW_CFG_PPC_DEPTH, "depth"},
->> +        {FW_CFG_PPC_TBFREQ, "tbfreq"},
->> +        {FW_CFG_PPC_CLOCKFREQ, "clockfreq"},
->> +        {FW_CFG_PPC_IS_KVM, "is_kvm"},
->> +        {FW_CFG_PPC_KVM_HC, "kvm_hc"},
->> +        {FW_CFG_PPC_KVM_PID, "pid"},
->> +        {FW_CFG_PPC_NVRAM_ADDR, "nvram_addr"},
->> +        {FW_CFG_PPC_BUSFREQ, "busfreq"},
->> +        {FW_CFG_PPC_NVRAM_FLAT, "nvram_flat"},
->> +        {FW_CFG_PPC_VIACONFIG, "viaconfig"},
->> +    };
->> +
->> +    for (size_t i = 0; i < ARRAY_SIZE(fw_cfg_arch_wellknown_keys); i++) {
->> +        if (fw_cfg_arch_wellknown_keys[i].key == key) {
->> +            return fw_cfg_arch_wellknown_keys[i].name;
->> +        }
->> +    }
->> +    return NULL;
->> +}
-> 
 
