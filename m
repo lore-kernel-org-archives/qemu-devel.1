@@ -2,63 +2,68 @@ Return-Path: <SRS0=zUjA=SZ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.4 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_PASS,USER_AGENT_MUTT autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-6.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 34EE7C10F11
-	for <qemu-devel@archiver.kernel.org>; Tue, 23 Apr 2019 02:43:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 78A0FC10F11
+	for <qemu-devel@archiver.kernel.org>; Tue, 23 Apr 2019 03:11:26 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id F1371206BA
-	for <qemu-devel@archiver.kernel.org>; Tue, 23 Apr 2019 02:43:20 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F1371206BA
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.intel.com
+	by mail.kernel.org (Postfix) with ESMTPS id 39995206BA
+	for <qemu-devel@archiver.kernel.org>; Tue, 23 Apr 2019 03:11:26 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 39995206BA
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:47063 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:47291 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hIlOx-0002Bj-Qz
-	for qemu-devel@archiver.kernel.org; Mon, 22 Apr 2019 22:43:19 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:44221)
+	id 1hIlq9-0006tx-5U
+	for qemu-devel@archiver.kernel.org; Mon, 22 Apr 2019 23:11:25 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:47685)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richardw.yang@linux.intel.com>) id 1hIlOA-0001ov-Cy
-	for qemu-devel@nongnu.org; Mon, 22 Apr 2019 22:42:31 -0400
+	(envelope-from <jasowang@redhat.com>) id 1hIlp4-00065p-Qd
+	for qemu-devel@nongnu.org; Mon, 22 Apr 2019 23:10:20 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richardw.yang@linux.intel.com>) id 1hIlO9-0001zO-5z
-	for qemu-devel@nongnu.org; Mon, 22 Apr 2019 22:42:30 -0400
-Received: from mga03.intel.com ([134.134.136.65]:43349)
+	(envelope-from <jasowang@redhat.com>) id 1hIleJ-0000tK-Eg
+	for qemu-devel@nongnu.org; Mon, 22 Apr 2019 22:59:12 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:50320)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <richardw.yang@linux.intel.com>)
-	id 1hIlO8-0001wZ-UZ
-	for qemu-devel@nongnu.org; Mon, 22 Apr 2019 22:42:29 -0400
-X-Amp-Result: UNSCANNABLE
-X-Amp-File-Uploaded: False
-Received: from fmsmga003.fm.intel.com ([10.253.24.29])
-	by orsmga103.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384;
-	22 Apr 2019 19:42:22 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.60,384,1549958400"; d="scan'208";a="151518380"
-Received: from richard.sh.intel.com (HELO localhost) ([10.239.159.54])
-	by FMSMGA003.fm.intel.com with ESMTP; 22 Apr 2019 19:42:18 -0700
-Date: Tue, 23 Apr 2019 10:41:51 +0800
-From: Wei Yang <richardw.yang@linux.intel.com>
-To: Eduardo Habkost <ehabkost@redhat.com>
-Message-ID: <20190423024151.GA10783@richard>
-References: <20190422004849.26463-1-richardw.yang@linux.intel.com>
-	<20190422083013-mutt-send-email-mst@kernel.org>
-	<20190422182255.GV25134@habkost.net>
+	(Exim 4.71) (envelope-from <jasowang@redhat.com>)
+	id 1hIleJ-0000sr-6u; Mon, 22 Apr 2019 22:59:11 -0400
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+	[10.5.11.13])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 817E159461;
+	Tue, 23 Apr 2019 02:59:09 +0000 (UTC)
+Received: from [10.72.12.166] (ovpn-12-166.pek2.redhat.com [10.72.12.166])
+	by smtp.corp.redhat.com (Postfix) with ESMTP id 9CBAB183F3;
+	Tue, 23 Apr 2019 02:58:59 +0000 (UTC)
+To: Dan Streetman <dan.streetman@canonical.com>
+References: <20190416184624.15397-1-dan.streetman@canonical.com>
+	<20190416184624.15397-2-dan.streetman@canonical.com>
+	<9f3dac2a-15fe-8463-6aee-f6916b8d5e1c@redhat.com>
+	<CAOZ2QJO5-V4xydkVxKTC-1qnhqhUEMck04D=6+PFkhP9Z9+vmA@mail.gmail.com>
+From: Jason Wang <jasowang@redhat.com>
+Message-ID: <ec53494d-99fc-d7b2-987d-ccd79ee47652@redhat.com>
+Date: Tue, 23 Apr 2019 10:58:57 +0800
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+	Thunderbird/60.6.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
-Content-Disposition: inline
-In-Reply-To: <20190422182255.GV25134@habkost.net>
-User-Agent: Mutt/1.10.1 (2018-07-13)
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
-	recognized.
-X-Received-From: 134.134.136.65
-Subject: Re: [Qemu-devel] [PATCH v14 0/2] support MAP_SYNC for
- memory-backend-file
+In-Reply-To: <CAOZ2QJO5-V4xydkVxKTC-1qnhqhUEMck04D=6+PFkhP9Z9+vmA@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"; format="flowed"
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+	(mx1.redhat.com [10.5.110.39]);
+	Tue, 23 Apr 2019 02:59:09 +0000 (UTC)
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 209.132.183.28
+Subject: Re: [Qemu-devel] [PATCH 1/2] add VirtIONet vhost_stopped flag to
+ prevent multiple stops
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -70,65 +75,141 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Wei Yang <richardw.yang@linux.intel.com>
-Cc: pagupta@redhat.com, xiaoguangrong.eric@gmail.com,
-	"Michael S. Tsirkin" <mst@redhat.com>, qemu-devel@nongnu.org,
-	yi.z.zhang@linux.intel.com, yu.c.zhang@linux.intel.com,
-	Wei Yang <richardw.yang@linux.intel.com>, stefanha@redhat.com,
-	imammedo@redhat.com, pbonzini@redhat.com, dan.j.williams@intel.com
+Cc: =?UTF-8?Q?marcandre=2elureau=40redhat=2ecom_=3e=3e_Marc-Andr=c3=a9_Lureau?=
+	<marcandre.lureau@redhat.com>, qemu-stable@nongnu.org,
+	qemu-devel@nongnu.org, "Michael S. Tsirkin" <mst@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190423024151.r7GydGnU87pOsceVqhXFypVs3mpRk8NBfm1D764RuLU@z>
+Message-ID: <20190423025857._HXqbTGpCsyKiiPA5a9_Xu2sJUZGAut2otnTd_l1sl0@z>
 
-On Mon, Apr 22, 2019 at 03:22:55PM -0300, Eduardo Habkost wrote:
->On Mon, Apr 22, 2019 at 08:34:51AM -0400, Michael S. Tsirkin wrote:
->> On Mon, Apr 22, 2019 at 08:48:47AM +0800, Wei Yang wrote:
->> > Linux 4.15 introduces a new mmap flag MAP_SYNC, which can be used to
->> > guarantee the write persistence to mmap'ed files supporting DAX (e.g.,
->> > files on ext4/xfs file system mounted with '-o dax').
->> > 
->> > A description of MAP_SYNC and MAP_SHARED_VALIDATE can be found at
->> >     https://patchwork.kernel.org/patch/10028151/
->> > 
->> > In order to make sure that the file metadata is in sync after a fault 
->> > while we are writing a shared DAX supporting backend files, this
->> > patch-set enables QEMU to use MAP_SYNC flag for memory-backend-dax-file.
->> > 
->> > As the DAX vs DMA truncated issue was solved, we refined the code and
->> > send out this feature for the v5 version.
->> > 
->> > We will pass MAP_SYNC to mmap(2); if MAP_SYNC is supported and
->> > 'share=on' & 'pmem=on'. 
->> > Or QEMU will not pass this flag to mmap(2)
->> 
->> OK this is in a good shape. As we are in freeze anyway,
->> there's still a bit more time to polish it. I have a couple of
->> suggestions:
->> 
->> - squash docs in same patch with code, no need for two patches
->> - mmap errors are not silently ignored as the doc says,
->>   a warning is produced
->
->Note that a warning is produced only if both share=on and pmem=on
->is specified.  If using pmem=on without share=on, no warning is
->printed at all.
->
->I agree we could squash the docs in the same patch, but I don't
->want to prevent the code from being merged and require v15 to be
->sent just because we are still polishing the documentation.
->
->If there are no objections, I plan to apply this version of the
->series including the following fixup (just removing the word
->"silently"), and I suggest further improvements to be sent as
->follow up patches.
->
 
-If my understanding is correct, the following up patch is:
+On 2019/4/23 =E4=B8=8A=E5=8D=884:14, Dan Streetman wrote:
+> On Sun, Apr 21, 2019 at 10:50 PM Jason Wang <jasowang@redhat.com> wrote=
+:
+>>
+>> On 2019/4/17 =E4=B8=8A=E5=8D=882:46, Dan Streetman wrote:
+>>> From: Dan Streetman <ddstreet@canonical.com>
+>>>
+>>> Buglink: https://launchpad.net/bugs/1823458
+>>>
+>>> There is a race condition when using the vhost-user driver, between a=
+ guest
+>>> shutdown and the vhost-user interface being closed.  This is explaine=
+d in
+>>> more detail at the bug link above; the short explanation is the vhost=
+-user
+>>> device can be closed while the main thread is in the middle of stoppi=
+ng
+>>> the vhost_net.  In this case, the main thread handling shutdown will
+>>> enter virtio_net_vhost_status() and move into the n->vhost_started (e=
+lse)
+>>> block, and call vhost_net_stop(); while it is running that function,
+>>> another thread is notified that the vhost-user device has been closed=
+,
+>>> and (indirectly) calls into virtio_net_vhost_status() also.
+>>
+>> I think we need figure out why there are multiple vhost_net_stop() cal=
+ls
+>> simultaneously. E.g vhost-user register fd handlers like:
+>>
+>>           qemu_chr_fe_set_handlers(&s->chr, NULL, NULL,
+>>                                    net_vhost_user_event, NULL, nc0->na=
+me,
+>> NULL,
+>>                                    true);
+>>
+>> which uses default main context, so it should only be called only in
+>> main thread.
+> net_vhost_user_event() schedules chr_closed_bh() to do its bottom half
+> work; does aio_bh_schedule_oneshot() execute its events from the main
+> thread?
 
-"send the warnings to an errp object and not stderr"
 
--- 
-Wei Yang
-Help you, Help me
+I think so if net_vhost_user_event() was called in main thread (it calls=20
+qemu_get_current_aio_context()).
+
+
+>
+> For reference, the call chain is:
+>
+> chr_closed_bh()
+>    qmp_set_link()
+>      nc->info->link_status_changed() -> virtio_net_set_link_status()
+>        virtio_net_set_status()
+>          virtio_net_vhost_status()
+
+
+The code was added by Marc since:
+
+commit e7c83a885f865128ae3cf1946f8cb538b63cbfba
+Author: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+Date:=C2=A0=C2=A0 Mon Feb 27 14:49:56 2017 +0400
+
+ =C2=A0=C2=A0=C2=A0 vhost-user: delay vhost_user_stop
+
+Cc him for more thoughts.
+
+Thanks
+
+
+>> Thanks
+>>
+>>
+>>>    Since the
+>>> vhost_net status hasn't yet changed, the second thread also enters
+>>> the n->vhost_started block, and also calls vhost_net_stop().  This
+>>> causes problems for the second thread when it tries to stop the netwo=
+rk
+>>> that's already been stopped.
+>>>
+>>> This adds a flag to the struct that's atomically set to prevent more =
+than
+>>> one thread from calling vhost_net_stop().  The atomic_fetch_inc() is =
+likely
+>>> overkill and probably could be done with a simple check-and-set, but
+>>> since it's a race condition there would still be a (very, very) small
+>>> window without using an atomic to set it.
+>>>
+>>> Signed-off-by: Dan Streetman <ddstreet@canonical.com>
+>>> ---
+>>>    hw/net/virtio-net.c            | 3 ++-
+>>>    include/hw/virtio/virtio-net.h | 1 +
+>>>    2 files changed, 3 insertions(+), 1 deletion(-)
+>>>
+>>> diff --git a/hw/net/virtio-net.c b/hw/net/virtio-net.c
+>>> index ffe0872fff..d36f50d5dd 100644
+>>> --- a/hw/net/virtio-net.c
+>>> +++ b/hw/net/virtio-net.c
+>>> @@ -13,6 +13,7 @@
+>>>
+>>>    #include "qemu/osdep.h"
+>>>    #include "qemu/iov.h"
+>>> +#include "qemu/atomic.h"
+>>>    #include "hw/virtio/virtio.h"
+>>>    #include "net/net.h"
+>>>    #include "net/checksum.h"
+>>> @@ -240,7 +241,7 @@ static void virtio_net_vhost_status(VirtIONet *n,=
+ uint8_t status)
+>>>                             "falling back on userspace virtio", -r);
+>>>                n->vhost_started =3D 0;
+>>>            }
+>>> -    } else {
+>>> +    } else if (atomic_fetch_inc(&n->vhost_stopped) =3D=3D 0) {
+>>>            vhost_net_stop(vdev, n->nic->ncs, queues);
+>>>            n->vhost_started =3D 0;
+>>>        }
+>>> diff --git a/include/hw/virtio/virtio-net.h b/include/hw/virtio/virti=
+o-net.h
+>>> index b96f0c643f..d03fd933d0 100644
+>>> --- a/include/hw/virtio/virtio-net.h
+>>> +++ b/include/hw/virtio/virtio-net.h
+>>> @@ -164,6 +164,7 @@ struct VirtIONet {
+>>>        uint8_t nouni;
+>>>        uint8_t nobcast;
+>>>        uint8_t vhost_started;
+>>> +    int vhost_stopped;
+>>>        struct {
+>>>            uint32_t in_use;
+>>>            uint32_t first_multi;
 
