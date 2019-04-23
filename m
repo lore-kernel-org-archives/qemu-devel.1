@@ -2,86 +2,72 @@ Return-Path: <SRS0=zUjA=SZ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.5 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4E1EDC10F03
-	for <qemu-devel@archiver.kernel.org>; Tue, 23 Apr 2019 19:47:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 448F4C10F03
+	for <qemu-devel@archiver.kernel.org>; Tue, 23 Apr 2019 20:21:57 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 11CD721773
-	for <qemu-devel@archiver.kernel.org>; Tue, 23 Apr 2019 19:47:15 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="HVvLz7LZ"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 11CD721773
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	by mail.kernel.org (Postfix) with ESMTPS id 1146F208E4
+	for <qemu-devel@archiver.kernel.org>; Tue, 23 Apr 2019 20:21:56 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1146F208E4
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=nongnu.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:58784 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:59072 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hJ1Nr-0006JB-1T
-	for qemu-devel@archiver.kernel.org; Tue, 23 Apr 2019 15:47:15 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:60930)
+	id 1hJ1vQ-0004WO-4s
+	for qemu-devel@archiver.kernel.org; Tue, 23 Apr 2019 16:21:56 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:57331)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <amitkumarrathore07@gmail.com>) id 1hJ1N0-0005z8-Es
-	for qemu-devel@nongnu.org; Tue, 23 Apr 2019 15:46:25 -0400
+	(envelope-from <bounces@canonical.com>) id 1hJ1uZ-00046R-7B
+	for qemu-devel@nongnu.org; Tue, 23 Apr 2019 16:21:04 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <amitkumarrathore07@gmail.com>) id 1hJ1My-0000ls-GU
-	for qemu-devel@nongnu.org; Tue, 23 Apr 2019 15:46:22 -0400
-Received: from mail-ot1-x32e.google.com ([2607:f8b0:4864:20::32e]:37006)
+	(envelope-from <bounces@canonical.com>) id 1hJ1uS-000183-AZ
+	for qemu-devel@nongnu.org; Tue, 23 Apr 2019 16:20:58 -0400
+Received: from indium.canonical.com ([91.189.90.7]:57058)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <amitkumarrathore07@gmail.com>)
-	id 1hJ1My-0000l5-9R
-	for qemu-devel@nongnu.org; Tue, 23 Apr 2019 15:46:20 -0400
-Received: by mail-ot1-x32e.google.com with SMTP id c16so13975538otn.4
-	for <qemu-devel@nongnu.org>; Tue, 23 Apr 2019 12:46:18 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
-	h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-	:cc; bh=8zOFy7yA8T7YdtG155u08K6grwLmP4QiMLCIVx1AYFw=;
-	b=HVvLz7LZZG1TNTuXRXqUkyqKMAqTPYOdq29E32A1ThN4RyZyPzkes71GJdPUxByuRu
-	t0PRwk/oD2yhsdubY+PC3qo4W57xyFt4748kgaTAuf+I8wtl8dXTCHw5/hAzpriBDhYP
-	Foz2kqDczbQEWtNZ1fhvqnLL1dkfM/k0SIJygMQGkjGAMZzJAX3Fqvznr4gK9Uxt+83J
-	wpVU2OxrIlRjMdAeyV7oz/CtA4mYjXbUj/I1CEg9Wqw4S6WigFkkSfuxeVN9y8OU+26l
-	Op6Xf38Zasn7HIRr8BgBjhsFTGT2iZQyY8wi5M2Kl4WSJxxfd1y9JOe7ltfdfNs5w3BI
-	jE5Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=1e100.net; s=20161025;
-	h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-	:message-id:subject:to:cc;
-	bh=8zOFy7yA8T7YdtG155u08K6grwLmP4QiMLCIVx1AYFw=;
-	b=tiCOpxpzSaIxw25V3bqj5aytGbaypS1WHoJAkAWj2JFlC9ONRUAimOchWM7akeN6vd
-	6r+UqvdgswYezpfkhDQxDwgLs14JSeoYbqzYw7csK03LKZl0ZIQIaaqVuq4vSa21N4LV
-	7kVO1YSDgf0p8Wx5MqfuQ8gMP5L0XkNa6G1sf+oPGEA6KAMElQPylxV4lr8VW86bpMLi
-	XFol24TWQArURi7ey1LaIFZc37ymOw8GpaHjNqZryuQU1HZntMI4DF4YzqFq/UW7cuqo
-	Ij53ke5v1jOsFUMrYV97QO3cmkrfIOrjvL12CBPX5LqOr8UkHRyMw5PgsdHJ1j02kcCJ
-	l28A==
-X-Gm-Message-State: APjAAAU28vPM1RkbFYCKPzdYRTep7JodBLddVtoKoR75YA2FMpOTRbOc
-	2jPOEMZhc5CjEyTC+KWBVsPFvKSx/E3f1ArAkxw=
-X-Google-Smtp-Source: APXvYqwMit17NMh/5ahOtdYQTYL8i3cWAg/0mkshJwdzz5gFrbADHIVD1KcqiWdP7jcfL80odHb/FKsMWJG2OkknBgs=
-X-Received: by 2002:a05:6830:16c3:: with SMTP id
-	l3mr17346511otr.359.1556048777352; 
-	Tue, 23 Apr 2019 12:46:17 -0700 (PDT)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1hJ1uF-0000vU-BU
+	for qemu-devel@nongnu.org; Tue, 23 Apr 2019 16:20:46 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1hJ1u8-0001i7-QB
+	for <qemu-devel@nongnu.org>; Tue, 23 Apr 2019 20:20:36 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id C3B7A2E80C8
+	for <qemu-devel@nongnu.org>; Tue, 23 Apr 2019 20:20:36 +0000 (UTC)
 MIME-Version: 1.0
-References: <5cbe25f0.1c69fb81.e0425.9c3b@mx.google.com>
-	<20190423135215.GK32465@stefanha-x1.localdomain>
-In-Reply-To: <20190423135215.GK32465@stefanha-x1.localdomain>
-From: Amit Kumar Rathore <amitkumarrathore07@gmail.com>
-Date: Wed, 24 Apr 2019 01:16:05 +0530
-Message-ID:
- <CALxb8AG=-65qf2eF9cfAuaUOsWGCUm9yckWAmk-Yu74B+Eo89Q@mail.gmail.com>
-To: Stefan Hajnoczi <stefanha@gmail.com>
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
-	recognized.
-X-Received-From: 2607:f8b0:4864:20::32e
 Content-Type: text/plain; charset="UTF-8"
-X-Content-Filtered-By: Mailman/MimeDel 2.1.21
-Subject: Re: [Qemu-devel] Review my proposal
+Content-Transfer-Encoding: quoted-printable
+Date: Tue, 23 Apr 2019 20:12:31 -0000
+To: qemu-devel@nongnu.org
+X-Launchpad-Notification-Type: bug
+X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
+X-Launchpad-Bug-Information-Type: Public
+X-Launchpad-Bug-Private: no
+X-Launchpad-Bug-Security-Vulnerability: no
+X-Launchpad-Bug-Commenters: mike-papersolve
+X-Launchpad-Bug-Reporter: mike@papersolve.com (mike-papersolve)
+X-Launchpad-Bug-Modifier: mike@papersolve.com (mike-papersolve)
+References: <152217198529.30594.10454069952660679046.malonedeb@gac.canonical.com>
+Message-Id:
+ <155605035154.17547.2881432107973210089.malone@soybean.canonical.com>
+X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
+X-Launchpad-Message-For: qemu-devel-ml
+Precedence: bulk
+X-Generated-By: Launchpad (canonical.com); Revision="18928";
+	Instance="launchpad-lazr.conf"
+X-Launchpad-Hash: 1fd5f04cdbd926ef7b5703b8a032641716261bfe
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 91.189.90.7
+Subject: [Qemu-devel] [Bug 1759338] Re: qemu-system-sparc w/ SS-20 ROM does
+ not add processors
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
-Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -90,27 +76,92 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-devel@nongnu.org
+From: mike--- via Qemu-devel <qemu-devel@nongnu.org>
+Reply-To: Bug 1759338 <1759338@bugs.launchpad.net>
+Cc: "mike@papersolve.com" <mike@papersolve.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190423194605.0x4n2TQWsA4vDO1ktsymgoy_SlvoM3DgJL_kIWlkcPE@z>
+Message-ID: <20190423201231.cfrXHUkeALRDH01aioWq7tSJ4YgSnboL0DB29r21ofU@z>
 
-Thank you for your response.
+As of QEMU 4 OpenBIOS can boot Solaris again, and it does properly
+allocate multiple CPUs. Of course, it's a whole lot slower on multiple
+CPUs which I wasn't really anticipating, but it does work.  (And single
+CPU is so fast anyway compared to the actual hardware it's emulating!)
+So this bug while still applicable can be closed.
 
-On Tue, Apr 23, 2019, 7:22 PM Stefan Hajnoczi <stefanha@gmail.com> wrote:
+-- =
 
-> On Tue, Apr 23, 2019 at 02:07:03AM +0530, amit kumar rathore wrote:
-> > Sir,
-> > My proposal is still not review by my mentor. My mentor is JAN KISZKA .I
-> already mail him but he not responding me. What I do now? How can I know my
-> proposal is view or not.
->
-> Hi Amit,
-> I am the organization administrator for QEMU.  I can confirm that your
-> Google Summer of Code application was submitted.
->
-> Google will announce results on May 6th.
->
-> Stefan
->
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1759338
+
+Title:
+  qemu-system-sparc w/ SS-20 ROM does not add processors
+
+Status in QEMU:
+  New
+
+Bug description:
+  When booting a SPARCstation-20 with the original ROM, qemu does not
+  set the number of processors in a way that this ROM can understand it,
+  and the ROM always reports only 1 processor installed:
+
+  =
+
+   ~/qemu =EE=82=B0 /usr/local/bin/qemu-system-sparc -bios ./ss20_v2.25_rom=
+ -M SS-20 -cpu "TI SuperSparc 60" -smp 2 -nographic
+
+  Power-ON Reset
+
+
+  =
+
+             SMCC SPARCstation 10/20 UP/MP POST version VRV3.45 (09/11/95)
+
+  =
+
+  CPU_#0       TI, TMS390Z50(3.x)       0Mb External cache
+
+  CPU_#1       ******* NOT installed *******
+  CPU_#2       ******* NOT installed *******
+  CPU_#3       ******* NOT installed *******
+
+      <<< CPU_00000000 on MBus Slot_00000000 >>> IS RUNNING (MID =3D
+  00000008)
+
+  =
+
+  ...
+
+  Cpu #0 TI,TMS390Z50 =
+
+  Cpu #1 Nothing there =
+
+  Cpu #2 Nothing there =
+
+  Cpu #3 Nothing there =
+
+
+  ...
+
+  SPARCstation 20 (1 X 390Z50), No Keyboard
+  ROM Rev. 2.25, 128 MB memory installed, Serial #1193046.
+  Ethernet address 52:54:0:12:34:56, Host ID: 72123456.
+
+
+  =
+
+  (It is necessary use SS-20 since it is the only sun4m model that supports=
+ 512MB RAM, and I can't get Solaris to install on the SS-20 using OpenBIOS.=
+) =
+
+
+  When booting with OpenBIOS I can't seem to boot any version of Solaris
+  though I had heard this did work.  Solaris 8 and 9 do work nicely with
+  this ROM, but I am opening this to see if it is possible to fix this
+  to allow the original OBP ROM to see multiple processors.
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1759338/+subscriptions
+
