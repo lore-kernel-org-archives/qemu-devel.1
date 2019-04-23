@@ -1,27 +1,21 @@
-Received: from eggs.gnu.org ([209.51.188.92]:57262)
+Received: from eggs.gnu.org ([209.51.188.92]:36560)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1hIymx-0008Eo-NT
-	for qemu-devel@nongnu.org; Tue, 23 Apr 2019 13:01:00 -0400
+	(envelope-from <lersek@redhat.com>) id 1hIz1F-00052u-Q3
+	for qemu-devel@nongnu.org; Tue, 23 Apr 2019 13:15:47 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1hIymw-0007Py-SZ
-	for qemu-devel@nongnu.org; Tue, 23 Apr 2019 13:00:59 -0400
-Received: from mail-pf1-x429.google.com ([2607:f8b0:4864:20::429]:33223)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1hIymw-0007Ou-LY
-	for qemu-devel@nongnu.org; Tue, 23 Apr 2019 13:00:58 -0400
-Received: by mail-pf1-x429.google.com with SMTP id h5so7804624pfo.0
-	for <qemu-devel@nongnu.org>; Tue, 23 Apr 2019 10:00:58 -0700 (PDT)
-References: <20190423102145.14812-1-f4bug@amsat.org>
-From: Richard Henderson <richard.henderson@linaro.org>
-Message-ID: <0ccf7480-4f78-14af-c03e-8c28e41b1e32@linaro.org>
-Date: Tue, 23 Apr 2019 10:00:54 -0700
+	(envelope-from <lersek@redhat.com>) id 1hIz1D-0005GS-Um
+	for qemu-devel@nongnu.org; Tue, 23 Apr 2019 13:15:45 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:26652)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <lersek@redhat.com>) id 1hIz1C-0005DH-1K
+	for qemu-devel@nongnu.org; Tue, 23 Apr 2019 13:15:42 -0400
+From: Laszlo Ersek <lersek@redhat.com>
+Date: Tue, 23 Apr 2019 19:15:08 +0200
+Message-Id: <20190423171520.4511-1-lersek@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20190423102145.14812-1-f4bug@amsat.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH 0/2] tcg: more tcg_gen_abs() uses
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PULL 00/12] bundle edk2 platform firmware with QEMU
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,15 +24,98 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>, qemu-devel@nongnu.org
-Cc: David Gibson <david@gibson.dropbear.id.au>, David Hildenbrand <david@redhat.com>, Bastian Koppelmann <kbastian@mail.uni-paderborn.de>, qemu-ppc@nongnu.org
+To: berrange@redhat.com, eblake@redhat.com, f4bug@amsat.org, imammedo@redhat.com, kraxel@redhat.com, mprivozn@redhat.com, mst@redhat.com, peter.maydell@linaro.org, philmd@redhat.com, qemu-devel@nongnu.org
 
-On 4/23/19 3:21 AM, Philippe Mathieu-Daudé wrote:
-> Philippe Mathieu-Daudé (2):
->   target/ppc: Use tcg_gen_abs_i32
->   target/tricore: Use tcg_gen_abs_tl
+Picked up the new feedback tags from the v4 thread, which had been
+posted at:
+- https://lists.gnu.org/archive/html/qemu-devel/2019-04/msg01549.html
+- http://mid.mail-archive.com/20190409230022.6462-1-lersek@redhat.com
 
-Queued onto tcg-vec-next.
+The following changes since commit eeba63fc7fface36f438bcbc0d3b02e7dcb599=
+83:
 
+  Update version for v4.0.0-rc4 release (2019-04-16 21:53:00 +0100)
 
-r~
+are available in the Git repository at:
+
+  https://github.com/lersek/qemu.git tags/edk2-pull-2019-04-22
+
+for you to fetch changes up to 6739df3fafaa3e2ec37af23fd77d2119869f4a4f:
+
+  MAINTAINERS: add the "EDK2 Firmware" subsystem (2019-04-17 15:38:35 +02=
+00)
+
+----------------------------------------------------------------
+Advance the roms/edk2 submodule to the "edk2-stable201903" release, and
+build and capture platform firmware binaries from that release. The
+binaries are meant to be used by both end-users and by the "BIOS tables"
+unit tests in qtest ("make check").
+
+----------------------------------------------------------------
+Laszlo Ersek (12):
+      roms: lift "edk2-funcs.sh" from "tests/uefi-test-tools/build.sh"
+      roms/edk2-funcs.sh: require gcc-4.8+ for building i386 and x86_64
+      tests/uefi-test-tools/build.sh: work around TianoCore#1607
+      roms/edk2: advance to tag edk2-stable201903
+      roms/edk2-funcs.sh: add the qemu_edk2_get_thread_count() function
+      roms/Makefile: replace the $(EDK2_EFIROM) target with "edk2-basetoo=
+ls"
+      roms: build edk2 firmware binaries and variable store templates
+      pc-bios: add edk2 firmware binaries and variable store templates
+      pc-bios: document the edk2 firmware images; add firmware descriptor=
+s
+      tests: add missing dependency to build QTEST_QEMU_BINARY, round 2
+      Makefile: install the edk2 firmware images and their descriptors
+      MAINTAINERS: add the "EDK2 Firmware" subsystem
+
+ .gitignore                                     |   1 +
+ MAINTAINERS                                    |  12 ++
+ Makefile                                       |  29 ++-
+ configure                                      |   1 +
+ pc-bios/README                                 |  11 ++
+ pc-bios/descriptors/50-edk2-i386-secure.json   |  34 ++++
+ pc-bios/descriptors/50-edk2-x86_64-secure.json |  35 ++++
+ pc-bios/descriptors/60-edk2-aarch64.json       |  31 +++
+ pc-bios/descriptors/60-edk2-arm.json           |  31 +++
+ pc-bios/descriptors/60-edk2-i386.json          |  33 ++++
+ pc-bios/descriptors/60-edk2-x86_64.json        |  34 ++++
+ pc-bios/edk2-aarch64-code.fd.bz2               | Bin 0 -> 1177603 bytes
+ pc-bios/edk2-arm-code.fd.bz2                   | Bin 0 -> 1173662 bytes
+ pc-bios/edk2-arm-vars.fd.bz2                   | Bin 0 -> 263 bytes
+ pc-bios/edk2-i386-code.fd.bz2                  | Bin 0 -> 1688659 bytes
+ pc-bios/edk2-i386-secure-code.fd.bz2           | Bin 0 -> 1881979 bytes
+ pc-bios/edk2-i386-vars.fd.bz2                  | Bin 0 -> 190 bytes
+ pc-bios/edk2-licenses.txt                      | 209 +++++++++++++++++++=
++
+ pc-bios/edk2-x86_64-code.fd.bz2                | Bin 0 -> 1669280 bytes
+ pc-bios/edk2-x86_64-secure-code.fd.bz2         | Bin 0 -> 1901210 bytes
+ roms/Makefile                                  |   9 +-
+ roms/Makefile.edk2                             | 148 +++++++++++++++
+ roms/edk2                                      |   2 +-
+ roms/edk2-build.sh                             |  55 ++++++
+ roms/edk2-funcs.sh                             | 253 +++++++++++++++++++=
+++++++
+ tests/Makefile.include                         |   2 +-
+ tests/uefi-test-tools/build.sh                 | 100 +---------
+ 27 files changed, 934 insertions(+), 96 deletions(-)
+ create mode 100644 pc-bios/descriptors/50-edk2-i386-secure.json
+ create mode 100644 pc-bios/descriptors/50-edk2-x86_64-secure.json
+ create mode 100644 pc-bios/descriptors/60-edk2-aarch64.json
+ create mode 100644 pc-bios/descriptors/60-edk2-arm.json
+ create mode 100644 pc-bios/descriptors/60-edk2-i386.json
+ create mode 100644 pc-bios/descriptors/60-edk2-x86_64.json
+ create mode 100644 pc-bios/edk2-aarch64-code.fd.bz2
+ create mode 100644 pc-bios/edk2-arm-code.fd.bz2
+ create mode 100644 pc-bios/edk2-arm-vars.fd.bz2
+ create mode 100644 pc-bios/edk2-i386-code.fd.bz2
+ create mode 100644 pc-bios/edk2-i386-secure-code.fd.bz2
+ create mode 100644 pc-bios/edk2-i386-vars.fd.bz2
+ create mode 100644 pc-bios/edk2-licenses.txt
+ create mode 100644 pc-bios/edk2-x86_64-code.fd.bz2
+ create mode 100644 pc-bios/edk2-x86_64-secure-code.fd.bz2
+ create mode 100644 roms/Makefile.edk2
+ create mode 100755 roms/edk2-build.sh
+ create mode 100644 roms/edk2-funcs.sh
+
+--=20
+2.19.1.3.g30247aa5d201
