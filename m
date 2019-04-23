@@ -2,99 +2,93 @@ Return-Path: <SRS0=zUjA=SZ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-4.0 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BED1AC10F03
-	for <qemu-devel@archiver.kernel.org>; Tue, 23 Apr 2019 20:53:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 185ECC10F03
+	for <qemu-devel@archiver.kernel.org>; Tue, 23 Apr 2019 20:59:54 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7E143218D2
-	for <qemu-devel@archiver.kernel.org>; Tue, 23 Apr 2019 20:53:45 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7E143218D2
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.vnet.ibm.com
+	by mail.kernel.org (Postfix) with ESMTPS id D0BBE218DA
+	for <qemu-devel@archiver.kernel.org>; Tue, 23 Apr 2019 20:59:53 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="NX1KqeMT"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D0BBE218DA
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:59358 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:59411 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hJ2QC-0003zB-PX
-	for qemu-devel@archiver.kernel.org; Tue, 23 Apr 2019 16:53:44 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:53796)
+	id 1hJ2W9-0005WK-15
+	for qemu-devel@archiver.kernel.org; Tue, 23 Apr 2019 16:59:53 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:57619)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mdroth@linux.vnet.ibm.com>) id 1hJ2PN-0003gK-Cn
-	for qemu-devel@nongnu.org; Tue, 23 Apr 2019 16:52:54 -0400
+	(envelope-from <richard.henderson@linaro.org>) id 1hJ2VH-0005AK-Lq
+	for qemu-devel@nongnu.org; Tue, 23 Apr 2019 16:59:00 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mdroth@linux.vnet.ibm.com>) id 1hJ2PJ-00052o-GB
-	for qemu-devel@nongnu.org; Tue, 23 Apr 2019 16:52:53 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:36030
-	helo=mx0a-001b2d01.pphosted.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mdroth@linux.vnet.ibm.com>)
-	id 1hJ2PF-0004st-Nf
-	for qemu-devel@nongnu.org; Tue, 23 Apr 2019 16:52:45 -0400
-Received: from pps.filterd (m0098419.ppops.net [127.0.0.1])
-	by mx0b-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id
-	x3NKnXRW136857
-	for <qemu-devel@nongnu.org>; Tue, 23 Apr 2019 16:52:36 -0400
-Received: from e35.co.us.ibm.com (e35.co.us.ibm.com [32.97.110.153])
-	by mx0b-001b2d01.pphosted.com with ESMTP id 2s28whu2tt-1
-	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Tue, 23 Apr 2019 16:52:36 -0400
-Received: from localhost
-	by e35.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
-	Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <mdroth@linux.vnet.ibm.com>;
-	Tue, 23 Apr 2019 21:52:35 +0100
-Received: from b03cxnp08026.gho.boulder.ibm.com (9.17.130.18)
-	by e35.co.us.ibm.com (192.168.1.135) with IBM ESMTP SMTP Gateway:
-	Authorized Use Only! Violators will be prosecuted; 
-	(version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
-	Tue, 23 Apr 2019 21:52:32 +0100
-Received: from b03ledav005.gho.boulder.ibm.com
-	(b03ledav005.gho.boulder.ibm.com [9.17.130.236])
-	by b03cxnp08026.gho.boulder.ibm.com (8.14.9/8.14.9/NCO v10.0) with
-	ESMTP id x3NKqVKB55115968
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256
-	verify=OK); Tue, 23 Apr 2019 20:52:31 GMT
-Received: from b03ledav005.gho.boulder.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id B20B6BE054;
-	Tue, 23 Apr 2019 20:52:31 +0000 (GMT)
-Received: from b03ledav005.gho.boulder.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 684F0BE04F;
-	Tue, 23 Apr 2019 20:52:31 +0000 (GMT)
-Received: from localhost (unknown [9.80.95.60])
-	by b03ledav005.gho.boulder.ibm.com (Postfix) with ESMTP;
-	Tue, 23 Apr 2019 20:52:31 +0000 (GMT)
-Content-Type: text/plain; charset="UTF-8"
+	(envelope-from <richard.henderson@linaro.org>) id 1hJ2VG-0002BI-LV
+	for qemu-devel@nongnu.org; Tue, 23 Apr 2019 16:58:59 -0400
+Received: from mail-pg1-x542.google.com ([2607:f8b0:4864:20::542]:46440)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+	id 1hJ2VE-00029u-Mr
+	for qemu-devel@nongnu.org; Tue, 23 Apr 2019 16:58:58 -0400
+Received: by mail-pg1-x542.google.com with SMTP id v2so5781619pge.13
+	for <qemu-devel@nongnu.org>; Tue, 23 Apr 2019 13:58:56 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+	h=subject:to:references:from:openpgp:message-id:date:user-agent
+	:mime-version:in-reply-to:content-language:content-transfer-encoding;
+	bh=stUvOROvbgPFVjRNiSu0eagtnmxdLN05cmHxeFf/RCY=;
+	b=NX1KqeMT3sR0YKw36fdHitbC/HsyjBfWgE+jcJESisOm32jzxJMc9KOyrv9Lvi6eOg
+	lRscuLVqtFb0hkfIda971F9F9foByLkvFO71gsDF3igimWI9I/pdbAp5+0ymjEG+GZJs
+	mC/tbhr3nAYLwVu4LfBLdE//8uO7gDaudkZplcA01a0+Z5fGNomyhfvua/EtypLuQ1cf
+	qEyaq2KpTBNjjBdu5i+6uST3wFOWZ0jWcIATgbuTqMdNWTWxndnS4CfyhWXcd7A5p0A9
+	SD3b+K8RBhdzs7iMtK+YQv/yqvbnqwDCYCc5vW8ADTRwrx9yuGqKVyQiExQ85iqLXTuy
+	wGZQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=1e100.net; s=20161025;
+	h=x-gm-message-state:subject:to:references:from:openpgp:message-id
+	:date:user-agent:mime-version:in-reply-to:content-language
+	:content-transfer-encoding;
+	bh=stUvOROvbgPFVjRNiSu0eagtnmxdLN05cmHxeFf/RCY=;
+	b=Yu4YrW9vhCHdG5Wqe32D4lLU+a5Yo8O6yrk2Akt6WjFnpP9RczAHcAUBfDT4cy5ONp
+	YxLvWZ/aG6B8Evu76CfWP/kugS3E4ogFyqnJmPkazKa4vZ9SslM/+wiRAURmHD54ZSX0
+	PJZMP/sGu/Gn8NLzg2aOpTkWbrvNcBW3OTP9Xvlewv9CeS9UiuDIfUJkiSvhgG/7xzFC
+	wLXDDGlekZWIj8XtfyaxpL3rsN/V+TQteuyBO5OlyD4YYbXiDzW4C9cUYYaVUwTkkfUd
+	VXj8RCBuEmoa7VY8NSNcikTF0xmw7QSSnO35dPYG+wFHyP/Yuz5YoIFSDO3Z6KRhWNZn
+	wZ8g==
+X-Gm-Message-State: APjAAAV67y5aar6bY+A8G9sznEQl3LDbuWFAsM8jv5kUgVGjZPDcNJe3
+	OjGXa1jHidT7yLh1bC029SOmHALrAIA=
+X-Google-Smtp-Source: APXvYqywo53AAm+FWnKtqQZyiqvSWZsKVEVR0qVAzwWCdTBcoI4FJBSt+xJllOdkAuEbduLqf0XW8g==
+X-Received: by 2002:a63:5d44:: with SMTP id o4mr26688689pgm.15.1556053135056; 
+	Tue, 23 Apr 2019 13:58:55 -0700 (PDT)
+Received: from [192.168.1.11] (97-113-179-147.tukw.qwest.net. [97.113.179.147])
+	by smtp.gmail.com with ESMTPSA id
+	c3sm29548001pfg.88.2019.04.23.13.58.53
+	(version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+	Tue, 23 Apr 2019 13:58:54 -0700 (PDT)
+To: Peter Maydell <peter.maydell@linaro.org>, qemu-arm@nongnu.org,
+	qemu-devel@nongnu.org
+References: <20190416125744.27770-1-peter.maydell@linaro.org>
+	<20190416125744.27770-8-peter.maydell@linaro.org>
+From: Richard Henderson <richard.henderson@linaro.org>
+Openpgp: preference=signencrypt
+Message-ID: <6f380f5c-f65b-49ba-7af8-f1c84b2fba7e@linaro.org>
+Date: Tue, 23 Apr 2019 13:58:52 -0700
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+	Thunderbird/60.6.1
 MIME-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-From: Michael Roth <mdroth@linux.vnet.ibm.com>
-User-Agent: alot/0.7
-To: qemu-devel@nongnu.org
-Date: Tue, 23 Apr 2019 15:52:22 -0500
-X-TM-AS-GCONF: 00
-x-cbid: 19042320-0012-0000-0000-0000172B0105
-X-IBM-SpamModules-Scores: 
-X-IBM-SpamModules-Versions: BY=3.00010982; HX=3.00000242; KW=3.00000007;
-	PH=3.00000004; SC=3.00000285; SDB=6.01193382; UDB=6.00625592;
-	IPR=6.00974202; 
-	MB=3.00026562; MTD=3.00000008; XFM=3.00000015; UTC=2019-04-23 20:52:34
-X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
-x-cbparentid: 19042320-0013-0000-0000-000056FC04F3
-Message-Id: <155605274242.20501.8592407664900944363@sif>
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:, ,
-	definitions=2019-04-23_07:, , signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
-	priorityscore=1501
-	malwarescore=0 suspectscore=0 phishscore=0 bulkscore=63 spamscore=0
-	clxscore=1015 lowpriorityscore=63 mlxscore=0 impostorscore=0
-	mlxlogscore=999 adultscore=0 classifier=spam adjust=0 reason=mlx
-	scancount=1 engine=8.0.1-1810050000 definitions=main-1904230147
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic]
-X-Received-From: 148.163.158.5
-Subject: [Qemu-devel] [ANNOUNCE] QEMU 4.0.0 is now available
+In-Reply-To: <20190416125744.27770-8-peter.maydell@linaro.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+	recognized.
+X-Received-From: 2607:f8b0:4864:20::542
+Subject: Re: [Qemu-devel] [PATCH 07/26] target/arm: Clear CONTROL_S.SFPA in
+ SG insn if FPU present
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -106,86 +100,26 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: peter.maydell@linaro.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190423205222.GModej0_FUFTJAB3P69whnnELls4O7OTunaWBw-tXTQ@z>
+Message-ID: <20190423205852.kK8ns6zS-azMq3KDdiz2QD8jt5zz8IvXQTjRYW9aNPA@z>
 
-Hello,
+On 4/16/19 5:57 AM, Peter Maydell wrote:
+> If the floating point extension is present, then the SG instruction
+> must clear the CONTROL_S.SFPA bit. Implement this.
+> 
+> (On a no-FPU system the bit will always be zero, so we don't need
+> to make the clearing of the bit conditional on ARM_FEATURE_VFP.)
+> 
+> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+> ---
+>  target/arm/helper.c | 1 +
+>  1 file changed, 1 insertion(+)
 
-On behalf of the QEMU Team, I'd like to announce the availability of
-the QEMU 4.0.0 release. This release contains 3100+ commits from 220
-authors.
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 
-You can grab the tarball from our download page here:
 
-  https://www.qemu.org/download/#source
-
-The full list of changes are available at:
-
-  https://wiki.qemu.org/ChangeLog/4.0
-
-Highlights include:
-
- * ARM: ARMv8+ extensions for SB, PredInv, HPD, LOR, FHM, AA32HPD,
-   PAuth, JSConv, CondM, FRINT, and BTI
- * ARM: new emulation support for "Musca" and "MPS2" development boards
- * ARM: virt: support for >255GB of RAM and u-boot "noload" image types
- * ARM: improved emulation of ARM PMU
- * HPPA: support for TLB protection IDs and TLB trace events
- * MIPS: support for multi-threaded TCG emulation
- * MIPS: emulation support for I7200 I6500 CPUs, QMP-base querying of
-   CPU types, and improved support for SAARI and SAAR configuration registe=
-rs
- * MIPS: improvements to Interthread Communication Unit, Fulong 2E
-   machine types, and end-user documentation.
- * PowerPC: pseries/powernv: support for POWER9 large decrementer
- * PowerPC: pseries: emulation support for XIVE interrupt controller
- * PowerPC: pseries: support for hotplugging PCI host bridges (PHBs)
- * PowerPC: pseries: Spectre/Meltdown mitigations enabled by default,
-   additional support for count-cache-flush mitigation
- * RISC-V: virt: support for PCI and USB
- * RISC-V: support for TSR, TW, and TVM fields of mstatus, FS field now
-   supports three stats (dirty, clean, and off)
- * RISC-V: built-in gdbserver supports register lists via XML files
- * s390: support for z14 GA 2 CPU model, Multiple-epoch and PTFF
-   features now enabled in z14 CPU model by default
- * s390: vfio-ap: now supports hot plug/unplug, and no longer inhibits memo=
-ry
-   ballooning
- * s390: emulation support for floating-point extension facility and
-   vector support instructions
- * x86: HAX accelerator now supported POSIX hosts other than Darwin,
-   including Linux and NetBSD
- * x86: Q35: advertised PCIe root port speeds will now optimally default
-   to maximum link speed (16GT/s) and width (x32) provided by PCIe 4.0 for
-   QEMU 4.0+ machine types; older machine types will retain 2.5GT/x1
-   defaults for compatibility.
- * x86: Xen PVH images can now be booted with "-kernel" option
- * Xtensa: xtfpga: improved SMP support for linux (interrupt
-   distributor, IPI, and runstall) and new SMP-capable test_mmuhifi_c3
-   core configuration
- * Xtensa: support for Flexible length instructions extension (FLIX)
-
- * GUI: new '-display spice-app' to configure/launch a Spice client GUI with
-   a similar UI to QEMU GTK. VNC server now supports access controls via
-   tls-authz/sasl-authz options
- * QMP: support for "out-of-band" command execution, can be useful for
-   postcopy migration recovery. Additional QMP commands for working with
-   block devices and dirty bitmaps
- * VFIO: EDID interface for supported mdev (Intel vGPU for kernel 5.0+),
-   allows resolution setting via xres/yres options.
- * Xen: new 'xen-disk' device which can create a Xen PV disk backend,
-   and performance improvements for Xen PV disk backend.
- * Network Block Device: improved tracing and error diagnostics, improved
-   client compatibility with buggy NBD server implementations, new
-   --bitmap, --list, --tls-authz options for qemu-nbd
- * virtio-blk now supports DISCARD and WRITE_ZEROES
- * pvrdma device now supports RDMA Management Datagram services (MAD)
-
- * and lots more...
-
-Thank you to everyone involved!
+r~
 
 
