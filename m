@@ -2,49 +2,49 @@ Return-Path: <SRS0=zUjA=SZ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-6.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 95CA7C10F03
-	for <qemu-devel@archiver.kernel.org>; Tue, 23 Apr 2019 16:31:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 393ECC10F03
+	for <qemu-devel@archiver.kernel.org>; Tue, 23 Apr 2019 16:32:04 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6A0372183E
-	for <qemu-devel@archiver.kernel.org>; Tue, 23 Apr 2019 16:31:48 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6A0372183E
+	by mail.kernel.org (Postfix) with ESMTPS id 07A3521773
+	for <qemu-devel@archiver.kernel.org>; Tue, 23 Apr 2019 16:32:03 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 07A3521773
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:56440 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:56444 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hIyKh-0005zW-Fy
-	for qemu-devel@archiver.kernel.org; Tue, 23 Apr 2019 12:31:47 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:48343)
+	id 1hIyKx-0006Ad-6B
+	for qemu-devel@archiver.kernel.org; Tue, 23 Apr 2019 12:32:03 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:48443)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1hIyIb-0004O9-29
-	for qemu-devel@nongnu.org; Tue, 23 Apr 2019 12:29:37 -0400
+	(envelope-from <thuth@redhat.com>) id 1hIyIW-0004PB-Ur
+	for qemu-devel@nongnu.org; Tue, 23 Apr 2019 12:29:34 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1hIyFq-00057i-M1
-	for qemu-devel@nongnu.org; Tue, 23 Apr 2019 12:26:47 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:34662)
+	(envelope-from <thuth@redhat.com>) id 1hIyIV-0007Cd-Qe
+	for qemu-devel@nongnu.org; Tue, 23 Apr 2019 12:29:32 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:50638)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1hIyFq-00057R-EG
-	for qemu-devel@nongnu.org; Tue, 23 Apr 2019 12:26:46 -0400
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
-	[10.5.11.23])
+	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1hIyIU-0007A5-W3
+	for qemu-devel@nongnu.org; Tue, 23 Apr 2019 12:29:31 -0400
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+	[10.5.11.16])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id B50863016F23;
-	Tue, 23 Apr 2019 16:26:45 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id 7F7BE7D0D8;
+	Tue, 23 Apr 2019 16:29:27 +0000 (UTC)
 Received: from thuth.remote.csb (ovpn-116-87.ams2.redhat.com [10.36.116.87])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id EAE2919936;
-	Tue, 23 Apr 2019 16:26:39 +0000 (UTC)
+	by smtp.corp.redhat.com (Postfix) with ESMTP id 839775C28D;
+	Tue, 23 Apr 2019 16:29:21 +0000 (UTC)
 To: Li Qiang <liq3ea@163.com>, lvivier@redhat.com, pbonzini@redhat.com,
 	philmd@redhat.com, lersek@redhat.com, kraxel@redhat.com
 References: <20190420100056.116305-1-liq3ea@163.com>
-	<20190420100056.116305-3-liq3ea@163.com>
+	<20190420100056.116305-4-liq3ea@163.com>
 From: Thomas Huth <thuth@redhat.com>
 Openpgp: preference=signencrypt
 Autocrypt: addr=thuth@redhat.com; keydata=
@@ -90,23 +90,23 @@ Autocrypt: addr=thuth@redhat.com; keydata=
 	rCELuGwT9hsYkUPjVd4lfylN3mzEc6iAv/wwjsc0DRTSQCpXT3v2ymTAsRKrVaEZLibTXaf+
 	WslxWek3xNYRiqwwWAJuL652eAlxUgQ5ZS+fXBRTiQpJ+F26I/2lccScRd9G5w==
 Organization: Red Hat
-Message-ID: <23d57c5a-7cbc-4f7c-a02e-771f4f24ef00@redhat.com>
-Date: Tue, 23 Apr 2019 18:26:39 +0200
+Message-ID: <a27cd912-4f58-55ac-1aae-e4999fa3d84d@redhat.com>
+Date: Tue, 23 Apr 2019 18:29:20 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
 	Thunderbird/60.6.1
 MIME-Version: 1.0
-In-Reply-To: <20190420100056.116305-3-liq3ea@163.com>
+In-Reply-To: <20190420100056.116305-4-liq3ea@163.com>
 Content-Type: text/plain; charset="UTF-8"
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.48]);
-	Tue, 23 Apr 2019 16:26:45 +0000 (UTC)
+	(mx1.redhat.com [10.5.110.27]);
+	Tue, 23 Apr 2019 16:29:27 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH 2/4] tests: fw_cfg: add a function to get
- the fw_cfg file
+Subject: Re: [Qemu-devel] [PATCH 3/4] tests: fw_cfg: add reboot_timeout test
+ case
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -122,16 +122,39 @@ Cc: liq3ea@gmail.com, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190423162639.xaMQuCtLg3e25XLPXK5nxP3VEse1s-hJpCV_MOjl15A@z>
+Message-ID: <20190423162920.-HzOXMFWkLkJQsNBoNdcyEssndx8aJQ2d5P8CNGhGDk@z>
 
 On 20/04/2019 12.00, Li Qiang wrote:
-> This is useful to write qtest about fw_cfg file entry.
-> 
 > Signed-off-by: Li Qiang <liq3ea@163.com>
 > ---
->  tests/libqos/fw_cfg.c | 45 +++++++++++++++++++++++++++++++++++++++++++
->  tests/libqos/fw_cfg.h |  2 ++
->  2 files changed, 47 insertions(+)
+>  tests/fw_cfg-test.c | 19 +++++++++++++++++++
+>  1 file changed, 19 insertions(+)
+> 
+> diff --git a/tests/fw_cfg-test.c b/tests/fw_cfg-test.c
+> index c22503619f..9f75dbb5f4 100644
+> --- a/tests/fw_cfg-test.c
+> +++ b/tests/fw_cfg-test.c
+> @@ -174,6 +174,24 @@ static void test_fw_cfg_boot_menu(void)
+>      qtest_quit(s);
+>  }
+>  
+> +static void test_fw_cfg_reboot_timeout(void)
+> +{
+> +    QFWCFG *fw_cfg;
+> +    QTestState *s;
+> +    uint32_t reboot_timeout = 0;
+> +    size_t filesize;
+> +
+> +    s = qtest_init("-boot reboot-timeout=15");
+> +    fw_cfg = pc_fw_cfg_init(s);
+> +
+> +    filesize = qfw_cfg_get_file(fw_cfg, "etc/boot-fail-wait",
+> +                     &reboot_timeout, sizeof(reboot_timeout));
+> +    g_assert_cmpint(filesize, ==, sizeof(reboot_timeout));
+> +    g_assert_cmpint(reboot_timeout, ==, 15);
 
-Acked-by: Thomas Huth <thuth@redhat.com>
+Is this endianess-safe? Or do you need to byteswap reboot_timeout if the
+host and guest endianess does not match?
+
+ Thomas
 
