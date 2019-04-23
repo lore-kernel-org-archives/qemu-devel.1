@@ -2,91 +2,84 @@ Return-Path: <SRS0=zUjA=SZ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-6.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CD158C10F14
-	for <qemu-devel@archiver.kernel.org>; Tue, 23 Apr 2019 10:10:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F1AF6C10F14
+	for <qemu-devel@archiver.kernel.org>; Tue, 23 Apr 2019 10:10:58 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8B4A52175B
-	for <qemu-devel@archiver.kernel.org>; Tue, 23 Apr 2019 10:10:44 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8B4A52175B
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=canonical.com
+	by mail.kernel.org (Postfix) with ESMTPS id B3AE42175B
+	for <qemu-devel@archiver.kernel.org>; Tue, 23 Apr 2019 10:10:58 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B3AE42175B
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:51079 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:51083 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hIsNv-0007Xu-MV
-	for qemu-devel@archiver.kernel.org; Tue, 23 Apr 2019 06:10:43 -0400
+	id 1hIsO9-0007hN-Tj
+	for qemu-devel@archiver.kernel.org; Tue, 23 Apr 2019 06:10:57 -0400
 Received: from eggs.gnu.org ([209.51.188.92]:38934)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1hIsJu-0004dL-3R
-	for qemu-devel@nongnu.org; Tue, 23 Apr 2019 06:06:38 -0400
+	(envelope-from <philmd@redhat.com>) id 1hIsK6-0004dL-NY
+	for qemu-devel@nongnu.org; Tue, 23 Apr 2019 06:06:49 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1hIsEk-0008LV-UR
-	for qemu-devel@nongnu.org; Tue, 23 Apr 2019 06:01:16 -0400
-Received: from indium.canonical.com ([91.189.90.7]:37124)
+	(envelope-from <philmd@redhat.com>) id 1hIs8f-00040N-3S
+	for qemu-devel@nongnu.org; Tue, 23 Apr 2019 05:54:58 -0400
+Received: from mail-wr1-f65.google.com ([209.85.221.65]:42249)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1hIsEk-0008L6-Of
-	for qemu-devel@nongnu.org; Tue, 23 Apr 2019 06:01:14 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1hIsEh-0005VO-SK
-	for <qemu-devel@nongnu.org>; Tue, 23 Apr 2019 10:01:12 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id D15392E819C
-	for <qemu-devel@nongnu.org>; Tue, 23 Apr 2019 10:01:10 +0000 (UTC)
+	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1hIs8e-000404-9y
+	for qemu-devel@nongnu.org; Tue, 23 Apr 2019 05:54:57 -0400
+Received: by mail-wr1-f65.google.com with SMTP id g3so19351978wrx.9
+	for <qemu-devel@nongnu.org>; Tue, 23 Apr 2019 02:54:56 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=1e100.net; s=20161025;
+	h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
+	:date:user-agent:mime-version:in-reply-to:content-language
+	:content-transfer-encoding;
+	bh=ZFYWe0PFTVI7X2Bw76Ye+VToFcQrBPO2iRompV2p7gg=;
+	b=fWT2ZLi/3soAKxbYCzVRxBaFYljg2PJXAp5ioOVbDy3/ksy1L5ihUk09Mo6DdVN4BD
+	M64Nte56OK9erLlcsvUy25tHqOndFj+9wAz2OU3mNaajG2Zk5hRVCsWvvXwHauKFsvue
+	BGuvA9IHUDVBqoxPO5Qlxzku86qsQ9CyGYqIwMC3YpCWhxBqd+NrkzVvb0Xkp1Q9ostS
+	QI1yww4Sg9PJKJKAf+S8H9jJ0ip2DXHv+CsSuXW7zr5C4OUU5G/SSWpse2G+JX7NwBXp
+	1T+c15KuanglHD6+uz/+anqBCphQRYR1k60ha28I7hN4IJh/MCvOGYKg60XsDD/2kRFI
+	C5SQ==
+X-Gm-Message-State: APjAAAWnw+6rSSdSr2rmk6i1sLKZa6A1C7GxdAUUHP11sAL3URydTfeV
+	aQBXYDg/8JGRJlnE+rwhrRpGng==
+X-Google-Smtp-Source: APXvYqzWw924cBDLAztl0o38Dy5LFAXm1A7TQtDt26Kox/hfeQ7yFpIbrKej8ay3edkL/RrE/4NwVQ==
+X-Received: by 2002:adf:f749:: with SMTP id z9mr221184wrp.218.1556013295154;
+	Tue, 23 Apr 2019 02:54:55 -0700 (PDT)
+Received: from [192.168.1.25] (atoulouse-656-1-803-163.w86-221.abo.wanadoo.fr.
+	[86.221.12.163]) by smtp.gmail.com with ESMTPSA id
+	d18sm1165372wrx.56.2019.04.23.02.54.53
+	(version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+	Tue, 23 Apr 2019 02:54:54 -0700 (PDT)
+To: Richard Henderson <richard.henderson@linaro.org>, qemu-devel@nongnu.org,
+	"Daniel P. Berrange" <berrange@redhat.com>
+References: <20190417053225.27505-1-richard.henderson@linaro.org>
+	<20190417053225.27505-2-richard.henderson@linaro.org>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Openpgp: id=89C1E78F601EE86C867495CBA2A3FD6EDEADC0DE;
+	url=http://pgp.mit.edu/pks/lookup?op=get&search=0xA2A3FD6EDEADC0DE
+Message-ID: <fb4917eb-4ff3-7a93-cbcd-39d1800827e8@redhat.com>
+Date: Tue, 23 Apr 2019 11:54:53 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+	Thunderbird/60.6.1
 MIME-Version: 1.0
+In-Reply-To: <20190417053225.27505-2-richard.henderson@linaro.org>
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Tue, 23 Apr 2019 09:50:07 -0000
-From: Dan Streetman <dan.streetman@canonical.com>
-To: qemu-devel@nongnu.org
-X-Launchpad-Notification-Type: bug
-X-Launchpad-Bug: product=qemu; status=Fix Released; importance=Undecided;
-	assignee=None; 
-X-Launchpad-Bug: distribution=ubuntu; sourcepackage=qemu; component=main;
-	status=Fix Released; importance=Medium; assignee=None; 
-X-Launchpad-Bug: distribution=ubuntu; distroseries=trusty; sourcepackage=qemu; 
-	component=main; status=Won't Fix; importance=Medium;
-	assignee=None; 
-X-Launchpad-Bug: distribution=ubuntu; distroseries=xenial; sourcepackage=qemu; 
-	component=main; status=In Progress; importance=Medium;
-	assignee=dan.streetman@canonical.com; 
-X-Launchpad-Bug: distribution=ubuntu; distroseries=bionic; sourcepackage=qemu; 
-	component=main; status=Fix Released; importance=Medium;
-	assignee=None; 
-X-Launchpad-Bug: distribution=ubuntu; distroseries=cosmic; sourcepackage=qemu; 
-	component=main; status=Fix Released; importance=Medium;
-	assignee=None; 
-X-Launchpad-Bug: distribution=ubuntu; distroseries=disco; sourcepackage=qemu; 
-	component=main; status=Fix Released; importance=Medium;
-	assignee=None; 
-X-Launchpad-Bug-Information-Type: Public
-X-Launchpad-Bug-Private: no
-X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: ddstreet
-X-Launchpad-Bug-Reporter: Dan Streetman (ddstreet)
-X-Launchpad-Bug-Modifier: Dan Streetman (ddstreet)
-References: <155455149397.14414.11595397789908732027.malonedeb@gac.canonical.com>
-Message-Id:
- <155601300707.14336.15416482747204217560.malone@gac.canonical.com>
-X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
-X-Launchpad-Message-For: qemu-devel-ml
-Precedence: bulk
-X-Generated-By: Launchpad (canonical.com); Revision="18928";
-	Instance="launchpad-lazr.conf"
-X-Launchpad-Hash: c4c79b35ffef368f6a4f1fcaf1d330906f3a0116
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 91.189.90.7
-Subject: [Qemu-devel] [Bug 1823458] Re: race condition between
- vhost_net_stop and CHR_EVENT_CLOSED on shutdown crashes qemu
+	[fuzzy]
+X-Received-From: 209.85.221.65
+Subject: Re: [Qemu-devel] [PATCH 1/1] util/path: Do not cache all filenames
+ at startup
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
+Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -95,194 +88,301 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1823458 <1823458@bugs.launchpad.net>
+Cc: peter.maydell@linaro.org, laurent@vivier.eu, evgreen@chromium.org,
+	=?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190423095007.WRSEH3tzlCm6C2kfYfriUCRiREkOxau7jH_JHHdOSn8@z>
+Message-ID: <20190423095453.7PjtuW4m4qcGG-TqmccBe0fZd4K-jBUQHQA1cR1333w@z>
 
-Note as mentioned in the description, it appears this was fixed upstream
-by commit e7c83a885f8, which is included starting in version 2.9.
-However, this commit depends on at least commit 5345fdb4467, and likely
-more other previous commits, which make widespread code changes and are
-unsuitable to backport. Therefore this seems like it should be
-specifically worked around in the Xenial qemu codebase.
+Hi Richard, Daniel,
 
--- =
+On 4/17/19 7:32 AM, Richard Henderson wrote:
+> If one uses -L $PATH to point to a full chroot, the startup time
+> is significant.  In addition, the existing probing algorithm fails
+> to handle symlink loops.
+> 
+> Instead, probe individual paths on demand.  Cache both positive
+> and negative results within $PATH, so that any one filename is
+> probed only once.
+> 
+> Use glib filename functions for clarity.
+> 
+> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+> ---
+>  util/path.c | 211 ++++++++++++++--------------------------------------
+>  1 file changed, 57 insertions(+), 154 deletions(-)
+> 
+> diff --git a/util/path.c b/util/path.c
+> index 7f9fc272fb..09f75f100a 100644
+> --- a/util/path.c
+> +++ b/util/path.c
+> @@ -8,170 +8,73 @@
+>  #include <dirent.h>
+>  #include "qemu/cutils.h"
+>  #include "qemu/path.h"
+> +#include "qemu/thread.h"
+>  
+> -struct pathelem
+> -{
+> -    /* Name of this, eg. lib */
+> -    char *name;
+> -    /* Full path name, eg. /usr/gnemul/x86-linux/lib. */
+> -    char *pathname;
+> -    struct pathelem *parent;
+> -    /* Children */
+> -    unsigned int num_entries;
+> -    struct pathelem *entries[0];
+> -};
+> -
+> -static struct pathelem *base;
+> -
+> -/* First N chars of S1 match S2, and S2 is N chars long. */
+> -static int strneq(const char *s1, unsigned int n, const char *s2)
+> -{
+> -    unsigned int i;
+> -
+> -    for (i = 0; i < n; i++)
+> -        if (s1[i] != s2[i])
+> -            return 0;
+> -    return s2[i] == 0;
+> -}
+> -
+> -static struct pathelem *add_entry(struct pathelem *root, const char *name,
+> -                                  unsigned type);
+> -
+> -static struct pathelem *new_entry(const char *root,
+> -                                  struct pathelem *parent,
+> -                                  const char *name)
+> -{
+> -    struct pathelem *new = g_malloc(sizeof(*new));
+> -    new->name = g_strdup(name);
+> -    new->pathname = g_strdup_printf("%s/%s", root, name);
+> -    new->num_entries = 0;
+> -    return new;
+> -}
+> -
+> -#define streq(a,b) (strcmp((a), (b)) == 0)
+> -
+> -/* Not all systems provide this feature */
+> -#if defined(DT_DIR) && defined(DT_UNKNOWN) && defined(DT_LNK)
+> -# define dirent_type(dirent) ((dirent)->d_type)
+> -# define is_dir_maybe(type) \
+> -    ((type) == DT_DIR || (type) == DT_UNKNOWN || (type) == DT_LNK)
+> -#else
+> -# define dirent_type(dirent) (1)
+> -# define is_dir_maybe(type)  (type)
+> -#endif
+> -
+> -static struct pathelem *add_dir_maybe(struct pathelem *path)
+> -{
+> -    DIR *dir;
+> -
+> -    if ((dir = opendir(path->pathname)) != NULL) {
+> -        struct dirent *dirent;
+> -
+> -        while ((dirent = readdir(dir)) != NULL) {
+> -            if (!streq(dirent->d_name,".") && !streq(dirent->d_name,"..")){
+> -                path = add_entry(path, dirent->d_name, dirent_type(dirent));
+> -            }
+> -        }
+> -        closedir(dir);
+> -    }
+> -    return path;
+> -}
+> -
+> -static struct pathelem *add_entry(struct pathelem *root, const char *name,
+> -                                  unsigned type)
+> -{
+> -    struct pathelem **e;
+> -
+> -    root->num_entries++;
+> -
+> -    root = g_realloc(root, sizeof(*root)
+> -                   + sizeof(root->entries[0])*root->num_entries);
+> -    e = &root->entries[root->num_entries-1];
+> -
+> -    *e = new_entry(root->pathname, root, name);
+> -    if (is_dir_maybe(type)) {
+> -        *e = add_dir_maybe(*e);
+> -    }
+> -
+> -    return root;
+> -}
+> -
+> -/* This needs to be done after tree is stabilized (ie. no more reallocs!). */
+> -static void set_parents(struct pathelem *child, struct pathelem *parent)
+> -{
+> -    unsigned int i;
+> -
+> -    child->parent = parent;
+> -    for (i = 0; i < child->num_entries; i++)
+> -        set_parents(child->entries[i], child);
+> -}
+> -
+> -/* FIXME: Doesn't handle DIR/.. where DIR is not in emulated dir. */
+> -static const char *
+> -follow_path(const struct pathelem *cursor, const char *name)
+> -{
+> -    unsigned int i, namelen;
+> -
+> -    name += strspn(name, "/");
+> -    namelen = strcspn(name, "/");
+> -
+> -    if (namelen == 0)
+> -        return cursor->pathname;
+> -
+> -    if (strneq(name, namelen, ".."))
+> -        return follow_path(cursor->parent, name + namelen);
+> -
+> -    if (strneq(name, namelen, "."))
+> -        return follow_path(cursor, name + namelen);
+> -
+> -    for (i = 0; i < cursor->num_entries; i++)
+> -        if (strneq(name, namelen, cursor->entries[i]->name))
+> -            return follow_path(cursor->entries[i], name + namelen);
+> -
+> -    /* Not found */
+> -    return NULL;
+> -}
+> +static const char *base;
+> +static GHashTable *hash;
+> +static QemuMutex lock;
+>  
+>  void init_paths(const char *prefix)
+>  {
+> -    char pref_buf[PATH_MAX];
+> -
+> -    if (prefix[0] == '\0' ||
+> -        !strcmp(prefix, "/"))
+> +    if (prefix[0] == '\0' || !strcmp(prefix, "/")) {
+>          return;
+> -
+> -    if (prefix[0] != '/') {
+> -        char *cwd = getcwd(NULL, 0);
+> -        size_t pref_buf_len = sizeof(pref_buf);
+> -
+> -        if (!cwd)
+> -            abort();
+> -        pstrcpy(pref_buf, sizeof(pref_buf), cwd);
+> -        pstrcat(pref_buf, pref_buf_len, "/");
+> -        pstrcat(pref_buf, pref_buf_len, prefix);
+> -        free(cwd);
+> -    } else
+> -        pstrcpy(pref_buf, sizeof(pref_buf), prefix + 1);
+> -
+> -    base = new_entry("", NULL, pref_buf);
+> -    base = add_dir_maybe(base);
+> -    if (base->num_entries == 0) {
+> -        g_free(base->pathname);
+> -        g_free(base->name);
+> -        g_free(base);
+> -        base = NULL;
+> -    } else {
+> -        set_parents(base, base);
+>      }
+> +
+> +#if GLIB_CHECK_VERSION(2, 58, 0)
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1823458
+Should we raise GLIB_VERSION_MAX_ALLOWED in "glib-compat.h"?
 
-Title:
-  race condition between vhost_net_stop and CHR_EVENT_CLOSED on shutdown
-  crashes qemu
+Currently it is:
 
-Status in QEMU:
-  Fix Released
-Status in qemu package in Ubuntu:
-  Fix Released
-Status in qemu source package in Trusty:
-  Won't Fix
-Status in qemu source package in Xenial:
-  In Progress
-Status in qemu source package in Bionic:
-  Fix Released
-Status in qemu source package in Cosmic:
-  Fix Released
-Status in qemu source package in Disco:
-  Fix Released
+  /* Ask for warnings if code tries to use function that did not
+   * exist in the defined version. These risk breaking builds
+   */
+  #define GLIB_VERSION_MAX_ALLOWED GLIB_VERSION_2_40
 
-Bug description:
-  [impact]
+From commit e71e8cc035558eabd6b3e19f6d3254c754c027ef:
 
-  on shutdown of a guest, there is a race condition that results in qemu
-  crashing instead of normally shutting down.  The bt looks similar to
-  this (depending on the specific version of qemu, of course; this is
-  taken from 2.5 version of qemu):
+ glib: enforce the minimum required version and warn about old APIs
 
-  (gdb) bt
-  #0  __GI___pthread_mutex_lock (mutex=3D0x0) at ../nptl/pthread_mutex_lock=
-.c:66
-  #1  0x00005636c0bc4389 in qemu_mutex_lock (mutex=3Dmutex@entry=3D0x0) at =
-/build/qemu-7I4i1R/qemu-2.5+dfsg/util/qemu-thread-posix.c:73
-  #2  0x00005636c0988130 in qemu_chr_fe_write_all (s=3Ds@entry=3D0x0, buf=
-=3Dbuf@entry=3D0x7ffe65c086a0 "\v", len=3Dlen@entry=3D20) at /build/qemu-7I=
-4i1R/qemu-2.5+dfsg/qemu-char.c:205
-  #3  0x00005636c08f3483 in vhost_user_write (msg=3Dmsg@entry=3D0x7ffe65c08=
-6a0, fds=3Dfds@entry=3D0x0, fd_num=3Dfd_num@entry=3D0, dev=3D0x5636c1bf6b70=
-, dev=3D0x5636c1bf6b70)
-  =C2=A0=C2=A0=C2=A0=C2=A0at /build/qemu-7I4i1R/qemu-2.5+dfsg/hw/virtio/vho=
-st-user.c:195
-  #4  0x00005636c08f411c in vhost_user_get_vring_base (dev=3D0x5636c1bf6b70=
-, ring=3D0x7ffe65c087e0) at /build/qemu-7I4i1R/qemu-2.5+dfsg/hw/virtio/vhos=
-t-user.c:364
-  #5  0x00005636c08efff0 in vhost_virtqueue_stop (dev=3Ddev@entry=3D0x5636c=
-1bf6b70, vdev=3Dvdev@entry=3D0x5636c2853338, vq=3D0x5636c1bf6d00, idx=3D1) =
-at /build/qemu-7I4i1R/qemu-2.5+dfsg/hw/virtio/vhost.c:895
-  #6  0x00005636c08f2944 in vhost_dev_stop (hdev=3Dhdev@entry=3D0x5636c1bf6=
-b70, vdev=3Dvdev@entry=3D0x5636c2853338) at /build/qemu-7I4i1R/qemu-2.5+dfs=
-g/hw/virtio/vhost.c:1262
-  #7  0x00005636c08db2a8 in vhost_net_stop_one (net=3D0x5636c1bf6b70, dev=
-=3Ddev@entry=3D0x5636c2853338) at /build/qemu-7I4i1R/qemu-2.5+dfsg/hw/net/v=
-host_net.c:293
-  #8  0x00005636c08dbe5b in vhost_net_stop (dev=3Ddev@entry=3D0x5636c285333=
-8, ncs=3D0x5636c209d110, total_queues=3Dtotal_queues@entry=3D1) at /build/q=
-emu-7I4i1R/qemu-2.5+dfsg/hw/net/vhost_net.c:371
-  #9  0x00005636c08d7745 in virtio_net_vhost_status (status=3D7 '\a', n=3D0=
-x5636c2853338) at /build/qemu-7I4i1R/qemu-2.5+dfsg/hw/net/virtio-net.c:150
-  #10 virtio_net_set_status (vdev=3D<optimized out>, status=3D<optimized ou=
-t>) at /build/qemu-7I4i1R/qemu-2.5+dfsg/hw/net/virtio-net.c:162
-  #11 0x00005636c08ec42c in virtio_set_status (vdev=3D0x5636c2853338, val=
-=3D<optimized out>) at /build/qemu-7I4i1R/qemu-2.5+dfsg/hw/virtio/virtio.c:=
-624
-  #12 0x00005636c098fed2 in vm_state_notify (running=3Drunning@entry=3D0, s=
-tate=3Dstate@entry=3DRUN_STATE_SHUTDOWN) at /build/qemu-7I4i1R/qemu-2.5+dfs=
-g/vl.c:1605
-  #13 0x00005636c089172a in do_vm_stop (state=3DRUN_STATE_SHUTDOWN) at /bui=
-ld/qemu-7I4i1R/qemu-2.5+dfsg/cpus.c:724
-  #14 vm_stop (state=3DRUN_STATE_SHUTDOWN) at /build/qemu-7I4i1R/qemu-2.5+d=
-fsg/cpus.c:1407
-  #15 0x00005636c085d240 in main_loop_should_exit () at /build/qemu-7I4i1R/=
-qemu-2.5+dfsg/vl.c:1883
-  #16 main_loop () at /build/qemu-7I4i1R/qemu-2.5+dfsg/vl.c:1931
-  #17 main (argc=3D<optimized out>, argv=3D<optimized out>, envp=3D<optimiz=
-ed out>) at /build/qemu-7I4i1R/qemu-2.5+dfsg/vl.c:4683
+ There are two useful macros that can be defined before including
+ glib.h that are related to the min required glib version
 
-  [test case]
+  - GLIB_VERSION_MIN_REQUIRED
 
-  unfortunately since this is a race condition, it's very hard to
-  arbitrarily reproduce; it depends very much on the overall
-  configuration of the guest as well as how exactly it's shut down -
-  specifically, its vhost user net must be closed from the host side at
-  a specific time during qemu shutdown.
+    When this is defined, if code uses an API that was deprecated
+    in this version, or older, a compiler warning will be emitted.
+    This alerts maintainers to update their code to whatever new
+    replacement API is now recommended best practice.
 
-  I have someone with such a setup who has reported to me their setup is
-  able to reproduce this reliably, but the config is too complex for me
-  to reproduce so I have relied on their reproduction and testing to
-  debug and craft the patch for this.
+  - GLIB_VERSION_MAX_ALLOWED
 
-  [regression potential]
+    When this is defined, if code uses an API that was introduced
+    in a version that is newer than the declared version, a compiler
+    warning will be emitted. This alerts maintainers if new code
+    accidentally uses functionality that won't be available on some
+    supported platforms.
 
-  the change adds a flag to prevent repeated calls to vhost_net_stop().
-  This also prevents any calls to vhost_net_cleanup() from
-  net_vhost_user_event().  Any regression would be seen when stopping
-  and/or cleaning up a vhost net.  Regressions might include failure to
-  hot-remove a vhost net from a guest, or failure to cleanup (i.e. mem
-  leak), or crashes during cleanup or stopping a vhost net.
+ The GLIB_VERSION_MAX_ALLOWED constant makes it a bit harder to opt
+ in to using specific new APIs with a GLIB_CHECK_VERSION conditional.
+ To workaround this Pragmas can be used to temporarily turn off the
+ -Wdeprecated-declarations compiler warning, while a static inline
+ compat function is implemented. This workaround is illustrated with the
+ implementation of the g_strv_contains method to satisfy the test suite.
 
-  [other info]
-
-  this was originally seen in the 2.5 version of qemu - specifically,
-  the UCA version in trusty-mitaka (which uses the xenial qemu
-  codebase).
-
-  After discussion upstream, it appears this was fixed upstream by
-  commit e7c83a885f8, which is included starting in version 2.9.
-  However, this commit depends on at least commit 5345fdb4467, and
-  likely more other previous commits, which make widespread code changes
-  and are unsuitable to backport.  Therefore this seems like it should
-  be specifically worked around in the Xenial qemu codebase.
-
-  =
-
-  The specific race condition for this (in the qemu 2.5 code version) is:
-
-  as shown in above bt, thread A starts shutting down qemu, e.g.:
-
-  vm_stop->do_vm_stop->vm_state_notify
-  =C2=A0=C2=A0virtio_set_status
-  =C2=A0=C2=A0=C2=A0=C2=A0virtio_net_set_status
-  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0virtio_net_vhost_status
-
-  in this function, code gets to an if-else check for
-  (!n->vhost_started), which is false (i.e. vhost_started is true) and
-  enters the else code block, which calls vhost_net_stop() and then sets
-  n->vhost_started to false.
-
-  While thread A is inside vhost_net_stop(), thread B is triggered by
-  the vhost net chr handler with a user event and calls:
-
-  net_vhost_user_event
-  =C2=A0=C2=A0qmp_set_link (from case CHR_EVENT_CLOSED)
-  =C2=A0=C2=A0=C2=A0=C2=A0virtio_net_set_link_status (via ->link_status_cha=
-nged)
-  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0virtio_net_set_status
-  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0virtio_net_vhost_status
-
-  notice thread B has now reached the same function that thread A is in;
-  since the checks in the function have not changed, thread B follows
-  the same path that thread A followed, and enters vhost_net_stop().
-
-  Since thread A has already shut down and cleaned up some of the
-  internals, once thread B starts trying to also clean up things, it
-  segfaults as the shown in the bt.
-
-  Avoiding only this duplicate call to vhost_net_stop() is required, but
-  not enough - let's continue to look at what thread B does after its
-  call to qmp_set_link() returns:
-
-  net_vhost_user_event
-  =C2=A0=C2=A0vhost_user_stop
-  =C2=A0=C2=A0=C2=A0=C2=A0vhost_net_cleanup
-  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0vhost_dev_cleanup
-
-  However, in main() qemu registers atexit(net_cleanup()), which does:
-  net_cleanup
-  =C2=A0=C2=A0qemu_del_nic (or qemu_del_net_client, depending on ->type)
-  =C2=A0=C2=A0=C2=A0=C2=A0qemu_cleanup_net_client
-  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0vhost_user_cleanup (via ->cleanup)
-  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0vhost_net_cleanup
-  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0vhost_dev_cle=
-anup
-
-  and the duplicate vhost_dev_cleanup fails assertions since things were
-  already cleaned up.  Additionally, if thread B's call to
-  vhost_dev_cleanup() comes before thread A finishes vhost_net_stop(),
-  then that will call vhost_dev_stop() and vhost_disable_notifiers()
-  which both try to access things that have been freed/cleared/disabled
-  by vhost_dev_cleanup().
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1823458/+subscriptions
+> +    base = g_canonicalize_filename(prefix, NULL);
+> +#else
+> +    if (prefix[0] != '/') {
+> +        char *cwd = g_get_current_dir();
+> +        base = g_build_filename(cwd, prefix, NULL);
+> +        g_free(cwd);
+> +    } else {
+> +        base = g_strdup(prefix);
+> +    }
+> +#endif
+> +
+> +    hash = g_hash_table_new(g_str_hash, g_str_equal);
+> +    qemu_mutex_init(&lock);
+>  }
+>  
+>  /* Look for path in emulation dir, otherwise return name. */
+>  const char *path(const char *name)
+>  {
+> -    /* Only do absolute paths: quick and dirty, but should mostly be OK.
+> -       Could do relative by tracking cwd. */
+> -    if (!base || !name || name[0] != '/')
+> -        return name;
+> +    gpointer key, value;
+> +    char *ret;
+>  
+> -    return follow_path(base, name) ?: name;
+> +    /* Only do absolute paths: quick and dirty, but should mostly be OK.  */
+> +    if (!base || !name || name[0] != '/') {
+> +        return name;
+> +    }
+> +
+> +    qemu_mutex_lock(&lock);
+> +
+> +    /* Have we looked up this file before?  */
+> +    if (g_hash_table_lookup_extended(hash, name, &key, &value)) {
+> +        ret = value ? value : name;
+> +    } else {
+> +        char *full_name, *save_name;
+> +
+> +        save_name = g_strdup(name);
+> +#if GLIB_CHECK_VERSION(2, 58, 0)
+> +        full_name = g_canonicalize_filename(g_path_skip_root(name), base);
+> +#else
+> +        full_name = g_build_filename(base, name, NULL);
+> +#endif
+> +
+> +        /* Look for the path; record the result, pass or fail.  */
+> +        if (access(full_name, F_OK) == 0) {
+> +            /* Exists.  */
+> +            g_hash_table_insert(hash, save_name, full_name);
+> +            ret = full_name;
+> +        } else {
+> +            /* Does not exist.  */
+> +            g_free(full_name);
+> +            g_hash_table_insert(hash, save_name, NULL);
+> +            ret = name;
+> +        }
+> +    }
+> +
+> +    qemu_mutex_unlock(&lock);
+> +    return ret;
+>  }
+> 
 
