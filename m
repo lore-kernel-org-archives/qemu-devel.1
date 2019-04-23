@@ -1,24 +1,22 @@
-Received: from eggs.gnu.org ([209.51.188.92]:37382)
+Received: from eggs.gnu.org ([209.51.188.92]:51422)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <lersek@redhat.com>) id 1hIz2S-0005kR-JR
-	for qemu-devel@nongnu.org; Tue, 23 Apr 2019 13:17:01 -0400
+	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1hIzMJ-00081U-Cu
+	for qemu-devel@nongnu.org; Tue, 23 Apr 2019 13:37:32 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <lersek@redhat.com>) id 1hIz2O-0006Nl-QB
-	for qemu-devel@nongnu.org; Tue, 23 Apr 2019 13:16:58 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:54524)
+	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1hIzKX-00084s-1f
+	for qemu-devel@nongnu.org; Tue, 23 Apr 2019 13:35:42 -0400
+Received: from mx2.rt-rk.com ([89.216.37.149]:49613 helo=mail.rt-rk.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <lersek@redhat.com>) id 1hIz2H-0006Fj-4p
-	for qemu-devel@nongnu.org; Tue, 23 Apr 2019 13:16:50 -0400
-From: Laszlo Ersek <lersek@redhat.com>
-Date: Tue, 23 Apr 2019 19:15:18 +0200
-Message-Id: <20190423171520.4511-11-lersek@redhat.com>
-In-Reply-To: <20190423171520.4511-1-lersek@redhat.com>
-References: <20190423171520.4511-1-lersek@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 10/12] tests: add missing dependency to build
- QTEST_QEMU_BINARY, round 2
+	(Exim 4.71) (envelope-from <aleksandar.markovic@rt-rk.com>)
+	id 1hIzKW-00080P-Q5
+	for qemu-devel@nongnu.org; Tue, 23 Apr 2019 13:35:40 -0400
+From: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>
+Date: Tue, 23 Apr 2019 19:35:23 +0200
+Message-Id: <1556040926-23931-2-git-send-email-aleksandar.markovic@rt-rk.com>
+In-Reply-To: <1556040926-23931-1-git-send-email-aleksandar.markovic@rt-rk.com>
+References: <1556040926-23931-1-git-send-email-aleksandar.markovic@rt-rk.com>
+Subject: [Qemu-devel] [PATCH 1/4] linux-user: Fix support for the SIOCATMARK
+ and SIOCGPGRP ioctls for eXtensa
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,72 +25,57 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: berrange@redhat.com, eblake@redhat.com, f4bug@amsat.org, imammedo@redhat.com, kraxel@redhat.com, mprivozn@redhat.com, mst@redhat.com, peter.maydell@linaro.org, philmd@redhat.com, qemu-devel@nongnu.org
+To: qemu-devel@nongnu.org
+Cc: aurelien@aurel32.net, amarkovic@wavecomp.com, arikalo@wavecomp.com, daniel.santos@pobox.com, jcmvbkbc@gmail.com, lvivier@redhat.com, thuth@redhat.com
 
-In commit b94b330e2333 ("tests: add missing dependency to build
-QTEST_QEMU_BINARY", 2017-07-31), Phil fixed the dependency list of make
-target "check-qtest-%". Namely, the recipe would set QTEST_QEMU_BINARY to
-the softmmu emulator for the emulation target, but the prerequisites
-didn't include the emulator.
+From: Aleksandar Markovic <amarkovic@wavecomp.com>
 
-The same issue affects the "check-report-qtest-%.tap" make target, which
-is the other make target whose recipe sets QTEST_QEMU_BINARY:
+Fix support for the SIOCATMARK and SIOCGPGRP ioctls for eXtensa by
+correcting corresponding macro definition.
 
-> $ make -j4 check-report-qtest-aarch64.tap
->   TAP     check-report-qtest-aarch64.tap
-> sh: /.../aarch64-softmmu/qemu-system-aarch64: No such file or directory
+Values for TARGET_SIOCATMARK and TARGET_SIOCGPGRP are determined by
+Linux kernel. Following relevant lines are from kernel source tree:
 
-Apply Phil's fix to this make target too.
+arch/ia64/include/uapi/asm/sockios.h:#define SIOCATMARK    0x8905
+arch/mips/include/uapi/asm/sockios.h:#define SIOCATMARK    _IOR('s', 7, int)
+arch/parisc/include/uapi/asm/sockios.h:#define SIOCATMARK  0x8905
+arch/sh/include/uapi/asm/sockios.h:#define SIOCATMARK      _IOR('s', 7, int)
+arch/xtensa/include/uapi/asm/sockios.h:#define SIOCATMARK  _IOR('s', 7, int)
+arch/alpha/include/uapi/asm/sockios.h:#define SIOCATMARK   _IOR('s', 7, int)
+arch/sparc/include/uapi/asm/sockios.h:#define SIOCATMARK   0x8905
+include/uapi/asm-generic/sockios.h:#define SIOCATMARK	   0x8905
 
-Signed-off-by: Laszlo Ersek <lersek@redhat.com>
-Reviewed-by: Michal Privoznik <mprivozn@redhat.com>
-Tested-by: Igor Mammedov <imammedo@redhat.com>
-Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
-Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
-Tested-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
-Reviewed-by: Igor Mammedov <imammedo@redhat.com>
+arch/ia64/include/uapi/asm/sockios.h:#define SIOCGPGRP     0x8904
+arch/mips/include/uapi/asm/sockios.h:#define SIOCGPGRP     _IOR('s', 9, pid_t)
+arch/parisc/include/uapi/asm/sockios.h:#define SIOCGPGRP   0x8904
+arch/sh/include/uapi/asm/sockios.h:#define SIOCGPGRP       _IOR('s', 9, pid_t)
+arch/xtensa/include/uapi/asm/sockios.h:#define SIOCGPGRP   _IOR('s', 9, pid_t)
+arch/alpha/include/uapi/asm/sockios.h:#define SIOCGPGRP    _IOR('s', 9, pid_t)
+arch/sparc/include/uapi/asm/sockios.h:#define SIOCGPGRP    0x8904
+include/uapi/asm-generic/sockios.h:#define SIOCGPGRP       0x8904
+
+It is visible that eXtensa should have the same definitions as
+alpha, mips and sh4 already do. This patch brings that to the
+accurate state.
+
+Signed-off-by: Aleksandar Markovic <amarkovic@wavecomp.com>
 ---
+ linux-user/syscall_defs.h | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
 
-Notes:
-    pull:
-   =20
-    - pick up Phil's R-b / T-b
-   =20
-    - pick up Igor's R-b
-   =20
-    v4:
-   =20
-    - no change
-   =20
-    v3:
-   =20
-    - pick up Michal's R-b
-   =20
-    - pick up Igor's T-b
-   =20
-    - pick up Michael's R-b
-   =20
-    v2:
-   =20
-    - new patch, relied upon by the next patch
-
- tests/Makefile.include | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
-
-diff --git a/tests/Makefile.include b/tests/Makefile.include
-index 36fc73fef55a..e2432d5e7712 100644
---- a/tests/Makefile.include
-+++ b/tests/Makefile.include
-@@ -912,7 +912,7 @@ check-speed: $(check-speed-y)
-=20
- # gtester tests with TAP output
-=20
--$(patsubst %, check-report-qtest-%.tap, $(QTEST_TARGETS)): check-report-=
-qtest-%.tap: $(check-qtest-y)
-+$(patsubst %, check-report-qtest-%.tap, $(QTEST_TARGETS)): check-report-=
-qtest-%.tap: subdir-%-softmmu $(check-qtest-y)
- 	$(call do_test_tap, $(check-qtest-$*-y) $(check-qtest-generic-y), \
- 	  QTEST_QEMU_BINARY=3D$*-softmmu/qemu-system-$* \
- 	  QTEST_QEMU_IMG=3Dqemu-img$(EXESUF))
---=20
-2.19.1.3.g30247aa5d201
+diff --git a/linux-user/syscall_defs.h b/linux-user/syscall_defs.h
+index 12c8407..1e86fb9 100644
+--- a/linux-user/syscall_defs.h
++++ b/linux-user/syscall_defs.h
+@@ -736,7 +736,8 @@ struct target_pollfd {
+ #define TARGET_KDSETLED        0x4B32	/* set led state [lights, not flags] */
+ #define TARGET_KDSIGACCEPT     0x4B4E
+ 
+-#if defined(TARGET_ALPHA) || defined(TARGET_MIPS) || defined(TARGET_SH4)
++#if defined(TARGET_ALPHA) || defined(TARGET_MIPS) || defined(TARGET_SH4) ||    \
++       defined(TARGET_XTENSA)
+ #define TARGET_SIOCATMARK      TARGET_IOR('s', 7, int)
+ #define TARGET_SIOCGPGRP       TARGET_IOR('s', 9, pid_t)
+ #else
+-- 
+2.7.4
