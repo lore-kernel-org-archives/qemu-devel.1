@@ -2,88 +2,76 @@ Return-Path: <SRS0=zUjA=SZ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BA687C10F03
-	for <qemu-devel@archiver.kernel.org>; Tue, 23 Apr 2019 23:07:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E5F55C10F03
+	for <qemu-devel@archiver.kernel.org>; Tue, 23 Apr 2019 23:44:40 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7990A206BA
-	for <qemu-devel@archiver.kernel.org>; Tue, 23 Apr 2019 23:07:26 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7990A206BA
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id ACA32206BA
+	for <qemu-devel@archiver.kernel.org>; Tue, 23 Apr 2019 23:44:40 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org ACA32206BA
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:60853 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:32928 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hJ4VZ-0000CF-Kk
-	for qemu-devel@archiver.kernel.org; Tue, 23 Apr 2019 19:07:25 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:36509)
+	id 1hJ55b-0006MQ-P5
+	for qemu-devel@archiver.kernel.org; Tue, 23 Apr 2019 19:44:39 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:35188)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1hJ4UF-0007iM-Rx
-	for qemu-devel@nongnu.org; Tue, 23 Apr 2019 19:06:05 -0400
+	(envelope-from <bounces@canonical.com>) id 1hJ54H-0005f2-Hp
+	for qemu-devel@nongnu.org; Tue, 23 Apr 2019 19:43:18 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1hJ4UC-0005qy-MB
-	for qemu-devel@nongnu.org; Tue, 23 Apr 2019 19:06:03 -0400
-Received: from mail-wr1-f65.google.com ([209.85.221.65]:37756)
+	(envelope-from <bounces@canonical.com>) id 1hJ4sK-0004TW-8g
+	for qemu-devel@nongnu.org; Tue, 23 Apr 2019 19:30:57 -0400
+Received: from indium.canonical.com ([91.189.90.7]:54258)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1hJ4UA-0005jW-8v
-	for qemu-devel@nongnu.org; Tue, 23 Apr 2019 19:05:59 -0400
-Received: by mail-wr1-f65.google.com with SMTP id t17so10590545wrr.4
-	for <qemu-devel@nongnu.org>; Tue, 23 Apr 2019 16:05:46 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=1e100.net; s=20161025;
-	h=x-gm-message-state:subject:to:references:from:openpgp:message-id
-	:date:user-agent:mime-version:in-reply-to:content-language
-	:content-transfer-encoding;
-	bh=srkgzhl3zFioReUFN4h6XVy8brTSQ9DMoHDLXQqCfZ8=;
-	b=JjXt4hnRzBnXG43F7zWQqRRYFI6jViz/HRjavwoNdjxbJ2r+CemOAfLYInjz4GGZIA
-	pm9OnTScHDk5X6soUGwpXjVnoMibG/OBiQabBrQrdIyUZirSZNo2VvzXkHgMWL+AeWKh
-	amCx7I2bJRQsUAioN5g76/H0x8/1QZVKy5BFog+CzVXoTwGOuqBogf9Fi+ukxmdBvQvs
-	1FSvFkHu88pHzaYAdmz9N7fPVwkyLpmlxYQAFzSOv1fLj4n916syb64Wv3tNON/KRQqi
-	vvgFGxdJbcXpTR0JSn43GZ0w8h8UVj+nc5p3pCa4DhJELwq9huvEJYldoT4/giWD0G9R
-	y1dQ==
-X-Gm-Message-State: APjAAAVmGaDhNENq/pTnUwndefUKH8zLkl78h2UENApk02RR7jQtRWXo
-	eQf2yrWZvlZ9qy08wOC6YHcbmg==
-X-Google-Smtp-Source: APXvYqy2lTq7NmFPHPZgceA+Nokx2Ch8Q6vIa2kx6MchGdHkRs3qdSkIsuv0EBh4nhrkDghgfQad2Q==
-X-Received: by 2002:adf:8062:: with SMTP id 89mr19302838wrk.107.1556060745913; 
-	Tue, 23 Apr 2019 16:05:45 -0700 (PDT)
-Received: from [192.168.1.25] (atoulouse-656-1-803-163.w86-221.abo.wanadoo.fr.
-	[86.221.12.163]) by smtp.gmail.com with ESMTPSA id
-	62sm18608922wrm.18.2019.04.23.16.05.44
-	(version=TLS1_3 cipher=AEAD-AES128-GCM-SHA256 bits=128/128);
-	Tue, 23 Apr 2019 16:05:45 -0700 (PDT)
-To: Richard Henderson <richard.henderson@linaro.org>,
-	David Hildenbrand <david@redhat.com>, qemu-devel@nongnu.org,
-	"Edgar E. Iglesias" <edgar.iglesias@gmail.com>
-References: <20190420073442.7488-1-richard.henderson@linaro.org>
-	<20190420073442.7488-20-richard.henderson@linaro.org>
-	<e10e5627-25b2-0563-e971-2864256727d6@redhat.com>
-	<0bd7fd6a-1fcb-ac0c-b4bf-7b04ada4443c@redhat.com>
-	<eebc0218-4334-2b68-9081-a3a4d2d12172@linaro.org>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Openpgp: id=89C1E78F601EE86C867495CBA2A3FD6EDEADC0DE;
-	url=http://pgp.mit.edu/pks/lookup?op=get&search=0xA2A3FD6EDEADC0DE
-Message-ID: <8a886fc7-5746-d87f-5422-49f3ae5f4bed@redhat.com>
-Date: Wed, 24 Apr 2019 01:05:44 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
-	Thunderbird/60.6.1
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1hJ4sJ-0004M6-Ce
+	for qemu-devel@nongnu.org; Tue, 23 Apr 2019 19:30:55 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1hJ4sA-0001eU-Bb
+	for <qemu-devel@nongnu.org>; Tue, 23 Apr 2019 23:30:46 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 384A92E80CC
+	for <qemu-devel@nongnu.org>; Tue, 23 Apr 2019 23:30:46 +0000 (UTC)
 MIME-Version: 1.0
-In-Reply-To: <eebc0218-4334-2b68-9081-a3a4d2d12172@linaro.org>
 Content-Type: text/plain; charset="UTF-8"
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
+Content-Transfer-Encoding: quoted-printable
+Date: Tue, 23 Apr 2019 23:19:21 -0000
+From: =?utf-8?q?Philippe_Mathieu-Daud=C3=A9?= <1796520@bugs.launchpad.net>
+To: qemu-devel@nongnu.org
+X-Launchpad-Notification-Type: bug
+X-Launchpad-Bug: product=qemu; status=Confirmed; importance=Undecided;
+	assignee=None; 
+X-Launchpad-Bug-Tags: linux-user sh4
+X-Launchpad-Bug-Information-Type: Public
+X-Launchpad-Bug-Private: no
+X-Launchpad-Bug-Security-Vulnerability: no
+X-Launchpad-Bug-Commenters: glaubitz
+X-Launchpad-Bug-Reporter: John Paul Adrian Glaubitz (glaubitz)
+X-Launchpad-Bug-Modifier: =?utf-8?q?Philippe_Mathieu-Daud=C3=A9_=28philmd?=
+	=?utf-8?q?=29?=
+References: <153886120838.22456.12836438866392888832.malonedeb@gac.canonical.com>
+Message-Id:
+ <155606156176.17627.7172965440670237646.launchpad@soybean.canonical.com>
+X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
+X-Launchpad-Message-For: qemu-devel-ml
+Precedence: bulk
+X-Generated-By: Launchpad (canonical.com); Revision="18928";
+	Instance="launchpad-lazr.conf"
+X-Launchpad-Hash: 2b4d2d2deba7af30d27929c5f4bb7e9bd2769088
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-	[fuzzy]
-X-Received-From: 209.85.221.65
-Subject: Re: [Qemu-devel] [PATCH 19/38] tcg: Add support for integer
- absolute value
+X-Received-From: 91.189.90.7
+Subject: [Qemu-devel] [Bug 1796520] Re: autogen crashes on qemu-sh4-user
+ after 61dedf2af7
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
-Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -92,145 +80,69 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Reply-To: Bug 1796520 <1796520@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190423230544.KEqFE56j_YDKiYvXrdhi19AjxIdsLbcdnbcEzCCUcrY@z>
+Message-ID: <20190423231921.aem49PT1IG8GCNYZBGAm537QxJbu5CZlDw07dJZcuVk@z>
 
-On 4/24/19 12:29 AM, Richard Henderson wrote:
-> On 4/23/19 3:09 PM, Philippe Mathieu-Daudé wrote:
->> On 4/23/19 8:37 PM, David Hildenbrand wrote:
->>> On 20.04.19 09:34, Richard Henderson wrote:
->>>> Remove a function of the same name from target/arm/.
->>>> Use a branchless implementation of abs that gcc uses for x86.
->>>>
->>>> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
->>>> ---
->>>>  tcg/tcg-op.h           |  5 +++++
->>>>  target/arm/translate.c | 10 ----------
->>>>  tcg/tcg-op.c           | 20 ++++++++++++++++++++
->>>>  3 files changed, 25 insertions(+), 10 deletions(-)
->>>>
->>>> diff --git a/tcg/tcg-op.h b/tcg/tcg-op.h
->>>> index 472b73cb38..660fe205d0 100644
->>>> --- a/tcg/tcg-op.h
->>>> +++ b/tcg/tcg-op.h
->>>> @@ -335,6 +335,7 @@ void tcg_gen_smin_i32(TCGv_i32, TCGv_i32 arg1, TCGv_i32 arg2);
->>>>  void tcg_gen_smax_i32(TCGv_i32, TCGv_i32 arg1, TCGv_i32 arg2);
->>>>  void tcg_gen_umin_i32(TCGv_i32, TCGv_i32 arg1, TCGv_i32 arg2);
->>>>  void tcg_gen_umax_i32(TCGv_i32, TCGv_i32 arg1, TCGv_i32 arg2);
->>>> +void tcg_gen_abs_i32(TCGv_i32, TCGv_i32);
->>>>  
->>>>  static inline void tcg_gen_discard_i32(TCGv_i32 arg)
->>>>  {
->>>> @@ -534,6 +535,7 @@ void tcg_gen_smin_i64(TCGv_i64, TCGv_i64 arg1, TCGv_i64 arg2);
->>>>  void tcg_gen_smax_i64(TCGv_i64, TCGv_i64 arg1, TCGv_i64 arg2);
->>>>  void tcg_gen_umin_i64(TCGv_i64, TCGv_i64 arg1, TCGv_i64 arg2);
->>>>  void tcg_gen_umax_i64(TCGv_i64, TCGv_i64 arg1, TCGv_i64 arg2);
->>>> +void tcg_gen_abs_i64(TCGv_i64, TCGv_i64);
->>>>  
->>>>  #if TCG_TARGET_REG_BITS == 64
->>>>  static inline void tcg_gen_discard_i64(TCGv_i64 arg)
->>>> @@ -973,6 +975,7 @@ void tcg_gen_nor_vec(unsigned vece, TCGv_vec r, TCGv_vec a, TCGv_vec b);
->>>>  void tcg_gen_eqv_vec(unsigned vece, TCGv_vec r, TCGv_vec a, TCGv_vec b);
->>>>  void tcg_gen_not_vec(unsigned vece, TCGv_vec r, TCGv_vec a);
->>>>  void tcg_gen_neg_vec(unsigned vece, TCGv_vec r, TCGv_vec a);
->>>> +void tcg_gen_abs_vec(unsigned vece, TCGv_vec r, TCGv_vec a);
->>>>  void tcg_gen_ssadd_vec(unsigned vece, TCGv_vec r, TCGv_vec a, TCGv_vec b);
->>>>  void tcg_gen_usadd_vec(unsigned vece, TCGv_vec r, TCGv_vec a, TCGv_vec b);
->>>>  void tcg_gen_sssub_vec(unsigned vece, TCGv_vec r, TCGv_vec a, TCGv_vec b);
->>>> @@ -1019,6 +1022,7 @@ void tcg_gen_stl_vec(TCGv_vec r, TCGv_ptr base, TCGArg offset, TCGType t);
->>>>  #define tcg_gen_addi_tl tcg_gen_addi_i64
->>>>  #define tcg_gen_sub_tl tcg_gen_sub_i64
->>>>  #define tcg_gen_neg_tl tcg_gen_neg_i64
->>>> +#define tcg_gen_abs_tl tcg_gen_abs_i64
->>>>  #define tcg_gen_subfi_tl tcg_gen_subfi_i64
->>>>  #define tcg_gen_subi_tl tcg_gen_subi_i64
->>>>  #define tcg_gen_and_tl tcg_gen_and_i64
->>>> @@ -1131,6 +1135,7 @@ void tcg_gen_stl_vec(TCGv_vec r, TCGv_ptr base, TCGArg offset, TCGType t);
->>>>  #define tcg_gen_addi_tl tcg_gen_addi_i32
->>>>  #define tcg_gen_sub_tl tcg_gen_sub_i32
->>>>  #define tcg_gen_neg_tl tcg_gen_neg_i32
->>>> +#define tcg_gen_abs_tl tcg_gen_abs_i32
->>>>  #define tcg_gen_subfi_tl tcg_gen_subfi_i32
->>>>  #define tcg_gen_subi_tl tcg_gen_subi_i32
->>>>  #define tcg_gen_and_tl tcg_gen_and_i32
->>>> diff --git a/target/arm/translate.c b/target/arm/translate.c
->>>> index 83a008e945..721171794d 100644
->>>> --- a/target/arm/translate.c
->>>> +++ b/target/arm/translate.c
->>>> @@ -603,16 +603,6 @@ static void gen_sar(TCGv_i32 dest, TCGv_i32 t0, TCGv_i32 t1)
->>>>      tcg_temp_free_i32(tmp1);
->>>>  }
->>>>  
->>>> -static void tcg_gen_abs_i32(TCGv_i32 dest, TCGv_i32 src)
->>>> -{
->>>> -    TCGv_i32 c0 = tcg_const_i32(0);
->>>> -    TCGv_i32 tmp = tcg_temp_new_i32();
->>>> -    tcg_gen_neg_i32(tmp, src);
->>>> -    tcg_gen_movcond_i32(TCG_COND_GT, dest, src, c0, src, tmp);
->>>> -    tcg_temp_free_i32(c0);
->>>> -    tcg_temp_free_i32(tmp);
->>>> -}
->>>> -
->>>>  static void shifter_out_im(TCGv_i32 var, int shift)
->>>>  {
->>>>      if (shift == 0) {
->>>> diff --git a/tcg/tcg-op.c b/tcg/tcg-op.c
->>>> index a00d1df37e..0ac291f1c4 100644
->>>> --- a/tcg/tcg-op.c
->>>> +++ b/tcg/tcg-op.c
->>>> @@ -1091,6 +1091,16 @@ void tcg_gen_umax_i32(TCGv_i32 ret, TCGv_i32 a, TCGv_i32 b)
->>>>      tcg_gen_movcond_i32(TCG_COND_LTU, ret, a, b, b, a);
->>>>  }
->>>>  
->>>> +void tcg_gen_abs_i32(TCGv_i32 ret, TCGv_i32 a)
->>>> +{
->>>> +    TCGv_i32 t = tcg_temp_new_i32();
->>>> +
->>>> +    tcg_gen_sari_i32(t, a, 31);
->>>> +    tcg_gen_xor_i32(ret, a, t);
->>>> +    tcg_gen_sub_i32(ret, ret, t);
->>>> +    tcg_temp_free_i32(t);
->>>> +}
->>>> +
->>>>  /* 64-bit ops */
->>>>  
->>>>  #if TCG_TARGET_REG_BITS == 32
->>>> @@ -2548,6 +2558,16 @@ void tcg_gen_umax_i64(TCGv_i64 ret, TCGv_i64 a, TCGv_i64 b)
->>>>      tcg_gen_movcond_i64(TCG_COND_LTU, ret, a, b, b, a);
->>>>  }
->>>>  
->>>> +void tcg_gen_abs_i64(TCGv_i64 ret, TCGv_i64 a)
->>>> +{
->>>> +    TCGv_i64 t = tcg_temp_new_i64();
->>>> +
->>>> +    tcg_gen_sari_i64(t, a, 63);
->>>> +    tcg_gen_xor_i64(ret, a, t);
->>>> +    tcg_gen_sub_i64(ret, ret, t);
->>>> +    tcg_temp_free_i64(t);
->>>> +}
->>>> +
->>>>  /* Size changing operations.  */
->>>>  
->>>>  void tcg_gen_extrl_i64_i32(TCGv_i32 ret, TCGv_i64 arg)
->>>>
->>>
->>> Nice trick
->>
->> Per commit 7dcfb0897b99, I think it's worth a:
->>
->> Inspired-by: Edgar E. Iglesias <edgar.iglesias@gmail.com>
-> 
-> *shrug* As per the comment, I got the sequence from gcc -O2 -S.
+** Changed in: qemu
+       Status: New =3D> Confirmed
 
-Now I understand better your comment "Use a branchless implementation of
-abs that gcc uses for x86". Previously I misunderstood it =)
+-- =
 
-Back to commit 7dcfb0897b99, eventually Edgar figured the same trick
-from GCC.
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1796520
 
-Regards,
+Title:
+  autogen crashes on qemu-sh4-user after 61dedf2af7
 
-Phil.
+Status in QEMU:
+  Confirmed
+
+Bug description:
+  Running "autogen --help" crashes on qemu-sh4-user with:
+
+  (sid-sh4-sbuild)root@nofan:/# autogen --help
+  Unhandled trap: 0x180
+  pc=3D0xf64dd2de sr=3D0x00000000 pr=3D0xf63b9c74 fpscr=3D0x00080000
+  spc=3D0x00000000 ssr=3D0x00000000 gbr=3D0xf61102a8 vbr=3D0x00000000
+  sgr=3D0x00000000 dbr=3D0x00000000 delayed_pc=3D0xf64dd2a0 fpul=3D0x000000=
+03
+  r0=3D0xf6fc1320 r1=3D0x00000000 r2=3D0xffff5dc4 r3=3D0xf67bfb50
+  r4=3D0xf6fc1230 r5=3D0xf6fc141c r6=3D0x000003ff r7=3D0x00000000
+  r8=3D0x00000004 r9=3D0xf63e20bc r10=3D0xf6fc141c r11=3D0xf63e28f0
+  r12=3D0xf63e2258 r13=3D0xf63eae1c r14=3D0x00000804 r15=3D0xf6fc1220
+  r16=3D0x00000000 r17=3D0x00000000 r18=3D0x00000000 r19=3D0x00000000
+  r20=3D0x00000000 r21=3D0x00000000 r22=3D0x00000000 r23=3D0x00000000
+  (sid-sh4-sbuild)root@nofan:/#
+
+  Bi-secting found this commit to be the culprit:
+
+  61dedf2af79fb5866dc7a0f972093682f2185e17 is the first bad commit
+  commit 61dedf2af79fb5866dc7a0f972093682f2185e17
+  Author: Richard Henderson <rth@twiddle.net>
+  Date:   Tue Jul 18 10:02:50 2017 -1000
+
+      target/sh4: Add missing FPSCR.PR =3D=3D 0 checks
+      =
+
+      Both frchg and fschg require PR =3D=3D 0, otherwise undefined_operati=
+on.
+      =
+
+      Reviewed-by: Aurelien Jarno <aurelien@aurel32.net>
+      Signed-off-by: Richard Henderson <rth@twiddle.net>
+      Message-Id: <20170718200255.31647-26-rth@twiddle.net>
+      Signed-off-by: Aurelien Jarno <aurelien@aurel32.net>
+
+  :040000 040000 980d79b69ae712f23a1e4c56983e97a843153b4a
+  1024c109f506c7ad57367c63bc8bbbc8a7a36cd7 M      target
+
+  Reverting 61dedf2af79fb5866dc7a0f972093682f2185e17 fixes the problem
+  for me.
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1796520/+subscriptions
 
