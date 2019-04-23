@@ -1,28 +1,21 @@
-Received: from eggs.gnu.org ([209.51.188.92]:53039)
+Received: from eggs.gnu.org ([209.51.188.92]:53681)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1hIrAm-0002po-Bs
-	for qemu-devel@nongnu.org; Tue, 23 Apr 2019 04:53:06 -0400
+	(envelope-from <kwolf@redhat.com>) id 1hIrC0-0003cU-O0
+	for qemu-devel@nongnu.org; Tue, 23 Apr 2019 04:54:21 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1hIrAi-0006Mh-I8
-	for qemu-devel@nongnu.org; Tue, 23 Apr 2019 04:53:04 -0400
-Received: from mail-wm1-f66.google.com ([209.85.128.66]:50840)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1hIrAg-000645-LH
-	for qemu-devel@nongnu.org; Tue, 23 Apr 2019 04:53:00 -0400
-Received: by mail-wm1-f66.google.com with SMTP id 10so1178008wmk.0
-	for <qemu-devel@nongnu.org>; Tue, 23 Apr 2019 01:52:44 -0700 (PDT)
-References: <20190420073442.7488-1-richard.henderson@linaro.org>
-	<20190420073442.7488-20-richard.henderson@linaro.org>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Message-ID: <2f9b3973-4e56-b3b0-1a5c-bbb68e27e939@redhat.com>
-Date: Tue, 23 Apr 2019 10:52:41 +0200
+	(envelope-from <kwolf@redhat.com>) id 1hIrBz-0007Rc-II
+	for qemu-devel@nongnu.org; Tue, 23 Apr 2019 04:54:20 -0400
+Date: Tue, 23 Apr 2019 10:54:06 +0200
+From: Kevin Wolf <kwolf@redhat.com>
+Message-ID: <20190423085406.GD9041@localhost.localdomain>
+References: <20190422152315.74361-1-vsementsov@virtuozzo.com>
+	<20190422152315.74361-3-vsementsov@virtuozzo.com>
 MIME-Version: 1.0
-In-Reply-To: <20190420073442.7488-20-richard.henderson@linaro.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH 19/38] tcg: Add support for integer
- absolute value
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20190422152315.74361-3-vsementsov@virtuozzo.com>
+Subject: Re: [Qemu-devel] [PATCH v4 2/3] block/io: bdrv_pdiscard: support
+ int64_t bytes parameter
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,123 +24,111 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Richard Henderson <richard.henderson@linaro.org>, qemu-devel@nongnu.org
-Cc: david@redhat.com
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org, mreitz@redhat.com, fam@euphon.net, stefanha@redhat.com, den@virtuozzo.com, eblake@redhat.com
 
-On 4/20/19 9:34 AM, Richard Henderson wrote:
-> Remove a function of the same name from target/arm/.
-> Use a branchless implementation of abs that gcc uses for x86.
+Am 22.04.2019 um 17:23 hat Vladimir Sementsov-Ogievskiy geschrieben:
+> This fixes at least one overflow in qcow2_process_discards, which
+> passes 64bit region length to bdrv_pdiscard where bytes (or sectors in
+> the past) parameter is int since its introduction in 0b919fae.
 > 
-> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+> Reviewed-by: Eric Blake <eblake@redhat.com>
 > ---
->  tcg/tcg-op.h           |  5 +++++
->  target/arm/translate.c | 10 ----------
->  tcg/tcg-op.c           | 20 ++++++++++++++++++++
->  3 files changed, 25 insertions(+), 10 deletions(-)
+>  include/block/block.h |  4 ++--
+>  block/io.c            | 16 ++++++++--------
+>  2 files changed, 10 insertions(+), 10 deletions(-)
 > 
-> diff --git a/tcg/tcg-op.h b/tcg/tcg-op.h
-> index 472b73cb38..660fe205d0 100644
-> --- a/tcg/tcg-op.h
-> +++ b/tcg/tcg-op.h
-> @@ -335,6 +335,7 @@ void tcg_gen_smin_i32(TCGv_i32, TCGv_i32 arg1, TCGv_i32 arg2);
->  void tcg_gen_smax_i32(TCGv_i32, TCGv_i32 arg1, TCGv_i32 arg2);
->  void tcg_gen_umin_i32(TCGv_i32, TCGv_i32 arg1, TCGv_i32 arg2);
->  void tcg_gen_umax_i32(TCGv_i32, TCGv_i32 arg1, TCGv_i32 arg2);
-> +void tcg_gen_abs_i32(TCGv_i32, TCGv_i32);
+> diff --git a/include/block/block.h b/include/block/block.h
+> index c7a26199aa..69fa18867e 100644
+> --- a/include/block/block.h
+> +++ b/include/block/block.h
+> @@ -432,8 +432,8 @@ void bdrv_drain_all(void);
+>      AIO_WAIT_WHILE(bdrv_get_aio_context(bs_),              \
+>                     cond); })
 >  
->  static inline void tcg_gen_discard_i32(TCGv_i32 arg)
+> -int bdrv_pdiscard(BdrvChild *child, int64_t offset, int bytes);
+> -int bdrv_co_pdiscard(BdrvChild *child, int64_t offset, int bytes);
+> +int bdrv_pdiscard(BdrvChild *child, int64_t offset, int64_t bytes);
+> +int bdrv_co_pdiscard(BdrvChild *child, int64_t offset, int64_t bytes);
+>  int bdrv_has_zero_init_1(BlockDriverState *bs);
+>  int bdrv_has_zero_init(BlockDriverState *bs);
+>  bool bdrv_unallocated_blocks_are_zero(BlockDriverState *bs);
+> diff --git a/block/io.c b/block/io.c
+> index dfc153b8d8..35c4157669 100644
+> --- a/block/io.c
+> +++ b/block/io.c
+> @@ -2653,7 +2653,7 @@ int bdrv_flush(BlockDriverState *bs)
+>  typedef struct DiscardCo {
+>      BdrvChild *child;
+>      int64_t offset;
+> -    int bytes;
+> +    int64_t bytes;
+>      int ret;
+>  } DiscardCo;
+>  static void coroutine_fn bdrv_pdiscard_co_entry(void *opaque)
+> @@ -2664,14 +2664,15 @@ static void coroutine_fn bdrv_pdiscard_co_entry(void *opaque)
+>      aio_wait_kick();
+>  }
+>  
+> -int coroutine_fn bdrv_co_pdiscard(BdrvChild *child, int64_t offset, int bytes)
+> +int coroutine_fn bdrv_co_pdiscard(BdrvChild *child, int64_t offset,
+> +                                  int64_t bytes)
 >  {
-> @@ -534,6 +535,7 @@ void tcg_gen_smin_i64(TCGv_i64, TCGv_i64 arg1, TCGv_i64 arg2);
->  void tcg_gen_smax_i64(TCGv_i64, TCGv_i64 arg1, TCGv_i64 arg2);
->  void tcg_gen_umin_i64(TCGv_i64, TCGv_i64 arg1, TCGv_i64 arg2);
->  void tcg_gen_umax_i64(TCGv_i64, TCGv_i64 arg1, TCGv_i64 arg2);
-> +void tcg_gen_abs_i64(TCGv_i64, TCGv_i64);
+>      BdrvTrackedRequest req;
+>      int max_pdiscard, ret;
+>      int head, tail, align;
+>      BlockDriverState *bs = child->bs;
 >  
->  #if TCG_TARGET_REG_BITS == 64
->  static inline void tcg_gen_discard_i64(TCGv_i64 arg)
-> @@ -973,6 +975,7 @@ void tcg_gen_nor_vec(unsigned vece, TCGv_vec r, TCGv_vec a, TCGv_vec b);
->  void tcg_gen_eqv_vec(unsigned vece, TCGv_vec r, TCGv_vec a, TCGv_vec b);
->  void tcg_gen_not_vec(unsigned vece, TCGv_vec r, TCGv_vec a);
->  void tcg_gen_neg_vec(unsigned vece, TCGv_vec r, TCGv_vec a);
-> +void tcg_gen_abs_vec(unsigned vece, TCGv_vec r, TCGv_vec a);
->  void tcg_gen_ssadd_vec(unsigned vece, TCGv_vec r, TCGv_vec a, TCGv_vec b);
->  void tcg_gen_usadd_vec(unsigned vece, TCGv_vec r, TCGv_vec a, TCGv_vec b);
->  void tcg_gen_sssub_vec(unsigned vece, TCGv_vec r, TCGv_vec a, TCGv_vec b);
-> @@ -1019,6 +1022,7 @@ void tcg_gen_stl_vec(TCGv_vec r, TCGv_ptr base, TCGArg offset, TCGType t);
->  #define tcg_gen_addi_tl tcg_gen_addi_i64
->  #define tcg_gen_sub_tl tcg_gen_sub_i64
->  #define tcg_gen_neg_tl tcg_gen_neg_i64
-> +#define tcg_gen_abs_tl tcg_gen_abs_i64
->  #define tcg_gen_subfi_tl tcg_gen_subfi_i64
->  #define tcg_gen_subi_tl tcg_gen_subi_i64
->  #define tcg_gen_and_tl tcg_gen_and_i64
-> @@ -1131,6 +1135,7 @@ void tcg_gen_stl_vec(TCGv_vec r, TCGv_ptr base, TCGArg offset, TCGType t);
->  #define tcg_gen_addi_tl tcg_gen_addi_i32
->  #define tcg_gen_sub_tl tcg_gen_sub_i32
->  #define tcg_gen_neg_tl tcg_gen_neg_i32
-> +#define tcg_gen_abs_tl tcg_gen_abs_i32
->  #define tcg_gen_subfi_tl tcg_gen_subfi_i32
->  #define tcg_gen_subi_tl tcg_gen_subi_i32
->  #define tcg_gen_and_tl tcg_gen_and_i32
-> diff --git a/target/arm/translate.c b/target/arm/translate.c
-> index 83a008e945..721171794d 100644
-> --- a/target/arm/translate.c
-> +++ b/target/arm/translate.c
-> @@ -603,16 +603,6 @@ static void gen_sar(TCGv_i32 dest, TCGv_i32 t0, TCGv_i32 t1)
->      tcg_temp_free_i32(tmp1);
->  }
->  
-> -static void tcg_gen_abs_i32(TCGv_i32 dest, TCGv_i32 src)
-> -{
-> -    TCGv_i32 c0 = tcg_const_i32(0);
-> -    TCGv_i32 tmp = tcg_temp_new_i32();
-> -    tcg_gen_neg_i32(tmp, src);
-> -    tcg_gen_movcond_i32(TCG_COND_GT, dest, src, c0, src, tmp);
-> -    tcg_temp_free_i32(c0);
-> -    tcg_temp_free_i32(tmp);
-> -}
-> -
->  static void shifter_out_im(TCGv_i32 var, int shift)
->  {
->      if (shift == 0) {
-> diff --git a/tcg/tcg-op.c b/tcg/tcg-op.c
-> index a00d1df37e..0ac291f1c4 100644
-> --- a/tcg/tcg-op.c
-> +++ b/tcg/tcg-op.c
-> @@ -1091,6 +1091,16 @@ void tcg_gen_umax_i32(TCGv_i32 ret, TCGv_i32 a, TCGv_i32 b)
->      tcg_gen_movcond_i32(TCG_COND_LTU, ret, a, b, b, a);
->  }
->  
-> +void tcg_gen_abs_i32(TCGv_i32 ret, TCGv_i32 a)
-> +{
-> +    TCGv_i32 t = tcg_temp_new_i32();
-> +
-> +    tcg_gen_sari_i32(t, a, 31);
-> +    tcg_gen_xor_i32(ret, a, t);
-> +    tcg_gen_sub_i32(ret, ret, t);
-> +    tcg_temp_free_i32(t);
-> +}
-> +
->  /* 64-bit ops */
->  
->  #if TCG_TARGET_REG_BITS == 32
-> @@ -2548,6 +2558,16 @@ void tcg_gen_umax_i64(TCGv_i64 ret, TCGv_i64 a, TCGv_i64 b)
->      tcg_gen_movcond_i64(TCG_COND_LTU, ret, a, b, b, a);
->  }
->  
-> +void tcg_gen_abs_i64(TCGv_i64 ret, TCGv_i64 a)
-> +{
-> +    TCGv_i64 t = tcg_temp_new_i64();
-> +
-> +    tcg_gen_sari_i64(t, a, 63);
-> +    tcg_gen_xor_i64(ret, a, t);
-> +    tcg_gen_sub_i64(ret, ret, t);
-> +    tcg_temp_free_i64(t);
-> +}
-> +
->  /* Size changing operations.  */
->  
->  void tcg_gen_extrl_i64_i32(TCGv_i32 ret, TCGv_i64 arg)
-> 
+> -    if (!bs || !bs->drv) {
+> +    if (!bs || !bs->drv || !bdrv_is_inserted(bs)) {
+>          return -ENOMEDIUM;
+>      }
 
-Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+Ok, this comes from bdrv_is_inserted(). Priority of errors is changed,
+but that shouldn't be a problem.
+
+In fact, I wonder why bdrv_check_byte_request() should check
+bdrv_is_inserted() at all. If the drive is empty and we perform the
+request, we'll get an error anyway. No real reason to check beforehand
+and slow down the success path.
+
+But this is an issue separate from your patch. We can consider removing
+the bdrv_is_inserted() call in a follow-up.
+
+> @@ -2679,9 +2680,8 @@ int coroutine_fn bdrv_co_pdiscard(BdrvChild *child, int64_t offset, int bytes)
+>          return -EPERM;
+>      }
+>  
+> -    ret = bdrv_check_byte_request(bs, offset, bytes);
+> -    if (ret < 0) {
+> -        return ret;
+> +    if (offset < 0) {
+> +        return -EIO;
+>      }
+
+This loses the check for the maximum size (and therefore integer
+overflows). I think we want to check for bytes > INT64_MAX - offset,
+too.
+
+>      /* Do nothing if disabled.  */
+> @@ -2716,7 +2716,7 @@ int coroutine_fn bdrv_co_pdiscard(BdrvChild *child, int64_t offset, int bytes)
+>      assert(max_pdiscard >= bs->bl.request_alignment);
+>  
+>      while (bytes > 0) {
+> -        int num = bytes;
+> +        int64_t num = bytes;
+>  
+>          if (head) {
+>              /* Make small requests to get to alignment boundaries. */
+> @@ -2778,7 +2778,7 @@ out:
+>      return ret;
+>  }
+>  
+> -int bdrv_pdiscard(BdrvChild *child, int64_t offset, int bytes)
+> +int bdrv_pdiscard(BdrvChild *child, int64_t offset, int64_t bytes)
+>  {
+>      Coroutine *co;
+>      DiscardCo rwco = {
+
+Kevin
