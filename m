@@ -6,106 +6,64 @@ X-Spam-Status: No, score=-6.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D676AC10F03
-	for <qemu-devel@archiver.kernel.org>; Tue, 23 Apr 2019 18:42:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E51EBC10F03
+	for <qemu-devel@archiver.kernel.org>; Tue, 23 Apr 2019 19:11:54 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A890021738
-	for <qemu-devel@archiver.kernel.org>; Tue, 23 Apr 2019 18:42:37 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A890021738
+	by mail.kernel.org (Postfix) with ESMTPS id B9DE321773
+	for <qemu-devel@archiver.kernel.org>; Tue, 23 Apr 2019 19:11:54 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B9DE321773
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:58132 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:58389 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hJ0NJ-00030I-0w
-	for qemu-devel@archiver.kernel.org; Tue, 23 Apr 2019 14:42:37 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:39087)
+	id 1hJ0pd-0001bf-I6
+	for qemu-devel@archiver.kernel.org; Tue, 23 Apr 2019 15:11:53 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:59656)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1hJ0LZ-0001hY-Gv
-	for qemu-devel@nongnu.org; Tue, 23 Apr 2019 14:40:50 -0400
+	(envelope-from <lersek@redhat.com>) id 1hJ0ne-0000FQ-8L
+	for qemu-devel@nongnu.org; Tue, 23 Apr 2019 15:09:51 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1hJ0LX-0002OP-GQ
-	for qemu-devel@nongnu.org; Tue, 23 Apr 2019 14:40:49 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:49486)
+	(envelope-from <lersek@redhat.com>) id 1hJ0l5-0004CQ-L1
+	for qemu-devel@nongnu.org; Tue, 23 Apr 2019 15:07:12 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:45386)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <david@redhat.com>) id 1hJ0LX-0002Mr-7d
-	for qemu-devel@nongnu.org; Tue, 23 Apr 2019 14:40:47 -0400
+	(Exim 4.71) (envelope-from <lersek@redhat.com>)
+	id 1hJ0l5-0004B0-Dp; Tue, 23 Apr 2019 15:07:11 -0400
 Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
 	[10.5.11.11])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id DABA4301A632;
-	Tue, 23 Apr 2019 18:40:45 +0000 (UTC)
-Received: from [10.36.116.61] (ovpn-116-61.ams2.redhat.com [10.36.116.61])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id 34EB260148;
-	Tue, 23 Apr 2019 18:40:45 +0000 (UTC)
-To: Richard Henderson <richard.henderson@linaro.org>, qemu-devel@nongnu.org
-References: <20190420073442.7488-1-richard.henderson@linaro.org>
-	<20190420073442.7488-25-richard.henderson@linaro.org>
-From: David Hildenbrand <david@redhat.com>
-Openpgp: preference=signencrypt
-Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
-	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
-	SE+xAvmumFBY
-Organization: Red Hat GmbH
-Message-ID: <dbba8b1e-b108-cd66-f49d-1519158f1462@redhat.com>
-Date: Tue, 23 Apr 2019 20:40:44 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
-	Thunderbird/60.6.1
+	by mx1.redhat.com (Postfix) with ESMTPS id 9CDC630ADBDC;
+	Tue, 23 Apr 2019 19:07:10 +0000 (UTC)
+Received: from lacos-laptop-7.usersys.redhat.com (ovpn-125-214.rdu2.redhat.com
+	[10.10.125.214])
+	by smtp.corp.redhat.com (Postfix) with ESMTP id 8E41060143;
+	Tue, 23 Apr 2019 19:07:00 +0000 (UTC)
+To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
+	qemu-devel@nongnu.org
+References: <20190422195020.1494-1-philmd@redhat.com>
+	<20190422195020.1494-8-philmd@redhat.com>
+From: Laszlo Ersek <lersek@redhat.com>
+Message-ID: <499877a9-e657-d071-c7b7-5db5e8e82017@redhat.com>
+Date: Tue, 23 Apr 2019 21:06:58 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:52.0) Gecko/20100101
+	Thunderbird/52.9.1
 MIME-Version: 1.0
-In-Reply-To: <20190420073442.7488-25-richard.henderson@linaro.org>
+In-Reply-To: <20190422195020.1494-8-philmd@redhat.com>
 Content-Type: text/plain; charset="UTF-8"
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.40]);
-	Tue, 23 Apr 2019 18:40:45 +0000 (UTC)
+	(mx1.redhat.com [10.5.110.47]);
+	Tue, 23 Apr 2019 19:07:10 +0000 (UTC)
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH 24/38] target/s390x: Use tcg_gen_abs_i64
+Subject: Re: [Qemu-devel] [PATCH v3 7/7] hw/sparc64: Implement
+ fw_cfg_arch_key_name()
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -117,43 +75,64 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: Eduardo Habkost <ehabkost@redhat.com>,
+	"Michael S. Tsirkin" <mst@redhat.com>,
+	Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>,
+	qemu-ppc@nongnu.org, Gerd Hoffmann <kraxel@redhat.com>,
+	Paolo Bonzini <pbonzini@redhat.com>,
+	David Gibson <david@gibson.dropbear.id.au>,
+	Artyom Tarasenko <atar4qemu@gmail.com>, Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190423184044.Y-ew6YLC06YDZznpwdbA2mlzzLxEpJ6n0QqD2bf8sbc@z>
+Message-ID: <20190423190658.wIFuEPFjuvGg1IeXENSQpPTEBMQbKk2J-Gii20wCBKw@z>
 
-On 20.04.19 09:34, Richard Henderson wrote:
-> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+On 04/22/19 21:50, Philippe Mathieu-Daud=C3=A9 wrote:
+> Implement fw_cfg_arch_key_name(), which returns the name of a
+> sparc64-specific key.
+>=20
+> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
 > ---
->  target/s390x/translate.c | 8 +-------
->  1 file changed, 1 insertion(+), 7 deletions(-)
-> 
-> diff --git a/target/s390x/translate.c b/target/s390x/translate.c
-> index 0afa8f7ca5..030129acbb 100644
-> --- a/target/s390x/translate.c
-> +++ b/target/s390x/translate.c
-> @@ -1407,13 +1407,7 @@ static DisasJumpType help_branch(DisasContext *s, DisasCompare *c,
->  
->  static DisasJumpType op_abs(DisasContext *s, DisasOps *o)
+>  hw/sparc64/sun4u.c | 19 +++++++++++++++++++
+>  1 file changed, 19 insertions(+)
+>=20
+> diff --git a/hw/sparc64/sun4u.c b/hw/sparc64/sun4u.c
+> index 399f2d73c81..4230b17b873 100644
+> --- a/hw/sparc64/sun4u.c
+> +++ b/hw/sparc64/sun4u.c
+> @@ -91,6 +91,25 @@ typedef struct EbusState {
+>  #define TYPE_EBUS "ebus"
+>  #define EBUS(obj) OBJECT_CHECK(EbusState, (obj), TYPE_EBUS)
+> =20
+> +const char *fw_cfg_arch_key_name(uint16_t key)
+> +{
+> +    static const struct {
+> +        uint16_t key;
+> +        const char *name;
+> +    } fw_cfg_arch_wellknown_keys[] =3D {
+> +        {FW_CFG_SPARC64_WIDTH, "width"},
+> +        {FW_CFG_SPARC64_HEIGHT, "height"},
+> +        {FW_CFG_SPARC64_DEPTH, "depth"},
+> +    };
+> +
+> +    for (size_t i =3D 0; i < ARRAY_SIZE(fw_cfg_arch_wellknown_keys); i=
+++) {
+> +        if (fw_cfg_arch_wellknown_keys[i].key =3D=3D key) {
+> +            return fw_cfg_arch_wellknown_keys[i].name;
+> +        }
+> +    }
+> +    return NULL;
+> +}
+> +
+>  static void fw_cfg_boot_set(void *opaque, const char *boot_device,
+>                              Error **errp)
 >  {
-> -    TCGv_i64 z, n;
-> -    z = tcg_const_i64(0);
-> -    n = tcg_temp_new_i64();
-> -    tcg_gen_neg_i64(n, o->in2);
-> -    tcg_gen_movcond_i64(TCG_COND_LT, o->out, o->in2, z, n, o->in2);
-> -    tcg_temp_free_i64(n);
-> -    tcg_temp_free_i64(z);
-> +    tcg_gen_abs_i64(o->out, o->in2);
->      return DISAS_NEXT;
->  }
->  
-> 
+>=20
 
-Reviewed-by: David Hildenbrand <david@redhat.com>
+Same questions. From my POV:
 
--- 
+Reviewed-by: Laszlo Ersek <lersek@redhat.com>
 
-Thanks,
-
-David / dhildenb
+Thanks
+Laszlo
 
