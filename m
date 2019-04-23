@@ -2,110 +2,109 @@ Return-Path: <SRS0=zUjA=SZ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.7 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MIME_QP_LONG_LINE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A9818C10F14
-	for <qemu-devel@archiver.kernel.org>; Tue, 23 Apr 2019 04:22:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8DF03C10F14
+	for <qemu-devel@archiver.kernel.org>; Tue, 23 Apr 2019 05:08:20 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 592A120B1F
-	for <qemu-devel@archiver.kernel.org>; Tue, 23 Apr 2019 04:22:56 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="kYhP4iUf"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 592A120B1F
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=oracle.com
+	by mail.kernel.org (Postfix) with ESMTPS id 3C45420811
+	for <qemu-devel@archiver.kernel.org>; Tue, 23 Apr 2019 05:08:19 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3C45420811
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:47850 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:48192 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hImxL-0002id-9x
-	for qemu-devel@archiver.kernel.org; Tue, 23 Apr 2019 00:22:55 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:58070)
+	id 1hInfH-0001gn-21
+	for qemu-devel@archiver.kernel.org; Tue, 23 Apr 2019 01:08:19 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:36027)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <wei.d.li@oracle.com>) id 1hImwX-0002Pl-Sr
-	for qemu-devel@nongnu.org; Tue, 23 Apr 2019 00:22:07 -0400
+	(envelope-from <thuth@redhat.com>) id 1hIneJ-0001BW-Bd
+	for qemu-devel@nongnu.org; Tue, 23 Apr 2019 01:07:20 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <wei.d.li@oracle.com>) id 1hImwW-0005qB-BQ
-	for qemu-devel@nongnu.org; Tue, 23 Apr 2019 00:22:05 -0400
-Received: from userp2130.oracle.com ([156.151.31.86]:37826)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <wei.d.li@oracle.com>) id 1hImwW-0005pV-2C
-	for qemu-devel@nongnu.org; Tue, 23 Apr 2019 00:22:04 -0400
-Received: from pps.filterd (userp2130.oracle.com [127.0.0.1])
-	by userp2130.oracle.com (8.16.0.27/8.16.0.27) with SMTP id
-	x3N4E9jo001425; Tue, 23 Apr 2019 04:21:59 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com;
-	h=date : subject : from
-	: to : cc : message-id : references : in-reply-to : mime-version :
-	content-type : content-transfer-encoding; s=corp-2018-07-02;
-	bh=bIMLN0ydGBnsO4rHVyjGwlIY8CGcMdwbWlyuyeDdXsE=;
-	b=kYhP4iUfWQ20XRFTsZ9120jMt8xC9Wsziu1bO2L2vw6OiTd9qdYyjBqNK1ZLxZ7X2vYd
-	03QgUrFdgzFwSdHvFWfaStmrv5Ml8f42nqmTqGd1mCKiu3rVNMvvnueVKrj5/8XLuOes
-	nTtEVCzXl9H7H05xCz85JiMyJ45Va8eIQE9GwEm391sgFRsP8C+Z6Xeh2OJFdvB05ujT
-	JMgyGCSgkohH4qOXxaDQJS66yIAIsz+Xe7Ww4X4v/r/LOyGFPVoj0m9EQvuYXCofOT2Y
-	8LMXSNtSeRAPkfR2SM1XgyAT2BxdPaYNeLTwD3fmk/KUnFdzbOVQrcp3i75NAWs4KSjh
-	mw== 
-Received: from aserp3030.oracle.com (aserp3030.oracle.com [141.146.126.71])
-	by userp2130.oracle.com with ESMTP id 2rytusskww-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Tue, 23 Apr 2019 04:21:59 +0000
-Received: from pps.filterd (aserp3030.oracle.com [127.0.0.1])
-	by aserp3030.oracle.com (8.16.0.27/8.16.0.27) with SMTP id
-	x3N4KMDt164989; Tue, 23 Apr 2019 04:21:59 GMT
-Received: from aserv0121.oracle.com (aserv0121.oracle.com [141.146.126.235])
-	by aserp3030.oracle.com with ESMTP id 2s0f0v9cam-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Tue, 23 Apr 2019 04:21:58 +0000
-Received: from abhmp0012.oracle.com (abhmp0012.oracle.com [141.146.116.18])
-	by aserv0121.oracle.com (8.14.4/8.13.8) with ESMTP id x3N4LtYu007940;
-	Tue, 23 Apr 2019 04:21:55 GMT
-Received: from [10.74.106.144] (/10.74.106.144)
-	by default (Oracle Beehive Gateway v4.0)
-	with ESMTP ; Mon, 22 Apr 2019 21:21:55 -0700
-User-Agent: Microsoft-MacOutlook/10.15.0.190115
-Date: Mon, 22 Apr 2019 21:21:53 -0700
-From: Wei Li <wei.d.li@oracle.com>
-To: Stefan Hajnoczi <stefanha@gmail.com>,
-	Dongli Zhang <dongli.zhang@oracle.com>
-Message-ID: <3F7E854A-3C1D-4204-8C35-893FC0614796@oracle.com>
-Thread-Topic: [Qemu-devel] Following up questions related to QEMU and I/O
-	Thread
-References: <5FF901C1-0AA5-4308-A65C-C448D0A2BA63@oracle.com>
-	<20190305172905.GD13806@stefanha-x1.localdomain>
-	<2D7F11D0-4A02-4A0F-961D-854240376B17@oracle.com>
-	<20190401090724.GA643@stefanha-x1.localdomain>
-	<CC372DF3-1AC6-46B5-98A5-21159497034A@oracle.com>
-	<60340EAF-4C85-4798-9999-34F1A37E2086@oracle.com>
-	<898ef1d4-bfa2-9952-8ceb-f1282b85e29c@oracle.com>
-	<20190416092042.GB32709@stefanha-x1.localdomain>
-	<8E5AF770-69ED-4D44-8A25-B51344996D9E@oracle.com>
-In-Reply-To: <8E5AF770-69ED-4D44-8A25-B51344996D9E@oracle.com>
-Mime-version: 1.0
-Content-type: text/plain; charset="UTF-8"
-Content-transfer-encoding: quoted-printable
-X-Proofpoint-Virus-Version: vendor=nai engine=5900 definitions=9235
-	signatures=668685
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=0
-	malwarescore=0
-	phishscore=0 bulkscore=0 spamscore=0 mlxscore=0 mlxlogscore=999
-	adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
-	engine=8.0.1-1810050000 definitions=main-1904230031
-X-Proofpoint-Virus-Version: vendor=nai engine=5900 definitions=9235
-	signatures=668685
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0
-	priorityscore=1501 malwarescore=0
-	suspectscore=0 phishscore=0 bulkscore=0 spamscore=0 clxscore=1015
-	lowpriorityscore=0 mlxscore=0 impostorscore=0 mlxlogscore=999
-	adultscore=0
-	classifier=spam adjust=0 reason=mlx scancount=1 engine=8.0.1-1810050000
-	definitions=main-1904230031
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic]
-X-Received-From: 156.151.31.86
-Subject: Re: [Qemu-devel] Following up questions related to QEMU and I/O
- Thread
+	(envelope-from <thuth@redhat.com>) id 1hIneI-0005MN-IL
+	for qemu-devel@nongnu.org; Tue, 23 Apr 2019 01:07:19 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:42808)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1hIneI-0005KG-AG
+	for qemu-devel@nongnu.org; Tue, 23 Apr 2019 01:07:18 -0400
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+	[10.5.11.15])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id C1EE8C0AD1F1
+	for <qemu-devel@nongnu.org>; Tue, 23 Apr 2019 05:07:15 +0000 (UTC)
+Received: from thuth.remote.csb (ovpn-116-87.ams2.redhat.com [10.36.116.87])
+	by smtp.corp.redhat.com (Postfix) with ESMTP id 272D55D71D;
+	Tue, 23 Apr 2019 05:07:10 +0000 (UTC)
+To: Eduardo Habkost <ehabkost@redhat.com>, qemu-devel@nongnu.org
+References: <20190422210448.2488-1-ehabkost@redhat.com>
+	<20190422210448.2488-2-ehabkost@redhat.com>
+From: Thomas Huth <thuth@redhat.com>
+Openpgp: preference=signencrypt
+Autocrypt: addr=thuth@redhat.com; keydata=
+	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
+Organization: Red Hat
+Message-ID: <91f001e1-a47a-9eb0-f9af-746699f72fb4@redhat.com>
+Date: Tue, 23 Apr 2019 07:07:06 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+	Thunderbird/60.6.1
+MIME-Version: 1.0
+In-Reply-To: <20190422210448.2488-2-ehabkost@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+	(mx1.redhat.com [10.5.110.31]);
+	Tue, 23 Apr 2019 05:07:15 +0000 (UTC)
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 209.132.183.28
+Subject: Re: [Qemu-devel] [PATCH 1/3] qtest: Move accel code to accel/qtest.c
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -117,163 +116,25 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org,
-	Stefan Hajnoczi <stefanha@redhat.com>
+Cc: Laurent Vivier <lvivier@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190423042153.czwQB4F76zohwAnsE4nZwZwnmOYRHoo9C1oDYPb044E@z>
+Message-ID: <20190423050706.FEGoXsIQii1gNCfJSCXCWWk9r-ztt1daoEjIol2wy2g@z>
 
-Hi Stefan,
+On 22/04/2019 23.04, Eduardo Habkost wrote:
+> QTest has two parts: the server (-qtest) and the accelerator
+> (-machine accel=qtest).  The accelerator depends on CONFIG_POSIX
+> due to its usage of sigwait(), but the server doesn't.
+> 
+> Move the accel code to accel/qtest.c.  Later we will disable
+> compilation of accel/qtest.c on non-POSIX systems.
+> 
+> Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
+> ---
+>  accel/qtest.c       | 55 +++++++++++++++++++++++++++++++++++++++++++++
 
-I did investigation per your advices, please see inline for the details and=
- questions.
-=20
-       1. Compare "iostat -dx 1" inside the guest and host.  Are the I/O
-           patterns comparable?  blktrace(8) can give you even more detail =
-on
-           the exact I/O patterns.  If the guest and host have different I/=
-O
-           patterns (blocksize, IOPS, queue depth) then request merging or
-           I/O scheduler effects could be responsible for the difference.
+New file ==> You should update MAINTAINERS here as well.
 
-[wei]: That's good point, I compared 'iostate -dx1" between guest and host,=
- but I have not find obvious difference between guest and host which could r=
-esponsible for the difference.
-       =20
-        2. kvm_stat or perf record -a -e kvm:\* counters for vmexits and
-           interrupt injections.  If these counters vary greatly between qu=
-eue
-           sizes, then that is usually a clue.  It's possible to get higher
-           performance by spending more CPU cycles although your system doe=
-sn't
-           have many CPUs available, so I'm not sure if this is the case.
-
-[wei]: vmexits looks like a reason. I am using FIO tool to read/write block=
- storage via following sample command, interesting thing is that kvm:kvm_exi=
-t count decreased from 846K to 395K after I increased num_queues from 2 to 4=
- while the vCPU count is 2.
-           1). Does this mean using more queues than vCPU count may increas=
-e IOPS via spending more CPU cycle?=20
-           2). Could you please help me better understand how more queues i=
-s able to spend more CPU cycle? Thanks!
-           FIO command: fio --filename=3D/dev/sdb --direct=3D1 --rw=3Drandrw --bs=
-=3D4k --ioengine=3Dlibaio --iodepth=3D64 --numjobs=3D4 --time_based --group_reportin=
-g --name=3Diops --runtime=3D60 --eta-newline=3D1
-
-        3. Power management and polling (kvm.ko halt_poll_ns, tuned profile=
-s,
-           and QEMU iothread poll-max-ns).  It's expensive to wake a CPU wh=
-en it
-           goes into a low power mode due to idle.  There are several featu=
-res
-           that can keep the CPU awake or even poll so that request latency=
- is
-           reduced.  The reason why the number of queues may matter is that
-           kicking multiple queues may keep the CPU awake more than batchin=
-g
-           multiple requests onto a small number of queues.
-[wei]: CPU awake could be another reason, I noticed that kvm:kvm_vcpu_wakeu=
-p count decreased from 151K to 47K after I increased num_queues from 2 to 4 =
-while the vCPU count is 2.
-           1). Does this mean more queues may keep CPU more busy and awake =
-which reduced the vcpu wakeup time?
-           2). If using more num_queues than vCPU count is able to get high=
-er IOPS for this case, is it safe to use 4 queues while it only have 2 vCPU,=
- or there is any concern or impact by using more queues than vCPU count whic=
-h I should keep in mind?
-
-In addition, does Virtio-scsi support Batch I/O Submission feature which ma=
-y be able to increase the IOPS via reducing the number of system calls?
-
-Thanks,
-Wei
-
-=EF=BB=BFOn 4/16/19, 6:42 PM, "Wei Li" <wei.d.li@oracle.com> wrote:
-
-    Thanks Stefan and Dongli for your feedback and advices!
-   =20
-    I will do the further investigation per your advices and get back to yo=
-u later on.
-   =20
-    Thanks,=20
-    -Wei
-   =20
-    =EF=BB=BFOn 4/16/19, 2:20 AM, "Stefan Hajnoczi" <stefanha@gmail.com> wrote:
-   =20
-        On Tue, Apr 16, 2019 at 07:23:38AM +0800, Dongli Zhang wrote:
-        >=20
-        >=20
-        > On 4/16/19 1:34 AM, Wei Li wrote:
-        > > Hi @Paolo Bonzini & @Stefan Hajnoczi,
-        > >=20
-        > > Would you please help confirm whether @Paolo Bonzini's multique=
-ue feature change will benefit virtio-scsi or not? Thanks!
-        > >=20
-        > > @Stefan Hajnoczi,
-        > > I also spent some time on exploring the virtio-scsi multi-queue=
- features via num_queues parameter as below, here are what we found:
-        > >=20
-        > > 1. Increase number of Queues from one to the same number as CPU=
- will get better IOPS increase.
-        > > 2. Increase number of Queues to the number (e.g. 8) larger than=
- the number of vCPU (e.g. 2) can get even better IOPS increase.
-        >=20
-        > As mentioned in below link, when the number of hw queues is large=
-r than
-        > nr_cpu_ids, the blk-mq layer would limit and only use at most nr_=
-cpu_ids queues
-        > (e.g., /sys/block/sda/mq/).
-        >=20
-        > That is, when the num_queus=3D4 while vcpus is 2, there should be o=
-nly 2 queues
-        > available /sys/block/sda/mq/
-        >=20
-        > https://lore.kernel.org/lkml/1553682995-5682-1-git-send-email-don=
-gli.zhang@oracle.com/
-        >=20
-        > I am just curious how increasing the num_queues from 2 to 4 would=
- double the
-        > iops, while there are only 2 vcpus available...
-       =20
-        I don't know the answer.  It's especially hard to guess without see=
-ing
-        the benchmark (fio?) configuration and QEMU command-line.
-       =20
-        Common things to look at are:
-       =20
-        1. Compare "iostat -dx 1" inside the guest and host.  Are the I/O
-           patterns comparable?  blktrace(8) can give you even more detail =
-on
-           the exact I/O patterns.  If the guest and host have different I/=
-O
-           patterns (blocksize, IOPS, queue depth) then request merging or
-           I/O scheduler effects could be responsible for the difference.
-       =20
-        2. kvm_stat or perf record -a -e kvm:\* counters for vmexits and
-           interrupt injections.  If these counters vary greatly between qu=
-eue
-           sizes, then that is usually a clue.  It's possible to get higher
-           performance by spending more CPU cycles although your system doe=
-sn't
-           have many CPUs available, so I'm not sure if this is the case.
-       =20
-        3. Power management and polling (kvm.ko halt_poll_ns, tuned profile=
-s,
-           and QEMU iothread poll-max-ns).  It's expensive to wake a CPU wh=
-en it
-           goes into a low power mode due to idle.  There are several featu=
-res
-           that can keep the CPU awake or even poll so that request latency=
- is
-           reduced.  The reason why the number of queues may matter is that
-           kicking multiple queues may keep the CPU awake more than batchin=
-g
-           multiple requests onto a small number of queues.
-       =20
-        Stefan
-       =20
-   =20
-
-
+ Thomas
 
