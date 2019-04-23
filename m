@@ -6,62 +6,62 @@ X-Spam-Status: No, score=-6.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 737F2C10F03
-	for <qemu-devel@archiver.kernel.org>; Tue, 23 Apr 2019 17:25:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0E7E5C282DD
+	for <qemu-devel@archiver.kernel.org>; Tue, 23 Apr 2019 17:27:33 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4690120835
-	for <qemu-devel@archiver.kernel.org>; Tue, 23 Apr 2019 17:25:47 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4690120835
+	by mail.kernel.org (Postfix) with ESMTPS id D5DC4206A3
+	for <qemu-devel@archiver.kernel.org>; Tue, 23 Apr 2019 17:27:32 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D5DC4206A3
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:57120 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:57133 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hIzAw-0003sQ-JF
-	for qemu-devel@archiver.kernel.org; Tue, 23 Apr 2019 13:25:46 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:37475)
+	id 1hIzCe-0005N5-4i
+	for qemu-devel@archiver.kernel.org; Tue, 23 Apr 2019 13:27:32 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:37127)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <lersek@redhat.com>) id 1hIz2U-0005mK-Ix
-	for qemu-devel@nongnu.org; Tue, 23 Apr 2019 13:17:06 -0400
+	(envelope-from <lersek@redhat.com>) id 1hIz1u-0005Kc-1y
+	for qemu-devel@nongnu.org; Tue, 23 Apr 2019 13:16:28 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <lersek@redhat.com>) id 1hIz2T-0006Qa-4m
-	for qemu-devel@nongnu.org; Tue, 23 Apr 2019 13:17:02 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:58446)
+	(envelope-from <lersek@redhat.com>) id 1hIz1s-0005wf-4L
+	for qemu-devel@nongnu.org; Tue, 23 Apr 2019 13:16:25 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:54334)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <lersek@redhat.com>) id 1hIz2S-0006Ov-V9
-	for qemu-devel@nongnu.org; Tue, 23 Apr 2019 13:17:01 -0400
+	(Exim 4.71) (envelope-from <lersek@redhat.com>) id 1hIz1r-0005ui-U2
+	for qemu-devel@nongnu.org; Tue, 23 Apr 2019 13:16:24 -0400
 Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
 	[10.5.11.23])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id A6BB43006023;
-	Tue, 23 Apr 2019 17:16:59 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id 795C6821DE;
+	Tue, 23 Apr 2019 17:16:21 +0000 (UTC)
 Received: from lacos-laptop-7.usersys.redhat.com (ovpn-125-214.rdu2.redhat.com
 	[10.10.125.214])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id 5720F1973B;
-	Tue, 23 Apr 2019 17:16:51 +0000 (UTC)
+	by smtp.corp.redhat.com (Postfix) with ESMTP id D874E19729;
+	Tue, 23 Apr 2019 17:16:18 +0000 (UTC)
 From: Laszlo Ersek <lersek@redhat.com>
 To: berrange@redhat.com, eblake@redhat.com, f4bug@amsat.org,
 	imammedo@redhat.com, kraxel@redhat.com, mprivozn@redhat.com,
 	mst@redhat.com, peter.maydell@linaro.org, philmd@redhat.com,
 	qemu-devel@nongnu.org
-Date: Tue, 23 Apr 2019 19:15:20 +0200
-Message-Id: <20190423171520.4511-13-lersek@redhat.com>
+Date: Tue, 23 Apr 2019 19:15:14 +0200
+Message-Id: <20190423171520.4511-7-lersek@redhat.com>
 In-Reply-To: <20190423171520.4511-1-lersek@redhat.com>
 References: <20190423171520.4511-1-lersek@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="UTF-8"
 X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.40]);
-	Tue, 23 Apr 2019 17:16:59 +0000 (UTC)
+	(mx1.redhat.com [10.5.110.28]);
+	Tue, 23 Apr 2019 17:16:21 +0000 (UTC)
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] [PULL 12/12] MAINTAINERS: add the "EDK2 Firmware"
- subsystem
+Subject: [Qemu-devel] [PULL 06/12] roms/Makefile: replace the $(EDK2_EFIROM)
+ target with "edk2-basetools"
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -76,80 +76,90 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190423171520.LMxuxCPaNnLPlsg4vml0yhbZ6kme0X42EMcx_C_zaLw@z>
+Message-ID: <20190423171514.bNmJGr_TIxngKl8CVoGcFpNokL5UFyp9jlpRpqsgkP0@z>
 
-We now have the edk2 submodule, somewhat elaborate build helpers for it,
-and even a UEFI application written against edk2 whose genuine home is th=
+We don't (can't) have a recipe for building just $(EDK2_EFIROM);
+therefore, while we call the target $(EDK2_EFIROM), we actually build all
+of the edk2 BaseTools. Rename the target to edk2-basetools, and update th=
 e
-QEMU repository. Add the "EDK2 Firmware" subsystem such that all relevant
-pathnames be covered.
+iPXE prerequisite accordingly. This will let other targets depend on
+"edk2-basetools", where an $(EDK2_EFIROM) pre-requisite would be
+misleading.
 
-Suggested-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
-Suggested-by: Michael S. Tsirkin <mst@redhat.com>
-Suggested-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
 Signed-off-by: Laszlo Ersek <lersek@redhat.com>
-Reviewed-by: Michal Privoznik <mprivozn@redhat.com>
 Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
 Tested-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
-Tested-by: Igor Mammedov <imammedo@redhat.com>
-Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
+Acked-by: Michael S. Tsirkin <mst@redhat.com>
 Reviewed-by: Igor Mammedov <imammedo@redhat.com>
 ---
 
 Notes:
     pull:
    =20
+    - pick up Phil's R-b / T-b
+   =20
+    - pick up Michael's A-b
+   =20
     - pick up Igor's R-b
    =20
     v4:
    =20
-    - no change
+    - rebase: resolve conflicts with
+   =20
+      - commit d912e795e029 ("roms: Rename the EFIROM variable to avoid
+        clashing with iPXE", 2019-04-09)
+   =20
+      - commit 1cab464136b4 ("roms: Allow passing configure options to th=
+e
+        EDK2 build tools", 2019-04-09)
+   =20
+    - refresh commit message accordingly: replace EFIROM references with
+      EDK2_EFIROM references
+   =20
+    - drop all previous feedback tags, consequently :(
+   =20
+      - Phil's R-b / T-b
+      - Michal's R-b
+      - Michael's R-b
+      - Igor's T-b
    =20
     v3:
    =20
-    - pick up Michal's R-b
-   =20
-    - pick up Phil's R-b/T-b
-   =20
     - pick up Igor's T-b
-   =20
-    - pick up Michael's R-b
    =20
     v2:
    =20
-    - new patch [Dan, Michael, Phil]
+    - pick up Phil's R-b / T-b
    =20
-    - compared to the suggestions, upgrade the maintenance status ("S") f=
-rom
-      Maintained to Supported
+    - pick up Michal's and Michael's R-b's
 
- MAINTAINERS | 12 ++++++++++++
- 1 file changed, 12 insertions(+)
+ roms/Makefile | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/MAINTAINERS b/MAINTAINERS
-index 56139ac8ab05..d7505e074a0d 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -2222,6 +2222,18 @@ F: include/hw/i2c/smbus_master.h
- F: include/hw/i2c/smbus_slave.h
- F: include/hw/i2c/smbus_eeprom.h
+diff --git a/roms/Makefile b/roms/Makefile
+index 1ff78b63bb3a..93c3d467be14 100644
+--- a/roms/Makefile
++++ b/roms/Makefile
+@@ -102,7 +102,7 @@ pxe-rom-%: build-pxe-roms
 =20
-+EDK2 Firmware
-+M: Laszlo Ersek <lersek@redhat.com>
-+M: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
-+S: Supported
-+F: pc-bios/descriptors/??-edk2-*.json
-+F: pc-bios/edk2-*
-+F: roms/Makefile.edk2
-+F: roms/edk2
-+F: roms/edk2-*
-+F: tests/data/uefi-boot-images/
-+F: tests/uefi-test-tools/
-+
- Usermode Emulation
- ------------------
- Overall
+ efirom: $(patsubst %,efi-rom-%,$(pxerom_variants))
+=20
+-efi-rom-%: build-pxe-roms build-efi-roms $(EDK2_EFIROM)
++efi-rom-%: build-pxe-roms build-efi-roms edk2-basetools
+ 	$(EDK2_EFIROM) -f "0x$(VID)" -i "0x$(DID)" -l 0x02 \
+ 		-b ipxe/src/bin/$(VID)$(DID).rom \
+ 		-ec ipxe/src/bin-i386-efi/$(VID)$(DID).efidrv \
+@@ -131,7 +131,7 @@ build-efi-roms: build-pxe-roms
+ #    EDK2_BASETOOLS_LDFLAGS=3D'...' \
+ #    efirom
+ #
+-$(EDK2_EFIROM):
++edk2-basetools:
+ 	$(MAKE) -C edk2/BaseTools \
+ 		EXTRA_OPTFLAGS=3D'$(EDK2_BASETOOLS_OPTFLAGS)' \
+ 		EXTRA_LDFLAGS=3D'$(EDK2_BASETOOLS_LDFLAGS)'
 --=20
 2.19.1.3.g30247aa5d201
+
 
 
