@@ -1,27 +1,22 @@
-Received: from eggs.gnu.org ([209.51.188.92]:40281)
+Received: from eggs.gnu.org ([209.51.188.92]:40483)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1hIw1u-0006kK-2v
-	for qemu-devel@nongnu.org; Tue, 23 Apr 2019 10:04:17 -0400
+	(envelope-from <stefanha@gmail.com>) id 1hIw2V-00074I-Ur
+	for qemu-devel@nongnu.org; Tue, 23 Apr 2019 10:04:52 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1hIw1L-0007Bi-Sj
-	for qemu-devel@nongnu.org; Tue, 23 Apr 2019 10:03:44 -0400
-Received: from mail-wr1-f66.google.com ([209.85.221.66]:34765)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1hIw1L-0007Av-N1
-	for qemu-devel@nongnu.org; Tue, 23 Apr 2019 10:03:39 -0400
-Received: by mail-wr1-f66.google.com with SMTP id c6so14693146wrm.1
-	for <qemu-devel@nongnu.org>; Tue, 23 Apr 2019 07:03:39 -0700 (PDT)
-References: <1555669092-10351-1-git-send-email-frederic.konrad@adacore.com>
-	<1555669092-10351-4-git-send-email-frederic.konrad@adacore.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Message-ID: <9971c427-45e2-4f3b-b871-19539da11a41@redhat.com>
-Date: Tue, 23 Apr 2019 16:03:35 +0200
+	(envelope-from <stefanha@gmail.com>) id 1hIvuZ-0000iZ-VR
+	for qemu-devel@nongnu.org; Tue, 23 Apr 2019 09:56:40 -0400
+Date: Tue, 23 Apr 2019 14:56:35 +0100
+From: Stefan Hajnoczi <stefanha@gmail.com>
+Message-ID: <20190423135635.GL32465@stefanha-x1.localdomain>
+References: <c47aea74-cec7-0369-591e-e1b1fdddc3e6@huawei.com>
 MIME-Version: 1.0
-In-Reply-To: <1555669092-10351-4-git-send-email-frederic.konrad@adacore.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH V1 3/3] MAINTAINERS: add myself for leon3
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="1hKfHPzOXWu1rh0v"
+Content-Disposition: inline
+In-Reply-To: <c47aea74-cec7-0369-591e-e1b1fdddc3e6@huawei.com>
+Subject: Re: [Qemu-devel]
+ =?utf-8?q?=5BQemu-block=5D_question=EF=BC=9A_Does_q?=
+ =?utf-8?q?emu-pr-helper_have_its_own_log_files=EF=BC=9F?=
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,29 +25,38 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: KONRAD Frederic <frederic.konrad@adacore.com>, qemu-devel@nongnu.org
-Cc: peter.maydell@linaro.org, mark.cave-ayland@ilande.co.uk, atar4qemu@gmail.com, chouteau@adacore.com
+To: Jie Wang <wangjie88@huawei.com>
+Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org, "Zhangbo (Oscar)" <oscar.zhangbo@huawei.com>, "Fangyi (C)" <eric.fangyi@huawei.com>
 
-On 4/19/19 12:18 PM, KONRAD Frederic wrote:
-> Signed-off-by: KONRAD Frederic <frederic.konrad@adacore.com>
-> ---
->  MAINTAINERS | 1 +
->  1 file changed, 1 insertion(+)
-> 
-> diff --git a/MAINTAINERS b/MAINTAINERS
-> index 56139ac..3543035 100644
-> --- a/MAINTAINERS
-> +++ b/MAINTAINERS
-> @@ -1151,6 +1151,7 @@ F: include/hw/timer/sun4v-rtc.h
->  
->  Leon3
->  M: Fabien Chouteau <chouteau@adacore.com>
-> +M: KONRAD Frederic <frederic.konrad@adacore.com>
->  S: Maintained
->  F: hw/sparc/leon3.c
->  F: hw/*/grlib*
-> 
 
-Thank you for stepping in!
+--1hKfHPzOXWu1rh0v
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+On Tue, Apr 23, 2019 at 11:12:40AM +0800, Jie Wang wrote:
+> =C2=A0Does qemu-pr-helper have its own log files=EF=BC=9F
+
+No, it does not.  qemu-pr-helper uses stderr for errors and there is not
+much output during normal operation.
+
+Check journalctl(1) for errors if you are launching it as a systemd
+service.
+
+Stefan
+
+--1hKfHPzOXWu1rh0v
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEcBAEBAgAGBQJcvxmTAAoJEJykq7OBq3PI6QUIAMiYRUcvsCI5IZ3WKTnXeJFw
+31XmCdsP8k8VO4c9FCN+pwSNhJg4jDZO7vbREKbOu1AYSdCY7c6NfAQKAswu/5hF
+LFsXPoH4SST8qu7cmykmPmebgdAv34P0jjdpqhWhNHBlPrp+TgcD9QJVSsRG3pZq
+I1TtNp3HpKeVXiRWg+C8fSTqaEnl+fQEvCA9TCustcwTgm3JqRZbueNU/tD5vht2
+74/XZpz5MHIydh/jNEf/CRwDHIvejERL+XPOg784eZW1J6EP6qMIqcry0pTFT0JP
+xOOF4/xI5V/0sDSXfvj/RuQQJgxtKhlcpIGbYxbRWuHmyHg4erm6BPtD+Mtwfc4=
+=RyMb
+-----END PGP SIGNATURE-----
+
+--1hKfHPzOXWu1rh0v--
