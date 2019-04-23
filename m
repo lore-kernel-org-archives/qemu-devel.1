@@ -2,75 +2,101 @@ Return-Path: <SRS0=zUjA=SZ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_PASS,URIBL_BLOCKED autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.0 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A8D02C10F03
-	for <qemu-devel@archiver.kernel.org>; Tue, 23 Apr 2019 22:43:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6CC7FC10F03
+	for <qemu-devel@archiver.kernel.org>; Tue, 23 Apr 2019 22:43:39 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 78E84218D3
-	for <qemu-devel@archiver.kernel.org>; Tue, 23 Apr 2019 22:43:17 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 78E84218D3
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
+	by mail.kernel.org (Postfix) with ESMTPS id 1CCEC218D3
+	for <qemu-devel@archiver.kernel.org>; Tue, 23 Apr 2019 22:43:38 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="JIOGjNyQ"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1CCEC218D3
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:60554 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:60556 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hJ48C-0006qy-Md
-	for qemu-devel@archiver.kernel.org; Tue, 23 Apr 2019 18:43:16 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:45220)
+	id 1hJ48Y-00079v-5o
+	for qemu-devel@archiver.kernel.org; Tue, 23 Apr 2019 18:43:38 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:44583)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1hJ46K-0005gR-CP
-	for qemu-devel@nongnu.org; Tue, 23 Apr 2019 18:41:21 -0400
+	(envelope-from <richard.henderson@linaro.org>) id 1hJ45t-0005Ez-5d
+	for qemu-devel@nongnu.org; Tue, 23 Apr 2019 18:40:57 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1hJ46I-0003Nc-Pq
-	for qemu-devel@nongnu.org; Tue, 23 Apr 2019 18:41:20 -0400
-Received: from indium.canonical.com ([91.189.90.7]:47344)
+	(envelope-from <richard.henderson@linaro.org>) id 1hJ3uU-00061Z-3P
+	for qemu-devel@nongnu.org; Tue, 23 Apr 2019 18:29:07 -0400
+Received: from mail-pl1-x643.google.com ([2607:f8b0:4864:20::643]:35089)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1hJ46I-0003HR-Fs
-	for qemu-devel@nongnu.org; Tue, 23 Apr 2019 18:41:18 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1hJ46E-00050C-P1
-	for <qemu-devel@nongnu.org>; Tue, 23 Apr 2019 22:41:15 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 65EEF2E8196
-	for <qemu-devel@nongnu.org>; Tue, 23 Apr 2019 22:41:09 +0000 (UTC)
+	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+	id 1hJ3uT-0005z4-IO
+	for qemu-devel@nongnu.org; Tue, 23 Apr 2019 18:29:06 -0400
+Received: by mail-pl1-x643.google.com with SMTP id w24so8212717plp.2
+	for <qemu-devel@nongnu.org>; Tue, 23 Apr 2019 15:29:05 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+	h=subject:to:references:from:openpgp:message-id:date:user-agent
+	:mime-version:in-reply-to:content-language:content-transfer-encoding;
+	bh=8rj3JOUwXZAX2IMOURsfO+5gQodyIoAh31uqXPbMz84=;
+	b=JIOGjNyQRv3lpuPttGXzI5tMqKa/Czgii4Di3xWlItudA7BmN/JuI0yo3+gZRf5SNQ
+	HDMBeyPIdT/7d2QSrvwHd7JTlmciX/y+0ooWFw9QfJFA0pR+O25xRTbAHBS+5uP3Hc1s
+	z13miUCy2wVsbpLz+Dx70O0JSHHheP0r8CR2RuGIOCedgDXU+PO1qq1ASiyIhB5/xBY7
+	MCGc11FY70wPIhcppW+EClpQCk7jcDdXg6KIDqLix01AarvHs+TO/E/VwNhTWrti/VOq
+	H8csjQfImBvirRuw/u/F/+Vei7w5G3U9oEe79Av7jqs0YqyLMz0vrT/ftbTbwNQmYczD
+	km/g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=1e100.net; s=20161025;
+	h=x-gm-message-state:subject:to:references:from:openpgp:message-id
+	:date:user-agent:mime-version:in-reply-to:content-language
+	:content-transfer-encoding;
+	bh=8rj3JOUwXZAX2IMOURsfO+5gQodyIoAh31uqXPbMz84=;
+	b=ILR53tJRemCdbQ79bKzk0BgXF9j1Z76urPYcorf+N/6yPJLMLGT9/cHhV4hzsUjGn1
+	uGZoTLHvT0c0dAkHYJK4BdfqzUQYvi5nf5/NrqQTkZpYLNQdhmD6/Io2RxuuwG4wHsUp
+	6XOOb+OKG7pOgFzfGrPOPkdBYqNW8hfSuMehoh+4Xoelc4d9S7PzrkWFzibl+HXMQKwB
+	x6fsZI/UmaF48Kr2rs0fvtc/YZw3TgLS5JxIAoupu9llT9svsBEDOsrmrfxcXuHGcaYM
+	mgkbnjYd/FuVXK1e1OuJ+uZ8ob2EgT4A0NYYLH4hsWnfGDVQVrU/KQEbexUz4ZVz/OJH
+	J4Lg==
+X-Gm-Message-State: APjAAAVnaEIsMfaY6lMn0gK0ZMRHZHGjgKq9mR8VytwYFitgEpfNwtko
+	9T5l4pF4/FNGG/CMCDiYScnpyocoSEY=
+X-Google-Smtp-Source: APXvYqyyXkpLgMkiHQr30glC0d2G7ZYtEqNz4lcZVv1afGswhwPmUYQe0ecKR7pHhnC7wxqqxNv76Q==
+X-Received: by 2002:a17:902:8c97:: with SMTP id
+	t23mr28767423plo.110.1556058544439; 
+	Tue, 23 Apr 2019 15:29:04 -0700 (PDT)
+Received: from [192.168.1.11] (97-113-179-147.tukw.qwest.net. [97.113.179.147])
+	by smtp.gmail.com with ESMTPSA id
+	l15sm19214173pfi.79.2019.04.23.15.29.03
+	(version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+	Tue, 23 Apr 2019 15:29:03 -0700 (PDT)
+To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
+	David Hildenbrand <david@redhat.com>, qemu-devel@nongnu.org,
+	"Edgar E. Iglesias" <edgar.iglesias@gmail.com>
+References: <20190420073442.7488-1-richard.henderson@linaro.org>
+	<20190420073442.7488-20-richard.henderson@linaro.org>
+	<e10e5627-25b2-0563-e971-2864256727d6@redhat.com>
+	<0bd7fd6a-1fcb-ac0c-b4bf-7b04ada4443c@redhat.com>
+From: Richard Henderson <richard.henderson@linaro.org>
+Openpgp: preference=signencrypt
+Message-ID: <eebc0218-4334-2b68-9081-a3a4d2d12172@linaro.org>
+Date: Tue, 23 Apr 2019 15:29:01 -0700
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+	Thunderbird/60.6.1
 MIME-Version: 1.0
+In-Reply-To: <0bd7fd6a-1fcb-ac0c-b4bf-7b04ada4443c@redhat.com>
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Tue, 23 Apr 2019 22:31:37 -0000
-From: Erik Kline <1814352@bugs.launchpad.net>
-To: qemu-devel@nongnu.org
-X-Launchpad-Notification-Type: bug
-X-Launchpad-Bug: product=qemu; status=Confirmed; importance=Undecided;
-	assignee=None; 
-X-Launchpad-Bug-Tags: linux-user
-X-Launchpad-Bug-Information-Type: Public
-X-Launchpad-Bug-Private: no
-X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: ekline pmaydell
-X-Launchpad-Bug-Reporter: Erik Kline (ekline)
-X-Launchpad-Bug-Modifier: Erik Kline (ekline)
-References: <154907151753.31178.12938166708527410326.malonedeb@gac.canonical.com>
-Message-Id:
- <155605869747.6483.11709055267790106875.malone@chaenomeles.canonical.com>
-X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
-X-Launchpad-Message-For: qemu-devel-ml
-Precedence: bulk
-X-Generated-By: Launchpad (canonical.com); Revision="18928";
-	Instance="launchpad-lazr.conf"
-X-Launchpad-Hash: 58a5a1858d5949abc7773e4f5a3ce328ba00913a
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 91.189.90.7
-Subject: [Qemu-devel] [Bug 1814352] Re: SIOCGIFNAME takes a struct ifreq not
- an integer
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+	recognized.
+X-Received-From: 2607:f8b0:4864:20::643
+Subject: Re: [Qemu-devel] [PATCH 19/38] tcg: Add support for integer
+ absolute value
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
+Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -79,56 +105,137 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1814352 <1814352@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190423223137.w8R4iO7WvHbq8hhLmai2Wx9DYWNt68Ne_r6uJk7c_fU@z>
+Message-ID: <20190423222901.a4sBsFjbpmLTkIgxVDbHyuObJAjx2Q-89IlKrg1PY9E@z>
 
-Patch sent to the list.  Apologies for the delay.
+On 4/23/19 3:09 PM, Philippe Mathieu-Daudé wrote:
+> On 4/23/19 8:37 PM, David Hildenbrand wrote:
+>> On 20.04.19 09:34, Richard Henderson wrote:
+>>> Remove a function of the same name from target/arm/.
+>>> Use a branchless implementation of abs that gcc uses for x86.
+>>>
+>>> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+>>> ---
+>>>  tcg/tcg-op.h           |  5 +++++
+>>>  target/arm/translate.c | 10 ----------
+>>>  tcg/tcg-op.c           | 20 ++++++++++++++++++++
+>>>  3 files changed, 25 insertions(+), 10 deletions(-)
+>>>
+>>> diff --git a/tcg/tcg-op.h b/tcg/tcg-op.h
+>>> index 472b73cb38..660fe205d0 100644
+>>> --- a/tcg/tcg-op.h
+>>> +++ b/tcg/tcg-op.h
+>>> @@ -335,6 +335,7 @@ void tcg_gen_smin_i32(TCGv_i32, TCGv_i32 arg1, TCGv_i32 arg2);
+>>>  void tcg_gen_smax_i32(TCGv_i32, TCGv_i32 arg1, TCGv_i32 arg2);
+>>>  void tcg_gen_umin_i32(TCGv_i32, TCGv_i32 arg1, TCGv_i32 arg2);
+>>>  void tcg_gen_umax_i32(TCGv_i32, TCGv_i32 arg1, TCGv_i32 arg2);
+>>> +void tcg_gen_abs_i32(TCGv_i32, TCGv_i32);
+>>>  
+>>>  static inline void tcg_gen_discard_i32(TCGv_i32 arg)
+>>>  {
+>>> @@ -534,6 +535,7 @@ void tcg_gen_smin_i64(TCGv_i64, TCGv_i64 arg1, TCGv_i64 arg2);
+>>>  void tcg_gen_smax_i64(TCGv_i64, TCGv_i64 arg1, TCGv_i64 arg2);
+>>>  void tcg_gen_umin_i64(TCGv_i64, TCGv_i64 arg1, TCGv_i64 arg2);
+>>>  void tcg_gen_umax_i64(TCGv_i64, TCGv_i64 arg1, TCGv_i64 arg2);
+>>> +void tcg_gen_abs_i64(TCGv_i64, TCGv_i64);
+>>>  
+>>>  #if TCG_TARGET_REG_BITS == 64
+>>>  static inline void tcg_gen_discard_i64(TCGv_i64 arg)
+>>> @@ -973,6 +975,7 @@ void tcg_gen_nor_vec(unsigned vece, TCGv_vec r, TCGv_vec a, TCGv_vec b);
+>>>  void tcg_gen_eqv_vec(unsigned vece, TCGv_vec r, TCGv_vec a, TCGv_vec b);
+>>>  void tcg_gen_not_vec(unsigned vece, TCGv_vec r, TCGv_vec a);
+>>>  void tcg_gen_neg_vec(unsigned vece, TCGv_vec r, TCGv_vec a);
+>>> +void tcg_gen_abs_vec(unsigned vece, TCGv_vec r, TCGv_vec a);
+>>>  void tcg_gen_ssadd_vec(unsigned vece, TCGv_vec r, TCGv_vec a, TCGv_vec b);
+>>>  void tcg_gen_usadd_vec(unsigned vece, TCGv_vec r, TCGv_vec a, TCGv_vec b);
+>>>  void tcg_gen_sssub_vec(unsigned vece, TCGv_vec r, TCGv_vec a, TCGv_vec b);
+>>> @@ -1019,6 +1022,7 @@ void tcg_gen_stl_vec(TCGv_vec r, TCGv_ptr base, TCGArg offset, TCGType t);
+>>>  #define tcg_gen_addi_tl tcg_gen_addi_i64
+>>>  #define tcg_gen_sub_tl tcg_gen_sub_i64
+>>>  #define tcg_gen_neg_tl tcg_gen_neg_i64
+>>> +#define tcg_gen_abs_tl tcg_gen_abs_i64
+>>>  #define tcg_gen_subfi_tl tcg_gen_subfi_i64
+>>>  #define tcg_gen_subi_tl tcg_gen_subi_i64
+>>>  #define tcg_gen_and_tl tcg_gen_and_i64
+>>> @@ -1131,6 +1135,7 @@ void tcg_gen_stl_vec(TCGv_vec r, TCGv_ptr base, TCGArg offset, TCGType t);
+>>>  #define tcg_gen_addi_tl tcg_gen_addi_i32
+>>>  #define tcg_gen_sub_tl tcg_gen_sub_i32
+>>>  #define tcg_gen_neg_tl tcg_gen_neg_i32
+>>> +#define tcg_gen_abs_tl tcg_gen_abs_i32
+>>>  #define tcg_gen_subfi_tl tcg_gen_subfi_i32
+>>>  #define tcg_gen_subi_tl tcg_gen_subi_i32
+>>>  #define tcg_gen_and_tl tcg_gen_and_i32
+>>> diff --git a/target/arm/translate.c b/target/arm/translate.c
+>>> index 83a008e945..721171794d 100644
+>>> --- a/target/arm/translate.c
+>>> +++ b/target/arm/translate.c
+>>> @@ -603,16 +603,6 @@ static void gen_sar(TCGv_i32 dest, TCGv_i32 t0, TCGv_i32 t1)
+>>>      tcg_temp_free_i32(tmp1);
+>>>  }
+>>>  
+>>> -static void tcg_gen_abs_i32(TCGv_i32 dest, TCGv_i32 src)
+>>> -{
+>>> -    TCGv_i32 c0 = tcg_const_i32(0);
+>>> -    TCGv_i32 tmp = tcg_temp_new_i32();
+>>> -    tcg_gen_neg_i32(tmp, src);
+>>> -    tcg_gen_movcond_i32(TCG_COND_GT, dest, src, c0, src, tmp);
+>>> -    tcg_temp_free_i32(c0);
+>>> -    tcg_temp_free_i32(tmp);
+>>> -}
+>>> -
+>>>  static void shifter_out_im(TCGv_i32 var, int shift)
+>>>  {
+>>>      if (shift == 0) {
+>>> diff --git a/tcg/tcg-op.c b/tcg/tcg-op.c
+>>> index a00d1df37e..0ac291f1c4 100644
+>>> --- a/tcg/tcg-op.c
+>>> +++ b/tcg/tcg-op.c
+>>> @@ -1091,6 +1091,16 @@ void tcg_gen_umax_i32(TCGv_i32 ret, TCGv_i32 a, TCGv_i32 b)
+>>>      tcg_gen_movcond_i32(TCG_COND_LTU, ret, a, b, b, a);
+>>>  }
+>>>  
+>>> +void tcg_gen_abs_i32(TCGv_i32 ret, TCGv_i32 a)
+>>> +{
+>>> +    TCGv_i32 t = tcg_temp_new_i32();
+>>> +
+>>> +    tcg_gen_sari_i32(t, a, 31);
+>>> +    tcg_gen_xor_i32(ret, a, t);
+>>> +    tcg_gen_sub_i32(ret, ret, t);
+>>> +    tcg_temp_free_i32(t);
+>>> +}
+>>> +
+>>>  /* 64-bit ops */
+>>>  
+>>>  #if TCG_TARGET_REG_BITS == 32
+>>> @@ -2548,6 +2558,16 @@ void tcg_gen_umax_i64(TCGv_i64 ret, TCGv_i64 a, TCGv_i64 b)
+>>>      tcg_gen_movcond_i64(TCG_COND_LTU, ret, a, b, b, a);
+>>>  }
+>>>  
+>>> +void tcg_gen_abs_i64(TCGv_i64 ret, TCGv_i64 a)
+>>> +{
+>>> +    TCGv_i64 t = tcg_temp_new_i64();
+>>> +
+>>> +    tcg_gen_sari_i64(t, a, 63);
+>>> +    tcg_gen_xor_i64(ret, a, t);
+>>> +    tcg_gen_sub_i64(ret, ret, t);
+>>> +    tcg_temp_free_i64(t);
+>>> +}
+>>> +
+>>>  /* Size changing operations.  */
+>>>  
+>>>  void tcg_gen_extrl_i64_i32(TCGv_i32 ret, TCGv_i64 arg)
+>>>
+>>
+>> Nice trick
+> 
+> Per commit 7dcfb0897b99, I think it's worth a:
+> 
+> Inspired-by: Edgar E. Iglesias <edgar.iglesias@gmail.com>
 
--- =
+*shrug* As per the comment, I got the sequence from gcc -O2 -S.
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1814352
 
-Title:
-  SIOCGIFNAME takes a struct ifreq not an integer
-
-Status in QEMU:
-  Confirmed
-
-Bug description:
-  The ioctl SIOCGIFNAME takes a pointer to a struct ifreq, not an
-  integer.  This leads to if_indextoname() not correctly returning
-  interface names (well, not if they're longer than 4 characters
-  including the trailing NULL ;-).
-
-  This is observed on v3.1.0.
-
-  The following one-line patch will be sent to the qemu-devel mailing
-  list:
-
-  """
-  diff --git a/linux-user/ioctls.h b/linux-user/ioctls.h
-  index ae8951625f..37501f575c 100644
-  --- a/linux-user/ioctls.h
-  +++ b/linux-user/ioctls.h
-  @@ -178,7 +178,7 @@
-   #endif /* CONFIG_USBFS */
-   =
-
-     IOCTL(SIOCATMARK, IOC_R, MK_PTR(TYPE_INT))
-  -  IOCTL(SIOCGIFNAME, IOC_RW, MK_PTR(TYPE_INT))
-  +  IOCTL(SIOCGIFNAME, IOC_RW, MK_PTR(MK_STRUCT(STRUCT_int_ifreq)))
-     IOCTL(SIOCGIFFLAGS, IOC_W | IOC_R, MK_PTR(MK_STRUCT(STRUCT_short_ifreq=
-)))
-     IOCTL(SIOCSIFFLAGS, IOC_W, MK_PTR(MK_STRUCT(STRUCT_short_ifreq)))
-     IOCTL(SIOCGIFADDR, IOC_W | IOC_R, MK_PTR(MK_STRUCT(STRUCT_sockaddr_ifr=
-eq)))
-  """
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1814352/+subscriptions
+r~
 
