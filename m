@@ -1,25 +1,29 @@
-Received: from eggs.gnu.org ([209.51.188.92]:36713)
+Received: from eggs.gnu.org ([209.51.188.92]:36937)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1hIqMJ-0007Z5-4H
-	for qemu-devel@nongnu.org; Tue, 23 Apr 2019 04:00:57 -0400
+	(envelope-from <kwolf@redhat.com>) id 1hIqMz-000860-De
+	for qemu-devel@nongnu.org; Tue, 23 Apr 2019 04:01:38 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1hIqMI-0001X7-1p
-	for qemu-devel@nongnu.org; Tue, 23 Apr 2019 04:00:55 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:53854)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <david@redhat.com>) id 1hIqMH-0001Uw-Pe
-	for qemu-devel@nongnu.org; Tue, 23 Apr 2019 04:00:53 -0400
-References: <20190420073442.7488-1-richard.henderson@linaro.org>
-	<20190420073442.7488-2-richard.henderson@linaro.org>
-From: David Hildenbrand <david@redhat.com>
-Message-ID: <606d1286-b0e0-b84b-afc4-9757eb70c417@redhat.com>
-Date: Tue, 23 Apr 2019 10:00:47 +0200
+	(envelope-from <kwolf@redhat.com>) id 1hIqMx-0001qk-Fj
+	for qemu-devel@nongnu.org; Tue, 23 Apr 2019 04:01:37 -0400
+Date: Tue, 23 Apr 2019 09:56:19 +0200
+From: Kevin Wolf <kwolf@redhat.com>
+Message-ID: <20190423075619.GB9041@localhost.localdomain>
+References: <20190411105025.97397-2-sgarzare@redhat.com>
+	<CA+aFP1AMzNjWtMeGy4MpWBa26qxShgciYkcEZ8mkSmDrtCvfqA@mail.gmail.com>
+	<20190411130245.ltfyp7d2dfe2cr3h@steredhat>
+	<CA+aFP1B7ZZ_xwNOfMbKUzEjYbMH=9dJstLYEyVq4LphPR81u0Q@mail.gmail.com>
+	<20190414132008.uxoia6avdpp4jov6@steredhat.homenet.telecomitalia.it>
+	<CA+aFP1D8VYcnwWpB=4PzAdBKr+YK-r8bSwzKKUCkH7jT3kVvoQ@mail.gmail.com>
+	<20190415080452.GA6031@localhost.localdomain>
+	<20190417073438.r57lemi6emu4x3ld@steredhat>
+	<20190417080443.GA8330@localhost.localdomain>
+	<20190419122356.7dmwwdbtnzgimydw@steredhat>
 MIME-Version: 1.0
-In-Reply-To: <20190420073442.7488-2-richard.henderson@linaro.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 01/38] target/arm: Fill in .opc for cmtst_op
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20190419122356.7dmwwdbtnzgimydw@steredhat>
+Subject: Re: [Qemu-devel] [PATCH RFC 1/1] block/rbd: increase dynamically
+ the image size
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,48 +32,74 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Richard Henderson <richard.henderson@linaro.org>, qemu-devel@nongnu.org
+To: Stefano Garzarella <sgarzare@redhat.com>
+Cc: dillaman@redhat.com, qemu-devel <qemu-devel@nongnu.org>, Josh Durgin <jdurgin@redhat.com>, qemu-block <qemu-block@nongnu.org>, Max Reitz <mreitz@redhat.com>
 
-On 20.04.19 09:34, Richard Henderson wrote:
-> This allows us to fall back to integers if the tcg backend
-> does not support comparisons in the given vece.
+Am 19.04.2019 um 14:23 hat Stefano Garzarella geschrieben:
+> Hi Kevin,
 > 
-> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
-> ---
->  target/arm/translate.c | 4 ++++
->  1 file changed, 4 insertions(+)
+> On Wed, Apr 17, 2019 at 10:04:43AM +0200, Kevin Wolf wrote:
+> > Am 17.04.2019 um 09:34 hat Stefano Garzarella geschrieben:
+> > > On Mon, Apr 15, 2019 at 10:04:52AM +0200, Kevin Wolf wrote:
+> > > > 
+> > > > I think a potential actual use case could be persistent dirty bitmaps
+> > > > for incremental backup. Though maybe that would be better served by
+> > > > using the rbd image just as a raw external data file and keeping the
+> > > > qcow2 metadata on a filesystem.
+> > > 
+> > > Thanks to point it out! I'll take a look to understand how to keep
+> > > metadata separated from the data.
+> > 
+> > I'd consider the feature still experimental, but for local files, it
+> > works like this:
+> > 
+> >     qemu-img create -f qcow2 -o data_file=test.raw test.qcow2 4G
+> > 
+> > And then just use test.qcow2. As long as you can put everything you need
+> > into an rbd URL, the same approach should work. Otherwise, you may need
+> > to use QMP blockdev-create on creation and possibly the data-file option
+> > of the qcow2 driver for opening.
 > 
-> diff --git a/target/arm/translate.c b/target/arm/translate.c
-> index d408e4d7ef..13e2dc6562 100644
-> --- a/target/arm/translate.c
-> +++ b/target/arm/translate.c
-> @@ -6140,16 +6140,20 @@ static void gen_cmtst_vec(unsigned vece, TCGv_vec d, TCGv_vec a, TCGv_vec b)
->  const GVecGen3 cmtst_op[4] = {
->      { .fni4 = gen_helper_neon_tst_u8,
->        .fniv = gen_cmtst_vec,
-> +      .opc = INDEX_op_cmp_vec,
->        .vece = MO_8 },
->      { .fni4 = gen_helper_neon_tst_u16,
->        .fniv = gen_cmtst_vec,
-> +      .opc = INDEX_op_cmp_vec,
->        .vece = MO_16 },
->      { .fni4 = gen_cmtst_i32,
->        .fniv = gen_cmtst_vec,
-> +      .opc = INDEX_op_cmp_vec,
->        .vece = MO_32 },
->      { .fni8 = gen_cmtst_i64,
->        .fniv = gen_cmtst_vec,
->        .prefer_i64 = TCG_TARGET_REG_BITS == 64,
-> +      .opc = INDEX_op_cmp_vec,
->        .vece = MO_64 },
->  };
->  
+> Very interesting, I'll try to add this support also in the rbd driver.
+
+I don't understand - what is the thing you want to add to the rbd driver?
+qcow2 doesn't need special protocol driver support for doing this, and I
+don't think the QEMU rbd driver has any metadata that could be split off.
+
+> > > > How fast is rbd_resize()? Does automatically resizing for every write
+> > > > request actually work reasonably well in practice? If it does, there is
+> > > > probably little reason not to allow it, even if the use cases are rather
+> > > > obscure.
+> > > 
+> > > I'll try to measure the percentage of the time spent in the rbd_resize.
+> > > 
+> > > Another solution could be to pass to the rbd driver the virtual size of
+> > > the image and resize it only one time also if the preallocation is
+> > > disabled, because RBD will not allocate blocks but IIUC it only set the max
+> > > size.
+> > > 
+> > > Do you think make sense? Is it feasible?
+> > 
+> > In theory yes, though it requires modification of every driver that
+> > should be usable together with rbd (i.e. ideally all of the drivers). If
+> > automatic resize works good enough, I'd prefer that
 > 
+> I did some tests and it seems that the cost of rbd_resize() is
+> negligible. IIUC it only updates the metadata without allocating any
+> blocks (if we are growing, like that case).
+> 
+> Anyway the automatic resize will not affect the current use-case (raw
+> images on rbd), where the file size is set during the creation, so I
+> think there should not be side effects with this patch.
 
-Reviewed-by: David Hildenbrand <david@redhat.com>
+Okay, sounds good.
 
--- 
+> I'm also adding the support for preallocation (i.e. full) in the rbd
+> driver that can be useful for qcow2 images.
+> 
+> If you prefer I can resend this patch with the preallocation series.
 
-Thanks,
+Let's keep seperate things separate. Huge patch series are always harder
+to handle.
 
-David / dhildenb
+Kevin
