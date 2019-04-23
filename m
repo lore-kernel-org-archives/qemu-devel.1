@@ -1,30 +1,28 @@
-Received: from eggs.gnu.org ([209.51.188.92]:44239)
+Received: from eggs.gnu.org ([209.51.188.92]:45243)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1hJ3Pf-00087A-7n
-	for qemu-devel@nongnu.org; Tue, 23 Apr 2019 17:57:16 -0400
+	(envelope-from <philmd@redhat.com>) id 1hJ3RI-0000Td-7c
+	for qemu-devel@nongnu.org; Tue, 23 Apr 2019 17:58:57 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1hJ3Pd-0004Ya-37
-	for qemu-devel@nongnu.org; Tue, 23 Apr 2019 17:57:15 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:37206)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <david@redhat.com>) id 1hJ3Pc-0004SY-5M
-	for qemu-devel@nongnu.org; Tue, 23 Apr 2019 17:57:13 -0400
-References: <20190420073442.7488-1-richard.henderson@linaro.org>
-	<20190420073442.7488-13-richard.henderson@linaro.org>
-	<ab0269a3-c0fd-44c4-f939-e3f073e8e2dd@redhat.com>
-	<a32e78bf-e4e4-a808-0c42-95e3b64ed1cf@linaro.org>
-	<a2cca8a8-24ca-679e-22ce-500bf111ac8f@redhat.com>
-	<952ddc67-8012-eb87-3f1f-8ef1f27b93da@linaro.org>
-From: David Hildenbrand <david@redhat.com>
-Message-ID: <64073447-ca7b-194d-8080-29da74c6e487@redhat.com>
-Date: Tue, 23 Apr 2019 23:57:01 +0200
+	(envelope-from <philmd@redhat.com>) id 1hJ3RG-0006Gw-Vn
+	for qemu-devel@nongnu.org; Tue, 23 Apr 2019 17:58:56 -0400
+Received: from mail-wm1-f65.google.com ([209.85.128.65]:34048)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1hJ3RG-0006Ci-OE
+	for qemu-devel@nongnu.org; Tue, 23 Apr 2019 17:58:54 -0400
+Received: by mail-wm1-f65.google.com with SMTP id r186so3172028wmf.1
+	for <qemu-devel@nongnu.org>; Tue, 23 Apr 2019 14:58:53 -0700 (PDT)
+References: <20180106153730.30313-1-hpoussin@reactos.org>
+	<20180106153730.30313-13-hpoussin@reactos.org>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Message-ID: <f6179552-cc21-0935-ddea-7bbdeecddac3@redhat.com>
+Date: Tue, 23 Apr 2019 23:58:50 +0200
 MIME-Version: 1.0
-In-Reply-To: <952ddc67-8012-eb87-3f1f-8ef1f27b93da@linaro.org>
+In-Reply-To: <20180106153730.30313-13-hpoussin@reactos.org>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 12/38] tcg: Add gvec expanders for variable
- shift
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH v4 12/16] piix4: add a mc146818rtc
+ controller as specified in datasheet
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,75 +31,122 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Richard Henderson <richard.henderson@linaro.org>, qemu-devel@nongnu.org
+To: =?UTF-8?Q?Herv=c3=a9_Poussineau?= <hpoussin@reactos.org>, "Michael S . Tsirkin" <mst@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
+Cc: Aurelien Jarno <aurelien@aurel32.net>, qemu-devel@nongnu.org
 
-On 23.04.19 23:40, Richard Henderson wrote:
-> On 4/23/19 2:02 PM, David Hildenbrand wrote:
->> On 23.04.19 21:28, Richard Henderson wrote:
->>> On 4/23/19 12:04 PM, David Hildenbrand wrote:
->>>> In order to use this on s390x for VECTOR ELEMENT SHIFT, like
->>>>
->>>> +static DisasJumpType op_vesv(DisasContext *s, DisasOps *o)
->>>> +{
->>>> +    const uint8_t es = get_field(s->fields, m4);
->>>> +    const uint8_t v1 = get_field(s->fields, v1);
->>>> +    const uint8_t v2 = get_field(s->fields, v2);
->>>> +    const uint8_t v3 = get_field(s->fields, v3);
->>>> +
->>>> +    if (es > ES_64) {
->>>> +        gen_program_exception(s, PGM_SPECIFICATION);
->>>> +        return DISAS_NORETURN;
->>>> +    }
->>>> +
->>>> +    switch (s->fields->op2) {
->>>> +    case 0x70:
->>>> +        gen_gvec_fn_3(shlv, es, v1, v2, v3);
->>>> +        break;
->>>> +    case 0x7a:
->>>> +        gen_gvec_fn_3(sarv, es, v1, v2, v3);
->>>> +        break;
->>>> +    case 0x78:
->>>> +        gen_gvec_fn_3(shrv, es, v1, v2, v3);
->>>> +        break;
->>>> +    default:
->>>> +        g_assert_not_reached();
->>>> +    }
->>>> +
->>>> +    return DISAS_NEXT;
->>>> +}
->>>>
->>>> We need to mask of invalid bits from the shift. Can that be added?
->>>
->>> Yes, I do exactly this in patch 31 for target/ppc.
->>>
->>>
->>> r~
->>>
->>
->> Got it, so not via a generic gvec expansion. Thanks!
+Hi Hervé,
+
+I haven't forgot this series (still 15 months passed...) and it is now
+integrated in a bigger one. While retesting the whole previous to post,
+I noticed an error...
+
+On 1/6/18 4:37 PM, Hervé Poussineau wrote:
+> Remove mc146818rtc instanciated in malta board, to not have it twice.
 > 
-> I do wonder if I *should* make the truncating expansion the
-> generic gvec expansion.  It would be usable from two targets
-> at least...
+> Acked-by: Michael S. Tsirkin <mst@redhat.com>
+> Acked-by: Paolo Bonzini <pbonzini@redhat.com>
+> Signed-off-by: Hervé Poussineau <hpoussin@reactos.org>
+> ---
+>  hw/isa/piix4.c       | 12 ++++++++++++
+>  hw/mips/mips_malta.c |  5 -----
+>  2 files changed, 12 insertions(+), 5 deletions(-)
 > 
-> Because the one's that *don't* truncate in hardware will
-> still have to have their own custom expansion code.
+> diff --git a/hw/isa/piix4.c b/hw/isa/piix4.c
+> index 7a13e83270..0d68fcb193 100644
+> --- a/hw/isa/piix4.c
+> +++ b/hw/isa/piix4.c
+> @@ -31,6 +31,7 @@
+>  #include "hw/char/isa.h"
+>  #include "hw/sysbus.h"
+>  #include "hw/timer/i8254.h"
+> +#include "hw/timer/mc146818rtc.h"
+>  #include "qapi/error.h"
+>  
+>  PCIDevice *piix4_dev;
+> @@ -43,6 +44,7 @@ typedef struct PIIX4State {
+>      FDCtrlISABus floppy;
+>      ISASerialState serial[2];
+>      ISAParallelState parallel;
+> +    RTCState rtc;
+>  
+>      /* Reset Control Register */
+>      MemoryRegion rcr_mem;
+> @@ -217,6 +219,15 @@ static void piix4_realize(PCIDevice *pci_dev, Error **errp)
+>          return;
+>      }
+>  
+> +    /* timer */
+> +    qdev_set_parent_bus(DEVICE(&s->rtc), BUS(isa_bus));
+
+... here. You don't set the "base_year" property.
+If unset, the default of 1980 is used.
+However ...
+
+> +    object_property_set_bool(OBJECT(&s->rtc), true, "realized", &err);
+> +    if (err) {
+> +        error_propagate(errp, err);
+> +        return;
+> +    }
+> +    isa_init_irq(ISA_DEVICE(&s->rtc), &s->rtc.irq, RTC_ISA_IRQ);
+> +
+>      piix4_dev = pci_dev;
+>      qemu_register_reset(piix4_reset, s);
+>  }
+> @@ -231,6 +242,7 @@ static void piix4_init(Object *obj)
+>          object_initialize(&s->serial[i], sizeof(s->serial[i]), TYPE_ISA_SERIAL);
+>      }
+>      object_initialize(&s->parallel, sizeof(s->parallel), TYPE_ISA_PARALLEL);
+> +    object_initialize(&s->rtc, sizeof(s->rtc), TYPE_MC146818_RTC);
+>  
+>      object_property_add_alias(obj, "floppy", OBJECT(&s->floppy), "driveA",
+>                                &error_abort);
+> diff --git a/hw/mips/mips_malta.c b/hw/mips/mips_malta.c
+> index 30fb30fc0e..3d304a6e0a 100644
+> --- a/hw/mips/mips_malta.c
+> +++ b/hw/mips/mips_malta.c
+> @@ -995,7 +995,6 @@ void mips_malta_init(MachineState *machine)
+>      uint8_t *smbus_eeprom_buf = g_malloc0(smbus_eeprom_size);
+>      int64_t kernel_entry, bootloader_run_addr;
+>      PCIBus *pci_bus;
+> -    ISABus *isa_bus;
+>      qemu_irq cbus_irq, i8259_irq;
+>      PCIDevice *pci;
+>      int piix4_devfn;
+> @@ -1197,7 +1196,6 @@ void mips_malta_init(MachineState *machine)
+>      qdev_prop_set_chr(dev, "parallel", parallel_hds[0]);
+>  
+>      qdev_init_nofail(dev);
+> -    isa_bus = ISA_BUS(qdev_get_child_bus(dev, "isa.0"));
+>      piix4_devfn = pci->devfn;
+>  
+>      /* Interrupt controller */
+> @@ -1213,9 +1211,6 @@ void mips_malta_init(MachineState *machine)
+>      smbus_eeprom_init(smbus, 8, smbus_eeprom_buf, smbus_eeprom_size);
+>      g_free(smbus_eeprom_buf);
+>  
+> -    /* Super I/O */
+> -    mc146818_rtc_init(isa_bus, 2000, NULL);
+
+... here it is set to 2000.
+The same value is used in the PC machine (which uses the PIIX3).
+
+> -
+>      /* Network card */
+>      network_init(pci_bus);
+>  
 > 
-> Thoughts?
-> 
 
-Exactly what I had in mind. I wonder if the same applies to all shift
-helpers/expansions. Expected behavior (mask off bits) is always better
-than unexpected behavior. But of course I might be wrong. At least, here
-I would vote for doing the truncation in the generic gvec expansion.
+I'll amend this snippet to your patch:
 
-> 
-> r~
-> 
+-- >8 --
+     /* RTC */
+     qdev_set_parent_bus(DEVICE(&s->rtc), BUS(isa_bus));
++    qdev_prop_set_int32(DEVICE(&s->rtc), "base_year", 2000);
+     object_property_set_bool(OBJECT(&s->rtc), true, "realized", &err);
+--
 
+Paolo/Michael: I'll keep your Acked-by, I hope you are OK with that.
 
--- 
+Regards,
 
-Thanks,
-
-David / dhildenb
+Phil.
