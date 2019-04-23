@@ -6,47 +6,48 @@ X-Spam-Status: No, score=-8.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED,
 	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AC932C282DD
-	for <qemu-devel@archiver.kernel.org>; Tue, 23 Apr 2019 12:58:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4676DC10F14
+	for <qemu-devel@archiver.kernel.org>; Tue, 23 Apr 2019 13:00:31 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7E4C9214AE
-	for <qemu-devel@archiver.kernel.org>; Tue, 23 Apr 2019 12:58:45 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7E4C9214AE
+	by mail.kernel.org (Postfix) with ESMTPS id 19E99206A3
+	for <qemu-devel@archiver.kernel.org>; Tue, 23 Apr 2019 13:00:31 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 19E99206A3
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:53416 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:53507 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hIv0W-0005Dq-Pc
-	for qemu-devel@archiver.kernel.org; Tue, 23 Apr 2019 08:58:44 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:54904)
+	id 1hIv2E-0006eU-ES
+	for qemu-devel@archiver.kernel.org; Tue, 23 Apr 2019 09:00:30 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:54909)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1hIuz2-0004J2-RG
+	(envelope-from <vsementsov@virtuozzo.com>) id 1hIuz3-0004J4-2P
 	for qemu-devel@nongnu.org; Tue, 23 Apr 2019 08:57:14 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1hIuz1-0004wi-DA
-	for qemu-devel@nongnu.org; Tue, 23 Apr 2019 08:57:12 -0400
-Received: from relay.sw.ru ([185.231.240.75]:42554)
+	(envelope-from <vsementsov@virtuozzo.com>) id 1hIuz1-0004xI-OS
+	for qemu-devel@nongnu.org; Tue, 23 Apr 2019 08:57:13 -0400
+Received: from relay.sw.ru ([185.231.240.75]:42556)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
-	id 1hIuz1-0004um-50; Tue, 23 Apr 2019 08:57:11 -0400
+	id 1hIuz1-0004uo-H9; Tue, 23 Apr 2019 08:57:11 -0400
 Received: from [10.28.8.145] (helo=kvm.sw.ru)
 	by relay.sw.ru with esmtp (Exim 4.91)
 	(envelope-from <vsementsov@virtuozzo.com>)
-	id 1hIuyx-0001B4-7h; Tue, 23 Apr 2019 15:57:07 +0300
+	id 1hIuyw-0001B4-Vt; Tue, 23 Apr 2019 15:57:07 +0300
 From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 To: qemu-devel@nongnu.org,
 	qemu-block@nongnu.org
-Date: Tue, 23 Apr 2019 15:57:06 +0300
-Message-Id: <20190423125706.26989-4-vsementsov@virtuozzo.com>
+Date: Tue, 23 Apr 2019 15:57:05 +0300
+Message-Id: <20190423125706.26989-3-vsementsov@virtuozzo.com>
 X-Mailer: git-send-email 2.18.0
 In-Reply-To: <20190423125706.26989-1-vsementsov@virtuozzo.com>
 References: <20190423125706.26989-1-vsementsov@virtuozzo.com>
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x
 X-Received-From: 185.231.240.75
-Subject: [Qemu-devel] [PATCH v5 3/3] iotests: test big qcow2 shrink
+Subject: [Qemu-devel] [PATCH v5 2/3] block/io: bdrv_pdiscard: support
+ int64_t bytes parameter
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -64,137 +65,94 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 Content-Type: text/plain; charset="UTF-8"
-Message-ID: <20190423125706.PBvzkM4qCyV6nr4W797S2YgOS1DTCKk-rVJCvsDY0LI@z>
+Message-ID: <20190423125705.mXmp97hu6kGEPGBHWJZUqIPS3Ga8BKJ2js3Hh3P_haM@z>
 
-This test checks bug in qcow2_process_discards, fixed by previous
-commit.
+This fixes at least one overflow in qcow2_process_discards, which
+passes 64bit region length to bdrv_pdiscard where bytes (or sectors in
+the past) parameter is int since its introduction in 0b919fae.
 
 Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 ---
- tests/qemu-iotests/250     | 73 ++++++++++++++++++++++++++++++++++++++
- tests/qemu-iotests/250.out | 23 ++++++++++++
- tests/qemu-iotests/group   |  1 +
- 3 files changed, 97 insertions(+)
- create mode 100755 tests/qemu-iotests/250
- create mode 100644 tests/qemu-iotests/250.out
+ include/block/block.h |  4 ++--
+ block/io.c            | 16 ++++++++--------
+ 2 files changed, 10 insertions(+), 10 deletions(-)
 
-diff --git a/tests/qemu-iotests/250 b/tests/qemu-iotests/250
-new file mode 100755
-index 0000000000..850e3546ca
---- /dev/null
-+++ b/tests/qemu-iotests/250
-@@ -0,0 +1,73 @@
-+#!/usr/bin/env bash
-+#
-+# Test big discard in qcow2 shrink
-+#
-+# Copyright (c) 2019 Virtuozzo International GmbH. All rights reserved.
-+#
-+# This program is free software; you can redistribute it and/or modify
-+# it under the terms of the GNU General Public License as published by
-+# the Free Software Foundation; either version 2 of the License, or
-+# (at your option) any later version.
-+#
-+# This program is distributed in the hope that it will be useful,
-+# but WITHOUT ANY WARRANTY; without even the implied warranty of
-+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+# GNU General Public License for more details.
-+#
-+# You should have received a copy of the GNU General Public License
-+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
-+#
-+
-+# creator
-+owner=vsementsov@virtuozzo.com
-+
-+seq=`basename $0`
-+echo "QA output created by $seq"
-+
-+status=1	# failure is the default!
-+
-+_cleanup()
-+{
-+    _cleanup_test_img
-+}
-+trap "_cleanup; exit \$status" 0 1 2 3 15
-+
-+# get standard environment, filters and checks
-+. ./common.rc
-+. ./common.filter
-+
-+_supported_fmt qcow2
-+_supported_proto file
-+_supported_os Linux
-+
-+# This test checks that qcow2_process_discards does not truncate a discard
-+# request > 2G.
-+# To reproduce bug we need to overflow int by one sequential discard, so we
-+# need size > 2G, bigger cluster size (as with default 64k we may have maximum
-+# of 512M sequential data, corresponding to one L1 entry), and we need some
-+# data of the beginning of the disk mapped to the end of file to prevent
-+# bdrv_co_truncate(bs->file) call in qcow2_co_truncate(), which might succeed
-+# anyway.
-+
-+size=2100M
-+IMGOPTS="cluster_size=1M,preallocation=metadata"
-+
-+_make_test_img $size
-+$QEMU_IO -c 'discard 0 10M' -c 'discard 2090M 10M' \
-+         -c 'write 2090M 10M' -c 'write 0 10M' "$TEST_IMG" | _filter_qemu_io
-+
-+# Check that our trick with swapping first and last 10M chunks succeeded.
-+# Otherwise test may pass even if bdrv_pdiscard() fails in
-+# qcow2_process_discards()
-+$QEMU_IMG map "$TEST_IMG" | _filter_testdir
-+
-+$QEMU_IMG map -f raw "$TEST_IMG" |  _filter_testdir
-+
-+$QEMU_IMG resize --shrink "$TEST_IMG" 5M
-+
-+$QEMU_IMG map -f raw "$TEST_IMG" | _filter_testdir
-+
-+# success, all done
-+echo "*** done"
-+rm -f $seq.full
-+status=0
-diff --git a/tests/qemu-iotests/250.out b/tests/qemu-iotests/250.out
-new file mode 100644
-index 0000000000..49baee5eee
---- /dev/null
-+++ b/tests/qemu-iotests/250.out
-@@ -0,0 +1,23 @@
-+QA output created by 250
-+Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=2202009600 preallocation=metadata
-+discard 10485760/10485760 bytes at offset 0
-+10 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+discard 10485760/10485760 bytes at offset 2191523840
-+10 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+wrote 10485760/10485760 bytes at offset 2191523840
-+10 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+wrote 10485760/10485760 bytes at offset 0
-+10 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+Offset          Length          Mapped to       File
-+0               0xa00000        0x82f00000      TEST_DIR/t.qcow2
-+0x82a00000      0xa00000        0x500000        TEST_DIR/t.qcow2
-+Offset          Length          Mapped to       File
-+0               0x301000        0               TEST_DIR/t.qcow2
-+0x400000        0xb00000        0x400000        TEST_DIR/t.qcow2
-+0x82f00000      0xa00000        0x82f00000      TEST_DIR/t.qcow2
-+Image resized.
-+Offset          Length          Mapped to       File
-+0               0x301000        0               TEST_DIR/t.qcow2
-+0x400000        0x100000        0x400000        TEST_DIR/t.qcow2
-+0x82f00000      0x500000        0x82f00000      TEST_DIR/t.qcow2
-+*** done
-diff --git a/tests/qemu-iotests/group b/tests/qemu-iotests/group
-index bae7718380..588ae8b8b1 100644
---- a/tests/qemu-iotests/group
-+++ b/tests/qemu-iotests/group
-@@ -248,3 +248,4 @@
- 246 rw auto quick
- 247 rw auto quick
- 248 rw auto quick
-+250 rw auto quick
+diff --git a/include/block/block.h b/include/block/block.h
+index c7a26199aa..69fa18867e 100644
+--- a/include/block/block.h
++++ b/include/block/block.h
+@@ -432,8 +432,8 @@ void bdrv_drain_all(void);
+     AIO_WAIT_WHILE(bdrv_get_aio_context(bs_),              \
+                    cond); })
+ 
+-int bdrv_pdiscard(BdrvChild *child, int64_t offset, int bytes);
+-int bdrv_co_pdiscard(BdrvChild *child, int64_t offset, int bytes);
++int bdrv_pdiscard(BdrvChild *child, int64_t offset, int64_t bytes);
++int bdrv_co_pdiscard(BdrvChild *child, int64_t offset, int64_t bytes);
+ int bdrv_has_zero_init_1(BlockDriverState *bs);
+ int bdrv_has_zero_init(BlockDriverState *bs);
+ bool bdrv_unallocated_blocks_are_zero(BlockDriverState *bs);
+diff --git a/block/io.c b/block/io.c
+index dfc153b8d8..16b6c5d855 100644
+--- a/block/io.c
++++ b/block/io.c
+@@ -2653,7 +2653,7 @@ int bdrv_flush(BlockDriverState *bs)
+ typedef struct DiscardCo {
+     BdrvChild *child;
+     int64_t offset;
+-    int bytes;
++    int64_t bytes;
+     int ret;
+ } DiscardCo;
+ static void coroutine_fn bdrv_pdiscard_co_entry(void *opaque)
+@@ -2664,14 +2664,15 @@ static void coroutine_fn bdrv_pdiscard_co_entry(void *opaque)
+     aio_wait_kick();
+ }
+ 
+-int coroutine_fn bdrv_co_pdiscard(BdrvChild *child, int64_t offset, int bytes)
++int coroutine_fn bdrv_co_pdiscard(BdrvChild *child, int64_t offset,
++                                  int64_t bytes)
+ {
+     BdrvTrackedRequest req;
+     int max_pdiscard, ret;
+     int head, tail, align;
+     BlockDriverState *bs = child->bs;
+ 
+-    if (!bs || !bs->drv) {
++    if (!bs || !bs->drv || !bdrv_is_inserted(bs)) {
+         return -ENOMEDIUM;
+     }
+ 
+@@ -2679,9 +2680,8 @@ int coroutine_fn bdrv_co_pdiscard(BdrvChild *child, int64_t offset, int bytes)
+         return -EPERM;
+     }
+ 
+-    ret = bdrv_check_byte_request(bs, offset, bytes);
+-    if (ret < 0) {
+-        return ret;
++    if (offset < 0 || bytes < 0 || bytes > INT64_MAX - offset) {
++        return -EIO;
+     }
+ 
+     /* Do nothing if disabled.  */
+@@ -2716,7 +2716,7 @@ int coroutine_fn bdrv_co_pdiscard(BdrvChild *child, int64_t offset, int bytes)
+     assert(max_pdiscard >= bs->bl.request_alignment);
+ 
+     while (bytes > 0) {
+-        int num = bytes;
++        int64_t num = bytes;
+ 
+         if (head) {
+             /* Make small requests to get to alignment boundaries. */
+@@ -2778,7 +2778,7 @@ out:
+     return ret;
+ }
+ 
+-int bdrv_pdiscard(BdrvChild *child, int64_t offset, int bytes)
++int bdrv_pdiscard(BdrvChild *child, int64_t offset, int64_t bytes)
+ {
+     Coroutine *co;
+     DiscardCo rwco = {
 -- 
 2.18.0
 
