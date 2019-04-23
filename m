@@ -6,59 +6,58 @@ X-Spam-Status: No, score=-6.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS
 	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 61598C10F14
-	for <qemu-devel@archiver.kernel.org>; Tue, 23 Apr 2019 08:28:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CAC3FC10F14
+	for <qemu-devel@archiver.kernel.org>; Tue, 23 Apr 2019 08:28:43 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id AAD8320645
-	for <qemu-devel@archiver.kernel.org>; Tue, 23 Apr 2019 08:28:33 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AAD8320645
+	by mail.kernel.org (Postfix) with ESMTPS id 80FB620645
+	for <qemu-devel@archiver.kernel.org>; Tue, 23 Apr 2019 08:28:43 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 80FB620645
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:49987 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:49989 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hIqn2-0001SR-Kj
-	for qemu-devel@archiver.kernel.org; Tue, 23 Apr 2019 04:28:32 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:40573)
+	id 1hIqnC-0001e4-NI
+	for qemu-devel@archiver.kernel.org; Tue, 23 Apr 2019 04:28:42 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:40511)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pagupta@redhat.com>) id 1hIqhF-0004wt-7s
-	for qemu-devel@nongnu.org; Tue, 23 Apr 2019 04:22:34 -0400
+	(envelope-from <pagupta@redhat.com>) id 1hIqh9-0004tA-14
+	for qemu-devel@nongnu.org; Tue, 23 Apr 2019 04:22:28 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pagupta@redhat.com>) id 1hIqRz-0004rz-Ih
-	for qemu-devel@nongnu.org; Tue, 23 Apr 2019 04:06:49 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:43558)
+	(envelope-from <pagupta@redhat.com>) id 1hIqSg-0005NV-JA
+	for qemu-devel@nongnu.org; Tue, 23 Apr 2019 04:07:31 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:53668)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pagupta@redhat.com>) id 1hIqRx-0004qa-Vk
-	for qemu-devel@nongnu.org; Tue, 23 Apr 2019 04:06:47 -0400
+	(Exim 4.71) (envelope-from <pagupta@redhat.com>) id 1hIqSg-0005M2-BW
+	for qemu-devel@nongnu.org; Tue, 23 Apr 2019 04:07:30 -0400
 Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
 	[10.5.11.22])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 043BD33024A;
-	Tue, 23 Apr 2019 08:06:45 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id 6060F3092665;
+	Tue, 23 Apr 2019 08:07:29 +0000 (UTC)
 Received: from dhcp201-121.englab.pnq.redhat.com (unknown [10.65.16.97])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id 7D3401001DE6;
-	Tue, 23 Apr 2019 08:06:32 +0000 (UTC)
+	by smtp.corp.redhat.com (Postfix) with ESMTP id 999DD1001E84;
+	Tue, 23 Apr 2019 08:07:04 +0000 (UTC)
 From: Pankaj Gupta <pagupta@redhat.com>
 To: linux-nvdimm@lists.01.org, linux-kernel@vger.kernel.org,
 	virtualization@lists.linux-foundation.org, kvm@vger.kernel.org,
 	linux-fsdevel@vger.kernel.org, linux-acpi@vger.kernel.org,
 	qemu-devel@nongnu.org, linux-ext4@vger.kernel.org,
 	linux-xfs@vger.kernel.org
-Date: Tue, 23 Apr 2019 13:36:07 +0530
-Message-Id: <20190423080612.15361-2-pagupta@redhat.com>
+Date: Tue, 23 Apr 2019 13:36:09 +0530
+Message-Id: <20190423080612.15361-4-pagupta@redhat.com>
 In-Reply-To: <20190423080612.15361-1-pagupta@redhat.com>
 References: <20190423080612.15361-1-pagupta@redhat.com>
 X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.29]);
-	Tue, 23 Apr 2019 08:06:45 +0000 (UTC)
+	(mx1.redhat.com [10.5.110.43]);
+	Tue, 23 Apr 2019 08:07:29 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] [PATCH v6 1/6] libnvdimm: nd_region flush callback
- support
+Subject: [Qemu-devel] [PATCH v6 3/6] libnvdimm: add dax_dev sync flag
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -86,243 +85,177 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 Content-Type: text/plain; charset="UTF-8"
-Message-ID: <20190423080607.rCwnP8XG2XSO0FiLtc9uRmyk72bdqKR9pP5NFwspXGc@z>
+Message-ID: <20190423080609.X1hBBj0ttxUt7GPTOy-yqA28JBB9e84oQwqaA4FG6So@z>
 
-This patch adds functionality to perform flush from guest
-to host over VIRTIO. We are registering a callback based
-on 'nd_region' type. virtio_pmem driver requires this special
-flush function. For rest of the region types we are registering
-existing flush function. Report error returned by host fsync
-failure to userspace.
+This patch adds 'DAXDEV_SYNC' flag which is set
+for nd_region doing synchronous flush. This later
+is used to disable MAP_SYNC functionality for
+ext4 & xfs filesystem for devices don't support
+synchronous flush.
 
 Signed-off-by: Pankaj Gupta <pagupta@redhat.com>
 ---
- drivers/acpi/nfit/core.c     |  4 ++--
- drivers/nvdimm/claim.c       |  6 ++++--
- drivers/nvdimm/nd.h          |  1 +
- drivers/nvdimm/pmem.c        | 13 ++++++++-----
- drivers/nvdimm/region_devs.c | 26 ++++++++++++++++++++++++--
- include/linux/libnvdimm.h    |  8 +++++++-
- 6 files changed, 46 insertions(+), 12 deletions(-)
+ drivers/dax/bus.c            |  2 +-
+ drivers/dax/super.c          | 13 ++++++++++++-
+ drivers/md/dm.c              |  3 ++-
+ drivers/nvdimm/pmem.c        |  3 ++-
+ drivers/nvdimm/region_devs.c |  7 +++++++
+ include/linux/dax.h          |  8 ++++++--
+ include/linux/libnvdimm.h    |  1 +
+ 7 files changed, 31 insertions(+), 6 deletions(-)
 
-diff --git a/drivers/acpi/nfit/core.c b/drivers/acpi/nfit/core.c
-index 5a389a4f4f65..08dde76cf459 100644
---- a/drivers/acpi/nfit/core.c
-+++ b/drivers/acpi/nfit/core.c
-@@ -2434,7 +2434,7 @@ static void write_blk_ctl(struct nfit_blk *nfit_blk, unsigned int bw,
- 		offset = to_interleave_offset(offset, mmio);
+diff --git a/drivers/dax/bus.c b/drivers/dax/bus.c
+index 2109cfe80219..5f184e751c82 100644
+--- a/drivers/dax/bus.c
++++ b/drivers/dax/bus.c
+@@ -388,7 +388,7 @@ struct dev_dax *__devm_create_dev_dax(struct dax_region *dax_region, int id,
+ 	 * No 'host' or dax_operations since there is no access to this
+ 	 * device outside of mmap of the resulting character device.
+ 	 */
+-	dax_dev = alloc_dax(dev_dax, NULL, NULL);
++	dax_dev = alloc_dax(dev_dax, NULL, NULL, DAXDEV_F_SYNC);
+ 	if (!dax_dev)
+ 		goto err;
  
- 	writeq(cmd, mmio->addr.base + offset);
--	nvdimm_flush(nfit_blk->nd_region);
-+	nvdimm_flush(nfit_blk->nd_region, NULL);
- 
- 	if (nfit_blk->dimm_flags & NFIT_BLK_DCR_LATCH)
- 		readq(mmio->addr.base + offset);
-@@ -2483,7 +2483,7 @@ static int acpi_nfit_blk_single_io(struct nfit_blk *nfit_blk,
- 	}
- 
- 	if (rw)
--		nvdimm_flush(nfit_blk->nd_region);
-+		nvdimm_flush(nfit_blk->nd_region, NULL);
- 
- 	rc = read_blk_stat(nfit_blk, lane) ? -EIO : 0;
- 	return rc;
-diff --git a/drivers/nvdimm/claim.c b/drivers/nvdimm/claim.c
-index fb667bf469c7..13510bae1e6f 100644
---- a/drivers/nvdimm/claim.c
-+++ b/drivers/nvdimm/claim.c
-@@ -263,7 +263,7 @@ static int nsio_rw_bytes(struct nd_namespace_common *ndns,
- 	struct nd_namespace_io *nsio = to_nd_namespace_io(&ndns->dev);
- 	unsigned int sz_align = ALIGN(size + (offset & (512 - 1)), 512);
- 	sector_t sector = offset >> 9;
--	int rc = 0;
-+	int rc = 0, ret = 0;
- 
- 	if (unlikely(!size))
- 		return 0;
-@@ -301,7 +301,9 @@ static int nsio_rw_bytes(struct nd_namespace_common *ndns,
- 	}
- 
- 	memcpy_flushcache(nsio->addr + offset, buf, size);
--	nvdimm_flush(to_nd_region(ndns->dev.parent));
-+	ret = nvdimm_flush(to_nd_region(ndns->dev.parent), NULL);
-+	if (ret)
-+		rc = ret;
- 
- 	return rc;
- }
-diff --git a/drivers/nvdimm/nd.h b/drivers/nvdimm/nd.h
-index a5ac3b240293..0c74d2428bd7 100644
---- a/drivers/nvdimm/nd.h
-+++ b/drivers/nvdimm/nd.h
-@@ -159,6 +159,7 @@ struct nd_region {
- 	struct badblocks bb;
- 	struct nd_interleave_set *nd_set;
- 	struct nd_percpu_lane __percpu *lane;
-+	int (*flush)(struct nd_region *nd_region, struct bio *bio);
- 	struct nd_mapping mapping[0];
+diff --git a/drivers/dax/super.c b/drivers/dax/super.c
+index 0a339b85133e..bd6509308d05 100644
+--- a/drivers/dax/super.c
++++ b/drivers/dax/super.c
+@@ -186,6 +186,8 @@ enum dax_device_flags {
+ 	DAXDEV_ALIVE,
+ 	/* gate whether dax_flush() calls the low level flush routine */
+ 	DAXDEV_WRITE_CACHE,
++	/* flag to check if device supports synchronous flush */
++	DAXDEV_SYNC,
  };
  
+ /**
+@@ -354,6 +356,12 @@ bool dax_write_cache_enabled(struct dax_device *dax_dev)
+ }
+ EXPORT_SYMBOL_GPL(dax_write_cache_enabled);
+ 
++bool dax_synchronous(struct dax_device *dax_dev)
++{
++	return test_bit(DAXDEV_SYNC, &dax_dev->flags);
++}
++EXPORT_SYMBOL_GPL(dax_synchronous);
++
+ bool dax_alive(struct dax_device *dax_dev)
+ {
+ 	lockdep_assert_held(&dax_srcu);
+@@ -511,7 +519,7 @@ static void dax_add_host(struct dax_device *dax_dev, const char *host)
+ }
+ 
+ struct dax_device *alloc_dax(void *private, const char *__host,
+-		const struct dax_operations *ops)
++		const struct dax_operations *ops, bool sync)
+ {
+ 	struct dax_device *dax_dev;
+ 	const char *host;
+@@ -534,6 +542,9 @@ struct dax_device *alloc_dax(void *private, const char *__host,
+ 	dax_add_host(dax_dev, host);
+ 	dax_dev->ops = ops;
+ 	dax_dev->private = private;
++	if (sync)
++		set_bit(DAXDEV_SYNC, &dax_dev->flags);
++
+ 	return dax_dev;
+ 
+  err_dev:
+diff --git a/drivers/md/dm.c b/drivers/md/dm.c
+index 68d24056d0b1..dd5266fb5471 100644
+--- a/drivers/md/dm.c
++++ b/drivers/md/dm.c
+@@ -1965,7 +1965,8 @@ static struct mapped_device *alloc_dev(int minor)
+ 	sprintf(md->disk->disk_name, "dm-%d", minor);
+ 
+ 	if (IS_ENABLED(CONFIG_DAX_DRIVER)) {
+-		dax_dev = alloc_dax(md, md->disk->disk_name, &dm_dax_ops);
++		dax_dev = alloc_dax(md, md->disk->disk_name, &dm_dax_ops,
++							DAXDEV_F_SYNC);
+ 		if (!dax_dev)
+ 			goto bad;
+ 	}
 diff --git a/drivers/nvdimm/pmem.c b/drivers/nvdimm/pmem.c
-index bc2f700feef8..f719245da170 100644
+index f719245da170..34fa20381c05 100644
 --- a/drivers/nvdimm/pmem.c
 +++ b/drivers/nvdimm/pmem.c
-@@ -192,6 +192,7 @@ static blk_status_t pmem_do_bvec(struct pmem_device *pmem, struct page *page,
+@@ -466,7 +466,8 @@ static int pmem_attach_disk(struct device *dev,
+ 	nvdimm_badblocks_populate(nd_region, &pmem->bb, &bb_res);
+ 	disk->bb = &pmem->bb;
  
- static blk_qc_t pmem_make_request(struct request_queue *q, struct bio *bio)
- {
-+	int ret = 0;
- 	blk_status_t rc = 0;
- 	bool do_acct;
- 	unsigned long start;
-@@ -201,7 +202,7 @@ static blk_qc_t pmem_make_request(struct request_queue *q, struct bio *bio)
- 	struct nd_region *nd_region = to_region(pmem);
- 
- 	if (bio->bi_opf & REQ_PREFLUSH)
--		nvdimm_flush(nd_region);
-+		ret = nvdimm_flush(nd_region, bio);
- 
- 	do_acct = nd_iostat_start(bio, &start);
- 	bio_for_each_segment(bvec, bio, iter) {
-@@ -216,7 +217,10 @@ static blk_qc_t pmem_make_request(struct request_queue *q, struct bio *bio)
- 		nd_iostat_end(bio, start);
- 
- 	if (bio->bi_opf & REQ_FUA)
--		nvdimm_flush(nd_region);
-+		ret = nvdimm_flush(nd_region, bio);
-+
-+	if (ret)
-+		bio->bi_status = errno_to_blk_status(ret);
- 
- 	bio_endio(bio);
- 	return BLK_QC_T_NONE;
-@@ -469,7 +473,6 @@ static int pmem_attach_disk(struct device *dev,
- 	}
- 	dax_write_cache(dax_dev, nvdimm_has_cache(nd_region));
- 	pmem->dax_dev = dax_dev;
--
- 	gendev = disk_to_dev(disk);
- 	gendev->groups = pmem_attribute_groups;
- 
-@@ -527,14 +530,14 @@ static int nd_pmem_remove(struct device *dev)
- 		sysfs_put(pmem->bb_state);
- 		pmem->bb_state = NULL;
- 	}
--	nvdimm_flush(to_nd_region(dev->parent));
-+	nvdimm_flush(to_nd_region(dev->parent), NULL);
- 
- 	return 0;
- }
- 
- static void nd_pmem_shutdown(struct device *dev)
- {
--	nvdimm_flush(to_nd_region(dev->parent));
-+	nvdimm_flush(to_nd_region(dev->parent), NULL);
- }
- 
- static void nd_pmem_notify(struct device *dev, enum nvdimm_event event)
+-	dax_dev = alloc_dax(pmem, disk->disk_name, &pmem_dax_ops);
++	dax_dev = alloc_dax(pmem, disk->disk_name, &pmem_dax_ops,
++					is_nvdimm_sync(nd_region));
+ 	if (!dax_dev) {
+ 		put_disk(disk);
+ 		return -ENOMEM;
 diff --git a/drivers/nvdimm/region_devs.c b/drivers/nvdimm/region_devs.c
-index b4ef7d9ff22e..e5b59708865e 100644
+index e5b59708865e..427cf28380c6 100644
 --- a/drivers/nvdimm/region_devs.c
 +++ b/drivers/nvdimm/region_devs.c
-@@ -295,7 +295,9 @@ static ssize_t deep_flush_store(struct device *dev, struct device_attribute *att
- 		return rc;
- 	if (!flush)
- 		return -EINVAL;
--	nvdimm_flush(nd_region);
-+	rc = nvdimm_flush(nd_region, NULL);
-+	if (rc)
-+		return rc;
- 
- 	return len;
+@@ -1219,6 +1219,13 @@ int nvdimm_has_cache(struct nd_region *nd_region)
  }
-@@ -1085,6 +1087,11 @@ static struct nd_region *nd_region_create(struct nvdimm_bus *nvdimm_bus,
- 	dev->of_node = ndr_desc->of_node;
- 	nd_region->ndr_size = resource_size(ndr_desc->res);
- 	nd_region->ndr_start = ndr_desc->res->start;
-+	if (ndr_desc->flush)
-+		nd_region->flush = ndr_desc->flush;
-+	else
-+		nd_region->flush = NULL;
-+
- 	nd_device_register(dev);
+ EXPORT_SYMBOL_GPL(nvdimm_has_cache);
  
- 	return nd_region;
-@@ -1125,11 +1132,24 @@ struct nd_region *nvdimm_volatile_region_create(struct nvdimm_bus *nvdimm_bus,
- }
- EXPORT_SYMBOL_GPL(nvdimm_volatile_region_create);
- 
-+int nvdimm_flush(struct nd_region *nd_region, struct bio *bio)
++bool is_nvdimm_sync(struct nd_region *nd_region)
 +{
-+	int rc = 0;
-+
-+	if (!nd_region->flush)
-+		rc = generic_nvdimm_flush(nd_region);
-+	else {
-+		if (nd_region->flush(nd_region, bio))
-+			rc = -EIO;
-+	}
-+
-+	return rc;
++	return is_nd_pmem(&nd_region->dev) &&
++		!test_bit(ND_REGION_ASYNC, &nd_region->flags);
 +}
- /**
-  * nvdimm_flush - flush any posted write queues between the cpu and pmem media
-  * @nd_region: blk or interleaved pmem region
-  */
--void nvdimm_flush(struct nd_region *nd_region)
-+int generic_nvdimm_flush(struct nd_region *nd_region)
- {
- 	struct nd_region_data *ndrd = dev_get_drvdata(&nd_region->dev);
- 	int i, idx;
-@@ -1153,6 +1173,8 @@ void nvdimm_flush(struct nd_region *nd_region)
- 		if (ndrd_get_flush_wpq(ndrd, i, 0))
- 			writeq(1, ndrd_get_flush_wpq(ndrd, i, idx));
- 	wmb();
++EXPORT_SYMBOL_GPL(is_nvdimm_sync);
 +
-+	return 0;
- }
- EXPORT_SYMBOL_GPL(nvdimm_flush);
+ struct conflict_context {
+ 	struct nd_region *nd_region;
+ 	resource_size_t start, size;
+diff --git a/include/linux/dax.h b/include/linux/dax.h
+index 0dd316a74a29..c97fc0cc7167 100644
+--- a/include/linux/dax.h
++++ b/include/linux/dax.h
+@@ -7,6 +7,9 @@
+ #include <linux/radix-tree.h>
+ #include <asm/pgtable.h>
  
++/* Flag for synchronous flush */
++#define DAXDEV_F_SYNC true
++
+ typedef unsigned long dax_entry_t;
+ 
+ struct iomap_ops;
+@@ -32,18 +35,19 @@ extern struct attribute_group dax_attribute_group;
+ #if IS_ENABLED(CONFIG_DAX)
+ struct dax_device *dax_get_by_host(const char *host);
+ struct dax_device *alloc_dax(void *private, const char *host,
+-		const struct dax_operations *ops);
++		const struct dax_operations *ops, bool sync);
+ void put_dax(struct dax_device *dax_dev);
+ void kill_dax(struct dax_device *dax_dev);
+ void dax_write_cache(struct dax_device *dax_dev, bool wc);
+ bool dax_write_cache_enabled(struct dax_device *dax_dev);
++bool dax_synchronous(struct dax_device *dax_dev);
+ #else
+ static inline struct dax_device *dax_get_by_host(const char *host)
+ {
+ 	return NULL;
+ }
+ static inline struct dax_device *alloc_dax(void *private, const char *host,
+-		const struct dax_operations *ops)
++		const struct dax_operations *ops, bool sync)
+ {
+ 	/*
+ 	 * Callers should check IS_ENABLED(CONFIG_DAX) to know if this
 diff --git a/include/linux/libnvdimm.h b/include/linux/libnvdimm.h
-index feb342d026f2..a5f369ec3726 100644
+index a5f369ec3726..8ae6b65d67e2 100644
 --- a/include/linux/libnvdimm.h
 +++ b/include/linux/libnvdimm.h
-@@ -65,6 +65,9 @@ enum {
- 	 */
- 	ND_REGION_PERSIST_MEMCTRL = 2,
- 
-+	/* Platform provides asynchronous flush mechanism */
-+	ND_REGION_ASYNC = 3,
-+
- 	/* mark newly adjusted resources as requiring a label update */
- 	DPA_RESOURCE_ADJUSTED = 1 << 0,
- };
-@@ -121,6 +124,7 @@ struct nd_mapping_desc {
- 	int position;
- };
- 
-+struct nd_region;
- struct nd_region_desc {
- 	struct resource *res;
- 	struct nd_mapping_desc *mapping;
-@@ -133,6 +137,7 @@ struct nd_region_desc {
- 	int target_node;
- 	unsigned long flags;
- 	struct device_node *of_node;
-+	int (*flush)(struct nd_region *nd_region, struct bio *bio);
- };
- 
- struct device;
-@@ -260,7 +265,8 @@ unsigned long nd_blk_memremap_flags(struct nd_blk_region *ndbr);
- unsigned int nd_region_acquire_lane(struct nd_region *nd_region);
- void nd_region_release_lane(struct nd_region *nd_region, unsigned int lane);
- u64 nd_fletcher64(void *addr, size_t len, bool le);
--void nvdimm_flush(struct nd_region *nd_region);
-+int nvdimm_flush(struct nd_region *nd_region, struct bio *bio);
-+int generic_nvdimm_flush(struct nd_region *nd_region);
+@@ -270,6 +270,7 @@ int generic_nvdimm_flush(struct nd_region *nd_region);
  int nvdimm_has_flush(struct nd_region *nd_region);
  int nvdimm_has_cache(struct nd_region *nd_region);
  int nvdimm_in_overwrite(struct nvdimm *nvdimm);
++bool is_nvdimm_sync(struct nd_region *nd_region);
+ 
+ static inline int nvdimm_ctl(struct nvdimm *nvdimm, unsigned int cmd, void *buf,
+ 		unsigned int buf_len, int *cmd_rc)
 -- 
 2.20.1
 
