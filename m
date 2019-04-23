@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([209.51.188.92]:54906)
+Received: from eggs.gnu.org ([209.51.188.92]:54909)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1hIuz2-0004J3-Tl
-	for qemu-devel@nongnu.org; Tue, 23 Apr 2019 08:57:13 -0400
+	(envelope-from <vsementsov@virtuozzo.com>) id 1hIuz3-0004J4-2P
+	for qemu-devel@nongnu.org; Tue, 23 Apr 2019 08:57:14 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1hIuz1-0004wo-E2
-	for qemu-devel@nongnu.org; Tue, 23 Apr 2019 08:57:12 -0400
+	(envelope-from <vsementsov@virtuozzo.com>) id 1hIuz1-0004xI-OS
+	for qemu-devel@nongnu.org; Tue, 23 Apr 2019 08:57:13 -0400
 From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Date: Tue, 23 Apr 2019 15:57:04 +0300
-Message-Id: <20190423125706.26989-2-vsementsov@virtuozzo.com>
+Date: Tue, 23 Apr 2019 15:57:05 +0300
+Message-Id: <20190423125706.26989-3-vsementsov@virtuozzo.com>
 In-Reply-To: <20190423125706.26989-1-vsementsov@virtuozzo.com>
 References: <20190423125706.26989-1-vsementsov@virtuozzo.com>
-Subject: [Qemu-devel] [PATCH v5 1/3] block/qcow2-refcount: add trace-point
- to qcow2_process_discards
+Subject: [Qemu-devel] [PATCH v5 2/3] block/io: bdrv_pdiscard: support
+ int64_t bytes parameter
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,53 +23,91 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org, qemu-block@nongnu.org
 Cc: kwolf@redhat.com, mreitz@redhat.com, fam@euphon.net, stefanha@redhat.com, vsementsov@virtuozzo.com, den@virtuozzo.com, eblake@redhat.com
 
-Let's at least trace ignored failure.
+This fixes at least one overflow in qcow2_process_discards, which
+passes 64bit region length to bdrv_pdiscard where bytes (or sectors in
+the past) parameter is int since its introduction in 0b919fae.
 
 Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Reviewed-by: Eric Blake <eblake@redhat.com>
 ---
- block/qcow2-refcount.c | 7 ++++++-
- block/trace-events     | 3 +++
- 2 files changed, 9 insertions(+), 1 deletion(-)
+ include/block/block.h |  4 ++--
+ block/io.c            | 16 ++++++++--------
+ 2 files changed, 10 insertions(+), 10 deletions(-)
 
-diff --git a/block/qcow2-refcount.c b/block/qcow2-refcount.c
-index e0fe322500..60284bcaac 100644
---- a/block/qcow2-refcount.c
-+++ b/block/qcow2-refcount.c
-@@ -30,6 +30,7 @@
- #include "qemu/range.h"
- #include "qemu/bswap.h"
- #include "qemu/cutils.h"
-+#include "trace.h"
+diff --git a/include/block/block.h b/include/block/block.h
+index c7a26199aa..69fa18867e 100644
+--- a/include/block/block.h
++++ b/include/block/block.h
+@@ -432,8 +432,8 @@ void bdrv_drain_all(void);
+     AIO_WAIT_WHILE(bdrv_get_aio_context(bs_),              \
+                    cond); })
  
- static int64_t alloc_clusters_noref(BlockDriverState *bs, uint64_t size,
-                                     uint64_t max);
-@@ -738,7 +739,11 @@ void qcow2_process_discards(BlockDriverState *bs, int ret)
+-int bdrv_pdiscard(BdrvChild *child, int64_t offset, int bytes);
+-int bdrv_co_pdiscard(BdrvChild *child, int64_t offset, int bytes);
++int bdrv_pdiscard(BdrvChild *child, int64_t offset, int64_t bytes);
++int bdrv_co_pdiscard(BdrvChild *child, int64_t offset, int64_t bytes);
+ int bdrv_has_zero_init_1(BlockDriverState *bs);
+ int bdrv_has_zero_init(BlockDriverState *bs);
+ bool bdrv_unallocated_blocks_are_zero(BlockDriverState *bs);
+diff --git a/block/io.c b/block/io.c
+index dfc153b8d8..16b6c5d855 100644
+--- a/block/io.c
++++ b/block/io.c
+@@ -2653,7 +2653,7 @@ int bdrv_flush(BlockDriverState *bs)
+ typedef struct DiscardCo {
+     BdrvChild *child;
+     int64_t offset;
+-    int bytes;
++    int64_t bytes;
+     int ret;
+ } DiscardCo;
+ static void coroutine_fn bdrv_pdiscard_co_entry(void *opaque)
+@@ -2664,14 +2664,15 @@ static void coroutine_fn bdrv_pdiscard_co_entry(void *opaque)
+     aio_wait_kick();
+ }
  
-         /* Discard is optional, ignore the return value */
-         if (ret >= 0) {
--            bdrv_pdiscard(bs->file, d->offset, d->bytes);
-+            int r2 = bdrv_pdiscard(bs->file, d->offset, d->bytes);
-+            if (r2 < 0) {
-+                trace_qcow2_process_discards_failed_region(d->offset, d->bytes,
-+                                                           r2);
-+            }
-         }
+-int coroutine_fn bdrv_co_pdiscard(BdrvChild *child, int64_t offset, int bytes)
++int coroutine_fn bdrv_co_pdiscard(BdrvChild *child, int64_t offset,
++                                  int64_t bytes)
+ {
+     BdrvTrackedRequest req;
+     int max_pdiscard, ret;
+     int head, tail, align;
+     BlockDriverState *bs = child->bs;
  
-         g_free(d);
-diff --git a/block/trace-events b/block/trace-events
-index 7335a42540..ea508f637e 100644
---- a/block/trace-events
-+++ b/block/trace-events
-@@ -91,6 +91,9 @@ qcow2_cache_get_done(void *co, int c, int i) "co %p is_l2_cache %d index %d"
- qcow2_cache_flush(void *co, int c) "co %p is_l2_cache %d"
- qcow2_cache_entry_flush(void *co, int c, int i) "co %p is_l2_cache %d index %d"
+-    if (!bs || !bs->drv) {
++    if (!bs || !bs->drv || !bdrv_is_inserted(bs)) {
+         return -ENOMEDIUM;
+     }
  
-+# qcow2-refcount.c
-+qcow2_process_discards_failed_region(uint64_t offset, uint64_t bytes, int ret) "offset 0x%" PRIx64 " bytes 0x%" PRIx64 " ret %d"
-+
- # qed-l2-cache.c
- qed_alloc_l2_cache_entry(void *l2_cache, void *entry) "l2_cache %p entry %p"
- qed_unref_l2_cache_entry(void *entry, int ref) "entry %p ref %d"
+@@ -2679,9 +2680,8 @@ int coroutine_fn bdrv_co_pdiscard(BdrvChild *child, int64_t offset, int bytes)
+         return -EPERM;
+     }
+ 
+-    ret = bdrv_check_byte_request(bs, offset, bytes);
+-    if (ret < 0) {
+-        return ret;
++    if (offset < 0 || bytes < 0 || bytes > INT64_MAX - offset) {
++        return -EIO;
+     }
+ 
+     /* Do nothing if disabled.  */
+@@ -2716,7 +2716,7 @@ int coroutine_fn bdrv_co_pdiscard(BdrvChild *child, int64_t offset, int bytes)
+     assert(max_pdiscard >= bs->bl.request_alignment);
+ 
+     while (bytes > 0) {
+-        int num = bytes;
++        int64_t num = bytes;
+ 
+         if (head) {
+             /* Make small requests to get to alignment boundaries. */
+@@ -2778,7 +2778,7 @@ out:
+     return ret;
+ }
+ 
+-int bdrv_pdiscard(BdrvChild *child, int64_t offset, int bytes)
++int bdrv_pdiscard(BdrvChild *child, int64_t offset, int64_t bytes)
+ {
+     Coroutine *co;
+     DiscardCo rwco = {
 -- 
 2.18.0
