@@ -1,21 +1,29 @@
-Received: from eggs.gnu.org ([209.51.188.92]:60638)
+Received: from eggs.gnu.org ([209.51.188.92]:34761)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1hIzan-0007XT-5h
-	for qemu-devel@nongnu.org; Tue, 23 Apr 2019 13:52:30 -0400
+	(envelope-from <richard.henderson@linaro.org>) id 1hIze7-0000Ca-Gf
+	for qemu-devel@nongnu.org; Tue, 23 Apr 2019 13:55:56 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1hIzal-0005rF-Lu
-	for qemu-devel@nongnu.org; Tue, 23 Apr 2019 13:52:28 -0400
-References: <20190423160608.7519-1-thuth@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <f1db3bb5-6028-e8a4-f56b-fdd22215688f@redhat.com>
-Date: Tue, 23 Apr 2019 12:52:18 -0500
+	(envelope-from <richard.henderson@linaro.org>) id 1hIzdv-0001DM-9l
+	for qemu-devel@nongnu.org; Tue, 23 Apr 2019 13:55:46 -0400
+Received: from mail-pg1-x530.google.com ([2607:f8b0:4864:20::530]:35532)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+	id 1hIzdm-00010R-VO
+	for qemu-devel@nongnu.org; Tue, 23 Apr 2019 13:55:38 -0400
+Received: by mail-pg1-x530.google.com with SMTP id g8so7993594pgf.2
+	for <qemu-devel@nongnu.org>; Tue, 23 Apr 2019 10:55:28 -0700 (PDT)
+References: <20190416125744.27770-1-peter.maydell@linaro.org>
+	<20190416125744.27770-4-peter.maydell@linaro.org>
+From: Richard Henderson <richard.henderson@linaro.org>
+Message-ID: <ee47862f-a890-ad32-1fd1-974f09f19d8c@linaro.org>
+Date: Tue, 23 Apr 2019 10:55:24 -0700
 MIME-Version: 1.0
-In-Reply-To: <20190423160608.7519-1-thuth@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="oG3L6d2PSVZYkVCaZcW6WzX09EPqdzahr"
-Subject: Re: [Qemu-devel] [PATCH] net: Print output of "-net nic,
- model=help" to stdout instead of stderr
+In-Reply-To: <20190416125744.27770-4-peter.maydell@linaro.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH 03/26] target/arm: Implement dummy versions
+ of M-profile FP-related registers
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,84 +32,34 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Thomas Huth <thuth@redhat.com>, Jason Wang <jasowang@redhat.com>, qemu-devel@nongnu.org
-Cc: qemu-trivial@nongnu.org, Markus Armbruster <armbru@redhat.com>
+To: Peter Maydell <peter.maydell@linaro.org>, qemu-arm@nongnu.org, qemu-devel@nongnu.org
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---oG3L6d2PSVZYkVCaZcW6WzX09EPqdzahr
-From: Eric Blake <eblake@redhat.com>
-To: Thomas Huth <thuth@redhat.com>, Jason Wang <jasowang@redhat.com>,
- qemu-devel@nongnu.org
-Cc: qemu-trivial@nongnu.org, Markus Armbruster <armbru@redhat.com>
-Message-ID: <f1db3bb5-6028-e8a4-f56b-fdd22215688f@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH] net: Print output of "-net nic, model=help"
- to stdout instead of stderr
-References: <20190423160608.7519-1-thuth@redhat.com>
-In-Reply-To: <20190423160608.7519-1-thuth@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-
-[adding Markus, as he send a recent batch of similar patches]
-
-On 4/23/19 11:06 AM, Thomas Huth wrote:
-> We are printing all other help output to stdout already (e.g. "-help",
-> "-cpu help" and "-machine help" output). So the "-net nic,model=3Dhelp"=
-
-> output should go to stdout instead of stderr, too. And while we're at
-> it, also print the NICs line by line, like we do it e.g. with the
-> "-cpu help" or "-M help" output, too.
->=20
-> Buglink: https://bugs.launchpad.net/qemu/+bug/1574327
-> Signed-off-by: Thomas Huth <thuth@redhat.com>
+On 4/16/19 5:57 AM, Peter Maydell wrote:
+> The M-profile floating point support has three associated config
+> registers: FPCAR, FPCCR and FPDSCR. It also makes the registers
+> CPACR and NSACR have behaviour other than reads-as-zero.
+> Add support for all of these as simple reads-as-written registers.
+> We will hook up actual functionality later.
+> 
+> The main complexity here is handling the FPCCR register, which
+> has a mix of banked and unbanked bits.
+> 
+> Note that we don't share storage with the A-profile
+> cpu->cp15.nsacr and cpu->cp15.cpacr_el1, though the behaviour
+> is quite similar, for two reasons:
+>  * the M profile CPACR is banked between security states
+>  * it preserves the invariant that M profile uses no state
+>    inside the cp15 substruct
+> 
+> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 > ---
->  net/net.c | 7 ++++---
->  1 file changed, 4 insertions(+), 3 deletions(-)
+>  target/arm/cpu.h      |  34 ++++++++++++
+>  hw/intc/armv7m_nvic.c | 125 ++++++++++++++++++++++++++++++++++++++++++
+>  target/arm/cpu.c      |   5 ++
+>  target/arm/machine.c  |  16 ++++++
+>  4 files changed, 180 insertions(+)
 
-Reviewed-by: Eric Blake <eblake@redhat.com>
-
->=20
-> diff --git a/net/net.c b/net/net.c
-> index f3a3c5444c..2cf5e76469 100644
-> --- a/net/net.c
-> +++ b/net/net.c
-> @@ -837,9 +837,10 @@ int qemu_show_nic_models(const char *arg, const ch=
-ar *const *models)
->          return 0;
->      }
-> =20
-> -    fprintf(stderr, "qemu: Supported NIC models: ");
-> -    for (i =3D 0 ; models[i]; i++)
-> -        fprintf(stderr, "%s%c", models[i], models[i+1] ? ',' : '\n');
-> +    printf("Supported NIC models:\n");
-> +    for (i =3D 0 ; models[i]; i++) {
-> +        printf("%s\n", models[i]);
-> +    }
->      return 1;
->  }
-> =20
->=20
-
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3226
-Virtualization:  qemu.org | libvirt.org
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 
 
---oG3L6d2PSVZYkVCaZcW6WzX09EPqdzahr
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAly/UNIACgkQp6FrSiUn
-Q2pLsggAoZ110sQJBNhz05OBWHy7JQ9Fa1S7rcjEfhDM7BA68oj3X3VzxcPVVsv0
-jo+mBKTVryVMqKpv1RCziPWbo/tHJvMnERHHqX+24zXeztLaxD0H/JjxvrA/I2EA
-nPqARjEFpTtwKLBx5+j/+A6W5z66GZy3goqWor17Bs9nyVPa811N9LhsCGNVT//M
-1IMASrN1dE0k8R4d+0xwbJdt7COZHP8UJv41zG+TRFEyZcIO8EbgoE4QVoxQYSIy
-Ounyiz5t9gXKSHWdTxuc0U7LTNTxMf49920wIdunddj/7ZqIG4NTZTlDSt7MPnbg
-1yzTX7IZRVYg4KLiquREl86qyo/uzA==
-=/CYd
------END PGP SIGNATURE-----
-
---oG3L6d2PSVZYkVCaZcW6WzX09EPqdzahr--
+r~
