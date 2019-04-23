@@ -2,96 +2,93 @@ Return-Path: <SRS0=zUjA=SZ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.7 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-4.0 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A7DB4C10F03
-	for <qemu-devel@archiver.kernel.org>; Tue, 23 Apr 2019 21:41:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A698FC10F03
+	for <qemu-devel@archiver.kernel.org>; Tue, 23 Apr 2019 21:48:05 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6AE1B218D3
-	for <qemu-devel@archiver.kernel.org>; Tue, 23 Apr 2019 21:41:25 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 6C453218D2
+	for <qemu-devel@archiver.kernel.org>; Tue, 23 Apr 2019 21:48:05 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="mZE0Y6Vl"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6AE1B218D3
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="TITAyOnS"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6C453218D2
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:59884 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:59949 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hJ3AK-0003Mb-Bu
-	for qemu-devel@archiver.kernel.org; Tue, 23 Apr 2019 17:41:24 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:59180)
+	id 1hJ3Gm-00068n-O5
+	for qemu-devel@archiver.kernel.org; Tue, 23 Apr 2019 17:48:04 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:36219)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1hJ39Y-0002yb-MN
-	for qemu-devel@nongnu.org; Tue, 23 Apr 2019 17:40:37 -0400
+	(envelope-from <richard.henderson@linaro.org>) id 1hJ3Ff-0005lK-Qj
+	for qemu-devel@nongnu.org; Tue, 23 Apr 2019 17:46:56 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1hJ39X-0001ka-Ly
-	for qemu-devel@nongnu.org; Tue, 23 Apr 2019 17:40:36 -0400
-Received: from mail-pl1-x642.google.com ([2607:f8b0:4864:20::642]:43000)
+	(envelope-from <richard.henderson@linaro.org>) id 1hJ3Fe-0000Nq-Pt
+	for qemu-devel@nongnu.org; Tue, 23 Apr 2019 17:46:55 -0400
+Received: from mail-pg1-x529.google.com ([2607:f8b0:4864:20::529]:42393)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1hJ39X-0001h8-DX
-	for qemu-devel@nongnu.org; Tue, 23 Apr 2019 17:40:35 -0400
-Received: by mail-pl1-x642.google.com with SMTP id x15so3801511pln.9
-	for <qemu-devel@nongnu.org>; Tue, 23 Apr 2019 14:40:31 -0700 (PDT)
+	id 1hJ3Fe-0000Lj-Hi
+	for qemu-devel@nongnu.org; Tue, 23 Apr 2019 17:46:54 -0400
+Received: by mail-pg1-x529.google.com with SMTP id p6so8253314pgh.9
+	for <qemu-devel@nongnu.org>; Tue, 23 Apr 2019 14:46:54 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
 	h=subject:to:references:from:openpgp:message-id:date:user-agent
 	:mime-version:in-reply-to:content-language:content-transfer-encoding;
-	bh=y2BKPxn1lpqjUk/Bl0BtndT7nfcu8b4tSIz3rsMttwc=;
-	b=mZE0Y6VlSBEC6SI7Iy3+a7RULxidioXYE5Jm4dVdHoOs0fxIplU8jdyC5iz9u/sGsF
-	n/4ou9Xdk0Wocbbh6cYZ2rthacpGzo1d5bab1wVYZKS6e8Gqrat53mNAYnvRfD9wPPdg
-	BR8B5yjylyWW4E1eczn4c7GSX9CKDiIPOsWlIiyj2bUF4dF2XbfdTGTy8ZqD+2wxmKCX
-	OjiSxkrlR/9m16Sa2rix6Biq/7+eQi59aXiKA4JNT+jy4RqN1xWV+OOQS7xtor76HCJc
-	6iaIgc/gf812M0SAekFFg5dUNE2VHA4/6rUt5ATpzHXZUY0szQLLuJBqFxEKhfAt7MQW
-	O2mg==
+	bh=FDLMRKRPzp/pSJ3ZDS5uhKHxLRwPh/L4VqETRioA01M=;
+	b=TITAyOnSodgtXIyRXeAJtd+5CmZsPqpAa8s96hR2fRmOJItS73ex2p04Zyl91B3htH
+	3sKURhJOS3xLLR02szW+wXC5OHFuIdOMHRspMAgNhAHSSrSpa88eszMygnX2+KScmS9u
+	kj59cNcbM+XDUewNeVWW3a+7uNit1QK53/t0RF42hVOTZvLB4eJsHeCNHqYlQBT1ZCEb
+	rGPIoVTySFy6SvWX0lI4KgicR0b/Z5zdpyWcn05K+mqoocsFOjs7BMNxRqnJc7UOF66y
+	XKK+55/qDcjYtocpo56Ost82f7cAd2X2KP35i3uYABXwph4KGoguHT/cNGDFPdnRxi9+
+	34wA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
 	d=1e100.net; s=20161025;
 	h=x-gm-message-state:subject:to:references:from:openpgp:message-id
 	:date:user-agent:mime-version:in-reply-to:content-language
 	:content-transfer-encoding;
-	bh=y2BKPxn1lpqjUk/Bl0BtndT7nfcu8b4tSIz3rsMttwc=;
-	b=O+PldnEMvVXVDW3ZSrcm/9/0fSGdg4GOyo1Qvrdwr6ff4SqvLPY2t6VEg19LdAKOQ7
-	RoU5Mz7NMZyGpNdowSylwa2CJeDmnum5+144KFzCboRu71NkAnfqNfoFzwHa9CYIRYsU
-	AMiRspwd6aPDOwgmsMko9LQplx2JrfNsfxCXy4xcnYO7qD4jeJ5aai8ozNltZfBJ2SQ0
-	lEJLGa6h/hp9t+wxsNCQB3wZ2KS+lCfmbKsuba4WM1D3wsmmoMni5RsdjI7RreQnfoeb
-	NQmGKaWwPbNQGGs2ccKrYUu5+BaCKipd3nlKtYWHl+o+9wD6sNFkEfTz5vnBaVIYwTmx
-	jBjA==
-X-Gm-Message-State: APjAAAUKpdbCgJx427MKmUaCMRKS5YKrjIhNvUYtSEGZoeoMK5LMnZA5
-	Yf6GmoAcp+SlJZvyN5E1GwqrsmRIGqA=
-X-Google-Smtp-Source: APXvYqyx+WZyWiW+eNni9P9jr81nXtMGol8j41oY/tVqpvKrbFeDEfyIwP5drrhEIFqci159ICVgdg==
-X-Received: by 2002:a17:902:7e05:: with SMTP id
-	b5mr29274415plm.127.1556055629952; 
-	Tue, 23 Apr 2019 14:40:29 -0700 (PDT)
+	bh=FDLMRKRPzp/pSJ3ZDS5uhKHxLRwPh/L4VqETRioA01M=;
+	b=pMH++GNRJz7NOvWjDRHL56fmxJnwxSPVbrCFUanphwuhrA4JH2Z/HQfjypMgArLjI2
+	T/W4+hDjxfBABcuWszDcffZiEnDAGQ3owK2fvT/eleAGia2ZO3sptmYf+4U3ukgOt3LO
+	hytjRZyucCXlgiIHoXDYYqSDcqyHD03dc74vY4ybCYdqcDMpGC3+GIVlBn8mCwNadyk7
+	JKFjUY5xaw1BtQSzacEVkb+RlaszEqDAP6YtXQpxhYBrdRW2IP+GUd9NBwG3dBNd2Fyg
+	1oJmW6hMt9lXFtlFoDOBS2r8a5AZWNxtcd84Foie8/fiZj5HB3iHR/QZ1CvVEPg7yzyX
+	7Akw==
+X-Gm-Message-State: APjAAAUljvxB7asmFQ3zCCXpboXUJd+CdYYhTIaxFSCFHxqC+4rSRP/e
+	M/6Ek8GNFHA7zb56ZOXsgc7HYTQ0wzU=
+X-Google-Smtp-Source: APXvYqwUP02UIol0ws0nW05IQ9Y5s3l/WvDj81ysHDsyv6sIjyroxkb7qt9T7t6R/ZnyXhreBPGg3A==
+X-Received: by 2002:a63:f24f:: with SMTP id d15mr27177287pgk.410.1556056013194;
+	Tue, 23 Apr 2019 14:46:53 -0700 (PDT)
 Received: from [192.168.1.11] (97-113-179-147.tukw.qwest.net. [97.113.179.147])
 	by smtp.gmail.com with ESMTPSA id
-	v9sm20545049pgf.73.2019.04.23.14.40.28
+	n11sm2276008pgm.50.2019.04.23.14.46.52
 	(version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-	Tue, 23 Apr 2019 14:40:29 -0700 (PDT)
-To: David Hildenbrand <david@redhat.com>, qemu-devel@nongnu.org
-References: <20190420073442.7488-1-richard.henderson@linaro.org>
-	<20190420073442.7488-13-richard.henderson@linaro.org>
-	<ab0269a3-c0fd-44c4-f939-e3f073e8e2dd@redhat.com>
-	<a32e78bf-e4e4-a808-0c42-95e3b64ed1cf@linaro.org>
-	<a2cca8a8-24ca-679e-22ce-500bf111ac8f@redhat.com>
+	Tue, 23 Apr 2019 14:46:52 -0700 (PDT)
+To: Peter Maydell <peter.maydell@linaro.org>, qemu-arm@nongnu.org,
+	qemu-devel@nongnu.org
+References: <20190416125744.27770-1-peter.maydell@linaro.org>
+	<20190416125744.27770-10-peter.maydell@linaro.org>
 From: Richard Henderson <richard.henderson@linaro.org>
 Openpgp: preference=signencrypt
-Message-ID: <952ddc67-8012-eb87-3f1f-8ef1f27b93da@linaro.org>
-Date: Tue, 23 Apr 2019 14:40:27 -0700
+Message-ID: <11425be6-f1ec-e707-9a81-eb0ed9362551@linaro.org>
+Date: Tue, 23 Apr 2019 14:46:50 -0700
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
 	Thunderbird/60.6.1
 MIME-Version: 1.0
-In-Reply-To: <a2cca8a8-24ca-679e-22ce-500bf111ac8f@redhat.com>
+In-Reply-To: <20190416125744.27770-10-peter.maydell@linaro.org>
 Content-Type: text/plain; charset="UTF-8"
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
 	recognized.
-X-Received-From: 2607:f8b0:4864:20::642
-Subject: Re: [Qemu-devel] [PATCH 12/38] tcg: Add gvec expanders for variable
- shift
+X-Received-From: 2607:f8b0:4864:20::529
+Subject: Re: [Qemu-devel] [PATCH 09/26] target/arm/helper: don't return
+ early for STKOF faults during stacking
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -106,61 +103,26 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190423214027.tO_v6ngl_4wlI_AVDGPqYkH2WMT5i2w-7rz2TbaB6ns@z>
+Message-ID: <20190423214650.eXll0reiH3Lm2q-ilQ08yFFaanWnS_UgjZqxa30679Y@z>
 
-On 4/23/19 2:02 PM, David Hildenbrand wrote:
-> On 23.04.19 21:28, Richard Henderson wrote:
->> On 4/23/19 12:04 PM, David Hildenbrand wrote:
->>> In order to use this on s390x for VECTOR ELEMENT SHIFT, like
->>>
->>> +static DisasJumpType op_vesv(DisasContext *s, DisasOps *o)
->>> +{
->>> +    const uint8_t es = get_field(s->fields, m4);
->>> +    const uint8_t v1 = get_field(s->fields, v1);
->>> +    const uint8_t v2 = get_field(s->fields, v2);
->>> +    const uint8_t v3 = get_field(s->fields, v3);
->>> +
->>> +    if (es > ES_64) {
->>> +        gen_program_exception(s, PGM_SPECIFICATION);
->>> +        return DISAS_NORETURN;
->>> +    }
->>> +
->>> +    switch (s->fields->op2) {
->>> +    case 0x70:
->>> +        gen_gvec_fn_3(shlv, es, v1, v2, v3);
->>> +        break;
->>> +    case 0x7a:
->>> +        gen_gvec_fn_3(sarv, es, v1, v2, v3);
->>> +        break;
->>> +    case 0x78:
->>> +        gen_gvec_fn_3(shrv, es, v1, v2, v3);
->>> +        break;
->>> +    default:
->>> +        g_assert_not_reached();
->>> +    }
->>> +
->>> +    return DISAS_NEXT;
->>> +}
->>>
->>> We need to mask of invalid bits from the shift. Can that be added?
->>
->> Yes, I do exactly this in patch 31 for target/ppc.
->>
->>
->> r~
->>
+On 4/16/19 5:57 AM, Peter Maydell wrote:
+> Currently the code in v7m_push_stack() which detects a violation
+> of the v8M stack limit simply returns early if it does so. This
+> is OK for the current integer-only code, but won't work for the
+> floating point handling we're about to add. We need to continue
+> executing the rest of the function so that we check for other
+> exceptions like not having permission to use the FPU and so
+> that we correctly set the FPCCR state if we are doing lazy
+> stacking. Refactor to avoid the early return.
 > 
-> Got it, so not via a generic gvec expansion. Thanks!
+> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+> ---
+>  target/arm/helper.c | 23 ++++++++++++++++++-----
+>  1 file changed, 18 insertions(+), 5 deletions(-)
 
-I do wonder if I *should* make the truncating expansion the
-generic gvec expansion.  It would be usable from two targets
-at least...
-
-Because the one's that *don't* truncate in hardware will
-still have to have their own custom expansion code.
-
-Thoughts?
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 
 
 r~
+
 
