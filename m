@@ -1,25 +1,24 @@
-Received: from eggs.gnu.org ([209.51.188.92]:34034)
+Received: from eggs.gnu.org ([209.51.188.92]:35459)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1hIxQ0-0007Sn-BD
-	for qemu-devel@nongnu.org; Tue, 23 Apr 2019 11:33:14 -0400
+	(envelope-from <richard.henderson@linaro.org>) id 1hIxVb-00017P-8v
+	for qemu-devel@nongnu.org; Tue, 23 Apr 2019 11:39:00 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1hIxPy-0004Bv-TU
-	for qemu-devel@nongnu.org; Tue, 23 Apr 2019 11:33:12 -0400
-Resent-Message-Id: <E1hIxPy-0004Bv-TU@eggs.gnu.org>
-Received: from sender4-of-o55.zoho.com ([136.143.188.55]:21519)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
-	id 1hIxPy-0004BP-KH
-	for qemu-devel@nongnu.org; Tue, 23 Apr 2019 11:33:10 -0400
-In-Reply-To: <20190423132004.13725-1-marcandre.lureau@redhat.com>
-Message-ID: <155603352545.26689.16170981364890335168@c2072b67cc0c>
-Reply-To: <qemu-devel@nongnu.org>
+	(envelope-from <richard.henderson@linaro.org>) id 1hIxVa-0006v4-5f
+	for qemu-devel@nongnu.org; Tue, 23 Apr 2019 11:38:59 -0400
+Received: from mail-pf1-x42b.google.com ([2607:f8b0:4864:20::42b]:37006)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+	id 1hIxVZ-0006ul-TL
+	for qemu-devel@nongnu.org; Tue, 23 Apr 2019 11:38:58 -0400
+Received: by mail-pf1-x42b.google.com with SMTP id 8so7693650pfr.4
+	for <qemu-devel@nongnu.org>; Tue, 23 Apr 2019 08:38:57 -0700 (PDT)
+From: Richard Henderson <richard.henderson@linaro.org>
+Date: Tue, 23 Apr 2019 08:38:46 -0700
+Message-Id: <20190423153853.19790-1-richard.henderson@linaro.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Tue, 23 Apr 2019 08:32:06 -0700 (PDT)
-Subject: Re: [Qemu-devel] [PATCH v6 00/11] vhost-user for input & GPU
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Subject: [Qemu-devel] [PATCH v2 0/7] tcg: Restart TB generation on overflow
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,117 +27,73 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: marcandre.lureau@redhat.com
-Cc: fam@euphon.net, qemu-devel@nongnu.org, kraxel@redhat.com, mst@redhat.com
+To: qemu-devel@nongnu.org
+Cc: alistair23@gmail.com
 
-UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDE5MDQyMzEzMjAwNC4xMzcy
-NS0xLW1hcmNhbmRyZS5sdXJlYXVAcmVkaGF0LmNvbS8KCgoKSGksCgpUaGlzIHNlcmllcyBzZWVt
-cyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1zLiBTZWUgb3V0cHV0IGJlbG93IGZv
-cgptb3JlIGluZm9ybWF0aW9uOgoKVHlwZTogc2VyaWVzCk1lc3NhZ2UtaWQ6IDIwMTkwNDIzMTMy
-MDA0LjEzNzI1LTEtbWFyY2FuZHJlLmx1cmVhdUByZWRoYXQuY29tClN1YmplY3Q6IFtRZW11LWRl
-dmVsXSBbUEFUQ0ggdjYgMDAvMTFdIHZob3N0LXVzZXIgZm9yIGlucHV0ICYgR1BVCgo9PT0gVEVT
-VCBTQ1JJUFQgQkVHSU4gPT09CiMhL2Jpbi9iYXNoCmdpdCByZXYtcGFyc2UgYmFzZSA+IC9kZXYv
-bnVsbCB8fCBleGl0IDAKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYucmVuYW1lbGltaXQgMApnaXQg
-Y29uZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVzIFRydWUKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYu
-YWxnb3JpdGhtIGhpc3RvZ3JhbQouL3NjcmlwdHMvY2hlY2twYXRjaC5wbCAtLW1haWxiYWNrIGJh
-c2UuLgo9PT0gVEVTVCBTQ1JJUFQgRU5EID09PQoKVXBkYXRpbmcgM2M4Y2Y1YTljMjFmZjg3ODIx
-NjRkMWRlZjdmNDRiZDg4ODcxMzM4NApTd2l0Y2hlZCB0byBhIG5ldyBicmFuY2ggJ3Rlc3QnCmRh
-ZTJiZGRhMDYgaHcvZGlzcGxheTogYWRkIHZob3N0LXVzZXItdmdhICYgZ3B1LXBjaQo1MDg1ZDg3
-MzIwIHZpcnRpby1ncHU6IHNwbGl0IHZpcnRpby1ncHUtcGNpICYgdmlydGlvLXZnYQo0YjBhY2Qz
-Mzg0IHZpcnRpby1ncHU6IHNwbGl0IHZpcnRpby1ncHUsIGludHJvZHVjZSB2aXJ0aW8tZ3B1LWJh
-c2UKYzFkODMzMTkxZiBjb250cmliOiBhZGQgdmhvc3QtdXNlci1ncHUKY2JhOTdmYTcwNCB1dGls
-OiBjb21waWxlIGRybS5vIG9uIExpbnV4CmI3ZjA1Zjk1MDUgdmlydGlvOiBhZGQgdmlydGlvLWdw
-dSBic3dhcCBoZWxwZXJzIGhlYWRlcgo1NjdjYjAzMzk5IHZob3N0LXVzZXI6IGFkZCB2aG9zdF91
-c2VyX2dwdV9zZXRfc29ja2V0KCkKZTQyYjg0YmNiMyBjb250cmliOiBhZGQgdmhvc3QtdXNlci1p
-bnB1dAo0NTUyNzBiZjM0IGxpYnZob3N0LXVzZXI6IGFkZCBQUk9UT0NPTF9GX0NPTkZJRyBpZiB7
-c2V0LCBnZXR9X2NvbmZpZwo0Y2NlMDM5NGIwIEFkZCB2aG9zdC11c2VyLWlucHV0LXBjaQozNGE4
-NTE4NjYwIEFkZCB2aG9zdC11c2VyLWJhY2tlbmQKCj09PSBPVVRQVVQgQkVHSU4gPT09CjEvMTEg
-Q2hlY2tpbmcgY29tbWl0IDM0YTg1MTg2NjA0MSAoQWRkIHZob3N0LXVzZXItYmFja2VuZCkKV0FS
-TklORzogYWRkZWQsIG1vdmVkIG9yIGRlbGV0ZWQgZmlsZShzKSwgZG9lcyBNQUlOVEFJTkVSUyBu
-ZWVkIHVwZGF0aW5nPwojNDQ6IApuZXcgZmlsZSBtb2RlIDEwMDY0NAoKV0FSTklORzogQmxvY2sg
-Y29tbWVudHMgdXNlIGEgbGVhZGluZyAvKiBvbiBhIHNlcGFyYXRlIGxpbmUKIzE0MzogRklMRTog
-YmFja2VuZHMvdmhvc3QtdXNlci5jOjk1OgorICAgIC8qIGd1ZXN0X25vdGlmaWVyX21hc2svcGVu
-ZGluZyBub3QgdXNlZCB5ZXQsIHNvIGp1c3QgdW5tYXNrCgp0b3RhbDogMCBlcnJvcnMsIDIgd2Fy
-bmluZ3MsIDI4MCBsaW5lcyBjaGVja2VkCgpQYXRjaCAxLzExIGhhcyBzdHlsZSBwcm9ibGVtcywg
-cGxlYXNlIHJldmlldy4gIElmIGFueSBvZiB0aGVzZSBlcnJvcnMKYXJlIGZhbHNlIHBvc2l0aXZl
-cyByZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRhaW5lciwgc2VlCkNIRUNLUEFUQ0ggaW4gTUFJTlRB
-SU5FUlMuCjIvMTEgQ2hlY2tpbmcgY29tbWl0IDRjY2UwMzk0YjAyYyAoQWRkIHZob3N0LXVzZXIt
-aW5wdXQtcGNpKQpXQVJOSU5HOiBhZGRlZCwgbW92ZWQgb3IgZGVsZXRlZCBmaWxlKHMpLCBkb2Vz
-IE1BSU5UQUlORVJTIG5lZWQgdXBkYXRpbmc/CiM1ODogCm5ldyBmaWxlIG1vZGUgMTAwNjQ0Cgp0
-b3RhbDogMCBlcnJvcnMsIDEgd2FybmluZ3MsIDI1MCBsaW5lcyBjaGVja2VkCgpQYXRjaCAyLzEx
-IGhhcyBzdHlsZSBwcm9ibGVtcywgcGxlYXNlIHJldmlldy4gIElmIGFueSBvZiB0aGVzZSBlcnJv
-cnMKYXJlIGZhbHNlIHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRhaW5lciwgc2Vl
-CkNIRUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMuCjMvMTEgQ2hlY2tpbmcgY29tbWl0IDQ1NTI3MGJm
-MzQ5MiAobGlidmhvc3QtdXNlcjogYWRkIFBST1RPQ09MX0ZfQ09ORklHIGlmIHtzZXQsIGdldH1f
-Y29uZmlnKQo0LzExIENoZWNraW5nIGNvbW1pdCBlNDJiODRiY2IzZmMgKGNvbnRyaWI6IGFkZCB2
-aG9zdC11c2VyLWlucHV0KQpXQVJOSU5HOiBhZGRlZCwgbW92ZWQgb3IgZGVsZXRlZCBmaWxlKHMp
-LCBkb2VzIE1BSU5UQUlORVJTIG5lZWQgdXBkYXRpbmc/CiM2OTogCm5ldyBmaWxlIG1vZGUgMTAw
-NjQ0Cgp0b3RhbDogMCBlcnJvcnMsIDEgd2FybmluZ3MsIDQ1OCBsaW5lcyBjaGVja2VkCgpQYXRj
-aCA0LzExIGhhcyBzdHlsZSBwcm9ibGVtcywgcGxlYXNlIHJldmlldy4gIElmIGFueSBvZiB0aGVz
-ZSBlcnJvcnMKYXJlIGZhbHNlIHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRhaW5l
-ciwgc2VlCkNIRUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMuCjUvMTEgQ2hlY2tpbmcgY29tbWl0IDU2
-N2NiMDMzOTk1OCAodmhvc3QtdXNlcjogYWRkIHZob3N0X3VzZXJfZ3B1X3NldF9zb2NrZXQoKSkK
-V0FSTklORzogYWRkZWQsIG1vdmVkIG9yIGRlbGV0ZWQgZmlsZShzKSwgZG9lcyBNQUlOVEFJTkVS
-UyBuZWVkIHVwZGF0aW5nPwojNzQ6IApuZXcgZmlsZSBtb2RlIDEwMDY0NAoKdG90YWw6IDAgZXJy
-b3JzLCAxIHdhcm5pbmdzLCAzMTMgbGluZXMgY2hlY2tlZAoKUGF0Y2ggNS8xMSBoYXMgc3R5bGUg
-cHJvYmxlbXMsIHBsZWFzZSByZXZpZXcuICBJZiBhbnkgb2YgdGhlc2UgZXJyb3JzCmFyZSBmYWxz
-ZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1haW50YWluZXIsIHNlZQpDSEVDS1BBVENI
-IGluIE1BSU5UQUlORVJTLgo2LzExIENoZWNraW5nIGNvbW1pdCBiN2YwNWY5NTA1OGQgKHZpcnRp
-bzogYWRkIHZpcnRpby1ncHUgYnN3YXAgaGVscGVycyBoZWFkZXIpCldBUk5JTkc6IGFkZGVkLCBt
-b3ZlZCBvciBkZWxldGVkIGZpbGUocyksIGRvZXMgTUFJTlRBSU5FUlMgbmVlZCB1cGRhdGluZz8K
-Izc0OiAKbmV3IGZpbGUgbW9kZSAxMDA2NDQKCnRvdGFsOiAwIGVycm9ycywgMSB3YXJuaW5ncywg
-MTE2IGxpbmVzIGNoZWNrZWQKClBhdGNoIDYvMTEgaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2Ug
-cmV2aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9y
-dCB0aGVtIHRvIHRoZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4K
-Ny8xMSBDaGVja2luZyBjb21taXQgY2JhOTdmYTcwNGMxICh1dGlsOiBjb21waWxlIGRybS5vIG9u
-IExpbnV4KQo4LzExIENoZWNraW5nIGNvbW1pdCBjMWQ4MzMxOTFmMzQgKGNvbnRyaWI6IGFkZCB2
-aG9zdC11c2VyLWdwdSkKV0FSTklORzogYWRkZWQsIG1vdmVkIG9yIGRlbGV0ZWQgZmlsZShzKSwg
-ZG9lcyBNQUlOVEFJTkVSUyBuZWVkIHVwZGF0aW5nPwojMTY0OiAKbmV3IGZpbGUgbW9kZSAxMDA2
-NDQKCnRvdGFsOiAwIGVycm9ycywgMSB3YXJuaW5ncywgMjU3MyBsaW5lcyBjaGVja2VkCgpQYXRj
-aCA4LzExIGhhcyBzdHlsZSBwcm9ibGVtcywgcGxlYXNlIHJldmlldy4gIElmIGFueSBvZiB0aGVz
-ZSBlcnJvcnMKYXJlIGZhbHNlIHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRhaW5l
-ciwgc2VlCkNIRUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMuCjkvMTEgQ2hlY2tpbmcgY29tbWl0IDRi
-MGFjZDMzODQ4YSAodmlydGlvLWdwdTogc3BsaXQgdmlydGlvLWdwdSwgaW50cm9kdWNlIHZpcnRp
-by1ncHUtYmFzZSkKV0FSTklORzogQmxvY2sgY29tbWVudHMgdXNlIGEgbGVhZGluZyAvKiBvbiBh
-IHNlcGFyYXRlIGxpbmUKIzEwMDogRklMRTogaHcvZGlzcGxheS92aXJ0aW8tZ3B1LTNkLmM6MTgx
-OgorICAgICAgICAgICAgaW5mby5mbGFncyAmIDEgLyogRklYTUU6IFlfMF9UT1AgKi8sCgpXQVJO
-SU5HOiBhZGRlZCwgbW92ZWQgb3IgZGVsZXRlZCBmaWxlKHMpLCBkb2VzIE1BSU5UQUlORVJTIG5l
-ZWQgdXBkYXRpbmc/CiMxODg6IApuZXcgZmlsZSBtb2RlIDEwMDY0NAoKRVJST1I6IE1hY3JvcyB3
-aXRoIGNvbXBsZXggdmFsdWVzIHNob3VsZCBiZSBlbmNsb3NlZCBpbiBwYXJlbnRoZXNpcwojMTI1
-MzogRklMRTogaW5jbHVkZS9ody92aXJ0aW8vdmlydGlvLWdwdS5oOjEyMjoKKyNkZWZpbmUgVklS
-VElPX0dQVV9CQVNFX1BST1BFUlRJRVMoX3N0YXRlLCBfY29uZikgICAgICAgICAgICAgICAgICAg
-ICAgIFwKKyAgICBERUZJTkVfUFJPUF9VSU5UMzIoIm1heF9vdXRwdXRzIiwgX3N0YXRlLCBfY29u
-Zi5tYXhfb3V0cHV0cywgMSksICAgIFwKKyAgICBERUZJTkVfUFJPUF9CSVQoImVkaWQiLCBfc3Rh
-dGUsIF9jb25mLmZsYWdzLCBcCisgICAgICAgICAgICAgICAgICAgIFZJUlRJT19HUFVfRkxBR19F
-RElEX0VOQUJMRUQsIGZhbHNlKSwgXAorICAgIERFRklORV9QUk9QX1VJTlQzMigieHJlcyIsIF9z
-dGF0ZSwgX2NvbmYueHJlcywgMTAyNCksIFwKKyAgICBERUZJTkVfUFJPUF9VSU5UMzIoInlyZXMi
-LCBfc3RhdGUsIF9jb25mLnlyZXMsIDc2OCkKCnRvdGFsOiAxIGVycm9ycywgMiB3YXJuaW5ncywg
-MTE4NCBsaW5lcyBjaGVja2VkCgpQYXRjaCA5LzExIGhhcyBzdHlsZSBwcm9ibGVtcywgcGxlYXNl
-IHJldmlldy4gIElmIGFueSBvZiB0aGVzZSBlcnJvcnMKYXJlIGZhbHNlIHBvc2l0aXZlcyByZXBv
-cnQgdGhlbSB0byB0aGUgbWFpbnRhaW5lciwgc2VlCkNIRUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMu
-CgoxMC8xMSBDaGVja2luZyBjb21taXQgNTA4NWQ4NzMyMGU4ICh2aXJ0aW8tZ3B1OiBzcGxpdCB2
-aXJ0aW8tZ3B1LXBjaSAmIHZpcnRpby12Z2EpCldBUk5JTkc6IGFkZGVkLCBtb3ZlZCBvciBkZWxl
-dGVkIGZpbGUocyksIGRvZXMgTUFJTlRBSU5FUlMgbmVlZCB1cGRhdGluZz8KIzM5MjogCm5ldyBm
-aWxlIG1vZGUgMTAwNjQ0Cgp0b3RhbDogMCBlcnJvcnMsIDEgd2FybmluZ3MsIDM5MCBsaW5lcyBj
-aGVja2VkCgpQYXRjaCAxMC8xMSBoYXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZpZXcuICBJ
-ZiBhbnkgb2YgdGhlc2UgZXJyb3JzCmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0gdG8g
-dGhlIG1haW50YWluZXIsIHNlZQpDSEVDS1BBVENIIGluIE1BSU5UQUlORVJTLgoxMS8xMSBDaGVj
-a2luZyBjb21taXQgZGFlMmJkZGEwNmUxIChody9kaXNwbGF5OiBhZGQgdmhvc3QtdXNlci12Z2Eg
-JiBncHUtcGNpKQpXQVJOSU5HOiBhZGRlZCwgbW92ZWQgb3IgZGVsZXRlZCBmaWxlKHMpLCBkb2Vz
-IE1BSU5UQUlORVJTIG5lZWQgdXBkYXRpbmc/CiM1NjogCm5ldyBmaWxlIG1vZGUgMTAwNjQ0CgpF
-UlJPUjogTWFjcm9zIHdpdGggY29tcGxleCB2YWx1ZXMgc2hvdWxkIGJlIGVuY2xvc2VkIGluIHBh
-cmVudGhlc2lzCiM4Mjk6IEZJTEU6IGluY2x1ZGUvaHcvdmlydGlvL3ZpcnRpby1ncHUtcGNpLmg6
-MzU6CisjZGVmaW5lIERFRklORV9WSVJUSU9fR1BVX1BDSV9QUk9QRVJUSUVTKF9zdGF0ZSkgICAg
-ICAgICAgICAgICAgXAorICAgIERFRklORV9QUk9QX0JJVCgiaW9ldmVudGZkIiwgX3N0YXRlLCBm
-bGFncywgICAgICAgICAgICAgICAgIFwKKyAgICAgICAgICAgICAgICAgICAgVklSVElPX1BDSV9G
-TEFHX1VTRV9JT0VWRU5URkRfQklULCBmYWxzZSksICBcCisgICAgICAgIERFRklORV9QUk9QX1VJ
-TlQzMigidmVjdG9ycyIsIF9zdGF0ZSwgbnZlY3RvcnMsIDMpCgp0b3RhbDogMSBlcnJvcnMsIDEg
-d2FybmluZ3MsIDgxOCBsaW5lcyBjaGVja2VkCgpQYXRjaCAxMS8xMSBoYXMgc3R5bGUgcHJvYmxl
-bXMsIHBsZWFzZSByZXZpZXcuICBJZiBhbnkgb2YgdGhlc2UgZXJyb3JzCmFyZSBmYWxzZSBwb3Np
-dGl2ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1haW50YWluZXIsIHNlZQpDSEVDS1BBVENIIGluIE1B
-SU5UQUlORVJTLgoKPT09IE9VVFBVVCBFTkQgPT09CgpUZXN0IGNvbW1hbmQgZXhpdGVkIHdpdGgg
-Y29kZTogMQoKClRoZSBmdWxsIGxvZyBpcyBhdmFpbGFibGUgYXQKaHR0cDovL3BhdGNoZXcub3Jn
-L2xvZ3MvMjAxOTA0MjMxMzIwMDQuMTM3MjUtMS1tYXJjYW5kcmUubHVyZWF1QHJlZGhhdC5jb20v
-dGVzdGluZy5jaGVja3BhdGNoLz90eXBlPW1lc3NhZ2UuCi0tLQpFbWFpbCBnZW5lcmF0ZWQgYXV0
-b21hdGljYWxseSBieSBQYXRjaGV3IFtodHRwczovL3BhdGNoZXcub3JnL10uClBsZWFzZSBzZW5k
-IHlvdXIgZmVlZGJhY2sgdG8gcGF0Y2hldy1kZXZlbEByZWRoYXQuY29t
+This is for lauchpad 1824853.  The v1 patch set fixed this for
+x86 as a host.  This goes further to handle the other cases in
+which a TB can become too large, resulting in overflows from
+relocations.
+
+Finally, the last two patches take advantage of this.  Since
+we now have a reliable way to try again if a relocation overflows,
+we can avoid adding extra nops on the off-chance we have to deal
+with very large TBs.
+
+There is possibly room for additional work in tcg/riscv, with
+respect to its short conditional branches.  But that's probably
+best left to someone who can test that properly.
+
+
+r~
+
+
+Richard Henderson (7):
+  tcg: Hoist max_insns computation to tb_gen_code
+  tcg: Restart after TB code generation overflow
+  tcg: Restart TB generation after relocation overflow
+  tcg: Restart TB generation after constant pool overflow
+  tcg: Restart TB generation after out-of-line ldst overflow
+  tcg/ppc: Allow the constant pool to overflow at 32k
+  tcg/arm: Restrict constant pool displacement to 12 bits
+
+ include/exec/exec-all.h       |  4 +-
+ include/exec/translator.h     |  3 +-
+ tcg/tcg.h                     | 15 +++----
+ accel/tcg/translate-all.c     | 53 +++++++++++++++++++----
+ accel/tcg/translator.c        | 15 +------
+ target/alpha/translate.c      |  4 +-
+ target/arm/translate.c        |  4 +-
+ target/cris/translate.c       | 10 +----
+ target/hppa/translate.c       |  5 +--
+ target/i386/translate.c       |  4 +-
+ target/lm32/translate.c       | 10 +----
+ target/m68k/translate.c       |  4 +-
+ target/microblaze/translate.c | 10 +----
+ target/mips/translate.c       |  4 +-
+ target/moxie/translate.c      | 11 +----
+ target/nios2/translate.c      | 14 +-----
+ target/openrisc/translate.c   |  4 +-
+ target/ppc/translate.c        |  4 +-
+ target/riscv/translate.c      |  4 +-
+ target/s390x/translate.c      |  4 +-
+ target/sh4/translate.c        |  4 +-
+ target/sparc/translate.c      |  4 +-
+ target/tilegx/translate.c     | 12 +-----
+ target/tricore/translate.c    | 16 +------
+ target/unicore32/translate.c  | 10 +----
+ target/xtensa/translate.c     |  4 +-
+ tcg/aarch64/tcg-target.inc.c  | 16 ++++---
+ tcg/arm/tcg-target.inc.c      | 73 ++++++++++++++-----------------
+ tcg/i386/tcg-target.inc.c     |  6 ++-
+ tcg/mips/tcg-target.inc.c     |  6 ++-
+ tcg/ppc/tcg-target.inc.c      | 42 +++++++++---------
+ tcg/riscv/tcg-target.inc.c    | 16 +++++--
+ tcg/s390/tcg-target.inc.c     | 20 +++++----
+ tcg/tcg-ldst.inc.c            | 18 ++++----
+ tcg/tcg-pool.inc.c            | 12 +++---
+ tcg/tcg.c                     | 81 ++++++++++++++++++-----------------
+ 36 files changed, 246 insertions(+), 280 deletions(-)
+
+-- 
+2.17.1
