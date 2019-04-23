@@ -2,55 +2,67 @@ Return-Path: <SRS0=zUjA=SZ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_PASS,URIBL_BLOCKED autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EEA52C10F14
-	for <qemu-devel@archiver.kernel.org>; Tue, 23 Apr 2019 10:41:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2CDB3C10F14
+	for <qemu-devel@archiver.kernel.org>; Tue, 23 Apr 2019 10:46:13 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id BC8E4214AE
-	for <qemu-devel@archiver.kernel.org>; Tue, 23 Apr 2019 10:41:40 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BC8E4214AE
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kernkonzept.com
+	by mail.kernel.org (Postfix) with ESMTPS id F3FA1206A3
+	for <qemu-devel@archiver.kernel.org>; Tue, 23 Apr 2019 10:46:12 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F3FA1206A3
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=patchew.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:51538 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:51600 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hIsrs-0003aM-19
-	for qemu-devel@archiver.kernel.org; Tue, 23 Apr 2019 06:41:40 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:53827)
+	id 1hIswG-0005St-BV
+	for qemu-devel@archiver.kernel.org; Tue, 23 Apr 2019 06:46:12 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:55076)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jermar@gorgo>) id 1hIsqc-0002wt-N1
-	for qemu-devel@nongnu.org; Tue, 23 Apr 2019 06:40:23 -0400
+	(envelope-from <no-reply@patchew.org>) id 1hIsvT-0004ve-CE
+	for qemu-devel@nongnu.org; Tue, 23 Apr 2019 06:45:24 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jermar@gorgo>) id 1hIsqb-0002A2-JW
-	for qemu-devel@nongnu.org; Tue, 23 Apr 2019 06:40:22 -0400
-Received: from [93.153.64.87] (port=41040 helo=gorgo)
+	(envelope-from <no-reply@patchew.org>) id 1hIsvS-00069U-5H
+	for qemu-devel@nongnu.org; Tue, 23 Apr 2019 06:45:23 -0400
+Resent-Date: Tue, 23 Apr 2019 06:45:23 -0400
+Resent-Message-Id: <E1hIsvS-00069U-5H@eggs.gnu.org>
+Received: from sender-of-o52.zoho.com ([135.84.80.217]:21469)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <jermar@gorgo>) id 1hIsqb-00026k-9L
-	for qemu-devel@nongnu.org; Tue, 23 Apr 2019 06:40:21 -0400
-Received: from gorgo (localhost.localdomain [127.0.0.1])
-	by gorgo (8.15.2/8.15.2) with ESMTPS id x3NAdxNT1258059
-	(version=TLSv1.3 cipher=TLS_AES_256_GCM_SHA384 bits=256 verify=NOT);
-	Tue, 23 Apr 2019 12:39:59 +0200
-Received: (from jermar@localhost)
-	by gorgo (8.15.2/8.15.2/Submit) id x3NAdxLD1258015;
-	Tue, 23 Apr 2019 12:39:59 +0200
-From: =?UTF-8?q?Jakub=20Jerm=C3=A1=C5=99?= <jakub.jermar@kernkonzept.com>
-To: qemu-devel@nongnu.org
-Date: Tue, 23 Apr 2019 12:38:55 +0200
-Message-Id: <20190423103855.1257968-1-jakub.jermar@kernkonzept.com>
-X-Mailer: git-send-email 2.20.1
+	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
+	id 1hIsvR-00061A-Ti
+	for qemu-devel@nongnu.org; Tue, 23 Apr 2019 06:45:22 -0400
+ARC-Seal: i=1; a=rsa-sha256; t=1556016278; cv=none; d=zoho.com; s=zohoarc; 
+	b=bsSswANVTnmzIII6jUKExU99EHpbGsn0ZWlQBkmttaZx9G2pp7kDvUygYzOWRMU1GIRko+V908LRhRGfjx5VR1b2CY/O6dnF9q+ew/MHRYvf4QkqtTCnXE0Od0rZpP97eQbFzsusphLlipIbixG6z+BrMUliGfPxSZXrq/gaU5w=
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zoho.com;
+	s=zohoarc; t=1556016278;
+	h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:Reply-To:Subject:To:ARC-Authentication-Results;
+	bh=ehbHiW0a7qIsLACD0XKWBrRinkNYpYapmXen0vymslU=; 
+	b=dHjeSsD7G3RWwBRroqLgyvYjGMXxs8jaXvu2hskgqsqfNc4Zqn9klGB5AOP/EMdM8aISTPlQejNWCaITq8F8IfTXhuiSuDvj2mRzsPise8ul4/BzFN/cFUbfMh+vlg/tbEGCFehP9Z4pAquSfWQuolLTKzC023U+lWVuiVPSP/A=
+ARC-Authentication-Results: i=1; mx.zoho.com; dkim=pass  header.i=patchew.org;
+	spf=pass  smtp.mailfrom=no-reply@patchew.org;
+	dmarc=pass header.from=<no-reply@patchew.org>
+	header.from=<no-reply@patchew.org>
+Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by
+	mx.zohomail.com with SMTPS id 1556016273221193.2518567502192;
+	Tue, 23 Apr 2019 03:44:33 -0700 (PDT)
+In-Reply-To: <20190423103855.1257968-1-jakub.jermar@kernkonzept.com>
+Message-ID: <155601627096.26689.2851011824444304661@c2072b67cc0c>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-MIME-Autoconverted: from 8bit to quoted-printable by gorgo id x3NAdxNT1258059
+Content-Transfer-Encoding: base64
+Resent-From: 
+From: no-reply@patchew.org
+To: jakub.jermar@kernkonzept.com
+Date: Tue, 23 Apr 2019 03:44:33 -0700 (PDT)
+X-ZohoMailClient: External
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 93.153.64.87
-Subject: [Qemu-devel] [PATCH] mips: Decide to map PAGE_EXEC in map_address
+X-Received-From: 135.84.80.217
+Subject: Re: [Qemu-devel] [PATCH] mips: Decide to map PAGE_EXEC in
+ map_address
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -62,102 +74,43 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: =?UTF-8?q?Jakub=20Jerm=C3=A1=C5=99?= <jakub.jermar@kernkonzept.com>,
-	Aleksandar Rikalo <arikalo@wavecomp.com>,
-	Aleksandar Markovic <amarkovic@wavecomp.com>,
-	Aurelien Jarno <aurelien@aurel32.net>
+Reply-To: qemu-devel@nongnu.org
+Cc: fam@euphon.net, arikalo@wavecomp.com, qemu-devel@nongnu.org,
+	jakub.jermar@kernkonzept.com, amarkovic@wavecomp.com, aurelien@aurel32.net
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190423103855.01L7Qjw2qxDOJfsW0acz02onbLWO-OIL3wPQyqHj27U@z>
+Message-ID: <20190423104433.rz6nGWaIsfnOI1SYluPkRuPLNjTEwXph_b-mmNIGFNY@z>
 
-This commit addresses QEMU Bug #1825311:
-
-  mips_cpu_handle_mmu_fault renders all accessed pages executable
-
-It allows finer-grained control over whether the accessed page should be
-executable by moving the decision to the underlying map_address
-function, which has more information for this.
-
-As a result, pages that have the XI bit set in the TLB and are accessed
-for read/write, don't suddenly end up being executable.
-
-Signed-off-by: Jakub Jerm=C3=A1=C5=99 <jakub.jermar@kernkonzept.com>
----
- target/mips/helper.c | 16 +++++++++-------
- 1 file changed, 9 insertions(+), 7 deletions(-)
-
-diff --git a/target/mips/helper.c b/target/mips/helper.c
-index c44cdca3b5..f182935fcf 100644
---- a/target/mips/helper.c
-+++ b/target/mips/helper.c
-@@ -43,7 +43,7 @@ int no_mmu_map_address (CPUMIPSState *env, hwaddr *phys=
-ical, int *prot,
-                         target_ulong address, int rw, int access_type)
- {
-     *physical =3D address;
--    *prot =3D PAGE_READ | PAGE_WRITE;
-+    *prot =3D PAGE_READ | PAGE_WRITE | PAGE_EXEC;
-     return TLBRET_MATCH;
- }
-=20
-@@ -61,7 +61,7 @@ int fixed_mmu_map_address (CPUMIPSState *env, hwaddr *p=
-hysical, int *prot,
-     else
-         *physical =3D address;
-=20
--    *prot =3D PAGE_READ | PAGE_WRITE;
-+    *prot =3D PAGE_READ | PAGE_WRITE | PAGE_EXEC;
-     return TLBRET_MATCH;
- }
-=20
-@@ -101,6 +101,8 @@ int r4k_map_address (CPUMIPSState *env, hwaddr *physi=
-cal, int *prot,
-                 *prot =3D PAGE_READ;
-                 if (n ? tlb->D1 : tlb->D0)
-                     *prot |=3D PAGE_WRITE;
-+                if (!(n ? tlb->XI1 : tlb->XI0))
-+                    *prot |=3D PAGE_EXEC;
-                 return TLBRET_MATCH;
-             }
-             return TLBRET_DIRTY;
-@@ -182,7 +184,7 @@ static int get_seg_physical_address(CPUMIPSState *env=
-, hwaddr *physical,
-     } else {
-         /* The segment is unmapped */
-         *physical =3D physical_base | (real_address & segmask);
--        *prot =3D PAGE_READ | PAGE_WRITE;
-+        *prot =3D PAGE_READ | PAGE_WRITE | PAGE_EXEC;
-         return TLBRET_MATCH;
-     }
- }
-@@ -913,8 +915,8 @@ int mips_cpu_handle_mmu_fault(CPUState *cs, vaddr add=
-ress, int size, int rw,
-     }
-     if (ret =3D=3D TLBRET_MATCH) {
-         tlb_set_page(cs, address & TARGET_PAGE_MASK,
--                     physical & TARGET_PAGE_MASK, prot | PAGE_EXEC,
--                     mmu_idx, TARGET_PAGE_SIZE);
-+                     physical & TARGET_PAGE_MASK, prot, mmu_idx,
-+                     TARGET_PAGE_SIZE);
-         ret =3D 0;
-     } else if (ret < 0)
- #endif
-@@ -936,8 +938,8 @@ int mips_cpu_handle_mmu_fault(CPUState *cs, vaddr add=
-ress, int size, int rw,
-                                            address, rw, access_type, mmu=
-_idx);
-                 if (ret =3D=3D TLBRET_MATCH) {
-                     tlb_set_page(cs, address & TARGET_PAGE_MASK,
--                            physical & TARGET_PAGE_MASK, prot | PAGE_EXE=
-C,
--                            mmu_idx, TARGET_PAGE_SIZE);
-+                            physical & TARGET_PAGE_MASK, prot, mmu_idx,
-+                            TARGET_PAGE_SIZE);
-                     ret =3D 0;
-                     return ret;
-                 }
---=20
-2.20.1
+UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDE5MDQyMzEwMzg1NS4xMjU3
+OTY4LTEtamFrdWIuamVybWFyQGtlcm5rb256ZXB0LmNvbS8KCgoKSGksCgpUaGlzIHNlcmllcyBz
+ZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1zLiBTZWUgb3V0cHV0IGJlbG93
+IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKVHlwZTogc2VyaWVzCk1lc3NhZ2UtaWQ6IDIwMTkwNDIz
+MTAzODU1LjEyNTc5NjgtMS1qYWt1Yi5qZXJtYXJAa2VybmtvbnplcHQuY29tClN1YmplY3Q6IFtR
+ZW11LWRldmVsXSBbUEFUQ0hdIG1pcHM6IERlY2lkZSB0byBtYXAgUEFHRV9FWEVDIGluIG1hcF9h
+ZGRyZXNzCgo9PT0gVEVTVCBTQ1JJUFQgQkVHSU4gPT09CiMhL2Jpbi9iYXNoCmdpdCByZXYtcGFy
+c2UgYmFzZSA+IC9kZXYvbnVsbCB8fCBleGl0IDAKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYucmVu
+YW1lbGltaXQgMApnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVzIFRydWUKZ2l0IGNvbmZp
+ZyAtLWxvY2FsIGRpZmYuYWxnb3JpdGhtIGhpc3RvZ3JhbQouL3NjcmlwdHMvY2hlY2twYXRjaC5w
+bCAtLW1haWxiYWNrIGJhc2UuLgo9PT0gVEVTVCBTQ1JJUFQgRU5EID09PQoKVXBkYXRpbmcgM2M4
+Y2Y1YTljMjFmZjg3ODIxNjRkMWRlZjdmNDRiZDg4ODcxMzM4NApGcm9tIGh0dHBzOi8vZ2l0aHVi
+LmNvbS9wYXRjaGV3LXByb2plY3QvcWVtdQogKiBbbmV3IHRhZ10gICAgICAgICAgICAgICBwYXRj
+aGV3LzIwMTkwNDIzMTAzODU1LjEyNTc5NjgtMS1qYWt1Yi5qZXJtYXJAa2VybmtvbnplcHQuY29t
+IC0+IHBhdGNoZXcvMjAxOTA0MjMxMDM4NTUuMTI1Nzk2OC0xLWpha3ViLmplcm1hckBrZXJua29u
+emVwdC5jb20KU3dpdGNoZWQgdG8gYSBuZXcgYnJhbmNoICd0ZXN0Jwo0MGUwZDcyMTU3IG1pcHM6
+IERlY2lkZSB0byBtYXAgUEFHRV9FWEVDIGluIG1hcF9hZGRyZXNzCgo9PT0gT1VUUFVUIEJFR0lO
+ID09PQpFUlJPUjogYnJhY2VzIHt9IGFyZSBuZWNlc3NhcnkgZm9yIGFsbCBhcm1zIG9mIHRoaXMg
+c3RhdGVtZW50CiM0NzogRklMRTogdGFyZ2V0L21pcHMvaGVscGVyLmM6MTA0OgorICAgICAgICAg
+ICAgICAgIGlmICghKG4gPyB0bGItPlhJMSA6IHRsYi0+WEkwKSkKWy4uLl0KCnRvdGFsOiAxIGVy
+cm9ycywgMCB3YXJuaW5ncywgNTIgbGluZXMgY2hlY2tlZAoKQ29tbWl0IDQwZTBkNzIxNTcyNCAo
+bWlwczogRGVjaWRlIHRvIG1hcCBQQUdFX0VYRUMgaW4gbWFwX2FkZHJlc3MpIGhhcyBzdHlsZSBw
+cm9ibGVtcywgcGxlYXNlIHJldmlldy4gIElmIGFueSBvZiB0aGVzZSBlcnJvcnMKYXJlIGZhbHNl
+IHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRhaW5lciwgc2VlCkNIRUNLUEFUQ0gg
+aW4gTUFJTlRBSU5FUlMuCj09PSBPVVRQVVQgRU5EID09PQoKVGVzdCBjb21tYW5kIGV4aXRlZCB3
+aXRoIGNvZGU6IDEKCgpUaGUgZnVsbCBsb2cgaXMgYXZhaWxhYmxlIGF0Cmh0dHA6Ly9wYXRjaGV3
+Lm9yZy9sb2dzLzIwMTkwNDIzMTAzODU1LjEyNTc5NjgtMS1qYWt1Yi5qZXJtYXJAa2Vybmtvbnpl
+cHQuY29tL3Rlc3RpbmcuY2hlY2twYXRjaC8/dHlwZT1tZXNzYWdlLgotLS0KRW1haWwgZ2VuZXJh
+dGVkIGF1dG9tYXRpY2FsbHkgYnkgUGF0Y2hldyBbaHR0cHM6Ly9wYXRjaGV3Lm9yZy9dLgpQbGVh
+c2Ugc2VuZCB5b3VyIGZlZWRiYWNrIHRvIHBhdGNoZXctZGV2ZWxAcmVkaGF0LmNvbQ==
 
 
