@@ -1,28 +1,25 @@
-Received: from eggs.gnu.org ([209.51.188.92]:45243)
+Received: from eggs.gnu.org ([209.51.188.92]:47446)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1hJ3RI-0000Td-7c
-	for qemu-devel@nongnu.org; Tue, 23 Apr 2019 17:58:57 -0400
+	(envelope-from <david@fromorbit.com>) id 1hJ3Uy-0001q3-WE
+	for qemu-devel@nongnu.org; Tue, 23 Apr 2019 18:02:46 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1hJ3RG-0006Gw-Vn
-	for qemu-devel@nongnu.org; Tue, 23 Apr 2019 17:58:56 -0400
-Received: from mail-wm1-f65.google.com ([209.85.128.65]:34048)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1hJ3RG-0006Ci-OE
-	for qemu-devel@nongnu.org; Tue, 23 Apr 2019 17:58:54 -0400
-Received: by mail-wm1-f65.google.com with SMTP id r186so3172028wmf.1
-	for <qemu-devel@nongnu.org>; Tue, 23 Apr 2019 14:58:53 -0700 (PDT)
-References: <20180106153730.30313-1-hpoussin@reactos.org>
-	<20180106153730.30313-13-hpoussin@reactos.org>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Message-ID: <f6179552-cc21-0935-ddea-7bbdeecddac3@redhat.com>
-Date: Tue, 23 Apr 2019 23:58:50 +0200
+	(envelope-from <david@fromorbit.com>) id 1hJ3Uu-00024I-7I
+	for qemu-devel@nongnu.org; Tue, 23 Apr 2019 18:02:43 -0400
+Received: from mail105.syd.optusnet.com.au ([211.29.132.249]:38844)
+	by eggs.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <david@fromorbit.com>) id 1hJ3Ul-0001tw-DM
+	for qemu-devel@nongnu.org; Tue, 23 Apr 2019 18:02:33 -0400
+Date: Wed, 24 Apr 2019 08:02:17 +1000
+From: Dave Chinner <david@fromorbit.com>
+Message-ID: <20190423220217.GA29573@dread.disaster.area>
+References: <20190423080612.15361-1-pagupta@redhat.com>
+	<20190423080612.15361-7-pagupta@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20180106153730.30313-13-hpoussin@reactos.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH v4 12/16] piix4: add a mc146818rtc
- controller as specified in datasheet
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20190423080612.15361-7-pagupta@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v6 6/6] xfs: disable map_sync for async
+ flush
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,122 +28,46 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Herv=c3=a9_Poussineau?= <hpoussin@reactos.org>, "Michael S . Tsirkin" <mst@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
-Cc: Aurelien Jarno <aurelien@aurel32.net>, qemu-devel@nongnu.org
+To: Pankaj Gupta <pagupta@redhat.com>
+Cc: linux-nvdimm@lists.01.org, linux-kernel@vger.kernel.org, virtualization@lists.linux-foundation.org, kvm@vger.kernel.org, linux-fsdevel@vger.kernel.org, linux-acpi@vger.kernel.org, qemu-devel@nongnu.org, linux-ext4@vger.kernel.org, linux-xfs@vger.kernel.org, dan.j.williams@intel.com, zwisler@kernel.org, vishal.l.verma@intel.com, dave.jiang@intel.com, mst@redhat.com, jasowang@redhat.com, willy@infradead.org, rjw@rjwysocki.net, hch@infradead.org, lenb@kernel.org, jack@suse.cz, tytso@mit.edu, adilger.kernel@dilger.ca, darrick.wong@oracle.com, lcapitulino@redhat.com, kwolf@redhat.com, imammedo@redhat.com, jmoyer@redhat.com, nilal@redhat.com, riel@surriel.com, stefanha@redhat.com, aarcange@redhat.com, david@redhat.com, cohuck@redhat.com, xiaoguangrong.eric@gmail.com, pbonzini@redhat.com, yuval.shaia@oracle.com, kilobyte@angband.pl
 
-Hi Hervé,
-
-I haven't forgot this series (still 15 months passed...) and it is now
-integrated in a bigger one. While retesting the whole previous to post,
-I noticed an error...
-
-On 1/6/18 4:37 PM, Hervé Poussineau wrote:
-> Remove mc146818rtc instanciated in malta board, to not have it twice.
+On Tue, Apr 23, 2019 at 01:36:12PM +0530, Pankaj Gupta wrote:
+> Dont support 'MAP_SYNC' with non-DAX files and DAX files
+> with asynchronous dax_device. Virtio pmem provides
+> asynchronous host page cache flush mechanism. We don't
+> support 'MAP_SYNC' with virtio pmem and xfs.
 > 
-> Acked-by: Michael S. Tsirkin <mst@redhat.com>
-> Acked-by: Paolo Bonzini <pbonzini@redhat.com>
-> Signed-off-by: Hervé Poussineau <hpoussin@reactos.org>
+> Signed-off-by: Pankaj Gupta <pagupta@redhat.com>
 > ---
->  hw/isa/piix4.c       | 12 ++++++++++++
->  hw/mips/mips_malta.c |  5 -----
->  2 files changed, 12 insertions(+), 5 deletions(-)
+>  fs/xfs/xfs_file.c | 10 ++++++----
+>  1 file changed, 6 insertions(+), 4 deletions(-)
 > 
-> diff --git a/hw/isa/piix4.c b/hw/isa/piix4.c
-> index 7a13e83270..0d68fcb193 100644
-> --- a/hw/isa/piix4.c
-> +++ b/hw/isa/piix4.c
-> @@ -31,6 +31,7 @@
->  #include "hw/char/isa.h"
->  #include "hw/sysbus.h"
->  #include "hw/timer/i8254.h"
-> +#include "hw/timer/mc146818rtc.h"
->  #include "qapi/error.h"
->  
->  PCIDevice *piix4_dev;
-> @@ -43,6 +44,7 @@ typedef struct PIIX4State {
->      FDCtrlISABus floppy;
->      ISASerialState serial[2];
->      ISAParallelState parallel;
-> +    RTCState rtc;
->  
->      /* Reset Control Register */
->      MemoryRegion rcr_mem;
-> @@ -217,6 +219,15 @@ static void piix4_realize(PCIDevice *pci_dev, Error **errp)
->          return;
->      }
->  
-> +    /* timer */
-> +    qdev_set_parent_bus(DEVICE(&s->rtc), BUS(isa_bus));
-
-... here. You don't set the "base_year" property.
-If unset, the default of 1980 is used.
-However ...
-
-> +    object_property_set_bool(OBJECT(&s->rtc), true, "realized", &err);
-> +    if (err) {
-> +        error_propagate(errp, err);
-> +        return;
-> +    }
-> +    isa_init_irq(ISA_DEVICE(&s->rtc), &s->rtc.irq, RTC_ISA_IRQ);
+> diff --git a/fs/xfs/xfs_file.c b/fs/xfs/xfs_file.c
+> index 1f2e2845eb76..0e59be018511 100644
+> --- a/fs/xfs/xfs_file.c
+> +++ b/fs/xfs/xfs_file.c
+> @@ -1196,11 +1196,13 @@ xfs_file_mmap(
+>  	struct file	*filp,
+>  	struct vm_area_struct *vma)
+>  {
+> -	/*
+> -	 * We don't support synchronous mappings for non-DAX files. At least
+> -	 * until someone comes with a sensible use case.
+> +	struct dax_device *dax_dev = xfs_find_daxdev_for_inode
+> +						(file_inode(filp));
 > +
->      piix4_dev = pci_dev;
->      qemu_register_reset(piix4_reset, s);
->  }
-> @@ -231,6 +242,7 @@ static void piix4_init(Object *obj)
->          object_initialize(&s->serial[i], sizeof(s->serial[i]), TYPE_ISA_SERIAL);
->      }
->      object_initialize(&s->parallel, sizeof(s->parallel), TYPE_ISA_PARALLEL);
-> +    object_initialize(&s->rtc, sizeof(s->rtc), TYPE_MC146818_RTC);
->  
->      object_property_add_alias(obj, "floppy", OBJECT(&s->floppy), "driveA",
->                                &error_abort);
-> diff --git a/hw/mips/mips_malta.c b/hw/mips/mips_malta.c
-> index 30fb30fc0e..3d304a6e0a 100644
-> --- a/hw/mips/mips_malta.c
-> +++ b/hw/mips/mips_malta.c
-> @@ -995,7 +995,6 @@ void mips_malta_init(MachineState *machine)
->      uint8_t *smbus_eeprom_buf = g_malloc0(smbus_eeprom_size);
->      int64_t kernel_entry, bootloader_run_addr;
->      PCIBus *pci_bus;
-> -    ISABus *isa_bus;
->      qemu_irq cbus_irq, i8259_irq;
->      PCIDevice *pci;
->      int piix4_devfn;
-> @@ -1197,7 +1196,6 @@ void mips_malta_init(MachineState *machine)
->      qdev_prop_set_chr(dev, "parallel", parallel_hds[0]);
->  
->      qdev_init_nofail(dev);
-> -    isa_bus = ISA_BUS(qdev_get_child_bus(dev, "isa.0"));
->      piix4_devfn = pci->devfn;
->  
->      /* Interrupt controller */
-> @@ -1213,9 +1211,6 @@ void mips_malta_init(MachineState *machine)
->      smbus_eeprom_init(smbus, 8, smbus_eeprom_buf, smbus_eeprom_size);
->      g_free(smbus_eeprom_buf);
->  
-> -    /* Super I/O */
-> -    mc146818_rtc_init(isa_bus, 2000, NULL);
+> +	/* We don't support synchronous mappings for non-DAX files and
+> +	 * for DAX files if underneath dax_device is not synchronous.
+>  	 */
 
-... here it is set to 2000.
-The same value is used in the PC machine (which uses the PIIX3).
+	/*
+	 * This is the correct multi-line comment format. Please
+	 * update the patch to maintain the existing comment format.
+	 */
 
-> -
->      /* Network card */
->      network_init(pci_bus);
->  
-> 
+Cheers,
 
-I'll amend this snippet to your patch:
-
--- >8 --
-     /* RTC */
-     qdev_set_parent_bus(DEVICE(&s->rtc), BUS(isa_bus));
-+    qdev_prop_set_int32(DEVICE(&s->rtc), "base_year", 2000);
-     object_property_set_bool(OBJECT(&s->rtc), true, "realized", &err);
---
-
-Paolo/Michael: I'll keep your Acked-by, I hope you are OK with that.
-
-Regards,
-
-Phil.
+Dave.
+-- 
+Dave Chinner
+david@fromorbit.com
