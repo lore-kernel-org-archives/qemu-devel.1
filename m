@@ -2,111 +2,73 @@ Return-Path: <SRS0=zUjA=SZ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.4 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_PASS,USER_AGENT_MUTT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BA16EC10F14
-	for <qemu-devel@archiver.kernel.org>; Tue, 23 Apr 2019 08:32:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B4B1FC10F14
+	for <qemu-devel@archiver.kernel.org>; Tue, 23 Apr 2019 08:49:39 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7C50420645
-	for <qemu-devel@archiver.kernel.org>; Tue, 23 Apr 2019 08:32:26 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7C50420645
+	by mail.kernel.org (Postfix) with ESMTPS id 86CAA20685
+	for <qemu-devel@archiver.kernel.org>; Tue, 23 Apr 2019 08:49:39 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 86CAA20685
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:50070 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:50191 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hIqqn-0004vV-Rf
-	for qemu-devel@archiver.kernel.org; Tue, 23 Apr 2019 04:32:25 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:42857)
+	id 1hIr7S-0007sJ-MP
+	for qemu-devel@archiver.kernel.org; Tue, 23 Apr 2019 04:49:38 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:48190)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1hIqno-0002SG-LK
-	for qemu-devel@nongnu.org; Tue, 23 Apr 2019 04:29:21 -0400
+	(envelope-from <kwolf@redhat.com>) id 1hIr5y-00078E-NV
+	for qemu-devel@nongnu.org; Tue, 23 Apr 2019 04:48:10 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1hIqnn-0008Ll-KD
-	for qemu-devel@nongnu.org; Tue, 23 Apr 2019 04:29:20 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:42830)
+	(envelope-from <kwolf@redhat.com>) id 1hIqwQ-0003zo-Sd
+	for qemu-devel@nongnu.org; Tue, 23 Apr 2019 04:38:15 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:55476)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <david@redhat.com>) id 1hIqnn-0008LS-BU
-	for qemu-devel@nongnu.org; Tue, 23 Apr 2019 04:29:19 -0400
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
-	[10.5.11.12])
+	(Exim 4.71) (envelope-from <kwolf@redhat.com>)
+	id 1hIqwO-0003yi-7z; Tue, 23 Apr 2019 04:38:12 -0400
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+	[10.5.11.16])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id A201B308622A;
-	Tue, 23 Apr 2019 08:29:18 +0000 (UTC)
-Received: from [10.36.117.135] (ovpn-117-135.ams2.redhat.com [10.36.117.135])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id F16C860C64;
-	Tue, 23 Apr 2019 08:29:17 +0000 (UTC)
-To: Richard Henderson <richard.henderson@linaro.org>, qemu-devel@nongnu.org
-References: <20190420073442.7488-1-richard.henderson@linaro.org>
-	<20190420073442.7488-5-richard.henderson@linaro.org>
-From: David Hildenbrand <david@redhat.com>
-Openpgp: preference=signencrypt
-Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
-	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
-	SE+xAvmumFBY
-Organization: Red Hat GmbH
-Message-ID: <b4633799-eb78-6c7f-54e5-8b11bca37370@redhat.com>
-Date: Tue, 23 Apr 2019 10:29:17 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
-	Thunderbird/60.6.1
+	by mx1.redhat.com (Postfix) with ESMTPS id 57D4C33024A;
+	Tue, 23 Apr 2019 08:38:10 +0000 (UTC)
+Received: from localhost.localdomain (ovpn-116-143.ams2.redhat.com
+	[10.36.116.143])
+	by smtp.corp.redhat.com (Postfix) with ESMTPS id A6E325C1B5;
+	Tue, 23 Apr 2019 08:38:06 +0000 (UTC)
+Date: Tue, 23 Apr 2019 10:38:05 +0200
+From: Kevin Wolf <kwolf@redhat.com>
+To: Stefano Garzarella <sgarzare@redhat.com>
+Message-ID: <20190423083805.GC9041@localhost.localdomain>
+References: <20190411130245.ltfyp7d2dfe2cr3h@steredhat>
+	<CA+aFP1B7ZZ_xwNOfMbKUzEjYbMH=9dJstLYEyVq4LphPR81u0Q@mail.gmail.com>
+	<20190414132008.uxoia6avdpp4jov6@steredhat.homenet.telecomitalia.it>
+	<CA+aFP1D8VYcnwWpB=4PzAdBKr+YK-r8bSwzKKUCkH7jT3kVvoQ@mail.gmail.com>
+	<20190415080452.GA6031@localhost.localdomain>
+	<20190417073438.r57lemi6emu4x3ld@steredhat>
+	<20190417080443.GA8330@localhost.localdomain>
+	<20190419122356.7dmwwdbtnzgimydw@steredhat>
+	<20190423075619.GB9041@localhost.localdomain>
+	<20190423082657.mzulhihpv6rhgiww@steredhat>
 MIME-Version: 1.0
-In-Reply-To: <20190420073442.7488-5-richard.henderson@linaro.org>
 Content-Type: text/plain; charset="UTF-8"
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+Content-Disposition: inline
+In-Reply-To: <20190423082657.mzulhihpv6rhgiww@steredhat>
+User-Agent: Mutt/1.11.3 (2019-02-01)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.42]);
-	Tue, 23 Apr 2019 08:29:18 +0000 (UTC)
+	(mx1.redhat.com [10.5.110.29]);
+	Tue, 23 Apr 2019 08:38:10 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH 04/38] tcg: Support cross-class moves
- without instruction support
+Subject: Re: [Qemu-devel] [PATCH RFC 1/1] block/rbd: increase dynamically
+ the image size
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -118,78 +80,92 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: Josh Durgin <jdurgin@redhat.com>, dillaman@redhat.com,
+	qemu-devel <qemu-devel@nongnu.org>, qemu-block <qemu-block@nongnu.org>,
+	Max Reitz <mreitz@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190423082917.dtz0UOrZHXA_lAEbTkfP7ngCaynHIny4XuAdGmwW4Zo@z>
+Message-ID: <20190423083805.xAs8xadQG5WWZaCujQAwMjvcxvMS3mR83W5Yn4o2qco@z>
 
-On 20.04.19 09:34, Richard Henderson wrote:
-> PowerPC Altivec does not support direct moves between vector registers
-> and general registers.  So when tcg_out_mov fails, we can use the
-> backing memory for the temporary to perform the move.
+Am 23.04.2019 um 10:26 hat Stefano Garzarella geschrieben:
+> On Tue, Apr 23, 2019 at 09:56:19AM +0200, Kevin Wolf wrote:
+> > Am 19.04.2019 um 14:23 hat Stefano Garzarella geschrieben:
+> > > Hi Kevin,
+> > > 
+> > > On Wed, Apr 17, 2019 at 10:04:43AM +0200, Kevin Wolf wrote:
+> > > > Am 17.04.2019 um 09:34 hat Stefano Garzarella geschrieben:
+> > > > > On Mon, Apr 15, 2019 at 10:04:52AM +0200, Kevin Wolf wrote:
+> > > > > > 
+> > > > > > I think a potential actual use case could be persistent dirty bitmaps
+> > > > > > for incremental backup. Though maybe that would be better served by
+> > > > > > using the rbd image just as a raw external data file and keeping the
+> > > > > > qcow2 metadata on a filesystem.
+> > > > > 
+> > > > > Thanks to point it out! I'll take a look to understand how to keep
+> > > > > metadata separated from the data.
+> > > > 
+> > > > I'd consider the feature still experimental, but for local files, it
+> > > > works like this:
+> > > > 
+> > > >     qemu-img create -f qcow2 -o data_file=test.raw test.qcow2 4G
+> > > > 
+> > > > And then just use test.qcow2. As long as you can put everything you need
+> > > > into an rbd URL, the same approach should work. Otherwise, you may need
+> > > > to use QMP blockdev-create on creation and possibly the data-file option
+> > > > of the qcow2 driver for opening.
+> > > 
+> > > Very interesting, I'll try to add this support also in the rbd driver.
+> > 
+> > I don't understand - what is the thing you want to add to the rbd driver?
+> > qcow2 doesn't need special protocol driver support for doing this, and I
+> > don't think the QEMU rbd driver has any metadata that could be split off.
+> > 
 > 
-> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
-> ---
->  tcg/tcg.c | 25 ++++++++++++++++++++++---
->  1 file changed, 22 insertions(+), 3 deletions(-)
+> Oh sorry, I didn't understand that was completely independent from the
+> protocol.
 > 
-> diff --git a/tcg/tcg.c b/tcg/tcg.c
-> index b083faacd2..d3dcfe3dca 100644
-> --- a/tcg/tcg.c
-> +++ b/tcg/tcg.c
-> @@ -3373,7 +3373,18 @@ static void tcg_reg_alloc_mov(TCGContext *s, const TCGOp *op)
->                                           ots->indirect_base);
->              }
->              if (!tcg_out_mov(s, otype, ots->reg, ts->reg)) {
-> -                abort();
-> +                /* Cross register class move not supported.
-> +                   Store the source register into the destination slot
-> +                   and leave the destination temp as TEMP_VAL_MEM.  */
-> +                assert(!ots->fixed_reg);
-> +                if (!ts->mem_allocated) {
-> +                    temp_allocate_frame(s, ots);
-> +                }
-> +                tcg_out_st(s, ts->type, ts->reg,
-> +                           ots->mem_base->reg, ots->mem_offset);
-> +                ots->mem_coherent = 1;
-> +                temp_free_or_dead(s, ots, -1);
-> +                return;
->              }
->          }
->          ots->val_type = TEMP_VAL_REG;
-> @@ -3475,7 +3486,11 @@ static void tcg_reg_alloc_op(TCGContext *s, const TCGOp *op)
->              reg = tcg_reg_alloc(s, arg_ct->u.regs, i_allocated_regs,
->                                  o_preferred_regs, ts->indirect_base);
->              if (!tcg_out_mov(s, ts->type, reg, ts->reg)) {
-> -                abort();
-> +                /* Cross register class move not supported.  Sync the
-> +                   temp back to its slot and load from there.  */
-> +                temp_sync(s, ts, i_allocated_regs, 0, 0);
-> +                tcg_out_ld(s, ts->type, reg,
-> +                           ts->mem_base->reg, ts->mem_offset);
->              }
->          }
->          new_args[i] = reg;
-> @@ -3634,7 +3649,11 @@ static void tcg_reg_alloc_call(TCGContext *s, TCGOp *op)
->                  if (ts->reg != reg) {
->                      tcg_reg_free(s, reg, allocated_regs);
->                      if (!tcg_out_mov(s, ts->type, reg, ts->reg)) {
-> -                        abort();
-> +                        /* Cross register class move not supported.  Sync the
-> +                           temp back to its slot and load from there.  */
-> +                        temp_sync(s, ts, allocated_regs, 0, 0);
-> +                        tcg_out_ld(s, ts->type, reg,
-> +                                   ts->mem_base->reg, ts->mem_offset);
->                      }
->                  }
->              } else {
+> > > > > > How fast is rbd_resize()? Does automatically resizing for every write
+> > > > > > request actually work reasonably well in practice? If it does, there is
+> > > > > > probably little reason not to allow it, even if the use cases are rather
+> > > > > > obscure.
+> > > > > 
+> > > > > I'll try to measure the percentage of the time spent in the rbd_resize.
+> > > > > 
+> > > > > Another solution could be to pass to the rbd driver the virtual size of
+> > > > > the image and resize it only one time also if the preallocation is
+> > > > > disabled, because RBD will not allocate blocks but IIUC it only set the max
+> > > > > size.
+> > > > > 
+> > > > > Do you think make sense? Is it feasible?
+> > > > 
+> > > > In theory yes, though it requires modification of every driver that
+> > > > should be usable together with rbd (i.e. ideally all of the drivers). If
+> > > > automatic resize works good enough, I'd prefer that
+> > > 
+> > > I did some tests and it seems that the cost of rbd_resize() is
+> > > negligible. IIUC it only updates the metadata without allocating any
+> > > blocks (if we are growing, like that case).
+> > > 
+> > > Anyway the automatic resize will not affect the current use-case (raw
+> > > images on rbd), where the file size is set during the creation, so I
+> > > think there should not be side effects with this patch.
+> > 
+> > Okay, sounds good.
+> > 
+> > > I'm also adding the support for preallocation (i.e. full) in the rbd
+> > > driver that can be useful for qcow2 images.
+> > > 
+> > > If you prefer I can resend this patch with the preallocation series.
+> > 
+> > Let's keep seperate things separate. Huge patch series are always harder
+> > to handle.
 > 
+> Okay, thanks for the suggestion!
+> 
+> Should this patch go through your tree?
 
-Acked-by: David Hildenbrand <david@redhat.com>
+I think so, yes.
 
--- 
-
-Thanks,
-
-David / dhildenb
+Kevin
 
