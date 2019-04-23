@@ -1,25 +1,23 @@
-Received: from eggs.gnu.org ([209.51.188.92]:38390)
+Received: from eggs.gnu.org ([209.51.188.92]:40110)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <aleksandar.m.mail@gmail.com>) id 1hIzjE-0002fh-0N
-	for qemu-devel@nongnu.org; Tue, 23 Apr 2019 14:01:13 -0400
+	(envelope-from <jsnow@redhat.com>) id 1hIzlI-0003aK-Un
+	for qemu-devel@nongnu.org; Tue, 23 Apr 2019 14:03:22 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <aleksandar.m.mail@gmail.com>) id 1hIzjA-0006es-JN
-	for qemu-devel@nongnu.org; Tue, 23 Apr 2019 14:01:10 -0400
-Received: from mail-oi1-x242.google.com ([2607:f8b0:4864:20::242]:32889)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <aleksandar.m.mail@gmail.com>)
-	id 1hIzj1-0006Z9-Qe
-	for qemu-devel@nongnu.org; Tue, 23 Apr 2019 14:01:02 -0400
-Received: by mail-oi1-x242.google.com with SMTP id e5so12066385oii.0
-	for <qemu-devel@nongnu.org>; Tue, 23 Apr 2019 11:00:55 -0700 (PDT)
+	(envelope-from <jsnow@redhat.com>) id 1hIzlG-0000Nm-P5
+	for qemu-devel@nongnu.org; Tue, 23 Apr 2019 14:03:20 -0400
+References: <20190422221714.7630-1-jsnow@redhat.com>
+	<20190422221714.7630-3-jsnow@redhat.com>
+	<a8aa6da5-7951-e42b-23b2-3718dec543e9@virtuozzo.com>
+From: John Snow <jsnow@redhat.com>
+Message-ID: <70ec70ea-02e0-b740-2523-a2cc0d650d06@redhat.com>
+Date: Tue, 23 Apr 2019 14:03:00 -0400
 MIME-Version: 1.0
-References: <20190417194821.23017-1-daniel.santos@pobox.com>
-In-Reply-To: <20190417194821.23017-1-daniel.santos@pobox.com>
-From: Aleksandar Markovic <aleksandar.m.mail@gmail.com>
-Date: Tue, 23 Apr 2019 20:00:42 +0200
-Message-ID: <CAL1e-=jNcnCgdQM7+qYM_fArLLUET-KtyHEGDboPK_pXqYu+=g@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH] mips: Fix "Unexpected FPU mode"
+In-Reply-To: <a8aa6da5-7951-e42b-23b2-3718dec543e9@virtuozzo.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v2 2/2] docs/interop/bitmaps: rewrite and
+ modernize doc
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,78 +26,317 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Daniel Santos <daniel.santos@pobox.com>
-Cc: qemu-devel <qemu-devel@nongnu.org>
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+Cc: "aliang@redhat.com" <aliang@redhat.com>, "kchamart@redhat.com" <kchamart@redhat.com>, "eblake@redhat.com" <eblake@redhat.com>, Fam Zheng <fam@euphon.net>, "nsoffer@redhat.com" <nsoffer@redhat.com>, "qemu-stable@nongnu.org" <qemu-stable@nongnu.org>, "armbru@redhat.com" <armbru@redhat.com>
 
-On Wed, Apr 17, 2019 at 9:50 PM Daniel Santos <daniel.santos@pobox.com> wrote:
->
-> In load_elf_binary, struct image_info interp_info is used without being
-> properly initialized.  One result is that when the ELF's program header
-> doesn't contain an entry for the ABI flags, then the value of the struct
-> image_info's fp_abi field is set to whatever happened to be in stack
-> memory at the time.
->
-> This patch both sanitizes interp_info and initializes fp_abi for
-> TARGET_MIPS to MIPS_ABI_FP_UNKNOWN so that when we don't know the FP
-> ABI, we don't just blow up.  Currently, this bug is a complete stopper
-> for some MIPS binaries.
->
-> ***PLEASE NOTE***
-> There may be other bugs as a result of struct image_info interp_info
-> fields not being properly initialized -- this patch only addresses the
-> fp_abi field.  I reccomend somebody who knows the code better than I
-> audit this function and the whole of that execution path.
->
-> Fixes bug #1825002 and affects 3.1.0 and 4.x, reccomend backporting to
-> 3.1.0.
->
-> Signed-off-by: Daniel Santos <daniel.santos@pobox.com>
-> ---
 
-Daniel, not knowing that you already send this patch, I included it in another
-series (with different title and commit message, but the same content):
 
-https://lists.gnu.org/archive/html/qemu-devel/2019-04/msg03813.html
+On 4/23/19 1:58 PM, Vladimir Sementsov-Ogievskiy wrote:
+> 23.04.2019 1:17, John Snow wrote:
+>> This just about rewrites the entirety of the bitmaps.rst document to
+>> make it consistent with the 4.0 release. I have added new features seen
+>> in the 4.0 release, as well as tried to clarify some points that keep
+>> coming up when discussing this feature both in-house and upstream.
+>>
+>> Yes, it's a lot longer, mostly due to examples. I get a bit chatty.
+>> I could use a good editor to help reign in my chattiness.
+>>
+>> It does not yet cover pull backups or migration details, but I intend to
+>> keep extending this document to cover those cases.
+>>
+>> Please try compiling it with sphinx and look at the rendered output, I
+>> don't have hosting to share my copy at present. I think this new layout
+>> reads nicer in the HTML format than the old one did, at the expense of
+>> looking less readable in the source tree itself (though not completely
+>> unmanagable. We did decide to convert it from Markdown to ReST, after
+>> all, so I am going all-in on ReST.)
+>>
+>> Signed-off-by: John Snow <jsnow@redhat.com>
+>> ---
+> 
+> [..]
+> 
+>> +Bitmap Status
+>> +-------------
+>> +
+>> +Dirty Bitmap objects can be queried with the QMP command `query-block
+>> +<qemu-qmp-ref.html#index-query_002dblock>`_, and are visible via the
+>> +`BlockDirtyInfo <qemu-qmp-ref.html#index-BlockDirtyInfo>`_ QAPI structure.
+>> +
+>> +This struct shows the name, granularity, and dirty byte count for each bitmap.
+>> +Additionally, it shows several boolean status indicators:
+>> +
+>> +- ``recording``: This bitmap is recording writes.
+>> +- ``busy``: This bitmap is in-use by an operation.
+>> +- ``persistent``: This bitmap is a persistent type.
+>> +- ``inconsistent``: This bitmap is corrupted and cannot be used.
+>> +
+>> +The ``+busy`` status prohibits you from deleting, clearing, or otherwise
+>> +modifying a bitmap, and happens when the bitmap is being used for a backup
+>> +operation or is in the process of being loaded from a migration. Many of the
+>> +commands documented below will refuse to work on such bitmaps.
+>> +
+>> +The ``+inconsistent`` status similarly prohibits almost all operations,
+>> +notably allowing only the ``block-dirty-bitmap-remove`` operation.
+>> +
+>> +There is also a deprecated "`DirtyBitmapStatus
+>> +<qemu-qmp-ref.html#index-DirtyBitmapStatus>`_" field. a bitmap historically
+> 
+> I think, better s/DirtyBitmapStatus/status/, to use field name, not type for what
+> to call "field".
+> 
+> 
+>> +had five visible states:
+>> +
+>> +   #. ``Frozen``: This bitmap is currently in-use by an operation and is
+>> +      immutable. It can't be deleted, renamed, reset, etc.
+>> +
+>> +      (This is now ``+busy``.)
+>> +
+>> +   #. ``Disabled``: This bitmap is not recording new writes.
+>> +
+> 
+> [..]
+> 
+>> +Example: Incremental Push Backups without Backing Files
+>> +~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+>> +
+>> +Backup images are best kept off-site, so we often will not have the preceding
+>> +backups in a chain available to link against. This is not a problem at backup
+>> +time; we simply do not set the backing image when creating the destination
+>> +image:
+>> +
+>> +#. Create a new destination image with no backing file set. We will need to
+>> +   specify the size of the base image this time, because it isn't available
+>> +   for QEMU to use to guess:
+> 
+> hmm, s/to use to guess/to guess/ ?
+> 
 
-Please let's track this patch there.
+Good point.
 
-I will change the commit message to bring it closer to the yours version
-in the next version of the series, and I will review the patch from MIPS
-point of view.
+>>   
+>>      .. code:: bash
+>>   
+> 
+> [..]
+> 
+>> +Example: Individual Failures
+>> +~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+>> +
+>> +Backup jobs that fail individually behave simply as described above. This
+>> +example shows the simplest case:
+> 
+> Hmm, I think the simplest would be full backup without mode=existing :),
+> so suggest just s/This example.../Consider example below:/, or s/Backup/Incremental backup/
+> 
+>> +
+>> +#. Create a target image:
+>> +
+>> +   .. code:: bash
+>> +
+>> +       $ qemu-img create -f qcow2 drive0.inc0.qcow2 \
+>> +         -b drive0.full.qcow2 -F qcow2
+>> +
+>> +#. Attempt to create an incremental backup via QMP:
+>> +
+>> +   .. code:: json
+>> +
+>> +    -> {
+>> +         "execute": "drive-backup",
+>> +         "arguments": {
+>> +           "device": "drive0",
+>> +           "bitmap": "bitmap0",
+>> +           "target": "drive0.inc0.qcow2",
+>> +           "format": "qcow2",
+>> +           "sync": "incremental",
+>> +           "mode": "existing"
+>> +         }
+>> +       }
+>> +
+>> +    <- { "return": {} }
+>> +
+>> +#. Receive a pair of events indicating failure:
+>> +
+>> +   .. code:: json
+>> +
+>> +    <- {
+>> +         "timestamp": {...},
+>> +         "data": {
+>> +           "device": "drive0",
+>> +           "action": "report",
+>> +           "operation": "read"
+>> +         },
+>> +         "event": "BLOCK_JOB_ERROR"
+>> +       }
+>> +
+>> +    <- {
+>> +         "timestamp": {...},
+>> +         "data": {
+>> +           "speed": 0,
+>> +           "offset": 0,
+>> +           "len": 67108864,
+>> +           "error": "No space left on device",
+>> +           "device": "drive0",
+>> +           "type": "backup"
+>> +         },
+>> +         "event": "BLOCK_JOB_COMPLETED"
+>> +       }
+> 
+> a bit strange to get ENOSPC on read (understand that you use blkdebug),
+> consider s/read/write/ just for beauty
+> 
 
-Just advice for the future: Before sending patches to qemu-devel,
-check what are maintainers for the applicable code. There is even a
-script for that: <qemu-root>/scripts/get_maintainers.pl
+You are absolutely right, this doesn't make sense in the context of
+something you'd see in the wild.
 
-There are also other rules and conventiones, and all of them are
-mentioned on the page "How to submit a patch" on QEMU web site.
+>>   
+>> -4. Delete the failed incremental, and re-create the image.
+>> +#. Delete the failed image, and re-create it.
+>>   
+>>      .. code:: bash
+> 
+> [..]
+> 
+>> +
+>> +Example: Partial Transactional Failures
+>> +~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+>> +
+>> +QMP commands like `drive-backup <qemu-qmp-ref.html#index-drive_002dbackup>`_
+>> +conceptually only start a job, and so transactions containing these commands
+>> +may succeed even if the job it created later fails. This might have surprising
+>> +interactions with notions of how a "transaction" ought to behave.
+>> +
+>> +This distinction means that on occasion, a transaction containing such job
+>> +launching commands may appear to succeed and return success, but later
+>> +individual jobs associated with the transaction may fail. It is possible that
+>> +a management application may have to deal with a partial backup failure after
+>> +a "successful" transaction.
+>> +
+>> +If multiple backup jobs are specified in a single transaction, if one of those
+>> +jobs fails, it will not interact with the other backup jobs in any way by
+>> +default. The job(s) that succeeded will clear the dirty bitmap associated with
+>> +the operation, but the job(s) that failed will not. It is therefore not safe
+>> +to delete any incremental backups that were created successfully in this
+>> +scenario, even though others failed.
+>> +
+>> +This example illustrates a transaction with two backup jobs, where one fails
+>> +and one succeeds:
+>> +
+>> +#. Issue the transaction to start a backup of both drives. Note that the
+>> +   transaction is accepted, indicating that the jobs are started succesfully.
+> 
+> And now this "note" looks strange, as it related not to this list item but to the next.
+> Actually, we can't "note" that in context of this list item.
+> 
+>>   
+>>      .. code:: json
+>>   
+>> -       { "execute": "transaction",
+>> +    -> {
+>> +         "execute": "transaction",
+>>            "arguments": {
+>>              "actions": [
+>> -             { "type": "drive-backup",
+>> -               "data": { "device": "drive0", "bitmap": "bitmap0",
+>> -                         "format": "qcow2", "mode": "existing",
+>> -                         "sync": "incremental", "target": "d0-incr-1.qcow2" } },
+>> -             { "type": "drive-backup",
+>> -               "data": { "device": "drive1", "bitmap": "bitmap1",
+>> -                         "format": "qcow2", "mode": "existing",
+>> -                         "sync": "incremental", "target": "d1-incr-1.qcow2" } },
+>> -           ]
+>> +           {
+>> +             "type": "drive-backup",
+>> +             "data": {
+>> +               "device": "drive0",
+>> +               "bitmap": "bitmap0",
+>> +               "format": "qcow2",
+>> +               "mode": "existing",
+>> +               "sync": "incremental",
+>> +               "target": "drive0.inc0.qcow2"
+>> +             }
+>> +           },
+>> +           {
+>> +             "type": "drive-backup",
+>> +             "data": {
+>> +               "device": "drive1",
+>> +               "bitmap": "bitmap0",
+>> +               "format": "qcow2",
+>> +               "mode": "existing",
+>> +               "sync": "incremental",
+>> +               "target": "drive1.inc0.qcow2"
+>> +             }
+>> +           }]
+>>            }
+>>          }
+>>   
+>> --  QMP example response, highlighting one success and one failure:
+>> +#. Receive notice that the Transaction was accepted, and jobs were
+>> +   launched:
+>>   
+>> -   -  Acknowledgement that the Transaction was accepted and jobs were
+>> -      launched:
+>> +   .. code:: json
+>> +
+>> +    <- { "return": {} }
+>> +
+>> +#. Receive notice that the first job has completed:
+>>   
+> 
+> [..]
+> 
+>> -      .. code:: json
+>> +At the conclusion of the above example, ``drive0.inc0.qcow2`` is valid and
+>> +must be kept, but ``drive1.inc0.qcow2`` is incomplete and should be
+>> +deleted. If a VM-wide incremental backup of all drives at a point-in-time is
+>> +to be made, new backups for both drives will need to be made, taking into
+>> +account that a new incremental backup for drive0 needs to be based on top of
+>> +``drive0.inc0.qcow2``.
+>>   
+>> -          { "timestamp": { "seconds": 1447192399, "microseconds": 683015 },
+>> -            "data": { "device": "drive1", "action": "report",
+>> -                      "operation": "read" },
+>> -            "event": "BLOCK_JOB_ERROR" }
+>> +In other words, at the conclusion of the above example, we'd have made only an
+>> +incremental backup for drive0 but not drive1. The last VM-wide crash
+>> +consistent backup we have access to in this case is the anchor point.
+> 
+> Not sure about "anchor point", can't be it applied to incremental backup point?
+> May be just "full-backup point" or something like this?
+> 
 
-But, in any case, many thanks for discovering and reporting the bug,
-and even devising the fix!
+You're right, I don't really use this term too consistently. I always
+refer to them as "anchors" because they're at "the bottom of the chain"
+but I should at least explain this terminology if I am going to use it.
 
-Yours,
-Aleksandar
+>>   
+>> -      .. code:: json
+>> +.. code:: text
+>>   
+>> -          { "timestamp": { "seconds": 1447192399, "microseconds":
+>> -          685853 }, "data": { "speed": 0, "offset": 0, "len": 67108864,
+>> -          "error": "Input/output error", "device": "drive1", "type":
+>> -          "backup" }, "event": "BLOCK_JOB_COMPLETED" }
+>> +          [drive0.full.qcow2] <-- [drive0.inc0.qcow2]
+>> +          [drive1.full.qcow2]
+>>   
+>> --  In the above example, ``d0-incr-1.qcow2`` is valid and must be kept,
+>> -   but ``d1-incr-1.qcow2`` is invalid and should be deleted. If a VM-wide
+>> -   incremental backup of all drives at a point-in-time is to be made,
+>> -   new backups for both drives will need to be made, taking into account
+>> -   that a new incremental backup for drive0 needs to be based on top of
+>> -   ``d0-incr-1.qcow2``.
+>> +To repair this, issue a new incremental backup across both drives. The result
+>> +will be backup chains that resemble the following:
+>>   
+> 
+> [..]
+> 
+> With or without my nit-picking suggestions:
+> 
+> Reviewed-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+> 
 
->  linux-user/elfload.c | 5 +++++
->  1 file changed, 5 insertions(+)
->
-> diff --git a/linux-user/elfload.c b/linux-user/elfload.c
-> index c1a26021f8..7f09d572a2 100644
-> --- a/linux-user/elfload.c
-> +++ b/linux-user/elfload.c
-> @@ -2698,6 +2698,11 @@ int load_elf_binary(struct linux_binprm *bprm, struct image_info *info)
->      char *elf_interpreter = NULL;
->      char *scratch;
->
-> +    memset(&interp_info, 0, sizeof(interp_info));
-> +#ifdef TARGET_MIPS
-> +    interp_info.fp_abi = MIPS_ABI_FP_UNKNOWN;
-> +#endif
-> +
->      info->start_mmap = (abi_ulong)ELF_START_MMAP;
->
->      load_elf_image(bprm->filename, bprm->fd, info,
-> --
-> 2.19.2
->
->
+They're good suggestions, so I will revise them. Thank you for reviewing
+such a large document!
