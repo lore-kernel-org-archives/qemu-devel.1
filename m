@@ -1,27 +1,27 @@
-Received: from eggs.gnu.org ([209.51.188.92]:38253)
+Received: from eggs.gnu.org ([209.51.188.92]:40281)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1hIvn2-0003qg-KF
-	for qemu-devel@nongnu.org; Tue, 23 Apr 2019 09:48:54 -0400
+	(envelope-from <philmd@redhat.com>) id 1hIw1u-0006kK-2v
+	for qemu-devel@nongnu.org; Tue, 23 Apr 2019 10:04:17 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1hIvn0-0002n8-LN
-	for qemu-devel@nongnu.org; Tue, 23 Apr 2019 09:48:52 -0400
-Received: from mail-wr1-f65.google.com ([209.85.221.65]:42927)
+	(envelope-from <philmd@redhat.com>) id 1hIw1L-0007Bi-Sj
+	for qemu-devel@nongnu.org; Tue, 23 Apr 2019 10:03:44 -0400
+Received: from mail-wr1-f66.google.com ([209.85.221.66]:34765)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1hIvmy-0002eQ-Mq
-	for qemu-devel@nongnu.org; Tue, 23 Apr 2019 09:48:50 -0400
-Received: by mail-wr1-f65.google.com with SMTP id g3so20300669wrx.9
-	for <qemu-devel@nongnu.org>; Tue, 23 Apr 2019 06:48:46 -0700 (PDT)
-References: <20190423110034.1260142-1-jakub.jermar@kernkonzept.com>
+	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1hIw1L-0007Av-N1
+	for qemu-devel@nongnu.org; Tue, 23 Apr 2019 10:03:39 -0400
+Received: by mail-wr1-f66.google.com with SMTP id c6so14693146wrm.1
+	for <qemu-devel@nongnu.org>; Tue, 23 Apr 2019 07:03:39 -0700 (PDT)
+References: <1555669092-10351-1-git-send-email-frederic.konrad@adacore.com>
+	<1555669092-10351-4-git-send-email-frederic.konrad@adacore.com>
 From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Message-ID: <ab4b6d04-74f9-2f12-829d-9df8c1b1c4ca@redhat.com>
-Date: Tue, 23 Apr 2019 15:48:42 +0200
+Message-ID: <9971c427-45e2-4f3b-b871-19539da11a41@redhat.com>
+Date: Tue, 23 Apr 2019 16:03:35 +0200
 MIME-Version: 1.0
-In-Reply-To: <20190423110034.1260142-1-jakub.jermar@kernkonzept.com>
+In-Reply-To: <1555669092-10351-4-git-send-email-frederic.konrad@adacore.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH v2] mips: Decide to map PAGE_EXEC in
- map_address
+Subject: Re: [Qemu-devel] [PATCH V1 3/3] MAINTAINERS: add myself for leon3
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,103 +30,29 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?B?SmFrdWIgSmVybcOhxZk=?= <jakub.jermar@kernkonzept.com>, qemu-devel@nongnu.org
-Cc: Aleksandar Rikalo <arikalo@wavecomp.com>, Aleksandar Markovic <amarkovic@wavecomp.com>, Aurelien Jarno <aurelien@aurel32.net>, Leon Alrae <leon.alrae@imgtec.com>
+To: KONRAD Frederic <frederic.konrad@adacore.com>, qemu-devel@nongnu.org
+Cc: peter.maydell@linaro.org, mark.cave-ayland@ilande.co.uk, atar4qemu@gmail.com, chouteau@adacore.com
 
-Hi Jakub,
-
-On 4/23/19 1:00 PM, Jakub Jermář wrote:
-> This commit addresses QEMU Bug #1825311:
-> 
->   mips_cpu_handle_mmu_fault renders all accessed pages executable
-> 
-> It allows finer-grained control over whether the accessed page should be
-> executable by moving the decision to the underlying map_address
-> function, which has more information for this.
-> 
-> As a result, pages that have the XI bit set in the TLB and are accessed
-> for read/write, don't suddenly end up being executable.
-> 
-
-Fixes: https://bugs.launchpad.net/qemu/+bug/1825311
-
-> Signed-off-by: Jakub Jermář <jakub.jermar@kernkonzept.com>
+On 4/19/19 12:18 PM, KONRAD Frederic wrote:
+> Signed-off-by: KONRAD Frederic <frederic.konrad@adacore.com>
 > ---
->  target/mips/helper.c | 17 ++++++++++-------
->  1 file changed, 10 insertions(+), 7 deletions(-)
+>  MAINTAINERS | 1 +
+>  1 file changed, 1 insertion(+)
 > 
-> diff --git a/target/mips/helper.c b/target/mips/helper.c
-> index c44cdca3b5..132d073fbe 100644
-> --- a/target/mips/helper.c
-> +++ b/target/mips/helper.c
-> @@ -43,7 +43,7 @@ int no_mmu_map_address (CPUMIPSState *env, hwaddr *physical, int *prot,
->                          target_ulong address, int rw, int access_type)
->  {
->      *physical = address;
-> -    *prot = PAGE_READ | PAGE_WRITE;
-> +    *prot = PAGE_READ | PAGE_WRITE | PAGE_EXEC;
->      return TLBRET_MATCH;
->  }
+> diff --git a/MAINTAINERS b/MAINTAINERS
+> index 56139ac..3543035 100644
+> --- a/MAINTAINERS
+> +++ b/MAINTAINERS
+> @@ -1151,6 +1151,7 @@ F: include/hw/timer/sun4v-rtc.h
 >  
-> @@ -61,7 +61,7 @@ int fixed_mmu_map_address (CPUMIPSState *env, hwaddr *physical, int *prot,
->      else
->          *physical = address;
->  
-> -    *prot = PAGE_READ | PAGE_WRITE;
-> +    *prot = PAGE_READ | PAGE_WRITE | PAGE_EXEC;
->      return TLBRET_MATCH;
->  }
->  
-> @@ -101,6 +101,9 @@ int r4k_map_address (CPUMIPSState *env, hwaddr *physical, int *prot,
->                  *prot = PAGE_READ;
->                  if (n ? tlb->D1 : tlb->D0)
->                      *prot |= PAGE_WRITE;
-> +                if (!(n ? tlb->XI1 : tlb->XI0)) {
-> +                    *prot |= PAGE_EXEC;
-> +                }
-
-This was indeed missed in commit 2fb58b73746e.
-
->                  return TLBRET_MATCH;
->              }
->              return TLBRET_DIRTY;
-> @@ -182,7 +185,7 @@ static int get_seg_physical_address(CPUMIPSState *env, hwaddr *physical,
->      } else {
->          /* The segment is unmapped */
->          *physical = physical_base | (real_address & segmask);
-> -        *prot = PAGE_READ | PAGE_WRITE;
-> +        *prot = PAGE_READ | PAGE_WRITE | PAGE_EXEC;
->          return TLBRET_MATCH;
->      }
->  }
-> @@ -913,8 +916,8 @@ int mips_cpu_handle_mmu_fault(CPUState *cs, vaddr address, int size, int rw,
->      }
->      if (ret == TLBRET_MATCH) {
->          tlb_set_page(cs, address & TARGET_PAGE_MASK,
-> -                     physical & TARGET_PAGE_MASK, prot | PAGE_EXEC,
-> -                     mmu_idx, TARGET_PAGE_SIZE);
-> +                     physical & TARGET_PAGE_MASK, prot, mmu_idx,
-> +                     TARGET_PAGE_SIZE);
->          ret = 0;
->      } else if (ret < 0)
->  #endif
-> @@ -936,8 +939,8 @@ int mips_cpu_handle_mmu_fault(CPUState *cs, vaddr address, int size, int rw,
->                                             address, rw, access_type, mmu_idx);
->                  if (ret == TLBRET_MATCH) {
->                      tlb_set_page(cs, address & TARGET_PAGE_MASK,
-> -                            physical & TARGET_PAGE_MASK, prot | PAGE_EXEC,
-> -                            mmu_idx, TARGET_PAGE_SIZE);
-> +                            physical & TARGET_PAGE_MASK, prot, mmu_idx,
-> +                            TARGET_PAGE_SIZE);
->                      ret = 0;
->                      return ret;
->                  }
+>  Leon3
+>  M: Fabien Chouteau <chouteau@adacore.com>
+> +M: KONRAD Frederic <frederic.konrad@adacore.com>
+>  S: Maintained
+>  F: hw/sparc/leon3.c
+>  F: hw/*/grlib*
 > 
 
-Your patch looks correct, but I'd like to test it.
-Do you have a reproducer?
-Can you describe the command line you used?
+Thank you for stepping in!
 
-Thanks,
-
-Phil.
+Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
