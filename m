@@ -1,27 +1,28 @@
-Received: from eggs.gnu.org ([209.51.188.92]:33352)
-	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1hJ3pC-0000S6-B3
-	for qemu-devel@nongnu.org; Tue, 23 Apr 2019 18:23:39 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:60226)
+	by lists.gnu.org with esmtp (Exim 4.71) (envelope-from
+	<3oI-_XAIKCqkNTPXXPUN.LXVZNVd-MNeNUWXWPWd.XaP@flex--ek.bounces.google.com>)
+	id 1hJ3mX-0007jb-Uy
+	for qemu-devel@nongnu.org; Tue, 23 Apr 2019 18:20:54 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1hJ3pB-0007ee-4V
-	for qemu-devel@nongnu.org; Tue, 23 Apr 2019 18:23:38 -0400
-Received: from mail-wr1-f66.google.com ([209.85.221.66]:42385)
+	(envelope-from
+	<3oI-_XAIKCqkNTPXXPUN.LXVZNVd-MNeNUWXWPWd.XaP@flex--ek.bounces.google.com>)
+	id 1hJ3mQ-0005cz-Gc
+	for qemu-devel@nongnu.org; Tue, 23 Apr 2019 18:20:50 -0400
+Received: from mail-pg1-x54a.google.com ([2607:f8b0:4864:20::54a]:48289)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1hJ3pA-0007bA-TH
-	for qemu-devel@nongnu.org; Tue, 23 Apr 2019 18:23:37 -0400
-Received: by mail-wr1-f66.google.com with SMTP id g3so22193932wrx.9
-	for <qemu-devel@nongnu.org>; Tue, 23 Apr 2019 15:23:35 -0700 (PDT)
-References: <20190423212246.3542-1-ehabkost@redhat.com>
-	<20190423212246.3542-2-ehabkost@redhat.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Message-ID: <76b8bb16-2e71-c41f-0d4a-79f6df059092@redhat.com>
-Date: Wed, 24 Apr 2019 00:23:33 +0200
-MIME-Version: 1.0
-In-Reply-To: <20190423212246.3542-2-ehabkost@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH 1/3] qapi: SupportStatusInfo struct
+	(Exim 4.71) (envelope-from
+	<3oI-_XAIKCqkNTPXXPUN.LXVZNVd-MNeNUWXWPWd.XaP@flex--ek.bounces.google.com>)
+	id 1hJ3mO-0005Sf-Cn
+	for qemu-devel@nongnu.org; Tue, 23 Apr 2019 18:20:46 -0400
+Received: by mail-pg1-x54a.google.com with SMTP id o1so10835250pgv.15
+	for <qemu-devel@nongnu.org>; Tue, 23 Apr 2019 15:20:18 -0700 (PDT)
+Date: Tue, 23 Apr 2019 15:20:05 -0700
+Message-Id: <20190423222005.246981-1-ek@google.com>
+Mime-Version: 1.0
+From: Erik Kline <ek@google.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: [Qemu-devel] [PATCH] The ioctl(SIOCGIFNAME) call requires a struct
+ ifreq.
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,64 +31,27 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eduardo Habkost <ehabkost@redhat.com>, qemu-devel@nongnu.org
-Cc: mprivozn@redhat.com, Markus Armbruster <armbru@redhat.com>
+To: qemu-devel@nongnu.org
+Cc: ek@loon.com, Erik Kline <ek@google.com>
 
-Hi Eduardo,
+Signed-off-by: Erik Kline <ek@google.com>
+Buglink: https://bugs.launchpad.net/qemu/+bug/1814352
+---
+ linux-user/ioctls.h | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-On 4/23/19 11:22 PM, Eduardo Habkost wrote:
-> This struct will be used to represent support and deprecation
-> status of QEMU features.
-
-Excellent idea!
-
-> 
-> Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
-> ---
->  qapi/common.json | 24 ++++++++++++++++++++++++
->  1 file changed, 24 insertions(+)
-> 
-> diff --git a/qapi/common.json b/qapi/common.json
-> index 99d313ef3b..b59d0dc66b 100644
-> --- a/qapi/common.json
-> +++ b/qapi/common.json
-> @@ -193,3 +193,27 @@
->               'ppc64', 'riscv32', 'riscv64', 's390x', 'sh4',
->               'sh4eb', 'sparc', 'sparc64', 'tricore', 'unicore32',
->               'x86_64', 'xtensa', 'xtensaeb' ] }
-> +
-> +##
-> +# @SupportStatusInfo:
-> +#
-> +# Information on support status of a given feature
-> +# (e.g. machine type)
-
-Hopefully it is generic, we can use it for devices too.
-
-> +#
-> +# @deprecated: if true, the given feature is deprecated and may be removed
-> +#              in future versions of QEMU according to the QEMU deprecation
-> +#              policy.
-> +#
-> +# @status-message: Human readable message describing support status
-> +#                  of the feature.
-> +#
-> +# @suggested-alternative: Optional.  Suggested alternative for a deprecated
-> +#                         feature.  For machine types, this should be the name
-> +#                         of an available machine-type.
-> +#
-> +# Since: 4.1
-> +##
-> +{ 'struct': 'SupportStatusInfo',
-> +  'data': { 'deprecated': 'bool',
-> +            '*status-message': 'str',
-
-This one shouldn't be optional IMHO, we should enforce developpers to
-give a reason for their deprecation.
-
-With this argument not optional:
-
-Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
-
-> +            '*suggested-alternative': 'str' } }
-> 
+diff --git a/linux-user/ioctls.h b/linux-user/ioctls.h
+index ae8951625f..37501f575c 100644
+--- a/linux-user/ioctls.h
++++ b/linux-user/ioctls.h
+@@ -178,7 +178,7 @@
+ #endif /* CONFIG_USBFS */
+ 
+   IOCTL(SIOCATMARK, IOC_R, MK_PTR(TYPE_INT))
+-  IOCTL(SIOCGIFNAME, IOC_RW, MK_PTR(TYPE_INT))
++  IOCTL(SIOCGIFNAME, IOC_RW, MK_PTR(MK_STRUCT(STRUCT_int_ifreq)))
+   IOCTL(SIOCGIFFLAGS, IOC_W | IOC_R, MK_PTR(MK_STRUCT(STRUCT_short_ifreq)))
+   IOCTL(SIOCSIFFLAGS, IOC_W, MK_PTR(MK_STRUCT(STRUCT_short_ifreq)))
+   IOCTL(SIOCGIFADDR, IOC_W | IOC_R, MK_PTR(MK_STRUCT(STRUCT_sockaddr_ifreq)))
+-- 
+2.21.0.593.g511ec345e18-goog
