@@ -2,55 +2,66 @@ Return-Path: <SRS0=zUjA=SZ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 022A6C282DD
-	for <qemu-devel@archiver.kernel.org>; Tue, 23 Apr 2019 11:04:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2109DC10F14
+	for <qemu-devel@archiver.kernel.org>; Tue, 23 Apr 2019 11:06:18 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C86AA21738
-	for <qemu-devel@archiver.kernel.org>; Tue, 23 Apr 2019 11:04:44 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C86AA21738
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kernkonzept.com
+	by mail.kernel.org (Postfix) with ESMTPS id A0E5021738
+	for <qemu-devel@archiver.kernel.org>; Tue, 23 Apr 2019 11:06:17 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A0E5021738
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=adacore.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:51751 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:51797 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hItEC-0001KB-1Y
-	for qemu-devel@archiver.kernel.org; Tue, 23 Apr 2019 07:04:44 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:58149)
+	id 1hItFg-0002dl-UA
+	for qemu-devel@archiver.kernel.org; Tue, 23 Apr 2019 07:06:16 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:57285)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jermar@gorgo>) id 1hItBZ-0008D7-QG
-	for qemu-devel@nongnu.org; Tue, 23 Apr 2019 07:02:04 -0400
+	(envelope-from <chouteau@adacore.com>) id 1hItAJ-0007GU-PK
+	for qemu-devel@nongnu.org; Tue, 23 Apr 2019 07:00:44 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jermar@gorgo>) id 1hItBW-0001R8-E9
-	for qemu-devel@nongnu.org; Tue, 23 Apr 2019 07:02:01 -0400
-Received: from [93.153.64.87] (port=41234 helo=gorgo)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <jermar@gorgo>) id 1hItBV-0001Id-WC
-	for qemu-devel@nongnu.org; Tue, 23 Apr 2019 07:01:58 -0400
-Received: from gorgo (localhost.localdomain [127.0.0.1])
-	by gorgo (8.15.2/8.15.2) with ESMTPS id x3NB1cXK1260256
-	(version=TLSv1.3 cipher=TLS_AES_256_GCM_SHA384 bits=256 verify=NOT);
-	Tue, 23 Apr 2019 13:01:38 +0200
-Received: (from jermar@localhost)
-	by gorgo (8.15.2/8.15.2/Submit) id x3NB1cIT1260189;
-	Tue, 23 Apr 2019 13:01:38 +0200
-From: =?UTF-8?q?Jakub=20Jerm=C3=A1=C5=99?= <jakub.jermar@kernkonzept.com>
-To: qemu-devel@nongnu.org
-Date: Tue, 23 Apr 2019 13:00:34 +0200
-Message-Id: <20190423110034.1260142-1-jakub.jermar@kernkonzept.com>
-X-Mailer: git-send-email 2.20.1
+	(envelope-from <chouteau@adacore.com>) id 1hIt8Y-0007WR-0t
+	for qemu-devel@nongnu.org; Tue, 23 Apr 2019 06:58:54 -0400
+Received: from mel.act-europe.fr ([2a02:2ab8:224:1::a0a:d2]:51911
+	helo=smtp.eu.adacore.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <chouteau@adacore.com>)
+	id 1hIt8X-0007Td-RG
+	for qemu-devel@nongnu.org; Tue, 23 Apr 2019 06:58:53 -0400
+Received: from localhost (localhost [127.0.0.1])
+	by filtered-smtp.eu.adacore.com (Postfix) with ESMTP id 43C5A81387;
+	Tue, 23 Apr 2019 12:58:51 +0200 (CEST)
+X-Virus-Scanned: Debian amavisd-new at eu.adacore.com
+Received: from smtp.eu.adacore.com ([127.0.0.1])
+	by localhost (smtp.eu.adacore.com [127.0.0.1]) (amavisd-new, port 10024)
+	with ESMTP id J7Y6iKEN8PzO; Tue, 23 Apr 2019 12:58:51 +0200 (CEST)
+Received: from [192.168.42.81] (unknown [37.175.125.110])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+	(No client certificate requested)
+	by smtp.eu.adacore.com (Postfix) with ESMTPSA id B042781386;
+	Tue, 23 Apr 2019 12:58:50 +0200 (CEST)
+To: KONRAD Frederic <frederic.konrad@adacore.com>, qemu-devel@nongnu.org
+References: <1555669092-10351-1-git-send-email-frederic.konrad@adacore.com>
+	<1555669092-10351-2-git-send-email-frederic.konrad@adacore.com>
+From: Fabien Chouteau <chouteau@adacore.com>
+Message-ID: <92f9bdab-36af-d76a-02b4-0ea2610b7498@adacore.com>
+Date: Tue, 23 Apr 2019 12:58:47 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+	Thunderbird/60.5.1
 MIME-Version: 1.0
+In-Reply-To: <1555669092-10351-2-git-send-email-frederic.konrad@adacore.com>
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-MIME-Autoconverted: from 8bit to quoted-printable by gorgo id x3NB1cXK1260256
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 93.153.64.87
-Subject: [Qemu-devel] [PATCH v2] mips: Decide to map PAGE_EXEC in map_address
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x
+X-Received-From: 2a02:2ab8:224:1::a0a:d2
+Subject: Re: [Qemu-devel] [PATCH V1 1/3] leon3: add a little bootloader
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -62,103 +73,20 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: =?UTF-8?q?Jakub=20Jerm=C3=A1=C5=99?= <jakub.jermar@kernkonzept.com>,
-	Aleksandar Rikalo <arikalo@wavecomp.com>,
-	Aleksandar Markovic <amarkovic@wavecomp.com>,
-	Aurelien Jarno <aurelien@aurel32.net>
+Cc: peter.maydell@linaro.org, mark.cave-ayland@ilande.co.uk,
+	atar4qemu@gmail.com, philmd@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190423110034.p9FqVCBEojRkdyrbl0lKaDv_Fbi0TNJa_QshM4PcYcc@z>
+Message-ID: <20190423105847.D-2RnkhQy_Tp4qX9be8gn-UD13BX-6rloql3FI1E2vs@z>
 
-This commit addresses QEMU Bug #1825311:
+On 19/04/2019 12:18, KONRAD Frederic wrote:
+> This adds a little bootloader to the leon3_machine when a ram image is
+> given through the kernel parameter and no bios are provided:
+>   * The UART transmiter is enabled.
+>   * The TIMER is initialized.
+> 
+> Signed-off-by: KONRAD Frederic <frederic.konrad@adacore.com>
 
-  mips_cpu_handle_mmu_fault renders all accessed pages executable
-
-It allows finer-grained control over whether the accessed page should be
-executable by moving the decision to the underlying map_address
-function, which has more information for this.
-
-As a result, pages that have the XI bit set in the TLB and are accessed
-for read/write, don't suddenly end up being executable.
-
-Signed-off-by: Jakub Jerm=C3=A1=C5=99 <jakub.jermar@kernkonzept.com>
----
- target/mips/helper.c | 17 ++++++++++-------
- 1 file changed, 10 insertions(+), 7 deletions(-)
-
-diff --git a/target/mips/helper.c b/target/mips/helper.c
-index c44cdca3b5..132d073fbe 100644
---- a/target/mips/helper.c
-+++ b/target/mips/helper.c
-@@ -43,7 +43,7 @@ int no_mmu_map_address (CPUMIPSState *env, hwaddr *phys=
-ical, int *prot,
-                         target_ulong address, int rw, int access_type)
- {
-     *physical =3D address;
--    *prot =3D PAGE_READ | PAGE_WRITE;
-+    *prot =3D PAGE_READ | PAGE_WRITE | PAGE_EXEC;
-     return TLBRET_MATCH;
- }
-=20
-@@ -61,7 +61,7 @@ int fixed_mmu_map_address (CPUMIPSState *env, hwaddr *p=
-hysical, int *prot,
-     else
-         *physical =3D address;
-=20
--    *prot =3D PAGE_READ | PAGE_WRITE;
-+    *prot =3D PAGE_READ | PAGE_WRITE | PAGE_EXEC;
-     return TLBRET_MATCH;
- }
-=20
-@@ -101,6 +101,9 @@ int r4k_map_address (CPUMIPSState *env, hwaddr *physi=
-cal, int *prot,
-                 *prot =3D PAGE_READ;
-                 if (n ? tlb->D1 : tlb->D0)
-                     *prot |=3D PAGE_WRITE;
-+                if (!(n ? tlb->XI1 : tlb->XI0)) {
-+                    *prot |=3D PAGE_EXEC;
-+                }
-                 return TLBRET_MATCH;
-             }
-             return TLBRET_DIRTY;
-@@ -182,7 +185,7 @@ static int get_seg_physical_address(CPUMIPSState *env=
-, hwaddr *physical,
-     } else {
-         /* The segment is unmapped */
-         *physical =3D physical_base | (real_address & segmask);
--        *prot =3D PAGE_READ | PAGE_WRITE;
-+        *prot =3D PAGE_READ | PAGE_WRITE | PAGE_EXEC;
-         return TLBRET_MATCH;
-     }
- }
-@@ -913,8 +916,8 @@ int mips_cpu_handle_mmu_fault(CPUState *cs, vaddr add=
-ress, int size, int rw,
-     }
-     if (ret =3D=3D TLBRET_MATCH) {
-         tlb_set_page(cs, address & TARGET_PAGE_MASK,
--                     physical & TARGET_PAGE_MASK, prot | PAGE_EXEC,
--                     mmu_idx, TARGET_PAGE_SIZE);
-+                     physical & TARGET_PAGE_MASK, prot, mmu_idx,
-+                     TARGET_PAGE_SIZE);
-         ret =3D 0;
-     } else if (ret < 0)
- #endif
-@@ -936,8 +939,8 @@ int mips_cpu_handle_mmu_fault(CPUState *cs, vaddr add=
-ress, int size, int rw,
-                                            address, rw, access_type, mmu=
-_idx);
-                 if (ret =3D=3D TLBRET_MATCH) {
-                     tlb_set_page(cs, address & TARGET_PAGE_MASK,
--                            physical & TARGET_PAGE_MASK, prot | PAGE_EXE=
-C,
--                            mmu_idx, TARGET_PAGE_SIZE);
-+                            physical & TARGET_PAGE_MASK, prot, mmu_idx,
-+                            TARGET_PAGE_SIZE);
-                     ret =3D 0;
-                     return ret;
-                 }
---=20
-2.20.1
-
+Reviewed-by: Fabien Chouteau <chouteau@adacore.com>
 
