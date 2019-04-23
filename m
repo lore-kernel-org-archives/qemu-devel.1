@@ -1,25 +1,24 @@
-Received: from eggs.gnu.org ([209.51.188.92]:36431)
+Received: from eggs.gnu.org ([209.51.188.92]:36479)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1hIqKv-0006SZ-Ec
-	for qemu-devel@nongnu.org; Tue, 23 Apr 2019 03:59:30 -0400
+	(envelope-from <like.xu@linux.intel.com>) id 1hIqL6-0006X9-Vn
+	for qemu-devel@nongnu.org; Tue, 23 Apr 2019 03:59:42 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1hIqKu-0000fR-9x
-	for qemu-devel@nongnu.org; Tue, 23 Apr 2019 03:59:29 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:35160)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <cohuck@redhat.com>) id 1hIqKu-0000ee-43
-	for qemu-devel@nongnu.org; Tue, 23 Apr 2019 03:59:28 -0400
-Date: Tue, 23 Apr 2019 09:59:21 +0200
-From: Cornelia Huck <cohuck@redhat.com>
-Message-ID: <20190423095921.3af966b8.cohuck@redhat.com>
-In-Reply-To: <20190419191910-mutt-send-email-mst@kernel.org>
-References: <20190411110157.14252-1-yuval.shaia@oracle.com>
-	<20190411110157.14252-3-yuval.shaia@oracle.com>
-	<20190419191910-mutt-send-email-mst@kernel.org>
+	(envelope-from <like.xu@linux.intel.com>) id 1hIqL5-0000kp-QY
+	for qemu-devel@nongnu.org; Tue, 23 Apr 2019 03:59:40 -0400
+References: <1555315185-16414-1-git-send-email-like.xu@linux.intel.com>
+	<1555315185-16414-3-git-send-email-like.xu@linux.intel.com>
+	<20190416212003.GB2272@habkost.net> <87ftqh1ae5.fsf@dusky.pond.sub.org>
+	<20190417171059.GC25134@habkost.net>
+From: Like Xu <like.xu@linux.intel.com>
+Message-ID: <3fc39df9-9c4e-219c-e7dc-c93754fd1315@linux.intel.com>
+Date: Tue, 23 Apr 2019 15:59:31 +0800
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+In-Reply-To: <20190417171059.GC25134@habkost.net>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [RFC 2/3] hw/virtio-rdma: VirtIO rdma device
+Subject: Re: [Qemu-devel] [PATCH v3 2/2] core/qdev: refactor
+ qdev_get_machine() with type assertion
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,38 +27,75 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Michael S. Tsirkin" <mst@redhat.com>
-Cc: Yuval Shaia <yuval.shaia@oracle.com>, virtualization@lists.linux-foundation.org, qemu-devel@nongnu.org, marcel.apfelbaum@gmail.com, linux-rdma@vger.kernel.org, jgg@mellanox.com
+To: Eduardo Habkost <ehabkost@redhat.com>, Markus Armbruster <armbru@redhat.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>, Thomas Huth <thuth@redhat.com>, qemu-trivial@nongnu.org, qemu-devel@nongnu.org, like.xu@intel.com, Igor Mammedov <imammedo@redhat.com>
 
-On Fri, 19 Apr 2019 19:20:22 -0400
-"Michael S. Tsirkin" <mst@redhat.com> wrote:
-
-> On Thu, Apr 11, 2019 at 02:01:56PM +0300, Yuval Shaia wrote:
-> > diff --git a/include/standard-headers/linux/virtio_ids.h b/include/standard-headers/linux/virtio_ids.h
-> > index 6d5c3b2d4f..bd2c699450 100644
-> > --- a/include/standard-headers/linux/virtio_ids.h
-> > +++ b/include/standard-headers/linux/virtio_ids.h
-> > @@ -43,5 +43,6 @@
-> >  #define VIRTIO_ID_INPUT        18 /* virtio input */
-> >  #define VIRTIO_ID_VSOCK        19 /* virtio vsock transport */
-> >  #define VIRTIO_ID_CRYPTO       20 /* virtio crypto */
-> > +#define VIRTIO_ID_RDMA         26 /* virtio crypto */
-
-I think 26 is already de facto used by virtio-audio(?) and 27 has just
-been reserved for virtio-pmem. The next free id seems to be 28.
-
-(Also, the comment is a straight copy-paste :)
-
-> >  
-> >  #endif /* _LINUX_VIRTIO_IDS_H */  
+On 2019/4/18 1:10, Eduardo Habkost wrote:
+> On Wed, Apr 17, 2019 at 07:14:10AM +0200, Markus Armbruster wrote:
+>> Eduardo Habkost <ehabkost@redhat.com> writes:
+>>
+>>> On Mon, Apr 15, 2019 at 03:59:45PM +0800, Like Xu wrote:
+>>>> To avoid the misuse of qdev_get_machine() if machine hasn't been created yet,
+>>>> this patch uses qdev_get_machine_uncheck() for obj-common (share with user-only
+>>>> mode) and adds type assertion to qdev_get_machine() in system-emulation mode.
+>>>>
+>>>> Suggested-by: Igor Mammedov <imammedo@redhat.com>
+>>>> Signed-off-by: Like Xu <like.xu@linux.intel.com>
+>>>
+>>> Reviewed-by: Eduardo Habkost <ehabkost@redhat.com>
+>>>
+>>> I'm queueing the series on machine-next, thanks!
+>>
+>> Hold your horses, please.
+>>
+>> I dislike the name qdev_get_machine_uncheck().  I could live with
+>> qdev_get_machine_unchecked().
+>>
+>> However, I doubt this is the right approach.
+>>
+>> The issue at hand is undisciplined creation of QOM object /machine.
+>>
+>> This patch adds an asseertion "undisciplined creation of /machine didn't
+>> create crap", but only in some places.
+>>
+>> I think we should never create /machine as (surprising!) side effect of
+>> qdev_get_machine().  Create it explicitly instead, and have
+>> qdev_get_machine() use object_resolve_path("/machine", NULL) to get it.
+>> Look ma, no side effects.
 > 
+> OK, I'm dropping this one while we discuss it.
 > 
-> Please reserve an ID with the virtio TC.
-> Process:
-> - create a github issue
-> - post patch with Fixes: tag
-> - wait a bit
-> - if no comments on either ask for a vote
+> I really miss a good explanation why qdev_get_machine_unchecked()
+> needs to exist.  When exactly do we want /machine to exist but
+> not be TYPE_MACHINE?  Why?
 
-Agreed, let's reserve an id. There seems to be enough interest in this
-device type.
+AFAICT, there is no such "/machine" that is not of type TYPE_MACHINE.
+
+The original qdev_get_machine() would always return a "/container" 
+object in user-only mode and there is none TYPE_MACHINE object.
+
+In system emulation mode, it returns the same "/container" object at the 
+beginning, until we initialize and add a TYPE_MACHINE object to the 
+"/container" as a child and it would return OBJECT(current_machine)
+for later usages.
+
+The starting point is to avoid using the legacy qdev_get_machine()
+in system emulation mode when we haven't added the "/machine" object.
+As a result, we introduced type checking assertions to avoid premature 
+invocations.
+
+In this proposal, the qdev_get_machine_unchecked() is only used
+in user-only mode, part of which shares with system emulation mode
+(such as device_set_realized, cpu_common_realizefn). The new 
+qdev_get_machine() is only used in system emulation mode and type 
+checking assertion does reduce the irrational use of this function (if 
+any in the future).
+
+We all agree to use this qdev_get_machine() as little as possible
+and this patch could make future clean up work easier.
+
+> 
+> Once the expectations and use cases are explained, we can choose
+> a better name for qdev_get_machine_unchecked() and document it
+> properly.
+> 
