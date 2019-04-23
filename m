@@ -1,29 +1,25 @@
-Received: from eggs.gnu.org ([209.51.188.92]:44222)
+Received: from eggs.gnu.org ([209.51.188.92]:46273)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1hIzq6-0006Bg-Js
-	for qemu-devel@nongnu.org; Tue, 23 Apr 2019 14:08:19 -0400
+	(envelope-from <vsementsov@virtuozzo.com>) id 1hIzsc-0007GM-4c
+	for qemu-devel@nongnu.org; Tue, 23 Apr 2019 14:10:55 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1hIzq4-0005Wm-M2
-	for qemu-devel@nongnu.org; Tue, 23 Apr 2019 14:08:18 -0400
-Received: from mail-pf1-x444.google.com ([2607:f8b0:4864:20::444]:37899)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1hIzq3-0005Vn-13
-	for qemu-devel@nongnu.org; Tue, 23 Apr 2019 14:08:16 -0400
-Received: by mail-pf1-x444.google.com with SMTP id 10so7887889pfo.5
-	for <qemu-devel@nongnu.org>; Tue, 23 Apr 2019 11:08:14 -0700 (PDT)
-References: <20190416125744.27770-1-peter.maydell@linaro.org>
-	<20190416125744.27770-5-peter.maydell@linaro.org>
-From: Richard Henderson <richard.henderson@linaro.org>
-Message-ID: <42db75fd-84a8-eb45-b1e7-d64c3201440d@linaro.org>
-Date: Tue, 23 Apr 2019 11:08:10 -0700
-MIME-Version: 1.0
-In-Reply-To: <20190416125744.27770-5-peter.maydell@linaro.org>
-Content-Type: text/plain; charset=utf-8
+	(envelope-from <vsementsov@virtuozzo.com>) id 1hIzsa-0008JG-JE
+	for qemu-devel@nongnu.org; Tue, 23 Apr 2019 14:10:54 -0400
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Date: Tue, 23 Apr 2019 18:10:44 +0000
+Message-ID: <1397feac-3f80-5db6-4e03-566fd020c809@virtuozzo.com>
+References: <20190422221714.7630-1-jsnow@redhat.com>
+	<20190422221714.7630-2-jsnow@redhat.com>
+	<eaa73eb3-a84f-a263-13b2-e25588f00fd7@virtuozzo.com>
+	<91bbd108-4ac4-7e07-6d7f-03efb536ba14@redhat.com>
+In-Reply-To: <91bbd108-4ac4-7e07-6d7f-03efb536ba14@redhat.com>
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 04/26] target/arm: Disable most VFP sysregs
- for M-profile
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <446CE5FA89566341A82D84F3A04E6A1F@eurprd08.prod.outlook.com>
+Content-Transfer-Encoding: base64
+MIME-Version: 1.0
+Subject: Re: [Qemu-devel] [PATCH v2 1/2] Makefile: add nit-picky mode to
+ sphinx-build
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,20 +28,42 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>, qemu-arm@nongnu.org, qemu-devel@nongnu.org
+To: John Snow <jsnow@redhat.com>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+Cc: "aliang@redhat.com" <aliang@redhat.com>, "kchamart@redhat.com" <kchamart@redhat.com>, "eblake@redhat.com" <eblake@redhat.com>, Fam Zheng <fam@euphon.net>, "nsoffer@redhat.com" <nsoffer@redhat.com>, "qemu-stable@nongnu.org" <qemu-stable@nongnu.org>, "armbru@redhat.com" <armbru@redhat.com>
 
-On 4/16/19 5:57 AM, Peter Maydell wrote:
-> The only "system register" that M-profile floating point exposes
-> via the VMRS/VMRS instructions is FPSCR, and it does not have
-> the odd special case for rd==15. Add a check to ensure we only
-> expose FPSCR.
-> 
-> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
-> ---
->  target/arm/translate.c | 19 +++++++++++++++++--
->  1 file changed, 17 insertions(+), 2 deletions(-)
-
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
-
-
-r~
+MjMuMDQuMjAxOSAyMTowNiwgSm9obiBTbm93IHdyb3RlOg0KPiANCj4gDQo+IE9uIDQvMjMvMTkg
+MjowMyBQTSwgVmxhZGltaXIgU2VtZW50c292LU9naWV2c2tpeSB3cm90ZToNCj4+IDIzLjA0LjIw
+MTkgMToxNywgSm9obiBTbm93IHdyb3RlOg0KPj4+IElmIHdlIGFkZCByZWZlcmVuY2VzIHRoYXQg
+ZG9uJ3QgcmVzb2x2ZSAob3IgYWNjaWRlbnRhbGx5IHJlbW92ZSB0aGVtKSwNCj4+PiBpdCB3aWxs
+IGJlIGhlbHBmdWwgdG8gaGF2ZSBhbiBlcnJvciBtZXNzYWdlIGFsZXJ0aW5nIHVzIHRvIHRoYXQu
+DQo+Pg0KPj4gYWNjb3JkaW5nbHkgdG8gZG9jcyBJJ3ZlIGZvdW5kLCBub3QgZXJyb3IgYnV0IHdh
+cm5pbmcuDQo+Pg0KPiBPaCwgdHJ1ZS4gSSBoYXZlIHRvIHJldmlzZSB0aGUgZG9jdW1lbnQgYW55
+d2F5LCBzbyBJJ2xsIGNoYW5nZSBteQ0KPiBwaHJhc2luZyBoZXJlIC0tIGl0IHdvbid0IGNhdXNl
+IHRoZSBidWlsZCB0byBmYWlsLCBidXQgeW91IHdpbGwgYmUgYWJsZQ0KPiB0byBzZWUgdGhlIGVy
+cm9yIHdoZW4geW91IGJ1aWxkLiBJIHRoaW5rIGl0J3MgaGVscGZ1bCB0byBoYXZlIGFzIGENCj4g
+bWVjaGFuaWNhbCBjaGVjayAtLSBlc3BlY2lhbGx5IGlmIHdlIHN1Y2NlZWQgaW4gYnVpbGRpbmcg
+Z2VuZXJhdGVkIFJlU1QNCj4gZG9jdW1lbnRhdGlvbiAoZXZlbnR1YWxseT8uLi4pDQoNCkhtLCBp
+ZiB3ZSBub3cgZG9uJ3QgaGF2ZSBvdGhlciB3YXJuaW5ncywgd2UgbWF5IGFsc28gZW5hYmxlIC1X
+LCB0byBiZSBzdHJpY3QuDQoNCj4gDQo+Pj4NCj4+PiBTaWduZWQtb2ZmLWJ5OiBKb2huIFNub3cg
+PGpzbm93QHJlZGhhdC5jb20+DQo+Pg0KPj4gUmV2aWV3ZWQtYnk6IFZsYWRpbWlyIFNlbWVudHNv
+di1PZ2lldnNraXkgPHZzZW1lbnRzb3ZAdmlydHVvenpvLmNvbT4NCj4+DQo+Pj4gLS0tDQo+Pj4g
+ICAgTWFrZWZpbGUgfCAyICstDQo+Pj4gICAgMSBmaWxlIGNoYW5nZWQsIDEgaW5zZXJ0aW9uKCsp
+LCAxIGRlbGV0aW9uKC0pDQo+Pj4NCj4+PiBkaWZmIC0tZ2l0IGEvTWFrZWZpbGUgYi9NYWtlZmls
+ZQ0KPj4+IGluZGV4IDA0YTBkNDUwNTAuLmZmOWNlMmVkNGMgMTAwNjQ0DQo+Pj4gLS0tIGEvTWFr
+ZWZpbGUNCj4+PiArKysgYi9NYWtlZmlsZQ0KPj4+IEBAIC04OTksNyArODk5LDcgQEAgZG9jcy92
+ZXJzaW9uLnRleGk6ICQoU1JDX1BBVEgpL1ZFUlNJT04NCj4+PiAgICBzcGhpbnhkb2NzOiAkKE1B
+TlVBTF9CVUlMRERJUikvZGV2ZWwvaW5kZXguaHRtbCAkKE1BTlVBTF9CVUlMRERJUikvaW50ZXJv
+cC9pbmRleC5odG1sDQo+Pj4gICAgDQo+Pj4gICAgIyBDYW5uZWQgY29tbWFuZCB0byBidWlsZCBh
+IHNpbmdsZSBtYW51YWwNCj4+PiAtYnVpbGQtbWFudWFsID0gJChjYWxsIHF1aWV0LWNvbW1hbmQs
+c3BoaW54LWJ1aWxkICQoaWYgJChWKSwsLXEpIC1iIGh0bWwgLUQgdmVyc2lvbj0kKFZFUlNJT04p
+IC1EIHJlbGVhc2U9IiQoRlVMTF9WRVJTSU9OKSIgLWQgLmRvY3RyZWVzLyQxICQoU1JDX1BBVEgp
+L2RvY3MvJDEgJChNQU5VQUxfQlVJTERESVIpLyQxICwiU1BISU5YIiwiJChNQU5VQUxfQlVJTERE
+SVIpLyQxIikNCj4+PiArYnVpbGQtbWFudWFsID0gJChjYWxsIHF1aWV0LWNvbW1hbmQsc3BoaW54
+LWJ1aWxkICQoaWYgJChWKSwsLXEpIC1uIC1iIGh0bWwgLUQgdmVyc2lvbj0kKFZFUlNJT04pIC1E
+IHJlbGVhc2U9IiQoRlVMTF9WRVJTSU9OKSIgLWQgLmRvY3RyZWVzLyQxICQoU1JDX1BBVEgpL2Rv
+Y3MvJDEgJChNQU5VQUxfQlVJTERESVIpLyQxICwiU1BISU5YIiwiJChNQU5VQUxfQlVJTERESVIp
+LyQxIikNCj4+PiAgICAjIFdlIGFzc3VtZSBhbGwgUlNUIGZpbGVzIGluIHRoZSBtYW51YWwncyBk
+aXJlY3RvcnkgYXJlIHVzZWQgaW4gaXQNCj4+PiAgICBtYW51YWwtZGVwcyA9ICQod2lsZGNhcmQg
+JChTUkNfUEFUSCkvZG9jcy8kMS8qLnJzdCkgJChTUkNfUEFUSCkvZG9jcy8kMS9jb25mLnB5ICQo
+U1JDX1BBVEgpL2RvY3MvY29uZi5weQ0KPj4+ICAgIA0KPj4+DQo+Pg0KPj4NCj4gDQoNCg0KLS0g
+DQpCZXN0IHJlZ2FyZHMsDQpWbGFkaW1pcg0K
