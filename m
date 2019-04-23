@@ -6,49 +6,49 @@ X-Spam-Status: No, score=-6.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6A60BC10F03
-	for <qemu-devel@archiver.kernel.org>; Tue, 23 Apr 2019 17:20:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9B759C10F03
+	for <qemu-devel@archiver.kernel.org>; Tue, 23 Apr 2019 17:21:00 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3160220835
-	for <qemu-devel@archiver.kernel.org>; Tue, 23 Apr 2019 17:20:38 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3160220835
+	by mail.kernel.org (Postfix) with ESMTPS id 6FAD920835
+	for <qemu-devel@archiver.kernel.org>; Tue, 23 Apr 2019 17:21:00 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6FAD920835
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:57039 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:57046 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hIz5x-0008Ch-Ec
-	for qemu-devel@archiver.kernel.org; Tue, 23 Apr 2019 13:20:37 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:36605)
+	id 1hIz6J-0008VU-NK
+	for qemu-devel@archiver.kernel.org; Tue, 23 Apr 2019 13:20:59 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:36731)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <lersek@redhat.com>) id 1hIz1N-000563-Iz
-	for qemu-devel@nongnu.org; Tue, 23 Apr 2019 13:15:55 -0400
+	(envelope-from <lersek@redhat.com>) id 1hIz1U-00058K-8e
+	for qemu-devel@nongnu.org; Tue, 23 Apr 2019 13:16:01 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <lersek@redhat.com>) id 1hIz1H-0005K3-L9
-	for qemu-devel@nongnu.org; Tue, 23 Apr 2019 13:15:51 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:54014)
+	(envelope-from <lersek@redhat.com>) id 1hIz1T-0005SS-4B
+	for qemu-devel@nongnu.org; Tue, 23 Apr 2019 13:16:00 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:54212)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <lersek@redhat.com>) id 1hIz1F-0005G4-Pd
-	for qemu-devel@nongnu.org; Tue, 23 Apr 2019 13:15:46 -0400
+	(Exim 4.71) (envelope-from <lersek@redhat.com>) id 1hIz1S-0005RH-TK
+	for qemu-devel@nongnu.org; Tue, 23 Apr 2019 13:15:59 -0400
 Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
 	[10.5.11.23])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id A56BA308A109;
-	Tue, 23 Apr 2019 17:15:42 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id 2495B307EA96;
+	Tue, 23 Apr 2019 17:15:58 +0000 (UTC)
 Received: from lacos-laptop-7.usersys.redhat.com (ovpn-125-214.rdu2.redhat.com
 	[10.10.125.214])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id 693B519936;
-	Tue, 23 Apr 2019 17:15:39 +0000 (UTC)
+	by smtp.corp.redhat.com (Postfix) with ESMTP id 7FD2219729;
+	Tue, 23 Apr 2019 17:15:55 +0000 (UTC)
 From: Laszlo Ersek <lersek@redhat.com>
 To: berrange@redhat.com, eblake@redhat.com, f4bug@amsat.org,
 	imammedo@redhat.com, kraxel@redhat.com, mprivozn@redhat.com,
 	mst@redhat.com, peter.maydell@linaro.org, philmd@redhat.com,
 	qemu-devel@nongnu.org
-Date: Tue, 23 Apr 2019 19:15:09 +0200
-Message-Id: <20190423171520.4511-2-lersek@redhat.com>
+Date: Tue, 23 Apr 2019 19:15:11 +0200
+Message-Id: <20190423171520.4511-4-lersek@redhat.com>
 In-Reply-To: <20190423171520.4511-1-lersek@redhat.com>
 References: <20190423171520.4511-1-lersek@redhat.com>
 MIME-Version: 1.0
@@ -56,12 +56,12 @@ Content-Type: text/plain; charset="UTF-8"
 X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
 	(mx1.redhat.com [10.5.110.44]);
-	Tue, 23 Apr 2019 17:15:42 +0000 (UTC)
+	Tue, 23 Apr 2019 17:15:58 +0000 (UTC)
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] [PULL 01/12] roms: lift "edk2-funcs.sh" from
- "tests/uefi-test-tools/build.sh"
+Subject: [Qemu-devel] [PULL 03/12] tests/uefi-test-tools/build.sh: work
+ around TianoCore#1607
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -76,12 +76,17 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190423171509.m6I5QtICbT0a9Vy-I_F0WdIRuxGdAluGCk5gBYL2aYA@z>
+Message-ID: <20190423171511._WOt-Q3NUwV7kKYwqBBXTAQf_avC3NkD3ZQml3ueTv4@z>
 
-Extract the dense logic for architecture and toolchain massaging from
-"tests/uefi-test-tools/build.sh", to a set of small functions. We'll reus=
-e
-these functions for building full platform firmware images.
+The edk2-stabe201903 release introduced Python3 support to edk2's
+BaseTools; however the Python3 enablement breaks in a corner case (which
+is nevertheless supported by the edk2 community), namely the in-module
+parallelization that we utilize.
+
+This is tracked under
+<https://bugzilla.tianocore.org/show_bug.cgi?id=3D1607>. For now, work
+around the issue (in advance) by forcing Python2. (The workaround is a
+no-op before we move to edk2-stabe201903 in the roms/edk2 submodule.)
 
 Signed-off-by: Laszlo Ersek <lersek@redhat.com>
 Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
@@ -107,405 +112,28 @@ Notes:
    =20
     v2:
    =20
-    - Pick up Phil's R-b and T-b. (I hope that's okay, after the discussi=
-on
-      about cross-building on Ubuntu and/or with Linaro toolchains!)
-   =20
-    - drop comma after copyright year, in the new file [Eric]
-   =20
-    - clarify in the leading comment of "edk2-funcs.sh" that the file
-      requires bash [Phil, Eric]
+    - pick up Phil's R-b / T-b
    =20
     - pick up Michal's and Michael's R-b's
 
- roms/edk2-funcs.sh             | 240 ++++++++++++++++++++
- tests/uefi-test-tools/build.sh |  97 +-------
- 2 files changed, 246 insertions(+), 91 deletions(-)
+ tests/uefi-test-tools/build.sh | 3 +++
+ 1 file changed, 3 insertions(+)
 
-diff --git a/roms/edk2-funcs.sh b/roms/edk2-funcs.sh
-new file mode 100644
-index 000000000000..8930479dcb44
---- /dev/null
-+++ b/roms/edk2-funcs.sh
-@@ -0,0 +1,240 @@
-+# Shell script that defines functions for determining some environmental
-+# characteristics for the edk2 "build" utility.
-+#
-+# This script is meant to be sourced, in a bash environment.
-+#
-+# Copyright (C) 2019 Red Hat, Inc.
-+#
-+# This program and the accompanying materials are licensed and made avai=
-lable
-+# under the terms and conditions of the BSD License that accompanies thi=
-s
-+# distribution. The full text of the license may be found at
-+# <http://opensource.org/licenses/bsd-license.php>.
-+#
-+# THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS, =
-WITHOUT
-+# WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
-+
-+
-+# Verify whether the QEMU system emulation target is supported by the UE=
-FI spec
-+# and edk2. Print a message to the standard error, and return with nonze=
-ro
-+# status, if verification fails.
-+#
-+# Parameters:
-+#   $1: QEMU system emulation target
-+qemu_edk2_verify_arch()
-+{
-+  local emulation_target=3D"$1"
-+  local program_name=3D$(basename -- "$0")
-+
-+  case "$emulation_target" in
-+    (arm|aarch64|i386|x86_64)
-+      ;;
-+    (*)
-+      printf '%s: unknown/unsupported QEMU system emulation target "%s"\=
-n' \
-+        "$program_name" "$emulation_target" >&2
-+      return 1
-+      ;;
-+  esac
-+}
-+
-+
-+# Translate the QEMU system emulation target to the edk2 architecture
-+# identifier. Print the result to the standard output.
-+#
-+# Parameters:
-+#   $1: QEMU system emulation target
-+qemu_edk2_get_arch()
-+{
-+  local emulation_target=3D"$1"
-+
-+  if ! qemu_edk2_verify_arch "$emulation_target"; then
-+    return 1
-+  fi
-+
-+  case "$emulation_target" in
-+    (arm)
-+      printf 'ARM\n'
-+      ;;
-+    (aarch64)
-+      printf 'AARCH64\n'
-+      ;;
-+    (i386)
-+      printf 'IA32\n'
-+      ;;
-+    (x86_64)
-+      printf 'X64\n'
-+      ;;
-+  esac
-+}
-+
-+
-+# Translate the QEMU system emulation target to the gcc cross-compilatio=
-n
-+# architecture identifier. Print the result to the standard output.
-+#
-+# Parameters:
-+#   $1: QEMU system emulation target
-+qemu_edk2_get_gcc_arch()
-+{
-+  local emulation_target=3D"$1"
-+
-+  if ! qemu_edk2_verify_arch "$emulation_target"; then
-+    return 1
-+  fi
-+
-+  case "$emulation_target" in
-+    (arm|aarch64|x86_64)
-+      printf '%s\n' "$emulation_target"
-+      ;;
-+    (i386)
-+      printf 'i686\n'
-+      ;;
-+  esac
-+}
-+
-+
-+# Determine the gcc cross-compiler prefix (if any) for use with the edk2
-+# toolchain. Print the result to the standard output.
-+#
-+# Parameters:
-+#   $1: QEMU system emulation target
-+qemu_edk2_get_cross_prefix()
-+{
-+  local emulation_target=3D"$1"
-+  local gcc_arch
-+  local host_arch
-+
-+  if ! gcc_arch=3D$(qemu_edk2_get_gcc_arch "$emulation_target"); then
-+    return 1
-+  fi
-+
-+  host_arch=3D$(uname -m)
-+
-+  if [ "$gcc_arch" =3D=3D "$host_arch" ] ||
-+     ( [ "$gcc_arch" =3D=3D i686 ] && [ "$host_arch" =3D=3D x86_64 ] ); =
-then
-+    # no cross-compiler needed
-+    :
-+  else
-+    printf '%s-linux-gnu-\n' "$gcc_arch"
-+  fi
-+}
-+
-+
-+# Determine the edk2 toolchain tag for the QEMU system emulation target.=
- Print
-+# the result to the standard output. Print a message to the standard err=
-or, and
-+# return with nonzero status, if the (conditional) gcc version check fai=
-ls.
-+#
-+# Parameters:
-+#   $1: QEMU system emulation target
-+qemu_edk2_get_toolchain()
-+{
-+  local emulation_target=3D"$1"
-+  local program_name=3D$(basename -- "$0")
-+  local cross_prefix
-+  local gcc_version
-+
-+  if ! qemu_edk2_verify_arch "$emulation_target"; then
-+    return 1
-+  fi
-+
-+  case "$emulation_target" in
-+    (arm|aarch64)
-+      printf 'GCC5\n'
-+      ;;
-+
-+    (i386|x86_64)
-+      if ! cross_prefix=3D$(qemu_edk2_get_cross_prefix "$emulation_targe=
-t"); then
-+        return 1
-+      fi
-+
-+      gcc_version=3D$("${cross_prefix}gcc" -v 2>&1 | tail -1 | awk '{pri=
-nt $3}')
-+      # Run "git-blame" on "OvmfPkg/build.sh" in edk2 for more informati=
-on on
-+      # the mapping below.
-+      case "$gcc_version" in
-+        ([1-3].*|4.[0-3].*)
-+          printf '%s: unsupported gcc version "%s"\n' \
-+            "$program_name" "$gcc_version" >&2
-+          return 1
-+          ;;
-+        (4.4.*)
-+          printf 'GCC44\n'
-+          ;;
-+        (4.5.*)
-+          printf 'GCC45\n'
-+          ;;
-+        (4.6.*)
-+          printf 'GCC46\n'
-+          ;;
-+        (4.7.*)
-+          printf 'GCC47\n'
-+          ;;
-+        (4.8.*)
-+          printf 'GCC48\n'
-+          ;;
-+        (4.9.*|6.[0-2].*)
-+          printf 'GCC49\n'
-+          ;;
-+        (*)
-+          printf 'GCC5\n'
-+          ;;
-+      esac
-+      ;;
-+  esac
-+}
-+
-+
-+# Determine the name of the environment variable that exposes the
-+# cross-compiler prefix to the edk2 "build" utility. Print the result to=
- the
-+# standard output.
-+#
-+# Parameters:
-+#   $1: QEMU system emulation target
-+qemu_edk2_get_cross_prefix_var()
-+{
-+  local emulation_target=3D"$1"
-+  local edk2_toolchain
-+  local edk2_arch
-+
-+  if ! edk2_toolchain=3D$(qemu_edk2_get_toolchain "$emulation_target"); =
-then
-+    return 1
-+  fi
-+
-+  case "$emulation_target" in
-+    (arm|aarch64)
-+      if ! edk2_arch=3D$(qemu_edk2_get_arch "$emulation_target"); then
-+        return 1
-+      fi
-+      printf '%s_%s_PREFIX\n' "$edk2_toolchain" "$edk2_arch"
-+      ;;
-+    (i386|x86_64)
-+      printf '%s_BIN\n' "$edk2_toolchain"
-+      ;;
-+  esac
-+}
-+
-+
-+# Set and export the environment variable(s) necessary for cross-compila=
-tion,
-+# whenever needed by the edk2 "build" utility.
-+#
-+# Parameters:
-+#   $1: QEMU system emulation target
-+qemu_edk2_set_cross_env()
-+{
-+  local emulation_target=3D"$1"
-+  local cross_prefix
-+  local cross_prefix_var
-+
-+  if ! cross_prefix=3D$(qemu_edk2_get_cross_prefix "$emulation_target");=
- then
-+    return 1
-+  fi
-+
-+  if [ -z "$cross_prefix" ]; then
-+    # Nothing to do.
-+    return 0
-+  fi
-+
-+  if ! cross_prefix_var=3D$(qemu_edk2_get_cross_prefix_var \
-+                            "$emulation_target"); then
-+    return 1
-+  fi
-+
-+  eval "export $cross_prefix_var=3D\$cross_prefix"
-+}
 diff --git a/tests/uefi-test-tools/build.sh b/tests/uefi-test-tools/build=
 .sh
-index 155cb75c4ddb..e2b52c855c39 100755
+index e2b52c855c39..8aa7935c43bb 100755
 --- a/tests/uefi-test-tools/build.sh
 +++ b/tests/uefi-test-tools/build.sh
-@@ -38,97 +38,12 @@ if [ $ret -ne 0 ]; then
-   exit $ret
- fi
+@@ -29,6 +29,9 @@ export PACKAGES_PATH=3D$(realpath -- "$edk2_dir")
+ export WORKSPACE=3D$PWD
+ mkdir -p Conf
 =20
--# Map the QEMU system emulation target to the following types of archite=
-cture
--# identifiers:
--# - edk2,
--# - gcc cross-compilation.
--# Cover only those targets that are supported by the UEFI spec and edk2.
--case "$emulation_target" in
--  (arm)
--    edk2_arch=3DARM
--    gcc_arch=3Darm
--    ;;
--  (aarch64)
--    edk2_arch=3DAARCH64
--    gcc_arch=3Daarch64
--    ;;
--  (i386)
--    edk2_arch=3DIA32
--    gcc_arch=3Di686
--    ;;
--  (x86_64)
--    edk2_arch=3DX64
--    gcc_arch=3Dx86_64
--    ;;
--  (*)
--    printf '%s: unknown/unsupported QEMU system emulation target "%s"\n'=
- \
--      "$program_name" "$emulation_target" >&2
--    exit 1
--    ;;
--esac
--
--# Check if cross-compilation is needed.
--host_arch=3D$(uname -m)
--if [ "$gcc_arch" =3D=3D "$host_arch" ] ||
--   ( [ "$gcc_arch" =3D=3D i686 ] && [ "$host_arch" =3D=3D x86_64 ] ); th=
-en
--  cross_prefix=3D
--else
--  cross_prefix=3D${gcc_arch}-linux-gnu-
--fi
--
--# Expose cross_prefix (which is possibly empty) to the edk2 tools. While=
- at it,
--# determine the suitable edk2 toolchain as well.
--# - For ARM and AARCH64, edk2 only offers the GCC5 toolchain tag, which =
-covers
--#   the gcc-5+ releases.
--# - For IA32 and X64, edk2 offers the GCC44 through GCC49 toolchain tags=
-, in
--#   addition to GCC5. Unfortunately, the mapping between the toolchain t=
-ags and
--#   the actual gcc releases isn't entirely trivial. Run "git-blame" on
--#   "OvmfPkg/build.sh" in edk2 for more information.
--# And, because the above is too simple, we have to assign cross_prefix t=
-o an
--# edk2 build variable that is specific to both the toolchain tag and the=
- target
--# architecture.
--case "$edk2_arch" in
--  (ARM)
--    edk2_toolchain=3DGCC5
--    export GCC5_ARM_PREFIX=3D$cross_prefix
--    ;;
--  (AARCH64)
--    edk2_toolchain=3DGCC5
--    export GCC5_AARCH64_PREFIX=3D$cross_prefix
--    ;;
--  (IA32|X64)
--    gcc_version=3D$("${cross_prefix}gcc" -v 2>&1 | tail -1 | awk '{print=
- $3}')
--    case "$gcc_version" in
--      ([1-3].*|4.[0-3].*)
--        printf '%s: unsupported gcc version "%s"\n' \
--          "$program_name" "$gcc_version" >&2
--        exit 1
--        ;;
--      (4.4.*)
--        edk2_toolchain=3DGCC44
--        ;;
--      (4.5.*)
--        edk2_toolchain=3DGCC45
--        ;;
--      (4.6.*)
--        edk2_toolchain=3DGCC46
--        ;;
--      (4.7.*)
--        edk2_toolchain=3DGCC47
--        ;;
--      (4.8.*)
--        edk2_toolchain=3DGCC48
--        ;;
--      (4.9.*|6.[0-2].*)
--        edk2_toolchain=3DGCC49
--        ;;
--      (*)
--        edk2_toolchain=3DGCC5
--        ;;
--    esac
--    eval "export ${edk2_toolchain}_BIN=3D\$cross_prefix"
--    ;;
--esac
-+# Fetch some option arguments, and set the cross-compilation environment=
- (if
-+# any), for the edk2 "build" utility.
-+source "$edk2_dir/../edk2-funcs.sh"
-+edk2_arch=3D$(qemu_edk2_get_arch "$emulation_target")
-+edk2_toolchain=3D$(qemu_edk2_get_toolchain "$emulation_target")
-+qemu_edk2_set_cross_env "$emulation_target"
-=20
- # Build the UEFI binary
- mkdir -p log
++# Work around <https://bugzilla.tianocore.org/show_bug.cgi?id=3D1607>.
++export PYTHON_COMMAND=3Dpython2
++
+ # Source "edksetup.sh" carefully.
+ set +e +u +C
+ source "$PACKAGES_PATH/edksetup.sh"
 --=20
 2.19.1.3.g30247aa5d201
 
