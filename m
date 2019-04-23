@@ -2,92 +2,93 @@ Return-Path: <SRS0=zUjA=SZ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-4.0 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 32FE8C10F03
-	for <qemu-devel@archiver.kernel.org>; Tue, 23 Apr 2019 17:53:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 41299C10F03
+	for <qemu-devel@archiver.kernel.org>; Tue, 23 Apr 2019 17:56:45 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0ADD3214AE
-	for <qemu-devel@archiver.kernel.org>; Tue, 23 Apr 2019 17:53:29 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0ADD3214AE
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 0C8B520651
+	for <qemu-devel@archiver.kernel.org>; Tue, 23 Apr 2019 17:56:45 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="YUV5Pdto"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0C8B520651
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:57517 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:57564 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hIzbl-0007vq-4g
-	for qemu-devel@archiver.kernel.org; Tue, 23 Apr 2019 13:53:29 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:60638)
+	id 1hIzeu-0000ih-2i
+	for qemu-devel@archiver.kernel.org; Tue, 23 Apr 2019 13:56:44 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:34761)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1hIzan-0007XT-5h
-	for qemu-devel@nongnu.org; Tue, 23 Apr 2019 13:52:30 -0400
+	(envelope-from <richard.henderson@linaro.org>) id 1hIze7-0000Ca-Gf
+	for qemu-devel@nongnu.org; Tue, 23 Apr 2019 13:55:56 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1hIzal-0005rF-Lu
-	for qemu-devel@nongnu.org; Tue, 23 Apr 2019 13:52:28 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:39838)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>)
-	id 1hIzal-0005hx-Bc; Tue, 23 Apr 2019 13:52:27 -0400
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
-	[10.5.11.22])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id ECBB930ADBA2;
-	Tue, 23 Apr 2019 17:52:20 +0000 (UTC)
-Received: from [10.3.116.149] (ovpn-116-149.phx2.redhat.com [10.3.116.149])
-	by smtp.corp.redhat.com (Postfix) with ESMTPS id 1DB0B1001E71;
-	Tue, 23 Apr 2019 17:52:19 +0000 (UTC)
-To: Thomas Huth <thuth@redhat.com>, Jason Wang <jasowang@redhat.com>,
+	(envelope-from <richard.henderson@linaro.org>) id 1hIzdv-0001DM-9l
+	for qemu-devel@nongnu.org; Tue, 23 Apr 2019 13:55:46 -0400
+Received: from mail-pg1-x530.google.com ([2607:f8b0:4864:20::530]:35532)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+	id 1hIzdm-00010R-VO
+	for qemu-devel@nongnu.org; Tue, 23 Apr 2019 13:55:38 -0400
+Received: by mail-pg1-x530.google.com with SMTP id g8so7993594pgf.2
+	for <qemu-devel@nongnu.org>; Tue, 23 Apr 2019 10:55:28 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+	h=subject:to:references:from:openpgp:message-id:date:user-agent
+	:mime-version:in-reply-to:content-language:content-transfer-encoding;
+	bh=eMHIqNiaYPstimrjnVZgtyQcOdfT4KUvHAKuck7iNsc=;
+	b=YUV5Pdtoa4lHW5qgMKKF1GGjxtrf8jZjuXhDeg/2zXVkskVlLb5ynYNrs8X23mgHyQ
+	lBMOjvIXydSCNxHe28vEGKHxaF0kjtft39puUL8xzOGrP9XZjhJhqZ0O3iitVIj8C9xL
+	P82i9YD8wLbP4SJc/3TUByyEgyYj5fa3E7jpAzIN73MI+62Rmq8sMfKXpe9DAG8mQyEv
+	3piLB4t/DXG1qq8s3ZdGnJTaICb7+RAxP/+MCJQXUJ89gYdAISvl9Z5DmqrWDVZpkJtK
+	lO637/ht4m0P8SfjFkk+5E+OF7VYYwmb6Dqty7/zcdSZUsNxLknYt1v9PbZu1yFXj8BG
+	U/ow==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=1e100.net; s=20161025;
+	h=x-gm-message-state:subject:to:references:from:openpgp:message-id
+	:date:user-agent:mime-version:in-reply-to:content-language
+	:content-transfer-encoding;
+	bh=eMHIqNiaYPstimrjnVZgtyQcOdfT4KUvHAKuck7iNsc=;
+	b=rUUA4d404Q/RHE3cb21V1e5UAA1KAz3YCoW0qlad5ZDdeU483k6w5Kd7ADCSGWYop+
+	NuMaVG7YSOXjZR9nFmUwPa+gmoG4SamK/VUwdxrEmUWzEDuhk4UddTOvvYwk7WJK+h5w
+	nHHwojUEePMBongxlGUIdFa4ZHU8Z6PNZgQ2yWLu9RSez2NTcLsmcSdxKeD6w1h2F54f
+	9g5gdsajM4Snj6pb3SX6yOsnd5FJ13S+A/nwYLbARVBRWgoVmeyl4ujbnhGw2HUSw1O5
+	iGRTnxiblpIVX2uQm5+DvPtFM1ZHl1b5ZQoliWCs65ljO+rxSyeqxFSZmTFl6GqRc8W0
+	TS0Q==
+X-Gm-Message-State: APjAAAUSdmVAUn4y/e61WVvnody2U2G+yq9DkaS/mlxwJWDoJFJ3re4T
+	qnhdkDO2Mt5H+TfEeyaQExmgsZIHTJU=
+X-Google-Smtp-Source: APXvYqwxERPs2gAaa9MiwS/4N3rih6AwTiesjmfUmhu1yBztPFV6v/XhzCfX1TYDFOrqm/51y/sI8Q==
+X-Received: by 2002:a63:171a:: with SMTP id x26mr26601817pgl.438.1556042126978;
+	Tue, 23 Apr 2019 10:55:26 -0700 (PDT)
+Received: from [192.168.1.11] (97-113-179-147.tukw.qwest.net. [97.113.179.147])
+	by smtp.gmail.com with ESMTPSA id
+	17sm30711325pfw.65.2019.04.23.10.55.25
+	(version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+	Tue, 23 Apr 2019 10:55:26 -0700 (PDT)
+To: Peter Maydell <peter.maydell@linaro.org>, qemu-arm@nongnu.org,
 	qemu-devel@nongnu.org
-References: <20190423160608.7519-1-thuth@redhat.com>
-From: Eric Blake <eblake@redhat.com>
+References: <20190416125744.27770-1-peter.maydell@linaro.org>
+	<20190416125744.27770-4-peter.maydell@linaro.org>
+From: Richard Henderson <richard.henderson@linaro.org>
 Openpgp: preference=signencrypt
-Autocrypt: addr=eblake@redhat.com; keydata=
-	xsBNBEvHyWwBCACw7DwsQIh0kAbUXyqhfiKAKOTVu6OiMGffw2w90Ggrp4bdVKmCaEXlrVLU
-	xphBM8mb+wsFkU+pq9YR621WXo9REYVIl0FxKeQo9dyQBZ/XvmUMka4NOmHtFg74nvkpJFCD
-	TUNzmqfcjdKhfFV0d7P/ixKQeZr2WP1xMcjmAQY5YvQ2lUoHP43m8TtpB1LkjyYBCodd+LkV
-	GmCx2Bop1LSblbvbrOm2bKpZdBPjncRNob73eTpIXEutvEaHH72LzpzksfcKM+M18cyRH+nP
-	sAd98xIbVjm3Jm4k4d5oQyE2HwOur+trk2EcxTgdp17QapuWPwMfhaNq3runaX7x34zhABEB
-	AAHNHkVyaWMgQmxha2UgPGVibGFrZUByZWRoYXQuY29tPsLAegQTAQgAJAIbAwULCQgHAwUV
-	CgkICwUWAgMBAAIeAQIXgAUCS8fL9QIZAQAKCRCnoWtKJSdDahBHCACbl/5FGkUqJ89GAjeX
-	RjpAeJtdKhujir0iS4CMSIng7fCiGZ0fNJCpL5RpViSo03Q7l37ss+No+dJI8KtAp6ID+PMz
-	wTJe5Egtv/KGUKSDvOLYJ9WIIbftEObekP+GBpWP2+KbpADsc7EsNd70sYxExD3liwVJYqLc
-	Rw7so1PEIFp+Ni9A1DrBR5NaJBnno2PHzHPTS9nmZVYm/4I32qkLXOcdX0XElO8VPDoVobG6
-	gELf4v/vIImdmxLh/w5WctUpBhWWIfQDvSOW2VZDOihm7pzhQodr3QP/GDLfpK6wI7exeu3P
-	pfPtqwa06s1pae3ad13mZGzkBdNKs1HEm8x6zsBNBEvHyWwBCADGkMFzFjmmyqAEn5D+Mt4P
-	zPdO8NatsDw8Qit3Rmzu+kUygxyYbz52ZO40WUu7EgQ5kDTOeRPnTOd7awWDQcl1gGBXgrkR
-	pAlQ0l0ReO57Q0eglFydLMi5bkwYhfY+TwDPMh3aOP5qBXkm4qIYSsxb8A+i00P72AqFb9Q7
-	3weG/flxSPApLYQE5qWGSXjOkXJv42NGS6o6gd4RmD6Ap5e8ACo1lSMPfTpGzXlt4aRkBfvb
-	NCfNsQikLZzFYDLbQgKBA33BDeV6vNJ9Cj0SgEGOkYyed4I6AbU0kIy1hHAm1r6+sAnEdIKj
-	cHi3xWH/UPrZW5flM8Kqo14OTDkI9EtlABEBAAHCwF8EGAEIAAkFAkvHyWwCGwwACgkQp6Fr
-	SiUnQ2q03wgAmRFGDeXzc58NX0NrDijUu0zx3Lns/qZ9VrkSWbNZBFjpWKaeL1fdVeE4TDGm
-	I5mRRIsStjQzc2R9b+2VBUhlAqY1nAiBDv0Qnt+9cLiuEICeUwlyl42YdwpmY0ELcy5+u6wz
-	mK/jxrYOpzXKDwLq5k4X+hmGuSNWWAN3gHiJqmJZPkhFPUIozZUCeEc76pS/IUN72NfprZmF
-	Dp6/QDjDFtfS39bHSWXKVZUbqaMPqlj/z6Ugk027/3GUjHHr8WkeL1ezWepYDY7WSoXwfoAL
-	2UXYsMAr/uUncSKlfjvArhsej0S4zbqim2ZY6S8aRWw94J3bSvJR+Nwbs34GPTD4Pg==
-Organization: Red Hat, Inc.
-Message-ID: <f1db3bb5-6028-e8a4-f56b-fdd22215688f@redhat.com>
-Date: Tue, 23 Apr 2019 12:52:18 -0500
+Message-ID: <ee47862f-a890-ad32-1fd1-974f09f19d8c@linaro.org>
+Date: Tue, 23 Apr 2019 10:55:24 -0700
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
 	Thunderbird/60.6.1
 MIME-Version: 1.0
-In-Reply-To: <20190423160608.7519-1-thuth@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="oG3L6d2PSVZYkVCaZcW6WzX09EPqdzahr"
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.47]);
-	Tue, 23 Apr 2019 17:52:22 +0000 (UTC)
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-X-Content-Filtered-By: Mailman/MimeDel 2.1.21
-Subject: Re: [Qemu-devel] [PATCH] net: Print output of "-net nic,
- model=help" to stdout instead of stderr
+In-Reply-To: <20190416125744.27770-4-peter.maydell@linaro.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+	recognized.
+X-Received-From: 2607:f8b0:4864:20::530
+Subject: Re: [Qemu-devel] [PATCH 03/26] target/arm: Implement dummy versions
+ of M-profile FP-related registers
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -99,88 +100,39 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-trivial@nongnu.org, Markus Armbruster <armbru@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190423175218.B4Obj2RW0YnPMaO2OgnUnrlN3ITLkCyVUzPRzHpI-JE@z>
+Message-ID: <20190423175524.Cv8GLqoXwFrE1XyHsCcVUhG1lQ92qsQHdpU1ld2yqmw@z>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---oG3L6d2PSVZYkVCaZcW6WzX09EPqdzahr
-From: Eric Blake <eblake@redhat.com>
-To: Thomas Huth <thuth@redhat.com>, Jason Wang <jasowang@redhat.com>,
- qemu-devel@nongnu.org
-Cc: qemu-trivial@nongnu.org, Markus Armbruster <armbru@redhat.com>
-Message-ID: <f1db3bb5-6028-e8a4-f56b-fdd22215688f@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH] net: Print output of "-net nic, model=help"
- to stdout instead of stderr
-References: <20190423160608.7519-1-thuth@redhat.com>
-In-Reply-To: <20190423160608.7519-1-thuth@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-
-[adding Markus, as he send a recent batch of similar patches]
-
-On 4/23/19 11:06 AM, Thomas Huth wrote:
-> We are printing all other help output to stdout already (e.g. "-help",
-> "-cpu help" and "-machine help" output). So the "-net nic,model=3Dhelp"=
-
-> output should go to stdout instead of stderr, too. And while we're at
-> it, also print the NICs line by line, like we do it e.g. with the
-> "-cpu help" or "-M help" output, too.
->=20
-> Buglink: https://bugs.launchpad.net/qemu/+bug/1574327
-> Signed-off-by: Thomas Huth <thuth@redhat.com>
+On 4/16/19 5:57 AM, Peter Maydell wrote:
+> The M-profile floating point support has three associated config
+> registers: FPCAR, FPCCR and FPDSCR. It also makes the registers
+> CPACR and NSACR have behaviour other than reads-as-zero.
+> Add support for all of these as simple reads-as-written registers.
+> We will hook up actual functionality later.
+> 
+> The main complexity here is handling the FPCCR register, which
+> has a mix of banked and unbanked bits.
+> 
+> Note that we don't share storage with the A-profile
+> cpu->cp15.nsacr and cpu->cp15.cpacr_el1, though the behaviour
+> is quite similar, for two reasons:
+>  * the M profile CPACR is banked between security states
+>  * it preserves the invariant that M profile uses no state
+>    inside the cp15 substruct
+> 
+> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 > ---
->  net/net.c | 7 ++++---
->  1 file changed, 4 insertions(+), 3 deletions(-)
+>  target/arm/cpu.h      |  34 ++++++++++++
+>  hw/intc/armv7m_nvic.c | 125 ++++++++++++++++++++++++++++++++++++++++++
+>  target/arm/cpu.c      |   5 ++
+>  target/arm/machine.c  |  16 ++++++
+>  4 files changed, 180 insertions(+)
 
-Reviewed-by: Eric Blake <eblake@redhat.com>
-
->=20
-> diff --git a/net/net.c b/net/net.c
-> index f3a3c5444c..2cf5e76469 100644
-> --- a/net/net.c
-> +++ b/net/net.c
-> @@ -837,9 +837,10 @@ int qemu_show_nic_models(const char *arg, const ch=
-ar *const *models)
->          return 0;
->      }
-> =20
-> -    fprintf(stderr, "qemu: Supported NIC models: ");
-> -    for (i =3D 0 ; models[i]; i++)
-> -        fprintf(stderr, "%s%c", models[i], models[i+1] ? ',' : '\n');
-> +    printf("Supported NIC models:\n");
-> +    for (i =3D 0 ; models[i]; i++) {
-> +        printf("%s\n", models[i]);
-> +    }
->      return 1;
->  }
-> =20
->=20
-
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3226
-Virtualization:  qemu.org | libvirt.org
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 
 
---oG3L6d2PSVZYkVCaZcW6WzX09EPqdzahr
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
+r~
 
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAly/UNIACgkQp6FrSiUn
-Q2pLsggAoZ110sQJBNhz05OBWHy7JQ9Fa1S7rcjEfhDM7BA68oj3X3VzxcPVVsv0
-jo+mBKTVryVMqKpv1RCziPWbo/tHJvMnERHHqX+24zXeztLaxD0H/JjxvrA/I2EA
-nPqARjEFpTtwKLBx5+j/+A6W5z66GZy3goqWor17Bs9nyVPa811N9LhsCGNVT//M
-1IMASrN1dE0k8R4d+0xwbJdt7COZHP8UJv41zG+TRFEyZcIO8EbgoE4QVoxQYSIy
-Ounyiz5t9gXKSHWdTxuc0U7LTNTxMf49920wIdunddj/7ZqIG4NTZTlDSt7MPnbg
-1yzTX7IZRVYg4KLiquREl86qyo/uzA==
-=/CYd
------END PGP SIGNATURE-----
-
---oG3L6d2PSVZYkVCaZcW6WzX09EPqdzahr--
 
