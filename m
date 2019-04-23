@@ -2,80 +2,65 @@ Return-Path: <SRS0=zUjA=SZ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.4 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_MUTT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 42722C10F14
-	for <qemu-devel@archiver.kernel.org>; Tue, 23 Apr 2019 08:54:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2D470C10F14
+	for <qemu-devel@archiver.kernel.org>; Tue, 23 Apr 2019 08:55:13 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0593D20685
-	for <qemu-devel@archiver.kernel.org>; Tue, 23 Apr 2019 08:54:10 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0593D20685
+	by mail.kernel.org (Postfix) with ESMTPS id E8CEC20685
+	for <qemu-devel@archiver.kernel.org>; Tue, 23 Apr 2019 08:55:12 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E8CEC20685
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:50275 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:50287 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hIrBq-0003QS-A8
-	for qemu-devel@archiver.kernel.org; Tue, 23 Apr 2019 04:54:10 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:53039)
+	id 1hIrCq-00045I-Af
+	for qemu-devel@archiver.kernel.org; Tue, 23 Apr 2019 04:55:12 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:53681)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1hIrAm-0002po-Bs
-	for qemu-devel@nongnu.org; Tue, 23 Apr 2019 04:53:06 -0400
+	(envelope-from <kwolf@redhat.com>) id 1hIrC0-0003cU-O0
+	for qemu-devel@nongnu.org; Tue, 23 Apr 2019 04:54:21 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1hIrAi-0006Mh-I8
-	for qemu-devel@nongnu.org; Tue, 23 Apr 2019 04:53:04 -0400
-Received: from mail-wm1-f66.google.com ([209.85.128.66]:50840)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1hIrAg-000645-LH
-	for qemu-devel@nongnu.org; Tue, 23 Apr 2019 04:53:00 -0400
-Received: by mail-wm1-f66.google.com with SMTP id 10so1178008wmk.0
-	for <qemu-devel@nongnu.org>; Tue, 23 Apr 2019 01:52:44 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=1e100.net; s=20161025;
-	h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
-	:date:user-agent:mime-version:in-reply-to:content-language
-	:content-transfer-encoding;
-	bh=5amF3rMMW0JKkHGQuB0Nco9Et3F92ZoGz7Ke3wTsUAk=;
-	b=duCAEO6j1JZMKeesqHANIe83+Qy/8k4LkonALzzzd0YxHybhxrapAOGO3FVbMyF+Oj
-	Y6GMifVVCYYP3qSLoVHoKdMr9xtEWM+x0z/nuJUFAUkoXzX2ariKm0LzyoUROAySh/Ta
-	MOG2fUa2oZnJUrkO2YlxGxT859W1p2LyUEBIq7IhMDBAnMz2liQnrgjASSWMo07Rgn4+
-	ny3BvepDIuFaYiPYT1l+TDLxEBOOvsqfK/arhOfN3AUYDsqvkWJdzsXfJRajVR6zhHrG
-	CAytYCX9BQ4ocAQKkOjr3g0Ick4vtaHeMqu9biQhc4jVFfrGLX4vScdTEkOxzmpsTIf8
-	hfBQ==
-X-Gm-Message-State: APjAAAUk2LoPPcGog2BbVegKLa7KFd72Wy6+KynbqPkp8ZONIjk644DN
-	hOln4n+ZuLdHFTrQkHIqWXHGDT1HMISoFQ==
-X-Google-Smtp-Source: APXvYqxgYHTgDrXLrtgtP75ObH5c5zYs0nzoqUGyzYcPzfRH82xSjtyV/OFOeQQAsjJZzlW7km4IZA==
-X-Received: by 2002:a1c:2d45:: with SMTP id t66mr1396603wmt.106.1556009563047; 
-	Tue, 23 Apr 2019 01:52:43 -0700 (PDT)
-Received: from [192.168.1.25] (atoulouse-656-1-803-163.w86-221.abo.wanadoo.fr.
-	[86.221.12.163]) by smtp.gmail.com with ESMTPSA id
-	t17sm12166607wrr.26.2019.04.23.01.52.42
-	(version=TLS1_3 cipher=AEAD-AES128-GCM-SHA256 bits=128/128);
-	Tue, 23 Apr 2019 01:52:42 -0700 (PDT)
-To: Richard Henderson <richard.henderson@linaro.org>, qemu-devel@nongnu.org
-References: <20190420073442.7488-1-richard.henderson@linaro.org>
-	<20190420073442.7488-20-richard.henderson@linaro.org>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Openpgp: id=89C1E78F601EE86C867495CBA2A3FD6EDEADC0DE;
-	url=http://pgp.mit.edu/pks/lookup?op=get&search=0xA2A3FD6EDEADC0DE
-Message-ID: <2f9b3973-4e56-b3b0-1a5c-bbb68e27e939@redhat.com>
-Date: Tue, 23 Apr 2019 10:52:41 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
-	Thunderbird/60.6.1
+	(envelope-from <kwolf@redhat.com>) id 1hIrBz-0007Rc-II
+	for qemu-devel@nongnu.org; Tue, 23 Apr 2019 04:54:20 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:55420)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <kwolf@redhat.com>)
+	id 1hIrBw-0007Mw-IO; Tue, 23 Apr 2019 04:54:16 -0400
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+	[10.5.11.11])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id F2B0087629;
+	Tue, 23 Apr 2019 08:54:11 +0000 (UTC)
+Received: from localhost.localdomain (ovpn-116-143.ams2.redhat.com
+	[10.36.116.143])
+	by smtp.corp.redhat.com (Postfix) with ESMTPS id 17FFF6013D;
+	Tue, 23 Apr 2019 08:54:07 +0000 (UTC)
+Date: Tue, 23 Apr 2019 10:54:06 +0200
+From: Kevin Wolf <kwolf@redhat.com>
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Message-ID: <20190423085406.GD9041@localhost.localdomain>
+References: <20190422152315.74361-1-vsementsov@virtuozzo.com>
+	<20190422152315.74361-3-vsementsov@virtuozzo.com>
 MIME-Version: 1.0
-In-Reply-To: <20190420073442.7488-20-richard.henderson@linaro.org>
 Content-Type: text/plain; charset="UTF-8"
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
+Content-Disposition: inline
+In-Reply-To: <20190422152315.74361-3-vsementsov@virtuozzo.com>
+User-Agent: Mutt/1.11.3 (2019-02-01)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+	(mx1.redhat.com [10.5.110.26]);
+	Tue, 23 Apr 2019 08:54:12 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-	[fuzzy]
-X-Received-From: 209.85.128.66
-Subject: Re: [Qemu-devel] [PATCH 19/38] tcg: Add support for integer
- absolute value
+X-Received-From: 209.132.183.28
+Subject: Re: [Qemu-devel] [PATCH v4 2/3] block/io: bdrv_pdiscard: support
+ int64_t bytes parameter
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -87,127 +72,116 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: david@redhat.com
+Cc: fam@euphon.net, den@virtuozzo.com, qemu-block@nongnu.org,
+	qemu-devel@nongnu.org, mreitz@redhat.com, stefanha@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190423085241.6eDft5CSr5BQVAi60pGmGIWMO3s6dMXPEERToQ_usL4@z>
+Message-ID: <20190423085406.OQR8hnRX0SaroHC2-813rJKp9HprSElE1ILEyru0_Z0@z>
 
-On 4/20/19 9:34 AM, Richard Henderson wrote:
-> Remove a function of the same name from target/arm/.
-> Use a branchless implementation of abs that gcc uses for x86.
+Am 22.04.2019 um 17:23 hat Vladimir Sementsov-Ogievskiy geschrieben:
+> This fixes at least one overflow in qcow2_process_discards, which
+> passes 64bit region length to bdrv_pdiscard where bytes (or sectors in
+> the past) parameter is int since its introduction in 0b919fae.
 > 
-> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+> Reviewed-by: Eric Blake <eblake@redhat.com>
 > ---
->  tcg/tcg-op.h           |  5 +++++
->  target/arm/translate.c | 10 ----------
->  tcg/tcg-op.c           | 20 ++++++++++++++++++++
->  3 files changed, 25 insertions(+), 10 deletions(-)
+>  include/block/block.h |  4 ++--
+>  block/io.c            | 16 ++++++++--------
+>  2 files changed, 10 insertions(+), 10 deletions(-)
 > 
-> diff --git a/tcg/tcg-op.h b/tcg/tcg-op.h
-> index 472b73cb38..660fe205d0 100644
-> --- a/tcg/tcg-op.h
-> +++ b/tcg/tcg-op.h
-> @@ -335,6 +335,7 @@ void tcg_gen_smin_i32(TCGv_i32, TCGv_i32 arg1, TCGv_i32 arg2);
->  void tcg_gen_smax_i32(TCGv_i32, TCGv_i32 arg1, TCGv_i32 arg2);
->  void tcg_gen_umin_i32(TCGv_i32, TCGv_i32 arg1, TCGv_i32 arg2);
->  void tcg_gen_umax_i32(TCGv_i32, TCGv_i32 arg1, TCGv_i32 arg2);
-> +void tcg_gen_abs_i32(TCGv_i32, TCGv_i32);
+> diff --git a/include/block/block.h b/include/block/block.h
+> index c7a26199aa..69fa18867e 100644
+> --- a/include/block/block.h
+> +++ b/include/block/block.h
+> @@ -432,8 +432,8 @@ void bdrv_drain_all(void);
+>      AIO_WAIT_WHILE(bdrv_get_aio_context(bs_),              \
+>                     cond); })
 >  
->  static inline void tcg_gen_discard_i32(TCGv_i32 arg)
+> -int bdrv_pdiscard(BdrvChild *child, int64_t offset, int bytes);
+> -int bdrv_co_pdiscard(BdrvChild *child, int64_t offset, int bytes);
+> +int bdrv_pdiscard(BdrvChild *child, int64_t offset, int64_t bytes);
+> +int bdrv_co_pdiscard(BdrvChild *child, int64_t offset, int64_t bytes);
+>  int bdrv_has_zero_init_1(BlockDriverState *bs);
+>  int bdrv_has_zero_init(BlockDriverState *bs);
+>  bool bdrv_unallocated_blocks_are_zero(BlockDriverState *bs);
+> diff --git a/block/io.c b/block/io.c
+> index dfc153b8d8..35c4157669 100644
+> --- a/block/io.c
+> +++ b/block/io.c
+> @@ -2653,7 +2653,7 @@ int bdrv_flush(BlockDriverState *bs)
+>  typedef struct DiscardCo {
+>      BdrvChild *child;
+>      int64_t offset;
+> -    int bytes;
+> +    int64_t bytes;
+>      int ret;
+>  } DiscardCo;
+>  static void coroutine_fn bdrv_pdiscard_co_entry(void *opaque)
+> @@ -2664,14 +2664,15 @@ static void coroutine_fn bdrv_pdiscard_co_entry(void *opaque)
+>      aio_wait_kick();
+>  }
+>  
+> -int coroutine_fn bdrv_co_pdiscard(BdrvChild *child, int64_t offset, int bytes)
+> +int coroutine_fn bdrv_co_pdiscard(BdrvChild *child, int64_t offset,
+> +                                  int64_t bytes)
 >  {
-> @@ -534,6 +535,7 @@ void tcg_gen_smin_i64(TCGv_i64, TCGv_i64 arg1, TCGv_i64 arg2);
->  void tcg_gen_smax_i64(TCGv_i64, TCGv_i64 arg1, TCGv_i64 arg2);
->  void tcg_gen_umin_i64(TCGv_i64, TCGv_i64 arg1, TCGv_i64 arg2);
->  void tcg_gen_umax_i64(TCGv_i64, TCGv_i64 arg1, TCGv_i64 arg2);
-> +void tcg_gen_abs_i64(TCGv_i64, TCGv_i64);
+>      BdrvTrackedRequest req;
+>      int max_pdiscard, ret;
+>      int head, tail, align;
+>      BlockDriverState *bs = child->bs;
 >  
->  #if TCG_TARGET_REG_BITS == 64
->  static inline void tcg_gen_discard_i64(TCGv_i64 arg)
-> @@ -973,6 +975,7 @@ void tcg_gen_nor_vec(unsigned vece, TCGv_vec r, TCGv_vec a, TCGv_vec b);
->  void tcg_gen_eqv_vec(unsigned vece, TCGv_vec r, TCGv_vec a, TCGv_vec b);
->  void tcg_gen_not_vec(unsigned vece, TCGv_vec r, TCGv_vec a);
->  void tcg_gen_neg_vec(unsigned vece, TCGv_vec r, TCGv_vec a);
-> +void tcg_gen_abs_vec(unsigned vece, TCGv_vec r, TCGv_vec a);
->  void tcg_gen_ssadd_vec(unsigned vece, TCGv_vec r, TCGv_vec a, TCGv_vec b);
->  void tcg_gen_usadd_vec(unsigned vece, TCGv_vec r, TCGv_vec a, TCGv_vec b);
->  void tcg_gen_sssub_vec(unsigned vece, TCGv_vec r, TCGv_vec a, TCGv_vec b);
-> @@ -1019,6 +1022,7 @@ void tcg_gen_stl_vec(TCGv_vec r, TCGv_ptr base, TCGArg offset, TCGType t);
->  #define tcg_gen_addi_tl tcg_gen_addi_i64
->  #define tcg_gen_sub_tl tcg_gen_sub_i64
->  #define tcg_gen_neg_tl tcg_gen_neg_i64
-> +#define tcg_gen_abs_tl tcg_gen_abs_i64
->  #define tcg_gen_subfi_tl tcg_gen_subfi_i64
->  #define tcg_gen_subi_tl tcg_gen_subi_i64
->  #define tcg_gen_and_tl tcg_gen_and_i64
-> @@ -1131,6 +1135,7 @@ void tcg_gen_stl_vec(TCGv_vec r, TCGv_ptr base, TCGArg offset, TCGType t);
->  #define tcg_gen_addi_tl tcg_gen_addi_i32
->  #define tcg_gen_sub_tl tcg_gen_sub_i32
->  #define tcg_gen_neg_tl tcg_gen_neg_i32
-> +#define tcg_gen_abs_tl tcg_gen_abs_i32
->  #define tcg_gen_subfi_tl tcg_gen_subfi_i32
->  #define tcg_gen_subi_tl tcg_gen_subi_i32
->  #define tcg_gen_and_tl tcg_gen_and_i32
-> diff --git a/target/arm/translate.c b/target/arm/translate.c
-> index 83a008e945..721171794d 100644
-> --- a/target/arm/translate.c
-> +++ b/target/arm/translate.c
-> @@ -603,16 +603,6 @@ static void gen_sar(TCGv_i32 dest, TCGv_i32 t0, TCGv_i32 t1)
->      tcg_temp_free_i32(tmp1);
->  }
->  
-> -static void tcg_gen_abs_i32(TCGv_i32 dest, TCGv_i32 src)
-> -{
-> -    TCGv_i32 c0 = tcg_const_i32(0);
-> -    TCGv_i32 tmp = tcg_temp_new_i32();
-> -    tcg_gen_neg_i32(tmp, src);
-> -    tcg_gen_movcond_i32(TCG_COND_GT, dest, src, c0, src, tmp);
-> -    tcg_temp_free_i32(c0);
-> -    tcg_temp_free_i32(tmp);
-> -}
-> -
->  static void shifter_out_im(TCGv_i32 var, int shift)
->  {
->      if (shift == 0) {
-> diff --git a/tcg/tcg-op.c b/tcg/tcg-op.c
-> index a00d1df37e..0ac291f1c4 100644
-> --- a/tcg/tcg-op.c
-> +++ b/tcg/tcg-op.c
-> @@ -1091,6 +1091,16 @@ void tcg_gen_umax_i32(TCGv_i32 ret, TCGv_i32 a, TCGv_i32 b)
->      tcg_gen_movcond_i32(TCG_COND_LTU, ret, a, b, b, a);
->  }
->  
-> +void tcg_gen_abs_i32(TCGv_i32 ret, TCGv_i32 a)
-> +{
-> +    TCGv_i32 t = tcg_temp_new_i32();
-> +
-> +    tcg_gen_sari_i32(t, a, 31);
-> +    tcg_gen_xor_i32(ret, a, t);
-> +    tcg_gen_sub_i32(ret, ret, t);
-> +    tcg_temp_free_i32(t);
-> +}
-> +
->  /* 64-bit ops */
->  
->  #if TCG_TARGET_REG_BITS == 32
-> @@ -2548,6 +2558,16 @@ void tcg_gen_umax_i64(TCGv_i64 ret, TCGv_i64 a, TCGv_i64 b)
->      tcg_gen_movcond_i64(TCG_COND_LTU, ret, a, b, b, a);
->  }
->  
-> +void tcg_gen_abs_i64(TCGv_i64 ret, TCGv_i64 a)
-> +{
-> +    TCGv_i64 t = tcg_temp_new_i64();
-> +
-> +    tcg_gen_sari_i64(t, a, 63);
-> +    tcg_gen_xor_i64(ret, a, t);
-> +    tcg_gen_sub_i64(ret, ret, t);
-> +    tcg_temp_free_i64(t);
-> +}
-> +
->  /* Size changing operations.  */
->  
->  void tcg_gen_extrl_i64_i32(TCGv_i32 ret, TCGv_i64 arg)
-> 
+> -    if (!bs || !bs->drv) {
+> +    if (!bs || !bs->drv || !bdrv_is_inserted(bs)) {
+>          return -ENOMEDIUM;
+>      }
 
-Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+Ok, this comes from bdrv_is_inserted(). Priority of errors is changed,
+but that shouldn't be a problem.
+
+In fact, I wonder why bdrv_check_byte_request() should check
+bdrv_is_inserted() at all. If the drive is empty and we perform the
+request, we'll get an error anyway. No real reason to check beforehand
+and slow down the success path.
+
+But this is an issue separate from your patch. We can consider removing
+the bdrv_is_inserted() call in a follow-up.
+
+> @@ -2679,9 +2680,8 @@ int coroutine_fn bdrv_co_pdiscard(BdrvChild *child, int64_t offset, int bytes)
+>          return -EPERM;
+>      }
+>  
+> -    ret = bdrv_check_byte_request(bs, offset, bytes);
+> -    if (ret < 0) {
+> -        return ret;
+> +    if (offset < 0) {
+> +        return -EIO;
+>      }
+
+This loses the check for the maximum size (and therefore integer
+overflows). I think we want to check for bytes > INT64_MAX - offset,
+too.
+
+>      /* Do nothing if disabled.  */
+> @@ -2716,7 +2716,7 @@ int coroutine_fn bdrv_co_pdiscard(BdrvChild *child, int64_t offset, int bytes)
+>      assert(max_pdiscard >= bs->bl.request_alignment);
+>  
+>      while (bytes > 0) {
+> -        int num = bytes;
+> +        int64_t num = bytes;
+>  
+>          if (head) {
+>              /* Make small requests to get to alignment boundaries. */
+> @@ -2778,7 +2778,7 @@ out:
+>      return ret;
+>  }
+>  
+> -int bdrv_pdiscard(BdrvChild *child, int64_t offset, int bytes)
+> +int bdrv_pdiscard(BdrvChild *child, int64_t offset, int64_t bytes)
+>  {
+>      Coroutine *co;
+>      DiscardCo rwco = {
+
+Kevin
 
