@@ -4,56 +4,56 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-8.4 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_MUTT autolearn=unavailable autolearn_force=no version=3.4.0
+	USER_AGENT_MUTT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 74B28C10F14
-	for <qemu-devel@archiver.kernel.org>; Tue, 23 Apr 2019 14:30:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 71977C10F14
+	for <qemu-devel@archiver.kernel.org>; Tue, 23 Apr 2019 14:32:05 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4853821738
-	for <qemu-devel@archiver.kernel.org>; Tue, 23 Apr 2019 14:30:21 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4853821738
+	by mail.kernel.org (Postfix) with ESMTPS id 4797921738
+	for <qemu-devel@archiver.kernel.org>; Tue, 23 Apr 2019 14:32:05 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4797921738
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=suse.cz
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:54641 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:54674 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hIwRA-0001yh-Kz
-	for qemu-devel@archiver.kernel.org; Tue, 23 Apr 2019 10:30:20 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:45221)
+	id 1hIwSq-0003Br-Gr
+	for qemu-devel@archiver.kernel.org; Tue, 23 Apr 2019 10:32:04 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:45334)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jack@suse.cz>) id 1hIwOR-0000Nx-5e
-	for qemu-devel@nongnu.org; Tue, 23 Apr 2019 10:27:32 -0400
+	(envelope-from <jack@suse.cz>) id 1hIwOm-0000dc-1b
+	for qemu-devel@nongnu.org; Tue, 23 Apr 2019 10:27:53 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jack@suse.cz>) id 1hIwOQ-0008FR-44
-	for qemu-devel@nongnu.org; Tue, 23 Apr 2019 10:27:31 -0400
-Received: from mx2.suse.de ([195.135.220.15]:55142 helo=mx1.suse.de)
+	(envelope-from <jack@suse.cz>) id 1hIwOl-0008U1-0X
+	for qemu-devel@nongnu.org; Tue, 23 Apr 2019 10:27:52 -0400
+Received: from mx2.suse.de ([195.135.220.15]:55360 helo=mx1.suse.de)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <jack@suse.cz>) id 1hIwOP-0008Du-Tv
-	for qemu-devel@nongnu.org; Tue, 23 Apr 2019 10:27:30 -0400
+	(Exim 4.71) (envelope-from <jack@suse.cz>) id 1hIwOk-0008Tb-Q8
+	for qemu-devel@nongnu.org; Tue, 23 Apr 2019 10:27:50 -0400
 X-Virus-Scanned: by amavisd-new at test-mx.suse.de
 Received: from relay2.suse.de (unknown [195.135.220.254])
-	by mx1.suse.de (Postfix) with ESMTP id 8B5DAACB8;
-	Tue, 23 Apr 2019 14:27:25 +0000 (UTC)
+	by mx1.suse.de (Postfix) with ESMTP id C1573AC44;
+	Tue, 23 Apr 2019 14:27:49 +0000 (UTC)
 Received: by quack2.suse.cz (Postfix, from userid 1000)
-	id 9F7B41E15B7; Tue, 23 Apr 2019 16:27:23 +0200 (CEST)
-Date: Tue, 23 Apr 2019 16:27:23 +0200
+	id AA27C1E15B7; Tue, 23 Apr 2019 16:27:48 +0200 (CEST)
+Date: Tue, 23 Apr 2019 16:27:48 +0200
 From: Jan Kara <jack@suse.cz>
 To: Pankaj Gupta <pagupta@redhat.com>
-Message-ID: <20190423142723.GD9910@quack2.suse.cz>
+Message-ID: <20190423142748.GE9910@quack2.suse.cz>
 References: <20190423080612.15361-1-pagupta@redhat.com>
-	<20190423080612.15361-5-pagupta@redhat.com>
+	<20190423080612.15361-6-pagupta@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="UTF-8"
 Content-Disposition: inline
-In-Reply-To: <20190423080612.15361-5-pagupta@redhat.com>
+In-Reply-To: <20190423080612.15361-6-pagupta@redhat.com>
 User-Agent: Mutt/1.10.1 (2018-07-13)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x (no
 	timestamps) [generic]
 X-Received-From: 195.135.220.15
-Subject: Re: [Qemu-devel] [PATCH v6 4/6] dax: check synchronous mapping is
- supported
+Subject: Re: [Qemu-devel] [PATCH v6 5/6] ext4: disable map_sync for async
+ flush
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -84,16 +84,14 @@ Cc: cohuck@redhat.com, jack@suse.cz, kvm@vger.kernel.org, mst@redhat.com,
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190423142723.PRwudwk9ucCvRjwPNEH8xjNv457Rf2zsa7fBpnl7SJo@z>
+Message-ID: <20190423142748.pksSMVOt9a_Ak8XfPLiVmD-1gCNy6FddmdlzqdrelEs@z>
 
-On Tue 23-04-19 13:36:10, Pankaj Gupta wrote:
-> This patch introduces 'daxdev_mapping_supported' helper
-> which checks if 'MAP_SYNC' is supported with filesystem
-> mapping. It also checks if corresponding dax_device is
-> synchronous. Virtio pmem device is asynchronous and
-> does not not support VM_SYNC. 
+On Tue 23-04-19 13:36:11, Pankaj Gupta wrote:
+> Dont support 'MAP_SYNC' with non-DAX files and DAX files
+> with asynchronous dax_device. Virtio pmem provides 
+> asynchronous host page cache flush mechanism. We don't
+> support 'MAP_SYNC' with virtio pmem and ext4.
 > 
-> Suggested-by: Jan Kara <jack@suse.cz>
 > Signed-off-by: Pankaj Gupta <pagupta@redhat.com>
 
 The patch looks good to me. You can add:
@@ -104,44 +102,35 @@ Reviewed-by: Jan Kara <jack@suse.cz>
 
 
 > ---
->  include/linux/dax.h | 17 +++++++++++++++++
->  1 file changed, 17 insertions(+)
+>  fs/ext4/file.c | 11 ++++++-----
+>  1 file changed, 6 insertions(+), 5 deletions(-)
 > 
-> diff --git a/include/linux/dax.h b/include/linux/dax.h
-> index c97fc0cc7167..41b4a5db6305 100644
-> --- a/include/linux/dax.h
-> +++ b/include/linux/dax.h
-> @@ -41,6 +41,18 @@ void kill_dax(struct dax_device *dax_dev);
->  void dax_write_cache(struct dax_device *dax_dev, bool wc);
->  bool dax_write_cache_enabled(struct dax_device *dax_dev);
->  bool dax_synchronous(struct dax_device *dax_dev);
-> +/*
-> + * Check if given mapping is supported by the file / underlying device.
-> + */
-> +static inline bool daxdev_mapping_supported(struct vm_area_struct *vma,
-> +				struct dax_device *dax_dev)
-> +{
-> +	if (!(vma->vm_flags & VM_SYNC))
-> +		return true;
-> +	if (!IS_DAX(file_inode(vma->vm_file)))
-> +		return false;
-> +	return dax_synchronous(dax_dev);
-> +}
->  #else
->  static inline struct dax_device *dax_get_by_host(const char *host)
+> diff --git a/fs/ext4/file.c b/fs/ext4/file.c
+> index 69d65d49837b..4b2ccaf1932e 100644
+> --- a/fs/ext4/file.c
+> +++ b/fs/ext4/file.c
+> @@ -360,15 +360,16 @@ static const struct vm_operations_struct ext4_file_vm_ops = {
+>  static int ext4_file_mmap(struct file *file, struct vm_area_struct *vma)
 >  {
-> @@ -68,6 +80,11 @@ static inline bool dax_write_cache_enabled(struct dax_device *dax_dev)
->  {
->  	return false;
->  }
-> +static inline bool daxdev_mapping_supported(struct vm_area_struct *vma,
-> +				struct dax_device *dax_dev)
-> +{
-> +	return !(vma->flags & VM_SYNC);
-> +}
->  #endif
+>  	struct inode *inode = file->f_mapping->host;
+> +	struct ext4_sb_info *sbi = EXT4_SB(inode->i_sb);
+> +	struct dax_device *dax_dev = sbi->s_daxdev;
 >  
->  struct writeback_control;
+> -	if (unlikely(ext4_forced_shutdown(EXT4_SB(inode->i_sb))))
+> +	if (unlikely(ext4_forced_shutdown(sbi)))
+>  		return -EIO;
+>  
+> -	/*
+> -	 * We don't support synchronous mappings for non-DAX files. At least
+> -	 * until someone comes with a sensible use case.
+> +	/* We don't support synchronous mappings for non-DAX files and
+> +	 * for DAX files if underneath dax_device is not synchronous.
+>  	 */
+> -	if (!IS_DAX(file_inode(file)) && (vma->vm_flags & VM_SYNC))
+> +	if (!daxdev_mapping_supported(vma, dax_dev))
+>  		return -EOPNOTSUPP;
+>  
+>  	file_accessed(file);
 > -- 
 > 2.20.1
 > 
