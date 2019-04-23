@@ -2,107 +2,142 @@ Return-Path: <SRS0=zUjA=SZ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.7 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D857BC10F03
-	for <qemu-devel@archiver.kernel.org>; Tue, 23 Apr 2019 18:05:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1DA93C10F03
+	for <qemu-devel@archiver.kernel.org>; Tue, 23 Apr 2019 18:07:33 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 93AF420685
-	for <qemu-devel@archiver.kernel.org>; Tue, 23 Apr 2019 18:05:18 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="RARwzJCS"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 93AF420685
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
+	by mail.kernel.org (Postfix) with ESMTPS id D13302183E
+	for <qemu-devel@archiver.kernel.org>; Tue, 23 Apr 2019 18:07:32 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D13302183E
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:57665 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:57728 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hIznB-0004ZX-TE
-	for qemu-devel@archiver.kernel.org; Tue, 23 Apr 2019 14:05:17 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:40672)
+	id 1hIzpM-0005pL-1L
+	for qemu-devel@archiver.kernel.org; Tue, 23 Apr 2019 14:07:32 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:42736)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1hIzlj-0003qk-BE
-	for qemu-devel@nongnu.org; Tue, 23 Apr 2019 14:03:48 -0400
+	(envelope-from <jsnow@redhat.com>) id 1hIzoR-0005Q4-Lq
+	for qemu-devel@nongnu.org; Tue, 23 Apr 2019 14:06:38 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1hIzlh-0001CY-91
-	for qemu-devel@nongnu.org; Tue, 23 Apr 2019 14:03:47 -0400
-Received: from mail-eopbgr140113.outbound.protection.outlook.com
-	([40.107.14.113]:45638
-	helo=EUR01-VE1-obe.outbound.protection.outlook.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
-	id 1hIzlc-00014f-By; Tue, 23 Apr 2019 14:03:41 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=virtuozzo.com;
-	s=selector1;
-	h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
-	bh=ZelAeojf7ZeSjN8K3BAAqjNdLW/ieSIASmNFM+ZdxXI=;
-	b=RARwzJCStnafbc62zt+raoLcmO91eDI8/JrY91sTtFo3ddLD+FiLxHIQqmSWodz4eeSF+Jl2tUZVoVeAMLg5xWwTrfX6txt/rl4XKUJfpDh5+Tg1tJgzQC8x5JKVyLTGhOLCEyptl27YfwwzIhmaKSUHDD0FNWE20jOmAe9WsHU=
-Received: from DB7PR08MB3851.eurprd08.prod.outlook.com (20.178.46.222) by
-	DB7PR08MB3241.eurprd08.prod.outlook.com (52.134.111.15) with Microsoft
-	SMTP
-	Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
-	15.20.1813.12; Tue, 23 Apr 2019 18:03:36 +0000
-Received: from DB7PR08MB3851.eurprd08.prod.outlook.com
-	([fe80::3c82:5da0:1633:f949]) by
-	DB7PR08MB3851.eurprd08.prod.outlook.com
-	([fe80::3c82:5da0:1633:f949%3]) with mapi id 15.20.1813.017;
-	Tue, 23 Apr 2019 18:03:36 +0000
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-To: John Snow <jsnow@redhat.com>, "qemu-block@nongnu.org"
-	<qemu-block@nongnu.org>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
-Thread-Topic: [PATCH v2 1/2] Makefile: add nit-picky mode to sphinx-build
-Thread-Index: AQHU+Vko6le7PUXZmkeAQqTRBCSkK6ZKCwiA
-Date: Tue, 23 Apr 2019 18:03:36 +0000
-Message-ID: <eaa73eb3-a84f-a263-13b2-e25588f00fd7@virtuozzo.com>
+	(envelope-from <jsnow@redhat.com>) id 1hIzoE-0003jC-UX
+	for qemu-devel@nongnu.org; Tue, 23 Apr 2019 14:06:31 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:53308)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <jsnow@redhat.com>)
+	id 1hIzo9-0003SC-Ep; Tue, 23 Apr 2019 14:06:17 -0400
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+	[10.5.11.11])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 9DC4E308621F;
+	Tue, 23 Apr 2019 18:06:08 +0000 (UTC)
+Received: from [10.10.120.166] (ovpn-120-166.rdu2.redhat.com [10.10.120.166])
+	by smtp.corp.redhat.com (Postfix) with ESMTP id 3ACFF6013B;
+	Tue, 23 Apr 2019 18:06:04 +0000 (UTC)
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
+	"qemu-block@nongnu.org" <qemu-block@nongnu.org>,
+	"qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
 References: <20190422221714.7630-1-jsnow@redhat.com>
 	<20190422221714.7630-2-jsnow@redhat.com>
-In-Reply-To: <20190422221714.7630-2-jsnow@redhat.com>
-Accept-Language: ru-RU, en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-clientproxiedby: HE1PR0902CA0060.eurprd09.prod.outlook.com
-	(2603:10a6:7:15::49) To DB7PR08MB3851.eurprd08.prod.outlook.com
-	(2603:10a6:10:7b::30)
-authentication-results: spf=none (sender IP is )
-	smtp.mailfrom=vsementsov@virtuozzo.com; 
-x-ms-exchange-messagesentrepresentingtype: 1
-x-tagtoolbar-keys: D20190423210332998
-x-originating-ip: [185.231.240.5]
-x-ms-publictraffictype: Email
-x-ms-office365-filtering-correlation-id: 2bb2f24a-2e86-4df3-d0cb-08d6c8160159
-x-microsoft-antispam: BCL:0; PCL:0;
-	RULEID:(2390118)(7020095)(4652040)(8989299)(4534185)(4627221)(201703031133081)(201702281549075)(8990200)(5600141)(711020)(4605104)(2017052603328)(7193020);
-	SRVR:DB7PR08MB3241; 
-x-ms-traffictypediagnostic: DB7PR08MB3241:
-x-microsoft-antispam-prvs: <DB7PR08MB32417958844A628033ECC37AC1230@DB7PR08MB3241.eurprd08.prod.outlook.com>
-x-forefront-prvs: 0016DEFF96
-x-forefront-antispam-report: SFV:NSPM;
-	SFS:(10019020)(346002)(376002)(366004)(136003)(39850400004)(396003)(189003)(199004)(8936002)(76176011)(97736004)(6512007)(31686004)(14454004)(36756003)(52116002)(2906002)(7736002)(66066001)(5660300002)(8676002)(6436002)(478600001)(81156014)(25786009)(7416002)(81166006)(186003)(4326008)(102836004)(229853002)(26005)(386003)(86362001)(6506007)(347745004)(446003)(68736007)(486006)(2501003)(71190400001)(3846002)(476003)(6116002)(66556008)(2616005)(11346002)(305945005)(66446008)(66946007)(54906003)(2201001)(14444005)(316002)(73956011)(31696002)(110136005)(6486002)(6246003)(71200400001)(99286004)(66476007)(256004)(64756008)(53936002);
-	DIR:OUT; SFP:1102; SCL:1; SRVR:DB7PR08MB3241;
-	H:DB7PR08MB3851.eurprd08.prod.outlook.com; FPR:; SPF:None;
-	LANG:en; PTR:InfoNoRecords; MX:1; A:1; 
-received-spf: None (protection.outlook.com: virtuozzo.com does not designate
-	permitted sender hosts)
-x-ms-exchange-senderadcheck: 1
-x-microsoft-antispam-message-info: URFlPTBUkJuWRm7BreuT8+l3jbH7OG4YXOOIQ5FkzoNuub4F/gTOGVIBkbZ20BC0R5HOEeQYuOYLsRWJ/SOOMccX2lumWSLpQUeA5EQZYIcXSpbbrClkG7KgJ9jIs1t/EHHDt4dxdfA1BKHBdp+w0uQOPcAR7fXIMJd1JXVa0GcRTwEgS/RiYHl+Ze8rHX/CLDedxFaxb6OYRYVewe+jmBfbnoZ+6Z95NZut9O/PHz+pRPYxV9WTO7XZ/v79r/nYgGpNHysJ+6OplnZQZ2LIAoaGKonZMb6guH2GjezIuqFO6m8oA0qwmp6rrco8FaQs94JjoCKvt0gVjLOkMmkelHylNUhzGl/ApMPUSwGCeNtRW0tDw7gQ+NFZP6a0Byr5hVTzKs7IOpVJCpOqgvBN+Uy2XdYkuPIZKSsh37tyWao=
-Content-Type: text/plain; charset="UTF-8"
-Content-ID: <901CD8BD2C0B1143BCDE519EE0ED55E7@eurprd08.prod.outlook.com>
-Content-Transfer-Encoding: base64
+	<eaa73eb3-a84f-a263-13b2-e25588f00fd7@virtuozzo.com>
+From: John Snow <jsnow@redhat.com>
+Openpgp: preference=signencrypt
+Autocrypt: addr=jsnow@redhat.com; prefer-encrypt=mutual; keydata=
+	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
+Message-ID: <91bbd108-4ac4-7e07-6d7f-03efb536ba14@redhat.com>
+Date: Tue, 23 Apr 2019 14:06:02 -0400
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+	Thunderbird/60.6.1
 MIME-Version: 1.0
-X-OriginatorOrg: virtuozzo.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 2bb2f24a-2e86-4df3-d0cb-08d6c8160159
-X-MS-Exchange-CrossTenant-originalarrivaltime: 23 Apr 2019 18:03:36.2396 (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 0bc7f26d-0264-416e-a6fc-8352af79c58f
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DB7PR08MB3241
-X-detected-operating-system: by eggs.gnu.org: Windows 7 or 8 [fuzzy]
-X-Received-From: 40.107.14.113
+In-Reply-To: <eaa73eb3-a84f-a263-13b2-e25588f00fd7@virtuozzo.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+	(mx1.redhat.com [10.5.110.42]);
+	Tue, 23 Apr 2019 18:06:08 +0000 (UTC)
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 209.132.183.28
 Subject: Re: [Qemu-devel] [PATCH v2 1/2] Makefile: add nit-picky mode to
  sphinx-build
 X-BeenThere: qemu-devel@nongnu.org
@@ -124,32 +159,57 @@ Cc: Fam Zheng <fam@euphon.net>, "aliang@redhat.com" <aliang@redhat.com>,
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190423180336.OO5CiX85hHK_oIUuT6SiQMhE_UKRj6IwEH3kFy8FQL0@z>
+Message-ID: <20190423180602.D88xqX2vQLvAix-Va-qwEHsoZhc0d5QqZT4YvgCphK4@z>
 
-MjMuMDQuMjAxOSAxOjE3LCBKb2huIFNub3cgd3JvdGU6DQo+IElmIHdlIGFkZCByZWZlcmVuY2Vz
-IHRoYXQgZG9uJ3QgcmVzb2x2ZSAob3IgYWNjaWRlbnRhbGx5IHJlbW92ZSB0aGVtKSwNCj4gaXQg
-d2lsbCBiZSBoZWxwZnVsIHRvIGhhdmUgYW4gZXJyb3IgbWVzc2FnZSBhbGVydGluZyB1cyB0byB0
-aGF0Lg0KDQphY2NvcmRpbmdseSB0byBkb2NzIEkndmUgZm91bmQsIG5vdCBlcnJvciBidXQgd2Fy
-bmluZy4NCg0KPiANCj4gU2lnbmVkLW9mZi1ieTogSm9obiBTbm93IDxqc25vd0ByZWRoYXQuY29t
-Pg0KDQpSZXZpZXdlZC1ieTogVmxhZGltaXIgU2VtZW50c292LU9naWV2c2tpeSA8dnNlbWVudHNv
-dkB2aXJ0dW96em8uY29tPg0KDQo+IC0tLQ0KPiAgIE1ha2VmaWxlIHwgMiArLQ0KPiAgIDEgZmls
-ZSBjaGFuZ2VkLCAxIGluc2VydGlvbigrKSwgMSBkZWxldGlvbigtKQ0KPiANCj4gZGlmZiAtLWdp
-dCBhL01ha2VmaWxlIGIvTWFrZWZpbGUNCj4gaW5kZXggMDRhMGQ0NTA1MC4uZmY5Y2UyZWQ0YyAx
-MDA2NDQNCj4gLS0tIGEvTWFrZWZpbGUNCj4gKysrIGIvTWFrZWZpbGUNCj4gQEAgLTg5OSw3ICs4
-OTksNyBAQCBkb2NzL3ZlcnNpb24udGV4aTogJChTUkNfUEFUSCkvVkVSU0lPTg0KPiAgIHNwaGlu
-eGRvY3M6ICQoTUFOVUFMX0JVSUxERElSKS9kZXZlbC9pbmRleC5odG1sICQoTUFOVUFMX0JVSUxE
-RElSKS9pbnRlcm9wL2luZGV4Lmh0bWwNCj4gICANCj4gICAjIENhbm5lZCBjb21tYW5kIHRvIGJ1
-aWxkIGEgc2luZ2xlIG1hbnVhbA0KPiAtYnVpbGQtbWFudWFsID0gJChjYWxsIHF1aWV0LWNvbW1h
-bmQsc3BoaW54LWJ1aWxkICQoaWYgJChWKSwsLXEpIC1iIGh0bWwgLUQgdmVyc2lvbj0kKFZFUlNJ
-T04pIC1EIHJlbGVhc2U9IiQoRlVMTF9WRVJTSU9OKSIgLWQgLmRvY3RyZWVzLyQxICQoU1JDX1BB
-VEgpL2RvY3MvJDEgJChNQU5VQUxfQlVJTERESVIpLyQxICwiU1BISU5YIiwiJChNQU5VQUxfQlVJ
-TERESVIpLyQxIikNCj4gK2J1aWxkLW1hbnVhbCA9ICQoY2FsbCBxdWlldC1jb21tYW5kLHNwaGlu
-eC1idWlsZCAkKGlmICQoViksLC1xKSAtbiAtYiBodG1sIC1EIHZlcnNpb249JChWRVJTSU9OKSAt
-RCByZWxlYXNlPSIkKEZVTExfVkVSU0lPTikiIC1kIC5kb2N0cmVlcy8kMSAkKFNSQ19QQVRIKS9k
-b2NzLyQxICQoTUFOVUFMX0JVSUxERElSKS8kMSAsIlNQSElOWCIsIiQoTUFOVUFMX0JVSUxERElS
-KS8kMSIpDQo+ICAgIyBXZSBhc3N1bWUgYWxsIFJTVCBmaWxlcyBpbiB0aGUgbWFudWFsJ3MgZGly
-ZWN0b3J5IGFyZSB1c2VkIGluIGl0DQo+ICAgbWFudWFsLWRlcHMgPSAkKHdpbGRjYXJkICQoU1JD
-X1BBVEgpL2RvY3MvJDEvKi5yc3QpICQoU1JDX1BBVEgpL2RvY3MvJDEvY29uZi5weSAkKFNSQ19Q
-QVRIKS9kb2NzL2NvbmYucHkNCj4gICANCj4gDQoNCg0KLS0gDQpCZXN0IHJlZ2FyZHMsDQpWbGFk
-aW1pcg0K
+
+
+On 4/23/19 2:03 PM, Vladimir Sementsov-Ogievskiy wrote:
+> 23.04.2019 1:17, John Snow wrote:
+>> If we add references that don't resolve (or accidentally remove them),
+>> it will be helpful to have an error message alerting us to that.
+>=20
+> accordingly to docs I've found, not error but warning.
+>=20
+Oh, true. I have to revise the document anyway, so I'll change my
+phrasing here -- it won't cause the build to fail, but you will be able
+to see the error when you build. I think it's helpful to have as a
+mechanical check -- especially if we succeed in building generated ReST
+documentation (eventually?...)
+
+>>
+>> Signed-off-by: John Snow <jsnow@redhat.com>
+>=20
+> Reviewed-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+>=20
+>> ---
+>>   Makefile | 2 +-
+>>   1 file changed, 1 insertion(+), 1 deletion(-)
+>>
+>> diff --git a/Makefile b/Makefile
+>> index 04a0d45050..ff9ce2ed4c 100644
+>> --- a/Makefile
+>> +++ b/Makefile
+>> @@ -899,7 +899,7 @@ docs/version.texi: $(SRC_PATH)/VERSION
+>>   sphinxdocs: $(MANUAL_BUILDDIR)/devel/index.html $(MANUAL_BUILDDIR)/i=
+nterop/index.html
+>>  =20
+>>   # Canned command to build a single manual
+>> -build-manual =3D $(call quiet-command,sphinx-build $(if $(V),,-q) -b =
+html -D version=3D$(VERSION) -D release=3D"$(FULL_VERSION)" -d .doctrees/=
+$1 $(SRC_PATH)/docs/$1 $(MANUAL_BUILDDIR)/$1 ,"SPHINX","$(MANUAL_BUILDDIR=
+)/$1")
+>> +build-manual =3D $(call quiet-command,sphinx-build $(if $(V),,-q) -n =
+-b html -D version=3D$(VERSION) -D release=3D"$(FULL_VERSION)" -d .doctre=
+es/$1 $(SRC_PATH)/docs/$1 $(MANUAL_BUILDDIR)/$1 ,"SPHINX","$(MANUAL_BUILD=
+DIR)/$1")
+>>   # We assume all RST files in the manual's directory are used in it
+>>   manual-deps =3D $(wildcard $(SRC_PATH)/docs/$1/*.rst) $(SRC_PATH)/do=
+cs/$1/conf.py $(SRC_PATH)/docs/conf.py
+>>  =20
+>>
+>=20
+>=20
+
+--=20
+=E2=80=94js
 
