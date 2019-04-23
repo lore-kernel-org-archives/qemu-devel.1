@@ -1,34 +1,30 @@
-Received: from eggs.gnu.org ([209.51.188.92]:45680)
+Received: from eggs.gnu.org ([209.51.188.92]:49059)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1hIuAV-00071R-Eq
-	for qemu-devel@nongnu.org; Tue, 23 Apr 2019 08:05:00 -0400
+	(envelope-from <kwolf@redhat.com>) id 1hIuTm-000283-RO
+	for qemu-devel@nongnu.org; Tue, 23 Apr 2019 08:24:56 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1hIuAU-0007Ya-AM
-	for qemu-devel@nongnu.org; Tue, 23 Apr 2019 08:04:59 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:37814)
+	(envelope-from <kwolf@redhat.com>) id 1hIuHf-0003AK-UV
+	for qemu-devel@nongnu.org; Tue, 23 Apr 2019 08:12:25 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:37410)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1hIuAS-0007XI-OT
-	for qemu-devel@nongnu.org; Tue, 23 Apr 2019 08:04:56 -0400
-Date: Tue, 23 Apr 2019 13:04:53 +0100
-From: Stefan Hajnoczi <stefanha@redhat.com>
-Message-ID: <20190423120453.GF32465@stefanha-x1.localdomain>
-References: <5FF901C1-0AA5-4308-A65C-C448D0A2BA63@oracle.com>
-	<20190305172905.GD13806@stefanha-x1.localdomain>
-	<2D7F11D0-4A02-4A0F-961D-854240376B17@oracle.com>
-	<20190401090724.GA643@stefanha-x1.localdomain>
-	<CC372DF3-1AC6-46B5-98A5-21159497034A@oracle.com>
-	<60340EAF-4C85-4798-9999-34F1A37E2086@oracle.com>
-	<898ef1d4-bfa2-9952-8ceb-f1282b85e29c@oracle.com>
-	<20190416092042.GB32709@stefanha-x1.localdomain>
-	<8E5AF770-69ED-4D44-8A25-B51344996D9E@oracle.com>
-	<3F7E854A-3C1D-4204-8C35-893FC0614796@oracle.com>
+	(Exim 4.71) (envelope-from <kwolf@redhat.com>) id 1hIuHf-00039l-L6
+	for qemu-devel@nongnu.org; Tue, 23 Apr 2019 08:12:23 -0400
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+	[10.5.11.15])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id E65362D4B78
+	for <qemu-devel@nongnu.org>; Tue, 23 Apr 2019 12:12:22 +0000 (UTC)
+Date: Tue, 23 Apr 2019 14:12:18 +0200
+From: Kevin Wolf <kwolf@redhat.com>
+Message-ID: <20190423121218.GF9041@localhost.localdomain>
+References: <20190423113028.GD30014@wheatley>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="yRA+Bmk8aPhU85Qt"
+	protocol="application/pgp-signature"; boundary="oyUTqETQ0mS9luUI"
 Content-Disposition: inline
-In-Reply-To: <3F7E854A-3C1D-4204-8C35-893FC0614796@oracle.com>
-Subject: Re: [Qemu-devel] Following up questions related to QEMU and I/O
- Thread
+In-Reply-To: <20190423113028.GD30014@wheatley>
+Subject: Re: [Qemu-devel] Possibly incorrect data sparsification by qemu-img
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,92 +33,138 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Wei Li <wei.d.li@oracle.com>
-Cc: Stefan Hajnoczi <stefanha@gmail.com>, Dongli Zhang <dongli.zhang@oracle.com>, Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org
+To: Martin Kletzander <mkletzan@redhat.com>
+Cc: qemu-devel@nongnu.org, Richard Jones <rjones@redhat.com>, Eric Blake <eblake@redhat.com>
 
 
---yRA+Bmk8aPhU85Qt
-Content-Type: text/plain; charset=us-ascii
+--oyUTqETQ0mS9luUI
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Mon, Apr 22, 2019 at 09:21:53PM -0700, Wei Li wrote:
->         2. kvm_stat or perf record -a -e kvm:\* counters for vmexits and
->            interrupt injections.  If these counters vary greatly between =
-queue
->            sizes, then that is usually a clue.  It's possible to get high=
-er
->            performance by spending more CPU cycles although your system d=
-oesn't
->            have many CPUs available, so I'm not sure if this is the case.
+Am 23.04.2019 um 13:30 hat Martin Kletzander geschrieben:
+> Hi,
 >=20
-> [wei]: vmexits looks like a reason. I am using FIO tool to read/write blo=
-ck storage via following sample command, interesting thing is that kvm:kvm_=
-exit count decreased from 846K to 395K after I increased num_queues from 2 =
-to 4 while the vCPU count is 2.
->            1). Does this mean using more queues than vCPU count may incre=
-ase IOPS via spending more CPU cycle?=20
->            2). Could you please help me better understand how more queues=
- is able to spend more CPU cycle? Thanks!
->            FIO command: fio --filename=3D/dev/sdb --direct=3D1 --rw=3Dran=
-drw --bs=3D4k --ioengine=3Dlibaio --iodepth=3D64 --numjobs=3D4 --time_based=
- --group_reporting --name=3Diops --runtime=3D60 --eta-newline=3D1
+> I am using qemu-img with nbdkit to transfer a disk image and the update i=
+t with
+> extra data from newer snapshots.  The end image cannot be transferred bec=
+ause
+> the snapshots will be created later than the first transfer and we want t=
+o save
+> some time up front.  You might think of it as a continuous synchronisatio=
+n.  It
+> looks something like this:
 >=20
->         3. Power management and polling (kvm.ko halt_poll_ns, tuned profi=
-les,
->            and QEMU iothread poll-max-ns).  It's expensive to wake a CPU =
-when it
->            goes into a low power mode due to idle.  There are several fea=
-tures
->            that can keep the CPU awake or even poll so that request laten=
-cy is
->            reduced.  The reason why the number of queues may matter is th=
-at
->            kicking multiple queues may keep the CPU awake more than batch=
-ing
->            multiple requests onto a small number of queues.
-> [wei]: CPU awake could be another reason, I noticed that kvm:kvm_vcpu_wak=
-eup count decreased from 151K to 47K after I increased num_queues from 2 to=
- 4 while the vCPU count is 2.
+> I first transfer the whole image:
+>=20
+>  qemu-img convert -p $nbd disk.raw
+>=20
+> Where `$nbd` is something along the lines of `nbd+unix:///?socket=3Dnbdki=
+t.sock`
+>=20
+> Then, after the next snapshot is created, I can update it thanks to the `=
+-n`
+> parameter (the $nbd now points to the newer snapshot with unchanged data =
+looking
+> like holes in the file):
+>=20
+>  qemu-img convert -p -n $nbd disk.raw
+>=20
+> This is fast and efficient as it uses block status nbd extension, so it o=
+nly
+> transfers new data.
 
-This suggests that wakeups are involved in the performance difference.
+This is an implementation detail. Don't rely on it. What you're doing is
+abusing 'qemu-img convert', so problems like what you describe are to be
+expected.
 
->            1). Does this mean more queues may keep CPU more busy and awak=
-e which reduced the vcpu wakeup time?
+> This can be done over and over again to keep the local
+> `disk.raw` image up to date with the latest remote snapshot.
+>=20
+> However, when the guest OS zeroes some of the data and it gets written in=
+to the
+> snapshot, qemu-img scans for those zeros and does not write them to the
+> destination image.  Checking the output of `qemu-img map --output=3Djson =
+$nbd`
+> shows that the zeroed data is properly marked as `data: true`.
+>=20
+> Using `-S 0` would write zeros even where the holes are, effectively over=
+writing
+> the data from the last snapshot even though they should not be changed.
+>=20
+> Having gone through some workarounds I would like there to be another way=
+=2E  I
+> know this is far from the typical usage of qemu-img, but is this really t=
+he
+> expected behaviour or is this just something nobody really needed before?=
+  If it
+> is the former, would it be possible to have a parameter that would contro=
+l this
+> behaviour?  If the latter is the case, can that behaviour be changed so t=
+hat it
+> properly replicates the data when `-n` parameter is used?
+>=20
+> Basically the only thing we need is to either:
+>=20
+> 1) write zeros where they actually are or
+>=20
+> 2) turn off explicit sparsification without requesting dense image (basic=
+ally
+>    sparsify only the par that is reported as hole on the source) or
+>=20
+> 3) ideally, just FALLOC_FL_PUNCH_HOLE in places where source did report d=
+ata,
+>    but qemu-img found they are all zeros (or source reported HOLE+ZERO wh=
+ich, I
+>    believe, is effectively the same)
+>=20
+> If you want to try this out, I found the easiest reproducible way is using
+> nbdkit's data plugin, which can simulate whatever source image you like.
 
-Yes, although it depends on how I/O requests are distributed across the
-queues.  You can check /proc/interrupts inside the guest to see
-interrupt counts for the virtqueues.
+I think what you _really_ want is a commit block job. The problem is
+just that you don't have a proper backing file chain, but just a bunch
+of NBD connections.
 
->            2). If using more num_queues than vCPU count is able to get hi=
-gher IOPS for this case, is it safe to use 4 queues while it only have 2 vC=
-PU, or there is any concern or impact by using more queues than vCPU count =
-which I should keep in mind?
+Can't you get an NBD connection that already provides the condensed form
+of the whole snapshot chain directly at the source? If the NBD server
+was QEMU, this would actually be easier than providing each snapshot
+individually.
 
-2 vs 4 queues should be functionally identical.  The only difference is
-performance.
+If this isn't possible, I think you need to replicate the backing chain
+on the destination instead of converting into the same image again and
+again so that qemu-img knows that it must take existing data of the
+backing file into consideration:
 
-> In addition, does Virtio-scsi support Batch I/O Submission feature which =
-may be able to increase the IOPS via reducing the number of system calls?
+    qemu-img convert -O qcow2 nbd://... base.qcow2
+    qemu-img convert -O qcow2 -F qcow2 -B base.qcow2 nbd://... overlay1.qco=
+w2
+    qemu-img convert -O qcow2 -F qcow2 -B overlay1.qcow2 nbd://... overlay2=
+=2Eqcow2
+    ...
 
-I don't see obvious batching support in drivers/scsi/virtio_scsi.c.  The
-Linux block layer supports batching but I'm not sure if the SCSI layer
-does.
+And at the end you can merge the snapshot chain (using a commit or
+stream b=C4=BAock job, or qemu-img commit/rebase).
 
-Stefan
+Kevin
 
---yRA+Bmk8aPhU85Qt
+--oyUTqETQ0mS9luUI
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQEcBAEBAgAGBQJcvv9lAAoJEJykq7OBq3PI9p8H/iYfB3k6y4E7Npe806M3d8/0
-TO+l/gR/1minGRclEpiw9DWzvQOEnv/IKcEPnu7nvyQgtEtN5eTu+CiNHXWEzIB0
-MzGVTm2XpqKkl+ov/M9PeY4QNqMpasKaLuHafJx7W4VVjaN1xIQ1gv3ZwKBGGDwc
-GD+OsWFQXXRZcb+18iseRFNrDzUFvW7aHX4Hk3qDog6dYdWzSmKdxtqBnY08/Kf0
-CYvnGFCP7jB54/m3ymT88qbp4gQutxrLQlpU+kI2qK/9GaoqqcF2AG8kbOKl2bbf
-DBh78TNjiN0uzNhtiyksLfCi2vRYlcYyrWQAq/MjkoZVWKCISYOQNcpd0TWBCKk=
-=sKm3
+iQIcBAEBAgAGBQJcvwEiAAoJEH8JsnLIjy/W7FUQALrCfi/4GvfD1v6q2iK3PXb6
+Y+0eRQApdfYkn52gSFciYcIfO/PvQPSoeoo6IbwYnXNALNida1im59P+ne02l+S1
+9/vHxnwkJ1c+aabWMVYkQy2fFU/5eLggt+V8yY+vnH4bDNBwTvEkrRvnoyyduIEQ
+NHremXwNVv99gAb1bvTP6+iHohYHJKr+H5CSVB1gJhXPa2el13l8eXNKRH34xF6o
+fsrCuRuS7YGYrHP1tCpU4uXTA2Axfm1rKzZPYIvkEk/UUDYH4kOuoSTezOwwU2eB
+4OPNaLSzwUUNG5pWPNuI/UldxPi8aUlfSMq6wdyNMgJ252HPwhaluk6Yxw4nX0P5
+bHDyyFQ4ZG9aT5Cdc7D0MauSakWyFSX8yEr1iKgpqMF9ny3x+7xNRVouH6RAg5+Y
+D3CZbYC/qqZxXpE+4KGBNhiSHR2rJb/cfBAHFzOJHw7WOpovQfE3Y/TfnN3eYqD0
+L4LC7wmHrD3OXZIE//lMxBvVxIgOEd3nif7QA6b+ACTlR6vzHAT6BWAxwI57zgnx
+209TMpltBylZ5ObLnnCVAimCn2fnQiw8FgTWdVUleYDHKbnCT7mThVf4D0HKz7wO
+uSCshLngsHRAurMOUvmOS6jmXBF8Np3oYRD7XSBDXfQJTuT1u33N/bl/TSJcIoer
+uWtVNO4Nz7JmnqcEIlDj
+=wSaw
 -----END PGP SIGNATURE-----
 
---yRA+Bmk8aPhU85Qt--
+--oyUTqETQ0mS9luUI--
