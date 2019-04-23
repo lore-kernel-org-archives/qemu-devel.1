@@ -1,22 +1,29 @@
-Received: from eggs.gnu.org ([209.51.188.92]:51421)
+Received: from eggs.gnu.org ([209.51.188.92]:51422)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1hIzMJ-00081T-On
-	for qemu-devel@nongnu.org; Tue, 23 Apr 2019 13:37:32 -0400
+	(envelope-from <richard.henderson@linaro.org>) id 1hIzMe-00081U-VO
+	for qemu-devel@nongnu.org; Tue, 23 Apr 2019 13:37:53 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1hIzKW-00084e-Sj
-	for qemu-devel@nongnu.org; Tue, 23 Apr 2019 13:35:42 -0400
-Received: from mx2.rt-rk.com ([89.216.37.149]:49619 helo=mail.rt-rk.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <aleksandar.markovic@rt-rk.com>)
-	id 1hIzKV-00080S-K6
-	for qemu-devel@nongnu.org; Tue, 23 Apr 2019 13:35:40 -0400
-From: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>
-Date: Tue, 23 Apr 2019 19:35:24 +0200
-Message-Id: <1556040926-23931-3-git-send-email-aleksandar.markovic@rt-rk.com>
-In-Reply-To: <1556040926-23931-1-git-send-email-aleksandar.markovic@rt-rk.com>
-References: <1556040926-23931-1-git-send-email-aleksandar.markovic@rt-rk.com>
-Subject: [Qemu-devel] [PATCH 2/4] linux-user: Add support for the SIOCSPGRP
- ioctl
+	(envelope-from <richard.henderson@linaro.org>) id 1hIzCl-0001NU-GA
+	for qemu-devel@nongnu.org; Tue, 23 Apr 2019 13:27:40 -0400
+Received: from mail-pg1-x542.google.com ([2607:f8b0:4864:20::542]:33986)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+	id 1hIzCl-0001Jt-7W
+	for qemu-devel@nongnu.org; Tue, 23 Apr 2019 13:27:39 -0400
+Received: by mail-pg1-x542.google.com with SMTP id v12so7961914pgq.1
+	for <qemu-devel@nongnu.org>; Tue, 23 Apr 2019 10:27:38 -0700 (PDT)
+References: <20190416125744.27770-1-peter.maydell@linaro.org>
+	<20190416125744.27770-3-peter.maydell@linaro.org>
+From: Richard Henderson <richard.henderson@linaro.org>
+Message-ID: <4a3a72f6-a450-b074-b8da-26fe6615ae59@linaro.org>
+Date: Tue, 23 Apr 2019 10:27:34 -0700
+MIME-Version: 1.0
+In-Reply-To: <20190416125744.27770-3-peter.maydell@linaro.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH 02/26] hw/intc/armv7m_nvic: Allow reading
+ of M-profile MVFR* registers
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,65 +32,19 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: aurelien@aurel32.net, amarkovic@wavecomp.com, arikalo@wavecomp.com, daniel.santos@pobox.com, jcmvbkbc@gmail.com, lvivier@redhat.com, thuth@redhat.com
+To: Peter Maydell <peter.maydell@linaro.org>, qemu-arm@nongnu.org, qemu-devel@nongnu.org
 
-From: Aleksandar Markovic <amarkovic@wavecomp.com>
+On 4/16/19 5:57 AM, Peter Maydell wrote:
+> For M-profile the MVFR* ID registers are memory mapped, in the
+> range we implement via the NVIC. Allow them to be read.
+> (If the CPU has no FPU, these registers are defined to be RAZ.)
+> 
+> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+> ---
+>  hw/intc/armv7m_nvic.c | 6 ++++++
+>  1 file changed, 6 insertions(+)
 
-Add support for setting the process (or process group) to receive SIGIO
-or SIGURG signals when I/O becomes possible or urgent data is available,
-using SIOCSPGRP ioctl.
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 
-The ioctl numeric values for SIOCSPGRP are platform-dependent and are
-determined by following files in Linux kernel source tree:
 
-arch/ia64/include/uapi/asm/sockios.h:#define SIOCSPGRP    0x8902
-arch/mips/include/uapi/asm/sockios.h:#define SIOCSPGRP    _IOW('s', 8, pid_t)
-arch/parisc/include/uapi/asm/sockios.h:#define SIOCSPGRP  0x8902
-arch/sh/include/uapi/asm/sockios.h:#define SIOCSPGRP      _IOW('s', 8, pid_t)
-arch/xtensa/include/uapi/asm/sockios.h:#define SIOCSPGRP  _IOW('s', 8, pid_t)
-arch/alpha/include/uapi/asm/sockios.h:#define SIOCSPGRP   _IOW('s', 8, pid_t)
-arch/sparc/include/uapi/asm/sockios.h:#define SIOCSPGRP   0x8902
-include/uapi/asm-generic/sockios.h:#define SIOCSPGRP      0x8902
-
-Hence the different definition for alpha, mips, sh4, and extensa.
-
-Signed-off-by: Aleksandar Markovic <amarkovic@wavecomp.com>
----
- linux-user/ioctls.h       | 1 +
- linux-user/syscall_defs.h | 3 +++
- 2 files changed, 4 insertions(+)
-
-diff --git a/linux-user/ioctls.h b/linux-user/ioctls.h
-index ae89516..c37adc5 100644
---- a/linux-user/ioctls.h
-+++ b/linux-user/ioctls.h
-@@ -218,6 +218,7 @@
-   IOCTL(SIOCSRARP, IOC_W, MK_PTR(MK_STRUCT(STRUCT_arpreq)))
-   IOCTL(SIOCGRARP, IOC_R, MK_PTR(MK_STRUCT(STRUCT_arpreq)))
-   IOCTL(SIOCGIWNAME, IOC_W | IOC_R, MK_PTR(MK_STRUCT(STRUCT_char_ifreq)))
-+  IOCTL(SIOCSPGRP, IOC_W, MK_PTR(TYPE_INT)) /* pid_t */
-   IOCTL(SIOCGPGRP, IOC_R, MK_PTR(TYPE_INT)) /* pid_t */
-   IOCTL(SIOCGSTAMP, IOC_R, MK_PTR(MK_STRUCT(STRUCT_timeval)))
-   IOCTL(SIOCGSTAMPNS, IOC_R, MK_PTR(MK_STRUCT(STRUCT_timespec)))
-diff --git a/linux-user/syscall_defs.h b/linux-user/syscall_defs.h
-index 1e86fb9..2941231 100644
---- a/linux-user/syscall_defs.h
-+++ b/linux-user/syscall_defs.h
-@@ -739,11 +739,14 @@ struct target_pollfd {
- #if defined(TARGET_ALPHA) || defined(TARGET_MIPS) || defined(TARGET_SH4) ||    \
-        defined(TARGET_XTENSA)
- #define TARGET_SIOCATMARK      TARGET_IOR('s', 7, int)
-+#define TARGET_SIOCSPGRP       TARGET_IOW('s', 8, pid_t)
- #define TARGET_SIOCGPGRP       TARGET_IOR('s', 9, pid_t)
- #else
- #define TARGET_SIOCATMARK      0x8905
-+#define TARGET_SIOCSPGRP       0x8902
- #define TARGET_SIOCGPGRP       0x8904
- #endif
-+
- #define TARGET_SIOCGSTAMP      0x8906          /* Get stamp (timeval) */
- #define TARGET_SIOCGSTAMPNS    0x8907          /* Get stamp (timespec) */
- 
--- 
-2.7.4
+r~
