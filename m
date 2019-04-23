@@ -2,65 +2,66 @@ Return-Path: <SRS0=zUjA=SZ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.3 required=3.0 tests=FROM_EXCESS_BASE64,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_MUTT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.4 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_PASS,USER_AGENT_MUTT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D907BC10F14
-	for <qemu-devel@archiver.kernel.org>; Tue, 23 Apr 2019 14:27:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 56FCBC10F14
+	for <qemu-devel@archiver.kernel.org>; Tue, 23 Apr 2019 14:29:08 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id ACBBB214AE
-	for <qemu-devel@archiver.kernel.org>; Tue, 23 Apr 2019 14:27:23 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org ACBBB214AE
+	by mail.kernel.org (Postfix) with ESMTPS id 17D48214AE
+	for <qemu-devel@archiver.kernel.org>; Tue, 23 Apr 2019 14:29:08 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 17D48214AE
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:54573 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:54617 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hIwOI-0008PD-S8
-	for qemu-devel@archiver.kernel.org; Tue, 23 Apr 2019 10:27:22 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:44262)
+	id 1hIwPz-0001Lg-EA
+	for qemu-devel@archiver.kernel.org; Tue, 23 Apr 2019 10:29:07 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:45011)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1hIwMe-0006cJ-1x
-	for qemu-devel@nongnu.org; Tue, 23 Apr 2019 10:25:41 -0400
+	(envelope-from <mkletzan@redhat.com>) id 1hIwNq-0008Nh-GF
+	for qemu-devel@nongnu.org; Tue, 23 Apr 2019 10:26:55 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1hIwBA-00074x-Ci
-	for qemu-devel@nongnu.org; Tue, 23 Apr 2019 10:13:49 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:57836)
+	(envelope-from <mkletzan@redhat.com>) id 1hIwNp-0007oa-19
+	for qemu-devel@nongnu.org; Tue, 23 Apr 2019 10:26:54 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:56102)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1hIwB8-00073K-W7
-	for qemu-devel@nongnu.org; Tue, 23 Apr 2019 10:13:47 -0400
+	(Exim 4.71) (envelope-from <mkletzan@redhat.com>) id 1hIwNo-0007ly-Nt
+	for qemu-devel@nongnu.org; Tue, 23 Apr 2019 10:26:52 -0400
 Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
 	[10.5.11.16])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 8C0F53019888;
-	Tue, 23 Apr 2019 14:13:41 +0000 (UTC)
-Received: from redhat.com (ovpn-112-50.ams2.redhat.com [10.36.112.50])
-	by smtp.corp.redhat.com (Postfix) with ESMTPS id DAC9A5C220;
-	Tue, 23 Apr 2019 14:13:35 +0000 (UTC)
-Date: Tue, 23 Apr 2019 15:13:32 +0100
-From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-To: Eric Blake <eblake@redhat.com>
-Message-ID: <20190423141332.GN6022@redhat.com>
-References: <20190211182442.8542-1-berrange@redhat.com>
-	<46b6b751-4e3f-1b11-9ac7-d0d73cca2227@redhat.com>
+	by mx1.redhat.com (Postfix) with ESMTPS id 0CB40DBD6F
+	for <qemu-devel@nongnu.org>; Tue, 23 Apr 2019 14:26:50 +0000 (UTC)
+Received: from caroline (unknown [10.43.2.67])
+	by smtp.corp.redhat.com (Postfix) with ESMTPS id AB5DD61B7D;
+	Tue, 23 Apr 2019 14:26:49 +0000 (UTC)
+Received: by caroline (Postfix, from userid 1000)
+	id 691AB1206F3; Tue, 23 Apr 2019 16:26:48 +0200 (CEST)
+Date: Tue, 23 Apr 2019 16:26:48 +0200
+From: Martin Kletzander <mkletzan@redhat.com>
+To: Kevin Wolf <kwolf@redhat.com>
+Message-ID: <20190423142648.GA2967@wheatley>
+References: <20190423113028.GD30014@wheatley>
+	<20190423121218.GF9041@localhost.localdomain>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature"; boundary="WIyZ46R2i8wDzkSu"
 Content-Disposition: inline
-In-Reply-To: <46b6b751-4e3f-1b11-9ac7-d0d73cca2227@redhat.com>
-User-Agent: Mutt/1.11.3 (2019-02-01)
+In-Reply-To: <20190423121218.GF9041@localhost.localdomain>
+User-Agent: Mutt/1.11.4 (2019-03-13)
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.47]);
-	Tue, 23 Apr 2019 14:13:41 +0000 (UTC)
-Content-Transfer-Encoding: quoted-printable
+	(mx1.redhat.com [10.5.110.39]);
+	Tue, 23 Apr 2019 14:26:50 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH v3 00/16] chardev: refactoring & many
- bugfixes related tcp_chr_wait_connected
+Subject: Re: [Qemu-devel] Possibly incorrect data sparsification by qemu-img
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -72,101 +73,155 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-Cc: Laurent Vivier <lvivier@redhat.com>, Thomas Huth <thuth@redhat.com>,
-	qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>,
-	Yongji Xie <elohimes@gmail.com>,
-	=?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>,
-	Paolo Bonzini <pbonzini@redhat.com>
+Cc: qemu-devel@nongnu.org, Richard Jones <rjones@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190423141332.FuAN6PS5t2v0g6LAf3nY8wMlTKInBV7jrSjjkhWmBXs@z>
+Message-ID: <20190423142648.kGh9SW4fewASPlo8_oxYYksCHmoGnzuDq1cFlHz3RLU@z>
 
-On Mon, Apr 22, 2019 at 09:51:17AM -0500, Eric Blake wrote:
-> On 2/11/19 12:24 PM, Daniel P. Berrang=C3=A9 wrote:
-> > This is a followup to
-> >=20
-> >   v1: https://lists.gnu.org/archive/html/qemu-devel/2019-01/msg03344.=
-html
-> >   v2: http://lists.nongnu.org/archive/html/qemu-devel/2019-01/msg0594=
-7.html
-> >=20
-> > This series comes out of a discussion between myself & Yongji Xie in:
-> >=20
-> >   https://lists.gnu.org/archive/html/qemu-devel/2019-01/msg01881.html
-> >=20
-> > I eventually understood that the problem faced was that
-> > tcp_chr_wait_connected was racing with the background connection atte=
-mpt
-> > previously started, causing two connections to be established. This
-> > broke because some vhost user servers only allow a single connection.
-> >=20
-> > After messing around with the code alot the final solution was in fac=
-t
-> > very easy. We simply have to delay the first background connection
-> > attempt until the main loop is running. It will then automatically
-> > turn into a no-op if tcp_chr_wait_connected has been run. This is
-> > dealt with in the last patch in this series
-> >=20
-> > I believe this should solve the problem Yongji Xie faced, and thus no=
-t
-> > require us to add support for "nowait" option with client sockets at
-> > all. The reconnect=3D1 option effectively already implements nowait
-> > semantics, and now plays nicely with tcp_chr_wait_connected.
-> >=20
-> > In investigating this I found various other bugs that needed fixing a=
-nd
-> > identified some useful refactoring to simplify / clarify the code, he=
-nce
-> > this very long series.
->=20
-> Even with this series applied, I'm still seeing sporadic failures of
-> iotest 169. Max posted a hack patch a while back that tries to work
-> around the race:
->=20
-> https://lists.gnu.org/archive/html/qemu-devel/2019-01/msg05907.html
->=20
-> which he originally diagnosed in iotest 147:
-> https://lists.nongnu.org/archive/html/qemu-devel/2018-12/msg05579.html
->=20
-> but as it was a hack, he has not pursued it further, and so the symptom=
-s
-> are still there, although not completely reproducible:
->=20
-> 169 10s ... - output mismatch (see 169.out.bad)
-> --- /home/eblake/qemu/tests/qemu-iotests/169.out	2018-11-16
-> 15:48:12.018526748 -0600
-> +++ /home/eblake/qemu/tests/qemu-iotests/169.out.bad	2019-04-22
-> 09:38:45.481517132 -0500
-> @@ -1,3 +1,5 @@
-> +WARNING:qemu:qemu received signal 11:
-> /home/eblake/qemu/tests/qemu-iotests/../../x86_64-softmmu/qemu-system-x=
-86_64
-> -chardev
-> socket,id=3Dmon,path=3D/home/eblake/qemu/tests/qemu-iotests/scratch/tmp=
-4clmPF/qemua-26803-monitor.sock
-> -mon chardev=3Dmon,mode=3Dcontrol -display none -vga none -qtest
-> unix:path=3D/home/eblake/qemu/tests/qemu-iotests/scratch/qemua-26803-qt=
-est.sock
-> -machine accel=3Dqtest -nodefaults -machine accel=3Dqtest -drive
-> if=3Dvirtio,id=3Ddrive0,file=3D/home/eblake/qemu/tests/qemu-iotests/scr=
-atch/disk_a,format=3Dqcow2,cache=3Dwriteback
->=20
-> Any chance you can take a look as to what a non-hack fix should be?
 
-Oh, it looks like we dropped the ball here. We have a fix already but
-it doesn't appear to have been merged for 4.0 :-(
+--WIyZ46R2i8wDzkSu
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-  https://lists.gnu.org/archive/html/qemu-devel/2019-02/msg06174.html
+On Tue, Apr 23, 2019 at 02:12:18PM +0200, Kevin Wolf wrote:
+>Am 23.04.2019 um 13:30 hat Martin Kletzander geschrieben:
+>> Hi,
+>>
+>> I am using qemu-img with nbdkit to transfer a disk image and the update =
+it with
+>> extra data from newer snapshots.  The end image cannot be transferred be=
+cause
+>> the snapshots will be created later than the first transfer and we want =
+to save
+>> some time up front.  You might think of it as a continuous synchronisati=
+on.  It
+>> looks something like this:
+>>
+>> I first transfer the whole image:
+>>
+>>  qemu-img convert -p $nbd disk.raw
+>>
+>> Where `$nbd` is something along the lines of `nbd+unix:///?socket=3Dnbdk=
+it.sock`
+>>
+>> Then, after the next snapshot is created, I can update it thanks to the =
+`-n`
+>> parameter (the $nbd now points to the newer snapshot with unchanged data=
+ looking
+>> like holes in the file):
+>>
+>>  qemu-img convert -p -n $nbd disk.raw
+>>
+>> This is fast and efficient as it uses block status nbd extension, so it =
+only
+>> transfers new data.
+>
+>This is an implementation detail. Don't rely on it. What you're doing is
+>abusing 'qemu-img convert', so problems like what you describe are to be
+>expected.
+>
+>> This can be done over and over again to keep the local
+>> `disk.raw` image up to date with the latest remote snapshot.
+>>
+>> However, when the guest OS zeroes some of the data and it gets written i=
+nto the
+>> snapshot, qemu-img scans for those zeros and does not write them to the
+>> destination image.  Checking the output of `qemu-img map --output=3Djson=
+ $nbd`
+>> shows that the zeroed data is properly marked as `data: true`.
+>>
+>> Using `-S 0` would write zeros even where the holes are, effectively ove=
+rwriting
+>> the data from the last snapshot even though they should not be changed.
+>>
+>> Having gone through some workarounds I would like there to be another wa=
+y.  I
+>> know this is far from the typical usage of qemu-img, but is this really =
+the
+>> expected behaviour or is this just something nobody really needed before=
+?  If it
+>> is the former, would it be possible to have a parameter that would contr=
+ol this
+>> behaviour?  If the latter is the case, can that behaviour be changed so =
+that it
+>> properly replicates the data when `-n` parameter is used?
+>>
+>> Basically the only thing we need is to either:
+>>
+>> 1) write zeros where they actually are or
+>>
+>> 2) turn off explicit sparsification without requesting dense image (basi=
+cally
+>>    sparsify only the par that is reported as hole on the source) or
+>>
+>> 3) ideally, just FALLOC_FL_PUNCH_HOLE in places where source did report =
+data,
+>>    but qemu-img found they are all zeros (or source reported HOLE+ZERO w=
+hich, I
+>>    believe, is effectively the same)
+>>
+>> If you want to try this out, I found the easiest reproducible way is usi=
+ng
+>> nbdkit's data plugin, which can simulate whatever source image you like.
+>
+>I think what you _really_ want is a commit block job. The problem is
+>just that you don't have a proper backing file chain, but just a bunch
+>of NBD connections.
+>
+>Can't you get an NBD connection that already provides the condensed form
+>of the whole snapshot chain directly at the source? If the NBD server
+>was QEMU, this would actually be easier than providing each snapshot
+>individually.
+>
+>If this isn't possible, I think you need to replicate the backing chain
+>on the destination instead of converting into the same image again and
+>again so that qemu-img knows that it must take existing data of the
+>backing file into consideration:
+>
+>    qemu-img convert -O qcow2 nbd://... base.qcow2
+>    qemu-img convert -O qcow2 -F qcow2 -B base.qcow2 nbd://... overlay1.qc=
+ow2
+>    qemu-img convert -O qcow2 -F qcow2 -B overlay1.qcow2 nbd://... overlay=
+2.qcow2
+>    ...
+>
 
-Regards,
-Daniel
---=20
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberran=
-ge :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.c=
-om :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberran=
-ge :|
+I thought of this, but (to be honest) I did not know that `-B` would work f=
+or
+nbd.  Does it assume that data are to be taken from the base image if and o=
+nly
+if the source (be it nbd server or just a plain file) says there is a hole?=
+  If
+yes, then it could nicely solve the issue.
+
+>And at the end you can merge the snapshot chain (using a commit or
+>stream b=C4=BAock job, or qemu-img commit/rebase).
+>
+>Kevin
+
+
+
+--WIyZ46R2i8wDzkSu
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAABCAAdFiEEiXAnXDYdKAaCyvS1CB/CnyQXht0FAly/IKgACgkQCB/CnyQX
+ht3N8xAAmhNuj1bdKsTBmfOWgfBgqtHIsVe4pNTDDdEn2SqRu9Yemy247kjSD0yv
+IWXDu+IkTieYOaIve228QwWoEtErPFklObERYQrBfNiTx1Rpnt2URmYKZS3fFidI
+pnSgxZ3g0DTibcFGWTeWQoHm0HOT0rXRYWMm3sJRM8CtpExB5GR6w3jSuta6wGah
+MhQEfJ0M+rt6G6OrF21gJVWj5eYiuK0wyZyBL0hHNCGqa7cFPySvIB7JGuXc9sVS
+/G62poiKq/ykPERVZIt+UrExTSJ2S/w01fg8U46Hp8JfL7HvRcjJKqCy3m2unxs0
+CGroGxdW9IUKhTTU6NZ6uq3cpJ3wdFKnvpr2r/9F4g7ikl65OcSlxSkmZCcXfil2
+30VOgfLm+WrAy5Aw/catlQiUjda56d5MmA8FzOE8tqV0uofPdpxbmmCCbKT5LZ8+
+UKblTQfK0ZcdRrZxMVfVgt3fqOXsmajfsK5s37AH0vkp0dvn6DlMcIT+f0xTQDDs
+wZiia8bRGeBT72CHLTa1ko7kHFIdcFf7qt8zhOWnQA3QTC/HKV2oZLzmR5BR7kb2
+AisjHA4IFP7S2rTVVqDiQ82NPqTdAIYCqdkJDAWTK5b6JxXd3ID8QgzC5wvU/d0S
+wzfmZ7hADRJ7GSlWFqgwQDDYC2u71o3wiyI7Oz0SvmZxvyCop/U=
+=FwVf
+-----END PGP SIGNATURE-----
+
+--WIyZ46R2i8wDzkSu--
 
