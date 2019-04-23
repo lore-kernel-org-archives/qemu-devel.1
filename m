@@ -1,28 +1,34 @@
-Received: from eggs.gnu.org ([209.51.188.92]:38758)
+Received: from eggs.gnu.org ([209.51.188.92]:38934)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1hIsJs-0004cC-4q
-	for qemu-devel@nongnu.org; Tue, 23 Apr 2019 06:06:33 -0400
+	(envelope-from <bounces@canonical.com>) id 1hIsJu-0004dL-3R
+	for qemu-devel@nongnu.org; Tue, 23 Apr 2019 06:06:38 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1hIsF6-0008TE-D0
-	for qemu-devel@nongnu.org; Tue, 23 Apr 2019 06:01:41 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:55496)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1hIsF6-0008Sl-3V
-	for qemu-devel@nongnu.org; Tue, 23 Apr 2019 06:01:36 -0400
-Date: Tue, 23 Apr 2019 11:01:01 +0100
-From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-Message-ID: <20190423100101.GD6022@redhat.com>
-Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-References: <20190417053225.27505-1-richard.henderson@linaro.org>
-	<20190417053225.27505-2-richard.henderson@linaro.org>
-	<fb4917eb-4ff3-7a93-cbcd-39d1800827e8@redhat.com>
+	(envelope-from <bounces@canonical.com>) id 1hIsEk-0008LV-UR
+	for qemu-devel@nongnu.org; Tue, 23 Apr 2019 06:01:16 -0400
+Received: from indium.canonical.com ([91.189.90.7]:37124)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1hIsEk-0008L6-Of
+	for qemu-devel@nongnu.org; Tue, 23 Apr 2019 06:01:14 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1hIsEh-0005VO-SK
+	for <qemu-devel@nongnu.org>; Tue, 23 Apr 2019 10:01:12 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id D15392E819C
+	for <qemu-devel@nongnu.org>; Tue, 23 Apr 2019 10:01:10 +0000 (UTC)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <fb4917eb-4ff3-7a93-cbcd-39d1800827e8@redhat.com>
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH 1/1] util/path: Do not cache all filenames
- at startup
+Date: Tue, 23 Apr 2019 09:50:07 -0000
+From: Dan Streetman <dan.streetman@canonical.com>
+Reply-To: Bug 1823458 <1823458@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <155455149397.14414.11595397789908732027.malonedeb@gac.canonical.com>
+Message-Id: <155601300707.14336.15416482747204217560.malone@gac.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1823458] Re: race condition between
+ vhost_net_stop and CHR_EVENT_CLOSED on shutdown crashes qemu
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,144 +37,189 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>
-Cc: Richard Henderson <richard.henderson@linaro.org>, qemu-devel@nongnu.org, peter.maydell@linaro.org, laurent@vivier.eu, evgreen@chromium.org, =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>
+To: qemu-devel@nongnu.org
 
-On Tue, Apr 23, 2019 at 11:54:53AM +0200, Philippe Mathieu-Daud=C3=A9 wro=
-te:
-> Hi Richard, Daniel,
->=20
-> On 4/17/19 7:32 AM, Richard Henderson wrote:
-> > If one uses -L $PATH to point to a full chroot, the startup time
-> > is significant.  In addition, the existing probing algorithm fails
-> > to handle symlink loops.
-> >=20
-> > Instead, probe individual paths on demand.  Cache both positive
-> > and negative results within $PATH, so that any one filename is
-> > probed only once.
-> >=20
-> > Use glib filename functions for clarity.
-> >=20
-> > Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
-> > ---
-> >  util/path.c | 211 ++++++++++++++------------------------------------=
---
-> >  1 file changed, 57 insertions(+), 154 deletions(-)
+Note as mentioned in the description, it appears this was fixed upstream
+by commit e7c83a885f8, which is included starting in version 2.9.
+However, this commit depends on at least commit 5345fdb4467, and likely
+more other previous commits, which make widespread code changes and are
+unsuitable to backport. Therefore this seems like it should be
+specifically worked around in the Xenial qemu codebase.
 
+-- =
 
-> > +#if GLIB_CHECK_VERSION(2, 58, 0)
->=20
-> Should we raise GLIB_VERSION_MAX_ALLOWED in "glib-compat.h"?
->=20
-> Currently it is:
->=20
->   /* Ask for warnings if code tries to use function that did not
->    * exist in the defined version. These risk breaking builds
->    */
->   #define GLIB_VERSION_MAX_ALLOWED GLIB_VERSION_2_40
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1823458
 
-Use of 2.40 is set in accordance with our targetted platform support
-policy. If Peter has stopped using the Ubuntu 14.04 build host, we
-could bump it to 2.42. Once our dev tree opens up we could in fact
-drop Jessie since we'll be supporting Buster by the time next QEMU
-is released. That would still only take us upto perhaps Glib 2.48
+Title:
+  race condition between vhost_net_stop and CHR_EVENT_CLOSED on shutdown
+  crashes qemu
 
-Glib 2.58 is waaaay to new to rely on.
+Status in QEMU:
+  Fix Released
+Status in qemu package in Ubuntu:
+  Fix Released
+Status in qemu source package in Trusty:
+  Won't Fix
+Status in qemu source package in Xenial:
+  In Progress
+Status in qemu source package in Bionic:
+  Fix Released
+Status in qemu source package in Cosmic:
+  Fix Released
+Status in qemu source package in Disco:
+  Fix Released
 
-commit e7b3af81597db1a6b55f2c15d030d703c6b2c6ac
-Author: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
-Date:   Fri May 4 15:34:46 2018 +0100
+Bug description:
+  [impact]
 
-    glib: bump min required glib library version to 2.40
-   =20
-    Per supported platforms doc[1], the various min glib on relevant dist=
-ros is:
-   =20
-      RHEL-7: 2.50.3
-      Debian (Stretch): 2.50.3
-      Debian (Jessie): 2.42.1
-      OpenBSD (Ports): 2.54.3
-      FreeBSD (Ports): 2.50.3
-      OpenSUSE Leap 15: 2.54.3
-      SLE12-SP2: 2.48.2
-      Ubuntu (Xenial): 2.48.0
-      macOS (Homebrew): 2.56.0
-   =20
-    This suggests that a minimum glib of 2.42 is a reasonable target.
-   =20
-    The GLibC compile farm, however, uses Ubuntu 14.04 (Trusty) which onl=
-y
-    has glib 2.40.0, and this is needed for testing during merge. Thus an
-    exception is made to the documented platform support policy to allow =
-for
-    all three current LTS releases to be supported.
-   =20
-    Docker jobs that not longer satisfy this new min version are removed.
-   =20
-    [1] https://qemu.weilnetz.de/doc/qemu-doc.html#Supported-build-platfo=
-rms
-   =20
-    Reviewed-by: Thomas Huth <thuth@redhat.com>
-    Signed-off-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
+  on shutdown of a guest, there is a race condition that results in qemu
+  crashing instead of normally shutting down.  The bt looks similar to
+  this (depending on the specific version of qemu, of course; this is
+  taken from 2.5 version of qemu):
 
+  (gdb) bt
+  #0  __GI___pthread_mutex_lock (mutex=3D0x0) at ../nptl/pthread_mutex_lock=
+.c:66
+  #1  0x00005636c0bc4389 in qemu_mutex_lock (mutex=3Dmutex@entry=3D0x0) at =
+/build/qemu-7I4i1R/qemu-2.5+dfsg/util/qemu-thread-posix.c:73
+  #2  0x00005636c0988130 in qemu_chr_fe_write_all (s=3Ds@entry=3D0x0, buf=
+=3Dbuf@entry=3D0x7ffe65c086a0 "\v", len=3Dlen@entry=3D20) at /build/qemu-7I=
+4i1R/qemu-2.5+dfsg/qemu-char.c:205
+  #3  0x00005636c08f3483 in vhost_user_write (msg=3Dmsg@entry=3D0x7ffe65c08=
+6a0, fds=3Dfds@entry=3D0x0, fd_num=3Dfd_num@entry=3D0, dev=3D0x5636c1bf6b70=
+, dev=3D0x5636c1bf6b70)
+  =C2=A0=C2=A0=C2=A0=C2=A0at /build/qemu-7I4i1R/qemu-2.5+dfsg/hw/virtio/vho=
+st-user.c:195
+  #4  0x00005636c08f411c in vhost_user_get_vring_base (dev=3D0x5636c1bf6b70=
+, ring=3D0x7ffe65c087e0) at /build/qemu-7I4i1R/qemu-2.5+dfsg/hw/virtio/vhos=
+t-user.c:364
+  #5  0x00005636c08efff0 in vhost_virtqueue_stop (dev=3Ddev@entry=3D0x5636c=
+1bf6b70, vdev=3Dvdev@entry=3D0x5636c2853338, vq=3D0x5636c1bf6d00, idx=3D1) =
+at /build/qemu-7I4i1R/qemu-2.5+dfsg/hw/virtio/vhost.c:895
+  #6  0x00005636c08f2944 in vhost_dev_stop (hdev=3Dhdev@entry=3D0x5636c1bf6=
+b70, vdev=3Dvdev@entry=3D0x5636c2853338) at /build/qemu-7I4i1R/qemu-2.5+dfs=
+g/hw/virtio/vhost.c:1262
+  #7  0x00005636c08db2a8 in vhost_net_stop_one (net=3D0x5636c1bf6b70, dev=
+=3Ddev@entry=3D0x5636c2853338) at /build/qemu-7I4i1R/qemu-2.5+dfsg/hw/net/v=
+host_net.c:293
+  #8  0x00005636c08dbe5b in vhost_net_stop (dev=3Ddev@entry=3D0x5636c285333=
+8, ncs=3D0x5636c209d110, total_queues=3Dtotal_queues@entry=3D1) at /build/q=
+emu-7I4i1R/qemu-2.5+dfsg/hw/net/vhost_net.c:371
+  #9  0x00005636c08d7745 in virtio_net_vhost_status (status=3D7 '\a', n=3D0=
+x5636c2853338) at /build/qemu-7I4i1R/qemu-2.5+dfsg/hw/net/virtio-net.c:150
+  #10 virtio_net_set_status (vdev=3D<optimized out>, status=3D<optimized ou=
+t>) at /build/qemu-7I4i1R/qemu-2.5+dfsg/hw/net/virtio-net.c:162
+  #11 0x00005636c08ec42c in virtio_set_status (vdev=3D0x5636c2853338, val=
+=3D<optimized out>) at /build/qemu-7I4i1R/qemu-2.5+dfsg/hw/virtio/virtio.c:=
+624
+  #12 0x00005636c098fed2 in vm_state_notify (running=3Drunning@entry=3D0, s=
+tate=3Dstate@entry=3DRUN_STATE_SHUTDOWN) at /build/qemu-7I4i1R/qemu-2.5+dfs=
+g/vl.c:1605
+  #13 0x00005636c089172a in do_vm_stop (state=3DRUN_STATE_SHUTDOWN) at /bui=
+ld/qemu-7I4i1R/qemu-2.5+dfsg/cpus.c:724
+  #14 vm_stop (state=3DRUN_STATE_SHUTDOWN) at /build/qemu-7I4i1R/qemu-2.5+d=
+fsg/cpus.c:1407
+  #15 0x00005636c085d240 in main_loop_should_exit () at /build/qemu-7I4i1R/=
+qemu-2.5+dfsg/vl.c:1883
+  #16 main_loop () at /build/qemu-7I4i1R/qemu-2.5+dfsg/vl.c:1931
+  #17 main (argc=3D<optimized out>, argv=3D<optimized out>, envp=3D<optimiz=
+ed out>) at /build/qemu-7I4i1R/qemu-2.5+dfsg/vl.c:4683
 
->=20
-> From commit e71e8cc035558eabd6b3e19f6d3254c754c027ef:
->=20
->  glib: enforce the minimum required version and warn about old APIs
->=20
->  There are two useful macros that can be defined before including
->  glib.h that are related to the min required glib version
->=20
->   - GLIB_VERSION_MIN_REQUIRED
->=20
->     When this is defined, if code uses an API that was deprecated
->     in this version, or older, a compiler warning will be emitted.
->     This alerts maintainers to update their code to whatever new
->     replacement API is now recommended best practice.
->=20
->   - GLIB_VERSION_MAX_ALLOWED
->=20
->     When this is defined, if code uses an API that was introduced
->     in a version that is newer than the declared version, a compiler
->     warning will be emitted. This alerts maintainers if new code
->     accidentally uses functionality that won't be available on some
->     supported platforms.
->=20
->  The GLIB_VERSION_MAX_ALLOWED constant makes it a bit harder to opt
->  in to using specific new APIs with a GLIB_CHECK_VERSION conditional.
->  To workaround this Pragmas can be used to temporarily turn off the
->  -Wdeprecated-declarations compiler warning, while a static inline
->  compat function is implemented. This workaround is illustrated with th=
-e
->  implementation of the g_strv_contains method to satisfy the test suite=
-.
->=20
-> > +    base =3D g_canonicalize_filename(prefix, NULL);
-> > +#else
-> > +    if (prefix[0] !=3D '/') {
-> > +        char *cwd =3D g_get_current_dir();
-> > +        base =3D g_build_filename(cwd, prefix, NULL);
-> > +        g_free(cwd);
-> > +    } else {
-> > +        base =3D g_strdup(prefix);
-> > +    }
-> > +#endif
+  [test case]
 
-To use functionality from newer glib releases we can't put the #ifdef
-conditionals inline in the main source files.
+  unfortunately since this is a race condition, it's very hard to
+  arbitrarily reproduce; it depends very much on the overall
+  configuration of the guest as well as how exactly it's shut down -
+  specifically, its vhost user net must be closed from the host side at
+  a specific time during qemu shutdown.
 
-They have to be put into glib-compat.h instead. There's a detailed
-comment in that file illustrating how todo this without triggering
-the compile warnings about deprecations.
+  I have someone with such a setup who has reported to me their setup is
+  able to reproduce this reliably, but the config is too complex for me
+  to reproduce so I have relied on their reproduction and testing to
+  debug and craft the patch for this.
 
+  [regression potential]
 
-Regards,
-Daniel
---=20
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberran=
-ge :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.c=
-om :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberran=
-ge :|
+  the change adds a flag to prevent repeated calls to vhost_net_stop().
+  This also prevents any calls to vhost_net_cleanup() from
+  net_vhost_user_event().  Any regression would be seen when stopping
+  and/or cleaning up a vhost net.  Regressions might include failure to
+  hot-remove a vhost net from a guest, or failure to cleanup (i.e. mem
+  leak), or crashes during cleanup or stopping a vhost net.
+
+  [other info]
+
+  this was originally seen in the 2.5 version of qemu - specifically,
+  the UCA version in trusty-mitaka (which uses the xenial qemu
+  codebase).
+
+  After discussion upstream, it appears this was fixed upstream by
+  commit e7c83a885f8, which is included starting in version 2.9.
+  However, this commit depends on at least commit 5345fdb4467, and
+  likely more other previous commits, which make widespread code changes
+  and are unsuitable to backport.  Therefore this seems like it should
+  be specifically worked around in the Xenial qemu codebase.
+
+  =
+
+  The specific race condition for this (in the qemu 2.5 code version) is:
+
+  as shown in above bt, thread A starts shutting down qemu, e.g.:
+
+  vm_stop->do_vm_stop->vm_state_notify
+  =C2=A0=C2=A0virtio_set_status
+  =C2=A0=C2=A0=C2=A0=C2=A0virtio_net_set_status
+  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0virtio_net_vhost_status
+
+  in this function, code gets to an if-else check for
+  (!n->vhost_started), which is false (i.e. vhost_started is true) and
+  enters the else code block, which calls vhost_net_stop() and then sets
+  n->vhost_started to false.
+
+  While thread A is inside vhost_net_stop(), thread B is triggered by
+  the vhost net chr handler with a user event and calls:
+
+  net_vhost_user_event
+  =C2=A0=C2=A0qmp_set_link (from case CHR_EVENT_CLOSED)
+  =C2=A0=C2=A0=C2=A0=C2=A0virtio_net_set_link_status (via ->link_status_cha=
+nged)
+  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0virtio_net_set_status
+  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0virtio_net_vhost_status
+
+  notice thread B has now reached the same function that thread A is in;
+  since the checks in the function have not changed, thread B follows
+  the same path that thread A followed, and enters vhost_net_stop().
+
+  Since thread A has already shut down and cleaned up some of the
+  internals, once thread B starts trying to also clean up things, it
+  segfaults as the shown in the bt.
+
+  Avoiding only this duplicate call to vhost_net_stop() is required, but
+  not enough - let's continue to look at what thread B does after its
+  call to qmp_set_link() returns:
+
+  net_vhost_user_event
+  =C2=A0=C2=A0vhost_user_stop
+  =C2=A0=C2=A0=C2=A0=C2=A0vhost_net_cleanup
+  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0vhost_dev_cleanup
+
+  However, in main() qemu registers atexit(net_cleanup()), which does:
+  net_cleanup
+  =C2=A0=C2=A0qemu_del_nic (or qemu_del_net_client, depending on ->type)
+  =C2=A0=C2=A0=C2=A0=C2=A0qemu_cleanup_net_client
+  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0vhost_user_cleanup (via ->cleanup)
+  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0vhost_net_cleanup
+  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0vhost_dev_cle=
+anup
+
+  and the duplicate vhost_dev_cleanup fails assertions since things were
+  already cleaned up.  Additionally, if thread B's call to
+  vhost_dev_cleanup() comes before thread A finishes vhost_net_stop(),
+  then that will call vhost_dev_stop() and vhost_disable_notifiers()
+  which both try to access things that have been freed/cleared/disabled
+  by vhost_dev_cleanup().
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1823458/+subscriptions
