@@ -3,62 +3,61 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
 X-Spam-Status: No, score=-6.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS
 	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EF08BC10F14
-	for <qemu-devel@archiver.kernel.org>; Tue, 23 Apr 2019 08:25:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7B71FC10F14
+	for <qemu-devel@archiver.kernel.org>; Tue, 23 Apr 2019 08:26:10 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C2F8520674
-	for <qemu-devel@archiver.kernel.org>; Tue, 23 Apr 2019 08:25:57 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C2F8520674
+	by mail.kernel.org (Postfix) with ESMTPS id 4B1E320674
+	for <qemu-devel@archiver.kernel.org>; Tue, 23 Apr 2019 08:26:10 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4B1E320674
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:49957 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:49959 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hIqkW-0007Pv-Vg
-	for qemu-devel@archiver.kernel.org; Tue, 23 Apr 2019 04:25:57 -0400
+	id 1hIqkj-0007g0-Gs
+	for qemu-devel@archiver.kernel.org; Tue, 23 Apr 2019 04:26:09 -0400
 Received: from eggs.gnu.org ([209.51.188.92]:40511)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pagupta@redhat.com>) id 1hIqh5-0004tA-Kt
-	for qemu-devel@nongnu.org; Tue, 23 Apr 2019 04:22:24 -0400
+	(envelope-from <pagupta@redhat.com>) id 1hIqgz-0004tA-CI
+	for qemu-devel@nongnu.org; Tue, 23 Apr 2019 04:22:18 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pagupta@redhat.com>) id 1hIqT2-0005d3-Mq
-	for qemu-devel@nongnu.org; Tue, 23 Apr 2019 04:07:53 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:46964)
+	(envelope-from <pagupta@redhat.com>) id 1hIqTf-0005xB-G8
+	for qemu-devel@nongnu.org; Tue, 23 Apr 2019 04:08:32 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:18409)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pagupta@redhat.com>) id 1hIqT2-0005cS-HM
-	for qemu-devel@nongnu.org; Tue, 23 Apr 2019 04:07:52 -0400
+	(Exim 4.71) (envelope-from <pagupta@redhat.com>) id 1hIqTf-0005wW-Ak
+	for qemu-devel@nongnu.org; Tue, 23 Apr 2019 04:08:31 -0400
 Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
 	[10.5.11.22])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 79217309E976;
-	Tue, 23 Apr 2019 08:07:51 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id 494A63092667;
+	Tue, 23 Apr 2019 08:08:30 +0000 (UTC)
 Received: from dhcp201-121.englab.pnq.redhat.com (unknown [10.65.16.97])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id D37C31001DC5;
-	Tue, 23 Apr 2019 08:07:29 +0000 (UTC)
+	by smtp.corp.redhat.com (Postfix) with ESMTP id 762CB1001DC5;
+	Tue, 23 Apr 2019 08:08:11 +0000 (UTC)
 From: Pankaj Gupta <pagupta@redhat.com>
 To: linux-nvdimm@lists.01.org, linux-kernel@vger.kernel.org,
 	virtualization@lists.linux-foundation.org, kvm@vger.kernel.org,
 	linux-fsdevel@vger.kernel.org, linux-acpi@vger.kernel.org,
 	qemu-devel@nongnu.org, linux-ext4@vger.kernel.org,
 	linux-xfs@vger.kernel.org
-Date: Tue, 23 Apr 2019 13:36:10 +0530
-Message-Id: <20190423080612.15361-5-pagupta@redhat.com>
+Date: Tue, 23 Apr 2019 13:36:12 +0530
+Message-Id: <20190423080612.15361-7-pagupta@redhat.com>
 In-Reply-To: <20190423080612.15361-1-pagupta@redhat.com>
 References: <20190423080612.15361-1-pagupta@redhat.com>
 X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.49]);
-	Tue, 23 Apr 2019 08:07:51 +0000 (UTC)
+	(mx1.redhat.com [10.5.110.43]);
+	Tue, 23 Apr 2019 08:08:30 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] [PATCH v6 4/6] dax: check synchronous mapping is
- supported
+Subject: [Qemu-devel] [PATCH v6 6/6] xfs: disable map_sync for async flush
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -86,55 +85,40 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 Content-Type: text/plain; charset="UTF-8"
-Message-ID: <20190423080610.2vrbkkZmCK8YSZXO5iYNgdqeaJJxpjRubFogyOJwFOk@z>
+Message-ID: <20190423080612.y5OfQTBOkBZnl0x4iP1vBH_iz-iXwdUo32_70hgVA1w@z>
 
-This patch introduces 'daxdev_mapping_supported' helper
-which checks if 'MAP_SYNC' is supported with filesystem
-mapping. It also checks if corresponding dax_device is
-synchronous. Virtio pmem device is asynchronous and
-does not not support VM_SYNC. 
+Dont support 'MAP_SYNC' with non-DAX files and DAX files
+with asynchronous dax_device. Virtio pmem provides
+asynchronous host page cache flush mechanism. We don't
+support 'MAP_SYNC' with virtio pmem and xfs.
 
-Suggested-by: Jan Kara <jack@suse.cz>
 Signed-off-by: Pankaj Gupta <pagupta@redhat.com>
 ---
- include/linux/dax.h | 17 +++++++++++++++++
- 1 file changed, 17 insertions(+)
+ fs/xfs/xfs_file.c | 10 ++++++----
+ 1 file changed, 6 insertions(+), 4 deletions(-)
 
-diff --git a/include/linux/dax.h b/include/linux/dax.h
-index c97fc0cc7167..41b4a5db6305 100644
---- a/include/linux/dax.h
-+++ b/include/linux/dax.h
-@@ -41,6 +41,18 @@ void kill_dax(struct dax_device *dax_dev);
- void dax_write_cache(struct dax_device *dax_dev, bool wc);
- bool dax_write_cache_enabled(struct dax_device *dax_dev);
- bool dax_synchronous(struct dax_device *dax_dev);
-+/*
-+ * Check if given mapping is supported by the file / underlying device.
-+ */
-+static inline bool daxdev_mapping_supported(struct vm_area_struct *vma,
-+				struct dax_device *dax_dev)
-+{
-+	if (!(vma->vm_flags & VM_SYNC))
-+		return true;
-+	if (!IS_DAX(file_inode(vma->vm_file)))
-+		return false;
-+	return dax_synchronous(dax_dev);
-+}
- #else
- static inline struct dax_device *dax_get_by_host(const char *host)
+diff --git a/fs/xfs/xfs_file.c b/fs/xfs/xfs_file.c
+index 1f2e2845eb76..0e59be018511 100644
+--- a/fs/xfs/xfs_file.c
++++ b/fs/xfs/xfs_file.c
+@@ -1196,11 +1196,13 @@ xfs_file_mmap(
+ 	struct file	*filp,
+ 	struct vm_area_struct *vma)
  {
-@@ -68,6 +80,11 @@ static inline bool dax_write_cache_enabled(struct dax_device *dax_dev)
- {
- 	return false;
- }
-+static inline bool daxdev_mapping_supported(struct vm_area_struct *vma,
-+				struct dax_device *dax_dev)
-+{
-+	return !(vma->flags & VM_SYNC);
-+}
- #endif
+-	/*
+-	 * We don't support synchronous mappings for non-DAX files. At least
+-	 * until someone comes with a sensible use case.
++	struct dax_device *dax_dev = xfs_find_daxdev_for_inode
++						(file_inode(filp));
++
++	/* We don't support synchronous mappings for non-DAX files and
++	 * for DAX files if underneath dax_device is not synchronous.
+ 	 */
+-	if (!IS_DAX(file_inode(filp)) && (vma->vm_flags & VM_SYNC))
++	if (!daxdev_mapping_supported(vma, dax_dev))
+ 		return -EOPNOTSUPP;
  
- struct writeback_control;
+ 	file_accessed(filp);
 -- 
 2.20.1
 
