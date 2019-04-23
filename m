@@ -1,29 +1,19 @@
-Received: from eggs.gnu.org ([209.51.188.92]:60802)
+Received: from eggs.gnu.org ([209.51.188.92]:34119)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1hIq6y-0000TF-Um
-	for qemu-devel@nongnu.org; Tue, 23 Apr 2019 03:45:05 -0400
+	(envelope-from <tao3.xu@intel.com>) id 1hIq8V-0001iS-2O
+	for qemu-devel@nongnu.org; Tue, 23 Apr 2019 03:46:39 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1hIptn-00020n-Ue
-	for qemu-devel@nongnu.org; Tue, 23 Apr 2019 03:31:28 -0400
-Received: from mail-wr1-f68.google.com ([209.85.221.68]:34428)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1hIptn-00020W-ON
-	for qemu-devel@nongnu.org; Tue, 23 Apr 2019 03:31:27 -0400
-Received: by mail-wr1-f68.google.com with SMTP id c6so13085558wrm.1
-	for <qemu-devel@nongnu.org>; Tue, 23 Apr 2019 00:31:27 -0700 (PDT)
-References: <20190422195020.1494-1-philmd@redhat.com>
-	<20190422195020.1494-6-philmd@redhat.com>
-	<20190423012057.GA31496@umbus.fritz.box>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Message-ID: <c082036d-9bac-8c4c-ddf8-02f3852ebb99@redhat.com>
-Date: Tue, 23 Apr 2019 09:31:08 +0200
-MIME-Version: 1.0
-In-Reply-To: <20190423012057.GA31496@umbus.fritz.box>
-Content-Type: text/plain; charset=windows-1252
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH v3 5/7] hw/ppc: Implement
- fw_cfg_arch_key_name()
+	(envelope-from <tao3.xu@intel.com>) id 1hIq8U-0002qV-1y
+	for qemu-devel@nongnu.org; Tue, 23 Apr 2019 03:46:39 -0400
+Received: from mga11.intel.com ([192.55.52.93]:31624)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <tao3.xu@intel.com>) id 1hIq8T-0002nl-PA
+	for qemu-devel@nongnu.org; Tue, 23 Apr 2019 03:46:38 -0400
+From: Tao Xu <tao3.xu@intel.com>
+Date: Tue, 23 Apr 2019 15:44:25 +0800
+Message-Id: <20190423074428.23031-1-tao3.xu@intel.com>
+Subject: [Qemu-devel] [PATCH v3 0/3] numa: move numa global variables into
+ MachineState
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,95 +22,52 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Gibson <david@gibson.dropbear.id.au>, Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, =?UTF-8?Q?Herv=c3=a9_Poussineau?= <hpoussin@reactos.org>
-Cc: qemu-devel@nongnu.org, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, "Michael S. Tsirkin" <mst@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, Artyom Tarasenko <atar4qemu@gmail.com>, Richard Henderson <rth@twiddle.net>, Laszlo Ersek <lersek@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>, qemu-ppc@nongnu.org
+To: ehabkost@redhat.com, imammedo@redhat.com, pbonzini@redhat.com
+Cc: tao3.xu@intel.com, jingqi.liu@intel.com, qemu-devel@nongnu.org
 
-Hi David,
+The aim of this patch is to add struct NumaState in MachineState
+and move existing numa global nb_numa_nodes into NumaState.
+And add variable numa_support into MachineClass to decide which
+submachines support NUMA.
 
-On 4/23/19 3:20 AM, David Gibson wrote:
-> On Mon, Apr 22, 2019 at 09:50:18PM +0200, Philippe Mathieu-Daudé wrote:
->> Implement fw_cfg_arch_key_name(), which returns the name of a
->> ppc-specific key.
->>
->> Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
-> 
-> What ppc machines actually use fw_cfg?  I know pseries and powernv
-> don't.
+---
+Changes in v3 -> v2:
+    - rename the "NumaState::nb_numa_nodes" as "NumaState::num_nodes",
+    and rename the "NumaState::numa_info" as "NumaState::nodes" (Eduardo)
+    - use machine_num_numa_nodes(MachineState *ms) to check if
+    ms->numa_state is NULL before using NumaState::num_nodes (Eduardo)
+    - check if ms->numa_state == NULL in the set_numa_options to avoid
+    using -numa in a machine-type which don't support numa
 
-I see:
+Changes in v2:
+    - fix the mistake in numa_complete_configuration in numa.c
+    - add MachineState into some functions to avoid using
+    qdev_get_machine
+    - add some if experssion to avoid the NumaState is null
 
-- 40p
-- g3beige (newworld)
-- mac99 (oldworld)
+Tao Xu (3):
+  numa: move numa global variable nb_numa_nodes into MachineState
+  numa: move numa global variable have_numa_distance into MachineState
+  numa: move numa global variable numa_info into MachineState
 
-I guess it is because they use OpenBIOS.
+ exec.c                              |  5 +-
+ hw/acpi/aml-build.c                 |  9 ++--
+ hw/arm/boot.c                       |  4 +-
+ hw/arm/virt-acpi-build.c            | 17 ++++---
+ hw/arm/virt.c                       |  8 +++-
+ hw/core/machine.c                   | 21 ++++++--
+ hw/i386/acpi-build.c                |  4 +-
+ hw/i386/pc.c                        | 11 +++--
+ hw/mem/pc-dimm.c                    |  2 +
+ hw/pci-bridge/pci_expander_bridge.c |  2 +
+ hw/ppc/spapr.c                      | 25 ++++++++--
+ hw/ppc/spapr_pci.c                  |  2 +
+ include/hw/acpi/aml-build.h         |  2 +-
+ include/hw/boards.h                 | 22 +++++++++
+ include/sysemu/numa.h               | 13 +----
+ monitor.c                           |  4 +-
+ numa.c                              | 74 +++++++++++++++++------------
+ 17 files changed, 155 insertions(+), 70 deletions(-)
 
->> ---
->>  hw/ppc/Makefile.objs |  2 +-
->>  hw/ppc/fw_cfg.c      | 45 ++++++++++++++++++++++++++++++++++++++++++++
->>  2 files changed, 46 insertions(+), 1 deletion(-)
->>  create mode 100644 hw/ppc/fw_cfg.c
->>
->> diff --git a/hw/ppc/Makefile.objs b/hw/ppc/Makefile.objs
->> index 1111b218a04..ae940981553 100644
->> --- a/hw/ppc/Makefile.objs
->> +++ b/hw/ppc/Makefile.objs
->> @@ -1,5 +1,5 @@
->>  # shared objects
->> -obj-y += ppc.o ppc_booke.o fdt.o
->> +obj-y += ppc.o ppc_booke.o fdt.o fw_cfg.o
->>  # IBM pSeries (sPAPR)
->>  obj-$(CONFIG_PSERIES) += spapr.o spapr_caps.o spapr_vio.o spapr_events.o
->>  obj-$(CONFIG_PSERIES) += spapr_hcall.o spapr_iommu.o spapr_rtas.o
->> diff --git a/hw/ppc/fw_cfg.c b/hw/ppc/fw_cfg.c
->> new file mode 100644
->> index 00000000000..a88b5c4bde2
->> --- /dev/null
->> +++ b/hw/ppc/fw_cfg.c
->> @@ -0,0 +1,45 @@
->> +/*
->> + * fw_cfg helpers (PPC specific)
->> + *
->> + * Copyright (c) 2019 Red Hat, Inc.
->> + *
->> + * Author:
->> + *   Philippe Mathieu-Daudé <philmd@redhat.com>
->> + *
->> + * SPDX-License-Identifier: GPL-2.0-or-later
->> + *
->> + * This work is licensed under the terms of the GNU GPL, version 2 or later.
->> + * See the COPYING file in the top-level directory.
->> + */
->> +
->> +#include "qemu/osdep.h"
->> +#include "hw/ppc/ppc.h"
->> +#include "hw/nvram/fw_cfg.h"
->> +
->> +const char *fw_cfg_arch_key_name(uint16_t key)
->> +{
->> +    static const struct {
->> +        uint16_t key;
->> +        const char *name;
->> +    } fw_cfg_arch_wellknown_keys[] = {
->> +        {FW_CFG_PPC_WIDTH, "width"},
->> +        {FW_CFG_PPC_HEIGHT, "height"},
->> +        {FW_CFG_PPC_DEPTH, "depth"},
->> +        {FW_CFG_PPC_TBFREQ, "tbfreq"},
->> +        {FW_CFG_PPC_CLOCKFREQ, "clockfreq"},
->> +        {FW_CFG_PPC_IS_KVM, "is_kvm"},
->> +        {FW_CFG_PPC_KVM_HC, "kvm_hc"},
->> +        {FW_CFG_PPC_KVM_PID, "pid"},
->> +        {FW_CFG_PPC_NVRAM_ADDR, "nvram_addr"},
->> +        {FW_CFG_PPC_BUSFREQ, "busfreq"},
->> +        {FW_CFG_PPC_NVRAM_FLAT, "nvram_flat"},
->> +        {FW_CFG_PPC_VIACONFIG, "viaconfig"},
->> +    };
->> +
->> +    for (size_t i = 0; i < ARRAY_SIZE(fw_cfg_arch_wellknown_keys); i++) {
->> +        if (fw_cfg_arch_wellknown_keys[i].key == key) {
->> +            return fw_cfg_arch_wellknown_keys[i].name;
->> +        }
->> +    }
->> +    return NULL;
->> +}
-> 
+-- 
+2.17.1
