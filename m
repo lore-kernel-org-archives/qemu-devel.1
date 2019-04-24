@@ -1,22 +1,25 @@
-Received: from eggs.gnu.org ([209.51.188.92]:44270)
+Received: from eggs.gnu.org ([209.51.188.92]:43979)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1hJIzQ-00053B-Uq
-	for qemu-devel@nongnu.org; Wed, 24 Apr 2019 10:35:13 -0400
+	(envelope-from <arilou@gmail.com>) id 1hJIzJ-0004qG-St
+	for qemu-devel@nongnu.org; Wed, 24 Apr 2019 10:35:06 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1hJIl4-0001in-UQ
-	for qemu-devel@nongnu.org; Wed, 24 Apr 2019 10:20:24 -0400
-References: <20190424103747.10173-1-thuth@redhat.com>
-	<20190424103747.10173-4-thuth@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <167b6b7c-3fef-47e8-d30d-09abfe1e50ba@redhat.com>
-Date: Wed, 24 Apr 2019 09:14:29 -0500
+	(envelope-from <arilou@gmail.com>) id 1hJIsT-0000zp-96
+	for qemu-devel@nongnu.org; Wed, 24 Apr 2019 10:28:02 -0400
+Received: from mail-wr1-x442.google.com ([2a00:1450:4864:20::442]:40934)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <arilou@gmail.com>) id 1hJIsP-0000oX-HX
+	for qemu-devel@nongnu.org; Wed, 24 Apr 2019 10:27:59 -0400
+Received: by mail-wr1-x442.google.com with SMTP id h4so25452121wre.7
+	for <qemu-devel@nongnu.org>; Wed, 24 Apr 2019 07:27:53 -0700 (PDT)
+From: arilou@gmail.com
+Date: Wed, 24 Apr 2019 17:27:07 +0300
+Message-Id: <20190424142714.28460-13-arilou@gmail.com>
+In-Reply-To: <20190424142714.28460-1-arilou@gmail.com>
+References: <20190424142714.28460-1-arilou@gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <20190424103747.10173-4-thuth@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="gihy7ScO5bQVPVVZmlxviIEpVeYcfDTsn"
-Subject: Re: [Qemu-devel] [PATCH 3/6] tests/qemu-iotests: Do not hard-code
- the path to bash
+Content-Transfer-Encoding: 8bit
+Subject: [Qemu-devel] [PATCH v3 13/20] gdbstub: Implement write all
+ registers (G pkt) with new infra
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,69 +28,82 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org
-Cc: Fam Zheng <fam@euphon.net>, Kevin Wolf <kwolf@redhat.com>, Ed Maste <emaste@freebsd.org>, qemu-block@nongnu.org, =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>, Max Reitz <mreitz@redhat.com>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>, Li-Wen Hsu <lwhsu@freebsd.org>
+To: qemu-devel@nongnu.org
+Cc: Jon Doron <arilou@gmail.com>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---gihy7ScO5bQVPVVZmlxviIEpVeYcfDTsn
-From: Eric Blake <eblake@redhat.com>
-To: Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org
-Cc: Fam Zheng <fam@euphon.net>, Kevin Wolf <kwolf@redhat.com>,
- Ed Maste <emaste@freebsd.org>, qemu-block@nongnu.org,
- =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>,
- Max Reitz <mreitz@redhat.com>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?=
- <philmd@redhat.com>, Li-Wen Hsu <lwhsu@freebsd.org>
-Message-ID: <167b6b7c-3fef-47e8-d30d-09abfe1e50ba@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH 3/6] tests/qemu-iotests: Do not hard-code the
- path to bash
-References: <20190424103747.10173-1-thuth@redhat.com>
- <20190424103747.10173-4-thuth@redhat.com>
-In-Reply-To: <20190424103747.10173-4-thuth@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+From: Jon Doron <arilou@gmail.com>
 
-On 4/24/19 5:37 AM, Thomas Huth wrote:
-> bash is installed in a different directory on non-Linux systems like
-> FreeBSD. Do not hard-code /bin/bash here so that the tests can run
-> there, too.
+Signed-off-by: Jon Doron <arilou@gmail.com>
+---
+ gdbstub.c | 41 +++++++++++++++++++++++++++++++----------
+ 1 file changed, 31 insertions(+), 10 deletions(-)
 
-These tests were obviously copy-and-pasted from a fork point prior to
-commit 11a82d14.
-
-Reviewed-by: Eric Blake <eblake@redhat.com>
-
->=20
-> Signed-off-by: Thomas Huth <thuth@redhat.com>
-> ---
->  tests/qemu-iotests/239 | 2 +-
->  tests/qemu-iotests/240 | 2 +-
->  tests/qemu-iotests/241 | 2 +-
->  tests/qemu-iotests/243 | 2 +-
->  tests/qemu-iotests/244 | 2 +-
->  5 files changed, 5 insertions(+), 5 deletions(-)
-
-
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3226
-Virtualization:  qemu.org | libvirt.org
-
-
---gihy7ScO5bQVPVVZmlxviIEpVeYcfDTsn
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlzAb0UACgkQp6FrSiUn
-Q2pSpggAn0Vi5CAUsUPfx4aPFC1TACLvJBiPKzD38UtY9PYx4vx6/ahUXBSdeB2P
-nApO9+iHFT1z+gjkXnBTnUCbNjO7KLzvDvX9KnLN0+f8YW0iPm8n7mUQN7uOhBnR
-R0VkmdWN0Cw4UQ/gVLp+OOV50nVPOpcqApOisSI47fThJxytzXx7TyCSumqKurxi
-+bSFD00bHo/N5c0TWZyFdbe/CGS7M/mM77Ww1N+JipJQ+tr/y+D2pybphG5/flAp
-xlULDH2FByZOt5APqeG9/VKSUsjx9mLkMFNNkZoIbFfbhHC0RhvUWJm6XQb6+RpZ
-Q5cWZPKfQroXALmQJPrEFhW5HS78lg==
-=AmWS
------END PGP SIGNATURE-----
-
---gihy7ScO5bQVPVVZmlxviIEpVeYcfDTsn--
+diff --git a/gdbstub.c b/gdbstub.c
+index deeb78c341..0523deaef2 100644
+--- a/gdbstub.c
++++ b/gdbstub.c
+@@ -1750,6 +1750,29 @@ static void handle_read_mem(GdbCmdContext *gdb_ctx, void *user_ctx)
+     put_packet(gdb_ctx->s, gdb_ctx->str_buf);
+ }
+ 
++static void handle_write_all_regs(GdbCmdContext *gdb_ctx, void *user_ctx)
++{
++    target_ulong addr, len;
++    uint8_t *registers;
++    int reg_size;
++
++    if (!gdb_ctx->num_params) {
++        return;
++    }
++
++    cpu_synchronize_state(gdb_ctx->s->g_cpu);
++    registers = gdb_ctx->mem_buf;
++    len = strlen(gdb_ctx->params[0].data) / 2;
++    hextomem(registers, gdb_ctx->params[0].data, len);
++    for (addr = 0; addr < gdb_ctx->s->g_cpu->gdb_num_g_regs && len > 0;
++         addr++) {
++        reg_size = gdb_write_register(gdb_ctx->s->g_cpu, registers, addr);
++        len -= reg_size;
++        registers += reg_size;
++    }
++    put_packet(gdb_ctx->s, "OK");
++}
++
+ static int gdb_handle_packet(GDBState *s, const char *line_buf)
+ {
+     CPUState *cpu;
+@@ -1761,7 +1784,6 @@ static int gdb_handle_packet(GDBState *s, const char *line_buf)
+     uint8_t mem_buf[MAX_PACKET_LENGTH];
+     char buf[sizeof(mem_buf) + 1 /* trailing NUL */];
+     char thread_id[16];
+-    uint8_t *registers;
+     target_ulong addr, len;
+ 
+     trace_gdbstub_io_command(line_buf);
+@@ -1926,16 +1948,15 @@ static int gdb_handle_packet(GDBState *s, const char *line_buf)
+         put_packet(s, buf);
+         break;
+     case 'G':
+-        cpu_synchronize_state(s->g_cpu);
+-        registers = mem_buf;
+-        len = strlen(p) / 2;
+-        hextomem((uint8_t *)registers, p, len);
+-        for (addr = 0; addr < s->g_cpu->gdb_num_g_regs && len > 0; addr++) {
+-            reg_size = gdb_write_register(s->g_cpu, registers, addr);
+-            len -= reg_size;
+-            registers += reg_size;
++        {
++            static GdbCmdParseEntry write_all_regs_cmd_desc = {
++                .handler = handle_write_all_regs,
++                .cmd = "G",
++                .cmd_startswith = 1,
++                .schema = "s0"
++            };
++            process_string_cmd(s, NULL, line_buf, &write_all_regs_cmd_desc, 1);
+         }
+-        put_packet(s, "OK");
+         break;
+     case 'm':
+         {
+-- 
+2.20.1
