@@ -2,98 +2,113 @@ Return-Path: <SRS0=3XOk=S2=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-5.7 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
+	SPF_PASS,URIBL_BLOCKED autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id ADBF2C10F11
-	for <qemu-devel@archiver.kernel.org>; Wed, 24 Apr 2019 21:03:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 999E5C10F11
+	for <qemu-devel@archiver.kernel.org>; Wed, 24 Apr 2019 21:43:27 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 735EC20835
-	for <qemu-devel@archiver.kernel.org>; Wed, 24 Apr 2019 21:03:31 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 735EC20835
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=canonical.com
+	by mail.kernel.org (Postfix) with ESMTPS id 48BB120811
+	for <qemu-devel@archiver.kernel.org>; Wed, 24 Apr 2019 21:43:27 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=amdcloud.onmicrosoft.com header.i=@amdcloud.onmicrosoft.com header.b="rUaQIBUW"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 48BB120811
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=amd.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:47241 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:47639 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hJP3C-0005Ht-Ky
-	for qemu-devel@archiver.kernel.org; Wed, 24 Apr 2019 17:03:30 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:45946)
+	id 1hJPfq-0006RB-6q
+	for qemu-devel@archiver.kernel.org; Wed, 24 Apr 2019 17:43:26 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:53436)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1hJP0j-0003qN-SA
-	for qemu-devel@nongnu.org; Wed, 24 Apr 2019 17:00:59 -0400
+	(envelope-from <brijesh.singh@amd.com>) id 1hJPeE-00056u-SA
+	for qemu-devel@nongnu.org; Wed, 24 Apr 2019 17:41:48 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1hJP0h-0007h1-Jv
-	for qemu-devel@nongnu.org; Wed, 24 Apr 2019 17:00:57 -0400
-Received: from indium.canonical.com ([91.189.90.7]:39048)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1hJP0h-0007gg-CY
-	for qemu-devel@nongnu.org; Wed, 24 Apr 2019 17:00:55 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1hJP0f-0001wi-TR
-	for <qemu-devel@nongnu.org>; Wed, 24 Apr 2019 21:00:53 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id CC74E2E80D1
-	for <qemu-devel@nongnu.org>; Wed, 24 Apr 2019 21:00:53 +0000 (UTC)
-MIME-Version: 1.0
+	(envelope-from <brijesh.singh@amd.com>) id 1hJPVT-0003Bc-9a
+	for qemu-devel@nongnu.org; Wed, 24 Apr 2019 17:32:44 -0400
+Received: from mail-eopbgr810085.outbound.protection.outlook.com
+	([40.107.81.85]:2416
+	helo=NAM01-BY2-obe.outbound.protection.outlook.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <brijesh.singh@amd.com>)
+	id 1hJPVS-0003AP-Tg
+	for qemu-devel@nongnu.org; Wed, 24 Apr 2019 17:32:43 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=amdcloud.onmicrosoft.com; s=selector1-amd-com;
+	h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+	bh=Q0qbdc2MkYIB/BGZJhOG1+y161iGdo+ILHAlWdVZiSU=;
+	b=rUaQIBUWDm4Ukh4FghJJTid0nsreThDNvbKTDoOLjXTvpfmGgh3cUNKYFkZDNyzdpRVD+Y1awBZ8kw9ecXtaavXzrpmkG9UFBzwV3LKuQVxh8dM6v8O0yQdbTnkbM3MbMDtcJeOfO7tcrAYRhlw5bJ5+IkLnOefezsXZxHIKZm4=
+Received: from DM6PR12MB2682.namprd12.prod.outlook.com (20.176.116.31) by
+	DM6PR12MB2651.namprd12.prod.outlook.com (20.176.116.24) with Microsoft
+	SMTP
+	Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+	15.20.1813.18; Wed, 24 Apr 2019 21:32:39 +0000
+Received: from DM6PR12MB2682.namprd12.prod.outlook.com
+	([fe80::9183:846f:a93e:9a43]) by
+	DM6PR12MB2682.namprd12.prod.outlook.com
+	([fe80::9183:846f:a93e:9a43%5]) with mapi id 15.20.1813.017;
+	Wed, 24 Apr 2019 21:32:39 +0000
+From: "Singh, Brijesh" <brijesh.singh@amd.com>
+To: Steve Rutherford <srutherford@google.com>
+Thread-Topic: [RFC PATCH v1 00/10] Add AMD SEV guest live migration support
+Thread-Index: AQHU+rgpwai7tJB3uUaULXjJMShjVaZLrqMAgAAmZAA=
+Date: Wed, 24 Apr 2019 21:32:39 +0000
+Message-ID: <eee5e112-89bd-331b-6875-34c0712de4cb@amd.com>
+References: <20190424160942.13567-1-brijesh.singh@amd.com>
+	<CABayD+eYsqT49-Smp0a9OGRt2or_L7LNKHpe-iraM62XzGq5_g@mail.gmail.com>
+In-Reply-To: <CABayD+eYsqT49-Smp0a9OGRt2or_L7LNKHpe-iraM62XzGq5_g@mail.gmail.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-clientproxiedby: SN4PR0501CA0125.namprd05.prod.outlook.com
+	(2603:10b6:803:42::42) To DM6PR12MB2682.namprd12.prod.outlook.com
+	(2603:10b6:5:4a::31)
+authentication-results: spf=none (sender IP is )
+	smtp.mailfrom=brijesh.singh@amd.com; 
+x-ms-exchange-messagesentrepresentingtype: 1
+x-originating-ip: [165.204.77.1]
+x-ms-publictraffictype: Email
+x-ms-office365-filtering-correlation-id: eaa54622-bd62-4599-153c-08d6c8fc6013
+x-ms-office365-filtering-ht: Tenant
+x-microsoft-antispam: BCL:0; PCL:0;
+	RULEID:(2390118)(7020095)(4652040)(8989299)(4534185)(4627221)(201703031133081)(201702281549075)(8990200)(5600141)(711020)(4605104)(4618075)(2017052603328)(7193020);
+	SRVR:DM6PR12MB2651; 
+x-ms-traffictypediagnostic: DM6PR12MB2651:
+x-ms-exchange-purlcount: 2
+x-microsoft-antispam-prvs: <DM6PR12MB26518F94CE1389ACD51A3A9CE53C0@DM6PR12MB2651.namprd12.prod.outlook.com>
+x-forefront-prvs: 00179089FD
+x-forefront-antispam-report: SFV:NSPM;
+	SFS:(10009020)(396003)(376002)(366004)(136003)(39860400002)(346002)(189003)(199004)(7736002)(25786009)(478600001)(26005)(86362001)(31696002)(186003)(6246003)(3846002)(6916009)(6116002)(99286004)(6436002)(305945005)(76176011)(4326008)(6486002)(53936002)(229853002)(102836004)(256004)(14444005)(81156014)(81166006)(68736007)(8676002)(71190400001)(386003)(53546011)(66066001)(2906002)(6512007)(14454004)(36756003)(31686004)(11346002)(2616005)(52116002)(476003)(97736004)(7416002)(66446008)(54906003)(486006)(316002)(446003)(5660300002)(64756008)(966005)(66946007)(66556008)(66476007)(6306002)(8936002)(73956011)(66574012)(6506007)(71200400001);
+	DIR:OUT; SFP:1101; SCL:1; SRVR:DM6PR12MB2651;
+	H:DM6PR12MB2682.namprd12.prod.outlook.com; FPR:; SPF:None;
+	LANG:en; PTR:InfoNoRecords; MX:1; A:1; 
+received-spf: None (protection.outlook.com: amd.com does not designate
+	permitted sender hosts)
+x-ms-exchange-senderadcheck: 1
+x-microsoft-antispam-message-info: cr61WHLL3zDHP8oh8yYthVXqdIZcPjV07phBcic0OzufkzoFFTTJmk5yCB/1kTixZePpowcSP8v79f60X1mlwlcWwMgtv6smEigfcewtD3bhxbQtpR0chUj0OZMXfsZr5LfVus08kdvipTUSZSWOEfmJ3oo5zu8OwJTX8u/uaB5bHSX9tX7TEt12tGOF9pxn+/tTNJgYM2Ta+njn/Cxg64Rbx2QpPWVwJ3YaGDFpx5y9fGt3k0KSXETBv5khO7SKCYJyumjhWXzpvzlTbuVvkZKEKsv0C74vvZn3cOlBMJrfnmBAyskoiD3EDMbzGST6tQxHw7wTtXd1f9CY9DovMSZWaoAnSWNSJXSt4ZpWQlF3FVzX78Ffsih5kgsSTMJ6BoiAwy5yI1MsmEj8BMGiB4QZyhjZgjx8gJNlzOQVo8s=
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Wed, 24 Apr 2019 20:54:33 -0000
-From: Corey Bryant <corey.bryant@canonical.com>
-To: qemu-devel@nongnu.org
-X-Launchpad-Notification-Type: bug
-X-Launchpad-Bug: product=cloud-archive; status=Fix Released;
-	importance=Undecided; assignee=None; 
-X-Launchpad-Bug: product=cloud-archive; productseries=mitaka;
-	status=Fix Committed; importance=Medium; assignee=None; 
-X-Launchpad-Bug: product=cloud-archive; productseries=ocata;
-	status=Fix Committed; importance=Medium; assignee=None; 
-X-Launchpad-Bug: product=qemu; status=Fix Released; importance=Undecided;
-	assignee=None; 
-X-Launchpad-Bug: distribution=ubuntu; sourcepackage=qemu; component=main;
-	status=Fix Released; importance=Medium; assignee=None; 
-X-Launchpad-Bug: distribution=ubuntu; distroseries=trusty; sourcepackage=qemu; 
-	component=main; status=Won't Fix; importance=Medium;
-	assignee=None; 
-X-Launchpad-Bug: distribution=ubuntu; distroseries=xenial; sourcepackage=qemu; 
-	component=main; status=Fix Committed; importance=Medium;
-	assignee=dan.streetman@canonical.com; 
-X-Launchpad-Bug: distribution=ubuntu; distroseries=bionic; sourcepackage=qemu; 
-	component=main; status=Fix Released; importance=Medium;
-	assignee=None; 
-X-Launchpad-Bug: distribution=ubuntu; distroseries=cosmic; sourcepackage=qemu; 
-	component=main; status=Fix Released; importance=Medium;
-	assignee=None; 
-X-Launchpad-Bug: distribution=ubuntu; distroseries=disco; sourcepackage=qemu; 
-	component=main; status=Fix Released; importance=Medium;
-	assignee=None; 
-X-Launchpad-Bug-Tags: verification-mitaka-needed verification-needed
-	verification-needed-xenial verification-ocata-needed
-X-Launchpad-Bug-Information-Type: Public
-X-Launchpad-Bug-Private: no
-X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: corey.bryant ddstreet racb
-X-Launchpad-Bug-Reporter: Dan Streetman (ddstreet)
-X-Launchpad-Bug-Modifier: Corey Bryant (corey.bryant)
-References: <155455149397.14414.11595397789908732027.malonedeb@gac.canonical.com>
-Message-Id:
- <155613927368.14126.17373729126336602726.malone@gac.canonical.com>
-X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
-X-Launchpad-Message-For: qemu-devel-ml
-Precedence: bulk
-X-Generated-By: Launchpad (canonical.com); Revision="18928";
-	Instance="launchpad-lazr.conf"
-X-Launchpad-Hash: 3ce659df53f8a262261e6286d91c4c3ca4b8583d
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 91.189.90.7
-Subject: [Qemu-devel] [Bug 1823458] Please test proposed package
+Content-ID: <D3669A442693E444A3F42BFE1337BDDB@namprd12.prod.outlook.com>
+Content-Transfer-Encoding: base64
+MIME-Version: 1.0
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: eaa54622-bd62-4599-153c-08d6c8fc6013
+X-MS-Exchange-CrossTenant-originalarrivaltime: 24 Apr 2019 21:32:39.2413 (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM6PR12MB2651
+X-detected-operating-system: by eggs.gnu.org: Windows 7 or 8 [fuzzy]
+X-Received-From: 40.107.81.85
+Subject: Re: [Qemu-devel] [RFC PATCH v1 00/10] Add AMD SEV guest live
+ migration support
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
+Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -102,223 +117,100 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1823458 <1823458@bugs.launchpad.net>
+Cc: "Lendacky, Thomas" <Thomas.Lendacky@amd.com>, "Singh,
+	Brijesh" <brijesh.singh@amd.com>,
+	"kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+	=?utf-8?B?UmFkaW0gS3LEjW3DocWZ?= <rkrcmar@redhat.com>,
+	Joerg Roedel <joro@8bytes.org>, "x86@kernel.org" <x86@kernel.org>,
+	"qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+	Ingo Molnar <mingo@redhat.com>, "H.
+	Peter Anvin" <hpa@zytor.com>, Paolo Bonzini <pbonzini@redhat.com>,
+	Thomas Gleixner <tglx@linutronix.de>, Borislav Petkov <bp@suse.de>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190424205433.BiIQIXwGDV2zArF2zEMpl9uhS_0c8Or7C466hz5a_9s@z>
+Message-ID: <20190424213239.L26HY5nY24FBqlx3w8gj7ZAcFwpZ_GMPB1wJ-MXr1K4@z>
 
-Hello Dan, or anyone else affected,
-
-Accepted qemu into ocata-proposed. The package will build now and be
-available in the Ubuntu Cloud Archive in a few hours, and then in the
--proposed repository.
-
-Please help us by testing this new package. To enable the -proposed
-repository:
-
-  sudo add-apt-repository cloud-archive:ocata-proposed
-  sudo apt-get update
-
-Your feedback will aid us getting this update out to other Ubuntu users.
-
-If this package fixes the bug for you, please add a comment to this bug,
-mentioning the version of the package you tested, and change the tag
-from verification-ocata-needed to verification-ocata-done. If it does
-not fix the bug for you, please add a comment stating that, and change
-the tag to verification-ocata-failed. In either case, details of your
-testing will help us make a better decision.
-
-Further information regarding the verification process can be found at
-https://wiki.ubuntu.com/QATeam/PerformingSRUVerification . Thank you in
-advance!
-
-** Changed in: cloud-archive/ocata
-       Status: Triaged =3D> Fix Committed
-
-** Tags added: verification-ocata-needed
-
--- =
-
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1823458
-
-Title:
-  race condition between vhost_net_stop and CHR_EVENT_CLOSED on shutdown
-  crashes qemu
-
-Status in Ubuntu Cloud Archive:
-  Fix Released
-Status in Ubuntu Cloud Archive mitaka series:
-  Fix Committed
-Status in Ubuntu Cloud Archive ocata series:
-  Fix Committed
-Status in QEMU:
-  Fix Released
-Status in qemu package in Ubuntu:
-  Fix Released
-Status in qemu source package in Trusty:
-  Won't Fix
-Status in qemu source package in Xenial:
-  Fix Committed
-Status in qemu source package in Bionic:
-  Fix Released
-Status in qemu source package in Cosmic:
-  Fix Released
-Status in qemu source package in Disco:
-  Fix Released
-
-Bug description:
-  [impact]
-
-  on shutdown of a guest, there is a race condition that results in qemu
-  crashing instead of normally shutting down.  The bt looks similar to
-  this (depending on the specific version of qemu, of course; this is
-  taken from 2.5 version of qemu):
-
-  (gdb) bt
-  #0  __GI___pthread_mutex_lock (mutex=3D0x0) at ../nptl/pthread_mutex_lock=
-.c:66
-  #1  0x00005636c0bc4389 in qemu_mutex_lock (mutex=3Dmutex@entry=3D0x0) at =
-/build/qemu-7I4i1R/qemu-2.5+dfsg/util/qemu-thread-posix.c:73
-  #2  0x00005636c0988130 in qemu_chr_fe_write_all (s=3Ds@entry=3D0x0, buf=
-=3Dbuf@entry=3D0x7ffe65c086a0 "\v", len=3Dlen@entry=3D20) at /build/qemu-7I=
-4i1R/qemu-2.5+dfsg/qemu-char.c:205
-  #3  0x00005636c08f3483 in vhost_user_write (msg=3Dmsg@entry=3D0x7ffe65c08=
-6a0, fds=3Dfds@entry=3D0x0, fd_num=3Dfd_num@entry=3D0, dev=3D0x5636c1bf6b70=
-, dev=3D0x5636c1bf6b70)
-  =C2=A0=C2=A0=C2=A0=C2=A0at /build/qemu-7I4i1R/qemu-2.5+dfsg/hw/virtio/vho=
-st-user.c:195
-  #4  0x00005636c08f411c in vhost_user_get_vring_base (dev=3D0x5636c1bf6b70=
-, ring=3D0x7ffe65c087e0) at /build/qemu-7I4i1R/qemu-2.5+dfsg/hw/virtio/vhos=
-t-user.c:364
-  #5  0x00005636c08efff0 in vhost_virtqueue_stop (dev=3Ddev@entry=3D0x5636c=
-1bf6b70, vdev=3Dvdev@entry=3D0x5636c2853338, vq=3D0x5636c1bf6d00, idx=3D1) =
-at /build/qemu-7I4i1R/qemu-2.5+dfsg/hw/virtio/vhost.c:895
-  #6  0x00005636c08f2944 in vhost_dev_stop (hdev=3Dhdev@entry=3D0x5636c1bf6=
-b70, vdev=3Dvdev@entry=3D0x5636c2853338) at /build/qemu-7I4i1R/qemu-2.5+dfs=
-g/hw/virtio/vhost.c:1262
-  #7  0x00005636c08db2a8 in vhost_net_stop_one (net=3D0x5636c1bf6b70, dev=
-=3Ddev@entry=3D0x5636c2853338) at /build/qemu-7I4i1R/qemu-2.5+dfsg/hw/net/v=
-host_net.c:293
-  #8  0x00005636c08dbe5b in vhost_net_stop (dev=3Ddev@entry=3D0x5636c285333=
-8, ncs=3D0x5636c209d110, total_queues=3Dtotal_queues@entry=3D1) at /build/q=
-emu-7I4i1R/qemu-2.5+dfsg/hw/net/vhost_net.c:371
-  #9  0x00005636c08d7745 in virtio_net_vhost_status (status=3D7 '\a', n=3D0=
-x5636c2853338) at /build/qemu-7I4i1R/qemu-2.5+dfsg/hw/net/virtio-net.c:150
-  #10 virtio_net_set_status (vdev=3D<optimized out>, status=3D<optimized ou=
-t>) at /build/qemu-7I4i1R/qemu-2.5+dfsg/hw/net/virtio-net.c:162
-  #11 0x00005636c08ec42c in virtio_set_status (vdev=3D0x5636c2853338, val=
-=3D<optimized out>) at /build/qemu-7I4i1R/qemu-2.5+dfsg/hw/virtio/virtio.c:=
-624
-  #12 0x00005636c098fed2 in vm_state_notify (running=3Drunning@entry=3D0, s=
-tate=3Dstate@entry=3DRUN_STATE_SHUTDOWN) at /build/qemu-7I4i1R/qemu-2.5+dfs=
-g/vl.c:1605
-  #13 0x00005636c089172a in do_vm_stop (state=3DRUN_STATE_SHUTDOWN) at /bui=
-ld/qemu-7I4i1R/qemu-2.5+dfsg/cpus.c:724
-  #14 vm_stop (state=3DRUN_STATE_SHUTDOWN) at /build/qemu-7I4i1R/qemu-2.5+d=
-fsg/cpus.c:1407
-  #15 0x00005636c085d240 in main_loop_should_exit () at /build/qemu-7I4i1R/=
-qemu-2.5+dfsg/vl.c:1883
-  #16 main_loop () at /build/qemu-7I4i1R/qemu-2.5+dfsg/vl.c:1931
-  #17 main (argc=3D<optimized out>, argv=3D<optimized out>, envp=3D<optimiz=
-ed out>) at /build/qemu-7I4i1R/qemu-2.5+dfsg/vl.c:4683
-
-  [test case]
-
-  unfortunately since this is a race condition, it's very hard to
-  arbitrarily reproduce; it depends very much on the overall
-  configuration of the guest as well as how exactly it's shut down -
-  specifically, its vhost user net must be closed from the host side at
-  a specific time during qemu shutdown.
-
-  I have someone with such a setup who has reported to me their setup is
-  able to reproduce this reliably, but the config is too complex for me
-  to reproduce so I have relied on their reproduction and testing to
-  debug and craft the patch for this.
-
-  [regression potential]
-
-  the change adds a flag to prevent repeated calls to vhost_net_stop().
-  This also prevents any calls to vhost_net_cleanup() from
-  net_vhost_user_event().  Any regression would be seen when stopping
-  and/or cleaning up a vhost net.  Regressions might include failure to
-  hot-remove a vhost net from a guest, or failure to cleanup (i.e. mem
-  leak), or crashes during cleanup or stopping a vhost net.
-
-  [other info]
-
-  this was originally seen in the 2.5 version of qemu - specifically,
-  the UCA version in trusty-mitaka (which uses the xenial qemu
-  codebase).
-
-  After discussion upstream, it appears this was fixed upstream by
-  commit e7c83a885f8, which is included starting in version 2.9.
-  However, this commit depends on at least commit 5345fdb4467, and
-  likely more other previous commits, which make widespread code changes
-  and are unsuitable to backport.  Therefore this seems like it should
-  be specifically worked around in the Xenial qemu codebase.
-
-  =
-
-  The specific race condition for this (in the qemu 2.5 code version) is:
-
-  as shown in above bt, thread A starts shutting down qemu, e.g.:
-
-  vm_stop->do_vm_stop->vm_state_notify
-  =C2=A0=C2=A0virtio_set_status
-  =C2=A0=C2=A0=C2=A0=C2=A0virtio_net_set_status
-  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0virtio_net_vhost_status
-
-  in this function, code gets to an if-else check for
-  (!n->vhost_started), which is false (i.e. vhost_started is true) and
-  enters the else code block, which calls vhost_net_stop() and then sets
-  n->vhost_started to false.
-
-  While thread A is inside vhost_net_stop(), thread B is triggered by
-  the vhost net chr handler with a user event and calls:
-
-  net_vhost_user_event
-  =C2=A0=C2=A0qmp_set_link (from case CHR_EVENT_CLOSED)
-  =C2=A0=C2=A0=C2=A0=C2=A0virtio_net_set_link_status (via ->link_status_cha=
-nged)
-  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0virtio_net_set_status
-  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0virtio_net_vhost_status
-
-  notice thread B has now reached the same function that thread A is in;
-  since the checks in the function have not changed, thread B follows
-  the same path that thread A followed, and enters vhost_net_stop().
-
-  Since thread A has already shut down and cleaned up some of the
-  internals, once thread B starts trying to also clean up things, it
-  segfaults as the shown in the bt.
-
-  Avoiding only this duplicate call to vhost_net_stop() is required, but
-  not enough - let's continue to look at what thread B does after its
-  call to qmp_set_link() returns:
-
-  net_vhost_user_event
-  =C2=A0=C2=A0vhost_user_stop
-  =C2=A0=C2=A0=C2=A0=C2=A0vhost_net_cleanup
-  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0vhost_dev_cleanup
-
-  However, in main() qemu registers atexit(net_cleanup()), which does:
-  net_cleanup
-  =C2=A0=C2=A0qemu_del_nic (or qemu_del_net_client, depending on ->type)
-  =C2=A0=C2=A0=C2=A0=C2=A0qemu_cleanup_net_client
-  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0vhost_user_cleanup (via ->cleanup)
-  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0vhost_net_cleanup
-  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0vhost_dev_cle=
-anup
-
-  and the duplicate vhost_dev_cleanup fails assertions since things were
-  already cleaned up.  Additionally, if thread B's call to
-  vhost_dev_cleanup() comes before thread A finishes vhost_net_stop(),
-  then that will call vhost_dev_stop() and vhost_disable_notifiers()
-  which both try to access things that have been freed/cleared/disabled
-  by vhost_dev_cleanup().
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/cloud-archive/+bug/1823458/+subscriptions
+DQoNCk9uIDQvMjQvMTkgMjoxNSBQTSwgU3RldmUgUnV0aGVyZm9yZCB3cm90ZToNCj4gT24gV2Vk
+LCBBcHIgMjQsIDIwMTkgYXQgOToxMCBBTSBTaW5naCwgQnJpamVzaCA8YnJpamVzaC5zaW5naEBh
+bWQuY29tPiB3cm90ZToNCj4+DQo+PiBUaGUgc2VyaWVzIGFkZCBzdXBwb3J0IGZvciBBTUQgU0VW
+IGd1ZXN0IGxpdmUgbWlncmF0aW9uIGNvbW1hbmRzLiBUbyBwcm90ZWN0IHRoZQ0KPj4gY29uZmlk
+ZW50aWFsaXR5IG9mIGFuIFNFViBwcm90ZWN0ZWQgZ3Vlc3QgbWVtb3J5IHdoaWxlIGluIHRyYW5z
+aXQgd2UgbmVlZCB0bw0KPj4gdXNlIHRoZSBTRVYgY29tbWFuZHMgZGVmaW5lZCBpbiBTRVYgQVBJ
+IHNwZWMgWzFdLg0KPj4NCj4+IFNFViBndWVzdCBWTXMgaGF2ZSB0aGUgY29uY2VwdCBvZiBwcml2
+YXRlIGFuZCBzaGFyZWQgbWVtb3J5LiBQcml2YXRlIG1lbW9yeQ0KPj4gaXMgZW5jcnlwdGVkIHdp
+dGggdGhlIGd1ZXN0LXNwZWNpZmljIGtleSwgd2hpbGUgc2hhcmVkIG1lbW9yeSBtYXkgYmUgZW5j
+cnlwdGVkDQo+PiB3aXRoIGh5cGVydmlzb3Iga2V5LiBUaGUgY29tbWFuZHMgcHJvdmlkZWQgYnkg
+dGhlIFNFViBGVyBhcmUgbWVhbnQgdG8gYmUgdXNlZA0KPj4gZm9yIHRoZSBwcml2YXRlIG1lbW9y
+eSBvbmx5LiBUaGUgcGF0Y2ggc2VyaWVzIGludHJvZHVjZXMgYSBuZXcgaHlwZXJjYWxsLg0KPj4g
+VGhlIGd1ZXN0IE9TIGNhbiB1c2UgdGhpcyBoeXBlcmNhbGwgdG8gbm90aWZ5IHRoZSBwYWdlIGVu
+Y3J5cHRpb24gc3RhdHVzLg0KPj4gSWYgdGhlIHBhZ2UgaXMgZW5jcnlwdGVkIHdpdGggZ3Vlc3Qg
+c3BlY2lmaWMta2V5IHRoZW4gd2UgdXNlIFNFViBjb21tYW5kIGR1cmluZw0KPj4gdGhlIG1pZ3Jh
+dGlvbi4gSWYgcGFnZSBpcyBub3QgZW5jcnlwdGVkIHRoZW4gZmFsbGJhY2sgdG8gZGVmYXVsdC4N
+Cj4+DQo+PiBUaGUgcGF0Y2ggYWRkcyBhIG5ldyBpb2N0bCBLVk1fR0VUX1BBR0VfRU5DX0JJVE1B
+UC4gVGhlIGlvY3RsIGNhbiBiZSB1c2VkDQo+PiBieSB0aGUgcWVtdSB0byBnZXQgdGhlIHBhZ2Ug
+ZW5jcnlwdGVkIGJpdG1hcC4gUWVtdSBjYW4gY29uc3VsdCB0aGlzIGJpdG1hcA0KPj4gZHVyaW5n
+IHRoZSBtaWdyYXRpb24gdG8ga25vdyB3aGV0aGVyIHRoZSBwYWdlIGlzIGVuY3J5cHRlZC4NCj4+
+DQo+PiBbMV0gaHR0cHM6Ly9kZXZlbG9wZXIuYW1kLmNvbS93cC1jb250ZW50L3Jlc291cmNlcy81
+NTc2Ni5QREYNCj4+DQo+PiBUaGUgc2VyaWVzIGlzIHRlc3RlZCB3aXRoIHRoZSBRZW11LCBJIGFt
+IGluIHByb2Nlc3Mgb2YgY2xlYW5pbmcNCj4+IHVwIHRoZSBRZW11IGNvZGUgYW5kIHdpbGwgc3Vi
+bWl0IHNvb24uDQo+Pg0KPj4gV2hpbGUgaW1wbGVtZW50aW5nIHRoZSBtaWdyYXRpb24gSSBzdHVt
+YmxlZCBvbiB0aGUgZm9sbG93IHF1ZXN0aW9uOg0KPj4NCj4+IC0gU2luY2UgdGhlcmUgaXMgYSBn
+dWVzdCBPUyBjaGFuZ2VzIHJlcXVpcmVkIHRvIHN1cHBvcnQgdGhlIG1pZ3JhdGlvbiwNCj4+ICAg
+IHNvIGhvdyBkbyB3ZSBrbm93IHdoZXRoZXIgZ3Vlc3QgT1MgaXMgdXBkYXRlZD8gU2hvdWxkIHdl
+IGV4dGVuZCBLVk0NCj4+ICAgIGNhcGFiaWxpdGllcy9mZWF0dXJlIGJpdHMgdG8gY2hlY2sgdGhp
+cz8NCj4+DQo+PiBUT0RPOg0KPj4gICAtIGFkZCBhbiBpb2N0bCB0byBidWlsZCBlbmNyeXB0aW9u
+IGJpdG1hcC4gVGhlIGVuY3J5cHRpb24gYml0bWFwIGlzIGJ1aWx0IGR1cmluZw0KPj4gICAgIHRo
+ZSBndWVzdCBib290dXAvZXhlY3V0aW9uLiBXZSBzaG91bGQgcHJvdmlkZSBhbiBpb2N0bCBzbyB0
+aGF0IGRlc3RpbmF0aW9uDQo+PiAgICAgY2FuIGJ1aWxkIHRoZSBiaXRtYXAgYXMgaXQgcmVjZWl2
+ZXMgdGhlIHBhZ2VzLg0KPj4gICAtIHJlc2V0IHRoZSBiaXRtYXAgb24gZ3Vlc3QgcmVib290Lg0K
+Pj4NCj4+IFRoZSBjb21wbGV0ZSB0cmVlIHdpdGggcGF0Y2ggaXMgYXZhaWxhYmxlIGF0Og0KPj4g
+aHR0cHM6Ly9naXRodWIuY29tL2NvZG9tYW5pYS9rdm0vdHJlZS9zZXYtbWlncmF0aW9uLXJmYy12
+MQ0KPj4NCj4+IENjOiBUaG9tYXMgR2xlaXhuZXIgPHRnbHhAbGludXRyb25peC5kZT4NCj4+IENj
+OiBJbmdvIE1vbG5hciA8bWluZ29AcmVkaGF0LmNvbT4NCj4+IENjOiAiSC4gUGV0ZXIgQW52aW4i
+IDxocGFAenl0b3IuY29tPg0KPj4gQ2M6IFBhb2xvIEJvbnppbmkgPHBib256aW5pQHJlZGhhdC5j
+b20+DQo+PiBDYzogIlJhZGltIEtyxI1tw6HFmSIgPHJrcmNtYXJAcmVkaGF0LmNvbT4NCj4+IENj
+OiBKb2VyZyBSb2VkZWwgPGpvcm9AOGJ5dGVzLm9yZz4NCj4+IENjOiBCb3Jpc2xhdiBQZXRrb3Yg
+PGJwQHN1c2UuZGU+DQo+PiBDYzogVG9tIExlbmRhY2t5IDx0aG9tYXMubGVuZGFja3lAYW1kLmNv
+bT4NCj4+IENjOiB4ODZAa2VybmVsLm9yZw0KPj4gQ2M6IGt2bUB2Z2VyLmtlcm5lbC5vcmcNCj4+
+IENjOiBsaW51eC1rZXJuZWxAdmdlci5rZXJuZWwub3JnDQo+Pg0KPj4gQnJpamVzaCBTaW5naCAo
+MTApOg0KPj4gICAgS1ZNOiBTVk06IEFkZCBLVk1fU0VWIFNFTkRfU1RBUlQgY29tbWFuZA0KPj4g
+ICAgS1ZNOiBTVk06IEFkZCBLVk1fU0VORF9VUERBVEVfREFUQSBjb21tYW5kDQo+PiAgICBLVk06
+IFNWTTogQWRkIEtWTV9TRVZfU0VORF9GSU5JU0ggY29tbWFuZA0KPj4gICAgS1ZNOiBTVk06IEFk
+ZCBzdXBwb3J0IGZvciBLVk1fU0VWX1JFQ0VJVkVfU1RBUlQgY29tbWFuZA0KPj4gICAgS1ZNOiBT
+Vk06IEFkZCBLVk1fU0VWX1JFQ0VJVkVfVVBEQVRFX0RBVEEgY29tbWFuZA0KPj4gICAgS1ZNOiBT
+Vk06IEFkZCBLVk1fU0VWX1JFQ0VJVkVfRklOSVNIIGNvbW1hbmQNCj4+ICAgIEtWTTogeDg2OiBB
+ZGQgQU1EIFNFViBzcGVjaWZpYyBIeXBlcmNhbGwzDQo+PiAgICBLVk06IFg4NjogSW50cm9kdWNl
+IEtWTV9IQ19QQUdFX0VOQ19TVEFUVVMgaHlwZXJjYWxsDQo+PiAgICBLVk06IHg4NjogSW50cm9k
+dWNlIEtWTV9HRVRfUEFHRV9FTkNfQklUTUFQIGlvY3RsDQo+PiAgICBtbTogeDg2OiBJbnZva2Ug
+aHlwZXJjYWxsIHdoZW4gcGFnZSBlbmNyeXB0aW9uIHN0YXR1cyBpcyBjaGFuZ2VkDQo+Pg0KPj4g
+ICAuLi4vdmlydHVhbC9rdm0vYW1kLW1lbW9yeS1lbmNyeXB0aW9uLnJzdCAgICAgfCAxMTYgKysr
+Kw0KPj4gICBEb2N1bWVudGF0aW9uL3ZpcnR1YWwva3ZtL2h5cGVyY2FsbHMudHh0ICAgICAgfCAg
+MTQgKw0KPj4gICBhcmNoL3g4Ni9pbmNsdWRlL2FzbS9rdm1faG9zdC5oICAgICAgICAgICAgICAg
+fCAgIDMgKw0KPj4gICBhcmNoL3g4Ni9pbmNsdWRlL2FzbS9rdm1fcGFyYS5oICAgICAgICAgICAg
+ICAgfCAgMTIgKw0KPj4gICBhcmNoL3g4Ni9pbmNsdWRlL2FzbS9tZW1fZW5jcnlwdC5oICAgICAg
+ICAgICAgfCAgIDMgKw0KPj4gICBhcmNoL3g4Ni9rdm0vc3ZtLmMgICAgICAgICAgICAgICAgICAg
+ICAgICAgICAgfCA1NjAgKysrKysrKysrKysrKysrKystDQo+PiAgIGFyY2gveDg2L2t2bS92bXgv
+dm14LmMgICAgICAgICAgICAgICAgICAgICAgICB8ICAgMSArDQo+PiAgIGFyY2gveDg2L2t2bS94
+ODYuYyAgICAgICAgICAgICAgICAgICAgICAgICAgICB8ICAxNyArDQo+PiAgIGFyY2gveDg2L21t
+L21lbV9lbmNyeXB0LmMgICAgICAgICAgICAgICAgICAgICB8ICA0NSArLQ0KPj4gICBhcmNoL3g4
+Ni9tbS9wYWdlYXR0ci5jICAgICAgICAgICAgICAgICAgICAgICAgfCAgMTUgKw0KPj4gICBpbmNs
+dWRlL3VhcGkvbGludXgva3ZtLmggICAgICAgICAgICAgICAgICAgICAgfCAgNTEgKysNCj4+ICAg
+aW5jbHVkZS91YXBpL2xpbnV4L2t2bV9wYXJhLmggICAgICAgICAgICAgICAgIHwgICAxICsNCj4+
+ICAgMTIgZmlsZXMgY2hhbmdlZCwgODM0IGluc2VydGlvbnMoKyksIDQgZGVsZXRpb25zKC0pDQo+
+Pg0KPj4gLS0NCj4+IDIuMTcuMQ0KPj4NCj4gDQo+IFdoYXQncyB0aGUgYmFjay1vZi10aGUtZW52
+ZWxvcGUgbWFyZ2luYWwgY29zdCBvZiB0cmFuc2ZlcnJpbmcgYSAxNmtCDQo+IHJlZ2lvbiBmcm9t
+IG9uZSBob3N0IHRvIGFub3RoZXI/IEknbSBpbnRlcmVzdGVkIGluIHdoYXQgdGhlIGVuZCB0byBl
+bmQNCj4gbWlncmF0aW9uIHBlcmYgY2hhbmdlcyBsb29rIGxpa2UgZm9yIHRoaXMuIElmIHlvdSBo
+YXZlIG1lYXN1cmVkDQo+IG1pZ3JhdGlvbiBwZXJmLCBJJ20gaW50ZXJlc3RlZCBpbiB0aGF0IGFs
+c28uDQo+IA0KDQpJIGhhdmUgbm90IGRvbmUgYSBjb21wbGV0ZSBwZXJmb3JtYW5jZSBhbmFseXNp
+cyB5ZXQhIEZyb20gdGhlIHFlbXUNClFNUCBwcm9tcHQgKHF1ZXJ5LW1pZ3JhdGlvbikgSSBhbSBn
+ZXR0aW5nIH44bWJwcyB0aHJvdWdocHV0IGZyb20NCm9uZSBob3N0IHRvIGFub3RoZXIgKHRoaXMg
+aXMgd2l0aCA0a2IgcmVnaW9ucykuIEkgaGF2ZSBiZWVuIHRvbGQNCnRoYXQgaW5jcmVhc2luZyB0
+aGUgdHJhbnNmZXIgc2l6ZSBmcm9tIDRrYiAtPiAxNmtiIG1heSBub3QgZ2l2ZSBhDQpodWdlIHBl
+cmZvcm1hbmNlIGdhaW4gYmVjYXVzZSBhdCBGVyBsZXZlbCB0aGV5IHN0aWxsIG9wZXJhdGluZw0K
+b24gNGtiIGJsb2Nrcy4gVGhlcmUgaXMgcG9zc2liaWxpdHkgdGhhdCBmdXR1cmUgRlcgdXBkYXRl
+cyBtYXkNCmdpdmUgYSBiaXQgYmV0dGVyIHBlcmZvcm1hbmNlIG9uIDE2a2Igc2l6ZS4NCg0KLUJy
+aWplc2gNCg==
 
