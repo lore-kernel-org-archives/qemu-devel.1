@@ -2,82 +2,64 @@ Return-Path: <SRS0=3XOk=S2=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.2 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS,USER_AGENT_MUTT
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.7 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 78FACC10F11
-	for <qemu-devel@archiver.kernel.org>; Wed, 24 Apr 2019 04:20:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id ACFD8C10F11
+	for <qemu-devel@archiver.kernel.org>; Wed, 24 Apr 2019 04:21:41 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 35FC520878
-	for <qemu-devel@archiver.kernel.org>; Wed, 24 Apr 2019 04:20:07 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 7144020878
+	for <qemu-devel@archiver.kernel.org>; Wed, 24 Apr 2019 04:21:41 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=nvidia.com header.i=@nvidia.com header.b="MCiHozPL"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 35FC520878
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=nvidia.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="dqmU1hsN"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7144020878
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gibson.dropbear.id.au
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:35387 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:35434 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hJ9OA-00065s-0e
-	for qemu-devel@archiver.kernel.org; Wed, 24 Apr 2019 00:20:06 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:56100)
+	id 1hJ9Pg-0007ZJ-Hh
+	for qemu-devel@archiver.kernel.org; Wed, 24 Apr 2019 00:21:40 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:56545)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cjia@nvidia.com>) id 1hJ9My-0005Uf-T4
-	for qemu-devel@nongnu.org; Wed, 24 Apr 2019 00:18:54 -0400
+	(envelope-from <dgibson@ozlabs.org>) id 1hJ9OH-0006J5-SN
+	for qemu-devel@nongnu.org; Wed, 24 Apr 2019 00:20:14 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cjia@nvidia.com>) id 1hJ9Mx-0005PI-Ml
-	for qemu-devel@nongnu.org; Wed, 24 Apr 2019 00:18:52 -0400
-Received: from hqemgate16.nvidia.com ([216.228.121.65]:15558)
+	(envelope-from <dgibson@ozlabs.org>) id 1hJ9OH-0008Kw-0v
+	for qemu-devel@nongnu.org; Wed, 24 Apr 2019 00:20:13 -0400
+Received: from ozlabs.org ([2401:3900:2:1::2]:58057)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <cjia@nvidia.com>) id 1hJ9Mx-0005K5-6o
-	for qemu-devel@nongnu.org; Wed, 24 Apr 2019 00:18:51 -0400
-Received: from hqpgpgate101.nvidia.com (Not Verified[216.228.121.13]) by
-	hqemgate16.nvidia.com (using TLS: TLSv1.2, DES-CBC3-SHA)
-	id <B5cbfe2750000>; Tue, 23 Apr 2019 21:13:41 -0700
-Received: from hqmail.nvidia.com ([172.20.161.6])
-	by hqpgpgate101.nvidia.com (PGP Universal service);
-	Tue, 23 Apr 2019 21:13:44 -0700
-X-PGP-Universal: processed;
-	by hqpgpgate101.nvidia.com on Tue, 23 Apr 2019 21:13:44 -0700
-Received: from nvidia.com (172.20.13.39) by HQMAIL101.nvidia.com
-	(172.20.187.10) with Microsoft SMTP Server (TLS) id 15.0.1473.3;
-	Wed, 24 Apr 2019 04:13:43 +0000
-Date: Tue, 23 Apr 2019 21:13:41 -0700
-From: Neo Jia <cjia@nvidia.com>
-To: Daniel =?iso-8859-1?Q?P=2E_Berrang=E9?= <berrange@redhat.com>
-Message-ID: <20190424041340.GA5498@nvidia.com>
-References: <20190419083258.19580-1-yan.y.zhao@intel.com>
-	<20190419083505.19654-1-yan.y.zhao@intel.com>
-	<20190423103939.GF6022@redhat.com>
+	(Exim 4.71) (envelope-from <dgibson@ozlabs.org>)
+	id 1hJ9OG-0007ud-C6; Wed, 24 Apr 2019 00:20:12 -0400
+Received: by ozlabs.org (Postfix, from userid 1007)
+	id 44pnCk0CFQz9s5c; Wed, 24 Apr 2019 14:20:01 +1000 (AEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+	d=gibson.dropbear.id.au; s=201602; t=1556079602;
+	bh=RHUPFBMkFYu4hWKdf7/Df7eUjK+AtZJm7HDAbd4EALs=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=dqmU1hsNsb6SjVgpIxonA0opKNJsMDmyJn7038h7aMhvDecrUo9mhBJJ/+a4UApSZ
+	4UxSDBSRdB6yaH2bT5FVyVEZ1/t6sspEqrsakOjQAiNyeQWy49XIZDjQNIn2h5p0oE
+	aGnFhtCdh/z4hsMa3B9V6dyyDnuIgN1xS1PDi+Jk=
+From: David Gibson <david@gibson.dropbear.id.au>
+To: Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, qemu-devel@nongnu.org,
+	"Michael S. Tsirkin" <mst@redhat.com>,
+	Alex Williamson <alex.williamson@redhat.com>, Greg Kurz <groug@kaod.org>
+Date: Wed, 24 Apr 2019 14:19:57 +1000
+Message-Id: <20190424041959.4087-2-david@gibson.dropbear.id.au>
+X-Mailer: git-send-email 2.20.1
+In-Reply-To: <20190424041959.4087-1-david@gibson.dropbear.id.au>
+References: <20190424041959.4087-1-david@gibson.dropbear.id.au>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
-Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
-In-Reply-To: <20190423103939.GF6022@redhat.com>
-X-NVConfidentiality: public
-User-Agent: Mutt/1.8.3 (2017-05-23)
-X-Originating-IP: [172.20.13.39]
-X-ClientProxiedBy: HQMAIL107.nvidia.com (172.20.187.13) To
-	HQMAIL101.nvidia.com (172.20.187.10)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nvidia.com; s=n1;
-	t=1556079221; bh=m8gOn2B1g2bQ591PhvROeRFRvKnk6OyIOZF3JB4dA64=;
-	h=X-PGP-Universal:Date:From:To:CC:Subject:Message-ID:References:
-	MIME-Version:Content-Type:Content-Disposition:
-	Content-Transfer-Encoding:In-Reply-To:X-NVConfidentiality:
-	User-Agent:X-Originating-IP:X-ClientProxiedBy;
-	b=MCiHozPLhh5n80paDMb5cxXglbdstr725AkzgNoSPz0yqUWr0PbulY0dR5taIXz9m
-	vfa9WTKHJ4ZzC//47RK+NT8uZsD0uaQ6+9ZGMFLUfFZJ3FUO/XOLRH3RKXJ3nPvDlF
-	TH4ssSjg1MrWuJ01l7V2/5VtzWX0EsvTlqpk9/2jP7cI5La+yiRUD/z2Ah6o3QDVyF
-	fgtGeXLmtOJRtw7X1D3ZhuD793nroEhYmqmFBooPtHu4Vc/lnwTbiSecx+5qzW/Ad3
-	0JbLnjYLcWtyxzkkKMA/XW45EjocUPA6muujevEnoVMje6/oy3Ip52cuM1L9e7Iei3
-	3eRnHhseUgjgA==
-X-detected-operating-system: by eggs.gnu.org: Windows 7 or 8
-X-Received-From: 216.228.121.65
-Subject: Re: [Qemu-devel] [PATCH 1/2] vfio/mdev: add version field as
- mandatory attribute for mdev device
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+	recognized.
+X-Received-From: 2401:3900:2:1::2
+Subject: [Qemu-devel] [PATCH v2 1/3] pcie: Remove redundant test in
+ pcie_mmcfg_data_{read, write}()
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -89,111 +71,54 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: kvm@vger.kernel.org, aik@ozlabs.ru, Zhengxiao.zx@alibaba-inc.com,
-	shuangtai.tst@alibaba-inc.com, qemu-devel@nongnu.org,
-	kwankhede@nvidia.com, eauger@redhat.com, yi.l.liu@intel.com,
-	eskultet@redhat.com, ziye.yang@intel.com, mlevitsk@redhat.com,
-	pasic@linux.ibm.com, libvir-list@redhat.com,
-	arei.gonglei@huawei.com, felipe@nutanix.com, Ken.Xue@amd.com,
-	kevin.tian@intel.com, Yan Zhao <yan.y.zhao@intel.com>,
-	dgilbert@redhat.com, zhenyuw@linux.intel.com,
-	alex.williamson@redhat.com, intel-gvt-dev@lists.freedesktop.org,
-	changpeng.liu@intel.com, cohuck@redhat.com,
-	linux-kernel@vger.kernel.org, zhi.a.wang@intel.com,
-	jonathan.davies@nutanix.com, shaopeng.he@intel.com
+Cc: qemu-ppc@nongnu.org, clg@kaod.org,
+	David Gibson <david@gibson.dropbear.id.au>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190424041341.kjOLWuPC3rz7MR7dQErWGI5B6JpnKhZu8yL_FBQiDMw@z>
+Content-Type: text/plain; charset="UTF-8"
+Message-ID: <20190424041957.A8cK_RZve2FWNWo1h0izZ5aQVNWWZ3gu992gkm6x6I8@z>
 
-On Tue, Apr 23, 2019 at 11:39:39AM +0100, Daniel P. Berrang=E9 wrote:
-> On Fri, Apr 19, 2019 at 04:35:04AM -0400, Yan Zhao wrote:
-> > device version attribute in mdev sysfs is used by user space software
-> > (e.g. libvirt) to query device compatibility for live migration of VFIO
-> > mdev devices. This attribute is mandatory if a mdev device supports liv=
-e
-> > migration.
-> >=20
-> > It consists of two parts: common part and vendor proprietary part.
-> > common part: 32 bit. lower 16 bits is vendor id and higher 16 bits
-> >              identifies device type. e.g., for pci device, it is
-> >              "pci vendor id" | (VFIO_DEVICE_FLAGS_PCI << 16).
-> > vendor proprietary part: this part is varied in length. vendor driver c=
-an
-> >              specify any string to identify a device.
-> >=20
-> > When reading this attribute, it should show device version string of th=
-e
-> > device of type <type-id>. If a device does not support live migration, =
-it
-> > should return errno.
-> > When writing a string to this attribute, it returns errno for
-> > incompatibility or returns written string length in compatibility case.
-> > If a device does not support live migration, it always returns errno.
-> >=20
-> > For user space software to use:
-> > 1.
-> > Before starting live migration, user space software first reads source =
-side
-> > mdev device's version. e.g.
-> > "#cat \
-> > /sys/bus/pci/devices/0000\:00\:02.0/5ac1fb20-2bbf-4842-bb7e-36c58c3be9c=
-d/mdev_type/version"
-> > 00028086-193b-i915-GVTg_V5_4
-> >=20
-> > 2.
-> > Then, user space software writes the source side returned version strin=
-g
-> > to device version attribute in target side, and checks the return value=
-.
-> > If a negative errno is returned in the target side, then mdev devices i=
-n
-> > source and target sides are not compatible;
-> > If a positive number is returned and it equals to the length of written
-> > string, then the two mdev devices in source and target side are compati=
-ble.
-> > e.g.
-> > (a) compatibility case
-> > "# echo 00028086-193b-i915-GVTg_V5_4 >
-> > /sys/bus/pci/devices/0000\:00\:02.0/882cc4da-dede-11e7-9180-078a62063ab=
-1/mdev_type/version"
-> >=20
-> > (b) incompatibility case
-> > "#echo 00028086-193b-i915-GVTg_V5_1 >
-> > /sys/bus/pci/devices/0000\:00\:02.0/882cc4da-dede-11e7-9180-078a62063ab=
-1/mdev_type/version"
-> > -bash: echo: write error: Invalid argument
->=20
-> What you have written here seems to imply that each mdev type is able to
-> support many different versions at the same time. Writing a version into
-> this sysfs file then chooses which of the many versions to actually use.
->=20
-> This is good as it allows for live migration across driver software upgra=
-des.
->=20
-> A mgmt application may well want to know what versions are supported for =
-an
-> mdev type *before* starting a migration. A mgmt app can query all the 100=
-'s
-> of hosts it knows and thus figure out which are valid to use as the targe=
-t
-> of a migration.
->=20
-> IOW, we want to avoid the ever hitting the incompatibility case in the
-> first place, by only choosing to migrate to a host that we know is going
-> to be compatible.
->=20
-> This would need some kind of way to report the full list of supported
-> versions against the mdev supported types on the host.
+These functions have an explicit test for accesses above the device's
+config size.  But pci_host_config_{read,write}_common() which they're
+about to call already have checks against the config space limit and
+do the right thing.  So, remove the redundant tests.
 
-What would be the typical scenario / use case for mgmt layer to query the v=
-ersion
-information? Do they expect this get done completely offline as long as the
-vendor driver installed on each host?
+Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
+---
+ hw/pci/pcie_host.c | 10 ----------
+ 1 file changed, 10 deletions(-)
 
-Thanks,
-Neo
+diff --git a/hw/pci/pcie_host.c b/hw/pci/pcie_host.c
+index 553db56778..1ee4945a6d 100644
+--- a/hw/pci/pcie_host.c
++++ b/hw/pci/pcie_host.c
+@@ -47,11 +47,6 @@ static void pcie_mmcfg_data_write(void *opaque, hwaddr=
+ mmcfg_addr,
+     }
+     addr =3D PCIE_MMCFG_CONFOFFSET(mmcfg_addr);
+     limit =3D pci_config_size(pci_dev);
+-    if (limit <=3D addr) {
+-        /* conventional pci device can be behind pcie-to-pci bridge.
+-           256 <=3D addr < 4K has no effects. */
+-        return;
+-    }
+     pci_host_config_write_common(pci_dev, addr, limit, val, len);
+ }
+=20
+@@ -70,11 +65,6 @@ static uint64_t pcie_mmcfg_data_read(void *opaque,
+     }
+     addr =3D PCIE_MMCFG_CONFOFFSET(mmcfg_addr);
+     limit =3D pci_config_size(pci_dev);
+-    if (limit <=3D addr) {
+-        /* conventional pci device can be behind pcie-to-pci bridge.
+-           256 <=3D addr < 4K has no effects. */
+-        return ~0x0;
+-    }
+     return pci_host_config_read_common(pci_dev, addr, limit, len);
+ }
+=20
+--=20
+2.20.1
 
->=20
->=20
 
