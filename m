@@ -2,81 +2,63 @@ Return-Path: <SRS0=3XOk=S2=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.0 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_PASS autolearn=ham
+X-Spam-Status: No, score=-6.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 03C3DC10F11
-	for <qemu-devel@archiver.kernel.org>; Wed, 24 Apr 2019 11:09:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7FA4AC10F11
+	for <qemu-devel@archiver.kernel.org>; Wed, 24 Apr 2019 11:10:17 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id BBE582175B
-	for <qemu-devel@archiver.kernel.org>; Wed, 24 Apr 2019 11:09:40 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="gWISbKg/"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BBE582175B
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id 4C5672175B
+	for <qemu-devel@archiver.kernel.org>; Wed, 24 Apr 2019 11:10:17 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4C5672175B
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:39693 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:39695 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hJFmV-0003Uu-RS
-	for qemu-devel@archiver.kernel.org; Wed, 24 Apr 2019 07:09:39 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:47215)
+	id 1hJFn6-0003wJ-KC
+	for qemu-devel@archiver.kernel.org; Wed, 24 Apr 2019 07:10:16 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:47300)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1hJFic-0008E7-Fp
-	for qemu-devel@nongnu.org; Wed, 24 Apr 2019 07:05:39 -0400
+	(envelope-from <marcandre.lureau@redhat.com>) id 1hJFiO-0008HY-1u
+	for qemu-devel@nongnu.org; Wed, 24 Apr 2019 07:05:24 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1hJFZ0-0000Kn-3e
-	for qemu-devel@nongnu.org; Wed, 24 Apr 2019 06:55:43 -0400
-Received: from mail-ot1-x341.google.com ([2607:f8b0:4864:20::341]:33171)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1hJFYz-0000GR-U1
-	for qemu-devel@nongnu.org; Wed, 24 Apr 2019 06:55:42 -0400
-Received: by mail-ot1-x341.google.com with SMTP id j10so15735933otq.0
-	for <qemu-devel@nongnu.org>; Wed, 24 Apr 2019 03:55:38 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
-	h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-	:cc; bh=oB1mNpodHSI8ODyaBBkcsIYkolpsfAZ2feP4QiXkh8E=;
-	b=gWISbKg/+A/KRqETyiD/oDDco5Gco5yDLa4H33smp3NNm0QhvAd3Tb7rM1/l3wC6hI
-	TTc9Cv04seae+OBsVexelSyXGPWmpzGnwTCqZrby/BEqaR7IjUKl6Os8Rw5jzG8sl+sU
-	0ITgrtBRM9SGLPcFPIsBxgDFps3MOAeiDRP8xWNT+ZQ2Mgd8RMNiMhhoxkw5V32xewbY
-	oblmAxqPAay6xJlAU5yQp2MrFOGYZM2r6IDv9DJqD4UD3kfciQOv9cbdfm5MtGImBv/e
-	ZWRgDydW2ivK2QIe00IeTEHLUutsgiC+hpgTPtN/yJdQ/i4n8MSmK836u7pbePJYnKnY
-	qSFA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=1e100.net; s=20161025;
-	h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-	:message-id:subject:to:cc;
-	bh=oB1mNpodHSI8ODyaBBkcsIYkolpsfAZ2feP4QiXkh8E=;
-	b=epZMXc70uBetU2rh2C4/HoBUg4VeHzb9d0UadCCZsnmqLpEX3/qCmXO34BtnPcGwZ9
-	2numQYIQVAgtrR5yJ7Ak0/dTgdv2u+ldUru49VP45KpVvmkFWrU6+ywETmu+FL8LL42V
-	p0n/5mYOFcaFmZ97eGKgDN1VFQ8FmA9gHgeWWYJkMq2n/VND+PC+I+1JCKNUnuaAOlzz
-	Q88ZJ2tXwGoP58VlUmHKX61xXiGDCROtYN0R1PBJ40xS/lPzvFlZxr9B/tiRKtlougIv
-	2uRDVx4xbOQFKGsomG8g0GzHpqD1vNZg9XXFzlTgtvV4zIix9CuC6YWB5oiniMYahvnN
-	mMWQ==
-X-Gm-Message-State: APjAAAUu3bTnIcpjrgHhbxvXkO5P2fAx0bM/idPB9RZHckffnM1c/kkI
-	L135/g//6xbALs1nULv7wlsJOBBuAUWkf0prWh2ACg==
-X-Google-Smtp-Source: APXvYqxX//jKqy4O+Sn58q6Oun7Btus/wqnRAluK/0iLEtNkKpi0WqbGDdaA8f23IyeDy+XEOD8smQIx0S5OC5stATI=
-X-Received: by 2002:a9d:67:: with SMTP id 94mr19238714ota.238.1556103337736;
-	Wed, 24 Apr 2019 03:55:37 -0700 (PDT)
+	(envelope-from <marcandre.lureau@redhat.com>) id 1hJFdz-0006in-MV
+	for qemu-devel@nongnu.org; Wed, 24 Apr 2019 07:00:52 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:58364)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <marcandre.lureau@redhat.com>)
+	id 1hJFdx-0006d8-WB
+	for qemu-devel@nongnu.org; Wed, 24 Apr 2019 07:00:51 -0400
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+	[10.5.11.14])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 24D505946A;
+	Wed, 24 Apr 2019 11:00:49 +0000 (UTC)
+Received: from localhost (ovpn-112-52.ams2.redhat.com [10.36.112.52])
+	by smtp.corp.redhat.com (Postfix) with ESMTP id BB1E55D9C8;
+	Wed, 24 Apr 2019 11:00:46 +0000 (UTC)
+From: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
+To: qemu-devel@nongnu.org
+Date: Wed, 24 Apr 2019 13:00:40 +0200
+Message-Id: <20190424110041.8175-2-marcandre.lureau@redhat.com>
+In-Reply-To: <20190424110041.8175-1-marcandre.lureau@redhat.com>
+References: <20190424110041.8175-1-marcandre.lureau@redhat.com>
 MIME-Version: 1.0
-References: <20190418203840.10528-1-armbru@redhat.com>
-In-Reply-To: <20190418203840.10528-1-armbru@redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Wed, 24 Apr 2019 11:55:25 +0100
-Message-ID:
- <CAFEAcA9d5uMBiWx+OiLGuSs6qA5CRzG2dqhzsF8Q7tnOf_84Gg@mail.gmail.com>
-To: Markus Armbruster <armbru@redhat.com>
 Content-Type: text/plain; charset="UTF-8"
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
-	recognized.
-X-Received-From: 2607:f8b0:4864:20::341
-Subject: Re: [Qemu-devel] [PULL for-4.1 0/9] Miscellaneous patches for
- 2019-04-18
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+	(mx1.redhat.com [10.5.110.39]);
+	Wed, 24 Apr 2019 11:00:49 +0000 (UTC)
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 209.132.183.28
+Subject: [Qemu-devel] [PATCH v2 1/2] build-sys: pass CFLAGS & LDFLAGS to
+ subdir-slirp
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -88,72 +70,42 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: QEMU Developers <qemu-devel@nongnu.org>
+Cc: samuel.thibault@ens-lyon.org,
+	=?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190424105525.Gm1j6Y_xqtQF8XhIZrb4-buM4SjO7-zfXhLrcYzW4Zg@z>
+Message-ID: <20190424110040.uOGjrvFVF_0Y0_8g6I5C4yvh6fCzFFXfMw9J41un62w@z>
 
-On Thu, 18 Apr 2019 at 21:40, Markus Armbruster <armbru@redhat.com> wrote:
->
-> Early pull request because I'll be on vacation when 4.1 opens.  Hope
-> that's okay.
->
-> The following changes since commit eeba63fc7fface36f438bcbc0d3b02e7dcb59983:
->
->   Update version for v4.0.0-rc4 release (2019-04-16 21:53:00 +0100)
->
-> are available in the Git repository at:
->
->   git://repo.or.cz/qemu/armbru.git tags/pull-misc-2019-04-18
->
-> for you to fetch changes up to 15136db27efaf0bdcf1131d41ad57832a2acadcc:
->
->   Clean up decorations and whitespace around header guards (2019-04-17 19:20:46 +0200)
->
-> ----------------------------------------------------------------
-> Miscellaneous patches for 2019-04-18
->
-> ----------------------------------------------------------------
-> Markus Armbruster (9):
->       Clean up includes
->       Use #include "..." for our own headers, <...> for others
->       authz: Normalize #include "authz/trace.h" to "trace.h"
->       linux-user/nios2 linux-user/riscv: Clean up header guards
->       target/xtensa: Clean up core-isa.h header guards
->       Clean up header guards that don't match their file name
->       Clean up ill-advised or unusual header guards
->       Normalize header guard symbol definition.
->       Clean up decorations and whitespace around header guards
+CFLAGS/LDFLAGS have debug and sanitizers flags, which should be passed
+to slirp compilation.
 
-Hi -- this fails 'make check' on ppc64 and s390, so likely
-a big-endian hosts issue:
+Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+---
+ Makefile | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-make[1]: Leaving directory `/home/pm215/qemu/build/all/tests/fp'
-cd /home/pm215/qemu/build/all/tests/fp && ./fp-test -s -l 1 -r all
-i32_to_f16 i64_to_f16 i32_to_f32 i64_to_f32 i32_to_f64 i64_to_f64
-i32_to_f128 i64_to_f128 >  int-to-float.out 2>&1 || (cat
-int-to-float.out && exit 1;)
->> Testing i32_to_f16, rounding near_even
-^M372 tests total.
-^M372 tests performed.
-In 372 tests, no errors found in i32_to_f16, rounding near_even.
-[...]
->> Testing i32_to_f128
-^M372 tests total.
-^MErrors found in i32_to_f128:
-1006FFFF  => +0000.000000000000401B006FFFF00000 .....
-        expected +401B.006FFFF000000000000000000000 .....
-^M0001DDEB  => +0000.000000000000400FDDEB00000000 .....
-        expected +400F.DDEB000000000000000000000000 .....
-^MFFF6FFFC  => +0000.000000000000C012200080000000 .....
-        expected -4012.2000800000000000000000000000 .....
-[...]
-^M00000020  => +0000.0000000000004004000000000000 .....
-        expected +4004.0000000000000000000000000000 .....
-^M21 tests performed; 20 errors found.
-make: *** [check-softfloat-conv] Error 1
+diff --git a/Makefile b/Makefile
+index 04a0d45050..ff705e3f83 100644
+--- a/Makefile
++++ b/Makefile
+@@ -475,7 +475,7 @@ subdir-capstone: .git-submodule-status
+ 	$(call quiet-command,$(MAKE) -C $(SRC_PATH)/capstone CAPSTONE_SHARED=3D=
+no BUILDDIR=3D"$(BUILD_DIR)/capstone" CC=3D"$(CC)" AR=3D"$(AR)" LD=3D"$(L=
+D)" RANLIB=3D"$(RANLIB)" CFLAGS=3D"$(CAP_CFLAGS)" $(SUBDIR_MAKEFLAGS) $(B=
+UILD_DIR)/capstone/$(LIBCAPSTONE))
+=20
+ subdir-slirp: .git-submodule-status
+-	$(call quiet-command,$(MAKE) -C $(SRC_PATH)/slirp BUILD_DIR=3D"$(BUILD_=
+DIR)/slirp" CC=3D"$(CC)" AR=3D"$(AR)" LD=3D"$(LD)" RANLIB=3D"$(RANLIB)" C=
+FLAGS=3D"$(QEMU_CFLAGS)")
++	$(call quiet-command,$(MAKE) -C $(SRC_PATH)/slirp BUILD_DIR=3D"$(BUILD_=
+DIR)/slirp" CC=3D"$(CC)" AR=3D"$(AR)" LD=3D"$(LD)" RANLIB=3D"$(RANLIB)" C=
+FLAGS=3D"$(QEMU_CFLAGS) $(CFLAGS)" LDFLAGS=3D"$(LDFLAGS)")
+=20
+ $(SUBDIR_RULES): libqemuutil.a $(common-obj-y) $(chardev-obj-y) \
+ 	$(qom-obj-y) $(crypto-aes-obj-$(CONFIG_USER_ONLY))
+--=20
+2.21.0.313.ge35b8cb8e2
 
-thanks
--- PMM
 
