@@ -2,75 +2,59 @@ Return-Path: <SRS0=3XOk=S2=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_PASS,URIBL_BLOCKED autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9DBE7C10F11
-	for <qemu-devel@archiver.kernel.org>; Wed, 24 Apr 2019 13:23:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 43417C10F11
+	for <qemu-devel@archiver.kernel.org>; Wed, 24 Apr 2019 13:23:52 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 739942077C
-	for <qemu-devel@archiver.kernel.org>; Wed, 24 Apr 2019 13:23:36 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 739942077C
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 100382077C
+	for <qemu-devel@archiver.kernel.org>; Wed, 24 Apr 2019 13:23:52 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 100382077C
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=rt-rk.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:41466 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:41404 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hJHb1-0007RJ-VR
-	for qemu-devel@archiver.kernel.org; Wed, 24 Apr 2019 09:05:55 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:48328)
+	id 1hJHYw-0005rq-IU
+	for qemu-devel@archiver.kernel.org; Wed, 24 Apr 2019 09:03:46 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:47785)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1hJHWG-000413-ST
-	for qemu-devel@nongnu.org; Wed, 24 Apr 2019 09:01:02 -0400
+	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1hJHUo-0002aW-TR
+	for qemu-devel@nongnu.org; Wed, 24 Apr 2019 08:59:32 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1hJHWA-0003o7-85
-	for qemu-devel@nongnu.org; Wed, 24 Apr 2019 09:00:59 -0400
-Received: from indium.canonical.com ([91.189.90.7]:39946)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1hJHW8-0003j3-Av
-	for qemu-devel@nongnu.org; Wed, 24 Apr 2019 09:00:54 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1hJHW4-0007r9-Ns
-	for <qemu-devel@nongnu.org>; Wed, 24 Apr 2019 13:00:48 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id B2C7D2E80C8
-	for <qemu-devel@nongnu.org>; Wed, 24 Apr 2019 13:00:48 +0000 (UTC)
-MIME-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Wed, 24 Apr 2019 12:53:00 -0000
-From: "Laszlo Ersek \(Red Hat\)" <lersek@redhat.com>
+	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1hJHUJ-0000Ua-1B
+	for qemu-devel@nongnu.org; Wed, 24 Apr 2019 08:59:24 -0400
+Received: from mx2.rt-rk.com ([89.216.37.149]:54666 helo=mail.rt-rk.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <aleksandar.markovic@rt-rk.com>)
+	id 1hJHUI-0007X2-R1
+	for qemu-devel@nongnu.org; Wed, 24 Apr 2019 08:58:58 -0400
+Received: from localhost (localhost [127.0.0.1])
+	by mail.rt-rk.com (Postfix) with ESMTP id 00D311A4131;
+	Wed, 24 Apr 2019 14:57:57 +0200 (CEST)
+X-Virus-Scanned: amavisd-new at rt-rk.com
+Received: from rtrkw774-lin.domain.local (rtrkw774-lin.domain.local
+	[10.10.13.43])
+	by mail.rt-rk.com (Postfix) with ESMTPSA id 9C2C71A23E6;
+	Wed, 24 Apr 2019 14:57:56 +0200 (CEST)
+From: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>
 To: qemu-devel@nongnu.org
-X-Launchpad-Notification-Type: bug
-X-Launchpad-Bug: product=qemu; status=Confirmed; importance=Undecided;
-	assignee=berrange@redhat.com; 
-X-Launchpad-Bug-Tags: feature-request
-X-Launchpad-Bug-Information-Type: Public
-X-Launchpad-Bug-Private: no
-X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: lersek
-X-Launchpad-Bug-Reporter: Laszlo Ersek (Red Hat) (lersek)
-X-Launchpad-Bug-Modifier: Laszlo Ersek (Red Hat) (lersek)
-References: <155610584995.13565.1262636932024040431.malonedeb@wampee.canonical.com>
-Message-Id:
- <155611038071.17354.13472458339188522052.malone@soybean.canonical.com>
-X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
-X-Launchpad-Message-For: qemu-devel-ml
-Precedence: bulk
-X-Generated-By: Launchpad (canonical.com); Revision="18928";
-	Instance="launchpad-lazr.conf"
-X-Launchpad-Hash: 67707312e65a7d548b160542a06d6f8f988d64f7
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 91.189.90.7
-Subject: [Qemu-devel] [Bug 1826200] Re: RFE: populate "OEM Strings" (type
- 11) SMBIOS table strings from regular files
+Date: Wed, 24 Apr 2019 14:56:59 +0200
+Message-Id: <1556110623-655-2-git-send-email-aleksandar.markovic@rt-rk.com>
+X-Mailer: git-send-email 2.7.4
+In-Reply-To: <1556110623-655-1-git-send-email-aleksandar.markovic@rt-rk.com>
+References: <1556110623-655-1-git-send-email-aleksandar.markovic@rt-rk.com>
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x
+X-Received-From: 89.216.37.149
+Subject: [Qemu-devel] [PATCH v2 1/5] linux-user: Fix support for the
+ SIOCATMARK and SIOCGPGRP ioctls for eXtensa
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
+Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -79,58 +63,65 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1826200 <1826200@bugs.launchpad.net>
+Cc: lvivier@redhat.com, thuth@redhat.com, jcmvbkbc@gmail.com,
+	arikalo@wavecomp.com, daniel.santos@pobox.com,
+	amarkovic@wavecomp.com, philmd@redhat.com, aurelien@aurel32.net
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190424125300.htxgb3rPVlil1wFJlzc1W_VEGksMNxfgsrXMG7Z0lKo@z>
+Content-Type: text/plain; charset="UTF-8"
+Message-ID: <20190424125659.B-dP4Ryrw5b8HFeliJoDA9wgBRHd7622oC854jyMgs0@z>
 
-See also: https://bugzilla.tianocore.org/show_bug.cgi?id=3D1747
+From: Aleksandar Markovic <amarkovic@wavecomp.com>
 
-** Bug watch added: bugzilla.tianocore.org/ #1747
-   https://bugzilla.tianocore.org/show_bug.cgi?id=3D1747
+Fix support for the SIOCATMARK and SIOCGPGRP ioctls for eXtensa by
+correcting corresponding macro definition.
 
--- =
+Values for TARGET_SIOCATMARK and TARGET_SIOCGPGRP are determined by
+Linux kernel. Following relevant lines are from kernel source tree:
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1826200
+arch/ia64/include/uapi/asm/sockios.h:#define SIOCATMARK    0x8905
+arch/mips/include/uapi/asm/sockios.h:#define SIOCATMARK    _IOR('s', 7, int)
+arch/parisc/include/uapi/asm/sockios.h:#define SIOCATMARK  0x8905
+arch/sh/include/uapi/asm/sockios.h:#define SIOCATMARK      _IOR('s', 7, int)
+arch/xtensa/include/uapi/asm/sockios.h:#define SIOCATMARK  _IOR('s', 7, int)
+arch/alpha/include/uapi/asm/sockios.h:#define SIOCATMARK   _IOR('s', 7, int)
+arch/sparc/include/uapi/asm/sockios.h:#define SIOCATMARK   0x8905
+include/uapi/asm-generic/sockios.h:#define SIOCATMARK	   0x8905
 
-Title:
-  RFE: populate "OEM Strings" (type 11) SMBIOS table strings from
-  regular files
+arch/ia64/include/uapi/asm/sockios.h:#define SIOCGPGRP     0x8904
+arch/mips/include/uapi/asm/sockios.h:#define SIOCGPGRP     _IOR('s', 9, pid_t)
+arch/parisc/include/uapi/asm/sockios.h:#define SIOCGPGRP   0x8904
+arch/sh/include/uapi/asm/sockios.h:#define SIOCGPGRP       _IOR('s', 9, pid_t)
+arch/xtensa/include/uapi/asm/sockios.h:#define SIOCGPGRP   _IOR('s', 9, pid_t)
+arch/alpha/include/uapi/asm/sockios.h:#define SIOCGPGRP    _IOR('s', 9, pid_t)
+arch/sparc/include/uapi/asm/sockios.h:#define SIOCGPGRP    0x8904
+include/uapi/asm-generic/sockios.h:#define SIOCGPGRP       0x8904
 
-Status in QEMU:
-  Confirmed
+It is visible that eXtensa should have the same definitions as
+alpha, mips and sh4 already do. This patch brings that to the
+accurate state.
 
-Bug description:
-  The feature added in
+Signed-off-by: Aleksandar Markovic <amarkovic@wavecomp.com>
+---
+ linux-user/syscall_defs.h | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
 
-  https://git.qemu.org/?p=3Dqemu.git;a=3Dcommitdiff;h=3D2d6dcbf93fb01b4a7f4=
-5a93d276d4d74b16392dd
+diff --git a/linux-user/syscall_defs.h b/linux-user/syscall_defs.h
+index 12c8407..1e86fb9 100644
+--- a/linux-user/syscall_defs.h
++++ b/linux-user/syscall_defs.h
+@@ -736,7 +736,8 @@ struct target_pollfd {
+ #define TARGET_KDSETLED        0x4B32	/* set led state [lights, not flags] */
+ #define TARGET_KDSIGACCEPT     0x4B4E
+ 
+-#if defined(TARGET_ALPHA) || defined(TARGET_MIPS) || defined(TARGET_SH4)
++#if defined(TARGET_ALPHA) || defined(TARGET_MIPS) || defined(TARGET_SH4) ||    \
++       defined(TARGET_XTENSA)
+ #define TARGET_SIOCATMARK      TARGET_IOR('s', 7, int)
+ #define TARGET_SIOCGPGRP       TARGET_IOR('s', 9, pid_t)
+ #else
+-- 
+2.7.4
 
-  and exposed by libvirt as
-
-    https://libvirt.org/formatdomain.html#elementsSysinfo
-
-  allows the user to specify up to 255 strings in the unofmatted area of
-  the Type 11 SMBIOS table, where each string may be of arbitrary
-  length. This feature is useful for exposing arbitrary text to
-  arbitrary guest components (in particular when strings are prefixed
-  with "application identifiers").
-
-  Right now, strings can only be specified on the QEMU command line,
-  which limits the amount of data that can be passed. Please enable
-  users to pass data from regular files too.
-
-  For example:
-
-    $QEMU -smbios
-  type=3D11,value=3DHello,txtfile=3Dfile1.txt,txtfile=3Dfile2.txt
-
-  where "file1.txt" and "file2.txt" could be text files containing ASCII
-  application prefixes, followed by base64-encoded binary data.
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1826200/+subscriptions
 
