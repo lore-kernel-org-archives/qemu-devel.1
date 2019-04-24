@@ -1,27 +1,18 @@
-Received: from eggs.gnu.org ([209.51.188.92]:56100)
+Received: from eggs.gnu.org ([209.51.188.92]:56559)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cjia@nvidia.com>) id 1hJ9My-0005Uf-T4
-	for qemu-devel@nongnu.org; Wed, 24 Apr 2019 00:18:54 -0400
+	(envelope-from <dgibson@ozlabs.org>) id 1hJ9OI-0006JR-Fz
+	for qemu-devel@nongnu.org; Wed, 24 Apr 2019 00:20:15 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cjia@nvidia.com>) id 1hJ9Mx-0005PI-Ml
-	for qemu-devel@nongnu.org; Wed, 24 Apr 2019 00:18:52 -0400
-Received: from hqemgate16.nvidia.com ([216.228.121.65]:15558)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <cjia@nvidia.com>) id 1hJ9Mx-0005K5-6o
-	for qemu-devel@nongnu.org; Wed, 24 Apr 2019 00:18:51 -0400
-Date: Tue, 23 Apr 2019 21:13:41 -0700
-From: Neo Jia <cjia@nvidia.com>
-Message-ID: <20190424041340.GA5498@nvidia.com>
-References: <20190419083258.19580-1-yan.y.zhao@intel.com>
-	<20190419083505.19654-1-yan.y.zhao@intel.com>
-	<20190423103939.GF6022@redhat.com>
+	(envelope-from <dgibson@ozlabs.org>) id 1hJ9OH-0008Ll-95
+	for qemu-devel@nongnu.org; Wed, 24 Apr 2019 00:20:14 -0400
+From: David Gibson <david@gibson.dropbear.id.au>
+Date: Wed, 24 Apr 2019 14:19:58 +1000
+Message-Id: <20190424041959.4087-3-david@gibson.dropbear.id.au>
+In-Reply-To: <20190424041959.4087-1-david@gibson.dropbear.id.au>
+References: <20190424041959.4087-1-david@gibson.dropbear.id.au>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="iso-8859-1"
-Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
-In-Reply-To: <20190423103939.GF6022@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH 1/2] vfio/mdev: add version field as
- mandatory attribute for mdev device
+Subject: [Qemu-devel] [PATCH v2 2/3] pci: Simplify pci_bus_is_root()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,96 +21,169 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Daniel =?iso-8859-1?Q?P=2E_Berrang=E9?= <berrange@redhat.com>
-Cc: Yan Zhao <yan.y.zhao@intel.com>, intel-gvt-dev@lists.freedesktop.org, kvm@vger.kernel.org, aik@ozlabs.ru, Zhengxiao.zx@alibaba-inc.com, shuangtai.tst@alibaba-inc.com, qemu-devel@nongnu.org, kwankhede@nvidia.com, eauger@redhat.com, yi.l.liu@intel.com, eskultet@redhat.com, ziye.yang@intel.com, mlevitsk@redhat.com, pasic@linux.ibm.com, libvir-list@redhat.com, arei.gonglei@huawei.com, felipe@nutanix.com, Ken.Xue@amd.com, kevin.tian@intel.com, dgilbert@redhat.com, zhenyuw@linux.intel.com, alex.williamson@redhat.com, changpeng.liu@intel.com, cohuck@redhat.com, linux-kernel@vger.kernel.org, zhi.a.wang@intel.com, jonathan.davies@nutanix.com, shaopeng.he@intel.com
+To: Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, qemu-devel@nongnu.org, "Michael S. Tsirkin" <mst@redhat.com>, Alex Williamson <alex.williamson@redhat.com>, Greg Kurz <groug@kaod.org>
+Cc: David Gibson <david@gibson.dropbear.id.au>, clg@kaod.org, qemu-ppc@nongnu.org, Marcel Apfelbaum <marcel@redhat.com>, Peter Xu <peterx@redhat.com>
 
-On Tue, Apr 23, 2019 at 11:39:39AM +0100, Daniel P. Berrang=E9 wrote:
-> On Fri, Apr 19, 2019 at 04:35:04AM -0400, Yan Zhao wrote:
-> > device version attribute in mdev sysfs is used by user space software
-> > (e.g. libvirt) to query device compatibility for live migration of VFIO
-> > mdev devices. This attribute is mandatory if a mdev device supports liv=
-e
-> > migration.
-> >=20
-> > It consists of two parts: common part and vendor proprietary part.
-> > common part: 32 bit. lower 16 bits is vendor id and higher 16 bits
-> >              identifies device type. e.g., for pci device, it is
-> >              "pci vendor id" | (VFIO_DEVICE_FLAGS_PCI << 16).
-> > vendor proprietary part: this part is varied in length. vendor driver c=
-an
-> >              specify any string to identify a device.
-> >=20
-> > When reading this attribute, it should show device version string of th=
-e
-> > device of type <type-id>. If a device does not support live migration, =
-it
-> > should return errno.
-> > When writing a string to this attribute, it returns errno for
-> > incompatibility or returns written string length in compatibility case.
-> > If a device does not support live migration, it always returns errno.
-> >=20
-> > For user space software to use:
-> > 1.
-> > Before starting live migration, user space software first reads source =
-side
-> > mdev device's version. e.g.
-> > "#cat \
-> > /sys/bus/pci/devices/0000\:00\:02.0/5ac1fb20-2bbf-4842-bb7e-36c58c3be9c=
-d/mdev_type/version"
-> > 00028086-193b-i915-GVTg_V5_4
-> >=20
-> > 2.
-> > Then, user space software writes the source side returned version strin=
-g
-> > to device version attribute in target side, and checks the return value=
-.
-> > If a negative errno is returned in the target side, then mdev devices i=
+pci_bus_is_root() currently relies on a method in the PCIBusClass.
+But it's always known if a PCI bus is a root bus when we create it, so
+using a dynamic method is overkill.
+
+This replaces it with an IS_ROOT bit in a new flags field, which is set o=
 n
-> > source and target sides are not compatible;
-> > If a positive number is returned and it equals to the length of written
-> > string, then the two mdev devices in source and target side are compati=
-ble.
-> > e.g.
-> > (a) compatibility case
-> > "# echo 00028086-193b-i915-GVTg_V5_4 >
-> > /sys/bus/pci/devices/0000\:00\:02.0/882cc4da-dede-11e7-9180-078a62063ab=
-1/mdev_type/version"
-> >=20
-> > (b) incompatibility case
-> > "#echo 00028086-193b-i915-GVTg_V5_1 >
-> > /sys/bus/pci/devices/0000\:00\:02.0/882cc4da-dede-11e7-9180-078a62063ab=
-1/mdev_type/version"
-> > -bash: echo: write error: Invalid argument
->=20
-> What you have written here seems to imply that each mdev type is able to
-> support many different versions at the same time. Writing a version into
-> this sysfs file then chooses which of the many versions to actually use.
->=20
-> This is good as it allows for live migration across driver software upgra=
-des.
->=20
-> A mgmt application may well want to know what versions are supported for =
-an
-> mdev type *before* starting a migration. A mgmt app can query all the 100=
-'s
-> of hosts it knows and thus figure out which are valid to use as the targe=
-t
-> of a migration.
->=20
-> IOW, we want to avoid the ever hitting the incompatibility case in the
-> first place, by only choosing to migrate to a host that we know is going
-> to be compatible.
->=20
-> This would need some kind of way to report the full list of supported
-> versions against the mdev supported types on the host.
+root buses and otherwise clear.  As a bonus this removes the special
+is_root logic from pci_expander_bridge, since it already creates its bus
+as a root bus.
 
-What would be the typical scenario / use case for mgmt layer to query the v=
-ersion
-information? Do they expect this get done completely offline as long as the
-vendor driver installed on each host?
+Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
+Reviewed-by: Marcel Apfelbaum <marcel@redhat.com>
+Reviewed-by: Peter Xu <peterx@redhat.com>
+Reviewed-by: Greg Kurz <groug@kaod.org>
+---
+ hw/pci-bridge/pci_expander_bridge.c |  6 ------
+ hw/pci/pci.c                        | 14 ++------------
+ hw/virtio/virtio-pci.c              |  1 +
+ include/hw/pci/pci.h                |  1 -
+ include/hw/pci/pci_bus.h            | 12 +++++++++++-
+ 5 files changed, 14 insertions(+), 20 deletions(-)
 
-Thanks,
-Neo
-
->=20
->=20
+diff --git a/hw/pci-bridge/pci_expander_bridge.c b/hw/pci-bridge/pci_expa=
+nder_bridge.c
+index e62de4218f..ca66bc721a 100644
+--- a/hw/pci-bridge/pci_expander_bridge.c
++++ b/hw/pci-bridge/pci_expander_bridge.c
+@@ -66,11 +66,6 @@ static int pxb_bus_num(PCIBus *bus)
+     return pxb->bus_nr;
+ }
+=20
+-static bool pxb_is_root(PCIBus *bus)
+-{
+-    return true; /* by definition */
+-}
+-
+ static uint16_t pxb_bus_numa_node(PCIBus *bus)
+ {
+     PXBDev *pxb =3D convert_to_pxb(bus->parent_dev);
+@@ -83,7 +78,6 @@ static void pxb_bus_class_init(ObjectClass *class, void=
+ *data)
+     PCIBusClass *pbc =3D PCI_BUS_CLASS(class);
+=20
+     pbc->bus_num =3D pxb_bus_num;
+-    pbc->is_root =3D pxb_is_root;
+     pbc->numa_node =3D pxb_bus_numa_node;
+ }
+=20
+diff --git a/hw/pci/pci.c b/hw/pci/pci.c
+index 6d13ef877b..ea5941fb22 100644
+--- a/hw/pci/pci.c
++++ b/hw/pci/pci.c
+@@ -129,14 +129,9 @@ static void pci_bus_unrealize(BusState *qbus, Error =
+**errp)
+     vmstate_unregister(NULL, &vmstate_pcibus, bus);
+ }
+=20
+-static bool pcibus_is_root(PCIBus *bus)
+-{
+-    return !bus->parent_dev;
+-}
+-
+ static int pcibus_num(PCIBus *bus)
+ {
+-    if (pcibus_is_root(bus)) {
++    if (pci_bus_is_root(bus)) {
+         return 0; /* pci host bridge */
+     }
+     return bus->parent_dev->config[PCI_SECONDARY_BUS];
+@@ -164,7 +159,6 @@ static void pci_bus_class_init(ObjectClass *klass, vo=
+id *data)
+     k->unrealize =3D pci_bus_unrealize;
+     k->reset =3D pcibus_reset;
+=20
+-    pbc->is_root =3D pcibus_is_root;
+     pbc->bus_num =3D pcibus_num;
+     pbc->numa_node =3D pcibus_numa_node;
+     pbc->allows_extended_config_space =3D pcibus_allows_extended_config_=
+space;
+@@ -398,6 +392,7 @@ static void pci_root_bus_init(PCIBus *bus, DeviceStat=
+e *parent,
+     bus->slot_reserved_mask =3D 0x0;
+     bus->address_space_mem =3D address_space_mem;
+     bus->address_space_io =3D address_space_io;
++    bus->flags |=3D PCI_BUS_IS_ROOT;
+=20
+     /* host bridge */
+     QLIST_INIT(&bus->child);
+@@ -415,11 +410,6 @@ bool pci_bus_is_express(PCIBus *bus)
+     return object_dynamic_cast(OBJECT(bus), TYPE_PCIE_BUS);
+ }
+=20
+-bool pci_bus_is_root(PCIBus *bus)
+-{
+-    return PCI_BUS_GET_CLASS(bus)->is_root(bus);
+-}
+-
+ bool pci_bus_allows_extended_config_space(PCIBus *bus)
+ {
+     return PCI_BUS_GET_CLASS(bus)->allows_extended_config_space(bus);
+diff --git a/hw/virtio/virtio-pci.c b/hw/virtio/virtio-pci.c
+index cb44e19b67..942173d830 100644
+--- a/hw/virtio/virtio-pci.c
++++ b/hw/virtio/virtio-pci.c
+@@ -20,6 +20,7 @@
+ #include "standard-headers/linux/virtio_pci.h"
+ #include "hw/virtio/virtio.h"
+ #include "hw/pci/pci.h"
++#include "hw/pci/pci_bus.h"
+ #include "qapi/error.h"
+ #include "qemu/error-report.h"
+ #include "hw/pci/msi.h"
+diff --git a/include/hw/pci/pci.h b/include/hw/pci/pci.h
+index 0abb06b357..33ccce320c 100644
+--- a/include/hw/pci/pci.h
++++ b/include/hw/pci/pci.h
+@@ -395,7 +395,6 @@ typedef PCIINTxRoute (*pci_route_irq_fn)(void *opaque=
+, int pin);
+ #define TYPE_PCIE_BUS "PCIE"
+=20
+ bool pci_bus_is_express(PCIBus *bus);
+-bool pci_bus_is_root(PCIBus *bus);
+ bool pci_bus_allows_extended_config_space(PCIBus *bus);
+=20
+ void pci_root_bus_new_inplace(PCIBus *bus, size_t bus_size, DeviceState =
+*parent,
+diff --git a/include/hw/pci/pci_bus.h b/include/hw/pci/pci_bus.h
+index f6df834170..aea98d5040 100644
+--- a/include/hw/pci/pci_bus.h
++++ b/include/hw/pci/pci_bus.h
+@@ -15,14 +15,19 @@ typedef struct PCIBusClass {
+     BusClass parent_class;
+     /*< public >*/
+=20
+-    bool (*is_root)(PCIBus *bus);
+     int (*bus_num)(PCIBus *bus);
+     uint16_t (*numa_node)(PCIBus *bus);
+     bool (*allows_extended_config_space)(PCIBus *bus);
+ } PCIBusClass;
+=20
++enum PCIBusFlags {
++    /* This bus is the root of a PCI domain */
++    PCI_BUS_IS_ROOT                                         =3D 0x0001,
++};
++
+ struct PCIBus {
+     BusState qbus;
++    enum PCIBusFlags flags;
+     PCIIOMMUFunc iommu_fn;
+     void *iommu_opaque;
+     uint8_t devfn_min;
+@@ -47,4 +52,9 @@ struct PCIBus {
+     Notifier machine_done;
+ };
+=20
++static inline bool pci_bus_is_root(PCIBus *bus)
++{
++    return !!(bus->flags & PCI_BUS_IS_ROOT);
++}
++
+ #endif /* QEMU_PCI_BUS_H */
+--=20
+2.20.1
