@@ -1,23 +1,23 @@
-Received: from eggs.gnu.org ([209.51.188.92]:47300)
+Received: from eggs.gnu.org ([209.51.188.92]:47215)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1hJFiP-0008HY-Tx
-	for qemu-devel@nongnu.org; Wed, 24 Apr 2019 07:05:27 -0400
+	(envelope-from <marcandre.lureau@redhat.com>) id 1hJFiO-0008E7-2C
+	for qemu-devel@nongnu.org; Wed, 24 Apr 2019 07:05:25 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1hJFdT-0005p6-R5
-	for qemu-devel@nongnu.org; Wed, 24 Apr 2019 07:00:21 -0400
-References: <20190424103747.10173-1-thuth@redhat.com>
-	<20190424103747.10173-6-thuth@redhat.com>
-	<20190424104855.GE31388@redhat.com>
-From: Thomas Huth <thuth@redhat.com>
-Message-ID: <d9137693-7727-5f2c-04f3-b1eafd70f056@redhat.com>
-Date: Wed, 24 Apr 2019 12:59:59 +0200
+	(envelope-from <marcandre.lureau@redhat.com>) id 1hJFdv-0006c0-TJ
+	for qemu-devel@nongnu.org; Wed, 24 Apr 2019 07:00:49 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:58314)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <marcandre.lureau@redhat.com>)
+	id 1hJFdv-0006Xl-Ky
+	for qemu-devel@nongnu.org; Wed, 24 Apr 2019 07:00:47 -0400
+From: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
+Date: Wed, 24 Apr 2019 13:00:39 +0200
+Message-Id: <20190424110041.8175-1-marcandre.lureau@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20190424104855.GE31388@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH 5/6] tests: Run the iotests during "make
- check" again
+Subject: [Qemu-devel] [PATCH v2 0/2] slirp: move slirp as git submodule
+ project
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,76 +26,142 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Daniel_P=2e_Berrang=c3=a9?= <berrange@redhat.com>
-Cc: qemu-devel@nongnu.org, Fam Zheng <fam@euphon.net>, Kevin Wolf <kwolf@redhat.com>, Ed Maste <emaste@freebsd.org>, qemu-block@nongnu.org, =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>, Max Reitz <mreitz@redhat.com>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>, Li-Wen Hsu <lwhsu@freebsd.org>
+To: qemu-devel@nongnu.org
+Cc: samuel.thibault@ens-lyon.org, berrange@redhat.com, eblake@redhat.com, =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
 
-On 24/04/2019 12.48, Daniel P. Berrang=C3=A9 wrote:
-> On Wed, Apr 24, 2019 at 12:37:46PM +0200, Thomas Huth wrote:
->> People often forget to run the iotests before submitting patches or
->> pull requests - this is likely due to the fact that we do not run the
->> tests during our mandatory "make check" tests yet. Now that we've got
->> a new "ci" group of iotests that should be fine to run in every enviro=
-n-
->> ment, it should be OK to enable the iotests during "make check" again.
->> Thus we now run the "ci" tests by default from the qemu-iotests-quick.=
-sh
->> script, and only use the former "quick" group (that contains some test=
-s
->> that are failing in some environments) when the user decided to run
->> "make check SPEED=3Dthorough" or something similar.
->>
->> Signed-off-by: Thomas Huth <thuth@redhat.com>
->> ---
->>  tests/Makefile.include      |  2 +-
->>  tests/qemu-iotests-quick.sh | 17 ++++++++++++++++-
->>  2 files changed, 17 insertions(+), 2 deletions(-)
->=20
->> diff --git a/tests/qemu-iotests-quick.sh b/tests/qemu-iotests-quick.sh
->> index 0e554bb972..416b3fc48b 100755
->> --- a/tests/qemu-iotests-quick.sh
->> +++ b/tests/qemu-iotests-quick.sh
->=20
-> s/-quick//  perhaps, since it no longer only runs the "quick" tests.
->=20
->> @@ -1,8 +1,23 @@
->>  #!/bin/sh
->> =20
->> +# Honor the SPEED environment variable, just like we do it for the qt=
-ests.
->> +# The default is to run all tests that still work fine in a CI enviro=
-nments,
->> +# but if the user set SPEED=3Dslow or SPEED=3Dthorough, we also run a=
-ll other
->> +# tests that are still marked as "quick"
->> +if [ "$SPEED" =3D "slow" -o "$SPEED" =3D "thorough" ]; then
->> +    group=3Dquick
->=20
-> When user asks for "slow" tests we run the "quick" tests, which
-> presumably implies...
->=20
->> +else
->> +    group=3Dci
->=20
-> ..."ci" is quicker than the "quick"  tests !
->=20
-> Confused ? We certainly try to ensure that you will be :-)
+Hi,
 
-... and there is also tests/check-block.sh (which is not used by "make
-check-block", by the way, but still talks about "make check-block"),
-which is even slower than the "ci" and "quick" group...
+v2:
+ - add a patch to pass CFLAGS/LDFLAGS
+ - order diff files to ease reviewing
+ - drop RFC status
 
-I guess that could be cleaned up, too (why do we need two scripts?) ...
-just not sure how the final result should look like and if it should be
-part of this patch series or rather something separate. Max, Kevin, what
-do you think?
+Marc-Andr=C3=A9 Lureau (2):
+  build-sys: pass CFLAGS & LDFLAGS to subdir-slirp
+  build-sys: move slirp as git submodule project
 
-Maybe we should merge the two scripts, and depending on the SPEED
-variable, we run:
+ configure              |   11 +-
+ .gitmodules            |    3 +
+ slirp/src/bootp.h      |  129 ----
+ slirp/src/debug.h      |   46 --
+ slirp/src/dhcpv6.h     |   53 --
+ slirp/src/if.h         |   21 -
+ slirp/src/ip.h         |  242 -------
+ slirp/src/ip6.h        |  160 -----
+ slirp/src/ip6_icmp.h   |  232 ------
+ slirp/src/ip_icmp.h    |  166 -----
+ slirp/src/libslirp.h   |  118 ---
+ slirp/src/main.h       |   16 -
+ slirp/src/mbuf.h       |  127 ----
+ slirp/src/misc.h       |   66 --
+ slirp/src/ncsi-pkt.h   |  445 ------------
+ slirp/src/qtailq.h     |  194 -----
+ slirp/src/sbuf.h       |   27 -
+ slirp/src/slirp.h      |  275 -------
+ slirp/src/socket.h     |  160 -----
+ slirp/src/stream.h     |   35 -
+ slirp/src/tcp.h        |  181 -----
+ slirp/src/tcp_timer.h  |  128 ----
+ slirp/src/tcp_var.h    |  162 -----
+ slirp/src/tcpip.h      |  102 ---
+ slirp/src/tftp.h       |   52 --
+ slirp/src/udp.h        |   92 ---
+ slirp/src/util.h       |  175 -----
+ slirp/src/vmstate.h    |  409 -----------
+ slirp/src/arp_table.c  |   92 ---
+ slirp/src/bootp.c      |  371 ----------
+ slirp/src/cksum.c      |  161 -----
+ slirp/src/dhcpv6.c     |  224 ------
+ slirp/src/dnssearch.c  |  311 --------
+ slirp/src/if.c         |  218 ------
+ slirp/src/ip6_icmp.c   |  438 -----------
+ slirp/src/ip6_input.c  |   78 --
+ slirp/src/ip6_output.c |   39 -
+ slirp/src/ip_icmp.c    |  470 ------------
+ slirp/src/ip_input.c   |  469 ------------
+ slirp/src/ip_output.c  |  170 -----
+ slirp/src/mbuf.c       |  235 ------
+ slirp/src/misc.c       |  321 ---------
+ slirp/src/ncsi.c       |  194 -----
+ slirp/src/ndp_table.c  |   87 ---
+ slirp/src/sbuf.c       |  186 -----
+ slirp/src/slirp.c      | 1118 -----------------------------
+ slirp/src/socket.c     |  945 ------------------------
+ slirp/src/state.c      |  388 ----------
+ slirp/src/stream.c     |  120 ----
+ slirp/src/tcp_input.c  | 1554 ----------------------------------------
+ slirp/src/tcp_output.c |  522 --------------
+ slirp/src/tcp_subr.c   |  987 -------------------------
+ slirp/src/tcp_timer.c  |  294 --------
+ slirp/src/tftp.c       |  463 ------------
+ slirp/src/udp.c        |  363 ----------
+ slirp/src/udp6.c       |  173 -----
+ slirp/src/util.c       |  368 ----------
+ slirp/src/vmstate.c    |  441 ------------
+ Makefile               |    2 +-
+ slirp                  |    1 +
+ slirp/COPYRIGHT        |   62 --
+ slirp/Makefile         |   47 --
+ 62 files changed, 14 insertions(+), 15725 deletions(-)
+ delete mode 100644 slirp/src/bootp.h
+ delete mode 100644 slirp/src/debug.h
+ delete mode 100644 slirp/src/dhcpv6.h
+ delete mode 100644 slirp/src/if.h
+ delete mode 100644 slirp/src/ip.h
+ delete mode 100644 slirp/src/ip6.h
+ delete mode 100644 slirp/src/ip6_icmp.h
+ delete mode 100644 slirp/src/ip_icmp.h
+ delete mode 100644 slirp/src/libslirp.h
+ delete mode 100644 slirp/src/main.h
+ delete mode 100644 slirp/src/mbuf.h
+ delete mode 100644 slirp/src/misc.h
+ delete mode 100644 slirp/src/ncsi-pkt.h
+ delete mode 100644 slirp/src/qtailq.h
+ delete mode 100644 slirp/src/sbuf.h
+ delete mode 100644 slirp/src/slirp.h
+ delete mode 100644 slirp/src/socket.h
+ delete mode 100644 slirp/src/stream.h
+ delete mode 100644 slirp/src/tcp.h
+ delete mode 100644 slirp/src/tcp_timer.h
+ delete mode 100644 slirp/src/tcp_var.h
+ delete mode 100644 slirp/src/tcpip.h
+ delete mode 100644 slirp/src/tftp.h
+ delete mode 100644 slirp/src/udp.h
+ delete mode 100644 slirp/src/util.h
+ delete mode 100644 slirp/src/vmstate.h
+ delete mode 100644 slirp/src/arp_table.c
+ delete mode 100644 slirp/src/bootp.c
+ delete mode 100644 slirp/src/cksum.c
+ delete mode 100644 slirp/src/dhcpv6.c
+ delete mode 100644 slirp/src/dnssearch.c
+ delete mode 100644 slirp/src/if.c
+ delete mode 100644 slirp/src/ip6_icmp.c
+ delete mode 100644 slirp/src/ip6_input.c
+ delete mode 100644 slirp/src/ip6_output.c
+ delete mode 100644 slirp/src/ip_icmp.c
+ delete mode 100644 slirp/src/ip_input.c
+ delete mode 100644 slirp/src/ip_output.c
+ delete mode 100644 slirp/src/mbuf.c
+ delete mode 100644 slirp/src/misc.c
+ delete mode 100644 slirp/src/ncsi.c
+ delete mode 100644 slirp/src/ndp_table.c
+ delete mode 100644 slirp/src/sbuf.c
+ delete mode 100644 slirp/src/slirp.c
+ delete mode 100644 slirp/src/socket.c
+ delete mode 100644 slirp/src/state.c
+ delete mode 100644 slirp/src/stream.c
+ delete mode 100644 slirp/src/tcp_input.c
+ delete mode 100644 slirp/src/tcp_output.c
+ delete mode 100644 slirp/src/tcp_subr.c
+ delete mode 100644 slirp/src/tcp_timer.c
+ delete mode 100644 slirp/src/tftp.c
+ delete mode 100644 slirp/src/udp.c
+ delete mode 100644 slirp/src/udp6.c
+ delete mode 100644 slirp/src/util.c
+ delete mode 100644 slirp/src/vmstate.c
+ create mode 160000 slirp
+ delete mode 100644 slirp/COPYRIGHT
+ delete mode 100644 slirp/Makefile
 
- quick =3D> "ci" group
- thorough =3D> "quick" group
- slow =3D> old behaviour of the check-block.sh script
-
-?
-
- Thomas
+--=20
+2.21.0.313.ge35b8cb8e2
