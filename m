@@ -5,67 +5,70 @@ X-Spam-Level:
 X-Spam-Status: No, score=-0.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	MAILING_LIST_MULTI,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F09F1C282CE
-	for <qemu-devel@archiver.kernel.org>; Wed, 24 Apr 2019 13:59:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 21110C10F11
+	for <qemu-devel@archiver.kernel.org>; Wed, 24 Apr 2019 14:00:16 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B2F8D2148D
-	for <qemu-devel@archiver.kernel.org>; Wed, 24 Apr 2019 13:59:14 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B2F8D2148D
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=clisp.org
+	by mail.kernel.org (Postfix) with ESMTPS id D3E48218FC
+	for <qemu-devel@archiver.kernel.org>; Wed, 24 Apr 2019 14:00:15 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D3E48218FC
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:42123 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:42129 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hJIQc-00049J-0Z
-	for qemu-devel@archiver.kernel.org; Wed, 24 Apr 2019 09:59:14 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:33982)
+	id 1hJIRb-0004xL-3K
+	for qemu-devel@archiver.kernel.org; Wed, 24 Apr 2019 10:00:15 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:33917)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1hJILu-0008Uj-6H
-	for qemu-devel@nongnu.org; Wed, 24 Apr 2019 09:54:26 -0400
+	(envelope-from <bounces@canonical.com>) id 1hJIMJ-0008Qs-5S
+	for qemu-devel@nongnu.org; Wed, 24 Apr 2019 09:54:49 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1hJIId-0003t0-Ex
-	for qemu-devel@nongnu.org; Wed, 24 Apr 2019 09:51:00 -0400
-Received: from indium.canonical.com ([91.189.90.7]:60712)
+	(envelope-from <bounces@canonical.com>) id 1hJI9A-0001MK-LZ
+	for qemu-devel@nongnu.org; Wed, 24 Apr 2019 09:41:16 -0400
+Received: from indium.canonical.com ([91.189.90.7]:54790)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1hJIId-0003rc-8E
-	for qemu-devel@nongnu.org; Wed, 24 Apr 2019 09:50:59 -0400
+	id 1hJI98-00011z-Q3
+	for qemu-devel@nongnu.org; Wed, 24 Apr 2019 09:41:12 -0400
 Received: from loganberry.canonical.com ([91.189.90.37])
 	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1hJIIb-0000WF-3o
-	for <qemu-devel@nongnu.org>; Wed, 24 Apr 2019 13:50:57 +0000
+	id 1hJI96-0006JH-LW
+	for <qemu-devel@nongnu.org>; Wed, 24 Apr 2019 13:41:08 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id C0F592E80CE
-	for <qemu-devel@nongnu.org>; Wed, 24 Apr 2019 13:50:56 +0000 (UTC)
+	by loganberry.canonical.com (Postfix) with ESMTP id 75A552E80CC
+	for <qemu-devel@nongnu.org>; Wed, 24 Apr 2019 13:41:08 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Wed, 24 Apr 2019 13:41:03 -0000
-From: Bruno Haible <bruno@clisp.org>
+Date: Wed, 24 Apr 2019 13:34:30 -0000
+From: =?utf-8?q?Philippe_Mathieu-Daud=C3=A9?= <1825002@bugs.launchpad.net>
 To: qemu-devel@nongnu.org
 X-Launchpad-Notification-Type: bug
-X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
+X-Launchpad-Bug: product=qemu; status=In Progress; importance=Undecided;
+	assignee=None; 
+X-Launchpad-Bug-Tags: linux-user mips
 X-Launchpad-Bug-Information-Type: Public
 X-Launchpad-Bug-Private: no
 X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: bruno-clisp rth stefanrin th-huth
-X-Launchpad-Bug-Reporter: Bruno Haible (bruno-clisp)
-X-Launchpad-Bug-Modifier: Bruno Haible (bruno-clisp)
-References: <149893001258.15852.11258418521313176097.malonedeb@wampee.canonical.com>
+X-Launchpad-Bug-Commenters: daniel-santos philmd pmaydell th-huth
+X-Launchpad-Bug-Reporter: Daniel Santos (daniel-santos)
+X-Launchpad-Bug-Modifier: =?utf-8?q?Philippe_Mathieu-Daud=C3=A9_=28philmd?=
+	=?utf-8?q?=29?=
+References: <155542675846.7866.6509809085972568558.malonedeb@wampee.canonical.com>
 Message-Id:
- <155611326381.7289.13592030405620639690.malone@chaenomeles.canonical.com>
+ <155611287018.17547.13632323009169477245.malone@soybean.canonical.com>
 X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
 X-Launchpad-Message-For: qemu-devel-ml
 Precedence: bulk
 X-Generated-By: Launchpad (canonical.com); Revision="18928";
 	Instance="launchpad-lazr.conf"
-X-Launchpad-Hash: 1c4f6ce82719668e215a8d4227dcbcd4af18455d
+X-Launchpad-Hash: 9e32bc109e1e26580e36a2822ec17919f47197e8
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 91.189.90.7
-Subject: [Qemu-devel] [Bug 1701835] Re: floating-point operation bugs in
- qemu-alpha
+Subject: [Qemu-devel] [Bug 1825002] Re: "qemu: Unexpected FPU mode" since
+ 0c1bbedc10e86ea9366b6af8c5520fafa3266b2f
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 List-Id: <qemu-devel.nongnu.org>
@@ -76,222 +79,266 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1701835 <1701835@bugs.launchpad.net>
+Reply-To: Bug 1825002 <1825002@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190424134103.n0O7LiGfAiLCdpMC0etXAWj-3oB8WhWreWVtVdJtdu8@z>
+Message-ID: <20190424133430._zSuKdxKDAUXA3k4sJAL3m3DqPbpdr_vb113BwXFXV8@z>
 
-The problem is still reproducible with QEMU 4.0.0:
-- The test programs test-cbrt ... test-truncf1 crash or abort as described.
-- The test program from comment #6, run with qemu-alpha, prints 600e8000000=
-00000, i.e. bit 59 is unset.
+Fix posted on the list:
+https://lists.gnu.org/archive/html/qemu-devel/2019-04/msg04037.html
+
+** Changed in: qemu
+       Status: Fix Committed =3D> In Progress
 
 -- =
 
 You received this bug notification because you are a member of qemu-
 devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1701835
+https://bugs.launchpad.net/bugs/1825002
 
 Title:
-  floating-point operation bugs in qemu-alpha
+  "qemu: Unexpected FPU mode" since
+  0c1bbedc10e86ea9366b6af8c5520fafa3266b2f
 
 Status in QEMU:
-  New
+  In Progress
 
 Bug description:
-  When running the gnulib testsuite, I'm seeing test failures in the tests =
-for libm functions
-    cbrt
-    cbrtf
-    ceil
-    ceilf
-    coshf
-    exp2
-    exp2f
-    floor
-    floorf
-    fma
-    fmaf
-    fmal
-    frexp
-    frexpf
-    hypot
-    hypotf
-    hypotl
-    ilogb
-    ilogbf
-    isfinite
-    isinf
-    isnan
-    isnand
-    isnanf
-    ldexp
-    ldexpf
-    ldexpl
-    log1p
-    log1pf
-    log2
-    log2f
-    logb
-    logbf
-    logbl
-    rint
-    rintf
-    rintl
-    signbit
-    sqrt
-    sqrtf
-    strtod
-  that I don't see when running the same (statically linked) executables in=
- a VM, through qemu-system-alpha.
+  This happens every time I attempt to chroot into a gentoo-mips image
+  unless I load the executable via ld.so
 
-  How to reproduce:
-  - Using gnulib, run ./gnulib-tool --create-testdir --dir=3D../testdir-mat=
-h --single-configure cbrt cbrtf ceil ceilf coshf exp2 exp2f float floor flo=
-orf fma fmaf fmal frexp frexpf hypot hypotf hypotl ilogb ilogbf isfinite is=
-inf isnan isnand isnanf ldexp ldexpf ldexpl log1p log1pf log2 log2f logb lo=
-gbf logbl math printf-frexp rint rintf rintl round roundf signbit sqrt sqrt=
-f strtod trunc truncf
-  - Copy the resulting directory to a VM running Linux 2.6.26 with qemu-sys=
-tem-alpha.
-  - There, configure and build the package:
-    mkdir build-native-static; cd build-native-static; ../configure CPPFLAG=
-S=3D"-Wall" LDFLAGS=3D"-static"; make; make check
-    Only 4 tests fail.
-  - Copy the resulting binaries back to the original x86_64 machine.
-  - Set environment variables for using qemu-alpha.
-  - Here, 50 tests fail that did not fail originally:
+  /home (root)# chroot gentoo-mips32r2el /bin/sh
+  qemu: Unexpected FPU mode
+  /home (root)# chroot gentoo-mips32r2el /lib/ld-2.19.so /bin/sh
+  sh-4.2# exit
+  /home (root)# =
 
-  $ ~/inst-qemu/2.9.0/bin/qemu-alpha test-cbrt
-  ../../gltests/test-cbrt.h:39: assertion 'err > - L_(4.0) * L_(16.0) / TWO=
-_MANT_DIG && err < L_(4.0) * L_(16.0) / TWO_MANT_DIG' failed
-  Aborted (core dumped)
-  $ ~/inst-qemu/2.9.0/bin/qemu-alpha test-ceil1
-  Floating point exception (core dumped)
-  $ ~/inst-qemu/2.9.0/bin/qemu-alpha test-ceil2
-  Floating point exception (core dumped)
-  $ ~/inst-qemu/2.9.0/bin/qemu-alpha test-ceilf1
-  Floating point exception (core dumped)
-  $ ~/inst-qemu/2.9.0/bin/qemu-alpha test-ceilf2
-  Floating point exception (core dumped)
-  $ ~/inst-qemu/2.9.0/bin/qemu-alpha test-coshf =
 
-  ../../gltests/test-coshf.c:37: assertion 'y >=3D 1.1854652f && y <=3D 1.1=
-854653f' failed
-  Aborted (core dumped)
-  $ ~/inst-qemu/2.9.0/bin/qemu-alpha test-float
-  Floating point exception (core dumped)
-  $ ~/inst-qemu/2.9.0/bin/qemu-alpha test-floor1
-  Floating point exception (core dumped)
-  $ ~/inst-qemu/2.9.0/bin/qemu-alpha test-floor2
-  Floating point exception (core dumped)
-  $ ~/inst-qemu/2.9.0/bin/qemu-alpha test-floorf1
-  Floating point exception (core dumped)
-  $ ~/inst-qemu/2.9.0/bin/qemu-alpha test-floorf2
-  Floating point exception (core dumped)
-  $ ~/inst-qemu/2.9.0/bin/qemu-alpha test-fma1   =
+  I don't know the underlying cause, but keep in mind that we may lie
+  and claim to have an FPU when our CPU doesn't because of kernel
+  emulation that may not be present in the host kernel.  Don't know if
+  that's related.
 
-  Floating point exception (core dumped)
-  $ ~/inst-qemu/2.9.0/bin/qemu-alpha test-fma2
-  ../../gltests/test-fma2.h:116: assertion 'result =3D=3D expected' failed
-  Aborted (core dumped)
-  $ ~/inst-qemu/2.9.0/bin/qemu-alpha test-fmaf1
-  Floating point exception (core dumped)
-  $ ~/inst-qemu/2.9.0/bin/qemu-alpha test-fmaf2
-  ../../gltests/test-fma2.h:116: assertion 'result =3D=3D expected' failed
-  Aborted (core dumped)
-  $ ~/inst-qemu/2.9.0/bin/qemu-alpha test-fmal2
-  ../../gltests/test-fma2.h:116: assertion 'result =3D=3D expected' failed
-  Aborted (core dumped)
-  $ ~/inst-qemu/2.9.0/bin/qemu-alpha test-frexp
-  Floating point exception (core dumped)
-  $ ~/inst-qemu/2.9.0/bin/qemu-alpha test-frexpf
-  Floating point exception (core dumped)
-  $ ~/inst-qemu/2.9.0/bin/qemu-alpha test-hypot =
+  I get this with various gentoo-mips stage3 tarballs, but not with
+  OpenWRT.  (e.g.,
+  https://gentoo.osuosl.org/experimental/mips/stages/mips32r2el/2014)
 
-  Floating point exception (core dumped)
-  $ ~/inst-qemu/2.9.0/bin/qemu-alpha test-hypotf
-  Floating point exception (core dumped)
-  $ ~/inst-qemu/2.9.0/bin/qemu-alpha test-hypotl
-  ../../gltests/test-hypot.h:41: assertion 'z =3D=3D HUGEVAL' failed
-  Aborted (core dumped)
-  $ ~/inst-qemu/2.9.0/bin/qemu-alpha test-ilogb =
 
-  Floating point exception (core dumped)
-  $ ~/inst-qemu/2.9.0/bin/qemu-alpha test-ilogbf
-  Floating point exception (core dumped)
-  $ ~/inst-qemu/2.9.0/bin/qemu-alpha test-isfinite
-  Floating point exception (core dumped)
-  $ ~/inst-qemu/2.9.0/bin/qemu-alpha test-isinf   =
+  # emerge --info app-emulation/qemu
+  Portage 2.3.51 (python 3.6.5-final-0, default/linux/amd64/17.0/desktop/pl=
+asma, gcc-8.2.0, glibc-2.27-r6, 4.14.96-gentoo x86_64)
+  =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+                           System Settings
+  =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+  System uname: Linux-4.14.96-gentoo-x86_64-AMD_Ryzen_7_2700X_Eight-Core_Pr=
+ocessor-with-gentoo-2.6
+  KiB Mem:    32890732 total,   3480024 free
+  KiB Swap:   16777212 total,  10575592 free
+  Timestamp of repository gentoo: Thu, 11 Apr 2019 06:00:01 +0000
+  Head commit of repository gentoo: 66eaaa28926103e690db0699466a274a17ab1979
+  sh bash 4.4_p23-r1
+  ld GNU ld (Gentoo 2.30 p5) 2.30.0
+  distcc 3.3.2 x86_64-pc-linux-gnu [disabled]
+  ccache version 3.3.4 [disabled]
+  app-shells/bash:          4.4_p23-r1::gentoo
+  dev-java/java-config:     2.2.0-r4::gentoo
+  dev-lang/perl:            5.26.2::gentoo
+  dev-lang/python:          2.7.15::gentoo, 3.6.5::gentoo
+  dev-util/ccache:          3.3.4-r1::gentoo
+  dev-util/cmake:           3.9.6::gentoo
+  dev-util/pkgconfig:       0.29.2::gentoo
+  sys-apps/baselayout:      2.6-r1::gentoo
+  sys-apps/openrc:          0.38.3-r1::gentoo
+  sys-apps/sandbox:         2.13::gentoo
+  sys-devel/autoconf:       2.13-r1::gentoo, 2.64-r1::gentoo, 2.69-r4::gent=
+oo
+  sys-devel/automake:       1.11.6-r3::gentoo, 1.13.4-r2::gentoo, 1.15.1-r2=
+::gentoo, 1.16.1-r1::gentoo
+  sys-devel/binutils:       2.30-r4::gentoo
+  sys-devel/gcc:            4.9.4::gentoo, 5.4.0-r6::gentoo, 6.4.0-r5::gent=
+oo, 7.3.0-r6::gentoo, 8.1.0-r3::gentoo, 8.2.0-r6::gentoo, 8.3.0::gentoo
+  sys-devel/gcc-config:     2.0::gentoo
+  sys-devel/libtool:        2.4.6-r3::gentoo
+  sys-devel/make:           4.2.1-r4::gentoo
+  sys-kernel/linux-headers: 4.14-r1::gentoo (virtual/os-headers)
+  sys-libs/glibc:           2.27-r6::gentoo
+  Repositories:
 
-  Floating point exception (core dumped)
-  $ ~/inst-qemu/2.9.0/bin/qemu-alpha test-isnan
-  Floating point exception (core dumped)
-  $ ~/inst-qemu/2.9.0/bin/qemu-alpha test-isnand-nolibm
-  Floating point exception (core dumped)
-  $ ~/inst-qemu/2.9.0/bin/qemu-alpha test-isnand       =
+  gentoo
+      location: /usr/portage
+      sync-type: rsync
+      sync-uri: rsync://rsync.gentoo.org/gentoo-portage
+      priority: -1000
+      sync-rsync-verify-jobs: 1
+      sync-rsync-extra-opts: =
 
-  Floating point exception (core dumped)
-  $ ~/inst-qemu/2.9.0/bin/qemu-alpha test-isnanf-nolibm
-  Floating point exception (core dumped)
-  $ ~/inst-qemu/2.9.0/bin/qemu-alpha test-isnanf       =
+      sync-rsync-verify-metamanifest: yes
+      sync-rsync-verify-max-age: 24
 
-  Floating point exception (core dumped)
-  $ ~/inst-qemu/2.9.0/bin/qemu-alpha test-ldexp =
+  love-local
+      location: /usr/local/portage
+      masters: gentoo
+      priority: 0
 
-  Floating point exception (core dumped)
-  $ ~/inst-qemu/2.9.0/bin/qemu-alpha test-ldexpf
-  Floating point exception (core dumped)
-  $ ~/inst-qemu/2.9.0/bin/qemu-alpha test-ldexpl
-  ../../gltests/test-ldexp.h:99: assertion 'y =3D=3D expected' failed
-  Aborted (core dumped)
-  $ ~/inst-qemu/2.9.0/bin/qemu-alpha test-log1p =
+  chaoslab
+      location: /var/lib/layman/chaoslab
+      masters: gentoo
+      priority: 50
 
-  Floating point exception (core dumped)
-  $ ~/inst-qemu/2.9.0/bin/qemu-alpha test-log1pf
-  Floating point exception (core dumped)
-  $ ~/inst-qemu/2.9.0/bin/qemu-alpha test-log2  =
+  java
+      location: /var/lib/layman/java
+      masters: gentoo
+      priority: 50
 
-  Floating point exception (core dumped)
-  $ ~/inst-qemu/2.9.0/bin/qemu-alpha test-log2f
-  Floating point exception (core dumped)
-  $ ~/inst-qemu/2.9.0/bin/qemu-alpha test-logb =
+  steam-overlay
+      location: /var/lib/layman/steam-overlay
+      masters: gentoo
+      priority: 50
 
-  Floating point exception (core dumped)
-  $ ~/inst-qemu/2.9.0/bin/qemu-alpha test-logbf
-  Floating point exception (core dumped)
-  $ ~/inst-qemu/2.9.0/bin/qemu-alpha test-math =
+  zugaina
+      location: /var/lib/layman/zugaina
+      masters: gentoo
+      priority: 50
 
-  Floating point exception (core dumped)
-  $ ~/inst-qemu/2.9.0/bin/qemu-alpha test-printf-frexp
-  Floating point exception (core dumped)
-  $ ~/inst-qemu/2.9.0/bin/qemu-alpha test-rint        =
+  ACCEPT_KEYWORDS=3D"amd64"
+  ACCEPT_LICENSE=3D"* -@EULA"
+  CBUILD=3D"x86_64-pc-linux-gnu"
+  CFLAGS=3D"-march=3Dnative -O2 -ggdb3 -pipe"
+  CHOST=3D"x86_64-pc-linux-gnu"
+  CONFIG_PROTECT=3D"/etc /usr/lib64/libreoffice/program/sofficerc /usr/shar=
+e/config /usr/share/gnupg/qualified.txt"
+  CONFIG_PROTECT_MASK=3D"/etc/ca-certificates.conf /etc/dconf /etc/env.d /e=
+tc/fonts/fonts.conf /etc/gconf /etc/gentoo-release /etc/revdep-rebuild /etc=
+/sandbox.d /etc/splash /etc/terminfo /etc/texmf/language.dat.d /etc/texmf/l=
+anguage.def.d /etc/texmf/updmap.d /etc/texmf/web2c"
+  CXXFLAGS=3D"-march=3Dnative -O2 -ggdb3 -pipe"
+  DISTDIR=3D"/mnt/large/distfiles"
+  EMERGE_DEFAULT_OPTS=3D"-j3 --load-average=3D17.5 --with-bdeps=3Dy --autou=
+nmask=3Dn"
+  ENV_UNSET=3D"DBUS_SESSION_BUS_ADDRESS DISPLAY GOBIN PERL5LIB PERL5OPT PER=
+LPREFIX PERL_CORE PERL_MB_OPT PERL_MM_OPT XAUTHORITY XDG_CACHE_HOME XDG_CON=
+FIG_HOME XDG_DATA_HOME XDG_RUNTIME_DIR"
+  FCFLAGS=3D"-O2 -pipe"
+  FEATURES=3D"assume-digests binpkg-logs buildpkg candy cgroup compress-bui=
+ld-logs compressdebug config-protect-if-modified distlocks ebuild-locks fix=
+lafiles installsources ipc-sandbox merge-sync multilib-strict network-sandb=
+ox news parallel-fetch preserve-libs protect-owned sandbox sfperms split-el=
+og split-log splitdebug strict strict-keepdir unknown-features-warn unmerge=
+-logs unmerge-orphans userfetch userpriv usersandbox usersync xattr"
+  FFLAGS=3D"-O2 -pipe"
+  GENTOO_MIRRORS=3D"http://gentoo.mirrors.tds.net/gentoo http://gentoo.mirr=
+ors.easynews.com/linux/gentoo/ http://gentoo.osuosl.org/ http://mirrors.rit=
+.edu/gentoo/ http://gentoo.cs.uni.edu/ http://gentoo.osuosl.org/ "
+  LANG=3D"en_US.utf8"
+  LDFLAGS=3D"-Wl,-O1 -Wl,--as-needed"
+  LINGUAS=3D"en en-US en_US"
+  MAKEOPTS=3D"-j15 --load-average=3D17"
+  PKGDIR=3D"/mnt/large/packages"
+  PORTAGE_COMPRESS=3D"pxz"
+  PORTAGE_COMPRESS_FLAGS=3D"-9e"
+  PORTAGE_CONFIGROOT=3D"/"
+  PORTAGE_RSYNC_OPTS=3D"--recursive --links --safe-links --perms --times --=
+omit-dir-times --compress --force --whole-file --delete --stats --human-rea=
+dable --timeout=3D180 --exclude=3D/distfiles --exclude=3D/local --exclude=
+=3D/packages --exclude=3D/.git"
+  PORTAGE_TMPDIR=3D"/tmp"
+  USE=3D"X a52 aac aacs acl acpi activities aes aio alsa amd64 amr avx avx2=
+ bcache berkdb bluetooth bluray branding bzip2 cairo cdda cddb cdio cdr cel=
+t cli consolekit crypt cups cxx d3d9 dbus declarative designer device-mappe=
+r dirac directfb dot dri dts dvd dvdr emboss encode exif f16c fam ffmpeg ff=
+tw flac fluidsynth fma3 fontconfig fortran fuse gdbm geolocation gif git gl=
+amor go gphoto2 gpm gps graphite graphviz gsm gstreamer gtk hardened hddtem=
+p highlight iconv icu ipv6 jpeg jpeg2k kde kerberos kipi kwallet lame latex=
+ lcms ldap libass libcaca libnotify libsamplerate libtirpc lm_sensors lto l=
+vm lz4 lzma lzo mad matroska midi mjpeg mmx mmxext mng mono mp3 mp4 mpeg mt=
+p multicall multilib multitarget musepack natspec ncurses netlink networkma=
+nager nfs nls nptl nsplugin ogg openal openexr opengl openh264 openmp opens=
+sl opus osmesa pam pango pcap pch pclmul pcre pdf perl pgo phonon plasma pl=
+aylist png policykit popcnt postgres postproc ppds pulseaudio python qml qt=
+5 rar raw readline samba sasl savedconfig scanner schroedinger sdl seccomp =
+sensors sid smp snappy speex spell spice sqlite sqlite3 squashfs sse sse2 s=
+se3 sse4_1 sse4_2 sse4a ssh ssl ssse3 startup-notification static-libs subv=
+ersion svg syslog systemtap taglib tcpd theora threads tiff timidity tools =
+tremor truetype tty-helpers twolame udev udisks unicode upnp-av upower usb =
+usbredir utils v4l vaapi valgrind vcdx vdpau vim-syntax virt-network virtio=
+ vlc vorbis vpx webdav webp widgets wxwidgets x264 x265 xattr xcb xcomposit=
+e xen xine xml xspice xv xvid xvmc zeroconf zlib" ABI_X86=3D"64 32" ALSA_CA=
+RDS=3D"ali5451 als4000 atiixp atiixp-modem bt87x ca0106 cmipci emu10k1x ens=
+1370 ens1371 es1938 es1968 fm801 hda-intel intel8x0 intel8x0m maestro3 trid=
+ent usb-audio via82xx via82xx-modem ymfpci" APACHE2_MODULES=3D"authn_core a=
+uthz_core socache_shmcb unixd actions alias auth_basic authn_alias authn_an=
+on authn_dbm authn_default authn_file authz_dbm authz_default authz_groupfi=
+le authz_host authz_owner authz_user autoindex cache cgi cgid dav dav_fs da=
+v_lock deflate dir disk_cache env expires ext_filter file_cache filter head=
+ers include info log_config logio mem_cache mime mime_magic negotiation rew=
+rite setenvif speling status unique_id userdir usertrack vhost_alias" CALLI=
+GRA_FEATURES=3D"karbon sheets words" COLLECTD_PLUGINS=3D"df interface irq l=
+oad memory rrdtool swap syslog" CPU_FLAGS_X86=3D"aes avx avx2 f16c fma3 mmx=
+ mmxext pclmul popcnt sse sse2 sse3 sse4_1 sse4_2 sse4a ssse3" CURL_SSL=3D"=
+openssl" ELIBC=3D"glibc" GPSD_PROTOCOLS=3D"ashtech aivdm earthmate evermore=
+ fv18 garmin garmintxt gpsclock isync itrax mtk3301 nmea ntrip navcom ocean=
+server oldstyle oncore rtcm104v2 rtcm104v3 sirf skytraq superstar2 timing t=
+sip tripmate tnt ublox ubx" GRUB_PLATFORMS=3D"efi-64 pc coreboot emu multib=
+oot qemu xen" INPUT_DEVICES=3D"keyboard mouse joystick evdev wacom vmmouse"=
+ KERNEL=3D"linux" L10N=3D"en en-US en_US" LCD_DEVICES=3D"bayrad cfontz cfon=
+tz633 glk hd44780 lb216 lcdm001 mtxorb ncurses text" LIBREOFFICE_EXTENSIONS=
+=3D"presenter-console presenter-minimizer" LLVM_TARGETS=3D"AMDGPU ARM BPF N=
+VPTX Mips X86" NETBEANS_MODULES=3D"apisupport cnd groovy gsf harness ide id=
+entity j2ee java mobility nb php profiler soa visualweb webcommon websvccom=
+mon xml" OFFICE_IMPLEMENTATION=3D"libreoffice" PHP_TARGETS=3D"php5-6 php7-1=
+" POSTGRES_TARGETS=3D"postgres9_5 postgres10" PYTHON_SINGLE_TARGET=3D"pytho=
+n3_6" PYTHON_TARGETS=3D"python2_7 python3_6" QEMU_SOFTMMU_TARGETS=3D"aarch6=
+4 arm armeb i386 hppa m68k microblaze microblazeel mips mips64 mips64el mip=
+sel mipsn32 mipsn32el ppc ppc64 ppc64abi32 ppc64le s390x sparc sparc32plus =
+sparc64 x86_64" QEMU_USER_TARGETS=3D"aarch64 arm armeb i386 hppa m68k micro=
+blaze microblazeel mips mips64 mips64el mipsel mipsn32 mipsn32el ppc ppc64 =
+ppc64abi32 ppc64le s390x sparc sparc32plus sparc64 x86_64" RUBY_TARGETS=3D"=
+ruby24" USERLAND=3D"GNU" VIDEO_CARDS=3D"radeon radeonsi vesa qxl vmware amd=
+gpu" XTABLES_ADDONS=3D"quota2 psd pknock lscan length2 ipv4options ipset ip=
+p2p iface geoip fuzzy condition tee tarpit sysrq steal rawnat logmark ipmar=
+k dhcpmac delude chaos account"
+  Unset:  CC, CPPFLAGS, CTARGET, CXX, INSTALL_MASK, LC_ALL, PORTAGE_BINHOST=
+, PORTAGE_BUNZIP2_COMMAND, PORTAGE_RSYNC_EXTRA_OPTS
 
-  ../../gltests/test-rint.c:63: assertion 'rint (0.7) =3D=3D 1.0' failed
-  Aborted (core dumped)
-  $ ~/inst-qemu/2.9.0/bin/qemu-alpha test-rintf
-  ../../gltests/test-rintf.c:63: assertion 'rintf (0.7f) =3D=3D 1.0f' failed
-  Aborted (core dumped)
-  $ ~/inst-qemu/2.9.0/bin/qemu-alpha test-rintl
-  ../../gltests/test-rintl.c:68: assertion 'rintl (0.7L) =3D=3D 1.0L' failed
-  Aborted (core dumped)
-  $ ~/inst-qemu/2.9.0/bin/qemu-alpha test-round1
-  Floating point exception (core dumped)
-  $ ~/inst-qemu/2.9.0/bin/qemu-alpha test-roundf1
-  Floating point exception (core dumped)
-  $ ~/inst-qemu/2.9.0/bin/qemu-alpha test-signbit
-  Floating point exception (core dumped)
-  $ ~/inst-qemu/2.9.0/bin/qemu-alpha test-sqrt   =
+  =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+                          Package Settings
+  =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
 
-  ../../gltests/test-sqrt.h:40: assertion 'err > - L_(16.0) / TWO_MANT_DIG =
-&& err < L_(16.0) / TWO_MANT_DIG' failed
-  Aborted (core dumped)
-  $ ~/inst-qemu/2.9.0/bin/qemu-alpha test-trunc1
-  Floating point exception (core dumped)
-  $ ~/inst-qemu/2.9.0/bin/qemu-alpha test-truncf1
-  Floating point exception (core dumped)
+  app-emulation/qemu-3.1.0-r4::gentoo was built with the following:
+  USE=3D"aio alsa bzip2 caps curl fdt filecaps gtk jpeg lzo ncurses nfs nls=
+ opengl pin-upstream-blobs png pulseaudio python sasl sdl seccomp snappy sp=
+ice ssh static-user systemtap usb usbredir vde vhost-net virtfs vnc vte xat=
+tr xen -accessibility (-capstone) -debug (-glusterfs) -gnutls -infiniband -=
+iscsi -numa -rbd (-selinux) -smartcard (-static) -tci -test -virgl -xfs" AB=
+I_X86=3D"(64)" PYTHON_TARGETS=3D"python2_7 python3_6 -python3_5 (-python3_7=
+)" QEMU_SOFTMMU_TARGETS=3D"aarch64 arm hppa i386 m68k microblaze microblaze=
+el mips mips64 mips64el mipsel ppc ppc64 s390x sparc sparc64 x86_64 -alpha =
+-cris -lm32 -moxie -nios2 -or1k -riscv32 -riscv64 -sh4 -sh4eb -tricore -uni=
+core32 -xtensa -xtensaeb" QEMU_USER_TARGETS=3D"aarch64 arm armeb hppa i386 =
+m68k microblaze microblazeel mips mips64 mips64el mipsel mipsn32 mipsn32el =
+ppc ppc64 ppc64abi32 ppc64le s390x sparc sparc32plus sparc64 x86_64 -aarch6=
+4_be -alpha -cris -nios2 -or1k -riscv32 -riscv64 -sh4 -sh4eb -tilegx -xtens=
+a -xtensaeb"
+
+  >>> Attempting to run pkg_info() for 'app-emulation/qemu-3.1.0-r4'
+  Using:
+    app-emulation/spice-protocol-0.12.14
+    sys-firmware/edk2-ovmf-2017_p20180211
+      USE=3Dbinary
+    sys-firmware/ipxe-1.0.0_p20180211
+    sys-firmware/seabios-1.11.0
+      USE=3Dbinary
+    sys-firmware/sgabios-0.1_pre8-r1
 
 To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1701835/+subscriptions
+https://bugs.launchpad.net/qemu/+bug/1825002/+subscriptions
 
