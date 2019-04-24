@@ -2,68 +2,54 @@ Return-Path: <SRS0=3XOk=S2=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.3 required=3.0 tests=FROM_EXCESS_BASE64,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_PASS,URIBL_BLOCKED,USER_AGENT_MUTT autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-2.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 30E1BC10F11
-	for <qemu-devel@archiver.kernel.org>; Wed, 24 Apr 2019 12:51:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D5D62C10F11
+	for <qemu-devel@archiver.kernel.org>; Wed, 24 Apr 2019 13:00:56 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 03A09218B0
-	for <qemu-devel@archiver.kernel.org>; Wed, 24 Apr 2019 12:51:53 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 03A09218B0
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id A6C0821773
+	for <qemu-devel@archiver.kernel.org>; Wed, 24 Apr 2019 13:00:56 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A6C0821773
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=rt-rk.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:41238 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:41348 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hJHNQ-0000XU-Aq
-	for qemu-devel@archiver.kernel.org; Wed, 24 Apr 2019 08:51:52 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:45891)
+	id 1hJHWB-0003Qy-H5
+	for qemu-devel@archiver.kernel.org; Wed, 24 Apr 2019 09:00:55 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:47706)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1hJHMb-0008OP-2X
-	for qemu-devel@nongnu.org; Wed, 24 Apr 2019 08:51:02 -0400
+	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1hJHUf-0002Y5-VU
+	for qemu-devel@nongnu.org; Wed, 24 Apr 2019 08:59:26 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1hJHMZ-0006NT-OT
-	for qemu-devel@nongnu.org; Wed, 24 Apr 2019 08:51:01 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:59318)
+	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1hJHUC-0000S3-UB
+	for qemu-devel@nongnu.org; Wed, 24 Apr 2019 08:59:18 -0400
+Received: from mx2.rt-rk.com ([89.216.37.149]:54580 helo=mail.rt-rk.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>)
-	id 1hJHMW-0006B7-Ju; Wed, 24 Apr 2019 08:50:56 -0400
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
-	[10.5.11.13])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 64DD8307D867;
-	Wed, 24 Apr 2019 12:50:55 +0000 (UTC)
-Received: from redhat.com (ovpn-112-50.ams2.redhat.com [10.36.112.50])
-	by smtp.corp.redhat.com (Postfix) with ESMTPS id D5885648A3;
-	Wed, 24 Apr 2019 12:50:49 +0000 (UTC)
-Date: Wed, 24 Apr 2019 13:50:46 +0100
-From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-To: Thomas Huth <thuth@redhat.com>
-Message-ID: <20190424125046.GJ31388@redhat.com>
-References: <20190424103747.10173-1-thuth@redhat.com>
-	<20190424103747.10173-3-thuth@redhat.com>
-	<20190424112537.GF31388@redhat.com>
-	<c2202c0c-e504-7678-d1f3-6afc67bd2164@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
-Content-Disposition: inline
-In-Reply-To: <c2202c0c-e504-7678-d1f3-6afc67bd2164@redhat.com>
-User-Agent: Mutt/1.11.3 (2019-02-01)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.48]);
-	Wed, 24 Apr 2019 12:50:55 +0000 (UTC)
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH 2/6] tests/qemu-iotests/group: Introduce a
- new "ci" group for CI pipelines
+	(Exim 4.71) (envelope-from <aleksandar.markovic@rt-rk.com>)
+	id 1hJHUC-0007JT-Ni
+	for qemu-devel@nongnu.org; Wed, 24 Apr 2019 08:58:52 -0400
+Received: from localhost (localhost [127.0.0.1])
+	by mail.rt-rk.com (Postfix) with ESMTP id 549A01A413C;
+	Wed, 24 Apr 2019 14:57:48 +0200 (CEST)
+X-Virus-Scanned: amavisd-new at rt-rk.com
+Received: from rtrkw774-lin.domain.local (rtrkw774-lin.domain.local
+	[10.10.13.43])
+	by mail.rt-rk.com (Postfix) with ESMTPSA id F211C1A23E6;
+	Wed, 24 Apr 2019 14:57:47 +0200 (CEST)
+From: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>
+To: qemu-devel@nongnu.org
+Date: Wed, 24 Apr 2019 14:56:58 +0200
+Message-Id: <1556110623-655-1-git-send-email-aleksandar.markovic@rt-rk.com>
+X-Mailer: git-send-email 2.7.4
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x
+X-Received-From: 89.216.37.149
+Subject: [Qemu-devel] [PATCH v2 0/5] linux-user: A set of misc patches for
+ 4.1
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -75,113 +61,47 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-Cc: Fam Zheng <fam@euphon.net>, Kevin Wolf <kwolf@redhat.com>,
-	Ed Maste <emaste@freebsd.org>, qemu-block@nongnu.org,
-	Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
-	qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>,
-	Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>,
-	Li-Wen Hsu <lwhsu@freebsd.org>
+Cc: lvivier@redhat.com, thuth@redhat.com, jcmvbkbc@gmail.com,
+	arikalo@wavecomp.com, daniel.santos@pobox.com,
+	amarkovic@wavecomp.com, philmd@redhat.com, aurelien@aurel32.net
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190424125046.0ZZSou6K_XNBEHRXMZHo3k9at6duOmcb2vH25G6fPr8@z>
+Content-Type: text/plain; charset="UTF-8"
+Message-ID: <20190424125658.z1TP0SvBjNFXtRVcCNDqO_wYx0KoSpimar5GI1qA2u8@z>
 
-On Wed, Apr 24, 2019 at 02:37:02PM +0200, Thomas Huth wrote:
-> On 24/04/2019 13.25, Daniel P. Berrang=C3=A9 wrote:
-> > On Wed, Apr 24, 2019 at 12:37:43PM +0200, Thomas Huth wrote:
-> >> Tests in this group are supposed to run in every possible QEMU confi=
-guration.
-> >> That means they should run with every QEMU binary (also non-x86), wi=
-thout
-> >> dependencies on an optional features, they must work at least with t=
-he qcow2
-> >> image format and be able to run on all kind of host filesystems and =
-users
-> >> (i.e. also as "nobody" or "root").
-> >>
-> >> The initial list has been created as a subset of the "quick" group, =
-where
-> >> I've disabled all tests that are failing with qemu-system-aarch64 or
-> >> qemu-system-tricore or in one of our CI pipelines.
-> >>
-> >> Signed-off-by: Thomas Huth <thuth@redhat.com>
-> >> ---
-> >>  tests/qemu-iotests/group | 194 ++++++++++++++++++++----------------=
----
-> >>  1 file changed, 102 insertions(+), 92 deletions(-)
-> >>
-> >> diff --git a/tests/qemu-iotests/group b/tests/qemu-iotests/group
-> >> index bae7718380..2ed42dcc14 100644
-> >> --- a/tests/qemu-iotests/group
-> >> +++ b/tests/qemu-iotests/group
-> >> @@ -4,63 +4,73 @@
-> >>  # - do not start group names with a digit
-> >>  #
-> >> =20
-> >> +#
-> >> +# Some notes about the groups:
-> >> +# - Tests in the "quick" group should finish within some few second=
-s
-> >> +# - Tests in the "ci" group are suitable for running in CI systems.=
- That
-> >> +#   means they should run with every QEMU binary (also non-x86), wi=
-th
-> >> +#   every QEMU configuration (i.e. no dependency on an optional fea=
-ture),
-> >> +#   at least with the qcow2 image format and all kind of host files=
-ystems
-> >> +#   and users (i.e. also as "nobody" or "root").
-> >=20
-> > No dependancy on optional features feels a bit restrictive from my PO=
-V.
-> >=20
-> > We have quite alot of testing coverage of stuff that depends on the
-> > crypto libraries that is important for us to run in "CI". This includ=
-es
-> > LUKS block drivers, qcow2 with LUKS,  NBD with TLS. Personally I expe=
-ct
-> > all of those to be tested by CI systems.
-> >=20
-> > IOW for a "CI" group, the bar should be higher than "no optional feat=
-ures"
->=20
-> Ok, I think I just did not write it properly. What I meant was: the tes=
-t
-> should not *fail* because of a missing feature (what some tests are
-> unfortunately doing). It's fine if the test detects the missing feature
-> and then marks the test as *skip*.
+From: Aleksandar Markovic <amarkovic@wavecomp.com>
 
-Ok, this brings back the topic I don't think we ever resolved around how
-to best "detect" features in the iotests. eg if we want to know whether
-we can use TLS features, how do we decide this ?
+This is a collection of misc patches for kinux user that I recently
+collected. Most of them originate from problems observed on target
+mips. However, all of them actually fix problems on multiple
+targets.
 
-One option is to do a dummy launch of QEMU using TLS & check if it fails,
-but that's kind of fragile for CI. A genuine bug in QEMU might cause this
-dummy launch to fail, and thus mistakenly skip all the tests instead of
-failing.
+v1->v2:
 
-We can't look at config-host.{h,mak} either as iotests are supposed to be
-runnable outside of a build tree.
+  - added the patch on setsockopt()'s option IPV6_ADD_MEMBERSHIP
+  - improved the commit message of interp_info sanitizing patch
 
-We could look at whether gnutls is linked to QEMU but again that is going
-to be fragile if a bug in configure causes us to mistakenly stop enabling
-gnutls.
+Aleksandar Markovic (2):
+  linux-user: Fix support for the SIOCATMARK and SIOCGPGRP ioctls for
+    eXtensa
+  linux-user: Add support for the SIOCSPGRP ioctl
 
-For developers, dynamically probing features & skipping is reasonable.
+Daniel Santos (1):
+  linux-user: Sanitize interp_info and, for mips only, init field fp_abi
 
-For automated CI, I think we should set clear desired featureset upfront
-based on what we know we are supposde to have available and not silently
-skip tests
+Neng Chen (2):
+  linux-user: Add support the SIOCSIFPFLAGS and SIOCGIFPFLAGS ioctls
+  linux-user: setsockopt(): Add support for the option
+    IPV6_ADD_MEMBERSHIP
 
+ linux-user/elfload.c      |  5 +++++
+ linux-user/ioctls.h       |  3 +++
+ linux-user/syscall.c      | 18 ++++++++++++++++++
+ linux-user/syscall_defs.h |  8 +++++++-
+ 4 files changed, 33 insertions(+), 1 deletion(-)
 
-Regards,
-Daniel
---=20
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberran=
-ge :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.c=
-om :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberran=
-ge :|
+-- 
+2.7.4
+
 
