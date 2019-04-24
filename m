@@ -5,69 +5,69 @@ X-Spam-Level:
 X-Spam-Status: No, score=-0.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	MAILING_LIST_MULTI,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E3AEEC10F11
-	for <qemu-devel@archiver.kernel.org>; Wed, 24 Apr 2019 06:12:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3F7DCC10F11
+	for <qemu-devel@archiver.kernel.org>; Wed, 24 Apr 2019 06:16:39 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B37C62089F
-	for <qemu-devel@archiver.kernel.org>; Wed, 24 Apr 2019 06:12:50 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B37C62089F
+	by mail.kernel.org (Postfix) with ESMTPS id BA3142089F
+	for <qemu-devel@archiver.kernel.org>; Wed, 24 Apr 2019 06:16:38 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BA3142089F
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:36460 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:36509 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hJB9F-0005cU-WC
-	for qemu-devel@archiver.kernel.org; Wed, 24 Apr 2019 02:12:50 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:54416)
+	id 1hJBCv-0007WF-Kv
+	for qemu-devel@archiver.kernel.org; Wed, 24 Apr 2019 02:16:37 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:55838)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1hJB7X-0004hr-SH
-	for qemu-devel@nongnu.org; Wed, 24 Apr 2019 02:11:05 -0400
+	(envelope-from <bounces@canonical.com>) id 1hJBC9-0007Bq-Vr
+	for qemu-devel@nongnu.org; Wed, 24 Apr 2019 02:15:51 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1hJB7V-0000mX-Rh
-	for qemu-devel@nongnu.org; Wed, 24 Apr 2019 02:11:03 -0400
-Received: from indium.canonical.com ([91.189.90.7]:42766)
+	(envelope-from <bounces@canonical.com>) id 1hJBC8-000599-JM
+	for qemu-devel@nongnu.org; Wed, 24 Apr 2019 02:15:49 -0400
+Received: from indium.canonical.com ([91.189.90.7]:43402)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1hJB7V-0000lK-LB
-	for qemu-devel@nongnu.org; Wed, 24 Apr 2019 02:11:01 -0400
+	id 1hJBC8-00055i-Ct
+	for qemu-devel@nongnu.org; Wed, 24 Apr 2019 02:15:48 -0400
 Received: from loganberry.canonical.com ([91.189.90.37])
 	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1hJB7U-0006yi-Ps
-	for <qemu-devel@nongnu.org>; Wed, 24 Apr 2019 06:11:00 +0000
+	id 1hJBC7-0007Ng-2M
+	for <qemu-devel@nongnu.org>; Wed, 24 Apr 2019 06:15:47 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id C14AE2E80CF
-	for <qemu-devel@nongnu.org>; Wed, 24 Apr 2019 06:11:00 +0000 (UTC)
+	by loganberry.canonical.com (Postfix) with ESMTP id 096072E80CB
+	for <qemu-devel@nongnu.org>; Wed, 24 Apr 2019 06:15:47 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Wed, 24 Apr 2019 06:01:34 -0000
-From: Thomas Huth <1803872@bugs.launchpad.net>
+Date: Wed, 24 Apr 2019 06:01:10 -0000
+From: Thomas Huth <1523246@bugs.launchpad.net>
 To: qemu-devel@nongnu.org
 X-Launchpad-Notification-Type: bug
-X-Launchpad-Bug: product=qemu; status=Fix Released; importance=Undecided;
+X-Launchpad-Bug: product=qemu; status=Fix Released; importance=Wishlist;
 	assignee=None; 
+X-Launchpad-Bug-Tags: trim virtio windows
 X-Launchpad-Bug-Information-Type: Public
 X-Launchpad-Bug-Private: no
 X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: amirgon berrange dgilbert-h eblake imammedo
-	marcandre-lureau mst-0 pmaydell
-X-Launchpad-Bug-Reporter: Amir Gonnen (amirgon)
+X-Launchpad-Bug-Commenters: jamespharvey20 manouchehri mikemol rustamabd
+	socketpair stefanha th-huth
+X-Launchpad-Bug-Reporter: David Manouchehri (manouchehri)
 X-Launchpad-Bug-Modifier: Thomas Huth (th-huth)
-References: <154254872666.7803.12367996737502527787.malonedeb@wampee.canonical.com>
+References: <20151206150708.14182.82430.malonedeb@wampee.canonical.com>
 Message-Id:
- <155608569531.13864.14754380970849607768.launchpad@wampee.canonical.com>
+ <155608567235.13969.11591304391473188281.launchpad@gac.canonical.com>
 X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
 X-Launchpad-Message-For: qemu-devel-ml
 Precedence: bulk
 X-Generated-By: Launchpad (canonical.com); Revision="18928";
 	Instance="launchpad-lazr.conf"
-X-Launchpad-Hash: 06d58abaffa2c7f99f1fe37b88438d02fc406953
+X-Launchpad-Hash: 1ffb0c9ad0ef95e12bf6bc2b2031122e2eca87b8
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 91.189.90.7
-Subject: [Qemu-devel] [Bug 1803872] Re: gcc 8.2 reports stringop-truncation
- when building qemu
+Subject: [Qemu-devel] [Bug 1523246] Re: Virtio-blk does not support TRIM
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 List-Id: <qemu-devel.nongnu.org>
@@ -78,11 +78,11 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1803872 <1803872@bugs.launchpad.net>
+Reply-To: Bug 1523246 <1523246@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190424060134.bE95pI3J9oFjQDcO1uYyTHtEi12FoAUbMN1YX1goX00@z>
+Message-ID: <20190424060110.O863uTeX6b_Sc8FGVRxPx2Dh2EzCALoeSWihEbqhld4@z>
 
 ** Changed in: qemu
        Status: Fix Committed =3D> Fix Released
@@ -91,38 +91,34 @@ Message-ID: <20190424060134.bE95pI3J9oFjQDcO1uYyTHtEi12FoAUbMN1YX1goX00@z>
 
 You received this bug notification because you are a member of qemu-
 devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1803872
+https://bugs.launchpad.net/bugs/1523246
 
 Title:
-  gcc 8.2 reports stringop-truncation when building qemu
+  Virtio-blk does not support TRIM
 
 Status in QEMU:
   Fix Released
 
 Bug description:
-  QEMU 3.0
+  When model=3Dvirtio is used, TRIM is not supported.
 
-  block/sheepdog.c: In function 'find_vdi_name':
-  block/sheepdog.c:1239:5: error: 'strncpy' specified bound 256 equals dest=
-ination size [-Werror=3Dstringop-truncation]
-  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0strncpy(buf + SD_MAX_VDI_LEN, tag, SD_MAX_V=
-DI_TAG_LEN);
-  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~=
-~~~~~~~~~~~
+  # mount -o discard /dev/vda4 /mnt
+  # mount | tail -1
+  /dev/vda4 on /mnt type fuseblk (rw,nosuid,nodev,relatime,user_id=3D0,grou=
+p_id=3D0,allow_other,blksize=3D4096)
+  # fstrim /mnt/
+  fstrim: /mnt/: the discard operation is not supported
 
-  If this is the intended behavior, please suppress the warning. For
-  example:
+  Booting without model=3Dvirtio allows using TRIM (in Windows as well).
 
-  #pragma GCC diagnostic push
-  #pragma GCC diagnostic ignored "-Wstringop-truncation"
-  =C2=A0=C2=A0=C2=A0=C2=A0strncpy(buf + SD_MAX_VDI_LEN, tag, SD_MAX_VDI_TAG=
-_LEN);
-  #pragma GCC diagnostic pop
+  Full QEMU line:
 
-  This also happens on other sources, for example hw/acpi/core.c, so
-  another option is to suppress it globally on CFLAGS (-Wno-stringop-
-  truncation)
+  qemu-system-x86_64 -enable-kvm -cpu host -bios
+  /usr/share/ovmf/ovmf_x64.bin -smp 2 -m 7G -vga qxl -usbdevice tablet
+  -net nic,model=3Dvirtio -net user -drive discard=3Dunmap,detect-
+  zeroes=3Dunmap,cache=3Dnone,file=3Dvms/win10.hd.img.vmdk,format=3Dvmdk,if=
+=3Dvirtio
 
 To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1803872/+subscriptions
+https://bugs.launchpad.net/qemu/+bug/1523246/+subscriptions
 
