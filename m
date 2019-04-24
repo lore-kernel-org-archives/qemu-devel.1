@@ -2,63 +2,92 @@ Return-Path: <SRS0=3XOk=S2=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.4 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_PASS,URIBL_BLOCKED,USER_AGENT_MUTT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-4.0 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4B0F9C10F03
-	for <qemu-devel@archiver.kernel.org>; Wed, 24 Apr 2019 01:02:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7432DC10F03
+	for <qemu-devel@archiver.kernel.org>; Wed, 24 Apr 2019 01:28:47 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 18E862148D
-	for <qemu-devel@archiver.kernel.org>; Wed, 24 Apr 2019 01:02:49 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 18E862148D
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.intel.com
+	by mail.kernel.org (Postfix) with ESMTPS id 35234218DA
+	for <qemu-devel@archiver.kernel.org>; Wed, 24 Apr 2019 01:28:47 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="sVvYziBO"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 35234218DA
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:33706 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:33901 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hJ6JE-0007Ve-FB
-	for qemu-devel@archiver.kernel.org; Tue, 23 Apr 2019 21:02:48 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:60275)
+	id 1hJ6iM-0003j1-FE
+	for qemu-devel@archiver.kernel.org; Tue, 23 Apr 2019 21:28:46 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:37819)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richardw.yang@linux.intel.com>) id 1hJ6IF-0007CV-6T
-	for qemu-devel@nongnu.org; Tue, 23 Apr 2019 21:01:48 -0400
+	(envelope-from <richard.henderson@linaro.org>) id 1hJ6h4-0002zp-IA
+	for qemu-devel@nongnu.org; Tue, 23 Apr 2019 21:27:27 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richardw.yang@linux.intel.com>) id 1hJ6IE-0003PI-07
-	for qemu-devel@nongnu.org; Tue, 23 Apr 2019 21:01:47 -0400
-Received: from mga09.intel.com ([134.134.136.24]:12614)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <richardw.yang@linux.intel.com>)
-	id 1hJ6ID-0003Lx-Mw
-	for qemu-devel@nongnu.org; Tue, 23 Apr 2019 21:01:45 -0400
-X-Amp-Result: UNSCANNABLE
-X-Amp-File-Uploaded: False
-Received: from orsmga006.jf.intel.com ([10.7.209.51])
-	by orsmga102.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384;
-	23 Apr 2019 18:01:34 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.60,387,1549958400"; d="scan'208";a="138267874"
-Received: from richard.sh.intel.com (HELO localhost) ([10.239.159.54])
-	by orsmga006.jf.intel.com with ESMTP; 23 Apr 2019 18:01:32 -0700
-Date: Wed, 24 Apr 2019 09:01:05 +0800
-From: Wei Yang <richardw.yang@linux.intel.com>
-To: Stefan Hajnoczi <stefanha@redhat.com>
-Message-ID: <20190424010105.GA12824@richard>
-References: <20190422004849.26463-1-richardw.yang@linux.intel.com>
-	<20190422004849.26463-2-richardw.yang@linux.intel.com>
-	<20190423092518.GD32465@stefanha-x1.localdomain>
+	(envelope-from <richard.henderson@linaro.org>) id 1hJ6h3-00079e-Jg
+	for qemu-devel@nongnu.org; Tue, 23 Apr 2019 21:27:26 -0400
+Received: from mail-pf1-x443.google.com ([2607:f8b0:4864:20::443]:36898)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+	id 1hJ6h1-00077B-Kw
+	for qemu-devel@nongnu.org; Tue, 23 Apr 2019 21:27:25 -0400
+Received: by mail-pf1-x443.google.com with SMTP id 8so8403729pfr.4
+	for <qemu-devel@nongnu.org>; Tue, 23 Apr 2019 18:27:22 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+	h=subject:to:references:from:openpgp:message-id:date:user-agent
+	:mime-version:in-reply-to:content-language:content-transfer-encoding;
+	bh=NBLEvRIjRGhMKAVexH9SVdSYnNnSzp3ixEGv6UvlgBo=;
+	b=sVvYziBOPKz5Axa5XEkWdQtjlSwadGKxnows590qfsGX3MIcVJgpjEv1Qx+v8lz8S7
+	MtdZyqGZ/byQHynn5a+u6QmzE2kfQXPPf4UMFVPG6nwXSWtpl7ZDSfZLH1myNKc3ycje
+	gxoUsXHu9X8EFCyxGnzroGckU0YT5oyNC5hxZRqGX21gfG6xCMo/VbxjKlkyKhJn71jb
+	8Zch/EMmyEL0pO0ZnPe/1jzmCRqIukXtXB+o4pP9egInRn1C/r3cFd5O/OU9hAEMbEOb
+	b0bgfh+TbPqmxJumpYznPRmVmTxTU0oFuOb3yqwizjW6qt7erDyKurvXWB5sfyU1So74
+	GsQw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=1e100.net; s=20161025;
+	h=x-gm-message-state:subject:to:references:from:openpgp:message-id
+	:date:user-agent:mime-version:in-reply-to:content-language
+	:content-transfer-encoding;
+	bh=NBLEvRIjRGhMKAVexH9SVdSYnNnSzp3ixEGv6UvlgBo=;
+	b=tl2FApcJk8EaiJ7IM5tO2+nOt5zt2wRwmqu/+cS4VjdLYzj+dbumuky6cfu5HQQhxi
+	aW8bVl3Sat1wRopvUfPCDiqGrTio4Nl3jjksYHjcRRwQl+WsWk/Sir3OjE5/bciaGbdM
+	bZI5y80l1OXwTpS1tLCipeYCpdJ50uGOiB6JRyrCo+hycrhVUuqIs4HHksPiW6IhdhXD
+	+ck5IKJV54IrETq7MMs62QYDhcNnEoSdddEG6FTSEZ9LZfX2Xkkm5YgZrEXMWTPXn+Ai
+	MMSVJMs5qa4mKB9GWoAwR0BfMy7L5p6s+OivUh9xAGU6KLeKGsciVd9Ytwj+lemv8C/H
+	MkjA==
+X-Gm-Message-State: APjAAAUG0tsljKg4OSp8cug/p1GgtX1o5SvmQvg5F+WextIS+42Bl8e1
+	lxIlVxbYY8p8NR5Zj/dBs2Cz7vOxXYU=
+X-Google-Smtp-Source: APXvYqwUEtm5YGN2o/w8XY4gpt+6w61PoghYabrZ6Eu0DTWT60A33zmcmbEymU4n5Zshv44BEgV4iw==
+X-Received: by 2002:a63:e304:: with SMTP id f4mr27788981pgh.374.1556069240792; 
+	Tue, 23 Apr 2019 18:27:20 -0700 (PDT)
+Received: from [192.168.1.11] (97-113-179-147.tukw.qwest.net. [97.113.179.147])
+	by smtp.gmail.com with ESMTPSA id r5sm1545142pgv.52.2019.04.23.18.27.19
+	(version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+	Tue, 23 Apr 2019 18:27:20 -0700 (PDT)
+To: Peter Maydell <peter.maydell@linaro.org>, qemu-arm@nongnu.org,
+	qemu-devel@nongnu.org
+References: <20190416125744.27770-1-peter.maydell@linaro.org>
+	<20190416125744.27770-23-peter.maydell@linaro.org>
+From: Richard Henderson <richard.henderson@linaro.org>
+Openpgp: preference=signencrypt
+Message-ID: <59198f7b-231e-939a-6bf4-77649513f881@linaro.org>
+Date: Tue, 23 Apr 2019 18:27:17 -0700
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+	Thunderbird/60.6.1
 MIME-Version: 1.0
+In-Reply-To: <20190416125744.27770-23-peter.maydell@linaro.org>
 Content-Type: text/plain; charset="UTF-8"
-Content-Disposition: inline
-In-Reply-To: <20190423092518.GD32465@stefanha-x1.localdomain>
-User-Agent: Mutt/1.10.1 (2018-07-13)
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
 	recognized.
-X-Received-From: 134.134.136.24
-Subject: Re: [Qemu-devel] [PATCH v14 1/2] util/mmap-alloc: support MAP_SYNC
- in qemu_ram_mmap()
+X-Received-From: 2607:f8b0:4864:20::443
+Subject: Re: [Qemu-devel] [PATCH 22/26] target/arm: Add lazy-FP-stacking
+ support to v7m_stack_write()
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -70,69 +99,32 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Wei Yang <richardw.yang@linux.intel.com>
-Cc: pagupta@redhat.com, xiaoguangrong.eric@gmail.com, mst@redhat.com,
-	qemu-devel@nongnu.org, yi.z.zhang@linux.intel.com,
-	yu.c.zhang@linux.intel.com, Wei Yang <richardw.yang@linux.intel.com>,
-	Haozhong Zhang <haozhong.zhang@intel.com>, imammedo@redhat.com,
-	pbonzini@redhat.com, dan.j.williams@intel.com, ehabkost@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190424010105.HeG1_cHsnZz_O-h9laCMIqmnsaGrA9hLr6OBYDe8AEA@z>
+Message-ID: <20190424012717.U3zQAePXBmZ4HQQt_qj9bvVP2Hp-QTfoFUqnz69muM4@z>
 
-On Tue, Apr 23, 2019 at 10:25:18AM +0100, Stefan Hajnoczi wrote:
-[...]
->> +#ifdef CONFIG_LINUX
->> +#include <linux/mman.h>
->> +#else  /* !CONFIG_LINUX */
->> +#define MAP_SYNC              0x0
->> +#define MAP_SHARED_VALIDATE   0x0
->> +#endif /* CONFIG_LINUX */
->
->MAP_SHARED_VALIDATE is is from 2017:
->
->  commit 1c9725974074a047f6080eecc62c50a8e840d050
->  Author: Dan Williams <dan.j.williams@intel.com>
->  Date:   Wed Nov 1 16:36:30 2017 +0100
->
->    mm: introduce MAP_SHARED_VALIDATE, a mechanism to safely define new mmap flags
->
->This code fails to compile on Linux hosts with pre-4.15 headers.
->
+On 4/16/19 5:57 AM, Peter Maydell wrote:
+> Pushing registers to the stack for v7M needs to handle three cases:
+>  * the "normal" case where we pend exceptions
+>  * an "ignore faults" case where we set FSR bits but
+>    do not pend exceptions (this is used when we are
+>    handling some kinds of derived exception on exception entry)
+>  * a "lazy FP stacking" case, where different FSR bits
+>    are set and the exception is pended differently
+> 
+> Implement this by changing the existing flag argument that
+> tells us whether to ignore faults or not into an enum that
+> specifies which of the 3 modes we should handle.
+> 
+> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+> ---
+>  target/arm/helper.c | 118 +++++++++++++++++++++++++++++---------------
+>  1 file changed, 79 insertions(+), 39 deletions(-)
 
-Ok, qemu build will fail on pre-4.15 linux.
-
->Instead you could use the following (even on Linux!):
->
->  #ifndef MAP_SYNC
->  #define MAP_SYNC 0
->  #endif
->  #ifndef MAP_SHARED_VALIDATE
->  #define MAP_SHARED_VALIDATE 0
->  #endif
->
->Either way:
-
-You mean replace the above code to:
-
-#ifdef CONFIG_LINUX
-#include <linux/mman.h>
-#endif /* CONFIG_LINUX */
-
-#ifndef MAP_SYNC
-#define MAP_SYNC 0
-#endif
-#ifndef MAP_SHARED_VALIDATE
-#define MAP_SHARED_VALIDATE 0
-#endif
-
->
->Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 
 
+r~
 
--- 
-Wei Yang
-Help you, Help me
 
