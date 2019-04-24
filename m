@@ -2,48 +2,49 @@ Return-Path: <SRS0=3XOk=S2=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_PASS,URIBL_BLOCKED autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 54844C282CE
-	for <qemu-devel@archiver.kernel.org>; Wed, 24 Apr 2019 06:24:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7B6F8C10F11
+	for <qemu-devel@archiver.kernel.org>; Wed, 24 Apr 2019 06:26:50 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 120A5206A3
-	for <qemu-devel@archiver.kernel.org>; Wed, 24 Apr 2019 06:24:39 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 120A5206A3
+	by mail.kernel.org (Postfix) with ESMTPS id 4C2E3218DA
+	for <qemu-devel@archiver.kernel.org>; Wed, 24 Apr 2019 06:26:50 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4C2E3218DA
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:36583 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:36634 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hJBKh-0002u9-4W
-	for qemu-devel@archiver.kernel.org; Wed, 24 Apr 2019 02:24:39 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:57389)
+	id 1hJBMn-0004qN-FJ
+	for qemu-devel@archiver.kernel.org; Wed, 24 Apr 2019 02:26:49 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:57417)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1hJBH2-0008II-87
+	(envelope-from <bounces@canonical.com>) id 1hJBH3-0008Ii-NM
 	for qemu-devel@nongnu.org; Wed, 24 Apr 2019 02:20:54 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1hJBH0-00016r-Mo
-	for qemu-devel@nongnu.org; Wed, 24 Apr 2019 02:20:52 -0400
-Received: from indium.canonical.com ([91.189.90.7]:44250)
+	(envelope-from <bounces@canonical.com>) id 1hJBH2-00019c-Ko
+	for qemu-devel@nongnu.org; Wed, 24 Apr 2019 02:20:53 -0400
+Received: from indium.canonical.com ([91.189.90.7]:44384)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1hJBH0-00015q-Ey
-	for qemu-devel@nongnu.org; Wed, 24 Apr 2019 02:20:50 -0400
+	id 1hJBH2-00017n-Eh
+	for qemu-devel@nongnu.org; Wed, 24 Apr 2019 02:20:52 -0400
 Received: from loganberry.canonical.com ([91.189.90.37])
 	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1hJBGz-0007pu-AY
-	for <qemu-devel@nongnu.org>; Wed, 24 Apr 2019 06:20:49 +0000
+	id 1hJBH1-0007nD-Ku
+	for <qemu-devel@nongnu.org>; Wed, 24 Apr 2019 06:20:51 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 2F3822E80D4
-	for <qemu-devel@nongnu.org>; Wed, 24 Apr 2019 06:20:49 +0000 (UTC)
+	by loganberry.canonical.com (Postfix) with ESMTP id 9C40A2E80C9
+	for <qemu-devel@nongnu.org>; Wed, 24 Apr 2019 06:20:51 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Wed, 24 Apr 2019 06:06:08 -0000
-From: Thomas Huth <1802684@bugs.launchpad.net>
+Date: Wed, 24 Apr 2019 06:11:54 -0000
+From: Thomas Huth <1798659@bugs.launchpad.net>
 To: qemu-devel@nongnu.org
 X-Launchpad-Notification-Type: bug
 X-Launchpad-Bug: product=qemu; status=Fix Released; importance=Undecided;
@@ -51,22 +52,22 @@ X-Launchpad-Bug: product=qemu; status=Fix Released; importance=Undecided;
 X-Launchpad-Bug-Information-Type: Public
 X-Launchpad-Bug-Private: no
 X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: berkus-deactivatedaccount pmaydell programmingkidx
-	roolebo
-X-Launchpad-Bug-Reporter: inactive (berkus-deactivatedaccount)
+X-Launchpad-Bug-Commenters: orenmn pmaydell th-huth
+X-Launchpad-Bug-Reporter: Oren Milman (orenmn)
 X-Launchpad-Bug-Modifier: Thomas Huth (th-huth)
-References: <154188862302.10366.13833780699115467264.malonedeb@wampee.canonical.com>
+References: <153989027444.15424.224613242357516969.malonedeb@gac.canonical.com>
 Message-Id:
- <155608596964.17354.4639477975917008997.launchpad@soybean.canonical.com>
+ <155608631514.13880.11850226665415342118.launchpad@gac.canonical.com>
 X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
 X-Launchpad-Message-For: qemu-devel-ml
 Precedence: bulk
 X-Generated-By: Launchpad (canonical.com); Revision="18928";
 	Instance="launchpad-lazr.conf"
-X-Launchpad-Hash: 5a25a1d2330d5b33831808f70409b90cb7f9102c
+X-Launchpad-Hash: 737496503a7b20ea5f3f3f269e12a45b35a753e7
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 91.189.90.7
-Subject: [Qemu-devel] [Bug 1802684] Re: QEMU gui crashes on macOS Mojave
+Subject: [Qemu-devel] [Bug 1798659] Re: Replace comma with semicolon in
+ trace/simple.c
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 List-Id: <qemu-devel.nongnu.org>
@@ -77,11 +78,11 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1802684 <1802684@bugs.launchpad.net>
+Reply-To: Bug 1798659 <1798659@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190424060608.1mJ03qsCkdOy7yercRWvp8JAuGC-gb8OQDtL3MEVPLk@z>
+Message-ID: <20190424061154.wi0mOtwXJtQJyGwSQlC4i0JUFZbxSCPlCVm-nC3PEzo@z>
 
 ** Changed in: qemu
        Status: Fix Committed =3D> Fix Released
@@ -90,120 +91,23 @@ Message-ID: <20190424060608.1mJ03qsCkdOy7yercRWvp8JAuGC-gb8OQDtL3MEVPLk@z>
 
 You received this bug notification because you are a member of qemu-
 devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1802684
+https://bugs.launchpad.net/bugs/1798659
 
 Title:
-  QEMU gui crashes on macOS Mojave
+  Replace comma with semicolon in trace/simple.c
 
 Status in QEMU:
   Fix Released
 
 Bug description:
-  QEMU release 3.0.0 as well as a recent head build
+  In the master branch in trace/simple.c in writeout_thread (https://github=
+.com/qemu/qemu/blob/master/trace/simple.c#L174) we currently have:
+    dropped.rec.length =3D sizeof(TraceRecord) + sizeof(uint64_t),
+    dropped.rec.pid =3D trace_pid;
 
-  /usr/local/Cellar/qemu/HEAD-03c1ca1 (147 files, 257.2MB)
-    Built from source on 2018-11-06 at 13:41:32 with: --with-gtk+3 --with-s=
-dl2 --with-libusb
-  /usr/local/Cellar/qemu/3.0.0 (137 files, 261.6MB) *
-    Poured from bottle on 2018-11-10 at 22:58:32 with: --with-gtk+3 --with-=
-libusb --with-sdl2
-
-  Crashes when attempting to use any gui interface (tried SDL and
-  default Cocoa):
-
-  2018-11-10 22:58:41.799 qemu-system-aarch64[42982:1102466] *** Terminatin=
-g app due to uncaught exception 'NSInternalInconsistencyException', reason:=
- 'NSWindow drag regions should only be invalidated on the Main Thread!'
-  *** First throw call stack:
-  (
-  	0   CoreFoundation                      0x00007fff3ea96ecd __exceptionPr=
-eprocess + 256
-  	1   libobjc.A.dylib                     0x00007fff6ab49720 objc_exceptio=
-n_throw + 48
-  	2   CoreFoundation                      0x00007fff3eab095d -[NSException=
- raise] + 9
-  	3   AppKit                              0x00007fff3bfb13fa -[NSWindow(NS=
-Window_Theme) _postWindowNeedsToResetDragMarginsUnlessPostingDisabled] + 324
-  	4   AppKit                              0x00007fff3bfb6850 -[NSView setF=
-rameSize:] + 2082
-  	5   AppKit                              0x00007fff3c02747d -[NSVisualEff=
-ectView setFrameSize:] + 171
-  	6   AppKit                              0x00007fff3c0811b1 -[NSTitlebarV=
-iew setFrameSize:] + 84
-  	7   AppKit                              0x00007fff3bfb5859 -[NSView setF=
-rame:] + 478
-  	8   AppKit                              0x00007fff3c081154 -[NSTitlebarV=
-iew resizeWithOldSuperviewSize:] + 100
-  	9   AppKit                              0x00007fff3bfbc95e -[NSView resi=
-zeSubviewsWithOldSize:] + 502
-  	10  AppKit                              0x00007fff3bfb66d9 -[NSView setF=
-rameSize:] + 1707
-  	11  AppKit                              0x00007fff3c9773c0 -[NSTitlebarC=
-ontainerView setFrameSize:] + 142
-  	12  AppKit                              0x00007fff3bfb5859 -[NSView setF=
-rame:] + 478
-  	13  AppKit                              0x00007fff3bfbcdb5 -[NSView resi=
-zeWithOldSuperviewSize:] + 776
-  	14  AppKit                              0x00007fff3bfbc95e -[NSView resi=
-zeSubviewsWithOldSize:] + 502
-  	15  AppKit                              0x00007fff3bfb66d9 -[NSView setF=
-rameSize:] + 1707
-  	16  AppKit                              0x00007fff3c024570 -[NSThemeFram=
-e setFrameSize:] + 495
-  	17  AppKit                              0x00007fff3c011223 -[NSWindow _s=
-etFrame:updateBorderViewSize:] + 966
-  	18  AppKit                              0x00007fff3c010b46 -[NSWindow _o=
-ldPlaceWindow:] + 547
-  	19  AppKit                              0x00007fff3c010151 -[NSWindow _s=
-etFrameCommon:display:stashSize:] + 3006
-  	20  AppKit                              0x00007fff3c00f57d -[NSWindow _s=
-etFrame:display:allowImplicitAnimation:stashSize:] + 192
-  	21  AppKit                              0x00007fff3c019ff8 -[NSWindow se=
-tFrame:display:animate:] + 567
-  	22  qemu-system-aarch64                 0x000000010b7b2abf qemu-system-a=
-arch64 + 3668671
-  	23  qemu-system-aarch64                 0x000000010b7b6356 qemu-system-a=
-arch64 + 3683158
-  	24  qemu-system-aarch64                 0x000000010b7ad836 qemu-system-a=
-arch64 + 3647542
-  	25  qemu-system-aarch64                 0x000000010b4ce769 qemu-system-a=
-arch64 + 636777
-  	26  qemu-system-aarch64                 0x000000010b487c24 qemu-system-a=
-arch64 + 347172
-  	27  qemu-system-aarch64                 0x000000010b487a15 qemu-system-a=
-arch64 + 346645
-  	28  qemu-system-aarch64                 0x000000010b4878f1 qemu-system-a=
-arch64 + 346353
-  	29  qemu-system-aarch64                 0x000000010b4414aa qemu-system-a=
-arch64 + 58538
-  	30  qemu-system-aarch64                 0x000000010b4f78c3 qemu-system-a=
-arch64 + 805059
-  	31  qemu-system-aarch64                 0x000000010b487c24 qemu-system-a=
-arch64 + 347172
-  	32  qemu-system-aarch64                 0x000000010b487a15 qemu-system-a=
-arch64 + 346645
-  	33  qemu-system-aarch64                 0x000000010b4878f1 qemu-system-a=
-arch64 + 346353
-  	34  qemu-system-aarch64                 0x000000010b4b8f57 qemu-system-a=
-arch64 + 548695
-  	35  qemu-system-aarch64                 0x000000010b49c3af qemu-system-a=
-arch64 + 431023
-  	36  ???                                 0x00000001117891f3 0x0 + 4588081=
-651
-  )
-  libc++abi.dylib: terminating with uncaught exception of type NSException
-  fish: 'qemu-system-aarch64 -M raspi3 -=E2=80=A6' terminated by signal SIG=
-ABRT (Abort)
-
-  =
-
-  macOS Mojave 10.14.2 Beta (18C38b)
-  Qemu in the same configuration used to work in High Sierra, started crash=
-ing only after upgrade to Mojave.
-
-  Command line:
-  `qemu-system-aarch64 -M raspi3 -d in_asm -serial stdio -kernel $1.bin`
+  It seems to me like a typo that the first line ends with a comma.
+  Currently this causes no harm, but I think this should be fixed.
 
 To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1802684/+subscriptions
+https://bugs.launchpad.net/qemu/+bug/1798659/+subscriptions
 
