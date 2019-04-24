@@ -2,65 +2,85 @@ Return-Path: <SRS0=3XOk=S2=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.4 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,USER_AGENT_MUTT
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.5 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0B1DDC10F03
-	for <qemu-devel@archiver.kernel.org>; Wed, 24 Apr 2019 02:41:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7A714C10F03
+	for <qemu-devel@archiver.kernel.org>; Wed, 24 Apr 2019 03:15:45 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C0A61218D3
-	for <qemu-devel@archiver.kernel.org>; Wed, 24 Apr 2019 02:41:44 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C0A61218D3
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=intel.com
+	by mail.kernel.org (Postfix) with ESMTPS id 28D0A218D3
+	for <qemu-devel@archiver.kernel.org>; Wed, 24 Apr 2019 03:15:45 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="araSHSko"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 28D0A218D3
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:34635 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:34908 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hJ7qy-0005vn-41
-	for qemu-devel@archiver.kernel.org; Tue, 23 Apr 2019 22:41:44 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:33207)
+	id 1hJ8Ns-0002KD-Bo
+	for qemu-devel@archiver.kernel.org; Tue, 23 Apr 2019 23:15:44 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:41876)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <yan.y.zhao@intel.com>) id 1hJ7o8-00042z-Ro
-	for qemu-devel@nongnu.org; Tue, 23 Apr 2019 22:38:50 -0400
+	(envelope-from <fengyd81@gmail.com>) id 1hJ8Ms-00020W-5G
+	for qemu-devel@nongnu.org; Tue, 23 Apr 2019 23:14:45 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <yan.y.zhao@intel.com>) id 1hJ7o6-0003p6-TO
-	for qemu-devel@nongnu.org; Tue, 23 Apr 2019 22:38:48 -0400
-Received: from mga04.intel.com ([192.55.52.120]:38611)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <yan.y.zhao@intel.com>)
-	id 1hJ7o6-0003k9-J9
-	for qemu-devel@nongnu.org; Tue, 23 Apr 2019 22:38:46 -0400
-X-Amp-Result: UNKNOWN
-X-Amp-Original-Verdict: FILE UNKNOWN
-X-Amp-File-Uploaded: False
-Received: from fmsmga006.fm.intel.com ([10.253.24.20])
-	by fmsmga104.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384;
-	23 Apr 2019 19:38:42 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.60,388,1549958400"; d="scan'208";a="340239758"
-Received: from joy-optiplex-7040.sh.intel.com (HELO joy-OptiPlex-7040)
-	([10.239.13.9])
-	by fmsmga006.fm.intel.com with ESMTP; 23 Apr 2019 19:38:38 -0700
-Date: Tue, 23 Apr 2019 22:33:06 -0400
-From: Yan Zhao <yan.y.zhao@intel.com>
-To: Cornelia Huck <cohuck@redhat.com>
-Message-ID: <20190424023305.GA26247@joy-OptiPlex-7040>
-References: <20190419083258.19580-1-yan.y.zhao@intel.com>
-	<20190419083559.19725-1-yan.y.zhao@intel.com>
-	<20190423133911.5ee7bf38.cohuck@redhat.com>
+	(envelope-from <fengyd81@gmail.com>) id 1hJ8Mo-0004wc-1p
+	for qemu-devel@nongnu.org; Tue, 23 Apr 2019 23:14:41 -0400
+Received: from mail-io1-xd2e.google.com ([2607:f8b0:4864:20::d2e]:45411)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <fengyd81@gmail.com>) id 1hJ8Ml-0004Tq-DH
+	for qemu-devel@nongnu.org; Tue, 23 Apr 2019 23:14:35 -0400
+Received: by mail-io1-xd2e.google.com with SMTP id e8so2248124ioe.12
+	for <qemu-devel@nongnu.org>; Tue, 23 Apr 2019 20:14:27 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+	h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+	:cc; bh=FNrGQS2JXlw0O7nz2lyXEUXZXZWfDdIfXxDdyjcBigw=;
+	b=araSHSko0R5Z2PlYgvwCy18GCo73iKBezcv3+rIvZYh9dY+nKucZliPoI79ZM6BEd1
+	CHLiU05eE0gmpFd6XT+R60C5Ulo+GZ3gSS1KAMFkbG36UNY17CF+HRR1Ajc1DWvduTCU
+	wsIMTI55utmQkEvQ34iXxUjYXe88mJ+StGlDAjgJKTdyfb7LlKLJDmfLp//5ZmYCFRGt
+	yi6eOK1YiiJu8Ku7PLEbqmCOnJsdbFkbd9Mc1Ip+auK2flpbQt6/TYLmnqHIf3ru0A0P
+	XgpfhPruWSq+Ifg2scbGhFQqTBtvlMe4d2j6LvDitYoUosKjV1kyzTurub13sK1Rd8Ft
+	mliA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=1e100.net; s=20161025;
+	h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+	:message-id:subject:to:cc;
+	bh=FNrGQS2JXlw0O7nz2lyXEUXZXZWfDdIfXxDdyjcBigw=;
+	b=SAXyS6QgkXtwCa2hDFDVxmvddetLDhKiYp2ahyoqJR8BqK9ICXOt+WtInIHuGP8Jzk
+	pTKaSled+N/PQKVb5Yc4lpkdrkW2nZTm0E/oRIfdxmeXcqOURh4U4uqH8mmVSYwJbPXE
+	WGg+EUIhSp0cGcSGUmqvGPVQMYiu9SMnaQFhniKzp6HxUNxZdVxXe91kYf5YLuvEzkkV
+	lwALi3s6LgpSMLafsioBIpMjblzvh57dgwVdtAVWwLClICTpPBRtgpLO5Yl0Xy4auMk1
+	os3Dk9xohgmYOW2sO1POZiSn4hG71cRu5Mqc1hbuRXWTVR/OTR5FTzKaa29EzNYcyHks
+	l3Lg==
+X-Gm-Message-State: APjAAAUCdho1xOKqEhfDWvM0jBV6bLYzO3Dd/3BdeQWrNyUjmRrk9YoN
+	GEXToho5lK2cM1juIJYrVpUqaeFwWqDHRTdDkaw=
+X-Google-Smtp-Source: APXvYqyhCcetm4KmOYEcTGF0VljCqGvqfISCx88DUUD3Ut89Ntl+17027AokktoFmkaWD+HvvQjaAcclX643M2qgbHk=
+X-Received: by 2002:a5d:9d84:: with SMTP id 4mr2520578ion.124.1556075666727;
+	Tue, 23 Apr 2019 20:14:26 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
-Content-Disposition: inline
-In-Reply-To: <20190423133911.5ee7bf38.cohuck@redhat.com>
-User-Agent: Mutt/1.9.4 (2018-02-28)
+References: <CACnvu8YKqaZA7XSD41=SQrUL7h9YafJMgKPe5cJZd3XZ3zrSNw@mail.gmail.com>
+	<20190415145358.GA2893@work-vm>
+	<CACnvu8a5DjAUhfAGmi6GtpD1V2hfoNLTkKEgbsFuL_6GrRc+pg@mail.gmail.com>
+	<CACnvu8Y9Ub5PAOt18ukzvOoDxmfzwvygWWwOZaT5Q2Eig6YFTw@mail.gmail.com>
+	<20190416084738.GA3123@work-vm>
+	<CACnvu8Y7OQSYgGUXm5+bdB0owwmm+gSDpuaGQn=5QNhB5wcjvQ@mail.gmail.com>
+In-Reply-To: <CACnvu8Y7OQSYgGUXm5+bdB0owwmm+gSDpuaGQn=5QNhB5wcjvQ@mail.gmail.com>
+From: fengyd <fengyd81@gmail.com>
+Date: Wed, 24 Apr 2019 11:14:15 +0800
+Message-ID:
+ <CACnvu8aWowPEo=0fE+CXbdp+g9LFvxSNjRsAHdQiQzvJfoYjsQ@mail.gmail.com>
+To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
 	recognized.
-X-Received-From: 192.55.52.120
-Subject: Re: [Qemu-devel] [PATCH 2/2] drm/i915/gvt: export mdev device
- version to sysfs for Intel vGPU
+X-Received-From: 2607:f8b0:4864:20::d2e
+Content-Type: text/plain; charset="UTF-8"
+X-Content-Filtered-By: Mailman/MimeDel 2.1.21
+Subject: Re: [Qemu-devel] Fwd: How live migration work for vhost-user
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -72,290 +92,143 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Yan Zhao <yan.y.zhao@intel.com>
-Cc: "cjia@nvidia.com" <cjia@nvidia.com>,
-	"kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-	"aik@ozlabs.ru" <aik@ozlabs.ru>,
-	"Zhengxiao.zx@alibaba-inc.com" <Zhengxiao.zx@alibaba-inc.com>,
-	"shuangtai.tst@alibaba-inc.com" <shuangtai.tst@alibaba-inc.com>,
-	"qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
-	"kwankhede@nvidia.com" <kwankhede@nvidia.com>,
-	"eauger@redhat.com" <eauger@redhat.com>, "Liu, Yi L" <yi.l.liu@intel.com>,
-	"eskultet@redhat.com" <eskultet@redhat.com>, "Yang,
-	Ziye" <ziye.yang@intel.com>, "mlevitsk@redhat.com" <mlevitsk@redhat.com>,
-	"pasic@linux.ibm.com" <pasic@linux.ibm.com>,
-	"libvir-list@redhat.com" <libvir-list@redhat.com>,
-	"arei.gonglei@huawei.com" <arei.gonglei@huawei.com>,
-	"felipe@nutanix.com" <felipe@nutanix.com>,
-	"Ken.Xue@amd.com" <Ken.Xue@amd.com>, "Tian, Kevin" <kevin.tian@intel.com>,
-	"dgilbert@redhat.com" <dgilbert@redhat.com>,
-	"zhenyuw@linux.intel.com" <zhenyuw@linux.intel.com>,
-	"alex.williamson@redhat.com" <alex.williamson@redhat.com>,
-	"intel-gvt-dev@lists.freedesktop.org"
-	<intel-gvt-dev@lists.freedesktop.org>, "Liu,
-	Changpeng" <changpeng.liu@intel.com>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	"Wang, Zhi A" <zhi.a.wang@intel.com>,
-	"jonathan.davies@nutanix.com" <jonathan.davies@nutanix.com>, "He,
-	Shaopeng" <shaopeng.he@intel.com>
+Cc: qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190424023306.SAqQJSdT21GEs3puWdgpXsmGzpGLw6HoMnjQDzOiFGc@z>
+Message-ID: <20190424031415.6xfiahFDDMaVWbNEo0eN3y2alZKbeMg9nbXXVOb9I6I@z>
 
-On Tue, Apr 23, 2019 at 07:39:11PM +0800, Cornelia Huck wrote:
-> On Fri, 19 Apr 2019 04:35:59 -0400
-> Yan Zhao <yan.y.zhao@intel.com> wrote:
-> 
-> > This feature implements the version attribute for Intel's vGPU mdev
-> > devices.
-> >
-> > version attribute is rw. It is queried by userspace software like libvirt
-> > to check whether two vGPUs are compatible for live migration.
-> >
-> > It consists of two parts: common part and vendor proprietary part.
-> > common part: 32 bit. lower 16 bits is vendor id and higher 16 bits
-> >              identifies device type. e.g., for pci device, it is
-> >              "pci vendor id" | (VFIO_DEVICE_FLAGS_PCI << 16).
-> > vendor proprietary part: this part is varied in length. vendor driver can
-> >              specify any string to identify a device.
-> >
-> > For Intel vGPU of gen8 and gen9, the vendor proprietary part currently
-> > consists of 2 fields: "device id" + "mdev type".
-> >
-> > Reading from a vGPU's version attribute, a string is returned in below
-> > format: 00028086-<device id>-<mdev type>. e.g.
-> > 00028086-193b-i915-GVTg_V5_2.
-> >
-> > Writing a string to a vGPU's version attribute will trigger GVT to check
-> > whether a vGPU identified by the written string is compatible with
-> > current vGPU owning this version attribute. errno is returned if the two
-> > vGPUs are incompatible. The length of written string is returned in
-> > compatible case.
-> >
-> > For other platforms, and for GVT not supporting vGPU live migration
-> > feature, errnos are returned when read/write of mdev devices' version
-> > attributes.
-> >
-> > For old GVT versions where no version attributes exposed in sysfs, it is
-> > regarded as not supporting vGPU live migration.
-> >
-> > For future platforms, besides the current 2 fields in vendor proprietary
-> > part, more fields may be added to identify Intel vGPU well for live
-> > migration purpose.
-> >
-> > Cc: Alex Williamson <alex.williamson@redhat.com>
-> > Cc: Erik Skultety <eskultet@redhat.com>
-> > Cc: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-> > Cc: Cornelia Huck <cohuck@redhat.com>
-> > Cc: "Tian, Kevin" <kevin.tian@intel.com>
-> > Cc: Zhenyu Wang <zhenyuw@linux.intel.com>
-> > Cc: "Wang, Zhi A" <zhi.a.wang@intel.com>
-> > c: Neo Jia <cjia@nvidia.com>
-> > Cc: Kirti Wankhede <kwankhede@nvidia.com>
-> >
-> > Signed-off-by: Yan Zhao <yan.y.zhao@intel.com>
-> > ---
-> >  drivers/gpu/drm/i915/gvt/Makefile         |  2 +-
-> >  drivers/gpu/drm/i915/gvt/device_version.c | 94 +++++++++++++++++++++++
-> >  drivers/gpu/drm/i915/gvt/gvt.c            | 55 +++++++++++++
-> >  drivers/gpu/drm/i915/gvt/gvt.h            |  6 ++
-> >  4 files changed, 156 insertions(+), 1 deletion(-)
-> >  create mode 100644 drivers/gpu/drm/i915/gvt/device_version.c
-> >
-> 
-> (...)
-> 
-> > +static bool is_compatible(const char *self, const char *remote)
-> > +{
-> > +     if (strlen(remote) != strlen(self))
-> > +             return false;
-> > +
-> > +     return (strncmp(self, remote, strlen(self))) ? false : true;
-> > +}
-> > +
-> > +ssize_t intel_gvt_get_vfio_device_version_len(struct drm_i915_private *dev_priv)
-> > +{
-> > +     if (!IS_GEN(dev_priv, 8) && !IS_GEN(dev_priv, 9))
-> > +             return -ENODEV;
-> > +
-> > +     return PAGE_SIZE;
-> > +}
-> > +
-> > +ssize_t intel_gvt_get_vfio_device_version(struct drm_i915_private *dev_priv,
-> > +             char *buf, const char *mdev_type)
-> > +{
-> > +     int cnt = 0, ret = 0;
-> > +     const char *str = NULL;
-> > +
-> > +     /* currently only gen8 & gen9 are supported */
-> > +     if (!IS_GEN(dev_priv, 8) && !IS_GEN(dev_priv, 9))
-> > +             return -ENODEV;
-> > +
-> > +     /* first 32 bit common part specifying vendor id and it's a pci
-> > +      * device
-> > +      */
-> > +     cnt = snprintf(buf, GVT_DEVICE_VERSION_COMMON_LEN + 1,
-> > +                     "%08x", GVT_VFIO_DEVICE_VENDOR_ID);
-> > +     buf += cnt;
-> > +     ret += cnt;
-> > +
-> > +     /* vendor proprietary part: device id + mdev type */
-> > +     /* device id */
-> > +     cnt = snprintf(buf, GVT_DEVICE_VERSION_DEVICE_ID_LEN + 2,
-> > +                     "-%04x", INTEL_DEVID(dev_priv));
-> > +     buf += cnt;
-> > +     ret += cnt;
-> > +
-> > +     /* mdev type */
-> > +     str = mdev_type;
-> > +     cnt = snprintf(buf, strlen(str) + 3, "-%s\n", mdev_type);
-> > +     buf += cnt;
-> > +     ret += cnt;
-> > +
-> > +     return ret;
-> > +}
-> 
-> Looking at this handling, it seems much easier to me to simply use a
-> numeric value instead of a string: You don't have to build it via
-> sprintf, there are generic functions for parsing a string input into a
-> simple number, and you have more options for compatibility (e.g.
-> "version must be between m and n" instead of an exact match).
-> 
-> If you still need to encode the device id here, you should be able to
-> easily do something like (device_id << 16) | migration_version -- do
-> you think that could work?
+Hi,
+
+For vhost,  *last_avail_idx*  is maintained in vhost_virtqueue
+but during live migration, *last_avail_idx*  is fetched from VirtQueue.
+Do you know how these two *last_avail_idx *are synchronized?
+
+virtio_load related code which is called during live migration:
+
+* vdev->vq[i].inuse = (uint16_t)(vdev->vq[i].last_avail_idx -*
+
+*                                vdev->vq[i].used_idx);*
+
+*            if (vdev->vq[i].inuse > vdev->vq[i].vring.num) {*
+
+*                error_report("VQ %d size 0x%x < last_avail_idx 0x%x - "*
+
+*                             "used_idx 0x%x",*
+
+*                             i, vdev->vq[i].vring.num,*
+
+*                             vdev->vq[i].last_avail_idx,*
+
+
+Thanks
+
+On Tue, 23 Apr 2019 at 14:20, fengyd <fengyd81@gmail.com> wrote:
+
+> Hi,
 >
-hi Cornelia,
-using string is based on the consideration that we want to make this
-version string a thing that can distinguish a mdev, so we incoportate
-vendor id, device id to identify parent device first, then mdev type to
-describe the mdev based on the parent device. And that's only for gen8 and
-gen9. For future platforms, we may incorpate more information, e.g. besides
-vendor id and device id, different device revision number, or even a value
-in a register on the run may be needed to identify a parent device. 
-
-I think it's cleaner than a numeric version between m and n, because in that
-case we have to maintain what m's configration is and what n's is. 
-whenever a mdev type is added (like changing a resolution type in mdev
-type) a new version is generated. it's too complicated.
-
-That's why we use current way: version describe parent device + mdev type
-elaborately, then vendor driver checks compatibility according to this
-information.
-
-Do you think it's all right?
-
-> > +
-> > +ssize_t intel_gvt_check_vfio_device_version(struct drm_i915_private *dev_priv,
-> > +             const char *self, const char *remote)
-> > +{
-> > +
-> > +     /* currently only gen8 & gen9 are supported */
-> > +     if (!IS_GEN(dev_priv, 8) && !IS_GEN(dev_priv, 9))
-> > +             return -ENODEV;
-> > +
-> > +     if (!is_compatible(self, remote))
-> > +             return -EINVAL;
-> 
-> I think the meaning of the error codes should really be standardized
-> across vendor drivers, if we need a value for "this device does not
-> support migration at all". (Your choices look reasonable for that.)
+> I want to add some log to qemu-kvm-ev.
+> Do you know how to compile qemu-kvm-ev from source code?
 >
-Agree. thank you. I'll keep error codes consistently in future.
-
-> > +
-> > +     return 0;
-> > +}
-> > diff --git a/drivers/gpu/drm/i915/gvt/gvt.c b/drivers/gpu/drm/i915/gvt/gvt.c
-> > index 43f4242062dd..e720465b93d8 100644
-> > --- a/drivers/gpu/drm/i915/gvt/gvt.c
-> > +++ b/drivers/gpu/drm/i915/gvt/gvt.c
-> > @@ -105,14 +105,69 @@ static ssize_t description_show(struct kobject *kobj, struct device *dev,
-> >                      type->weight);
-> >  }
-> >
-> > +static ssize_t version_show(struct kobject *kobj, struct device *dev,
-> > +             char *buf)
-> > +{
-> > +#ifdef GVT_MIGRATION_VERSION
-> > +     struct drm_i915_private *i915 = kdev_to_i915(dev);
-> > +     const char *mdev_type = kobject_name(kobj);
-> > +
-> > +     return intel_gvt_get_vfio_device_version(i915, buf, mdev_type);
-> > +#else
-> > +     /* do not support live migration */
-> > +     return -EINVAL;
-> 
-> ...but this looks inconsistent. I would expect -ENODEV here, same as
-> for non-gen{8,9}.
-Right, case "not suppporting live migration" should return -ENODEV.
-Thanks:)
-
-
-> Or simply do not create the attribute at all in that case?
-That's also a good choice :) 
-
-
-
-> > +#endif
-> > +}
-> > +
-> > +static ssize_t version_store(struct kobject *kobj, struct device *dev,
-> > +             const char *buf, size_t count)
-> > +{
-> > +#ifdef GVT_MIGRATION_VERSION
-> > +     char *remote = NULL, *self = NULL;
-> > +     int len, ret = 0;
-> > +     struct drm_i915_private *i915 = kdev_to_i915(dev);
-> > +     const char *mdev_type = kobject_name(kobj);
-> > +
-> > +     len = intel_gvt_get_vfio_device_version_len(i915);
-> > +     if (len < 0)
-> > +             return len;
-> > +
-> > +     self = kmalloc(len, GFP_KERNEL);
-> > +     if (!self)
-> > +             return -ENOMEM;
-> > +
-> > +     ret = intel_gvt_get_vfio_device_version(i915, self, mdev_type);
-> > +     if (ret < 0)
-> > +             goto out;
-> > +
-> > +     remote = kstrndup(buf, count, GFP_KERNEL);
-> > +     if (!remote) {
-> > +             ret = -ENOMEM;
-> > +             goto out;
-> > +     }
-> > +
-> > +     ret = intel_gvt_check_vfio_device_version(i915, self, remote);
-> > +
-> > +out:
-> > +     kfree(self);
-> > +     kfree(remote);
-> > +     return (ret < 0 ? ret : count);
-> > +#else
-> > +     /* do not support live migration */
-> > +     return -EINVAL;
-> > +#endif
-> > +}
-> > +
-> >  static MDEV_TYPE_ATTR_RO(available_instances);
-> >  static MDEV_TYPE_ATTR_RO(device_api);
-> >  static MDEV_TYPE_ATTR_RO(description);
-> > +static MDEV_TYPE_ATTR_RW(version);
-> >
-> >  static struct attribute *gvt_type_attrs[] = {
-> >       &mdev_type_attr_available_instances.attr,
-> >       &mdev_type_attr_device_api.attr,
-> >       &mdev_type_attr_description.attr,
-> > +     &mdev_type_attr_version.attr,
-> >       NULL,
-> >  };
-> >
-> (...)
-> _______________________________________________
-> intel-gvt-dev mailing list
-> intel-gvt-dev@lists.freedesktop.org
-> https://lists.freedesktop.org/mailman/listinfo/intel-gvt-dev
-
+> Thanks
+>
+> Yafeng
+>
+> On Tue, 16 Apr 2019 at 16:47, Dr. David Alan Gilbert <dgilbert@redhat.com>
+> wrote:
+>
+>> * fengyd (fengyd81@gmail.com) wrote:
+>> > ---------- Forwarded message ---------
+>> > From: fengyd <fengyd81@gmail.com>
+>> > Date: Tue, 16 Apr 2019 at 09:17
+>> > Subject: Re: [Qemu-devel] How live migration work for vhost-user
+>> > To: Dr. David Alan Gilbert <dgilbert@redhat.com>
+>> >
+>> >
+>> > Hi,
+>> >
+>> > Any special feature needs to be supported on guest driver?
+>> > Because it's OK for standard Linux VM, but not OK for our VM where
+>> virtio
+>> > is  implemented by ourself.
+>>
+>> I'm not sure; you do have to support that 'log' mechanism but I don't
+>> know what else is needed.
+>>
+>> > And with qemu-kvm-ev-2.6, live migration can work with our VM where
+>> virtio
+>> > is  implemented by ourself.
+>>
+>> 2.6 is pretty old, so there's a lot of changes - not sure what's
+>> relevant.
+>>
+>> Dave
+>>
+>> > Thanks
+>> > Yafeng
+>> >
+>> > On Mon, 15 Apr 2019 at 22:54, Dr. David Alan Gilbert <
+>> dgilbert@redhat.com>
+>> > wrote:
+>> >
+>> > > * fengyd (fengyd81@gmail.com) wrote:
+>> > > > Hi,
+>> > > >
+>> > > > During live migration,  the folloing log can see in
+>> nova-compute.log in
+>> > > my
+>> > > > environment:
+>> > > >  ERROR nova.virt.libvirt.driver
+>> [req-039a85e1-e7a1-4a63-bc6d-c4b9a044aab6
+>> > > > 0cdab20dc79f4bc6ae5790e7b4a898ac 3363c319773549178acc67f32c78310e -
+>> > > default
+>> > > > default] [instance: 5ec719f4-1865-4afe-a207-3d9fae22c410] Live
+>> Migration
+>> > > > failure: internal error: qemu unexpectedly closed the monitor:
+>> > > > 2019-04-15T02:58:22.213897Z qemu-kvm: VQ 0
+>> > > > size 0x100 < last_avail_idx 0x1e - used_idx 0x23
+>> > > >
+>> > > > It's OK for standard Linux VM, but not OK for our VM where virtio is
+>> > > > implemented by ourself.
+>> > > > KVM version as follow:
+>> > > > qemu-kvm-common-ev-2.12.0-18.el7_6.3.1.x86_64
+>> > > > qemu-kvm-ev-2.12.0-18.el7_6.3.1.x86_64
+>> > > > libvirt-daemon-kvm-3.9.0-14.2.el7.centos.ncir.8.x86_64
+>> > > >
+>> > > > Do you know what's the difference between virtio and vhost-user
+>> during
+>> > > > migration?
+>> > > > The function virtio_load in Qemu is called for virtio and vhost-user
+>> > > during
+>> > > > migration.
+>> > > > For virtio,  last_avail_idx  and used_idx are stored in Qemu, Qemu
+>> is
+>> > > > responsible for updating their values accordingly
+>> > > > For vhost-user, last_avail_idx  and used_idx are stored in
+>> vhost-user
+>> > > app,
+>> > > > eg. DPDK, not in Qemu?
+>> > > > How does migration work for vhost-user?
+>> > >
+>> > > I don't know the details, but my understanding is that vhost-user
+>> > > tells the vhost-user client about an area of 'log' memory, where the
+>> > > vhost-user client must mark pages as dirty.
+>> > >
+>> > > In the qemu source, see docs/interop/vhost-user.txt and see
+>> > > the VHOST_SET_LOG_BASE and VHOST_USER_SET_LOG_FD calls.
+>> > >
+>> > > If the client correctly marks the areas as dirty, then qemu
+>> > > should resend those pages across.
+>> > >
+>> > >
+>> > > Dave
+>> > >
+>> > > > Thanks in advance
+>> > > > Yafeng
+>> > > --
+>> > > Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+>> > >
+>> --
+>> Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+>>
+>
