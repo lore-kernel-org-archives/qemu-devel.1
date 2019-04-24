@@ -2,49 +2,49 @@ Return-Path: <SRS0=3XOk=S2=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-5.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_PASS,URIBL_BLOCKED autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id ECD1AC282CE
-	for <qemu-devel@archiver.kernel.org>; Wed, 24 Apr 2019 06:22:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 12990C10F11
+	for <qemu-devel@archiver.kernel.org>; Wed, 24 Apr 2019 06:22:24 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7C726218DA
-	for <qemu-devel@archiver.kernel.org>; Wed, 24 Apr 2019 06:22:22 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7C726218DA
+	by mail.kernel.org (Postfix) with ESMTPS id D756A218DA
+	for <qemu-devel@archiver.kernel.org>; Wed, 24 Apr 2019 06:22:23 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D756A218DA
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:36560 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:36562 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hJBIT-0000jE-9u
-	for qemu-devel@archiver.kernel.org; Wed, 24 Apr 2019 02:22:21 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:57291)
+	id 1hJBIV-0000kg-2J
+	for qemu-devel@archiver.kernel.org; Wed, 24 Apr 2019 02:22:23 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:57328)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1hJBGv-0008GW-JY
-	for qemu-devel@nongnu.org; Wed, 24 Apr 2019 02:20:46 -0400
+	(envelope-from <bounces@canonical.com>) id 1hJBGy-0008Gk-0u
+	for qemu-devel@nongnu.org; Wed, 24 Apr 2019 02:20:49 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1hJBGu-0000wq-DG
-	for qemu-devel@nongnu.org; Wed, 24 Apr 2019 02:20:45 -0400
-Received: from indium.canonical.com ([91.189.90.7]:43850)
+	(envelope-from <bounces@canonical.com>) id 1hJBGw-00012D-8D
+	for qemu-devel@nongnu.org; Wed, 24 Apr 2019 02:20:47 -0400
+Received: from indium.canonical.com ([91.189.90.7]:43954)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1hJBGu-0000vp-7i
-	for qemu-devel@nongnu.org; Wed, 24 Apr 2019 02:20:44 -0400
+	id 1hJBGw-0000zo-1e
+	for qemu-devel@nongnu.org; Wed, 24 Apr 2019 02:20:46 -0400
 Received: from loganberry.canonical.com ([91.189.90.37])
 	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1hJBGs-0007fI-NY
-	for <qemu-devel@nongnu.org>; Wed, 24 Apr 2019 06:20:42 +0000
+	id 1hJBGv-0007fT-78
+	for <qemu-devel@nongnu.org>; Wed, 24 Apr 2019 06:20:45 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id AFBE52E80C8
-	for <qemu-devel@nongnu.org>; Wed, 24 Apr 2019 06:20:42 +0000 (UTC)
+	by loganberry.canonical.com (Postfix) with ESMTP id 322682E80C8
+	for <qemu-devel@nongnu.org>; Wed, 24 Apr 2019 06:20:45 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Wed, 24 Apr 2019 06:09:44 -0000
-From: Thomas Huth <1817865@bugs.launchpad.net>
+Date: Wed, 24 Apr 2019 06:09:57 -0000
+From: Thomas Huth <1815024@bugs.launchpad.net>
 To: qemu-devel@nongnu.org
 X-Launchpad-Notification-Type: bug
 X-Launchpad-Bug: product=qemu; status=Fix Released; importance=Undecided;
@@ -52,21 +52,22 @@ X-Launchpad-Bug: product=qemu; status=Fix Released; importance=Undecided;
 X-Launchpad-Bug-Information-Type: Public
 X-Launchpad-Bug-Private: no
 X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: llyzs
-X-Launchpad-Bug-Reporter: Vic (llyzs)
+X-Launchpad-Bug-Commenters: giomasce th-huth
+X-Launchpad-Bug-Reporter: Giovanni Mascellani (giomasce)
 X-Launchpad-Bug-Modifier: Thomas Huth (th-huth)
-References: <155125923743.16914.13241911895735421382.malonedeb@soybean.canonical.com>
+References: <154953276796.22523.967637403683519556.malonedeb@chaenomeles.canonical.com>
 Message-Id:
- <155608618538.16959.4237724165339356729.launchpad@soybean.canonical.com>
+ <155608619763.14166.7520573647829765867.launchpad@gac.canonical.com>
 X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
 X-Launchpad-Message-For: qemu-devel-ml
 Precedence: bulk
 X-Generated-By: Launchpad (canonical.com); Revision="18928";
 	Instance="launchpad-lazr.conf"
-X-Launchpad-Hash: 43f336ccad41dd13c09c940515155a7ec8cf3625
+X-Launchpad-Hash: 03b819521a7949768d91202f9655ee94326d559d
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 91.189.90.7
-Subject: [Qemu-devel] [Bug 1817865] Re: sorecvfrom freezes guest
+Subject: [Qemu-devel] [Bug 1815024] Re: SIGILL on instruction "stck" under
+ qemu-s390x in user mode
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 List-Id: <qemu-devel.nongnu.org>
@@ -77,11 +78,11 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1817865 <1817865@bugs.launchpad.net>
+Reply-To: Bug 1815024 <1815024@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190424060944.acfncN4DDSM8TNyE4sLrADo7dI6AODtzS59mAVm_zCw@z>
+Message-ID: <20190424060957.LmZXfPIuJxZfZk95kfRwRUMi4YutDz6dBTpVr2uJy5s@z>
 
 ** Changed in: qemu
        Status: Fix Committed =3D> Fix Released
@@ -90,21 +91,48 @@ Message-ID: <20190424060944.acfncN4DDSM8TNyE4sLrADo7dI6AODtzS59mAVm_zCw@z>
 
 You received this bug notification because you are a member of qemu-
 devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1817865
+https://bugs.launchpad.net/bugs/1815024
 
 Title:
-  sorecvfrom freezes guest
+  SIGILL on instruction "stck" under qemu-s390x in user mode
 
 Status in QEMU:
   Fix Released
 
 Bug description:
-  QEMU release 3.1.0; Guest running win10.
+  qemu-s390x in user mode crashes with SIGILL (under host architecture
+  x86_64, running Debian unstable) when executing target instruction
+  "stck" ("STORE CLOCK", see
+  https://www-01.ibm.com/support/docview.wss?uid=3Disg26480faec85f44e238525=
+6d5200627dee&aid=3D1),
+  which is basically a kind of equivalent of Intel "rdtsc". The same
+  instruction works fine under qemu-s390x in system mode. The bug is
+  reproducible with both the qemu version distributed in Debian unstable
+  and with the latest upstream master (commit
+  47994e16b1d66411953623e7c0bf0cdcd50bd507).
 
-  Sometimes sorecvfrom() is called from slirp.c because revents =3D=3D
-  G_IO_IN, however inside sorecvfrom() function, ioctlsocket() returns 0
-  bytes available and recvfrom could be blocking indefinitely.
+  This bug manifested itself as a crash of ssh-keygen program, which
+  uses "stck" to obtain some bits of randomness during key creation.
+  Bisection of the code led to the attached minimal example. Compile
+  with (inside an s390x system):
+
+   $ gcc -c -o test.o test.c
+   $ gcc -c -o rdtsc.o rdtsc.S
+   $ gcc -o test test.o rdtsc.o
+
+  Then run test. It will crash with SIGILL in user mode and run fine in
+  system mode. Also, compare with the original file at
+  https://github.com/openssl/openssl/blob/master/crypto/s390xcpuid.pl#L139
+  (there the instruction "stckf" is also used; it is probable that it
+  has the same problem if it is supported altogether, but it did not
+  test for this).
+
+  Running qemu-s390x with options -d
+  in_asm,out_asm,op,op_opt,exec,nochain,cpu gives the trace attached in
+  log.txt.
+
+  Thanks, Giovanni.
 
 To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1817865/+subscriptions
+https://bugs.launchpad.net/qemu/+bug/1815024/+subscriptions
 
