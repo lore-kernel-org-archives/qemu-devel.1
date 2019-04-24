@@ -2,85 +2,69 @@ Return-Path: <SRS0=3XOk=S2=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.7 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
-	SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+X-Spam-Status: No, score=-8.3 required=3.0 tests=FROM_EXCESS_BASE64,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_PASS,URIBL_BLOCKED,USER_AGENT_MUTT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B49BEC10F11
-	for <qemu-devel@archiver.kernel.org>; Wed, 24 Apr 2019 12:20:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3849BC10F11
+	for <qemu-devel@archiver.kernel.org>; Wed, 24 Apr 2019 12:34:55 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7910221773
-	for <qemu-devel@archiver.kernel.org>; Wed, 24 Apr 2019 12:20:56 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="AVLrEiWH"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7910221773
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id 087F1218FE
+	for <qemu-devel@archiver.kernel.org>; Wed, 24 Apr 2019 12:34:54 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 087F1218FE
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:40828 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:40966 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hJGtT-0007k5-EE
-	for qemu-devel@archiver.kernel.org; Wed, 24 Apr 2019 08:20:55 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:37572)
+	id 1hJH70-0002Kg-3P
+	for qemu-devel@archiver.kernel.org; Wed, 24 Apr 2019 08:34:54 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:41440)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1hJGnx-0003kg-7o
-	for qemu-devel@nongnu.org; Wed, 24 Apr 2019 08:15:15 -0400
+	(envelope-from <berrange@redhat.com>) id 1hJH5r-0001ji-Ad
+	for qemu-devel@nongnu.org; Wed, 24 Apr 2019 08:33:44 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1hJGnv-0006gA-As
-	for qemu-devel@nongnu.org; Wed, 24 Apr 2019 08:15:13 -0400
-Received: from mail-ot1-x343.google.com ([2607:f8b0:4864:20::343]:41140)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1hJGnu-0006aQ-W8
-	for qemu-devel@nongnu.org; Wed, 24 Apr 2019 08:15:11 -0400
-Received: by mail-ot1-x343.google.com with SMTP id g8so1938039otk.8
-	for <qemu-devel@nongnu.org>; Wed, 24 Apr 2019 05:15:10 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
-	h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-	:cc:content-transfer-encoding;
-	bh=WHJE5grGHhy6iPngu3sas69rL2nh47u2iEIu/g1MAdA=;
-	b=AVLrEiWHQ0cMuU5I29RoM4aXY8TwQsQHTuWToBVEnZEWz5sc8A0/mHnLdW/eLna7He
-	A3AhCili037IamqqsLUt5rnKrKKq3Yzz4NbKO8g0h82TxvDM0uSFdGnEUYJnwPtFzKCf
-	RyOvkiX+SSiFtJhaKxGQLU1RSZw+kZYc3DbZ7+W21HpZpbCJReSpC8+KQCSqY7Wp9Fdq
-	y9IM7PlEbL11yR49vwLOsyXMxVdLiBi0JmYItvOY2nqhakSHSmQHK+ENq7hOEeZNXoHj
-	XnXH1m2Nq7a8MRT0F6gcZ87gezcjMS+Og6IQ/8G8cH6RKdFYHLEyUlWkIkJ69VoY2lRX
-	+ZVA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=1e100.net; s=20161025;
-	h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-	:message-id:subject:to:cc:content-transfer-encoding;
-	bh=WHJE5grGHhy6iPngu3sas69rL2nh47u2iEIu/g1MAdA=;
-	b=k5EgDU4xiQR+SgCmsC4OQmK8bo4/vTJP35vUmL2JE+tElU18mEyxpFsqhxbujkhG2b
-	vZGJmSu4v/TSTMsi43xzNrBDaUkmO9S3ygdn4Sk8kGkeEXueRc3pA7szrVEpUaHD7zRB
-	P4gAp4VKdcRz5WK03rak9e9yaEi072g9hjvwzhCasIy2bANL+59arlEBt1hECIlcfQ70
-	VBf9AqguRYQS6dXpldUJugz40BhI2D6i2EsriHr5pSKtzAqsF2chJsTgN+KzL/XrOzrN
-	k4d8jn45UB+Hhul9ICx+PQJ6tRRZ1Br5Xh9zDUb1hgiIz56W/yjVKNu/xJXMFarSYwaL
-	So1g==
-X-Gm-Message-State: APjAAAVT8JeX2+ivfwYtNdQWYmWA0NXCN00PgUfNJIIAJg8OoEeR+58S
-	IocrkjsAvVm8MH/cTynHAbf6S4THPq6drcxSejFmBA==
-X-Google-Smtp-Source: APXvYqxSwXfW2RWuYyRr5L7qMu9g72z83szwYphcg8Fnv1P5tifgLvQfNXEVycfqsFM7UAjAxIektLIRM8OQzXGQtto=
-X-Received: by 2002:a05:6830:2094:: with SMTP id
-	y20mr18885293otq.316.1556108109139; 
-	Wed, 24 Apr 2019 05:15:09 -0700 (PDT)
+	(envelope-from <berrange@redhat.com>) id 1hJGrh-0001dO-EO
+	for qemu-devel@nongnu.org; Wed, 24 Apr 2019 08:19:06 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:64866)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <berrange@redhat.com>)
+	id 1hJGmd-00047S-AQ; Wed, 24 Apr 2019 08:13:53 -0400
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+	[10.5.11.22])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 473F6C065E5B;
+	Wed, 24 Apr 2019 12:13:48 +0000 (UTC)
+Received: from redhat.com (ovpn-112-50.ams2.redhat.com [10.36.112.50])
+	by smtp.corp.redhat.com (Postfix) with ESMTPS id 9B6F71001F52;
+	Wed, 24 Apr 2019 12:13:42 +0000 (UTC)
+Date: Wed, 24 Apr 2019 13:13:39 +0100
+From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Message-ID: <20190424121339.GG31388@redhat.com>
+References: <20190424103747.10173-1-thuth@redhat.com>
+	<20190424103747.10173-6-thuth@redhat.com>
+	<20190424104855.GE31388@redhat.com>
+	<d9137693-7727-5f2c-04f3-b1eafd70f056@redhat.com>
+	<f8040ada-cb84-d669-3493-0d2da89e6b0b@virtuozzo.com>
 MIME-Version: 1.0
-References: <20190424110041.8175-1-marcandre.lureau@redhat.com>
-	<20190424110041.8175-3-marcandre.lureau@redhat.com>
-In-Reply-To: <20190424110041.8175-3-marcandre.lureau@redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Wed, 24 Apr 2019 13:14:57 +0100
-Message-ID:
- <CAFEAcA-_mX4_sJQ1KxSZbdcR1weANO+8430Y+zSYNBKgezPPLA@mail.gmail.com>
-To: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@redhat.com>
 Content-Type: text/plain; charset="UTF-8"
+Content-Disposition: inline
+In-Reply-To: <f8040ada-cb84-d669-3493-0d2da89e6b0b@virtuozzo.com>
+User-Agent: Mutt/1.11.3 (2019-02-01)
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+	(mx1.redhat.com [10.5.110.32]);
+	Wed, 24 Apr 2019 12:13:48 +0000 (UTC)
 Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
-	recognized.
-X-Received-From: 2607:f8b0:4864:20::343
-Subject: Re: [Qemu-devel] [PATCH v2 2/2] build-sys: move slirp as git
- submodule project
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 209.132.183.28
+Subject: Re: [Qemu-devel] [PATCH 5/6] tests: Run the iotests during "make
+ check" again
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -92,45 +76,111 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Jeff Cody <codyprime@gmail.com>,
-	Samuel Thibault <samuel.thibault@ens-lyon.org>,
-	QEMU Developers <qemu-devel@nongnu.org>,
-	Stefan Hajnoczi <stefanha@redhat.com>
+Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+Cc: Fam Zheng <fam@euphon.net>, Kevin Wolf <kwolf@redhat.com>,
+	Thomas Huth <thuth@redhat.com>, Ed Maste <emaste@freebsd.org>,
+	"qemu-block@nongnu.org" <qemu-block@nongnu.org>,
+	Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>,
+	"qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
+	Max Reitz <mreitz@redhat.com>,
+	Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
+	Li-Wen Hsu <lwhsu@freebsd.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190424121457.RTMJuTogRyqgTNmdxn7V4IHQtlSc_coul3Oop5Y0cDA@z>
+Message-ID: <20190424121339.c8OxtKop6RdrfkFvB8hmyJb5ixDg-gh3Gdc15qboC2g@z>
 
-On Wed, 24 Apr 2019 at 12:13, Marc-Andr=C3=A9 Lureau
-<marcandre.lureau@redhat.com> wrote:
->
-> The slirp project is now hosted on freedesktop at:
-> https://gitlab.freedesktop.org/slirp.
->
-> The libslirp source was extracted from qemu/slirp filtered through
-> clang-format (available in project tree). The qemu slirp directory can
-> be swapped by a git submodule.
->
-> Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+On Wed, Apr 24, 2019 at 12:02:29PM +0000, Vladimir Sementsov-Ogievskiy wr=
+ote:
+> 24.04.2019 13:59, Thomas Huth wrote:
+> > On 24/04/2019 12.48, Daniel P. Berrang=C3=A9 wrote:
+> >> On Wed, Apr 24, 2019 at 12:37:46PM +0200, Thomas Huth wrote:
+> >>> People often forget to run the iotests before submitting patches or
+> >>> pull requests - this is likely due to the fact that we do not run t=
+he
+> >>> tests during our mandatory "make check" tests yet. Now that we've g=
+ot
+> >>> a new "ci" group of iotests that should be fine to run in every env=
+iron-
+> >>> ment, it should be OK to enable the iotests during "make check" aga=
+in.
+> >>> Thus we now run the "ci" tests by default from the qemu-iotests-qui=
+ck.sh
+> >>> script, and only use the former "quick" group (that contains some t=
+ests
+> >>> that are failing in some environments) when the user decided to run
+> >>> "make check SPEED=3Dthorough" or something similar.
+> >>>
+> >>> Signed-off-by: Thomas Huth <thuth@redhat.com>
+> >>> ---
+> >>>   tests/Makefile.include      |  2 +-
+> >>>   tests/qemu-iotests-quick.sh | 17 ++++++++++++++++-
+> >>>   2 files changed, 17 insertions(+), 2 deletions(-)
+> >>
+> >>> diff --git a/tests/qemu-iotests-quick.sh b/tests/qemu-iotests-quick=
+.sh
+> >>> index 0e554bb972..416b3fc48b 100755
+> >>> --- a/tests/qemu-iotests-quick.sh
+> >>> +++ b/tests/qemu-iotests-quick.sh
+> >>
+> >> s/-quick//  perhaps, since it no longer only runs the "quick" tests.
+> >>
+> >>> @@ -1,8 +1,23 @@
+> >>>   #!/bin/sh
+> >>>  =20
+> >>> +# Honor the SPEED environment variable, just like we do it for the=
+ qtests.
+> >>> +# The default is to run all tests that still work fine in a CI env=
+ironments,
+> >>> +# but if the user set SPEED=3Dslow or SPEED=3Dthorough, we also ru=
+n all other
+> >>> +# tests that are still marked as "quick"
+> >>> +if [ "$SPEED" =3D "slow" -o "$SPEED" =3D "thorough" ]; then
+> >>> +    group=3Dquick
+> >>
+> >> When user asks for "slow" tests we run the "quick" tests, which
+> >> presumably implies...
+> >>
+> >>> +else
+> >>> +    group=3Dci
+> >>
+> >> ..."ci" is quicker than the "quick"  tests !
+> >>
+> >> Confused ? We certainly try to ensure that you will be :-)
+> >=20
+> > ... and there is also tests/check-block.sh (which is not used by "mak=
+e
+> > check-block", by the way, but still talks about "make check-block"),
+> > which is even slower than the "ci" and "quick" group...
+> >=20
+> > I guess that could be cleaned up, too (why do we need two scripts?) .=
+..
+> > just not sure how the final result should look like and if it should =
+be
+> > part of this patch series or rather something separate. Max, Kevin, w=
+hat
+> > do you think?
+> >=20
+> > Maybe we should merge the two scripts, and depending on the SPEED
+> > variable, we run:
+> >=20
+> >   quick =3D> "ci" group
+> >   thorough =3D> "quick" group
+> >   slow =3D> old behaviour of the check-block.sh script
+>=20
+> May be, instead of SPEED, introduce GROUP variable? To make it plain
 
-> --- a/.gitmodules
-> +++ b/.gitmodules
-> @@ -52,3 +52,6 @@
->  [submodule "roms/edk2"]
->         path =3D roms/edk2
->         url =3D https://github.com/tianocore/edk2.git
-> +[submodule "slirp"]
-> +       path =3D slirp
-> +       url =3D https://gitlab.freedesktop.org/slirp/libslirp.git
+"$SPEED" is something used/defined by the gtester harness, so other bits
+run by "make check" already honour that, hence it is desirable fro the
+iotests todo the same.
 
-We should prefer to set up a mirror of the git repo
-on git.qemu.org and use that, rather than a remote repo.
-
-We also need to do that for the berkeley softfloat
-and edk2 repos, I notice.
-
-Stefan or Jeff, could one of you set that up, please?
-
-thanks
--- PMM
+Regards,
+Daniel
+--=20
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberran=
+ge :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.c=
+om :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberran=
+ge :|
 
