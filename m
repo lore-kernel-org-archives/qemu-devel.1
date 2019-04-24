@@ -1,34 +1,26 @@
-Received: from eggs.gnu.org ([209.51.188.92]:37755)
+Received: from eggs.gnu.org ([209.51.188.92]:37774)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1hJGoN-000450-TC
+	(envelope-from <peter.maydell@linaro.org>) id 1hJGoP-00045x-8q
 	for qemu-devel@nongnu.org; Wed, 24 Apr 2019 08:15:42 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1hJGoM-0007HJ-0J
-	for qemu-devel@nongnu.org; Wed, 24 Apr 2019 08:15:39 -0400
-Received: from indium.canonical.com ([91.189.90.7]:57562)
+	(envelope-from <peter.maydell@linaro.org>) id 1hJGoN-0007IK-6w
+	for qemu-devel@nongnu.org; Wed, 24 Apr 2019 08:15:41 -0400
+Received: from mail-oi1-x229.google.com ([2607:f8b0:4864:20::229]:34628)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1hJGoL-0007FR-30
-	for qemu-devel@nongnu.org; Wed, 24 Apr 2019 08:15:37 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1hJGoH-0002HF-Mn
-	for <qemu-devel@nongnu.org>; Wed, 24 Apr 2019 12:15:33 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id A47A62E80C7
-	for <qemu-devel@nongnu.org>; Wed, 24 Apr 2019 12:15:33 +0000 (UTC)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1hJGoN-0007H5-0t
+	for qemu-devel@nongnu.org; Wed, 24 Apr 2019 08:15:39 -0400
+Received: by mail-oi1-x229.google.com with SMTP id v10so14074961oib.1
+	for <qemu-devel@nongnu.org>; Wed, 24 Apr 2019 05:15:38 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Wed, 24 Apr 2019 12:10:21 -0000
-From: Gwendolyn Haller <1826175@bugs.launchpad.net>
-Reply-To: Bug 1826175 <1826175@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <155609955691.16667.3366200166619949036.malonedeb@soybean.canonical.com>
-Message-Id: <155610782118.17507.15856887681028117924.malone@soybean.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1826175] Re: Compilation on MSYS2/MinGW-w64 fails
- with error: "No rule to make target capstone.lib"
+References: <20190418205135.6686-1-armbru@redhat.com>
+In-Reply-To: <20190418205135.6686-1-armbru@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Wed, 24 Apr 2019 13:15:26 +0100
+Message-ID: <CAFEAcA8SPuiUHEcXHBfTigo79TRp6Qr6QHnXN3SY2odUr=0HvQ@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PULL for-4.1 00/36] Error reporting & monitor
+ patches for 2019-04-18
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,56 +29,33 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Markus Armbruster <armbru@redhat.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>
 
-I did submit a bug already to Capstone proper on their GitHub. Thanks
-for the heads-up about it needing to cover both cases for cross-
-compilers!
+On Thu, 18 Apr 2019 at 21:53, Markus Armbruster <armbru@redhat.com> wrote:
+>
+> Early pull request because I'll be on vacation when 4.1 opens.  Hope
+> that's okay.
+>
+> The following changes since commit eeba63fc7fface36f438bcbc0d3b02e7dcb59983:
+>
+>   Update version for v4.0.0-rc4 release (2019-04-16 21:53:00 +0100)
+>
+> are available in the Git repository at:
+>
+>   git://repo.or.cz/qemu/armbru.git tags/pull-error-monitor-2019-04-18
+>
+> for you to fetch changes up to ede9a8a656c992deecce45f8175985dd81cc6be9:
+>
+>   include: Move fprintf_function to disas/ (2019-04-18 22:18:59 +0200)
+>
+> ----------------------------------------------------------------
+> Error reporting & monitor patches for 2019-04-18
+>
 
--- =
+Applied, thanks.
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1826175
+Please update the changelog at https://wiki.qemu.org/ChangeLog/4.1
+for any user-visible changes.
 
-Title:
-  Compilation on MSYS2/MinGW-w64 fails with error: "No rule to make
-  target capstone.lib"
-
-Status in QEMU:
-  New
-
-Bug description:
-  I submitted this bug to Capstone directly but I figured it'd be useful
-  to post it here too. The IS_MINGW check in the Makefile for Capstone
-  fails under MSYS2 MinGW-w64 because cc --version doesn't have mingw in
-  the output anymore:
-
-  $ whereis cc
-  cc: /mingw64/bin/cc.exe
-
-  $ cc --version
-  cc.exe (Rev2, Built by MSYS2 project) 8.3.0
-  Copyright (C) 2018 Free Software Foundation, Inc.
-  This is free software; see the source for copying conditions.  There is NO
-  warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOS=
-E.
-
-  Really simple patch:
-
-  diff --git "a/Makefile" "b/Makefile"
-  index 063f50db..1d9f042e 100644
-  --- "a/Makefile"
-  +++ "b/Makefile"
-  @@ -288,7 +288,7 @@ CFLAGS :=3D $(CFLAGS:-fPIC=3D)
-   # On Windows we need the shared library to be executable
-   else
-   # mingw?
-  -IS_MINGW :=3D $(shell $(CC) --version | grep -i mingw | wc -l)
-  +IS_MINGW :=3D $(shell $(CC) --version | grep -i msys2 | wc -l)
-   ifeq ($(IS_MINGW),1)
-   EXT =3D dll
-   AR_EXT =3D lib
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1826175/+subscriptions
+-- PMM
