@@ -1,27 +1,22 @@
-Received: from eggs.gnu.org ([209.51.188.92]:53270)
+Received: from eggs.gnu.org ([209.51.188.92]:44281)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <srutherford@google.com>) id 1hJNZk-0006R5-6X
-	for qemu-devel@nongnu.org; Wed, 24 Apr 2019 15:29:01 -0400
+	(envelope-from <wainersm@redhat.com>) id 1hJOvJ-0001BH-IM
+	for qemu-devel@nongnu.org; Wed, 24 Apr 2019 16:55:22 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <srutherford@google.com>) id 1hJNN2-0001MD-RB
-	for qemu-devel@nongnu.org; Wed, 24 Apr 2019 15:15:54 -0400
-Received: from mail-yb1-xb44.google.com ([2607:f8b0:4864:20::b44]:44357)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <srutherford@google.com>)
-	id 1hJNN2-0001If-JN
-	for qemu-devel@nongnu.org; Wed, 24 Apr 2019 15:15:52 -0400
-Received: by mail-yb1-xb44.google.com with SMTP id u187so7532705ybg.11
-	for <qemu-devel@nongnu.org>; Wed, 24 Apr 2019 12:15:51 -0700 (PDT)
+	(envelope-from <wainersm@redhat.com>) id 1hJOiy-0006Ft-Ly
+	for qemu-devel@nongnu.org; Wed, 24 Apr 2019 16:42:37 -0400
+References: <20190424103747.10173-1-thuth@redhat.com>
+	<20190424103747.10173-6-thuth@redhat.com>
+From: Wainer dos Santos Moschetta <wainersm@redhat.com>
+Message-ID: <6b284aaa-353c-92c1-b01b-21882e7ff9ef@redhat.com>
+Date: Wed, 24 Apr 2019 17:42:14 -0300
 MIME-Version: 1.0
-References: <20190424160942.13567-1-brijesh.singh@amd.com>
-In-Reply-To: <20190424160942.13567-1-brijesh.singh@amd.com>
-From: Steve Rutherford <srutherford@google.com>
-Date: Wed, 24 Apr 2019 12:15:12 -0700
-Message-ID: <CABayD+eYsqT49-Smp0a9OGRt2or_L7LNKHpe-iraM62XzGq5_g@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [RFC PATCH v1 00/10] Add AMD SEV guest live
- migration support
+In-Reply-To: <20190424103747.10173-6-thuth@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
+Content-Language: en-US
+Subject: Re: [Qemu-devel] [PATCH 5/6] tests: Run the iotests during "make
+ check" again
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,100 +25,85 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Singh, Brijesh" <brijesh.singh@amd.com>
-Cc: "kvm@vger.kernel.org" <kvm@vger.kernel.org>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>, "H. Peter Anvin" <hpa@zytor.com>, Paolo Bonzini <pbonzini@redhat.com>, =?UTF-8?B?UmFkaW0gS3LEjW3DocWZ?= <rkrcmar@redhat.com>, Joerg Roedel <joro@8bytes.org>, Borislav Petkov <bp@suse.de>, "Lendacky, Thomas" <Thomas.Lendacky@amd.com>, "x86@kernel.org" <x86@kernel.org>, "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+To: Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org
+Cc: Fam Zheng <fam@euphon.net>, Kevin Wolf <kwolf@redhat.com>, Ed Maste <emaste@freebsd.org>, qemu-block@nongnu.org, =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>, Max Reitz <mreitz@redhat.com>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>, Li-Wen Hsu <lwhsu@freebsd.org>
 
-On Wed, Apr 24, 2019 at 9:10 AM Singh, Brijesh <brijesh.singh@amd.com> wrot=
-e:
->
-> The series add support for AMD SEV guest live migration commands. To prot=
-ect the
-> confidentiality of an SEV protected guest memory while in transit we need=
- to
-> use the SEV commands defined in SEV API spec [1].
->
-> SEV guest VMs have the concept of private and shared memory. Private memo=
-ry
-> is encrypted with the guest-specific key, while shared memory may be encr=
-ypted
-> with hypervisor key. The commands provided by the SEV FW are meant to be =
-used
-> for the private memory only. The patch series introduces a new hypercall.
-> The guest OS can use this hypercall to notify the page encryption status.
-> If the page is encrypted with guest specific-key then we use SEV command =
-during
-> the migration. If page is not encrypted then fallback to default.
->
-> The patch adds a new ioctl KVM_GET_PAGE_ENC_BITMAP. The ioctl can be used
-> by the qemu to get the page encrypted bitmap. Qemu can consult this bitma=
-p
-> during the migration to know whether the page is encrypted.
->
-> [1] https://developer.amd.com/wp-content/resources/55766.PDF
->
-> The series is tested with the Qemu, I am in process of cleaning
-> up the Qemu code and will submit soon.
->
-> While implementing the migration I stumbled on the follow question:
->
-> - Since there is a guest OS changes required to support the migration,
->   so how do we know whether guest OS is updated? Should we extend KVM
->   capabilities/feature bits to check this?
->
-> TODO:
->  - add an ioctl to build encryption bitmap. The encryption bitmap is buil=
-t during
->    the guest bootup/execution. We should provide an ioctl so that destina=
-tion
->    can build the bitmap as it receives the pages.
->  - reset the bitmap on guest reboot.
->
-> The complete tree with patch is available at:
-> https://github.com/codomania/kvm/tree/sev-migration-rfc-v1
->
-> Cc: Thomas Gleixner <tglx@linutronix.de>
-> Cc: Ingo Molnar <mingo@redhat.com>
-> Cc: "H. Peter Anvin" <hpa@zytor.com>
-> Cc: Paolo Bonzini <pbonzini@redhat.com>
-> Cc: "Radim Kr=C4=8Dm=C3=A1=C5=99" <rkrcmar@redhat.com>
-> Cc: Joerg Roedel <joro@8bytes.org>
-> Cc: Borislav Petkov <bp@suse.de>
-> Cc: Tom Lendacky <thomas.lendacky@amd.com>
-> Cc: x86@kernel.org
-> Cc: kvm@vger.kernel.org
-> Cc: linux-kernel@vger.kernel.org
->
-> Brijesh Singh (10):
->   KVM: SVM: Add KVM_SEV SEND_START command
->   KVM: SVM: Add KVM_SEND_UPDATE_DATA command
->   KVM: SVM: Add KVM_SEV_SEND_FINISH command
->   KVM: SVM: Add support for KVM_SEV_RECEIVE_START command
->   KVM: SVM: Add KVM_SEV_RECEIVE_UPDATE_DATA command
->   KVM: SVM: Add KVM_SEV_RECEIVE_FINISH command
->   KVM: x86: Add AMD SEV specific Hypercall3
->   KVM: X86: Introduce KVM_HC_PAGE_ENC_STATUS hypercall
->   KVM: x86: Introduce KVM_GET_PAGE_ENC_BITMAP ioctl
->   mm: x86: Invoke hypercall when page encryption status is changed
->
->  .../virtual/kvm/amd-memory-encryption.rst     | 116 ++++
->  Documentation/virtual/kvm/hypercalls.txt      |  14 +
->  arch/x86/include/asm/kvm_host.h               |   3 +
->  arch/x86/include/asm/kvm_para.h               |  12 +
->  arch/x86/include/asm/mem_encrypt.h            |   3 +
->  arch/x86/kvm/svm.c                            | 560 +++++++++++++++++-
->  arch/x86/kvm/vmx/vmx.c                        |   1 +
->  arch/x86/kvm/x86.c                            |  17 +
->  arch/x86/mm/mem_encrypt.c                     |  45 +-
->  arch/x86/mm/pageattr.c                        |  15 +
->  include/uapi/linux/kvm.h                      |  51 ++
->  include/uapi/linux/kvm_para.h                 |   1 +
->  12 files changed, 834 insertions(+), 4 deletions(-)
->
-> --
-> 2.17.1
->
+Hi Thomas,
 
-What's the back-of-the-envelope marginal cost of transferring a 16kB
-region from one host to another? I'm interested in what the end to end
-migration perf changes look like for this. If you have measured
-migration perf, I'm interested in that also.
+
+On 04/24/2019 07:37 AM, Thomas Huth wrote:
+> People often forget to run the iotests before submitting patches or
+> pull requests - this is likely due to the fact that we do not run the
+> tests during our mandatory "make check" tests yet. Now that we've got
+> a new "ci" group of iotests that should be fine to run in every environ-
+> ment, it should be OK to enable the iotests during "make check" again.
+> Thus we now run the "ci" tests by default from the qemu-iotests-quick.sh
+> script, and only use the former "quick" group (that contains some tests
+> that are failing in some environments) when the user decided to run
+> "make check SPEED=thorough" or something similar.
+>
+> Signed-off-by: Thomas Huth <thuth@redhat.com>
+> ---
+>   tests/Makefile.include      |  2 +-
+>   tests/qemu-iotests-quick.sh | 17 ++++++++++++++++-
+>   2 files changed, 17 insertions(+), 2 deletions(-)
+
+One of Patchew's runners failed with this patch series:
+https://patchew.org/QEMU/20190424103747.10173-1-thuth@redhat.com/
+
+I encountered same failures with `make check` locally on Fedora 29 
+x86_64 (pulled latest qemu, and configured with defaults and 
+x86_64-softmmu target):
+---
+Not run: 233
+Failures: 069 103 114 133 140 143 197 215 226 244
+Failed 10 of 91 tests
+---
+
+Let me know if you need more details.
+
+- Wainer
+
+>
+> diff --git a/tests/Makefile.include b/tests/Makefile.include
+> index 36fc73fef5..eb6a7a41e2 100644
+> --- a/tests/Makefile.include
+> +++ b/tests/Makefile.include
+> @@ -1168,7 +1168,7 @@ check-acceptance: check-venv $(TESTS_RESULTS_DIR)
+>   check-qapi-schema: $(patsubst %,check-%, $(check-qapi-schema-y)) check-tests/qapi-schema/doc-good.texi
+>   check-qtest: $(patsubst %,check-qtest-%, $(QTEST_TARGETS))
+>   check-block: $(patsubst %,check-%, $(check-block-y))
+> -check: check-qapi-schema check-unit check-softfloat check-qtest check-decodetree
+> +check: check-qapi-schema check-unit check-softfloat check-qtest check-decodetree check-block
+>   check-clean:
+>   	rm -rf $(check-unit-y) tests/*.o $(QEMU_IOTESTS_HELPERS-y)
+>   	rm -rf $(sort $(foreach target,$(SYSEMU_TARGET_LIST), $(check-qtest-$(target)-y)) $(check-qtest-generic-y))
+> diff --git a/tests/qemu-iotests-quick.sh b/tests/qemu-iotests-quick.sh
+> index 0e554bb972..416b3fc48b 100755
+> --- a/tests/qemu-iotests-quick.sh
+> +++ b/tests/qemu-iotests-quick.sh
+> @@ -1,8 +1,23 @@
+>   #!/bin/sh
+>   
+> +# Honor the SPEED environment variable, just like we do it for the qtests.
+> +# The default is to run all tests that still work fine in a CI environments,
+> +# but if the user set SPEED=slow or SPEED=thorough, we also run all other
+> +# tests that are still marked as "quick"
+> +if [ "$SPEED" = "slow" -o "$SPEED" = "thorough" ]; then
+> +    group=quick
+> +else
+> +    group=ci
+> +fi
+> +
+> +if [ -z "$(find . -name 'qemu-system-*' -print)" ]; then
+> +    echo "No qemu-system binary available. Skipped qemu-iotests."
+> +    exit 0
+> +fi
+> +
+>   cd tests/qemu-iotests
+>   
+>   ret=0
+> -TEST_DIR=${TEST_DIR:-/tmp/qemu-iotests-quick-$$} ./check -T -qcow2 -g quick || ret=1
+> +TEST_DIR=${TEST_DIR:-/tmp/qemu-iotests-quick-$$} ./check -T -qcow2 -g "$group" || ret=1
+>   
+>   exit $ret
