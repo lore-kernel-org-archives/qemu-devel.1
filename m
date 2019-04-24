@@ -6,67 +6,67 @@ X-Spam-Status: No, score=-0.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	MAILING_LIST_MULTI,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F1D4CC10F11
-	for <qemu-devel@archiver.kernel.org>; Wed, 24 Apr 2019 06:27:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 739D1C282CE
+	for <qemu-devel@archiver.kernel.org>; Wed, 24 Apr 2019 06:27:44 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C3D2C218D3
-	for <qemu-devel@archiver.kernel.org>; Wed, 24 Apr 2019 06:27:40 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C3D2C218D3
+	by mail.kernel.org (Postfix) with ESMTPS id 468A1218D3
+	for <qemu-devel@archiver.kernel.org>; Wed, 24 Apr 2019 06:27:44 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 468A1218D3
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:36638 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:36640 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hJBNb-0005ds-Uw
-	for qemu-devel@archiver.kernel.org; Wed, 24 Apr 2019 02:27:40 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:58918)
+	id 1hJBNf-0005ex-E5
+	for qemu-devel@archiver.kernel.org; Wed, 24 Apr 2019 02:27:43 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:58905)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1hJBLy-0004TR-EM
+	(envelope-from <bounces@canonical.com>) id 1hJBLw-0004Rb-IE
 	for qemu-devel@nongnu.org; Wed, 24 Apr 2019 02:25:59 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1hJBLw-0005a0-JJ
-	for qemu-devel@nongnu.org; Wed, 24 Apr 2019 02:25:58 -0400
-Received: from indium.canonical.com ([91.189.90.7]:45130)
+	(envelope-from <bounces@canonical.com>) id 1hJBLu-0005Y0-NV
+	for qemu-devel@nongnu.org; Wed, 24 Apr 2019 02:25:56 -0400
+Received: from indium.canonical.com ([91.189.90.7]:45088)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1hJBLu-0005VM-Kl
-	for qemu-devel@nongnu.org; Wed, 24 Apr 2019 02:25:55 -0400
+	id 1hJBLs-0005Un-No
+	for qemu-devel@nongnu.org; Wed, 24 Apr 2019 02:25:54 -0400
 Received: from loganberry.canonical.com ([91.189.90.37])
 	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1hJBLr-0008MJ-2X
-	for <qemu-devel@nongnu.org>; Wed, 24 Apr 2019 06:25:51 +0000
+	id 1hJBLq-0008O7-BR
+	for <qemu-devel@nongnu.org>; Wed, 24 Apr 2019 06:25:50 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 110E12E80C7
-	for <qemu-devel@nongnu.org>; Wed, 24 Apr 2019 06:25:51 +0000 (UTC)
+	by loganberry.canonical.com (Postfix) with ESMTP id 4F68D2E80CC
+	for <qemu-devel@nongnu.org>; Wed, 24 Apr 2019 06:25:50 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Wed, 24 Apr 2019 06:09:16 -0000
-From: Thomas Huth <1392468@bugs.launchpad.net>
+Date: Wed, 24 Apr 2019 06:15:00 -0000
+From: Thomas Huth <1577937@bugs.launchpad.net>
 To: qemu-devel@nongnu.org
 X-Launchpad-Notification-Type: bug
-X-Launchpad-Bug: product=qemu; status=Fix Released; importance=Undecided;
+X-Launchpad-Bug: product=qemu; status=Incomplete; importance=Undecided;
 	assignee=None; 
 X-Launchpad-Bug-Information-Type: Public
 X-Launchpad-Bug-Private: no
 X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: berrange fturco ingo-buerk jakub th-huth zta77
-X-Launchpad-Bug-Reporter: =?utf-8?q?Ingo_B=C3=BCrk_=28ingo-buerk=29?=
+X-Launchpad-Bug-Commenters: th-huth veskra
+X-Launchpad-Bug-Reporter: Veskra (veskra)
 X-Launchpad-Bug-Modifier: Thomas Huth (th-huth)
-References: <20141113201019.18949.57499.malonedeb@gac.canonical.com>
-Message-Id:
- <155608615763.14250.13052145300196974826.launchpad@gac.canonical.com>
+References: <20160503205253.23902.44163.malonedeb@gac.canonical.com>
+Message-Id: <155608650028.13778.2698226466764645998.malone@gac.canonical.com>
 X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
 X-Launchpad-Message-For: qemu-devel-ml
 Precedence: bulk
 X-Generated-By: Launchpad (canonical.com); Revision="18928";
 	Instance="launchpad-lazr.conf"
-X-Launchpad-Hash: 714de9b374495ef7251f5fe389e9ff0a38ce2be0
+X-Launchpad-Hash: 9d31bc725be48f8e770bc31f5fa372460d755873
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 91.189.90.7
-Subject: [Qemu-devel] [Bug 1392468] Re: qemu uses a bitmap icon
+Subject: [Qemu-devel] [Bug 1577937] Re: netbeans not working with std
+ graphic driver
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 List-Id: <qemu-devel.nongnu.org>
@@ -77,35 +77,56 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1392468 <1392468@bugs.launchpad.net>
+Reply-To: Bug 1577937 <1577937@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190424060916.JXR7qrfE1qU_9oJlsfvB3ZgLRIdpn76gMsx0xVy6GX0@z>
+Message-ID: <20190424061500.g19ABBNJyAq6j-8mlES5OY1nloMurknkk1cQ8QL7G4Y@z>
+
+Looking through old bug tickets... can you still reproduce this issue
+with the latest version of QEMU? Or could we close this ticket nowadays?
+
 
 ** Changed in: qemu
-       Status: Fix Committed =3D> Fix Released
+       Status: New =3D> Incomplete
 
 -- =
 
 You received this bug notification because you are a member of qemu-
 devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1392468
+https://bugs.launchpad.net/bugs/1577937
 
 Title:
-  qemu uses a bitmap icon
+  netbeans not working with std graphic driver
 
 Status in QEMU:
-  Fix Released
+  Incomplete
 
 Bug description:
-  qemu currently uses the icon in pc-bios/qemu-icon.bmp, which,
-  obviously, is a bitmap file. It is loaded such that white pixels will
-  be transparent. This can cause nasty artifacts in the display.
+  Qemu Version:
+  QEMU emulator version 2.5.1, Copyright (c) 2003-2008 Fabrice Bellard
 
-  Unless there is a specific reason to use bitmaps, I'd suggest moving
-  to, e.g., a PNG file with a proper alpha channel.
+  Launching VM with:
+  sudo qemu-system-x86_64 -enable-kvm -m 1024M ~/guest.vm -usb -vga std
+
+  Guest:
+  Kali Linux 2016.1
+  Kernel:
+  4.4.0-kali1-amd64
+  Affected Arch:
+  64bit & 32bit
+
+  Netbeans failing to start after netbeans splash comes up. No netbeans win=
+dow is being drawn.
+  Problem can be reproduced.
+  It IS working with -vga qxl, so maybe there's a bug in std emulation.
+
+  output from netbeans log (more in attachement):
+
+  SEVERE [global]
+  java.lang.RuntimeException: failed to load system cursor: DnD.Cursor.Copy=
+Drop : cannot load system cursor: CopyDrop.32x32
 
 To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1392468/+subscriptions
+https://bugs.launchpad.net/qemu/+bug/1577937/+subscriptions
 
