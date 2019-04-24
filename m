@@ -1,34 +1,22 @@
-Received: from eggs.gnu.org ([209.51.188.92]:40297)
+Received: from eggs.gnu.org ([209.51.188.92]:42900)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1hJFLS-000114-98
-	for qemu-devel@nongnu.org; Wed, 24 Apr 2019 06:41:43 -0400
+	(envelope-from <berrange@redhat.com>) id 1hJFSh-0005ZR-7x
+	for qemu-devel@nongnu.org; Wed, 24 Apr 2019 06:49:12 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1hJFLQ-0000yP-TU
-	for qemu-devel@nongnu.org; Wed, 24 Apr 2019 06:41:42 -0400
-Received: from indium.canonical.com ([91.189.90.7]:35516)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1hJFLQ-0000xp-Nd
-	for qemu-devel@nongnu.org; Wed, 24 Apr 2019 06:41:40 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1hJFLP-0006MA-IE
-	for <qemu-devel@nongnu.org>; Wed, 24 Apr 2019 10:41:39 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 88ECF2E800F
-	for <qemu-devel@nongnu.org>; Wed, 24 Apr 2019 10:41:39 +0000 (UTC)
+	(envelope-from <berrange@redhat.com>) id 1hJFSf-0007lV-Oj
+	for qemu-devel@nongnu.org; Wed, 24 Apr 2019 06:49:11 -0400
+Date: Wed, 24 Apr 2019 11:48:55 +0100
+From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+Message-ID: <20190424104855.GE31388@redhat.com>
+Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+References: <20190424103747.10173-1-thuth@redhat.com>
+	<20190424103747.10173-6-thuth@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Wed, 24 Apr 2019 10:33:12 -0000
-From: yuchenlin <1809304@bugs.launchpad.net>
-Reply-To: Bug 1809304 <1809304@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <154533506483.19401.8849680441407310900.malonedeb@soybean.canonical.com>
-Message-Id: <155610199227.17469.5809680321766083140.malone@soybean.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1809304] Re: qemu-img convert is freezing for
- some DMG files.
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20190424103747.10173-6-thuth@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH 5/6] tests: Run the iotests during "make
+ check" again
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,46 +25,70 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Thomas Huth <thuth@redhat.com>
+Cc: qemu-devel@nongnu.org, Fam Zheng <fam@euphon.net>, Kevin Wolf <kwolf@redhat.com>, Ed Maste <emaste@freebsd.org>, qemu-block@nongnu.org, Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>, Max Reitz <mreitz@redhat.com>, Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>, Li-Wen Hsu <lwhsu@freebsd.org>
 
-I re-test the dmg img with QEMU 4.0 again, and it works.
+On Wed, Apr 24, 2019 at 12:37:46PM +0200, Thomas Huth wrote:
+> People often forget to run the iotests before submitting patches or
+> pull requests - this is likely due to the fact that we do not run the
+> tests during our mandatory "make check" tests yet. Now that we've got
+> a new "ci" group of iotests that should be fine to run in every environ-
+> ment, it should be OK to enable the iotests during "make check" again.
+> Thus we now run the "ci" tests by default from the qemu-iotests-quick.sh
+> script, and only use the former "quick" group (that contains some tests
+> that are failing in some environments) when the user decided to run
+> "make check SPEED=thorough" or something similar.
+> 
+> Signed-off-by: Thomas Huth <thuth@redhat.com>
+> ---
+>  tests/Makefile.include      |  2 +-
+>  tests/qemu-iotests-quick.sh | 17 ++++++++++++++++-
+>  2 files changed, 17 insertions(+), 2 deletions(-)
 
-In my opinion, the bug can be closed as "Fix released".
+> diff --git a/tests/qemu-iotests-quick.sh b/tests/qemu-iotests-quick.sh
+> index 0e554bb972..416b3fc48b 100755
+> --- a/tests/qemu-iotests-quick.sh
+> +++ b/tests/qemu-iotests-quick.sh
 
-Thanks.
+s/-quick//  perhaps, since it no longer only runs the "quick" tests.
 
--- =
+> @@ -1,8 +1,23 @@
+>  #!/bin/sh
+>  
+> +# Honor the SPEED environment variable, just like we do it for the qtests.
+> +# The default is to run all tests that still work fine in a CI environments,
+> +# but if the user set SPEED=slow or SPEED=thorough, we also run all other
+> +# tests that are still marked as "quick"
+> +if [ "$SPEED" = "slow" -o "$SPEED" = "thorough" ]; then
+> +    group=quick
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1809304
+When user asks for "slow" tests we run the "quick" tests, which
+presumably implies...
 
-Title:
-  qemu-img convert is freezing for some DMG files.
+> +else
+> +    group=ci
 
-Status in QEMU:
-  Fix Committed
+..."ci" is quicker than the "quick"  tests !
 
-Bug description:
-  Recently, I created a file using hdiutil from MacOS (using Zlib
-  compression):
+Confused ? We certainly try to ensure that you will be :-)
 
-  $ hdiutil create -volname MyVolName -srcfolder /path/to/my/vol/ -ov
-  -format UDZO myvolname.dmg
+> +fi
+> +
+> +if [ -z "$(find . -name 'qemu-system-*' -print)" ]; then
+> +    echo "No qemu-system binary available. Skipped qemu-iotests."
+> +    exit 0
+> +fi
+> +
+>  cd tests/qemu-iotests
+>  
+>  ret=0
+> -TEST_DIR=${TEST_DIR:-/tmp/qemu-iotests-quick-$$} ./check -T -qcow2 -g quick || ret=1
+> +TEST_DIR=${TEST_DIR:-/tmp/qemu-iotests-quick-$$} ./check -T -qcow2 -g "$group" || ret=1
 
-  But, when I try to convert this volume using qemu-img convert, this
-  command is freezing.
 
-  I'm using the upstream version to test it.
-
-  It is freezing inside the binary search method to retrieve the chunk.
-
-  But, I still don't know why.
-
-  I'm attaching the file as an example.
-
-  It can be mounted using MacOS or other Linux apps like hfsleuth and
-  darling-dmg.
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1809304/+subscriptions
+Regards,
+Daniel
+-- 
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
