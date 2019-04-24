@@ -1,25 +1,25 @@
-Received: from eggs.gnu.org ([209.51.188.92]:43979)
+Received: from eggs.gnu.org ([209.51.188.92]:43917)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <arilou@gmail.com>) id 1hJIzM-0004qG-1f
+	(envelope-from <arilou@gmail.com>) id 1hJIzM-0004gR-7z
 	for qemu-devel@nongnu.org; Wed, 24 Apr 2019 10:35:09 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <arilou@gmail.com>) id 1hJIs3-0000Sg-3q
-	for qemu-devel@nongnu.org; Wed, 24 Apr 2019 10:27:36 -0400
-Received: from mail-wr1-x444.google.com ([2a00:1450:4864:20::444]:41514)
+	(envelope-from <arilou@gmail.com>) id 1hJIs1-0000Rd-3n
+	for qemu-devel@nongnu.org; Wed, 24 Apr 2019 10:27:34 -0400
+Received: from mail-wr1-x442.google.com ([2a00:1450:4864:20::442]:43416)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <arilou@gmail.com>) id 1hJIs2-0000SF-U4
-	for qemu-devel@nongnu.org; Wed, 24 Apr 2019 10:27:35 -0400
-Received: by mail-wr1-x444.google.com with SMTP id c12so19288055wrt.8
-	for <qemu-devel@nongnu.org>; Wed, 24 Apr 2019 07:27:34 -0700 (PDT)
+	(Exim 4.71) (envelope-from <arilou@gmail.com>) id 1hJIs0-0000Ql-Tt
+	for qemu-devel@nongnu.org; Wed, 24 Apr 2019 10:27:33 -0400
+Received: by mail-wr1-x442.google.com with SMTP id a12so2198618wrq.10
+	for <qemu-devel@nongnu.org>; Wed, 24 Apr 2019 07:27:32 -0700 (PDT)
 From: arilou@gmail.com
-Date: Wed, 24 Apr 2019 17:27:00 +0300
-Message-Id: <20190424142714.28460-6-arilou@gmail.com>
+Date: Wed, 24 Apr 2019 17:26:59 +0300
+Message-Id: <20190424142714.28460-5-arilou@gmail.com>
 In-Reply-To: <20190424142714.28460-1-arilou@gmail.com>
 References: <20190424142714.28460-1-arilou@gmail.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH v3 06/20] gdbstub: Implement set_thread (H pkt)
- with new infra
+Subject: [Qemu-devel] [PATCH v3 05/20] gdbstub: Implement continue with
+ signal (C pkt) with new infra
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,112 +35,56 @@ From: Jon Doron <arilou@gmail.com>
 
 Signed-off-by: Jon Doron <arilou@gmail.com>
 ---
- gdbstub.c | 79 ++++++++++++++++++++++++++++++++++---------------------
- 1 file changed, 49 insertions(+), 30 deletions(-)
+ gdbstub.c | 30 +++++++++++++++++++++++++-----
+ 1 file changed, 25 insertions(+), 5 deletions(-)
 
 diff --git a/gdbstub.c b/gdbstub.c
-index eaa42713ac..87b364b1d0 100644
+index a6d5acd6f0..eaa42713ac 100644
 --- a/gdbstub.c
 +++ b/gdbstub.c
-@@ -1563,6 +1563,47 @@ static void handle_cont_with_sig(GdbCmdContext *gdb_ctx, void *user_ctx)
+@@ -1548,6 +1548,21 @@ static void handle_continue(GdbCmdContext *gdb_ctx, void *user_ctx)
      gdb_continue(gdb_ctx->s);
  }
  
-+static void handle_set_thread(GdbCmdContext *gdb_ctx, void *user_ctx)
++static void handle_cont_with_sig(GdbCmdContext *gdb_ctx, void *user_ctx)
 +{
-+    CPUState *cpu;
++    unsigned long signal = 0;
 +
-+    if (gdb_ctx->num_params < 2) {
-+        put_packet(gdb_ctx->s, "E22");
-+        return;
++    if (gdb_ctx->num_params) {
++        signal = gdb_ctx->params[0].val_ul;
 +    }
 +
-+    if (gdb_ctx->params[1].thread_id.kind == GDB_READ_THREAD_ERR) {
-+        put_packet(gdb_ctx->s, "E22");
-+        return;
++    gdb_ctx->s->signal = gdb_signal_to_target(signal);
++    if (gdb_ctx->s->signal == -1) {
++        gdb_ctx->s->signal = 0;
 +    }
-+
-+    if (gdb_ctx->params[1].thread_id.kind != GDB_ONE_THREAD) {
-+        put_packet(gdb_ctx->s, "OK");
-+        return;
-+    }
-+
-+    cpu = gdb_get_cpu(gdb_ctx->s, gdb_ctx->params[1].thread_id.pid,
-+                      gdb_ctx->params[1].thread_id.tid);
-+    if (!cpu) {
-+        put_packet(gdb_ctx->s, "E22");
-+        return;
-+    }
-+
-+    switch (gdb_ctx->params[0].opcode) {
-+    case 'c':
-+        gdb_ctx->s->c_cpu = cpu;
-+        put_packet(gdb_ctx->s, "OK");
-+        break;
-+    case 'g':
-+        gdb_ctx->s->g_cpu = cpu;
-+        put_packet(gdb_ctx->s, "OK");
-+        break;
-+    default:
-+        put_packet(gdb_ctx->s, "E22");
-+        break;
-+    }
++    gdb_continue(gdb_ctx->s);
 +}
 +
  static int gdb_handle_packet(GDBState *s, const char *line_buf)
  {
      CPUState *cpu;
-@@ -1576,7 +1617,6 @@ static int gdb_handle_packet(GDBState *s, const char *line_buf)
-     char thread_id[16];
-     uint8_t *registers;
-     target_ulong addr, len;
--    GDBThreadIdKind thread_kind;
- 
-     trace_gdbstub_io_command(line_buf);
- 
-@@ -1838,35 +1878,14 @@ static int gdb_handle_packet(GDBState *s, const char *line_buf)
-             put_packet(s, "E22");
-         break;
-     case 'H':
--        type = *p++;
--
--        thread_kind = read_thread_id(p, &p, &pid, &tid);
--        if (thread_kind == GDB_READ_THREAD_ERR) {
--            put_packet(s, "E22");
--            break;
--        }
--
--        if (thread_kind != GDB_ONE_THREAD) {
--            put_packet(s, "OK");
--            break;
--        }
--        cpu = gdb_get_cpu(s, pid, tid);
--        if (cpu == NULL) {
--            put_packet(s, "E22");
--            break;
--        }
--        switch (type) {
--        case 'c':
--            s->c_cpu = cpu;
--            put_packet(s, "OK");
--            break;
--        case 'g':
--            s->g_cpu = cpu;
--            put_packet(s, "OK");
--            break;
--        default:
--             put_packet(s, "E22");
--             break;
-+        {
-+            static GdbCmdParseEntry set_thread_cmd_desc = {
-+                .handler = handle_set_thread,
-+                .cmd = "H",
-+                .cmd_startswith = 1,
-+                .schema = "o.t0"
-+            };
-+            process_string_cmd(s, NULL, line_buf, &set_thread_cmd_desc, 1);
+@@ -1594,11 +1609,16 @@ static int gdb_handle_packet(GDBState *s, const char *line_buf)
          }
          break;
-     case 'T':
+     case 'C':
+-        s->signal = gdb_signal_to_target (strtoul(p, (char **)&p, 16));
+-        if (s->signal == -1)
+-            s->signal = 0;
+-        gdb_continue(s);
+-        return RS_IDLE;
++        {
++            static GdbCmdParseEntry cont_with_sig_cmd_desc = {
++                .handler = handle_cont_with_sig,
++                .cmd = "C",
++                .cmd_startswith = 1,
++                .schema = "l0"
++            };
++            process_string_cmd(s, NULL, line_buf, &cont_with_sig_cmd_desc, 1);
++        }
++        break;
+     case 'v':
+         if (strncmp(p, "Cont", 4) == 0) {
+             p += 4;
 -- 
 2.20.1
