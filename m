@@ -1,25 +1,25 @@
 Received: from eggs.gnu.org ([209.51.188.92]:45538)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <arilou@gmail.com>) id 1hJN6I-0001z4-Up
-	for qemu-devel@nongnu.org; Wed, 24 Apr 2019 14:58:36 -0400
+	(envelope-from <arilou@gmail.com>) id 1hJN6C-0001z4-Br
+	for qemu-devel@nongnu.org; Wed, 24 Apr 2019 14:58:29 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <arilou@gmail.com>) id 1hJMuS-0005XY-Dd
-	for qemu-devel@nongnu.org; Wed, 24 Apr 2019 14:46:21 -0400
-Received: from mail-wr1-x444.google.com ([2a00:1450:4864:20::444]:40593)
+	(envelope-from <arilou@gmail.com>) id 1hJMuo-00060C-PZ
+	for qemu-devel@nongnu.org; Wed, 24 Apr 2019 14:46:43 -0400
+Received: from mail-wm1-x342.google.com ([2a00:1450:4864:20::342]:53043)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <arilou@gmail.com>) id 1hJMuS-0005Wv-6o
-	for qemu-devel@nongnu.org; Wed, 24 Apr 2019 14:46:20 -0400
-Received: by mail-wr1-x444.google.com with SMTP id h4so26567905wre.7
-	for <qemu-devel@nongnu.org>; Wed, 24 Apr 2019 11:46:20 -0700 (PDT)
+	(Exim 4.71) (envelope-from <arilou@gmail.com>) id 1hJMuo-0005y6-Ff
+	for qemu-devel@nongnu.org; Wed, 24 Apr 2019 14:46:42 -0400
+Received: by mail-wm1-x342.google.com with SMTP id j13so5983140wmh.2
+	for <qemu-devel@nongnu.org>; Wed, 24 Apr 2019 11:46:40 -0700 (PDT)
 From: Jon Doron <arilou@gmail.com>
-Date: Wed, 24 Apr 2019 21:45:45 +0300
-Message-Id: <20190424184600.8445-5-arilou@gmail.com>
+Date: Wed, 24 Apr 2019 21:45:56 +0300
+Message-Id: <20190424184600.8445-16-arilou@gmail.com>
 In-Reply-To: <20190424184600.8445-1-arilou@gmail.com>
 References: <20190424184600.8445-1-arilou@gmail.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH v4 05/20] gdbstub: Implement continue with
- signal (C pkt) with new infra
+Subject: [Qemu-devel] [PATCH v4 16/20] gdbstub: Implement step (s pkt) with
+ new infra
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,56 +33,52 @@ Cc: Jon Doron <arilou@gmail.com>
 
 Signed-off-by: Jon Doron <arilou@gmail.com>
 ---
- gdbstub.c | 30 +++++++++++++++++++++++++-----
- 1 file changed, 25 insertions(+), 5 deletions(-)
+ gdbstub.c | 25 +++++++++++++++++++------
+ 1 file changed, 19 insertions(+), 6 deletions(-)
 
 diff --git a/gdbstub.c b/gdbstub.c
-index 47b1e7e7a4..edcb7bfd17 100644
+index 772bcd2e1f..265a6e3aeb 100644
 --- a/gdbstub.c
 +++ b/gdbstub.c
-@@ -1542,6 +1542,21 @@ static void handle_continue(GdbCmdContext *gdb_ctx, void *user_ctx)
+@@ -1815,6 +1815,16 @@ static void handle_file_io(GdbCmdContext *gdb_ctx, void *user_ctx)
      gdb_continue(gdb_ctx->s);
  }
  
-+static void handle_cont_with_sig(GdbCmdContext *gdb_ctx, void *user_ctx)
++static void handle_step(GdbCmdContext *gdb_ctx, void *user_ctx)
 +{
-+    unsigned long signal = 0;
-+
 +    if (gdb_ctx->num_params) {
-+        signal = gdb_ctx->params[0].val_ul;
++        gdb_set_cpu_pc(gdb_ctx->s, (target_ulong)gdb_ctx->params[0].val_ull);
 +    }
 +
-+    gdb_ctx->s->signal = gdb_signal_to_target(signal);
-+    if (gdb_ctx->s->signal == -1) {
-+        gdb_ctx->s->signal = 0;
-+    }
++    cpu_single_step(gdb_ctx->s->c_cpu, sstep_flags);
 +    gdb_continue(gdb_ctx->s);
 +}
 +
  static int gdb_handle_packet(GDBState *s, const char *line_buf)
  {
      CPUState *cpu;
-@@ -1588,11 +1603,16 @@ static int gdb_handle_packet(GDBState *s, const char *line_buf)
+@@ -1946,13 +1956,16 @@ static int gdb_handle_packet(GDBState *s, const char *line_buf)
          }
          break;
-     case 'C':
--        s->signal = gdb_signal_to_target (strtoul(p, (char **)&p, 16));
--        if (s->signal == -1)
--            s->signal = 0;
+     case 's':
+-        if (*p != '\0') {
+-            addr = strtoull(p, (char **)&p, 16);
+-            gdb_set_cpu_pc(s, addr);
++        {
++            static GdbCmdParseEntry step_cmd_desc = {
++                .handler = handle_step,
++                .cmd = "s",
++                .cmd_startswith = 1,
++                .schema = "L0"
++            };
++            process_string_cmd(s, NULL, line_buf, &step_cmd_desc, 1);
+         }
+-        cpu_single_step(s->c_cpu, sstep_flags);
 -        gdb_continue(s);
 -        return RS_IDLE;
-+        {
-+            static GdbCmdParseEntry cont_with_sig_cmd_desc = {
-+                .handler = handle_cont_with_sig,
-+                .cmd = "C",
-+                .cmd_startswith = 1,
-+                .schema = "l0"
-+            };
-+            process_string_cmd(s, NULL, line_buf, &cont_with_sig_cmd_desc, 1);
-+        }
 +        break;
-     case 'v':
-         if (strncmp(p, "Cont", 4) == 0) {
-             p += 4;
+     case 'F':
+         {
+             static GdbCmdParseEntry file_io_cmd_desc = {
 -- 
 2.20.1
