@@ -2,68 +2,70 @@ Return-Path: <SRS0=3XOk=S2=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.3 required=3.0 tests=FROM_EXCESS_BASE64,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,
-	USER_AGENT_MUTT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.4 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_PASS,USER_AGENT_MUTT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3816CC282E1
-	for <qemu-devel@archiver.kernel.org>; Wed, 24 Apr 2019 08:42:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 703A7C10F11
+	for <qemu-devel@archiver.kernel.org>; Wed, 24 Apr 2019 09:08:28 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id F0EED218D3
-	for <qemu-devel@archiver.kernel.org>; Wed, 24 Apr 2019 08:42:35 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F0EED218D3
+	by mail.kernel.org (Postfix) with ESMTPS id 2FC1C21773
+	for <qemu-devel@archiver.kernel.org>; Wed, 24 Apr 2019 09:08:28 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2FC1C21773
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:38069 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:38268 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hJDUB-00078T-5v
-	for qemu-devel@archiver.kernel.org; Wed, 24 Apr 2019 04:42:35 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:33686)
+	id 1hJDtC-0004QI-RG
+	for qemu-devel@archiver.kernel.org; Wed, 24 Apr 2019 05:08:26 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:42233)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1hJDLt-00083L-ER
-	for qemu-devel@nongnu.org; Wed, 24 Apr 2019 04:34:03 -0400
+	(envelope-from <mkletzan@redhat.com>) id 1hJDrU-0003DM-Kh
+	for qemu-devel@nongnu.org; Wed, 24 Apr 2019 05:06:44 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1hJD7D-0006qa-5n
-	for qemu-devel@nongnu.org; Wed, 24 Apr 2019 04:18:53 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:34926)
+	(envelope-from <mkletzan@redhat.com>) id 1hJDpD-0004FI-FK
+	for qemu-devel@nongnu.org; Wed, 24 Apr 2019 05:04:21 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:49544)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1hJD7C-0006fr-OZ
-	for qemu-devel@nongnu.org; Wed, 24 Apr 2019 04:18:51 -0400
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
-	[10.5.11.13])
+	(Exim 4.71) (envelope-from <mkletzan@redhat.com>) id 1hJDp9-0004BY-Qm
+	for qemu-devel@nongnu.org; Wed, 24 Apr 2019 05:04:19 -0400
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+	[10.5.11.11])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 4520330832CB;
-	Wed, 24 Apr 2019 08:18:49 +0000 (UTC)
-Received: from redhat.com (ovpn-112-57.ams2.redhat.com [10.36.112.57])
-	by smtp.corp.redhat.com (Postfix) with ESMTPS id A239F2C8FB;
-	Wed, 24 Apr 2019 08:18:40 +0000 (UTC)
-Date: Wed, 24 Apr 2019 09:18:37 +0100
-From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-To: David Hildenbrand <david@redhat.com>
-Message-ID: <20190424081837.GA28615@redhat.com>
-References: <20190417053225.27505-1-richard.henderson@linaro.org>
-	<20190417053225.27505-2-richard.henderson@linaro.org>
-	<fb4917eb-4ff3-7a93-cbcd-39d1800827e8@redhat.com>
-	<20190423100101.GD6022@redhat.com>
-	<cc1481bc-5f80-2792-2a36-a31a42357825@redhat.com>
+	by mx1.redhat.com (Postfix) with ESMTPS id 11B13308FC23;
+	Wed, 24 Apr 2019 09:04:06 +0000 (UTC)
+Received: from caroline (unknown [10.43.2.67])
+	by smtp.corp.redhat.com (Postfix) with ESMTPS id 7DE53600C4;
+	Wed, 24 Apr 2019 09:04:05 +0000 (UTC)
+Received: by caroline (Postfix, from userid 1000)
+	id 36D9B1206F3; Wed, 24 Apr 2019 11:04:04 +0200 (CEST)
+Date: Wed, 24 Apr 2019 11:04:04 +0200
+From: Martin Kletzander <mkletzan@redhat.com>
+To: Kevin Wolf <kwolf@redhat.com>
+Message-ID: <20190424090404.GA7640@wheatley>
+References: <20190423113028.GD30014@wheatley>
+	<20190423121218.GF9041@localhost.localdomain>
+	<20190423142648.GA2967@wheatley>
+	<20190423150845.GG9041@localhost.localdomain>
+	<aeb62174-5aad-676e-792d-e71d694dbd1e@virtuozzo.com>
+	<20190424071917.GA15891@linux.fritz.box>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature"; boundary="wac7ysb48OaltWcw"
 Content-Disposition: inline
-In-Reply-To: <cc1481bc-5f80-2792-2a36-a31a42357825@redhat.com>
-User-Agent: Mutt/1.11.3 (2019-02-01)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+In-Reply-To: <20190424071917.GA15891@linux.fritz.box>
+User-Agent: Mutt/1.11.4 (2019-03-13)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.44]);
-	Wed, 24 Apr 2019 08:18:49 +0000 (UTC)
-Content-Transfer-Encoding: quoted-printable
+	(mx1.redhat.com [10.5.110.43]);
+	Wed, 24 Apr 2019 09:04:06 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH 1/1] util/path: Do not cache all filenames
- at startup
+Subject: Re: [Qemu-devel] Possibly incorrect data sparsification by qemu-img
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -75,175 +77,169 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-Cc: peter.maydell@linaro.org, Richard Henderson <richard.henderson@linaro.org>,
-	qemu-devel@nongnu.org, evgreen@chromium.org, laurent@vivier.eu,
-	=?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>,
-	Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>
+Cc: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
+	"qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
+	Richard Jones <rjones@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190424081837.C-nnbpJ5Lkctvu867LArhRpCvzcsFSWhgf0vEo2v_68@z>
+Message-ID: <20190424090404.v6obsB_b8AcnTh40iSNNpH9OR7YGliwG9AUqDbqErOE@z>
 
-On Tue, Apr 23, 2019 at 08:30:55PM +0200, David Hildenbrand wrote:
-> On 23.04.19 12:01, Daniel P. Berrang=C3=A9 wrote:
-> > On Tue, Apr 23, 2019 at 11:54:53AM +0200, Philippe Mathieu-Daud=C3=A9=
- wrote:
-> >> Hi Richard, Daniel,
-> >>
-> >> On 4/17/19 7:32 AM, Richard Henderson wrote:
-> >>> If one uses -L $PATH to point to a full chroot, the startup time
-> >>> is significant.  In addition, the existing probing algorithm fails
-> >>> to handle symlink loops.
-> >>>
-> >>> Instead, probe individual paths on demand.  Cache both positive
-> >>> and negative results within $PATH, so that any one filename is
-> >>> probed only once.
-> >>>
-> >>> Use glib filename functions for clarity.
-> >>>
-> >>> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
-> >>> ---
-> >>>  util/path.c | 211 ++++++++++++++----------------------------------=
-----
-> >>>  1 file changed, 57 insertions(+), 154 deletions(-)
-> >=20
-> >=20
-> >>> +#if GLIB_CHECK_VERSION(2, 58, 0)
-> >>
-> >> Should we raise GLIB_VERSION_MAX_ALLOWED in "glib-compat.h"?
-> >>
-> >> Currently it is:
-> >>
-> >>   /* Ask for warnings if code tries to use function that did not
-> >>    * exist in the defined version. These risk breaking builds
-> >>    */
-> >>   #define GLIB_VERSION_MAX_ALLOWED GLIB_VERSION_2_40
-> >=20
-> > Use of 2.40 is set in accordance with our targetted platform support
-> > policy. If Peter has stopped using the Ubuntu 14.04 build host, we
-> > could bump it to 2.42. Once our dev tree opens up we could in fact
-> > drop Jessie since we'll be supporting Buster by the time next QEMU
-> > is released. That would still only take us upto perhaps Glib 2.48
-> >=20
-> > Glib 2.58 is waaaay to new to rely on.
-> >=20
-> > commit e7b3af81597db1a6b55f2c15d030d703c6b2c6ac
-> > Author: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
-> > Date:   Fri May 4 15:34:46 2018 +0100
-> >=20
-> >     glib: bump min required glib library version to 2.40
-> >    =20
-> >     Per supported platforms doc[1], the various min glib on relevant =
-distros is:
-> >    =20
-> >       RHEL-7: 2.50.3
-> >       Debian (Stretch): 2.50.3
-> >       Debian (Jessie): 2.42.1
-> >       OpenBSD (Ports): 2.54.3
-> >       FreeBSD (Ports): 2.50.3
-> >       OpenSUSE Leap 15: 2.54.3
-> >       SLE12-SP2: 2.48.2
-> >       Ubuntu (Xenial): 2.48.0
-> >       macOS (Homebrew): 2.56.0
-> >    =20
-> >     This suggests that a minimum glib of 2.42 is a reasonable target.
-> >    =20
-> >     The GLibC compile farm, however, uses Ubuntu 14.04 (Trusty) which=
- only
-> >     has glib 2.40.0, and this is needed for testing during merge. Thu=
-s an
-> >     exception is made to the documented platform support policy to al=
-low for
-> >     all three current LTS releases to be supported.
-> >    =20
-> >     Docker jobs that not longer satisfy this new min version are remo=
-ved.
-> >    =20
-> >     [1] https://qemu.weilnetz.de/doc/qemu-doc.html#Supported-build-pl=
-atforms
-> >    =20
-> >     Reviewed-by: Thomas Huth <thuth@redhat.com>
-> >     Signed-off-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
-> >=20
-> >=20
-> >>
-> >> From commit e71e8cc035558eabd6b3e19f6d3254c754c027ef:
-> >>
-> >>  glib: enforce the minimum required version and warn about old APIs
-> >>
-> >>  There are two useful macros that can be defined before including
-> >>  glib.h that are related to the min required glib version
-> >>
-> >>   - GLIB_VERSION_MIN_REQUIRED
-> >>
-> >>     When this is defined, if code uses an API that was deprecated
-> >>     in this version, or older, a compiler warning will be emitted.
-> >>     This alerts maintainers to update their code to whatever new
-> >>     replacement API is now recommended best practice.
-> >>
-> >>   - GLIB_VERSION_MAX_ALLOWED
-> >>
-> >>     When this is defined, if code uses an API that was introduced
-> >>     in a version that is newer than the declared version, a compiler
-> >>     warning will be emitted. This alerts maintainers if new code
-> >>     accidentally uses functionality that won't be available on some
-> >>     supported platforms.
-> >>
-> >>  The GLIB_VERSION_MAX_ALLOWED constant makes it a bit harder to opt
-> >>  in to using specific new APIs with a GLIB_CHECK_VERSION conditional=
-.
-> >>  To workaround this Pragmas can be used to temporarily turn off the
-> >>  -Wdeprecated-declarations compiler warning, while a static inline
-> >>  compat function is implemented. This workaround is illustrated with=
- the
-> >>  implementation of the g_strv_contains method to satisfy the test su=
-ite.
-> >>
-> >>> +    base =3D g_canonicalize_filename(prefix, NULL);
-> >>> +#else
-> >>> +    if (prefix[0] !=3D '/') {
-> >>> +        char *cwd =3D g_get_current_dir();
-> >>> +        base =3D g_build_filename(cwd, prefix, NULL);
-> >>> +        g_free(cwd);
-> >>> +    } else {
-> >>> +        base =3D g_strdup(prefix);
-> >>> +    }
-> >>> +#endif
-> >=20
-> > To use functionality from newer glib releases we can't put the #ifdef
-> > conditionals inline in the main source files.
-> >=20
-> > They have to be put into glib-compat.h instead. There's a detailed
-> > comment in that file illustrating how todo this without triggering
-> > the compile warnings about deprecations.
-> >=20
-> >=20
-> > Regards,
-> > Daniel
-> >=20
->=20
-> Trying to build (Richard's tcg-vec-next branch) on Fedora29 I get
->=20
-> util/path.c: In function 'init_paths':
-> util/path.c:24:5: error: 'g_canonicalize_filename' is deprecated: Not
-> available before 2.58 [-Werror=3Ddeprecated-declarations]
->      base =3D g_canonicalize_filename(prefix, NULL);
->      ^~~~
 
-[snip]
+--wac7ysb48OaltWcw
+Content-Type: text/plain; charset=us-ascii; format=flowed
+Content-Disposition: inline
 
-This is exactly why the compat code needs to go into glib-compat.h.
-There is a special mechanism in that file for avoiding triggering
-the deprecation warnings from glib.
+On Wed, Apr 24, 2019 at 09:19:17AM +0200, Kevin Wolf wrote:
+>Am 24.04.2019 um 08:40 hat Vladimir Sementsov-Ogievskiy geschrieben:
+>> 23.04.2019 18:08, Kevin Wolf wrote:
+>> > Am 23.04.2019 um 16:26 hat Martin Kletzander geschrieben:
+>> >> On Tue, Apr 23, 2019 at 02:12:18PM +0200, Kevin Wolf wrote:
+>> >>> Am 23.04.2019 um 13:30 hat Martin Kletzander geschrieben:
+>> >>>> Hi,
+>> >>>>
+>> >>>> I am using qemu-img with nbdkit to transfer a disk image and the update it with
+>> >>>> extra data from newer snapshots.  The end image cannot be transferred because
+>> >>>> the snapshots will be created later than the first transfer and we want to save
+>> >>>> some time up front.  You might think of it as a continuous synchronisation.  It
+>> >>>> looks something like this:
+>> >>>>
+>> >>>> I first transfer the whole image:
+>> >>>>
+>> >>>>   qemu-img convert -p $nbd disk.raw
+>> >>>>
+>> >>>> Where `$nbd` is something along the lines of `nbd+unix:///?socket=nbdkit.sock`
+>> >>>>
+>> >>>> Then, after the next snapshot is created, I can update it thanks to the `-n`
+>> >>>> parameter (the $nbd now points to the newer snapshot with unchanged data looking
+>> >>>> like holes in the file):
+>> >>>>
+>> >>>>   qemu-img convert -p -n $nbd disk.raw
+>> >>>>
+>> >>>> This is fast and efficient as it uses block status nbd extension, so it only
+>> >>>> transfers new data.
+>> >>>
+>> >>> This is an implementation detail. Don't rely on it. What you're doing is
+>> >>> abusing 'qemu-img convert', so problems like what you describe are to be
+>> >>> expected.
+>> >>>
+>> >>>> This can be done over and over again to keep the local
+>> >>>> `disk.raw` image up to date with the latest remote snapshot.
+>> >>>>
+>> >>>> However, when the guest OS zeroes some of the data and it gets written into the
+>> >>>> snapshot, qemu-img scans for those zeros and does not write them to the
+>> >>>> destination image.  Checking the output of `qemu-img map --output=json $nbd`
+>> >>>> shows that the zeroed data is properly marked as `data: true`.
+>> >>>>
+>> >>>> Using `-S 0` would write zeros even where the holes are, effectively overwriting
+>> >>>> the data from the last snapshot even though they should not be changed.
+>> >>>>
+>> >>>> Having gone through some workarounds I would like there to be another way.  I
+>> >>>> know this is far from the typical usage of qemu-img, but is this really the
+>> >>>> expected behaviour or is this just something nobody really needed before?  If it
+>> >>>> is the former, would it be possible to have a parameter that would control this
+>> >>>> behaviour?  If the latter is the case, can that behaviour be changed so that it
+>> >>>> properly replicates the data when `-n` parameter is used?
+>> >>>>
+>> >>>> Basically the only thing we need is to either:
+>> >>>>
+>> >>>> 1) write zeros where they actually are or
+>> >>>>
+>> >>>> 2) turn off explicit sparsification without requesting dense image (basically
+>> >>>>     sparsify only the par that is reported as hole on the source) or
+>> >>>>
+>> >>>> 3) ideally, just FALLOC_FL_PUNCH_HOLE in places where source did report data,
+>> >>>>     but qemu-img found they are all zeros (or source reported HOLE+ZERO which, I
+>> >>>>     believe, is effectively the same)
+>> >>>>
+>> >>>> If you want to try this out, I found the easiest reproducible way is using
+>> >>>> nbdkit's data plugin, which can simulate whatever source image you like.
+>> >>>
+>> >>> I think what you _really_ want is a commit block job. The problem is
+>> >>> just that you don't have a proper backing file chain, but just a bunch
+>> >>> of NBD connections.
+>> >>>
+>> >>> Can't you get an NBD connection that already provides the condensed form
+>> >>> of the whole snapshot chain directly at the source? If the NBD server
+>> >>> was QEMU, this would actually be easier than providing each snapshot
+>> >>> individually.
+>> >>>
+>> >>> If this isn't possible, I think you need to replicate the backing chain
+>> >>> on the destination instead of converting into the same image again and
+>> >>> again so that qemu-img knows that it must take existing data of the
+>> >>> backing file into consideration:
+>> >>>
+>> >>>     qemu-img convert -O qcow2 nbd://... base.qcow2
+>> >>>     qemu-img convert -O qcow2 -F qcow2 -B base.qcow2 nbd://... overlay1.qcow2
+>> >>>     qemu-img convert -O qcow2 -F qcow2 -B overlay1.qcow2 nbd://... overlay2.qcow2
+>> >>>     ...
+>>
+>> Is it safe in general?
+>>
+>> Qemu often consider rounding-up allocated ranges to be safe, or just
+>> consider unknown area as allocated.  And if this happen, we'll convert
+>> unallocated hole to allocated zeroes on target, which will break
+>> backing chain.
+>>
+>> This way would be correct if on source under nbd server we have valid
+>> backing chain too, so in case of "rounding-up" we'll just read valid
+>> data from backing. But it is not the case (or sorry, if I
+>> misunderstood).
+>
+>As I said, it depends on the NBD server providing the right block
+>allocation status - and this includes alignment etc. as well.
+>
+>It's not a very nice solution because NBD doesn't actually do backing
+>fields, so we're relying on things that the spec doesn't talk about. But
 
-Regards,
-Daniel
---=20
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberran=
-ge :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.c=
-om :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberran=
-ge :|
+That is what I was concerned about, if I understand correctly there is no
+concept of backing chains in the NBD protocol.
+
+>as I understand, we don't have control over the server side, so it's
+>probably the best we can do under these conditions.
+>
+>If the NBD server already took the backing chain into consideration, it
+>would indeed be much more reliable.
+>
+
+We *kind of* have control over the server.  The nbd server is nbdkit in which we
+can make sure does the right thing, however making it open the local file as
+backing is something that does not really fit in the design, or at least not
+yet.
+
+But we can make sure the provided data is correct even for unallocated areas
+because the backing chain we replicated is present on the source.  Reading
+couple more blocks is still a major improvement over reading all the data.
+
+I tried your solution and it works nicely, even though it consumes more data
+then needed.  I'm guessing this could be at least partially avoided by using
+internal snapshots, if that was supported with `convert`, but that's not really
+needed.  This is more than enough and, as more of us said, this usage is kind of
+an abuse of what qemu-img is designed to do.
+
+Thanks everyone for all the help!
+
+Martin
+
+--wac7ysb48OaltWcw
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAABCAAdFiEEiXAnXDYdKAaCyvS1CB/CnyQXht0FAlzAJoQACgkQCB/CnyQX
+ht0lwBAAkX8QsOHk0+6sKg6PSyHn8zsrllP0CatzgMfjKCfBCoXrY1ayq0lp+SNY
+lFxMUHhwB9FU8qagSyhozTncCH12F9N3uvwFvihGSDFZOZlD1MjbPVUTncXlDKj3
+jnKuZWC2kvDXdlKkrw/ZZyVmyK8oJp0w0YP0WIifK9YQim6yhQ7/B4MqjqOba/2z
+BXsQAE1JzQQ7gRU93CVAXijABkd+8iZX4r+TfCJLo8M+/IMNZPVnzUbomI62H6nR
+a9l5reQdReanwX9TliksUehg7Uh4JXYjCAFgftdCFyet+4Sr58CbNiMALogChGK1
+Kk+GKaHPgh5br1tJ4/m8e8u+R2QZKc/uUKkxD5acE3IMgTjyURArRtOBDMOwM39H
+fxLOkgHgDgZl53KHRFWvLY30PxwYZsnDhbFRgHXAFRGArhXI1gydc7REfLm43d7D
+DuxcQQhJeuFVSOIlCuPhqgmnUsdlbJwOe0dLWjV371GZaQ6o1YFiY3tUEaRF6y4C
+L5cblavs/9AdoB68qHVF8nzl5kzRmEHv1wWdWXnHXb769KS1A0gSoAK9+nWvODpO
+3nom501msOVXuPJ00c86LdlvAJU3xY4UFexYi3ay1PjgVCiDRKKOWayJXkw/6Rxb
+MlvDzMsjSWCaMCZewJVI05C9tcjiK0e87GA5KsEamZ1beMPQnNg=
+=pN/c
+-----END PGP SIGNATURE-----
+
+--wac7ysb48OaltWcw--
 
