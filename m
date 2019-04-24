@@ -2,49 +2,49 @@ Return-Path: <SRS0=3XOk=S2=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5F2EEC10F11
-	for <qemu-devel@archiver.kernel.org>; Wed, 24 Apr 2019 14:02:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 43D78C10F11
+	for <qemu-devel@archiver.kernel.org>; Wed, 24 Apr 2019 14:02:56 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2C692218FC
-	for <qemu-devel@archiver.kernel.org>; Wed, 24 Apr 2019 14:02:23 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2C692218FC
+	by mail.kernel.org (Postfix) with ESMTPS id 149EE218FC
+	for <qemu-devel@archiver.kernel.org>; Wed, 24 Apr 2019 14:02:56 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 149EE218FC
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:42203 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:42207 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hJITe-0006u2-Ag
-	for qemu-devel@archiver.kernel.org; Wed, 24 Apr 2019 10:02:22 -0400
+	id 1hJIUB-0007GV-92
+	for qemu-devel@archiver.kernel.org; Wed, 24 Apr 2019 10:02:55 -0400
 Received: from eggs.gnu.org ([209.51.188.92]:33946)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1hJIM2-0008ST-PW
-	for qemu-devel@nongnu.org; Wed, 24 Apr 2019 09:54:31 -0400
+	(envelope-from <mreitz@redhat.com>) id 1hJIMB-0008ST-N7
+	for qemu-devel@nongnu.org; Wed, 24 Apr 2019 09:54:40 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1hJIGq-0002ib-JW
-	for qemu-devel@nongnu.org; Wed, 24 Apr 2019 09:49:09 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:45972)
+	(envelope-from <mreitz@redhat.com>) id 1hJIAh-0005Dq-1U
+	for qemu-devel@nongnu.org; Wed, 24 Apr 2019 09:42:47 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:49624)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <mreitz@redhat.com>)
-	id 1hJIGp-0002ho-Fp; Wed, 24 Apr 2019 09:49:07 -0400
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
-	[10.5.11.14])
+	id 1hJIAf-00057P-Ng; Wed, 24 Apr 2019 09:42:45 -0400
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+	[10.5.11.11])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 48AC530A9DC2;
-	Wed, 24 Apr 2019 13:49:03 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id BFF41307E047;
+	Wed, 24 Apr 2019 13:42:44 +0000 (UTC)
 Received: from dresden.str.redhat.com (unknown [10.40.205.28])
-	by smtp.corp.redhat.com (Postfix) with ESMTPS id 1A5515D9CD;
-	Wed, 24 Apr 2019 13:49:01 +0000 (UTC)
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
-	"qemu-block@nongnu.org" <qemu-block@nongnu.org>
+	by smtp.corp.redhat.com (Postfix) with ESMTPS id 7FC78600C4;
+	Wed, 24 Apr 2019 13:42:43 +0000 (UTC)
+To: Eric Blake <eblake@redhat.com>, qemu-block@nongnu.org
 References: <20180713111424.23670-1-mreitz@redhat.com>
-	<9afddacb-ca54-6ac3-1c02-b8916a08fcd3@redhat.com>
-	<c3f01ebe-37f7-d1d8-8bcd-45df37d80ff6@virtuozzo.com>
+	<20180713111424.23670-3-mreitz@redhat.com>
+	<cec09e49-6702-cb66-e668-42d728800a75@redhat.com>
 From: Max Reitz <mreitz@redhat.com>
 Openpgp: preference=signencrypt
 Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
@@ -71,24 +71,24 @@ Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
 	/ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
 	bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
 	R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
-Message-ID: <3583e4e9-d29e-fc5a-6e83-637e515c38f7@redhat.com>
-Date: Wed, 24 Apr 2019 15:48:55 +0200
+Message-ID: <0bf6aa98-3792-40bd-6520-f8ba419455d7@redhat.com>
+Date: Wed, 24 Apr 2019 15:42:41 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
 	Thunderbird/60.6.1
 MIME-Version: 1.0
-In-Reply-To: <c3f01ebe-37f7-d1d8-8bcd-45df37d80ff6@virtuozzo.com>
+In-Reply-To: <cec09e49-6702-cb66-e668-42d728800a75@redhat.com>
 Content-Type: multipart/signed; micalg=pgp-sha256;
 	protocol="application/pgp-signature";
-	boundary="WbTQsdO1hO6b1aqFXzRpYXmiowF2oosH9"
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+	boundary="UNxDxx9xL2ZSmtfEJSlAjub3m4iJPbTAn"
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.45]);
-	Wed, 24 Apr 2019 13:49:03 +0000 (UTC)
+	(mx1.redhat.com [10.5.110.42]);
+	Wed, 24 Apr 2019 13:42:44 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
 X-Content-Filtered-By: Mailman/MimeDel 2.1.21
-Subject: Re: [Qemu-devel] [PATCH 0/3] qemu-img: Allow rebase with no input
- base
+Subject: Re: [Qemu-devel] [PATCH 2/3] qemu-img: Use zero writes after source
+ backing EOF
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -100,61 +100,84 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>,
-	"qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+Cc: Kevin Wolf <kwolf@redhat.com>, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190424134855.X8G4Kt5p23hst7aGDeLZyD-gi07kz72OO_zkHV5CNSw@z>
+Message-ID: <20190424134241.qJyKYOGUeCaAfoKe8449rsFQSjgwgL4icTuD90vBwuA@z>
 
 This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---WbTQsdO1hO6b1aqFXzRpYXmiowF2oosH9
+--UNxDxx9xL2ZSmtfEJSlAjub3m4iJPbTAn
 From: Max Reitz <mreitz@redhat.com>
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
- "qemu-block@nongnu.org" <qemu-block@nongnu.org>
-Cc: Kevin Wolf <kwolf@redhat.com>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
-Message-ID: <3583e4e9-d29e-fc5a-6e83-637e515c38f7@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH 0/3] qemu-img: Allow rebase with no input
- base
+To: Eric Blake <eblake@redhat.com>, qemu-block@nongnu.org
+Cc: Kevin Wolf <kwolf@redhat.com>, qemu-devel@nongnu.org
+Message-ID: <0bf6aa98-3792-40bd-6520-f8ba419455d7@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH 2/3] qemu-img: Use zero writes after source
+ backing EOF
 References: <20180713111424.23670-1-mreitz@redhat.com>
- <9afddacb-ca54-6ac3-1c02-b8916a08fcd3@redhat.com>
- <c3f01ebe-37f7-d1d8-8bcd-45df37d80ff6@virtuozzo.com>
-In-Reply-To: <c3f01ebe-37f7-d1d8-8bcd-45df37d80ff6@virtuozzo.com>
+ <20180713111424.23670-3-mreitz@redhat.com>
+ <cec09e49-6702-cb66-e668-42d728800a75@redhat.com>
+In-Reply-To: <cec09e49-6702-cb66-e668-42d728800a75@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
 
-On 18.04.19 19:00, Vladimir Sementsov-Ogievskiy wrote:
-> 13.04.2019 19:11, Max Reitz wrote:
->> Ping again
+On 18.04.19 20:59, Eric Blake wrote:
+> On 7/13/18 6:14 AM, Max Reitz wrote:
+>> Past the end of the source backing file, we memset() buf_old to zero, =
+so
+>> it is clearly easy to use blk_pwrite_zeroes() instead of blk_pwrite()
+>> then.
 >>
->> (I feel like I just need to start merging unreviewed patches until I
->> break something (can't take that long) so you get so scared of my
->> patches that you at least refuse them outright)
+>> Signed-off-by: Max Reitz <mreitz@redhat.com>
+>> ---
+>>  qemu-img.c | 11 +++++++++--
+>>  1 file changed, 9 insertions(+), 2 deletions(-)
+>>
 >=20
-> Could you resend before?
+>> @@ -3458,8 +3461,12 @@ static int img_rebase(int argc, char **argv)
+>>                  if (compare_buffers(buf_old + written, buf_new + writ=
+ten,
+>>                                      n - written, &pnum))
+>>                  {
+>> -                    ret =3D blk_pwrite(blk, offset + written,
+>> -                                     buf_old + written, pnum, 0);
+>> +                    if (buf_old_is_zero) {
+>> +                        ret =3D blk_pwrite_zeroes(blk, offset + writt=
+en, pnum, 0);
+>=20
+> Should we allow BDRV_REQ_MAY_UNMAP here, either unconditionally, or
+> based on a command line knob that told us whether the user is more
+> interested in a sparse result (that still reads as zero) vs. a
+> fully-allocated result?
 
-Sure, but for me, this series still applies as-is.
+I wouldn=E2=80=99t trust that.  We haven=E2=80=99t yet switched to the ne=
+w backing file
+at this point, so I think a driver would be correct in handling such
+requests by punching a hole in the file -- which would lead to the new
+backing file poking through once we=E2=80=99ve switched to it.
 
 Max
 
+> Reviewed-by: Eric Blake <eblake@redhat.com>
 
---WbTQsdO1hO6b1aqFXzRpYXmiowF2oosH9
+
+
+--UNxDxx9xL2ZSmtfEJSlAjub3m4iJPbTAn
 Content-Type: application/pgp-signature; name="signature.asc"
 Content-Description: OpenPGP digital signature
 Content-Disposition: attachment; filename="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAlzAaUcACgkQ9AfbAGHV
-z0CdwQf9F8Il0sXGQuaThI7ulHJJUDNq/aRhuVZLF0GF1xjKZ9/98L7Cgg/Otpol
-a5BjHLz1ENixS2big3uRjY+Ch1sx1qibkH20jP9T3OAYHsnZz03DDP5DM3qvR4jV
-sSbHonLi2Swpr4Mv9FdseCAUJ7BtqPUqv+rXMHQiBGqkADhgaPCluX3VkQ3A9G81
-iQtSp4Uhn+aGMtMw7vRJeNOSaFYk67A5VKX48hn7UlQpHValKnf9t8RhMqMx7EOT
-RGGh8izy2HL2o3DrOuOfyE9HHWRxkaLGw1S8sVaGReYfwNWkjOEi3DTjk5yPcFN4
-CQVe9G2BzVXvGF5N+XCnz7E3q+1gZQ==
-=Z+z0
+iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAlzAZ9EACgkQ9AfbAGHV
+z0ANUgf9HgjsPsrvGPUZvs/281P2a9XloQt6lnutxa1Q97wvlOf7F9sOqBhZpcMR
+NOFtrTbN81CBVOHjuSpP7rZUuXkML7LX65+vuF4b4/sw8nsU9uRz0bBPmW7WtLOR
+Zmnw4mIQSa6uKV13eeo5RPCtQ7uL1MlrZvpQzPZMsYKx+PAauYu5pQ7xrEJv+1Sh
+qrpZrrOMNQxatNgelcNY6ghXroWX8PmnmVE1A/sWLUhr3kMJ2A7tsjsJE2YYLFEV
+qKvVr3uhM4PDMXAmNeV1ZE4QvD/YABrQatVCAOKQ5ZUErohVmYef0AhDhCZFm5L4
+gb78iAT6ogqin0mLKkpKwHjCvay9GQ==
+=cU4U
 -----END PGP SIGNATURE-----
 
---WbTQsdO1hO6b1aqFXzRpYXmiowF2oosH9--
+--UNxDxx9xL2ZSmtfEJSlAjub3m4iJPbTAn--
 
