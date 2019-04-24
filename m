@@ -5,70 +5,119 @@ X-Spam-Level:
 X-Spam-Status: No, score=-0.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	MAILING_LIST_MULTI,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 26BE7C10F11
-	for <qemu-devel@archiver.kernel.org>; Wed, 24 Apr 2019 11:49:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7A5C0C10F11
+	for <qemu-devel@archiver.kernel.org>; Wed, 24 Apr 2019 11:51:06 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id EE16F218D3
-	for <qemu-devel@archiver.kernel.org>; Wed, 24 Apr 2019 11:49:11 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EE16F218D3
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
+	by mail.kernel.org (Postfix) with ESMTPS id 3929F218B0
+	for <qemu-devel@archiver.kernel.org>; Wed, 24 Apr 2019 11:51:06 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3929F218B0
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:40080 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:40122 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hJGOl-00055M-Ai
-	for qemu-devel@archiver.kernel.org; Wed, 24 Apr 2019 07:49:11 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:59016)
+	id 1hJGQb-00060d-F8
+	for qemu-devel@archiver.kernel.org; Wed, 24 Apr 2019 07:51:05 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:59892)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1hJGNO-000495-PY
-	for qemu-devel@nongnu.org; Wed, 24 Apr 2019 07:47:49 -0400
+	(envelope-from <david@redhat.com>) id 1hJGPd-0005Rr-CE
+	for qemu-devel@nongnu.org; Wed, 24 Apr 2019 07:50:07 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1hJG72-0007W0-DM
-	for qemu-devel@nongnu.org; Wed, 24 Apr 2019 07:30:53 -0400
-Received: from indium.canonical.com ([91.189.90.7]:50564)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1hJG72-0007VP-7P
-	for qemu-devel@nongnu.org; Wed, 24 Apr 2019 07:30:52 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1hJG6z-0006D7-Dg
-	for <qemu-devel@nongnu.org>; Wed, 24 Apr 2019 11:30:49 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 668272E80C0
-	for <qemu-devel@nongnu.org>; Wed, 24 Apr 2019 11:30:49 +0000 (UTC)
+	(envelope-from <david@redhat.com>) id 1hJGPb-000551-IJ
+	for qemu-devel@nongnu.org; Wed, 24 Apr 2019 07:50:05 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:33134)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <david@redhat.com>)
+	id 1hJGPb-00054J-8s; Wed, 24 Apr 2019 07:50:03 -0400
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+	[10.5.11.23])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 427B23E2D7;
+	Wed, 24 Apr 2019 11:50:02 +0000 (UTC)
+Received: from [10.36.117.149] (ovpn-117-149.ams2.redhat.com [10.36.117.149])
+	by smtp.corp.redhat.com (Postfix) with ESMTP id 3F290272BB;
+	Wed, 24 Apr 2019 11:50:00 +0000 (UTC)
+To: Christian Borntraeger <borntraeger@de.ibm.com>,
+	=?UTF-8?Q?Daniel_P=2e_Berrang=c3=a9?= <berrange@redhat.com>
+References: <20190418113110.160664-1-borntraeger@de.ibm.com>
+	<d3cdd199-0457-7255-9540-2bbe5555e079@redhat.com>
+	<a9e5863e-cb05-11a6-03a8-89ee45febcc9@de.ibm.com>
+	<03eb94f6-6f8f-0358-df00-bc487e5e3bff@redhat.com>
+	<20190424093014.GB31388@redhat.com>
+	<d1db9861-f18d-0364-0a24-0697766f46b4@redhat.com>
+	<20190424094120.GC31388@redhat.com>
+	<49e2cd3d-ac11-b76d-1bf3-24908c0015c1@redhat.com>
+	<4f3871ef-86a6-e6be-4e87-2affa3bd2d6f@de.ibm.com>
+	<8d7716cf-95e5-4de9-8d31-f6b5ff88223f@redhat.com>
+	<1db08399-c9e0-3640-c505-545fc50378b2@de.ibm.com>
+From: David Hildenbrand <david@redhat.com>
+Openpgp: preference=signencrypt
+Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
+	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
+	SE+xAvmumFBY
+Organization: Red Hat GmbH
+Message-ID: <5c739b44-e346-e603-0d07-fbdc05084974@redhat.com>
+Date: Wed, 24 Apr 2019 13:49:59 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+	Thunderbird/60.6.1
 MIME-Version: 1.0
+In-Reply-To: <1db08399-c9e0-3640-c505-545fc50378b2@de.ibm.com>
 Content-Type: text/plain; charset="UTF-8"
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+	(mx1.redhat.com [10.5.110.30]);
+	Wed, 24 Apr 2019 11:50:02 +0000 (UTC)
 Content-Transfer-Encoding: quoted-printable
-Date: Wed, 24 Apr 2019 11:20:53 -0000
-From: Thomas Huth <1826175@bugs.launchpad.net>
-To: qemu-devel@nongnu.org
-X-Launchpad-Notification-Type: bug
-X-Launchpad-Bug: product=qemu; status=Invalid; importance=Undecided;
-	assignee=None; 
-X-Launchpad-Bug-Information-Type: Public
-X-Launchpad-Bug-Private: no
-X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: berrange fonthime th-huth
-X-Launchpad-Bug-Reporter: Gwendolyn Haller (fonthime)
-X-Launchpad-Bug-Modifier: Thomas Huth (th-huth)
-References: <155609955691.16667.3366200166619949036.malonedeb@soybean.canonical.com>
-Message-Id:
- <155610485379.16775.7821715224844031569.malone@soybean.canonical.com>
-X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
-X-Launchpad-Message-For: qemu-devel-ml
-Precedence: bulk
-X-Generated-By: Launchpad (canonical.com); Revision="18928";
-	Instance="launchpad-lazr.conf"
-X-Launchpad-Hash: c9d27944b7add9f75e340d9525855158fe752807
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 91.189.90.7
-Subject: [Qemu-devel] [Bug 1826175] Re: Compilation on MSYS2/MinGW-w64 fails
- with error: "No rule to make target capstone.lib"
+X-Received-From: 209.132.183.28
+Subject: Re: [Qemu-devel] [PATCH 00/10] s390x: new guest features
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
+Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -77,64 +126,268 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1826175 <1826175@bugs.launchpad.net>
+Cc: "Jason J . Herne" <jjherne@linux.ibm.com>,
+	Collin Walling <walling@linux.ibm.com>, Cornelia Huck <cohuck@redhat.com>,
+	qemu-devel <qemu-devel@nongnu.org>, Halil Pasic <pasic@linux.ibm.com>,
+	qemu-s390x <qemu-s390x@nongnu.org>, Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190424112053.HwqlD5qoRQv1inDYSnr1nriEn7Icc_objrC0ggk2qio@z>
+Message-ID: <20190424114959.OS0ZJNDwHF2900IQjuBHt-24NBXlPS2gjzRQr3Mkt1A@z>
 
-This change needs to go in via the capstone project. capstone is just an
-unmodified "submodule" in QEMU - we do not include any QEMU-only changes
-here.
+On 24.04.19 12:38, Christian Borntraeger wrote:
+>=20
+>=20
+> On 24.04.19 12:27, David Hildenbrand wrote:
+>> On 24.04.19 12:26, Christian Borntraeger wrote:
+>>>
+>>>
+>>> On 24.04.19 11:56, David Hildenbrand wrote:
+>>>> On 24.04.19 11:41, Daniel P. Berrang=C3=A9 wrote:
+>>>>> On Wed, Apr 24, 2019 at 11:35:40AM +0200, David Hildenbrand wrote:
+>>>>>> On 24.04.19 11:30, Daniel P. Berrang=C3=A9 wrote:
+>>>>>>> On Wed, Apr 24, 2019 at 11:03:03AM +0200, David Hildenbrand wrote=
+:
+>>>>>>>> On 24.04.19 10:40, Christian Borntraeger wrote:
+>>>>>>>>>
+>>>>>>>>>
+>>>>>>>>> On 23.04.19 14:11, David Hildenbrand wrote:
+>>>>>>>>>> On 18.04.19 13:31, Christian Borntraeger wrote:
+>>>>>>>>>>> Adding generation 15.
+>>>>>>>>>>>
+>>>>>>>>>>> Some interesting aspects:
+>>>>>>>>>>> - conditional SSKE and bpb are deprecated. This patch set add=
+resses that
+>>>>>>>>>>>   for csske.
+>>>>>>>>>>> - no name yet for gen15, I suggest to use the assigned number=
+s and
+>>>>>>>>>>>   provide an alias later on. (I have split out this into a se=
+parate
+>>>>>>>>>>>   patch)
+>>>>>>>>>>>
+>>>>>>>>>>> Christian Borntraeger (10):
+>>>>>>>>>>>   linux header sync
+>>>>>>>>>>>   s390x/cpumodel: remove CSSKE from base model
+>>>>>>>>>>>   s390x/cpumodel: Miscellaneous-Instruction-Extensions Facili=
+ty 3
+>>>>>>>>>>>   s390x/cpumodel: msa9 facility
+>>>>>>>>>>>   s390x/cpumodel: vector enhancements
+>>>>>>>>>>>   s390x/cpumodel: enhanced sort facility
+>>>>>>>>>>>   s390x/cpumodel: deflate
+>>>>>>>>>>>   s390x/cpumodel: add gen15 defintions
+>>>>>>>>>>>   s390x/cpumodel: wire up 8561 and 8562 as gen15 machines
+>>>>>>>>>>>   s390x/cpumodel: do not claim csske for expanded models in q=
+mp
+>>>>>>>>>>>
+>>>>>>>>>>>  hw/s390x/s390-virtio-ccw.c      |  6 +++
+>>>>>>>>>>>  linux-headers/asm-s390/kvm.h    |  5 +-
+>>>>>>>>>>>  target/s390x/cpu_features.c     | 54 +++++++++++++++++++
+>>>>>>>>>>>  target/s390x/cpu_features.h     |  3 ++
+>>>>>>>>>>>  target/s390x/cpu_features_def.h | 49 +++++++++++++++++
+>>>>>>>>>>>  target/s390x/cpu_models.c       | 35 ++++++++++++
+>>>>>>>>>>>  target/s390x/cpu_models.h       |  1 +
+>>>>>>>>>>>  target/s390x/gen-features.c     | 94 +++++++++++++++++++++++=
++++++++++-
+>>>>>>>>>>>  target/s390x/kvm.c              | 18 +++++++
+>>>>>>>>>>>  9 files changed, 263 insertions(+), 2 deletions(-)
+>>>>>>>>>>>
+>>>>>>>>>>
+>>>>>>>>>> I guess to handle deprecation of CSSKE:
+>>>>>>>>>>
+>>>>>>>>>> 1. Remove it from the base + default model of the gen15, keep =
+it in the
+>>>>>>>>>> max model. This is completely done in target/s390x/gen-feature=
+s.c.
+>>>>>>>>>> Existing base models are not modified.
+>>>>>>>>>>
+>>>>>>>>>> 2. Add CSSKE to "ignored_base_feat", so fallback of gen15 to e=
+.g. z14
+>>>>>>>>>> will work. We can backport this to distros/stable.
+>>>>>>>>>
+>>>>>>>>> Yes, I have already implemented that, still doing some testing =
+and polishinh.
+>>>>>>>>>>
+>>>>>>>>>>
+>>>>>>>>>> CPU model expansion:
+>>>>>>>>>>
+>>>>>>>>>> cpu_info_from_model() should already properly be based on the =
+base
+>>>>>>>>>> features. "gen15" vs. "gen15,csske=3Don" should be automatical=
+ly generated
+>>>>>>>>>> when expanding.
+>>>>>>>>>>
+>>>>>>>>>> CPU model baseline:
+>>>>>>>>>>
+>>>>>>>>>> s390_find_cpu_def() should make sure that CSSKE is basically i=
+gnored
+>>>>>>>>>> when determining maximum model, however it will properly be in=
+dicated if
+>>>>>>>>>> both models had the feature.
+>>>>>>>>>>
+>>>>>>>>>> CPU model comparison:
+>>>>>>>>>>
+>>>>>>>>>> Should work as expected. Availability of CSSKE will be conside=
+red when
+>>>>>>>>>> calculating the result.
+>>>>>>>>>>
+>>>>>>>>>> gen14,csske=3Don and gen15,csske=3Doff will result in
+>>>>>>>>>> CPU_MODEL_COMPARE_RESULT_INCOMPATIBLE.
+>>>>>>>>>>
+>>>>>>>>>> gen14,csske=3Doff and gen15,csske=3Doff should result in
+>>>>>>>>>> CPU_MODEL_COMPARE_RESULT_SUBSET
+>>>>>>>>>>
+>>>>>>>>>> gen14,csske=3Don and gen15,csske=3Don should result in
+>>>>>>>>>> CPU_MODEL_COMPARE_RESULT_SUBSET
+>>>>>>>>>>
+>>>>>>>>>> Forward migration:
+>>>>>>>>>>
+>>>>>>>>>> Now, the only issue is when csske is actually turned of in fut=
+ure
+>>>>>>>>>> machines. We would e.g. have
+>>>>>>>>>>
+>>>>>>>>>> gen15,csske=3Don and gen16,csske=3Doff
+>>>>>>>>>>
+>>>>>>>>>> While baselining will work correctly (gen15,csske=3Doff), forw=
+ard
+>>>>>>>>>> migration is broken (comparison will properly indicate
+>>>>>>>>>> CPU_MODEL_COMPARE_RESULT_INCOMPATIBLE), which is expected when=
+ ripping
+>>>>>>>>>> out features. Same applies to BPB.
+>>>>>>>>>>
+>>>>>>>>>>
+>>>>>>>>>> Your patch "[PATCH 10/10] s390x/cpumodel: do not claim csske f=
+or
+>>>>>>>>>> expanded models in qmp" tried to address this, however I am no=
+t really
+>>>>>>>>>> happy with this approach. We should not play such tricks when =
+expanding
+>>>>>>>>>> the host model. "-cpu host" and "-cpu $expanded_host" would be
+>>>>>>>>>> different,
+>>>>>>>>>
+>>>>>>>>> We discussed this some time ago and I think we agreed that for =
+host passthrough
+>>>>>>>>> it is ok to be different that host-model (e.g. passing through =
+the cpuid, passing
+>>>>>>>>> through all non-hypervisor managed features etc).
+>>>>>>>>
+>>>>>>>> I remember the plan was to use the "max" model to do such stuff.=
+ E.g.
+>>>>>>>> -cpu max / no -cpu
+>>>>>>>>
+>>>>>>>> Versus
+>>>>>>>> -cpu host
+>>>>>>>>
+>>>>>>>> We can have features in "host" we don't have in "max". But "-cpu=
+ host"
+>>>>>>>> and it's expansion should look 100% the same.
+>>>>>>>
+>>>>>>> I don't think that's the intended semantics of "max" vs "host".
+>>>>>>>
+>>>>>>> The "max" CPU model is supposed to enable all features that are p=
+ossible to
+>>>>>>> enable.
+>>>>>>>
+>>>>>>> For KVM, thus "max" should be identical to "host".
+>>>>>>
+>>>>>> There once was a mode used by x86-64 to simply pipe through cpuid
+>>>>>> features that were not even supported. (I remember something like
+>>>>>> passthorugh=3Dtrue), do you remember if something like that still =
+exists?
+>>>>>
+>>>>> I don't recall such a feature existing even in the past !
+>>>>
+>>>> Maybe my mind is tricking me, or maybe that has long been removed :)
+>>>>
+>>>>>
+>>>>>>> For TCG, "max" should be everything that QEMU currently knows how=
+ to emulate.
+>>>>>>
+>>>>>> Yes, and on s390x. "max" contains more features than "qemu".
+>>>>>>
+>>>>>>>
+>>>>>>> Essentially think of "max" as a better name for "host", since "ho=
+st" as
+>>>>>>> a name concept didn't make sense for TCG.
+>>>>>>
+>>>>>> I agree. The main question is, is it acceptable that
+>>>>>
+>>>>> Hmm, maybe I misinterpreted when you wrote
+>>>>>
+>>>>>       We can have features in "host" we don't have in "max"
+>>>>>
+>>>>> I read that as meaning that "-cpu host" and "-cpu max" would be
+>>>>> different.
+>>>>
+>>>> No you didn't misinterpret it, I agreed after you spelled it out :)
+>>>>
+>>>>>
+>>>>>> "-cpu host" and "-cpu $expanded_host" produce different results, a=
+fter
+>>>>>> expanding "host" via query-cpu-model-expansion?
+>>>>>
+>>>>> That has always been the case on x86-64, since it is not possible t=
+o set
+>>>>> the level, xlevel, vendor, family, model & stepping properties via =
+-cpu,
+>>>>> only the feature flags.
+>>>>
+>>>> Fair enough, but the question is if we should mess with feature flag=
+s we
+>>>> can indicate on that level.
+>>>>
+>>>> It would mean that on a specific host e.g.
+>>>>
+>>>> "-cpu gen15,csske=3Don" and "-cpu gen15,csske=3Doff"
+>>>>
+>>>> Would work. However, "host" model expansion would give us
+>>>>
+>>>> "-cpu gen15,csske=3Doff"
+>>>>
+>>>> So trying to e.g. do a query-cpu-model-comparison or
+>>>> query-cpu-model-baseline against "host" and against the expanded hos=
+t
+>>>> model will produce different results.
+>>>>
+>>>> Libvirt could detect "-cpu gen14,csske=3Don" as not runnable on the =
+host,
+>>>> because comparing "-cpu gen14,csske=3Don" vs. "-cpu gen15,csske=3Dof=
+f" would
+>>>> be "incompatible". But running "-cpu gen14,csske=3Don" on the host w=
+ould
+>>>> work perfectly fine.
+>>>
+>>> I would like to avoid special knowledge in libvirt (since we moved to=
+ have
+>>> everything in qemu).=20
+>>>
+>>> A more complex idea would be to extend the qmp query with a list of d=
+eprecated
+>>> features and libvirt could then disable that for expansion but allow =
+it for
+>>> baselining.
+>>
+>> That would fit in nicely into query-cpu-model-expansion. Nice idea.
+>=20
+> Hmm, I think that should also be possible as an add-on patch series lat=
+er on
+> (e.g. in 6 month or so). We would have instances of gen15 machines with=
+ host-model
+> that start with csske but sooner or later they will be restarted and th=
+en they no=20
+> longer have csske.
+> As we do not change anything for baselining this would allow us to sepa=
+rate patch10
+> from the other patches and deal with it later with a proper series on i=
+ts on?
+> Need to think about that.
 
-** Changed in: qemu
-       Status: New =3D> Invalid
+Makes sense, we already have forward migration issues to > gen15 with
+guests started in the past when dropping features. No need to rush with
+that.
 
--- =
+--=20
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1826175
+Thanks,
 
-Title:
-  Compilation on MSYS2/MinGW-w64 fails with error: "No rule to make
-  target capstone.lib"
-
-Status in QEMU:
-  Invalid
-
-Bug description:
-  I submitted this bug to Capstone directly but I figured it'd be useful
-  to post it here too. The IS_MINGW check in the Makefile for Capstone
-  fails under MSYS2 MinGW-w64 because cc --version doesn't have mingw in
-  the output anymore:
-
-  $ whereis cc
-  cc: /mingw64/bin/cc.exe
-
-  $ cc --version
-  cc.exe (Rev2, Built by MSYS2 project) 8.3.0
-  Copyright (C) 2018 Free Software Foundation, Inc.
-  This is free software; see the source for copying conditions.  There is NO
-  warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOS=
-E.
-
-  Really simple patch:
-
-  diff --git "a/Makefile" "b/Makefile"
-  index 063f50db..1d9f042e 100644
-  --- "a/Makefile"
-  +++ "b/Makefile"
-  @@ -288,7 +288,7 @@ CFLAGS :=3D $(CFLAGS:-fPIC=3D)
-   # On Windows we need the shared library to be executable
-   else
-   # mingw?
-  -IS_MINGW :=3D $(shell $(CC) --version | grep -i mingw | wc -l)
-  +IS_MINGW :=3D $(shell $(CC) --version | grep -i msys2 | wc -l)
-   ifeq ($(IS_MINGW),1)
-   EXT =3D dll
-   AR_EXT =3D lib
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1826175/+subscriptions
+David / dhildenb
 
