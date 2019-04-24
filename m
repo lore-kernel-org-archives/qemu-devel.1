@@ -2,86 +2,72 @@ Return-Path: <SRS0=3XOk=S2=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.7 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,FROM_EXCESS_BASE64,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2A5CEC282E1
-	for <qemu-devel@archiver.kernel.org>; Wed, 24 Apr 2019 13:59:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F09F1C282CE
+	for <qemu-devel@archiver.kernel.org>; Wed, 24 Apr 2019 13:59:14 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D716B21900
-	for <qemu-devel@archiver.kernel.org>; Wed, 24 Apr 2019 13:59:11 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="YiANODJB"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D716B21900
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	by mail.kernel.org (Postfix) with ESMTPS id B2F8D2148D
+	for <qemu-devel@archiver.kernel.org>; Wed, 24 Apr 2019 13:59:14 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B2F8D2148D
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=clisp.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:42121 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:42123 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hJIQY-00042b-Oy
-	for qemu-devel@archiver.kernel.org; Wed, 24 Apr 2019 09:59:10 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:33946)
+	id 1hJIQc-00049J-0Z
+	for qemu-devel@archiver.kernel.org; Wed, 24 Apr 2019 09:59:14 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:33982)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcandre.lureau@gmail.com>) id 1hJILu-0008ST-NI
+	(envelope-from <bounces@canonical.com>) id 1hJILu-0008Uj-6H
 	for qemu-devel@nongnu.org; Wed, 24 Apr 2019 09:54:26 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcandre.lureau@gmail.com>) id 1hJII9-0003aj-Hr
-	for qemu-devel@nongnu.org; Wed, 24 Apr 2019 09:50:31 -0400
-Received: from mail-wr1-x442.google.com ([2a00:1450:4864:20::442]:39464)
+	(envelope-from <bounces@canonical.com>) id 1hJIId-0003t0-Ex
+	for qemu-devel@nongnu.org; Wed, 24 Apr 2019 09:51:00 -0400
+Received: from indium.canonical.com ([91.189.90.7]:60712)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <marcandre.lureau@gmail.com>)
-	id 1hJII9-0003ZE-2n
-	for qemu-devel@nongnu.org; Wed, 24 Apr 2019 09:50:29 -0400
-Received: by mail-wr1-x442.google.com with SMTP id a9so7687872wrp.6
-	for <qemu-devel@nongnu.org>; Wed, 24 Apr 2019 06:50:28 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
-	h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-	:cc:content-transfer-encoding;
-	bh=YyKAsYf50TUGclcq2xvGIOFoGQ0hdh8P58U1HqiutXo=;
-	b=YiANODJB0fp519XHaHmxVL+fFtU6WN7hmD7JE0FQnpah4oMa4HVSf9PeIKWxJ+ZTuK
-	KQNNxiE9GAE0yC7YTcw7ua2/doT5ITdeL1LgK8MU9UAjiL9s38C1ppTRINp0O73GMpbM
-	P4DQLhQh9SIcqdOMU54XW0+fo7FRMge0NnMKrMQHC8MJhAOoFnvvRJP/7ID9tEpQFz0e
-	uHfOs+VKcPlfp18xwX9Lfs9XsvmITELfJWbO18ed2dFEUT05hE2JQ81yUjJvhQkbNgXZ
-	sMNPN7vdfN+83Cnafop9ipwK4XIwaoeI0xpOnvznjCwx0qLLKHa47lddhjvjOCLsu1TN
-	JXmA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=1e100.net; s=20161025;
-	h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-	:message-id:subject:to:cc:content-transfer-encoding;
-	bh=YyKAsYf50TUGclcq2xvGIOFoGQ0hdh8P58U1HqiutXo=;
-	b=RiFPptVmuYDVje5wL43h0E319td5b0G+Cw3E9SB+4TMuD8h95fqqOYMcxAIVW1R9BZ
-	+OV4+CioD3JkxSxqbdLKmCKyHbuuhyB7m2cy7o4lmhu4dNdEC8vThputLAAX+bwmy/ca
-	Sy4YyChu0OcLfcsX8HPX5BYBZ4L9zVgRT+HoIjMtuNreUe39ESUA6Vxk+cmU1sz/c0bG
-	XjPOy+2+P1bsChdtDPBlkwf2OAZEYDK/zqVsvacazPwc9yP3eM7f/vADCMfUH30HlM2j
-	NRIoUHJMokqgwfACSH9nML6x97k0rwTI2CkBoxYjRgfDGfohKggUFfLsSyArzSni1G3n
-	pQ/g==
-X-Gm-Message-State: APjAAAXE4oxFdgiXAweIcASZaNUi39ibQ9G6eHQAzXPmpEaUhHyakVDH
-	fjmNGezFg63cW3ZFGhM3izNuts3ofMlbshwtz48=
-X-Google-Smtp-Source: APXvYqzJceGiXIicIRnl+OLsrvTCjGfh/oKNsh539/7I6fhEXK6Hz3xIHpEAeXH+AkC9wEpShAL591R1HTbg+iqL1hA=
-X-Received: by 2002:adf:b641:: with SMTP id i1mr21513470wre.288.1556113827344; 
-	Wed, 24 Apr 2019 06:50:27 -0700 (PDT)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1hJIId-0003rc-8E
+	for qemu-devel@nongnu.org; Wed, 24 Apr 2019 09:50:59 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1hJIIb-0000WF-3o
+	for <qemu-devel@nongnu.org>; Wed, 24 Apr 2019 13:50:57 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id C0F592E80CE
+	for <qemu-devel@nongnu.org>; Wed, 24 Apr 2019 13:50:56 +0000 (UTC)
 MIME-Version: 1.0
-References: <20190423132004.13725-1-marcandre.lureau@redhat.com>
-	<20190424092028-mutt-send-email-mst@kernel.org>
-In-Reply-To: <20190424092028-mutt-send-email-mst@kernel.org>
-From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
-Date: Wed, 24 Apr 2019 15:50:15 +0200
-Message-ID:
- <CAJ+F1CLPjEwwrXwEYTGE-zsmK4cAn0Dg=dv8h6CnXt537mofCA@mail.gmail.com>
-To: "Michael S. Tsirkin" <mst@redhat.com>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
-	recognized.
-X-Received-From: 2a00:1450:4864:20::442
-Subject: Re: [Qemu-devel] [PATCH v6 00/11] vhost-user for input & GPU
+Date: Wed, 24 Apr 2019 13:41:03 -0000
+From: Bruno Haible <bruno@clisp.org>
+To: qemu-devel@nongnu.org
+X-Launchpad-Notification-Type: bug
+X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
+X-Launchpad-Bug-Information-Type: Public
+X-Launchpad-Bug-Private: no
+X-Launchpad-Bug-Security-Vulnerability: no
+X-Launchpad-Bug-Commenters: bruno-clisp rth stefanrin th-huth
+X-Launchpad-Bug-Reporter: Bruno Haible (bruno-clisp)
+X-Launchpad-Bug-Modifier: Bruno Haible (bruno-clisp)
+References: <149893001258.15852.11258418521313176097.malonedeb@wampee.canonical.com>
+Message-Id:
+ <155611326381.7289.13592030405620639690.malone@chaenomeles.canonical.com>
+X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
+X-Launchpad-Message-For: qemu-devel-ml
+Precedence: bulk
+X-Generated-By: Launchpad (canonical.com); Revision="18928";
+	Instance="launchpad-lazr.conf"
+X-Launchpad-Hash: 1c4f6ce82719668e215a8d4227dcbcd4af18455d
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 91.189.90.7
+Subject: [Qemu-devel] [Bug 1701835] Re: floating-point operation bugs in
+ qemu-alpha
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
-Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -90,182 +76,222 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: QEMU <qemu-devel@nongnu.org>, Gerd Hoffmann <kraxel@redhat.com>
+Reply-To: Bug 1701835 <1701835@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190424135015.xtjBcZrnjK0MJmtmjZfhnzGo1gA2RAHKYHMXW3n1wKs@z>
+Message-ID: <20190424134103.n0O7LiGfAiLCdpMC0etXAWj-3oB8WhWreWVtVdJtdu8@z>
 
-Hi
+The problem is still reproducible with QEMU 4.0.0:
+- The test programs test-cbrt ... test-truncf1 crash or abort as described.
+- The test program from comment #6, run with qemu-alpha, prints 600e8000000=
+00000, i.e. bit 59 is unset.
 
-On Wed, Apr 24, 2019 at 3:29 PM Michael S. Tsirkin <mst@redhat.com> wrote:
->
-> On Tue, Apr 23, 2019 at 03:19:53PM +0200, Marc-Andr=C3=A9 Lureau wrote:
-> > Hi,
-> >
-> > vhost-user allows to drive a virtio device in a seperate
-> > process. After vhost-user-net, we have seen
-> > vhost-user-{scsi,blk,crypto} added more recently.
-> >
-> > This series, initially proposed ~3 years ago, time flies
-> > (https://lists.gnu.org/archive/html/qemu-devel/2016-06/msg01905.html)
-> > contributes with vhost-user-input and vhost-user-gpu.
->
->
-> Pls note asan errors reported by patchew.
+-- =
 
-Those are pre-existing, and I thought we had patches on the list for
-them, but I can't find them.
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1701835
 
-A quick fix could be:
+Title:
+  floating-point operation bugs in qemu-alpha
 
-diff --git a/contrib/libvhost-user/libvhost-user.c
-b/contrib/libvhost-user/libvhost-user.c
-index c9823a1354..944d5c9c4f 100644
---- a/contrib/libvhost-user/libvhost-user.c
-+++ b/contrib/libvhost-user/libvhost-user.c
-@@ -543,7 +543,7 @@ static bool
- vu_set_mem_table_exec_postcopy(VuDev *dev, VhostUserMsg *vmsg)
- {
-     int i;
--    VhostUserMemory *memory =3D &vmsg->payload.memory;
-+    VhostUserMemory m =3D vmsg->payload.memory, *memory =3D &m;
-     dev->nregions =3D memory->nregions;
+Status in QEMU:
+  New
 
-     DPRINT("Nregions: %d\n", memory->nregions);
-@@ -685,7 +685,7 @@ static bool
- vu_set_mem_table_exec(VuDev *dev, VhostUserMsg *vmsg)
- {
-     int i;
--    VhostUserMemory *memory =3D &vmsg->payload.memory;
-+    VhostUserMemory m =3D vmsg->payload.memory, *memory =3D &m;
+Bug description:
+  When running the gnulib testsuite, I'm seeing test failures in the tests =
+for libm functions
+    cbrt
+    cbrtf
+    ceil
+    ceilf
+    coshf
+    exp2
+    exp2f
+    floor
+    floorf
+    fma
+    fmaf
+    fmal
+    frexp
+    frexpf
+    hypot
+    hypotf
+    hypotl
+    ilogb
+    ilogbf
+    isfinite
+    isinf
+    isnan
+    isnand
+    isnanf
+    ldexp
+    ldexpf
+    ldexpl
+    log1p
+    log1pf
+    log2
+    log2f
+    logb
+    logbf
+    logbl
+    rint
+    rintf
+    rintl
+    signbit
+    sqrt
+    sqrtf
+    strtod
+  that I don't see when running the same (statically linked) executables in=
+ a VM, through qemu-system-alpha.
 
-     for (i =3D 0; i < dev->nregions; i++) {
-         VuDevRegion *r =3D &dev->regions[i];
-@@ -814,7 +814,7 @@ vu_set_vring_num_exec(VuDev *dev, VhostUserMsg *vmsg)
- static bool
- vu_set_vring_addr_exec(VuDev *dev, VhostUserMsg *vmsg)
- {
--    struct vhost_vring_addr *vra =3D &vmsg->payload.addr;
-+    struct vhost_vring_addr addr =3D vmsg->payload.addr, *vra =3D &addr;
-     unsigned int index =3D vra->index;
-     VuVirtq *vq =3D &dev->vq[index];
+  How to reproduce:
+  - Using gnulib, run ./gnulib-tool --create-testdir --dir=3D../testdir-mat=
+h --single-configure cbrt cbrtf ceil ceilf coshf exp2 exp2f float floor flo=
+orf fma fmaf fmal frexp frexpf hypot hypotf hypotl ilogb ilogbf isfinite is=
+inf isnan isnand isnanf ldexp ldexpf ldexpl log1p log1pf log2 log2f logb lo=
+gbf logbl math printf-frexp rint rintf rintl round roundf signbit sqrt sqrt=
+f strtod trunc truncf
+  - Copy the resulting directory to a VM running Linux 2.6.26 with qemu-sys=
+tem-alpha.
+  - There, configure and build the package:
+    mkdir build-native-static; cd build-native-static; ../configure CPPFLAG=
+S=3D"-Wall" LDFLAGS=3D"-static"; make; make check
+    Only 4 tests fail.
+  - Copy the resulting binaries back to the original x86_64 machine.
+  - Set environment variables for using qemu-alpha.
+  - Here, 50 tests fail that did not fail originally:
 
+  $ ~/inst-qemu/2.9.0/bin/qemu-alpha test-cbrt
+  ../../gltests/test-cbrt.h:39: assertion 'err > - L_(4.0) * L_(16.0) / TWO=
+_MANT_DIG && err < L_(4.0) * L_(16.0) / TWO_MANT_DIG' failed
+  Aborted (core dumped)
+  $ ~/inst-qemu/2.9.0/bin/qemu-alpha test-ceil1
+  Floating point exception (core dumped)
+  $ ~/inst-qemu/2.9.0/bin/qemu-alpha test-ceil2
+  Floating point exception (core dumped)
+  $ ~/inst-qemu/2.9.0/bin/qemu-alpha test-ceilf1
+  Floating point exception (core dumped)
+  $ ~/inst-qemu/2.9.0/bin/qemu-alpha test-ceilf2
+  Floating point exception (core dumped)
+  $ ~/inst-qemu/2.9.0/bin/qemu-alpha test-coshf =
 
->
->
-> > You may start a vhost-user-gpu with virgl rendering in a separate
-> > process like this:
-> >
-> > $ ./vhost-user-gpu --virgl -s vgpu.sock &
-> > $ qemu...
-> >   -chardev socket,id=3Dchr,path=3Dvgpu.sock
-> >   -device vhost-user-vga,chardev=3Dchr
-> >
-> > v6:
-> >  - do not install vhost-user-input
-> >  - install vhost-user-gpu and json file following the spec
-> >  - fix the build when drm-intel-devel missing
-> >  - rebase (& resend without already applied patches)
-> >
-> > v5:
-> >  - remove user-creatable version of vhost-user-backend
-> >  - remove optinal management of sub-process in vhost-user-backend
-> >  - removed daemonize/pid code
-> >  - drop introduction of new input & gpu messages for PCI config space
-> >    handling, instead use VHOST_USER_PROTOCOL_F_CONFIG
-> >  - plain mem & udmabuf fallback for 2d rendering
-> >  - rebased, kconfig-ify, rst-ify
-> >
-> > Marc-Andr=C3=A9 Lureau (11):
-> >   Add vhost-user-backend
-> >   Add vhost-user-input-pci
-> >   libvhost-user: add PROTOCOL_F_CONFIG if {set,get}_config
-> >   contrib: add vhost-user-input
-> >   vhost-user: add vhost_user_gpu_set_socket()
-> >   virtio: add virtio-gpu bswap helpers header
-> >   util: compile drm.o on Linux
-> >   contrib: add vhost-user-gpu
-> >   virtio-gpu: split virtio-gpu, introduce virtio-gpu-base
-> >   virtio-gpu: split virtio-gpu-pci & virtio-vga
-> >   hw/display: add vhost-user-vga & gpu-pci
-> >
-> >  contrib/libvhost-user/libvhost-user.h      |    1 +
-> >  contrib/vhost-user-gpu/drm.h               |   72 ++
-> >  contrib/vhost-user-gpu/virgl.h             |   25 +
-> >  contrib/vhost-user-gpu/vugpu.h             |  170 +++
-> >  hw/display/virtio-vga.h                    |   32 +
-> >  include/hw/virtio/vhost-backend.h          |    2 +
-> >  include/hw/virtio/virtio-gpu-bswap.h       |   61 +
-> >  include/hw/virtio/virtio-gpu-pci.h         |   40 +
-> >  include/hw/virtio/virtio-gpu.h             |   92 +-
-> >  include/hw/virtio/virtio-input.h           |   14 +
-> >  include/sysemu/vhost-user-backend.h        |   57 +
-> >  backends/vhost-user.c                      |  209 ++++
-> >  contrib/libvhost-user/libvhost-user.c      |    5 +
-> >  contrib/vhost-user-gpu/drm.c               |  341 ++++++
-> >  contrib/vhost-user-gpu/main.c              | 1236 ++++++++++++++++++++
-> >  contrib/vhost-user-gpu/virgl.c             |  579 +++++++++
-> >  contrib/vhost-user-input/main.c            |  427 +++++++
-> >  hw/display/vhost-user-gpu-pci.c            |   51 +
-> >  hw/display/vhost-user-gpu.c                |  572 +++++++++
-> >  hw/display/vhost-user-vga.c                |   52 +
-> >  hw/display/virtio-gpu-3d.c                 |   49 +-
-> >  hw/display/virtio-gpu-base.c               |  268 +++++
-> >  hw/display/virtio-gpu-pci.c                |   55 +-
-> >  hw/display/virtio-gpu.c                    |  415 ++-----
-> >  hw/display/virtio-vga.c                    |  138 +--
-> >  hw/input/vhost-user-input.c                |  129 ++
-> >  hw/virtio/vhost-user-input-pci.c           |   53 +
-> >  hw/virtio/vhost-user.c                     |   11 +
-> >  vl.c                                       |    1 +
-> >  MAINTAINERS                                |   14 +-
-> >  Makefile                                   |   27 +-
-> >  Makefile.objs                              |    2 +
-> >  backends/Makefile.objs                     |    2 +
-> >  configure                                  |   29 +
-> >  contrib/vhost-user-gpu/50-qemu-gpu.json.in |    5 +
-> >  contrib/vhost-user-gpu/Makefile.objs       |   10 +
-> >  contrib/vhost-user-input/Makefile.objs     |    1 +
-> >  docs/interop/index.rst                     |    2 +-
-> >  docs/interop/vhost-user-gpu.rst            |  238 ++++
-> >  docs/interop/vhost-user.txt                |    9 +
-> >  hw/display/Kconfig                         |   10 +
-> >  hw/display/Makefile.objs                   |    5 +-
-> >  hw/input/Kconfig                           |    5 +
-> >  hw/input/Makefile.objs                     |    1 +
-> >  hw/virtio/Makefile.objs                    |    1 +
-> >  rules.mak                                  |    9 +-
-> >  util/Makefile.objs                         |    2 +-
-> >  47 files changed, 5070 insertions(+), 459 deletions(-)
-> >  create mode 100644 contrib/vhost-user-gpu/drm.h
-> >  create mode 100644 contrib/vhost-user-gpu/virgl.h
-> >  create mode 100644 contrib/vhost-user-gpu/vugpu.h
-> >  create mode 100644 hw/display/virtio-vga.h
-> >  create mode 100644 include/hw/virtio/virtio-gpu-bswap.h
-> >  create mode 100644 include/hw/virtio/virtio-gpu-pci.h
-> >  create mode 100644 include/sysemu/vhost-user-backend.h
-> >  create mode 100644 backends/vhost-user.c
-> >  create mode 100644 contrib/vhost-user-gpu/drm.c
-> >  create mode 100644 contrib/vhost-user-gpu/main.c
-> >  create mode 100644 contrib/vhost-user-gpu/virgl.c
-> >  create mode 100644 contrib/vhost-user-input/main.c
-> >  create mode 100644 hw/display/vhost-user-gpu-pci.c
-> >  create mode 100644 hw/display/vhost-user-gpu.c
-> >  create mode 100644 hw/display/vhost-user-vga.c
-> >  create mode 100644 hw/display/virtio-gpu-base.c
-> >  create mode 100644 hw/input/vhost-user-input.c
-> >  create mode 100644 hw/virtio/vhost-user-input-pci.c
-> >  create mode 100644 contrib/vhost-user-gpu/50-qemu-gpu.json.in
-> >  create mode 100644 contrib/vhost-user-gpu/Makefile.objs
-> >  create mode 100644 contrib/vhost-user-input/Makefile.objs
-> >  create mode 100644 docs/interop/vhost-user-gpu.rst
-> >
-> > --
-> > 2.21.0.313.ge35b8cb8e2
->
+  ../../gltests/test-coshf.c:37: assertion 'y >=3D 1.1854652f && y <=3D 1.1=
+854653f' failed
+  Aborted (core dumped)
+  $ ~/inst-qemu/2.9.0/bin/qemu-alpha test-float
+  Floating point exception (core dumped)
+  $ ~/inst-qemu/2.9.0/bin/qemu-alpha test-floor1
+  Floating point exception (core dumped)
+  $ ~/inst-qemu/2.9.0/bin/qemu-alpha test-floor2
+  Floating point exception (core dumped)
+  $ ~/inst-qemu/2.9.0/bin/qemu-alpha test-floorf1
+  Floating point exception (core dumped)
+  $ ~/inst-qemu/2.9.0/bin/qemu-alpha test-floorf2
+  Floating point exception (core dumped)
+  $ ~/inst-qemu/2.9.0/bin/qemu-alpha test-fma1   =
 
+  Floating point exception (core dumped)
+  $ ~/inst-qemu/2.9.0/bin/qemu-alpha test-fma2
+  ../../gltests/test-fma2.h:116: assertion 'result =3D=3D expected' failed
+  Aborted (core dumped)
+  $ ~/inst-qemu/2.9.0/bin/qemu-alpha test-fmaf1
+  Floating point exception (core dumped)
+  $ ~/inst-qemu/2.9.0/bin/qemu-alpha test-fmaf2
+  ../../gltests/test-fma2.h:116: assertion 'result =3D=3D expected' failed
+  Aborted (core dumped)
+  $ ~/inst-qemu/2.9.0/bin/qemu-alpha test-fmal2
+  ../../gltests/test-fma2.h:116: assertion 'result =3D=3D expected' failed
+  Aborted (core dumped)
+  $ ~/inst-qemu/2.9.0/bin/qemu-alpha test-frexp
+  Floating point exception (core dumped)
+  $ ~/inst-qemu/2.9.0/bin/qemu-alpha test-frexpf
+  Floating point exception (core dumped)
+  $ ~/inst-qemu/2.9.0/bin/qemu-alpha test-hypot =
 
---=20
-Marc-Andr=C3=A9 Lureau
+  Floating point exception (core dumped)
+  $ ~/inst-qemu/2.9.0/bin/qemu-alpha test-hypotf
+  Floating point exception (core dumped)
+  $ ~/inst-qemu/2.9.0/bin/qemu-alpha test-hypotl
+  ../../gltests/test-hypot.h:41: assertion 'z =3D=3D HUGEVAL' failed
+  Aborted (core dumped)
+  $ ~/inst-qemu/2.9.0/bin/qemu-alpha test-ilogb =
+
+  Floating point exception (core dumped)
+  $ ~/inst-qemu/2.9.0/bin/qemu-alpha test-ilogbf
+  Floating point exception (core dumped)
+  $ ~/inst-qemu/2.9.0/bin/qemu-alpha test-isfinite
+  Floating point exception (core dumped)
+  $ ~/inst-qemu/2.9.0/bin/qemu-alpha test-isinf   =
+
+  Floating point exception (core dumped)
+  $ ~/inst-qemu/2.9.0/bin/qemu-alpha test-isnan
+  Floating point exception (core dumped)
+  $ ~/inst-qemu/2.9.0/bin/qemu-alpha test-isnand-nolibm
+  Floating point exception (core dumped)
+  $ ~/inst-qemu/2.9.0/bin/qemu-alpha test-isnand       =
+
+  Floating point exception (core dumped)
+  $ ~/inst-qemu/2.9.0/bin/qemu-alpha test-isnanf-nolibm
+  Floating point exception (core dumped)
+  $ ~/inst-qemu/2.9.0/bin/qemu-alpha test-isnanf       =
+
+  Floating point exception (core dumped)
+  $ ~/inst-qemu/2.9.0/bin/qemu-alpha test-ldexp =
+
+  Floating point exception (core dumped)
+  $ ~/inst-qemu/2.9.0/bin/qemu-alpha test-ldexpf
+  Floating point exception (core dumped)
+  $ ~/inst-qemu/2.9.0/bin/qemu-alpha test-ldexpl
+  ../../gltests/test-ldexp.h:99: assertion 'y =3D=3D expected' failed
+  Aborted (core dumped)
+  $ ~/inst-qemu/2.9.0/bin/qemu-alpha test-log1p =
+
+  Floating point exception (core dumped)
+  $ ~/inst-qemu/2.9.0/bin/qemu-alpha test-log1pf
+  Floating point exception (core dumped)
+  $ ~/inst-qemu/2.9.0/bin/qemu-alpha test-log2  =
+
+  Floating point exception (core dumped)
+  $ ~/inst-qemu/2.9.0/bin/qemu-alpha test-log2f
+  Floating point exception (core dumped)
+  $ ~/inst-qemu/2.9.0/bin/qemu-alpha test-logb =
+
+  Floating point exception (core dumped)
+  $ ~/inst-qemu/2.9.0/bin/qemu-alpha test-logbf
+  Floating point exception (core dumped)
+  $ ~/inst-qemu/2.9.0/bin/qemu-alpha test-math =
+
+  Floating point exception (core dumped)
+  $ ~/inst-qemu/2.9.0/bin/qemu-alpha test-printf-frexp
+  Floating point exception (core dumped)
+  $ ~/inst-qemu/2.9.0/bin/qemu-alpha test-rint        =
+
+  ../../gltests/test-rint.c:63: assertion 'rint (0.7) =3D=3D 1.0' failed
+  Aborted (core dumped)
+  $ ~/inst-qemu/2.9.0/bin/qemu-alpha test-rintf
+  ../../gltests/test-rintf.c:63: assertion 'rintf (0.7f) =3D=3D 1.0f' failed
+  Aborted (core dumped)
+  $ ~/inst-qemu/2.9.0/bin/qemu-alpha test-rintl
+  ../../gltests/test-rintl.c:68: assertion 'rintl (0.7L) =3D=3D 1.0L' failed
+  Aborted (core dumped)
+  $ ~/inst-qemu/2.9.0/bin/qemu-alpha test-round1
+  Floating point exception (core dumped)
+  $ ~/inst-qemu/2.9.0/bin/qemu-alpha test-roundf1
+  Floating point exception (core dumped)
+  $ ~/inst-qemu/2.9.0/bin/qemu-alpha test-signbit
+  Floating point exception (core dumped)
+  $ ~/inst-qemu/2.9.0/bin/qemu-alpha test-sqrt   =
+
+  ../../gltests/test-sqrt.h:40: assertion 'err > - L_(16.0) / TWO_MANT_DIG =
+&& err < L_(16.0) / TWO_MANT_DIG' failed
+  Aborted (core dumped)
+  $ ~/inst-qemu/2.9.0/bin/qemu-alpha test-trunc1
+  Floating point exception (core dumped)
+  $ ~/inst-qemu/2.9.0/bin/qemu-alpha test-truncf1
+  Floating point exception (core dumped)
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1701835/+subscriptions
 
