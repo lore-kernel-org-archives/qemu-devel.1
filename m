@@ -1,23 +1,30 @@
-Received: from eggs.gnu.org ([209.51.188.92]:34349)
+Received: from eggs.gnu.org ([209.51.188.92]:39018)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1hJIMV-0000Pz-8i
-	for qemu-devel@nongnu.org; Wed, 24 Apr 2019 09:55:02 -0400
+	(envelope-from <liq3ea@gmail.com>) id 1hJIfQ-0002XI-3l
+	for qemu-devel@nongnu.org; Wed, 24 Apr 2019 10:14:33 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1hJI7K-00064r-R4
-	for qemu-devel@nongnu.org; Wed, 24 Apr 2019 09:39:19 -0400
-References: <20180713111424.23670-1-mreitz@redhat.com>
-	<20180713111424.23670-2-mreitz@redhat.com>
-	<a36f26f1-61b3-799f-5cee-281257cba123@redhat.com>
-From: Max Reitz <mreitz@redhat.com>
-Message-ID: <3c983edf-047f-c463-90f2-f1b542d9f3dd@redhat.com>
-Date: Wed, 24 Apr 2019 15:38:54 +0200
+	(envelope-from <liq3ea@gmail.com>) id 1hJIae-0000Db-PP
+	for qemu-devel@nongnu.org; Wed, 24 Apr 2019 10:09:38 -0400
+Received: from mail-ot1-x342.google.com ([2607:f8b0:4864:20::342]:40967)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <liq3ea@gmail.com>) id 1hJIae-0000Bp-JE
+	for qemu-devel@nongnu.org; Wed, 24 Apr 2019 10:09:36 -0400
+Received: by mail-ot1-x342.google.com with SMTP id g8so2277559otk.8
+	for <qemu-devel@nongnu.org>; Wed, 24 Apr 2019 07:09:36 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <a36f26f1-61b3-799f-5cee-281257cba123@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="LN3Ni5ZNrpgspsOQUB9OvNNpCFS8e9Rkw"
-Subject: Re: [Qemu-devel] [PATCH 1/3] qemu-img: Allow rebase with no input
- base
+References: <20190420100056.116305-1-liq3ea@163.com>
+	<20190420100056.116305-4-liq3ea@163.com>
+	<a27cd912-4f58-55ac-1aae-e4999fa3d84d@redhat.com>
+	<CAKXe6SJZWs7HtXutX6W3saDhaNDtVPMQEh2+s+9XiM3TtZqLdQ@mail.gmail.com>
+	<6dd699b1-f24d-743b-343e-f1df6c8672b9@redhat.com>
+In-Reply-To: <6dd699b1-f24d-743b-343e-f1df6c8672b9@redhat.com>
+From: Li Qiang <liq3ea@gmail.com>
+Date: Wed, 24 Apr 2019 22:08:59 +0800
+Message-ID: <CAKXe6SJ5iqXTMZMKQG4X0r1dDKNCBq06hcDPVzzUupCD=nH4zw@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH 3/4] tests: fw_cfg: add reboot_timeout test
+ case
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,73 +33,104 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>, qemu-block@nongnu.org
-Cc: Kevin Wolf <kwolf@redhat.com>, qemu-devel@nongnu.org
+To: Thomas Huth <thuth@redhat.com>
+Cc: Li Qiang <liq3ea@163.com>, lvivier@redhat.com, Paolo Bonzini <pbonzini@redhat.com>, =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>, Laszlo Ersek <lersek@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>, Qemu Developers <qemu-devel@nongnu.org>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---LN3Ni5ZNrpgspsOQUB9OvNNpCFS8e9Rkw
-From: Max Reitz <mreitz@redhat.com>
-To: Eric Blake <eblake@redhat.com>, qemu-block@nongnu.org
-Cc: Kevin Wolf <kwolf@redhat.com>, qemu-devel@nongnu.org
-Message-ID: <3c983edf-047f-c463-90f2-f1b542d9f3dd@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH 1/3] qemu-img: Allow rebase with no input
- base
-References: <20180713111424.23670-1-mreitz@redhat.com>
- <20180713111424.23670-2-mreitz@redhat.com>
- <a36f26f1-61b3-799f-5cee-281257cba123@redhat.com>
-In-Reply-To: <a36f26f1-61b3-799f-5cee-281257cba123@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+Thomas Huth <thuth@redhat.com> =E4=BA=8E2019=E5=B9=B44=E6=9C=8824=E6=97=A5=
+=E5=91=A8=E4=B8=89 =E4=B8=8B=E5=8D=883:31=E5=86=99=E9=81=93=EF=BC=9A
 
-On 18.04.19 20:55, Eric Blake wrote:
-> On 7/13/18 6:14 AM, Max Reitz wrote:
->> Currently, you cannot add a backing file to an image when it currently=
+> On 24/04/2019 03.16, Li Qiang wrote:
+> >
+> > Thomas Huth <thuth@redhat.com <mailto:thuth@redhat.com>> =E4=BA=8E2019=
+=E5=B9=B44=E6=9C=8824=E6=97=A5
+> > =E5=91=A8=E4=B8=89 =E4=B8=8A=E5=8D=8812:29=E5=86=99=E9=81=93=EF=BC=9A
+> >
+> >     On 20/04/2019 12.00, Li Qiang wrote:
+> >     > Signed-off-by: Li Qiang <liq3ea@163.com <mailto:liq3ea@163.com>>
+> >     > ---
+> >     >  tests/fw_cfg-test.c | 19 +++++++++++++++++++
+> >     >  1 file changed, 19 insertions(+)
+> >     >
+> >     > diff --git a/tests/fw_cfg-test.c b/tests/fw_cfg-test.c
+> >     > index c22503619f..9f75dbb5f4 100644
+> >     > --- a/tests/fw_cfg-test.c
+> >     > +++ b/tests/fw_cfg-test.c
+> >     > @@ -174,6 +174,24 @@ static void test_fw_cfg_boot_menu(void)
+> >     >      qtest_quit(s);
+> >     >  }
+> >     >
+> >     > +static void test_fw_cfg_reboot_timeout(void)
+> >     > +{
+> >     > +    QFWCFG *fw_cfg;
+> >     > +    QTestState *s;
+> >     > +    uint32_t reboot_timeout =3D 0;
+> >     > +    size_t filesize;
+> >     > +
+> >     > +    s =3D qtest_init("-boot reboot-timeout=3D15");
+> >     > +    fw_cfg =3D pc_fw_cfg_init(s);
+> >     > +
+> >     > +    filesize =3D qfw_cfg_get_file(fw_cfg, "etc/boot-fail-wait",
+> >     > +                     &reboot_timeout, sizeof(reboot_timeout));
+> >     > +    g_assert_cmpint(filesize, =3D=3D, sizeof(reboot_timeout));
+> >     > +    g_assert_cmpint(reboot_timeout, =3D=3D, 15);
+> >
+> >     Is this endianess-safe? Or do you need to byteswap reboot_timeout i=
+f
+> the
+> >     host and guest endianess does not match?
+> >
+> > Good question!
+> >
+> > IIUC, the qemu fw_cfg store the 'file' entry data just in byte stream.
+> > So there is no need
+> > to consider the file's endianess. If when the file entry is stored
+> > without considering endianess,
+> > it will be ok to ignore the endianess. So for this patch, the
+> > 'reboot_timeout' is ok as when we stored
+> > it we don't consider endianess. But for 'splash-time', when we stored
+> > it  we convert it to little endian
+> > so when we fetches it, we should also convert it from little endian to
+> > cpu-endian.
+>
+> I just gave these patches a try on a big endian host, and the test fails
+> indeed:
+>
+>
+Hi Thomas,
 
->> has none.  It is really simple to allow this, though (effectively by
->> setting old_backing_size to 0), so this patch does just that.
->=20
-> Can't you do that with 'rebase -u'? I guess the point of this patch is
-> to make 'rebase' without -u also able to add a backing file?  A bit mor=
-e
-> clarity in the commit message, such as a sample command line (and
-> possibly even the error it issued pre-patch) would help.
+I have sent out a revision patchset, could you please also try the new in
+the big endian host.
 
-Yes, this is about normal rebase without -u.
-
-There is an example in the cover letter, but I can add it to this patch
-here, too, yes.
-
->> Signed-off-by: Max Reitz <mreitz@redhat.com>
->> ---
->>  qemu-img.c | 61 ++++++++++++++++++++++++++++++-----------------------=
--
->>  1 file changed, 34 insertions(+), 27 deletions(-)
->=20
-> At any rate, the code looks fine, even if the diff is harder to read
-> because of added indentation.
->=20
-> Reviewed-by: Eric Blake <eblake@redhat.com>
-
-Thanks!
-
-Max
+Thanks,
+Li Qiang
 
 
---LN3Ni5ZNrpgspsOQUB9OvNNpCFS8e9Rkw
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
 
------BEGIN PGP SIGNATURE-----
 
-iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAlzAZu4ACgkQ9AfbAGHV
-z0Cruwf+Pd0xQD119UktAbODprzQYu4GvTGgKB2Hw7W+CME+fQ9sxR/zkERpHe6h
-aUyXME4v+/2EI8eEMWPpxK6sP0nLCnMAJ3RmFVG2Ud8xloLOeXiXK/V5KF92VVDJ
-aNHPfKlAMGZ8RE2GAMc0SQDFYMqAbVh36FFN6KfGtUuF16ZuGMTT40zxVhlnOwj/
-IdvnemV11ovHCuUDy3v+9mGUdx1gb/5UcotNnhxQs+VUP3VPjqsjAfgbUDcggqjR
-t9dPyBwap5omCyVcAmw5R+M42PHOKBgvh0xLZjrgBke/Rq6lEUybjACt0WL3WMbe
-+ZGH1mMKIXLtjpwoWRFBrJpWH6xEHw==
-=EpZE
------END PGP SIGNATURE-----
-
---LN3Ni5ZNrpgspsOQUB9OvNNpCFS8e9Rkw--
+> $ QTEST_QEMU_BINARY=3Dx86_64-softmmu/qemu-system-x86_64 tests/fw_cfg-test
+> /x86_64/fw_cfg/signature: OK
+> /x86_64/fw_cfg/id: OK
+> /x86_64/fw_cfg/uuid: OK
+> /x86_64/fw_cfg/ram_size: OK
+> /x86_64/fw_cfg/nographic: OK
+> /x86_64/fw_cfg/nb_cpus: OK
+> /x86_64/fw_cfg/max_cpus: OK
+> /x86_64/fw_cfg/numa: OK
+> /x86_64/fw_cfg/boot_menu: OK
+> /x86_64/fw_cfg/reboot_timeout: **
+> ERROR:tests/fw_cfg-test.c:190:test_fw_cfg_reboot_timeout: assertion
+> failed (reboot_timeout =3D=3D 15): (0 =3D=3D 15)
+> Aborted
+>
+> =3D> it also fails for reboot_timeout already, not only for splash_time.
+>
+> > So I think we can have following choose:
+> >
+> > 1. Don't consider the endianess, this is ok when emaulated target and
+> > host target has the same endianess.
+>
+> Sorry, but that's not a real choice. qtests must also work when you e.g.
+> run qemu-system-x86_64 on a big endian host.
+>
+>  Thomas
+>
