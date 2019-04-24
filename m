@@ -1,23 +1,26 @@
 Received: from eggs.gnu.org ([209.51.188.92]:33946)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1hJIM2-0008ST-PW
-	for qemu-devel@nongnu.org; Wed, 24 Apr 2019 09:54:31 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1hJIM6-0008ST-CL
+	for qemu-devel@nongnu.org; Wed, 24 Apr 2019 09:54:35 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1hJIGq-0002ib-JW
-	for qemu-devel@nongnu.org; Wed, 24 Apr 2019 09:49:09 -0400
-References: <20180713111424.23670-1-mreitz@redhat.com>
-	<9afddacb-ca54-6ac3-1c02-b8916a08fcd3@redhat.com>
-	<c3f01ebe-37f7-d1d8-8bcd-45df37d80ff6@virtuozzo.com>
-From: Max Reitz <mreitz@redhat.com>
-Message-ID: <3583e4e9-d29e-fc5a-6e83-637e515c38f7@redhat.com>
-Date: Wed, 24 Apr 2019 15:48:55 +0200
+	(envelope-from <peter.maydell@linaro.org>) id 1hJIFC-00013o-OD
+	for qemu-devel@nongnu.org; Wed, 24 Apr 2019 09:47:27 -0400
+Received: from mail-oi1-x22f.google.com ([2607:f8b0:4864:20::22f]:34251)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1hJIFB-00011r-7S
+	for qemu-devel@nongnu.org; Wed, 24 Apr 2019 09:47:26 -0400
+Received: by mail-oi1-x22f.google.com with SMTP id v10so14315951oib.1
+	for <qemu-devel@nongnu.org>; Wed, 24 Apr 2019 06:47:24 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <c3f01ebe-37f7-d1d8-8bcd-45df37d80ff6@virtuozzo.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="WbTQsdO1hO6b1aqFXzRpYXmiowF2oosH9"
-Subject: Re: [Qemu-devel] [PATCH 0/3] qemu-img: Allow rebase with no input
- base
+References: <20190423171520.4511-1-lersek@redhat.com>
+In-Reply-To: <20190423171520.4511-1-lersek@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Wed, 24 Apr 2019 14:47:10 +0100
+Message-ID: <CAFEAcA9B-FpTySXUKTxYaw=8V=to0VTjCAvCAMGF-x=yQY3G9A@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PULL 00/12] bundle edk2 platform firmware with
+ QEMU
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,56 +29,54 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>
-Cc: Kevin Wolf <kwolf@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+To: Laszlo Ersek <lersek@redhat.com>
+Cc: "Daniel P. Berrange" <berrange@redhat.com>, Eric Blake <eblake@redhat.com>, =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>, Igor Mammedov <imammedo@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>, Michal Privoznik <mprivozn@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---WbTQsdO1hO6b1aqFXzRpYXmiowF2oosH9
-From: Max Reitz <mreitz@redhat.com>
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
- "qemu-block@nongnu.org" <qemu-block@nongnu.org>
-Cc: Kevin Wolf <kwolf@redhat.com>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
-Message-ID: <3583e4e9-d29e-fc5a-6e83-637e515c38f7@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH 0/3] qemu-img: Allow rebase with no input
- base
-References: <20180713111424.23670-1-mreitz@redhat.com>
- <9afddacb-ca54-6ac3-1c02-b8916a08fcd3@redhat.com>
- <c3f01ebe-37f7-d1d8-8bcd-45df37d80ff6@virtuozzo.com>
-In-Reply-To: <c3f01ebe-37f7-d1d8-8bcd-45df37d80ff6@virtuozzo.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+On Tue, 23 Apr 2019 at 18:15, Laszlo Ersek <lersek@redhat.com> wrote:
+>
+> Picked up the new feedback tags from the v4 thread, which had been
+> posted at:
+> - https://lists.gnu.org/archive/html/qemu-devel/2019-04/msg01549.html
+> - http://mid.mail-archive.com/20190409230022.6462-1-lersek@redhat.com
+>
+> The following changes since commit eeba63fc7fface36f438bcbc0d3b02e7dcb59983:
+>
+>   Update version for v4.0.0-rc4 release (2019-04-16 21:53:00 +0100)
+>
+> are available in the Git repository at:
+>
+>   https://github.com/lersek/qemu.git tags/edk2-pull-2019-04-22
+>
+> for you to fetch changes up to 6739df3fafaa3e2ec37af23fd77d2119869f4a4f:
+>
+>   MAINTAINERS: add the "EDK2 Firmware" subsystem (2019-04-17 15:38:35 +0200)
+>
+> ----------------------------------------------------------------
+> Advance the roms/edk2 submodule to the "edk2-stable201903" release, and
+> build and capture platform firmware binaries from that release. The
+> binaries are meant to be used by both end-users and by the "BIOS tables"
+> unit tests in qtest ("make check").
+>
+> ----------------------------------------------------------------
+> Laszlo Ersek (12):
+>       roms: lift "edk2-funcs.sh" from "tests/uefi-test-tools/build.sh"
+>       roms/edk2-funcs.sh: require gcc-4.8+ for building i386 and x86_64
+>       tests/uefi-test-tools/build.sh: work around TianoCore#1607
+>       roms/edk2: advance to tag edk2-stable201903
+>       roms/edk2-funcs.sh: add the qemu_edk2_get_thread_count() function
+>       roms/Makefile: replace the $(EDK2_EFIROM) target with "edk2-basetools"
+>       roms: build edk2 firmware binaries and variable store templates
+>       pc-bios: add edk2 firmware binaries and variable store templates
+>       pc-bios: document the edk2 firmware images; add firmware descriptors
+>       tests: add missing dependency to build QTEST_QEMU_BINARY, round 2
+>       Makefile: install the edk2 firmware images and their descriptors
+>       MAINTAINERS: add the "EDK2 Firmware" subsystem
 
-On 18.04.19 19:00, Vladimir Sementsov-Ogievskiy wrote:
-> 13.04.2019 19:11, Max Reitz wrote:
->> Ping again
->>
->> (I feel like I just need to start merging unreviewed patches until I
->> break something (can't take that long) so you get so scared of my
->> patches that you at least refuse them outright)
->=20
-> Could you resend before?
-
-Sure, but for me, this series still applies as-is.
-
-Max
 
 
---WbTQsdO1hO6b1aqFXzRpYXmiowF2oosH9
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
+Applied, thanks.
 
------BEGIN PGP SIGNATURE-----
+Please update the changelog at https://wiki.qemu.org/ChangeLog/4.1
+for any user-visible changes.
 
-iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAlzAaUcACgkQ9AfbAGHV
-z0CdwQf9F8Il0sXGQuaThI7ulHJJUDNq/aRhuVZLF0GF1xjKZ9/98L7Cgg/Otpol
-a5BjHLz1ENixS2big3uRjY+Ch1sx1qibkH20jP9T3OAYHsnZz03DDP5DM3qvR4jV
-sSbHonLi2Swpr4Mv9FdseCAUJ7BtqPUqv+rXMHQiBGqkADhgaPCluX3VkQ3A9G81
-iQtSp4Uhn+aGMtMw7vRJeNOSaFYk67A5VKX48hn7UlQpHValKnf9t8RhMqMx7EOT
-RGGh8izy2HL2o3DrOuOfyE9HHWRxkaLGw1S8sVaGReYfwNWkjOEi3DTjk5yPcFN4
-CQVe9G2BzVXvGF5N+XCnz7E3q+1gZQ==
-=Z+z0
------END PGP SIGNATURE-----
-
---WbTQsdO1hO6b1aqFXzRpYXmiowF2oosH9--
+-- PMM
