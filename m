@@ -2,70 +2,111 @@ Return-Path: <SRS0=3XOk=S2=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.4 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_PASS,USER_AGENT_MUTT autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-0.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 703A7C10F11
-	for <qemu-devel@archiver.kernel.org>; Wed, 24 Apr 2019 09:08:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 032AFC10F11
+	for <qemu-devel@archiver.kernel.org>; Wed, 24 Apr 2019 09:08:34 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2FC1C21773
-	for <qemu-devel@archiver.kernel.org>; Wed, 24 Apr 2019 09:08:28 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2FC1C21773
+	by mail.kernel.org (Postfix) with ESMTPS id BA90E21773
+	for <qemu-devel@archiver.kernel.org>; Wed, 24 Apr 2019 09:08:33 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BA90E21773
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:38268 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:38270 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hJDtC-0004QI-RG
-	for qemu-devel@archiver.kernel.org; Wed, 24 Apr 2019 05:08:26 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:42233)
+	id 1hJDtI-0004UE-VZ
+	for qemu-devel@archiver.kernel.org; Wed, 24 Apr 2019 05:08:33 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:42289)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mkletzan@redhat.com>) id 1hJDrU-0003DM-Kh
-	for qemu-devel@nongnu.org; Wed, 24 Apr 2019 05:06:44 -0400
+	(envelope-from <david@redhat.com>) id 1hJDrb-0003JP-39
+	for qemu-devel@nongnu.org; Wed, 24 Apr 2019 05:06:48 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mkletzan@redhat.com>) id 1hJDpD-0004FI-FK
-	for qemu-devel@nongnu.org; Wed, 24 Apr 2019 05:04:21 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:49544)
+	(envelope-from <david@redhat.com>) id 1hJDoD-0003cP-Q8
+	for qemu-devel@nongnu.org; Wed, 24 Apr 2019 05:03:18 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:50914)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mkletzan@redhat.com>) id 1hJDp9-0004BY-Qm
-	for qemu-devel@nongnu.org; Wed, 24 Apr 2019 05:04:19 -0400
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
-	[10.5.11.11])
+	(Exim 4.71) (envelope-from <david@redhat.com>)
+	id 1hJDoD-0003P9-IF; Wed, 24 Apr 2019 05:03:17 -0400
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+	[10.5.11.14])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 11B13308FC23;
-	Wed, 24 Apr 2019 09:04:06 +0000 (UTC)
-Received: from caroline (unknown [10.43.2.67])
-	by smtp.corp.redhat.com (Postfix) with ESMTPS id 7DE53600C4;
-	Wed, 24 Apr 2019 09:04:05 +0000 (UTC)
-Received: by caroline (Postfix, from userid 1000)
-	id 36D9B1206F3; Wed, 24 Apr 2019 11:04:04 +0200 (CEST)
-Date: Wed, 24 Apr 2019 11:04:04 +0200
-From: Martin Kletzander <mkletzan@redhat.com>
-To: Kevin Wolf <kwolf@redhat.com>
-Message-ID: <20190424090404.GA7640@wheatley>
-References: <20190423113028.GD30014@wheatley>
-	<20190423121218.GF9041@localhost.localdomain>
-	<20190423142648.GA2967@wheatley>
-	<20190423150845.GG9041@localhost.localdomain>
-	<aeb62174-5aad-676e-792d-e71d694dbd1e@virtuozzo.com>
-	<20190424071917.GA15891@linux.fritz.box>
+	by mx1.redhat.com (Postfix) with ESMTPS id C570C308B25E;
+	Wed, 24 Apr 2019 09:03:06 +0000 (UTC)
+Received: from [10.36.116.45] (ovpn-116-45.ams2.redhat.com [10.36.116.45])
+	by smtp.corp.redhat.com (Postfix) with ESMTP id 51B8D5D9C8;
+	Wed, 24 Apr 2019 09:03:04 +0000 (UTC)
+To: Christian Borntraeger <borntraeger@de.ibm.com>,
+	Cornelia Huck <cohuck@redhat.com>
+References: <20190418113110.160664-1-borntraeger@de.ibm.com>
+	<d3cdd199-0457-7255-9540-2bbe5555e079@redhat.com>
+	<a9e5863e-cb05-11a6-03a8-89ee45febcc9@de.ibm.com>
+From: David Hildenbrand <david@redhat.com>
+Openpgp: preference=signencrypt
+Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
+	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
+	SE+xAvmumFBY
+Organization: Red Hat GmbH
+Message-ID: <03eb94f6-6f8f-0358-df00-bc487e5e3bff@redhat.com>
+Date: Wed, 24 Apr 2019 11:03:03 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+	Thunderbird/60.6.1
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="wac7ysb48OaltWcw"
-Content-Disposition: inline
-In-Reply-To: <20190424071917.GA15891@linux.fritz.box>
-User-Agent: Mutt/1.11.4 (2019-03-13)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+In-Reply-To: <a9e5863e-cb05-11a6-03a8-89ee45febcc9@de.ibm.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.43]);
-	Wed, 24 Apr 2019 09:04:06 +0000 (UTC)
+	(mx1.redhat.com [10.5.110.47]);
+	Wed, 24 Apr 2019 09:03:07 +0000 (UTC)
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] Possibly incorrect data sparsification by qemu-img
+Subject: Re: [Qemu-devel] [PATCH 00/10] s390x: new guest features
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -77,169 +118,158 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
-	"qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
-	Richard Jones <rjones@redhat.com>
+Cc: "Jason J . Herne" <jjherne@linux.ibm.com>,
+	Collin Walling <walling@linux.ibm.com>, qemu-devel <qemu-devel@nongnu.org>,
+	Halil Pasic <pasic@linux.ibm.com>, qemu-s390x <qemu-s390x@nongnu.org>,
+	Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190424090404.v6obsB_b8AcnTh40iSNNpH9OR7YGliwG9AUqDbqErOE@z>
+Message-ID: <20190424090303.aGmChzZgAx0VpvdzHgwRqq4ww8KHYOexodgI0X8q8wo@z>
 
-
---wac7ysb48OaltWcw
-Content-Type: text/plain; charset=us-ascii; format=flowed
-Content-Disposition: inline
-
-On Wed, Apr 24, 2019 at 09:19:17AM +0200, Kevin Wolf wrote:
->Am 24.04.2019 um 08:40 hat Vladimir Sementsov-Ogievskiy geschrieben:
->> 23.04.2019 18:08, Kevin Wolf wrote:
->> > Am 23.04.2019 um 16:26 hat Martin Kletzander geschrieben:
->> >> On Tue, Apr 23, 2019 at 02:12:18PM +0200, Kevin Wolf wrote:
->> >>> Am 23.04.2019 um 13:30 hat Martin Kletzander geschrieben:
->> >>>> Hi,
->> >>>>
->> >>>> I am using qemu-img with nbdkit to transfer a disk image and the update it with
->> >>>> extra data from newer snapshots.  The end image cannot be transferred because
->> >>>> the snapshots will be created later than the first transfer and we want to save
->> >>>> some time up front.  You might think of it as a continuous synchronisation.  It
->> >>>> looks something like this:
->> >>>>
->> >>>> I first transfer the whole image:
->> >>>>
->> >>>>   qemu-img convert -p $nbd disk.raw
->> >>>>
->> >>>> Where `$nbd` is something along the lines of `nbd+unix:///?socket=nbdkit.sock`
->> >>>>
->> >>>> Then, after the next snapshot is created, I can update it thanks to the `-n`
->> >>>> parameter (the $nbd now points to the newer snapshot with unchanged data looking
->> >>>> like holes in the file):
->> >>>>
->> >>>>   qemu-img convert -p -n $nbd disk.raw
->> >>>>
->> >>>> This is fast and efficient as it uses block status nbd extension, so it only
->> >>>> transfers new data.
->> >>>
->> >>> This is an implementation detail. Don't rely on it. What you're doing is
->> >>> abusing 'qemu-img convert', so problems like what you describe are to be
->> >>> expected.
->> >>>
->> >>>> This can be done over and over again to keep the local
->> >>>> `disk.raw` image up to date with the latest remote snapshot.
->> >>>>
->> >>>> However, when the guest OS zeroes some of the data and it gets written into the
->> >>>> snapshot, qemu-img scans for those zeros and does not write them to the
->> >>>> destination image.  Checking the output of `qemu-img map --output=json $nbd`
->> >>>> shows that the zeroed data is properly marked as `data: true`.
->> >>>>
->> >>>> Using `-S 0` would write zeros even where the holes are, effectively overwriting
->> >>>> the data from the last snapshot even though they should not be changed.
->> >>>>
->> >>>> Having gone through some workarounds I would like there to be another way.  I
->> >>>> know this is far from the typical usage of qemu-img, but is this really the
->> >>>> expected behaviour or is this just something nobody really needed before?  If it
->> >>>> is the former, would it be possible to have a parameter that would control this
->> >>>> behaviour?  If the latter is the case, can that behaviour be changed so that it
->> >>>> properly replicates the data when `-n` parameter is used?
->> >>>>
->> >>>> Basically the only thing we need is to either:
->> >>>>
->> >>>> 1) write zeros where they actually are or
->> >>>>
->> >>>> 2) turn off explicit sparsification without requesting dense image (basically
->> >>>>     sparsify only the par that is reported as hole on the source) or
->> >>>>
->> >>>> 3) ideally, just FALLOC_FL_PUNCH_HOLE in places where source did report data,
->> >>>>     but qemu-img found they are all zeros (or source reported HOLE+ZERO which, I
->> >>>>     believe, is effectively the same)
->> >>>>
->> >>>> If you want to try this out, I found the easiest reproducible way is using
->> >>>> nbdkit's data plugin, which can simulate whatever source image you like.
->> >>>
->> >>> I think what you _really_ want is a commit block job. The problem is
->> >>> just that you don't have a proper backing file chain, but just a bunch
->> >>> of NBD connections.
->> >>>
->> >>> Can't you get an NBD connection that already provides the condensed form
->> >>> of the whole snapshot chain directly at the source? If the NBD server
->> >>> was QEMU, this would actually be easier than providing each snapshot
->> >>> individually.
->> >>>
->> >>> If this isn't possible, I think you need to replicate the backing chain
->> >>> on the destination instead of converting into the same image again and
->> >>> again so that qemu-img knows that it must take existing data of the
->> >>> backing file into consideration:
->> >>>
->> >>>     qemu-img convert -O qcow2 nbd://... base.qcow2
->> >>>     qemu-img convert -O qcow2 -F qcow2 -B base.qcow2 nbd://... overlay1.qcow2
->> >>>     qemu-img convert -O qcow2 -F qcow2 -B overlay1.qcow2 nbd://... overlay2.qcow2
->> >>>     ...
+On 24.04.19 10:40, Christian Borntraeger wrote:
+>=20
+>=20
+> On 23.04.19 14:11, David Hildenbrand wrote:
+>> On 18.04.19 13:31, Christian Borntraeger wrote:
+>>> Adding generation 15.
+>>>
+>>> Some interesting aspects:
+>>> - conditional SSKE and bpb are deprecated. This patch set addresses t=
+hat
+>>>   for csske.
+>>> - no name yet for gen15, I suggest to use the assigned numbers and
+>>>   provide an alias later on. (I have split out this into a separate
+>>>   patch)
+>>>
+>>> Christian Borntraeger (10):
+>>>   linux header sync
+>>>   s390x/cpumodel: remove CSSKE from base model
+>>>   s390x/cpumodel: Miscellaneous-Instruction-Extensions Facility 3
+>>>   s390x/cpumodel: msa9 facility
+>>>   s390x/cpumodel: vector enhancements
+>>>   s390x/cpumodel: enhanced sort facility
+>>>   s390x/cpumodel: deflate
+>>>   s390x/cpumodel: add gen15 defintions
+>>>   s390x/cpumodel: wire up 8561 and 8562 as gen15 machines
+>>>   s390x/cpumodel: do not claim csske for expanded models in qmp
+>>>
+>>>  hw/s390x/s390-virtio-ccw.c      |  6 +++
+>>>  linux-headers/asm-s390/kvm.h    |  5 +-
+>>>  target/s390x/cpu_features.c     | 54 +++++++++++++++++++
+>>>  target/s390x/cpu_features.h     |  3 ++
+>>>  target/s390x/cpu_features_def.h | 49 +++++++++++++++++
+>>>  target/s390x/cpu_models.c       | 35 ++++++++++++
+>>>  target/s390x/cpu_models.h       |  1 +
+>>>  target/s390x/gen-features.c     | 94 +++++++++++++++++++++++++++++++=
++-
+>>>  target/s390x/kvm.c              | 18 +++++++
+>>>  9 files changed, 263 insertions(+), 2 deletions(-)
+>>>
 >>
->> Is it safe in general?
+>> I guess to handle deprecation of CSSKE:
 >>
->> Qemu often consider rounding-up allocated ranges to be safe, or just
->> consider unknown area as allocated.  And if this happen, we'll convert
->> unallocated hole to allocated zeroes on target, which will break
->> backing chain.
+>> 1. Remove it from the base + default model of the gen15, keep it in th=
+e
+>> max model. This is completely done in target/s390x/gen-features.c.
+>> Existing base models are not modified.
 >>
->> This way would be correct if on source under nbd server we have valid
->> backing chain too, so in case of "rounding-up" we'll just read valid
->> data from backing. But it is not the case (or sorry, if I
->> misunderstood).
->
->As I said, it depends on the NBD server providing the right block
->allocation status - and this includes alignment etc. as well.
->
->It's not a very nice solution because NBD doesn't actually do backing
->fields, so we're relying on things that the spec doesn't talk about. But
+>> 2. Add CSSKE to "ignored_base_feat", so fallback of gen15 to e.g. z14
+>> will work. We can backport this to distros/stable.
+>=20
+> Yes, I have already implemented that, still doing some testing and poli=
+shinh.
+>>
+>>
+>> CPU model expansion:
+>>
+>> cpu_info_from_model() should already properly be based on the base
+>> features. "gen15" vs. "gen15,csske=3Don" should be automatically gener=
+ated
+>> when expanding.
+>>
+>> CPU model baseline:
+>>
+>> s390_find_cpu_def() should make sure that CSSKE is basically ignored
+>> when determining maximum model, however it will properly be indicated =
+if
+>> both models had the feature.
+>>
+>> CPU model comparison:
+>>
+>> Should work as expected. Availability of CSSKE will be considered when
+>> calculating the result.
+>>
+>> gen14,csske=3Don and gen15,csske=3Doff will result in
+>> CPU_MODEL_COMPARE_RESULT_INCOMPATIBLE.
+>>
+>> gen14,csske=3Doff and gen15,csske=3Doff should result in
+>> CPU_MODEL_COMPARE_RESULT_SUBSET
+>>
+>> gen14,csske=3Don and gen15,csske=3Don should result in
+>> CPU_MODEL_COMPARE_RESULT_SUBSET
+>>
+>> Forward migration:
+>>
+>> Now, the only issue is when csske is actually turned of in future
+>> machines. We would e.g. have
+>>
+>> gen15,csske=3Don and gen16,csske=3Doff
+>>
+>> While baselining will work correctly (gen15,csske=3Doff), forward
+>> migration is broken (comparison will properly indicate
+>> CPU_MODEL_COMPARE_RESULT_INCOMPATIBLE), which is expected when ripping
+>> out features. Same applies to BPB.
+>>
+>>
+>> Your patch "[PATCH 10/10] s390x/cpumodel: do not claim csske for
+>> expanded models in qmp" tried to address this, however I am not really
+>> happy with this approach. We should not play such tricks when expandin=
+g
+>> the host model. "-cpu host" and "-cpu $expanded_host" would be
+>> different,
+>=20
+> We discussed this some time ago and I think we agreed that for host pas=
+sthrough
+> it is ok to be different that host-model (e.g. passing through the cpui=
+d, passing
+> through all non-hypervisor managed features etc).
 
-That is what I was concerned about, if I understand correctly there is no
-concept of backing chains in the NBD protocol.
+I remember the plan was to use the "max" model to do such stuff. E.g.
+-cpu max / no -cpu
 
->as I understand, we don't have control over the server side, so it's
->probably the best we can do under these conditions.
->
->If the NBD server already took the backing chain into consideration, it
->would indeed be much more reliable.
->
+Versus
+-cpu host
 
-We *kind of* have control over the server.  The nbd server is nbdkit in which we
-can make sure does the right thing, however making it open the local file as
-backing is something that does not really fit in the design, or at least not
-yet.
+We can have features in "host" we don't have in "max". But "-cpu host"
+and it's expansion should look 100% the same.
 
-But we can make sure the provided data is correct even for unallocated areas
-because the backing chain we replicated is present on the source.  Reading
-couple more blocks is still a major improvement over reading all the data.
+>=20
+>=20
+>> that is really confusing, especially think about baselining
+>> or comparing against "host", where your patch does not apply..
+>>
+>>
+>> Whenever users would specify "-cpu gen15", everything would be fine in
+>> regards to forward migration. Maybe clients really have to be taught
+>> about upcoming forward migration issues. "Don't use the host model, ma=
+ke
+>> sure bpa and csske are disabled".
+>=20
+>=20
+> the thing is, I think the host-model is actually the preferred setting =
+so I
+> would like to have this forward-migrateable as well. I will focus on pa=
+tches
+> 1-9 first and lets have a side discussion on patch 10.
+>=20
 
-I tried your solution and it works nicely, even though it consumes more data
-then needed.  I'm guessing this could be at least partially avoided by using
-internal snapshots, if that was supported with `convert`, but that's not really
-needed.  This is more than enough and, as more of us said, this usage is kind of
-an abuse of what qemu-img is designed to do.
+Makes sense. This is also something that can be fixed on higher layers
+(disable cpu feature for gen15 to prepare for migration).
 
-Thanks everyone for all the help!
+--=20
 
-Martin
+Thanks,
 
---wac7ysb48OaltWcw
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAABCAAdFiEEiXAnXDYdKAaCyvS1CB/CnyQXht0FAlzAJoQACgkQCB/CnyQX
-ht0lwBAAkX8QsOHk0+6sKg6PSyHn8zsrllP0CatzgMfjKCfBCoXrY1ayq0lp+SNY
-lFxMUHhwB9FU8qagSyhozTncCH12F9N3uvwFvihGSDFZOZlD1MjbPVUTncXlDKj3
-jnKuZWC2kvDXdlKkrw/ZZyVmyK8oJp0w0YP0WIifK9YQim6yhQ7/B4MqjqOba/2z
-BXsQAE1JzQQ7gRU93CVAXijABkd+8iZX4r+TfCJLo8M+/IMNZPVnzUbomI62H6nR
-a9l5reQdReanwX9TliksUehg7Uh4JXYjCAFgftdCFyet+4Sr58CbNiMALogChGK1
-Kk+GKaHPgh5br1tJ4/m8e8u+R2QZKc/uUKkxD5acE3IMgTjyURArRtOBDMOwM39H
-fxLOkgHgDgZl53KHRFWvLY30PxwYZsnDhbFRgHXAFRGArhXI1gydc7REfLm43d7D
-DuxcQQhJeuFVSOIlCuPhqgmnUsdlbJwOe0dLWjV371GZaQ6o1YFiY3tUEaRF6y4C
-L5cblavs/9AdoB68qHVF8nzl5kzRmEHv1wWdWXnHXb769KS1A0gSoAK9+nWvODpO
-3nom501msOVXuPJ00c86LdlvAJU3xY4UFexYi3ay1PjgVCiDRKKOWayJXkw/6Rxb
-MlvDzMsjSWCaMCZewJVI05C9tcjiK0e87GA5KsEamZ1beMPQnNg=
-=pN/c
------END PGP SIGNATURE-----
-
---wac7ysb48OaltWcw--
+David / dhildenb
 
