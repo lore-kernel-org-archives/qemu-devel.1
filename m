@@ -1,22 +1,30 @@
 Received: from eggs.gnu.org ([209.51.188.92]:33686)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1hJDLp-00083L-T1
-	for qemu-devel@nongnu.org; Wed, 24 Apr 2019 04:33:59 -0400
+	(envelope-from <yan.y.zhao@intel.com>) id 1hJDLr-00083L-DM
+	for qemu-devel@nongnu.org; Wed, 24 Apr 2019 04:34:01 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1hJDBo-0004Sq-2a
-	for qemu-devel@nongnu.org; Wed, 24 Apr 2019 04:23:37 -0400
-Date: Wed, 24 Apr 2019 09:23:09 +0100
-From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-Message-ID: <20190424082309.GB28615@redhat.com>
-Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-References: <20190423212246.3542-1-ehabkost@redhat.com>
-	<20190423212246.3542-3-ehabkost@redhat.com>
+	(envelope-from <yan.y.zhao@intel.com>) id 1hJD9v-0002HX-Oc
+	for qemu-devel@nongnu.org; Wed, 24 Apr 2019 04:21:41 -0400
+Received: from mga03.intel.com ([134.134.136.65]:11227)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <yan.y.zhao@intel.com>)
+	id 1hJD9v-0002EQ-C0
+	for qemu-devel@nongnu.org; Wed, 24 Apr 2019 04:21:39 -0400
+Date: Wed, 24 Apr 2019 04:15:58 -0400
+From: Yan Zhao <yan.y.zhao@intel.com>
+Message-ID: <20190424081558.GE26247@joy-OptiPlex-7040>
+Reply-To: Yan Zhao <yan.y.zhao@intel.com>
+References: <20190419083258.19580-1-yan.y.zhao@intel.com>
+	<20190419083505.19654-1-yan.y.zhao@intel.com>
+	<20190423115932.42619422.cohuck@redhat.com>
+	<20190424031036.GB26247@joy-OptiPlex-7040>
+	<20190424095624.0ce97328.cohuck@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20190423212246.3542-3-ehabkost@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH 2/3] machine: Use SupportStatusInfo for
- deprecation info
+In-Reply-To: <20190424095624.0ce97328.cohuck@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH 1/2] vfio/mdev: add version field as
+ mandatory attribute for mdev device
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,122 +33,245 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eduardo Habkost <ehabkost@redhat.com>
-Cc: qemu-devel@nongnu.org, "Michael S. Tsirkin" <mst@redhat.com>, mprivozn@redhat.com, Markus Armbruster <armbru@redhat.com>, =?utf-8?B?SGVydsOp?= Poussineau <hpoussin@reactos.org>, qemu-ppc@nongnu.org, David Gibson <david@gibson.dropbear.id.au>
+To: Cornelia Huck <cohuck@redhat.com>
+Cc: "cjia@nvidia.com" <cjia@nvidia.com>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>, "aik@ozlabs.ru" <aik@ozlabs.ru>, "Zhengxiao.zx@alibaba-inc.com" <Zhengxiao.zx@alibaba-inc.com>, "shuangtai.tst@alibaba-inc.com" <shuangtai.tst@alibaba-inc.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "kwankhede@nvidia.com" <kwankhede@nvidia.com>, "eauger@redhat.com" <eauger@redhat.com>, "Liu, Yi L" <yi.l.liu@intel.com>, "eskultet@redhat.com" <eskultet@redhat.com>, "Yang, Ziye" <ziye.yang@intel.com>, "mlevitsk@redhat.com" <mlevitsk@redhat.com>, "pasic@linux.ibm.com" <pasic@linux.ibm.com>, "libvir-list@redhat.com" <libvir-list@redhat.com>, "arei.gonglei@huawei.com" <arei.gonglei@huawei.com>, "felipe@nutanix.com" <felipe@nutanix.com>, "Ken.Xue@amd.com" <Ken.Xue@amd.com>, "Tian, Kevin" <kevin.tian@intel.com>, "dgilbert@redhat.com" <dgilbert@redhat.com>, "zhenyuw@linux.intel.com" <zhenyuw@linux.intel.com>, "alex.williamson@redhat.com" <alex.williamson@redhat.com>, "intel-gvt-dev@lists.freedesktop.org" <intel-gvt-dev@lists.freedesktop.org>, "Liu, Changpeng" <changpeng.liu@intel.com>, "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, "Wang, Zhi A" <zhi.a.wang@intel.com>, "jonathan.davies@nutanix.com" <jonathan.davies@nutanix.com>, "He, Shaopeng" <shaopeng.he@intel.com>
 
-On Tue, Apr 23, 2019 at 06:22:45PM -0300, Eduardo Habkost wrote:
-> Use SupportStatusInfo to represent deprecation information of
-> machine types.
+On Wed, Apr 24, 2019 at 03:56:24PM +0800, Cornelia Huck wrote:
+> On Tue, 23 Apr 2019 23:10:37 -0400
+> Yan Zhao <yan.y.zhao@intel.com> wrote:
 > 
-> Instead of using a generic "use XXX instead" message for humans,
-> encode the suggested alternative in a machine-friendly way at the
-> 'suggested_alternatives' field.
+> > On Tue, Apr 23, 2019 at 05:59:32PM +0800, Cornelia Huck wrote:
+> > > On Fri, 19 Apr 2019 04:35:04 -0400
+> > > Yan Zhao <yan.y.zhao@intel.com> wrote:
+> > >   
+> > > > device version attribute in mdev sysfs is used by user space software
+> > > > (e.g. libvirt) to query device compatibility for live migration of VFIO
+> > > > mdev devices. This attribute is mandatory if a mdev device supports live
+> > > > migration.
+> > > >
+> > > > It consists of two parts: common part and vendor proprietary part.
+> > > > common part: 32 bit. lower 16 bits is vendor id and higher 16 bits
+> > > >              identifies device type. e.g., for pci device, it is
+> > > >              "pci vendor id" | (VFIO_DEVICE_FLAGS_PCI << 16).
+> > > > vendor proprietary part: this part is varied in length. vendor driver can
+> > > >              specify any string to identify a device.
+> > > >
+> > > > When reading this attribute, it should show device version string of the
+> > > > device of type <type-id>. If a device does not support live migration, it
+> > > > should return errno.  
+> > > 
+> > > It might make more sense if the driver does not register the attribute
+> > > for the device in that case at all.
+> > >   
+> > yes. what about rephrase like this:
+> > "
+> > When reading this attribute, it should show device version string of the
+> > device of type <type-id>.
+> > If a device does not support live migration, it has two choices:
+> > 1. do not register this version attribute
+> > 2. return -ENODEV on rw this version attribute
 > 
-> Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
-> ---
->  include/hw/boards.h |  7 ++++---
->  hw/i386/pc_piix.c   |  4 +++-
->  hw/ppc/prep.c       |  4 +++-
->  vl.c                | 13 +++++++++----
->  4 files changed, 19 insertions(+), 9 deletions(-)
+> "return -ENODEV when accessing the version attribute" ?
+Yeah, this one is better, thanks :)
+
+> > Choice 1 is preferred.
+> > "
+> > 
+> > 
+> > > > When writing a string to this attribute, it returns errno for
+> > > > incompatibility or returns written string length in compatibility case.
+> > > > If a device does not support live migration, it always returns errno.
+> > > >
+> > > > For user space software to use:
+> > > > 1.
+> > > > Before starting live migration, user space software first reads source side
+> > > > mdev device's version. e.g.
+> > > > "#cat \
+> > > > /sys/bus/pci/devices/0000\:00\:02.0/5ac1fb20-2bbf-4842-bb7e-36c58c3be9cd/mdev_type/version"
+> > > > 00028086-193b-i915-GVTg_V5_4
+> > > >
+> > > > 2.
+> > > > Then, user space software writes the source side returned version string
+> > > > to device version attribute in target side, and checks the return value.
+> > > > If a negative errno is returned in the target side, then mdev devices in
+> > > > source and target sides are not compatible;
+> > > > If a positive number is returned and it equals to the length of written
+> > > > string, then the two mdev devices in source and target side are compatible.
+> > > > e.g.
+> > > > (a) compatibility case
+> > > > "# echo 00028086-193b-i915-GVTg_V5_4 >
+> > > > /sys/bus/pci/devices/0000\:00\:02.0/882cc4da-dede-11e7-9180-078a62063ab1/mdev_type/version"
+> > > >
+> > > > (b) incompatibility case
+> > > > "#echo 00028086-193b-i915-GVTg_V5_1 >
+> > > > /sys/bus/pci/devices/0000\:00\:02.0/882cc4da-dede-11e7-9180-078a62063ab1/mdev_type/version"
+> > > > -bash: echo: write error: Invalid argument
+> > > >
+> > > > 3. if two mdev devices are compatible, user space software can start
+> > > > live migration, and vice versa.
+> > > >
+> > > > Note: if a mdev device does not support live migration, it either does
+> > > > not provide a version attribute, or always returns errno when its version
+> > > > attribute is read/written.
+> > > >
+> > > > Cc: Alex Williamson <alex.williamson@redhat.com>
+> > > > Cc: Erik Skultety <eskultet@redhat.com>
+> > > > Cc: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+> > > > Cc: Cornelia Huck <cohuck@redhat.com>
+> > > > Cc: "Tian, Kevin" <kevin.tian@intel.com>
+> > > > Cc: Zhenyu Wang <zhenyuw@linux.intel.com>
+> > > > Cc: "Wang, Zhi A" <zhi.a.wang@intel.com>
+> > > > Cc: Neo Jia <cjia@nvidia.com>
+> > > > Cc: Kirti Wankhede <kwankhede@nvidia.com>
+> > > >
+> > > > Signed-off-by: Yan Zhao <yan.y.zhao@intel.com>
+> > > > ---
+> > > >  Documentation/vfio-mediated-device.txt | 36 ++++++++++++++++++++++++++
+> > > >  samples/vfio-mdev/mbochs.c             | 17 ++++++++++++
+> > > >  samples/vfio-mdev/mdpy.c               | 16 ++++++++++++
+> > > >  samples/vfio-mdev/mtty.c               | 16 ++++++++++++
+> > > >  4 files changed, 85 insertions(+)
+> > > >
+> > > > diff --git a/Documentation/vfio-mediated-device.txt b/Documentation/vfio-mediated-device.txt
+> > > > index c3f69bcaf96e..bc28471c0667 100644
+> > > > --- a/Documentation/vfio-mediated-device.txt
+> > > > +++ b/Documentation/vfio-mediated-device.txt
+> > > > @@ -202,6 +202,7 @@ Directories and files under the sysfs for Each Physical Device
+> > > >    |     |   |--- available_instances
+> > > >    |     |   |--- device_api
+> > > >    |     |   |--- description
+> > > > +  |     |   |--- version
+> > > >    |     |   |--- [devices]
+> > > >    |     |--- [<type-id>]
+> > > >    |     |   |--- create
+> > > > @@ -209,6 +210,7 @@ Directories and files under the sysfs for Each Physical Device
+> > > >    |     |   |--- available_instances
+> > > >    |     |   |--- device_api
+> > > >    |     |   |--- description
+> > > > +  |     |   |--- version
+> > > >    |     |   |--- [devices]
+> > > >    |     |--- [<type-id>]
+> > > >    |          |--- create
+> > > > @@ -216,6 +218,7 @@ Directories and files under the sysfs for Each Physical Device
+> > > >    |          |--- available_instances
+> > > >    |          |--- device_api
+> > > >    |          |--- description
+> > > > +  |          |--- version
+> > > >    |          |--- [devices]
+> > > >
+> > > >  * [mdev_supported_types]
+> > > > @@ -225,6 +228,8 @@ Directories and files under the sysfs for Each Physical Device
+> > > >    [<type-id>], device_api, and available_instances are mandatory attributes
+> > > >    that should be provided by vendor driver.
+> > > >
+> > > > +  version is a mandatory attribute if a mdev device supports live migration.  
+> > > 
+> > > What about "An mdev device wishing to support live migration must
+> > > provide the version attribute."?  
+> > yes, I just want to keep consistent with the line above it 
+> > " [<type-id>], device_api, and available_instances are mandatory attributes
+> >   that should be provided by vendor driver."
+> > what about below one?
+> >   "version is a mandatory attribute if a mdev device wishing to support live
+> >   migration."
 > 
-> diff --git a/include/hw/boards.h b/include/hw/boards.h
-> index e231860666..243bf3c7ce 100644
-> --- a/include/hw/boards.h
-> +++ b/include/hw/boards.h
-> @@ -8,6 +8,8 @@
->  #include "hw/qdev.h"
->  #include "qom/object.h"
->  #include "qom/cpu.h"
-> +#include "qapi/qapi-types-common.h"
-> +
->  
->  /**
->   * memory_region_allocate_system_memory - Allocate a board's main memory
-> @@ -105,8 +107,7 @@ typedef struct {
->  
->  /**
->   * MachineClass:
-> - * @deprecation_reason: If set, the machine is marked as deprecated. The
-> - *    string should provide some clear information about what to use instead.
-> + * @support_status: Support and deprecation status of machine type.
->   * @max_cpus: maximum number of CPUs supported. Default: 1
->   * @min_cpus: minimum number of CPUs supported. Default: 1
->   * @default_cpus: number of CPUs instantiated if none are specified. Default: 1
-> @@ -169,7 +170,7 @@ struct MachineClass {
->      char *name;
->      const char *alias;
->      const char *desc;
-> -    const char *deprecation_reason;
-> +    SupportStatusInfo support_status;
->  
->      void (*init)(MachineState *state);
->      void (*reset)(void);
-> diff --git a/hw/i386/pc_piix.c b/hw/i386/pc_piix.c
-> index 8ad8e885c6..97bd401618 100644
-> --- a/hw/i386/pc_piix.c
-> +++ b/hw/i386/pc_piix.c
-> @@ -781,7 +781,9 @@ static void pc_i440fx_0_15_machine_options(MachineClass *m)
->  
->      pc_i440fx_1_0_machine_options(m);
->      m->hw_version = "0.15";
-> -    m->deprecation_reason = "use a newer machine type instead";
-> +    m->support_status.deprecated = true;
-> +    m->support_status.has_suggested_alternative = true;
-> +    m->support_status.suggested_alternative = g_strdup("pc");
->      compat_props_add(m->compat_props, compat, G_N_ELEMENTS(compat));
->  }
->  
-> diff --git a/hw/ppc/prep.c b/hw/ppc/prep.c
-> index 847d320465..9a02b0eec4 100644
-> --- a/hw/ppc/prep.c
-> +++ b/hw/ppc/prep.c
-> @@ -587,7 +587,9 @@ static void ppc_prep_init(MachineState *machine)
->  
->  static void prep_machine_init(MachineClass *mc)
->  {
-> -    mc->deprecation_reason = "use 40p machine type instead";
-> +    mc->support_status.deprecated = true;
-> +    mc->support_status.has_suggested_alternative = true;
-> +    mc->support_status.suggested_alternative = g_strdup("40p");
->      mc->desc = "PowerPC PREP platform";
->      mc->init = ppc_prep_init;
->      mc->block_default_type = IF_IDE;
-> diff --git a/vl.c b/vl.c
-> index c696ad2a13..99b857ed2a 100644
-> --- a/vl.c
-> +++ b/vl.c
-> @@ -2610,7 +2610,7 @@ static gint machine_class_cmp(gconstpointer a, gconstpointer b)
->              }
->              printf("%-20s %s%s%s\n", mc->name, mc->desc,
->                     mc->is_default ? " (default)" : "",
-> -                   mc->deprecation_reason ? " (deprecated)" : "");
-> +                   mc->support_status.deprecated ? " (deprecated)" : "");
->          }
->      }
->  
-> @@ -4308,9 +4308,14 @@ int main(int argc, char **argv, char **envp)
->       * called from configure_accelerator().
->       */
->  
-> -    if (!qtest_enabled() && machine_class->deprecation_reason) {
-> -        error_report("Machine type '%s' is deprecated: %s",
-> -                     machine_class->name, machine_class->deprecation_reason);
-> +    if (!qtest_enabled() && machine_class->support_status.deprecated) {
-> +        error_report("Machine type '%s' is deprecated%s%s", machine_class->name,
-> +                     machine_class->support_status.status_message ? ": " : "",
-> +                     machine_class->support_status.status_message ?: "");
-> +        if (machine_class->support_status.suggested_alternative) {
-> +            error_report("Suggested solution: use '%s' machine type instead",
-> +                         machine_class->support_status.suggested_alternative);
+> My point is that an attribute is not mandatory if it can be left out :)
+> (I'm not a native speaker, though; maybe this makes perfect sense
+> after all?)
+> 
+> Maybe "version is a required attribute if live migration is supported
+> for an mdev device"?
+> 
+you are right, "mandatory" may bring some confusion.
+Maybe
+"vendor driver must provide version attribute for an mdev device wishing to
+support live migration." ?
+based on your first version :)
 
-I'd just drop the word "Suggested solution: " as I think it is fine to just
-say "Use foobar machine type instead".
+> > 
+> > 
+> > > > +
+> > > >  * [<type-id>]
+> > > >
+> > > >    The [<type-id>] name is created by adding the device driver string as a prefix
+> > > > @@ -246,6 +251,35 @@ Directories and files under the sysfs for Each Physical Device
+> > > >    This attribute should show the number of devices of type <type-id> that can be
+> > > >    created.
+> > > >
+> > > > +* version
+> > > > +
+> > > > +  This attribute is rw. It is used to check whether two devices are compatible
+> > > > +  for live migration. If this attribute is missing, then the corresponding mdev
+> > > > +  device is regarded as not supporting live migration.
+> > > > +
+> > > > +  It consists of two parts: common part and vendor proprietary part.
+> > > > +  common part: 32 bit. lower 16 bits is vendor id and higher 16 bits identifies
+> > > > +               device type. e.g., for pci device, it is
+> > > > +               "pci vendor id" | (VFIO_DEVICE_FLAGS_PCI << 16).
+> > > > +  vendor proprietary part: this part is varied in length. vendor driver can
+> > > > +               specify any string to identify a device.
+> > > > +
+> > > > +  When reading this attribute, it should show device version string of the device
+> > > > +  of type <type-id>. If a device does not support live migration, it should
+> > > > +  return errno.
+> > > > +  When writing a string to this attribute, it returns errno for incompatibility
+> > > > +  or returns written string length in compatibility case. If a device does not
+> > > > +  support live migration, it always returns errno.  
+> > > 
+> > > I'm not sure whether a device that does not support live migration
+> > > should expose this attribute in the first place. Or is that to cover
+> > > cases where a driver supports live migration only for some of the
+> > > devices it supports?  
+> > yes, driver returning error code is to cover the cases where only part of devices it
+> > supports can be migrated.
+> > 
+> > 
+> > > Also, I'm not sure if a string that has to be parsed is a good idea...
+> > > is this 'version' attribute supposed to convey some human-readable
+> > > information as well? The procedure you describe for compatibility
+> > > checking does the checking within the vendor driver which I would
+> > > expect to have a table/rules for that anyway.  
+> > right. if a vendor driver has the confidence to migrate between devices of
+> > diffent platform or mdev types, it can maintain a compatibility table for that
+> > purpose. That's the reason why we would leave the compatibility check to vendor
+> > driver. vendor driver can freely choose its own complicated way to decide
+> > which device is migratable to which device.
+> 
+> I think there are two scenarios here:
+> - Migrating between different device types, which is unlikely to work,
+>   except in special cases.
+> - Migrating between different versions of the same device type, which
+>   may work for some drivers/devices (and at least migrating to a newer
+>   version looks quite reasonable).
+> 
+> But both should be something that is decided by the individual driver;
+> I hope we don't want to support migration between different drivers :-O
+> 
+> Can we make this a driver-defined format?
+>
+yes, this is indeed driver-defined format.
+Actually we define it into two parts: common part and vendor proprietary part.
+common part: 32 bit. lower 16 bits is vendor id and higher 16 bits
+             identifies device type. e.g., for pci device, it is
+             "pci vendor id" | (VFIO_DEVICE_FLAGS_PCI << 16).
+vendor proprietary part: this part is varied in length. vendor driver can
+             specify any string to identify a device.
+
+vendor proprietary part is defined by vendor driver. vendor driver can
+define any format it wishes to use. Also it is its own responsibility to
+ensure backward compatibility if it wants to update format definition in this
+part.
+
+So user space only needs to get source side's version string, and asks
+target side whether the two are compatible. The decision maker is the
+vendor driver:)
 
 
-Regards,
-Daniel
--- 
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
+> > 
+> > > I think you should also specify which errno writing an incompatible id
+> > > is supposed to return (probably best something different than if the
+> > > device does not support live migration at all, if we stick with
+> > > creating the attribute in that case.)  
+> > Agree. I'll define it clearly in next revison.
+> 
+> Thanks!
