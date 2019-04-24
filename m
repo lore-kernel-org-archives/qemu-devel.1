@@ -2,67 +2,80 @@ Return-Path: <SRS0=3XOk=S2=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_PASS,URIBL_BLOCKED autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.7 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AA1CCC10F11
-	for <qemu-devel@archiver.kernel.org>; Wed, 24 Apr 2019 09:10:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3CD70C10F11
+	for <qemu-devel@archiver.kernel.org>; Wed, 24 Apr 2019 09:11:39 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7BB9E218B0
-	for <qemu-devel@archiver.kernel.org>; Wed, 24 Apr 2019 09:10:39 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7BB9E218B0
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id EAEC8218B0
+	for <qemu-devel@archiver.kernel.org>; Wed, 24 Apr 2019 09:11:38 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="V0FKUetq"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EAEC8218B0
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:38321 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:38347 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hJDvK-00061d-8t
-	for qemu-devel@archiver.kernel.org; Wed, 24 Apr 2019 05:10:38 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:43068)
+	id 1hJDwI-0006vj-1Z
+	for qemu-devel@archiver.kernel.org; Wed, 24 Apr 2019 05:11:38 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:43684)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <lersek@redhat.com>) id 1hJDsb-0004Hc-JW
-	for qemu-devel@nongnu.org; Wed, 24 Apr 2019 05:07:51 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1hJDut-0005vH-OU
+	for qemu-devel@nongnu.org; Wed, 24 Apr 2019 05:10:12 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <lersek@redhat.com>) id 1hJDsZ-0008Fr-Jy
-	for qemu-devel@nongnu.org; Wed, 24 Apr 2019 05:07:49 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:51896)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <lersek@redhat.com>) id 1hJDsZ-0008Dq-AW
-	for qemu-devel@nongnu.org; Wed, 24 Apr 2019 05:07:47 -0400
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
-	[10.5.11.16])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 505FD8666E;
-	Wed, 24 Apr 2019 09:07:46 +0000 (UTC)
-Received: from lacos-laptop-7.usersys.redhat.com (ovpn-120-123.rdu2.redhat.com
-	[10.10.120.123])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id B94AC5C220;
-	Wed, 24 Apr 2019 09:07:33 +0000 (UTC)
-To: Wainer dos Santos Moschetta <wainersm@redhat.com>, qemu-devel@nongnu.org
-References: <20190329210804.22121-1-wainersm@redhat.com>
-	<5005fcec-42af-427c-4f68-8415490e9598@redhat.com>
-From: Laszlo Ersek <lersek@redhat.com>
-Message-ID: <5bf78706-d357-a92d-7065-46a9839c9c2f@redhat.com>
-Date: Wed, 24 Apr 2019 11:07:32 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:52.0) Gecko/20100101
-	Thunderbird/52.9.1
+	(envelope-from <peter.maydell@linaro.org>) id 1hJDus-0005Kw-Kz
+	for qemu-devel@nongnu.org; Wed, 24 Apr 2019 05:10:11 -0400
+Received: from mail-ot1-x343.google.com ([2607:f8b0:4864:20::343]:35822)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1hJDus-0005E5-CO
+	for qemu-devel@nongnu.org; Wed, 24 Apr 2019 05:10:10 -0400
+Received: by mail-ot1-x343.google.com with SMTP id m10so15500911otp.2
+	for <qemu-devel@nongnu.org>; Wed, 24 Apr 2019 02:10:09 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+	h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+	:cc; bh=Fmc2ddR5a0H1Cp8oPdUcD/hOoad/YZdjPUimPq9/mp8=;
+	b=V0FKUetqCamSo54XKydWwWh3MhfyJgCRi5VAmDy8hXyZ7jbXgbkRynH09gwcyc93Gg
+	FtzyKBWsy8+pHBvJBiOTLLNntsANUwc+RVlXILeIHzobGsgVNxMzSzn+1p/VTi+WKFuo
+	FgfjLYXl2OlJcSaapsLGzAiEh9meBRiycRd6mO0m8VxAbwaposYAqBXydUsgTy63MOHW
+	bwpWu0dKHo1p5tTxYXiNXupCkepmiqTn7H1FGIwSDaCGag0ehOb2LZYJ6hBENzmuE6ya
+	ApvbA1GnT3EkVzE101R9HMcOQfyvbs4fzJPc2jlTAgp9iZxfOAwY/KvrfB1EyemKVInr
+	SeSQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=1e100.net; s=20161025;
+	h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+	:message-id:subject:to:cc;
+	bh=Fmc2ddR5a0H1Cp8oPdUcD/hOoad/YZdjPUimPq9/mp8=;
+	b=jGcPV61qmbpu1A/YfiEJar83f3FbeNi3uQIho8sSeM+MINCyBqEZsmuStNrUkQAkbU
+	E+5suHtMYL8TmlNFArV6AieoOBUVqvzBzYv6yxqcsR9yfWn2kdNOxT6rcfg8Gmzb3t2l
+	1sO405Mqbz06larnmMW+PnoIWC9KxVvgL5l7Im5ZlBMM7RCDF07kTc/SetyucyZKJ1JH
+	GxZV++QytIZ170RQkwwfIPHol122Od4KonmkYLdM3HbfIEOZb67gwWWG1sy2AkR+7OQV
+	Gh07RNw9gTZuxNMeHz943qi5s3rpkI6XzcY0qTDa6gyuK/B7LGEAf6k8zSUUPbj58Xb6
+	e1IA==
+X-Gm-Message-State: APjAAAX9HzynLPloldjdvUW97O1y0S9uFCkzESSJf4BrRaeimfW3b+aD
+	ov0JxkrT+GSoTprPr9sR0oSmuysC1z2ugov2AVbNeg==
+X-Google-Smtp-Source: APXvYqzS0ajw9TOjIp3DhkhTL98MoZKcVgtgw5VrLdZIhUJRFMezrGdSUvmyB2COKPqGgJbtjBRPPUb8gDnCbaP9ggU=
+X-Received: by 2002:a9d:67:: with SMTP id 94mr18971493ota.238.1556097008234;
+	Wed, 24 Apr 2019 02:10:08 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <5005fcec-42af-427c-4f68-8415490e9598@redhat.com>
+References: <20190423222005.246981-1-ek@google.com>
+In-Reply-To: <20190423222005.246981-1-ek@google.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Wed, 24 Apr 2019 10:09:56 +0100
+Message-ID:
+ <CAFEAcA_C4BQgYmZrzFZ_bwWVWcfcV1NF_PWp1wHsvqB9iPu0kQ@mail.gmail.com>
+To: Erik Kline <ek@google.com>
 Content-Type: text/plain; charset="UTF-8"
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.26]);
-	Wed, 24 Apr 2019 09:07:46 +0000 (UTC)
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH 0/5] tests/vm: Python 3,
- improve image caching, and misc
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+	recognized.
+X-Received-From: 2607:f8b0:4864:20::343
+Subject: Re: [Qemu-devel] [PATCH] The ioctl(SIOCGIFNAME) call requires a
+ struct ifreq.
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -74,93 +87,40 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: fam@euphon.net, peter.maydell@linaro.org, alex.bennee@linaro.org,
-	philmd@redhat.com, pbonzini@redhat.com
+Cc: ek@loon.com, QEMU Developers <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190424090732.nMTfam0lDzdDniUIqcmESXr5cT_jSNdt2xUMecaOjxw@z>
+Message-ID: <20190424090956.LirnqbcSRM58zP_SdCtHAyUTitSMiEX9IxqIVHednCg@z>
 
-Hello Wainer,
+On Tue, 23 Apr 2019 at 23:28, Erik Kline via Qemu-devel
+<qemu-devel@nongnu.org> wrote:
+>
+> Signed-off-by: Erik Kline <ek@google.com>
+> Buglink: https://bugs.launchpad.net/qemu/+bug/1814352
+> ---
+>  linux-user/ioctls.h | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+>
+> diff --git a/linux-user/ioctls.h b/linux-user/ioctls.h
+> index ae8951625f..37501f575c 100644
+> --- a/linux-user/ioctls.h
+> +++ b/linux-user/ioctls.h
+> @@ -178,7 +178,7 @@
+>  #endif /* CONFIG_USBFS */
+>
+>    IOCTL(SIOCATMARK, IOC_R, MK_PTR(TYPE_INT))
+> -  IOCTL(SIOCGIFNAME, IOC_RW, MK_PTR(TYPE_INT))
+> +  IOCTL(SIOCGIFNAME, IOC_RW, MK_PTR(MK_STRUCT(STRUCT_int_ifreq)))
+>    IOCTL(SIOCGIFFLAGS, IOC_W | IOC_R, MK_PTR(MK_STRUCT(STRUCT_short_ifreq)))
+>    IOCTL(SIOCSIFFLAGS, IOC_W, MK_PTR(MK_STRUCT(STRUCT_short_ifreq)))
+>    IOCTL(SIOCGIFADDR, IOC_W | IOC_R, MK_PTR(MK_STRUCT(STRUCT_sockaddr_ifreq)))
+> --
+> 2.21.0.593.g511ec345e18-goog
+>
 
-(answering because I dislike ignoring emails without giving any feedback:=
-)
+Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
 
-On 04/23/19 21:28, Wainer dos Santos Moschetta wrote:
-> Ping. More reviews needed.
->=20
-> I've already got Philippe's reviewed-by, thanks!
-
-I'm going to skip this one. According to "scripts/get_maintainer.pl", an
-ACK from either Alex or Fam should suffice. (They could also decide to
-queue your set with Phil's R-b, who's a designated reviewer on this topic=
-.)
-
-Thanks
-Laszlo
-
-> On 03/29/2019 06:07 PM, Wainer dos Santos Moschetta wrote:
->> Hi all!
->>
->> This series bundles the support to Python3, improvement to image
->> caching, and miscellaneous changes for the vm-test (`make vm-build-*`)=
-.
->>
->> Git tree: http://github.com/wainersm/qemu
->> Branch: vm_test_python3_and_misc
->> Travis: https://travis-ci.org/wainersm/qemu/builds/513220300
->>
->> Below you can find some general comments.
->>
->> Patch 01:
->> Uses python configured at build, although vm-test can be executed from
->> the code tree (see docs/devel/testing.rst) too. In this case $(PYTHON)
->> will be empty and it picks python pointed by the script's shebang, as
->> a result failing on Python 3 only Linux distros.
->>
->> Patch 02:
->> Ported based.py to work with Python 3 (kept Python 2 compatibility).
->> Fixed the follow errors:
->> =C2=A0=C2=A0 - Raising "TypeError: Unicode-objects must be encoded bef=
-ore
->> hashing" exception by hashlib.sha1().
->> =C2=A0=C2=A0 - get_default_jobs() is used to set the vm cpus, but it w=
-as
->> returning an invalid float number.
->> =C2=A0=C2=A0 - On check_sha256sum(), subprocess.check_output() returns=
- bytes so
->> that string comparison was failing.
->>
->> Patch 03:
->> Implemented a simple mechanism to detect the image file changed on
->> http://download.patchew.org, as discussed in
->> https://www.mail-archive.com/qemu-devel@nongnu.org/msg607839.html. I
->> didn't implement the '--force' option that Paolo suggested, because it
->> would require a major refactoring (technically the vm implementation
->> decides whether use the cache or not). My intention is to keep the
->> script as simple as possible, so IMO, if the image file changed on the
->> server then it should equally be updated the checksum on QEMU's side.
->>
->> Patch 04:
->> Default network (NETWORK=3D1) backend is enough to have the docker-bas=
-ed
->> tests run properly. Note: `make docker-test-block@centos7` is broken
->> inside the CentOS VM and apparently on my host (Fedora 29 x86_64) too.
->>
->> Wainer dos Santos Moschetta (5):
->> =C2=A0=C2=A0 tests/vm: Use python configured on build
->> =C2=A0=C2=A0 tests/vm: Port basevm to Python 3
->> =C2=A0=C2=A0 tests/vm: Detect the image changed on server
->> =C2=A0=C2=A0 tests/vm: Fix build-centos docker-based tests run
->> =C2=A0=C2=A0 tests/vm: Add missing variables on help
->>
->> =C2=A0 tests/vm/Makefile.include | 12 ++++++++----
->> =C2=A0 tests/vm/basevm.py=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 | =
-39 ++++++++++++++++++++++++++++++++++-----
->> =C2=A0 tests/vm/centos=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0 |=C2=A0 6 +++---
->> =C2=A0 3 files changed, 45 insertions(+), 12 deletions(-)
->>
->=20
-
+thanks
+-- PMM
 
