@@ -1,21 +1,25 @@
-Received: from eggs.gnu.org ([209.51.188.92]:39025)
+Received: from eggs.gnu.org ([209.51.188.92]:39085)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <liq3ea@163.com>) id 1hJIfe-0002XO-9D
-	for qemu-devel@nongnu.org; Wed, 24 Apr 2019 10:14:47 -0400
+	(envelope-from <vsementsov@virtuozzo.com>) id 1hJIff-0002aF-Er
+	for qemu-devel@nongnu.org; Wed, 24 Apr 2019 10:14:48 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <liq3ea@163.com>) id 1hJIY4-0006iH-5O
-	for qemu-devel@nongnu.org; Wed, 24 Apr 2019 10:06:57 -0400
-Received: from m12-14.163.com ([220.181.12.14]:54701)
-	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <liq3ea@163.com>) id 1hJIY2-0006gJ-HF
-	for qemu-devel@nongnu.org; Wed, 24 Apr 2019 10:06:56 -0400
-From: Li Qiang <liq3ea@163.com>
-Date: Wed, 24 Apr 2019 07:06:42 -0700
-Message-Id: <20190424140643.62457-5-liq3ea@163.com>
-In-Reply-To: <20190424140643.62457-1-liq3ea@163.com>
-References: <20190424140643.62457-1-liq3ea@163.com>
-Subject: [Qemu-devel] [PATCH v2 4/5] tests: fw_cfg: add reboot_timeout test
- case
+	(envelope-from <vsementsov@virtuozzo.com>) id 1hJIWu-00068i-No
+	for qemu-devel@nongnu.org; Wed, 24 Apr 2019 10:05:49 -0400
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Date: Wed, 24 Apr 2019 14:05:41 +0000
+Message-ID: <f8b16373-3cf4-ff16-b453-dbdc741b41a9@virtuozzo.com>
+References: <20180713111424.23670-1-mreitz@redhat.com>
+	<9afddacb-ca54-6ac3-1c02-b8916a08fcd3@redhat.com>
+	<c3f01ebe-37f7-d1d8-8bcd-45df37d80ff6@virtuozzo.com>
+	<3583e4e9-d29e-fc5a-6e83-637e515c38f7@redhat.com>
+In-Reply-To: <3583e4e9-d29e-fc5a-6e83-637e515c38f7@redhat.com>
+Content-Language: en-US
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <EFAB9D39F2540D4D8AB247A803306EB3@eurprd08.prod.outlook.com>
+Content-Transfer-Encoding: base64
+MIME-Version: 1.0
+Subject: Re: [Qemu-devel] [PATCH 0/3] qemu-img: Allow rebase with no input
+ base
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,62 +28,16 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: philmd@redhat.com, lersek@redhat.com, kraxel@redhat.com, thuth@redhat.com, lvivier@redhat.com, pbonzini@redhat.com
-Cc: qemu-devel@nongnu.org, liq3ea@gmail.com, Li Qiang <liq3ea@163.com>
+To: Max Reitz <mreitz@redhat.com>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>
+Cc: Kevin Wolf <kwolf@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
 
-Signed-off-by: Li Qiang <liq3ea@163.com>
----
-Change since v1:
-Converting little endian reboot_timeout to cpu endian
-
- tests/fw_cfg-test.c | 21 +++++++++++++++++++++
- 1 file changed, 21 insertions(+)
-
-diff --git a/tests/fw_cfg-test.c b/tests/fw_cfg-test.c
-index c22503619f..6c6add54db 100644
---- a/tests/fw_cfg-test.c
-+++ b/tests/fw_cfg-test.c
-@@ -15,6 +15,7 @@
- #include "libqtest.h"
- #include "standard-headers/linux/qemu_fw_cfg.h"
- #include "libqos/fw_cfg.h"
-+#include "qemu/bswap.h"
- 
- static uint64_t ram_size = 128 << 20;
- static uint16_t nb_cpus = 1;
-@@ -174,6 +175,25 @@ static void test_fw_cfg_boot_menu(void)
-     qtest_quit(s);
- }
- 
-+static void test_fw_cfg_reboot_timeout(void)
-+{
-+    QFWCFG *fw_cfg;
-+    QTestState *s;
-+    uint32_t reboot_timeout = 0;
-+    size_t filesize;
-+
-+    s = qtest_init("-boot reboot-timeout=15");
-+    fw_cfg = pc_fw_cfg_init(s);
-+
-+    filesize = qfw_cfg_get_file(fw_cfg, "etc/boot-fail-wait",
-+                     &reboot_timeout, sizeof(reboot_timeout));
-+    g_assert_cmpint(filesize, ==, sizeof(reboot_timeout));
-+    reboot_timeout = le32_to_cpu(reboot_timeout);
-+    g_assert_cmpint(reboot_timeout, ==, 15);
-+    pc_fw_cfg_uninit(fw_cfg);
-+    qtest_quit(s);
-+}
-+
- int main(int argc, char **argv)
- {
-     int ret;
-@@ -195,6 +215,7 @@ int main(int argc, char **argv)
-     qtest_add_func("fw_cfg/max_cpus", test_fw_cfg_max_cpus);
-     qtest_add_func("fw_cfg/numa", test_fw_cfg_numa);
-     qtest_add_func("fw_cfg/boot_menu", test_fw_cfg_boot_menu);
-+    qtest_add_func("fw_cfg/reboot_timeout", test_fw_cfg_reboot_timeout);
- 
-     ret = g_test_run();
- 
--- 
-2.17.1
+MjQuMDQuMjAxOSAxNjo0OCwgTWF4IFJlaXR6IHdyb3RlOg0KPiBPbiAxOC4wNC4xOSAxOTowMCwg
+VmxhZGltaXIgU2VtZW50c292LU9naWV2c2tpeSB3cm90ZToNCj4+IDEzLjA0LjIwMTkgMTk6MTEs
+IE1heCBSZWl0eiB3cm90ZToNCj4+PiBQaW5nIGFnYWluDQo+Pj4NCj4+PiAoSSBmZWVsIGxpa2Ug
+SSBqdXN0IG5lZWQgdG8gc3RhcnQgbWVyZ2luZyB1bnJldmlld2VkIHBhdGNoZXMgdW50aWwgSQ0K
+Pj4+IGJyZWFrIHNvbWV0aGluZyAoY2FuJ3QgdGFrZSB0aGF0IGxvbmcpIHNvIHlvdSBnZXQgc28g
+c2NhcmVkIG9mIG15DQo+Pj4gcGF0Y2hlcyB0aGF0IHlvdSBhdCBsZWFzdCByZWZ1c2UgdGhlbSBv
+dXRyaWdodCkNCj4+DQo+PiBDb3VsZCB5b3UgcmVzZW5kIGJlZm9yZT8NCj4gDQo+IFN1cmUsIGJ1
+dCBmb3IgbWUsIHRoaXMgc2VyaWVzIHN0aWxsIGFwcGxpZXMgYXMtaXMuDQo+IA0KDQpGb3IgbWUg
+dGhlIHByb2JsZW0gaXMgdGhhdCBJJ3ZlIHJlbW92ZWQgbWFpbHMgb2xkZXIgdGhhbiBoYWxmIGEg
+eWVhciBzb21lIHRpbWUNCmFnby4uDQoNCg0KLS0gDQpCZXN0IHJlZ2FyZHMsDQpWbGFkaW1pcg0K
