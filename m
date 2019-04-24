@@ -2,91 +2,115 @@ Return-Path: <SRS0=3XOk=S2=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-1.0 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 282DBC10F11
-	for <qemu-devel@archiver.kernel.org>; Wed, 24 Apr 2019 14:20:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2FB47C10F11
+	for <qemu-devel@archiver.kernel.org>; Wed, 24 Apr 2019 14:20:14 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E02E1218FE
-	for <qemu-devel@archiver.kernel.org>; Wed, 24 Apr 2019 14:20:04 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E02E1218FE
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
+	by mail.kernel.org (Postfix) with ESMTPS id EBC48218FE
+	for <qemu-devel@archiver.kernel.org>; Wed, 24 Apr 2019 14:20:13 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="W0Zmk9VQ"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EBC48218FE
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:42419 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:42421 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hJIkm-0006PE-3g
-	for qemu-devel@archiver.kernel.org; Wed, 24 Apr 2019 10:20:04 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:39092)
+	id 1hJIkv-0006aQ-3L
+	for qemu-devel@archiver.kernel.org; Wed, 24 Apr 2019 10:20:13 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:39085)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1hJIfY-0002aR-FY
-	for qemu-devel@nongnu.org; Wed, 24 Apr 2019 10:14:42 -0400
+	(envelope-from <vsementsov@virtuozzo.com>) id 1hJIff-0002aF-Er
+	for qemu-devel@nongnu.org; Wed, 24 Apr 2019 10:14:48 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1hJIcA-0001gh-Tt
-	for qemu-devel@nongnu.org; Wed, 24 Apr 2019 10:11:12 -0400
-Received: from indium.canonical.com ([91.189.90.7]:38122)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1hJIcA-0001gM-Oa
-	for qemu-devel@nongnu.org; Wed, 24 Apr 2019 10:11:10 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1hJIc9-00043t-MZ
-	for <qemu-devel@nongnu.org>; Wed, 24 Apr 2019 14:11:09 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id A3E692E80C8
-	for <qemu-devel@nongnu.org>; Wed, 24 Apr 2019 14:11:09 +0000 (UTC)
-MIME-Version: 1.0
+	(envelope-from <vsementsov@virtuozzo.com>) id 1hJIWu-00068i-No
+	for qemu-devel@nongnu.org; Wed, 24 Apr 2019 10:05:49 -0400
+Received: from mail-eopbgr40109.outbound.protection.outlook.com
+	([40.107.4.109]:16636
+	helo=EUR03-DB5-obe.outbound.protection.outlook.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
+	id 1hJIWu-00064P-22; Wed, 24 Apr 2019 10:05:44 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=virtuozzo.com;
+	s=selector1;
+	h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+	bh=Khc3Har5M/ybiLNA4Xqa6jEW71UlOMDqRGRmU5vutdo=;
+	b=W0Zmk9VQjol6fwXvhs/x9QiMlHp6Ed4uV4rk9QGODuCB7LoBjcPdAALU7sOn5W6HmxeDj+IKxXwOQfmIfchFK9r1Nw6E1n/0w65tfmVKeLU5iw9wLJqoeRZjvyzhLu+WZhQ7Fi7R+4vTH4OVjzJ92uyAkZOldv3mYev52ZfLBWM=
+Received: from DB7PR08MB3851.eurprd08.prod.outlook.com (20.178.46.222) by
+	DB7PR08MB3612.eurprd08.prod.outlook.com (20.177.120.142) with Microsoft
+	SMTP
+	Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+	15.20.1835.12; Wed, 24 Apr 2019 14:05:41 +0000
+Received: from DB7PR08MB3851.eurprd08.prod.outlook.com
+	([fe80::3c82:5da0:1633:f949]) by
+	DB7PR08MB3851.eurprd08.prod.outlook.com
+	([fe80::3c82:5da0:1633:f949%3]) with mapi id 15.20.1813.017;
+	Wed, 24 Apr 2019 14:05:41 +0000
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+To: Max Reitz <mreitz@redhat.com>, "qemu-block@nongnu.org"
+	<qemu-block@nongnu.org>
+Thread-Topic: [Qemu-devel] [PATCH 0/3] qemu-img: Allow rebase with no input
+	base
+Thread-Index: AQHU8hOZBPDFXraAfkSD/PJ5F8DVG6ZCXoiAgAkGO4CAAAStgA==
+Date: Wed, 24 Apr 2019 14:05:41 +0000
+Message-ID: <f8b16373-3cf4-ff16-b453-dbdc741b41a9@virtuozzo.com>
+References: <20180713111424.23670-1-mreitz@redhat.com>
+	<9afddacb-ca54-6ac3-1c02-b8916a08fcd3@redhat.com>
+	<c3f01ebe-37f7-d1d8-8bcd-45df37d80ff6@virtuozzo.com>
+	<3583e4e9-d29e-fc5a-6e83-637e515c38f7@redhat.com>
+In-Reply-To: <3583e4e9-d29e-fc5a-6e83-637e515c38f7@redhat.com>
+Accept-Language: ru-RU, en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-clientproxiedby: HE1PR1001CA0017.EURPRD10.PROD.OUTLOOK.COM
+	(2603:10a6:3:f7::27) To DB7PR08MB3851.eurprd08.prod.outlook.com
+	(2603:10a6:10:7b::30)
+authentication-results: spf=none (sender IP is )
+	smtp.mailfrom=vsementsov@virtuozzo.com; 
+x-ms-exchange-messagesentrepresentingtype: 1
+x-tagtoolbar-keys: D20190424170539080
+x-originating-ip: [185.231.240.5]
+x-ms-publictraffictype: Email
+x-ms-office365-filtering-correlation-id: 7a708b91-5181-43a1-bc67-08d6c8bdef73
+x-microsoft-antispam: BCL:0; PCL:0;
+	RULEID:(2390118)(7020095)(4652040)(8989299)(4534185)(4627221)(201703031133081)(201702281549075)(8990200)(5600141)(711020)(4605104)(2017052603328)(7193020);
+	SRVR:DB7PR08MB3612; 
+x-ms-traffictypediagnostic: DB7PR08MB3612:
+x-microsoft-antispam-prvs: <DB7PR08MB3612BFE3D729F6F76E925AACC13C0@DB7PR08MB3612.eurprd08.prod.outlook.com>
+x-forefront-prvs: 00179089FD
+x-forefront-antispam-report: SFV:NSPM;
+	SFS:(10019020)(346002)(366004)(376002)(136003)(396003)(39850400004)(189003)(199004)(102836004)(66446008)(6506007)(2501003)(186003)(66066001)(386003)(53546011)(66476007)(486006)(52116002)(26005)(53936002)(36756003)(11346002)(446003)(476003)(31696002)(73956011)(86362001)(5660300002)(64756008)(66946007)(6246003)(2616005)(66556008)(76176011)(7736002)(4744005)(31686004)(305945005)(2906002)(6486002)(6436002)(4326008)(81156014)(93886005)(81166006)(6512007)(229853002)(256004)(316002)(8676002)(8936002)(25786009)(6116002)(3846002)(97736004)(99286004)(68736007)(14454004)(54906003)(110136005)(478600001)(71190400001)(71200400001);
+	DIR:OUT; SFP:1102; SCL:1; SRVR:DB7PR08MB3612;
+	H:DB7PR08MB3851.eurprd08.prod.outlook.com; FPR:; SPF:None;
+	LANG:en; PTR:InfoNoRecords; MX:1; A:1; 
+received-spf: None (protection.outlook.com: virtuozzo.com does not designate
+	permitted sender hosts)
+x-ms-exchange-senderadcheck: 1
+x-microsoft-antispam-message-info: X6l/jYPC6b2c7dPLARomRzWQC6KqtxtKwdvEacj9C8VtocXPqqwgQle1d+8nhP6+vj24rSBJQrXJECBCpCrvoGr3obb4qiLCeWrxVk/WCZq+Kvl8TPkioHgcgvRZ03rqews2JsQBCEb8L5ks8imM+JMRpipPtIfIONPBuuSwKNQMU3K1cainAqDj7quFs6g7ShFcewgQKkTerh8HVzWELh37e4SUpyHNXDaKc3mxLGn0thf9Wip8DFYB7WJzOxHHpBDFlRxmVRxLat1WM7jv9mMvrRWjKXPufDKAW1DY8Dt3kkTCgU/Fh3IDghIh1fMjuCntMWnYXwfyvhnA+GTRb/cFpvxASo4dnXkXNspXL9oZ1aAoL/tLpJM2OdmyHYND4HQRUOSnzXaUrZeJjkN1Zj7adzSzBL6wPIuIvDnJe3o=
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Wed, 24 Apr 2019 14:00:19 -0000
-From: Robie Basak <1823458@bugs.launchpad.net>
-To: qemu-devel@nongnu.org
-X-Launchpad-Notification-Type: bug
-X-Launchpad-Bug: product=qemu; status=Fix Released; importance=Undecided;
-	assignee=None; 
-X-Launchpad-Bug: distribution=ubuntu; sourcepackage=qemu; component=main;
-	status=Fix Released; importance=Medium; assignee=None; 
-X-Launchpad-Bug: distribution=ubuntu; distroseries=trusty; sourcepackage=qemu; 
-	component=main; status=Won't Fix; importance=Medium;
-	assignee=None; 
-X-Launchpad-Bug: distribution=ubuntu; distroseries=xenial; sourcepackage=qemu; 
-	component=main; status=Fix Committed; importance=Medium;
-	assignee=dan.streetman@canonical.com; 
-X-Launchpad-Bug: distribution=ubuntu; distroseries=bionic; sourcepackage=qemu; 
-	component=main; status=Fix Released; importance=Medium;
-	assignee=None; 
-X-Launchpad-Bug: distribution=ubuntu; distroseries=cosmic; sourcepackage=qemu; 
-	component=main; status=Fix Released; importance=Medium;
-	assignee=None; 
-X-Launchpad-Bug: distribution=ubuntu; distroseries=disco; sourcepackage=qemu; 
-	component=main; status=Fix Released; importance=Medium;
-	assignee=None; 
-X-Launchpad-Bug-Tags: verification-needed verification-needed-xenial
-X-Launchpad-Bug-Information-Type: Public
-X-Launchpad-Bug-Private: no
-X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: ddstreet racb
-X-Launchpad-Bug-Reporter: Dan Streetman (ddstreet)
-X-Launchpad-Bug-Modifier: Robie Basak (racb)
-References: <155455149397.14414.11595397789908732027.malonedeb@gac.canonical.com>
-Message-Id:
- <155611441990.6380.14924198096156963710.malone@chaenomeles.canonical.com>
-X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
-X-Launchpad-Message-For: qemu-devel-ml
-Precedence: bulk
-X-Generated-By: Launchpad (canonical.com); Revision="18928";
-	Instance="launchpad-lazr.conf"
-X-Launchpad-Hash: 9d360aa6d3c708e881267c0c6b36eb211ff4b571
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 91.189.90.7
-Subject: [Qemu-devel] [Bug 1823458] Please test proposed package
+Content-ID: <EFAB9D39F2540D4D8AB247A803306EB3@eurprd08.prod.outlook.com>
+Content-Transfer-Encoding: base64
+MIME-Version: 1.0
+X-OriginatorOrg: virtuozzo.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 7a708b91-5181-43a1-bc67-08d6c8bdef73
+X-MS-Exchange-CrossTenant-originalarrivaltime: 24 Apr 2019 14:05:41.7722 (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 0bc7f26d-0264-416e-a6fc-8352af79c58f
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DB7PR08MB3612
+X-detected-operating-system: by eggs.gnu.org: Windows 7 or 8 [fuzzy]
+X-Received-From: 40.107.4.109
+Subject: Re: [Qemu-devel] [PATCH 0/3] qemu-img: Allow rebase with no input
+ base
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
+Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -95,209 +119,21 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1823458 <1823458@bugs.launchpad.net>
+Cc: Kevin Wolf <kwolf@redhat.com>,
+	"qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190424140019.oTIfC-v-tmkx5KGkZqngA8QTAP_OFxf5aGwVZd6T2nA@z>
+Message-ID: <20190424140541.GyaKrQ3tAoxMhSwbm3gelgxYEvolv5WgEx3HThnNgdo@z>
 
-Hello Dan, or anyone else affected,
-
-Accepted qemu into xenial-proposed. The package will build now and be
-available at https://launchpad.net/ubuntu/+source/qemu/1:2.5+dfsg-
-5ubuntu10.37 in a few hours, and then in the -proposed repository.
-
-Please help us by testing this new package.  See
-https://wiki.ubuntu.com/Testing/EnableProposed for documentation on how
-to enable and use -proposed.Your feedback will aid us getting this
-update out to other Ubuntu users.
-
-If this package fixes the bug for you, please add a comment to this bug,
-mentioning the version of the package you tested and change the tag from
-verification-needed-xenial to verification-done-xenial. If it does not
-fix the bug for you, please add a comment stating that, and change the
-tag to verification-failed-xenial. In either case, details of your
-testing will help us make a better decision.
-
-Further information regarding the verification process can be found at
-https://wiki.ubuntu.com/QATeam/PerformingSRUVerification .  Thank you in
-advance!
-
--- =
-
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1823458
-
-Title:
-  race condition between vhost_net_stop and CHR_EVENT_CLOSED on shutdown
-  crashes qemu
-
-Status in QEMU:
-  Fix Released
-Status in qemu package in Ubuntu:
-  Fix Released
-Status in qemu source package in Trusty:
-  Won't Fix
-Status in qemu source package in Xenial:
-  Fix Committed
-Status in qemu source package in Bionic:
-  Fix Released
-Status in qemu source package in Cosmic:
-  Fix Released
-Status in qemu source package in Disco:
-  Fix Released
-
-Bug description:
-  [impact]
-
-  on shutdown of a guest, there is a race condition that results in qemu
-  crashing instead of normally shutting down.  The bt looks similar to
-  this (depending on the specific version of qemu, of course; this is
-  taken from 2.5 version of qemu):
-
-  (gdb) bt
-  #0  __GI___pthread_mutex_lock (mutex=3D0x0) at ../nptl/pthread_mutex_lock=
-.c:66
-  #1  0x00005636c0bc4389 in qemu_mutex_lock (mutex=3Dmutex@entry=3D0x0) at =
-/build/qemu-7I4i1R/qemu-2.5+dfsg/util/qemu-thread-posix.c:73
-  #2  0x00005636c0988130 in qemu_chr_fe_write_all (s=3Ds@entry=3D0x0, buf=
-=3Dbuf@entry=3D0x7ffe65c086a0 "\v", len=3Dlen@entry=3D20) at /build/qemu-7I=
-4i1R/qemu-2.5+dfsg/qemu-char.c:205
-  #3  0x00005636c08f3483 in vhost_user_write (msg=3Dmsg@entry=3D0x7ffe65c08=
-6a0, fds=3Dfds@entry=3D0x0, fd_num=3Dfd_num@entry=3D0, dev=3D0x5636c1bf6b70=
-, dev=3D0x5636c1bf6b70)
-  =C2=A0=C2=A0=C2=A0=C2=A0at /build/qemu-7I4i1R/qemu-2.5+dfsg/hw/virtio/vho=
-st-user.c:195
-  #4  0x00005636c08f411c in vhost_user_get_vring_base (dev=3D0x5636c1bf6b70=
-, ring=3D0x7ffe65c087e0) at /build/qemu-7I4i1R/qemu-2.5+dfsg/hw/virtio/vhos=
-t-user.c:364
-  #5  0x00005636c08efff0 in vhost_virtqueue_stop (dev=3Ddev@entry=3D0x5636c=
-1bf6b70, vdev=3Dvdev@entry=3D0x5636c2853338, vq=3D0x5636c1bf6d00, idx=3D1) =
-at /build/qemu-7I4i1R/qemu-2.5+dfsg/hw/virtio/vhost.c:895
-  #6  0x00005636c08f2944 in vhost_dev_stop (hdev=3Dhdev@entry=3D0x5636c1bf6=
-b70, vdev=3Dvdev@entry=3D0x5636c2853338) at /build/qemu-7I4i1R/qemu-2.5+dfs=
-g/hw/virtio/vhost.c:1262
-  #7  0x00005636c08db2a8 in vhost_net_stop_one (net=3D0x5636c1bf6b70, dev=
-=3Ddev@entry=3D0x5636c2853338) at /build/qemu-7I4i1R/qemu-2.5+dfsg/hw/net/v=
-host_net.c:293
-  #8  0x00005636c08dbe5b in vhost_net_stop (dev=3Ddev@entry=3D0x5636c285333=
-8, ncs=3D0x5636c209d110, total_queues=3Dtotal_queues@entry=3D1) at /build/q=
-emu-7I4i1R/qemu-2.5+dfsg/hw/net/vhost_net.c:371
-  #9  0x00005636c08d7745 in virtio_net_vhost_status (status=3D7 '\a', n=3D0=
-x5636c2853338) at /build/qemu-7I4i1R/qemu-2.5+dfsg/hw/net/virtio-net.c:150
-  #10 virtio_net_set_status (vdev=3D<optimized out>, status=3D<optimized ou=
-t>) at /build/qemu-7I4i1R/qemu-2.5+dfsg/hw/net/virtio-net.c:162
-  #11 0x00005636c08ec42c in virtio_set_status (vdev=3D0x5636c2853338, val=
-=3D<optimized out>) at /build/qemu-7I4i1R/qemu-2.5+dfsg/hw/virtio/virtio.c:=
-624
-  #12 0x00005636c098fed2 in vm_state_notify (running=3Drunning@entry=3D0, s=
-tate=3Dstate@entry=3DRUN_STATE_SHUTDOWN) at /build/qemu-7I4i1R/qemu-2.5+dfs=
-g/vl.c:1605
-  #13 0x00005636c089172a in do_vm_stop (state=3DRUN_STATE_SHUTDOWN) at /bui=
-ld/qemu-7I4i1R/qemu-2.5+dfsg/cpus.c:724
-  #14 vm_stop (state=3DRUN_STATE_SHUTDOWN) at /build/qemu-7I4i1R/qemu-2.5+d=
-fsg/cpus.c:1407
-  #15 0x00005636c085d240 in main_loop_should_exit () at /build/qemu-7I4i1R/=
-qemu-2.5+dfsg/vl.c:1883
-  #16 main_loop () at /build/qemu-7I4i1R/qemu-2.5+dfsg/vl.c:1931
-  #17 main (argc=3D<optimized out>, argv=3D<optimized out>, envp=3D<optimiz=
-ed out>) at /build/qemu-7I4i1R/qemu-2.5+dfsg/vl.c:4683
-
-  [test case]
-
-  unfortunately since this is a race condition, it's very hard to
-  arbitrarily reproduce; it depends very much on the overall
-  configuration of the guest as well as how exactly it's shut down -
-  specifically, its vhost user net must be closed from the host side at
-  a specific time during qemu shutdown.
-
-  I have someone with such a setup who has reported to me their setup is
-  able to reproduce this reliably, but the config is too complex for me
-  to reproduce so I have relied on their reproduction and testing to
-  debug and craft the patch for this.
-
-  [regression potential]
-
-  the change adds a flag to prevent repeated calls to vhost_net_stop().
-  This also prevents any calls to vhost_net_cleanup() from
-  net_vhost_user_event().  Any regression would be seen when stopping
-  and/or cleaning up a vhost net.  Regressions might include failure to
-  hot-remove a vhost net from a guest, or failure to cleanup (i.e. mem
-  leak), or crashes during cleanup or stopping a vhost net.
-
-  [other info]
-
-  this was originally seen in the 2.5 version of qemu - specifically,
-  the UCA version in trusty-mitaka (which uses the xenial qemu
-  codebase).
-
-  After discussion upstream, it appears this was fixed upstream by
-  commit e7c83a885f8, which is included starting in version 2.9.
-  However, this commit depends on at least commit 5345fdb4467, and
-  likely more other previous commits, which make widespread code changes
-  and are unsuitable to backport.  Therefore this seems like it should
-  be specifically worked around in the Xenial qemu codebase.
-
-  =
-
-  The specific race condition for this (in the qemu 2.5 code version) is:
-
-  as shown in above bt, thread A starts shutting down qemu, e.g.:
-
-  vm_stop->do_vm_stop->vm_state_notify
-  =C2=A0=C2=A0virtio_set_status
-  =C2=A0=C2=A0=C2=A0=C2=A0virtio_net_set_status
-  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0virtio_net_vhost_status
-
-  in this function, code gets to an if-else check for
-  (!n->vhost_started), which is false (i.e. vhost_started is true) and
-  enters the else code block, which calls vhost_net_stop() and then sets
-  n->vhost_started to false.
-
-  While thread A is inside vhost_net_stop(), thread B is triggered by
-  the vhost net chr handler with a user event and calls:
-
-  net_vhost_user_event
-  =C2=A0=C2=A0qmp_set_link (from case CHR_EVENT_CLOSED)
-  =C2=A0=C2=A0=C2=A0=C2=A0virtio_net_set_link_status (via ->link_status_cha=
-nged)
-  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0virtio_net_set_status
-  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0virtio_net_vhost_status
-
-  notice thread B has now reached the same function that thread A is in;
-  since the checks in the function have not changed, thread B follows
-  the same path that thread A followed, and enters vhost_net_stop().
-
-  Since thread A has already shut down and cleaned up some of the
-  internals, once thread B starts trying to also clean up things, it
-  segfaults as the shown in the bt.
-
-  Avoiding only this duplicate call to vhost_net_stop() is required, but
-  not enough - let's continue to look at what thread B does after its
-  call to qmp_set_link() returns:
-
-  net_vhost_user_event
-  =C2=A0=C2=A0vhost_user_stop
-  =C2=A0=C2=A0=C2=A0=C2=A0vhost_net_cleanup
-  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0vhost_dev_cleanup
-
-  However, in main() qemu registers atexit(net_cleanup()), which does:
-  net_cleanup
-  =C2=A0=C2=A0qemu_del_nic (or qemu_del_net_client, depending on ->type)
-  =C2=A0=C2=A0=C2=A0=C2=A0qemu_cleanup_net_client
-  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0vhost_user_cleanup (via ->cleanup)
-  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0vhost_net_cleanup
-  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0vhost_dev_cle=
-anup
-
-  and the duplicate vhost_dev_cleanup fails assertions since things were
-  already cleaned up.  Additionally, if thread B's call to
-  vhost_dev_cleanup() comes before thread A finishes vhost_net_stop(),
-  then that will call vhost_dev_stop() and vhost_disable_notifiers()
-  which both try to access things that have been freed/cleared/disabled
-  by vhost_dev_cleanup().
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1823458/+subscriptions
+MjQuMDQuMjAxOSAxNjo0OCwgTWF4IFJlaXR6IHdyb3RlOg0KPiBPbiAxOC4wNC4xOSAxOTowMCwg
+VmxhZGltaXIgU2VtZW50c292LU9naWV2c2tpeSB3cm90ZToNCj4+IDEzLjA0LjIwMTkgMTk6MTEs
+IE1heCBSZWl0eiB3cm90ZToNCj4+PiBQaW5nIGFnYWluDQo+Pj4NCj4+PiAoSSBmZWVsIGxpa2Ug
+SSBqdXN0IG5lZWQgdG8gc3RhcnQgbWVyZ2luZyB1bnJldmlld2VkIHBhdGNoZXMgdW50aWwgSQ0K
+Pj4+IGJyZWFrIHNvbWV0aGluZyAoY2FuJ3QgdGFrZSB0aGF0IGxvbmcpIHNvIHlvdSBnZXQgc28g
+c2NhcmVkIG9mIG15DQo+Pj4gcGF0Y2hlcyB0aGF0IHlvdSBhdCBsZWFzdCByZWZ1c2UgdGhlbSBv
+dXRyaWdodCkNCj4+DQo+PiBDb3VsZCB5b3UgcmVzZW5kIGJlZm9yZT8NCj4gDQo+IFN1cmUsIGJ1
+dCBmb3IgbWUsIHRoaXMgc2VyaWVzIHN0aWxsIGFwcGxpZXMgYXMtaXMuDQo+IA0KDQpGb3IgbWUg
+dGhlIHByb2JsZW0gaXMgdGhhdCBJJ3ZlIHJlbW92ZWQgbWFpbHMgb2xkZXIgdGhhbiBoYWxmIGEg
+eWVhciBzb21lIHRpbWUNCmFnby4uDQoNCg0KLS0gDQpCZXN0IHJlZ2FyZHMsDQpWbGFkaW1pcg0K
 
