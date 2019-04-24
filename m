@@ -2,83 +2,67 @@ Return-Path: <SRS0=3XOk=S2=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.7 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
-	SPF_PASS,URIBL_BLOCKED autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8E688C10F11
-	for <qemu-devel@archiver.kernel.org>; Wed, 24 Apr 2019 20:13:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 26A0AC10F11
+	for <qemu-devel@archiver.kernel.org>; Wed, 24 Apr 2019 20:57:20 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 439B52175B
-	for <qemu-devel@archiver.kernel.org>; Wed, 24 Apr 2019 20:13:46 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=google.com header.i=@google.com header.b="raMrLPW2"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 439B52175B
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=nongnu.org
+	by mail.kernel.org (Postfix) with ESMTPS id ECD9C20835
+	for <qemu-devel@archiver.kernel.org>; Wed, 24 Apr 2019 20:57:19 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org ECD9C20835
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:46744 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:47173 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hJOH3-0008S8-Fj
-	for qemu-devel@archiver.kernel.org; Wed, 24 Apr 2019 16:13:45 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:53270)
+	id 1hJOxD-0002gd-2s
+	for qemu-devel@archiver.kernel.org; Wed, 24 Apr 2019 16:57:19 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:44281)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <srutherford@google.com>) id 1hJNZk-0006R5-6X
-	for qemu-devel@nongnu.org; Wed, 24 Apr 2019 15:29:01 -0400
+	(envelope-from <wainersm@redhat.com>) id 1hJOvJ-0001BH-IM
+	for qemu-devel@nongnu.org; Wed, 24 Apr 2019 16:55:22 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <srutherford@google.com>) id 1hJNN2-0001MD-RB
-	for qemu-devel@nongnu.org; Wed, 24 Apr 2019 15:15:54 -0400
-Received: from mail-yb1-xb44.google.com ([2607:f8b0:4864:20::b44]:44357)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <srutherford@google.com>)
-	id 1hJNN2-0001If-JN
-	for qemu-devel@nongnu.org; Wed, 24 Apr 2019 15:15:52 -0400
-Received: by mail-yb1-xb44.google.com with SMTP id u187so7532705ybg.11
-	for <qemu-devel@nongnu.org>; Wed, 24 Apr 2019 12:15:51 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20161025;
-	h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-	:cc:content-transfer-encoding;
-	bh=KXoQ7BFg8MCQ5w2hqas+YRo88Lj083QKeczBFQqo+mk=;
-	b=raMrLPW2n1ySXsJ6Qmx9cvhAR1LPiM58H94Ej4RtkOTT/cuhxC+TgVkMETA3AMnIZW
-	utg/Xp0jYhyNQ2H0AVcXTLZVJvOz9TLtcgtL+sReblkJjBdvC4PBznLzpAABE4F+EV9g
-	LpzKI5aigxtjVsAe8KIdWlwvTIMSy7GJ/t8h7uXcvxZOZX+s8SBXcv3i9F0kl83jP46R
-	rRrAr1i7EC8YDeAHhdSFtG1mSuZv4GATkUIjYr11v4HNq4rO825DI6hK0MfAOPwbhvU4
-	8On6Xcpq3txtwSHoXqX6ZLDu5m6sTdXXCdgTROj7iE0SzYl/X6bmPveBwIOoGBYZUJHz
-	uL7g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=1e100.net; s=20161025;
-	h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-	:message-id:subject:to:cc:content-transfer-encoding;
-	bh=KXoQ7BFg8MCQ5w2hqas+YRo88Lj083QKeczBFQqo+mk=;
-	b=jkUAjDiyYtRJYeeSRyY0qb5Z7A0ZggB+iGy7lXVe97fCsqI/8NYD3+2cNexA2xIhv+
-	1mpyZi5o+d5Sr6mSR3o8ZjYhvd8wmvPocqdQIG7b0MVr9tqrwt7wHn+ceg+cJboDiTgK
-	hqQ7LSET6BrcfreIVEmLFWhjmqac9d266zi3hev3t0ooFmXQcSkhbWWILxE8jgxuy3/z
-	VSezV03IAZ2DpSD0+tXdDa1GYnkOxGXSaYDm1FU0H9GvRAmtKyUl/MV7YJ4LC1K7LfPl
-	jUHrBoLOaA8HmOQoBl8bFLeBVBqTn7PZwreWGTQ+mgrSQvpHJnAksUQFFgpzUE+vo0O7
-	RBhg==
-X-Gm-Message-State: APjAAAV3jFYmNtQpZQkBz3fo1O8/pGKfSAqgfZtHt2RdUJQDq8pvsvgz
-	1wK9b7N7PGNwGHc1X/g8kVQT+iAvWHMQCi1tmR6tOQ==
-X-Google-Smtp-Source: APXvYqwuvnaNjb+LHJwQCOoaewr1dMCcdZFhFpVWce8CYO3hVcV9gxLrABhtjfqSjY46v+1HYZXRfcPfBZu3clAo3O0=
-X-Received: by 2002:a25:e081:: with SMTP id
-	x123mr27613524ybg.152.1556133349594; 
-	Wed, 24 Apr 2019 12:15:49 -0700 (PDT)
+	(envelope-from <wainersm@redhat.com>) id 1hJOiy-0006Ft-Ly
+	for qemu-devel@nongnu.org; Wed, 24 Apr 2019 16:42:37 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:52846)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <wainersm@redhat.com>)
+	id 1hJOiq-000621-Hk; Wed, 24 Apr 2019 16:42:28 -0400
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+	[10.5.11.15])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 5F840309848B;
+	Wed, 24 Apr 2019 20:42:24 +0000 (UTC)
+Received: from localhost.localdomain (ovpn-122-118.rdu2.redhat.com
+	[10.10.122.118])
+	by smtp.corp.redhat.com (Postfix) with ESMTP id A22615D719;
+	Wed, 24 Apr 2019 20:42:15 +0000 (UTC)
+To: Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org
+References: <20190424103747.10173-1-thuth@redhat.com>
+	<20190424103747.10173-6-thuth@redhat.com>
+From: Wainer dos Santos Moschetta <wainersm@redhat.com>
+Message-ID: <6b284aaa-353c-92c1-b01b-21882e7ff9ef@redhat.com>
+Date: Wed, 24 Apr 2019 17:42:14 -0300
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:52.0) Gecko/20100101
+	Thunderbird/52.5.2
 MIME-Version: 1.0
-References: <20190424160942.13567-1-brijesh.singh@amd.com>
-In-Reply-To: <20190424160942.13567-1-brijesh.singh@amd.com>
-Date: Wed, 24 Apr 2019 12:15:12 -0700
-Message-ID:
- <CABayD+eYsqT49-Smp0a9OGRt2or_L7LNKHpe-iraM62XzGq5_g@mail.gmail.com>
-To: "Singh, Brijesh" <brijesh.singh@amd.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
-	recognized.
-X-Received-From: 2607:f8b0:4864:20::b44
-X-Mailman-Approved-At: Wed, 24 Apr 2019 16:12:52 -0400
-Subject: Re: [Qemu-devel] [RFC PATCH v1 00/10] Add AMD SEV guest live
- migration support
+In-Reply-To: <20190424103747.10173-6-thuth@redhat.com>
+Content-Type: text/plain; charset="UTF-8"; format="flowed"
+Content-Transfer-Encoding: 7bit
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+	(mx1.redhat.com [10.5.110.42]);
+	Wed, 24 Apr 2019 20:42:24 +0000 (UTC)
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 209.132.183.28
+Subject: Re: [Qemu-devel] [PATCH 5/6] tests: Run the iotests during "make
+ check" again
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -90,114 +74,95 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-From: Steve Rutherford via Qemu-devel <qemu-devel@nongnu.org>
-Reply-To: Steve Rutherford <srutherford@google.com>
-Cc: "Lendacky, Thomas" <Thomas.Lendacky@amd.com>,
-	"kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-	=?UTF-8?B?UmFkaW0gS3LEjW3DocWZ?= <rkrcmar@redhat.com>,
-	Joerg Roedel <joro@8bytes.org>, "x86@kernel.org" <x86@kernel.org>,
-	"qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	Ingo Molnar <mingo@redhat.com>, "H. Peter Anvin" <hpa@zytor.com>,
-	Paolo Bonzini <pbonzini@redhat.com>, Thomas Gleixner <tglx@linutronix.de>,
-	Borislav Petkov <bp@suse.de>
+Cc: Fam Zheng <fam@euphon.net>, Kevin Wolf <kwolf@redhat.com>,
+	Ed Maste <emaste@freebsd.org>, qemu-block@nongnu.org,
+	=?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
+	Max Reitz <mreitz@redhat.com>,
+	=?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>,
+	Li-Wen Hsu <lwhsu@freebsd.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190424191512.5fJmg-PEBjurgOUaMSKpdpGBEQ8cskOXVlkS8hCU3F0@z>
+Message-ID: <20190424204214.8kfKtbDl6q2ozUaod_9wTlXcABp0B-t9Jl5Dg1NIFNE@z>
 
-On Wed, Apr 24, 2019 at 9:10 AM Singh, Brijesh <brijesh.singh@amd.com> wrot=
-e:
->
-> The series add support for AMD SEV guest live migration commands. To prot=
-ect the
-> confidentiality of an SEV protected guest memory while in transit we need=
- to
-> use the SEV commands defined in SEV API spec [1].
->
-> SEV guest VMs have the concept of private and shared memory. Private memo=
-ry
-> is encrypted with the guest-specific key, while shared memory may be encr=
-ypted
-> with hypervisor key. The commands provided by the SEV FW are meant to be =
-used
-> for the private memory only. The patch series introduces a new hypercall.
-> The guest OS can use this hypercall to notify the page encryption status.
-> If the page is encrypted with guest specific-key then we use SEV command =
-during
-> the migration. If page is not encrypted then fallback to default.
->
-> The patch adds a new ioctl KVM_GET_PAGE_ENC_BITMAP. The ioctl can be used
-> by the qemu to get the page encrypted bitmap. Qemu can consult this bitma=
-p
-> during the migration to know whether the page is encrypted.
->
-> [1] https://developer.amd.com/wp-content/resources/55766.PDF
->
-> The series is tested with the Qemu, I am in process of cleaning
-> up the Qemu code and will submit soon.
->
-> While implementing the migration I stumbled on the follow question:
->
-> - Since there is a guest OS changes required to support the migration,
->   so how do we know whether guest OS is updated? Should we extend KVM
->   capabilities/feature bits to check this?
->
-> TODO:
->  - add an ioctl to build encryption bitmap. The encryption bitmap is buil=
-t during
->    the guest bootup/execution. We should provide an ioctl so that destina=
-tion
->    can build the bitmap as it receives the pages.
->  - reset the bitmap on guest reboot.
->
-> The complete tree with patch is available at:
-> https://github.com/codomania/kvm/tree/sev-migration-rfc-v1
->
-> Cc: Thomas Gleixner <tglx@linutronix.de>
-> Cc: Ingo Molnar <mingo@redhat.com>
-> Cc: "H. Peter Anvin" <hpa@zytor.com>
-> Cc: Paolo Bonzini <pbonzini@redhat.com>
-> Cc: "Radim Kr=C4=8Dm=C3=A1=C5=99" <rkrcmar@redhat.com>
-> Cc: Joerg Roedel <joro@8bytes.org>
-> Cc: Borislav Petkov <bp@suse.de>
-> Cc: Tom Lendacky <thomas.lendacky@amd.com>
-> Cc: x86@kernel.org
-> Cc: kvm@vger.kernel.org
-> Cc: linux-kernel@vger.kernel.org
->
-> Brijesh Singh (10):
->   KVM: SVM: Add KVM_SEV SEND_START command
->   KVM: SVM: Add KVM_SEND_UPDATE_DATA command
->   KVM: SVM: Add KVM_SEV_SEND_FINISH command
->   KVM: SVM: Add support for KVM_SEV_RECEIVE_START command
->   KVM: SVM: Add KVM_SEV_RECEIVE_UPDATE_DATA command
->   KVM: SVM: Add KVM_SEV_RECEIVE_FINISH command
->   KVM: x86: Add AMD SEV specific Hypercall3
->   KVM: X86: Introduce KVM_HC_PAGE_ENC_STATUS hypercall
->   KVM: x86: Introduce KVM_GET_PAGE_ENC_BITMAP ioctl
->   mm: x86: Invoke hypercall when page encryption status is changed
->
->  .../virtual/kvm/amd-memory-encryption.rst     | 116 ++++
->  Documentation/virtual/kvm/hypercalls.txt      |  14 +
->  arch/x86/include/asm/kvm_host.h               |   3 +
->  arch/x86/include/asm/kvm_para.h               |  12 +
->  arch/x86/include/asm/mem_encrypt.h            |   3 +
->  arch/x86/kvm/svm.c                            | 560 +++++++++++++++++-
->  arch/x86/kvm/vmx/vmx.c                        |   1 +
->  arch/x86/kvm/x86.c                            |  17 +
->  arch/x86/mm/mem_encrypt.c                     |  45 +-
->  arch/x86/mm/pageattr.c                        |  15 +
->  include/uapi/linux/kvm.h                      |  51 ++
->  include/uapi/linux/kvm_para.h                 |   1 +
->  12 files changed, 834 insertions(+), 4 deletions(-)
->
-> --
-> 2.17.1
->
+Hi Thomas,
 
-What's the back-of-the-envelope marginal cost of transferring a 16kB
-region from one host to another? I'm interested in what the end to end
-migration perf changes look like for this. If you have measured
-migration perf, I'm interested in that also.
+
+On 04/24/2019 07:37 AM, Thomas Huth wrote:
+> People often forget to run the iotests before submitting patches or
+> pull requests - this is likely due to the fact that we do not run the
+> tests during our mandatory "make check" tests yet. Now that we've got
+> a new "ci" group of iotests that should be fine to run in every environ-
+> ment, it should be OK to enable the iotests during "make check" again.
+> Thus we now run the "ci" tests by default from the qemu-iotests-quick.sh
+> script, and only use the former "quick" group (that contains some tests
+> that are failing in some environments) when the user decided to run
+> "make check SPEED=thorough" or something similar.
+>
+> Signed-off-by: Thomas Huth <thuth@redhat.com>
+> ---
+>   tests/Makefile.include      |  2 +-
+>   tests/qemu-iotests-quick.sh | 17 ++++++++++++++++-
+>   2 files changed, 17 insertions(+), 2 deletions(-)
+
+One of Patchew's runners failed with this patch series:
+https://patchew.org/QEMU/20190424103747.10173-1-thuth@redhat.com/
+
+I encountered same failures with `make check` locally on Fedora 29 
+x86_64 (pulled latest qemu, and configured with defaults and 
+x86_64-softmmu target):
+---
+Not run: 233
+Failures: 069 103 114 133 140 143 197 215 226 244
+Failed 10 of 91 tests
+---
+
+Let me know if you need more details.
+
+- Wainer
+
+>
+> diff --git a/tests/Makefile.include b/tests/Makefile.include
+> index 36fc73fef5..eb6a7a41e2 100644
+> --- a/tests/Makefile.include
+> +++ b/tests/Makefile.include
+> @@ -1168,7 +1168,7 @@ check-acceptance: check-venv $(TESTS_RESULTS_DIR)
+>   check-qapi-schema: $(patsubst %,check-%, $(check-qapi-schema-y)) check-tests/qapi-schema/doc-good.texi
+>   check-qtest: $(patsubst %,check-qtest-%, $(QTEST_TARGETS))
+>   check-block: $(patsubst %,check-%, $(check-block-y))
+> -check: check-qapi-schema check-unit check-softfloat check-qtest check-decodetree
+> +check: check-qapi-schema check-unit check-softfloat check-qtest check-decodetree check-block
+>   check-clean:
+>   	rm -rf $(check-unit-y) tests/*.o $(QEMU_IOTESTS_HELPERS-y)
+>   	rm -rf $(sort $(foreach target,$(SYSEMU_TARGET_LIST), $(check-qtest-$(target)-y)) $(check-qtest-generic-y))
+> diff --git a/tests/qemu-iotests-quick.sh b/tests/qemu-iotests-quick.sh
+> index 0e554bb972..416b3fc48b 100755
+> --- a/tests/qemu-iotests-quick.sh
+> +++ b/tests/qemu-iotests-quick.sh
+> @@ -1,8 +1,23 @@
+>   #!/bin/sh
+>   
+> +# Honor the SPEED environment variable, just like we do it for the qtests.
+> +# The default is to run all tests that still work fine in a CI environments,
+> +# but if the user set SPEED=slow or SPEED=thorough, we also run all other
+> +# tests that are still marked as "quick"
+> +if [ "$SPEED" = "slow" -o "$SPEED" = "thorough" ]; then
+> +    group=quick
+> +else
+> +    group=ci
+> +fi
+> +
+> +if [ -z "$(find . -name 'qemu-system-*' -print)" ]; then
+> +    echo "No qemu-system binary available. Skipped qemu-iotests."
+> +    exit 0
+> +fi
+> +
+>   cd tests/qemu-iotests
+>   
+>   ret=0
+> -TEST_DIR=${TEST_DIR:-/tmp/qemu-iotests-quick-$$} ./check -T -qcow2 -g quick || ret=1
+> +TEST_DIR=${TEST_DIR:-/tmp/qemu-iotests-quick-$$} ./check -T -qcow2 -g "$group" || ret=1
+>   
+>   exit $ret
+
 
