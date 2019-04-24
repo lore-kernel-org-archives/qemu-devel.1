@@ -2,110 +2,112 @@ Return-Path: <SRS0=3XOk=S2=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.0 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A2B94C10F11
-	for <qemu-devel@archiver.kernel.org>; Wed, 24 Apr 2019 06:47:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 61D57C10F11
+	for <qemu-devel@archiver.kernel.org>; Wed, 24 Apr 2019 07:33:55 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5A9172148D
-	for <qemu-devel@archiver.kernel.org>; Wed, 24 Apr 2019 06:47:31 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="RvAvPChn"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5A9172148D
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
+	by mail.kernel.org (Postfix) with ESMTPS id 2057A2089F
+	for <qemu-devel@archiver.kernel.org>; Wed, 24 Apr 2019 07:33:54 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2057A2089F
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:36827 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:37261 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hJBgo-0004A5-41
-	for qemu-devel@archiver.kernel.org; Wed, 24 Apr 2019 02:47:30 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:36878)
+	id 1hJCPg-0006oy-0K
+	for qemu-devel@archiver.kernel.org; Wed, 24 Apr 2019 03:33:52 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:47780)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1hJBf5-0002kU-Nq
-	for qemu-devel@nongnu.org; Wed, 24 Apr 2019 02:45:45 -0400
+	(envelope-from <thuth@redhat.com>) id 1hJCNp-0005hs-U6
+	for qemu-devel@nongnu.org; Wed, 24 Apr 2019 03:31:58 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1hJBZi-0003En-L0
-	for qemu-devel@nongnu.org; Wed, 24 Apr 2019 02:40:11 -0400
-Received: from mail-eopbgr150114.outbound.protection.outlook.com
-	([40.107.15.114]:62955
-	helo=EUR01-DB5-obe.outbound.protection.outlook.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
-	id 1hJBZi-0003Ag-3Z
-	for qemu-devel@nongnu.org; Wed, 24 Apr 2019 02:40:10 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=virtuozzo.com;
-	s=selector1;
-	h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
-	bh=tmhRoTg2wwLd+n4RLfubqu56zLOAs+K2hyW9MzPTujg=;
-	b=RvAvPChnOUb3glEnnO74CPqCaZP4WNe+Eu48H2KBna3JhesGXBaBepkaR+YR+zysrKbqMGPuDnKK7aioPd+KGFPGyKidoobAnNTEO+DSBlBLzjryav+MCaz4yJvFqzVzG1vqffap1fNQyRrybS2Kui+R61lMwys6adBDrimaD1g=
-Received: from DB7PR08MB3851.eurprd08.prod.outlook.com (20.178.46.222) by
-	DB7PR08MB3354.eurprd08.prod.outlook.com (52.134.111.149) with Microsoft
-	SMTP
-	Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
-	15.20.1813.17; Wed, 24 Apr 2019 06:40:05 +0000
-Received: from DB7PR08MB3851.eurprd08.prod.outlook.com
-	([fe80::3c82:5da0:1633:f949]) by
-	DB7PR08MB3851.eurprd08.prod.outlook.com
-	([fe80::3c82:5da0:1633:f949%3]) with mapi id 15.20.1813.017;
-	Wed, 24 Apr 2019 06:40:05 +0000
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-To: Kevin Wolf <kwolf@redhat.com>, Martin Kletzander <mkletzan@redhat.com>
-Thread-Topic: [Qemu-devel] Possibly incorrect data sparsification by qemu-img
-Thread-Index: AQHU+cg/x9u6pQM730uOb2lCE8MzcKZJqAYAgAAllACAAAu5gIABBDIA
-Date: Wed, 24 Apr 2019 06:40:04 +0000
-Message-ID: <aeb62174-5aad-676e-792d-e71d694dbd1e@virtuozzo.com>
-References: <20190423113028.GD30014@wheatley>
-	<20190423121218.GF9041@localhost.localdomain>
-	<20190423142648.GA2967@wheatley>
-	<20190423150845.GG9041@localhost.localdomain>
-In-Reply-To: <20190423150845.GG9041@localhost.localdomain>
-Accept-Language: ru-RU, en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-clientproxiedby: HE1PR05CA0180.eurprd05.prod.outlook.com
-	(2603:10a6:3:f8::28) To DB7PR08MB3851.eurprd08.prod.outlook.com
-	(2603:10a6:10:7b::30)
-authentication-results: spf=none (sender IP is )
-	smtp.mailfrom=vsementsov@virtuozzo.com; 
-x-ms-exchange-messagesentrepresentingtype: 1
-x-tagtoolbar-keys: D20190424094002330
-x-originating-ip: [185.231.240.5]
-x-ms-publictraffictype: Email
-x-ms-office365-filtering-correlation-id: 98b245f9-cee8-4fb0-503b-08d6c87faf19
-x-microsoft-antispam: BCL:0; PCL:0;
-	RULEID:(2390118)(7020095)(4652040)(8989299)(4534185)(4627221)(201703031133081)(201702281549075)(8990200)(5600141)(711020)(4605104)(2017052603328)(7193020);
-	SRVR:DB7PR08MB3354; 
-x-ms-traffictypediagnostic: DB7PR08MB3354:
-x-microsoft-antispam-prvs: <DB7PR08MB33540C8C7E4D13FBD250F495C13C0@DB7PR08MB3354.eurprd08.prod.outlook.com>
-x-forefront-prvs: 00179089FD
-x-forefront-antispam-report: SFV:NSPM;
-	SFS:(10019020)(396003)(136003)(366004)(376002)(346002)(39850400004)(189003)(199004)(81166006)(2906002)(5660300002)(71190400001)(229853002)(478600001)(6436002)(3846002)(8676002)(6116002)(71200400001)(36756003)(31696002)(68736007)(97736004)(14454004)(93886005)(31686004)(86362001)(316002)(81156014)(102836004)(66066001)(476003)(4326008)(54906003)(6506007)(386003)(99286004)(8936002)(7736002)(6246003)(6512007)(6486002)(53936002)(446003)(305945005)(76176011)(486006)(2616005)(64756008)(256004)(110136005)(186003)(66946007)(66556008)(66476007)(73956011)(52116002)(66446008)(25786009)(11346002)(26005)(14444005)(33290500001);
-	DIR:OUT; SFP:1102; SCL:1; SRVR:DB7PR08MB3354;
-	H:DB7PR08MB3851.eurprd08.prod.outlook.com; FPR:; SPF:None;
-	LANG:en; PTR:InfoNoRecords; MX:1; A:1; 
-received-spf: None (protection.outlook.com: virtuozzo.com does not designate
-	permitted sender hosts)
-x-ms-exchange-senderadcheck: 1
-x-microsoft-antispam-message-info: FfhjPa1wjTwNwZCXFWZrvXjGjHn+UHi0ZRofDS/l/mnISCdAL9dbLihuRIR8ytbr2D+E5oO+W3I9NpsENUD5jULQfBjFmd7EcOfyLda8J3nn6SuY+cK8JTQFQVOmG+H08r+lSWlWNHsijVGFNdJ2+ZyFjXoXpIShwaXHF+AgH1wyXl5q5Qtr8fmYV2R+Py+5H04zwPYMWB8dv8kC7q/GjVrgYoyFj/T0KpBqp0hPI9GUcaGci9Wr5htP5wgwhL0Q607+kNAQ3UKjDOaCdcaekINMbrexgVBGWSId+qGEpQQORT+SD3f+5Rtk9JsW7oPi+fuq5wh8ktci/U+4BSsh8kG3Nexf2x5bv5IEAckdP0CrP2m3tYpgwp6WiMCyg0BzjoKUViptaZJuANj5zN/4Y//y55KU7KNVYOLQne/FjAs=
-Content-Type: text/plain; charset="UTF-8"
-Content-ID: <9656653A1CF5874483A8CFDEB232A8E9@eurprd08.prod.outlook.com>
-Content-Transfer-Encoding: quoted-printable
+	(envelope-from <thuth@redhat.com>) id 1hJCN1-0006Vd-Dw
+	for qemu-devel@nongnu.org; Wed, 24 Apr 2019 03:31:08 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:52124)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1hJCN1-0006To-60
+	for qemu-devel@nongnu.org; Wed, 24 Apr 2019 03:31:07 -0400
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+	[10.5.11.16])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 513313098488;
+	Wed, 24 Apr 2019 07:31:04 +0000 (UTC)
+Received: from thuth.remote.csb (ovpn-116-69.ams2.redhat.com [10.36.116.69])
+	by smtp.corp.redhat.com (Postfix) with ESMTP id B9D2C5C28D;
+	Wed, 24 Apr 2019 07:30:57 +0000 (UTC)
+To: Li Qiang <liq3ea@gmail.com>
+References: <20190420100056.116305-1-liq3ea@163.com>
+	<20190420100056.116305-4-liq3ea@163.com>
+	<a27cd912-4f58-55ac-1aae-e4999fa3d84d@redhat.com>
+	<CAKXe6SJZWs7HtXutX6W3saDhaNDtVPMQEh2+s+9XiM3TtZqLdQ@mail.gmail.com>
+From: Thomas Huth <thuth@redhat.com>
+Openpgp: preference=signencrypt
+Autocrypt: addr=thuth@redhat.com; keydata=
+	xsFNBFH7eUwBEACzyOXKU+5Pcs6wNpKzrlJwzRl3VGZt95VCdb+FgoU9g11m7FWcOafrVRwU
+	yYkTm9+7zBUc0sW5AuPGR/dp3pSLX/yFWsA/UB4nJsHqgDvDU7BImSeiTrnpMOTXb7Arw2a2
+	4CflIyFqjCpfDM4MuTmzTjXq4Uov1giGE9X6viNo1pxyEpd7PanlKNnf4PqEQp06X4IgUacW
+	tSGj6Gcns1bCuHV8OPWLkf4hkRnu8hdL6i60Yxz4E6TqlrpxsfYwLXgEeswPHOA6Mn4Cso9O
+	0lewVYfFfsmokfAVMKWzOl1Sr0KGI5T9CpmRfAiSHpthhHWnECcJFwl72NTi6kUcUzG4se81
+	O6n9d/kTj7pzTmBdfwuOZ0YUSqcqs0W+l1NcASSYZQaDoD3/SLk+nqVeCBB4OnYOGhgmIHNW
+	0CwMRO/GK+20alxzk//V9GmIM2ACElbfF8+Uug3pqiHkVnKqM7W9/S1NH2qmxB6zMiJUHlTH
+	gnVeZX0dgH27mzstcF786uPcdEqS0KJuxh2kk5IvUSL3Qn3ZgmgdxBMyCPciD/1cb7/Ahazr
+	3ThHQXSHXkH/aDXdfLsKVuwDzHLVSkdSnZdt5HHh75/NFHxwaTlydgfHmFFwodK8y/TjyiGZ
+	zg2Kje38xnz8zKn9iesFBCcONXS7txENTzX0z80WKBhK+XSFJwARAQABzRxUaG9tYXMgSHV0
+	aCA8dGguaHV0aEBnbXguZGU+wsF7BBMBAgAlAhsDBgsJCAcDAgYVCAIJCgsEFgIDAQIeAQIX
+	gAUCUfuWKwIZAQAKCRAu2dd0/nAttbe/EACb9hafyOb2FmhUqeAiBORSsUifFacQ7laVjcgR
+	I4um8CSHvxijYftpkM2EdAtmXIKgbNDpQoXcWLXB9lu9mLgTO4DVT00TRR65ikn3FCWcyT74
+	ENTOzRKyKLsDCjhXKPblTPIQbYAUCOWElcyAPm0ERd62fA/rKNxgIiNo/l4UODOMoOJm2/Ox
+	ZoTckW68Eqv7k9L7m7j+Hn3hoDTjAmcCBJt+j7pOhzWvCbqoNOIH8C8qvPaNlrba+R/K6jkO
+	6jZkTbYQpGIofEQJ/TNn38IsNGpI1ALTHWFtoMxp3j2Imz0REO6dRE2fHRN8sVlHgkoeGhmY
+	NbDsDE1jFQOEObFnu0euk//7BXU7tGOHckVAZ8T1smiRPHfQU7UEH2a/grndxJ+PNeM5w7n2
+	l+FN3cf2KgPotCK2s9MjSdZA7C5e3rFYO8lqiqTJKvc62vqp3e7B0Kjyy5/QtzSOejBij2QL
+	xkKSFNtxIz4MtuxN8e3IDQNxsKry3nF7R4MDvouXlMo6wP9KuyNWb+vFJt9GtbgfDMIFVamp
+	ZfhEWzWRJH4VgksENA4K/BzjEHCcbTUb1TFsiB1VRnBPJ0SqlvifnfKk6HcpkDk6Pg8Q5FOJ
+	gbNHrdgXsm+m/9GF2zUUr+rOlhVbK23TUqKqPfwnD7uxjpakVcJnsVCFqJpZi1F/ga9IN87B
+	TQRR+3lMARAAtp831HniPHb9AuKq3wj83ujZK8lH5RLrfVsB4X1wi47bwo56BqhXpR/zxPTR
+	eOFT0gnbw9UkphVc7uk/alnXMDEmgvnuxv89PwIQX6k3qLABeV7ykJQG/WT5HQ6+2DdGtVw3
+	2vjYAPiWQeETsgWRRQMDR0/hwp8s8tL/UodwYCScH6Vxx9pdy353L1fK4Bb9G73a+9FPjp9l
+	x+WwKTsltVqSBuSjyZQ3c3EE8qbTidXZxB38JwARH8yN3TX+t65cbBqLl/zRUUUTapHQpUEd
+	yoAsHIml32e4q+3xdLtTdlLi7FgPBItSazcqZPjEcYW73UAuLcmQmfJlQ5PkDiuqcitn+KzH
+	/1pqsTU7QFZjbmSMJyXY0TDErOFuMOjf20b6arcpEqse1V3IKrb+nqqA2azboRm3pEANLAJw
+	iVTwK3qwGRgK5ut6N/Znv20VEHkFUsRAZoOusrIRfR5HFDxlXguAdEz8M/hxXFYYXqOoaCYy
+	6pJxTjy0Y/tIfmS/g9Bnp8qg9wsrsnk0+XRnDVPak++G3Uq9tJPwpJbyO0vcqEI3vAXkAB7X
+	VXLzvFwi66RrsPUoDkuzj+aCNumtOePDOCpXQGPpKl+l1aYRMN/+lNSk3+1sVuc2C07WnYyE
+	gV/cbEVklPmKrNwu6DeUyD0qI/bVzKMWZAiB1r56hsGeyYcAEQEAAcLBXwQYAQIACQUCUft5
+	TAIbDAAKCRAu2dd0/nAttYTwEACLAS/THRqXRKb17PQmKwZHerUvZm2klo+lwQ3wNQBHUJAT
+	p2R9ULexyXrJPqjUpy7+voz+FcKiuQBTKyieiIxO46oMxsbXGZ70o3gxjxdYdgimUD6U8PPd
+	JH8tfAL4BR5FZNjspcnscN2jgbF4OrpDeOLyBaj6HPmElNPtECHWCaf1xbIFsZxSDGMA6cUh
+	0uX3Q8VI7JN1AR2cfiIRY7NrIlWYucJxyKjO3ivWm69nCtsHiJ0wcF8KlVo7F2eLaufo0K8A
+	ynL8SHMF3VEyxsXOP2f1UR9T2Ur30MXcTBpjUxml1TX3RWY5uH89Js/jlIugBwuAmacJ7JYh
+	lTg6sF/GNc4nPb4kk2yktNWTade+TzsllYlJPaorD2Qe8qX0iFUhFC6y9+O6mP4ZvWoYapp9
+	ezYNuebMgEr93ob1+4sFg3812wNP01WqsGtWCJHnPv/JoonFdMzD/bIkXGEJMk6ks2kxQQZq
+	g6Ik/s/vxOfao/xCn8nHt7GwvVy41795hzK6tbSl+BuyCRp0vfPRP34OnK7+jR2nvQpJu/pU
+	rCELuGwT9hsYkUPjVd4lfylN3mzEc6iAv/wwjsc0DRTSQCpXT3v2ymTAsRKrVaEZLibTXaf+
+	WslxWek3xNYRiqwwWAJuL652eAlxUgQ5ZS+fXBRTiQpJ+F26I/2lccScRd9G5w==
+Organization: Red Hat
+Message-ID: <6dd699b1-f24d-743b-343e-f1df6c8672b9@redhat.com>
+Date: Wed, 24 Apr 2019 09:30:56 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+	Thunderbird/60.6.1
 MIME-Version: 1.0
-X-OriginatorOrg: virtuozzo.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 98b245f9-cee8-4fb0-503b-08d6c87faf19
-X-MS-Exchange-CrossTenant-originalarrivaltime: 24 Apr 2019 06:40:05.3434 (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 0bc7f26d-0264-416e-a6fc-8352af79c58f
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DB7PR08MB3354
-X-detected-operating-system: by eggs.gnu.org: Windows 7 or 8 [fuzzy]
-X-Received-From: 40.107.15.114
-Subject: Re: [Qemu-devel] Possibly incorrect data sparsification by qemu-img
+In-Reply-To: <CAKXe6SJZWs7HtXutX6W3saDhaNDtVPMQEh2+s+9XiM3TtZqLdQ@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+	(mx1.redhat.com [10.5.110.42]);
+	Wed, 24 Apr 2019 07:31:04 +0000 (UTC)
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 209.132.183.28
+Subject: Re: [Qemu-devel] [PATCH 3/4] tests: fw_cfg: add reboot_timeout test
+ case
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -117,159 +119,98 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
-	Richard Jones <rjones@redhat.com>
+Cc: lvivier@redhat.com,
+	=?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
+	Li Qiang <liq3ea@163.com>, Qemu Developers <qemu-devel@nongnu.org>,
+	Gerd Hoffmann <kraxel@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
+	Laszlo Ersek <lersek@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190424064004.iX-R3CqmIaqGpNECBMIEeBHn3MUyE4udnSBKCmcdenU@z>
+Message-ID: <20190424073056.h0_4tcKTsOER0s95bly9ZE9_tfUtlaVrE_uyhIRsTBo@z>
 
-23.04.2019 18:08, Kevin Wolf wrote:
-> Am 23.04.2019 um 16:26 hat Martin Kletzander geschrieben:
->> On Tue, Apr 23, 2019 at 02:12:18PM +0200, Kevin Wolf wrote:
->>> Am 23.04.2019 um 13:30 hat Martin Kletzander geschrieben:
->>>> Hi,
->>>>
->>>> I am using qemu-img with nbdkit to transfer a disk image and the updat=
-e it with
->>>> extra data from newer snapshots.  The end image cannot be transferred =
-because
->>>> the snapshots will be created later than the first transfer and we wan=
-t to save
->>>> some time up front.  You might think of it as a continuous synchronisa=
-tion.  It
->>>> looks something like this:
->>>>
->>>> I first transfer the whole image:
->>>>
->>>>   qemu-img convert -p $nbd disk.raw
->>>>
->>>> Where `$nbd` is something along the lines of `nbd+unix:///?socket=3Dnb=
-dkit.sock`
->>>>
->>>> Then, after the next snapshot is created, I can update it thanks to th=
-e `-n`
->>>> parameter (the $nbd now points to the newer snapshot with unchanged da=
-ta looking
->>>> like holes in the file):
->>>>
->>>>   qemu-img convert -p -n $nbd disk.raw
->>>>
->>>> This is fast and efficient as it uses block status nbd extension, so i=
-t only
->>>> transfers new data.
->>>
->>> This is an implementation detail. Don't rely on it. What you're doing i=
-s
->>> abusing 'qemu-img convert', so problems like what you describe are to b=
-e
->>> expected.
->>>
->>>> This can be done over and over again to keep the local
->>>> `disk.raw` image up to date with the latest remote snapshot.
->>>>
->>>> However, when the guest OS zeroes some of the data and it gets written=
- into the
->>>> snapshot, qemu-img scans for those zeros and does not write them to th=
-e
->>>> destination image.  Checking the output of `qemu-img map --output=3Djs=
-on $nbd`
->>>> shows that the zeroed data is properly marked as `data: true`.
->>>>
->>>> Using `-S 0` would write zeros even where the holes are, effectively o=
-verwriting
->>>> the data from the last snapshot even though they should not be changed=
-.
->>>>
->>>> Having gone through some workarounds I would like there to be another =
-way.  I
->>>> know this is far from the typical usage of qemu-img, but is this reall=
-y the
->>>> expected behaviour or is this just something nobody really needed befo=
-re?  If it
->>>> is the former, would it be possible to have a parameter that would con=
-trol this
->>>> behaviour?  If the latter is the case, can that behaviour be changed s=
-o that it
->>>> properly replicates the data when `-n` parameter is used?
->>>>
->>>> Basically the only thing we need is to either:
->>>>
->>>> 1) write zeros where they actually are or
->>>>
->>>> 2) turn off explicit sparsification without requesting dense image (ba=
-sically
->>>>     sparsify only the par that is reported as hole on the source) or
->>>>
->>>> 3) ideally, just FALLOC_FL_PUNCH_HOLE in places where source did repor=
-t data,
->>>>     but qemu-img found they are all zeros (or source reported HOLE+ZER=
-O which, I
->>>>     believe, is effectively the same)
->>>>
->>>> If you want to try this out, I found the easiest reproducible way is u=
-sing
->>>> nbdkit's data plugin, which can simulate whatever source image you lik=
-e.
->>>
->>> I think what you _really_ want is a commit block job. The problem is
->>> just that you don't have a proper backing file chain, but just a bunch
->>> of NBD connections.
->>>
->>> Can't you get an NBD connection that already provides the condensed for=
-m
->>> of the whole snapshot chain directly at the source? If the NBD server
->>> was QEMU, this would actually be easier than providing each snapshot
->>> individually.
->>>
->>> If this isn't possible, I think you need to replicate the backing chain
->>> on the destination instead of converting into the same image again and
->>> again so that qemu-img knows that it must take existing data of the
->>> backing file into consideration:
->>>
->>>     qemu-img convert -O qcow2 nbd://... base.qcow2
->>>     qemu-img convert -O qcow2 -F qcow2 -B base.qcow2 nbd://... overlay1=
-.qcow2
->>>     qemu-img convert -O qcow2 -F qcow2 -B overlay1.qcow2 nbd://... over=
-lay2.qcow2
->>>     ...
-
-Is it safe in general?
-
-Qemu often consider rounding-up allocated ranges to be safe, or just consid=
-er unknown area as allocated.
-And if this happen, we'll convert unallocated hole to allocated zeroes on t=
-arget, which will break
-backing chain.
-
-This way would be correct if on source under nbd server we have valid backi=
-ng chain too, so in case of
-"rounding-up" we'll just read valid data from backing. But it is not the ca=
-se (or sorry, if I misunderstood).
-
->>>
->>
->> I thought of this, but (to be honest) I did not know that `-B` would
->> work for nbd.
+On 24/04/2019 03.16, Li Qiang wrote:
 >=20
-> It still depends on the NBD server providing the right block allocation
-> status, but that's no worse than what you needed for -n. But whether -B
-> can be used at all depends on the target format, not the source.
+> Thomas Huth <thuth@redhat.com <mailto:thuth@redhat.com>> =E4=BA=8E2019=E5=
+=B9=B44=E6=9C=8824=E6=97=A5
+> =E5=91=A8=E4=B8=89 =E4=B8=8A=E5=8D=8812:29=E5=86=99=E9=81=93=EF=BC=9A
 >=20
->> Does it assume that data are to be taken from the base image if and
->> only if the source (be it nbd server or just a plain file) says there
->> is a hole?  If yes, then it could nicely solve the issue.
+>     On 20/04/2019 12.00, Li Qiang wrote:
+>     > Signed-off-by: Li Qiang <liq3ea@163.com <mailto:liq3ea@163.com>>
+>     > ---
+>     >=C2=A0 tests/fw_cfg-test.c | 19 +++++++++++++++++++
+>     >=C2=A0 1 file changed, 19 insertions(+)
+>     >
+>     > diff --git a/tests/fw_cfg-test.c b/tests/fw_cfg-test.c
+>     > index c22503619f..9f75dbb5f4 100644
+>     > --- a/tests/fw_cfg-test.c
+>     > +++ b/tests/fw_cfg-test.c
+>     > @@ -174,6 +174,24 @@ static void test_fw_cfg_boot_menu(void)
+>     >=C2=A0 =C2=A0 =C2=A0 qtest_quit(s);
+>     >=C2=A0 }
+>     >=C2=A0
+>     > +static void test_fw_cfg_reboot_timeout(void)
+>     > +{
+>     > +=C2=A0 =C2=A0 QFWCFG *fw_cfg;
+>     > +=C2=A0 =C2=A0 QTestState *s;
+>     > +=C2=A0 =C2=A0 uint32_t reboot_timeout =3D 0;
+>     > +=C2=A0 =C2=A0 size_t filesize;
+>     > +
+>     > +=C2=A0 =C2=A0 s =3D qtest_init("-boot reboot-timeout=3D15");
+>     > +=C2=A0 =C2=A0 fw_cfg =3D pc_fw_cfg_init(s);
+>     > +
+>     > +=C2=A0 =C2=A0 filesize =3D qfw_cfg_get_file(fw_cfg, "etc/boot-fa=
+il-wait",
+>     > +=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
+=A0 =C2=A0&reboot_timeout, sizeof(reboot_timeout));
+>     > +=C2=A0 =C2=A0 g_assert_cmpint(filesize, =3D=3D, sizeof(reboot_ti=
+meout));
+>     > +=C2=A0 =C2=A0 g_assert_cmpint(reboot_timeout, =3D=3D, 15);
 >=20
-> I haven't tested it now, but yes, that's what I remember it to do.
+>     Is this endianess-safe? Or do you need to byteswap reboot_timeout i=
+f the
+>     host and guest endianess does not match?
 >=20
-> Looking at the code, the requirement seems to be that the NBD server
-> flags the sparse blocks as a HOLE, but not as ZERO.
+> Good question!
 >=20
-> Kevin
->=20
+> IIUC, the qemu fw_cfg store the 'file' entry data just in byte stream.
+> So there is no need
+> to consider the file's endianess. If when the file entry is stored
+> without considering endianess,
+> it will be ok to ignore the endianess. So for this patch, the
+> 'reboot_timeout' is ok as when we stored=C2=A0
+> it we don't consider endianess. But for 'splash-time', when we stored
+> it=C2=A0 we convert it to little endian
+> so when we fetches it, we should also convert it from little endian to
+> cpu-endian.
 
+I just gave these patches a try on a big endian host, and the test fails
+indeed:
 
---=20
-Best regards,
-Vladimir
+$ QTEST_QEMU_BINARY=3Dx86_64-softmmu/qemu-system-x86_64 tests/fw_cfg-test
+/x86_64/fw_cfg/signature: OK
+/x86_64/fw_cfg/id: OK
+/x86_64/fw_cfg/uuid: OK
+/x86_64/fw_cfg/ram_size: OK
+/x86_64/fw_cfg/nographic: OK
+/x86_64/fw_cfg/nb_cpus: OK
+/x86_64/fw_cfg/max_cpus: OK
+/x86_64/fw_cfg/numa: OK
+/x86_64/fw_cfg/boot_menu: OK
+/x86_64/fw_cfg/reboot_timeout: **
+ERROR:tests/fw_cfg-test.c:190:test_fw_cfg_reboot_timeout: assertion
+failed (reboot_timeout =3D=3D 15): (0 =3D=3D 15)
+Aborted
+
+=3D> it also fails for reboot_timeout already, not only for splash_time.
+
+> So I think we can have following choose:
+>=20
+> 1. Don't consider the endianess, this is ok when emaulated target and
+> host target has the same endianess.
+
+Sorry, but that's not a real choice. qtests must also work when you e.g.
+run qemu-system-x86_64 on a big endian host.
+
+ Thomas
 
