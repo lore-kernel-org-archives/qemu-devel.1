@@ -2,62 +2,75 @@ Return-Path: <SRS0=3XOk=S2=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_PASS,URIBL_BLOCKED autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E3386C10F11
-	for <qemu-devel@archiver.kernel.org>; Wed, 24 Apr 2019 13:21:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A9CDAC10F11
+	for <qemu-devel@archiver.kernel.org>; Wed, 24 Apr 2019 13:21:47 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B0B512077C
-	for <qemu-devel@archiver.kernel.org>; Wed, 24 Apr 2019 13:21:43 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B0B512077C
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=rt-rk.com
+	by mail.kernel.org (Postfix) with ESMTPS id 7BE842077C
+	for <qemu-devel@archiver.kernel.org>; Wed, 24 Apr 2019 13:21:47 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7BE842077C
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:41402 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:41675 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hJHYh-0005hy-HF
-	for qemu-devel@archiver.kernel.org; Wed, 24 Apr 2019 09:03:31 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:47777)
+	id 1hJHqM-0004he-Ky
+	for qemu-devel@archiver.kernel.org; Wed, 24 Apr 2019 09:21:46 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:52586)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1hJHUo-0002aK-JN
-	for qemu-devel@nongnu.org; Wed, 24 Apr 2019 08:59:32 -0400
+	(envelope-from <bounces@canonical.com>) id 1hJHnJ-0002I7-Jt
+	for qemu-devel@nongnu.org; Wed, 24 Apr 2019 09:18:38 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1hJHUE-0000SZ-AA
-	for qemu-devel@nongnu.org; Wed, 24 Apr 2019 08:59:24 -0400
-Received: from mx2.rt-rk.com ([89.216.37.149]:55319 helo=mail.rt-rk.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <aleksandar.markovic@rt-rk.com>)
-	id 1hJHUE-0000SA-0k
-	for qemu-devel@nongnu.org; Wed, 24 Apr 2019 08:58:54 -0400
-Received: from localhost (localhost [127.0.0.1])
-	by mail.rt-rk.com (Postfix) with ESMTP id 4AF1B1A4140;
-	Wed, 24 Apr 2019 14:58:16 +0200 (CEST)
-X-Virus-Scanned: amavisd-new at rt-rk.com
-Received: from rtrkw774-lin.domain.local (rtrkw774-lin.domain.local
-	[10.10.13.43])
-	by mail.rt-rk.com (Postfix) with ESMTPSA id E9B311A23E6;
-	Wed, 24 Apr 2019 14:58:15 +0200 (CEST)
-From: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>
-To: qemu-devel@nongnu.org
-Date: Wed, 24 Apr 2019 14:57:03 +0200
-Message-Id: <1556110623-655-6-git-send-email-aleksandar.markovic@rt-rk.com>
-X-Mailer: git-send-email 2.7.4
-In-Reply-To: <1556110623-655-1-git-send-email-aleksandar.markovic@rt-rk.com>
-References: <1556110623-655-1-git-send-email-aleksandar.markovic@rt-rk.com>
+	(envelope-from <bounces@canonical.com>) id 1hJHfl-00051W-Rb
+	for qemu-devel@nongnu.org; Wed, 24 Apr 2019 09:10:52 -0400
+Received: from indium.canonical.com ([91.189.90.7]:43558)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1hJHfk-0004wS-Ld
+	for qemu-devel@nongnu.org; Wed, 24 Apr 2019 09:10:48 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1hJHfh-0001DM-Ol
+	for <qemu-devel@nongnu.org>; Wed, 24 Apr 2019 13:10:45 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id B7A8F2E800F
+	for <qemu-devel@nongnu.org>; Wed, 24 Apr 2019 13:10:45 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x
-X-Received-From: 89.216.37.149
-Subject: [Qemu-devel] [PATCH v2 5/5] linux-user: Sanitize interp_info and,
- for mips only, init field fp_abi
+Date: Wed, 24 Apr 2019 13:03:59 -0000
+From: "Laszlo Ersek \(Red Hat\)" <lersek@redhat.com>
+To: qemu-devel@nongnu.org
+X-Launchpad-Notification-Type: bug
+X-Launchpad-Bug: product=qemu; status=Confirmed; importance=Undecided;
+	assignee=berrange@redhat.com; 
+X-Launchpad-Bug-Tags: feature-request
+X-Launchpad-Bug-Information-Type: Public
+X-Launchpad-Bug-Private: no
+X-Launchpad-Bug-Security-Vulnerability: no
+X-Launchpad-Bug-Commenters: lersek
+X-Launchpad-Bug-Reporter: Laszlo Ersek (Red Hat) (lersek)
+X-Launchpad-Bug-Modifier: Laszlo Ersek (Red Hat) (lersek)
+References: <155610584995.13565.1262636932024040431.malonedeb@wampee.canonical.com>
+Message-Id:
+ <155611103943.13917.11637588148228048841.malone@gac.canonical.com>
+X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
+X-Launchpad-Message-For: qemu-devel-ml
+Precedence: bulk
+X-Generated-By: Launchpad (canonical.com); Revision="18928";
+	Instance="launchpad-lazr.conf"
+X-Launchpad-Hash: e729ef527bce68c926886d19dba2cf4559cb37dd
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 91.189.90.7
+Subject: [Qemu-devel] [Bug 1826200] Re: RFE: populate "OEM Strings" (type
+ 11) SMBIOS table strings from regular files
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
-Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -66,56 +79,58 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: lvivier@redhat.com, thuth@redhat.com, jcmvbkbc@gmail.com,
-	arikalo@wavecomp.com, daniel.santos@pobox.com,
-	amarkovic@wavecomp.com, philmd@redhat.com, aurelien@aurel32.net
+Reply-To: Bug 1826200 <1826200@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190424125703.PH_KxgnuSAjYwl5BGPSxrgkYq3QbtPVgrkFAzcRfDJ8@z>
+Message-ID: <20190424130359.EkoGUbvajYI5pGluBTbl_vnrXahDTg-8jeLx11GSZ6M@z>
 
-From: Daniel Santos <daniel.santos@pobox.com>
+See also: https://github.com/puiterwijk/qemu-ovmf-secureboot/issues/25
 
-Sanitize interp_info structure in load_elf_binary() and, for MIPS only,
-init its field fp_abi to MIPS_ABI_FP_UNKNOWN. This fixes appearances of
-"Unexpected FPU mode" message in some MIPS use cases. Currently, this
-bug is a complete stopper for some MIPS binaries.
+** Bug watch added: github.com/puiterwijk/qemu-ovmf-secureboot/issues #25
+   https://github.com/puiterwijk/qemu-ovmf-secureboot/issues/25
 
-In load_elf_binary(), struct image_info interp_info is used without
-being properly initialized. One result is that when the ELF's program
-header doesn't contain an entry for the ABI flags, then the value of
-the struct image_info's fp_abi field is set to whatever happened to
-be in stack memory at the time.
+-- =
 
-Backporting to 4.0 and, if possible, to 3.1 is recommended.
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1826200
 
-Fixes: https://bugs.launchpad.net/qemu/+bug/1825002
+Title:
+  RFE: populate "OEM Strings" (type 11) SMBIOS table strings from
+  regular files
 
-Signed-off-by: Daniel Santos <daniel.santos@pobox.com>
-Signed-off-by: Aleksandar Markovic <amarkovic@wavecomp.com>
-Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
----
- linux-user/elfload.c | 5 +++++
- 1 file changed, 5 insertions(+)
+Status in QEMU:
+  Confirmed
 
-diff --git a/linux-user/elfload.c b/linux-user/elfload.c
-index c1a2602..7f09d57 100644
---- a/linux-user/elfload.c
-+++ b/linux-user/elfload.c
-@@ -2698,6 +2698,11 @@ int load_elf_binary(struct linux_binprm *bprm, str=
-uct image_info *info)
-     char *elf_interpreter =3D NULL;
-     char *scratch;
-=20
-+    memset(&interp_info, 0, sizeof(interp_info));
-+#ifdef TARGET_MIPS
-+    interp_info.fp_abi =3D MIPS_ABI_FP_UNKNOWN;
-+#endif
-+
-     info->start_mmap =3D (abi_ulong)ELF_START_MMAP;
-=20
-     load_elf_image(bprm->filename, bprm->fd, info,
---=20
-2.7.4
+Bug description:
+  The feature added in
 
+  https://git.qemu.org/?p=3Dqemu.git;a=3Dcommitdiff;h=3D2d6dcbf93fb01b4a7f4=
+5a93d276d4d74b16392dd
+
+  and exposed by libvirt as
+
+    https://libvirt.org/formatdomain.html#elementsSysinfo
+
+  allows the user to specify up to 255 strings in the unofmatted area of
+  the Type 11 SMBIOS table, where each string may be of arbitrary
+  length. This feature is useful for exposing arbitrary text to
+  arbitrary guest components (in particular when strings are prefixed
+  with "application identifiers").
+
+  Right now, strings can only be specified on the QEMU command line,
+  which limits the amount of data that can be passed. Please enable
+  users to pass data from regular files too.
+
+  For example:
+
+    $QEMU -smbios
+  type=3D11,value=3DHello,txtfile=3Dfile1.txt,txtfile=3Dfile2.txt
+
+  where "file1.txt" and "file2.txt" could be text files containing ASCII
+  application prefixes, followed by base64-encoded binary data.
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1826200/+subscriptions
 
