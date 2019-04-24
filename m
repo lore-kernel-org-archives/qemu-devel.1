@@ -1,34 +1,25 @@
-Received: from eggs.gnu.org ([209.51.188.92]:39057)
+Received: from eggs.gnu.org ([209.51.188.92]:45722)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1hJKUX-0002tq-46
-	for qemu-devel@nongnu.org; Wed, 24 Apr 2019 12:11:27 -0400
+	(envelope-from <mreitz@redhat.com>) id 1hJKtX-0007fu-Lj
+	for qemu-devel@nongnu.org; Wed, 24 Apr 2019 12:37:20 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1hJKUV-0005iR-3o
-	for qemu-devel@nongnu.org; Wed, 24 Apr 2019 12:11:25 -0400
-Received: from indium.canonical.com ([91.189.90.7]:51146)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1hJKUU-0005eS-TU
-	for qemu-devel@nongnu.org; Wed, 24 Apr 2019 12:11:23 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1hJKUT-0000oP-3y
-	for <qemu-devel@nongnu.org>; Wed, 24 Apr 2019 16:11:21 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 1B5112E8042
-	for <qemu-devel@nongnu.org>; Wed, 24 Apr 2019 16:11:21 +0000 (UTC)
+	(envelope-from <mreitz@redhat.com>) id 1hJKtU-00061F-AO
+	for qemu-devel@nongnu.org; Wed, 24 Apr 2019 12:37:15 -0400
+References: <20190410202033.28617-1-mreitz@redhat.com>
+	<20190410202033.28617-3-mreitz@redhat.com>
+	<5a335159-8a98-5c60-657d-920e1eb81065@virtuozzo.com>
+	<f7fa24d8-7608-ecc8-475c-42e3d58ba272@redhat.com>
+	<495b2cb1-4a99-59d7-b7af-97bb3b9a55c1@virtuozzo.com>
+From: Max Reitz <mreitz@redhat.com>
+Message-ID: <18f06b0a-294a-97ac-c12c-e454580cfbd2@redhat.com>
+Date: Wed, 24 Apr 2019 18:36:59 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Wed, 24 Apr 2019 16:03:45 -0000
-From: Corey Bryant <corey.bryant@canonical.com>
-Reply-To: Bug 1823458 <1823458@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <155455149397.14414.11595397789908732027.malonedeb@gac.canonical.com>
-Message-Id: <155612182547.17431.13094176358990192751.launchpad@soybean.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1823458] Re: race condition between
- vhost_net_stop and CHR_EVENT_CLOSED on shutdown crashes qemu
+In-Reply-To: <495b2cb1-4a99-59d7-b7af-97bb3b9a55c1@virtuozzo.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="oQaFWRsXfXlA08YdgtQEfzzND5yJprdln"
+Subject: Re: [Qemu-devel] [PATCH v4 02/11] block: Filtered children access
+ functions
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,201 +28,402 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>
+Cc: Kevin Wolf <kwolf@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
 
-** Also affects: cloud-archive/ocata
-   Importance: Undecided
-       Status: New
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--oQaFWRsXfXlA08YdgtQEfzzND5yJprdln
+From: Max Reitz <mreitz@redhat.com>
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
+ "qemu-block@nongnu.org" <qemu-block@nongnu.org>
+Cc: Kevin Wolf <kwolf@redhat.com>,
+ "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+Message-ID: <18f06b0a-294a-97ac-c12c-e454580cfbd2@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v4 02/11] block: Filtered children access
+ functions
+References: <20190410202033.28617-1-mreitz@redhat.com>
+ <20190410202033.28617-3-mreitz@redhat.com>
+ <5a335159-8a98-5c60-657d-920e1eb81065@virtuozzo.com>
+ <f7fa24d8-7608-ecc8-475c-42e3d58ba272@redhat.com>
+ <495b2cb1-4a99-59d7-b7af-97bb3b9a55c1@virtuozzo.com>
+In-Reply-To: <495b2cb1-4a99-59d7-b7af-97bb3b9a55c1@virtuozzo.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-** Changed in: cloud-archive/ocata
-   Importance: Undecided =3D> Medium
+On 19.04.19 12:23, Vladimir Sementsov-Ogievskiy wrote:
+> 17.04.2019 19:22, Max Reitz wrote:
+>> On 16.04.19 12:02, Vladimir Sementsov-Ogievskiy wrote:
+>>> 10.04.2019 23:20, Max Reitz wrote:
+>>>> What bs->file and bs->backing mean depends on the node.  For filter
+>>>> nodes, both signify a node that will eventually receive all R/W
+>>>> accesses.  For format nodes, bs->file contains metadata and data, an=
+d
+>>>> bs->backing will not receive writes -- instead, writes are COWed to
+>>>> bs->file.  Usually.
+>>>>
+>>>> In any case, it is not trivial to guess what a child means exactly w=
+ith
+>>>> our currently limited form of expression.  It is better to introduce=
 
-** Changed in: cloud-archive/ocata
-       Status: New =3D> Triaged
+>>>> some functions that actually guarantee a meaning:
+>>>>
+>>>> - bdrv_filtered_cow_child() will return the child that receives requ=
+ests
+>>>>     filtered through COW.  That is, reads may or may not be forwarde=
+d
+>>>>     (depending on the overlay's allocation status), but writes never=
+ go to
+>>>>     this child.
+>>>>
+>>>> - bdrv_filtered_rw_child() will return the child that receives reque=
+sts
+>>>>     filtered through some very plain process.  Reads and writes issu=
+ed to
+>>>>     the parent will go to the child as well (although timing, etc. m=
+ay be
+>>>>     modified).
+>>>>
+>>>> - All drivers but quorum (but quorum is pretty opaque to the general=
 
-** Changed in: cloud-archive
-       Status: New =3D> Fix Released
+>>>>     block layer anyway) always only have one of these children: All =
+read
+>>>>     requests must be served from the filtered_rw_child (if it exists=
+), so
+>>>>     if there was a filtered_cow_child in addition, it would not rece=
+ive
+>>>>     any requests at all.
+>>>>     (The closest here is mirror, where all requests are passed on to=
+ the
+>>>>     source, but with write-blocking, write requests are "COWed" to t=
+he
+>>>>     target.  But that just means that the target is a special child =
+that
+>>>>     cannot be introspected by the generic block layer functions, and=
+ that
+>>>>     source is a filtered_rw_child.)
+>>>>     Therefore, we can also add bdrv_filtered_child() which returns t=
+hat
+>>>>     one child (or NULL, if there is no filtered child).
+>>>>
+>>>> Also, many places in the current block layer should be skipping filt=
+ers
+>>>> (all filters or just the ones added implicitly, it depends) when goi=
+ng
+>>>> through a block node chain.  They do not do that currently, but this=
 
--- =
+>>>> patch makes them.
+>>>>
+>>>> One example for this is qemu-img map, which should skip filters and =
+only
+>>>> look at the COW elements in the graph.  The change to iotest 204's
+>>>> reference output shows how using blkdebug on top of a COW node used =
+to
+>>>> make qemu-img map disregard the rest of the backing chain, but with =
+this
+>>>> patch, the allocation in the base image is reported correctly.
+>>>>
+>>>> Furthermore, a note should be made that sometimes we do want to acce=
+ss
+>>>> bs->backing directly.  This is whenever the operation in question is=
+ not
+>>>> about accessing the COW child, but the "backing" child, be it COW or=
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1823458
+>>>> not.  This is the case in functions such as bdrv_open_backing_file()=
+ or
+>>>> whenever we have to deal with the special behavior of @backing as a
+>>>> blockdev option, which is that it does not default to null like all
+>>>> other child references do.
+>>>>
+>>>> Finally, the query functions (query-block and query-named-block-node=
+s)
+>>>> are modified to return any filtered child under "backing", not just
+>>>> bs->backing or COW children.  This is so that filters do not interru=
+pt
+>>>> the reported backing chain.  This changes the output of iotest 184, =
+as
+>>>> the throttled node now appears as a backing child.
+>>>>
+>>>> Signed-off-by: Max Reitz <mreitz@redhat.com>
+>>>> ---
+>>>>    qapi/block-core.json           |   4 +
+>>>>    include/block/block.h          |   1 +
+>>>>    include/block/block_int.h      |  40 +++++--
+>>>>    block.c                        | 210 +++++++++++++++++++++++++++-=
+-----
+>>>>    block/backup.c                 |   8 +-
+>>>>    block/block-backend.c          |  16 ++-
+>>>>    block/commit.c                 |  33 +++---
+>>>>    block/io.c                     |  45 ++++---
+>>>>    block/mirror.c                 |  21 ++--
+>>>>    block/qapi.c                   |  30 +++--
+>>>>    block/stream.c                 |  13 +-
+>>>>    blockdev.c                     |  88 +++++++++++---
+>>>>    migration/block-dirty-bitmap.c |   4 +-
+>>>>    nbd/server.c                   |   6 +-
+>>>>    qemu-img.c                     |  29 ++---
+>>>>    tests/qemu-iotests/184.out     |   7 +-
+>>>>    tests/qemu-iotests/204.out     |   1 +
+>>>>    17 files changed, 411 insertions(+), 145 deletions(-)
+>>>
+>>> really huge... didn't you consider conversion file-by-file?
+>>
+>> Frankly, no, I just didn=E2=80=99t consider it.
+>>
+>> Hm.  I don=E2=80=99t know, 30-patch series always look so frightening.=
 
-Title:
-  race condition between vhost_net_stop and CHR_EVENT_CLOSED on shutdown
-  crashes qemu
+>>
+>>>> diff --git a/block.c b/block.c
+>>>> index 16615bc876..e8f6febda0 100644
+>>>> --- a/block.c
+>>>> +++ b/block.c
+>>>
+>>> [..]
+>>>
+>>>>   =20
+>>>> @@ -3467,14 +3469,17 @@ static int bdrv_reopen_parse_backing(BDRVReo=
+penState *reopen_state,
+>>>>        /*
+>>>>         * Find the "actual" backing file by skipping all links that =
+point
+>>>>         * to an implicit node, if any (e.g. a commit filter node).
+>>>> +     * We cannot use any of the bdrv_skip_*() functions here becaus=
+e
+>>>> +     * those return the first explicit node, while we are looking f=
+or
+>>>> +     * its overlay here.
+>>>>         */
+>>>>        overlay_bs =3D bs;
+>>>> -    while (backing_bs(overlay_bs) && backing_bs(overlay_bs)->implic=
+it) {
+>>>> -        overlay_bs =3D backing_bs(overlay_bs);
+>>>> +    while (overlay_bs->backing && bdrv_filtered_bs(overlay_bs)->imp=
+licit) {
+>>>
+>>> So, you don't want to skip implicit filters with 'file' child? Then, =
+why not to use
+>>> child_bs(overlay_bs->backing), like in following if condition?
+>>
+>> I think it was an artifact of writing the patch.  I started with
+>> bdrv_filtered_bs() and then realized this depends on ->backing,
+>> actually.  There was no functional difference so I left it as it was.
+>>
+>> But you=E2=80=99re right, it is more clear to use child_bs(overlay_bs-=
+>backing)
+>> isntead.
+>>
+>>> Could we instead make backing-based filters equal to file-based, to m=
+ake it possible
+>>> to use file-based filters in backing-chain related scenarios (like up=
+coming copy-on-read
+>>> filter for stream)? So, to expand backing-chain concept to include fi=
+lters with file child?
+>>
+>> If I understand you correctly, that=E2=80=99s basically the purpose of=
+ this
+>> series and especially this patch here.  As far as it is possible and
+>> reasonable, I want filters that use bs->backing and bs->file behave th=
+e
+>> same.
+>>
+>> However, there are cases where this is not possible and
+>> bdrv_reopen_parse_backing() is one such case.  bs->backing and bs->fil=
+e
+>> correspond to QAPI names, namely 'backing' and 'file'.  If that
+>> distinction was already visible to the user, we cannot change it now.
+>>
+>> We definitely cannot make file-based filters use bs->backing now becau=
+se
+>> you can create them over QAPI and they use 'file' as their child name.=
 
-Status in Ubuntu Cloud Archive:
-  Fix Released
-Status in Ubuntu Cloud Archive mitaka series:
-  Triaged
-Status in Ubuntu Cloud Archive ocata series:
-  Triaged
-Status in QEMU:
-  Fix Released
-Status in qemu package in Ubuntu:
-  Fix Released
-Status in qemu source package in Trusty:
-  Won't Fix
-Status in qemu source package in Xenial:
-  Fix Committed
-Status in qemu source package in Bionic:
-  Fix Released
-Status in qemu source package in Cosmic:
-  Fix Released
-Status in qemu source package in Disco:
-  Fix Released
+>> Can we make backing-based filters use bs->file?  Seems more likely,
+>> because all of them are implicit nodes, so the user usually doesn=E2=80=
+=99t see
+>> them.  But usually isn=E2=80=99t always; they do become user-visible o=
+nce the
+>> user specifies a node-name for mirror or commit.
+>>
+>> I found it more reasonable to introduce new functions that explicitly
+>> express what kind of child they expect and then apply them everywhere =
+as
+>> I saw fit, instead of making the mirror/commit filter drivers use
+>> bs->file and hope it works; not least because I=E2=80=99d still have t=
+o go
+>> through the whole block layer and check every instance of bs->backing =
+to
+>> see whether it really needs bs->backing or whether it should use eithe=
+r
+>> of bs->backing or bs->file.
+>>
+>>>> +        overlay_bs =3D bdrv_filtered_bs(overlay_bs);
+>>>>        }
+>>>>   =20
+>>>>        /* If we want to replace the backing file we need some extra =
+checks */
+>>>> -    if (new_backing_bs !=3D backing_bs(overlay_bs)) {
+>>>> +    if (new_backing_bs !=3D child_bs(overlay_bs->backing)) { >     =
+      /* Check for implicit nodes between bs and its backing file */
+>>>>            if (bs !=3D overlay_bs) {
+>>>>                error_setg(errp, "Cannot change backing link if '%s' =
+has "
+>>>
+>>> [..]
+>>>
+>>>> @@ -4203,8 +4208,8 @@ int bdrv_change_backing_file(BlockDriverState =
+*bs,
+>>>>    BlockDriverState *bdrv_find_overlay(BlockDriverState *active,
+>>>>                                        BlockDriverState *bs)
+>>>>    {
+>>>> -    while (active && bs !=3D backing_bs(active)) {
+>>>> -        active =3D backing_bs(active);
+>>>> +    while (active && bs !=3D bdrv_filtered_bs(active)) {
+>>>
+>>> hmm and here you actually support backing-chain with file-child-based=
+ filters in it..
+>>
+>> Yes, because this is not about the QAPI 'backing' link.  This function=
 
-Bug description:
-  [impact]
+>> should continue to work even if there are filters in the backing chain=
+=2E
+>=20
+> this is a generic function to find overlay in backing chain and it may =
+be used from different places,
+> for example it is used in Andrey's series about filter for block-stream=
+=2E
 
-  on shutdown of a guest, there is a race condition that results in qemu
-  crashing instead of normally shutting down.  The bt looks similar to
-  this (depending on the specific version of qemu, of course; this is
-  taken from 2.5 version of qemu):
+Well, all places that use it accept backing chains with filters inside
+of them.
 
-  (gdb) bt
-  #0  __GI___pthread_mutex_lock (mutex=3D0x0) at ../nptl/pthread_mutex_lock=
-.c:66
-  #1  0x00005636c0bc4389 in qemu_mutex_lock (mutex=3Dmutex@entry=3D0x0) at =
-/build/qemu-7I4i1R/qemu-2.5+dfsg/util/qemu-thread-posix.c:73
-  #2  0x00005636c0988130 in qemu_chr_fe_write_all (s=3Ds@entry=3D0x0, buf=
-=3Dbuf@entry=3D0x7ffe65c086a0 "\v", len=3Dlen@entry=3D20) at /build/qemu-7I=
-4i1R/qemu-2.5+dfsg/qemu-char.c:205
-  #3  0x00005636c08f3483 in vhost_user_write (msg=3Dmsg@entry=3D0x7ffe65c08=
-6a0, fds=3Dfds@entry=3D0x0, fd_num=3Dfd_num@entry=3D0, dev=3D0x5636c1bf6b70=
-, dev=3D0x5636c1bf6b70)
-  =C2=A0=C2=A0=C2=A0=C2=A0at /build/qemu-7I4i1R/qemu-2.5+dfsg/hw/virtio/vho=
-st-user.c:195
-  #4  0x00005636c08f411c in vhost_user_get_vring_base (dev=3D0x5636c1bf6b70=
-, ring=3D0x7ffe65c087e0) at /build/qemu-7I4i1R/qemu-2.5+dfsg/hw/virtio/vhos=
-t-user.c:364
-  #5  0x00005636c08efff0 in vhost_virtqueue_stop (dev=3Ddev@entry=3D0x5636c=
-1bf6b70, vdev=3Dvdev@entry=3D0x5636c2853338, vq=3D0x5636c1bf6d00, idx=3D1) =
-at /build/qemu-7I4i1R/qemu-2.5+dfsg/hw/virtio/vhost.c:895
-  #6  0x00005636c08f2944 in vhost_dev_stop (hdev=3Dhdev@entry=3D0x5636c1bf6=
-b70, vdev=3Dvdev@entry=3D0x5636c2853338) at /build/qemu-7I4i1R/qemu-2.5+dfs=
-g/hw/virtio/vhost.c:1262
-  #7  0x00005636c08db2a8 in vhost_net_stop_one (net=3D0x5636c1bf6b70, dev=
-=3Ddev@entry=3D0x5636c2853338) at /build/qemu-7I4i1R/qemu-2.5+dfsg/hw/net/v=
-host_net.c:293
-  #8  0x00005636c08dbe5b in vhost_net_stop (dev=3Ddev@entry=3D0x5636c285333=
-8, ncs=3D0x5636c209d110, total_queues=3Dtotal_queues@entry=3D1) at /build/q=
-emu-7I4i1R/qemu-2.5+dfsg/hw/net/vhost_net.c:371
-  #9  0x00005636c08d7745 in virtio_net_vhost_status (status=3D7 '\a', n=3D0=
-x5636c2853338) at /build/qemu-7I4i1R/qemu-2.5+dfsg/hw/net/virtio-net.c:150
-  #10 virtio_net_set_status (vdev=3D<optimized out>, status=3D<optimized ou=
-t>) at /build/qemu-7I4i1R/qemu-2.5+dfsg/hw/net/virtio-net.c:162
-  #11 0x00005636c08ec42c in virtio_set_status (vdev=3D0x5636c2853338, val=
-=3D<optimized out>) at /build/qemu-7I4i1R/qemu-2.5+dfsg/hw/virtio/virtio.c:=
-624
-  #12 0x00005636c098fed2 in vm_state_notify (running=3Drunning@entry=3D0, s=
-tate=3Dstate@entry=3DRUN_STATE_SHUTDOWN) at /build/qemu-7I4i1R/qemu-2.5+dfs=
-g/vl.c:1605
-  #13 0x00005636c089172a in do_vm_stop (state=3DRUN_STATE_SHUTDOWN) at /bui=
-ld/qemu-7I4i1R/qemu-2.5+dfsg/cpus.c:724
-  #14 vm_stop (state=3DRUN_STATE_SHUTDOWN) at /build/qemu-7I4i1R/qemu-2.5+d=
-fsg/cpus.c:1407
-  #15 0x00005636c085d240 in main_loop_should_exit () at /build/qemu-7I4i1R/=
-qemu-2.5+dfsg/vl.c:1883
-  #16 main_loop () at /build/qemu-7I4i1R/qemu-2.5+dfsg/vl.c:1931
-  #17 main (argc=3D<optimized out>, argv=3D<optimized out>, envp=3D<optimiz=
-ed out>) at /build/qemu-7I4i1R/qemu-2.5+dfsg/vl.c:4683
+> It is used from qmp_block_commit, isn't it about QAPI?
 
-  [test case]
+By "QAPI 'backing' link" I mean the user-visible block graph.  Hm.  I
+wrote in my other mail that you could use query-named-block-nodes to see
+that graph; apparently you can=E2=80=99t.  So besides x-debug-query-block=
+-graph,
+we still don=E2=80=99t have any facility to query the block graph?  I don=
+=E2=80=99t know
+what to say.
 
-  unfortunately since this is a race condition, it's very hard to
-  arbitrarily reproduce; it depends very much on the overall
-  configuration of the guest as well as how exactly it's shut down -
-  specifically, its vhost user net must be closed from the host side at
-  a specific time during qemu shutdown.
+Anyway, you can still construct the graph with blockdev-add, so it is
+user-visible.  And in that block graph, there is a 'backing' link, and
+there is a 'file' link -- this is what I mean with "QAPI link".
 
-  I have someone with such a setup who has reported to me their setup is
-  able to reproduce this reliably, but the config is too complex for me
-  to reproduce so I have relied on their reproduction and testing to
-  debug and craft the patch for this.
+We have commands that are abstract and don=E2=80=99t work on specific gra=
+ph
+links.  For instance, block-commit commits across a backing chain, so it
+doesn=E2=80=99t matter whether the graph link is called 'backing' or what=
+ever,
+what is important is that it=E2=80=99s a COW link.  But we should also ig=
+nore
+filters on the way, so this patch makes block-commit and others use
+those more abstract child access functions.
 
-  [regression potential]
+But whenever it is about exactly the "file" or the "backing" link, we
+have to use bs->file and bs->backing, respectively.  That's just how it
+currently is.
 
-  the change adds a flag to prevent repeated calls to vhost_net_stop().
-  This also prevents any calls to vhost_net_cleanup() from
-  net_vhost_user_event().  Any regression would be seen when stopping
-  and/or cleaning up a vhost net.  Regressions might include failure to
-  hot-remove a vhost net from a guest, or failure to cleanup (i.e. mem
-  leak), or crashes during cleanup or stopping a vhost net.
+>>>> +        active =3D bdrv_filtered_bs(active);
+>>>>        }
+>>>>   =20
+>>>>        return active;
+>>>> @@ -4226,11 +4231,11 @@ bool bdrv_is_backing_chain_frozen(BlockDrive=
+rState *bs, BlockDriverState *base,
+>>>>    {
+>>>>        BlockDriverState *i;
+>>>>   =20
+>>>> -    for (i =3D bs; i !=3D base; i =3D backing_bs(i)) {
+>>>> +    for (i =3D bs; i !=3D base; i =3D child_bs(i->backing)) {
+>>>
+>>> and here don't..
+>>
+>> Yes, because this function is about the QAPI 'backing' link.
+>=20
+> And this again a generic thing, that may be used in same places as bdrv=
+_find_overlay,
 
-  [other info]
+But it isn=E2=80=99t.
 
-  this was originally seen in the 2.5 version of qemu - specifically,
-  the UCA version in trusty-mitaka (which uses the xenial qemu
-  codebase).
+> and it is used in series about block-stream filter too. So, for further=
+ developments
+> we'll have to keep in mind all these differences between generic block =
+layer functions,
+> which supports .file children inside backing chain and which are not...=
 
-  After discussion upstream, it appears this was fixed upstream by
-  commit e7c83a885f8, which is included starting in version 2.9.
-  However, this commit depends on at least commit 5345fdb4467, and
-  likely more other previous commits, which make widespread code changes
-  and are unsuitable to backport.  Therefore this seems like it should
-  be specifically worked around in the Xenial qemu codebase.
 
-  =
+I was wrong about bdrv_is_backing_chain_frozen(), if that helps (as I
+wrote in my other (previous) mail).
 
-  The specific race condition for this (in the qemu 2.5 code version) is:
+But for example bdrv_set_backing_hd() always has to use bs->backing,
+because that=E2=80=99s what it=E2=80=99s about (and I do change its descr=
+iptive comment
+to reflect that, so you don=E2=80=99t need to keep it in mind).  Same for=
 
-  as shown in above bt, thread A starts shutting down qemu, e.g.:
+bdrv_open_backing_file().
 
-  vm_stop->do_vm_stop->vm_state_notify
-  =C2=A0=C2=A0virtio_set_status
-  =C2=A0=C2=A0=C2=A0=C2=A0virtio_net_set_status
-  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0virtio_net_vhost_status
+Hm, what other cases are there...
 
-  in this function, code gets to an if-else check for
-  (!n->vhost_started), which is false (i.e. vhost_started is true) and
-  enters the else code block, which calls vhost_net_stop() and then sets
-  n->vhost_started to false.
+bdrv_reopen_parse_backing(): Fundamentally, this too is about the
+user-visible "backing" link (as specified through x-blockdev-reopen).
+But the loop it contains is more difficult to translate than I had
+thought.  At some point, there needs to be a bs->backing link, because
+that is what this function is about, but it should also skip all
+implicit filters in the way, I think.  So e.g. this should be recognized:=
 
-  While thread A is inside vhost_net_stop(), thread B is triggered by
-  the vhost net chr handler with a user event and calls:
 
-  net_vhost_user_event
-  =C2=A0=C2=A0qmp_set_link (from case CHR_EVENT_CLOSED)
-  =C2=A0=C2=A0=C2=A0=C2=A0virtio_net_set_link_status (via ->link_status_cha=
-nged)
-  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0virtio_net_set_status
-  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0virtio_net_vhost_status
+bs  ---backing-->  COR ---file-->  base
 
-  notice thread B has now reached the same function that thread A is in;
-  since the checks in the function have not changed, thread B follows
-  the same path that thread A followed, and enters vhost_net_stop().
+@overlay_bs should be COR, I think...?  I mean, as long as COR is an
+implicit node.  So the loop really should use bdrv_filtered_bs()
+everywhere, and then the same afterwards.  I think that we should also
+ensure that @bs can support a ->backing child, but how would I check
+that?  Maybe it=E2=80=99s safe to just omit such a check...
 
-  Since thread A has already shut down and cleaned up some of the
-  internals, once thread B starts trying to also clean up things, it
-  segfaults as the shown in the bt.
+But then another issue comes in: The link to replace (in the above case
+from "COR" to "base") is no longer necessarily a backing link.  So
+bdrv_reopen_commit() has to be capable of replacing both bs->backing and
+bs->file.
 
-  Avoiding only this duplicate call to vhost_net_stop() is required, but
-  not enough - let's continue to look at what thread B does after its
-  call to qmp_set_link() returns:
+Actually, how does bdrv_reopen_commit() handle implicit nodes at all?
+bdrv_reopen_parse_backing() just sets reopen_state->replace_backing_bs
+and ->new_backing_bs.  It doesn=E2=80=99t communicate anything about over=
+lay_bs.
+ bdrv_reopen_commit() then asserts that !bs->backing->bs->implicit and
+replaces bs->backing.  So it seems to just fail on the implicit nodes
+that bdrv_reopen_parse_backing() took care to skip...
 
-  net_vhost_user_event
-  =C2=A0=C2=A0vhost_user_stop
-  =C2=A0=C2=A0=C2=A0=C2=A0vhost_net_cleanup
-  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0vhost_dev_cleanup
 
-  However, in main() qemu registers atexit(net_cleanup()), which does:
-  net_cleanup
-  =C2=A0=C2=A0qemu_del_nic (or qemu_del_net_client, depending on ->type)
-  =C2=A0=C2=A0=C2=A0=C2=A0qemu_cleanup_net_client
-  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0vhost_user_cleanup (via ->cleanup)
-  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0vhost_net_cleanup
-  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0vhost_dev_cle=
-anup
+OK, what else...  bdrv_reopen_prepare() checks
+reopen_state->bs->backing, which I claim is correct because while there
+may be implicit filters in the chain, the first link has to be a
+->backing link.
 
-  and the duplicate vhost_dev_cleanup fails assertions since things were
-  already cleaned up.  Additionally, if thread B's call to
-  vhost_dev_cleanup() comes before thread A finishes vhost_net_stop(),
-  then that will call vhost_dev_stop() and vhost_disable_notifiers()
-  which both try to access things that have been freed/cleared/disabled
-  by vhost_dev_cleanup().
+bdrv_backing_overridden() has to query bs->backing because this function
+is used when it is about a specific characteristic of the backing link:
+There is a non-null default (given by the image header), so if the
+current bs->backing matches this default, you do not have to specify the
+backing filename in either blockdev-add or a filename.  Same in
+bdrv_refresh_filename().
 
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/cloud-archive/+bug/1823458/+subscriptions
+
+I hope that was all...?
+
+Max
+
+
+--oQaFWRsXfXlA08YdgtQEfzzND5yJprdln
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAlzAkKsACgkQ9AfbAGHV
+z0BPwgf+MkCce7cM9USU6fLSgwoVPqpzolIxKOvvROu9LgrwAmZEQvhb9pG2ApBe
+5nttwz9I3oHrRd6Y1aZLFRL7c45GpKiSQk2eEhX+41za4jz+OfhCBAXjdxydytBw
+x8GJ88Ussi3aiLxsAOXgJXulle9dHm1Xz4Y8mlTD7j1AmA2e/iAwmvmwn6/i4eN6
+mMkkWW6MjRHB9kvELy5viqsqVanu4P/CBNXOUPgirSd8AXGu4WlJAlAgDglAQSld
+BSSqrJNlDGvMM5Cvh7ZANmfsaWcKLjf5vzSwsYZoMOA2NpGnMcYQtusbAexbWs8+
+XwXxQi/jpOtwjGZPf4CNeOJkznZahA==
+=xFtm
+-----END PGP SIGNATURE-----
+
+--oQaFWRsXfXlA08YdgtQEfzzND5yJprdln--
