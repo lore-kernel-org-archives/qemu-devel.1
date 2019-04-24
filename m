@@ -2,49 +2,49 @@ Return-Path: <SRS0=3XOk=S2=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS autolearn=ham autolearn_force=no
+X-Spam-Status: No, score=-0.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 04420C10F11
-	for <qemu-devel@archiver.kernel.org>; Wed, 24 Apr 2019 05:27:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D89E8C10F11
+	for <qemu-devel@archiver.kernel.org>; Wed, 24 Apr 2019 05:27:32 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id CD112218D3
-	for <qemu-devel@archiver.kernel.org>; Wed, 24 Apr 2019 05:27:22 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CD112218D3
+	by mail.kernel.org (Postfix) with ESMTPS id AC6C62089F
+	for <qemu-devel@archiver.kernel.org>; Wed, 24 Apr 2019 05:27:32 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AC6C62089F
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:36002 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:36004 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hJARG-0006ee-1S
-	for qemu-devel@archiver.kernel.org; Wed, 24 Apr 2019 01:27:22 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:41103)
+	id 1hJARP-0006ki-Tc
+	for qemu-devel@archiver.kernel.org; Wed, 24 Apr 2019 01:27:31 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:41172)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1hJAPg-0005Jn-9r
-	for qemu-devel@nongnu.org; Wed, 24 Apr 2019 01:25:46 -0400
+	(envelope-from <bounces@canonical.com>) id 1hJAPl-0005Y6-Rn
+	for qemu-devel@nongnu.org; Wed, 24 Apr 2019 01:25:51 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1hJAPd-0004zz-Kq
-	for qemu-devel@nongnu.org; Wed, 24 Apr 2019 01:25:44 -0400
-Received: from indium.canonical.com ([91.189.90.7]:35566)
+	(envelope-from <bounces@canonical.com>) id 1hJAPi-00058r-Ae
+	for qemu-devel@nongnu.org; Wed, 24 Apr 2019 01:25:47 -0400
+Received: from indium.canonical.com ([91.189.90.7]:35774)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1hJAPc-0004qF-Kc
-	for qemu-devel@nongnu.org; Wed, 24 Apr 2019 01:25:40 -0400
+	id 1hJAPg-00050T-7G
+	for qemu-devel@nongnu.org; Wed, 24 Apr 2019 01:25:46 -0400
 Received: from loganberry.canonical.com ([91.189.90.37])
 	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1hJAPZ-0002M7-Q6
-	for <qemu-devel@nongnu.org>; Wed, 24 Apr 2019 05:25:37 +0000
+	id 1hJAPd-0002Fd-G6
+	for <qemu-devel@nongnu.org>; Wed, 24 Apr 2019 05:25:41 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id BF76E2E805D
-	for <qemu-devel@nongnu.org>; Wed, 24 Apr 2019 05:25:37 +0000 (UTC)
+	by loganberry.canonical.com (Postfix) with ESMTP id 7732B2E805D
+	for <qemu-devel@nongnu.org>; Wed, 24 Apr 2019 05:25:41 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Wed, 24 Apr 2019 05:18:56 -0000
-From: Thomas Huth <1816052@bugs.launchpad.net>
+Date: Wed, 24 Apr 2019 05:20:04 -0000
+From: Thomas Huth <1810433@bugs.launchpad.net>
 To: qemu-devel@nongnu.org
 X-Launchpad-Notification-Type: bug
 X-Launchpad-Bug: product=qemu; status=Fix Released; importance=Undecided;
@@ -52,23 +52,22 @@ X-Launchpad-Bug: product=qemu; status=Fix Released; importance=Undecided;
 X-Launchpad-Bug-Information-Type: Public
 X-Launchpad-Bug-Private: no
 X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: berrange jbicha kraxel-redhat krislema2 likexu
-	pmaydell
-X-Launchpad-Bug-Reporter: Daniel Berrange (berrange)
+X-Launchpad-Bug-Commenters: matwey-kornilov pmaydell
+X-Launchpad-Bug-Reporter: Matwey V. Kornilov (matwey-kornilov)
 X-Launchpad-Bug-Modifier: Thomas Huth (th-huth)
-References: <155024186658.3618.3655538630796654144.malonedeb@wampee.canonical.com>
+References: <154653873624.24628.7091357257162393259.malonedeb@gac.canonical.com>
 Message-Id:
- <155608313742.13705.13656253369295250867.launchpad@gac.canonical.com>
+ <155608320501.14043.14816119070594708436.launchpad@gac.canonical.com>
 X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
 X-Launchpad-Message-For: qemu-devel-ml
 Precedence: bulk
 X-Generated-By: Launchpad (canonical.com); Revision="18928";
 	Instance="launchpad-lazr.conf"
-X-Launchpad-Hash: 6be7dbdba4f2b92cf188967f86aadfdcc8edf251
+X-Launchpad-Hash: 0f38fefdb2920c461b63078196eb645d4b6529ea
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 91.189.90.7
-Subject: [Qemu-devel] [Bug 1816052] Re: qemu system emulator fails to start
- if no sound card is present on host
+Subject: [Qemu-devel] [Bug 1810433] Re: aarch64-linux-user master:
+ inconsistent pwrite behaviour
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 List-Id: <qemu-devel.nongnu.org>
@@ -79,11 +78,11 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1816052 <1816052@bugs.launchpad.net>
+Reply-To: Bug 1810433 <1810433@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190424051856.MmZvKey90-FFiCPSSVpu478bqeKqFRqAsH3A76M5R1Q@z>
+Message-ID: <20190424052004.YxrwZsvvSP8EHLM_-X2vhNvidBufAV2jj4n8dgg0gNI@z>
 
 ** Changed in: qemu
        Status: Fix Committed =3D> Fix Released
@@ -92,110 +91,68 @@ Message-ID: <20190424051856.MmZvKey90-FFiCPSSVpu478bqeKqFRqAsH3A76M5R1Q@z>
 
 You received this bug notification because you are a member of qemu-
 devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1816052
+https://bugs.launchpad.net/bugs/1810433
 
 Title:
-  qemu system emulator fails to start if no sound card is present on
-  host
+  aarch64-linux-user master: inconsistent pwrite behaviour
 
 Status in QEMU:
   Fix Released
 
 Bug description:
-  A plain build from git master at
-  81dbcfa9e1d8bab3f7c4cc923c0b40cd666f374f on Fedora 29 x86_64 host,
-  with no options passed to configure.
+  Hello,
 
-  Trying to launch QEMU on a  host with no audio card present:
+  I am running aarch64-linux-user from master, commit
+  20d6c7312f1b812bb9c750f4087f69ac8485cc90
 
-  # ls /dev/snd/
-  seq  timer
+  And I've found the following inconsistent emulation of pwrite() call when=
+ buf=3D=3DNULL and len=3D0.
+  Minimal reproducible sample is the following:
 
-  It will fail to initialize alsa and abort startup:
+  #define _GNU_SOURCE
+  #include <stdlib.h>
+  #include <stdio.h>
+  #include <unistd.h>
+  #include <sys/types.h>
+  #include <sys/stat.h>
+  #include <fcntl.h>
+  #include <string.h>
 
-  # qemu-system-x86_64 -cdrom Fedora-Workstation-Live-x86_64-29-1.2.iso  -m=
- 4000 -vnc 0.0.0.0:1 =
+  /*
+  =C2=A0System                  | Result
+  -------------------------+----------------
+  =C2=A0Native x86_64 4.12.14   | pwrite ret =3D 0
+  =C2=A0Native aarch64 4.4.159  | pwrite ret =3D 0
+  =C2=A0qemu-aarch64 at x86_64  | pwrite ret =3D -1
+  =C2=A0=C2=A0=C2=A0( 20d6c7312f1b8 )     |
+  */
 
-  ALSA lib confmisc.c:767:(parse_card) cannot find card '0'
-  ALSA lib conf.c:4555:(_snd_config_evaluate) function snd_func_card_driver=
- returned error: No such file or directory
-  ALSA lib confmisc.c:392:(snd_func_concat) error evaluating strings
-  ALSA lib conf.c:4555:(_snd_config_evaluate) function snd_func_concat retu=
-rned error: No such file or directory
-  ALSA lib confmisc.c:1246:(snd_func_refer) error evaluating name
-  ALSA lib conf.c:4555:(_snd_config_evaluate) function snd_func_refer retur=
-ned error: No such file or directory
-  ALSA lib conf.c:5034:(snd_config_expand) Evaluate error: No such file or =
-directory
-  ALSA lib pcm.c:2565:(snd_pcm_open_noupdate) Unknown PCM default
-  alsa: Could not initialize DAC
-  alsa: Failed to open `default':
-  alsa: Reason: No such file or directory
-  ALSA lib confmisc.c:767:(parse_card) cannot find card '0'
-  ALSA lib conf.c:4555:(_snd_config_evaluate) function snd_func_card_driver=
- returned error: No such file or directory
-  ALSA lib confmisc.c:392:(snd_func_concat) error evaluating strings
-  ALSA lib conf.c:4555:(_snd_config_evaluate) function snd_func_concat retu=
-rned error: No such file or directory
-  ALSA lib confmisc.c:1246:(snd_func_refer) error evaluating name
-  ALSA lib conf.c:4555:(_snd_config_evaluate) function snd_func_refer retur=
-ned error: No such file or directory
-  ALSA lib conf.c:5034:(snd_config_expand) Evaluate error: No such file or =
-directory
-  ALSA lib pcm.c:2565:(snd_pcm_open_noupdate) Unknown PCM default
-  alsa: Could not initialize DAC
-  alsa: Failed to open `default':
-  alsa: Reason: No such file or directory
-  init fail
-  audio: Failed to create voice `pcspk'
-  qemu-system-x86_64: Initialization of device isa-pcspk failed: Initializi=
-ng audio voice failed
+  int main(int argc, char** argv) {
+  =C2=A0int fd =3D open("test.dat", O_CREAT | O_RDWR, 0644);
+  =C2=A0if (fd < 0) {
+  =C2=A0=C2=A0perror("open");
+  =C2=A0=C2=A0return 1;
+  =C2=A0}
 
-  =
+  =C2=A0int ret =3D fallocate(fd, 0, 0, 1000);
+  =C2=A0if (ret < 0) {
+  =C2=A0=C2=A0perror("fallocate");
+  =C2=A0=C2=A0return 1;
+  =C2=A0}
 
-  git bisect blames this change:
+  =C2=A0ssize_t ret_pwrite =3D pwrite(fd, NULL, 0, 0);
+  =C2=A0printf("pwrite ret =3D %ld\n", ret_pwrite);
+
+  =C2=A0close(fd);
+
+  =C2=A0return 0;
+  }
 
   =
 
-    commit 6a48541873f14b597630283f8f5397674ad82ea9 (HEAD, refs/bisect/bad)
-    Author: Gerd Hoffmann <kraxel@redhat.com>
-    Date:   Thu Jan 24 12:20:55 2019 +0100
-
-      audio: probe audio drivers by default
-      =
-
-      Add the drivers listed in audio_possible_drivers to audio_drv_list,
-      using the try-* variants.  That way the probable drivers are compiled=
- by
-      default if possible.
-      =
-
-      Additioal tweaks:
-        linux: reorder to: pa alsa sdl oss.
-        *bsd: drop pa.
-      =
-
-      Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
-      Message-id: 20190124112055.547-7-kraxel@redhat.com
-
-  =
-
-  This changed our probe order:
-
-     Linux)
-    -  audio_drv_list=3D"oss"
-    +  audio_drv_list=3D"try-pa try-alsa try-sdl oss"
-
-  After some debugging I can see that 'audio_init' successfully
-  initializes the alsa driver.
-
-  When the pcspk devices goes to AUD_open_out though, the alsa driver
-  fails spewing the above text to stderr and thus causes QEMU to fail.
-
-  This looks very much like the ALSA driver in QEMU is broken -
-  audio_init() should not have succeeded unless the ALSA driver knew it
-  could later succesfully honour AUD_open_out.
+  Please note, that the same binary executable prints different output at n=
+ative aarch64 platform and under aarch64-linux-user
 
 To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1816052/+subscriptions
+https://bugs.launchpad.net/qemu/+bug/1810433/+subscriptions
 
