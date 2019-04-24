@@ -1,29 +1,34 @@
-Received: from eggs.gnu.org ([209.51.188.92]:38833)
+Received: from eggs.gnu.org ([209.51.188.92]:39057)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <brijesh.singh@amd.com>) id 1hJKTx-0002Ph-2t
-	for qemu-devel@nongnu.org; Wed, 24 Apr 2019 12:10:52 -0400
+	(envelope-from <bounces@canonical.com>) id 1hJKUX-0002tq-46
+	for qemu-devel@nongnu.org; Wed, 24 Apr 2019 12:11:27 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <brijesh.singh@amd.com>) id 1hJKTo-0004Fg-7A
-	for qemu-devel@nongnu.org; Wed, 24 Apr 2019 12:10:48 -0400
-Received: from mail-eopbgr780088.outbound.protection.outlook.com
-	([40.107.78.88]:16416
-	helo=NAM03-BY2-obe.outbound.protection.outlook.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <brijesh.singh@amd.com>)
-	id 1hJKTn-0003kU-Ug
-	for qemu-devel@nongnu.org; Wed, 24 Apr 2019 12:10:40 -0400
-From: "Singh, Brijesh" <brijesh.singh@amd.com>
-Date: Wed, 24 Apr 2019 16:10:09 +0000
-Message-ID: <20190424160942.13567-9-brijesh.singh@amd.com>
-References: <20190424160942.13567-1-brijesh.singh@amd.com>
-In-Reply-To: <20190424160942.13567-1-brijesh.singh@amd.com>
-Content-Language: en-US
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <6B8DECB3663B0344BE95803E07CBE394@namprd12.prod.outlook.com>
-Content-Transfer-Encoding: base64
+	(envelope-from <bounces@canonical.com>) id 1hJKUV-0005iR-3o
+	for qemu-devel@nongnu.org; Wed, 24 Apr 2019 12:11:25 -0400
+Received: from indium.canonical.com ([91.189.90.7]:51146)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1hJKUU-0005eS-TU
+	for qemu-devel@nongnu.org; Wed, 24 Apr 2019 12:11:23 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1hJKUT-0000oP-3y
+	for <qemu-devel@nongnu.org>; Wed, 24 Apr 2019 16:11:21 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 1B5112E8042
+	for <qemu-devel@nongnu.org>; Wed, 24 Apr 2019 16:11:21 +0000 (UTC)
 MIME-Version: 1.0
-Subject: [Qemu-devel] [RFC PATCH v1 08/10] KVM: X86: Introduce
- KVM_HC_PAGE_ENC_STATUS hypercall
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Wed, 24 Apr 2019 16:03:45 -0000
+From: Corey Bryant <corey.bryant@canonical.com>
+Reply-To: Bug 1823458 <1823458@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <155455149397.14414.11595397789908732027.malonedeb@gac.canonical.com>
+Message-Id: <155612182547.17431.13094176358990192751.launchpad@soybean.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1823458] Re: race condition between
+ vhost_net_stop and CHR_EVENT_CLOSED on shutdown crashes qemu
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,122 +37,201 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "kvm@vger.kernel.org" <kvm@vger.kernel.org>
-Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "Singh, Brijesh" <brijesh.singh@amd.com>, Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>, "H. Peter Anvin" <hpa@zytor.com>, Paolo Bonzini <pbonzini@redhat.com>, =?utf-8?B?UmFkaW0gS3LEjW3DocWZ?= <rkrcmar@redhat.com>, Joerg Roedel <joro@8bytes.org>, Borislav Petkov <bp@suse.de>, "Lendacky,
-	Thomas" <Thomas.Lendacky@amd.com>, "x86@kernel.org" <x86@kernel.org>, "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+To: qemu-devel@nongnu.org
 
-VGhlIGh5cGVyY2FsbCBjYW4gYmUgdXNlZCBieSB0aGUgU0VWIGd1ZXN0IHRvIG5vdGlmeSB0aGUg
-cGFnZSBlbmNyeXB0aW9uDQpzdGF0dXMgdG8gdGhlIGh5cGVydmlzb3IuIFRoZSBoeXBlcmNhbGwg
-c2hvdWxkIGJlIGludm9rZWQgb25seSB3aGVuDQp0aGUgZW5jcnlwdGlvbiBhdHRyaWJ1dGUgaXMg
-Y2hhbmdlZCBmcm9tIGVuY3J5cHRlZCAtPiBkZWNyeXB0ZWQgYW5kIHZpY2UNCnZlcnNhLiBCeSBk
-ZWZhdWx0IGFsbCB0aGUgZ3Vlc3QgcGFnZXMgc2hvdWxkIGJlIGNvbnNpZGVyZWQgZW5jcnlwdGVk
-Lg0KDQpDYzogVGhvbWFzIEdsZWl4bmVyIDx0Z2x4QGxpbnV0cm9uaXguZGU+DQpDYzogSW5nbyBN
-b2xuYXIgPG1pbmdvQHJlZGhhdC5jb20+DQpDYzogIkguIFBldGVyIEFudmluIiA8aHBhQHp5dG9y
-LmNvbT4NCkNjOiBQYW9sbyBCb256aW5pIDxwYm9uemluaUByZWRoYXQuY29tPg0KQ2M6ICJSYWRp
-bSBLcsSNbcOhxZkiIDxya3JjbWFyQHJlZGhhdC5jb20+DQpDYzogSm9lcmcgUm9lZGVsIDxqb3Jv
-QDhieXRlcy5vcmc+DQpDYzogQm9yaXNsYXYgUGV0a292IDxicEBzdXNlLmRlPg0KQ2M6IFRvbSBM
-ZW5kYWNreSA8dGhvbWFzLmxlbmRhY2t5QGFtZC5jb20+DQpDYzogeDg2QGtlcm5lbC5vcmcNCkNj
-OiBrdm1Admdlci5rZXJuZWwub3JnDQpDYzogbGludXgta2VybmVsQHZnZXIua2VybmVsLm9yZw0K
-U2lnbmVkLW9mZi1ieTogQnJpamVzaCBTaW5naCA8YnJpamVzaC5zaW5naEBhbWQuY29tPg0KLS0t
-DQogRG9jdW1lbnRhdGlvbi92aXJ0dWFsL2t2bS9oeXBlcmNhbGxzLnR4dCB8IDE0ICsrKysrDQog
-YXJjaC94ODYvaW5jbHVkZS9hc20va3ZtX2hvc3QuaCAgICAgICAgICB8ICAyICsNCiBhcmNoL3g4
-Ni9rdm0vc3ZtLmMgICAgICAgICAgICAgICAgICAgICAgIHwgNjkgKysrKysrKysrKysrKysrKysr
-KysrKysrDQogYXJjaC94ODYva3ZtL3ZteC92bXguYyAgICAgICAgICAgICAgICAgICB8ICAxICsN
-CiBhcmNoL3g4Ni9rdm0veDg2LmMgICAgICAgICAgICAgICAgICAgICAgIHwgIDUgKysNCiBpbmNs
-dWRlL3VhcGkvbGludXgva3ZtX3BhcmEuaCAgICAgICAgICAgIHwgIDEgKw0KIDYgZmlsZXMgY2hh
-bmdlZCwgOTIgaW5zZXJ0aW9ucygrKQ0KDQpkaWZmIC0tZ2l0IGEvRG9jdW1lbnRhdGlvbi92aXJ0
-dWFsL2t2bS9oeXBlcmNhbGxzLnR4dCBiL0RvY3VtZW50YXRpb24vdmlydHVhbC9rdm0vaHlwZXJj
-YWxscy50eHQNCmluZGV4IGRhMjRjMTM4YzhkMS4uZWNkNDRlNDg4Njc5IDEwMDY0NA0KLS0tIGEv
-RG9jdW1lbnRhdGlvbi92aXJ0dWFsL2t2bS9oeXBlcmNhbGxzLnR4dA0KKysrIGIvRG9jdW1lbnRh
-dGlvbi92aXJ0dWFsL2t2bS9oeXBlcmNhbGxzLnR4dA0KQEAgLTE0MSwzICsxNDEsMTcgQEAgYTAg
-Y29ycmVzcG9uZHMgdG8gdGhlIEFQSUMgSUQgaW4gdGhlIHRoaXJkIGFyZ3VtZW50IChhMiksIGJp
-dCAxDQogY29ycmVzcG9uZHMgdG8gdGhlIEFQSUMgSUQgYTIrMSwgYW5kIHNvIG9uLg0KIA0KIFJl
-dHVybnMgdGhlIG51bWJlciBvZiBDUFVzIHRvIHdoaWNoIHRoZSBJUElzIHdlcmUgZGVsaXZlcmVk
-IHN1Y2Nlc3NmdWxseS4NCisNCis3LiBLVk1fSENfUEFHRV9FTkNfU1RBVFVTDQorLS0tLS0tLS0t
-LS0tLS0tLS0tLS0tLS0tLQ0KK0FyY2hpdGVjdHVyZTogeDg2DQorU3RhdHVzOiBhY3RpdmUNCitQ
-dXJwb3NlOiBOb3RpZnkgdGhlIGVuY3J5cHRpb24gc3RhdHVzIGNoYW5nZXMgaW4gZ3Vlc3QgcGFn
-ZSB0YWJsZSAoU0VWIGd1ZXN0KQ0KKw0KK2EwOiB0aGUgZ3Vlc3QgcGh5c2ljYWwgYWRkcmVzcyBv
-ZiB0aGUgc3RhcnQgcGFnZQ0KK2ExOiB0aGUgbnVtYmVyIG9mIHBhZ2VzDQorYTI6IHNldCBvciBj
-bGVhciB0aGUgZW5jcnlwdGlvbiBhdHRyaWJ1dGUNCisNCisgICBXaGVyZToNCisJKiAxOiBFbmNy
-eXB0aW9uIGF0dHJpYnV0ZSBpcyBzZXQNCisJKiAwOiBFbmNyeXB0aW9uIGF0dHJpYnV0ZSBpcyBj
-bGVhcmVkDQpkaWZmIC0tZ2l0IGEvYXJjaC94ODYvaW5jbHVkZS9hc20va3ZtX2hvc3QuaCBiL2Fy
-Y2gveDg2L2luY2x1ZGUvYXNtL2t2bV9ob3N0LmgNCmluZGV4IGE5ZDAzYWYzNDAzMC4uYWRiMGNh
-MDM1Yjk3IDEwMDY0NA0KLS0tIGEvYXJjaC94ODYvaW5jbHVkZS9hc20va3ZtX2hvc3QuaA0KKysr
-IGIvYXJjaC94ODYvaW5jbHVkZS9hc20va3ZtX2hvc3QuaA0KQEAgLTExOTYsNiArMTE5Niw4IEBA
-IHN0cnVjdCBrdm1feDg2X29wcyB7DQogCXVpbnQxNl90ICgqbmVzdGVkX2dldF9ldm1jc192ZXJz
-aW9uKShzdHJ1Y3Qga3ZtX3ZjcHUgKnZjcHUpOw0KIA0KIAlib29sICgqbmVlZF9lbXVsYXRpb25f
-b25fcGFnZV9mYXVsdCkoc3RydWN0IGt2bV92Y3B1ICp2Y3B1KTsNCisJaW50ICgqcGFnZV9lbmNf
-c3RhdHVzX2hjKShzdHJ1Y3Qga3ZtICprdm0sIHVuc2lnbmVkIGxvbmcgZ3BhLA0KKwkJCQkgIHVu
-c2lnbmVkIGxvbmcgc3osIHVuc2lnbmVkIGxvbmcgbW9kZSk7DQogfTsNCiANCiBzdHJ1Y3Qga3Zt
-X2FyY2hfYXN5bmNfcGYgew0KZGlmZiAtLWdpdCBhL2FyY2gveDg2L2t2bS9zdm0uYyBiL2FyY2gv
-eDg2L2t2bS9zdm0uYw0KaW5kZXggNzRiNTdhYjc0MmFkLi5mMDI0ZjIwOGIwNTIgMTAwNjQ0DQot
-LS0gYS9hcmNoL3g4Ni9rdm0vc3ZtLmMNCisrKyBiL2FyY2gveDg2L2t2bS9zdm0uYw0KQEAgLTEz
-OCw2ICsxMzgsOCBAQCBzdHJ1Y3Qga3ZtX3Nldl9pbmZvIHsNCiAJaW50IGZkOwkJCS8qIFNFViBk
-ZXZpY2UgZmQgKi8NCiAJdW5zaWduZWQgbG9uZyBwYWdlc19sb2NrZWQ7IC8qIE51bWJlciBvZiBw
-YWdlcyBsb2NrZWQgKi8NCiAJc3RydWN0IGxpc3RfaGVhZCByZWdpb25zX2xpc3Q7ICAvKiBMaXN0
-IG9mIHJlZ2lzdGVyZWQgcmVnaW9ucyAqLw0KKwl1bnNpZ25lZCBsb25nICpwYWdlX2VuY19ibWFw
-Ow0KKwl1bnNpZ25lZCBsb25nIHBhZ2VfZW5jX2JtYXBfc2l6ZTsNCiB9Ow0KIA0KIHN0cnVjdCBr
-dm1fc3ZtIHsNCkBAIC0xOTExLDYgKzE5MTMsOCBAQCBzdGF0aWMgdm9pZCBzZXZfdm1fZGVzdHJv
-eShzdHJ1Y3Qga3ZtICprdm0pDQogDQogCXNldl91bmJpbmRfYXNpZChrdm0sIHNldi0+aGFuZGxl
-KTsNCiAJc2V2X2FzaWRfZnJlZShrdm0pOw0KKw0KKwlrdmZyZWUoc2V2LT5wYWdlX2VuY19ibWFw
-KTsNCiB9DQogDQogc3RhdGljIHZvaWQgYXZpY192bV9kZXN0cm95KHN0cnVjdCBrdm0gKmt2bSkN
-CkBAIC03MzcwLDYgKzczNzQsNjkgQEAgc3RhdGljIGludCBzZXZfcmVjZWl2ZV9maW5pc2goc3Ry
-dWN0IGt2bSAqa3ZtLCBzdHJ1Y3Qga3ZtX3Nldl9jbWQgKmFyZ3ApDQogCXJldHVybiByZXQ7DQog
-fQ0KIA0KK3N0YXRpYyBpbnQgc2V2X3Jlc2l6ZV9wYWdlX2VuY19iaXRtYXAoc3RydWN0IGt2bSAq
-a3ZtLCB1bnNpZ25lZCBsb25nIG5ld19zaXplKQ0KK3sNCisJc3RydWN0IGt2bV9zZXZfaW5mbyAq
-c2V2ID0gJnRvX2t2bV9zdm0oa3ZtKS0+c2V2X2luZm87DQorCXVuc2lnbmVkIGxvbmcgKm1hcDsN
-CisJdW5zaWduZWQgbG9uZyBzejsNCisNCisJaWYgKHNldi0+cGFnZV9lbmNfYm1hcF9zaXplID49
-IG5ld19zaXplKQ0KKwkJcmV0dXJuIDA7DQorDQorCXN6ID0gQUxJR04obmV3X3NpemUsIEJJVFNf
-UEVSX0xPTkcpIC8gODsNCisNCisJaWYgKHN6ID4gUEFHRV9TSVpFKQ0KKwkJbWFwID0gdm1hbGxv
-Yyhzeik7DQorCWVsc2UNCisJCW1hcCA9IGttYWxsb2Moc3osIEdGUF9LRVJORUwpOw0KKw0KKwlp
-ZiAoIW1hcCkgew0KKwkJcHJfZXJyX29uY2UoIkZhaWxlZCB0byBhbGxvY2F0ZSBkZWNyeXB0ZWQg
-Yml0bWFwIHNpemUgJWx4XG4iLCBzeik7DQorCQlyZXR1cm4gMTsNCisJfQ0KKw0KKwkvKiBtYXJr
-IHRoZSBwYWdlIGVuY3J5cHRlZCAoYnkgZGVmYXVsdCkgKi8NCisJbWVtc2V0KG1hcCwgMHhmZiwg
-c3opOw0KKw0KKwliaXRtYXBfY29weShtYXAsIHNldi0+cGFnZV9lbmNfYm1hcCwgc2V2LT5wYWdl
-X2VuY19ibWFwX3NpemUpOw0KKwlrdmZyZWUoc2V2LT5wYWdlX2VuY19ibWFwKTsNCisNCisJc2V2
-LT5wYWdlX2VuY19ibWFwID0gbWFwOw0KKwlzZXYtPnBhZ2VfZW5jX2JtYXBfc2l6ZSA9IG5ld19z
-aXplOw0KKw0KKwlyZXR1cm4gMDsNCit9DQorDQorc3RhdGljIGludCBzdm1fcGFnZV9lbmNfc3Rh
-dHVzX2hjKHN0cnVjdCBrdm0gKmt2bSwgdW5zaWduZWQgbG9uZyBncGEsDQorCQkJCSAgdW5zaWdu
-ZWQgbG9uZyBucGFnZXMsIHVuc2lnbmVkIGxvbmcgZW5jKQ0KK3sNCisJc3RydWN0IGt2bV9zZXZf
-aW5mbyAqc2V2ID0gJnRvX2t2bV9zdm0oa3ZtKS0+c2V2X2luZm87DQorCWdmbl90IGdmbl9zdGFy
-dCwgZ2ZuX2VuZDsNCisJaW50IHI7DQorDQorCWlmICghbnBhZ2VzKQ0KKwkJcmV0dXJuIDA7DQor
-DQorCWdmbl9zdGFydCA9IGdwYV90b19nZm4oZ3BhKTsNCisJZ2ZuX2VuZCA9IGdmbl9zdGFydCAr
-IG5wYWdlczsNCisNCisJbXV0ZXhfbG9jaygma3ZtLT5sb2NrKTsNCisNCisJciA9IDE7DQorCWlm
-IChzZXZfcmVzaXplX3BhZ2VfZW5jX2JpdG1hcChrdm0sIGdmbl9lbmQpKQ0KKwkJZ290byB1bmxv
-Y2s7DQorDQorCWlmIChlbmMpDQorCQlfX2JpdG1hcF9zZXQoc2V2LT5wYWdlX2VuY19ibWFwLCBn
-Zm5fc3RhcnQsIGdmbl9lbmQgLSBnZm5fc3RhcnQpOw0KKwllbHNlDQorCQlfX2JpdG1hcF9jbGVh
-cihzZXYtPnBhZ2VfZW5jX2JtYXAsIGdmbl9zdGFydCwgZ2ZuX2VuZCAtIGdmbl9zdGFydCk7DQor
-DQorCXIgPSAwOw0KK3VubG9jazoNCisJbXV0ZXhfdW5sb2NrKCZrdm0tPmxvY2spOw0KKwlyZXR1
-cm4gcjsNCit9DQorDQogc3RhdGljIGludCBzdm1fbWVtX2VuY19vcChzdHJ1Y3Qga3ZtICprdm0s
-IHZvaWQgX191c2VyICphcmdwKQ0KIHsNCiAJc3RydWN0IGt2bV9zZXZfY21kIHNldl9jbWQ7DQpA
-QCAtNzcxMSw2ICs3Nzc4LDggQEAgc3RhdGljIHN0cnVjdCBrdm1feDg2X29wcyBzdm1feDg2X29w
-cyBfX3JvX2FmdGVyX2luaXQgPSB7DQogCS5uZXN0ZWRfZ2V0X2V2bWNzX3ZlcnNpb24gPSBuZXN0
-ZWRfZ2V0X2V2bWNzX3ZlcnNpb24sDQogDQogCS5uZWVkX2VtdWxhdGlvbl9vbl9wYWdlX2ZhdWx0
-ID0gc3ZtX25lZWRfZW11bGF0aW9uX29uX3BhZ2VfZmF1bHQsDQorDQorCS5wYWdlX2VuY19zdGF0
-dXNfaGMgPSBzdm1fcGFnZV9lbmNfc3RhdHVzX2hjDQogfTsNCiANCiBzdGF0aWMgaW50IF9faW5p
-dCBzdm1faW5pdCh2b2lkKQ0KZGlmZiAtLWdpdCBhL2FyY2gveDg2L2t2bS92bXgvdm14LmMgYi9h
-cmNoL3g4Ni9rdm0vdm14L3ZteC5jDQppbmRleCBiNGU3ZDY0NTI3NWEuLjljODE0ZTU2MGUwZiAx
-MDA2NDQNCi0tLSBhL2FyY2gveDg2L2t2bS92bXgvdm14LmMNCisrKyBiL2FyY2gveDg2L2t2bS92
-bXgvdm14LmMNCkBAIC03NzMxLDYgKzc3MzEsNyBAQCBzdGF0aWMgc3RydWN0IGt2bV94ODZfb3Bz
-IHZteF94ODZfb3BzIF9fcm9fYWZ0ZXJfaW5pdCA9IHsNCiAJLmdldF92bWNzMTJfcGFnZXMgPSBO
-VUxMLA0KIAkubmVzdGVkX2VuYWJsZV9ldm1jcyA9IE5VTEwsDQogCS5uZWVkX2VtdWxhdGlvbl9v
-bl9wYWdlX2ZhdWx0ID0gdm14X25lZWRfZW11bGF0aW9uX29uX3BhZ2VfZmF1bHQsDQorCS5wYWdl
-X2VuY19zdGF0dXNfaGMgPSBOVUxMLA0KIH07DQogDQogc3RhdGljIHZvaWQgdm14X2NsZWFudXBf
-bDFkX2ZsdXNoKHZvaWQpDQpkaWZmIC0tZ2l0IGEvYXJjaC94ODYva3ZtL3g4Ni5jIGIvYXJjaC94
-ODYva3ZtL3g4Ni5jDQppbmRleCBhMGQxZmM4MGFjNWEuLmRlYTY0NGJlNTk5MiAxMDA2NDQNCi0t
-LSBhL2FyY2gveDg2L2t2bS94ODYuYw0KKysrIGIvYXJjaC94ODYva3ZtL3g4Ni5jDQpAQCAtNzE0
-MSw2ICs3MTQxLDExIEBAIGludCBrdm1fZW11bGF0ZV9oeXBlcmNhbGwoc3RydWN0IGt2bV92Y3B1
-ICp2Y3B1KQ0KIAljYXNlIEtWTV9IQ19TRU5EX0lQSToNCiAJCXJldCA9IGt2bV9wdl9zZW5kX2lw
-aSh2Y3B1LT5rdm0sIGEwLCBhMSwgYTIsIGEzLCBvcF82NF9iaXQpOw0KIAkJYnJlYWs7DQorCWNh
-c2UgS1ZNX0hDX1BBR0VfRU5DX1NUQVRVUzoNCisJCXJldCA9IC1LVk1fRU5PU1lTOw0KKwkJaWYg
-KGt2bV94ODZfb3BzLT5wYWdlX2VuY19zdGF0dXNfaGMpDQorCQkJcmV0ID0ga3ZtX3g4Nl9vcHMt
-PnBhZ2VfZW5jX3N0YXR1c19oYyh2Y3B1LT5rdm0sIGEwLCBhMSwgYTIpOw0KKwkJYnJlYWs7DQog
-CWRlZmF1bHQ6DQogCQlyZXQgPSAtS1ZNX0VOT1NZUzsNCiAJCWJyZWFrOw0KZGlmZiAtLWdpdCBh
-L2luY2x1ZGUvdWFwaS9saW51eC9rdm1fcGFyYS5oIGIvaW5jbHVkZS91YXBpL2xpbnV4L2t2bV9w
-YXJhLmgNCmluZGV4IDZjMGNlNDk5MzFlNS4uM2RjOWU1NzlmNGY5IDEwMDY0NA0KLS0tIGEvaW5j
-bHVkZS91YXBpL2xpbnV4L2t2bV9wYXJhLmgNCisrKyBiL2luY2x1ZGUvdWFwaS9saW51eC9rdm1f
-cGFyYS5oDQpAQCAtMjgsNiArMjgsNyBAQA0KICNkZWZpbmUgS1ZNX0hDX01JUFNfQ09OU09MRV9P
-VVRQVVQJOA0KICNkZWZpbmUgS1ZNX0hDX0NMT0NLX1BBSVJJTkcJCTkNCiAjZGVmaW5lIEtWTV9I
-Q19TRU5EX0lQSQkJMTANCisjZGVmaW5lIEtWTV9IQ19QQUdFX0VOQ19TVEFUVVMJCTExDQogDQog
-LyoNCiAgKiBoeXBlcmNhbGxzIHVzZSBhcmNoaXRlY3R1cmUgc3BlY2lmaWMNCi0tIA0KMi4xNy4x
-DQoNCg==
+** Also affects: cloud-archive/ocata
+   Importance: Undecided
+       Status: New
+
+** Changed in: cloud-archive/ocata
+   Importance: Undecided =3D> Medium
+
+** Changed in: cloud-archive/ocata
+       Status: New =3D> Triaged
+
+** Changed in: cloud-archive
+       Status: New =3D> Fix Released
+
+-- =
+
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1823458
+
+Title:
+  race condition between vhost_net_stop and CHR_EVENT_CLOSED on shutdown
+  crashes qemu
+
+Status in Ubuntu Cloud Archive:
+  Fix Released
+Status in Ubuntu Cloud Archive mitaka series:
+  Triaged
+Status in Ubuntu Cloud Archive ocata series:
+  Triaged
+Status in QEMU:
+  Fix Released
+Status in qemu package in Ubuntu:
+  Fix Released
+Status in qemu source package in Trusty:
+  Won't Fix
+Status in qemu source package in Xenial:
+  Fix Committed
+Status in qemu source package in Bionic:
+  Fix Released
+Status in qemu source package in Cosmic:
+  Fix Released
+Status in qemu source package in Disco:
+  Fix Released
+
+Bug description:
+  [impact]
+
+  on shutdown of a guest, there is a race condition that results in qemu
+  crashing instead of normally shutting down.  The bt looks similar to
+  this (depending on the specific version of qemu, of course; this is
+  taken from 2.5 version of qemu):
+
+  (gdb) bt
+  #0  __GI___pthread_mutex_lock (mutex=3D0x0) at ../nptl/pthread_mutex_lock=
+.c:66
+  #1  0x00005636c0bc4389 in qemu_mutex_lock (mutex=3Dmutex@entry=3D0x0) at =
+/build/qemu-7I4i1R/qemu-2.5+dfsg/util/qemu-thread-posix.c:73
+  #2  0x00005636c0988130 in qemu_chr_fe_write_all (s=3Ds@entry=3D0x0, buf=
+=3Dbuf@entry=3D0x7ffe65c086a0 "\v", len=3Dlen@entry=3D20) at /build/qemu-7I=
+4i1R/qemu-2.5+dfsg/qemu-char.c:205
+  #3  0x00005636c08f3483 in vhost_user_write (msg=3Dmsg@entry=3D0x7ffe65c08=
+6a0, fds=3Dfds@entry=3D0x0, fd_num=3Dfd_num@entry=3D0, dev=3D0x5636c1bf6b70=
+, dev=3D0x5636c1bf6b70)
+  =C2=A0=C2=A0=C2=A0=C2=A0at /build/qemu-7I4i1R/qemu-2.5+dfsg/hw/virtio/vho=
+st-user.c:195
+  #4  0x00005636c08f411c in vhost_user_get_vring_base (dev=3D0x5636c1bf6b70=
+, ring=3D0x7ffe65c087e0) at /build/qemu-7I4i1R/qemu-2.5+dfsg/hw/virtio/vhos=
+t-user.c:364
+  #5  0x00005636c08efff0 in vhost_virtqueue_stop (dev=3Ddev@entry=3D0x5636c=
+1bf6b70, vdev=3Dvdev@entry=3D0x5636c2853338, vq=3D0x5636c1bf6d00, idx=3D1) =
+at /build/qemu-7I4i1R/qemu-2.5+dfsg/hw/virtio/vhost.c:895
+  #6  0x00005636c08f2944 in vhost_dev_stop (hdev=3Dhdev@entry=3D0x5636c1bf6=
+b70, vdev=3Dvdev@entry=3D0x5636c2853338) at /build/qemu-7I4i1R/qemu-2.5+dfs=
+g/hw/virtio/vhost.c:1262
+  #7  0x00005636c08db2a8 in vhost_net_stop_one (net=3D0x5636c1bf6b70, dev=
+=3Ddev@entry=3D0x5636c2853338) at /build/qemu-7I4i1R/qemu-2.5+dfsg/hw/net/v=
+host_net.c:293
+  #8  0x00005636c08dbe5b in vhost_net_stop (dev=3Ddev@entry=3D0x5636c285333=
+8, ncs=3D0x5636c209d110, total_queues=3Dtotal_queues@entry=3D1) at /build/q=
+emu-7I4i1R/qemu-2.5+dfsg/hw/net/vhost_net.c:371
+  #9  0x00005636c08d7745 in virtio_net_vhost_status (status=3D7 '\a', n=3D0=
+x5636c2853338) at /build/qemu-7I4i1R/qemu-2.5+dfsg/hw/net/virtio-net.c:150
+  #10 virtio_net_set_status (vdev=3D<optimized out>, status=3D<optimized ou=
+t>) at /build/qemu-7I4i1R/qemu-2.5+dfsg/hw/net/virtio-net.c:162
+  #11 0x00005636c08ec42c in virtio_set_status (vdev=3D0x5636c2853338, val=
+=3D<optimized out>) at /build/qemu-7I4i1R/qemu-2.5+dfsg/hw/virtio/virtio.c:=
+624
+  #12 0x00005636c098fed2 in vm_state_notify (running=3Drunning@entry=3D0, s=
+tate=3Dstate@entry=3DRUN_STATE_SHUTDOWN) at /build/qemu-7I4i1R/qemu-2.5+dfs=
+g/vl.c:1605
+  #13 0x00005636c089172a in do_vm_stop (state=3DRUN_STATE_SHUTDOWN) at /bui=
+ld/qemu-7I4i1R/qemu-2.5+dfsg/cpus.c:724
+  #14 vm_stop (state=3DRUN_STATE_SHUTDOWN) at /build/qemu-7I4i1R/qemu-2.5+d=
+fsg/cpus.c:1407
+  #15 0x00005636c085d240 in main_loop_should_exit () at /build/qemu-7I4i1R/=
+qemu-2.5+dfsg/vl.c:1883
+  #16 main_loop () at /build/qemu-7I4i1R/qemu-2.5+dfsg/vl.c:1931
+  #17 main (argc=3D<optimized out>, argv=3D<optimized out>, envp=3D<optimiz=
+ed out>) at /build/qemu-7I4i1R/qemu-2.5+dfsg/vl.c:4683
+
+  [test case]
+
+  unfortunately since this is a race condition, it's very hard to
+  arbitrarily reproduce; it depends very much on the overall
+  configuration of the guest as well as how exactly it's shut down -
+  specifically, its vhost user net must be closed from the host side at
+  a specific time during qemu shutdown.
+
+  I have someone with such a setup who has reported to me their setup is
+  able to reproduce this reliably, but the config is too complex for me
+  to reproduce so I have relied on their reproduction and testing to
+  debug and craft the patch for this.
+
+  [regression potential]
+
+  the change adds a flag to prevent repeated calls to vhost_net_stop().
+  This also prevents any calls to vhost_net_cleanup() from
+  net_vhost_user_event().  Any regression would be seen when stopping
+  and/or cleaning up a vhost net.  Regressions might include failure to
+  hot-remove a vhost net from a guest, or failure to cleanup (i.e. mem
+  leak), or crashes during cleanup or stopping a vhost net.
+
+  [other info]
+
+  this was originally seen in the 2.5 version of qemu - specifically,
+  the UCA version in trusty-mitaka (which uses the xenial qemu
+  codebase).
+
+  After discussion upstream, it appears this was fixed upstream by
+  commit e7c83a885f8, which is included starting in version 2.9.
+  However, this commit depends on at least commit 5345fdb4467, and
+  likely more other previous commits, which make widespread code changes
+  and are unsuitable to backport.  Therefore this seems like it should
+  be specifically worked around in the Xenial qemu codebase.
+
+  =
+
+  The specific race condition for this (in the qemu 2.5 code version) is:
+
+  as shown in above bt, thread A starts shutting down qemu, e.g.:
+
+  vm_stop->do_vm_stop->vm_state_notify
+  =C2=A0=C2=A0virtio_set_status
+  =C2=A0=C2=A0=C2=A0=C2=A0virtio_net_set_status
+  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0virtio_net_vhost_status
+
+  in this function, code gets to an if-else check for
+  (!n->vhost_started), which is false (i.e. vhost_started is true) and
+  enters the else code block, which calls vhost_net_stop() and then sets
+  n->vhost_started to false.
+
+  While thread A is inside vhost_net_stop(), thread B is triggered by
+  the vhost net chr handler with a user event and calls:
+
+  net_vhost_user_event
+  =C2=A0=C2=A0qmp_set_link (from case CHR_EVENT_CLOSED)
+  =C2=A0=C2=A0=C2=A0=C2=A0virtio_net_set_link_status (via ->link_status_cha=
+nged)
+  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0virtio_net_set_status
+  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0virtio_net_vhost_status
+
+  notice thread B has now reached the same function that thread A is in;
+  since the checks in the function have not changed, thread B follows
+  the same path that thread A followed, and enters vhost_net_stop().
+
+  Since thread A has already shut down and cleaned up some of the
+  internals, once thread B starts trying to also clean up things, it
+  segfaults as the shown in the bt.
+
+  Avoiding only this duplicate call to vhost_net_stop() is required, but
+  not enough - let's continue to look at what thread B does after its
+  call to qmp_set_link() returns:
+
+  net_vhost_user_event
+  =C2=A0=C2=A0vhost_user_stop
+  =C2=A0=C2=A0=C2=A0=C2=A0vhost_net_cleanup
+  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0vhost_dev_cleanup
+
+  However, in main() qemu registers atexit(net_cleanup()), which does:
+  net_cleanup
+  =C2=A0=C2=A0qemu_del_nic (or qemu_del_net_client, depending on ->type)
+  =C2=A0=C2=A0=C2=A0=C2=A0qemu_cleanup_net_client
+  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0vhost_user_cleanup (via ->cleanup)
+  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0vhost_net_cleanup
+  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0vhost_dev_cle=
+anup
+
+  and the duplicate vhost_dev_cleanup fails assertions since things were
+  already cleaned up.  Additionally, if thread B's call to
+  vhost_dev_cleanup() comes before thread A finishes vhost_net_stop(),
+  then that will call vhost_dev_stop() and vhost_disable_notifiers()
+  which both try to access things that have been freed/cleared/disabled
+  by vhost_dev_cleanup().
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/cloud-archive/+bug/1823458/+subscriptions
