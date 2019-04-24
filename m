@@ -2,65 +2,93 @@ Return-Path: <SRS0=3XOk=S2=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.2 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_PASS,URIBL_BLOCKED,USER_AGENT_MUTT autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-4.0 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7F47AC10F03
-	for <qemu-devel@archiver.kernel.org>; Wed, 24 Apr 2019 01:49:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0FC38C10F03
+	for <qemu-devel@archiver.kernel.org>; Wed, 24 Apr 2019 02:05:43 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 37FAC2148D
-	for <qemu-devel@archiver.kernel.org>; Wed, 24 Apr 2019 01:49:05 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id C9FF3218D2
+	for <qemu-devel@archiver.kernel.org>; Wed, 24 Apr 2019 02:05:42 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="QX4ZhyAp"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 37FAC2148D
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gibson.dropbear.id.au
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="YSBebw8d"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C9FF3218D2
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:34165 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:34340 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hJ720-0000mP-EH
-	for qemu-devel@archiver.kernel.org; Tue, 23 Apr 2019 21:49:04 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:43880)
+	id 1hJ7I6-0003oW-1l
+	for qemu-devel@archiver.kernel.org; Tue, 23 Apr 2019 22:05:42 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:50606)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1hJ70K-00083B-4J
-	for qemu-devel@nongnu.org; Tue, 23 Apr 2019 21:47:21 -0400
+	(envelope-from <richard.henderson@linaro.org>) id 1hJ7Gr-0003Fl-B9
+	for qemu-devel@nongnu.org; Tue, 23 Apr 2019 22:04:26 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1hJ6yv-0007U9-Gg
-	for qemu-devel@nongnu.org; Tue, 23 Apr 2019 21:45:55 -0400
-Received: from ozlabs.org ([2401:3900:2:1::2]:54105)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgibson@ozlabs.org>)
-	id 1hJ6ys-0007Pn-6t; Tue, 23 Apr 2019 21:45:52 -0400
-Received: by ozlabs.org (Postfix, from userid 1007)
-	id 44pjnf5GVqz9s3l; Wed, 24 Apr 2019 11:45:42 +1000 (AEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-	d=gibson.dropbear.id.au; s=201602; t=1556070342;
-	bh=LenBieuxwmkMp/2F/Mjz9Ivn9UnokiS3mBcN9DORAQE=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=QX4ZhyAp5ZzWW8cbpNIG4r0D8tkDgklTynetNIMlLLjhbXGSPlnwWzhtouPcV+Lnz
-	l432O2z5XpQjPk2NAf/yB0h/Oqb5Ce3Vh8STP17DbET0DES2tcXpClVDFXzpfv1sEL
-	Kn2IFruEwVkHl73mINfamnyfsaeYFumkkBobgB8A=
-Date: Wed, 24 Apr 2019 11:37:22 +1000
-From: David Gibson <david@gibson.dropbear.id.au>
-To: Eduardo Habkost <ehabkost@redhat.com>
-Message-ID: <20190424013722.GA6983@umbus.fritz.box>
-References: <20190423212246.3542-1-ehabkost@redhat.com>
-	<20190423212246.3542-3-ehabkost@redhat.com>
+	(envelope-from <richard.henderson@linaro.org>) id 1hJ7Gq-00038J-8l
+	for qemu-devel@nongnu.org; Tue, 23 Apr 2019 22:04:25 -0400
+Received: from mail-pl1-x62b.google.com ([2607:f8b0:4864:20::62b]:46150)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+	id 1hJ7Gp-000377-VD
+	for qemu-devel@nongnu.org; Tue, 23 Apr 2019 22:04:24 -0400
+Received: by mail-pl1-x62b.google.com with SMTP id o7so6195353pll.13
+	for <qemu-devel@nongnu.org>; Tue, 23 Apr 2019 19:04:23 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+	h=subject:to:references:from:openpgp:message-id:date:user-agent
+	:mime-version:in-reply-to:content-language:content-transfer-encoding;
+	bh=KDivsViAOfCo4RFhgtCHKlZh3xZHxL33MKFDeHxfAbc=;
+	b=YSBebw8diX/h5thr/IuP1swEcz+IuMhACpHorx6w0G89/8/weuAXjmExTeGM6EhagP
+	xEG6Va/HBpM2Uyr0f9tKoXmHct5yyZwPHYwNHALPCrR/RAZxWzI+QoD2yVi0rZqxCFnI
+	qmUTq0azoGokAHT6hjwhJFdbQG3bvlHjt4LIOCZDdL0GmtOVEmmqemMhclWhIsJUSOKz
+	IriRchJOG0Wu5EP1B2ZxyEynWMj1RFi3P6nTE5qNUcUVh6k2gZX6Mk10RL9XpjtiEoxb
+	GzOa5eqtfoTFT7v/gH0shISIlnxU+4bet4agsTu9FSfW7YNP9J5L1wlO9yJ/+zjzOX/P
+	iCwg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=1e100.net; s=20161025;
+	h=x-gm-message-state:subject:to:references:from:openpgp:message-id
+	:date:user-agent:mime-version:in-reply-to:content-language
+	:content-transfer-encoding;
+	bh=KDivsViAOfCo4RFhgtCHKlZh3xZHxL33MKFDeHxfAbc=;
+	b=UeiBuVi3A/UUe3xrEUnCrGPBhyRcR60qoM6msNoEf/jT85vJeBUux82b7YVO/o1CMX
+	S4EvW/VvttR5bYcHS5+rYjyILQDBdIcI+aBqjen6fgsSDCo5scMhW4iwz8JcQwUPkAWh
+	IBlUwFttmMlcEtKnV+yhUcwoZ6aKKVV2c9K3HPPg/xJC7bkM0Obu+nSVZzPspEEsCViz
+	VJCwmOL1kDAF+/Uw9mRad9HHPBXRIfASEQxcuyua/hsoQFdTMlnEi8mMFGc96dNh0dcg
+	I4/ctywEH6V0Z4M/t/RK7XFuaE8GnGoWEH6BTD9FqS+6l2M7bgj45/WcXsEkXKBHuTYH
+	dKWA==
+X-Gm-Message-State: APjAAAXUt7RRRlfMJCfv0K578X50TBtWtNMo1zsCTKlv6sD24U2/Yotn
+	kHnVx6i0Ic/vvUZkVeqgHRI6VRgbW2E=
+X-Google-Smtp-Source: APXvYqyu0TRt+zq169Y2vRAobmml+s9bAtn/OO2HS9ys2E1vuOTzD0DLGUkdml40GPAU6QgC2kXbIg==
+X-Received: by 2002:a17:902:2b87:: with SMTP id
+	l7mr29867358plb.130.1556071461788; 
+	Tue, 23 Apr 2019 19:04:21 -0700 (PDT)
+Received: from [192.168.1.11] (97-113-179-147.tukw.qwest.net. [97.113.179.147])
+	by smtp.gmail.com with ESMTPSA id i2sm24611611pfo.9.2019.04.23.19.04.20
+	(version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+	Tue, 23 Apr 2019 19:04:20 -0700 (PDT)
+To: Peter Maydell <peter.maydell@linaro.org>, qemu-arm@nongnu.org,
+	qemu-devel@nongnu.org
+References: <20190416125744.27770-1-peter.maydell@linaro.org>
+	<20190416125744.27770-24-peter.maydell@linaro.org>
+From: Richard Henderson <richard.henderson@linaro.org>
+Openpgp: preference=signencrypt
+Message-ID: <88fec784-bb2c-b80b-9e71-104296f063ed@linaro.org>
+Date: Tue, 23 Apr 2019 19:04:18 -0700
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+	Thunderbird/60.6.1
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="IJpNTDwzlM2Ie8A6"
-Content-Disposition: inline
-In-Reply-To: <20190423212246.3542-3-ehabkost@redhat.com>
-User-Agent: Mutt/1.11.3 (2019-02-01)
+In-Reply-To: <20190416125744.27770-24-peter.maydell@linaro.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
 	recognized.
-X-Received-From: 2401:3900:2:1::2
-Subject: Re: [Qemu-devel] [PATCH 2/3] machine: Use SupportStatusInfo for
- deprecation info
+X-Received-From: 2607:f8b0:4864:20::62b
+Subject: Re: [Qemu-devel] [PATCH 23/26] target/arm: Implement M-profile lazy
+ FP state preservation
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -72,170 +100,31 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "Michael S. Tsirkin" <mst@redhat.com>, mprivozn@redhat.com,
-	qemu-devel@nongnu.org, Markus Armbruster <armbru@redhat.com>,
-	=?iso-8859-1?Q?Herv=E9?= Poussineau <hpoussin@reactos.org>,
-	qemu-ppc@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190424013722.-JTjXG8-v6QW_c-_q8q1UyFLT45EUmSIIXvD4R81_6w@z>
+Message-ID: <20190424020418.VV2hYPOVg-8rJ7I-oRi2vtZY_Iqr9QRkF-huAriMPoY@z>
 
-
---IJpNTDwzlM2Ie8A6
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
-
-On Tue, Apr 23, 2019 at 06:22:45PM -0300, Eduardo Habkost wrote:
-> Use SupportStatusInfo to represent deprecation information of
-> machine types.
->=20
-> Instead of using a generic "use XXX instead" message for humans,
-> encode the suggested alternative in a machine-friendly way at the
-> 'suggested_alternatives' field.
->=20
-> Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
-
-ppc parts
-
-Acked-by: David Gibson <david@gibson.dropbear.id.au>
-
+On 4/16/19 5:57 AM, Peter Maydell wrote:
+> The M-profile architecture floating point system supports
+> lazy FP state preservation, where FP registers are not
+> pushed to the stack when an exception occurs but are instead
+> only saved if and when the first FP instruction in the exception
+> handler is executed. Implement this in QEMU, corresponding
+> to the check of LSPACT in the pseudocode ExecuteFPCheck().
+> 
+> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 > ---
->  include/hw/boards.h |  7 ++++---
->  hw/i386/pc_piix.c   |  4 +++-
->  hw/ppc/prep.c       |  4 +++-
->  vl.c                | 13 +++++++++----
->  4 files changed, 19 insertions(+), 9 deletions(-)
->=20
-> diff --git a/include/hw/boards.h b/include/hw/boards.h
-> index e231860666..243bf3c7ce 100644
-> --- a/include/hw/boards.h
-> +++ b/include/hw/boards.h
-> @@ -8,6 +8,8 @@
->  #include "hw/qdev.h"
->  #include "qom/object.h"
->  #include "qom/cpu.h"
-> +#include "qapi/qapi-types-common.h"
-> +
-> =20
->  /**
->   * memory_region_allocate_system_memory - Allocate a board's main memory
-> @@ -105,8 +107,7 @@ typedef struct {
-> =20
->  /**
->   * MachineClass:
-> - * @deprecation_reason: If set, the machine is marked as deprecated. The
-> - *    string should provide some clear information about what to use ins=
-tead.
-> + * @support_status: Support and deprecation status of machine type.
->   * @max_cpus: maximum number of CPUs supported. Default: 1
->   * @min_cpus: minimum number of CPUs supported. Default: 1
->   * @default_cpus: number of CPUs instantiated if none are specified. Def=
-ault: 1
-> @@ -169,7 +170,7 @@ struct MachineClass {
->      char *name;
->      const char *alias;
->      const char *desc;
-> -    const char *deprecation_reason;
-> +    SupportStatusInfo support_status;
-> =20
->      void (*init)(MachineState *state);
->      void (*reset)(void);
-> diff --git a/hw/i386/pc_piix.c b/hw/i386/pc_piix.c
-> index 8ad8e885c6..97bd401618 100644
-> --- a/hw/i386/pc_piix.c
-> +++ b/hw/i386/pc_piix.c
-> @@ -781,7 +781,9 @@ static void pc_i440fx_0_15_machine_options(MachineCla=
-ss *m)
-> =20
->      pc_i440fx_1_0_machine_options(m);
->      m->hw_version =3D "0.15";
-> -    m->deprecation_reason =3D "use a newer machine type instead";
-> +    m->support_status.deprecated =3D true;
-> +    m->support_status.has_suggested_alternative =3D true;
-> +    m->support_status.suggested_alternative =3D g_strdup("pc");
->      compat_props_add(m->compat_props, compat, G_N_ELEMENTS(compat));
->  }
-> =20
-> diff --git a/hw/ppc/prep.c b/hw/ppc/prep.c
-> index 847d320465..9a02b0eec4 100644
-> --- a/hw/ppc/prep.c
-> +++ b/hw/ppc/prep.c
-> @@ -587,7 +587,9 @@ static void ppc_prep_init(MachineState *machine)
-> =20
->  static void prep_machine_init(MachineClass *mc)
->  {
-> -    mc->deprecation_reason =3D "use 40p machine type instead";
-> +    mc->support_status.deprecated =3D true;
-> +    mc->support_status.has_suggested_alternative =3D true;
-> +    mc->support_status.suggested_alternative =3D g_strdup("40p");
->      mc->desc =3D "PowerPC PREP platform";
->      mc->init =3D ppc_prep_init;
->      mc->block_default_type =3D IF_IDE;
-> diff --git a/vl.c b/vl.c
-> index c696ad2a13..99b857ed2a 100644
-> --- a/vl.c
-> +++ b/vl.c
-> @@ -2610,7 +2610,7 @@ static gint machine_class_cmp(gconstpointer a, gcon=
-stpointer b)
->              }
->              printf("%-20s %s%s%s\n", mc->name, mc->desc,
->                     mc->is_default ? " (default)" : "",
-> -                   mc->deprecation_reason ? " (deprecated)" : "");
-> +                   mc->support_status.deprecated ? " (deprecated)" : "");
->          }
->      }
-> =20
-> @@ -4308,9 +4308,14 @@ int main(int argc, char **argv, char **envp)
->       * called from configure_accelerator().
->       */
-> =20
-> -    if (!qtest_enabled() && machine_class->deprecation_reason) {
-> -        error_report("Machine type '%s' is deprecated: %s",
-> -                     machine_class->name, machine_class->deprecation_rea=
-son);
-> +    if (!qtest_enabled() && machine_class->support_status.deprecated) {
-> +        error_report("Machine type '%s' is deprecated%s%s", machine_clas=
-s->name,
-> +                     machine_class->support_status.status_message ? ": "=
- : "",
-> +                     machine_class->support_status.status_message ?: "");
-> +        if (machine_class->support_status.suggested_alternative) {
-> +            error_report("Suggested solution: use '%s' machine type inst=
-ead",
-> +                         machine_class->support_status.suggested_alterna=
-tive);
-> +        }
->      }
-> =20
->      /*
+>  target/arm/cpu.h       |   3 ++
+>  target/arm/helper.h    |   2 +
+>  target/arm/translate.h |   1 +
+>  target/arm/helper.c    | 112 +++++++++++++++++++++++++++++++++++++++++
+>  target/arm/translate.c |  22 ++++++++
+>  5 files changed, 140 insertions(+)
 
---=20
-David Gibson			| I'll have my music baroque, and my code
-david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
-				| _way_ _around_!
-http://www.ozlabs.org/~dgibson
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 
---IJpNTDwzlM2Ie8A6
-Content-Type: application/pgp-signature; name="signature.asc"
 
------BEGIN PGP SIGNATURE-----
+r~
 
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAly/vcwACgkQbDjKyiDZ
-s5JSgw//d1OSw6alz9LWz9nLzuaqQujRofl+oge6gzQ5ZvEwwLkpRvbviCjN+cUk
-wPc4p2ar19QxHMUMscXyJhOZJjBFnGq40tzX723ikHU441wAtMFFCfaIAXLOdQY0
-czJeqXIwLHNYIPzlGSWmLKFpRGPUsdVsucnnwptdN9NcZgp0dqvH1cJuKaMtYnYP
-Isb06arbF65rjpIUUhKRibn4y5VjTfmF9wVfrlInCjdAEvj05Ac/F3sIJE0JRWZV
-te4YC8cfG+Lfvt3U/o6+KCjjHWLOorlxdsbwKJi8L6SIk0Ns4kDno4WDBc8c2m1m
-1SnBLbFUrXQh1HjLgHvrDmFodqOgPLMX8a0ioFNbzg34AhnviobGY24TMXD5bfKd
-E9zg2JfiHU2VEyljYnt8dpf6NLRycaloT33CLtaBxJeJsEcYcJn9POaqYDzj7BKS
-6PoNx8C64/Rb8wWnxO1I2fIJRMwqMrCWdrT1MsfE+/JN9cNZPyINMrqmUKk7wwL7
-s5KsdaX/rQQtihIfiwIt+oZkAcOsLI+Tkm5euQws83lI06bTc0EbzLERYHlt+IPp
-unkGfK7LhPpjApAZDGhAI8EAo9vgn9wqKxdORKUbUwsr4uBPld+zk4tQz7h02Ric
-xpK+GvQFlmHB6CnPZ4xb4bzf3BdALdCiF+U23htRagQbaqxMuL4=
-=m6xh
------END PGP SIGNATURE-----
-
---IJpNTDwzlM2Ie8A6--
 
