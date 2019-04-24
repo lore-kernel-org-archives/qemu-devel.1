@@ -1,34 +1,33 @@
-Received: from eggs.gnu.org ([209.51.188.92]:54416)
+Received: from eggs.gnu.org ([209.51.188.92]:55838)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1hJB7X-0004hr-SH
-	for qemu-devel@nongnu.org; Wed, 24 Apr 2019 02:11:05 -0400
+	(envelope-from <bounces@canonical.com>) id 1hJBC9-0007Bq-Vr
+	for qemu-devel@nongnu.org; Wed, 24 Apr 2019 02:15:51 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1hJB7V-0000mX-Rh
-	for qemu-devel@nongnu.org; Wed, 24 Apr 2019 02:11:03 -0400
-Received: from indium.canonical.com ([91.189.90.7]:42766)
+	(envelope-from <bounces@canonical.com>) id 1hJBC8-000599-JM
+	for qemu-devel@nongnu.org; Wed, 24 Apr 2019 02:15:49 -0400
+Received: from indium.canonical.com ([91.189.90.7]:43402)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1hJB7V-0000lK-LB
-	for qemu-devel@nongnu.org; Wed, 24 Apr 2019 02:11:01 -0400
+	id 1hJBC8-00055i-Ct
+	for qemu-devel@nongnu.org; Wed, 24 Apr 2019 02:15:48 -0400
 Received: from loganberry.canonical.com ([91.189.90.37])
 	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1hJB7U-0006yi-Ps
-	for <qemu-devel@nongnu.org>; Wed, 24 Apr 2019 06:11:00 +0000
+	id 1hJBC7-0007Ng-2M
+	for <qemu-devel@nongnu.org>; Wed, 24 Apr 2019 06:15:47 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id C14AE2E80CF
-	for <qemu-devel@nongnu.org>; Wed, 24 Apr 2019 06:11:00 +0000 (UTC)
+	by loganberry.canonical.com (Postfix) with ESMTP id 096072E80CB
+	for <qemu-devel@nongnu.org>; Wed, 24 Apr 2019 06:15:47 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Wed, 24 Apr 2019 06:01:34 -0000
-From: Thomas Huth <1803872@bugs.launchpad.net>
-Reply-To: Bug 1803872 <1803872@bugs.launchpad.net>
+Date: Wed, 24 Apr 2019 06:01:10 -0000
+From: Thomas Huth <1523246@bugs.launchpad.net>
+Reply-To: Bug 1523246 <1523246@bugs.launchpad.net>
 Sender: bounces@canonical.com
-References: <154254872666.7803.12367996737502527787.malonedeb@wampee.canonical.com>
-Message-Id: <155608569531.13864.14754380970849607768.launchpad@wampee.canonical.com>
+References: <20151206150708.14182.82430.malonedeb@wampee.canonical.com>
+Message-Id: <155608567235.13969.11591304391473188281.launchpad@gac.canonical.com>
 Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1803872] Re: gcc 8.2 reports stringop-truncation
- when building qemu
+Subject: [Qemu-devel] [Bug 1523246] Re: Virtio-blk does not support TRIM
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -46,37 +45,33 @@ To: qemu-devel@nongnu.org
 
 You received this bug notification because you are a member of qemu-
 devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1803872
+https://bugs.launchpad.net/bugs/1523246
 
 Title:
-  gcc 8.2 reports stringop-truncation when building qemu
+  Virtio-blk does not support TRIM
 
 Status in QEMU:
   Fix Released
 
 Bug description:
-  QEMU 3.0
+  When model=3Dvirtio is used, TRIM is not supported.
 
-  block/sheepdog.c: In function 'find_vdi_name':
-  block/sheepdog.c:1239:5: error: 'strncpy' specified bound 256 equals dest=
-ination size [-Werror=3Dstringop-truncation]
-  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0strncpy(buf + SD_MAX_VDI_LEN, tag, SD_MAX_V=
-DI_TAG_LEN);
-  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~=
-~~~~~~~~~~~
+  # mount -o discard /dev/vda4 /mnt
+  # mount | tail -1
+  /dev/vda4 on /mnt type fuseblk (rw,nosuid,nodev,relatime,user_id=3D0,grou=
+p_id=3D0,allow_other,blksize=3D4096)
+  # fstrim /mnt/
+  fstrim: /mnt/: the discard operation is not supported
 
-  If this is the intended behavior, please suppress the warning. For
-  example:
+  Booting without model=3Dvirtio allows using TRIM (in Windows as well).
 
-  #pragma GCC diagnostic push
-  #pragma GCC diagnostic ignored "-Wstringop-truncation"
-  =C2=A0=C2=A0=C2=A0=C2=A0strncpy(buf + SD_MAX_VDI_LEN, tag, SD_MAX_VDI_TAG=
-_LEN);
-  #pragma GCC diagnostic pop
+  Full QEMU line:
 
-  This also happens on other sources, for example hw/acpi/core.c, so
-  another option is to suppress it globally on CFLAGS (-Wno-stringop-
-  truncation)
+  qemu-system-x86_64 -enable-kvm -cpu host -bios
+  /usr/share/ovmf/ovmf_x64.bin -smp 2 -m 7G -vga qxl -usbdevice tablet
+  -net nic,model=3Dvirtio -net user -drive discard=3Dunmap,detect-
+  zeroes=3Dunmap,cache=3Dnone,file=3Dvms/win10.hd.img.vmdk,format=3Dvmdk,if=
+=3Dvirtio
 
 To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1803872/+subscriptions
+https://bugs.launchpad.net/qemu/+bug/1523246/+subscriptions
