@@ -1,31 +1,28 @@
-Received: from eggs.gnu.org ([209.51.188.92]:36878)
+Received: from eggs.gnu.org ([209.51.188.92]:47780)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1hJBf5-0002kU-Nq
-	for qemu-devel@nongnu.org; Wed, 24 Apr 2019 02:45:45 -0400
+	(envelope-from <thuth@redhat.com>) id 1hJCNp-0005hs-U6
+	for qemu-devel@nongnu.org; Wed, 24 Apr 2019 03:31:58 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1hJBZi-0003En-L0
-	for qemu-devel@nongnu.org; Wed, 24 Apr 2019 02:40:11 -0400
-Received: from mail-eopbgr150114.outbound.protection.outlook.com
-	([40.107.15.114]:62955
-	helo=EUR01-DB5-obe.outbound.protection.outlook.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
-	id 1hJBZi-0003Ag-3Z
-	for qemu-devel@nongnu.org; Wed, 24 Apr 2019 02:40:10 -0400
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Date: Wed, 24 Apr 2019 06:40:04 +0000
-Message-ID: <aeb62174-5aad-676e-792d-e71d694dbd1e@virtuozzo.com>
-References: <20190423113028.GD30014@wheatley>
-	<20190423121218.GF9041@localhost.localdomain>
-	<20190423142648.GA2967@wheatley>
-	<20190423150845.GG9041@localhost.localdomain>
-In-Reply-To: <20190423150845.GG9041@localhost.localdomain>
-Content-Language: en-US
-Content-Type: text/plain; charset="Windows-1252"
-Content-ID: <9656653A1CF5874483A8CFDEB232A8E9@eurprd08.prod.outlook.com>
-Content-Transfer-Encoding: quoted-printable
+	(envelope-from <thuth@redhat.com>) id 1hJCN1-0006Vd-Dw
+	for qemu-devel@nongnu.org; Wed, 24 Apr 2019 03:31:08 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:52124)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1hJCN1-0006To-60
+	for qemu-devel@nongnu.org; Wed, 24 Apr 2019 03:31:07 -0400
+References: <20190420100056.116305-1-liq3ea@163.com>
+	<20190420100056.116305-4-liq3ea@163.com>
+	<a27cd912-4f58-55ac-1aae-e4999fa3d84d@redhat.com>
+	<CAKXe6SJZWs7HtXutX6W3saDhaNDtVPMQEh2+s+9XiM3TtZqLdQ@mail.gmail.com>
+From: Thomas Huth <thuth@redhat.com>
+Message-ID: <6dd699b1-f24d-743b-343e-f1df6c8672b9@redhat.com>
+Date: Wed, 24 Apr 2019 09:30:56 +0200
 MIME-Version: 1.0
-Subject: Re: [Qemu-devel] Possibly incorrect data sparsification by qemu-img
+In-Reply-To: <CAKXe6SJZWs7HtXutX6W3saDhaNDtVPMQEh2+s+9XiM3TtZqLdQ@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH 3/4] tests: fw_cfg: add reboot_timeout test
+ case
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,154 +31,90 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Kevin Wolf <kwolf@redhat.com>, Martin Kletzander <mkletzan@redhat.com>
-Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, Richard Jones <rjones@redhat.com>
+To: Li Qiang <liq3ea@gmail.com>
+Cc: Li Qiang <liq3ea@163.com>, lvivier@redhat.com, Paolo Bonzini <pbonzini@redhat.com>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>, Laszlo Ersek <lersek@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>, Qemu Developers <qemu-devel@nongnu.org>
 
-23.04.2019 18:08, Kevin Wolf wrote:
-> Am 23.04.2019 um 16:26 hat Martin Kletzander geschrieben:
->> On Tue, Apr 23, 2019 at 02:12:18PM +0200, Kevin Wolf wrote:
->>> Am 23.04.2019 um 13:30 hat Martin Kletzander geschrieben:
->>>> Hi,
->>>>
->>>> I am using qemu-img with nbdkit to transfer a disk image and the updat=
-e it with
->>>> extra data from newer snapshots.  The end image cannot be transferred =
-because
->>>> the snapshots will be created later than the first transfer and we wan=
-t to save
->>>> some time up front.  You might think of it as a continuous synchronisa=
-tion.  It
->>>> looks something like this:
->>>>
->>>> I first transfer the whole image:
->>>>
->>>>   qemu-img convert -p $nbd disk.raw
->>>>
->>>> Where `$nbd` is something along the lines of `nbd+unix:///?socket=3Dnb=
-dkit.sock`
->>>>
->>>> Then, after the next snapshot is created, I can update it thanks to th=
-e `-n`
->>>> parameter (the $nbd now points to the newer snapshot with unchanged da=
-ta looking
->>>> like holes in the file):
->>>>
->>>>   qemu-img convert -p -n $nbd disk.raw
->>>>
->>>> This is fast and efficient as it uses block status nbd extension, so i=
-t only
->>>> transfers new data.
->>>
->>> This is an implementation detail. Don't rely on it. What you're doing i=
-s
->>> abusing 'qemu-img convert', so problems like what you describe are to b=
-e
->>> expected.
->>>
->>>> This can be done over and over again to keep the local
->>>> `disk.raw` image up to date with the latest remote snapshot.
->>>>
->>>> However, when the guest OS zeroes some of the data and it gets written=
- into the
->>>> snapshot, qemu-img scans for those zeros and does not write them to th=
-e
->>>> destination image.  Checking the output of `qemu-img map --output=3Djs=
-on $nbd`
->>>> shows that the zeroed data is properly marked as `data: true`.
->>>>
->>>> Using `-S 0` would write zeros even where the holes are, effectively o=
-verwriting
->>>> the data from the last snapshot even though they should not be changed=
-.
->>>>
->>>> Having gone through some workarounds I would like there to be another =
-way.  I
->>>> know this is far from the typical usage of qemu-img, but is this reall=
-y the
->>>> expected behaviour or is this just something nobody really needed befo=
-re?  If it
->>>> is the former, would it be possible to have a parameter that would con=
-trol this
->>>> behaviour?  If the latter is the case, can that behaviour be changed s=
-o that it
->>>> properly replicates the data when `-n` parameter is used?
->>>>
->>>> Basically the only thing we need is to either:
->>>>
->>>> 1) write zeros where they actually are or
->>>>
->>>> 2) turn off explicit sparsification without requesting dense image (ba=
-sically
->>>>     sparsify only the par that is reported as hole on the source) or
->>>>
->>>> 3) ideally, just FALLOC_FL_PUNCH_HOLE in places where source did repor=
-t data,
->>>>     but qemu-img found they are all zeros (or source reported HOLE+ZER=
-O which, I
->>>>     believe, is effectively the same)
->>>>
->>>> If you want to try this out, I found the easiest reproducible way is u=
-sing
->>>> nbdkit's data plugin, which can simulate whatever source image you lik=
-e.
->>>
->>> I think what you _really_ want is a commit block job. The problem is
->>> just that you don't have a proper backing file chain, but just a bunch
->>> of NBD connections.
->>>
->>> Can't you get an NBD connection that already provides the condensed for=
-m
->>> of the whole snapshot chain directly at the source? If the NBD server
->>> was QEMU, this would actually be easier than providing each snapshot
->>> individually.
->>>
->>> If this isn't possible, I think you need to replicate the backing chain
->>> on the destination instead of converting into the same image again and
->>> again so that qemu-img knows that it must take existing data of the
->>> backing file into consideration:
->>>
->>>     qemu-img convert -O qcow2 nbd://... base.qcow2
->>>     qemu-img convert -O qcow2 -F qcow2 -B base.qcow2 nbd://... overlay1=
-.qcow2
->>>     qemu-img convert -O qcow2 -F qcow2 -B overlay1.qcow2 nbd://... over=
-lay2.qcow2
->>>     ...
-
-Is it safe in general?
-
-Qemu often consider rounding-up allocated ranges to be safe, or just consid=
-er unknown area as allocated.
-And if this happen, we'll convert unallocated hole to allocated zeroes on t=
-arget, which will break
-backing chain.
-
-This way would be correct if on source under nbd server we have valid backi=
-ng chain too, so in case of
-"rounding-up" we'll just read valid data from backing. But it is not the ca=
-se (or sorry, if I misunderstood).
-
->>>
->>
->> I thought of this, but (to be honest) I did not know that `-B` would
->> work for nbd.
+On 24/04/2019 03.16, Li Qiang wrote:
 >=20
-> It still depends on the NBD server providing the right block allocation
-> status, but that's no worse than what you needed for -n. But whether -B
-> can be used at all depends on the target format, not the source.
+> Thomas Huth <thuth@redhat.com <mailto:thuth@redhat.com>> =E4=BA=8E2019=E5=
+=B9=B44=E6=9C=8824=E6=97=A5
+> =E5=91=A8=E4=B8=89 =E4=B8=8A=E5=8D=8812:29=E5=86=99=E9=81=93=EF=BC=9A
 >=20
->> Does it assume that data are to be taken from the base image if and
->> only if the source (be it nbd server or just a plain file) says there
->> is a hole?  If yes, then it could nicely solve the issue.
+>     On 20/04/2019 12.00, Li Qiang wrote:
+>     > Signed-off-by: Li Qiang <liq3ea@163.com <mailto:liq3ea@163.com>>
+>     > ---
+>     >=C2=A0 tests/fw_cfg-test.c | 19 +++++++++++++++++++
+>     >=C2=A0 1 file changed, 19 insertions(+)
+>     >
+>     > diff --git a/tests/fw_cfg-test.c b/tests/fw_cfg-test.c
+>     > index c22503619f..9f75dbb5f4 100644
+>     > --- a/tests/fw_cfg-test.c
+>     > +++ b/tests/fw_cfg-test.c
+>     > @@ -174,6 +174,24 @@ static void test_fw_cfg_boot_menu(void)
+>     >=C2=A0 =C2=A0 =C2=A0 qtest_quit(s);
+>     >=C2=A0 }
+>     >=C2=A0
+>     > +static void test_fw_cfg_reboot_timeout(void)
+>     > +{
+>     > +=C2=A0 =C2=A0 QFWCFG *fw_cfg;
+>     > +=C2=A0 =C2=A0 QTestState *s;
+>     > +=C2=A0 =C2=A0 uint32_t reboot_timeout =3D 0;
+>     > +=C2=A0 =C2=A0 size_t filesize;
+>     > +
+>     > +=C2=A0 =C2=A0 s =3D qtest_init("-boot reboot-timeout=3D15");
+>     > +=C2=A0 =C2=A0 fw_cfg =3D pc_fw_cfg_init(s);
+>     > +
+>     > +=C2=A0 =C2=A0 filesize =3D qfw_cfg_get_file(fw_cfg, "etc/boot-fa=
+il-wait",
+>     > +=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
+=A0 =C2=A0&reboot_timeout, sizeof(reboot_timeout));
+>     > +=C2=A0 =C2=A0 g_assert_cmpint(filesize, =3D=3D, sizeof(reboot_ti=
+meout));
+>     > +=C2=A0 =C2=A0 g_assert_cmpint(reboot_timeout, =3D=3D, 15);
 >=20
-> I haven't tested it now, but yes, that's what I remember it to do.
+>     Is this endianess-safe? Or do you need to byteswap reboot_timeout i=
+f the
+>     host and guest endianess does not match?
 >=20
-> Looking at the code, the requirement seems to be that the NBD server
-> flags the sparse blocks as a HOLE, but not as ZERO.
+> Good question!
 >=20
-> Kevin
->=20
+> IIUC, the qemu fw_cfg store the 'file' entry data just in byte stream.
+> So there is no need
+> to consider the file's endianess. If when the file entry is stored
+> without considering endianess,
+> it will be ok to ignore the endianess. So for this patch, the
+> 'reboot_timeout' is ok as when we stored=C2=A0
+> it we don't consider endianess. But for 'splash-time', when we stored
+> it=C2=A0 we convert it to little endian
+> so when we fetches it, we should also convert it from little endian to
+> cpu-endian.
 
+I just gave these patches a try on a big endian host, and the test fails
+indeed:
 
---=20
-Best regards,
-Vladimir
+$ QTEST_QEMU_BINARY=3Dx86_64-softmmu/qemu-system-x86_64 tests/fw_cfg-test
+/x86_64/fw_cfg/signature: OK
+/x86_64/fw_cfg/id: OK
+/x86_64/fw_cfg/uuid: OK
+/x86_64/fw_cfg/ram_size: OK
+/x86_64/fw_cfg/nographic: OK
+/x86_64/fw_cfg/nb_cpus: OK
+/x86_64/fw_cfg/max_cpus: OK
+/x86_64/fw_cfg/numa: OK
+/x86_64/fw_cfg/boot_menu: OK
+/x86_64/fw_cfg/reboot_timeout: **
+ERROR:tests/fw_cfg-test.c:190:test_fw_cfg_reboot_timeout: assertion
+failed (reboot_timeout =3D=3D 15): (0 =3D=3D 15)
+Aborted
+
+=3D> it also fails for reboot_timeout already, not only for splash_time.
+
+> So I think we can have following choose:
+>=20
+> 1. Don't consider the endianess, this is ok when emaulated target and
+> host target has the same endianess.
+
+Sorry, but that's not a real choice. qtests must also work when you e.g.
+run qemu-system-x86_64 on a big endian host.
+
+ Thomas
