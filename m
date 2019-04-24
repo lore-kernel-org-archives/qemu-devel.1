@@ -2,85 +2,67 @@ Return-Path: <SRS0=3XOk=S2=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.7 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,
+	UNWANTED_LANGUAGE_BODY,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 66638C10F11
-	for <qemu-devel@archiver.kernel.org>; Wed, 24 Apr 2019 14:16:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BEEF0C10F11
+	for <qemu-devel@archiver.kernel.org>; Wed, 24 Apr 2019 14:17:15 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2DD5721773
-	for <qemu-devel@archiver.kernel.org>; Wed, 24 Apr 2019 14:16:56 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 89FA321773
+	for <qemu-devel@archiver.kernel.org>; Wed, 24 Apr 2019 14:17:15 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="fgEUkEqr"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2DD5721773
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=163.com header.i=@163.com header.b="Iky/ArWz"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 89FA321773
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=163.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:42369 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:42371 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hJIhj-0003xD-3O
-	for qemu-devel@archiver.kernel.org; Wed, 24 Apr 2019 10:16:55 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:39018)
+	id 1hJIi2-0004AA-LY
+	for qemu-devel@archiver.kernel.org; Wed, 24 Apr 2019 10:17:14 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:39025)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <liq3ea@gmail.com>) id 1hJIfQ-0002XI-3l
-	for qemu-devel@nongnu.org; Wed, 24 Apr 2019 10:14:33 -0400
+	(envelope-from <liq3ea@163.com>) id 1hJIfe-0002XO-9D
+	for qemu-devel@nongnu.org; Wed, 24 Apr 2019 10:14:47 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <liq3ea@gmail.com>) id 1hJIae-0000Db-PP
-	for qemu-devel@nongnu.org; Wed, 24 Apr 2019 10:09:38 -0400
-Received: from mail-ot1-x342.google.com ([2607:f8b0:4864:20::342]:40967)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <liq3ea@gmail.com>) id 1hJIae-0000Bp-JE
-	for qemu-devel@nongnu.org; Wed, 24 Apr 2019 10:09:36 -0400
-Received: by mail-ot1-x342.google.com with SMTP id g8so2277559otk.8
-	for <qemu-devel@nongnu.org>; Wed, 24 Apr 2019 07:09:36 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
-	h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-	:cc; bh=8v3p45lRJSCzNAEgD3C3YA3auMNuh58OuyBB6RW9DgI=;
-	b=fgEUkEqrzzUGOJvLHpnsgvwtAN/72xIqaQaZZZUK/Um674y9CpV9sikyTH+j8vqjLl
-	iZBZ365qO1nGcZgt8lTG0GjTGOEzSw6yvU4VdHeZZ3QZCztto6lht0Q2EXnmN4AkJ1xq
-	vG9FdtqHnWh4iaWQkbD/6FCI6vtcMUaEQrpEdKnAicMXMPkP3k+Y2sejSfRCzwVhZPjf
-	Mm5dkw3vNDnxI9hpFaoYY/ciuCrqBVc4MlsnaWG872cN5FPpu0+A6v3cpvGIKARlu5nl
-	28Ql2T/zEBkRPFr0M3K+R0+2JkpzMshFFwN+Kdo1a0fxVYeoe3xQcwrVFGhnCK/AM89h
-	lDhA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=1e100.net; s=20161025;
-	h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-	:message-id:subject:to:cc;
-	bh=8v3p45lRJSCzNAEgD3C3YA3auMNuh58OuyBB6RW9DgI=;
-	b=So7fmh6cW0tEnXab96hbOmQ+FmhJ832KJVmQPY+qzWLEWuk/CWomiR8wGJ9o8Koc6w
-	8oYpSzkp/1Pa72mqVyr7oNAeagD5qEXmC2faidZXwDbbNL7WOWJVYzmF3TEhH+WsNlOq
-	qbr3SYqi65af+wr89aP3L7AVKml11JMFVvh7reH75BMBGUIWrqgsgIXF75uYMCvt3bGS
-	yYnZYN3dhazSonqI7okYEF8+1SgJjvrpb1duoA4ZDH4dLhXRk/mMTUCa4xHHYEXIbOg/
-	dP4RG77fjc/gOhdx0bFDpPxKkamzuUmCl7AAgagLuWiUnTFSmzofkfBD3RT7aUCR93nI
-	H5qA==
-X-Gm-Message-State: APjAAAXLuuFw8hgDMZxEbn+nWbXZ7e1YxqnD8z2Ewa5IsoBpIgfuDZ8i
-	+ao7B01jbvZCu+9TMjjC6h3om0ZMJ0G97gqHHuA=
-X-Google-Smtp-Source: APXvYqyP18S9wYx3nm3FvokhDTVznJUZJYP8TuBOtPmUtWUAypFEUT9OX0VV2S1uLySDKrAtMEIjLkuS/hKX7s1YHW4=
-X-Received: by 2002:a9d:7b50:: with SMTP id f16mr19183704oto.221.1556114975523;
-	Wed, 24 Apr 2019 07:09:35 -0700 (PDT)
-MIME-Version: 1.0
-References: <20190420100056.116305-1-liq3ea@163.com>
-	<20190420100056.116305-4-liq3ea@163.com>
-	<a27cd912-4f58-55ac-1aae-e4999fa3d84d@redhat.com>
-	<CAKXe6SJZWs7HtXutX6W3saDhaNDtVPMQEh2+s+9XiM3TtZqLdQ@mail.gmail.com>
-	<6dd699b1-f24d-743b-343e-f1df6c8672b9@redhat.com>
-In-Reply-To: <6dd699b1-f24d-743b-343e-f1df6c8672b9@redhat.com>
-From: Li Qiang <liq3ea@gmail.com>
-Date: Wed, 24 Apr 2019 22:08:59 +0800
-Message-ID:
- <CAKXe6SJ5iqXTMZMKQG4X0r1dDKNCBq06hcDPVzzUupCD=nH4zw@mail.gmail.com>
-To: Thomas Huth <thuth@redhat.com>
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
-	recognized.
-X-Received-From: 2607:f8b0:4864:20::342
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Content-Filtered-By: Mailman/MimeDel 2.1.21
-Subject: Re: [Qemu-devel] [PATCH 3/4] tests: fw_cfg: add reboot_timeout test
+	(envelope-from <liq3ea@163.com>) id 1hJIY4-0006iH-5O
+	for qemu-devel@nongnu.org; Wed, 24 Apr 2019 10:06:57 -0400
+Received: from m12-14.163.com ([220.181.12.14]:54701)
+	by eggs.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <liq3ea@163.com>) id 1hJIY2-0006gJ-HF
+	for qemu-devel@nongnu.org; Wed, 24 Apr 2019 10:06:56 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=163.com;
+	s=s110527; h=From:Subject:Date:Message-Id; bh=vgOeaRvpko5K839zOg
+	5xl9f11bNiWV/S9xLagM3xojs=; b=Iky/ArWzE7zTNSsAoAPwbDm222RehfXnnB
+	qyxdaVjMRiWZtcydpJ2hOQDLdnD13AHU3VxZTW3Cqryv4AFDHPkxncy/FjPF4HfW
+	tDGYUxQAP/zNZrWG7e/diM5+bDLnqyBgcjrNfTUKqmAFgsAw1pKtxvrSePPUwglm
+	PEWhpoz4I=
+Received: from localhost.localdomain (unknown [115.200.201.0])
+	by smtp10 (Coremail) with SMTP id DsCowAC3Ayl0bcBcrks9CA--.5531S6;
+	Wed, 24 Apr 2019 22:06:52 +0800 (CST)
+From: Li Qiang <liq3ea@163.com>
+To: philmd@redhat.com, lersek@redhat.com, kraxel@redhat.com, thuth@redhat.com,
+	lvivier@redhat.com, pbonzini@redhat.com
+Date: Wed, 24 Apr 2019 07:06:42 -0700
+Message-Id: <20190424140643.62457-5-liq3ea@163.com>
+X-Mailer: git-send-email 2.17.1
+In-Reply-To: <20190424140643.62457-1-liq3ea@163.com>
+References: <20190424140643.62457-1-liq3ea@163.com>
+X-CM-TRANSID: DsCowAC3Ayl0bcBcrks9CA--.5531S6
+X-Coremail-Antispam: 1Uf129KBjvJXoW7CFyrWw48tw45CrWDAw1rXrb_yoW8WF13pF
+	1jk3ZFkrZ5JFW2qr13KrnFqr1aq3s7Jr4UArZrXFW0yw18Wr1qqa18Ca4Fg3WDWFZ2vFs8
+	ZF4vqF13KF1DWaDanT9S1TB71UUUUUUqnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+	9KBjDUYxBIdaVFxhVjvjDU0xZFpf9x07U2_M-UUUUU=
+X-Originating-IP: [115.200.201.0]
+X-CM-SenderInfo: 5oltjvrd6rljoofrz/1tbitBygbVSIbtkMzQAAsP
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x
+X-Received-From: 220.181.12.14
+Subject: [Qemu-devel] [PATCH v2 4/5] tests: fw_cfg: add reboot_timeout test
  case
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
@@ -93,111 +75,69 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: lvivier@redhat.com,
-	=?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>,
-	Li Qiang <liq3ea@163.com>, Qemu Developers <qemu-devel@nongnu.org>,
-	Gerd Hoffmann <kraxel@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
-	Laszlo Ersek <lersek@redhat.com>
+Cc: Li Qiang <liq3ea@163.com>, liq3ea@gmail.com, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190424140859.s9ty7KCwFr9ZC_qv6NGMBDH8DXoHWyaWCTgpxLFsPl8@z>
+Content-Type: text/plain; charset="UTF-8"
+Message-ID: <20190424140642.nq3m4Bgn3N3ADupRP00zV7dSYtrqJpeDdcnE_qRiopM@z>
 
-Thomas Huth <thuth@redhat.com> =E4=BA=8E2019=E5=B9=B44=E6=9C=8824=E6=97=A5=
-=E5=91=A8=E4=B8=89 =E4=B8=8B=E5=8D=883:31=E5=86=99=E9=81=93=EF=BC=9A
+Signed-off-by: Li Qiang <liq3ea@163.com>
+---
+Change since v1:
+Converting little endian reboot_timeout to cpu endian
 
-> On 24/04/2019 03.16, Li Qiang wrote:
-> >
-> > Thomas Huth <thuth@redhat.com <mailto:thuth@redhat.com>> =E4=BA=8E2019=
-=E5=B9=B44=E6=9C=8824=E6=97=A5
-> > =E5=91=A8=E4=B8=89 =E4=B8=8A=E5=8D=8812:29=E5=86=99=E9=81=93=EF=BC=9A
-> >
-> >     On 20/04/2019 12.00, Li Qiang wrote:
-> >     > Signed-off-by: Li Qiang <liq3ea@163.com <mailto:liq3ea@163.com>>
-> >     > ---
-> >     >  tests/fw_cfg-test.c | 19 +++++++++++++++++++
-> >     >  1 file changed, 19 insertions(+)
-> >     >
-> >     > diff --git a/tests/fw_cfg-test.c b/tests/fw_cfg-test.c
-> >     > index c22503619f..9f75dbb5f4 100644
-> >     > --- a/tests/fw_cfg-test.c
-> >     > +++ b/tests/fw_cfg-test.c
-> >     > @@ -174,6 +174,24 @@ static void test_fw_cfg_boot_menu(void)
-> >     >      qtest_quit(s);
-> >     >  }
-> >     >
-> >     > +static void test_fw_cfg_reboot_timeout(void)
-> >     > +{
-> >     > +    QFWCFG *fw_cfg;
-> >     > +    QTestState *s;
-> >     > +    uint32_t reboot_timeout =3D 0;
-> >     > +    size_t filesize;
-> >     > +
-> >     > +    s =3D qtest_init("-boot reboot-timeout=3D15");
-> >     > +    fw_cfg =3D pc_fw_cfg_init(s);
-> >     > +
-> >     > +    filesize =3D qfw_cfg_get_file(fw_cfg, "etc/boot-fail-wait",
-> >     > +                     &reboot_timeout, sizeof(reboot_timeout));
-> >     > +    g_assert_cmpint(filesize, =3D=3D, sizeof(reboot_timeout));
-> >     > +    g_assert_cmpint(reboot_timeout, =3D=3D, 15);
-> >
-> >     Is this endianess-safe? Or do you need to byteswap reboot_timeout i=
-f
-> the
-> >     host and guest endianess does not match?
-> >
-> > Good question!
-> >
-> > IIUC, the qemu fw_cfg store the 'file' entry data just in byte stream.
-> > So there is no need
-> > to consider the file's endianess. If when the file entry is stored
-> > without considering endianess,
-> > it will be ok to ignore the endianess. So for this patch, the
-> > 'reboot_timeout' is ok as when we stored
-> > it we don't consider endianess. But for 'splash-time', when we stored
-> > it  we convert it to little endian
-> > so when we fetches it, we should also convert it from little endian to
-> > cpu-endian.
->
-> I just gave these patches a try on a big endian host, and the test fails
-> indeed:
->
->
-Hi Thomas,
+ tests/fw_cfg-test.c | 21 +++++++++++++++++++++
+ 1 file changed, 21 insertions(+)
 
-I have sent out a revision patchset, could you please also try the new in
-the big endian host.
-
-Thanks,
-Li Qiang
+diff --git a/tests/fw_cfg-test.c b/tests/fw_cfg-test.c
+index c22503619f..6c6add54db 100644
+--- a/tests/fw_cfg-test.c
++++ b/tests/fw_cfg-test.c
+@@ -15,6 +15,7 @@
+ #include "libqtest.h"
+ #include "standard-headers/linux/qemu_fw_cfg.h"
+ #include "libqos/fw_cfg.h"
++#include "qemu/bswap.h"
+ 
+ static uint64_t ram_size = 128 << 20;
+ static uint16_t nb_cpus = 1;
+@@ -174,6 +175,25 @@ static void test_fw_cfg_boot_menu(void)
+     qtest_quit(s);
+ }
+ 
++static void test_fw_cfg_reboot_timeout(void)
++{
++    QFWCFG *fw_cfg;
++    QTestState *s;
++    uint32_t reboot_timeout = 0;
++    size_t filesize;
++
++    s = qtest_init("-boot reboot-timeout=15");
++    fw_cfg = pc_fw_cfg_init(s);
++
++    filesize = qfw_cfg_get_file(fw_cfg, "etc/boot-fail-wait",
++                     &reboot_timeout, sizeof(reboot_timeout));
++    g_assert_cmpint(filesize, ==, sizeof(reboot_timeout));
++    reboot_timeout = le32_to_cpu(reboot_timeout);
++    g_assert_cmpint(reboot_timeout, ==, 15);
++    pc_fw_cfg_uninit(fw_cfg);
++    qtest_quit(s);
++}
++
+ int main(int argc, char **argv)
+ {
+     int ret;
+@@ -195,6 +215,7 @@ int main(int argc, char **argv)
+     qtest_add_func("fw_cfg/max_cpus", test_fw_cfg_max_cpus);
+     qtest_add_func("fw_cfg/numa", test_fw_cfg_numa);
+     qtest_add_func("fw_cfg/boot_menu", test_fw_cfg_boot_menu);
++    qtest_add_func("fw_cfg/reboot_timeout", test_fw_cfg_reboot_timeout);
+ 
+     ret = g_test_run();
+ 
+-- 
+2.17.1
 
 
 
-
-> $ QTEST_QEMU_BINARY=3Dx86_64-softmmu/qemu-system-x86_64 tests/fw_cfg-test
-> /x86_64/fw_cfg/signature: OK
-> /x86_64/fw_cfg/id: OK
-> /x86_64/fw_cfg/uuid: OK
-> /x86_64/fw_cfg/ram_size: OK
-> /x86_64/fw_cfg/nographic: OK
-> /x86_64/fw_cfg/nb_cpus: OK
-> /x86_64/fw_cfg/max_cpus: OK
-> /x86_64/fw_cfg/numa: OK
-> /x86_64/fw_cfg/boot_menu: OK
-> /x86_64/fw_cfg/reboot_timeout: **
-> ERROR:tests/fw_cfg-test.c:190:test_fw_cfg_reboot_timeout: assertion
-> failed (reboot_timeout =3D=3D 15): (0 =3D=3D 15)
-> Aborted
->
-> =3D> it also fails for reboot_timeout already, not only for splash_time.
->
-> > So I think we can have following choose:
-> >
-> > 1. Don't consider the endianess, this is ok when emaulated target and
-> > host target has the same endianess.
->
-> Sorry, but that's not a real choice. qtests must also work when you e.g.
-> run qemu-system-x86_64 on a big endian host.
->
->  Thomas
->
