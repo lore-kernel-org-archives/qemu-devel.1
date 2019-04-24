@@ -7,62 +7,62 @@ X-Spam-Status: No, score=-8.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,USER_AGENT_GIT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 13E6FC282E1
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 565E4C282CE
 	for <qemu-devel@archiver.kernel.org>; Wed, 24 Apr 2019 14:23:39 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id CEC1121903
-	for <qemu-devel@archiver.kernel.org>; Wed, 24 Apr 2019 14:23:38 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 1E849218FE
+	for <qemu-devel@archiver.kernel.org>; Wed, 24 Apr 2019 14:23:39 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=163.com header.i=@163.com header.b="Bj4KFbY+"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CEC1121903
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=163.com header.i=@163.com header.b="E9B7PVev"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1E849218FE
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=163.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:42493 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:42491 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hJIoE-0000j8-1R
+	id 1hJIoE-0000j4-AQ
 	for qemu-devel@archiver.kernel.org; Wed, 24 Apr 2019 10:23:38 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:39117)
+Received: from eggs.gnu.org ([209.51.188.92]:39085)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <liq3ea@163.com>) id 1hJIfe-0002as-7g
+	(envelope-from <liq3ea@163.com>) id 1hJIfe-0002aF-9o
 	for qemu-devel@nongnu.org; Wed, 24 Apr 2019 10:14:47 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <liq3ea@163.com>) id 1hJIY6-0006jE-2f
-	for qemu-devel@nongnu.org; Wed, 24 Apr 2019 10:06:59 -0400
-Received: from m12-14.163.com ([220.181.12.14]:54282)
+	(envelope-from <liq3ea@163.com>) id 1hJIY2-0006hS-OE
+	for qemu-devel@nongnu.org; Wed, 24 Apr 2019 10:06:56 -0400
+Received: from m12-14.163.com ([220.181.12.14]:54537)
 	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <liq3ea@163.com>) id 1hJIY4-0006fB-19
-	for qemu-devel@nongnu.org; Wed, 24 Apr 2019 10:06:57 -0400
+	(envelope-from <liq3ea@163.com>) id 1hJIY1-0006fH-8q
+	for qemu-devel@nongnu.org; Wed, 24 Apr 2019 10:06:54 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=163.com;
-	s=s110527; h=From:Subject:Date:Message-Id; bh=PwPb4mLM2B0UzCTSk2
-	KeE78xv8ZHNYgaXG8Hlt3/UP8=; b=Bj4KFbY+oJQhATtW8WDlyUSG7ACyBW490c
-	nlwxDY79kJ53viKMgb2h9Kdg+oejgb00a+xpV3rzu/ZfCSvt1LDHqZjn/TiQ6bhV
-	JfCYX5qIdFpQmNjJ4ImVaajbkuCTcYPIf+r9i59oGef3uKPwhQAzKHnskoemcpZm
-	HMsa7sIu8=
+	s=s110527; h=From:Subject:Date:Message-Id; bh=BBctNjDbfh7h2nNE/V
+	nZPLT9nVBtuY81kv5/qyNenhU=; b=E9B7PVevEE46QOVsoSuKAu2BWPUWTKmFIL
+	KCs1c+wGZyuVOcecxS8LW/UjeuUIzzreCsRxcMIpGgVTa30lPO2z/unRoMK0XEHl
+	rDzJCFqdZcj2LqLwBOJ7hUfuDYwb/8t0xPeb54vByUS/1rzR59DElpDGSy4ya0x+
+	Ioa3xRn0w=
 Received: from localhost.localdomain (unknown [115.200.201.0])
-	by smtp10 (Coremail) with SMTP id DsCowAC3Ayl0bcBcrks9CA--.5531S4;
-	Wed, 24 Apr 2019 22:06:49 +0800 (CST)
+	by smtp10 (Coremail) with SMTP id DsCowAC3Ayl0bcBcrks9CA--.5531S5;
+	Wed, 24 Apr 2019 22:06:51 +0800 (CST)
 From: Li Qiang <liq3ea@163.com>
 To: philmd@redhat.com, lersek@redhat.com, kraxel@redhat.com, thuth@redhat.com,
 	lvivier@redhat.com, pbonzini@redhat.com
-Date: Wed, 24 Apr 2019 07:06:40 -0700
-Message-Id: <20190424140643.62457-3-liq3ea@163.com>
+Date: Wed, 24 Apr 2019 07:06:41 -0700
+Message-Id: <20190424140643.62457-4-liq3ea@163.com>
 X-Mailer: git-send-email 2.17.1
 In-Reply-To: <20190424140643.62457-1-liq3ea@163.com>
 References: <20190424140643.62457-1-liq3ea@163.com>
-X-CM-TRANSID: DsCowAC3Ayl0bcBcrks9CA--.5531S4
-X-Coremail-Antispam: 1Uf129KBjvJXoWxWr4DAr4rtrW8Jw18Ar1xAFb_yoW5AFW3pF
-	ZxCF13trZ3G3WfKrnxJw17JF1a9rykXr1UW3y3uFWFyw17Arn8tF42k34Y9ryUXrW8ZF45
-	A3yq9Fyak3Z7XFJanT9S1TB71UUUUUUqnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-	9KBjDUYxBIdaVFxhVjvjDU0xZFpf9x07j8TmhUUUUU=
+X-CM-TRANSID: DsCowAC3Ayl0bcBcrks9CA--.5531S5
+X-Coremail-Antispam: 1Uf129KBjvdXoWrKr45Wr1DZF17CFyxJr45Awb_yoWfCFc_uF
+	W3Aw1rW3y7AwnFkF9YyF15Aw15Ka4UXF9Ikrn7KFyqy34UX39Fkw4Iqa9F9w1rWFWUCr9x
+	Ca95Xr1DCa1v9jkaLaAFLSUrUUUUUb8apTn2vfkv8UJUUUU8Yxn0WfASr-VFAUDa7-sFnT
+	9fnUUvcSsGvfC2KfnxnUUI43ZEXa7IU8IzuJUUUUU==
 X-Originating-IP: [115.200.201.0]
-X-CM-SenderInfo: 5oltjvrd6rljoofrz/xtbBZhmgbVaD1JFpjQAAsG
+X-CM-SenderInfo: 5oltjvrd6rljoofrz/xtbBLxWgbVUMI+dgjQAAsH
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x
 X-Received-From: 220.181.12.14
-Subject: [Qemu-devel] [PATCH v2 2/5] tests: fw_cfg: add a function to get
- the fw_cfg file
+Subject: [Qemu-devel] [PATCH v2 3/5] fw_cfg: reboot: store reboot-timeout as
+ little endian
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -79,93 +79,38 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 Content-Type: text/plain; charset="UTF-8"
-Message-ID: <20190424140640.SJ-NEwa6Kw4r9iUASy5Pr5jSXXbsn8mxdyB6qnAdr64@z>
+Message-ID: <20190424140641.QY80v4LCpLQ6Y6P8Ku4ik1d_AczmZz8AplFHfa0RXfM@z>
 
-This is useful to write qtest about fw_cfg file entry.
+So that if the guest and host endianess does not match it
+can still work as expection.
 
 Signed-off-by: Li Qiang <liq3ea@163.com>
-Acked-by: Thomas Huth <thuth@redhat.com>
 ---
- tests/libqos/fw_cfg.c | 45 +++++++++++++++++++++++++++++++++++++++++++
- tests/libqos/fw_cfg.h |  2 ++
- 2 files changed, 47 insertions(+)
+ hw/nvram/fw_cfg.c | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
 
-diff --git a/tests/libqos/fw_cfg.c b/tests/libqos/fw_cfg.c
-index c6839c53c8..1f46258f96 100644
---- a/tests/libqos/fw_cfg.c
-+++ b/tests/libqos/fw_cfg.c
-@@ -16,6 +16,7 @@
- #include "libqos/fw_cfg.h"
- #include "libqtest.h"
- #include "qemu/bswap.h"
-+#include "hw/nvram/fw_cfg.h"
- 
- void qfw_cfg_select(QFWCFG *fw_cfg, uint16_t key)
+diff --git a/hw/nvram/fw_cfg.c b/hw/nvram/fw_cfg.c
+index 5c3a46ce6f..df4242fc9c 100644
+--- a/hw/nvram/fw_cfg.c
++++ b/hw/nvram/fw_cfg.c
+@@ -178,6 +178,7 @@ static void fw_cfg_reboot(FWCfgState *s)
  {
-@@ -59,6 +60,50 @@ static void mm_fw_cfg_select(QFWCFG *fw_cfg, uint16_t key)
-     qtest_writew(fw_cfg->qts, fw_cfg->base, key);
+     const char *reboot_timeout = NULL;
+     int64_t rt_val = -1;
++    uint32_t rt_le32;
+ 
+     /* get user configuration */
+     QemuOptsList *plist = qemu_find_opts("boot-opts");
+@@ -194,7 +195,8 @@ static void fw_cfg_reboot(FWCfgState *s)
+         }
+     }
+ 
+-    fw_cfg_add_file(s, "etc/boot-fail-wait", g_memdup(&rt_val, 4), 4);
++    rt_le32 = cpu_to_le32(rt_val);
++    fw_cfg_add_file(s, "etc/boot-fail-wait", g_memdup(&rt_le32, 4), 4);
  }
  
-+/*
-+ * The caller need check the return value. When the return value is
-+ * nonzero, it means that some bytes have been transferred.
-+ *
-+ * If the fw_cfg file in question is smaller than the allocated & passed-in
-+ * buffer, then the buffer has been populated only in part.
-+ *
-+ * If the fw_cfg file in question is larger than the passed-in
-+ * buffer, then the return value explains how much room would have been
-+ * necessary in total. And, while the caller's buffer has been fully
-+ * populated, it has received only a starting slice of the fw_cfg file.
-+ */
-+size_t qfw_cfg_get_file(QFWCFG *fw_cfg, const char *filename,
-+                      void *data, size_t buflen)
-+{
-+    uint32_t count;
-+    uint32_t i;
-+    unsigned char *filesbuf = NULL;
-+    size_t dsize;
-+    FWCfgFile *pdir_entry;
-+    size_t filesize = 0;
-+
-+    qfw_cfg_get(fw_cfg, FW_CFG_FILE_DIR, &count, sizeof(count));
-+    count = be32_to_cpu(count);
-+    dsize = sizeof(uint32_t) + count * sizeof(struct fw_cfg_file);
-+    filesbuf = g_malloc(dsize);
-+    qfw_cfg_get(fw_cfg, FW_CFG_FILE_DIR, filesbuf, dsize);
-+    pdir_entry = (FWCfgFile *)(filesbuf + sizeof(uint32_t));
-+    for (i = 0; i < count; ++i, ++pdir_entry) {
-+        if (!strcmp(pdir_entry->name, filename)) {
-+            uint32_t len = be32_to_cpu(pdir_entry->size);
-+            uint16_t sel = be16_to_cpu(pdir_entry->select);
-+            filesize = len;
-+            if (len > buflen) {
-+                len = buflen;
-+            }
-+            qfw_cfg_get(fw_cfg, sel, data, len);
-+            break;
-+        }
-+    }
-+    g_free(filesbuf);
-+    return filesize;
-+}
-+
- static void mm_fw_cfg_read(QFWCFG *fw_cfg, void *data, size_t len)
- {
-     uint8_t *ptr = data;
-diff --git a/tests/libqos/fw_cfg.h b/tests/libqos/fw_cfg.h
-index 60de81e863..13325cc4ff 100644
---- a/tests/libqos/fw_cfg.h
-+++ b/tests/libqos/fw_cfg.h
-@@ -31,6 +31,8 @@ void qfw_cfg_get(QFWCFG *fw_cfg, uint16_t key, void *data, size_t len);
- uint16_t qfw_cfg_get_u16(QFWCFG *fw_cfg, uint16_t key);
- uint32_t qfw_cfg_get_u32(QFWCFG *fw_cfg, uint16_t key);
- uint64_t qfw_cfg_get_u64(QFWCFG *fw_cfg, uint16_t key);
-+size_t qfw_cfg_get_file(QFWCFG *fw_cfg, const char *filename,
-+                        void *data, size_t buflen);
- 
- QFWCFG *mm_fw_cfg_init(QTestState *qts, uint64_t base);
- void mm_fw_cfg_uninit(QFWCFG *fw_cfg);
+ static void fw_cfg_write(FWCfgState *s, uint8_t value)
 -- 
 2.17.1
 
