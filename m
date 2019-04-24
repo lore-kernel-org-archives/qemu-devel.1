@@ -1,30 +1,30 @@
 Received: from eggs.gnu.org ([209.51.188.92]:40516)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1hJMfe-0003Rw-5Y
-	for qemu-devel@nongnu.org; Wed, 24 Apr 2019 14:31:03 -0400
+	(envelope-from <ehabkost@redhat.com>) id 1hJMfl-0003Rw-ID
+	for qemu-devel@nongnu.org; Wed, 24 Apr 2019 14:31:10 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1hJMZA-00008R-Eh
-	for qemu-devel@nongnu.org; Wed, 24 Apr 2019 14:24:21 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:50746)
+	(envelope-from <ehabkost@redhat.com>) id 1hJMVj-0003et-JP
+	for qemu-devel@nongnu.org; Wed, 24 Apr 2019 14:20:49 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:59636)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1hJMZA-00007n-9F
-	for qemu-devel@nongnu.org; Wed, 24 Apr 2019 14:24:20 -0400
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
-	[10.5.11.14])
+	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1hJMVb-0003Qx-Mu
+	for qemu-devel@nongnu.org; Wed, 24 Apr 2019 14:20:40 -0400
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+	[10.5.11.13])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 8075012E4FE
-	for <qemu-devel@nongnu.org>; Wed, 24 Apr 2019 18:24:19 +0000 (UTC)
-Date: Wed, 24 Apr 2019 15:24:15 -0300
+	by mx1.redhat.com (Postfix) with ESMTPS id 2E134C0B2A4C
+	for <qemu-devel@nongnu.org>; Wed, 24 Apr 2019 18:20:38 +0000 (UTC)
+Date: Wed, 24 Apr 2019 15:20:36 -0300
 From: Eduardo Habkost <ehabkost@redhat.com>
-Message-ID: <20190424182415.GI18406@habkost.net>
+Message-ID: <20190424182036.GH18406@habkost.net>
 References: <20190423212246.3542-1-ehabkost@redhat.com>
 	<20190423212246.3542-2-ehabkost@redhat.com>
-	<76b8bb16-2e71-c41f-0d4a-79f6df059092@redhat.com>
+	<20190424082652.GC28615@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=iso-8859-1
 Content-Disposition: inline
-In-Reply-To: <76b8bb16-2e71-c41f-0d4a-79f6df059092@redhat.com>
+In-Reply-To: <20190424082652.GC28615@redhat.com>
 Content-Transfer-Encoding: quoted-printable
 Subject: Re: [Qemu-devel] [PATCH 1/3] qapi: SupportStatusInfo struct
 List-Id: <qemu-devel.nongnu.org>
@@ -35,18 +35,13 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <philmd@redhat.com>
+To: Daniel =?iso-8859-1?Q?P=2E_Berrang=E9?= <berrange@redhat.com>
 Cc: qemu-devel@nongnu.org, mprivozn@redhat.com, Markus Armbruster <armbru@redhat.com>
 
-On Wed, Apr 24, 2019 at 12:23:33AM +0200, Philippe Mathieu-Daud=E9 wrote:
-> Hi Eduardo,
->=20
-> On 4/23/19 11:22 PM, Eduardo Habkost wrote:
+On Wed, Apr 24, 2019 at 09:26:52AM +0100, Daniel P. Berrang=E9 wrote:
+> On Tue, Apr 23, 2019 at 06:22:44PM -0300, Eduardo Habkost wrote:
 > > This struct will be used to represent support and deprecation
 > > status of QEMU features.
->=20
-> Excellent idea!
->=20
 > >=20
 > > Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
 > > ---
@@ -67,12 +62,6 @@ On Wed, Apr 24, 2019 at 12:23:33AM +0200, Philippe Mathieu-Daud=E9 wrote:
 > > +#
 > > +# Information on support status of a given feature
 > > +# (e.g. machine type)
->=20
-> Hopefully it is generic, we can use it for devices too.
-
-Yes, I want to keep it generic.
-
->=20
 > > +#
 > > +# @deprecated: if true, the given feature is deprecated and may be r=
 emoved
@@ -94,20 +83,23 @@ e the name
 > > +{ 'struct': 'SupportStatusInfo',
 > > +  'data': { 'deprecated': 'bool',
 > > +            '*status-message': 'str',
+> > +            '*suggested-alternative': 'str' } }
 >=20
-> This one shouldn't be optional IMHO, we should enforce developpers to
-> give a reason for their deprecation.
+> I see status-message has to be optional, since you're embedding the
+> struct into another struct and want deprecated=3D=3Dfalse by default.
 >=20
-> With this argument not optional:
->=20
-> Reviewed-by: Philippe Mathieu-Daud=E9 <philmd@redhat.com>
+> I'd be inclined to change it to embed a pointer to the struct and
+> drop the deprecated field, and make both status-message and
+> suggested-alternative be mandatory. ie a struct  "DeprecationInfo"=20
+> the pointer to which is NULL if not deprecated.
 
-I might agree with you if you show me what would be a good
-"reason for deprecation" string for pc-0.15 and spapr.  :)
+That could be a simple solution if we were sure we would only
+track deprecation info.  But I would like us to track additional
+support status on that struct eventually.
 
-The only information contained in these machines today is "use
-another machine instead", and this is already encoded in the
-suggested-alternative field.
+Also, I'd like to explicitly differentiate "information is not
+available because QEMU is old" from "information is available and
+machine type is not deprecated".
 
 --=20
 Eduardo
