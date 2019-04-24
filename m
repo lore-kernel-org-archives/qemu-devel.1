@@ -2,85 +2,83 @@ Return-Path: <SRS0=3XOk=S2=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.5 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.7 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
+	SPF_PASS,URIBL_BLOCKED autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E8B9BC10F11
-	for <qemu-devel@archiver.kernel.org>; Wed, 24 Apr 2019 19:56:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8E688C10F11
+	for <qemu-devel@archiver.kernel.org>; Wed, 24 Apr 2019 20:13:46 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A4A702077C
-	for <qemu-devel@archiver.kernel.org>; Wed, 24 Apr 2019 19:56:32 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 439B52175B
+	for <qemu-devel@archiver.kernel.org>; Wed, 24 Apr 2019 20:13:46 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="DtCCAgic"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A4A702077C
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=google.com header.i=@google.com header.b="raMrLPW2"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 439B52175B
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=nongnu.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:46539 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:46744 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hJO0N-0000Uq-R0
-	for qemu-devel@archiver.kernel.org; Wed, 24 Apr 2019 15:56:31 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:56477)
+	id 1hJOH3-0008S8-Fj
+	for qemu-devel@archiver.kernel.org; Wed, 24 Apr 2019 16:13:45 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:53270)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <arilou@gmail.com>) id 1hJNkO-00042p-Ku
-	for qemu-devel@nongnu.org; Wed, 24 Apr 2019 15:40:01 -0400
+	(envelope-from <srutherford@google.com>) id 1hJNZk-0006R5-6X
+	for qemu-devel@nongnu.org; Wed, 24 Apr 2019 15:29:01 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <arilou@gmail.com>) id 1hJNkN-0004I9-Ax
-	for qemu-devel@nongnu.org; Wed, 24 Apr 2019 15:40:00 -0400
-Received: from mail-wm1-x342.google.com ([2a00:1450:4864:20::342]:35079)
+	(envelope-from <srutherford@google.com>) id 1hJNN2-0001MD-RB
+	for qemu-devel@nongnu.org; Wed, 24 Apr 2019 15:15:54 -0400
+Received: from mail-yb1-xb44.google.com ([2607:f8b0:4864:20::b44]:44357)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <arilou@gmail.com>) id 1hJNkN-0004Gk-4U
-	for qemu-devel@nongnu.org; Wed, 24 Apr 2019 15:39:59 -0400
-Received: by mail-wm1-x342.google.com with SMTP id y197so6751831wmd.0
-	for <qemu-devel@nongnu.org>; Wed, 24 Apr 2019 12:39:59 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
-	h=from:to:cc:subject:date:message-id:in-reply-to:references
-	:mime-version:content-transfer-encoding;
-	bh=ARCXn+8Wo0U+oiTppL+C49FLsYT2QmTKL0yfmugVNz8=;
-	b=DtCCAgiclLBLPlbio9vUnPnpzrbPWWH3HKOmWbEbTGpRNVHWXh7lgJKN+N42WYhXb+
-	0HMi7lxgF97TBiC7bT4/iD39XrgNt9CtgsiK7CWcMcZp24cGgR6pUlnXv2++/0uXdfvi
-	Lhtee5cu7IHmzhEyCv7pghPIrfMaCKFzURT7L/vAKxr3xY46Vy0+xZ1mRkVpXinjvSwX
-	zf+NVdJlR93++i9iEaT2RGC9xn7LFzFNHc8R7OhJaaGLzTyShF/PCZEl6/5f48yQGx1o
-	8l8JdepCxpryH0dFWgAfXf/mQyrffkmJfNmuMisuRhMyhHGNvSk8EybwCYeCV3nBsF7H
-	EYKw==
+	(Exim 4.71) (envelope-from <srutherford@google.com>)
+	id 1hJNN2-0001If-JN
+	for qemu-devel@nongnu.org; Wed, 24 Apr 2019 15:15:52 -0400
+Received: by mail-yb1-xb44.google.com with SMTP id u187so7532705ybg.11
+	for <qemu-devel@nongnu.org>; Wed, 24 Apr 2019 12:15:51 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20161025;
+	h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+	:cc:content-transfer-encoding;
+	bh=KXoQ7BFg8MCQ5w2hqas+YRo88Lj083QKeczBFQqo+mk=;
+	b=raMrLPW2n1ySXsJ6Qmx9cvhAR1LPiM58H94Ej4RtkOTT/cuhxC+TgVkMETA3AMnIZW
+	utg/Xp0jYhyNQ2H0AVcXTLZVJvOz9TLtcgtL+sReblkJjBdvC4PBznLzpAABE4F+EV9g
+	LpzKI5aigxtjVsAe8KIdWlwvTIMSy7GJ/t8h7uXcvxZOZX+s8SBXcv3i9F0kl83jP46R
+	rRrAr1i7EC8YDeAHhdSFtG1mSuZv4GATkUIjYr11v4HNq4rO825DI6hK0MfAOPwbhvU4
+	8On6Xcpq3txtwSHoXqX6ZLDu5m6sTdXXCdgTROj7iE0SzYl/X6bmPveBwIOoGBYZUJHz
+	uL7g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
 	d=1e100.net; s=20161025;
-	h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
-	:references:mime-version:content-transfer-encoding;
-	bh=ARCXn+8Wo0U+oiTppL+C49FLsYT2QmTKL0yfmugVNz8=;
-	b=EDKP2FWOgZDriheGFLQafeH3SkL+8qjOwP8cvAFBNPmbERdR7jNO1eR3cbahJm9Ud1
-	xxcF5yUuGLo4tjo6B01gyjGN2UojEicuPBypYLq7qA9KVZxyFZIhufLsmf2P1gle0y/7
-	bZTEsDXfIBDs736sRQYUBVyLpAt1HMdP5HEmQrnvKieNwRMphSgOndFdoQNpbk5gq9dV
-	d06+9jX8OZkcx3a4S99Jdcw1+ZuJLpBPj3bkimhSATzuYwgD/htzUSUiN04tspALqa45
-	PHAJ6iwE1nJLgooIJlmh66RX8kmnsmchczqDwaxrig4bEEbyiSmHlnZKKIieuk4JEw2l
-	4CQA==
-X-Gm-Message-State: APjAAAXlsMUky3GEe2aMv8uD9JSm4HT49QA0eFLoIWyXChbh/6LOUN1F
-	TlFxtLh4SLv5a8P6Jam2zMJYQJdo
-X-Google-Smtp-Source: APXvYqyNSC9I6B34LJOkeyGh++0RnrPOuQrzQ8LcafWvFB+R+M9OPWegpL5khRR7Jow5e8nMNWbj8g==
-X-Received: by 2002:a1c:dc43:: with SMTP id t64mr522506wmg.19.1556134797507;
-	Wed, 24 Apr 2019 12:39:57 -0700 (PDT)
-Received: from linux.local ([31.154.166.148]) by smtp.gmail.com with ESMTPSA id
-	n18sm16281372wrt.16.2019.04.24.12.39.55
-	(version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
-	Wed, 24 Apr 2019 12:39:56 -0700 (PDT)
-From: Jon Doron <arilou@gmail.com>
-To: qemu-devel@nongnu.org
-Date: Wed, 24 Apr 2019 22:38:55 +0300
-Message-Id: <20190424193859.31817-17-arilou@gmail.com>
-X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20190424193859.31817-1-arilou@gmail.com>
-References: <20190424193859.31817-1-arilou@gmail.com>
+	h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+	:message-id:subject:to:cc:content-transfer-encoding;
+	bh=KXoQ7BFg8MCQ5w2hqas+YRo88Lj083QKeczBFQqo+mk=;
+	b=jkUAjDiyYtRJYeeSRyY0qb5Z7A0ZggB+iGy7lXVe97fCsqI/8NYD3+2cNexA2xIhv+
+	1mpyZi5o+d5Sr6mSR3o8ZjYhvd8wmvPocqdQIG7b0MVr9tqrwt7wHn+ceg+cJboDiTgK
+	hqQ7LSET6BrcfreIVEmLFWhjmqac9d266zi3hev3t0ooFmXQcSkhbWWILxE8jgxuy3/z
+	VSezV03IAZ2DpSD0+tXdDa1GYnkOxGXSaYDm1FU0H9GvRAmtKyUl/MV7YJ4LC1K7LfPl
+	jUHrBoLOaA8HmOQoBl8bFLeBVBqTn7PZwreWGTQ+mgrSQvpHJnAksUQFFgpzUE+vo0O7
+	RBhg==
+X-Gm-Message-State: APjAAAV3jFYmNtQpZQkBz3fo1O8/pGKfSAqgfZtHt2RdUJQDq8pvsvgz
+	1wK9b7N7PGNwGHc1X/g8kVQT+iAvWHMQCi1tmR6tOQ==
+X-Google-Smtp-Source: APXvYqwuvnaNjb+LHJwQCOoaewr1dMCcdZFhFpVWce8CYO3hVcV9gxLrABhtjfqSjY46v+1HYZXRfcPfBZu3clAo3O0=
+X-Received: by 2002:a25:e081:: with SMTP id
+	x123mr27613524ybg.152.1556133349594; 
+	Wed, 24 Apr 2019 12:15:49 -0700 (PDT)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20190424160942.13567-1-brijesh.singh@amd.com>
+In-Reply-To: <20190424160942.13567-1-brijesh.singh@amd.com>
+Date: Wed, 24 Apr 2019 12:15:12 -0700
+Message-ID:
+ <CABayD+eYsqT49-Smp0a9OGRt2or_L7LNKHpe-iraM62XzGq5_g@mail.gmail.com>
+To: "Singh, Brijesh" <brijesh.singh@amd.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
 	recognized.
-X-Received-From: 2a00:1450:4864:20::342
-Subject: [Qemu-devel] [PATCH v5 17/21] gdbstub: Implement v commands with
- new infra
+X-Received-From: 2607:f8b0:4864:20::b44
+X-Mailman-Approved-At: Wed, 24 Apr 2019 16:12:52 -0400
+Subject: Re: [Qemu-devel] [RFC PATCH v1 00/10] Add AMD SEV guest live
+ migration support
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -92,215 +90,114 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Jon Doron <arilou@gmail.com>
+From: Steve Rutherford via Qemu-devel <qemu-devel@nongnu.org>
+Reply-To: Steve Rutherford <srutherford@google.com>
+Cc: "Lendacky, Thomas" <Thomas.Lendacky@amd.com>,
+	"kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+	=?UTF-8?B?UmFkaW0gS3LEjW3DocWZ?= <rkrcmar@redhat.com>,
+	Joerg Roedel <joro@8bytes.org>, "x86@kernel.org" <x86@kernel.org>,
+	"qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+	Ingo Molnar <mingo@redhat.com>, "H. Peter Anvin" <hpa@zytor.com>,
+	Paolo Bonzini <pbonzini@redhat.com>, Thomas Gleixner <tglx@linutronix.de>,
+	Borislav Petkov <bp@suse.de>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Content-Type: text/plain; charset="UTF-8"
-Message-ID: <20190424193855._QpvmcjP6AyCtGOt7mULCEO1IAuirt2euZDVAOC46fA@z>
+Message-ID: <20190424191512.5fJmg-PEBjurgOUaMSKpdpGBEQ8cskOXVlkS8hCU3F0@z>
 
-Signed-off-by: Jon Doron <arilou@gmail.com>
----
- gdbstub.c | 170 +++++++++++++++++++++++++++++++++++-------------------
- 1 file changed, 110 insertions(+), 60 deletions(-)
+On Wed, Apr 24, 2019 at 9:10 AM Singh, Brijesh <brijesh.singh@amd.com> wrot=
+e:
+>
+> The series add support for AMD SEV guest live migration commands. To prot=
+ect the
+> confidentiality of an SEV protected guest memory while in transit we need=
+ to
+> use the SEV commands defined in SEV API spec [1].
+>
+> SEV guest VMs have the concept of private and shared memory. Private memo=
+ry
+> is encrypted with the guest-specific key, while shared memory may be encr=
+ypted
+> with hypervisor key. The commands provided by the SEV FW are meant to be =
+used
+> for the private memory only. The patch series introduces a new hypercall.
+> The guest OS can use this hypercall to notify the page encryption status.
+> If the page is encrypted with guest specific-key then we use SEV command =
+during
+> the migration. If page is not encrypted then fallback to default.
+>
+> The patch adds a new ioctl KVM_GET_PAGE_ENC_BITMAP. The ioctl can be used
+> by the qemu to get the page encrypted bitmap. Qemu can consult this bitma=
+p
+> during the migration to know whether the page is encrypted.
+>
+> [1] https://developer.amd.com/wp-content/resources/55766.PDF
+>
+> The series is tested with the Qemu, I am in process of cleaning
+> up the Qemu code and will submit soon.
+>
+> While implementing the migration I stumbled on the follow question:
+>
+> - Since there is a guest OS changes required to support the migration,
+>   so how do we know whether guest OS is updated? Should we extend KVM
+>   capabilities/feature bits to check this?
+>
+> TODO:
+>  - add an ioctl to build encryption bitmap. The encryption bitmap is buil=
+t during
+>    the guest bootup/execution. We should provide an ioctl so that destina=
+tion
+>    can build the bitmap as it receives the pages.
+>  - reset the bitmap on guest reboot.
+>
+> The complete tree with patch is available at:
+> https://github.com/codomania/kvm/tree/sev-migration-rfc-v1
+>
+> Cc: Thomas Gleixner <tglx@linutronix.de>
+> Cc: Ingo Molnar <mingo@redhat.com>
+> Cc: "H. Peter Anvin" <hpa@zytor.com>
+> Cc: Paolo Bonzini <pbonzini@redhat.com>
+> Cc: "Radim Kr=C4=8Dm=C3=A1=C5=99" <rkrcmar@redhat.com>
+> Cc: Joerg Roedel <joro@8bytes.org>
+> Cc: Borislav Petkov <bp@suse.de>
+> Cc: Tom Lendacky <thomas.lendacky@amd.com>
+> Cc: x86@kernel.org
+> Cc: kvm@vger.kernel.org
+> Cc: linux-kernel@vger.kernel.org
+>
+> Brijesh Singh (10):
+>   KVM: SVM: Add KVM_SEV SEND_START command
+>   KVM: SVM: Add KVM_SEND_UPDATE_DATA command
+>   KVM: SVM: Add KVM_SEV_SEND_FINISH command
+>   KVM: SVM: Add support for KVM_SEV_RECEIVE_START command
+>   KVM: SVM: Add KVM_SEV_RECEIVE_UPDATE_DATA command
+>   KVM: SVM: Add KVM_SEV_RECEIVE_FINISH command
+>   KVM: x86: Add AMD SEV specific Hypercall3
+>   KVM: X86: Introduce KVM_HC_PAGE_ENC_STATUS hypercall
+>   KVM: x86: Introduce KVM_GET_PAGE_ENC_BITMAP ioctl
+>   mm: x86: Invoke hypercall when page encryption status is changed
+>
+>  .../virtual/kvm/amd-memory-encryption.rst     | 116 ++++
+>  Documentation/virtual/kvm/hypercalls.txt      |  14 +
+>  arch/x86/include/asm/kvm_host.h               |   3 +
+>  arch/x86/include/asm/kvm_para.h               |  12 +
+>  arch/x86/include/asm/mem_encrypt.h            |   3 +
+>  arch/x86/kvm/svm.c                            | 560 +++++++++++++++++-
+>  arch/x86/kvm/vmx/vmx.c                        |   1 +
+>  arch/x86/kvm/x86.c                            |  17 +
+>  arch/x86/mm/mem_encrypt.c                     |  45 +-
+>  arch/x86/mm/pageattr.c                        |  15 +
+>  include/uapi/linux/kvm.h                      |  51 ++
+>  include/uapi/linux/kvm_para.h                 |   1 +
+>  12 files changed, 834 insertions(+), 4 deletions(-)
+>
+> --
+> 2.17.1
+>
 
-diff --git a/gdbstub.c b/gdbstub.c
-index 809503c20a..7bc00d7f77 100644
---- a/gdbstub.c
-+++ b/gdbstub.c
-@@ -1816,6 +1816,106 @@ static void handle_step(GdbCmdContext *gdb_ctx, void *user_ctx)
-     gdb_continue(gdb_ctx->s);
- }
- 
-+static void handle_v_cont_query(GdbCmdContext *gdb_ctx, void *user_ctx)
-+{
-+    put_packet(gdb_ctx->s, "vCont;c;C;s;S");
-+}
-+
-+static void handle_v_cont(GdbCmdContext *gdb_ctx, void *user_ctx)
-+{
-+    int res;
-+
-+    if (!gdb_ctx->num_params) {
-+        return;
-+    }
-+
-+    res = gdb_handle_vcont(gdb_ctx->s, gdb_ctx->params[0].data);
-+    if ((res == -EINVAL) || (res == -ERANGE)) {
-+        put_packet(gdb_ctx->s, "E22");
-+    } else if (res) {
-+        put_packet(gdb_ctx->s, "\0");
-+    }
-+}
-+
-+static void handle_v_attach(GdbCmdContext *gdb_ctx, void *user_ctx)
-+{
-+    GDBProcess *process;
-+    CPUState *cpu;
-+    char thread_id[16];
-+
-+    strcpy(gdb_ctx->str_buf, "E22");
-+    if (!gdb_ctx->num_params) {
-+        goto cleanup;
-+    }
-+
-+    process = gdb_get_process(gdb_ctx->s, gdb_ctx->params[0].val_ul);
-+    if (!process) {
-+        goto cleanup;
-+    }
-+
-+    cpu = get_first_cpu_in_process(gdb_ctx->s, process);
-+    if (!cpu) {
-+        goto cleanup;
-+    }
-+
-+    process->attached = true;
-+    gdb_ctx->s->g_cpu = cpu;
-+    gdb_ctx->s->c_cpu = cpu;
-+
-+    gdb_fmt_thread_id(gdb_ctx->s, cpu, thread_id, sizeof(thread_id));
-+    snprintf(gdb_ctx->str_buf, sizeof(gdb_ctx->str_buf), "T%02xthread:%s;",
-+             GDB_SIGNAL_TRAP, thread_id);
-+cleanup:
-+    put_packet(gdb_ctx->s, gdb_ctx->str_buf);
-+}
-+
-+static void handle_v_kill(GdbCmdContext *gdb_ctx, void *user_ctx)
-+{
-+    /* Kill the target */
-+    put_packet(gdb_ctx->s, "OK");
-+    error_report("QEMU: Terminated via GDBstub");
-+    exit(0);
-+}
-+
-+static GdbCmdParseEntry gdb_v_commands_table[] = {
-+    /* Order is important if has same prefix */
-+    {
-+        .handler = handle_v_cont_query,
-+        .cmd = "Cont?",
-+        .cmd_startswith = 1
-+    },
-+    {
-+        .handler = handle_v_cont,
-+        .cmd = "Cont",
-+        .cmd_startswith = 1,
-+        .schema = "s0"
-+    },
-+    {
-+        .handler = handle_v_attach,
-+        .cmd = "Attach;",
-+        .cmd_startswith = 1,
-+        .schema = "l0"
-+    },
-+    {
-+        .handler = handle_v_kill,
-+        .cmd = "Kill;",
-+        .cmd_startswith = 1
-+    },
-+};
-+
-+static void handle_v_commands(GdbCmdContext *gdb_ctx, void *user_ctx)
-+{
-+    if (!gdb_ctx->num_params) {
-+        return;
-+    }
-+
-+    if (process_string_cmd(gdb_ctx->s, NULL, gdb_ctx->params[0].data,
-+                           gdb_v_commands_table,
-+                           ARRAY_SIZE(gdb_v_commands_table))) {
-+        put_packet(gdb_ctx->s, "");
-+    }
-+}
-+
- static int gdb_handle_packet(GDBState *s, const char *line_buf)
- {
-     CPUState *cpu;
-@@ -1823,7 +1923,7 @@ static int gdb_handle_packet(GDBState *s, const char *line_buf)
-     CPUClass *cc;
-     const char *p;
-     uint32_t pid, tid;
--    int ch, type, res;
-+    int ch, type;
-     uint8_t mem_buf[MAX_PACKET_LENGTH];
-     char buf[sizeof(mem_buf) + 1 /* trailing NUL */];
-     char thread_id[16];
-@@ -1872,66 +1972,16 @@ static int gdb_handle_packet(GDBState *s, const char *line_buf)
-         }
-         break;
-     case 'v':
--        if (strncmp(p, "Cont", 4) == 0) {
--            p += 4;
--            if (*p == '?') {
--                put_packet(s, "vCont;c;C;s;S");
--                break;
--            }
--
--            res = gdb_handle_vcont(s, p);
--
--            if (res) {
--                if ((res == -EINVAL) || (res == -ERANGE)) {
--                    put_packet(s, "E22");
--                    break;
--                }
--                goto unknown_command;
--            }
--            break;
--        } else if (strncmp(p, "Attach;", 7) == 0) {
--            unsigned long pid;
--
--            p += 7;
--
--            if (qemu_strtoul(p, &p, 16, &pid)) {
--                put_packet(s, "E22");
--                break;
--            }
--
--            process = gdb_get_process(s, pid);
--
--            if (process == NULL) {
--                put_packet(s, "E22");
--                break;
--            }
--
--            cpu = get_first_cpu_in_process(s, process);
--
--            if (cpu == NULL) {
--                /* Refuse to attach an empty process */
--                put_packet(s, "E22");
--                break;
--            }
--
--            process->attached = true;
--
--            s->g_cpu = cpu;
--            s->c_cpu = cpu;
--
--            snprintf(buf, sizeof(buf), "T%02xthread:%s;", GDB_SIGNAL_TRAP,
--                     gdb_fmt_thread_id(s, cpu, thread_id, sizeof(thread_id)));
--
--            put_packet(s, buf);
--            break;
--        } else if (strncmp(p, "Kill;", 5) == 0) {
--            /* Kill the target */
--            put_packet(s, "OK");
--            error_report("QEMU: Terminated via GDBstub");
--            exit(0);
--        } else {
--            goto unknown_command;
-+        {
-+            static const GdbCmdParseEntry v_cmd_desc = {
-+                .handler = handle_v_commands,
-+                .cmd = "v",
-+                .cmd_startswith = 1,
-+                .schema = "s0"
-+            };
-+            cmd_parser = &v_cmd_desc;
-         }
-+        break;
-     case 'k':
-         /* Kill the target */
-         error_report("QEMU: Terminated via GDBstub");
--- 
-2.20.1
-
+What's the back-of-the-envelope marginal cost of transferring a 16kB
+region from one host to another? I'm interested in what the end to end
+migration perf changes look like for this. If you have measured
+migration perf, I'm interested in that also.
 
