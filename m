@@ -1,24 +1,25 @@
-Received: from eggs.gnu.org ([209.51.188.92]:41440)
+Received: from eggs.gnu.org ([209.51.188.92]:42117)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1hJH5r-0001ji-Ad
-	for qemu-devel@nongnu.org; Wed, 24 Apr 2019 08:33:44 -0400
+	(envelope-from <vsementsov@virtuozzo.com>) id 1hJH75-0002UA-9v
+	for qemu-devel@nongnu.org; Wed, 24 Apr 2019 08:35:01 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1hJGrh-0001dO-EO
-	for qemu-devel@nongnu.org; Wed, 24 Apr 2019 08:19:06 -0400
-Date: Wed, 24 Apr 2019 13:13:39 +0100
-From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-Message-ID: <20190424121339.GG31388@redhat.com>
-Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+	(envelope-from <vsementsov@virtuozzo.com>) id 1hJGrQ-0001RO-Uf
+	for qemu-devel@nongnu.org; Wed, 24 Apr 2019 08:18:50 -0400
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Date: Wed, 24 Apr 2019 12:18:43 +0000
+Message-ID: <afeaa77a-3480-237b-e71c-70559a7529f4@virtuozzo.com>
 References: <20190424103747.10173-1-thuth@redhat.com>
 	<20190424103747.10173-6-thuth@redhat.com>
 	<20190424104855.GE31388@redhat.com>
 	<d9137693-7727-5f2c-04f3-b1eafd70f056@redhat.com>
 	<f8040ada-cb84-d669-3493-0d2da89e6b0b@virtuozzo.com>
+	<20190424121339.GG31388@redhat.com>
+In-Reply-To: <20190424121339.GG31388@redhat.com>
+Content-Language: en-US
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <2D0ECEF3838A02458B7C1C7152901C29@eurprd08.prod.outlook.com>
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <f8040ada-cb84-d669-3493-0d2da89e6b0b@virtuozzo.com>
-Content-Transfer-Encoding: quoted-printable
 Subject: Re: [Qemu-devel] [PATCH 5/6] tests: Run the iotests during "make
  check" again
 List-Id: <qemu-devel.nongnu.org>
@@ -29,99 +30,63 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Cc: Thomas Huth <thuth@redhat.com>, Fam Zheng <fam@euphon.net>, Kevin Wolf <kwolf@redhat.com>, Ed Maste <emaste@freebsd.org>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>, Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, Max Reitz <mreitz@redhat.com>, Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>, Li-Wen Hsu <lwhsu@freebsd.org>
+To: =?utf-8?B?RGFuaWVsIFAuIEJlcnJhbmfDqQ==?= <berrange@redhat.com>
+Cc: Thomas Huth <thuth@redhat.com>, Fam Zheng <fam@euphon.net>, Kevin Wolf <kwolf@redhat.com>, Ed Maste <emaste@freebsd.org>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>, =?utf-8?B?UGhpbGlwcGUgTWF0aGlldS1EYXVkw6k=?= <philmd@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, Max Reitz <mreitz@redhat.com>, =?utf-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>, Li-Wen Hsu <lwhsu@freebsd.org>
 
-On Wed, Apr 24, 2019 at 12:02:29PM +0000, Vladimir Sementsov-Ogievskiy wr=
-ote:
-> 24.04.2019 13:59, Thomas Huth wrote:
-> > On 24/04/2019 12.48, Daniel P. Berrang=C3=A9 wrote:
-> >> On Wed, Apr 24, 2019 at 12:37:46PM +0200, Thomas Huth wrote:
-> >>> People often forget to run the iotests before submitting patches or
-> >>> pull requests - this is likely due to the fact that we do not run t=
-he
-> >>> tests during our mandatory "make check" tests yet. Now that we've g=
-ot
-> >>> a new "ci" group of iotests that should be fine to run in every env=
-iron-
-> >>> ment, it should be OK to enable the iotests during "make check" aga=
-in.
-> >>> Thus we now run the "ci" tests by default from the qemu-iotests-qui=
-ck.sh
-> >>> script, and only use the former "quick" group (that contains some t=
-ests
-> >>> that are failing in some environments) when the user decided to run
-> >>> "make check SPEED=3Dthorough" or something similar.
-> >>>
-> >>> Signed-off-by: Thomas Huth <thuth@redhat.com>
-> >>> ---
-> >>>   tests/Makefile.include      |  2 +-
-> >>>   tests/qemu-iotests-quick.sh | 17 ++++++++++++++++-
-> >>>   2 files changed, 17 insertions(+), 2 deletions(-)
-> >>
-> >>> diff --git a/tests/qemu-iotests-quick.sh b/tests/qemu-iotests-quick=
-.sh
-> >>> index 0e554bb972..416b3fc48b 100755
-> >>> --- a/tests/qemu-iotests-quick.sh
-> >>> +++ b/tests/qemu-iotests-quick.sh
-> >>
-> >> s/-quick//  perhaps, since it no longer only runs the "quick" tests.
-> >>
-> >>> @@ -1,8 +1,23 @@
-> >>>   #!/bin/sh
-> >>>  =20
-> >>> +# Honor the SPEED environment variable, just like we do it for the=
- qtests.
-> >>> +# The default is to run all tests that still work fine in a CI env=
-ironments,
-> >>> +# but if the user set SPEED=3Dslow or SPEED=3Dthorough, we also ru=
-n all other
-> >>> +# tests that are still marked as "quick"
-> >>> +if [ "$SPEED" =3D "slow" -o "$SPEED" =3D "thorough" ]; then
-> >>> +    group=3Dquick
-> >>
-> >> When user asks for "slow" tests we run the "quick" tests, which
-> >> presumably implies...
-> >>
-> >>> +else
-> >>> +    group=3Dci
-> >>
-> >> ..."ci" is quicker than the "quick"  tests !
-> >>
-> >> Confused ? We certainly try to ensure that you will be :-)
-> >=20
-> > ... and there is also tests/check-block.sh (which is not used by "mak=
-e
-> > check-block", by the way, but still talks about "make check-block"),
-> > which is even slower than the "ci" and "quick" group...
-> >=20
-> > I guess that could be cleaned up, too (why do we need two scripts?) .=
-..
-> > just not sure how the final result should look like and if it should =
-be
-> > part of this patch series or rather something separate. Max, Kevin, w=
-hat
-> > do you think?
-> >=20
-> > Maybe we should merge the two scripts, and depending on the SPEED
-> > variable, we run:
-> >=20
-> >   quick =3D> "ci" group
-> >   thorough =3D> "quick" group
-> >   slow =3D> old behaviour of the check-block.sh script
->=20
-> May be, instead of SPEED, introduce GROUP variable? To make it plain
-
-"$SPEED" is something used/defined by the gtester harness, so other bits
-run by "make check" already honour that, hence it is desirable fro the
-iotests todo the same.
-
-Regards,
-Daniel
---=20
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberran=
-ge :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.c=
-om :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberran=
-ge :|
+MjQuMDQuMjAxOSAxNToxMywgRGFuaWVsIFAuIEJlcnJhbmfDqSB3cm90ZToNCj4gT24gV2VkLCBB
+cHIgMjQsIDIwMTkgYXQgMTI6MDI6MjlQTSArMDAwMCwgVmxhZGltaXIgU2VtZW50c292LU9naWV2
+c2tpeSB3cm90ZToNCj4+IDI0LjA0LjIwMTkgMTM6NTksIFRob21hcyBIdXRoIHdyb3RlOg0KPj4+
+IE9uIDI0LzA0LzIwMTkgMTIuNDgsIERhbmllbCBQLiBCZXJyYW5nw6kgd3JvdGU6DQo+Pj4+IE9u
+IFdlZCwgQXByIDI0LCAyMDE5IGF0IDEyOjM3OjQ2UE0gKzAyMDAsIFRob21hcyBIdXRoIHdyb3Rl
+Og0KPj4+Pj4gUGVvcGxlIG9mdGVuIGZvcmdldCB0byBydW4gdGhlIGlvdGVzdHMgYmVmb3JlIHN1
+Ym1pdHRpbmcgcGF0Y2hlcyBvcg0KPj4+Pj4gcHVsbCByZXF1ZXN0cyAtIHRoaXMgaXMgbGlrZWx5
+IGR1ZSB0byB0aGUgZmFjdCB0aGF0IHdlIGRvIG5vdCBydW4gdGhlDQo+Pj4+PiB0ZXN0cyBkdXJp
+bmcgb3VyIG1hbmRhdG9yeSAibWFrZSBjaGVjayIgdGVzdHMgeWV0LiBOb3cgdGhhdCB3ZSd2ZSBn
+b3QNCj4+Pj4+IGEgbmV3ICJjaSIgZ3JvdXAgb2YgaW90ZXN0cyB0aGF0IHNob3VsZCBiZSBmaW5l
+IHRvIHJ1biBpbiBldmVyeSBlbnZpcm9uLQ0KPj4+Pj4gbWVudCwgaXQgc2hvdWxkIGJlIE9LIHRv
+IGVuYWJsZSB0aGUgaW90ZXN0cyBkdXJpbmcgIm1ha2UgY2hlY2siIGFnYWluLg0KPj4+Pj4gVGh1
+cyB3ZSBub3cgcnVuIHRoZSAiY2kiIHRlc3RzIGJ5IGRlZmF1bHQgZnJvbSB0aGUgcWVtdS1pb3Rl
+c3RzLXF1aWNrLnNoDQo+Pj4+PiBzY3JpcHQsIGFuZCBvbmx5IHVzZSB0aGUgZm9ybWVyICJxdWlj
+ayIgZ3JvdXAgKHRoYXQgY29udGFpbnMgc29tZSB0ZXN0cw0KPj4+Pj4gdGhhdCBhcmUgZmFpbGlu
+ZyBpbiBzb21lIGVudmlyb25tZW50cykgd2hlbiB0aGUgdXNlciBkZWNpZGVkIHRvIHJ1bg0KPj4+
+Pj4gIm1ha2UgY2hlY2sgU1BFRUQ9dGhvcm91Z2giIG9yIHNvbWV0aGluZyBzaW1pbGFyLg0KPj4+
+Pj4NCj4+Pj4+IFNpZ25lZC1vZmYtYnk6IFRob21hcyBIdXRoIDx0aHV0aEByZWRoYXQuY29tPg0K
+Pj4+Pj4gLS0tDQo+Pj4+PiAgICB0ZXN0cy9NYWtlZmlsZS5pbmNsdWRlICAgICAgfCAgMiArLQ0K
+Pj4+Pj4gICAgdGVzdHMvcWVtdS1pb3Rlc3RzLXF1aWNrLnNoIHwgMTcgKysrKysrKysrKysrKysr
+Ky0NCj4+Pj4+ICAgIDIgZmlsZXMgY2hhbmdlZCwgMTcgaW5zZXJ0aW9ucygrKSwgMiBkZWxldGlv
+bnMoLSkNCj4+Pj4NCj4+Pj4+IGRpZmYgLS1naXQgYS90ZXN0cy9xZW11LWlvdGVzdHMtcXVpY2su
+c2ggYi90ZXN0cy9xZW11LWlvdGVzdHMtcXVpY2suc2gNCj4+Pj4+IGluZGV4IDBlNTU0YmI5NzIu
+LjQxNmIzZmM0OGIgMTAwNzU1DQo+Pj4+PiAtLS0gYS90ZXN0cy9xZW11LWlvdGVzdHMtcXVpY2su
+c2gNCj4+Pj4+ICsrKyBiL3Rlc3RzL3FlbXUtaW90ZXN0cy1xdWljay5zaA0KPj4+Pg0KPj4+PiBz
+Ly1xdWljay8vICBwZXJoYXBzLCBzaW5jZSBpdCBubyBsb25nZXIgb25seSBydW5zIHRoZSAicXVp
+Y2siIHRlc3RzLg0KPj4+Pg0KPj4+Pj4gQEAgLTEsOCArMSwyMyBAQA0KPj4+Pj4gICAgIyEvYmlu
+L3NoDQo+Pj4+PiAgICANCj4+Pj4+ICsjIEhvbm9yIHRoZSBTUEVFRCBlbnZpcm9ubWVudCB2YXJp
+YWJsZSwganVzdCBsaWtlIHdlIGRvIGl0IGZvciB0aGUgcXRlc3RzLg0KPj4+Pj4gKyMgVGhlIGRl
+ZmF1bHQgaXMgdG8gcnVuIGFsbCB0ZXN0cyB0aGF0IHN0aWxsIHdvcmsgZmluZSBpbiBhIENJIGVu
+dmlyb25tZW50cywNCj4+Pj4+ICsjIGJ1dCBpZiB0aGUgdXNlciBzZXQgU1BFRUQ9c2xvdyBvciBT
+UEVFRD10aG9yb3VnaCwgd2UgYWxzbyBydW4gYWxsIG90aGVyDQo+Pj4+PiArIyB0ZXN0cyB0aGF0
+IGFyZSBzdGlsbCBtYXJrZWQgYXMgInF1aWNrIg0KPj4+Pj4gK2lmIFsgIiRTUEVFRCIgPSAic2xv
+dyIgLW8gIiRTUEVFRCIgPSAidGhvcm91Z2giIF07IHRoZW4NCj4+Pj4+ICsgICAgZ3JvdXA9cXVp
+Y2sNCj4+Pj4NCj4+Pj4gV2hlbiB1c2VyIGFza3MgZm9yICJzbG93IiB0ZXN0cyB3ZSBydW4gdGhl
+ICJxdWljayIgdGVzdHMsIHdoaWNoDQo+Pj4+IHByZXN1bWFibHkgaW1wbGllcy4uLg0KPj4+Pg0K
+Pj4+Pj4gK2Vsc2UNCj4+Pj4+ICsgICAgZ3JvdXA9Y2kNCj4+Pj4NCj4+Pj4gLi4uImNpIiBpcyBx
+dWlja2VyIHRoYW4gdGhlICJxdWljayIgIHRlc3RzICENCj4+Pj4NCj4+Pj4gQ29uZnVzZWQgPyBX
+ZSBjZXJ0YWlubHkgdHJ5IHRvIGVuc3VyZSB0aGF0IHlvdSB3aWxsIGJlIDotKQ0KPj4+DQo+Pj4g
+Li4uIGFuZCB0aGVyZSBpcyBhbHNvIHRlc3RzL2NoZWNrLWJsb2NrLnNoICh3aGljaCBpcyBub3Qg
+dXNlZCBieSAibWFrZQ0KPj4+IGNoZWNrLWJsb2NrIiwgYnkgdGhlIHdheSwgYnV0IHN0aWxsIHRh
+bGtzIGFib3V0ICJtYWtlIGNoZWNrLWJsb2NrIiksDQo+Pj4gd2hpY2ggaXMgZXZlbiBzbG93ZXIg
+dGhhbiB0aGUgImNpIiBhbmQgInF1aWNrIiBncm91cC4uLg0KPj4+DQo+Pj4gSSBndWVzcyB0aGF0
+IGNvdWxkIGJlIGNsZWFuZWQgdXAsIHRvbyAod2h5IGRvIHdlIG5lZWQgdHdvIHNjcmlwdHM/KSAu
+Li4NCj4+PiBqdXN0IG5vdCBzdXJlIGhvdyB0aGUgZmluYWwgcmVzdWx0IHNob3VsZCBsb29rIGxp
+a2UgYW5kIGlmIGl0IHNob3VsZCBiZQ0KPj4+IHBhcnQgb2YgdGhpcyBwYXRjaCBzZXJpZXMgb3Ig
+cmF0aGVyIHNvbWV0aGluZyBzZXBhcmF0ZS4gTWF4LCBLZXZpbiwgd2hhdA0KPj4+IGRvIHlvdSB0
+aGluaz8NCj4+Pg0KPj4+IE1heWJlIHdlIHNob3VsZCBtZXJnZSB0aGUgdHdvIHNjcmlwdHMsIGFu
+ZCBkZXBlbmRpbmcgb24gdGhlIFNQRUVEDQo+Pj4gdmFyaWFibGUsIHdlIHJ1bjoNCj4+Pg0KPj4+
+ICAgIHF1aWNrID0+ICJjaSIgZ3JvdXANCj4+PiAgICB0aG9yb3VnaCA9PiAicXVpY2siIGdyb3Vw
+DQo+Pj4gICAgc2xvdyA9PiBvbGQgYmVoYXZpb3VyIG9mIHRoZSBjaGVjay1ibG9jay5zaCBzY3Jp
+cHQNCj4+DQo+PiBNYXkgYmUsIGluc3RlYWQgb2YgU1BFRUQsIGludHJvZHVjZSBHUk9VUCB2YXJp
+YWJsZT8gVG8gbWFrZSBpdCBwbGFpbg0KPiANCj4gIiRTUEVFRCIgaXMgc29tZXRoaW5nIHVzZWQv
+ZGVmaW5lZCBieSB0aGUgZ3Rlc3RlciBoYXJuZXNzLCBzbyBvdGhlciBiaXRzDQo+IHJ1biBieSAi
+bWFrZSBjaGVjayIgYWxyZWFkeSBob25vdXIgdGhhdCwgaGVuY2UgaXQgaXMgZGVzaXJhYmxlIGZy
+byB0aGUNCj4gaW90ZXN0cyB0b2RvIHRoZSBzYW1lLg0KPiANCg0KT0ssIHNvcnJ5LCBkaWRuJ3Qg
+a25vdy4NCg0KDQotLSANCkJlc3QgcmVnYXJkcywNClZsYWRpbWlyDQo=
