@@ -1,26 +1,42 @@
-Received: from eggs.gnu.org ([209.51.188.92]:34557)
+Received: from eggs.gnu.org ([209.51.188.92]:34656)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pagupta@redhat.com>) id 1hJ9xI-0006fZ-1I
-	for qemu-devel@nongnu.org; Wed, 24 Apr 2019 00:56:24 -0400
+	(envelope-from <aravinda@linux.vnet.ibm.com>) id 1hJ9xg-0006mX-4M
+	for qemu-devel@nongnu.org; Wed, 24 Apr 2019 00:56:48 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pagupta@redhat.com>) id 1hJ9wh-0007YA-0n
-	for qemu-devel@nongnu.org; Wed, 24 Apr 2019 00:55:47 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:34394)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pagupta@redhat.com>) id 1hJ9wg-0007Vl-R3
-	for qemu-devel@nongnu.org; Wed, 24 Apr 2019 00:55:46 -0400
-Date: Wed, 24 Apr 2019 00:55:40 -0400 (EDT)
-From: Pankaj Gupta <pagupta@redhat.com>
-Message-ID: <476344290.23160847.1556081740211.JavaMail.zimbra@redhat.com>
-In-Reply-To: <20190423220217.GA29573@dread.disaster.area>
-References: <20190423080612.15361-1-pagupta@redhat.com>
-	<20190423080612.15361-7-pagupta@redhat.com>
-	<20190423220217.GA29573@dread.disaster.area>
+	(envelope-from <aravinda@linux.vnet.ibm.com>) id 1hJ9t0-0004DO-DE
+	for qemu-devel@nongnu.org; Wed, 24 Apr 2019 00:51:59 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:46898
+	helo=mx0a-001b2d01.pphosted.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <aravinda@linux.vnet.ibm.com>)
+	id 1hJ9t0-0004Cr-7R
+	for qemu-devel@nongnu.org; Wed, 24 Apr 2019 00:51:58 -0400
+Received: from pps.filterd (m0098419.ppops.net [127.0.0.1])
+	by mx0b-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id
+	x3O4heTT016074
+	for <qemu-devel@nongnu.org>; Wed, 24 Apr 2019 00:51:57 -0400
+Received: from e12.ny.us.ibm.com (e12.ny.us.ibm.com [129.33.205.202])
+	by mx0b-001b2d01.pphosted.com with ESMTP id 2s2ghj9m7g-1
+	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Wed, 24 Apr 2019 00:51:57 -0400
+Received: from localhost
+	by e12.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+	Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <aravinda@linux.vnet.ibm.com>;
+	Wed, 24 Apr 2019 05:51:56 +0100
+References: <155591636364.20338.844048953355207313.stgit@aravinda>
+	<155591660602.20338.9804738040071843715.stgit@aravinda>
+	<875zr43hxj.fsf@linux.ibm.com>
+From: Aravinda Prasad <aravinda@linux.vnet.ibm.com>
+Date: Wed, 24 Apr 2019 10:21:50 +0530
 MIME-Version: 1.0
+In-Reply-To: <875zr43hxj.fsf@linux.ibm.com>
 Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v6 6/6] xfs: disable map_sync for async
- flush
+Message-Id: <a1e59aa3-f596-abbd-8365-3a12293d85e8@linux.vnet.ibm.com>
+Subject: Re: [Qemu-devel] [Qemu-ppc] [PATCH v8 4/6] target/ppc: Build rtas
+ error log upon an MCE
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,55 +45,34 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Dave Chinner <david@fromorbit.com>
-Cc: linux-nvdimm@lists.01.org, linux-kernel@vger.kernel.org, virtualization@lists.linux-foundation.org, kvm@vger.kernel.org, linux-fsdevel@vger.kernel.org, linux-acpi@vger.kernel.org, qemu-devel@nongnu.org, linux-ext4@vger.kernel.org, linux-xfs@vger.kernel.org, dan j williams <dan.j.williams@intel.com>, zwisler@kernel.org, vishal l verma <vishal.l.verma@intel.com>, dave jiang <dave.jiang@intel.com>, mst@redhat.com, jasowang@redhat.com, willy@infradead.org, rjw@rjwysocki.net, hch@infradead.org, lenb@kernel.org, jack@suse.cz, tytso@mit.edu, adilger kernel <adilger.kernel@dilger.ca>, darrick wong <darrick.wong@oracle.com>, lcapitulino@redhat.com, kwolf@redhat.com, imammedo@redhat.com, jmoyer@redhat.com, nilal@redhat.com, riel@surriel.com, stefanha@redhat.com, aarcange@redhat.com, david@redhat.com, cohuck@redhat.com, xiaoguangrong eric <xiaoguangrong.eric@gmail.com>, pbonzini@redhat.com, yuval shaia <yuval.shaia@oracle.com>, kilobyte@angband.pl
+To: Fabiano Rosas <farosas@linux.ibm.com>
+Cc: aik@au1.ibm.com, mahesh@linux.vnet.ibm.com, qemu-devel@nongnu.org, paulus@ozlabs.org, qemu-ppc@nongnu.org, david@gibson.dropbear.id.au
 
 
-> 
-> On Tue, Apr 23, 2019 at 01:36:12PM +0530, Pankaj Gupta wrote:
-> > Dont support 'MAP_SYNC' with non-DAX files and DAX files
-> > with asynchronous dax_device. Virtio pmem provides
-> > asynchronous host page cache flush mechanism. We don't
-> > support 'MAP_SYNC' with virtio pmem and xfs.
-> > 
-> > Signed-off-by: Pankaj Gupta <pagupta@redhat.com>
-> > ---
-> >  fs/xfs/xfs_file.c | 10 ++++++----
-> >  1 file changed, 6 insertions(+), 4 deletions(-)
-> > 
-> > diff --git a/fs/xfs/xfs_file.c b/fs/xfs/xfs_file.c
-> > index 1f2e2845eb76..0e59be018511 100644
-> > --- a/fs/xfs/xfs_file.c
-> > +++ b/fs/xfs/xfs_file.c
-> > @@ -1196,11 +1196,13 @@ xfs_file_mmap(
-> >  	struct file	*filp,
-> >  	struct vm_area_struct *vma)
-> >  {
-> > -	/*
-> > -	 * We don't support synchronous mappings for non-DAX files. At least
-> > -	 * until someone comes with a sensible use case.
-> > +	struct dax_device *dax_dev = xfs_find_daxdev_for_inode
-> > +						(file_inode(filp));
-> > +
-> > +	/* We don't support synchronous mappings for non-DAX files and
-> > +	 * for DAX files if underneath dax_device is not synchronous.
-> >  	 */
-> 
-> 	/*
-> 	 * This is the correct multi-line comment format. Please
-> 	 * update the patch to maintain the existing comment format.
-> 	 */
 
-Sure. Will correct this for both xfs & ext4.
+On Tuesday 23 April 2019 08:08 PM, Fabiano Rosas wrote:
+> Aravinda Prasad <aravinda@linux.vnet.ibm.com> writes:
+> 
+>> +    /*
+>> +     * Properly set bits in MSR before we invoke the handler.
+>> +     * SRR0/1, DAR and DSISR are properly set by KVM
+>> +     */
+>> +    if (!(*pcc->interrupts_big_endian)(cpu)) {
+>> +        msr |= (1ULL << MSR_LE);
+>> +    }
+>> +
+>> +    if (env->msr && (1ULL << MSR_SF)) {
+> 
+> Don't you mean & instead of &&?
 
-Thanks,
-Pankaj
+Ah.. yes.. Thanks for pointing out.
 
 > 
-> Cheers,
+>> +        msr |= (1ULL << MSR_SF);
+>> +    }
 > 
-> Dave.
-> --
-> Dave Chinner
-> david@fromorbit.com
 > 
+
+-- 
+Regards,
+Aravinda
