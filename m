@@ -1,35 +1,34 @@
-Received: from eggs.gnu.org ([209.51.188.92]:57392)
+Received: from eggs.gnu.org ([209.51.188.92]:57441)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1hJBH2-0008IJ-CC
-	for qemu-devel@nongnu.org; Wed, 24 Apr 2019 02:20:53 -0400
+	(envelope-from <bounces@canonical.com>) id 1hJBH5-0008Kd-Be
+	for qemu-devel@nongnu.org; Wed, 24 Apr 2019 02:20:56 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1hJBH1-00017C-3R
-	for qemu-devel@nongnu.org; Wed, 24 Apr 2019 02:20:52 -0400
-Received: from indium.canonical.com ([91.189.90.7]:44292)
+	(envelope-from <bounces@canonical.com>) id 1hJBH3-0001Au-VD
+	for qemu-devel@nongnu.org; Wed, 24 Apr 2019 02:20:55 -0400
+Received: from indium.canonical.com ([91.189.90.7]:44418)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1hJBH0-00016e-Tt
-	for qemu-devel@nongnu.org; Wed, 24 Apr 2019 02:20:51 -0400
+	id 1hJBH3-00019y-NC
+	for qemu-devel@nongnu.org; Wed, 24 Apr 2019 02:20:53 -0400
 Received: from loganberry.canonical.com ([91.189.90.37])
 	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1hJBH0-0007fL-3K
-	for <qemu-devel@nongnu.org>; Wed, 24 Apr 2019 06:20:50 +0000
+	id 1hJBH2-0007lp-Gx
+	for <qemu-devel@nongnu.org>; Wed, 24 Apr 2019 06:20:52 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 160222E80CB
-	for <qemu-devel@nongnu.org>; Wed, 24 Apr 2019 06:20:50 +0000 (UTC)
+	by loganberry.canonical.com (Postfix) with ESMTP id 7B67D2E80D3
+	for <qemu-devel@nongnu.org>; Wed, 24 Apr 2019 06:20:52 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Wed, 24 Apr 2019 06:06:50 -0000
-From: Thomas Huth <1801073@bugs.launchpad.net>
-Reply-To: Bug 1801073 <1801073@bugs.launchpad.net>
+Date: Wed, 24 Apr 2019 06:10:39 -0000
+From: Thomas Huth <1795100@bugs.launchpad.net>
+Reply-To: Bug 1795100 <1795100@bugs.launchpad.net>
 Sender: bounces@canonical.com
-References: <154107832062.28716.3850477436321808708.malonedeb@soybean.canonical.com>
-Message-Id: <155608601152.13953.30287693307562144.launchpad@wampee.canonical.com>
+References: <153818746845.29396.3425570709275982365.malonedeb@soybean.canonical.com>
+Message-Id: <155608624076.7202.7057364423758398700.launchpad@chaenomeles.canonical.com>
 Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1801073] Re: util/zbin.c:390:37: error: absolute
- value function 'abs' given an argument of type 'long int' but has parameter
- of type 'int' which may cause truncation of value [-Werror=absolute-value]
+Subject: [Qemu-devel] [Bug 1795100] Re: VNC unix-domain socket unlink()ed
+ prematurely
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -47,48 +46,45 @@ To: qemu-devel@nongnu.org
 
 You received this bug notification because you are a member of qemu-
 devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1801073
+https://bugs.launchpad.net/bugs/1795100
 
 Title:
-  util/zbin.c:390:37: error: absolute value function 'abs' given an
-  argument of type 'long int' but has parameter of type 'int' which may
-  cause truncation of value [-Werror=3Dabsolute-value]
+  VNC unix-domain socket unlink()ed prematurely
 
 Status in QEMU:
   Fix Released
 
 Bug description:
-  For qemu-3.0.0 I see with GCC 9 compiler a new warning:
+  With qemu 3.0.0 (I don't believe this happened with previous
+  versions), if I tell it `-vnc unix:/path/to/vnc.sock`, qemu will
+  unlink() that file when the first client disconnects, meaning that
+  once I disconnect, I can't ever reconnect without restarting the VM.
 
-  $ make -j1 -C roms pxerom VERBOSE=3D1 V=3D1
-  make: Entering directory '/home/abuild/rpmbuild/BUILD/qemu-3.0.0/roms'
-  make -C ipxe/src CONFIG=3Dqemu \
-  	PACKAGING_TIMESTAMP=3D1534273834 \
-  	CROSS_COMPILE=3D \
-  	bin/8086100e.rom bin/808610d3.rom bin/80861209.rom bin/10500940.rom bin/=
-10222000.rom bin/10ec8139.rom bin/1af41000.rom bin/15ad07b0.rom
-  make[1]: Entering directory '/home/abuild/rpmbuild/BUILD/qemu-3.0.0/roms/=
-ipxe/src'
-  gcc  -Wall -W -Wformat-nonliteral -O2 -g -Werror util/zbin.c -llzma -o ut=
-il/zbin
-  util/zbin.c: In function 'process_zinfo_add':
-  util/zbin.c:390:37: error: absolute value function 'abs' given an argumen=
-t of type 'long int' but has parameter of type 'int' which may cause trunca=
-tion of value [-Werror=3Dabsolute-value]
-    390 |      ( ( addend < 0 ) ? "-" : "" ), abs ( addend ), size,
-        |                                     ^~~
-  util/zbin.c:398:37: error: absolute value function 'abs' given an argumen=
-t of type 'long int' but has parameter of type 'int' which may cause trunca=
-tion of value [-Werror=3Dabsolute-value]
-    398 |      ( ( addend < 0 ) ? "-" : "" ), abs ( addend ), size,
-        |                                     ^~~
-  util/zbin.c:419:37: error: absolute value function 'abs' given an argumen=
-t of type 'long int' but has parameter of type 'int' which may cause trunca=
-tion of value [-Werror=3Dabsolute-value]
-    419 |      ( ( addend < 0 ) ? "-" : "" ), abs ( addend ),
-        |                                     ^~~
-  cc1: all warnings being treated as errors
-  make[1]: *** [Makefile.housekeeping:1368: util/zbin] Error 1
+  A stupid testcase demonstrating the issue:
+
+  In terminal A:
+
+      $ qemu-system-x86_64 -vnc unix:$PWD/vnc.sock
+
+  In terminal B:
+
+      $ ls vnc.sock
+      vnc.sock
+      $ socat STDIO UNIX-CONNECT:vnc.sock <<<''
+      RFB 003.008
+      $ ls vnc.sock
+      ls: cannot access 'vnc.sock': No such file or directory
+
+  I have determined that the offending unlink() call is the one in
+  io/channel-socket.c:qio_channel_socket_close().  That call was first
+  introduced in commit d66f78e1eaa832f73c771d9df1b606fe75d52a50, which
+  first appeared in version 3.0.0.
+
+  This type of premature unlink() does not happen on monitor.sock with
+  `-monitor unix:/path/to/monitor.sock,server,nowait`.
+
+  I am not familiar enough with the QIO subsystem to suggest a fix that
+  fixes VNC, but preserves the QMP fix targeted in the offending commit.
 
 To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1801073/+subscriptions
+https://bugs.launchpad.net/qemu/+bug/1795100/+subscriptions
