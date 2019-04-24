@@ -1,22 +1,29 @@
-Received: from eggs.gnu.org ([209.51.188.92]:37183)
+Received: from eggs.gnu.org ([209.51.188.92]:38143)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <yuchenlin@synology.com>) id 1hJFE7-0002eh-JT
-	for qemu-devel@nongnu.org; Wed, 24 Apr 2019 06:34:10 -0400
+	(envelope-from <berrange@redhat.com>) id 1hJFFe-00044Y-11
+	for qemu-devel@nongnu.org; Wed, 24 Apr 2019 06:35:45 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <yuchenlin@synology.com>) id 1hJF0b-0005p1-Ho
-	for qemu-devel@nongnu.org; Wed, 24 Apr 2019 06:20:10 -0400
+	(envelope-from <berrange@redhat.com>) id 1hJFFa-0005Zi-Fm
+	for qemu-devel@nongnu.org; Wed, 24 Apr 2019 06:35:41 -0400
+Date: Wed, 24 Apr 2019 11:35:15 +0100
+From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+Message-ID: <20190424103515.GD31388@redhat.com>
+Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+References: <20190418113110.160664-1-borntraeger@de.ibm.com>
+	<d3cdd199-0457-7255-9540-2bbe5555e079@redhat.com>
+	<a9e5863e-cb05-11a6-03a8-89ee45febcc9@de.ibm.com>
+	<03eb94f6-6f8f-0358-df00-bc487e5e3bff@redhat.com>
+	<20190424093014.GB31388@redhat.com>
+	<d1db9861-f18d-0364-0a24-0697766f46b4@redhat.com>
+	<20190424094120.GC31388@redhat.com>
+	<49e2cd3d-ac11-b76d-1bf3-24908c0015c1@redhat.com>
+	<4f3871ef-86a6-e6be-4e87-2affa3bd2d6f@de.ibm.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII;
- format=flowed
-Content-Transfer-Encoding: 7bit
-Date: Wed, 24 Apr 2019 18:19:54 +0800
-From: yuchenlin <yuchenlin@synology.com>
-In-Reply-To: <20190424074901.31430-2-shmuel.eiderman@oracle.com>
-References: <20190424074901.31430-1-shmuel.eiderman@oracle.com>
-	<20190424074901.31430-2-shmuel.eiderman@oracle.com>
-Message-ID: <4da5f516c2a2512e87709141f4c2b4e2@synology.com>
-Subject: Re: [Qemu-devel] [Qemu-block] [PATCH 1/2] vmdk: Fix comment
- regarding max l1_size coverage
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <4f3871ef-86a6-e6be-4e87-2affa3bd2d6f@de.ibm.com>
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH 00/10] s390x: new guest features
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,70 +32,247 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Sam Eiderman <shmuel.eiderman@oracle.com>
-Cc: fam@euphon.net, kwolf@redhat.com, mreitz@redhat.com, qemu-block@nongnu.org, eyal.moscovici@oracle.com, arbel.moshe@oracle.com, qemu-devel@nongnu.org, liran.alon@oracle.com, Qemu-block <qemu-block-bounces+yuchenlin=synology.com@nongnu.org>
+To: Christian Borntraeger <borntraeger@de.ibm.com>
+Cc: David Hildenbrand <david@redhat.com>, Cornelia Huck <cohuck@redhat.com>, "Jason J . Herne" <jjherne@linux.ibm.com>, Collin Walling <walling@linux.ibm.com>, qemu-devel <qemu-devel@nongnu.org>, Halil Pasic <pasic@linux.ibm.com>, qemu-s390x <qemu-s390x@nongnu.org>, Richard Henderson <rth@twiddle.net>
 
-On 2019-04-24 15:49, Sam Eiderman wrote:
-> Commit b0651b8c246d ("vmdk: Move l1_size check into vmdk_add_extent")
-> extended the l1_size check from VMDK4 to VMDK3 but did not update the
-> default coverage in the moved comment.
-> 
-> The previous vmdk4 calculation:
-> 
->     (512 * 1024 * 1024) * 512(l2 entries) * 65536(grain) = 16PB
-> 
-> The added vmdk3 calculation:
-> 
->     (512 * 1024 * 1024) * 4096(l2 entries) * 512(grain) = 1PB
-> 
-> Adding the calculation of vmdk3 to the comment.
-> 
-> In any case, VMware does not offer virtual disks more than 2TB for
-> vmdk4/vmdk3 or 64TB for the new undocumented seSparse format which is
-> not implemented yet in qemu.
-> 
-> Reviewed-by: Karl Heubaum <karl.heubaum@oracle.com>
-> Reviewed-by: Eyal Moscovici <eyal.moscovici@oracle.com>
-> Reviewed-by: Liran Alon <liran.alon@oracle.com>
-> Reviewed-by: Arbel Moshe <arbel.moshe@oracle.com>
-> Signed-off-by: Sam Eiderman <shmuel.eiderman@oracle.com>
-> ---
->  block/vmdk.c | 11 ++++++++---
->  1 file changed, 8 insertions(+), 3 deletions(-)
-> 
-> diff --git a/block/vmdk.c b/block/vmdk.c
-> index de8cb859f8..fc7378da78 100644
-> --- a/block/vmdk.c
-> +++ b/block/vmdk.c
-> @@ -426,10 +426,15 @@ static int vmdk_add_extent(BlockDriverState *bs,
->          return -EFBIG;
->      }
->      if (l1_size > 512 * 1024 * 1024) {
-> -        /* Although with big capacity and small l1_entry_sectors, we 
-> can get a
-> +        /*
-> +         * Although with big capacity and small l1_entry_sectors, we 
-> can get a
->           * big l1_size, we don't want unbounded value to allocate the 
-> table.
-> -         * Limit it to 512M, which is 16PB for default cluster and L2 
-> table
-> -         * size */
-> +         * Limit it to 512M, which is:
-> +         *     16PB - for default "Hosted Sparse Extent" (VMDK4)
-> +         *            cluster size: 64KB, L2 table size: 512 entries
-> +         *     1PB  - for default "ESXi Host Sparse Extent" 
-> (VMDK3/vmfsSparse)
-> +         *            cluster size: 512B, L2 table size: 4096 entries
-> +         */
->          error_setg(errp, "L1 size too big");
->          return -EFBIG;
->      }
+On Wed, Apr 24, 2019 at 12:26:26PM +0200, Christian Borntraeger wrote:
+>=20
+>=20
+> On 24.04.19 11:56, David Hildenbrand wrote:
+> > On 24.04.19 11:41, Daniel P. Berrang=C3=A9 wrote:
+> >> On Wed, Apr 24, 2019 at 11:35:40AM +0200, David Hildenbrand wrote:
+> >>> On 24.04.19 11:30, Daniel P. Berrang=C3=A9 wrote:
+> >>>> On Wed, Apr 24, 2019 at 11:03:03AM +0200, David Hildenbrand wrote:
+> >>>>> On 24.04.19 10:40, Christian Borntraeger wrote:
+> >>>>>>
+> >>>>>>
+> >>>>>> On 23.04.19 14:11, David Hildenbrand wrote:
+> >>>>>>> On 18.04.19 13:31, Christian Borntraeger wrote:
+> >>>>>>>> Adding generation 15.
+> >>>>>>>>
+> >>>>>>>> Some interesting aspects:
+> >>>>>>>> - conditional SSKE and bpb are deprecated. This patch set addr=
+esses that
+> >>>>>>>>   for csske.
+> >>>>>>>> - no name yet for gen15, I suggest to use the assigned numbers=
+ and
+> >>>>>>>>   provide an alias later on. (I have split out this into a sep=
+arate
+> >>>>>>>>   patch)
+> >>>>>>>>
+> >>>>>>>> Christian Borntraeger (10):
+> >>>>>>>>   linux header sync
+> >>>>>>>>   s390x/cpumodel: remove CSSKE from base model
+> >>>>>>>>   s390x/cpumodel: Miscellaneous-Instruction-Extensions Facilit=
+y 3
+> >>>>>>>>   s390x/cpumodel: msa9 facility
+> >>>>>>>>   s390x/cpumodel: vector enhancements
+> >>>>>>>>   s390x/cpumodel: enhanced sort facility
+> >>>>>>>>   s390x/cpumodel: deflate
+> >>>>>>>>   s390x/cpumodel: add gen15 defintions
+> >>>>>>>>   s390x/cpumodel: wire up 8561 and 8562 as gen15 machines
+> >>>>>>>>   s390x/cpumodel: do not claim csske for expanded models in qm=
+p
+> >>>>>>>>
+> >>>>>>>>  hw/s390x/s390-virtio-ccw.c      |  6 +++
+> >>>>>>>>  linux-headers/asm-s390/kvm.h    |  5 +-
+> >>>>>>>>  target/s390x/cpu_features.c     | 54 +++++++++++++++++++
+> >>>>>>>>  target/s390x/cpu_features.h     |  3 ++
+> >>>>>>>>  target/s390x/cpu_features_def.h | 49 +++++++++++++++++
+> >>>>>>>>  target/s390x/cpu_models.c       | 35 ++++++++++++
+> >>>>>>>>  target/s390x/cpu_models.h       |  1 +
+> >>>>>>>>  target/s390x/gen-features.c     | 94 ++++++++++++++++++++++++=
+++++++++-
+> >>>>>>>>  target/s390x/kvm.c              | 18 +++++++
+> >>>>>>>>  9 files changed, 263 insertions(+), 2 deletions(-)
+> >>>>>>>>
+> >>>>>>>
+> >>>>>>> I guess to handle deprecation of CSSKE:
+> >>>>>>>
+> >>>>>>> 1. Remove it from the base + default model of the gen15, keep i=
+t in the
+> >>>>>>> max model. This is completely done in target/s390x/gen-features=
+.c.
+> >>>>>>> Existing base models are not modified.
+> >>>>>>>
+> >>>>>>> 2. Add CSSKE to "ignored_base_feat", so fallback of gen15 to e.=
+g. z14
+> >>>>>>> will work. We can backport this to distros/stable.
+> >>>>>>
+> >>>>>> Yes, I have already implemented that, still doing some testing a=
+nd polishinh.
+> >>>>>>>
+> >>>>>>>
+> >>>>>>> CPU model expansion:
+> >>>>>>>
+> >>>>>>> cpu_info_from_model() should already properly be based on the b=
+ase
+> >>>>>>> features. "gen15" vs. "gen15,csske=3Don" should be automaticall=
+y generated
+> >>>>>>> when expanding.
+> >>>>>>>
+> >>>>>>> CPU model baseline:
+> >>>>>>>
+> >>>>>>> s390_find_cpu_def() should make sure that CSSKE is basically ig=
+nored
+> >>>>>>> when determining maximum model, however it will properly be ind=
+icated if
+> >>>>>>> both models had the feature.
+> >>>>>>>
+> >>>>>>> CPU model comparison:
+> >>>>>>>
+> >>>>>>> Should work as expected. Availability of CSSKE will be consider=
+ed when
+> >>>>>>> calculating the result.
+> >>>>>>>
+> >>>>>>> gen14,csske=3Don and gen15,csske=3Doff will result in
+> >>>>>>> CPU_MODEL_COMPARE_RESULT_INCOMPATIBLE.
+> >>>>>>>
+> >>>>>>> gen14,csske=3Doff and gen15,csske=3Doff should result in
+> >>>>>>> CPU_MODEL_COMPARE_RESULT_SUBSET
+> >>>>>>>
+> >>>>>>> gen14,csske=3Don and gen15,csske=3Don should result in
+> >>>>>>> CPU_MODEL_COMPARE_RESULT_SUBSET
+> >>>>>>>
+> >>>>>>> Forward migration:
+> >>>>>>>
+> >>>>>>> Now, the only issue is when csske is actually turned of in futu=
+re
+> >>>>>>> machines. We would e.g. have
+> >>>>>>>
+> >>>>>>> gen15,csske=3Don and gen16,csske=3Doff
+> >>>>>>>
+> >>>>>>> While baselining will work correctly (gen15,csske=3Doff), forwa=
+rd
+> >>>>>>> migration is broken (comparison will properly indicate
+> >>>>>>> CPU_MODEL_COMPARE_RESULT_INCOMPATIBLE), which is expected when =
+ripping
+> >>>>>>> out features. Same applies to BPB.
+> >>>>>>>
+> >>>>>>>
+> >>>>>>> Your patch "[PATCH 10/10] s390x/cpumodel: do not claim csske fo=
+r
+> >>>>>>> expanded models in qmp" tried to address this, however I am not=
+ really
+> >>>>>>> happy with this approach. We should not play such tricks when e=
+xpanding
+> >>>>>>> the host model. "-cpu host" and "-cpu $expanded_host" would be
+> >>>>>>> different,
+> >>>>>>
+> >>>>>> We discussed this some time ago and I think we agreed that for h=
+ost passthrough
+> >>>>>> it is ok to be different that host-model (e.g. passing through t=
+he cpuid, passing
+> >>>>>> through all non-hypervisor managed features etc).
+> >>>>>
+> >>>>> I remember the plan was to use the "max" model to do such stuff. =
+E.g.
+> >>>>> -cpu max / no -cpu
+> >>>>>
+> >>>>> Versus
+> >>>>> -cpu host
+> >>>>>
+> >>>>> We can have features in "host" we don't have in "max". But "-cpu =
+host"
+> >>>>> and it's expansion should look 100% the same.
+> >>>>
+> >>>> I don't think that's the intended semantics of "max" vs "host".
+> >>>>
+> >>>> The "max" CPU model is supposed to enable all features that are po=
+ssible to
+> >>>> enable.
+> >>>>
+> >>>> For KVM, thus "max" should be identical to "host".
+> >>>
+> >>> There once was a mode used by x86-64 to simply pipe through cpuid
+> >>> features that were not even supported. (I remember something like
+> >>> passthorugh=3Dtrue), do you remember if something like that still e=
+xists?
+> >>
+> >> I don't recall such a feature existing even in the past !
+> >=20
+> > Maybe my mind is tricking me, or maybe that has long been removed :)
+> >=20
+> >>
+> >>>> For TCG, "max" should be everything that QEMU currently knows how =
+to emulate.
+> >>>
+> >>> Yes, and on s390x. "max" contains more features than "qemu".
+> >>>
+> >>>>
+> >>>> Essentially think of "max" as a better name for "host", since "hos=
+t" as
+> >>>> a name concept didn't make sense for TCG.
+> >>>
+> >>> I agree. The main question is, is it acceptable that
+> >>
+> >> Hmm, maybe I misinterpreted when you wrote
+> >>
+> >>       We can have features in "host" we don't have in "max"
+> >>
+> >> I read that as meaning that "-cpu host" and "-cpu max" would be
+> >> different.
+> >=20
+> > No you didn't misinterpret it, I agreed after you spelled it out :)
+> >=20
+> >>
+> >>> "-cpu host" and "-cpu $expanded_host" produce different results, af=
+ter
+> >>> expanding "host" via query-cpu-model-expansion?
+> >>
+> >> That has always been the case on x86-64, since it is not possible to=
+ set
+> >> the level, xlevel, vendor, family, model & stepping properties via -=
+cpu,
+> >> only the feature flags.
+> >=20
+> > Fair enough, but the question is if we should mess with feature flags=
+ we
+> > can indicate on that level.
+> >=20
+> > It would mean that on a specific host e.g.
+> >=20
+> > "-cpu gen15,csske=3Don" and "-cpu gen15,csske=3Doff"
+> >=20
+> > Would work. However, "host" model expansion would give us
+> >=20
+> > "-cpu gen15,csske=3Doff"
+> >=20
+> > So trying to e.g. do a query-cpu-model-comparison or
+> > query-cpu-model-baseline against "host" and against the expanded host
+> > model will produce different results.
+> >=20
+> > Libvirt could detect "-cpu gen14,csske=3Don" as not runnable on the h=
+ost,
+> > because comparing "-cpu gen14,csske=3Don" vs. "-cpu gen15,csske=3Doff=
+" would
+> > be "incompatible". But running "-cpu gen14,csske=3Don" on the host wo=
+uld
+> > work perfectly fine.
+>=20
+> I would like to avoid special knowledge in libvirt (since we moved to h=
+ave
+> everything in qemu).=20
+>=20
+> A more complex idea would be to extend the qmp query with a list of dep=
+recated
+> features and libvirt could then disable that for expansion but allow it=
+ for
+> baselining.
 
-The calculation of VMDK3 can be verified in end of page No.9 of the spec 
-(https://www.vmware.com/support/developer/vddk/vmdk_50_technote.pdf).
+Funny that you mention deprecation with CPU features....
 
-Also the VMDK4 can be checked in the section Grain Table and Grain in 
-page No.8 of the spec.
+  https://lists.gnu.org/archive/html/qemu-devel/2019-04/msg03969.html
 
-Reviewed-by: yuchenlin <yuchenlin@synology.com>
+So that makes 4 things we want to report deprecation for. Devices,
+machine types, cpu models and now cpu features.
+
+Regards,
+Daniel
+--=20
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberran=
+ge :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.c=
+om :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberran=
+ge :|
