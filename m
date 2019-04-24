@@ -2,85 +2,92 @@ Return-Path: <SRS0=3XOk=S2=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-4.0 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 10C99C10F03
-	for <qemu-devel@archiver.kernel.org>; Wed, 24 Apr 2019 01:28:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2C5C7C10F03
+	for <qemu-devel@archiver.kernel.org>; Wed, 24 Apr 2019 01:30:36 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id CA772218DA
-	for <qemu-devel@archiver.kernel.org>; Wed, 24 Apr 2019 01:28:57 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id E266E218D2
+	for <qemu-devel@archiver.kernel.org>; Wed, 24 Apr 2019 01:30:35 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="LamFINOZ"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CA772218DA
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="HgcPb5y+"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E266E218D2
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:33903 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:33985 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hJ6iX-0003qa-1d
-	for qemu-devel@archiver.kernel.org; Tue, 23 Apr 2019 21:28:57 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:37819)
+	id 1hJ6k7-0005Gp-4S
+	for qemu-devel@archiver.kernel.org; Tue, 23 Apr 2019 21:30:35 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:38266)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <liq3ea@gmail.com>) id 1hJ6hF-0002zp-5H
-	for qemu-devel@nongnu.org; Tue, 23 Apr 2019 21:27:38 -0400
+	(envelope-from <richard.henderson@linaro.org>) id 1hJ6hb-0003IR-CE
+	for qemu-devel@nongnu.org; Tue, 23 Apr 2019 21:28:00 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <liq3ea@gmail.com>) id 1hJ6XW-0004yC-9G
-	for qemu-devel@nongnu.org; Tue, 23 Apr 2019 21:17:35 -0400
-Received: from mail-ot1-x342.google.com ([2607:f8b0:4864:20::342]:33506)
+	(envelope-from <richard.henderson@linaro.org>) id 1hJ6QM-0000fI-DA
+	for qemu-devel@nongnu.org; Tue, 23 Apr 2019 21:10:12 -0400
+Received: from mail-pf1-x444.google.com ([2607:f8b0:4864:20::444]:37850)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <liq3ea@gmail.com>) id 1hJ6XW-0004xI-00
-	for qemu-devel@nongnu.org; Tue, 23 Apr 2019 21:17:34 -0400
-Received: by mail-ot1-x342.google.com with SMTP id j10so14673063otq.0
-	for <qemu-devel@nongnu.org>; Tue, 23 Apr 2019 18:17:33 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
-	h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-	:cc; bh=1Drxi0czTndeQYtSj5oqTKM47n8G11q5OHlMiZW2iK4=;
-	b=LamFINOZv5O8/FGGe6TY0WsIu6+7O6YPLLMWAGbAAJm4ph5eXBKde7fMeZphIpC5Ef
-	B+iE4SmpeGO3LQHU5v1TiclveasBPEyWQNcluzy4uLc2mxdeo1V07CtHIrWExB0+7lO2
-	Iqzpyempxf2lEauXu5JBaqZndiQcLtTxAq/vc+XKS4Vo27fQWfL/HfNibIIdQz/EbVye
-	FAARKv9F6EUn5hwmDPOePDaZ/NHUfUQxlhDDwHWQ33VsIznATHlfHaN7qissKGXCQqoh
-	Zznw7EnEMe+/HRU0CmasWrdD4CLwfeuSF9Bl3yjPykEGzQPQIL79msBApzBz9k/aYGRB
-	ZEzQ==
+	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+	id 1hJ6QM-0000dQ-6u
+	for qemu-devel@nongnu.org; Tue, 23 Apr 2019 21:10:10 -0400
+Received: by mail-pf1-x444.google.com with SMTP id 8so8385342pfr.4
+	for <qemu-devel@nongnu.org>; Tue, 23 Apr 2019 18:10:10 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+	h=subject:to:references:from:openpgp:message-id:date:user-agent
+	:mime-version:in-reply-to:content-language:content-transfer-encoding;
+	bh=q8TwHAD9KwFnBIO0KaXZmx6DPy4UhsaMneZio0TCMM0=;
+	b=HgcPb5y+fII6sdy5gQ98Vqi8AL/ItOmU5uIdaRDhux3BQTeq6r4+j7+/BhtZ4TVUma
+	XIMeESzQo9QIRv/kIzJAq4OeVeM9hq+Vo562UD8BefB/w6eKi2DhTD5n5vgwYC0awAq/
+	RFrrWZJ2qcCHNR1cicYjNsJSmfhDisfF+zTxP8/EKMZpMdJofyQ1GfDoJNGd3+I2Upt8
+	98tDcRZzjeGof8aOJsjdeUidorzWvp2kNjhecNelaMJHiQl8BqLIm6yWyaFKOxuu90rm
+	2fMw2uCa5RF2SNYGoKfwy8Fm0sUPXaVs6WRtlBfkgmUE+lN/AMVQZ8/0SE8TJKaUdBDB
+	9ROg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
 	d=1e100.net; s=20161025;
-	h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-	:message-id:subject:to:cc;
-	bh=1Drxi0czTndeQYtSj5oqTKM47n8G11q5OHlMiZW2iK4=;
-	b=hcaW4w7FyNY5Y2xFUh+AjVpgsr8MSh40kOIM8LKSZSKQzso4g8BSAAr7H7HfsyjW95
-	bfyIFOVcON/6NnYylVjYIgWvJ2I57XP4I0OMpGwKqL+tYp8Z8D47xauvfuUCj716rKy8
-	naRtubI6Ud0Vsbz0ivF9hOebdy0DbjkXmCOX7tWH2BLC2CafCf6p4VBFoTsee8KPeLal
-	MgU7eWT8rgWJS2mrV4su3VIver2b8qyPtR8CLd4FsubY2GTZAkzAx7Qx9GFcoizUIvDO
-	F9Zu+RttocQAcewCgGOoHi9ZbBh454vulM03tRKp9VLykWBLA0i1oI6XxL706KANGjoC
-	Xalw==
-X-Gm-Message-State: APjAAAWWavcIbzGDIopJBNKGGg3a0kVT4NskOpuqrLi1uklBGFXlivuT
-	AHCAKgmyHDDd0Vnmrx1ckkIsL83bHFRae47C0Go=
-X-Google-Smtp-Source: APXvYqxU0oplcUDNZWkhHccwdPFBDUWVKLyvs40Pf5mSqqgU70Hj95MZixbxybHmFZZlDtBIcYYnygAtkzjn5k7yUIw=
-X-Received: by 2002:a05:6830:2148:: with SMTP id
-	r8mr5299304otd.25.1556068653065; 
-	Tue, 23 Apr 2019 18:17:33 -0700 (PDT)
+	h=x-gm-message-state:subject:to:references:from:openpgp:message-id
+	:date:user-agent:mime-version:in-reply-to:content-language
+	:content-transfer-encoding;
+	bh=q8TwHAD9KwFnBIO0KaXZmx6DPy4UhsaMneZio0TCMM0=;
+	b=N3pI1xyeohPjzzRXzuMbj5PoAa5uTt4/cok5jPPamtSOzNJT3wBDOsJX1f2wdtvkcn
+	wt8WfjpmjWVCj4W5MGxU5eZ8N11pYV8FvNj5DOOtun6N2yYQ/xyoJ8syxs0V5Uo5uy2X
+	6d3TocC5xsVgcUJeZ6D3b4GhqMplFZuaFzr+/z2VZr3VamFu2rW+hRC6IADCW+vPGid9
+	+tL4CRC7Qa8VFG2mHbRGOLpPDBFk0r3vls2yMqGPQDPZFgPz8RBeONDMsb70SpYTgnJ7
+	9DpYqgIOZZ8Df3yYKvErMUk3JUUG+vTRD38e0+27mw88JJARI9ipQEnvuQZmZzBDZBc6
+	+BGg==
+X-Gm-Message-State: APjAAAVzgQ2zfdJPQTG8p7Gpubg79glfV0X62cx1eOj4YWJCvdfrZxrZ
+	/p3JB6m1Sz7NWU9sLY/RCOk4SXSBysQ=
+X-Google-Smtp-Source: APXvYqzmUNiQ2zmA1ADGFy3SXNPBWxuDspXn9Gi93usTlgs37nLnbRlL0dzF90slGhDE9Zxdc3YsvA==
+X-Received: by 2002:a65:6546:: with SMTP id a6mr3987527pgw.5.1556068208672;
+	Tue, 23 Apr 2019 18:10:08 -0700 (PDT)
+Received: from [192.168.1.11] (97-113-179-147.tukw.qwest.net. [97.113.179.147])
+	by smtp.gmail.com with ESMTPSA id l1sm19665052pgp.9.2019.04.23.18.10.07
+	(version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+	Tue, 23 Apr 2019 18:10:07 -0700 (PDT)
+To: Peter Maydell <peter.maydell@linaro.org>, qemu-arm@nongnu.org,
+	qemu-devel@nongnu.org
+References: <20190416125744.27770-1-peter.maydell@linaro.org>
+	<20190416125744.27770-22-peter.maydell@linaro.org>
+From: Richard Henderson <richard.henderson@linaro.org>
+Openpgp: preference=signencrypt
+Message-ID: <8ab80d37-fc52-55ba-71b1-635a535f6c5a@linaro.org>
+Date: Tue, 23 Apr 2019 18:10:05 -0700
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+	Thunderbird/60.6.1
 MIME-Version: 1.0
-References: <20190420100056.116305-1-liq3ea@163.com>
-	<20190420100056.116305-4-liq3ea@163.com>
-	<a27cd912-4f58-55ac-1aae-e4999fa3d84d@redhat.com>
-In-Reply-To: <a27cd912-4f58-55ac-1aae-e4999fa3d84d@redhat.com>
-From: Li Qiang <liq3ea@gmail.com>
-Date: Wed, 24 Apr 2019 09:16:56 +0800
-Message-ID:
- <CAKXe6SJZWs7HtXutX6W3saDhaNDtVPMQEh2+s+9XiM3TtZqLdQ@mail.gmail.com>
-To: Thomas Huth <thuth@redhat.com>
+In-Reply-To: <20190416125744.27770-22-peter.maydell@linaro.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
 	recognized.
-X-Received-From: 2607:f8b0:4864:20::342
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Content-Filtered-By: Mailman/MimeDel 2.1.21
-Subject: Re: [Qemu-devel] [PATCH 3/4] tests: fw_cfg: add reboot_timeout test
- case
+X-Received-From: 2607:f8b0:4864:20::444
+Subject: Re: [Qemu-devel] [PATCH 21/26] target/arm: New function
+ armv7m_nvic_set_pending_lazyfp()
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -92,96 +99,32 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: lvivier@redhat.com,
-	=?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>,
-	Li Qiang <liq3ea@163.com>, Qemu Developers <qemu-devel@nongnu.org>,
-	Gerd Hoffmann <kraxel@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
-	Laszlo Ersek <lersek@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190424011656.UhcN5O-qXN8F5qH2apHu3cRTDITTByvNaEpGlaz2PFg@z>
+Message-ID: <20190424011005.2hXfbRr_j1Z9Nj5Vor-0gybnGUUUF9i22RhHsYiN2a0@z>
 
-Thomas Huth <thuth@redhat.com> =E4=BA=8E2019=E5=B9=B44=E6=9C=8824=E6=97=A5=
-=E5=91=A8=E4=B8=89 =E4=B8=8A=E5=8D=8812:29=E5=86=99=E9=81=93=EF=BC=9A
+On 4/16/19 5:57 AM, Peter Maydell wrote:
+> In the v7M architecture, if an exception is generated in the process
+> of doing the lazy stacking of FP registers, the handling of
+> possible escalation to HardFault is treated differently to the normal
+> approach: it works based on the saved information about exception
+> readiness that was stored in the FPCCR when the stack frame was
+> created. Provide a new function armv7m_nvic_set_pending_lazyfp()
+> which pends exceptions during lazy stacking, and implements
+> this logic.
+> 
+> This corresponds to the pseudocode TakePreserveFPException().
+> 
+> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+> ---
+>  target/arm/cpu.h      | 12 ++++++
+>  hw/intc/armv7m_nvic.c | 96 +++++++++++++++++++++++++++++++++++++++++++
+>  2 files changed, 108 insertions(+)
 
-> On 20/04/2019 12.00, Li Qiang wrote:
-> > Signed-off-by: Li Qiang <liq3ea@163.com>
-> > ---
-> >  tests/fw_cfg-test.c | 19 +++++++++++++++++++
-> >  1 file changed, 19 insertions(+)
-> >
-> > diff --git a/tests/fw_cfg-test.c b/tests/fw_cfg-test.c
-> > index c22503619f..9f75dbb5f4 100644
-> > --- a/tests/fw_cfg-test.c
-> > +++ b/tests/fw_cfg-test.c
-> > @@ -174,6 +174,24 @@ static void test_fw_cfg_boot_menu(void)
-> >      qtest_quit(s);
-> >  }
-> >
-> > +static void test_fw_cfg_reboot_timeout(void)
-> > +{
-> > +    QFWCFG *fw_cfg;
-> > +    QTestState *s;
-> > +    uint32_t reboot_timeout =3D 0;
-> > +    size_t filesize;
-> > +
-> > +    s =3D qtest_init("-boot reboot-timeout=3D15");
-> > +    fw_cfg =3D pc_fw_cfg_init(s);
-> > +
-> > +    filesize =3D qfw_cfg_get_file(fw_cfg, "etc/boot-fail-wait",
-> > +                     &reboot_timeout, sizeof(reboot_timeout));
-> > +    g_assert_cmpint(filesize, =3D=3D, sizeof(reboot_timeout));
-> > +    g_assert_cmpint(reboot_timeout, =3D=3D, 15);
->
-> Is this endianess-safe? Or do you need to byteswap reboot_timeout if the
-> host and guest endianess does not match?
->
->
-
-Good question!
-
-IIUC, the qemu fw_cfg store the 'file' entry data just in byte stream. So
-there is no need
-to consider the file's endianess. If when the file entry is stored without
-considering endianess,
-it will be ok to ignore the endianess. So for this patch, the 'reboot_timeo=
-ut'
-is ok as when we stored
-it we don't consider endianess. But for 'splash-time', when we stored it
-we convert it to little endian
-so when we fetches it, we should also convert it from little endian to
-cpu-endian.
-
-So this raises another question.
-Should we consider the endianness for this 'file' entry used for 'integer
-value'?
-I read the seabios related code function 'qemu_cfg_read_file' and
-'romfile_loadint'.
-It doesn't consider endianess. This seems we should drop the 'endianess
-convertion' in 'fw_cfg_bootsplash'
-when we store 'etc/boot-menu-wait'.
-However what's if the emulation target has a different endianess for the
-host target. I think there will be inconsistent.
-So I think we can have following choose:
-
-1. Don't consider the endianess, this is ok when emaulated target and host
-target has the same endianess.
-2. definite an endianess for the 'file' entry used as an integer value.
-When we store this kind of data we uses the definited endianess
-and when we fetch it out, we also do an endianess convertion. This will
-change the seabios I think.
-
-Gerd, Philippe
-
-What do you think of this?
-
-Thanks,
-Li Qiang
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 
 
+r~
 
 
-
->  Thomas
->
