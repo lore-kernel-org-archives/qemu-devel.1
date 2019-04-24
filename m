@@ -1,25 +1,29 @@
-Received: from eggs.gnu.org ([209.51.188.92]:56735)
+Received: from eggs.gnu.org ([209.51.188.92]:56671)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1hJLgx-0001Ch-TS
-	for qemu-devel@nongnu.org; Wed, 24 Apr 2019 13:28:21 -0400
+	(envelope-from <richard.henderson@linaro.org>) id 1hJLhB-00018K-St
+	for qemu-devel@nongnu.org; Wed, 24 Apr 2019 13:28:37 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1hJLaj-00013p-IV
-	for qemu-devel@nongnu.org; Wed, 24 Apr 2019 13:21:54 -0400
-Date: Wed, 24 Apr 2019 14:21:43 -0300
-From: Eduardo Habkost <ehabkost@redhat.com>
-Message-ID: <20190424172143.GC18406@habkost.net>
-References: <1555315185-16414-1-git-send-email-like.xu@linux.intel.com>
-	<1555315185-16414-3-git-send-email-like.xu@linux.intel.com>
-	<20190416212003.GB2272@habkost.net>
-	<87ftqh1ae5.fsf@dusky.pond.sub.org>
-	<20190417171059.GC25134@habkost.net>
-	<3fc39df9-9c4e-219c-e7dc-c93754fd1315@linux.intel.com>
+	(envelope-from <richard.henderson@linaro.org>) id 1hJLSz-0002Dc-TX
+	for qemu-devel@nongnu.org; Wed, 24 Apr 2019 13:13:54 -0400
+Received: from mail-pf1-x42e.google.com ([2607:f8b0:4864:20::42e]:45431)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+	id 1hJLSz-0002CX-Lf
+	for qemu-devel@nongnu.org; Wed, 24 Apr 2019 13:13:53 -0400
+Received: by mail-pf1-x42e.google.com with SMTP id e24so9615389pfi.12
+	for <qemu-devel@nongnu.org>; Wed, 24 Apr 2019 10:13:53 -0700 (PDT)
+References: <20190424142714.28460-1-arilou@gmail.com>
+	<20190424142714.28460-2-arilou@gmail.com>
+From: Richard Henderson <richard.henderson@linaro.org>
+Message-ID: <ef86e214-eb94-034a-16a4-30a7334c6e0e@linaro.org>
+Date: Wed, 24 Apr 2019 10:13:48 -0700
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <3fc39df9-9c4e-219c-e7dc-c93754fd1315@linux.intel.com>
-Subject: Re: [Qemu-devel] [PATCH v3 2/2] core/qdev: refactor
- qdev_get_machine() with type assertion
+In-Reply-To: <20190424142714.28460-2-arilou@gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v3 02/20] gdbstub: Implement deatch (D pkt)
+ with new infra
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,111 +32,26 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Like Xu <like.xu@linux.intel.com>
-Cc: Markus Armbruster <armbru@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, Thomas Huth <thuth@redhat.com>, qemu-trivial@nongnu.org, qemu-devel@nongnu.org, like.xu@intel.com, Igor Mammedov <imammedo@redhat.com>
+To: arilou@gmail.com, qemu-devel@nongnu.org
 
-On Tue, Apr 23, 2019 at 03:59:31PM +0800, Like Xu wrote:
-> On 2019/4/18 1:10, Eduardo Habkost wrote:
-> > On Wed, Apr 17, 2019 at 07:14:10AM +0200, Markus Armbruster wrote:
-> > > Eduardo Habkost <ehabkost@redhat.com> writes:
-> > > 
-> > > > On Mon, Apr 15, 2019 at 03:59:45PM +0800, Like Xu wrote:
-> > > > > To avoid the misuse of qdev_get_machine() if machine hasn't been created yet,
-> > > > > this patch uses qdev_get_machine_uncheck() for obj-common (share with user-only
-> > > > > mode) and adds type assertion to qdev_get_machine() in system-emulation mode.
-> > > > > 
-> > > > > Suggested-by: Igor Mammedov <imammedo@redhat.com>
-> > > > > Signed-off-by: Like Xu <like.xu@linux.intel.com>
-> > > > 
-> > > > Reviewed-by: Eduardo Habkost <ehabkost@redhat.com>
-> > > > 
-> > > > I'm queueing the series on machine-next, thanks!
-> > > 
-> > > Hold your horses, please.
-> > > 
-> > > I dislike the name qdev_get_machine_uncheck().  I could live with
-> > > qdev_get_machine_unchecked().
-> > > 
-> > > However, I doubt this is the right approach.
-> > > 
-> > > The issue at hand is undisciplined creation of QOM object /machine.
-> > > 
-> > > This patch adds an asseertion "undisciplined creation of /machine didn't
-> > > create crap", but only in some places.
-> > > 
-> > > I think we should never create /machine as (surprising!) side effect of
-> > > qdev_get_machine().  Create it explicitly instead, and have
-> > > qdev_get_machine() use object_resolve_path("/machine", NULL) to get it.
-> > > Look ma, no side effects.
-> > 
-> > OK, I'm dropping this one while we discuss it.
-> > 
-> > I really miss a good explanation why qdev_get_machine_unchecked()
-> > needs to exist.  When exactly do we want /machine to exist but
-> > not be TYPE_MACHINE?  Why?
-> 
-> AFAICT, there is no such "/machine" that is not of type TYPE_MACHINE.
-> 
-> The original qdev_get_machine() would always return a "/container" object in
-> user-only mode and there is none TYPE_MACHINE object.
+On 4/24/19 7:26 AM, arilou@gmail.com wrote:
+> +        {
+> +            static GdbCmdParseEntry deatch_cmd_desc = {
 
-I'm confused.  Both qdev_get_machine() and
-qdev_get_machine_unchecked() still return the object at
-"/machine".  On softmmu, /machine will be of type TYPE_MACHINE.
-On user-only, /machine will be of type "container".
+static const.  s/deatch/detach/.
+
+That'll require changes to patch 1, since process_string_cmd doesn't take a
+const GdbCmdParseEntry pointer.
+
+> +                .handler = handle_detach,
+> +                .cmd = "D",
+> +                .cmd_startswith = 1,
+> +                .schema = "?.l0"
+> +            };
+> +            process_string_cmd(s, NULL, line_buf, &deatch_cmd_desc, 1);
+
+process_string_cmd returns errors, which you make no attempt to handle here.
+Should the errors returns in fact be asserts?
 
 
-> 
-> In system emulation mode, it returns the same "/container" object at the
-> beginning, until we initialize and add a TYPE_MACHINE object to the
-> "/container" as a child and it would return OBJECT(current_machine)
-> for later usages.
-> 
-> The starting point is to avoid using the legacy qdev_get_machine()
-> in system emulation mode when we haven't added the "/machine" object.
-> As a result, we introduced type checking assertions to avoid premature
-> invocations.
-
-I believe Markus is suggesting that avoiding unwanted side
-effects is even better than doing type checking after it's
-already too late.  In other words, it doesn't make sense to call
-container_get("/machine") on system emulation mode.
-
-
-> 
-> In this proposal, the qdev_get_machine_unchecked() is only used
-> in user-only mode, part of which shares with system emulation mode
-> (such as device_set_realized, cpu_common_realizefn). The new
-> qdev_get_machine() is only used in system emulation mode and type checking
-> assertion does reduce the irrational use of this function (if any in the
-> future).
-
-This part confuses me as well.  qdev_get_machine_unchecked() is
-used in both user-only and softmmu, isn't?  Thus we can't say it
-is only used in user-only mode.
-
-I think we all agree that qdev_get_machine() should eventually be
-available in softmmu only.
-
-But I don't think we agree when it would be appropriate to call
-qdev_get_machine_unchecked() instead of qdev_get_machine().
-
-On both examples in your patch, the code checks for TYPE_MACHINE
-immediately after calling qdev_get_machine_unchecked().  If that
-code is only useful in softmmu mode, when would anybody want to
-call qdev_get_machine_unchecked() in user-only mode?
-
-
-> 
-> We all agree to use this qdev_get_machine() as little as possible
-> and this patch could make future clean up work easier.
-> 
-> > 
-> > Once the expectations and use cases are explained, we can choose
-> > a better name for qdev_get_machine_unchecked() and document it
-> > properly.
-> > 
-> 
-
--- 
-Eduardo
+r~
