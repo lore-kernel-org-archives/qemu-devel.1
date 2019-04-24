@@ -1,26 +1,25 @@
-Received: from eggs.gnu.org ([209.51.188.92]:47215)
+Received: from eggs.gnu.org ([209.51.188.92]:47337)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1hJFic-0008E7-Fp
-	for qemu-devel@nongnu.org; Wed, 24 Apr 2019 07:05:39 -0400
+	(envelope-from <marcandre.lureau@redhat.com>) id 1hJFiO-0008KB-0m
+	for qemu-devel@nongnu.org; Wed, 24 Apr 2019 07:06:18 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1hJFZ0-0000Kn-3e
-	for qemu-devel@nongnu.org; Wed, 24 Apr 2019 06:55:43 -0400
-Received: from mail-ot1-x341.google.com ([2607:f8b0:4864:20::341]:33171)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1hJFYz-0000GR-U1
-	for qemu-devel@nongnu.org; Wed, 24 Apr 2019 06:55:42 -0400
-Received: by mail-ot1-x341.google.com with SMTP id j10so15735933otq.0
-	for <qemu-devel@nongnu.org>; Wed, 24 Apr 2019 03:55:38 -0700 (PDT)
+	(envelope-from <marcandre.lureau@redhat.com>) id 1hJFe2-0006oS-SU
+	for qemu-devel@nongnu.org; Wed, 24 Apr 2019 07:01:33 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:13846)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <marcandre.lureau@redhat.com>)
+	id 1hJFe1-0006nM-Sq
+	for qemu-devel@nongnu.org; Wed, 24 Apr 2019 07:00:54 -0400
+From: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
+Date: Wed, 24 Apr 2019 13:00:41 +0200
+Message-Id: <20190424110041.8175-3-marcandre.lureau@redhat.com>
+In-Reply-To: <20190424110041.8175-1-marcandre.lureau@redhat.com>
+References: <20190424110041.8175-1-marcandre.lureau@redhat.com>
 MIME-Version: 1.0
-References: <20190418203840.10528-1-armbru@redhat.com>
-In-Reply-To: <20190418203840.10528-1-armbru@redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Wed, 24 Apr 2019 11:55:25 +0100
-Message-ID: <CAFEAcA9d5uMBiWx+OiLGuSs6qA5CRzG2dqhzsF8Q7tnOf_84Gg@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PULL for-4.1 0/9] Miscellaneous patches for
- 2019-04-18
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PATCH v2 2/2] build-sys: move slirp as git submodule
+ project
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,68 +28,17192 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Markus Armbruster <armbru@redhat.com>
-Cc: QEMU Developers <qemu-devel@nongnu.org>
+To: qemu-devel@nongnu.org
+Cc: samuel.thibault@ens-lyon.org, berrange@redhat.com, eblake@redhat.com, =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
 
-On Thu, 18 Apr 2019 at 21:40, Markus Armbruster <armbru@redhat.com> wrote:
->
-> Early pull request because I'll be on vacation when 4.1 opens.  Hope
-> that's okay.
->
-> The following changes since commit eeba63fc7fface36f438bcbc0d3b02e7dcb59983:
->
->   Update version for v4.0.0-rc4 release (2019-04-16 21:53:00 +0100)
->
-> are available in the Git repository at:
->
->   git://repo.or.cz/qemu/armbru.git tags/pull-misc-2019-04-18
->
-> for you to fetch changes up to 15136db27efaf0bdcf1131d41ad57832a2acadcc:
->
->   Clean up decorations and whitespace around header guards (2019-04-17 19:20:46 +0200)
->
-> ----------------------------------------------------------------
-> Miscellaneous patches for 2019-04-18
->
-> ----------------------------------------------------------------
-> Markus Armbruster (9):
->       Clean up includes
->       Use #include "..." for our own headers, <...> for others
->       authz: Normalize #include "authz/trace.h" to "trace.h"
->       linux-user/nios2 linux-user/riscv: Clean up header guards
->       target/xtensa: Clean up core-isa.h header guards
->       Clean up header guards that don't match their file name
->       Clean up ill-advised or unusual header guards
->       Normalize header guard symbol definition.
->       Clean up decorations and whitespace around header guards
+The slirp project is now hosted on freedesktop at:
+https://gitlab.freedesktop.org/slirp.
 
-Hi -- this fails 'make check' on ppc64 and s390, so likely
-a big-endian hosts issue:
+The libslirp source was extracted from qemu/slirp filtered through
+clang-format (available in project tree). The qemu slirp directory can
+be swapped by a git submodule.
 
-make[1]: Leaving directory `/home/pm215/qemu/build/all/tests/fp'
-cd /home/pm215/qemu/build/all/tests/fp && ./fp-test -s -l 1 -r all
-i32_to_f16 i64_to_f16 i32_to_f32 i64_to_f32 i32_to_f64 i64_to_f64
-i32_to_f128 i64_to_f128 >  int-to-float.out 2>&1 || (cat
-int-to-float.out && exit 1;)
->> Testing i32_to_f16, rounding near_even
-^M372 tests total.
-^M372 tests performed.
-In 372 tests, no errors found in i32_to_f16, rounding near_even.
-[...]
->> Testing i32_to_f128
-^M372 tests total.
-^MErrors found in i32_to_f128:
-1006FFFF  => +0000.000000000000401B006FFFF00000 .....
-        expected +401B.006FFFF000000000000000000000 .....
-^M0001DDEB  => +0000.000000000000400FDDEB00000000 .....
-        expected +400F.DDEB000000000000000000000000 .....
-^MFFF6FFFC  => +0000.000000000000C012200080000000 .....
-        expected -4012.2000800000000000000000000000 .....
-[...]
-^M00000020  => +0000.0000000000004004000000000000 .....
-        expected +4004.0000000000000000000000000000 .....
-^M21 tests performed; 20 errors found.
-make: *** [check-softfloat-conv] Error 1
+Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+---
+ configure              |   11 +-
+ .gitmodules            |    3 +
+ slirp/src/bootp.h      |  129 ----
+ slirp/src/debug.h      |   46 --
+ slirp/src/dhcpv6.h     |   53 --
+ slirp/src/if.h         |   21 -
+ slirp/src/ip.h         |  242 -------
+ slirp/src/ip6.h        |  160 -----
+ slirp/src/ip6_icmp.h   |  232 ------
+ slirp/src/ip_icmp.h    |  166 -----
+ slirp/src/libslirp.h   |  118 ---
+ slirp/src/main.h       |   16 -
+ slirp/src/mbuf.h       |  127 ----
+ slirp/src/misc.h       |   66 --
+ slirp/src/ncsi-pkt.h   |  445 ------------
+ slirp/src/qtailq.h     |  194 -----
+ slirp/src/sbuf.h       |   27 -
+ slirp/src/slirp.h      |  275 -------
+ slirp/src/socket.h     |  160 -----
+ slirp/src/stream.h     |   35 -
+ slirp/src/tcp.h        |  181 -----
+ slirp/src/tcp_timer.h  |  128 ----
+ slirp/src/tcp_var.h    |  162 -----
+ slirp/src/tcpip.h      |  102 ---
+ slirp/src/tftp.h       |   52 --
+ slirp/src/udp.h        |   92 ---
+ slirp/src/util.h       |  175 -----
+ slirp/src/vmstate.h    |  409 -----------
+ slirp/src/arp_table.c  |   92 ---
+ slirp/src/bootp.c      |  371 ----------
+ slirp/src/cksum.c      |  161 -----
+ slirp/src/dhcpv6.c     |  224 ------
+ slirp/src/dnssearch.c  |  311 --------
+ slirp/src/if.c         |  218 ------
+ slirp/src/ip6_icmp.c   |  438 -----------
+ slirp/src/ip6_input.c  |   78 --
+ slirp/src/ip6_output.c |   39 -
+ slirp/src/ip_icmp.c    |  470 ------------
+ slirp/src/ip_input.c   |  469 ------------
+ slirp/src/ip_output.c  |  170 -----
+ slirp/src/mbuf.c       |  235 ------
+ slirp/src/misc.c       |  321 ---------
+ slirp/src/ncsi.c       |  194 -----
+ slirp/src/ndp_table.c  |   87 ---
+ slirp/src/sbuf.c       |  186 -----
+ slirp/src/slirp.c      | 1118 -----------------------------
+ slirp/src/socket.c     |  945 ------------------------
+ slirp/src/state.c      |  388 ----------
+ slirp/src/stream.c     |  120 ----
+ slirp/src/tcp_input.c  | 1554 ----------------------------------------
+ slirp/src/tcp_output.c |  522 --------------
+ slirp/src/tcp_subr.c   |  987 -------------------------
+ slirp/src/tcp_timer.c  |  294 --------
+ slirp/src/tftp.c       |  463 ------------
+ slirp/src/udp.c        |  363 ----------
+ slirp/src/udp6.c       |  173 -----
+ slirp/src/util.c       |  368 ----------
+ slirp/src/vmstate.c    |  441 ------------
+ slirp                  |    1 +
+ slirp/COPYRIGHT        |   62 --
+ slirp/Makefile         |   47 --
+ 61 files changed, 13 insertions(+), 15724 deletions(-)
+ delete mode 100644 slirp/src/bootp.h
+ delete mode 100644 slirp/src/debug.h
+ delete mode 100644 slirp/src/dhcpv6.h
+ delete mode 100644 slirp/src/if.h
+ delete mode 100644 slirp/src/ip.h
+ delete mode 100644 slirp/src/ip6.h
+ delete mode 100644 slirp/src/ip6_icmp.h
+ delete mode 100644 slirp/src/ip_icmp.h
+ delete mode 100644 slirp/src/libslirp.h
+ delete mode 100644 slirp/src/main.h
+ delete mode 100644 slirp/src/mbuf.h
+ delete mode 100644 slirp/src/misc.h
+ delete mode 100644 slirp/src/ncsi-pkt.h
+ delete mode 100644 slirp/src/qtailq.h
+ delete mode 100644 slirp/src/sbuf.h
+ delete mode 100644 slirp/src/slirp.h
+ delete mode 100644 slirp/src/socket.h
+ delete mode 100644 slirp/src/stream.h
+ delete mode 100644 slirp/src/tcp.h
+ delete mode 100644 slirp/src/tcp_timer.h
+ delete mode 100644 slirp/src/tcp_var.h
+ delete mode 100644 slirp/src/tcpip.h
+ delete mode 100644 slirp/src/tftp.h
+ delete mode 100644 slirp/src/udp.h
+ delete mode 100644 slirp/src/util.h
+ delete mode 100644 slirp/src/vmstate.h
+ delete mode 100644 slirp/src/arp_table.c
+ delete mode 100644 slirp/src/bootp.c
+ delete mode 100644 slirp/src/cksum.c
+ delete mode 100644 slirp/src/dhcpv6.c
+ delete mode 100644 slirp/src/dnssearch.c
+ delete mode 100644 slirp/src/if.c
+ delete mode 100644 slirp/src/ip6_icmp.c
+ delete mode 100644 slirp/src/ip6_input.c
+ delete mode 100644 slirp/src/ip6_output.c
+ delete mode 100644 slirp/src/ip_icmp.c
+ delete mode 100644 slirp/src/ip_input.c
+ delete mode 100644 slirp/src/ip_output.c
+ delete mode 100644 slirp/src/mbuf.c
+ delete mode 100644 slirp/src/misc.c
+ delete mode 100644 slirp/src/ncsi.c
+ delete mode 100644 slirp/src/ndp_table.c
+ delete mode 100644 slirp/src/sbuf.c
+ delete mode 100644 slirp/src/slirp.c
+ delete mode 100644 slirp/src/socket.c
+ delete mode 100644 slirp/src/state.c
+ delete mode 100644 slirp/src/stream.c
+ delete mode 100644 slirp/src/tcp_input.c
+ delete mode 100644 slirp/src/tcp_output.c
+ delete mode 100644 slirp/src/tcp_subr.c
+ delete mode 100644 slirp/src/tcp_timer.c
+ delete mode 100644 slirp/src/tftp.c
+ delete mode 100644 slirp/src/udp.c
+ delete mode 100644 slirp/src/udp6.c
+ delete mode 100644 slirp/src/util.c
+ delete mode 100644 slirp/src/vmstate.c
+ create mode 160000 slirp
+ delete mode 100644 slirp/COPYRIGHT
+ delete mode 100644 slirp/Makefile
 
-thanks
--- PMM
+diff --git a/configure b/configure
+index 1c563a7027..a6aaf1276d 100755
+--- a/configure
++++ b/configure
+@@ -1120,6 +1120,8 @@ for opt do
+   ;;
+   --disable-slirp) slirp=3D"no"
+   ;;
++  --enable-slirp=3Dgit) slirp=3D"git"
++  ;;
+   --enable-slirp=3Dsystem) slirp=3D"system"
+   ;;
+   --disable-vde) vde=3D"no"
+@@ -5891,6 +5893,8 @@ case "$slirp" in
+   "" | yes)
+     if $pkg_config slirp; then
+       slirp=3Dsystem
++    elif test -e "${source_path}/.git" && test $git_update =3D 'yes' ; t=
+hen
++      slirp=3Dgit
+     elif test -e "${source_path}/slirp/Makefile" ; then
+       slirp=3Dinternal
+     elif test -z "$slirp" ; then
+@@ -5908,7 +5912,10 @@ case "$slirp" in
+ esac
+=20
+ case "$slirp" in
+-  internal)
++  git | internal)
++    if test "$slirp" =3D git; then
++      git_submodules=3D"${git_submodules} slirp"
++    fi
+     mkdir -p slirp
+     slirp_cflags=3D"-I\$(SRC_PATH)/slirp/src -I\$(BUILD_DIR)/slirp/src"
+     slirp_libs=3D"-L\$(BUILD_DIR)/slirp -lslirp"
+@@ -6571,7 +6578,7 @@ if test "$slirp" !=3D "no"; then
+   echo "SLIRP_CFLAGS=3D$slirp_cflags" >> $config_host_mak
+   echo "SLIRP_LIBS=3D$slirp_libs" >> $config_host_mak
+ fi
+-if [ "$slirp" =3D "internal" ]; then
++if [ "$slirp" =3D "git" -o "$slirp" =3D "internal" ]; then
+     echo "config-host.h: subdir-slirp" >> $config_host_mak
+ fi
+ if test "$vde" =3D "yes" ; then
+diff --git a/.gitmodules b/.gitmodules
+index ceafb0ee29..aa77ce6f50 100644
+--- a/.gitmodules
++++ b/.gitmodules
+@@ -52,3 +52,6 @@
+ [submodule "roms/edk2"]
+ 	path =3D roms/edk2
+ 	url =3D https://github.com/tianocore/edk2.git
++[submodule "slirp"]
++	path =3D slirp
++	url =3D https://gitlab.freedesktop.org/slirp/libslirp.git
+diff --git a/slirp/src/bootp.h b/slirp/src/bootp.h
+deleted file mode 100644
+index d881ad620a..0000000000
+--- a/slirp/src/bootp.h
++++ /dev/null
+@@ -1,129 +0,0 @@
+-/* SPDX-License-Identifier: BSD-3-Clause */
+-/* bootp/dhcp defines */
+-
+-#ifndef SLIRP_BOOTP_H
+-#define SLIRP_BOOTP_H
+-
+-#define BOOTP_SERVER	67
+-#define BOOTP_CLIENT	68
+-
+-#define BOOTP_REQUEST	1
+-#define BOOTP_REPLY	2
+-
+-#define RFC1533_COOKIE		99, 130, 83, 99
+-#define RFC1533_PAD		0
+-#define RFC1533_NETMASK		1
+-#define RFC1533_TIMEOFFSET	2
+-#define RFC1533_GATEWAY		3
+-#define RFC1533_TIMESERVER	4
+-#define RFC1533_IEN116NS	5
+-#define RFC1533_DNS		6
+-#define RFC1533_LOGSERVER	7
+-#define RFC1533_COOKIESERVER	8
+-#define RFC1533_LPRSERVER	9
+-#define RFC1533_IMPRESSSERVER	10
+-#define RFC1533_RESOURCESERVER	11
+-#define RFC1533_HOSTNAME	12
+-#define RFC1533_BOOTFILESIZE	13
+-#define RFC1533_MERITDUMPFILE	14
+-#define RFC1533_DOMAINNAME	15
+-#define RFC1533_SWAPSERVER	16
+-#define RFC1533_ROOTPATH	17
+-#define RFC1533_EXTENSIONPATH	18
+-#define RFC1533_IPFORWARDING	19
+-#define RFC1533_IPSOURCEROUTING	20
+-#define RFC1533_IPPOLICYFILTER	21
+-#define RFC1533_IPMAXREASSEMBLY	22
+-#define RFC1533_IPTTL		23
+-#define RFC1533_IPMTU		24
+-#define RFC1533_IPMTUPLATEAU	25
+-#define RFC1533_INTMTU		26
+-#define RFC1533_INTLOCALSUBNETS	27
+-#define RFC1533_INTBROADCAST	28
+-#define RFC1533_INTICMPDISCOVER	29
+-#define RFC1533_INTICMPRESPOND	30
+-#define RFC1533_INTROUTEDISCOVER 31
+-#define RFC1533_INTROUTESOLICIT	32
+-#define RFC1533_INTSTATICROUTES	33
+-#define RFC1533_LLTRAILERENCAP	34
+-#define RFC1533_LLARPCACHETMO	35
+-#define RFC1533_LLETHERNETENCAP	36
+-#define RFC1533_TCPTTL		37
+-#define RFC1533_TCPKEEPALIVETMO	38
+-#define RFC1533_TCPKEEPALIVEGB	39
+-#define RFC1533_NISDOMAIN	40
+-#define RFC1533_NISSERVER	41
+-#define RFC1533_NTPSERVER	42
+-#define RFC1533_VENDOR		43
+-#define RFC1533_NBNS		44
+-#define RFC1533_NBDD		45
+-#define RFC1533_NBNT		46
+-#define RFC1533_NBSCOPE		47
+-#define RFC1533_XFS		48
+-#define RFC1533_XDM		49
+-
+-#define RFC2132_REQ_ADDR	50
+-#define RFC2132_LEASE_TIME      51
+-#define RFC2132_MSG_TYPE	53
+-#define RFC2132_SRV_ID		54
+-#define RFC2132_PARAM_LIST	55
+-#define RFC2132_MESSAGE		56
+-#define RFC2132_MAX_SIZE	57
+-#define RFC2132_RENEWAL_TIME    58
+-#define RFC2132_REBIND_TIME     59
+-#define RFC2132_TFTP_SERVER_NAME 66
+-
+-#define DHCPDISCOVER		1
+-#define DHCPOFFER		2
+-#define DHCPREQUEST		3
+-#define DHCPACK			5
+-#define DHCPNAK			6
+-
+-#define RFC1533_VENDOR_MAJOR	0
+-#define RFC1533_VENDOR_MINOR	0
+-
+-#define RFC1533_VENDOR_MAGIC	128
+-#define RFC1533_VENDOR_ADDPARM	129
+-#define	RFC1533_VENDOR_ETHDEV	130
+-#define RFC1533_VENDOR_HOWTO    132
+-#define RFC1533_VENDOR_MNUOPTS	160
+-#define RFC1533_VENDOR_SELECTION 176
+-#define RFC1533_VENDOR_MOTD	184
+-#define RFC1533_VENDOR_NUMOFMOTD 8
+-#define RFC1533_VENDOR_IMG	192
+-#define RFC1533_VENDOR_NUMOFIMG	16
+-
+-#define RFC1533_END		255
+-#define BOOTP_VENDOR_LEN	64
+-#define DHCP_OPT_LEN		312
+-
+-struct bootp_t {
+-    struct ip ip;
+-    struct udphdr udp;
+-    uint8_t bp_op;
+-    uint8_t bp_htype;
+-    uint8_t bp_hlen;
+-    uint8_t bp_hops;
+-    uint32_t bp_xid;
+-    uint16_t bp_secs;
+-    uint16_t unused;
+-    struct in_addr bp_ciaddr;
+-    struct in_addr bp_yiaddr;
+-    struct in_addr bp_siaddr;
+-    struct in_addr bp_giaddr;
+-    uint8_t bp_hwaddr[16];
+-    uint8_t bp_sname[64];
+-    uint8_t bp_file[128];
+-    uint8_t bp_vend[DHCP_OPT_LEN];
+-};
+-
+-typedef struct {
+-    uint16_t allocated;
+-    uint8_t macaddr[6];
+-} BOOTPClient;
+-
+-#define NB_BOOTP_CLIENTS 16
+-
+-void bootp_input(struct mbuf *m);
+-
+-#endif
+diff --git a/slirp/src/debug.h b/slirp/src/debug.h
+deleted file mode 100644
+index c95fd8ffd2..0000000000
+--- a/slirp/src/debug.h
++++ /dev/null
+@@ -1,46 +0,0 @@
+-/* SPDX-License-Identifier: BSD-3-Clause */
+-/*
+- * Copyright (c) 1995 Danny Gasparovski.
+- */
+-
+-#ifndef DEBUG_H_
+-#define DEBUG_H_
+-
+-#define DBG_CALL (1 << 0)
+-#define DBG_MISC (1 << 1)
+-#define DBG_ERROR (1 << 2)
+-#define DBG_TFTP (1 << 3)
+-
+-extern int slirp_debug;
+-
+-#define DEBUG_CALL(fmt, ...) do {               \
+-    if (G_UNLIKELY(slirp_debug & DBG_CALL)) {   \
+-        g_debug(fmt "...", ##__VA_ARGS__);      \
+-    }                                           \
+-} while (0)
+-
+-#define DEBUG_ARG(fmt, ...) do {                \
+-    if (G_UNLIKELY(slirp_debug & DBG_CALL)) {   \
+-        g_debug(" " fmt, ##__VA_ARGS__);        \
+-    }                                           \
+-} while (0)
+-
+-#define DEBUG_MISC(fmt, ...) do {               \
+-    if (G_UNLIKELY(slirp_debug & DBG_MISC)) {   \
+-        g_debug(fmt, ##__VA_ARGS__);            \
+-    }                                           \
+-} while (0)
+-
+-#define DEBUG_ERROR(fmt, ...) do {              \
+-    if (G_UNLIKELY(slirp_debug & DBG_ERROR)) {  \
+-        g_debug(fmt, ##__VA_ARGS__);            \
+-    }                                           \
+-} while (0)
+-
+-#define DEBUG_TFTP(fmt, ...) do {               \
+-    if (G_UNLIKELY(slirp_debug & DBG_TFTP)) {   \
+-        g_debug(fmt, ##__VA_ARGS__);            \
+-    }                                           \
+-} while (0)
+-
+-#endif /* DEBUG_H_ */
+diff --git a/slirp/src/dhcpv6.h b/slirp/src/dhcpv6.h
+deleted file mode 100644
+index dc26a93cff..0000000000
+--- a/slirp/src/dhcpv6.h
++++ /dev/null
+@@ -1,53 +0,0 @@
+-/* SPDX-License-Identifier: BSD-3-Clause */
+-/*
+- * Definitions and prototypes for SLIRP stateless DHCPv6
+- *
+- * Copyright 2016 Thomas Huth, Red Hat Inc.
+- *
+- * Redistribution and use in source and binary forms, with or without
+- * modification, are permitted provided that the following conditions
+- * are met:
+- *
+- * 1. Redistributions of source code must retain the above
+- * copyright notice, this list of conditions and the following
+- * disclaimer.
+- *
+- * 2. Redistributions in binary form must reproduce the above
+- * copyright notice, this list of conditions and the following
+- * disclaimer in the documentation and/or other materials provided
+- * with the distribution.
+- *
+- * 3. Neither the name of the copyright holder nor the names of its
+- * contributors may be used to endorse or promote products derived
+- * from this software without specific prior written permission.
+- *
+- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+- * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+- * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS
+- * FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE
+- * COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
+- * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+- * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+- * SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
+- * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT,
+- * STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+- * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
+- * OF THE POSSIBILITY OF SUCH DAMAGE.
+- */
+-#ifndef SLIRP_DHCPV6_H
+-#define SLIRP_DHCPV6_H
+-
+-#define DHCPV6_SERVER_PORT 547
+-
+-#define ALLDHCP_MULTICAST { .s6_addr =3D \
+-                            { 0xff, 0x02, 0x00, 0x00,\
+-                            0x00, 0x00, 0x00, 0x00,\
+-                            0x00, 0x00, 0x00, 0x00,\
+-                            0x00, 0x01, 0x00, 0x02 } }
+-
+-#define in6_dhcp_multicast(a)\
+-    in6_equal(a, &(struct in6_addr)ALLDHCP_MULTICAST)
+-
+-void dhcpv6_input(struct sockaddr_in6 *srcsas, struct mbuf *m);
+-
+-#endif
+diff --git a/slirp/src/if.h b/slirp/src/if.h
+deleted file mode 100644
+index b71c37d6ea..0000000000
+--- a/slirp/src/if.h
++++ /dev/null
+@@ -1,21 +0,0 @@
+-/* SPDX-License-Identifier: BSD-3-Clause */
+-/*
+- * Copyright (c) 1995 Danny Gasparovski.
+- */
+-
+-#ifndef IF_H
+-#define IF_H
+-
+-#define IF_COMPRESS	0x01	/* We want compression */
+-#define IF_NOCOMPRESS	0x02	/* Do not do compression */
+-#define IF_AUTOCOMP	0x04	/* Autodetect (default) */
+-#define IF_NOCIDCOMP	0x08	/* CID compression */
+-
+-#define IF_MTU 1500
+-#define IF_MRU 1500
+-#define	IF_COMP IF_AUTOCOMP	/* Flags for compression */
+-
+-/* 2 for alignment, 14 for ethernet */
+-#define IF_MAXLINKHDR (2 + ETH_HLEN)
+-
+-#endif
+diff --git a/slirp/src/ip.h b/slirp/src/ip.h
+deleted file mode 100644
+index 1484de1176..0000000000
+--- a/slirp/src/ip.h
++++ /dev/null
+@@ -1,242 +0,0 @@
+-/* SPDX-License-Identifier: BSD-3-Clause */
+-/*
+- * Copyright (c) 1982, 1986, 1993
+- *	The Regents of the University of California.  All rights reserved.
+- *
+- * Redistribution and use in source and binary forms, with or without
+- * modification, are permitted provided that the following conditions
+- * are met:
+- * 1. Redistributions of source code must retain the above copyright
+- *    notice, this list of conditions and the following disclaimer.
+- * 2. Redistributions in binary form must reproduce the above copyright
+- *    notice, this list of conditions and the following disclaimer in th=
+e
+- *    documentation and/or other materials provided with the distributio=
+n.
+- * 3. Neither the name of the University nor the names of its contributo=
+rs
+- *    may be used to endorse or promote products derived from this softw=
+are
+- *    without specific prior written permission.
+- *
+- * THIS SOFTWARE IS PROVIDED BY THE REGENTS AND CONTRIBUTORS ``AS IS'' A=
+ND
+- * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+- * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PU=
+RPOSE
+- * ARE DISCLAIMED.  IN NO EVENT SHALL THE REGENTS OR CONTRIBUTORS BE LIA=
+BLE
+- * FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUE=
+NTIAL
+- * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOO=
+DS
+- * OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
+- * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, S=
+TRICT
+- * LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY=
+ WAY
+- * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY O=
+F
+- * SUCH DAMAGE.
+- *
+- *	@(#)ip.h	8.1 (Berkeley) 6/10/93
+- * ip.h,v 1.3 1994/08/21 05:27:30 paul Exp
+- */
+-
+-#ifndef IP_H
+-#define IP_H
+-
+-#include <glib.h>
+-
+-#if G_BYTE_ORDER =3D=3D G_BIG_ENDIAN
+-# undef NTOHL
+-# undef NTOHS
+-# undef HTONL
+-# undef HTONS
+-# define NTOHL(d)
+-# define NTOHS(d)
+-# define HTONL(d)
+-# define HTONS(d)
+-#else
+-# ifndef NTOHL
+-#  define NTOHL(d) ((d) =3D ntohl((d)))
+-# endif
+-# ifndef NTOHS
+-#  define NTOHS(d) ((d) =3D ntohs((uint16_t)(d)))
+-# endif
+-# ifndef HTONL
+-#  define HTONL(d) ((d) =3D htonl((d)))
+-# endif
+-# ifndef HTONS
+-#  define HTONS(d) ((d) =3D htons((uint16_t)(d)))
+-# endif
+-#endif
+-
+-typedef uint32_t n_long;                 /* long as received from the ne=
+t */
+-
+-/*
+- * Definitions for internet protocol version 4.
+- * Per RFC 791, September 1981.
+- */
+-#define	IPVERSION	4
+-
+-/*
+- * Structure of an internet header, naked of options.
+- */
+-struct ip {
+-#if G_BYTE_ORDER =3D=3D G_BIG_ENDIAN
+-	uint8_t ip_v:4,			/* version */
+-		ip_hl:4;		/* header length */
+-#else
+-	uint8_t ip_hl:4,		/* header length */
+-		ip_v:4;			/* version */
+-#endif
+-	uint8_t		ip_tos;			/* type of service */
+-	uint16_t	ip_len;			/* total length */
+-	uint16_t	ip_id;			/* identification */
+-	uint16_t	ip_off;			/* fragment offset field */
+-#define	IP_DF 0x4000			/* don't fragment flag */
+-#define	IP_MF 0x2000			/* more fragments flag */
+-#define	IP_OFFMASK 0x1fff		/* mask for fragmenting bits */
+-	uint8_t ip_ttl;			/* time to live */
+-	uint8_t ip_p;			/* protocol */
+-	uint16_t	ip_sum;			/* checksum */
+-	struct	in_addr ip_src,ip_dst;	/* source and dest address */
+-} SLIRP_PACKED;
+-
+-#define	IP_MAXPACKET	65535		/* maximum packet size */
+-
+-/*
+- * Definitions for IP type of service (ip_tos)
+- */
+-#define	IPTOS_LOWDELAY		0x10
+-#define	IPTOS_THROUGHPUT	0x08
+-#define	IPTOS_RELIABILITY	0x04
+-
+-/*
+- * Definitions for options.
+- */
+-#define	IPOPT_COPIED(o)		((o)&0x80)
+-#define	IPOPT_CLASS(o)		((o)&0x60)
+-#define	IPOPT_NUMBER(o)		((o)&0x1f)
+-
+-#define	IPOPT_CONTROL		0x00
+-#define	IPOPT_RESERVED1		0x20
+-#define	IPOPT_DEBMEAS		0x40
+-#define	IPOPT_RESERVED2		0x60
+-
+-#define	IPOPT_EOL		0		/* end of option list */
+-#define	IPOPT_NOP		1		/* no operation */
+-
+-#define	IPOPT_RR		7		/* record packet route */
+-#define	IPOPT_TS		68		/* timestamp */
+-#define	IPOPT_SECURITY		130		/* provide s,c,h,tcc */
+-#define	IPOPT_LSRR		131		/* loose source route */
+-#define	IPOPT_SATID		136		/* satnet id */
+-#define	IPOPT_SSRR		137		/* strict source route */
+-
+-/*
+- * Offsets to fields in options other than EOL and NOP.
+- */
+-#define	IPOPT_OPTVAL		0		/* option ID */
+-#define	IPOPT_OLEN		1		/* option length */
+-#define IPOPT_OFFSET		2		/* offset within option */
+-#define	IPOPT_MINOFF		4		/* min value of above */
+-
+-/*
+- * Time stamp option structure.
+- */
+-struct	ip_timestamp {
+-	uint8_t	ipt_code;		/* IPOPT_TS */
+-	uint8_t	ipt_len;		/* size of structure (variable) */
+-	uint8_t	ipt_ptr;		/* index of current entry */
+-#if G_BYTE_ORDER =3D=3D G_BIG_ENDIAN
+-	uint8_t	ipt_oflw:4,		/* overflow counter */
+-		ipt_flg:4;		/* flags, see below */
+-#else
+-	uint8_t	ipt_flg:4,		/* flags, see below */
+-		ipt_oflw:4;		/* overflow counter */
+-#endif
+-	union ipt_timestamp {
+-		n_long	ipt_time[1];
+-		struct	ipt_ta {
+-			struct in_addr ipt_addr;
+-			n_long ipt_time;
+-		} ipt_ta[1];
+-	} ipt_timestamp;
+-} SLIRP_PACKED;
+-
+-/* flag bits for ipt_flg */
+-#define	IPOPT_TS_TSONLY		0		/* timestamps only */
+-#define	IPOPT_TS_TSANDADDR	1		/* timestamps and addresses */
+-#define	IPOPT_TS_PRESPEC	3		/* specified modules only */
+-
+-/* bits for security (not byte swapped) */
+-#define	IPOPT_SECUR_UNCLASS	0x0000
+-#define	IPOPT_SECUR_CONFID	0xf135
+-#define	IPOPT_SECUR_EFTO	0x789a
+-#define	IPOPT_SECUR_MMMM	0xbc4d
+-#define	IPOPT_SECUR_RESTR	0xaf13
+-#define	IPOPT_SECUR_SECRET	0xd788
+-#define	IPOPT_SECUR_TOPSECRET	0x6bc5
+-
+-/*
+- * Internet implementation parameters.
+- */
+-#define	MAXTTL		255		/* maximum time to live (seconds) */
+-#define	IPDEFTTL	64		/* default ttl, from RFC 1340 */
+-#define	IPFRAGTTL	60		/* time to live for frags, slowhz */
+-#define	IPTTLDEC	1		/* subtracted when forwarding */
+-
+-#define	IP_MSS		576		/* default maximum segment size */
+-
+-#if GLIB_SIZEOF_VOID_P =3D=3D 4
+-struct mbuf_ptr {
+-	struct mbuf *mptr;
+-	uint32_t dummy;
+-} SLIRP_PACKED;
+-#else
+-struct mbuf_ptr {
+-	struct mbuf *mptr;
+-} SLIRP_PACKED;
+-#endif
+-struct qlink {
+-	void *next, *prev;
+-};
+-
+-/*
+- * Overlay for ip header used by other protocols (tcp, udp).
+- */
+-struct ipovly {
+-	struct mbuf_ptr ih_mbuf;	/* backpointer to mbuf */
+-	uint8_t	ih_x1;			/* (unused) */
+-	uint8_t	ih_pr;			/* protocol */
+-	uint16_t	ih_len;			/* protocol length */
+-	struct	in_addr ih_src;		/* source internet address */
+-	struct	in_addr ih_dst;		/* destination internet address */
+-} SLIRP_PACKED;
+-
+-/*
+- * Ip reassembly queue structure.  Each fragment
+- * being reassembled is attached to one of these structures.
+- * They are timed out after ipq_ttl drops to 0, and may also
+- * be reclaimed if memory becomes tight.
+- * size 28 bytes
+- */
+-struct ipq {
+-        struct qlink frag_link;			/* to ip headers of fragments */
+-	struct qlink ip_link;				/* to other reass headers */
+-	uint8_t	ipq_ttl;		/* time for reass q to live */
+-	uint8_t	ipq_p;			/* protocol of this fragment */
+-	uint16_t	ipq_id;			/* sequence id for reassembly */
+-	struct	in_addr ipq_src,ipq_dst;
+-};
+-
+-/*
+- * Ip header, when holding a fragment.
+- *
+- * Note: ipf_link must be at same offset as frag_link above
+- */
+-struct	ipasfrag {
+-	struct qlink ipf_link;
+-	struct ip ipf_ip;
+-};
+-
+-G_STATIC_ASSERT(offsetof(struct ipq, frag_link) =3D=3D
+-                offsetof(struct ipasfrag, ipf_link));
+-
+-#define ipf_off      ipf_ip.ip_off
+-#define ipf_tos      ipf_ip.ip_tos
+-#define ipf_len      ipf_ip.ip_len
+-#define ipf_next     ipf_link.next
+-#define ipf_prev     ipf_link.prev
+-
+-#endif
+diff --git a/slirp/src/ip6.h b/slirp/src/ip6.h
+deleted file mode 100644
+index 33683c8e20..0000000000
+--- a/slirp/src/ip6.h
++++ /dev/null
+@@ -1,160 +0,0 @@
+-/* SPDX-License-Identifier: BSD-3-Clause */
+-/*
+- * Copyright (c) 2013
+- * Guillaume Subiron, Yann Bordenave, Serigne Modou Wagne.
+- */
+-
+-#ifndef SLIRP_IP6_H
+-#define SLIRP_IP6_H
+-
+-#include <glib.h>
+-#include <string.h>
+-
+-#define ALLNODES_MULTICAST  { .s6_addr =3D \
+-                            { 0xff, 0x02, 0x00, 0x00,\
+-                            0x00, 0x00, 0x00, 0x00,\
+-                            0x00, 0x00, 0x00, 0x00,\
+-                            0x00, 0x00, 0x00, 0x01 } }
+-
+-#define SOLICITED_NODE_PREFIX { .s6_addr =3D \
+-                            { 0xff, 0x02, 0x00, 0x00,\
+-                            0x00, 0x00, 0x00, 0x00,\
+-                            0x00, 0x00, 0x00, 0x01,\
+-                            0xff, 0x00, 0x00, 0x00 } }
+-
+-#define LINKLOCAL_ADDR  { .s6_addr =3D \
+-                        { 0xfe, 0x80, 0x00, 0x00,\
+-                        0x00, 0x00, 0x00, 0x00,\
+-                        0x00, 0x00, 0x00, 0x00,\
+-                        0x00, 0x00, 0x00, 0x02 } }
+-
+-#define ZERO_ADDR  { .s6_addr =3D \
+-                        { 0x00, 0x00, 0x00, 0x00,\
+-                        0x00, 0x00, 0x00, 0x00,\
+-                        0x00, 0x00, 0x00, 0x00,\
+-                        0x00, 0x00, 0x00, 0x00 } }
+-
+-static inline bool in6_equal(const struct in6_addr *a, const struct in6_=
+addr *b)
+-{
+-    return memcmp(a, b, sizeof(*a)) =3D=3D 0;
+-}
+-
+-static inline bool in6_equal_net(const struct in6_addr *a,
+-                                 const struct in6_addr *b,
+-                                 int prefix_len)
+-{
+-    if (memcmp(a, b, prefix_len / 8) !=3D 0) {
+-        return 0;
+-    }
+-
+-    if (prefix_len % 8 =3D=3D 0) {
+-        return 1;
+-    }
+-
+-    return a->s6_addr[prefix_len / 8] >> (8 - (prefix_len % 8))
+-        =3D=3D b->s6_addr[prefix_len / 8] >> (8 - (prefix_len % 8));
+-}
+-
+-static inline bool in6_equal_mach(const struct in6_addr *a,
+-                                  const struct in6_addr *b,
+-                                  int prefix_len)
+-{
+-    if (memcmp(&(a->s6_addr[DIV_ROUND_UP(prefix_len, 8)]),
+-               &(b->s6_addr[DIV_ROUND_UP(prefix_len, 8)]),
+-               16 - DIV_ROUND_UP(prefix_len, 8)) !=3D 0) {
+-        return 0;
+-    }
+-
+-    if (prefix_len % 8 =3D=3D 0) {
+-        return 1;
+-    }
+-
+-    return (a->s6_addr[prefix_len / 8] & ((1U << (8 - (prefix_len % 8)))=
+ - 1))
+-        =3D=3D (b->s6_addr[prefix_len / 8] & ((1U << (8 - (prefix_len % =
+8))) - 1));
+-}
+-
+-
+-#define in6_equal_router(a)\
+-    ((in6_equal_net(a, &slirp->vprefix_addr6, slirp->vprefix_len)\
+-      && in6_equal_mach(a, &slirp->vhost_addr6, slirp->vprefix_len))\
+-  || (in6_equal_net(a, &(struct in6_addr)LINKLOCAL_ADDR, 64)\
+-      && in6_equal_mach(a, &slirp->vhost_addr6, 64)))
+-
+-#define in6_equal_dns(a)\
+-    ((in6_equal_net(a, &slirp->vprefix_addr6, slirp->vprefix_len)\
+-      && in6_equal_mach(a, &slirp->vnameserver_addr6, slirp->vprefix_len=
+))\
+-  || (in6_equal_net(a, &(struct in6_addr)LINKLOCAL_ADDR, 64)\
+-      && in6_equal_mach(a, &slirp->vnameserver_addr6, 64)))
+-
+-#define in6_equal_host(a)\
+-    (in6_equal_router(a) || in6_equal_dns(a))
+-
+-#define in6_solicitednode_multicast(a)\
+-    (in6_equal_net(a, &(struct in6_addr)SOLICITED_NODE_PREFIX, 104))
+-
+-#define in6_zero(a)\
+-    (in6_equal(a, &(struct in6_addr)ZERO_ADDR))
+-
+-/* Compute emulated host MAC address from its ipv6 address */
+-static inline void in6_compute_ethaddr(struct in6_addr ip,
+-                                       uint8_t eth[ETH_ALEN])
+-{
+-    eth[0] =3D 0x52;
+-    eth[1] =3D 0x56;
+-    memcpy(&eth[2], &ip.s6_addr[16 - (ETH_ALEN - 2)], ETH_ALEN - 2);
+-}
+-
+-/*
+- * Definitions for internet protocol version 6.
+- * Per RFC 2460, December 1998.
+- */
+-#define IP6VERSION      6
+-#define IP6_HOP_LIMIT 255
+-
+-/*
+- * Structure of an internet header, naked of options.
+- */
+-struct ip6 {
+-#if G_BYTE_ORDER =3D=3D G_BIG_ENDIAN
+-    uint32_t
+-        ip_v:4,         /* version */
+-        ip_tc_hi:4,     /* traffic class */
+-        ip_tc_lo:4,
+-        ip_fl_hi:4,     /* flow label */
+-        ip_fl_lo:16;
+-#else
+-    uint32_t
+-        ip_tc_hi:4,
+-        ip_v:4,
+-        ip_fl_hi:4,
+-        ip_tc_lo:4,
+-        ip_fl_lo:16;
+-#endif
+-    uint16_t    ip_pl;               /* payload length */
+-    uint8_t     ip_nh;               /* next header */
+-    uint8_t     ip_hl;               /* hop limit */
+-    struct in6_addr ip_src, ip_dst;  /* source and dest address */
+-};
+-
+-/*
+- * IPv6 pseudo-header used by upper-layer protocols
+- */
+-struct ip6_pseudohdr {
+-    struct      in6_addr ih_src;  /* source internet address */
+-    struct      in6_addr ih_dst;  /* destination internet address */
+-    uint32_t    ih_pl;            /* upper-layer packet length */
+-    uint16_t    ih_zero_hi;       /* zero */
+-    uint8_t     ih_zero_lo;       /* zero */
+-    uint8_t     ih_nh;            /* next header */
+-};
+-
+-/*
+- * We don't want to mark these ip6 structs as packed as they are natural=
+ly
+- * correctly aligned; instead assert that there is no stray padding.
+- * If we marked the struct as packed then we would be unable to take
+- * the address of any of the fields in it.
+- */
+-G_STATIC_ASSERT(sizeof(struct ip6) =3D=3D 40);
+-G_STATIC_ASSERT(sizeof(struct ip6_pseudohdr) =3D=3D 40);
+-
+-#endif
+diff --git a/slirp/src/ip6_icmp.h b/slirp/src/ip6_icmp.h
+deleted file mode 100644
+index d8d13e30fc..0000000000
+--- a/slirp/src/ip6_icmp.h
++++ /dev/null
+@@ -1,232 +0,0 @@
+-/* SPDX-License-Identifier: BSD-3-Clause */
+-/*
+- * Copyright (c) 2013
+- * Guillaume Subiron, Yann Bordenave, Serigne Modou Wagne.
+- */
+-
+-#ifndef SLIRP_IP6_ICMP_H
+-#define SLIRP_IP6_ICMP_H
+-
+-/*
+- * Interface Control Message Protocol version 6 Definitions.
+- * Per RFC 4443, March 2006.
+- *
+- * Network Discover Protocol Definitions.
+- * Per RFC 4861, September 2007.
+- */
+-
+-struct icmp6_echo { /* Echo Messages */
+-    uint16_t id;
+-    uint16_t seq_num;
+-};
+-
+-union icmp6_error_body {
+-    uint32_t unused;
+-    uint32_t pointer;
+-    uint32_t mtu;
+-};
+-
+-/*
+- * NDP Messages
+- */
+-struct ndp_rs {     /* Router Solicitation Message */
+-    uint32_t reserved;
+-};
+-
+-struct ndp_ra {     /* Router Advertisement Message */
+-    uint8_t chl;    /* Cur Hop Limit */
+-#if G_BYTE_ORDER =3D=3D G_BIG_ENDIAN
+-    uint8_t
+-        M:1,
+-        O:1,
+-        reserved:6;
+-#else
+-    uint8_t
+-        reserved:6,
+-        O:1,
+-        M:1;
+-#endif
+-    uint16_t lifetime;      /* Router Lifetime */
+-    uint32_t reach_time;    /* Reachable Time */
+-    uint32_t retrans_time;  /* Retrans Timer */
+-};
+-
+-G_STATIC_ASSERT(sizeof(struct ndp_ra) =3D=3D 12);
+-
+-struct ndp_ns {     /* Neighbor Solicitation Message */
+-    uint32_t reserved;
+-    struct in6_addr target; /* Target Address */
+-};
+-
+-G_STATIC_ASSERT(sizeof(struct ndp_ns) =3D=3D 20);
+-
+-struct ndp_na {     /* Neighbor Advertisement Message */
+-#if G_BYTE_ORDER =3D=3D G_BIG_ENDIAN
+-    uint32_t
+-        R:1,                /* Router Flag */
+-        S:1,                /* Solicited Flag */
+-        O:1,                /* Override Flag */
+-        reserved_hi:5,
+-        reserved_lo:24;
+-#else
+-    uint32_t
+-        reserved_hi:5,
+-        O:1,
+-        S:1,
+-        R:1,
+-        reserved_lo:24;
+-#endif
+-    struct in6_addr target; /* Target Address */
+-};
+-
+-G_STATIC_ASSERT(sizeof(struct ndp_na) =3D=3D 20);
+-
+-struct ndp_redirect {
+-    uint32_t reserved;
+-    struct in6_addr target; /* Target Address */
+-    struct in6_addr dest;   /* Destination Address */
+-};
+-
+-G_STATIC_ASSERT(sizeof(struct ndp_redirect) =3D=3D 36);
+-
+-/*
+- * Structure of an icmpv6 header.
+- */
+-struct icmp6 {
+-    uint8_t     icmp6_type;         /* type of message, see below */
+-    uint8_t     icmp6_code;         /* type sub code */
+-    uint16_t    icmp6_cksum;        /* ones complement cksum of struct *=
+/
+-    union {
+-        union icmp6_error_body error_body;
+-        struct icmp6_echo echo;
+-        struct ndp_rs ndp_rs;
+-        struct ndp_ra ndp_ra;
+-        struct ndp_ns ndp_ns;
+-        struct ndp_na ndp_na;
+-        struct ndp_redirect ndp_redirect;
+-    } icmp6_body;
+-#define icmp6_err icmp6_body.error_body
+-#define icmp6_echo icmp6_body.echo
+-#define icmp6_nrs icmp6_body.ndp_rs
+-#define icmp6_nra icmp6_body.ndp_ra
+-#define icmp6_nns icmp6_body.ndp_ns
+-#define icmp6_nna icmp6_body.ndp_na
+-#define icmp6_redirect icmp6_body.ndp_redirect
+-};
+-
+-G_STATIC_ASSERT(sizeof(struct icmp6) =3D=3D 40);
+-
+-#define ICMP6_MINLEN    4
+-#define ICMP6_ERROR_MINLEN  8
+-#define ICMP6_ECHO_MINLEN   8
+-#define ICMP6_NDP_RS_MINLEN 8
+-#define ICMP6_NDP_RA_MINLEN 16
+-#define ICMP6_NDP_NS_MINLEN 24
+-#define ICMP6_NDP_NA_MINLEN 24
+-#define ICMP6_NDP_REDIRECT_MINLEN 40
+-
+-/*
+- * NDP Options
+- */
+-struct ndpopt {
+-    uint8_t     ndpopt_type;                    /* Option type */
+-    uint8_t     ndpopt_len;                     /* /!\ In units of 8 oct=
+ets */
+-    union {
+-        unsigned char   linklayer_addr[6];      /* Source/Target Link-la=
+yer */
+-#define ndpopt_linklayer ndpopt_body.linklayer_addr
+-        struct prefixinfo {                     /* Prefix Information */
+-            uint8_t     prefix_length;
+-#if G_BYTE_ORDER =3D=3D G_BIG_ENDIAN
+-            uint8_t     L:1, A:1, reserved1:6;
+-#else
+-            uint8_t     reserved1:6, A:1, L:1;
+-#endif
+-            uint32_t    valid_lt;               /* Valid Lifetime */
+-            uint32_t    pref_lt;                /* Preferred Lifetime */
+-            uint32_t    reserved2;
+-            struct in6_addr prefix;
+-        } SLIRP_PACKED prefixinfo;
+-#define ndpopt_prefixinfo ndpopt_body.prefixinfo
+-        struct rdnss {
+-            uint16_t reserved;
+-            uint32_t lifetime;
+-            struct in6_addr addr;
+-        } SLIRP_PACKED rdnss;
+-#define ndpopt_rdnss ndpopt_body.rdnss
+-    } ndpopt_body;
+-} SLIRP_PACKED;
+-
+-/* NDP options type */
+-#define NDPOPT_LINKLAYER_SOURCE     1   /* Source Link-Layer Address */
+-#define NDPOPT_LINKLAYER_TARGET     2   /* Target Link-Layer Address */
+-#define NDPOPT_PREFIX_INFO          3   /* Prefix Information */
+-#define NDPOPT_RDNSS                25  /* Recursive DNS Server Address =
+*/
+-
+-/* NDP options size, in octets. */
+-#define NDPOPT_LINKLAYER_LEN    8
+-#define NDPOPT_PREFIXINFO_LEN   32
+-#define NDPOPT_RDNSS_LEN        24
+-
+-/*
+- * Definition of type and code field values.
+- * Per https://www.iana.org/assignments/icmpv6-parameters/icmpv6-paramet=
+ers.xml
+- * Last Updated 2012-11-12
+- */
+-
+-/* Errors */
+-#define ICMP6_UNREACH   1   /* Destination Unreachable */
+-#define     ICMP6_UNREACH_NO_ROUTE      0   /* no route to dest */
+-#define     ICMP6_UNREACH_DEST_PROHIB   1   /* com with dest prohibited =
+*/
+-#define     ICMP6_UNREACH_SCOPE         2   /* beyond scope of src addr =
+*/
+-#define     ICMP6_UNREACH_ADDRESS       3   /* address unreachable */
+-#define     ICMP6_UNREACH_PORT          4   /* port unreachable */
+-#define     ICMP6_UNREACH_SRC_FAIL      5   /* src addr failed */
+-#define     ICMP6_UNREACH_REJECT_ROUTE  6   /* reject route to dest */
+-#define     ICMP6_UNREACH_SRC_HDR_ERROR 7   /* error in src routing head=
+er */
+-#define ICMP6_TOOBIG    2   /* Packet Too Big */
+-#define ICMP6_TIMXCEED  3   /* Time Exceeded */
+-#define     ICMP6_TIMXCEED_INTRANS      0   /* hop limit exceeded in tra=
+nsit */
+-#define     ICMP6_TIMXCEED_REASS        1   /* ttl=3D0 in reass */
+-#define ICMP6_PARAMPROB 4   /* Parameter Problem */
+-#define     ICMP6_PARAMPROB_HDR_FIELD   0   /* err header field */
+-#define     ICMP6_PARAMPROB_NXTHDR_TYPE 1   /* unrecognized Next Header =
+type */
+-#define     ICMP6_PARAMPROB_IPV6_OPT    2   /* unrecognized IPv6 option =
+*/
+-
+-/* Informational Messages */
+-#define ICMP6_ECHO_REQUEST      128 /* Echo Request */
+-#define ICMP6_ECHO_REPLY        129 /* Echo Reply */
+-#define ICMP6_NDP_RS            133 /* Router Solicitation (NDP) */
+-#define ICMP6_NDP_RA            134 /* Router Advertisement (NDP) */
+-#define ICMP6_NDP_NS            135 /* Neighbor Solicitation (NDP) */
+-#define ICMP6_NDP_NA            136 /* Neighbor Advertisement (NDP) */
+-#define ICMP6_NDP_REDIRECT      137 /* Redirect Message (NDP) */
+-
+-/*
+- * Router Configuration Variables (rfc4861#section-6)
+- */
+-#define NDP_IsRouter                1
+-#define NDP_AdvSendAdvertisements   1
+-#define NDP_MaxRtrAdvInterval       600000
+-#define NDP_MinRtrAdvInterval       ((NDP_MaxRtrAdvInterval >=3D 9) ? \
+-                                        NDP_MaxRtrAdvInterval / 3 : \
+-                                        NDP_MaxRtrAdvInterval)
+-#define NDP_AdvManagedFlag          0
+-#define NDP_AdvOtherConfigFlag      0
+-#define NDP_AdvLinkMTU              0
+-#define NDP_AdvReachableTime        0
+-#define NDP_AdvRetransTime          0
+-#define NDP_AdvCurHopLimit          64
+-#define NDP_AdvDefaultLifetime      ((3 * NDP_MaxRtrAdvInterval) / 1000)
+-#define NDP_AdvValidLifetime        86400
+-#define NDP_AdvOnLinkFlag           1
+-#define NDP_AdvPrefLifetime         14400
+-#define NDP_AdvAutonomousFlag       1
+-
+-void icmp6_init(Slirp *slirp);
+-void icmp6_cleanup(Slirp *slirp);
+-void icmp6_input(struct mbuf *);
+-void icmp6_send_error(struct mbuf *m, uint8_t type, uint8_t code);
+-void ndp_send_ra(Slirp *slirp);
+-void ndp_send_ns(Slirp *slirp, struct in6_addr addr);
+-
+-#endif
+diff --git a/slirp/src/ip_icmp.h b/slirp/src/ip_icmp.h
+deleted file mode 100644
+index 05d85c59dd..0000000000
+--- a/slirp/src/ip_icmp.h
++++ /dev/null
+@@ -1,166 +0,0 @@
+-/* SPDX-License-Identifier: BSD-3-Clause */
+-/*
+- * Copyright (c) 1982, 1986, 1993
+- *	The Regents of the University of California.  All rights reserved.
+- *
+- * Redistribution and use in source and binary forms, with or without
+- * modification, are permitted provided that the following conditions
+- * are met:
+- * 1. Redistributions of source code must retain the above copyright
+- *    notice, this list of conditions and the following disclaimer.
+- * 2. Redistributions in binary form must reproduce the above copyright
+- *    notice, this list of conditions and the following disclaimer in th=
+e
+- *    documentation and/or other materials provided with the distributio=
+n.
+- * 3. Neither the name of the University nor the names of its contributo=
+rs
+- *    may be used to endorse or promote products derived from this softw=
+are
+- *    without specific prior written permission.
+- *
+- * THIS SOFTWARE IS PROVIDED BY THE REGENTS AND CONTRIBUTORS ``AS IS'' A=
+ND
+- * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+- * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PU=
+RPOSE
+- * ARE DISCLAIMED.  IN NO EVENT SHALL THE REGENTS OR CONTRIBUTORS BE LIA=
+BLE
+- * FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUE=
+NTIAL
+- * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOO=
+DS
+- * OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
+- * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, S=
+TRICT
+- * LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY=
+ WAY
+- * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY O=
+F
+- * SUCH DAMAGE.
+- *
+- *	@(#)ip_icmp.h	8.1 (Berkeley) 6/10/93
+- * ip_icmp.h,v 1.4 1995/05/30 08:09:43 rgrimes Exp
+- */
+-
+-#ifndef NETINET_IP_ICMP_H
+-#define NETINET_IP_ICMP_H
+-
+-/*
+- * Interface Control Message Protocol Definitions.
+- * Per RFC 792, September 1981.
+- */
+-
+-typedef uint32_t n_time;
+-
+-/*
+- * Structure of an icmp header.
+- */
+-struct icmp {
+-	uint8_t	icmp_type;		/* type of message, see below */
+-	uint8_t	icmp_code;		/* type sub code */
+-	uint16_t	icmp_cksum;		/* ones complement cksum of struct */
+-	union {
+-		uint8_t ih_pptr;			/* ICMP_PARAMPROB */
+-		struct in_addr ih_gwaddr;	/* ICMP_REDIRECT */
+-		struct ih_idseq {
+-			uint16_t	icd_id;
+-			uint16_t	icd_seq;
+-		} ih_idseq;
+-		int ih_void;
+-
+-		/* ICMP_UNREACH_NEEDFRAG -- Path MTU Discovery (RFC1191) */
+-		struct ih_pmtu {
+-			uint16_t ipm_void;
+-			uint16_t ipm_nextmtu;
+-		} ih_pmtu;
+-	} icmp_hun;
+-#define	icmp_pptr	icmp_hun.ih_pptr
+-#define	icmp_gwaddr	icmp_hun.ih_gwaddr
+-#define	icmp_id		icmp_hun.ih_idseq.icd_id
+-#define	icmp_seq	icmp_hun.ih_idseq.icd_seq
+-#define	icmp_void	icmp_hun.ih_void
+-#define	icmp_pmvoid	icmp_hun.ih_pmtu.ipm_void
+-#define	icmp_nextmtu	icmp_hun.ih_pmtu.ipm_nextmtu
+-	union {
+-		struct id_ts {
+-			n_time its_otime;
+-			n_time its_rtime;
+-			n_time its_ttime;
+-		} id_ts;
+-		struct id_ip  {
+-			struct ip idi_ip;
+-			/* options and then 64 bits of data */
+-		} id_ip;
+-		uint32_t	id_mask;
+-		char		id_data[1];
+-	} icmp_dun;
+-#define	icmp_otime	icmp_dun.id_ts.its_otime
+-#define	icmp_rtime	icmp_dun.id_ts.its_rtime
+-#define	icmp_ttime	icmp_dun.id_ts.its_ttime
+-#define	icmp_ip		icmp_dun.id_ip.idi_ip
+-#define	icmp_mask	icmp_dun.id_mask
+-#define	icmp_data	icmp_dun.id_data
+-};
+-
+-/*
+- * Lower bounds on packet lengths for various types.
+- * For the error advice packets must first ensure that the
+- * packet is large enough to contain the returned ip header.
+- * Only then can we do the check to see if 64 bits of packet
+- * data have been returned, since we need to check the returned
+- * ip header length.
+- */
+-#define	ICMP_MINLEN	8				/* abs minimum */
+-#define	ICMP_TSLEN	(8 + 3 * sizeof (n_time))	/* timestamp */
+-#define	ICMP_MASKLEN	12				/* address mask */
+-#define	ICMP_ADVLENMIN	(8 + sizeof (struct ip) + 8)	/* min */
+-#define	ICMP_ADVLEN(p)	(8 + ((p)->icmp_ip.ip_hl << 2) + 8)
+-	/* N.B.: must separately check that ip_hl >=3D 5 */
+-
+-/*
+- * Definition of type and code field values.
+- */
+-#define	ICMP_ECHOREPLY		0		/* echo reply */
+-#define	ICMP_UNREACH		3		/* dest unreachable, codes: */
+-#define		ICMP_UNREACH_NET	0		/* bad net */
+-#define		ICMP_UNREACH_HOST	1		/* bad host */
+-#define		ICMP_UNREACH_PROTOCOL	2		/* bad protocol */
+-#define		ICMP_UNREACH_PORT	3		/* bad port */
+-#define		ICMP_UNREACH_NEEDFRAG	4		/* IP_DF caused drop */
+-#define		ICMP_UNREACH_SRCFAIL	5		/* src route failed */
+-#define		ICMP_UNREACH_NET_UNKNOWN 6		/* unknown net */
+-#define		ICMP_UNREACH_HOST_UNKNOWN 7		/* unknown host */
+-#define		ICMP_UNREACH_ISOLATED	8		/* src host isolated */
+-#define		ICMP_UNREACH_NET_PROHIB	9		/* prohibited access */
+-#define		ICMP_UNREACH_HOST_PROHIB 10		/* ditto */
+-#define		ICMP_UNREACH_TOSNET	11		/* bad tos for net */
+-#define		ICMP_UNREACH_TOSHOST	12		/* bad tos for host */
+-#define	ICMP_SOURCEQUENCH	4		/* packet lost, slow down */
+-#define	ICMP_REDIRECT		5		/* shorter route, codes: */
+-#define		ICMP_REDIRECT_NET	0		/* for network */
+-#define		ICMP_REDIRECT_HOST	1		/* for host */
+-#define		ICMP_REDIRECT_TOSNET	2		/* for tos and net */
+-#define		ICMP_REDIRECT_TOSHOST	3		/* for tos and host */
+-#define	ICMP_ECHO		8		/* echo service */
+-#define	ICMP_ROUTERADVERT	9		/* router advertisement */
+-#define	ICMP_ROUTERSOLICIT	10		/* router solicitation */
+-#define	ICMP_TIMXCEED		11		/* time exceeded, code: */
+-#define		ICMP_TIMXCEED_INTRANS	0		/* ttl=3D=3D0 in transit */
+-#define		ICMP_TIMXCEED_REASS	1		/* ttl=3D=3D0 in reass */
+-#define	ICMP_PARAMPROB		12		/* ip header bad */
+-#define		ICMP_PARAMPROB_OPTABSENT 1		/* req. opt. absent */
+-#define	ICMP_TSTAMP		13		/* timestamp request */
+-#define	ICMP_TSTAMPREPLY	14		/* timestamp reply */
+-#define	ICMP_IREQ		15		/* information request */
+-#define	ICMP_IREQREPLY		16		/* information reply */
+-#define	ICMP_MASKREQ		17		/* address mask request */
+-#define	ICMP_MASKREPLY		18		/* address mask reply */
+-
+-#define	ICMP_MAXTYPE		18
+-
+-#define	ICMP_INFOTYPE(type) \
+-	((type) =3D=3D ICMP_ECHOREPLY || (type) =3D=3D ICMP_ECHO || \
+-	(type) =3D=3D ICMP_ROUTERADVERT || (type) =3D=3D ICMP_ROUTERSOLICIT || =
+\
+-	(type) =3D=3D ICMP_TSTAMP || (type) =3D=3D ICMP_TSTAMPREPLY || \
+-	(type) =3D=3D ICMP_IREQ || (type) =3D=3D ICMP_IREQREPLY || \
+-	(type) =3D=3D ICMP_MASKREQ || (type) =3D=3D ICMP_MASKREPLY)
+-
+-void icmp_init(Slirp *slirp);
+-void icmp_cleanup(Slirp *slirp);
+-void icmp_input(struct mbuf *, int);
+-void icmp_send_error(struct mbuf *msrc, uint8_t type, uint8_t code, int =
+minsize,
+-                     const char *message);
+-void icmp_reflect(struct mbuf *);
+-void icmp_receive(struct socket *so);
+-void icmp_detach(struct socket *so);
+-
+-#endif
+diff --git a/slirp/src/libslirp.h b/slirp/src/libslirp.h
+deleted file mode 100644
+index 3b28764bec..0000000000
+--- a/slirp/src/libslirp.h
++++ /dev/null
+@@ -1,118 +0,0 @@
+-/* SPDX-License-Identifier: BSD-3-Clause */
+-#ifndef LIBSLIRP_H
+-#define LIBSLIRP_H
+-
+-#include <stdint.h>
+-#include <stdbool.h>
+-#include <sys/types.h>
+-
+-#ifdef _WIN32
+-#include <winsock2.h>
+-#include <in6addr.h>
+-#else
+-#include <netinet/in.h>
+-#include <arpa/inet.h>
+-#endif
+-
+-#ifdef __cplusplus
+-extern "C" {
+-#endif
+-
+-typedef struct Slirp Slirp;
+-
+-enum {
+-    SLIRP_POLL_IN  =3D 1 << 0,
+-    SLIRP_POLL_OUT =3D 1 << 1,
+-    SLIRP_POLL_PRI =3D 1 << 2,
+-    SLIRP_POLL_ERR =3D 1 << 3,
+-    SLIRP_POLL_HUP =3D 1 << 4,
+-};
+-
+-typedef ssize_t (*SlirpReadCb)(void *buf, size_t len, void *opaque);
+-typedef ssize_t (*SlirpWriteCb)(const void *buf, size_t len, void *opaqu=
+e);
+-typedef void (*SlirpTimerCb)(void *opaque);
+-typedef int (*SlirpAddPollCb)(int fd, int events, void *opaque);
+-typedef int (*SlirpGetREventsCb)(int idx, void *opaque);
+-
+-/*
+- * Callbacks from slirp
+- */
+-typedef struct SlirpCb {
+-    /*
+-     * Send an ethernet frame to the guest network. The opaque
+-     * parameter is the one given to slirp_init(). The function
+-     * doesn't need to send all the data and may return <len (no
+-     * buffering is done on libslirp side, so the data will be dropped
+-     * in this case). <0 reports an IO error.
+-     */
+-    SlirpWriteCb send_packet;
+-    /* Print a message for an error due to guest misbehavior.  */
+-    void (*guest_error)(const char *msg, void *opaque);
+-    /* Return the virtual clock value in nanoseconds */
+-    int64_t (*clock_get_ns)(void *opaque);
+-    /* Create a new timer with the given callback and opaque data */
+-    void *(*timer_new)(SlirpTimerCb cb, void *cb_opaque, void *opaque);
+-    /* Remove and free a timer */
+-    void (*timer_free)(void *timer, void *opaque);
+-    /* Modify a timer to expire at @expire_time */
+-    void (*timer_mod)(void *timer, int64_t expire_time, void *opaque);
+-    /* Register a fd for future polling */
+-    void (*register_poll_fd)(int fd, void *opaque);
+-    /* Unregister a fd */
+-    void (*unregister_poll_fd)(int fd, void *opaque);
+-    /* Kick the io-thread, to signal that new events may be processed */
+-    void (*notify)(void *opaque);
+-} SlirpCb;
+-
+-
+-Slirp *slirp_init(int restricted, bool in_enabled, struct in_addr vnetwo=
+rk,
+-                  struct in_addr vnetmask, struct in_addr vhost,
+-                  bool in6_enabled,
+-                  struct in6_addr vprefix_addr6, uint8_t vprefix_len,
+-                  struct in6_addr vhost6, const char *vhostname,
+-                  const char *tftp_server_name,
+-                  const char *tftp_path, const char *bootfile,
+-                  struct in_addr vdhcp_start, struct in_addr vnameserver=
+,
+-                  struct in6_addr vnameserver6, const char **vdnssearch,
+-                  const char *vdomainname,
+-                  const SlirpCb *callbacks,
+-                  void *opaque);
+-void slirp_cleanup(Slirp *slirp);
+-
+-void slirp_pollfds_fill(Slirp *slirp, uint32_t *timeout,
+-                        SlirpAddPollCb add_poll, void *opaque);
+-
+-void slirp_pollfds_poll(Slirp *slirp, int select_error,
+-                        SlirpGetREventsCb get_revents, void *opaque);
+-
+-void slirp_input(Slirp *slirp, const uint8_t *pkt, int pkt_len);
+-
+-int slirp_add_hostfwd(Slirp *slirp, int is_udp,
+-                      struct in_addr host_addr, int host_port,
+-                      struct in_addr guest_addr, int guest_port);
+-int slirp_remove_hostfwd(Slirp *slirp, int is_udp,
+-                         struct in_addr host_addr, int host_port);
+-int slirp_add_exec(Slirp *slirp, const char *cmdline,
+-                   struct in_addr *guest_addr, int guest_port);
+-int slirp_add_guestfwd(Slirp *slirp, SlirpWriteCb write_cb, void *opaque=
+,
+-                   struct in_addr *guest_addr, int guest_port);
+-
+-char *slirp_connection_info(Slirp *slirp);
+-
+-void slirp_socket_recv(Slirp *slirp, struct in_addr guest_addr,
+-                       int guest_port, const uint8_t *buf, int size);
+-size_t slirp_socket_can_recv(Slirp *slirp, struct in_addr guest_addr,
+-                             int guest_port);
+-
+-void slirp_state_save(Slirp *s, SlirpWriteCb write_cb, void *opaque);
+-
+-int slirp_state_load(Slirp *s, int version_id,
+-                     SlirpReadCb read_cb, void *opaque);
+-
+-int slirp_state_version(void);
+-
+-#ifdef __cplusplus
+-} /* extern "C" */
+-#endif
+-
+-#endif /* LIBSLIRP_H */
+diff --git a/slirp/src/main.h b/slirp/src/main.h
+deleted file mode 100644
+index 3b3f883703..0000000000
+--- a/slirp/src/main.h
++++ /dev/null
+@@ -1,16 +0,0 @@
+-/* SPDX-License-Identifier: BSD-3-Clause */
+-/*
+- * Copyright (c) 1995 Danny Gasparovski.
+- */
+-
+-#ifndef SLIRP_MAIN_H
+-#define SLIRP_MAIN_H
+-
+-extern unsigned curtime;
+-extern struct in_addr loopback_addr;
+-extern unsigned long loopback_mask;
+-
+-int if_encap(Slirp *slirp, struct mbuf *ifm);
+-ssize_t slirp_send(struct socket *so, const void *buf, size_t len, int f=
+lags);
+-
+-#endif
+diff --git a/slirp/src/mbuf.h b/slirp/src/mbuf.h
+deleted file mode 100644
+index 732c85c63c..0000000000
+--- a/slirp/src/mbuf.h
++++ /dev/null
+@@ -1,127 +0,0 @@
+-/* SPDX-License-Identifier: BSD-3-Clause */
+-/*
+- * Copyright (c) 1982, 1986, 1988, 1993
+- *	The Regents of the University of California.  All rights reserved.
+- *
+- * Redistribution and use in source and binary forms, with or without
+- * modification, are permitted provided that the following conditions
+- * are met:
+- * 1. Redistributions of source code must retain the above copyright
+- *    notice, this list of conditions and the following disclaimer.
+- * 2. Redistributions in binary form must reproduce the above copyright
+- *    notice, this list of conditions and the following disclaimer in th=
+e
+- *    documentation and/or other materials provided with the distributio=
+n.
+- * 3. Neither the name of the University nor the names of its contributo=
+rs
+- *    may be used to endorse or promote products derived from this softw=
+are
+- *    without specific prior written permission.
+- *
+- * THIS SOFTWARE IS PROVIDED BY THE REGENTS AND CONTRIBUTORS ``AS IS'' A=
+ND
+- * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+- * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PU=
+RPOSE
+- * ARE DISCLAIMED.  IN NO EVENT SHALL THE REGENTS OR CONTRIBUTORS BE LIA=
+BLE
+- * FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUE=
+NTIAL
+- * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOO=
+DS
+- * OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
+- * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, S=
+TRICT
+- * LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY=
+ WAY
+- * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY O=
+F
+- * SUCH DAMAGE.
+- *
+- *	@(#)mbuf.h	8.3 (Berkeley) 1/21/94
+- * mbuf.h,v 1.9 1994/11/14 13:54:20 bde Exp
+- */
+-
+-#ifndef MBUF_H
+-#define MBUF_H
+-
+-/*
+- * Macros for type conversion
+- * mtod(m,t) -	convert mbuf pointer to data pointer of correct type
+- */
+-#define mtod(m,t)	((t)(m)->m_data)
+-
+-/* XXX About mbufs for slirp:
+- * Only one mbuf is ever used in a chain, for each "cell" of data.
+- * m_nextpkt points to the next packet, if fragmented.
+- * If the data is too large, the M_EXT is used, and a larger block
+- * is alloced.  Therefore, m_free[m] must check for M_EXT and if set
+- * free the m_ext.  This is inefficient memory-wise, but who cares.
+- */
+-
+-/*
+- * mbufs allow to have a gap between the start of the allocated buffer (=
+m_ext if
+- * M_EXT is set, m_dat otherwise) and the in-use data:
+- *
+- *  |--gapsize----->|---m_len------->
+- *  |----------m_size------------------------------>
+- *                  |----M_ROOM-------------------->
+- *                                   |-M_FREEROOM-->
+- *
+- *  ^               ^                               ^
+- *  m_dat/m_ext     m_data                          end of buffer
+- */
+-
+-/*
+- * How much room is in the mbuf, from m_data to the end of the mbuf
+- */
+-#define M_ROOM(m) ((m->m_flags & M_EXT)? \
+-			(((m)->m_ext + (m)->m_size) - (m)->m_data) \
+-		   : \
+-			(((m)->m_dat + (m)->m_size) - (m)->m_data))
+-
+-/*
+- * How much free room there is
+- */
+-#define M_FREEROOM(m) (M_ROOM(m) - (m)->m_len)
+-
+-struct mbuf {
+-	/* XXX should union some of these! */
+-	/* header at beginning of each mbuf: */
+-	struct	mbuf *m_next;		/* Linked list of mbufs */
+-	struct	mbuf *m_prev;
+-	struct	mbuf *m_nextpkt;	/* Next packet in queue/record */
+-	struct	mbuf *m_prevpkt;	/* Flags aren't used in the output queue */
+-	int	m_flags;		/* Misc flags */
+-
+-	int	m_size;			/* Size of mbuf, from m_dat or m_ext */
+-	struct	socket *m_so;
+-
+-	char *m_data;			/* Current location of data */
+-	int	m_len;			/* Amount of data in this mbuf, from m_data */
+-
+-	Slirp *slirp;
+-	bool	resolution_requested;
+-	uint64_t expiration_date;
+-	char   *m_ext;
+-	/* start of dynamic buffer area, must be last element */
+-	char    m_dat[];
+-};
+-
+-#define ifq_prev m_prev
+-#define ifq_next m_next
+-#define ifs_prev m_prevpkt
+-#define ifs_next m_nextpkt
+-#define ifq_so m_so
+-
+-#define M_EXT			0x01	/* m_ext points to more (malloced) data */
+-#define M_FREELIST		0x02	/* mbuf is on free list */
+-#define M_USEDLIST		0x04	/* XXX mbuf is on used list (for dtom()) */
+-#define M_DOFREE		0x08	/* when m_free is called on the mbuf, free()
+-					 * it rather than putting it on the free list */
+-
+-void m_init(Slirp *);
+-void m_cleanup(Slirp *slirp);
+-struct mbuf * m_get(Slirp *);
+-void m_free(struct mbuf *);
+-void m_cat(register struct mbuf *, register struct mbuf *);
+-void m_inc(struct mbuf *, int);
+-void m_adj(struct mbuf *, int);
+-int m_copy(struct mbuf *, struct mbuf *, int, int);
+-struct mbuf * dtom(Slirp *, void *);
+-
+-static inline void ifs_init(struct mbuf *ifm)
+-{
+-    ifm->ifs_next =3D ifm->ifs_prev =3D ifm;
+-}
+-
+-#endif
+diff --git a/slirp/src/misc.h b/slirp/src/misc.h
+deleted file mode 100644
+index 23b7490448..0000000000
+--- a/slirp/src/misc.h
++++ /dev/null
+@@ -1,66 +0,0 @@
+-/* SPDX-License-Identifier: BSD-3-Clause */
+-/*
+- * Copyright (c) 1995 Danny Gasparovski.
+- */
+-
+-#ifndef MISC_H
+-#define MISC_H
+-
+-#include "libslirp.h"
+-
+-struct gfwd_list {
+-	SlirpWriteCb write_cb;
+-	void *opaque;
+-	struct in_addr ex_addr;		/* Server address */
+-	int ex_fport;                   /* Port to telnet to */
+-	char *ex_exec;                  /* Command line of what to exec */
+-	struct gfwd_list *ex_next;
+-};
+-
+-#define EMU_NONE 0x0
+-
+-/* TCP emulations */
+-#define EMU_CTL 0x1
+-#define EMU_FTP 0x2
+-#define EMU_KSH 0x3
+-#define EMU_IRC 0x4
+-#define EMU_REALAUDIO 0x5
+-#define EMU_RLOGIN 0x6
+-#define EMU_IDENT 0x7
+-
+-#define EMU_NOCONNECT 0x10	/* Don't connect */
+-
+-struct tos_t {
+-    uint16_t lport;
+-    uint16_t fport;
+-    uint8_t tos;
+-    uint8_t emu;
+-};
+-
+-struct emu_t {
+-    uint16_t lport;
+-    uint16_t fport;
+-    uint8_t tos;
+-    uint8_t emu;
+-    struct emu_t *next;
+-};
+-
+-struct slirp_quehead {
+-    struct slirp_quehead *qh_link;
+-    struct slirp_quehead *qh_rlink;
+-};
+-
+-void slirp_insque(void *, void *);
+-void slirp_remque(void *);
+-int fork_exec(struct socket *so, const char *ex);
+-
+-struct gfwd_list *
+-add_guestfwd(struct gfwd_list **ex_ptr,
+-             SlirpWriteCb write_cb, void *opaque,
+-             struct in_addr addr, int port);
+-
+-struct gfwd_list *
+-add_exec(struct gfwd_list **ex_ptr, const char *cmdline,
+-         struct in_addr addr, int port);
+-
+-#endif
+diff --git a/slirp/src/ncsi-pkt.h b/slirp/src/ncsi-pkt.h
+deleted file mode 100644
+index 4c0be39f6e..0000000000
+--- a/slirp/src/ncsi-pkt.h
++++ /dev/null
+@@ -1,445 +0,0 @@
+-/* SPDX-License-Identifier: BSD-3-Clause */
+-/*
+- * Copyright Gavin Shan, IBM Corporation 2016.
+- *
+- * Redistribution and use in source and binary forms, with or without
+- * modification, are permitted provided that the following conditions
+- * are met:
+- *
+- * 1. Redistributions of source code must retain the above
+- * copyright notice, this list of conditions and the following
+- * disclaimer.
+- *
+- * 2. Redistributions in binary form must reproduce the above
+- * copyright notice, this list of conditions and the following
+- * disclaimer in the documentation and/or other materials provided
+- * with the distribution.
+- *
+- * 3. Neither the name of the copyright holder nor the names of its
+- * contributors may be used to endorse or promote products derived
+- * from this software without specific prior written permission.
+- *
+- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+- * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+- * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS
+- * FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE
+- * COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
+- * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+- * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+- * SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
+- * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT,
+- * STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+- * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
+- * OF THE POSSIBILITY OF SUCH DAMAGE.
+- */
+-
+-#ifndef NCSI_PKT_H
+-#define NCSI_PKT_H
+-
+-/* from linux/net/ncsi/ncsi-pkt.h */
+-#define __be32 uint32_t
+-#define __be16 uint16_t
+-
+-struct ncsi_pkt_hdr {
+-        unsigned char mc_id;        /* Management controller ID */
+-        unsigned char revision;     /* NCSI version - 0x01      */
+-        unsigned char reserved;     /* Reserved                 */
+-        unsigned char id;           /* Packet sequence number   */
+-        unsigned char type;         /* Packet type              */
+-        unsigned char channel;      /* Network controller ID    */
+-        __be16        length;       /* Payload length           */
+-        __be32        reserved1[2]; /* Reserved                 */
+-};
+-
+-struct ncsi_cmd_pkt_hdr {
+-        struct ncsi_pkt_hdr common; /* Common NCSI packet header */
+-};
+-
+-struct ncsi_rsp_pkt_hdr {
+-        struct ncsi_pkt_hdr common; /* Common NCSI packet header */
+-        __be16              code;   /* Response code             */
+-        __be16              reason; /* Response reason           */
+-};
+-
+-struct ncsi_aen_pkt_hdr {
+-        struct ncsi_pkt_hdr common;       /* Common NCSI packet header *=
+/
+-        unsigned char       reserved2[3]; /* Reserved                  *=
+/
+-        unsigned char       type;         /* AEN packet type           *=
+/
+-};
+-
+-/* NCSI common command packet */
+-struct ncsi_cmd_pkt {
+-        struct ncsi_cmd_pkt_hdr cmd;      /* Command header */
+-        __be32                  checksum; /* Checksum       */
+-        unsigned char           pad[26];
+-};
+-
+-struct ncsi_rsp_pkt {
+-        struct ncsi_rsp_pkt_hdr rsp;      /* Response header */
+-        __be32                  checksum; /* Checksum        */
+-        unsigned char           pad[22];
+-};
+-
+-/* Select Package */
+-struct ncsi_cmd_sp_pkt {
+-        struct ncsi_cmd_pkt_hdr cmd;            /* Command header */
+-        unsigned char           reserved[3];    /* Reserved       */
+-        unsigned char           hw_arbitration; /* HW arbitration */
+-        __be32                  checksum;       /* Checksum       */
+-        unsigned char           pad[22];
+-};
+-
+-/* Disable Channel */
+-struct ncsi_cmd_dc_pkt {
+-        struct ncsi_cmd_pkt_hdr cmd;         /* Command header  */
+-        unsigned char           reserved[3]; /* Reserved        */
+-        unsigned char           ald;         /* Allow link down */
+-        __be32                  checksum;    /* Checksum        */
+-        unsigned char           pad[22];
+-};
+-
+-/* Reset Channel */
+-struct ncsi_cmd_rc_pkt {
+-        struct ncsi_cmd_pkt_hdr cmd;      /* Command header */
+-        __be32                  reserved; /* Reserved       */
+-        __be32                  checksum; /* Checksum       */
+-        unsigned char           pad[22];
+-};
+-
+-/* AEN Enable */
+-struct ncsi_cmd_ae_pkt {
+-        struct ncsi_cmd_pkt_hdr cmd;         /* Command header   */
+-        unsigned char           reserved[3]; /* Reserved         */
+-        unsigned char           mc_id;       /* MC ID            */
+-        __be32                  mode;        /* AEN working mode */
+-        __be32                  checksum;    /* Checksum         */
+-        unsigned char           pad[18];
+-};
+-
+-/* Set Link */
+-struct ncsi_cmd_sl_pkt {
+-        struct ncsi_cmd_pkt_hdr cmd;      /* Command header    */
+-        __be32                  mode;     /* Link working mode */
+-        __be32                  oem_mode; /* OEM link mode     */
+-        __be32                  checksum; /* Checksum          */
+-        unsigned char           pad[18];
+-};
+-
+-/* Set VLAN Filter */
+-struct ncsi_cmd_svf_pkt {
+-        struct ncsi_cmd_pkt_hdr cmd;       /* Command header    */
+-        __be16                  reserved;  /* Reserved          */
+-        __be16                  vlan;      /* VLAN ID           */
+-        __be16                  reserved1; /* Reserved          */
+-        unsigned char           index;     /* VLAN table index  */
+-        unsigned char           enable;    /* Enable or disable */
+-        __be32                  checksum;  /* Checksum          */
+-        unsigned char           pad[14];
+-};
+-
+-/* Enable VLAN */
+-struct ncsi_cmd_ev_pkt {
+-        struct ncsi_cmd_pkt_hdr cmd;         /* Command header   */
+-        unsigned char           reserved[3]; /* Reserved         */
+-        unsigned char           mode;        /* VLAN filter mode */
+-        __be32                  checksum;    /* Checksum         */
+-        unsigned char           pad[22];
+-};
+-
+-/* Set MAC Address */
+-struct ncsi_cmd_sma_pkt {
+-        struct ncsi_cmd_pkt_hdr cmd;      /* Command header          */
+-        unsigned char           mac[6];   /* MAC address             */
+-        unsigned char           index;    /* MAC table index         */
+-        unsigned char           at_e;     /* Addr type and operation */
+-        __be32                  checksum; /* Checksum                */
+-        unsigned char           pad[18];
+-};
+-
+-/* Enable Broadcast Filter */
+-struct ncsi_cmd_ebf_pkt {
+-        struct ncsi_cmd_pkt_hdr cmd;      /* Command header */
+-        __be32                  mode;     /* Filter mode    */
+-        __be32                  checksum; /* Checksum       */
+-        unsigned char           pad[22];
+-};
+-
+-/* Enable Global Multicast Filter */
+-struct ncsi_cmd_egmf_pkt {
+-        struct ncsi_cmd_pkt_hdr cmd;      /* Command header */
+-        __be32                  mode;     /* Global MC mode */
+-        __be32                  checksum; /* Checksum       */
+-        unsigned char           pad[22];
+-};
+-
+-/* Set NCSI Flow Control */
+-struct ncsi_cmd_snfc_pkt {
+-        struct ncsi_cmd_pkt_hdr cmd;         /* Command header    */
+-        unsigned char           reserved[3]; /* Reserved          */
+-        unsigned char           mode;        /* Flow control mode */
+-        __be32                  checksum;    /* Checksum          */
+-        unsigned char           pad[22];
+-};
+-
+-/* Get Link Status */
+-struct ncsi_rsp_gls_pkt {
+-        struct ncsi_rsp_pkt_hdr rsp;        /* Response header   */
+-        __be32                  status;     /* Link status       */
+-        __be32                  other;      /* Other indications */
+-        __be32                  oem_status; /* OEM link status   */
+-        __be32                  checksum;
+-        unsigned char           pad[10];
+-};
+-
+-/* Get Version ID */
+-struct ncsi_rsp_gvi_pkt {
+-        struct ncsi_rsp_pkt_hdr rsp;          /* Response header */
+-        __be32                  ncsi_version; /* NCSI version    */
+-        unsigned char           reserved[3];  /* Reserved        */
+-        unsigned char           alpha2;       /* NCSI version    */
+-        unsigned char           fw_name[12];  /* f/w name string */
+-        __be32                  fw_version;   /* f/w version     */
+-        __be16                  pci_ids[4];   /* PCI IDs         */
+-        __be32                  mf_id;        /* Manufacture ID  */
+-        __be32                  checksum;
+-};
+-
+-/* Get Capabilities */
+-struct ncsi_rsp_gc_pkt {
+-        struct ncsi_rsp_pkt_hdr rsp;         /* Response header   */
+-        __be32                  cap;         /* Capabilities      */
+-        __be32                  bc_cap;      /* Broadcast cap     */
+-        __be32                  mc_cap;      /* Multicast cap     */
+-        __be32                  buf_cap;     /* Buffering cap     */
+-        __be32                  aen_cap;     /* AEN cap           */
+-        unsigned char           vlan_cnt;    /* VLAN filter count */
+-        unsigned char           mixed_cnt;   /* Mix filter count  */
+-        unsigned char           mc_cnt;      /* MC filter count   */
+-        unsigned char           uc_cnt;      /* UC filter count   */
+-        unsigned char           reserved[2]; /* Reserved          */
+-        unsigned char           vlan_mode;   /* VLAN mode         */
+-        unsigned char           channel_cnt; /* Channel count     */
+-        __be32                  checksum;    /* Checksum          */
+-};
+-
+-/* Get Parameters */
+-struct ncsi_rsp_gp_pkt {
+-        struct ncsi_rsp_pkt_hdr rsp;          /* Response header       *=
+/
+-        unsigned char           mac_cnt;      /* Number of MAC addr    *=
+/
+-        unsigned char           reserved[2];  /* Reserved              *=
+/
+-        unsigned char           mac_enable;   /* MAC addr enable flags *=
+/
+-        unsigned char           vlan_cnt;     /* VLAN tag count        *=
+/
+-        unsigned char           reserved1;    /* Reserved              *=
+/
+-        __be16                  vlan_enable;  /* VLAN tag enable flags *=
+/
+-        __be32                  link_mode;    /* Link setting          *=
+/
+-        __be32                  bc_mode;      /* BC filter mode        *=
+/
+-        __be32                  valid_modes;  /* Valid mode parameters *=
+/
+-        unsigned char           vlan_mode;    /* VLAN mode             *=
+/
+-        unsigned char           fc_mode;      /* Flow control mode     *=
+/
+-        unsigned char           reserved2[2]; /* Reserved              *=
+/
+-        __be32                  aen_mode;     /* AEN mode              *=
+/
+-        unsigned char           mac[6];       /* Supported MAC addr    *=
+/
+-        __be16                  vlan;         /* Supported VLAN tags   *=
+/
+-        __be32                  checksum;     /* Checksum              *=
+/
+-};
+-
+-/* Get Controller Packet Statistics */
+-struct ncsi_rsp_gcps_pkt {
+-        struct ncsi_rsp_pkt_hdr rsp;            /* Response header      =
+      */
+-        __be32                  cnt_hi;         /* Counter cleared      =
+      */
+-        __be32                  cnt_lo;         /* Counter cleared      =
+      */
+-        __be32                  rx_bytes;       /* Rx bytes             =
+      */
+-        __be32                  tx_bytes;       /* Tx bytes             =
+      */
+-        __be32                  rx_uc_pkts;     /* Rx UC packets        =
+      */
+-        __be32                  rx_mc_pkts;     /* Rx MC packets        =
+      */
+-        __be32                  rx_bc_pkts;     /* Rx BC packets        =
+      */
+-        __be32                  tx_uc_pkts;     /* Tx UC packets        =
+      */
+-        __be32                  tx_mc_pkts;     /* Tx MC packets        =
+      */
+-        __be32                  tx_bc_pkts;     /* Tx BC packets        =
+      */
+-        __be32                  fcs_err;        /* FCS errors           =
+      */
+-        __be32                  align_err;      /* Alignment errors     =
+      */
+-        __be32                  false_carrier;  /* False carrier detecti=
+on    */
+-        __be32                  runt_pkts;      /* Rx runt packets      =
+      */
+-        __be32                  jabber_pkts;    /* Rx jabber packets    =
+      */
+-        __be32                  rx_pause_xon;   /* Rx pause XON frames  =
+      */
+-        __be32                  rx_pause_xoff;  /* Rx XOFF frames       =
+      */
+-        __be32                  tx_pause_xon;   /* Tx XON frames        =
+      */
+-        __be32                  tx_pause_xoff;  /* Tx XOFF frames       =
+      */
+-        __be32                  tx_s_collision; /* Single collision fram=
+es    */
+-        __be32                  tx_m_collision; /* Multiple collision fr=
+ames  */
+-        __be32                  l_collision;    /* Late collision frames=
+      */
+-        __be32                  e_collision;    /* Excessive collision f=
+rames */
+-        __be32                  rx_ctl_frames;  /* Rx control frames    =
+      */
+-        __be32                  rx_64_frames;   /* Rx 64-bytes frames   =
+      */
+-        __be32                  rx_127_frames;  /* Rx 65-127 bytes frame=
+s     */
+-        __be32                  rx_255_frames;  /* Rx 128-255 bytes fram=
+es    */
+-        __be32                  rx_511_frames;  /* Rx 256-511 bytes fram=
+es    */
+-        __be32                  rx_1023_frames; /* Rx 512-1023 bytes fra=
+mes   */
+-        __be32                  rx_1522_frames; /* Rx 1024-1522 bytes fr=
+ames  */
+-        __be32                  rx_9022_frames; /* Rx 1523-9022 bytes fr=
+ames  */
+-        __be32                  tx_64_frames;   /* Tx 64-bytes frames   =
+      */
+-        __be32                  tx_127_frames;  /* Tx 65-127 bytes frame=
+s     */
+-        __be32                  tx_255_frames;  /* Tx 128-255 bytes fram=
+es    */
+-        __be32                  tx_511_frames;  /* Tx 256-511 bytes fram=
+es    */
+-        __be32                  tx_1023_frames; /* Tx 512-1023 bytes fra=
+mes   */
+-        __be32                  tx_1522_frames; /* Tx 1024-1522 bytes fr=
+ames  */
+-        __be32                  tx_9022_frames; /* Tx 1523-9022 bytes fr=
+ames  */
+-        __be32                  rx_valid_bytes; /* Rx valid bytes       =
+      */
+-        __be32                  rx_runt_pkts;   /* Rx error runt packets=
+      */
+-        __be32                  rx_jabber_pkts; /* Rx error jabber packe=
+ts    */
+-        __be32                  checksum;       /* Checksum             =
+      */
+-};
+-
+-/* Get NCSI Statistics */
+-struct ncsi_rsp_gns_pkt {
+-        struct ncsi_rsp_pkt_hdr rsp;           /* Response header       =
+  */
+-        __be32                  rx_cmds;       /* Rx NCSI commands      =
+  */
+-        __be32                  dropped_cmds;  /* Dropped commands      =
+  */
+-        __be32                  cmd_type_errs; /* Command type errors   =
+  */
+-        __be32                  cmd_csum_errs; /* Command checksum error=
+s */
+-        __be32                  rx_pkts;       /* Rx NCSI packets       =
+  */
+-        __be32                  tx_pkts;       /* Tx NCSI packets       =
+  */
+-        __be32                  tx_aen_pkts;   /* Tx AEN packets        =
+  */
+-        __be32                  checksum;      /* Checksum              =
+  */
+-};
+-
+-/* Get NCSI Pass-through Statistics */
+-struct ncsi_rsp_gnpts_pkt {
+-        struct ncsi_rsp_pkt_hdr rsp;            /* Response header     *=
+/
+-        __be32                  tx_pkts;        /* Tx packets          *=
+/
+-        __be32                  tx_dropped;     /* Tx dropped packets  *=
+/
+-        __be32                  tx_channel_err; /* Tx channel errors   *=
+/
+-        __be32                  tx_us_err;      /* Tx undersize errors *=
+/
+-        __be32                  rx_pkts;        /* Rx packets          *=
+/
+-        __be32                  rx_dropped;     /* Rx dropped packets  *=
+/
+-        __be32                  rx_channel_err; /* Rx channel errors   *=
+/
+-        __be32                  rx_us_err;      /* Rx undersize errors *=
+/
+-        __be32                  rx_os_err;      /* Rx oversize errors  *=
+/
+-        __be32                  checksum;       /* Checksum            *=
+/
+-};
+-
+-/* Get package status */
+-struct ncsi_rsp_gps_pkt {
+-        struct ncsi_rsp_pkt_hdr rsp;      /* Response header            =
+ */
+-        __be32                  status;   /* Hardware arbitration status=
+ */
+-        __be32                  checksum;
+-};
+-
+-/* Get package UUID */
+-struct ncsi_rsp_gpuuid_pkt {
+-        struct ncsi_rsp_pkt_hdr rsp;      /* Response header */
+-        unsigned char           uuid[16]; /* UUID            */
+-        __be32                  checksum;
+-};
+-
+-/* AEN: Link State Change */
+-struct ncsi_aen_lsc_pkt {
+-        struct ncsi_aen_pkt_hdr aen;        /* AEN header      */
+-        __be32                  status;     /* Link status     */
+-        __be32                  oem_status; /* OEM link status */
+-        __be32                  checksum;   /* Checksum        */
+-        unsigned char           pad[14];
+-};
+-
+-/* AEN: Configuration Required */
+-struct ncsi_aen_cr_pkt {
+-        struct ncsi_aen_pkt_hdr aen;      /* AEN header */
+-        __be32                  checksum; /* Checksum   */
+-        unsigned char           pad[22];
+-};
+-
+-/* AEN: Host Network Controller Driver Status Change */
+-struct ncsi_aen_hncdsc_pkt {
+-        struct ncsi_aen_pkt_hdr aen;      /* AEN header */
+-        __be32                  status;   /* Status     */
+-        __be32                  checksum; /* Checksum   */
+-        unsigned char           pad[18];
+-};
+-
+-/* NCSI packet revision */
+-#define NCSI_PKT_REVISION       0x01
+-
+-/* NCSI packet commands */
+-#define NCSI_PKT_CMD_CIS        0x00 /* Clear Initial State             =
+ */
+-#define NCSI_PKT_CMD_SP         0x01 /* Select Package                  =
+ */
+-#define NCSI_PKT_CMD_DP         0x02 /* Deselect Package                =
+ */
+-#define NCSI_PKT_CMD_EC         0x03 /* Enable Channel                  =
+ */
+-#define NCSI_PKT_CMD_DC         0x04 /* Disable Channel                 =
+ */
+-#define NCSI_PKT_CMD_RC         0x05 /* Reset Channel                   =
+ */
+-#define NCSI_PKT_CMD_ECNT       0x06 /* Enable Channel Network Tx       =
+ */
+-#define NCSI_PKT_CMD_DCNT       0x07 /* Disable Channel Network Tx      =
+ */
+-#define NCSI_PKT_CMD_AE         0x08 /* AEN Enable                      =
+ */
+-#define NCSI_PKT_CMD_SL         0x09 /* Set Link                        =
+ */
+-#define NCSI_PKT_CMD_GLS        0x0a /* Get Link                        =
+ */
+-#define NCSI_PKT_CMD_SVF        0x0b /* Set VLAN Filter                 =
+ */
+-#define NCSI_PKT_CMD_EV         0x0c /* Enable VLAN                     =
+ */
+-#define NCSI_PKT_CMD_DV         0x0d /* Disable VLAN                    =
+ */
+-#define NCSI_PKT_CMD_SMA        0x0e /* Set MAC address                 =
+ */
+-#define NCSI_PKT_CMD_EBF        0x10 /* Enable Broadcast Filter         =
+ */
+-#define NCSI_PKT_CMD_DBF        0x11 /* Disable Broadcast Filter        =
+ */
+-#define NCSI_PKT_CMD_EGMF       0x12 /* Enable Global Multicast Filter  =
+ */
+-#define NCSI_PKT_CMD_DGMF       0x13 /* Disable Global Multicast Filter =
+ */
+-#define NCSI_PKT_CMD_SNFC       0x14 /* Set NCSI Flow Control           =
+ */
+-#define NCSI_PKT_CMD_GVI        0x15 /* Get Version ID                  =
+ */
+-#define NCSI_PKT_CMD_GC         0x16 /* Get Capabilities                =
+ */
+-#define NCSI_PKT_CMD_GP         0x17 /* Get Parameters                  =
+ */
+-#define NCSI_PKT_CMD_GCPS       0x18 /* Get Controller Packet Statistics=
+ */
+-#define NCSI_PKT_CMD_GNS        0x19 /* Get NCSI Statistics             =
+ */
+-#define NCSI_PKT_CMD_GNPTS      0x1a /* Get NCSI Pass-throu Statistics  =
+ */
+-#define NCSI_PKT_CMD_GPS        0x1b /* Get package status              =
+ */
+-#define NCSI_PKT_CMD_OEM        0x50 /* OEM                             =
+ */
+-#define NCSI_PKT_CMD_PLDM       0x51 /* PLDM request over NCSI over RBT =
+ */
+-#define NCSI_PKT_CMD_GPUUID     0x52 /* Get package UUID                =
+ */
+-
+-/* NCSI packet responses */
+-#define NCSI_PKT_RSP_CIS        (NCSI_PKT_CMD_CIS    + 0x80)
+-#define NCSI_PKT_RSP_SP         (NCSI_PKT_CMD_SP     + 0x80)
+-#define NCSI_PKT_RSP_DP         (NCSI_PKT_CMD_DP     + 0x80)
+-#define NCSI_PKT_RSP_EC         (NCSI_PKT_CMD_EC     + 0x80)
+-#define NCSI_PKT_RSP_DC         (NCSI_PKT_CMD_DC     + 0x80)
+-#define NCSI_PKT_RSP_RC         (NCSI_PKT_CMD_RC     + 0x80)
+-#define NCSI_PKT_RSP_ECNT       (NCSI_PKT_CMD_ECNT   + 0x80)
+-#define NCSI_PKT_RSP_DCNT       (NCSI_PKT_CMD_DCNT   + 0x80)
+-#define NCSI_PKT_RSP_AE         (NCSI_PKT_CMD_AE     + 0x80)
+-#define NCSI_PKT_RSP_SL         (NCSI_PKT_CMD_SL     + 0x80)
+-#define NCSI_PKT_RSP_GLS        (NCSI_PKT_CMD_GLS    + 0x80)
+-#define NCSI_PKT_RSP_SVF        (NCSI_PKT_CMD_SVF    + 0x80)
+-#define NCSI_PKT_RSP_EV         (NCSI_PKT_CMD_EV     + 0x80)
+-#define NCSI_PKT_RSP_DV         (NCSI_PKT_CMD_DV     + 0x80)
+-#define NCSI_PKT_RSP_SMA        (NCSI_PKT_CMD_SMA    + 0x80)
+-#define NCSI_PKT_RSP_EBF        (NCSI_PKT_CMD_EBF    + 0x80)
+-#define NCSI_PKT_RSP_DBF        (NCSI_PKT_CMD_DBF    + 0x80)
+-#define NCSI_PKT_RSP_EGMF       (NCSI_PKT_CMD_EGMF   + 0x80)
+-#define NCSI_PKT_RSP_DGMF       (NCSI_PKT_CMD_DGMF   + 0x80)
+-#define NCSI_PKT_RSP_SNFC       (NCSI_PKT_CMD_SNFC   + 0x80)
+-#define NCSI_PKT_RSP_GVI        (NCSI_PKT_CMD_GVI    + 0x80)
+-#define NCSI_PKT_RSP_GC         (NCSI_PKT_CMD_GC     + 0x80)
+-#define NCSI_PKT_RSP_GP         (NCSI_PKT_CMD_GP     + 0x80)
+-#define NCSI_PKT_RSP_GCPS       (NCSI_PKT_CMD_GCPS   + 0x80)
+-#define NCSI_PKT_RSP_GNS        (NCSI_PKT_CMD_GNS    + 0x80)
+-#define NCSI_PKT_RSP_GNPTS      (NCSI_PKT_CMD_GNPTS  + 0x80)
+-#define NCSI_PKT_RSP_GPS        (NCSI_PKT_CMD_GPS    + 0x80)
+-#define NCSI_PKT_RSP_OEM        (NCSI_PKT_CMD_OEM    + 0x80)
+-#define NCSI_PKT_RSP_PLDM       (NCSI_PKT_CMD_PLDM   + 0x80)
+-#define NCSI_PKT_RSP_GPUUID     (NCSI_PKT_CMD_GPUUID + 0x80)
+-
+-/* NCSI response code/reason */
+-#define NCSI_PKT_RSP_C_COMPLETED        0x0000 /* Command Completed     =
+   */
+-#define NCSI_PKT_RSP_C_FAILED           0x0001 /* Command Failed        =
+   */
+-#define NCSI_PKT_RSP_C_UNAVAILABLE      0x0002 /* Command Unavailable   =
+   */
+-#define NCSI_PKT_RSP_C_UNSUPPORTED      0x0003 /* Command Unsupported   =
+   */
+-#define NCSI_PKT_RSP_R_NO_ERROR         0x0000 /* No Error              =
+   */
+-#define NCSI_PKT_RSP_R_INTERFACE        0x0001 /* Interface not ready   =
+   */
+-#define NCSI_PKT_RSP_R_PARAM            0x0002 /* Invalid Parameter     =
+   */
+-#define NCSI_PKT_RSP_R_CHANNEL          0x0003 /* Channel not Ready     =
+   */
+-#define NCSI_PKT_RSP_R_PACKAGE          0x0004 /* Package not Ready     =
+   */
+-#define NCSI_PKT_RSP_R_LENGTH           0x0005 /* Invalid payload length=
+   */
+-#define NCSI_PKT_RSP_R_UNKNOWN          0x7fff /* Command type unsupport=
+ed */
+-
+-/* NCSI AEN packet type */
+-#define NCSI_PKT_AEN            0xFF /* AEN Packet               */
+-#define NCSI_PKT_AEN_LSC        0x00 /* Link status change       */
+-#define NCSI_PKT_AEN_CR         0x01 /* Configuration required   */
+-#define NCSI_PKT_AEN_HNCDSC     0x02 /* HNC driver status change */
+-
+-#endif /* NCSI_PKT_H */
+diff --git a/slirp/src/qtailq.h b/slirp/src/qtailq.h
+deleted file mode 100644
+index d8aa0e19a4..0000000000
+--- a/slirp/src/qtailq.h
++++ /dev/null
+@@ -1,194 +0,0 @@
+-/* SPDX-License-Identifier: BSD-3-Clause */
+-/*      $NetBSD: queue.h,v 1.52 2009/04/20 09:56:08 mschuett Exp $ */
+-
+-/*
+- * slirp version: Copy from QEMU, removed all but tail queues.
+- */
+-
+-/*
+- * Copyright (c) 1991, 1993
+- *      The Regents of the University of California.  All rights reserve=
+d.
+- *
+- * Redistribution and use in source and binary forms, with or without
+- * modification, are permitted provided that the following conditions
+- * are met:
+- * 1. Redistributions of source code must retain the above copyright
+- *    notice, this list of conditions and the following disclaimer.
+- * 2. Redistributions in binary form must reproduce the above copyright
+- *    notice, this list of conditions and the following disclaimer in th=
+e
+- *    documentation and/or other materials provided with the distributio=
+n.
+- * 3. Neither the name of the University nor the names of its contributo=
+rs
+- *    may be used to endorse or promote products derived from this softw=
+are
+- *    without specific prior written permission.
+- *
+- * THIS SOFTWARE IS PROVIDED BY THE REGENTS AND CONTRIBUTORS ``AS IS'' A=
+ND
+- * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+- * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PU=
+RPOSE
+- * ARE DISCLAIMED.  IN NO EVENT SHALL THE REGENTS OR CONTRIBUTORS BE LIA=
+BLE
+- * FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUE=
+NTIAL
+- * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOO=
+DS
+- * OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
+- * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, S=
+TRICT
+- * LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY=
+ WAY
+- * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY O=
+F
+- * SUCH DAMAGE.
+- *
+- *      @(#)queue.h     8.5 (Berkeley) 8/20/94
+- */
+-
+-#ifndef QTAILQ_H
+-#define QTAILQ_H
+-
+-/*
+- * A tail queue is headed by a pair of pointers, one to the head of the
+- * list and the other to the tail of the list. The elements are doubly
+- * linked so that an arbitrary element can be removed without a need to
+- * traverse the list. New elements can be added to the list before or
+- * after an existing element, at the head of the list, or at the end of
+- * the list. A tail queue may be traversed in either direction.
+- */
+-typedef struct QTailQLink {
+-    void *tql_next;
+-    struct QTailQLink *tql_prev;
+-} QTailQLink;
+-
+-/*
+- * Tail queue definitions.  The union acts as a poor man template, as if
+- * it were QTailQLink<type>.
+- */
+-#define QTAILQ_HEAD(name, type)                                         =
+\
+-    union name {                                                        =
+\
+-        struct type *tqh_first;       /* first element */               =
+\
+-        QTailQLink tqh_circ;          /* link for circular backwards lis=
+t */ \
+-    }
+-
+-#define QTAILQ_HEAD_INITIALIZER(head)           \
+-    { .tqh_circ =3D { NULL, &(head).tqh_circ } }
+-
+-#define QTAILQ_ENTRY(type)                                              =
+\
+-    union {                                                             =
+\
+-        struct type *tqe_next;        /* next element */                =
+\
+-        QTailQLink tqe_circ;          /* link for circular backwards lis=
+t */ \
+-    }
+-
+-#define QTAILQ_INIT(head) do {                                          =
+\
+-        (head)->tqh_first =3D NULL;                                     =
+  \
+-        (head)->tqh_circ.tql_prev =3D &(head)->tqh_circ;                =
+  \
+-} while (/*CONSTCOND*/0)
+-
+-#define QTAILQ_INSERT_HEAD(head, elm, field) do {                       =
+\
+-        if (((elm)->field.tqe_next =3D (head)->tqh_first) !=3D NULL)    =
+    \
+-            (head)->tqh_first->field.tqe_circ.tql_prev =3D              =
+  \
+-                &(elm)->field.tqe_circ;                                 =
+\
+-        else                                                            =
+\
+-            (head)->tqh_circ.tql_prev =3D &(elm)->field.tqe_circ;       =
+  \
+-        (head)->tqh_first =3D (elm);                                    =
+  \
+-        (elm)->field.tqe_circ.tql_prev =3D &(head)->tqh_circ;           =
+  \
+-} while (/*CONSTCOND*/0)
+-
+-#define QTAILQ_INSERT_TAIL(head, elm, field) do {                       =
+\
+-        (elm)->field.tqe_next =3D NULL;                                 =
+  \
+-        (elm)->field.tqe_circ.tql_prev =3D (head)->tqh_circ.tql_prev;   =
+  \
+-        (head)->tqh_circ.tql_prev->tql_next =3D (elm);                  =
+  \
+-        (head)->tqh_circ.tql_prev =3D &(elm)->field.tqe_circ;           =
+  \
+-} while (/*CONSTCOND*/0)
+-
+-#define QTAILQ_INSERT_AFTER(head, listelm, elm, field) do {             =
+\
+-        if (((elm)->field.tqe_next =3D (listelm)->field.tqe_next) !=3D N=
+ULL)\
+-            (elm)->field.tqe_next->field.tqe_circ.tql_prev =3D          =
+  \
+-                &(elm)->field.tqe_circ;                                 =
+\
+-        else                                                            =
+\
+-            (head)->tqh_circ.tql_prev =3D &(elm)->field.tqe_circ;       =
+  \
+-        (listelm)->field.tqe_next =3D (elm);                            =
+  \
+-        (elm)->field.tqe_circ.tql_prev =3D &(listelm)->field.tqe_circ;  =
+  \
+-} while (/*CONSTCOND*/0)
+-
+-#define QTAILQ_INSERT_BEFORE(listelm, elm, field) do {                  =
+     \
+-        (elm)->field.tqe_circ.tql_prev =3D (listelm)->field.tqe_circ.tql=
+_prev; \
+-        (elm)->field.tqe_next =3D (listelm);                            =
+       \
+-        (listelm)->field.tqe_circ.tql_prev->tql_next =3D (elm);         =
+       \
+-        (listelm)->field.tqe_circ.tql_prev =3D &(elm)->field.tqe_circ;  =
+       \
+-} while (/*CONSTCOND*/0)
+-
+-#define QTAILQ_REMOVE(head, elm, field) do {                            =
+\
+-        if (((elm)->field.tqe_next) !=3D NULL)                          =
+  \
+-            (elm)->field.tqe_next->field.tqe_circ.tql_prev =3D          =
+  \
+-                (elm)->field.tqe_circ.tql_prev;                         =
+\
+-        else                                                            =
+\
+-            (head)->tqh_circ.tql_prev =3D (elm)->field.tqe_circ.tql_prev=
+; \
+-        (elm)->field.tqe_circ.tql_prev->tql_next =3D (elm)->field.tqe_ne=
+xt; \
+-        (elm)->field.tqe_circ.tql_prev =3D NULL;                        =
+  \
+-} while (/*CONSTCOND*/0)
+-
+-#define QTAILQ_FOREACH(var, head, field)                                =
+\
+-        for ((var) =3D ((head)->tqh_first);                             =
+  \
+-                (var);                                                  =
+\
+-                (var) =3D ((var)->field.tqe_next))
+-
+-#define QTAILQ_FOREACH_SAFE(var, head, field, next_var)                 =
+\
+-        for ((var) =3D ((head)->tqh_first);                             =
+  \
+-                (var) && ((next_var) =3D ((var)->field.tqe_next), 1);   =
+  \
+-                (var) =3D (next_var))
+-
+-#define QTAILQ_FOREACH_REVERSE(var, head, field)                        =
+\
+-        for ((var) =3D QTAILQ_LAST(head);                               =
+  \
+-                (var);                                                  =
+\
+-                (var) =3D QTAILQ_PREV(var, field))
+-
+-#define QTAILQ_FOREACH_REVERSE_SAFE(var, head, field, prev_var)         =
+\
+-        for ((var) =3D QTAILQ_LAST(head);                               =
+  \
+-             (var) && ((prev_var) =3D QTAILQ_PREV(var, field));         =
+  \
+-             (var) =3D (prev_var))
+-
+-/*
+- * Tail queue access methods.
+- */
+-#define QTAILQ_EMPTY(head)               ((head)->tqh_first =3D=3D NULL)
+-#define QTAILQ_FIRST(head)               ((head)->tqh_first)
+-#define QTAILQ_NEXT(elm, field)          ((elm)->field.tqe_next)
+-#define QTAILQ_IN_USE(elm, field)        ((elm)->field.tqe_circ.tql_prev=
+ !=3D NULL)
+-
+-#define QTAILQ_LINK_PREV(link)                                          =
+\
+-        ((link).tql_prev->tql_prev->tql_next)
+-#define QTAILQ_LAST(head)                                               =
+\
+-        ((typeof((head)->tqh_first)) QTAILQ_LINK_PREV((head)->tqh_circ))
+-#define QTAILQ_PREV(elm, field)                                         =
+\
+-        ((typeof((elm)->field.tqe_next)) QTAILQ_LINK_PREV((elm)->field.t=
+qe_circ))
+-
+-#define field_at_offset(base, offset, type)                             =
+       \
+-        ((type *) (((char *) (base)) + (offset)))
+-
+-/*
+- * Raw access of elements of a tail queue head.  Offsets are all zero
+- * because it's a union.
+- */
+-#define QTAILQ_RAW_FIRST(head)                                          =
+       \
+-        field_at_offset(head, 0, void *)
+-#define QTAILQ_RAW_TQH_CIRC(head)                                       =
+       \
+-        field_at_offset(head, 0, QTailQLink)
+-
+-/*
+- * Raw access of elements of a tail entry
+- */
+-#define QTAILQ_RAW_NEXT(elm, entry)                                     =
+       \
+-        field_at_offset(elm, entry, void *)
+-#define QTAILQ_RAW_TQE_CIRC(elm, entry)                                 =
+       \
+-        field_at_offset(elm, entry, QTailQLink)
+-/*
+- * Tail queue traversal using pointer arithmetic.
+- */
+-#define QTAILQ_RAW_FOREACH(elm, head, entry)                            =
+       \
+-        for ((elm) =3D *QTAILQ_RAW_FIRST(head);                         =
+         \
+-             (elm);                                                     =
+       \
+-             (elm) =3D *QTAILQ_RAW_NEXT(elm, entry))
+-/*
+- * Tail queue insertion using pointer arithmetic.
+- */
+-#define QTAILQ_RAW_INSERT_TAIL(head, elm, entry) do {                   =
+        \
+-        *QTAILQ_RAW_NEXT(elm, entry) =3D NULL;                          =
+          \
+-        QTAILQ_RAW_TQE_CIRC(elm, entry)->tql_prev =3D QTAILQ_RAW_TQH_CIR=
+C(head)->tql_prev; \
+-        QTAILQ_RAW_TQH_CIRC(head)->tql_prev->tql_next =3D (elm);        =
+          \
+-        QTAILQ_RAW_TQH_CIRC(head)->tql_prev =3D QTAILQ_RAW_TQE_CIRC(elm,=
+ entry);  \
+-} while (/*CONSTCOND*/0)
+-
+-#endif /* QTAILQ_H */
+diff --git a/slirp/src/sbuf.h b/slirp/src/sbuf.h
+deleted file mode 100644
+index 337af1bbde..0000000000
+--- a/slirp/src/sbuf.h
++++ /dev/null
+@@ -1,27 +0,0 @@
+-/* SPDX-License-Identifier: BSD-3-Clause */
+-/*
+- * Copyright (c) 1995 Danny Gasparovski.
+- */
+-
+-#ifndef SBUF_H
+-#define SBUF_H
+-
+-#define sbspace(sb) ((sb)->sb_datalen - (sb)->sb_cc)
+-
+-struct sbuf {
+-	uint32_t sb_cc;		/* actual chars in buffer */
+-	uint32_t sb_datalen;	/* Length of data  */
+-	char	*sb_wptr;	/* write pointer. points to where the next
+-				 * bytes should be written in the sbuf */
+-	char	*sb_rptr;	/* read pointer. points to where the next
+-				 * byte should be read from the sbuf */
+-	char	*sb_data;	/* Actual data */
+-};
+-
+-void sbfree(struct sbuf *);
+-bool sbdrop(struct sbuf *, int);
+-void sbreserve(struct sbuf *, int);
+-void sbappend(struct socket *, struct mbuf *);
+-void sbcopy(struct sbuf *, int, int, char *);
+-
+-#endif
+diff --git a/slirp/src/slirp.h b/slirp/src/slirp.h
+deleted file mode 100644
+index 39580934f3..0000000000
+--- a/slirp/src/slirp.h
++++ /dev/null
+@@ -1,275 +0,0 @@
+-/* SPDX-License-Identifier: BSD-3-Clause */
+-#ifndef SLIRP_H
+-#define SLIRP_H
+-
+-#ifdef _WIN32
+-
+-/* as defined in sdkddkver.h */
+-#ifndef _WIN32_WINNT
+-#define _WIN32_WINNT 0x0600 /* Vista */
+-#endif
+-/* reduces the number of implicitly included headers */
+-#ifndef WIN32_LEAN_AND_MEAN
+-#define WIN32_LEAN_AND_MEAN
+-#endif
+-
+-# include <winsock2.h>
+-# include <windows.h>
+-# include <ws2tcpip.h>
+-# include <sys/timeb.h>
+-# include <iphlpapi.h>
+-
+-#else
+-# if !defined(__HAIKU__)
+-#  define O_BINARY 0
+-# endif
+-#endif
+-
+-#ifndef _WIN32
+-#include <sys/uio.h>
+-#include <netinet/in.h>
+-#include <arpa/inet.h>
+-#include <sys/socket.h>
+-#include <sys/ioctl.h>
+-#endif
+-
+-#ifdef __APPLE__
+-# include <sys/filio.h>
+-#endif
+-
+-/* Avoid conflicting with the libc insque() and remque(), which
+-   have different prototypes. */
+-#define insque slirp_insque
+-#define remque slirp_remque
+-#define quehead slirp_quehead
+-
+-#include "debug.h"
+-#include "util.h"
+-#include "qtailq.h"
+-
+-#include "libslirp.h"
+-#include "ip.h"
+-#include "ip6.h"
+-#include "tcp.h"
+-#include "tcp_timer.h"
+-#include "tcp_var.h"
+-#include "tcpip.h"
+-#include "udp.h"
+-#include "ip_icmp.h"
+-#include "ip6_icmp.h"
+-#include "mbuf.h"
+-#include "sbuf.h"
+-#include "socket.h"
+-#include "if.h"
+-#include "main.h"
+-#include "misc.h"
+-
+-#include "bootp.h"
+-#include "tftp.h"
+-
+-#define ARPOP_REQUEST 1         /* ARP request */
+-#define ARPOP_REPLY   2         /* ARP reply   */
+-
+-struct ethhdr {
+-    unsigned char  h_dest[ETH_ALEN];   /* destination eth addr */
+-    unsigned char  h_source[ETH_ALEN]; /* source ether addr    */
+-    unsigned short h_proto;            /* packet type ID field */
+-};
+-
+-struct slirp_arphdr {
+-    unsigned short ar_hrd;      /* format of hardware address */
+-    unsigned short ar_pro;      /* format of protocol address */
+-    unsigned char  ar_hln;      /* length of hardware address */
+-    unsigned char  ar_pln;      /* length of protocol address */
+-    unsigned short ar_op;       /* ARP opcode (command)       */
+-
+-    /*
+-     *  Ethernet looks like this : This bit is variable sized however...
+-     */
+-    unsigned char ar_sha[ETH_ALEN]; /* sender hardware address */
+-    uint32_t      ar_sip;           /* sender IP address       */
+-    unsigned char ar_tha[ETH_ALEN]; /* target hardware address */
+-    uint32_t      ar_tip;           /* target IP address       */
+-} SLIRP_PACKED;
+-
+-#define ARP_TABLE_SIZE 16
+-
+-typedef struct ArpTable {
+-    struct slirp_arphdr table[ARP_TABLE_SIZE];
+-    int next_victim;
+-} ArpTable;
+-
+-void arp_table_add(Slirp *slirp, uint32_t ip_addr, uint8_t ethaddr[ETH_A=
+LEN]);
+-
+-bool arp_table_search(Slirp *slirp, uint32_t ip_addr,
+-                      uint8_t out_ethaddr[ETH_ALEN]);
+-
+-struct ndpentry {
+-    unsigned char   eth_addr[ETH_ALEN];     /* sender hardware address *=
+/
+-    struct in6_addr ip_addr;                /* sender IP address       *=
+/
+-};
+-
+-#define NDP_TABLE_SIZE 16
+-
+-typedef struct NdpTable {
+-    struct ndpentry table[NDP_TABLE_SIZE];
+-    int next_victim;
+-} NdpTable;
+-
+-void ndp_table_add(Slirp *slirp, struct in6_addr ip_addr,
+-                   uint8_t ethaddr[ETH_ALEN]);
+-bool ndp_table_search(Slirp *slirp, struct in6_addr ip_addr,
+-                      uint8_t out_ethaddr[ETH_ALEN]);
+-
+-struct Slirp {
+-    QTAILQ_ENTRY(Slirp) entry;
+-    unsigned time_fasttimo;
+-    unsigned last_slowtimo;
+-    bool do_slowtimo;
+-
+-    bool in_enabled, in6_enabled;
+-
+-    /* virtual network configuration */
+-    struct in_addr vnetwork_addr;
+-    struct in_addr vnetwork_mask;
+-    struct in_addr vhost_addr;
+-    struct in6_addr vprefix_addr6;
+-    uint8_t vprefix_len;
+-    struct in6_addr vhost_addr6;
+-    struct in_addr vdhcp_startaddr;
+-    struct in_addr vnameserver_addr;
+-    struct in6_addr vnameserver_addr6;
+-
+-    struct in_addr client_ipaddr;
+-    char client_hostname[33];
+-
+-    int restricted;
+-    struct gfwd_list *guestfwd_list;
+-
+-    /* mbuf states */
+-    struct quehead m_freelist;
+-    struct quehead m_usedlist;
+-    int mbuf_alloced;
+-
+-    /* if states */
+-    struct quehead if_fastq;   /* fast queue (for interactive data) */
+-    struct quehead if_batchq;  /* queue for non-interactive data */
+-    bool if_start_busy;     /* avoid if_start recursion */
+-
+-    /* ip states */
+-    struct ipq ipq;         /* ip reass. queue */
+-    uint16_t ip_id;         /* ip packet ctr, for ids */
+-
+-    /* bootp/dhcp states */
+-    BOOTPClient bootp_clients[NB_BOOTP_CLIENTS];
+-    char *bootp_filename;
+-    size_t vdnssearch_len;
+-    uint8_t *vdnssearch;
+-    char *vdomainname;
+-
+-    /* tcp states */
+-    struct socket tcb;
+-    struct socket *tcp_last_so;
+-    tcp_seq tcp_iss;        /* tcp initial send seq # */
+-    uint32_t tcp_now;       /* for RFC 1323 timestamps */
+-
+-    /* udp states */
+-    struct socket udb;
+-    struct socket *udp_last_so;
+-
+-    /* icmp states */
+-    struct socket icmp;
+-    struct socket *icmp_last_so;
+-
+-    /* tftp states */
+-    char *tftp_prefix;
+-    struct tftp_session tftp_sessions[TFTP_SESSIONS_MAX];
+-    char *tftp_server_name;
+-
+-    ArpTable arp_table;
+-    NdpTable ndp_table;
+-
+-    GRand *grand;
+-    void *ra_timer;
+-
+-    const SlirpCb *cb;
+-    void *opaque;
+-};
+-
+-void if_start(Slirp *);
+-
+-int get_dns_addr(struct in_addr *pdns_addr);
+-int get_dns6_addr(struct in6_addr *pdns6_addr, uint32_t *scope_id);
+-
+-/* ncsi.c */
+-void ncsi_input(Slirp *slirp, const uint8_t *pkt, int pkt_len);
+-
+-#ifndef _WIN32
+-#include <netdb.h>
+-#endif
+-
+-
+-extern bool slirp_do_keepalive;
+-
+-#define TCP_MAXIDLE (TCPTV_KEEPCNT * TCPTV_KEEPINTVL)
+-
+-/* dnssearch.c */
+-int translate_dnssearch(Slirp *s, const char ** names);
+-
+-/* cksum.c */
+-int cksum(struct mbuf *m, int len);
+-int ip6_cksum(struct mbuf *m);
+-
+-/* if.c */
+-void if_init(Slirp *);
+-void if_output(struct socket *, struct mbuf *);
+-
+-/* ip_input.c */
+-void ip_init(Slirp *);
+-void ip_cleanup(Slirp *);
+-void ip_input(struct mbuf *);
+-void ip_slowtimo(Slirp *);
+-void ip_stripoptions(register struct mbuf *, struct mbuf *);
+-
+-/* ip_output.c */
+-int ip_output(struct socket *, struct mbuf *);
+-
+-/* ip6_input.c */
+-void ip6_init(Slirp *);
+-void ip6_cleanup(Slirp *);
+-void ip6_input(struct mbuf *);
+-
+-/* ip6_output */
+-int ip6_output(struct socket *, struct mbuf *, int fast);
+-
+-/* tcp_input.c */
+-void tcp_input(register struct mbuf *, int, struct socket *, unsigned sh=
+ort af);
+-int tcp_mss(register struct tcpcb *, unsigned);
+-
+-/* tcp_output.c */
+-int tcp_output(register struct tcpcb *);
+-void tcp_setpersist(register struct tcpcb *);
+-
+-/* tcp_subr.c */
+-void tcp_init(Slirp *);
+-void tcp_cleanup(Slirp *);
+-void tcp_template(struct tcpcb *);
+-void tcp_respond(struct tcpcb *, register struct tcpiphdr *,
+-        register struct mbuf *, tcp_seq, tcp_seq, int, unsigned short);
+-struct tcpcb * tcp_newtcpcb(struct socket *);
+-struct tcpcb * tcp_close(register struct tcpcb *);
+-void tcp_sockclosed(struct tcpcb *);
+-int tcp_fconnect(struct socket *, unsigned short af);
+-void tcp_connect(struct socket *);
+-int tcp_attach(struct socket *);
+-uint8_t tcp_tos(struct socket *);
+-int tcp_emu(struct socket *, struct mbuf *);
+-int tcp_ctl(struct socket *);
+-struct tcpcb *tcp_drop(struct tcpcb *tp, int err);
+-
+-struct socket *
+-slirp_find_ctl_socket(Slirp *slirp, struct in_addr guest_addr, int guest=
+_port);
+-
+-void slirp_send_packet_all(Slirp *slirp, const void *buf, size_t len);
+-
+-#endif
+diff --git a/slirp/src/socket.h b/slirp/src/socket.h
+deleted file mode 100644
+index 25403898cd..0000000000
+--- a/slirp/src/socket.h
++++ /dev/null
+@@ -1,160 +0,0 @@
+-/* SPDX-License-Identifier: BSD-3-Clause */
+-/*
+- * Copyright (c) 1995 Danny Gasparovski.
+- */
+-
+-#ifndef SLIRP_SOCKET_H
+-#define SLIRP_SOCKET_H
+-
+-#include "misc.h"
+-
+-#define SO_EXPIRE 240000
+-#define SO_EXPIREFAST 10000
+-
+-/*
+- * Our socket structure
+- */
+-
+-union slirp_sockaddr {
+-    struct sockaddr_storage ss;
+-    struct sockaddr_in sin;
+-    struct sockaddr_in6 sin6;
+-};
+-
+-struct socket {
+-  struct socket *so_next,*so_prev;      /* For a linked list of sockets =
+*/
+-
+-  int s;                           /* The actual socket */
+-  struct gfwd_list *guestfwd;
+-
+-  int pollfds_idx;                 /* GPollFD GArray index */
+-
+-  Slirp *slirp;			   /* managing slirp instance */
+-
+-			/* XXX union these with not-yet-used sbuf params */
+-  struct mbuf *so_m;	           /* Pointer to the original SYN packet,
+-				    * for non-blocking connect()'s, and
+-				    * PING reply's */
+-  struct tcpiphdr *so_ti;	   /* Pointer to the original ti within
+-				    * so_mconn, for non-blocking connections */
+-  uint32_t      so_urgc;
+-  union slirp_sockaddr fhost;      /* Foreign host */
+-#define so_faddr fhost.sin.sin_addr
+-#define so_fport fhost.sin.sin_port
+-#define so_faddr6 fhost.sin6.sin6_addr
+-#define so_fport6 fhost.sin6.sin6_port
+-#define so_ffamily fhost.ss.ss_family
+-
+-  union slirp_sockaddr lhost;      /* Local host */
+-#define so_laddr lhost.sin.sin_addr
+-#define so_lport lhost.sin.sin_port
+-#define so_laddr6 lhost.sin6.sin6_addr
+-#define so_lport6 lhost.sin6.sin6_port
+-#define so_lfamily lhost.ss.ss_family
+-
+-  uint8_t	so_iptos;	/* Type of service */
+-  uint8_t	so_emu;		/* Is the socket emulated? */
+-
+-  uint8_t       so_type;        /* Type of socket, UDP or TCP */
+-  int32_t       so_state;       /* internal state flags SS_*, below */
+-
+-  struct 	tcpcb *so_tcpcb;	/* pointer to TCP protocol control block */
+-  unsigned	so_expire;		/* When the socket will expire */
+-
+-  int	so_queued;		/* Number of packets queued from this socket */
+-  int	so_nqueued;		/* Number of packets queued in a row
+-				 * Used to determine when to "downgrade" a session
+-					 * from fastq to batchq */
+-
+-  struct sbuf so_rcv;		/* Receive buffer */
+-  struct sbuf so_snd;		/* Send buffer */
+-};
+-
+-
+-/*
+- * Socket state bits. (peer means the host on the Internet,
+- * local host means the host on the other end of the modem)
+- */
+-#define SS_NOFDREF		0x001	/* No fd reference */
+-
+-#define SS_ISFCONNECTING	0x002	/* Socket is connecting to peer (non-bloc=
+king connect()'s) */
+-#define SS_ISFCONNECTED		0x004	/* Socket is connected to peer */
+-#define SS_FCANTRCVMORE		0x008	/* Socket can't receive more from peer (f=
+or half-closes) */
+-#define SS_FCANTSENDMORE	0x010	/* Socket can't send more to peer (for ha=
+lf-closes) */
+-#define SS_FWDRAIN		0x040	/* We received a FIN, drain data and set SS_FC=
+ANTSENDMORE */
+-
+-#define SS_CTL			0x080
+-#define SS_FACCEPTCONN		0x100	/* Socket is accepting connections from a =
+host on the internet */
+-#define SS_FACCEPTONCE		0x200	/* If set, the SS_FACCEPTCONN socket will =
+die after one accept */
+-
+-#define SS_PERSISTENT_MASK	0xf000	/* Unremovable state bits */
+-#define SS_HOSTFWD		0x1000	/* Socket describes host->guest forwarding */
+-#define SS_INCOMING		0x2000	/* Connection was initiated by a host on the=
+ internet */
+-
+-static inline int sockaddr_equal(struct sockaddr_storage *a,
+-        struct sockaddr_storage *b)
+-{
+-    if (a->ss_family !=3D b->ss_family) {
+-        return 0;
+-    }
+-
+-    switch (a->ss_family) {
+-    case AF_INET:
+-    {
+-        struct sockaddr_in *a4 =3D (struct sockaddr_in *) a;
+-        struct sockaddr_in *b4 =3D (struct sockaddr_in *) b;
+-        return a4->sin_addr.s_addr =3D=3D b4->sin_addr.s_addr
+-               && a4->sin_port =3D=3D b4->sin_port;
+-    }
+-    case AF_INET6:
+-    {
+-        struct sockaddr_in6 *a6 =3D (struct sockaddr_in6 *) a;
+-        struct sockaddr_in6 *b6 =3D (struct sockaddr_in6 *) b;
+-        return (in6_equal(&a6->sin6_addr, &b6->sin6_addr)
+-                && a6->sin6_port =3D=3D b6->sin6_port);
+-    }
+-    default:
+-        g_assert_not_reached();
+-    }
+-
+-    return 0;
+-}
+-
+-static inline socklen_t sockaddr_size(struct sockaddr_storage *a)
+-{
+-    switch (a->ss_family) {
+-    case AF_INET:
+-        return sizeof(struct sockaddr_in);
+-    case AF_INET6:
+-        return sizeof(struct sockaddr_in6);
+-    default:
+-        g_assert_not_reached();
+-    }
+-}
+-
+-struct socket *solookup(struct socket **, struct socket *,
+-        struct sockaddr_storage *, struct sockaddr_storage *);
+-struct socket *socreate(Slirp *);
+-void sofree(struct socket *);
+-int soread(struct socket *);
+-int sorecvoob(struct socket *);
+-int sosendoob(struct socket *);
+-int sowrite(struct socket *);
+-void sorecvfrom(struct socket *);
+-int sosendto(struct socket *, struct mbuf *);
+-struct socket * tcp_listen(Slirp *, uint32_t, unsigned, uint32_t, unsign=
+ed,
+-                               int);
+-void soisfconnecting(register struct socket *);
+-void soisfconnected(register struct socket *);
+-void sofwdrain(struct socket *);
+-struct iovec; /* For win32 */
+-size_t sopreprbuf(struct socket *so, struct iovec *iov, int *np);
+-int soreadbuf(struct socket *so, const char *buf, int size);
+-
+-void sotranslate_out(struct socket *, struct sockaddr_storage *);
+-void sotranslate_in(struct socket *, struct sockaddr_storage *);
+-void sotranslate_accept(struct socket *);
+-void sodrop(struct socket *, int num);
+-
+-
+-#endif /* SLIRP_SOCKET_H */
+diff --git a/slirp/src/stream.h b/slirp/src/stream.h
+deleted file mode 100644
+index 08bb5b6610..0000000000
+--- a/slirp/src/stream.h
++++ /dev/null
+@@ -1,35 +0,0 @@
+-/* SPDX-License-Identifier: BSD-3-Clause */
+-#ifndef STREAM_H_
+-#define STREAM_H_
+-
+-#include "libslirp.h"
+-
+-typedef struct SlirpIStream {
+-    SlirpReadCb read_cb;
+-    void *opaque;
+-} SlirpIStream;
+-
+-typedef struct SlirpOStream {
+-    SlirpWriteCb write_cb;
+-    void *opaque;
+-} SlirpOStream;
+-
+-bool slirp_istream_read(SlirpIStream *f, void *buf, size_t size);
+-bool slirp_ostream_write(SlirpOStream *f, const void *buf, size_t size);
+-
+-uint8_t slirp_istream_read_u8(SlirpIStream *f);
+-bool slirp_ostream_write_u8(SlirpOStream *f, uint8_t b);
+-
+-uint16_t slirp_istream_read_u16(SlirpIStream *f);
+-bool slirp_ostream_write_u16(SlirpOStream *f, uint16_t b);
+-
+-uint32_t slirp_istream_read_u32(SlirpIStream *f);
+-bool slirp_ostream_write_u32(SlirpOStream *f, uint32_t b);
+-
+-int16_t slirp_istream_read_i16(SlirpIStream *f);
+-bool slirp_ostream_write_i16(SlirpOStream *f, int16_t b);
+-
+-int32_t slirp_istream_read_i32(SlirpIStream *f);
+-bool slirp_ostream_write_i32(SlirpOStream *f, int32_t b);
+-
+-#endif /* STREAM_H_ */
+diff --git a/slirp/src/tcp.h b/slirp/src/tcp.h
+deleted file mode 100644
+index 79d3251bb5..0000000000
+--- a/slirp/src/tcp.h
++++ /dev/null
+@@ -1,181 +0,0 @@
+-/* SPDX-License-Identifier: BSD-3-Clause */
+-/*
+- * Copyright (c) 1982, 1986, 1993
+- *	The Regents of the University of California.  All rights reserved.
+- *
+- * Redistribution and use in source and binary forms, with or without
+- * modification, are permitted provided that the following conditions
+- * are met:
+- * 1. Redistributions of source code must retain the above copyright
+- *    notice, this list of conditions and the following disclaimer.
+- * 2. Redistributions in binary form must reproduce the above copyright
+- *    notice, this list of conditions and the following disclaimer in th=
+e
+- *    documentation and/or other materials provided with the distributio=
+n.
+- * 3. Neither the name of the University nor the names of its contributo=
+rs
+- *    may be used to endorse or promote products derived from this softw=
+are
+- *    without specific prior written permission.
+- *
+- * THIS SOFTWARE IS PROVIDED BY THE REGENTS AND CONTRIBUTORS ``AS IS'' A=
+ND
+- * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+- * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PU=
+RPOSE
+- * ARE DISCLAIMED.  IN NO EVENT SHALL THE REGENTS OR CONTRIBUTORS BE LIA=
+BLE
+- * FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUE=
+NTIAL
+- * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOO=
+DS
+- * OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
+- * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, S=
+TRICT
+- * LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY=
+ WAY
+- * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY O=
+F
+- * SUCH DAMAGE.
+- *
+- *	@(#)tcp.h	8.1 (Berkeley) 6/10/93
+- * tcp.h,v 1.3 1994/08/21 05:27:34 paul Exp
+- */
+-
+-#ifndef TCP_H
+-#define TCP_H
+-
+-#include <glib.h>
+-
+-typedef	uint32_t tcp_seq;
+-
+-#define      PR_SLOWHZ       2               /* 2 slow timeouts per seco=
+nd (approx) */
+-#define      PR_FASTHZ       5               /* 5 fast timeouts per seco=
+nd (not important) */
+-
+-#define TCP_SNDSPACE 8192
+-#define TCP_RCVSPACE 8192
+-
+-/*
+- * TCP header.
+- * Per RFC 793, September, 1981.
+- */
+-#define tcphdr slirp_tcphdr
+-struct tcphdr {
+-	uint16_t th_sport;              /* source port */
+-	uint16_t th_dport;              /* destination port */
+-	tcp_seq	th_seq;			/* sequence number */
+-	tcp_seq	th_ack;			/* acknowledgement number */
+-#if G_BYTE_ORDER =3D=3D G_BIG_ENDIAN
+-	uint8_t	th_off:4,		/* data offset */
+-		th_x2:4;		/* (unused) */
+-#else
+-	uint8_t	th_x2:4,		/* (unused) */
+-		th_off:4;		/* data offset */
+-#endif
+-	uint8_t th_flags;
+-	uint16_t th_win;                /* window */
+-	uint16_t th_sum;                /* checksum */
+-	uint16_t th_urp;                /* urgent pointer */
+-};
+-
+-#include "tcp_var.h"
+-
+-#ifndef TH_FIN
+-#define	TH_FIN	0x01
+-#define	TH_SYN	0x02
+-#define	TH_RST	0x04
+-#define	TH_PUSH	0x08
+-#define	TH_ACK	0x10
+-#define	TH_URG	0x20
+-#endif
+-
+-#ifndef TCPOPT_EOL
+-#define	TCPOPT_EOL		0
+-#define	TCPOPT_NOP		1
+-#define	TCPOPT_MAXSEG		2
+-#define TCPOPT_WINDOW		3
+-#define TCPOPT_SACK_PERMITTED	4		/* Experimental */
+-#define TCPOPT_SACK		5		/* Experimental */
+-#define TCPOPT_TIMESTAMP	8
+-
+-#define TCPOPT_TSTAMP_HDR	\
+-    (TCPOPT_NOP<<24|TCPOPT_NOP<<16|TCPOPT_TIMESTAMP<<8|TCPOLEN_TIMESTAMP=
+)
+-#endif
+-
+-#ifndef TCPOLEN_MAXSEG
+-#define    TCPOLEN_MAXSEG		4
+-#define    TCPOLEN_WINDOW		3
+-#define    TCPOLEN_SACK_PERMITTED	2
+-#define    TCPOLEN_TIMESTAMP		10
+-#define    TCPOLEN_TSTAMP_APPA		(TCPOLEN_TIMESTAMP+2) /* appendix A */
+-#endif
+-
+-/*
+- * Default maximum segment size for TCP.
+- * With an IP MSS of 576, this is 536,
+- * but 512 is probably more convenient.
+- * This should be defined as MIN(512, IP_MSS - sizeof (struct tcpiphdr))=
+.
+- *
+- * We make this 1460 because we only care about Ethernet in the qemu con=
+text.
+- */
+-#undef TCP_MSS
+-#define	TCP_MSS	1460
+-#undef TCP6_MSS
+-#define TCP6_MSS 1440
+-
+-#undef TCP_MAXWIN
+-#define	TCP_MAXWIN	65535	/* largest value for (unscaled) window */
+-
+-#undef TCP_MAX_WINSHIFT
+-#define TCP_MAX_WINSHIFT	14	/* maximum window shift */
+-
+-/*
+- * User-settable options (used with setsockopt).
+- *
+- * We don't use the system headers on unix because we have conflicting
+- * local structures. We can't avoid the system definitions on Windows,
+- * so we undefine them.
+- */
+-#undef TCP_NODELAY
+-#define	TCP_NODELAY	0x01	/* don't delay send to coalesce packets */
+-#undef TCP_MAXSEG
+-
+-/*
+- * TCP FSM state definitions.
+- * Per RFC793, September, 1981.
+- */
+-
+-#define TCP_NSTATES     11
+-
+-#define TCPS_CLOSED             0       /* closed */
+-#define TCPS_LISTEN             1       /* listening for connection */
+-#define TCPS_SYN_SENT           2       /* active, have sent syn */
+-#define TCPS_SYN_RECEIVED       3       /* have send and received syn */
+-/* states < TCPS_ESTABLISHED are those where connections not established=
+ */
+-#define TCPS_ESTABLISHED        4       /* established */
+-#define TCPS_CLOSE_WAIT         5       /* rcvd fin, waiting for close *=
+/
+-/* states > TCPS_CLOSE_WAIT are those where user has closed */
+-#define TCPS_FIN_WAIT_1         6       /* have closed, sent fin */
+-#define TCPS_CLOSING            7       /* closed xchd FIN; await FIN AC=
+K */
+-#define TCPS_LAST_ACK           8       /* had fin and close; await FIN =
+ACK */
+-/* states > TCPS_CLOSE_WAIT && < TCPS_FIN_WAIT_2 await ACK of FIN */
+-#define TCPS_FIN_WAIT_2         9       /* have closed, fin is acked */
+-#define TCPS_TIME_WAIT          10      /* in 2*msl quiet wait after clo=
+se */
+-
+-#define TCPS_HAVERCVDSYN(s)     ((s) >=3D TCPS_SYN_RECEIVED)
+-#define TCPS_HAVEESTABLISHED(s) ((s) >=3D TCPS_ESTABLISHED)
+-#define TCPS_HAVERCVDFIN(s)     ((s) >=3D TCPS_TIME_WAIT)
+-
+-/*
+- * TCP sequence numbers are 32 bit integers operated
+- * on with modular arithmetic.  These macros can be
+- * used to compare such integers.
+- */
+-#define SEQ_LT(a,b)     ((int)((a)-(b)) < 0)
+-#define SEQ_LEQ(a,b)    ((int)((a)-(b)) <=3D 0)
+-#define SEQ_GT(a,b)     ((int)((a)-(b)) > 0)
+-#define SEQ_GEQ(a,b)    ((int)((a)-(b)) >=3D 0)
+-
+-/*
+- * Macros to initialize tcp sequence numbers for
+- * send and receive from initial send and receive
+- * sequence numbers.
+- */
+-#define tcp_rcvseqinit(tp) \
+-     (tp)->rcv_adv =3D (tp)->rcv_nxt =3D (tp)->irs + 1
+-
+-#define tcp_sendseqinit(tp) \
+-    (tp)->snd_una =3D (tp)->snd_nxt =3D (tp)->snd_max =3D (tp)->snd_up =3D=
+ (tp)->iss
+-
+-#define TCP_ISSINCR     (125*1024)      /* increment for tcp_iss each se=
+cond */
+-
+-#endif
+diff --git a/slirp/src/tcp_timer.h b/slirp/src/tcp_timer.h
+deleted file mode 100644
+index 709f63987a..0000000000
+--- a/slirp/src/tcp_timer.h
++++ /dev/null
+@@ -1,128 +0,0 @@
+-/* SPDX-License-Identifier: BSD-3-Clause */
+-/*
+- * Copyright (c) 1982, 1986, 1993
+- *	The Regents of the University of California.  All rights reserved.
+- *
+- * Redistribution and use in source and binary forms, with or without
+- * modification, are permitted provided that the following conditions
+- * are met:
+- * 1. Redistributions of source code must retain the above copyright
+- *    notice, this list of conditions and the following disclaimer.
+- * 2. Redistributions in binary form must reproduce the above copyright
+- *    notice, this list of conditions and the following disclaimer in th=
+e
+- *    documentation and/or other materials provided with the distributio=
+n.
+- * 3. Neither the name of the University nor the names of its contributo=
+rs
+- *    may be used to endorse or promote products derived from this softw=
+are
+- *    without specific prior written permission.
+- *
+- * THIS SOFTWARE IS PROVIDED BY THE REGENTS AND CONTRIBUTORS ``AS IS'' A=
+ND
+- * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+- * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PU=
+RPOSE
+- * ARE DISCLAIMED.  IN NO EVENT SHALL THE REGENTS OR CONTRIBUTORS BE LIA=
+BLE
+- * FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUE=
+NTIAL
+- * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOO=
+DS
+- * OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
+- * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, S=
+TRICT
+- * LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY=
+ WAY
+- * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY O=
+F
+- * SUCH DAMAGE.
+- *
+- *	@(#)tcp_timer.h	8.1 (Berkeley) 6/10/93
+- * tcp_timer.h,v 1.4 1994/08/21 05:27:38 paul Exp
+- */
+-
+-#ifndef TCP_TIMER_H
+-#define TCP_TIMER_H
+-
+-/*
+- * Definitions of the TCP timers.  These timers are counted
+- * down PR_SLOWHZ times a second.
+- */
+-#define	TCPT_NTIMERS	4
+-
+-#define	TCPT_REXMT	0		/* retransmit */
+-#define	TCPT_PERSIST	1		/* retransmit persistence */
+-#define	TCPT_KEEP	2		/* keep alive */
+-#define	TCPT_2MSL	3		/* 2*msl quiet time timer */
+-
+-/*
+- * The TCPT_REXMT timer is used to force retransmissions.
+- * The TCP has the TCPT_REXMT timer set whenever segments
+- * have been sent for which ACKs are expected but not yet
+- * received.  If an ACK is received which advances tp->snd_una,
+- * then the retransmit timer is cleared (if there are no more
+- * outstanding segments) or reset to the base value (if there
+- * are more ACKs expected).  Whenever the retransmit timer goes off,
+- * we retransmit one unacknowledged segment, and do a backoff
+- * on the retransmit timer.
+- *
+- * The TCPT_PERSIST timer is used to keep window size information
+- * flowing even if the window goes shut.  If all previous transmissions
+- * have been acknowledged (so that there are no retransmissions in progr=
+ess),
+- * and the window is too small to bother sending anything, then we start
+- * the TCPT_PERSIST timer.  When it expires, if the window is nonzero,
+- * we go to transmit state.  Otherwise, at intervals send a single byte
+- * into the peer's window to force him to update our window information.
+- * We do this at most as often as TCPT_PERSMIN time intervals,
+- * but no more frequently than the current estimate of round-trip
+- * packet time.  The TCPT_PERSIST timer is cleared whenever we receive
+- * a window update from the peer.
+- *
+- * The TCPT_KEEP timer is used to keep connections alive.  If an
+- * connection is idle (no segments received) for TCPTV_KEEP_INIT amount =
+of time,
+- * but not yet established, then we drop the connection.  Once the conne=
+ction
+- * is established, if the connection is idle for TCPTV_KEEP_IDLE time
+- * (and keepalives have been enabled on the socket), we begin to probe
+- * the connection.  We force the peer to send us a segment by sending:
+- *	<SEQ=3DSND.UNA-1><ACK=3DRCV.NXT><CTL=3DACK>
+- * This segment is (deliberately) outside the window, and should elicit
+- * an ack segment in response from the peer.  If, despite the TCPT_KEEP
+- * initiated segments we cannot elicit a response from a peer in TCPT_MA=
+XIDLE
+- * amount of time probing, then we drop the connection.
+- */
+-
+-/*
+- * Time constants.
+- */
+-#define TCPTV_MSL       ( 5*PR_SLOWHZ)          /* max seg lifetime (hah=
+!) */
+-
+-#define	TCPTV_SRTTBASE	0			/* base roundtrip time;
+-						   if 0, no idea yet */
+-#define	TCPTV_SRTTDFLT	(  3*PR_SLOWHZ)		/* assumed RTT if no info */
+-
+-#define	TCPTV_PERSMIN	(  5*PR_SLOWHZ)		/* retransmit persistence */
+-#define	TCPTV_PERSMAX	( 60*PR_SLOWHZ)		/* maximum persist interval */
+-
+-#define	TCPTV_KEEP_INIT	( 75*PR_SLOWHZ)		/* initial connect keep alive *=
+/
+-#define	TCPTV_KEEP_IDLE	(120*60*PR_SLOWHZ)	/* dflt time before probing *=
+/
+-#define	TCPTV_KEEPINTVL	( 75*PR_SLOWHZ)		/* default probe interval */
+-#define	TCPTV_KEEPCNT	8			/* max probes before drop */
+-
+-#define	TCPTV_MIN	(  1*PR_SLOWHZ)		/* minimum allowable value */
+-#define TCPTV_REXMTMAX  ( 12*PR_SLOWHZ)		/* max allowable REXMT value */
+-
+-#define	TCP_LINGERTIME	120			/* linger at most 2 minutes */
+-
+-#define TCP_MAXRXTSHIFT 12                      /* maximum retransmits *=
+/
+-
+-
+-/*
+- * Force a time value to be in a certain range.
+- */
+-#define	TCPT_RANGESET(tv, value, tvmin, tvmax) { \
+-	(tv) =3D (value); \
+-	if ((tv) < (tvmin)) \
+-		(tv) =3D (tvmin); \
+-	else if ((tv) > (tvmax)) \
+-		(tv) =3D (tvmax); \
+-}
+-
+-extern const int tcp_backoff[];
+-
+-struct tcpcb;
+-
+-void tcp_fasttimo(Slirp *);
+-void tcp_slowtimo(Slirp *);
+-void tcp_canceltimers(struct tcpcb *);
+-
+-#endif
+diff --git a/slirp/src/tcp_var.h b/slirp/src/tcp_var.h
+deleted file mode 100644
+index 162be6e95e..0000000000
+--- a/slirp/src/tcp_var.h
++++ /dev/null
+@@ -1,162 +0,0 @@
+-/* SPDX-License-Identifier: BSD-3-Clause */
+-/*
+- * Copyright (c) 1982, 1986, 1993, 1994
+- *	The Regents of the University of California.  All rights reserved.
+- *
+- * Redistribution and use in source and binary forms, with or without
+- * modification, are permitted provided that the following conditions
+- * are met:
+- * 1. Redistributions of source code must retain the above copyright
+- *    notice, this list of conditions and the following disclaimer.
+- * 2. Redistributions in binary form must reproduce the above copyright
+- *    notice, this list of conditions and the following disclaimer in th=
+e
+- *    documentation and/or other materials provided with the distributio=
+n.
+- * 3. Neither the name of the University nor the names of its contributo=
+rs
+- *    may be used to endorse or promote products derived from this softw=
+are
+- *    without specific prior written permission.
+- *
+- * THIS SOFTWARE IS PROVIDED BY THE REGENTS AND CONTRIBUTORS ``AS IS'' A=
+ND
+- * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+- * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PU=
+RPOSE
+- * ARE DISCLAIMED.  IN NO EVENT SHALL THE REGENTS OR CONTRIBUTORS BE LIA=
+BLE
+- * FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUE=
+NTIAL
+- * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOO=
+DS
+- * OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
+- * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, S=
+TRICT
+- * LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY=
+ WAY
+- * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY O=
+F
+- * SUCH DAMAGE.
+- *
+- *	@(#)tcp_var.h	8.3 (Berkeley) 4/10/94
+- * tcp_var.h,v 1.3 1994/08/21 05:27:39 paul Exp
+- */
+-
+-#ifndef TCP_VAR_H
+-#define TCP_VAR_H
+-
+-#include "tcpip.h"
+-#include "tcp_timer.h"
+-
+-/*
+- * Tcp control block, one per tcp; fields:
+- */
+-struct tcpcb {
+-	struct tcpiphdr *seg_next;	/* sequencing queue */
+-	struct tcpiphdr *seg_prev;
+-	short	t_state;		/* state of this connection */
+-	short	t_timer[TCPT_NTIMERS];	/* tcp timers */
+-	short	t_rxtshift;		/* log(2) of rexmt exp. backoff */
+-	short	t_rxtcur;		/* current retransmit value */
+-	short	t_dupacks;		/* consecutive dup acks recd */
+-	uint16_t	t_maxseg;		/* maximum segment size */
+-	uint8_t t_force;		/* 1 if forcing out a byte */
+-	uint16_t	t_flags;
+-#define	TF_ACKNOW	0x0001		/* ack peer immediately */
+-#define	TF_DELACK	0x0002		/* ack, but try to delay it */
+-#define	TF_NODELAY	0x0004		/* don't delay packets to coalesce */
+-#define	TF_NOOPT	0x0008		/* don't use tcp options */
+-#define	TF_SENTFIN	0x0010		/* have sent FIN */
+-#define	TF_REQ_SCALE	0x0020		/* have/will request window scaling */
+-#define	TF_RCVD_SCALE	0x0040		/* other side has requested scaling */
+-#define	TF_REQ_TSTMP	0x0080		/* have/will request timestamps */
+-#define	TF_RCVD_TSTMP	0x0100		/* a timestamp was received in SYN */
+-#define	TF_SACK_PERMIT	0x0200		/* other side said I could SACK */
+-
+-	struct	tcpiphdr t_template;    /* static skeletal packet for xmit */
+-
+-	struct	socket *t_socket;		/* back pointer to socket */
+-/*
+- * The following fields are used as in the protocol specification.
+- * See RFC783, Dec. 1981, page 21.
+- */
+-/* send sequence variables */
+-	tcp_seq	snd_una;		/* send unacknowledged */
+-	tcp_seq	snd_nxt;		/* send next */
+-	tcp_seq	snd_up;			/* send urgent pointer */
+-	tcp_seq	snd_wl1;		/* window update seg seq number */
+-	tcp_seq	snd_wl2;		/* window update seg ack number */
+-	tcp_seq	iss;			/* initial send sequence number */
+-	uint32_t snd_wnd;		/* send window */
+-/* receive sequence variables */
+-	uint32_t rcv_wnd;		/* receive window */
+-	tcp_seq	rcv_nxt;		/* receive next */
+-	tcp_seq	rcv_up;			/* receive urgent pointer */
+-	tcp_seq	irs;			/* initial receive sequence number */
+-/*
+- * Additional variables for this implementation.
+- */
+-/* receive variables */
+-	tcp_seq	rcv_adv;		/* advertised window */
+-/* retransmit variables */
+-	tcp_seq	snd_max;		/* highest sequence number sent;
+-					 * used to recognize retransmits
+-					 */
+-/* congestion control (for slow start, source quench, retransmit after l=
+oss) */
+-	uint32_t snd_cwnd;		/* congestion-controlled window */
+-	uint32_t snd_ssthresh;		/* snd_cwnd size threshold for
+-					 * for slow start exponential to
+-					 * linear switch
+-					 */
+-/*
+- * transmit timing stuff.  See below for scale of srtt and rttvar.
+- * "Variance" is actually smoothed difference.
+- */
+-	short	t_idle;			/* inactivity time */
+-	short	t_rtt;			/* round trip time */
+-	tcp_seq	t_rtseq;		/* sequence number being timed */
+-	short	t_srtt;			/* smoothed round-trip time */
+-	short	t_rttvar;		/* variance in round-trip time */
+-	uint16_t	t_rttmin;		/* minimum rtt allowed */
+-	uint32_t max_sndwnd;		/* largest window peer has offered */
+-
+-/* out-of-band data */
+-	uint8_t	t_oobflags;		/* have some */
+-	uint8_t	t_iobc;			/* input character */
+-#define	TCPOOB_HAVEDATA	0x01
+-#define	TCPOOB_HADDATA	0x02
+-	short	t_softerror;		/* possible error not yet reported */
+-
+-/* RFC 1323 variables */
+-	uint8_t	snd_scale;		/* window scaling for send window */
+-	uint8_t	rcv_scale;		/* window scaling for recv window */
+-	uint8_t	request_r_scale;	/* pending window scaling */
+-	uint8_t	requested_s_scale;
+-	uint32_t	ts_recent;		/* timestamp echo data */
+-	uint32_t	ts_recent_age;		/* when last updated */
+-	tcp_seq	last_ack_sent;
+-
+-};
+-
+-#define	sototcpcb(so)	((so)->so_tcpcb)
+-
+-/*
+- * The smoothed round-trip time and estimated variance
+- * are stored as fixed point numbers scaled by the values below.
+- * For convenience, these scales are also used in smoothing the average
+- * (smoothed =3D (1/scale)sample + ((scale-1)/scale)smoothed).
+- * With these scales, srtt has 3 bits to the right of the binary point,
+- * and thus an "ALPHA" of 0.875.  rttvar has 2 bits to the right of the
+- * binary point, and is smoothed with an ALPHA of 0.75.
+- */
+-#define	TCP_RTT_SCALE		8	/* multiplier for srtt; 3 bits frac. */
+-#define	TCP_RTT_SHIFT		3	/* shift for srtt; 3 bits frac. */
+-#define	TCP_RTTVAR_SCALE	4	/* multiplier for rttvar; 2 bits */
+-#define	TCP_RTTVAR_SHIFT	2	/* multiplier for rttvar; 2 bits */
+-
+-/*
+- * The initial retransmission should happen at rtt + 4 * rttvar.
+- * Because of the way we do the smoothing, srtt and rttvar
+- * will each average +1/2 tick of bias.  When we compute
+- * the retransmit timer, we want 1/2 tick of rounding and
+- * 1 extra tick because of +-1/2 tick uncertainty in the
+- * firing of the timer.  The bias will give us exactly the
+- * 1.5 tick we need.  But, because the bias is
+- * statistical, we have to test that we don't drop below
+- * the minimum feasible timer (which is 2 ticks).
+- * This macro assumes that the value of TCP_RTTVAR_SCALE
+- * is the same as the multiplier for rttvar.
+- */
+-#define	TCP_REXMTVAL(tp) \
+-	(((tp)->t_srtt >> TCP_RTT_SHIFT) + (tp)->t_rttvar)
+-
+-#endif
+diff --git a/slirp/src/tcpip.h b/slirp/src/tcpip.h
+deleted file mode 100644
+index 560a86417c..0000000000
+--- a/slirp/src/tcpip.h
++++ /dev/null
+@@ -1,102 +0,0 @@
+-/* SPDX-License-Identifier: BSD-3-Clause */
+-/*
+- * Copyright (c) 1982, 1986, 1993
+- *	The Regents of the University of California.  All rights reserved.
+- *
+- * Redistribution and use in source and binary forms, with or without
+- * modification, are permitted provided that the following conditions
+- * are met:
+- * 1. Redistributions of source code must retain the above copyright
+- *    notice, this list of conditions and the following disclaimer.
+- * 2. Redistributions in binary form must reproduce the above copyright
+- *    notice, this list of conditions and the following disclaimer in th=
+e
+- *    documentation and/or other materials provided with the distributio=
+n.
+- * 3. Neither the name of the University nor the names of its contributo=
+rs
+- *    may be used to endorse or promote products derived from this softw=
+are
+- *    without specific prior written permission.
+- *
+- * THIS SOFTWARE IS PROVIDED BY THE REGENTS AND CONTRIBUTORS ``AS IS'' A=
+ND
+- * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+- * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PU=
+RPOSE
+- * ARE DISCLAIMED.  IN NO EVENT SHALL THE REGENTS OR CONTRIBUTORS BE LIA=
+BLE
+- * FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUE=
+NTIAL
+- * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOO=
+DS
+- * OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
+- * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, S=
+TRICT
+- * LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY=
+ WAY
+- * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY O=
+F
+- * SUCH DAMAGE.
+- *
+- *	@(#)tcpip.h	8.1 (Berkeley) 6/10/93
+- * tcpip.h,v 1.3 1994/08/21 05:27:40 paul Exp
+- */
+-
+-#ifndef TCPIP_H
+-#define TCPIP_H
+-
+-/*
+- * Tcp+ip header, after ip options removed.
+- */
+-struct tcpiphdr {
+-    struct mbuf_ptr ih_mbuf;	/* backpointer to mbuf */
+-    union {
+-        struct {
+-            struct  in_addr ih_src; /* source internet address */
+-            struct  in_addr ih_dst; /* destination internet address */
+-            uint8_t ih_x1;          /* (unused) */
+-            uint8_t ih_pr;          /* protocol */
+-        } ti_i4;
+-        struct {
+-            struct  in6_addr ih_src;
+-            struct  in6_addr ih_dst;
+-            uint8_t ih_x1;
+-            uint8_t ih_nh;
+-        } ti_i6;
+-    } ti;
+-    uint16_t    ti_x0;
+-    uint16_t    ti_len;             /* protocol length */
+-    struct      tcphdr ti_t;        /* tcp header */
+-};
+-#define	ti_mbuf		ih_mbuf.mptr
+-#define	ti_pr		ti.ti_i4.ih_pr
+-#define	ti_src		ti.ti_i4.ih_src
+-#define	ti_dst		ti.ti_i4.ih_dst
+-#define	ti_src6		ti.ti_i6.ih_src
+-#define	ti_dst6		ti.ti_i6.ih_dst
+-#define	ti_nh6		ti.ti_i6.ih_nh
+-#define	ti_sport	ti_t.th_sport
+-#define	ti_dport	ti_t.th_dport
+-#define	ti_seq		ti_t.th_seq
+-#define	ti_ack		ti_t.th_ack
+-#define	ti_x2		ti_t.th_x2
+-#define	ti_off		ti_t.th_off
+-#define	ti_flags	ti_t.th_flags
+-#define	ti_win		ti_t.th_win
+-#define	ti_sum		ti_t.th_sum
+-#define	ti_urp		ti_t.th_urp
+-
+-#define tcpiphdr2qlink(T) ((struct qlink*)(((char*)(T)) - sizeof(struct =
+qlink)))
+-#define qlink2tcpiphdr(Q) ((struct tcpiphdr*)(((char*)(Q)) + sizeof(stru=
+ct qlink)))
+-#define tcpiphdr_next(T) qlink2tcpiphdr(tcpiphdr2qlink(T)->next)
+-#define tcpiphdr_prev(T) qlink2tcpiphdr(tcpiphdr2qlink(T)->prev)
+-#define tcpfrag_list_first(T) qlink2tcpiphdr((T)->seg_next)
+-#define tcpfrag_list_end(F, T) (tcpiphdr2qlink(F) =3D=3D (struct qlink*)=
+(T))
+-#define tcpfrag_list_empty(T) ((T)->seg_next =3D=3D (struct tcpiphdr*)(T=
+))
+-
+-/* This is the difference between the size of a tcpiphdr structure, and =
+the
+- * size of actual ip+tcp headers, rounded up since we need to align data=
+.  */
+-#define TCPIPHDR_DELTA\
+-    (MAX(0,\
+-         (sizeof(struct tcpiphdr)\
+-          - sizeof(struct ip) - sizeof(struct tcphdr) + 3) & ~3))
+-
+-/*
+- * Just a clean way to get to the first byte
+- * of the packet
+- */
+-struct tcpiphdr_2 {
+-	struct tcpiphdr dummy;
+-	char first_char;
+-};
+-
+-#endif
+diff --git a/slirp/src/tftp.h b/slirp/src/tftp.h
+deleted file mode 100644
+index 3fe3b70205..0000000000
+--- a/slirp/src/tftp.h
++++ /dev/null
+@@ -1,52 +0,0 @@
+-/* SPDX-License-Identifier: BSD-3-Clause */
+-/* tftp defines */
+-
+-#ifndef SLIRP_TFTP_H
+-#define SLIRP_TFTP_H
+-
+-#define TFTP_SESSIONS_MAX 20
+-
+-#define TFTP_SERVER	69
+-
+-#define TFTP_RRQ    1
+-#define TFTP_WRQ    2
+-#define TFTP_DATA   3
+-#define TFTP_ACK    4
+-#define TFTP_ERROR  5
+-#define TFTP_OACK   6
+-
+-#define TFTP_FILENAME_MAX 512
+-#define TFTP_BLOCKSIZE_MAX 1428
+-
+-struct tftp_t {
+-  struct udphdr udp;
+-  uint16_t tp_op;
+-  union {
+-    struct {
+-      uint16_t tp_block_nr;
+-      uint8_t tp_buf[TFTP_BLOCKSIZE_MAX];
+-    } tp_data;
+-    struct {
+-      uint16_t tp_error_code;
+-      uint8_t tp_msg[TFTP_BLOCKSIZE_MAX];
+-    } tp_error;
+-    char tp_buf[TFTP_BLOCKSIZE_MAX + 2];
+-  } x;
+-} __attribute__((packed));
+-
+-struct tftp_session {
+-    Slirp *slirp;
+-    char *filename;
+-    int fd;
+-    uint16_t block_size;
+-
+-    struct sockaddr_storage client_addr;
+-    uint16_t client_port;
+-    uint32_t block_nr;
+-
+-    int timestamp;
+-};
+-
+-void tftp_input(struct sockaddr_storage *srcsas, struct mbuf *m);
+-
+-#endif
+diff --git a/slirp/src/udp.h b/slirp/src/udp.h
+deleted file mode 100644
+index 29c0297179..0000000000
+--- a/slirp/src/udp.h
++++ /dev/null
+@@ -1,92 +0,0 @@
+-/* SPDX-License-Identifier: BSD-3-Clause */
+-/*
+- * Copyright (c) 1982, 1986, 1993
+- *	The Regents of the University of California.  All rights reserved.
+- *
+- * Redistribution and use in source and binary forms, with or without
+- * modification, are permitted provided that the following conditions
+- * are met:
+- * 1. Redistributions of source code must retain the above copyright
+- *    notice, this list of conditions and the following disclaimer.
+- * 2. Redistributions in binary form must reproduce the above copyright
+- *    notice, this list of conditions and the following disclaimer in th=
+e
+- *    documentation and/or other materials provided with the distributio=
+n.
+- * 3. Neither the name of the University nor the names of its contributo=
+rs
+- *    may be used to endorse or promote products derived from this softw=
+are
+- *    without specific prior written permission.
+- *
+- * THIS SOFTWARE IS PROVIDED BY THE REGENTS AND CONTRIBUTORS ``AS IS'' A=
+ND
+- * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+- * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PU=
+RPOSE
+- * ARE DISCLAIMED.  IN NO EVENT SHALL THE REGENTS OR CONTRIBUTORS BE LIA=
+BLE
+- * FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUE=
+NTIAL
+- * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOO=
+DS
+- * OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
+- * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, S=
+TRICT
+- * LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY=
+ WAY
+- * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY O=
+F
+- * SUCH DAMAGE.
+- *
+- *	@(#)udp.h	8.1 (Berkeley) 6/10/93
+- * udp.h,v 1.3 1994/08/21 05:27:41 paul Exp
+- */
+-
+-#ifndef UDP_H
+-#define UDP_H
+-
+-#define UDP_TTL 0x60
+-#define UDP_UDPDATALEN 16192
+-
+-/*
+- * Udp protocol header.
+- * Per RFC 768, September, 1981.
+- */
+-struct udphdr {
+-    uint16_t uh_sport;          /* source port */
+-    uint16_t uh_dport;          /* destination port */
+-    int16_t  uh_ulen;           /* udp length */
+-    uint16_t uh_sum;            /* udp checksum */
+-};
+-
+-/*
+- * UDP kernel structures and variables.
+- */
+-struct udpiphdr {
+-	        struct  ipovly ui_i;            /* overlaid ip structure */
+-	        struct  udphdr ui_u;            /* udp header */
+-};
+-#define ui_mbuf         ui_i.ih_mbuf.mptr
+-#define ui_x1           ui_i.ih_x1
+-#define ui_pr           ui_i.ih_pr
+-#define ui_len          ui_i.ih_len
+-#define ui_src          ui_i.ih_src
+-#define ui_dst          ui_i.ih_dst
+-#define ui_sport        ui_u.uh_sport
+-#define ui_dport        ui_u.uh_dport
+-#define ui_ulen         ui_u.uh_ulen
+-#define ui_sum          ui_u.uh_sum
+-
+-/*
+- * Names for UDP sysctl objects
+- */
+-#define UDPCTL_CHECKSUM         1       /* checksum UDP packets */
+-#define UDPCTL_MAXID            2
+-
+-struct mbuf;
+-
+-void udp_init(Slirp *);
+-void udp_cleanup(Slirp *);
+-void udp_input(register struct mbuf *, int);
+-int udp_attach(struct socket *, unsigned short af);
+-void udp_detach(struct socket *);
+-struct socket * udp_listen(Slirp *, uint32_t, unsigned, uint32_t, unsign=
+ed,
+-                           int);
+-int udp_output(struct socket *so, struct mbuf *m,
+-                struct sockaddr_in *saddr, struct sockaddr_in *daddr,
+-                int iptos);
+-
+-void udp6_input(register struct mbuf *);
+-int udp6_output(struct socket *so, struct mbuf *m,
+-                struct sockaddr_in6 *saddr, struct sockaddr_in6 *daddr);
+-
+-#endif
+diff --git a/slirp/src/util.h b/slirp/src/util.h
+deleted file mode 100644
+index 01f1e0e068..0000000000
+--- a/slirp/src/util.h
++++ /dev/null
+@@ -1,175 +0,0 @@
+-/* SPDX-License-Identifier: MIT */
+-/*
+- * Copyright (c) 2003-2008 Fabrice Bellard
+- * Copyright (c) 2010-2019 Red Hat, Inc.
+- *
+- * Permission is hereby granted, free of charge, to any person obtaining=
+ a copy
+- * of this software and associated documentation files (the "Software"),=
+ to deal
+- * in the Software without restriction, including without limitation the=
+ rights
+- * to use, copy, modify, merge, publish, distribute, sublicense, and/or =
+sell
+- * copies of the Software, and to permit persons to whom the Software is
+- * furnished to do so, subject to the following conditions:
+- *
+- * The above copyright notice and this permission notice shall be includ=
+ed in
+- * all copies or substantial portions of the Software.
+- *
+- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRE=
+SS OR
+- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILI=
+TY,
+- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHA=
+LL
+- * THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR =
+OTHER
+- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISI=
+NG FROM,
+- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALING=
+S IN
+- * THE SOFTWARE.
+- */
+-#ifndef UTIL_H_
+-#define UTIL_H_
+-
+-#include <stdlib.h>
+-#include <stdio.h>
+-#include <assert.h>
+-#include <errno.h>
+-#include <unistd.h>
+-#include <sys/types.h>
+-#include <sys/stat.h>
+-#include <unistd.h>
+-#include <inttypes.h>
+-
+-#ifdef _WIN32
+-#include <winsock2.h>
+-#include <windows.h>
+-#else
+-#include <sys/socket.h>
+-#include <netinet/tcp.h>
+-#include <netinet/in.h>
+-#endif
+-
+-#if defined(_WIN32)
+-# define SLIRP_PACKED __attribute__((gcc_struct, packed))
+-#else
+-# define SLIRP_PACKED __attribute__((packed))
+-#endif
+-
+-#ifndef DIV_ROUND_UP
+-#define DIV_ROUND_UP(n, d) (((n) + (d) - 1) / (d))
+-#endif
+-
+-#ifndef container_of
+-#define container_of(ptr, type, member) __extension__ ({    \
+-    void *__mptr =3D (void *)(ptr);               \
+-    ((type *)(__mptr - offsetof(type, member))); })
+-#endif
+-
+-#if defined(_WIN32) /* CONFIG_IOVEC */
+-# if !defined(IOV_MAX) /* XXX: to avoid duplicate with QEMU osdep.h */
+-struct iovec {
+-    void *iov_base;
+-    size_t iov_len;
+-};
+-# endif
+-#else
+-#include <sys/uio.h>
+-#endif
+-
+-#define SCALE_MS 1000000
+-
+-#define ETH_ALEN    6
+-#define ETH_HLEN    14
+-#define ETH_P_IP                  (0x0800)      /* Internet Protocol pac=
+ket  */
+-#define ETH_P_ARP                 (0x0806)      /* Address Resolution pa=
+cket */
+-#define ETH_P_IPV6                (0x86dd)
+-#define ETH_P_VLAN                (0x8100)
+-#define ETH_P_DVLAN               (0x88a8)
+-#define ETH_P_NCSI                (0x88f8)
+-#define ETH_P_UNKNOWN             (0xffff)
+-
+-/* FIXME: remove me when made standalone */
+-#ifdef _WIN32
+-#undef accept
+-#undef bind
+-#undef closesocket
+-#undef connect
+-#undef getpeername
+-#undef getsockname
+-#undef getsockopt
+-#undef ioctlsocket
+-#undef listen
+-#undef recv
+-#undef recvfrom
+-#undef send
+-#undef sendto
+-#undef setsockopt
+-#undef shutdown
+-#undef socket
+-#endif
+-
+-#ifdef _WIN32
+-#define connect slirp_connect_wrap
+-int slirp_connect_wrap(int fd, const struct sockaddr *addr, int addrlen)=
+;
+-#define listen slirp_listen_wrap
+-int slirp_listen_wrap(int fd, int backlog);
+-#define bind slirp_bind_wrap
+-int slirp_bind_wrap(int fd, const struct sockaddr *addr, int addrlen);
+-#define socket slirp_socket_wrap
+-int slirp_socket_wrap(int domain, int type, int protocol);
+-#define accept slirp_accept_wrap
+-int slirp_accept_wrap(int fd, struct sockaddr *addr, int *addrlen);
+-#define shutdown slirp_shutdown_wrap
+-int slirp_shutdown_wrap(int fd, int how);
+-#define getpeername slirp_getpeername_wrap
+-int slirp_getpeername_wrap(int fd, struct sockaddr *addr, int *addrlen);
+-#define getsockname slirp_getsockname_wrap
+-int slirp_getsockname_wrap(int fd, struct sockaddr *addr, int *addrlen);
+-#define send slirp_send_wrap
+-ssize_t slirp_send_wrap(int fd, const void *buf, size_t len, int flags);
+-#define sendto slirp_sendto_wrap
+-ssize_t slirp_sendto_wrap(int fd, const void *buf, size_t len, int flags=
+,
+-                          const struct sockaddr *dest_addr, int addrlen)=
+;
+-#define recv slirp_recv_wrap
+-ssize_t slirp_recv_wrap(int fd, void *buf, size_t len, int flags);
+-#define recvfrom slirp_recvfrom_wrap
+-ssize_t slirp_recvfrom_wrap(int fd, void *buf, size_t len, int flags,
+-                            struct sockaddr *src_addr, int *addrlen);
+-#define closesocket slirp_closesocket_wrap
+-int slirp_closesocket_wrap(int fd);
+-#define ioctlsocket slirp_ioctlsocket_wrap
+-int slirp_ioctlsocket_wrap(int fd, int req, void *val);
+-#define getsockopt slirp_getsockopt_wrap
+-int slirp_getsockopt_wrap(int sockfd, int level, int optname,
+-                     void *optval, int *optlen);
+-#define setsockopt slirp_setsockopt_wrap
+-int slirp_setsockopt_wrap(int sockfd, int level, int optname,
+-                          const void *optval, int optlen);
+-#define inet_aton slirp_inet_aton
+-int slirp_inet_aton(const char *cp, struct in_addr *ia);
+-#else
+-#define closesocket(s) close(s)
+-#define ioctlsocket(s, r, v) ioctl(s, r, v)
+-#endif
+-
+-int slirp_socket(int domain, int type, int protocol);
+-void slirp_set_nonblock(int fd);
+-
+-static inline int slirp_socket_set_nodelay(int fd)
+-{
+-    int v =3D 1;
+-    return setsockopt(fd, IPPROTO_TCP, TCP_NODELAY, &v, sizeof(v));
+-}
+-
+-static inline int slirp_socket_set_fast_reuse(int fd)
+-{
+-#ifndef _WIN32
+-    int v =3D 1;
+-    return setsockopt(fd, SOL_SOCKET, SO_REUSEADDR, &v, sizeof(v));
+-#else
+-    /* Enabling the reuse of an endpoint that was used by a socket still=
+ in
+-     * TIME_WAIT state is usually performed by setting SO_REUSEADDR. On =
+Windows
+-     * fast reuse is the default and SO_REUSEADDR does strange things. S=
+o we
+-     * don't have to do anything here. More info can be found at:
+-     * http://msdn.microsoft.com/en-us/library/windows/desktop/ms740621.=
+aspx */
+-    return 0;
+-#endif
+-}
+-
+-void slirp_pstrcpy(char *buf, int buf_size, const char *str);
+-
+-#endif
+diff --git a/slirp/src/vmstate.h b/slirp/src/vmstate.h
+deleted file mode 100644
+index 44efea7b50..0000000000
+--- a/slirp/src/vmstate.h
++++ /dev/null
+@@ -1,409 +0,0 @@
+-/* SPDX-License-Identifier: BSD-3-Clause */
+-/*
+- * QEMU migration/snapshot declarations
+- *
+- * Copyright (c) 2009-2011 Red Hat, Inc.
+- *
+- * Original author: Juan Quintela <quintela@redhat.com>
+- *
+- * Redistribution and use in source and binary forms, with or without
+- * modification, are permitted provided that the following conditions
+- * are met:
+- *
+- * 1. Redistributions of source code must retain the above
+- * copyright notice, this list of conditions and the following
+- * disclaimer.
+- *
+- * 2. Redistributions in binary form must reproduce the above
+- * copyright notice, this list of conditions and the following
+- * disclaimer in the documentation and/or other materials provided
+- * with the distribution.
+- *
+- * 3. Neither the name of the copyright holder nor the names of its
+- * contributors may be used to endorse or promote products derived
+- * from this software without specific prior written permission.
+- *
+- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+- * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+- * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS
+- * FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE
+- * COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
+- * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+- * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+- * SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
+- * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT,
+- * STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+- * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
+- * OF THE POSSIBILITY OF SUCH DAMAGE.
+- */
+-#ifndef VMSTATE_H_
+-#define VMSTATE_H_
+-
+-#include <unistd.h>
+-#include <stdint.h>
+-#include <stdbool.h>
+-#include "slirp.h"
+-#include "stream.h"
+-
+-#define stringify(s) tostring(s)
+-#define tostring(s) #s
+-
+-typedef struct VMStateInfo VMStateInfo;
+-typedef struct VMStateDescription VMStateDescription;
+-typedef struct VMStateField VMStateField;
+-
+-int slirp_vmstate_save_state(SlirpOStream *f, const VMStateDescription *=
+vmsd,
+-                             void *opaque);
+-int slirp_vmstate_load_state(SlirpIStream *f, const VMStateDescription *=
+vmsd,
+-                             void *opaque, int version_id);
+-
+-/* VMStateInfo allows customized migration of objects that don't fit in
+- * any category in VMStateFlags. Additional information is always passed
+- * into get and put in terms of field and vmdesc parameters. However
+- * these two parameters should only be used in cases when customized
+- * handling is needed, such as QTAILQ. For primitive data types such as
+- * integer, field and vmdesc parameters should be ignored inside get/put=
+.
+- */
+-struct VMStateInfo {
+-    const char *name;
+-    int (*get)(SlirpIStream *f, void *pv, size_t size, const VMStateFiel=
+d *field);
+-    int (*put)(SlirpOStream *f, void *pv, size_t size, const VMStateFiel=
+d *field);
+-};
+-
+-enum VMStateFlags {
+-    /* Ignored */
+-    VMS_SINGLE           =3D 0x001,
+-
+-    /* The struct member at opaque + VMStateField.offset is a pointer
+-     * to the actual field (e.g. struct a { uint8_t *b;
+-     * }). Dereference the pointer before using it as basis for
+-     * further pointer arithmetic (see e.g. VMS_ARRAY). Does not
+-     * affect the meaning of VMStateField.num_offset or
+-     * VMStateField.size_offset; see VMS_VARRAY* and VMS_VBUFFER for
+-     * those. */
+-    VMS_POINTER          =3D 0x002,
+-
+-    /* The field is an array of fixed size. VMStateField.num contains
+-     * the number of entries in the array. The size of each entry is
+-     * given by VMStateField.size and / or opaque +
+-     * VMStateField.size_offset; see VMS_VBUFFER and
+-     * VMS_MULTIPLY. Each array entry will be processed individually
+-     * (VMStateField.info.get()/put() if VMS_STRUCT is not set,
+-     * recursion into VMStateField.vmsd if VMS_STRUCT is set). May not
+-     * be combined with VMS_VARRAY*. */
+-    VMS_ARRAY            =3D 0x004,
+-
+-    /* The field is itself a struct, containing one or more
+-     * fields. Recurse into VMStateField.vmsd. Most useful in
+-     * combination with VMS_ARRAY / VMS_VARRAY*, recursing into each
+-     * array entry. */
+-    VMS_STRUCT           =3D 0x008,
+-
+-    /* The field is an array of variable size. The int32_t at opaque +
+-     * VMStateField.num_offset contains the number of entries in the
+-     * array. See the VMS_ARRAY description regarding array handling
+-     * in general. May not be combined with VMS_ARRAY or any other
+-     * VMS_VARRAY*. */
+-    VMS_VARRAY_INT32     =3D 0x010,
+-
+-    /* Ignored */
+-    VMS_BUFFER           =3D 0x020,
+-
+-    /* The field is a (fixed-size or variable-size) array of pointers
+-     * (e.g. struct a { uint8_t *b[]; }). Dereference each array entry
+-     * before using it. Note: Does not imply any one of VMS_ARRAY /
+-     * VMS_VARRAY*; these need to be set explicitly. */
+-    VMS_ARRAY_OF_POINTER =3D 0x040,
+-
+-    /* The field is an array of variable size. The uint16_t at opaque
+-     * + VMStateField.num_offset (subject to VMS_MULTIPLY_ELEMENTS)
+-     * contains the number of entries in the array. See the VMS_ARRAY
+-     * description regarding array handling in general. May not be
+-     * combined with VMS_ARRAY or any other VMS_VARRAY*. */
+-    VMS_VARRAY_UINT16    =3D 0x080,
+-
+-    /* The size of the individual entries (a single array entry if
+-     * VMS_ARRAY or any of VMS_VARRAY* are set, or the field itself if
+-     * neither is set) is variable (i.e. not known at compile-time),
+-     * but the same for all entries. Use the int32_t at opaque +
+-     * VMStateField.size_offset (subject to VMS_MULTIPLY) to determine
+-     * the size of each (and every) entry. */
+-    VMS_VBUFFER          =3D 0x100,
+-
+-    /* Multiply the entry size given by the int32_t at opaque +
+-     * VMStateField.size_offset (see VMS_VBUFFER description) with
+-     * VMStateField.size to determine the number of bytes to be
+-     * allocated. Only valid in combination with VMS_VBUFFER. */
+-    VMS_MULTIPLY         =3D 0x200,
+-
+-    /* The field is an array of variable size. The uint8_t at opaque +
+-     * VMStateField.num_offset (subject to VMS_MULTIPLY_ELEMENTS)
+-     * contains the number of entries in the array. See the VMS_ARRAY
+-     * description regarding array handling in general. May not be
+-     * combined with VMS_ARRAY or any other VMS_VARRAY*. */
+-    VMS_VARRAY_UINT8     =3D 0x400,
+-
+-    /* The field is an array of variable size. The uint32_t at opaque
+-     * + VMStateField.num_offset (subject to VMS_MULTIPLY_ELEMENTS)
+-     * contains the number of entries in the array. See the VMS_ARRAY
+-     * description regarding array handling in general. May not be
+-     * combined with VMS_ARRAY or any other VMS_VARRAY*. */
+-    VMS_VARRAY_UINT32    =3D 0x800,
+-
+-    /* Fail loading the serialised VM state if this field is missing
+-     * from the input. */
+-    VMS_MUST_EXIST       =3D 0x1000,
+-
+-    /* When loading serialised VM state, allocate memory for the
+-     * (entire) field. Only valid in combination with
+-     * VMS_POINTER. Note: Not all combinations with other flags are
+-     * currently supported, e.g. VMS_ALLOC|VMS_ARRAY_OF_POINTER won't
+-     * cause the individual entries to be allocated. */
+-    VMS_ALLOC            =3D 0x2000,
+-
+-    /* Multiply the number of entries given by the integer at opaque +
+-     * VMStateField.num_offset (see VMS_VARRAY*) with VMStateField.num
+-     * to determine the number of entries in the array. Only valid in
+-     * combination with one of VMS_VARRAY*. */
+-    VMS_MULTIPLY_ELEMENTS =3D 0x4000,
+-
+-    /* A structure field that is like VMS_STRUCT, but uses
+-     * VMStateField.struct_version_id to tell which version of the
+-     * structure we are referencing to use. */
+-    VMS_VSTRUCT           =3D 0x8000,
+-};
+-
+-struct VMStateField {
+-    const char *name;
+-    size_t offset;
+-    size_t size;
+-    size_t start;
+-    int num;
+-    size_t num_offset;
+-    size_t size_offset;
+-    const VMStateInfo *info;
+-    enum VMStateFlags flags;
+-    const VMStateDescription *vmsd;
+-    int version_id;
+-    int struct_version_id;
+-    bool (*field_exists)(void *opaque, int version_id);
+-};
+-
+-struct VMStateDescription {
+-    const char *name;
+-    int version_id;
+-    int (*pre_load)(void *opaque);
+-    int (*post_load)(void *opaque, int version_id);
+-    int (*pre_save)(void *opaque);
+-    VMStateField *fields;
+-};
+-
+-
+-extern const VMStateInfo slirp_vmstate_info_int16;
+-extern const VMStateInfo slirp_vmstate_info_int32;
+-extern const VMStateInfo slirp_vmstate_info_uint8;
+-extern const VMStateInfo slirp_vmstate_info_uint16;
+-extern const VMStateInfo slirp_vmstate_info_uint32;
+-
+-/** Put this in the stream when migrating a null pointer.*/
+-#define VMS_NULLPTR_MARKER (0x30U) /* '0' */
+-extern const VMStateInfo slirp_vmstate_info_nullptr;
+-
+-extern const VMStateInfo slirp_vmstate_info_buffer;
+-extern const VMStateInfo slirp_vmstate_info_tmp;
+-
+-#define type_check_array(t1,t2,n) ((t1(*)[n])0 - (t2*)0)
+-#define type_check_pointer(t1,t2) ((t1**)0 - (t2*)0)
+-#define typeof_field(type, field) typeof(((type *)0)->field)
+-#define type_check(t1,t2) ((t1*)0 - (t2*)0)
+-
+-#define vmstate_offset_value(_state, _field, _type)                  \
+-    (offsetof(_state, _field) +                                      \
+-     type_check(_type, typeof_field(_state, _field)))
+-
+-#define vmstate_offset_pointer(_state, _field, _type)                \
+-    (offsetof(_state, _field) +                                      \
+-     type_check_pointer(_type, typeof_field(_state, _field)))
+-
+-#define vmstate_offset_array(_state, _field, _type, _num)            \
+-    (offsetof(_state, _field) +                                      \
+-     type_check_array(_type, typeof_field(_state, _field), _num))
+-
+-#define vmstate_offset_buffer(_state, _field)                        \
+-    vmstate_offset_array(_state, _field, uint8_t,                    \
+-                         sizeof(typeof_field(_state, _field)))
+-
+-/* In the macros below, if there is a _version, that means the macro's
+- * field will be processed only if the version being received is >=3D
+- * the _version specified.  In general, if you add a new field, you
+- * would increment the structure's version and put that version
+- * number into the new field so it would only be processed with the
+- * new version.
+- *
+- * In particular, for VMSTATE_STRUCT() and friends the _version does
+- * *NOT* pick the version of the sub-structure.  It works just as
+- * specified above.  The version of the top-level structure received
+- * is passed down to all sub-structures.  This means that the
+- * sub-structures must have version that are compatible with all the
+- * structures that use them.
+- *
+- * If you want to specify the version of the sub-structure, use
+- * VMSTATE_VSTRUCT(), which allows the specific sub-structure version
+- * to be directly specified.
+- */
+-
+-#define VMSTATE_SINGLE_TEST(_field, _state, _test, _version, _info, _typ=
+e) { \
+-    .name         =3D (stringify(_field)),                             \
+-    .version_id   =3D (_version),                                      \
+-    .field_exists =3D (_test),                                         \
+-    .size         =3D sizeof(_type),                                   \
+-    .info         =3D &(_info),                                        \
+-    .flags        =3D VMS_SINGLE,                                      \
+-    .offset       =3D vmstate_offset_value(_state, _field, _type),     \
+-}
+-
+-#define VMSTATE_ARRAY(_field, _state, _num, _version, _info, _type) {\
+-    .name       =3D (stringify(_field)),                               \
+-    .version_id =3D (_version),                                        \
+-    .num        =3D (_num),                                            \
+-    .info       =3D &(_info),                                          \
+-    .size       =3D sizeof(_type),                                     \
+-    .flags      =3D VMS_ARRAY,                                         \
+-    .offset     =3D vmstate_offset_array(_state, _field, _type, _num), \
+-}
+-
+-#define VMSTATE_STRUCT_TEST(_field, _state, _test, _version, _vmsd, _typ=
+e) { \
+-    .name         =3D (stringify(_field)),                             \
+-    .version_id   =3D (_version),                                      \
+-    .field_exists =3D (_test),                                         \
+-    .vmsd         =3D &(_vmsd),                                        \
+-    .size         =3D sizeof(_type),                                   \
+-    .flags        =3D VMS_STRUCT,                                      \
+-    .offset       =3D vmstate_offset_value(_state, _field, _type),     \
+-}
+-
+-#define VMSTATE_STRUCT_POINTER_V(_field, _state, _version, _vmsd, _type)=
+ { \
+-    .name         =3D (stringify(_field)),                             \
+-    .version_id   =3D (_version),                                       =
+ \
+-    .vmsd         =3D &(_vmsd),                                        \
+-    .size         =3D sizeof(_type *),                                 \
+-    .flags        =3D VMS_STRUCT|VMS_POINTER,                          \
+-    .offset       =3D vmstate_offset_pointer(_state, _field, _type),   \
+-}
+-
+-#define VMSTATE_STRUCT_ARRAY_TEST(_field, _state, _num, _test, _version,=
+ _vmsd, _type) { \
+-    .name         =3D (stringify(_field)),                             \
+-    .num          =3D (_num),                                          \
+-    .field_exists =3D (_test),                                         \
+-    .version_id   =3D (_version),                                      \
+-    .vmsd         =3D &(_vmsd),                                        \
+-    .size         =3D sizeof(_type),                                   \
+-    .flags        =3D VMS_STRUCT|VMS_ARRAY,                            \
+-    .offset       =3D vmstate_offset_array(_state, _field, _type, _num),=
+\
+-}
+-
+-#define VMSTATE_STATIC_BUFFER(_field, _state, _version, _test, _start, _=
+size) { \
+-    .name         =3D (stringify(_field)),                             \
+-    .version_id   =3D (_version),                                      \
+-    .field_exists =3D (_test),                                         \
+-    .size         =3D (_size - _start),                                \
+-    .info         =3D &slirp_vmstate_info_buffer,                      \
+-    .flags        =3D VMS_BUFFER,                                      \
+-    .offset       =3D vmstate_offset_buffer(_state, _field) + _start,  \
+-}
+-
+-#define VMSTATE_VBUFFER_UINT32(_field, _state, _version, _test, _field_s=
+ize) { \
+-    .name         =3D (stringify(_field)),                             \
+-    .version_id   =3D (_version),                                      \
+-    .field_exists =3D (_test),                                         \
+-    .size_offset  =3D vmstate_offset_value(_state, _field_size, uint32_t=
+),\
+-    .info         =3D &slirp_vmstate_info_buffer,                      \
+-    .flags        =3D VMS_VBUFFER|VMS_POINTER,                         \
+-    .offset       =3D offsetof(_state, _field),                        \
+-}
+-
+-#define QEMU_BUILD_BUG_ON_STRUCT(x)             \
+-    struct {                                    \
+-        int:(x) ? -1 : 1;                       \
+-    }
+-
+-#define QEMU_BUILD_BUG_ON_ZERO(x) (sizeof(QEMU_BUILD_BUG_ON_STRUCT(x)) -=
+ \
+-                                   sizeof(QEMU_BUILD_BUG_ON_STRUCT(x)))
+-
+-/* Allocate a temporary of type 'tmp_type', set tmp->parent to _state
+- * and execute the vmsd on the temporary.  Note that we're working with
+- * the whole of _state here, not a field within it.
+- * We compile time check that:
+- *    That _tmp_type contains a 'parent' member that's a pointer to the
+- *        '_state' type
+- *    That the pointer is right at the start of _tmp_type.
+- */
+-#define VMSTATE_WITH_TMP(_state, _tmp_type, _vmsd) {                 \
+-    .name         =3D "tmp",                                           \
+-    .size         =3D sizeof(_tmp_type) +                              \
+-                    QEMU_BUILD_BUG_ON_ZERO(offsetof(_tmp_type, parent) !=
+=3D 0) + \
+-                    type_check_pointer(_state,                       \
+-                        typeof_field(_tmp_type, parent)),            \
+-    .vmsd         =3D &(_vmsd),                                        \
+-    .info         =3D &slirp_vmstate_info_tmp,                         \
+-}
+-
+-#define VMSTATE_SINGLE(_field, _state, _version, _info, _type)          =
+\
+-    VMSTATE_SINGLE_TEST(_field, _state, NULL, _version, _info, _type)
+-
+-#define VMSTATE_STRUCT(_field, _state, _version, _vmsd, _type)        \
+-    VMSTATE_STRUCT_TEST(_field, _state, NULL, _version, _vmsd, _type)
+-
+-#define VMSTATE_STRUCT_POINTER(_field, _state, _vmsd, _type)          \
+-    VMSTATE_STRUCT_POINTER_V(_field, _state, 0, _vmsd, _type)
+-
+-#define VMSTATE_STRUCT_ARRAY(_field, _state, _num, _version, _vmsd, _typ=
+e) \
+-    VMSTATE_STRUCT_ARRAY_TEST(_field, _state, _num, NULL, _version,   \
+-            _vmsd, _type)
+-
+-#define VMSTATE_INT16_V(_f, _s, _v)                                   \
+-    VMSTATE_SINGLE(_f, _s, _v, slirp_vmstate_info_int16, int16_t)
+-#define VMSTATE_INT32_V(_f, _s, _v)                                   \
+-    VMSTATE_SINGLE(_f, _s, _v, slirp_vmstate_info_int32, int32_t)
+-
+-#define VMSTATE_UINT8_V(_f, _s, _v)                                   \
+-    VMSTATE_SINGLE(_f, _s, _v, slirp_vmstate_info_uint8, uint8_t)
+-#define VMSTATE_UINT16_V(_f, _s, _v)                                  \
+-    VMSTATE_SINGLE(_f, _s, _v, slirp_vmstate_info_uint16, uint16_t)
+-#define VMSTATE_UINT32_V(_f, _s, _v)                                  \
+-    VMSTATE_SINGLE(_f, _s, _v, slirp_vmstate_info_uint32, uint32_t)
+-
+-#define VMSTATE_INT16(_f, _s)                                         \
+-    VMSTATE_INT16_V(_f, _s, 0)
+-#define VMSTATE_INT32(_f, _s)                                         \
+-    VMSTATE_INT32_V(_f, _s, 0)
+-
+-#define VMSTATE_UINT8(_f, _s)                                         \
+-    VMSTATE_UINT8_V(_f, _s, 0)
+-#define VMSTATE_UINT16(_f, _s)                                        \
+-    VMSTATE_UINT16_V(_f, _s, 0)
+-#define VMSTATE_UINT32(_f, _s)                                        \
+-    VMSTATE_UINT32_V(_f, _s, 0)
+-
+-#define VMSTATE_UINT16_TEST(_f, _s, _t)                               \
+-    VMSTATE_SINGLE_TEST(_f, _s, _t, 0, slirp_vmstate_info_uint16, uint16=
+_t)
+-
+-#define VMSTATE_UINT32_TEST(_f, _s, _t)                                 =
+ \
+-    VMSTATE_SINGLE_TEST(_f, _s, _t, 0, slirp_vmstate_info_uint32, uint32=
+_t)
+-
+-#define VMSTATE_INT16_ARRAY_V(_f, _s, _n, _v)                         \
+-    VMSTATE_ARRAY(_f, _s, _n, _v, slirp_vmstate_info_int16, int16_t)
+-
+-#define VMSTATE_INT16_ARRAY(_f, _s, _n)                               \
+-    VMSTATE_INT16_ARRAY_V(_f, _s, _n, 0)
+-
+-#define VMSTATE_BUFFER_V(_f, _s, _v)                                    =
+\
+-    VMSTATE_STATIC_BUFFER(_f, _s, _v, NULL, 0, sizeof(typeof_field(_s, _=
+f)))
+-
+-#define VMSTATE_BUFFER(_f, _s)                                        \
+-    VMSTATE_BUFFER_V(_f, _s, 0)
+-
+-#define VMSTATE_END_OF_LIST()                                         \
+-    {}
+-
+-#endif
+diff --git a/slirp/src/arp_table.c b/slirp/src/arp_table.c
+deleted file mode 100644
+index 9d7a59eb2c..0000000000
+--- a/slirp/src/arp_table.c
++++ /dev/null
+@@ -1,92 +0,0 @@
+-/* SPDX-License-Identifier: MIT */
+-/*
+- * ARP table
+- *
+- * Copyright (c) 2011 AdaCore
+- *
+- * Permission is hereby granted, free of charge, to any person obtaining=
+ a copy
+- * of this software and associated documentation files (the "Software"),=
+ to deal
+- * in the Software without restriction, including without limitation the=
+ rights
+- * to use, copy, modify, merge, publish, distribute, sublicense, and/or =
+sell
+- * copies of the Software, and to permit persons to whom the Software is
+- * furnished to do so, subject to the following conditions:
+- *
+- * The above copyright notice and this permission notice shall be includ=
+ed in
+- * all copies or substantial portions of the Software.
+- *
+- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRE=
+SS OR
+- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILI=
+TY,
+- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHA=
+LL
+- * THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR =
+OTHER
+- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISI=
+NG FROM,
+- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALING=
+S IN
+- * THE SOFTWARE.
+- */
+-
+-#include "slirp.h"
+-
+-#include <string.h>
+-
+-void arp_table_add(Slirp *slirp, uint32_t ip_addr, uint8_t ethaddr[ETH_A=
+LEN])
+-{
+-    const uint32_t broadcast_addr =3D
+-        ~slirp->vnetwork_mask.s_addr | slirp->vnetwork_addr.s_addr;
+-    ArpTable *arptbl =3D &slirp->arp_table;
+-    int i;
+-
+-    DEBUG_CALL("arp_table_add");
+-    DEBUG_ARG("ip =3D %s", inet_ntoa((struct in_addr){.s_addr =3D ip_add=
+r}));
+-    DEBUG_ARG("hw addr =3D %02x:%02x:%02x:%02x:%02x:%02x",
+-              ethaddr[0], ethaddr[1], ethaddr[2],
+-              ethaddr[3], ethaddr[4], ethaddr[5]);
+-
+-    if (ip_addr =3D=3D 0 || ip_addr =3D=3D 0xffffffff || ip_addr =3D=3D =
+broadcast_addr) {
+-        /* Do not register broadcast addresses */
+-        return;
+-    }
+-
+-    /* Search for an entry */
+-    for (i =3D 0; i < ARP_TABLE_SIZE; i++) {
+-        if (arptbl->table[i].ar_sip =3D=3D ip_addr) {
+-            /* Update the entry */
+-            memcpy(arptbl->table[i].ar_sha, ethaddr, ETH_ALEN);
+-            return;
+-        }
+-    }
+-
+-    /* No entry found, create a new one */
+-    arptbl->table[arptbl->next_victim].ar_sip =3D ip_addr;
+-    memcpy(arptbl->table[arptbl->next_victim].ar_sha,  ethaddr, ETH_ALEN=
+);
+-    arptbl->next_victim =3D (arptbl->next_victim + 1) % ARP_TABLE_SIZE;
+-}
+-
+-bool arp_table_search(Slirp *slirp, uint32_t ip_addr,
+-                      uint8_t out_ethaddr[ETH_ALEN])
+-{
+-    const uint32_t broadcast_addr =3D
+-        ~slirp->vnetwork_mask.s_addr | slirp->vnetwork_addr.s_addr;
+-    ArpTable *arptbl =3D &slirp->arp_table;
+-    int i;
+-
+-    DEBUG_CALL("arp_table_search");
+-    DEBUG_ARG("ip =3D %s", inet_ntoa((struct in_addr){.s_addr =3D ip_add=
+r}));
+-
+-    /* If broadcast address */
+-    if (ip_addr =3D=3D 0xffffffff || ip_addr =3D=3D broadcast_addr) {
+-        /* return Ethernet broadcast address */
+-        memset(out_ethaddr, 0xff, ETH_ALEN);
+-        return 1;
+-    }
+-
+-    for (i =3D 0; i < ARP_TABLE_SIZE; i++) {
+-        if (arptbl->table[i].ar_sip =3D=3D ip_addr) {
+-            memcpy(out_ethaddr, arptbl->table[i].ar_sha,  ETH_ALEN);
+-            DEBUG_ARG("found hw addr =3D %02x:%02x:%02x:%02x:%02x:%02x",
+-                      out_ethaddr[0], out_ethaddr[1], out_ethaddr[2],
+-                      out_ethaddr[3], out_ethaddr[4], out_ethaddr[5]);
+-            return 1;
+-        }
+-    }
+-
+-    return 0;
+-}
+diff --git a/slirp/src/bootp.c b/slirp/src/bootp.c
+deleted file mode 100644
+index b208e3b216..0000000000
+--- a/slirp/src/bootp.c
++++ /dev/null
+@@ -1,371 +0,0 @@
+-/* SPDX-License-Identifier: MIT */
+-/*
+- * QEMU BOOTP/DHCP server
+- *
+- * Copyright (c) 2004 Fabrice Bellard
+- *
+- * Permission is hereby granted, free of charge, to any person obtaining=
+ a copy
+- * of this software and associated documentation files (the "Software"),=
+ to deal
+- * in the Software without restriction, including without limitation the=
+ rights
+- * to use, copy, modify, merge, publish, distribute, sublicense, and/or =
+sell
+- * copies of the Software, and to permit persons to whom the Software is
+- * furnished to do so, subject to the following conditions:
+- *
+- * The above copyright notice and this permission notice shall be includ=
+ed in
+- * all copies or substantial portions of the Software.
+- *
+- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRE=
+SS OR
+- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILI=
+TY,
+- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHA=
+LL
+- * THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR =
+OTHER
+- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISI=
+NG FROM,
+- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALING=
+S IN
+- * THE SOFTWARE.
+- */
+-#include "slirp.h"
+-
+-#if defined(_WIN32)
+-/* Windows ntohl() returns an u_long value.
+- * Add a type cast to match the format strings. */
+-# define ntohl(n) ((uint32_t)ntohl(n))
+-#endif
+-
+-/* XXX: only DHCP is supported */
+-
+-#define LEASE_TIME (24 * 3600)
+-
+-static const uint8_t rfc1533_cookie[] =3D { RFC1533_COOKIE };
+-
+-#define DPRINTF(fmt, ...) DEBUG_CALL(fmt, ##__VA_ARGS__)
+-
+-static BOOTPClient *get_new_addr(Slirp *slirp, struct in_addr *paddr,
+-                                 const uint8_t *macaddr)
+-{
+-    BOOTPClient *bc;
+-    int i;
+-
+-    for(i =3D 0; i < NB_BOOTP_CLIENTS; i++) {
+-        bc =3D &slirp->bootp_clients[i];
+-        if (!bc->allocated || !memcmp(macaddr, bc->macaddr, 6))
+-            goto found;
+-    }
+-    return NULL;
+- found:
+-    bc =3D &slirp->bootp_clients[i];
+-    bc->allocated =3D 1;
+-    paddr->s_addr =3D slirp->vdhcp_startaddr.s_addr + htonl(i);
+-    return bc;
+-}
+-
+-static BOOTPClient *request_addr(Slirp *slirp, const struct in_addr *pad=
+dr,
+-                                 const uint8_t *macaddr)
+-{
+-    uint32_t req_addr =3D ntohl(paddr->s_addr);
+-    uint32_t dhcp_addr =3D ntohl(slirp->vdhcp_startaddr.s_addr);
+-    BOOTPClient *bc;
+-
+-    if (req_addr >=3D dhcp_addr &&
+-        req_addr < (dhcp_addr + NB_BOOTP_CLIENTS)) {
+-        bc =3D &slirp->bootp_clients[req_addr - dhcp_addr];
+-        if (!bc->allocated || !memcmp(macaddr, bc->macaddr, 6)) {
+-            bc->allocated =3D 1;
+-            return bc;
+-        }
+-    }
+-    return NULL;
+-}
+-
+-static BOOTPClient *find_addr(Slirp *slirp, struct in_addr *paddr,
+-                              const uint8_t *macaddr)
+-{
+-    BOOTPClient *bc;
+-    int i;
+-
+-    for(i =3D 0; i < NB_BOOTP_CLIENTS; i++) {
+-        if (!memcmp(macaddr, slirp->bootp_clients[i].macaddr, 6))
+-            goto found;
+-    }
+-    return NULL;
+- found:
+-    bc =3D &slirp->bootp_clients[i];
+-    bc->allocated =3D 1;
+-    paddr->s_addr =3D slirp->vdhcp_startaddr.s_addr + htonl(i);
+-    return bc;
+-}
+-
+-static void dhcp_decode(const struct bootp_t *bp, int *pmsg_type,
+-                        struct in_addr *preq_addr)
+-{
+-    const uint8_t *p, *p_end;
+-    int len, tag;
+-
+-    *pmsg_type =3D 0;
+-    preq_addr->s_addr =3D htonl(0L);
+-
+-    p =3D bp->bp_vend;
+-    p_end =3D p + DHCP_OPT_LEN;
+-    if (memcmp(p, rfc1533_cookie, 4) !=3D 0)
+-        return;
+-    p +=3D 4;
+-    while (p < p_end) {
+-        tag =3D p[0];
+-        if (tag =3D=3D RFC1533_PAD) {
+-            p++;
+-        } else if (tag =3D=3D RFC1533_END) {
+-            break;
+-        } else {
+-            p++;
+-            if (p >=3D p_end)
+-                break;
+-            len =3D *p++;
+-            if (p + len > p_end) {
+-                break;
+-            }
+-            DPRINTF("dhcp: tag=3D%d len=3D%d\n", tag, len);
+-
+-            switch(tag) {
+-            case RFC2132_MSG_TYPE:
+-                if (len >=3D 1)
+-                    *pmsg_type =3D p[0];
+-                break;
+-            case RFC2132_REQ_ADDR:
+-                if (len >=3D 4) {
+-                    memcpy(&(preq_addr->s_addr), p, 4);
+-                }
+-                break;
+-            default:
+-                break;
+-            }
+-            p +=3D len;
+-        }
+-    }
+-    if (*pmsg_type =3D=3D DHCPREQUEST && preq_addr->s_addr =3D=3D htonl(=
+0L) &&
+-        bp->bp_ciaddr.s_addr) {
+-        memcpy(&(preq_addr->s_addr), &bp->bp_ciaddr, 4);
+-    }
+-}
+-
+-static void bootp_reply(Slirp *slirp, const struct bootp_t *bp)
+-{
+-    BOOTPClient *bc =3D NULL;
+-    struct mbuf *m;
+-    struct bootp_t *rbp;
+-    struct sockaddr_in saddr, daddr;
+-    struct in_addr preq_addr;
+-    int dhcp_msg_type, val;
+-    uint8_t *q;
+-    uint8_t *end;
+-    uint8_t client_ethaddr[ETH_ALEN];
+-
+-    /* extract exact DHCP msg type */
+-    dhcp_decode(bp, &dhcp_msg_type, &preq_addr);
+-    DPRINTF("bootp packet op=3D%d msgtype=3D%d", bp->bp_op, dhcp_msg_typ=
+e);
+-    if (preq_addr.s_addr !=3D htonl(0L))
+-        DPRINTF(" req_addr=3D%08" PRIx32 "\n", ntohl(preq_addr.s_addr));
+-    else {
+-        DPRINTF("\n");
+-    }
+-
+-    if (dhcp_msg_type =3D=3D 0)
+-        dhcp_msg_type =3D DHCPREQUEST; /* Force reply for old BOOTP clie=
+nts */
+-
+-    if (dhcp_msg_type !=3D DHCPDISCOVER &&
+-        dhcp_msg_type !=3D DHCPREQUEST)
+-        return;
+-
+-    /* Get client's hardware address from bootp request */
+-    memcpy(client_ethaddr, bp->bp_hwaddr, ETH_ALEN);
+-
+-    m =3D m_get(slirp);
+-    if (!m) {
+-        return;
+-    }
+-    m->m_data +=3D IF_MAXLINKHDR;
+-    rbp =3D (struct bootp_t *)m->m_data;
+-    m->m_data +=3D sizeof(struct udpiphdr);
+-    memset(rbp, 0, sizeof(struct bootp_t));
+-
+-    if (dhcp_msg_type =3D=3D DHCPDISCOVER) {
+-        if (preq_addr.s_addr !=3D htonl(0L)) {
+-            bc =3D request_addr(slirp, &preq_addr, client_ethaddr);
+-            if (bc) {
+-                daddr.sin_addr =3D preq_addr;
+-            }
+-        }
+-        if (!bc) {
+-         new_addr:
+-            bc =3D get_new_addr(slirp, &daddr.sin_addr, client_ethaddr);
+-            if (!bc) {
+-                DPRINTF("no address left\n");
+-                return;
+-            }
+-        }
+-        memcpy(bc->macaddr, client_ethaddr, ETH_ALEN);
+-    } else if (preq_addr.s_addr !=3D htonl(0L)) {
+-        bc =3D request_addr(slirp, &preq_addr, client_ethaddr);
+-        if (bc) {
+-            daddr.sin_addr =3D preq_addr;
+-            memcpy(bc->macaddr, client_ethaddr, ETH_ALEN);
+-        } else {
+-            /* DHCPNAKs should be sent to broadcast */
+-            daddr.sin_addr.s_addr =3D 0xffffffff;
+-        }
+-    } else {
+-        bc =3D find_addr(slirp, &daddr.sin_addr, bp->bp_hwaddr);
+-        if (!bc) {
+-            /* if never assigned, behaves as if it was already
+-               assigned (windows fix because it remembers its address) *=
+/
+-            goto new_addr;
+-        }
+-    }
+-
+-    /* Update ARP table for this IP address */
+-    arp_table_add(slirp, daddr.sin_addr.s_addr, client_ethaddr);
+-
+-    saddr.sin_addr =3D slirp->vhost_addr;
+-    saddr.sin_port =3D htons(BOOTP_SERVER);
+-
+-    daddr.sin_port =3D htons(BOOTP_CLIENT);
+-
+-    rbp->bp_op =3D BOOTP_REPLY;
+-    rbp->bp_xid =3D bp->bp_xid;
+-    rbp->bp_htype =3D 1;
+-    rbp->bp_hlen =3D 6;
+-    memcpy(rbp->bp_hwaddr, bp->bp_hwaddr, ETH_ALEN);
+-
+-    rbp->bp_yiaddr =3D daddr.sin_addr; /* Client IP address */
+-    rbp->bp_siaddr =3D saddr.sin_addr; /* Server IP address */
+-
+-    q =3D rbp->bp_vend;
+-    end =3D (uint8_t *)&rbp[1];
+-    memcpy(q, rfc1533_cookie, 4);
+-    q +=3D 4;
+-
+-    if (bc) {
+-        DPRINTF("%s addr=3D%08" PRIx32 "\n",
+-                (dhcp_msg_type =3D=3D DHCPDISCOVER) ? "offered" : "ack'e=
+d",
+-                ntohl(daddr.sin_addr.s_addr));
+-
+-        if (dhcp_msg_type =3D=3D DHCPDISCOVER) {
+-            *q++ =3D RFC2132_MSG_TYPE;
+-            *q++ =3D 1;
+-            *q++ =3D DHCPOFFER;
+-        } else /* DHCPREQUEST */ {
+-            *q++ =3D RFC2132_MSG_TYPE;
+-            *q++ =3D 1;
+-            *q++ =3D DHCPACK;
+-        }
+-
+-        if (slirp->bootp_filename)
+-            snprintf((char *)rbp->bp_file, sizeof(rbp->bp_file), "%s",
+-                     slirp->bootp_filename);
+-
+-        *q++ =3D RFC2132_SRV_ID;
+-        *q++ =3D 4;
+-        memcpy(q, &saddr.sin_addr, 4);
+-        q +=3D 4;
+-
+-        *q++ =3D RFC1533_NETMASK;
+-        *q++ =3D 4;
+-        memcpy(q, &slirp->vnetwork_mask, 4);
+-        q +=3D 4;
+-
+-        if (!slirp->restricted) {
+-            *q++ =3D RFC1533_GATEWAY;
+-            *q++ =3D 4;
+-            memcpy(q, &saddr.sin_addr, 4);
+-            q +=3D 4;
+-
+-            *q++ =3D RFC1533_DNS;
+-            *q++ =3D 4;
+-            memcpy(q, &slirp->vnameserver_addr, 4);
+-            q +=3D 4;
+-        }
+-
+-        *q++ =3D RFC2132_LEASE_TIME;
+-        *q++ =3D 4;
+-        val =3D htonl(LEASE_TIME);
+-        memcpy(q, &val, 4);
+-        q +=3D 4;
+-
+-        if (*slirp->client_hostname) {
+-            val =3D strlen(slirp->client_hostname);
+-            if (q + val + 2 >=3D end) {
+-                g_warning("DHCP packet size exceeded, "
+-                    "omitting host name option.");
+-            } else {
+-                *q++ =3D RFC1533_HOSTNAME;
+-                *q++ =3D val;
+-                memcpy(q, slirp->client_hostname, val);
+-                q +=3D val;
+-            }
+-        }
+-
+-        if (slirp->vdomainname) {
+-            val =3D strlen(slirp->vdomainname);
+-            if (q + val + 2 >=3D end) {
+-                g_warning("DHCP packet size exceeded, "
+-                    "omitting domain name option.");
+-            } else {
+-                *q++ =3D RFC1533_DOMAINNAME;
+-                *q++ =3D val;
+-                memcpy(q, slirp->vdomainname, val);
+-                q +=3D val;
+-            }
+-        }
+-
+-        if (slirp->tftp_server_name) {
+-            val =3D strlen(slirp->tftp_server_name);
+-            if (q + val + 2 >=3D end) {
+-                g_warning("DHCP packet size exceeded, "
+-                    "omitting tftp-server-name option.");
+-            } else {
+-                *q++ =3D RFC2132_TFTP_SERVER_NAME;
+-                *q++ =3D val;
+-                memcpy(q, slirp->tftp_server_name, val);
+-                q +=3D val;
+-            }
+-        }
+-
+-        if (slirp->vdnssearch) {
+-            val =3D slirp->vdnssearch_len;
+-            if (q + val >=3D end) {
+-                g_warning("DHCP packet size exceeded, "
+-                    "omitting domain-search option.");
+-            } else {
+-                memcpy(q, slirp->vdnssearch, val);
+-                q +=3D val;
+-            }
+-        }
+-    } else {
+-        static const char nak_msg[] =3D "requested address not available=
+";
+-
+-        DPRINTF("nak'ed addr=3D%08" PRIx32 "\n", ntohl(preq_addr.s_addr)=
+);
+-
+-        *q++ =3D RFC2132_MSG_TYPE;
+-        *q++ =3D 1;
+-        *q++ =3D DHCPNAK;
+-
+-        *q++ =3D RFC2132_MESSAGE;
+-        *q++ =3D sizeof(nak_msg) - 1;
+-        memcpy(q, nak_msg, sizeof(nak_msg) - 1);
+-        q +=3D sizeof(nak_msg) - 1;
+-    }
+-    assert(q < end);
+-    *q =3D RFC1533_END;
+-
+-    daddr.sin_addr.s_addr =3D 0xffffffffu;
+-
+-    m->m_len =3D sizeof(struct bootp_t) -
+-        sizeof(struct ip) - sizeof(struct udphdr);
+-    udp_output(NULL, m, &saddr, &daddr, IPTOS_LOWDELAY);
+-}
+-
+-void bootp_input(struct mbuf *m)
+-{
+-    struct bootp_t *bp =3D mtod(m, struct bootp_t *);
+-
+-    if (bp->bp_op =3D=3D BOOTP_REQUEST) {
+-        bootp_reply(m->slirp, bp);
+-    }
+-}
+diff --git a/slirp/src/cksum.c b/slirp/src/cksum.c
+deleted file mode 100644
+index 9599f6a280..0000000000
+--- a/slirp/src/cksum.c
++++ /dev/null
+@@ -1,161 +0,0 @@
+-/* SPDX-License-Identifier: BSD-3-Clause */
+-/*
+- * Copyright (c) 1988, 1992, 1993
+- *	The Regents of the University of California.  All rights reserved.
+- *
+- * Redistribution and use in source and binary forms, with or without
+- * modification, are permitted provided that the following conditions
+- * are met:
+- * 1. Redistributions of source code must retain the above copyright
+- *    notice, this list of conditions and the following disclaimer.
+- * 2. Redistributions in binary form must reproduce the above copyright
+- *    notice, this list of conditions and the following disclaimer in th=
+e
+- *    documentation and/or other materials provided with the distributio=
+n.
+- * 3. Neither the name of the University nor the names of its contributo=
+rs
+- *    may be used to endorse or promote products derived from this softw=
+are
+- *    without specific prior written permission.
+- *
+- * THIS SOFTWARE IS PROVIDED BY THE REGENTS AND CONTRIBUTORS ``AS IS'' A=
+ND
+- * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+- * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PU=
+RPOSE
+- * ARE DISCLAIMED.  IN NO EVENT SHALL THE REGENTS OR CONTRIBUTORS BE LIA=
+BLE
+- * FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUE=
+NTIAL
+- * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOO=
+DS
+- * OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
+- * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, S=
+TRICT
+- * LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY=
+ WAY
+- * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY O=
+F
+- * SUCH DAMAGE.
+- *
+- *	@(#)in_cksum.c	8.1 (Berkeley) 6/10/93
+- * in_cksum.c,v 1.2 1994/08/02 07:48:16 davidg Exp
+- */
+-
+-#include "slirp.h"
+-
+-/*
+- * Checksum routine for Internet Protocol family headers (Portable Versi=
+on).
+- *
+- * This routine is very heavily used in the network
+- * code and should be modified for each CPU to be as fast as possible.
+- *
+- * XXX Since we will never span more than 1 mbuf, we can optimise this
+- */
+-
+-#define ADDCARRY(x)  (x > 65535 ? x -=3D 65535 : x)
+-#define REDUCE {l_util.l =3D sum; sum =3D l_util.s[0] + l_util.s[1];    =
+    \
+-        (void)ADDCARRY(sum);}
+-
+-int cksum(struct mbuf *m, int len)
+-{
+-	register uint16_t *w;
+-	register int sum =3D 0;
+-	register int mlen =3D 0;
+-	int byte_swapped =3D 0;
+-
+-	union {
+-		uint8_t  c[2];
+-		uint16_t s;
+-	} s_util;
+-	union {
+-		uint16_t s[2];
+-		uint32_t l;
+-	} l_util;
+-
+-	if (m->m_len =3D=3D 0)
+-	   goto cont;
+-	w =3D mtod(m, uint16_t *);
+-
+-	mlen =3D m->m_len;
+-
+-	if (len < mlen)
+-	   mlen =3D len;
+-	len -=3D mlen;
+-	/*
+-	 * Force to even boundary.
+-	 */
+-	if ((1 & (uintptr_t)w) && (mlen > 0)) {
+-		REDUCE;
+-		sum <<=3D 8;
+-		s_util.c[0] =3D *(uint8_t *)w;
+-		w =3D (uint16_t *)((int8_t *)w + 1);
+-		mlen--;
+-		byte_swapped =3D 1;
+-	}
+-	/*
+-	 * Unroll the loop to make overhead from
+-	 * branches &c small.
+-	 */
+-	while ((mlen -=3D 32) >=3D 0) {
+-		sum +=3D w[0]; sum +=3D w[1]; sum +=3D w[2]; sum +=3D w[3];
+-		sum +=3D w[4]; sum +=3D w[5]; sum +=3D w[6]; sum +=3D w[7];
+-		sum +=3D w[8]; sum +=3D w[9]; sum +=3D w[10]; sum +=3D w[11];
+-		sum +=3D w[12]; sum +=3D w[13]; sum +=3D w[14]; sum +=3D w[15];
+-		w +=3D 16;
+-	}
+-	mlen +=3D 32;
+-	while ((mlen -=3D 8) >=3D 0) {
+-		sum +=3D w[0]; sum +=3D w[1]; sum +=3D w[2]; sum +=3D w[3];
+-		w +=3D 4;
+-	}
+-	mlen +=3D 8;
+-	if (mlen =3D=3D 0 && byte_swapped =3D=3D 0)
+-	   goto cont;
+-	REDUCE;
+-	while ((mlen -=3D 2) >=3D 0) {
+-		sum +=3D *w++;
+-	}
+-
+-	if (byte_swapped) {
+-		REDUCE;
+-		sum <<=3D 8;
+-		if (mlen =3D=3D -1) {
+-			s_util.c[1] =3D *(uint8_t *)w;
+-			sum +=3D s_util.s;
+-			mlen =3D 0;
+-		} else
+-
+-		   mlen =3D -1;
+-	} else if (mlen =3D=3D -1)
+-	   s_util.c[0] =3D *(uint8_t *)w;
+-
+-cont:
+-	if (len) {
+-		DEBUG_ERROR("cksum: out of data");
+-		DEBUG_ERROR(" len =3D %d", len);
+-	}
+-	if (mlen =3D=3D -1) {
+-		/* The last mbuf has odd # of bytes. Follow the
+-		 standard (the odd byte may be shifted left by 8 bits
+-			   or not as determined by endian-ness of the machine) */
+-		s_util.c[1] =3D 0;
+-		sum +=3D s_util.s;
+-	}
+-	REDUCE;
+-	return (~sum & 0xffff);
+-}
+-
+-int ip6_cksum(struct mbuf *m)
+-{
+-    /* TODO: Optimize this by being able to pass the ip6_pseudohdr to ck=
+sum
+-     * separately from the mbuf */
+-    struct ip6 save_ip, *ip =3D mtod(m, struct ip6 *);
+-    struct ip6_pseudohdr *ih =3D mtod(m, struct ip6_pseudohdr *);
+-    int sum;
+-
+-    save_ip =3D *ip;
+-
+-    ih->ih_src =3D save_ip.ip_src;
+-    ih->ih_dst =3D save_ip.ip_dst;
+-    ih->ih_pl =3D htonl((uint32_t)ntohs(save_ip.ip_pl));
+-    ih->ih_zero_hi =3D 0;
+-    ih->ih_zero_lo =3D 0;
+-    ih->ih_nh =3D save_ip.ip_nh;
+-
+-    sum =3D cksum(m, ((int)sizeof(struct ip6_pseudohdr))
+-                    + ntohl(ih->ih_pl));
+-
+-    *ip =3D save_ip;
+-
+-    return sum;
+-}
+diff --git a/slirp/src/dhcpv6.c b/slirp/src/dhcpv6.c
+deleted file mode 100644
+index 3c8f420912..0000000000
+--- a/slirp/src/dhcpv6.c
++++ /dev/null
+@@ -1,224 +0,0 @@
+-/* SPDX-License-Identifier: BSD-3-Clause */
+-/*
+- * SLIRP stateless DHCPv6
+- *
+- * We only support stateless DHCPv6, e.g. for network booting.
+- * See RFC 3315, RFC 3736, RFC 3646 and RFC 5970 for details.
+- *
+- * Copyright 2016 Thomas Huth, Red Hat Inc.
+- *
+- * Redistribution and use in source and binary forms, with or without
+- * modification, are permitted provided that the following conditions
+- * are met:
+- *
+- * 1. Redistributions of source code must retain the above
+- * copyright notice, this list of conditions and the following
+- * disclaimer.
+- *
+- * 2. Redistributions in binary form must reproduce the above
+- * copyright notice, this list of conditions and the following
+- * disclaimer in the documentation and/or other materials provided
+- * with the distribution.
+- *
+- * 3. Neither the name of the copyright holder nor the names of its
+- * contributors may be used to endorse or promote products derived
+- * from this software without specific prior written permission.
+- *
+- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+- * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+- * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS
+- * FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE
+- * COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
+- * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+- * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+- * SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
+- * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT,
+- * STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+- * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
+- * OF THE POSSIBILITY OF SUCH DAMAGE.
+- */
+-
+-#include "slirp.h"
+-#include "dhcpv6.h"
+-
+-/* DHCPv6 message types */
+-#define MSGTYPE_REPLY        7
+-#define MSGTYPE_INFO_REQUEST 11
+-
+-/* DHCPv6 option types */
+-#define OPTION_CLIENTID      1
+-#define OPTION_IAADDR        5
+-#define OPTION_ORO           6
+-#define OPTION_DNS_SERVERS   23
+-#define OPTION_BOOTFILE_URL  59
+-
+-struct requested_infos {
+-    uint8_t *client_id;
+-    int client_id_len;
+-    bool want_dns;
+-    bool want_boot_url;
+-};
+-
+-/**
+- * Analyze the info request message sent by the client to see what data =
+it
+- * provided and what it wants to have. The information is gathered in th=
+e
+- * "requested_infos" struct. Note that client_id (if provided) points in=
+to
+- * the odata region, thus the caller must keep odata valid as long as it
+- * needs to access the requested_infos struct.
+- */
+-static int dhcpv6_parse_info_request(Slirp *slirp, uint8_t *odata, int o=
+len,
+-                                     struct requested_infos *ri)
+-{
+-    int i, req_opt;
+-
+-    while (olen > 4) {
+-        /* Parse one option */
+-        int option =3D odata[0] << 8 | odata[1];
+-        int len =3D odata[2] << 8 | odata[3];
+-
+-        if (len + 4 > olen) {
+-            slirp->cb->guest_error("Guest sent bad DHCPv6 packet!", slir=
+p->opaque);
+-            return -E2BIG;
+-        }
+-
+-        switch (option) {
+-        case OPTION_IAADDR:
+-            /* According to RFC3315, we must discard requests with IA op=
+tion */
+-            return -EINVAL;
+-        case OPTION_CLIENTID:
+-            if (len > 256) {
+-                /* Avoid very long IDs which could cause problems later =
+*/
+-                return -E2BIG;
+-            }
+-            ri->client_id =3D odata + 4;
+-            ri->client_id_len =3D len;
+-            break;
+-        case OPTION_ORO:        /* Option request option */
+-            if (len & 1) {
+-                return -EINVAL;
+-            }
+-            /* Check which options the client wants to have */
+-            for (i =3D 0; i < len; i +=3D 2) {
+-                req_opt =3D odata[4 + i] << 8 | odata[4 + i + 1];
+-                switch (req_opt) {
+-                case OPTION_DNS_SERVERS:
+-                    ri->want_dns =3D true;
+-                    break;
+-                case OPTION_BOOTFILE_URL:
+-                    ri->want_boot_url =3D true;
+-                    break;
+-                default:
+-                    DEBUG_MISC("dhcpv6: Unsupported option request %d",
+-                               req_opt);
+-                }
+-            }
+-            break;
+-        default:
+-            DEBUG_MISC("dhcpv6 info req: Unsupported option %d, len=3D%d=
+",
+-                       option, len);
+-        }
+-
+-        odata +=3D len + 4;
+-        olen -=3D len + 4;
+-    }
+-
+-    return 0;
+-}
+-
+-
+-/**
+- * Handle information request messages
+- */
+-static void dhcpv6_info_request(Slirp *slirp, struct sockaddr_in6 *srcsa=
+s,
+-                                uint32_t xid, uint8_t *odata, int olen)
+-{
+-    struct requested_infos ri =3D { NULL };
+-    struct sockaddr_in6 sa6, da6;
+-    struct mbuf *m;
+-    uint8_t *resp;
+-
+-    if (dhcpv6_parse_info_request(slirp, odata, olen, &ri) < 0) {
+-        return;
+-    }
+-
+-    m =3D m_get(slirp);
+-    if (!m) {
+-        return;
+-    }
+-    memset(m->m_data, 0, m->m_size);
+-    m->m_data +=3D IF_MAXLINKHDR;
+-    resp =3D (uint8_t *)m->m_data + sizeof(struct ip6) + sizeof(struct u=
+dphdr);
+-
+-    /* Fill in response */
+-    *resp++ =3D MSGTYPE_REPLY;
+-    *resp++ =3D (uint8_t)(xid >> 16);
+-    *resp++ =3D (uint8_t)(xid >> 8);
+-    *resp++ =3D (uint8_t)xid;
+-
+-    if (ri.client_id) {
+-        *resp++ =3D OPTION_CLIENTID >> 8;         /* option-code high by=
+te */
+-        *resp++ =3D OPTION_CLIENTID;              /* option-code low byt=
+e */
+-        *resp++ =3D ri.client_id_len >> 8;        /* option-len high byt=
+e */
+-        *resp++ =3D ri.client_id_len;             /* option-len low byte=
+ */
+-        memcpy(resp, ri.client_id, ri.client_id_len);
+-        resp +=3D ri.client_id_len;
+-    }
+-    if (ri.want_dns) {
+-        *resp++ =3D OPTION_DNS_SERVERS >> 8;      /* option-code high by=
+te */
+-        *resp++ =3D OPTION_DNS_SERVERS;           /* option-code low byt=
+e */
+-        *resp++ =3D 0;                            /* option-len high byt=
+e */
+-        *resp++ =3D 16;                           /* option-len low byte=
+ */
+-        memcpy(resp, &slirp->vnameserver_addr6, 16);
+-        resp +=3D 16;
+-    }
+-    if (ri.want_boot_url) {
+-        uint8_t *sa =3D slirp->vhost_addr6.s6_addr;
+-        int slen, smaxlen;
+-
+-        *resp++ =3D OPTION_BOOTFILE_URL >> 8;     /* option-code high by=
+te */
+-        *resp++ =3D OPTION_BOOTFILE_URL;          /* option-code low byt=
+e */
+-        smaxlen =3D (uint8_t *)m->m_data + IF_MTU - (resp + 2);
+-        slen =3D snprintf((char *)resp + 2, smaxlen,
+-                        "tftp://[%02x%02x:%02x%02x:%02x%02x:%02x%02x:"
+-                                "%02x%02x:%02x%02x:%02x%02x:%02x%02x]/%s=
+",
+-                        sa[0], sa[1], sa[2], sa[3], sa[4], sa[5], sa[6],=
+ sa[7],
+-                        sa[8], sa[9], sa[10], sa[11], sa[12], sa[13], sa=
+[14],
+-                        sa[15], slirp->bootp_filename);
+-        slen =3D MIN(slen, smaxlen);
+-        *resp++ =3D slen >> 8;                    /* option-len high byt=
+e */
+-        *resp++ =3D slen;                         /* option-len low byte=
+ */
+-        resp +=3D slen;
+-    }
+-
+-    sa6.sin6_addr =3D slirp->vhost_addr6;
+-    sa6.sin6_port =3D DHCPV6_SERVER_PORT;
+-    da6.sin6_addr =3D srcsas->sin6_addr;
+-    da6.sin6_port =3D srcsas->sin6_port;
+-    m->m_data +=3D sizeof(struct ip6) + sizeof(struct udphdr);
+-    m->m_len =3D resp - (uint8_t *)m->m_data;
+-    udp6_output(NULL, m, &sa6, &da6);
+-}
+-
+-/**
+- * Handle DHCPv6 messages sent by the client
+- */
+-void dhcpv6_input(struct sockaddr_in6 *srcsas, struct mbuf *m)
+-{
+-    uint8_t *data =3D (uint8_t *)m->m_data + sizeof(struct udphdr);
+-    int data_len =3D m->m_len - sizeof(struct udphdr);
+-    uint32_t xid;
+-
+-    if (data_len < 4) {
+-        return;
+-    }
+-
+-    xid =3D ntohl(*(uint32_t *)data) & 0xffffff;
+-
+-    switch (data[0]) {
+-    case MSGTYPE_INFO_REQUEST:
+-        dhcpv6_info_request(m->slirp, srcsas, xid, &data[4], data_len - =
+4);
+-        break;
+-    default:
+-        DEBUG_MISC("dhcpv6_input: Unsupported message type 0x%x", data[0=
+]);
+-    }
+-}
+diff --git a/slirp/src/dnssearch.c b/slirp/src/dnssearch.c
+deleted file mode 100644
+index 12c488971e..0000000000
+--- a/slirp/src/dnssearch.c
++++ /dev/null
+@@ -1,311 +0,0 @@
+-/* SPDX-License-Identifier: MIT */
+-/*
+- * Domain search option for DHCP (RFC 3397)
+- *
+- * Copyright (c) 2012 Klaus Stengel
+- *
+- * Permission is hereby granted, free of charge, to any person obtaining=
+ a copy
+- * of this software and associated documentation files (the "Software"),=
+ to deal
+- * in the Software without restriction, including without limitation the=
+ rights
+- * to use, copy, modify, merge, publish, distribute, sublicense, and/or =
+sell
+- * copies of the Software, and to permit persons to whom the Software is
+- * furnished to do so, subject to the following conditions:
+- *
+- * The above copyright notice and this permission notice shall be includ=
+ed in
+- * all copies or substantial portions of the Software.
+- *
+- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRE=
+SS OR
+- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILI=
+TY,
+- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHA=
+LL
+- * THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR =
+OTHER
+- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISI=
+NG FROM,
+- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALING=
+S IN
+- * THE SOFTWARE.
+- */
+-
+-#include "slirp.h"
+-
+-static const uint8_t RFC3397_OPT_DOMAIN_SEARCH =3D 119;
+-static const uint8_t MAX_OPT_LEN =3D 255;
+-static const uint8_t OPT_HEADER_LEN =3D 2;
+-static const uint8_t REFERENCE_LEN =3D 2;
+-
+-struct compact_domain;
+-
+-typedef struct compact_domain {
+-    struct compact_domain *self;
+-    struct compact_domain *refdom;
+-    uint8_t *labels;
+-    size_t len;
+-    size_t common_octets;
+-} CompactDomain;
+-
+-static size_t
+-domain_suffix_diffoff(const CompactDomain *a, const CompactDomain *b)
+-{
+-    size_t la =3D a->len, lb =3D b->len;
+-    uint8_t *da =3D a->labels + la, *db =3D b->labels + lb;
+-    size_t i, lm =3D (la < lb) ? la : lb;
+-
+-    for (i =3D 0; i < lm; i++) {
+-        da--; db--;
+-        if (*da !=3D *db) {
+-            break;
+-        }
+-    }
+-    return i;
+-}
+-
+-static int domain_suffix_ord(const void *cva, const void *cvb)
+-{
+-    const CompactDomain *a =3D cva, *b =3D cvb;
+-    size_t la =3D a->len, lb =3D b->len;
+-    size_t doff =3D domain_suffix_diffoff(a, b);
+-    uint8_t ca =3D a->labels[la - doff];
+-    uint8_t cb =3D b->labels[lb - doff];
+-
+-    if (ca < cb) {
+-        return -1;
+-    }
+-    if (ca > cb) {
+-        return 1;
+-    }
+-    if (la < lb) {
+-        return -1;
+-    }
+-    if (la > lb) {
+-        return 1;
+-    }
+-    return 0;
+-}
+-
+-static size_t domain_common_label(CompactDomain *a, CompactDomain *b)
+-{
+-    size_t res, doff =3D domain_suffix_diffoff(a, b);
+-    uint8_t *first_eq_pos =3D a->labels + (a->len - doff);
+-    uint8_t *label =3D a->labels;
+-
+-    while (*label && label < first_eq_pos) {
+-        label +=3D *label + 1;
+-    }
+-    res =3D a->len - (label - a->labels);
+-    /* only report if it can help to reduce the packet size */
+-    return (res > REFERENCE_LEN) ? res : 0;
+-}
+-
+-static void domain_fixup_order(CompactDomain *cd, size_t n)
+-{
+-    size_t i;
+-
+-    for (i =3D 0; i < n; i++) {
+-        CompactDomain *cur =3D cd + i, *next =3D cd[i].self;
+-
+-        while (!cur->common_octets) {
+-            CompactDomain *tmp =3D next->self; /* backup target value */
+-
+-            next->self =3D cur;
+-            cur->common_octets++;
+-
+-            cur =3D next;
+-            next =3D tmp;
+-        }
+-    }
+-}
+-
+-static void domain_mklabels(CompactDomain *cd, const char *input)
+-{
+-    uint8_t *len_marker =3D cd->labels;
+-    uint8_t *output =3D len_marker; /* pre-incremented */
+-    const char *in =3D input;
+-    char cur_chr;
+-    size_t len =3D 0;
+-
+-    if (cd->len =3D=3D 0) {
+-        goto fail;
+-    }
+-    cd->len++;
+-
+-    do {
+-        cur_chr =3D *in++;
+-        if (cur_chr =3D=3D '.' || cur_chr =3D=3D '\0') {
+-            len =3D output - len_marker;
+-            if ((len =3D=3D 0 && cur_chr =3D=3D '.') || len >=3D 64) {
+-                goto fail;
+-            }
+-            *len_marker =3D len;
+-
+-            output++;
+-            len_marker =3D output;
+-        } else {
+-            output++;
+-            *output =3D cur_chr;
+-        }
+-    } while (cur_chr !=3D '\0');
+-
+-    /* ensure proper zero-termination */
+-    if (len !=3D 0) {
+-        *len_marker =3D 0;
+-        cd->len++;
+-    }
+-    return;
+-
+-fail:
+-    g_warning("failed to parse domain name '%s'\n", input);
+-    cd->len =3D 0;
+-}
+-
+-static void
+-domain_mkxrefs(CompactDomain *doms, CompactDomain *last, size_t depth)
+-{
+-    CompactDomain *i =3D doms, *target =3D doms;
+-
+-    do {
+-        if (i->labels < target->labels) {
+-            target =3D i;
+-        }
+-    } while (i++ !=3D last);
+-
+-    for (i =3D doms; i !=3D last; i++) {
+-        CompactDomain *group_last;
+-        size_t next_depth;
+-
+-        if (i->common_octets =3D=3D depth) {
+-            continue;
+-        }
+-
+-        next_depth =3D -1;
+-        for (group_last =3D i; group_last !=3D last; group_last++) {
+-            size_t co =3D group_last->common_octets;
+-            if (co <=3D depth) {
+-                break;
+-            }
+-            if (co < next_depth) {
+-                next_depth =3D co;
+-            }
+-        }
+-        domain_mkxrefs(i, group_last, next_depth);
+-
+-        i =3D group_last;
+-        if (i =3D=3D last) {
+-            break;
+-        }
+-    }
+-
+-    if (depth =3D=3D 0) {
+-        return;
+-    }
+-
+-    i =3D doms;
+-    do {
+-        if (i !=3D target && i->refdom =3D=3D NULL) {
+-            i->refdom =3D target;
+-            i->common_octets =3D depth;
+-        }
+-    } while (i++ !=3D last);
+-}
+-
+-static size_t domain_compactify(CompactDomain *domains, size_t n)
+-{
+-    uint8_t *start =3D domains->self->labels, *outptr =3D start;
+-    size_t i;
+-
+-    for (i =3D 0; i < n; i++) {
+-        CompactDomain *cd =3D domains[i].self;
+-        CompactDomain *rd =3D cd->refdom;
+-
+-        if (rd !=3D NULL) {
+-            size_t moff =3D (rd->labels - start)
+-                    + (rd->len - cd->common_octets);
+-            if (moff < 0x3FFFu) {
+-                cd->len -=3D cd->common_octets - 2;
+-                cd->labels[cd->len - 1] =3D moff & 0xFFu;
+-                cd->labels[cd->len - 2] =3D 0xC0u | (moff >> 8);
+-            }
+-        }
+-
+-        if (cd->labels !=3D outptr) {
+-            memmove(outptr, cd->labels, cd->len);
+-            cd->labels =3D outptr;
+-        }
+-        outptr +=3D cd->len;
+-    }
+-    return outptr - start;
+-}
+-
+-int translate_dnssearch(Slirp *s, const char **names)
+-{
+-    size_t blocks, bsrc_start, bsrc_end, bdst_start;
+-    size_t i, num_domains, memreq =3D 0;
+-    uint8_t *result =3D NULL, *outptr;
+-    CompactDomain *domains =3D NULL;
+-    const char **nameptr =3D names;
+-
+-    while (*nameptr !=3D NULL) {
+-        nameptr++;
+-    }
+-
+-    num_domains =3D nameptr - names;
+-    if (num_domains =3D=3D 0) {
+-        return -2;
+-    }
+-
+-    domains =3D g_malloc(num_domains * sizeof(*domains));
+-
+-    for (i =3D 0; i < num_domains; i++) {
+-        size_t nlen =3D strlen(names[i]);
+-        memreq +=3D nlen + 2; /* 1 zero octet + 1 label length octet */
+-        domains[i].self =3D domains + i;
+-        domains[i].len =3D nlen;
+-        domains[i].common_octets =3D 0;
+-        domains[i].refdom =3D NULL;
+-    }
+-
+-    /* reserve extra 2 header bytes for each 255 bytes of output */
+-    memreq +=3D DIV_ROUND_UP(memreq, MAX_OPT_LEN) * OPT_HEADER_LEN;
+-    result =3D g_malloc(memreq * sizeof(*result));
+-
+-    outptr =3D result;
+-    for (i =3D 0; i < num_domains; i++) {
+-        domains[i].labels =3D outptr;
+-        domain_mklabels(domains + i, names[i]);
+-        outptr +=3D domains[i].len;
+-    }
+-
+-    if (outptr =3D=3D result) {
+-        g_free(domains);
+-        g_free(result);
+-        return -1;
+-    }
+-
+-    qsort(domains, num_domains, sizeof(*domains), domain_suffix_ord);
+-    domain_fixup_order(domains, num_domains);
+-
+-    for (i =3D 1; i < num_domains; i++) {
+-        size_t cl =3D domain_common_label(domains + i - 1, domains + i);
+-        domains[i - 1].common_octets =3D cl;
+-    }
+-
+-    domain_mkxrefs(domains, domains + num_domains - 1, 0);
+-    memreq =3D domain_compactify(domains, num_domains);
+-
+-    blocks =3D DIV_ROUND_UP(memreq, MAX_OPT_LEN);
+-    bsrc_end =3D memreq;
+-    bsrc_start =3D (blocks - 1) * MAX_OPT_LEN;
+-    bdst_start =3D bsrc_start + blocks * OPT_HEADER_LEN;
+-    memreq +=3D blocks * OPT_HEADER_LEN;
+-
+-    while (blocks--) {
+-        size_t len =3D bsrc_end - bsrc_start;
+-        memmove(result + bdst_start, result + bsrc_start, len);
+-        result[bdst_start - 2] =3D RFC3397_OPT_DOMAIN_SEARCH;
+-        result[bdst_start - 1] =3D len;
+-        bsrc_end =3D bsrc_start;
+-        bsrc_start -=3D MAX_OPT_LEN;
+-        bdst_start -=3D MAX_OPT_LEN + OPT_HEADER_LEN;
+-    }
+-
+-    g_free(domains);
+-    s->vdnssearch =3D result;
+-    s->vdnssearch_len =3D memreq;
+-    return 0;
+-}
+diff --git a/slirp/src/if.c b/slirp/src/if.c
+deleted file mode 100644
+index 6eaac7292a..0000000000
+--- a/slirp/src/if.c
++++ /dev/null
+@@ -1,218 +0,0 @@
+-/* SPDX-License-Identifier: BSD-3-Clause */
+-/*
+- * Copyright (c) 1995 Danny Gasparovski.
+- */
+-
+-#include "slirp.h"
+-
+-static void
+-ifs_insque(struct mbuf *ifm, struct mbuf *ifmhead)
+-{
+-	ifm->ifs_next =3D ifmhead->ifs_next;
+-	ifmhead->ifs_next =3D ifm;
+-	ifm->ifs_prev =3D ifmhead;
+-	ifm->ifs_next->ifs_prev =3D ifm;
+-}
+-
+-static void
+-ifs_remque(struct mbuf *ifm)
+-{
+-	ifm->ifs_prev->ifs_next =3D ifm->ifs_next;
+-	ifm->ifs_next->ifs_prev =3D ifm->ifs_prev;
+-}
+-
+-void
+-if_init(Slirp *slirp)
+-{
+-    slirp->if_fastq.qh_link =3D slirp->if_fastq.qh_rlink =3D &slirp->if_=
+fastq;
+-    slirp->if_batchq.qh_link =3D slirp->if_batchq.qh_rlink =3D &slirp->i=
+f_batchq;
+-}
+-
+-/*
+- * if_output: Queue packet into an output queue.
+- * There are 2 output queue's, if_fastq and if_batchq.
+- * Each output queue is a doubly linked list of double linked lists
+- * of mbufs, each list belonging to one "session" (socket).  This
+- * way, we can output packets fairly by sending one packet from each
+- * session, instead of all the packets from one session, then all packet=
+s
+- * from the next session, etc.  Packets on the if_fastq get absolute
+- * priority, but if one session hogs the link, it gets "downgraded"
+- * to the batchq until it runs out of packets, then it'll return
+- * to the fastq (eg. if the user does an ls -alR in a telnet session,
+- * it'll temporarily get downgraded to the batchq)
+- */
+-void
+-if_output(struct socket *so, struct mbuf *ifm)
+-{
+-	Slirp *slirp =3D ifm->slirp;
+-	struct mbuf *ifq;
+-	int on_fastq =3D 1;
+-
+-	DEBUG_CALL("if_output");
+-	DEBUG_ARG("so =3D %p", so);
+-	DEBUG_ARG("ifm =3D %p", ifm);
+-
+-	/*
+-	 * First remove the mbuf from m_usedlist,
+-	 * since we're gonna use m_next and m_prev ourselves
+-	 * XXX Shouldn't need this, gotta change dtom() etc.
+-	 */
+-	if (ifm->m_flags & M_USEDLIST) {
+-		remque(ifm);
+-		ifm->m_flags &=3D ~M_USEDLIST;
+-	}
+-
+-	/*
+-	 * See if there's already a batchq list for this session.
+-	 * This can include an interactive session, which should go on fastq,
+-	 * but gets too greedy... hence it'll be downgraded from fastq to batch=
+q.
+-	 * We mustn't put this packet back on the fastq (or we'll send it out o=
+f order)
+-	 * XXX add cache here?
+-	 */
+-	if (so) {
+-		for (ifq =3D (struct mbuf *) slirp->if_batchq.qh_rlink;
+-		     (struct quehead *) ifq !=3D &slirp->if_batchq;
+-		     ifq =3D ifq->ifq_prev) {
+-			if (so =3D=3D ifq->ifq_so) {
+-				/* A match! */
+-				ifm->ifq_so =3D so;
+-				ifs_insque(ifm, ifq->ifs_prev);
+-				goto diddit;
+-			}
+-		}
+-	}
+-
+-	/* No match, check which queue to put it on */
+-	if (so && (so->so_iptos & IPTOS_LOWDELAY)) {
+-		ifq =3D (struct mbuf *) slirp->if_fastq.qh_rlink;
+-		on_fastq =3D 1;
+-		/*
+-		 * Check if this packet is a part of the last
+-		 * packet's session
+-		 */
+-		if (ifq->ifq_so =3D=3D so) {
+-			ifm->ifq_so =3D so;
+-			ifs_insque(ifm, ifq->ifs_prev);
+-			goto diddit;
+-		}
+-        } else {
+-		ifq =3D (struct mbuf *) slirp->if_batchq.qh_rlink;
+-        }
+-
+-	/* Create a new doubly linked list for this session */
+-	ifm->ifq_so =3D so;
+-	ifs_init(ifm);
+-	insque(ifm, ifq);
+-
+-diddit:
+-	if (so) {
+-		/* Update *_queued */
+-		so->so_queued++;
+-		so->so_nqueued++;
+-		/*
+-		 * Check if the interactive session should be downgraded to
+-		 * the batchq.  A session is downgraded if it has queued 6
+-		 * packets without pausing, and at least 3 of those packets
+-		 * have been sent over the link
+-		 * (XXX These are arbitrary numbers, probably not optimal..)
+-		 */
+-		if (on_fastq && ((so->so_nqueued >=3D 6) &&
+-				 (so->so_nqueued - so->so_queued) >=3D 3)) {
+-
+-			/* Remove from current queue... */
+-			remque(ifm->ifs_next);
+-
+-			/* ...And insert in the new.  That'll teach ya! */
+-			insque(ifm->ifs_next, &slirp->if_batchq);
+-		}
+-	}
+-
+-	/*
+-	 * This prevents us from malloc()ing too many mbufs
+-	 */
+-	if_start(ifm->slirp);
+-}
+-
+-/*
+- * Send one packet from each session.
+- * If there are packets on the fastq, they are sent FIFO, before
+- * everything else.  Then we choose the first packet from each
+- * batchq session (socket) and send it.
+- * For example, if there are 3 ftp sessions fighting for bandwidth,
+- * one packet will be sent from the first session, then one packet
+- * from the second session, then one packet from the third.
+- */
+-void if_start(Slirp *slirp)
+-{
+-    uint64_t now =3D slirp->cb->clock_get_ns(slirp->opaque);
+-    bool from_batchq =3D false;
+-    struct mbuf *ifm, *ifm_next, *ifqt;
+-
+-    DEBUG_CALL("if_start");
+-
+-    if (slirp->if_start_busy) {
+-        return;
+-    }
+-    slirp->if_start_busy =3D true;
+-
+-    struct mbuf *batch_head =3D NULL;
+-    if (slirp->if_batchq.qh_link !=3D &slirp->if_batchq) {
+-        batch_head =3D (struct mbuf *) slirp->if_batchq.qh_link;
+-    }
+-
+-    if (slirp->if_fastq.qh_link !=3D &slirp->if_fastq) {
+-        ifm_next =3D (struct mbuf *) slirp->if_fastq.qh_link;
+-    } else if (batch_head) {
+-        /* Nothing on fastq, pick up from batchq */
+-        ifm_next =3D batch_head;
+-        from_batchq =3D true;
+-    } else {
+-        ifm_next =3D NULL;
+-    }
+-
+-    while (ifm_next) {
+-        ifm =3D ifm_next;
+-
+-        ifm_next =3D ifm->ifq_next;
+-        if ((struct quehead *) ifm_next =3D=3D &slirp->if_fastq) {
+-            /* No more packets in fastq, switch to batchq */
+-            ifm_next =3D batch_head;
+-            from_batchq =3D true;
+-        }
+-        if ((struct quehead *) ifm_next =3D=3D &slirp->if_batchq) {
+-            /* end of batchq */
+-            ifm_next =3D NULL;
+-        }
+-
+-        /* Try to send packet unless it already expired */
+-        if (ifm->expiration_date >=3D now && !if_encap(slirp, ifm)) {
+-            /* Packet is delayed due to pending ARP or NDP resolution */
+-            continue;
+-        }
+-
+-        /* Remove it from the queue */
+-        ifqt =3D ifm->ifq_prev;
+-        remque(ifm);
+-
+-        /* If there are more packets for this session, re-queue them */
+-        if (ifm->ifs_next !=3D ifm) {
+-            struct mbuf *next =3D ifm->ifs_next;
+-
+-            insque(next, ifqt);
+-            ifs_remque(ifm);
+-            if (!from_batchq) {
+-                ifm_next =3D next;
+-            }
+-        }
+-
+-        /* Update so_queued */
+-        if (ifm->ifq_so && --ifm->ifq_so->so_queued =3D=3D 0) {
+-            /* If there's no more queued, reset nqueued */
+-            ifm->ifq_so->so_nqueued =3D 0;
+-        }
+-
+-        m_free(ifm);
+-    }
+-
+-    slirp->if_start_busy =3D false;
+-}
+diff --git a/slirp/src/ip6_icmp.c b/slirp/src/ip6_icmp.c
+deleted file mode 100644
+index 5642457fdd..0000000000
+--- a/slirp/src/ip6_icmp.c
++++ /dev/null
+@@ -1,438 +0,0 @@
+-/* SPDX-License-Identifier: BSD-3-Clause */
+-/*
+- * Copyright (c) 2013
+- * Guillaume Subiron, Yann Bordenave, Serigne Modou Wagne.
+- */
+-
+-#include "slirp.h"
+-#include "ip6_icmp.h"
+-
+-#define NDP_Interval g_rand_int_range(slirp->grand, \
+-        NDP_MinRtrAdvInterval, NDP_MaxRtrAdvInterval)
+-
+-static void ra_timer_handler(void *opaque)
+-{
+-    Slirp *slirp =3D opaque;
+-
+-    slirp->cb->timer_mod(slirp->ra_timer,
+-        slirp->cb->clock_get_ns(slirp->opaque) / SCALE_MS + NDP_Interval=
+,
+-        slirp->opaque);
+-    ndp_send_ra(slirp);
+-}
+-
+-void icmp6_init(Slirp *slirp)
+-{
+-    if (!slirp->in6_enabled) {
+-        return;
+-    }
+-
+-    slirp->ra_timer =3D slirp->cb->timer_new(ra_timer_handler, slirp, sl=
+irp->opaque);
+-    slirp->cb->timer_mod(slirp->ra_timer,
+-        slirp->cb->clock_get_ns(slirp->opaque) / SCALE_MS + NDP_Interval=
+,
+-        slirp->opaque);
+-}
+-
+-void icmp6_cleanup(Slirp *slirp)
+-{
+-    if (!slirp->in6_enabled) {
+-        return;
+-    }
+-
+-    slirp->cb->timer_free(slirp->ra_timer, slirp->opaque);
+-}
+-
+-static void icmp6_send_echoreply(struct mbuf *m, Slirp *slirp, struct ip=
+6 *ip,
+-        struct icmp6 *icmp)
+-{
+-    struct mbuf *t =3D m_get(slirp);
+-    t->m_len =3D sizeof(struct ip6) + ntohs(ip->ip_pl);
+-    memcpy(t->m_data, m->m_data, t->m_len);
+-
+-    /* IPv6 Packet */
+-    struct ip6 *rip =3D mtod(t, struct ip6 *);
+-    rip->ip_dst =3D ip->ip_src;
+-    rip->ip_src =3D ip->ip_dst;
+-
+-    /* ICMPv6 packet */
+-    t->m_data +=3D sizeof(struct ip6);
+-    struct icmp6 *ricmp =3D mtod(t, struct icmp6 *);
+-    ricmp->icmp6_type =3D ICMP6_ECHO_REPLY;
+-    ricmp->icmp6_cksum =3D 0;
+-
+-    /* Checksum */
+-    t->m_data -=3D sizeof(struct ip6);
+-    ricmp->icmp6_cksum =3D ip6_cksum(t);
+-
+-    ip6_output(NULL, t, 0);
+-}
+-
+-void icmp6_send_error(struct mbuf *m, uint8_t type, uint8_t code)
+-{
+-    Slirp *slirp =3D m->slirp;
+-    struct mbuf *t;
+-    struct ip6 *ip =3D mtod(m, struct ip6 *);
+-    char addrstr[INET6_ADDRSTRLEN];
+-
+-    DEBUG_CALL("icmp6_send_error");
+-    DEBUG_ARG("type =3D %d, code =3D %d", type, code);
+-
+-    if (IN6_IS_ADDR_MULTICAST(&ip->ip_src) ||
+-            in6_zero(&ip->ip_src)) {
+-        /* TODO icmp error? */
+-        return;
+-    }
+-
+-    t =3D m_get(slirp);
+-
+-    /* IPv6 packet */
+-    struct ip6 *rip =3D mtod(t, struct ip6 *);
+-    rip->ip_src =3D (struct in6_addr)LINKLOCAL_ADDR;
+-    rip->ip_dst =3D ip->ip_src;
+-    inet_ntop(AF_INET6, &rip->ip_dst, addrstr, INET6_ADDRSTRLEN);
+-    DEBUG_ARG("target =3D %s", addrstr);
+-
+-    rip->ip_nh =3D IPPROTO_ICMPV6;
+-    const int error_data_len =3D MIN(m->m_len,
+-            IF_MTU - (sizeof(struct ip6) + ICMP6_ERROR_MINLEN));
+-    rip->ip_pl =3D htons(ICMP6_ERROR_MINLEN + error_data_len);
+-    t->m_len =3D sizeof(struct ip6) + ntohs(rip->ip_pl);
+-
+-    /* ICMPv6 packet */
+-    t->m_data +=3D sizeof(struct ip6);
+-    struct icmp6 *ricmp =3D mtod(t, struct icmp6 *);
+-    ricmp->icmp6_type =3D type;
+-    ricmp->icmp6_code =3D code;
+-    ricmp->icmp6_cksum =3D 0;
+-
+-    switch (type) {
+-    case ICMP6_UNREACH:
+-    case ICMP6_TIMXCEED:
+-        ricmp->icmp6_err.unused =3D 0;
+-        break;
+-    case ICMP6_TOOBIG:
+-        ricmp->icmp6_err.mtu =3D htonl(IF_MTU);
+-        break;
+-    case ICMP6_PARAMPROB:
+-        /* TODO: Handle this case */
+-        break;
+-    default:
+-        g_assert_not_reached();
+-        break;
+-    }
+-    t->m_data +=3D ICMP6_ERROR_MINLEN;
+-    memcpy(t->m_data, m->m_data, error_data_len);
+-
+-    /* Checksum */
+-    t->m_data -=3D ICMP6_ERROR_MINLEN;
+-    t->m_data -=3D sizeof(struct ip6);
+-    ricmp->icmp6_cksum =3D ip6_cksum(t);
+-
+-    ip6_output(NULL, t, 0);
+-}
+-
+-/*
+- * Send NDP Router Advertisement
+- */
+-void ndp_send_ra(Slirp *slirp)
+-{
+-    DEBUG_CALL("ndp_send_ra");
+-
+-    /* Build IPv6 packet */
+-    struct mbuf *t =3D m_get(slirp);
+-    struct ip6 *rip =3D mtod(t, struct ip6 *);
+-    size_t pl_size =3D 0;
+-    struct in6_addr addr;
+-    uint32_t scope_id;
+-
+-    rip->ip_src =3D (struct in6_addr)LINKLOCAL_ADDR;
+-    rip->ip_dst =3D (struct in6_addr)ALLNODES_MULTICAST;
+-    rip->ip_nh =3D IPPROTO_ICMPV6;
+-
+-    /* Build ICMPv6 packet */
+-    t->m_data +=3D sizeof(struct ip6);
+-    struct icmp6 *ricmp =3D mtod(t, struct icmp6 *);
+-    ricmp->icmp6_type =3D ICMP6_NDP_RA;
+-    ricmp->icmp6_code =3D 0;
+-    ricmp->icmp6_cksum =3D 0;
+-
+-    /* NDP */
+-    ricmp->icmp6_nra.chl =3D NDP_AdvCurHopLimit;
+-    ricmp->icmp6_nra.M =3D NDP_AdvManagedFlag;
+-    ricmp->icmp6_nra.O =3D NDP_AdvOtherConfigFlag;
+-    ricmp->icmp6_nra.reserved =3D 0;
+-    ricmp->icmp6_nra.lifetime =3D htons(NDP_AdvDefaultLifetime);
+-    ricmp->icmp6_nra.reach_time =3D htonl(NDP_AdvReachableTime);
+-    ricmp->icmp6_nra.retrans_time =3D htonl(NDP_AdvRetransTime);
+-    t->m_data +=3D ICMP6_NDP_RA_MINLEN;
+-    pl_size +=3D ICMP6_NDP_RA_MINLEN;
+-
+-    /* Source link-layer address (NDP option) */
+-    struct ndpopt *opt =3D mtod(t, struct ndpopt *);
+-    opt->ndpopt_type =3D NDPOPT_LINKLAYER_SOURCE;
+-    opt->ndpopt_len =3D NDPOPT_LINKLAYER_LEN / 8;
+-    in6_compute_ethaddr(rip->ip_src, opt->ndpopt_linklayer);
+-    t->m_data +=3D NDPOPT_LINKLAYER_LEN;
+-    pl_size +=3D NDPOPT_LINKLAYER_LEN;
+-
+-    /* Prefix information (NDP option) */
+-    struct ndpopt *opt2 =3D mtod(t, struct ndpopt *);
+-    opt2->ndpopt_type =3D NDPOPT_PREFIX_INFO;
+-    opt2->ndpopt_len =3D NDPOPT_PREFIXINFO_LEN / 8;
+-    opt2->ndpopt_prefixinfo.prefix_length =3D slirp->vprefix_len;
+-    opt2->ndpopt_prefixinfo.L =3D 1;
+-    opt2->ndpopt_prefixinfo.A =3D 1;
+-    opt2->ndpopt_prefixinfo.reserved1 =3D 0;
+-    opt2->ndpopt_prefixinfo.valid_lt =3D htonl(NDP_AdvValidLifetime);
+-    opt2->ndpopt_prefixinfo.pref_lt =3D htonl(NDP_AdvPrefLifetime);
+-    opt2->ndpopt_prefixinfo.reserved2 =3D 0;
+-    opt2->ndpopt_prefixinfo.prefix =3D slirp->vprefix_addr6;
+-    t->m_data +=3D NDPOPT_PREFIXINFO_LEN;
+-    pl_size +=3D NDPOPT_PREFIXINFO_LEN;
+-
+-    /* Prefix information (NDP option) */
+-    if (get_dns6_addr(&addr, &scope_id) >=3D 0) {
+-        /* Host system does have an IPv6 DNS server, announce our proxy.=
+  */
+-        struct ndpopt *opt3 =3D mtod(t, struct ndpopt *);
+-        opt3->ndpopt_type =3D NDPOPT_RDNSS;
+-        opt3->ndpopt_len =3D NDPOPT_RDNSS_LEN / 8;
+-        opt3->ndpopt_rdnss.reserved =3D 0;
+-        opt3->ndpopt_rdnss.lifetime =3D htonl(2 * NDP_MaxRtrAdvInterval)=
+;
+-        opt3->ndpopt_rdnss.addr =3D slirp->vnameserver_addr6;
+-        t->m_data +=3D NDPOPT_RDNSS_LEN;
+-        pl_size +=3D NDPOPT_RDNSS_LEN;
+-    }
+-
+-    rip->ip_pl =3D htons(pl_size);
+-    t->m_data -=3D sizeof(struct ip6) + pl_size;
+-    t->m_len =3D sizeof(struct ip6) + pl_size;
+-
+-    /* ICMPv6 Checksum */
+-    ricmp->icmp6_cksum =3D ip6_cksum(t);
+-
+-    ip6_output(NULL, t, 0);
+-}
+-
+-/*
+- * Send NDP Neighbor Solitication
+- */
+-void ndp_send_ns(Slirp *slirp, struct in6_addr addr)
+-{
+-    char addrstr[INET6_ADDRSTRLEN];
+-
+-    inet_ntop(AF_INET6, &addr, addrstr, INET6_ADDRSTRLEN);
+-
+-    DEBUG_CALL("ndp_send_ns");
+-    DEBUG_ARG("target =3D %s", addrstr);
+-
+-    /* Build IPv6 packet */
+-    struct mbuf *t =3D m_get(slirp);
+-    struct ip6 *rip =3D mtod(t, struct ip6 *);
+-    rip->ip_src =3D slirp->vhost_addr6;
+-    rip->ip_dst =3D (struct in6_addr)SOLICITED_NODE_PREFIX;
+-    memcpy(&rip->ip_dst.s6_addr[13], &addr.s6_addr[13], 3);
+-    rip->ip_nh =3D IPPROTO_ICMPV6;
+-    rip->ip_pl =3D htons(ICMP6_NDP_NS_MINLEN + NDPOPT_LINKLAYER_LEN);
+-    t->m_len =3D sizeof(struct ip6) + ntohs(rip->ip_pl);
+-
+-    /* Build ICMPv6 packet */
+-    t->m_data +=3D sizeof(struct ip6);
+-    struct icmp6 *ricmp =3D mtod(t, struct icmp6 *);
+-    ricmp->icmp6_type =3D ICMP6_NDP_NS;
+-    ricmp->icmp6_code =3D 0;
+-    ricmp->icmp6_cksum =3D 0;
+-
+-    /* NDP */
+-    ricmp->icmp6_nns.reserved =3D 0;
+-    ricmp->icmp6_nns.target =3D addr;
+-
+-    /* Build NDP option */
+-    t->m_data +=3D ICMP6_NDP_NS_MINLEN;
+-    struct ndpopt *opt =3D mtod(t, struct ndpopt *);
+-    opt->ndpopt_type =3D NDPOPT_LINKLAYER_SOURCE;
+-    opt->ndpopt_len =3D NDPOPT_LINKLAYER_LEN / 8;
+-    in6_compute_ethaddr(slirp->vhost_addr6, opt->ndpopt_linklayer);
+-
+-    /* ICMPv6 Checksum */
+-    t->m_data -=3D ICMP6_NDP_NA_MINLEN;
+-    t->m_data -=3D sizeof(struct ip6);
+-    ricmp->icmp6_cksum =3D ip6_cksum(t);
+-
+-    ip6_output(NULL, t, 1);
+-}
+-
+-/*
+- * Send NDP Neighbor Advertisement
+- */
+-static void ndp_send_na(Slirp *slirp, struct ip6 *ip, struct icmp6 *icmp=
+)
+-{
+-    /* Build IPv6 packet */
+-    struct mbuf *t =3D m_get(slirp);
+-    struct ip6 *rip =3D mtod(t, struct ip6 *);
+-    rip->ip_src =3D icmp->icmp6_nns.target;
+-    if (in6_zero(&ip->ip_src)) {
+-        rip->ip_dst =3D (struct in6_addr)ALLNODES_MULTICAST;
+-    } else {
+-        rip->ip_dst =3D ip->ip_src;
+-    }
+-    rip->ip_nh =3D IPPROTO_ICMPV6;
+-    rip->ip_pl =3D htons(ICMP6_NDP_NA_MINLEN
+-                        + NDPOPT_LINKLAYER_LEN);
+-    t->m_len =3D sizeof(struct ip6) + ntohs(rip->ip_pl);
+-
+-    /* Build ICMPv6 packet */
+-    t->m_data +=3D sizeof(struct ip6);
+-    struct icmp6 *ricmp =3D mtod(t, struct icmp6 *);
+-    ricmp->icmp6_type =3D ICMP6_NDP_NA;
+-    ricmp->icmp6_code =3D 0;
+-    ricmp->icmp6_cksum =3D 0;
+-
+-    /* NDP */
+-    ricmp->icmp6_nna.R =3D NDP_IsRouter;
+-    ricmp->icmp6_nna.S =3D !IN6_IS_ADDR_MULTICAST(&rip->ip_dst);
+-    ricmp->icmp6_nna.O =3D 1;
+-    ricmp->icmp6_nna.reserved_hi =3D 0;
+-    ricmp->icmp6_nna.reserved_lo =3D 0;
+-    ricmp->icmp6_nna.target =3D icmp->icmp6_nns.target;
+-
+-    /* Build NDP option */
+-    t->m_data +=3D ICMP6_NDP_NA_MINLEN;
+-    struct ndpopt *opt =3D mtod(t, struct ndpopt *);
+-    opt->ndpopt_type =3D NDPOPT_LINKLAYER_TARGET;
+-    opt->ndpopt_len =3D NDPOPT_LINKLAYER_LEN / 8;
+-    in6_compute_ethaddr(ricmp->icmp6_nna.target,
+-                    opt->ndpopt_linklayer);
+-
+-    /* ICMPv6 Checksum */
+-    t->m_data -=3D ICMP6_NDP_NA_MINLEN;
+-    t->m_data -=3D sizeof(struct ip6);
+-    ricmp->icmp6_cksum =3D ip6_cksum(t);
+-
+-    ip6_output(NULL, t, 0);
+-}
+-
+-/*
+- * Process a NDP message
+- */
+-static void ndp_input(struct mbuf *m, Slirp *slirp, struct ip6 *ip,
+-        struct icmp6 *icmp)
+-{
+-    m->m_len +=3D ETH_HLEN;
+-    m->m_data -=3D ETH_HLEN;
+-    struct ethhdr *eth =3D mtod(m, struct ethhdr *);
+-    m->m_len -=3D ETH_HLEN;
+-    m->m_data +=3D ETH_HLEN;
+-
+-    switch (icmp->icmp6_type) {
+-    case ICMP6_NDP_RS:
+-        DEBUG_CALL(" type =3D Router Solicitation");
+-        if (ip->ip_hl =3D=3D 255
+-                && icmp->icmp6_code =3D=3D 0
+-                && ntohs(ip->ip_pl) >=3D ICMP6_NDP_RS_MINLEN) {
+-            /* Gratuitous NDP */
+-            ndp_table_add(slirp, ip->ip_src, eth->h_source);
+-
+-            ndp_send_ra(slirp);
+-        }
+-        break;
+-
+-    case ICMP6_NDP_RA:
+-        DEBUG_CALL(" type =3D Router Advertisement");
+-        slirp->cb->guest_error("Warning: guest sent NDP RA, but shouldn'=
+t",
+-                               slirp->opaque);
+-        break;
+-
+-    case ICMP6_NDP_NS:
+-        DEBUG_CALL(" type =3D Neighbor Solicitation");
+-        if (ip->ip_hl =3D=3D 255
+-                && icmp->icmp6_code =3D=3D 0
+-                && !IN6_IS_ADDR_MULTICAST(&icmp->icmp6_nns.target)
+-                && ntohs(ip->ip_pl) >=3D ICMP6_NDP_NS_MINLEN
+-                && (!in6_zero(&ip->ip_src)
+-                    || in6_solicitednode_multicast(&ip->ip_dst))) {
+-            if (in6_equal_host(&icmp->icmp6_nns.target)) {
+-                /* Gratuitous NDP */
+-                ndp_table_add(slirp, ip->ip_src, eth->h_source);
+-                ndp_send_na(slirp, ip, icmp);
+-            }
+-        }
+-        break;
+-
+-    case ICMP6_NDP_NA:
+-        DEBUG_CALL(" type =3D Neighbor Advertisement");
+-        if (ip->ip_hl =3D=3D 255
+-                && icmp->icmp6_code =3D=3D 0
+-                && ntohs(ip->ip_pl) >=3D ICMP6_NDP_NA_MINLEN
+-                && !IN6_IS_ADDR_MULTICAST(&icmp->icmp6_nna.target)
+-                && (!IN6_IS_ADDR_MULTICAST(&ip->ip_dst)
+-                    || icmp->icmp6_nna.S =3D=3D 0)) {
+-            ndp_table_add(slirp, ip->ip_src, eth->h_source);
+-        }
+-        break;
+-
+-    case ICMP6_NDP_REDIRECT:
+-        DEBUG_CALL(" type =3D Redirect");
+-        slirp->cb->guest_error(
+-            "Warning: guest sent NDP REDIRECT, but shouldn't", slirp->op=
+aque);
+-        break;
+-    }
+-}
+-
+-/*
+- * Process a received ICMPv6 message.
+- */
+-void icmp6_input(struct mbuf *m)
+-{
+-    struct icmp6 *icmp;
+-    struct ip6 *ip =3D mtod(m, struct ip6 *);
+-    Slirp *slirp =3D m->slirp;
+-    int hlen =3D sizeof(struct ip6);
+-
+-    DEBUG_CALL("icmp6_input");
+-    DEBUG_ARG("m =3D %p", m);
+-    DEBUG_ARG("m_len =3D %d", m->m_len);
+-
+-    if (ntohs(ip->ip_pl) < ICMP6_MINLEN) {
+-        goto end;
+-    }
+-
+-    if (ip6_cksum(m)) {
+-        goto end;
+-    }
+-
+-    m->m_len -=3D hlen;
+-    m->m_data +=3D hlen;
+-    icmp =3D mtod(m, struct icmp6 *);
+-    m->m_len +=3D hlen;
+-    m->m_data -=3D hlen;
+-
+-    DEBUG_ARG("icmp6_type =3D %d", icmp->icmp6_type);
+-    switch (icmp->icmp6_type) {
+-    case ICMP6_ECHO_REQUEST:
+-        if (in6_equal_host(&ip->ip_dst)) {
+-            icmp6_send_echoreply(m, slirp, ip, icmp);
+-        } else {
+-            /* TODO */
+-            g_critical("external icmpv6 not supported yet");
+-        }
+-        break;
+-
+-    case ICMP6_NDP_RS:
+-    case ICMP6_NDP_RA:
+-    case ICMP6_NDP_NS:
+-    case ICMP6_NDP_NA:
+-    case ICMP6_NDP_REDIRECT:
+-        ndp_input(m, slirp, ip, icmp);
+-        break;
+-
+-    case ICMP6_UNREACH:
+-    case ICMP6_TOOBIG:
+-    case ICMP6_TIMXCEED:
+-    case ICMP6_PARAMPROB:
+-        /* XXX? report error? close socket? */
+-    default:
+-        break;
+-    }
+-
+-end:
+-    m_free(m);
+-}
+diff --git a/slirp/src/ip6_input.c b/slirp/src/ip6_input.c
+deleted file mode 100644
+index d9d2b7e9cd..0000000000
+--- a/slirp/src/ip6_input.c
++++ /dev/null
+@@ -1,78 +0,0 @@
+-/* SPDX-License-Identifier: BSD-3-Clause */
+-/*
+- * Copyright (c) 2013
+- * Guillaume Subiron, Yann Bordenave, Serigne Modou Wagne.
+- */
+-
+-#include "slirp.h"
+-#include "ip6_icmp.h"
+-
+-/*
+- * IP initialization: fill in IP protocol switch table.
+- * All protocols not implemented in kernel go to raw IP protocol handler=
+.
+- */
+-void ip6_init(Slirp *slirp)
+-{
+-    icmp6_init(slirp);
+-}
+-
+-void ip6_cleanup(Slirp *slirp)
+-{
+-    icmp6_cleanup(slirp);
+-}
+-
+-void ip6_input(struct mbuf *m)
+-{
+-    struct ip6 *ip6;
+-    Slirp *slirp =3D m->slirp;
+-
+-    if (!slirp->in6_enabled) {
+-        goto bad;
+-    }
+-
+-    DEBUG_CALL("ip6_input");
+-    DEBUG_ARG("m =3D %p", m);
+-    DEBUG_ARG("m_len =3D %d", m->m_len);
+-
+-    if (m->m_len < sizeof(struct ip6)) {
+-        goto bad;
+-    }
+-
+-    ip6 =3D mtod(m, struct ip6 *);
+-
+-    if (ip6->ip_v !=3D IP6VERSION) {
+-        goto bad;
+-    }
+-
+-    if (ntohs(ip6->ip_pl) > IF_MTU) {
+-        icmp6_send_error(m, ICMP6_TOOBIG, 0);
+-        goto bad;
+-    }
+-
+-    /* check ip_ttl for a correct ICMP reply */
+-    if (ip6->ip_hl =3D=3D 0) {
+-        icmp6_send_error(m, ICMP6_TIMXCEED, ICMP6_TIMXCEED_INTRANS);
+-        goto bad;
+-    }
+-
+-    /*
+-     * Switch out to protocol's input routine.
+-     */
+-    switch (ip6->ip_nh) {
+-    case IPPROTO_TCP:
+-        NTOHS(ip6->ip_pl);
+-        tcp_input(m, sizeof(struct ip6), (struct socket *)NULL, AF_INET6=
+);
+-        break;
+-    case IPPROTO_UDP:
+-        udp6_input(m);
+-        break;
+-    case IPPROTO_ICMPV6:
+-        icmp6_input(m);
+-        break;
+-    default:
+-        m_free(m);
+-    }
+-    return;
+-bad:
+-    m_free(m);
+-}
+diff --git a/slirp/src/ip6_output.c b/slirp/src/ip6_output.c
+deleted file mode 100644
+index b86110662c..0000000000
+--- a/slirp/src/ip6_output.c
++++ /dev/null
+@@ -1,39 +0,0 @@
+-/* SPDX-License-Identifier: BSD-3-Clause */
+-/*
+- * Copyright (c) 2013
+- * Guillaume Subiron, Yann Bordenave, Serigne Modou Wagne.
+- */
+-
+-#include "slirp.h"
+-
+-/* Number of packets queued before we start sending
+- * (to prevent allocing too many mbufs) */
+-#define IF6_THRESH 10
+-
+-/*
+- * IPv6 output. The packet in mbuf chain m contains a IP header
+- */
+-int ip6_output(struct socket *so, struct mbuf *m, int fast)
+-{
+-    struct ip6 *ip =3D mtod(m, struct ip6 *);
+-
+-    DEBUG_CALL("ip6_output");
+-    DEBUG_ARG("so =3D %p", so);
+-    DEBUG_ARG("m =3D %p", m);
+-
+-    /* Fill IPv6 header */
+-    ip->ip_v =3D IP6VERSION;
+-    ip->ip_hl =3D IP6_HOP_LIMIT;
+-    ip->ip_tc_hi =3D 0;
+-    ip->ip_tc_lo =3D 0;
+-    ip->ip_fl_hi =3D 0;
+-    ip->ip_fl_lo =3D 0;
+-
+-    if (fast) {
+-        if_encap(m->slirp, m);
+-    } else {
+-        if_output(so, m);
+-    }
+-
+-    return 0;
+-}
+diff --git a/slirp/src/ip_icmp.c b/slirp/src/ip_icmp.c
+deleted file mode 100644
+index 1aea18afa7..0000000000
+--- a/slirp/src/ip_icmp.c
++++ /dev/null
+@@ -1,470 +0,0 @@
+-/* SPDX-License-Identifier: BSD-3-Clause */
+-/*
+- * Copyright (c) 1982, 1986, 1988, 1993
+- *	The Regents of the University of California.  All rights reserved.
+- *
+- * Redistribution and use in source and binary forms, with or without
+- * modification, are permitted provided that the following conditions
+- * are met:
+- * 1. Redistributions of source code must retain the above copyright
+- *    notice, this list of conditions and the following disclaimer.
+- * 2. Redistributions in binary form must reproduce the above copyright
+- *    notice, this list of conditions and the following disclaimer in th=
+e
+- *    documentation and/or other materials provided with the distributio=
+n.
+- * 3. Neither the name of the University nor the names of its contributo=
+rs
+- *    may be used to endorse or promote products derived from this softw=
+are
+- *    without specific prior written permission.
+- *
+- * THIS SOFTWARE IS PROVIDED BY THE REGENTS AND CONTRIBUTORS ``AS IS'' A=
+ND
+- * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+- * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PU=
+RPOSE
+- * ARE DISCLAIMED.  IN NO EVENT SHALL THE REGENTS OR CONTRIBUTORS BE LIA=
+BLE
+- * FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUE=
+NTIAL
+- * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOO=
+DS
+- * OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
+- * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, S=
+TRICT
+- * LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY=
+ WAY
+- * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY O=
+F
+- * SUCH DAMAGE.
+- *
+- *	@(#)ip_icmp.c	8.2 (Berkeley) 1/4/94
+- * ip_icmp.c,v 1.7 1995/05/30 08:09:42 rgrimes Exp
+- */
+-
+-#include "slirp.h"
+-#include "ip_icmp.h"
+-
+-#ifndef WITH_ICMP_ERROR_MSG
+-#define WITH_ICMP_ERROR_MSG 0
+-#endif
+-
+-/* The message sent when emulating PING */
+-/* Be nice and tell them it's just a pseudo-ping packet */
+-static const char icmp_ping_msg[] =3D "This is a pseudo-PING packet used=
+ by Slirp to emulate ICMP ECHO-REQUEST packets.\n";
+-
+-/* list of actions for icmp_send_error() on RX of an icmp message */
+-static const int icmp_flush[19] =3D {
+-/*  ECHO REPLY (0)  */   0,
+-		         1,
+-		         1,
+-/* DEST UNREACH (3) */   1,
+-/* SOURCE QUENCH (4)*/   1,
+-/* REDIRECT (5) */       1,
+-		         1,
+-		         1,
+-/* ECHO (8) */           0,
+-/* ROUTERADVERT (9) */   1,
+-/* ROUTERSOLICIT (10) */ 1,
+-/* TIME EXCEEDED (11) */ 1,
+-/* PARAMETER PROBLEM (12) */ 1,
+-/* TIMESTAMP (13) */     0,
+-/* TIMESTAMP REPLY (14) */ 0,
+-/* INFO (15) */          0,
+-/* INFO REPLY (16) */    0,
+-/* ADDR MASK (17) */     0,
+-/* ADDR MASK REPLY (18) */ 0
+-};
+-
+-void icmp_init(Slirp *slirp)
+-{
+-    slirp->icmp.so_next =3D slirp->icmp.so_prev =3D &slirp->icmp;
+-    slirp->icmp_last_so =3D &slirp->icmp;
+-}
+-
+-void icmp_cleanup(Slirp *slirp)
+-{
+-    while (slirp->icmp.so_next !=3D &slirp->icmp) {
+-        icmp_detach(slirp->icmp.so_next);
+-    }
+-}
+-
+-static int icmp_send(struct socket *so, struct mbuf *m, int hlen)
+-{
+-    struct ip *ip =3D mtod(m, struct ip *);
+-    struct sockaddr_in addr;
+-
+-    so->s =3D slirp_socket(AF_INET, SOCK_DGRAM, IPPROTO_ICMP);
+-    if (so->s =3D=3D -1) {
+-        return -1;
+-    }
+-
+-    so->so_m =3D m;
+-    so->so_faddr =3D ip->ip_dst;
+-    so->so_laddr =3D ip->ip_src;
+-    so->so_iptos =3D ip->ip_tos;
+-    so->so_type =3D IPPROTO_ICMP;
+-    so->so_state =3D SS_ISFCONNECTED;
+-    so->so_expire =3D curtime + SO_EXPIRE;
+-
+-    addr.sin_family =3D AF_INET;
+-    addr.sin_addr =3D so->so_faddr;
+-
+-    insque(so, &so->slirp->icmp);
+-
+-    if (sendto(so->s, m->m_data + hlen, m->m_len - hlen, 0,
+-               (struct sockaddr *)&addr, sizeof(addr)) =3D=3D -1) {
+-        DEBUG_MISC("icmp_input icmp sendto tx errno =3D %d-%s",
+-                   errno, strerror(errno));
+-        icmp_send_error(m, ICMP_UNREACH, ICMP_UNREACH_NET, 0, strerror(e=
+rrno));
+-        icmp_detach(so);
+-    }
+-
+-    return 0;
+-}
+-
+-void icmp_detach(struct socket *so)
+-{
+-    so->slirp->cb->unregister_poll_fd(so->s, so->slirp->opaque);
+-    closesocket(so->s);
+-    sofree(so);
+-}
+-
+-/*
+- * Process a received ICMP message.
+- */
+-void
+-icmp_input(struct mbuf *m, int hlen)
+-{
+-  register struct icmp *icp;
+-  register struct ip *ip=3Dmtod(m, struct ip *);
+-  int icmplen=3Dip->ip_len;
+-  Slirp *slirp =3D m->slirp;
+-
+-  DEBUG_CALL("icmp_input");
+-  DEBUG_ARG("m =3D %p", m);
+-  DEBUG_ARG("m_len =3D %d", m->m_len);
+-
+-  /*
+-   * Locate icmp structure in mbuf, and check
+-   * that its not corrupted and of at least minimum length.
+-   */
+-  if (icmplen < ICMP_MINLEN) {          /* min 8 bytes payload */
+-  freeit:
+-    m_free(m);
+-    goto end_error;
+-  }
+-
+-  m->m_len -=3D hlen;
+-  m->m_data +=3D hlen;
+-  icp =3D mtod(m, struct icmp *);
+-  if (cksum(m, icmplen)) {
+-    goto freeit;
+-  }
+-  m->m_len +=3D hlen;
+-  m->m_data -=3D hlen;
+-
+-  DEBUG_ARG("icmp_type =3D %d", icp->icmp_type);
+-  switch (icp->icmp_type) {
+-  case ICMP_ECHO:
+-    ip->ip_len +=3D hlen;	             /* since ip_input subtracts this =
+*/
+-    if (ip->ip_dst.s_addr =3D=3D slirp->vhost_addr.s_addr ||
+-        ip->ip_dst.s_addr =3D=3D slirp->vnameserver_addr.s_addr) {
+-        icmp_reflect(m);
+-    } else if (slirp->restricted) {
+-        goto freeit;
+-    } else {
+-      struct socket *so;
+-      struct sockaddr_storage addr;
+-      so =3D socreate(slirp);
+-      if (icmp_send(so, m, hlen) =3D=3D 0) {
+-        return;
+-      }
+-      if (udp_attach(so, AF_INET) =3D=3D -1) {
+-	DEBUG_MISC("icmp_input udp_attach errno =3D %d-%s",
+-               errno,strerror(errno));
+-	sofree(so);
+-	m_free(m);
+-	goto end_error;
+-      }
+-      so->so_m =3D m;
+-      so->so_ffamily =3D AF_INET;
+-      so->so_faddr =3D ip->ip_dst;
+-      so->so_fport =3D htons(7);
+-      so->so_lfamily =3D AF_INET;
+-      so->so_laddr =3D ip->ip_src;
+-      so->so_lport =3D htons(9);
+-      so->so_iptos =3D ip->ip_tos;
+-      so->so_type =3D IPPROTO_ICMP;
+-      so->so_state =3D SS_ISFCONNECTED;
+-
+-      /* Send the packet */
+-      addr =3D so->fhost.ss;
+-      sotranslate_out(so, &addr);
+-
+-      if(sendto(so->s, icmp_ping_msg, strlen(icmp_ping_msg), 0,
+-		(struct sockaddr *)&addr, sockaddr_size(&addr)) =3D=3D -1) {
+-	DEBUG_MISC("icmp_input udp sendto tx errno =3D %d-%s",
+-               errno,strerror(errno));
+-	icmp_send_error(m, ICMP_UNREACH, ICMP_UNREACH_NET, 0, strerror(errno));
+-	udp_detach(so);
+-      }
+-    } /* if ip->ip_dst.s_addr =3D=3D alias_addr.s_addr */
+-    break;
+-  case ICMP_UNREACH:
+-    /* XXX? report error? close socket? */
+-  case ICMP_TIMXCEED:
+-  case ICMP_PARAMPROB:
+-  case ICMP_SOURCEQUENCH:
+-  case ICMP_TSTAMP:
+-  case ICMP_MASKREQ:
+-  case ICMP_REDIRECT:
+-    m_free(m);
+-    break;
+-
+-  default:
+-    m_free(m);
+-  } /* swith */
+-
+-end_error:
+-  /* m is m_free()'d xor put in a socket xor or given to ip_send */
+-  return;
+-}
+-
+-
+-/*
+- *	Send an ICMP message in response to a situation
+- *
+- *	RFC 1122: 3.2.2	MUST send at least the IP header and 8 bytes of heade=
+r. MAY send more (we do).
+- *			MUST NOT change this header information.
+- *			MUST NOT reply to a multicast/broadcast IP address.
+- *			MUST NOT reply to a multicast/broadcast MAC address.
+- *			MUST reply to only the first fragment.
+- */
+-/*
+- * Send ICMP_UNREACH back to the source regarding msrc.
+- * mbuf *msrc is used as a template, but is NOT m_free()'d.
+- * It is reported as the bad ip packet.  The header should
+- * be fully correct and in host byte order.
+- * ICMP fragmentation is illegal.  All machines must accept 576 bytes in=
+ one
+- * packet.  The maximum payload is 576-20(ip hdr)-8(icmp hdr)=3D548
+- */
+-
+-#define ICMP_MAXDATALEN (IP_MSS-28)
+-void
+-icmp_send_error(struct mbuf *msrc, uint8_t type, uint8_t code, int minsi=
+ze,
+-           const char *message)
+-{
+-  unsigned hlen, shlen, s_ip_len;
+-  register struct ip *ip;
+-  register struct icmp *icp;
+-  register struct mbuf *m;
+-
+-  DEBUG_CALL("icmp_send_error");
+-  DEBUG_ARG("msrc =3D %p", msrc);
+-  DEBUG_ARG("msrc_len =3D %d", msrc->m_len);
+-
+-  if(type!=3DICMP_UNREACH && type!=3DICMP_TIMXCEED) goto end_error;
+-
+-  /* check msrc */
+-  if(!msrc) goto end_error;
+-  ip =3D mtod(msrc, struct ip *);
+-  if (slirp_debug & DBG_MISC) {
+-    char bufa[20], bufb[20];
+-    strcpy(bufa, inet_ntoa(ip->ip_src));
+-    strcpy(bufb, inet_ntoa(ip->ip_dst));
+-    DEBUG_MISC(" %.16s to %.16s", bufa, bufb);
+-  }
+-  if(ip->ip_off & IP_OFFMASK) goto end_error;    /* Only reply to fragme=
+nt 0 */
+-
+-  /* Do not reply to source-only IPs */
+-  if ((ip->ip_src.s_addr & htonl(~(0xf << 28))) =3D=3D 0) {
+-      goto end_error;
+-  }
+-
+-  shlen=3Dip->ip_hl << 2;
+-  s_ip_len=3Dip->ip_len;
+-  if(ip->ip_p =3D=3D IPPROTO_ICMP) {
+-    icp =3D (struct icmp *)((char *)ip + shlen);
+-    /*
+-     *	Assume any unknown ICMP type is an error. This isn't
+-     *	specified by the RFC, but think about it..
+-     */
+-    if(icp->icmp_type>18 || icmp_flush[icp->icmp_type]) goto end_error;
+-  }
+-
+-  /* make a copy */
+-  m =3D m_get(msrc->slirp);
+-  if (!m) {
+-      goto end_error;
+-  }
+-
+-  { int new_m_size;
+-    new_m_size=3Dsizeof(struct ip )+ICMP_MINLEN+msrc->m_len+ICMP_MAXDATA=
+LEN;
+-    if(new_m_size>m->m_size) m_inc(m, new_m_size);
+-  }
+-  memcpy(m->m_data, msrc->m_data, msrc->m_len);
+-  m->m_len =3D msrc->m_len;                        /* copy msrc to m */
+-
+-  /* make the header of the reply packet */
+-  ip  =3D mtod(m, struct ip *);
+-  hlen=3D sizeof(struct ip );     /* no options in reply */
+-
+-  /* fill in icmp */
+-  m->m_data +=3D hlen;
+-  m->m_len -=3D hlen;
+-
+-  icp =3D mtod(m, struct icmp *);
+-
+-  if(minsize) s_ip_len=3Dshlen+ICMP_MINLEN;   /* return header+8b only *=
+/
+-  else if(s_ip_len>ICMP_MAXDATALEN)         /* maximum size */
+-    s_ip_len=3DICMP_MAXDATALEN;
+-
+-  m->m_len=3DICMP_MINLEN+s_ip_len;        /* 8 bytes ICMP header */
+-
+-  /* min. size =3D 8+sizeof(struct ip)+8 */
+-
+-  icp->icmp_type =3D type;
+-  icp->icmp_code =3D code;
+-  icp->icmp_id =3D 0;
+-  icp->icmp_seq =3D 0;
+-
+-  memcpy(&icp->icmp_ip, msrc->m_data, s_ip_len);   /* report the ip pack=
+et */
+-  HTONS(icp->icmp_ip.ip_len);
+-  HTONS(icp->icmp_ip.ip_id);
+-  HTONS(icp->icmp_ip.ip_off);
+-
+-  if (message && WITH_ICMP_ERROR_MSG) { /* append message to ICMP packet=
+ */
+-    int message_len;
+-    char *cpnt;
+-    message_len=3Dstrlen(message);
+-    if(message_len>ICMP_MAXDATALEN) message_len=3DICMP_MAXDATALEN;
+-    cpnt=3D(char *)m->m_data+m->m_len;
+-    memcpy(cpnt, message, message_len);
+-    m->m_len+=3Dmessage_len;
+-  }
+-
+-  icp->icmp_cksum =3D 0;
+-  icp->icmp_cksum =3D cksum(m, m->m_len);
+-
+-  m->m_data -=3D hlen;
+-  m->m_len +=3D hlen;
+-
+-  /* fill in ip */
+-  ip->ip_hl =3D hlen >> 2;
+-  ip->ip_len =3D m->m_len;
+-
+-  ip->ip_tos=3D((ip->ip_tos & 0x1E) | 0xC0);  /* high priority for error=
+s */
+-
+-  ip->ip_ttl =3D MAXTTL;
+-  ip->ip_p =3D IPPROTO_ICMP;
+-  ip->ip_dst =3D ip->ip_src;    /* ip addresses */
+-  ip->ip_src =3D m->slirp->vhost_addr;
+-
+-  (void ) ip_output((struct socket *)NULL, m);
+-
+-end_error:
+-  return;
+-}
+-#undef ICMP_MAXDATALEN
+-
+-/*
+- * Reflect the ip packet back to the source
+- */
+-void
+-icmp_reflect(struct mbuf *m)
+-{
+-  register struct ip *ip =3D mtod(m, struct ip *);
+-  int hlen =3D ip->ip_hl << 2;
+-  int optlen =3D hlen - sizeof(struct ip );
+-  register struct icmp *icp;
+-
+-  /*
+-   * Send an icmp packet back to the ip level,
+-   * after supplying a checksum.
+-   */
+-  m->m_data +=3D hlen;
+-  m->m_len -=3D hlen;
+-  icp =3D mtod(m, struct icmp *);
+-
+-  icp->icmp_type =3D ICMP_ECHOREPLY;
+-  icp->icmp_cksum =3D 0;
+-  icp->icmp_cksum =3D cksum(m, ip->ip_len - hlen);
+-
+-  m->m_data -=3D hlen;
+-  m->m_len +=3D hlen;
+-
+-  /* fill in ip */
+-  if (optlen > 0) {
+-    /*
+-     * Strip out original options by copying rest of first
+-     * mbuf's data back, and adjust the IP length.
+-     */
+-    memmove((char *)(ip + 1), (char *)ip + hlen,
+-	    (unsigned )(m->m_len - hlen));
+-    hlen -=3D optlen;
+-    ip->ip_hl =3D hlen >> 2;
+-    ip->ip_len -=3D optlen;
+-    m->m_len -=3D optlen;
+-  }
+-
+-  ip->ip_ttl =3D MAXTTL;
+-  { /* swap */
+-    struct in_addr icmp_dst;
+-    icmp_dst =3D ip->ip_dst;
+-    ip->ip_dst =3D ip->ip_src;
+-    ip->ip_src =3D icmp_dst;
+-  }
+-
+-  (void ) ip_output((struct socket *)NULL, m);
+-}
+-
+-void icmp_receive(struct socket *so)
+-{
+-    struct mbuf *m =3D so->so_m;
+-    struct ip *ip =3D mtod(m, struct ip *);
+-    int hlen =3D ip->ip_hl << 2;
+-    uint8_t error_code;
+-    struct icmp *icp;
+-    int id, len;
+-
+-    m->m_data +=3D hlen;
+-    m->m_len -=3D hlen;
+-    icp =3D mtod(m, struct icmp *);
+-
+-    id =3D icp->icmp_id;
+-    len =3D recv(so->s, icp, M_ROOM(m), 0);
+-    /*
+-     * The behavior of reading SOCK_DGRAM+IPPROTO_ICMP sockets is incons=
+istent
+-     * between host OSes.  On Linux, only the ICMP header and payload is
+-     * included.  On macOS/Darwin, the socket acts like a raw socket and
+-     * includes the IP header as well.  On other BSDs, SOCK_DGRAM+IPPROT=
+O_ICMP
+-     * sockets aren't supported at all, so we treat them like raw socket=
+s.  It
+-     * isn't possible to detect this difference at runtime, so we must u=
+se an
+-     * #ifdef to determine if we need to remove the IP header.
+-     */
+-#ifdef CONFIG_BSD
+-    if (len >=3D sizeof(struct ip)) {
+-        struct ip *inner_ip =3D mtod(m, struct ip *);
+-        int inner_hlen =3D inner_ip->ip_hl << 2;
+-        if (inner_hlen > len) {
+-            len =3D -1;
+-            errno =3D -EINVAL;
+-        } else {
+-            len -=3D inner_hlen;
+-            memmove(icp, (unsigned char *)icp + inner_hlen, len);
+-        }
+-    } else {
+-      len =3D -1;
+-      errno =3D -EINVAL;
+-    }
+-#endif
+-    icp->icmp_id =3D id;
+-
+-    m->m_data -=3D hlen;
+-    m->m_len +=3D hlen;
+-
+-    if (len =3D=3D -1 || len =3D=3D 0) {
+-        if (errno =3D=3D ENETUNREACH) {
+-            error_code =3D ICMP_UNREACH_NET;
+-        } else {
+-            error_code =3D ICMP_UNREACH_HOST;
+-        }
+-        DEBUG_MISC(" udp icmp rx errno =3D %d-%s", errno,
+-                   strerror(errno));
+-        icmp_send_error(so->so_m, ICMP_UNREACH, error_code, 0, strerror(=
+errno));
+-    } else {
+-        icmp_reflect(so->so_m);
+-        so->so_m =3D NULL; /* Don't m_free() it again! */
+-    }
+-    icmp_detach(so);
+-}
+diff --git a/slirp/src/ip_input.c b/slirp/src/ip_input.c
+deleted file mode 100644
+index a714fecd58..0000000000
+--- a/slirp/src/ip_input.c
++++ /dev/null
+@@ -1,469 +0,0 @@
+-/* SPDX-License-Identifier: BSD-3-Clause */
+-/*
+- * Copyright (c) 1982, 1986, 1988, 1993
+- *	The Regents of the University of California.  All rights reserved.
+- *
+- * Redistribution and use in source and binary forms, with or without
+- * modification, are permitted provided that the following conditions
+- * are met:
+- * 1. Redistributions of source code must retain the above copyright
+- *    notice, this list of conditions and the following disclaimer.
+- * 2. Redistributions in binary form must reproduce the above copyright
+- *    notice, this list of conditions and the following disclaimer in th=
+e
+- *    documentation and/or other materials provided with the distributio=
+n.
+- * 3. Neither the name of the University nor the names of its contributo=
+rs
+- *    may be used to endorse or promote products derived from this softw=
+are
+- *    without specific prior written permission.
+- *
+- * THIS SOFTWARE IS PROVIDED BY THE REGENTS AND CONTRIBUTORS ``AS IS'' A=
+ND
+- * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+- * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PU=
+RPOSE
+- * ARE DISCLAIMED.  IN NO EVENT SHALL THE REGENTS OR CONTRIBUTORS BE LIA=
+BLE
+- * FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUE=
+NTIAL
+- * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOO=
+DS
+- * OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
+- * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, S=
+TRICT
+- * LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY=
+ WAY
+- * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY O=
+F
+- * SUCH DAMAGE.
+- *
+- *	@(#)ip_input.c	8.2 (Berkeley) 1/4/94
+- * ip_input.c,v 1.11 1994/11/16 10:17:08 jkh Exp
+- */
+-
+-/*
+- * Changes and additions relating to SLiRP are
+- * Copyright (c) 1995 Danny Gasparovski.
+- */
+-
+-#include "slirp.h"
+-#include "ip_icmp.h"
+-
+-static struct ip *ip_reass(Slirp *slirp, struct ip *ip, struct ipq *fp);
+-static void ip_freef(Slirp *slirp, struct ipq *fp);
+-static void ip_enq(register struct ipasfrag *p,
+-                   register struct ipasfrag *prev);
+-static void ip_deq(register struct ipasfrag *p);
+-
+-/*
+- * IP initialization: fill in IP protocol switch table.
+- * All protocols not implemented in kernel go to raw IP protocol handler=
+.
+- */
+-void
+-ip_init(Slirp *slirp)
+-{
+-    slirp->ipq.ip_link.next =3D slirp->ipq.ip_link.prev =3D &slirp->ipq.=
+ip_link;
+-    udp_init(slirp);
+-    tcp_init(slirp);
+-    icmp_init(slirp);
+-}
+-
+-void ip_cleanup(Slirp *slirp)
+-{
+-    udp_cleanup(slirp);
+-    tcp_cleanup(slirp);
+-    icmp_cleanup(slirp);
+-}
+-
+-/*
+- * Ip input routine.  Checksum and byte swap header.  If fragmented
+- * try to reassemble.  Process options.  Pass to next level.
+- */
+-void
+-ip_input(struct mbuf *m)
+-{
+-	Slirp *slirp =3D m->slirp;
+-	register struct ip *ip;
+-	int hlen;
+-
+-	if (!slirp->in_enabled) {
+-		goto bad;
+-	}
+-
+-	DEBUG_CALL("ip_input");
+-	DEBUG_ARG("m =3D %p", m);
+-	DEBUG_ARG("m_len =3D %d", m->m_len);
+-
+-	if (m->m_len < sizeof (struct ip)) {
+-		goto bad;
+-	}
+-
+-	ip =3D mtod(m, struct ip *);
+-
+-	if (ip->ip_v !=3D IPVERSION) {
+-		goto bad;
+-	}
+-
+-	hlen =3D ip->ip_hl << 2;
+-	if (hlen<sizeof(struct ip ) || hlen>m->m_len) {/* min header length */
+-	  goto bad;                                  /* or packet too short */
+-	}
+-
+-        /* keep ip header intact for ICMP reply
+-	 * ip->ip_sum =3D cksum(m, hlen);
+-	 * if (ip->ip_sum) {
+-	 */
+-	if(cksum(m,hlen)) {
+-	  goto bad;
+-	}
+-
+-	/*
+-	 * Convert fields to host representation.
+-	 */
+-	NTOHS(ip->ip_len);
+-	if (ip->ip_len < hlen) {
+-		goto bad;
+-	}
+-	NTOHS(ip->ip_id);
+-	NTOHS(ip->ip_off);
+-
+-	/*
+-	 * Check that the amount of data in the buffers
+-	 * is as at least much as the IP header would have us expect.
+-	 * Trim mbufs if longer than we expect.
+-	 * Drop packet if shorter than we expect.
+-	 */
+-	if (m->m_len < ip->ip_len) {
+-		goto bad;
+-	}
+-
+-	/* Should drop packet if mbuf too long? hmmm... */
+-	if (m->m_len > ip->ip_len)
+-	   m_adj(m, ip->ip_len - m->m_len);
+-
+-	/* check ip_ttl for a correct ICMP reply */
+-	if (ip->ip_ttl =3D=3D 0) {
+-	    icmp_send_error(m, ICMP_TIMXCEED, ICMP_TIMXCEED_INTRANS, 0, "ttl");
+-	    goto bad;
+-	}
+-
+-	/*
+-	 * If offset or IP_MF are set, must reassemble.
+-	 * Otherwise, nothing need be done.
+-	 * (We could look in the reassembly queue to see
+-	 * if the packet was previously fragmented,
+-	 * but it's not worth the time; just let them time out.)
+-	 *
+-	 * XXX This should fail, don't fragment yet
+-	 */
+-	if (ip->ip_off &~ IP_DF) {
+-	  register struct ipq *fp;
+-      struct qlink *l;
+-		/*
+-		 * Look for queue of fragments
+-		 * of this datagram.
+-		 */
+-		for (l =3D slirp->ipq.ip_link.next; l !=3D &slirp->ipq.ip_link;
+-		     l =3D l->next) {
+-            fp =3D container_of(l, struct ipq, ip_link);
+-            if (ip->ip_id =3D=3D fp->ipq_id &&
+-                    ip->ip_src.s_addr =3D=3D fp->ipq_src.s_addr &&
+-                    ip->ip_dst.s_addr =3D=3D fp->ipq_dst.s_addr &&
+-                    ip->ip_p =3D=3D fp->ipq_p)
+-		    goto found;
+-        }
+-        fp =3D NULL;
+-	found:
+-
+-		/*
+-		 * Adjust ip_len to not reflect header,
+-		 * set ip_mff if more fragments are expected,
+-		 * convert offset of this to bytes.
+-		 */
+-		ip->ip_len -=3D hlen;
+-		if (ip->ip_off & IP_MF)
+-		  ip->ip_tos |=3D 1;
+-		else
+-		  ip->ip_tos &=3D ~1;
+-
+-		ip->ip_off <<=3D 3;
+-
+-		/*
+-		 * If datagram marked as having more fragments
+-		 * or if this is not the first fragment,
+-		 * attempt reassembly; if it succeeds, proceed.
+-		 */
+-		if (ip->ip_tos & 1 || ip->ip_off) {
+-			ip =3D ip_reass(slirp, ip, fp);
+-                        if (ip =3D=3D NULL)
+-				return;
+-			m =3D dtom(slirp, ip);
+-		} else
+-			if (fp)
+-			   ip_freef(slirp, fp);
+-
+-	} else
+-		ip->ip_len -=3D hlen;
+-
+-	/*
+-	 * Switch out to protocol's input routine.
+-	 */
+-	switch (ip->ip_p) {
+-	 case IPPROTO_TCP:
+-		tcp_input(m, hlen, (struct socket *)NULL, AF_INET);
+-		break;
+-	 case IPPROTO_UDP:
+-		udp_input(m, hlen);
+-		break;
+-	 case IPPROTO_ICMP:
+-		icmp_input(m, hlen);
+-		break;
+-	 default:
+-		m_free(m);
+-	}
+-	return;
+-bad:
+-	m_free(m);
+-}
+-
+-#define iptofrag(P) ((struct ipasfrag *)(((char*)(P)) - sizeof(struct ql=
+ink)))
+-#define fragtoip(P) ((struct ip*)(((char*)(P)) + sizeof(struct qlink)))
+-/*
+- * Take incoming datagram fragment and try to
+- * reassemble it into whole datagram.  If a chain for
+- * reassembly of this datagram already exists, then it
+- * is given as fp; otherwise have to make a chain.
+- */
+-static struct ip *
+-ip_reass(Slirp *slirp, struct ip *ip, struct ipq *fp)
+-{
+-	register struct mbuf *m =3D dtom(slirp, ip);
+-	register struct ipasfrag *q;
+-	int hlen =3D ip->ip_hl << 2;
+-	int i, next;
+-
+-	DEBUG_CALL("ip_reass");
+-	DEBUG_ARG("ip =3D %p", ip);
+-	DEBUG_ARG("fp =3D %p", fp);
+-	DEBUG_ARG("m =3D %p", m);
+-
+-	/*
+-	 * Presence of header sizes in mbufs
+-	 * would confuse code below.
+-         * Fragment m_data is concatenated.
+-	 */
+-	m->m_data +=3D hlen;
+-	m->m_len -=3D hlen;
+-
+-	/*
+-	 * If first fragment to arrive, create a reassembly queue.
+-	 */
+-        if (fp =3D=3D NULL) {
+-	  struct mbuf *t =3D m_get(slirp);
+-
+-	  if (t =3D=3D NULL) {
+-	      goto dropfrag;
+-	  }
+-	  fp =3D mtod(t, struct ipq *);
+-	  insque(&fp->ip_link, &slirp->ipq.ip_link);
+-	  fp->ipq_ttl =3D IPFRAGTTL;
+-	  fp->ipq_p =3D ip->ip_p;
+-	  fp->ipq_id =3D ip->ip_id;
+-	  fp->frag_link.next =3D fp->frag_link.prev =3D &fp->frag_link;
+-	  fp->ipq_src =3D ip->ip_src;
+-	  fp->ipq_dst =3D ip->ip_dst;
+-	  q =3D (struct ipasfrag *)fp;
+-	  goto insert;
+-	}
+-
+-	/*
+-	 * Find a segment which begins after this one does.
+-	 */
+-	for (q =3D fp->frag_link.next; q !=3D (struct ipasfrag *)&fp->frag_link=
+;
+-            q =3D q->ipf_next)
+-		if (q->ipf_off > ip->ip_off)
+-			break;
+-
+-	/*
+-	 * If there is a preceding segment, it may provide some of
+-	 * our data already.  If so, drop the data from the incoming
+-	 * segment.  If it provides all of our data, drop us.
+-	 */
+-	if (q->ipf_prev !=3D &fp->frag_link) {
+-        struct ipasfrag *pq =3D q->ipf_prev;
+-		i =3D pq->ipf_off + pq->ipf_len - ip->ip_off;
+-		if (i > 0) {
+-			if (i >=3D ip->ip_len)
+-				goto dropfrag;
+-			m_adj(dtom(slirp, ip), i);
+-			ip->ip_off +=3D i;
+-			ip->ip_len -=3D i;
+-		}
+-	}
+-
+-	/*
+-	 * While we overlap succeeding segments trim them or,
+-	 * if they are completely covered, dequeue them.
+-	 */
+-	while (q !=3D (struct ipasfrag*)&fp->frag_link &&
+-            ip->ip_off + ip->ip_len > q->ipf_off) {
+-		i =3D (ip->ip_off + ip->ip_len) - q->ipf_off;
+-		if (i < q->ipf_len) {
+-			q->ipf_len -=3D i;
+-			q->ipf_off +=3D i;
+-			m_adj(dtom(slirp, q), i);
+-			break;
+-		}
+-		q =3D q->ipf_next;
+-		m_free(dtom(slirp, q->ipf_prev));
+-		ip_deq(q->ipf_prev);
+-	}
+-
+-insert:
+-	/*
+-	 * Stick new segment in its place;
+-	 * check for complete reassembly.
+-	 */
+-	ip_enq(iptofrag(ip), q->ipf_prev);
+-	next =3D 0;
+-	for (q =3D fp->frag_link.next; q !=3D (struct ipasfrag*)&fp->frag_link;
+-            q =3D q->ipf_next) {
+-		if (q->ipf_off !=3D next)
+-                        return NULL;
+-		next +=3D q->ipf_len;
+-	}
+-	if (((struct ipasfrag *)(q->ipf_prev))->ipf_tos & 1)
+-                return NULL;
+-
+-	/*
+-	 * Reassembly is complete; concatenate fragments.
+-	 */
+-    q =3D fp->frag_link.next;
+-	m =3D dtom(slirp, q);
+-
+-	q =3D (struct ipasfrag *) q->ipf_next;
+-	while (q !=3D (struct ipasfrag*)&fp->frag_link) {
+-	  struct mbuf *t =3D dtom(slirp, q);
+-	  q =3D (struct ipasfrag *) q->ipf_next;
+-	  m_cat(m, t);
+-	}
+-
+-	/*
+-	 * Create header for new ip packet by
+-	 * modifying header of first packet;
+-	 * dequeue and discard fragment reassembly header.
+-	 * Make header visible.
+-	 */
+-	q =3D fp->frag_link.next;
+-
+-	/*
+-	 * If the fragments concatenated to an mbuf that's
+-	 * bigger than the total size of the fragment, then and
+-	 * m_ext buffer was alloced. But fp->ipq_next points to
+-	 * the old buffer (in the mbuf), so we must point ip
+-	 * into the new buffer.
+-	 */
+-	if (m->m_flags & M_EXT) {
+-	  int delta =3D (char *)q - m->m_dat;
+-	  q =3D (struct ipasfrag *)(m->m_ext + delta);
+-	}
+-
+-    ip =3D fragtoip(q);
+-	ip->ip_len =3D next;
+-	ip->ip_tos &=3D ~1;
+-	ip->ip_src =3D fp->ipq_src;
+-	ip->ip_dst =3D fp->ipq_dst;
+-	remque(&fp->ip_link);
+-	(void) m_free(dtom(slirp, fp));
+-	m->m_len +=3D (ip->ip_hl << 2);
+-	m->m_data -=3D (ip->ip_hl << 2);
+-
+-	return ip;
+-
+-dropfrag:
+-	m_free(m);
+-        return NULL;
+-}
+-
+-/*
+- * Free a fragment reassembly header and all
+- * associated datagrams.
+- */
+-static void
+-ip_freef(Slirp *slirp, struct ipq *fp)
+-{
+-	register struct ipasfrag *q, *p;
+-
+-	for (q =3D fp->frag_link.next; q !=3D (struct ipasfrag*)&fp->frag_link;=
+ q =3D p) {
+-		p =3D q->ipf_next;
+-		ip_deq(q);
+-		m_free(dtom(slirp, q));
+-	}
+-	remque(&fp->ip_link);
+-	(void) m_free(dtom(slirp, fp));
+-}
+-
+-/*
+- * Put an ip fragment on a reassembly chain.
+- * Like insque, but pointers in middle of structure.
+- */
+-static void
+-ip_enq(register struct ipasfrag *p, register struct ipasfrag *prev)
+-{
+-	DEBUG_CALL("ip_enq");
+-	DEBUG_ARG("prev =3D %p", prev);
+-	p->ipf_prev =3D  prev;
+-	p->ipf_next =3D prev->ipf_next;
+-	((struct ipasfrag *)(prev->ipf_next))->ipf_prev =3D p;
+-	prev->ipf_next =3D p;
+-}
+-
+-/*
+- * To ip_enq as remque is to insque.
+- */
+-static void
+-ip_deq(register struct ipasfrag *p)
+-{
+-	((struct ipasfrag *)(p->ipf_prev))->ipf_next =3D p->ipf_next;
+-	((struct ipasfrag *)(p->ipf_next))->ipf_prev =3D p->ipf_prev;
+-}
+-
+-/*
+- * IP timer processing;
+- * if a timer expires on a reassembly
+- * queue, discard it.
+- */
+-void
+-ip_slowtimo(Slirp *slirp)
+-{
+-    struct qlink *l;
+-
+-	DEBUG_CALL("ip_slowtimo");
+-
+-    l =3D slirp->ipq.ip_link.next;
+-
+-        if (l =3D=3D NULL)
+-	   return;
+-
+-    while (l !=3D &slirp->ipq.ip_link) {
+-        struct ipq *fp =3D container_of(l, struct ipq, ip_link);
+-        l =3D l->next;
+-		if (--fp->ipq_ttl =3D=3D 0) {
+-			ip_freef(slirp, fp);
+-		}
+-    }
+-}
+-
+-/*
+- * Strip out IP options, at higher
+- * level protocol in the kernel.
+- * Second argument is buffer to which options
+- * will be moved, and return value is their length.
+- * (XXX) should be deleted; last arg currently ignored.
+- */
+-void
+-ip_stripoptions(register struct mbuf *m, struct mbuf *mopt)
+-{
+-	register int i;
+-	struct ip *ip =3D mtod(m, struct ip *);
+-	register char *opts;
+-	int olen;
+-
+-	olen =3D (ip->ip_hl<<2) - sizeof (struct ip);
+-	opts =3D (char *)(ip + 1);
+-	i =3D m->m_len - (sizeof (struct ip) + olen);
+-	memcpy(opts, opts  + olen, (unsigned)i);
+-	m->m_len -=3D olen;
+-
+-	ip->ip_hl =3D sizeof(struct ip) >> 2;
+-}
+diff --git a/slirp/src/ip_output.c b/slirp/src/ip_output.c
+deleted file mode 100644
+index 8560197cf6..0000000000
+--- a/slirp/src/ip_output.c
++++ /dev/null
+@@ -1,170 +0,0 @@
+-/* SPDX-License-Identifier: BSD-3-Clause */
+-/*
+- * Copyright (c) 1982, 1986, 1988, 1990, 1993
+- *	The Regents of the University of California.  All rights reserved.
+- *
+- * Redistribution and use in source and binary forms, with or without
+- * modification, are permitted provided that the following conditions
+- * are met:
+- * 1. Redistributions of source code must retain the above copyright
+- *    notice, this list of conditions and the following disclaimer.
+- * 2. Redistributions in binary form must reproduce the above copyright
+- *    notice, this list of conditions and the following disclaimer in th=
+e
+- *    documentation and/or other materials provided with the distributio=
+n.
+- * 3. Neither the name of the University nor the names of its contributo=
+rs
+- *    may be used to endorse or promote products derived from this softw=
+are
+- *    without specific prior written permission.
+- *
+- * THIS SOFTWARE IS PROVIDED BY THE REGENTS AND CONTRIBUTORS ``AS IS'' A=
+ND
+- * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+- * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PU=
+RPOSE
+- * ARE DISCLAIMED.  IN NO EVENT SHALL THE REGENTS OR CONTRIBUTORS BE LIA=
+BLE
+- * FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUE=
+NTIAL
+- * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOO=
+DS
+- * OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
+- * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, S=
+TRICT
+- * LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY=
+ WAY
+- * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY O=
+F
+- * SUCH DAMAGE.
+- *
+- *	@(#)ip_output.c	8.3 (Berkeley) 1/21/94
+- * ip_output.c,v 1.9 1994/11/16 10:17:10 jkh Exp
+- */
+-
+-/*
+- * Changes and additions relating to SLiRP are
+- * Copyright (c) 1995 Danny Gasparovski.
+- */
+-
+-#include "slirp.h"
+-
+-/* Number of packets queued before we start sending
+- * (to prevent allocing too many mbufs) */
+-#define IF_THRESH 10
+-
+-/*
+- * IP output.  The packet in mbuf chain m contains a skeletal IP
+- * header (with len, off, ttl, proto, tos, src, dst).
+- * The mbuf chain containing the packet will be freed.
+- * The mbuf opt, if present, will not be freed.
+- */
+-int
+-ip_output(struct socket *so, struct mbuf *m0)
+-{
+-	Slirp *slirp =3D m0->slirp;
+-	register struct ip *ip;
+-	register struct mbuf *m =3D m0;
+-	register int hlen =3D sizeof(struct ip );
+-	int len, off, error =3D 0;
+-
+-	DEBUG_CALL("ip_output");
+-	DEBUG_ARG("so =3D %p", so);
+-	DEBUG_ARG("m0 =3D %p", m0);
+-
+-	ip =3D mtod(m, struct ip *);
+-	/*
+-	 * Fill in IP header.
+-	 */
+-	ip->ip_v =3D IPVERSION;
+-	ip->ip_off &=3D IP_DF;
+-	ip->ip_id =3D htons(slirp->ip_id++);
+-	ip->ip_hl =3D hlen >> 2;
+-
+-	/*
+-	 * If small enough for interface, can just send directly.
+-	 */
+-	if ((uint16_t)ip->ip_len <=3D IF_MTU) {
+-		ip->ip_len =3D htons((uint16_t)ip->ip_len);
+-		ip->ip_off =3D htons((uint16_t)ip->ip_off);
+-		ip->ip_sum =3D 0;
+-		ip->ip_sum =3D cksum(m, hlen);
+-
+-		if_output(so, m);
+-		goto done;
+-	}
+-
+-	/*
+-	 * Too large for interface; fragment if possible.
+-	 * Must be able to put at least 8 bytes per fragment.
+-	 */
+-	if (ip->ip_off & IP_DF) {
+-		error =3D -1;
+-		goto bad;
+-	}
+-
+-	len =3D (IF_MTU - hlen) &~ 7;       /* ip databytes per packet */
+-	if (len < 8) {
+-		error =3D -1;
+-		goto bad;
+-	}
+-
+-    {
+-	int mhlen, firstlen =3D len;
+-	struct mbuf **mnext =3D &m->m_nextpkt;
+-
+-	/*
+-	 * Loop through length of segment after first fragment,
+-	 * make new header and copy data of each part and link onto chain.
+-	 */
+-	m0 =3D m;
+-	mhlen =3D sizeof (struct ip);
+-	for (off =3D hlen + len; off < (uint16_t)ip->ip_len; off +=3D len) {
+-	  register struct ip *mhip;
+-	  m =3D m_get(slirp);
+-          if (m =3D=3D NULL) {
+-	    error =3D -1;
+-	    goto sendorfree;
+-	  }
+-	  m->m_data +=3D IF_MAXLINKHDR;
+-	  mhip =3D mtod(m, struct ip *);
+-	  *mhip =3D *ip;
+-
+-	  m->m_len =3D mhlen;
+-	  mhip->ip_off =3D ((off - hlen) >> 3) + (ip->ip_off & ~IP_MF);
+-	  if (ip->ip_off & IP_MF)
+-	    mhip->ip_off |=3D IP_MF;
+-	  if (off + len >=3D (uint16_t)ip->ip_len)
+-	    len =3D (uint16_t)ip->ip_len - off;
+-	  else
+-	    mhip->ip_off |=3D IP_MF;
+-	  mhip->ip_len =3D htons((uint16_t)(len + mhlen));
+-
+-	  if (m_copy(m, m0, off, len) < 0) {
+-	    error =3D -1;
+-	    goto sendorfree;
+-	  }
+-
+-	  mhip->ip_off =3D htons((uint16_t)mhip->ip_off);
+-	  mhip->ip_sum =3D 0;
+-	  mhip->ip_sum =3D cksum(m, mhlen);
+-	  *mnext =3D m;
+-	  mnext =3D &m->m_nextpkt;
+-	}
+-	/*
+-	 * Update first fragment by trimming what's been copied out
+-	 * and updating header, then send each fragment (in order).
+-	 */
+-	m =3D m0;
+-	m_adj(m, hlen + firstlen - (uint16_t)ip->ip_len);
+-	ip->ip_len =3D htons((uint16_t)m->m_len);
+-	ip->ip_off =3D htons((uint16_t)(ip->ip_off | IP_MF));
+-	ip->ip_sum =3D 0;
+-	ip->ip_sum =3D cksum(m, hlen);
+-sendorfree:
+-	for (m =3D m0; m; m =3D m0) {
+-		m0 =3D m->m_nextpkt;
+-                m->m_nextpkt =3D NULL;
+-		if (error =3D=3D 0)
+-			if_output(so, m);
+-		else
+-			m_free(m);
+-	}
+-    }
+-
+-done:
+-	return (error);
+-
+-bad:
+-	m_free(m0);
+-	goto done;
+-}
+diff --git a/slirp/src/mbuf.c b/slirp/src/mbuf.c
+deleted file mode 100644
+index 800406ca9e..0000000000
+--- a/slirp/src/mbuf.c
++++ /dev/null
+@@ -1,235 +0,0 @@
+-/* SPDX-License-Identifier: BSD-3-Clause */
+-/*
+- * Copyright (c) 1995 Danny Gasparovski
+- */
+-
+-/*
+- * mbuf's in SLiRP are much simpler than the real mbufs in
+- * FreeBSD.  They are fixed size, determined by the MTU,
+- * so that one whole packet can fit.  Mbuf's cannot be
+- * chained together.  If there's more data than the mbuf
+- * could hold, an external g_malloced buffer is pointed to
+- * by m_ext (and the data pointers) and M_EXT is set in
+- * the flags
+- */
+-
+-#include "slirp.h"
+-
+-#define MBUF_THRESH 30
+-
+-/*
+- * Find a nice value for msize
+- */
+-#define SLIRP_MSIZE\
+-    (offsetof(struct mbuf, m_dat) + IF_MAXLINKHDR + TCPIPHDR_DELTA + IF_=
+MTU)
+-
+-void
+-m_init(Slirp *slirp)
+-{
+-    slirp->m_freelist.qh_link =3D slirp->m_freelist.qh_rlink =3D &slirp-=
+>m_freelist;
+-    slirp->m_usedlist.qh_link =3D slirp->m_usedlist.qh_rlink =3D &slirp-=
+>m_usedlist;
+-}
+-
+-void m_cleanup(Slirp *slirp)
+-{
+-    struct mbuf *m, *next;
+-
+-    m =3D (struct mbuf *) slirp->m_usedlist.qh_link;
+-    while ((struct quehead *) m !=3D &slirp->m_usedlist) {
+-        next =3D m->m_next;
+-        if (m->m_flags & M_EXT) {
+-            g_free(m->m_ext);
+-        }
+-        g_free(m);
+-        m =3D next;
+-    }
+-    m =3D (struct mbuf *) slirp->m_freelist.qh_link;
+-    while ((struct quehead *) m !=3D &slirp->m_freelist) {
+-        next =3D m->m_next;
+-        g_free(m);
+-        m =3D next;
+-    }
+-}
+-
+-/*
+- * Get an mbuf from the free list, if there are none
+- * allocate one
+- *
+- * Because fragmentation can occur if we alloc new mbufs and
+- * free old mbufs, we mark all mbufs above mbuf_thresh as M_DOFREE,
+- * which tells m_free to actually g_free() it
+- */
+-struct mbuf *
+-m_get(Slirp *slirp)
+-{
+-	register struct mbuf *m;
+-	int flags =3D 0;
+-
+-	DEBUG_CALL("m_get");
+-
+-	if (slirp->m_freelist.qh_link =3D=3D &slirp->m_freelist) {
+-                m =3D g_malloc(SLIRP_MSIZE);
+-		slirp->mbuf_alloced++;
+-		if (slirp->mbuf_alloced > MBUF_THRESH)
+-			flags =3D M_DOFREE;
+-		m->slirp =3D slirp;
+-	} else {
+-		m =3D (struct mbuf *) slirp->m_freelist.qh_link;
+-		remque(m);
+-	}
+-
+-	/* Insert it in the used list */
+-	insque(m,&slirp->m_usedlist);
+-	m->m_flags =3D (flags | M_USEDLIST);
+-
+-	/* Initialise it */
+-	m->m_size =3D SLIRP_MSIZE - offsetof(struct mbuf, m_dat);
+-	m->m_data =3D m->m_dat;
+-	m->m_len =3D 0;
+-        m->m_nextpkt =3D NULL;
+-        m->m_prevpkt =3D NULL;
+-        m->resolution_requested =3D false;
+-        m->expiration_date =3D (uint64_t)-1;
+-	DEBUG_ARG("m =3D %p", m);
+-	return m;
+-}
+-
+-void
+-m_free(struct mbuf *m)
+-{
+-
+-  DEBUG_CALL("m_free");
+-  DEBUG_ARG("m =3D %p", m);
+-
+-  if(m) {
+-	/* Remove from m_usedlist */
+-	if (m->m_flags & M_USEDLIST)
+-	   remque(m);
+-
+-	/* If it's M_EXT, free() it */
+-        if (m->m_flags & M_EXT) {
+-                g_free(m->m_ext);
+-        }
+-	/*
+-	 * Either free() it or put it on the free list
+-	 */
+-	if (m->m_flags & M_DOFREE) {
+-		m->slirp->mbuf_alloced--;
+-                g_free(m);
+-	} else if ((m->m_flags & M_FREELIST) =3D=3D 0) {
+-		insque(m,&m->slirp->m_freelist);
+-		m->m_flags =3D M_FREELIST; /* Clobber other flags */
+-	}
+-  } /* if(m) */
+-}
+-
+-/*
+- * Copy data from one mbuf to the end of
+- * the other.. if result is too big for one mbuf, allocate
+- * an M_EXT data segment
+- */
+-void
+-m_cat(struct mbuf *m, struct mbuf *n)
+-{
+-	/*
+-	 * If there's no room, realloc
+-	 */
+-	if (M_FREEROOM(m) < n->m_len)
+-		m_inc(m, m->m_len + n->m_len);
+-
+-	memcpy(m->m_data+m->m_len, n->m_data, n->m_len);
+-	m->m_len +=3D n->m_len;
+-
+-	m_free(n);
+-}
+-
+-
+-/* make m 'size' bytes large from m_data */
+-void
+-m_inc(struct mbuf *m, int size)
+-{
+-    int gapsize;
+-
+-    /* some compilers throw up on gotos.  This one we can fake. */
+-    if (M_ROOM(m) > size) {
+-        return;
+-    }
+-
+-    if (m->m_flags & M_EXT) {
+-        gapsize =3D m->m_data - m->m_ext;
+-        m->m_ext =3D g_realloc(m->m_ext, size + gapsize);
+-    } else {
+-        gapsize =3D m->m_data - m->m_dat;
+-        m->m_ext =3D g_malloc(size + gapsize);
+-        memcpy(m->m_ext, m->m_dat, m->m_size);
+-        m->m_flags |=3D M_EXT;
+-    }
+-
+-    m->m_data =3D m->m_ext + gapsize;
+-    m->m_size =3D size + gapsize;
+-}
+-
+-
+-
+-void
+-m_adj(struct mbuf *m, int len)
+-{
+-	if (m =3D=3D NULL)
+-		return;
+-	if (len >=3D 0) {
+-		/* Trim from head */
+-		m->m_data +=3D len;
+-		m->m_len -=3D len;
+-	} else {
+-		/* Trim from tail */
+-		len =3D -len;
+-		m->m_len -=3D len;
+-	}
+-}
+-
+-
+-/*
+- * Copy len bytes from m, starting off bytes into n
+- */
+-int
+-m_copy(struct mbuf *n, struct mbuf *m, int off, int len)
+-{
+-	if (len > M_FREEROOM(n))
+-		return -1;
+-
+-	memcpy((n->m_data + n->m_len), (m->m_data + off), len);
+-	n->m_len +=3D len;
+-	return 0;
+-}
+-
+-
+-/*
+- * Given a pointer into an mbuf, return the mbuf
+- * XXX This is a kludge, I should eliminate the need for it
+- * Fortunately, it's not used often
+- */
+-struct mbuf *
+-dtom(Slirp *slirp, void *dat)
+-{
+-	struct mbuf *m;
+-
+-	DEBUG_CALL("dtom");
+-	DEBUG_ARG("dat =3D %p", dat);
+-
+-	/* bug corrected for M_EXT buffers */
+-	for (m =3D (struct mbuf *) slirp->m_usedlist.qh_link;
+-	     (struct quehead *) m !=3D &slirp->m_usedlist;
+-	     m =3D m->m_next) {
+-	  if (m->m_flags & M_EXT) {
+-	    if( (char *)dat>=3Dm->m_ext && (char *)dat<(m->m_ext + m->m_size) )
+-	      return m;
+-	  } else {
+-	    if( (char *)dat >=3D m->m_dat && (char *)dat<(m->m_dat + m->m_size)=
+ )
+-	      return m;
+-	  }
+-	}
+-
+-	DEBUG_ERROR("dtom failed");
+-
+-	return (struct mbuf *)0;
+-}
+diff --git a/slirp/src/misc.c b/slirp/src/misc.c
+deleted file mode 100644
+index 7c5db0e0aa..0000000000
+--- a/slirp/src/misc.c
++++ /dev/null
+@@ -1,321 +0,0 @@
+-/* SPDX-License-Identifier: BSD-3-Clause */
+-/*
+- * Copyright (c) 1995 Danny Gasparovski.
+- */
+-
+-#include "slirp.h"
+-
+-inline void
+-insque(void *a, void *b)
+-{
+-	register struct quehead *element =3D (struct quehead *) a;
+-	register struct quehead *head =3D (struct quehead *) b;
+-	element->qh_link =3D head->qh_link;
+-	head->qh_link =3D (struct quehead *)element;
+-	element->qh_rlink =3D (struct quehead *)head;
+-	((struct quehead *)(element->qh_link))->qh_rlink
+-	=3D (struct quehead *)element;
+-}
+-
+-inline void
+-remque(void *a)
+-{
+-  register struct quehead *element =3D (struct quehead *) a;
+-  ((struct quehead *)(element->qh_link))->qh_rlink =3D element->qh_rlink=
+;
+-  ((struct quehead *)(element->qh_rlink))->qh_link =3D element->qh_link;
+-  element->qh_rlink =3D NULL;
+-}
+-
+-/* TODO: IPv6 */
+-struct gfwd_list *
+-add_guestfwd(struct gfwd_list **ex_ptr,
+-             SlirpWriteCb write_cb, void *opaque,
+-             struct in_addr addr, int port)
+-{
+-    struct gfwd_list *f =3D g_new0(struct gfwd_list, 1);
+-
+-    f->write_cb =3D write_cb;
+-    f->opaque =3D opaque;
+-    f->ex_fport =3D port;
+-    f->ex_addr =3D addr;
+-    f->ex_next =3D *ex_ptr;
+-    *ex_ptr =3D f;
+-
+-    return f;
+-}
+-
+-struct gfwd_list *
+-add_exec(struct gfwd_list **ex_ptr, const char *cmdline,
+-         struct in_addr addr, int port)
+-{
+-    struct gfwd_list *f =3D add_guestfwd(ex_ptr, NULL, NULL, addr, port)=
+;
+-
+-    f->ex_exec =3D g_strdup(cmdline);
+-
+-    return f;
+-}
+-
+-static int
+-slirp_socketpair_with_oob(int sv[2])
+-{
+-    struct sockaddr_in addr =3D {
+-        .sin_family =3D AF_INET,
+-        .sin_port =3D 0,
+-        .sin_addr.s_addr =3D INADDR_ANY,
+-    };
+-    socklen_t addrlen =3D sizeof(addr);
+-    int ret, s;
+-
+-    sv[1] =3D -1;
+-    s =3D slirp_socket(AF_INET, SOCK_STREAM, 0);
+-    if (s < 0 || bind(s, (struct sockaddr *)&addr, addrlen) < 0 ||
+-        listen(s, 1) < 0 ||
+-        getsockname(s, (struct sockaddr *)&addr, &addrlen) < 0) {
+-        goto err;
+-    }
+-
+-    sv[1] =3D slirp_socket(AF_INET, SOCK_STREAM, 0);
+-    if (sv[1] < 0) {
+-        goto err;
+-    }
+-    /*
+-     * This connect won't block because we've already listen()ed on
+-     * the server end (even though we won't accept() the connection
+-     * until later on).
+-     */
+-    do {
+-        ret =3D connect(sv[1], (struct sockaddr *)&addr, addrlen);
+-    } while (ret < 0 && errno =3D=3D EINTR);
+-    if (ret < 0) {
+-        goto err;
+-    }
+-
+-    do {
+-        sv[0] =3D accept(s, (struct sockaddr *)&addr, &addrlen);
+-    } while (sv[0] < 0 && errno =3D=3D EINTR);
+-    if (sv[0] < 0) {
+-        goto err;
+-    }
+-
+-    closesocket(s);
+-    return 0;
+-
+-err:
+-    g_critical("slirp_socketpair(): %s", strerror(errno));
+-    if (s >=3D 0) {
+-        closesocket(s);
+-    }
+-    if (sv[1] >=3D 0) {
+-        closesocket(sv[1]);
+-    }
+-    return -1;
+-}
+-
+-static void
+-fork_exec_child_setup(gpointer data)
+-{
+-#ifndef _WIN32
+-    setsid();
+-#endif
+-}
+-
+-#pragma GCC diagnostic push
+-#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+-
+-#if !GLIB_CHECK_VERSION(2, 58, 0)
+-typedef struct SlirpGSpawnFds {
+-    GSpawnChildSetupFunc child_setup;
+-    gpointer user_data;
+-    gint stdin_fd;
+-    gint stdout_fd;
+-    gint stderr_fd;
+-} SlirpGSpawnFds;
+-
+-static inline void
+-slirp_gspawn_fds_setup(gpointer user_data)
+-{
+-    SlirpGSpawnFds *q =3D (SlirpGSpawnFds *)user_data;
+-
+-    dup2(q->stdin_fd, 0);
+-    dup2(q->stdout_fd, 1);
+-    dup2(q->stderr_fd, 2);
+-    q->child_setup(q->user_data);
+-}
+-#endif
+-
+-static inline gboolean
+-g_spawn_async_with_fds_slirp(const gchar *working_directory,
+-                            gchar **argv,
+-                            gchar **envp,
+-                            GSpawnFlags flags,
+-                            GSpawnChildSetupFunc child_setup,
+-                            gpointer user_data,
+-                            GPid *child_pid,
+-                            gint stdin_fd,
+-                            gint stdout_fd,
+-                            gint stderr_fd,
+-                            GError **error)
+-{
+-#if GLIB_CHECK_VERSION(2, 58, 0)
+-    return g_spawn_async_with_fds(working_directory, argv, envp, flags,
+-                                  child_setup, user_data,
+-                                  child_pid, stdin_fd, stdout_fd, stderr=
+_fd,
+-                                  error);
+-#else
+-    SlirpGSpawnFds setup =3D {
+-        .child_setup =3D child_setup,
+-        .user_data =3D user_data,
+-        .stdin_fd =3D stdin_fd,
+-        .stdout_fd =3D stdout_fd,
+-        .stderr_fd =3D stderr_fd,
+-    };
+-
+-    return g_spawn_async(working_directory, argv, envp, flags,
+-                         slirp_gspawn_fds_setup, &setup,
+-                         child_pid, error);
+-#endif
+-}
+-
+-#define g_spawn_async_with_fds(wd, argv, env, f, c, d, p, ifd, ofd, efd,=
+ err) \
+-    g_spawn_async_with_fds_slirp(wd, argv, env, f, c, d, p, ifd, ofd, ef=
+d, err)
+-
+-#pragma GCC diagnostic pop
+-
+-int
+-fork_exec(struct socket *so, const char *ex)
+-{
+-    GError *err =3D NULL;
+-    char **argv;
+-    int opt, sp[2];
+-
+-    DEBUG_CALL("fork_exec");
+-    DEBUG_ARG("so =3D %p", so);
+-    DEBUG_ARG("ex =3D %p", ex);
+-
+-    if (slirp_socketpair_with_oob(sp) < 0) {
+-        return 0;
+-    }
+-
+-    argv =3D g_strsplit(ex, " ", -1);
+-    g_spawn_async_with_fds(NULL /* cwd */,
+-                           argv,
+-                           NULL /* env */,
+-                           G_SPAWN_SEARCH_PATH,
+-                           fork_exec_child_setup, NULL /* data */,
+-                           NULL /* child_pid */,
+-                           sp[1], sp[1], sp[1],
+-                           &err);
+-    g_strfreev(argv);
+-
+-    if (err) {
+-        g_critical("fork_exec: %s", err->message);
+-        g_error_free(err);
+-        closesocket(sp[0]);
+-        closesocket(sp[1]);
+-        return 0;
+-    }
+-
+-    so->s =3D sp[0];
+-    closesocket(sp[1]);
+-    slirp_socket_set_fast_reuse(so->s);
+-    opt =3D 1;
+-    setsockopt(so->s, SOL_SOCKET, SO_OOBINLINE, &opt, sizeof(int));
+-    slirp_set_nonblock(so->s);
+-    so->slirp->cb->register_poll_fd(so->s, so->slirp->opaque);
+-    return 1;
+-}
+-
+-char *slirp_connection_info(Slirp *slirp)
+-{
+-    GString *str =3D g_string_new(NULL);
+-    const char * const tcpstates[] =3D {
+-        [TCPS_CLOSED]       =3D "CLOSED",
+-        [TCPS_LISTEN]       =3D "LISTEN",
+-        [TCPS_SYN_SENT]     =3D "SYN_SENT",
+-        [TCPS_SYN_RECEIVED] =3D "SYN_RCVD",
+-        [TCPS_ESTABLISHED]  =3D "ESTABLISHED",
+-        [TCPS_CLOSE_WAIT]   =3D "CLOSE_WAIT",
+-        [TCPS_FIN_WAIT_1]   =3D "FIN_WAIT_1",
+-        [TCPS_CLOSING]      =3D "CLOSING",
+-        [TCPS_LAST_ACK]     =3D "LAST_ACK",
+-        [TCPS_FIN_WAIT_2]   =3D "FIN_WAIT_2",
+-        [TCPS_TIME_WAIT]    =3D "TIME_WAIT",
+-    };
+-    struct in_addr dst_addr;
+-    struct sockaddr_in src;
+-    socklen_t src_len;
+-    uint16_t dst_port;
+-    struct socket *so;
+-    const char *state;
+-    char buf[20];
+-
+-    g_string_append_printf(str,
+-        "  Protocol[State]    FD  Source Address  Port   "
+-        "Dest. Address  Port RecvQ SendQ\n");
+-
+-    /* TODO: IPv6 */
+-
+-    for (so =3D slirp->tcb.so_next; so !=3D &slirp->tcb; so =3D so->so_n=
+ext) {
+-        if (so->so_state & SS_HOSTFWD) {
+-            state =3D "HOST_FORWARD";
+-        } else if (so->so_tcpcb) {
+-            state =3D tcpstates[so->so_tcpcb->t_state];
+-        } else {
+-            state =3D "NONE";
+-        }
+-        if (so->so_state & (SS_HOSTFWD | SS_INCOMING)) {
+-            src_len =3D sizeof(src);
+-            getsockname(so->s, (struct sockaddr *)&src, &src_len);
+-            dst_addr =3D so->so_laddr;
+-            dst_port =3D so->so_lport;
+-        } else {
+-            src.sin_addr =3D so->so_laddr;
+-            src.sin_port =3D so->so_lport;
+-            dst_addr =3D so->so_faddr;
+-            dst_port =3D so->so_fport;
+-        }
+-        snprintf(buf, sizeof(buf), "  TCP[%s]", state);
+-        g_string_append_printf(str, "%-19s %3d %15s %5d ", buf, so->s,
+-                       src.sin_addr.s_addr ? inet_ntoa(src.sin_addr) : "=
+*",
+-                       ntohs(src.sin_port));
+-        g_string_append_printf(str, "%15s %5d %5d %5d\n",
+-                       inet_ntoa(dst_addr), ntohs(dst_port),
+-                       so->so_rcv.sb_cc, so->so_snd.sb_cc);
+-    }
+-
+-    for (so =3D slirp->udb.so_next; so !=3D &slirp->udb; so =3D so->so_n=
+ext) {
+-        if (so->so_state & SS_HOSTFWD) {
+-            snprintf(buf, sizeof(buf), "  UDP[HOST_FORWARD]");
+-            src_len =3D sizeof(src);
+-            getsockname(so->s, (struct sockaddr *)&src, &src_len);
+-            dst_addr =3D so->so_laddr;
+-            dst_port =3D so->so_lport;
+-        } else {
+-            snprintf(buf, sizeof(buf), "  UDP[%d sec]",
+-                         (so->so_expire - curtime) / 1000);
+-            src.sin_addr =3D so->so_laddr;
+-            src.sin_port =3D so->so_lport;
+-            dst_addr =3D so->so_faddr;
+-            dst_port =3D so->so_fport;
+-        }
+-        g_string_append_printf(str, "%-19s %3d %15s %5d ", buf, so->s,
+-                       src.sin_addr.s_addr ? inet_ntoa(src.sin_addr) : "=
+*",
+-                       ntohs(src.sin_port));
+-        g_string_append_printf(str, "%15s %5d %5d %5d\n",
+-                       inet_ntoa(dst_addr), ntohs(dst_port),
+-                       so->so_rcv.sb_cc, so->so_snd.sb_cc);
+-    }
+-
+-    for (so =3D slirp->icmp.so_next; so !=3D &slirp->icmp; so =3D so->so=
+_next) {
+-        snprintf(buf, sizeof(buf), "  ICMP[%d sec]",
+-                     (so->so_expire - curtime) / 1000);
+-        src.sin_addr =3D so->so_laddr;
+-        dst_addr =3D so->so_faddr;
+-        g_string_append_printf(str, "%-19s %3d %15s  -    ", buf, so->s,
+-                       src.sin_addr.s_addr ? inet_ntoa(src.sin_addr) : "=
+*");
+-        g_string_append_printf(str, "%15s  -    %5d %5d\n", inet_ntoa(ds=
+t_addr),
+-                       so->so_rcv.sb_cc, so->so_snd.sb_cc);
+-    }
+-
+-    return g_string_free(str, FALSE);
+-}
+diff --git a/slirp/src/ncsi.c b/slirp/src/ncsi.c
+deleted file mode 100644
+index 6d574ec5ec..0000000000
+--- a/slirp/src/ncsi.c
++++ /dev/null
+@@ -1,194 +0,0 @@
+-/* SPDX-License-Identifier: BSD-3-Clause */
+-/*
+- * NC-SI (Network Controller Sideband Interface) "echo" model
+- *
+- * Copyright (C) 2016-2018 IBM Corp.
+- *
+- * Redistribution and use in source and binary forms, with or without
+- * modification, are permitted provided that the following conditions
+- * are met:
+- *
+- * 1. Redistributions of source code must retain the above
+- * copyright notice, this list of conditions and the following
+- * disclaimer.
+- *
+- * 2. Redistributions in binary form must reproduce the above
+- * copyright notice, this list of conditions and the following
+- * disclaimer in the documentation and/or other materials provided
+- * with the distribution.
+- *
+- * 3. Neither the name of the copyright holder nor the names of its
+- * contributors may be used to endorse or promote products derived
+- * from this software without specific prior written permission.
+- *
+- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+- * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+- * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS
+- * FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE
+- * COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
+- * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+- * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+- * SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
+- * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT,
+- * STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+- * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
+- * OF THE POSSIBILITY OF SUCH DAMAGE.
+- */
+-#include "slirp.h"
+-
+-#include "ncsi-pkt.h"
+-
+-static uint32_t ncsi_calculate_checksum(uint16_t *data, int len)
+-{
+-    uint32_t checksum =3D 0;
+-    int i;
+-
+-    /*
+-     * 32-bit unsigned sum of the NC-SI packet header and NC-SI packet
+-     * payload interpreted as a series of 16-bit unsigned integer values=
+.
+-     */
+-    for (i =3D 0; i < len; i++) {
+-        checksum +=3D htons(data[i]);
+-    }
+-
+-    checksum =3D (~checksum + 1);
+-    return checksum;
+-}
+-
+-/* Get Capabilities */
+-static int ncsi_rsp_handler_gc(struct ncsi_rsp_pkt_hdr *rnh)
+-{
+-    struct ncsi_rsp_gc_pkt *rsp =3D (struct ncsi_rsp_gc_pkt *) rnh;
+-
+-    rsp->cap =3D htonl(~0);
+-    rsp->bc_cap =3D htonl(~0);
+-    rsp->mc_cap =3D htonl(~0);
+-    rsp->buf_cap =3D htonl(~0);
+-    rsp->aen_cap =3D htonl(~0);
+-    rsp->vlan_mode =3D 0xff;
+-    rsp->uc_cnt =3D 2;
+-    return 0;
+-}
+-
+-/* Get Link status */
+-static int ncsi_rsp_handler_gls(struct ncsi_rsp_pkt_hdr *rnh)
+-{
+-    struct ncsi_rsp_gls_pkt *rsp =3D (struct ncsi_rsp_gls_pkt *) rnh;
+-
+-    rsp->status =3D htonl(0x1);
+-    return 0;
+-}
+-
+-/* Get Parameters */
+-static int ncsi_rsp_handler_gp(struct ncsi_rsp_pkt_hdr *rnh)
+-{
+-    struct ncsi_rsp_gp_pkt *rsp =3D (struct ncsi_rsp_gp_pkt *) rnh;
+-
+-    /* no MAC address filters or VLAN filters on the channel */
+-    rsp->mac_cnt =3D 0;
+-    rsp->mac_enable =3D 0;
+-    rsp->vlan_cnt =3D 0;
+-    rsp->vlan_enable =3D 0;
+-
+-    return 0;
+-}
+-
+-static const struct ncsi_rsp_handler {
+-        unsigned char   type;
+-        int             payload;
+-        int             (*handler)(struct ncsi_rsp_pkt_hdr *rnh);
+-} ncsi_rsp_handlers[] =3D {
+-        { NCSI_PKT_RSP_CIS,     4, NULL },
+-        { NCSI_PKT_RSP_SP,      4, NULL },
+-        { NCSI_PKT_RSP_DP,      4, NULL },
+-        { NCSI_PKT_RSP_EC,      4, NULL },
+-        { NCSI_PKT_RSP_DC,      4, NULL },
+-        { NCSI_PKT_RSP_RC,      4, NULL },
+-        { NCSI_PKT_RSP_ECNT,    4, NULL },
+-        { NCSI_PKT_RSP_DCNT,    4, NULL },
+-        { NCSI_PKT_RSP_AE,      4, NULL },
+-        { NCSI_PKT_RSP_SL,      4, NULL },
+-        { NCSI_PKT_RSP_GLS,    16, ncsi_rsp_handler_gls },
+-        { NCSI_PKT_RSP_SVF,     4, NULL },
+-        { NCSI_PKT_RSP_EV,      4, NULL },
+-        { NCSI_PKT_RSP_DV,      4, NULL },
+-        { NCSI_PKT_RSP_SMA,     4, NULL },
+-        { NCSI_PKT_RSP_EBF,     4, NULL },
+-        { NCSI_PKT_RSP_DBF,     4, NULL },
+-        { NCSI_PKT_RSP_EGMF,    4, NULL },
+-        { NCSI_PKT_RSP_DGMF,    4, NULL },
+-        { NCSI_PKT_RSP_SNFC,    4, NULL },
+-        { NCSI_PKT_RSP_GVI,    40, NULL },
+-        { NCSI_PKT_RSP_GC,     32, ncsi_rsp_handler_gc },
+-        { NCSI_PKT_RSP_GP,     40, ncsi_rsp_handler_gp },
+-        { NCSI_PKT_RSP_GCPS,  172, NULL },
+-        { NCSI_PKT_RSP_GNS,   172, NULL },
+-        { NCSI_PKT_RSP_GNPTS, 172, NULL },
+-        { NCSI_PKT_RSP_GPS,     8, NULL },
+-        { NCSI_PKT_RSP_OEM,     0, NULL },
+-        { NCSI_PKT_RSP_PLDM,    0, NULL },
+-        { NCSI_PKT_RSP_GPUUID, 20, NULL }
+-};
+-
+-/*
+- * packet format : ncsi header + payload + checksum
+- */
+-#define NCSI_MAX_PAYLOAD 172
+-#define NCSI_MAX_LEN     (sizeof(struct ncsi_pkt_hdr) + NCSI_MAX_PAYLOAD=
+ + 4)
+-
+-void ncsi_input(Slirp *slirp, const uint8_t *pkt, int pkt_len)
+-{
+-    struct ncsi_pkt_hdr *nh =3D (struct ncsi_pkt_hdr *)(pkt + ETH_HLEN);
+-    uint8_t ncsi_reply[ETH_HLEN + NCSI_MAX_LEN];
+-    struct ethhdr *reh =3D (struct ethhdr *)ncsi_reply;
+-    struct ncsi_rsp_pkt_hdr *rnh =3D (struct ncsi_rsp_pkt_hdr *)
+-        (ncsi_reply + ETH_HLEN);
+-    const struct ncsi_rsp_handler *handler =3D NULL;
+-    int i;
+-    int ncsi_rsp_len =3D sizeof(*nh);
+-    uint32_t checksum;
+-    uint32_t *pchecksum;
+-
+-    memset(ncsi_reply, 0, sizeof(ncsi_reply));
+-
+-    memset(reh->h_dest, 0xff, ETH_ALEN);
+-    memset(reh->h_source, 0xff, ETH_ALEN);
+-    reh->h_proto =3D htons(ETH_P_NCSI);
+-
+-    for (i =3D 0; i < G_N_ELEMENTS(ncsi_rsp_handlers); i++) {
+-        if (ncsi_rsp_handlers[i].type =3D=3D nh->type + 0x80) {
+-            handler =3D &ncsi_rsp_handlers[i];
+-            break;
+-        }
+-    }
+-
+-    rnh->common.mc_id      =3D nh->mc_id;
+-    rnh->common.revision   =3D NCSI_PKT_REVISION;
+-    rnh->common.id         =3D nh->id;
+-    rnh->common.type       =3D nh->type + 0x80;
+-    rnh->common.channel    =3D nh->channel;
+-
+-    if (handler) {
+-        rnh->common.length =3D htons(handler->payload);
+-        rnh->code          =3D htons(NCSI_PKT_RSP_C_COMPLETED);
+-        rnh->reason        =3D htons(NCSI_PKT_RSP_R_NO_ERROR);
+-
+-        if (handler->handler) {
+-            /* TODO: handle errors */
+-            handler->handler(rnh);
+-        }
+-        ncsi_rsp_len +=3D handler->payload;
+-    } else {
+-        rnh->common.length =3D 0;
+-        rnh->code          =3D htons(NCSI_PKT_RSP_C_UNAVAILABLE);
+-        rnh->reason        =3D htons(NCSI_PKT_RSP_R_UNKNOWN);
+-    }
+-
+-    /* Add the optional checksum at the end of the frame. */
+-    checksum =3D ncsi_calculate_checksum((uint16_t *) rnh, ncsi_rsp_len)=
+;
+-    pchecksum =3D (uint32_t *)((void *) rnh + ncsi_rsp_len);
+-    *pchecksum =3D htonl(checksum);
+-    ncsi_rsp_len +=3D 4;
+-
+-    slirp_send_packet_all(slirp, ncsi_reply, ETH_HLEN + ncsi_rsp_len);
+-}
+diff --git a/slirp/src/ndp_table.c b/slirp/src/ndp_table.c
+deleted file mode 100644
+index 78324877e2..0000000000
+--- a/slirp/src/ndp_table.c
++++ /dev/null
+@@ -1,87 +0,0 @@
+-/* SPDX-License-Identifier: BSD-3-Clause */
+-/*
+- * Copyright (c) 2013
+- * Guillaume Subiron, Yann Bordenave, Serigne Modou Wagne.
+- */
+-
+-#include "slirp.h"
+-
+-void ndp_table_add(Slirp *slirp, struct in6_addr ip_addr,
+-                    uint8_t ethaddr[ETH_ALEN])
+-{
+-    char addrstr[INET6_ADDRSTRLEN];
+-    NdpTable *ndp_table =3D &slirp->ndp_table;
+-    int i;
+-
+-    inet_ntop(AF_INET6, &(ip_addr), addrstr, INET6_ADDRSTRLEN);
+-
+-    DEBUG_CALL("ndp_table_add");
+-    DEBUG_ARG("ip =3D %s", addrstr);
+-    DEBUG_ARG("hw addr =3D %02x:%02x:%02x:%02x:%02x:%02x",
+-              ethaddr[0], ethaddr[1], ethaddr[2],
+-              ethaddr[3], ethaddr[4], ethaddr[5]);
+-
+-    if (IN6_IS_ADDR_MULTICAST(&ip_addr) || in6_zero(&ip_addr)) {
+-        /* Do not register multicast or unspecified addresses */
+-        DEBUG_CALL(" abort: do not register multicast or unspecified add=
+ress");
+-        return;
+-    }
+-
+-    /* Search for an entry */
+-    for (i =3D 0; i < NDP_TABLE_SIZE; i++) {
+-        if (in6_equal(&ndp_table->table[i].ip_addr, &ip_addr)) {
+-            DEBUG_CALL(" already in table: update the entry");
+-            /* Update the entry */
+-            memcpy(ndp_table->table[i].eth_addr, ethaddr, ETH_ALEN);
+-            return;
+-        }
+-    }
+-
+-    /* No entry found, create a new one */
+-    DEBUG_CALL(" create new entry");
+-    ndp_table->table[ndp_table->next_victim].ip_addr =3D ip_addr;
+-    memcpy(ndp_table->table[ndp_table->next_victim].eth_addr,
+-            ethaddr, ETH_ALEN);
+-    ndp_table->next_victim =3D (ndp_table->next_victim + 1) % NDP_TABLE_=
+SIZE;
+-}
+-
+-bool ndp_table_search(Slirp *slirp, struct in6_addr ip_addr,
+-                      uint8_t out_ethaddr[ETH_ALEN])
+-{
+-    char addrstr[INET6_ADDRSTRLEN];
+-    NdpTable *ndp_table =3D &slirp->ndp_table;
+-    int i;
+-
+-    inet_ntop(AF_INET6, &(ip_addr), addrstr, INET6_ADDRSTRLEN);
+-
+-    DEBUG_CALL("ndp_table_search");
+-    DEBUG_ARG("ip =3D %s", addrstr);
+-
+-    assert(!in6_zero(&ip_addr));
+-
+-    /* Multicast address: fec0::abcd:efgh/8 -> 33:33:ab:cd:ef:gh */
+-    if (IN6_IS_ADDR_MULTICAST(&ip_addr)) {
+-        out_ethaddr[0] =3D 0x33; out_ethaddr[1] =3D 0x33;
+-        out_ethaddr[2] =3D ip_addr.s6_addr[12];
+-        out_ethaddr[3] =3D ip_addr.s6_addr[13];
+-        out_ethaddr[4] =3D ip_addr.s6_addr[14];
+-        out_ethaddr[5] =3D ip_addr.s6_addr[15];
+-        DEBUG_ARG("multicast addr =3D %02x:%02x:%02x:%02x:%02x:%02x",
+-                  out_ethaddr[0], out_ethaddr[1], out_ethaddr[2],
+-                  out_ethaddr[3], out_ethaddr[4], out_ethaddr[5]);
+-        return 1;
+-    }
+-
+-    for (i =3D 0; i < NDP_TABLE_SIZE; i++) {
+-        if (in6_equal(&ndp_table->table[i].ip_addr, &ip_addr)) {
+-            memcpy(out_ethaddr, ndp_table->table[i].eth_addr,  ETH_ALEN)=
+;
+-            DEBUG_ARG("found hw addr =3D %02x:%02x:%02x:%02x:%02x:%02x",
+-                      out_ethaddr[0], out_ethaddr[1], out_ethaddr[2],
+-                      out_ethaddr[3], out_ethaddr[4], out_ethaddr[5]);
+-            return 1;
+-        }
+-    }
+-
+-    DEBUG_CALL(" ip not found in table");
+-    return 0;
+-}
+diff --git a/slirp/src/sbuf.c b/slirp/src/sbuf.c
+deleted file mode 100644
+index 9c0b31b513..0000000000
+--- a/slirp/src/sbuf.c
++++ /dev/null
+@@ -1,186 +0,0 @@
+-/* SPDX-License-Identifier: BSD-3-Clause */
+-/*
+- * Copyright (c) 1995 Danny Gasparovski.
+- */
+-
+-#include "slirp.h"
+-
+-static void sbappendsb(struct sbuf *sb, struct mbuf *m);
+-
+-void
+-sbfree(struct sbuf *sb)
+-{
+-	free(sb->sb_data);
+-}
+-
+-bool
+-sbdrop(struct sbuf *sb, int num)
+-{
+-    int limit =3D sb->sb_datalen / 2;
+-
+-	/*
+-	 * We can only drop how much we have
+-	 * This should never succeed
+-	 */
+-	if(num > sb->sb_cc)
+-		num =3D sb->sb_cc;
+-	sb->sb_cc -=3D num;
+-	sb->sb_rptr +=3D num;
+-	if(sb->sb_rptr >=3D sb->sb_data + sb->sb_datalen)
+-		sb->sb_rptr -=3D sb->sb_datalen;
+-
+-    if (sb->sb_cc < limit && sb->sb_cc + num >=3D limit) {
+-        return true;
+-    }
+-
+-    return false;
+-}
+-
+-void
+-sbreserve(struct sbuf *sb, int size)
+-{
+-	if (sb->sb_data) {
+-		/* Already alloced, realloc if necessary */
+-		if (sb->sb_datalen !=3D size) {
+-			sb->sb_wptr =3D sb->sb_rptr =3D sb->sb_data =3D (char *)realloc(sb->s=
+b_data, size);
+-			sb->sb_cc =3D 0;
+-			if (sb->sb_wptr)
+-			   sb->sb_datalen =3D size;
+-			else
+-			   sb->sb_datalen =3D 0;
+-		}
+-	} else {
+-		sb->sb_wptr =3D sb->sb_rptr =3D sb->sb_data =3D (char *)malloc(size);
+-		sb->sb_cc =3D 0;
+-		if (sb->sb_wptr)
+-		   sb->sb_datalen =3D size;
+-		else
+-		   sb->sb_datalen =3D 0;
+-	}
+-}
+-
+-/*
+- * Try and write() to the socket, whatever doesn't get written
+- * append to the buffer... for a host with a fast net connection,
+- * this prevents an unnecessary copy of the data
+- * (the socket is non-blocking, so we won't hang)
+- */
+-void
+-sbappend(struct socket *so, struct mbuf *m)
+-{
+-	int ret =3D 0;
+-
+-	DEBUG_CALL("sbappend");
+-	DEBUG_ARG("so =3D %p", so);
+-	DEBUG_ARG("m =3D %p", m);
+-	DEBUG_ARG("m->m_len =3D %d", m->m_len);
+-
+-	/* Shouldn't happen, but...  e.g. foreign host closes connection */
+-	if (m->m_len <=3D 0) {
+-		m_free(m);
+-		return;
+-	}
+-
+-	/*
+-	 * If there is urgent data, call sosendoob
+-	 * if not all was sent, sowrite will take care of the rest
+-	 * (The rest of this function is just an optimisation)
+-	 */
+-	if (so->so_urgc) {
+-		sbappendsb(&so->so_rcv, m);
+-		m_free(m);
+-		(void)sosendoob(so);
+-		return;
+-	}
+-
+-	/*
+-	 * We only write if there's nothing in the buffer,
+-	 * ottherwise it'll arrive out of order, and hence corrupt
+-	 */
+-	if (!so->so_rcv.sb_cc)
+-	   ret =3D slirp_send(so, m->m_data, m->m_len, 0);
+-
+-	if (ret <=3D 0) {
+-		/*
+-		 * Nothing was written
+-		 * It's possible that the socket has closed, but
+-		 * we don't need to check because if it has closed,
+-		 * it will be detected in the normal way by soread()
+-		 */
+-		sbappendsb(&so->so_rcv, m);
+-	} else if (ret !=3D m->m_len) {
+-		/*
+-		 * Something was written, but not everything..
+-		 * sbappendsb the rest
+-		 */
+-		m->m_len -=3D ret;
+-		m->m_data +=3D ret;
+-		sbappendsb(&so->so_rcv, m);
+-	} /* else */
+-	/* Whatever happened, we free the mbuf */
+-	m_free(m);
+-}
+-
+-/*
+- * Copy the data from m into sb
+- * The caller is responsible to make sure there's enough room
+- */
+-static void
+-sbappendsb(struct sbuf *sb, struct mbuf *m)
+-{
+-	int len, n,  nn;
+-
+-	len =3D m->m_len;
+-
+-	if (sb->sb_wptr < sb->sb_rptr) {
+-		n =3D sb->sb_rptr - sb->sb_wptr;
+-		if (n > len) n =3D len;
+-		memcpy(sb->sb_wptr, m->m_data, n);
+-	} else {
+-		/* Do the right edge first */
+-		n =3D sb->sb_data + sb->sb_datalen - sb->sb_wptr;
+-		if (n > len) n =3D len;
+-		memcpy(sb->sb_wptr, m->m_data, n);
+-		len -=3D n;
+-		if (len) {
+-			/* Now the left edge */
+-			nn =3D sb->sb_rptr - sb->sb_data;
+-			if (nn > len) nn =3D len;
+-			memcpy(sb->sb_data,m->m_data+n,nn);
+-			n +=3D nn;
+-		}
+-	}
+-
+-	sb->sb_cc +=3D n;
+-	sb->sb_wptr +=3D n;
+-	if (sb->sb_wptr >=3D sb->sb_data + sb->sb_datalen)
+-		sb->sb_wptr -=3D sb->sb_datalen;
+-}
+-
+-/*
+- * Copy data from sbuf to a normal, straight buffer
+- * Don't update the sbuf rptr, this will be
+- * done in sbdrop when the data is acked
+- */
+-void
+-sbcopy(struct sbuf *sb, int off, int len, char *to)
+-{
+-	char *from;
+-
+-	from =3D sb->sb_rptr + off;
+-	if (from >=3D sb->sb_data + sb->sb_datalen)
+-		from -=3D sb->sb_datalen;
+-
+-	if (from < sb->sb_wptr) {
+-		if (len > sb->sb_cc) len =3D sb->sb_cc;
+-		memcpy(to,from,len);
+-	} else {
+-		/* re-use off */
+-		off =3D (sb->sb_data + sb->sb_datalen) - from;
+-		if (off > len) off =3D len;
+-		memcpy(to,from,off);
+-		len -=3D off;
+-		if (len)
+-		   memcpy(to+off,sb->sb_data,len);
+-	}
+-}
+diff --git a/slirp/src/slirp.c b/slirp/src/slirp.c
+deleted file mode 100644
+index 169c85b906..0000000000
+--- a/slirp/src/slirp.c
++++ /dev/null
+@@ -1,1118 +0,0 @@
+-/* SPDX-License-Identifier: MIT */
+-/*
+- * libslirp glue
+- *
+- * Copyright (c) 2004-2008 Fabrice Bellard
+- *
+- * Permission is hereby granted, free of charge, to any person obtaining=
+ a copy
+- * of this software and associated documentation files (the "Software"),=
+ to deal
+- * in the Software without restriction, including without limitation the=
+ rights
+- * to use, copy, modify, merge, publish, distribute, sublicense, and/or =
+sell
+- * copies of the Software, and to permit persons to whom the Software is
+- * furnished to do so, subject to the following conditions:
+- *
+- * The above copyright notice and this permission notice shall be includ=
+ed in
+- * all copies or substantial portions of the Software.
+- *
+- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRE=
+SS OR
+- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILI=
+TY,
+- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHA=
+LL
+- * THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR =
+OTHER
+- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISI=
+NG FROM,
+- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALING=
+S IN
+- * THE SOFTWARE.
+- */
+-#include "slirp.h"
+-
+-
+-#ifndef _WIN32
+-#include <net/if.h>
+-#endif
+-
+-int slirp_debug;
+-
+-/* Define to 1 if you want KEEPALIVE timers */
+-bool slirp_do_keepalive;
+-
+-/* host loopback address */
+-struct in_addr loopback_addr;
+-/* host loopback network mask */
+-unsigned long loopback_mask;
+-
+-/* emulated hosts use the MAC addr 52:55:IP:IP:IP:IP */
+-static const uint8_t special_ethaddr[ETH_ALEN] =3D {
+-    0x52, 0x55, 0x00, 0x00, 0x00, 0x00
+-};
+-
+-unsigned curtime;
+-
+-static struct in_addr dns_addr;
+-#ifndef _WIN32
+-static struct in6_addr dns6_addr;
+-#endif
+-static unsigned dns_addr_time;
+-#ifndef _WIN32
+-static unsigned dns6_addr_time;
+-#endif
+-
+-#define TIMEOUT_FAST 2  /* milliseconds */
+-#define TIMEOUT_SLOW 499  /* milliseconds */
+-/* for the aging of certain requests like DNS */
+-#define TIMEOUT_DEFAULT 1000  /* milliseconds */
+-
+-#ifdef _WIN32
+-
+-int get_dns_addr(struct in_addr *pdns_addr)
+-{
+-    FIXED_INFO *FixedInfo=3DNULL;
+-    ULONG    BufLen;
+-    DWORD    ret;
+-    IP_ADDR_STRING *pIPAddr;
+-    struct in_addr tmp_addr;
+-
+-    if (dns_addr.s_addr !=3D 0 && (curtime - dns_addr_time) < TIMEOUT_DE=
+FAULT) {
+-        *pdns_addr =3D dns_addr;
+-        return 0;
+-    }
+-
+-    FixedInfo =3D (FIXED_INFO *)GlobalAlloc(GPTR, sizeof(FIXED_INFO));
+-    BufLen =3D sizeof(FIXED_INFO);
+-
+-    if (ERROR_BUFFER_OVERFLOW =3D=3D GetNetworkParams(FixedInfo, &BufLen=
+)) {
+-        if (FixedInfo) {
+-            GlobalFree(FixedInfo);
+-            FixedInfo =3D NULL;
+-        }
+-        FixedInfo =3D GlobalAlloc(GPTR, BufLen);
+-    }
+-
+-    if ((ret =3D GetNetworkParams(FixedInfo, &BufLen)) !=3D ERROR_SUCCES=
+S) {
+-        printf("GetNetworkParams failed. ret =3D %08x\n", (unsigned)ret =
+);
+-        if (FixedInfo) {
+-            GlobalFree(FixedInfo);
+-            FixedInfo =3D NULL;
+-        }
+-        return -1;
+-    }
+-
+-    pIPAddr =3D &(FixedInfo->DnsServerList);
+-    inet_aton(pIPAddr->IpAddress.String, &tmp_addr);
+-    *pdns_addr =3D tmp_addr;
+-    dns_addr =3D tmp_addr;
+-    dns_addr_time =3D curtime;
+-    if (FixedInfo) {
+-        GlobalFree(FixedInfo);
+-        FixedInfo =3D NULL;
+-    }
+-    return 0;
+-}
+-
+-int get_dns6_addr(struct in6_addr *pdns6_addr, uint32_t *scope_id)
+-{
+-    return -1;
+-}
+-
+-static void winsock_cleanup(void)
+-{
+-    WSACleanup();
+-}
+-
+-#else
+-
+-static int get_dns_addr_cached(void *pdns_addr, void *cached_addr,
+-                               socklen_t addrlen,
+-                               struct stat *cached_stat, unsigned *cache=
+d_time)
+-{
+-    struct stat old_stat;
+-    if (curtime - *cached_time < TIMEOUT_DEFAULT) {
+-        memcpy(pdns_addr, cached_addr, addrlen);
+-        return 0;
+-    }
+-    old_stat =3D *cached_stat;
+-    if (stat("/etc/resolv.conf", cached_stat) !=3D 0) {
+-        return -1;
+-    }
+-    if (cached_stat->st_dev =3D=3D old_stat.st_dev
+-        && cached_stat->st_ino =3D=3D old_stat.st_ino
+-        && cached_stat->st_size =3D=3D old_stat.st_size
+-        && cached_stat->st_mtime =3D=3D old_stat.st_mtime) {
+-        memcpy(pdns_addr, cached_addr, addrlen);
+-        return 0;
+-    }
+-    return 1;
+-}
+-
+-static int get_dns_addr_resolv_conf(int af, void *pdns_addr, void *cache=
+d_addr,
+-                                    socklen_t addrlen, uint32_t *scope_i=
+d,
+-                                    unsigned *cached_time)
+-{
+-    char buff[512];
+-    char buff2[257];
+-    FILE *f;
+-    int found =3D 0;
+-    void *tmp_addr =3D alloca(addrlen);
+-    unsigned if_index;
+-
+-    f =3D fopen("/etc/resolv.conf", "r");
+-    if (!f)
+-        return -1;
+-
+-    DEBUG_MISC("IP address of your DNS(s):");
+-    while (fgets(buff, 512, f) !=3D NULL) {
+-        if (sscanf(buff, "nameserver%*[ \t]%256s", buff2) =3D=3D 1) {
+-            char *c =3D strchr(buff2, '%');
+-            if (c) {
+-                if_index =3D if_nametoindex(c + 1);
+-                *c =3D '\0';
+-            } else {
+-                if_index =3D 0;
+-            }
+-
+-            if (!inet_pton(af, buff2, tmp_addr)) {
+-                continue;
+-            }
+-            /* If it's the first one, set it to dns_addr */
+-            if (!found) {
+-                memcpy(pdns_addr, tmp_addr, addrlen);
+-                memcpy(cached_addr, tmp_addr, addrlen);
+-                if (scope_id) {
+-                    *scope_id =3D if_index;
+-                }
+-                *cached_time =3D curtime;
+-            }
+-
+-            if (++found > 3) {
+-                DEBUG_MISC("  (more)");
+-                break;
+-            } else if (slirp_debug & DBG_MISC) {
+-                char s[INET6_ADDRSTRLEN];
+-                const char *res =3D inet_ntop(af, tmp_addr, s, sizeof(s)=
+);
+-                if (!res) {
+-                    res =3D "  (string conversion error)";
+-                }
+-                DEBUG_MISC("  %s", res);
+-            }
+-        }
+-    }
+-    fclose(f);
+-    if (!found)
+-        return -1;
+-    return 0;
+-}
+-
+-int get_dns_addr(struct in_addr *pdns_addr)
+-{
+-    static struct stat dns_addr_stat;
+-
+-    if (dns_addr.s_addr !=3D 0) {
+-        int ret;
+-        ret =3D get_dns_addr_cached(pdns_addr, &dns_addr, sizeof(dns_add=
+r),
+-                                  &dns_addr_stat, &dns_addr_time);
+-        if (ret <=3D 0) {
+-            return ret;
+-        }
+-    }
+-    return get_dns_addr_resolv_conf(AF_INET, pdns_addr, &dns_addr,
+-                                    sizeof(dns_addr), NULL, &dns_addr_ti=
+me);
+-}
+-
+-int get_dns6_addr(struct in6_addr *pdns6_addr, uint32_t *scope_id)
+-{
+-    static struct stat dns6_addr_stat;
+-
+-    if (!in6_zero(&dns6_addr)) {
+-        int ret;
+-        ret =3D get_dns_addr_cached(pdns6_addr, &dns6_addr, sizeof(dns6_=
+addr),
+-                                  &dns6_addr_stat, &dns6_addr_time);
+-        if (ret <=3D 0) {
+-            return ret;
+-        }
+-    }
+-    return get_dns_addr_resolv_conf(AF_INET6, pdns6_addr, &dns6_addr,
+-                                    sizeof(dns6_addr),
+-                                    scope_id, &dns6_addr_time);
+-}
+-
+-#endif
+-
+-static void slirp_init_once(void)
+-{
+-    static int initialized;
+-    const char *debug;
+-#ifdef _WIN32
+-    WSADATA Data;
+-#endif
+-
+-    if (initialized) {
+-        return;
+-    }
+-    initialized =3D 1;
+-
+-#ifdef _WIN32
+-    WSAStartup(MAKEWORD(2,0), &Data);
+-    atexit(winsock_cleanup);
+-#endif
+-
+-    loopback_addr.s_addr =3D htonl(INADDR_LOOPBACK);
+-    loopback_mask =3D htonl(IN_CLASSA_NET);
+-
+-    debug =3D g_getenv("SLIRP_DEBUG");
+-    if (debug) {
+-        const GDebugKey keys[] =3D {
+-            { "call", DBG_CALL },
+-            { "misc", DBG_MISC },
+-            { "error", DBG_ERROR },
+-            { "tftp", DBG_TFTP },
+-        };
+-        slirp_debug =3D g_parse_debug_string(debug, keys, G_N_ELEMENTS(k=
+eys));
+-    }
+-
+-
+-}
+-
+-Slirp *slirp_init(int restricted, bool in_enabled, struct in_addr vnetwo=
+rk,
+-                  struct in_addr vnetmask, struct in_addr vhost,
+-                  bool in6_enabled,
+-                  struct in6_addr vprefix_addr6, uint8_t vprefix_len,
+-                  struct in6_addr vhost6, const char *vhostname,
+-                  const char *tftp_server_name,
+-                  const char *tftp_path, const char *bootfile,
+-                  struct in_addr vdhcp_start, struct in_addr vnameserver=
+,
+-                  struct in6_addr vnameserver6, const char **vdnssearch,
+-                  const char *vdomainname,
+-                  const SlirpCb *callbacks,
+-                  void *opaque)
+-{
+-    Slirp *slirp =3D g_malloc0(sizeof(Slirp));
+-
+-    slirp_init_once();
+-
+-    slirp->opaque =3D opaque;
+-    slirp->cb =3D callbacks;
+-    slirp->grand =3D g_rand_new();
+-    slirp->restricted =3D restricted;
+-
+-    slirp->in_enabled =3D in_enabled;
+-    slirp->in6_enabled =3D in6_enabled;
+-
+-    if_init(slirp);
+-    ip_init(slirp);
+-    ip6_init(slirp);
+-
+-    /* Initialise mbufs *after* setting the MTU */
+-    m_init(slirp);
+-
+-    slirp->vnetwork_addr =3D vnetwork;
+-    slirp->vnetwork_mask =3D vnetmask;
+-    slirp->vhost_addr =3D vhost;
+-    slirp->vprefix_addr6 =3D vprefix_addr6;
+-    slirp->vprefix_len =3D vprefix_len;
+-    slirp->vhost_addr6 =3D vhost6;
+-    if (vhostname) {
+-        slirp_pstrcpy(slirp->client_hostname, sizeof(slirp->client_hostn=
+ame),
+-                      vhostname);
+-    }
+-    slirp->tftp_prefix =3D g_strdup(tftp_path);
+-    slirp->bootp_filename =3D g_strdup(bootfile);
+-    slirp->vdomainname =3D g_strdup(vdomainname);
+-    slirp->vdhcp_startaddr =3D vdhcp_start;
+-    slirp->vnameserver_addr =3D vnameserver;
+-    slirp->vnameserver_addr6 =3D vnameserver6;
+-    slirp->tftp_server_name =3D g_strdup(tftp_server_name);
+-
+-    if (vdnssearch) {
+-        translate_dnssearch(slirp, vdnssearch);
+-    }
+-
+-    return slirp;
+-}
+-
+-void slirp_cleanup(Slirp *slirp)
+-{
+-    struct gfwd_list *e, *next;
+-
+-    for (e =3D slirp->guestfwd_list; e; e =3D next) {
+-        next =3D e->ex_next;
+-        g_free(e->ex_exec);
+-        g_free(e);
+-    }
+-
+-    ip_cleanup(slirp);
+-    ip6_cleanup(slirp);
+-    m_cleanup(slirp);
+-
+-    g_rand_free(slirp->grand);
+-
+-    g_free(slirp->vdnssearch);
+-    g_free(slirp->tftp_prefix);
+-    g_free(slirp->bootp_filename);
+-    g_free(slirp->vdomainname);
+-    g_free(slirp);
+-}
+-
+-#define CONN_CANFSEND(so) (((so)->so_state & (SS_FCANTSENDMORE|SS_ISFCON=
+NECTED)) =3D=3D SS_ISFCONNECTED)
+-#define CONN_CANFRCV(so) (((so)->so_state & (SS_FCANTRCVMORE|SS_ISFCONNE=
+CTED)) =3D=3D SS_ISFCONNECTED)
+-
+-static void slirp_update_timeout(Slirp *slirp, uint32_t *timeout)
+-{
+-    uint32_t t;
+-
+-    if (*timeout <=3D TIMEOUT_FAST) {
+-        return;
+-    }
+-
+-    t =3D MIN(1000, *timeout);
+-
+-    /* If we have tcp timeout with slirp, then we will fill @timeout wit=
+h
+-     * more precise value.
+-     */
+-    if (slirp->time_fasttimo) {
+-        *timeout =3D TIMEOUT_FAST;
+-        return;
+-    }
+-    if (slirp->do_slowtimo) {
+-        t =3D MIN(TIMEOUT_SLOW, t);
+-    }
+-    *timeout =3D t;
+-}
+-
+-void slirp_pollfds_fill(Slirp *slirp, uint32_t *timeout,
+-                        SlirpAddPollCb add_poll, void *opaque)
+-{
+-    struct socket *so, *so_next;
+-
+-    /*
+-     * First, TCP sockets
+-     */
+-
+-    /*
+-     * *_slowtimo needs calling if there are IP fragments
+-     * in the fragment queue, or there are TCP connections active
+-     */
+-    slirp->do_slowtimo =3D ((slirp->tcb.so_next !=3D &slirp->tcb) ||
+-                          (&slirp->ipq.ip_link !=3D slirp->ipq.ip_link.n=
+ext));
+-
+-    for (so =3D slirp->tcb.so_next; so !=3D &slirp->tcb; so =3D so_next)=
+ {
+-        int events =3D 0;
+-
+-        so_next =3D so->so_next;
+-
+-        so->pollfds_idx =3D -1;
+-
+-        /*
+-         * See if we need a tcp_fasttimo
+-         */
+-        if (slirp->time_fasttimo =3D=3D 0 &&
+-            so->so_tcpcb->t_flags & TF_DELACK) {
+-            slirp->time_fasttimo =3D curtime; /* Flag when want a fastti=
+mo */
+-        }
+-
+-        /*
+-         * NOFDREF can include still connecting to local-host,
+-         * newly socreated() sockets etc. Don't want to select these.
+-         */
+-        if (so->so_state & SS_NOFDREF || so->s =3D=3D -1) {
+-            continue;
+-        }
+-
+-        /*
+-         * Set for reading sockets which are accepting
+-         */
+-        if (so->so_state & SS_FACCEPTCONN) {
+-            so->pollfds_idx =3D add_poll(so->s,
+-                SLIRP_POLL_IN | SLIRP_POLL_HUP | SLIRP_POLL_ERR, opaque)=
+;
+-            continue;
+-        }
+-
+-        /*
+-         * Set for writing sockets which are connecting
+-         */
+-        if (so->so_state & SS_ISFCONNECTING) {
+-            so->pollfds_idx =3D add_poll(so->s,
+-                SLIRP_POLL_OUT | SLIRP_POLL_ERR, opaque);
+-            continue;
+-        }
+-
+-        /*
+-         * Set for writing if we are connected, can send more, and
+-         * we have something to send
+-         */
+-        if (CONN_CANFSEND(so) && so->so_rcv.sb_cc) {
+-            events |=3D SLIRP_POLL_OUT | SLIRP_POLL_ERR;
+-        }
+-
+-        /*
+-         * Set for reading (and urgent data) if we are connected, can
+-         * receive more, and we have room for it XXX /2 ?
+-         */
+-        if (CONN_CANFRCV(so) &&
+-            (so->so_snd.sb_cc < (so->so_snd.sb_datalen/2))) {
+-            events |=3D SLIRP_POLL_IN | SLIRP_POLL_HUP |
+-                      SLIRP_POLL_ERR | SLIRP_POLL_PRI;
+-        }
+-
+-        if (events) {
+-            so->pollfds_idx =3D add_poll(so->s, events, opaque);
+-        }
+-    }
+-
+-    /*
+-     * UDP sockets
+-     */
+-    for (so =3D slirp->udb.so_next; so !=3D &slirp->udb; so =3D so_next)=
+ {
+-        so_next =3D so->so_next;
+-
+-        so->pollfds_idx =3D -1;
+-
+-        /*
+-         * See if it's timed out
+-         */
+-        if (so->so_expire) {
+-            if (so->so_expire <=3D curtime) {
+-                udp_detach(so);
+-                continue;
+-            } else {
+-                slirp->do_slowtimo =3D true; /* Let socket expire */
+-            }
+-        }
+-
+-        /*
+-         * When UDP packets are received from over the
+-         * link, they're sendto()'d straight away, so
+-         * no need for setting for writing
+-         * Limit the number of packets queued by this session
+-         * to 4.  Note that even though we try and limit this
+-         * to 4 packets, the session could have more queued
+-         * if the packets needed to be fragmented
+-         * (XXX <=3D 4 ?)
+-         */
+-        if ((so->so_state & SS_ISFCONNECTED) && so->so_queued <=3D 4) {
+-            so->pollfds_idx =3D add_poll(so->s,
+-                SLIRP_POLL_IN | SLIRP_POLL_HUP | SLIRP_POLL_ERR, opaque)=
+;
+-        }
+-    }
+-
+-    /*
+-     * ICMP sockets
+-     */
+-    for (so =3D slirp->icmp.so_next; so !=3D &slirp->icmp; so =3D so_nex=
+t) {
+-        so_next =3D so->so_next;
+-
+-        so->pollfds_idx =3D -1;
+-
+-        /*
+-         * See if it's timed out
+-         */
+-        if (so->so_expire) {
+-            if (so->so_expire <=3D curtime) {
+-                icmp_detach(so);
+-                continue;
+-            } else {
+-                slirp->do_slowtimo =3D true; /* Let socket expire */
+-            }
+-        }
+-
+-        if (so->so_state & SS_ISFCONNECTED) {
+-            so->pollfds_idx =3D add_poll(so->s,
+-                SLIRP_POLL_IN | SLIRP_POLL_HUP | SLIRP_POLL_ERR, opaque)=
+;
+-        }
+-    }
+-
+-    slirp_update_timeout(slirp, timeout);
+-}
+-
+-void slirp_pollfds_poll(Slirp *slirp, int select_error,
+-                        SlirpGetREventsCb get_revents, void *opaque)
+-{
+-    struct socket *so, *so_next;
+-    int ret;
+-
+-    curtime =3D slirp->cb->clock_get_ns(slirp->opaque) / SCALE_MS;
+-
+-    /*
+-     * See if anything has timed out
+-     */
+-    if (slirp->time_fasttimo &&
+-        ((curtime - slirp->time_fasttimo) >=3D TIMEOUT_FAST)) {
+-        tcp_fasttimo(slirp);
+-        slirp->time_fasttimo =3D 0;
+-    }
+-    if (slirp->do_slowtimo &&
+-        ((curtime - slirp->last_slowtimo) >=3D TIMEOUT_SLOW)) {
+-        ip_slowtimo(slirp);
+-        tcp_slowtimo(slirp);
+-        slirp->last_slowtimo =3D curtime;
+-    }
+-
+-    /*
+-     * Check sockets
+-     */
+-    if (!select_error) {
+-        /*
+-         * Check TCP sockets
+-         */
+-        for (so =3D slirp->tcb.so_next; so !=3D &slirp->tcb;
+-             so =3D so_next) {
+-            int revents;
+-
+-            so_next =3D so->so_next;
+-
+-            revents =3D 0;
+-            if (so->pollfds_idx !=3D -1) {
+-                revents =3D get_revents(so->pollfds_idx, opaque);
+-            }
+-
+-            if (so->so_state & SS_NOFDREF || so->s =3D=3D -1) {
+-                continue;
+-            }
+-
+-            /*
+-             * Check for URG data
+-             * This will soread as well, so no need to
+-             * test for SLIRP_POLL_IN below if this succeeds
+-             */
+-            if (revents & SLIRP_POLL_PRI) {
+-                ret =3D sorecvoob(so);
+-                if (ret < 0) {
+-                    /* Socket error might have resulted in the socket be=
+ing
+-                     * removed, do not try to do anything more with it. =
+*/
+-                    continue;
+-                }
+-            }
+-            /*
+-             * Check sockets for reading
+-             */
+-            else if (revents &
+-                     (SLIRP_POLL_IN | SLIRP_POLL_HUP | SLIRP_POLL_ERR)) =
+{
+-                /*
+-                 * Check for incoming connections
+-                 */
+-                if (so->so_state & SS_FACCEPTCONN) {
+-                    tcp_connect(so);
+-                    continue;
+-                } /* else */
+-                ret =3D soread(so);
+-
+-                /* Output it if we read something */
+-                if (ret > 0) {
+-                    tcp_output(sototcpcb(so));
+-                }
+-                if (ret < 0) {
+-                    /* Socket error might have resulted in the socket be=
+ing
+-                     * removed, do not try to do anything more with it. =
+*/
+-                    continue;
+-                }
+-            }
+-
+-            /*
+-             * Check sockets for writing
+-             */
+-            if (!(so->so_state & SS_NOFDREF) &&
+-                (revents & (SLIRP_POLL_OUT | SLIRP_POLL_ERR))) {
+-                /*
+-                 * Check for non-blocking, still-connecting sockets
+-                 */
+-                if (so->so_state & SS_ISFCONNECTING) {
+-                    /* Connected */
+-                    so->so_state &=3D ~SS_ISFCONNECTING;
+-
+-                    ret =3D send(so->s, (const void *) &ret, 0, 0);
+-                    if (ret < 0) {
+-                        /* XXXXX Must fix, zero bytes is a NOP */
+-                        if (errno =3D=3D EAGAIN || errno =3D=3D EWOULDBL=
+OCK ||
+-                            errno =3D=3D EINPROGRESS || errno =3D=3D ENO=
+TCONN) {
+-                            continue;
+-                        }
+-
+-                        /* else failed */
+-                        so->so_state &=3D SS_PERSISTENT_MASK;
+-                        so->so_state |=3D SS_NOFDREF;
+-                    }
+-                    /* else so->so_state &=3D ~SS_ISFCONNECTING; */
+-
+-                    /*
+-                     * Continue tcp_input
+-                     */
+-                    tcp_input((struct mbuf *)NULL, sizeof(struct ip), so=
+,
+-                              so->so_ffamily);
+-                    /* continue; */
+-                } else {
+-                    ret =3D sowrite(so);
+-                    if (ret > 0) {
+-                        /* Call tcp_output in case we need to send a win=
+dow
+-                         * update to the guest, otherwise it will be stu=
+ck
+-                         * until it sends a window probe. */
+-                        tcp_output(sototcpcb(so));
+-                    }
+-                }
+-            }
+-        }
+-
+-        /*
+-         * Now UDP sockets.
+-         * Incoming packets are sent straight away, they're not buffered=
+.
+-         * Incoming UDP data isn't buffered either.
+-         */
+-        for (so =3D slirp->udb.so_next; so !=3D &slirp->udb;
+-             so =3D so_next) {
+-            int revents;
+-
+-            so_next =3D so->so_next;
+-
+-            revents =3D 0;
+-            if (so->pollfds_idx !=3D -1) {
+-                revents =3D get_revents(so->pollfds_idx, opaque);
+-            }
+-
+-            if (so->s !=3D -1 &&
+-                (revents & (SLIRP_POLL_IN | SLIRP_POLL_HUP | SLIRP_POLL_=
+ERR))) {
+-                sorecvfrom(so);
+-            }
+-        }
+-
+-        /*
+-         * Check incoming ICMP relies.
+-         */
+-        for (so =3D slirp->icmp.so_next; so !=3D &slirp->icmp;
+-             so =3D so_next) {
+-            int revents;
+-
+-            so_next =3D so->so_next;
+-
+-            revents =3D 0;
+-            if (so->pollfds_idx !=3D -1) {
+-                revents =3D get_revents(so->pollfds_idx, opaque);
+-            }
+-
+-            if (so->s !=3D -1 &&
+-                (revents & (SLIRP_POLL_IN | SLIRP_POLL_HUP | SLIRP_POLL_=
+ERR))) {
+-                icmp_receive(so);
+-            }
+-        }
+-    }
+-
+-    if_start(slirp);
+-}
+-
+-static void arp_input(Slirp *slirp, const uint8_t *pkt, int pkt_len)
+-{
+-    struct slirp_arphdr *ah =3D (struct slirp_arphdr *)(pkt + ETH_HLEN);
+-    uint8_t arp_reply[MAX(ETH_HLEN + sizeof(struct slirp_arphdr), 64)];
+-    struct ethhdr *reh =3D (struct ethhdr *)arp_reply;
+-    struct slirp_arphdr *rah =3D (struct slirp_arphdr *)(arp_reply + ETH=
+_HLEN);
+-    int ar_op;
+-    struct gfwd_list *ex_ptr;
+-
+-    if (!slirp->in_enabled) {
+-        return;
+-    }
+-
+-    ar_op =3D ntohs(ah->ar_op);
+-    switch(ar_op) {
+-    case ARPOP_REQUEST:
+-        if (ah->ar_tip =3D=3D ah->ar_sip) {
+-            /* Gratuitous ARP */
+-            arp_table_add(slirp, ah->ar_sip, ah->ar_sha);
+-            return;
+-        }
+-
+-        if ((ah->ar_tip & slirp->vnetwork_mask.s_addr) =3D=3D
+-            slirp->vnetwork_addr.s_addr) {
+-            if (ah->ar_tip =3D=3D slirp->vnameserver_addr.s_addr ||
+-                ah->ar_tip =3D=3D slirp->vhost_addr.s_addr)
+-                goto arp_ok;
+-            /* TODO: IPv6 */
+-            for (ex_ptr =3D slirp->guestfwd_list; ex_ptr; ex_ptr =3D ex_=
+ptr->ex_next) {
+-                if (ex_ptr->ex_addr.s_addr =3D=3D ah->ar_tip)
+-                    goto arp_ok;
+-            }
+-            return;
+-        arp_ok:
+-            memset(arp_reply, 0, sizeof(arp_reply));
+-
+-            arp_table_add(slirp, ah->ar_sip, ah->ar_sha);
+-
+-            /* ARP request for alias/dns mac address */
+-            memcpy(reh->h_dest, pkt + ETH_ALEN, ETH_ALEN);
+-            memcpy(reh->h_source, special_ethaddr, ETH_ALEN - 4);
+-            memcpy(&reh->h_source[2], &ah->ar_tip, 4);
+-            reh->h_proto =3D htons(ETH_P_ARP);
+-
+-            rah->ar_hrd =3D htons(1);
+-            rah->ar_pro =3D htons(ETH_P_IP);
+-            rah->ar_hln =3D ETH_ALEN;
+-            rah->ar_pln =3D 4;
+-            rah->ar_op =3D htons(ARPOP_REPLY);
+-            memcpy(rah->ar_sha, reh->h_source, ETH_ALEN);
+-            rah->ar_sip =3D ah->ar_tip;
+-            memcpy(rah->ar_tha, ah->ar_sha, ETH_ALEN);
+-            rah->ar_tip =3D ah->ar_sip;
+-            slirp_send_packet_all(slirp, arp_reply, sizeof(arp_reply));
+-        }
+-        break;
+-    case ARPOP_REPLY:
+-        arp_table_add(slirp, ah->ar_sip, ah->ar_sha);
+-        break;
+-    default:
+-        break;
+-    }
+-}
+-
+-void slirp_input(Slirp *slirp, const uint8_t *pkt, int pkt_len)
+-{
+-    struct mbuf *m;
+-    int proto;
+-
+-    if (pkt_len < ETH_HLEN)
+-        return;
+-
+-    proto =3D (((uint16_t) pkt[12]) << 8) + pkt[13];
+-    switch(proto) {
+-    case ETH_P_ARP:
+-        arp_input(slirp, pkt, pkt_len);
+-        break;
+-    case ETH_P_IP:
+-    case ETH_P_IPV6:
+-        m =3D m_get(slirp);
+-        if (!m)
+-            return;
+-        /* Note: we add 2 to align the IP header on 4 bytes,
+-         * and add the margin for the tcpiphdr overhead  */
+-        if (M_FREEROOM(m) < pkt_len + TCPIPHDR_DELTA + 2) {
+-            m_inc(m, pkt_len + TCPIPHDR_DELTA + 2);
+-        }
+-        m->m_len =3D pkt_len + TCPIPHDR_DELTA + 2;
+-        memcpy(m->m_data + TCPIPHDR_DELTA + 2, pkt, pkt_len);
+-
+-        m->m_data +=3D TCPIPHDR_DELTA + 2 + ETH_HLEN;
+-        m->m_len -=3D TCPIPHDR_DELTA + 2 + ETH_HLEN;
+-
+-        if (proto =3D=3D ETH_P_IP) {
+-            ip_input(m);
+-        } else if (proto =3D=3D ETH_P_IPV6) {
+-            ip6_input(m);
+-        }
+-        break;
+-
+-    case ETH_P_NCSI:
+-        ncsi_input(slirp, pkt, pkt_len);
+-        break;
+-
+-    default:
+-        break;
+-    }
+-}
+-
+-/* Prepare the IPv4 packet to be sent to the ethernet device. Returns 1 =
+if no
+- * packet should be sent, 0 if the packet must be re-queued, 2 if the pa=
+cket
+- * is ready to go.
+- */
+-static int if_encap4(Slirp *slirp, struct mbuf *ifm, struct ethhdr *eh,
+-        uint8_t ethaddr[ETH_ALEN])
+-{
+-    const struct ip *iph =3D (const struct ip *)ifm->m_data;
+-
+-    if (iph->ip_dst.s_addr =3D=3D 0) {
+-        /* 0.0.0.0 can not be a destination address, something went wron=
+g,
+-         * avoid making it worse */
+-        return 1;
+-    }
+-    if (!arp_table_search(slirp, iph->ip_dst.s_addr, ethaddr)) {
+-        uint8_t arp_req[ETH_HLEN + sizeof(struct slirp_arphdr)];
+-        struct ethhdr *reh =3D (struct ethhdr *)arp_req;
+-        struct slirp_arphdr *rah =3D (struct slirp_arphdr *)(arp_req + E=
+TH_HLEN);
+-
+-        if (!ifm->resolution_requested) {
+-            /* If the client addr is not known, send an ARP request */
+-            memset(reh->h_dest, 0xff, ETH_ALEN);
+-            memcpy(reh->h_source, special_ethaddr, ETH_ALEN - 4);
+-            memcpy(&reh->h_source[2], &slirp->vhost_addr, 4);
+-            reh->h_proto =3D htons(ETH_P_ARP);
+-            rah->ar_hrd =3D htons(1);
+-            rah->ar_pro =3D htons(ETH_P_IP);
+-            rah->ar_hln =3D ETH_ALEN;
+-            rah->ar_pln =3D 4;
+-            rah->ar_op =3D htons(ARPOP_REQUEST);
+-
+-            /* source hw addr */
+-            memcpy(rah->ar_sha, special_ethaddr, ETH_ALEN - 4);
+-            memcpy(&rah->ar_sha[2], &slirp->vhost_addr, 4);
+-
+-            /* source IP */
+-            rah->ar_sip =3D slirp->vhost_addr.s_addr;
+-
+-            /* target hw addr (none) */
+-            memset(rah->ar_tha, 0, ETH_ALEN);
+-
+-            /* target IP */
+-            rah->ar_tip =3D iph->ip_dst.s_addr;
+-            slirp->client_ipaddr =3D iph->ip_dst;
+-            slirp_send_packet_all(slirp, arp_req, sizeof(arp_req));
+-            ifm->resolution_requested =3D true;
+-
+-            /* Expire request and drop outgoing packet after 1 second */
+-            ifm->expiration_date =3D
+-                slirp->cb->clock_get_ns(slirp->opaque) + 1000000000ULL;
+-        }
+-        return 0;
+-    } else {
+-        memcpy(eh->h_source, special_ethaddr, ETH_ALEN - 4);
+-        /* XXX: not correct */
+-        memcpy(&eh->h_source[2], &slirp->vhost_addr, 4);
+-        eh->h_proto =3D htons(ETH_P_IP);
+-
+-        /* Send this */
+-        return 2;
+-    }
+-}
+-
+-/* Prepare the IPv6 packet to be sent to the ethernet device. Returns 1 =
+if no
+- * packet should be sent, 0 if the packet must be re-queued, 2 if the pa=
+cket
+- * is ready to go.
+- */
+-static int if_encap6(Slirp *slirp, struct mbuf *ifm, struct ethhdr *eh,
+-        uint8_t ethaddr[ETH_ALEN])
+-{
+-    const struct ip6 *ip6h =3D mtod(ifm, const struct ip6 *);
+-    if (!ndp_table_search(slirp, ip6h->ip_dst, ethaddr)) {
+-        if (!ifm->resolution_requested) {
+-            ndp_send_ns(slirp, ip6h->ip_dst);
+-            ifm->resolution_requested =3D true;
+-            ifm->expiration_date =3D slirp->cb->clock_get_ns(slirp->opaq=
+ue) + 1000000000ULL;
+-        }
+-        return 0;
+-    } else {
+-        eh->h_proto =3D htons(ETH_P_IPV6);
+-        in6_compute_ethaddr(ip6h->ip_src, eh->h_source);
+-
+-        /* Send this */
+-        return 2;
+-    }
+-}
+-
+-/* Output the IP packet to the ethernet device. Returns 0 if the packet =
+must be
+- * re-queued.
+- */
+-int if_encap(Slirp *slirp, struct mbuf *ifm)
+-{
+-    uint8_t buf[1600];
+-    struct ethhdr *eh =3D (struct ethhdr *)buf;
+-    uint8_t ethaddr[ETH_ALEN];
+-    const struct ip *iph =3D (const struct ip *)ifm->m_data;
+-    int ret;
+-
+-    if (ifm->m_len + ETH_HLEN > sizeof(buf)) {
+-        return 1;
+-    }
+-
+-    switch (iph->ip_v) {
+-    case IPVERSION:
+-        ret =3D if_encap4(slirp, ifm, eh, ethaddr);
+-        if (ret < 2) {
+-            return ret;
+-        }
+-        break;
+-
+-    case IP6VERSION:
+-        ret =3D if_encap6(slirp, ifm, eh, ethaddr);
+-        if (ret < 2) {
+-            return ret;
+-        }
+-        break;
+-
+-    default:
+-        g_assert_not_reached();
+-        break;
+-    }
+-
+-    memcpy(eh->h_dest, ethaddr, ETH_ALEN);
+-    DEBUG_ARG("src =3D %02x:%02x:%02x:%02x:%02x:%02x",
+-              eh->h_source[0], eh->h_source[1], eh->h_source[2],
+-              eh->h_source[3], eh->h_source[4], eh->h_source[5]);
+-    DEBUG_ARG("dst =3D %02x:%02x:%02x:%02x:%02x:%02x",
+-              eh->h_dest[0], eh->h_dest[1], eh->h_dest[2],
+-              eh->h_dest[3], eh->h_dest[4], eh->h_dest[5]);
+-    memcpy(buf + sizeof(struct ethhdr), ifm->m_data, ifm->m_len);
+-    slirp_send_packet_all(slirp, buf, ifm->m_len + ETH_HLEN);
+-    return 1;
+-}
+-
+-/* Drop host forwarding rule, return 0 if found. */
+-/* TODO: IPv6 */
+-int slirp_remove_hostfwd(Slirp *slirp, int is_udp, struct in_addr host_a=
+ddr,
+-                         int host_port)
+-{
+-    struct socket *so;
+-    struct socket *head =3D (is_udp ? &slirp->udb : &slirp->tcb);
+-    struct sockaddr_in addr;
+-    int port =3D htons(host_port);
+-    socklen_t addr_len;
+-
+-    for (so =3D head->so_next; so !=3D head; so =3D so->so_next) {
+-        addr_len =3D sizeof(addr);
+-        if ((so->so_state & SS_HOSTFWD) &&
+-            getsockname(so->s, (struct sockaddr *)&addr, &addr_len) =3D=3D=
+ 0 &&
+-            addr.sin_addr.s_addr =3D=3D host_addr.s_addr &&
+-            addr.sin_port =3D=3D port) {
+-            so->slirp->cb->unregister_poll_fd(so->s, so->slirp->opaque);
+-            closesocket(so->s);
+-            sofree(so);
+-            return 0;
+-        }
+-    }
+-
+-    return -1;
+-}
+-
+-/* TODO: IPv6 */
+-int slirp_add_hostfwd(Slirp *slirp, int is_udp, struct in_addr host_addr=
+,
+-                      int host_port, struct in_addr guest_addr, int gues=
+t_port)
+-{
+-    if (!guest_addr.s_addr) {
+-        guest_addr =3D slirp->vdhcp_startaddr;
+-    }
+-    if (is_udp) {
+-        if (!udp_listen(slirp, host_addr.s_addr, htons(host_port),
+-                        guest_addr.s_addr, htons(guest_port), SS_HOSTFWD=
+))
+-            return -1;
+-    } else {
+-        if (!tcp_listen(slirp, host_addr.s_addr, htons(host_port),
+-                        guest_addr.s_addr, htons(guest_port), SS_HOSTFWD=
+))
+-            return -1;
+-    }
+-    return 0;
+-}
+-
+-/* TODO: IPv6 */
+-static bool
+-check_guestfwd(Slirp *slirp, struct in_addr *guest_addr, int guest_port)
+-{
+-    struct gfwd_list *tmp_ptr;
+-
+-    if (!guest_addr->s_addr) {
+-        guest_addr->s_addr =3D slirp->vnetwork_addr.s_addr |
+-            (htonl(0x0204) & ~slirp->vnetwork_mask.s_addr);
+-    }
+-    if ((guest_addr->s_addr & slirp->vnetwork_mask.s_addr) !=3D
+-        slirp->vnetwork_addr.s_addr ||
+-        guest_addr->s_addr =3D=3D slirp->vhost_addr.s_addr ||
+-        guest_addr->s_addr =3D=3D slirp->vnameserver_addr.s_addr) {
+-        return false;
+-    }
+-
+-    /* check if the port is "bound" */
+-    for (tmp_ptr =3D slirp->guestfwd_list; tmp_ptr; tmp_ptr =3D tmp_ptr-=
+>ex_next) {
+-        if (guest_port =3D=3D tmp_ptr->ex_fport &&
+-            guest_addr->s_addr =3D=3D tmp_ptr->ex_addr.s_addr)
+-            return false;
+-    }
+-
+-    return true;
+-}
+-
+-int slirp_add_exec(Slirp *slirp, const char *cmdline,
+-                   struct in_addr *guest_addr, int guest_port)
+-{
+-    if (!check_guestfwd(slirp, guest_addr, guest_port)) {
+-        return -1;
+-    }
+-
+-    add_exec(&slirp->guestfwd_list, cmdline, *guest_addr, htons(guest_po=
+rt));
+-    return 0;
+-}
+-
+-int slirp_add_guestfwd(Slirp *slirp, SlirpWriteCb write_cb, void *opaque=
+,
+-                       struct in_addr *guest_addr, int guest_port)
+-{
+-    if (!check_guestfwd(slirp, guest_addr, guest_port)) {
+-        return -1;
+-    }
+-
+-    add_guestfwd(&slirp->guestfwd_list, write_cb, opaque,
+-                 *guest_addr, htons(guest_port));
+-    return 0;
+-}
+-
+-ssize_t slirp_send(struct socket *so, const void *buf, size_t len, int f=
+lags)
+-{
+-    if (so->s =3D=3D -1 && so->guestfwd) {
+-        /* XXX this blocks entire thread. Rewrite to use
+-         * qemu_chr_fe_write and background I/O callbacks */
+-        so->guestfwd->write_cb(buf, len, so->guestfwd->opaque);
+-        return len;
+-    }
+-
+-    if (so->s =3D=3D -1) {
+-        /*
+-         * This should in theory not happen but it is hard to be
+-         * sure because some code paths will end up with so->s =3D=3D -1
+-         * on a failure but don't dispose of the struct socket.
+-         * Check specifically, so we don't pass -1 to send().
+-         */
+-        errno =3D EBADF;
+-        return -1;
+-    }
+-
+-    return send(so->s, buf, len, flags);
+-}
+-
+-struct socket *
+-slirp_find_ctl_socket(Slirp *slirp, struct in_addr guest_addr, int guest=
+_port)
+-{
+-    struct socket *so;
+-
+-    /* TODO: IPv6 */
+-    for (so =3D slirp->tcb.so_next; so !=3D &slirp->tcb; so =3D so->so_n=
+ext) {
+-        if (so->so_faddr.s_addr =3D=3D guest_addr.s_addr &&
+-            htons(so->so_fport) =3D=3D guest_port) {
+-            return so;
+-        }
+-    }
+-    return NULL;
+-}
+-
+-size_t slirp_socket_can_recv(Slirp *slirp, struct in_addr guest_addr,
+-                             int guest_port)
+-{
+-    struct iovec iov[2];
+-    struct socket *so;
+-
+-    so =3D slirp_find_ctl_socket(slirp, guest_addr, guest_port);
+-
+-    if (!so || so->so_state & SS_NOFDREF) {
+-        return 0;
+-    }
+-
+-    if (!CONN_CANFRCV(so) || so->so_snd.sb_cc >=3D (so->so_snd.sb_datale=
+n/2)) {
+-        return 0;
+-    }
+-
+-    return sopreprbuf(so, iov, NULL);
+-}
+-
+-void slirp_socket_recv(Slirp *slirp, struct in_addr guest_addr, int gues=
+t_port,
+-                       const uint8_t *buf, int size)
+-{
+-    int ret;
+-    struct socket *so =3D slirp_find_ctl_socket(slirp, guest_addr, guest=
+_port);
+-
+-    if (!so)
+-        return;
+-
+-    ret =3D soreadbuf(so, (const char *)buf, size);
+-
+-    if (ret > 0)
+-        tcp_output(sototcpcb(so));
+-}
+-
+-void slirp_send_packet_all(Slirp *slirp, const void *buf, size_t len)
+-{
+-    ssize_t ret =3D slirp->cb->send_packet(buf, len, slirp->opaque);
+-
+-    if (ret < 0) {
+-        g_critical("Failed to send packet, ret: %ld", (long) ret);
+-    } else if (ret < len) {
+-        DEBUG_ERROR("send_packet() didn't send all data: %ld < %lu",
+-                (long) ret, (unsigned long) len);
+-    }
+-}
+diff --git a/slirp/src/socket.c b/slirp/src/socket.c
+deleted file mode 100644
+index bb752fdcae..0000000000
+--- a/slirp/src/socket.c
++++ /dev/null
+@@ -1,945 +0,0 @@
+-/* SPDX-License-Identifier: BSD-3-Clause */
+-/*
+- * Copyright (c) 1995 Danny Gasparovski.
+- */
+-
+-#include "slirp.h"
+-#include "ip_icmp.h"
+-#ifdef __sun__
+-#include <sys/filio.h>
+-#endif
+-
+-static void sofcantrcvmore(struct socket *so);
+-static void sofcantsendmore(struct socket *so);
+-
+-struct socket *solookup(struct socket **last, struct socket *head,
+-        struct sockaddr_storage *lhost, struct sockaddr_storage *fhost)
+-{
+-    struct socket *so =3D *last;
+-
+-    /* Optimisation */
+-    if (so !=3D head && sockaddr_equal(&(so->lhost.ss), lhost)
+-            && (!fhost || sockaddr_equal(&so->fhost.ss, fhost))) {
+-        return so;
+-    }
+-
+-    for (so =3D head->so_next; so !=3D head; so =3D so->so_next) {
+-        if (sockaddr_equal(&(so->lhost.ss), lhost)
+-                && (!fhost || sockaddr_equal(&so->fhost.ss, fhost))) {
+-            *last =3D so;
+-            return so;
+-        }
+-    }
+-
+-    return (struct socket *)NULL;
+-}
+-
+-/*
+- * Create a new socket, initialise the fields
+- * It is the responsibility of the caller to
+- * insque() it into the correct linked-list
+- */
+-struct socket *
+-socreate(Slirp *slirp)
+-{
+-    struct socket *so =3D g_new(struct socket, 1);
+-
+-    memset(so, 0, sizeof(struct socket));
+-    so->so_state =3D SS_NOFDREF;
+-    so->s =3D -1;
+-    so->slirp =3D slirp;
+-    so->pollfds_idx =3D -1;
+-
+-    return so;
+-}
+-
+-/*
+- * Remove references to so from the given message queue.
+- */
+-static void
+-soqfree(struct socket *so, struct quehead *qh)
+-{
+-    struct mbuf *ifq;
+-
+-    for (ifq =3D (struct mbuf *) qh->qh_link;
+-             (struct quehead *) ifq !=3D qh;
+-             ifq =3D ifq->ifq_next) {
+-        if (ifq->ifq_so =3D=3D so) {
+-            struct mbuf *ifm;
+-            ifq->ifq_so =3D NULL;
+-            for (ifm =3D ifq->ifs_next; ifm !=3D ifq; ifm =3D ifm->ifs_n=
+ext) {
+-                ifm->ifq_so =3D NULL;
+-            }
+-        }
+-    }
+-}
+-
+-/*
+- * remque and free a socket, clobber cache
+- */
+-void
+-sofree(struct socket *so)
+-{
+-  Slirp *slirp =3D so->slirp;
+-
+-  soqfree(so, &slirp->if_fastq);
+-  soqfree(so, &slirp->if_batchq);
+-
+-  if (so =3D=3D slirp->tcp_last_so) {
+-      slirp->tcp_last_so =3D &slirp->tcb;
+-  } else if (so =3D=3D slirp->udp_last_so) {
+-      slirp->udp_last_so =3D &slirp->udb;
+-  } else if (so =3D=3D slirp->icmp_last_so) {
+-      slirp->icmp_last_so =3D &slirp->icmp;
+-  }
+-  m_free(so->so_m);
+-
+-  if(so->so_next && so->so_prev)
+-    remque(so);  /* crashes if so is not in a queue */
+-
+-  if (so->so_tcpcb) {
+-      free(so->so_tcpcb);
+-  }
+-  g_free(so);
+-}
+-
+-size_t sopreprbuf(struct socket *so, struct iovec *iov, int *np)
+-{
+-	int n, lss, total;
+-	struct sbuf *sb =3D &so->so_snd;
+-	int len =3D sb->sb_datalen - sb->sb_cc;
+-	int mss =3D so->so_tcpcb->t_maxseg;
+-
+-	DEBUG_CALL("sopreprbuf");
+-	DEBUG_ARG("so =3D %p", so);
+-
+-	if (len <=3D 0)
+-		return 0;
+-
+-	iov[0].iov_base =3D sb->sb_wptr;
+-        iov[1].iov_base =3D NULL;
+-        iov[1].iov_len =3D 0;
+-	if (sb->sb_wptr < sb->sb_rptr) {
+-		iov[0].iov_len =3D sb->sb_rptr - sb->sb_wptr;
+-		/* Should never succeed, but... */
+-		if (iov[0].iov_len > len)
+-		   iov[0].iov_len =3D len;
+-		if (iov[0].iov_len > mss)
+-		   iov[0].iov_len -=3D iov[0].iov_len%mss;
+-		n =3D 1;
+-	} else {
+-		iov[0].iov_len =3D (sb->sb_data + sb->sb_datalen) - sb->sb_wptr;
+-		/* Should never succeed, but... */
+-		if (iov[0].iov_len > len) iov[0].iov_len =3D len;
+-		len -=3D iov[0].iov_len;
+-		if (len) {
+-			iov[1].iov_base =3D sb->sb_data;
+-			iov[1].iov_len =3D sb->sb_rptr - sb->sb_data;
+-			if(iov[1].iov_len > len)
+-			   iov[1].iov_len =3D len;
+-			total =3D iov[0].iov_len + iov[1].iov_len;
+-			if (total > mss) {
+-				lss =3D total%mss;
+-				if (iov[1].iov_len > lss) {
+-					iov[1].iov_len -=3D lss;
+-					n =3D 2;
+-				} else {
+-					lss -=3D iov[1].iov_len;
+-					iov[0].iov_len -=3D lss;
+-					n =3D 1;
+-				}
+-			} else
+-				n =3D 2;
+-		} else {
+-			if (iov[0].iov_len > mss)
+-			   iov[0].iov_len -=3D iov[0].iov_len%mss;
+-			n =3D 1;
+-		}
+-	}
+-	if (np)
+-		*np =3D n;
+-
+-	return iov[0].iov_len + (n - 1) * iov[1].iov_len;
+-}
+-
+-/*
+- * Read from so's socket into sb_snd, updating all relevant sbuf fields
+- * NOTE: This will only be called if it is select()ed for reading, so
+- * a read() of 0 (or less) means it's disconnected
+- */
+-int
+-soread(struct socket *so)
+-{
+-	int n, nn;
+-	size_t buf_len;
+-	struct sbuf *sb =3D &so->so_snd;
+-	struct iovec iov[2];
+-
+-	DEBUG_CALL("soread");
+-	DEBUG_ARG("so =3D %p", so);
+-
+-	/*
+-	 * No need to check if there's enough room to read.
+-	 * soread wouldn't have been called if there weren't
+-	 */
+-	buf_len =3D sopreprbuf(so, iov, &n);
+-	assert(buf_len !=3D 0);
+-
+-	nn =3D recv(so->s, iov[0].iov_base, iov[0].iov_len,0);
+-	if (nn <=3D 0) {
+-		if (nn < 0 && (errno =3D=3D EINTR || errno =3D=3D EAGAIN))
+-			return 0;
+-		else {
+-			int err;
+-			socklen_t elen =3D sizeof err;
+-			struct sockaddr_storage addr;
+-			struct sockaddr *paddr =3D (struct sockaddr *) &addr;
+-			socklen_t alen =3D sizeof addr;
+-
+-			err =3D errno;
+-			if (nn =3D=3D 0) {
+-				if (getpeername(so->s, paddr, &alen) < 0) {
+-					err =3D errno;
+-				} else {
+-					getsockopt(so->s, SOL_SOCKET, SO_ERROR,
+-						&err, &elen);
+-				}
+-			}
+-
+-			DEBUG_MISC(" --- soread() disconnected, nn =3D %d, errno =3D %d-%s",
+-                       nn, errno,strerror(errno));
+-			sofcantrcvmore(so);
+-
+-			if (err =3D=3D ECONNRESET || err =3D=3D ECONNREFUSED
+-			    || err =3D=3D ENOTCONN || err =3D=3D EPIPE) {
+-				tcp_drop(sototcpcb(so), err);
+-			} else {
+-				tcp_sockclosed(sototcpcb(so));
+-			}
+-			return -1;
+-		}
+-	}
+-
+-	/*
+-	 * If there was no error, try and read the second time round
+-	 * We read again if n =3D 2 (ie, there's another part of the buffer)
+-	 * and we read as much as we could in the first read
+-	 * We don't test for <=3D 0 this time, because there legitimately
+-	 * might not be any more data (since the socket is non-blocking),
+-	 * a close will be detected on next iteration.
+-	 * A return of -1 won't (shouldn't) happen, since it didn't happen abov=
+e
+-	 */
+-	if (n =3D=3D 2 && nn =3D=3D iov[0].iov_len) {
+-            int ret;
+-            ret =3D recv(so->s, iov[1].iov_base, iov[1].iov_len,0);
+-            if (ret > 0)
+-                nn +=3D ret;
+-        }
+-
+-	DEBUG_MISC(" ... read nn =3D %d bytes", nn);
+-
+-	/* Update fields */
+-	sb->sb_cc +=3D nn;
+-	sb->sb_wptr +=3D nn;
+-	if (sb->sb_wptr >=3D (sb->sb_data + sb->sb_datalen))
+-		sb->sb_wptr -=3D sb->sb_datalen;
+-	return nn;
+-}
+-
+-int soreadbuf(struct socket *so, const char *buf, int size)
+-{
+-    int n, nn, copy =3D size;
+-	struct sbuf *sb =3D &so->so_snd;
+-	struct iovec iov[2];
+-
+-	DEBUG_CALL("soreadbuf");
+-	DEBUG_ARG("so =3D %p", so);
+-
+-	/*
+-	 * No need to check if there's enough room to read.
+-	 * soread wouldn't have been called if there weren't
+-	 */
+-	assert(size > 0);
+-	if (sopreprbuf(so, iov, &n) < size)
+-        goto err;
+-
+-    nn =3D MIN(iov[0].iov_len, copy);
+-    memcpy(iov[0].iov_base, buf, nn);
+-
+-    copy -=3D nn;
+-    buf +=3D nn;
+-
+-    if (copy =3D=3D 0)
+-        goto done;
+-
+-    memcpy(iov[1].iov_base, buf, copy);
+-
+-done:
+-    /* Update fields */
+-	sb->sb_cc +=3D size;
+-	sb->sb_wptr +=3D size;
+-	if (sb->sb_wptr >=3D (sb->sb_data + sb->sb_datalen))
+-		sb->sb_wptr -=3D sb->sb_datalen;
+-    return size;
+-err:
+-
+-    sofcantrcvmore(so);
+-    tcp_sockclosed(sototcpcb(so));
+-    g_critical("soreadbuf buffer too small");
+-    return -1;
+-}
+-
+-/*
+- * Get urgent data
+- *
+- * When the socket is created, we set it SO_OOBINLINE,
+- * so when OOB data arrives, we soread() it and everything
+- * in the send buffer is sent as urgent data
+- */
+-int
+-sorecvoob(struct socket *so)
+-{
+-	struct tcpcb *tp =3D sototcpcb(so);
+-	int ret;
+-
+-	DEBUG_CALL("sorecvoob");
+-	DEBUG_ARG("so =3D %p", so);
+-
+-	/*
+-	 * We take a guess at how much urgent data has arrived.
+-	 * In most situations, when urgent data arrives, the next
+-	 * read() should get all the urgent data.  This guess will
+-	 * be wrong however if more data arrives just after the
+-	 * urgent data, or the read() doesn't return all the
+-	 * urgent data.
+-	 */
+-	ret =3D soread(so);
+-	if (ret > 0) {
+-	    tp->snd_up =3D tp->snd_una + so->so_snd.sb_cc;
+-	    tp->t_force =3D 1;
+-	    tcp_output(tp);
+-	    tp->t_force =3D 0;
+-	}
+-
+-	return ret;
+-}
+-
+-/*
+- * Send urgent data
+- * There's a lot duplicated code here, but...
+- */
+-int
+-sosendoob(struct socket *so)
+-{
+-	struct sbuf *sb =3D &so->so_rcv;
+-	char buff[2048]; /* XXX Shouldn't be sending more oob data than this */
+-
+-	int n;
+-
+-	DEBUG_CALL("sosendoob");
+-	DEBUG_ARG("so =3D %p", so);
+-	DEBUG_ARG("sb->sb_cc =3D %d", sb->sb_cc);
+-
+-	if (so->so_urgc > 2048)
+-	   so->so_urgc =3D 2048; /* XXXX */
+-
+-	if (sb->sb_rptr < sb->sb_wptr) {
+-		/* We can send it directly */
+-		n =3D slirp_send(so, sb->sb_rptr, so->so_urgc, (MSG_OOB)); /* |MSG_DON=
+TWAIT)); */
+-	} else {
+-		/*
+-		 * Since there's no sendv or sendtov like writev,
+-		 * we must copy all data to a linear buffer then
+-		 * send it all
+-		 */
+-		uint32_t urgc =3D so->so_urgc;
+-		int len =3D (sb->sb_data + sb->sb_datalen) - sb->sb_rptr;
+-		if (len > urgc) {
+-			len =3D urgc;
+-		}
+-		memcpy(buff, sb->sb_rptr, len);
+-		urgc -=3D len;
+-		if (urgc) {
+-			n =3D sb->sb_wptr - sb->sb_data;
+-			if (n > urgc) {
+-				n =3D urgc;
+-			}
+-			memcpy((buff + len), sb->sb_data, n);
+-			len +=3D n;
+-		}
+-		n =3D slirp_send(so, buff, len, (MSG_OOB)); /* |MSG_DONTWAIT)); */
+-#ifdef DEBUG
+-		if (n !=3D len) {
+-			DEBUG_ERROR("Didn't send all data urgently XXXXX");
+-		}
+-#endif
+-	}
+-
+-	if (n < 0) {
+-		return n;
+-	}
+-	so->so_urgc -=3D n;
+-	DEBUG_MISC(" ---2 sent %d bytes urgent data, %d urgent bytes left", n, =
+so->so_urgc);
+-
+-	sb->sb_cc -=3D n;
+-	sb->sb_rptr +=3D n;
+-	if (sb->sb_rptr >=3D (sb->sb_data + sb->sb_datalen))
+-		sb->sb_rptr -=3D sb->sb_datalen;
+-
+-	return n;
+-}
+-
+-/*
+- * Write data from so_rcv to so's socket,
+- * updating all sbuf field as necessary
+- */
+-int
+-sowrite(struct socket *so)
+-{
+-	int  n,nn;
+-	struct sbuf *sb =3D &so->so_rcv;
+-	int len =3D sb->sb_cc;
+-	struct iovec iov[2];
+-
+-	DEBUG_CALL("sowrite");
+-	DEBUG_ARG("so =3D %p", so);
+-
+-	if (so->so_urgc) {
+-		uint32_t expected =3D so->so_urgc;
+-		if (sosendoob(so) < expected) {
+-			/* Treat a short write as a fatal error too,
+-			 * rather than continuing on and sending the urgent
+-			 * data as if it were non-urgent and leaving the
+-			 * so_urgc count wrong.
+-			 */
+-			goto err_disconnected;
+-		}
+-		if (sb->sb_cc =3D=3D 0)
+-			return 0;
+-	}
+-
+-	/*
+-	 * No need to check if there's something to write,
+-	 * sowrite wouldn't have been called otherwise
+-	 */
+-
+-	iov[0].iov_base =3D sb->sb_rptr;
+-        iov[1].iov_base =3D NULL;
+-        iov[1].iov_len =3D 0;
+-	if (sb->sb_rptr < sb->sb_wptr) {
+-		iov[0].iov_len =3D sb->sb_wptr - sb->sb_rptr;
+-		/* Should never succeed, but... */
+-		if (iov[0].iov_len > len) iov[0].iov_len =3D len;
+-		n =3D 1;
+-	} else {
+-		iov[0].iov_len =3D (sb->sb_data + sb->sb_datalen) - sb->sb_rptr;
+-		if (iov[0].iov_len > len) iov[0].iov_len =3D len;
+-		len -=3D iov[0].iov_len;
+-		if (len) {
+-			iov[1].iov_base =3D sb->sb_data;
+-			iov[1].iov_len =3D sb->sb_wptr - sb->sb_data;
+-			if (iov[1].iov_len > len) iov[1].iov_len =3D len;
+-			n =3D 2;
+-		} else
+-			n =3D 1;
+-	}
+-	/* Check if there's urgent data to send, and if so, send it */
+-
+-	nn =3D slirp_send(so, iov[0].iov_base, iov[0].iov_len,0);
+-	/* This should never happen, but people tell me it does *shrug* */
+-	if (nn < 0 && (errno =3D=3D EAGAIN || errno =3D=3D EINTR))
+-		return 0;
+-
+-	if (nn <=3D 0) {
+-		goto err_disconnected;
+-	}
+-
+-	if (n =3D=3D 2 && nn =3D=3D iov[0].iov_len) {
+-            int ret;
+-            ret =3D slirp_send(so, iov[1].iov_base, iov[1].iov_len,0);
+-            if (ret > 0)
+-                nn +=3D ret;
+-        }
+-        DEBUG_MISC("  ... wrote nn =3D %d bytes", nn);
+-
+-	/* Update sbuf */
+-	sb->sb_cc -=3D nn;
+-	sb->sb_rptr +=3D nn;
+-	if (sb->sb_rptr >=3D (sb->sb_data + sb->sb_datalen))
+-		sb->sb_rptr -=3D sb->sb_datalen;
+-
+-	/*
+-	 * If in DRAIN mode, and there's no more data, set
+-	 * it CANTSENDMORE
+-	 */
+-	if ((so->so_state & SS_FWDRAIN) && sb->sb_cc =3D=3D 0)
+-		sofcantsendmore(so);
+-
+-	return nn;
+-
+-err_disconnected:
+-	DEBUG_MISC(" --- sowrite disconnected, so->so_state =3D %x, errno =3D %=
+d",
+-               so->so_state, errno);
+-	sofcantsendmore(so);
+-	tcp_sockclosed(sototcpcb(so));
+-	return -1;
+-}
+-
+-/*
+- * recvfrom() a UDP socket
+- */
+-void
+-sorecvfrom(struct socket *so)
+-{
+-	struct sockaddr_storage addr;
+-	struct sockaddr_storage saddr, daddr;
+-	socklen_t addrlen =3D sizeof(struct sockaddr_storage);
+-
+-	DEBUG_CALL("sorecvfrom");
+-	DEBUG_ARG("so =3D %p", so);
+-
+-	if (so->so_type =3D=3D IPPROTO_ICMP) {   /* This is a "ping" reply */
+-	  char buff[256];
+-	  int len;
+-
+-	  len =3D recvfrom(so->s, buff, 256, 0,
+-			 (struct sockaddr *)&addr, &addrlen);
+-	  /* XXX Check if reply is "correct"? */
+-
+-	  if(len =3D=3D -1 || len =3D=3D 0) {
+-	    uint8_t code=3DICMP_UNREACH_PORT;
+-
+-	    if(errno =3D=3D EHOSTUNREACH) code=3DICMP_UNREACH_HOST;
+-	    else if(errno =3D=3D ENETUNREACH) code=3DICMP_UNREACH_NET;
+-
+-	    DEBUG_MISC(" udp icmp rx errno =3D %d-%s",
+-                   errno,strerror(errno));
+-	    icmp_send_error(so->so_m, ICMP_UNREACH, code, 0, strerror(errno));
+-	  } else {
+-	    icmp_reflect(so->so_m);
+-            so->so_m =3D NULL; /* Don't m_free() it again! */
+-	  }
+-	  /* No need for this socket anymore, udp_detach it */
+-	  udp_detach(so);
+-	} else {                            	/* A "normal" UDP packet */
+-	  struct mbuf *m;
+-          int len;
+-#ifdef _WIN32
+-          unsigned long n;
+-#else
+-          int n;
+-#endif
+-
+-	  if (ioctlsocket(so->s, FIONREAD, &n) !=3D 0) {
+-	      DEBUG_MISC(" ioctlsocket errno =3D %d-%s\n",
+-			 errno,strerror(errno));
+-	      return;
+-	  }
+-	  if (n =3D=3D 0) {
+-	      return;
+-	  }
+-
+-	  m =3D m_get(so->slirp);
+-	  if (!m) {
+-	      return;
+-	  }
+-	  switch (so->so_ffamily) {
+-	  case AF_INET:
+-	      m->m_data +=3D IF_MAXLINKHDR + sizeof(struct udpiphdr);
+-	      break;
+-	  case AF_INET6:
+-	      m->m_data +=3D IF_MAXLINKHDR + sizeof(struct ip6)
+-	                                 + sizeof(struct udphdr);
+-	      break;
+-	  default:
+-	      g_assert_not_reached();
+-	      break;
+-	  }
+-
+-	  /*
+-	   * XXX Shouldn't FIONREAD packets destined for port 53,
+-	   * but I don't know the max packet size for DNS lookups
+-	   */
+-	  len =3D M_FREEROOM(m);
+-	  /* if (so->so_fport !=3D htons(53)) { */
+-
+-	  if (n > len) {
+-	    n =3D (m->m_data - m->m_dat) + m->m_len + n + 1;
+-	    m_inc(m, n);
+-	    len =3D M_FREEROOM(m);
+-	  }
+-	  /* } */
+-
+-	  m->m_len =3D recvfrom(so->s, m->m_data, len, 0,
+-			      (struct sockaddr *)&addr, &addrlen);
+-	  DEBUG_MISC(" did recvfrom %d, errno =3D %d-%s",
+-                 m->m_len, errno,strerror(errno));
+-	  if(m->m_len<0) {
+-	    /* Report error as ICMP */
+-	    switch (so->so_lfamily) {
+-	    uint8_t code;
+-	    case AF_INET:
+-	      code =3D ICMP_UNREACH_PORT;
+-
+-	      if (errno =3D=3D EHOSTUNREACH) {
+-		code =3D ICMP_UNREACH_HOST;
+-	      } else if (errno =3D=3D ENETUNREACH) {
+-		code =3D ICMP_UNREACH_NET;
+-	      }
+-
+-	      DEBUG_MISC(" rx error, tx icmp ICMP_UNREACH:%i", code);
+-	      icmp_send_error(so->so_m, ICMP_UNREACH, code, 0, strerror(errno))=
+;
+-	      break;
+-	    case AF_INET6:
+-	      code =3D ICMP6_UNREACH_PORT;
+-
+-	      if (errno =3D=3D EHOSTUNREACH) {
+-		code =3D ICMP6_UNREACH_ADDRESS;
+-	      } else if (errno =3D=3D ENETUNREACH) {
+-		code =3D ICMP6_UNREACH_NO_ROUTE;
+-	      }
+-
+-	      DEBUG_MISC(" rx error, tx icmp6 ICMP_UNREACH:%i", code);
+-	      icmp6_send_error(so->so_m, ICMP6_UNREACH, code);
+-	      break;
+-	    default:
+-	      g_assert_not_reached();
+-	      break;
+-	    }
+-	    m_free(m);
+-	  } else {
+-	  /*
+-	   * Hack: domain name lookup will be used the most for UDP,
+-	   * and since they'll only be used once there's no need
+-	   * for the 4 minute (or whatever) timeout... So we time them
+-	   * out much quicker (10 seconds  for now...)
+-	   */
+-	    if (so->so_expire) {
+-	      if (so->so_fport =3D=3D htons(53))
+-		so->so_expire =3D curtime + SO_EXPIREFAST;
+-	      else
+-		so->so_expire =3D curtime + SO_EXPIRE;
+-	    }
+-
+-	    /*
+-	     * If this packet was destined for CTL_ADDR,
+-	     * make it look like that's where it came from
+-	     */
+-	    saddr =3D addr;
+-	    sotranslate_in(so, &saddr);
+-	    daddr =3D so->lhost.ss;
+-
+-	    switch (so->so_ffamily) {
+-	    case AF_INET:
+-	        udp_output(so, m, (struct sockaddr_in *) &saddr,
+-	                   (struct sockaddr_in *) &daddr,
+-	                   so->so_iptos);
+-	        break;
+-	    case AF_INET6:
+-	        udp6_output(so, m, (struct sockaddr_in6 *) &saddr,
+-	                    (struct sockaddr_in6 *) &daddr);
+-	        break;
+-	    default:
+-	        g_assert_not_reached();
+-	        break;
+-	    }
+-	  } /* rx error */
+-	} /* if ping packet */
+-}
+-
+-/*
+- * sendto() a socket
+- */
+-int
+-sosendto(struct socket *so, struct mbuf *m)
+-{
+-	int ret;
+-	struct sockaddr_storage addr;
+-
+-	DEBUG_CALL("sosendto");
+-	DEBUG_ARG("so =3D %p", so);
+-	DEBUG_ARG("m =3D %p", m);
+-
+-	addr =3D so->fhost.ss;
+-	DEBUG_CALL(" sendto()ing)");
+-	sotranslate_out(so, &addr);
+-
+-	/* Don't care what port we get */
+-	ret =3D sendto(so->s, m->m_data, m->m_len, 0,
+-		     (struct sockaddr *)&addr, sockaddr_size(&addr));
+-	if (ret < 0)
+-		return -1;
+-
+-	/*
+-	 * Kill the socket if there's no reply in 4 minutes,
+-	 * but only if it's an expirable socket
+-	 */
+-	if (so->so_expire)
+-		so->so_expire =3D curtime + SO_EXPIRE;
+-	so->so_state &=3D SS_PERSISTENT_MASK;
+-	so->so_state |=3D SS_ISFCONNECTED; /* So that it gets select()ed */
+-	return 0;
+-}
+-
+-/*
+- * Listen for incoming TCP connections
+- */
+-struct socket *
+-tcp_listen(Slirp *slirp, uint32_t haddr, unsigned hport, uint32_t laddr,
+-           unsigned lport, int flags)
+-{
+-        /* TODO: IPv6 */
+-	struct sockaddr_in addr;
+-	struct socket *so;
+-	int s, opt =3D 1;
+-	socklen_t addrlen =3D sizeof(addr);
+-	memset(&addr, 0, addrlen);
+-
+-	DEBUG_CALL("tcp_listen");
+-	DEBUG_ARG("haddr =3D %s", inet_ntoa((struct in_addr){.s_addr =3D haddr}=
+));
+-	DEBUG_ARG("hport =3D %d", ntohs(hport));
+-	DEBUG_ARG("laddr =3D %s", inet_ntoa((struct in_addr){.s_addr =3D laddr}=
+));
+-	DEBUG_ARG("lport =3D %d", ntohs(lport));
+-	DEBUG_ARG("flags =3D %x", flags);
+-
+-	so =3D socreate(slirp);
+-
+-	/* Don't tcp_attach... we don't need so_snd nor so_rcv */
+-	if ((so->so_tcpcb =3D tcp_newtcpcb(so)) =3D=3D NULL) {
+-            g_free(so);
+-            return NULL;
+-	}
+-	insque(so, &slirp->tcb);
+-
+-	/*
+-	 * SS_FACCEPTONCE sockets must time out.
+-	 */
+-	if (flags & SS_FACCEPTONCE)
+-	   so->so_tcpcb->t_timer[TCPT_KEEP] =3D TCPTV_KEEP_INIT*2;
+-
+-	so->so_state &=3D SS_PERSISTENT_MASK;
+-	so->so_state |=3D (SS_FACCEPTCONN | flags);
+-	so->so_lfamily =3D AF_INET;
+-	so->so_lport =3D lport; /* Kept in network format */
+-	so->so_laddr.s_addr =3D laddr; /* Ditto */
+-
+-	addr.sin_family =3D AF_INET;
+-	addr.sin_addr.s_addr =3D haddr;
+-	addr.sin_port =3D hport;
+-
+-	if (((s =3D slirp_socket(AF_INET,SOCK_STREAM,0)) < 0) ||
+-	    (slirp_socket_set_fast_reuse(s) < 0) ||
+-	    (bind(s,(struct sockaddr *)&addr, sizeof(addr)) < 0) ||
+-	    (listen(s,1) < 0)) {
+-		int tmperrno =3D errno; /* Don't clobber the real reason we failed */
+-
+-                if (s >=3D 0) {
+-                    closesocket(s);
+-                }
+-		sofree(so);
+-		/* Restore the real errno */
+-#ifdef _WIN32
+-		WSASetLastError(tmperrno);
+-#else
+-		errno =3D tmperrno;
+-#endif
+-		return NULL;
+-	}
+-	setsockopt(s, SOL_SOCKET, SO_OOBINLINE, &opt, sizeof(int));
+-	opt =3D 1;
+-	setsockopt(s, IPPROTO_TCP, TCP_NODELAY, &opt, sizeof(int));
+-
+-	getsockname(s,(struct sockaddr *)&addr,&addrlen);
+-	so->so_ffamily =3D AF_INET;
+-	so->so_fport =3D addr.sin_port;
+-	if (addr.sin_addr.s_addr =3D=3D 0 || addr.sin_addr.s_addr =3D=3D loopba=
+ck_addr.s_addr)
+-	   so->so_faddr =3D slirp->vhost_addr;
+-	else
+-	   so->so_faddr =3D addr.sin_addr;
+-
+-	so->s =3D s;
+-	return so;
+-}
+-
+-/*
+- * Various session state calls
+- * XXX Should be #define's
+- * The socket state stuff needs work, these often get call 2 or 3
+- * times each when only 1 was needed
+- */
+-void
+-soisfconnecting(struct socket *so)
+-{
+-	so->so_state &=3D ~(SS_NOFDREF|SS_ISFCONNECTED|SS_FCANTRCVMORE|
+-			  SS_FCANTSENDMORE|SS_FWDRAIN);
+-	so->so_state |=3D SS_ISFCONNECTING; /* Clobber other states */
+-}
+-
+-void
+-soisfconnected(struct socket *so)
+-{
+-	so->so_state &=3D ~(SS_ISFCONNECTING|SS_FWDRAIN|SS_NOFDREF);
+-	so->so_state |=3D SS_ISFCONNECTED; /* Clobber other states */
+-}
+-
+-static void
+-sofcantrcvmore(struct socket *so)
+-{
+-	if ((so->so_state & SS_NOFDREF) =3D=3D 0) {
+-		shutdown(so->s,0);
+-	}
+-	so->so_state &=3D ~(SS_ISFCONNECTING);
+-	if (so->so_state & SS_FCANTSENDMORE) {
+-	   so->so_state &=3D SS_PERSISTENT_MASK;
+-	   so->so_state |=3D SS_NOFDREF; /* Don't select it */
+-	} else {
+-	   so->so_state |=3D SS_FCANTRCVMORE;
+-	}
+-}
+-
+-static void
+-sofcantsendmore(struct socket *so)
+-{
+-	if ((so->so_state & SS_NOFDREF) =3D=3D 0) {
+-            shutdown(so->s,1);           /* send FIN to fhost */
+-	}
+-	so->so_state &=3D ~(SS_ISFCONNECTING);
+-	if (so->so_state & SS_FCANTRCVMORE) {
+-	   so->so_state &=3D SS_PERSISTENT_MASK;
+-	   so->so_state |=3D SS_NOFDREF; /* as above */
+-	} else {
+-	   so->so_state |=3D SS_FCANTSENDMORE;
+-	}
+-}
+-
+-/*
+- * Set write drain mode
+- * Set CANTSENDMORE once all data has been write()n
+- */
+-void
+-sofwdrain(struct socket *so)
+-{
+-	if (so->so_rcv.sb_cc)
+-		so->so_state |=3D SS_FWDRAIN;
+-	else
+-		sofcantsendmore(so);
+-}
+-
+-/*
+- * Translate addr in host addr when it is a virtual address
+- */
+-void sotranslate_out(struct socket *so, struct sockaddr_storage *addr)
+-{
+-    Slirp *slirp =3D so->slirp;
+-    struct sockaddr_in *sin =3D (struct sockaddr_in *)addr;
+-    struct sockaddr_in6 *sin6 =3D (struct sockaddr_in6 *)addr;
+-
+-    switch (addr->ss_family) {
+-    case AF_INET:
+-        if ((so->so_faddr.s_addr & slirp->vnetwork_mask.s_addr) =3D=3D
+-                slirp->vnetwork_addr.s_addr) {
+-            /* It's an alias */
+-            if (so->so_faddr.s_addr =3D=3D slirp->vnameserver_addr.s_add=
+r) {
+-                if (get_dns_addr(&sin->sin_addr) < 0) {
+-                    sin->sin_addr =3D loopback_addr;
+-                }
+-            } else {
+-                sin->sin_addr =3D loopback_addr;
+-            }
+-        }
+-
+-        DEBUG_MISC(" addr.sin_port=3D%d, addr.sin_addr.s_addr=3D%.16s",
+-                   ntohs(sin->sin_port), inet_ntoa(sin->sin_addr));
+-        break;
+-
+-    case AF_INET6:
+-        if (in6_equal_net(&so->so_faddr6, &slirp->vprefix_addr6,
+-                    slirp->vprefix_len)) {
+-            if (in6_equal(&so->so_faddr6, &slirp->vnameserver_addr6)) {
+-                uint32_t scope_id;
+-                if (get_dns6_addr(&sin6->sin6_addr, &scope_id) >=3D 0) {
+-                    sin6->sin6_scope_id =3D scope_id;
+-                } else {
+-                    sin6->sin6_addr =3D in6addr_loopback;
+-                }
+-            } else {
+-                sin6->sin6_addr =3D in6addr_loopback;
+-            }
+-        }
+-        break;
+-
+-    default:
+-        break;
+-    }
+-}
+-
+-void sotranslate_in(struct socket *so, struct sockaddr_storage *addr)
+-{
+-    Slirp *slirp =3D so->slirp;
+-    struct sockaddr_in *sin =3D (struct sockaddr_in *)addr;
+-    struct sockaddr_in6 *sin6 =3D (struct sockaddr_in6 *)addr;
+-
+-    switch (addr->ss_family) {
+-    case AF_INET:
+-        if ((so->so_faddr.s_addr & slirp->vnetwork_mask.s_addr) =3D=3D
+-            slirp->vnetwork_addr.s_addr) {
+-            uint32_t inv_mask =3D ~slirp->vnetwork_mask.s_addr;
+-
+-            if ((so->so_faddr.s_addr & inv_mask) =3D=3D inv_mask) {
+-                sin->sin_addr =3D slirp->vhost_addr;
+-            } else if (sin->sin_addr.s_addr =3D=3D loopback_addr.s_addr =
+||
+-                       so->so_faddr.s_addr !=3D slirp->vhost_addr.s_addr=
+) {
+-                sin->sin_addr =3D so->so_faddr;
+-            }
+-        }
+-        break;
+-
+-    case AF_INET6:
+-        if (in6_equal_net(&so->so_faddr6, &slirp->vprefix_addr6,
+-                    slirp->vprefix_len)) {
+-            if (in6_equal(&sin6->sin6_addr, &in6addr_loopback)
+-                    || !in6_equal(&so->so_faddr6, &slirp->vhost_addr6)) =
+{
+-                sin6->sin6_addr =3D so->so_faddr6;
+-            }
+-        }
+-        break;
+-
+-    default:
+-        break;
+-    }
+-}
+-
+-/*
+- * Translate connections from localhost to the real hostname
+- */
+-void sotranslate_accept(struct socket *so)
+-{
+-    Slirp *slirp =3D so->slirp;
+-
+-    switch (so->so_ffamily) {
+-    case AF_INET:
+-        if (so->so_faddr.s_addr =3D=3D INADDR_ANY ||
+-            (so->so_faddr.s_addr & loopback_mask) =3D=3D
+-            (loopback_addr.s_addr & loopback_mask)) {
+-           so->so_faddr =3D slirp->vhost_addr;
+-        }
+-        break;
+-
+-   case AF_INET6:
+-        if (in6_equal(&so->so_faddr6, &in6addr_any) ||
+-                in6_equal(&so->so_faddr6, &in6addr_loopback)) {
+-           so->so_faddr6 =3D slirp->vhost_addr6;
+-        }
+-        break;
+-
+-    default:
+-        break;
+-    }
+-}
+-
+-void sodrop(struct socket *s, int num)
+-{
+-    if (sbdrop(&s->so_snd, num)) {
+-        s->slirp->cb->notify(s->slirp->opaque);
+-    }
+-}
+diff --git a/slirp/src/state.c b/slirp/src/state.c
+deleted file mode 100644
+index 09cea3590e..0000000000
+--- a/slirp/src/state.c
++++ /dev/null
+@@ -1,388 +0,0 @@
+-/* SPDX-License-Identifier: MIT */
+-/*
+- * libslirp
+- *
+- * Copyright (c) 2004-2008 Fabrice Bellard
+- *
+- * Permission is hereby granted, free of charge, to any person obtaining=
+ a copy
+- * of this software and associated documentation files (the "Software"),=
+ to deal
+- * in the Software without restriction, including without limitation the=
+ rights
+- * to use, copy, modify, merge, publish, distribute, sublicense, and/or =
+sell
+- * copies of the Software, and to permit persons to whom the Software is
+- * furnished to do so, subject to the following conditions:
+- *
+- * The above copyright notice and this permission notice shall be includ=
+ed in
+- * all copies or substantial portions of the Software.
+- *
+- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRE=
+SS OR
+- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILI=
+TY,
+- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHA=
+LL
+- * THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR =
+OTHER
+- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISI=
+NG FROM,
+- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALING=
+S IN
+- * THE SOFTWARE.
+- */
+-#include "slirp.h"
+-#include "vmstate.h"
+-#include "stream.h"
+-
+-static int slirp_tcp_post_load(void *opaque, int version)
+-{
+-    tcp_template((struct tcpcb *)opaque);
+-
+-    return 0;
+-}
+-
+-static const VMStateDescription vmstate_slirp_tcp =3D {
+-    .name =3D "slirp-tcp",
+-    .version_id =3D 0,
+-    .post_load =3D slirp_tcp_post_load,
+-    .fields =3D (VMStateField[]) {
+-        VMSTATE_INT16(t_state, struct tcpcb),
+-        VMSTATE_INT16_ARRAY(t_timer, struct tcpcb, TCPT_NTIMERS),
+-        VMSTATE_INT16(t_rxtshift, struct tcpcb),
+-        VMSTATE_INT16(t_rxtcur, struct tcpcb),
+-        VMSTATE_INT16(t_dupacks, struct tcpcb),
+-        VMSTATE_UINT16(t_maxseg, struct tcpcb),
+-        VMSTATE_UINT8(t_force, struct tcpcb),
+-        VMSTATE_UINT16(t_flags, struct tcpcb),
+-        VMSTATE_UINT32(snd_una, struct tcpcb),
+-        VMSTATE_UINT32(snd_nxt, struct tcpcb),
+-        VMSTATE_UINT32(snd_up, struct tcpcb),
+-        VMSTATE_UINT32(snd_wl1, struct tcpcb),
+-        VMSTATE_UINT32(snd_wl2, struct tcpcb),
+-        VMSTATE_UINT32(iss, struct tcpcb),
+-        VMSTATE_UINT32(snd_wnd, struct tcpcb),
+-        VMSTATE_UINT32(rcv_wnd, struct tcpcb),
+-        VMSTATE_UINT32(rcv_nxt, struct tcpcb),
+-        VMSTATE_UINT32(rcv_up, struct tcpcb),
+-        VMSTATE_UINT32(irs, struct tcpcb),
+-        VMSTATE_UINT32(rcv_adv, struct tcpcb),
+-        VMSTATE_UINT32(snd_max, struct tcpcb),
+-        VMSTATE_UINT32(snd_cwnd, struct tcpcb),
+-        VMSTATE_UINT32(snd_ssthresh, struct tcpcb),
+-        VMSTATE_INT16(t_idle, struct tcpcb),
+-        VMSTATE_INT16(t_rtt, struct tcpcb),
+-        VMSTATE_UINT32(t_rtseq, struct tcpcb),
+-        VMSTATE_INT16(t_srtt, struct tcpcb),
+-        VMSTATE_INT16(t_rttvar, struct tcpcb),
+-        VMSTATE_UINT16(t_rttmin, struct tcpcb),
+-        VMSTATE_UINT32(max_sndwnd, struct tcpcb),
+-        VMSTATE_UINT8(t_oobflags, struct tcpcb),
+-        VMSTATE_UINT8(t_iobc, struct tcpcb),
+-        VMSTATE_INT16(t_softerror, struct tcpcb),
+-        VMSTATE_UINT8(snd_scale, struct tcpcb),
+-        VMSTATE_UINT8(rcv_scale, struct tcpcb),
+-        VMSTATE_UINT8(request_r_scale, struct tcpcb),
+-        VMSTATE_UINT8(requested_s_scale, struct tcpcb),
+-        VMSTATE_UINT32(ts_recent, struct tcpcb),
+-        VMSTATE_UINT32(ts_recent_age, struct tcpcb),
+-        VMSTATE_UINT32(last_ack_sent, struct tcpcb),
+-        VMSTATE_END_OF_LIST()
+-    }
+-};
+-
+-/* The sbuf has a pair of pointers that are migrated as offsets;
+- * we calculate the offsets and restore the pointers using
+- * pre_save/post_load on a tmp structure.
+- */
+-struct sbuf_tmp {
+-    struct sbuf *parent;
+-    uint32_t roff, woff;
+-};
+-
+-static int sbuf_tmp_pre_save(void *opaque)
+-{
+-    struct sbuf_tmp *tmp =3D opaque;
+-    tmp->woff =3D tmp->parent->sb_wptr - tmp->parent->sb_data;
+-    tmp->roff =3D tmp->parent->sb_rptr - tmp->parent->sb_data;
+-
+-    return 0;
+-}
+-
+-static int sbuf_tmp_post_load(void *opaque, int version)
+-{
+-    struct sbuf_tmp *tmp =3D opaque;
+-    uint32_t requested_len =3D tmp->parent->sb_datalen;
+-
+-    /* Allocate the buffer space used by the field after the tmp */
+-    sbreserve(tmp->parent, tmp->parent->sb_datalen);
+-
+-    if (tmp->parent->sb_datalen !=3D requested_len) {
+-        return -ENOMEM;
+-    }
+-    if (tmp->woff >=3D requested_len ||
+-        tmp->roff >=3D requested_len) {
+-        g_critical("invalid sbuf offsets r/w=3D%u/%u len=3D%u",
+-                   tmp->roff, tmp->woff, requested_len);
+-        return -EINVAL;
+-    }
+-
+-    tmp->parent->sb_wptr =3D tmp->parent->sb_data + tmp->woff;
+-    tmp->parent->sb_rptr =3D tmp->parent->sb_data + tmp->roff;
+-
+-    return 0;
+-}
+-
+-
+-static const VMStateDescription vmstate_slirp_sbuf_tmp =3D {
+-    .name =3D "slirp-sbuf-tmp",
+-    .post_load =3D sbuf_tmp_post_load,
+-    .pre_save  =3D sbuf_tmp_pre_save,
+-    .version_id =3D 0,
+-    .fields =3D (VMStateField[]) {
+-        VMSTATE_UINT32(woff, struct sbuf_tmp),
+-        VMSTATE_UINT32(roff, struct sbuf_tmp),
+-        VMSTATE_END_OF_LIST()
+-    }
+-};
+-
+-static const VMStateDescription vmstate_slirp_sbuf =3D {
+-    .name =3D "slirp-sbuf",
+-    .version_id =3D 0,
+-    .fields =3D (VMStateField[]) {
+-        VMSTATE_UINT32(sb_cc, struct sbuf),
+-        VMSTATE_UINT32(sb_datalen, struct sbuf),
+-        VMSTATE_WITH_TMP(struct sbuf, struct sbuf_tmp, vmstate_slirp_sbu=
+f_tmp),
+-        VMSTATE_VBUFFER_UINT32(sb_data, struct sbuf, 0, NULL, sb_datalen=
+),
+-        VMSTATE_END_OF_LIST()
+-    }
+-};
+-
+-static bool slirp_older_than_v4(void *opaque, int version_id)
+-{
+-    return version_id < 4;
+-}
+-
+-static bool slirp_family_inet(void *opaque, int version_id)
+-{
+-    union slirp_sockaddr *ssa =3D (union slirp_sockaddr *)opaque;
+-    return ssa->ss.ss_family =3D=3D AF_INET;
+-}
+-
+-static int slirp_socket_pre_load(void *opaque)
+-{
+-    struct socket *so =3D opaque;
+-    if (tcp_attach(so) < 0) {
+-        return -ENOMEM;
+-    }
+-    /* Older versions don't load these fields */
+-    so->so_ffamily =3D AF_INET;
+-    so->so_lfamily =3D AF_INET;
+-    return 0;
+-}
+-
+-#ifndef _WIN32
+-#define VMSTATE_SIN4_ADDR(f, s, t) VMSTATE_UINT32_TEST(f, s, t)
+-#else
+-/* Win uses u_long rather than uint32_t - but it's still 32bits long */
+-#define VMSTATE_SIN4_ADDR(f, s, t) VMSTATE_SINGLE_TEST(f, s, t, 0, \
+-                                       slirp_vmstate_info_uint32, u_long=
+)
+-#endif
+-
+-/* The OS provided ss_family field isn't that portable; it's size
+- * and type varies (16/8 bit, signed, unsigned)
+- * and the values it contains aren't fully portable.
+- */
+-typedef struct SS_FamilyTmpStruct {
+-    union slirp_sockaddr    *parent;
+-    uint16_t                 portable_family;
+-} SS_FamilyTmpStruct;
+-
+-#define SS_FAMILY_MIG_IPV4   2  /* Linux, BSD, Win... */
+-#define SS_FAMILY_MIG_IPV6  10  /* Linux */
+-#define SS_FAMILY_MIG_OTHER 0xffff
+-
+-static int ss_family_pre_save(void *opaque)
+-{
+-    SS_FamilyTmpStruct *tss =3D opaque;
+-
+-    tss->portable_family =3D SS_FAMILY_MIG_OTHER;
+-
+-    if (tss->parent->ss.ss_family =3D=3D AF_INET) {
+-        tss->portable_family =3D SS_FAMILY_MIG_IPV4;
+-    } else if (tss->parent->ss.ss_family =3D=3D AF_INET6) {
+-        tss->portable_family =3D SS_FAMILY_MIG_IPV6;
+-    }
+-
+-    return 0;
+-}
+-
+-static int ss_family_post_load(void *opaque, int version_id)
+-{
+-    SS_FamilyTmpStruct *tss =3D opaque;
+-
+-    switch (tss->portable_family) {
+-    case SS_FAMILY_MIG_IPV4:
+-        tss->parent->ss.ss_family =3D AF_INET;
+-        break;
+-    case SS_FAMILY_MIG_IPV6:
+-    case 23: /* compatibility: AF_INET6 from mingw */
+-    case 28: /* compatibility: AF_INET6 from FreeBSD sys/socket.h */
+-        tss->parent->ss.ss_family =3D AF_INET6;
+-        break;
+-    default:
+-        g_critical("invalid ss_family type %x", tss->portable_family);
+-        return -EINVAL;
+-    }
+-
+-    return 0;
+-}
+-
+-static const VMStateDescription vmstate_slirp_ss_family =3D {
+-    .name =3D "slirp-socket-addr/ss_family",
+-    .pre_save  =3D ss_family_pre_save,
+-    .post_load =3D ss_family_post_load,
+-    .fields =3D (VMStateField[]) {
+-        VMSTATE_UINT16(portable_family, SS_FamilyTmpStruct),
+-        VMSTATE_END_OF_LIST()
+-    }
+-};
+-
+-static const VMStateDescription vmstate_slirp_socket_addr =3D {
+-    .name =3D "slirp-socket-addr",
+-    .version_id =3D 4,
+-    .fields =3D (VMStateField[]) {
+-        VMSTATE_WITH_TMP(union slirp_sockaddr, SS_FamilyTmpStruct,
+-                            vmstate_slirp_ss_family),
+-        VMSTATE_SIN4_ADDR(sin.sin_addr.s_addr, union slirp_sockaddr,
+-                            slirp_family_inet),
+-        VMSTATE_UINT16_TEST(sin.sin_port, union slirp_sockaddr,
+-                            slirp_family_inet),
+-
+-#if 0
+-        /* Untested: Needs checking by someone with IPv6 test */
+-        VMSTATE_BUFFER_TEST(sin6.sin6_addr, union slirp_sockaddr,
+-                            slirp_family_inet6),
+-        VMSTATE_UINT16_TEST(sin6.sin6_port, union slirp_sockaddr,
+-                            slirp_family_inet6),
+-        VMSTATE_UINT32_TEST(sin6.sin6_flowinfo, union slirp_sockaddr,
+-                            slirp_family_inet6),
+-        VMSTATE_UINT32_TEST(sin6.sin6_scope_id, union slirp_sockaddr,
+-                            slirp_family_inet6),
+-#endif
+-
+-        VMSTATE_END_OF_LIST()
+-    }
+-};
+-
+-static const VMStateDescription vmstate_slirp_socket =3D {
+-    .name =3D "slirp-socket",
+-    .version_id =3D 4,
+-    .pre_load =3D slirp_socket_pre_load,
+-    .fields =3D (VMStateField[]) {
+-        VMSTATE_UINT32(so_urgc, struct socket),
+-        /* Pre-v4 versions */
+-        VMSTATE_SIN4_ADDR(so_faddr.s_addr, struct socket,
+-                            slirp_older_than_v4),
+-        VMSTATE_SIN4_ADDR(so_laddr.s_addr, struct socket,
+-                            slirp_older_than_v4),
+-        VMSTATE_UINT16_TEST(so_fport, struct socket, slirp_older_than_v4=
+),
+-        VMSTATE_UINT16_TEST(so_lport, struct socket, slirp_older_than_v4=
+),
+-        /* v4 and newer */
+-        VMSTATE_STRUCT(fhost, struct socket, 4, vmstate_slirp_socket_add=
+r,
+-                       union slirp_sockaddr),
+-        VMSTATE_STRUCT(lhost, struct socket, 4, vmstate_slirp_socket_add=
+r,
+-                       union slirp_sockaddr),
+-
+-        VMSTATE_UINT8(so_iptos, struct socket),
+-        VMSTATE_UINT8(so_emu, struct socket),
+-        VMSTATE_UINT8(so_type, struct socket),
+-        VMSTATE_INT32(so_state, struct socket),
+-        VMSTATE_STRUCT(so_rcv, struct socket, 0, vmstate_slirp_sbuf,
+-                       struct sbuf),
+-        VMSTATE_STRUCT(so_snd, struct socket, 0, vmstate_slirp_sbuf,
+-                       struct sbuf),
+-        VMSTATE_STRUCT_POINTER(so_tcpcb, struct socket, vmstate_slirp_tc=
+p,
+-                       struct tcpcb),
+-        VMSTATE_END_OF_LIST()
+-    }
+-};
+-
+-static const VMStateDescription vmstate_slirp_bootp_client =3D {
+-    .name =3D "slirp_bootpclient",
+-    .fields =3D (VMStateField[]) {
+-        VMSTATE_UINT16(allocated, BOOTPClient),
+-        VMSTATE_BUFFER(macaddr, BOOTPClient),
+-        VMSTATE_END_OF_LIST()
+-    }
+-};
+-
+-static const VMStateDescription vmstate_slirp =3D {
+-    .name =3D "slirp",
+-    .version_id =3D 4,
+-    .fields =3D (VMStateField[]) {
+-        VMSTATE_UINT16_V(ip_id, Slirp, 2),
+-        VMSTATE_STRUCT_ARRAY(bootp_clients, Slirp, NB_BOOTP_CLIENTS, 3,
+-                             vmstate_slirp_bootp_client, BOOTPClient),
+-        VMSTATE_END_OF_LIST()
+-    }
+-};
+-
+-void slirp_state_save(Slirp *slirp, SlirpWriteCb write_cb, void *opaque)
+-{
+-    struct gfwd_list *ex_ptr;
+-    SlirpOStream f =3D {
+-        .write_cb =3D write_cb,
+-        .opaque =3D opaque,
+-    };
+-
+-    for (ex_ptr =3D slirp->guestfwd_list; ex_ptr; ex_ptr =3D ex_ptr->ex_=
+next)
+-        if (ex_ptr->write_cb) {
+-            struct socket *so;
+-            so =3D slirp_find_ctl_socket(slirp, ex_ptr->ex_addr,
+-                                       ntohs(ex_ptr->ex_fport));
+-            if (!so) {
+-                continue;
+-            }
+-
+-            slirp_ostream_write_u8(&f, 42);
+-            slirp_vmstate_save_state(&f, &vmstate_slirp_socket, so);
+-        }
+-    slirp_ostream_write_u8(&f, 0);
+-
+-    slirp_vmstate_save_state(&f, &vmstate_slirp, slirp);
+-}
+-
+-
+-int slirp_state_load(Slirp *slirp, int version_id,
+-                     SlirpReadCb read_cb, void *opaque)
+-{
+-    struct gfwd_list *ex_ptr;
+-    SlirpIStream f =3D {
+-        .read_cb =3D read_cb,
+-        .opaque =3D opaque,
+-    };
+-
+-    while (slirp_istream_read_u8(&f)) {
+-        int ret;
+-        struct socket *so =3D socreate(slirp);
+-
+-        ret =3D slirp_vmstate_load_state(&f, &vmstate_slirp_socket, so, =
+version_id);
+-        if (ret < 0) {
+-            return ret;
+-        }
+-
+-        if ((so->so_faddr.s_addr & slirp->vnetwork_mask.s_addr) !=3D
+-            slirp->vnetwork_addr.s_addr) {
+-            return -EINVAL;
+-        }
+-        for (ex_ptr =3D slirp->guestfwd_list; ex_ptr; ex_ptr =3D ex_ptr-=
+>ex_next) {
+-            if (ex_ptr->write_cb &&
+-                so->so_faddr.s_addr =3D=3D ex_ptr->ex_addr.s_addr &&
+-                so->so_fport =3D=3D ex_ptr->ex_fport) {
+-                break;
+-            }
+-        }
+-        if (!ex_ptr) {
+-            return -EINVAL;
+-        }
+-    }
+-
+-    return slirp_vmstate_load_state(&f, &vmstate_slirp, slirp, version_i=
+d);
+-}
+-
+-int slirp_state_version(void)
+-{
+-    return 4;
+-}
+diff --git a/slirp/src/stream.c b/slirp/src/stream.c
+deleted file mode 100644
+index 9c1764c0b7..0000000000
+--- a/slirp/src/stream.c
++++ /dev/null
+@@ -1,120 +0,0 @@
+-/* SPDX-License-Identifier: MIT */
+-/*
+- * libslirp io streams
+- *
+- * Copyright (c) 2018 Red Hat, Inc.
+- *
+- * Permission is hereby granted, free of charge, to any person obtaining=
+ a copy
+- * of this software and associated documentation files (the "Software"),=
+ to deal
+- * in the Software without restriction, including without limitation the=
+ rights
+- * to use, copy, modify, merge, publish, distribute, sublicense, and/or =
+sell
+- * copies of the Software, and to permit persons to whom the Software is
+- * furnished to do so, subject to the following conditions:
+- *
+- * The above copyright notice and this permission notice shall be includ=
+ed in
+- * all copies or substantial portions of the Software.
+- *
+- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRE=
+SS OR
+- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILI=
+TY,
+- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHA=
+LL
+- * THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR =
+OTHER
+- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISI=
+NG FROM,
+- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALING=
+S IN
+- * THE SOFTWARE.
+- */
+-#include "stream.h"
+-#include <glib.h>
+-
+-bool slirp_istream_read(SlirpIStream *f, void *buf, size_t size)
+-{
+-    return f->read_cb(buf, size, f->opaque) =3D=3D size;
+-}
+-
+-bool slirp_ostream_write(SlirpOStream *f, const void *buf, size_t size)
+-{
+-    return f->write_cb(buf, size, f->opaque) =3D=3D size;
+-}
+-
+-uint8_t slirp_istream_read_u8(SlirpIStream *f)
+-{
+-    uint8_t b;
+-
+-    if (slirp_istream_read(f, &b, sizeof(b))) {
+-        return b;
+-    }
+-
+-    return 0;
+-}
+-
+-bool slirp_ostream_write_u8(SlirpOStream *f, uint8_t b)
+-{
+-    return slirp_ostream_write(f, &b, sizeof(b));
+-}
+-
+-uint16_t slirp_istream_read_u16(SlirpIStream *f)
+-{
+-    uint16_t b;
+-
+-    if (slirp_istream_read(f, &b, sizeof(b))) {
+-        return GUINT16_FROM_BE(b);
+-    }
+-
+-    return 0;
+-}
+-
+-bool slirp_ostream_write_u16(SlirpOStream *f, uint16_t b)
+-{
+-    b =3D  GUINT16_TO_BE(b);
+-    return slirp_ostream_write(f, &b, sizeof(b));
+-}
+-
+-uint32_t slirp_istream_read_u32(SlirpIStream *f)
+-{
+-    uint32_t b;
+-
+-    if (slirp_istream_read(f, &b, sizeof(b))) {
+-        return GUINT32_FROM_BE(b);
+-    }
+-
+-    return 0;
+-}
+-
+-bool slirp_ostream_write_u32(SlirpOStream *f, uint32_t b)
+-{
+-    b =3D GUINT32_TO_BE(b);
+-    return slirp_ostream_write(f, &b, sizeof(b));
+-}
+-
+-int16_t slirp_istream_read_i16(SlirpIStream *f)
+-{
+-    int16_t b;
+-
+-    if (slirp_istream_read(f, &b, sizeof(b))) {
+-        return GINT16_FROM_BE(b);
+-    }
+-
+-    return 0;
+-}
+-
+-bool slirp_ostream_write_i16(SlirpOStream *f, int16_t b)
+-{
+-    b =3D GINT16_TO_BE(b);
+-    return slirp_ostream_write(f, &b, sizeof(b));
+-}
+-
+-int32_t slirp_istream_read_i32(SlirpIStream *f)
+-{
+-    int32_t b;
+-
+-    if (slirp_istream_read(f, &b, sizeof(b))) {
+-        return GINT32_FROM_BE(b);
+-    }
+-
+-    return 0;
+-}
+-
+-bool slirp_ostream_write_i32(SlirpOStream *f, int32_t b)
+-{
+-    b =3D GINT32_TO_BE(b);
+-    return slirp_ostream_write(f, &b, sizeof(b));
+-}
+diff --git a/slirp/src/tcp_input.c b/slirp/src/tcp_input.c
+deleted file mode 100644
+index 50a1145ec9..0000000000
+--- a/slirp/src/tcp_input.c
++++ /dev/null
+@@ -1,1554 +0,0 @@
+-/* SPDX-License-Identifier: BSD-3-Clause */
+-/*
+- * Copyright (c) 1982, 1986, 1988, 1990, 1993, 1994
+- *	The Regents of the University of California.  All rights reserved.
+- *
+- * Redistribution and use in source and binary forms, with or without
+- * modification, are permitted provided that the following conditions
+- * are met:
+- * 1. Redistributions of source code must retain the above copyright
+- *    notice, this list of conditions and the following disclaimer.
+- * 2. Redistributions in binary form must reproduce the above copyright
+- *    notice, this list of conditions and the following disclaimer in th=
+e
+- *    documentation and/or other materials provided with the distributio=
+n.
+- * 3. Neither the name of the University nor the names of its contributo=
+rs
+- *    may be used to endorse or promote products derived from this softw=
+are
+- *    without specific prior written permission.
+- *
+- * THIS SOFTWARE IS PROVIDED BY THE REGENTS AND CONTRIBUTORS ``AS IS'' A=
+ND
+- * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+- * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PU=
+RPOSE
+- * ARE DISCLAIMED.  IN NO EVENT SHALL THE REGENTS OR CONTRIBUTORS BE LIA=
+BLE
+- * FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUE=
+NTIAL
+- * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOO=
+DS
+- * OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
+- * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, S=
+TRICT
+- * LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY=
+ WAY
+- * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY O=
+F
+- * SUCH DAMAGE.
+- *
+- *	@(#)tcp_input.c	8.5 (Berkeley) 4/10/94
+- * tcp_input.c,v 1.10 1994/10/13 18:36:32 wollman Exp
+- */
+-
+-/*
+- * Changes and additions relating to SLiRP
+- * Copyright (c) 1995 Danny Gasparovski.
+- */
+-
+-#include "slirp.h"
+-#include "ip_icmp.h"
+-
+-#define	TCPREXMTTHRESH 3
+-
+-#define TCP_PAWS_IDLE	(24 * 24 * 60 * 60 * PR_SLOWHZ)
+-
+-/* for modulo comparisons of timestamps */
+-#define TSTMP_LT(a,b)	((int)((a)-(b)) < 0)
+-#define TSTMP_GEQ(a,b)	((int)((a)-(b)) >=3D 0)
+-
+-/*
+- * Insert segment ti into reassembly queue of tcp with
+- * control block tp.  Return TH_FIN if reassembly now includes
+- * a segment with FIN.  The macro form does the common case inline
+- * (segment is the next to be received on an established connection,
+- * and the queue is empty), avoiding linkage into and removal
+- * from the queue and repetition of various conversions.
+- * Set DELACK for segments received in order, but ack immediately
+- * when segments are out of order (so fast retransmit can work).
+- */
+-#define	TCP_REASS(tp, ti, m, so, flags) { \
+-	if ((ti)->ti_seq =3D=3D (tp)->rcv_nxt && \
+-        tcpfrag_list_empty(tp) && \
+-	    (tp)->t_state =3D=3D TCPS_ESTABLISHED) { \
+-		tp->t_flags |=3D TF_DELACK; \
+-		(tp)->rcv_nxt +=3D (ti)->ti_len; \
+-		flags =3D (ti)->ti_flags & TH_FIN; \
+-		if (so->so_emu) { \
+-			if (tcp_emu((so),(m))) sbappend(so, (m)); \
+-		} else \
+-			sbappend((so), (m)); \
+-	} else { \
+-		(flags) =3D tcp_reass((tp), (ti), (m)); \
+-		tp->t_flags |=3D TF_ACKNOW; \
+-	} \
+-}
+-
+-static void tcp_dooptions(struct tcpcb *tp, uint8_t *cp, int cnt,
+-                          struct tcpiphdr *ti);
+-static void tcp_xmit_timer(register struct tcpcb *tp, int rtt);
+-
+-static int
+-tcp_reass(register struct tcpcb *tp, register struct tcpiphdr *ti,
+-          struct mbuf *m)
+-{
+-	register struct tcpiphdr *q;
+-	struct socket *so =3D tp->t_socket;
+-	int flags;
+-
+-	/*
+-	 * Call with ti=3D=3DNULL after become established to
+-	 * force pre-ESTABLISHED data up to user socket.
+-	 */
+-        if (ti =3D=3D NULL)
+-		goto present;
+-
+-	/*
+-	 * Find a segment which begins after this one does.
+-	 */
+-	for (q =3D tcpfrag_list_first(tp); !tcpfrag_list_end(q, tp);
+-            q =3D tcpiphdr_next(q))
+-		if (SEQ_GT(q->ti_seq, ti->ti_seq))
+-			break;
+-
+-	/*
+-	 * If there is a preceding segment, it may provide some of
+-	 * our data already.  If so, drop the data from the incoming
+-	 * segment.  If it provides all of our data, drop us.
+-	 */
+-	if (!tcpfrag_list_end(tcpiphdr_prev(q), tp)) {
+-		register int i;
+-		q =3D tcpiphdr_prev(q);
+-		/* conversion to int (in i) handles seq wraparound */
+-		i =3D q->ti_seq + q->ti_len - ti->ti_seq;
+-		if (i > 0) {
+-			if (i >=3D ti->ti_len) {
+-				m_free(m);
+-				/*
+-				 * Try to present any queued data
+-				 * at the left window edge to the user.
+-				 * This is needed after the 3-WHS
+-				 * completes.
+-				 */
+-				goto present;   /* ??? */
+-			}
+-			m_adj(m, i);
+-			ti->ti_len -=3D i;
+-			ti->ti_seq +=3D i;
+-		}
+-		q =3D tcpiphdr_next(q);
+-	}
+-	ti->ti_mbuf =3D m;
+-
+-	/*
+-	 * While we overlap succeeding segments trim them or,
+-	 * if they are completely covered, dequeue them.
+-	 */
+-	while (!tcpfrag_list_end(q, tp)) {
+-		register int i =3D (ti->ti_seq + ti->ti_len) - q->ti_seq;
+-		if (i <=3D 0)
+-			break;
+-		if (i < q->ti_len) {
+-			q->ti_seq +=3D i;
+-			q->ti_len -=3D i;
+-			m_adj(q->ti_mbuf, i);
+-			break;
+-		}
+-		q =3D tcpiphdr_next(q);
+-		m =3D tcpiphdr_prev(q)->ti_mbuf;
+-		remque(tcpiphdr2qlink(tcpiphdr_prev(q)));
+-		m_free(m);
+-	}
+-
+-	/*
+-	 * Stick new segment in its place.
+-	 */
+-	insque(tcpiphdr2qlink(ti), tcpiphdr2qlink(tcpiphdr_prev(q)));
+-
+-present:
+-	/*
+-	 * Present data to user, advancing rcv_nxt through
+-	 * completed sequence space.
+-	 */
+-	if (!TCPS_HAVEESTABLISHED(tp->t_state))
+-		return (0);
+-	ti =3D tcpfrag_list_first(tp);
+-	if (tcpfrag_list_end(ti, tp) || ti->ti_seq !=3D tp->rcv_nxt)
+-		return (0);
+-	if (tp->t_state =3D=3D TCPS_SYN_RECEIVED && ti->ti_len)
+-		return (0);
+-	do {
+-		tp->rcv_nxt +=3D ti->ti_len;
+-		flags =3D ti->ti_flags & TH_FIN;
+-		remque(tcpiphdr2qlink(ti));
+-		m =3D ti->ti_mbuf;
+-		ti =3D tcpiphdr_next(ti);
+-		if (so->so_state & SS_FCANTSENDMORE)
+-			m_free(m);
+-		else {
+-			if (so->so_emu) {
+-				if (tcp_emu(so,m)) sbappend(so, m);
+-			} else
+-				sbappend(so, m);
+-		}
+-	} while (ti !=3D (struct tcpiphdr *)tp && ti->ti_seq =3D=3D tp->rcv_nxt=
+);
+-	return (flags);
+-}
+-
+-/*
+- * TCP input routine, follows pages 65-76 of the
+- * protocol specification dated September, 1981 very closely.
+- */
+-void
+-tcp_input(struct mbuf *m, int iphlen, struct socket *inso, unsigned shor=
+t af)
+-{
+-	struct ip save_ip, *ip;
+-	struct ip6 save_ip6, *ip6;
+-	register struct tcpiphdr *ti;
+-	char *optp =3D NULL;
+-	int optlen =3D 0;
+-	int len, tlen, off;
+-        register struct tcpcb *tp =3D NULL;
+-	register int tiflags;
+-        struct socket *so =3D NULL;
+-	int todrop, acked, ourfinisacked, needoutput =3D 0;
+-	int iss =3D 0;
+-	uint32_t tiwin;
+-	int ret;
+-	struct sockaddr_storage lhost, fhost;
+-	struct sockaddr_in *lhost4, *fhost4;
+-	struct sockaddr_in6 *lhost6, *fhost6;
+-    struct gfwd_list *ex_ptr;
+-    Slirp *slirp;
+-
+-	DEBUG_CALL("tcp_input");
+-	DEBUG_ARG("m =3D %p  iphlen =3D %2d  inso =3D %p",
+-              m, iphlen, inso);
+-
+-	/*
+-	 * If called with m =3D=3D 0, then we're continuing the connect
+-	 */
+-	if (m =3D=3D NULL) {
+-		so =3D inso;
+-		slirp =3D so->slirp;
+-
+-		/* Re-set a few variables */
+-		tp =3D sototcpcb(so);
+-		m =3D so->so_m;
+-                so->so_m =3D NULL;
+-		ti =3D so->so_ti;
+-		tiwin =3D ti->ti_win;
+-		tiflags =3D ti->ti_flags;
+-
+-		goto cont_conn;
+-	}
+-	slirp =3D m->slirp;
+-
+-	ip =3D mtod(m, struct ip *);
+-	ip6 =3D mtod(m, struct ip6 *);
+-
+-	switch (af) {
+-	case AF_INET:
+-	    if (iphlen > sizeof(struct ip)) {
+-	        ip_stripoptions(m, (struct mbuf *)0);
+-	        iphlen =3D sizeof(struct ip);
+-	    }
+-	    /* XXX Check if too short */
+-
+-
+-	    /*
+-	     * Save a copy of the IP header in case we want restore it
+-	     * for sending an ICMP error message in response.
+-	     */
+-	    save_ip =3D *ip;
+-	    save_ip.ip_len +=3D iphlen;
+-
+-	    /*
+-	     * Get IP and TCP header together in first mbuf.
+-	     * Note: IP leaves IP header in first mbuf.
+-	     */
+-	    m->m_data -=3D sizeof(struct tcpiphdr) - sizeof(struct ip)
+-	                                         - sizeof(struct tcphdr);
+-	    m->m_len +=3D sizeof(struct tcpiphdr) - sizeof(struct ip)
+-	                                        - sizeof(struct tcphdr);
+-	    ti =3D mtod(m, struct tcpiphdr *);
+-
+-	    /*
+-	     * Checksum extended TCP header and data.
+-	     */
+-	    tlen =3D ip->ip_len;
+-	    tcpiphdr2qlink(ti)->next =3D tcpiphdr2qlink(ti)->prev =3D NULL;
+-	    memset(&ti->ih_mbuf, 0 , sizeof(struct mbuf_ptr));
+-	    memset(&ti->ti, 0, sizeof(ti->ti));
+-	    ti->ti_x0 =3D 0;
+-	    ti->ti_src =3D save_ip.ip_src;
+-	    ti->ti_dst =3D save_ip.ip_dst;
+-	    ti->ti_pr =3D save_ip.ip_p;
+-	    ti->ti_len =3D htons((uint16_t)tlen);
+-	    break;
+-
+-	case AF_INET6:
+-	    /*
+-	     * Save a copy of the IP header in case we want restore it
+-	     * for sending an ICMP error message in response.
+-	     */
+-	    save_ip6 =3D *ip6;
+-	    /*
+-	     * Get IP and TCP header together in first mbuf.
+-	     * Note: IP leaves IP header in first mbuf.
+-	     */
+-	    m->m_data -=3D sizeof(struct tcpiphdr) - (sizeof(struct ip6)
+-	                                         + sizeof(struct tcphdr));
+-	    m->m_len  +=3D sizeof(struct tcpiphdr) - (sizeof(struct ip6)
+-	                                         + sizeof(struct tcphdr));
+-	    ti =3D mtod(m, struct tcpiphdr *);
+-
+-	    tlen =3D ip6->ip_pl;
+-	    tcpiphdr2qlink(ti)->next =3D tcpiphdr2qlink(ti)->prev =3D NULL;
+-	    memset(&ti->ih_mbuf, 0 , sizeof(struct mbuf_ptr));
+-	    memset(&ti->ti, 0, sizeof(ti->ti));
+-	    ti->ti_x0 =3D 0;
+-	    ti->ti_src6 =3D save_ip6.ip_src;
+-	    ti->ti_dst6 =3D save_ip6.ip_dst;
+-	    ti->ti_nh6 =3D save_ip6.ip_nh;
+-	    ti->ti_len =3D htons((uint16_t)tlen);
+-	    break;
+-
+-	default:
+-	    g_assert_not_reached();
+-	}
+-
+-	len =3D ((sizeof(struct tcpiphdr) - sizeof(struct tcphdr)) + tlen);
+-	if (cksum(m, len)) {
+-	    goto drop;
+-	}
+-
+-	/*
+-	 * Check that TCP offset makes sense,
+-	 * pull out TCP options and adjust length.		XXX
+-	 */
+-	off =3D ti->ti_off << 2;
+-	if (off < sizeof (struct tcphdr) || off > tlen) {
+-	  goto drop;
+-	}
+-	tlen -=3D off;
+-	ti->ti_len =3D tlen;
+-	if (off > sizeof (struct tcphdr)) {
+-	  optlen =3D off - sizeof (struct tcphdr);
+-	  optp =3D mtod(m, char *) + sizeof (struct tcpiphdr);
+-	}
+-	tiflags =3D ti->ti_flags;
+-
+-	/*
+-	 * Convert TCP protocol specific fields to host format.
+-	 */
+-	NTOHL(ti->ti_seq);
+-	NTOHL(ti->ti_ack);
+-	NTOHS(ti->ti_win);
+-	NTOHS(ti->ti_urp);
+-
+-	/*
+-	 * Drop TCP, IP headers and TCP options.
+-	 */
+-	m->m_data +=3D sizeof(struct tcpiphdr)+off-sizeof(struct tcphdr);
+-	m->m_len  -=3D sizeof(struct tcpiphdr)+off-sizeof(struct tcphdr);
+-
+-	/*
+-	 * Locate pcb for segment.
+-	 */
+-findso:
+-	lhost.ss_family =3D af;
+-	fhost.ss_family =3D af;
+-	switch (af) {
+-	case AF_INET:
+-	    lhost4 =3D (struct sockaddr_in *) &lhost;
+-	    lhost4->sin_addr =3D ti->ti_src;
+-	    lhost4->sin_port =3D ti->ti_sport;
+-	    fhost4 =3D (struct sockaddr_in *) &fhost;
+-	    fhost4->sin_addr =3D ti->ti_dst;
+-	    fhost4->sin_port =3D ti->ti_dport;
+-	    break;
+-	case AF_INET6:
+-	    lhost6 =3D (struct sockaddr_in6 *) &lhost;
+-	    lhost6->sin6_addr =3D ti->ti_src6;
+-	    lhost6->sin6_port =3D ti->ti_sport;
+-	    fhost6 =3D (struct sockaddr_in6 *) &fhost;
+-	    fhost6->sin6_addr =3D ti->ti_dst6;
+-	    fhost6->sin6_port =3D ti->ti_dport;
+-	    break;
+-	default:
+-	    g_assert_not_reached();
+-	}
+-
+-	so =3D solookup(&slirp->tcp_last_so, &slirp->tcb, &lhost, &fhost);
+-
+-	/*
+-	 * If the state is CLOSED (i.e., TCB does not exist) then
+-	 * all data in the incoming segment is discarded.
+-	 * If the TCB exists but is in CLOSED state, it is embryonic,
+-	 * but should either do a listen or a connect soon.
+-	 *
+-	 * state =3D=3D CLOSED means we've done socreate() but haven't
+-	 * attached it to a protocol yet...
+-	 *
+-	 * XXX If a TCB does not exist, and the TH_SYN flag is
+-	 * the only flag set, then create a session, mark it
+-	 * as if it was LISTENING, and continue...
+-	 */
+-        if (so =3D=3D NULL) {
+-          /* TODO: IPv6 */
+-          if (slirp->restricted) {
+-            /* Any hostfwds will have an existing socket, so we only get=
+ here
+-             * for non-hostfwd connections. These should be dropped, unl=
+ess it
+-             * happens to be a guestfwd.
+-             */
+-            for (ex_ptr =3D slirp->guestfwd_list; ex_ptr; ex_ptr =3D ex_=
+ptr->ex_next) {
+-                if (ex_ptr->ex_fport =3D=3D ti->ti_dport &&
+-                    ti->ti_dst.s_addr =3D=3D ex_ptr->ex_addr.s_addr) {
+-                    break;
+-                }
+-            }
+-            if (!ex_ptr) {
+-                goto dropwithreset;
+-            }
+-          }
+-
+-	  if ((tiflags & (TH_SYN|TH_FIN|TH_RST|TH_URG|TH_ACK)) !=3D TH_SYN)
+-	    goto dropwithreset;
+-
+-          so =3D socreate(slirp);
+-	  if (tcp_attach(so) < 0) {
+-            g_free(so); /* Not sofree (if it failed, it's not insqued) *=
+/
+-            goto dropwithreset;
+-	  }
+-
+-	  sbreserve(&so->so_snd, TCP_SNDSPACE);
+-	  sbreserve(&so->so_rcv, TCP_RCVSPACE);
+-
+-	  so->lhost.ss =3D lhost;
+-	  so->fhost.ss =3D fhost;
+-
+-	  so->so_iptos =3D tcp_tos(so);
+-	  if (so->so_iptos =3D=3D 0) {
+-	      switch (af) {
+-	      case AF_INET:
+-	          so->so_iptos =3D ((struct ip *)ti)->ip_tos;
+-	          break;
+-	      case AF_INET6:
+-	          break;
+-	      default:
+-	          g_assert_not_reached();
+-	      }
+-	  }
+-
+-	  tp =3D sototcpcb(so);
+-	  tp->t_state =3D TCPS_LISTEN;
+-	}
+-
+-        /*
+-         * If this is a still-connecting socket, this probably
+-         * a retransmit of the SYN.  Whether it's a retransmit SYN
+-	 * or something else, we nuke it.
+-         */
+-        if (so->so_state & SS_ISFCONNECTING)
+-                goto drop;
+-
+-	tp =3D sototcpcb(so);
+-
+-	/* XXX Should never fail */
+-        if (tp =3D=3D NULL)
+-		goto dropwithreset;
+-	if (tp->t_state =3D=3D TCPS_CLOSED)
+-		goto drop;
+-
+-	tiwin =3D ti->ti_win;
+-
+-	/*
+-	 * Segment received on connection.
+-	 * Reset idle time and keep-alive timer.
+-	 */
+-	tp->t_idle =3D 0;
+-	if (slirp_do_keepalive)
+-	   tp->t_timer[TCPT_KEEP] =3D TCPTV_KEEPINTVL;
+-	else
+-	   tp->t_timer[TCPT_KEEP] =3D TCPTV_KEEP_IDLE;
+-
+-	/*
+-	 * Process options if not in LISTEN state,
+-	 * else do it below (after getting remote address).
+-	 */
+-	if (optp && tp->t_state !=3D TCPS_LISTEN)
+-		tcp_dooptions(tp, (uint8_t *)optp, optlen, ti);
+-
+-	/*
+-	 * Header prediction: check for the two common cases
+-	 * of a uni-directional data xfer.  If the packet has
+-	 * no control flags, is in-sequence, the window didn't
+-	 * change and we're not retransmitting, it's a
+-	 * candidate.  If the length is zero and the ack moved
+-	 * forward, we're the sender side of the xfer.  Just
+-	 * free the data acked & wake any higher level process
+-	 * that was blocked waiting for space.  If the length
+-	 * is non-zero and the ack didn't move, we're the
+-	 * receiver side.  If we're getting packets in-order
+-	 * (the reassembly queue is empty), add the data to
+-	 * the socket buffer and note that we need a delayed ack.
+-	 *
+-	 * XXX Some of these tests are not needed
+-	 * eg: the tiwin =3D=3D tp->snd_wnd prevents many more
+-	 * predictions.. with no *real* advantage..
+-	 */
+-	if (tp->t_state =3D=3D TCPS_ESTABLISHED &&
+-	    (tiflags & (TH_SYN|TH_FIN|TH_RST|TH_URG|TH_ACK)) =3D=3D TH_ACK &&
+-	    ti->ti_seq =3D=3D tp->rcv_nxt &&
+-	    tiwin && tiwin =3D=3D tp->snd_wnd &&
+-	    tp->snd_nxt =3D=3D tp->snd_max) {
+-		if (ti->ti_len =3D=3D 0) {
+-			if (SEQ_GT(ti->ti_ack, tp->snd_una) &&
+-			    SEQ_LEQ(ti->ti_ack, tp->snd_max) &&
+-			    tp->snd_cwnd >=3D tp->snd_wnd) {
+-				/*
+-				 * this is a pure ack for outstanding data.
+-				 */
+-				if (tp->t_rtt &&
+-				    SEQ_GT(ti->ti_ack, tp->t_rtseq))
+-					tcp_xmit_timer(tp, tp->t_rtt);
+-				acked =3D ti->ti_ack - tp->snd_una;
+-				sodrop(so, acked);
+-				tp->snd_una =3D ti->ti_ack;
+-				m_free(m);
+-
+-				/*
+-				 * If all outstanding data are acked, stop
+-				 * retransmit timer, otherwise restart timer
+-				 * using current (possibly backed-off) value.
+-				 * If process is waiting for space,
+-				 * wakeup/selwakeup/signal.  If data
+-				 * are ready to send, let tcp_output
+-				 * decide between more output or persist.
+-				 */
+-				if (tp->snd_una =3D=3D tp->snd_max)
+-					tp->t_timer[TCPT_REXMT] =3D 0;
+-				else if (tp->t_timer[TCPT_PERSIST] =3D=3D 0)
+-					tp->t_timer[TCPT_REXMT] =3D tp->t_rxtcur;
+-
+-				/*
+-				 * This is called because sowwakeup might have
+-				 * put data into so_snd.  Since we don't so sowwakeup,
+-				 * we don't need this.. XXX???
+-				 */
+-				if (so->so_snd.sb_cc)
+-					(void) tcp_output(tp);
+-
+-				return;
+-			}
+-		} else if (ti->ti_ack =3D=3D tp->snd_una &&
+-		    tcpfrag_list_empty(tp) &&
+-		    ti->ti_len <=3D sbspace(&so->so_rcv)) {
+-			/*
+-			 * this is a pure, in-sequence data packet
+-			 * with nothing on the reassembly queue and
+-			 * we have enough buffer space to take it.
+-			 */
+-			tp->rcv_nxt +=3D ti->ti_len;
+-			/*
+-			 * Add data to socket buffer.
+-			 */
+-			if (so->so_emu) {
+-				if (tcp_emu(so,m)) sbappend(so, m);
+-			} else
+-				sbappend(so, m);
+-
+-			/*
+-			 * If this is a short packet, then ACK now - with Nagel
+-			 *	congestion avoidance sender won't send more until
+-			 *	he gets an ACK.
+-			 *
+-			 * It is better to not delay acks at all to maximize
+-			 * TCP throughput.  See RFC 2581.
+-			 */
+-			tp->t_flags |=3D TF_ACKNOW;
+-			tcp_output(tp);
+-			return;
+-		}
+-	} /* header prediction */
+-	/*
+-	 * Calculate amount of space in receive window,
+-	 * and then do TCP input processing.
+-	 * Receive window is amount of space in rcv queue,
+-	 * but not less than advertised window.
+-	 */
+-	{ int win;
+-          win =3D sbspace(&so->so_rcv);
+-	  if (win < 0)
+-	    win =3D 0;
+-          tp->rcv_wnd =3D MAX(win, (int)(tp->rcv_adv - tp->rcv_nxt));
+-	}
+-
+-	switch (tp->t_state) {
+-
+-	/*
+-	 * If the state is LISTEN then ignore segment if it contains an RST.
+-	 * If the segment contains an ACK then it is bad and send a RST.
+-	 * If it does not contain a SYN then it is not interesting; drop it.
+-	 * Don't bother responding if the destination was a broadcast.
+-	 * Otherwise initialize tp->rcv_nxt, and tp->irs, select an initial
+-	 * tp->iss, and send a segment:
+-	 *     <SEQ=3DISS><ACK=3DRCV_NXT><CTL=3DSYN,ACK>
+-	 * Also initialize tp->snd_nxt to tp->iss+1 and tp->snd_una to tp->iss.
+-	 * Fill in remote peer address fields if not previously specified.
+-	 * Enter SYN_RECEIVED state, and process any other fields of this
+-	 * segment in this state.
+-	 */
+-	case TCPS_LISTEN: {
+-
+-	  if (tiflags & TH_RST)
+-	    goto drop;
+-	  if (tiflags & TH_ACK)
+-	    goto dropwithreset;
+-	  if ((tiflags & TH_SYN) =3D=3D 0)
+-	    goto drop;
+-
+-	  /*
+-	   * This has way too many gotos...
+-	   * But a bit of spaghetti code never hurt anybody :)
+-	   */
+-
+-	  /*
+-	   * If this is destined for the control address, then flag to
+-	   * tcp_ctl once connected, otherwise connect
+-	   */
+-          /* TODO: IPv6 */
+-	  if (af =3D=3D AF_INET &&
+-	         (so->so_faddr.s_addr & slirp->vnetwork_mask.s_addr) =3D=3D
+-	         slirp->vnetwork_addr.s_addr) {
+-	    if (so->so_faddr.s_addr !=3D slirp->vhost_addr.s_addr &&
+-		so->so_faddr.s_addr !=3D slirp->vnameserver_addr.s_addr) {
+-		/* May be an add exec */
+-		for (ex_ptr =3D slirp->guestfwd_list; ex_ptr;
+-		     ex_ptr =3D ex_ptr->ex_next) {
+-		  if(ex_ptr->ex_fport =3D=3D so->so_fport &&
+-		     so->so_faddr.s_addr =3D=3D ex_ptr->ex_addr.s_addr) {
+-		    so->so_state |=3D SS_CTL;
+-		    break;
+-		  }
+-		}
+-		if (so->so_state & SS_CTL) {
+-		    goto cont_input;
+-		}
+-	    }
+-	    /* CTL_ALIAS: Do nothing, tcp_fconnect will be called on it */
+-	  }
+-
+-	  if (so->so_emu & EMU_NOCONNECT) {
+-	    so->so_emu &=3D ~EMU_NOCONNECT;
+-	    goto cont_input;
+-	  }
+-
+-	  if ((tcp_fconnect(so, so->so_ffamily) =3D=3D -1) &&
+-              (errno !=3D EAGAIN) &&
+-              (errno !=3D EINPROGRESS) && (errno !=3D EWOULDBLOCK)
+-          ) {
+-	    uint8_t code;
+-	    DEBUG_MISC(" tcp fconnect errno =3D %d-%s", errno, strerror(errno))=
+;
+-	    if(errno =3D=3D ECONNREFUSED) {
+-	      /* ACK the SYN, send RST to refuse the connection */
+-	      tcp_respond(tp, ti, m, ti->ti_seq + 1, (tcp_seq) 0,
+-			  TH_RST | TH_ACK, af);
+-	    } else {
+-	      switch (af) {
+-	      case AF_INET:
+-		code =3D ICMP_UNREACH_NET;
+-		if (errno =3D=3D EHOSTUNREACH) {
+-		  code =3D ICMP_UNREACH_HOST;
+-		}
+-		break;
+-	      case AF_INET6:
+-		code =3D ICMP6_UNREACH_NO_ROUTE;
+-		if (errno =3D=3D EHOSTUNREACH) {
+-		  code =3D ICMP6_UNREACH_ADDRESS;
+-		}
+-		break;
+-	      default:
+-		g_assert_not_reached();
+-	      }
+-	      HTONL(ti->ti_seq);             /* restore tcp header */
+-	      HTONL(ti->ti_ack);
+-	      HTONS(ti->ti_win);
+-	      HTONS(ti->ti_urp);
+-	      m->m_data -=3D sizeof(struct tcpiphdr)+off-sizeof(struct tcphdr);
+-	      m->m_len  +=3D sizeof(struct tcpiphdr)+off-sizeof(struct tcphdr);
+-	      switch (af) {
+-	      case AF_INET:
+-		m->m_data +=3D sizeof(struct tcpiphdr) - sizeof(struct ip)
+-						     - sizeof(struct tcphdr);
+-		m->m_len  -=3D sizeof(struct tcpiphdr) - sizeof(struct ip)
+-						     - sizeof(struct tcphdr);
+-		*ip =3D save_ip;
+-		icmp_send_error(m, ICMP_UNREACH, code, 0, strerror(errno));
+-		break;
+-	      case AF_INET6:
+-		m->m_data +=3D sizeof(struct tcpiphdr) - (sizeof(struct ip6)
+-						     + sizeof(struct tcphdr));
+-		m->m_len  -=3D sizeof(struct tcpiphdr) - (sizeof(struct ip6)
+-						     + sizeof(struct tcphdr));
+-		*ip6 =3D save_ip6;
+-		icmp6_send_error(m, ICMP6_UNREACH, code);
+-		break;
+-	      default:
+-		g_assert_not_reached();
+-	      }
+-	    }
+-            tcp_close(tp);
+-	    m_free(m);
+-	  } else {
+-	    /*
+-	     * Haven't connected yet, save the current mbuf
+-	     * and ti, and return
+-	     * XXX Some OS's don't tell us whether the connect()
+-	     * succeeded or not.  So we must time it out.
+-	     */
+-	    so->so_m =3D m;
+-	    so->so_ti =3D ti;
+-	    tp->t_timer[TCPT_KEEP] =3D TCPTV_KEEP_INIT;
+-	    tp->t_state =3D TCPS_SYN_RECEIVED;
+-	    /*
+-	     * Initialize receive sequence numbers now so that we can send a
+-	     * valid RST if the remote end rejects our connection.
+-	     */
+-	    tp->irs =3D ti->ti_seq;
+-	    tcp_rcvseqinit(tp);
+-	    tcp_template(tp);
+-	  }
+-	  return;
+-
+-	cont_conn:
+-	  /* m=3D=3DNULL
+-	   * Check if the connect succeeded
+-	   */
+-	  if (so->so_state & SS_NOFDREF) {
+-	    tp =3D tcp_close(tp);
+-	    goto dropwithreset;
+-	  }
+-	cont_input:
+-	  tcp_template(tp);
+-
+-	  if (optp)
+-	    tcp_dooptions(tp, (uint8_t *)optp, optlen, ti);
+-
+-	  if (iss)
+-	    tp->iss =3D iss;
+-	  else
+-	    tp->iss =3D slirp->tcp_iss;
+-	  slirp->tcp_iss +=3D TCP_ISSINCR/2;
+-	  tp->irs =3D ti->ti_seq;
+-	  tcp_sendseqinit(tp);
+-	  tcp_rcvseqinit(tp);
+-	  tp->t_flags |=3D TF_ACKNOW;
+-	  tp->t_state =3D TCPS_SYN_RECEIVED;
+-	  tp->t_timer[TCPT_KEEP] =3D TCPTV_KEEP_INIT;
+-	  goto trimthenstep6;
+-	} /* case TCPS_LISTEN */
+-
+-	/*
+-	 * If the state is SYN_SENT:
+-	 *	if seg contains an ACK, but not for our SYN, drop the input.
+-	 *	if seg contains a RST, then drop the connection.
+-	 *	if seg does not contain SYN, then drop it.
+-	 * Otherwise this is an acceptable SYN segment
+-	 *	initialize tp->rcv_nxt and tp->irs
+-	 *	if seg contains ack then advance tp->snd_una
+-	 *	if SYN has been acked change to ESTABLISHED else SYN_RCVD state
+-	 *	arrange for segment to be acked (eventually)
+-	 *	continue processing rest of data/controls, beginning with URG
+-	 */
+-	case TCPS_SYN_SENT:
+-		if ((tiflags & TH_ACK) &&
+-		    (SEQ_LEQ(ti->ti_ack, tp->iss) ||
+-		     SEQ_GT(ti->ti_ack, tp->snd_max)))
+-			goto dropwithreset;
+-
+-		if (tiflags & TH_RST) {
+-                        if (tiflags & TH_ACK) {
+-                                tcp_drop(tp, 0); /* XXX Check t_softerro=
+r! */
+-                        }
+-			goto drop;
+-		}
+-
+-		if ((tiflags & TH_SYN) =3D=3D 0)
+-			goto drop;
+-		if (tiflags & TH_ACK) {
+-			tp->snd_una =3D ti->ti_ack;
+-			if (SEQ_LT(tp->snd_nxt, tp->snd_una))
+-				tp->snd_nxt =3D tp->snd_una;
+-		}
+-
+-		tp->t_timer[TCPT_REXMT] =3D 0;
+-		tp->irs =3D ti->ti_seq;
+-		tcp_rcvseqinit(tp);
+-		tp->t_flags |=3D TF_ACKNOW;
+-		if (tiflags & TH_ACK && SEQ_GT(tp->snd_una, tp->iss)) {
+-			soisfconnected(so);
+-			tp->t_state =3D TCPS_ESTABLISHED;
+-
+-			(void) tcp_reass(tp, (struct tcpiphdr *)0,
+-				(struct mbuf *)0);
+-			/*
+-			 * if we didn't have to retransmit the SYN,
+-			 * use its rtt as our initial srtt & rtt var.
+-			 */
+-			if (tp->t_rtt)
+-				tcp_xmit_timer(tp, tp->t_rtt);
+-		} else
+-			tp->t_state =3D TCPS_SYN_RECEIVED;
+-
+-trimthenstep6:
+-		/*
+-		 * Advance ti->ti_seq to correspond to first data byte.
+-		 * If data, trim to stay within window,
+-		 * dropping FIN if necessary.
+-		 */
+-		ti->ti_seq++;
+-		if (ti->ti_len > tp->rcv_wnd) {
+-			todrop =3D ti->ti_len - tp->rcv_wnd;
+-			m_adj(m, -todrop);
+-			ti->ti_len =3D tp->rcv_wnd;
+-			tiflags &=3D ~TH_FIN;
+-		}
+-		tp->snd_wl1 =3D ti->ti_seq - 1;
+-		tp->rcv_up =3D ti->ti_seq;
+-		goto step6;
+-	} /* switch tp->t_state */
+-	/*
+-	 * States other than LISTEN or SYN_SENT.
+-	 * Check that at least some bytes of segment are within
+-	 * receive window.  If segment begins before rcv_nxt,
+-	 * drop leading data (and SYN); if nothing left, just ack.
+-	 */
+-	todrop =3D tp->rcv_nxt - ti->ti_seq;
+-	if (todrop > 0) {
+-		if (tiflags & TH_SYN) {
+-			tiflags &=3D ~TH_SYN;
+-			ti->ti_seq++;
+-			if (ti->ti_urp > 1)
+-				ti->ti_urp--;
+-			else
+-				tiflags &=3D ~TH_URG;
+-			todrop--;
+-		}
+-		/*
+-		 * Following if statement from Stevens, vol. 2, p. 960.
+-		 */
+-		if (todrop > ti->ti_len
+-		    || (todrop =3D=3D ti->ti_len && (tiflags & TH_FIN) =3D=3D 0)) {
+-			/*
+-			 * Any valid FIN must be to the left of the window.
+-			 * At this point the FIN must be a duplicate or out
+-			 * of sequence; drop it.
+-			 */
+-			tiflags &=3D ~TH_FIN;
+-
+-			/*
+-			 * Send an ACK to resynchronize and drop any data.
+-			 * But keep on processing for RST or ACK.
+-			 */
+-			tp->t_flags |=3D TF_ACKNOW;
+-			todrop =3D ti->ti_len;
+-		}
+-		m_adj(m, todrop);
+-		ti->ti_seq +=3D todrop;
+-		ti->ti_len -=3D todrop;
+-		if (ti->ti_urp > todrop)
+-			ti->ti_urp -=3D todrop;
+-		else {
+-			tiflags &=3D ~TH_URG;
+-			ti->ti_urp =3D 0;
+-		}
+-	}
+-	/*
+-	 * If new data are received on a connection after the
+-	 * user processes are gone, then RST the other end.
+-	 */
+-	if ((so->so_state & SS_NOFDREF) &&
+-	    tp->t_state > TCPS_CLOSE_WAIT && ti->ti_len) {
+-		tp =3D tcp_close(tp);
+-		goto dropwithreset;
+-	}
+-
+-	/*
+-	 * If segment ends after window, drop trailing data
+-	 * (and PUSH and FIN); if nothing left, just ACK.
+-	 */
+-	todrop =3D (ti->ti_seq+ti->ti_len) - (tp->rcv_nxt+tp->rcv_wnd);
+-	if (todrop > 0) {
+-		if (todrop >=3D ti->ti_len) {
+-			/*
+-			 * If a new connection request is received
+-			 * while in TIME_WAIT, drop the old connection
+-			 * and start over if the sequence numbers
+-			 * are above the previous ones.
+-			 */
+-			if (tiflags & TH_SYN &&
+-			    tp->t_state =3D=3D TCPS_TIME_WAIT &&
+-			    SEQ_GT(ti->ti_seq, tp->rcv_nxt)) {
+-				iss =3D tp->rcv_nxt + TCP_ISSINCR;
+-				tp =3D tcp_close(tp);
+-				goto findso;
+-			}
+-			/*
+-			 * If window is closed can only take segments at
+-			 * window edge, and have to drop data and PUSH from
+-			 * incoming segments.  Continue processing, but
+-			 * remember to ack.  Otherwise, drop segment
+-			 * and ack.
+-			 */
+-			if (tp->rcv_wnd =3D=3D 0 && ti->ti_seq =3D=3D tp->rcv_nxt) {
+-				tp->t_flags |=3D TF_ACKNOW;
+-			} else {
+-				goto dropafterack;
+-			}
+-		}
+-		m_adj(m, -todrop);
+-		ti->ti_len -=3D todrop;
+-		tiflags &=3D ~(TH_PUSH|TH_FIN);
+-	}
+-
+-	/*
+-	 * If the RST bit is set examine the state:
+-	 *    SYN_RECEIVED STATE:
+-	 *	If passive open, return to LISTEN state.
+-	 *	If active open, inform user that connection was refused.
+-	 *    ESTABLISHED, FIN_WAIT_1, FIN_WAIT2, CLOSE_WAIT STATES:
+-	 *	Inform user that connection was reset, and close tcb.
+-	 *    CLOSING, LAST_ACK, TIME_WAIT STATES
+-	 *	Close the tcb.
+-	 */
+-	if (tiflags&TH_RST) switch (tp->t_state) {
+-
+-	case TCPS_SYN_RECEIVED:
+-	case TCPS_ESTABLISHED:
+-	case TCPS_FIN_WAIT_1:
+-	case TCPS_FIN_WAIT_2:
+-	case TCPS_CLOSE_WAIT:
+-		tp->t_state =3D TCPS_CLOSED;
+-                tcp_close(tp);
+-		goto drop;
+-
+-	case TCPS_CLOSING:
+-	case TCPS_LAST_ACK:
+-	case TCPS_TIME_WAIT:
+-                tcp_close(tp);
+-		goto drop;
+-	}
+-
+-	/*
+-	 * If a SYN is in the window, then this is an
+-	 * error and we send an RST and drop the connection.
+-	 */
+-	if (tiflags & TH_SYN) {
+-		tp =3D tcp_drop(tp,0);
+-		goto dropwithreset;
+-	}
+-
+-	/*
+-	 * If the ACK bit is off we drop the segment and return.
+-	 */
+-	if ((tiflags & TH_ACK) =3D=3D 0) goto drop;
+-
+-	/*
+-	 * Ack processing.
+-	 */
+-	switch (tp->t_state) {
+-	/*
+-	 * In SYN_RECEIVED state if the ack ACKs our SYN then enter
+-	 * ESTABLISHED state and continue processing, otherwise
+-	 * send an RST.  una<=3Dack<=3Dmax
+-	 */
+-	case TCPS_SYN_RECEIVED:
+-
+-		if (SEQ_GT(tp->snd_una, ti->ti_ack) ||
+-		    SEQ_GT(ti->ti_ack, tp->snd_max))
+-			goto dropwithreset;
+-		tp->t_state =3D TCPS_ESTABLISHED;
+-		/*
+-		 * The sent SYN is ack'ed with our sequence number +1
+-		 * The first data byte already in the buffer will get
+-		 * lost if no correction is made.  This is only needed for
+-		 * SS_CTL since the buffer is empty otherwise.
+-		 * tp->snd_una++; or:
+-		 */
+-		tp->snd_una=3Dti->ti_ack;
+-		if (so->so_state & SS_CTL) {
+-		  /* So tcp_ctl reports the right state */
+-		  ret =3D tcp_ctl(so);
+-		  if (ret =3D=3D 1) {
+-		    soisfconnected(so);
+-		    so->so_state &=3D ~SS_CTL;   /* success XXX */
+-		  } else if (ret =3D=3D 2) {
+-		    so->so_state &=3D SS_PERSISTENT_MASK;
+-		    so->so_state |=3D SS_NOFDREF; /* CTL_CMD */
+-		  } else {
+-		    needoutput =3D 1;
+-		    tp->t_state =3D TCPS_FIN_WAIT_1;
+-		  }
+-		} else {
+-		  soisfconnected(so);
+-		}
+-
+-		(void) tcp_reass(tp, (struct tcpiphdr *)0, (struct mbuf *)0);
+-		tp->snd_wl1 =3D ti->ti_seq - 1;
+-		/* Avoid ack processing; snd_una=3D=3Dti_ack  =3D>  dup ack */
+-		goto synrx_to_est;
+-		/* fall into ... */
+-
+-	/*
+-	 * In ESTABLISHED state: drop duplicate ACKs; ACK out of range
+-	 * ACKs.  If the ack is in the range
+-	 *	tp->snd_una < ti->ti_ack <=3D tp->snd_max
+-	 * then advance tp->snd_una to ti->ti_ack and drop
+-	 * data from the retransmission queue.  If this ACK reflects
+-	 * more up to date window information we update our window information.
+-	 */
+-	case TCPS_ESTABLISHED:
+-	case TCPS_FIN_WAIT_1:
+-	case TCPS_FIN_WAIT_2:
+-	case TCPS_CLOSE_WAIT:
+-	case TCPS_CLOSING:
+-	case TCPS_LAST_ACK:
+-	case TCPS_TIME_WAIT:
+-
+-		if (SEQ_LEQ(ti->ti_ack, tp->snd_una)) {
+-			if (ti->ti_len =3D=3D 0 && tiwin =3D=3D tp->snd_wnd) {
+-			  DEBUG_MISC(" dup ack  m =3D %p  so =3D %p", m, so);
+-				/*
+-				 * If we have outstanding data (other than
+-				 * a window probe), this is a completely
+-				 * duplicate ack (ie, window info didn't
+-				 * change), the ack is the biggest we've
+-				 * seen and we've seen exactly our rexmt
+-				 * threshold of them, assume a packet
+-				 * has been dropped and retransmit it.
+-				 * Kludge snd_nxt & the congestion
+-				 * window so we send only this one
+-				 * packet.
+-				 *
+-				 * We know we're losing at the current
+-				 * window size so do congestion avoidance
+-				 * (set ssthresh to half the current window
+-				 * and pull our congestion window back to
+-				 * the new ssthresh).
+-				 *
+-				 * Dup acks mean that packets have left the
+-				 * network (they're now cached at the receiver)
+-				 * so bump cwnd by the amount in the receiver
+-				 * to keep a constant cwnd packets in the
+-				 * network.
+-				 */
+-				if (tp->t_timer[TCPT_REXMT] =3D=3D 0 ||
+-				    ti->ti_ack !=3D tp->snd_una)
+-					tp->t_dupacks =3D 0;
+-				else if (++tp->t_dupacks =3D=3D TCPREXMTTHRESH) {
+-					tcp_seq onxt =3D tp->snd_nxt;
+-					unsigned win =3D
+-                                                MIN(tp->snd_wnd, tp->snd=
+_cwnd) /
+-                                                2 / tp->t_maxseg;
+-
+-					if (win < 2)
+-						win =3D 2;
+-					tp->snd_ssthresh =3D win * tp->t_maxseg;
+-					tp->t_timer[TCPT_REXMT] =3D 0;
+-					tp->t_rtt =3D 0;
+-					tp->snd_nxt =3D ti->ti_ack;
+-					tp->snd_cwnd =3D tp->t_maxseg;
+-					(void) tcp_output(tp);
+-					tp->snd_cwnd =3D tp->snd_ssthresh +
+-					       tp->t_maxseg * tp->t_dupacks;
+-					if (SEQ_GT(onxt, tp->snd_nxt))
+-						tp->snd_nxt =3D onxt;
+-					goto drop;
+-				} else if (tp->t_dupacks > TCPREXMTTHRESH) {
+-					tp->snd_cwnd +=3D tp->t_maxseg;
+-					(void) tcp_output(tp);
+-					goto drop;
+-				}
+-			} else
+-				tp->t_dupacks =3D 0;
+-			break;
+-		}
+-	synrx_to_est:
+-		/*
+-		 * If the congestion window was inflated to account
+-		 * for the other side's cached packets, retract it.
+-		 */
+-		if (tp->t_dupacks > TCPREXMTTHRESH &&
+-		    tp->snd_cwnd > tp->snd_ssthresh)
+-			tp->snd_cwnd =3D tp->snd_ssthresh;
+-		tp->t_dupacks =3D 0;
+-		if (SEQ_GT(ti->ti_ack, tp->snd_max)) {
+-			goto dropafterack;
+-		}
+-		acked =3D ti->ti_ack - tp->snd_una;
+-
+-		/*
+-		 * If transmit timer is running and timed sequence
+-		 * number was acked, update smoothed round trip time.
+-		 * Since we now have an rtt measurement, cancel the
+-		 * timer backoff (cf., Phil Karn's retransmit alg.).
+-		 * Recompute the initial retransmit timer.
+-		 */
+-		if (tp->t_rtt && SEQ_GT(ti->ti_ack, tp->t_rtseq))
+-			tcp_xmit_timer(tp,tp->t_rtt);
+-
+-		/*
+-		 * If all outstanding data is acked, stop retransmit
+-		 * timer and remember to restart (more output or persist).
+-		 * If there is more data to be acked, restart retransmit
+-		 * timer, using current (possibly backed-off) value.
+-		 */
+-		if (ti->ti_ack =3D=3D tp->snd_max) {
+-			tp->t_timer[TCPT_REXMT] =3D 0;
+-			needoutput =3D 1;
+-		} else if (tp->t_timer[TCPT_PERSIST] =3D=3D 0)
+-			tp->t_timer[TCPT_REXMT] =3D tp->t_rxtcur;
+-		/*
+-		 * When new data is acked, open the congestion window.
+-		 * If the window gives us less than ssthresh packets
+-		 * in flight, open exponentially (maxseg per packet).
+-		 * Otherwise open linearly: maxseg per window
+-		 * (maxseg^2 / cwnd per packet).
+-		 */
+-		{
+-		  register unsigned cw =3D tp->snd_cwnd;
+-		  register unsigned incr =3D tp->t_maxseg;
+-
+-		  if (cw > tp->snd_ssthresh)
+-		    incr =3D incr * incr / cw;
+-                  tp->snd_cwnd =3D MIN(cw + incr, TCP_MAXWIN << tp->snd_=
+scale);
+-		}
+-		if (acked > so->so_snd.sb_cc) {
+-			tp->snd_wnd -=3D so->so_snd.sb_cc;
+-			sodrop(so, (int)so->so_snd.sb_cc);
+-			ourfinisacked =3D 1;
+-		} else {
+-			sodrop(so, acked);
+-			tp->snd_wnd -=3D acked;
+-			ourfinisacked =3D 0;
+-		}
+-		tp->snd_una =3D ti->ti_ack;
+-		if (SEQ_LT(tp->snd_nxt, tp->snd_una))
+-			tp->snd_nxt =3D tp->snd_una;
+-
+-		switch (tp->t_state) {
+-
+-		/*
+-		 * In FIN_WAIT_1 STATE in addition to the processing
+-		 * for the ESTABLISHED state if our FIN is now acknowledged
+-		 * then enter FIN_WAIT_2.
+-		 */
+-		case TCPS_FIN_WAIT_1:
+-			if (ourfinisacked) {
+-				/*
+-				 * If we can't receive any more
+-				 * data, then closing user can proceed.
+-				 * Starting the timer is contrary to the
+-				 * specification, but if we don't get a FIN
+-				 * we'll hang forever.
+-				 */
+-				if (so->so_state & SS_FCANTRCVMORE) {
+-					tp->t_timer[TCPT_2MSL] =3D TCP_MAXIDLE;
+-				}
+-				tp->t_state =3D TCPS_FIN_WAIT_2;
+-			}
+-			break;
+-
+-		/*
+-		 * In CLOSING STATE in addition to the processing for
+-		 * the ESTABLISHED state if the ACK acknowledges our FIN
+-		 * then enter the TIME-WAIT state, otherwise ignore
+-		 * the segment.
+-		 */
+-		case TCPS_CLOSING:
+-			if (ourfinisacked) {
+-				tp->t_state =3D TCPS_TIME_WAIT;
+-				tcp_canceltimers(tp);
+-				tp->t_timer[TCPT_2MSL] =3D 2 * TCPTV_MSL;
+-			}
+-			break;
+-
+-		/*
+-		 * In LAST_ACK, we may still be waiting for data to drain
+-		 * and/or to be acked, as well as for the ack of our FIN.
+-		 * If our FIN is now acknowledged, delete the TCB,
+-		 * enter the closed state and return.
+-		 */
+-		case TCPS_LAST_ACK:
+-			if (ourfinisacked) {
+-                                tcp_close(tp);
+-				goto drop;
+-			}
+-			break;
+-
+-		/*
+-		 * In TIME_WAIT state the only thing that should arrive
+-		 * is a retransmission of the remote FIN.  Acknowledge
+-		 * it and restart the finack timer.
+-		 */
+-		case TCPS_TIME_WAIT:
+-			tp->t_timer[TCPT_2MSL] =3D 2 * TCPTV_MSL;
+-			goto dropafterack;
+-		}
+-	} /* switch(tp->t_state) */
+-
+-step6:
+-	/*
+-	 * Update window information.
+-	 * Don't look at window if no ACK: TAC's send garbage on first SYN.
+-	 */
+-	if ((tiflags & TH_ACK) &&
+-	    (SEQ_LT(tp->snd_wl1, ti->ti_seq) ||
+-	    (tp->snd_wl1 =3D=3D ti->ti_seq && (SEQ_LT(tp->snd_wl2, ti->ti_ack) =
+||
+-	    (tp->snd_wl2 =3D=3D ti->ti_ack && tiwin > tp->snd_wnd))))) {
+-		tp->snd_wnd =3D tiwin;
+-		tp->snd_wl1 =3D ti->ti_seq;
+-		tp->snd_wl2 =3D ti->ti_ack;
+-		if (tp->snd_wnd > tp->max_sndwnd)
+-			tp->max_sndwnd =3D tp->snd_wnd;
+-		needoutput =3D 1;
+-	}
+-
+-	/*
+-	 * Process segments with URG.
+-	 */
+-	if ((tiflags & TH_URG) && ti->ti_urp &&
+-	    TCPS_HAVERCVDFIN(tp->t_state) =3D=3D 0) {
+-		/*
+-		 * This is a kludge, but if we receive and accept
+-		 * random urgent pointers, we'll crash in
+-		 * soreceive.  It's hard to imagine someone
+-		 * actually wanting to send this much urgent data.
+-		 */
+-		if (ti->ti_urp + so->so_rcv.sb_cc > so->so_rcv.sb_datalen) {
+-			ti->ti_urp =3D 0;
+-			tiflags &=3D ~TH_URG;
+-			goto dodata;
+-		}
+-		/*
+-		 * If this segment advances the known urgent pointer,
+-		 * then mark the data stream.  This should not happen
+-		 * in CLOSE_WAIT, CLOSING, LAST_ACK or TIME_WAIT STATES since
+-		 * a FIN has been received from the remote side.
+-		 * In these states we ignore the URG.
+-		 *
+-		 * According to RFC961 (Assigned Protocols),
+-		 * the urgent pointer points to the last octet
+-		 * of urgent data.  We continue, however,
+-		 * to consider it to indicate the first octet
+-		 * of data past the urgent section as the original
+-		 * spec states (in one of two places).
+-		 */
+-		if (SEQ_GT(ti->ti_seq+ti->ti_urp, tp->rcv_up)) {
+-			tp->rcv_up =3D ti->ti_seq + ti->ti_urp;
+-			so->so_urgc =3D  so->so_rcv.sb_cc +
+-				(tp->rcv_up - tp->rcv_nxt); /* -1; */
+-			tp->rcv_up =3D ti->ti_seq + ti->ti_urp;
+-
+-		}
+-	} else
+-		/*
+-		 * If no out of band data is expected,
+-		 * pull receive urgent pointer along
+-		 * with the receive window.
+-		 */
+-		if (SEQ_GT(tp->rcv_nxt, tp->rcv_up))
+-			tp->rcv_up =3D tp->rcv_nxt;
+-dodata:
+-
+-	/*
+-	 * If this is a small packet, then ACK now - with Nagel
+-	 *      congestion avoidance sender won't send more until
+-	 *      he gets an ACK.
+-	 */
+-	if (ti->ti_len && (unsigned)ti->ti_len <=3D 5 &&
+-	    ((struct tcpiphdr_2 *)ti)->first_char =3D=3D (char)27) {
+-		tp->t_flags |=3D TF_ACKNOW;
+-	}
+-
+-	/*
+-	 * Process the segment text, merging it into the TCP sequencing queue,
+-	 * and arranging for acknowledgment of receipt if necessary.
+-	 * This process logically involves adjusting tp->rcv_wnd as data
+-	 * is presented to the user (this happens in tcp_usrreq.c,
+-	 * case PRU_RCVD).  If a FIN has already been received on this
+-	 * connection then we just ignore the text.
+-	 */
+-	if ((ti->ti_len || (tiflags&TH_FIN)) &&
+-	    TCPS_HAVERCVDFIN(tp->t_state) =3D=3D 0) {
+-		TCP_REASS(tp, ti, m, so, tiflags);
+-	} else {
+-		m_free(m);
+-		tiflags &=3D ~TH_FIN;
+-	}
+-
+-	/*
+-	 * If FIN is received ACK the FIN and let the user know
+-	 * that the connection is closing.
+-	 */
+-	if (tiflags & TH_FIN) {
+-		if (TCPS_HAVERCVDFIN(tp->t_state) =3D=3D 0) {
+-			/*
+-			 * If we receive a FIN we can't send more data,
+-			 * set it SS_FDRAIN
+-                         * Shutdown the socket if there is no rx data in=
+ the
+-			 * buffer.
+-			 * soread() is called on completion of shutdown() and
+-			 * will got to TCPS_LAST_ACK, and use tcp_output()
+-			 * to send the FIN.
+-			 */
+-			sofwdrain(so);
+-
+-			tp->t_flags |=3D TF_ACKNOW;
+-			tp->rcv_nxt++;
+-		}
+-		switch (tp->t_state) {
+-
+-		/*
+-		 * In SYN_RECEIVED and ESTABLISHED STATES
+-		 * enter the CLOSE_WAIT state.
+-		 */
+-		case TCPS_SYN_RECEIVED:
+-		case TCPS_ESTABLISHED:
+-		  if(so->so_emu =3D=3D EMU_CTL)        /* no shutdown on socket */
+-		    tp->t_state =3D TCPS_LAST_ACK;
+-		  else
+-		    tp->t_state =3D TCPS_CLOSE_WAIT;
+-		  break;
+-
+-		/*
+-		 * If still in FIN_WAIT_1 STATE FIN has not been acked so
+-		 * enter the CLOSING state.
+-		 */
+-		case TCPS_FIN_WAIT_1:
+-			tp->t_state =3D TCPS_CLOSING;
+-			break;
+-
+-		/*
+-		 * In FIN_WAIT_2 state enter the TIME_WAIT state,
+-		 * starting the time-wait timer, turning off the other
+-		 * standard timers.
+-		 */
+-		case TCPS_FIN_WAIT_2:
+-			tp->t_state =3D TCPS_TIME_WAIT;
+-			tcp_canceltimers(tp);
+-			tp->t_timer[TCPT_2MSL] =3D 2 * TCPTV_MSL;
+-			break;
+-
+-		/*
+-		 * In TIME_WAIT state restart the 2 MSL time_wait timer.
+-		 */
+-		case TCPS_TIME_WAIT:
+-			tp->t_timer[TCPT_2MSL] =3D 2 * TCPTV_MSL;
+-			break;
+-		}
+-	}
+-
+-	/*
+-	 * Return any desired output.
+-	 */
+-	if (needoutput || (tp->t_flags & TF_ACKNOW)) {
+-		(void) tcp_output(tp);
+-	}
+-	return;
+-
+-dropafterack:
+-	/*
+-	 * Generate an ACK dropping incoming segment if it occupies
+-	 * sequence space, where the ACK reflects our state.
+-	 */
+-	if (tiflags & TH_RST)
+-		goto drop;
+-	m_free(m);
+-	tp->t_flags |=3D TF_ACKNOW;
+-	(void) tcp_output(tp);
+-	return;
+-
+-dropwithreset:
+-	/* reuses m if m!=3DNULL, m_free() unnecessary */
+-	if (tiflags & TH_ACK)
+-		tcp_respond(tp, ti, m, (tcp_seq)0, ti->ti_ack, TH_RST, af);
+-	else {
+-		if (tiflags & TH_SYN) ti->ti_len++;
+-		tcp_respond(tp, ti, m, ti->ti_seq + ti->ti_len, (tcp_seq) 0,
+-		    TH_RST | TH_ACK, af);
+-	}
+-
+-	return;
+-
+-drop:
+-	/*
+-	 * Drop space held by incoming segment and return.
+-	 */
+-	m_free(m);
+-}
+-
+-static void
+-tcp_dooptions(struct tcpcb *tp, uint8_t *cp, int cnt, struct tcpiphdr *t=
+i)
+-{
+-	uint16_t mss;
+-	int opt, optlen;
+-
+-	DEBUG_CALL("tcp_dooptions");
+-	DEBUG_ARG("tp =3D %p  cnt=3D%i", tp, cnt);
+-
+-	for (; cnt > 0; cnt -=3D optlen, cp +=3D optlen) {
+-		opt =3D cp[0];
+-		if (opt =3D=3D TCPOPT_EOL)
+-			break;
+-		if (opt =3D=3D TCPOPT_NOP)
+-			optlen =3D 1;
+-		else {
+-			optlen =3D cp[1];
+-			if (optlen <=3D 0)
+-				break;
+-		}
+-		switch (opt) {
+-
+-		default:
+-			continue;
+-
+-		case TCPOPT_MAXSEG:
+-			if (optlen !=3D TCPOLEN_MAXSEG)
+-				continue;
+-			if (!(ti->ti_flags & TH_SYN))
+-				continue;
+-			memcpy((char *) &mss, (char *) cp + 2, sizeof(mss));
+-			NTOHS(mss);
+-			(void) tcp_mss(tp, mss);	/* sets t_maxseg */
+-			break;
+-		}
+-	}
+-}
+-
+-/*
+- * Collect new round-trip time estimate
+- * and update averages and current timeout.
+- */
+-
+-static void
+-tcp_xmit_timer(register struct tcpcb *tp, int rtt)
+-{
+-	register short delta;
+-
+-	DEBUG_CALL("tcp_xmit_timer");
+-	DEBUG_ARG("tp =3D %p", tp);
+-	DEBUG_ARG("rtt =3D %d", rtt);
+-
+-	if (tp->t_srtt !=3D 0) {
+-		/*
+-		 * srtt is stored as fixed point with 3 bits after the
+-		 * binary point (i.e., scaled by 8).  The following magic
+-		 * is equivalent to the smoothing algorithm in rfc793 with
+-		 * an alpha of .875 (srtt =3D rtt/8 + srtt*7/8 in fixed
+-		 * point).  Adjust rtt to origin 0.
+-		 */
+-		delta =3D rtt - 1 - (tp->t_srtt >> TCP_RTT_SHIFT);
+-		if ((tp->t_srtt +=3D delta) <=3D 0)
+-			tp->t_srtt =3D 1;
+-		/*
+-		 * We accumulate a smoothed rtt variance (actually, a
+-		 * smoothed mean difference), then set the retransmit
+-		 * timer to smoothed rtt + 4 times the smoothed variance.
+-		 * rttvar is stored as fixed point with 2 bits after the
+-		 * binary point (scaled by 4).  The following is
+-		 * equivalent to rfc793 smoothing with an alpha of .75
+-		 * (rttvar =3D rttvar*3/4 + |delta| / 4).  This replaces
+-		 * rfc793's wired-in beta.
+-		 */
+-		if (delta < 0)
+-			delta =3D -delta;
+-		delta -=3D (tp->t_rttvar >> TCP_RTTVAR_SHIFT);
+-		if ((tp->t_rttvar +=3D delta) <=3D 0)
+-			tp->t_rttvar =3D 1;
+-	} else {
+-		/*
+-		 * No rtt measurement yet - use the unsmoothed rtt.
+-		 * Set the variance to half the rtt (so our first
+-		 * retransmit happens at 3*rtt).
+-		 */
+-		tp->t_srtt =3D rtt << TCP_RTT_SHIFT;
+-		tp->t_rttvar =3D rtt << (TCP_RTTVAR_SHIFT - 1);
+-	}
+-	tp->t_rtt =3D 0;
+-	tp->t_rxtshift =3D 0;
+-
+-	/*
+-	 * the retransmit should happen at rtt + 4 * rttvar.
+-	 * Because of the way we do the smoothing, srtt and rttvar
+-	 * will each average +1/2 tick of bias.  When we compute
+-	 * the retransmit timer, we want 1/2 tick of rounding and
+-	 * 1 extra tick because of +-1/2 tick uncertainty in the
+-	 * firing of the timer.  The bias will give us exactly the
+-	 * 1.5 tick we need.  But, because the bias is
+-	 * statistical, we have to test that we don't drop below
+-	 * the minimum feasible timer (which is 2 ticks).
+-	 */
+-	TCPT_RANGESET(tp->t_rxtcur, TCP_REXMTVAL(tp),
+-	    (short)tp->t_rttmin, TCPTV_REXMTMAX); /* XXX */
+-
+-	/*
+-	 * We received an ack for a packet that wasn't retransmitted;
+-	 * it is probably safe to discard any error indications we've
+-	 * received recently.  This isn't quite right, but close enough
+-	 * for now (a route might have failed after we sent a segment,
+-	 * and the return path might not be symmetrical).
+-	 */
+-	tp->t_softerror =3D 0;
+-}
+-
+-/*
+- * Determine a reasonable value for maxseg size.
+- * If the route is known, check route for mtu.
+- * If none, use an mss that can be handled on the outgoing
+- * interface without forcing IP to fragment; if bigger than
+- * an mbuf cluster (MCLBYTES), round down to nearest multiple of MCLBYTE=
+S
+- * to utilize large mbufs.  If no route is found, route has no mtu,
+- * or the destination isn't local, use a default, hopefully conservative
+- * size (usually 512 or the default IP max size, but no more than the mt=
+u
+- * of the interface), as we can't discover anything about intervening
+- * gateways or networks.  We also initialize the congestion/slow start
+- * window to be a single segment if the destination isn't local.
+- * While looking at the routing entry, we also initialize other path-dep=
+endent
+- * parameters from pre-set or cached values in the routing entry.
+- */
+-
+-int
+-tcp_mss(struct tcpcb *tp, unsigned offer)
+-{
+-	struct socket *so =3D tp->t_socket;
+-	int mss;
+-
+-	DEBUG_CALL("tcp_mss");
+-	DEBUG_ARG("tp =3D %p", tp);
+-	DEBUG_ARG("offer =3D %d", offer);
+-
+-	switch (so->so_ffamily) {
+-	case AF_INET:
+-            mss =3D MIN(IF_MTU, IF_MRU) - sizeof(struct tcphdr)
+-	                              - sizeof(struct ip);
+-	    break;
+-	case AF_INET6:
+-            mss =3D MIN(IF_MTU, IF_MRU) - sizeof(struct tcphdr)
+-	                              - sizeof(struct ip6);
+-	    break;
+-	default:
+-	    g_assert_not_reached();
+-	}
+-
+-	if (offer)
+-            mss =3D MIN(mss, offer);
+-        mss =3D MAX(mss, 32);
+-	if (mss < tp->t_maxseg || offer !=3D 0)
+-	   tp->t_maxseg =3D mss;
+-
+-	tp->snd_cwnd =3D mss;
+-
+-	sbreserve(&so->so_snd, TCP_SNDSPACE + ((TCP_SNDSPACE % mss) ?
+-                                               (mss - (TCP_SNDSPACE % ms=
+s)) :
+-                                               0));
+-	sbreserve(&so->so_rcv, TCP_RCVSPACE + ((TCP_RCVSPACE % mss) ?
+-                                               (mss - (TCP_RCVSPACE % ms=
+s)) :
+-                                               0));
+-
+-	DEBUG_MISC(" returning mss =3D %d", mss);
+-
+-	return mss;
+-}
+diff --git a/slirp/src/tcp_output.c b/slirp/src/tcp_output.c
+deleted file mode 100644
+index 6bbaf6ca6f..0000000000
+--- a/slirp/src/tcp_output.c
++++ /dev/null
+@@ -1,522 +0,0 @@
+-/* SPDX-License-Identifier: BSD-3-Clause */
+-/*
+- * Copyright (c) 1982, 1986, 1988, 1990, 1993
+- *	The Regents of the University of California.  All rights reserved.
+- *
+- * Redistribution and use in source and binary forms, with or without
+- * modification, are permitted provided that the following conditions
+- * are met:
+- * 1. Redistributions of source code must retain the above copyright
+- *    notice, this list of conditions and the following disclaimer.
+- * 2. Redistributions in binary form must reproduce the above copyright
+- *    notice, this list of conditions and the following disclaimer in th=
+e
+- *    documentation and/or other materials provided with the distributio=
+n.
+- * 3. Neither the name of the University nor the names of its contributo=
+rs
+- *    may be used to endorse or promote products derived from this softw=
+are
+- *    without specific prior written permission.
+- *
+- * THIS SOFTWARE IS PROVIDED BY THE REGENTS AND CONTRIBUTORS ``AS IS'' A=
+ND
+- * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+- * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PU=
+RPOSE
+- * ARE DISCLAIMED.  IN NO EVENT SHALL THE REGENTS OR CONTRIBUTORS BE LIA=
+BLE
+- * FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUE=
+NTIAL
+- * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOO=
+DS
+- * OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
+- * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, S=
+TRICT
+- * LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY=
+ WAY
+- * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY O=
+F
+- * SUCH DAMAGE.
+- *
+- *	@(#)tcp_output.c	8.3 (Berkeley) 12/30/93
+- * tcp_output.c,v 1.3 1994/09/15 10:36:55 davidg Exp
+- */
+-
+-/*
+- * Changes and additions relating to SLiRP
+- * Copyright (c) 1995 Danny Gasparovski.
+- */
+-
+-#include "slirp.h"
+-
+-static const uint8_t  tcp_outflags[TCP_NSTATES] =3D {
+-	TH_RST|TH_ACK, 0,      TH_SYN,        TH_SYN|TH_ACK,
+-	TH_ACK,        TH_ACK, TH_FIN|TH_ACK, TH_FIN|TH_ACK,
+-	TH_FIN|TH_ACK, TH_ACK, TH_ACK,
+-};
+-
+-
+-#undef MAX_TCPOPTLEN
+-#define MAX_TCPOPTLEN	32	/* max # bytes that go in options */
+-
+-/*
+- * Tcp output routine: figure out what should be sent and send it.
+- */
+-int
+-tcp_output(struct tcpcb *tp)
+-{
+-	register struct socket *so =3D tp->t_socket;
+-	register long len, win;
+-	int off, flags, error;
+-	register struct mbuf *m;
+-	register struct tcpiphdr *ti, tcpiph_save;
+-	struct ip *ip;
+-	struct ip6 *ip6;
+-	uint8_t opt[MAX_TCPOPTLEN];
+-	unsigned optlen, hdrlen;
+-	int idle, sendalot;
+-
+-	DEBUG_CALL("tcp_output");
+-	DEBUG_ARG("tp =3D %p", tp);
+-
+-	/*
+-	 * Determine length of data that should be transmitted,
+-	 * and flags that will be used.
+-	 * If there is some data or critical controls (SYN, RST)
+-	 * to send, then transmit; otherwise, investigate further.
+-	 */
+-	idle =3D (tp->snd_max =3D=3D tp->snd_una);
+-	if (idle && tp->t_idle >=3D tp->t_rxtcur)
+-		/*
+-		 * We have been idle for "a while" and no acks are
+-		 * expected to clock out any data we send --
+-		 * slow start to get ack "clock" running again.
+-		 */
+-		tp->snd_cwnd =3D tp->t_maxseg;
+-again:
+-	sendalot =3D 0;
+-	off =3D tp->snd_nxt - tp->snd_una;
+-        win =3D MIN(tp->snd_wnd, tp->snd_cwnd);
+-
+-	flags =3D tcp_outflags[tp->t_state];
+-
+-	DEBUG_MISC(" --- tcp_output flags =3D 0x%x", flags);
+-
+-	/*
+-	 * If in persist timeout with window of 0, send 1 byte.
+-	 * Otherwise, if window is small but nonzero
+-	 * and timer expired, we will send what we can
+-	 * and go to transmit state.
+-	 */
+-	if (tp->t_force) {
+-		if (win =3D=3D 0) {
+-			/*
+-			 * If we still have some data to send, then
+-			 * clear the FIN bit.  Usually this would
+-			 * happen below when it realizes that we
+-			 * aren't sending all the data.  However,
+-			 * if we have exactly 1 byte of unset data,
+-			 * then it won't clear the FIN bit below,
+-			 * and if we are in persist state, we wind
+-			 * up sending the packet without recording
+-			 * that we sent the FIN bit.
+-			 *
+-			 * We can't just blindly clear the FIN bit,
+-			 * because if we don't have any more data
+-			 * to send then the probe will be the FIN
+-			 * itself.
+-			 */
+-			if (off < so->so_snd.sb_cc)
+-				flags &=3D ~TH_FIN;
+-			win =3D 1;
+-		} else {
+-			tp->t_timer[TCPT_PERSIST] =3D 0;
+-			tp->t_rxtshift =3D 0;
+-		}
+-	}
+-
+-        len =3D MIN(so->so_snd.sb_cc, win) - off;
+-
+-	if (len < 0) {
+-		/*
+-		 * If FIN has been sent but not acked,
+-		 * but we haven't been called to retransmit,
+-		 * len will be -1.  Otherwise, window shrank
+-		 * after we sent into it.  If window shrank to 0,
+-		 * cancel pending retransmit and pull snd_nxt
+-		 * back to (closed) window.  We will enter persist
+-		 * state below.  If the window didn't close completely,
+-		 * just wait for an ACK.
+-		 */
+-		len =3D 0;
+-		if (win =3D=3D 0) {
+-			tp->t_timer[TCPT_REXMT] =3D 0;
+-			tp->snd_nxt =3D tp->snd_una;
+-		}
+-	}
+-
+-	if (len > tp->t_maxseg) {
+-		len =3D tp->t_maxseg;
+-		sendalot =3D 1;
+-	}
+-	if (SEQ_LT(tp->snd_nxt + len, tp->snd_una + so->so_snd.sb_cc))
+-		flags &=3D ~TH_FIN;
+-
+-	win =3D sbspace(&so->so_rcv);
+-
+-	/*
+-	 * Sender silly window avoidance.  If connection is idle
+-	 * and can send all data, a maximum segment,
+-	 * at least a maximum default-size segment do it,
+-	 * or are forced, do it; otherwise don't bother.
+-	 * If peer's buffer is tiny, then send
+-	 * when window is at least half open.
+-	 * If retransmitting (possibly after persist timer forced us
+-	 * to send into a small window), then must resend.
+-	 */
+-	if (len) {
+-		if (len =3D=3D tp->t_maxseg)
+-			goto send;
+-		if ((1 || idle || tp->t_flags & TF_NODELAY) &&
+-		    len + off >=3D so->so_snd.sb_cc)
+-			goto send;
+-		if (tp->t_force)
+-			goto send;
+-		if (len >=3D tp->max_sndwnd / 2 && tp->max_sndwnd > 0)
+-			goto send;
+-		if (SEQ_LT(tp->snd_nxt, tp->snd_max))
+-			goto send;
+-	}
+-
+-	/*
+-	 * Compare available window to amount of window
+-	 * known to peer (as advertised window less
+-	 * next expected input).  If the difference is at least two
+-	 * max size segments, or at least 50% of the maximum possible
+-	 * window, then want to send a window update to peer.
+-	 */
+-	if (win > 0) {
+-		/*
+-		 * "adv" is the amount we can increase the window,
+-		 * taking into account that we are limited by
+-		 * TCP_MAXWIN << tp->rcv_scale.
+-		 */
+-                long adv =3D MIN(win, (long)TCP_MAXWIN << tp->rcv_scale)=
+ -
+-			(tp->rcv_adv - tp->rcv_nxt);
+-
+-		if (adv >=3D (long) (2 * tp->t_maxseg))
+-			goto send;
+-		if (2 * adv >=3D (long) so->so_rcv.sb_datalen)
+-			goto send;
+-	}
+-
+-	/*
+-	 * Send if we owe peer an ACK.
+-	 */
+-	if (tp->t_flags & TF_ACKNOW)
+-		goto send;
+-	if (flags & (TH_SYN|TH_RST))
+-		goto send;
+-	if (SEQ_GT(tp->snd_up, tp->snd_una))
+-		goto send;
+-	/*
+-	 * If our state indicates that FIN should be sent
+-	 * and we have not yet done so, or we're retransmitting the FIN,
+-	 * then we need to send.
+-	 */
+-	if (flags & TH_FIN &&
+-	    ((tp->t_flags & TF_SENTFIN) =3D=3D 0 || tp->snd_nxt =3D=3D tp->snd_=
+una))
+-		goto send;
+-
+-	/*
+-	 * TCP window updates are not reliable, rather a polling protocol
+-	 * using ``persist'' packets is used to insure receipt of window
+-	 * updates.  The three ``states'' for the output side are:
+-	 *	idle			not doing retransmits or persists
+-	 *	persisting		to move a small or zero window
+-	 *	(re)transmitting	and thereby not persisting
+-	 *
+-	 * tp->t_timer[TCPT_PERSIST]
+-	 *	is set when we are in persist state.
+-	 * tp->t_force
+-	 *	is set when we are called to send a persist packet.
+-	 * tp->t_timer[TCPT_REXMT]
+-	 *	is set when we are retransmitting
+-	 * The output side is idle when both timers are zero.
+-	 *
+-	 * If send window is too small, there is data to transmit, and no
+-	 * retransmit or persist is pending, then go to persist state.
+-	 * If nothing happens soon, send when timer expires:
+-	 * if window is nonzero, transmit what we can,
+-	 * otherwise force out a byte.
+-	 */
+-	if (so->so_snd.sb_cc && tp->t_timer[TCPT_REXMT] =3D=3D 0 &&
+-	    tp->t_timer[TCPT_PERSIST] =3D=3D 0) {
+-		tp->t_rxtshift =3D 0;
+-		tcp_setpersist(tp);
+-	}
+-
+-	/*
+-	 * No reason to send a segment, just return.
+-	 */
+-	return (0);
+-
+-send:
+-	/*
+-	 * Before ESTABLISHED, force sending of initial options
+-	 * unless TCP set not to do any options.
+-	 * NOTE: we assume that the IP/TCP header plus TCP options
+-	 * always fit in a single mbuf, leaving room for a maximum
+-	 * link header, i.e.
+-	 *	max_linkhdr + sizeof (struct tcpiphdr) + optlen <=3D MHLEN
+-	 */
+-	optlen =3D 0;
+-	hdrlen =3D sizeof (struct tcpiphdr);
+-	if (flags & TH_SYN) {
+-		tp->snd_nxt =3D tp->iss;
+-		if ((tp->t_flags & TF_NOOPT) =3D=3D 0) {
+-			uint16_t mss;
+-
+-			opt[0] =3D TCPOPT_MAXSEG;
+-			opt[1] =3D 4;
+-			mss =3D htons((uint16_t) tcp_mss(tp, 0));
+-			memcpy((char *)(opt + 2), (char *)&mss, sizeof(mss));
+-			optlen =3D 4;
+-		}
+-	}
+-
+-	hdrlen +=3D optlen;
+-
+-	/*
+-	 * Adjust data length if insertion of options will
+-	 * bump the packet length beyond the t_maxseg length.
+-	 */
+-	 if (len > tp->t_maxseg - optlen) {
+-		len =3D tp->t_maxseg - optlen;
+-		sendalot =3D 1;
+-	 }
+-
+-	/*
+-	 * Grab a header mbuf, attaching a copy of data to
+-	 * be transmitted, and initialize the header from
+-	 * the template for sends on this connection.
+-	 */
+-	if (len) {
+-		m =3D m_get(so->slirp);
+-		if (m =3D=3D NULL) {
+-			error =3D 1;
+-			goto out;
+-		}
+-		m->m_data +=3D IF_MAXLINKHDR;
+-		m->m_len =3D hdrlen;
+-
+-		sbcopy(&so->so_snd, off, (int) len, mtod(m, char *) + hdrlen);
+-		m->m_len +=3D len;
+-
+-		/*
+-		 * If we're sending everything we've got, set PUSH.
+-		 * (This will keep happy those implementations which only
+-		 * give data to the user when a buffer fills or
+-		 * a PUSH comes in.)
+-		 */
+-		if (off + len =3D=3D so->so_snd.sb_cc)
+-			flags |=3D TH_PUSH;
+-	} else {
+-		m =3D m_get(so->slirp);
+-		if (m =3D=3D NULL) {
+-			error =3D 1;
+-			goto out;
+-		}
+-		m->m_data +=3D IF_MAXLINKHDR;
+-		m->m_len =3D hdrlen;
+-	}
+-
+-	ti =3D mtod(m, struct tcpiphdr *);
+-
+-	memcpy((char *)ti, &tp->t_template, sizeof (struct tcpiphdr));
+-
+-	/*
+-	 * Fill in fields, remembering maximum advertised
+-	 * window for use in delaying messages about window sizes.
+-	 * If resending a FIN, be sure not to use a new sequence number.
+-	 */
+-	if (flags & TH_FIN && tp->t_flags & TF_SENTFIN &&
+-	    tp->snd_nxt =3D=3D tp->snd_max)
+-		tp->snd_nxt--;
+-	/*
+-	 * If we are doing retransmissions, then snd_nxt will
+-	 * not reflect the first unsent octet.  For ACK only
+-	 * packets, we do not want the sequence number of the
+-	 * retransmitted packet, we want the sequence number
+-	 * of the next unsent octet.  So, if there is no data
+-	 * (and no SYN or FIN), use snd_max instead of snd_nxt
+-	 * when filling in ti_seq.  But if we are in persist
+-	 * state, snd_max might reflect one byte beyond the
+-	 * right edge of the window, so use snd_nxt in that
+-	 * case, since we know we aren't doing a retransmission.
+-	 * (retransmit and persist are mutually exclusive...)
+-	 */
+-	if (len || (flags & (TH_SYN|TH_FIN)) || tp->t_timer[TCPT_PERSIST])
+-		ti->ti_seq =3D htonl(tp->snd_nxt);
+-	else
+-		ti->ti_seq =3D htonl(tp->snd_max);
+-	ti->ti_ack =3D htonl(tp->rcv_nxt);
+-	if (optlen) {
+-		memcpy((char *)(ti + 1), (char *)opt, optlen);
+-		ti->ti_off =3D (sizeof (struct tcphdr) + optlen) >> 2;
+-	}
+-	ti->ti_flags =3D flags;
+-	/*
+-	 * Calculate receive window.  Don't shrink window,
+-	 * but avoid silly window syndrome.
+-	 */
+-	if (win < (long)(so->so_rcv.sb_datalen / 4) && win < (long)tp->t_maxseg=
+)
+-		win =3D 0;
+-	if (win > (long)TCP_MAXWIN << tp->rcv_scale)
+-		win =3D (long)TCP_MAXWIN << tp->rcv_scale;
+-	if (win < (long)(tp->rcv_adv - tp->rcv_nxt))
+-		win =3D (long)(tp->rcv_adv - tp->rcv_nxt);
+-	ti->ti_win =3D htons((uint16_t) (win>>tp->rcv_scale));
+-
+-	if (SEQ_GT(tp->snd_up, tp->snd_una)) {
+-		ti->ti_urp =3D htons((uint16_t)(tp->snd_up - ntohl(ti->ti_seq)));
+-		ti->ti_flags |=3D TH_URG;
+-	} else
+-		/*
+-		 * If no urgent pointer to send, then we pull
+-		 * the urgent pointer to the left edge of the send window
+-		 * so that it doesn't drift into the send window on sequence
+-		 * number wraparound.
+-		 */
+-		tp->snd_up =3D tp->snd_una;		/* drag it along */
+-
+-	/*
+-	 * Put TCP length in extended header, and then
+-	 * checksum extended header and data.
+-	 */
+-	if (len + optlen)
+-		ti->ti_len =3D htons((uint16_t)(sizeof (struct tcphdr) +
+-		    optlen + len));
+-	ti->ti_sum =3D cksum(m, (int)(hdrlen + len));
+-
+-	/*
+-	 * In transmit state, time the transmission and arrange for
+-	 * the retransmit.  In persist state, just set snd_max.
+-	 */
+-	if (tp->t_force =3D=3D 0 || tp->t_timer[TCPT_PERSIST] =3D=3D 0) {
+-		tcp_seq startseq =3D tp->snd_nxt;
+-
+-		/*
+-		 * Advance snd_nxt over sequence space of this segment.
+-		 */
+-		if (flags & (TH_SYN|TH_FIN)) {
+-			if (flags & TH_SYN)
+-				tp->snd_nxt++;
+-			if (flags & TH_FIN) {
+-				tp->snd_nxt++;
+-				tp->t_flags |=3D TF_SENTFIN;
+-			}
+-		}
+-		tp->snd_nxt +=3D len;
+-		if (SEQ_GT(tp->snd_nxt, tp->snd_max)) {
+-			tp->snd_max =3D tp->snd_nxt;
+-			/*
+-			 * Time this transmission if not a retransmission and
+-			 * not currently timing anything.
+-			 */
+-			if (tp->t_rtt =3D=3D 0) {
+-				tp->t_rtt =3D 1;
+-				tp->t_rtseq =3D startseq;
+-			}
+-		}
+-
+-		/*
+-		 * Set retransmit timer if not currently set,
+-		 * and not doing an ack or a keep-alive probe.
+-		 * Initial value for retransmit timer is smoothed
+-		 * round-trip time + 2 * round-trip time variance.
+-		 * Initialize shift counter which is used for backoff
+-		 * of retransmit time.
+-		 */
+-		if (tp->t_timer[TCPT_REXMT] =3D=3D 0 &&
+-		    tp->snd_nxt !=3D tp->snd_una) {
+-			tp->t_timer[TCPT_REXMT] =3D tp->t_rxtcur;
+-			if (tp->t_timer[TCPT_PERSIST]) {
+-				tp->t_timer[TCPT_PERSIST] =3D 0;
+-				tp->t_rxtshift =3D 0;
+-			}
+-		}
+-	} else
+-		if (SEQ_GT(tp->snd_nxt + len, tp->snd_max))
+-			tp->snd_max =3D tp->snd_nxt + len;
+-
+-	/*
+-	 * Fill in IP length and desired time to live and
+-	 * send to IP level.  There should be a better way
+-	 * to handle ttl and tos; we could keep them in
+-	 * the template, but need a way to checksum without them.
+-	 */
+-	m->m_len =3D hdrlen + len; /* XXX Needed? m_len should be correct */
+-	tcpiph_save =3D *mtod(m, struct tcpiphdr *);
+-
+-	switch (so->so_ffamily) {
+-	case AF_INET:
+-	    m->m_data +=3D sizeof(struct tcpiphdr) - sizeof(struct tcphdr)
+-	                                         - sizeof(struct ip);
+-	    m->m_len  -=3D sizeof(struct tcpiphdr) - sizeof(struct tcphdr)
+-	                                         - sizeof(struct ip);
+-	    ip =3D mtod(m, struct ip *);
+-
+-	    ip->ip_len =3D m->m_len;
+-	    ip->ip_dst =3D tcpiph_save.ti_dst;
+-	    ip->ip_src =3D tcpiph_save.ti_src;
+-	    ip->ip_p =3D tcpiph_save.ti_pr;
+-
+-	    ip->ip_ttl =3D IPDEFTTL;
+-	    ip->ip_tos =3D so->so_iptos;
+-	    error =3D ip_output(so, m);
+-	    break;
+-
+-	case AF_INET6:
+-	    m->m_data +=3D sizeof(struct tcpiphdr) - sizeof(struct tcphdr)
+-	                                         - sizeof(struct ip6);
+-	    m->m_len  -=3D sizeof(struct tcpiphdr) - sizeof(struct tcphdr)
+-	                                         - sizeof(struct ip6);
+-	    ip6 =3D mtod(m, struct ip6 *);
+-
+-	    ip6->ip_pl =3D tcpiph_save.ti_len;
+-	    ip6->ip_dst =3D tcpiph_save.ti_dst6;
+-	    ip6->ip_src =3D tcpiph_save.ti_src6;
+-	    ip6->ip_nh =3D tcpiph_save.ti_nh6;
+-
+-	    error =3D ip6_output(so, m, 0);
+-	    break;
+-
+-	default:
+-	    g_assert_not_reached();
+-	}
+-
+-	if (error) {
+-out:
+-		return (error);
+-	}
+-
+-	/*
+-	 * Data sent (as far as we can tell).
+-	 * If this advertises a larger window than any other segment,
+-	 * then remember the size of the advertised window.
+-	 * Any pending ACK has now been sent.
+-	 */
+-	if (win > 0 && SEQ_GT(tp->rcv_nxt+win, tp->rcv_adv))
+-		tp->rcv_adv =3D tp->rcv_nxt + win;
+-	tp->last_ack_sent =3D tp->rcv_nxt;
+-	tp->t_flags &=3D ~(TF_ACKNOW|TF_DELACK);
+-	if (sendalot)
+-		goto again;
+-
+-	return (0);
+-}
+-
+-void
+-tcp_setpersist(struct tcpcb *tp)
+-{
+-    int t =3D ((tp->t_srtt >> 2) + tp->t_rttvar) >> 1;
+-
+-	/*
+-	 * Start/restart persistence timer.
+-	 */
+-	TCPT_RANGESET(tp->t_timer[TCPT_PERSIST],
+-	    t * tcp_backoff[tp->t_rxtshift],
+-	    TCPTV_PERSMIN, TCPTV_PERSMAX);
+-	if (tp->t_rxtshift < TCP_MAXRXTSHIFT)
+-		tp->t_rxtshift++;
+-}
+diff --git a/slirp/src/tcp_subr.c b/slirp/src/tcp_subr.c
+deleted file mode 100644
+index fde9207b0c..0000000000
+--- a/slirp/src/tcp_subr.c
++++ /dev/null
+@@ -1,987 +0,0 @@
+-/* SPDX-License-Identifier: BSD-3-Clause */
+-/*
+- * Copyright (c) 1982, 1986, 1988, 1990, 1993
+- *	The Regents of the University of California.  All rights reserved.
+- *
+- * Redistribution and use in source and binary forms, with or without
+- * modification, are permitted provided that the following conditions
+- * are met:
+- * 1. Redistributions of source code must retain the above copyright
+- *    notice, this list of conditions and the following disclaimer.
+- * 2. Redistributions in binary form must reproduce the above copyright
+- *    notice, this list of conditions and the following disclaimer in th=
+e
+- *    documentation and/or other materials provided with the distributio=
+n.
+- * 3. Neither the name of the University nor the names of its contributo=
+rs
+- *    may be used to endorse or promote products derived from this softw=
+are
+- *    without specific prior written permission.
+- *
+- * THIS SOFTWARE IS PROVIDED BY THE REGENTS AND CONTRIBUTORS ``AS IS'' A=
+ND
+- * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+- * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PU=
+RPOSE
+- * ARE DISCLAIMED.  IN NO EVENT SHALL THE REGENTS OR CONTRIBUTORS BE LIA=
+BLE
+- * FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUE=
+NTIAL
+- * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOO=
+DS
+- * OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
+- * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, S=
+TRICT
+- * LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY=
+ WAY
+- * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY O=
+F
+- * SUCH DAMAGE.
+- *
+- *	@(#)tcp_subr.c	8.1 (Berkeley) 6/10/93
+- * tcp_subr.c,v 1.5 1994/10/08 22:39:58 phk Exp
+- */
+-
+-/*
+- * Changes and additions relating to SLiRP
+- * Copyright (c) 1995 Danny Gasparovski.
+- */
+-
+-#include "slirp.h"
+-
+-/* patchable/settable parameters for tcp */
+-/* Don't do rfc1323 performance enhancements */
+-#define TCP_DO_RFC1323 0
+-
+-/*
+- * Tcp initialization
+- */
+-void
+-tcp_init(Slirp *slirp)
+-{
+-    slirp->tcp_iss =3D 1;		/* wrong */
+-    slirp->tcb.so_next =3D slirp->tcb.so_prev =3D &slirp->tcb;
+-    slirp->tcp_last_so =3D &slirp->tcb;
+-}
+-
+-void tcp_cleanup(Slirp *slirp)
+-{
+-    while (slirp->tcb.so_next !=3D &slirp->tcb) {
+-        tcp_close(sototcpcb(slirp->tcb.so_next));
+-    }
+-}
+-
+-/*
+- * Create template to be used to send tcp packets on a connection.
+- * Call after host entry created, fills
+- * in a skeletal tcp/ip header, minimizing the amount of work
+- * necessary when the connection is used.
+- */
+-void
+-tcp_template(struct tcpcb *tp)
+-{
+-	struct socket *so =3D tp->t_socket;
+-	register struct tcpiphdr *n =3D &tp->t_template;
+-
+-	n->ti_mbuf =3D NULL;
+-	memset(&n->ti, 0, sizeof(n->ti));
+-	n->ti_x0 =3D 0;
+-	switch (so->so_ffamily) {
+-	case AF_INET:
+-	    n->ti_pr =3D IPPROTO_TCP;
+-	    n->ti_len =3D htons(sizeof(struct tcphdr));
+-	    n->ti_src =3D so->so_faddr;
+-	    n->ti_dst =3D so->so_laddr;
+-	    n->ti_sport =3D so->so_fport;
+-	    n->ti_dport =3D so->so_lport;
+-	    break;
+-
+-	case AF_INET6:
+-	    n->ti_nh6 =3D IPPROTO_TCP;
+-	    n->ti_len =3D htons(sizeof(struct tcphdr));
+-	    n->ti_src6 =3D so->so_faddr6;
+-	    n->ti_dst6 =3D so->so_laddr6;
+-	    n->ti_sport =3D so->so_fport6;
+-	    n->ti_dport =3D so->so_lport6;
+-	    break;
+-
+-	default:
+-	    g_assert_not_reached();
+-	}
+-
+-	n->ti_seq =3D 0;
+-	n->ti_ack =3D 0;
+-	n->ti_x2 =3D 0;
+-	n->ti_off =3D 5;
+-	n->ti_flags =3D 0;
+-	n->ti_win =3D 0;
+-	n->ti_sum =3D 0;
+-	n->ti_urp =3D 0;
+-}
+-
+-/*
+- * Send a single message to the TCP at address specified by
+- * the given TCP/IP header.  If m =3D=3D 0, then we make a copy
+- * of the tcpiphdr at ti and send directly to the addressed host.
+- * This is used to force keep alive messages out using the TCP
+- * template for a connection tp->t_template.  If flags are given
+- * then we send a message back to the TCP which originated the
+- * segment ti, and discard the mbuf containing it and any other
+- * attached mbufs.
+- *
+- * In any case the ack and sequence number of the transmitted
+- * segment are as specified by the parameters.
+- */
+-void
+-tcp_respond(struct tcpcb *tp, struct tcpiphdr *ti, struct mbuf *m,
+-            tcp_seq ack, tcp_seq seq, int flags, unsigned short af)
+-{
+-	register int tlen;
+-	int win =3D 0;
+-
+-	DEBUG_CALL("tcp_respond");
+-	DEBUG_ARG("tp =3D %p", tp);
+-	DEBUG_ARG("ti =3D %p", ti);
+-	DEBUG_ARG("m =3D %p", m);
+-	DEBUG_ARG("ack =3D %u", ack);
+-	DEBUG_ARG("seq =3D %u", seq);
+-	DEBUG_ARG("flags =3D %x", flags);
+-
+-	if (tp)
+-		win =3D sbspace(&tp->t_socket->so_rcv);
+-        if (m =3D=3D NULL) {
+-		if (!tp || (m =3D m_get(tp->t_socket->slirp)) =3D=3D NULL)
+-			return;
+-		tlen =3D 0;
+-		m->m_data +=3D IF_MAXLINKHDR;
+-		*mtod(m, struct tcpiphdr *) =3D *ti;
+-		ti =3D mtod(m, struct tcpiphdr *);
+-		switch (af) {
+-		case AF_INET:
+-		    ti->ti.ti_i4.ih_x1 =3D 0;
+-		    break;
+-		case AF_INET6:
+-		    ti->ti.ti_i6.ih_x1 =3D 0;
+-		    break;
+-		default:
+-		    g_assert_not_reached();
+-		}
+-		flags =3D TH_ACK;
+-	} else {
+-		/*
+-		 * ti points into m so the next line is just making
+-		 * the mbuf point to ti
+-		 */
+-		m->m_data =3D (char *)ti;
+-
+-		m->m_len =3D sizeof (struct tcpiphdr);
+-		tlen =3D 0;
+-#define xchg(a,b,type) { type t; t=3Da; a=3Db; b=3Dt; }
+-		switch (af) {
+-		case AF_INET:
+-		    xchg(ti->ti_dst.s_addr, ti->ti_src.s_addr, uint32_t);
+-		    xchg(ti->ti_dport, ti->ti_sport, uint16_t);
+-		    break;
+-		case AF_INET6:
+-		    xchg(ti->ti_dst6, ti->ti_src6, struct in6_addr);
+-		    xchg(ti->ti_dport, ti->ti_sport, uint16_t);
+-		    break;
+-		default:
+-		    g_assert_not_reached();
+-		}
+-#undef xchg
+-	}
+-	ti->ti_len =3D htons((uint16_t)(sizeof (struct tcphdr) + tlen));
+-	tlen +=3D sizeof (struct tcpiphdr);
+-	m->m_len =3D tlen;
+-
+-	ti->ti_mbuf =3D NULL;
+-	ti->ti_x0 =3D 0;
+-	ti->ti_seq =3D htonl(seq);
+-	ti->ti_ack =3D htonl(ack);
+-	ti->ti_x2 =3D 0;
+-	ti->ti_off =3D sizeof (struct tcphdr) >> 2;
+-	ti->ti_flags =3D flags;
+-	if (tp)
+-		ti->ti_win =3D htons((uint16_t) (win >> tp->rcv_scale));
+-	else
+-		ti->ti_win =3D htons((uint16_t)win);
+-	ti->ti_urp =3D 0;
+-	ti->ti_sum =3D 0;
+-	ti->ti_sum =3D cksum(m, tlen);
+-
+-	struct tcpiphdr tcpiph_save =3D *(mtod(m, struct tcpiphdr *));
+-	struct ip *ip;
+-	struct ip6 *ip6;
+-
+-	switch (af) {
+-	case AF_INET:
+-	    m->m_data +=3D sizeof(struct tcpiphdr) - sizeof(struct tcphdr)
+-	                                         - sizeof(struct ip);
+-	    m->m_len  -=3D sizeof(struct tcpiphdr) - sizeof(struct tcphdr)
+-	                                         - sizeof(struct ip);
+-	    ip =3D mtod(m, struct ip *);
+-	    ip->ip_len =3D m->m_len;
+-	    ip->ip_dst =3D tcpiph_save.ti_dst;
+-	    ip->ip_src =3D tcpiph_save.ti_src;
+-	    ip->ip_p =3D tcpiph_save.ti_pr;
+-
+-	    if (flags & TH_RST) {
+-	        ip->ip_ttl =3D MAXTTL;
+-	    } else {
+-	        ip->ip_ttl =3D IPDEFTTL;
+-	    }
+-
+-	    ip_output(NULL, m);
+-	    break;
+-
+-	case AF_INET6:
+-	    m->m_data +=3D sizeof(struct tcpiphdr) - sizeof(struct tcphdr)
+-	                                         - sizeof(struct ip6);
+-	    m->m_len  -=3D sizeof(struct tcpiphdr) - sizeof(struct tcphdr)
+-	                                         - sizeof(struct ip6);
+-	    ip6 =3D mtod(m, struct ip6 *);
+-	    ip6->ip_pl =3D tcpiph_save.ti_len;
+-	    ip6->ip_dst =3D tcpiph_save.ti_dst6;
+-	    ip6->ip_src =3D tcpiph_save.ti_src6;
+-	    ip6->ip_nh =3D tcpiph_save.ti_nh6;
+-
+-	    ip6_output(NULL, m, 0);
+-	    break;
+-
+-	default:
+-	    g_assert_not_reached();
+-	}
+-}
+-
+-/*
+- * Create a new TCP control block, making an
+- * empty reassembly queue and hooking it to the argument
+- * protocol control block.
+- */
+-struct tcpcb *
+-tcp_newtcpcb(struct socket *so)
+-{
+-	register struct tcpcb *tp;
+-
+-	tp =3D (struct tcpcb *)malloc(sizeof(*tp));
+-	if (tp =3D=3D NULL)
+-		return ((struct tcpcb *)0);
+-
+-	memset((char *) tp, 0, sizeof(struct tcpcb));
+-	tp->seg_next =3D tp->seg_prev =3D (struct tcpiphdr*)tp;
+-	tp->t_maxseg =3D (so->so_ffamily =3D=3D AF_INET) ? TCP_MSS : TCP6_MSS;
+-
+-	tp->t_flags =3D TCP_DO_RFC1323 ? (TF_REQ_SCALE|TF_REQ_TSTMP) : 0;
+-	tp->t_socket =3D so;
+-
+-	/*
+-	 * Init srtt to TCPTV_SRTTBASE (0), so we can tell that we have no
+-	 * rtt estimate.  Set rttvar so that srtt + 2 * rttvar gives
+-	 * reasonable initial retransmit time.
+-	 */
+-	tp->t_srtt =3D TCPTV_SRTTBASE;
+-	tp->t_rttvar =3D TCPTV_SRTTDFLT << 2;
+-	tp->t_rttmin =3D TCPTV_MIN;
+-
+-	TCPT_RANGESET(tp->t_rxtcur,
+-	    ((TCPTV_SRTTBASE >> 2) + (TCPTV_SRTTDFLT << 2)) >> 1,
+-	    TCPTV_MIN, TCPTV_REXMTMAX);
+-
+-	tp->snd_cwnd =3D TCP_MAXWIN << TCP_MAX_WINSHIFT;
+-	tp->snd_ssthresh =3D TCP_MAXWIN << TCP_MAX_WINSHIFT;
+-	tp->t_state =3D TCPS_CLOSED;
+-
+-	so->so_tcpcb =3D tp;
+-
+-	return (tp);
+-}
+-
+-/*
+- * Drop a TCP connection, reporting
+- * the specified error.  If connection is synchronized,
+- * then send a RST to peer.
+- */
+-struct tcpcb *tcp_drop(struct tcpcb *tp, int err)
+-{
+-	DEBUG_CALL("tcp_drop");
+-	DEBUG_ARG("tp =3D %p", tp);
+-	DEBUG_ARG("errno =3D %d", errno);
+-
+-	if (TCPS_HAVERCVDSYN(tp->t_state)) {
+-		tp->t_state =3D TCPS_CLOSED;
+-		(void) tcp_output(tp);
+-	}
+-	return (tcp_close(tp));
+-}
+-
+-/*
+- * Close a TCP control block:
+- *	discard all space held by the tcp
+- *	discard internet protocol block
+- *	wake up any sleepers
+- */
+-struct tcpcb *
+-tcp_close(struct tcpcb *tp)
+-{
+-	register struct tcpiphdr *t;
+-	struct socket *so =3D tp->t_socket;
+-	Slirp *slirp =3D so->slirp;
+-	register struct mbuf *m;
+-
+-	DEBUG_CALL("tcp_close");
+-	DEBUG_ARG("tp =3D %p", tp);
+-
+-	/* free the reassembly queue, if any */
+-	t =3D tcpfrag_list_first(tp);
+-	while (!tcpfrag_list_end(t, tp)) {
+-		t =3D tcpiphdr_next(t);
+-		m =3D tcpiphdr_prev(t)->ti_mbuf;
+-		remque(tcpiphdr2qlink(tcpiphdr_prev(t)));
+-		m_free(m);
+-	}
+-	free(tp);
+-        so->so_tcpcb =3D NULL;
+-	/* clobber input socket cache if we're closing the cached connection */
+-	if (so =3D=3D slirp->tcp_last_so)
+-		slirp->tcp_last_so =3D &slirp->tcb;
+-	so->slirp->cb->unregister_poll_fd(so->s, so->slirp->opaque);
+-	closesocket(so->s);
+-	sbfree(&so->so_rcv);
+-	sbfree(&so->so_snd);
+-	sofree(so);
+-	return ((struct tcpcb *)0);
+-}
+-
+-/*
+- * TCP protocol interface to socket abstraction.
+- */
+-
+-/*
+- * User issued close, and wish to trail through shutdown states:
+- * if never received SYN, just forget it.  If got a SYN from peer,
+- * but haven't sent FIN, then go to FIN_WAIT_1 state to send peer a FIN.
+- * If already got a FIN from peer, then almost done; go to LAST_ACK
+- * state.  In all other cases, have already sent FIN to peer (e.g.
+- * after PRU_SHUTDOWN), and just have to play tedious game waiting
+- * for peer to send FIN or not respond to keep-alives, etc.
+- * We can let the user exit from the close as soon as the FIN is acked.
+- */
+-void
+-tcp_sockclosed(struct tcpcb *tp)
+-{
+-
+-	DEBUG_CALL("tcp_sockclosed");
+-	DEBUG_ARG("tp =3D %p", tp);
+-
+-	if (!tp) {
+-		return;
+-	}
+-
+-	switch (tp->t_state) {
+-
+-	case TCPS_CLOSED:
+-	case TCPS_LISTEN:
+-	case TCPS_SYN_SENT:
+-		tp->t_state =3D TCPS_CLOSED;
+-		tp =3D tcp_close(tp);
+-		break;
+-
+-	case TCPS_SYN_RECEIVED:
+-	case TCPS_ESTABLISHED:
+-		tp->t_state =3D TCPS_FIN_WAIT_1;
+-		break;
+-
+-	case TCPS_CLOSE_WAIT:
+-		tp->t_state =3D TCPS_LAST_ACK;
+-		break;
+-	}
+-	tcp_output(tp);
+-}
+-
+-/*
+- * Connect to a host on the Internet
+- * Called by tcp_input
+- * Only do a connect, the tcp fields will be set in tcp_input
+- * return 0 if there's a result of the connect,
+- * else return -1 means we're still connecting
+- * The return value is almost always -1 since the socket is
+- * nonblocking.  Connect returns after the SYN is sent, and does
+- * not wait for ACK+SYN.
+- */
+-int tcp_fconnect(struct socket *so, unsigned short af)
+-{
+-  int ret=3D0;
+-
+-  DEBUG_CALL("tcp_fconnect");
+-  DEBUG_ARG("so =3D %p", so);
+-
+-  ret =3D so->s =3D slirp_socket(af, SOCK_STREAM, 0);
+-  if (ret >=3D 0) {
+-    int opt, s=3Dso->s;
+-    struct sockaddr_storage addr;
+-
+-    slirp_set_nonblock(s);
+-    so->slirp->cb->register_poll_fd(so->s, so->slirp->opaque);
+-    slirp_socket_set_fast_reuse(s);
+-    opt =3D 1;
+-    setsockopt(s, SOL_SOCKET, SO_OOBINLINE, &opt, sizeof(opt));
+-    opt =3D 1;
+-    setsockopt(s, IPPROTO_TCP, TCP_NODELAY, &opt, sizeof(opt));
+-
+-    addr =3D so->fhost.ss;
+-    DEBUG_CALL(" connect()ing");
+-    sotranslate_out(so, &addr);
+-
+-    /* We don't care what port we get */
+-    ret =3D connect(s, (struct sockaddr *)&addr, sockaddr_size(&addr));
+-
+-    /*
+-     * If it's not in progress, it failed, so we just return 0,
+-     * without clearing SS_NOFDREF
+-     */
+-    soisfconnecting(so);
+-  }
+-
+-  return(ret);
+-}
+-
+-/*
+- * Accept the socket and connect to the local-host
+- *
+- * We have a problem. The correct thing to do would be
+- * to first connect to the local-host, and only if the
+- * connection is accepted, then do an accept() here.
+- * But, a) we need to know who's trying to connect
+- * to the socket to be able to SYN the local-host, and
+- * b) we are already connected to the foreign host by
+- * the time it gets to accept(), so... We simply accept
+- * here and SYN the local-host.
+- */
+-void tcp_connect(struct socket *inso)
+-{
+-    Slirp *slirp =3D inso->slirp;
+-    struct socket *so;
+-    struct sockaddr_storage addr;
+-    socklen_t addrlen =3D sizeof(struct sockaddr_storage);
+-    struct tcpcb *tp;
+-    int s, opt;
+-
+-    DEBUG_CALL("tcp_connect");
+-    DEBUG_ARG("inso =3D %p", inso);
+-
+-    /*
+-     * If it's an SS_ACCEPTONCE socket, no need to socreate()
+-     * another socket, just use the accept() socket.
+-     */
+-    if (inso->so_state & SS_FACCEPTONCE) {
+-        /* FACCEPTONCE already have a tcpcb */
+-        so =3D inso;
+-    } else {
+-        so =3D socreate(slirp);
+-        if (tcp_attach(so) < 0) {
+-            g_free(so); /* NOT sofree */
+-            return;
+-        }
+-        so->lhost =3D inso->lhost;
+-        so->so_ffamily =3D inso->so_ffamily;
+-    }
+-
+-    tcp_mss(sototcpcb(so), 0);
+-
+-    s =3D accept(inso->s, (struct sockaddr *)&addr, &addrlen);
+-    if (s < 0) {
+-        tcp_close(sototcpcb(so)); /* This will sofree() as well */
+-        return;
+-    }
+-    slirp_set_nonblock(s);
+-    so->slirp->cb->register_poll_fd(so->s, so->slirp->opaque);
+-    slirp_socket_set_fast_reuse(s);
+-    opt =3D 1;
+-    setsockopt(s, SOL_SOCKET, SO_OOBINLINE, &opt, sizeof(int));
+-    slirp_socket_set_nodelay(s);
+-
+-    so->fhost.ss =3D addr;
+-    sotranslate_accept(so);
+-
+-    /* Close the accept() socket, set right state */
+-    if (inso->so_state & SS_FACCEPTONCE) {
+-        /* If we only accept once, close the accept() socket */
+-        so->slirp->cb->unregister_poll_fd(so->s, so->slirp->opaque);
+-        closesocket(so->s);
+-
+-        /* Don't select it yet, even though we have an FD */
+-        /* if it's not FACCEPTONCE, it's already NOFDREF */
+-        so->so_state =3D SS_NOFDREF;
+-    }
+-    so->s =3D s;
+-    so->so_state |=3D SS_INCOMING;
+-
+-    so->so_iptos =3D tcp_tos(so);
+-    tp =3D sototcpcb(so);
+-
+-    tcp_template(tp);
+-
+-    tp->t_state =3D TCPS_SYN_SENT;
+-    tp->t_timer[TCPT_KEEP] =3D TCPTV_KEEP_INIT;
+-    tp->iss =3D slirp->tcp_iss;
+-    slirp->tcp_iss +=3D TCP_ISSINCR/2;
+-    tcp_sendseqinit(tp);
+-    tcp_output(tp);
+-}
+-
+-/*
+- * Attach a TCPCB to a socket.
+- */
+-int
+-tcp_attach(struct socket *so)
+-{
+-	if ((so->so_tcpcb =3D tcp_newtcpcb(so)) =3D=3D NULL)
+-	   return -1;
+-
+-	insque(so, &so->slirp->tcb);
+-
+-	return 0;
+-}
+-
+-/*
+- * Set the socket's type of service field
+- */
+-static const struct tos_t tcptos[] =3D {
+-	  {0, 20, IPTOS_THROUGHPUT, 0},	/* ftp data */
+-	  {21, 21, IPTOS_LOWDELAY,  EMU_FTP},	/* ftp control */
+-	  {0, 23, IPTOS_LOWDELAY, 0},	/* telnet */
+-	  {0, 80, IPTOS_THROUGHPUT, 0},	/* WWW */
+-	  {0, 513, IPTOS_LOWDELAY, EMU_RLOGIN|EMU_NOCONNECT},	/* rlogin */
+-	  {0, 544, IPTOS_LOWDELAY, EMU_KSH},		/* kshell */
+-	  {0, 543, IPTOS_LOWDELAY, 0},	/* klogin */
+-	  {0, 6667, IPTOS_THROUGHPUT, EMU_IRC},	/* IRC */
+-	  {0, 6668, IPTOS_THROUGHPUT, EMU_IRC},	/* IRC undernet */
+-	  {0, 7070, IPTOS_LOWDELAY, EMU_REALAUDIO }, /* RealAudio control */
+-	  {0, 113, IPTOS_LOWDELAY, EMU_IDENT }, /* identd protocol */
+-	  {0, 0, 0, 0}
+-};
+-
+-static struct emu_t *tcpemu =3D NULL;
+-
+-/*
+- * Return TOS according to the above table
+- */
+-uint8_t
+-tcp_tos(struct socket *so)
+-{
+-	int i =3D 0;
+-	struct emu_t *emup;
+-
+-	while(tcptos[i].tos) {
+-		if ((tcptos[i].fport && (ntohs(so->so_fport) =3D=3D tcptos[i].fport)) =
+||
+-		    (tcptos[i].lport && (ntohs(so->so_lport) =3D=3D tcptos[i].lport)))=
+ {
+-			so->so_emu =3D tcptos[i].emu;
+-			return tcptos[i].tos;
+-		}
+-		i++;
+-	}
+-
+-	/* Nope, lets see if there's a user-added one */
+-	for (emup =3D tcpemu; emup; emup =3D emup->next) {
+-		if ((emup->fport && (ntohs(so->so_fport) =3D=3D emup->fport)) ||
+-		    (emup->lport && (ntohs(so->so_lport) =3D=3D emup->lport))) {
+-			so->so_emu =3D emup->emu;
+-			return emup->tos;
+-		}
+-	}
+-
+-	return 0;
+-}
+-
+-/*
+- * Emulate programs that try and connect to us
+- * This includes ftp (the data connection is
+- * initiated by the server) and IRC (DCC CHAT and
+- * DCC SEND) for now
+- *
+- * NOTE: It's possible to crash SLiRP by sending it
+- * unstandard strings to emulate... if this is a problem,
+- * more checks are needed here
+- *
+- * XXX Assumes the whole command came in one packet
+- *
+- * XXX Some ftp clients will have their TOS set to
+- * LOWDELAY and so Nagel will kick in.  Because of this,
+- * we'll get the first letter, followed by the rest, so
+- * we simply scan for ORT instead of PORT...
+- * DCC doesn't have this problem because there's other stuff
+- * in the packet before the DCC command.
+- *
+- * Return 1 if the mbuf m is still valid and should be
+- * sbappend()ed
+- *
+- * NOTE: if you return 0 you MUST m_free() the mbuf!
+- */
+-int
+-tcp_emu(struct socket *so, struct mbuf *m)
+-{
+-	Slirp *slirp =3D so->slirp;
+-	unsigned n1, n2, n3, n4, n5, n6;
+-        char buff[257];
+-	uint32_t laddr;
+-	unsigned lport;
+-	char *bptr;
+-
+-	DEBUG_CALL("tcp_emu");
+-	DEBUG_ARG("so =3D %p", so);
+-	DEBUG_ARG("m =3D %p", m);
+-
+-	switch(so->so_emu) {
+-		int x, i;
+-
+-        /* TODO: IPv6 */
+-	 case EMU_IDENT:
+-		/*
+-		 * Identification protocol as per rfc-1413
+-		 */
+-
+-		{
+-			struct socket *tmpso;
+-			struct sockaddr_in addr;
+-			socklen_t addrlen =3D sizeof(struct sockaddr_in);
+-			struct sbuf *so_rcv =3D &so->so_rcv;
+-
+-			if (m->m_len > so_rcv->sb_datalen
+-					- (so_rcv->sb_wptr - so_rcv->sb_data)) {
+-			    return 1;
+-			}
+-
+-			memcpy(so_rcv->sb_wptr, m->m_data, m->m_len);
+-			so_rcv->sb_wptr +=3D m->m_len;
+-			so_rcv->sb_rptr +=3D m->m_len;
+-			m->m_data[m->m_len] =3D 0; /* NULL terminate */
+-			if (strchr(m->m_data, '\r') || strchr(m->m_data, '\n')) {
+-				if (sscanf(so_rcv->sb_data, "%u%*[ ,]%u", &n1, &n2) =3D=3D 2) {
+-					HTONS(n1);
+-					HTONS(n2);
+-					/* n2 is the one on our host */
+-					for (tmpso =3D slirp->tcb.so_next;
+-					     tmpso !=3D &slirp->tcb;
+-					     tmpso =3D tmpso->so_next) {
+-						if (tmpso->so_laddr.s_addr =3D=3D so->so_laddr.s_addr &&
+-						    tmpso->so_lport =3D=3D n2 &&
+-						    tmpso->so_faddr.s_addr =3D=3D so->so_faddr.s_addr &&
+-						    tmpso->so_fport =3D=3D n1) {
+-							if (getsockname(tmpso->s,
+-								(struct sockaddr *)&addr, &addrlen) =3D=3D 0)
+-							   n2 =3D addr.sin_port;
+-							break;
+-						}
+-					}
+-					NTOHS(n1);
+-					NTOHS(n2);
+-					so_rcv->sb_cc =3D snprintf(so_rcv->sb_data,
+-								 so_rcv->sb_datalen,
+-								 "%d,%d\r\n", n1, n2);
+-					so_rcv->sb_rptr =3D so_rcv->sb_data;
+-					so_rcv->sb_wptr =3D so_rcv->sb_data + so_rcv->sb_cc;
+-				}
+-			}
+-			m_free(m);
+-			return 0;
+-		}
+-
+-        case EMU_FTP: /* ftp */
+-                *(m->m_data+m->m_len) =3D 0; /* NUL terminate for strstr=
+ */
+-		if ((bptr =3D (char *)strstr(m->m_data, "ORT")) !=3D NULL) {
+-			/*
+-			 * Need to emulate the PORT command
+-			 */
+-			x =3D sscanf(bptr, "ORT %u,%u,%u,%u,%u,%u\r\n%256[^\177]",
+-				   &n1, &n2, &n3, &n4, &n5, &n6, buff);
+-			if (x < 6)
+-			   return 1;
+-
+-			laddr =3D htonl((n1 << 24) | (n2 << 16) | (n3 << 8) | (n4));
+-			lport =3D htons((n5 << 8) | (n6));
+-
+-			if ((so =3D tcp_listen(slirp, INADDR_ANY, 0, laddr,
+-			                     lport, SS_FACCEPTONCE)) =3D=3D NULL) {
+-			   return 1;
+-			}
+-			n6 =3D ntohs(so->so_fport);
+-
+-			n5 =3D (n6 >> 8) & 0xff;
+-			n6 &=3D 0xff;
+-
+-			laddr =3D ntohl(so->so_faddr.s_addr);
+-
+-			n1 =3D ((laddr >> 24) & 0xff);
+-			n2 =3D ((laddr >> 16) & 0xff);
+-			n3 =3D ((laddr >> 8)  & 0xff);
+-			n4 =3D  (laddr & 0xff);
+-
+-			m->m_len =3D bptr - m->m_data; /* Adjust length */
+-                        m->m_len +=3D snprintf(bptr, m->m_size - m->m_le=
+n,
+-                                             "ORT %d,%d,%d,%d,%d,%d\r\n%=
+s",
+-                                             n1, n2, n3, n4, n5, n6, x=3D=
+=3D7?buff:"");
+-			return 1;
+-		} else if ((bptr =3D (char *)strstr(m->m_data, "27 Entering")) !=3D NU=
+LL) {
+-			/*
+-			 * Need to emulate the PASV response
+-			 */
+-			x =3D sscanf(bptr, "27 Entering Passive Mode (%u,%u,%u,%u,%u,%u)\r\n%=
+256[^\177]",
+-				   &n1, &n2, &n3, &n4, &n5, &n6, buff);
+-			if (x < 6)
+-			   return 1;
+-
+-			laddr =3D htonl((n1 << 24) | (n2 << 16) | (n3 << 8) | (n4));
+-			lport =3D htons((n5 << 8) | (n6));
+-
+-			if ((so =3D tcp_listen(slirp, INADDR_ANY, 0, laddr,
+-			                     lport, SS_FACCEPTONCE)) =3D=3D NULL) {
+-			   return 1;
+-			}
+-			n6 =3D ntohs(so->so_fport);
+-
+-			n5 =3D (n6 >> 8) & 0xff;
+-			n6 &=3D 0xff;
+-
+-			laddr =3D ntohl(so->so_faddr.s_addr);
+-
+-			n1 =3D ((laddr >> 24) & 0xff);
+-			n2 =3D ((laddr >> 16) & 0xff);
+-			n3 =3D ((laddr >> 8)  & 0xff);
+-			n4 =3D  (laddr & 0xff);
+-
+-			m->m_len =3D bptr - m->m_data; /* Adjust length */
+-			m->m_len +=3D snprintf(bptr, m->m_size - m->m_len,
+-                                             "27 Entering Passive Mode (=
+%d,%d,%d,%d,%d,%d)\r\n%s",
+-                                             n1, n2, n3, n4, n5, n6, x=3D=
+=3D7?buff:"");
+-
+-			return 1;
+-		}
+-
+-		return 1;
+-
+-	 case EMU_KSH:
+-		/*
+-		 * The kshell (Kerberos rsh) and shell services both pass
+-		 * a local port port number to carry signals to the server
+-		 * and stderr to the client.  It is passed at the beginning
+-		 * of the connection as a NUL-terminated decimal ASCII string.
+-		 */
+-		so->so_emu =3D 0;
+-		for (lport =3D 0, i =3D 0; i < m->m_len-1; ++i) {
+-			if (m->m_data[i] < '0' || m->m_data[i] > '9')
+-				return 1;       /* invalid number */
+-			lport *=3D 10;
+-			lport +=3D m->m_data[i] - '0';
+-		}
+-		if (m->m_data[m->m_len-1] =3D=3D '\0' && lport !=3D 0 &&
+-		    (so =3D tcp_listen(slirp, INADDR_ANY, 0, so->so_laddr.s_addr,
+-		                     htons(lport), SS_FACCEPTONCE)) !=3D NULL)
+-                    m->m_len =3D snprintf(m->m_data, m->m_size, "%d",
+-                                        ntohs(so->so_fport)) + 1;
+-		return 1;
+-
+-	 case EMU_IRC:
+-		/*
+-		 * Need to emulate DCC CHAT, DCC SEND and DCC MOVE
+-		 */
+-		*(m->m_data+m->m_len) =3D 0; /* NULL terminate the string for strstr *=
+/
+-		if ((bptr =3D (char *)strstr(m->m_data, "DCC")) =3D=3D NULL)
+-			 return 1;
+-
+-		/* The %256s is for the broken mIRC */
+-		if (sscanf(bptr, "DCC CHAT %256s %u %u", buff, &laddr, &lport) =3D=3D =
+3) {
+-			if ((so =3D tcp_listen(slirp, INADDR_ANY, 0,
+-			                     htonl(laddr), htons(lport),
+-			                     SS_FACCEPTONCE)) =3D=3D NULL) {
+-				return 1;
+-			}
+-			m->m_len =3D bptr - m->m_data; /* Adjust length */
+-                        m->m_len +=3D snprintf(bptr, m->m_size,
+-                                             "DCC CHAT chat %lu %u%c\n",
+-                                             (unsigned long)ntohl(so->so=
+_faddr.s_addr),
+-                                             ntohs(so->so_fport), 1);
+-		} else if (sscanf(bptr, "DCC SEND %256s %u %u %u", buff, &laddr, &lpor=
+t, &n1) =3D=3D 4) {
+-			if ((so =3D tcp_listen(slirp, INADDR_ANY, 0,
+-			                     htonl(laddr), htons(lport),
+-			                     SS_FACCEPTONCE)) =3D=3D NULL) {
+-				return 1;
+-			}
+-			m->m_len =3D bptr - m->m_data; /* Adjust length */
+-                        m->m_len +=3D snprintf(bptr, m->m_size,
+-                                             "DCC SEND %s %lu %u %u%c\n"=
+, buff,
+-                                             (unsigned long)ntohl(so->so=
+_faddr.s_addr),
+-                                             ntohs(so->so_fport), n1, 1)=
+;
+-		} else if (sscanf(bptr, "DCC MOVE %256s %u %u %u", buff, &laddr, &lpor=
+t, &n1) =3D=3D 4) {
+-			if ((so =3D tcp_listen(slirp, INADDR_ANY, 0,
+-			                     htonl(laddr), htons(lport),
+-			                     SS_FACCEPTONCE)) =3D=3D NULL) {
+-				return 1;
+-			}
+-			m->m_len =3D bptr - m->m_data; /* Adjust length */
+-                        m->m_len +=3D snprintf(bptr, m->m_size,
+-                                             "DCC MOVE %s %lu %u %u%c\n"=
+, buff,
+-                                             (unsigned long)ntohl(so->so=
+_faddr.s_addr),
+-                                             ntohs(so->so_fport), n1, 1)=
+;
+-		}
+-		return 1;
+-
+-	 case EMU_REALAUDIO:
+-                /*
+-		 * RealAudio emulation - JP. We must try to parse the incoming
+-		 * data and try to find the two characters that contain the
+-		 * port number. Then we redirect an udp port and replace the
+-		 * number with the real port we got.
+-		 *
+-		 * The 1.0 beta versions of the player are not supported
+-		 * any more.
+-		 *
+-		 * A typical packet for player version 1.0 (release version):
+-		 *
+-		 * 0000:50 4E 41 00 05
+-		 * 0000:00 01 00 02 1B D7 00 00 67 E6 6C DC 63 00 12 50 ........g.l.c.=
+.P
+-		 * 0010:4E 43 4C 49 45 4E 54 20 31 30 31 20 41 4C 50 48 NCLIENT 101 AL=
+PH
+-		 * 0020:41 6C 00 00 52 00 17 72 61 66 69 6C 65 73 2F 76 Al..R..rafiles=
+/v
+-		 * 0030:6F 61 2F 65 6E 67 6C 69 73 68 5F 2E 72 61 79 42 oa/english_.ra=
+yB
+-		 *
+-		 * Now the port number 0x1BD7 is found at offset 0x04 of the
+-		 * Now the port number 0x1BD7 is found at offset 0x04 of the
+-		 * second packet. This time we received five bytes first and
+-		 * then the rest. You never know how many bytes you get.
+-		 *
+-		 * A typical packet for player version 2.0 (beta):
+-		 *
+-		 * 0000:50 4E 41 00 06 00 02 00 00 00 01 00 02 1B C1 00 PNA...........=
+..
+-		 * 0010:00 67 75 78 F5 63 00 0A 57 69 6E 32 2E 30 2E 30 .gux.c..Win2.0=
+.0
+-		 * 0020:2E 35 6C 00 00 52 00 1C 72 61 66 69 6C 65 73 2F .5l..R..rafile=
+s/
+-		 * 0030:77 65 62 73 69 74 65 2F 32 30 72 65 6C 65 61 73 website/20rele=
+as
+-		 * 0040:65 2E 72 61 79 53 00 00 06 36 42                e.rayS...6B
+-		 *
+-		 * Port number 0x1BC1 is found at offset 0x0d.
+-		 *
+-		 * This is just a horrible switch statement. Variable ra tells
+-		 * us where we're going.
+-		 */
+-
+-		bptr =3D m->m_data;
+-		while (bptr < m->m_data + m->m_len) {
+-			uint16_t p;
+-			static int ra =3D 0;
+-			char ra_tbl[4];
+-
+-			ra_tbl[0] =3D 0x50;
+-			ra_tbl[1] =3D 0x4e;
+-			ra_tbl[2] =3D 0x41;
+-			ra_tbl[3] =3D 0;
+-
+-			switch (ra) {
+-			 case 0:
+-			 case 2:
+-			 case 3:
+-				if (*bptr++ !=3D ra_tbl[ra]) {
+-					ra =3D 0;
+-					continue;
+-				}
+-				break;
+-
+-			 case 1:
+-				/*
+-				 * We may get 0x50 several times, ignore them
+-				 */
+-				if (*bptr =3D=3D 0x50) {
+-					ra =3D 1;
+-					bptr++;
+-					continue;
+-				} else if (*bptr++ !=3D ra_tbl[ra]) {
+-					ra =3D 0;
+-					continue;
+-				}
+-				break;
+-
+-			 case 4:
+-				/*
+-				 * skip version number
+-				 */
+-				bptr++;
+-				break;
+-
+-			 case 5:
+-				/*
+-				 * The difference between versions 1.0 and
+-				 * 2.0 is here. For future versions of
+-				 * the player this may need to be modified.
+-				 */
+-				if (*(bptr + 1) =3D=3D 0x02)
+-				   bptr +=3D 8;
+-				else
+-				   bptr +=3D 4;
+-				break;
+-
+-			 case 6:
+-				/* This is the field containing the port
+-				 * number that RA-player is listening to.
+-				 */
+-				lport =3D (((uint8_t*)bptr)[0] << 8)
+-				+ ((uint8_t *)bptr)[1];
+-				if (lport < 6970)
+-				   lport +=3D 256;   /* don't know why */
+-				if (lport < 6970 || lport > 7170)
+-				   return 1;       /* failed */
+-
+-				/* try to get udp port between 6970 - 7170 */
+-				for (p =3D 6970; p < 7071; p++) {
+-					if (udp_listen(slirp, INADDR_ANY,
+-						       htons(p),
+-						       so->so_laddr.s_addr,
+-						       htons(lport),
+-						       SS_FACCEPTONCE)) {
+-						break;
+-					}
+-				}
+-				if (p =3D=3D 7071)
+-				   p =3D 0;
+-				*(uint8_t *)bptr++ =3D (p >> 8) & 0xff;
+-                                *(uint8_t *)bptr =3D p & 0xff;
+-				ra =3D 0;
+-				return 1;   /* port redirected, we're done */
+-				break;
+-
+-			 default:
+-				ra =3D 0;
+-			}
+-			ra++;
+-		}
+-		return 1;
+-
+-	 default:
+-		/* Ooops, not emulated, won't call tcp_emu again */
+-		so->so_emu =3D 0;
+-		return 1;
+-	}
+-}
+-
+-/*
+- * Do misc. config of SLiRP while its running.
+- * Return 0 if this connections is to be closed, 1 otherwise,
+- * return 2 if this is a command-line connection
+- */
+-int tcp_ctl(struct socket *so)
+-{
+-    Slirp *slirp =3D so->slirp;
+-    struct sbuf *sb =3D &so->so_snd;
+-    struct gfwd_list *ex_ptr;
+-
+-    DEBUG_CALL("tcp_ctl");
+-    DEBUG_ARG("so =3D %p", so);
+-
+-    /* TODO: IPv6 */
+-    if (so->so_faddr.s_addr !=3D slirp->vhost_addr.s_addr) {
+-        /* Check if it's pty_exec */
+-        for (ex_ptr =3D slirp->guestfwd_list; ex_ptr; ex_ptr =3D ex_ptr-=
+>ex_next) {
+-            if (ex_ptr->ex_fport =3D=3D so->so_fport &&
+-                so->so_faddr.s_addr =3D=3D ex_ptr->ex_addr.s_addr) {
+-                if (ex_ptr->write_cb) {
+-                    so->s =3D -1;
+-                    so->guestfwd =3D ex_ptr;
+-                    return 1;
+-                }
+-                DEBUG_MISC(" executing %s", ex_ptr->ex_exec);
+-                return fork_exec(so, ex_ptr->ex_exec);
+-            }
+-        }
+-    }
+-    sb->sb_cc =3D
+-        snprintf(sb->sb_wptr, sb->sb_datalen - (sb->sb_wptr - sb->sb_dat=
+a),
+-                 "Error: No application configured.\r\n");
+-    sb->sb_wptr +=3D sb->sb_cc;
+-    return 0;
+-}
+diff --git a/slirp/src/tcp_timer.c b/slirp/src/tcp_timer.c
+deleted file mode 100644
+index be361a1bb6..0000000000
+--- a/slirp/src/tcp_timer.c
++++ /dev/null
+@@ -1,294 +0,0 @@
+-/* SPDX-License-Identifier: BSD-3-Clause */
+-/*
+- * Copyright (c) 1982, 1986, 1988, 1990, 1993
+- *	The Regents of the University of California.  All rights reserved.
+- *
+- * Redistribution and use in source and binary forms, with or without
+- * modification, are permitted provided that the following conditions
+- * are met:
+- * 1. Redistributions of source code must retain the above copyright
+- *    notice, this list of conditions and the following disclaimer.
+- * 2. Redistributions in binary form must reproduce the above copyright
+- *    notice, this list of conditions and the following disclaimer in th=
+e
+- *    documentation and/or other materials provided with the distributio=
+n.
+- * 3. Neither the name of the University nor the names of its contributo=
+rs
+- *    may be used to endorse or promote products derived from this softw=
+are
+- *    without specific prior written permission.
+- *
+- * THIS SOFTWARE IS PROVIDED BY THE REGENTS AND CONTRIBUTORS ``AS IS'' A=
+ND
+- * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+- * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PU=
+RPOSE
+- * ARE DISCLAIMED.  IN NO EVENT SHALL THE REGENTS OR CONTRIBUTORS BE LIA=
+BLE
+- * FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUE=
+NTIAL
+- * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOO=
+DS
+- * OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
+- * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, S=
+TRICT
+- * LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY=
+ WAY
+- * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY O=
+F
+- * SUCH DAMAGE.
+- *
+- *	@(#)tcp_timer.c	8.1 (Berkeley) 6/10/93
+- * tcp_timer.c,v 1.2 1994/08/02 07:49:10 davidg Exp
+- */
+-
+-#include "slirp.h"
+-
+-static struct tcpcb *tcp_timers(register struct tcpcb *tp, int timer);
+-
+-/*
+- * Fast timeout routine for processing delayed acks
+- */
+-void
+-tcp_fasttimo(Slirp *slirp)
+-{
+-	register struct socket *so;
+-	register struct tcpcb *tp;
+-
+-	DEBUG_CALL("tcp_fasttimo");
+-
+-	so =3D slirp->tcb.so_next;
+-	if (so)
+-	for (; so !=3D &slirp->tcb; so =3D so->so_next)
+-		if ((tp =3D (struct tcpcb *)so->so_tcpcb) &&
+-		    (tp->t_flags & TF_DELACK)) {
+-			tp->t_flags &=3D ~TF_DELACK;
+-			tp->t_flags |=3D TF_ACKNOW;
+-			(void) tcp_output(tp);
+-		}
+-}
+-
+-/*
+- * Tcp protocol timeout routine called every 500 ms.
+- * Updates the timers in all active tcb's and
+- * causes finite state machine actions if timers expire.
+- */
+-void
+-tcp_slowtimo(Slirp *slirp)
+-{
+-	register struct socket *ip, *ipnxt;
+-	register struct tcpcb *tp;
+-	register int i;
+-
+-	DEBUG_CALL("tcp_slowtimo");
+-
+-	/*
+-	 * Search through tcb's and update active timers.
+-	 */
+-	ip =3D slirp->tcb.so_next;
+-        if (ip =3D=3D NULL) {
+-            return;
+-        }
+-	for (; ip !=3D &slirp->tcb; ip =3D ipnxt) {
+-		ipnxt =3D ip->so_next;
+-		tp =3D sototcpcb(ip);
+-                if (tp =3D=3D NULL) {
+-                        continue;
+-                }
+-		for (i =3D 0; i < TCPT_NTIMERS; i++) {
+-			if (tp->t_timer[i] && --tp->t_timer[i] =3D=3D 0) {
+-				tcp_timers(tp,i);
+-				if (ipnxt->so_prev !=3D ip)
+-					goto tpgone;
+-			}
+-		}
+-		tp->t_idle++;
+-		if (tp->t_rtt)
+-		   tp->t_rtt++;
+-tpgone:
+-		;
+-	}
+-	slirp->tcp_iss +=3D TCP_ISSINCR/PR_SLOWHZ;	/* increment iss */
+-	slirp->tcp_now++;				/* for timestamps */
+-}
+-
+-/*
+- * Cancel all timers for TCP tp.
+- */
+-void
+-tcp_canceltimers(struct tcpcb *tp)
+-{
+-	register int i;
+-
+-	for (i =3D 0; i < TCPT_NTIMERS; i++)
+-		tp->t_timer[i] =3D 0;
+-}
+-
+-const int tcp_backoff[TCP_MAXRXTSHIFT + 1] =3D
+-   { 1, 2, 4, 8, 16, 32, 64, 64, 64, 64, 64, 64, 64 };
+-
+-/*
+- * TCP timer processing.
+- */
+-static struct tcpcb *
+-tcp_timers(register struct tcpcb *tp, int timer)
+-{
+-	register int rexmt;
+-
+-	DEBUG_CALL("tcp_timers");
+-
+-	switch (timer) {
+-
+-	/*
+-	 * 2 MSL timeout in shutdown went off.  If we're closed but
+-	 * still waiting for peer to close and connection has been idle
+-	 * too long, or if 2MSL time is up from TIME_WAIT, delete connection
+-	 * control block.  Otherwise, check again in a bit.
+-	 */
+-	case TCPT_2MSL:
+-		if (tp->t_state !=3D TCPS_TIME_WAIT &&
+-		    tp->t_idle <=3D TCP_MAXIDLE)
+-			tp->t_timer[TCPT_2MSL] =3D TCPTV_KEEPINTVL;
+-		else
+-			tp =3D tcp_close(tp);
+-		break;
+-
+-	/*
+-	 * Retransmission timer went off.  Message has not
+-	 * been acked within retransmit interval.  Back off
+-	 * to a longer retransmit interval and retransmit one segment.
+-	 */
+-	case TCPT_REXMT:
+-
+-		/*
+-		 * XXXXX If a packet has timed out, then remove all the queued
+-		 * packets for that session.
+-		 */
+-
+-		if (++tp->t_rxtshift > TCP_MAXRXTSHIFT) {
+-			/*
+-			 * This is a hack to suit our terminal server here at the uni of canb=
+erra
+-			 * since they have trouble with zeroes... It usually lets them throug=
+h
+-			 * unharmed, but under some conditions, it'll eat the zeros.  If we
+-			 * keep retransmitting it, it'll keep eating the zeroes, so we keep
+-			 * retransmitting, and eventually the connection dies...
+-			 * (this only happens on incoming data)
+-			 *
+-			 * So, if we were gonna drop the connection from too many retransmits=
+,
+-			 * don't... instead halve the t_maxseg, which might break up the NULL=
+s and
+-			 * let them through
+-			 *
+-			 * *sigh*
+-			 */
+-
+-			tp->t_maxseg >>=3D 1;
+-			if (tp->t_maxseg < 32) {
+-				/*
+-				 * We tried our best, now the connection must die!
+-				 */
+-				tp->t_rxtshift =3D TCP_MAXRXTSHIFT;
+-				tp =3D tcp_drop(tp, tp->t_softerror);
+-				/* tp->t_softerror : ETIMEDOUT); */ /* XXX */
+-				return (tp); /* XXX */
+-			}
+-
+-			/*
+-			 * Set rxtshift to 6, which is still at the maximum
+-			 * backoff time
+-			 */
+-			tp->t_rxtshift =3D 6;
+-		}
+-		rexmt =3D TCP_REXMTVAL(tp) * tcp_backoff[tp->t_rxtshift];
+-		TCPT_RANGESET(tp->t_rxtcur, rexmt,
+-		    (short)tp->t_rttmin, TCPTV_REXMTMAX); /* XXX */
+-		tp->t_timer[TCPT_REXMT] =3D tp->t_rxtcur;
+-		/*
+-		 * If losing, let the lower level know and try for
+-		 * a better route.  Also, if we backed off this far,
+-		 * our srtt estimate is probably bogus.  Clobber it
+-		 * so we'll take the next rtt measurement as our srtt;
+-		 * move the current srtt into rttvar to keep the current
+-		 * retransmit times until then.
+-		 */
+-		if (tp->t_rxtshift > TCP_MAXRXTSHIFT / 4) {
+-			tp->t_rttvar +=3D (tp->t_srtt >> TCP_RTT_SHIFT);
+-			tp->t_srtt =3D 0;
+-		}
+-		tp->snd_nxt =3D tp->snd_una;
+-		/*
+-		 * If timing a segment in this window, stop the timer.
+-		 */
+-		tp->t_rtt =3D 0;
+-		/*
+-		 * Close the congestion window down to one segment
+-		 * (we'll open it by one segment for each ack we get).
+-		 * Since we probably have a window's worth of unacked
+-		 * data accumulated, this "slow start" keeps us from
+-		 * dumping all that data as back-to-back packets (which
+-		 * might overwhelm an intermediate gateway).
+-		 *
+-		 * There are two phases to the opening: Initially we
+-		 * open by one mss on each ack.  This makes the window
+-		 * size increase exponentially with time.  If the
+-		 * window is larger than the path can handle, this
+-		 * exponential growth results in dropped packet(s)
+-		 * almost immediately.  To get more time between
+-		 * drops but still "push" the network to take advantage
+-		 * of improving conditions, we switch from exponential
+-		 * to linear window opening at some threshold size.
+-		 * For a threshold, we use half the current window
+-		 * size, truncated to a multiple of the mss.
+-		 *
+-		 * (the minimum cwnd that will give us exponential
+-		 * growth is 2 mss.  We don't allow the threshold
+-		 * to go below this.)
+-		 */
+-		{
+-                unsigned win =3D MIN(tp->snd_wnd, tp->snd_cwnd) / 2 / tp=
+->t_maxseg;
+-		if (win < 2)
+-			win =3D 2;
+-		tp->snd_cwnd =3D tp->t_maxseg;
+-		tp->snd_ssthresh =3D win * tp->t_maxseg;
+-		tp->t_dupacks =3D 0;
+-		}
+-		(void) tcp_output(tp);
+-		break;
+-
+-	/*
+-	 * Persistence timer into zero window.
+-	 * Force a byte to be output, if possible.
+-	 */
+-	case TCPT_PERSIST:
+-		tcp_setpersist(tp);
+-		tp->t_force =3D 1;
+-		(void) tcp_output(tp);
+-		tp->t_force =3D 0;
+-		break;
+-
+-	/*
+-	 * Keep-alive timer went off; send something
+-	 * or drop connection if idle for too long.
+-	 */
+-	case TCPT_KEEP:
+-		if (tp->t_state < TCPS_ESTABLISHED)
+-			goto dropit;
+-
+-		if (slirp_do_keepalive && tp->t_state <=3D TCPS_CLOSE_WAIT) {
+-			if (tp->t_idle >=3D TCPTV_KEEP_IDLE + TCP_MAXIDLE)
+-				goto dropit;
+-			/*
+-			 * Send a packet designed to force a response
+-			 * if the peer is up and reachable:
+-			 * either an ACK if the connection is still alive,
+-			 * or an RST if the peer has closed the connection
+-			 * due to timeout or reboot.
+-			 * Using sequence number tp->snd_una-1
+-			 * causes the transmitted zero-length segment
+-			 * to lie outside the receive window;
+-			 * by the protocol spec, this requires the
+-			 * correspondent TCP to respond.
+-			 */
+-			tcp_respond(tp, &tp->t_template, (struct mbuf *)NULL,
+-			    tp->rcv_nxt, tp->snd_una - 1, 0,
+-			    tp->t_socket->so_ffamily);
+-			tp->t_timer[TCPT_KEEP] =3D TCPTV_KEEPINTVL;
+-		} else
+-			tp->t_timer[TCPT_KEEP] =3D TCPTV_KEEP_IDLE;
+-		break;
+-
+-	dropit:
+-		tp =3D tcp_drop(tp, 0);
+-		break;
+-	}
+-
+-	return (tp);
+-}
+diff --git a/slirp/src/tftp.c b/slirp/src/tftp.c
+deleted file mode 100644
+index 2071dca2a6..0000000000
+--- a/slirp/src/tftp.c
++++ /dev/null
+@@ -1,463 +0,0 @@
+-/* SPDX-License-Identifier: MIT */
+-/*
+- * tftp.c - a simple, read-only tftp server for qemu
+- *
+- * Copyright (c) 2004 Magnus Damm <damm@opensource.se>
+- *
+- * Permission is hereby granted, free of charge, to any person obtaining=
+ a copy
+- * of this software and associated documentation files (the "Software"),=
+ to deal
+- * in the Software without restriction, including without limitation the=
+ rights
+- * to use, copy, modify, merge, publish, distribute, sublicense, and/or =
+sell
+- * copies of the Software, and to permit persons to whom the Software is
+- * furnished to do so, subject to the following conditions:
+- *
+- * The above copyright notice and this permission notice shall be includ=
+ed in
+- * all copies or substantial portions of the Software.
+- *
+- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRE=
+SS OR
+- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILI=
+TY,
+- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHA=
+LL
+- * THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR =
+OTHER
+- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISI=
+NG FROM,
+- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALING=
+S IN
+- * THE SOFTWARE.
+- */
+-
+-#include "slirp.h"
+-
+-#include <sys/types.h>
+-#include <sys/stat.h>
+-#include <fcntl.h>
+-
+-static inline int tftp_session_in_use(struct tftp_session *spt)
+-{
+-    return (spt->slirp !=3D NULL);
+-}
+-
+-static inline void tftp_session_update(struct tftp_session *spt)
+-{
+-    spt->timestamp =3D curtime;
+-}
+-
+-static void tftp_session_terminate(struct tftp_session *spt)
+-{
+-    if (spt->fd >=3D 0) {
+-        close(spt->fd);
+-        spt->fd =3D -1;
+-    }
+-    g_free(spt->filename);
+-    spt->slirp =3D NULL;
+-}
+-
+-static int tftp_session_allocate(Slirp *slirp, struct sockaddr_storage *=
+srcsas,
+-                                 struct tftp_t *tp)
+-{
+-  struct tftp_session *spt;
+-  int k;
+-
+-  for (k =3D 0; k < TFTP_SESSIONS_MAX; k++) {
+-    spt =3D &slirp->tftp_sessions[k];
+-
+-    if (!tftp_session_in_use(spt))
+-        goto found;
+-
+-    /* sessions time out after 5 inactive seconds */
+-    if ((int)(curtime - spt->timestamp) > 5000) {
+-        tftp_session_terminate(spt);
+-        goto found;
+-    }
+-  }
+-
+-  return -1;
+-
+- found:
+-  memset(spt, 0, sizeof(*spt));
+-  memcpy(&spt->client_addr, srcsas, sockaddr_size(srcsas));
+-  spt->fd =3D -1;
+-  spt->block_size =3D 512;
+-  spt->client_port =3D tp->udp.uh_sport;
+-  spt->slirp =3D slirp;
+-
+-  tftp_session_update(spt);
+-
+-  return k;
+-}
+-
+-static int tftp_session_find(Slirp *slirp, struct sockaddr_storage *srcs=
+as,
+-                             struct tftp_t *tp)
+-{
+-  struct tftp_session *spt;
+-  int k;
+-
+-  for (k =3D 0; k < TFTP_SESSIONS_MAX; k++) {
+-    spt =3D &slirp->tftp_sessions[k];
+-
+-    if (tftp_session_in_use(spt)) {
+-      if (sockaddr_equal(&spt->client_addr, srcsas)) {
+-	if (spt->client_port =3D=3D tp->udp.uh_sport) {
+-	  return k;
+-	}
+-      }
+-    }
+-  }
+-
+-  return -1;
+-}
+-
+-static int tftp_read_data(struct tftp_session *spt, uint32_t block_nr,
+-                          uint8_t *buf, int len)
+-{
+-    int bytes_read =3D 0;
+-
+-    if (spt->fd < 0) {
+-        spt->fd =3D open(spt->filename, O_RDONLY | O_BINARY);
+-    }
+-
+-    if (spt->fd < 0) {
+-        return -1;
+-    }
+-
+-    if (len) {
+-        lseek(spt->fd, block_nr * spt->block_size, SEEK_SET);
+-
+-        bytes_read =3D read(spt->fd, buf, len);
+-    }
+-
+-    return bytes_read;
+-}
+-
+-static struct tftp_t *tftp_prep_mbuf_data(struct tftp_session *spt,
+-                                          struct mbuf *m)
+-{
+-    struct tftp_t *tp;
+-
+-    memset(m->m_data, 0, m->m_size);
+-
+-    m->m_data +=3D IF_MAXLINKHDR;
+-    if (spt->client_addr.ss_family =3D=3D AF_INET6) {
+-        m->m_data +=3D sizeof(struct ip6);
+-    } else {
+-        m->m_data +=3D sizeof(struct ip);
+-    }
+-    tp =3D (void *)m->m_data;
+-    m->m_data +=3D sizeof(struct udphdr);
+-
+-    return tp;
+-}
+-
+-static void tftp_udp_output(struct tftp_session *spt, struct mbuf *m,
+-                            struct tftp_t *recv_tp)
+-{
+-    if (spt->client_addr.ss_family =3D=3D AF_INET6) {
+-        struct sockaddr_in6 sa6, da6;
+-
+-        sa6.sin6_addr =3D spt->slirp->vhost_addr6;
+-        sa6.sin6_port =3D recv_tp->udp.uh_dport;
+-        da6.sin6_addr =3D ((struct sockaddr_in6 *)&spt->client_addr)->si=
+n6_addr;
+-        da6.sin6_port =3D spt->client_port;
+-
+-        udp6_output(NULL, m, &sa6, &da6);
+-    } else {
+-        struct sockaddr_in sa4, da4;
+-
+-        sa4.sin_addr =3D spt->slirp->vhost_addr;
+-        sa4.sin_port =3D recv_tp->udp.uh_dport;
+-        da4.sin_addr =3D ((struct sockaddr_in *)&spt->client_addr)->sin_=
+addr;
+-        da4.sin_port =3D spt->client_port;
+-
+-        udp_output(NULL, m, &sa4, &da4, IPTOS_LOWDELAY);
+-    }
+-}
+-
+-static int tftp_send_oack(struct tftp_session *spt,
+-                          const char *keys[], uint32_t values[], int nb,
+-                          struct tftp_t *recv_tp)
+-{
+-    struct mbuf *m;
+-    struct tftp_t *tp;
+-    int i, n =3D 0;
+-
+-    m =3D m_get(spt->slirp);
+-
+-    if (!m)
+-        return -1;
+-
+-    tp =3D tftp_prep_mbuf_data(spt, m);
+-
+-    tp->tp_op =3D htons(TFTP_OACK);
+-    for (i =3D 0; i < nb; i++) {
+-        n +=3D snprintf(tp->x.tp_buf + n, sizeof(tp->x.tp_buf) - n, "%s"=
+,
+-                      keys[i]) + 1;
+-        n +=3D snprintf(tp->x.tp_buf + n, sizeof(tp->x.tp_buf) - n, "%u"=
+,
+-                      values[i]) + 1;
+-    }
+-
+-    m->m_len =3D sizeof(struct tftp_t) - (TFTP_BLOCKSIZE_MAX + 2) + n
+-               - sizeof(struct udphdr);
+-    tftp_udp_output(spt, m, recv_tp);
+-
+-    return 0;
+-}
+-
+-static void tftp_send_error(struct tftp_session *spt,
+-                            uint16_t errorcode, const char *msg,
+-                            struct tftp_t *recv_tp)
+-{
+-  struct mbuf *m;
+-  struct tftp_t *tp;
+-
+-  DEBUG_TFTP("tftp error msg: %s", msg);
+-
+-  m =3D m_get(spt->slirp);
+-
+-  if (!m) {
+-    goto out;
+-  }
+-
+-  tp =3D tftp_prep_mbuf_data(spt, m);
+-
+-  tp->tp_op =3D htons(TFTP_ERROR);
+-  tp->x.tp_error.tp_error_code =3D htons(errorcode);
+-  slirp_pstrcpy((char *)tp->x.tp_error.tp_msg, sizeof(tp->x.tp_error.tp_=
+msg), msg);
+-
+-  m->m_len =3D sizeof(struct tftp_t) - (TFTP_BLOCKSIZE_MAX + 2) + 3 + st=
+rlen(msg)
+-             - sizeof(struct udphdr);
+-  tftp_udp_output(spt, m, recv_tp);
+-
+-out:
+-  tftp_session_terminate(spt);
+-}
+-
+-static void tftp_send_next_block(struct tftp_session *spt,
+-                                 struct tftp_t *recv_tp)
+-{
+-  struct mbuf *m;
+-  struct tftp_t *tp;
+-  int nobytes;
+-
+-  m =3D m_get(spt->slirp);
+-
+-  if (!m) {
+-    return;
+-  }
+-
+-  tp =3D tftp_prep_mbuf_data(spt, m);
+-
+-  tp->tp_op =3D htons(TFTP_DATA);
+-  tp->x.tp_data.tp_block_nr =3D htons((spt->block_nr + 1) & 0xffff);
+-
+-  nobytes =3D tftp_read_data(spt, spt->block_nr, tp->x.tp_data.tp_buf,
+-                           spt->block_size);
+-
+-  if (nobytes < 0) {
+-    m_free(m);
+-
+-    /* send "file not found" error back */
+-
+-    tftp_send_error(spt, 1, "File not found", tp);
+-
+-    return;
+-  }
+-
+-  m->m_len =3D sizeof(struct tftp_t) - (TFTP_BLOCKSIZE_MAX - nobytes)
+-             - sizeof(struct udphdr);
+-  tftp_udp_output(spt, m, recv_tp);
+-
+-  if (nobytes =3D=3D spt->block_size) {
+-    tftp_session_update(spt);
+-  }
+-  else {
+-    tftp_session_terminate(spt);
+-  }
+-
+-  spt->block_nr++;
+-}
+-
+-static void tftp_handle_rrq(Slirp *slirp, struct sockaddr_storage *srcsa=
+s,
+-                            struct tftp_t *tp, int pktlen)
+-{
+-  struct tftp_session *spt;
+-  int s, k;
+-  size_t prefix_len;
+-  char *req_fname;
+-  const char *option_name[2];
+-  uint32_t option_value[2];
+-  int nb_options =3D 0;
+-
+-  /* check if a session already exists and if so terminate it */
+-  s =3D tftp_session_find(slirp, srcsas, tp);
+-  if (s >=3D 0) {
+-    tftp_session_terminate(&slirp->tftp_sessions[s]);
+-  }
+-
+-  s =3D tftp_session_allocate(slirp, srcsas, tp);
+-
+-  if (s < 0) {
+-    return;
+-  }
+-
+-  spt =3D &slirp->tftp_sessions[s];
+-
+-  /* unspecified prefix means service disabled */
+-  if (!slirp->tftp_prefix) {
+-      tftp_send_error(spt, 2, "Access violation", tp);
+-      return;
+-  }
+-
+-  /* skip header fields */
+-  k =3D 0;
+-  pktlen -=3D offsetof(struct tftp_t, x.tp_buf);
+-
+-  /* prepend tftp_prefix */
+-  prefix_len =3D strlen(slirp->tftp_prefix);
+-  spt->filename =3D g_malloc(prefix_len + TFTP_FILENAME_MAX + 2);
+-  memcpy(spt->filename, slirp->tftp_prefix, prefix_len);
+-  spt->filename[prefix_len] =3D '/';
+-
+-  /* get name */
+-  req_fname =3D spt->filename + prefix_len + 1;
+-
+-  while (1) {
+-    if (k >=3D TFTP_FILENAME_MAX || k >=3D pktlen) {
+-      tftp_send_error(spt, 2, "Access violation", tp);
+-      return;
+-    }
+-    req_fname[k] =3D tp->x.tp_buf[k];
+-    if (req_fname[k++] =3D=3D '\0') {
+-      break;
+-    }
+-  }
+-
+-  DEBUG_TFTP("tftp rrq file: %s", req_fname);
+-
+-  /* check mode */
+-  if ((pktlen - k) < 6) {
+-    tftp_send_error(spt, 2, "Access violation", tp);
+-    return;
+-  }
+-
+-  if (strcasecmp(&tp->x.tp_buf[k], "octet") !=3D 0) {
+-      tftp_send_error(spt, 4, "Unsupported transfer mode", tp);
+-      return;
+-  }
+-
+-  k +=3D 6; /* skipping octet */
+-
+-  /* do sanity checks on the filename */
+-  if (!strncmp(req_fname, "../", 3) ||
+-      req_fname[strlen(req_fname) - 1] =3D=3D '/' ||
+-      strstr(req_fname, "/../")) {
+-      tftp_send_error(spt, 2, "Access violation", tp);
+-      return;
+-  }
+-
+-  /* check if the file exists */
+-  if (tftp_read_data(spt, 0, NULL, 0) < 0) {
+-      tftp_send_error(spt, 1, "File not found", tp);
+-      return;
+-  }
+-
+-  if (tp->x.tp_buf[pktlen - 1] !=3D 0) {
+-      tftp_send_error(spt, 2, "Access violation", tp);
+-      return;
+-  }
+-
+-  while (k < pktlen && nb_options < G_N_ELEMENTS(option_name)) {
+-      const char *key, *value;
+-
+-      key =3D &tp->x.tp_buf[k];
+-      k +=3D strlen(key) + 1;
+-
+-      if (k >=3D pktlen) {
+-	  tftp_send_error(spt, 2, "Access violation", tp);
+-	  return;
+-      }
+-
+-      value =3D &tp->x.tp_buf[k];
+-      k +=3D strlen(value) + 1;
+-
+-      if (strcasecmp(key, "tsize") =3D=3D 0) {
+-	  int tsize =3D atoi(value);
+-	  struct stat stat_p;
+-
+-	  if (tsize =3D=3D 0) {
+-	      if (stat(spt->filename, &stat_p) =3D=3D 0)
+-		  tsize =3D stat_p.st_size;
+-	      else {
+-		  tftp_send_error(spt, 1, "File not found", tp);
+-		  return;
+-	      }
+-	  }
+-
+-          option_name[nb_options] =3D "tsize";
+-          option_value[nb_options] =3D tsize;
+-          nb_options++;
+-      } else if (strcasecmp(key, "blksize") =3D=3D 0) {
+-          int blksize =3D atoi(value);
+-
+-          /* Accept blksize up to our maximum size */
+-          if (blksize > 0) {
+-              spt->block_size =3D MIN(blksize, TFTP_BLOCKSIZE_MAX);
+-              option_name[nb_options] =3D "blksize";
+-              option_value[nb_options] =3D spt->block_size;
+-              nb_options++;
+-          }
+-      }
+-  }
+-
+-  if (nb_options > 0) {
+-      assert(nb_options <=3D G_N_ELEMENTS(option_name));
+-      tftp_send_oack(spt, option_name, option_value, nb_options, tp);
+-      return;
+-  }
+-
+-  spt->block_nr =3D 0;
+-  tftp_send_next_block(spt, tp);
+-}
+-
+-static void tftp_handle_ack(Slirp *slirp, struct sockaddr_storage *srcsa=
+s,
+-                            struct tftp_t *tp, int pktlen)
+-{
+-  int s;
+-
+-  s =3D tftp_session_find(slirp, srcsas, tp);
+-
+-  if (s < 0) {
+-    return;
+-  }
+-
+-  tftp_send_next_block(&slirp->tftp_sessions[s], tp);
+-}
+-
+-static void tftp_handle_error(Slirp *slirp, struct sockaddr_storage *src=
+sas,
+-                              struct tftp_t *tp, int pktlen)
+-{
+-  int s;
+-
+-  s =3D tftp_session_find(slirp, srcsas, tp);
+-
+-  if (s < 0) {
+-    return;
+-  }
+-
+-  tftp_session_terminate(&slirp->tftp_sessions[s]);
+-}
+-
+-void tftp_input(struct sockaddr_storage *srcsas, struct mbuf *m)
+-{
+-  struct tftp_t *tp =3D (struct tftp_t *)m->m_data;
+-
+-  switch(ntohs(tp->tp_op)) {
+-  case TFTP_RRQ:
+-    tftp_handle_rrq(m->slirp, srcsas, tp, m->m_len);
+-    break;
+-
+-  case TFTP_ACK:
+-    tftp_handle_ack(m->slirp, srcsas, tp, m->m_len);
+-    break;
+-
+-  case TFTP_ERROR:
+-    tftp_handle_error(m->slirp, srcsas, tp, m->m_len);
+-    break;
+-  }
+-}
+diff --git a/slirp/src/udp.c b/slirp/src/udp.c
+deleted file mode 100644
+index 27bb829c37..0000000000
+--- a/slirp/src/udp.c
++++ /dev/null
+@@ -1,363 +0,0 @@
+-/* SPDX-License-Identifier: BSD-3-Clause */
+-/*
+- * Copyright (c) 1982, 1986, 1988, 1990, 1993
+- *	The Regents of the University of California.  All rights reserved.
+- *
+- * Redistribution and use in source and binary forms, with or without
+- * modification, are permitted provided that the following conditions
+- * are met:
+- * 1. Redistributions of source code must retain the above copyright
+- *    notice, this list of conditions and the following disclaimer.
+- * 2. Redistributions in binary form must reproduce the above copyright
+- *    notice, this list of conditions and the following disclaimer in th=
+e
+- *    documentation and/or other materials provided with the distributio=
+n.
+- * 3. Neither the name of the University nor the names of its contributo=
+rs
+- *    may be used to endorse or promote products derived from this softw=
+are
+- *    without specific prior written permission.
+- *
+- * THIS SOFTWARE IS PROVIDED BY THE REGENTS AND CONTRIBUTORS ``AS IS'' A=
+ND
+- * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+- * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PU=
+RPOSE
+- * ARE DISCLAIMED.  IN NO EVENT SHALL THE REGENTS OR CONTRIBUTORS BE LIA=
+BLE
+- * FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUE=
+NTIAL
+- * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOO=
+DS
+- * OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
+- * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, S=
+TRICT
+- * LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY=
+ WAY
+- * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY O=
+F
+- * SUCH DAMAGE.
+- *
+- *	@(#)udp_usrreq.c	8.4 (Berkeley) 1/21/94
+- * udp_usrreq.c,v 1.4 1994/10/02 17:48:45 phk Exp
+- */
+-
+-/*
+- * Changes and additions relating to SLiRP
+- * Copyright (c) 1995 Danny Gasparovski.
+- *
+- * Please read the file COPYRIGHT for the
+- * terms and conditions of the copyright.
+- */
+-
+-#include "slirp.h"
+-#include "ip_icmp.h"
+-
+-static uint8_t udp_tos(struct socket *so);
+-
+-void
+-udp_init(Slirp *slirp)
+-{
+-    slirp->udb.so_next =3D slirp->udb.so_prev =3D &slirp->udb;
+-    slirp->udp_last_so =3D &slirp->udb;
+-}
+-
+-void udp_cleanup(Slirp *slirp)
+-{
+-    while (slirp->udb.so_next !=3D &slirp->udb) {
+-        udp_detach(slirp->udb.so_next);
+-    }
+-}
+-
+-/* m->m_data  points at ip packet header
+- * m->m_len   length ip packet
+- * ip->ip_len length data (IPDU)
+- */
+-void
+-udp_input(register struct mbuf *m, int iphlen)
+-{
+-	Slirp *slirp =3D m->slirp;
+-	register struct ip *ip;
+-	register struct udphdr *uh;
+-	int len;
+-	struct ip save_ip;
+-	struct socket *so;
+-	struct sockaddr_storage lhost;
+-	struct sockaddr_in *lhost4;
+-
+-	DEBUG_CALL("udp_input");
+-	DEBUG_ARG("m =3D %p", m);
+-	DEBUG_ARG("iphlen =3D %d", iphlen);
+-
+-	/*
+-	 * Strip IP options, if any; should skip this,
+-	 * make available to user, and use on returned packets,
+-	 * but we don't yet have a way to check the checksum
+-	 * with options still present.
+-	 */
+-	if(iphlen > sizeof(struct ip)) {
+-		ip_stripoptions(m, (struct mbuf *)0);
+-		iphlen =3D sizeof(struct ip);
+-	}
+-
+-	/*
+-	 * Get IP and UDP header together in first mbuf.
+-	 */
+-	ip =3D mtod(m, struct ip *);
+-	uh =3D (struct udphdr *)((char *)ip + iphlen);
+-
+-	/*
+-	 * Make mbuf data length reflect UDP length.
+-	 * If not enough data to reflect UDP length, drop.
+-	 */
+-	len =3D ntohs((uint16_t)uh->uh_ulen);
+-
+-	if (ip->ip_len !=3D len) {
+-		if (len > ip->ip_len) {
+-			goto bad;
+-		}
+-		m_adj(m, len - ip->ip_len);
+-		ip->ip_len =3D len;
+-	}
+-
+-	/*
+-	 * Save a copy of the IP header in case we want restore it
+-	 * for sending an ICMP error message in response.
+-	 */
+-	save_ip =3D *ip;
+-	save_ip.ip_len+=3D iphlen;         /* tcp_input subtracts this */
+-
+-	/*
+-	 * Checksum extended UDP header and data.
+-	 */
+-	if (uh->uh_sum) {
+-      memset(&((struct ipovly *)ip)->ih_mbuf, 0, sizeof(struct mbuf_ptr)=
+);
+-	  ((struct ipovly *)ip)->ih_x1 =3D 0;
+-	  ((struct ipovly *)ip)->ih_len =3D uh->uh_ulen;
+-	  if(cksum(m, len + sizeof(struct ip))) {
+-	    goto bad;
+-	  }
+-	}
+-
+-	lhost.ss_family =3D AF_INET;
+-	lhost4 =3D (struct sockaddr_in *) &lhost;
+-	lhost4->sin_addr =3D ip->ip_src;
+-	lhost4->sin_port =3D uh->uh_sport;
+-
+-        /*
+-         *  handle DHCP/BOOTP
+-         */
+-        if (ntohs(uh->uh_dport) =3D=3D BOOTP_SERVER &&
+-            (ip->ip_dst.s_addr =3D=3D slirp->vhost_addr.s_addr ||
+-             ip->ip_dst.s_addr =3D=3D 0xffffffff)) {
+-                bootp_input(m);
+-                goto bad;
+-            }
+-
+-        /*
+-         *  handle TFTP
+-         */
+-        if (ntohs(uh->uh_dport) =3D=3D TFTP_SERVER &&
+-            ip->ip_dst.s_addr =3D=3D slirp->vhost_addr.s_addr) {
+-            m->m_data +=3D iphlen;
+-            m->m_len -=3D iphlen;
+-            tftp_input(&lhost, m);
+-            m->m_data -=3D iphlen;
+-            m->m_len +=3D iphlen;
+-            goto bad;
+-        }
+-
+-        if (slirp->restricted) {
+-            goto bad;
+-        }
+-
+-	/*
+-	 * Locate pcb for datagram.
+-	 */
+-	so =3D solookup(&slirp->udp_last_so, &slirp->udb, &lhost, NULL);
+-
+-	if (so =3D=3D NULL) {
+-	  /*
+-	   * If there's no socket for this packet,
+-	   * create one
+-	   */
+-	  so =3D socreate(slirp);
+-	  if (udp_attach(so, AF_INET) =3D=3D -1) {
+-	    DEBUG_MISC(" udp_attach errno =3D %d-%s", errno, strerror(errno));
+-	    sofree(so);
+-	    goto bad;
+-	  }
+-
+-	  /*
+-	   * Setup fields
+-	   */
+-	  so->so_lfamily =3D AF_INET;
+-	  so->so_laddr =3D ip->ip_src;
+-	  so->so_lport =3D uh->uh_sport;
+-
+-	  if ((so->so_iptos =3D udp_tos(so)) =3D=3D 0)
+-	    so->so_iptos =3D ip->ip_tos;
+-
+-	  /*
+-	   * XXXXX Here, check if it's in udpexec_list,
+-	   * and if it is, do the fork_exec() etc.
+-	   */
+-	}
+-
+-        so->so_ffamily =3D AF_INET;
+-        so->so_faddr =3D ip->ip_dst; /* XXX */
+-        so->so_fport =3D uh->uh_dport; /* XXX */
+-
+-	iphlen +=3D sizeof(struct udphdr);
+-	m->m_len -=3D iphlen;
+-	m->m_data +=3D iphlen;
+-
+-	/*
+-	 * Now we sendto() the packet.
+-	 */
+-	if(sosendto(so,m) =3D=3D -1) {
+-	  m->m_len +=3D iphlen;
+-	  m->m_data -=3D iphlen;
+-	  *ip=3Dsave_ip;
+-	  DEBUG_MISC("udp tx errno =3D %d-%s", errno, strerror(errno));
+-	  icmp_send_error(m, ICMP_UNREACH, ICMP_UNREACH_NET, 0,
+-	                  strerror(errno));
+-	  goto bad;
+-	}
+-
+-	m_free(so->so_m);   /* used for ICMP if error on sorecvfrom */
+-
+-	/* restore the orig mbuf packet */
+-	m->m_len +=3D iphlen;
+-	m->m_data -=3D iphlen;
+-	*ip=3Dsave_ip;
+-	so->so_m=3Dm;         /* ICMP backup */
+-
+-	return;
+-bad:
+-	m_free(m);
+-}
+-
+-int udp_output(struct socket *so, struct mbuf *m,
+-                struct sockaddr_in *saddr, struct sockaddr_in *daddr,
+-                int iptos)
+-{
+-	register struct udpiphdr *ui;
+-	int error =3D 0;
+-
+-	DEBUG_CALL("udp_output");
+-	DEBUG_ARG("so =3D %p", so);
+-	DEBUG_ARG("m =3D %p", m);
+-	DEBUG_ARG("saddr =3D %s", inet_ntoa(saddr->sin_addr));
+-	DEBUG_ARG("daddr =3D %s", inet_ntoa(daddr->sin_addr));
+-
+-	/*
+-	 * Adjust for header
+-	 */
+-	m->m_data -=3D sizeof(struct udpiphdr);
+-	m->m_len +=3D sizeof(struct udpiphdr);
+-
+-	/*
+-	 * Fill in mbuf with extended UDP header
+-	 * and addresses and length put into network format.
+-	 */
+-	ui =3D mtod(m, struct udpiphdr *);
+-    memset(&ui->ui_i.ih_mbuf, 0 , sizeof(struct mbuf_ptr));
+-	ui->ui_x1 =3D 0;
+-	ui->ui_pr =3D IPPROTO_UDP;
+-	ui->ui_len =3D htons(m->m_len - sizeof(struct ip));
+-	/* XXXXX Check for from-one-location sockets, or from-any-location sock=
+ets */
+-        ui->ui_src =3D saddr->sin_addr;
+-	ui->ui_dst =3D daddr->sin_addr;
+-	ui->ui_sport =3D saddr->sin_port;
+-	ui->ui_dport =3D daddr->sin_port;
+-	ui->ui_ulen =3D ui->ui_len;
+-
+-	/*
+-	 * Stuff checksum and output datagram.
+-	 */
+-	ui->ui_sum =3D 0;
+-	if ((ui->ui_sum =3D cksum(m, m->m_len)) =3D=3D 0)
+-		ui->ui_sum =3D 0xffff;
+-	((struct ip *)ui)->ip_len =3D m->m_len;
+-
+-	((struct ip *)ui)->ip_ttl =3D IPDEFTTL;
+-	((struct ip *)ui)->ip_tos =3D iptos;
+-
+-	error =3D ip_output(so, m);
+-
+-	return (error);
+-}
+-
+-int
+-udp_attach(struct socket *so, unsigned short af)
+-{
+-  so->s =3D slirp_socket(af, SOCK_DGRAM, 0);
+-  if (so->s !=3D -1) {
+-    so->so_expire =3D curtime + SO_EXPIRE;
+-    insque(so, &so->slirp->udb);
+-  }
+-  return(so->s);
+-}
+-
+-void
+-udp_detach(struct socket *so)
+-{
+-	so->slirp->cb->unregister_poll_fd(so->s, so->slirp->opaque);
+-	closesocket(so->s);
+-	sofree(so);
+-}
+-
+-static const struct tos_t udptos[] =3D {
+-	{0, 53, IPTOS_LOWDELAY, 0},			/* DNS */
+-	{0, 0, 0, 0}
+-};
+-
+-static uint8_t
+-udp_tos(struct socket *so)
+-{
+-	int i =3D 0;
+-
+-	while(udptos[i].tos) {
+-		if ((udptos[i].fport && ntohs(so->so_fport) =3D=3D udptos[i].fport) ||
+-		    (udptos[i].lport && ntohs(so->so_lport) =3D=3D udptos[i].lport)) {
+-			so->so_emu =3D udptos[i].emu;
+-			return udptos[i].tos;
+-		}
+-		i++;
+-	}
+-
+-	return 0;
+-}
+-
+-struct socket *
+-udp_listen(Slirp *slirp, uint32_t haddr, unsigned hport, uint32_t laddr,
+-           unsigned lport, int flags)
+-{
+-        /* TODO: IPv6 */
+-	struct sockaddr_in addr;
+-	struct socket *so;
+-	socklen_t addrlen =3D sizeof(struct sockaddr_in);
+-
+-	so =3D socreate(slirp);
+-	so->s =3D slirp_socket(AF_INET,SOCK_DGRAM,0);
+-        if (so->s < 0) {
+-            sofree(so);
+-            return NULL;
+-        }
+-	so->so_expire =3D curtime + SO_EXPIRE;
+-	insque(so, &slirp->udb);
+-
+-	addr.sin_family =3D AF_INET;
+-	addr.sin_addr.s_addr =3D haddr;
+-	addr.sin_port =3D hport;
+-
+-	if (bind(so->s,(struct sockaddr *)&addr, addrlen) < 0) {
+-		udp_detach(so);
+-		return NULL;
+-	}
+-	slirp_socket_set_fast_reuse(so->s);
+-
+-	getsockname(so->s,(struct sockaddr *)&addr,&addrlen);
+-	so->fhost.sin =3D addr;
+-	sotranslate_accept(so);
+-	so->so_lfamily =3D AF_INET;
+-	so->so_lport =3D lport;
+-	so->so_laddr.s_addr =3D laddr;
+-	if (flags !=3D SS_FACCEPTONCE)
+-	   so->so_expire =3D 0;
+-
+-	so->so_state &=3D SS_PERSISTENT_MASK;
+-	so->so_state |=3D SS_ISFCONNECTED | flags;
+-
+-	return so;
+-}
+diff --git a/slirp/src/udp6.c b/slirp/src/udp6.c
+deleted file mode 100644
+index bfcc7ec6fa..0000000000
+--- a/slirp/src/udp6.c
++++ /dev/null
+@@ -1,173 +0,0 @@
+-/* SPDX-License-Identifier: BSD-3-Clause */
+-/*
+- * Copyright (c) 2013
+- * Guillaume Subiron
+- */
+-
+-#include "slirp.h"
+-#include "udp.h"
+-#include "dhcpv6.h"
+-
+-void udp6_input(struct mbuf *m)
+-{
+-    Slirp *slirp =3D m->slirp;
+-    struct ip6 *ip, save_ip;
+-    struct udphdr *uh;
+-    int iphlen =3D sizeof(struct ip6);
+-    int len;
+-    struct socket *so;
+-    struct sockaddr_in6 lhost;
+-
+-    DEBUG_CALL("udp6_input");
+-    DEBUG_ARG("m =3D %p", m);
+-
+-    if (slirp->restricted) {
+-        goto bad;
+-    }
+-
+-    ip =3D mtod(m, struct ip6 *);
+-    m->m_len -=3D iphlen;
+-    m->m_data +=3D iphlen;
+-    uh =3D mtod(m, struct udphdr *);
+-    m->m_len +=3D iphlen;
+-    m->m_data -=3D iphlen;
+-
+-    if (ip6_cksum(m)) {
+-        goto bad;
+-    }
+-
+-    len =3D ntohs((uint16_t)uh->uh_ulen);
+-
+-    /*
+-     * Make mbuf data length reflect UDP length.
+-     * If not enough data to reflect UDP length, drop.
+-     */
+-    if (ntohs(ip->ip_pl) !=3D len) {
+-        if (len > ntohs(ip->ip_pl)) {
+-            goto bad;
+-        }
+-        m_adj(m, len - ntohs(ip->ip_pl));
+-        ip->ip_pl =3D htons(len);
+-    }
+-
+-    /*
+-     * Save a copy of the IP header in case we want restore it
+-     * for sending an ICMP error message in response.
+-     */
+-    save_ip =3D *ip;
+-
+-    /* Locate pcb for datagram. */
+-    lhost.sin6_family =3D AF_INET6;
+-    lhost.sin6_addr =3D ip->ip_src;
+-    lhost.sin6_port =3D uh->uh_sport;
+-
+-    /* handle DHCPv6 */
+-    if (ntohs(uh->uh_dport) =3D=3D DHCPV6_SERVER_PORT &&
+-        (in6_equal(&ip->ip_dst, &slirp->vhost_addr6) ||
+-         in6_dhcp_multicast(&ip->ip_dst))) {
+-        m->m_data +=3D iphlen;
+-        m->m_len -=3D iphlen;
+-        dhcpv6_input(&lhost, m);
+-        m->m_data -=3D iphlen;
+-        m->m_len +=3D iphlen;
+-        goto bad;
+-    }
+-
+-    /* handle TFTP */
+-    if (ntohs(uh->uh_dport) =3D=3D TFTP_SERVER &&
+-        !memcmp(ip->ip_dst.s6_addr, slirp->vhost_addr6.s6_addr, 16)) {
+-        m->m_data +=3D iphlen;
+-        m->m_len -=3D iphlen;
+-        tftp_input((struct sockaddr_storage *)&lhost, m);
+-        m->m_data -=3D iphlen;
+-        m->m_len +=3D iphlen;
+-        goto bad;
+-    }
+-
+-    so =3D solookup(&slirp->udp_last_so, &slirp->udb,
+-                  (struct sockaddr_storage *) &lhost, NULL);
+-
+-    if (so =3D=3D NULL) {
+-        /* If there's no socket for this packet, create one. */
+-        so =3D socreate(slirp);
+-        if (udp_attach(so, AF_INET6) =3D=3D -1) {
+-            DEBUG_MISC(" udp6_attach errno =3D %d-%s", errno, strerror(e=
+rrno));
+-            sofree(so);
+-            goto bad;
+-        }
+-
+-        /* Setup fields */
+-        so->so_lfamily =3D AF_INET6;
+-        so->so_laddr6 =3D ip->ip_src;
+-        so->so_lport6 =3D uh->uh_sport;
+-    }
+-
+-    so->so_ffamily =3D AF_INET6;
+-    so->so_faddr6 =3D ip->ip_dst; /* XXX */
+-    so->so_fport6 =3D uh->uh_dport; /* XXX */
+-
+-    iphlen +=3D sizeof(struct udphdr);
+-    m->m_len -=3D iphlen;
+-    m->m_data +=3D iphlen;
+-
+-    /*
+-     * Now we sendto() the packet.
+-     */
+-    if (sosendto(so, m) =3D=3D -1) {
+-        m->m_len +=3D iphlen;
+-        m->m_data -=3D iphlen;
+-        *ip =3D save_ip;
+-        DEBUG_MISC("udp tx errno =3D %d-%s", errno, strerror(errno));
+-        icmp6_send_error(m, ICMP6_UNREACH, ICMP6_UNREACH_NO_ROUTE);
+-        goto bad;
+-    }
+-
+-    m_free(so->so_m);   /* used for ICMP if error on sorecvfrom */
+-
+-    /* restore the orig mbuf packet */
+-    m->m_len +=3D iphlen;
+-    m->m_data -=3D iphlen;
+-    *ip =3D save_ip;
+-    so->so_m =3D m;
+-
+-    return;
+-bad:
+-    m_free(m);
+-}
+-
+-int udp6_output(struct socket *so, struct mbuf *m,
+-        struct sockaddr_in6 *saddr, struct sockaddr_in6 *daddr)
+-{
+-    struct ip6 *ip;
+-    struct udphdr *uh;
+-
+-    DEBUG_CALL("udp6_output");
+-    DEBUG_ARG("so =3D %p", so);
+-    DEBUG_ARG("m =3D %p", m);
+-
+-    /* adjust for header */
+-    m->m_data -=3D sizeof(struct udphdr);
+-    m->m_len +=3D sizeof(struct udphdr);
+-    uh =3D mtod(m, struct udphdr *);
+-    m->m_data -=3D sizeof(struct ip6);
+-    m->m_len +=3D sizeof(struct ip6);
+-    ip =3D mtod(m, struct ip6 *);
+-
+-    /* Build IP header */
+-    ip->ip_pl =3D htons(m->m_len - sizeof(struct ip6));
+-    ip->ip_nh =3D IPPROTO_UDP;
+-    ip->ip_src =3D saddr->sin6_addr;
+-    ip->ip_dst =3D daddr->sin6_addr;
+-
+-    /* Build UDP header */
+-    uh->uh_sport =3D saddr->sin6_port;
+-    uh->uh_dport =3D daddr->sin6_port;
+-    uh->uh_ulen =3D ip->ip_pl;
+-    uh->uh_sum =3D 0;
+-    uh->uh_sum =3D ip6_cksum(m);
+-    if (uh->uh_sum =3D=3D 0) {
+-        uh->uh_sum =3D 0xffff;
+-    }
+-
+-    return ip6_output(so, m, 0);
+-}
+diff --git a/slirp/src/util.c b/slirp/src/util.c
+deleted file mode 100644
+index 60bb200801..0000000000
+--- a/slirp/src/util.c
++++ /dev/null
+@@ -1,368 +0,0 @@
+-/* SPDX-License-Identifier: MIT */
+-/*
+- * util.c (mostly based on QEMU os-win32.c)
+- *
+- * Copyright (c) 2003-2008 Fabrice Bellard
+- * Copyright (c) 2010-2016 Red Hat, Inc.
+- *
+- * QEMU library functions for win32 which are shared between QEMU and
+- * the QEMU tools.
+- *
+- * Permission is hereby granted, free of charge, to any person obtaining=
+ a copy
+- * of this software and associated documentation files (the "Software"),=
+ to deal
+- * in the Software without restriction, including without limitation the=
+ rights
+- * to use, copy, modify, merge, publish, distribute, sublicense, and/or =
+sell
+- * copies of the Software, and to permit persons to whom the Software is
+- * furnished to do so, subject to the following conditions:
+- *
+- * The above copyright notice and this permission notice shall be includ=
+ed in
+- * all copies or substantial portions of the Software.
+- *
+- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRE=
+SS OR
+- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILI=
+TY,
+- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHA=
+LL
+- * THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR =
+OTHER
+- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISI=
+NG FROM,
+- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALING=
+S IN
+- * THE SOFTWARE.
+- */
+-#include "util.h"
+-
+-#include <glib.h>
+-#include <fcntl.h>
+-#include <stdint.h>
+-
+-#if defined(_WIN32)
+-int slirp_inet_aton(const char *cp, struct in_addr *ia)
+-{
+-    uint32_t addr =3D inet_addr(cp);
+-    if (addr =3D=3D 0xffffffff) {
+-        return 0;
+-    }
+-    ia->s_addr =3D addr;
+-    return 1;
+-}
+-#endif
+-
+-void slirp_set_nonblock(int fd)
+-{
+-#ifndef _WIN32
+-    int f;
+-    f =3D fcntl(fd, F_GETFL);
+-    assert(f !=3D -1);
+-    f =3D fcntl(fd, F_SETFL, f | O_NONBLOCK);
+-    assert(f !=3D -1);
+-#else
+-    unsigned long opt =3D 1;
+-    ioctlsocket(fd, FIONBIO, &opt);
+-#endif
+-}
+-
+-static void slirp_set_cloexec(int fd)
+-{
+-#ifndef _WIN32
+-    int f;
+-    f =3D fcntl(fd, F_GETFD);
+-    assert(f !=3D -1);
+-    f =3D fcntl(fd, F_SETFD, f | FD_CLOEXEC);
+-    assert(f !=3D -1);
+-#endif
+-}
+-
+-/*
+- * Opens a socket with FD_CLOEXEC set
+- */
+-int slirp_socket(int domain, int type, int protocol)
+-{
+-    int ret;
+-
+-#ifdef SOCK_CLOEXEC
+-    ret =3D socket(domain, type | SOCK_CLOEXEC, protocol);
+-    if (ret !=3D -1 || errno !=3D EINVAL) {
+-        return ret;
+-    }
+-#endif
+-    ret =3D socket(domain, type, protocol);
+-    if (ret >=3D 0) {
+-        slirp_set_cloexec(ret);
+-    }
+-
+-    return ret;
+-}
+-
+-#ifdef _WIN32
+-static int socket_error(void)
+-{
+-    switch (WSAGetLastError()) {
+-    case 0:
+-        return 0;
+-    case WSAEINTR:
+-        return EINTR;
+-    case WSAEINVAL:
+-        return EINVAL;
+-    case WSA_INVALID_HANDLE:
+-        return EBADF;
+-    case WSA_NOT_ENOUGH_MEMORY:
+-        return ENOMEM;
+-    case WSA_INVALID_PARAMETER:
+-        return EINVAL;
+-    case WSAENAMETOOLONG:
+-        return ENAMETOOLONG;
+-    case WSAENOTEMPTY:
+-        return ENOTEMPTY;
+-    case WSAEWOULDBLOCK:
+-         /* not using EWOULDBLOCK as we don't want code to have
+-          * to check both EWOULDBLOCK and EAGAIN */
+-        return EAGAIN;
+-    case WSAEINPROGRESS:
+-        return EINPROGRESS;
+-    case WSAEALREADY:
+-        return EALREADY;
+-    case WSAENOTSOCK:
+-        return ENOTSOCK;
+-    case WSAEDESTADDRREQ:
+-        return EDESTADDRREQ;
+-    case WSAEMSGSIZE:
+-        return EMSGSIZE;
+-    case WSAEPROTOTYPE:
+-        return EPROTOTYPE;
+-    case WSAENOPROTOOPT:
+-        return ENOPROTOOPT;
+-    case WSAEPROTONOSUPPORT:
+-        return EPROTONOSUPPORT;
+-    case WSAEOPNOTSUPP:
+-        return EOPNOTSUPP;
+-    case WSAEAFNOSUPPORT:
+-        return EAFNOSUPPORT;
+-    case WSAEADDRINUSE:
+-        return EADDRINUSE;
+-    case WSAEADDRNOTAVAIL:
+-        return EADDRNOTAVAIL;
+-    case WSAENETDOWN:
+-        return ENETDOWN;
+-    case WSAENETUNREACH:
+-        return ENETUNREACH;
+-    case WSAENETRESET:
+-        return ENETRESET;
+-    case WSAECONNABORTED:
+-        return ECONNABORTED;
+-    case WSAECONNRESET:
+-        return ECONNRESET;
+-    case WSAENOBUFS:
+-        return ENOBUFS;
+-    case WSAEISCONN:
+-        return EISCONN;
+-    case WSAENOTCONN:
+-        return ENOTCONN;
+-    case WSAETIMEDOUT:
+-        return ETIMEDOUT;
+-    case WSAECONNREFUSED:
+-        return ECONNREFUSED;
+-    case WSAELOOP:
+-        return ELOOP;
+-    case WSAEHOSTUNREACH:
+-        return EHOSTUNREACH;
+-    default:
+-        return EIO;
+-    }
+-}
+-
+-#undef ioctlsocket
+-int slirp_ioctlsocket_wrap(int fd, int req, void *val)
+-{
+-    int ret;
+-    ret =3D ioctlsocket(fd, req, val);
+-    if (ret < 0) {
+-        errno =3D socket_error();
+-    }
+-    return ret;
+-}
+-
+-#undef closesocket
+-int slirp_closesocket_wrap(int fd)
+-{
+-    int ret;
+-    ret =3D closesocket(fd);
+-    if (ret < 0) {
+-        errno =3D socket_error();
+-    }
+-    return ret;
+-}
+-
+-#undef connect
+-int slirp_connect_wrap(int sockfd, const struct sockaddr *addr, int addr=
+len)
+-{
+-    int ret;
+-    ret =3D connect(sockfd, addr, addrlen);
+-    if (ret < 0) {
+-        errno =3D socket_error();
+-    }
+-    return ret;
+-}
+-
+-#undef listen
+-int slirp_listen_wrap(int sockfd, int backlog)
+-{
+-    int ret;
+-    ret =3D listen(sockfd, backlog);
+-    if (ret < 0) {
+-        errno =3D socket_error();
+-    }
+-    return ret;
+-}
+-
+-#undef bind
+-int slirp_bind_wrap(int sockfd, const struct sockaddr *addr, int addrlen=
+)
+-{
+-    int ret;
+-    ret =3D bind(sockfd, addr, addrlen);
+-    if (ret < 0) {
+-        errno =3D socket_error();
+-    }
+-    return ret;
+-}
+-
+-#undef socket
+-int slirp_socket_wrap(int domain, int type, int protocol)
+-{
+-    int ret;
+-    ret =3D socket(domain, type, protocol);
+-    if (ret < 0) {
+-        errno =3D socket_error();
+-    }
+-    return ret;
+-}
+-
+-#undef accept
+-int slirp_accept_wrap(int sockfd, struct sockaddr *addr, int *addrlen)
+-{
+-    int ret;
+-    ret =3D accept(sockfd, addr, addrlen);
+-    if (ret < 0) {
+-        errno =3D socket_error();
+-    }
+-    return ret;
+-}
+-
+-#undef shutdown
+-int slirp_shutdown_wrap(int sockfd, int how)
+-{
+-    int ret;
+-    ret =3D shutdown(sockfd, how);
+-    if (ret < 0) {
+-        errno =3D socket_error();
+-    }
+-    return ret;
+-}
+-
+-#undef getsockopt
+-int slirp_getsockopt_wrap(int sockfd, int level, int optname,
+-                          void *optval, int *optlen)
+-{
+-    int ret;
+-    ret =3D getsockopt(sockfd, level, optname, optval, optlen);
+-    if (ret < 0) {
+-        errno =3D socket_error();
+-    }
+-    return ret;
+-}
+-
+-#undef setsockopt
+-int slirp_setsockopt_wrap(int sockfd, int level, int optname,
+-                          const void *optval, int optlen)
+-{
+-    int ret;
+-    ret =3D setsockopt(sockfd, level, optname, optval, optlen);
+-    if (ret < 0) {
+-        errno =3D socket_error();
+-    }
+-    return ret;
+-}
+-
+-#undef getpeername
+-int slirp_getpeername_wrap(int sockfd, struct sockaddr *addr,
+-                           int *addrlen)
+-{
+-    int ret;
+-    ret =3D getpeername(sockfd, addr, addrlen);
+-    if (ret < 0) {
+-        errno =3D socket_error();
+-    }
+-    return ret;
+-}
+-
+-#undef getsockname
+-int slirp_getsockname_wrap(int sockfd, struct sockaddr *addr,
+-                           int *addrlen)
+-{
+-    int ret;
+-    ret =3D getsockname(sockfd, addr, addrlen);
+-    if (ret < 0) {
+-        errno =3D socket_error();
+-    }
+-    return ret;
+-}
+-
+-#undef send
+-ssize_t slirp_send_wrap(int sockfd, const void *buf, size_t len, int fla=
+gs)
+-{
+-    int ret;
+-    ret =3D send(sockfd, buf, len, flags);
+-    if (ret < 0) {
+-        errno =3D socket_error();
+-    }
+-    return ret;
+-}
+-
+-#undef sendto
+-ssize_t slirp_sendto_wrap(int sockfd, const void *buf, size_t len, int f=
+lags,
+-                     const struct sockaddr *addr, int addrlen)
+-{
+-    int ret;
+-    ret =3D sendto(sockfd, buf, len, flags, addr, addrlen);
+-    if (ret < 0) {
+-        errno =3D socket_error();
+-    }
+-    return ret;
+-}
+-
+-#undef recv
+-ssize_t slirp_recv_wrap(int sockfd, void *buf, size_t len, int flags)
+-{
+-    int ret;
+-    ret =3D recv(sockfd, buf, len, flags);
+-    if (ret < 0) {
+-        errno =3D socket_error();
+-    }
+-    return ret;
+-}
+-
+-#undef recvfrom
+-ssize_t slirp_recvfrom_wrap(int sockfd, void *buf, size_t len, int flags=
+,
+-                            struct sockaddr *addr, int *addrlen)
+-{
+-    int ret;
+-    ret =3D recvfrom(sockfd, buf, len, flags, addr, addrlen);
+-    if (ret < 0) {
+-        errno =3D socket_error();
+-    }
+-    return ret;
+-}
+-#endif /* WIN32 */
+-
+-void slirp_pstrcpy(char *buf, int buf_size, const char *str)
+-{
+-    int c;
+-    char *q =3D buf;
+-
+-    if (buf_size <=3D 0)
+-        return;
+-
+-    for(;;) {
+-        c =3D *str++;
+-        if (c =3D=3D 0 || q >=3D buf + buf_size - 1)
+-            break;
+-        *q++ =3D c;
+-    }
+-    *q =3D '\0';
+-}
+diff --git a/slirp/src/vmstate.c b/slirp/src/vmstate.c
+deleted file mode 100644
+index 43bb3ebc6f..0000000000
+--- a/slirp/src/vmstate.c
++++ /dev/null
+@@ -1,441 +0,0 @@
+-/* SPDX-License-Identifier: BSD-3-Clause */
+-/*
+- * VMState interpreter
+- *
+- * Copyright (c) 2009-2018 Red Hat Inc
+- *
+- * Authors:
+- *  Juan Quintela <quintela@redhat.com>
+- *
+- * Redistribution and use in source and binary forms, with or without
+- * modification, are permitted provided that the following conditions
+- * are met:
+- *
+- * 1. Redistributions of source code must retain the above
+- * copyright notice, this list of conditions and the following
+- * disclaimer.
+- *
+- * 2. Redistributions in binary form must reproduce the above
+- * copyright notice, this list of conditions and the following
+- * disclaimer in the documentation and/or other materials provided
+- * with the distribution.
+- *
+- * 3. Neither the name of the copyright holder nor the names of its
+- * contributors may be used to endorse or promote products derived
+- * from this software without specific prior written permission.
+- *
+- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+- * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+- * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS
+- * FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE
+- * COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
+- * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+- * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+- * SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
+- * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT,
+- * STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+- * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
+- * OF THE POSSIBILITY OF SUCH DAMAGE.
+- */
+-#include <assert.h>
+-#include <errno.h>
+-#include <string.h>
+-#include <glib.h>
+-
+-#include "stream.h"
+-#include "vmstate.h"
+-
+-static int get_nullptr(SlirpIStream *f, void *pv, size_t size,
+-                       const VMStateField *field)
+-{
+-    if (slirp_istream_read_u8(f) =3D=3D VMS_NULLPTR_MARKER) {
+-        return  0;
+-    }
+-    g_warning("vmstate: get_nullptr expected VMS_NULLPTR_MARKER");
+-    return -EINVAL;
+-}
+-
+-static int put_nullptr(SlirpOStream *f, void *pv, size_t size,
+-                       const VMStateField *field)
+-
+-{
+-    if (pv =3D=3D NULL) {
+-        slirp_ostream_write_u8(f, VMS_NULLPTR_MARKER);
+-        return 0;
+-    }
+-    g_warning("vmstate: put_nullptr must be called with pv =3D=3D NULL")=
+;
+-    return -EINVAL;
+-}
+-
+-const VMStateInfo slirp_vmstate_info_nullptr =3D {
+-    .name =3D "uint64",
+-    .get  =3D get_nullptr,
+-    .put  =3D put_nullptr,
+-};
+-
+-/* 8 bit unsigned int */
+-
+-static int get_uint8(SlirpIStream *f, void *pv, size_t size, const VMSta=
+teField *field)
+-{
+-    uint8_t *v =3D pv;
+-    *v =3D slirp_istream_read_u8(f);
+-    return 0;
+-}
+-
+-static int put_uint8(SlirpOStream *f, void *pv, size_t size, const VMSta=
+teField *field)
+-{
+-    uint8_t *v =3D pv;
+-    slirp_ostream_write_u8(f, *v);
+-    return 0;
+-}
+-
+-const VMStateInfo slirp_vmstate_info_uint8 =3D {
+-    .name =3D "uint8",
+-    .get  =3D get_uint8,
+-    .put  =3D put_uint8,
+-};
+-
+-/* 16 bit unsigned int */
+-
+-static int get_uint16(SlirpIStream *f, void *pv, size_t size,
+-                      const VMStateField *field)
+-{
+-    uint16_t *v =3D pv;
+-    *v =3D slirp_istream_read_u16(f);
+-    return 0;
+-}
+-
+-static int put_uint16(SlirpOStream *f, void *pv, size_t size,
+-                      const VMStateField *field)
+-{
+-    uint16_t *v =3D pv;
+-    slirp_ostream_write_u16(f, *v);
+-    return 0;
+-}
+-
+-const VMStateInfo slirp_vmstate_info_uint16 =3D {
+-    .name =3D "uint16",
+-    .get  =3D get_uint16,
+-    .put  =3D put_uint16,
+-};
+-
+-/* 32 bit unsigned int */
+-
+-static int get_uint32(SlirpIStream *f, void *pv, size_t size,
+-                      const VMStateField *field)
+-{
+-    uint32_t *v =3D pv;
+-    *v =3D slirp_istream_read_u32(f);
+-    return 0;
+-}
+-
+-static int put_uint32(SlirpOStream *f, void *pv, size_t size,
+-                      const VMStateField *field)
+-{
+-    uint32_t *v =3D pv;
+-    slirp_ostream_write_u32(f, *v);
+-    return 0;
+-}
+-
+-const VMStateInfo slirp_vmstate_info_uint32 =3D {
+-    .name =3D "uint32",
+-    .get  =3D get_uint32,
+-    .put  =3D put_uint32,
+-};
+-
+-/* 16 bit int */
+-
+-static int get_int16(SlirpIStream *f, void *pv, size_t size, const VMSta=
+teField *field)
+-{
+-    int16_t *v =3D pv;
+-    *v =3D slirp_istream_read_i16(f);
+-    return 0;
+-}
+-
+-static int put_int16(SlirpOStream *f, void *pv, size_t size, const VMSta=
+teField *field)
+-{
+-    int16_t *v =3D pv;
+-    slirp_ostream_write_i16(f, *v);
+-    return 0;
+-}
+-
+-const VMStateInfo slirp_vmstate_info_int16 =3D {
+-    .name =3D "int16",
+-    .get  =3D get_int16,
+-    .put  =3D put_int16,
+-};
+-
+-/* 32 bit int */
+-
+-static int get_int32(SlirpIStream *f, void *pv, size_t size, const VMSta=
+teField *field)
+-{
+-    int32_t *v =3D pv;
+-    *v =3D slirp_istream_read_i32(f);
+-    return 0;
+-}
+-
+-static int put_int32(SlirpOStream *f, void *pv, size_t size, const VMSta=
+teField *field)
+-{
+-    int32_t *v =3D pv;
+-    slirp_ostream_write_i32(f, *v);
+-    return 0;
+-}
+-
+-const VMStateInfo slirp_vmstate_info_int32 =3D {
+-    .name =3D "int32",
+-    .get  =3D get_int32,
+-    .put  =3D put_int32,
+-};
+-
+-/* vmstate_info_tmp, see VMSTATE_WITH_TMP, the idea is that we allocate
+- * a temporary buffer and the pre_load/pre_save methods in the child vms=
+d
+- * copy stuff from the parent into the child and do calculations to fill
+- * in fields that don't really exist in the parent but need to be in the
+- * stream.
+- */
+-static int get_tmp(SlirpIStream *f, void *pv, size_t size, const VMState=
+Field *field)
+-{
+-    int ret;
+-    const VMStateDescription *vmsd =3D field->vmsd;
+-    int version_id =3D field->version_id;
+-    void *tmp =3D g_malloc(size);
+-
+-    /* Writes the parent field which is at the start of the tmp */
+-    *(void **)tmp =3D pv;
+-    ret =3D slirp_vmstate_load_state(f, vmsd, tmp, version_id);
+-    g_free(tmp);
+-    return ret;
+-}
+-
+-static int put_tmp(SlirpOStream *f, void *pv, size_t size, const VMState=
+Field *field)
+-{
+-    const VMStateDescription *vmsd =3D field->vmsd;
+-    void *tmp =3D g_malloc(size);
+-    int ret;
+-
+-    /* Writes the parent field which is at the start of the tmp */
+-    *(void **)tmp =3D pv;
+-    ret =3D slirp_vmstate_save_state(f, vmsd, tmp);
+-    g_free(tmp);
+-
+-    return ret;
+-}
+-
+-const VMStateInfo slirp_vmstate_info_tmp =3D {
+-    .name =3D "tmp",
+-    .get =3D get_tmp,
+-    .put =3D put_tmp,
+-};
+-
+-/* uint8_t buffers */
+-
+-static int get_buffer(SlirpIStream *f, void *pv, size_t size,
+-                      const VMStateField *field)
+-{
+-    slirp_istream_read(f, pv, size);
+-    return 0;
+-}
+-
+-static int put_buffer(SlirpOStream *f, void *pv, size_t size,
+-                      const VMStateField *field)
+-{
+-    slirp_ostream_write(f, pv, size);
+-    return 0;
+-}
+-
+-const VMStateInfo slirp_vmstate_info_buffer =3D {
+-    .name =3D "buffer",
+-    .get  =3D get_buffer,
+-    .put  =3D put_buffer,
+-};
+-
+-static int vmstate_n_elems(void *opaque, const VMStateField *field)
+-{
+-    int n_elems =3D 1;
+-
+-    if (field->flags & VMS_ARRAY) {
+-        n_elems =3D field->num;
+-    } else if (field->flags & VMS_VARRAY_INT32) {
+-        n_elems =3D *(int32_t *)(opaque + field->num_offset);
+-    } else if (field->flags & VMS_VARRAY_UINT32) {
+-        n_elems =3D *(uint32_t *)(opaque + field->num_offset);
+-    } else if (field->flags & VMS_VARRAY_UINT16) {
+-        n_elems =3D *(uint16_t *)(opaque + field->num_offset);
+-    } else if (field->flags & VMS_VARRAY_UINT8) {
+-        n_elems =3D *(uint8_t *)(opaque + field->num_offset);
+-    }
+-
+-    if (field->flags & VMS_MULTIPLY_ELEMENTS) {
+-        n_elems *=3D field->num;
+-    }
+-
+-    return n_elems;
+-}
+-
+-static int vmstate_size(void *opaque, const VMStateField *field)
+-{
+-    int size =3D field->size;
+-
+-    if (field->flags & VMS_VBUFFER) {
+-        size =3D *(int32_t *)(opaque + field->size_offset);
+-        if (field->flags & VMS_MULTIPLY) {
+-            size *=3D field->size;
+-        }
+-    }
+-
+-    return size;
+-}
+-
+-static int
+-vmstate_save_state_v(SlirpOStream *f, const VMStateDescription *vmsd,
+-                     void *opaque, int version_id)
+-{
+-    int ret =3D 0;
+-    const VMStateField *field =3D vmsd->fields;
+-
+-    if (vmsd->pre_save) {
+-        ret =3D vmsd->pre_save(opaque);
+-        if (ret) {
+-            g_warning("pre-save failed: %s", vmsd->name);
+-            return ret;
+-        }
+-    }
+-
+-    while (field->name) {
+-        if ((field->field_exists &&
+-             field->field_exists(opaque, version_id)) ||
+-            (!field->field_exists &&
+-             field->version_id <=3D version_id)) {
+-            void *first_elem =3D opaque + field->offset;
+-            int i, n_elems =3D vmstate_n_elems(opaque, field);
+-            int size =3D vmstate_size(opaque, field);
+-
+-            if (field->flags & VMS_POINTER) {
+-                first_elem =3D *(void **)first_elem;
+-                assert(first_elem || !n_elems || !size);
+-            }
+-            for (i =3D 0; i < n_elems; i++) {
+-                void *curr_elem =3D first_elem + size * i;
+-                ret =3D 0;
+-
+-                if (field->flags & VMS_ARRAY_OF_POINTER) {
+-                    assert(curr_elem);
+-                    curr_elem =3D *(void **)curr_elem;
+-                }
+-                if (!curr_elem && size) {
+-                    /* if null pointer write placeholder and do not foll=
+ow */
+-                    assert(field->flags & VMS_ARRAY_OF_POINTER);
+-                    ret =3D slirp_vmstate_info_nullptr.put(f, curr_elem,=
+ size, NULL);
+-                } else if (field->flags & VMS_STRUCT) {
+-                    ret =3D slirp_vmstate_save_state(f, field->vmsd, cur=
+r_elem);
+-                } else if (field->flags & VMS_VSTRUCT) {
+-                    ret =3D vmstate_save_state_v(f, field->vmsd, curr_el=
+em,
+-                                               field->struct_version_id)=
+;
+-                } else {
+-                    ret =3D field->info->put(f, curr_elem, size, field);
+-                }
+-                if (ret) {
+-                    g_warning("Save of field %s/%s failed",
+-                              vmsd->name, field->name);
+-                    return ret;
+-                }
+-            }
+-        } else {
+-            if (field->flags & VMS_MUST_EXIST) {
+-                g_warning("Output state validation failed: %s/%s",
+-                          vmsd->name, field->name);
+-                assert(!(field->flags & VMS_MUST_EXIST));
+-            }
+-        }
+-        field++;
+-    }
+-
+-    return 0;
+-}
+-
+-int slirp_vmstate_save_state(SlirpOStream *f, const VMStateDescription *=
+vmsd,
+-                             void *opaque)
+-{
+-    return vmstate_save_state_v(f, vmsd, opaque, vmsd->version_id);
+-}
+-
+-static void vmstate_handle_alloc(void *ptr, VMStateField *field, void *o=
+paque)
+-{
+-    if (field->flags & VMS_POINTER && field->flags & VMS_ALLOC) {
+-        size_t size =3D vmstate_size(opaque, field);
+-        size *=3D vmstate_n_elems(opaque, field);
+-        if (size) {
+-            *(void **)ptr =3D g_malloc(size);
+-        }
+-    }
+-}
+-
+-int slirp_vmstate_load_state(SlirpIStream *f, const VMStateDescription *=
+vmsd,
+-                             void *opaque, int version_id)
+-{
+-    VMStateField *field =3D vmsd->fields;
+-    int ret =3D 0;
+-
+-    if (version_id > vmsd->version_id) {
+-        g_warning("%s: incoming version_id %d is too new "
+-                  "for local version_id %d",
+-                  vmsd->name, version_id, vmsd->version_id);
+-        return -EINVAL;
+-    }
+-    if (vmsd->pre_load) {
+-        int ret =3D vmsd->pre_load(opaque);
+-        if (ret) {
+-            return ret;
+-        }
+-    }
+-    while (field->name) {
+-        if ((field->field_exists &&
+-             field->field_exists(opaque, version_id)) ||
+-            (!field->field_exists &&
+-             field->version_id <=3D version_id)) {
+-            void *first_elem =3D opaque + field->offset;
+-            int i, n_elems =3D vmstate_n_elems(opaque, field);
+-            int size =3D vmstate_size(opaque, field);
+-
+-            vmstate_handle_alloc(first_elem, field, opaque);
+-            if (field->flags & VMS_POINTER) {
+-                first_elem =3D *(void **)first_elem;
+-                assert(first_elem || !n_elems || !size);
+-            }
+-            for (i =3D 0; i < n_elems; i++) {
+-                void *curr_elem =3D first_elem + size * i;
+-
+-                if (field->flags & VMS_ARRAY_OF_POINTER) {
+-                    curr_elem =3D *(void **)curr_elem;
+-                }
+-                if (!curr_elem && size) {
+-                    /* if null pointer check placeholder and do not foll=
+ow */
+-                    assert(field->flags & VMS_ARRAY_OF_POINTER);
+-                    ret =3D slirp_vmstate_info_nullptr.get(f, curr_elem,=
+ size, NULL);
+-                } else if (field->flags & VMS_STRUCT) {
+-                    ret =3D slirp_vmstate_load_state(f, field->vmsd, cur=
+r_elem,
+-                                             field->vmsd->version_id);
+-                } else if (field->flags & VMS_VSTRUCT) {
+-                    ret =3D slirp_vmstate_load_state(f, field->vmsd, cur=
+r_elem,
+-                                             field->struct_version_id);
+-                } else {
+-                    ret =3D field->info->get(f, curr_elem, size, field);
+-                }
+-                if (ret < 0) {
+-                    g_warning("Failed to load %s:%s", vmsd->name,
+-                              field->name);
+-                    return ret;
+-                }
+-            }
+-        } else if (field->flags & VMS_MUST_EXIST) {
+-            g_warning("Input validation failed: %s/%s",
+-                      vmsd->name, field->name);
+-            return -1;
+-        }
+-        field++;
+-    }
+-    if (vmsd->post_load) {
+-        ret =3D vmsd->post_load(opaque, version_id);
+-    }
+-    return ret;
+-}
+diff --git a/slirp b/slirp
+new file mode 160000
+index 0000000000..59a1b1f165
+--- /dev/null
++++ b/slirp
+@@ -0,0 +1 @@
++Subproject commit 59a1b1f165458c2acb7ff0525b543945f7416225
+diff --git a/slirp/COPYRIGHT b/slirp/COPYRIGHT
+deleted file mode 100644
+index ed49512dbc..0000000000
+--- a/slirp/COPYRIGHT
++++ /dev/null
+@@ -1,62 +0,0 @@
+-Slirp was written by Danny Gasparovski.
+-Copyright (c), 1995,1996 All Rights Reserved.
+-
+-Slirp is free software; "free" as in you don't have to pay for it, and y=
+ou
+-are free to do whatever you want with it.  I do not accept any donations=
+,
+-monetary or otherwise, for Slirp.  Instead, I would ask you to pass this
+-potential donation to your favorite charity.  In fact, I encourage
+-*everyone* who finds Slirp useful to make a small donation to their
+-favorite charity (for example, GreenPeace).  This is not a requirement, =
+but
+-a suggestion from someone who highly values the service they provide.
+-
+-The copyright terms and conditions:
+-
+----BEGIN---
+-
+- Copyright (c) 1995,1996 Danny Gasparovski.  All rights reserved.
+-
+- Redistribution and use in source and binary forms, with or without
+- modification, are permitted provided that the following conditions
+- are met:
+- 1. Redistributions of source code must retain the above copyright
+-    notice, this list of conditions and the following disclaimer.
+- 2. Redistributions in binary form must reproduce the above copyright
+-    notice, this list of conditions and the following disclaimer in the
+-    documentation and/or other materials provided with the distribution.
+- 3. Neither the name of the copyright holder nor the names of its
+-    contributors may be used to endorse or promote products derived
+-    from this software without specific prior written permission.
+-
+- THIS SOFTWARE IS PROVIDED ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTI=
+ES,
+- INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILIT=
+Y
+- AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.  IN NO EVENT SHALL
+- DANNY GASPAROVSKI OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
+- INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BU=
+T
+- NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF US=
+E,
+- DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+- THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+- (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE O=
+F
+- THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+-
+----END---
+-
+-This basically means you can do anything you want with the software, exc=
+ept
+-1) call it your own, and 2) claim warranty on it.  There is no warranty =
+for
+-this software.  None.  Nada.  If you lose a million dollars while using
+-Slirp, that's your loss not mine.  So, ***USE AT YOUR OWN RISK!***.
+-
+-If these conditions cannot be met due to legal restrictions (E.g. where =
+it
+-is against the law to give out Software without warranty), you must ceas=
+e
+-using the software and delete all copies you have.
+-
+-Slirp uses code that is copyrighted by the following people/organization=
+s:
+-
+-Juha Pirkola.
+-Gregory M. Christy.
+-The Regents of the University of California.
+-Carnegie Mellon University.
+-The Australian National University.
+-RSA Data Security, Inc.
+-
+-Please read the top of each source file for the details on the various
+-copyrights.
+diff --git a/slirp/Makefile b/slirp/Makefile
+deleted file mode 100644
+index 6d48f626ba..0000000000
+--- a/slirp/Makefile
++++ /dev/null
+@@ -1,47 +0,0 @@
+-ROOT_DIR :=3D $(shell dirname $(realpath $(lastword $(MAKEFILE_LIST))))
+-BUILD_DIR ?=3D .
+-
+-LIBSLIRP =3D $(BUILD_DIR)/libslirp.a
+-
+-all: $(LIBSLIRP)
+-
+-SRCS :=3D $(wildcard src/*.c)
+-OBJS :=3D $(SRCS:%.c=3D$(BUILD_DIR)/%.o)
+-DEPS :=3D $(OBJS:%.o=3D%.d)
+-
+-INC_DIRS :=3D $(BUILD_DIR)/src
+-INC_FLAGS :=3D $(addprefix -I,$(INC_DIRS))
+-
+-override CFLAGS +=3D					\
+-	-DG_LOG_DOMAIN=3D'"Slirp"'			\
+-	$(shell $(PKG_CONFIG) --cflags glib-2.0)	\
+-	$(INC_FLAGS)					\
+-	-MMD -MP
+-override LDFLAGS +=3D $(shell $(PKG_CONFIG) --libs glib-2.0)
+-
+-$(LIBSLIRP): $(OBJS)
+-
+-.PHONY: clean
+-
+-clean:
+-	rm -r $(OBJS) $(DEPS) $(LIBSLIRP)
+-
+-$(BUILD_DIR)/src/%.o: $(ROOT_DIR)/src/%.c
+-	@$(MKDIR_P) $(dir $@)
+-	$(call quiet-command,$(CC) $(CFLAGS) -c -o $@ $<,"CC","$@")
+-
+-%.a:
+-	$(call quiet-command,rm -f $@ && $(AR) rcs $@ $^,"AR","$@")
+-
+-PKG_CONFIG ?=3D pkg-config
+-MKDIR_P ?=3D mkdir -p
+-quiet-command-run =3D $(if $(V),,$(if $2,printf "  %-7s %s\n" $2 $3 && )=
+)$1
+-quiet-@ =3D $(if $(V),,@)
+-quiet-command =3D $(quiet-@)$(call quiet-command-run,$1,$2,$3)
+-
+-print-%:
+-	@echo '$*=3D$($*)'
+-
+-.SUFFIXES:
+-
+--include $(DEPS)
+--=20
+2.21.0.313.ge35b8cb8e2
