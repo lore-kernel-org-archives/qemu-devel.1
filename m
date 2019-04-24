@@ -1,26 +1,23 @@
 Received: from eggs.gnu.org ([209.51.188.92]:33946)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1hJIM6-0008ST-CL
-	for qemu-devel@nongnu.org; Wed, 24 Apr 2019 09:54:35 -0400
+	(envelope-from <mreitz@redhat.com>) id 1hJIMB-0008ST-N7
+	for qemu-devel@nongnu.org; Wed, 24 Apr 2019 09:54:40 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1hJIFC-00013o-OD
-	for qemu-devel@nongnu.org; Wed, 24 Apr 2019 09:47:27 -0400
-Received: from mail-oi1-x22f.google.com ([2607:f8b0:4864:20::22f]:34251)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1hJIFB-00011r-7S
-	for qemu-devel@nongnu.org; Wed, 24 Apr 2019 09:47:26 -0400
-Received: by mail-oi1-x22f.google.com with SMTP id v10so14315951oib.1
-	for <qemu-devel@nongnu.org>; Wed, 24 Apr 2019 06:47:24 -0700 (PDT)
+	(envelope-from <mreitz@redhat.com>) id 1hJIAh-0005Dq-1U
+	for qemu-devel@nongnu.org; Wed, 24 Apr 2019 09:42:47 -0400
+References: <20180713111424.23670-1-mreitz@redhat.com>
+	<20180713111424.23670-3-mreitz@redhat.com>
+	<cec09e49-6702-cb66-e668-42d728800a75@redhat.com>
+From: Max Reitz <mreitz@redhat.com>
+Message-ID: <0bf6aa98-3792-40bd-6520-f8ba419455d7@redhat.com>
+Date: Wed, 24 Apr 2019 15:42:41 +0200
 MIME-Version: 1.0
-References: <20190423171520.4511-1-lersek@redhat.com>
-In-Reply-To: <20190423171520.4511-1-lersek@redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Wed, 24 Apr 2019 14:47:10 +0100
-Message-ID: <CAFEAcA9B-FpTySXUKTxYaw=8V=to0VTjCAvCAMGF-x=yQY3G9A@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PULL 00/12] bundle edk2 platform firmware with
- QEMU
+In-Reply-To: <cec09e49-6702-cb66-e668-42d728800a75@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="UNxDxx9xL2ZSmtfEJSlAjub3m4iJPbTAn"
+Subject: Re: [Qemu-devel] [PATCH 2/3] qemu-img: Use zero writes after source
+ backing EOF
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,54 +26,80 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Laszlo Ersek <lersek@redhat.com>
-Cc: "Daniel P. Berrange" <berrange@redhat.com>, Eric Blake <eblake@redhat.com>, =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>, Igor Mammedov <imammedo@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>, Michal Privoznik <mprivozn@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>
+To: Eric Blake <eblake@redhat.com>, qemu-block@nongnu.org
+Cc: Kevin Wolf <kwolf@redhat.com>, qemu-devel@nongnu.org
 
-On Tue, 23 Apr 2019 at 18:15, Laszlo Ersek <lersek@redhat.com> wrote:
->
-> Picked up the new feedback tags from the v4 thread, which had been
-> posted at:
-> - https://lists.gnu.org/archive/html/qemu-devel/2019-04/msg01549.html
-> - http://mid.mail-archive.com/20190409230022.6462-1-lersek@redhat.com
->
-> The following changes since commit eeba63fc7fface36f438bcbc0d3b02e7dcb59983:
->
->   Update version for v4.0.0-rc4 release (2019-04-16 21:53:00 +0100)
->
-> are available in the Git repository at:
->
->   https://github.com/lersek/qemu.git tags/edk2-pull-2019-04-22
->
-> for you to fetch changes up to 6739df3fafaa3e2ec37af23fd77d2119869f4a4f:
->
->   MAINTAINERS: add the "EDK2 Firmware" subsystem (2019-04-17 15:38:35 +0200)
->
-> ----------------------------------------------------------------
-> Advance the roms/edk2 submodule to the "edk2-stable201903" release, and
-> build and capture platform firmware binaries from that release. The
-> binaries are meant to be used by both end-users and by the "BIOS tables"
-> unit tests in qtest ("make check").
->
-> ----------------------------------------------------------------
-> Laszlo Ersek (12):
->       roms: lift "edk2-funcs.sh" from "tests/uefi-test-tools/build.sh"
->       roms/edk2-funcs.sh: require gcc-4.8+ for building i386 and x86_64
->       tests/uefi-test-tools/build.sh: work around TianoCore#1607
->       roms/edk2: advance to tag edk2-stable201903
->       roms/edk2-funcs.sh: add the qemu_edk2_get_thread_count() function
->       roms/Makefile: replace the $(EDK2_EFIROM) target with "edk2-basetools"
->       roms: build edk2 firmware binaries and variable store templates
->       pc-bios: add edk2 firmware binaries and variable store templates
->       pc-bios: document the edk2 firmware images; add firmware descriptors
->       tests: add missing dependency to build QTEST_QEMU_BINARY, round 2
->       Makefile: install the edk2 firmware images and their descriptors
->       MAINTAINERS: add the "EDK2 Firmware" subsystem
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--UNxDxx9xL2ZSmtfEJSlAjub3m4iJPbTAn
+From: Max Reitz <mreitz@redhat.com>
+To: Eric Blake <eblake@redhat.com>, qemu-block@nongnu.org
+Cc: Kevin Wolf <kwolf@redhat.com>, qemu-devel@nongnu.org
+Message-ID: <0bf6aa98-3792-40bd-6520-f8ba419455d7@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH 2/3] qemu-img: Use zero writes after source
+ backing EOF
+References: <20180713111424.23670-1-mreitz@redhat.com>
+ <20180713111424.23670-3-mreitz@redhat.com>
+ <cec09e49-6702-cb66-e668-42d728800a75@redhat.com>
+In-Reply-To: <cec09e49-6702-cb66-e668-42d728800a75@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+
+On 18.04.19 20:59, Eric Blake wrote:
+> On 7/13/18 6:14 AM, Max Reitz wrote:
+>> Past the end of the source backing file, we memset() buf_old to zero, =
+so
+>> it is clearly easy to use blk_pwrite_zeroes() instead of blk_pwrite()
+>> then.
+>>
+>> Signed-off-by: Max Reitz <mreitz@redhat.com>
+>> ---
+>>  qemu-img.c | 11 +++++++++--
+>>  1 file changed, 9 insertions(+), 2 deletions(-)
+>>
+>=20
+>> @@ -3458,8 +3461,12 @@ static int img_rebase(int argc, char **argv)
+>>                  if (compare_buffers(buf_old + written, buf_new + writ=
+ten,
+>>                                      n - written, &pnum))
+>>                  {
+>> -                    ret =3D blk_pwrite(blk, offset + written,
+>> -                                     buf_old + written, pnum, 0);
+>> +                    if (buf_old_is_zero) {
+>> +                        ret =3D blk_pwrite_zeroes(blk, offset + writt=
+en, pnum, 0);
+>=20
+> Should we allow BDRV_REQ_MAY_UNMAP here, either unconditionally, or
+> based on a command line knob that told us whether the user is more
+> interested in a sparse result (that still reads as zero) vs. a
+> fully-allocated result?
+
+I wouldn=E2=80=99t trust that.  We haven=E2=80=99t yet switched to the ne=
+w backing file
+at this point, so I think a driver would be correct in handling such
+requests by punching a hole in the file -- which would lead to the new
+backing file poking through once we=E2=80=99ve switched to it.
+
+Max
+
+> Reviewed-by: Eric Blake <eblake@redhat.com>
 
 
 
-Applied, thanks.
+--UNxDxx9xL2ZSmtfEJSlAjub3m4iJPbTAn
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
 
-Please update the changelog at https://wiki.qemu.org/ChangeLog/4.1
-for any user-visible changes.
+-----BEGIN PGP SIGNATURE-----
 
--- PMM
+iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAlzAZ9EACgkQ9AfbAGHV
+z0ANUgf9HgjsPsrvGPUZvs/281P2a9XloQt6lnutxa1Q97wvlOf7F9sOqBhZpcMR
+NOFtrTbN81CBVOHjuSpP7rZUuXkML7LX65+vuF4b4/sw8nsU9uRz0bBPmW7WtLOR
+Zmnw4mIQSa6uKV13eeo5RPCtQ7uL1MlrZvpQzPZMsYKx+PAauYu5pQ7xrEJv+1Sh
+qrpZrrOMNQxatNgelcNY6ghXroWX8PmnmVE1A/sWLUhr3kMJ2A7tsjsJE2YYLFEV
+qKvVr3uhM4PDMXAmNeV1ZE4QvD/YABrQatVCAOKQ5ZUErohVmYef0AhDhCZFm5L4
+gb78iAT6ogqin0mLKkpKwHjCvay9GQ==
+=cU4U
+-----END PGP SIGNATURE-----
+
+--UNxDxx9xL2ZSmtfEJSlAjub3m4iJPbTAn--
