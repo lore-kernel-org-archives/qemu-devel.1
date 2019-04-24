@@ -2,93 +2,86 @@ Return-Path: <SRS0=3XOk=S2=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BDDEEC10F11
-	for <qemu-devel@archiver.kernel.org>; Wed, 24 Apr 2019 14:03:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 66638C10F11
+	for <qemu-devel@archiver.kernel.org>; Wed, 24 Apr 2019 14:16:56 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8DEC3218FC
-	for <qemu-devel@archiver.kernel.org>; Wed, 24 Apr 2019 14:03:40 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8DEC3218FC
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 2DD5721773
+	for <qemu-devel@archiver.kernel.org>; Wed, 24 Apr 2019 14:16:56 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="fgEUkEqr"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2DD5721773
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:42209 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:42369 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hJIUt-0007qP-Od
-	for qemu-devel@archiver.kernel.org; Wed, 24 Apr 2019 10:03:39 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:34349)
+	id 1hJIhj-0003xD-3O
+	for qemu-devel@archiver.kernel.org; Wed, 24 Apr 2019 10:16:55 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:39018)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1hJIMV-0000Pz-8i
-	for qemu-devel@nongnu.org; Wed, 24 Apr 2019 09:55:02 -0400
+	(envelope-from <liq3ea@gmail.com>) id 1hJIfQ-0002XI-3l
+	for qemu-devel@nongnu.org; Wed, 24 Apr 2019 10:14:33 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1hJI7K-00064r-R4
-	for qemu-devel@nongnu.org; Wed, 24 Apr 2019 09:39:19 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:34042)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mreitz@redhat.com>)
-	id 1hJI7I-0005Wv-9U; Wed, 24 Apr 2019 09:39:16 -0400
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
-	[10.5.11.13])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id F29CD8830B;
-	Wed, 24 Apr 2019 13:38:57 +0000 (UTC)
-Received: from dresden.str.redhat.com (unknown [10.40.205.28])
-	by smtp.corp.redhat.com (Postfix) with ESMTPS id C597F608C1;
-	Wed, 24 Apr 2019 13:38:56 +0000 (UTC)
-To: Eric Blake <eblake@redhat.com>, qemu-block@nongnu.org
-References: <20180713111424.23670-1-mreitz@redhat.com>
-	<20180713111424.23670-2-mreitz@redhat.com>
-	<a36f26f1-61b3-799f-5cee-281257cba123@redhat.com>
-From: Max Reitz <mreitz@redhat.com>
-Openpgp: preference=signencrypt
-Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
-	mQENBFXOJlcBCADEyyhOTsoa/2ujoTRAJj4MKA21dkxxELVj3cuILpLTmtachWj7QW+TVG8U
-	/PsMCFbpwsQR7oEy8eHHZwuGQsNpEtNC2G/L8Yka0BIBzv7dEgrPzIu+W3anZXQW4702+uES
-	U29G8TP/NGfXRRHGlbBIH9KNUnOSUD2vRtpOLXkWsV5CN6vQFYgQfFvmp5ZpPeUe6xNplu8V
-	mcTw8OSEDW/ZnxJc8TekCKZSpdzYoxfzjm7xGmZqB18VFwgJZlIibt1HE0EB4w5GsD7x5ekh
-	awIe3RwoZgZDLQMdOitJ1tUc8aqaxvgA4tz6J6st8D8pS//m1gAoYJWGwwIVj1DjTYLtABEB
-	AAG0HU1heCBSZWl0eiA8bXJlaXR6QHJlZGhhdC5jb20+iQFTBBMBCAA9AhsDBQkSzAMABQsJ
-	CAcCBhUICQoLAgQWAgMBAh4BAheABQJVzie5FRhoa3A6Ly9rZXlzLmdudXBnLm5ldAAKCRD0
-	B9sAYdXPQDcIB/9uNkbYEex1rHKz3mr12uxYMwLOOFY9fstP5aoVJQ1nWQVB6m2cfKGdcRe1
-	2/nFaHSNAzT0NnKz2MjhZVmcrpyd2Gp2QyISCfb1FbT82GMtXFj1wiHmPb3CixYmWGQUUh+I
-	AvUqsevLA+WihgBUyaJq/vuDVM1/K9Un+w+Tz5vpeMidlIsTYhcsMhn0L9wlCjoucljvbDy/
-	8C9L2DUdgi3XTa0ORKeflUhdL4gucWoAMrKX2nmPjBMKLgU7WLBc8AtV+84b9OWFML6NEyo4
-	4cP7cM/07VlJK53pqNg5cHtnWwjHcbpGkQvx6RUx6F1My3y52vM24rNUA3+ligVEgPYBuQEN
-	BFXOJlcBCADAmcVUNTWT6yLWQHvxZ0o47KCP8OcLqD+67T0RCe6d0LP8GsWtrJdeDIQk+T+F
-	xO7DolQPS6iQ6Ak2/lJaPX8L0BkEAiMuLCKFU6Bn3lFOkrQeKp3u05wCSV1iKnhg0UPji9V2
-	W5eNfy8F4ZQHpeGUGy+liGXlxqkeRVhLyevUqfU0WgNqAJpfhHSGpBgihUupmyUg7lfUPeRM
-	DzAN1pIqoFuxnN+BRHdAecpsLcbR8sQddXmDg9BpSKozO/JyBmaS1RlquI8HERQoe6EynJhd
-	64aICHDfj61rp+/0jTIcevxIIAzW70IadoS/y3DVIkuhncgDBvGbF3aBtjrJVP+5ABEBAAGJ
-	ASUEGAEIAA8FAlXOJlcCGwwFCRLMAwAACgkQ9AfbAGHVz0CbFwf9F/PXxQR9i4N0iipISYjU
-	sxVdjJOM2TMut+ZZcQ6NSMvhZ0ogQxJ+iEQ5OjnIputKvPVd5U7WRh+4lF1lB/NQGrGZQ1ic
-	alkj6ocscQyFwfib+xIe9w8TG1CVGkII7+TbS5pXHRxZH1niaRpoi/hYtgzkuOPp35jJyqT/
-	/ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
-	bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
-	R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
-Message-ID: <3c983edf-047f-c463-90f2-f1b542d9f3dd@redhat.com>
-Date: Wed, 24 Apr 2019 15:38:54 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
-	Thunderbird/60.6.1
+	(envelope-from <liq3ea@gmail.com>) id 1hJIae-0000Db-PP
+	for qemu-devel@nongnu.org; Wed, 24 Apr 2019 10:09:38 -0400
+Received: from mail-ot1-x342.google.com ([2607:f8b0:4864:20::342]:40967)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <liq3ea@gmail.com>) id 1hJIae-0000Bp-JE
+	for qemu-devel@nongnu.org; Wed, 24 Apr 2019 10:09:36 -0400
+Received: by mail-ot1-x342.google.com with SMTP id g8so2277559otk.8
+	for <qemu-devel@nongnu.org>; Wed, 24 Apr 2019 07:09:36 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+	h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+	:cc; bh=8v3p45lRJSCzNAEgD3C3YA3auMNuh58OuyBB6RW9DgI=;
+	b=fgEUkEqrzzUGOJvLHpnsgvwtAN/72xIqaQaZZZUK/Um674y9CpV9sikyTH+j8vqjLl
+	iZBZ365qO1nGcZgt8lTG0GjTGOEzSw6yvU4VdHeZZ3QZCztto6lht0Q2EXnmN4AkJ1xq
+	vG9FdtqHnWh4iaWQkbD/6FCI6vtcMUaEQrpEdKnAicMXMPkP3k+Y2sejSfRCzwVhZPjf
+	Mm5dkw3vNDnxI9hpFaoYY/ciuCrqBVc4MlsnaWG872cN5FPpu0+A6v3cpvGIKARlu5nl
+	28Ql2T/zEBkRPFr0M3K+R0+2JkpzMshFFwN+Kdo1a0fxVYeoe3xQcwrVFGhnCK/AM89h
+	lDhA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=1e100.net; s=20161025;
+	h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+	:message-id:subject:to:cc;
+	bh=8v3p45lRJSCzNAEgD3C3YA3auMNuh58OuyBB6RW9DgI=;
+	b=So7fmh6cW0tEnXab96hbOmQ+FmhJ832KJVmQPY+qzWLEWuk/CWomiR8wGJ9o8Koc6w
+	8oYpSzkp/1Pa72mqVyr7oNAeagD5qEXmC2faidZXwDbbNL7WOWJVYzmF3TEhH+WsNlOq
+	qbr3SYqi65af+wr89aP3L7AVKml11JMFVvh7reH75BMBGUIWrqgsgIXF75uYMCvt3bGS
+	yYnZYN3dhazSonqI7okYEF8+1SgJjvrpb1duoA4ZDH4dLhXRk/mMTUCa4xHHYEXIbOg/
+	dP4RG77fjc/gOhdx0bFDpPxKkamzuUmCl7AAgagLuWiUnTFSmzofkfBD3RT7aUCR93nI
+	H5qA==
+X-Gm-Message-State: APjAAAXLuuFw8hgDMZxEbn+nWbXZ7e1YxqnD8z2Ewa5IsoBpIgfuDZ8i
+	+ao7B01jbvZCu+9TMjjC6h3om0ZMJ0G97gqHHuA=
+X-Google-Smtp-Source: APXvYqyP18S9wYx3nm3FvokhDTVznJUZJYP8TuBOtPmUtWUAypFEUT9OX0VV2S1uLySDKrAtMEIjLkuS/hKX7s1YHW4=
+X-Received: by 2002:a9d:7b50:: with SMTP id f16mr19183704oto.221.1556114975523;
+	Wed, 24 Apr 2019 07:09:35 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <a36f26f1-61b3-799f-5cee-281257cba123@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="LN3Ni5ZNrpgspsOQUB9OvNNpCFS8e9Rkw"
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.28]);
-	Wed, 24 Apr 2019 13:38:58 +0000 (UTC)
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
+References: <20190420100056.116305-1-liq3ea@163.com>
+	<20190420100056.116305-4-liq3ea@163.com>
+	<a27cd912-4f58-55ac-1aae-e4999fa3d84d@redhat.com>
+	<CAKXe6SJZWs7HtXutX6W3saDhaNDtVPMQEh2+s+9XiM3TtZqLdQ@mail.gmail.com>
+	<6dd699b1-f24d-743b-343e-f1df6c8672b9@redhat.com>
+In-Reply-To: <6dd699b1-f24d-743b-343e-f1df6c8672b9@redhat.com>
+From: Li Qiang <liq3ea@gmail.com>
+Date: Wed, 24 Apr 2019 22:08:59 +0800
+Message-ID:
+ <CAKXe6SJ5iqXTMZMKQG4X0r1dDKNCBq06hcDPVzzUupCD=nH4zw@mail.gmail.com>
+To: Thomas Huth <thuth@redhat.com>
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+	recognized.
+X-Received-From: 2607:f8b0:4864:20::342
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 X-Content-Filtered-By: Mailman/MimeDel 2.1.21
-Subject: Re: [Qemu-devel] [PATCH 1/3] qemu-img: Allow rebase with no input
- base
+Subject: Re: [Qemu-devel] [PATCH 3/4] tests: fw_cfg: add reboot_timeout test
+ case
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -100,77 +93,111 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, qemu-devel@nongnu.org
+Cc: lvivier@redhat.com,
+	=?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>,
+	Li Qiang <liq3ea@163.com>, Qemu Developers <qemu-devel@nongnu.org>,
+	Gerd Hoffmann <kraxel@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
+	Laszlo Ersek <lersek@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190424133854.EMg4ko-5XfHB6_e9bOKKP3Vx3RCrZcrULDOY9c8TJT8@z>
+Message-ID: <20190424140859.s9ty7KCwFr9ZC_qv6NGMBDH8DXoHWyaWCTgpxLFsPl8@z>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---LN3Ni5ZNrpgspsOQUB9OvNNpCFS8e9Rkw
-From: Max Reitz <mreitz@redhat.com>
-To: Eric Blake <eblake@redhat.com>, qemu-block@nongnu.org
-Cc: Kevin Wolf <kwolf@redhat.com>, qemu-devel@nongnu.org
-Message-ID: <3c983edf-047f-c463-90f2-f1b542d9f3dd@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH 1/3] qemu-img: Allow rebase with no input
- base
-References: <20180713111424.23670-1-mreitz@redhat.com>
- <20180713111424.23670-2-mreitz@redhat.com>
- <a36f26f1-61b3-799f-5cee-281257cba123@redhat.com>
-In-Reply-To: <a36f26f1-61b3-799f-5cee-281257cba123@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+Thomas Huth <thuth@redhat.com> =E4=BA=8E2019=E5=B9=B44=E6=9C=8824=E6=97=A5=
+=E5=91=A8=E4=B8=89 =E4=B8=8B=E5=8D=883:31=E5=86=99=E9=81=93=EF=BC=9A
 
-On 18.04.19 20:55, Eric Blake wrote:
-> On 7/13/18 6:14 AM, Max Reitz wrote:
->> Currently, you cannot add a backing file to an image when it currently=
+> On 24/04/2019 03.16, Li Qiang wrote:
+> >
+> > Thomas Huth <thuth@redhat.com <mailto:thuth@redhat.com>> =E4=BA=8E2019=
+=E5=B9=B44=E6=9C=8824=E6=97=A5
+> > =E5=91=A8=E4=B8=89 =E4=B8=8A=E5=8D=8812:29=E5=86=99=E9=81=93=EF=BC=9A
+> >
+> >     On 20/04/2019 12.00, Li Qiang wrote:
+> >     > Signed-off-by: Li Qiang <liq3ea@163.com <mailto:liq3ea@163.com>>
+> >     > ---
+> >     >  tests/fw_cfg-test.c | 19 +++++++++++++++++++
+> >     >  1 file changed, 19 insertions(+)
+> >     >
+> >     > diff --git a/tests/fw_cfg-test.c b/tests/fw_cfg-test.c
+> >     > index c22503619f..9f75dbb5f4 100644
+> >     > --- a/tests/fw_cfg-test.c
+> >     > +++ b/tests/fw_cfg-test.c
+> >     > @@ -174,6 +174,24 @@ static void test_fw_cfg_boot_menu(void)
+> >     >      qtest_quit(s);
+> >     >  }
+> >     >
+> >     > +static void test_fw_cfg_reboot_timeout(void)
+> >     > +{
+> >     > +    QFWCFG *fw_cfg;
+> >     > +    QTestState *s;
+> >     > +    uint32_t reboot_timeout =3D 0;
+> >     > +    size_t filesize;
+> >     > +
+> >     > +    s =3D qtest_init("-boot reboot-timeout=3D15");
+> >     > +    fw_cfg =3D pc_fw_cfg_init(s);
+> >     > +
+> >     > +    filesize =3D qfw_cfg_get_file(fw_cfg, "etc/boot-fail-wait",
+> >     > +                     &reboot_timeout, sizeof(reboot_timeout));
+> >     > +    g_assert_cmpint(filesize, =3D=3D, sizeof(reboot_timeout));
+> >     > +    g_assert_cmpint(reboot_timeout, =3D=3D, 15);
+> >
+> >     Is this endianess-safe? Or do you need to byteswap reboot_timeout i=
+f
+> the
+> >     host and guest endianess does not match?
+> >
+> > Good question!
+> >
+> > IIUC, the qemu fw_cfg store the 'file' entry data just in byte stream.
+> > So there is no need
+> > to consider the file's endianess. If when the file entry is stored
+> > without considering endianess,
+> > it will be ok to ignore the endianess. So for this patch, the
+> > 'reboot_timeout' is ok as when we stored
+> > it we don't consider endianess. But for 'splash-time', when we stored
+> > it  we convert it to little endian
+> > so when we fetches it, we should also convert it from little endian to
+> > cpu-endian.
+>
+> I just gave these patches a try on a big endian host, and the test fails
+> indeed:
+>
+>
+Hi Thomas,
 
->> has none.  It is really simple to allow this, though (effectively by
->> setting old_backing_size to 0), so this patch does just that.
->=20
-> Can't you do that with 'rebase -u'? I guess the point of this patch is
-> to make 'rebase' without -u also able to add a backing file?  A bit mor=
-e
-> clarity in the commit message, such as a sample command line (and
-> possibly even the error it issued pre-patch) would help.
+I have sent out a revision patchset, could you please also try the new in
+the big endian host.
 
-Yes, this is about normal rebase without -u.
-
-There is an example in the cover letter, but I can add it to this patch
-here, too, yes.
-
->> Signed-off-by: Max Reitz <mreitz@redhat.com>
->> ---
->>  qemu-img.c | 61 ++++++++++++++++++++++++++++++-----------------------=
--
->>  1 file changed, 34 insertions(+), 27 deletions(-)
->=20
-> At any rate, the code looks fine, even if the diff is harder to read
-> because of added indentation.
->=20
-> Reviewed-by: Eric Blake <eblake@redhat.com>
-
-Thanks!
-
-Max
+Thanks,
+Li Qiang
 
 
---LN3Ni5ZNrpgspsOQUB9OvNNpCFS8e9Rkw
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
 
------BEGIN PGP SIGNATURE-----
 
-iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAlzAZu4ACgkQ9AfbAGHV
-z0Cruwf+Pd0xQD119UktAbODprzQYu4GvTGgKB2Hw7W+CME+fQ9sxR/zkERpHe6h
-aUyXME4v+/2EI8eEMWPpxK6sP0nLCnMAJ3RmFVG2Ud8xloLOeXiXK/V5KF92VVDJ
-aNHPfKlAMGZ8RE2GAMc0SQDFYMqAbVh36FFN6KfGtUuF16ZuGMTT40zxVhlnOwj/
-IdvnemV11ovHCuUDy3v+9mGUdx1gb/5UcotNnhxQs+VUP3VPjqsjAfgbUDcggqjR
-t9dPyBwap5omCyVcAmw5R+M42PHOKBgvh0xLZjrgBke/Rq6lEUybjACt0WL3WMbe
-+ZGH1mMKIXLtjpwoWRFBrJpWH6xEHw==
-=EpZE
------END PGP SIGNATURE-----
-
---LN3Ni5ZNrpgspsOQUB9OvNNpCFS8e9Rkw--
-
+> $ QTEST_QEMU_BINARY=3Dx86_64-softmmu/qemu-system-x86_64 tests/fw_cfg-test
+> /x86_64/fw_cfg/signature: OK
+> /x86_64/fw_cfg/id: OK
+> /x86_64/fw_cfg/uuid: OK
+> /x86_64/fw_cfg/ram_size: OK
+> /x86_64/fw_cfg/nographic: OK
+> /x86_64/fw_cfg/nb_cpus: OK
+> /x86_64/fw_cfg/max_cpus: OK
+> /x86_64/fw_cfg/numa: OK
+> /x86_64/fw_cfg/boot_menu: OK
+> /x86_64/fw_cfg/reboot_timeout: **
+> ERROR:tests/fw_cfg-test.c:190:test_fw_cfg_reboot_timeout: assertion
+> failed (reboot_timeout =3D=3D 15): (0 =3D=3D 15)
+> Aborted
+>
+> =3D> it also fails for reboot_timeout already, not only for splash_time.
+>
+> > So I think we can have following choose:
+> >
+> > 1. Don't consider the endianess, this is ok when emaulated target and
+> > host target has the same endianess.
+>
+> Sorry, but that's not a real choice. qtests must also work when you e.g.
+> run qemu-system-x86_64 on a big endian host.
+>
+>  Thomas
+>
