@@ -3,71 +3,70 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
 X-Spam-Status: No, score=-0.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+	MAILING_LIST_MULTI,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3F7DCC10F11
-	for <qemu-devel@archiver.kernel.org>; Wed, 24 Apr 2019 06:16:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id ECD1AC282CE
+	for <qemu-devel@archiver.kernel.org>; Wed, 24 Apr 2019 06:22:22 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id BA3142089F
-	for <qemu-devel@archiver.kernel.org>; Wed, 24 Apr 2019 06:16:38 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BA3142089F
+	by mail.kernel.org (Postfix) with ESMTPS id 7C726218DA
+	for <qemu-devel@archiver.kernel.org>; Wed, 24 Apr 2019 06:22:22 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7C726218DA
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:36509 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:36560 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hJBCv-0007WF-Kv
-	for qemu-devel@archiver.kernel.org; Wed, 24 Apr 2019 02:16:37 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:55838)
+	id 1hJBIT-0000jE-9u
+	for qemu-devel@archiver.kernel.org; Wed, 24 Apr 2019 02:22:21 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:57291)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1hJBC9-0007Bq-Vr
-	for qemu-devel@nongnu.org; Wed, 24 Apr 2019 02:15:51 -0400
+	(envelope-from <bounces@canonical.com>) id 1hJBGv-0008GW-JY
+	for qemu-devel@nongnu.org; Wed, 24 Apr 2019 02:20:46 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1hJBC8-000599-JM
-	for qemu-devel@nongnu.org; Wed, 24 Apr 2019 02:15:49 -0400
-Received: from indium.canonical.com ([91.189.90.7]:43402)
+	(envelope-from <bounces@canonical.com>) id 1hJBGu-0000wq-DG
+	for qemu-devel@nongnu.org; Wed, 24 Apr 2019 02:20:45 -0400
+Received: from indium.canonical.com ([91.189.90.7]:43850)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1hJBC8-00055i-Ct
-	for qemu-devel@nongnu.org; Wed, 24 Apr 2019 02:15:48 -0400
+	id 1hJBGu-0000vp-7i
+	for qemu-devel@nongnu.org; Wed, 24 Apr 2019 02:20:44 -0400
 Received: from loganberry.canonical.com ([91.189.90.37])
 	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1hJBC7-0007Ng-2M
-	for <qemu-devel@nongnu.org>; Wed, 24 Apr 2019 06:15:47 +0000
+	id 1hJBGs-0007fI-NY
+	for <qemu-devel@nongnu.org>; Wed, 24 Apr 2019 06:20:42 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 096072E80CB
-	for <qemu-devel@nongnu.org>; Wed, 24 Apr 2019 06:15:47 +0000 (UTC)
+	by loganberry.canonical.com (Postfix) with ESMTP id AFBE52E80C8
+	for <qemu-devel@nongnu.org>; Wed, 24 Apr 2019 06:20:42 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Wed, 24 Apr 2019 06:01:10 -0000
-From: Thomas Huth <1523246@bugs.launchpad.net>
+Date: Wed, 24 Apr 2019 06:09:44 -0000
+From: Thomas Huth <1817865@bugs.launchpad.net>
 To: qemu-devel@nongnu.org
 X-Launchpad-Notification-Type: bug
-X-Launchpad-Bug: product=qemu; status=Fix Released; importance=Wishlist;
+X-Launchpad-Bug: product=qemu; status=Fix Released; importance=Undecided;
 	assignee=None; 
-X-Launchpad-Bug-Tags: trim virtio windows
 X-Launchpad-Bug-Information-Type: Public
 X-Launchpad-Bug-Private: no
 X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: jamespharvey20 manouchehri mikemol rustamabd
-	socketpair stefanha th-huth
-X-Launchpad-Bug-Reporter: David Manouchehri (manouchehri)
+X-Launchpad-Bug-Commenters: llyzs
+X-Launchpad-Bug-Reporter: Vic (llyzs)
 X-Launchpad-Bug-Modifier: Thomas Huth (th-huth)
-References: <20151206150708.14182.82430.malonedeb@wampee.canonical.com>
+References: <155125923743.16914.13241911895735421382.malonedeb@soybean.canonical.com>
 Message-Id:
- <155608567235.13969.11591304391473188281.launchpad@gac.canonical.com>
+ <155608618538.16959.4237724165339356729.launchpad@soybean.canonical.com>
 X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
 X-Launchpad-Message-For: qemu-devel-ml
 Precedence: bulk
 X-Generated-By: Launchpad (canonical.com); Revision="18928";
 	Instance="launchpad-lazr.conf"
-X-Launchpad-Hash: 1ffb0c9ad0ef95e12bf6bc2b2031122e2eca87b8
+X-Launchpad-Hash: 43f336ccad41dd13c09c940515155a7ec8cf3625
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 91.189.90.7
-Subject: [Qemu-devel] [Bug 1523246] Re: Virtio-blk does not support TRIM
+Subject: [Qemu-devel] [Bug 1817865] Re: sorecvfrom freezes guest
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 List-Id: <qemu-devel.nongnu.org>
@@ -78,11 +77,11 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1523246 <1523246@bugs.launchpad.net>
+Reply-To: Bug 1817865 <1817865@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190424060110.O863uTeX6b_Sc8FGVRxPx2Dh2EzCALoeSWihEbqhld4@z>
+Message-ID: <20190424060944.acfncN4DDSM8TNyE4sLrADo7dI6AODtzS59mAVm_zCw@z>
 
 ** Changed in: qemu
        Status: Fix Committed =3D> Fix Released
@@ -91,34 +90,21 @@ Message-ID: <20190424060110.O863uTeX6b_Sc8FGVRxPx2Dh2EzCALoeSWihEbqhld4@z>
 
 You received this bug notification because you are a member of qemu-
 devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1523246
+https://bugs.launchpad.net/bugs/1817865
 
 Title:
-  Virtio-blk does not support TRIM
+  sorecvfrom freezes guest
 
 Status in QEMU:
   Fix Released
 
 Bug description:
-  When model=3Dvirtio is used, TRIM is not supported.
+  QEMU release 3.1.0; Guest running win10.
 
-  # mount -o discard /dev/vda4 /mnt
-  # mount | tail -1
-  /dev/vda4 on /mnt type fuseblk (rw,nosuid,nodev,relatime,user_id=3D0,grou=
-p_id=3D0,allow_other,blksize=3D4096)
-  # fstrim /mnt/
-  fstrim: /mnt/: the discard operation is not supported
-
-  Booting without model=3Dvirtio allows using TRIM (in Windows as well).
-
-  Full QEMU line:
-
-  qemu-system-x86_64 -enable-kvm -cpu host -bios
-  /usr/share/ovmf/ovmf_x64.bin -smp 2 -m 7G -vga qxl -usbdevice tablet
-  -net nic,model=3Dvirtio -net user -drive discard=3Dunmap,detect-
-  zeroes=3Dunmap,cache=3Dnone,file=3Dvms/win10.hd.img.vmdk,format=3Dvmdk,if=
-=3Dvirtio
+  Sometimes sorecvfrom() is called from slirp.c because revents =3D=3D
+  G_IO_IN, however inside sorecvfrom() function, ioctlsocket() returns 0
+  bytes available and recvfrom could be blocking indefinitely.
 
 To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1523246/+subscriptions
+https://bugs.launchpad.net/qemu/+bug/1817865/+subscriptions
 
