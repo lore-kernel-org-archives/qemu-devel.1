@@ -2,68 +2,73 @@ Return-Path: <SRS0=3XOk=S2=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4ABA4C10F11
-	for <qemu-devel@archiver.kernel.org>; Wed, 24 Apr 2019 12:18:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B389BC10F11
+	for <qemu-devel@archiver.kernel.org>; Wed, 24 Apr 2019 12:19:11 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 104FB21773
-	for <qemu-devel@archiver.kernel.org>; Wed, 24 Apr 2019 12:17:59 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 104FB21773
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id ED82F21773
+	for <qemu-devel@archiver.kernel.org>; Wed, 24 Apr 2019 12:19:10 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org ED82F21773
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:40776 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:40784 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hJGqc-0005kZ-BO
-	for qemu-devel@archiver.kernel.org; Wed, 24 Apr 2019 08:17:58 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:37107)
+	id 1hJGrl-0006VN-SH
+	for qemu-devel@archiver.kernel.org; Wed, 24 Apr 2019 08:19:09 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:37755)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jasowang@redhat.com>) id 1hJGmk-0002ls-W4
-	for qemu-devel@nongnu.org; Wed, 24 Apr 2019 08:14:03 -0400
+	(envelope-from <bounces@canonical.com>) id 1hJGoN-000450-TC
+	for qemu-devel@nongnu.org; Wed, 24 Apr 2019 08:15:42 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jasowang@redhat.com>) id 1hJGY4-0004p1-Ni
-	for qemu-devel@nongnu.org; Wed, 24 Apr 2019 07:58:49 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:47418)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <jasowang@redhat.com>) id 1hJGY4-0004n8-Fj
-	for qemu-devel@nongnu.org; Wed, 24 Apr 2019 07:58:48 -0400
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
-	[10.5.11.12])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 7014C307028B;
-	Wed, 24 Apr 2019 11:58:47 +0000 (UTC)
-Received: from [10.72.12.170] (ovpn-12-170.pek2.redhat.com [10.72.12.170])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id E9FEB60C64;
-	Wed, 24 Apr 2019 11:58:43 +0000 (UTC)
-To: mst@redhat.com, qemu-devel@nongnu.org
-References: <20190409055850.25797-1-jasowang@redhat.com>
-From: Jason Wang <jasowang@redhat.com>
-Message-ID: <c2bf2ef7-36ab-723f-b245-055d22f68978@redhat.com>
-Date: Wed, 24 Apr 2019 19:58:42 +0800
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
-	Thunderbird/60.6.1
+	(envelope-from <bounces@canonical.com>) id 1hJGoM-0007HJ-0J
+	for qemu-devel@nongnu.org; Wed, 24 Apr 2019 08:15:39 -0400
+Received: from indium.canonical.com ([91.189.90.7]:57562)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1hJGoL-0007FR-30
+	for qemu-devel@nongnu.org; Wed, 24 Apr 2019 08:15:37 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1hJGoH-0002HF-Mn
+	for <qemu-devel@nongnu.org>; Wed, 24 Apr 2019 12:15:33 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id A47A62E80C7
+	for <qemu-devel@nongnu.org>; Wed, 24 Apr 2019 12:15:33 +0000 (UTC)
 MIME-Version: 1.0
-In-Reply-To: <20190409055850.25797-1-jasowang@redhat.com>
-Content-Type: text/plain; charset="UTF-8"; format="flowed"
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.44]);
-	Wed, 24 Apr 2019 11:58:47 +0000 (UTC)
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
+Date: Wed, 24 Apr 2019 12:10:21 -0000
+From: Gwendolyn Haller <1826175@bugs.launchpad.net>
+To: qemu-devel@nongnu.org
+X-Launchpad-Notification-Type: bug
+X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
+X-Launchpad-Bug-Information-Type: Public
+X-Launchpad-Bug-Private: no
+X-Launchpad-Bug-Security-Vulnerability: no
+X-Launchpad-Bug-Commenters: berrange fonthime th-huth
+X-Launchpad-Bug-Reporter: Gwendolyn Haller (fonthime)
+X-Launchpad-Bug-Modifier: Gwendolyn Haller (fonthime)
+References: <155609955691.16667.3366200166619949036.malonedeb@soybean.canonical.com>
+Message-Id:
+ <155610782118.17507.15856887681028117924.malone@soybean.canonical.com>
+X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
+X-Launchpad-Message-For: qemu-devel-ml
+Precedence: bulk
+X-Generated-By: Launchpad (canonical.com); Revision="18928";
+	Instance="launchpad-lazr.conf"
+X-Launchpad-Hash: b013a0887396a86d96d70927adb0b4ec4a61aa3d
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH V3] vhost_net: don't set backend for the
- uninitialized virtqueue
+X-Received-From: 91.189.90.7
+Subject: [Qemu-devel] [Bug 1826175] Re: Compilation on MSYS2/MinGW-w64 fails
+ with error: "No rule to make target capstone.lib"
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
-Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -72,96 +77,61 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: yuri.benditovich@daynix.com
+Reply-To: Bug 1826175 <1826175@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190424115842.RBzME6IF_bhakkCsYeFS72V1fscBxVE-1XuuufebRFU@z>
+Message-ID: <20190424121021.DUPaBRUFVMWacrykanT7Bzu0Q9xrniO2pPg-9ZL0Ad4@z>
 
+I did submit a bug already to Capstone proper on their GitHub. Thanks
+for the heads-up about it needing to cover both cases for cross-
+compilers!
 
-On 2019/4/9 =E4=B8=8B=E5=8D=881:58, Jason Wang wrote:
-> We used to set backend unconditionally, this won't work for some
-> guests (e.g windows driver) who may not initialize all virtqueues. For
-> kernel backend, this will fail since it may try to validate the rings
-> during setting backend.
->
-> Fixing this by simply skipping the backend set when we find desc is
-> not ready.
->
-> Signed-off-by: Jason Wang <jasowang@redhat.com>
-> ---
-> Changes from V1:
-> - introduce a generic helper to check if a virtqueue is enabled
-> ---
+-- =
 
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1826175
 
-Michael, does this look good to you?
+Title:
+  Compilation on MSYS2/MinGW-w64 fails with error: "No rule to make
+  target capstone.lib"
 
-Thanks
+Status in QEMU:
+  New
 
+Bug description:
+  I submitted this bug to Capstone directly but I figured it'd be useful
+  to post it here too. The IS_MINGW check in the Makefile for Capstone
+  fails under MSYS2 MinGW-w64 because cc --version doesn't have mingw in
+  the output anymore:
 
->   hw/net/vhost_net.c         | 10 ++++++++++
->   hw/virtio/virtio.c         |  5 +++++
->   include/hw/virtio/virtio.h |  1 +
->   3 files changed, 16 insertions(+)
->
-> diff --git a/hw/net/vhost_net.c b/hw/net/vhost_net.c
-> index be3cc88370..a6b719035c 100644
-> --- a/hw/net/vhost_net.c
-> +++ b/hw/net/vhost_net.c
-> @@ -244,6 +244,11 @@ static int vhost_net_start_one(struct vhost_net *n=
-et,
->           qemu_set_fd_handler(net->backend, NULL, NULL, NULL);
->           file.fd =3D net->backend;
->           for (file.index =3D 0; file.index < net->dev.nvqs; ++file.ind=
-ex) {
-> +            if (!virtio_queue_enabled(dev, net->dev.vq_index +
-> +                                      file.index)) {
-> +                /* Queue might not be ready for start */
-> +                continue;
-> +            }
->               r =3D vhost_net_set_backend(&net->dev, &file);
->               if (r < 0) {
->                   r =3D -errno;
-> @@ -256,6 +261,11 @@ fail:
->       file.fd =3D -1;
->       if (net->nc->info->type =3D=3D NET_CLIENT_DRIVER_TAP) {
->           while (file.index-- > 0) {
-> +            if (!virtio_queue_enabled(dev, net->dev.vq_index +
-> +                                      file.index)) {
-> +                /* Queue might not be ready for start */
-> +                continue;
-> +            }
->               int r =3D vhost_net_set_backend(&net->dev, &file);
->               assert(r >=3D 0);
->           }
-> diff --git a/hw/virtio/virtio.c b/hw/virtio/virtio.c
-> index 2626a895cb..28056a7ef7 100644
-> --- a/hw/virtio/virtio.c
-> +++ b/hw/virtio/virtio.c
-> @@ -2318,6 +2318,11 @@ hwaddr virtio_queue_get_desc_addr(VirtIODevice *=
-vdev, int n)
->       return vdev->vq[n].vring.desc;
->   }
->  =20
-> +bool virtio_queue_enabled(VirtIODevice *vdev, int n)
-> +{
-> +    return virtio_queue_get_desc_addr(vdev, n) !=3D 0;
-> +}
-> +
->   hwaddr virtio_queue_get_avail_addr(VirtIODevice *vdev, int n)
->   {
->       return vdev->vq[n].vring.avail;
-> diff --git a/include/hw/virtio/virtio.h b/include/hw/virtio/virtio.h
-> index ce9516236a..7140381e3a 100644
-> --- a/include/hw/virtio/virtio.h
-> +++ b/include/hw/virtio/virtio.h
-> @@ -282,6 +282,7 @@ typedef struct VirtIORNGConf VirtIORNGConf;
->                         VIRTIO_F_IOMMU_PLATFORM, false)
->  =20
->   hwaddr virtio_queue_get_desc_addr(VirtIODevice *vdev, int n);
-> +bool virtio_queue_enabled(VirtIODevice *vdev, int n);
->   hwaddr virtio_queue_get_avail_addr(VirtIODevice *vdev, int n);
->   hwaddr virtio_queue_get_used_addr(VirtIODevice *vdev, int n);
->   hwaddr virtio_queue_get_desc_size(VirtIODevice *vdev, int n);
+  $ whereis cc
+  cc: /mingw64/bin/cc.exe
+
+  $ cc --version
+  cc.exe (Rev2, Built by MSYS2 project) 8.3.0
+  Copyright (C) 2018 Free Software Foundation, Inc.
+  This is free software; see the source for copying conditions.  There is NO
+  warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOS=
+E.
+
+  Really simple patch:
+
+  diff --git "a/Makefile" "b/Makefile"
+  index 063f50db..1d9f042e 100644
+  --- "a/Makefile"
+  +++ "b/Makefile"
+  @@ -288,7 +288,7 @@ CFLAGS :=3D $(CFLAGS:-fPIC=3D)
+   # On Windows we need the shared library to be executable
+   else
+   # mingw?
+  -IS_MINGW :=3D $(shell $(CC) --version | grep -i mingw | wc -l)
+  +IS_MINGW :=3D $(shell $(CC) --version | grep -i msys2 | wc -l)
+   ifeq ($(IS_MINGW),1)
+   EXT =3D dll
+   AR_EXT =3D lib
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1826175/+subscriptions
 
