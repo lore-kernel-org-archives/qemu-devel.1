@@ -7,78 +7,81 @@ X-Spam-Status: No, score=-8.5 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
 	SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AF8A4C282E1
-	for <qemu-devel@archiver.kernel.org>; Wed, 24 Apr 2019 14:59:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 17970C282CE
+	for <qemu-devel@archiver.kernel.org>; Wed, 24 Apr 2019 14:59:48 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 68F712084F
-	for <qemu-devel@archiver.kernel.org>; Wed, 24 Apr 2019 14:59:23 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id D8CB62084F
+	for <qemu-devel@archiver.kernel.org>; Wed, 24 Apr 2019 14:59:47 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="q3XvPy3v"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 68F712084F
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="foBgZQSX"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D8CB62084F
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:42855 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:42773 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hJJDo-0000kE-K3
-	for qemu-devel@archiver.kernel.org; Wed, 24 Apr 2019 10:50:04 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:43876)
+	id 1hJJ9I-0005fL-Km
+	for qemu-devel@archiver.kernel.org; Wed, 24 Apr 2019 10:45:24 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:43917)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <arilou@gmail.com>) id 1hJIzN-0004gC-6G
-	for qemu-devel@nongnu.org; Wed, 24 Apr 2019 10:35:12 -0400
+	(envelope-from <arilou@gmail.com>) id 1hJIzM-0004gR-7z
+	for qemu-devel@nongnu.org; Wed, 24 Apr 2019 10:35:09 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <arilou@gmail.com>) id 1hJIrt-0000KA-Jj
-	for qemu-devel@nongnu.org; Wed, 24 Apr 2019 10:27:26 -0400
-Received: from mail-wr1-x442.google.com ([2a00:1450:4864:20::442]:33636)
+	(envelope-from <arilou@gmail.com>) id 1hJIs1-0000Rd-3n
+	for qemu-devel@nongnu.org; Wed, 24 Apr 2019 10:27:34 -0400
+Received: from mail-wr1-x442.google.com ([2a00:1450:4864:20::442]:43416)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <arilou@gmail.com>) id 1hJIrt-0000Iv-CT
-	for qemu-devel@nongnu.org; Wed, 24 Apr 2019 10:27:25 -0400
-Received: by mail-wr1-x442.google.com with SMTP id s18so630476wrp.0
-	for <qemu-devel@nongnu.org>; Wed, 24 Apr 2019 07:27:25 -0700 (PDT)
+	(Exim 4.71) (envelope-from <arilou@gmail.com>) id 1hJIs0-0000Ql-Tt
+	for qemu-devel@nongnu.org; Wed, 24 Apr 2019 10:27:33 -0400
+Received: by mail-wr1-x442.google.com with SMTP id a12so2198618wrq.10
+	for <qemu-devel@nongnu.org>; Wed, 24 Apr 2019 07:27:32 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
-	h=from:to:cc:subject:date:message-id:mime-version
-	:content-transfer-encoding;
-	bh=5TvE4pfl6f5eEGUEFOQhBOkuedA1G1QP7QDZaqPSExU=;
-	b=q3XvPy3vd+RQrkOfkFDqYu5qiJU/ahYqHJYMJUuqR/LjAWtqV++fmRK4NH0wBL/Axw
-	NuWdbgkkqL7k1inz++Kdfz8hQ/pKzwPosAHx32dzz8GAV8ttkROJ8X/Ik2idyTd3hpVD
-	ytzpy8LRx4uArqrArTNNWJnmjY5oxesQAJf0Gnw3vEoQs1HUIam6fNW+V+rYUWUjhVxn
-	xDikA8Q1ngb/Twzws1+5olcAu6kX7BQwkXMpWY1mKpqNMNUBHynztnZlyQTnS01MPG7r
-	a3YYsCoUSrWNvMXXu3Q5C529PBRC3D1m+H8uC+MzJsRAu9sSadQiwILOBTxwIM3oNEY6
-	VO4Q==
+	h=from:to:cc:subject:date:message-id:in-reply-to:references
+	:mime-version:content-transfer-encoding;
+	bh=TfkE6Ar039zvehEi89kG1PU/hrNuG0kcx18XMkvwwEs=;
+	b=foBgZQSXyHAPGWNLvw9odtZac0gYsDBsdqAg6HNJtqYFGCDaHyQYShd7Po9NvX6ZGU
+	miCJ8Xzj6B+mArSKXaXvupf6aooq36hTHAPg+VgYZOgCbibtN18H3vzCtZp23EnAxi1r
+	AeMP4JztslzNN2LQzgCZoylhGIyh7NpHr8/Q729az566SbLs982eFVinAzDLW73uGPwn
+	NsB61XbI572t3Xf80mm2+fKn6hiK2/zouH2hQKoyZ0J7MoGun68+fg4l9+Z9VrAJ/Ql2
+	ziy3Q6Pl8VWqybOGxNIFnCmjXeaoCYz22cRIB9lgnUDAggKMkxBNdGz9NsptUd5CZ+Do
+	dl1A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
 	d=1e100.net; s=20161025;
-	h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
-	:content-transfer-encoding;
-	bh=5TvE4pfl6f5eEGUEFOQhBOkuedA1G1QP7QDZaqPSExU=;
-	b=RPBQ5TyLWJBVoRJGFkZrdoQMA/2nvuYurbi79bdKczxTNZdFeHxR/u4WlIURbSWyRe
-	Vx1glXETRFNrNNn9JvVQwKsvaQZizVYQWCvtgSwx8GtMdcVZOVYbrGK0tuBYddE3NnEv
-	KGe+dEUcbRY7PcjjG8oO4TzkzEtVV9IVjFlavIjQPQKIOK6Czkvqw/Q6v/m33GEqqH6j
-	hbdxEBaXg99agf1A5F4RHtx7yGbtO9fkHX6lQ2WC3bh1GuGH0Hd3cnqKrGT5pv7j8EGc
-	yFImrMvmLy4NG/ivY9oSCr194JtX57xiWwIxJjNVtvwYB/VGY3jdggvyO1ZwHXBYhWw1
-	ZnRg==
-X-Gm-Message-State: APjAAAUR9HAKD3/Ux7RvDTE9/k+YSDjEeEo02Huvp/q1xG6rXkkmoaSD
-	A71pXXI2y/BJVYZojN1mU/hIotRP
-X-Google-Smtp-Source: APXvYqxd24h1Uz5CQID/i0Eh7HAmfP1kwEePvK23yYiltgzDs3f4Ql45DKMXXmbOqVTRRO0pHoCDuw==
-X-Received: by 2002:adf:b641:: with SMTP id i1mr21654807wre.288.1556116043114; 
-	Wed, 24 Apr 2019 07:27:23 -0700 (PDT)
+	h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+	:references:mime-version:content-transfer-encoding;
+	bh=TfkE6Ar039zvehEi89kG1PU/hrNuG0kcx18XMkvwwEs=;
+	b=J691/OxjxyhLfP8my9tVyV/yXu8DX/QHdSoUedCUrtfkuZOAs7dZZ3ViRPCfCCRnBp
+	28aFcx0h54yc8sWLLWsDrOz6bDwG2Uiv216wrtmHy4a8lDOMu64XYzd9rdVgr7JYbuvj
+	PQtJexTtgSvDuA05qPG9wMxy/WKgVdfT168Alty90L9kTZiTXZ1Hn016BJ6Q7ogHiHP4
+	YDBNpOXuJ3eFTxkja9KIiaYhGzuygIa8mfrPhMN/c3td9DouDshOa0gDeHV7bueH+z50
+	gXYpWz5i5Fe0XZijOnHGHcwpXvBWCtVgRf2FqrPRpr8Jd4TneUahWcuVOVYjJE5M1+OE
+	jxvQ==
+X-Gm-Message-State: APjAAAUvAZCHeGPftjbx2H6YBREKT8WWyCHUzECN6LIDHBTaP1J9ybSJ
+	yy56BJctOsUSXcIZ74yhXokBCFl0
+X-Google-Smtp-Source: APXvYqw2yvZpgvIS91nz/XnAUzYnvKNMTuppXBBzayQs8i17LK5DSGzhg2fY5ZsAgzjG+cb6A1iztA==
+X-Received: by 2002:a05:6000:12c7:: with SMTP id
+	l7mr20535902wrx.4.1556116051407; 
+	Wed, 24 Apr 2019 07:27:31 -0700 (PDT)
 Received: from linux.local ([31.154.166.148])
-	by smtp.gmail.com with ESMTPSA id q7sm5518041wmc.11.2019.04.24.07.27.20
+	by smtp.gmail.com with ESMTPSA id q7sm5518041wmc.11.2019.04.24.07.27.29
 	(version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
-	Wed, 24 Apr 2019 07:27:20 -0700 (PDT)
+	Wed, 24 Apr 2019 07:27:30 -0700 (PDT)
 From: arilou@gmail.com
 To: qemu-devel@nongnu.org
-Date: Wed, 24 Apr 2019 17:26:55 +0300
-Message-Id: <20190424142714.28460-1-arilou@gmail.com>
+Date: Wed, 24 Apr 2019 17:26:59 +0300
+Message-Id: <20190424142714.28460-5-arilou@gmail.com>
 X-Mailer: git-send-email 2.20.1
+In-Reply-To: <20190424142714.28460-1-arilou@gmail.com>
+References: <20190424142714.28460-1-arilou@gmail.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
 	recognized.
 X-Received-From: 2a00:1450:4864:20::442
-Subject: [Qemu-devel] [PATCH v3 01/20] gdbstub: Add infrastructure to parse
- cmd packets
+Subject: [Qemu-devel] [PATCH v3 05/20] gdbstub: Implement continue with
+ signal (C pkt) with new infra
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -95,241 +98,63 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 Content-Type: text/plain; charset="UTF-8"
-Message-ID: <20190424142655.QElLB5MjvTXvRLpg4ss8s_9DXHr80meIGbeuPsL4yBA@z>
+Message-ID: <20190424142659.1ZVgPTPu5nD-xS--xw8TkHC44-6Vktw-vMfZOrC6SiA@z>
 
 From: Jon Doron <arilou@gmail.com>
 
 Signed-off-by: Jon Doron <arilou@gmail.com>
 ---
- gdbstub.c | 215 ++++++++++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 215 insertions(+)
+ gdbstub.c | 30 +++++++++++++++++++++++++-----
+ 1 file changed, 25 insertions(+), 5 deletions(-)
 
 diff --git a/gdbstub.c b/gdbstub.c
-index d54abd17cc..b5bd01b913 100644
+index a6d5acd6f0..eaa42713ac 100644
 --- a/gdbstub.c
 +++ b/gdbstub.c
-@@ -1268,6 +1268,221 @@ out:
-     return res;
+@@ -1548,6 +1548,21 @@ static void handle_continue(GdbCmdContext *gdb_ctx, void *user_ctx)
+     gdb_continue(gdb_ctx->s);
  }
  
-+typedef union GdbCmdVariant {
-+    const char *data;
-+    uint8_t opcode;
-+    unsigned long val_ul;
-+    unsigned long long val_ull;
-+    struct {
-+        GDBThreadIdKind kind;
-+        uint32_t pid;
-+        uint32_t tid;
-+    } thread_id;
-+} GdbCmdVariant;
-+
-+static const char *cmd_next_param(const char *param, const char delimiter)
++static void handle_cont_with_sig(GdbCmdContext *gdb_ctx, void *user_ctx)
 +{
-+    const char *delim;
-+    static char all_delimiters[] = ",;:=";
-+    static char no_delimiter[] = "\0";
-+    char curr_delimiters[2] = {0};
-+    const char *delimiters;
++    unsigned long signal = 0;
 +
-+    if (delimiter == '?') {
-+        delimiters = all_delimiters;
-+    } else if (delimiter == '0') {
-+        delimiters = no_delimiter;
-+    } else if (delimiter == '.' && *param) {
-+        return param + 1;
-+    } else {
-+        curr_delimiters[0] = delimiter;
-+        delimiters = curr_delimiters;
++    if (gdb_ctx->num_params) {
++        signal = gdb_ctx->params[0].val_ul;
 +    }
 +
-+    while (*param) {
-+        delim = delimiters;
-+        while (*delim) {
-+            if (*param == *delim) {
-+                return param + 1;
-+            }
-+            delim++;
-+        }
-+        param++;
++    gdb_ctx->s->signal = gdb_signal_to_target(signal);
++    if (gdb_ctx->s->signal == -1) {
++        gdb_ctx->s->signal = 0;
 +    }
-+
-+    return param;
-+}
-+
-+static int cmd_parse_params(const char *data, const char *schema,
-+                            GdbCmdVariant *params, int *num_params)
-+{
-+    int curr_param;
-+    const char *curr_schema, *curr_data;
-+
-+    *num_params = 0;
-+
-+    if (!schema) {
-+        return 0;
-+    }
-+
-+    curr_schema = schema;
-+    curr_param = 0;
-+    curr_data = data;
-+    while (curr_schema[0] && curr_schema[1] && *curr_data) {
-+        switch (curr_schema[0]) {
-+        case 'l':
-+            if (qemu_strtoul(curr_data, &curr_data, 16,
-+                             &params[curr_param].val_ul)) {
-+                return -EINVAL;
-+            }
-+            curr_param++;
-+            curr_data = cmd_next_param(curr_data, curr_schema[1]);
-+            break;
-+        case 'L':
-+            if (qemu_strtou64(curr_data, &curr_data, 16,
-+                              (uint64_t *)&params[curr_param].val_ull)) {
-+                return -EINVAL;
-+            }
-+            curr_param++;
-+            curr_data = cmd_next_param(curr_data, curr_schema[1]);
-+            break;
-+        case 's':
-+            params[curr_param].data = curr_data;
-+            curr_param++;
-+            curr_data = cmd_next_param(curr_data, curr_schema[1]);
-+            break;
-+        case 'o':
-+            params[curr_param].opcode = *(uint8_t *)curr_data;
-+            curr_param++;
-+            curr_data = cmd_next_param(curr_data, curr_schema[1]);
-+            break;
-+        case 't':
-+            params[curr_param].thread_id.kind =
-+                read_thread_id(curr_data, &curr_data,
-+                               &params[curr_param].thread_id.pid,
-+                               &params[curr_param].thread_id.tid);
-+            curr_param++;
-+            curr_data = cmd_next_param(curr_data, curr_schema[1]);
-+            break;
-+        case 'x':
-+            params[curr_param].data = curr_data;
-+            curr_param++;
-+            curr_data = cmd_next_param(curr_data, curr_schema[1]);
-+            break;
-+        case '?':
-+            curr_data = cmd_next_param(curr_data, curr_schema[1]);
-+            break;
-+        default:
-+            return -EINVAL;
-+        }
-+        curr_schema += 2;
-+    }
-+
-+    *num_params = curr_param;
-+    return 0;
-+}
-+
-+typedef struct GdbCmdContext {
-+    GDBState *s;
-+    GdbCmdVariant *params;
-+    int num_params;
-+    uint8_t mem_buf[MAX_PACKET_LENGTH];
-+    char str_buf[MAX_PACKET_LENGTH + 1];
-+} GdbCmdContext;
-+
-+typedef void (*GdbCmdHandler)(GdbCmdContext *gdb_ctx, void *user_ctx);
-+
-+/*
-+ * cmd_startswith -> cmd is compared using startswith
-+ * cmd_full_match -> cmd is compared using strcmp
-+ *
-+ *
-+ * schema definitions:
-+ * Each schema parameter entry consists of 2 chars,
-+ * the first char represents the parameter type handling
-+ * the second char represents the delimiter for the next parameter
-+ *
-+ * Currently supported schema types:
-+ * 'l' -> unsigned long (stored in .val_ul)
-+ * 'L' -> unsigned long long (stored in .val_ull)
-+ * 's' -> string (stored in .data)
-+ * 'o' -> single char (stored in .opcode)
-+ * 't' -> thread id (stored in .thread_id)
-+ * 'x' -> xml (stored in .data), must have a ':' delimiter
-+ * '?' -> skip according to delimiter
-+ *
-+ * Currently supported delimiters:
-+ * '?' -> Stop at any delimiter (",;:=\0")
-+ * '0' -> Stop at "\0"
-+ * '.' -> Skip 1 char unless reached "\0"
-+ * Any other value is treated as the delimiter value itself
-+ */
-+typedef struct GdbCmdParseEntry {
-+    GdbCmdHandler handler;
-+    const char *cmd;
-+    union {
-+        int flags;
-+        struct {
-+            int cmd_startswith:1;
-+            int cmd_full_match:1;
-+        };
-+    };
-+    const char *schema;
-+} GdbCmdParseEntry;
-+
-+static inline int startswith(const char *string, const char *pattern)
-+{
-+  return !strncmp(string, pattern, strlen(pattern));
-+}
-+
-+__attribute__((unused)) static int process_string_cmd(
-+        GDBState *s, void *user_ctx, const char *data,
-+        GdbCmdParseEntry *cmds, int num_cmds);
-+
-+static int process_string_cmd(GDBState *s, void *user_ctx, const char *data,
-+                              GdbCmdParseEntry *cmds, int num_cmds)
-+{
-+    int i, schema_len, max_num_params;
-+    GdbCmdContext gdb_ctx;
-+
-+    if (!cmds) {
-+        return -1;
-+    }
-+
-+    for (i = 0; i < num_cmds; i++) {
-+        if (!cmds[i].handler || !cmds[i].cmd ||
-+            (cmds[i].cmd_startswith && !startswith(data, cmds[i].cmd)) ||
-+            (cmds[i].cmd_full_match && strcmp(data, cmds[i].cmd))) {
-+            continue;
-+        }
-+
-+        max_num_params = 0;
-+        if (cmds[i].schema) {
-+            schema_len = strlen(cmds[i].schema);
-+            if (schema_len % 2) {
-+                return -2;
-+            }
-+
-+            max_num_params = schema_len / 2;
-+        }
-+
-+        gdb_ctx.params =
-+            (GdbCmdVariant *)alloca(sizeof(*gdb_ctx.params) * max_num_params);
-+        memset(gdb_ctx.params, 0, sizeof(*gdb_ctx.params) * max_num_params);
-+
-+        if (cmd_parse_params(&data[strlen(cmds[i].cmd)], cmds[i].schema,
-+                             gdb_ctx.params, &gdb_ctx.num_params)) {
-+            return -1;
-+        }
-+
-+        gdb_ctx.s = s;
-+        cmds[i].handler(&gdb_ctx, user_ctx);
-+        return 0;
-+    }
-+
-+    return -1;
++    gdb_continue(gdb_ctx->s);
 +}
 +
  static int gdb_handle_packet(GDBState *s, const char *line_buf)
  {
      CPUState *cpu;
+@@ -1594,11 +1609,16 @@ static int gdb_handle_packet(GDBState *s, const char *line_buf)
+         }
+         break;
+     case 'C':
+-        s->signal = gdb_signal_to_target (strtoul(p, (char **)&p, 16));
+-        if (s->signal == -1)
+-            s->signal = 0;
+-        gdb_continue(s);
+-        return RS_IDLE;
++        {
++            static GdbCmdParseEntry cont_with_sig_cmd_desc = {
++                .handler = handle_cont_with_sig,
++                .cmd = "C",
++                .cmd_startswith = 1,
++                .schema = "l0"
++            };
++            process_string_cmd(s, NULL, line_buf, &cont_with_sig_cmd_desc, 1);
++        }
++        break;
+     case 'v':
+         if (strncmp(p, "Cont", 4) == 0) {
+             p += 4;
 -- 
 2.20.1
 
