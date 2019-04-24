@@ -1,26 +1,29 @@
-Received: from eggs.gnu.org ([209.51.188.92]:54142)
+Received: from eggs.gnu.org ([209.51.188.92]:33917)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1hJHpY-0004Qc-NH
-	for qemu-devel@nongnu.org; Wed, 24 Apr 2019 09:20:59 -0400
+	(envelope-from <amarkovic@wavecomp.com>) id 1hJILr-0008Qs-9z
+	for qemu-devel@nongnu.org; Wed, 24 Apr 2019 09:54:20 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1hJHpW-0000t4-WE
-	for qemu-devel@nongnu.org; Wed, 24 Apr 2019 09:20:56 -0400
-Received: from mail-qk1-f194.google.com ([209.85.222.194]:37108)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1hJHpW-0000q2-Q5
-	for qemu-devel@nongnu.org; Wed, 24 Apr 2019 09:20:54 -0400
-Received: by mail-qk1-f194.google.com with SMTP id c1so10797012qkk.4
-	for <qemu-devel@nongnu.org>; Wed, 24 Apr 2019 06:20:53 -0700 (PDT)
-Date: Wed, 24 Apr 2019 09:20:49 -0400
-From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <20190424092028-mutt-send-email-mst@kernel.org>
-References: <20190423132004.13725-1-marcandre.lureau@redhat.com>
+	(envelope-from <amarkovic@wavecomp.com>) id 1hJIKY-0006Oh-3n
+	for qemu-devel@nongnu.org; Wed, 24 Apr 2019 09:52:59 -0400
+Received: from mail-eopbgr700136.outbound.protection.outlook.com
+	([40.107.70.136]:35553
+	helo=NAM04-SN1-obe.outbound.protection.outlook.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <amarkovic@wavecomp.com>)
+	id 1hJIKX-0006NA-R4
+	for qemu-devel@nongnu.org; Wed, 24 Apr 2019 09:52:58 -0400
+From: Aleksandar Markovic <amarkovic@wavecomp.com>
+Date: Wed, 24 Apr 2019 13:52:53 +0000
+Message-ID: <BN6PR2201MB125182A9057BB508EDD06DFDC63C0@BN6PR2201MB1251.namprd22.prod.outlook.com>
+References: <1556110623-655-1-git-send-email-aleksandar.markovic@rt-rk.com>,
+	<1556110623-655-5-git-send-email-aleksandar.markovic@rt-rk.com>
+In-Reply-To: <1556110623-655-5-git-send-email-aleksandar.markovic@rt-rk.com>
+Content-Language: en-US
+Content-Type: text/plain; charset="iso-8859-1"
+Content-Transfer-Encoding: quoted-printable
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20190423132004.13725-1-marcandre.lureau@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v6 00/11] vhost-user for input & GPU
+Subject: Re: [Qemu-devel] [PATCH v2 4/5] linux-user: setsockopt(): Add
+ support for the option IPV6_ADD_MEMBERSHIP
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,130 +32,115 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?iso-8859-1?Q?Marc-Andr=E9?= Lureau <marcandre.lureau@redhat.com>
-Cc: qemu-devel@nongnu.org, Gerd Hoffmann <kraxel@redhat.com>
+To: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+Cc: "aurelien@aurel32.net" <aurelien@aurel32.net>, Aleksandar Rikalo <arikalo@wavecomp.com>, "daniel.santos@pobox.com" <daniel.santos@pobox.com>, "jcmvbkbc@gmail.com" <jcmvbkbc@gmail.com>, "lvivier@redhat.com" <lvivier@redhat.com>, "thuth@redhat.com" <thuth@redhat.com>, "philmd@redhat.com" <philmd@redhat.com>, Neng Chen <nchen@wavecomp.com>
 
-On Tue, Apr 23, 2019 at 03:19:53PM +0200, Marc-André Lureau wrote:
-> Hi,
-> 
-> vhost-user allows to drive a virtio device in a seperate
-> process. After vhost-user-net, we have seen
-> vhost-user-{scsi,blk,crypto} added more recently.
-> 
-> This series, initially proposed ~3 years ago, time flies
-> (https://lists.gnu.org/archive/html/qemu-devel/2016-06/msg01905.html)
-> contributes with vhost-user-input and vhost-user-gpu.
-
-
-Pls note asan errors reported by patchew.
+>=20
+> ________________________________________
+> From: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>
+> Sent: Wednesday, April 24, 2019 2:57 PM
+> To: qemu-devel@nongnu.org
+> Cc: aurelien@aurel32.net; Aleksandar Markovic; Aleksandar Rikalo; daniel.=
+santos@pobox.com; jcmvbkbc@gmail.com; lvivier@redhat.com; thuth@redhat.com;=
+ philmd@redhat.com; Neng Chen
+> Subject: [PATCH v2 4/5] linux-user: setsockopt(): Add support for the opt=
+ion IPV6_ADD_MEMBERSHIP
+>=20
 
 
-> You may start a vhost-user-gpu with virgl rendering in a separate
-> process like this:
-> 
-> $ ./vhost-user-gpu --virgl -s vgpu.sock &
-> $ qemu...
->   -chardev socket,id=chr,path=vgpu.sock
->   -device vhost-user-vga,chardev=chr
-> 
-> v6:
->  - do not install vhost-user-input
->  - install vhost-user-gpu and json file following the spec
->  - fix the build when drm-intel-devel missing
->  - rebase (& resend without already applied patches)
-> 
-> v5:
->  - remove user-creatable version of vhost-user-backend
->  - remove optinal management of sub-process in vhost-user-backend
->  - removed daemonize/pid code
->  - drop introduction of new input & gpu messages for PCI config space
->    handling, instead use VHOST_USER_PROTOCOL_F_CONFIG
->  - plain mem & udmabuf fallback for 2d rendering
->  - rebased, kconfig-ify, rst-ify
-> 
-> Marc-André Lureau (11):
->   Add vhost-user-backend
->   Add vhost-user-input-pci
->   libvhost-user: add PROTOCOL_F_CONFIG if {set,get}_config
->   contrib: add vhost-user-input
->   vhost-user: add vhost_user_gpu_set_socket()
->   virtio: add virtio-gpu bswap helpers header
->   util: compile drm.o on Linux
->   contrib: add vhost-user-gpu
->   virtio-gpu: split virtio-gpu, introduce virtio-gpu-base
->   virtio-gpu: split virtio-gpu-pci & virtio-vga
->   hw/display: add vhost-user-vga & gpu-pci
-> 
->  contrib/libvhost-user/libvhost-user.h      |    1 +
->  contrib/vhost-user-gpu/drm.h               |   72 ++
->  contrib/vhost-user-gpu/virgl.h             |   25 +
->  contrib/vhost-user-gpu/vugpu.h             |  170 +++
->  hw/display/virtio-vga.h                    |   32 +
->  include/hw/virtio/vhost-backend.h          |    2 +
->  include/hw/virtio/virtio-gpu-bswap.h       |   61 +
->  include/hw/virtio/virtio-gpu-pci.h         |   40 +
->  include/hw/virtio/virtio-gpu.h             |   92 +-
->  include/hw/virtio/virtio-input.h           |   14 +
->  include/sysemu/vhost-user-backend.h        |   57 +
->  backends/vhost-user.c                      |  209 ++++
->  contrib/libvhost-user/libvhost-user.c      |    5 +
->  contrib/vhost-user-gpu/drm.c               |  341 ++++++
->  contrib/vhost-user-gpu/main.c              | 1236 ++++++++++++++++++++
->  contrib/vhost-user-gpu/virgl.c             |  579 +++++++++
->  contrib/vhost-user-input/main.c            |  427 +++++++
->  hw/display/vhost-user-gpu-pci.c            |   51 +
->  hw/display/vhost-user-gpu.c                |  572 +++++++++
->  hw/display/vhost-user-vga.c                |   52 +
->  hw/display/virtio-gpu-3d.c                 |   49 +-
->  hw/display/virtio-gpu-base.c               |  268 +++++
->  hw/display/virtio-gpu-pci.c                |   55 +-
->  hw/display/virtio-gpu.c                    |  415 ++-----
->  hw/display/virtio-vga.c                    |  138 +--
->  hw/input/vhost-user-input.c                |  129 ++
->  hw/virtio/vhost-user-input-pci.c           |   53 +
->  hw/virtio/vhost-user.c                     |   11 +
->  vl.c                                       |    1 +
->  MAINTAINERS                                |   14 +-
->  Makefile                                   |   27 +-
->  Makefile.objs                              |    2 +
->  backends/Makefile.objs                     |    2 +
->  configure                                  |   29 +
->  contrib/vhost-user-gpu/50-qemu-gpu.json.in |    5 +
->  contrib/vhost-user-gpu/Makefile.objs       |   10 +
->  contrib/vhost-user-input/Makefile.objs     |    1 +
->  docs/interop/index.rst                     |    2 +-
->  docs/interop/vhost-user-gpu.rst            |  238 ++++
->  docs/interop/vhost-user.txt                |    9 +
->  hw/display/Kconfig                         |   10 +
->  hw/display/Makefile.objs                   |    5 +-
->  hw/input/Kconfig                           |    5 +
->  hw/input/Makefile.objs                     |    1 +
->  hw/virtio/Makefile.objs                    |    1 +
->  rules.mak                                  |    9 +-
->  util/Makefile.objs                         |    2 +-
->  47 files changed, 5070 insertions(+), 459 deletions(-)
->  create mode 100644 contrib/vhost-user-gpu/drm.h
->  create mode 100644 contrib/vhost-user-gpu/virgl.h
->  create mode 100644 contrib/vhost-user-gpu/vugpu.h
->  create mode 100644 hw/display/virtio-vga.h
->  create mode 100644 include/hw/virtio/virtio-gpu-bswap.h
->  create mode 100644 include/hw/virtio/virtio-gpu-pci.h
->  create mode 100644 include/sysemu/vhost-user-backend.h
->  create mode 100644 backends/vhost-user.c
->  create mode 100644 contrib/vhost-user-gpu/drm.c
->  create mode 100644 contrib/vhost-user-gpu/main.c
->  create mode 100644 contrib/vhost-user-gpu/virgl.c
->  create mode 100644 contrib/vhost-user-input/main.c
->  create mode 100644 hw/display/vhost-user-gpu-pci.c
->  create mode 100644 hw/display/vhost-user-gpu.c
->  create mode 100644 hw/display/vhost-user-vga.c
->  create mode 100644 hw/display/virtio-gpu-base.c
->  create mode 100644 hw/input/vhost-user-input.c
->  create mode 100644 hw/virtio/vhost-user-input-pci.c
->  create mode 100644 contrib/vhost-user-gpu/50-qemu-gpu.json.in
->  create mode 100644 contrib/vhost-user-gpu/Makefile.objs
->  create mode 100644 contrib/vhost-user-input/Makefile.objs
->  create mode 100644 docs/interop/vhost-user-gpu.rst
-> 
-> -- 
-> 2.21.0.313.ge35b8cb8e2
+Hello, Loraine,
+
+
+I am just a submitter for this patch (the author is my colegue
+Neng Chen), and I see that this patch really fills in some missing
+functionality in linux-user, however I would like to ask you for
+your opinion on the following:
+
+1) Should the field ipv6mr_multiaddr also be subject to some
+big/little endian conversion, or the current solution is sufficient?
+
+2) Should we complete setsockopt() functionality with other remaining
+not implemented options at this moment, while we are already on
+implementing IPV6_ADD_MEMBERSHIP support?
+
+Thanks,
+Aleksandar
+
+
+> From: Neng Chen <nchen@wavecomp.com>
+>=20
+> Add support for the option IPV6_ADD_MEMBERSHIP of the syscall
+> setsockopt(). This option controls membership in multicast groups.
+> Argument is a pointer to a struct ipv6_mreq, which is in turn defined
+> in a platform-inedependant manner in the Linux kernel file
+> include/uapi/linux/in6.h as:
+>=20
+> The <netinet/in.h> header defines the ipv6_mreq structure, which
+> includes the following members:
+>=20
+> struct in6_addr ipv6mr_multiaddr  /* IPv6 multicast address   */
+> unsigned int    ipv6mr_interface  /* local interface index    */
+>=20
+> struct ipv6_mreq {
+>     /* IPv6 multicast address of group */
+>     struct in6_addr  ipv6mr_multiaddr;
+>=20
+>     /* local IPv6 address of interface */
+>     int              ipv6mr_ifindex;
+> };
+>=20
+> The <netinet/in.h> header also defines the in6_addr structure,
+> which a union of the following structure:
+>=20
+> struct in6_addr {
+>     union {
+>         __u8    u6_addr8[16];
+>         __be16  u6_addr16[8];
+>         __be32  u6_addr32[4];
+>     } in6_u;
+>=20
+> The emulation behavior of IPV6_ADD_MEMBERSHIP is devised based on
+> the definitions above.
+>=20
+> Signed-off-by: Neng Chen <nchen@wavecomp.com>
+> Signed-off-by: Aleksandar Markovic <amarkovic@wavecomp.com>
+> ---
+>  linux-user/syscall.c | 18 ++++++++++++++++++
+>  1 file changed, 18 insertions(+)
+>=20
+> diff --git a/linux-user/syscall.c b/linux-user/syscall.c
+> index 96cd4bf..b47a45d 100644
+> --- a/linux-user/syscall.c
+> +++ b/linux-user/syscall.c
+> @@ -1892,6 +1892,24 @@ static abi_long do_setsockopt(int sockfd, int leve=
+l, int optname,
+>                                         &pki, sizeof(pki)));
+>              break;
+>          }
+> +        case IPV6_ADD_MEMBERSHIP:
+> +        {
+> +            struct ipv6_mreq ipv6mreq;
+> +
+> +            if (optlen < sizeof(ipv6mreq)) {
+> +                return -TARGET_EINVAL;
+> +            }
+> +
+> +            if (copy_from_user(&ipv6mreq, optval_addr, sizeof(ipv6mreq))=
+) {
+> +                return -TARGET_EFAULT;
+> +            }
+> +
+> +            ipv6mreq.ipv6mr_interface =3D tswap32(ipv6mreq.ipv6mr_interf=
+ace);
+> +
+> +            ret =3D get_errno(setsockopt(sockfd, level, optname,
+> +                                       &ipv6mreq, sizeof(ipv6mreq)));
+> +            break;
+> +        }
+>          default:
+>              goto unimplemented;
+>          }
+> --
+> 2.7.4
+>=20
+> =
