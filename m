@@ -7,58 +7,57 @@ X-Spam-Status: No, score=-8.7 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D9168C10F11
-	for <qemu-devel@archiver.kernel.org>; Wed, 24 Apr 2019 04:23:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B2067C10F11
+	for <qemu-devel@archiver.kernel.org>; Wed, 24 Apr 2019 04:24:12 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8BC3D20878
-	for <qemu-devel@archiver.kernel.org>; Wed, 24 Apr 2019 04:23:08 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 6797720878
+	for <qemu-devel@archiver.kernel.org>; Wed, 24 Apr 2019 04:24:12 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="CIANgtuI"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8BC3D20878
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="DcO2CBne"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6797720878
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gibson.dropbear.id.au
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:35448 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:35455 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hJ9R5-00006k-T0
-	for qemu-devel@archiver.kernel.org; Wed, 24 Apr 2019 00:23:07 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:56559)
+	id 1hJ9S7-0000iV-Ji
+	for qemu-devel@archiver.kernel.org; Wed, 24 Apr 2019 00:24:11 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:56572)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1hJ9OI-0006JR-Fz
-	for qemu-devel@nongnu.org; Wed, 24 Apr 2019 00:20:15 -0400
+	(envelope-from <dgibson@ozlabs.org>) id 1hJ9OJ-0006Jv-1k
+	for qemu-devel@nongnu.org; Wed, 24 Apr 2019 00:20:16 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1hJ9OH-0008Ll-95
-	for qemu-devel@nongnu.org; Wed, 24 Apr 2019 00:20:14 -0400
-Received: from ozlabs.org ([2401:3900:2:1::2]:55857)
+	(envelope-from <dgibson@ozlabs.org>) id 1hJ9OH-0008ME-Dg
+	for qemu-devel@nongnu.org; Wed, 24 Apr 2019 00:20:15 -0400
+Received: from bilbo.ozlabs.org ([203.11.71.1]:47939 helo=ozlabs.org)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <dgibson@ozlabs.org>)
-	id 1hJ9OG-0007u2-Ij; Wed, 24 Apr 2019 00:20:13 -0400
+	id 1hJ9OG-0007ue-Bc; Wed, 24 Apr 2019 00:20:13 -0400
 Received: by ozlabs.org (Postfix, from userid 1007)
-	id 44pnCj6JbPz9s4V; Wed, 24 Apr 2019 14:20:01 +1000 (AEST)
+	id 44pnCk1B19z9s55; Wed, 24 Apr 2019 14:20:01 +1000 (AEST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-	d=gibson.dropbear.id.au; s=201602; t=1556079601;
-	bh=1TCldW4/94RREFBM+6o8PuzFfgGN5FLqxC7Y5jQpr44=;
+	d=gibson.dropbear.id.au; s=201602; t=1556079602;
+	bh=i5wDM9n5BQU1nFXLcxEUJQtZIASMK/19+h0VivHGMgY=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=CIANgtuI0LTWQTmY/dGtIviYXU7D8T9vJ13YAQ8U5w7Q6VJnh5tqDDaRBo1+I5ZQ3
-	KWFLvYGTvH9DSBGERgZx/SEbPP+y1/aX1wKU7VzDiv2fT0X8BbWy8SiQ8s5frTBQZi
-	MagP59m5TRvLXzK7k+Ek6zDp0liVWXt1NDZPJMQg=
+	b=DcO2CBneuu4nPVP6bED0dJWG2XQWmUkg6B9az6vueZoRXN1JSblqt7TIRVp/ZQbiD
+	9wqDjWelkUPVirtwr+fZOQhb/3hjZnDZjtuRxqNHd5AnZ7wxeVMYGd3t4Paqsf5Pzb
+	PANn+m/SZGx3SaxI9HHnfo9QnVMYfhKkT+aiHFKY=
 From: David Gibson <david@gibson.dropbear.id.au>
 To: Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, qemu-devel@nongnu.org,
 	"Michael S. Tsirkin" <mst@redhat.com>,
 	Alex Williamson <alex.williamson@redhat.com>, Greg Kurz <groug@kaod.org>
-Date: Wed, 24 Apr 2019 14:19:58 +1000
-Message-Id: <20190424041959.4087-3-david@gibson.dropbear.id.au>
+Date: Wed, 24 Apr 2019 14:19:59 +1000
+Message-Id: <20190424041959.4087-4-david@gibson.dropbear.id.au>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20190424041959.4087-1-david@gibson.dropbear.id.au>
 References: <20190424041959.4087-1-david@gibson.dropbear.id.au>
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
-	recognized.
-X-Received-From: 2401:3900:2:1::2
-Subject: [Qemu-devel] [PATCH v2 2/3] pci: Simplify pci_bus_is_root()
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 203.11.71.1
+Subject: [Qemu-devel] [PATCH v2 3/3] pcie: Simplify pci_adjust_config_limit()
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -70,128 +69,232 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Marcel Apfelbaum <marcel@redhat.com>, qemu-ppc@nongnu.org, clg@kaod.org,
-	Peter Xu <peterx@redhat.com>, David Gibson <david@gibson.dropbear.id.au>
+Cc: qemu-ppc@nongnu.org, clg@kaod.org,
+	David Gibson <david@gibson.dropbear.id.au>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 Content-Type: text/plain; charset="UTF-8"
-Message-ID: <20190424041958.HKkdMf2JGFg_zmOz--zX1TcT69vq4_ti1UOQiGMm_Dc@z>
+Message-ID: <20190424041959.1E9uTIFVgmWBHIukyee0UuoamVm9ticEsSSTp9zIVLs@z>
 
-pci_bus_is_root() currently relies on a method in the PCIBusClass.
-But it's always known if a PCI bus is a root bus when we create it, so
-using a dynamic method is overkill.
+Since c2077e2c "pci: Adjust PCI config limit based on bus topology",
+pci_adjust_config_limit() has been used in the config space read and writ=
+e
+paths to only permit access to extended config space on buses which permi=
+t
+it.  Specifically it prevents access on devices below a vanilla-PCI bus v=
+ia
+some combination of bridges, even if both the host bridge and the device
+itself are PCI-E.
 
-This replaces it with an IS_ROOT bit in a new flags field, which is set o=
-n
-root buses and otherwise clear.  As a bonus this removes the special
-is_root logic from pci_expander_bridge, since it already creates its bus
-as a root bus.
+It accomplishes this with a somewhat complex call up the chain of bridges
+to see if any of them prohibit extended config space access.  This is
+overly complex, since we can always know if the bus will support such
+access at the point it is constructed.
 
-Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
-Reviewed-by: Marcel Apfelbaum <marcel@redhat.com>
-Reviewed-by: Peter Xu <peterx@redhat.com>
-Reviewed-by: Greg Kurz <groug@kaod.org>
+This patch simplifies the test by using a flag in the PCIBus instance
+indicating whether extended configuration space is accessible.  It is
+false for vanilla PCI buses.  For PCI-E buses, it is true for root
+buses and equal to the parent bus's's capability otherwise.
+
+For the special case of sPAPR's paravirtualized PCI root bus, which
+acts mostly like vanilla PCI, but does allow extended config space
+access, we override the default value of the flag from the host bridge
+code.
+
+This should cause no behavioural change.
+
+Signed-off-by: David Gibson <david@gibson.dropbear.id.au>cd
 ---
- hw/pci-bridge/pci_expander_bridge.c |  6 ------
- hw/pci/pci.c                        | 14 ++------------
- hw/virtio/virtio-pci.c              |  1 +
- include/hw/pci/pci.h                |  1 -
- include/hw/pci/pci_bus.h            | 12 +++++++++++-
- 5 files changed, 14 insertions(+), 20 deletions(-)
+ hw/pci/pci.c             | 41 ++++++++++++++++++++++------------------
+ hw/pci/pci_host.c        | 13 +++----------
+ hw/ppc/spapr_pci.c       | 34 ++++++++++-----------------------
+ include/hw/pci/pci.h     |  1 -
+ include/hw/pci/pci_bus.h |  9 ++++++++-
+ 5 files changed, 44 insertions(+), 54 deletions(-)
 
-diff --git a/hw/pci-bridge/pci_expander_bridge.c b/hw/pci-bridge/pci_expa=
-nder_bridge.c
-index e62de4218f..ca66bc721a 100644
---- a/hw/pci-bridge/pci_expander_bridge.c
-+++ b/hw/pci-bridge/pci_expander_bridge.c
-@@ -66,11 +66,6 @@ static int pxb_bus_num(PCIBus *bus)
-     return pxb->bus_nr;
- }
-=20
--static bool pxb_is_root(PCIBus *bus)
--{
--    return true; /* by definition */
--}
--
- static uint16_t pxb_bus_numa_node(PCIBus *bus)
- {
-     PXBDev *pxb =3D convert_to_pxb(bus->parent_dev);
-@@ -83,7 +78,6 @@ static void pxb_bus_class_init(ObjectClass *class, void=
- *data)
-     PCIBusClass *pbc =3D PCI_BUS_CLASS(class);
-=20
-     pbc->bus_num =3D pxb_bus_num;
--    pbc->is_root =3D pxb_is_root;
-     pbc->numa_node =3D pxb_bus_numa_node;
- }
-=20
 diff --git a/hw/pci/pci.c b/hw/pci/pci.c
-index 6d13ef877b..ea5941fb22 100644
+index ea5941fb22..59ee034331 100644
 --- a/hw/pci/pci.c
 +++ b/hw/pci/pci.c
-@@ -129,14 +129,9 @@ static void pci_bus_unrealize(BusState *qbus, Error =
-**errp)
-     vmstate_unregister(NULL, &vmstate_pcibus, bus);
+@@ -120,6 +120,27 @@ static void pci_bus_realize(BusState *qbus, Error **=
+errp)
+     vmstate_register(NULL, -1, &vmstate_pcibus, bus);
  }
 =20
--static bool pcibus_is_root(PCIBus *bus)
++static void pcie_bus_realize(BusState *qbus, Error **errp)
++{
++    PCIBus *bus =3D PCI_BUS(qbus);
++
++    pci_bus_realize(qbus, errp);
++
++    /*
++     * A PCI-E bus can support extended config space if it's the root
++     * bus, or if the bus/bridge above it does as well
++     */
++    if (pci_bus_is_root(bus)) {
++        bus->flags |=3D PCI_BUS_EXTENDED_CONFIG_SPACE;
++    } else {
++        PCIBus *parent_bus =3D pci_get_bus(bus->parent_dev);
++
++        if (pci_bus_allows_extended_config_space(parent_bus)) {
++            bus->flags |=3D PCI_BUS_EXTENDED_CONFIG_SPACE;
++        }
++    }
++}
++
+ static void pci_bus_unrealize(BusState *qbus, Error **errp)
+ {
+     PCIBus *bus =3D PCI_BUS(qbus);
+@@ -142,11 +163,6 @@ static uint16_t pcibus_numa_node(PCIBus *bus)
+     return NUMA_NODE_UNASSIGNED;
+ }
+=20
+-static bool pcibus_allows_extended_config_space(PCIBus *bus)
 -{
--    return !bus->parent_dev;
+-    return false;
 -}
 -
- static int pcibus_num(PCIBus *bus)
+ static void pci_bus_class_init(ObjectClass *klass, void *data)
  {
--    if (pcibus_is_root(bus)) {
-+    if (pci_bus_is_root(bus)) {
-         return 0; /* pci host bridge */
-     }
-     return bus->parent_dev->config[PCI_SECONDARY_BUS];
-@@ -164,7 +159,6 @@ static void pci_bus_class_init(ObjectClass *klass, vo=
+     BusClass *k =3D BUS_CLASS(klass);
+@@ -161,7 +177,6 @@ static void pci_bus_class_init(ObjectClass *klass, vo=
 id *data)
-     k->unrealize =3D pci_bus_unrealize;
-     k->reset =3D pcibus_reset;
 =20
--    pbc->is_root =3D pcibus_is_root;
      pbc->bus_num =3D pcibus_num;
      pbc->numa_node =3D pcibus_numa_node;
-     pbc->allows_extended_config_space =3D pcibus_allows_extended_config_=
+-    pbc->allows_extended_config_space =3D pcibus_allows_extended_config_=
 space;
-@@ -398,6 +392,7 @@ static void pci_root_bus_init(PCIBus *bus, DeviceStat=
-e *parent,
-     bus->slot_reserved_mask =3D 0x0;
-     bus->address_space_mem =3D address_space_mem;
-     bus->address_space_io =3D address_space_io;
-+    bus->flags |=3D PCI_BUS_IS_ROOT;
+ }
 =20
-     /* host bridge */
-     QLIST_INIT(&bus->child);
-@@ -415,11 +410,6 @@ bool pci_bus_is_express(PCIBus *bus)
+ static const TypeInfo pci_bus_info =3D {
+@@ -182,16 +197,11 @@ static const TypeInfo conventional_pci_interface_in=
+fo =3D {
+     .parent        =3D TYPE_INTERFACE,
+ };
+=20
+-static bool pciebus_allows_extended_config_space(PCIBus *bus)
+-{
+-    return true;
+-}
+-
+ static void pcie_bus_class_init(ObjectClass *klass, void *data)
+ {
+-    PCIBusClass *pbc =3D PCI_BUS_CLASS(klass);
++    BusClass *k =3D BUS_CLASS(klass);
+=20
+-    pbc->allows_extended_config_space =3D pciebus_allows_extended_config=
+_space;
++    k->realize =3D pcie_bus_realize;
+ }
+=20
+ static const TypeInfo pcie_bus_info =3D {
+@@ -410,11 +420,6 @@ bool pci_bus_is_express(PCIBus *bus)
      return object_dynamic_cast(OBJECT(bus), TYPE_PCIE_BUS);
  }
 =20
--bool pci_bus_is_root(PCIBus *bus)
+-bool pci_bus_allows_extended_config_space(PCIBus *bus)
 -{
--    return PCI_BUS_GET_CLASS(bus)->is_root(bus);
+-    return PCI_BUS_GET_CLASS(bus)->allows_extended_config_space(bus);
 -}
 -
- bool pci_bus_allows_extended_config_space(PCIBus *bus)
+ void pci_root_bus_new_inplace(PCIBus *bus, size_t bus_size, DeviceState =
+*parent,
+                               const char *name,
+                               MemoryRegion *address_space_mem,
+diff --git a/hw/pci/pci_host.c b/hw/pci/pci_host.c
+index 9d64b2e12f..5f3497256c 100644
+--- a/hw/pci/pci_host.c
++++ b/hw/pci/pci_host.c
+@@ -53,16 +53,9 @@ static inline PCIDevice *pci_dev_find_by_addr(PCIBus *=
+bus, uint32_t addr)
+=20
+ static void pci_adjust_config_limit(PCIBus *bus, uint32_t *limit)
  {
-     return PCI_BUS_GET_CLASS(bus)->allows_extended_config_space(bus);
-diff --git a/hw/virtio/virtio-pci.c b/hw/virtio/virtio-pci.c
-index cb44e19b67..942173d830 100644
---- a/hw/virtio/virtio-pci.c
-+++ b/hw/virtio/virtio-pci.c
-@@ -20,6 +20,7 @@
- #include "standard-headers/linux/virtio_pci.h"
- #include "hw/virtio/virtio.h"
- #include "hw/pci/pci.h"
-+#include "hw/pci/pci_bus.h"
- #include "qapi/error.h"
- #include "qemu/error-report.h"
- #include "hw/pci/msi.h"
+-    if (*limit > PCI_CONFIG_SPACE_SIZE) {
+-        if (!pci_bus_allows_extended_config_space(bus)) {
+-            *limit =3D PCI_CONFIG_SPACE_SIZE;
+-            return;
+-        }
+-
+-        if (!pci_bus_is_root(bus)) {
+-            PCIDevice *bridge =3D pci_bridge_get_device(bus);
+-            pci_adjust_config_limit(pci_get_bus(bridge), limit);
+-        }
++    if ((*limit > PCI_CONFIG_SPACE_SIZE) &&
++        !pci_bus_allows_extended_config_space(bus)) {
++        *limit =3D PCI_CONFIG_SPACE_SIZE;
+     }
+ }
+=20
+diff --git a/hw/ppc/spapr_pci.c b/hw/ppc/spapr_pci.c
+index f62e6833b8..65a86be29c 100644
+--- a/hw/ppc/spapr_pci.c
++++ b/hw/ppc/spapr_pci.c
+@@ -1638,28 +1638,6 @@ static void spapr_phb_unrealize(DeviceState *dev, =
+Error **errp)
+     memory_region_del_subregion(get_system_memory(), &sphb->mem32window)=
+;
+ }
+=20
+-static bool spapr_phb_allows_extended_config_space(PCIBus *bus)
+-{
+-    SpaprPhbState *sphb =3D SPAPR_PCI_HOST_BRIDGE(BUS(bus)->parent);
+-
+-    return sphb->pcie_ecs;
+-}
+-
+-static void spapr_phb_root_bus_class_init(ObjectClass *klass, void *data=
+)
+-{
+-    PCIBusClass *pbc =3D PCI_BUS_CLASS(klass);
+-
+-    pbc->allows_extended_config_space =3D spapr_phb_allows_extended_conf=
+ig_space;
+-}
+-
+-#define TYPE_SPAPR_PHB_ROOT_BUS "pci"
+-
+-static const TypeInfo spapr_phb_root_bus_info =3D {
+-    .name =3D TYPE_SPAPR_PHB_ROOT_BUS,
+-    .parent =3D TYPE_PCI_BUS,
+-    .class_init =3D spapr_phb_root_bus_class_init,
+-};
+-
+ static void spapr_phb_realize(DeviceState *dev, Error **errp)
+ {
+     /* We don't use SPAPR_MACHINE() in order to exit gracefully if the u=
+ser
+@@ -1765,7 +1743,16 @@ static void spapr_phb_realize(DeviceState *dev, Er=
+ror **errp)
+                                 pci_spapr_set_irq, pci_spapr_map_irq, sp=
+hb,
+                                 &sphb->memspace, &sphb->iospace,
+                                 PCI_DEVFN(0, 0), PCI_NUM_PINS,
+-                                TYPE_SPAPR_PHB_ROOT_BUS);
++                                TYPE_PCI_BUS);
++
++    /*
++     * Despite resembling a vanilla PCI bus in most ways, the PAPR
++     * para-virtualized PCI bus *does* permit PCI-E extended config
++     * space access
++     */
++    if (sphb->pcie_ecs) {
++        bus->flags |=3D PCI_BUS_EXTENDED_CONFIG_SPACE;
++    }
+     phb->bus =3D bus;
+     qbus_set_hotplug_handler(BUS(phb->bus), OBJECT(sphb), NULL);
+=20
+@@ -2348,7 +2335,6 @@ void spapr_pci_rtas_init(void)
+ static void spapr_pci_register_types(void)
+ {
+     type_register_static(&spapr_phb_info);
+-    type_register_static(&spapr_phb_root_bus_info);
+ }
+=20
+ type_init(spapr_pci_register_types)
 diff --git a/include/hw/pci/pci.h b/include/hw/pci/pci.h
-index 0abb06b357..33ccce320c 100644
+index 33ccce320c..0edfaabbb0 100644
 --- a/include/hw/pci/pci.h
 +++ b/include/hw/pci/pci.h
 @@ -395,7 +395,6 @@ typedef PCIINTxRoute (*pci_route_irq_fn)(void *opaque=
@@ -199,44 +302,39 @@ index 0abb06b357..33ccce320c 100644
  #define TYPE_PCIE_BUS "PCIE"
 =20
  bool pci_bus_is_express(PCIBus *bus);
--bool pci_bus_is_root(PCIBus *bus);
- bool pci_bus_allows_extended_config_space(PCIBus *bus);
+-bool pci_bus_allows_extended_config_space(PCIBus *bus);
 =20
  void pci_root_bus_new_inplace(PCIBus *bus, size_t bus_size, DeviceState =
 *parent,
+                               const char *name,
 diff --git a/include/hw/pci/pci_bus.h b/include/hw/pci/pci_bus.h
-index f6df834170..aea98d5040 100644
+index aea98d5040..2d5f74b7c1 100644
 --- a/include/hw/pci/pci_bus.h
 +++ b/include/hw/pci/pci_bus.h
-@@ -15,14 +15,19 @@ typedef struct PCIBusClass {
-     BusClass parent_class;
-     /*< public >*/
+@@ -17,12 +17,13 @@ typedef struct PCIBusClass {
 =20
--    bool (*is_root)(PCIBus *bus);
      int (*bus_num)(PCIBus *bus);
      uint16_t (*numa_node)(PCIBus *bus);
-     bool (*allows_extended_config_space)(PCIBus *bus);
+-    bool (*allows_extended_config_space)(PCIBus *bus);
  } PCIBusClass;
 =20
-+enum PCIBusFlags {
-+    /* This bus is the root of a PCI domain */
-+    PCI_BUS_IS_ROOT                                         =3D 0x0001,
-+};
-+
- struct PCIBus {
-     BusState qbus;
-+    enum PCIBusFlags flags;
-     PCIIOMMUFunc iommu_fn;
-     void *iommu_opaque;
-     uint8_t devfn_min;
-@@ -47,4 +52,9 @@ struct PCIBus {
-     Notifier machine_done;
+ enum PCIBusFlags {
+     /* This bus is the root of a PCI domain */
+     PCI_BUS_IS_ROOT                                         =3D 0x0001,
++    /* PCIe extended configuration space is accessible on this bus */
++    PCI_BUS_EXTENDED_CONFIG_SPACE                           =3D 0x0002,
  };
 =20
-+static inline bool pci_bus_is_root(PCIBus *bus)
+ struct PCIBus {
+@@ -57,4 +58,10 @@ static inline bool pci_bus_is_root(PCIBus *bus)
+     return !!(bus->flags & PCI_BUS_IS_ROOT);
+ }
+=20
++static inline bool pci_bus_allows_extended_config_space(PCIBus *bus)
 +{
-+    return !!(bus->flags & PCI_BUS_IS_ROOT);
++    return !!(bus->flags & PCI_BUS_EXTENDED_CONFIG_SPACE);
 +}
++
 +
  #endif /* QEMU_PCI_BUS_H */
 --=20
