@@ -2,69 +2,60 @@ Return-Path: <SRS0=3XOk=S2=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 46C4BC282CE
-	for <qemu-devel@archiver.kernel.org>; Wed, 24 Apr 2019 09:49:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 552F6C10F11
+	for <qemu-devel@archiver.kernel.org>; Wed, 24 Apr 2019 09:50:02 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1B1542148D
-	for <qemu-devel@archiver.kernel.org>; Wed, 24 Apr 2019 09:49:49 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1B1542148D
+	by mail.kernel.org (Postfix) with ESMTPS id 274D62148D
+	for <qemu-devel@archiver.kernel.org>; Wed, 24 Apr 2019 09:50:02 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 274D62148D
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:38736 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:38738 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hJEXE-0007aV-74
-	for qemu-devel@archiver.kernel.org; Wed, 24 Apr 2019 05:49:48 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:53339)
+	id 1hJEXR-0007lC-EM
+	for qemu-devel@archiver.kernel.org; Wed, 24 Apr 2019 05:50:01 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:53372)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jasowang@redhat.com>) id 1hJEVV-0006e3-Ap
-	for qemu-devel@nongnu.org; Wed, 24 Apr 2019 05:48:02 -0400
+	(envelope-from <thuth@redhat.com>) id 1hJEVX-0006f2-IF
+	for qemu-devel@nongnu.org; Wed, 24 Apr 2019 05:48:06 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jasowang@redhat.com>) id 1hJEUk-0000Gy-DE
-	for qemu-devel@nongnu.org; Wed, 24 Apr 2019 05:47:16 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:50598)
+	(envelope-from <thuth@redhat.com>) id 1hJETb-00062b-8c
+	for qemu-devel@nongnu.org; Wed, 24 Apr 2019 05:46:04 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:42182)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <jasowang@redhat.com>)
-	id 1hJEUh-0008Kt-Ih; Wed, 24 Apr 2019 05:47:13 -0400
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
-	[10.5.11.12])
+	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1hJETb-00061e-3N
+	for qemu-devel@nongnu.org; Wed, 24 Apr 2019 05:46:03 -0400
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+	[10.5.11.14])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 0BA1EC0B1B48;
-	Wed, 24 Apr 2019 09:47:04 +0000 (UTC)
-Received: from [10.72.12.170] (ovpn-12-170.pek2.redhat.com [10.72.12.170])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id BF55860C70;
-	Wed, 24 Apr 2019 09:46:57 +0000 (UTC)
-To: Dan Streetman <dan.streetman@canonical.com>
-References: <20190416184624.15397-1-dan.streetman@canonical.com>
-	<20190416184624.15397-2-dan.streetman@canonical.com>
-	<9f3dac2a-15fe-8463-6aee-f6916b8d5e1c@redhat.com>
-	<CAOZ2QJO5-V4xydkVxKTC-1qnhqhUEMck04D=6+PFkhP9Z9+vmA@mail.gmail.com>
-	<ec53494d-99fc-d7b2-987d-ccd79ee47652@redhat.com>
-	<CAOZ2QJMKO8_8ygcycNf7xVWYWE8GX1PAk7hePB9D8Q5XCq1=yA@mail.gmail.com>
-From: Jason Wang <jasowang@redhat.com>
-Message-ID: <ade59025-3c49-b9f9-673b-8d9c397037d2@redhat.com>
-Date: Wed, 24 Apr 2019 17:46:55 +0800
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
-	Thunderbird/60.6.1
+	by mx1.redhat.com (Postfix) with ESMTPS id 5D2C530BC755;
+	Wed, 24 Apr 2019 09:46:02 +0000 (UTC)
+Received: from thuth.com (ovpn-116-69.ams2.redhat.com [10.36.116.69])
+	by smtp.corp.redhat.com (Postfix) with ESMTP id 1B4DD5DC1B;
+	Wed, 24 Apr 2019 09:46:00 +0000 (UTC)
+From: Thomas Huth <thuth@redhat.com>
+To: qemu-devel@nongnu.org,
+	Stefan Berger <stefanb@linux.ibm.com>
+Date: Wed, 24 Apr 2019 11:45:57 +0200
+Message-Id: <20190424094557.28404-1-thuth@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <CAOZ2QJMKO8_8ygcycNf7xVWYWE8GX1PAk7hePB9D8Q5XCq1=yA@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"; format="flowed"
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.31]);
-	Wed, 24 Apr 2019 09:47:04 +0000 (UTC)
+	(mx1.redhat.com [10.5.110.43]);
+	Wed, 24 Apr 2019 09:46:02 +0000 (UTC)
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH 1/2] add VirtIONet vhost_stopped flag to
- prevent multiple stops
+Subject: [Qemu-devel] [PATCH] tests/tpm-tests: Use g_test_skip() to mark
+ skipped tests
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -76,29 +67,35 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: =?UTF-8?Q?marcandre=2elureau=40redhat=2ecom_=3e=3e_Marc-Andr=c3=a9_Lurea?=
-	=?UTF-8?Q?u?= <marcandre.lureau@redhat.com>,
-	"Michael S. Tsirkin" <mst@redhat.com>, qemu-stable@nongnu.org,
-	qemu-devel@nongnu.org
+Cc: lvivier@redhat.com, pbonzini@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190424094655.dfDHue30Ufb5WlxAIAFhkhUKrvb5hh90pQwfPjAsqjY@z>
+Content-Type: text/plain; charset="UTF-8"
+Message-ID: <20190424094557.Yh5zw4o-f8nfToHFOqPb2JNacvGVh2ttmDRt2W4jW0g@z>
 
+Since we do not use gtester anymore (which had a bug here),
+we can now use g_test_skip() to mark skipped tests.
 
-On 2019/4/23 =E4=B8=8B=E5=8D=884:49, Dan Streetman wrote:
->> I think so if net_vhost_user_event() was called in main thread (it cal=
-ls
->> qemu_get_current_aio_context()).
-> ok, I'll check that, thanks!
->
-> I think my other patch, to remove the vhost_user_stop() call
-> completely from the net_vhost_user_event() handler for
-> CHR_EVENT_CLOSED, is still relevant; do you have thoughts on that?
->
+Signed-off-by: Thomas Huth <thuth@redhat.com>
+---
+ tests/tpm-tests.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-I think that patch makes sense.
-
-Thanks
+diff --git a/tests/tpm-tests.c b/tests/tpm-tests.c
+index 582ec0cfd4..e640777aa9 100644
+--- a/tests/tpm-tests.c
++++ b/tests/tpm-tests.c
+@@ -22,7 +22,7 @@ static bool
+ tpm_test_swtpm_skip(void)
+ {
+     if (!tpm_util_swtpm_has_tpm2()) {
+-        g_test_message("swtpm not in PATH or missing --tpm2 support");
++        g_test_skip("swtpm not in PATH or missing --tpm2 support");
+         return true;
+     }
+=20
+--=20
+2.21.0
 
 
