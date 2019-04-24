@@ -2,94 +2,71 @@ Return-Path: <SRS0=3XOk=S2=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-4.0 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B7B51C10F03
-	for <qemu-devel@archiver.kernel.org>; Wed, 24 Apr 2019 02:39:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6751DC10F03
+	for <qemu-devel@archiver.kernel.org>; Wed, 24 Apr 2019 02:40:32 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7C38E20674
-	for <qemu-devel@archiver.kernel.org>; Wed, 24 Apr 2019 02:39:25 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="HeEuCPco"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7C38E20674
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id 39BE9218D3
+	for <qemu-devel@archiver.kernel.org>; Wed, 24 Apr 2019 02:40:32 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 39BE9218D3
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:34587 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:34627 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hJ7oi-0004Dv-CR
-	for qemu-devel@archiver.kernel.org; Tue, 23 Apr 2019 22:39:24 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:60196)
+	id 1hJ7pn-0004xo-C6
+	for qemu-devel@archiver.kernel.org; Tue, 23 Apr 2019 22:40:31 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:32960)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1hJ7l4-0001LH-9a
-	for qemu-devel@nongnu.org; Tue, 23 Apr 2019 22:35:39 -0400
+	(envelope-from <oscar.zhangbo@huawei.com>) id 1hJ7nM-0003WE-Hq
+	for qemu-devel@nongnu.org; Tue, 23 Apr 2019 22:38:01 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1hJ7X9-0006Km-U6
-	for qemu-devel@nongnu.org; Tue, 23 Apr 2019 22:21:17 -0400
-Received: from mail-pl1-x629.google.com ([2607:f8b0:4864:20::629]:46180)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1hJ7X8-0006HW-0V
-	for qemu-devel@nongnu.org; Tue, 23 Apr 2019 22:21:15 -0400
-Received: by mail-pl1-x629.google.com with SMTP id o7so6214092pll.13
-	for <qemu-devel@nongnu.org>; Tue, 23 Apr 2019 19:21:13 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
-	h=subject:to:references:from:openpgp:message-id:date:user-agent
-	:mime-version:in-reply-to:content-language:content-transfer-encoding;
-	bh=awSJgQAoQVA5ExwYBvo16thb3xfdL8UgbbmHfDB5SYI=;
-	b=HeEuCPcob66BMK78I7Achv0OG1p1gwK67/AjuXy0y1BFK/uWO+Y2tihJsniM5c32S4
-	DVWFN2vEoTT/nFEyMrRqey74OgZBJvCHDcXP9SvIMAfih7+6++bXFPOT8Skmbu/YEkZy
-	d6w1OJ5GUknKAHyv3GVMwwlg0RWqEJnf/CWIxf3Mwpq+GCmUwDXGzKmw7NS7TKd6Fzwt
-	yaoye1ejquc4MY9/hLyYx0WjEk0OczLQZ+4QzNJuNp+tfGGhu/qC8/kLRmyh7WabvzX4
-	ZPXVBaX3tFC+thg+eGKTpNKbOmShg+gzanlTWYGiKP1DD2E0qqDhOMWYZ1Y7IdBFR5Cf
-	h4xQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=1e100.net; s=20161025;
-	h=x-gm-message-state:subject:to:references:from:openpgp:message-id
-	:date:user-agent:mime-version:in-reply-to:content-language
-	:content-transfer-encoding;
-	bh=awSJgQAoQVA5ExwYBvo16thb3xfdL8UgbbmHfDB5SYI=;
-	b=YHJGoR8a92BpFUG7UZHqlgZwl61+H6b/cEOfxfBoojMY2eA7VKRqKLR1I/3FbLiiFN
-	U2cg4A1spb+2X8bg5Oz1R8fldE+E5JySIBLhEov5iFHvdoRwmSdTMnn4fwbwYs+GrTQ5
-	yomHPctc1YXfCHieBNUyoyxvNoGSmyxt4kNIFQ9v3WSYyO4MCjTKYKMWshp/KYpYjRKN
-	BLMMvWrk0CvmUH4k+JVoIyOMQZz6rNKzGatb14h9B42T1hQZcgH0mGR0Hth2HQxZY6sO
-	qFUwjWJqlBuhQlwO9MOVQqaPFRbiE4oP57ilmvg8JtIrXzWAjIh2KXI4glQq+NgvXiHa
-	L3qg==
-X-Gm-Message-State: APjAAAX/vnhU6/6QZjBYJt87QpZmL47rDH/i+r77KIP9KfH5FQtpFrw1
-	J/knJ5g4GY8zwuzqEsWp8GzgRr7qONw=
-X-Google-Smtp-Source: APXvYqxNbyxIRFLFHtE0AQB7EJNsS9LJkl+ozlEcI1InHS6qvSBCV5kk1nZdOCSTWGchd4BiosjEpA==
-X-Received: by 2002:a17:902:7294:: with SMTP id
-	d20mr22204808pll.300.1556072472439; 
-	Tue, 23 Apr 2019 19:21:12 -0700 (PDT)
-Received: from [192.168.1.11] (97-113-179-147.tukw.qwest.net. [97.113.179.147])
-	by smtp.gmail.com with ESMTPSA id
-	v1sm25573039pff.81.2019.04.23.19.21.11
-	(version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-	Tue, 23 Apr 2019 19:21:11 -0700 (PDT)
-To: Peter Maydell <peter.maydell@linaro.org>, qemu-arm@nongnu.org,
-	qemu-devel@nongnu.org
-References: <20190416125744.27770-1-peter.maydell@linaro.org>
-	<20190416125744.27770-26-peter.maydell@linaro.org>
-From: Richard Henderson <richard.henderson@linaro.org>
-Openpgp: preference=signencrypt
-Message-ID: <772b2b44-cdaf-7fb3-2c1e-a9ad5f7ba76e@linaro.org>
-Date: Tue, 23 Apr 2019 19:21:09 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
-	Thunderbird/60.6.1
-MIME-Version: 1.0
-In-Reply-To: <20190416125744.27770-26-peter.maydell@linaro.org>
+	(envelope-from <oscar.zhangbo@huawei.com>) id 1hJ7nL-0002ih-IH
+	for qemu-devel@nongnu.org; Tue, 23 Apr 2019 22:38:00 -0400
+Received: from szxga02-in.huawei.com ([45.249.212.188]:2493 helo=huawei.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <oscar.zhangbo@huawei.com>)
+	id 1hJ7nD-0002Oy-T0; Tue, 23 Apr 2019 22:37:52 -0400
+Received: from DGGEML401-HUB.china.huawei.com (unknown [172.30.72.57])
+	by Forcepoint Email with ESMTP id B814F47A8198B879D3A3;
+	Wed, 24 Apr 2019 10:37:42 +0800 (CST)
+Received: from DGGEML424-HUB.china.huawei.com (10.1.199.41) by
+	DGGEML401-HUB.china.huawei.com (10.3.17.32) with Microsoft SMTP Server
+	(TLS) id 14.3.439.0; Wed, 24 Apr 2019 10:37:42 +0800
+Received: from DGGEML529-MBS.china.huawei.com ([169.254.5.207]) by
+	dggeml424-hub.china.huawei.com ([10.1.199.41]) with mapi id
+	14.03.0439.000; Wed, 24 Apr 2019 10:37:36 +0800
+From: "Zhangbo (Oscar)" <oscar.zhangbo@huawei.com>
+To: Stefan Hajnoczi <stefanha@gmail.com>, "wangjie (P)"
+	<wangjie88@huawei.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
+	"qemu-block@nongnu.org" <qemu-block@nongnu.org>
+Thread-Topic: =?utf-8?B?W1FlbXUtYmxvY2tdIHF1ZXN0aW9u77yaIERvZXMgcWVtdS1wci1oZWxwZXIg?=
+	=?utf-8?B?aGF2ZSBpdHMgb3duIGxvZyBmaWxlc++8nw==?=
+Thread-Index: AQHU+YJvbuIuosAbgE6Pz+QfP7tbKaZJP5iAgAFVrQA=
+Date: Wed, 24 Apr 2019 02:37:36 +0000
+Message-ID:
+ <0259E1C966E8C54AA93AA2B1240828E65D0BE6FB@DGGEML529-MBS.china.huawei.com>
+References: <c47aea74-cec7-0369-591e-e1b1fdddc3e6@huawei.com>
+	<20190423135635.GL32465@stefanha-x1.localdomain>
+In-Reply-To: <20190423135635.GL32465@stefanha-x1.localdomain>
+Accept-Language: zh-CN, en-US
+Content-Language: zh-CN
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-originating-ip: [10.177.17.158]
 Content-Type: text/plain; charset="UTF-8"
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
-	recognized.
-X-Received-From: 2607:f8b0:4864:20::629
-Subject: Re: [Qemu-devel] [PATCH 25/26] target/arm: Implement VLLDM for v7M
- CPUs with an FPU
+Content-Transfer-Encoding: base64
+MIME-Version: 1.0
+X-CFilter-Loop: Reflected
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 45.249.212.188
+Subject: Re: [Qemu-devel] 
+ =?utf-8?q?=5BQemu-block=5D_question=EF=BC=9A_Does_q?=
+ =?utf-8?q?emu-pr-helper_have_its_own_log_files=EF=BC=9F?=
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -101,24 +78,34 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: "Wangjing \(King\)" <king.wang@huawei.com>,
+	"Fangyi \(C\)" <eric.fangyi@huawei.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190424022109.Lzq--U8rCOPyTVoPtqolI5ej_Xwd4CcrQl1rpUPov6c@z>
+Message-ID: <20190424023736.iAvOGS-RiZ4jVGVqYnmVb0dj7N5HE3kCGVQGKt9ot5o@z>
 
-On 4/16/19 5:57 AM, Peter Maydell wrote:
-> Implement the VLLDM instruction for v7M for the FPU present cas.
-> 
-> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
-> ---
->  target/arm/helper.h    |  1 +
->  target/arm/helper.c    | 54 ++++++++++++++++++++++++++++++++++++++++++
->  target/arm/translate.c |  2 +-
->  3 files changed, 56 insertions(+), 1 deletion(-)
-
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
-
-
-r~
-
+PkZyb206IFN0ZWZhbiBIYWpub2N6aSBbbWFpbHRvOnN0ZWZhbmhhQGdtYWlsLmNvbV0NCj5TZW50
+OiBUdWVzZGF5LCBBcHJpbCAyMywgMjAxOSA5OjU3IFBNDQo+T24gVHVlLCBBcHIgMjMsIDIwMTkg
+YXQgMTE6MTI6NDBBTSArMDgwMCwgSmllIFdhbmcgd3JvdGU6DQo+PiDCoERvZXMgcWVtdS1wci1o
+ZWxwZXIgaGF2ZSBpdHMgb3duIGxvZyBmaWxlc++8nw0KPg0KPk5vLCBpdCBkb2VzIG5vdC4gIHFl
+bXUtcHItaGVscGVyIHVzZXMgc3RkZXJyIGZvciBlcnJvcnMgYW5kIHRoZXJlIGlzIG5vdA0KPm11
+Y2ggb3V0cHV0IGR1cmluZyBub3JtYWwgb3BlcmF0aW9uLg0KPg0KPkNoZWNrIGpvdXJuYWxjdGwo
+MSkgZm9yIGVycm9ycyBpZiB5b3UgYXJlIGxhdW5jaGluZyBpdCBhcyBhIHN5c3RlbWQNCj5zZXJ2
+aWNlLg0KPg0KPlN0ZWZhbg0KDQpUaGUgZXJyb3IgbWVzc2FnZXMgdGhhdCBzZW50IHRvICpzdGRl
+cnIqIGFyZSAqbm90KiBjYXB0dXJlZCBieSBhbnlvbmUsIHRoZW4NCnRoZXNlIGVycm9yIG1lc3Nh
+Z2VzIHNlZW1zIGhlbHBsZXNzLg0KSXQncyBkaWZmZXJlbnQgZm9ybSBxZW11J3MgbG9nLCAgcWVt
+dSdzIHN0ZGVyciBsb2dzIGFyZSB0cmFuc2ZlcnJlZCB0byB2aXJ0bG9nZCwNCnRoYXQgbWVhbnMg
+dGhlc2UgbG9ncyBhcmUgZmluYWxseSB3cml0dGVuIGludG8gZGlzay4NCkFueSBmdXJ0aGVyIGRl
+dmVsb3BtZW50IHBsYW4/DQoNCldlIHRob3VnaHQgb2Y6DQoxIGxvZ2dpbmcgaW50byBzeXNsb2cs
+IGJ1dCB0aGUgbWFsaWNpb3VzIGd1ZXN0IG1heSBjYXVzZSBsYXJnZSBhbW91bnQgb2YgZXJyb3IN
+CiAgbWVzc2FnZXMgdG8gb3ZlcmZsb3cgdGhlIG1lc3NhZ2UgbG9nLg0KMiBvciwgbGV0IHZpcnRs
+b2dkIHRvIHJlZGlyZWN0IGl0cyBsb2dzLiBCdXQgaWYgdmlydGxvZ2QgZ2V0IHJlc3RhcnRlZCwg
+dGhlIGhlbHBlcidzIGxvZyB3b3VsZA0KICBubyBsb25nZXIgYmUgbG9nZ2VkLCBiZWNhdXNlLCB1
+bmxpa2UgcWVtdSwgdGhlcmUncyBubyBxbXAgc29ja2V0IGJldHdlZW4gDQogIGxpYnZpcnRkIGFu
+ZCB0aGUgaGVscGVyLCB0aGUgY2hhbm5lbCBiZXR3ZWVuIHRoZSBoZWxwZXIgYW5kIHZpcnRsb2dk
+IGNvdWxkIG5vdCBiZQ0KICByZS1lc3RhYmxpc2hlZC4NCjMgb3IsIGxldCBxZW11IHRvIGxvZyB0
+aGUgaGVscGVyJ3MgbG9nLCBzZWVtcyBhIGxpdHRsZSBvZGQgYW5kIGNvbXBsZXguDQo0IG9yLCBs
+ZXQgdGhlIGhlbHBlciByZWFsaXplIGl0cyBvd24gbG9nZ2luZyBzY2hlbWUgYW5kIGxvZyBpbnRv
+IGl0c2VsZidzIGxvZ2ZpbGUgPw0KDQpXaGF0J3MgeW91ciBzdWdnZXN0aW9uPyBUaGFua3MhDQo=
 
