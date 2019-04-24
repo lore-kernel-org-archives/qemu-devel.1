@@ -2,66 +2,97 @@ Return-Path: <SRS0=3XOk=S2=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.4 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_PASS,USER_AGENT_MUTT autolearn=ham autolearn_force=no
+X-Spam-Status: No, score=-8.7 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_PASS,UNPARSEABLE_RELAY,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A29BBC282E1
-	for <qemu-devel@archiver.kernel.org>; Wed, 24 Apr 2019 07:34:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D2EA3C10F11
+	for <qemu-devel@archiver.kernel.org>; Wed, 24 Apr 2019 07:54:25 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6985A218D3
-	for <qemu-devel@archiver.kernel.org>; Wed, 24 Apr 2019 07:34:07 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6985A218D3
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 9C317206BA
+	for <qemu-devel@archiver.kernel.org>; Wed, 24 Apr 2019 07:54:25 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="zkBl0S1m"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9C317206BA
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=oracle.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:37265 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:37467 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hJCPu-00070E-Bi
-	for qemu-devel@archiver.kernel.org; Wed, 24 Apr 2019 03:34:06 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:47957)
+	id 1hJCjY-00050T-Jg
+	for qemu-devel@archiver.kernel.org; Wed, 24 Apr 2019 03:54:24 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:52715)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1hJCNy-0005o8-6W
-	for qemu-devel@nongnu.org; Wed, 24 Apr 2019 03:32:07 -0400
+	(envelope-from <shmuel.eiderman@oracle.com>) id 1hJCha-0003k9-Ul
+	for qemu-devel@nongnu.org; Wed, 24 Apr 2019 03:52:24 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1hJCBd-0002SX-WC
-	for qemu-devel@nongnu.org; Wed, 24 Apr 2019 03:19:23 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:46144)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <kwolf@redhat.com>) id 1hJCBd-0002Lk-NM
-	for qemu-devel@nongnu.org; Wed, 24 Apr 2019 03:19:21 -0400
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
-	[10.5.11.16])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 3CAC23098487;
-	Wed, 24 Apr 2019 07:19:20 +0000 (UTC)
-Received: from linux.fritz.box (ovpn-116-161.ams2.redhat.com [10.36.116.161])
-	by smtp.corp.redhat.com (Postfix) with ESMTPS id BAB0D5C28D;
-	Wed, 24 Apr 2019 07:19:18 +0000 (UTC)
-Date: Wed, 24 Apr 2019 09:19:17 +0200
-From: Kevin Wolf <kwolf@redhat.com>
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Message-ID: <20190424071917.GA15891@linux.fritz.box>
-References: <20190423113028.GD30014@wheatley>
-	<20190423121218.GF9041@localhost.localdomain>
-	<20190423142648.GA2967@wheatley>
-	<20190423150845.GG9041@localhost.localdomain>
-	<aeb62174-5aad-676e-792d-e71d694dbd1e@virtuozzo.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
-Content-Disposition: inline
-In-Reply-To: <aeb62174-5aad-676e-792d-e71d694dbd1e@virtuozzo.com>
-User-Agent: Mutt/1.11.3 (2019-02-01)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.42]);
-	Wed, 24 Apr 2019 07:19:20 +0000 (UTC)
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] Possibly incorrect data sparsification by qemu-img
+	(envelope-from <shmuel.eiderman@oracle.com>) id 1hJCek-00081W-O3
+	for qemu-devel@nongnu.org; Wed, 24 Apr 2019 03:49:28 -0400
+Received: from userp2130.oracle.com ([156.151.31.86]:48998)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <shmuel.eiderman@oracle.com>)
+	id 1hJCej-0007rn-9g; Wed, 24 Apr 2019 03:49:25 -0400
+Received: from pps.filterd (userp2130.oracle.com [127.0.0.1])
+	by userp2130.oracle.com (8.16.0.27/8.16.0.27) with SMTP id
+	x3O7n5Yw118836; Wed, 24 Apr 2019 07:49:15 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com;
+	h=from : to : cc :
+	subject : date : message-id : in-reply-to : references;
+	s=corp-2018-07-02; 
+	bh=asTKXEYM/BwFVwIDqkM3+Fnyd91984U1g4yfMnxhwKU=;
+	b=zkBl0S1mPhZ4pxz3jzke4yRxEfYEnPcNQ0xUJTt/aW3MNQbjOKwxdOtw4HXVK2HooDib
+	L+11/CD3cli8QEqzAv4/I3hi10hR99t7zqD7vpNB8a5WboFxVy6ChQZ/HB1mp3BPSduO
+	3L8oifToNGyQQ7c7Eo9WR/OHswucSHhxV1wLo574UA1IMgrhc7SLmwZOJ/AlAndrnEaf
+	Z6zUtSJOtszA/lHjQl2l1Y6ueylCYuiiTlJycMpPLfHNpYisMcqi1tgbD58XDVSEPE20
+	5WL3809ZnO2rJNZ+1HT7898nW6Iu4Dy8KhdZcNlDTziqvJE1QD7p3UmAhHlIBmbJASBo
+	NA== 
+Received: from aserp3020.oracle.com (aserp3020.oracle.com [141.146.126.70])
+	by userp2130.oracle.com with ESMTP id 2rytut0muh-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Wed, 24 Apr 2019 07:49:15 +0000
+Received: from pps.filterd (aserp3020.oracle.com [127.0.0.1])
+	by aserp3020.oracle.com (8.16.0.27/8.16.0.27) with SMTP id
+	x3O7mdMx090482; Wed, 24 Apr 2019 07:49:14 GMT
+Received: from aserv0122.oracle.com (aserv0122.oracle.com [141.146.126.236])
+	by aserp3020.oracle.com with ESMTP id 2s0fv3e3j1-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Wed, 24 Apr 2019 07:49:14 +0000
+Received: from abhmp0012.oracle.com (abhmp0012.oracle.com [141.146.116.18])
+	by aserv0122.oracle.com (8.14.4/8.14.4) with ESMTP id x3O7nDAY017058;
+	Wed, 24 Apr 2019 07:49:13 GMT
+Received: from nexus.ravello.local (/213.57.127.2)
+	by default (Oracle Beehive Gateway v4.0)
+	with ESMTP ; Wed, 24 Apr 2019 00:49:13 -0700
+From: Sam Eiderman <shmuel.eiderman@oracle.com>
+To: fam@euphon.net, kwolf@redhat.com, mreitz@redhat.com, qemu-block@nongnu.org
+Date: Wed, 24 Apr 2019 10:49:00 +0300
+Message-Id: <20190424074901.31430-2-shmuel.eiderman@oracle.com>
+X-Mailer: git-send-email 2.13.3
+In-Reply-To: <20190424074901.31430-1-shmuel.eiderman@oracle.com>
+References: <20190424074901.31430-1-shmuel.eiderman@oracle.com>
+X-Proofpoint-Virus-Version: vendor=nai engine=5900 definitions=9236
+	signatures=668685
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=0
+	malwarescore=0
+	phishscore=0 bulkscore=0 spamscore=0 mlxscore=0 mlxlogscore=999
+	adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+	engine=8.0.1-1810050000 definitions=main-1904240068
+X-Proofpoint-Virus-Version: vendor=nai engine=5900 definitions=9236
+	signatures=668685
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0
+	priorityscore=1501 malwarescore=0
+	suspectscore=0 phishscore=0 bulkscore=0 spamscore=0 clxscore=1015
+	lowpriorityscore=0 mlxscore=0 impostorscore=0 mlxlogscore=999
+	adultscore=0
+	classifier=spam adjust=0 reason=mlx scancount=1 engine=8.0.1-1810050000
+	definitions=main-1904240068
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic]
+X-Received-From: 156.151.31.86
+Subject: [Qemu-devel] [PATCH 1/2] vmdk: Fix comment regarding max l1_size
+ coverage
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -73,119 +104,65 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Martin Kletzander <mkletzan@redhat.com>,
-	"qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
-	Richard Jones <rjones@redhat.com>
+Cc: eyal.moscovici@oracle.com, arbel.moshe@oracle.com, qemu-devel@nongnu.org,
+	shmuel.eiderman@oracle.com, liran.alon@oracle.com, karl.heubaum@oracle.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190424071917._NmjyiZI57waqkjKgnN9TWQ7W917o_LAU-miHJ0tikk@z>
+Content-Type: text/plain; charset="UTF-8"
+Message-ID: <20190424074900.omiWLm_lRirSW5HdkZ01z5oNoKNMFiexQSlj-gfVI1w@z>
 
-Am 24.04.2019 um 08:40 hat Vladimir Sementsov-Ogievskiy geschrieben:
-> 23.04.2019 18:08, Kevin Wolf wrote:
-> > Am 23.04.2019 um 16:26 hat Martin Kletzander geschrieben:
-> >> On Tue, Apr 23, 2019 at 02:12:18PM +0200, Kevin Wolf wrote:
-> >>> Am 23.04.2019 um 13:30 hat Martin Kletzander geschrieben:
-> >>>> Hi,
-> >>>>
-> >>>> I am using qemu-img with nbdkit to transfer a disk image and the update it with
-> >>>> extra data from newer snapshots.  The end image cannot be transferred because
-> >>>> the snapshots will be created later than the first transfer and we want to save
-> >>>> some time up front.  You might think of it as a continuous synchronisation.  It
-> >>>> looks something like this:
-> >>>>
-> >>>> I first transfer the whole image:
-> >>>>
-> >>>>   qemu-img convert -p $nbd disk.raw
-> >>>>
-> >>>> Where `$nbd` is something along the lines of `nbd+unix:///?socket=nbdkit.sock`
-> >>>>
-> >>>> Then, after the next snapshot is created, I can update it thanks to the `-n`
-> >>>> parameter (the $nbd now points to the newer snapshot with unchanged data looking
-> >>>> like holes in the file):
-> >>>>
-> >>>>   qemu-img convert -p -n $nbd disk.raw
-> >>>>
-> >>>> This is fast and efficient as it uses block status nbd extension, so it only
-> >>>> transfers new data.
-> >>>
-> >>> This is an implementation detail. Don't rely on it. What you're doing is
-> >>> abusing 'qemu-img convert', so problems like what you describe are to be
-> >>> expected.
-> >>>
-> >>>> This can be done over and over again to keep the local
-> >>>> `disk.raw` image up to date with the latest remote snapshot.
-> >>>>
-> >>>> However, when the guest OS zeroes some of the data and it gets written into the
-> >>>> snapshot, qemu-img scans for those zeros and does not write them to the
-> >>>> destination image.  Checking the output of `qemu-img map --output=json $nbd`
-> >>>> shows that the zeroed data is properly marked as `data: true`.
-> >>>>
-> >>>> Using `-S 0` would write zeros even where the holes are, effectively overwriting
-> >>>> the data from the last snapshot even though they should not be changed.
-> >>>>
-> >>>> Having gone through some workarounds I would like there to be another way.  I
-> >>>> know this is far from the typical usage of qemu-img, but is this really the
-> >>>> expected behaviour or is this just something nobody really needed before?  If it
-> >>>> is the former, would it be possible to have a parameter that would control this
-> >>>> behaviour?  If the latter is the case, can that behaviour be changed so that it
-> >>>> properly replicates the data when `-n` parameter is used?
-> >>>>
-> >>>> Basically the only thing we need is to either:
-> >>>>
-> >>>> 1) write zeros where they actually are or
-> >>>>
-> >>>> 2) turn off explicit sparsification without requesting dense image (basically
-> >>>>     sparsify only the par that is reported as hole on the source) or
-> >>>>
-> >>>> 3) ideally, just FALLOC_FL_PUNCH_HOLE in places where source did report data,
-> >>>>     but qemu-img found they are all zeros (or source reported HOLE+ZERO which, I
-> >>>>     believe, is effectively the same)
-> >>>>
-> >>>> If you want to try this out, I found the easiest reproducible way is using
-> >>>> nbdkit's data plugin, which can simulate whatever source image you like.
-> >>>
-> >>> I think what you _really_ want is a commit block job. The problem is
-> >>> just that you don't have a proper backing file chain, but just a bunch
-> >>> of NBD connections.
-> >>>
-> >>> Can't you get an NBD connection that already provides the condensed form
-> >>> of the whole snapshot chain directly at the source? If the NBD server
-> >>> was QEMU, this would actually be easier than providing each snapshot
-> >>> individually.
-> >>>
-> >>> If this isn't possible, I think you need to replicate the backing chain
-> >>> on the destination instead of converting into the same image again and
-> >>> again so that qemu-img knows that it must take existing data of the
-> >>> backing file into consideration:
-> >>>
-> >>>     qemu-img convert -O qcow2 nbd://... base.qcow2
-> >>>     qemu-img convert -O qcow2 -F qcow2 -B base.qcow2 nbd://... overlay1.qcow2
-> >>>     qemu-img convert -O qcow2 -F qcow2 -B overlay1.qcow2 nbd://... overlay2.qcow2
-> >>>     ...
-> 
-> Is it safe in general?
-> 
-> Qemu often consider rounding-up allocated ranges to be safe, or just
-> consider unknown area as allocated.  And if this happen, we'll convert
-> unallocated hole to allocated zeroes on target, which will break
-> backing chain.
-> 
-> This way would be correct if on source under nbd server we have valid
-> backing chain too, so in case of "rounding-up" we'll just read valid
-> data from backing. But it is not the case (or sorry, if I
-> misunderstood).
+Commit b0651b8c246d ("vmdk: Move l1_size check into vmdk_add_extent")
+extended the l1_size check from VMDK4 to VMDK3 but did not update the
+default coverage in the moved comment.
 
-As I said, it depends on the NBD server providing the right block
-allocation status - and this includes alignment etc. as well.
+The previous vmdk4 calculation:
 
-It's not a very nice solution because NBD doesn't actually do backing
-fields, so we're relying on things that the spec doesn't talk about. But
-as I understand, we don't have control over the server side, so it's
-probably the best we can do under these conditions.
+    (512 * 1024 * 1024) * 512(l2 entries) * 65536(grain) = 16PB
 
-If the NBD server already took the backing chain into consideration, it
-would indeed be much more reliable.
+The added vmdk3 calculation:
 
-Kevin
+    (512 * 1024 * 1024) * 4096(l2 entries) * 512(grain) = 1PB
+
+Adding the calculation of vmdk3 to the comment.
+
+In any case, VMware does not offer virtual disks more than 2TB for
+vmdk4/vmdk3 or 64TB for the new undocumented seSparse format which is
+not implemented yet in qemu.
+
+Reviewed-by: Karl Heubaum <karl.heubaum@oracle.com>
+Reviewed-by: Eyal Moscovici <eyal.moscovici@oracle.com>
+Reviewed-by: Liran Alon <liran.alon@oracle.com>
+Reviewed-by: Arbel Moshe <arbel.moshe@oracle.com>
+Signed-off-by: Sam Eiderman <shmuel.eiderman@oracle.com>
+---
+ block/vmdk.c | 11 ++++++++---
+ 1 file changed, 8 insertions(+), 3 deletions(-)
+
+diff --git a/block/vmdk.c b/block/vmdk.c
+index de8cb859f8..fc7378da78 100644
+--- a/block/vmdk.c
++++ b/block/vmdk.c
+@@ -426,10 +426,15 @@ static int vmdk_add_extent(BlockDriverState *bs,
+         return -EFBIG;
+     }
+     if (l1_size > 512 * 1024 * 1024) {
+-        /* Although with big capacity and small l1_entry_sectors, we can get a
++        /*
++         * Although with big capacity and small l1_entry_sectors, we can get a
+          * big l1_size, we don't want unbounded value to allocate the table.
+-         * Limit it to 512M, which is 16PB for default cluster and L2 table
+-         * size */
++         * Limit it to 512M, which is:
++         *     16PB - for default "Hosted Sparse Extent" (VMDK4)
++         *            cluster size: 64KB, L2 table size: 512 entries
++         *     1PB  - for default "ESXi Host Sparse Extent" (VMDK3/vmfsSparse)
++         *            cluster size: 512B, L2 table size: 4096 entries
++         */
+         error_setg(errp, "L1 size too big");
+         return -EFBIG;
+     }
+-- 
+2.13.3
+
 
