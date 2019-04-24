@@ -1,29 +1,26 @@
-Received: from eggs.gnu.org ([209.51.188.92]:52586)
+Received: from eggs.gnu.org ([209.51.188.92]:52561)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <amarkovic@wavecomp.com>) id 1hJHnP-0002I7-5A
+	(envelope-from <alex.bennee@linaro.org>) id 1hJHnP-0002HG-7n
 	for qemu-devel@nongnu.org; Wed, 24 Apr 2019 09:18:44 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <amarkovic@wavecomp.com>) id 1hJHen-0003jZ-K0
-	for qemu-devel@nongnu.org; Wed, 24 Apr 2019 09:09:50 -0400
-Received: from mail-eopbgr700107.outbound.protection.outlook.com
-	([40.107.70.107]:4245
-	helo=NAM04-SN1-obe.outbound.protection.outlook.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <amarkovic@wavecomp.com>)
-	id 1hJHYw-0005p0-Lt
-	for qemu-devel@nongnu.org; Wed, 24 Apr 2019 09:03:48 -0400
-From: Aleksandar Markovic <amarkovic@wavecomp.com>
-Date: Wed, 24 Apr 2019 13:03:43 +0000
-Message-ID: <BN6PR2201MB1251B9F471655E8E079E83E2C63C0@BN6PR2201MB1251.namprd22.prod.outlook.com>
-References: <1556110623-655-1-git-send-email-aleksandar.markovic@rt-rk.com>,
-	<1556110623-655-2-git-send-email-aleksandar.markovic@rt-rk.com>
-In-Reply-To: <1556110623-655-2-git-send-email-aleksandar.markovic@rt-rk.com>
-Content-Language: en-US
-Content-Type: text/plain; charset="iso-8859-1"
-Content-Transfer-Encoding: quoted-printable
+	(envelope-from <alex.bennee@linaro.org>) id 1hJHeQ-0003CH-M1
+	for qemu-devel@nongnu.org; Wed, 24 Apr 2019 09:09:32 -0400
+Received: from mail-wr1-x441.google.com ([2a00:1450:4864:20::441]:36207)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+	id 1hJHeQ-00038a-CK
+	for qemu-devel@nongnu.org; Wed, 24 Apr 2019 09:09:26 -0400
+Received: by mail-wr1-x441.google.com with SMTP id b1so13738412wru.3
+	for <qemu-devel@nongnu.org>; Wed, 24 Apr 2019 06:09:24 -0700 (PDT)
+References: <20190424124414.17775-1-arilou@gmail.com>
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+In-reply-to: <20190424124414.17775-1-arilou@gmail.com>
+Date: Wed, 24 Apr 2019 13:09:22 +0000
+Message-ID: <87ftq7wnwd.fsf@zen.linaroharston>
 MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [PATCH v2 1/5] linux-user: Fix support for the
- SIOCATMARK and SIOCGPGRP ioctls for eXtensa
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v1] gdbstub: Refactor gdb packets handler
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,22 +29,31 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "jcmvbkbc@gmail.com" <jcmvbkbc@gmail.com>
-Cc: "aurelien@aurel32.net" <aurelien@aurel32.net>, Aleksandar Rikalo <arikalo@wavecomp.com>, "daniel.santos@pobox.com" <daniel.santos@pobox.com>, "lvivier@redhat.com" <lvivier@redhat.com>, "thuth@redhat.com" <thuth@redhat.com>, "philmd@redhat.com" <philmd@redhat.com>
+To: qemu-devel@nongnu.org
+Cc: Jon Doron <arilou@gmail.com>
 
-> From: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>
-> Subject: [PATCH v2 1/5] linux-user: Fix support for the SIOCATMARK and SI=
-OCGPGRP ioctls for eXtensa
+
+Jon Doron <arilou@gmail.com> writes:
+
+> Refactor the command packet handling code to ease the work of
+> adding and extending commands that are currently not implemented.
 >
-> Fix support for the SIOCATMARK and SIOCGPGRP ioctls for eXtensa by
-> correcting corresponding macro definition.
+> Signed-off-by: Jon Doron <arilou@gmail.com>
+> ---
+>  gdbstub.c | 1577 +++++++++++++++++++++++++++++++++++++----------------
+>  1 file changed, 1092 insertions(+), 485 deletions(-)
 
-Hello, Xtensa folks!
+This is worthwhile but the patch is huge compared to recent changes to
+this currently orphaned file. Could you please consider splitting your
+patch up into more discreet parts. I would suggest:
 
-This patch was devised while looking at some MIPS scenarios, but, in fact,
-it affects Xtensa platform only (found by inspecting relevant Linux kernel
-headers).
+  - introduce infrastructure
+  - one patch per converted command
 
-Could someone form Xtensa Ack ot Not-Ack this patch?
+this way when something breaks bisect stands a better chance of locating
+a minimal failing chunk of code.
 
-Sincerely, Aleksandar=
+Out of interest what additional commands are you planning to implement?
+
+--
+Alex Benn=C3=A9e
