@@ -7,70 +7,70 @@ X-Spam-Status: No, score=-8.5 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
 	SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A823AC10F11
-	for <qemu-devel@archiver.kernel.org>; Wed, 24 Apr 2019 19:47:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6D2B6C10F11
+	for <qemu-devel@archiver.kernel.org>; Wed, 24 Apr 2019 19:48:21 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6268620674
-	for <qemu-devel@archiver.kernel.org>; Wed, 24 Apr 2019 19:47:16 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 345CA20652
+	for <qemu-devel@archiver.kernel.org>; Wed, 24 Apr 2019 19:48:21 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="safFpYa4"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6268620674
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="tfx3Nuqw"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 345CA20652
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:46408 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:46414 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hJNrP-0002E4-ME
-	for qemu-devel@archiver.kernel.org; Wed, 24 Apr 2019 15:47:15 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:56496)
+	id 1hJNsS-00031O-Bl
+	for qemu-devel@archiver.kernel.org; Wed, 24 Apr 2019 15:48:20 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:56448)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <arilou@gmail.com>) id 1hJNkR-00045x-FM
-	for qemu-devel@nongnu.org; Wed, 24 Apr 2019 15:40:05 -0400
+	(envelope-from <arilou@gmail.com>) id 1hJNkJ-0003xA-6U
+	for qemu-devel@nongnu.org; Wed, 24 Apr 2019 15:39:56 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <arilou@gmail.com>) id 1hJNkP-0004M4-La
-	for qemu-devel@nongnu.org; Wed, 24 Apr 2019 15:40:03 -0400
-Received: from mail-wm1-x344.google.com ([2a00:1450:4864:20::344]:52315)
+	(envelope-from <arilou@gmail.com>) id 1hJNkI-0004Cl-6b
+	for qemu-devel@nongnu.org; Wed, 24 Apr 2019 15:39:55 -0400
+Received: from mail-wm1-x343.google.com ([2a00:1450:4864:20::343]:36178)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <arilou@gmail.com>) id 1hJNkP-0004LA-EP
-	for qemu-devel@nongnu.org; Wed, 24 Apr 2019 15:40:01 -0400
-Received: by mail-wm1-x344.google.com with SMTP id j13so6166575wmh.2
-	for <qemu-devel@nongnu.org>; Wed, 24 Apr 2019 12:40:01 -0700 (PDT)
+	(Exim 4.71) (envelope-from <arilou@gmail.com>) id 1hJNkI-0004C3-0E
+	for qemu-devel@nongnu.org; Wed, 24 Apr 2019 15:39:54 -0400
+Received: by mail-wm1-x343.google.com with SMTP id h18so6740474wml.1
+	for <qemu-devel@nongnu.org>; Wed, 24 Apr 2019 12:39:53 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
 	h=from:to:cc:subject:date:message-id:in-reply-to:references
 	:mime-version:content-transfer-encoding;
-	bh=0Iz5SrYAXu7VpCoWsP3e/cvDID9SYRQ00R50I33AURg=;
-	b=safFpYa47ztPQZhbI5Yg4NQi5YatH2u6LOJqetCSwp14nzdbaibyRDI2z1PjlEaUPU
-	mvsjbFTk3q5Grq7pWIclDxvTeV49aDK85QWvmOyi2EfHf0cRVXjTGG/0QBVqHVvwpsKk
-	RAqLl/3W5BdBKKtAug+9j1YR8vvcsy51wGJrogCCoiS3ioC53/8/XTqYTcOfhKFLbOvg
-	xTZOAXJu5sDzuq1lZ1AevWN/Q4gbziSHzjRbiZR9ZCT/3cwyqE396lDqlvnKU6Bvxumg
-	NUYGk4nlTZdrT/i4uwl6pcAtAgDxlnCDFK1Y5QWJHTPABER5yAJNW4PN6kfW7zfh+Q51
-	UMgA==
+	bh=EG9sk85M4LsflXbUNBRhLCHZfOCHF6EVSbclOy8vwek=;
+	b=tfx3NuqwR8oWHl+bhJbg+JjG5q/jApslB7GiBNkIvGYs3VpDsIJ9Vz/YPVK5e+gKq4
+	PLrOpB6gRD4lEvYfaXlFNrS+1HkdFSTC2AVYe4ltiN0DKz9jIMJwv+Ko2g9GFs1oMnli
+	qJdpoYXOaxt7AnM5Hi0q+TTZD7MKPmSmMcpkWZsK9hhi62E8bD4oraG5G9irI0WXEgmG
+	FjfBImDN+co34QxpYXWPAwOFTWgCCvQuD9oCHPZefT87Q9Fyi4JCQo4Cjhv+bu2kDKUt
+	+GiJu1UTK2q4kco2pON3tntsIl+p/rT+gUUp7DPpiTL7+D0MNhPbXifWWFSFA7jee80u
+	A1Xw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
 	d=1e100.net; s=20161025;
 	h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
 	:references:mime-version:content-transfer-encoding;
-	bh=0Iz5SrYAXu7VpCoWsP3e/cvDID9SYRQ00R50I33AURg=;
-	b=Msjot74yNN3Odh0iTePWVQRD0gMc3rVTyMGk/FkUWENQHALUbYyvFtRsJMlix18fi/
-	gkplID4o2R0iwFntIddGXYTrCjoWZ9pq41ud8GIbNyXVb1+SN2FJqRo6Cum06T1BdzI+
-	1LIDbbGAhEKPOexJTpQco2wP9o7BmICpX47yJwAXUdnXnVfJ2BAL+DHkxjrf1hSSEGu3
-	76R4tJzM0hn8GZNUIyyuJddH4bPP9fH+Xwt0+to5oMKP609uHytjAKOKRlp9nj+7lBaV
-	XpPS7cVZYxyO6mERiGNPWU3jlNtbjFvcFseot1EPnLpJ+4x3ZEbnybMbT7EBJdtz/M1d
-	V6YA==
-X-Gm-Message-State: APjAAAVk1I5BPQC7x39FjZTrFV1fR+9itWbOZsbpdK+FtQeqd2R7tRGF
-	EPVzT6gjB6ypRnvISrNDSHRuwn3j
-X-Google-Smtp-Source: APXvYqyEtljDnWrteTGRDScqjjOVMIX2nfPvuU4/sMyXFrDGmvW9H7Y2cULmAZKA7kLm69KjkB11dQ==
-X-Received: by 2002:a7b:c054:: with SMTP id u20mr585320wmc.100.1556134799837; 
-	Wed, 24 Apr 2019 12:39:59 -0700 (PDT)
+	bh=EG9sk85M4LsflXbUNBRhLCHZfOCHF6EVSbclOy8vwek=;
+	b=c8vYLHVtUyw41ZSIFioR+3sxHcCoDpUPsyObDUdFolofmThjWV81J05by7epXQNI7V
+	D2rRfHXy9RF23qASQ+DiW4vd87lP/YPlwiDekoHCVzkb6XiD8oQYZRmL5MOuKDwTxktF
+	UoLI+OwYZ5WT5fZoPAM52Qjsv1dScMCtJFgfHZJerpOzbi6tsupKhZmVvu+pDmppFMR5
+	QNYPxV/ca7CFBIVnQnFMydXntBGbCB+1fl+JfZIHxWPH96HFSmMgx/TMkIClbTC1OZV/
+	2LMcdAk/n0Spo2VI2R2dAf1E6tHzaqdiGRhgxFFAn8r3AgGWiGtMnEpeotPTqDIeVNVK
+	LxHw==
+X-Gm-Message-State: APjAAAVoFMUz+7ves4Xs3kH4TUeEfA/SFtvjecydIzNV9TH9xIOH+isG
+	8ns/Zd7LgeI4METvcQ2a85ezwoOM
+X-Google-Smtp-Source: APXvYqz8QLr32i9wxwM9kexe0Ohtdgv9kDlSdF4r2NgSl/tx9L+P515U++UjBObXbacjy4BkqaBtQA==
+X-Received: by 2002:a1c:d1c5:: with SMTP id i188mr566187wmg.8.1556134792416;
+	Wed, 24 Apr 2019 12:39:52 -0700 (PDT)
 Received: from linux.local ([31.154.166.148]) by smtp.gmail.com with ESMTPSA id
-	n18sm16281372wrt.16.2019.04.24.12.39.57
+	n18sm16281372wrt.16.2019.04.24.12.39.50
 	(version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
-	Wed, 24 Apr 2019 12:39:58 -0700 (PDT)
+	Wed, 24 Apr 2019 12:39:51 -0700 (PDT)
 From: Jon Doron <arilou@gmail.com>
 To: qemu-devel@nongnu.org
-Date: Wed, 24 Apr 2019 22:38:56 +0300
-Message-Id: <20190424193859.31817-18-arilou@gmail.com>
+Date: Wed, 24 Apr 2019 22:38:53 +0300
+Message-Id: <20190424193859.31817-15-arilou@gmail.com>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20190424193859.31817-1-arilou@gmail.com>
 References: <20190424193859.31817-1-arilou@gmail.com>
@@ -78,9 +78,9 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
 	recognized.
-X-Received-From: 2a00:1450:4864:20::344
-Subject: [Qemu-devel] [PATCH v5 18/21] gdbstub: Implement generic query (q
- pkt) with new infra
+X-Received-From: 2a00:1450:4864:20::343
+Subject: [Qemu-devel] [PATCH v5 15/21] gdbstub: Implement file io (F pkt)
+ with new infra
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -97,366 +97,93 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 Content-Type: text/plain; charset="UTF-8"
-Message-ID: <20190424193856.iz-h0xsGH6SQnlruzisV-m77EXc5Um6DYbCAWZZSWII@z>
+Message-ID: <20190424193853.U0WjDsCLpxdBBPfcXmXeBzPIYHxIfPBczT51MPCmiTk@z>
 
 Signed-off-by: Jon Doron <arilou@gmail.com>
 ---
- gdbstub.c | 335 ++++++++++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 335 insertions(+)
+ gdbstub.c | 62 +++++++++++++++++++++++++++++++++++--------------------
+ 1 file changed, 40 insertions(+), 22 deletions(-)
 
 diff --git a/gdbstub.c b/gdbstub.c
-index 7bc00d7f77..a2db1ec661 100644
+index 3a7ef5eea6..18949120be 100644
 --- a/gdbstub.c
 +++ b/gdbstub.c
-@@ -1916,6 +1916,331 @@ static void handle_v_commands(GdbCmdContext *gdb_ctx, void *user_ctx)
-     }
+@@ -1773,6 +1773,39 @@ static void handle_read_all_regs(GdbCmdContext *gdb_ctx, void *user_ctx)
+     put_packet(gdb_ctx->s, gdb_ctx->str_buf);
  }
  
-+static void handle_query_qemu_sstepbits(GdbCmdContext *gdb_ctx, void *user_ctx)
++static void handle_file_io(GdbCmdContext *gdb_ctx, void *user_ctx)
 +{
-+    snprintf(gdb_ctx->str_buf, sizeof(gdb_ctx->str_buf),
-+             "ENABLE=%x,NOIRQ=%x,NOTIMER=%x", SSTEP_ENABLE,
-+             SSTEP_NOIRQ, SSTEP_NOTIMER);
-+    put_packet(gdb_ctx->s, gdb_ctx->str_buf);
-+}
++    int num_syscall_params;
++    GdbCmdVariant syscall_params[3] = {};
 +
-+static void handle_set_qemu_sstep(GdbCmdContext *gdb_ctx, void *user_ctx)
-+{
 +    if (!gdb_ctx->num_params) {
 +        return;
 +    }
 +
-+    sstep_flags = gdb_ctx->params[0].val_ul;
-+    put_packet(gdb_ctx->s, "OK");
-+}
-+
-+static void handle_query_qemu_sstep(GdbCmdContext *gdb_ctx, void *user_ctx)
-+{
-+    snprintf(gdb_ctx->str_buf, sizeof(gdb_ctx->str_buf), "0x%x", sstep_flags);
-+    put_packet(gdb_ctx->s, gdb_ctx->str_buf);
-+}
-+
-+static void handle_query_curr_tid(GdbCmdContext *gdb_ctx, void *user_ctx)
-+{
-+    CPUState *cpu;
-+    GDBProcess *process;
-+    char thread_id[16];
-+
-+    /*
-+     * "Current thread" remains vague in the spec, so always return
-+     * the first thread of the current process (gdb returns the
-+     * first thread).
-+     */
-+    process = gdb_get_cpu_process(gdb_ctx->s, gdb_ctx->s->g_cpu);
-+    cpu = get_first_cpu_in_process(gdb_ctx->s, process);
-+    gdb_fmt_thread_id(gdb_ctx->s, cpu, thread_id, sizeof(thread_id));
-+    snprintf(gdb_ctx->str_buf, sizeof(gdb_ctx->str_buf), "QC%s", thread_id);
-+    put_packet(gdb_ctx->s, gdb_ctx->str_buf);
-+}
-+
-+static void handle_query_threads(GdbCmdContext *gdb_ctx, void *user_ctx)
-+{
-+    char thread_id[16];
-+
-+    if (!gdb_ctx->s->query_cpu) {
-+        put_packet(gdb_ctx->s, "l");
++    if (cmd_parse_params(gdb_ctx->params[0].data, "L,L,o0", syscall_params,
++                         &num_syscall_params)) {
 +        return;
 +    }
 +
-+    gdb_fmt_thread_id(gdb_ctx->s, gdb_ctx->s->query_cpu, thread_id,
-+                      sizeof(thread_id));
-+    snprintf(gdb_ctx->str_buf, sizeof(gdb_ctx->str_buf), "m%s", thread_id);
-+    put_packet(gdb_ctx->s, gdb_ctx->str_buf);
-+    gdb_ctx->s->query_cpu =
-+        gdb_next_attached_cpu(gdb_ctx->s, gdb_ctx->s->query_cpu);
-+}
-+
-+static void handle_query_first_threads(GdbCmdContext *gdb_ctx, void *user_ctx)
-+{
-+    gdb_ctx->s->query_cpu = gdb_first_attached_cpu(gdb_ctx->s);
-+    handle_query_threads(gdb_ctx, user_ctx);
-+}
-+
-+static void handle_query_thread_extra(GdbCmdContext *gdb_ctx, void *user_ctx)
-+{
-+    CPUState *cpu;
-+    int len;
-+
-+    if (!gdb_ctx->num_params ||
-+        gdb_ctx->params[0].thread_id.kind == GDB_READ_THREAD_ERR) {
-+        put_packet(gdb_ctx->s, "E22");
++    if (!num_syscall_params) {
 +        return;
 +    }
 +
-+    cpu = gdb_get_cpu(gdb_ctx->s, gdb_ctx->params[0].thread_id.pid,
-+                      gdb_ctx->params[0].thread_id.tid);
-+    if (!cpu) {
++    if (gdb_ctx->s->current_syscall_cb) {
++        gdb_ctx->s->current_syscall_cb(gdb_ctx->s->c_cpu,
++                                       (target_ulong)syscall_params[0].val_ull,
++                                       (target_ulong)syscall_params[1].val_ull);
++        gdb_ctx->s->current_syscall_cb = NULL;
++    }
++
++    if (syscall_params[2].opcode == (uint8_t)'C') {
++        put_packet(gdb_ctx->s, "T02");
 +        return;
 +    }
 +
-+    cpu_synchronize_state(cpu);
-+
-+    if (gdb_ctx->s->multiprocess && (gdb_ctx->s->process_num > 1)) {
-+        /* Print the CPU model and name in multiprocess mode */
-+        ObjectClass *oc = object_get_class(OBJECT(cpu));
-+        const char *cpu_model = object_class_get_name(oc);
-+        char *cpu_name = object_get_canonical_path_component(OBJECT(cpu));
-+        len = snprintf((char *)gdb_ctx->mem_buf, sizeof(gdb_ctx->str_buf) / 2,
-+                       "%s %s [%s]", cpu_model, cpu_name,
-+                       cpu->halted ? "halted " : "running");
-+        g_free(cpu_name);
-+    } else {
-+        /* memtohex() doubles the required space */
-+        len = snprintf((char *)gdb_ctx->mem_buf, sizeof(gdb_ctx->str_buf) / 2,
-+                        "CPU#%d [%s]", cpu->cpu_index,
-+                        cpu->halted ? "halted " : "running");
-+    }
-+    trace_gdbstub_op_extra_info((char *)gdb_ctx->mem_buf);
-+    memtohex(gdb_ctx->str_buf, gdb_ctx->mem_buf, len);
-+    put_packet(gdb_ctx->s, gdb_ctx->str_buf);
-+}
-+
-+#ifdef CONFIG_USER_ONLY
-+static void handle_query_offsets(GdbCmdContext *gdb_ctx, void *user_ctx)
-+{
-+    TaskState *ts;
-+
-+    ts = gdb_ctx->s->c_cpu->opaque;
-+    snprintf(gdb_ctx->str_buf, sizeof(gdb_ctx->str_buf),
-+             "Text=" TARGET_ABI_FMT_lx ";Data=" TARGET_ABI_FMT_lx
-+             ";Bss=" TARGET_ABI_FMT_lx,
-+             ts->info->code_offset,
-+             ts->info->data_offset,
-+             ts->info->data_offset);
-+    put_packet(gdb_ctx->s, gdb_ctx->str_buf);
-+}
-+#else
-+static void handle_query_rcmd(GdbCmdContext *gdb_ctx, void *user_ctx)
-+{
-+    int len;
-+
-+    if (!gdb_ctx->num_params) {
-+        put_packet(gdb_ctx->s, "E22");
-+        return;
-+    }
-+
-+    len = strlen(gdb_ctx->params[0].data);
-+    if (len % 2) {
-+        put_packet(gdb_ctx->s, "E01");
-+        return;
-+    }
-+
-+    len = len / 2;
-+    hextomem(gdb_ctx->mem_buf, gdb_ctx->params[0].data, len);
-+    gdb_ctx->mem_buf[len++] = 0;
-+    qemu_chr_be_write(gdb_ctx->s->mon_chr, gdb_ctx->mem_buf, len);
-+    put_packet(gdb_ctx->s, "OK");
-+
-+}
-+#endif
-+
-+static void handle_query_supported(GdbCmdContext *gdb_ctx, void *user_ctx)
-+{
-+    CPUClass *cc;
-+
-+    snprintf(gdb_ctx->str_buf, sizeof(gdb_ctx->str_buf), "PacketSize=%x",
-+             MAX_PACKET_LENGTH);
-+    cc = CPU_GET_CLASS(first_cpu);
-+    if (cc->gdb_core_xml_file) {
-+        pstrcat(gdb_ctx->str_buf, sizeof(gdb_ctx->str_buf),
-+                ";qXfer:features:read+");
-+    }
-+
-+    if (gdb_ctx->num_params &&
-+        strstr(gdb_ctx->params[0].data, "multiprocess+")) {
-+        gdb_ctx->s->multiprocess = true;
-+    }
-+
-+    pstrcat(gdb_ctx->str_buf, sizeof(gdb_ctx->str_buf), ";multiprocess+");
-+    put_packet(gdb_ctx->s, gdb_ctx->str_buf);
-+}
-+
-+static void handle_query_xfer_features(GdbCmdContext *gdb_ctx, void *user_ctx)
-+{
-+    GDBProcess *process;
-+    CPUClass *cc;
-+    unsigned long len, total_len, addr;
-+    const char *xml;
-+    const char *p;
-+
-+    if (gdb_ctx->num_params < 3) {
-+        put_packet(gdb_ctx->s, "E22");
-+        return;
-+    }
-+
-+    process = gdb_get_cpu_process(gdb_ctx->s, gdb_ctx->s->g_cpu);
-+    cc = CPU_GET_CLASS(gdb_ctx->s->g_cpu);
-+    if (!cc->gdb_core_xml_file) {
-+        put_packet(gdb_ctx->s, "");
-+        return;
-+    }
-+
-+    gdb_has_xml = true;
-+    p = gdb_ctx->params[0].data;
-+    xml = get_feature_xml(gdb_ctx->s, p, &p, process);
-+    if (!xml) {
-+        put_packet(gdb_ctx->s, "E00");
-+        return;
-+    }
-+
-+    addr = gdb_ctx->params[1].val_ul;
-+    len = gdb_ctx->params[2].val_ul;
-+    total_len = strlen(xml);
-+    if (addr > total_len) {
-+        put_packet(gdb_ctx->s, "E00");
-+        return;
-+    }
-+
-+    if (len > (MAX_PACKET_LENGTH - 5) / 2) {
-+        len = (MAX_PACKET_LENGTH - 5) / 2;
-+    }
-+
-+    if (len < total_len - addr) {
-+        gdb_ctx->str_buf[0] = 'm';
-+        len = memtox(gdb_ctx->str_buf + 1, xml + addr, len);
-+    } else {
-+        gdb_ctx->str_buf[0] = 'l';
-+        len = memtox(gdb_ctx->str_buf + 1, xml + addr, total_len - addr);
-+    }
-+
-+    put_packet_binary(gdb_ctx->s, gdb_ctx->str_buf, len + 1, true);
-+}
-+
-+static void handle_query_attached(GdbCmdContext *gdb_ctx, void *user_ctx)
-+{
-+    put_packet(gdb_ctx->s, GDB_ATTACHED);
-+}
-+
-+static GdbCmdParseEntry gdb_gen_query_set_common_table[] = {
-+    /* Order is important if has same prefix */
-+    {
-+        .handler = handle_query_qemu_sstepbits,
-+        .cmd = "qemu.sstepbits",
-+        .cmd_full_match = 1
-+    },
-+    {
-+        .handler = handle_query_qemu_sstep,
-+        .cmd = "qemu.sstep",
-+        .cmd_full_match = 1,
-+    },
-+    {
-+        .handler = handle_set_qemu_sstep,
-+        .cmd = "qemu.sstep=",
-+        .cmd_startswith = 1,
-+        .schema = "l0"
-+    },
-+};
-+
-+static GdbCmdParseEntry gdb_gen_query_table[] = {
-+    {
-+        .handler = handle_query_curr_tid,
-+        .cmd = "C",
-+        .cmd_full_match = 1
-+    },
-+    {
-+        .handler = handle_query_threads,
-+        .cmd = "sThreadInfo",
-+        .cmd_full_match = 1
-+    },
-+    {
-+        .handler = handle_query_first_threads,
-+        .cmd = "fThreadInfo",
-+        .cmd_full_match = 1
-+    },
-+    {
-+        .handler = handle_query_thread_extra,
-+        .cmd = "ThreadExtraInfo,",
-+        .cmd_startswith = 1,
-+        .schema = "t0"
-+    },
-+#ifdef CONFIG_USER_ONLY
-+    {
-+        .handler = handle_query_offsets,
-+        .cmd = "Offsets",
-+        .cmd_full_match = 1
-+    },
-+#else
-+    {
-+        .handler = handle_query_rcmd,
-+        .cmd = "Rcmd,",
-+        .cmd_startswith = 1,
-+        .schema = "s0"
-+    },
-+#endif
-+    {
-+        .handler = handle_query_supported,
-+        .cmd = "Supported:",
-+        .cmd_startswith = 1,
-+        .schema = "s0"
-+    },
-+    {
-+        .handler = handle_query_supported,
-+        .cmd = "Supported",
-+        .cmd_full_match = 1,
-+        .schema = "s0"
-+    },
-+    {
-+        .handler = handle_query_xfer_features,
-+        .cmd = "Xfer:features:read:",
-+        .cmd_startswith = 1,
-+        .schema = "s:l,l0"
-+    },
-+    {
-+        .handler = handle_query_attached,
-+        .cmd = "Attached:",
-+        .cmd_startswith = 1
-+    },
-+    {
-+        .handler = handle_query_attached,
-+        .cmd = "Attached",
-+        .cmd_full_match = 1
-+    },
-+};
-+
-+static void handle_gen_query(GdbCmdContext *gdb_ctx, void *user_ctx)
-+{
-+    if (!gdb_ctx->num_params) {
-+        return;
-+    }
-+
-+    if (!process_string_cmd(gdb_ctx->s, NULL, gdb_ctx->params[0].data,
-+                            gdb_gen_query_set_common_table,
-+                            ARRAY_SIZE(gdb_gen_query_set_common_table))) {
-+        return;
-+    }
-+
-+    if (process_string_cmd(gdb_ctx->s, NULL, gdb_ctx->params[0].data,
-+                           gdb_gen_query_table,
-+                           ARRAY_SIZE(gdb_gen_query_table))) {
-+        put_packet(gdb_ctx->s, "");
-+    }
++    gdb_continue(gdb_ctx->s);
 +}
 +
  static int gdb_handle_packet(GDBState *s, const char *line_buf)
  {
      CPUState *cpu;
-@@ -2129,6 +2454,16 @@ static int gdb_handle_packet(GDBState *s, const char *line_buf)
-         }
-         break;
-     case 'q':
-+        {
-+            static const GdbCmdParseEntry gen_query_cmd_desc = {
-+                .handler = handle_gen_query,
-+                .cmd = "q",
+@@ -1914,28 +1947,13 @@ static int gdb_handle_packet(GDBState *s, const char *line_buf)
+         return RS_IDLE;
+     case 'F':
+         {
+-            target_ulong ret;
+-            target_ulong err;
+-
+-            ret = strtoull(p, (char **)&p, 16);
+-            if (*p == ',') {
+-                p++;
+-                err = strtoull(p, (char **)&p, 16);
+-            } else {
+-                err = 0;
+-            }
+-            if (*p == ',')
+-                p++;
+-            type = *p;
+-            if (s->current_syscall_cb) {
+-                s->current_syscall_cb(s->c_cpu, ret, err);
+-                s->current_syscall_cb = NULL;
+-            }
+-            if (type == 'C') {
+-                put_packet(s, "T02");
+-            } else {
+-                gdb_continue(s);
+-            }
++            static const GdbCmdParseEntry file_io_cmd_desc = {
++                .handler = handle_file_io,
++                .cmd = "F",
 +                .cmd_startswith = 1,
 +                .schema = "s0"
 +            };
-+            cmd_parser = &gen_query_cmd_desc;
-+        }
-+        break;
-     case 'Q':
-         /* parse any 'q' packets here */
-         if (!strcmp(p,"qemu.sstepbits")) {
++            cmd_parser = &file_io_cmd_desc;
+         }
+         break;
+     case 'g':
 -- 
 2.20.1
 
