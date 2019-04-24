@@ -2,63 +2,91 @@ Return-Path: <SRS0=3XOk=S2=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.4 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,USER_AGENT_MUTT
+X-Spam-Status: No, score=-1.0 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9782EC10F11
-	for <qemu-devel@archiver.kernel.org>; Wed, 24 Apr 2019 17:04:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0AAC3C10F11
+	for <qemu-devel@archiver.kernel.org>; Wed, 24 Apr 2019 17:08:04 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 69E8E2148D
-	for <qemu-devel@archiver.kernel.org>; Wed, 24 Apr 2019 17:04:29 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 69E8E2148D
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id C83C1218FE
+	for <qemu-devel@archiver.kernel.org>; Wed, 24 Apr 2019 17:08:03 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="OH7TIdh4"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C83C1218FE
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:44649 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:44710 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hJLJs-0001cx-PJ
-	for qemu-devel@archiver.kernel.org; Wed, 24 Apr 2019 13:04:28 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:49601)
+	id 1hJLNK-0004Vk-Q6
+	for qemu-devel@archiver.kernel.org; Wed, 24 Apr 2019 13:08:02 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:52522)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1hJLCi-0004RJ-5g
-	for qemu-devel@nongnu.org; Wed, 24 Apr 2019 12:57:05 -0400
+	(envelope-from <richard.henderson@linaro.org>) id 1hJLKo-0002Tm-Rc
+	for qemu-devel@nongnu.org; Wed, 24 Apr 2019 13:05:27 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1hJL0y-0008Bq-32
-	for qemu-devel@nongnu.org; Wed, 24 Apr 2019 12:44:56 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:7183)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1hJL0x-0008Ah-TQ
-	for qemu-devel@nongnu.org; Wed, 24 Apr 2019 12:44:56 -0400
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
-	[10.5.11.14])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 993A330A819D;
-	Wed, 24 Apr 2019 16:44:53 +0000 (UTC)
-Received: from localhost (ovpn-116-9.gru2.redhat.com [10.97.116.9])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id DE1455D9C8;
-	Wed, 24 Apr 2019 16:44:48 +0000 (UTC)
-Date: Wed, 24 Apr 2019 13:44:47 -0300
-From: Eduardo Habkost <ehabkost@redhat.com>
-To: Stefan Hajnoczi <stefanha@redhat.com>
-Message-ID: <20190424164447.GB18406@habkost.net>
-References: <20190424152401.28304-1-stefanha@redhat.com>
+	(envelope-from <richard.henderson@linaro.org>) id 1hJLKn-0007V1-Rs
+	for qemu-devel@nongnu.org; Wed, 24 Apr 2019 13:05:26 -0400
+Received: from mail-pg1-x530.google.com ([2607:f8b0:4864:20::530]:38160)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+	id 1hJLKn-0007U1-BH
+	for qemu-devel@nongnu.org; Wed, 24 Apr 2019 13:05:25 -0400
+Received: by mail-pg1-x530.google.com with SMTP id j26so9681730pgl.5
+	for <qemu-devel@nongnu.org>; Wed, 24 Apr 2019 10:05:24 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+	h=subject:to:references:from:openpgp:message-id:date:user-agent
+	:mime-version:in-reply-to:content-language:content-transfer-encoding;
+	bh=3Orv7Nej65PeYzvB0AI25SZ17jU+Mw4ScyDJ/RG7uns=;
+	b=OH7TIdh4lPB0any+4ChR4pNbQXebzLUMU4y0c1KLfudSiEG7HVyY7C5B62ltmxc+7h
+	4aUHgVZCeTy0bZicRf2yU8WrS/+CunIz+usZC4Q3X5KZKUM+SNJfw5Ut2fgSYs0QgORM
+	6LVhrbrvuC8R/OoPlLw4v5eO8hVz3XWq3Mz6J0whXjwcgBaZr0RFlm3TGIchKrS1dbOR
+	tpTrKKvid8oPkbDywl/ZpK2Lh2/b0xxCZodznhPqmpT8kxy0dc6kWWYq5x0FcbA+Yh1+
+	lKGOm0pvl7MCjiu+l9L8X0Ay27OMr+4p3SC6SNAA2VajN8ms+HdpeT+9Gv5rL5AbG9cg
+	Ptbg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=1e100.net; s=20161025;
+	h=x-gm-message-state:subject:to:references:from:openpgp:message-id
+	:date:user-agent:mime-version:in-reply-to:content-language
+	:content-transfer-encoding;
+	bh=3Orv7Nej65PeYzvB0AI25SZ17jU+Mw4ScyDJ/RG7uns=;
+	b=LMGBImaMYTeN+SqPNc5T1YZOgIhA2XI17DnwAXY9FR7F5SDhpuF2rxxpJ1uhyg4cHZ
+	3jYD1neLr5fEk/KusnZ//ebE594O7aWggLUHCpkgDvlKtCGJ46E370FxcWMx6g7ym4ka
+	yt/Y44YvIfVPspQNoNS5xf5Ogmz4Hb7PjPd5isUqqdyMeDwJCOkOD0ykxw1MO8PQJX1h
+	Pv2r30SnGFuBlqX8htPvwJks8h49BNYOzC/gvHY8kGGaSAOeXBx9OsN9vpAzk3g97f3e
+	wqi9JOVWTP4hVKPmW0SCttv/GdEQL69bU67HjDmdGECvCROW/KkT0E6bdOeNshUdrTID
+	/4TA==
+X-Gm-Message-State: APjAAAVqi5snL+jFj0El9K7XeJB2pwzavVsok+lTokAJNBJjjc1TNEfn
+	bu/MkxOrGfszilJqyP8uypZ/FEhE3FA=
+X-Google-Smtp-Source: APXvYqwuVwYv3EnqnHpD+OhC3YlHKYtG7vKZPaCqt8r8+cCIcAl9dX5IUvTO2u8FW2dJv1jKjnUonQ==
+X-Received: by 2002:a62:1d0d:: with SMTP id d13mr34557294pfd.96.1556125522932; 
+	Wed, 24 Apr 2019 10:05:22 -0700 (PDT)
+Received: from [192.168.1.11] (97-113-179-147.tukw.qwest.net. [97.113.179.147])
+	by smtp.gmail.com with ESMTPSA id
+	p20sm16821909pgj.86.2019.04.24.10.05.21
+	(version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+	Wed, 24 Apr 2019 10:05:21 -0700 (PDT)
+To: arilou@gmail.com, qemu-devel@nongnu.org
+References: <20190424142714.28460-1-arilou@gmail.com>
+From: Richard Henderson <richard.henderson@linaro.org>
+Openpgp: preference=signencrypt
+Message-ID: <5cab37c9-8bdf-2e7d-c6a8-93f6f176720b@linaro.org>
+Date: Wed, 24 Apr 2019 10:05:19 -0700
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+	Thunderbird/60.6.1
 MIME-Version: 1.0
+In-Reply-To: <20190424142714.28460-1-arilou@gmail.com>
 Content-Type: text/plain; charset="UTF-8"
-Content-Disposition: inline
-In-Reply-To: <20190424152401.28304-1-stefanha@redhat.com>
-User-Agent: Mutt/1.10.1 (2018-07-13)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.44]);
-	Wed, 24 Apr 2019 16:44:53 +0000 (UTC)
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH] virtio: clarify VirtioPCIDeviceTypeInfo
- usage
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+	recognized.
+X-Received-From: 2607:f8b0:4864:20::530
+Subject: Re: [Qemu-devel] [PATCH v3 01/20] gdbstub: Add infrastructure to
+ parse cmd packets
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -70,65 +98,49 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: sebastien.boeuf@intel.com, qemu-devel@nongnu.org,
-	"Michael S. Tsirkin" <mst@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190424164447.1Tx9bRhi0FWLkLpmJOZJGNqRjyoBuXpTZe3aYXqjHpA@z>
+Message-ID: <20190424170519.7fr8HwEDO8XXtMwvcbTmMs3C3CILaabkt38J8x4CD60@z>
 
-On Wed, Apr 24, 2019 at 04:24:01PM +0100, Stefan Hajnoczi wrote:
-> How to use .base_name, .generic_name, .transitional_name, and
-> .non_transitional_name can be confusing.
-> 
-> Existing devices have .generic_name but its behavior is somewhat magic.
-> 
-> Devices added to new versions of the VIRTIO specification should forego
-> transitional mode completely and always operate in non-transitional mode
-> because there are no existing drivers for them that require backwards
-> compatibility.
-> 
-> This patch adds comments that hopefully make it easier for developers to
-> decide how to fill out VirtioPCIDeviceTypeInfo.
-> 
-> Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
-> ---
->  hw/virtio/virtio-pci.h | 7 ++++++-
->  1 file changed, 6 insertions(+), 1 deletion(-)
-> 
-> diff --git a/hw/virtio/virtio-pci.h b/hw/virtio/virtio-pci.h
-> index 18581854ca..debdee28b3 100644
-> --- a/hw/virtio/virtio-pci.h
-> +++ b/hw/virtio/virtio-pci.h
-> @@ -209,7 +209,9 @@ typedef struct VirtioPCIDeviceTypeInfo {
->       * Implements both INTERFACE_PCIE_DEVICE and INTERFACE_CONVENTIONAL_PCI_DEVICE,
->       * but PCI Express is supported only in non-transitional mode.
->       *
-> -     * The only type implemented by QEMU 3.1 and older.
-> +     * The only type implemented by QEMU 3.1 and older.  This type is less
-> +     * explicit than the transitional and non-transitional device types.  Its
-> +     * behavior can be affected by machine type compat properties.
+On 4/24/19 7:26 AM, arilou@gmail.com wrote:
+> +static const char *cmd_next_param(const char *param, const char delimiter)
+> +{
+> +    const char *delim;
+> +    static char all_delimiters[] = ",;:=";
 
-I'm not sure what you mean here.  All types can be affected by
-machine type compat properties when necessary, don't they?
+static const char
 
->       */
->      const char *generic_name;
->      /*
-> @@ -222,6 +224,9 @@ typedef struct VirtioPCIDeviceTypeInfo {
->       * The non-transitional device type.  Optional.
->       *
->       * Implements INTERFACE_CONVENTIONAL_PCI_DEVICE only.
-> +     *
-> +     * New virtio device types should only define this and base_name, thereby
-> +     * allowing only non-transitional mode.
->       */
->      const char *non_transitional_name;
->  
-> -- 
-> 2.20.1
-> 
+> +    static char no_delimiter[] = "\0";
+> +    char curr_delimiters[2] = {0};
+> +    const char *delimiters;
+> +
+> +    if (delimiter == '?') {
+> +        delimiters = all_delimiters;
+> +    } else if (delimiter == '0') {
+> +        delimiters = no_delimiter;
 
--- 
-Eduardo
+    return strchr(param, '\0')
+
+> +    while (*param) {
+> +        delim = delimiters;
+> +        while (*delim) {
+> +            if (*param == *delim) {
+> +                return param + 1;
+> +            }
+> +            delim++;
+> +        }
+> +        param++;
+> +    }
+
+Maybe
+
+    param += strcspn(param, delim);
+    if (*param) {
+        param++;
+    }
+    return param;
+
+
+r~
 
