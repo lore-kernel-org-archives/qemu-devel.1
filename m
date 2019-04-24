@@ -6,44 +6,44 @@ X-Spam-Status: No, score=-0.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	MAILING_LIST_MULTI,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 59CB0C10F11
-	for <qemu-devel@archiver.kernel.org>; Wed, 24 Apr 2019 16:59:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C63CFC10F11
+	for <qemu-devel@archiver.kernel.org>; Wed, 24 Apr 2019 17:01:11 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1888A206A3
-	for <qemu-devel@archiver.kernel.org>; Wed, 24 Apr 2019 16:59:02 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1888A206A3
+	by mail.kernel.org (Postfix) with ESMTPS id 84A082148D
+	for <qemu-devel@archiver.kernel.org>; Wed, 24 Apr 2019 17:01:11 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 84A082148D
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=canonical.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:44546 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:44615 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hJLEa-0005mg-Tz
-	for qemu-devel@archiver.kernel.org; Wed, 24 Apr 2019 12:59:00 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:49502)
+	id 1hJLGf-0007dQ-Tm
+	for qemu-devel@archiver.kernel.org; Wed, 24 Apr 2019 13:01:09 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:49470)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1hJLCX-0004OT-NA
+	(envelope-from <bounces@canonical.com>) id 1hJLCX-0004LQ-NH
 	for qemu-devel@nongnu.org; Wed, 24 Apr 2019 12:56:55 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1hJL71-00077t-ER
-	for qemu-devel@nongnu.org; Wed, 24 Apr 2019 12:51:13 -0400
-Received: from indium.canonical.com ([91.189.90.7]:46184)
+	(envelope-from <bounces@canonical.com>) id 1hJL6z-00075P-IU
+	for qemu-devel@nongnu.org; Wed, 24 Apr 2019 12:51:11 -0400
+Received: from indium.canonical.com ([91.189.90.7]:45954)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1hJL71-00074r-8V
-	for qemu-devel@nongnu.org; Wed, 24 Apr 2019 12:51:11 -0400
+	id 1hJL6z-00071M-Cw
+	for qemu-devel@nongnu.org; Wed, 24 Apr 2019 12:51:09 -0400
 Received: from loganberry.canonical.com ([91.189.90.37])
 	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1hJL6x-0001MN-Bp
-	for <qemu-devel@nongnu.org>; Wed, 24 Apr 2019 16:51:07 +0000
+	id 1hJL6u-0001MU-OQ
+	for <qemu-devel@nongnu.org>; Wed, 24 Apr 2019 16:51:04 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id AC41F2E8193
-	for <qemu-devel@nongnu.org>; Wed, 24 Apr 2019 16:51:05 +0000 (UTC)
+	by loganberry.canonical.com (Postfix) with ESMTP id 3F0082E81BB
+	for <qemu-devel@nongnu.org>; Wed, 24 Apr 2019 16:51:01 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Wed, 24 Apr 2019 16:40:56 -0000
+Date: Wed, 24 Apr 2019 16:39:05 -0000
 From: Dan Streetman <dan.streetman@canonical.com>
 To: qemu-devel@nongnu.org
 X-Launchpad-Notification-Type: bug
@@ -81,13 +81,13 @@ X-Launchpad-Bug-Reporter: Dan Streetman (ddstreet)
 X-Launchpad-Bug-Modifier: Dan Streetman (ddstreet)
 References: <155455149397.14414.11595397789908732027.malonedeb@gac.canonical.com>
 Message-Id:
- <155612405683.7089.17544564104126723704.malone@chaenomeles.canonical.com>
+ <155612394598.6530.14456421985219618030.malone@chaenomeles.canonical.com>
 X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
 X-Launchpad-Message-For: qemu-devel-ml
 Precedence: bulk
 X-Generated-By: Launchpad (canonical.com); Revision="18928";
 	Instance="launchpad-lazr.conf"
-X-Launchpad-Hash: 42b50197f05e3b3b777b747075f11d11c3d8f7b7
+X-Launchpad-Hash: 31ddc9be1301642e0c4bc1cc8d113971ff6166da
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 91.189.90.7
 Subject: [Qemu-devel] [Bug 1823458] Re: race condition between
@@ -106,12 +106,11 @@ Reply-To: Bug 1823458 <1823458@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190424164056.AQdbXEcklwYcBJgr17fE5C99TSN32EeqsFgP-vjIi8M@z>
+Message-ID: <20190424163905.tqIAS19R0Dfr2nFPntWAgW0yHNX7Bz17l4fRn5MKF0s@z>
 
-uca: workaround patches are needed in mitaka and ocata.  Mitaka can pull
-from Xenial build as usual, and debdiff for Ocata attached.  Other UCA
-releases are later than 2.9 and so are fixed with the upstream fix
-mentioned in the description.
+** Patch added: "lp1823458-ocata.debdiff"
+   https://bugs.launchpad.net/cloud-archive/+bug/1823458/+attachment/525868=
+3/+files/lp1823458-ocata.debdiff
 
 -- =
 
