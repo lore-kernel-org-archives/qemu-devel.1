@@ -1,25 +1,25 @@
-Received: from eggs.gnu.org ([209.51.188.92]:45555)
+Received: from eggs.gnu.org ([209.51.188.92]:45538)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <arilou@gmail.com>) id 1hJN6C-0001zm-Ly
-	for qemu-devel@nongnu.org; Wed, 24 Apr 2019 14:58:29 -0400
+	(envelope-from <arilou@gmail.com>) id 1hJN6K-0001z4-CY
+	for qemu-devel@nongnu.org; Wed, 24 Apr 2019 14:58:37 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <arilou@gmail.com>) id 1hJMuo-0005zX-Ge
-	for qemu-devel@nongnu.org; Wed, 24 Apr 2019 14:46:43 -0400
-Received: from mail-wm1-x341.google.com ([2a00:1450:4864:20::341]:37007)
+	(envelope-from <arilou@gmail.com>) id 1hJMuO-0005Tl-EM
+	for qemu-devel@nongnu.org; Wed, 24 Apr 2019 14:46:17 -0400
+Received: from mail-wr1-x444.google.com ([2a00:1450:4864:20::444]:44052)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <arilou@gmail.com>) id 1hJMum-0005wr-Il
-	for qemu-devel@nongnu.org; Wed, 24 Apr 2019 14:46:40 -0400
-Received: by mail-wm1-x341.google.com with SMTP id v14so6525029wmf.2
-	for <qemu-devel@nongnu.org>; Wed, 24 Apr 2019 11:46:39 -0700 (PDT)
+	(Exim 4.71) (envelope-from <arilou@gmail.com>) id 1hJMuO-0005Sf-8d
+	for qemu-devel@nongnu.org; Wed, 24 Apr 2019 14:46:16 -0400
+Received: by mail-wr1-x444.google.com with SMTP id c5so17693653wrs.11
+	for <qemu-devel@nongnu.org>; Wed, 24 Apr 2019 11:46:16 -0700 (PDT)
 From: Jon Doron <arilou@gmail.com>
-Date: Wed, 24 Apr 2019 21:45:55 +0300
-Message-Id: <20190424184600.8445-15-arilou@gmail.com>
+Date: Wed, 24 Apr 2019 21:45:43 +0300
+Message-Id: <20190424184600.8445-3-arilou@gmail.com>
 In-Reply-To: <20190424184600.8445-1-arilou@gmail.com>
 References: <20190424184600.8445-1-arilou@gmail.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH v4 15/20] gdbstub: Implement file io (F pkt)
- with new infra
+Subject: [Qemu-devel] [PATCH v4 03/20] gdbstub: Implement thread_alive (T
+ pkt) with new infra
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,88 +33,69 @@ Cc: Jon Doron <arilou@gmail.com>
 
 Signed-off-by: Jon Doron <arilou@gmail.com>
 ---
- gdbstub.c | 62 +++++++++++++++++++++++++++++++++++--------------------
- 1 file changed, 40 insertions(+), 22 deletions(-)
+ gdbstub.c | 43 ++++++++++++++++++++++++++++++++-----------
+ 1 file changed, 32 insertions(+), 11 deletions(-)
 
 diff --git a/gdbstub.c b/gdbstub.c
-index b9ac9401ed..772bcd2e1f 100644
+index 952a6d92ef..7704edd69c 100644
 --- a/gdbstub.c
 +++ b/gdbstub.c
-@@ -1782,6 +1782,39 @@ static void handle_read_all_regs(GdbCmdContext *gdb_ctx, void *user_ctx)
-     put_packet(gdb_ctx->s, gdb_ctx->str_buf);
+@@ -1508,6 +1508,30 @@ static void handle_detach(GdbCmdContext *gdb_ctx, void *user_ctx)
+     put_packet(s, "OK");
  }
  
-+static void handle_file_io(GdbCmdContext *gdb_ctx, void *user_ctx)
++static void handle_thread_alive(GdbCmdContext *gdb_ctx, void *user_ctx)
 +{
-+    int num_syscall_params;
-+    GdbCmdVariant syscall_params[3] = {};
++    CPUState *cpu;
 +
 +    if (!gdb_ctx->num_params) {
++        put_packet(gdb_ctx->s, "E22");
 +        return;
 +    }
 +
-+    if (cmd_parse_params(gdb_ctx->params[0].data, "L,L,o0", syscall_params,
-+                         &num_syscall_params)) {
++    if (gdb_ctx->params[0].thread_id.kind == GDB_READ_THREAD_ERR) {
++        put_packet(gdb_ctx->s, "E22");
 +        return;
 +    }
 +
-+    if (!num_syscall_params) {
++    cpu = gdb_get_cpu(gdb_ctx->s, gdb_ctx->params[0].thread_id.pid,
++                      gdb_ctx->params[0].thread_id.tid);
++    if (!cpu) {
++        put_packet(gdb_ctx->s, "E22");
 +        return;
 +    }
 +
-+    if (gdb_ctx->s->current_syscall_cb) {
-+        gdb_ctx->s->current_syscall_cb(gdb_ctx->s->c_cpu,
-+                                       (target_ulong)syscall_params[0].val_ull,
-+                                       (target_ulong)syscall_params[1].val_ull);
-+        gdb_ctx->s->current_syscall_cb = NULL;
-+    }
-+
-+    if (syscall_params[2].opcode == (uint8_t)'C') {
-+        put_packet(gdb_ctx->s, "T02");
-+        return;
-+    }
-+
-+    gdb_continue(gdb_ctx->s);
++    put_packet(gdb_ctx->s, "OK");
 +}
 +
  static int gdb_handle_packet(GDBState *s, const char *line_buf)
  {
      CPUState *cpu;
-@@ -1922,28 +1955,13 @@ static int gdb_handle_packet(GDBState *s, const char *line_buf)
-         return RS_IDLE;
-     case 'F':
-         {
--            target_ulong ret;
--            target_ulong err;
--
--            ret = strtoull(p, (char **)&p, 16);
--            if (*p == ',') {
--                p++;
--                err = strtoull(p, (char **)&p, 16);
--            } else {
--                err = 0;
--            }
--            if (*p == ',')
--                p++;
--            type = *p;
--            if (s->current_syscall_cb) {
--                s->current_syscall_cb(s->c_cpu, ret, err);
--                s->current_syscall_cb = NULL;
--            }
--            if (type == 'C') {
--                put_packet(s, "T02");
--            } else {
--                gdb_continue(s);
--            }
-+            static GdbCmdParseEntry file_io_cmd_desc = {
-+                .handler = handle_file_io,
-+                .cmd = "F",
-+                .cmd_startswith = 1,
-+                .schema = "s0"
-+            };
-+            process_string_cmd(s, NULL, line_buf, &file_io_cmd_desc, 1);
+@@ -1807,17 +1831,14 @@ static int gdb_handle_packet(GDBState *s, const char *line_buf)
          }
          break;
-     case 'g':
+     case 'T':
+-        thread_kind = read_thread_id(p, &p, &pid, &tid);
+-        if (thread_kind == GDB_READ_THREAD_ERR) {
+-            put_packet(s, "E22");
+-            break;
+-        }
+-        cpu = gdb_get_cpu(s, pid, tid);
+-
+-        if (cpu != NULL) {
+-            put_packet(s, "OK");
+-        } else {
+-            put_packet(s, "E22");
++        {
++            static GdbCmdParseEntry thread_alive_cmd_desc = {
++                .handler = handle_thread_alive,
++                .cmd = "T",
++                .cmd_startswith = 1,
++                .schema = "t0"
++            };
++            process_string_cmd(s, NULL, line_buf, &thread_alive_cmd_desc, 1);
+         }
+         break;
+     case 'q':
 -- 
 2.20.1
