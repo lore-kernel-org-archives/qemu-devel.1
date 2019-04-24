@@ -2,85 +2,80 @@ Return-Path: <SRS0=3XOk=S2=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.5 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.7 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 032E4C10F11
-	for <qemu-devel@archiver.kernel.org>; Wed, 24 Apr 2019 19:14:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C1A5BC10F11
+	for <qemu-devel@archiver.kernel.org>; Wed, 24 Apr 2019 19:17:19 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id BD1E4205ED
-	for <qemu-devel@archiver.kernel.org>; Wed, 24 Apr 2019 19:14:55 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 899D5205ED
+	for <qemu-devel@archiver.kernel.org>; Wed, 24 Apr 2019 19:17:19 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="TAOnH07Z"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BD1E4205ED
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="XhGSs6hu"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 899D5205ED
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:45986 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:46052 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hJNM6-0008G0-Th
-	for qemu-devel@archiver.kernel.org; Wed, 24 Apr 2019 15:14:54 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:45538)
+	id 1hJNOQ-0001i6-Hg
+	for qemu-devel@archiver.kernel.org; Wed, 24 Apr 2019 15:17:18 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:48765)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <arilou@gmail.com>) id 1hJN6I-0001z4-Up
-	for qemu-devel@nongnu.org; Wed, 24 Apr 2019 14:58:36 -0400
+	(envelope-from <richard.henderson@linaro.org>) id 1hJNEd-0001iK-4d
+	for qemu-devel@nongnu.org; Wed, 24 Apr 2019 15:07:12 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <arilou@gmail.com>) id 1hJMuS-0005XY-Dd
-	for qemu-devel@nongnu.org; Wed, 24 Apr 2019 14:46:21 -0400
-Received: from mail-wr1-x444.google.com ([2a00:1450:4864:20::444]:40593)
+	(envelope-from <richard.henderson@linaro.org>) id 1hJNEb-0001ij-V8
+	for qemu-devel@nongnu.org; Wed, 24 Apr 2019 15:07:11 -0400
+Received: from mail-pg1-x541.google.com ([2607:f8b0:4864:20::541]:32839)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <arilou@gmail.com>) id 1hJMuS-0005Wv-6o
-	for qemu-devel@nongnu.org; Wed, 24 Apr 2019 14:46:20 -0400
-Received: by mail-wr1-x444.google.com with SMTP id h4so26567905wre.7
-	for <qemu-devel@nongnu.org>; Wed, 24 Apr 2019 11:46:20 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
-	h=from:to:cc:subject:date:message-id:in-reply-to:references
-	:mime-version:content-transfer-encoding;
-	bh=neNtOgJjSERZhKri3cFMATtFZ1OMKf5FbCq0FcQMwkI=;
-	b=TAOnH07Z+cvsTorTNSBoMjKMKHuBqad3OJP2NetmFpD0ayCIFvNP7cs9lrXGSteqxs
-	s3kEBmxrjn8/uIEY992oZfNWiyZ/8e1++6Te5gM3fbX9Vi3nlTIL3alQRudtga9Lf+Co
-	3Ad0ASgLL72m8JDX9ZrBVIk00GOgvxVeKMwy7YLKSNqiNFdP8ASH38dPjRZgolhPRFkf
-	idv0HSmShCnlD1H+1PbC87vxE3gGXFi09iW2HKOCVvD4zSRDHG2YVrpWXkOzcn28JJWE
-	p/du2UPhdJ+Pf9i0vtSimckfkraFl1kRbpU3vYviBLE5Iq22eUVadm3emt9HmUlnBEUK
-	Jjgg==
+	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+	id 1hJNEb-0001hN-KB
+	for qemu-devel@nongnu.org; Wed, 24 Apr 2019 15:07:09 -0400
+Received: by mail-pg1-x541.google.com with SMTP id k19so9848932pgh.0
+	for <qemu-devel@nongnu.org>; Wed, 24 Apr 2019 12:07:09 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+	h=from:to:cc:subject:date:message-id;
+	bh=sSm6UX0R52w8vBHy4v0QRMxvKsGbXKFYR5kOUYsNw4o=;
+	b=XhGSs6huRSNQ0c8hS83vp40EA3+vraLPOpg4dD4/IZZFpF8d/0ceiHbO4gyIce1z1V
+	cpMBPkjFvwHc1oPyzcqcMilfts/Krdeu1c+KQklTT6bMcEJEdouQC4GMxz8kLt8FBelV
+	EB9jB4tbOqMbhBE+Uf3t4ZSYmDL9ugWsQrs9E+quR6vG0o400wxPDyQStTEdourJTrXE
+	8wvLPVMMMvZoiYGaPAFeacdlvvYXqcequDbZsfUFDlhZk22+WlUpZ1uLnoUl2xQ/RDi8
+	uN7cG0/Ul/vNmMFbV4ulYojDOp1D/IhL2AJzSe/QXY0Nx1kBuyJRv9QvBMbM41z1BwHH
+	f9DA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
 	d=1e100.net; s=20161025;
-	h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
-	:references:mime-version:content-transfer-encoding;
-	bh=neNtOgJjSERZhKri3cFMATtFZ1OMKf5FbCq0FcQMwkI=;
-	b=tUHieMe0SxN3iUsN1wkcqSOG3onHU2h1r4hGd6keYuE8AZhjqgh+l8y+UnMOXRaZOX
-	yJUiPYcSv4CltBXkvsEmSVqRLhpHW7ZR4nJugFO18+snVMYv2rtiX4MXvvYfgdltPUqA
-	T3VxdNo/Su/fQltWxkAyw0Vkas4IlQk9kVECRfAWADFLE5rUehcLsXCPndFsiLF84Mrq
-	XRtHmzLnJAj155/ZNpuAgFUyQx3S7Iakv5IpUfNErqpYb8Z01+seAOFGzPfLMcUmj3FU
-	8Ye6VB56YKj94Q86OuBCYbroabFOJpnLUR8/DTmDdUEbc9eJccbirPBO7m1k/NcRBkXu
-	B8oA==
-X-Gm-Message-State: APjAAAWPFMo19pXW1Lub4C8pXP7iz6ZcKUZpAwcLkILSCNcX5qMugnNz
-	kb9aboOrQL/Cqvt/aNaX1S0+mLBt
-X-Google-Smtp-Source: APXvYqz6L0ouZLaQzt4/TZpujOvuJs8Z63hDyw46NLFhZoH3xPhzHlMTi+9oN+ZhyWYqXQBVy6Vh3A==
-X-Received: by 2002:adf:eb84:: with SMTP id t4mr22294109wrn.43.1556131578858; 
-	Wed, 24 Apr 2019 11:46:18 -0700 (PDT)
-Received: from linux.local ([31.154.166.148])
-	by smtp.gmail.com with ESMTPSA id h9sm14720106wmb.5.2019.04.24.11.46.17
-	(version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
-	Wed, 24 Apr 2019 11:46:17 -0700 (PDT)
-From: Jon Doron <arilou@gmail.com>
+	h=x-gm-message-state:from:to:cc:subject:date:message-id;
+	bh=sSm6UX0R52w8vBHy4v0QRMxvKsGbXKFYR5kOUYsNw4o=;
+	b=bZ6U/DuEDtRSNcrkBFBdAZPvWVIj/50f71fQ/ykTx9j9rvp71vF2SsPVW3kbEXTf4Y
+	CuvUFTPDfek1+bW8kk5h/ZsqAnFUHaCo/PTUnEZ2qUqa+R0XJ4TRuPWLfV4nsXcotZ+n
+	G/hYazc+n7QfV3ayyI3zm7TN/06GdA3L9OpSuTw1V6eT8NSJ3D5Z7xLnpwlkE2wHguMQ
+	QNQk4L0HW7hWyflhZbbmqBBT+P5jHkuY/BSVlTh+h5Zw58mcEvuOvOANSJF79MMiFOhh
+	1uTH6dsCdEvxyrs7CR4XaFEeNkKdYDvwfTzBxCBFraBXoF1l2FWKARwIswfSjtDol5lK
+	iJvg==
+X-Gm-Message-State: APjAAAVKCUrmbYfIj2Pey23c2Qg6dxZndfQ/Jqp+ZId/y8Uthw+fMUTh
+	ieqCs0vQBmidbBDGyzUOpi6k+NNhqs0=
+X-Google-Smtp-Source: APXvYqyWEf8N47LQsVZCvZAlzleRvZjogAVLG/xskfObYv9kxSccTYPAYhPCSOpQVsyQfX8BwhhBXA==
+X-Received: by 2002:a63:c605:: with SMTP id w5mr31599165pgg.355.1556132827966; 
+	Wed, 24 Apr 2019 12:07:07 -0700 (PDT)
+Received: from localhost.localdomain (97-113-179-147.tukw.qwest.net.
+	[97.113.179.147])
+	by smtp.gmail.com with ESMTPSA id 8sm30761011pfs.50.2019.04.24.12.07.06
+	(version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+	Wed, 24 Apr 2019 12:07:07 -0700 (PDT)
+From: Richard Henderson <richard.henderson@linaro.org>
 To: qemu-devel@nongnu.org
-Date: Wed, 24 Apr 2019 21:45:45 +0300
-Message-Id: <20190424184600.8445-5-arilou@gmail.com>
-X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20190424184600.8445-1-arilou@gmail.com>
-References: <20190424184600.8445-1-arilou@gmail.com>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Date: Wed, 24 Apr 2019 12:07:04 -0700
+Message-Id: <20190424190705.12392-1-richard.henderson@linaro.org>
+X-Mailer: git-send-email 2.17.1
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
 	recognized.
-X-Received-From: 2a00:1450:4864:20::444
-Subject: [Qemu-devel] [PATCH v4 05/20] gdbstub: Implement continue with
- signal (C pkt) with new infra
+X-Received-From: 2607:f8b0:4864:20::541
+Subject: [Qemu-devel] [PATCH v2 0/1] util/path: Do not cache all filenames
+ at startup
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -92,67 +87,56 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Jon Doron <arilou@gmail.com>
+Cc: philmd@redhat.com, laurent@vivier.eu
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 Content-Type: text/plain; charset="UTF-8"
-Message-ID: <20190424184545.FhSdewFs6zdzk4ANvDKpcjBsZD4_JML09FC0vuhwenU@z>
+Message-ID: <20190424190704.-uZxb_lwnQqbddp9dUT0yDXPgkiDHxLpFOvPwRcPAtM@z>
 
-Signed-off-by: Jon Doron <arilou@gmail.com>
----
- gdbstub.c | 30 +++++++++++++++++++++++++-----
- 1 file changed, 25 insertions(+), 5 deletions(-)
+Changes for v2:
 
-diff --git a/gdbstub.c b/gdbstub.c
-index 47b1e7e7a4..edcb7bfd17 100644
---- a/gdbstub.c
-+++ b/gdbstub.c
-@@ -1542,6 +1542,21 @@ static void handle_continue(GdbCmdContext *gdb_ctx, void *user_ctx)
-     gdb_continue(gdb_ctx->s);
- }
- 
-+static void handle_cont_with_sig(GdbCmdContext *gdb_ctx, void *user_ctx)
-+{
-+    unsigned long signal = 0;
-+
-+    if (gdb_ctx->num_params) {
-+        signal = gdb_ctx->params[0].val_ul;
-+    }
-+
-+    gdb_ctx->s->signal = gdb_signal_to_target(signal);
-+    if (gdb_ctx->s->signal == -1) {
-+        gdb_ctx->s->signal = 0;
-+    }
-+    gdb_continue(gdb_ctx->s);
-+}
-+
- static int gdb_handle_packet(GDBState *s, const char *line_buf)
- {
-     CPUState *cpu;
-@@ -1588,11 +1603,16 @@ static int gdb_handle_packet(GDBState *s, const char *line_buf)
-         }
-         break;
-     case 'C':
--        s->signal = gdb_signal_to_target (strtoul(p, (char **)&p, 16));
--        if (s->signal == -1)
--            s->signal = 0;
--        gdb_continue(s);
--        return RS_IDLE;
-+        {
-+            static GdbCmdParseEntry cont_with_sig_cmd_desc = {
-+                .handler = handle_cont_with_sig,
-+                .cmd = "C",
-+                .cmd_startswith = 1,
-+                .schema = "l0"
-+            };
-+            process_string_cmd(s, NULL, line_buf, &cont_with_sig_cmd_desc, 1);
-+        }
-+        break;
-     case 'v':
-         if (strncmp(p, "Cont", 4) == 0) {
-             p += 4;
+Drop use of g_canonicalize_filename.
+
+While Daniel pointed out how to add stuff to glib-compat.h,
+full canonicalization is overkill for path() in any case.
+I also discovered that I'd been testing w/ glib 2.56 and so
+hadn't been testing the g_canonicalize_filename case anyway.
+
+Cover from v1:
+
+This is a third variant attempting to fix the problem of
+the -L interp_prefix handling not coping well pointing to
+a full chroot.
+
+Previous versions include:
+https://lists.gnu.org/archive/html/qemu-devel/2018-05/msg06592.html
+https://lists.gnu.org/archive/html/qemu-devel/2018-05/msg07304.html
+
+Both of the other versions keep an open file descriptor to
+the directory that is interp_prefix.  While this seems to be
+efficient, they also leak a file descriptor into the guest.
+This has follow-on effects on the emulation, causing failures
+e.g. within the LTP testsuite.
+
+This version uses only string manipulation and access(2).
+
+A plausible criticism of this is the mutex and the cache.
+Are they really needed?  I have no idea.  I can imagine
+removing that is actually more efficient, not needing a
+lock around a shared data structure.
+
+
+r~
+
+
+Richard Henderson (1):
+  util/path: Do not cache all filenames at startup
+
+ util/path.c | 201 ++++++++++++----------------------------------------
+ 1 file changed, 47 insertions(+), 154 deletions(-)
+
 -- 
-2.20.1
+2.17.1
 
 
