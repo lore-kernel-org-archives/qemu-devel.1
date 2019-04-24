@@ -1,25 +1,25 @@
-Received: from eggs.gnu.org ([209.51.188.92]:36774)
+Received: from eggs.gnu.org ([209.51.188.92]:37107)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1hJGmP-0002OZ-RI
-	for qemu-devel@nongnu.org; Wed, 24 Apr 2019 08:13:39 -0400
+	(envelope-from <jasowang@redhat.com>) id 1hJGmk-0002ls-W4
+	for qemu-devel@nongnu.org; Wed, 24 Apr 2019 08:14:03 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1hJGbi-0007hX-Uw
-	for qemu-devel@nongnu.org; Wed, 24 Apr 2019 08:02:36 -0400
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Date: Wed, 24 Apr 2019 12:02:29 +0000
-Message-ID: <f8040ada-cb84-d669-3493-0d2da89e6b0b@virtuozzo.com>
-References: <20190424103747.10173-1-thuth@redhat.com>
-	<20190424103747.10173-6-thuth@redhat.com>
-	<20190424104855.GE31388@redhat.com>
-	<d9137693-7727-5f2c-04f3-b1eafd70f056@redhat.com>
-In-Reply-To: <d9137693-7727-5f2c-04f3-b1eafd70f056@redhat.com>
-Content-Language: en-US
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <3A41D49096F71742B885CE567A202122@eurprd08.prod.outlook.com>
-Content-Transfer-Encoding: base64
+	(envelope-from <jasowang@redhat.com>) id 1hJGY4-0004p1-Ni
+	for qemu-devel@nongnu.org; Wed, 24 Apr 2019 07:58:49 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:47418)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <jasowang@redhat.com>) id 1hJGY4-0004n8-Fj
+	for qemu-devel@nongnu.org; Wed, 24 Apr 2019 07:58:48 -0400
+References: <20190409055850.25797-1-jasowang@redhat.com>
+From: Jason Wang <jasowang@redhat.com>
+Message-ID: <c2bf2ef7-36ab-723f-b245-055d22f68978@redhat.com>
+Date: Wed, 24 Apr 2019 19:58:42 +0800
 MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [PATCH 5/6] tests: Run the iotests during "make
- check" again
+In-Reply-To: <20190409055850.25797-1-jasowang@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH V3] vhost_net: don't set backend for the
+ uninitialized virtqueue
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,57 +28,92 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Thomas Huth <thuth@redhat.com>, =?utf-8?B?RGFuaWVsIFAuIEJlcnJhbmfDqQ==?= <berrange@redhat.com>
-Cc: Fam Zheng <fam@euphon.net>, Kevin Wolf <kwolf@redhat.com>, Ed Maste <emaste@freebsd.org>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>, =?utf-8?B?UGhpbGlwcGUgTWF0aGlldS1EYXVkw6k=?= <philmd@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, Max Reitz <mreitz@redhat.com>, =?utf-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>, Li-Wen Hsu <lwhsu@freebsd.org>
+To: mst@redhat.com, qemu-devel@nongnu.org
+Cc: yuri.benditovich@daynix.com
 
-MjQuMDQuMjAxOSAxMzo1OSwgVGhvbWFzIEh1dGggd3JvdGU6DQo+IE9uIDI0LzA0LzIwMTkgMTIu
-NDgsIERhbmllbCBQLiBCZXJyYW5nw6kgd3JvdGU6DQo+PiBPbiBXZWQsIEFwciAyNCwgMjAxOSBh
-dCAxMjozNzo0NlBNICswMjAwLCBUaG9tYXMgSHV0aCB3cm90ZToNCj4+PiBQZW9wbGUgb2Z0ZW4g
-Zm9yZ2V0IHRvIHJ1biB0aGUgaW90ZXN0cyBiZWZvcmUgc3VibWl0dGluZyBwYXRjaGVzIG9yDQo+
-Pj4gcHVsbCByZXF1ZXN0cyAtIHRoaXMgaXMgbGlrZWx5IGR1ZSB0byB0aGUgZmFjdCB0aGF0IHdl
-IGRvIG5vdCBydW4gdGhlDQo+Pj4gdGVzdHMgZHVyaW5nIG91ciBtYW5kYXRvcnkgIm1ha2UgY2hl
-Y2siIHRlc3RzIHlldC4gTm93IHRoYXQgd2UndmUgZ290DQo+Pj4gYSBuZXcgImNpIiBncm91cCBv
-ZiBpb3Rlc3RzIHRoYXQgc2hvdWxkIGJlIGZpbmUgdG8gcnVuIGluIGV2ZXJ5IGVudmlyb24tDQo+
-Pj4gbWVudCwgaXQgc2hvdWxkIGJlIE9LIHRvIGVuYWJsZSB0aGUgaW90ZXN0cyBkdXJpbmcgIm1h
-a2UgY2hlY2siIGFnYWluLg0KPj4+IFRodXMgd2Ugbm93IHJ1biB0aGUgImNpIiB0ZXN0cyBieSBk
-ZWZhdWx0IGZyb20gdGhlIHFlbXUtaW90ZXN0cy1xdWljay5zaA0KPj4+IHNjcmlwdCwgYW5kIG9u
-bHkgdXNlIHRoZSBmb3JtZXIgInF1aWNrIiBncm91cCAodGhhdCBjb250YWlucyBzb21lIHRlc3Rz
-DQo+Pj4gdGhhdCBhcmUgZmFpbGluZyBpbiBzb21lIGVudmlyb25tZW50cykgd2hlbiB0aGUgdXNl
-ciBkZWNpZGVkIHRvIHJ1bg0KPj4+ICJtYWtlIGNoZWNrIFNQRUVEPXRob3JvdWdoIiBvciBzb21l
-dGhpbmcgc2ltaWxhci4NCj4+Pg0KPj4+IFNpZ25lZC1vZmYtYnk6IFRob21hcyBIdXRoIDx0aHV0
-aEByZWRoYXQuY29tPg0KPj4+IC0tLQ0KPj4+ICAgdGVzdHMvTWFrZWZpbGUuaW5jbHVkZSAgICAg
-IHwgIDIgKy0NCj4+PiAgIHRlc3RzL3FlbXUtaW90ZXN0cy1xdWljay5zaCB8IDE3ICsrKysrKysr
-KysrKysrKystDQo+Pj4gICAyIGZpbGVzIGNoYW5nZWQsIDE3IGluc2VydGlvbnMoKyksIDIgZGVs
-ZXRpb25zKC0pDQo+Pg0KPj4+IGRpZmYgLS1naXQgYS90ZXN0cy9xZW11LWlvdGVzdHMtcXVpY2su
-c2ggYi90ZXN0cy9xZW11LWlvdGVzdHMtcXVpY2suc2gNCj4+PiBpbmRleCAwZTU1NGJiOTcyLi40
-MTZiM2ZjNDhiIDEwMDc1NQ0KPj4+IC0tLSBhL3Rlc3RzL3FlbXUtaW90ZXN0cy1xdWljay5zaA0K
-Pj4+ICsrKyBiL3Rlc3RzL3FlbXUtaW90ZXN0cy1xdWljay5zaA0KPj4NCj4+IHMvLXF1aWNrLy8g
-IHBlcmhhcHMsIHNpbmNlIGl0IG5vIGxvbmdlciBvbmx5IHJ1bnMgdGhlICJxdWljayIgdGVzdHMu
-DQo+Pg0KPj4+IEBAIC0xLDggKzEsMjMgQEANCj4+PiAgICMhL2Jpbi9zaA0KPj4+ICAgDQo+Pj4g
-KyMgSG9ub3IgdGhlIFNQRUVEIGVudmlyb25tZW50IHZhcmlhYmxlLCBqdXN0IGxpa2Ugd2UgZG8g
-aXQgZm9yIHRoZSBxdGVzdHMuDQo+Pj4gKyMgVGhlIGRlZmF1bHQgaXMgdG8gcnVuIGFsbCB0ZXN0
-cyB0aGF0IHN0aWxsIHdvcmsgZmluZSBpbiBhIENJIGVudmlyb25tZW50cywNCj4+PiArIyBidXQg
-aWYgdGhlIHVzZXIgc2V0IFNQRUVEPXNsb3cgb3IgU1BFRUQ9dGhvcm91Z2gsIHdlIGFsc28gcnVu
-IGFsbCBvdGhlcg0KPj4+ICsjIHRlc3RzIHRoYXQgYXJlIHN0aWxsIG1hcmtlZCBhcyAicXVpY2si
-DQo+Pj4gK2lmIFsgIiRTUEVFRCIgPSAic2xvdyIgLW8gIiRTUEVFRCIgPSAidGhvcm91Z2giIF07
-IHRoZW4NCj4+PiArICAgIGdyb3VwPXF1aWNrDQo+Pg0KPj4gV2hlbiB1c2VyIGFza3MgZm9yICJz
-bG93IiB0ZXN0cyB3ZSBydW4gdGhlICJxdWljayIgdGVzdHMsIHdoaWNoDQo+PiBwcmVzdW1hYmx5
-IGltcGxpZXMuLi4NCj4+DQo+Pj4gK2Vsc2UNCj4+PiArICAgIGdyb3VwPWNpDQo+Pg0KPj4gLi4u
-ImNpIiBpcyBxdWlja2VyIHRoYW4gdGhlICJxdWljayIgIHRlc3RzICENCj4+DQo+PiBDb25mdXNl
-ZCA/IFdlIGNlcnRhaW5seSB0cnkgdG8gZW5zdXJlIHRoYXQgeW91IHdpbGwgYmUgOi0pDQo+IA0K
-PiAuLi4gYW5kIHRoZXJlIGlzIGFsc28gdGVzdHMvY2hlY2stYmxvY2suc2ggKHdoaWNoIGlzIG5v
-dCB1c2VkIGJ5ICJtYWtlDQo+IGNoZWNrLWJsb2NrIiwgYnkgdGhlIHdheSwgYnV0IHN0aWxsIHRh
-bGtzIGFib3V0ICJtYWtlIGNoZWNrLWJsb2NrIiksDQo+IHdoaWNoIGlzIGV2ZW4gc2xvd2VyIHRo
-YW4gdGhlICJjaSIgYW5kICJxdWljayIgZ3JvdXAuLi4NCj4gDQo+IEkgZ3Vlc3MgdGhhdCBjb3Vs
-ZCBiZSBjbGVhbmVkIHVwLCB0b28gKHdoeSBkbyB3ZSBuZWVkIHR3byBzY3JpcHRzPykgLi4uDQo+
-IGp1c3Qgbm90IHN1cmUgaG93IHRoZSBmaW5hbCByZXN1bHQgc2hvdWxkIGxvb2sgbGlrZSBhbmQg
-aWYgaXQgc2hvdWxkIGJlDQo+IHBhcnQgb2YgdGhpcyBwYXRjaCBzZXJpZXMgb3IgcmF0aGVyIHNv
-bWV0aGluZyBzZXBhcmF0ZS4gTWF4LCBLZXZpbiwgd2hhdA0KPiBkbyB5b3UgdGhpbms/DQo+IA0K
-PiBNYXliZSB3ZSBzaG91bGQgbWVyZ2UgdGhlIHR3byBzY3JpcHRzLCBhbmQgZGVwZW5kaW5nIG9u
-IHRoZSBTUEVFRA0KPiB2YXJpYWJsZSwgd2UgcnVuOg0KPiANCj4gICBxdWljayA9PiAiY2kiIGdy
-b3VwDQo+ICAgdGhvcm91Z2ggPT4gInF1aWNrIiBncm91cA0KPiAgIHNsb3cgPT4gb2xkIGJlaGF2
-aW91ciBvZiB0aGUgY2hlY2stYmxvY2suc2ggc2NyaXB0DQoNCk1heSBiZSwgaW5zdGVhZCBvZiBT
-UEVFRCwgaW50cm9kdWNlIEdST1VQIHZhcmlhYmxlPyBUbyBtYWtlIGl0IHBsYWluDQpjaSAtPiBj
-aQ0KcXVpY2sgLT4gcXVpY2sNCm5vdGhpbmcgLT4gZGVmYXVsdCBvbGQgYmVoYXZpb3INCj8NCg0K
-PiANCj4gPw0KPiANCj4gICBUaG9tYXMNCj4gDQoNCg0KLS0gDQpCZXN0IHJlZ2FyZHMsDQpWbGFk
-aW1pcg0K
+
+On 2019/4/9 =E4=B8=8B=E5=8D=881:58, Jason Wang wrote:
+> We used to set backend unconditionally, this won't work for some
+> guests (e.g windows driver) who may not initialize all virtqueues. For
+> kernel backend, this will fail since it may try to validate the rings
+> during setting backend.
+>
+> Fixing this by simply skipping the backend set when we find desc is
+> not ready.
+>
+> Signed-off-by: Jason Wang <jasowang@redhat.com>
+> ---
+> Changes from V1:
+> - introduce a generic helper to check if a virtqueue is enabled
+> ---
+
+
+Michael, does this look good to you?
+
+Thanks
+
+
+>   hw/net/vhost_net.c         | 10 ++++++++++
+>   hw/virtio/virtio.c         |  5 +++++
+>   include/hw/virtio/virtio.h |  1 +
+>   3 files changed, 16 insertions(+)
+>
+> diff --git a/hw/net/vhost_net.c b/hw/net/vhost_net.c
+> index be3cc88370..a6b719035c 100644
+> --- a/hw/net/vhost_net.c
+> +++ b/hw/net/vhost_net.c
+> @@ -244,6 +244,11 @@ static int vhost_net_start_one(struct vhost_net *n=
+et,
+>           qemu_set_fd_handler(net->backend, NULL, NULL, NULL);
+>           file.fd =3D net->backend;
+>           for (file.index =3D 0; file.index < net->dev.nvqs; ++file.ind=
+ex) {
+> +            if (!virtio_queue_enabled(dev, net->dev.vq_index +
+> +                                      file.index)) {
+> +                /* Queue might not be ready for start */
+> +                continue;
+> +            }
+>               r =3D vhost_net_set_backend(&net->dev, &file);
+>               if (r < 0) {
+>                   r =3D -errno;
+> @@ -256,6 +261,11 @@ fail:
+>       file.fd =3D -1;
+>       if (net->nc->info->type =3D=3D NET_CLIENT_DRIVER_TAP) {
+>           while (file.index-- > 0) {
+> +            if (!virtio_queue_enabled(dev, net->dev.vq_index +
+> +                                      file.index)) {
+> +                /* Queue might not be ready for start */
+> +                continue;
+> +            }
+>               int r =3D vhost_net_set_backend(&net->dev, &file);
+>               assert(r >=3D 0);
+>           }
+> diff --git a/hw/virtio/virtio.c b/hw/virtio/virtio.c
+> index 2626a895cb..28056a7ef7 100644
+> --- a/hw/virtio/virtio.c
+> +++ b/hw/virtio/virtio.c
+> @@ -2318,6 +2318,11 @@ hwaddr virtio_queue_get_desc_addr(VirtIODevice *=
+vdev, int n)
+>       return vdev->vq[n].vring.desc;
+>   }
+>  =20
+> +bool virtio_queue_enabled(VirtIODevice *vdev, int n)
+> +{
+> +    return virtio_queue_get_desc_addr(vdev, n) !=3D 0;
+> +}
+> +
+>   hwaddr virtio_queue_get_avail_addr(VirtIODevice *vdev, int n)
+>   {
+>       return vdev->vq[n].vring.avail;
+> diff --git a/include/hw/virtio/virtio.h b/include/hw/virtio/virtio.h
+> index ce9516236a..7140381e3a 100644
+> --- a/include/hw/virtio/virtio.h
+> +++ b/include/hw/virtio/virtio.h
+> @@ -282,6 +282,7 @@ typedef struct VirtIORNGConf VirtIORNGConf;
+>                         VIRTIO_F_IOMMU_PLATFORM, false)
+>  =20
+>   hwaddr virtio_queue_get_desc_addr(VirtIODevice *vdev, int n);
+> +bool virtio_queue_enabled(VirtIODevice *vdev, int n);
+>   hwaddr virtio_queue_get_avail_addr(VirtIODevice *vdev, int n);
+>   hwaddr virtio_queue_get_used_addr(VirtIODevice *vdev, int n);
+>   hwaddr virtio_queue_get_desc_size(VirtIODevice *vdev, int n);
