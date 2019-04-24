@@ -1,29 +1,28 @@
 Received: from eggs.gnu.org ([209.51.188.92]:37819)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1hJ6h4-0002zp-IA
-	for qemu-devel@nongnu.org; Tue, 23 Apr 2019 21:27:27 -0400
+	(envelope-from <liq3ea@gmail.com>) id 1hJ6hF-0002zp-5H
+	for qemu-devel@nongnu.org; Tue, 23 Apr 2019 21:27:38 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1hJ6h3-00079e-Jg
-	for qemu-devel@nongnu.org; Tue, 23 Apr 2019 21:27:26 -0400
-Received: from mail-pf1-x443.google.com ([2607:f8b0:4864:20::443]:36898)
+	(envelope-from <liq3ea@gmail.com>) id 1hJ6XW-0004yC-9G
+	for qemu-devel@nongnu.org; Tue, 23 Apr 2019 21:17:35 -0400
+Received: from mail-ot1-x342.google.com ([2607:f8b0:4864:20::342]:33506)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1hJ6h1-00077B-Kw
-	for qemu-devel@nongnu.org; Tue, 23 Apr 2019 21:27:25 -0400
-Received: by mail-pf1-x443.google.com with SMTP id 8so8403729pfr.4
-	for <qemu-devel@nongnu.org>; Tue, 23 Apr 2019 18:27:22 -0700 (PDT)
-References: <20190416125744.27770-1-peter.maydell@linaro.org>
-	<20190416125744.27770-23-peter.maydell@linaro.org>
-From: Richard Henderson <richard.henderson@linaro.org>
-Message-ID: <59198f7b-231e-939a-6bf4-77649513f881@linaro.org>
-Date: Tue, 23 Apr 2019 18:27:17 -0700
+	(Exim 4.71) (envelope-from <liq3ea@gmail.com>) id 1hJ6XW-0004xI-00
+	for qemu-devel@nongnu.org; Tue, 23 Apr 2019 21:17:34 -0400
+Received: by mail-ot1-x342.google.com with SMTP id j10so14673063otq.0
+	for <qemu-devel@nongnu.org>; Tue, 23 Apr 2019 18:17:33 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20190416125744.27770-23-peter.maydell@linaro.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 22/26] target/arm: Add lazy-FP-stacking
- support to v7m_stack_write()
+References: <20190420100056.116305-1-liq3ea@163.com>
+	<20190420100056.116305-4-liq3ea@163.com>
+	<a27cd912-4f58-55ac-1aae-e4999fa3d84d@redhat.com>
+In-Reply-To: <a27cd912-4f58-55ac-1aae-e4999fa3d84d@redhat.com>
+From: Li Qiang <liq3ea@gmail.com>
+Date: Wed, 24 Apr 2019 09:16:56 +0800
+Message-ID: <CAKXe6SJZWs7HtXutX6W3saDhaNDtVPMQEh2+s+9XiM3TtZqLdQ@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH 3/4] tests: fw_cfg: add reboot_timeout test
+ case
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,27 +31,89 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>, qemu-arm@nongnu.org, qemu-devel@nongnu.org
+To: Thomas Huth <thuth@redhat.com>
+Cc: Li Qiang <liq3ea@163.com>, lvivier@redhat.com, Paolo Bonzini <pbonzini@redhat.com>, =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>, Laszlo Ersek <lersek@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>, Qemu Developers <qemu-devel@nongnu.org>
 
-On 4/16/19 5:57 AM, Peter Maydell wrote:
-> Pushing registers to the stack for v7M needs to handle three cases:
->  * the "normal" case where we pend exceptions
->  * an "ignore faults" case where we set FSR bits but
->    do not pend exceptions (this is used when we are
->    handling some kinds of derived exception on exception entry)
->  * a "lazy FP stacking" case, where different FSR bits
->    are set and the exception is pended differently
-> 
-> Implement this by changing the existing flag argument that
-> tells us whether to ignore faults or not into an enum that
-> specifies which of the 3 modes we should handle.
-> 
-> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
-> ---
->  target/arm/helper.c | 118 +++++++++++++++++++++++++++++---------------
->  1 file changed, 79 insertions(+), 39 deletions(-)
+Thomas Huth <thuth@redhat.com> =E4=BA=8E2019=E5=B9=B44=E6=9C=8824=E6=97=A5=
+=E5=91=A8=E4=B8=89 =E4=B8=8A=E5=8D=8812:29=E5=86=99=E9=81=93=EF=BC=9A
 
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+> On 20/04/2019 12.00, Li Qiang wrote:
+> > Signed-off-by: Li Qiang <liq3ea@163.com>
+> > ---
+> >  tests/fw_cfg-test.c | 19 +++++++++++++++++++
+> >  1 file changed, 19 insertions(+)
+> >
+> > diff --git a/tests/fw_cfg-test.c b/tests/fw_cfg-test.c
+> > index c22503619f..9f75dbb5f4 100644
+> > --- a/tests/fw_cfg-test.c
+> > +++ b/tests/fw_cfg-test.c
+> > @@ -174,6 +174,24 @@ static void test_fw_cfg_boot_menu(void)
+> >      qtest_quit(s);
+> >  }
+> >
+> > +static void test_fw_cfg_reboot_timeout(void)
+> > +{
+> > +    QFWCFG *fw_cfg;
+> > +    QTestState *s;
+> > +    uint32_t reboot_timeout =3D 0;
+> > +    size_t filesize;
+> > +
+> > +    s =3D qtest_init("-boot reboot-timeout=3D15");
+> > +    fw_cfg =3D pc_fw_cfg_init(s);
+> > +
+> > +    filesize =3D qfw_cfg_get_file(fw_cfg, "etc/boot-fail-wait",
+> > +                     &reboot_timeout, sizeof(reboot_timeout));
+> > +    g_assert_cmpint(filesize, =3D=3D, sizeof(reboot_timeout));
+> > +    g_assert_cmpint(reboot_timeout, =3D=3D, 15);
+>
+> Is this endianess-safe? Or do you need to byteswap reboot_timeout if the
+> host and guest endianess does not match?
+>
+>
+
+Good question!
+
+IIUC, the qemu fw_cfg store the 'file' entry data just in byte stream. So
+there is no need
+to consider the file's endianess. If when the file entry is stored without
+considering endianess,
+it will be ok to ignore the endianess. So for this patch, the 'reboot_timeo=
+ut'
+is ok as when we stored
+it we don't consider endianess. But for 'splash-time', when we stored it
+we convert it to little endian
+so when we fetches it, we should also convert it from little endian to
+cpu-endian.
+
+So this raises another question.
+Should we consider the endianness for this 'file' entry used for 'integer
+value'?
+I read the seabios related code function 'qemu_cfg_read_file' and
+'romfile_loadint'.
+It doesn't consider endianess. This seems we should drop the 'endianess
+convertion' in 'fw_cfg_bootsplash'
+when we store 'etc/boot-menu-wait'.
+However what's if the emulation target has a different endianess for the
+host target. I think there will be inconsistent.
+So I think we can have following choose:
+
+1. Don't consider the endianess, this is ok when emaulated target and host
+target has the same endianess.
+2. definite an endianess for the 'file' entry used as an integer value.
+When we store this kind of data we uses the definited endianess
+and when we fetch it out, we also do an endianess convertion. This will
+change the seabios I think.
+
+Gerd, Philippe
+
+What do you think of this?
+
+Thanks,
+Li Qiang
 
 
-r~
+
+
+
+>  Thomas
+>
