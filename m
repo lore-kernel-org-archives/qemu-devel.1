@@ -1,25 +1,26 @@
-Received: from eggs.gnu.org ([209.51.188.92]:45829)
+Received: from eggs.gnu.org ([209.51.188.92]:48455)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <arilou@gmail.com>) id 1hJN6K-0002Db-Ic
-	for qemu-devel@nongnu.org; Wed, 24 Apr 2019 14:58:38 -0400
+	(envelope-from <lersek@redhat.com>) id 1hJNDl-0000fs-9d
+	for qemu-devel@nongnu.org; Wed, 24 Apr 2019 15:06:18 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <arilou@gmail.com>) id 1hJMuM-0005Q2-M6
-	for qemu-devel@nongnu.org; Wed, 24 Apr 2019 14:46:15 -0400
-Received: from mail-wr1-x42c.google.com ([2a00:1450:4864:20::42c]:40809)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <arilou@gmail.com>) id 1hJMuM-0005O9-Fd
-	for qemu-devel@nongnu.org; Wed, 24 Apr 2019 14:46:14 -0400
-Received: by mail-wr1-x42c.google.com with SMTP id h4so26567572wre.7
-	for <qemu-devel@nongnu.org>; Wed, 24 Apr 2019 11:46:14 -0700 (PDT)
-From: Jon Doron <arilou@gmail.com>
-Date: Wed, 24 Apr 2019 21:45:42 +0300
-Message-Id: <20190424184600.8445-2-arilou@gmail.com>
-In-Reply-To: <20190424184600.8445-1-arilou@gmail.com>
-References: <20190424184600.8445-1-arilou@gmail.com>
+	(envelope-from <lersek@redhat.com>) id 1hJNDj-0008Ca-FR
+	for qemu-devel@nongnu.org; Wed, 24 Apr 2019 15:06:17 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:41776)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <lersek@redhat.com>) id 1hJNDj-00088T-1q
+	for qemu-devel@nongnu.org; Wed, 24 Apr 2019 15:06:15 -0400
+References: <20190423171520.4511-1-lersek@redhat.com>
+	<CAFEAcA9B-FpTySXUKTxYaw=8V=to0VTjCAvCAMGF-x=yQY3G9A@mail.gmail.com>
+From: Laszlo Ersek <lersek@redhat.com>
+Message-ID: <4cd50d7f-867d-8e90-7331-400d0548f4f5@redhat.com>
+Date: Wed, 24 Apr 2019 21:06:05 +0200
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH v4 02/20] gdbstub: Implement deatch (D pkt)
- with new infra
+In-Reply-To: <CAFEAcA9B-FpTySXUKTxYaw=8V=to0VTjCAvCAMGF-x=yQY3G9A@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PULL 00/12] bundle edk2 platform firmware with
+ QEMU
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,121 +29,62 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Jon Doron <arilou@gmail.com>
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: "Daniel P. Berrange" <berrange@redhat.com>, Eric Blake <eblake@redhat.com>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>, Igor Mammedov <imammedo@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>, Michal Privoznik <mprivozn@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>
 
-Signed-otff-by: Jon Doron <arilou@gmail.com>
----
- gdbstub.c | 82 +++++++++++++++++++++++++++++--------------------------
- 1 file changed, 43 insertions(+), 39 deletions(-)
+On 04/24/19 15:47, Peter Maydell wrote:
+> On Tue, 23 Apr 2019 at 18:15, Laszlo Ersek <lersek@redhat.com> wrote:
+>>
+>> Picked up the new feedback tags from the v4 thread, which had been
+>> posted at:
+>> - https://lists.gnu.org/archive/html/qemu-devel/2019-04/msg01549.html
+>> - http://mid.mail-archive.com/20190409230022.6462-1-lersek@redhat.com
+>>
+>> The following changes since commit eeba63fc7fface36f438bcbc0d3b02e7dcb59983:
+>>
+>>   Update version for v4.0.0-rc4 release (2019-04-16 21:53:00 +0100)
+>>
+>> are available in the Git repository at:
+>>
+>>   https://github.com/lersek/qemu.git tags/edk2-pull-2019-04-22
+>>
+>> for you to fetch changes up to 6739df3fafaa3e2ec37af23fd77d2119869f4a4f:
+>>
+>>   MAINTAINERS: add the "EDK2 Firmware" subsystem (2019-04-17 15:38:35 +0200)
+>>
+>> ----------------------------------------------------------------
+>> Advance the roms/edk2 submodule to the "edk2-stable201903" release, and
+>> build and capture platform firmware binaries from that release. The
+>> binaries are meant to be used by both end-users and by the "BIOS tables"
+>> unit tests in qtest ("make check").
+>>
+>> ----------------------------------------------------------------
+>> Laszlo Ersek (12):
+>>       roms: lift "edk2-funcs.sh" from "tests/uefi-test-tools/build.sh"
+>>       roms/edk2-funcs.sh: require gcc-4.8+ for building i386 and x86_64
+>>       tests/uefi-test-tools/build.sh: work around TianoCore#1607
+>>       roms/edk2: advance to tag edk2-stable201903
+>>       roms/edk2-funcs.sh: add the qemu_edk2_get_thread_count() function
+>>       roms/Makefile: replace the $(EDK2_EFIROM) target with "edk2-basetools"
+>>       roms: build edk2 firmware binaries and variable store templates
+>>       pc-bios: add edk2 firmware binaries and variable store templates
+>>       pc-bios: document the edk2 firmware images; add firmware descriptors
+>>       tests: add missing dependency to build QTEST_QEMU_BINARY, round 2
+>>       Makefile: install the edk2 firmware images and their descriptors
+>>       MAINTAINERS: add the "EDK2 Firmware" subsystem
+> 
+> 
+> 
+> Applied, thanks.
 
-diff --git a/gdbstub.c b/gdbstub.c
-index 64680722fc..952a6d92ef 100644
---- a/gdbstub.c
-+++ b/gdbstub.c
-@@ -1429,10 +1429,6 @@ static inline int startswith(const char *string, const char *pattern)
-   return !strncmp(string, pattern, strlen(pattern));
- }
- 
--__attribute__((unused)) static int process_string_cmd(
--        GDBState *s, void *user_ctx, const char *data,
--        GdbCmdParseEntry *cmds, int num_cmds);
--
- static int process_string_cmd(GDBState *s, void *user_ctx, const char *data,
-                               GdbCmdParseEntry *cmds, int num_cmds)
- {
-@@ -1477,6 +1473,41 @@ static int process_string_cmd(GDBState *s, void *user_ctx, const char *data,
-     return -1;
- }
- 
-+static void handle_detach(GdbCmdContext *gdb_ctx, void *user_ctx)
-+{
-+    GDBProcess *process;
-+    GDBState *s = gdb_ctx->s;
-+    uint32_t pid = 1;
-+
-+    if (s->multiprocess) {
-+        if (!gdb_ctx->num_params) {
-+            put_packet(s, "E22");
-+            return;
-+        }
-+
-+        pid = gdb_ctx->params[0].val_ul;
-+    }
-+
-+    process = gdb_get_process(s, pid);
-+    gdb_process_breakpoint_remove_all(s, process);
-+    process->attached = false;
-+
-+    if (pid == gdb_get_cpu_pid(s, s->c_cpu)) {
-+        s->c_cpu = gdb_first_attached_cpu(s);
-+    }
-+
-+    if (pid == gdb_get_cpu_pid(s, s->g_cpu)) {
-+        s->g_cpu = gdb_first_attached_cpu(s);
-+    }
-+
-+    if (!s->c_cpu) {
-+        /* No more process attached */
-+        gdb_syscall_mode = GDB_SYS_DISABLED;
-+        gdb_continue(s);
-+    }
-+    put_packet(s, "OK");
-+}
-+
- static int gdb_handle_packet(GDBState *s, const char *line_buf)
- {
-     CPUState *cpu;
-@@ -1591,42 +1622,15 @@ static int gdb_handle_packet(GDBState *s, const char *line_buf)
-         error_report("QEMU: Terminated via GDBstub");
-         exit(0);
-     case 'D':
--        /* Detach packet */
--        pid = 1;
--
--        if (s->multiprocess) {
--            unsigned long lpid;
--            if (*p != ';') {
--                put_packet(s, "E22");
--                break;
--            }
--
--            if (qemu_strtoul(p + 1, &p, 16, &lpid)) {
--                put_packet(s, "E22");
--                break;
--            }
--
--            pid = lpid;
--        }
--
--        process = gdb_get_process(s, pid);
--        gdb_process_breakpoint_remove_all(s, process);
--        process->attached = false;
--
--        if (pid == gdb_get_cpu_pid(s, s->c_cpu)) {
--            s->c_cpu = gdb_first_attached_cpu(s);
--        }
--
--        if (pid == gdb_get_cpu_pid(s, s->g_cpu)) {
--            s->g_cpu = gdb_first_attached_cpu(s);
--        }
--
--        if (s->c_cpu == NULL) {
--            /* No more process attached */
--            gdb_syscall_mode = GDB_SYS_DISABLED;
--            gdb_continue(s);
-+        {
-+            static GdbCmdParseEntry deatch_cmd_desc = {
-+                .handler = handle_detach,
-+                .cmd = "D",
-+                .cmd_startswith = 1,
-+                .schema = "?.l0"
-+            };
-+            process_string_cmd(s, NULL, line_buf, &deatch_cmd_desc, 1);
-         }
--        put_packet(s, "OK");
-         break;
-     case 's':
-         if (*p != '\0') {
--- 
-2.20.1
+Awesome, thanks!
+
+I'll soon get to work on <https://bugs.launchpad.net/qemu/+bug/1821884>.
+
+> Please update the changelog at https://wiki.qemu.org/ChangeLog/4.1
+> for any user-visible changes.
+
+Done, at <https://wiki.qemu.org/ChangeLog/4.1#Miscellaneous>.
+
+Thanks!
+Laszlo
