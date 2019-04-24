@@ -1,34 +1,25 @@
-Received: from eggs.gnu.org ([209.51.188.92]:36736)
+Received: from eggs.gnu.org ([209.51.188.92]:36774)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1hJGmI-0002MR-Ho
-	for qemu-devel@nongnu.org; Wed, 24 Apr 2019 08:13:31 -0400
+	(envelope-from <vsementsov@virtuozzo.com>) id 1hJGmP-0002OZ-RI
+	for qemu-devel@nongnu.org; Wed, 24 Apr 2019 08:13:39 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1hJGee-0002jm-Rn
-	for qemu-devel@nongnu.org; Wed, 24 Apr 2019 08:05:37 -0400
-Received: from indium.canonical.com ([91.189.90.7]:56642)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1hJGee-0002fn-LY
-	for qemu-devel@nongnu.org; Wed, 24 Apr 2019 08:05:36 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1hJGed-0001dL-EW
-	for <qemu-devel@nongnu.org>; Wed, 24 Apr 2019 12:05:35 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 630CB2E80C8
-	for <qemu-devel@nongnu.org>; Wed, 24 Apr 2019 12:05:35 +0000 (UTC)
-MIME-Version: 1.0
+	(envelope-from <vsementsov@virtuozzo.com>) id 1hJGbi-0007hX-Uw
+	for qemu-devel@nongnu.org; Wed, 24 Apr 2019 08:02:36 -0400
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Date: Wed, 24 Apr 2019 12:02:29 +0000
+Message-ID: <f8040ada-cb84-d669-3493-0d2da89e6b0b@virtuozzo.com>
+References: <20190424103747.10173-1-thuth@redhat.com>
+	<20190424103747.10173-6-thuth@redhat.com>
+	<20190424104855.GE31388@redhat.com>
+	<d9137693-7727-5f2c-04f3-b1eafd70f056@redhat.com>
+In-Reply-To: <d9137693-7727-5f2c-04f3-b1eafd70f056@redhat.com>
+Content-Language: en-US
 Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Wed, 24 Apr 2019 11:56:57 -0000
-From: Daniel Berrange <1826200@bugs.launchpad.net>
-Reply-To: Bug 1826200 <1826200@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <155610584995.13565.1262636932024040431.malonedeb@wampee.canonical.com>
-Message-Id: <155610701798.13864.6201237209107021604.launchpad@wampee.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1826200] Re: RFE: populate "OEM Strings" (type
- 11) SMBIOS table strings from regular files
+Content-ID: <3A41D49096F71742B885CE567A202122@eurprd08.prod.outlook.com>
+Content-Transfer-Encoding: base64
+MIME-Version: 1.0
+Subject: Re: [Qemu-devel] [PATCH 5/6] tests: Run the iotests during "make
+ check" again
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,54 +28,57 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Thomas Huth <thuth@redhat.com>, =?utf-8?B?RGFuaWVsIFAuIEJlcnJhbmfDqQ==?= <berrange@redhat.com>
+Cc: Fam Zheng <fam@euphon.net>, Kevin Wolf <kwolf@redhat.com>, Ed Maste <emaste@freebsd.org>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>, =?utf-8?B?UGhpbGlwcGUgTWF0aGlldS1EYXVkw6k=?= <philmd@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, Max Reitz <mreitz@redhat.com>, =?utf-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>, Li-Wen Hsu <lwhsu@freebsd.org>
 
-** Changed in: qemu
-       Status: New =3D> Confirmed
-
-** Changed in: qemu
-     Assignee: (unassigned) =3D> Daniel Berrange (berrange)
-
--- =
-
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1826200
-
-Title:
-  RFE: populate "OEM Strings" (type 11) SMBIOS table strings from
-  regular files
-
-Status in QEMU:
-  Confirmed
-
-Bug description:
-  The feature added in
-
-  https://git.qemu.org/?p=3Dqemu.git;a=3Dcommitdiff;h=3D2d6dcbf93fb01b4a7f4=
-5a93d276d4d74b16392dd
-
-  and exposed by libvirt as
-
-    https://libvirt.org/formatdomain.html#elementsSysinfo
-
-  allows the user to specify up to 255 strings in the unofmatted area of
-  the Type 11 SMBIOS table, where each string may be of arbitrary
-  length. This feature is useful for exposing arbitrary text to
-  arbitrary guest components (in particular when strings are prefixed
-  with "application identifiers").
-
-  Right now, strings can only be specified on the QEMU command line,
-  which limits the amount of data that can be passed. Please enable
-  users to pass data from regular files too.
-
-  For example:
-
-    $QEMU -smbios
-  type=3D11,value=3DHello,txtfile=3Dfile1.txt,txtfile=3Dfile2.txt
-
-  where "file1.txt" and "file2.txt" could be text files containing ASCII
-  application prefixes, followed by base64-encoded binary data.
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1826200/+subscriptions
+MjQuMDQuMjAxOSAxMzo1OSwgVGhvbWFzIEh1dGggd3JvdGU6DQo+IE9uIDI0LzA0LzIwMTkgMTIu
+NDgsIERhbmllbCBQLiBCZXJyYW5nw6kgd3JvdGU6DQo+PiBPbiBXZWQsIEFwciAyNCwgMjAxOSBh
+dCAxMjozNzo0NlBNICswMjAwLCBUaG9tYXMgSHV0aCB3cm90ZToNCj4+PiBQZW9wbGUgb2Z0ZW4g
+Zm9yZ2V0IHRvIHJ1biB0aGUgaW90ZXN0cyBiZWZvcmUgc3VibWl0dGluZyBwYXRjaGVzIG9yDQo+
+Pj4gcHVsbCByZXF1ZXN0cyAtIHRoaXMgaXMgbGlrZWx5IGR1ZSB0byB0aGUgZmFjdCB0aGF0IHdl
+IGRvIG5vdCBydW4gdGhlDQo+Pj4gdGVzdHMgZHVyaW5nIG91ciBtYW5kYXRvcnkgIm1ha2UgY2hl
+Y2siIHRlc3RzIHlldC4gTm93IHRoYXQgd2UndmUgZ290DQo+Pj4gYSBuZXcgImNpIiBncm91cCBv
+ZiBpb3Rlc3RzIHRoYXQgc2hvdWxkIGJlIGZpbmUgdG8gcnVuIGluIGV2ZXJ5IGVudmlyb24tDQo+
+Pj4gbWVudCwgaXQgc2hvdWxkIGJlIE9LIHRvIGVuYWJsZSB0aGUgaW90ZXN0cyBkdXJpbmcgIm1h
+a2UgY2hlY2siIGFnYWluLg0KPj4+IFRodXMgd2Ugbm93IHJ1biB0aGUgImNpIiB0ZXN0cyBieSBk
+ZWZhdWx0IGZyb20gdGhlIHFlbXUtaW90ZXN0cy1xdWljay5zaA0KPj4+IHNjcmlwdCwgYW5kIG9u
+bHkgdXNlIHRoZSBmb3JtZXIgInF1aWNrIiBncm91cCAodGhhdCBjb250YWlucyBzb21lIHRlc3Rz
+DQo+Pj4gdGhhdCBhcmUgZmFpbGluZyBpbiBzb21lIGVudmlyb25tZW50cykgd2hlbiB0aGUgdXNl
+ciBkZWNpZGVkIHRvIHJ1bg0KPj4+ICJtYWtlIGNoZWNrIFNQRUVEPXRob3JvdWdoIiBvciBzb21l
+dGhpbmcgc2ltaWxhci4NCj4+Pg0KPj4+IFNpZ25lZC1vZmYtYnk6IFRob21hcyBIdXRoIDx0aHV0
+aEByZWRoYXQuY29tPg0KPj4+IC0tLQ0KPj4+ICAgdGVzdHMvTWFrZWZpbGUuaW5jbHVkZSAgICAg
+IHwgIDIgKy0NCj4+PiAgIHRlc3RzL3FlbXUtaW90ZXN0cy1xdWljay5zaCB8IDE3ICsrKysrKysr
+KysrKysrKystDQo+Pj4gICAyIGZpbGVzIGNoYW5nZWQsIDE3IGluc2VydGlvbnMoKyksIDIgZGVs
+ZXRpb25zKC0pDQo+Pg0KPj4+IGRpZmYgLS1naXQgYS90ZXN0cy9xZW11LWlvdGVzdHMtcXVpY2su
+c2ggYi90ZXN0cy9xZW11LWlvdGVzdHMtcXVpY2suc2gNCj4+PiBpbmRleCAwZTU1NGJiOTcyLi40
+MTZiM2ZjNDhiIDEwMDc1NQ0KPj4+IC0tLSBhL3Rlc3RzL3FlbXUtaW90ZXN0cy1xdWljay5zaA0K
+Pj4+ICsrKyBiL3Rlc3RzL3FlbXUtaW90ZXN0cy1xdWljay5zaA0KPj4NCj4+IHMvLXF1aWNrLy8g
+IHBlcmhhcHMsIHNpbmNlIGl0IG5vIGxvbmdlciBvbmx5IHJ1bnMgdGhlICJxdWljayIgdGVzdHMu
+DQo+Pg0KPj4+IEBAIC0xLDggKzEsMjMgQEANCj4+PiAgICMhL2Jpbi9zaA0KPj4+ICAgDQo+Pj4g
+KyMgSG9ub3IgdGhlIFNQRUVEIGVudmlyb25tZW50IHZhcmlhYmxlLCBqdXN0IGxpa2Ugd2UgZG8g
+aXQgZm9yIHRoZSBxdGVzdHMuDQo+Pj4gKyMgVGhlIGRlZmF1bHQgaXMgdG8gcnVuIGFsbCB0ZXN0
+cyB0aGF0IHN0aWxsIHdvcmsgZmluZSBpbiBhIENJIGVudmlyb25tZW50cywNCj4+PiArIyBidXQg
+aWYgdGhlIHVzZXIgc2V0IFNQRUVEPXNsb3cgb3IgU1BFRUQ9dGhvcm91Z2gsIHdlIGFsc28gcnVu
+IGFsbCBvdGhlcg0KPj4+ICsjIHRlc3RzIHRoYXQgYXJlIHN0aWxsIG1hcmtlZCBhcyAicXVpY2si
+DQo+Pj4gK2lmIFsgIiRTUEVFRCIgPSAic2xvdyIgLW8gIiRTUEVFRCIgPSAidGhvcm91Z2giIF07
+IHRoZW4NCj4+PiArICAgIGdyb3VwPXF1aWNrDQo+Pg0KPj4gV2hlbiB1c2VyIGFza3MgZm9yICJz
+bG93IiB0ZXN0cyB3ZSBydW4gdGhlICJxdWljayIgdGVzdHMsIHdoaWNoDQo+PiBwcmVzdW1hYmx5
+IGltcGxpZXMuLi4NCj4+DQo+Pj4gK2Vsc2UNCj4+PiArICAgIGdyb3VwPWNpDQo+Pg0KPj4gLi4u
+ImNpIiBpcyBxdWlja2VyIHRoYW4gdGhlICJxdWljayIgIHRlc3RzICENCj4+DQo+PiBDb25mdXNl
+ZCA/IFdlIGNlcnRhaW5seSB0cnkgdG8gZW5zdXJlIHRoYXQgeW91IHdpbGwgYmUgOi0pDQo+IA0K
+PiAuLi4gYW5kIHRoZXJlIGlzIGFsc28gdGVzdHMvY2hlY2stYmxvY2suc2ggKHdoaWNoIGlzIG5v
+dCB1c2VkIGJ5ICJtYWtlDQo+IGNoZWNrLWJsb2NrIiwgYnkgdGhlIHdheSwgYnV0IHN0aWxsIHRh
+bGtzIGFib3V0ICJtYWtlIGNoZWNrLWJsb2NrIiksDQo+IHdoaWNoIGlzIGV2ZW4gc2xvd2VyIHRo
+YW4gdGhlICJjaSIgYW5kICJxdWljayIgZ3JvdXAuLi4NCj4gDQo+IEkgZ3Vlc3MgdGhhdCBjb3Vs
+ZCBiZSBjbGVhbmVkIHVwLCB0b28gKHdoeSBkbyB3ZSBuZWVkIHR3byBzY3JpcHRzPykgLi4uDQo+
+IGp1c3Qgbm90IHN1cmUgaG93IHRoZSBmaW5hbCByZXN1bHQgc2hvdWxkIGxvb2sgbGlrZSBhbmQg
+aWYgaXQgc2hvdWxkIGJlDQo+IHBhcnQgb2YgdGhpcyBwYXRjaCBzZXJpZXMgb3IgcmF0aGVyIHNv
+bWV0aGluZyBzZXBhcmF0ZS4gTWF4LCBLZXZpbiwgd2hhdA0KPiBkbyB5b3UgdGhpbms/DQo+IA0K
+PiBNYXliZSB3ZSBzaG91bGQgbWVyZ2UgdGhlIHR3byBzY3JpcHRzLCBhbmQgZGVwZW5kaW5nIG9u
+IHRoZSBTUEVFRA0KPiB2YXJpYWJsZSwgd2UgcnVuOg0KPiANCj4gICBxdWljayA9PiAiY2kiIGdy
+b3VwDQo+ICAgdGhvcm91Z2ggPT4gInF1aWNrIiBncm91cA0KPiAgIHNsb3cgPT4gb2xkIGJlaGF2
+aW91ciBvZiB0aGUgY2hlY2stYmxvY2suc2ggc2NyaXB0DQoNCk1heSBiZSwgaW5zdGVhZCBvZiBT
+UEVFRCwgaW50cm9kdWNlIEdST1VQIHZhcmlhYmxlPyBUbyBtYWtlIGl0IHBsYWluDQpjaSAtPiBj
+aQ0KcXVpY2sgLT4gcXVpY2sNCm5vdGhpbmcgLT4gZGVmYXVsdCBvbGQgYmVoYXZpb3INCj8NCg0K
+PiANCj4gPw0KPiANCj4gICBUaG9tYXMNCj4gDQoNCg0KLS0gDQpCZXN0IHJlZ2FyZHMsDQpWbGFk
+aW1pcg0K
