@@ -2,56 +2,88 @@ Return-Path: <SRS0=3XOk=S2=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-4.0 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 43417C10F11
-	for <qemu-devel@archiver.kernel.org>; Wed, 24 Apr 2019 13:23:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 63B77C10F11
+	for <qemu-devel@archiver.kernel.org>; Wed, 24 Apr 2019 13:26:15 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 100382077C
-	for <qemu-devel@archiver.kernel.org>; Wed, 24 Apr 2019 13:23:52 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 100382077C
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=rt-rk.com
+	by mail.kernel.org (Postfix) with ESMTPS id 2C75B2077C
+	for <qemu-devel@archiver.kernel.org>; Wed, 24 Apr 2019 13:26:15 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="DI8VshD9"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2C75B2077C
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:41404 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:41757 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hJHYw-0005rq-IU
-	for qemu-devel@archiver.kernel.org; Wed, 24 Apr 2019 09:03:46 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:47785)
+	id 1hJHug-0000Ry-Al
+	for qemu-devel@archiver.kernel.org; Wed, 24 Apr 2019 09:26:14 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:52561)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1hJHUo-0002aW-TR
-	for qemu-devel@nongnu.org; Wed, 24 Apr 2019 08:59:32 -0400
+	(envelope-from <alex.bennee@linaro.org>) id 1hJHnP-0002HG-7n
+	for qemu-devel@nongnu.org; Wed, 24 Apr 2019 09:18:44 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1hJHUJ-0000Ua-1B
-	for qemu-devel@nongnu.org; Wed, 24 Apr 2019 08:59:24 -0400
-Received: from mx2.rt-rk.com ([89.216.37.149]:54666 helo=mail.rt-rk.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <aleksandar.markovic@rt-rk.com>)
-	id 1hJHUI-0007X2-R1
-	for qemu-devel@nongnu.org; Wed, 24 Apr 2019 08:58:58 -0400
-Received: from localhost (localhost [127.0.0.1])
-	by mail.rt-rk.com (Postfix) with ESMTP id 00D311A4131;
-	Wed, 24 Apr 2019 14:57:57 +0200 (CEST)
-X-Virus-Scanned: amavisd-new at rt-rk.com
-Received: from rtrkw774-lin.domain.local (rtrkw774-lin.domain.local
-	[10.10.13.43])
-	by mail.rt-rk.com (Postfix) with ESMTPSA id 9C2C71A23E6;
-	Wed, 24 Apr 2019 14:57:56 +0200 (CEST)
-From: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>
+	(envelope-from <alex.bennee@linaro.org>) id 1hJHeQ-0003CH-M1
+	for qemu-devel@nongnu.org; Wed, 24 Apr 2019 09:09:32 -0400
+Received: from mail-wr1-x441.google.com ([2a00:1450:4864:20::441]:36207)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+	id 1hJHeQ-00038a-CK
+	for qemu-devel@nongnu.org; Wed, 24 Apr 2019 09:09:26 -0400
+Received: by mail-wr1-x441.google.com with SMTP id b1so13738412wru.3
+	for <qemu-devel@nongnu.org>; Wed, 24 Apr 2019 06:09:24 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+	h=references:user-agent:from:to:cc:subject:in-reply-to:date
+	:message-id:mime-version:content-transfer-encoding;
+	bh=yHyuOGarEIg48bCWJCsmeHVAQSQgS6q6g1jbjGnvd44=;
+	b=DI8VshD9HdknAAE3muvUSpYU4JaB33OSavrTJ9I+sXCQg0J1moj6UR3vInon1xubzn
+	Lqh+WKtQ5BmGgOQbx7IdrTbhbvI8c/nhmWuJtgPg+/1+S2DFXO2L2hsExiPFnIJtAPmO
+	NJLHHwZ+iN5tNztf89g6OCZi8jqRbJ4YVFrhAOCTq+zs951uoG55hX2Ki3nOEwE7m5Wg
+	jWiGgFcdIhYHqTdFnQ3mpPKH04XPZHeJH6EDWq4J2+CGFgHYIgG6fssK8U87AjJ7FSeH
+	IX5fQjeQvX+UaMr8JVsL4Iltrkt5UwmQkwhdH2h8NULcFoUKzqhJFY4ML3rtR0vpVUBJ
+	Rdbg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=1e100.net; s=20161025;
+	h=x-gm-message-state:references:user-agent:from:to:cc:subject
+	:in-reply-to:date:message-id:mime-version:content-transfer-encoding;
+	bh=yHyuOGarEIg48bCWJCsmeHVAQSQgS6q6g1jbjGnvd44=;
+	b=au6obhVjRqrCFh6JNyAxJz9kXWGUJHVJugPriZ6En71oJ/CUncJarySaJLDGzt4jQ1
+	5esD9H57POP3KqyVF8PGsIdUsyqIO7KwLl2PRraXqoErt4oM+tkXbYVSB785v5kVSNbQ
+	H9RD55S2FrqOclxrwn7buW4coZyFJKOuEmkoNexYi5++TQXiiMXiuFnYfDZW6yp1YeVG
+	F1bga4SgxQ8r2vvagWOMnMmR1MGIVmuZpYbkawP87t6VwxER87pDwYegcLCc16dLJatk
+	tTreNoazRifvM3YlOsP2/TCAqaXeZl9auPf7GxNzJ5BUXNd7Ub2DSqwJUTC6OYlph4iy
+	seHA==
+X-Gm-Message-State: APjAAAVlSP7WSrLM36m8MHiIUk5/JFCuDbYetj1Zsbv4ax/VC3rbLGqR
+	3JHP4lGfG/V3ElR2WpSuHibaMQ==
+X-Google-Smtp-Source: APXvYqxckjk6iZ0JUkzkyCo4GjinSBmkeYAtb5k5JyN9tDXMXqK+7V3UrrtmWcDxbBQp1jmUrkTWEQ==
+X-Received: by 2002:adf:d851:: with SMTP id k17mr2046065wrl.64.1556111363374; 
+	Wed, 24 Apr 2019 06:09:23 -0700 (PDT)
+Received: from zen.linaroharston ([81.128.185.34])
+	by smtp.gmail.com with ESMTPSA id m6sm6112595wro.4.2019.04.24.06.09.22
+	(version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
+	Wed, 24 Apr 2019 06:09:22 -0700 (PDT)
+Received: from zen (localhost [127.0.0.1])
+	by zen.linaroharston (Postfix) with ESMTP id 498811FF87;
+	Wed, 24 Apr 2019 13:09:22 +0000 (UTC)
+References: <20190424124414.17775-1-arilou@gmail.com>
+User-agent: mu4e 1.3.1; emacs 26.1
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
 To: qemu-devel@nongnu.org
-Date: Wed, 24 Apr 2019 14:56:59 +0200
-Message-Id: <1556110623-655-2-git-send-email-aleksandar.markovic@rt-rk.com>
-X-Mailer: git-send-email 2.7.4
-In-Reply-To: <1556110623-655-1-git-send-email-aleksandar.markovic@rt-rk.com>
-References: <1556110623-655-1-git-send-email-aleksandar.markovic@rt-rk.com>
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x
-X-Received-From: 89.216.37.149
-Subject: [Qemu-devel] [PATCH v2 1/5] linux-user: Fix support for the
- SIOCATMARK and SIOCGPGRP ioctls for eXtensa
+In-reply-to: <20190424124414.17775-1-arilou@gmail.com>
+Date: Wed, 24 Apr 2019 13:09:22 +0000
+Message-ID: <87ftq7wnwd.fsf@zen.linaroharston>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+	recognized.
+X-Received-From: 2a00:1450:4864:20::441
+Subject: Re: [Qemu-devel] [PATCH v1] gdbstub: Refactor gdb packets handler
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -63,65 +95,35 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: lvivier@redhat.com, thuth@redhat.com, jcmvbkbc@gmail.com,
-	arikalo@wavecomp.com, daniel.santos@pobox.com,
-	amarkovic@wavecomp.com, philmd@redhat.com, aurelien@aurel32.net
+Cc: Jon Doron <arilou@gmail.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Content-Type: text/plain; charset="UTF-8"
-Message-ID: <20190424125659.B-dP4Ryrw5b8HFeliJoDA9wgBRHd7622oC854jyMgs0@z>
+Message-ID: <20190424130922.c0_q5AGMns6-G3G0-jbaHmyuAkRnqiNVAqGR9X25EGI@z>
 
-From: Aleksandar Markovic <amarkovic@wavecomp.com>
 
-Fix support for the SIOCATMARK and SIOCGPGRP ioctls for eXtensa by
-correcting corresponding macro definition.
+Jon Doron <arilou@gmail.com> writes:
 
-Values for TARGET_SIOCATMARK and TARGET_SIOCGPGRP are determined by
-Linux kernel. Following relevant lines are from kernel source tree:
+> Refactor the command packet handling code to ease the work of
+> adding and extending commands that are currently not implemented.
+>
+> Signed-off-by: Jon Doron <arilou@gmail.com>
+> ---
+>  gdbstub.c | 1577 +++++++++++++++++++++++++++++++++++++----------------
+>  1 file changed, 1092 insertions(+), 485 deletions(-)
 
-arch/ia64/include/uapi/asm/sockios.h:#define SIOCATMARK    0x8905
-arch/mips/include/uapi/asm/sockios.h:#define SIOCATMARK    _IOR('s', 7, int)
-arch/parisc/include/uapi/asm/sockios.h:#define SIOCATMARK  0x8905
-arch/sh/include/uapi/asm/sockios.h:#define SIOCATMARK      _IOR('s', 7, int)
-arch/xtensa/include/uapi/asm/sockios.h:#define SIOCATMARK  _IOR('s', 7, int)
-arch/alpha/include/uapi/asm/sockios.h:#define SIOCATMARK   _IOR('s', 7, int)
-arch/sparc/include/uapi/asm/sockios.h:#define SIOCATMARK   0x8905
-include/uapi/asm-generic/sockios.h:#define SIOCATMARK	   0x8905
+This is worthwhile but the patch is huge compared to recent changes to
+this currently orphaned file. Could you please consider splitting your
+patch up into more discreet parts. I would suggest:
 
-arch/ia64/include/uapi/asm/sockios.h:#define SIOCGPGRP     0x8904
-arch/mips/include/uapi/asm/sockios.h:#define SIOCGPGRP     _IOR('s', 9, pid_t)
-arch/parisc/include/uapi/asm/sockios.h:#define SIOCGPGRP   0x8904
-arch/sh/include/uapi/asm/sockios.h:#define SIOCGPGRP       _IOR('s', 9, pid_t)
-arch/xtensa/include/uapi/asm/sockios.h:#define SIOCGPGRP   _IOR('s', 9, pid_t)
-arch/alpha/include/uapi/asm/sockios.h:#define SIOCGPGRP    _IOR('s', 9, pid_t)
-arch/sparc/include/uapi/asm/sockios.h:#define SIOCGPGRP    0x8904
-include/uapi/asm-generic/sockios.h:#define SIOCGPGRP       0x8904
+  - introduce infrastructure
+  - one patch per converted command
 
-It is visible that eXtensa should have the same definitions as
-alpha, mips and sh4 already do. This patch brings that to the
-accurate state.
+this way when something breaks bisect stands a better chance of locating
+a minimal failing chunk of code.
 
-Signed-off-by: Aleksandar Markovic <amarkovic@wavecomp.com>
----
- linux-user/syscall_defs.h | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
+Out of interest what additional commands are you planning to implement?
 
-diff --git a/linux-user/syscall_defs.h b/linux-user/syscall_defs.h
-index 12c8407..1e86fb9 100644
---- a/linux-user/syscall_defs.h
-+++ b/linux-user/syscall_defs.h
-@@ -736,7 +736,8 @@ struct target_pollfd {
- #define TARGET_KDSETLED        0x4B32	/* set led state [lights, not flags] */
- #define TARGET_KDSIGACCEPT     0x4B4E
- 
--#if defined(TARGET_ALPHA) || defined(TARGET_MIPS) || defined(TARGET_SH4)
-+#if defined(TARGET_ALPHA) || defined(TARGET_MIPS) || defined(TARGET_SH4) ||    \
-+       defined(TARGET_XTENSA)
- #define TARGET_SIOCATMARK      TARGET_IOR('s', 7, int)
- #define TARGET_SIOCGPGRP       TARGET_IOR('s', 9, pid_t)
- #else
--- 
-2.7.4
-
+--
+Alex Benn=C3=A9e
 
