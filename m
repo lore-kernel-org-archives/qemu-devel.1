@@ -2,66 +2,142 @@ Return-Path: <SRS0=3XOk=S2=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.4 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_MUTT autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1519BC10F11
-	for <qemu-devel@archiver.kernel.org>; Wed, 24 Apr 2019 08:38:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 17BBFC10F11
+	for <qemu-devel@archiver.kernel.org>; Wed, 24 Apr 2019 08:42:30 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id CDA5A2148D
-	for <qemu-devel@archiver.kernel.org>; Wed, 24 Apr 2019 08:38:33 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CDA5A2148D
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=intel.com
+	by mail.kernel.org (Postfix) with ESMTPS id CEFA5218D3
+	for <qemu-devel@archiver.kernel.org>; Wed, 24 Apr 2019 08:42:29 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CEFA5218D3
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=de.ibm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:37976 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:38065 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hJDQH-0003yl-3T
-	for qemu-devel@archiver.kernel.org; Wed, 24 Apr 2019 04:38:33 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:33686)
+	id 1hJDU4-00073B-Ka
+	for qemu-devel@archiver.kernel.org; Wed, 24 Apr 2019 04:42:28 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:36553)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <yan.y.zhao@intel.com>) id 1hJDLr-00083L-DM
-	for qemu-devel@nongnu.org; Wed, 24 Apr 2019 04:34:01 -0400
+	(envelope-from <borntraeger@de.ibm.com>) id 1hJDSc-000620-IG
+	for qemu-devel@nongnu.org; Wed, 24 Apr 2019 04:41:01 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <yan.y.zhao@intel.com>) id 1hJD9v-0002HX-Oc
-	for qemu-devel@nongnu.org; Wed, 24 Apr 2019 04:21:41 -0400
-Received: from mga03.intel.com ([134.134.136.65]:11227)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <yan.y.zhao@intel.com>)
-	id 1hJD9v-0002EQ-C0
-	for qemu-devel@nongnu.org; Wed, 24 Apr 2019 04:21:39 -0400
-X-Amp-Result: UNSCANNABLE
-X-Amp-File-Uploaded: False
-Received: from fmsmga008.fm.intel.com ([10.253.24.58])
-	by orsmga103.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384;
-	24 Apr 2019 01:21:35 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.60,389,1549958400"; d="scan'208";a="143171789"
-Received: from joy-optiplex-7040.sh.intel.com (HELO joy-OptiPlex-7040)
-	([10.239.13.9])
-	by fmsmga008.fm.intel.com with ESMTP; 24 Apr 2019 01:21:31 -0700
-Date: Wed, 24 Apr 2019 04:15:58 -0400
-From: Yan Zhao <yan.y.zhao@intel.com>
-To: Cornelia Huck <cohuck@redhat.com>
-Message-ID: <20190424081558.GE26247@joy-OptiPlex-7040>
-References: <20190419083258.19580-1-yan.y.zhao@intel.com>
-	<20190419083505.19654-1-yan.y.zhao@intel.com>
-	<20190423115932.42619422.cohuck@redhat.com>
-	<20190424031036.GB26247@joy-OptiPlex-7040>
-	<20190424095624.0ce97328.cohuck@redhat.com>
+	(envelope-from <borntraeger@de.ibm.com>) id 1hJDSa-0004X8-SH
+	for qemu-devel@nongnu.org; Wed, 24 Apr 2019 04:40:58 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:33142
+	helo=mx0a-001b2d01.pphosted.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <borntraeger@de.ibm.com>)
+	id 1hJDSa-0004U3-Kd
+	for qemu-devel@nongnu.org; Wed, 24 Apr 2019 04:40:56 -0400
+Received: from pps.filterd (m0098420.ppops.net [127.0.0.1])
+	by mx0b-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id
+	x3O8dsjj076823
+	for <qemu-devel@nongnu.org>; Wed, 24 Apr 2019 04:40:54 -0400
+Received: from e06smtp03.uk.ibm.com (e06smtp03.uk.ibm.com [195.75.94.99])
+	by mx0b-001b2d01.pphosted.com with ESMTP id 2s2gpjtp24-1
+	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Wed, 24 Apr 2019 04:40:53 -0400
+Received: from localhost
+	by e06smtp03.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	Only! Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <borntraeger@de.ibm.com>;
+	Wed, 24 Apr 2019 09:40:52 +0100
+Received: from b06cxnps4074.portsmouth.uk.ibm.com (9.149.109.196)
+	by e06smtp03.uk.ibm.com (192.168.101.133) with IBM ESMTP SMTP Gateway:
+	Authorized Use Only! Violators will be prosecuted; 
+	(version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
+	Wed, 24 Apr 2019 09:40:48 +0100
+Received: from d06av25.portsmouth.uk.ibm.com (d06av25.portsmouth.uk.ibm.com
+	[9.149.105.61])
+	by b06cxnps4074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with
+	ESMTP id x3O8elBG52428826
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256
+	verify=OK); Wed, 24 Apr 2019 08:40:47 GMT
+Received: from d06av25.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 3568111C050;
+	Wed, 24 Apr 2019 08:40:47 +0000 (GMT)
+Received: from d06av25.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id CC1A611C04C;
+	Wed, 24 Apr 2019 08:40:46 +0000 (GMT)
+Received: from oc7455500831.ibm.com (unknown [9.152.224.133])
+	by d06av25.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+	Wed, 24 Apr 2019 08:40:46 +0000 (GMT)
+To: David Hildenbrand <david@redhat.com>, Cornelia Huck <cohuck@redhat.com>
+References: <20190418113110.160664-1-borntraeger@de.ibm.com>
+	<d3cdd199-0457-7255-9540-2bbe5555e079@redhat.com>
+From: Christian Borntraeger <borntraeger@de.ibm.com>
+Openpgp: preference=signencrypt
+Autocrypt: addr=borntraeger@de.ibm.com; prefer-encrypt=mutual; keydata=
+	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
+	syiRa+UVlsKmx1hsEg==
+Date: Wed, 24 Apr 2019 10:40:46 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+	Thunderbird/60.6.1
 MIME-Version: 1.0
+In-Reply-To: <d3cdd199-0457-7255-9540-2bbe5555e079@redhat.com>
 Content-Type: text/plain; charset="UTF-8"
-Content-Disposition: inline
-In-Reply-To: <20190424095624.0ce97328.cohuck@redhat.com>
-User-Agent: Mutt/1.9.4 (2018-02-28)
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
-	recognized.
-X-Received-From: 134.134.136.65
-Subject: Re: [Qemu-devel] [PATCH 1/2] vfio/mdev: add version field as
- mandatory attribute for mdev device
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+x-cbid: 19042408-0012-0000-0000-00000312CAC7
+X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
+x-cbparentid: 19042408-0013-0000-0000-0000214B1F15
+Message-Id: <a9e5863e-cb05-11a6-03a8-89ee45febcc9@de.ibm.com>
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:, ,
+	definitions=2019-04-24_06:, , signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+	priorityscore=1501
+	malwarescore=0 suspectscore=0 phishscore=0 bulkscore=0 spamscore=0
+	clxscore=1015 lowpriorityscore=0 mlxscore=0 impostorscore=0
+	mlxlogscore=999 adultscore=0 classifier=spam adjust=0 reason=mlx
+	scancount=1 engine=8.0.1-1810050000 definitions=main-1904240075
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic]
+X-Received-From: 148.163.158.5
+Subject: Re: [Qemu-devel] [PATCH 00/10] s390x: new guest features
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -73,274 +149,126 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Yan Zhao <yan.y.zhao@intel.com>
-Cc: "cjia@nvidia.com" <cjia@nvidia.com>,
-	"kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-	"aik@ozlabs.ru" <aik@ozlabs.ru>,
-	"Zhengxiao.zx@alibaba-inc.com" <Zhengxiao.zx@alibaba-inc.com>,
-	"shuangtai.tst@alibaba-inc.com" <shuangtai.tst@alibaba-inc.com>,
-	"qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
-	"kwankhede@nvidia.com" <kwankhede@nvidia.com>,
-	"eauger@redhat.com" <eauger@redhat.com>, "Liu, Yi L" <yi.l.liu@intel.com>,
-	"eskultet@redhat.com" <eskultet@redhat.com>, "Yang,
-	Ziye" <ziye.yang@intel.com>, "mlevitsk@redhat.com" <mlevitsk@redhat.com>,
-	"pasic@linux.ibm.com" <pasic@linux.ibm.com>,
-	"libvir-list@redhat.com" <libvir-list@redhat.com>,
-	"arei.gonglei@huawei.com" <arei.gonglei@huawei.com>,
-	"felipe@nutanix.com" <felipe@nutanix.com>,
-	"Ken.Xue@amd.com" <Ken.Xue@amd.com>, "Tian, Kevin" <kevin.tian@intel.com>,
-	"dgilbert@redhat.com" <dgilbert@redhat.com>,
-	"zhenyuw@linux.intel.com" <zhenyuw@linux.intel.com>,
-	"alex.williamson@redhat.com" <alex.williamson@redhat.com>,
-	"intel-gvt-dev@lists.freedesktop.org"
-	<intel-gvt-dev@lists.freedesktop.org>, "Liu,
-	Changpeng" <changpeng.liu@intel.com>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	"Wang, Zhi A" <zhi.a.wang@intel.com>,
-	"jonathan.davies@nutanix.com" <jonathan.davies@nutanix.com>, "He,
-	Shaopeng" <shaopeng.he@intel.com>
+Cc: "Jason J . Herne" <jjherne@linux.ibm.com>,
+	Collin Walling <walling@linux.ibm.com>, qemu-devel <qemu-devel@nongnu.org>,
+	Halil Pasic <pasic@linux.ibm.com>, qemu-s390x <qemu-s390x@nongnu.org>,
+	Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190424081558.V0l6AVAzFdhtAmIW9rSJp5L8xMs4as2YEvLmI9htam0@z>
-
-On Wed, Apr 24, 2019 at 03:56:24PM +0800, Cornelia Huck wrote:
-> On Tue, 23 Apr 2019 23:10:37 -0400
-> Yan Zhao <yan.y.zhao@intel.com> wrote:
-> 
-> > On Tue, Apr 23, 2019 at 05:59:32PM +0800, Cornelia Huck wrote:
-> > > On Fri, 19 Apr 2019 04:35:04 -0400
-> > > Yan Zhao <yan.y.zhao@intel.com> wrote:
-> > >   
-> > > > device version attribute in mdev sysfs is used by user space software
-> > > > (e.g. libvirt) to query device compatibility for live migration of VFIO
-> > > > mdev devices. This attribute is mandatory if a mdev device supports live
-> > > > migration.
-> > > >
-> > > > It consists of two parts: common part and vendor proprietary part.
-> > > > common part: 32 bit. lower 16 bits is vendor id and higher 16 bits
-> > > >              identifies device type. e.g., for pci device, it is
-> > > >              "pci vendor id" | (VFIO_DEVICE_FLAGS_PCI << 16).
-> > > > vendor proprietary part: this part is varied in length. vendor driver can
-> > > >              specify any string to identify a device.
-> > > >
-> > > > When reading this attribute, it should show device version string of the
-> > > > device of type <type-id>. If a device does not support live migration, it
-> > > > should return errno.  
-> > > 
-> > > It might make more sense if the driver does not register the attribute
-> > > for the device in that case at all.
-> > >   
-> > yes. what about rephrase like this:
-> > "
-> > When reading this attribute, it should show device version string of the
-> > device of type <type-id>.
-> > If a device does not support live migration, it has two choices:
-> > 1. do not register this version attribute
-> > 2. return -ENODEV on rw this version attribute
-> 
-> "return -ENODEV when accessing the version attribute" ?
-Yeah, this one is better, thanks :)
-
-> > Choice 1 is preferred.
-> > "
-> > 
-> > 
-> > > > When writing a string to this attribute, it returns errno for
-> > > > incompatibility or returns written string length in compatibility case.
-> > > > If a device does not support live migration, it always returns errno.
-> > > >
-> > > > For user space software to use:
-> > > > 1.
-> > > > Before starting live migration, user space software first reads source side
-> > > > mdev device's version. e.g.
-> > > > "#cat \
-> > > > /sys/bus/pci/devices/0000\:00\:02.0/5ac1fb20-2bbf-4842-bb7e-36c58c3be9cd/mdev_type/version"
-> > > > 00028086-193b-i915-GVTg_V5_4
-> > > >
-> > > > 2.
-> > > > Then, user space software writes the source side returned version string
-> > > > to device version attribute in target side, and checks the return value.
-> > > > If a negative errno is returned in the target side, then mdev devices in
-> > > > source and target sides are not compatible;
-> > > > If a positive number is returned and it equals to the length of written
-> > > > string, then the two mdev devices in source and target side are compatible.
-> > > > e.g.
-> > > > (a) compatibility case
-> > > > "# echo 00028086-193b-i915-GVTg_V5_4 >
-> > > > /sys/bus/pci/devices/0000\:00\:02.0/882cc4da-dede-11e7-9180-078a62063ab1/mdev_type/version"
-> > > >
-> > > > (b) incompatibility case
-> > > > "#echo 00028086-193b-i915-GVTg_V5_1 >
-> > > > /sys/bus/pci/devices/0000\:00\:02.0/882cc4da-dede-11e7-9180-078a62063ab1/mdev_type/version"
-> > > > -bash: echo: write error: Invalid argument
-> > > >
-> > > > 3. if two mdev devices are compatible, user space software can start
-> > > > live migration, and vice versa.
-> > > >
-> > > > Note: if a mdev device does not support live migration, it either does
-> > > > not provide a version attribute, or always returns errno when its version
-> > > > attribute is read/written.
-> > > >
-> > > > Cc: Alex Williamson <alex.williamson@redhat.com>
-> > > > Cc: Erik Skultety <eskultet@redhat.com>
-> > > > Cc: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-> > > > Cc: Cornelia Huck <cohuck@redhat.com>
-> > > > Cc: "Tian, Kevin" <kevin.tian@intel.com>
-> > > > Cc: Zhenyu Wang <zhenyuw@linux.intel.com>
-> > > > Cc: "Wang, Zhi A" <zhi.a.wang@intel.com>
-> > > > Cc: Neo Jia <cjia@nvidia.com>
-> > > > Cc: Kirti Wankhede <kwankhede@nvidia.com>
-> > > >
-> > > > Signed-off-by: Yan Zhao <yan.y.zhao@intel.com>
-> > > > ---
-> > > >  Documentation/vfio-mediated-device.txt | 36 ++++++++++++++++++++++++++
-> > > >  samples/vfio-mdev/mbochs.c             | 17 ++++++++++++
-> > > >  samples/vfio-mdev/mdpy.c               | 16 ++++++++++++
-> > > >  samples/vfio-mdev/mtty.c               | 16 ++++++++++++
-> > > >  4 files changed, 85 insertions(+)
-> > > >
-> > > > diff --git a/Documentation/vfio-mediated-device.txt b/Documentation/vfio-mediated-device.txt
-> > > > index c3f69bcaf96e..bc28471c0667 100644
-> > > > --- a/Documentation/vfio-mediated-device.txt
-> > > > +++ b/Documentation/vfio-mediated-device.txt
-> > > > @@ -202,6 +202,7 @@ Directories and files under the sysfs for Each Physical Device
-> > > >    |     |   |--- available_instances
-> > > >    |     |   |--- device_api
-> > > >    |     |   |--- description
-> > > > +  |     |   |--- version
-> > > >    |     |   |--- [devices]
-> > > >    |     |--- [<type-id>]
-> > > >    |     |   |--- create
-> > > > @@ -209,6 +210,7 @@ Directories and files under the sysfs for Each Physical Device
-> > > >    |     |   |--- available_instances
-> > > >    |     |   |--- device_api
-> > > >    |     |   |--- description
-> > > > +  |     |   |--- version
-> > > >    |     |   |--- [devices]
-> > > >    |     |--- [<type-id>]
-> > > >    |          |--- create
-> > > > @@ -216,6 +218,7 @@ Directories and files under the sysfs for Each Physical Device
-> > > >    |          |--- available_instances
-> > > >    |          |--- device_api
-> > > >    |          |--- description
-> > > > +  |          |--- version
-> > > >    |          |--- [devices]
-> > > >
-> > > >  * [mdev_supported_types]
-> > > > @@ -225,6 +228,8 @@ Directories and files under the sysfs for Each Physical Device
-> > > >    [<type-id>], device_api, and available_instances are mandatory attributes
-> > > >    that should be provided by vendor driver.
-> > > >
-> > > > +  version is a mandatory attribute if a mdev device supports live migration.  
-> > > 
-> > > What about "An mdev device wishing to support live migration must
-> > > provide the version attribute."?  
-> > yes, I just want to keep consistent with the line above it 
-> > " [<type-id>], device_api, and available_instances are mandatory attributes
-> >   that should be provided by vendor driver."
-> > what about below one?
-> >   "version is a mandatory attribute if a mdev device wishing to support live
-> >   migration."
-> 
-> My point is that an attribute is not mandatory if it can be left out :)
-> (I'm not a native speaker, though; maybe this makes perfect sense
-> after all?)
-> 
-> Maybe "version is a required attribute if live migration is supported
-> for an mdev device"?
-> 
-you are right, "mandatory" may bring some confusion.
-Maybe
-"vendor driver must provide version attribute for an mdev device wishing to
-support live migration." ?
-based on your first version :)
-
-> > 
-> > 
-> > > > +
-> > > >  * [<type-id>]
-> > > >
-> > > >    The [<type-id>] name is created by adding the device driver string as a prefix
-> > > > @@ -246,6 +251,35 @@ Directories and files under the sysfs for Each Physical Device
-> > > >    This attribute should show the number of devices of type <type-id> that can be
-> > > >    created.
-> > > >
-> > > > +* version
-> > > > +
-> > > > +  This attribute is rw. It is used to check whether two devices are compatible
-> > > > +  for live migration. If this attribute is missing, then the corresponding mdev
-> > > > +  device is regarded as not supporting live migration.
-> > > > +
-> > > > +  It consists of two parts: common part and vendor proprietary part.
-> > > > +  common part: 32 bit. lower 16 bits is vendor id and higher 16 bits identifies
-> > > > +               device type. e.g., for pci device, it is
-> > > > +               "pci vendor id" | (VFIO_DEVICE_FLAGS_PCI << 16).
-> > > > +  vendor proprietary part: this part is varied in length. vendor driver can
-> > > > +               specify any string to identify a device.
-> > > > +
-> > > > +  When reading this attribute, it should show device version string of the device
-> > > > +  of type <type-id>. If a device does not support live migration, it should
-> > > > +  return errno.
-> > > > +  When writing a string to this attribute, it returns errno for incompatibility
-> > > > +  or returns written string length in compatibility case. If a device does not
-> > > > +  support live migration, it always returns errno.  
-> > > 
-> > > I'm not sure whether a device that does not support live migration
-> > > should expose this attribute in the first place. Or is that to cover
-> > > cases where a driver supports live migration only for some of the
-> > > devices it supports?  
-> > yes, driver returning error code is to cover the cases where only part of devices it
-> > supports can be migrated.
-> > 
-> > 
-> > > Also, I'm not sure if a string that has to be parsed is a good idea...
-> > > is this 'version' attribute supposed to convey some human-readable
-> > > information as well? The procedure you describe for compatibility
-> > > checking does the checking within the vendor driver which I would
-> > > expect to have a table/rules for that anyway.  
-> > right. if a vendor driver has the confidence to migrate between devices of
-> > diffent platform or mdev types, it can maintain a compatibility table for that
-> > purpose. That's the reason why we would leave the compatibility check to vendor
-> > driver. vendor driver can freely choose its own complicated way to decide
-> > which device is migratable to which device.
-> 
-> I think there are two scenarios here:
-> - Migrating between different device types, which is unlikely to work,
->   except in special cases.
-> - Migrating between different versions of the same device type, which
->   may work for some drivers/devices (and at least migrating to a newer
->   version looks quite reasonable).
-> 
-> But both should be something that is decided by the individual driver;
-> I hope we don't want to support migration between different drivers :-O
-> 
-> Can we make this a driver-defined format?
->
-yes, this is indeed driver-defined format.
-Actually we define it into two parts: common part and vendor proprietary part.
-common part: 32 bit. lower 16 bits is vendor id and higher 16 bits
-             identifies device type. e.g., for pci device, it is
-             "pci vendor id" | (VFIO_DEVICE_FLAGS_PCI << 16).
-vendor proprietary part: this part is varied in length. vendor driver can
-             specify any string to identify a device.
-
-vendor proprietary part is defined by vendor driver. vendor driver can
-define any format it wishes to use. Also it is its own responsibility to
-ensure backward compatibility if it wants to update format definition in this
-part.
-
-So user space only needs to get source side's version string, and asks
-target side whether the two are compatible. The decision maker is the
-vendor driver:)
+Message-ID: <20190424084046.8FZDmE5DtuEqd8mgn0rVsXuUIsdAlVIpi19wgsz9Di0@z>
 
 
-> > 
-> > > I think you should also specify which errno writing an incompatible id
-> > > is supposed to return (probably best something different than if the
-> > > device does not support live migration at all, if we stick with
-> > > creating the attribute in that case.)  
-> > Agree. I'll define it clearly in next revison.
+
+On 23.04.19 14:11, David Hildenbrand wrote:
+> On 18.04.19 13:31, Christian Borntraeger wrote:
+>> Adding generation 15.
+>>
+>> Some interesting aspects:
+>> - conditional SSKE and bpb are deprecated. This patch set addresses that
+>>   for csske.
+>> - no name yet for gen15, I suggest to use the assigned numbers and
+>>   provide an alias later on. (I have split out this into a separate
+>>   patch)
+>>
+>> Christian Borntraeger (10):
+>>   linux header sync
+>>   s390x/cpumodel: remove CSSKE from base model
+>>   s390x/cpumodel: Miscellaneous-Instruction-Extensions Facility 3
+>>   s390x/cpumodel: msa9 facility
+>>   s390x/cpumodel: vector enhancements
+>>   s390x/cpumodel: enhanced sort facility
+>>   s390x/cpumodel: deflate
+>>   s390x/cpumodel: add gen15 defintions
+>>   s390x/cpumodel: wire up 8561 and 8562 as gen15 machines
+>>   s390x/cpumodel: do not claim csske for expanded models in qmp
+>>
+>>  hw/s390x/s390-virtio-ccw.c      |  6 +++
+>>  linux-headers/asm-s390/kvm.h    |  5 +-
+>>  target/s390x/cpu_features.c     | 54 +++++++++++++++++++
+>>  target/s390x/cpu_features.h     |  3 ++
+>>  target/s390x/cpu_features_def.h | 49 +++++++++++++++++
+>>  target/s390x/cpu_models.c       | 35 ++++++++++++
+>>  target/s390x/cpu_models.h       |  1 +
+>>  target/s390x/gen-features.c     | 94 ++++++++++++++++++++++++++++++++-
+>>  target/s390x/kvm.c              | 18 +++++++
+>>  9 files changed, 263 insertions(+), 2 deletions(-)
+>>
 > 
-> Thanks!
+> I guess to handle deprecation of CSSKE:
+> 
+> 1. Remove it from the base + default model of the gen15, keep it in the
+> max model. This is completely done in target/s390x/gen-features.c.
+> Existing base models are not modified.
+> 
+> 2. Add CSSKE to "ignored_base_feat", so fallback of gen15 to e.g. z14
+> will work. We can backport this to distros/stable.
+
+Yes, I have already implemented that, still doing some testing and polishinh.
+> 
+> 
+> CPU model expansion:
+> 
+> cpu_info_from_model() should already properly be based on the base
+> features. "gen15" vs. "gen15,csske=on" should be automatically generated
+> when expanding.
+> 
+> CPU model baseline:
+> 
+> s390_find_cpu_def() should make sure that CSSKE is basically ignored
+> when determining maximum model, however it will properly be indicated if
+> both models had the feature.
+> 
+> CPU model comparison:
+> 
+> Should work as expected. Availability of CSSKE will be considered when
+> calculating the result.
+> 
+> gen14,csske=on and gen15,csske=off will result in
+> CPU_MODEL_COMPARE_RESULT_INCOMPATIBLE.
+> 
+> gen14,csske=off and gen15,csske=off should result in
+> CPU_MODEL_COMPARE_RESULT_SUBSET
+> 
+> gen14,csske=on and gen15,csske=on should result in
+> CPU_MODEL_COMPARE_RESULT_SUBSET
+> 
+> Forward migration:
+> 
+> Now, the only issue is when csske is actually turned of in future
+> machines. We would e.g. have
+> 
+> gen15,csske=on and gen16,csske=off
+> 
+> While baselining will work correctly (gen15,csske=off), forward
+> migration is broken (comparison will properly indicate
+> CPU_MODEL_COMPARE_RESULT_INCOMPATIBLE), which is expected when ripping
+> out features. Same applies to BPB.
+> 
+> 
+> Your patch "[PATCH 10/10] s390x/cpumodel: do not claim csske for
+> expanded models in qmp" tried to address this, however I am not really
+> happy with this approach. We should not play such tricks when expanding
+> the host model. "-cpu host" and "-cpu $expanded_host" would be
+> different,
+
+We discussed this some time ago and I think we agreed that for host passthrough
+it is ok to be different that host-model (e.g. passing through the cpuid, passing
+through all non-hypervisor managed features etc).
+
+
+> that is really confusing, especially think about baselining
+> or comparing against "host", where your patch does not apply..
+> 
+> 
+> Whenever users would specify "-cpu gen15", everything would be fine in
+> regards to forward migration. Maybe clients really have to be taught
+> about upcoming forward migration issues. "Don't use the host model, make
+> sure bpa and csske are disabled".
+
+
+the thing is, I think the host-model is actually the preferred setting so I
+would like to have this forward-migrateable as well. I will focus on patches
+1-9 first and lets have a side discussion on patch 10.
+
 
