@@ -1,21 +1,20 @@
-Received: from eggs.gnu.org ([209.51.188.92]:39117)
+Received: from eggs.gnu.org ([209.51.188.92]:39092)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <liq3ea@163.com>) id 1hJIfe-0002as-7g
+	(envelope-from <liq3ea@163.com>) id 1hJIfe-0002aR-7L
 	for qemu-devel@nongnu.org; Wed, 24 Apr 2019 10:14:47 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <liq3ea@163.com>) id 1hJIY6-0006jE-2f
+	(envelope-from <liq3ea@163.com>) id 1hJIY5-0006in-E4
 	for qemu-devel@nongnu.org; Wed, 24 Apr 2019 10:06:59 -0400
-Received: from m12-14.163.com ([220.181.12.14]:54282)
+Received: from m12-14.163.com ([220.181.12.14]:54119)
 	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <liq3ea@163.com>) id 1hJIY4-0006fB-19
-	for qemu-devel@nongnu.org; Wed, 24 Apr 2019 10:06:57 -0400
+	(envelope-from <liq3ea@163.com>) id 1hJIY4-0006eU-3r
+	for qemu-devel@nongnu.org; Wed, 24 Apr 2019 10:06:56 -0400
 From: Li Qiang <liq3ea@163.com>
-Date: Wed, 24 Apr 2019 07:06:40 -0700
-Message-Id: <20190424140643.62457-3-liq3ea@163.com>
+Date: Wed, 24 Apr 2019 07:06:39 -0700
+Message-Id: <20190424140643.62457-2-liq3ea@163.com>
 In-Reply-To: <20190424140643.62457-1-liq3ea@163.com>
 References: <20190424140643.62457-1-liq3ea@163.com>
-Subject: [Qemu-devel] [PATCH v2 2/5] tests: fw_cfg: add a function to get
- the fw_cfg file
+Subject: [Qemu-devel] [PATCH v2 1/5] tests: refactor fw_cfg_test
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,90 +26,251 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: philmd@redhat.com, lersek@redhat.com, kraxel@redhat.com, thuth@redhat.com, lvivier@redhat.com, pbonzini@redhat.com
 Cc: qemu-devel@nongnu.org, liq3ea@gmail.com, Li Qiang <liq3ea@163.com>
 
-This is useful to write qtest about fw_cfg file entry.
+Currently, fw_cfg_test uses one QTestState for every test case.
+This will add all command lines for every test case and
+this is unnecessary. This patch split the test cases and for
+every test case it uses his own QTestState. This patch does following
+things:
+
+1. Get rid of the global 'fw_cfg', this need add a uninit function
+
+2. Convert every test case in a separate QTestState
+
+After this patch, we can add fw_cfg test case freely and will not
+have effect on other test cases.
 
 Signed-off-by: Li Qiang <liq3ea@163.com>
 Acked-by: Thomas Huth <thuth@redhat.com>
 ---
- tests/libqos/fw_cfg.c | 45 +++++++++++++++++++++++++++++++++++++++++++
- tests/libqos/fw_cfg.h |  2 ++
- 2 files changed, 47 insertions(+)
+ tests/fw_cfg-test.c   | 86 ++++++++++++++++++++++++++++++++++++++-----
+ tests/libqos/fw_cfg.c | 10 +++++
+ tests/libqos/fw_cfg.h |  7 ++++
+ 3 files changed, 94 insertions(+), 9 deletions(-)
 
-diff --git a/tests/libqos/fw_cfg.c b/tests/libqos/fw_cfg.c
-index c6839c53c8..1f46258f96 100644
---- a/tests/libqos/fw_cfg.c
-+++ b/tests/libqos/fw_cfg.c
-@@ -16,6 +16,7 @@
- #include "libqos/fw_cfg.h"
- #include "libqtest.h"
- #include "qemu/bswap.h"
-+#include "hw/nvram/fw_cfg.h"
+diff --git a/tests/fw_cfg-test.c b/tests/fw_cfg-test.c
+index 1c5103fe1c..c22503619f 100644
+--- a/tests/fw_cfg-test.c
++++ b/tests/fw_cfg-test.c
+@@ -21,62 +21,127 @@ static uint16_t nb_cpus = 1;
+ static uint16_t max_cpus = 1;
+ static uint64_t nb_nodes = 0;
+ static uint16_t boot_menu = 0;
+-static QFWCFG *fw_cfg = NULL;
  
- void qfw_cfg_select(QFWCFG *fw_cfg, uint16_t key)
+ static void test_fw_cfg_signature(void)
  {
-@@ -59,6 +60,50 @@ static void mm_fw_cfg_select(QFWCFG *fw_cfg, uint16_t key)
-     qtest_writew(fw_cfg->qts, fw_cfg->base, key);
++    QFWCFG *fw_cfg;
++    QTestState *s;
+     char buf[5];
+ 
++    s = qtest_init("");
++    fw_cfg = pc_fw_cfg_init(s);
++
+     qfw_cfg_get(fw_cfg, FW_CFG_SIGNATURE, buf, 4);
+     buf[4] = 0;
+ 
+     g_assert_cmpstr(buf, ==, "QEMU");
++    pc_fw_cfg_uninit(fw_cfg);
++    qtest_quit(s);
  }
  
-+/*
-+ * The caller need check the return value. When the return value is
-+ * nonzero, it means that some bytes have been transferred.
-+ *
-+ * If the fw_cfg file in question is smaller than the allocated & passed-in
-+ * buffer, then the buffer has been populated only in part.
-+ *
-+ * If the fw_cfg file in question is larger than the passed-in
-+ * buffer, then the return value explains how much room would have been
-+ * necessary in total. And, while the caller's buffer has been fully
-+ * populated, it has received only a starting slice of the fw_cfg file.
-+ */
-+size_t qfw_cfg_get_file(QFWCFG *fw_cfg, const char *filename,
-+                      void *data, size_t buflen)
-+{
-+    uint32_t count;
-+    uint32_t i;
-+    unsigned char *filesbuf = NULL;
-+    size_t dsize;
-+    FWCfgFile *pdir_entry;
-+    size_t filesize = 0;
+ static void test_fw_cfg_id(void)
+ {
+-    uint32_t id = qfw_cfg_get_u32(fw_cfg, FW_CFG_ID);
++    QFWCFG *fw_cfg;
++    QTestState *s;
++    uint32_t id;
 +
-+    qfw_cfg_get(fw_cfg, FW_CFG_FILE_DIR, &count, sizeof(count));
-+    count = be32_to_cpu(count);
-+    dsize = sizeof(uint32_t) + count * sizeof(struct fw_cfg_file);
-+    filesbuf = g_malloc(dsize);
-+    qfw_cfg_get(fw_cfg, FW_CFG_FILE_DIR, filesbuf, dsize);
-+    pdir_entry = (FWCfgFile *)(filesbuf + sizeof(uint32_t));
-+    for (i = 0; i < count; ++i, ++pdir_entry) {
-+        if (!strcmp(pdir_entry->name, filename)) {
-+            uint32_t len = be32_to_cpu(pdir_entry->size);
-+            uint16_t sel = be16_to_cpu(pdir_entry->select);
-+            filesize = len;
-+            if (len > buflen) {
-+                len = buflen;
-+            }
-+            qfw_cfg_get(fw_cfg, sel, data, len);
-+            break;
-+        }
-+    }
-+    g_free(filesbuf);
-+    return filesize;
++    s = qtest_init("");
++    fw_cfg = pc_fw_cfg_init(s);
++
++    id = qfw_cfg_get_u32(fw_cfg, FW_CFG_ID);
+     g_assert((id == 1) ||
+              (id == 3));
++    pc_fw_cfg_uninit(fw_cfg);
++    qtest_quit(s);
+ }
+ 
+ static void test_fw_cfg_uuid(void)
+ {
++    QFWCFG *fw_cfg;
++    QTestState *s;
++
+     uint8_t buf[16];
+     static const uint8_t uuid[16] = {
+         0x46, 0x00, 0xcb, 0x32, 0x38, 0xec, 0x4b, 0x2f,
+         0x8a, 0xcb, 0x81, 0xc6, 0xea, 0x54, 0xf2, 0xd8,
+     };
+ 
++    s = qtest_init("-uuid 4600cb32-38ec-4b2f-8acb-81c6ea54f2d8");
++    fw_cfg = pc_fw_cfg_init(s);
++
+     qfw_cfg_get(fw_cfg, FW_CFG_UUID, buf, 16);
+     g_assert(memcmp(buf, uuid, sizeof(buf)) == 0);
++
++    pc_fw_cfg_uninit(fw_cfg);
++    qtest_quit(s);
++
+ }
+ 
+ static void test_fw_cfg_ram_size(void)
+ {
++    QFWCFG *fw_cfg;
++    QTestState *s;
++
++    s = qtest_init("");
++    fw_cfg = pc_fw_cfg_init(s);
++
+     g_assert_cmpint(qfw_cfg_get_u64(fw_cfg, FW_CFG_RAM_SIZE), ==, ram_size);
++
++    pc_fw_cfg_uninit(fw_cfg);
++    qtest_quit(s);
+ }
+ 
+ static void test_fw_cfg_nographic(void)
+ {
++    QFWCFG *fw_cfg;
++    QTestState *s;
++
++    s = qtest_init("");
++    fw_cfg = pc_fw_cfg_init(s);
++
+     g_assert_cmpint(qfw_cfg_get_u16(fw_cfg, FW_CFG_NOGRAPHIC), ==, 0);
++
++    pc_fw_cfg_uninit(fw_cfg);
++    qtest_quit(s);
+ }
+ 
+ static void test_fw_cfg_nb_cpus(void)
+ {
++    QFWCFG *fw_cfg;
++    QTestState *s;
++
++    s = qtest_init("");
++    fw_cfg = pc_fw_cfg_init(s);
++
+     g_assert_cmpint(qfw_cfg_get_u16(fw_cfg, FW_CFG_NB_CPUS), ==, nb_cpus);
++
++    pc_fw_cfg_uninit(fw_cfg);
++    qtest_quit(s);
+ }
+ 
+ static void test_fw_cfg_max_cpus(void)
+ {
++    QFWCFG *fw_cfg;
++    QTestState *s;
++
++    s = qtest_init("");
++    fw_cfg = pc_fw_cfg_init(s);
++
+     g_assert_cmpint(qfw_cfg_get_u16(fw_cfg, FW_CFG_MAX_CPUS), ==, max_cpus);
++    pc_fw_cfg_uninit(fw_cfg);
++    qtest_quit(s);
+ }
+ 
+ static void test_fw_cfg_numa(void)
+ {
++    QFWCFG *fw_cfg;
++    QTestState *s;
+     uint64_t *cpu_mask;
+     uint64_t *node_mask;
+ 
++    s = qtest_init("");
++    fw_cfg = pc_fw_cfg_init(s);
++
+     g_assert_cmpint(qfw_cfg_get_u64(fw_cfg, FW_CFG_NUMA), ==, nb_nodes);
+ 
+     cpu_mask = g_new0(uint64_t, max_cpus);
+@@ -92,24 +157,29 @@ static void test_fw_cfg_numa(void)
+ 
+     g_free(node_mask);
+     g_free(cpu_mask);
++    pc_fw_cfg_uninit(fw_cfg);
++    qtest_quit(s);
+ }
+ 
+ static void test_fw_cfg_boot_menu(void)
+ {
++    QFWCFG *fw_cfg;
++    QTestState *s;
++
++    s = qtest_init("");
++    fw_cfg = pc_fw_cfg_init(s);
++
+     g_assert_cmpint(qfw_cfg_get_u16(fw_cfg, FW_CFG_BOOT_MENU), ==, boot_menu);
++    pc_fw_cfg_uninit(fw_cfg);
++    qtest_quit(s);
+ }
+ 
+ int main(int argc, char **argv)
+ {
+-    QTestState *s;
+     int ret;
+ 
+     g_test_init(&argc, &argv, NULL);
+ 
+-    s = qtest_init("-uuid 4600cb32-38ec-4b2f-8acb-81c6ea54f2d8");
+-
+-    fw_cfg = pc_fw_cfg_init(s);
+-
+     qtest_add_func("fw_cfg/signature", test_fw_cfg_signature);
+     qtest_add_func("fw_cfg/id", test_fw_cfg_id);
+     qtest_add_func("fw_cfg/uuid", test_fw_cfg_uuid);
+@@ -128,7 +198,5 @@ int main(int argc, char **argv)
+ 
+     ret = g_test_run();
+ 
+-    qtest_quit(s);
+-
+     return ret;
+ }
+diff --git a/tests/libqos/fw_cfg.c b/tests/libqos/fw_cfg.c
+index d0889d1e22..c6839c53c8 100644
+--- a/tests/libqos/fw_cfg.c
++++ b/tests/libqos/fw_cfg.c
+@@ -81,6 +81,11 @@ QFWCFG *mm_fw_cfg_init(QTestState *qts, uint64_t base)
+     return fw_cfg;
+ }
+ 
++void mm_fw_cfg_uninit(QFWCFG *fw_cfg)
++{
++    g_free(fw_cfg);
 +}
 +
- static void mm_fw_cfg_read(QFWCFG *fw_cfg, void *data, size_t len)
+ static void io_fw_cfg_select(QFWCFG *fw_cfg, uint16_t key)
  {
-     uint8_t *ptr = data;
+     qtest_outw(fw_cfg->qts, fw_cfg->base, key);
+@@ -107,3 +112,8 @@ QFWCFG *io_fw_cfg_init(QTestState *qts, uint16_t base)
+ 
+     return fw_cfg;
+ }
++
++void io_fw_cfg_uninit(QFWCFG *fw_cfg)
++{
++    g_free(fw_cfg);
++}
 diff --git a/tests/libqos/fw_cfg.h b/tests/libqos/fw_cfg.h
-index 60de81e863..13325cc4ff 100644
+index 0353416af0..60de81e863 100644
 --- a/tests/libqos/fw_cfg.h
 +++ b/tests/libqos/fw_cfg.h
-@@ -31,6 +31,8 @@ void qfw_cfg_get(QFWCFG *fw_cfg, uint16_t key, void *data, size_t len);
- uint16_t qfw_cfg_get_u16(QFWCFG *fw_cfg, uint16_t key);
- uint32_t qfw_cfg_get_u32(QFWCFG *fw_cfg, uint16_t key);
+@@ -33,11 +33,18 @@ uint32_t qfw_cfg_get_u32(QFWCFG *fw_cfg, uint16_t key);
  uint64_t qfw_cfg_get_u64(QFWCFG *fw_cfg, uint16_t key);
-+size_t qfw_cfg_get_file(QFWCFG *fw_cfg, const char *filename,
-+                        void *data, size_t buflen);
  
  QFWCFG *mm_fw_cfg_init(QTestState *qts, uint64_t base);
- void mm_fw_cfg_uninit(QFWCFG *fw_cfg);
++void mm_fw_cfg_uninit(QFWCFG *fw_cfg);
+ QFWCFG *io_fw_cfg_init(QTestState *qts, uint16_t base);
++void io_fw_cfg_uninit(QFWCFG *fw_cfg);
+ 
+ static inline QFWCFG *pc_fw_cfg_init(QTestState *qts)
+ {
+     return io_fw_cfg_init(qts, 0x510);
+ }
+ 
++static inline void pc_fw_cfg_uninit(QFWCFG *fw_cfg)
++{
++    io_fw_cfg_uninit(fw_cfg);
++}
++
+ #endif
 -- 
 2.17.1
