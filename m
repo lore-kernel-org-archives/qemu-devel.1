@@ -2,62 +2,109 @@ Return-Path: <SRS0=3XOk=S2=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.7 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
+	SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8E214C10F11
-	for <qemu-devel@archiver.kernel.org>; Wed, 24 Apr 2019 16:11:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D4171C10F11
+	for <qemu-devel@archiver.kernel.org>; Wed, 24 Apr 2019 16:12:16 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4BC8F208E4
-	for <qemu-devel@archiver.kernel.org>; Wed, 24 Apr 2019 16:11:42 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4BC8F208E4
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
+	by mail.kernel.org (Postfix) with ESMTPS id 8AAB4208E4
+	for <qemu-devel@archiver.kernel.org>; Wed, 24 Apr 2019 16:12:16 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=amdcloud.onmicrosoft.com header.i=@amdcloud.onmicrosoft.com header.b="N3BZeE+b"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8AAB4208E4
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=amd.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:44011 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:44013 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hJKUn-0002lB-CG
-	for qemu-devel@archiver.kernel.org; Wed, 24 Apr 2019 12:11:41 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:38626)
+	id 1hJKVL-0003GQ-KK
+	for qemu-devel@archiver.kernel.org; Wed, 24 Apr 2019 12:12:15 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:38661)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1hJKTH-0001wG-UI
-	for qemu-devel@nongnu.org; Wed, 24 Apr 2019 12:10:15 -0400
+	(envelope-from <brijesh.singh@amd.com>) id 1hJKTP-0001wP-NL
+	for qemu-devel@nongnu.org; Wed, 24 Apr 2019 12:10:28 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1hJKTE-0003VK-3y
-	for qemu-devel@nongnu.org; Wed, 24 Apr 2019 12:10:07 -0400
-Received: from 7.mo177.mail-out.ovh.net ([46.105.61.149]:60033)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1hJKTD-0003PE-6b
+	(envelope-from <brijesh.singh@amd.com>) id 1hJKTG-0003YR-1L
+	for qemu-devel@nongnu.org; Wed, 24 Apr 2019 12:10:15 -0400
+Received: from mail-eopbgr780073.outbound.protection.outlook.com
+	([40.107.78.73]:27328
+	helo=NAM03-BY2-obe.outbound.protection.outlook.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <brijesh.singh@amd.com>)
+	id 1hJKTD-0003PD-9e
 	for qemu-devel@nongnu.org; Wed, 24 Apr 2019 12:10:04 -0400
-Received: from player778.ha.ovh.net (unknown [10.109.160.226])
-	by mo177.mail-out.ovh.net (Postfix) with ESMTP id EE905EFEBE
-	for <qemu-devel@nongnu.org>; Wed, 24 Apr 2019 18:09:59 +0200 (CEST)
-Received: from kaod.org (lns-bzn-46-82-253-208-248.adsl.proxad.net
-	[82.253.208.248]) (Authenticated sender: groug@kaod.org)
-	by player778.ha.ovh.net (Postfix) with ESMTPSA id 3E3FD505B33E;
-	Wed, 24 Apr 2019 16:09:53 +0000 (UTC)
-Date: Wed, 24 Apr 2019 18:09:52 +0200
-From: Greg Kurz <groug@kaod.org>
-To: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20190424180952.77f3f7d2@bahia.lan>
-In-Reply-To: <20190424041959.4087-4-david@gibson.dropbear.id.au>
-References: <20190424041959.4087-1-david@gibson.dropbear.id.au>
-	<20190424041959.4087-4-david@gibson.dropbear.id.au>
-X-Mailer: Claws Mail 3.16.0 (GTK+ 2.24.32; x86_64-redhat-linux-gnu)
-MIME-Version: 1.0
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=amdcloud.onmicrosoft.com; s=selector1-amd-com;
+	h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+	bh=dui2qMpD3nJ6b1BVahn6iBrgETSYyXno8AljJD17ha4=;
+	b=N3BZeE+bQZ8c4X3VgIIr2VhQ0mC1fsrRlaE64GezV4d8iKKi9ck83DdMQf9taExCIFvtnwek5Me0AVYlsb/O5zqaPCGziKWPoM+mfOs5aPDp1BX84tZdWPh4FQ6IFd35T0tCnWcayrcCq4Deb+rkusz9E55qq4Cu5OWoZ1rGQq8=
+Received: from DM6PR12MB2682.namprd12.prod.outlook.com (20.176.116.31) by
+	DM6PR12MB2907.namprd12.prod.outlook.com (20.179.71.213) with Microsoft
+	SMTP
+	Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+	15.20.1835.12; Wed, 24 Apr 2019 16:09:58 +0000
+Received: from DM6PR12MB2682.namprd12.prod.outlook.com
+	([fe80::9183:846f:a93e:9a43]) by
+	DM6PR12MB2682.namprd12.prod.outlook.com
+	([fe80::9183:846f:a93e:9a43%5]) with mapi id 15.20.1813.017;
+	Wed, 24 Apr 2019 16:09:58 +0000
+From: "Singh, Brijesh" <brijesh.singh@amd.com>
+To: "kvm@vger.kernel.org" <kvm@vger.kernel.org>
+Thread-Topic: [RFC PATCH v1 00/10] Add AMD SEV guest live migration support
+Thread-Index: AQHU+rgpwai7tJB3uUaULXjJMShjVQ==
+Date: Wed, 24 Apr 2019 16:09:58 +0000
+Message-ID: <20190424160942.13567-1-brijesh.singh@amd.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-clientproxiedby: SN4PR0601CA0019.namprd06.prod.outlook.com
+	(2603:10b6:803:2f::29) To DM6PR12MB2682.namprd12.prod.outlook.com
+	(2603:10b6:5:4a::31)
+authentication-results: spf=none (sender IP is )
+	smtp.mailfrom=brijesh.singh@amd.com; 
+x-ms-exchange-messagesentrepresentingtype: 1
+x-mailer: git-send-email 2.17.1
+x-originating-ip: [165.204.77.1]
+x-ms-publictraffictype: Email
+x-ms-office365-filtering-correlation-id: a232132e-0b1d-4919-222b-08d6c8cf4c35
+x-ms-office365-filtering-ht: Tenant
+x-microsoft-antispam: BCL:0; PCL:0;
+	RULEID:(2390118)(7020095)(4652040)(8989299)(4534185)(4627221)(201703031133081)(201702281549075)(8990200)(5600141)(711020)(4605104)(4618075)(2017052603328)(7193020);
+	SRVR:DM6PR12MB2907; 
+x-ms-traffictypediagnostic: DM6PR12MB2907:
+x-ms-exchange-purlcount: 2
+x-microsoft-antispam-prvs: <DM6PR12MB2907870F4046F203CB030C0BE53C0@DM6PR12MB2907.namprd12.prod.outlook.com>
+x-forefront-prvs: 00179089FD
+x-forefront-antispam-report: SFV:NSPM;
+	SFS:(10009020)(39860400002)(136003)(366004)(396003)(376002)(346002)(189003)(199004)(1730700003)(99286004)(2501003)(73956011)(478600001)(6506007)(14454004)(966005)(6116002)(52116002)(386003)(476003)(25786009)(66946007)(486006)(4326008)(71200400001)(66446008)(66556008)(3846002)(66476007)(64756008)(1076003)(66574012)(71190400001)(186003)(2616005)(5660300002)(2351001)(102836004)(97736004)(26005)(14444005)(86362001)(6512007)(8676002)(66066001)(6306002)(8936002)(68736007)(2906002)(50226002)(256004)(81156014)(305945005)(36756003)(316002)(6436002)(54906003)(7736002)(5640700003)(81166006)(53936002)(6916009)(6486002)(7416002);
+	DIR:OUT; SFP:1101; SCL:1; SRVR:DM6PR12MB2907;
+	H:DM6PR12MB2682.namprd12.prod.outlook.com; FPR:; SPF:None;
+	LANG:en; PTR:InfoNoRecords; MX:1; A:1; 
+received-spf: None (protection.outlook.com: amd.com does not designate
+	permitted sender hosts)
+x-ms-exchange-senderadcheck: 1
+x-microsoft-antispam-message-info: tpAzzmY9nbv5hx+9QFqMOOeF98xVZM/etoQR5Nlj+G5/jKvCiH/+TDZ3N8YtTZAS8CilOgNzWX8zjlbKpzPsSFCR1IROlb6z/zyk2ZIbcU6XpYBDBgZI3sqAKG1dpWvK7m7UGLfDVjC/uQ81cRcH4ryY/iOovc4J5Z8aBbF14jpRUHSMEwb1Sy7TRHXq5WYIq4MtkY+P3SsfG4P5xQmqzCH7yeJKiAAjQgZkxhn4m1pwijPqICQuW0A3FfQfD27zsZXggJ6yPvwd95ibZqjg7Tf+YreIWOiJA0+L8z2lXCDCS05RQ+RGvqBurw4eppHdTKygCPeAVOVv6bqOMUbGyPWkTrA2I7oC71lUYaOGjvFAJB+OOcZzAXqqEz+TRk1hdqAalX/HEq5TdiGSDJQJh5mFfaMiEBeW5t77SpiynBI=
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 7bit
-X-Ovh-Tracer-Id: 9968436300933601766
-X-VR-SPAMSTATE: OK
-X-VR-SPAMSCORE: -100
-X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgeduuddrhedugdefhecutefuodetggdotefrodftvfcurfhrohhfihhlvgemucfqggfjpdevjffgvefmvefgnecuuegrihhlohhuthemucehtddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmd
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 46.105.61.149
-Subject: Re: [Qemu-devel] [PATCH v2 3/3] pcie: Simplify
- pci_adjust_config_limit()
+Content-ID: <E0D8780B4ABB474EAE9EACD7D2C035AF@namprd12.prod.outlook.com>
+Content-Transfer-Encoding: base64
+MIME-Version: 1.0
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: a232132e-0b1d-4919-222b-08d6c8cf4c35
+X-MS-Exchange-CrossTenant-originalarrivaltime: 24 Apr 2019 16:09:58.5242 (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM6PR12MB2907
+X-detected-operating-system: by eggs.gnu.org: Windows 7 or 8 [fuzzy]
+X-Received-From: 40.107.78.73
+Subject: [Qemu-devel] [RFC PATCH v1 00/10] Add AMD SEV guest live migration
+ support
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -69,260 +116,79 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "Michael S. Tsirkin" <mst@redhat.com>, qemu-devel@nongnu.org,
-	Alex Williamson <alex.williamson@redhat.com>,
-	qemu-ppc@nongnu.org, clg@kaod.org
+Cc: "Lendacky, Thomas" <Thomas.Lendacky@amd.com>, "Singh,
+	Brijesh" <brijesh.singh@amd.com>,
+	=?utf-8?B?UmFkaW0gS3LEjW3DocWZ?= <rkrcmar@redhat.com>,
+	Joerg Roedel <joro@8bytes.org>, "x86@kernel.org" <x86@kernel.org>,
+	"qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+	Ingo Molnar <mingo@redhat.com>, "H. Peter Anvin" <hpa@zytor.com>,
+	Paolo Bonzini <pbonzini@redhat.com>, Thomas Gleixner <tglx@linutronix.de>,
+	Borislav Petkov <bp@suse.de>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190424160952.aXImB93LYjFGx_VYlDtTXdhItUvuUB1k4PlXHMtVWto@z>
+Message-ID: <20190424160958.xBrhi5EFrlqOAgn8mCYO1rvRRt2HLU6wURrcjqPnX38@z>
 
-On Wed, 24 Apr 2019 14:19:59 +1000
-David Gibson <david@gibson.dropbear.id.au> wrote:
-
-> Since c2077e2c "pci: Adjust PCI config limit based on bus topology",
-> pci_adjust_config_limit() has been used in the config space read and write
-> paths to only permit access to extended config space on buses which permit
-> it.  Specifically it prevents access on devices below a vanilla-PCI bus via
-> some combination of bridges, even if both the host bridge and the device
-> itself are PCI-E.
-> 
-> It accomplishes this with a somewhat complex call up the chain of bridges
-> to see if any of them prohibit extended config space access.  This is
-> overly complex, since we can always know if the bus will support such
-> access at the point it is constructed.
-> 
-> This patch simplifies the test by using a flag in the PCIBus instance
-> indicating whether extended configuration space is accessible.  It is
-> false for vanilla PCI buses.  For PCI-E buses, it is true for root
-> buses and equal to the parent bus's's capability otherwise.
-> 
-> For the special case of sPAPR's paravirtualized PCI root bus, which
-> acts mostly like vanilla PCI, but does allow extended config space
-> access, we override the default value of the flag from the host bridge
-> code.
-> 
-> This should cause no behavioural change.
-> 
-> Signed-off-by: David Gibson <david@gibson.dropbear.id.au>cd
-> ---
-
-Reviewed-by: Greg Kurz <groug@kaod.org>
-
->  hw/pci/pci.c             | 41 ++++++++++++++++++++++------------------
->  hw/pci/pci_host.c        | 13 +++----------
->  hw/ppc/spapr_pci.c       | 34 ++++++++++-----------------------
->  include/hw/pci/pci.h     |  1 -
->  include/hw/pci/pci_bus.h |  9 ++++++++-
->  5 files changed, 44 insertions(+), 54 deletions(-)
-> 
-> diff --git a/hw/pci/pci.c b/hw/pci/pci.c
-> index ea5941fb22..59ee034331 100644
-> --- a/hw/pci/pci.c
-> +++ b/hw/pci/pci.c
-> @@ -120,6 +120,27 @@ static void pci_bus_realize(BusState *qbus, Error **errp)
->      vmstate_register(NULL, -1, &vmstate_pcibus, bus);
->  }
->  
-> +static void pcie_bus_realize(BusState *qbus, Error **errp)
-> +{
-> +    PCIBus *bus = PCI_BUS(qbus);
-> +
-> +    pci_bus_realize(qbus, errp);
-> +
-> +    /*
-> +     * A PCI-E bus can support extended config space if it's the root
-> +     * bus, or if the bus/bridge above it does as well
-> +     */
-> +    if (pci_bus_is_root(bus)) {
-> +        bus->flags |= PCI_BUS_EXTENDED_CONFIG_SPACE;
-> +    } else {
-> +        PCIBus *parent_bus = pci_get_bus(bus->parent_dev);
-> +
-> +        if (pci_bus_allows_extended_config_space(parent_bus)) {
-> +            bus->flags |= PCI_BUS_EXTENDED_CONFIG_SPACE;
-> +        }
-> +    }
-> +}
-> +
->  static void pci_bus_unrealize(BusState *qbus, Error **errp)
->  {
->      PCIBus *bus = PCI_BUS(qbus);
-> @@ -142,11 +163,6 @@ static uint16_t pcibus_numa_node(PCIBus *bus)
->      return NUMA_NODE_UNASSIGNED;
->  }
->  
-> -static bool pcibus_allows_extended_config_space(PCIBus *bus)
-> -{
-> -    return false;
-> -}
-> -
->  static void pci_bus_class_init(ObjectClass *klass, void *data)
->  {
->      BusClass *k = BUS_CLASS(klass);
-> @@ -161,7 +177,6 @@ static void pci_bus_class_init(ObjectClass *klass, void *data)
->  
->      pbc->bus_num = pcibus_num;
->      pbc->numa_node = pcibus_numa_node;
-> -    pbc->allows_extended_config_space = pcibus_allows_extended_config_space;
->  }
->  
->  static const TypeInfo pci_bus_info = {
-> @@ -182,16 +197,11 @@ static const TypeInfo conventional_pci_interface_info = {
->      .parent        = TYPE_INTERFACE,
->  };
->  
-> -static bool pciebus_allows_extended_config_space(PCIBus *bus)
-> -{
-> -    return true;
-> -}
-> -
->  static void pcie_bus_class_init(ObjectClass *klass, void *data)
->  {
-> -    PCIBusClass *pbc = PCI_BUS_CLASS(klass);
-> +    BusClass *k = BUS_CLASS(klass);
->  
-> -    pbc->allows_extended_config_space = pciebus_allows_extended_config_space;
-> +    k->realize = pcie_bus_realize;
->  }
->  
->  static const TypeInfo pcie_bus_info = {
-> @@ -410,11 +420,6 @@ bool pci_bus_is_express(PCIBus *bus)
->      return object_dynamic_cast(OBJECT(bus), TYPE_PCIE_BUS);
->  }
->  
-> -bool pci_bus_allows_extended_config_space(PCIBus *bus)
-> -{
-> -    return PCI_BUS_GET_CLASS(bus)->allows_extended_config_space(bus);
-> -}
-> -
->  void pci_root_bus_new_inplace(PCIBus *bus, size_t bus_size, DeviceState *parent,
->                                const char *name,
->                                MemoryRegion *address_space_mem,
-> diff --git a/hw/pci/pci_host.c b/hw/pci/pci_host.c
-> index 9d64b2e12f..5f3497256c 100644
-> --- a/hw/pci/pci_host.c
-> +++ b/hw/pci/pci_host.c
-> @@ -53,16 +53,9 @@ static inline PCIDevice *pci_dev_find_by_addr(PCIBus *bus, uint32_t addr)
->  
->  static void pci_adjust_config_limit(PCIBus *bus, uint32_t *limit)
->  {
-> -    if (*limit > PCI_CONFIG_SPACE_SIZE) {
-> -        if (!pci_bus_allows_extended_config_space(bus)) {
-> -            *limit = PCI_CONFIG_SPACE_SIZE;
-> -            return;
-> -        }
-> -
-> -        if (!pci_bus_is_root(bus)) {
-> -            PCIDevice *bridge = pci_bridge_get_device(bus);
-> -            pci_adjust_config_limit(pci_get_bus(bridge), limit);
-> -        }
-> +    if ((*limit > PCI_CONFIG_SPACE_SIZE) &&
-> +        !pci_bus_allows_extended_config_space(bus)) {
-> +        *limit = PCI_CONFIG_SPACE_SIZE;
->      }
->  }
->  
-> diff --git a/hw/ppc/spapr_pci.c b/hw/ppc/spapr_pci.c
-> index f62e6833b8..65a86be29c 100644
-> --- a/hw/ppc/spapr_pci.c
-> +++ b/hw/ppc/spapr_pci.c
-> @@ -1638,28 +1638,6 @@ static void spapr_phb_unrealize(DeviceState *dev, Error **errp)
->      memory_region_del_subregion(get_system_memory(), &sphb->mem32window);
->  }
->  
-> -static bool spapr_phb_allows_extended_config_space(PCIBus *bus)
-> -{
-> -    SpaprPhbState *sphb = SPAPR_PCI_HOST_BRIDGE(BUS(bus)->parent);
-> -
-> -    return sphb->pcie_ecs;
-> -}
-> -
-> -static void spapr_phb_root_bus_class_init(ObjectClass *klass, void *data)
-> -{
-> -    PCIBusClass *pbc = PCI_BUS_CLASS(klass);
-> -
-> -    pbc->allows_extended_config_space = spapr_phb_allows_extended_config_space;
-> -}
-> -
-> -#define TYPE_SPAPR_PHB_ROOT_BUS "pci"
-> -
-> -static const TypeInfo spapr_phb_root_bus_info = {
-> -    .name = TYPE_SPAPR_PHB_ROOT_BUS,
-> -    .parent = TYPE_PCI_BUS,
-> -    .class_init = spapr_phb_root_bus_class_init,
-> -};
-> -
->  static void spapr_phb_realize(DeviceState *dev, Error **errp)
->  {
->      /* We don't use SPAPR_MACHINE() in order to exit gracefully if the user
-> @@ -1765,7 +1743,16 @@ static void spapr_phb_realize(DeviceState *dev, Error **errp)
->                                  pci_spapr_set_irq, pci_spapr_map_irq, sphb,
->                                  &sphb->memspace, &sphb->iospace,
->                                  PCI_DEVFN(0, 0), PCI_NUM_PINS,
-> -                                TYPE_SPAPR_PHB_ROOT_BUS);
-> +                                TYPE_PCI_BUS);
-> +
-> +    /*
-> +     * Despite resembling a vanilla PCI bus in most ways, the PAPR
-> +     * para-virtualized PCI bus *does* permit PCI-E extended config
-> +     * space access
-> +     */
-> +    if (sphb->pcie_ecs) {
-> +        bus->flags |= PCI_BUS_EXTENDED_CONFIG_SPACE;
-> +    }
->      phb->bus = bus;
->      qbus_set_hotplug_handler(BUS(phb->bus), OBJECT(sphb), NULL);
->  
-> @@ -2348,7 +2335,6 @@ void spapr_pci_rtas_init(void)
->  static void spapr_pci_register_types(void)
->  {
->      type_register_static(&spapr_phb_info);
-> -    type_register_static(&spapr_phb_root_bus_info);
->  }
->  
->  type_init(spapr_pci_register_types)
-> diff --git a/include/hw/pci/pci.h b/include/hw/pci/pci.h
-> index 33ccce320c..0edfaabbb0 100644
-> --- a/include/hw/pci/pci.h
-> +++ b/include/hw/pci/pci.h
-> @@ -395,7 +395,6 @@ typedef PCIINTxRoute (*pci_route_irq_fn)(void *opaque, int pin);
->  #define TYPE_PCIE_BUS "PCIE"
->  
->  bool pci_bus_is_express(PCIBus *bus);
-> -bool pci_bus_allows_extended_config_space(PCIBus *bus);
->  
->  void pci_root_bus_new_inplace(PCIBus *bus, size_t bus_size, DeviceState *parent,
->                                const char *name,
-> diff --git a/include/hw/pci/pci_bus.h b/include/hw/pci/pci_bus.h
-> index aea98d5040..2d5f74b7c1 100644
-> --- a/include/hw/pci/pci_bus.h
-> +++ b/include/hw/pci/pci_bus.h
-> @@ -17,12 +17,13 @@ typedef struct PCIBusClass {
->  
->      int (*bus_num)(PCIBus *bus);
->      uint16_t (*numa_node)(PCIBus *bus);
-> -    bool (*allows_extended_config_space)(PCIBus *bus);
->  } PCIBusClass;
->  
->  enum PCIBusFlags {
->      /* This bus is the root of a PCI domain */
->      PCI_BUS_IS_ROOT                                         = 0x0001,
-> +    /* PCIe extended configuration space is accessible on this bus */
-> +    PCI_BUS_EXTENDED_CONFIG_SPACE                           = 0x0002,
->  };
->  
->  struct PCIBus {
-> @@ -57,4 +58,10 @@ static inline bool pci_bus_is_root(PCIBus *bus)
->      return !!(bus->flags & PCI_BUS_IS_ROOT);
->  }
->  
-> +static inline bool pci_bus_allows_extended_config_space(PCIBus *bus)
-> +{
-> +    return !!(bus->flags & PCI_BUS_EXTENDED_CONFIG_SPACE);
-> +}
-> +
-> +
->  #endif /* QEMU_PCI_BUS_H */
-
+VGhlIHNlcmllcyBhZGQgc3VwcG9ydCBmb3IgQU1EIFNFViBndWVzdCBsaXZlIG1pZ3JhdGlvbiBj
+b21tYW5kcy4gVG8gcHJvdGVjdCB0aGUNCmNvbmZpZGVudGlhbGl0eSBvZiBhbiBTRVYgcHJvdGVj
+dGVkIGd1ZXN0IG1lbW9yeSB3aGlsZSBpbiB0cmFuc2l0IHdlIG5lZWQgdG8NCnVzZSB0aGUgU0VW
+IGNvbW1hbmRzIGRlZmluZWQgaW4gU0VWIEFQSSBzcGVjIFsxXS4NCg0KU0VWIGd1ZXN0IFZNcyBo
+YXZlIHRoZSBjb25jZXB0IG9mIHByaXZhdGUgYW5kIHNoYXJlZCBtZW1vcnkuIFByaXZhdGUgbWVt
+b3J5DQppcyBlbmNyeXB0ZWQgd2l0aCB0aGUgZ3Vlc3Qtc3BlY2lmaWMga2V5LCB3aGlsZSBzaGFy
+ZWQgbWVtb3J5IG1heSBiZSBlbmNyeXB0ZWQNCndpdGggaHlwZXJ2aXNvciBrZXkuIFRoZSBjb21t
+YW5kcyBwcm92aWRlZCBieSB0aGUgU0VWIEZXIGFyZSBtZWFudCB0byBiZSB1c2VkDQpmb3IgdGhl
+IHByaXZhdGUgbWVtb3J5IG9ubHkuIFRoZSBwYXRjaCBzZXJpZXMgaW50cm9kdWNlcyBhIG5ldyBo
+eXBlcmNhbGwuDQpUaGUgZ3Vlc3QgT1MgY2FuIHVzZSB0aGlzIGh5cGVyY2FsbCB0byBub3RpZnkg
+dGhlIHBhZ2UgZW5jcnlwdGlvbiBzdGF0dXMuDQpJZiB0aGUgcGFnZSBpcyBlbmNyeXB0ZWQgd2l0
+aCBndWVzdCBzcGVjaWZpYy1rZXkgdGhlbiB3ZSB1c2UgU0VWIGNvbW1hbmQgZHVyaW5nDQp0aGUg
+bWlncmF0aW9uLiBJZiBwYWdlIGlzIG5vdCBlbmNyeXB0ZWQgdGhlbiBmYWxsYmFjayB0byBkZWZh
+dWx0Lg0KDQpUaGUgcGF0Y2ggYWRkcyBhIG5ldyBpb2N0bCBLVk1fR0VUX1BBR0VfRU5DX0JJVE1B
+UC4gVGhlIGlvY3RsIGNhbiBiZSB1c2VkDQpieSB0aGUgcWVtdSB0byBnZXQgdGhlIHBhZ2UgZW5j
+cnlwdGVkIGJpdG1hcC4gUWVtdSBjYW4gY29uc3VsdCB0aGlzIGJpdG1hcA0KZHVyaW5nIHRoZSBt
+aWdyYXRpb24gdG8ga25vdyB3aGV0aGVyIHRoZSBwYWdlIGlzIGVuY3J5cHRlZC4NCg0KWzFdIGh0
+dHBzOi8vZGV2ZWxvcGVyLmFtZC5jb20vd3AtY29udGVudC9yZXNvdXJjZXMvNTU3NjYuUERGDQoN
+ClRoZSBzZXJpZXMgaXMgdGVzdGVkIHdpdGggdGhlIFFlbXUsIEkgYW0gaW4gcHJvY2VzcyBvZiBj
+bGVhbmluZw0KdXAgdGhlIFFlbXUgY29kZSBhbmQgd2lsbCBzdWJtaXQgc29vbi4NCg0KV2hpbGUg
+aW1wbGVtZW50aW5nIHRoZSBtaWdyYXRpb24gSSBzdHVtYmxlZCBvbiB0aGUgZm9sbG93IHF1ZXN0
+aW9uOg0KDQotIFNpbmNlIHRoZXJlIGlzIGEgZ3Vlc3QgT1MgY2hhbmdlcyByZXF1aXJlZCB0byBz
+dXBwb3J0IHRoZSBtaWdyYXRpb24sDQogIHNvIGhvdyBkbyB3ZSBrbm93IHdoZXRoZXIgZ3Vlc3Qg
+T1MgaXMgdXBkYXRlZD8gU2hvdWxkIHdlIGV4dGVuZCBLVk0NCiAgY2FwYWJpbGl0aWVzL2ZlYXR1
+cmUgYml0cyB0byBjaGVjayB0aGlzPw0KDQpUT0RPOg0KIC0gYWRkIGFuIGlvY3RsIHRvIGJ1aWxk
+IGVuY3J5cHRpb24gYml0bWFwLiBUaGUgZW5jcnlwdGlvbiBiaXRtYXAgaXMgYnVpbHQgZHVyaW5n
+DQogICB0aGUgZ3Vlc3QgYm9vdHVwL2V4ZWN1dGlvbi4gV2Ugc2hvdWxkIHByb3ZpZGUgYW4gaW9j
+dGwgc28gdGhhdCBkZXN0aW5hdGlvbg0KICAgY2FuIGJ1aWxkIHRoZSBiaXRtYXAgYXMgaXQgcmVj
+ZWl2ZXMgdGhlIHBhZ2VzLiANCiAtIHJlc2V0IHRoZSBiaXRtYXAgb24gZ3Vlc3QgcmVib290Lg0K
+DQpUaGUgY29tcGxldGUgdHJlZSB3aXRoIHBhdGNoIGlzIGF2YWlsYWJsZSBhdDoNCmh0dHBzOi8v
+Z2l0aHViLmNvbS9jb2RvbWFuaWEva3ZtL3RyZWUvc2V2LW1pZ3JhdGlvbi1yZmMtdjENCg0KQ2M6
+IFRob21hcyBHbGVpeG5lciA8dGdseEBsaW51dHJvbml4LmRlPg0KQ2M6IEluZ28gTW9sbmFyIDxt
+aW5nb0ByZWRoYXQuY29tPg0KQ2M6ICJILiBQZXRlciBBbnZpbiIgPGhwYUB6eXRvci5jb20+DQpD
+YzogUGFvbG8gQm9uemluaSA8cGJvbnppbmlAcmVkaGF0LmNvbT4NCkNjOiAiUmFkaW0gS3LEjW3D
+ocWZIiA8cmtyY21hckByZWRoYXQuY29tPg0KQ2M6IEpvZXJnIFJvZWRlbCA8am9yb0A4Ynl0ZXMu
+b3JnPg0KQ2M6IEJvcmlzbGF2IFBldGtvdiA8YnBAc3VzZS5kZT4NCkNjOiBUb20gTGVuZGFja3kg
+PHRob21hcy5sZW5kYWNreUBhbWQuY29tPg0KQ2M6IHg4NkBrZXJuZWwub3JnDQpDYzoga3ZtQHZn
+ZXIua2VybmVsLm9yZw0KQ2M6IGxpbnV4LWtlcm5lbEB2Z2VyLmtlcm5lbC5vcmcNCg0KQnJpamVz
+aCBTaW5naCAoMTApOg0KICBLVk06IFNWTTogQWRkIEtWTV9TRVYgU0VORF9TVEFSVCBjb21tYW5k
+DQogIEtWTTogU1ZNOiBBZGQgS1ZNX1NFTkRfVVBEQVRFX0RBVEEgY29tbWFuZA0KICBLVk06IFNW
+TTogQWRkIEtWTV9TRVZfU0VORF9GSU5JU0ggY29tbWFuZA0KICBLVk06IFNWTTogQWRkIHN1cHBv
+cnQgZm9yIEtWTV9TRVZfUkVDRUlWRV9TVEFSVCBjb21tYW5kDQogIEtWTTogU1ZNOiBBZGQgS1ZN
+X1NFVl9SRUNFSVZFX1VQREFURV9EQVRBIGNvbW1hbmQNCiAgS1ZNOiBTVk06IEFkZCBLVk1fU0VW
+X1JFQ0VJVkVfRklOSVNIIGNvbW1hbmQNCiAgS1ZNOiB4ODY6IEFkZCBBTUQgU0VWIHNwZWNpZmlj
+IEh5cGVyY2FsbDMNCiAgS1ZNOiBYODY6IEludHJvZHVjZSBLVk1fSENfUEFHRV9FTkNfU1RBVFVT
+IGh5cGVyY2FsbA0KICBLVk06IHg4NjogSW50cm9kdWNlIEtWTV9HRVRfUEFHRV9FTkNfQklUTUFQ
+IGlvY3RsDQogIG1tOiB4ODY6IEludm9rZSBoeXBlcmNhbGwgd2hlbiBwYWdlIGVuY3J5cHRpb24g
+c3RhdHVzIGlzIGNoYW5nZWQNCg0KIC4uLi92aXJ0dWFsL2t2bS9hbWQtbWVtb3J5LWVuY3J5cHRp
+b24ucnN0ICAgICB8IDExNiArKysrDQogRG9jdW1lbnRhdGlvbi92aXJ0dWFsL2t2bS9oeXBlcmNh
+bGxzLnR4dCAgICAgIHwgIDE0ICsNCiBhcmNoL3g4Ni9pbmNsdWRlL2FzbS9rdm1faG9zdC5oICAg
+ICAgICAgICAgICAgfCAgIDMgKw0KIGFyY2gveDg2L2luY2x1ZGUvYXNtL2t2bV9wYXJhLmggICAg
+ICAgICAgICAgICB8ICAxMiArDQogYXJjaC94ODYvaW5jbHVkZS9hc20vbWVtX2VuY3J5cHQuaCAg
+ICAgICAgICAgIHwgICAzICsNCiBhcmNoL3g4Ni9rdm0vc3ZtLmMgICAgICAgICAgICAgICAgICAg
+ICAgICAgICAgfCA1NjAgKysrKysrKysrKysrKysrKystDQogYXJjaC94ODYva3ZtL3ZteC92bXgu
+YyAgICAgICAgICAgICAgICAgICAgICAgIHwgICAxICsNCiBhcmNoL3g4Ni9rdm0veDg2LmMgICAg
+ICAgICAgICAgICAgICAgICAgICAgICAgfCAgMTcgKw0KIGFyY2gveDg2L21tL21lbV9lbmNyeXB0
+LmMgICAgICAgICAgICAgICAgICAgICB8ICA0NSArLQ0KIGFyY2gveDg2L21tL3BhZ2VhdHRyLmMg
+ICAgICAgICAgICAgICAgICAgICAgICB8ICAxNSArDQogaW5jbHVkZS91YXBpL2xpbnV4L2t2bS5o
+ICAgICAgICAgICAgICAgICAgICAgIHwgIDUxICsrDQogaW5jbHVkZS91YXBpL2xpbnV4L2t2bV9w
+YXJhLmggICAgICAgICAgICAgICAgIHwgICAxICsNCiAxMiBmaWxlcyBjaGFuZ2VkLCA4MzQgaW5z
+ZXJ0aW9ucygrKSwgNCBkZWxldGlvbnMoLSkNCg0KLS0gDQoyLjE3LjENCg0K
 
