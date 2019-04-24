@@ -1,24 +1,23 @@
-Received: from eggs.gnu.org ([209.51.188.92]:48794)
+Received: from eggs.gnu.org ([209.51.188.92]:56247)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1hJNEe-0001jV-Ho
-	for qemu-devel@nongnu.org; Wed, 24 Apr 2019 15:07:14 -0400
+	(envelope-from <arilou@gmail.com>) id 1hJNjm-0003ao-7g
+	for qemu-devel@nongnu.org; Wed, 24 Apr 2019 15:39:23 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1hJNEc-0001kE-RN
-	for qemu-devel@nongnu.org; Wed, 24 Apr 2019 15:07:12 -0400
-Received: from mail-pg1-x542.google.com ([2607:f8b0:4864:20::542]:46242)
+	(envelope-from <arilou@gmail.com>) id 1hJNji-0003eO-JW
+	for qemu-devel@nongnu.org; Wed, 24 Apr 2019 15:39:20 -0400
+Received: from mail-wr1-x444.google.com ([2a00:1450:4864:20::444]:44366)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1hJNEc-0001im-KI
-	for qemu-devel@nongnu.org; Wed, 24 Apr 2019 15:07:10 -0400
-Received: by mail-pg1-x542.google.com with SMTP id n2so707132pgg.13
-	for <qemu-devel@nongnu.org>; Wed, 24 Apr 2019 12:07:10 -0700 (PDT)
-From: Richard Henderson <richard.henderson@linaro.org>
-Date: Wed, 24 Apr 2019 12:07:05 -0700
-Message-Id: <20190424190705.12392-2-richard.henderson@linaro.org>
-In-Reply-To: <20190424190705.12392-1-richard.henderson@linaro.org>
-References: <20190424190705.12392-1-richard.henderson@linaro.org>
-Subject: [Qemu-devel] [PATCH v2 1/1] util/path: Do not cache all filenames
- at startup
+	(Exim 4.71) (envelope-from <arilou@gmail.com>) id 1hJNji-0003da-7r
+	for qemu-devel@nongnu.org; Wed, 24 Apr 2019 15:39:18 -0400
+Received: by mail-wr1-x444.google.com with SMTP id c5so17891224wrs.11
+	for <qemu-devel@nongnu.org>; Wed, 24 Apr 2019 12:39:18 -0700 (PDT)
+From: Jon Doron <arilou@gmail.com>
+Date: Wed, 24 Apr 2019 22:38:39 +0300
+Message-Id: <20190424193859.31817-1-arilou@gmail.com>
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+Subject: [Qemu-devel] [PATCH v5 01/21] gdbstub: Add infrastructure to parse
+ cmd packets
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,244 +27,223 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: berrange@redhat.com, philmd@redhat.com, laurent@vivier.eu
+Cc: Jon Doron <arilou@gmail.com>
 
-If one uses -L $PATH to point to a full chroot, the startup time
-is significant.  In addition, the existing probing algorithm fails
-to handle symlink loops.
-
-Instead, probe individual paths on demand.  Cache both positive
-and negative results within $PATH, so that any one filename is
-probed only once.
-
-Use glib filename functions for clarity.
-
-Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+Signed-off-by: Jon Doron <arilou@gmail.com>
 ---
- util/path.c | 201 ++++++++++++----------------------------------------
- 1 file changed, 47 insertions(+), 154 deletions(-)
+ gdbstub.c | 200 ++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 200 insertions(+)
 
-diff --git a/util/path.c b/util/path.c
-index 7f9fc272fb..8e174eb436 100644
---- a/util/path.c
-+++ b/util/path.c
-@@ -8,170 +8,63 @@
- #include <dirent.h>
- #include "qemu/cutils.h"
- #include "qemu/path.h"
-+#include "qemu/thread.h"
- 
--struct pathelem
--{
--    /* Name of this, eg. lib */
--    char *name;
--    /* Full path name, eg. /usr/gnemul/x86-linux/lib. */
--    char *pathname;
--    struct pathelem *parent;
--    /* Children */
--    unsigned int num_entries;
--    struct pathelem *entries[0];
--};
--
--static struct pathelem *base;
--
--/* First N chars of S1 match S2, and S2 is N chars long. */
--static int strneq(const char *s1, unsigned int n, const char *s2)
--{
--    unsigned int i;
--
--    for (i = 0; i < n; i++)
--        if (s1[i] != s2[i])
--            return 0;
--    return s2[i] == 0;
--}
--
--static struct pathelem *add_entry(struct pathelem *root, const char *name,
--                                  unsigned type);
--
--static struct pathelem *new_entry(const char *root,
--                                  struct pathelem *parent,
--                                  const char *name)
--{
--    struct pathelem *new = g_malloc(sizeof(*new));
--    new->name = g_strdup(name);
--    new->pathname = g_strdup_printf("%s/%s", root, name);
--    new->num_entries = 0;
--    return new;
--}
--
--#define streq(a,b) (strcmp((a), (b)) == 0)
--
--/* Not all systems provide this feature */
--#if defined(DT_DIR) && defined(DT_UNKNOWN) && defined(DT_LNK)
--# define dirent_type(dirent) ((dirent)->d_type)
--# define is_dir_maybe(type) \
--    ((type) == DT_DIR || (type) == DT_UNKNOWN || (type) == DT_LNK)
--#else
--# define dirent_type(dirent) (1)
--# define is_dir_maybe(type)  (type)
--#endif
--
--static struct pathelem *add_dir_maybe(struct pathelem *path)
--{
--    DIR *dir;
--
--    if ((dir = opendir(path->pathname)) != NULL) {
--        struct dirent *dirent;
--
--        while ((dirent = readdir(dir)) != NULL) {
--            if (!streq(dirent->d_name,".") && !streq(dirent->d_name,"..")){
--                path = add_entry(path, dirent->d_name, dirent_type(dirent));
--            }
--        }
--        closedir(dir);
--    }
--    return path;
--}
--
--static struct pathelem *add_entry(struct pathelem *root, const char *name,
--                                  unsigned type)
--{
--    struct pathelem **e;
--
--    root->num_entries++;
--
--    root = g_realloc(root, sizeof(*root)
--                   + sizeof(root->entries[0])*root->num_entries);
--    e = &root->entries[root->num_entries-1];
--
--    *e = new_entry(root->pathname, root, name);
--    if (is_dir_maybe(type)) {
--        *e = add_dir_maybe(*e);
--    }
--
--    return root;
--}
--
--/* This needs to be done after tree is stabilized (ie. no more reallocs!). */
--static void set_parents(struct pathelem *child, struct pathelem *parent)
--{
--    unsigned int i;
--
--    child->parent = parent;
--    for (i = 0; i < child->num_entries; i++)
--        set_parents(child->entries[i], child);
--}
--
--/* FIXME: Doesn't handle DIR/.. where DIR is not in emulated dir. */
--static const char *
--follow_path(const struct pathelem *cursor, const char *name)
--{
--    unsigned int i, namelen;
--
--    name += strspn(name, "/");
--    namelen = strcspn(name, "/");
--
--    if (namelen == 0)
--        return cursor->pathname;
--
--    if (strneq(name, namelen, ".."))
--        return follow_path(cursor->parent, name + namelen);
--
--    if (strneq(name, namelen, "."))
--        return follow_path(cursor, name + namelen);
--
--    for (i = 0; i < cursor->num_entries; i++)
--        if (strneq(name, namelen, cursor->entries[i]->name))
--            return follow_path(cursor->entries[i], name + namelen);
--
--    /* Not found */
--    return NULL;
--}
-+static const char *base;
-+static GHashTable *hash;
-+static QemuMutex lock;
- 
- void init_paths(const char *prefix)
- {
--    char pref_buf[PATH_MAX];
--
--    if (prefix[0] == '\0' ||
--        !strcmp(prefix, "/"))
-+    if (prefix[0] == '\0' || !strcmp(prefix, "/")) {
-         return;
--
--    if (prefix[0] != '/') {
--        char *cwd = getcwd(NULL, 0);
--        size_t pref_buf_len = sizeof(pref_buf);
--
--        if (!cwd)
--            abort();
--        pstrcpy(pref_buf, sizeof(pref_buf), cwd);
--        pstrcat(pref_buf, pref_buf_len, "/");
--        pstrcat(pref_buf, pref_buf_len, prefix);
--        free(cwd);
--    } else
--        pstrcpy(pref_buf, sizeof(pref_buf), prefix + 1);
--
--    base = new_entry("", NULL, pref_buf);
--    base = add_dir_maybe(base);
--    if (base->num_entries == 0) {
--        g_free(base->pathname);
--        g_free(base->name);
--        g_free(base);
--        base = NULL;
--    } else {
--        set_parents(base, base);
-     }
-+
-+    if (prefix[0] == '/') {
-+        base = g_strdup(prefix);
-+    } else {
-+        char *cwd = g_get_current_dir();
-+        base = g_build_filename(cwd, prefix, NULL);
-+        g_free(cwd);
-+    }
-+
-+    hash = g_hash_table_new(g_str_hash, g_str_equal);
-+    qemu_mutex_init(&lock);
+diff --git a/gdbstub.c b/gdbstub.c
+index d54abd17cc..3308279fa8 100644
+--- a/gdbstub.c
++++ b/gdbstub.c
+@@ -1268,6 +1268,206 @@ out:
+     return res;
  }
  
- /* Look for path in emulation dir, otherwise return name. */
- const char *path(const char *name)
- {
--    /* Only do absolute paths: quick and dirty, but should mostly be OK.
--       Could do relative by tracking cwd. */
--    if (!base || !name || name[0] != '/')
--        return name;
-+    gpointer key, value;
-+    const char *ret;
- 
--    return follow_path(base, name) ?: name;
-+    /* Only do absolute paths: quick and dirty, but should mostly be OK.  */
-+    if (!base || !name || name[0] != '/') {
-+        return name;
++typedef union GdbCmdVariant {
++    const char *data;
++    uint8_t opcode;
++    unsigned long val_ul;
++    unsigned long long val_ull;
++    struct {
++        GDBThreadIdKind kind;
++        uint32_t pid;
++        uint32_t tid;
++    } thread_id;
++} GdbCmdVariant;
++
++static const char *cmd_next_param(const char *param, const char delimiter)
++{
++    static const char all_delimiters[] = ",;:=";
++    char curr_delimiters[2] = {0};
++    const char *delimiters;
++
++    if (delimiter == '?') {
++        delimiters = all_delimiters;
++    } else if (delimiter == '0') {
++        return strchr(param, '\0');
++    } else if (delimiter == '.' && *param) {
++        return param + 1;
++    } else {
++        curr_delimiters[0] = delimiter;
++        delimiters = curr_delimiters;
 +    }
 +
-+    qemu_mutex_lock(&lock);
++    param += strcspn(param, delimiters);
++    if (*param) {
++        param++;
++    }
++    return param;
++}
 +
-+    /* Have we looked up this file before?  */
-+    if (g_hash_table_lookup_extended(hash, name, &key, &value)) {
-+        ret = value ? value : name;
-+    } else {
-+        char *save = g_strdup(name);
-+        char *full = g_build_filename(base, name, NULL);
++static int cmd_parse_params(const char *data, const char *schema,
++                            GdbCmdVariant *params, int *num_params)
++{
++    int curr_param;
++    const char *curr_schema, *curr_data;
 +
-+        /* Look for the path; record the result, pass or fail.  */
-+        if (access(full, F_OK) == 0) {
-+            /* Exists.  */
-+            g_hash_table_insert(hash, save, full);
-+            ret = full;
-+        } else {
-+            /* Does not exist.  */
-+            g_free(full);
-+            g_hash_table_insert(hash, save, NULL);
-+            ret = name;
++    *num_params = 0;
++
++    if (!schema) {
++        return 0;
++    }
++
++    curr_schema = schema;
++    curr_param = 0;
++    curr_data = data;
++    while (curr_schema[0] && curr_schema[1] && *curr_data) {
++        switch (curr_schema[0]) {
++        case 'l':
++            if (qemu_strtoul(curr_data, &curr_data, 16,
++                             &params[curr_param].val_ul)) {
++                return -EINVAL;
++            }
++            curr_param++;
++            curr_data = cmd_next_param(curr_data, curr_schema[1]);
++            break;
++        case 'L':
++            if (qemu_strtou64(curr_data, &curr_data, 16,
++                              (uint64_t *)&params[curr_param].val_ull)) {
++                return -EINVAL;
++            }
++            curr_param++;
++            curr_data = cmd_next_param(curr_data, curr_schema[1]);
++            break;
++        case 's':
++            params[curr_param].data = curr_data;
++            curr_param++;
++            curr_data = cmd_next_param(curr_data, curr_schema[1]);
++            break;
++        case 'o':
++            params[curr_param].opcode = *(uint8_t *)curr_data;
++            curr_param++;
++            curr_data = cmd_next_param(curr_data, curr_schema[1]);
++            break;
++        case 't':
++            params[curr_param].thread_id.kind =
++                read_thread_id(curr_data, &curr_data,
++                               &params[curr_param].thread_id.pid,
++                               &params[curr_param].thread_id.tid);
++            curr_param++;
++            curr_data = cmd_next_param(curr_data, curr_schema[1]);
++            break;
++        case '?':
++            curr_data = cmd_next_param(curr_data, curr_schema[1]);
++            break;
++        default:
++            return -EINVAL;
 +        }
++        curr_schema += 2;
 +    }
 +
-+    qemu_mutex_unlock(&lock);
-+    return ret;
- }
++    *num_params = curr_param;
++    return 0;
++}
++
++typedef struct GdbCmdContext {
++    GDBState *s;
++    GdbCmdVariant *params;
++    int num_params;
++    uint8_t mem_buf[MAX_PACKET_LENGTH];
++    char str_buf[MAX_PACKET_LENGTH + 1];
++} GdbCmdContext;
++
++typedef void (*GdbCmdHandler)(GdbCmdContext *gdb_ctx, void *user_ctx);
++
++/*
++ * cmd_startswith -> cmd is compared using startswith
++ * cmd_full_match -> cmd is compared using strcmp
++ *
++ *
++ * schema definitions:
++ * Each schema parameter entry consists of 2 chars,
++ * the first char represents the parameter type handling
++ * the second char represents the delimiter for the next parameter
++ *
++ * Currently supported schema types:
++ * 'l' -> unsigned long (stored in .val_ul)
++ * 'L' -> unsigned long long (stored in .val_ull)
++ * 's' -> string (stored in .data)
++ * 'o' -> single char (stored in .opcode)
++ * 't' -> thread id (stored in .thread_id)
++ * '?' -> skip according to delimiter
++ *
++ * Currently supported delimiters:
++ * '?' -> Stop at any delimiter (",;:=\0")
++ * '0' -> Stop at "\0"
++ * '.' -> Skip 1 char unless reached "\0"
++ * Any other value is treated as the delimiter value itself
++ */
++typedef struct GdbCmdParseEntry {
++    GdbCmdHandler handler;
++    const char *cmd;
++    union {
++        int flags;
++        struct {
++            int cmd_startswith:1;
++            int cmd_full_match:1;
++        };
++    };
++    const char *schema;
++} GdbCmdParseEntry;
++
++static inline int startswith(const char *string, const char *pattern)
++{
++  return !strncmp(string, pattern, strlen(pattern));
++}
++
++__attribute__((unused)) static int process_string_cmd(
++        GDBState *s, void *user_ctx, const char *data,
++        const GdbCmdParseEntry *cmds, int num_cmds);
++
++static int process_string_cmd(GDBState *s, void *user_ctx, const char *data,
++                              const GdbCmdParseEntry *cmds, int num_cmds)
++{
++    int i, schema_len, max_num_params;
++    GdbCmdContext gdb_ctx;
++
++    if (!cmds) {
++        return -1;
++    }
++
++    for (i = 0; i < num_cmds; i++) {
++        if (!cmds[i].handler || !cmds[i].cmd ||
++            (cmds[i].cmd_startswith && !startswith(data, cmds[i].cmd)) ||
++            (cmds[i].cmd_full_match && strcmp(data, cmds[i].cmd))) {
++            continue;
++        }
++
++        max_num_params = 0;
++        if (cmds[i].schema) {
++            schema_len = strlen(cmds[i].schema);
++            if (schema_len % 2) {
++                return -2;
++            }
++
++            max_num_params = schema_len / 2;
++        }
++
++        gdb_ctx.params =
++            (GdbCmdVariant *)alloca(sizeof(*gdb_ctx.params) * max_num_params);
++        memset(gdb_ctx.params, 0, sizeof(*gdb_ctx.params) * max_num_params);
++
++        if (cmd_parse_params(&data[strlen(cmds[i].cmd)], cmds[i].schema,
++                             gdb_ctx.params, &gdb_ctx.num_params)) {
++            return -1;
++        }
++
++        gdb_ctx.s = s;
++        cmds[i].handler(&gdb_ctx, user_ctx);
++        return 0;
++    }
++
++    return -1;
++}
++
+ static int gdb_handle_packet(GDBState *s, const char *line_buf)
+ {
+     CPUState *cpu;
 -- 
-2.17.1
+2.20.1
