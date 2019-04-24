@@ -7,62 +7,61 @@ X-Spam-Status: No, score=-8.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,USER_AGENT_GIT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 565E4C282CE
-	for <qemu-devel@archiver.kernel.org>; Wed, 24 Apr 2019 14:23:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0E4CBC10F11
+	for <qemu-devel@archiver.kernel.org>; Wed, 24 Apr 2019 14:25:13 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1E849218FE
-	for <qemu-devel@archiver.kernel.org>; Wed, 24 Apr 2019 14:23:39 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 6DD8B20811
+	for <qemu-devel@archiver.kernel.org>; Wed, 24 Apr 2019 14:25:12 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=163.com header.i=@163.com header.b="E9B7PVev"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1E849218FE
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=163.com header.i=@163.com header.b="kBH6L7Kz"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6DD8B20811
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=163.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:42491 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:42525 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hJIoE-0000j4-AQ
-	for qemu-devel@archiver.kernel.org; Wed, 24 Apr 2019 10:23:38 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:39085)
+	id 1hJIpj-0001sE-JA
+	for qemu-devel@archiver.kernel.org; Wed, 24 Apr 2019 10:25:11 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:39092)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <liq3ea@163.com>) id 1hJIfe-0002aF-9o
+	(envelope-from <liq3ea@163.com>) id 1hJIfe-0002aR-7L
 	for qemu-devel@nongnu.org; Wed, 24 Apr 2019 10:14:47 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <liq3ea@163.com>) id 1hJIY2-0006hS-OE
-	for qemu-devel@nongnu.org; Wed, 24 Apr 2019 10:06:56 -0400
-Received: from m12-14.163.com ([220.181.12.14]:54537)
+	(envelope-from <liq3ea@163.com>) id 1hJIY5-0006in-E4
+	for qemu-devel@nongnu.org; Wed, 24 Apr 2019 10:06:59 -0400
+Received: from m12-14.163.com ([220.181.12.14]:54119)
 	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <liq3ea@163.com>) id 1hJIY1-0006fH-8q
-	for qemu-devel@nongnu.org; Wed, 24 Apr 2019 10:06:54 -0400
+	(envelope-from <liq3ea@163.com>) id 1hJIY4-0006eU-3r
+	for qemu-devel@nongnu.org; Wed, 24 Apr 2019 10:06:56 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=163.com;
-	s=s110527; h=From:Subject:Date:Message-Id; bh=BBctNjDbfh7h2nNE/V
-	nZPLT9nVBtuY81kv5/qyNenhU=; b=E9B7PVevEE46QOVsoSuKAu2BWPUWTKmFIL
-	KCs1c+wGZyuVOcecxS8LW/UjeuUIzzreCsRxcMIpGgVTa30lPO2z/unRoMK0XEHl
-	rDzJCFqdZcj2LqLwBOJ7hUfuDYwb/8t0xPeb54vByUS/1rzR59DElpDGSy4ya0x+
-	Ioa3xRn0w=
+	s=s110527; h=From:Subject:Date:Message-Id; bh=KTK796b+CN5s4f878d
+	ALjFdRsk5kTGsNKIS5A/bVlYE=; b=kBH6L7Kzuypthh7yOsnx+HiMSSbKxSg39V
+	tFmAsbKBawmbwlGA0t8xiZ+Q3eIPszfhaebI9gX5LdVqK/ZuGu+kEdnw3J6yiILM
+	RVIWqfDM4n8g1J8zXS2S80x7cIotH1N8ZKKbchaQCupd+cmNTTZbf8N2hjBT9rut
+	lkm55b+Es=
 Received: from localhost.localdomain (unknown [115.200.201.0])
-	by smtp10 (Coremail) with SMTP id DsCowAC3Ayl0bcBcrks9CA--.5531S5;
-	Wed, 24 Apr 2019 22:06:51 +0800 (CST)
+	by smtp10 (Coremail) with SMTP id DsCowAC3Ayl0bcBcrks9CA--.5531S3;
+	Wed, 24 Apr 2019 22:06:48 +0800 (CST)
 From: Li Qiang <liq3ea@163.com>
 To: philmd@redhat.com, lersek@redhat.com, kraxel@redhat.com, thuth@redhat.com,
 	lvivier@redhat.com, pbonzini@redhat.com
-Date: Wed, 24 Apr 2019 07:06:41 -0700
-Message-Id: <20190424140643.62457-4-liq3ea@163.com>
+Date: Wed, 24 Apr 2019 07:06:39 -0700
+Message-Id: <20190424140643.62457-2-liq3ea@163.com>
 X-Mailer: git-send-email 2.17.1
 In-Reply-To: <20190424140643.62457-1-liq3ea@163.com>
 References: <20190424140643.62457-1-liq3ea@163.com>
-X-CM-TRANSID: DsCowAC3Ayl0bcBcrks9CA--.5531S5
-X-Coremail-Antispam: 1Uf129KBjvdXoWrKr45Wr1DZF17CFyxJr45Awb_yoWfCFc_uF
-	W3Aw1rW3y7AwnFkF9YyF15Aw15Ka4UXF9Ikrn7KFyqy34UX39Fkw4Iqa9F9w1rWFWUCr9x
-	Ca95Xr1DCa1v9jkaLaAFLSUrUUUUUb8apTn2vfkv8UJUUUU8Yxn0WfASr-VFAUDa7-sFnT
-	9fnUUvcSsGvfC2KfnxnUUI43ZEXa7IU8IzuJUUUUU==
+X-CM-TRANSID: DsCowAC3Ayl0bcBcrks9CA--.5531S3
+X-Coremail-Antispam: 1Uf129KBjvJXoW3JryfKFWDGr13XFyrCrW3ZFb_yoW7tryfpr
+	y7uF1YkrZ3JFsaqry3Jr1Ut3W3t34xW34kGw4Utay5tw4Uur4UJF4kAw1akw1DXrW8Zay5
+	Aa1vyr1YkFnxWaDanT9S1TB71UUUUUUqnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+	9KBjDUYxBIdaVFxhVjvjDU0xZFpf9x07UgAwsUUUUU=
 X-Originating-IP: [115.200.201.0]
-X-CM-SenderInfo: 5oltjvrd6rljoofrz/xtbBLxWgbVUMI+dgjQAAsH
+X-CM-SenderInfo: 5oltjvrd6rljoofrz/1tbitAKgbVSIbtkMXwABsC
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x
 X-Received-From: 220.181.12.14
-Subject: [Qemu-devel] [PATCH v2 3/5] fw_cfg: reboot: store reboot-timeout as
- little endian
+Subject: [Qemu-devel] [PATCH v2 1/5] tests: refactor fw_cfg_test
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -79,38 +78,254 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 Content-Type: text/plain; charset="UTF-8"
-Message-ID: <20190424140641.QY80v4LCpLQ6Y6P8Ku4ik1d_AczmZz8AplFHfa0RXfM@z>
+Message-ID: <20190424140639.Sf7sS5Xt3FHq-i4edRQSHciXWKeNC3xPcHEZsQ0qB-Q@z>
 
-So that if the guest and host endianess does not match it
-can still work as expection.
+Currently, fw_cfg_test uses one QTestState for every test case.
+This will add all command lines for every test case and
+this is unnecessary. This patch split the test cases and for
+every test case it uses his own QTestState. This patch does following
+things:
+
+1. Get rid of the global 'fw_cfg', this need add a uninit function
+
+2. Convert every test case in a separate QTestState
+
+After this patch, we can add fw_cfg test case freely and will not
+have effect on other test cases.
 
 Signed-off-by: Li Qiang <liq3ea@163.com>
+Acked-by: Thomas Huth <thuth@redhat.com>
 ---
- hw/nvram/fw_cfg.c | 4 +++-
- 1 file changed, 3 insertions(+), 1 deletion(-)
+ tests/fw_cfg-test.c   | 86 ++++++++++++++++++++++++++++++++++++++-----
+ tests/libqos/fw_cfg.c | 10 +++++
+ tests/libqos/fw_cfg.h |  7 ++++
+ 3 files changed, 94 insertions(+), 9 deletions(-)
 
-diff --git a/hw/nvram/fw_cfg.c b/hw/nvram/fw_cfg.c
-index 5c3a46ce6f..df4242fc9c 100644
---- a/hw/nvram/fw_cfg.c
-+++ b/hw/nvram/fw_cfg.c
-@@ -178,6 +178,7 @@ static void fw_cfg_reboot(FWCfgState *s)
+diff --git a/tests/fw_cfg-test.c b/tests/fw_cfg-test.c
+index 1c5103fe1c..c22503619f 100644
+--- a/tests/fw_cfg-test.c
++++ b/tests/fw_cfg-test.c
+@@ -21,62 +21,127 @@ static uint16_t nb_cpus = 1;
+ static uint16_t max_cpus = 1;
+ static uint64_t nb_nodes = 0;
+ static uint16_t boot_menu = 0;
+-static QFWCFG *fw_cfg = NULL;
+ 
+ static void test_fw_cfg_signature(void)
  {
-     const char *reboot_timeout = NULL;
-     int64_t rt_val = -1;
-+    uint32_t rt_le32;
++    QFWCFG *fw_cfg;
++    QTestState *s;
+     char buf[5];
  
-     /* get user configuration */
-     QemuOptsList *plist = qemu_find_opts("boot-opts");
-@@ -194,7 +195,8 @@ static void fw_cfg_reboot(FWCfgState *s)
-         }
-     }
++    s = qtest_init("");
++    fw_cfg = pc_fw_cfg_init(s);
++
+     qfw_cfg_get(fw_cfg, FW_CFG_SIGNATURE, buf, 4);
+     buf[4] = 0;
  
--    fw_cfg_add_file(s, "etc/boot-fail-wait", g_memdup(&rt_val, 4), 4);
-+    rt_le32 = cpu_to_le32(rt_val);
-+    fw_cfg_add_file(s, "etc/boot-fail-wait", g_memdup(&rt_le32, 4), 4);
+     g_assert_cmpstr(buf, ==, "QEMU");
++    pc_fw_cfg_uninit(fw_cfg);
++    qtest_quit(s);
  }
  
- static void fw_cfg_write(FWCfgState *s, uint8_t value)
+ static void test_fw_cfg_id(void)
+ {
+-    uint32_t id = qfw_cfg_get_u32(fw_cfg, FW_CFG_ID);
++    QFWCFG *fw_cfg;
++    QTestState *s;
++    uint32_t id;
++
++    s = qtest_init("");
++    fw_cfg = pc_fw_cfg_init(s);
++
++    id = qfw_cfg_get_u32(fw_cfg, FW_CFG_ID);
+     g_assert((id == 1) ||
+              (id == 3));
++    pc_fw_cfg_uninit(fw_cfg);
++    qtest_quit(s);
+ }
+ 
+ static void test_fw_cfg_uuid(void)
+ {
++    QFWCFG *fw_cfg;
++    QTestState *s;
++
+     uint8_t buf[16];
+     static const uint8_t uuid[16] = {
+         0x46, 0x00, 0xcb, 0x32, 0x38, 0xec, 0x4b, 0x2f,
+         0x8a, 0xcb, 0x81, 0xc6, 0xea, 0x54, 0xf2, 0xd8,
+     };
+ 
++    s = qtest_init("-uuid 4600cb32-38ec-4b2f-8acb-81c6ea54f2d8");
++    fw_cfg = pc_fw_cfg_init(s);
++
+     qfw_cfg_get(fw_cfg, FW_CFG_UUID, buf, 16);
+     g_assert(memcmp(buf, uuid, sizeof(buf)) == 0);
++
++    pc_fw_cfg_uninit(fw_cfg);
++    qtest_quit(s);
++
+ }
+ 
+ static void test_fw_cfg_ram_size(void)
+ {
++    QFWCFG *fw_cfg;
++    QTestState *s;
++
++    s = qtest_init("");
++    fw_cfg = pc_fw_cfg_init(s);
++
+     g_assert_cmpint(qfw_cfg_get_u64(fw_cfg, FW_CFG_RAM_SIZE), ==, ram_size);
++
++    pc_fw_cfg_uninit(fw_cfg);
++    qtest_quit(s);
+ }
+ 
+ static void test_fw_cfg_nographic(void)
+ {
++    QFWCFG *fw_cfg;
++    QTestState *s;
++
++    s = qtest_init("");
++    fw_cfg = pc_fw_cfg_init(s);
++
+     g_assert_cmpint(qfw_cfg_get_u16(fw_cfg, FW_CFG_NOGRAPHIC), ==, 0);
++
++    pc_fw_cfg_uninit(fw_cfg);
++    qtest_quit(s);
+ }
+ 
+ static void test_fw_cfg_nb_cpus(void)
+ {
++    QFWCFG *fw_cfg;
++    QTestState *s;
++
++    s = qtest_init("");
++    fw_cfg = pc_fw_cfg_init(s);
++
+     g_assert_cmpint(qfw_cfg_get_u16(fw_cfg, FW_CFG_NB_CPUS), ==, nb_cpus);
++
++    pc_fw_cfg_uninit(fw_cfg);
++    qtest_quit(s);
+ }
+ 
+ static void test_fw_cfg_max_cpus(void)
+ {
++    QFWCFG *fw_cfg;
++    QTestState *s;
++
++    s = qtest_init("");
++    fw_cfg = pc_fw_cfg_init(s);
++
+     g_assert_cmpint(qfw_cfg_get_u16(fw_cfg, FW_CFG_MAX_CPUS), ==, max_cpus);
++    pc_fw_cfg_uninit(fw_cfg);
++    qtest_quit(s);
+ }
+ 
+ static void test_fw_cfg_numa(void)
+ {
++    QFWCFG *fw_cfg;
++    QTestState *s;
+     uint64_t *cpu_mask;
+     uint64_t *node_mask;
+ 
++    s = qtest_init("");
++    fw_cfg = pc_fw_cfg_init(s);
++
+     g_assert_cmpint(qfw_cfg_get_u64(fw_cfg, FW_CFG_NUMA), ==, nb_nodes);
+ 
+     cpu_mask = g_new0(uint64_t, max_cpus);
+@@ -92,24 +157,29 @@ static void test_fw_cfg_numa(void)
+ 
+     g_free(node_mask);
+     g_free(cpu_mask);
++    pc_fw_cfg_uninit(fw_cfg);
++    qtest_quit(s);
+ }
+ 
+ static void test_fw_cfg_boot_menu(void)
+ {
++    QFWCFG *fw_cfg;
++    QTestState *s;
++
++    s = qtest_init("");
++    fw_cfg = pc_fw_cfg_init(s);
++
+     g_assert_cmpint(qfw_cfg_get_u16(fw_cfg, FW_CFG_BOOT_MENU), ==, boot_menu);
++    pc_fw_cfg_uninit(fw_cfg);
++    qtest_quit(s);
+ }
+ 
+ int main(int argc, char **argv)
+ {
+-    QTestState *s;
+     int ret;
+ 
+     g_test_init(&argc, &argv, NULL);
+ 
+-    s = qtest_init("-uuid 4600cb32-38ec-4b2f-8acb-81c6ea54f2d8");
+-
+-    fw_cfg = pc_fw_cfg_init(s);
+-
+     qtest_add_func("fw_cfg/signature", test_fw_cfg_signature);
+     qtest_add_func("fw_cfg/id", test_fw_cfg_id);
+     qtest_add_func("fw_cfg/uuid", test_fw_cfg_uuid);
+@@ -128,7 +198,5 @@ int main(int argc, char **argv)
+ 
+     ret = g_test_run();
+ 
+-    qtest_quit(s);
+-
+     return ret;
+ }
+diff --git a/tests/libqos/fw_cfg.c b/tests/libqos/fw_cfg.c
+index d0889d1e22..c6839c53c8 100644
+--- a/tests/libqos/fw_cfg.c
++++ b/tests/libqos/fw_cfg.c
+@@ -81,6 +81,11 @@ QFWCFG *mm_fw_cfg_init(QTestState *qts, uint64_t base)
+     return fw_cfg;
+ }
+ 
++void mm_fw_cfg_uninit(QFWCFG *fw_cfg)
++{
++    g_free(fw_cfg);
++}
++
+ static void io_fw_cfg_select(QFWCFG *fw_cfg, uint16_t key)
+ {
+     qtest_outw(fw_cfg->qts, fw_cfg->base, key);
+@@ -107,3 +112,8 @@ QFWCFG *io_fw_cfg_init(QTestState *qts, uint16_t base)
+ 
+     return fw_cfg;
+ }
++
++void io_fw_cfg_uninit(QFWCFG *fw_cfg)
++{
++    g_free(fw_cfg);
++}
+diff --git a/tests/libqos/fw_cfg.h b/tests/libqos/fw_cfg.h
+index 0353416af0..60de81e863 100644
+--- a/tests/libqos/fw_cfg.h
++++ b/tests/libqos/fw_cfg.h
+@@ -33,11 +33,18 @@ uint32_t qfw_cfg_get_u32(QFWCFG *fw_cfg, uint16_t key);
+ uint64_t qfw_cfg_get_u64(QFWCFG *fw_cfg, uint16_t key);
+ 
+ QFWCFG *mm_fw_cfg_init(QTestState *qts, uint64_t base);
++void mm_fw_cfg_uninit(QFWCFG *fw_cfg);
+ QFWCFG *io_fw_cfg_init(QTestState *qts, uint16_t base);
++void io_fw_cfg_uninit(QFWCFG *fw_cfg);
+ 
+ static inline QFWCFG *pc_fw_cfg_init(QTestState *qts)
+ {
+     return io_fw_cfg_init(qts, 0x510);
+ }
+ 
++static inline void pc_fw_cfg_uninit(QFWCFG *fw_cfg)
++{
++    io_fw_cfg_uninit(fw_cfg);
++}
++
+ #endif
 -- 
 2.17.1
 
