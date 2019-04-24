@@ -1,25 +1,25 @@
-Received: from eggs.gnu.org ([209.51.188.92]:56425)
+Received: from eggs.gnu.org ([209.51.188.92]:56448)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <arilou@gmail.com>) id 1hJNkE-0003t1-BN
-	for qemu-devel@nongnu.org; Wed, 24 Apr 2019 15:39:51 -0400
+	(envelope-from <arilou@gmail.com>) id 1hJNkJ-0003xA-6U
+	for qemu-devel@nongnu.org; Wed, 24 Apr 2019 15:39:56 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <arilou@gmail.com>) id 1hJNkD-00049n-C6
-	for qemu-devel@nongnu.org; Wed, 24 Apr 2019 15:39:50 -0400
-Received: from mail-wr1-x442.google.com ([2a00:1450:4864:20::442]:41540)
+	(envelope-from <arilou@gmail.com>) id 1hJNkI-0004Cl-6b
+	for qemu-devel@nongnu.org; Wed, 24 Apr 2019 15:39:55 -0400
+Received: from mail-wm1-x343.google.com ([2a00:1450:4864:20::343]:36178)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <arilou@gmail.com>) id 1hJNkD-000496-5y
-	for qemu-devel@nongnu.org; Wed, 24 Apr 2019 15:39:49 -0400
-Received: by mail-wr1-x442.google.com with SMTP id c12so20593494wrt.8
-	for <qemu-devel@nongnu.org>; Wed, 24 Apr 2019 12:39:49 -0700 (PDT)
+	(Exim 4.71) (envelope-from <arilou@gmail.com>) id 1hJNkI-0004C3-0E
+	for qemu-devel@nongnu.org; Wed, 24 Apr 2019 15:39:54 -0400
+Received: by mail-wm1-x343.google.com with SMTP id h18so6740474wml.1
+	for <qemu-devel@nongnu.org>; Wed, 24 Apr 2019 12:39:53 -0700 (PDT)
 From: Jon Doron <arilou@gmail.com>
-Date: Wed, 24 Apr 2019 22:38:51 +0300
-Message-Id: <20190424193859.31817-13-arilou@gmail.com>
+Date: Wed, 24 Apr 2019 22:38:53 +0300
+Message-Id: <20190424193859.31817-15-arilou@gmail.com>
 In-Reply-To: <20190424193859.31817-1-arilou@gmail.com>
 References: <20190424193859.31817-1-arilou@gmail.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH v5 13/21] gdbstub: Implement write all
- registers (G pkt) with new infra
+Subject: [Qemu-devel] [PATCH v5 15/21] gdbstub: Implement file io (F pkt)
+ with new infra
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,75 +33,88 @@ Cc: Jon Doron <arilou@gmail.com>
 
 Signed-off-by: Jon Doron <arilou@gmail.com>
 ---
- gdbstub.c | 41 +++++++++++++++++++++++++++++++----------
- 1 file changed, 31 insertions(+), 10 deletions(-)
+ gdbstub.c | 62 +++++++++++++++++++++++++++++++++++--------------------
+ 1 file changed, 40 insertions(+), 22 deletions(-)
 
 diff --git a/gdbstub.c b/gdbstub.c
-index 5b60c1369c..acf0e75908 100644
+index 3a7ef5eea6..18949120be 100644
 --- a/gdbstub.c
 +++ b/gdbstub.c
-@@ -1735,6 +1735,29 @@ static void handle_read_mem(GdbCmdContext *gdb_ctx, void *user_ctx)
+@@ -1773,6 +1773,39 @@ static void handle_read_all_regs(GdbCmdContext *gdb_ctx, void *user_ctx)
      put_packet(gdb_ctx->s, gdb_ctx->str_buf);
  }
  
-+static void handle_write_all_regs(GdbCmdContext *gdb_ctx, void *user_ctx)
++static void handle_file_io(GdbCmdContext *gdb_ctx, void *user_ctx)
 +{
-+    target_ulong addr, len;
-+    uint8_t *registers;
-+    int reg_size;
++    int num_syscall_params;
++    GdbCmdVariant syscall_params[3] = {};
 +
 +    if (!gdb_ctx->num_params) {
 +        return;
 +    }
 +
-+    cpu_synchronize_state(gdb_ctx->s->g_cpu);
-+    registers = gdb_ctx->mem_buf;
-+    len = strlen(gdb_ctx->params[0].data) / 2;
-+    hextomem(registers, gdb_ctx->params[0].data, len);
-+    for (addr = 0; addr < gdb_ctx->s->g_cpu->gdb_num_g_regs && len > 0;
-+         addr++) {
-+        reg_size = gdb_write_register(gdb_ctx->s->g_cpu, registers, addr);
-+        len -= reg_size;
-+        registers += reg_size;
++    if (cmd_parse_params(gdb_ctx->params[0].data, "L,L,o0", syscall_params,
++                         &num_syscall_params)) {
++        return;
 +    }
-+    put_packet(gdb_ctx->s, "OK");
++
++    if (!num_syscall_params) {
++        return;
++    }
++
++    if (gdb_ctx->s->current_syscall_cb) {
++        gdb_ctx->s->current_syscall_cb(gdb_ctx->s->c_cpu,
++                                       (target_ulong)syscall_params[0].val_ull,
++                                       (target_ulong)syscall_params[1].val_ull);
++        gdb_ctx->s->current_syscall_cb = NULL;
++    }
++
++    if (syscall_params[2].opcode == (uint8_t)'C') {
++        put_packet(gdb_ctx->s, "T02");
++        return;
++    }
++
++    gdb_continue(gdb_ctx->s);
 +}
 +
  static int gdb_handle_packet(GDBState *s, const char *line_buf)
  {
      CPUState *cpu;
-@@ -1746,7 +1769,6 @@ static int gdb_handle_packet(GDBState *s, const char *line_buf)
-     uint8_t mem_buf[MAX_PACKET_LENGTH];
-     char buf[sizeof(mem_buf) + 1 /* trailing NUL */];
-     char thread_id[16];
--    uint8_t *registers;
-     target_ulong addr, len;
-     const GdbCmdParseEntry *cmd_parser = NULL;
- 
-@@ -1912,16 +1934,15 @@ static int gdb_handle_packet(GDBState *s, const char *line_buf)
-         put_packet(s, buf);
-         break;
-     case 'G':
--        cpu_synchronize_state(s->g_cpu);
--        registers = mem_buf;
--        len = strlen(p) / 2;
--        hextomem((uint8_t *)registers, p, len);
--        for (addr = 0; addr < s->g_cpu->gdb_num_g_regs && len > 0; addr++) {
--            reg_size = gdb_write_register(s->g_cpu, registers, addr);
--            len -= reg_size;
--            registers += reg_size;
-+        {
-+            static const GdbCmdParseEntry write_all_regs_cmd_desc = {
-+                .handler = handle_write_all_regs,
-+                .cmd = "G",
+@@ -1914,28 +1947,13 @@ static int gdb_handle_packet(GDBState *s, const char *line_buf)
+         return RS_IDLE;
+     case 'F':
+         {
+-            target_ulong ret;
+-            target_ulong err;
+-
+-            ret = strtoull(p, (char **)&p, 16);
+-            if (*p == ',') {
+-                p++;
+-                err = strtoull(p, (char **)&p, 16);
+-            } else {
+-                err = 0;
+-            }
+-            if (*p == ',')
+-                p++;
+-            type = *p;
+-            if (s->current_syscall_cb) {
+-                s->current_syscall_cb(s->c_cpu, ret, err);
+-                s->current_syscall_cb = NULL;
+-            }
+-            if (type == 'C') {
+-                put_packet(s, "T02");
+-            } else {
+-                gdb_continue(s);
+-            }
++            static const GdbCmdParseEntry file_io_cmd_desc = {
++                .handler = handle_file_io,
++                .cmd = "F",
 +                .cmd_startswith = 1,
 +                .schema = "s0"
 +            };
-+            cmd_parser = &write_all_regs_cmd_desc;
++            cmd_parser = &file_io_cmd_desc;
          }
--        put_packet(s, "OK");
          break;
-     case 'm':
-         {
+     case 'g':
 -- 
 2.20.1
