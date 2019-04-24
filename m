@@ -1,31 +1,31 @@
-Received: from eggs.gnu.org ([209.51.188.92]:45928)
+Received: from eggs.gnu.org ([209.51.188.92]:45946)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1hJP0h-0003pp-U0
-	for qemu-devel@nongnu.org; Wed, 24 Apr 2019 17:00:58 -0400
+	(envelope-from <bounces@canonical.com>) id 1hJP0j-0003qN-SA
+	for qemu-devel@nongnu.org; Wed, 24 Apr 2019 17:00:59 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1hJP0f-0007fd-Dy
-	for qemu-devel@nongnu.org; Wed, 24 Apr 2019 17:00:55 -0400
-Received: from indium.canonical.com ([91.189.90.7]:38884)
+	(envelope-from <bounces@canonical.com>) id 1hJP0h-0007h1-Jv
+	for qemu-devel@nongnu.org; Wed, 24 Apr 2019 17:00:57 -0400
+Received: from indium.canonical.com ([91.189.90.7]:39048)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1hJP0f-0007e9-4w
-	for qemu-devel@nongnu.org; Wed, 24 Apr 2019 17:00:53 -0400
+	id 1hJP0h-0007gg-CY
+	for qemu-devel@nongnu.org; Wed, 24 Apr 2019 17:00:55 -0400
 Received: from loganberry.canonical.com ([91.189.90.37])
 	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1hJP0c-0001pS-M2
-	for <qemu-devel@nongnu.org>; Wed, 24 Apr 2019 21:00:50 +0000
+	id 1hJP0f-0001wi-TR
+	for <qemu-devel@nongnu.org>; Wed, 24 Apr 2019 21:00:53 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 9919F2E80CB
-	for <qemu-devel@nongnu.org>; Wed, 24 Apr 2019 21:00:50 +0000 (UTC)
+	by loganberry.canonical.com (Postfix) with ESMTP id CC74E2E80D1
+	for <qemu-devel@nongnu.org>; Wed, 24 Apr 2019 21:00:53 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Wed, 24 Apr 2019 20:53:05 -0000
+Date: Wed, 24 Apr 2019 20:54:33 -0000
 From: Corey Bryant <corey.bryant@canonical.com>
 Reply-To: Bug 1823458 <1823458@bugs.launchpad.net>
 Sender: bounces@canonical.com
 References: <155455149397.14414.11595397789908732027.malonedeb@gac.canonical.com>
-Message-Id: <155613918571.6930.1261295664604032966.malone@chaenomeles.canonical.com>
+Message-Id: <155613927368.14126.17373729126336602726.malone@gac.canonical.com>
 Errors-To: bounces@canonical.com
 Subject: [Qemu-devel] [Bug 1823458] Please test proposed package
 List-Id: <qemu-devel.nongnu.org>
@@ -40,33 +40,33 @@ To: qemu-devel@nongnu.org
 
 Hello Dan, or anyone else affected,
 
-Accepted qemu into mitaka-proposed. The package will build now and be
+Accepted qemu into ocata-proposed. The package will build now and be
 available in the Ubuntu Cloud Archive in a few hours, and then in the
 -proposed repository.
 
 Please help us by testing this new package. To enable the -proposed
 repository:
 
-  sudo add-apt-repository cloud-archive:mitaka-proposed
+  sudo add-apt-repository cloud-archive:ocata-proposed
   sudo apt-get update
 
 Your feedback will aid us getting this update out to other Ubuntu users.
 
 If this package fixes the bug for you, please add a comment to this bug,
 mentioning the version of the package you tested, and change the tag
-from verification-mitaka-needed to verification-mitaka-done. If it does
+from verification-ocata-needed to verification-ocata-done. If it does
 not fix the bug for you, please add a comment stating that, and change
-the tag to verification-mitaka-failed. In either case, details of your
+the tag to verification-ocata-failed. In either case, details of your
 testing will help us make a better decision.
 
 Further information regarding the verification process can be found at
 https://wiki.ubuntu.com/QATeam/PerformingSRUVerification . Thank you in
 advance!
 
-** Changed in: cloud-archive/mitaka
+** Changed in: cloud-archive/ocata
        Status: Triaged =3D> Fix Committed
 
-** Tags added: verification-mitaka-needed
+** Tags added: verification-ocata-needed
 
 -- =
 
