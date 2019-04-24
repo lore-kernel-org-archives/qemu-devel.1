@@ -1,28 +1,34 @@
-Received: from eggs.gnu.org ([209.51.188.92]:37572)
+Received: from eggs.gnu.org ([209.51.188.92]:37755)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1hJGnx-0003kg-7o
-	for qemu-devel@nongnu.org; Wed, 24 Apr 2019 08:15:15 -0400
+	(envelope-from <bounces@canonical.com>) id 1hJGoN-000450-TC
+	for qemu-devel@nongnu.org; Wed, 24 Apr 2019 08:15:42 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1hJGnv-0006gA-As
-	for qemu-devel@nongnu.org; Wed, 24 Apr 2019 08:15:13 -0400
-Received: from mail-ot1-x343.google.com ([2607:f8b0:4864:20::343]:41140)
+	(envelope-from <bounces@canonical.com>) id 1hJGoM-0007HJ-0J
+	for qemu-devel@nongnu.org; Wed, 24 Apr 2019 08:15:39 -0400
+Received: from indium.canonical.com ([91.189.90.7]:57562)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1hJGnu-0006aQ-W8
-	for qemu-devel@nongnu.org; Wed, 24 Apr 2019 08:15:11 -0400
-Received: by mail-ot1-x343.google.com with SMTP id g8so1938039otk.8
-	for <qemu-devel@nongnu.org>; Wed, 24 Apr 2019 05:15:10 -0700 (PDT)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1hJGoL-0007FR-30
+	for qemu-devel@nongnu.org; Wed, 24 Apr 2019 08:15:37 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1hJGoH-0002HF-Mn
+	for <qemu-devel@nongnu.org>; Wed, 24 Apr 2019 12:15:33 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id A47A62E80C7
+	for <qemu-devel@nongnu.org>; Wed, 24 Apr 2019 12:15:33 +0000 (UTC)
 MIME-Version: 1.0
-References: <20190424110041.8175-1-marcandre.lureau@redhat.com>
-	<20190424110041.8175-3-marcandre.lureau@redhat.com>
-In-Reply-To: <20190424110041.8175-3-marcandre.lureau@redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Wed, 24 Apr 2019 13:14:57 +0100
-Message-ID: <CAFEAcA-_mX4_sJQ1KxSZbdcR1weANO+8430Y+zSYNBKgezPPLA@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v2 2/2] build-sys: move slirp as git
- submodule project
+Date: Wed, 24 Apr 2019 12:10:21 -0000
+From: Gwendolyn Haller <1826175@bugs.launchpad.net>
+Reply-To: Bug 1826175 <1826175@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <155609955691.16667.3366200166619949036.malonedeb@soybean.canonical.com>
+Message-Id: <155610782118.17507.15856887681028117924.malone@soybean.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1826175] Re: Compilation on MSYS2/MinGW-w64 fails
+ with error: "No rule to make target capstone.lib"
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,38 +37,56 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@redhat.com>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, Samuel Thibault <samuel.thibault@ens-lyon.org>, Stefan Hajnoczi <stefanha@redhat.com>, Jeff Cody <codyprime@gmail.com>
+To: qemu-devel@nongnu.org
 
-On Wed, 24 Apr 2019 at 12:13, Marc-Andr=C3=A9 Lureau
-<marcandre.lureau@redhat.com> wrote:
->
-> The slirp project is now hosted on freedesktop at:
-> https://gitlab.freedesktop.org/slirp.
->
-> The libslirp source was extracted from qemu/slirp filtered through
-> clang-format (available in project tree). The qemu slirp directory can
-> be swapped by a git submodule.
->
-> Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+I did submit a bug already to Capstone proper on their GitHub. Thanks
+for the heads-up about it needing to cover both cases for cross-
+compilers!
 
-> --- a/.gitmodules
-> +++ b/.gitmodules
-> @@ -52,3 +52,6 @@
->  [submodule "roms/edk2"]
->         path =3D roms/edk2
->         url =3D https://github.com/tianocore/edk2.git
-> +[submodule "slirp"]
-> +       path =3D slirp
-> +       url =3D https://gitlab.freedesktop.org/slirp/libslirp.git
+-- =
 
-We should prefer to set up a mirror of the git repo
-on git.qemu.org and use that, rather than a remote repo.
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1826175
 
-We also need to do that for the berkeley softfloat
-and edk2 repos, I notice.
+Title:
+  Compilation on MSYS2/MinGW-w64 fails with error: "No rule to make
+  target capstone.lib"
 
-Stefan or Jeff, could one of you set that up, please?
+Status in QEMU:
+  New
 
-thanks
--- PMM
+Bug description:
+  I submitted this bug to Capstone directly but I figured it'd be useful
+  to post it here too. The IS_MINGW check in the Makefile for Capstone
+  fails under MSYS2 MinGW-w64 because cc --version doesn't have mingw in
+  the output anymore:
+
+  $ whereis cc
+  cc: /mingw64/bin/cc.exe
+
+  $ cc --version
+  cc.exe (Rev2, Built by MSYS2 project) 8.3.0
+  Copyright (C) 2018 Free Software Foundation, Inc.
+  This is free software; see the source for copying conditions.  There is NO
+  warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOS=
+E.
+
+  Really simple patch:
+
+  diff --git "a/Makefile" "b/Makefile"
+  index 063f50db..1d9f042e 100644
+  --- "a/Makefile"
+  +++ "b/Makefile"
+  @@ -288,7 +288,7 @@ CFLAGS :=3D $(CFLAGS:-fPIC=3D)
+   # On Windows we need the shared library to be executable
+   else
+   # mingw?
+  -IS_MINGW :=3D $(shell $(CC) --version | grep -i mingw | wc -l)
+  +IS_MINGW :=3D $(shell $(CC) --version | grep -i msys2 | wc -l)
+   ifeq ($(IS_MINGW),1)
+   EXT =3D dll
+   AR_EXT =3D lib
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1826175/+subscriptions
