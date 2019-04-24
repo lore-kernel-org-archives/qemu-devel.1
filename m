@@ -1,30 +1,22 @@
-Received: from eggs.gnu.org ([209.51.188.92]:53436)
+Received: from eggs.gnu.org ([209.51.188.92]:53399)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <brijesh.singh@amd.com>) id 1hJPeE-00056u-SA
+	(envelope-from <wainersm@redhat.com>) id 1hJPeE-00056A-Uy
 	for qemu-devel@nongnu.org; Wed, 24 Apr 2019 17:41:48 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <brijesh.singh@amd.com>) id 1hJPVT-0003Bc-9a
-	for qemu-devel@nongnu.org; Wed, 24 Apr 2019 17:32:44 -0400
-Received: from mail-eopbgr810085.outbound.protection.outlook.com
-	([40.107.81.85]:2416
-	helo=NAM01-BY2-obe.outbound.protection.outlook.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <brijesh.singh@amd.com>)
-	id 1hJPVS-0003AP-Tg
-	for qemu-devel@nongnu.org; Wed, 24 Apr 2019 17:32:43 -0400
-From: "Singh, Brijesh" <brijesh.singh@amd.com>
-Date: Wed, 24 Apr 2019 21:32:39 +0000
-Message-ID: <eee5e112-89bd-331b-6875-34c0712de4cb@amd.com>
-References: <20190424160942.13567-1-brijesh.singh@amd.com>
-	<CABayD+eYsqT49-Smp0a9OGRt2or_L7LNKHpe-iraM62XzGq5_g@mail.gmail.com>
-In-Reply-To: <CABayD+eYsqT49-Smp0a9OGRt2or_L7LNKHpe-iraM62XzGq5_g@mail.gmail.com>
-Content-Language: en-US
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <D3669A442693E444A3F42BFE1337BDDB@namprd12.prod.outlook.com>
-Content-Transfer-Encoding: base64
+	(envelope-from <wainersm@redhat.com>) id 1hJPSj-00017Y-Vm
+	for qemu-devel@nongnu.org; Wed, 24 Apr 2019 17:29:55 -0400
+References: <20190424103747.10173-1-thuth@redhat.com>
+	<20190424103747.10173-5-thuth@redhat.com>
+From: Wainer dos Santos Moschetta <wainersm@redhat.com>
+Message-ID: <f9dc291b-7ba2-c6b8-33aa-c8fa3c6d4950@redhat.com>
+Date: Wed, 24 Apr 2019 18:29:43 -0300
 MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [RFC PATCH v1 00/10] Add AMD SEV guest live
- migration support
+In-Reply-To: <20190424103747.10173-5-thuth@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
+Content-Language: en-US
+Subject: Re: [Qemu-devel] [PATCH 4/6] cirrus / travis: Add gnu-sed and bash
+ for macOS and FreeBSD
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,88 +25,69 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Steve Rutherford <srutherford@google.com>
-Cc: "Singh, Brijesh" <brijesh.singh@amd.com>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>, "H.
-	Peter Anvin" <hpa@zytor.com>, Paolo Bonzini <pbonzini@redhat.com>, =?utf-8?B?UmFkaW0gS3LEjW3DocWZ?= <rkrcmar@redhat.com>, Joerg Roedel <joro@8bytes.org>, Borislav Petkov <bp@suse.de>, "Lendacky, Thomas" <Thomas.Lendacky@amd.com>, "x86@kernel.org" <x86@kernel.org>, "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+To: Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org
+Cc: Fam Zheng <fam@euphon.net>, Kevin Wolf <kwolf@redhat.com>, Ed Maste <emaste@freebsd.org>, qemu-block@nongnu.org, =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>, Max Reitz <mreitz@redhat.com>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>, Li-Wen Hsu <lwhsu@freebsd.org>
 
-DQoNCk9uIDQvMjQvMTkgMjoxNSBQTSwgU3RldmUgUnV0aGVyZm9yZCB3cm90ZToNCj4gT24gV2Vk
-LCBBcHIgMjQsIDIwMTkgYXQgOToxMCBBTSBTaW5naCwgQnJpamVzaCA8YnJpamVzaC5zaW5naEBh
-bWQuY29tPiB3cm90ZToNCj4+DQo+PiBUaGUgc2VyaWVzIGFkZCBzdXBwb3J0IGZvciBBTUQgU0VW
-IGd1ZXN0IGxpdmUgbWlncmF0aW9uIGNvbW1hbmRzLiBUbyBwcm90ZWN0IHRoZQ0KPj4gY29uZmlk
-ZW50aWFsaXR5IG9mIGFuIFNFViBwcm90ZWN0ZWQgZ3Vlc3QgbWVtb3J5IHdoaWxlIGluIHRyYW5z
-aXQgd2UgbmVlZCB0bw0KPj4gdXNlIHRoZSBTRVYgY29tbWFuZHMgZGVmaW5lZCBpbiBTRVYgQVBJ
-IHNwZWMgWzFdLg0KPj4NCj4+IFNFViBndWVzdCBWTXMgaGF2ZSB0aGUgY29uY2VwdCBvZiBwcml2
-YXRlIGFuZCBzaGFyZWQgbWVtb3J5LiBQcml2YXRlIG1lbW9yeQ0KPj4gaXMgZW5jcnlwdGVkIHdp
-dGggdGhlIGd1ZXN0LXNwZWNpZmljIGtleSwgd2hpbGUgc2hhcmVkIG1lbW9yeSBtYXkgYmUgZW5j
-cnlwdGVkDQo+PiB3aXRoIGh5cGVydmlzb3Iga2V5LiBUaGUgY29tbWFuZHMgcHJvdmlkZWQgYnkg
-dGhlIFNFViBGVyBhcmUgbWVhbnQgdG8gYmUgdXNlZA0KPj4gZm9yIHRoZSBwcml2YXRlIG1lbW9y
-eSBvbmx5LiBUaGUgcGF0Y2ggc2VyaWVzIGludHJvZHVjZXMgYSBuZXcgaHlwZXJjYWxsLg0KPj4g
-VGhlIGd1ZXN0IE9TIGNhbiB1c2UgdGhpcyBoeXBlcmNhbGwgdG8gbm90aWZ5IHRoZSBwYWdlIGVu
-Y3J5cHRpb24gc3RhdHVzLg0KPj4gSWYgdGhlIHBhZ2UgaXMgZW5jcnlwdGVkIHdpdGggZ3Vlc3Qg
-c3BlY2lmaWMta2V5IHRoZW4gd2UgdXNlIFNFViBjb21tYW5kIGR1cmluZw0KPj4gdGhlIG1pZ3Jh
-dGlvbi4gSWYgcGFnZSBpcyBub3QgZW5jcnlwdGVkIHRoZW4gZmFsbGJhY2sgdG8gZGVmYXVsdC4N
-Cj4+DQo+PiBUaGUgcGF0Y2ggYWRkcyBhIG5ldyBpb2N0bCBLVk1fR0VUX1BBR0VfRU5DX0JJVE1B
-UC4gVGhlIGlvY3RsIGNhbiBiZSB1c2VkDQo+PiBieSB0aGUgcWVtdSB0byBnZXQgdGhlIHBhZ2Ug
-ZW5jcnlwdGVkIGJpdG1hcC4gUWVtdSBjYW4gY29uc3VsdCB0aGlzIGJpdG1hcA0KPj4gZHVyaW5n
-IHRoZSBtaWdyYXRpb24gdG8ga25vdyB3aGV0aGVyIHRoZSBwYWdlIGlzIGVuY3J5cHRlZC4NCj4+
-DQo+PiBbMV0gaHR0cHM6Ly9kZXZlbG9wZXIuYW1kLmNvbS93cC1jb250ZW50L3Jlc291cmNlcy81
-NTc2Ni5QREYNCj4+DQo+PiBUaGUgc2VyaWVzIGlzIHRlc3RlZCB3aXRoIHRoZSBRZW11LCBJIGFt
-IGluIHByb2Nlc3Mgb2YgY2xlYW5pbmcNCj4+IHVwIHRoZSBRZW11IGNvZGUgYW5kIHdpbGwgc3Vi
-bWl0IHNvb24uDQo+Pg0KPj4gV2hpbGUgaW1wbGVtZW50aW5nIHRoZSBtaWdyYXRpb24gSSBzdHVt
-YmxlZCBvbiB0aGUgZm9sbG93IHF1ZXN0aW9uOg0KPj4NCj4+IC0gU2luY2UgdGhlcmUgaXMgYSBn
-dWVzdCBPUyBjaGFuZ2VzIHJlcXVpcmVkIHRvIHN1cHBvcnQgdGhlIG1pZ3JhdGlvbiwNCj4+ICAg
-IHNvIGhvdyBkbyB3ZSBrbm93IHdoZXRoZXIgZ3Vlc3QgT1MgaXMgdXBkYXRlZD8gU2hvdWxkIHdl
-IGV4dGVuZCBLVk0NCj4+ICAgIGNhcGFiaWxpdGllcy9mZWF0dXJlIGJpdHMgdG8gY2hlY2sgdGhp
-cz8NCj4+DQo+PiBUT0RPOg0KPj4gICAtIGFkZCBhbiBpb2N0bCB0byBidWlsZCBlbmNyeXB0aW9u
-IGJpdG1hcC4gVGhlIGVuY3J5cHRpb24gYml0bWFwIGlzIGJ1aWx0IGR1cmluZw0KPj4gICAgIHRo
-ZSBndWVzdCBib290dXAvZXhlY3V0aW9uLiBXZSBzaG91bGQgcHJvdmlkZSBhbiBpb2N0bCBzbyB0
-aGF0IGRlc3RpbmF0aW9uDQo+PiAgICAgY2FuIGJ1aWxkIHRoZSBiaXRtYXAgYXMgaXQgcmVjZWl2
-ZXMgdGhlIHBhZ2VzLg0KPj4gICAtIHJlc2V0IHRoZSBiaXRtYXAgb24gZ3Vlc3QgcmVib290Lg0K
-Pj4NCj4+IFRoZSBjb21wbGV0ZSB0cmVlIHdpdGggcGF0Y2ggaXMgYXZhaWxhYmxlIGF0Og0KPj4g
-aHR0cHM6Ly9naXRodWIuY29tL2NvZG9tYW5pYS9rdm0vdHJlZS9zZXYtbWlncmF0aW9uLXJmYy12
-MQ0KPj4NCj4+IENjOiBUaG9tYXMgR2xlaXhuZXIgPHRnbHhAbGludXRyb25peC5kZT4NCj4+IENj
-OiBJbmdvIE1vbG5hciA8bWluZ29AcmVkaGF0LmNvbT4NCj4+IENjOiAiSC4gUGV0ZXIgQW52aW4i
-IDxocGFAenl0b3IuY29tPg0KPj4gQ2M6IFBhb2xvIEJvbnppbmkgPHBib256aW5pQHJlZGhhdC5j
-b20+DQo+PiBDYzogIlJhZGltIEtyxI1tw6HFmSIgPHJrcmNtYXJAcmVkaGF0LmNvbT4NCj4+IENj
-OiBKb2VyZyBSb2VkZWwgPGpvcm9AOGJ5dGVzLm9yZz4NCj4+IENjOiBCb3Jpc2xhdiBQZXRrb3Yg
-PGJwQHN1c2UuZGU+DQo+PiBDYzogVG9tIExlbmRhY2t5IDx0aG9tYXMubGVuZGFja3lAYW1kLmNv
-bT4NCj4+IENjOiB4ODZAa2VybmVsLm9yZw0KPj4gQ2M6IGt2bUB2Z2VyLmtlcm5lbC5vcmcNCj4+
-IENjOiBsaW51eC1rZXJuZWxAdmdlci5rZXJuZWwub3JnDQo+Pg0KPj4gQnJpamVzaCBTaW5naCAo
-MTApOg0KPj4gICAgS1ZNOiBTVk06IEFkZCBLVk1fU0VWIFNFTkRfU1RBUlQgY29tbWFuZA0KPj4g
-ICAgS1ZNOiBTVk06IEFkZCBLVk1fU0VORF9VUERBVEVfREFUQSBjb21tYW5kDQo+PiAgICBLVk06
-IFNWTTogQWRkIEtWTV9TRVZfU0VORF9GSU5JU0ggY29tbWFuZA0KPj4gICAgS1ZNOiBTVk06IEFk
-ZCBzdXBwb3J0IGZvciBLVk1fU0VWX1JFQ0VJVkVfU1RBUlQgY29tbWFuZA0KPj4gICAgS1ZNOiBT
-Vk06IEFkZCBLVk1fU0VWX1JFQ0VJVkVfVVBEQVRFX0RBVEEgY29tbWFuZA0KPj4gICAgS1ZNOiBT
-Vk06IEFkZCBLVk1fU0VWX1JFQ0VJVkVfRklOSVNIIGNvbW1hbmQNCj4+ICAgIEtWTTogeDg2OiBB
-ZGQgQU1EIFNFViBzcGVjaWZpYyBIeXBlcmNhbGwzDQo+PiAgICBLVk06IFg4NjogSW50cm9kdWNl
-IEtWTV9IQ19QQUdFX0VOQ19TVEFUVVMgaHlwZXJjYWxsDQo+PiAgICBLVk06IHg4NjogSW50cm9k
-dWNlIEtWTV9HRVRfUEFHRV9FTkNfQklUTUFQIGlvY3RsDQo+PiAgICBtbTogeDg2OiBJbnZva2Ug
-aHlwZXJjYWxsIHdoZW4gcGFnZSBlbmNyeXB0aW9uIHN0YXR1cyBpcyBjaGFuZ2VkDQo+Pg0KPj4g
-ICAuLi4vdmlydHVhbC9rdm0vYW1kLW1lbW9yeS1lbmNyeXB0aW9uLnJzdCAgICAgfCAxMTYgKysr
-Kw0KPj4gICBEb2N1bWVudGF0aW9uL3ZpcnR1YWwva3ZtL2h5cGVyY2FsbHMudHh0ICAgICAgfCAg
-MTQgKw0KPj4gICBhcmNoL3g4Ni9pbmNsdWRlL2FzbS9rdm1faG9zdC5oICAgICAgICAgICAgICAg
-fCAgIDMgKw0KPj4gICBhcmNoL3g4Ni9pbmNsdWRlL2FzbS9rdm1fcGFyYS5oICAgICAgICAgICAg
-ICAgfCAgMTIgKw0KPj4gICBhcmNoL3g4Ni9pbmNsdWRlL2FzbS9tZW1fZW5jcnlwdC5oICAgICAg
-ICAgICAgfCAgIDMgKw0KPj4gICBhcmNoL3g4Ni9rdm0vc3ZtLmMgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgfCA1NjAgKysrKysrKysrKysrKysrKystDQo+PiAgIGFyY2gveDg2L2t2bS92bXgv
-dm14LmMgICAgICAgICAgICAgICAgICAgICAgICB8ICAgMSArDQo+PiAgIGFyY2gveDg2L2t2bS94
-ODYuYyAgICAgICAgICAgICAgICAgICAgICAgICAgICB8ICAxNyArDQo+PiAgIGFyY2gveDg2L21t
-L21lbV9lbmNyeXB0LmMgICAgICAgICAgICAgICAgICAgICB8ICA0NSArLQ0KPj4gICBhcmNoL3g4
-Ni9tbS9wYWdlYXR0ci5jICAgICAgICAgICAgICAgICAgICAgICAgfCAgMTUgKw0KPj4gICBpbmNs
-dWRlL3VhcGkvbGludXgva3ZtLmggICAgICAgICAgICAgICAgICAgICAgfCAgNTEgKysNCj4+ICAg
-aW5jbHVkZS91YXBpL2xpbnV4L2t2bV9wYXJhLmggICAgICAgICAgICAgICAgIHwgICAxICsNCj4+
-ICAgMTIgZmlsZXMgY2hhbmdlZCwgODM0IGluc2VydGlvbnMoKyksIDQgZGVsZXRpb25zKC0pDQo+
-Pg0KPj4gLS0NCj4+IDIuMTcuMQ0KPj4NCj4gDQo+IFdoYXQncyB0aGUgYmFjay1vZi10aGUtZW52
-ZWxvcGUgbWFyZ2luYWwgY29zdCBvZiB0cmFuc2ZlcnJpbmcgYSAxNmtCDQo+IHJlZ2lvbiBmcm9t
-IG9uZSBob3N0IHRvIGFub3RoZXI/IEknbSBpbnRlcmVzdGVkIGluIHdoYXQgdGhlIGVuZCB0byBl
-bmQNCj4gbWlncmF0aW9uIHBlcmYgY2hhbmdlcyBsb29rIGxpa2UgZm9yIHRoaXMuIElmIHlvdSBo
-YXZlIG1lYXN1cmVkDQo+IG1pZ3JhdGlvbiBwZXJmLCBJJ20gaW50ZXJlc3RlZCBpbiB0aGF0IGFs
-c28uDQo+IA0KDQpJIGhhdmUgbm90IGRvbmUgYSBjb21wbGV0ZSBwZXJmb3JtYW5jZSBhbmFseXNp
-cyB5ZXQhIEZyb20gdGhlIHFlbXUNClFNUCBwcm9tcHQgKHF1ZXJ5LW1pZ3JhdGlvbikgSSBhbSBn
-ZXR0aW5nIH44bWJwcyB0aHJvdWdocHV0IGZyb20NCm9uZSBob3N0IHRvIGFub3RoZXIgKHRoaXMg
-aXMgd2l0aCA0a2IgcmVnaW9ucykuIEkgaGF2ZSBiZWVuIHRvbGQNCnRoYXQgaW5jcmVhc2luZyB0
-aGUgdHJhbnNmZXIgc2l6ZSBmcm9tIDRrYiAtPiAxNmtiIG1heSBub3QgZ2l2ZSBhDQpodWdlIHBl
-cmZvcm1hbmNlIGdhaW4gYmVjYXVzZSBhdCBGVyBsZXZlbCB0aGV5IHN0aWxsIG9wZXJhdGluZw0K
-b24gNGtiIGJsb2Nrcy4gVGhlcmUgaXMgcG9zc2liaWxpdHkgdGhhdCBmdXR1cmUgRlcgdXBkYXRl
-cyBtYXkNCmdpdmUgYSBiaXQgYmV0dGVyIHBlcmZvcm1hbmNlIG9uIDE2a2Igc2l6ZS4NCg0KLUJy
-aWplc2gNCg==
+Hello Thomas,
+
+On 04/24/2019 07:37 AM, Thomas Huth wrote:
+> We are going to enable the qemu-iotests during "make check" again,
+> and for running the iotests, we need bash and gnu-sed.
+>
+> Signed-off-by: Thomas Huth <thuth@redhat.com>
+> ---
+>   .cirrus.yml | 4 ++--
+>   .travis.yml | 1 +
+>   2 files changed, 3 insertions(+), 2 deletions(-)
+
+It needs to get the Freebsd image [1] updated too, in order to `make 
+BUILD_TARGET=check vm-build-freebsd` passes. Here it failed with:
+---
+env: bash: No such file or directory
+gmake: *** [/var/tmp/qemu-test.6OlDFH/tests/Makefile.include:1101: 
+check-tests/qemu-iotests-quick.sh] Error 1
+gmake: *** Waiting for unfinished jobs....
+---
+
+I'm not sure about the netbsd and openbsd images, they might need bash 
+and gnu-sed as well.
+
+[1] http://download.patchew.org/freebsd-11.1-amd64.img.xz
+
+- Wainer
+
+>
+> diff --git a/.cirrus.yml b/.cirrus.yml
+> index 47ef5bc604..8326a3a4b1 100644
+> --- a/.cirrus.yml
+> +++ b/.cirrus.yml
+> @@ -7,7 +7,7 @@ freebsd_12_task:
+>       cpu: 8
+>       memory: 8G
+>     install_script: pkg install -y
+> -    bison curl cyrus-sasl git glib gmake gnutls
+> +    bash bison curl cyrus-sasl git glib gmake gnutls gsed
+>       nettle perl5 pixman pkgconf png usbredir
+>     script:
+>       - mkdir build
+> @@ -20,7 +20,7 @@ macos_task:
+>     osx_instance:
+>       image: mojave-base
+>     install_script:
+> -    - brew install pkg-config python glib pixman make sdl2
+> +    - brew install pkg-config python gnu-sed glib pixman make sdl2
+>     script:
+>       - ./configure --python=/usr/local/bin/python3 || { cat config.log; exit 1; }
+>       - gmake -j$(sysctl -n hw.ncpu)
+> diff --git a/.travis.yml b/.travis.yml
+> index 2e06aee9d0..ba94644192 100644
+> --- a/.travis.yml
+> +++ b/.travis.yml
+> @@ -42,6 +42,7 @@ addons:
+>       packages:
+>         - glib
+>         - pixman
+> +      - gnu-sed
+>   
+>   
+>   # The channel name "irc.oftc.net#qemu" is encrypted against qemu/qemu
