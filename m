@@ -2,59 +2,61 @@ Return-Path: <SRS0=3XOk=S2=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-6.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7B515C10F11
-	for <qemu-devel@archiver.kernel.org>; Wed, 24 Apr 2019 10:40:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F25EEC10F11
+	for <qemu-devel@archiver.kernel.org>; Wed, 24 Apr 2019 10:40:22 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3D4922084F
-	for <qemu-devel@archiver.kernel.org>; Wed, 24 Apr 2019 10:40:20 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3D4922084F
+	by mail.kernel.org (Postfix) with ESMTPS id B71AF2084F
+	for <qemu-devel@archiver.kernel.org>; Wed, 24 Apr 2019 10:40:22 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B71AF2084F
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:39352 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:39354 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hJFK7-0007W4-Ez
-	for qemu-devel@archiver.kernel.org; Wed, 24 Apr 2019 06:40:19 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:39034)
+	id 1hJFK9-0007XW-Ux
+	for qemu-devel@archiver.kernel.org; Wed, 24 Apr 2019 06:40:22 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:39095)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1hJFHx-000653-J8
-	for qemu-devel@nongnu.org; Wed, 24 Apr 2019 06:38:07 -0400
+	(envelope-from <thuth@redhat.com>) id 1hJFI1-00069k-Ib
+	for qemu-devel@nongnu.org; Wed, 24 Apr 2019 06:38:15 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1hJFHt-0007Yk-Fl
-	for qemu-devel@nongnu.org; Wed, 24 Apr 2019 06:38:05 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:54454)
+	(envelope-from <thuth@redhat.com>) id 1hJFHz-0007cF-HR
+	for qemu-devel@nongnu.org; Wed, 24 Apr 2019 06:38:09 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:43188)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <thuth@redhat.com>)
-	id 1hJFHn-0007UF-Ie; Wed, 24 Apr 2019 06:37:56 -0400
+	id 1hJFHr-0007XM-Ui; Wed, 24 Apr 2019 06:38:00 -0400
 Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
 	[10.5.11.15])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id B53AB8B101;
-	Wed, 24 Apr 2019 10:37:54 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id 0BFE2C0B2037;
+	Wed, 24 Apr 2019 10:37:59 +0000 (UTC)
 Received: from thuth.com (ovpn-116-69.ams2.redhat.com [10.36.116.69])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id 7FFB05D704;
-	Wed, 24 Apr 2019 10:37:50 +0000 (UTC)
+	by smtp.corp.redhat.com (Postfix) with ESMTP id 3239C5D704;
+	Wed, 24 Apr 2019 10:37:57 +0000 (UTC)
 From: Thomas Huth <thuth@redhat.com>
 To: qemu-devel@nongnu.org
-Date: Wed, 24 Apr 2019 12:37:41 +0200
-Message-Id: <20190424103747.10173-1-thuth@redhat.com>
+Date: Wed, 24 Apr 2019 12:37:43 +0200
+Message-Id: <20190424103747.10173-3-thuth@redhat.com>
+In-Reply-To: <20190424103747.10173-1-thuth@redhat.com>
+References: <20190424103747.10173-1-thuth@redhat.com>
 MIME-Version: 1.0
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.28]);
-	Wed, 24 Apr 2019 10:37:54 +0000 (UTC)
+	(mx1.redhat.com [10.5.110.31]);
+	Wed, 24 Apr 2019 10:37:59 +0000 (UTC)
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] [PATCH 0/6] tests/qemu-iotests: Run basic iotests
- during "make check"
+Subject: [Qemu-devel] [PATCH 2/6] tests/qemu-iotests/group: Introduce a new
+ "ci" group for CI pipelines
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -76,164 +78,373 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 Content-Type: text/plain; charset="UTF-8"
-Message-ID: <20190424103741.zoDZFJnUVYkAXHT4YxKuj_Hqxjz_66UT2CGTm9jPZaI@z>
+Message-ID: <20190424103743.ykQyae8OX9J-9brOM9ueI7PQZzugYMNxw-pZ5L1EoeY@z>
 
-People often forget to run the iotests before submitting patches or
-pull requests - this is likely due to the fact that we do not run the
-tests during our mandatory "make check" tests yet.
-This patch series now introduces a new "ci" iotests group that should
-be safe to run in all CI environments (including FreeBSD and macOS!).
-Thus these iotests can now always be run during "make check" automati-
-cally, too.
+Tests in this group are supposed to run in every possible QEMU configurat=
+ion.
+That means they should run with every QEMU binary (also non-x86), without
+dependencies on an optional features, they must work at least with the qc=
+ow2
+image format and be able to run on all kind of host filesystems and users
+(i.e. also as "nobody" or "root").
 
-Thomas Huth (6):
-  tests/qemu-iotests/check: Pick a default machine if necessary
-  tests/qemu-iotests/group: Introduce a new "ci" group for CI pipelines
-  tests/qemu-iotests: Do not hard-code the path to bash
-  cirrus / travis: Add gnu-sed and bash for macOS and FreeBSD
-  tests: Run the iotests during "make check" again
-  tests/qemu-iotests: Remove the "_supported_os Linux" line from many
-    tests
+The initial list has been created as a subset of the "quick" group, where
+I've disabled all tests that are failing with qemu-system-aarch64 or
+qemu-system-tricore or in one of our CI pipelines.
 
- .cirrus.yml                 |   4 +-
- .travis.yml                 |   1 +
- tests/Makefile.include      |   2 +-
- tests/qemu-iotests-quick.sh |  17 +++-
- tests/qemu-iotests/001      |   1 -
- tests/qemu-iotests/002      |   1 -
- tests/qemu-iotests/003      |   1 -
- tests/qemu-iotests/004      |   1 -
- tests/qemu-iotests/005      |   1 -
- tests/qemu-iotests/007      |   1 -
- tests/qemu-iotests/008      |   1 -
- tests/qemu-iotests/009      |   1 -
- tests/qemu-iotests/010      |   1 -
- tests/qemu-iotests/011      |   1 -
- tests/qemu-iotests/012      |   1 -
- tests/qemu-iotests/013      |   1 -
- tests/qemu-iotests/014      |   1 -
- tests/qemu-iotests/015      |   1 -
- tests/qemu-iotests/017      |   1 -
- tests/qemu-iotests/020      |   1 -
- tests/qemu-iotests/021      |   1 -
- tests/qemu-iotests/022      |   1 -
- tests/qemu-iotests/023      |   1 -
- tests/qemu-iotests/025      |   1 -
- tests/qemu-iotests/026      |   1 -
- tests/qemu-iotests/027      |   1 -
- tests/qemu-iotests/028      |   1 -
- tests/qemu-iotests/029      |   1 -
- tests/qemu-iotests/031      |   1 -
- tests/qemu-iotests/032      |   1 -
- tests/qemu-iotests/033      |   1 -
- tests/qemu-iotests/035      |   1 -
- tests/qemu-iotests/036      |   1 -
- tests/qemu-iotests/037      |   1 -
- tests/qemu-iotests/042      |   1 -
- tests/qemu-iotests/043      |   1 -
- tests/qemu-iotests/046      |   1 -
- tests/qemu-iotests/047      |   1 -
- tests/qemu-iotests/049      |   1 -
- tests/qemu-iotests/050      |   1 -
- tests/qemu-iotests/051      |   1 -
- tests/qemu-iotests/052      |   1 -
- tests/qemu-iotests/053      |   1 -
- tests/qemu-iotests/054      |   1 -
- tests/qemu-iotests/060      |   1 -
- tests/qemu-iotests/061      |   1 -
- tests/qemu-iotests/062      |   1 -
- tests/qemu-iotests/063      |   1 -
- tests/qemu-iotests/066      |   1 -
- tests/qemu-iotests/067      |   1 -
- tests/qemu-iotests/068      |   1 -
- tests/qemu-iotests/069      |   1 -
- tests/qemu-iotests/071      |   1 -
- tests/qemu-iotests/072      |   1 -
- tests/qemu-iotests/073      |   1 -
- tests/qemu-iotests/079      |   1 -
- tests/qemu-iotests/080      |   1 -
- tests/qemu-iotests/082      |   1 -
- tests/qemu-iotests/085      |   1 -
- tests/qemu-iotests/089      |   1 -
- tests/qemu-iotests/090      |   1 -
- tests/qemu-iotests/091      |   1 -
- tests/qemu-iotests/094      |   1 -
- tests/qemu-iotests/095      |   1 -
- tests/qemu-iotests/097      |   1 -
- tests/qemu-iotests/098      |   1 -
- tests/qemu-iotests/102      |   1 -
- tests/qemu-iotests/103      |   1 -
- tests/qemu-iotests/104      |   1 -
- tests/qemu-iotests/105      |   1 -
- tests/qemu-iotests/107      |   1 -
- tests/qemu-iotests/110      |   1 -
- tests/qemu-iotests/111      |   1 -
- tests/qemu-iotests/112      |   1 -
- tests/qemu-iotests/114      |   1 -
- tests/qemu-iotests/115      |   1 -
- tests/qemu-iotests/117      |   1 -
- tests/qemu-iotests/120      |   1 -
- tests/qemu-iotests/121      |   1 -
- tests/qemu-iotests/122      |   1 -
- tests/qemu-iotests/125      |   1 -
- tests/qemu-iotests/126      |   1 -
- tests/qemu-iotests/127      |   1 -
- tests/qemu-iotests/130      |   1 -
- tests/qemu-iotests/133      |   1 -
- tests/qemu-iotests/134      |   1 -
- tests/qemu-iotests/137      |   1 -
- tests/qemu-iotests/138      |   1 -
- tests/qemu-iotests/141      |   1 -
- tests/qemu-iotests/142      |   1 -
- tests/qemu-iotests/143      |   1 -
- tests/qemu-iotests/144      |   1 -
- tests/qemu-iotests/145      |   1 -
- tests/qemu-iotests/153      |   1 -
- tests/qemu-iotests/156      |   1 -
- tests/qemu-iotests/157      |   1 -
- tests/qemu-iotests/158      |   1 -
- tests/qemu-iotests/159      |   1 -
- tests/qemu-iotests/161      |   1 -
- tests/qemu-iotests/162      |   1 -
- tests/qemu-iotests/170      |   1 -
- tests/qemu-iotests/172      |   1 -
- tests/qemu-iotests/173      |   1 -
- tests/qemu-iotests/176      |   1 -
- tests/qemu-iotests/178      |   1 -
- tests/qemu-iotests/181      |   1 -
- tests/qemu-iotests/182      |   1 -
- tests/qemu-iotests/183      |   1 -
- tests/qemu-iotests/185      |   1 -
- tests/qemu-iotests/186      |   1 -
- tests/qemu-iotests/187      |   1 -
- tests/qemu-iotests/189      |   1 -
- tests/qemu-iotests/190      |   1 -
- tests/qemu-iotests/191      |   1 -
- tests/qemu-iotests/192      |   1 -
- tests/qemu-iotests/195      |   1 -
- tests/qemu-iotests/197      |   1 -
- tests/qemu-iotests/198      |   1 -
- tests/qemu-iotests/200      |   1 -
- tests/qemu-iotests/201      |   1 -
- tests/qemu-iotests/214      |   1 -
- tests/qemu-iotests/215      |   1 -
- tests/qemu-iotests/217      |   1 -
- tests/qemu-iotests/220      |   1 -
- tests/qemu-iotests/227      |   1 -
- tests/qemu-iotests/229      |   1 -
- tests/qemu-iotests/231      |   1 -
- tests/qemu-iotests/232      |   1 -
- tests/qemu-iotests/233      |   1 -
- tests/qemu-iotests/239      |   2 +-
- tests/qemu-iotests/240      |   3 +-
- tests/qemu-iotests/241      |   2 +-
- tests/qemu-iotests/243      |   2 +-
- tests/qemu-iotests/244      |   2 +-
- tests/qemu-iotests/247      |   1 -
- tests/qemu-iotests/check    |  13 ++-
- tests/qemu-iotests/group    | 194 +++++++++++++++++++-----------------
- 137 files changed, 139 insertions(+), 229 deletions(-)
+Signed-off-by: Thomas Huth <thuth@redhat.com>
+---
+ tests/qemu-iotests/group | 194 ++++++++++++++++++++-------------------
+ 1 file changed, 102 insertions(+), 92 deletions(-)
 
+diff --git a/tests/qemu-iotests/group b/tests/qemu-iotests/group
+index bae7718380..2ed42dcc14 100644
+--- a/tests/qemu-iotests/group
++++ b/tests/qemu-iotests/group
+@@ -4,63 +4,73 @@
+ # - do not start group names with a digit
+ #
+=20
++#
++# Some notes about the groups:
++# - Tests in the "quick" group should finish within some few seconds
++# - Tests in the "ci" group are suitable for running in CI systems. That
++#   means they should run with every QEMU binary (also non-x86), with
++#   every QEMU configuration (i.e. no dependency on an optional feature)=
+,
++#   at least with the qcow2 image format and all kind of host filesystem=
+s
++#   and users (i.e. also as "nobody" or "root").
++#
++
+ #
+ # test-group association ... one line per test
+ #
+-001 rw auto quick
+-002 rw auto quick
++001 rw auto quick ci
++002 rw auto quick ci
+ 003 rw auto
+-004 rw auto quick
+-005 img auto quick
++004 rw auto quick ci
++005 img auto quick ci
+ # 006 was removed, do not reuse
+ 007 snapshot auto
+-008 rw auto quick
+-009 rw auto quick
+-010 rw auto quick
+-011 rw auto quick
+-012 auto quick
++008 rw auto quick ci
++009 rw auto quick ci
++010 rw auto quick ci
++011 rw auto quick ci
++012 auto quick ci
+ 013 rw auto
+ 014 rw auto
+ 015 rw snapshot auto
+ # 016 was removed, do not reuse
+-017 rw backing auto quick
+-018 rw backing auto quick
+-019 rw backing auto quick
+-020 rw backing auto quick
+-021 io auto quick
++017 rw backing auto quick ci
++018 rw backing auto quick ci
++019 rw backing auto quick ci
++020 rw backing auto quick ci
++021 io auto quick ci
+ 022 rw snapshot auto
+ 023 rw auto
+-024 rw backing auto quick
+-025 rw auto quick
++024 rw backing auto quick ci
++025 rw auto quick ci
+ 026 rw blkdbg auto
+-027 rw auto quick
++027 rw auto quick ci
+ 028 rw backing auto quick
+-029 rw auto quick
++029 rw auto quick ci
+ 030 rw auto backing
+-031 rw auto quick
+-032 rw auto quick
+-033 rw auto quick
+-034 rw auto backing quick
+-035 rw auto quick
+-036 rw auto quick
+-037 rw auto backing quick
+-038 rw auto backing quick
+-039 rw auto quick
++031 rw auto quick ci
++032 rw auto quick ci
++033 rw auto quick ci
++034 rw auto backing quick ci
++035 rw auto quick ci
++036 rw auto quick ci
++037 rw auto backing quick ci
++038 rw auto backing quick ci
++039 rw auto quick ci
+ 040 rw auto
+ 041 rw auto backing
+-042 rw auto quick
++042 rw auto quick ci
+ 043 rw auto backing
+ 044 rw auto
+ 045 rw auto quick
+-046 rw auto aio quick
+-047 rw auto quick
+-048 img auto quick
++046 rw auto aio quick ci
++047 rw auto quick ci
++048 img auto quick ci
+ 049 rw auto
+-050 rw auto backing quick
++050 rw auto backing quick ci
+ 051 rw auto
+-052 rw auto backing quick
+-053 rw auto quick
+-054 rw auto quick
++052 rw auto backing quick ci
++053 rw auto quick ci
++054 rw auto quick ci
+ 055 rw auto
+ 056 rw auto backing
+ 057 rw auto
+@@ -68,19 +78,19 @@
+ 059 rw auto quick
+ 060 rw auto quick
+ 061 rw auto
+-062 rw auto quick
+-063 rw auto quick
++062 rw auto quick ci
++063 rw auto quick ci
+ 064 rw auto quick
+ 065 rw auto quick
+-066 rw auto quick
++066 rw auto quick ci
+ 067 rw auto quick
+ 068 rw auto quick
+-069 rw auto quick
++069 rw auto quick ci
+ 070 rw auto quick
+-071 rw auto quick
+-072 rw auto quick
+-073 rw auto quick
+-074 rw auto quick
++071 rw auto quick ci
++072 rw auto quick ci
++073 rw auto quick ci
++074 rw auto quick ci
+ 075 rw auto quick
+ 076 auto
+ 077 rw auto quick
+@@ -88,15 +98,15 @@
+ 079 rw auto
+ 080 rw auto
+ 081 rw auto quick
+-082 rw auto quick
++082 rw auto quick ci
+ 083 rw auto
+ 084 img auto quick
+ 085 rw auto
+-086 rw auto quick
++086 rw auto quick ci
+ 087 rw auto quick
+ 088 rw auto quick
+-089 rw auto quick
+-090 rw auto quick
++089 rw auto quick ci
++090 rw auto quick ci
+ 091 rw auto migration
+ 092 rw auto quick
+ 093 auto
+@@ -104,29 +114,29 @@
+ 095 rw auto quick
+ 096 rw auto quick
+ 097 rw auto backing
+-098 rw auto backing quick
+-099 rw auto quick
++098 rw auto backing quick ci
++099 rw auto quick ci
+ # 100 was removed, do not reuse
+ 101 rw auto quick
+-102 rw auto quick
+-103 rw auto quick
++102 rw auto quick ci
++103 rw auto quick ci
+ 104 rw auto
+-105 rw auto quick
++105 rw auto quick ci
+ 106 rw auto quick
+-107 rw auto quick
+-108 rw auto quick
++107 rw auto quick ci
++108 rw auto quick ci
+ 109 rw auto
+-110 rw auto backing quick
+-111 rw auto quick
++110 rw auto backing quick ci
++111 rw auto quick ci
+ 112 rw auto
+ 113 rw auto quick
+-114 rw auto quick
++114 rw auto quick ci
+ 115 rw auto
+ 116 rw auto quick
+ 117 rw auto
+ 118 rw auto
+ 119 rw auto quick
+-120 rw auto quick
++120 rw auto quick ci
+ 121 rw auto
+ 122 rw auto
+ 123 rw auto quick
+@@ -136,73 +146,73 @@
+ 127 rw auto backing quick
+ 128 rw auto quick
+ 129 rw auto quick
+-130 rw auto quick
++130 rw auto quick ci
+ 131 rw auto quick
+ 132 rw auto quick
+-133 auto quick
+-134 rw auto quick
++133 auto quick ci
++134 rw auto quick ci
+ 135 rw auto
+ 136 rw auto
+ 137 rw auto
+ 138 rw auto quick
+ 139 rw auto quick
+-140 rw auto quick
+-141 rw auto quick
++140 rw auto quick ci
++141 rw auto quick ci
+ 142 auto
+-143 auto quick
++143 auto quick ci
+ 144 rw auto quick
+-145 auto quick
++145 auto quick ci
+ 146 auto quick
+ 147 auto
+ 148 rw auto quick
+ 149 rw auto sudo
+-150 rw auto quick
++150 rw auto quick ci
+ 151 rw auto
+ 152 rw auto quick
+ 153 rw auto quick
+-154 rw auto backing quick
++154 rw auto backing quick ci
+ 155 rw auto
+-156 rw auto quick
++156 rw auto quick ci
+ 157 auto
+-158 rw auto quick
+-159 rw auto quick
++158 rw auto quick ci
++159 rw auto quick ci
+ 160 rw auto quick
+-161 rw auto quick
++161 rw auto quick ci
+ 162 auto quick
+ 163 rw auto
+ 165 rw auto quick
+ 169 rw auto quick migration
+-170 rw auto quick
++170 rw auto quick ci
+ 171 rw auto quick
+ 172 auto
+ 173 rw auto
+ 174 auto
+ 175 auto quick
+ 176 rw auto backing
+-177 rw auto quick
++177 rw auto quick ci
+ 178 auto
+-179 rw auto quick
++179 rw auto quick ci
+ 181 rw auto migration
+ 182 rw auto quick
+ 183 rw auto migration
+-184 rw auto quick
++184 rw auto quick ci
+ 185 rw auto
+ 186 rw auto
+ 187 rw auto
+ 188 rw auto quick
+ 189 rw auto
+-190 rw auto quick
++190 rw auto quick ci
+ 191 rw auto
+ 192 rw auto quick
+ 194 rw auto migration quick
+-195 rw auto quick
++195 rw auto quick ci
+ 196 rw auto quick migration
+-197 rw auto quick
++197 rw auto quick ci
+ 198 rw auto
+ 199 rw auto migration
+ 200 rw auto
+ 201 rw auto migration
+-202 rw auto quick
++202 rw auto quick ci
+ 203 rw auto migration
+ 204 rw auto quick
+ 205 rw auto quick
+@@ -215,25 +225,25 @@
+ 212 rw auto quick
+ 213 rw auto quick
+ 214 rw auto
+-215 rw auto quick
+-216 rw auto quick
+-217 rw auto quick
+-218 rw auto quick
++215 rw auto quick ci
++216 rw auto quick ci
++217 rw auto quick ci
++218 rw auto quick ci
+ 219 rw auto
+ 220 rw auto
+ 221 rw auto quick
+ 222 rw auto quick
+ 223 rw auto quick
+-224 rw auto quick
++224 rw auto quick ci
+ 225 rw auto quick
+-226 auto quick
++226 auto quick ci
+ 227 auto quick
+-228 rw auto quick
+-229 auto quick
++228 rw auto quick ci
++229 auto quick ci
+ 231 auto quick
+ 232 auto quick
+-233 auto quick
+-234 auto quick migration
++233 auto quick ci
++234 auto quick ci migration
+ 235 auto quick
+ 236 auto quick
+ 237 rw auto quick
+@@ -242,9 +252,9 @@
+ 240 auto quick
+ 241 rw auto quick
+ 242 rw auto quick
+-243 rw auto quick
+-244 rw auto quick
++243 rw auto quick ci
++244 rw auto quick ci
+ 245 rw auto
+ 246 rw auto quick
+-247 rw auto quick
++247 rw auto quick ci
+ 248 rw auto quick
 --=20
 2.21.0
 
