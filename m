@@ -1,31 +1,25 @@
-Received: from eggs.gnu.org ([209.51.188.92]:50984)
+Received: from eggs.gnu.org ([209.51.188.92]:56100)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <yan.y.zhao@intel.com>) id 1hJ8ze-0000HD-3q
-	for qemu-devel@nongnu.org; Tue, 23 Apr 2019 23:54:49 -0400
+	(envelope-from <cjia@nvidia.com>) id 1hJ9My-0005Uf-T4
+	for qemu-devel@nongnu.org; Wed, 24 Apr 2019 00:18:54 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <yan.y.zhao@intel.com>) id 1hJ8kt-0008Tb-LK
-	for qemu-devel@nongnu.org; Tue, 23 Apr 2019 23:39:33 -0400
-Received: from mga12.intel.com ([192.55.52.136]:1800)
+	(envelope-from <cjia@nvidia.com>) id 1hJ9Mx-0005PI-Ml
+	for qemu-devel@nongnu.org; Wed, 24 Apr 2019 00:18:52 -0400
+Received: from hqemgate16.nvidia.com ([216.228.121.65]:15558)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <yan.y.zhao@intel.com>)
-	id 1hJ8ks-0008Iu-Cx
-	for qemu-devel@nongnu.org; Tue, 23 Apr 2019 23:39:31 -0400
-Date: Tue, 23 Apr 2019 23:33:46 -0400
-From: Yan Zhao <yan.y.zhao@intel.com>
-Message-ID: <20190424033346.GC26247@joy-OptiPlex-7040>
-Reply-To: Yan Zhao <yan.y.zhao@intel.com>
+	(Exim 4.71) (envelope-from <cjia@nvidia.com>) id 1hJ9Mx-0005K5-6o
+	for qemu-devel@nongnu.org; Wed, 24 Apr 2019 00:18:51 -0400
+Date: Tue, 23 Apr 2019 21:13:41 -0700
+From: Neo Jia <cjia@nvidia.com>
+Message-ID: <20190424041340.GA5498@nvidia.com>
 References: <20190419083258.19580-1-yan.y.zhao@intel.com>
 	<20190419083505.19654-1-yan.y.zhao@intel.com>
-	<20190422083950.25eb9e7c@x1.home>
-	<20190423010152.GC32217@joy-OptiPlex-7040>
-	<20190422192100.4d577e4b@x1.home>
-	<20190423054157.GA26190@joy-OptiPlex-7040>
-	<20190423102419.GE6022@redhat.com>
+	<20190423103939.GF6022@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
+Content-Type: text/plain; charset="iso-8859-1"
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20190423102419.GE6022@redhat.com>
+Content-Transfer-Encoding: quoted-printable
+In-Reply-To: <20190423103939.GF6022@redhat.com>
 Subject: Re: [Qemu-devel] [PATCH 1/2] vfio/mdev: add version field as
  mandatory attribute for mdev device
 List-Id: <qemu-devel.nongnu.org>
@@ -37,86 +31,95 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: Daniel =?iso-8859-1?Q?P=2E_Berrang=E9?= <berrange@redhat.com>
-Cc: Alex Williamson <alex.williamson@redhat.com>, "cjia@nvidia.com" <cjia@nvidia.com>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>, "aik@ozlabs.ru" <aik@ozlabs.ru>, "Zhengxiao.zx@alibaba-inc.com" <Zhengxiao.zx@alibaba-inc.com>, "shuangtai.tst@alibaba-inc.com" <shuangtai.tst@alibaba-inc.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "kwankhede@nvidia.com" <kwankhede@nvidia.com>, "eauger@redhat.com" <eauger@redhat.com>, "Liu, Yi L" <yi.l.liu@intel.com>, "eskultet@redhat.com" <eskultet@redhat.com>, "Yang, Ziye" <ziye.yang@intel.com>, "mlevitsk@redhat.com" <mlevitsk@redhat.com>, "pasic@linux.ibm.com" <pasic@linux.ibm.com>, "libvir-list@redhat.com" <libvir-list@redhat.com>, "arei.gonglei@huawei.com" <arei.gonglei@huawei.com>, "felipe@nutanix.com" <felipe@nutanix.com>, "Ken.Xue@amd.com" <Ken.Xue@amd.com>, "Tian, Kevin" <kevin.tian@intel.com>, "dgilbert@redhat.com" <dgilbert@redhat.com>, "zhenyuw@linux.intel.com" <zhenyuw@linux.intel.com>, "intel-gvt-dev@lists.freedesktop.org" <intel-gvt-dev@lists.freedesktop.org>, "Liu, Changpeng" <changpeng.liu@intel.com>, "cohuck@redhat.com" <cohuck@redhat.com>, "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, "Wang, Zhi A" <zhi.a.wang@intel.com>, "jonathan.davies@nutanix.com" <jonathan.davies@nutanix.com>, "He, Shaopeng" <shaopeng.he@intel.com>
+Cc: Yan Zhao <yan.y.zhao@intel.com>, intel-gvt-dev@lists.freedesktop.org, kvm@vger.kernel.org, aik@ozlabs.ru, Zhengxiao.zx@alibaba-inc.com, shuangtai.tst@alibaba-inc.com, qemu-devel@nongnu.org, kwankhede@nvidia.com, eauger@redhat.com, yi.l.liu@intel.com, eskultet@redhat.com, ziye.yang@intel.com, mlevitsk@redhat.com, pasic@linux.ibm.com, libvir-list@redhat.com, arei.gonglei@huawei.com, felipe@nutanix.com, Ken.Xue@amd.com, kevin.tian@intel.com, dgilbert@redhat.com, zhenyuw@linux.intel.com, alex.williamson@redhat.com, changpeng.liu@intel.com, cohuck@redhat.com, linux-kernel@vger.kernel.org, zhi.a.wang@intel.com, jonathan.davies@nutanix.com, shaopeng.he@intel.com
 
-On Tue, Apr 23, 2019 at 06:24:19PM +0800, Daniel P. Berrangé wrote:
-> On Tue, Apr 23, 2019 at 01:41:57AM -0400, Yan Zhao wrote:
-> > On Tue, Apr 23, 2019 at 09:21:00AM +0800, Alex Williamson wrote:
-> > > On Mon, 22 Apr 2019 21:01:52 -0400
-> > > Yan Zhao <yan.y.zhao@intel.com> wrote:
-> > >
-> > > > On Mon, Apr 22, 2019 at 10:39:50PM +0800, Alex Williamson wrote:
-> > > > > On Fri, 19 Apr 2019 04:35:04 -0400
-> > > > > Yan Zhao <yan.y.zhao@intel.com> wrote:
-> > > > >
-> > > > > > device version attribute in mdev sysfs is used by user space software
-> > > > > > (e.g. libvirt) to query device compatibility for live migration of VFIO
-> > > > > > mdev devices. This attribute is mandatory if a mdev device supports live
-> > > > > > migration.
-> > > > >
-> > > > > The Subject: doesn't quite match what's being proposed here.
-> > > > >
-> > > > > > It consists of two parts: common part and vendor proprietary part.
-> > > > > > common part: 32 bit. lower 16 bits is vendor id and higher 16 bits
-> > > > > >              identifies device type. e.g., for pci device, it is
-> > > > > >              "pci vendor id" | (VFIO_DEVICE_FLAGS_PCI << 16).
-> > > > >
-> > > > > What purpose does this serve?  If it's intended as some sort of
-> > > > > namespace feature, shouldn't we first assume that we can only support
-> > > > > migration to devices of the same type?  Therefore each type would
-> > > > > already have its own namespace.  Also that would make the trailing bit
-> > > > > of the version string listed below in the example redundant.  A vendor
-> > > > > is still welcome to include this in their version string if they wish,
-> > > > > but I think the string should be entirely vendor defined.
-> > > > >
-> > > > hi Alex,
-> > > > This common part is a kind of namespace.
-> > > > Because if version string is entirely defined by vendors, I'm worried about
-> > > > if there is a case that one vendor's version string happens to deceive and
-> > > > interfere with another vendor's version checking?
-> > > > e.g.
-> > > > vendor A has a version string like: vendor id + device id + mdev type
-> > > > vendor B has a version string like: device id + vendor id + mdev type
-> > > > but vendor A's vendor id is 0x8086, device id is 0x1217
-> > > > vendor B's vendor id is 0x1217, device id is 0x8086.
-> > > >
-> > > > In this corner case, the two vendors may regard the two device is
-> > > > migratable but actually they are not.
-> > > >
-> > > > That's the reason for this common part that serve as a kind of namespace
-> > > > that all vendors will comply with to avoid overlap.
-> > >
-> > > If we assume that migration can only occur between matching mdev types,
-> > > this is redundant, each type already has their own namespace.
-> > >
-> > hi Alex,
-> > do you mean user space software like libvirt needs to first check whether
-> > mdev type is matching and then check whether version is matching?
-> 
-> I would expect that libvirt (or other mgmt apps) will always first
-> check that the vendor id, device id, mdev type all match. So for the
-> version string it should suffice to be a "normal" numeric value.
-> 
-> Essentially version string just needs to be there to distinguish
-> revisions of the same mdev type over time.
->
-hi Daniel,
-The way that user space software checks that the vendor id, device id, mdev
-type all match and version string is just revisions is somewhat restrictive?
-user space software could not have so much detailed information regarding to
-which devices are compatible, especially when vendor id, device id,
-revision id, and mdev types are not enough or no need to be exactly the same.
-By moving decision making for compatibility from user space to vendor
-driver, user space software can be more change-resistant.
-Agree?
+On Tue, Apr 23, 2019 at 11:39:39AM +0100, Daniel P. Berrang=E9 wrote:
+> On Fri, Apr 19, 2019 at 04:35:04AM -0400, Yan Zhao wrote:
+> > device version attribute in mdev sysfs is used by user space software
+> > (e.g. libvirt) to query device compatibility for live migration of VFIO
+> > mdev devices. This attribute is mandatory if a mdev device supports liv=
+e
+> > migration.
+> >=20
+> > It consists of two parts: common part and vendor proprietary part.
+> > common part: 32 bit. lower 16 bits is vendor id and higher 16 bits
+> >              identifies device type. e.g., for pci device, it is
+> >              "pci vendor id" | (VFIO_DEVICE_FLAGS_PCI << 16).
+> > vendor proprietary part: this part is varied in length. vendor driver c=
+an
+> >              specify any string to identify a device.
+> >=20
+> > When reading this attribute, it should show device version string of th=
+e
+> > device of type <type-id>. If a device does not support live migration, =
+it
+> > should return errno.
+> > When writing a string to this attribute, it returns errno for
+> > incompatibility or returns written string length in compatibility case.
+> > If a device does not support live migration, it always returns errno.
+> >=20
+> > For user space software to use:
+> > 1.
+> > Before starting live migration, user space software first reads source =
+side
+> > mdev device's version. e.g.
+> > "#cat \
+> > /sys/bus/pci/devices/0000\:00\:02.0/5ac1fb20-2bbf-4842-bb7e-36c58c3be9c=
+d/mdev_type/version"
+> > 00028086-193b-i915-GVTg_V5_4
+> >=20
+> > 2.
+> > Then, user space software writes the source side returned version strin=
+g
+> > to device version attribute in target side, and checks the return value=
+.
+> > If a negative errno is returned in the target side, then mdev devices i=
+n
+> > source and target sides are not compatible;
+> > If a positive number is returned and it equals to the length of written
+> > string, then the two mdev devices in source and target side are compati=
+ble.
+> > e.g.
+> > (a) compatibility case
+> > "# echo 00028086-193b-i915-GVTg_V5_4 >
+> > /sys/bus/pci/devices/0000\:00\:02.0/882cc4da-dede-11e7-9180-078a62063ab=
+1/mdev_type/version"
+> >=20
+> > (b) incompatibility case
+> > "#echo 00028086-193b-i915-GVTg_V5_1 >
+> > /sys/bus/pci/devices/0000\:00\:02.0/882cc4da-dede-11e7-9180-078a62063ab=
+1/mdev_type/version"
+> > -bash: echo: write error: Invalid argument
+>=20
+> What you have written here seems to imply that each mdev type is able to
+> support many different versions at the same time. Writing a version into
+> this sysfs file then chooses which of the many versions to actually use.
+>=20
+> This is good as it allows for live migration across driver software upgra=
+des.
+>=20
+> A mgmt application may well want to know what versions are supported for =
+an
+> mdev type *before* starting a migration. A mgmt app can query all the 100=
+'s
+> of hosts it knows and thus figure out which are valid to use as the targe=
+t
+> of a migration.
+>=20
+> IOW, we want to avoid the ever hitting the incompatibility case in the
+> first place, by only choosing to migrate to a host that we know is going
+> to be compatible.
+>=20
+> This would need some kind of way to report the full list of supported
+> versions against the mdev supported types on the host.
 
-Thanks
-Yan
+What would be the typical scenario / use case for mgmt layer to query the v=
+ersion
+information? Do they expect this get done completely offline as long as the
+vendor driver installed on each host?
 
-> 
-> Regards,
-> Daniel
-> --
-> |: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
-> |: https://libvirt.org         -o-            https://fstop138.berrange.com :|
-> |: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
+Thanks,
+Neo
+
+>=20
+>=20
