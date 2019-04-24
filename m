@@ -1,34 +1,28 @@
-Received: from eggs.gnu.org ([209.51.188.92]:37168)
+Received: from eggs.gnu.org ([209.51.188.92]:37233)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1hJFDu-0002ec-Pa
-	for qemu-devel@nongnu.org; Wed, 24 Apr 2019 06:33:55 -0400
+	(envelope-from <david@redhat.com>) id 1hJFDy-0002fD-Uu
+	for qemu-devel@nongnu.org; Wed, 24 Apr 2019 06:34:00 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1hJFAz-0000Mz-HA
-	for qemu-devel@nongnu.org; Wed, 24 Apr 2019 06:30:54 -0400
-Received: from indium.canonical.com ([91.189.90.7]:60174)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1hJFAy-0000LE-UZ
-	for qemu-devel@nongnu.org; Wed, 24 Apr 2019 06:30:53 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1hJFAx-0004L4-1B
-	for <qemu-devel@nongnu.org>; Wed, 24 Apr 2019 10:30:51 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id DA19E2E80CC
-	for <qemu-devel@nongnu.org>; Wed, 24 Apr 2019 10:30:50 +0000 (UTC)
+	(envelope-from <david@redhat.com>) id 1hJF80-0005Qv-Eh
+	for qemu-devel@nongnu.org; Wed, 24 Apr 2019 06:27:49 -0400
+References: <20190418113110.160664-1-borntraeger@de.ibm.com>
+	<d3cdd199-0457-7255-9540-2bbe5555e079@redhat.com>
+	<a9e5863e-cb05-11a6-03a8-89ee45febcc9@de.ibm.com>
+	<03eb94f6-6f8f-0358-df00-bc487e5e3bff@redhat.com>
+	<20190424093014.GB31388@redhat.com>
+	<d1db9861-f18d-0364-0a24-0697766f46b4@redhat.com>
+	<20190424094120.GC31388@redhat.com>
+	<49e2cd3d-ac11-b76d-1bf3-24908c0015c1@redhat.com>
+	<4f3871ef-86a6-e6be-4e87-2affa3bd2d6f@de.ibm.com>
+From: David Hildenbrand <david@redhat.com>
+Message-ID: <8d7716cf-95e5-4de9-8d31-f6b5ff88223f@redhat.com>
+Date: Wed, 24 Apr 2019 12:27:42 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+In-Reply-To: <4f3871ef-86a6-e6be-4e87-2affa3bd2d6f@de.ibm.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
 Content-Transfer-Encoding: quoted-printable
-Date: Wed, 24 Apr 2019 10:21:21 -0000
-From: Daniel Berrange <1826175@bugs.launchpad.net>
-Reply-To: Bug 1826175 <1826175@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <155609955691.16667.3366200166619949036.malonedeb@soybean.canonical.com>
-Message-Id: <155610128140.16887.9238405303978507880.malone@soybean.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1826175] Re: Compilation on MSYS2/MinGW-w64 fails
- with error: "No rule to make target capstone.lib"
+Subject: Re: [Qemu-devel] [PATCH 00/10] s390x: new guest features
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,55 +31,236 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Christian Borntraeger <borntraeger@de.ibm.com>, =?UTF-8?Q?Daniel_P=2e_Berrang=c3=a9?= <berrange@redhat.com>
+Cc: Cornelia Huck <cohuck@redhat.com>, "Jason J . Herne" <jjherne@linux.ibm.com>, Collin Walling <walling@linux.ibm.com>, qemu-devel <qemu-devel@nongnu.org>, Halil Pasic <pasic@linux.ibm.com>, qemu-s390x <qemu-s390x@nongnu.org>, Richard Henderson <rth@twiddle.net>
 
-NB that patch will break Linux based Mingw builds, as they don't include
-"mys2" in their output from gcc, so it would need to match both.
+On 24.04.19 12:26, Christian Borntraeger wrote:
+>=20
+>=20
+> On 24.04.19 11:56, David Hildenbrand wrote:
+>> On 24.04.19 11:41, Daniel P. Berrang=C3=A9 wrote:
+>>> On Wed, Apr 24, 2019 at 11:35:40AM +0200, David Hildenbrand wrote:
+>>>> On 24.04.19 11:30, Daniel P. Berrang=C3=A9 wrote:
+>>>>> On Wed, Apr 24, 2019 at 11:03:03AM +0200, David Hildenbrand wrote:
+>>>>>> On 24.04.19 10:40, Christian Borntraeger wrote:
+>>>>>>>
+>>>>>>>
+>>>>>>> On 23.04.19 14:11, David Hildenbrand wrote:
+>>>>>>>> On 18.04.19 13:31, Christian Borntraeger wrote:
+>>>>>>>>> Adding generation 15.
+>>>>>>>>>
+>>>>>>>>> Some interesting aspects:
+>>>>>>>>> - conditional SSKE and bpb are deprecated. This patch set addre=
+sses that
+>>>>>>>>>   for csske.
+>>>>>>>>> - no name yet for gen15, I suggest to use the assigned numbers =
+and
+>>>>>>>>>   provide an alias later on. (I have split out this into a sepa=
+rate
+>>>>>>>>>   patch)
+>>>>>>>>>
+>>>>>>>>> Christian Borntraeger (10):
+>>>>>>>>>   linux header sync
+>>>>>>>>>   s390x/cpumodel: remove CSSKE from base model
+>>>>>>>>>   s390x/cpumodel: Miscellaneous-Instruction-Extensions Facility=
+ 3
+>>>>>>>>>   s390x/cpumodel: msa9 facility
+>>>>>>>>>   s390x/cpumodel: vector enhancements
+>>>>>>>>>   s390x/cpumodel: enhanced sort facility
+>>>>>>>>>   s390x/cpumodel: deflate
+>>>>>>>>>   s390x/cpumodel: add gen15 defintions
+>>>>>>>>>   s390x/cpumodel: wire up 8561 and 8562 as gen15 machines
+>>>>>>>>>   s390x/cpumodel: do not claim csske for expanded models in qmp
+>>>>>>>>>
+>>>>>>>>>  hw/s390x/s390-virtio-ccw.c      |  6 +++
+>>>>>>>>>  linux-headers/asm-s390/kvm.h    |  5 +-
+>>>>>>>>>  target/s390x/cpu_features.c     | 54 +++++++++++++++++++
+>>>>>>>>>  target/s390x/cpu_features.h     |  3 ++
+>>>>>>>>>  target/s390x/cpu_features_def.h | 49 +++++++++++++++++
+>>>>>>>>>  target/s390x/cpu_models.c       | 35 ++++++++++++
+>>>>>>>>>  target/s390x/cpu_models.h       |  1 +
+>>>>>>>>>  target/s390x/gen-features.c     | 94 +++++++++++++++++++++++++=
++++++++-
+>>>>>>>>>  target/s390x/kvm.c              | 18 +++++++
+>>>>>>>>>  9 files changed, 263 insertions(+), 2 deletions(-)
+>>>>>>>>>
+>>>>>>>>
+>>>>>>>> I guess to handle deprecation of CSSKE:
+>>>>>>>>
+>>>>>>>> 1. Remove it from the base + default model of the gen15, keep it=
+ in the
+>>>>>>>> max model. This is completely done in target/s390x/gen-features.=
+c.
+>>>>>>>> Existing base models are not modified.
+>>>>>>>>
+>>>>>>>> 2. Add CSSKE to "ignored_base_feat", so fallback of gen15 to e.g=
+. z14
+>>>>>>>> will work. We can backport this to distros/stable.
+>>>>>>>
+>>>>>>> Yes, I have already implemented that, still doing some testing an=
+d polishinh.
+>>>>>>>>
+>>>>>>>>
+>>>>>>>> CPU model expansion:
+>>>>>>>>
+>>>>>>>> cpu_info_from_model() should already properly be based on the ba=
+se
+>>>>>>>> features. "gen15" vs. "gen15,csske=3Don" should be automatically=
+ generated
+>>>>>>>> when expanding.
+>>>>>>>>
+>>>>>>>> CPU model baseline:
+>>>>>>>>
+>>>>>>>> s390_find_cpu_def() should make sure that CSSKE is basically ign=
+ored
+>>>>>>>> when determining maximum model, however it will properly be indi=
+cated if
+>>>>>>>> both models had the feature.
+>>>>>>>>
+>>>>>>>> CPU model comparison:
+>>>>>>>>
+>>>>>>>> Should work as expected. Availability of CSSKE will be considere=
+d when
+>>>>>>>> calculating the result.
+>>>>>>>>
+>>>>>>>> gen14,csske=3Don and gen15,csske=3Doff will result in
+>>>>>>>> CPU_MODEL_COMPARE_RESULT_INCOMPATIBLE.
+>>>>>>>>
+>>>>>>>> gen14,csske=3Doff and gen15,csske=3Doff should result in
+>>>>>>>> CPU_MODEL_COMPARE_RESULT_SUBSET
+>>>>>>>>
+>>>>>>>> gen14,csske=3Don and gen15,csske=3Don should result in
+>>>>>>>> CPU_MODEL_COMPARE_RESULT_SUBSET
+>>>>>>>>
+>>>>>>>> Forward migration:
+>>>>>>>>
+>>>>>>>> Now, the only issue is when csske is actually turned of in futur=
+e
+>>>>>>>> machines. We would e.g. have
+>>>>>>>>
+>>>>>>>> gen15,csske=3Don and gen16,csske=3Doff
+>>>>>>>>
+>>>>>>>> While baselining will work correctly (gen15,csske=3Doff), forwar=
+d
+>>>>>>>> migration is broken (comparison will properly indicate
+>>>>>>>> CPU_MODEL_COMPARE_RESULT_INCOMPATIBLE), which is expected when r=
+ipping
+>>>>>>>> out features. Same applies to BPB.
+>>>>>>>>
+>>>>>>>>
+>>>>>>>> Your patch "[PATCH 10/10] s390x/cpumodel: do not claim csske for
+>>>>>>>> expanded models in qmp" tried to address this, however I am not =
+really
+>>>>>>>> happy with this approach. We should not play such tricks when ex=
+panding
+>>>>>>>> the host model. "-cpu host" and "-cpu $expanded_host" would be
+>>>>>>>> different,
+>>>>>>>
+>>>>>>> We discussed this some time ago and I think we agreed that for ho=
+st passthrough
+>>>>>>> it is ok to be different that host-model (e.g. passing through th=
+e cpuid, passing
+>>>>>>> through all non-hypervisor managed features etc).
+>>>>>>
+>>>>>> I remember the plan was to use the "max" model to do such stuff. E=
+.g.
+>>>>>> -cpu max / no -cpu
+>>>>>>
+>>>>>> Versus
+>>>>>> -cpu host
+>>>>>>
+>>>>>> We can have features in "host" we don't have in "max". But "-cpu h=
+ost"
+>>>>>> and it's expansion should look 100% the same.
+>>>>>
+>>>>> I don't think that's the intended semantics of "max" vs "host".
+>>>>>
+>>>>> The "max" CPU model is supposed to enable all features that are pos=
+sible to
+>>>>> enable.
+>>>>>
+>>>>> For KVM, thus "max" should be identical to "host".
+>>>>
+>>>> There once was a mode used by x86-64 to simply pipe through cpuid
+>>>> features that were not even supported. (I remember something like
+>>>> passthorugh=3Dtrue), do you remember if something like that still ex=
+ists?
+>>>
+>>> I don't recall such a feature existing even in the past !
+>>
+>> Maybe my mind is tricking me, or maybe that has long been removed :)
+>>
+>>>
+>>>>> For TCG, "max" should be everything that QEMU currently knows how t=
+o emulate.
+>>>>
+>>>> Yes, and on s390x. "max" contains more features than "qemu".
+>>>>
+>>>>>
+>>>>> Essentially think of "max" as a better name for "host", since "host=
+" as
+>>>>> a name concept didn't make sense for TCG.
+>>>>
+>>>> I agree. The main question is, is it acceptable that
+>>>
+>>> Hmm, maybe I misinterpreted when you wrote
+>>>
+>>>       We can have features in "host" we don't have in "max"
+>>>
+>>> I read that as meaning that "-cpu host" and "-cpu max" would be
+>>> different.
+>>
+>> No you didn't misinterpret it, I agreed after you spelled it out :)
+>>
+>>>
+>>>> "-cpu host" and "-cpu $expanded_host" produce different results, aft=
+er
+>>>> expanding "host" via query-cpu-model-expansion?
+>>>
+>>> That has always been the case on x86-64, since it is not possible to =
+set
+>>> the level, xlevel, vendor, family, model & stepping properties via -c=
+pu,
+>>> only the feature flags.
+>>
+>> Fair enough, but the question is if we should mess with feature flags =
+we
+>> can indicate on that level.
+>>
+>> It would mean that on a specific host e.g.
+>>
+>> "-cpu gen15,csske=3Don" and "-cpu gen15,csske=3Doff"
+>>
+>> Would work. However, "host" model expansion would give us
+>>
+>> "-cpu gen15,csske=3Doff"
+>>
+>> So trying to e.g. do a query-cpu-model-comparison or
+>> query-cpu-model-baseline against "host" and against the expanded host
+>> model will produce different results.
+>>
+>> Libvirt could detect "-cpu gen14,csske=3Don" as not runnable on the ho=
+st,
+>> because comparing "-cpu gen14,csske=3Don" vs. "-cpu gen15,csske=3Doff"=
+ would
+>> be "incompatible". But running "-cpu gen14,csske=3Don" on the host wou=
+ld
+>> work perfectly fine.
+>=20
+> I would like to avoid special knowledge in libvirt (since we moved to h=
+ave
+> everything in qemu).=20
+>=20
+> A more complex idea would be to extend the qmp query with a list of dep=
+recated
+> features and libvirt could then disable that for expansion but allow it=
+ for
+> baselining.
 
--- =
+That would fit in nicely into query-cpu-model-expansion. Nice idea.
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1826175
+--=20
 
-Title:
-  Compilation on MSYS2/MinGW-w64 fails with error: "No rule to make
-  target capstone.lib"
+Thanks,
 
-Status in QEMU:
-  New
-
-Bug description:
-  I submitted this bug to Capstone directly but I figured it'd be useful
-  to post it here too. The IS_MINGW check in the Makefile for Capstone
-  fails under MSYS2 MinGW-w64 because cc --version doesn't have mingw in
-  the output anymore:
-
-  $ whereis cc
-  cc: /mingw64/bin/cc.exe
-
-  $ cc --version
-  cc.exe (Rev2, Built by MSYS2 project) 8.3.0
-  Copyright (C) 2018 Free Software Foundation, Inc.
-  This is free software; see the source for copying conditions.  There is NO
-  warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOS=
-E.
-
-  Really simple patch:
-
-  diff --git "a/Makefile" "b/Makefile"
-  index 063f50db..1d9f042e 100644
-  --- "a/Makefile"
-  +++ "b/Makefile"
-  @@ -288,7 +288,7 @@ CFLAGS :=3D $(CFLAGS:-fPIC=3D)
-   # On Windows we need the shared library to be executable
-   else
-   # mingw?
-  -IS_MINGW :=3D $(shell $(CC) --version | grep -i mingw | wc -l)
-  +IS_MINGW :=3D $(shell $(CC) --version | grep -i msys2 | wc -l)
-   ifeq ($(IS_MINGW),1)
-   EXT =3D dll
-   AR_EXT =3D lib
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1826175/+subscriptions
+David / dhildenb
