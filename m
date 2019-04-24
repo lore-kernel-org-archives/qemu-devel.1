@@ -1,27 +1,34 @@
-Received: from eggs.gnu.org ([209.51.188.92]:42117)
+Received: from eggs.gnu.org ([209.51.188.92]:42304)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1hJH75-0002UA-9v
-	for qemu-devel@nongnu.org; Wed, 24 Apr 2019 08:35:01 -0400
+	(envelope-from <bounces@canonical.com>) id 1hJH7k-0002yw-S5
+	for qemu-devel@nongnu.org; Wed, 24 Apr 2019 08:35:45 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1hJGrQ-0001RO-Uf
-	for qemu-devel@nongnu.org; Wed, 24 Apr 2019 08:18:50 -0400
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Date: Wed, 24 Apr 2019 12:18:43 +0000
-Message-ID: <afeaa77a-3480-237b-e71c-70559a7529f4@virtuozzo.com>
-References: <20190424103747.10173-1-thuth@redhat.com>
-	<20190424103747.10173-6-thuth@redhat.com>
-	<20190424104855.GE31388@redhat.com>
-	<d9137693-7727-5f2c-04f3-b1eafd70f056@redhat.com>
-	<f8040ada-cb84-d669-3493-0d2da89e6b0b@virtuozzo.com>
-	<20190424121339.GG31388@redhat.com>
-In-Reply-To: <20190424121339.GG31388@redhat.com>
-Content-Language: en-US
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <2D0ECEF3838A02458B7C1C7152901C29@eurprd08.prod.outlook.com>
-Content-Transfer-Encoding: base64
+	(envelope-from <bounces@canonical.com>) id 1hJH7i-00013Z-TA
+	for qemu-devel@nongnu.org; Wed, 24 Apr 2019 08:35:40 -0400
+Received: from indium.canonical.com ([91.189.90.7]:33084)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1hJH7i-0000xA-G7
+	for qemu-devel@nongnu.org; Wed, 24 Apr 2019 08:35:38 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1hJH7Z-0004RW-AY
+	for <qemu-devel@nongnu.org>; Wed, 24 Apr 2019 12:35:29 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 2D35F2E80CC
+	for <qemu-devel@nongnu.org>; Wed, 24 Apr 2019 12:35:29 +0000 (UTC)
 MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [PATCH 5/6] tests: Run the iotests during "make
- check" again
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Wed, 24 Apr 2019 12:25:50 -0000
+From: Peter Maydell <peter.maydell@linaro.org>
+Reply-To: Bug 1826175 <1826175@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <155609955691.16667.3366200166619949036.malonedeb@soybean.canonical.com>
+Message-Id: <155610875051.6812.7712055768616458458.malone@chaenomeles.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1826175] Re: Compilation on MSYS2/MinGW-w64 fails
+ with error: "No rule to make target capstone.lib"
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,63 +37,59 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?utf-8?B?RGFuaWVsIFAuIEJlcnJhbmfDqQ==?= <berrange@redhat.com>
-Cc: Thomas Huth <thuth@redhat.com>, Fam Zheng <fam@euphon.net>, Kevin Wolf <kwolf@redhat.com>, Ed Maste <emaste@freebsd.org>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>, =?utf-8?B?UGhpbGlwcGUgTWF0aGlldS1EYXVkw6k=?= <philmd@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, Max Reitz <mreitz@redhat.com>, =?utf-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>, Li-Wen Hsu <lwhsu@freebsd.org>
+To: qemu-devel@nongnu.org
 
-MjQuMDQuMjAxOSAxNToxMywgRGFuaWVsIFAuIEJlcnJhbmfDqSB3cm90ZToNCj4gT24gV2VkLCBB
-cHIgMjQsIDIwMTkgYXQgMTI6MDI6MjlQTSArMDAwMCwgVmxhZGltaXIgU2VtZW50c292LU9naWV2
-c2tpeSB3cm90ZToNCj4+IDI0LjA0LjIwMTkgMTM6NTksIFRob21hcyBIdXRoIHdyb3RlOg0KPj4+
-IE9uIDI0LzA0LzIwMTkgMTIuNDgsIERhbmllbCBQLiBCZXJyYW5nw6kgd3JvdGU6DQo+Pj4+IE9u
-IFdlZCwgQXByIDI0LCAyMDE5IGF0IDEyOjM3OjQ2UE0gKzAyMDAsIFRob21hcyBIdXRoIHdyb3Rl
-Og0KPj4+Pj4gUGVvcGxlIG9mdGVuIGZvcmdldCB0byBydW4gdGhlIGlvdGVzdHMgYmVmb3JlIHN1
-Ym1pdHRpbmcgcGF0Y2hlcyBvcg0KPj4+Pj4gcHVsbCByZXF1ZXN0cyAtIHRoaXMgaXMgbGlrZWx5
-IGR1ZSB0byB0aGUgZmFjdCB0aGF0IHdlIGRvIG5vdCBydW4gdGhlDQo+Pj4+PiB0ZXN0cyBkdXJp
-bmcgb3VyIG1hbmRhdG9yeSAibWFrZSBjaGVjayIgdGVzdHMgeWV0LiBOb3cgdGhhdCB3ZSd2ZSBn
-b3QNCj4+Pj4+IGEgbmV3ICJjaSIgZ3JvdXAgb2YgaW90ZXN0cyB0aGF0IHNob3VsZCBiZSBmaW5l
-IHRvIHJ1biBpbiBldmVyeSBlbnZpcm9uLQ0KPj4+Pj4gbWVudCwgaXQgc2hvdWxkIGJlIE9LIHRv
-IGVuYWJsZSB0aGUgaW90ZXN0cyBkdXJpbmcgIm1ha2UgY2hlY2siIGFnYWluLg0KPj4+Pj4gVGh1
-cyB3ZSBub3cgcnVuIHRoZSAiY2kiIHRlc3RzIGJ5IGRlZmF1bHQgZnJvbSB0aGUgcWVtdS1pb3Rl
-c3RzLXF1aWNrLnNoDQo+Pj4+PiBzY3JpcHQsIGFuZCBvbmx5IHVzZSB0aGUgZm9ybWVyICJxdWlj
-ayIgZ3JvdXAgKHRoYXQgY29udGFpbnMgc29tZSB0ZXN0cw0KPj4+Pj4gdGhhdCBhcmUgZmFpbGlu
-ZyBpbiBzb21lIGVudmlyb25tZW50cykgd2hlbiB0aGUgdXNlciBkZWNpZGVkIHRvIHJ1bg0KPj4+
-Pj4gIm1ha2UgY2hlY2sgU1BFRUQ9dGhvcm91Z2giIG9yIHNvbWV0aGluZyBzaW1pbGFyLg0KPj4+
-Pj4NCj4+Pj4+IFNpZ25lZC1vZmYtYnk6IFRob21hcyBIdXRoIDx0aHV0aEByZWRoYXQuY29tPg0K
-Pj4+Pj4gLS0tDQo+Pj4+PiAgICB0ZXN0cy9NYWtlZmlsZS5pbmNsdWRlICAgICAgfCAgMiArLQ0K
-Pj4+Pj4gICAgdGVzdHMvcWVtdS1pb3Rlc3RzLXF1aWNrLnNoIHwgMTcgKysrKysrKysrKysrKysr
-Ky0NCj4+Pj4+ICAgIDIgZmlsZXMgY2hhbmdlZCwgMTcgaW5zZXJ0aW9ucygrKSwgMiBkZWxldGlv
-bnMoLSkNCj4+Pj4NCj4+Pj4+IGRpZmYgLS1naXQgYS90ZXN0cy9xZW11LWlvdGVzdHMtcXVpY2su
-c2ggYi90ZXN0cy9xZW11LWlvdGVzdHMtcXVpY2suc2gNCj4+Pj4+IGluZGV4IDBlNTU0YmI5NzIu
-LjQxNmIzZmM0OGIgMTAwNzU1DQo+Pj4+PiAtLS0gYS90ZXN0cy9xZW11LWlvdGVzdHMtcXVpY2su
-c2gNCj4+Pj4+ICsrKyBiL3Rlc3RzL3FlbXUtaW90ZXN0cy1xdWljay5zaA0KPj4+Pg0KPj4+PiBz
-Ly1xdWljay8vICBwZXJoYXBzLCBzaW5jZSBpdCBubyBsb25nZXIgb25seSBydW5zIHRoZSAicXVp
-Y2siIHRlc3RzLg0KPj4+Pg0KPj4+Pj4gQEAgLTEsOCArMSwyMyBAQA0KPj4+Pj4gICAgIyEvYmlu
-L3NoDQo+Pj4+PiAgICANCj4+Pj4+ICsjIEhvbm9yIHRoZSBTUEVFRCBlbnZpcm9ubWVudCB2YXJp
-YWJsZSwganVzdCBsaWtlIHdlIGRvIGl0IGZvciB0aGUgcXRlc3RzLg0KPj4+Pj4gKyMgVGhlIGRl
-ZmF1bHQgaXMgdG8gcnVuIGFsbCB0ZXN0cyB0aGF0IHN0aWxsIHdvcmsgZmluZSBpbiBhIENJIGVu
-dmlyb25tZW50cywNCj4+Pj4+ICsjIGJ1dCBpZiB0aGUgdXNlciBzZXQgU1BFRUQ9c2xvdyBvciBT
-UEVFRD10aG9yb3VnaCwgd2UgYWxzbyBydW4gYWxsIG90aGVyDQo+Pj4+PiArIyB0ZXN0cyB0aGF0
-IGFyZSBzdGlsbCBtYXJrZWQgYXMgInF1aWNrIg0KPj4+Pj4gK2lmIFsgIiRTUEVFRCIgPSAic2xv
-dyIgLW8gIiRTUEVFRCIgPSAidGhvcm91Z2giIF07IHRoZW4NCj4+Pj4+ICsgICAgZ3JvdXA9cXVp
-Y2sNCj4+Pj4NCj4+Pj4gV2hlbiB1c2VyIGFza3MgZm9yICJzbG93IiB0ZXN0cyB3ZSBydW4gdGhl
-ICJxdWljayIgdGVzdHMsIHdoaWNoDQo+Pj4+IHByZXN1bWFibHkgaW1wbGllcy4uLg0KPj4+Pg0K
-Pj4+Pj4gK2Vsc2UNCj4+Pj4+ICsgICAgZ3JvdXA9Y2kNCj4+Pj4NCj4+Pj4gLi4uImNpIiBpcyBx
-dWlja2VyIHRoYW4gdGhlICJxdWljayIgIHRlc3RzICENCj4+Pj4NCj4+Pj4gQ29uZnVzZWQgPyBX
-ZSBjZXJ0YWlubHkgdHJ5IHRvIGVuc3VyZSB0aGF0IHlvdSB3aWxsIGJlIDotKQ0KPj4+DQo+Pj4g
-Li4uIGFuZCB0aGVyZSBpcyBhbHNvIHRlc3RzL2NoZWNrLWJsb2NrLnNoICh3aGljaCBpcyBub3Qg
-dXNlZCBieSAibWFrZQ0KPj4+IGNoZWNrLWJsb2NrIiwgYnkgdGhlIHdheSwgYnV0IHN0aWxsIHRh
-bGtzIGFib3V0ICJtYWtlIGNoZWNrLWJsb2NrIiksDQo+Pj4gd2hpY2ggaXMgZXZlbiBzbG93ZXIg
-dGhhbiB0aGUgImNpIiBhbmQgInF1aWNrIiBncm91cC4uLg0KPj4+DQo+Pj4gSSBndWVzcyB0aGF0
-IGNvdWxkIGJlIGNsZWFuZWQgdXAsIHRvbyAod2h5IGRvIHdlIG5lZWQgdHdvIHNjcmlwdHM/KSAu
-Li4NCj4+PiBqdXN0IG5vdCBzdXJlIGhvdyB0aGUgZmluYWwgcmVzdWx0IHNob3VsZCBsb29rIGxp
-a2UgYW5kIGlmIGl0IHNob3VsZCBiZQ0KPj4+IHBhcnQgb2YgdGhpcyBwYXRjaCBzZXJpZXMgb3Ig
-cmF0aGVyIHNvbWV0aGluZyBzZXBhcmF0ZS4gTWF4LCBLZXZpbiwgd2hhdA0KPj4+IGRvIHlvdSB0
-aGluaz8NCj4+Pg0KPj4+IE1heWJlIHdlIHNob3VsZCBtZXJnZSB0aGUgdHdvIHNjcmlwdHMsIGFu
-ZCBkZXBlbmRpbmcgb24gdGhlIFNQRUVEDQo+Pj4gdmFyaWFibGUsIHdlIHJ1bjoNCj4+Pg0KPj4+
-ICAgIHF1aWNrID0+ICJjaSIgZ3JvdXANCj4+PiAgICB0aG9yb3VnaCA9PiAicXVpY2siIGdyb3Vw
-DQo+Pj4gICAgc2xvdyA9PiBvbGQgYmVoYXZpb3VyIG9mIHRoZSBjaGVjay1ibG9jay5zaCBzY3Jp
-cHQNCj4+DQo+PiBNYXkgYmUsIGluc3RlYWQgb2YgU1BFRUQsIGludHJvZHVjZSBHUk9VUCB2YXJp
-YWJsZT8gVG8gbWFrZSBpdCBwbGFpbg0KPiANCj4gIiRTUEVFRCIgaXMgc29tZXRoaW5nIHVzZWQv
-ZGVmaW5lZCBieSB0aGUgZ3Rlc3RlciBoYXJuZXNzLCBzbyBvdGhlciBiaXRzDQo+IHJ1biBieSAi
-bWFrZSBjaGVjayIgYWxyZWFkeSBob25vdXIgdGhhdCwgaGVuY2UgaXQgaXMgZGVzaXJhYmxlIGZy
-byB0aGUNCj4gaW90ZXN0cyB0b2RvIHRoZSBzYW1lLg0KPiANCg0KT0ssIHNvcnJ5LCBkaWRuJ3Qg
-a25vdy4NCg0KDQotLSANCkJlc3QgcmVnYXJkcywNClZsYWRpbWlyDQo=
+https://github.com/aquynh/capstone/issues/1464 is the upstream bug --
+thanks for reporting it there.
+
+
+** Bug watch added: github.com/aquynh/capstone/issues #1464
+   https://github.com/aquynh/capstone/issues/1464
+
+-- =
+
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1826175
+
+Title:
+  Compilation on MSYS2/MinGW-w64 fails with error: "No rule to make
+  target capstone.lib"
+
+Status in QEMU:
+  New
+
+Bug description:
+  I submitted this bug to Capstone directly but I figured it'd be useful
+  to post it here too. The IS_MINGW check in the Makefile for Capstone
+  fails under MSYS2 MinGW-w64 because cc --version doesn't have mingw in
+  the output anymore:
+
+  $ whereis cc
+  cc: /mingw64/bin/cc.exe
+
+  $ cc --version
+  cc.exe (Rev2, Built by MSYS2 project) 8.3.0
+  Copyright (C) 2018 Free Software Foundation, Inc.
+  This is free software; see the source for copying conditions.  There is NO
+  warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOS=
+E.
+
+  Really simple patch:
+
+  diff --git "a/Makefile" "b/Makefile"
+  index 063f50db..1d9f042e 100644
+  --- "a/Makefile"
+  +++ "b/Makefile"
+  @@ -288,7 +288,7 @@ CFLAGS :=3D $(CFLAGS:-fPIC=3D)
+   # On Windows we need the shared library to be executable
+   else
+   # mingw?
+  -IS_MINGW :=3D $(shell $(CC) --version | grep -i mingw | wc -l)
+  +IS_MINGW :=3D $(shell $(CC) --version | grep -i msys2 | wc -l)
+   ifeq ($(IS_MINGW),1)
+   EXT =3D dll
+   AR_EXT =3D lib
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1826175/+subscriptions
