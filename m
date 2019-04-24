@@ -2,48 +2,49 @@ Return-Path: <SRS0=3XOk=S2=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_PASS,URIBL_BLOCKED autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1FD39C282CE
-	for <qemu-devel@archiver.kernel.org>; Wed, 24 Apr 2019 04:37:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 695F5C10F11
+	for <qemu-devel@archiver.kernel.org>; Wed, 24 Apr 2019 04:37:15 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E91DB218FE
-	for <qemu-devel@archiver.kernel.org>; Wed, 24 Apr 2019 04:37:10 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E91DB218FE
+	by mail.kernel.org (Postfix) with ESMTPS id 3ED44218D3
+	for <qemu-devel@archiver.kernel.org>; Wed, 24 Apr 2019 04:37:15 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3ED44218D3
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:35568 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:35570 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hJ9ef-0003MG-Pa
-	for qemu-devel@archiver.kernel.org; Wed, 24 Apr 2019 00:37:09 -0400
+	id 1hJ9ek-0003QO-En
+	for qemu-devel@archiver.kernel.org; Wed, 24 Apr 2019 00:37:14 -0400
 Received: from eggs.gnu.org ([209.51.188.92]:59154)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1hJ9dE-0002IL-N4
-	for qemu-devel@nongnu.org; Wed, 24 Apr 2019 00:35:41 -0400
+	(envelope-from <bounces@canonical.com>) id 1hJ9dG-0002IL-T7
+	for qemu-devel@nongnu.org; Wed, 24 Apr 2019 00:35:45 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1hJ9Yw-00031F-0X
-	for qemu-devel@nongnu.org; Wed, 24 Apr 2019 00:31:15 -0400
-Received: from indium.canonical.com ([91.189.90.7]:59726)
+	(envelope-from <bounces@canonical.com>) id 1hJ9Ys-0002yq-6k
+	for qemu-devel@nongnu.org; Wed, 24 Apr 2019 00:31:12 -0400
+Received: from indium.canonical.com ([91.189.90.7]:59668)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1hJ9Yu-0002xD-35
-	for qemu-devel@nongnu.org; Wed, 24 Apr 2019 00:31:12 -0400
+	id 1hJ9Yq-0002vb-ES
+	for qemu-devel@nongnu.org; Wed, 24 Apr 2019 00:31:09 -0400
 Received: from loganberry.canonical.com ([91.189.90.37])
 	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1hJ9Yq-0007cl-7k
-	for <qemu-devel@nongnu.org>; Wed, 24 Apr 2019 04:31:08 +0000
+	id 1hJ9Yp-0007bB-BL
+	for <qemu-devel@nongnu.org>; Wed, 24 Apr 2019 04:31:07 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 314DB2E806F
-	for <qemu-devel@nongnu.org>; Wed, 24 Apr 2019 04:31:08 +0000 (UTC)
+	by loganberry.canonical.com (Postfix) with ESMTP id 51FCD2E806F
+	for <qemu-devel@nongnu.org>; Wed, 24 Apr 2019 04:31:07 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Wed, 24 Apr 2019 04:17:33 -0000
-From: Launchpad Bug Tracker <1548166@bugs.launchpad.net>
+Date: Wed, 24 Apr 2019 04:17:36 -0000
+From: Launchpad Bug Tracker <1552549@bugs.launchpad.net>
 To: qemu-devel@nongnu.org
 X-Launchpad-Notification-Type: bug
 X-Launchpad-Bug: product=qemu; status=Expired; importance=Undecided;
@@ -51,22 +52,22 @@ X-Launchpad-Bug: product=qemu; status=Expired; importance=Undecided;
 X-Launchpad-Bug-Information-Type: Public
 X-Launchpad-Bug-Private: no
 X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: janitor sugar9032039 th-huth
-X-Launchpad-Bug-Reporter: Sugar (sugar9032039)
+X-Launchpad-Bug-Commenters: janitor liutgnu th-huth
+X-Launchpad-Bug-Reporter: liutgnu (liutgnu)
 X-Launchpad-Bug-Modifier: Launchpad Janitor (janitor)
-References: <20160222033240.1894.82255.malonedeb@wampee.canonical.com>
+References: <20160303051444.1816.68596.malonedeb@gac.canonical.com>
 Message-Id:
- <155607945409.22348.8935329774832677919.malone@loganberry.canonical.com>
+ <155607945638.22348.12682671048177165153.malone@loganberry.canonical.com>
 X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
 X-Launchpad-Message-For: qemu-devel-ml
 Precedence: bulk
 X-Generated-By: Launchpad (canonical.com); Revision="18928";
 	Instance="launchpad-lazr.conf"
-X-Launchpad-Hash: 2f411df9b14ca1dc045e9025aeab1f06e341a462
+X-Launchpad-Hash: 1eb52d622e8257811ef9ddf5283010549f988e7c
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 91.189.90.7
-Subject: [Qemu-devel] [Bug 1548166] Re: QEMU crash after send data from Host
- through serial port
+Subject: [Qemu-devel] [Bug 1552549] Re: qemu-system-i386 verison 2.5.50
+ fails at lmsw instruction
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 List-Id: <qemu-devel.nongnu.org>
@@ -77,11 +78,11 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1548166 <1548166@bugs.launchpad.net>
+Reply-To: Bug 1552549 <1552549@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190424041733.N3g07NfnbpDN8lbaG82LYKelasauOQp1i4meLwe7kgs@z>
+Message-ID: <20190424041736.dAn5IF5E87vHwrDkXSmJBB3Sgf6n05Tng6bIfLxYIU0@z>
 
 [Expired for QEMU because there has been no activity for 60 days.]
 
@@ -92,47 +93,26 @@ Message-ID: <20190424041733.N3g07NfnbpDN8lbaG82LYKelasauOQp1i4meLwe7kgs@z>
 
 You received this bug notification because you are a member of qemu-
 devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1548166
+https://bugs.launchpad.net/bugs/1552549
 
 Title:
-  QEMU crash after send data from Host through serial port
+  qemu-system-i386 verison 2.5.50 fails at lmsw instruction
 
 Status in QEMU:
   Expired
 
 Bug description:
-  Hi All
+  I cloned qemu source code from github.com, and compiled it on my
+  Kubuntu 15.10 laptop to run my little OS. When booting my little OS,
+  the virtual machine's screen keep blinking, I guess it's the virtual
+  machine rebooting on and on automatically for some unknown reason, but
+  there is no further information shown on Kubuntu's terminal. I'm
+  pretty sure this problem is not caused by my little OS, because it
+  works just fine in qemu-system-i386 version 2.5.0.
 
-  I have two computer, one is Win7 32 another is Win7 64, Both computer mee=
-t this issue.
-  My QEMU version is qemu-w32-setup-20160215
-
-  I want used EDK2 OVMF with Intel UDK Debugger tools to do source level de=
-bug
-  I had install com0com Virtual Com Port, and set COM3 connect to COM4
-
-  Intel UDK Debugger tools used COM3
-  QEMU run OVMF used COM4
-
-  First execute Intel UDK Debugger tools, then launch QEMU
-  C:\Program Files\qemu\qemu-system-x86_64.exe -bios "C:\EDK2\Build\OvmfX64=
-\DEBUG_VS2010\FV\OVMF.fd" -serial COM4
-  Then QEMU crashes on stratup
-
-  I have do some experiment
-  Execute terminal tool Tera Term and used COM3
-  launch QEMU and used COM4
-  C:\Program Files\qemu\qemu-system-x86_64.exe -bios "C:\EDK2\Build\OvmfX64=
-\DEBUG_VS2010\FV\OVMF.fd" -serial COM4
-  This is fine and i can see OVMF trace log on terminal
-  But if i press "Down" key on terminal, then QEMU crashe
-  It's caused by terminal send data("Down" key) to QEMU
-
-  Have somebody can share some information about this?
-
-  Thanks a lot.
-  Sugar
+  I debugged my OS and find this problem happens when executing
+  instruction "lmsw ax". Is this a bug, can anyone help me out?
 
 To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1548166/+subscriptions
+https://bugs.launchpad.net/qemu/+bug/1552549/+subscriptions
 
