@@ -7,59 +7,60 @@ X-Spam-Status: No, score=-8.3 required=3.0 tests=FROM_EXCESS_BASE64,
 	SPF_PASS,URIBL_BLOCKED,USER_AGENT_MUTT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E4529C10F11
-	for <qemu-devel@archiver.kernel.org>; Wed, 24 Apr 2019 08:37:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3BBFBC10F11
+	for <qemu-devel@archiver.kernel.org>; Wed, 24 Apr 2019 08:38:05 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B73242148D
-	for <qemu-devel@archiver.kernel.org>; Wed, 24 Apr 2019 08:37:38 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B73242148D
+	by mail.kernel.org (Postfix) with ESMTPS id 0CF812148D
+	for <qemu-devel@archiver.kernel.org>; Wed, 24 Apr 2019 08:38:05 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0CF812148D
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:37967 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:37971 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hJDPN-000399-Rv
-	for qemu-devel@archiver.kernel.org; Wed, 24 Apr 2019 04:37:37 -0400
+	id 1hJDPo-0003Wq-8Q
+	for qemu-devel@archiver.kernel.org; Wed, 24 Apr 2019 04:38:04 -0400
 Received: from eggs.gnu.org ([209.51.188.92]:33686)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1hJDLe-00083L-Hx
-	for qemu-devel@nongnu.org; Wed, 24 Apr 2019 04:33:47 -0400
+	(envelope-from <berrange@redhat.com>) id 1hJDLa-00083L-1U
+	for qemu-devel@nongnu.org; Wed, 24 Apr 2019 04:33:43 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1hJDF4-0007xT-AZ
-	for qemu-devel@nongnu.org; Wed, 24 Apr 2019 04:26:59 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:37840)
+	(envelope-from <berrange@redhat.com>) id 1hJDGT-0000zu-A8
+	for qemu-devel@nongnu.org; Wed, 24 Apr 2019 04:28:26 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:33634)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1hJDF4-0007wG-4b
-	for qemu-devel@nongnu.org; Wed, 24 Apr 2019 04:26:58 -0400
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
-	[10.5.11.23])
+	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1hJDGT-0000z0-1q
+	for qemu-devel@nongnu.org; Wed, 24 Apr 2019 04:28:25 -0400
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+	[10.5.11.16])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 5709AC0842D4
-	for <qemu-devel@nongnu.org>; Wed, 24 Apr 2019 08:26:57 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id 4078F3145729
+	for <qemu-devel@nongnu.org>; Wed, 24 Apr 2019 08:28:24 +0000 (UTC)
 Received: from redhat.com (ovpn-112-57.ams2.redhat.com [10.36.112.57])
-	by smtp.corp.redhat.com (Postfix) with ESMTPS id B29F41A92A;
-	Wed, 24 Apr 2019 08:26:55 +0000 (UTC)
-Date: Wed, 24 Apr 2019 09:26:52 +0100
+	by smtp.corp.redhat.com (Postfix) with ESMTPS id 08A525C239;
+	Wed, 24 Apr 2019 08:28:19 +0000 (UTC)
+Date: Wed, 24 Apr 2019 09:28:16 +0100
 From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
 To: Eduardo Habkost <ehabkost@redhat.com>
-Message-ID: <20190424082652.GC28615@redhat.com>
+Message-ID: <20190424082816.GD28615@redhat.com>
 References: <20190423212246.3542-1-ehabkost@redhat.com>
-	<20190423212246.3542-2-ehabkost@redhat.com>
+	<20190423212246.3542-4-ehabkost@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="UTF-8"
 Content-Disposition: inline
-In-Reply-To: <20190423212246.3542-2-ehabkost@redhat.com>
+In-Reply-To: <20190423212246.3542-4-ehabkost@redhat.com>
 User-Agent: Mutt/1.11.3 (2019-02-01)
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.32]);
-	Wed, 24 Apr 2019 08:26:57 +0000 (UTC)
+	(mx1.redhat.com [10.5.110.49]);
+	Wed, 24 Apr 2019 08:28:24 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH 1/3] qapi: SupportStatusInfo struct
+Subject: Re: [Qemu-devel] [PATCH 3/3] qmp: Add deprecation information to
+ query-machines
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -77,57 +78,99 @@ Cc: mprivozn@redhat.com, qemu-devel@nongnu.org,
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190424082652.t8kvK61Oj93gzCwDCvEJjX5AxeQw2nEZ56ekY7dnSDE@z>
+Message-ID: <20190424082816.6NtPWkd5Bj5Zvn8CsmuyrMWdrifJDxvKkZqa0-74BUg@z>
 
-On Tue, Apr 23, 2019 at 06:22:44PM -0300, Eduardo Habkost wrote:
-> This struct will be used to represent support and deprecation
-> status of QEMU features.
+On Tue, Apr 23, 2019 at 06:22:46PM -0300, Eduardo Habkost wrote:
+> Export machine type deprecation information through the
+> query-machines QMP command.  With this, libvirt and management
+> software will be able to show this information to users and/or
+> suggest changes to VM configuration to avoid deprecated machines.
 > 
 > Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
 > ---
->  qapi/common.json | 24 ++++++++++++++++++++++++
->  1 file changed, 24 insertions(+)
+>  qapi/misc.json                     |  5 ++++-
+>  vl.c                               |  6 ++++++
+>  tests/acceptance/query_machines.py | 27 +++++++++++++++++++++++++++
+>  3 files changed, 37 insertions(+), 1 deletion(-)
+>  create mode 100644 tests/acceptance/query_machines.py
 > 
-> diff --git a/qapi/common.json b/qapi/common.json
-> index 99d313ef3b..b59d0dc66b 100644
-> --- a/qapi/common.json
-> +++ b/qapi/common.json
-> @@ -193,3 +193,27 @@
->               'ppc64', 'riscv32', 'riscv64', 's390x', 'sh4',
->               'sh4eb', 'sparc', 'sparc64', 'tricore', 'unicore32',
->               'x86_64', 'xtensa', 'xtensaeb' ] }
+> diff --git a/qapi/misc.json b/qapi/misc.json
+> index 8b3ca4fdd3..941d251d17 100644
+> --- a/qapi/misc.json
+> +++ b/qapi/misc.json
+> @@ -2018,12 +2018,15 @@
+>  #
+>  # @hotpluggable-cpus: cpu hotplug via -device is supported (since 2.7.0)
+>  #
+> +# @support-status: Support/deprecation status information (since 4.1.0)
+> +#
+>  # Since: 1.2.0
+>  ##
+>  { 'struct': 'MachineInfo',
+>    'data': { 'name': 'str', '*alias': 'str',
+>              '*is-default': 'bool', 'cpu-max': 'int',
+> -            'hotpluggable-cpus': 'bool'} }
+> +            'hotpluggable-cpus': 'bool',
+> +            'support-status': 'SupportStatusInfo' } }
+
+With my comment on the first patch this would become
+
+    "deprecation-info": "*DeprecationInfo"
+
+> diff --git a/vl.c b/vl.c
+> index 99b857ed2a..ca23d2a404 100644
+> --- a/vl.c
+> +++ b/vl.c
+> @@ -1530,6 +1530,12 @@ MachineInfoList *qmp_query_machines(Error **errp)
+>          info->name = g_strdup(mc->name);
+>          info->cpu_max = !mc->max_cpus ? 1 : mc->max_cpus;
+>          info->hotpluggable_cpus = mc->has_hotpluggable_cpus;
+> +        assert(!mc->support_status.status_message ||
+> +               mc->support_status.has_status_message);
+> +        assert(!mc->support_status.suggested_alternative ||
+> +               mc->support_status.has_suggested_alternative);
+> +        info->support_status =
+> +            QAPI_CLONE(SupportStatusInfo, &mc->support_status);
+>  
+>          entry = g_malloc0(sizeof(*entry));
+>          entry->value = info;
+> diff --git a/tests/acceptance/query_machines.py b/tests/acceptance/query_machines.py
+> new file mode 100644
+> index 0000000000..23a56ea617
+> --- /dev/null
+> +++ b/tests/acceptance/query_machines.py
+> @@ -0,0 +1,27 @@
+> +# Sanity check query-machines QMP command results
+> +#
+> +# Copyright (c) 2019 Red Hat, Inc.
+> +#
+> +# Author:
+> +#  Eduardo Habkost <ehabkost@redhat.com>
+> +#
+> +# This work is licensed under the terms of the GNU GPL, version 2 or
+> +# later.  See the COPYING file in the top-level directory.
 > +
-> +##
-> +# @SupportStatusInfo:
-> +#
-> +# Information on support status of a given feature
-> +# (e.g. machine type)
-> +#
-> +# @deprecated: if true, the given feature is deprecated and may be removed
-> +#              in future versions of QEMU according to the QEMU deprecation
-> +#              policy.
-> +#
-> +# @status-message: Human readable message describing support status
-> +#                  of the feature.
-> +#
-> +# @suggested-alternative: Optional.  Suggested alternative for a deprecated
-> +#                         feature.  For machine types, this should be the name
-> +#                         of an available machine-type.
-> +#
-> +# Since: 4.1
-> +##
-> +{ 'struct': 'SupportStatusInfo',
-> +  'data': { 'deprecated': 'bool',
-> +            '*status-message': 'str',
-> +            '*suggested-alternative': 'str' } }
-
-I see status-message has to be optional, since you're embedding the
-struct into another struct and want deprecated==false by default.
-
-I'd be inclined to change it to embed a pointer to the struct and
-drop the deprecated field, and make both status-message and
-suggested-alternative be mandatory. ie a struct  "DeprecationInfo" 
-the pointer to which is NULL if not deprecated.
+> +from avocado_qemu import Test
+> +
+> +class QueryMachines(Test):
+> +    def test(self):
+> +        self.vm.launch()
+> +        machines = self.vm.command('query-machines')
+> +        machinesdict = dict((m['name'], m) for m in machines)
+> +        machinesdict.update((m['alias'], m) for m in machines if 'alias' in m)
+> +        for machine in machines:
+> +            status = machine['support-status']
+> +            if status['deprecated']:
+> +                self.assertTrue(status.get('status-message') or \
+> +                                status.get('suggested-alternative'),
+> +                                "Deprecated machine (%s) must have status-message or suggested-alternative" % (machine['name']))
+> +            if 'suggested-alternative' in status:
+> +                self.assertTrue(status['suggested-alternative'] in machinesdict,
+> +                                "suggested-alternative of %s must point to a valid machine type" % (machine['name']))
+> -- 
+> 2.18.0.rc1.1.g3f1ff2140
+> 
+> 
 
 Regards,
 Daniel
