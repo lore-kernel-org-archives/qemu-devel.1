@@ -1,33 +1,34 @@
-Received: from eggs.gnu.org ([209.51.188.92]:39092)
+Received: from eggs.gnu.org ([209.51.188.92]:39002)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1hJIfY-0002aR-FY
+	(envelope-from <bounces@canonical.com>) id 1hJIfY-0002X5-Gd
 	for qemu-devel@nongnu.org; Wed, 24 Apr 2019 10:14:42 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1hJIcA-0001gh-Tt
-	for qemu-devel@nongnu.org; Wed, 24 Apr 2019 10:11:12 -0400
-Received: from indium.canonical.com ([91.189.90.7]:38122)
+	(envelope-from <bounces@canonical.com>) id 1hJIc6-0001aW-DM
+	for qemu-devel@nongnu.org; Wed, 24 Apr 2019 10:11:08 -0400
+Received: from indium.canonical.com ([91.189.90.7]:37938)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1hJIcA-0001gM-Oa
-	for qemu-devel@nongnu.org; Wed, 24 Apr 2019 10:11:10 -0400
+	id 1hJIc6-0001Ym-7m
+	for qemu-devel@nongnu.org; Wed, 24 Apr 2019 10:11:06 -0400
 Received: from loganberry.canonical.com ([91.189.90.37])
 	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1hJIc9-00043t-MZ
-	for <qemu-devel@nongnu.org>; Wed, 24 Apr 2019 14:11:09 +0000
+	id 1hJIc4-0003vp-4K
+	for <qemu-devel@nongnu.org>; Wed, 24 Apr 2019 14:11:04 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id A3E692E80C8
-	for <qemu-devel@nongnu.org>; Wed, 24 Apr 2019 14:11:09 +0000 (UTC)
+	by loganberry.canonical.com (Postfix) with ESMTP id 1D81C2E80C7
+	for <qemu-devel@nongnu.org>; Wed, 24 Apr 2019 14:11:04 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Wed, 24 Apr 2019 14:00:19 -0000
+Date: Wed, 24 Apr 2019 13:59:33 -0000
 From: Robie Basak <1823458@bugs.launchpad.net>
 Reply-To: Bug 1823458 <1823458@bugs.launchpad.net>
 Sender: bounces@canonical.com
 References: <155455149397.14414.11595397789908732027.malonedeb@gac.canonical.com>
-Message-Id: <155611441990.6380.14924198096156963710.malone@chaenomeles.canonical.com>
+Message-Id: <155611437314.14210.11419985240685051601.malone@gac.canonical.com>
 Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1823458] Please test proposed package
+Subject: [Qemu-devel] [Bug 1823458] Re: race condition between
+ vhost_net_stop and CHR_EVENT_CLOSED on shutdown crashes qemu
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -38,27 +39,13 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-Hello Dan, or anyone else affected,
+SRU note: please see Christian's MP review (linked from this bug) for
+some advice on additional care during SRU verification.
 
-Accepted qemu into xenial-proposed. The package will build now and be
-available at https://launchpad.net/ubuntu/+source/qemu/1:2.5+dfsg-
-5ubuntu10.37 in a few hours, and then in the -proposed repository.
+** Changed in: qemu (Ubuntu Xenial)
+       Status: In Progress =3D> Fix Committed
 
-Please help us by testing this new package.  See
-https://wiki.ubuntu.com/Testing/EnableProposed for documentation on how
-to enable and use -proposed.Your feedback will aid us getting this
-update out to other Ubuntu users.
-
-If this package fixes the bug for you, please add a comment to this bug,
-mentioning the version of the package you tested and change the tag from
-verification-needed-xenial to verification-done-xenial. If it does not
-fix the bug for you, please add a comment stating that, and change the
-tag to verification-failed-xenial. In either case, details of your
-testing will help us make a better decision.
-
-Further information regarding the verification process can be found at
-https://wiki.ubuntu.com/QATeam/PerformingSRUVerification .  Thank you in
-advance!
+** Tags added: verification-needed verification-needed-xenial
 
 -- =
 
