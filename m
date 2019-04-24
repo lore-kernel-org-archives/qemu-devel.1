@@ -2,68 +2,66 @@ Return-Path: <SRS0=3XOk=S2=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.7 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+X-Spam-Status: No, score=-8.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,
-	UNWANTED_LANGUAGE_BODY,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BEEF0C10F11
-	for <qemu-devel@archiver.kernel.org>; Wed, 24 Apr 2019 14:17:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 36927C282CE
+	for <qemu-devel@archiver.kernel.org>; Wed, 24 Apr 2019 14:17:16 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 89FA321773
-	for <qemu-devel@archiver.kernel.org>; Wed, 24 Apr 2019 14:17:15 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 02E2221773
+	for <qemu-devel@archiver.kernel.org>; Wed, 24 Apr 2019 14:17:16 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=163.com header.i=@163.com header.b="Iky/ArWz"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 89FA321773
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=163.com header.i=@163.com header.b="HgOp5AyR"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 02E2221773
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=163.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:42371 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:42373 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hJIi2-0004AA-LY
-	for qemu-devel@archiver.kernel.org; Wed, 24 Apr 2019 10:17:14 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:39025)
+	id 1hJIi3-0004Bg-7q
+	for qemu-devel@archiver.kernel.org; Wed, 24 Apr 2019 10:17:15 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:39161)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <liq3ea@163.com>) id 1hJIfe-0002XO-9D
+	(envelope-from <liq3ea@163.com>) id 1hJIfe-0002cB-5w
 	for qemu-devel@nongnu.org; Wed, 24 Apr 2019 10:14:47 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <liq3ea@163.com>) id 1hJIY4-0006iH-5O
-	for qemu-devel@nongnu.org; Wed, 24 Apr 2019 10:06:57 -0400
-Received: from m12-14.163.com ([220.181.12.14]:54701)
+	(envelope-from <liq3ea@163.com>) id 1hJIYT-0006wA-2k
+	for qemu-devel@nongnu.org; Wed, 24 Apr 2019 10:07:21 -0400
+Received: from m12-14.163.com ([220.181.12.14]:54855)
 	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <liq3ea@163.com>) id 1hJIY2-0006gJ-HF
-	for qemu-devel@nongnu.org; Wed, 24 Apr 2019 10:06:56 -0400
+	(envelope-from <liq3ea@163.com>) id 1hJIY5-0006i8-Kb
+	for qemu-devel@nongnu.org; Wed, 24 Apr 2019 10:07:21 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=163.com;
-	s=s110527; h=From:Subject:Date:Message-Id; bh=vgOeaRvpko5K839zOg
-	5xl9f11bNiWV/S9xLagM3xojs=; b=Iky/ArWzE7zTNSsAoAPwbDm222RehfXnnB
-	qyxdaVjMRiWZtcydpJ2hOQDLdnD13AHU3VxZTW3Cqryv4AFDHPkxncy/FjPF4HfW
-	tDGYUxQAP/zNZrWG7e/diM5+bDLnqyBgcjrNfTUKqmAFgsAw1pKtxvrSePPUwglm
-	PEWhpoz4I=
+	s=s110527; h=From:Subject:Date:Message-Id; bh=yPoN3JtMf8K84xexdR
+	k3En+SE9Vh0h9Hg/YpOfcyn0s=; b=HgOp5AyRS31HS5TSSJZBzqnUpuvg2bxYlq
+	FGb4XsyMgRnTTbFQPmJhWcVrIRSMTjCmmJxbnY958FWg/oGzUh5ld98EfhhzrLU+
+	pVO7r2C3SW3FCxaW5LZqah9npzRtQqiV5UNr9vkYd4S2yXNYCJqtA3Pkcpd1S/oL
+	9Q2IHvvL8=
 Received: from localhost.localdomain (unknown [115.200.201.0])
-	by smtp10 (Coremail) with SMTP id DsCowAC3Ayl0bcBcrks9CA--.5531S6;
-	Wed, 24 Apr 2019 22:06:52 +0800 (CST)
+	by smtp10 (Coremail) with SMTP id DsCowAC3Ayl0bcBcrks9CA--.5531S7;
+	Wed, 24 Apr 2019 22:06:54 +0800 (CST)
 From: Li Qiang <liq3ea@163.com>
 To: philmd@redhat.com, lersek@redhat.com, kraxel@redhat.com, thuth@redhat.com,
 	lvivier@redhat.com, pbonzini@redhat.com
-Date: Wed, 24 Apr 2019 07:06:42 -0700
-Message-Id: <20190424140643.62457-5-liq3ea@163.com>
+Date: Wed, 24 Apr 2019 07:06:43 -0700
+Message-Id: <20190424140643.62457-6-liq3ea@163.com>
 X-Mailer: git-send-email 2.17.1
 In-Reply-To: <20190424140643.62457-1-liq3ea@163.com>
 References: <20190424140643.62457-1-liq3ea@163.com>
-X-CM-TRANSID: DsCowAC3Ayl0bcBcrks9CA--.5531S6
-X-Coremail-Antispam: 1Uf129KBjvJXoW7CFyrWw48tw45CrWDAw1rXrb_yoW8WF13pF
-	1jk3ZFkrZ5JFW2qr13KrnFqr1aq3s7Jr4UArZrXFW0yw18Wr1qqa18Ca4Fg3WDWFZ2vFs8
-	ZF4vqF13KF1DWaDanT9S1TB71UUUUUUqnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-	9KBjDUYxBIdaVFxhVjvjDU0xZFpf9x07U2_M-UUUUU=
+X-CM-TRANSID: DsCowAC3Ayl0bcBcrks9CA--.5531S7
+X-Coremail-Antispam: 1Uf129KBjvJXoW7CFy7trW7Gr43KF4fXr17Awb_yoW8GF15pF
+	WUu3WakrZ5JFZFqrnxGr1DWF1ftr97Jr4UJrZ0qrWjyw48Xr1DKa1Ika4Fgws8JFWkXa13
+	Z3ZYqF43KF1DXaDanT9S1TB71UUUUUUqnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+	9KBjDUYxBIdaVFxhVjvjDU0xZFpf9x07UCiihUUUUU=
 X-Originating-IP: [115.200.201.0]
-X-CM-SenderInfo: 5oltjvrd6rljoofrz/1tbitBygbVSIbtkMzQAAsP
+X-CM-SenderInfo: 5oltjvrd6rljoofrz/1tbiTxKgbVsGO+h6qAAAsM
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x
 X-Received-From: 220.181.12.14
-Subject: [Qemu-devel] [PATCH v2 4/5] tests: fw_cfg: add reboot_timeout test
- case
+Subject: [Qemu-devel] [PATCH v2 5/5] tests: fw_cfg: add splash time test case
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -80,47 +78,39 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 Content-Type: text/plain; charset="UTF-8"
-Message-ID: <20190424140642.nq3m4Bgn3N3ADupRP00zV7dSYtrqJpeDdcnE_qRiopM@z>
+Message-ID: <20190424140643.uSV9P957fN2qsc0SUyvDAy6yUNIQKh9RIlmYVdN6QTo@z>
 
 Signed-off-by: Li Qiang <liq3ea@163.com>
 ---
 Change since v1:
-Converting little endian reboot_timeout to cpu endian
+Converting little endian splash time to cpu endian
 
- tests/fw_cfg-test.c | 21 +++++++++++++++++++++
- 1 file changed, 21 insertions(+)
+ tests/fw_cfg-test.c | 20 ++++++++++++++++++++
+ 1 file changed, 20 insertions(+)
 
 diff --git a/tests/fw_cfg-test.c b/tests/fw_cfg-test.c
-index c22503619f..6c6add54db 100644
+index 6c6add54db..c6a3d6bb23 100644
 --- a/tests/fw_cfg-test.c
 +++ b/tests/fw_cfg-test.c
-@@ -15,6 +15,7 @@
- #include "libqtest.h"
- #include "standard-headers/linux/qemu_fw_cfg.h"
- #include "libqos/fw_cfg.h"
-+#include "qemu/bswap.h"
- 
- static uint64_t ram_size = 128 << 20;
- static uint16_t nb_cpus = 1;
-@@ -174,6 +175,25 @@ static void test_fw_cfg_boot_menu(void)
+@@ -194,6 +194,25 @@ static void test_fw_cfg_reboot_timeout(void)
      qtest_quit(s);
  }
  
-+static void test_fw_cfg_reboot_timeout(void)
++static void test_fw_cfg_splash_time(void)
 +{
 +    QFWCFG *fw_cfg;
 +    QTestState *s;
-+    uint32_t reboot_timeout = 0;
++    uint16_t splash_time = 0;
 +    size_t filesize;
 +
-+    s = qtest_init("-boot reboot-timeout=15");
++    s = qtest_init("-boot splash-time=12");
 +    fw_cfg = pc_fw_cfg_init(s);
 +
-+    filesize = qfw_cfg_get_file(fw_cfg, "etc/boot-fail-wait",
-+                     &reboot_timeout, sizeof(reboot_timeout));
-+    g_assert_cmpint(filesize, ==, sizeof(reboot_timeout));
-+    reboot_timeout = le32_to_cpu(reboot_timeout);
-+    g_assert_cmpint(reboot_timeout, ==, 15);
++    filesize = qfw_cfg_get_file(fw_cfg, "etc/boot-menu-wait",
++                     &splash_time, sizeof(splash_time));
++    g_assert_cmpint(filesize, ==, sizeof(splash_time));
++    splash_time = le16_to_cpu(splash_time);
++    g_assert_cmpint(splash_time, ==, 12);
 +    pc_fw_cfg_uninit(fw_cfg);
 +    qtest_quit(s);
 +}
@@ -128,11 +118,11 @@ index c22503619f..6c6add54db 100644
  int main(int argc, char **argv)
  {
      int ret;
-@@ -195,6 +215,7 @@ int main(int argc, char **argv)
-     qtest_add_func("fw_cfg/max_cpus", test_fw_cfg_max_cpus);
+@@ -216,6 +235,7 @@ int main(int argc, char **argv)
      qtest_add_func("fw_cfg/numa", test_fw_cfg_numa);
      qtest_add_func("fw_cfg/boot_menu", test_fw_cfg_boot_menu);
-+    qtest_add_func("fw_cfg/reboot_timeout", test_fw_cfg_reboot_timeout);
+     qtest_add_func("fw_cfg/reboot_timeout", test_fw_cfg_reboot_timeout);
++    qtest_add_func("fw_cfg/splash_time", test_fw_cfg_splash_time);
  
      ret = g_test_run();
  
