@@ -6,70 +6,67 @@ X-Spam-Status: No, score=-0.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	MAILING_LIST_MULTI,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 51D81C282CE
-	for <qemu-devel@archiver.kernel.org>; Wed, 24 Apr 2019 06:26:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F1D4CC10F11
+	for <qemu-devel@archiver.kernel.org>; Wed, 24 Apr 2019 06:27:40 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2710E218DA
-	for <qemu-devel@archiver.kernel.org>; Wed, 24 Apr 2019 06:26:55 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2710E218DA
+	by mail.kernel.org (Postfix) with ESMTPS id C3D2C218D3
+	for <qemu-devel@archiver.kernel.org>; Wed, 24 Apr 2019 06:27:40 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C3D2C218D3
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:36636 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:36638 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hJBMs-0004uE-9C
-	for qemu-devel@archiver.kernel.org; Wed, 24 Apr 2019 02:26:54 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:57392)
+	id 1hJBNb-0005ds-Uw
+	for qemu-devel@archiver.kernel.org; Wed, 24 Apr 2019 02:27:40 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:58918)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1hJBH2-0008IJ-CC
-	for qemu-devel@nongnu.org; Wed, 24 Apr 2019 02:20:53 -0400
+	(envelope-from <bounces@canonical.com>) id 1hJBLy-0004TR-EM
+	for qemu-devel@nongnu.org; Wed, 24 Apr 2019 02:25:59 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1hJBH1-00017C-3R
-	for qemu-devel@nongnu.org; Wed, 24 Apr 2019 02:20:52 -0400
-Received: from indium.canonical.com ([91.189.90.7]:44292)
+	(envelope-from <bounces@canonical.com>) id 1hJBLw-0005a0-JJ
+	for qemu-devel@nongnu.org; Wed, 24 Apr 2019 02:25:58 -0400
+Received: from indium.canonical.com ([91.189.90.7]:45130)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1hJBH0-00016e-Tt
-	for qemu-devel@nongnu.org; Wed, 24 Apr 2019 02:20:51 -0400
+	id 1hJBLu-0005VM-Kl
+	for qemu-devel@nongnu.org; Wed, 24 Apr 2019 02:25:55 -0400
 Received: from loganberry.canonical.com ([91.189.90.37])
 	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1hJBH0-0007fL-3K
-	for <qemu-devel@nongnu.org>; Wed, 24 Apr 2019 06:20:50 +0000
+	id 1hJBLr-0008MJ-2X
+	for <qemu-devel@nongnu.org>; Wed, 24 Apr 2019 06:25:51 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 160222E80CB
-	for <qemu-devel@nongnu.org>; Wed, 24 Apr 2019 06:20:50 +0000 (UTC)
+	by loganberry.canonical.com (Postfix) with ESMTP id 110E12E80C7
+	for <qemu-devel@nongnu.org>; Wed, 24 Apr 2019 06:25:51 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Wed, 24 Apr 2019 06:06:50 -0000
-From: Thomas Huth <1801073@bugs.launchpad.net>
+Date: Wed, 24 Apr 2019 06:09:16 -0000
+From: Thomas Huth <1392468@bugs.launchpad.net>
 To: qemu-devel@nongnu.org
 X-Launchpad-Notification-Type: bug
 X-Launchpad-Bug: product=qemu; status=Fix Released; importance=Undecided;
 	assignee=None; 
-X-Launchpad-Bug-Tags: ipxe
 X-Launchpad-Bug-Information-Type: Public
 X-Launchpad-Bug-Private: no
 X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: kraxel-redhat mliska pmaydell
-X-Launchpad-Bug-Reporter: Martin Liska (mliska)
+X-Launchpad-Bug-Commenters: berrange fturco ingo-buerk jakub th-huth zta77
+X-Launchpad-Bug-Reporter: =?utf-8?q?Ingo_B=C3=BCrk_=28ingo-buerk=29?=
 X-Launchpad-Bug-Modifier: Thomas Huth (th-huth)
-References: <154107832062.28716.3850477436321808708.malonedeb@soybean.canonical.com>
+References: <20141113201019.18949.57499.malonedeb@gac.canonical.com>
 Message-Id:
- <155608601152.13953.30287693307562144.launchpad@wampee.canonical.com>
+ <155608615763.14250.13052145300196974826.launchpad@gac.canonical.com>
 X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
 X-Launchpad-Message-For: qemu-devel-ml
 Precedence: bulk
 X-Generated-By: Launchpad (canonical.com); Revision="18928";
 	Instance="launchpad-lazr.conf"
-X-Launchpad-Hash: 213e7eb95930835e084b5a85843a6b8db1a783ca
+X-Launchpad-Hash: 714de9b374495ef7251f5fe389e9ff0a38ce2be0
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 91.189.90.7
-Subject: [Qemu-devel] [Bug 1801073] Re: util/zbin.c:390:37: error: absolute
- value function 'abs' given an argument of type 'long int' but has parameter
- of type 'int' which may cause truncation of value [-Werror=absolute-value]
+Subject: [Qemu-devel] [Bug 1392468] Re: qemu uses a bitmap icon
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 List-Id: <qemu-devel.nongnu.org>
@@ -80,11 +77,11 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1801073 <1801073@bugs.launchpad.net>
+Reply-To: Bug 1392468 <1392468@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190424060650.k_PXXE8dv5yYMROUolrE2dI-TTHoc60fIxtHanMPluc@z>
+Message-ID: <20190424060916.JXR7qrfE1qU_9oJlsfvB3ZgLRIdpn76gMsx0xVy6GX0@z>
 
 ** Changed in: qemu
        Status: Fix Committed =3D> Fix Released
@@ -93,49 +90,22 @@ Message-ID: <20190424060650.k_PXXE8dv5yYMROUolrE2dI-TTHoc60fIxtHanMPluc@z>
 
 You received this bug notification because you are a member of qemu-
 devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1801073
+https://bugs.launchpad.net/bugs/1392468
 
 Title:
-  util/zbin.c:390:37: error: absolute value function 'abs' given an
-  argument of type 'long int' but has parameter of type 'int' which may
-  cause truncation of value [-Werror=3Dabsolute-value]
+  qemu uses a bitmap icon
 
 Status in QEMU:
   Fix Released
 
 Bug description:
-  For qemu-3.0.0 I see with GCC 9 compiler a new warning:
+  qemu currently uses the icon in pc-bios/qemu-icon.bmp, which,
+  obviously, is a bitmap file. It is loaded such that white pixels will
+  be transparent. This can cause nasty artifacts in the display.
 
-  $ make -j1 -C roms pxerom VERBOSE=3D1 V=3D1
-  make: Entering directory '/home/abuild/rpmbuild/BUILD/qemu-3.0.0/roms'
-  make -C ipxe/src CONFIG=3Dqemu \
-  	PACKAGING_TIMESTAMP=3D1534273834 \
-  	CROSS_COMPILE=3D \
-  	bin/8086100e.rom bin/808610d3.rom bin/80861209.rom bin/10500940.rom bin/=
-10222000.rom bin/10ec8139.rom bin/1af41000.rom bin/15ad07b0.rom
-  make[1]: Entering directory '/home/abuild/rpmbuild/BUILD/qemu-3.0.0/roms/=
-ipxe/src'
-  gcc  -Wall -W -Wformat-nonliteral -O2 -g -Werror util/zbin.c -llzma -o ut=
-il/zbin
-  util/zbin.c: In function 'process_zinfo_add':
-  util/zbin.c:390:37: error: absolute value function 'abs' given an argumen=
-t of type 'long int' but has parameter of type 'int' which may cause trunca=
-tion of value [-Werror=3Dabsolute-value]
-    390 |      ( ( addend < 0 ) ? "-" : "" ), abs ( addend ), size,
-        |                                     ^~~
-  util/zbin.c:398:37: error: absolute value function 'abs' given an argumen=
-t of type 'long int' but has parameter of type 'int' which may cause trunca=
-tion of value [-Werror=3Dabsolute-value]
-    398 |      ( ( addend < 0 ) ? "-" : "" ), abs ( addend ), size,
-        |                                     ^~~
-  util/zbin.c:419:37: error: absolute value function 'abs' given an argumen=
-t of type 'long int' but has parameter of type 'int' which may cause trunca=
-tion of value [-Werror=3Dabsolute-value]
-    419 |      ( ( addend < 0 ) ? "-" : "" ), abs ( addend ),
-        |                                     ^~~
-  cc1: all warnings being treated as errors
-  make[1]: *** [Makefile.housekeeping:1368: util/zbin] Error 1
+  Unless there is a specific reason to use bitmaps, I'd suggest moving
+  to, e.g., a PNG file with a proper alpha channel.
 
 To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1801073/+subscriptions
+https://bugs.launchpad.net/qemu/+bug/1392468/+subscriptions
 
