@@ -1,22 +1,33 @@
-Received: from eggs.gnu.org ([209.51.188.92]:44281)
+Received: from eggs.gnu.org ([209.51.188.92]:45928)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <wainersm@redhat.com>) id 1hJOvJ-0001BH-IM
-	for qemu-devel@nongnu.org; Wed, 24 Apr 2019 16:55:22 -0400
+	(envelope-from <bounces@canonical.com>) id 1hJP0h-0003pp-U0
+	for qemu-devel@nongnu.org; Wed, 24 Apr 2019 17:00:58 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <wainersm@redhat.com>) id 1hJOiy-0006Ft-Ly
-	for qemu-devel@nongnu.org; Wed, 24 Apr 2019 16:42:37 -0400
-References: <20190424103747.10173-1-thuth@redhat.com>
-	<20190424103747.10173-6-thuth@redhat.com>
-From: Wainer dos Santos Moschetta <wainersm@redhat.com>
-Message-ID: <6b284aaa-353c-92c1-b01b-21882e7ff9ef@redhat.com>
-Date: Wed, 24 Apr 2019 17:42:14 -0300
+	(envelope-from <bounces@canonical.com>) id 1hJP0f-0007fd-Dy
+	for qemu-devel@nongnu.org; Wed, 24 Apr 2019 17:00:55 -0400
+Received: from indium.canonical.com ([91.189.90.7]:38884)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1hJP0f-0007e9-4w
+	for qemu-devel@nongnu.org; Wed, 24 Apr 2019 17:00:53 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1hJP0c-0001pS-M2
+	for <qemu-devel@nongnu.org>; Wed, 24 Apr 2019 21:00:50 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 9919F2E80CB
+	for <qemu-devel@nongnu.org>; Wed, 24 Apr 2019 21:00:50 +0000 (UTC)
 MIME-Version: 1.0
-In-Reply-To: <20190424103747.10173-6-thuth@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
-Content-Language: en-US
-Subject: Re: [Qemu-devel] [PATCH 5/6] tests: Run the iotests during "make
- check" again
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Wed, 24 Apr 2019 20:53:05 -0000
+From: Corey Bryant <corey.bryant@canonical.com>
+Reply-To: Bug 1823458 <1823458@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <155455149397.14414.11595397789908732027.malonedeb@gac.canonical.com>
+Message-Id: <155613918571.6930.1261295664604032966.malone@chaenomeles.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1823458] Please test proposed package
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,85 +36,218 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org
-Cc: Fam Zheng <fam@euphon.net>, Kevin Wolf <kwolf@redhat.com>, Ed Maste <emaste@freebsd.org>, qemu-block@nongnu.org, =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>, Max Reitz <mreitz@redhat.com>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>, Li-Wen Hsu <lwhsu@freebsd.org>
+To: qemu-devel@nongnu.org
 
-Hi Thomas,
+Hello Dan, or anyone else affected,
 
+Accepted qemu into mitaka-proposed. The package will build now and be
+available in the Ubuntu Cloud Archive in a few hours, and then in the
+-proposed repository.
 
-On 04/24/2019 07:37 AM, Thomas Huth wrote:
-> People often forget to run the iotests before submitting patches or
-> pull requests - this is likely due to the fact that we do not run the
-> tests during our mandatory "make check" tests yet. Now that we've got
-> a new "ci" group of iotests that should be fine to run in every environ-
-> ment, it should be OK to enable the iotests during "make check" again.
-> Thus we now run the "ci" tests by default from the qemu-iotests-quick.sh
-> script, and only use the former "quick" group (that contains some tests
-> that are failing in some environments) when the user decided to run
-> "make check SPEED=thorough" or something similar.
->
-> Signed-off-by: Thomas Huth <thuth@redhat.com>
-> ---
->   tests/Makefile.include      |  2 +-
->   tests/qemu-iotests-quick.sh | 17 ++++++++++++++++-
->   2 files changed, 17 insertions(+), 2 deletions(-)
+Please help us by testing this new package. To enable the -proposed
+repository:
 
-One of Patchew's runners failed with this patch series:
-https://patchew.org/QEMU/20190424103747.10173-1-thuth@redhat.com/
+  sudo add-apt-repository cloud-archive:mitaka-proposed
+  sudo apt-get update
 
-I encountered same failures with `make check` locally on Fedora 29 
-x86_64 (pulled latest qemu, and configured with defaults and 
-x86_64-softmmu target):
----
-Not run: 233
-Failures: 069 103 114 133 140 143 197 215 226 244
-Failed 10 of 91 tests
----
+Your feedback will aid us getting this update out to other Ubuntu users.
 
-Let me know if you need more details.
+If this package fixes the bug for you, please add a comment to this bug,
+mentioning the version of the package you tested, and change the tag
+from verification-mitaka-needed to verification-mitaka-done. If it does
+not fix the bug for you, please add a comment stating that, and change
+the tag to verification-mitaka-failed. In either case, details of your
+testing will help us make a better decision.
 
-- Wainer
+Further information regarding the verification process can be found at
+https://wiki.ubuntu.com/QATeam/PerformingSRUVerification . Thank you in
+advance!
 
->
-> diff --git a/tests/Makefile.include b/tests/Makefile.include
-> index 36fc73fef5..eb6a7a41e2 100644
-> --- a/tests/Makefile.include
-> +++ b/tests/Makefile.include
-> @@ -1168,7 +1168,7 @@ check-acceptance: check-venv $(TESTS_RESULTS_DIR)
->   check-qapi-schema: $(patsubst %,check-%, $(check-qapi-schema-y)) check-tests/qapi-schema/doc-good.texi
->   check-qtest: $(patsubst %,check-qtest-%, $(QTEST_TARGETS))
->   check-block: $(patsubst %,check-%, $(check-block-y))
-> -check: check-qapi-schema check-unit check-softfloat check-qtest check-decodetree
-> +check: check-qapi-schema check-unit check-softfloat check-qtest check-decodetree check-block
->   check-clean:
->   	rm -rf $(check-unit-y) tests/*.o $(QEMU_IOTESTS_HELPERS-y)
->   	rm -rf $(sort $(foreach target,$(SYSEMU_TARGET_LIST), $(check-qtest-$(target)-y)) $(check-qtest-generic-y))
-> diff --git a/tests/qemu-iotests-quick.sh b/tests/qemu-iotests-quick.sh
-> index 0e554bb972..416b3fc48b 100755
-> --- a/tests/qemu-iotests-quick.sh
-> +++ b/tests/qemu-iotests-quick.sh
-> @@ -1,8 +1,23 @@
->   #!/bin/sh
->   
-> +# Honor the SPEED environment variable, just like we do it for the qtests.
-> +# The default is to run all tests that still work fine in a CI environments,
-> +# but if the user set SPEED=slow or SPEED=thorough, we also run all other
-> +# tests that are still marked as "quick"
-> +if [ "$SPEED" = "slow" -o "$SPEED" = "thorough" ]; then
-> +    group=quick
-> +else
-> +    group=ci
-> +fi
-> +
-> +if [ -z "$(find . -name 'qemu-system-*' -print)" ]; then
-> +    echo "No qemu-system binary available. Skipped qemu-iotests."
-> +    exit 0
-> +fi
-> +
->   cd tests/qemu-iotests
->   
->   ret=0
-> -TEST_DIR=${TEST_DIR:-/tmp/qemu-iotests-quick-$$} ./check -T -qcow2 -g quick || ret=1
-> +TEST_DIR=${TEST_DIR:-/tmp/qemu-iotests-quick-$$} ./check -T -qcow2 -g "$group" || ret=1
->   
->   exit $ret
+** Changed in: cloud-archive/mitaka
+       Status: Triaged =3D> Fix Committed
+
+** Tags added: verification-mitaka-needed
+
+-- =
+
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1823458
+
+Title:
+  race condition between vhost_net_stop and CHR_EVENT_CLOSED on shutdown
+  crashes qemu
+
+Status in Ubuntu Cloud Archive:
+  Fix Released
+Status in Ubuntu Cloud Archive mitaka series:
+  Fix Committed
+Status in Ubuntu Cloud Archive ocata series:
+  Fix Committed
+Status in QEMU:
+  Fix Released
+Status in qemu package in Ubuntu:
+  Fix Released
+Status in qemu source package in Trusty:
+  Won't Fix
+Status in qemu source package in Xenial:
+  Fix Committed
+Status in qemu source package in Bionic:
+  Fix Released
+Status in qemu source package in Cosmic:
+  Fix Released
+Status in qemu source package in Disco:
+  Fix Released
+
+Bug description:
+  [impact]
+
+  on shutdown of a guest, there is a race condition that results in qemu
+  crashing instead of normally shutting down.  The bt looks similar to
+  this (depending on the specific version of qemu, of course; this is
+  taken from 2.5 version of qemu):
+
+  (gdb) bt
+  #0  __GI___pthread_mutex_lock (mutex=3D0x0) at ../nptl/pthread_mutex_lock=
+.c:66
+  #1  0x00005636c0bc4389 in qemu_mutex_lock (mutex=3Dmutex@entry=3D0x0) at =
+/build/qemu-7I4i1R/qemu-2.5+dfsg/util/qemu-thread-posix.c:73
+  #2  0x00005636c0988130 in qemu_chr_fe_write_all (s=3Ds@entry=3D0x0, buf=
+=3Dbuf@entry=3D0x7ffe65c086a0 "\v", len=3Dlen@entry=3D20) at /build/qemu-7I=
+4i1R/qemu-2.5+dfsg/qemu-char.c:205
+  #3  0x00005636c08f3483 in vhost_user_write (msg=3Dmsg@entry=3D0x7ffe65c08=
+6a0, fds=3Dfds@entry=3D0x0, fd_num=3Dfd_num@entry=3D0, dev=3D0x5636c1bf6b70=
+, dev=3D0x5636c1bf6b70)
+  =C2=A0=C2=A0=C2=A0=C2=A0at /build/qemu-7I4i1R/qemu-2.5+dfsg/hw/virtio/vho=
+st-user.c:195
+  #4  0x00005636c08f411c in vhost_user_get_vring_base (dev=3D0x5636c1bf6b70=
+, ring=3D0x7ffe65c087e0) at /build/qemu-7I4i1R/qemu-2.5+dfsg/hw/virtio/vhos=
+t-user.c:364
+  #5  0x00005636c08efff0 in vhost_virtqueue_stop (dev=3Ddev@entry=3D0x5636c=
+1bf6b70, vdev=3Dvdev@entry=3D0x5636c2853338, vq=3D0x5636c1bf6d00, idx=3D1) =
+at /build/qemu-7I4i1R/qemu-2.5+dfsg/hw/virtio/vhost.c:895
+  #6  0x00005636c08f2944 in vhost_dev_stop (hdev=3Dhdev@entry=3D0x5636c1bf6=
+b70, vdev=3Dvdev@entry=3D0x5636c2853338) at /build/qemu-7I4i1R/qemu-2.5+dfs=
+g/hw/virtio/vhost.c:1262
+  #7  0x00005636c08db2a8 in vhost_net_stop_one (net=3D0x5636c1bf6b70, dev=
+=3Ddev@entry=3D0x5636c2853338) at /build/qemu-7I4i1R/qemu-2.5+dfsg/hw/net/v=
+host_net.c:293
+  #8  0x00005636c08dbe5b in vhost_net_stop (dev=3Ddev@entry=3D0x5636c285333=
+8, ncs=3D0x5636c209d110, total_queues=3Dtotal_queues@entry=3D1) at /build/q=
+emu-7I4i1R/qemu-2.5+dfsg/hw/net/vhost_net.c:371
+  #9  0x00005636c08d7745 in virtio_net_vhost_status (status=3D7 '\a', n=3D0=
+x5636c2853338) at /build/qemu-7I4i1R/qemu-2.5+dfsg/hw/net/virtio-net.c:150
+  #10 virtio_net_set_status (vdev=3D<optimized out>, status=3D<optimized ou=
+t>) at /build/qemu-7I4i1R/qemu-2.5+dfsg/hw/net/virtio-net.c:162
+  #11 0x00005636c08ec42c in virtio_set_status (vdev=3D0x5636c2853338, val=
+=3D<optimized out>) at /build/qemu-7I4i1R/qemu-2.5+dfsg/hw/virtio/virtio.c:=
+624
+  #12 0x00005636c098fed2 in vm_state_notify (running=3Drunning@entry=3D0, s=
+tate=3Dstate@entry=3DRUN_STATE_SHUTDOWN) at /build/qemu-7I4i1R/qemu-2.5+dfs=
+g/vl.c:1605
+  #13 0x00005636c089172a in do_vm_stop (state=3DRUN_STATE_SHUTDOWN) at /bui=
+ld/qemu-7I4i1R/qemu-2.5+dfsg/cpus.c:724
+  #14 vm_stop (state=3DRUN_STATE_SHUTDOWN) at /build/qemu-7I4i1R/qemu-2.5+d=
+fsg/cpus.c:1407
+  #15 0x00005636c085d240 in main_loop_should_exit () at /build/qemu-7I4i1R/=
+qemu-2.5+dfsg/vl.c:1883
+  #16 main_loop () at /build/qemu-7I4i1R/qemu-2.5+dfsg/vl.c:1931
+  #17 main (argc=3D<optimized out>, argv=3D<optimized out>, envp=3D<optimiz=
+ed out>) at /build/qemu-7I4i1R/qemu-2.5+dfsg/vl.c:4683
+
+  [test case]
+
+  unfortunately since this is a race condition, it's very hard to
+  arbitrarily reproduce; it depends very much on the overall
+  configuration of the guest as well as how exactly it's shut down -
+  specifically, its vhost user net must be closed from the host side at
+  a specific time during qemu shutdown.
+
+  I have someone with such a setup who has reported to me their setup is
+  able to reproduce this reliably, but the config is too complex for me
+  to reproduce so I have relied on their reproduction and testing to
+  debug and craft the patch for this.
+
+  [regression potential]
+
+  the change adds a flag to prevent repeated calls to vhost_net_stop().
+  This also prevents any calls to vhost_net_cleanup() from
+  net_vhost_user_event().  Any regression would be seen when stopping
+  and/or cleaning up a vhost net.  Regressions might include failure to
+  hot-remove a vhost net from a guest, or failure to cleanup (i.e. mem
+  leak), or crashes during cleanup or stopping a vhost net.
+
+  [other info]
+
+  this was originally seen in the 2.5 version of qemu - specifically,
+  the UCA version in trusty-mitaka (which uses the xenial qemu
+  codebase).
+
+  After discussion upstream, it appears this was fixed upstream by
+  commit e7c83a885f8, which is included starting in version 2.9.
+  However, this commit depends on at least commit 5345fdb4467, and
+  likely more other previous commits, which make widespread code changes
+  and are unsuitable to backport.  Therefore this seems like it should
+  be specifically worked around in the Xenial qemu codebase.
+
+  =
+
+  The specific race condition for this (in the qemu 2.5 code version) is:
+
+  as shown in above bt, thread A starts shutting down qemu, e.g.:
+
+  vm_stop->do_vm_stop->vm_state_notify
+  =C2=A0=C2=A0virtio_set_status
+  =C2=A0=C2=A0=C2=A0=C2=A0virtio_net_set_status
+  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0virtio_net_vhost_status
+
+  in this function, code gets to an if-else check for
+  (!n->vhost_started), which is false (i.e. vhost_started is true) and
+  enters the else code block, which calls vhost_net_stop() and then sets
+  n->vhost_started to false.
+
+  While thread A is inside vhost_net_stop(), thread B is triggered by
+  the vhost net chr handler with a user event and calls:
+
+  net_vhost_user_event
+  =C2=A0=C2=A0qmp_set_link (from case CHR_EVENT_CLOSED)
+  =C2=A0=C2=A0=C2=A0=C2=A0virtio_net_set_link_status (via ->link_status_cha=
+nged)
+  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0virtio_net_set_status
+  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0virtio_net_vhost_status
+
+  notice thread B has now reached the same function that thread A is in;
+  since the checks in the function have not changed, thread B follows
+  the same path that thread A followed, and enters vhost_net_stop().
+
+  Since thread A has already shut down and cleaned up some of the
+  internals, once thread B starts trying to also clean up things, it
+  segfaults as the shown in the bt.
+
+  Avoiding only this duplicate call to vhost_net_stop() is required, but
+  not enough - let's continue to look at what thread B does after its
+  call to qmp_set_link() returns:
+
+  net_vhost_user_event
+  =C2=A0=C2=A0vhost_user_stop
+  =C2=A0=C2=A0=C2=A0=C2=A0vhost_net_cleanup
+  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0vhost_dev_cleanup
+
+  However, in main() qemu registers atexit(net_cleanup()), which does:
+  net_cleanup
+  =C2=A0=C2=A0qemu_del_nic (or qemu_del_net_client, depending on ->type)
+  =C2=A0=C2=A0=C2=A0=C2=A0qemu_cleanup_net_client
+  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0vhost_user_cleanup (via ->cleanup)
+  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0vhost_net_cleanup
+  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0vhost_dev_cle=
+anup
+
+  and the duplicate vhost_dev_cleanup fails assertions since things were
+  already cleaned up.  Additionally, if thread B's call to
+  vhost_dev_cleanup() comes before thread A finishes vhost_net_stop(),
+  then that will call vhost_dev_stop() and vhost_disable_notifiers()
+  which both try to access things that have been freed/cleared/disabled
+  by vhost_dev_cleanup().
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/cloud-archive/+bug/1823458/+subscriptions
