@@ -3,46 +3,47 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
 X-Spam-Status: No, score=-0.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+	MAILING_LIST_MULTI,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1A846C10F11
-	for <qemu-devel@archiver.kernel.org>; Wed, 24 Apr 2019 14:18:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 282DBC10F11
+	for <qemu-devel@archiver.kernel.org>; Wed, 24 Apr 2019 14:20:05 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C879721773
-	for <qemu-devel@archiver.kernel.org>; Wed, 24 Apr 2019 14:18:23 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C879721773
+	by mail.kernel.org (Postfix) with ESMTPS id E02E1218FE
+	for <qemu-devel@archiver.kernel.org>; Wed, 24 Apr 2019 14:20:04 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E02E1218FE
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:42376 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:42419 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hJIj8-00054r-W8
-	for qemu-devel@archiver.kernel.org; Wed, 24 Apr 2019 10:18:23 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:39002)
+	id 1hJIkm-0006PE-3g
+	for qemu-devel@archiver.kernel.org; Wed, 24 Apr 2019 10:20:04 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:39092)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1hJIfY-0002X5-Gd
+	(envelope-from <bounces@canonical.com>) id 1hJIfY-0002aR-FY
 	for qemu-devel@nongnu.org; Wed, 24 Apr 2019 10:14:42 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1hJIc6-0001aW-DM
-	for qemu-devel@nongnu.org; Wed, 24 Apr 2019 10:11:08 -0400
-Received: from indium.canonical.com ([91.189.90.7]:37938)
+	(envelope-from <bounces@canonical.com>) id 1hJIcA-0001gh-Tt
+	for qemu-devel@nongnu.org; Wed, 24 Apr 2019 10:11:12 -0400
+Received: from indium.canonical.com ([91.189.90.7]:38122)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1hJIc6-0001Ym-7m
-	for qemu-devel@nongnu.org; Wed, 24 Apr 2019 10:11:06 -0400
+	id 1hJIcA-0001gM-Oa
+	for qemu-devel@nongnu.org; Wed, 24 Apr 2019 10:11:10 -0400
 Received: from loganberry.canonical.com ([91.189.90.37])
 	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1hJIc4-0003vp-4K
-	for <qemu-devel@nongnu.org>; Wed, 24 Apr 2019 14:11:04 +0000
+	id 1hJIc9-00043t-MZ
+	for <qemu-devel@nongnu.org>; Wed, 24 Apr 2019 14:11:09 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 1D81C2E80C7
-	for <qemu-devel@nongnu.org>; Wed, 24 Apr 2019 14:11:04 +0000 (UTC)
+	by loganberry.canonical.com (Postfix) with ESMTP id A3E692E80C8
+	for <qemu-devel@nongnu.org>; Wed, 24 Apr 2019 14:11:09 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Wed, 24 Apr 2019 13:59:33 -0000
+Date: Wed, 24 Apr 2019 14:00:19 -0000
 From: Robie Basak <1823458@bugs.launchpad.net>
 To: qemu-devel@nongnu.org
 X-Launchpad-Notification-Type: bug
@@ -74,17 +75,16 @@ X-Launchpad-Bug-Reporter: Dan Streetman (ddstreet)
 X-Launchpad-Bug-Modifier: Robie Basak (racb)
 References: <155455149397.14414.11595397789908732027.malonedeb@gac.canonical.com>
 Message-Id:
- <155611437314.14210.11419985240685051601.malone@gac.canonical.com>
+ <155611441990.6380.14924198096156963710.malone@chaenomeles.canonical.com>
 X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
 X-Launchpad-Message-For: qemu-devel-ml
 Precedence: bulk
 X-Generated-By: Launchpad (canonical.com); Revision="18928";
 	Instance="launchpad-lazr.conf"
-X-Launchpad-Hash: fa478565d6f9a01d1d23f5c803d57f7cb66a8622
+X-Launchpad-Hash: 9d360aa6d3c708e881267c0c6b36eb211ff4b571
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 91.189.90.7
-Subject: [Qemu-devel] [Bug 1823458] Re: race condition between
- vhost_net_stop and CHR_EVENT_CLOSED on shutdown crashes qemu
+Subject: [Qemu-devel] [Bug 1823458] Please test proposed package
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 List-Id: <qemu-devel.nongnu.org>
@@ -99,15 +99,29 @@ Reply-To: Bug 1823458 <1823458@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190424135933.-f88Jo94L9feBvuG-AcVozvhbHhGRzWoEyVZu7bcG88@z>
+Message-ID: <20190424140019.oTIfC-v-tmkx5KGkZqngA8QTAP_OFxf5aGwVZd6T2nA@z>
 
-SRU note: please see Christian's MP review (linked from this bug) for
-some advice on additional care during SRU verification.
+Hello Dan, or anyone else affected,
 
-** Changed in: qemu (Ubuntu Xenial)
-       Status: In Progress =3D> Fix Committed
+Accepted qemu into xenial-proposed. The package will build now and be
+available at https://launchpad.net/ubuntu/+source/qemu/1:2.5+dfsg-
+5ubuntu10.37 in a few hours, and then in the -proposed repository.
 
-** Tags added: verification-needed verification-needed-xenial
+Please help us by testing this new package.  See
+https://wiki.ubuntu.com/Testing/EnableProposed for documentation on how
+to enable and use -proposed.Your feedback will aid us getting this
+update out to other Ubuntu users.
+
+If this package fixes the bug for you, please add a comment to this bug,
+mentioning the version of the package you tested and change the tag from
+verification-needed-xenial to verification-done-xenial. If it does not
+fix the bug for you, please add a comment stating that, and change the
+tag to verification-failed-xenial. In either case, details of your
+testing will help us make a better decision.
+
+Further information regarding the verification process can be found at
+https://wiki.ubuntu.com/QATeam/PerformingSRUVerification .  Thank you in
+advance!
 
 -- =
 
