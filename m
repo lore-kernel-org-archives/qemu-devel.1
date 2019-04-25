@@ -2,60 +2,81 @@ Return-Path: <SRS0=VSQP=S3=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 53FE1C43219
-	for <qemu-devel@archiver.kernel.org>; Thu, 25 Apr 2019 18:08:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 06EAAC43218
+	for <qemu-devel@archiver.kernel.org>; Thu, 25 Apr 2019 18:08:42 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D930220685
-	for <qemu-devel@archiver.kernel.org>; Thu, 25 Apr 2019 18:08:31 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D930220685
+	by mail.kernel.org (Postfix) with ESMTPS id 905FA20685
+	for <qemu-devel@archiver.kernel.org>; Thu, 25 Apr 2019 18:08:42 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 905FA20685
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:33402 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:33404 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hJinO-0000Nm-Ds
-	for qemu-devel@archiver.kernel.org; Thu, 25 Apr 2019 14:08:30 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:41511)
+	id 1hJinZ-0000VJ-3p
+	for qemu-devel@archiver.kernel.org; Thu, 25 Apr 2019 14:08:41 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:44380)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1hJici-0000Xo-V4
-	for qemu-devel@nongnu.org; Thu, 25 Apr 2019 13:57:31 -0400
+	(envelope-from <philmd@redhat.com>) id 1hJimI-0008Ki-Hz
+	for qemu-devel@nongnu.org; Thu, 25 Apr 2019 14:07:23 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1hJicb-00059S-9y
-	for qemu-devel@nongnu.org; Thu, 25 Apr 2019 13:57:23 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:38532)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1hJicZ-00056i-9i
-	for qemu-devel@nongnu.org; Thu, 25 Apr 2019 13:57:20 -0400
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
-	[10.5.11.14])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 18EDA792B3;
-	Thu, 25 Apr 2019 17:57:18 +0000 (UTC)
-Received: from localhost (ovpn-116-9.gru2.redhat.com [10.97.116.9])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id A2D785D9C6;
-	Thu, 25 Apr 2019 17:57:17 +0000 (UTC)
-From: Eduardo Habkost <ehabkost@redhat.com>
-To: Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org,
-	Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
-Date: Thu, 25 Apr 2019 14:56:56 -0300
-Message-Id: <20190425175659.24876-9-ehabkost@redhat.com>
-In-Reply-To: <20190425175659.24876-1-ehabkost@redhat.com>
-References: <20190425175659.24876-1-ehabkost@redhat.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.39]);
-	Thu, 25 Apr 2019 17:57:18 +0000 (UTC)
+	(envelope-from <philmd@redhat.com>) id 1hJimF-00071G-Py
+	for qemu-devel@nongnu.org; Thu, 25 Apr 2019 14:07:21 -0400
+Received: from mail-wr1-f65.google.com ([209.85.221.65]:36304)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1hJimB-0006e7-Se
+	for qemu-devel@nongnu.org; Thu, 25 Apr 2019 14:07:18 -0400
+Received: by mail-wr1-f65.google.com with SMTP id b1so679645wru.3
+	for <qemu-devel@nongnu.org>; Thu, 25 Apr 2019 11:07:09 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=1e100.net; s=20161025;
+	h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
+	:date:user-agent:mime-version:in-reply-to:content-language
+	:content-transfer-encoding;
+	bh=UxMNW3v3XkJRw4c3jaxUPZIB89NNTNyXaxEAjyuDd60=;
+	b=WlPQzpusol7XQ44xRJlBCYMLo4af3BW7sADTipuEvfIuM1qV7ROElSrapzhJ/rd8ij
+	od4mPbFiAcEVRKggysoiCFdLukFhHPQPHFx8K/CpU8Wxn7G0dJknqF4ACjiyki8TQifK
+	mThKYZqZI/PqW/LBlCMGqN80f2vPDotVEo42eUf3Y6Ayj3IfTeKT8nsOLwQPH6yEGlq6
+	55o8ZeLND8iSQD+URu2d75E7+fm2eDB6dsuxdHvXLk8hgATlf5nSkYnCFEIfE1W8uQn5
+	/ox6YtvoTWEU7DOzh9S4CK93OtH4OBYZ4o9LkTxpwHX6uYyQfierAOnwM0zWVge0Xft1
+	ZoCQ==
+X-Gm-Message-State: APjAAAXc5N4IT7X1ylKyQuKTu/vlm7S/w4cVkwBroNsAx2gAPZJdCWwN
+	uMIWrWCZObl8IGgglyBhZJ0u5g==
+X-Google-Smtp-Source: APXvYqxFbWrwazF8P3W52byqzrxEbZhvyUO79ej+ZkbdKbAhuRV13PFUwRDMJvRqjeU5lovcC74zPw==
+X-Received: by 2002:a5d:4942:: with SMTP id r2mr6149415wrs.159.1556215628402; 
+	Thu, 25 Apr 2019 11:07:08 -0700 (PDT)
+Received: from [192.168.1.25] (abayonne-654-1-209-122.w109-222.abo.wanadoo.fr.
+	[109.222.216.122]) by smtp.gmail.com with ESMTPSA id
+	u6sm42307131wrg.72.2019.04.25.11.07.07
+	(version=TLS1_3 cipher=AEAD-AES128-GCM-SHA256 bits=128/128);
+	Thu, 25 Apr 2019 11:07:07 -0700 (PDT)
+To: Peter Maydell <peter.maydell@linaro.org>,
+	Stefan Hajnoczi <stefanha@redhat.com>
+References: <20190103144124.18917-1-stefanha@redhat.com>
+	<CAFEAcA-B_T9E3ezWFXg-wp3RotMjv3-z3qY7hSJZEoqFBqCWnQ@mail.gmail.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Openpgp: id=89C1E78F601EE86C867495CBA2A3FD6EDEADC0DE;
+	url=http://pgp.mit.edu/pks/lookup?op=get&search=0xA2A3FD6EDEADC0DE
+Message-ID: <62b29bc1-cc78-cd64-4377-fc4007ba7189@redhat.com>
+Date: Thu, 25 Apr 2019 20:07:06 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+	Thunderbird/60.6.1
+MIME-Version: 1.0
+In-Reply-To: <CAFEAcA-B_T9E3ezWFXg-wp3RotMjv3-z3qY7hSJZEoqFBqCWnQ@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] [PULL 08/11] util/mmap-alloc: Add a 'is_pmem'
- parameter to qemu_ram_mmap
+	[fuzzy]
+X-Received-From: 209.85.221.65
+Subject: Re: [Qemu-devel] [PATCH] Revert "armv7m: Guard against no -kernel
+ argument"
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -67,109 +88,57 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Zhang Yi <yi.z.zhang@linux.intel.com>
+Cc: Jim Mussared <jim@groklearning.com>,
+	=?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>,
+	QEMU Developers <qemu-devel@nongnu.org>,
+	Steffen Gortz <qemu.ml@steffen-goertz.de>,
+	qemu-arm <qemu-arm@nongnu.org>, Joel Stanley <joel@jms.id.au>,
+	Thomas Huth <thuth@redhat.com>, Julia Suvorova <jusual@mail.ru>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Content-Type: text/plain; charset="UTF-8"
-Message-ID: <20190425175656.yYjDLPo2RAtHHy7GiT33RDSOtvMmLH4MsLyi_5TH7Uc@z>
+Message-ID: <20190425180706.W9hn6DelszL_wVcpV6JvTINPI4qJQLZDak-rDJMJalQ@z>
 
-From: Zhang Yi <yi.z.zhang@linux.intel.com>
+Hi Peter, Stefan,
 
-besides the existing 'shared' flags, we are going to add
-'is_pmem' to qemu_ram_mmap(), which indicated the memory backend
-file is a persist memory.
+On 1/4/19 4:16 PM, Peter Maydell wrote:
+> On Thu, 3 Jan 2019 at 14:41, Stefan Hajnoczi <stefanha@redhat.com> wrote:
+>>
+>> This reverts commit 01fd41ab3fb69971c24a69ed49cde96086d81278.
+>>
+>> The generic loader device (-device loader,file=kernel.bin) can be used
+>> to load a kernel instead of the -kernel option.  Some boards have flash
+>> memory (pflash) that is set via the -pflash or -drive options.
+>>
+>> Allow starting QEMU without the -kernel option to accommodate these
+>> scenarios.
+>>
+>> Suggested-by: Peter Maydell <peter.maydell@linaro.org>
+>> Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
 
-Signed-off-by: Haozhong Zhang <haozhong.zhang@intel.com>
-Signed-off-by: Zhang Yi <yi.z.zhang@linux.intel.com>
-Reviewed-by: Pankaj Gupta <pagupta@redhat.com>
-Message-Id: <786c46862cfeb253ee0ea2f44d62ffe76edb7fa4.1549555521.git.yi.z.zhang@linux.intel.com>
-Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
-Reviewed-by: Pankaj Gupta <pagupta@redhat.com>
-Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
----
- include/qemu/mmap-alloc.h | 21 ++++++++++++++++++++-
- exec.c                    |  2 +-
- util/mmap-alloc.c         |  6 +++++-
- util/oslib-posix.c        |  2 +-
- 4 files changed, 27 insertions(+), 4 deletions(-)
+Previous to this commit (v3.1), we have:
 
-diff --git a/include/qemu/mmap-alloc.h b/include/qemu/mmap-alloc.h
-index ef04f0ed5b..eec98d82c1 100644
---- a/include/qemu/mmap-alloc.h
-+++ b/include/qemu/mmap-alloc.h
-@@ -7,7 +7,26 @@ size_t qemu_fd_getpagesize(int fd);
- 
- size_t qemu_mempath_getpagesize(const char *mem_path);
- 
--void *qemu_ram_mmap(int fd, size_t size, size_t align, bool shared);
-+/**
-+ * qemu_ram_mmap: mmap the specified file or device.
-+ *
-+ * Parameters:
-+ *  @fd: the file or the device to mmap
-+ *  @size: the number of bytes to be mmaped
-+ *  @align: if not zero, specify the alignment of the starting mapping address;
-+ *          otherwise, the alignment in use will be determined by QEMU.
-+ *  @shared: map has RAM_SHARED flag.
-+ *  @is_pmem: map has RAM_PMEM flag.
-+ *
-+ * Return:
-+ *  On success, return a pointer to the mapped area.
-+ *  On failure, return MAP_FAILED.
-+ */
-+void *qemu_ram_mmap(int fd,
-+                    size_t size,
-+                    size_t align,
-+                    bool shared,
-+                    bool is_pmem);
- 
- void qemu_ram_munmap(int fd, void *ptr, size_t size);
- 
-diff --git a/exec.c b/exec.c
-index f7f3cdbf4a..aa07432929 100644
---- a/exec.c
-+++ b/exec.c
-@@ -1883,7 +1883,7 @@ static void *file_ram_alloc(RAMBlock *block,
-     }
- 
-     area = qemu_ram_mmap(fd, memory, block->mr->align,
--                         block->flags & RAM_SHARED);
-+                         block->flags & RAM_SHARED, block->flags & RAM_PMEM);
-     if (area == MAP_FAILED) {
-         error_setg_errno(errp, errno,
-                          "unable to map backing store for guest RAM");
-diff --git a/util/mmap-alloc.c b/util/mmap-alloc.c
-index 8565885420..9713f4b960 100644
---- a/util/mmap-alloc.c
-+++ b/util/mmap-alloc.c
-@@ -75,7 +75,11 @@ size_t qemu_mempath_getpagesize(const char *mem_path)
-     return getpagesize();
- }
- 
--void *qemu_ram_mmap(int fd, size_t size, size_t align, bool shared)
-+void *qemu_ram_mmap(int fd,
-+                    size_t size,
-+                    size_t align,
-+                    bool shared,
-+                    bool is_pmem)
- {
-     int flags;
-     int guardfd;
-diff --git a/util/oslib-posix.c b/util/oslib-posix.c
-index 88dda9cd39..d97b1717d5 100644
---- a/util/oslib-posix.c
-+++ b/util/oslib-posix.c
-@@ -203,7 +203,7 @@ void *qemu_memalign(size_t alignment, size_t size)
- void *qemu_anon_ram_alloc(size_t size, uint64_t *alignment, bool shared)
- {
-     size_t align = QEMU_VMALLOC_ALIGN;
--    void *ptr = qemu_ram_mmap(-1, size, align, shared);
-+    void *ptr = qemu_ram_mmap(-1, size, align, shared, false);
- 
-     if (ptr == MAP_FAILED) {
-         return NULL;
--- 
-2.18.0.rc1.1.g3f1ff2140
+$ qemu-system-aarch64 -M netduino2
+qemu-system-aarch64: Guest image must be specified (using -kernel)
 
+Now (v4.0) we get:
+
+$ qemu-system-aarch64 -M netduino2
+qemu: fatal: Lockup: can't escalate 3 to HardFault (current priority -1)
+
+R00=00000000 R01=00000000 R02=00000000 R03=00000000
+R04=00000000 R05=00000000 R06=00000000 R07=00000000
+R08=00000000 R09=00000000 R10=00000000 R11=00000000
+R12=00000000 R13=ffffffe0 R14=fffffff9 R15=00000000
+XPSR=40000003 -Z-- A handler
+FPSCR: 00000000
+Aborted (core dumped)
+
+This is confusing.
+
+(same happens with emcraft-sf2, microbit, musca-*)
+
+Regards,
+
+Phil.
 
