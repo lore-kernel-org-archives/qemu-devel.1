@@ -2,86 +2,59 @@ Return-Path: <SRS0=VSQP=S3=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.5 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A2CE8C43219
-	for <qemu-devel@archiver.kernel.org>; Thu, 25 Apr 2019 13:33:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C5E28C43218
+	for <qemu-devel@archiver.kernel.org>; Thu, 25 Apr 2019 13:36:06 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5DD6A206BF
-	for <qemu-devel@archiver.kernel.org>; Thu, 25 Apr 2019 13:33:20 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="SLInGwCH"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5DD6A206BF
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	by mail.kernel.org (Postfix) with ESMTPS id 7FFD1206BF
+	for <qemu-devel@archiver.kernel.org>; Thu, 25 Apr 2019 13:36:06 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7FFD1206BF
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:57245 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:57316 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hJeV5-0004NQ-KJ
-	for qemu-devel@archiver.kernel.org; Thu, 25 Apr 2019 09:33:19 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:60203)
+	id 1hJeXl-0006Vb-Pd
+	for qemu-devel@archiver.kernel.org; Thu, 25 Apr 2019 09:36:05 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:58766)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <arilou@gmail.com>) id 1hJePE-0007vO-W9
-	for qemu-devel@nongnu.org; Thu, 25 Apr 2019 09:27:17 -0400
+	(envelope-from <cohuck@redhat.com>) id 1hJeKZ-0003o1-32
+	for qemu-devel@nongnu.org; Thu, 25 Apr 2019 09:22:28 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <arilou@gmail.com>) id 1hJePE-0000Lc-2C
-	for qemu-devel@nongnu.org; Thu, 25 Apr 2019 09:27:16 -0400
-Received: from mail-wr1-x441.google.com ([2a00:1450:4864:20::441]:36420)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <arilou@gmail.com>) id 1hJePD-0000KJ-Sa
-	for qemu-devel@nongnu.org; Thu, 25 Apr 2019 09:27:16 -0400
-Received: by mail-wr1-x441.google.com with SMTP id b1so19006421wru.3
-	for <qemu-devel@nongnu.org>; Thu, 25 Apr 2019 06:27:15 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
-	h=from:to:cc:subject:date:message-id:in-reply-to:references
-	:mime-version:content-transfer-encoding;
-	bh=38LnIcypIDjektyoZrBn3/LYujk4iHNznA1yMdifAQQ=;
-	b=SLInGwCHS2AJXE9JsEM6osK40eY4yqqIv5R/9G0bybLnxQIkZ7mzIPhyPOx9+9ZJ8H
-	7TfsDmqn3vyQGertoQqIImFd+3pIlnR3phKEvGZgjxS+9ME+Uwjx57kjk8y05F9aKb6O
-	F7bRZQ2V3ZJ9vESq9/hxB8Lag51ePbIqngkM21hIJrZocQOChKEam0cY5wmK7RPWyt+W
-	PSN3D334Zjp1zgrxC/NalDZEI+P8I57SuGweLy8KyDa+RTGan2LT6N3W7Uy82wSETLrr
-	BzUHNKdMRlY0j1ui0vTpYch5U7HUpKNDe5qZjuhyIewX4GVaEfhbB/m2jyJipOQ0YT4n
-	tJCA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=1e100.net; s=20161025;
-	h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
-	:references:mime-version:content-transfer-encoding;
-	bh=38LnIcypIDjektyoZrBn3/LYujk4iHNznA1yMdifAQQ=;
-	b=hTA0sj8Pnv6N0ihGFhrlhpOLSZX3PQrDNgHscZS+JKv2RBymtuzXtqJZ7Mf+hahwJW
-	k3TkVlRizGvf2i7ebrjdUd+IBY1CyHVX921yObdGAEyxuCxYZLvXFk2qGAhgICT++BpU
-	aeldwijthAp970anU5fXg4hYegBU0LGF8vgV1YP9Rgny3W9VNwoea16jIxXH++aeZp77
-	QSlscXSiMFHJ5PA/HlEycyx/sD2K/KXR3tFGWH7JeC44mwzVMJJSHA2NVMUlddy4+HG9
-	54WoXy7c92QdYhip0CFeiHkzSfnlkpFskFDvMMND9TyzPcDD4GXU9L2Xq0wsSFOgzKG1
-	od4w==
-X-Gm-Message-State: APjAAAUA3Q8Yu0gHTZvNHZsK0aTMN3j2euv+/VOxQoBFrWFm/pU1pEFv
-	80N1sVuxCNawdRvtHsCwTmgbIZuS
-X-Google-Smtp-Source: APXvYqwyMZLL2T/WD06/YLGIXQdadpi7pFh3wLTbRd7Se08BIuJYl+Wnl+EMn0bF0vgc7JIE5izwRQ==
-X-Received: by 2002:adf:dbce:: with SMTP id e14mr25490860wrj.249.1556198832793;
-	Thu, 25 Apr 2019 06:27:12 -0700 (PDT)
-Received: from localhost.localdomain (bzq-79-178-247-46.red.bezeqint.net.
-	[79.178.247.46])
-	by smtp.gmail.com with ESMTPSA id y4sm2316540wrt.34.2019.04.25.06.27.08
-	(version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
-	Thu, 25 Apr 2019 06:27:10 -0700 (PDT)
-From: Jon Doron <arilou@gmail.com>
-To: qemu-devel@nongnu.org
-Date: Thu, 25 Apr 2019 16:26:18 +0300
-Message-Id: <20190425132636.31636-4-arilou@gmail.com>
-X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20190425132636.31636-1-arilou@gmail.com>
-References: <20190425132636.31636-1-arilou@gmail.com>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
-	recognized.
-X-Received-From: 2a00:1450:4864:20::441
-Subject: [Qemu-devel] [PATCH v6 03/21] gdbstub: Implement thread_alive (T
- pkt) with new infra
+	(envelope-from <cohuck@redhat.com>) id 1hJeKX-000459-I9
+	for qemu-devel@nongnu.org; Thu, 25 Apr 2019 09:22:27 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:60448)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <cohuck@redhat.com>)
+	id 1hJeKV-00042F-IS; Thu, 25 Apr 2019 09:22:25 -0400
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+	[10.5.11.14])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 3E461308CEBF;
+	Thu, 25 Apr 2019 13:22:20 +0000 (UTC)
+Received: from localhost (dhcp-192-187.str.redhat.com [10.33.192.187])
+	by smtp.corp.redhat.com (Postfix) with ESMTPS id 9A8975D9C5;
+	Thu, 25 Apr 2019 13:22:17 +0000 (UTC)
+From: Cornelia Huck <cohuck@redhat.com>
+To: Peter Maydell <peter.maydell@linaro.org>
+Date: Thu, 25 Apr 2019 15:21:33 +0200
+Message-Id: <20190425132134.2839-19-cohuck@redhat.com>
+In-Reply-To: <20190425132134.2839-1-cohuck@redhat.com>
+References: <20190425132134.2839-1-cohuck@redhat.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+	(mx1.redhat.com [10.5.110.45]);
+	Thu, 25 Apr 2019 13:22:20 +0000 (UTC)
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 209.132.183.28
+Subject: [Qemu-devel] [PULL 18/19] s390x/kvm: Configure page size after
+ memory has actually been initialized
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -93,80 +66,211 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Jon Doron <arilou@gmail.com>
+Cc: qemu-s390x@nongnu.org, Cornelia Huck <cohuck@redhat.com>,
+	qemu-devel@nongnu.org, David Hildenbrand <david@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 Content-Type: text/plain; charset="UTF-8"
-Message-ID: <20190425132618.yJsBao9CdpY7GfH--G4eZxjt35_08iw_fcwYSO7xmk4@z>
+Message-ID: <20190425132133.weBmln72V1sKAJMMAELpFR8VX7Uv7HXzVwS3EoPz4HI@z>
 
-Signed-off-by: Jon Doron <arilou@gmail.com>
+From: David Hildenbrand <david@redhat.com>
+
+Right now we configure the pagesize quite early, when initializing KVM.
+This is long before system memory is actually allocated via
+memory_region_allocate_system_memory(), and therefore memory backends
+marked as mapped.
+
+Instead, let's configure the maximum page size after initializing
+memory in s390_memory_init(). cap_hpage_1m is still properly
+configured before creating any CPUs, and therefore before configuring
+the CPU model and eventually enabling CMMA.
+
+This is not a fix but rather a preparation for the future, when initial
+memory might reside on memory backends (not the case for s390x right now)
+We will replace qemu_getrampagesize() soon by a function that will always
+return the maximum page size (not the minimum page size, which only
+works by pure luck so far, as there are no memory backends).
+
+Acked-by: Igor Mammedov <imammedo@redhat.com>
+Reviewed-by: David Gibson <david@gibson.dropbear.id.au>
+Signed-off-by: David Hildenbrand <david@redhat.com>
+Message-Id: <20190417113143.5551-2-david@redhat.com>
+Signed-off-by: Cornelia Huck <cohuck@redhat.com>
 ---
- gdbstub.c | 43 ++++++++++++++++++++++++++++++++-----------
- 1 file changed, 32 insertions(+), 11 deletions(-)
+ hw/s390x/s390-virtio-ccw.c | 12 ++++++++++++
+ target/s390x/cpu.c         |  7 +++++++
+ target/s390x/cpu.h         |  1 +
+ target/s390x/kvm-stub.c    |  4 ++++
+ target/s390x/kvm.c         | 35 ++++++++++++++---------------------
+ target/s390x/kvm_s390x.h   |  1 +
+ 6 files changed, 39 insertions(+), 21 deletions(-)
 
-diff --git a/gdbstub.c b/gdbstub.c
-index fdad1ac466..29ca6be3df 100644
---- a/gdbstub.c
-+++ b/gdbstub.c
-@@ -1499,6 +1499,30 @@ static void handle_detach(GdbCmdContext *gdb_ctx, void *user_ctx)
-     put_packet(s, "OK");
+diff --git a/hw/s390x/s390-virtio-ccw.c b/hw/s390x/s390-virtio-ccw.c
+index d11069b860b4..3be567965736 100644
+--- a/hw/s390x/s390-virtio-ccw.c
++++ b/hw/s390x/s390-virtio-ccw.c
+@@ -15,6 +15,7 @@
+ #include "cpu.h"
+ #include "hw/boards.h"
+ #include "exec/address-spaces.h"
++#include "exec/ram_addr.h"
+ #include "hw/s390x/s390-virtio-hcall.h"
+ #include "hw/s390x/sclp.h"
+ #include "hw/s390x/s390_flic.h"
+@@ -163,6 +164,7 @@ static void s390_memory_init(ram_addr_t mem_size)
+     MemoryRegion *sysmem = get_system_memory();
+     ram_addr_t chunk, offset = 0;
+     unsigned int number = 0;
++    Error *local_err = NULL;
+     gchar *name;
+ 
+     /* allocate RAM for core */
+@@ -182,6 +184,15 @@ static void s390_memory_init(ram_addr_t mem_size)
+     }
+     g_free(name);
+ 
++    /*
++     * Configure the maximum page size. As no memory devices were created
++     * yet, this is the page size of initial memory only.
++     */
++    s390_set_max_pagesize(qemu_getrampagesize(), &local_err);
++    if (local_err) {
++        error_report_err(local_err);
++        exit(EXIT_FAILURE);
++    }
+     /* Initialize storage key device */
+     s390_skeys_init();
+     /* Initialize storage attributes device */
+@@ -253,6 +264,7 @@ static void ccw_init(MachineState *machine)
+     DeviceState *dev;
+ 
+     s390_sclp_init();
++    /* init memory + setup max page size. Required for the CPU model */
+     s390_memory_init(machine->ram_size);
+ 
+     /* init CPUs (incl. CPU model) early so s390_has_feature() works */
+diff --git a/target/s390x/cpu.c b/target/s390x/cpu.c
+index 698dd9cb82ab..b58ef0a8ef62 100644
+--- a/target/s390x/cpu.c
++++ b/target/s390x/cpu.c
+@@ -399,6 +399,13 @@ int s390_set_memory_limit(uint64_t new_limit, uint64_t *hw_limit)
+     return 0;
  }
  
-+static void handle_thread_alive(GdbCmdContext *gdb_ctx, void *user_ctx)
++void s390_set_max_pagesize(uint64_t pagesize, Error **errp)
 +{
-+    CPUState *cpu;
-+
-+    if (!gdb_ctx->num_params) {
-+        put_packet(gdb_ctx->s, "E22");
-+        return;
++    if (kvm_enabled()) {
++        kvm_s390_set_max_pagesize(pagesize, errp);
 +    }
-+
-+    if (gdb_ctx->params[0].thread_id.kind == GDB_READ_THREAD_ERR) {
-+        put_packet(gdb_ctx->s, "E22");
-+        return;
-+    }
-+
-+    cpu = gdb_get_cpu(gdb_ctx->s, gdb_ctx->params[0].thread_id.pid,
-+                      gdb_ctx->params[0].thread_id.tid);
-+    if (!cpu) {
-+        put_packet(gdb_ctx->s, "E22");
-+        return;
-+    }
-+
-+    put_packet(gdb_ctx->s, "OK");
 +}
 +
- static int gdb_handle_packet(GDBState *s, const char *line_buf)
+ void s390_cmma_reset(void)
  {
-     CPUState *cpu;
-@@ -1799,17 +1823,14 @@ static int gdb_handle_packet(GDBState *s, const char *line_buf)
-         }
-         break;
-     case 'T':
--        thread_kind = read_thread_id(p, &p, &pid, &tid);
--        if (thread_kind == GDB_READ_THREAD_ERR) {
--            put_packet(s, "E22");
--            break;
--        }
--        cpu = gdb_get_cpu(s, pid, tid);
+     if (kvm_enabled()) {
+diff --git a/target/s390x/cpu.h b/target/s390x/cpu.h
+index d8990c405a5d..7305cacc7b77 100644
+--- a/target/s390x/cpu.h
++++ b/target/s390x/cpu.h
+@@ -734,6 +734,7 @@ static inline void s390_do_cpu_load_normal(CPUState *cs, run_on_cpu_data arg)
+ /* cpu.c */
+ void s390_crypto_reset(void);
+ int s390_set_memory_limit(uint64_t new_limit, uint64_t *hw_limit);
++void s390_set_max_pagesize(uint64_t pagesize, Error **errp);
+ void s390_cmma_reset(void);
+ void s390_enable_css_support(S390CPU *cpu);
+ int s390_assign_subch_ioeventfd(EventNotifier *notifier, uint32_t sch_id,
+diff --git a/target/s390x/kvm-stub.c b/target/s390x/kvm-stub.c
+index bf7795e47a1c..22b4514ca68c 100644
+--- a/target/s390x/kvm-stub.c
++++ b/target/s390x/kvm-stub.c
+@@ -93,6 +93,10 @@ int kvm_s390_set_mem_limit(uint64_t new_limit, uint64_t *hw_limit)
+     return 0;
+ }
+ 
++void kvm_s390_set_max_pagesize(uint64_t pagesize, Error **errp)
++{
++}
++
+ void kvm_s390_crypto_reset(void)
+ {
+ }
+diff --git a/target/s390x/kvm.c b/target/s390x/kvm.c
+index 2c6e35b5aafe..7df7be4a1bdc 100644
+--- a/target/s390x/kvm.c
++++ b/target/s390x/kvm.c
+@@ -283,44 +283,37 @@ void kvm_s390_crypto_reset(void)
+     }
+ }
+ 
+-static int kvm_s390_configure_mempath_backing(KVMState *s)
++void kvm_s390_set_max_pagesize(uint64_t pagesize, Error **errp)
+ {
+-    size_t path_psize = qemu_getrampagesize();
 -
--        if (cpu != NULL) {
--            put_packet(s, "OK");
--        } else {
--            put_packet(s, "E22");
-+        {
-+            static const GdbCmdParseEntry thread_alive_cmd_desc = {
-+                .handler = handle_thread_alive,
-+                .cmd = "T",
-+                .cmd_startswith = 1,
-+                .schema = "t0"
-+            };
-+            cmd_parser = &thread_alive_cmd_desc;
-         }
-         break;
-     case 'q':
+-    if (path_psize == 4 * KiB) {
+-        return 0;
++    if (pagesize == 4 * KiB) {
++        return;
+     }
+ 
+     if (!hpage_1m_allowed()) {
+-        error_report("This QEMU machine does not support huge page "
+-                     "mappings");
+-        return -EINVAL;
++        error_setg(errp, "This QEMU machine does not support huge page "
++                   "mappings");
++        return;
+     }
+ 
+-    if (path_psize != 1 * MiB) {
+-        error_report("Memory backing with 2G pages was specified, "
+-                     "but KVM does not support this memory backing");
+-        return -EINVAL;
++    if (pagesize != 1 * MiB) {
++        error_setg(errp, "Memory backing with 2G pages was specified, "
++                   "but KVM does not support this memory backing");
++        return;
+     }
+ 
+-    if (kvm_vm_enable_cap(s, KVM_CAP_S390_HPAGE_1M, 0)) {
+-        error_report("Memory backing with 1M pages was specified, "
+-                     "but KVM does not support this memory backing");
+-        return -EINVAL;
++    if (kvm_vm_enable_cap(kvm_state, KVM_CAP_S390_HPAGE_1M, 0)) {
++        error_setg(errp, "Memory backing with 1M pages was specified, "
++                   "but KVM does not support this memory backing");
++        return;
+     }
+ 
+     cap_hpage_1m = 1;
+-    return 0;
+ }
+ 
+ int kvm_arch_init(MachineState *ms, KVMState *s)
+ {
+     MachineClass *mc = MACHINE_GET_CLASS(ms);
+ 
+-    if (kvm_s390_configure_mempath_backing(s)) {
+-        return -EINVAL;
+-    }
+-
+     mc->default_cpu_type = S390_CPU_TYPE_NAME("host");
+     cap_sync_regs = kvm_check_extension(s, KVM_CAP_SYNC_REGS);
+     cap_async_pf = kvm_check_extension(s, KVM_CAP_ASYNC_PF);
+diff --git a/target/s390x/kvm_s390x.h b/target/s390x/kvm_s390x.h
+index 6e52287da3f0..caf985955ba5 100644
+--- a/target/s390x/kvm_s390x.h
++++ b/target/s390x/kvm_s390x.h
+@@ -36,6 +36,7 @@ int kvm_s390_cmma_active(void);
+ void kvm_s390_cmma_reset(void);
+ void kvm_s390_reset_vcpu(S390CPU *cpu);
+ int kvm_s390_set_mem_limit(uint64_t new_limit, uint64_t *hw_limit);
++void kvm_s390_set_max_pagesize(uint64_t pagesize, Error **errp);
+ void kvm_s390_crypto_reset(void);
+ void kvm_s390_restart_interrupt(S390CPU *cpu);
+ void kvm_s390_stop_interrupt(S390CPU *cpu);
 -- 
-2.20.1
+2.17.2
 
 
