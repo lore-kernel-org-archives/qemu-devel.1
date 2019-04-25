@@ -6,78 +6,78 @@ X-Spam-Status: No, score=-6.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E2B3EC43218
-	for <qemu-devel@archiver.kernel.org>; Thu, 25 Apr 2019 14:26:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 75DD4C43218
+	for <qemu-devel@archiver.kernel.org>; Thu, 25 Apr 2019 14:29:02 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A8EDF206C1
-	for <qemu-devel@archiver.kernel.org>; Thu, 25 Apr 2019 14:26:33 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A8EDF206C1
+	by mail.kernel.org (Postfix) with ESMTPS id 78E1420679
+	for <qemu-devel@archiver.kernel.org>; Thu, 25 Apr 2019 14:29:02 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 78E1420679
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:58508 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:58570 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hJfKa-0002CP-EE
-	for qemu-devel@archiver.kernel.org; Thu, 25 Apr 2019 10:26:32 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:49929)
+	id 1hJfMz-0003tK-Cy
+	for qemu-devel@archiver.kernel.org; Thu, 25 Apr 2019 10:29:01 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:51046)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1hJfJE-0001Ed-A9
-	for qemu-devel@nongnu.org; Thu, 25 Apr 2019 10:25:09 -0400
+	(envelope-from <philmd@redhat.com>) id 1hJfM4-0003Jy-Jr
+	for qemu-devel@nongnu.org; Thu, 25 Apr 2019 10:28:05 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1hJfJD-0005LZ-8T
-	for qemu-devel@nongnu.org; Thu, 25 Apr 2019 10:25:08 -0400
-Received: from mail-wm1-f68.google.com ([209.85.128.68]:51395)
+	(envelope-from <philmd@redhat.com>) id 1hJfM3-0007u6-Kc
+	for qemu-devel@nongnu.org; Thu, 25 Apr 2019 10:28:04 -0400
+Received: from mail-wr1-f65.google.com ([209.85.221.65]:46710)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1hJfJC-0005Kg-Ue
-	for qemu-devel@nongnu.org; Thu, 25 Apr 2019 10:25:07 -0400
-Received: by mail-wm1-f68.google.com with SMTP id 4so9550099wmf.1
-	for <qemu-devel@nongnu.org>; Thu, 25 Apr 2019 07:25:06 -0700 (PDT)
+	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1hJfM3-0007tI-Do
+	for qemu-devel@nongnu.org; Thu, 25 Apr 2019 10:28:03 -0400
+Received: by mail-wr1-f65.google.com with SMTP id t17so30576228wrw.13
+	for <qemu-devel@nongnu.org>; Thu, 25 Apr 2019 07:28:03 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
 	d=1e100.net; s=20161025;
 	h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
 	:date:user-agent:mime-version:in-reply-to:content-language
 	:content-transfer-encoding;
-	bh=tjNSeGqW5ltbIALXlNRkf09d8BwHxi8TlGUDyry9ra8=;
-	b=Pjjndiw0Y5VVm9tomqp9cpI3fYt8AfCgCW6HVnyhIyrvT3dppEACPeRsK5lsPx5aZg
-	v9Yqwb48ypxuSN4viP0LPMNDhDAbNoeXONyeLADjByDSqX/HLpJoIzjVKMhyqIZPlI7o
-	+Lwo+ox8cmiOu1wcQSr1U1GvYOI26Fdn872qWNFxl9hQfZjSQImSNaHOUtTKrNLWGtjJ
-	fUso3yKAXc6tAWD3dsZeTDgsKPUUyND9EZq6iPArMAIioRDOWKs8UHQ2f1FavQRDYbYm
-	b2eWClk4PdV26WPgKa+L12aDf56b19YaYI9GzMay76wCaEDzw6Ghmo5kWAFy9xrzPIKp
-	bdLw==
-X-Gm-Message-State: APjAAAX9IKtJs7oZfGSiW5ioAUCamBdKPp4diqqTNoOi4Z4oQ6x5pJvV
-	IGpnEcjlyJIK1sX6HPN4f3qjTQ==
-X-Google-Smtp-Source: APXvYqwgWvvGsIRt23DHdjkaUcHQORseWua2pxBF65CJbKg84DvPJUAH4YqcC4tgDf85B+os48f+bg==
-X-Received: by 2002:a1c:3507:: with SMTP id c7mr3598956wma.20.1556202305924;
-	Thu, 25 Apr 2019 07:25:05 -0700 (PDT)
+	bh=MPUAfE7XwR1+GwI9oqV+NsnrsOy6QGZjxP7WEADatpA=;
+	b=i6JleUUInxt64fvSUEveGZCAT/MmTu2iaG8s6YLKPOw9H0OhzqW5x/7u8jh15a5bX8
+	ae8Ar6LHYFfyrklS2OtTo1ZVPQ5JxXZJCXgNqbZoeSkTYzX5E4pVERA8kXRE2aQY8MTw
+	zcWWCHMK7M7S0ii7/G0yqFw2O57RebeEy7Zcuw42I4NlZqHgGouIvd0e34wYH7PjSMB5
+	qDrqgzYeTz+8tIyvgHKEP+HU1GPEhjiN4NQ76HzFc9I9bM3euZ2IvnqrlL/LdeI1NXsC
+	Nwxq2VIoAj7BkoDkychQvGkEL6/nI5bY3hkAUCo7V7my/4bmMkYgavlFleW036SlCSpy
+	0Nog==
+X-Gm-Message-State: APjAAAXdV+jWg9bpWM8xg/8mqQgID+nvz6lULbQfQ+6IXi20vrnLDGCi
+	FMtyT1JGVBiIRe06uoaOC/1tJQ==
+X-Google-Smtp-Source: APXvYqyT4F53jRcc/ctIhBFON2VbAZeLFawQNh5Z81PWdAZNSgU2gZzUvo0U69KZ1a7U508mayzTDA==
+X-Received: by 2002:adf:ce0b:: with SMTP id p11mr22654467wrn.196.1556202482288;
+	Thu, 25 Apr 2019 07:28:02 -0700 (PDT)
 Received: from [192.168.1.25] (abayonne-654-1-209-122.w109-222.abo.wanadoo.fr.
 	[109.222.216.122]) by smtp.gmail.com with ESMTPSA id
-	j190sm28069868wmb.19.2019.04.25.07.25.03
+	u6sm41394267wrg.72.2019.04.25.07.27.59
 	(version=TLS1_3 cipher=AEAD-AES128-GCM-SHA256 bits=128/128);
-	Thu, 25 Apr 2019 07:25:05 -0700 (PDT)
+	Thu, 25 Apr 2019 07:28:01 -0700 (PDT)
 To: Thomas Huth <thuth@redhat.com>, yang.zhong@intel.com,
 	Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org,
 	pbonzini@redhat.com
 References: <20190418180057.3593-1-thuth@redhat.com>
-	<20190418180057.3593-6-thuth@redhat.com>
+	<20190418180057.3593-8-thuth@redhat.com>
 From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
 Openpgp: id=89C1E78F601EE86C867495CBA2A3FD6EDEADC0DE;
 	url=http://pgp.mit.edu/pks/lookup?op=get&search=0xA2A3FD6EDEADC0DE
-Message-ID: <acc9802b-5f72-f9f5-32dd-a03d9b6d7e4e@redhat.com>
-Date: Thu, 25 Apr 2019 16:25:03 +0200
+Message-ID: <472cdca7-a01f-632f-bbac-633db846c605@redhat.com>
+Date: Thu, 25 Apr 2019 16:27:58 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
 	Thunderbird/60.6.1
 MIME-Version: 1.0
-In-Reply-To: <20190418180057.3593-6-thuth@redhat.com>
+In-Reply-To: <20190418180057.3593-8-thuth@redhat.com>
 Content-Type: text/plain; charset="UTF-8"
 Content-Language: en-US
 Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 	[fuzzy]
-X-Received-From: 209.85.128.68
-Subject: Re: [Qemu-devel] [PATCH for-QEMU-4.1 v5 05/29] hw/arm: Express
- dependencies of the highbank machines with Kconfig
+X-Received-From: 209.85.221.65
+Subject: Re: [Qemu-devel] [PATCH for-QEMU-4.1 v5 07/29] hw/arm: Express
+ dependencies of the fsl-imx31 machine with Kconfig
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -106,90 +106,79 @@ Cc: Rob Herring <robh@kernel.org>, Jan Kiszka <jan.kiszka@web.de>,
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190425142503.Y6u0tAU-dyTB7PQfIDUvt0_Wb9aT15dH404_yNxwFAU@z>
+Message-ID: <20190425142758.ec5lbDI6kbMBG6SWI-y7zrw1wgBLZjaUl3akrjOmB0A@z>
 
 On 4/18/19 8:00 PM, Thomas Huth wrote:
-> Add Kconfig dependencies for the highbank machine (and the midway
-> machine).
+> Add Kconfig dependencies for the fsl-imx31 / kzm machine.
 > This patch is slightly based on earlier work by Ákos Kovács (i.e.
 > his "hw/arm/Kconfig: Add ARM Kconfig" patch).
 > 
 > Signed-off-by: Thomas Huth <thuth@redhat.com>
 > ---
->  default-configs/arm-softmmu.mak |  9 +--------
->  hw/arm/Kconfig                  | 11 +++++++++++
->  2 files changed, 12 insertions(+), 8 deletions(-)
+>  default-configs/arm-softmmu.mak | 3 +--
+>  hw/arm/Kconfig                  | 4 ++++
+>  hw/misc/Kconfig                 | 2 ++
+>  3 files changed, 7 insertions(+), 2 deletions(-)
 > 
 > diff --git a/default-configs/arm-softmmu.mak b/default-configs/arm-softmmu.mak
-> index 2a11e76cc7..50a4be3cad 100644
+> index 6195b75f48..7f94811ccb 100644
 > --- a/default-configs/arm-softmmu.mak
 > +++ b/default-configs/arm-softmmu.mak
-> @@ -8,6 +8,7 @@ CONFIG_PCI_DEVICES=y
->  CONFIG_PCI_TESTDEV=y
->  
+> @@ -10,6 +10,7 @@ CONFIG_PCI_TESTDEV=y
 >  CONFIG_EXYNOS4=y
-> +CONFIG_HIGHBANK=y
+>  CONFIG_HIGHBANK=y
+>  CONFIG_INTEGRATOR=y
+> +CONFIG_FSL_IMX31=y
 >  
 >  CONFIG_VGA=y
 >  CONFIG_NAND=y
-> @@ -45,24 +46,17 @@ CONFIG_PLATFORM_BUS=y
->  CONFIG_VIRTIO_MMIO=y
+> @@ -68,7 +69,6 @@ CONFIG_TSC210X=y
+>  CONFIG_BLIZZARD=y
+>  CONFIG_ONENAND=y
+>  CONFIG_TUSB6010=y
+> -CONFIG_IMX=y
+>  CONFIG_MAINSTONE=y
+>  CONFIG_MPS2=y
+>  CONFIG_MUSCA=y
+> @@ -115,7 +115,6 @@ CONFIG_ALLWINNER_A10_PIC=y
+>  CONFIG_ALLWINNER_A10=y
 >  
->  CONFIG_ARM11MPCORE=y
-> -CONFIG_A15MPCORE=y
->  
->  CONFIG_NETDUINO2=y
->  
-> -CONFIG_ARM_TIMER=y
-> -CONFIG_PL011=y
-> -CONFIG_PL022=y
-> -CONFIG_PL031=y
->  CONFIG_PL041=y
->  CONFIG_PL050=y
-> -CONFIG_PL061=y
->  CONFIG_PL080=y
->  CONFIG_PL110=y
->  CONFIG_PL181=y
->  CONFIG_PL190=y
->  CONFIG_PL330=y
->  CONFIG_CADENCE=y
-> -CONFIG_XGMAC=y
->  CONFIG_PXA2XX=y
->  CONFIG_BITBANG_I2C=y
->  CONFIG_FRAMEBUFFER=y
-> @@ -150,7 +144,6 @@ CONFIG_XILINX_AXI=y
->  CONFIG_PCI_EXPRESS_DESIGNWARE=y
->  
->  CONFIG_STRONGARM=y
-> -CONFIG_HIGHBANK=y
->  CONFIG_MUSICPAL=y
->  
->  # for realview and versatilepb
+>  CONFIG_FSL_IMX6=y
+> -CONFIG_FSL_IMX31=y
+>  CONFIG_FSL_IMX25=y
+>  CONFIG_FSL_IMX7=y
+>  CONFIG_FSL_IMX6UL=y
 > diff --git a/hw/arm/Kconfig b/hw/arm/Kconfig
-> index acd07b2add..0ba377ac18 100644
+> index ad3b1f9b40..9087b7d714 100644
 > --- a/hw/arm/Kconfig
 > +++ b/hw/arm/Kconfig
-> @@ -18,6 +18,17 @@ config EXYNOS4
+> @@ -98,6 +98,10 @@ config FSL_IMX25
 >  
->  config HIGHBANK
+>  config FSL_IMX31
 >      bool
-> +    select A9MPCORE
-> +    select A15MPCORE
-> +    select AHCI
-> +    select ARM_TIMER # sp804
-> +    select ARM_V7M
-> +    select PL011 # UART
-> +    select PL022 # Serial port
-> +    select PL031 # RTC
-> +    select PL061 # GPIO
-> +    select PL310 # cache controller
-> +    select XGMAC # ethernet
+> +    select SERIAL
+> +    select IMX
+> +    select IMX_I2C
+> +    select LAN9118
 
 Similarly to my comment on patch 6 of this series:
 Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
 
 >  
->  config INTEGRATOR
+>  config FSL_IMX6
+>      bool
+> diff --git a/hw/misc/Kconfig b/hw/misc/Kconfig
+> index 5f67d0d6d9..385e1b0cec 100644
+> --- a/hw/misc/Kconfig
+> +++ b/hw/misc/Kconfig
+> @@ -76,6 +76,8 @@ config ECCMEMCTL
+>  config IMX
+>      bool
+>      select PTIMER
+> +    select SSI
+> +    select USB_EHCI_SYSBUS
+>  
+>  config STM32F2XX_SYSCFG
 >      bool
 > 
 
