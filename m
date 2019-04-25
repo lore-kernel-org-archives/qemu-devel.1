@@ -2,80 +2,84 @@ Return-Path: <SRS0=VSQP=S3=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.7 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
-	SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.7 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9D803C43219
-	for <qemu-devel@archiver.kernel.org>; Thu, 25 Apr 2019 17:27:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 98FDFC43218
+	for <qemu-devel@archiver.kernel.org>; Thu, 25 Apr 2019 17:27:58 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1F891206BF
-	for <qemu-devel@archiver.kernel.org>; Thu, 25 Apr 2019 17:27:58 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 25C0E2084F
+	for <qemu-devel@archiver.kernel.org>; Thu, 25 Apr 2019 17:27:59 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="OZnvBWEt"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1F891206BF
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="rBGrA1Ij"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 25C0E2084F
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:32936 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:32938 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hJiA8-0007PW-4C
-	for qemu-devel@archiver.kernel.org; Thu, 25 Apr 2019 13:27:56 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:35062)
+	id 1hJiA9-0007RT-Mg
+	for qemu-devel@archiver.kernel.org; Thu, 25 Apr 2019 13:27:57 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:35081)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1hJi8w-0006e1-5V
-	for qemu-devel@nongnu.org; Thu, 25 Apr 2019 13:26:43 -0400
+	(envelope-from <richard.henderson@linaro.org>) id 1hJi8x-0006fq-J9
+	for qemu-devel@nongnu.org; Thu, 25 Apr 2019 13:26:44 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1hJi8v-00039k-5Y
-	for qemu-devel@nongnu.org; Thu, 25 Apr 2019 13:26:42 -0400
-Received: from mail-pf1-x441.google.com ([2607:f8b0:4864:20::441]:34176)
+	(envelope-from <richard.henderson@linaro.org>) id 1hJi8w-0003A2-4L
+	for qemu-devel@nongnu.org; Thu, 25 Apr 2019 13:26:43 -0400
+Received: from mail-pf1-x441.google.com ([2607:f8b0:4864:20::441]:43692)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1hJi8u-00038v-Uk
-	for qemu-devel@nongnu.org; Thu, 25 Apr 2019 13:26:41 -0400
-Received: by mail-pf1-x441.google.com with SMTP id b3so257317pfd.1
-	for <qemu-devel@nongnu.org>; Thu, 25 Apr 2019 10:26:39 -0700 (PDT)
+	id 1hJi8v-00039g-Oz
+	for qemu-devel@nongnu.org; Thu, 25 Apr 2019 13:26:42 -0400
+Received: by mail-pf1-x441.google.com with SMTP id e67so234050pfe.10
+	for <qemu-devel@nongnu.org>; Thu, 25 Apr 2019 10:26:41 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
-	h=from:to:cc:subject:date:message-id;
-	bh=e50h0rv9rWiIypCYIm4Lk5gtLy8wge417FHJ3filWHs=;
-	b=OZnvBWEtXPmqlaeIoWutj/GFEofMNxBkLQm42hGokgQj/Vfje5supEuUrinkyQhkWE
-	slcW+lFhiIvtodpB8X4yuzFlqAasbma7mcW6KWG7R4nENxzcIm43PyI/dyDVQnolZ3AM
-	bMMUmgPXIoppzPzU/cFg4FIrTZOsQ/iFU1agVY2yahwaE3uuTN8PFno2wxRolTu/Yblm
-	ktEdBXNh27edKmoGDW1Xy1RW3y2KOssMTPYc8gWSgb5nGJc5b7cXHiwQKu3shadj8QXy
-	6lht0Vx87pMyYx4/vdqb5hlIca7KKRFXtB0YPunX28QOVxrNpvl9DhdfQbAuTnrFui4o
-	6Zxg==
+	h=from:to:cc:subject:date:message-id:in-reply-to:references;
+	bh=eGOk2C15hrcswvUDv6q+SuerrWLxsrIzu4DTJF3iqAI=;
+	b=rBGrA1IjauUSmIaKgWDl3jNQQDkAPBbgOkIGQpRE/zqfzBJatwAzj+IdToZr0Ut1LQ
+	X4djDr3B5SF8wd2FhLG2AmmeJLH8FlgSc+ZPDkBHOfEiEvM2z7qJGYvEUIETff9jpFiK
+	ewIFu5sLPxLLZQ66dLaK+5ZR37Cs81OJBq9JGifJRVBGf+GJD/T2dLOuDnEO6g6Tw6Uc
+	DouwVwpXogUQxlwukhdnBzh/fSdbTDNWclUbBfGDaX1bM4uyb5P19Jhhee6QnB3KIo2s
+	CFrllYffJa7P1JyU1lBbnSI/uOYF8QVzxR8LM2LdU8oitHQVRqkmEV5nwAuTRFe/72tF
+	gINw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
 	d=1e100.net; s=20161025;
-	h=x-gm-message-state:from:to:cc:subject:date:message-id;
-	bh=e50h0rv9rWiIypCYIm4Lk5gtLy8wge417FHJ3filWHs=;
-	b=bxFCwc4TKyYkxT/yuuw8cIOftuD2giziVoaV6ai0fED2eLe6xdGnMtnTzqB/sk3oCV
-	5yn1ixhbSvuOK0v2Jqm6a0PXX6jS6zYVrpv8j+iRtRQlpSCBbNtLAqVksK1JypnhYghi
-	RhiIo1CJXaFtNQ0xlgBOn28jwlPJayBucN3IMIP85keMpyo485XpkjoOV7Q3a+yfbr0+
-	a4ly2HJEq1VmDqRW79bBCb9OMKCXTRLUHfYk/jGI7zvDEoFJD/vjAlN/rXykiKmKbACq
-	dOrefQv4sRL4NbnmHBNoZ97EecM3+MHO0q8pJvohQmGsAoEZvbgKfAlz+ddxhQUDM4wv
-	EXCw==
-X-Gm-Message-State: APjAAAXk0F7ITRwDSRBDad0Q7my9bSluTF6kn0+EjdVuUQQzAeaWSNon
-	4asO45tgtczq/7Dug3lx3LjK6AKHk30=
-X-Google-Smtp-Source: APXvYqxzqus8ip4JabfRT9z+BQLlq4glHKV7biqgNZ0B4LXLdYoC6Tb/midXquWSywKSYooqk3Fw7g==
-X-Received: by 2002:a63:6844:: with SMTP id d65mr38929244pgc.393.1556213197963;
-	Thu, 25 Apr 2019 10:26:37 -0700 (PDT)
+	h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+	:references;
+	bh=eGOk2C15hrcswvUDv6q+SuerrWLxsrIzu4DTJF3iqAI=;
+	b=glBDvGB0TeEMLb8MboBYerhW8+705T0F6qWgk60ZdPYoOBFMJWitytQRraWY6akfCS
+	E2upMHYo/NKBV/t/SvnwrCYzZX4yVfJJ8vp2+MqXfcPscxxbSFhQSsI6nsJIoNPf4UjP
+	SFfuZo6eshB/Bfc0gm5FhR+5fkT+6cXGBAV4+HIHCzLx+Rjv5L3dhF4kBwhbsPLgUJOH
+	2TM9wy14Kf/E22n5NmFdxYMpZCdYOJ6H+47R81TopsinWCqX07NgfDCBpqo963zzX975
+	6aMU2qKa4B36I0af42kOIPgCIHQVS2y/6Y+AzrOnz6V2aw1v0S8FCHohWrDXAofVDtvg
+	Z49g==
+X-Gm-Message-State: APjAAAUJ0TUDTTjKMeOo9ntOhLmxmGndem2X3AUxS9U1vppfUCUgrsn3
+	5Kwkngnkwp8riuzRjh1NcX19KgF6Fwg=
+X-Google-Smtp-Source: APXvYqw4rKsjjbU3PaqWULM8tGt9AuLakWqRXE2j/Ock68Z22WRkBwmhtKX02OlMswiB2EzcRil52Q==
+X-Received: by 2002:a63:5166:: with SMTP id r38mr3858638pgl.429.1556213200351; 
+	Thu, 25 Apr 2019 10:26:40 -0700 (PDT)
 Received: from localhost.localdomain (97-113-179-147.tukw.qwest.net.
 	[97.113.179.147]) by smtp.gmail.com with ESMTPSA id
-	128sm26439908pgb.47.2019.04.25.10.26.36
+	128sm26439908pgb.47.2019.04.25.10.26.39
 	(version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-	Thu, 25 Apr 2019 10:26:37 -0700 (PDT)
+	Thu, 25 Apr 2019 10:26:39 -0700 (PDT)
 From: Richard Henderson <richard.henderson@linaro.org>
 To: qemu-devel@nongnu.org
-Date: Thu, 25 Apr 2019 10:26:34 -0700
-Message-Id: <20190425172636.11128-1-richard.henderson@linaro.org>
+Date: Thu, 25 Apr 2019 10:26:36 -0700
+Message-Id: <20190425172636.11128-3-richard.henderson@linaro.org>
 X-Mailer: git-send-email 2.17.1
+In-Reply-To: <20190425172636.11128-1-richard.henderson@linaro.org>
+References: <20190425172636.11128-1-richard.henderson@linaro.org>
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
 	recognized.
 X-Received-From: 2607:f8b0:4864:20::441
-Subject: [Qemu-devel] [PATCH 0/2] target/riscv fixup and reserved argument
- checks
+Subject: [Qemu-devel] [PATCH 2/2] target/riscv: Add checks for several RVC
+ reserved operands
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -92,33 +96,67 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 Content-Type: text/plain; charset="UTF-8"
-Message-ID: <20190425172634.K0QlljTxnJ_Uv5ygbbozgcAtWQEtkgTcIjxaOerTsik@z>
+Message-ID: <20190425172636.WoEVnQHcqtJhUBVIuomx7bzubm4s7vlH9lpZG0LbNiM@z>
 
-Based-on: https://github.com/palmer-dabbelt/qemu/tree/for-master
+C.ADDI16SP, C.LWSP, C.JR, C.ADDIW, C.LDSP all have reserved
+operands that were not diagnosed.
 
-The first patch is my (interim) solution for compilation with clang.
-I'm still open to Thomas' suggestion to add -Wno-typedef-redefinition
-in the configure script.  I had intended to squash this into the
-indicated patch when I got around to re-sending the patch set, but
-Palmer has started queueing patches already.
-
-The second patch handles the C.LWSP reserved operand case that Palmer
-pointed out during review, and 4 others that I found while double
-checking against the RVC instruction set listings.
-
-
-r~
-
-
-Richard Henderson (2):
-  fixup! target/riscv: Name the argument sets for all of insn32 formats
-  target/riscv: Add checks for several RVC reserved operands
-
- target/riscv/translate.c      | 13 ++++++++++---
+Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+---
  target/riscv/insn16-64.decode | 10 ++++++++--
  target/riscv/insn16.decode    |  7 ++++++-
- 3 files changed, 24 insertions(+), 6 deletions(-)
+ 2 files changed, 14 insertions(+), 3 deletions(-)
 
+diff --git a/target/riscv/insn16-64.decode b/target/riscv/insn16-64.decode
+index 055859d29f..672e1e916f 100644
+--- a/target/riscv/insn16-64.decode
++++ b/target/riscv/insn16-64.decode
+@@ -21,10 +21,16 @@ ld                011  ... ... .. ... 00 @cl_d
+ sd                111  ... ... .. ... 00 @cs_d
+ 
+ # *** RV64C Standard Extension (Quadrant 1) ***
+-addiw             001 .  .....  ..... 01 @ci
++{
++  illegal         001 -  00000  ----- 01 # c.addiw, RES rd=0
++  addiw           001 .  .....  ..... 01 @ci
++}
+ subw              100 1 11 ... 00 ... 01 @cs_2
+ addw              100 1 11 ... 01 ... 01 @cs_2
+ 
+ # *** RV64C Standard Extension (Quadrant 2) ***
+-ld                011 .  .....  ..... 10 @c_ldsp
++{
++  illegal         011 -  00000  ----- 10 # c.ldsp, RES rd=0
++  ld              011 .  .....  ..... 10 @c_ldsp
++}
+ sd                111 .  .....  ..... 10 @c_sdsp
+diff --git a/target/riscv/insn16.decode b/target/riscv/insn16.decode
+index 433c0e8c68..c06073ee72 100644
+--- a/target/riscv/insn16.decode
++++ b/target/riscv/insn16.decode
+@@ -96,6 +96,7 @@ sw                110  ... ... .. ... 00 @cs_w
+ addi              000 .  .....  ..... 01 @ci
+ addi              010 .  .....  ..... 01 @c_li
+ {
++  illegal         011 0  -----  00000 01 # c.addi16sp, RES nzimm=0
+   addi            011 .  00010  ..... 01 @c_addi16sp
+   lui             011 .  .....  ..... 01 @c_lui
+ }
+@@ -113,8 +114,12 @@ bne               111  ... ...  ..... 01 @cb_z
+ # *** RV32/64C Standard Extension (Quadrant 2) ***
+ slli              000 .  .....  ..... 10 @c_shift2
+ fld               001 .  .....  ..... 10 @c_ldsp
+-lw                010 .  .....  ..... 10 @c_lwsp
+ {
++  illegal         010 -  00000  ----- 10 # c.lwsp, RES rd=0
++  lw              010 .  .....  ..... 10 @c_lwsp
++}
++{
++  illegal         100 0  00000  00000 10 # c.jr, RES rs1=0
+   jalr            100 0  .....  00000 10 @c_jalr rd=0  # C.JR
+   addi            100 0  .....  ..... 10 @c_mv
+ }
 -- 
 2.17.1
+
 
