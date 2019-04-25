@@ -1,23 +1,24 @@
-Received: from eggs.gnu.org ([209.51.188.92]:54321)
+Received: from eggs.gnu.org ([209.51.188.92]:54770)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1hJZmM-0006MA-4f
-	for qemu-devel@nongnu.org; Thu, 25 Apr 2019 04:30:51 -0400
+	(envelope-from <stefanha@gmail.com>) id 1hJZoD-0007oj-02
+	for qemu-devel@nongnu.org; Thu, 25 Apr 2019 04:32:46 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1hJZmL-0003Za-6r
-	for qemu-devel@nongnu.org; Thu, 25 Apr 2019 04:30:50 -0400
-Date: Thu, 25 Apr 2019 09:30:45 +0100
+	(envelope-from <stefanha@gmail.com>) id 1hJZoB-0004pa-PA
+	for qemu-devel@nongnu.org; Thu, 25 Apr 2019 04:32:44 -0400
+Date: Thu, 25 Apr 2019 09:32:39 +0100
 From: Stefan Hajnoczi <stefanha@gmail.com>
-Message-ID: <20190425083045.GC30231@stefanha-x1.localdomain>
+Message-ID: <20190425083239.GD30231@stefanha-x1.localdomain>
 References: <c47aea74-cec7-0369-591e-e1b1fdddc3e6@huawei.com>
-	<20190423094217.GC6022@redhat.com>
+	<20190423135635.GL32465@stefanha-x1.localdomain>
+	<0259E1C966E8C54AA93AA2B1240828E65D0BE6FB@DGGEML529-MBS.china.huawei.com>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="1SQmhf2mF2YjsYvc"
+	protocol="application/pgp-signature"; boundary="VV4b6MQE+OnNyhkM"
 Content-Disposition: inline
-In-Reply-To: <20190423094217.GC6022@redhat.com>
+In-Reply-To: <0259E1C966E8C54AA93AA2B1240828E65D0BE6FB@DGGEML529-MBS.china.huawei.com>
 Subject: Re: [Qemu-devel]
- =?utf-8?q?=5BQemu-block=5D__question=EF=BC=9A_Does_?=
- =?utf-8?q?qemu-pr-helper_have_its_own_log_files=EF=BC=9F?=
+ =?utf-8?q?=5BQemu-block=5D_question=EF=BC=9A_Does_q?=
+ =?utf-8?q?emu-pr-helper_have_its_own_log_files=EF=BC=9F?=
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,49 +27,74 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Daniel =?iso-8859-1?Q?P=2E_Berrang=E9?= <berrange@redhat.com>
-Cc: Jie Wang <wangjie88@huawei.com>, "Zhangbo (Oscar)" <oscar.zhangbo@huawei.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org, "Fangyi (C)" <eric.fangyi@huawei.com>
+To: "Zhangbo (Oscar)" <oscar.zhangbo@huawei.com>
+Cc: "wangjie (P)" <wangjie88@huawei.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>, "Fangyi (C)" <eric.fangyi@huawei.com>, "Wangjing (King)" <king.wang@huawei.com>
 
 
---1SQmhf2mF2YjsYvc
+--VV4b6MQE+OnNyhkM
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Tue, Apr 23, 2019 at 10:42:17AM +0100, Daniel P. Berrang=C3=A9 wrote:
-> On Tue, Apr 23, 2019 at 11:12:40AM +0800, Jie Wang wrote:
-> > =C2=A0Does qemu-pr-helper have its own log files=EF=BC=9F
+On Wed, Apr 24, 2019 at 02:37:36AM +0000, Zhangbo (Oscar) wrote:
+> >From: Stefan Hajnoczi [mailto:stefanha@gmail.com]
+> >Sent: Tuesday, April 23, 2019 9:57 PM
+> >On Tue, Apr 23, 2019 at 11:12:40AM +0800, Jie Wang wrote:
+> >> =C2=A0Does qemu-pr-helper have its own log files=EF=BC=9F
+> >
+> >No, it does not.  qemu-pr-helper uses stderr for errors and there is not
+> >much output during normal operation.
+> >
+> >Check journalctl(1) for errors if you are launching it as a systemd
+> >service.
+> >
+> >Stefan
 >=20
-> When QEMU launches it, i think it just inherits stdout/err from
-> QEMU itself, so errors appear mixed into QEMU's stdout output.
+> The error messages that sent to *stderr* are *not* captured by anyone, th=
+en
+> these error messages seems helpless.
 
-I thought QEMU does not launch qemu-pr-helper.  Have I missed something?
+This depends on how qemu-pr-helper was launched.
 
-QEMU ships systemd .service and .socket files for managing
-qemu-pr-helper externally.
+Daniel Berrange mentioned that stderr is not captured when libvirt
+launches qemu-pr-helper.  So in this case there is a problem.
 
-> When libvirt launches it, there stdout is connected to /dev/null
-> and stderr is connected to a pipe which libvirt closes almost
-> immediately. This means any errors are lost as any attempt to
-> write to stderr will get EPIPE :-(
+> It's different form qemu's log,  qemu's stderr logs are transferred to vi=
+rtlogd,
+> that means these logs are finally written into disk.
+> Any further development plan?
+>=20
+> We thought of:
+> 1 logging into syslog, but the malicious guest may cause large amount of =
+error
+>   messages to overflow the message log.
+> 2 or, let virtlogd to redirect its logs. But if virtlogd get restarted, t=
+he helper's log would
+>   no longer be logged, because, unlike qemu, there's no qmp socket betwee=
+n=20
+>   libvirtd and the helper, the channel between the helper and virtlogd co=
+uld not be
+>   re-established.
+> 3 or, let qemu to log the helper's log, seems a little odd and complex.
+> 4 or, let the helper realize its own logging scheme and log into itself's=
+ logfile ?
 
-For anyone looking at the code:
-src/qemu/qemu_process.c:qemuProcessStartManagedPRDaemon()
+Perhaps libvirt should be modified to handle stderr.
 
 Stefan
 
---1SQmhf2mF2YjsYvc
+--VV4b6MQE+OnNyhkM
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQEcBAEBAgAGBQJcwXA1AAoJEJykq7OBq3PI/QoH/3PwwjgmRYq6fAoTt4Xu6FBU
-siKILMWL7wMWjzvxUIs+JY2ZeOXbvci6mT0zOvGqhNAiQANKVNhUunze576ZtFlD
-Ug2ePB4AuU3ccwAElR0zpJoneoJMU1T6ksIxLh4V/NwBDtQL1dNYFN7VSulLKxbo
-YMI0BZQ8ky7eZXCx7nSmHgF9BtdjxLqsvPMDtmSkOb6SXpnneTq+6FQRYTImSYEt
-o5Gp/bcc5NTgc67/tGfSPCEl1qqDdEQ6YN/S/mSk8tZkcbqoDpX0J/tpp4oDThI3
-g1o5yFTOHxeExtsk+Vff7bDXg3QRC+0gyn+IFA8XX8opWlOglN89SlR8qZceUL8=
-=0xgx
+iQEcBAEBAgAGBQJcwXCnAAoJEJykq7OBq3PI0p4H/0eotECdLXd992aTU3WnqVmT
+7+FvRrQRyORu8P6gPaJPEIRGD5mQSL8Py+L8EyaIP52hw+LkTzpAkVWOldFS9ix/
+asTP9i9WC0s9WUl+023ja9JntQcg0Xog3i7tFCCtcp1FS2EXp5J4pFEyh8e31Uzt
+5Vq/eq6dAQYpA9d05kplop3nTevZokVva6cbkTMXM95HGmlK80r0hHz6x+I5ehZG
+VVQEppiMLnPUD0YzimAfwLyEoStJw0CrT89DrUJ5+ep6YmRIIMOLu8kD/bW6YswF
+HyAiuNGpw4XDMSh32e/k+k/sH0sEalfx1QhOS/8c2zhdbVZe0cNbPPLxgOuzDi4=
+=bRO/
 -----END PGP SIGNATURE-----
 
---1SQmhf2mF2YjsYvc--
+--VV4b6MQE+OnNyhkM--
