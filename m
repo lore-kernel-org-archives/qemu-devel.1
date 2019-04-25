@@ -1,21 +1,27 @@
-Received: from eggs.gnu.org ([209.51.188.92]:41566)
+Received: from eggs.gnu.org ([209.51.188.92]:43113)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1hJicq-0000ge-H0
-	for qemu-devel@nongnu.org; Thu, 25 Apr 2019 13:57:38 -0400
+	(envelope-from <wainersm@redhat.com>) id 1hJihw-0005QW-Qr
+	for qemu-devel@nongnu.org; Thu, 25 Apr 2019 14:02:54 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1hJico-0005ML-SS
-	for qemu-devel@nongnu.org; Thu, 25 Apr 2019 13:57:36 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:44184)
+	(envelope-from <wainersm@redhat.com>) id 1hJihv-0002QT-EA
+	for qemu-devel@nongnu.org; Thu, 25 Apr 2019 14:02:52 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:42872)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1hJico-0005Cf-If
-	for qemu-devel@nongnu.org; Thu, 25 Apr 2019 13:57:34 -0400
-From: Eduardo Habkost <ehabkost@redhat.com>
-Date: Thu, 25 Apr 2019 14:56:59 -0300
-Message-Id: <20190425175659.24876-12-ehabkost@redhat.com>
-In-Reply-To: <20190425175659.24876-1-ehabkost@redhat.com>
-References: <20190425175659.24876-1-ehabkost@redhat.com>
-Subject: [Qemu-devel] [PULL 11/11] util/mmap-alloc: support MAP_SYNC in
- qemu_ram_mmap()
+	(Exim 4.71) (envelope-from <wainersm@redhat.com>) id 1hJihv-0002QE-5K
+	for qemu-devel@nongnu.org; Thu, 25 Apr 2019 14:02:51 -0400
+References: <20190329210804.22121-1-wainersm@redhat.com>
+	<5005fcec-42af-427c-4f68-8415490e9598@redhat.com>
+	<5bf78706-d357-a92d-7065-46a9839c9c2f@redhat.com>
+From: Wainer dos Santos Moschetta <wainersm@redhat.com>
+Message-ID: <8dd51a23-65a1-f567-e1cd-b0af665d22ad@redhat.com>
+Date: Thu, 25 Apr 2019 15:02:41 -0300
+MIME-Version: 1.0
+In-Reply-To: <5bf78706-d357-a92d-7065-46a9839c9c2f@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH 0/5] tests/vm: Python 3,
+ improve image caching, and misc
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,163 +30,115 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
-Cc: Zhang Yi <yi.z.zhang@linux.intel.com>
+To: Laszlo Ersek <lersek@redhat.com>, qemu-devel@nongnu.org
+Cc: fam@euphon.net, peter.maydell@linaro.org, philmd@redhat.com, pbonzini@redhat.com, alex.bennee@linaro.org
 
-From: Zhang Yi <yi.z.zhang@linux.intel.com>
+Hi Laszlo,
 
-When a file supporting DAX is used as vNVDIMM backend, mmap it with
-MAP_SYNC flag in addition which can ensure file system metadata
-synced in each guest writes to the backend file, without other QEMU
-actions (e.g., periodic fsync() by QEMU).
 
-Current, We have below different possible use cases:
+On 04/24/2019 06:07 AM, Laszlo Ersek wrote:
+> Hello Wainer,
+>
+> (answering because I dislike ignoring emails without giving any feedbac=
+k:)
 
-1. pmem=on is set, shared=on is set, MAP_SYNC supported:
-   a: backend is a dax supporting file.
-    - MAP_SYNC will active.
-   b: backend is not a dax supporting file.
-    - mmap will trigger a warning. then MAP_SYNC flag will be ignored
+I appreciated that! thanks!
 
-2. The rest of cases:
-   - we will never pass the MAP_SYNC to mmap2
+>
+> On 04/23/19 21:28, Wainer dos Santos Moschetta wrote:
+>> Ping. More reviews needed.
+>>
+>> I've already got Philippe's reviewed-by, thanks!
+> I'm going to skip this one. According to "scripts/get_maintainer.pl", a=
+n
+> ACK from either Alex or Fam should suffice. (They could also decide to
+> queue your set with Phil's R-b, who's a designated reviewer on this top=
+ic.)
 
-Signed-off-by: Haozhong Zhang <haozhong.zhang@intel.com>
-Signed-off-by: Zhang Yi <yi.z.zhang@linux.intel.com>
-[ehabkost: Rebased patch to latest code on master]
-Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
-Signed-off-by: Wei Yang <richardw.yang@linux.intel.com>
-Tested-by: Wei Yang <richardw.yang@linux.intel.com>
-Message-Id: <20190422004849.26463-2-richardw.yang@linux.intel.com>
-[ehabkost: squashed documentation patch]
-Message-Id: <20190422004849.26463-3-richardw.yang@linux.intel.com>
-[ehabkost: documentation fixup]
-Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
-Reviewed-by: Pankaj Gupta <pagupta@redhat.com>
-Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
-Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
----
- docs/nvdimm.txt   | 22 +++++++++++++++++++---
- util/mmap-alloc.c | 41 ++++++++++++++++++++++++++++++++++++++++-
- qemu-options.hx   |  5 +++++
- 3 files changed, 64 insertions(+), 4 deletions(-)
+Yes, that's ok.
 
-diff --git a/docs/nvdimm.txt b/docs/nvdimm.txt
-index 7231c2d78f..b531cacd35 100644
---- a/docs/nvdimm.txt
-+++ b/docs/nvdimm.txt
-@@ -144,9 +144,25 @@ Guest Data Persistence
- ----------------------
- 
- Though QEMU supports multiple types of vNVDIMM backends on Linux,
--currently the only one that can guarantee the guest write persistence
--is the device DAX on the real NVDIMM device (e.g., /dev/dax0.0), to
--which all guest access do not involve any host-side kernel cache.
-+the only backend that can guarantee the guest write persistence is:
-+
-+A. DAX device (e.g., /dev/dax0.0, ) or
-+B. DAX file(mounted with dax option)
-+
-+When using B (A file supporting direct mapping of persistent memory)
-+as a backend, write persistence is guaranteed if the host kernel has
-+support for the MAP_SYNC flag in the mmap system call (available
-+since Linux 4.15 and on certain distro kernels) and additionally
-+both 'pmem' and 'share' flags are set to 'on' on the backend.
-+
-+If these conditions are not satisfied i.e. if either 'pmem' or 'share'
-+are not set, if the backend file does not support DAX or if MAP_SYNC
-+is not supported by the host kernel, write persistence is not
-+guaranteed after a system crash. For compatibility reasons, these
-+conditions are ignored if not satisfied. Currently, no way is
-+provided to test for them.
-+For more details, please reference mmap(2) man page:
-+http://man7.org/linux/man-pages/man2/mmap.2.html.
- 
- When using other types of backends, it's suggested to set 'unarmed'
- option of '-device nvdimm' to 'on', which sets the unarmed flag of the
-diff --git a/util/mmap-alloc.c b/util/mmap-alloc.c
-index 9713f4b960..f7f177d0ea 100644
---- a/util/mmap-alloc.c
-+++ b/util/mmap-alloc.c
-@@ -10,6 +10,13 @@
-  * later.  See the COPYING file in the top-level directory.
-  */
- 
-+#ifdef CONFIG_LINUX
-+#include <linux/mman.h>
-+#else  /* !CONFIG_LINUX */
-+#define MAP_SYNC              0x0
-+#define MAP_SHARED_VALIDATE   0x0
-+#endif /* CONFIG_LINUX */
-+
- #include "qemu/osdep.h"
- #include "qemu/mmap-alloc.h"
- #include "qemu/host-utils.h"
-@@ -82,6 +89,7 @@ void *qemu_ram_mmap(int fd,
-                     bool is_pmem)
- {
-     int flags;
-+    int map_sync_flags = 0;
-     int guardfd;
-     size_t offset;
-     size_t pagesize;
-@@ -132,9 +140,40 @@ void *qemu_ram_mmap(int fd,
-     flags = MAP_FIXED;
-     flags |= fd == -1 ? MAP_ANONYMOUS : 0;
-     flags |= shared ? MAP_SHARED : MAP_PRIVATE;
-+    if (shared && is_pmem) {
-+        map_sync_flags = MAP_SYNC | MAP_SHARED_VALIDATE;
-+    }
-+
-     offset = QEMU_ALIGN_UP((uintptr_t)guardptr, align) - (uintptr_t)guardptr;
- 
--    ptr = mmap(guardptr + offset, size, PROT_READ | PROT_WRITE, flags, fd, 0);
-+    ptr = mmap(guardptr + offset, size, PROT_READ | PROT_WRITE,
-+               flags | map_sync_flags, fd, 0);
-+
-+    if (ptr == MAP_FAILED && map_sync_flags) {
-+        if (errno == ENOTSUP) {
-+            char *proc_link, *file_name;
-+            int len;
-+            proc_link = g_strdup_printf("/proc/self/fd/%d", fd);
-+            file_name = g_malloc0(PATH_MAX);
-+            len = readlink(proc_link, file_name, PATH_MAX - 1);
-+            if (len < 0) {
-+                len = 0;
-+            }
-+            file_name[len] = '\0';
-+            fprintf(stderr, "Warning: requesting persistence across crashes "
-+                    "for backend file %s failed. Proceeding without "
-+                    "persistence, data might become corrupted in case of host "
-+                    "crash.\n", file_name);
-+            g_free(proc_link);
-+            g_free(file_name);
-+        }
-+        /*
-+         * if map failed with MAP_SHARED_VALIDATE | MAP_SYNC,
-+         * we will remove these flags to handle compatibility.
-+         */
-+        ptr = mmap(guardptr + offset, size, PROT_READ | PROT_WRITE,
-+                   flags, fd, 0);
-+    }
- 
-     if (ptr == MAP_FAILED) {
-         munmap(guardptr, total);
-diff --git a/qemu-options.hx b/qemu-options.hx
-index 08749a3391..bdc74c0620 100644
---- a/qemu-options.hx
-+++ b/qemu-options.hx
-@@ -4233,6 +4233,11 @@ using the SNIA NVM programming model (e.g. Intel NVDIMM).
- If @option{pmem} is set to 'on', QEMU will take necessary operations to
- guarantee the persistence of its own writes to @option{mem-path}
- (e.g. in vNVDIMM label emulation and live migration).
-+Also, we will map the backend-file with MAP_SYNC flag, which ensures the
-+file metadata is in sync for @option{mem-path} in case of host crash
-+or a power failure. MAP_SYNC requires support from both the host kernel
-+(since Linux kernel 4.15) and the filesystem of @option{mem-path} mounted
-+with DAX option.
- 
- @item -object memory-backend-ram,id=@var{id},merge=@var{on|off},dump=@var{on|off},share=@var{on|off},prealloc=@var{on|off},size=@var{size},host-nodes=@var{host-nodes},policy=@var{default|preferred|bind|interleave}
- 
--- 
-2.18.0.rc1.1.g3f1ff2140
+I'm CC'ing you because the fix on patch 3/5 has origin on a discussion=20
+on your series ...
+
+[PATCH for-4.1 v3 00/12] bundle edk2 platform firmware with QEMU
+
+... see at https://www.mail-archive.com/qemu-devel@nongnu.org/msg606796.h=
+tml
+
+Sorry, failed to explain the context when I sent this series.
+
+Thanks!
+
+- Wainer
+
+>
+> Thanks
+> Laszlo
+>
+>> On 03/29/2019 06:07 PM, Wainer dos Santos Moschetta wrote:
+>>> Hi all!
+>>>
+>>> This series bundles the support to Python3, improvement to image
+>>> caching, and miscellaneous changes for the vm-test (`make vm-build-*`=
+).
+>>>
+>>> Git tree: http://github.com/wainersm/qemu
+>>> Branch: vm_test_python3_and_misc
+>>> Travis: https://travis-ci.org/wainersm/qemu/builds/513220300
+>>>
+>>> Below you can find some general comments.
+>>>
+>>> Patch 01:
+>>> Uses python configured at build, although vm-test can be executed fro=
+m
+>>> the code tree (see docs/devel/testing.rst) too. In this case $(PYTHON=
+)
+>>> will be empty and it picks python pointed by the script's shebang, as
+>>> a result failing on Python 3 only Linux distros.
+>>>
+>>> Patch 02:
+>>> Ported based.py to work with Python 3 (kept Python 2 compatibility).
+>>> Fixed the follow errors:
+>>>  =C2=A0=C2=A0 - Raising "TypeError: Unicode-objects must be encoded b=
+efore
+>>> hashing" exception by hashlib.sha1().
+>>>  =C2=A0=C2=A0 - get_default_jobs() is used to set the vm cpus, but it=
+ was
+>>> returning an invalid float number.
+>>>  =C2=A0=C2=A0 - On check_sha256sum(), subprocess.check_output() retur=
+ns bytes so
+>>> that string comparison was failing.
+>>>
+>>> Patch 03:
+>>> Implemented a simple mechanism to detect the image file changed on
+>>> http://download.patchew.org, as discussed in
+>>> https://www.mail-archive.com/qemu-devel@nongnu.org/msg607839.html. I
+>>> didn't implement the '--force' option that Paolo suggested, because i=
+t
+>>> would require a major refactoring (technically the vm implementation
+>>> decides whether use the cache or not). My intention is to keep the
+>>> script as simple as possible, so IMO, if the image file changed on th=
+e
+>>> server then it should equally be updated the checksum on QEMU's side.
+>>>
+>>> Patch 04:
+>>> Default network (NETWORK=3D1) backend is enough to have the docker-ba=
+sed
+>>> tests run properly. Note: `make docker-test-block@centos7` is broken
+>>> inside the CentOS VM and apparently on my host (Fedora 29 x86_64) too=
+.
+>>>
+>>> Wainer dos Santos Moschetta (5):
+>>>  =C2=A0=C2=A0 tests/vm: Use python configured on build
+>>>  =C2=A0=C2=A0 tests/vm: Port basevm to Python 3
+>>>  =C2=A0=C2=A0 tests/vm: Detect the image changed on server
+>>>  =C2=A0=C2=A0 tests/vm: Fix build-centos docker-based tests run
+>>>  =C2=A0=C2=A0 tests/vm: Add missing variables on help
+>>>
+>>>  =C2=A0 tests/vm/Makefile.include | 12 ++++++++----
+>>>  =C2=A0 tests/vm/basevm.py=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 =
+| 39 ++++++++++++++++++++++++++++++++++-----
+>>>  =C2=A0 tests/vm/centos=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0 |=C2=A0 6 +++---
+>>>  =C2=A0 3 files changed, 45 insertions(+), 12 deletions(-)
+>>>
