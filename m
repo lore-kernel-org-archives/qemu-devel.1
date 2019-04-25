@@ -1,27 +1,24 @@
-Received: from eggs.gnu.org ([209.51.188.92]:51454)
+Received: from eggs.gnu.org ([209.51.188.92]:51644)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <liq3ea@gmail.com>) id 1hJfNt-0004IW-Dl
-	for qemu-devel@nongnu.org; Thu, 25 Apr 2019 10:29:58 -0400
+	(envelope-from <thuth@redhat.com>) id 1hJfOe-0004qA-LT
+	for qemu-devel@nongnu.org; Thu, 25 Apr 2019 10:30:45 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <liq3ea@gmail.com>) id 1hJfNs-0000ww-2U
-	for qemu-devel@nongnu.org; Thu, 25 Apr 2019 10:29:57 -0400
-Received: from mail-ot1-x342.google.com ([2607:f8b0:4864:20::342]:45807)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <liq3ea@gmail.com>) id 1hJfNr-0000wA-Qr
-	for qemu-devel@nongnu.org; Thu, 25 Apr 2019 10:29:56 -0400
-Received: by mail-ot1-x342.google.com with SMTP id e5so19546006otk.12
-	for <qemu-devel@nongnu.org>; Thu, 25 Apr 2019 07:29:55 -0700 (PDT)
+	(envelope-from <thuth@redhat.com>) id 1hJfOd-0001TA-L4
+	for qemu-devel@nongnu.org; Thu, 25 Apr 2019 10:30:44 -0400
+References: <20190418180057.3593-1-thuth@redhat.com>
+	<20190418180057.3593-7-thuth@redhat.com>
+	<cf39902b-267a-ea7e-c513-fa0c9abf639c@redhat.com>
+	<f362864d-b8f7-687d-1397-03769202cd4f@redhat.com>
+From: Thomas Huth <thuth@redhat.com>
+Message-ID: <faade53f-595e-e97f-a3af-e867e11e248c@redhat.com>
+Date: Thu, 25 Apr 2019 16:29:53 +0200
 MIME-Version: 1.0
-References: <20190424140643.62457-1-liq3ea@163.com>
-	<2b623811-1be2-159c-0fa6-c548aa9eea82@redhat.com>
-In-Reply-To: <2b623811-1be2-159c-0fa6-c548aa9eea82@redhat.com>
-From: Li Qiang <liq3ea@gmail.com>
-Date: Thu, 25 Apr 2019 22:29:18 +0800
-Message-ID: <CAKXe6SLXrthYFrQGVQNT4hK1-22wrteMNyygZgx_j=jtDfYC6g@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
+In-Reply-To: <f362864d-b8f7-687d-1397-03769202cd4f@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v2 0/5] fw_cfg_test refactor and add two
- test cases
+Subject: Re: [Qemu-devel] [PATCH for-QEMU-4.1 v5 06/29] hw/arm: Express
+ dependencies of integratorcp with Kconfig
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,89 +27,67 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Thomas Huth <thuth@redhat.com>
-Cc: Li Qiang <liq3ea@163.com>, =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>, Laszlo Ersek <lersek@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>, lvivier@redhat.com, Paolo Bonzini <pbonzini@redhat.com>, Qemu Developers <qemu-devel@nongnu.org>
+To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>, yang.zhong@intel.com, Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org, pbonzini@redhat.com
+Cc: "Michael S. Tsirkin" <mst@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>, "Edgar E . Iglesias" <edgar.iglesias@gmail.com>, Jean-Christophe Dubois <jcd@tribudubois.net>, Rob Herring <robh@kernel.org>, qemu-block@nongnu.org, Andrey Smirnov <andrew.smirnov@gmail.com>, Joel Stanley <joel@jms.id.au>, Antony Pavlov <antonynpavlov@gmail.com>, Alistair Francis <alistair@alistair23.me>, Beniamino Galvani <b.galvani@gmail.com>, qemu-arm@nongnu.org, Peter Chubb <peter.chubb@nicta.com.au>, Cedric Le Goater <clg@kaod.org>, John Snow <jsnow@redhat.com>, Andrew Jeffery <andrew@aj.id.au>, Philippe Mathieu-Daude <f4bug@amsat.org>, Subbaraya Sundeep <sundeep.lkml@gmail.com>, Igor Mitsyanko <i.mitsyanko@gmail.com>, Jan Kiszka <jan.kiszka@web.de>
 
-Thomas Huth <thuth@redhat.com> =E4=BA=8E2019=E5=B9=B44=E6=9C=8825=E6=97=A5=
-=E5=91=A8=E5=9B=9B =E4=B8=8B=E5=8D=885:57=E5=86=99=E9=81=93=EF=BC=9A
+On 25/04/2019 16.22, Philippe Mathieu-Daud=C3=A9 wrote:
+> On 4/25/19 4:14 PM, Philippe Mathieu-Daud=C3=A9 wrote:
+>> Hi Thomas,
+>>
+>> On 4/18/19 8:00 PM, Thomas Huth wrote:
+>>> This patch is slightly based on earlier work by =C3=81kos Kov=C3=A1cs=
+ (i.e.
+>>> his "hw/arm/Kconfig: Add ARM Kconfig" patch).
+>>>
+>>> Signed-off-by: Thomas Huth <thuth@redhat.com>
+>>> ---
+>>>  default-configs/arm-softmmu.mak | 8 +-------
+>>>  hw/arm/Kconfig                  | 8 ++++++++
+>>>  hw/display/Kconfig              | 1 +
+>>>  3 files changed, 10 insertions(+), 7 deletions(-)
+>>>
+>>> diff --git a/default-configs/arm-softmmu.mak b/default-configs/arm-so=
+ftmmu.mak
+>>> index 50a4be3cad..6195b75f48 100644
+>>> --- a/default-configs/arm-softmmu.mak
+>>> +++ b/default-configs/arm-softmmu.mak
+>>> @@ -9,6 +9,7 @@ CONFIG_PCI_TESTDEV=3Dy
+>>> =20
+>>>  CONFIG_EXYNOS4=3Dy
+>>>  CONFIG_HIGHBANK=3Dy
+>>> +CONFIG_INTEGRATOR=3Dy
+>>> =20
+>>>  CONFIG_VGA=3Dy
+>>>  CONFIG_NAND=3Dy
+>>> @@ -33,7 +34,6 @@ CONFIG_ADS7846=3Dy
+>>>  CONFIG_MAX111X=3Dy
+>>>  CONFIG_SSI_SD=3Dy
+>>>  CONFIG_SSI_M25P80=3Dy
+>>> -CONFIG_SMC91C111=3Dy
+>>>  CONFIG_ALLWINNER_EMAC=3Dy
+>>>  CONFIG_IMX_FEC=3Dy
+>>>  CONFIG_FTGMAC100=3Dy
+>>> @@ -50,10 +50,7 @@ CONFIG_ARM11MPCORE=3Dy
+>>>  CONFIG_NETDUINO2=3Dy
+>>> =20
+>>>  CONFIG_PL041=3Dy
+>>> -CONFIG_PL050=3Dy
+>>
+>> You remove this device but it is used by the realview/versatile/vexpre=
+ss
+>> (you add it to these machines later in patch 11).
+>=20
+> My worry is the unlikely event of someone checking out a new branch
+> after this patch and before patch 11, and disable CONFIG_INTEGRATOR,
+> then these 3 machines would fail to build.
 
-> On 24/04/2019 16.06, Li Qiang wrote:
-> > In the disscuss of adding reboot timeout test case:
-> > https://lists.gnu.org/archive/html/qemu-devel/2019-04/msg03304.html
-> >
-> > Philippe suggested we should uses the only related option for one
-> > specific test. However currently we uses one QTestState for all the
-> > test cases. In order to achieve Philippe's idea, I split the test case
-> > for its own QTestState. As this patchset has changed a lot, I don't bum=
-p
-> > the version.
-> >
-> > Change since v1:
-> > Add a patch to store the reboot_timeout as little endian
-> > Fix the endian issue per Thomas's review
->
-> The test still aborts on a big endian host:
->
-> $ QTEST_QEMU_BINARY=3Dx86_64-softmmu/qemu-system-x86_64 tests/fw_cfg-test
-> /x86_64/fw_cfg/signature: OK
-> /x86_64/fw_cfg/id: OK
-> /x86_64/fw_cfg/uuid: OK
-> /x86_64/fw_cfg/ram_size: OK
-> /x86_64/fw_cfg/nographic: OK
-> /x86_64/fw_cfg/nb_cpus: OK
-> /x86_64/fw_cfg/max_cpus: OK
-> /x86_64/fw_cfg/numa: OK
-> /x86_64/fw_cfg/boot_menu: OK
-> /x86_64/fw_cfg/reboot_timeout: **
->
-> ERROR:/home/thuth/devel/qemu/tests/fw_cfg-test.c:190:test_fw_cfg_reboot_t=
-imeout:
-> assertion failed (reboot_timeout =3D=3D 15): (251658240 =3D=3D 15)
-> Aborted
->
-> 251658240 is 0x0F000000, i.e. a byte-swapped 0xf =3D 15 ... i.e. you stil=
-l
-> got an endianess issue somewhere in the code.
->
+Yeah, the basic idea in this series is that you can not easily do
+partial qemu-system-arm builds anyway as long as not all boards are
+converted. So I think this should be ok.
 
+> Since it is very unlikely:
+> Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
 
-Hmmmm,
+Thanks!
 
-I have thought a long time, still can't point where is wrong.
-
-Let's from the result:
-0x0f000000 in the big endian laid as this:
-low ---> high
-0x0f 00 00 00
-
-As I have swapped before the compare so it is read as this:
-low ---> high
-00 00 00 0x0f
-
-However from the store side:
-the 15 in big endian is:
-low ---> high
-00 00 00 0x0f
-
-But Before I store it, I convert it to little endian, so following should
-be stored:
-low ---> high
-0x0f 00 00 00
-
-Do you apply the patch 3 and recompile the qemu binary?
-If it is, I may need your help as I have no big endian host device.
-
-You can debug and  inspect the memory layout and point out where is wrong.
-
-Thanks,
-Li Qiang
-
-
-
-
-
-
-
->
->  Thomas
->
+ Thomas
