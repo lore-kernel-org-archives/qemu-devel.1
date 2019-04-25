@@ -1,28 +1,28 @@
-Received: from eggs.gnu.org ([209.51.188.92]:42046)
+Received: from eggs.gnu.org ([209.51.188.92]:42434)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1hJgl6-0004hi-4g
-	for qemu-devel@nongnu.org; Thu, 25 Apr 2019 11:58:01 -0400
+	(envelope-from <philmd@redhat.com>) id 1hJgm4-0005Gb-Pi
+	for qemu-devel@nongnu.org; Thu, 25 Apr 2019 11:59:01 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1hJgl5-0001Dd-35
-	for qemu-devel@nongnu.org; Thu, 25 Apr 2019 11:58:00 -0400
-Received: from mail-wm1-f68.google.com ([209.85.128.68]:53950)
+	(envelope-from <philmd@redhat.com>) id 1hJgm2-0002aj-Mo
+	for qemu-devel@nongnu.org; Thu, 25 Apr 2019 11:59:00 -0400
+Received: from mail-wr1-f66.google.com ([209.85.221.66]:41116)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1hJgl4-0001CH-TA
-	for qemu-devel@nongnu.org; Thu, 25 Apr 2019 11:57:59 -0400
-Received: by mail-wm1-f68.google.com with SMTP id 26so4124333wmj.3
-	for <qemu-devel@nongnu.org>; Thu, 25 Apr 2019 08:57:58 -0700 (PDT)
+	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1hJglt-0002OH-39
+	for qemu-devel@nongnu.org; Thu, 25 Apr 2019 11:58:52 -0400
+Received: by mail-wr1-f66.google.com with SMTP id c12so131250wrt.8
+	for <qemu-devel@nongnu.org>; Thu, 25 Apr 2019 08:58:48 -0700 (PDT)
 References: <20190418180057.3593-1-thuth@redhat.com>
-	<20190418180057.3593-19-thuth@redhat.com>
+	<20190418180057.3593-15-thuth@redhat.com>
 From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Message-ID: <4c6269d8-f4ec-04d2-8a17-81e00a2f26a0@redhat.com>
-Date: Thu, 25 Apr 2019 17:57:55 +0200
+Message-ID: <46bcb836-b4db-db2f-26a3-c2827c95e940@redhat.com>
+Date: Thu, 25 Apr 2019 17:58:44 +0200
 MIME-Version: 1.0
-In-Reply-To: <20190418180057.3593-19-thuth@redhat.com>
+In-Reply-To: <20190418180057.3593-15-thuth@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH for-QEMU-4.1 v5 18/29] hw/arm: Express
- dependencies of allwinner / cubieboard with Kconfig
+Subject: Re: [Qemu-devel] [PATCH for-QEMU-4.1 v5 14/29] hw/arm: Express
+ dependencies of collie with Kconfig
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,73 +35,67 @@ To: Thomas Huth <thuth@redhat.com>, yang.zhong@intel.com, Peter Maydell <peter.m
 Cc: "Michael S. Tsirkin" <mst@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>, "Edgar E . Iglesias" <edgar.iglesias@gmail.com>, Jean-Christophe Dubois <jcd@tribudubois.net>, Rob Herring <robh@kernel.org>, qemu-block@nongnu.org, Andrey Smirnov <andrew.smirnov@gmail.com>, Joel Stanley <joel@jms.id.au>, Antony Pavlov <antonynpavlov@gmail.com>, Alistair Francis <alistair@alistair23.me>, Beniamino Galvani <b.galvani@gmail.com>, qemu-arm@nongnu.org, Peter Chubb <peter.chubb@nicta.com.au>, Cedric Le Goater <clg@kaod.org>, John Snow <jsnow@redhat.com>, Andrew Jeffery <andrew@aj.id.au>, Philippe Mathieu-Daude <f4bug@amsat.org>, Subbaraya Sundeep <sundeep.lkml@gmail.com>, Igor Mitsyanko <i.mitsyanko@gmail.com>, Jan Kiszka <jan.kiszka@web.de>
 
 On 4/18/19 8:00 PM, Thomas Huth wrote:
-> Add dependencies for the Cubitech Cubieboard.
+> Add Kconfig dependencies for the Strongarm collie machine.
+> This patch is based on earlier work by Ákos Kovács (i.e.
+> his "hw/arm/Kconfig: Add ARM Kconfig" patch).
 > 
 > Signed-off-by: Thomas Huth <thuth@redhat.com>
 
 Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
 
 > ---
->  default-configs/arm-softmmu.mak | 6 +-----
->  hw/arm/Kconfig                  | 9 +++++++++
->  2 files changed, 10 insertions(+), 5 deletions(-)
+>  default-configs/arm-softmmu.mak | 3 +--
+>  hw/arm/Kconfig                  | 7 +++++++
+>  hw/arm/Makefile.objs            | 2 +-
+>  3 files changed, 9 insertions(+), 3 deletions(-)
 > 
 > diff --git a/default-configs/arm-softmmu.mak b/default-configs/arm-softmmu.mak
-> index c86a9f5427..a0b9016e3a 100644
+> index af78e7c892..25e8f717ac 100644
 > --- a/default-configs/arm-softmmu.mak
 > +++ b/default-configs/arm-softmmu.mak
-> @@ -7,6 +7,7 @@ CONFIG_ARM_V7M=y
->  # CONFIG_TEST_DEVICES=n
->  
->  CONFIG_ARM_VIRT=y
-> +CONFIG_CUBIEBOARD=y
->  CONFIG_EXYNOS4=y
->  CONFIG_HIGHBANK=y
->  CONFIG_INTEGRATOR=y
-> @@ -32,7 +33,6 @@ CONFIG_NETDUINO2=y
+> @@ -25,6 +25,7 @@ CONFIG_GUMSTIX=y
+>  CONFIG_SPITZ=y
+>  CONFIG_TOSA=y
+>  CONFIG_Z2=y
+> +CONFIG_COLLIE=y
 >  
 >  CONFIG_VGA=y
->  CONFIG_SSI_M25P80=y
-> -CONFIG_ALLWINNER_EMAC=y
->  CONFIG_IMX_FEC=y
->  
->  CONFIG_FRAMEBUFFER=y
-> @@ -60,10 +60,6 @@ CONFIG_IOTKIT_SYSINFO=y
->  CONFIG_ARMSSE_CPUID=y
->  CONFIG_ARMSSE_MHU=y
->  
-> -CONFIG_ALLWINNER_A10_PIT=y
-> -CONFIG_ALLWINNER_A10_PIC=y
-> -CONFIG_ALLWINNER_A10=y
+>  CONFIG_TMP421=y
+> @@ -97,5 +98,3 @@ CONFIG_GPIO_KEY=y
+>  CONFIG_MSF2=y
+>  CONFIG_FW_CFG_DMA=y
+>  CONFIG_PCI_EXPRESS_DESIGNWARE=y
 > -
->  CONFIG_FSL_IMX6=y
->  CONFIG_FSL_IMX25=y
->  CONFIG_FSL_IMX7=y
+> -CONFIG_STRONGARM=y
 > diff --git a/hw/arm/Kconfig b/hw/arm/Kconfig
-> index 49306d6419..2ef5696900 100644
+> index 785e383411..325133c129 100644
 > --- a/hw/arm/Kconfig
 > +++ b/hw/arm/Kconfig
-> @@ -25,6 +25,10 @@ config CHEETAH
->      select OMAP
->      select TSC210X
+> @@ -168,6 +168,13 @@ config STELLARIS
 >  
-> +config CUBIEBOARD
-> +    bool
-> +    select ALLWINNER_A10
+>  config STRONGARM
+>      bool
+> +    select PXA2XX
 > +
->  config DIGIC
->      bool
->      select PTIMER
-> @@ -245,6 +249,11 @@ config ARM_V7M
+> +config COLLIE
+> +    bool
+> +    select PFLASH_CFI01
+> +    select ZAURUS  # scoop
+> +    select STRONGARM
 >  
->  config ALLWINNER_A10
+>  config SX1
 >      bool
-> +    select AHCI
-> +    select ALLWINNER_A10_PIT
-> +    select ALLWINNER_A10_PIC
-> +    select ALLWINNER_EMAC
-> +    select SERIAL
->  
->  config RASPI
->      bool
+> diff --git a/hw/arm/Makefile.objs b/hw/arm/Makefile.objs
+> index 00328d1b0b..729e711b87 100644
+> --- a/hw/arm/Makefile.objs
+> +++ b/hw/arm/Makefile.objs
+> @@ -17,7 +17,7 @@ obj-$(CONFIG_TOSA) += tosa.o
+>  obj-$(CONFIG_Z2) += z2.o
+>  obj-$(CONFIG_REALVIEW) += realview.o
+>  obj-$(CONFIG_STELLARIS) += stellaris.o
+> -obj-$(CONFIG_STRONGARM) += collie.o
+> +obj-$(CONFIG_COLLIE) += collie.o
+>  obj-$(CONFIG_VERSATILE) += versatilepb.o
+>  obj-$(CONFIG_VEXPRESS) += vexpress.o
+>  obj-$(CONFIG_ZYNQ) += xilinx_zynq.o
 > 
