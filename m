@@ -1,28 +1,33 @@
-Received: from eggs.gnu.org ([209.51.188.92]:40817)
+Received: from eggs.gnu.org ([209.51.188.92]:43511)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richardw.yang@linux.intel.com>) id 1hJYl6-00071d-Bh
-	for qemu-devel@nongnu.org; Thu, 25 Apr 2019 03:25:29 -0400
+	(envelope-from <thuth@redhat.com>) id 1hJZ1Q-00023R-QC
+	for qemu-devel@nongnu.org; Thu, 25 Apr 2019 03:42:22 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richardw.yang@linux.intel.com>) id 1hJYl5-00061E-B3
-	for qemu-devel@nongnu.org; Thu, 25 Apr 2019 03:25:28 -0400
-Received: from mga02.intel.com ([134.134.136.20]:58897)
+	(envelope-from <thuth@redhat.com>) id 1hJYxM-0007Bp-A6
+	for qemu-devel@nongnu.org; Thu, 25 Apr 2019 03:38:09 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:31646)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <richardw.yang@linux.intel.com>)
-	id 1hJYl5-00060R-32
-	for qemu-devel@nongnu.org; Thu, 25 Apr 2019 03:25:27 -0400
-Date: Thu, 25 Apr 2019 15:24:55 +0800
-From: Wei Yang <richardw.yang@linux.intel.com>
-Message-ID: <20190425072455.GB24344@richard>
-Reply-To: Wei Yang <richardw.yang@linux.intel.com>
-References: <1556170489-131927-1-git-send-email-imammedo@redhat.com>
-	<1556170489-131927-3-git-send-email-imammedo@redhat.com>
+	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1hJYxM-0007AE-0Q
+	for qemu-devel@nongnu.org; Thu, 25 Apr 2019 03:38:08 -0400
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+	[10.5.11.11])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 5CBA63003B45
+	for <qemu-devel@nongnu.org>; Thu, 25 Apr 2019 07:38:05 +0000 (UTC)
+References: <20190423212246.3542-1-ehabkost@redhat.com>
+	<2b1d825f-8bd3-ba25-3e1b-8415aeec8ce6@redhat.com>
+	<20190424181049.GF18406@habkost.net>
+From: Thomas Huth <thuth@redhat.com>
+Message-ID: <f8b5a75c-c7de-a6d8-83d7-c3ba2a0cbaf8@redhat.com>
+Date: Thu, 25 Apr 2019 09:38:00 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <1556170489-131927-3-git-send-email-imammedo@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v3 02/13] tests: acpi: rename
- acpi_parse_rsdp_table() into acpi_fetch_rsdp_table()
+In-Reply-To: <20190424181049.GF18406@habkost.net>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH 0/3] Export machine type deprecation info
+ through QMP
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,79 +36,69 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Igor Mammedov <imammedo@redhat.com>
-Cc: qemu-devel@nongnu.org, Laszlo Ersek <lersek@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Gonglei <arei.gonglei@huawei.com>, Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <philmd@redhat.com>, Shannon Zhao <shannon.zhaosl@gmail.com>, Wei Yang <richardw.yang@linux.intel.com>, Andrew Jones <drjones@redhat.com>, Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>, Ben Warren <ben@skyportsystems.com>
+To: Eduardo Habkost <ehabkost@redhat.com>
+Cc: mprivozn@redhat.com, Gerd Hoffmann <kraxel@redhat.com>, qemu-devel@nongnu.org, Markus Armbruster <armbru@redhat.com>
 
-On Thu, Apr 25, 2019 at 07:34:38AM +0200, Igor Mammedov wrote:
->so name would reflect what the function does
->
->Signed-off-by: Igor Mammedov <imammedo@redhat.com>
->Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+On 24/04/2019 20.10, Eduardo Habkost wrote:
+> On Wed, Apr 24, 2019 at 09:56:53AM +0200, Thomas Huth wrote:
+>> On 23/04/2019 23.22, Eduardo Habkost wrote:
+>>> This series adds machine type deprecation information to the
+>>> output of the `query-machines` QMP command.  With this, libvirt
+>>> and management software will be able to show this information to
+>>> users and/or suggest changes to VM configuration to avoid
+>>> deprecated machine types.
+>>>
+>>> Eduardo Habkost (3):
+>>>   qapi: SupportStatusInfo struct
+>>>   machine: Use SupportStatusInfo for deprecation info
+>>>   qmp: Add deprecation information to query-machines
+>>>
+>>>  qapi/common.json                   | 24 ++++++++++++++++++++++++
+>>>  qapi/misc.json                     |  5 ++++-
+>>>  include/hw/boards.h                |  7 ++++---
+>>>  hw/i386/pc_piix.c                  |  4 +++-
+>>>  hw/ppc/prep.c                      |  4 +++-
+>>>  vl.c                               | 19 +++++++++++++++----
+>>>  tests/acceptance/query_machines.py | 27 +++++++++++++++++++++++++++
+>>>  7 files changed, 80 insertions(+), 10 deletions(-)
+>>>  create mode 100644 tests/acceptance/query_machines.py
+>>
+>> Good idea, but some questions come to my mind:
+>>
+>> - What about devices? IIRC Gerd wrote a patch series last year that do=
+es
+>>   something similar for devices... It would be good to synchronize the
+>>   work, so that we do not have two completely interfaces between devic=
+es
+>>   and machines here in the end...
+>=20
+> My plan is to support this on devices, too.  I even had a version
+> where documentation of SupportStatusInfo mentioned device types,
+> but I decided to leave that out until we actually implement a
+> device deprecation info API.
+>=20
+>>
+>> - Is deprecation as a status enough, or do we want to carry more
+>>   information here? E.g. is the machine maintained or orphan? Is it
+>>   stable or rather experimental? And didn't Gerd have also some
+>>   patches for this last year? ... yes, I think it was this series here=
+:
+>>   http://lists.gnu.org/archive/html/qemu-ppc/2018-11/msg00039.html
+>>   ... actually, I like that idea with QemuSupportState... maybe you
+>>   could base your work on that series instead?
+>=20
+> We might want to carry more information eventually.  The
+> possibility of extending the data later is the main reason I
+> called the struct SupportStatusInfo and not just DeprecationInfo.
 
-Reviewed-by: Wei Yang <richardw.yang@linux.intel.com>
+Ok. I was just a little bit afraid that we define an interface here that
+we have to change again completely once we want to carry more
+information. For example whether "deprecated" should be a "bool" here,
+or rather one of the "enum" entries like in Gerd's series. But after
+reading through https://patchwork.kernel.org/patch/10660677/ again, I
+think I agree that "deprecated" is orthogonal to the support state, e.g.
+a device could still be supported (in the sense that there is a
+maintainer for it), while it has been marked as "deprecated" already.
+So no more objections from my side here.
 
->---
-> tests/acpi-utils.h       | 2 +-
-> tests/acpi-utils.c       | 2 +-
-> tests/bios-tables-test.c | 2 +-
-> tests/vmgenid-test.c     | 2 +-
-> 4 files changed, 4 insertions(+), 4 deletions(-)
->
->diff --git a/tests/acpi-utils.h b/tests/acpi-utils.h
->index 8c68201..75f78f2 100644
->--- a/tests/acpi-utils.h
->+++ b/tests/acpi-utils.h
->@@ -46,7 +46,7 @@ typedef struct {
-> 
-> uint8_t acpi_calc_checksum(const uint8_t *data, int len);
-> uint32_t acpi_find_rsdp_address(QTestState *qts);
->-void acpi_parse_rsdp_table(QTestState *qts, uint64_t addr, uint8_t *rsdp_table);
->+void acpi_fetch_rsdp_table(QTestState *qts, uint64_t addr, uint8_t *rsdp_table);
-> void acpi_fetch_table(QTestState *qts, uint8_t **aml, uint32_t *aml_len,
->                       const uint8_t *addr_ptr, const char *sig,
->                       bool verify_checksum);
->diff --git a/tests/acpi-utils.c b/tests/acpi-utils.c
->index 9a6d1d3..2dd4fe0 100644
->--- a/tests/acpi-utils.c
->+++ b/tests/acpi-utils.c
->@@ -51,7 +51,7 @@ uint32_t acpi_find_rsdp_address(QTestState *qts)
->     return off;
-> }
-> 
->-void acpi_parse_rsdp_table(QTestState *qts, uint64_t addr, uint8_t *rsdp_table)
->+void acpi_fetch_rsdp_table(QTestState *qts, uint64_t addr, uint8_t *rsdp_table)
-> {
->     uint8_t revision;
-> 
->diff --git a/tests/bios-tables-test.c b/tests/bios-tables-test.c
->index 24bd102..2ee044c 100644
->--- a/tests/bios-tables-test.c
->+++ b/tests/bios-tables-test.c
->@@ -89,7 +89,7 @@ static void test_acpi_rsdp_table(test_data *data)
->     uint8_t *rsdp_table = data->rsdp_table, revision;
->     uint32_t addr = data->rsdp_addr;
-> 
->-    acpi_parse_rsdp_table(data->qts, addr, rsdp_table);
->+    acpi_fetch_rsdp_table(data->qts, addr, rsdp_table);
->     revision = rsdp_table[15 /* Revision offset */];
-> 
->     switch (revision) {
->diff --git a/tests/vmgenid-test.c b/tests/vmgenid-test.c
->index ae38ee5..f400184 100644
->--- a/tests/vmgenid-test.c
->+++ b/tests/vmgenid-test.c
->@@ -40,7 +40,7 @@ static uint32_t acpi_find_vgia(QTestState *qts)
->     g_assert_cmphex(rsdp_offset, <, RSDP_ADDR_INVALID);
-> 
-> 
->-    acpi_parse_rsdp_table(qts, rsdp_offset, rsdp_table);
->+    acpi_fetch_rsdp_table(qts, rsdp_offset, rsdp_table);
->     acpi_fetch_table(qts, &rsdt, &rsdt_len, &rsdp_table[16 /* RsdtAddress */],
->                      "RSDT", true);
-> 
->-- 
->2.7.4
-
--- 
-Wei Yang
-Help you, Help me
+ Thomas
