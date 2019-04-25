@@ -2,74 +2,57 @@ Return-Path: <SRS0=VSQP=S3=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-10.9 required=3.0
+	tests=HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 346D9C43218
-	for <qemu-devel@archiver.kernel.org>; Thu, 25 Apr 2019 17:54:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A1AF8C43219
+	for <qemu-devel@archiver.kernel.org>; Thu, 25 Apr 2019 17:58:49 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C2157206A3
-	for <qemu-devel@archiver.kernel.org>; Thu, 25 Apr 2019 17:54:28 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C2157206A3
+	by mail.kernel.org (Postfix) with ESMTPS id 36FA6206BF
+	for <qemu-devel@archiver.kernel.org>; Thu, 25 Apr 2019 17:58:50 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 36FA6206BF
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:33201 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:33251 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hJiZn-0007f2-6G
-	for qemu-devel@archiver.kernel.org; Thu, 25 Apr 2019 13:54:27 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:40617)
+	id 1hJie0-0001Om-Aj
+	for qemu-devel@archiver.kernel.org; Thu, 25 Apr 2019 13:58:48 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:41334)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1hJiYv-0007Lp-Kb
-	for qemu-devel@nongnu.org; Thu, 25 Apr 2019 13:53:38 -0400
+	(envelope-from <ehabkost@redhat.com>) id 1hJicK-0000Er-Cv
+	for qemu-devel@nongnu.org; Thu, 25 Apr 2019 13:57:05 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1hJiYu-0002Kc-Hw
-	for qemu-devel@nongnu.org; Thu, 25 Apr 2019 13:53:33 -0400
-Received: from mail-qt1-f193.google.com ([209.85.160.193]:36061)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1hJiYu-0002K8-DV
-	for qemu-devel@nongnu.org; Thu, 25 Apr 2019 13:53:32 -0400
-Received: by mail-qt1-f193.google.com with SMTP id c35so1118005qtk.3
-	for <qemu-devel@nongnu.org>; Thu, 25 Apr 2019 10:53:31 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=1e100.net; s=20161025;
-	h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-	:mime-version:content-disposition:in-reply-to;
-	bh=DKn2uPVXeHM2vv0uUlHLUnK8FQZ23RMKA1cT8lFwGAk=;
-	b=Z7Q9ToF8SKmPJs0LnwGHVkB46KHLqhwSJVEADx35gfq0z51LUqz60fQ1/fUWaPRCz1
-	XPDillr3K3Pl3ZkN7o+dBm7P/Rk+/gwuYarNakgvRjCml+tfwtKV8SqayQjU1tG/+IOD
-	cdnW0tmNZjWNKzSirZwvv2nq0K/YwS11u+Kg92Hp0r04FLKNf6LbDqMF2CytnViBDnzA
-	7+RxAUTXi4mpFqBd0/L7lpmPNeDR5bWmbV5zCghnRb1glHzjJFV2DheyKcmrlQSGZrtC
-	ObEAQxyr5PscZBzEp87h2G9weLR5hqutIVqyeWbFzbQgS5ot9noC6H66cnbT/31i6BZ1
-	GPmA==
-X-Gm-Message-State: APjAAAWFuj9AgZ3N14tJZbXNjz0wpsvC3r8noUpJXr/uYuglljwyI+aB
-	9X5sSz+HWTAKuOVQUM7rK0sM3Q==
-X-Google-Smtp-Source: APXvYqzJArLl8HGj0G/0LgJOk+WUiKxuKOIFvQpCFnZvJhqpHGAhuq/8UR+TZwluK/jV6cG9rPf8Fw==
-X-Received: by 2002:a0c:b24e:: with SMTP id k14mr19269412qve.180.1556214811085;
-	Thu, 25 Apr 2019 10:53:31 -0700 (PDT)
-Received: from redhat.com (pool-173-76-105-71.bstnma.fios.verizon.net.
-	[173.76.105.71]) by smtp.gmail.com with ESMTPSA id
-	y18sm12763782qty.78.2019.04.25.10.53.29
-	(version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
-	Thu, 25 Apr 2019 10:53:30 -0700 (PDT)
-Date: Thu, 25 Apr 2019 13:53:28 -0400
-From: "Michael S. Tsirkin" <mst@redhat.com>
-To: Stefan Hajnoczi <stefanha@gmail.com>
-Message-ID: <20190425135319-mutt-send-email-mst@kernel.org>
-References: <20190416125912.44001-1-liran.alon@oracle.com>
-	<20190418094101.GA23876@stefanha-x1.localdomain>
-	<17635C1F-A477-4C0F-B052-2948D853E6CD@oracle.com>
-	<20190425083819.GE30231@stefanha-x1.localdomain>
-MIME-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
-Content-Disposition: inline
-In-Reply-To: <20190425083819.GE30231@stefanha-x1.localdomain>
+	(envelope-from <ehabkost@redhat.com>) id 1hJicJ-0004sX-Ay
+	for qemu-devel@nongnu.org; Thu, 25 Apr 2019 13:57:04 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:28926)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1hJicJ-0004rT-2d
+	for qemu-devel@nongnu.org; Thu, 25 Apr 2019 13:57:03 -0400
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+	[10.5.11.11])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 1AFD9308FE62;
+	Thu, 25 Apr 2019 17:57:02 +0000 (UTC)
+Received: from localhost (ovpn-116-9.gru2.redhat.com [10.97.116.9])
+	by smtp.corp.redhat.com (Postfix) with ESMTP id A205B600C0;
+	Thu, 25 Apr 2019 17:57:01 +0000 (UTC)
+From: Eduardo Habkost <ehabkost@redhat.com>
+To: Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org,
+	Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
+Date: Thu, 25 Apr 2019 14:56:48 -0300
+Message-Id: <20190425175659.24876-1-ehabkost@redhat.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+	(mx1.redhat.com [10.5.110.49]);
+	Thu, 25 Apr 2019 17:57:02 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-	[fuzzy]
-X-Received-From: 209.85.160.193
-Subject: Re: [Qemu-devel] [PATCH v2 0/3] vhost-scsi: Support migration
+X-Received-From: 209.132.183.28
+Subject: [Qemu-devel] [PULL 00/11] Machine queue, 2019-04-25
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -81,48 +64,103 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: ehabkost@redhat.com, mtosatti@redhat.com, qemu-devel@nongnu.org,
-	bijan.mottahedeh@oracle.com, Liran Alon <liran.alon@oracle.com>,
-	pbonzini@redhat.com, nir.weiner@oracle.com, rth@twiddle.net
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190425175328.o59WFzfQHg8Isr1sDCHjrGCwh01tivF2JLlndZGXxoI@z>
+Content-Type: text/plain; charset="UTF-8"
+Message-ID: <20190425175648.FqKvr-7U4WWGaGqER4xzP_nTnxFJzOpp8dn1T6UUjjs@z>
 
-On Thu, Apr 25, 2019 at 09:38:19AM +0100, Stefan Hajnoczi wrote:
-> On Wed, Apr 24, 2019 at 07:38:57PM +0300, Liran Alon wrote:
-> > 
-> > 
-> > > On 18 Apr 2019, at 12:41, Stefan Hajnoczi <stefanha@gmail.com> wrote:
-> > > 
-> > > On Tue, Apr 16, 2019 at 03:59:09PM +0300, Liran Alon wrote:
-> > >> Hi,
-> > >> 
-> > >> This patch series aims to add supprot to migrate a VM with a vhost-scsi device.
-> > >> 
-> > >> The 1st patch fixes a bug of mistakenly not stopping vhost-scsi backend when a
-> > >> VM is stopped (As happens on migratino pre-copy completion).
-> > >> 
-> > >> The 2nd patch adds ability to save/load vhost-scsi device state in VMState.
-> > >> 
-> > >> The 3rd and final paqtch adds a flag to vhost-scsi which allows admin to specify
-> > >> it's setup supports vhost-scsi migratino. For more detailed information on why
-> > >> this is valid, see commit message of specific patch.
-> > >> 
-> > >> Regards,
-> > >> -Liran
-> > > 
-> > > Looks fine for vhost_scsi.ko.  I have not checked how this interacts
-> > > with vhost-user-scsi.
-> > > 
-> > > Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
-> > 
-> > Gentle Ping.
-> 
-> This should go either through Michael's virtio/vhost tree or Paolo's
-> SCSI tree.
-> 
-> Stefan
+The following changes since commit 3284aa128153750f14a61e8a96fd085e6f2999b6:
 
-OK I'll queue it.
+  Merge remote-tracking branch 'remotes/lersek/tags/edk2-pull-2019-04-22' into staging (2019-04-24 13:19:41 +0100)
+
+are available in the Git repository at:
+
+  git://github.com/ehabkost/qemu.git tags/machine-next-pull-request
+
+for you to fetch changes up to 119906afa5ca610adb87c55ab0d8e53c9104bfc3:
+
+  util/mmap-alloc: support MAP_SYNC in qemu_ram_mmap() (2019-04-25 14:17:36 -0300)
+
+----------------------------------------------------------------
+Machine queue, 2019-04-25
+
+* 4.1 machine-types (Cornelia Huck)
+* Support MAP_SYNC on pmem memory backends (Zhang Yi)
+* -cpu parsing fixes and cleanups (Eduardo Habkost)
+* machine initialization cleanups (Wei Yang, Markus Armbruster)
+
+----------------------------------------------------------------
+
+Queue for Machine Core patches
+
+
+Cornelia Huck (1):
+  hw: add compat machines for 4.1
+
+Eduardo Habkost (2):
+  cpu: Rename parse_cpu_model() to parse_cpu_option()
+  cpu: Fix crash with empty -cpu option
+
+Markus Armbruster (2):
+  vl: Clean up after previous commit
+  vl: Simplify machine_parse()
+
+Wei Yang (2):
+  vl.c: make find_default_machine() local
+  vl.c: allocate TYPE_MACHINE list once during bootup
+
+Zhang Yi (4):
+  util/mmap-alloc: Add a 'is_pmem' parameter to qemu_ram_mmap
+  scripts/update-linux-headers: add linux/mman.h
+  linux-headers: add linux/mman.h.
+  util/mmap-alloc: support MAP_SYNC in qemu_ram_mmap()
+
+ docs/nvdimm.txt                            |  22 ++++-
+ include/hw/boards.h                        |   4 +-
+ include/hw/i386/pc.h                       |   3 +
+ include/qemu/mmap-alloc.h                  |  21 +++-
+ include/qom/cpu.h                          |   6 +-
+ linux-headers/asm-arm/mman.h               |   4 +
+ linux-headers/asm-arm64/mman.h             |   1 +
+ linux-headers/asm-generic/hugetlb_encode.h |  36 +++++++
+ linux-headers/asm-generic/mman-common.h    |  77 +++++++++++++++
+ linux-headers/asm-generic/mman.h           |  24 +++++
+ linux-headers/asm-mips/mman.h              | 108 +++++++++++++++++++++
+ linux-headers/asm-powerpc/mman.h           |  39 ++++++++
+ linux-headers/asm-s390/mman.h              |   1 +
+ linux-headers/asm-x86/mman.h               |  31 ++++++
+ linux-headers/linux/mman.h                 |  38 ++++++++
+ bsd-user/main.c                            |   2 +-
+ exec.c                                     |  10 +-
+ hw/arm/virt.c                              |   9 +-
+ hw/core/machine.c                          |   3 +
+ hw/i386/pc.c                               |   3 +
+ hw/i386/pc_piix.c                          |  14 ++-
+ hw/i386/pc_q35.c                           |  13 ++-
+ hw/ppc/spapr.c                             |  15 ++-
+ hw/s390x/s390-virtio-ccw.c                 |  14 ++-
+ linux-user/main.c                          |   2 +-
+ util/mmap-alloc.c                          |  47 ++++++++-
+ util/oslib-posix.c                         |   2 +-
+ vl.c                                       |  87 +++++++----------
+ qemu-options.hx                            |   5 +
+ scripts/update-linux-headers.sh            |   6 +-
+ tests/acceptance/empty_cpu_model.py        |  19 ++++
+ 31 files changed, 591 insertions(+), 75 deletions(-)
+ create mode 100644 linux-headers/asm-arm/mman.h
+ create mode 100644 linux-headers/asm-arm64/mman.h
+ create mode 100644 linux-headers/asm-generic/hugetlb_encode.h
+ create mode 100644 linux-headers/asm-generic/mman-common.h
+ create mode 100644 linux-headers/asm-generic/mman.h
+ create mode 100644 linux-headers/asm-mips/mman.h
+ create mode 100644 linux-headers/asm-powerpc/mman.h
+ create mode 100644 linux-headers/asm-s390/mman.h
+ create mode 100644 linux-headers/asm-x86/mman.h
+ create mode 100644 linux-headers/linux/mman.h
+ create mode 100644 tests/acceptance/empty_cpu_model.py
+
+-- 
+2.18.0.rc1.1.g3f1ff2140
+
 
