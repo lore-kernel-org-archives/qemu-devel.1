@@ -1,34 +1,28 @@
-Received: from eggs.gnu.org ([209.51.188.92]:48446)
+Received: from eggs.gnu.org ([209.51.188.92]:48555)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dplotnikov@virtuozzo.com>) id 1hJh3q-0002M3-VQ
-	for qemu-devel@nongnu.org; Thu, 25 Apr 2019 12:17:24 -0400
+	(envelope-from <philmd@redhat.com>) id 1hJh49-0002e2-N4
+	for qemu-devel@nongnu.org; Thu, 25 Apr 2019 12:17:42 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dplotnikov@virtuozzo.com>) id 1hJh3p-0001k3-0n
-	for qemu-devel@nongnu.org; Thu, 25 Apr 2019 12:17:22 -0400
-Received: from mail-eopbgr80102.outbound.protection.outlook.com
-	([40.107.8.102]:13939
-	helo=EUR04-VI1-obe.outbound.protection.outlook.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dplotnikov@virtuozzo.com>)
-	id 1hJh3n-0001ex-0h
-	for qemu-devel@nongnu.org; Thu, 25 Apr 2019 12:17:20 -0400
-From: Denis Plotnikov <dplotnikov@virtuozzo.com>
-Date: Thu, 25 Apr 2019 16:17:13 +0000
-Message-ID: <6955ecd7-7573-99a7-db0a-6f6afe86370f@virtuozzo.com>
-References: <20190226131535.30361-1-dplotnikov@virtuozzo.com>
-	<8ef4ffa2-6c59-a6dd-e2bd-97b6fea7a5d1@virtuozzo.com>
-	<7abd40bc-963b-cf61-14e8-4c4187813c5c@virtuozzo.com>
-	<5c342066-30b6-e492-e23a-cb5accbfb11a@virtuozzo.com>
-	<53b5c677-870e-56a0-402d-7fdc985ec3f5@virtuozzo.com>
-	<4b9f5045-d4b2-fa10-ab8a-39eaf6ed220c@virtuozzo.com>
-In-Reply-To: <4b9f5045-d4b2-fa10-ab8a-39eaf6ed220c@virtuozzo.com>
-Content-Language: en-US
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <FBEA6144B12EE447AC10AC984882D74A@eurprd08.prod.outlook.com>
-Content-Transfer-Encoding: base64
+	(envelope-from <philmd@redhat.com>) id 1hJh48-0001v5-MB
+	for qemu-devel@nongnu.org; Thu, 25 Apr 2019 12:17:41 -0400
+Received: from mail-wr1-f67.google.com ([209.85.221.67]:37744)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1hJh48-0001tk-FP
+	for qemu-devel@nongnu.org; Thu, 25 Apr 2019 12:17:40 -0400
+Received: by mail-wr1-f67.google.com with SMTP id r6so249352wrm.4
+	for <qemu-devel@nongnu.org>; Thu, 25 Apr 2019 09:17:39 -0700 (PDT)
+References: <20190418180057.3593-1-thuth@redhat.com>
+	<20190418180057.3593-14-thuth@redhat.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Message-ID: <0dc4aa08-a0be-ab33-a717-7b8e488e63fc@redhat.com>
+Date: Thu, 25 Apr 2019 18:17:36 +0200
 MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [PING PING PING] [PATCH 0/3] migration: add sztd
- compression
+In-Reply-To: <20190418180057.3593-14-thuth@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH for-QEMU-4.1 v5 13/29] hw/arm: Express
+ dependencies of xilinx-zynq with Kconfig
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,73 +31,81 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "dgilbert@redhat.com" <dgilbert@redhat.com>, "quintela@redhat.com" <quintela@redhat.com>, "eblake@redhat.com" <eblake@redhat.com>, "armbru@redhat.com" <armbru@redhat.com>
-Cc: Denis Lunev <den@virtuozzo.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+To: Thomas Huth <thuth@redhat.com>, yang.zhong@intel.com, Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org, pbonzini@redhat.com
+Cc: "Michael S. Tsirkin" <mst@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>, "Edgar E . Iglesias" <edgar.iglesias@gmail.com>, Jean-Christophe Dubois <jcd@tribudubois.net>, Rob Herring <robh@kernel.org>, qemu-block@nongnu.org, Andrey Smirnov <andrew.smirnov@gmail.com>, Joel Stanley <joel@jms.id.au>, Antony Pavlov <antonynpavlov@gmail.com>, Alistair Francis <alistair@alistair23.me>, Beniamino Galvani <b.galvani@gmail.com>, qemu-arm@nongnu.org, Peter Chubb <peter.chubb@nicta.com.au>, Cedric Le Goater <clg@kaod.org>, John Snow <jsnow@redhat.com>, Andrew Jeffery <andrew@aj.id.au>, Philippe Mathieu-Daude <f4bug@amsat.org>, Subbaraya Sundeep <sundeep.lkml@gmail.com>, Igor Mitsyanko <i.mitsyanko@gmail.com>, Jan Kiszka <jan.kiszka@web.de>
 
-DQoNCk9uIDA1LjA0LjIwMTkgMTQ6NDAsIERlbmlzIFBsb3RuaWtvdiB3cm90ZToNCj4gcGluZyEN
-Cj4gDQo+IE9uIDI2LjAzLjIwMTkgMTg6NTEsIERlbmlzIFBsb3RuaWtvdiB3cm90ZToNCj4+IHBp
-bmcgcGluZyBwaW5nIHBpbmcgcGluZyENCj4+DQo+PiBPbiAxOC4wMy4yMDE5IDEwOjUzLCBEZW5p
-cyBQbG90bmlrb3Ygd3JvdGU6DQo+Pj4gcGluZyBwaW5nIHBpbmcgcGluZyENCj4+Pg0KPj4+IE9u
-IDExLjAzLjIwMTkgMTE6MjAsIERlbmlzIFBsb3RuaWtvdiB3cm90ZToNCj4+Pj4gcGluZyBwaW5n
-IHBpbmchDQo+Pj4+DQo+Pj4+IE9uIDA0LjAzLjIwMTkgMTg6MTAsIERlbmlzIFBsb3RuaWtvdiB3
-cm90ZToNCj4+Pj4+IHBpbmchDQo+Pj4+Pg0KPj4+Pj4gT24gMjYuMDIuMjAxOSAxNjoxNSwgRGVu
-aXMgUGxvdG5pa292IHdyb3RlOg0KPj4+Pj4+IHpzdGQgZGF0ZSBjb21wcmVzc2lvbiBhbGdvcml0
-aG0gc2hvd3MgYmV0dGVyIHBlcmZvcm1hbmNlIG9uIGRhdGEgDQo+Pj4+Pj4gY29tcHJlc3Npb24u
-DQo+Pj4+Pj4gSXQgbWlnaHQgYmUgdXNlZnVsIHRvIGVtcGxveSB0aGUgYWxnb3JpdGhtIGluIFZN
-IG1pZ3JhdGlvbiB0byANCj4+Pj4+PiByZWR1Y2UgQ1BVIHVzYWdlLg0KPj4+Pj4+IEEgdXNlciB3
-aWxsIGJlIGFibGUgdG8gY2hvb3NlIGJldHdlZW4gdGhvc2UgYWxnb3JpdGhtcywgdGhlcmVmb3Ig
-DQo+Pj4+Pj4gY29tcHJlc3MtdHlwZQ0KPj4+Pj4+IG1pZ3JhdGlvbiBwYXJhbWV0ZXIgaXMgYWRk
-ZWQuDQo+Pj4+Pj4NCj4+Pj4+PiBIZXJlIGFyZSBzb21lIHJlc3VsdHMgb2YgcGVyZm9ybWFuY2Ug
-Y29tcGFyaXNvbiB6c3RkIHZzIGd6aXA6DQo+Pj4+Pj4NCj4+Pj4+PiBob3N0OiBpNy00NzkwIDh4
-Q1BVIEAgMy42MEdIeiwgMTZHIFJBTQ0KPj4+Pj4+IG1pZ3JhdGlvbiB0byB0aGUgc2FtZSBob3N0
-DQo+Pj4+Pj4gVk06IDJ4VkNQVSwgOEcgUkFNIHRvdGFsDQo+Pj4+Pj4gNUcgUkFNIHVzZWQsIG1l
-bW9yeSBwb3B1bGF0ZWQgd2l0aCBwb3N0Z3JlcXNsIGRhdGENCj4+Pj4+PiBwcm9kdWNlZCBieSBw
-Z2JlbmNoIHBlcmZvcm1hbmNlIGJlbmNobWFyaw0KPj4+Pj4+DQo+Pj4+Pj4NCj4+Pj4+PiBUaHJl
-YWRzOiAxIGNvbXByZXNzIOKAkyAxIGRlY29tcHJlc3MNCj4+Pj4+Pg0KPj4+Pj4+IHpzdGQgcHJv
-dmlkZXMgc2xpZ2h0bHkgbGVzcyBjb21wcmVzc2lvbiByYXRpbyB3aXRoIGFsbW9zdCB0aGUgc2Ft
-ZQ0KPj4+Pj4+IENQVSB1c2FnZSBidXQgY29wZXMgd2l0aCBSQU3CoCBjb21wcmVzc2lvbiByb2do
-bHkgMiB0aW1lcyBmYXN0ZXINCj4+Pj4+Pg0KPj4+Pj4+IGNvbXByZXNzaW9uIHR5cGXCoMKgwqDC
-oMKgwqDCoMKgwqDCoMKgwqDCoCB6bGliwqDCoMKgwqDCoMKgIHzCoMKgwqDCoMKgIHpzdGQNCj4+
-Pj4+PiAtLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
-LS0tLS0NCj4+Pj4+PiBjb21wcmVzc2lvbiBsZXZlbMKgwqDCoMKgwqDCoMKgwqDCoCAxwqDCoMKg
-wqDCoMKgIDXCoMKgwqDCoCB8wqDCoCAxwqDCoMKgwqDCoMKgIDUNCj4+Pj4+PiBjb21wcmVzc2lv
-biByYXRpb8KgwqDCoMKgwqDCoMKgwqDCoCA2LjkywqDCoMKgIDcuMDXCoCB8wqDCoCA2LjY5wqDC
-oMKgIDYuODkNCj4+Pj4+PiBjcHUgaWRsZSwgJcKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDC
-oCA4MsKgwqDCoMKgwqAgODPCoMKgwqAgfMKgwqAgODbCoMKgwqDCoMKgIDgwDQo+Pj4+Pj4gdGlt
-ZSwgc2VjwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoCA0OcKgwqDCoMKgwqAgNzHC
-oMKgwqAgfMKgwqAgMjbCoMKgwqDCoMKgIDMxDQo+Pj4+Pj4gdGltZSBkaWZmIHRvIHpsaWIsIHNl
-Y8KgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoCAtMjXCoMKgwqDCoCAt
-NDENCj4+Pj4+Pg0KPj4+Pj4+DQo+Pj4+Pj4gVGhyZWFkczogOCBjb21wcmVzcyDigJMgMiBkZWNv
-bXByZXNzDQo+Pj4+Pj4NCj4+Pj4+PiB6c3RkIHByb3ZpZGVzIHRoZSBzYW1lIG1pZ3JhdGlvbiB0
-aW1lIHdpdGggbGVzcyBjcHUgY29uc3VtcHRpb24NCj4+Pj4+Pg0KPj4+Pj4+IGNvbXByZXNzaW9u
-IHR5cGXCoMKgwqDCoMKgwqDCoMKgIG5vbmXCoCB8wqDCoMKgwqDCoMKgwqAgZ3ppcCh6bGliKcKg
-wqDCoCB8wqDCoMKgwqDCoMKgwqDCoMKgIHpzdGQNCj4+Pj4+PiAtLS0tLS0tLS0tLS0tLS0tLS0t
-LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
-LS0gDQo+Pj4+Pj4NCj4+Pj4+PiBjb21wcmVzc2lvbiBsZXZlbMKgwqDCoMKgwqDCoMKgIC3CoMKg
-wqDCoCB8wqAgMcKgwqDCoMKgwqAgNcKgwqDCoMKgwqDCoCA5wqDCoMKgIHzCoMKgIDEgICAgICAg
-DQo+Pj4+Pj4gNcKgwqDCoMKgwqDCoCAxNQ0KPj4+Pj4+IGNvbXByZXNzaW9uIHJhdGlvwqDCoMKg
-wqDCoMKgwqAgLcKgwqDCoMKgIHzCoCA2Ljk0wqDCoCA2Ljk5wqDCoMKgIDcuMTQgfMKgwqAgNi42
-NCAgICANCj4+Pj4+PiA2Ljg5wqDCoMKgIDYuOTMNCj4+Pj4+PiB0aW1lLCBzZWPCoMKgwqDCoMKg
-wqDCoMKgwqDCoMKgwqDCoMKgwqAgMTU0wqDCoCB8wqAgMjLCoMKgwqDCoCAyM8KgwqDCoMKgwqAg
-MjfCoMKgIHzCoMKgIDIzICAgICAgDQo+Pj4+Pj4gMjPCoMKgwqDCoMKgIDI1DQo+Pj4+Pj4gY3B1
-IGlkbGUsICXCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoCA5OcKgwqDCoCB8wqAgNDXCoMKgwqDC
-oCAzMMKgwqDCoMKgwqAgMTLCoMKgIHzCoMKgIDcwICAgICAgDQo+Pj4+Pj4gNTLCoMKgwqDCoMKg
-IDIzDQo+Pj4+Pj4gY3B1IGlkbGUgZGlmZiB0byB6bGliwqDCoMKgwqDCoMKgwqDCoMKgIHzCoMKg
-wqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqAgfMKgIC0yNSUgICAgDQo+Pj4+
-Pj4gLTIyJcKgwqDCoCAtMTElDQo+Pj4+Pj4NCj4+Pj4+Pg0KPj4+Pj4+IERlbmlzIFBsb3RuaWtv
-diAoMyk6DQo+Pj4+Pj4gwqDCoMKgwqDCoMKgIG1pZ3JhdGlvbjogcmV3b3JrIGNvbXByZXNzaW9u
-IGNvZGUgZm9yIGFkZGluZyBtb3JlIGRhdGEgDQo+Pj4+Pj4gY29tcHJlc3NvcnMNCj4+Pj4+PiDC
-oMKgwqDCoMKgwqAgaG1wOiBhZGQgY29tcHJlc3MtdHlwZSBwYXJhbWV0ZXIgdG8gbWlncmF0aW9u
-IHBhcmFtZXRlcnMNCj4+Pj4+PiDCoMKgwqDCoMKgwqAgbWlncmF0aW9uOiBhZGQgenN0ZCBjb21w
-cmVzc2lvbg0KPj4+Pj4+DQo+Pj4+Pj4gwqDCoMKgwqDCoCBjb25maWd1cmXCoMKgwqDCoMKgwqDC
-oMKgwqDCoMKgwqAgfMKgIDI2ICsrKysNCj4+Pj4+PiDCoMKgwqDCoMKgIGhtcC5jwqDCoMKgwqDC
-oMKgwqDCoMKgwqDCoMKgwqDCoMKgwqAgfMKgwqAgOCArKw0KPj4+Pj4+IMKgwqDCoMKgwqAgbWln
-cmF0aW9uL21pZ3JhdGlvbi5jIHzCoCA0NSArKysrKystDQo+Pj4+Pj4gwqDCoMKgwqDCoCBtaWdy
-YXRpb24vbWlncmF0aW9uLmggfMKgwqAgMSArDQo+Pj4+Pj4gwqDCoMKgwqDCoCBtaWdyYXRpb24v
-cWVtdS1maWxlLmMgfMKgIDM5ICsrLS0tLQ0KPj4+Pj4+IMKgwqDCoMKgwqAgbWlncmF0aW9uL3Fl
-bXUtZmlsZS5oIHzCoCAxOCArKy0NCj4+Pj4+PiDCoMKgwqDCoMKgIG1pZ3JhdGlvbi9yYW0uY8Kg
-wqDCoMKgwqDCoCB8IDI5MSANCj4+Pj4+PiArKysrKysrKysrKysrKysrKysrKysrKysrKysrKysr
-KysrLS0tLS0tLS0NCj4+Pj4+PiDCoMKgwqDCoMKgIHFhcGkvbWlncmF0aW9uLmpzb27CoMKgIHzC
-oCAyNiArKystDQo+Pj4+Pj4gwqDCoMKgwqDCoCA4IGZpbGVzIGNoYW5nZWQsIDM2OSBpbnNlcnRp
-b25zKCspLCA4NSBkZWxldGlvbnMoLSkNCj4+Pj4+Pg0KPj4+Pj4NCj4+Pj4NCj4+Pg0KPj4NCj4g
-DQoNCi0tIA0KQmVzdCwNCkRlbmlzDQo=
+On 4/18/19 8:00 PM, Thomas Huth wrote:
+> Add Kconfig dependencies for the xilinx-zynq-a9 board.
+> This patch is based on earlier work by Ákos Kovács (i.e.
+> his "hw/arm/Kconfig: Add ARM Kconfig" patch).
+> 
+> Signed-off-by: Thomas Huth <thuth@redhat.com>
+
+Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+
+> ---
+>  default-configs/arm-softmmu.mak |  7 +------
+>  hw/arm/Kconfig                  | 12 ++++++++++++
+>  2 files changed, 13 insertions(+), 6 deletions(-)
+> 
+> diff --git a/default-configs/arm-softmmu.mak b/default-configs/arm-softmmu.mak
+> index f39a854f2e..af78e7c892 100644
+> --- a/default-configs/arm-softmmu.mak
+> +++ b/default-configs/arm-softmmu.mak
+> @@ -19,6 +19,7 @@ CONFIG_STELLARIS=y
+>  CONFIG_REALVIEW=y
+>  CONFIG_VERSATILE=y
+>  CONFIG_VEXPRESS=y
+> +CONFIG_ZYNQ=y
+>  CONFIG_MAINSTONE=y
+>  CONFIG_GUMSTIX=y
+>  CONFIG_SPITZ=y
+> @@ -38,16 +39,11 @@ CONFIG_VIRTIO_MMIO=y
+>  
+>  CONFIG_NETDUINO2=y
+>  
+> -CONFIG_PL330=y
+> -CONFIG_CADENCE=y
+>  CONFIG_FRAMEBUFFER=y
+> -CONFIG_XILINX_SPIPS=y
+> -CONFIG_ZYNQ_DEVCFG=y
+>  
+>  CONFIG_DIGIC=y
+>  CONFIG_MPS2=y
+>  CONFIG_RASPI=y
+> -CONFIG_ZYNQ=y
+>  CONFIG_STM32F2XX_TIMER=y
+>  CONFIG_STM32F2XX_USART=y
+>  CONFIG_STM32F2XX_SYSCFG=y
+> @@ -100,7 +96,6 @@ CONFIG_SMBUS_EEPROM=y
+>  CONFIG_GPIO_KEY=y
+>  CONFIG_MSF2=y
+>  CONFIG_FW_CFG_DMA=y
+> -CONFIG_XILINX_AXI=y
+>  CONFIG_PCI_EXPRESS_DESIGNWARE=y
+>  
+>  CONFIG_STRONGARM=y
+> diff --git a/hw/arm/Kconfig b/hw/arm/Kconfig
+> index 101de74260..785e383411 100644
+> --- a/hw/arm/Kconfig
+> +++ b/hw/arm/Kconfig
+> @@ -201,6 +201,18 @@ config VEXPRESS
+>  
+>  config ZYNQ
+>      bool
+> +    select A9MPCORE
+> +    select CADENCE # UART
+> +    select PFLASH_CFI02
+> +    select PL330
+> +    select SDHCI
+> +    select SSI_M25P80
+> +    select USB_EHCI_SYSBUS
+> +    select XILINX # UART
+> +    select XILINX_AXI
+> +    select XILINX_SPI
+> +    select XILINX_SPIPS
+> +    select ZYNQ_DEVCFG
+>  
+>  config ARM_V7M
+>      bool
+> 
