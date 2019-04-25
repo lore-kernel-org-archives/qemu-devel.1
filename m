@@ -2,82 +2,84 @@ Return-Path: <SRS0=VSQP=S3=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.5 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS,URIBL_BLOCKED
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 75DD4C43218
-	for <qemu-devel@archiver.kernel.org>; Thu, 25 Apr 2019 14:29:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 586A3C43219
+	for <qemu-devel@archiver.kernel.org>; Thu, 25 Apr 2019 14:30:41 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 78E1420679
-	for <qemu-devel@archiver.kernel.org>; Thu, 25 Apr 2019 14:29:02 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 78E1420679
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 5588420717
+	for <qemu-devel@archiver.kernel.org>; Thu, 25 Apr 2019 14:30:41 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="WddMWPff"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5588420717
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:58570 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:58606 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hJfMz-0003tK-Cy
-	for qemu-devel@archiver.kernel.org; Thu, 25 Apr 2019 10:29:01 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:51046)
+	id 1hJfOa-0004gh-Fg
+	for qemu-devel@archiver.kernel.org; Thu, 25 Apr 2019 10:30:40 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:51454)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1hJfM4-0003Jy-Jr
-	for qemu-devel@nongnu.org; Thu, 25 Apr 2019 10:28:05 -0400
+	(envelope-from <liq3ea@gmail.com>) id 1hJfNt-0004IW-Dl
+	for qemu-devel@nongnu.org; Thu, 25 Apr 2019 10:29:58 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1hJfM3-0007u6-Kc
-	for qemu-devel@nongnu.org; Thu, 25 Apr 2019 10:28:04 -0400
-Received: from mail-wr1-f65.google.com ([209.85.221.65]:46710)
+	(envelope-from <liq3ea@gmail.com>) id 1hJfNs-0000ww-2U
+	for qemu-devel@nongnu.org; Thu, 25 Apr 2019 10:29:57 -0400
+Received: from mail-ot1-x342.google.com ([2607:f8b0:4864:20::342]:45807)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1hJfM3-0007tI-Do
-	for qemu-devel@nongnu.org; Thu, 25 Apr 2019 10:28:03 -0400
-Received: by mail-wr1-f65.google.com with SMTP id t17so30576228wrw.13
-	for <qemu-devel@nongnu.org>; Thu, 25 Apr 2019 07:28:03 -0700 (PDT)
+	(Exim 4.71) (envelope-from <liq3ea@gmail.com>) id 1hJfNr-0000wA-Qr
+	for qemu-devel@nongnu.org; Thu, 25 Apr 2019 10:29:56 -0400
+Received: by mail-ot1-x342.google.com with SMTP id e5so19546006otk.12
+	for <qemu-devel@nongnu.org>; Thu, 25 Apr 2019 07:29:55 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+	h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+	:cc; bh=ViowtsQHEgKW7DCG0w4d8WLNkVhkI98vgMWHcb8V/qs=;
+	b=WddMWPffN7wsLIFZdUdrLYr6P+lZtkTYo/tGKmOst1mozCIEKXUFHd+7QpqFX0Ojkk
+	iBH0fLEeJhNbqfWHDUv9cvang61pFFDEZnEwtMYGpVwh2qpMbo8qpiMwagHltYXIT4kl
+	lcyIiPIbdRvop0vIkgxtguFqLGIyUISINs7AmoeOhrm+tFBk6G4AJMoyjnM6VSLDFo+E
+	XI37QOKObN/E+1fjRjElHU9ZcUOcedlCZ7GhD3ao6mt9Dvk7mjbsNmNc2Fsn8U8oVDMv
+	Aw4bt6FTPTgyEADYHBV12nGoFbcJSo9QEaZJ/jst4TbWduXDqjzH8mfrhznokI9GgepE
+	Np0w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
 	d=1e100.net; s=20161025;
-	h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
-	:date:user-agent:mime-version:in-reply-to:content-language
-	:content-transfer-encoding;
-	bh=MPUAfE7XwR1+GwI9oqV+NsnrsOy6QGZjxP7WEADatpA=;
-	b=i6JleUUInxt64fvSUEveGZCAT/MmTu2iaG8s6YLKPOw9H0OhzqW5x/7u8jh15a5bX8
-	ae8Ar6LHYFfyrklS2OtTo1ZVPQ5JxXZJCXgNqbZoeSkTYzX5E4pVERA8kXRE2aQY8MTw
-	zcWWCHMK7M7S0ii7/G0yqFw2O57RebeEy7Zcuw42I4NlZqHgGouIvd0e34wYH7PjSMB5
-	qDrqgzYeTz+8tIyvgHKEP+HU1GPEhjiN4NQ76HzFc9I9bM3euZ2IvnqrlL/LdeI1NXsC
-	Nwxq2VIoAj7BkoDkychQvGkEL6/nI5bY3hkAUCo7V7my/4bmMkYgavlFleW036SlCSpy
-	0Nog==
-X-Gm-Message-State: APjAAAXdV+jWg9bpWM8xg/8mqQgID+nvz6lULbQfQ+6IXi20vrnLDGCi
-	FMtyT1JGVBiIRe06uoaOC/1tJQ==
-X-Google-Smtp-Source: APXvYqyT4F53jRcc/ctIhBFON2VbAZeLFawQNh5Z81PWdAZNSgU2gZzUvo0U69KZ1a7U508mayzTDA==
-X-Received: by 2002:adf:ce0b:: with SMTP id p11mr22654467wrn.196.1556202482288;
-	Thu, 25 Apr 2019 07:28:02 -0700 (PDT)
-Received: from [192.168.1.25] (abayonne-654-1-209-122.w109-222.abo.wanadoo.fr.
-	[109.222.216.122]) by smtp.gmail.com with ESMTPSA id
-	u6sm41394267wrg.72.2019.04.25.07.27.59
-	(version=TLS1_3 cipher=AEAD-AES128-GCM-SHA256 bits=128/128);
-	Thu, 25 Apr 2019 07:28:01 -0700 (PDT)
-To: Thomas Huth <thuth@redhat.com>, yang.zhong@intel.com,
-	Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org,
-	pbonzini@redhat.com
-References: <20190418180057.3593-1-thuth@redhat.com>
-	<20190418180057.3593-8-thuth@redhat.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Openpgp: id=89C1E78F601EE86C867495CBA2A3FD6EDEADC0DE;
-	url=http://pgp.mit.edu/pks/lookup?op=get&search=0xA2A3FD6EDEADC0DE
-Message-ID: <472cdca7-a01f-632f-bbac-633db846c605@redhat.com>
-Date: Thu, 25 Apr 2019 16:27:58 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
-	Thunderbird/60.6.1
+	h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+	:message-id:subject:to:cc;
+	bh=ViowtsQHEgKW7DCG0w4d8WLNkVhkI98vgMWHcb8V/qs=;
+	b=BWdw/NUiKpWlbCc1YH0B0bnT+p1Ydep2sFanhC/L76Gzlq33eR5SmTTqU1H/9rY2gd
+	5ReX8RMle4agFQWRfy8Da9qDMU3BxJwofIcZ1Fa9d9wBL1P8gjJHi+t6zhozObYCiK9b
+	0q63VLqxAxBOQyHdDBwvDwj9926GSN327w4wN0APKnYucaGxuAfdyw2/IPPtXAVUvyIL
+	SuTB3WczOVASkXlKve3G948HwXsm7mH1H/3zNeMMmuqTbFiQ8JT/FXPkVjs71PPMKxh1
+	g8o3E87bHfoL2tTlFPLlMi+cqEg3pMYJpihTYO9PJqpNr3C3xHH+lz0hzR0gzar+1Vav
+	GJLQ==
+X-Gm-Message-State: APjAAAXjTYtEVj4h1paVzj9C22ZuxSz4Yh/khpXBTSdMjf5DJWG0Yy+X
+	MqLPMulfSbjEWKX7ApGjGRhZcPhNRR6kxq9EXBk=
+X-Google-Smtp-Source: APXvYqy19z5lbzcSn6f73J+suuJprn9LC0DZZK93YqhsdSroFKVUAG6FPhQUY8iLUeNAKqmC4a8BQgGEcJSovMrfqrE=
+X-Received: by 2002:a05:6830:2148:: with SMTP id
+	r8mr11257527otd.25.1556202594969; 
+	Thu, 25 Apr 2019 07:29:54 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20190418180057.3593-8-thuth@redhat.com>
+References: <20190424140643.62457-1-liq3ea@163.com>
+	<2b623811-1be2-159c-0fa6-c548aa9eea82@redhat.com>
+In-Reply-To: <2b623811-1be2-159c-0fa6-c548aa9eea82@redhat.com>
+From: Li Qiang <liq3ea@gmail.com>
+Date: Thu, 25 Apr 2019 22:29:18 +0800
+Message-ID:
+ <CAKXe6SLXrthYFrQGVQNT4hK1-22wrteMNyygZgx_j=jtDfYC6g@mail.gmail.com>
+To: Thomas Huth <thuth@redhat.com>
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+	recognized.
+X-Received-From: 2607:f8b0:4864:20::342
 Content-Type: text/plain; charset="UTF-8"
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-	[fuzzy]
-X-Received-From: 209.85.221.65
-Subject: Re: [Qemu-devel] [PATCH for-QEMU-4.1 v5 07/29] hw/arm: Express
- dependencies of the fsl-imx31 machine with Kconfig
+Content-Transfer-Encoding: quoted-printable
+X-Content-Filtered-By: Mailman/MimeDel 2.1.21
+Subject: Re: [Qemu-devel] [PATCH v2 0/5] fw_cfg_test refactor and add two
+ test cases
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -89,96 +91,95 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Rob Herring <robh@kernel.org>, Jan Kiszka <jan.kiszka@web.de>,
-	Igor Mitsyanko <i.mitsyanko@gmail.com>, qemu-block@nongnu.org,
-	"Michael S. Tsirkin" <mst@redhat.com>,
-	Andrey Smirnov <andrew.smirnov@gmail.com>,
-	Alistair Francis <alistair@alistair23.me>,
-	Philippe Mathieu-Daude <f4bug@amsat.org>,
-	Jean-Christophe Dubois <jcd@tribudubois.net>,
-	Beniamino Galvani <b.galvani@gmail.com>, Andrew Jeffery <andrew@aj.id.au>,
-	Cedric Le Goater <clg@kaod.org>, qemu-arm@nongnu.org,
-	Peter Chubb <peter.chubb@nicta.com.au>, Gerd Hoffmann <kraxel@redhat.com>,
-	Antony Pavlov <antonynpavlov@gmail.com>,
-	"Edgar E . Iglesias" <edgar.iglesias@gmail.com>,
-	Subbaraya Sundeep <sundeep.lkml@gmail.com>,
-	John Snow <jsnow@redhat.com>, Joel Stanley <joel@jms.id.au>
+Cc: lvivier@redhat.com, Laszlo Ersek <lersek@redhat.com>,
+	Li Qiang <liq3ea@163.com>, Qemu Developers <qemu-devel@nongnu.org>,
+	Gerd Hoffmann <kraxel@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
+	=?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190425142758.ec5lbDI6kbMBG6SWI-y7zrw1wgBLZjaUl3akrjOmB0A@z>
+Message-ID: <20190425142918.zbY4dzwCXSaeqde3PpGDVuLuAyuo2jJ1sNxvDLajW1A@z>
 
-On 4/18/19 8:00 PM, Thomas Huth wrote:
-> Add Kconfig dependencies for the fsl-imx31 / kzm machine.
-> This patch is slightly based on earlier work by Ákos Kovács (i.e.
-> his "hw/arm/Kconfig: Add ARM Kconfig" patch).
-> 
-> Signed-off-by: Thomas Huth <thuth@redhat.com>
-> ---
->  default-configs/arm-softmmu.mak | 3 +--
->  hw/arm/Kconfig                  | 4 ++++
->  hw/misc/Kconfig                 | 2 ++
->  3 files changed, 7 insertions(+), 2 deletions(-)
-> 
-> diff --git a/default-configs/arm-softmmu.mak b/default-configs/arm-softmmu.mak
-> index 6195b75f48..7f94811ccb 100644
-> --- a/default-configs/arm-softmmu.mak
-> +++ b/default-configs/arm-softmmu.mak
-> @@ -10,6 +10,7 @@ CONFIG_PCI_TESTDEV=y
->  CONFIG_EXYNOS4=y
->  CONFIG_HIGHBANK=y
->  CONFIG_INTEGRATOR=y
-> +CONFIG_FSL_IMX31=y
->  
->  CONFIG_VGA=y
->  CONFIG_NAND=y
-> @@ -68,7 +69,6 @@ CONFIG_TSC210X=y
->  CONFIG_BLIZZARD=y
->  CONFIG_ONENAND=y
->  CONFIG_TUSB6010=y
-> -CONFIG_IMX=y
->  CONFIG_MAINSTONE=y
->  CONFIG_MPS2=y
->  CONFIG_MUSCA=y
-> @@ -115,7 +115,6 @@ CONFIG_ALLWINNER_A10_PIC=y
->  CONFIG_ALLWINNER_A10=y
->  
->  CONFIG_FSL_IMX6=y
-> -CONFIG_FSL_IMX31=y
->  CONFIG_FSL_IMX25=y
->  CONFIG_FSL_IMX7=y
->  CONFIG_FSL_IMX6UL=y
-> diff --git a/hw/arm/Kconfig b/hw/arm/Kconfig
-> index ad3b1f9b40..9087b7d714 100644
-> --- a/hw/arm/Kconfig
-> +++ b/hw/arm/Kconfig
-> @@ -98,6 +98,10 @@ config FSL_IMX25
->  
->  config FSL_IMX31
->      bool
-> +    select SERIAL
-> +    select IMX
-> +    select IMX_I2C
-> +    select LAN9118
+Thomas Huth <thuth@redhat.com> =E4=BA=8E2019=E5=B9=B44=E6=9C=8825=E6=97=A5=
+=E5=91=A8=E5=9B=9B =E4=B8=8B=E5=8D=885:57=E5=86=99=E9=81=93=EF=BC=9A
 
-Similarly to my comment on patch 6 of this series:
-Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+> On 24/04/2019 16.06, Li Qiang wrote:
+> > In the disscuss of adding reboot timeout test case:
+> > https://lists.gnu.org/archive/html/qemu-devel/2019-04/msg03304.html
+> >
+> > Philippe suggested we should uses the only related option for one
+> > specific test. However currently we uses one QTestState for all the
+> > test cases. In order to achieve Philippe's idea, I split the test case
+> > for its own QTestState. As this patchset has changed a lot, I don't bum=
+p
+> > the version.
+> >
+> > Change since v1:
+> > Add a patch to store the reboot_timeout as little endian
+> > Fix the endian issue per Thomas's review
+>
+> The test still aborts on a big endian host:
+>
+> $ QTEST_QEMU_BINARY=3Dx86_64-softmmu/qemu-system-x86_64 tests/fw_cfg-test
+> /x86_64/fw_cfg/signature: OK
+> /x86_64/fw_cfg/id: OK
+> /x86_64/fw_cfg/uuid: OK
+> /x86_64/fw_cfg/ram_size: OK
+> /x86_64/fw_cfg/nographic: OK
+> /x86_64/fw_cfg/nb_cpus: OK
+> /x86_64/fw_cfg/max_cpus: OK
+> /x86_64/fw_cfg/numa: OK
+> /x86_64/fw_cfg/boot_menu: OK
+> /x86_64/fw_cfg/reboot_timeout: **
+>
+> ERROR:/home/thuth/devel/qemu/tests/fw_cfg-test.c:190:test_fw_cfg_reboot_t=
+imeout:
+> assertion failed (reboot_timeout =3D=3D 15): (251658240 =3D=3D 15)
+> Aborted
+>
+> 251658240 is 0x0F000000, i.e. a byte-swapped 0xf =3D 15 ... i.e. you stil=
+l
+> got an endianess issue somewhere in the code.
+>
 
->  
->  config FSL_IMX6
->      bool
-> diff --git a/hw/misc/Kconfig b/hw/misc/Kconfig
-> index 5f67d0d6d9..385e1b0cec 100644
-> --- a/hw/misc/Kconfig
-> +++ b/hw/misc/Kconfig
-> @@ -76,6 +76,8 @@ config ECCMEMCTL
->  config IMX
->      bool
->      select PTIMER
-> +    select SSI
-> +    select USB_EHCI_SYSBUS
->  
->  config STM32F2XX_SYSCFG
->      bool
-> 
 
+Hmmmm,
+
+I have thought a long time, still can't point where is wrong.
+
+Let's from the result:
+0x0f000000 in the big endian laid as this:
+low ---> high
+0x0f 00 00 00
+
+As I have swapped before the compare so it is read as this:
+low ---> high
+00 00 00 0x0f
+
+However from the store side:
+the 15 in big endian is:
+low ---> high
+00 00 00 0x0f
+
+But Before I store it, I convert it to little endian, so following should
+be stored:
+low ---> high
+0x0f 00 00 00
+
+Do you apply the patch 3 and recompile the qemu binary?
+If it is, I may need your help as I have no big endian host device.
+
+You can debug and  inspect the memory layout and point out where is wrong.
+
+Thanks,
+Li Qiang
+
+
+
+
+
+
+
+>
+>  Thomas
+>
