@@ -1,31 +1,28 @@
-Received: from eggs.gnu.org ([209.51.188.92]:49277)
+Received: from eggs.gnu.org ([209.51.188.92]:45827)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1hJv5C-0005pB-0x
-	for qemu-devel@nongnu.org; Fri, 26 Apr 2019 03:15:42 -0400
+	(envelope-from <Janakarajan.Natarajan@amd.com>) id 1hJnPs-0000sy-MH
+	for qemu-devel@nongnu.org; Thu, 25 Apr 2019 19:04:33 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1hJv5B-0006rI-1a
-	for qemu-devel@nongnu.org; Fri, 26 Apr 2019 03:15:42 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:43888)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1hJv5A-0006n3-M3
-	for qemu-devel@nongnu.org; Fri, 26 Apr 2019 03:15:40 -0400
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
-	[10.5.11.13])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 131B281227
-	for <qemu-devel@nongnu.org>; Fri, 26 Apr 2019 07:15:36 +0000 (UTC)
-Date: Fri, 26 Apr 2019 09:15:30 +0200
-From: Gerd Hoffmann <kraxel@redhat.com>
-Message-ID: <20190426071530.y4eeu6ekx2nzvpar@sirius.home.kraxel.org>
-References: <20190423132004.13725-1-marcandre.lureau@redhat.com>
-	<20190423132004.13725-5-marcandre.lureau@redhat.com>
+	(envelope-from <Janakarajan.Natarajan@amd.com>) id 1hJnK1-0000XR-TH
+	for qemu-devel@nongnu.org; Thu, 25 Apr 2019 18:58:31 -0400
+Received: from mail-eopbgr730086.outbound.protection.outlook.com
+	([40.107.73.86]:18512
+	helo=NAM05-DM3-obe.outbound.protection.outlook.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <Janakarajan.Natarajan@amd.com>)
+	id 1hJnK1-0008Tp-KZ
+	for qemu-devel@nongnu.org; Thu, 25 Apr 2019 18:58:29 -0400
+From: "Natarajan, Janakarajan" <Janakarajan.Natarajan@amd.com>
+Date: Thu, 25 Apr 2019 22:58:20 +0000
+Message-ID: <20190425225610.28350-4-Janakarajan.Natarajan@amd.com>
+References: <20190425225610.28350-1-Janakarajan.Natarajan@amd.com>
+In-Reply-To: <20190425225610.28350-1-Janakarajan.Natarajan@amd.com>
+Content-Language: en-US
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-In-Reply-To: <20190423132004.13725-5-marcandre.lureau@redhat.com>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v6 04/11] contrib: add vhost-user-input
+Subject: [Qemu-devel] [PATCH 3/3] sev: Change SEV to use EncryptedRAMBlock
+ Notifier
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,29 +31,49 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>
-Cc: qemu-devel@nongnu.org, "Michael S. Tsirkin" <mst@redhat.com>
+To: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+Cc: Richard Henderson <rth@twiddle.net>, Paolo Bonzini <pbonzini@redhat.com>, "Michael S . Tsirkin" <mst@redhat.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, Eduardo Habkost <ehabkost@redhat.com>, Igor Mammedov <imammedo@redhat.com>, "Singh, Brijesh" <brijesh.singh@amd.com>, "Natarajan, Janakarajan" <Janakarajan.Natarajan@amd.com>
 
-On Tue, Apr 23, 2019 at 03:19:57PM +0200, Marc-Andr=E9 Lureau wrote:
-> Add a vhost-user input backend example, based on virtio-input-host
-> device. It takes an evdev path as argument, and can be associated with
-> a vhost-user-input device via a UNIX socket:
->=20
-> $ vhost-user-input -p /dev/input/eventX -s /tmp/vui.sock
->=20
-> $ qemu ... -chardev socket,id=3Dvuic,path=3D/tmp/vui.sock
->   -device vhost-user-input-pci,chardev=3Dvuic
->=20
-> This example is intentionally not included in $TOOLS, to not be built
-> and installed by default.
-
-I think we should build it by default, so it doesn't bitrot,
-even if we don't install it by default.
-
-> +static int unix_sock_new(char *path)
-> +{
-
-Move to common code?
-
-cheers,
-  Gerd
+VGhlIEVuY3J5cHRlZFJBTUJsb2NrIE5vdGlmaWVyIGxldHMgU0VWIGtub3cgd2hpY2ggZ3Vlc3Qg
+UkFNIHBhZ2VzDQp3aWxsIGNvbnRhaW4gZW5jcnlwdGVkIGd1ZXN0IGRhdGEuDQoNClVzaW5nIHRo
+aXMgbm90aWZpZXIgbGV0cyBTRVYgc2tpcCBwaW5uaW5nIHBhZ2VzIHRoYXQgZG8gbm90IGNvbnRh
+aW4NCmVuY3J5cHRlZCBkYXRhLg0KDQpTaWduZWQtb2ZmLWJ5OiBKYW5ha2FyYWphbiBOYXRhcmFq
+YW4gPEphbmFrYXJhamFuLk5hdGFyYWphbkBhbWQuY29tPg0KLS0tDQogdGFyZ2V0L2kzODYvc2V2
+LmMgfCAyNSArKysrKysrKy0tLS0tLS0tLS0tLS0tLS0tDQogMSBmaWxlIGNoYW5nZWQsIDggaW5z
+ZXJ0aW9ucygrKSwgMTcgZGVsZXRpb25zKC0pDQoNCmRpZmYgLS1naXQgYS90YXJnZXQvaTM4Ni9z
+ZXYuYyBiL3RhcmdldC9pMzg2L3Nldi5jDQppbmRleCBjZDc3ZjZiNWQ0Li42MTBlOTkyZTY0IDEw
+MDY0NA0KLS0tIGEvdGFyZ2V0L2kzODYvc2V2LmMNCisrKyBiL3RhcmdldC9pMzg2L3Nldi5jDQpA
+QCAtMTI3LDIxICsxMjcsMTEgQEAgc2V2X3NldF9ndWVzdF9zdGF0ZShTZXZTdGF0ZSBuZXdfc3Rh
+dGUpDQogfQ0KIA0KIHN0YXRpYyB2b2lkDQotc2V2X3JhbV9ibG9ja19hZGRlZChSQU1CbG9ja05v
+dGlmaWVyICpuLCB2b2lkICpob3N0LCBzaXplX3Qgc2l6ZSkNCitzZXZfcmFtX2Jsb2NrX2VuY3J5
+cHRlZF9hZGRlZChSQU1CbG9ja0VuY3J5cHRlZE5vdGlmaWVyICpuLA0KKyAgICAgICAgICAgICAg
+ICAgICAgICAgICAgICAgIHZvaWQgKmhvc3QsIHNpemVfdCBzaXplKQ0KIHsNCiAgICAgaW50IHI7
+DQogICAgIHN0cnVjdCBrdm1fZW5jX3JlZ2lvbiByYW5nZTsNCi0gICAgcmFtX2FkZHJfdCBvZmZz
+ZXQ7DQotICAgIE1lbW9yeVJlZ2lvbiAqbXI7DQotDQotICAgIC8qDQotICAgICAqIFRoZSBSQU0g
+ZGV2aWNlIHByZXNlbnRzIGEgbWVtb3J5IHJlZ2lvbiB0aGF0IHNob3VsZCBiZSB0cmVhdGVkDQot
+ICAgICAqIGFzIElPIHJlZ2lvbiBhbmQgc2hvdWxkIG5vdCBiZSBwaW5uZWQuDQotICAgICAqLw0K
+LSAgICBtciA9IG1lbW9yeV9yZWdpb25fZnJvbV9ob3N0KGhvc3QsICZvZmZzZXQpOw0KLSAgICBp
+ZiAobXIgJiYgbWVtb3J5X3JlZ2lvbl9pc19yYW1fZGV2aWNlKG1yKSkgew0KLSAgICAgICAgcmV0
+dXJuOw0KLSAgICB9DQogDQogICAgIHJhbmdlLmFkZHIgPSAoX191NjQpKHVuc2lnbmVkIGxvbmcp
+aG9zdDsNCiAgICAgcmFuZ2Uuc2l6ZSA9IHNpemU7DQpAQCAtMTU2LDcgKzE0Niw4IEBAIHNldl9y
+YW1fYmxvY2tfYWRkZWQoUkFNQmxvY2tOb3RpZmllciAqbiwgdm9pZCAqaG9zdCwgc2l6ZV90IHNp
+emUpDQogfQ0KIA0KIHN0YXRpYyB2b2lkDQotc2V2X3JhbV9ibG9ja19yZW1vdmVkKFJBTUJsb2Nr
+Tm90aWZpZXIgKm4sIHZvaWQgKmhvc3QsIHNpemVfdCBzaXplKQ0KK3Nldl9yYW1fYmxvY2tfZW5j
+cnlwdGVkX3JlbW92ZWQoUkFNQmxvY2tFbmNyeXB0ZWROb3RpZmllciAqbiwNCisgICAgICAgICAg
+ICAgICAgICAgICAgICAgICAgICAgIHZvaWQgKmhvc3QsIHNpemVfdCBzaXplKQ0KIHsNCiAgICAg
+aW50IHI7DQogICAgIHN0cnVjdCBrdm1fZW5jX3JlZ2lvbiByYW5nZTsNCkBAIC0xNzIsOSArMTYz
+LDkgQEAgc2V2X3JhbV9ibG9ja19yZW1vdmVkKFJBTUJsb2NrTm90aWZpZXIgKm4sIHZvaWQgKmhv
+c3QsIHNpemVfdCBzaXplKQ0KICAgICB9DQogfQ0KIA0KLXN0YXRpYyBzdHJ1Y3QgUkFNQmxvY2tO
+b3RpZmllciBzZXZfcmFtX25vdGlmaWVyID0gew0KLSAgICAucmFtX2Jsb2NrX2FkZGVkID0gc2V2
+X3JhbV9ibG9ja19hZGRlZCwNCi0gICAgLnJhbV9ibG9ja19yZW1vdmVkID0gc2V2X3JhbV9ibG9j
+a19yZW1vdmVkLA0KK3N0YXRpYyBzdHJ1Y3QgUkFNQmxvY2tFbmNyeXB0ZWROb3RpZmllciBzZXZf
+cmFtX2VuY3J5cHRlZF9ub3RpZmllciA9IHsNCisgICAgLnJhbV9ibG9ja19lbmNyeXB0ZWRfYWRk
+ZWQgPSBzZXZfcmFtX2Jsb2NrX2VuY3J5cHRlZF9hZGRlZCwNCisgICAgLnJhbV9ibG9ja19lbmNy
+eXB0ZWRfcmVtb3ZlZCA9IHNldl9yYW1fYmxvY2tfZW5jcnlwdGVkX3JlbW92ZWQsDQogfTsNCiAN
+CiBzdGF0aWMgdm9pZA0KQEAgLTc5NCw3ICs3ODUsNyBAQCBzZXZfZ3Vlc3RfaW5pdChjb25zdCBj
+aGFyICppZCkNCiAgICAgICAgIGdvdG8gZXJyOw0KICAgICB9DQogDQotICAgIHJhbV9ibG9ja19u
+b3RpZmllcl9hZGQoJnNldl9yYW1fbm90aWZpZXIpOw0KKyAgICByYW1fYmxvY2tfZW5jcnlwdGVk
+X25vdGlmaWVyX2FkZCgmc2V2X3JhbV9lbmNyeXB0ZWRfbm90aWZpZXIpOw0KICAgICBxZW11X2Fk
+ZF9tYWNoaW5lX2luaXRfZG9uZV9ub3RpZmllcigmc2V2X21hY2hpbmVfZG9uZV9ub3RpZnkpOw0K
+ICAgICBxZW11X2FkZF92bV9jaGFuZ2Vfc3RhdGVfaGFuZGxlcihzZXZfdm1fc3RhdGVfY2hhbmdl
+LCBzKTsNCiANCi0tIA0KMi4yMC4xDQoNCg==
