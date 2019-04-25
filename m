@@ -6,56 +6,55 @@ X-Spam-Status: No, score=-6.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EE247C43218
-	for <qemu-devel@archiver.kernel.org>; Thu, 25 Apr 2019 17:59:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2D5EFC43219
+	for <qemu-devel@archiver.kernel.org>; Thu, 25 Apr 2019 18:01:34 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 85E98206BF
-	for <qemu-devel@archiver.kernel.org>; Thu, 25 Apr 2019 17:59:26 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 85E98206BF
+	by mail.kernel.org (Postfix) with ESMTPS id B633F206BF
+	for <qemu-devel@archiver.kernel.org>; Thu, 25 Apr 2019 18:01:34 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B633F206BF
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:33257 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:33315 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hJieb-0001vx-1m
-	for qemu-devel@archiver.kernel.org; Thu, 25 Apr 2019 13:59:25 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:41536)
+	id 1hJigf-0003uU-86
+	for qemu-devel@archiver.kernel.org; Thu, 25 Apr 2019 14:01:33 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:41472)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1hJicm-0000bJ-OJ
-	for qemu-devel@nongnu.org; Thu, 25 Apr 2019 13:57:33 -0400
+	(envelope-from <ehabkost@redhat.com>) id 1hJicb-0000Qf-AK
+	for qemu-devel@nongnu.org; Thu, 25 Apr 2019 13:57:22 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1hJici-0005FS-RX
-	for qemu-devel@nongnu.org; Thu, 25 Apr 2019 13:57:32 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:58500)
+	(envelope-from <ehabkost@redhat.com>) id 1hJicZ-00057i-AB
+	for qemu-devel@nongnu.org; Thu, 25 Apr 2019 13:57:21 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:30517)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1hJicb-000595-9A
-	for qemu-devel@nongnu.org; Thu, 25 Apr 2019 13:57:23 -0400
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
-	[10.5.11.22])
+	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1hJicX-00052x-D0
+	for qemu-devel@nongnu.org; Thu, 25 Apr 2019 13:57:17 -0400
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+	[10.5.11.15])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 2F46CC051671;
-	Thu, 25 Apr 2019 17:57:20 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id 0B21981F13;
+	Thu, 25 Apr 2019 17:57:16 +0000 (UTC)
 Received: from localhost (ovpn-116-9.gru2.redhat.com [10.97.116.9])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id B4EE61001E6C;
-	Thu, 25 Apr 2019 17:57:19 +0000 (UTC)
+	by smtp.corp.redhat.com (Postfix) with ESMTP id 8EC6E5D705;
+	Thu, 25 Apr 2019 17:57:15 +0000 (UTC)
 From: Eduardo Habkost <ehabkost@redhat.com>
 To: Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org,
 	Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
-Date: Thu, 25 Apr 2019 14:56:57 -0300
-Message-Id: <20190425175659.24876-10-ehabkost@redhat.com>
+Date: Thu, 25 Apr 2019 14:56:55 -0300
+Message-Id: <20190425175659.24876-8-ehabkost@redhat.com>
 In-Reply-To: <20190425175659.24876-1-ehabkost@redhat.com>
 References: <20190425175659.24876-1-ehabkost@redhat.com>
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.31]);
-	Thu, 25 Apr 2019 17:57:20 +0000 (UTC)
+	(mx1.redhat.com [10.5.110.27]);
+	Thu, 25 Apr 2019 17:57:16 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] [PULL 09/11] scripts/update-linux-headers: add
- linux/mman.h
+Subject: [Qemu-devel] [PULL 07/11] cpu: Fix crash with empty -cpu option
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -67,54 +66,72 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Zhang Yi <yi.z.zhang@linux.intel.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 Content-Type: text/plain; charset="UTF-8"
-Message-ID: <20190425175657.5X7JdbZuMRgtyahiSsSNRNuH7zNaQmwFvGRGnY47TSY@z>
+Message-ID: <20190425175655.db8O__XHiFvUv1423CKxjupQoXsCq79P2rNipirjyeQ@z>
 
-From: Zhang Yi <yi.z.zhang@linux.intel.com>
+Fix the following crash:
 
-Add linux/mman.h,asm/mman.h,asm/mman-common.h to linux-headers,
-So we can use more mmap2 flags.
+  $ qemu-system-x86_64 -cpu ''
+  qemu-system-x86_64: qom/cpu.c:291: cpu_class_by_name: \
+      Assertion `cpu_model && cc->class_by_name' failed.
 
-Signed-off-by: Zhang Yi <yi.z.zhang@linux.intel.com>
-Message-Id: <f65c78d74859f815aa9c4f97407eb33361a6672c.1549555521.git.yi.z.zhang@linux.intel.com>
+Regression test script included.
+
+Fixes: 99193d8f2ef5 ("cpu: drop unnecessary NULL check and cpu_common_class_by_name()")
+Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
+Message-Id: <20190418034501.5038-1-ehabkost@redhat.com>
+Reviewed-by: Stefano Garzarella <sgarzare@redhat.com>
+Tested-by: Stefano Garzarella <sgarzare@redhat.com>
 Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
 ---
- scripts/update-linux-headers.sh | 6 +++---
- 1 file changed, 3 insertions(+), 3 deletions(-)
+ exec.c                              |  4 ++++
+ tests/acceptance/empty_cpu_model.py | 19 +++++++++++++++++++
+ 2 files changed, 23 insertions(+)
+ create mode 100644 tests/acceptance/empty_cpu_model.py
 
-diff --git a/scripts/update-linux-headers.sh b/scripts/update-linux-headers.sh
-index a310a9072b..c3819d2b98 100755
---- a/scripts/update-linux-headers.sh
-+++ b/scripts/update-linux-headers.sh
-@@ -95,7 +95,7 @@ for arch in $ARCHLIST; do
+diff --git a/exec.c b/exec.c
+index 08f6cafcbc..f7f3cdbf4a 100644
+--- a/exec.c
++++ b/exec.c
+@@ -991,6 +991,10 @@ const char *parse_cpu_option(const char *cpu_option)
+     const char *cpu_type;
  
-     rm -rf "$output/linux-headers/asm-$arch"
-     mkdir -p "$output/linux-headers/asm-$arch"
--    for header in kvm.h unistd.h bitsperlong.h; do
-+    for header in kvm.h unistd.h bitsperlong.h mman.h; do
-         cp "$tmpdir/include/asm/$header" "$output/linux-headers/asm-$arch"
-     done
+     model_pieces = g_strsplit(cpu_option, ",", 2);
++    if (!model_pieces[0]) {
++        error_report("-cpu option cannot be empty");
++        exit(1);
++    }
  
-@@ -139,13 +139,13 @@ done
- rm -rf "$output/linux-headers/linux"
- mkdir -p "$output/linux-headers/linux"
- for header in kvm.h vfio.h vfio_ccw.h vhost.h \
--              psci.h psp-sev.h userfaultfd.h; do
-+              psci.h psp-sev.h userfaultfd.h mman.h; do
-     cp "$tmpdir/include/linux/$header" "$output/linux-headers/linux"
- done
- 
- rm -rf "$output/linux-headers/asm-generic"
- mkdir -p "$output/linux-headers/asm-generic"
--for header in unistd.h bitsperlong.h; do
-+for header in unistd.h bitsperlong.h mman-common.h mman.h hugetlb_encode.h; do
-     cp "$tmpdir/include/asm-generic/$header" "$output/linux-headers/asm-generic"
- done
- 
+     oc = cpu_class_by_name(CPU_RESOLVING_TYPE, model_pieces[0]);
+     if (oc == NULL) {
+diff --git a/tests/acceptance/empty_cpu_model.py b/tests/acceptance/empty_cpu_model.py
+new file mode 100644
+index 0000000000..3f4f663582
+--- /dev/null
++++ b/tests/acceptance/empty_cpu_model.py
+@@ -0,0 +1,19 @@
++# Check for crash when using empty -cpu option
++#
++# Copyright (c) 2019 Red Hat, Inc.
++#
++# Author:
++#  Eduardo Habkost <ehabkost@redhat.com>
++#
++# This work is licensed under the terms of the GNU GPL, version 2 or
++# later.  See the COPYING file in the top-level directory.
++import subprocess
++from avocado_qemu import Test
++
++class EmptyCPUModel(Test):
++    def test(self):
++        cmd = [self.qemu_bin, '-S', '-display', 'none', '-machine', 'none', '-cpu', '']
++        r = subprocess.run(cmd, stderr=subprocess.PIPE, stdout=subprocess.PIPE)
++        self.assertEquals(r.returncode, 1, "QEMU exit code should be 1")
++        self.assertEquals(r.stdout, b'', "QEMU stdout should be empty")
++        self.assertNotEquals(r.stderr, b'', "QEMU stderr shouldn't be empty")
 -- 
 2.18.0.rc1.1.g3f1ff2140
 
