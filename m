@@ -1,27 +1,32 @@
-Received: from eggs.gnu.org ([209.51.188.92]:45411)
+Received: from eggs.gnu.org ([209.51.188.92]:49063)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1hJbE5-0006zR-Cg
-	for qemu-devel@nongnu.org; Thu, 25 Apr 2019 06:03:34 -0400
+	(envelope-from <philmd@redhat.com>) id 1hJbX6-0003MI-3B
+	for qemu-devel@nongnu.org; Thu, 25 Apr 2019 06:23:13 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1hJbE3-0007FH-VE
-	for qemu-devel@nongnu.org; Thu, 25 Apr 2019 06:03:33 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:54666)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1hJbE3-0007Ej-OQ
-	for qemu-devel@nongnu.org; Thu, 25 Apr 2019 06:03:31 -0400
-Date: Thu, 25 Apr 2019 11:03:26 +0100
-From: Stefan Hajnoczi <stefanha@redhat.com>
-Message-ID: <20190425100326.GF30231@stefanha-x1.localdomain>
-References: <20190424110041.8175-1-marcandre.lureau@redhat.com>
-	<20190424110041.8175-3-marcandre.lureau@redhat.com>
-	<CAFEAcA-_mX4_sJQ1KxSZbdcR1weANO+8430Y+zSYNBKgezPPLA@mail.gmail.com>
+	(envelope-from <philmd@redhat.com>) id 1hJbX4-0004ns-Ne
+	for qemu-devel@nongnu.org; Thu, 25 Apr 2019 06:23:12 -0400
+Received: from mail-wm1-f67.google.com ([209.85.128.67]:38409)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1hJbX4-0004nG-FL
+	for qemu-devel@nongnu.org; Thu, 25 Apr 2019 06:23:10 -0400
+Received: by mail-wm1-f67.google.com with SMTP id w15so9745935wmc.3
+	for <qemu-devel@nongnu.org>; Thu, 25 Apr 2019 03:23:09 -0700 (PDT)
+References: <20190420100056.116305-1-liq3ea@163.com>
+	<20190420100056.116305-4-liq3ea@163.com>
+	<a27cd912-4f58-55ac-1aae-e4999fa3d84d@redhat.com>
+	<CAKXe6SJZWs7HtXutX6W3saDhaNDtVPMQEh2+s+9XiM3TtZqLdQ@mail.gmail.com>
+	<20190425081519.n4leez6sz2wlvpla@sirius.home.kraxel.org>
+	<CAKXe6SKvkJxauOPmBMS+CDPq9NS0qKpydkyOAuS7mHVrA8JVbQ@mail.gmail.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Message-ID: <d773a58b-e33c-fa66-5afc-05bdc85efa53@redhat.com>
+Date: Thu, 25 Apr 2019 12:23:03 +0200
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="H4SyuGOnfnj3aJqJ"
-Content-Disposition: inline
-In-Reply-To: <CAFEAcA-_mX4_sJQ1KxSZbdcR1weANO+8430Y+zSYNBKgezPPLA@mail.gmail.com>
-Subject: Re: [Qemu-devel] [PATCH v2 2/2] build-sys: move slirp as git
- submodule project
+In-Reply-To: <CAKXe6SKvkJxauOPmBMS+CDPq9NS0qKpydkyOAuS7mHVrA8JVbQ@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH 3/4] tests: fw_cfg: add reboot_timeout test
+ case
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,67 +35,62 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: =?iso-8859-1?Q?Marc-Andr=E9?= Lureau <marcandre.lureau@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>, Samuel Thibault <samuel.thibault@ens-lyon.org>, Jeff Cody <codyprime@gmail.com>
+To: Li Qiang <liq3ea@gmail.com>, Gerd Hoffmann <kraxel@redhat.com>, Laszlo Ersek <lersek@redhat.com>
+Cc: Thomas Huth <thuth@redhat.com>, Li Qiang <liq3ea@163.com>, lvivier@redhat.com, Paolo Bonzini <pbonzini@redhat.com>, Qemu Developers <qemu-devel@nongnu.org>
 
+On 4/25/19 10:29 AM, Li Qiang wrote:
+> 
+> 
+> Gerd Hoffmann <kraxel@redhat.com <mailto:kraxel@redhat.com>> 于2019年4月
+> 25日周四 下午4:15写道：
+> 
+>     On Wed, Apr 24, 2019 at 09:16:56AM +0800, Li Qiang wrote:
+>     > Thomas Huth <thuth@redhat.com <mailto:thuth@redhat.com>> 于2019年4
+>     月24日周三 上午12:29写道：
+>     >
+>     > > Is this endianess-safe? Or do you need to byteswap
+>     reboot_timeout if the
+>     > > host and guest endianess does not match?
+>     >
+>     > Good question!
+>     >
+>     > IIUC, the qemu fw_cfg store the 'file' entry data just in byte stream.
+> 
+>     No.  Integers are defined to be little endian.  See fw_cfg_add_i64() for
+>     example, there is an explicit cpu_to_le64() call for that.
+> 
+> 
+> 
+> Yes, for the fw_cfg 'integer' entry it is stored as little endian.
+> But for the fw_cfg 'file' entry interpred as an integer, there is no
+> specify the endianess.
 
---H4SyuGOnfnj3aJqJ
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+I agree with Li, the endianess of 'reboot-timeout' is not clear.
 
-On Wed, Apr 24, 2019 at 01:14:57PM +0100, Peter Maydell wrote:
-> On Wed, 24 Apr 2019 at 12:13, Marc-Andr=E9 Lureau
-> <marcandre.lureau@redhat.com> wrote:
-> >
-> > The slirp project is now hosted on freedesktop at:
-> > https://gitlab.freedesktop.org/slirp.
-> >
-> > The libslirp source was extracted from qemu/slirp filtered through
-> > clang-format (available in project tree). The qemu slirp directory can
-> > be swapped by a git submodule.
-> >
-> > Signed-off-by: Marc-Andr=E9 Lureau <marcandre.lureau@redhat.com>
->=20
-> > --- a/.gitmodules
-> > +++ b/.gitmodules
-> > @@ -52,3 +52,6 @@
-> >  [submodule "roms/edk2"]
-> >         path =3D roms/edk2
-> >         url =3D https://github.com/tianocore/edk2.git
-> > +[submodule "slirp"]
-> > +       path =3D slirp
-> > +       url =3D https://gitlab.freedesktop.org/slirp/libslirp.git
->=20
-> We should prefer to set up a mirror of the git repo
-> on git.qemu.org and use that, rather than a remote repo.
->=20
-> We also need to do that for the berkeley softfloat
-> and edk2 repos, I notice.
->=20
-> Stefan or Jeff, could one of you set that up, please?
+>From docs/specs/fw_cfg.txt:
 
-The mirrors are now set up:
+  === All Other Data Items ===
 
-  https://git.qemu.org/
+  Please consult the QEMU source for the most up-to-date
+  and authoritative list of selector keys and their respective
+  items' purpose, format and writeability.
 
-I will send a .gitmodules patch that switches over to our mirrors.  I
-will also include this libslirp submodule patch.
+So checking the git history, this code was introduced in commit
+ac05f3492421, very similar to commit 3d3b8303c6f8 for the
+'boot-menu-wait' entry, which explicitely use little-endian, so I think
+it is safe to consider it little-endian and add a comment about its
+endianess (referring the previous commits in the patch description).
 
-Stefan
+Thanks,
 
---H4SyuGOnfnj3aJqJ
-Content-Type: application/pgp-signature; name="signature.asc"
+Phil.
 
------BEGIN PGP SIGNATURE-----
-
-iQEcBAEBAgAGBQJcwYXuAAoJEJykq7OBq3PIZAMH/RP4VNIpHJFHGYNYbSHltvAO
-HaVD5p6kMVSsYKTTvT1gESuy8B9RhEUK1gw3lKm/1ANXT/VuXq/qA2Ffvg9lSBcW
-HDFox1Hj0BBJDZaMInh2HdzfnDRUPu1HAlgD0GCiIe8JpOETiDZk3aVRXBFu3uWq
-L2hxmBXlAo9DdAXDeG+HaD37Nl/YuHkwrCQbASg9+IOcMtCyqFUzfFcuAevE3kE6
-aGFstk2cTqq7e2OSl/W3PmYRDwp9grjh1IMC8XjU9AT01AY4qtiZBmG36LUqgFji
-of5djH15euLghNFNEZZOMtpHDpX3i9UNVAcljeRN5VJq3YPKFrHf98p1ZtThIk0=
-=korS
------END PGP SIGNATURE-----
-
---H4SyuGOnfnj3aJqJ--
+> 
+> Thanks,
+> Li Qiang
+> 
+>  
+> 
+>     cheers,
+>       Gerd
+> 
