@@ -6,55 +6,55 @@ X-Spam-Status: No, score=-6.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2D5EFC43219
-	for <qemu-devel@archiver.kernel.org>; Thu, 25 Apr 2019 18:01:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B7555C43219
+	for <qemu-devel@archiver.kernel.org>; Thu, 25 Apr 2019 18:01:44 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B633F206BF
-	for <qemu-devel@archiver.kernel.org>; Thu, 25 Apr 2019 18:01:34 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B633F206BF
+	by mail.kernel.org (Postfix) with ESMTPS id 4CF69206BF
+	for <qemu-devel@archiver.kernel.org>; Thu, 25 Apr 2019 18:01:45 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4CF69206BF
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:33315 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:33319 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hJigf-0003uU-86
-	for qemu-devel@archiver.kernel.org; Thu, 25 Apr 2019 14:01:33 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:41472)
+	id 1hJigp-00043J-P2
+	for qemu-devel@archiver.kernel.org; Thu, 25 Apr 2019 14:01:43 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:41397)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1hJicb-0000Qf-AK
-	for qemu-devel@nongnu.org; Thu, 25 Apr 2019 13:57:22 -0400
+	(envelope-from <ehabkost@redhat.com>) id 1hJicR-0000Jf-Rh
+	for qemu-devel@nongnu.org; Thu, 25 Apr 2019 13:57:12 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1hJicZ-00057i-AB
-	for qemu-devel@nongnu.org; Thu, 25 Apr 2019 13:57:21 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:30517)
+	(envelope-from <ehabkost@redhat.com>) id 1hJicQ-0004yp-RK
+	for qemu-devel@nongnu.org; Thu, 25 Apr 2019 13:57:11 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:48130)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1hJicX-00052x-D0
-	for qemu-devel@nongnu.org; Thu, 25 Apr 2019 13:57:17 -0400
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
-	[10.5.11.15])
+	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1hJicQ-0004xw-LM
+	for qemu-devel@nongnu.org; Thu, 25 Apr 2019 13:57:10 -0400
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+	[10.5.11.13])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 0B21981F13;
-	Thu, 25 Apr 2019 17:57:16 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id E589581258;
+	Thu, 25 Apr 2019 17:57:09 +0000 (UTC)
 Received: from localhost (ovpn-116-9.gru2.redhat.com [10.97.116.9])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id 8EC6E5D705;
-	Thu, 25 Apr 2019 17:57:15 +0000 (UTC)
+	by smtp.corp.redhat.com (Postfix) with ESMTP id 7310A17A87;
+	Thu, 25 Apr 2019 17:57:09 +0000 (UTC)
 From: Eduardo Habkost <ehabkost@redhat.com>
 To: Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org,
 	Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
-Date: Thu, 25 Apr 2019 14:56:55 -0300
-Message-Id: <20190425175659.24876-8-ehabkost@redhat.com>
+Date: Thu, 25 Apr 2019 14:56:52 -0300
+Message-Id: <20190425175659.24876-5-ehabkost@redhat.com>
 In-Reply-To: <20190425175659.24876-1-ehabkost@redhat.com>
 References: <20190425175659.24876-1-ehabkost@redhat.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.27]);
-	Thu, 25 Apr 2019 17:57:16 +0000 (UTC)
+	(mx1.redhat.com [10.5.110.25]);
+	Thu, 25 Apr 2019 17:57:09 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] [PULL 07/11] cpu: Fix crash with empty -cpu option
+Subject: [Qemu-devel] [PULL 04/11] vl: Clean up after previous commit
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -66,72 +66,80 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: Markus Armbruster <armbru@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 Content-Type: text/plain; charset="UTF-8"
-Message-ID: <20190425175655.db8O__XHiFvUv1423CKxjupQoXsCq79P2rNipirjyeQ@z>
+Message-ID: <20190425175652.ufPi0qWZ2ymfUDA9U48OCxwS7bYiYBWZ1WbkxPGbH0s@z>
 
-Fix the following crash:
+From: Markus Armbruster <armbru@redhat.com>
 
-  $ qemu-system-x86_64 -cpu ''
-  qemu-system-x86_64: qom/cpu.c:291: cpu_class_by_name: \
-      Assertion `cpu_model && cc->class_by_name' failed.
+Since the previous commit, find_machine() and find_default_machine()
+don't have to deallocate on return.  This permits further
+simplifications.
 
-Regression test script included.
-
-Fixes: 99193d8f2ef5 ("cpu: drop unnecessary NULL check and cpu_common_class_by_name()")
-Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
-Message-Id: <20190418034501.5038-1-ehabkost@redhat.com>
-Reviewed-by: Stefano Garzarella <sgarzare@redhat.com>
-Tested-by: Stefano Garzarella <sgarzare@redhat.com>
+Signed-off-by: Markus Armbruster <armbru@redhat.com>
+Reviewed-by: Wei Yang <richardw.yang@linux.intel.com>
+Message-Id: <20190405064121.23662-4-richardw.yang@linux.intel.com>
 Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
 ---
- exec.c                              |  4 ++++
- tests/acceptance/empty_cpu_model.py | 19 +++++++++++++++++++
- 2 files changed, 23 insertions(+)
- create mode 100644 tests/acceptance/empty_cpu_model.py
+ vl.c | 25 ++++++++-----------------
+ 1 file changed, 8 insertions(+), 17 deletions(-)
 
-diff --git a/exec.c b/exec.c
-index 08f6cafcbc..f7f3cdbf4a 100644
---- a/exec.c
-+++ b/exec.c
-@@ -991,6 +991,10 @@ const char *parse_cpu_option(const char *cpu_option)
-     const char *cpu_type;
+diff --git a/vl.c b/vl.c
+index fb8c8eda2a..69c530a920 100644
+--- a/vl.c
++++ b/vl.c
+@@ -1468,40 +1468,31 @@ MachineState *current_machine;
+ static MachineClass *find_machine(const char *name, GSList *machines)
+ {
+     GSList *el;
+-    MachineClass *mc = NULL;
  
-     model_pieces = g_strsplit(cpu_option, ",", 2);
-+    if (!model_pieces[0]) {
-+        error_report("-cpu option cannot be empty");
-+        exit(1);
-+    }
+     for (el = machines; el; el = el->next) {
+-        MachineClass *temp = el->data;
++        MachineClass *mc = el->data;
  
-     oc = cpu_class_by_name(CPU_RESOLVING_TYPE, model_pieces[0]);
-     if (oc == NULL) {
-diff --git a/tests/acceptance/empty_cpu_model.py b/tests/acceptance/empty_cpu_model.py
-new file mode 100644
-index 0000000000..3f4f663582
---- /dev/null
-+++ b/tests/acceptance/empty_cpu_model.py
-@@ -0,0 +1,19 @@
-+# Check for crash when using empty -cpu option
-+#
-+# Copyright (c) 2019 Red Hat, Inc.
-+#
-+# Author:
-+#  Eduardo Habkost <ehabkost@redhat.com>
-+#
-+# This work is licensed under the terms of the GNU GPL, version 2 or
-+# later.  See the COPYING file in the top-level directory.
-+import subprocess
-+from avocado_qemu import Test
-+
-+class EmptyCPUModel(Test):
-+    def test(self):
-+        cmd = [self.qemu_bin, '-S', '-display', 'none', '-machine', 'none', '-cpu', '']
-+        r = subprocess.run(cmd, stderr=subprocess.PIPE, stdout=subprocess.PIPE)
-+        self.assertEquals(r.returncode, 1, "QEMU exit code should be 1")
-+        self.assertEquals(r.stdout, b'', "QEMU stdout should be empty")
-+        self.assertNotEquals(r.stderr, b'', "QEMU stderr shouldn't be empty")
+-        if (!strcmp(temp->name, name)) {
+-            mc = temp;
+-            break;
+-        }
+-        if (temp->alias &&
+-            !strcmp(temp->alias, name)) {
+-            mc = temp;
+-            break;
++        if (!strcmp(mc->name, name) || !g_strcmp0(mc->alias, name)) {
++            return mc;
+         }
+     }
+ 
+-    return mc;
++    return NULL;
+ }
+ 
+ static MachineClass *find_default_machine(GSList *machines)
+ {
+     GSList *el;
+-    MachineClass *mc = NULL;
+ 
+     for (el = machines; el; el = el->next) {
+-        MachineClass *temp = el->data;
++        MachineClass *mc = el->data;
+ 
+-        if (temp->is_default) {
+-            mc = temp;
+-            break;
++        if (mc->is_default) {
++            return mc;
+         }
+     }
+ 
+-    return mc;
++    return NULL;
+ }
+ 
+ MachineInfoList *qmp_query_machines(Error **errp)
 -- 
 2.18.0.rc1.1.g3f1ff2140
 
