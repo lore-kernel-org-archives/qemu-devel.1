@@ -1,28 +1,18 @@
-Received: from eggs.gnu.org ([209.51.188.92]:51325)
+Received: from eggs.gnu.org ([209.51.188.92]:52029)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pmathieu@redhat.com>) id 1hJhEU-00037l-0R
-	for qemu-devel@nongnu.org; Thu, 25 Apr 2019 12:28:22 -0400
+	(envelope-from <berto@igalia.com>) id 1hJhHv-0004Sl-1V
+	for qemu-devel@nongnu.org; Thu, 25 Apr 2019 12:31:55 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pmathieu@redhat.com>) id 1hJhES-0003OP-Tp
-	for qemu-devel@nongnu.org; Thu, 25 Apr 2019 12:28:21 -0400
-Received: from mail-wm1-f68.google.com ([209.85.128.68]:32895)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <pmathieu@redhat.com>) id 1hJhES-0003NL-NK
-	for qemu-devel@nongnu.org; Thu, 25 Apr 2019 12:28:20 -0400
-Received: by mail-wm1-f68.google.com with SMTP id z6so2029991wmi.0
-	for <qemu-devel@nongnu.org>; Thu, 25 Apr 2019 09:28:19 -0700 (PDT)
+	(envelope-from <berto@igalia.com>) id 1hJhHu-000788-6x
+	for qemu-devel@nongnu.org; Thu, 25 Apr 2019 12:31:55 -0400
+From: Alberto Garcia <berto@igalia.com>
+In-Reply-To: <20190417153005.30096-1-mreitz@redhat.com>
+References: <20190417153005.30096-1-mreitz@redhat.com>
+Date: Thu, 25 Apr 2019 18:31:25 +0200
+Message-ID: <w51ef5q11ya.fsf@maestria.local.igalia.com>
 MIME-Version: 1.0
-References: <20190418180057.3593-1-thuth@redhat.com>
-	<20190418180057.3593-25-thuth@redhat.com>
-	<4fcfff75-aa44-e1cc-2e14-38faba3a3e47@redhat.com>
-In-Reply-To: <4fcfff75-aa44-e1cc-2e14-38faba3a3e47@redhat.com>
-From: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>
-Date: Thu, 25 Apr 2019 18:28:06 +0200
-Message-ID: <CAP+75-UkU6RkqD02FE81g1WffkhqP-uGarX42afkbdT3b_r2Lw@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH for-QEMU-4.1 v5 24/29] hw/arm: Express
- dependencies for remaining IMX boards with Kconfig
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [PATCH] iotests: Make 182 do without device_add
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,54 +21,18 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Thomas Huth <thuth@redhat.com>, Yang Zhong <yang.zhong@intel.com>, Peter Maydell <peter.maydell@linaro.org>, QEMU Developers <qemu-devel@nongnu.org>, Paolo Bonzini <pbonzini@redhat.com>
-Cc: "Michael S. Tsirkin" <mst@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>, "Edgar E . Iglesias" <edgar.iglesias@gmail.com>, Jean-Christophe Dubois <jcd@tribudubois.net>, Rob Herring <robh@kernel.org>, Qemu-block <qemu-block@nongnu.org>, Andrey Smirnov <andrew.smirnov@gmail.com>, Joel Stanley <joel@jms.id.au>, Antony Pavlov <antonynpavlov@gmail.com>, Alistair Francis <alistair@alistair23.me>, Beniamino Galvani <b.galvani@gmail.com>, qemu-arm <qemu-arm@nongnu.org>, Peter Chubb <peter.chubb@nicta.com.au>, Cedric Le Goater <clg@kaod.org>, John Snow <jsnow@redhat.com>, Andrew Jeffery <andrew@aj.id.au>, Philippe Mathieu-Daude <f4bug@amsat.org>, Subbaraya Sundeep <sundeep.lkml@gmail.com>, Igor Mitsyanko <i.mitsyanko@gmail.com>, Jan Kiszka <jan.kiszka@web.de>
+To: Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org
+Cc: qemu-devel@nongnu.org, Kevin Wolf <kwolf@redhat.com>
 
-On Thu, Apr 25, 2019 at 6:14 PM Philippe Mathieu-Daud=C3=A9
-<philmd@redhat.com> wrote:
-> On 4/18/19 8:00 PM, Thomas Huth wrote:
-> > IMX25, IMX7 and IMX6UL were still missing the Kconfig dependencies.
-> >
-> > Signed-off-by: Thomas Huth <thuth@redhat.com>
+On Wed 17 Apr 2019 05:30:05 PM CEST, Max Reitz wrote:
+> 182 fails if qemu has no support for hotplugging of a virtio-blk device.
+> Using an NBD server instead works just as well for the test, even on
+> qemus without hotplugging support.
 >
-> Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
->
-> > ---
-> >  default-configs/arm-softmmu.mak |  2 --
-> >  hw/arm/Kconfig                  | 19 +++++++++++++++++++
-> >  2 files changed, 19 insertions(+), 2 deletions(-)
-> >
-> > diff --git a/default-configs/arm-softmmu.mak b/default-configs/arm-soft=
-mmu.mak
-> > index 1455d083d8..6dc388c43e 100644
-> > --- a/default-configs/arm-softmmu.mak
-> > +++ b/default-configs/arm-softmmu.mak
-> > @@ -37,7 +37,6 @@ CONFIG_SABRELITE=3Dy
-> >  CONFIG_EMCRAFT_SF2=3Dy
-> >
-> >  CONFIG_VGA=3Dy
-> > -CONFIG_IMX_FEC=3Dy
-> >
-> >  CONFIG_NRF51_SOC=3Dy
-> >
-> > @@ -49,4 +48,3 @@ CONFIG_PCIE_PORT=3Dy
-> >  CONFIG_XIO3130=3Dy
-> >  CONFIG_IOH3420=3Dy
-> >  CONFIG_I82801B11=3Dy
-> > -CONFIG_PCI_EXPRESS_DESIGNWARE=3Dy
-> > diff --git a/hw/arm/Kconfig b/hw/arm/Kconfig
-> > index f5cd63860d..58439c492a 100644
-> > --- a/hw/arm/Kconfig
-> > +++ b/hw/arm/Kconfig
-> > @@ -283,6 +283,10 @@ config XLNX_VERSAL
-> >
-> >  config FSL_IMX25
-> >      bool
-> > +    select IMX
+> Fixes: 6d0a4a0fb5c8f10c8eb68b52cfda0082b00ae963
+> Reported-by: Danilo C. L. de Paula <ddepaula@redhat.com>
+> Signed-off-by: Max Reitz <mreitz@redhat.com>
 
-At some point we should split the IMX config in hw/misc/Kconfig.
+Acked-by: Alberto Garcia <berto@igalia.com>
 
-> > +    select IMX_FEC
-> > +    select IMX_I2C
-> > +    select DS1338
-[...]
+Berto
