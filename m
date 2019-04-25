@@ -2,84 +2,94 @@ Return-Path: <SRS0=VSQP=S3=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.7 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
 	SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 53134C43219
-	for <qemu-devel@archiver.kernel.org>; Thu, 25 Apr 2019 19:02:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D47CBC43218
+	for <qemu-devel@archiver.kernel.org>; Thu, 25 Apr 2019 19:28:38 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9D6C620693
-	for <qemu-devel@archiver.kernel.org>; Thu, 25 Apr 2019 19:02:45 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 0086020685
+	for <qemu-devel@archiver.kernel.org>; Thu, 25 Apr 2019 19:28:38 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=sifive.com header.i=@sifive.com header.b="Jxzmo/pI"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9D6C620693
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=sifive.com
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="bfP2LNwj"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0086020685
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:33917 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:34136 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hJjds-0000wK-AB
-	for qemu-devel@archiver.kernel.org; Thu, 25 Apr 2019 15:02:44 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:55139)
+	id 1hJk2v-00066p-9C
+	for qemu-devel@archiver.kernel.org; Thu, 25 Apr 2019 15:28:37 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:59889)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <palmer@sifive.com>) id 1hJjcj-0008UF-VG
-	for qemu-devel@nongnu.org; Thu, 25 Apr 2019 15:01:38 -0400
+	(envelope-from <danielhb413@gmail.com>) id 1hJk1s-0005YY-IN
+	for qemu-devel@nongnu.org; Thu, 25 Apr 2019 15:27:34 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <palmer@sifive.com>) id 1hJjYc-0006i7-S1
-	for qemu-devel@nongnu.org; Thu, 25 Apr 2019 14:57:19 -0400
-Received: from mail-pg1-x544.google.com ([2607:f8b0:4864:20::544]:40661)
+	(envelope-from <danielhb413@gmail.com>) id 1hJjvh-0001jD-24
+	for qemu-devel@nongnu.org; Thu, 25 Apr 2019 15:21:11 -0400
+Received: from mail-qk1-x743.google.com ([2607:f8b0:4864:20::743]:44096)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <palmer@sifive.com>) id 1hJjYc-0006ey-Li
-	for qemu-devel@nongnu.org; Thu, 25 Apr 2019 14:57:18 -0400
-Received: by mail-pg1-x544.google.com with SMTP id d31so291960pgl.7
-	for <qemu-devel@nongnu.org>; Thu, 25 Apr 2019 11:57:18 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=sifive.com; s=google;
-	h=date:subject:in-reply-to:cc:from:to:message-id:mime-version
-	:content-transfer-encoding;
-	bh=ZqUiWIRkd4FGmMptUc+o/kwZ71iZ9LxeQlW+P3BZ/6I=;
-	b=Jxzmo/pIrqKp4pRWy47Qp/Ih9IvLTQE/lS9KFLF8CYMGdIuV3ODvRcEw9ij3xAU4tm
-	EHhd0eSKR36lt60mEp/o+2kiKigLgRTqBoQSaMgLM8yDf9bep98BOF4epxa4fdh4SV3u
-	i4rcdrzwmGLQAjW0cuNWLQ/APKBdcU0IJY9yXRSQoLjZbNQ08/yXyjHxqoEthWhb7vRl
-	Q9LEFHOZR1bpKJwosoE4y4FbLvFJwb80Od4/5AhlZj97PNhJzHqOuXi1LnNyY3JDRmJ9
-	jd2+ir4qjcGd6bgGSJlJlX0PSDnDW6TQU+NGrUFO8sLJAqEMez+YLgkCsg8T1ARdJozX
-	WkDg==
+	(Exim 4.71) (envelope-from <danielhb413@gmail.com>)
+	id 1hJjvf-0001K7-2Q
+	for qemu-devel@nongnu.org; Thu, 25 Apr 2019 15:21:07 -0400
+Received: by mail-qk1-x743.google.com with SMTP id y5so432262qkc.11
+	for <qemu-devel@nongnu.org>; Thu, 25 Apr 2019 12:21:04 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+	h=subject:to:cc:references:from:message-id:date:user-agent
+	:mime-version:in-reply-to:content-transfer-encoding:content-language;
+	bh=trdNWblg77J5PrVc9fHnmhA1Nmi2cR9fU07cp/3jEW4=;
+	b=bfP2LNwjflVwTy1tSSqTG7c3o6bmu/iOESE1Ej78TZtPRqkZYzo1wHPLiRu47j0k0i
+	+ZOIm6SiTLd2eUQ/uiyXgYx/4YGUezbzYb1ZsCuzUEImrbGjL+umH7wmeEHKO77BEQjR
+	62j3u4sdJwNBUcVJVng7HZ0K6+1MnBRncp/yFADLqg3a3/oK2yR8RMdnPsFhYtqpTNEd
+	kiKydd5z3HIONmCP7cIjJFQjP5FrFGCuVaSCVjLSSPZGsRyHPSxeXbpOBfi0VcK8JU33
+	pR9GGX/2c6SojYZQDZFBP2Y4DrmcK9ndXAGfsEbkmOp4PPivUD+3u7vHwt6pNtxx9M1J
+	OV4A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
 	d=1e100.net; s=20161025;
-	h=x-gm-message-state:date:subject:in-reply-to:cc:from:to:message-id
-	:mime-version:content-transfer-encoding;
-	bh=ZqUiWIRkd4FGmMptUc+o/kwZ71iZ9LxeQlW+P3BZ/6I=;
-	b=hCiqnEU5oG2TkgfuMWrG7WuYw1Fdzeh+ePKcgEHVKmyeNW34RhOzPJHGMyn5+B7MWt
-	FOhoAFUJ2RA+ai4N/kI/ELJLBoGDonpO0OZFlMptDjqdlp616l0UPbbaWvrIlJm5kOIX
-	jzRNteyW6vrWjoBvr8pRoyBdI4/f2B0tLR83ACrnG2SiLAbe9qzNq8tKflMohd4bFdU2
-	sBioF5eRtFGWKvR69JPinhhnq59fBv7P4XIwzimUjVXIV9IGQGeJFRpJyOirBXQXhKaf
-	OcKvNhJiGZu02sTGDNg/2azR09J/CmPrAzMgqMQrVsINXWiJyvOpEv+jlefQ0AbnvTbQ
-	Abmw==
-X-Gm-Message-State: APjAAAUxIVuTOYDgbswfX7pRV4uV4T+9Wd6/LVzbLzeisMeg5TXdJIHo
-	MAMQognBYn2CdU3+iJlW0qLvTHpoFJQ=
-X-Google-Smtp-Source: APXvYqw+MzUsHOMRUqj2MyQSQs1lA7IxhmiMtkSD91VKJkahUOvo/AhAAuXgodOG+LUp7nTi+Ru9HA==
-X-Received: by 2002:a63:d34b:: with SMTP id u11mr7061204pgi.385.1556218637335; 
-	Thu, 25 Apr 2019 11:57:17 -0700 (PDT)
-Received: from localhost ([134.134.139.92]) by smtp.gmail.com with ESMTPSA id
-	y20sm32537117pfe.188.2019.04.25.11.57.16
-	(version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
-	Thu, 25 Apr 2019 11:57:16 -0700 (PDT)
-Date: Thu, 25 Apr 2019 11:57:16 -0700 (PDT)
-X-Google-Original-Date: Thu, 25 Apr 2019 11:56:10 PDT (-0700)
-In-Reply-To: <CANnJOVHbCGcgnHT3qVbHGFh_Ba0=FqABSoM2SG9ddf-fawwaYg@mail.gmail.com>
-From: Palmer Dabbelt <palmer@sifive.com>
-To: fintelia@gmail.com
-Message-ID: <mhng-5ee2a059-0cd2-4dc6-8952-2560c4f76161@palmer-si-x1e>
-Mime-Version: 1.0 (MHng)
+	h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+	:user-agent:mime-version:in-reply-to:content-transfer-encoding
+	:content-language;
+	bh=trdNWblg77J5PrVc9fHnmhA1Nmi2cR9fU07cp/3jEW4=;
+	b=C7yVXdXj8m9dG++krT3ibj4bEY031/WWrWYGuGXWY/zlL94yn4bD2JY+RYzjcv9Bw2
+	fQsIPE3G+1mTnWbJJ+ivjV4oTc0udUuwGFrrFneJI5613PW7lzGwtiWCcrDXzeHcV2zg
+	8aDCtFGfjsFSVZ7+BTJAjTACUP9Kyq0wAIil3wdKgxfknDhzoeQP0QzW9HZ7Q/1VDz2Q
+	OLiduCZO61mVJNUyA5OiSGF0RErQIyVS/koF7eqWg4q1QOgQO3Z+GC4BYhwYYv7o0wR/
+	Ed5SHdpY78/EQ0A+9x5n6H39f4nj08curcSwQoWglK7vs3bVHEXTLOu63BCrGK+AsjOk
+	s5lQ==
+X-Gm-Message-State: APjAAAWoeFnNLZD2JnV35F6kArte+WIU1rutmsamRl/ijhSL1CNe9Mkg
+	VKFyGKqzGZAqhF72NwJr6qo=
+X-Google-Smtp-Source: APXvYqwNIUwnfUr85DXLLXqWWlojx2m7uBoU1RzCPGdV0KgTKnuBf6Ia2yG3K+A1lyjokc9kdXXymw==
+X-Received: by 2002:a05:620a:124e:: with SMTP id
+	a14mr2577114qkl.43.1556220063333; 
+	Thu, 25 Apr 2019 12:21:03 -0700 (PDT)
+Received: from ?IPv6:2804:18:6a:bad:164e:37be:136d:b67b?
+	([2804:18:6a:bad:164e:37be:136d:b67b])
+	by smtp.gmail.com with ESMTPSA id
+	13sm10683828qtm.52.2019.04.25.12.21.00
+	(version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+	Thu, 25 Apr 2019 12:21:02 -0700 (PDT)
+To: Wei Yang <richardw.yang@linux.intel.com>, qemu-devel@nongnu.org
+References: <20190424004700.12766-1-richardw.yang@linux.intel.com>
+	<20190424004700.12766-2-richardw.yang@linux.intel.com>
+From: Daniel Henrique Barboza <danielhb413@gmail.com>
+Message-ID: <e9cd3438-345f-2a68-daec-1ce4cba37ef1@gmail.com>
+Date: Thu, 25 Apr 2019 16:20:57 -0300
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+	Thunderbird/60.6.1
+MIME-Version: 1.0
+In-Reply-To: <20190424004700.12766-2-richardw.yang@linux.intel.com>
 Content-Type: text/plain; charset="UTF-8"; format="flowed"
-Content-Transfer-Encoding: 8bit
+Content-Transfer-Encoding: 7bit
+Content-Language: en-US
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
 	recognized.
-X-Received-From: 2607:f8b0:4864:20::544
-Subject: Re: [Qemu-devel] [PATCH] target/riscv: Remove unused include of
- riscv_htif.h for virt board
+X-Received-From: 2607:f8b0:4864:20::743
+Subject: Re: [Qemu-devel] [PATCH 1/4] migration/savevm: remove duplicate
+ check of migration_is_blocked
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -91,37 +101,59 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Bastian Koppelmann <kbastian@mail.uni-paderborn.de>,
-	Alistair Francis <Alistair.Francis@wdc.com>,
-	qemu-devel@nongnu.org, sagark@eecs.berkeley.edu, qemu-riscv@nongnu.org
+Cc: dgilbert@redhat.com, quintela@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190425185716.YdHWk-mzUEeVcC1gsjPvxfGvcU2iCwxDGrl1lLc_OXI@z>
+Message-ID: <20190425192057.wrAcFVHJkmdWwLfqR5Vp-gXZkA-OvVhwq_QIsl2aUqI@z>
 
-On Wed, 10 Apr 2019 09:29:11 PDT (-0700), fintelia@gmail.com wrote:
-> Unless I'm missing something, the virt board doesn't support HTIF and
-> should not be including this header.
+
+
+On 4/23/19 9:46 PM, Wei Yang wrote:
+> Current call flow of save_snapshot is:
 >
-> Jonathan
+>    save_snapshot
+>      migration_is_blocked
+>        qemu_savevm_state
+>          migration_is_blocked
 >
-> Signed-off-by: Jonathan Behrens <fintelia@gmail.com>
+> Since qemu_savevm_state is only called in save_snapshot, this means
+> migration_is_blocked has been already checked.
+
+I think it would be a nice touch to add a comment in qemu_savevm_state,
+saying that the function must be called with migration_is_blocked()
+context. Just in case someone else in the future ends up re-using the
+function.
+
+
+Other than that, +1 for less code duplication.
+
+
+Reviewed-by: Daniel Henrique Barboza <danielhb413@gmail.com>
+
+
+
+
+>
+> Signed-off-by: Wei Yang <richardw.yang@linux.intel.com>
 > ---
->  hw/riscv/virt.c | 1 -
->  1 file changed, 1 deletion(-)
+>   migration/savevm.c | 4 ----
+>   1 file changed, 4 deletions(-)
 >
-> diff --git a/hw/riscv/virt.c b/hw/riscv/virt.c
-> index fc4c6b306e..3526463034 100644
-> --- a/hw/riscv/virt.c
-> +++ b/hw/riscv/virt.c
-> @@ -29,7 +29,6 @@
->  #include "hw/sysbus.h"
->  #include "hw/char/serial.h"
->  #include "target/riscv/cpu.h"
-> -#include "hw/riscv/riscv_htif.h"
->  #include "hw/riscv/riscv_hart.h"
->  #include "hw/riscv/sifive_plic.h"
->  #include "hw/riscv/sifive_clint.h"
+> diff --git a/migration/savevm.c b/migration/savevm.c
+> index 92af2471cd..2eea604624 100644
+> --- a/migration/savevm.c
+> +++ b/migration/savevm.c
+> @@ -1412,10 +1412,6 @@ static int qemu_savevm_state(QEMUFile *f, Error **errp)
+>           return -EINVAL;
+>       }
+>   
+> -    if (migration_is_blocked(errp)) {
+> -        return -EINVAL;
+> -    }
+> -
+>       if (migrate_use_block()) {
+>           error_setg(errp, "Block migration and snapshots are incompatible");
+>           return -EINVAL;
 
-Thanks!
 
