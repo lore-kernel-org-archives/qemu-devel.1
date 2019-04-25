@@ -3,58 +3,58 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
 X-Spam-Status: No, score=-6.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED
-	autolearn=ham autolearn_force=no version=3.4.0
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C5E28C43218
-	for <qemu-devel@archiver.kernel.org>; Thu, 25 Apr 2019 13:36:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 06CA8C43218
+	for <qemu-devel@archiver.kernel.org>; Thu, 25 Apr 2019 13:36:10 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7FFD1206BF
-	for <qemu-devel@archiver.kernel.org>; Thu, 25 Apr 2019 13:36:06 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7FFD1206BF
+	by mail.kernel.org (Postfix) with ESMTPS id B3594206BF
+	for <qemu-devel@archiver.kernel.org>; Thu, 25 Apr 2019 13:36:09 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B3594206BF
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:57316 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:57318 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hJeXl-0006Vb-Pd
-	for qemu-devel@archiver.kernel.org; Thu, 25 Apr 2019 09:36:05 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:58766)
+	id 1hJeXo-0006Xo-TQ
+	for qemu-devel@archiver.kernel.org; Thu, 25 Apr 2019 09:36:08 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:58577)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1hJeKZ-0003o1-32
-	for qemu-devel@nongnu.org; Thu, 25 Apr 2019 09:22:28 -0400
+	(envelope-from <cohuck@redhat.com>) id 1hJeKB-0003U0-LP
+	for qemu-devel@nongnu.org; Thu, 25 Apr 2019 09:22:07 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1hJeKX-000459-I9
-	for qemu-devel@nongnu.org; Thu, 25 Apr 2019 09:22:27 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:60448)
+	(envelope-from <cohuck@redhat.com>) id 1hJeKA-0003oU-Dp
+	for qemu-devel@nongnu.org; Thu, 25 Apr 2019 09:22:03 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:3015)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <cohuck@redhat.com>)
-	id 1hJeKV-00042F-IS; Thu, 25 Apr 2019 09:22:25 -0400
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
-	[10.5.11.14])
+	id 1hJeKA-0003nd-5r; Thu, 25 Apr 2019 09:22:02 -0400
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+	[10.5.11.13])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 3E461308CEBF;
-	Thu, 25 Apr 2019 13:22:20 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id 6AA9A3158797;
+	Thu, 25 Apr 2019 13:22:01 +0000 (UTC)
 Received: from localhost (dhcp-192-187.str.redhat.com [10.33.192.187])
-	by smtp.corp.redhat.com (Postfix) with ESMTPS id 9A8975D9C5;
-	Thu, 25 Apr 2019 13:22:17 +0000 (UTC)
+	by smtp.corp.redhat.com (Postfix) with ESMTPS id D3AF11796F;
+	Thu, 25 Apr 2019 13:22:00 +0000 (UTC)
 From: Cornelia Huck <cohuck@redhat.com>
 To: Peter Maydell <peter.maydell@linaro.org>
-Date: Thu, 25 Apr 2019 15:21:33 +0200
-Message-Id: <20190425132134.2839-19-cohuck@redhat.com>
+Date: Thu, 25 Apr 2019 15:21:26 +0200
+Message-Id: <20190425132134.2839-12-cohuck@redhat.com>
 In-Reply-To: <20190425132134.2839-1-cohuck@redhat.com>
 References: <20190425132134.2839-1-cohuck@redhat.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.45]);
-	Thu, 25 Apr 2019 13:22:20 +0000 (UTC)
+	(mx1.redhat.com [10.5.110.41]);
+	Thu, 25 Apr 2019 13:22:01 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] [PULL 18/19] s390x/kvm: Configure page size after
- memory has actually been initialized
+Subject: [Qemu-devel] [PULL 11/19] s390-bios: Factor finding boot device out
+ of virtio code path
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -66,210 +66,188 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-s390x@nongnu.org, Cornelia Huck <cohuck@redhat.com>,
-	qemu-devel@nongnu.org, David Hildenbrand <david@redhat.com>
+Cc: "Jason J. Herne" <jjherne@linux.ibm.com>, qemu-s390x@nongnu.org,
+	qemu-devel@nongnu.org, Thomas Huth <thuth@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 Content-Type: text/plain; charset="UTF-8"
-Message-ID: <20190425132133.weBmln72V1sKAJMMAELpFR8VX7Uv7HXzVwS3EoPz4HI@z>
+Message-ID: <20190425132126.PQ_T8g9fFj2UFT87KI8tJQuG6EXXV1rNeNPkJfm4J28@z>
 
-From: David Hildenbrand <david@redhat.com>
+From: "Jason J. Herne" <jjherne@linux.ibm.com>
 
-Right now we configure the pagesize quite early, when initializing KVM.
-This is long before system memory is actually allocated via
-memory_region_allocate_system_memory(), and therefore memory backends
-marked as mapped.
+Make a new routine find_boot_device to locate the boot device for all
+cases, not just virtio.
 
-Instead, let's configure the maximum page size after initializing
-memory in s390_memory_init(). cap_hpage_1m is still properly
-configured before creating any CPUs, and therefore before configuring
-the CPU model and eventually enabling CMMA.
+The error message for the case where no boot device has been specified
+and a suitable boot device cannot be auto detected was specific to
+virtio devices. We update this message to remove virtio specific wording.
 
-This is not a fix but rather a preparation for the future, when initial
-memory might reside on memory backends (not the case for s390x right now)
-We will replace qemu_getrampagesize() soon by a function that will always
-return the maximum page size (not the minimum page size, which only
-works by pure luck so far, as there are no memory backends).
-
-Acked-by: Igor Mammedov <imammedo@redhat.com>
-Reviewed-by: David Gibson <david@gibson.dropbear.id.au>
-Signed-off-by: David Hildenbrand <david@redhat.com>
-Message-Id: <20190417113143.5551-2-david@redhat.com>
-Signed-off-by: Cornelia Huck <cohuck@redhat.com>
+Signed-off-by: Jason J. Herne <jjherne@linux.ibm.com>
+Reviewed-by: Farhan Ali <alifm@linux.ibm.com>
+Reviewed-by: Cornelia Huck <cohuck@redhat.com>
+Message-Id: <1554388475-18329-12-git-send-email-jjherne@linux.ibm.com>
+Signed-off-by: Thomas Huth <thuth@redhat.com>
 ---
- hw/s390x/s390-virtio-ccw.c | 12 ++++++++++++
- target/s390x/cpu.c         |  7 +++++++
- target/s390x/cpu.h         |  1 +
- target/s390x/kvm-stub.c    |  4 ++++
- target/s390x/kvm.c         | 35 ++++++++++++++---------------------
- target/s390x/kvm_s390x.h   |  1 +
- 6 files changed, 39 insertions(+), 21 deletions(-)
+ pc-bios/s390-ccw/main.c  | 85 ++++++++++++++++++++++------------------
+ tests/boot-serial-test.c |  2 +-
+ 2 files changed, 47 insertions(+), 40 deletions(-)
 
-diff --git a/hw/s390x/s390-virtio-ccw.c b/hw/s390x/s390-virtio-ccw.c
-index d11069b860b4..3be567965736 100644
---- a/hw/s390x/s390-virtio-ccw.c
-+++ b/hw/s390x/s390-virtio-ccw.c
-@@ -15,6 +15,7 @@
- #include "cpu.h"
- #include "hw/boards.h"
- #include "exec/address-spaces.h"
-+#include "exec/ram_addr.h"
- #include "hw/s390x/s390-virtio-hcall.h"
- #include "hw/s390x/sclp.h"
- #include "hw/s390x/s390_flic.h"
-@@ -163,6 +164,7 @@ static void s390_memory_init(ram_addr_t mem_size)
-     MemoryRegion *sysmem = get_system_memory();
-     ram_addr_t chunk, offset = 0;
-     unsigned int number = 0;
-+    Error *local_err = NULL;
-     gchar *name;
+diff --git a/pc-bios/s390-ccw/main.c b/pc-bios/s390-ccw/main.c
+index d04ea8972a0c..d3a161c68546 100644
+--- a/pc-bios/s390-ccw/main.c
++++ b/pc-bios/s390-ccw/main.c
+@@ -58,17 +58,18 @@ unsigned int get_loadparm_index(void)
+  * NOTE: The global variable blk_schid is updated to contain the subchannel
+  * information.
+  */
+-static bool find_dev(Schib *schib, int dev_no)
++static bool find_subch(int dev_no)
+ {
++    Schib schib;
+     int i, r;
  
-     /* allocate RAM for core */
-@@ -182,6 +184,15 @@ static void s390_memory_init(ram_addr_t mem_size)
+     for (i = 0; i < 0x10000; i++) {
+         blk_schid.sch_no = i;
+-        r = stsch_err(blk_schid, schib);
++        r = stsch_err(blk_schid, &schib);
+         if ((r == 3) || (r == -EIO)) {
+             break;
+         }
+-        if (!schib->pmcw.dnv) {
++        if (!schib.pmcw.dnv) {
+             continue;
+         }
+ 
+@@ -80,7 +81,7 @@ static bool find_dev(Schib *schib, int dev_no)
+             continue;
+         }
+ 
+-        if ((dev_no < 0) || (schib->pmcw.dev == dev_no)) {
++        if ((dev_no < 0) || (schib.pmcw.dev == dev_no)) {
+             return true;
+         }
      }
-     g_free(name);
- 
-+    /*
-+     * Configure the maximum page size. As no memory devices were created
-+     * yet, this is the page size of initial memory only.
-+     */
-+    s390_set_max_pagesize(qemu_getrampagesize(), &local_err);
-+    if (local_err) {
-+        error_report_err(local_err);
-+        exit(EXIT_FAILURE);
-+    }
-     /* Initialize storage key device */
-     s390_skeys_init();
-     /* Initialize storage attributes device */
-@@ -253,6 +264,7 @@ static void ccw_init(MachineState *machine)
-     DeviceState *dev;
- 
-     s390_sclp_init();
-+    /* init memory + setup max page size. Required for the CPU model */
-     s390_memory_init(machine->ram_size);
- 
-     /* init CPUs (incl. CPU model) early so s390_has_feature() works */
-diff --git a/target/s390x/cpu.c b/target/s390x/cpu.c
-index 698dd9cb82ab..b58ef0a8ef62 100644
---- a/target/s390x/cpu.c
-+++ b/target/s390x/cpu.c
-@@ -399,6 +399,13 @@ int s390_set_memory_limit(uint64_t new_limit, uint64_t *hw_limit)
-     return 0;
+@@ -136,56 +137,61 @@ static void boot_setup(void)
+     have_iplb = store_iplb(&iplb);
  }
  
-+void s390_set_max_pagesize(uint64_t pagesize, Error **errp)
-+{
-+    if (kvm_enabled()) {
-+        kvm_s390_set_max_pagesize(pagesize, errp);
+-static void virtio_setup(void)
++static void find_boot_device(void)
+ {
+-    Schib schib;
+-    int ssid;
+-    bool found = false;
+-    uint16_t dev_no;
+     VDev *vdev = virtio_get_device();
+-    QemuIplParameters *early_qipl = (QemuIplParameters *)QIPL_ADDRESS;
+-
+-    memcpy(&qipl, early_qipl, sizeof(QemuIplParameters));
++    int ssid;
++    bool found;
+ 
+-    if (have_iplb) {
+-        switch (iplb.pbt) {
+-        case S390_IPL_TYPE_CCW:
+-            dev_no = iplb.ccw.devno;
+-            debug_print_int("device no. ", dev_no);
+-            blk_schid.ssid = iplb.ccw.ssid & 0x3;
+-            debug_print_int("ssid ", blk_schid.ssid);
+-            found = find_dev(&schib, dev_no);
+-            break;
+-        case S390_IPL_TYPE_QEMU_SCSI:
+-            vdev->scsi_device_selected = true;
+-            vdev->selected_scsi_device.channel = iplb.scsi.channel;
+-            vdev->selected_scsi_device.target = iplb.scsi.target;
+-            vdev->selected_scsi_device.lun = iplb.scsi.lun;
+-            blk_schid.ssid = iplb.scsi.ssid & 0x3;
+-            found = find_dev(&schib, iplb.scsi.devno);
+-            break;
+-        default:
+-            panic("List-directed IPL not supported yet!\n");
+-        }
+-        menu_setup();
+-    } else {
++    if (!have_iplb) {
+         for (ssid = 0; ssid < 0x3; ssid++) {
+             blk_schid.ssid = ssid;
+-            found = find_dev(&schib, -1);
++            found = find_subch(-1);
+             if (found) {
+-                break;
++                return;
+             }
+         }
++        panic("Could not find a suitable boot device (none specified)\n");
 +    }
++
++    switch (iplb.pbt) {
++    case S390_IPL_TYPE_CCW:
++        debug_print_int("device no. ", iplb.ccw.devno);
++        blk_schid.ssid = iplb.ccw.ssid & 0x3;
++        debug_print_int("ssid ", blk_schid.ssid);
++        found = find_subch(iplb.ccw.devno);
++        break;
++    case S390_IPL_TYPE_QEMU_SCSI:
++        vdev->scsi_device_selected = true;
++        vdev->selected_scsi_device.channel = iplb.scsi.channel;
++        vdev->selected_scsi_device.target = iplb.scsi.target;
++        vdev->selected_scsi_device.lun = iplb.scsi.lun;
++        blk_schid.ssid = iplb.scsi.ssid & 0x3;
++        found = find_subch(iplb.scsi.devno);
++        break;
++    default:
++        panic("List-directed IPL not supported yet!\n");
+     }
+ 
+-    IPL_assert(found, "No virtio device found");
++    IPL_assert(found, "Boot device not found\n");
 +}
 +
- void s390_cmma_reset(void)
- {
-     if (kvm_enabled()) {
-diff --git a/target/s390x/cpu.h b/target/s390x/cpu.h
-index d8990c405a5d..7305cacc7b77 100644
---- a/target/s390x/cpu.h
-+++ b/target/s390x/cpu.h
-@@ -734,6 +734,7 @@ static inline void s390_do_cpu_load_normal(CPUState *cs, run_on_cpu_data arg)
- /* cpu.c */
- void s390_crypto_reset(void);
- int s390_set_memory_limit(uint64_t new_limit, uint64_t *hw_limit);
-+void s390_set_max_pagesize(uint64_t pagesize, Error **errp);
- void s390_cmma_reset(void);
- void s390_enable_css_support(S390CPU *cpu);
- int s390_assign_subch_ioeventfd(EventNotifier *notifier, uint32_t sch_id,
-diff --git a/target/s390x/kvm-stub.c b/target/s390x/kvm-stub.c
-index bf7795e47a1c..22b4514ca68c 100644
---- a/target/s390x/kvm-stub.c
-+++ b/target/s390x/kvm-stub.c
-@@ -93,6 +93,10 @@ int kvm_s390_set_mem_limit(uint64_t new_limit, uint64_t *hw_limit)
-     return 0;
- }
- 
-+void kvm_s390_set_max_pagesize(uint64_t pagesize, Error **errp)
++static void virtio_setup(void)
 +{
-+}
++    VDev *vdev = virtio_get_device();
++    QemuIplParameters *early_qipl = (QemuIplParameters *)QIPL_ADDRESS;
 +
- void kvm_s390_crypto_reset(void)
- {
- }
-diff --git a/target/s390x/kvm.c b/target/s390x/kvm.c
-index 2c6e35b5aafe..7df7be4a1bdc 100644
---- a/target/s390x/kvm.c
-+++ b/target/s390x/kvm.c
-@@ -283,44 +283,37 @@ void kvm_s390_crypto_reset(void)
-     }
- }
++    memcpy(&qipl, early_qipl, sizeof(QemuIplParameters));
++
++    if (have_iplb) {
++        menu_setup();
++    }
  
--static int kvm_s390_configure_mempath_backing(KVMState *s)
-+void kvm_s390_set_max_pagesize(uint64_t pagesize, Error **errp)
- {
--    size_t path_psize = qemu_getrampagesize();
+     if (virtio_get_device_type() == VIRTIO_ID_NET) {
+         sclp_print("Network boot device detected\n");
+         vdev->netboot_start_addr = qipl.netboot_start_addr;
+     } else {
+         virtio_blk_setup_device(blk_schid);
 -
--    if (path_psize == 4 * KiB) {
--        return 0;
-+    if (pagesize == 4 * KiB) {
-+        return;
+         IPL_assert(virtio_ipl_disk_is_valid(), "No valid IPL device detected");
      }
- 
-     if (!hpage_1m_allowed()) {
--        error_report("This QEMU machine does not support huge page "
--                     "mappings");
--        return -EINVAL;
-+        error_setg(errp, "This QEMU machine does not support huge page "
-+                   "mappings");
-+        return;
-     }
- 
--    if (path_psize != 1 * MiB) {
--        error_report("Memory backing with 2G pages was specified, "
--                     "but KVM does not support this memory backing");
--        return -EINVAL;
-+    if (pagesize != 1 * MiB) {
-+        error_setg(errp, "Memory backing with 2G pages was specified, "
-+                   "but KVM does not support this memory backing");
-+        return;
-     }
- 
--    if (kvm_vm_enable_cap(s, KVM_CAP_S390_HPAGE_1M, 0)) {
--        error_report("Memory backing with 1M pages was specified, "
--                     "but KVM does not support this memory backing");
--        return -EINVAL;
-+    if (kvm_vm_enable_cap(kvm_state, KVM_CAP_S390_HPAGE_1M, 0)) {
-+        error_setg(errp, "Memory backing with 1M pages was specified, "
-+                   "but KVM does not support this memory backing");
-+        return;
-     }
- 
-     cap_hpage_1m = 1;
--    return 0;
  }
+@@ -195,8 +201,9 @@ int main(void)
+     sclp_setup();
+     css_setup();
+     boot_setup();
+-    virtio_setup();
++    find_boot_device();
  
- int kvm_arch_init(MachineState *ms, KVMState *s)
- {
-     MachineClass *mc = MACHINE_GET_CLASS(ms);
++    virtio_setup();
+     zipl_load(); /* no return */
  
--    if (kvm_s390_configure_mempath_backing(s)) {
--        return -EINVAL;
--    }
--
-     mc->default_cpu_type = S390_CPU_TYPE_NAME("host");
-     cap_sync_regs = kvm_check_extension(s, KVM_CAP_SYNC_REGS);
-     cap_async_pf = kvm_check_extension(s, KVM_CAP_ASYNC_PF);
-diff --git a/target/s390x/kvm_s390x.h b/target/s390x/kvm_s390x.h
-index 6e52287da3f0..caf985955ba5 100644
---- a/target/s390x/kvm_s390x.h
-+++ b/target/s390x/kvm_s390x.h
-@@ -36,6 +36,7 @@ int kvm_s390_cmma_active(void);
- void kvm_s390_cmma_reset(void);
- void kvm_s390_reset_vcpu(S390CPU *cpu);
- int kvm_s390_set_mem_limit(uint64_t new_limit, uint64_t *hw_limit);
-+void kvm_s390_set_max_pagesize(uint64_t pagesize, Error **errp);
- void kvm_s390_crypto_reset(void);
- void kvm_s390_restart_interrupt(S390CPU *cpu);
- void kvm_s390_stop_interrupt(S390CPU *cpu);
+     panic("Failed to load OS from hard disk\n");
+diff --git a/tests/boot-serial-test.c b/tests/boot-serial-test.c
+index c591748aaf00..24852d4c7d0b 100644
+--- a/tests/boot-serial-test.c
++++ b/tests/boot-serial-test.c
+@@ -114,7 +114,7 @@ static testdef_t tests[] = {
+     { "sparc", "SS-4", "", "MB86904" },
+     { "sparc", "SS-600MP", "", "TMS390Z55" },
+     { "sparc64", "sun4u", "", "UltraSPARC" },
+-    { "s390x", "s390-ccw-virtio", "", "virtio device" },
++    { "s390x", "s390-ccw-virtio", "", "device" },
+     { "m68k", "mcf5208evb", "", "TT", sizeof(kernel_mcf5208), kernel_mcf5208 },
+     { "microblaze", "petalogix-s3adsp1800", "", "TT",
+       sizeof(kernel_pls3adsp1800), kernel_pls3adsp1800 },
 -- 
 2.17.2
 
