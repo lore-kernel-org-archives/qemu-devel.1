@@ -1,24 +1,24 @@
-Received: from eggs.gnu.org ([209.51.188.92]:60549)
+Received: from eggs.gnu.org ([209.51.188.92]:60601)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <arilou@gmail.com>) id 1hJePk-0008Mi-VP
-	for qemu-devel@nongnu.org; Thu, 25 Apr 2019 09:27:49 -0400
+	(envelope-from <arilou@gmail.com>) id 1hJePo-0008Rw-VL
+	for qemu-devel@nongnu.org; Thu, 25 Apr 2019 09:27:53 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <arilou@gmail.com>) id 1hJePj-00016q-UA
-	for qemu-devel@nongnu.org; Thu, 25 Apr 2019 09:27:48 -0400
-Received: from mail-wm1-x344.google.com ([2a00:1450:4864:20::344]:38318)
+	(envelope-from <arilou@gmail.com>) id 1hJePn-0001Ek-QX
+	for qemu-devel@nongnu.org; Thu, 25 Apr 2019 09:27:52 -0400
+Received: from mail-wm1-x342.google.com ([2a00:1450:4864:20::342]:54428)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <arilou@gmail.com>) id 1hJePj-00015o-NU
-	for qemu-devel@nongnu.org; Thu, 25 Apr 2019 09:27:47 -0400
-Received: by mail-wm1-x344.google.com with SMTP id w15so263317wmc.3
-	for <qemu-devel@nongnu.org>; Thu, 25 Apr 2019 06:27:47 -0700 (PDT)
+	(Exim 4.71) (envelope-from <arilou@gmail.com>) id 1hJePn-0001B3-KH
+	for qemu-devel@nongnu.org; Thu, 25 Apr 2019 09:27:51 -0400
+Received: by mail-wm1-x342.google.com with SMTP id c1so9273123wml.4
+	for <qemu-devel@nongnu.org>; Thu, 25 Apr 2019 06:27:51 -0700 (PDT)
 From: Jon Doron <arilou@gmail.com>
-Date: Thu, 25 Apr 2019 16:26:26 +0300
-Message-Id: <20190425132636.31636-12-arilou@gmail.com>
+Date: Thu, 25 Apr 2019 16:26:27 +0300
+Message-Id: <20190425132636.31636-13-arilou@gmail.com>
 In-Reply-To: <20190425132636.31636-1-arilou@gmail.com>
 References: <20190425132636.31636-1-arilou@gmail.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH v6 11/21] gdbstub: Implement write memory (M
+Subject: [Qemu-devel] [PATCH v6 12/21] gdbstub: Implement read memory (m
  pkt) with new infra
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
@@ -33,77 +33,74 @@ Cc: Jon Doron <arilou@gmail.com>
 
 Signed-off-by: Jon Doron <arilou@gmail.com>
 ---
- gdbstub.c | 51 +++++++++++++++++++++++++++++++++------------------
- 1 file changed, 33 insertions(+), 18 deletions(-)
+ gdbstub.c | 48 ++++++++++++++++++++++++++++++++----------------
+ 1 file changed, 32 insertions(+), 16 deletions(-)
 
 diff --git a/gdbstub.c b/gdbstub.c
-index c439b8e796..4522c93fa2 100644
+index 4522c93fa2..5b60c1369c 100644
 --- a/gdbstub.c
 +++ b/gdbstub.c
-@@ -1686,6 +1686,31 @@ static void handle_get_reg(GdbCmdContext *gdb_ctx, void *user_ctx)
-     put_packet(gdb_ctx->s, gdb_ctx->str_buf);
+@@ -1711,6 +1711,30 @@ static void handle_write_mem(GdbCmdContext *gdb_ctx, void *user_ctx)
+     put_packet(gdb_ctx->s, "OK");
  }
  
-+static void handle_write_mem(GdbCmdContext *gdb_ctx, void *user_ctx)
++static void handle_read_mem(GdbCmdContext *gdb_ctx, void *user_ctx)
 +{
-+    if (gdb_ctx->num_params < 3) {
++    if (gdb_ctx->num_params < 2) {
 +        put_packet(gdb_ctx->s, "E22");
 +        return;
 +    }
 +
-+    /* hextomem() reads 2*len bytes */
-+    if (gdb_ctx->params[1].val_ull > strlen(gdb_ctx->params[2].data) / 2) {
++    /* memtohex() doubles the required space */
++    if (gdb_ctx->params[1].val_ull > MAX_PACKET_LENGTH / 2) {
 +        put_packet(gdb_ctx->s, "E22");
 +        return;
 +    }
 +
-+    hextomem(gdb_ctx->mem_buf, gdb_ctx->params[2].data,
-+             gdb_ctx->params[1].val_ull);
 +    if (target_memory_rw_debug(gdb_ctx->s->g_cpu, gdb_ctx->params[0].val_ull,
 +                               gdb_ctx->mem_buf,
-+                               gdb_ctx->params[1].val_ull, true)) {
++                               gdb_ctx->params[1].val_ull, false)) {
 +        put_packet(gdb_ctx->s, "E14");
 +        return;
 +    }
 +
-+    put_packet(gdb_ctx->s, "OK");
++    memtohex(gdb_ctx->str_buf, gdb_ctx->mem_buf, gdb_ctx->params[1].val_ull);
++    put_packet(gdb_ctx->s, gdb_ctx->str_buf);
 +}
 +
  static int gdb_handle_packet(GDBState *s, const char *line_buf)
  {
      CPUState *cpu;
-@@ -1894,24 +1919,14 @@ static int gdb_handle_packet(GDBState *s, const char *line_buf)
-         }
+@@ -1900,22 +1924,14 @@ static int gdb_handle_packet(GDBState *s, const char *line_buf)
+         put_packet(s, "OK");
          break;
-     case 'M':
+     case 'm':
 -        addr = strtoull(p, (char **)&p, 16);
 -        if (*p == ',')
 -            p++;
--        len = strtoull(p, (char **)&p, 16);
--        if (*p == ':')
--            p++;
+-        len = strtoull(p, NULL, 16);
 -
--        /* hextomem() reads 2*len bytes */
--        if (len > strlen(p) / 2) {
+-        /* memtohex() doubles the required space */
+-        if (len > MAX_PACKET_LENGTH / 2) {
 -            put_packet (s, "E22");
 -            break;
 -        }
--        hextomem(mem_buf, p, len);
--        if (target_memory_rw_debug(s->g_cpu, addr, mem_buf, len,
--                                   true) != 0) {
--            put_packet(s, "E14");
+-
+-        if (target_memory_rw_debug(s->g_cpu, addr, mem_buf, len, false) != 0) {
+-            put_packet (s, "E14");
 -        } else {
--            put_packet(s, "OK");
+-            memtohex(buf, mem_buf, len);
+-            put_packet(s, buf);
 +        {
-+            static const GdbCmdParseEntry write_mem_cmd_desc = {
-+                .handler = handle_write_mem,
-+                .cmd = "M",
++            static const GdbCmdParseEntry read_mem_cmd_desc = {
++                .handler = handle_read_mem,
++                .cmd = "m",
 +                .cmd_startswith = 1,
-+                .schema = "L,L:s0"
++                .schema = "L,L0"
 +            };
-+            cmd_parser = &write_mem_cmd_desc;
++            cmd_parser = &read_mem_cmd_desc;
          }
          break;
-     case 'p':
+     case 'M':
 -- 
 2.20.1
