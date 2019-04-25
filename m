@@ -1,28 +1,26 @@
-Received: from eggs.gnu.org ([209.51.188.92]:54523)
+Received: from eggs.gnu.org ([209.51.188.92]:54591)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <lersek@redhat.com>) id 1hJbyr-0003GZ-Nc
-	for qemu-devel@nongnu.org; Thu, 25 Apr 2019 06:51:54 -0400
+	(envelope-from <imammedo@redhat.com>) id 1hJbyw-0003JP-OY
+	for qemu-devel@nongnu.org; Thu, 25 Apr 2019 06:51:59 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <lersek@redhat.com>) id 1hJbqo-0000It-17
-	for qemu-devel@nongnu.org; Thu, 25 Apr 2019 06:43:35 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:41756)
+	(envelope-from <imammedo@redhat.com>) id 1hJblh-0001np-Pa
+	for qemu-devel@nongnu.org; Thu, 25 Apr 2019 06:38:19 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:50682)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <lersek@redhat.com>) id 1hJbqn-0000I6-Qa
-	for qemu-devel@nongnu.org; Thu, 25 Apr 2019 06:43:33 -0400
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
-	[10.5.11.14])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 94F778E5A1
-	for <qemu-devel@nongnu.org>; Thu, 25 Apr 2019 10:43:32 +0000 (UTC)
-From: Laszlo Ersek <lersek@redhat.com>
-Date: Thu, 25 Apr 2019 12:43:24 +0200
-Message-Id: <20190425104326.12835-1-lersek@redhat.com>
+	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1hJblf-0001kp-QS
+	for qemu-devel@nongnu.org; Thu, 25 Apr 2019 06:38:17 -0400
+Date: Thu, 25 Apr 2019 12:38:03 +0200
+From: Igor Mammedov <imammedo@redhat.com>
+Message-ID: <20190425123803.00bbb86d@redhat.com>
+In-Reply-To: <20190425073142.GA24829@richard>
+References: <1556170489-131927-1-git-send-email-imammedo@redhat.com>
+	<1556170489-131927-4-git-send-email-imammedo@redhat.com>
+	<20190425073142.GA24829@richard>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH 0/2] tests/uefi-test-tools: report the SMBIOS
- entry point structures
+Subject: Re: [Qemu-devel] [PATCH v3 03/13] tests: acpi: make pointer to RSDP
+ 64bit
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,54 +29,74 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu devel list <qemu-devel@nongnu.org>
-Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>, Igor Mammedov <imammedo@redhat.com>
+To: Wei Yang <richardw.yang@linux.intel.com>
+Cc: qemu-devel@nongnu.org, Laszlo Ersek <lersek@redhat.com>, "Michael S.
+	Tsirkin" <mst@redhat.com>, Gonglei <arei.gonglei@huawei.com>, Philippe =?UTF-8?B?TWF0aGlldS1EYXVkw6k=?= <philmd@redhat.com>, Shannon Zhao <shannon.zhaosl@gmail.com>, Andrew Jones <drjones@redhat.com>, Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>, Ben Warren <ben@skyportsystems.com>
 
-Repo:      https://github.com/lersek/qemu.git
-Branch:    smbios_lp_1821884
-Launchpad: https://bugs.launchpad.net/qemu/+bug/1821884
+On Thu, 25 Apr 2019 15:31:42 +0800
+Wei Yang <richardw.yang@linux.intel.com> wrote:
 
-In
+> On Thu, Apr 25, 2019 at 07:34:39AM +0200, Igor Mammedov wrote:
+> >In case of UEFI, RSDP doesn't have to be located in lowmem,
+> >it could be placed at any address. Make sure that test won't
+> >break if it is placed above the first 4Gb of address space.
+> >
+> >PS:
+> >While at it cleanup some local variables as we don't really
+> >need them.
+> >
+> >Signed-off-by: Igor Mammedov <imammedo@redhat.com>
+> >Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+> >---
+> >v2:
+> >  - s/In case of UEFI/In case of UEFI,/ (Laszlo Ersek <lersek@redhat.com=
+>)
+> >---
+> > tests/bios-tables-test.c | 10 ++++------
+> > 1 file changed, 4 insertions(+), 6 deletions(-)
+> >
+> >diff --git a/tests/bios-tables-test.c b/tests/bios-tables-test.c
+> >index 2ee044c..c29dcf4 100644
+> >--- a/tests/bios-tables-test.c
+> >+++ b/tests/bios-tables-test.c
+> >@@ -26,7 +26,7 @@
+> > typedef struct {
+> >     const char *machine;
+> >     const char *variant;
+> >-    uint32_t rsdp_addr;
+> >+    uint64_t rsdp_addr;
+> >     uint8_t rsdp_table[36 /* ACPI 2.0+ RSDP size */];
+> >     GArray *tables;
+> >     uint32_t smbios_ep_addr;
+> >@@ -86,13 +86,11 @@ static void test_acpi_rsdp_address(test_data *data)
+> >=20
+> > static void test_acpi_rsdp_table(test_data *data)
+> > {
+> >-    uint8_t *rsdp_table =3D data->rsdp_table, revision;
+> >-    uint32_t addr =3D data->rsdp_addr;
+> >+    uint8_t *rsdp_table =3D data->rsdp_table;
+> >=20
+> >-    acpi_fetch_rsdp_table(data->qts, addr, rsdp_table);
+> >-    revision =3D rsdp_table[15 /* Revision offset */];
+> >+    acpi_fetch_rsdp_table(data->qts, data->rsdp_addr, rsdp_table); =20
+>=20
+> Ok, I think this is the reason you change the second parameter from uint3=
+2_t
+> to uint64_t in 1st patch.
+>=20
+> Maybe we need to move that on to this one?
+Sure.
+There is one additional path to make 64-bit table pointers support a bit mo=
+re complete.
+I'll respin series once travis build passes.
 
-  [Qemu-devel] [PATCH for 4.1 v2 09/13]
-  tests: acpi: ignore SMBIOS tests when UEFI firmware is used
-
-at
-
-  http://mid.mail-archive.com/1553605799-168605-10-git-send-email-imammed=
-o@redhat.com
-  https://lists.gnu.org/archive/html/qemu-devel/2019-03/msg07037.html
-
-Igor had to temporarily exclude SMBIOS unit testing with UEFI guests.
-
-Let the BiosTablesTest guest UEFI app report the SMBIOS entry point(s),
-so that SMBIOS unit tests can cover UEFI guests.
-
-Cc: "Philippe Mathieu-Daud=C3=A9" <philmd@redhat.com>
-Cc: Igor Mammedov <imammedo@redhat.com>
-
-Thanks
-Laszlo
-
-Laszlo Ersek (2):
-  tests/uefi-test-tools: report the SMBIOS entry point structures
-  tests/uefi-boot-images: report the SMBIOS entry point structures
-
- tests/uefi-test-tools/UefiTestToolsPkg/Include/Guid/BiosTablesTest.h    =
- |  25 +++++++++++++++-----
- tests/uefi-test-tools/UefiTestToolsPkg/BiosTablesTest/BiosTablesTest.inf=
- |   2 ++
- tests/uefi-test-tools/UefiTestToolsPkg/BiosTablesTest/BiosTablesTest.c  =
- |  23 ++++++++++++++----
- tests/data/uefi-boot-images/bios-tables-test.aarch64.iso.qcow2          =
- | Bin 11776 -> 12288 bytes
- tests/data/uefi-boot-images/bios-tables-test.arm.iso.qcow2              =
- | Bin 11776 -> 11776 bytes
- tests/data/uefi-boot-images/bios-tables-test.i386.iso.qcow2             =
- | Bin 12800 -> 13312 bytes
- tests/data/uefi-boot-images/bios-tables-test.x86_64.iso.qcow2           =
- | Bin 13312 -> 13312 bytes
- 7 files changed, 40 insertions(+), 10 deletions(-)
-
---=20
-2.19.1.3.g30247aa5d201
+=20
+> >=20
+> >-    switch (revision) {
+> >+    switch (rsdp_table[15 /* Revision offset */]) {
+> >     case 0: /* ACPI 1.0 RSDP */
+> >         /* With rev 1, checksum is only for the first 20 bytes */
+> >         g_assert(!acpi_calc_checksum(rsdp_table,  20));
+> >--=20
+> >2.7.4 =20
+>=20
