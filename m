@@ -2,110 +2,63 @@ Return-Path: <SRS0=VSQP=S3=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-6.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E69CBC10F03
-	for <qemu-devel@archiver.kernel.org>; Thu, 25 Apr 2019 10:29:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B57F0C10F03
+	for <qemu-devel@archiver.kernel.org>; Thu, 25 Apr 2019 10:53:49 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B6DC72084B
-	for <qemu-devel@archiver.kernel.org>; Thu, 25 Apr 2019 10:29:55 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B6DC72084B
+	by mail.kernel.org (Postfix) with ESMTPS id 8872A217D7
+	for <qemu-devel@archiver.kernel.org>; Thu, 25 Apr 2019 10:53:49 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8872A217D7
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:54951 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:55172 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hJbdb-0006oi-0a
-	for qemu-devel@archiver.kernel.org; Thu, 25 Apr 2019 06:29:55 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:50855)
+	id 1hJc0i-0004bZ-Iv
+	for qemu-devel@archiver.kernel.org; Thu, 25 Apr 2019 06:53:48 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:54686)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1hJbcm-0006Uf-1R
-	for qemu-devel@nongnu.org; Thu, 25 Apr 2019 06:29:05 -0400
+	(envelope-from <lersek@redhat.com>) id 1hJbyr-0003TK-36
+	for qemu-devel@nongnu.org; Thu, 25 Apr 2019 06:51:54 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1hJbcj-0000rv-AG
-	for qemu-devel@nongnu.org; Thu, 25 Apr 2019 06:29:02 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:42066)
+	(envelope-from <lersek@redhat.com>) id 1hJbqs-0000SQ-Mn
+	for qemu-devel@nongnu.org; Thu, 25 Apr 2019 06:43:39 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:46236)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <thuth@redhat.com>)
-	id 1hJbcW-0000dV-Pr; Thu, 25 Apr 2019 06:28:49 -0400
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
-	[10.5.11.15])
+	(Exim 4.71) (envelope-from <lersek@redhat.com>) id 1hJbqs-0000QT-HW
+	for qemu-devel@nongnu.org; Thu, 25 Apr 2019 06:43:38 -0400
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+	[10.5.11.14])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id D87ED2DC34D;
-	Thu, 25 Apr 2019 10:28:45 +0000 (UTC)
-Received: from thuth.remote.csb (ovpn-116-68.ams2.redhat.com [10.36.116.68])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id 300375D719;
-	Thu, 25 Apr 2019 10:28:40 +0000 (UTC)
-To: Christophe Fergeau <cfergeau@redhat.com>, qemu-devel@nongnu.org,
-	Markus Armbruster <armbru@redhat.com>
-References: <20190131164614.19209-1-cfergeau@redhat.com>
-	<20190131164614.19209-2-cfergeau@redhat.com>
-From: Thomas Huth <thuth@redhat.com>
-Openpgp: preference=signencrypt
-Autocrypt: addr=thuth@redhat.com; keydata=
-	xsFNBFH7eUwBEACzyOXKU+5Pcs6wNpKzrlJwzRl3VGZt95VCdb+FgoU9g11m7FWcOafrVRwU
-	yYkTm9+7zBUc0sW5AuPGR/dp3pSLX/yFWsA/UB4nJsHqgDvDU7BImSeiTrnpMOTXb7Arw2a2
-	4CflIyFqjCpfDM4MuTmzTjXq4Uov1giGE9X6viNo1pxyEpd7PanlKNnf4PqEQp06X4IgUacW
-	tSGj6Gcns1bCuHV8OPWLkf4hkRnu8hdL6i60Yxz4E6TqlrpxsfYwLXgEeswPHOA6Mn4Cso9O
-	0lewVYfFfsmokfAVMKWzOl1Sr0KGI5T9CpmRfAiSHpthhHWnECcJFwl72NTi6kUcUzG4se81
-	O6n9d/kTj7pzTmBdfwuOZ0YUSqcqs0W+l1NcASSYZQaDoD3/SLk+nqVeCBB4OnYOGhgmIHNW
-	0CwMRO/GK+20alxzk//V9GmIM2ACElbfF8+Uug3pqiHkVnKqM7W9/S1NH2qmxB6zMiJUHlTH
-	gnVeZX0dgH27mzstcF786uPcdEqS0KJuxh2kk5IvUSL3Qn3ZgmgdxBMyCPciD/1cb7/Ahazr
-	3ThHQXSHXkH/aDXdfLsKVuwDzHLVSkdSnZdt5HHh75/NFHxwaTlydgfHmFFwodK8y/TjyiGZ
-	zg2Kje38xnz8zKn9iesFBCcONXS7txENTzX0z80WKBhK+XSFJwARAQABzRxUaG9tYXMgSHV0
-	aCA8dGguaHV0aEBnbXguZGU+wsF7BBMBAgAlAhsDBgsJCAcDAgYVCAIJCgsEFgIDAQIeAQIX
-	gAUCUfuWKwIZAQAKCRAu2dd0/nAttbe/EACb9hafyOb2FmhUqeAiBORSsUifFacQ7laVjcgR
-	I4um8CSHvxijYftpkM2EdAtmXIKgbNDpQoXcWLXB9lu9mLgTO4DVT00TRR65ikn3FCWcyT74
-	ENTOzRKyKLsDCjhXKPblTPIQbYAUCOWElcyAPm0ERd62fA/rKNxgIiNo/l4UODOMoOJm2/Ox
-	ZoTckW68Eqv7k9L7m7j+Hn3hoDTjAmcCBJt+j7pOhzWvCbqoNOIH8C8qvPaNlrba+R/K6jkO
-	6jZkTbYQpGIofEQJ/TNn38IsNGpI1ALTHWFtoMxp3j2Imz0REO6dRE2fHRN8sVlHgkoeGhmY
-	NbDsDE1jFQOEObFnu0euk//7BXU7tGOHckVAZ8T1smiRPHfQU7UEH2a/grndxJ+PNeM5w7n2
-	l+FN3cf2KgPotCK2s9MjSdZA7C5e3rFYO8lqiqTJKvc62vqp3e7B0Kjyy5/QtzSOejBij2QL
-	xkKSFNtxIz4MtuxN8e3IDQNxsKry3nF7R4MDvouXlMo6wP9KuyNWb+vFJt9GtbgfDMIFVamp
-	ZfhEWzWRJH4VgksENA4K/BzjEHCcbTUb1TFsiB1VRnBPJ0SqlvifnfKk6HcpkDk6Pg8Q5FOJ
-	gbNHrdgXsm+m/9GF2zUUr+rOlhVbK23TUqKqPfwnD7uxjpakVcJnsVCFqJpZi1F/ga9IN87B
-	TQRR+3lMARAAtp831HniPHb9AuKq3wj83ujZK8lH5RLrfVsB4X1wi47bwo56BqhXpR/zxPTR
-	eOFT0gnbw9UkphVc7uk/alnXMDEmgvnuxv89PwIQX6k3qLABeV7ykJQG/WT5HQ6+2DdGtVw3
-	2vjYAPiWQeETsgWRRQMDR0/hwp8s8tL/UodwYCScH6Vxx9pdy353L1fK4Bb9G73a+9FPjp9l
-	x+WwKTsltVqSBuSjyZQ3c3EE8qbTidXZxB38JwARH8yN3TX+t65cbBqLl/zRUUUTapHQpUEd
-	yoAsHIml32e4q+3xdLtTdlLi7FgPBItSazcqZPjEcYW73UAuLcmQmfJlQ5PkDiuqcitn+KzH
-	/1pqsTU7QFZjbmSMJyXY0TDErOFuMOjf20b6arcpEqse1V3IKrb+nqqA2azboRm3pEANLAJw
-	iVTwK3qwGRgK5ut6N/Znv20VEHkFUsRAZoOusrIRfR5HFDxlXguAdEz8M/hxXFYYXqOoaCYy
-	6pJxTjy0Y/tIfmS/g9Bnp8qg9wsrsnk0+XRnDVPak++G3Uq9tJPwpJbyO0vcqEI3vAXkAB7X
-	VXLzvFwi66RrsPUoDkuzj+aCNumtOePDOCpXQGPpKl+l1aYRMN/+lNSk3+1sVuc2C07WnYyE
-	gV/cbEVklPmKrNwu6DeUyD0qI/bVzKMWZAiB1r56hsGeyYcAEQEAAcLBXwQYAQIACQUCUft5
-	TAIbDAAKCRAu2dd0/nAttYTwEACLAS/THRqXRKb17PQmKwZHerUvZm2klo+lwQ3wNQBHUJAT
-	p2R9ULexyXrJPqjUpy7+voz+FcKiuQBTKyieiIxO46oMxsbXGZ70o3gxjxdYdgimUD6U8PPd
-	JH8tfAL4BR5FZNjspcnscN2jgbF4OrpDeOLyBaj6HPmElNPtECHWCaf1xbIFsZxSDGMA6cUh
-	0uX3Q8VI7JN1AR2cfiIRY7NrIlWYucJxyKjO3ivWm69nCtsHiJ0wcF8KlVo7F2eLaufo0K8A
-	ynL8SHMF3VEyxsXOP2f1UR9T2Ur30MXcTBpjUxml1TX3RWY5uH89Js/jlIugBwuAmacJ7JYh
-	lTg6sF/GNc4nPb4kk2yktNWTade+TzsllYlJPaorD2Qe8qX0iFUhFC6y9+O6mP4ZvWoYapp9
-	ezYNuebMgEr93ob1+4sFg3812wNP01WqsGtWCJHnPv/JoonFdMzD/bIkXGEJMk6ks2kxQQZq
-	g6Ik/s/vxOfao/xCn8nHt7GwvVy41795hzK6tbSl+BuyCRp0vfPRP34OnK7+jR2nvQpJu/pU
-	rCELuGwT9hsYkUPjVd4lfylN3mzEc6iAv/wwjsc0DRTSQCpXT3v2ymTAsRKrVaEZLibTXaf+
-	WslxWek3xNYRiqwwWAJuL652eAlxUgQ5ZS+fXBRTiQpJ+F26I/2lccScRd9G5w==
-Organization: Red Hat
-Message-ID: <42cbc07b-6525-ef95-69be-14786554b76b@redhat.com>
-Date: Thu, 25 Apr 2019 12:28:39 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
-	Thunderbird/60.6.1
+	by mx1.redhat.com (Postfix) with ESMTPS id CD77CC0528AC
+	for <qemu-devel@nongnu.org>; Thu, 25 Apr 2019 10:43:37 +0000 (UTC)
+Received: from lacos-laptop-7.usersys.redhat.com (ovpn-120-105.rdu2.redhat.com
+	[10.10.120.105])
+	by smtp.corp.redhat.com (Postfix) with ESMTP id A16FC5D9C5;
+	Thu, 25 Apr 2019 10:43:35 +0000 (UTC)
+From: Laszlo Ersek <lersek@redhat.com>
+To: qemu devel list <qemu-devel@nongnu.org>
+Date: Thu, 25 Apr 2019 12:43:26 +0200
+Message-Id: <20190425104326.12835-3-lersek@redhat.com>
+In-Reply-To: <20190425104326.12835-1-lersek@redhat.com>
+References: <20190425104326.12835-1-lersek@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20190131164614.19209-2-cfergeau@redhat.com>
 Content-Type: text/plain; charset="UTF-8"
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.29]);
-	Thu, 25 Apr 2019 10:28:45 +0000 (UTC)
+	(mx1.redhat.com [10.5.110.31]);
+	Thu, 25 Apr 2019 10:43:37 +0000 (UTC)
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH v7 1/2] qemu-io: Use error_[gs]et_progname()
+Subject: [Qemu-devel] [PATCH 2/2] tests/uefi-boot-images: report the SMBIOS
+ entry point structures
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -117,44 +70,55 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Qemu-block <qemu-block@nongnu.org>, Stefan Hajnoczi <stefanha@redhat.com>
+Cc: Igor Mammedov <imammedo@redhat.com>,
+	=?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190425102839.H80_RGn4fxmzY5iW_8DVLv-bXULveKDFc6CPtMqS3Ig@z>
+Message-ID: <20190425104326.hTZrRz0BOf2_ncU3prJmxQI8qp_z7-x7rpgNiiYfWLc@z>
 
-On 31/01/2019 17.46, Christophe Fergeau wrote:
-> qemu-io reimplements itself what
-> error_get_progname()/error_set_progname() already does.
-> This commit switches it to use this API from qemu-error.h
-> 
-> Signed-off-by: Christophe Fergeau <cfergeau@redhat.com>
-> Reviewed-by: Eric Blake <eblake@redhat.com>
-> Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
+Rebuild the "bios-tables-test" UEFI boot images with the SMBIOS entry
+point reporting that has been added in the previous patch.
 
-This patch causes some qemu-iotests to fail now, e.g.:
+Cc: "Philippe Mathieu-Daud=C3=A9" <philmd@redhat.com>
+Cc: Igor Mammedov <imammedo@redhat.com>
+Launchpad: https://bugs.launchpad.net/qemu/+bug/1821884
+Signed-off-by: Laszlo Ersek <lersek@redhat.com>
+---
+ tests/data/uefi-boot-images/bios-tables-test.aarch64.iso.qcow2 | Bin 117=
+76 -> 12288 bytes
+ tests/data/uefi-boot-images/bios-tables-test.arm.iso.qcow2     | Bin 117=
+76 -> 11776 bytes
+ tests/data/uefi-boot-images/bios-tables-test.i386.iso.qcow2    | Bin 128=
+00 -> 13312 bytes
+ tests/data/uefi-boot-images/bios-tables-test.x86_64.iso.qcow2  | Bin 133=
+12 -> 13312 bytes
+ 4 files changed, 0 insertions(+), 0 deletions(-)
 
-cd tests/qemu-iotests
-./check -qcow2 114
-[...]
-114 0s ... - output mismatch (see 114.out.bad)
---- /home/thuth/devel/qemu/tests/qemu-iotests/114.out	2019-04-23
-16:43:12.000000000 +0200
-+++ /home/thuth/tmp/qemu-build/tests/qemu-iotests/114.out.bad	2019-04-25
-12:27:47.000000000 +0200
-@@ -7,7 +7,7 @@
- cluster_size: 65536
- backing file: TEST_DIR/t.IMGFMT.base
- backing file format: foo
--can't open device TEST_DIR/t.qcow2: Could not open backing file:
-Unknown driver 'foo'
-+qemu-io: can't open device TEST_DIR/t.qcow2: Could not open backing
-file: Unknown driver 'foo'
- no file open, try 'help open'
- read 4096/4096 bytes at offset 0
- 4 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+diff --git a/tests/data/uefi-boot-images/bios-tables-test.aarch64.iso.qco=
+w2 b/tests/data/uefi-boot-images/bios-tables-test.aarch64.iso.qcow2
+index ac0b7b1b8f89..d588cf3ebd7d 100644
+Binary files a/tests/data/uefi-boot-images/bios-tables-test.aarch64.iso.q=
+cow2 and b/tests/data/uefi-boot-images/bios-tables-test.aarch64.iso.qcow2=
+ differ
+diff --git a/tests/data/uefi-boot-images/bios-tables-test.arm.iso.qcow2 b=
+/tests/data/uefi-boot-images/bios-tables-test.arm.iso.qcow2
+index d20fa7c81925..552c7a7ddce6 100644
+Binary files a/tests/data/uefi-boot-images/bios-tables-test.arm.iso.qcow2=
+ and b/tests/data/uefi-boot-images/bios-tables-test.arm.iso.qcow2 differ
+diff --git a/tests/data/uefi-boot-images/bios-tables-test.i386.iso.qcow2 =
+b/tests/data/uefi-boot-images/bios-tables-test.i386.iso.qcow2
+index 26c882baeaba..c66ad155196d 100644
+Binary files a/tests/data/uefi-boot-images/bios-tables-test.i386.iso.qcow=
+2 and b/tests/data/uefi-boot-images/bios-tables-test.i386.iso.qcow2 diffe=
+r
+diff --git a/tests/data/uefi-boot-images/bios-tables-test.x86_64.iso.qcow=
+2 b/tests/data/uefi-boot-images/bios-tables-test.x86_64.iso.qcow2
+index 9ec3c1f20bb2..f59e07c85415 100644
+Binary files a/tests/data/uefi-boot-images/bios-tables-test.x86_64.iso.qc=
+ow2 and b/tests/data/uefi-boot-images/bios-tables-test.x86_64.iso.qcow2 d=
+iffer
+--=20
+2.19.1.3.g30247aa5d201
 
-Could you please have a look?
-
- Thomas
 
