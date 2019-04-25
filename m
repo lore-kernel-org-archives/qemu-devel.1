@@ -2,91 +2,63 @@ Return-Path: <SRS0=VSQP=S3=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.7 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS autolearn=ham
+X-Spam-Status: No, score=-5.4 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,USER_AGENT_MUTT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 68DDCC43219
-	for <qemu-devel@archiver.kernel.org>; Thu, 25 Apr 2019 16:51:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 550EAC43218
+	for <qemu-devel@archiver.kernel.org>; Thu, 25 Apr 2019 17:17:51 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id CA768206BF
-	for <qemu-devel@archiver.kernel.org>; Thu, 25 Apr 2019 16:51:48 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="p3ZJC91k"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CA768206BF
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id D67F720717
+	for <qemu-devel@archiver.kernel.org>; Thu, 25 Apr 2019 17:17:51 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D67F720717
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:60799 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:32822 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hJhb9-0005XN-Ce
-	for qemu-devel@archiver.kernel.org; Thu, 25 Apr 2019 12:51:47 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:56912)
+	id 1hJi0M-00041H-2M
+	for qemu-devel@archiver.kernel.org; Thu, 25 Apr 2019 13:17:50 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:33008)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1hJhaA-0004qQ-UT
-	for qemu-devel@nongnu.org; Thu, 25 Apr 2019 12:50:48 -0400
+	(envelope-from <ehabkost@redhat.com>) id 1hJhyr-0002uB-EW
+	for qemu-devel@nongnu.org; Thu, 25 Apr 2019 13:16:18 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1hJha9-0003dv-Uf
-	for qemu-devel@nongnu.org; Thu, 25 Apr 2019 12:50:46 -0400
-Received: from mail-pl1-x644.google.com ([2607:f8b0:4864:20::644]:38842)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1hJha9-0003bc-KI
-	for qemu-devel@nongnu.org; Thu, 25 Apr 2019 12:50:45 -0400
-Received: by mail-pl1-x644.google.com with SMTP id f36so79550plb.5
-	for <qemu-devel@nongnu.org>; Thu, 25 Apr 2019 09:50:45 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
-	h=subject:to:cc:references:from:openpgp:message-id:date:user-agent
-	:mime-version:in-reply-to:content-language:content-transfer-encoding;
-	bh=6GsEehMrGxTNJ75kS5l1YQNwV0S6GpS3jOZIJxIwfHk=;
-	b=p3ZJC91kQtDtDVtvRhKMnIJ6nU+UB4QRDjpSYk1H1f1k5Xz3ifQECyV+C+ES/ZAUrB
-	n2W74PL+sRUs+Ep8HgRTw2DJWMJuzAeFZP0vEeqKCy8nWzVz5WT3bVs626R+YaBEAH11
-	lnNlugkvi1sADWd2xFrAuJ17+sdqqEbsVRzx2p2PVpCE/Z3PFWjzUkBxvR2mTdKENsdb
-	eUywopeNhrtHTf+aoxVaYkPQc5jzJ/OwuAaLTZywiZU4r2ZGd4PAb+zax3BqN/MQn7sF
-	j3RcifKkdGByuuFjdl8Sy+ajVjSnvl3LK4LjRwy5Lh2QSozY988u9fgZpYcMgl91qf3R
-	3F6g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=1e100.net; s=20161025;
-	h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
-	:date:user-agent:mime-version:in-reply-to:content-language
-	:content-transfer-encoding;
-	bh=6GsEehMrGxTNJ75kS5l1YQNwV0S6GpS3jOZIJxIwfHk=;
-	b=L0fGNG+7tP470gmBtvCMd0MHD08WRit3qtTY4MLcdJi3ngYapyLw2ymxkZL1bGZinl
-	h95oR5/FqzxZuotTbYCNtDoVZc/ECbSc8R4VjL6ZX4guAdiENCiOUCXX6ZoscbLDqNhZ
-	fR+WtOyCkOLzoTlN6lWZnJGFVwWM8s50Pfmv2FkRq2pKkxd5+r5dk4FhhuRGbhiPFoqk
-	Ar3EzCyj9AZuZOLW/LnmColMyaq9vEExRqoPhBHBTCwY91ftyv99COyozVskWnQT/nna
-	jKYSGehyul6seDppRTLS5hWRvWlrQJ9wubJA1kICtGfbr83/1qFy0iLAnFY8d4IVBU+a
-	HhgA==
-X-Gm-Message-State: APjAAAWiqjvhhZpU5dP1eG5jMjpciCR75MHVRf2FjZGkeRNJkVxJuBa/
-	evGi68bsTuE4WOUK898JOWVYKz2J4WQ=
-X-Google-Smtp-Source: APXvYqwvLuO0NnHt07fKSGYZtcoVl3I9CwPGXEcaTnt5LyScge5cXwcCokxRkQakxv6WqqkwSlW96w==
-X-Received: by 2002:a17:902:aa85:: with SMTP id
-	d5mr38983217plr.251.1556211044069; 
-	Thu, 25 Apr 2019 09:50:44 -0700 (PDT)
-Received: from [192.168.1.11] (97-113-179-147.tukw.qwest.net. [97.113.179.147])
-	by smtp.gmail.com with ESMTPSA id l1sm25977016pgp.9.2019.04.25.09.50.42
-	(version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-	Thu, 25 Apr 2019 09:50:43 -0700 (PDT)
-To: Palmer Dabbelt <palmer@sifive.com>
-References: <mhng-f65ff93d-20e5-4c4a-919a-c311ae97649d@palmer-si-x1e>
-From: Richard Henderson <richard.henderson@linaro.org>
-Openpgp: preference=signencrypt
-Message-ID: <357d260b-4baf-aea8-c332-f77ce2a3e9b2@linaro.org>
-Date: Thu, 25 Apr 2019 09:50:41 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
-	Thunderbird/60.6.1
+	(envelope-from <ehabkost@redhat.com>) id 1hJhwt-0002tD-Mg
+	for qemu-devel@nongnu.org; Thu, 25 Apr 2019 13:14:16 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:49810)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1hJhwt-0002sl-HA
+	for qemu-devel@nongnu.org; Thu, 25 Apr 2019 13:14:15 -0400
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+	[10.5.11.15])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 041E6307D85A;
+	Thu, 25 Apr 2019 17:14:13 +0000 (UTC)
+Received: from localhost (ovpn-116-9.gru2.redhat.com [10.97.116.9])
+	by smtp.corp.redhat.com (Postfix) with ESMTP id 4E8405D705;
+	Thu, 25 Apr 2019 17:14:07 +0000 (UTC)
+Date: Thu, 25 Apr 2019 14:14:06 -0300
+From: Eduardo Habkost <ehabkost@redhat.com>
+To: Stefan Hajnoczi <stefanha@redhat.com>
+Message-ID: <20190425171406.GN18406@habkost.net>
+References: <20190425130939.29674-1-stefanha@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <mhng-f65ff93d-20e5-4c4a-919a-c311ae97649d@palmer-si-x1e>
 Content-Type: text/plain; charset="UTF-8"
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
-	recognized.
-X-Received-From: 2607:f8b0:4864:20::644
-Subject: Re: [Qemu-devel] [PATCH for-4.1 4/8] target/riscv: Merge argument
- decode for RVC shifti
+Content-Disposition: inline
+In-Reply-To: <20190425130939.29674-1-stefanha@redhat.com>
+User-Agent: Mutt/1.10.1 (2018-07-13)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+	(mx1.redhat.com [10.5.110.48]);
+	Thu, 25 Apr 2019 17:14:13 +0000 (UTC)
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 209.132.183.28
+Subject: Re: [Qemu-devel] [PATCH v2] virtio: clarify VirtioPCIDeviceTypeInfo
+ usage
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -98,24 +70,31 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Bastian Koppelmann <kbastian@mail.uni-paderborn.de>,
-	Alistair Francis <Alistair.Francis@wdc.com>,
-	qemu-devel@nongnu.org, qemu-riscv@nongnu.org
+Cc: sebastien.boeuf@intel.com, qemu-devel@nongnu.org,
+	"Michael S. Tsirkin" <mst@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190425165041.3Ij1a5u3SoYnHz4i-BNldathz02OmkkWe-HAjiEjcpQ@z>
+Message-ID: <20190425171406.IwA3dyxqznzYroQ-oBrOsehEC8PQlRcVfOWQvhnlRfo@z>
 
-On 4/25/19 9:04 AM, Palmer Dabbelt wrote:
->>  # *** RV64C Standard Extension (Quadrant 2) ***
->> -c_slli            000 .  .....  ..... 10 @c_shift2
->> +slli              000 .  .....  ..... 10 @c_shift2
+On Thu, Apr 25, 2019 at 02:09:39PM +0100, Stefan Hajnoczi wrote:
+> How to use .base_name, .generic_name, .transitional_name, and
+> .non_transitional_name can be confusing.
 > 
-> This is another one where rd=0 is illegal in the compressed ISA, but again we
-> don't appear to handle these correctly before the cleanups.
+> Existing devices have .generic_name but its behavior is somewhat magic.
+> 
+> Devices added to new versions of the VIRTIO specification should forego
+> transitional mode completely and always operate in non-transitional mode
+> because there are no existing drivers for them that require backwards
+> compatibility.
+> 
+> This patch adds comments that hopefully make it easier for developers to
+> decide how to fill out VirtioPCIDeviceTypeInfo.
+> 
+> Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
 
-I see "HINT, rd=0" in the 2.2 documentation for this case.
+Reviewed-by: Eduardo Habkost <ehabkost@redhat.com>
 
-
-r~
+-- 
+Eduardo
 
