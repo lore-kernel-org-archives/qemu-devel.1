@@ -6,45 +6,45 @@ X-Spam-Status: No, score=-3.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 68B22C282E3
-	for <qemu-devel@archiver.kernel.org>; Thu, 25 Apr 2019 05:58:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5303AC10F03
+	for <qemu-devel@archiver.kernel.org>; Thu, 25 Apr 2019 06:02:23 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2B1E22077C
-	for <qemu-devel@archiver.kernel.org>; Thu, 25 Apr 2019 05:58:34 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2B1E22077C
+	by mail.kernel.org (Postfix) with ESMTPS id 214472077C
+	for <qemu-devel@archiver.kernel.org>; Thu, 25 Apr 2019 06:02:23 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 214472077C
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:52320 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:52379 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hJXOz-0000px-C7
-	for qemu-devel@archiver.kernel.org; Thu, 25 Apr 2019 01:58:33 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:52917)
+	id 1hJXSd-0002If-5B
+	for qemu-devel@archiver.kernel.org; Thu, 25 Apr 2019 02:02:21 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:53696)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1hJXO4-0000L4-3k
-	for qemu-devel@nongnu.org; Thu, 25 Apr 2019 01:57:37 -0400
+	(envelope-from <thuth@redhat.com>) id 1hJXRF-0001dE-Ts
+	for qemu-devel@nongnu.org; Thu, 25 Apr 2019 02:00:54 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1hJXO2-00070G-HF
-	for qemu-devel@nongnu.org; Thu, 25 Apr 2019 01:57:35 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:50816)
+	(envelope-from <thuth@redhat.com>) id 1hJXRE-0000rb-J3
+	for qemu-devel@nongnu.org; Thu, 25 Apr 2019 02:00:53 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:55030)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <thuth@redhat.com>)
-	id 1hJXNz-0006ul-5Y; Thu, 25 Apr 2019 01:57:31 -0400
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
-	[10.5.11.15])
+	id 1hJXR3-0000cH-Cn; Thu, 25 Apr 2019 02:00:43 -0400
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+	[10.5.11.22])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id EC9EE753CB;
-	Thu, 25 Apr 2019 05:57:29 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id 264953145728;
+	Thu, 25 Apr 2019 06:00:32 +0000 (UTC)
 Received: from thuth.remote.csb (ovpn-116-68.ams2.redhat.com [10.36.116.68])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id 6270B5D706;
-	Thu, 25 Apr 2019 05:57:20 +0000 (UTC)
+	by smtp.corp.redhat.com (Postfix) with ESMTP id E45F41001DDA;
+	Thu, 25 Apr 2019 06:00:24 +0000 (UTC)
 To: Wainer dos Santos Moschetta <wainersm@redhat.com>, qemu-devel@nongnu.org
 References: <20190424103747.10173-1-thuth@redhat.com>
-	<20190424103747.10173-6-thuth@redhat.com>
-	<6b284aaa-353c-92c1-b01b-21882e7ff9ef@redhat.com>
+	<20190424103747.10173-5-thuth@redhat.com>
+	<f9dc291b-7ba2-c6b8-33aa-c8fa3c6d4950@redhat.com>
 From: Thomas Huth <thuth@redhat.com>
 Openpgp: preference=signencrypt
 Autocrypt: addr=thuth@redhat.com; keydata=
@@ -90,23 +90,23 @@ Autocrypt: addr=thuth@redhat.com; keydata=
 	rCELuGwT9hsYkUPjVd4lfylN3mzEc6iAv/wwjsc0DRTSQCpXT3v2ymTAsRKrVaEZLibTXaf+
 	WslxWek3xNYRiqwwWAJuL652eAlxUgQ5ZS+fXBRTiQpJ+F26I/2lccScRd9G5w==
 Organization: Red Hat
-Message-ID: <e8d6cbeb-b1aa-deb1-b7a7-c3c7a3906229@redhat.com>
-Date: Thu, 25 Apr 2019 07:57:19 +0200
+Message-ID: <0300c8cc-d73c-b919-13f7-59f3218a609f@redhat.com>
+Date: Thu, 25 Apr 2019 08:00:23 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
 	Thunderbird/60.6.1
 MIME-Version: 1.0
-In-Reply-To: <6b284aaa-353c-92c1-b01b-21882e7ff9ef@redhat.com>
+In-Reply-To: <f9dc291b-7ba2-c6b8-33aa-c8fa3c6d4950@redhat.com>
 Content-Type: text/plain; charset="UTF-8"
 Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.39]);
-	Thu, 25 Apr 2019 05:57:30 +0000 (UTC)
+	(mx1.redhat.com [10.5.110.49]);
+	Thu, 25 Apr 2019 06:00:32 +0000 (UTC)
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH 5/6] tests: Run the iotests during "make
- check" again
+Subject: Re: [Qemu-devel] [PATCH 4/6] cirrus / travis: Add gnu-sed and bash
+ for macOS and FreeBSD
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -120,69 +120,43 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 Cc: Fam Zheng <fam@euphon.net>, Kevin Wolf <kwolf@redhat.com>,
 	Ed Maste <emaste@freebsd.org>, qemu-block@nongnu.org,
+	Peter Maydell <peter.maydell@linaro.org>,
 	=?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
-	Max Reitz <mreitz@redhat.com>,
+	Laszlo Ersek <lersek@redhat.com>, Max Reitz <mreitz@redhat.com>,
 	=?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>,
 	Li-Wen Hsu <lwhsu@freebsd.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190425055719.gHTEhkISr8g_vENQCiWgT7teZ4IbIqzrXPqprwf6F8k@z>
+Message-ID: <20190425060023.QyZjgWQzfuD091P-jWBHTF2TflGmkF8Qt6Ky91T6Rrk@z>
 
-On 24/04/2019 22.42, Wainer dos Santos Moschetta wrote:
-> Hi Thomas,
->=20
+On 24/04/2019 23.29, Wainer dos Santos Moschetta wrote:
+> Hello Thomas,
 >=20
 > On 04/24/2019 07:37 AM, Thomas Huth wrote:
->> People often forget to run the iotests before submitting patches or
->> pull requests - this is likely due to the fact that we do not run the
->> tests during our mandatory "make check" tests yet. Now that we've got
->> a new "ci" group of iotests that should be fine to run in every enviro=
-n-
->> ment, it should be OK to enable the iotests during "make check" again.
->> Thus we now run the "ci" tests by default from the qemu-iotests-quick.=
-sh
->> script, and only use the former "quick" group (that contains some test=
-s
->> that are failing in some environments) when the user decided to run
->> "make check SPEED=3Dthorough" or something similar.
+>> We are going to enable the qemu-iotests during "make check" again,
+>> and for running the iotests, we need bash and gnu-sed.
 >>
 >> Signed-off-by: Thomas Huth <thuth@redhat.com>
 >> ---
->> =C2=A0 tests/Makefile.include=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 |=C2=A0 2 =
-+-
->> =C2=A0 tests/qemu-iotests-quick.sh | 17 ++++++++++++++++-
->> =C2=A0 2 files changed, 17 insertions(+), 2 deletions(-)
+>> =C2=A0 .cirrus.yml | 4 ++--
+>> =C2=A0 .travis.yml | 1 +
+>> =C2=A0 2 files changed, 3 insertions(+), 2 deletions(-)
 >=20
-> One of Patchew's runners failed with this patch series:
-> https://patchew.org/QEMU/20190424103747.10173-1-thuth@redhat.com/
->=20
-> I encountered same failures with `make check` locally on Fedora 29
-> x86_64 (pulled latest qemu, and configured with defaults and
-> x86_64-softmmu target):
+> It needs to get the Freebsd image [1] updated too, in order to `make
+> BUILD_TARGET=3Dcheck vm-build-freebsd` passes. Here it failed with:
 > ---
-> Not run: 233
-> Failures: 069 103 114 133 140 143 197 215 226 244
+> env: bash: No such file or directory
+> gmake: *** [/var/tmp/qemu-test.6OlDFH/tests/Makefile.include:1101:
+> check-tests/qemu-iotests-quick.sh] Error 1
+> gmake: *** Waiting for unfinished jobs....
+> ---
+>=20
+> I'm not sure about the netbsd and openbsd images, they might need bash
+> and gnu-sed as well.
 
-Ok, thanks for the info. Looks like many tests are failing because qemu-i=
-o suddenly prints its program name in front of the error messages? E.g.:
-
---- /tmp/qemu-test/src/tests/qemu-iotests/069.out	2019-04-24 16:52:31.000=
-000000 +0000
-+++ /tmp/qemu-test/build/tests/qemu-iotests/069.out.bad	2019-04-24 16:59:=
-13.310226424 +0000
-@@ -4,5 +4,5 @@
-=20
- Formatting 'TEST_DIR/t.IMGFMT.base', fmt=3DIMGFMT size=3D131072
- Formatting 'TEST_DIR/t.IMGFMT', fmt=3DIMGFMT size=3D131072 backing_file=3D=
-TEST_DIR/t.IMGFMT.base
--can't open device TEST_DIR/t.IMGFMT: Could not open backing file: Could =
-not open 'TEST_DIR/t.IMGFMT.base': No such file or directory
-+qemu-io: can't open device TEST_DIR/t.IMGFMT: Could not open backing fil=
-e: Could not open 'TEST_DIR/t.IMGFMT.base': No such file or directory
-
-Does anybody from the block folks has a clue what might be going wrong he=
-re?
+D'oh! Does anybody know what are the correct steps to update these images=
+?
 
  Thomas
 
