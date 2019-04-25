@@ -6,59 +6,59 @@ X-Spam-Status: No, score=-8.4 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,USER_AGENT_MUTT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3C333C10F03
-	for <qemu-devel@archiver.kernel.org>; Thu, 25 Apr 2019 07:24:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CABAEC10F03
+	for <qemu-devel@archiver.kernel.org>; Thu, 25 Apr 2019 07:26:15 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1110D20878
-	for <qemu-devel@archiver.kernel.org>; Thu, 25 Apr 2019 07:24:29 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1110D20878
+	by mail.kernel.org (Postfix) with ESMTPS id 9CED020878
+	for <qemu-devel@archiver.kernel.org>; Thu, 25 Apr 2019 07:26:15 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9CED020878
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.intel.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:53129 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:53166 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hJYk9-0006JI-5S
-	for qemu-devel@archiver.kernel.org; Thu, 25 Apr 2019 03:24:29 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:40339)
+	id 1hJYlq-0007nT-Tk
+	for qemu-devel@archiver.kernel.org; Thu, 25 Apr 2019 03:26:14 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:40817)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richardw.yang@linux.intel.com>) id 1hJYjI-0005zi-Hu
-	for qemu-devel@nongnu.org; Thu, 25 Apr 2019 03:23:37 -0400
+	(envelope-from <richardw.yang@linux.intel.com>) id 1hJYl6-00071d-Bh
+	for qemu-devel@nongnu.org; Thu, 25 Apr 2019 03:25:29 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richardw.yang@linux.intel.com>) id 1hJYjG-0004SA-KX
-	for qemu-devel@nongnu.org; Thu, 25 Apr 2019 03:23:36 -0400
-Received: from mga11.intel.com ([192.55.52.93]:43344)
+	(envelope-from <richardw.yang@linux.intel.com>) id 1hJYl5-00061E-B3
+	for qemu-devel@nongnu.org; Thu, 25 Apr 2019 03:25:28 -0400
+Received: from mga02.intel.com ([134.134.136.20]:58897)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <richardw.yang@linux.intel.com>)
-	id 1hJYjF-0004Ja-VY
-	for qemu-devel@nongnu.org; Thu, 25 Apr 2019 03:23:34 -0400
-X-Amp-Result: UNKNOWN
-X-Amp-Original-Verdict: FILE UNKNOWN
+	id 1hJYl5-00060R-32
+	for qemu-devel@nongnu.org; Thu, 25 Apr 2019 03:25:27 -0400
+X-Amp-Result: UNSCANNABLE
 X-Amp-File-Uploaded: False
-Received: from orsmga004.jf.intel.com ([10.7.209.38])
-	by fmsmga102.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384;
-	25 Apr 2019 00:23:26 -0700
+Received: from orsmga007.jf.intel.com ([10.7.209.58])
+	by orsmga101.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384;
+	25 Apr 2019 00:25:25 -0700
 X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.60,392,1549958400"; d="scan'208";a="294392714"
+X-IronPort-AV: E=Sophos;i="5.60,392,1549958400"; d="scan'208";a="134224588"
 Received: from richard.sh.intel.com (HELO localhost) ([10.239.159.54])
-	by orsmga004.jf.intel.com with ESMTP; 25 Apr 2019 00:23:23 -0700
-Date: Thu, 25 Apr 2019 15:22:56 +0800
+	by orsmga007.jf.intel.com with ESMTP; 25 Apr 2019 00:25:22 -0700
+Date: Thu, 25 Apr 2019 15:24:55 +0800
 From: Wei Yang <richardw.yang@linux.intel.com>
 To: Igor Mammedov <imammedo@redhat.com>
-Message-ID: <20190425072256.GA24344@richard>
+Message-ID: <20190425072455.GB24344@richard>
 References: <1556170489-131927-1-git-send-email-imammedo@redhat.com>
-	<1556170489-131927-2-git-send-email-imammedo@redhat.com>
+	<1556170489-131927-3-git-send-email-imammedo@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="UTF-8"
 Content-Disposition: inline
-In-Reply-To: <1556170489-131927-2-git-send-email-imammedo@redhat.com>
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <1556170489-131927-3-git-send-email-imammedo@redhat.com>
 User-Agent: Mutt/1.10.1 (2018-07-13)
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
 	recognized.
-X-Received-From: 192.55.52.93
-Subject: Re: [Qemu-devel] [PATCH v3 01/13] tests: acpi: make RSDT test
- routine handle XSDT
+X-Received-From: 134.134.136.20
+Subject: Re: [Qemu-devel] [PATCH v3 02/13] tests: acpi: rename
+ acpi_parse_rsdp_table() into acpi_fetch_rsdp_table()
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -81,114 +81,75 @@ Cc: Andrew Jones <drjones@redhat.com>, Ben Warren <ben@skyportsystems.com>,
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190425072256.bXN6bEuHquWeuxUWbrKhh4ejtdWQM1Gu7g4RJqb9TNI@z>
+Message-ID: <20190425072455._6y5OeuVJJ89UgzqkrewV2jUGSEdouc_rEd1zawWiWk@z>
 
-On Thu, Apr 25, 2019 at 07:34:37AM +0200, Igor Mammedov wrote:
->If RSDP revision is more than 0 fetch table pointed by XSDT
->and fallback to legacy RSDT table otherwise.
->
->While at it drop unused acpi_get_xsdt_address().
-
-Would it be proper to split this into another patch?
-
+On Thu, Apr 25, 2019 at 07:34:38AM +0200, Igor Mammedov wrote:
+>so name would reflect what the function does
 >
 >Signed-off-by: Igor Mammedov <imammedo@redhat.com>
+>Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+
+Reviewed-by: Wei Yang <richardw.yang@linux.intel.com>
+
 >---
->PS:
-> it doesn't affect existing pc/q35 machines as they use RSDP.revision == 0
-> but it will be used by followup patch to enable testing arm/virt
-> board which uses provides XSDT table.
->---
-> tests/acpi-utils.h       |  3 +--
-> tests/acpi-utils.c       | 14 +-------------
-> tests/bios-tables-test.c | 18 +++++++++++++-----
-> 3 files changed, 15 insertions(+), 20 deletions(-)
+> tests/acpi-utils.h       | 2 +-
+> tests/acpi-utils.c       | 2 +-
+> tests/bios-tables-test.c | 2 +-
+> tests/vmgenid-test.c     | 2 +-
+> 4 files changed, 4 insertions(+), 4 deletions(-)
 >
 >diff --git a/tests/acpi-utils.h b/tests/acpi-utils.h
->index ef388bb..8c68201 100644
+>index 8c68201..75f78f2 100644
 >--- a/tests/acpi-utils.h
 >+++ b/tests/acpi-utils.h
->@@ -46,8 +46,7 @@ typedef struct {
+>@@ -46,7 +46,7 @@ typedef struct {
 > 
 > uint8_t acpi_calc_checksum(const uint8_t *data, int len);
 > uint32_t acpi_find_rsdp_address(QTestState *qts);
->-uint64_t acpi_get_xsdt_address(uint8_t *rsdp_table);
->-void acpi_parse_rsdp_table(QTestState *qts, uint32_t addr, uint8_t *rsdp_table);
->+void acpi_parse_rsdp_table(QTestState *qts, uint64_t addr, uint8_t *rsdp_table);
-
-Would you mind giving some hint of this change?
-
+>-void acpi_parse_rsdp_table(QTestState *qts, uint64_t addr, uint8_t *rsdp_table);
+>+void acpi_fetch_rsdp_table(QTestState *qts, uint64_t addr, uint8_t *rsdp_table);
 > void acpi_fetch_table(QTestState *qts, uint8_t **aml, uint32_t *aml_len,
 >                       const uint8_t *addr_ptr, const char *sig,
 >                       bool verify_checksum);
 >diff --git a/tests/acpi-utils.c b/tests/acpi-utils.c
->index cc33b46..9a6d1d3 100644
+>index 9a6d1d3..2dd4fe0 100644
 >--- a/tests/acpi-utils.c
 >+++ b/tests/acpi-utils.c
->@@ -51,19 +51,7 @@ uint32_t acpi_find_rsdp_address(QTestState *qts)
+>@@ -51,7 +51,7 @@ uint32_t acpi_find_rsdp_address(QTestState *qts)
 >     return off;
 > }
 > 
->-uint64_t acpi_get_xsdt_address(uint8_t *rsdp_table)
->-{
->-    uint64_t xsdt_physical_address;
->-    uint8_t revision = rsdp_table[15 /* Revision offset */];
->-
->-    /* We must have revision 2 if we're looking for an XSDT pointer */
->-    g_assert(revision == 2);
->-
->-    memcpy(&xsdt_physical_address, &rsdp_table[24 /* XsdtAddress offset */], 8);
->-    return le64_to_cpu(xsdt_physical_address);
->-}
->-
->-void acpi_parse_rsdp_table(QTestState *qts, uint32_t addr, uint8_t *rsdp_table)
->+void acpi_parse_rsdp_table(QTestState *qts, uint64_t addr, uint8_t *rsdp_table)
+>-void acpi_parse_rsdp_table(QTestState *qts, uint64_t addr, uint8_t *rsdp_table)
+>+void acpi_fetch_rsdp_table(QTestState *qts, uint64_t addr, uint8_t *rsdp_table)
 > {
 >     uint8_t revision;
 > 
 >diff --git a/tests/bios-tables-test.c b/tests/bios-tables-test.c
->index a506dcb..24bd102 100644
+>index 24bd102..2ee044c 100644
 >--- a/tests/bios-tables-test.c
 >+++ b/tests/bios-tables-test.c
->@@ -107,17 +107,25 @@ static void test_acpi_rsdp_table(test_data *data)
->     }
-> }
+>@@ -89,7 +89,7 @@ static void test_acpi_rsdp_table(test_data *data)
+>     uint8_t *rsdp_table = data->rsdp_table, revision;
+>     uint32_t addr = data->rsdp_addr;
 > 
->-static void test_acpi_rsdt_table(test_data *data)
->+static void test_acpi_rxsdt_table(test_data *data)
-> {
->+    const char *sig = "RSDT";
->     AcpiSdtTable rsdt = {};
->+    int entry_size = 4;
->+    int addr_off = 16 /* RsdtAddress */;
->     uint8_t *ent;
+>-    acpi_parse_rsdp_table(data->qts, addr, rsdp_table);
+>+    acpi_fetch_rsdp_table(data->qts, addr, rsdp_table);
+>     revision = rsdp_table[15 /* Revision offset */];
 > 
->-    /* read RSDT table */
->+    if (data->rsdp_table[15 /* Revision offset */] != 0) {
->+        addr_off = 24 /* XsdtAddress */;
->+        entry_size = 8;
->+        sig = "XSDT";
->+    }
->+    /* read [RX]SDT table */
->     acpi_fetch_table(data->qts, &rsdt.aml, &rsdt.aml_len,
->-                     &data->rsdp_table[16 /* RsdtAddress */], "RSDT", true);
->+                     &data->rsdp_table[addr_off], sig, true);
+>     switch (revision) {
+>diff --git a/tests/vmgenid-test.c b/tests/vmgenid-test.c
+>index ae38ee5..f400184 100644
+>--- a/tests/vmgenid-test.c
+>+++ b/tests/vmgenid-test.c
+>@@ -40,7 +40,7 @@ static uint32_t acpi_find_vgia(QTestState *qts)
+>     g_assert_cmphex(rsdp_offset, <, RSDP_ADDR_INVALID);
 > 
->     /* Load all tables and add to test list directly RSDT referenced tables */
->-    ACPI_FOREACH_RSDT_ENTRY(rsdt.aml, rsdt.aml_len, ent, 4 /* Entry size */) {
->+    ACPI_FOREACH_RSDT_ENTRY(rsdt.aml, rsdt.aml_len, ent, entry_size) {
->         AcpiSdtTable ssdt_table = {};
 > 
->         acpi_fetch_table(data->qts, &ssdt_table.aml, &ssdt_table.aml_len, ent,
->@@ -521,7 +529,7 @@ static void test_acpi_one(const char *params, test_data *data)
->     data->tables = g_array_new(false, true, sizeof(AcpiSdtTable));
->     test_acpi_rsdp_address(data);
->     test_acpi_rsdp_table(data);
->-    test_acpi_rsdt_table(data);
->+    test_acpi_rxsdt_table(data);
->     test_acpi_fadt_table(data);
+>-    acpi_parse_rsdp_table(qts, rsdp_offset, rsdp_table);
+>+    acpi_fetch_rsdp_table(qts, rsdp_offset, rsdp_table);
+>     acpi_fetch_table(qts, &rsdt, &rsdt_len, &rsdp_table[16 /* RsdtAddress */],
+>                      "RSDT", true);
 > 
->     if (iasl) {
 >-- 
 >2.7.4
 
