@@ -2,60 +2,87 @@ Return-Path: <SRS0=VSQP=S3=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.5 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS,URIBL_BLOCKED
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7DCB1C282E1
-	for <qemu-devel@archiver.kernel.org>; Thu, 25 Apr 2019 05:45:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 244F6C282E3
+	for <qemu-devel@archiver.kernel.org>; Thu, 25 Apr 2019 05:45:22 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4F856214AE
-	for <qemu-devel@archiver.kernel.org>; Thu, 25 Apr 2019 05:45:14 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4F856214AE
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id E16BF214AE
+	for <qemu-devel@archiver.kernel.org>; Thu, 25 Apr 2019 05:45:21 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="fz4Lxc1l"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E16BF214AE
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:52121 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:52123 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hJXC5-0002hP-E3
-	for qemu-devel@archiver.kernel.org; Thu, 25 Apr 2019 01:45:13 -0400
+	id 1hJXCD-0002ny-4U
+	for qemu-devel@archiver.kernel.org; Thu, 25 Apr 2019 01:45:21 -0400
 Received: from eggs.gnu.org ([209.51.188.92]:47203)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1hJX3N-0003hD-2K
-	for qemu-devel@nongnu.org; Thu, 25 Apr 2019 01:36:14 -0400
+	(envelope-from <aleksandar.m.mail@gmail.com>) id 1hJX3j-0003hD-Lc
+	for qemu-devel@nongnu.org; Thu, 25 Apr 2019 01:36:36 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1hJX26-00005h-IP
-	for qemu-devel@nongnu.org; Thu, 25 Apr 2019 01:34:55 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:41450)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1hJX26-0008WG-Ab
-	for qemu-devel@nongnu.org; Thu, 25 Apr 2019 01:34:54 -0400
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
-	[10.5.11.23])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 9283B307D963;
-	Thu, 25 Apr 2019 05:34:53 +0000 (UTC)
-Received: from dell-r430-03.lab.eng.brq.redhat.com
-	(dell-r430-03.lab.eng.brq.redhat.com [10.37.153.18])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id 9977488E0;
-	Thu, 25 Apr 2019 05:34:51 +0000 (UTC)
-From: Igor Mammedov <imammedo@redhat.com>
-To: qemu-devel@nongnu.org
-Date: Thu, 25 Apr 2019 07:34:43 +0200
-Message-Id: <1556170489-131927-8-git-send-email-imammedo@redhat.com>
-In-Reply-To: <1556170489-131927-1-git-send-email-imammedo@redhat.com>
-References: <1556170489-131927-1-git-send-email-imammedo@redhat.com>
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.48]);
-	Thu, 25 Apr 2019 05:34:53 +0000 (UTC)
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] [PATCH v3 07/13] tests: acpi: add
- acpi_find_rsdp_address_uefi() helper
+	(envelope-from <aleksandar.m.mail@gmail.com>) id 1hJWzE-0006Ms-Ey
+	for qemu-devel@nongnu.org; Thu, 25 Apr 2019 01:31:57 -0400
+Received: from mail-ot1-x341.google.com ([2607:f8b0:4864:20::341]:46409)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <aleksandar.m.mail@gmail.com>)
+	id 1hJWzE-0006Gy-7E; Thu, 25 Apr 2019 01:31:56 -0400
+Received: by mail-ot1-x341.google.com with SMTP id s24so18323709otk.13;
+	Wed, 24 Apr 2019 22:31:51 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+	h=mime-version:in-reply-to:references:from:date:message-id:subject:to
+	:cc; bh=4uyZD2f61WGWLfj/eczIBZtflr9JP7bJKe1rH3EAaJ0=;
+	b=fz4Lxc1lfE48CZLo0/6/dzA/FnRyaiS0ZP3+EUlxyBxZFmq0lOjAJ8wzFWdSeaKQrF
+	5SMquxN6/H2vVLIWdaP5rOh4ORzz+ljPGFSBrDISlthWlCGVnKW7VvBN62lOOBdwBwXI
+	yqkohfGUHqq0Stc/x6eB/R2rdiL4Q4PKJ2jUoLnHpllALq9oMCF2ADMsmoltVYhNPQZU
+	seOeCndW+eO//Bhv37gRi9H0PySA90p8+GrnS28VvrMNtEhzW6sjk490EFqMk3uCt2eO
+	vpJRV68xTxAgjx0z7ZKRLKh8yA0JbTXETGc9Yu2LiuxwwdONWAPs6tVfXZBS3GjaZHob
+	mGKw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=1e100.net; s=20161025;
+	h=x-gm-message-state:mime-version:in-reply-to:references:from:date
+	:message-id:subject:to:cc;
+	bh=4uyZD2f61WGWLfj/eczIBZtflr9JP7bJKe1rH3EAaJ0=;
+	b=La4KQ//8jZfxTk4rDxY0HgQs7mN9g3Hy3HICD5BfSYY5zqUVPBHd2o+755yxgHsWbp
+	uY/FySdOzvgUoOjCK5zB6zWtsJRudRTzCbp7f85R0ApD6mgwpY/0Wouzi5/nUNHkmFCv
+	+mxsPOkWvDZ18PjS87brheeszR+u9PFHHRqNfXE943Dsbi05ppLKKxW7AYwI1GQWninM
+	uFt1mX5NbYC58MdZ9GLCipjQW3Mt6oiuYhcW92hlllW8HTj2r/lIPVauLKxPgEVy+O3c
+	drEM3viohEXelXl5csUAGK4iehjW3SSmps9GG6U8bChWqH4cbr+foAnbQAlsFut0vNC4
+	3dJg==
+X-Gm-Message-State: APjAAAVuHPD575AypeW+OdC66Ob0NMKYF6lZxbBSrzW1AoVRoQdhiSG2
+	Ouvk+XIKAjP10bZYYMl2WJrhJj7HiRO29v7XZpo=
+X-Google-Smtp-Source: APXvYqy2WgXUnsw+iLHnt+USkfsMLQTOWEhCAgf4Uvc8T7T8TMBbDedO99JIdDhe6VoBRxEtjTyzxwI3nrGJ3iOHo+0=
+X-Received: by 2002:a9d:3ba1:: with SMTP id k30mr23665997otc.171.1556170310624;
+	Wed, 24 Apr 2019 22:31:50 -0700 (PDT)
+MIME-Version: 1.0
+Received: by 2002:a05:6830:2004:0:0:0:0 with HTTP; Wed, 24 Apr 2019 22:31:49
+	-0700 (PDT)
+Received: by 2002:a05:6830:2004:0:0:0:0 with HTTP; Wed, 24 Apr 2019 22:31:49
+	-0700 (PDT)
+In-Reply-To: <73a7ce8a-1d73-95f7-84a6-f0960a397c22@linaro.org>
+References: <mhng-4fc40e41-5464-469e-9334-1edc4f8294e3@palmer-si-x1e>
+	<73a7ce8a-1d73-95f7-84a6-f0960a397c22@linaro.org>
+From: Aleksandar Markovic <aleksandar.m.mail@gmail.com>
+Date: Thu, 25 Apr 2019 07:31:49 +0200
+Message-ID:
+ <CAL1e-=gTwNJ94-ZdhPZR_THAi_TfiToox0KrxLZnhARbjUKLxw@mail.gmail.com>
+To: Richard Henderson <richard.henderson@linaro.org>
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+	recognized.
+X-Received-From: 2607:f8b0:4864:20::341
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Content-Filtered-By: Mailman/MimeDel 2.1.21
+Subject: Re: [Qemu-devel] [PATCH for-4.1 1/8] target/riscv: Name the
+ argument sets for all of insn32 formats
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -67,107 +94,39 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Andrew Jones <drjones@redhat.com>, Ben Warren <ben@skyportsystems.com>,
-	"Michael S. Tsirkin" <mst@redhat.com>, Laszlo Ersek <lersek@redhat.com>,
-	Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>,
-	Shannon Zhao <shannon.zhaosl@gmail.com>, Gonglei <arei.gonglei@huawei.com>,
-	Wei Yang <richardw.yang@linux.intel.com>,
-	=?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
+Cc: Bastian Koppelmann <kbastian@mail.uni-paderborn.de>,
+	Palmer Dabbelt <palmer@sifive.com>,
+	Alistair Francis <Alistair.Francis@wdc.com>,
+	qemu-devel@nongnu.org, qemu-riscv@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Content-Type: text/plain; charset="UTF-8"
-Message-ID: <20190425053443.XPWK-gxxRpkWBdtlH80WY5YgqkATFji5cYh3mGZbOtM@z>
+Message-ID: <20190425053149.oQ4UZUfXItVh1XZ22zEvSIcWA16u2NoqKtJWrqH2A8Y@z>
 
-introduce UEFI specific counterpart to acpi_find_rsdp_address()
-that will help to find RSDP address when [OA]VMF is used as
-firmware. It requires guest firmware or other guest app to place
-1Mb aligned UefiTestSupport structure (defined in this patch)
-in RAM with UefiTestSupport::signature_guid set to
-AB87A6B1-2034-BDA0-71BD-375007757785
+On Apr 25, 2019 7:17 AM, "Richard Henderson" <richard.henderson@linaro.org>
+wrote:
+>
+> On 4/24/19 8:31 PM, Palmer Dabbelt wrote:
+> >>  # Argument sets:
+> >> +&empty
+> >
+> > If I understand decodetree correctly, this isn't used until patch 5.
+> > Otherwise,
+> >
+>
+> I think it's used as early as patch 3, but I haven't looked in detail to
+be sure.
+>
+>
+> r~
+>
 
-Signed-off-by: Igor Mammedov <imammedo@redhat.com>
-Reviewed-by: Laszlo Ersek <lersek@redhat.com>
----
-v3:
-  * fix checkpatch error (separate opening brace from values in AcpiTestSupportGuid initializer)
-v2:
-  * Laszlo Ersek <lersek@redhat.com>
-    - s/uefi_find_rsdp_addr/acpi_find_rsdp_address_uefi/
-    - use GUID_SIZE instead of opencodding size
-    - make AcpiTestSupportGuid const
-    - s/TCI/TCG/
----
- tests/acpi-utils.h |  2 ++
- tests/acpi-utils.c | 44 ++++++++++++++++++++++++++++++++++++++++++++
- 2 files changed, 46 insertions(+)
+I think it is a very bad practice to leave the commit message empty, and,
+in my view, the long-time contributor, like you, Richard, have the
+obligation to always give examples of commit messages of good quality.
+Leaving empty commit messages should not be a =E2=80=9Dprivelage=E2=80=9D t=
+hat comes with
+seniority, IMHO. On the contrary.
 
-diff --git a/tests/acpi-utils.h b/tests/acpi-utils.h
-index 75f78f2..dcfa721 100644
---- a/tests/acpi-utils.h
-+++ b/tests/acpi-utils.h
-@@ -46,6 +46,8 @@ typedef struct {
- 
- uint8_t acpi_calc_checksum(const uint8_t *data, int len);
- uint32_t acpi_find_rsdp_address(QTestState *qts);
-+uint64_t acpi_find_rsdp_address_uefi(QTestState *qts, uint64_t start,
-+                                     uint64_t size);
- void acpi_fetch_rsdp_table(QTestState *qts, uint64_t addr, uint8_t *rsdp_table);
- void acpi_fetch_table(QTestState *qts, uint8_t **aml, uint32_t *aml_len,
-                       const uint8_t *addr_ptr, const char *sig,
-diff --git a/tests/acpi-utils.c b/tests/acpi-utils.c
-index 2dd4fe0..197af82 100644
---- a/tests/acpi-utils.c
-+++ b/tests/acpi-utils.c
-@@ -99,3 +99,47 @@ void acpi_fetch_table(QTestState *qts, uint8_t **aml, uint32_t *aml_len,
-         g_assert(!acpi_calc_checksum(*aml, *aml_len));
-     }
- }
-+
-+#define GUID_SIZE 16
-+static const uint8_t AcpiTestSupportGuid[GUID_SIZE] = {
-+       0xb1, 0xa6, 0x87, 0xab,
-+       0x34, 0x20,
-+       0xa0, 0xbd,
-+       0x71, 0xbd, 0x37, 0x50, 0x07, 0x75, 0x77, 0x85 };
-+
-+typedef struct {
-+    uint8_t signature_guid[GUID_SIZE];
-+    uint64_t rsdp10;
-+    uint64_t rsdp20;
-+} __attribute__((packed)) UefiTestSupport;
-+
-+/* Wait at most 600 seconds (test is slow with TCG and --enable-debug) */
-+#define TEST_DELAY (1 * G_USEC_PER_SEC / 10)
-+#define TEST_CYCLES MAX((600 * G_USEC_PER_SEC / TEST_DELAY), 1)
-+#define MB 0x100000ULL
-+uint64_t acpi_find_rsdp_address_uefi(QTestState *qts, uint64_t start,
-+                                     uint64_t size)
-+{
-+    int i, j;
-+    uint8_t data[GUID_SIZE];
-+
-+    for (i = 0; i < TEST_CYCLES; ++i) {
-+        for (j = 0; j < size / MB; j++) {
-+            /* look for GUID at every 1Mb block */
-+            uint64_t addr = start + j * MB;
-+
-+            qtest_memread(qts, addr, data, sizeof(data));
-+            if (!memcmp(AcpiTestSupportGuid, data, sizeof(data))) {
-+                UefiTestSupport ret;
-+
-+                qtest_memread(qts, addr, &ret, sizeof(ret));
-+                ret.rsdp10 = le64_to_cpu(ret.rsdp10);
-+                ret.rsdp20 = le64_to_cpu(ret.rsdp20);
-+                return ret.rsdp20 ? ret.rsdp20 : ret.rsdp10;
-+            }
-+        }
-+        g_usleep(TEST_DELAY);
-+    }
-+    g_assert_not_reached();
-+    return 0;
-+}
--- 
-2.7.4
-
-
+Sincerely,
+Aleksandar
