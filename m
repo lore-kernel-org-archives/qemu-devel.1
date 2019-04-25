@@ -1,28 +1,21 @@
-Received: from eggs.gnu.org ([209.51.188.92]:44688)
+Received: from eggs.gnu.org ([209.51.188.92]:47203)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1hJWkq-0008SI-R3
-	for qemu-devel@nongnu.org; Thu, 25 Apr 2019 01:17:05 -0400
+	(envelope-from <imammedo@redhat.com>) id 1hJX39-0003hD-Qu
+	for qemu-devel@nongnu.org; Thu, 25 Apr 2019 01:36:00 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1hJWkp-0005yj-VA
-	for qemu-devel@nongnu.org; Thu, 25 Apr 2019 01:17:04 -0400
-Received: from mail-pf1-x430.google.com ([2607:f8b0:4864:20::430]:46406)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1hJWkp-0005wS-OE
-	for qemu-devel@nongnu.org; Thu, 25 Apr 2019 01:17:03 -0400
-Received: by mail-pf1-x430.google.com with SMTP id 9so10494284pfj.13
-	for <qemu-devel@nongnu.org>; Wed, 24 Apr 2019 22:17:03 -0700 (PDT)
-References: <mhng-4fc40e41-5464-469e-9334-1edc4f8294e3@palmer-si-x1e>
-From: Richard Henderson <richard.henderson@linaro.org>
-Message-ID: <73a7ce8a-1d73-95f7-84a6-f0960a397c22@linaro.org>
-Date: Wed, 24 Apr 2019 22:16:58 -0700
-MIME-Version: 1.0
-In-Reply-To: <mhng-4fc40e41-5464-469e-9334-1edc4f8294e3@palmer-si-x1e>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH for-4.1 1/8] target/riscv: Name the
- argument sets for all of insn32 formats
+	(envelope-from <imammedo@redhat.com>) id 1hJX2P-0000We-D6
+	for qemu-devel@nongnu.org; Thu, 25 Apr 2019 01:35:15 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:43906)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1hJX2O-0000Ut-H4
+	for qemu-devel@nongnu.org; Thu, 25 Apr 2019 01:35:13 -0400
+From: Igor Mammedov <imammedo@redhat.com>
+Date: Thu, 25 Apr 2019 07:34:49 +0200
+Message-Id: <1556170489-131927-14-git-send-email-imammedo@redhat.com>
+In-Reply-To: <1556170489-131927-1-git-send-email-imammedo@redhat.com>
+References: <1556170489-131927-1-git-send-email-imammedo@redhat.com>
+Subject: [Qemu-devel] [PATCH v3 13/13] tests: acpi: print error unable to
+ dump ACPI table during rebuild
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,18 +24,38 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Palmer Dabbelt <palmer@sifive.com>
-Cc: qemu-devel@nongnu.org, Bastian Koppelmann <kbastian@mail.uni-paderborn.de>, Alistair Francis <Alistair.Francis@wdc.com>, qemu-riscv@nongnu.org
+To: qemu-devel@nongnu.org
+Cc: Laszlo Ersek <lersek@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Gonglei <arei.gonglei@huawei.com>, =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>, Shannon Zhao <shannon.zhaosl@gmail.com>, Wei Yang <richardw.yang@linux.intel.com>, Andrew Jones <drjones@redhat.com>, Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>, Ben Warren <ben@skyportsystems.com>
 
-On 4/24/19 8:31 PM, Palmer Dabbelt wrote:
->>  # Argument sets:
->> +&empty
-> 
-> If I understand decodetree correctly, this isn't used until patch 5.
-> Otherwise,
-> 
+Instead of just asserting print the error that lead to assert first.
+While at it move assert into rebuild branch, which removes reduntant
+check done in case of !rebuild branch is taken (the later is taken
+care of by g_assert_no_error).
 
-I think it's used as early as patch 3, but I haven't looked in detail to be sure.
+Signed-off-by: Igor Mammedov <imammedo@redhat.com>
+---
+ tests/bios-tables-test.c | 5 ++++-
+ 1 file changed, 4 insertions(+), 1 deletion(-)
 
-
-r~
+diff --git a/tests/bios-tables-test.c b/tests/bios-tables-test.c
+index f117461..5a5d036 100644
+--- a/tests/bios-tables-test.c
++++ b/tests/bios-tables-test.c
+@@ -199,11 +199,14 @@ static void dump_aml_files(test_data *data, bool rebuild)
+                                        sdt->aml, ext);
+             fd = g_open(aml_file, O_WRONLY|O_TRUNC|O_CREAT,
+                         S_IRUSR|S_IWUSR|S_IRGRP|S_IWGRP|S_IROTH);
++            if (fd < 0) {
++                perror(aml_file);
++            }
++            g_assert(fd >= 0);
+         } else {
+             fd = g_file_open_tmp("aml-XXXXXX", &sdt->aml_file, &error);
+             g_assert_no_error(error);
+         }
+-        g_assert(fd >= 0);
+ 
+         ret = qemu_write_full(fd, sdt->aml, sdt->aml_len);
+         g_assert(ret == sdt->aml_len);
+-- 
+2.7.4
