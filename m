@@ -1,28 +1,21 @@
-Received: from eggs.gnu.org ([209.51.188.92]:44380)
+Received: from eggs.gnu.org ([209.51.188.92]:45820)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1hJimI-0008Ki-Hz
-	for qemu-devel@nongnu.org; Thu, 25 Apr 2019 14:07:23 -0400
+	(envelope-from <ehabkost@redhat.com>) id 1hJisb-0003Ho-Oe
+	for qemu-devel@nongnu.org; Thu, 25 Apr 2019 14:13:54 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1hJimF-00071G-Py
-	for qemu-devel@nongnu.org; Thu, 25 Apr 2019 14:07:21 -0400
-Received: from mail-wr1-f65.google.com ([209.85.221.65]:36304)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1hJimB-0006e7-Se
-	for qemu-devel@nongnu.org; Thu, 25 Apr 2019 14:07:18 -0400
-Received: by mail-wr1-f65.google.com with SMTP id b1so679645wru.3
-	for <qemu-devel@nongnu.org>; Thu, 25 Apr 2019 11:07:09 -0700 (PDT)
-References: <20190103144124.18917-1-stefanha@redhat.com>
-	<CAFEAcA-B_T9E3ezWFXg-wp3RotMjv3-z3qY7hSJZEoqFBqCWnQ@mail.gmail.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Message-ID: <62b29bc1-cc78-cd64-4377-fc4007ba7189@redhat.com>
-Date: Thu, 25 Apr 2019 20:07:06 +0200
+	(envelope-from <ehabkost@redhat.com>) id 1hJisX-000249-UD
+	for qemu-devel@nongnu.org; Thu, 25 Apr 2019 14:13:52 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:60596)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1hJisX-0001wu-7q
+	for qemu-devel@nongnu.org; Thu, 25 Apr 2019 14:13:49 -0400
+From: Eduardo Habkost <ehabkost@redhat.com>
+Date: Thu, 25 Apr 2019 15:13:38 -0300
+Message-Id: <20190425181342.15360-1-ehabkost@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <CAFEAcA-B_T9E3ezWFXg-wp3RotMjv3-z3qY7hSJZEoqFBqCWnQ@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH] Revert "armv7m: Guard against no -kernel
- argument"
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PULL 0/4] x86 queue, 2019-04-25
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,48 +24,49 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>, Stefan Hajnoczi <stefanha@redhat.com>
-Cc: Jim Mussared <jim@groklearning.com>, Julia Suvorova <jusual@mail.ru>, QEMU Developers <qemu-devel@nongnu.org>, Steffen Gortz <qemu.ml@steffen-goertz.de>, qemu-arm <qemu-arm@nongnu.org>, Joel Stanley <joel@jms.id.au>, =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>, Thomas Huth <thuth@redhat.com>
+To: Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org
+Cc: Paolo Bonzini <pbonzini@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, Richard Henderson <rth@twiddle.net>
 
-Hi Peter, Stefan,
+The following changes since commit 3284aa128153750f14a61e8a96fd085e6f2999=
+b6:
 
-On 1/4/19 4:16 PM, Peter Maydell wrote:
-> On Thu, 3 Jan 2019 at 14:41, Stefan Hajnoczi <stefanha@redhat.com> wrote:
->>
->> This reverts commit 01fd41ab3fb69971c24a69ed49cde96086d81278.
->>
->> The generic loader device (-device loader,file=kernel.bin) can be used
->> to load a kernel instead of the -kernel option.  Some boards have flash
->> memory (pflash) that is set via the -pflash or -drive options.
->>
->> Allow starting QEMU without the -kernel option to accommodate these
->> scenarios.
->>
->> Suggested-by: Peter Maydell <peter.maydell@linaro.org>
->> Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
+  Merge remote-tracking branch 'remotes/lersek/tags/edk2-pull-2019-04-22'=
+ into staging (2019-04-24 13:19:41 +0100)
 
-Previous to this commit (v3.1), we have:
+are available in the Git repository at:
 
-$ qemu-system-aarch64 -M netduino2
-qemu-system-aarch64: Guest image must be specified (using -kernel)
+  git://github.com/ehabkost/qemu.git tags/x86-next-pull-request
 
-Now (v4.0) we get:
+for you to fetch changes up to a4e0b436f44a4bb47ed4a75b0c05d2547cf12b1c:
 
-$ qemu-system-aarch64 -M netduino2
-qemu: fatal: Lockup: can't escalate 3 to HardFault (current priority -1)
+  Pass through cache information for TOPOEXT CPUs (2019-04-25 14:52:28 -0=
+300)
 
-R00=00000000 R01=00000000 R02=00000000 R03=00000000
-R04=00000000 R05=00000000 R06=00000000 R07=00000000
-R08=00000000 R09=00000000 R10=00000000 R11=00000000
-R12=00000000 R13=ffffffe0 R14=fffffff9 R15=00000000
-XPSR=40000003 -Z-- A handler
-FPSCR: 00000000
-Aborted (core dumped)
+----------------------------------------------------------------
+x86 queue, 2019-04-25
 
-This is confusing.
+* Hygon Dhyana CPU model (Pu Wen)
+* Categorize a few devices in hw/i386 (Ernest Esene)
+* Support host-cache-info on TOPOEXT CPUID leaf (Stanislav Lanci)
 
-(same happens with emcraft-sf2, microbit, musca-*)
+----------------------------------------------------------------
 
-Regards,
+Ernest Esene (2):
+  Categorize devices: IGD passthrough ISA bridge
+  Categorize devices: iommu
 
-Phil.
+Pu Wen (1):
+  i386: Add new Hygon 'Dhyana' CPU model
+
+Stanislav Lanci (1):
+  Pass through cache information for TOPOEXT CPUs
+
+ target/i386/cpu.h     |  2 ++
+ hw/i386/amd_iommu.c   |  2 ++
+ hw/i386/intel_iommu.c |  2 ++
+ hw/i386/pc_piix.c     |  1 +
+ target/i386/cpu.c     | 54 +++++++++++++++++++++++++++++++++++++++++++
+ 5 files changed, 61 insertions(+)
+
+--=20
+2.18.0.rc1.1.g3f1ff2140
