@@ -3,81 +3,63 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
 X-Spam-Status: No, score=-6.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.0
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CAECCC43219
-	for <qemu-devel@archiver.kernel.org>; Thu, 25 Apr 2019 14:08:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 502AAC43218
+	for <qemu-devel@archiver.kernel.org>; Thu, 25 Apr 2019 14:08:41 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A556220644
-	for <qemu-devel@archiver.kernel.org>; Thu, 25 Apr 2019 14:08:15 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A556220644
+	by mail.kernel.org (Postfix) with ESMTPS id 42B8A20644
+	for <qemu-devel@archiver.kernel.org>; Thu, 25 Apr 2019 14:08:41 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 42B8A20644
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:58094 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:58096 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hJf2s-0000WJ-Gs
-	for qemu-devel@archiver.kernel.org; Thu, 25 Apr 2019 10:08:14 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:45388)
+	id 1hJf3I-0000rl-B9
+	for qemu-devel@archiver.kernel.org; Thu, 25 Apr 2019 10:08:40 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:33638)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1hJf1Z-000815-Jf
-	for qemu-devel@nongnu.org; Thu, 25 Apr 2019 10:06:59 -0400
+	(envelope-from <imammedo@redhat.com>) id 1hJeTb-0003Pe-A9
+	for qemu-devel@nongnu.org; Thu, 25 Apr 2019 09:31:48 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1hJf1X-0006Ae-H7
-	for qemu-devel@nongnu.org; Thu, 25 Apr 2019 10:06:52 -0400
-Received: from mail-wr1-f66.google.com ([209.85.221.66]:36290)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1hJf1W-00068H-Tg
-	for qemu-devel@nongnu.org; Thu, 25 Apr 2019 10:06:51 -0400
-Received: by mail-wr1-f66.google.com with SMTP id b1so19194922wru.3
-	for <qemu-devel@nongnu.org>; Thu, 25 Apr 2019 07:06:48 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=1e100.net; s=20161025;
-	h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
-	:date:user-agent:mime-version:in-reply-to:content-language
-	:content-transfer-encoding;
-	bh=++1XX3+8k55A2Ila7MS9KJPTa3AUixyAgpwW0iiITRU=;
-	b=ELL3BHtGzLWrTRQbjfyTbrEgXOqDfNUenx4D2aJIhy+nnW5UC3SYGPP8W1H4dI0zhn
-	5qXLqlCrrFSCfZhI5iTnohCM5IWPb3RllaAMAJUBz9900DO2iR/rqIS8PsOS5Y2rrN4E
-	sWpHutKoP0OMuVo8fib9xX8VMTmVfa+SZTq2ZV5JMhqzqJkA80bip/nBeziBeTGOScx+
-	YQSsv90Jc5zuCx1JKhEGaU8K85SA+FzEaB6DvMf1+nmcdRd2NY+YlIqvBwWibOu8D4pk
-	PAXa9sf+bDE7+pgM7e3ayhUxMbMGF5v6AZxYQVVI6bqoo1g6/mkUXE+Vl2kSAaPrrv6T
-	Ux9A==
-X-Gm-Message-State: APjAAAX6xF6b+rAbS2aaXCzH67WOWEgVKDtsRrRClzKA30JVCHcmbkpP
-	M66rQr4zL5h8Gmf/mXDPo6GH4g==
-X-Google-Smtp-Source: APXvYqy8BYAx144HNRTNnSYopzBscGHdIsWMoI6vFPxaU/R4GBeHbMrgTd4fj+uUSBipBxtM5Pvtmw==
-X-Received: by 2002:a5d:4d49:: with SMTP id a9mr28576571wru.227.1556201208083; 
-	Thu, 25 Apr 2019 07:06:48 -0700 (PDT)
-Received: from [192.168.1.25] (abayonne-654-1-209-122.w109-222.abo.wanadoo.fr.
-	[109.222.216.122]) by smtp.gmail.com with ESMTPSA id
-	62sm28308476wrm.18.2019.04.25.07.06.46
-	(version=TLS1_3 cipher=AEAD-AES128-GCM-SHA256 bits=128/128);
-	Thu, 25 Apr 2019 07:06:47 -0700 (PDT)
-To: Thomas Huth <thuth@redhat.com>, yang.zhong@intel.com,
-	Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org,
-	pbonzini@redhat.com
-References: <20190418180057.3593-1-thuth@redhat.com>
-	<20190418180057.3593-2-thuth@redhat.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Openpgp: id=89C1E78F601EE86C867495CBA2A3FD6EDEADC0DE;
-	url=http://pgp.mit.edu/pks/lookup?op=get&search=0xA2A3FD6EDEADC0DE
-Message-ID: <7d4fdf95-f3b9-786a-9869-fdfca87d6a59@redhat.com>
-Date: Thu, 25 Apr 2019 16:06:42 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
-	Thunderbird/60.6.1
+	(envelope-from <imammedo@redhat.com>) id 1hJeTa-00068B-6H
+	for qemu-devel@nongnu.org; Thu, 25 Apr 2019 09:31:47 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:58074)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1hJeTZ-00067t-UP
+	for qemu-devel@nongnu.org; Thu, 25 Apr 2019 09:31:46 -0400
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+	[10.5.11.22])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 2C421308FED4;
+	Thu, 25 Apr 2019 13:31:45 +0000 (UTC)
+Received: from localhost (unknown [10.43.2.182])
+	by smtp.corp.redhat.com (Postfix) with ESMTP id 0C0171001DC0;
+	Thu, 25 Apr 2019 13:31:38 +0000 (UTC)
+Date: Thu, 25 Apr 2019 15:31:34 +0200
+From: Igor Mammedov <imammedo@redhat.com>
+To: Philippe =?UTF-8?B?TWF0aGlldS1EYXVkw6k=?= <philmd@redhat.com>
+Message-ID: <20190425153134.585b614d@redhat.com>
+In-Reply-To: <1f64a17a-57e8-448f-ced2-860d137eebaa@redhat.com>
+References: <1556170489-131927-1-git-send-email-imammedo@redhat.com>
+	<1556170489-131927-12-git-send-email-imammedo@redhat.com>
+	<1f64a17a-57e8-448f-ced2-860d137eebaa@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20190418180057.3593-2-thuth@redhat.com>
 Content-Type: text/plain; charset="UTF-8"
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
+Content-Transfer-Encoding: quoted-printable
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+	(mx1.redhat.com [10.5.110.49]);
+	Thu, 25 Apr 2019 13:31:45 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-	[fuzzy]
-X-Received-From: 209.85.221.66
-Subject: Re: [Qemu-devel] [PATCH for-QEMU-4.1 v5 01/29] hw/pci/pci-stub: Add
- msi_enabled() and msi_notify() to the pci stubs
+X-Received-From: 209.132.183.28
+Subject: Re: [Qemu-devel] [PATCH v3 11/13] tests: acpi: add simple arm/virt
+ testcase
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -89,60 +71,103 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Rob Herring <robh@kernel.org>, Jan Kiszka <jan.kiszka@web.de>,
-	Igor Mitsyanko <i.mitsyanko@gmail.com>, qemu-block@nongnu.org,
-	"Michael S. Tsirkin" <mst@redhat.com>,
-	Andrey Smirnov <andrew.smirnov@gmail.com>,
-	Alistair Francis <alistair@alistair23.me>,
-	Philippe Mathieu-Daude <f4bug@amsat.org>,
-	Jean-Christophe Dubois <jcd@tribudubois.net>,
-	Beniamino Galvani <b.galvani@gmail.com>, Andrew Jeffery <andrew@aj.id.au>,
-	Cedric Le Goater <clg@kaod.org>, qemu-arm@nongnu.org,
-	Peter Chubb <peter.chubb@nicta.com.au>, Gerd Hoffmann <kraxel@redhat.com>,
-	Antony Pavlov <antonynpavlov@gmail.com>,
-	"Edgar E . Iglesias" <edgar.iglesias@gmail.com>,
-	Subbaraya Sundeep <sundeep.lkml@gmail.com>,
-	John Snow <jsnow@redhat.com>, Joel Stanley <joel@jms.id.au>
+Cc: Andrew Jones <drjones@redhat.com>, Ben Warren <ben@skyportsystems.com>,
+	"Michael S. Tsirkin" <mst@redhat.com>, qemu-devel@nongnu.org,
+	Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>,
+	Shannon Zhao <shannon.zhaosl@gmail.com>, Gonglei <arei.gonglei@huawei.com>,
+	Wei Yang <richardw.yang@linux.intel.com>, Laszlo Ersek <lersek@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190425140642.Hq8dHeArMnKd6FKG-Z1stxwMkBg4azlKY1WD9UWfs94@z>
+Message-ID: <20190425133134.XY7LUEEvtSmyk4A8Tq48CJ2h8KIBsHojrVreH4htr9w@z>
 
-On 4/18/19 8:00 PM, Thomas Huth wrote:
-> Some machines have an AHCI adapter, but no PCI. To be able to
-> compile hw/ide/ahci.c without CONFIG_PCI, we still need the two
-> functions msi_enabled() and msi_notify() for linking.
-> This is required for the new Kconfig-like build system, if a user
-> wants to compile a QEMU binary with just one machine that has AHCI,
-> but no PCI, like the ARM "cubieboard" for example.
-> 
-> Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
-> Signed-off-by: Thomas Huth <thuth@redhat.com>
-> ---
->  hw/pci/pci-stub.c | 11 +++++++++++
->  1 file changed, 11 insertions(+)
-> 
-> diff --git a/hw/pci/pci-stub.c b/hw/pci/pci-stub.c
-> index b941a0e842..c04a5df651 100644
-> --- a/hw/pci/pci-stub.c
-> +++ b/hw/pci/pci-stub.c
-> @@ -53,3 +53,14 @@ uint16_t pci_requester_id(PCIDevice *dev)
->      g_assert(false);
->      return 0;
->  }
-> +
-> +/* Required by ahci.c */
-> +bool msi_enabled(const PCIDevice *dev)
-> +{
-> +    return false;
-> +}
-> +
-> +void msi_notify(PCIDevice *dev, unsigned int vector)
-> +{
-> +    g_assert_not_reached();
-> +}
-> 
+On Thu, 25 Apr 2019 14:41:28 +0200
+Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com> wrote:
 
-Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
-Tested-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+> On 4/25/19 7:34 AM, Igor Mammedov wrote:
+> > adds simple arm/virt test case that starts guest with
+> > bios-tables-test.aarch64.iso.qcow2 boot image which
+> > initializes UefiTestSupport* structure in RAM once
+> > guest is booted.
+> >=20
+> >  * see commit: tests: acpi: add acpi_find_rsdp_address_uefi() helper
+> >=20
+> > Signed-off-by: Igor Mammedov <imammedo@redhat.com>
+> > Reviewed-by: Laszlo Ersek <lersek@redhat.com> =20
+>=20
+> > Reviewed-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org> =20
+> Please replace previous R-b by:
+
+done
+
+> Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+> Tested-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+>=20
+> > ---
+> > v3:
+> >   * use firmware blobs directly from pc-bios directory
+> >   * use bios-tables-test.aarch64.iso.qcow2 as test boot image
+> >   * drop leftover qtest-uefi-images-aarch64 iMakefile rule from
+> >     previos version (Laszlo)
+> >   * add Makefile rule to include bios-tables-test into
+> >     check-qtest-aarch64 target
+> > v2:
+> >   * specify in test_data where board's RAM starts and RAM size
+> > ---
+> >  tests/Makefile.include   |  1 +
+> >  tests/bios-tables-test.c | 17 +++++++++++++++++
+> >  2 files changed, 18 insertions(+)
+> >=20
+> > diff --git a/tests/Makefile.include b/tests/Makefile.include
+> > index e2432d5..983c8b1 100644
+> > --- a/tests/Makefile.include
+> > +++ b/tests/Makefile.include
+> > @@ -267,6 +267,7 @@ check-qtest-arm-y +=3D tests/hexloader-test$(EXESUF)
+> >  check-qtest-aarch64-y =3D tests/numa-test$(EXESUF)
+> >  check-qtest-aarch64-y +=3D tests/boot-serial-test$(EXESUF)
+> >  check-qtest-aarch64-y +=3D tests/migration-test$(EXESUF)
+> > +check-qtest-aarch64-y +=3D tests/bios-tables-test$(EXESUF)
+> > =20
+> >  check-qtest-microblazeel-y +=3D $(check-qtest-microblaze-y)
+> > =20
+> > diff --git a/tests/bios-tables-test.c b/tests/bios-tables-test.c
+> > index 1be55a1..f117461 100644
+> > --- a/tests/bios-tables-test.c
+> > +++ b/tests/bios-tables-test.c
+> > @@ -812,6 +812,21 @@ static void test_acpi_piix4_tcg_dimm_pxm(void)
+> >      test_acpi_tcg_dimm_pxm(MACHINE_PC);
+> >  }
+> > =20
+> > +static void test_acpi_virt_tcg(void)
+> > +{
+> > +    test_data data =3D {
+> > +        .machine =3D "virt",
+> > +        .uefi_fl1 =3D "pc-bios/edk2-aarch64-code.fd",
+> > +        .uefi_fl2 =3D "pc-bios/edk2-arm-vars.fd",
+> > +        .cd =3D "tests/data/uefi-boot-images/bios-tables-test.aarch64.=
+iso.qcow2",
+> > +        .ram_start =3D 0x40000000ULL,
+> > +        .scan_len =3D 128ULL * 1024 * 1024,
+> > +    };
+> > +
+> > +    test_acpi_one("-cpu cortex-a57 ", &data);
+> > +    free_test_data(&data);
+> > +}
+> > +
+> >  int main(int argc, char *argv[])
+> >  {
+> >      const char *arch =3D qtest_get_arch();
+> > @@ -840,6 +855,8 @@ int main(int argc, char *argv[])
+> >          qtest_add_func("acpi/q35/numamem", test_acpi_q35_tcg_numamem);
+> >          qtest_add_func("acpi/piix4/dimmpxm", test_acpi_piix4_tcg_dimm_=
+pxm);
+> >          qtest_add_func("acpi/q35/dimmpxm", test_acpi_q35_tcg_dimm_pxm);
+> > +    } else if (strcmp(arch, "aarch64") =3D=3D 0) {
+> > +        qtest_add_func("acpi/virt", test_acpi_virt_tcg);
+> >      }
+> >      ret =3D g_test_run();
+> >      boot_sector_cleanup(disk);
+> >  =20
+>=20
+
 
