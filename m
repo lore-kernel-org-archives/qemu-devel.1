@@ -6,54 +6,54 @@ X-Spam-Status: No, score=-6.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D684EC43219
-	for <qemu-devel@archiver.kernel.org>; Thu, 25 Apr 2019 13:29:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EC2AFC43218
+	for <qemu-devel@archiver.kernel.org>; Thu, 25 Apr 2019 13:29:40 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7CBEF212F5
-	for <qemu-devel@archiver.kernel.org>; Thu, 25 Apr 2019 13:29:20 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7CBEF212F5
+	by mail.kernel.org (Postfix) with ESMTPS id 93C1E212F5
+	for <qemu-devel@archiver.kernel.org>; Thu, 25 Apr 2019 13:29:40 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 93C1E212F5
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:57166 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:57168 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hJeRD-0000s1-Fo
-	for qemu-devel@archiver.kernel.org; Thu, 25 Apr 2019 09:29:19 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:58398)
+	id 1hJeRX-00015D-Sb
+	for qemu-devel@archiver.kernel.org; Thu, 25 Apr 2019 09:29:39 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:58484)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1hJeJy-0003GD-Fv
-	for qemu-devel@nongnu.org; Thu, 25 Apr 2019 09:21:51 -0400
+	(envelope-from <cohuck@redhat.com>) id 1hJeK5-0003NC-16
+	for qemu-devel@nongnu.org; Thu, 25 Apr 2019 09:21:58 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1hJeJx-0003f4-AU
-	for qemu-devel@nongnu.org; Thu, 25 Apr 2019 09:21:50 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:53422)
+	(envelope-from <cohuck@redhat.com>) id 1hJeK3-0003i4-Bz
+	for qemu-devel@nongnu.org; Thu, 25 Apr 2019 09:21:57 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:41090)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <cohuck@redhat.com>)
-	id 1hJeJx-0003el-2i; Thu, 25 Apr 2019 09:21:49 -0400
+	id 1hJeK3-0003hY-3Z; Thu, 25 Apr 2019 09:21:55 -0400
 Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
 	[10.5.11.16])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 5534AC049E23;
-	Thu, 25 Apr 2019 13:21:48 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id 5F40D30944F2;
+	Thu, 25 Apr 2019 13:21:54 +0000 (UTC)
 Received: from localhost (dhcp-192-187.str.redhat.com [10.33.192.187])
-	by smtp.corp.redhat.com (Postfix) with ESMTPS id 044805C652;
-	Thu, 25 Apr 2019 13:21:47 +0000 (UTC)
+	by smtp.corp.redhat.com (Postfix) with ESMTPS id DD2C15C652;
+	Thu, 25 Apr 2019 13:21:53 +0000 (UTC)
 From: Cornelia Huck <cohuck@redhat.com>
 To: Peter Maydell <peter.maydell@linaro.org>
-Date: Thu, 25 Apr 2019 15:21:21 +0200
-Message-Id: <20190425132134.2839-7-cohuck@redhat.com>
+Date: Thu, 25 Apr 2019 15:21:24 +0200
+Message-Id: <20190425132134.2839-10-cohuck@redhat.com>
 In-Reply-To: <20190425132134.2839-1-cohuck@redhat.com>
 References: <20190425132134.2839-1-cohuck@redhat.com>
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.31]);
-	Thu, 25 Apr 2019 13:21:48 +0000 (UTC)
+	(mx1.redhat.com [10.5.110.40]);
+	Thu, 25 Apr 2019 13:21:54 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] [PULL 06/19] s390-bios: Map low core memory
+Subject: [Qemu-devel] [PULL 09/19] s390-bios: cio error handling
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -71,141 +71,330 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 Content-Type: text/plain; charset="UTF-8"
-Message-ID: <20190425132121.TFpyrLdNWpqW18iLH3FAYMWaTe1BTC8kGVtg6tCw6WI@z>
+Message-ID: <20190425132124.dR1t0ifSY_LMcfARTxzjgUkdwgJ4uQtPaSVN_9aFHQ8@z>
 
 From: "Jason J. Herne" <jjherne@linux.ibm.com>
 
-Create a new header for basic architecture specific definitions and add a
-mapping of low core memory. This mapping will be used by the real dasd boot
-process.
+Add verbose error output for when unexpected i/o errors happen. This eases the
+burden of debugging and reporting i/o errors. No error information is printed
+in the success case, here is an example of what is output on error:
+
+cio device error
+  ssid  : 0x0000000000000000
+  cssid : 0x0000000000000000
+  sch_no: 0x0000000000000000
+
+Interrupt Response Block Data:
+    Function Ctrl : [Start]
+    Activity Ctrl : [Start-Pending]
+    Status Ctrl : [Alert] [Primary] [Secondary] [Status-Pending]
+    Device Status : [Unit-Check]
+    Channel Status :
+    cpa=: 0x000000007f8d6038
+    prev_ccw=: 0x0000000000000000
+    this_ccw=: 0x0000000000000000
+Eckd Dasd Sense Data (fmt 32-bytes):
+    Sense Condition Flags :
+    Residual Count     =: 0x0000000000000000
+    Phys Drive ID      =: 0x000000000000009e
+    low cyl address    =: 0x0000000000000000
+    head addr & hi cyl =: 0x0000000000000000
+    format/message     =: 0x0000000000000008
+    fmt-dependent[0-7] =: 0x0000000000000004
+    fmt-dependent[8-15]=: 0xe561282305082fff
+    prog action code   =: 0x0000000000000016
+    Configuration info =: 0x00000000000040e0
+    mcode / hi-cyl     =: 0x0000000000000000
+    cyl & head addr [0]=: 0x0000000000000000
+    cyl & head addr [1]=: 0x0000000000000000
+    cyl & head addr [2]=: 0x0000000000000000
+
+The Sense Data section is currently only printed for ECKD DASD.
 
 Signed-off-by: Jason J. Herne <jjherne@linux.ibm.com>
-Acked-by: Cornelia Huck <cohuck@redhat.com>
-Reviewed-by: Thomas Huth <thuth@redhat.com>
-Message-Id: <1554388475-18329-7-git-send-email-jjherne@linux.ibm.com>
+Reviewed-by: Cornelia Huck <cohuck@redhat.com>
+Message-Id: <1554388475-18329-10-git-send-email-jjherne@linux.ibm.com>
 Signed-off-by: Thomas Huth <thuth@redhat.com>
 ---
- pc-bios/s390-ccw/main.c      |  2 +
- pc-bios/s390-ccw/s390-arch.h | 90 ++++++++++++++++++++++++++++++++++++
- 2 files changed, 92 insertions(+)
- create mode 100644 pc-bios/s390-ccw/s390-arch.h
+ pc-bios/s390-ccw/cio.c  | 235 ++++++++++++++++++++++++++++++++++++++++
+ pc-bios/s390-ccw/libc.h |  11 ++
+ 2 files changed, 246 insertions(+)
 
-diff --git a/pc-bios/s390-ccw/main.c b/pc-bios/s390-ccw/main.c
-index 10f04c69068f..e403b5f733e4 100644
---- a/pc-bios/s390-ccw/main.c
-+++ b/pc-bios/s390-ccw/main.c
-@@ -9,6 +9,7 @@
-  */
+diff --git a/pc-bios/s390-ccw/cio.c b/pc-bios/s390-ccw/cio.c
+index c43e50b00b8e..339ec5fbe7a4 100644
+--- a/pc-bios/s390-ccw/cio.c
++++ b/pc-bios/s390-ccw/cio.c
+@@ -85,6 +85,228 @@ static bool irb_error(Irb *irb)
+     return irb->scsw.dstat != (SCSW_DSTAT_DEVEND | SCSW_DSTAT_CHEND);
+ }
  
- #include "libc.h"
-+#include "s390-arch.h"
- #include "s390-ccw.h"
- #include "cio.h"
- #include "virtio.h"
-@@ -19,6 +20,7 @@ static char loadparm_str[LOADPARM_LEN + 1] = { 0, 0, 0, 0, 0, 0, 0, 0, 0 };
- QemuIplParameters qipl;
- IplParameterBlock iplb __attribute__((__aligned__(PAGE_SIZE)));
- static bool have_iplb;
-+LowCore const *lowcore; /* Yes, this *is* a pointer to address 0 */
++static void print_eckd_dasd_sense_data(SenseDataEckdDasd *sd)
++{
++    char msgline[512];
++
++    if (sd->config_info & 0x8000) {
++        sclp_print("Eckd Dasd Sense Data (fmt 24-bytes):\n");
++    } else {
++        sclp_print("Eckd Dasd Sense Data (fmt 32-bytes):\n");
++    }
++
++    strcat(msgline, "    Sense Condition Flags :");
++    if (sd->common_status & SNS_STAT0_CMD_REJECT) {
++        strcat(msgline, " [Cmd-Reject]");
++    }
++    if (sd->common_status & SNS_STAT0_INTERVENTION_REQ) {
++        strcat(msgline, " [Intervention-Required]");
++    }
++    if (sd->common_status & SNS_STAT0_BUS_OUT_CHECK) {
++        strcat(msgline, " [Bus-Out-Parity-Check]");
++    }
++    if (sd->common_status & SNS_STAT0_EQUIPMENT_CHECK) {
++        strcat(msgline, " [Equipment-Check]");
++    }
++    if (sd->common_status & SNS_STAT0_DATA_CHECK) {
++        strcat(msgline, " [Data-Check]");
++    }
++    if (sd->common_status & SNS_STAT0_OVERRUN) {
++        strcat(msgline, " [Overrun]");
++    }
++    if (sd->common_status & SNS_STAT0_INCOMPL_DOMAIN) {
++        strcat(msgline, " [Incomplete-Domain]");
++    }
++
++    if (sd->status[0] & SNS_STAT1_PERM_ERR) {
++        strcat(msgline, " [Permanent-Error]");
++    }
++    if (sd->status[0] & SNS_STAT1_INV_TRACK_FORMAT) {
++        strcat(msgline, " [Invalid-Track-Fmt]");
++    }
++    if (sd->status[0] & SNS_STAT1_EOC) {
++        strcat(msgline, " [End-of-Cyl]");
++    }
++    if (sd->status[0] & SNS_STAT1_MESSAGE_TO_OPER) {
++        strcat(msgline, " [Operator-Msg]");
++    }
++    if (sd->status[0] & SNS_STAT1_NO_REC_FOUND) {
++        strcat(msgline, " [No-Record-Found]");
++    }
++    if (sd->status[0] & SNS_STAT1_FILE_PROTECTED) {
++        strcat(msgline, " [File-Protected]");
++    }
++    if (sd->status[0] & SNS_STAT1_WRITE_INHIBITED) {
++        strcat(msgline, " [Write-Inhibited]");
++    }
++    if (sd->status[0] & SNS_STAT1_IMPRECISE_END) {
++        strcat(msgline, " [Imprecise-Ending]");
++    }
++
++    if (sd->status[1] & SNS_STAT2_REQ_INH_WRITE) {
++        strcat(msgline, " [Req-Inhibit-Write]");
++    }
++    if (sd->status[1] & SNS_STAT2_CORRECTABLE) {
++        strcat(msgline, " [Correctable-Data-Check]");
++    }
++    if (sd->status[1] & SNS_STAT2_FIRST_LOG_ERR) {
++        strcat(msgline, " [First-Error-Log]");
++    }
++    if (sd->status[1] & SNS_STAT2_ENV_DATA_PRESENT) {
++        strcat(msgline, " [Env-Data-Present]");
++    }
++    if (sd->status[1] & SNS_STAT2_IMPRECISE_END) {
++        strcat(msgline, " [Imprecise-End]");
++    }
++    strcat(msgline, "\n");
++    sclp_print(msgline);
++
++    print_int("    Residual Count     =", sd->res_count);
++    print_int("    Phys Drive ID      =", sd->phys_drive_id);
++    print_int("    low cyl address    =", sd->low_cyl_addr);
++    print_int("    head addr & hi cyl =", sd->head_high_cyl_addr);
++    print_int("    format/message     =", sd->fmt_msg);
++    print_int("    fmt-dependent[0-7] =", sd->fmt_dependent_info[0]);
++    print_int("    fmt-dependent[8-15]=", sd->fmt_dependent_info[1]);
++    print_int("    prog action code   =", sd->program_action_code);
++    print_int("    Configuration info =", sd->config_info);
++    print_int("    mcode / hi-cyl     =", sd->mcode_hicyl);
++    print_int("    cyl & head addr [0]=", sd->cyl_head_addr[0]);
++    print_int("    cyl & head addr [1]=", sd->cyl_head_addr[1]);
++    print_int("    cyl & head addr [2]=", sd->cyl_head_addr[2]);
++}
++
++static void print_irb_err(Irb *irb)
++{
++    uint64_t this_ccw = *(uint64_t *)u32toptr(irb->scsw.cpa);
++    uint64_t prev_ccw = *(uint64_t *)u32toptr(irb->scsw.cpa - 8);
++    char msgline[256];
++
++    sclp_print("Interrupt Response Block Data:\n");
++
++    strcat(msgline, "    Function Ctrl :");
++    if (irb->scsw.ctrl & SCSW_FCTL_START_FUNC) {
++        strcat(msgline, " [Start]");
++    }
++    if (irb->scsw.ctrl & SCSW_FCTL_HALT_FUNC) {
++        strcat(msgline, " [Halt]");
++    }
++    if (irb->scsw.ctrl & SCSW_FCTL_CLEAR_FUNC) {
++        strcat(msgline, " [Clear]");
++    }
++    strcat(msgline, "\n");
++    sclp_print(msgline);
++
++    msgline[0] = '\0';
++    strcat(msgline, "    Activity Ctrl :");
++    if (irb->scsw.ctrl & SCSW_ACTL_RESUME_PEND) {
++        strcat(msgline, " [Resume-Pending]");
++    }
++    if (irb->scsw.ctrl & SCSW_ACTL_START_PEND) {
++        strcat(msgline, " [Start-Pending]");
++    }
++    if (irb->scsw.ctrl & SCSW_ACTL_HALT_PEND) {
++        strcat(msgline, " [Halt-Pending]");
++    }
++    if (irb->scsw.ctrl & SCSW_ACTL_CLEAR_PEND) {
++        strcat(msgline, " [Clear-Pending]");
++    }
++    if (irb->scsw.ctrl & SCSW_ACTL_CH_ACTIVE) {
++        strcat(msgline, " [Channel-Active]");
++    }
++    if (irb->scsw.ctrl & SCSW_ACTL_DEV_ACTIVE) {
++        strcat(msgline, " [Device-Active]");
++    }
++    if (irb->scsw.ctrl & SCSW_ACTL_SUSPENDED) {
++        strcat(msgline, " [Suspended]");
++    }
++    strcat(msgline, "\n");
++    sclp_print(msgline);
++
++    msgline[0] = '\0';
++    strcat(msgline, "    Status Ctrl :");
++    if (irb->scsw.ctrl & SCSW_SCTL_ALERT) {
++        strcat(msgline, " [Alert]");
++    }
++    if (irb->scsw.ctrl & SCSW_SCTL_INTERMED) {
++        strcat(msgline, " [Intermediate]");
++    }
++    if (irb->scsw.ctrl & SCSW_SCTL_PRIMARY) {
++        strcat(msgline, " [Primary]");
++    }
++    if (irb->scsw.ctrl & SCSW_SCTL_SECONDARY) {
++        strcat(msgline, " [Secondary]");
++    }
++    if (irb->scsw.ctrl & SCSW_SCTL_STATUS_PEND) {
++        strcat(msgline, " [Status-Pending]");
++    }
++
++    strcat(msgline, "\n");
++    sclp_print(msgline);
++
++    msgline[0] = '\0';
++    strcat(msgline, "    Device Status :");
++    if (irb->scsw.dstat & SCSW_DSTAT_ATTN) {
++        strcat(msgline, " [Attention]");
++    }
++    if (irb->scsw.dstat & SCSW_DSTAT_STATMOD) {
++        strcat(msgline, " [Status-Modifier]");
++    }
++    if (irb->scsw.dstat & SCSW_DSTAT_CUEND) {
++        strcat(msgline, " [Ctrl-Unit-End]");
++    }
++    if (irb->scsw.dstat & SCSW_DSTAT_BUSY) {
++        strcat(msgline, " [Busy]");
++    }
++    if (irb->scsw.dstat & SCSW_DSTAT_CHEND) {
++        strcat(msgline, " [Channel-End]");
++    }
++    if (irb->scsw.dstat & SCSW_DSTAT_DEVEND) {
++        strcat(msgline, " [Device-End]");
++    }
++    if (irb->scsw.dstat & SCSW_DSTAT_UCHK) {
++        strcat(msgline, " [Unit-Check]");
++    }
++    if (irb->scsw.dstat & SCSW_DSTAT_UEXCP) {
++        strcat(msgline, " [Unit-Exception]");
++    }
++    strcat(msgline, "\n");
++    sclp_print(msgline);
++
++    msgline[0] = '\0';
++    strcat(msgline, "    Channel Status :");
++    if (irb->scsw.cstat & SCSW_CSTAT_PCINT) {
++        strcat(msgline, " [Program-Ctrl-Interruption]");
++    }
++    if (irb->scsw.cstat & SCSW_CSTAT_BADLEN) {
++        strcat(msgline, " [Incorrect-Length]");
++    }
++    if (irb->scsw.cstat & SCSW_CSTAT_PROGCHK) {
++        strcat(msgline, " [Program-Check]");
++    }
++    if (irb->scsw.cstat & SCSW_CSTAT_PROTCHK) {
++        strcat(msgline, " [Protection-Check]");
++    }
++    if (irb->scsw.cstat & SCSW_CSTAT_CHDCHK) {
++        strcat(msgline, " [Channel-Data-Check]");
++    }
++    if (irb->scsw.cstat & SCSW_CSTAT_CHCCHK) {
++        strcat(msgline, " [Channel-Ctrl-Check]");
++    }
++    if (irb->scsw.cstat & SCSW_CSTAT_ICCHK) {
++        strcat(msgline, " [Interface-Ctrl-Check]");
++    }
++    if (irb->scsw.cstat & SCSW_CSTAT_CHAINCHK) {
++        strcat(msgline, " [Chaining-Check]");
++    }
++    strcat(msgline, "\n");
++    sclp_print(msgline);
++
++    print_int("    cpa=", irb->scsw.cpa);
++    print_int("    prev_ccw=", prev_ccw);
++    print_int("    this_ccw=", this_ccw);
++}
++
+ /*
+  * Handles executing ssch, tsch and returns the irb obtained from tsch.
+  * Returns 0 on success, -1 if unexpected status pending and we need to retry,
+@@ -180,6 +402,19 @@ int do_cio(SubChannelId schid, uint16_t cutype, uint32_t ccw_addr, int fmt)
+             continue;
+         }
  
- #define LOADPARM_PROMPT "PROMPT  "
- #define LOADPARM_EMPTY  "        "
-diff --git a/pc-bios/s390-ccw/s390-arch.h b/pc-bios/s390-ccw/s390-arch.h
-new file mode 100644
-index 000000000000..5e92c7a27d53
---- /dev/null
-+++ b/pc-bios/s390-ccw/s390-arch.h
-@@ -0,0 +1,90 @@
-+/*
-+ * S390 Basic Architecture
-+ *
-+ * Copyright (c) 2019 Jason J. Herne <jjherne@us.ibm.com>
-+ *
-+ * This work is licensed under the terms of the GNU GPL, version 2 or (at
-+ * your option) any later version. See the COPYING file in the top-level
-+ * directory.
-+ */
++        sclp_print("cio device error\n");
++        print_int("  ssid  ", schid.ssid);
++        print_int("  cssid ", schid.cssid);
++        print_int("  sch_no", schid.sch_no);
++        print_int("  ctrl-unit type", cutype);
++        sclp_print("\n");
++        print_irb_err(&irb);
++        if (cutype == CU_TYPE_DASD_3990 || cutype == CU_TYPE_DASD_2107 ||
++            cutype == CU_TYPE_UNKNOWN) {
++            if (!basic_sense(schid, cutype, &sd, sizeof(sd))) {
++                print_eckd_dasd_sense_data(&sd);
++            }
++        }
+         rc = -1;
+         break;
+     }
+diff --git a/pc-bios/s390-ccw/libc.h b/pc-bios/s390-ccw/libc.h
+index 818517ff5d44..bcdc45732dd8 100644
+--- a/pc-bios/s390-ccw/libc.h
++++ b/pc-bios/s390-ccw/libc.h
+@@ -67,6 +67,17 @@ static inline size_t strlen(const char *str)
+     return i;
+ }
+ 
++static inline char *strcat(char *dest, const char *src)
++{
++    int i;
++    char *dest_end = dest + strlen(dest);
 +
-+#ifndef S390_ARCH_H
-+#define S390_ARCH_H
++    for (i = 0; i <= strlen(src); i++) {
++        dest_end[i] = src[i];
++    }
++    return dest;
++}
 +
-+typedef struct PSW {
-+    uint64_t mask;
-+    uint64_t addr;
-+} __attribute__ ((aligned(8))) PSW;
-+_Static_assert(sizeof(struct PSW) == 16, "PSW size incorrect");
-+
-+/* Older PSW format used by LPSW instruction */
-+typedef struct PSWLegacy {
-+    uint32_t mask;
-+    uint32_t addr;
-+} __attribute__ ((aligned(8))) PSWLegacy;
-+_Static_assert(sizeof(struct PSWLegacy) == 8, "PSWLegacy size incorrect");
-+
-+/* s390 psw bit masks */
-+#define PSW_MASK_IOINT      0x0200000000000000ULL
-+#define PSW_MASK_WAIT       0x0002000000000000ULL
-+#define PSW_MASK_EAMODE     0x0000000100000000ULL
-+#define PSW_MASK_BAMODE     0x0000000080000000ULL
-+#define PSW_MASK_ZMODE      (PSW_MASK_EAMODE | PSW_MASK_BAMODE)
-+
-+/* Low core mapping */
-+typedef struct LowCore {
-+    /* prefix area: defined by architecture */
-+    PSWLegacy       ipl_psw;                  /* 0x000 */
-+    uint32_t        ccw1[2];                  /* 0x008 */
-+    uint32_t        ccw2[2];                  /* 0x010 */
-+    uint8_t         pad1[0x80 - 0x18];        /* 0x018 */
-+    uint32_t        ext_params;               /* 0x080 */
-+    uint16_t        cpu_addr;                 /* 0x084 */
-+    uint16_t        ext_int_code;             /* 0x086 */
-+    uint16_t        svc_ilen;                 /* 0x088 */
-+    uint16_t        svc_code;                 /* 0x08a */
-+    uint16_t        pgm_ilen;                 /* 0x08c */
-+    uint16_t        pgm_code;                 /* 0x08e */
-+    uint32_t        data_exc_code;            /* 0x090 */
-+    uint16_t        mon_class_num;            /* 0x094 */
-+    uint16_t        per_perc_atmid;           /* 0x096 */
-+    uint64_t        per_address;              /* 0x098 */
-+    uint8_t         exc_access_id;            /* 0x0a0 */
-+    uint8_t         per_access_id;            /* 0x0a1 */
-+    uint8_t         op_access_id;             /* 0x0a2 */
-+    uint8_t         ar_access_id;             /* 0x0a3 */
-+    uint8_t         pad2[0xA8 - 0xA4];        /* 0x0a4 */
-+    uint64_t        trans_exc_code;           /* 0x0a8 */
-+    uint64_t        monitor_code;             /* 0x0b0 */
-+    uint16_t        subchannel_id;            /* 0x0b8 */
-+    uint16_t        subchannel_nr;            /* 0x0ba */
-+    uint32_t        io_int_parm;              /* 0x0bc */
-+    uint32_t        io_int_word;              /* 0x0c0 */
-+    uint8_t         pad3[0xc8 - 0xc4];        /* 0x0c4 */
-+    uint32_t        stfl_fac_list;            /* 0x0c8 */
-+    uint8_t         pad4[0xe8 - 0xcc];        /* 0x0cc */
-+    uint64_t        mcic;                     /* 0x0e8 */
-+    uint8_t         pad5[0xf4 - 0xf0];        /* 0x0f0 */
-+    uint32_t        external_damage_code;     /* 0x0f4 */
-+    uint64_t        failing_storage_address;  /* 0x0f8 */
-+    uint8_t         pad6[0x110 - 0x100];      /* 0x100 */
-+    uint64_t        per_breaking_event_addr;  /* 0x110 */
-+    uint8_t         pad7[0x120 - 0x118];      /* 0x118 */
-+    PSW             restart_old_psw;          /* 0x120 */
-+    PSW             external_old_psw;         /* 0x130 */
-+    PSW             svc_old_psw;              /* 0x140 */
-+    PSW             program_old_psw;          /* 0x150 */
-+    PSW             mcck_old_psw;             /* 0x160 */
-+    PSW             io_old_psw;               /* 0x170 */
-+    uint8_t         pad8[0x1a0 - 0x180];      /* 0x180 */
-+    PSW             restart_new_psw;          /* 0x1a0 */
-+    PSW             external_new_psw;         /* 0x1b0 */
-+    PSW             svc_new_psw;              /* 0x1c0 */
-+    PSW             program_new_psw;          /* 0x1d0 */
-+    PSW             mcck_new_psw;             /* 0x1e0 */
-+    PSW             io_new_psw;               /* 0x1f0 */
-+} __attribute__((packed, aligned(8192))) LowCore;
-+
-+extern LowCore const *lowcore;
-+
-+#endif
+ static inline int isdigit(int c)
+ {
+     return (c >= '0') && (c <= '9');
 -- 
 2.17.2
 
