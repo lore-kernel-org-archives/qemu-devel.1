@@ -3,59 +3,59 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
 X-Spam-Status: No, score=-6.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.0
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 16E8EC43218
-	for <qemu-devel@archiver.kernel.org>; Thu, 25 Apr 2019 18:06:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 53FE1C43219
+	for <qemu-devel@archiver.kernel.org>; Thu, 25 Apr 2019 18:08:31 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8DEF1206BF
-	for <qemu-devel@archiver.kernel.org>; Thu, 25 Apr 2019 18:06:47 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8DEF1206BF
+	by mail.kernel.org (Postfix) with ESMTPS id D930220685
+	for <qemu-devel@archiver.kernel.org>; Thu, 25 Apr 2019 18:08:31 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D930220685
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:33394 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:33402 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hJili-0007rW-47
-	for qemu-devel@archiver.kernel.org; Thu, 25 Apr 2019 14:06:46 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:41419)
+	id 1hJinO-0000Nm-Ds
+	for qemu-devel@archiver.kernel.org; Thu, 25 Apr 2019 14:08:30 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:41511)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1hJicW-0000Ns-9G
-	for qemu-devel@nongnu.org; Thu, 25 Apr 2019 13:57:17 -0400
+	(envelope-from <ehabkost@redhat.com>) id 1hJici-0000Xo-V4
+	for qemu-devel@nongnu.org; Thu, 25 Apr 2019 13:57:31 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1hJicU-00051d-Vm
-	for qemu-devel@nongnu.org; Thu, 25 Apr 2019 13:57:16 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:35642)
+	(envelope-from <ehabkost@redhat.com>) id 1hJicb-00059S-9y
+	for qemu-devel@nongnu.org; Thu, 25 Apr 2019 13:57:23 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:38532)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1hJicU-00051D-NE
-	for qemu-devel@nongnu.org; Thu, 25 Apr 2019 13:57:14 -0400
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
-	[10.5.11.23])
+	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1hJicZ-00056i-9i
+	for qemu-devel@nongnu.org; Thu, 25 Apr 2019 13:57:20 -0400
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+	[10.5.11.14])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 00B693092655;
-	Thu, 25 Apr 2019 17:57:14 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id 18EDA792B3;
+	Thu, 25 Apr 2019 17:57:18 +0000 (UTC)
 Received: from localhost (ovpn-116-9.gru2.redhat.com [10.97.116.9])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id 850AF19729;
-	Thu, 25 Apr 2019 17:57:13 +0000 (UTC)
+	by smtp.corp.redhat.com (Postfix) with ESMTP id A2D785D9C6;
+	Thu, 25 Apr 2019 17:57:17 +0000 (UTC)
 From: Eduardo Habkost <ehabkost@redhat.com>
 To: Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org,
 	Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
-Date: Thu, 25 Apr 2019 14:56:54 -0300
-Message-Id: <20190425175659.24876-7-ehabkost@redhat.com>
+Date: Thu, 25 Apr 2019 14:56:56 -0300
+Message-Id: <20190425175659.24876-9-ehabkost@redhat.com>
 In-Reply-To: <20190425175659.24876-1-ehabkost@redhat.com>
 References: <20190425175659.24876-1-ehabkost@redhat.com>
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.43]);
-	Thu, 25 Apr 2019 17:57:14 +0000 (UTC)
+	(mx1.redhat.com [10.5.110.39]);
+	Thu, 25 Apr 2019 17:57:18 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] [PULL 06/11] cpu: Rename parse_cpu_model() to
- parse_cpu_option()
+Subject: [Qemu-devel] [PULL 08/11] util/mmap-alloc: Add a 'is_pmem'
+ parameter to qemu_ram_mmap
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -67,165 +67,108 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: Zhang Yi <yi.z.zhang@linux.intel.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 Content-Type: text/plain; charset="UTF-8"
-Message-ID: <20190425175654.Xr-kU6_y0YUebvWca_UdZtUJAwxsL29AwFuNSaVDsJs@z>
+Message-ID: <20190425175656.yYjDLPo2RAtHHy7GiT33RDSOtvMmLH4MsLyi_5TH7Uc@z>
 
-The "model[,option...]" string parsed by the function is not just
-a CPU model.  Rename the function and its argument to indicate it
-expects the full "-cpu" option to be provided.
+From: Zhang Yi <yi.z.zhang@linux.intel.com>
 
-Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
-Message-Id: <20190417025944.16154-2-ehabkost@redhat.com>
-Reviewed-by: David Gibson <david@gibson.dropbear.id.au>
-Reviewed-by: Markus Armbruster <armbru@redhat.com>
-Reviewed-by: Igor Mammedov <imammedo@redhat.com>
+besides the existing 'shared' flags, we are going to add
+'is_pmem' to qemu_ram_mmap(), which indicated the memory backend
+file is a persist memory.
+
+Signed-off-by: Haozhong Zhang <haozhong.zhang@intel.com>
+Signed-off-by: Zhang Yi <yi.z.zhang@linux.intel.com>
+Reviewed-by: Pankaj Gupta <pagupta@redhat.com>
+Message-Id: <786c46862cfeb253ee0ea2f44d62ffe76edb7fa4.1549555521.git.yi.z.zhang@linux.intel.com>
+Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
+Reviewed-by: Pankaj Gupta <pagupta@redhat.com>
 Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
 ---
- include/qom/cpu.h |  6 +++---
- bsd-user/main.c   |  2 +-
- exec.c            |  4 ++--
- linux-user/main.c |  2 +-
- vl.c              | 18 +++++++++---------
- 5 files changed, 16 insertions(+), 16 deletions(-)
+ include/qemu/mmap-alloc.h | 21 ++++++++++++++++++++-
+ exec.c                    |  2 +-
+ util/mmap-alloc.c         |  6 +++++-
+ util/oslib-posix.c        |  2 +-
+ 4 files changed, 27 insertions(+), 4 deletions(-)
 
-diff --git a/include/qom/cpu.h b/include/qom/cpu.h
-index e9bec3a5bc..08abcbd3fe 100644
---- a/include/qom/cpu.h
-+++ b/include/qom/cpu.h
-@@ -681,15 +681,15 @@ ObjectClass *cpu_class_by_name(const char *typename, const char *cpu_model);
- CPUState *cpu_create(const char *typename);
+diff --git a/include/qemu/mmap-alloc.h b/include/qemu/mmap-alloc.h
+index ef04f0ed5b..eec98d82c1 100644
+--- a/include/qemu/mmap-alloc.h
++++ b/include/qemu/mmap-alloc.h
+@@ -7,7 +7,26 @@ size_t qemu_fd_getpagesize(int fd);
  
- /**
-- * parse_cpu_model:
-- * @cpu_model: The model string including optional parameters.
-+ * parse_cpu_option:
-+ * @cpu_option: The -cpu option including optional parameters.
-  *
-  * processes optional parameters and registers them as global properties
-  *
-  * Returns: type of CPU to create or prints error and terminates process
-  *          if an error occurred.
-  */
--const char *parse_cpu_model(const char *cpu_model);
-+const char *parse_cpu_option(const char *cpu_option);
+ size_t qemu_mempath_getpagesize(const char *mem_path);
  
- /**
-  * cpu_has_work:
-diff --git a/bsd-user/main.c b/bsd-user/main.c
-index a8c807e8df..6192e9d91e 100644
---- a/bsd-user/main.c
-+++ b/bsd-user/main.c
-@@ -905,7 +905,7 @@ int main(int argc, char **argv)
-     /* init tcg before creating CPUs and to get qemu_host_page_size */
-     tcg_exec_init(0);
+-void *qemu_ram_mmap(int fd, size_t size, size_t align, bool shared);
++/**
++ * qemu_ram_mmap: mmap the specified file or device.
++ *
++ * Parameters:
++ *  @fd: the file or the device to mmap
++ *  @size: the number of bytes to be mmaped
++ *  @align: if not zero, specify the alignment of the starting mapping address;
++ *          otherwise, the alignment in use will be determined by QEMU.
++ *  @shared: map has RAM_SHARED flag.
++ *  @is_pmem: map has RAM_PMEM flag.
++ *
++ * Return:
++ *  On success, return a pointer to the mapped area.
++ *  On failure, return MAP_FAILED.
++ */
++void *qemu_ram_mmap(int fd,
++                    size_t size,
++                    size_t align,
++                    bool shared,
++                    bool is_pmem);
  
--    cpu_type = parse_cpu_model(cpu_model);
-+    cpu_type = parse_cpu_option(cpu_model);
-     cpu = cpu_create(cpu_type);
-     env = cpu->env_ptr;
- #if defined(TARGET_SPARC) || defined(TARGET_PPC)
+ void qemu_ram_munmap(int fd, void *ptr, size_t size);
+ 
 diff --git a/exec.c b/exec.c
-index 2646207661..08f6cafcbc 100644
+index f7f3cdbf4a..aa07432929 100644
 --- a/exec.c
 +++ b/exec.c
-@@ -983,14 +983,14 @@ void cpu_exec_realizefn(CPUState *cpu, Error **errp)
- #endif
+@@ -1883,7 +1883,7 @@ static void *file_ram_alloc(RAMBlock *block,
+     }
+ 
+     area = qemu_ram_mmap(fd, memory, block->mr->align,
+-                         block->flags & RAM_SHARED);
++                         block->flags & RAM_SHARED, block->flags & RAM_PMEM);
+     if (area == MAP_FAILED) {
+         error_setg_errno(errp, errno,
+                          "unable to map backing store for guest RAM");
+diff --git a/util/mmap-alloc.c b/util/mmap-alloc.c
+index 8565885420..9713f4b960 100644
+--- a/util/mmap-alloc.c
++++ b/util/mmap-alloc.c
+@@ -75,7 +75,11 @@ size_t qemu_mempath_getpagesize(const char *mem_path)
+     return getpagesize();
  }
  
--const char *parse_cpu_model(const char *cpu_model)
-+const char *parse_cpu_option(const char *cpu_option)
+-void *qemu_ram_mmap(int fd, size_t size, size_t align, bool shared)
++void *qemu_ram_mmap(int fd,
++                    size_t size,
++                    size_t align,
++                    bool shared,
++                    bool is_pmem)
  {
-     ObjectClass *oc;
-     CPUClass *cc;
-     gchar **model_pieces;
-     const char *cpu_type;
+     int flags;
+     int guardfd;
+diff --git a/util/oslib-posix.c b/util/oslib-posix.c
+index 88dda9cd39..d97b1717d5 100644
+--- a/util/oslib-posix.c
++++ b/util/oslib-posix.c
+@@ -203,7 +203,7 @@ void *qemu_memalign(size_t alignment, size_t size)
+ void *qemu_anon_ram_alloc(size_t size, uint64_t *alignment, bool shared)
+ {
+     size_t align = QEMU_VMALLOC_ALIGN;
+-    void *ptr = qemu_ram_mmap(-1, size, align, shared);
++    void *ptr = qemu_ram_mmap(-1, size, align, shared, false);
  
--    model_pieces = g_strsplit(cpu_model, ",", 2);
-+    model_pieces = g_strsplit(cpu_option, ",", 2);
- 
-     oc = cpu_class_by_name(CPU_RESOLVING_TYPE, model_pieces[0]);
-     if (oc == NULL) {
-diff --git a/linux-user/main.c b/linux-user/main.c
-index 17387166ab..3d2230320b 100644
---- a/linux-user/main.c
-+++ b/linux-user/main.c
-@@ -662,7 +662,7 @@ int main(int argc, char **argv, char **envp)
-     if (cpu_model == NULL) {
-         cpu_model = cpu_get_model(get_elf_eflags(execfd));
-     }
--    cpu_type = parse_cpu_model(cpu_model);
-+    cpu_type = parse_cpu_option(cpu_model);
- 
-     /* init tcg before creating CPUs and to get qemu_host_page_size */
-     tcg_exec_init(0);
-diff --git a/vl.c b/vl.c
-index 4c794f2bf6..4019a4387d 100644
---- a/vl.c
-+++ b/vl.c
-@@ -2989,7 +2989,7 @@ int main(int argc, char **argv, char **envp)
-     const char *optarg;
-     const char *loadvm = NULL;
-     MachineClass *machine_class;
--    const char *cpu_model;
-+    const char *cpu_option;
-     const char *vga_model = NULL;
-     const char *qtest_chrdev = NULL;
-     const char *qtest_log = NULL;
-@@ -3068,7 +3068,7 @@ int main(int argc, char **argv, char **envp)
-     QLIST_INIT (&vm_change_state_head);
-     os_setup_early_signal_handling();
- 
--    cpu_model = NULL;
-+    cpu_option = NULL;
-     snapshot = 0;
- 
-     nb_nics = 0;
-@@ -3120,7 +3120,7 @@ int main(int argc, char **argv, char **envp)
-             switch(popt->index) {
-             case QEMU_OPTION_cpu:
-                 /* hw initialization will check this */
--                cpu_model = optarg;
-+                cpu_option = optarg;
-                 break;
-             case QEMU_OPTION_hda:
-             case QEMU_OPTION_hdb:
-@@ -4037,8 +4037,8 @@ int main(int argc, char **argv, char **envp)
-         qemu_set_hw_version(machine_class->hw_version);
-     }
- 
--    if (cpu_model && is_help_option(cpu_model)) {
--        list_cpus(cpu_model);
-+    if (cpu_option && is_help_option(cpu_option)) {
-+        list_cpus(cpu_option);
-         exit(0);
-     }
- 
-@@ -4286,9 +4286,9 @@ int main(int argc, char **argv, char **envp)
-      * Global properties get set up by qdev_prop_register_global(),
-      * called from user_register_global_props(), and certain option
-      * desugaring.  Also in CPU feature desugaring (buried in
--     * parse_cpu_model()), which happens below this point, but may
-+     * parse_cpu_option()), which happens below this point, but may
-      * only target the CPU type, which can only be created after
--     * parse_cpu_model() returned the type.
-+     * parse_cpu_option() returned the type.
-      *
-      * Machine compat properties: object_set_machine_compat_props().
-      * Accelerator compat props: object_set_accelerator_compat_props(),
-@@ -4452,8 +4452,8 @@ int main(int argc, char **argv, char **envp)
- 
-     /* parse features once if machine provides default cpu_type */
-     current_machine->cpu_type = machine_class->default_cpu_type;
--    if (cpu_model) {
--        current_machine->cpu_type = parse_cpu_model(cpu_model);
-+    if (cpu_option) {
-+        current_machine->cpu_type = parse_cpu_option(cpu_option);
-     }
-     parse_numa_opts(current_machine);
- 
+     if (ptr == MAP_FAILED) {
+         return NULL;
 -- 
 2.18.0.rc1.1.g3f1ff2140
 
