@@ -1,29 +1,28 @@
 Received: from eggs.gnu.org ([209.51.188.92]:35092)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <danielhb413@gmail.com>) id 1hJmWp-0000eg-5U
-	for qemu-devel@nongnu.org; Thu, 25 Apr 2019 18:07:40 -0400
+	(envelope-from <philmd@redhat.com>) id 1hJmXF-0000eg-Eb
+	for qemu-devel@nongnu.org; Thu, 25 Apr 2019 18:08:06 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <danielhb413@gmail.com>) id 1hJmWo-0002VL-64
-	for qemu-devel@nongnu.org; Thu, 25 Apr 2019 18:07:39 -0400
-Received: from mail-qk1-x744.google.com ([2607:f8b0:4864:20::744]:37273)
+	(envelope-from <philmd@redhat.com>) id 1hJmJX-0006YZ-N6
+	for qemu-devel@nongnu.org; Thu, 25 Apr 2019 17:53:57 -0400
+Received: from mail-wr1-f68.google.com ([209.85.221.68]:41721)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <danielhb413@gmail.com>)
-	id 1hJmWo-0002V4-1w
-	for qemu-devel@nongnu.org; Thu, 25 Apr 2019 18:07:38 -0400
-Received: by mail-qk1-x744.google.com with SMTP id c1so755426qkk.4
-	for <qemu-devel@nongnu.org>; Thu, 25 Apr 2019 15:07:38 -0700 (PDT)
-References: <20190424004700.12766-1-richardw.yang@linux.intel.com>
-	<20190424004700.12766-5-richardw.yang@linux.intel.com>
-From: Daniel Henrique Barboza <danielhb413@gmail.com>
-Message-ID: <31fe8ef8-56c0-ee41-4fd4-9197a6b1bbdb@gmail.com>
-Date: Thu, 25 Apr 2019 19:07:33 -0300
+	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1hJmJX-0006XB-52
+	for qemu-devel@nongnu.org; Thu, 25 Apr 2019 17:53:55 -0400
+Received: by mail-wr1-f68.google.com with SMTP id c12so1433446wrt.8
+	for <qemu-devel@nongnu.org>; Thu, 25 Apr 2019 14:53:54 -0700 (PDT)
+References: <20190418180057.3593-1-thuth@redhat.com>
+	<20190418180057.3593-20-thuth@redhat.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Message-ID: <8c7e6aa5-3f74-7c63-486c-80e3e21e9da5@redhat.com>
+Date: Thu, 25 Apr 2019 23:53:51 +0200
 MIME-Version: 1.0
-In-Reply-To: <20190424004700.12766-5-richardw.yang@linux.intel.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
+In-Reply-To: <20190418180057.3593-20-thuth@redhat.com>
+Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Subject: Re: [Qemu-devel] [PATCH 4/4] migration/savevm: wrap into
- qemu_loadvm_state_header()
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH for-QEMU-4.1 v5 19/29] hw/arm: Express
+ dependencies of the MPS2 boards with Kconfig
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,120 +31,95 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Wei Yang <richardw.yang@linux.intel.com>, qemu-devel@nongnu.org
-Cc: dgilbert@redhat.com, quintela@redhat.com
+To: Thomas Huth <thuth@redhat.com>, yang.zhong@intel.com, Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org, pbonzini@redhat.com
+Cc: "Michael S. Tsirkin" <mst@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>, "Edgar E . Iglesias" <edgar.iglesias@gmail.com>, Jean-Christophe Dubois <jcd@tribudubois.net>, Rob Herring <robh@kernel.org>, qemu-block@nongnu.org, Andrey Smirnov <andrew.smirnov@gmail.com>, Joel Stanley <joel@jms.id.au>, Antony Pavlov <antonynpavlov@gmail.com>, Alistair Francis <alistair@alistair23.me>, Beniamino Galvani <b.galvani@gmail.com>, qemu-arm@nongnu.org, Peter Chubb <peter.chubb@nicta.com.au>, Cedric Le Goater <clg@kaod.org>, John Snow <jsnow@redhat.com>, Andrew Jeffery <andrew@aj.id.au>, Philippe Mathieu-Daude <f4bug@amsat.org>, Subbaraya Sundeep <sundeep.lkml@gmail.com>, Igor Mitsyanko <i.mitsyanko@gmail.com>, Jan Kiszka <jan.kiszka@web.de>
 
-
-
-On 4/23/19 9:47 PM, Wei Yang wrote:
-> On source side, we have qemu_savevm_state_header() to send related data,
-> while on the receiving side those steps are scattered in
-> qemu_loadvm_state().
->
-> This patch wrap those related steps into qemu_loadvm_state_header() to
-> make it friendly to read.
->
-> Signed-off-by: Wei Yang <richardw.yang@linux.intel.com>
-
-
-Reviewed-by: Daniel Henrique Barboza <danielhb413@gmail.com>
-
-
+On 4/18/19 8:00 PM, Thomas Huth wrote:
+> Add Kconfig dependencies for the mps2-an* machines.
+> 
+> Signed-off-by: Thomas Huth <thuth@redhat.com>
 > ---
->   migration/savevm.c | 69 +++++++++++++++++++++++++++-------------------
->   1 file changed, 40 insertions(+), 29 deletions(-)
->
-> diff --git a/migration/savevm.c b/migration/savevm.c
-> index a80ae83663..64d23682c6 100644
-> --- a/migration/savevm.c
-> +++ b/migration/savevm.c
-> @@ -2256,6 +2256,43 @@ qemu_loadvm_section_part_end(QEMUFile *f, MigrationIncomingState *mis)
->       return 0;
->   }
->   
-> +static int qemu_loadvm_state_header(QEMUFile *f)
-> +{
-> +    unsigned int v;
-> +    int ret;
-> +
-> +    v = qemu_get_be32(f);
-> +    if (v != QEMU_VM_FILE_MAGIC) {
-> +        error_report("Not a migration stream");
-> +        return -EINVAL;
-> +    }
-> +
-> +    v = qemu_get_be32(f);
-> +    if (v == QEMU_VM_FILE_VERSION_COMPAT) {
-> +        error_report("SaveVM v2 format is obsolete and don't work anymore");
-> +        return -ENOTSUP;
-> +    }
-> +    if (v != QEMU_VM_FILE_VERSION) {
-> +        error_report("Unsupported migration stream version");
-> +        return -ENOTSUP;
-> +    }
-> +
-> +    if (migrate_get_current()->send_configuration) {
-> +        if (qemu_get_byte(f) != QEMU_VM_CONFIGURATION) {
-> +            error_report("Configuration section missing");
-> +            qemu_loadvm_state_cleanup();
-> +            return -EINVAL;
-> +        }
-> +        ret = vmstate_load_state(f, &vmstate_configuration, &savevm_state, 0);
-> +
-> +        if (ret) {
-> +            qemu_loadvm_state_cleanup();
-> +            return ret;
-> +        }
-> +    }
-> +    return 0;
-> +}
-> +
->   static int qemu_loadvm_state_setup(QEMUFile *f)
->   {
->       SaveStateEntry *se;
-> @@ -2403,7 +2440,6 @@ int qemu_loadvm_state(QEMUFile *f)
->   {
->       MigrationIncomingState *mis = migration_incoming_get_current();
->       Error *local_err = NULL;
-> -    unsigned int v;
->       int ret;
->   
->       if (migration_is_blocked(&local_err)) {
-> @@ -2411,34 +2447,9 @@ int qemu_loadvm_state(QEMUFile *f)
->           return -EINVAL;
->       }
->   
-> -    v = qemu_get_be32(f);
-> -    if (v != QEMU_VM_FILE_MAGIC) {
-> -        error_report("Not a migration stream");
-> -        return -EINVAL;
-> -    }
+>  default-configs/arm-softmmu.mak | 20 +-------------------
+>  hw/arm/Kconfig                  | 18 ++++++++++++++++++
+>  2 files changed, 19 insertions(+), 19 deletions(-)
+> 
+> diff --git a/default-configs/arm-softmmu.mak b/default-configs/arm-softmmu.mak
+> index a0b9016e3a..31d31d3f4a 100644
+> --- a/default-configs/arm-softmmu.mak
+> +++ b/default-configs/arm-softmmu.mak
+> @@ -30,6 +30,7 @@ CONFIG_Z2=y
+>  CONFIG_COLLIE=y
+>  CONFIG_ASPEED_SOC=y
+>  CONFIG_NETDUINO2=y
+> +CONFIG_MPS2=y
+>  
+>  CONFIG_VGA=y
+>  CONFIG_SSI_M25P80=y
+> @@ -38,28 +39,9 @@ CONFIG_IMX_FEC=y
+>  CONFIG_FRAMEBUFFER=y
+>  
+>  CONFIG_DIGIC=y
+> -CONFIG_MPS2=y
+>  CONFIG_RASPI=y
+>  CONFIG_NRF51_SOC=y
+>  
+> -CONFIG_CMSDK_APB_TIMER=y
+> -CONFIG_CMSDK_APB_DUALTIMER=y
+> -CONFIG_CMSDK_APB_UART=y
+> -CONFIG_CMSDK_APB_WATCHDOG=y
 > -
-> -    v = qemu_get_be32(f);
-> -    if (v == QEMU_VM_FILE_VERSION_COMPAT) {
-> -        error_report("SaveVM v2 format is obsolete and don't work anymore");
-> -        return -ENOTSUP;
-> -    }
-> -    if (v != QEMU_VM_FILE_VERSION) {
-> -        error_report("Unsupported migration stream version");
-> -        return -ENOTSUP;
-> -    }
+> -CONFIG_MPS2_FPGAIO=y
+> -CONFIG_MPS2_SCC=y
 > -
-> -    if (migrate_get_current()->send_configuration) {
-> -        if (qemu_get_byte(f) != QEMU_VM_CONFIGURATION) {
-> -            error_report("Configuration section missing");
-> -            qemu_loadvm_state_cleanup();
-> -            return -EINVAL;
-> -        }
-> -        ret = vmstate_load_state(f, &vmstate_configuration, &savevm_state, 0);
+> -CONFIG_TZ_MPC=y
+> -CONFIG_TZ_MSC=y
+> -CONFIG_TZ_PPC=y
+> -CONFIG_ARMSSE=y
+> -CONFIG_IOTKIT_SECCTL=y
+> -CONFIG_IOTKIT_SYSCTL=y
+> -CONFIG_IOTKIT_SYSINFO=y
+> -CONFIG_ARMSSE_CPUID=y
+> -CONFIG_ARMSSE_MHU=y
 > -
-> -        if (ret) {
-> -            qemu_loadvm_state_cleanup();
-> -            return ret;
-> -        }
-> +    ret = qemu_loadvm_state_header(f);
-> +    if (ret) {
-> +        return ret;
->       }
->   
->       if (qemu_loadvm_state_setup(f) != 0) {
+>  CONFIG_FSL_IMX6=y
+>  CONFIG_FSL_IMX25=y
+>  CONFIG_FSL_IMX7=y
+> diff --git a/hw/arm/Kconfig b/hw/arm/Kconfig
+> index 2ef5696900..466b143fdf 100644
+> --- a/hw/arm/Kconfig
+> +++ b/hw/arm/Kconfig
+> @@ -301,6 +301,12 @@ config ASPEED_SOC
+>  
+>  config MPS2
+>      bool
+> +    select ARMSSE
+> +    select LAN9118
+> +    select MPS2_FPGAIO
+> +    select MPS2_SCC
+> +    select PL022    # Serial port
+> +    select PL080    # DMA controller
+>  
+>  config FSL_IMX7
+>      bool
+> @@ -340,6 +346,18 @@ config ARM11MPCORE
+>  
+>  config ARMSSE
+>      bool
+> +    select ARMSSE_CPUID
+> +    select ARMSSE_MHU
+> +    select CMSDK_APB_TIMER
+> +    select CMSDK_APB_DUALTIMER
+> +    select CMSDK_APB_UART
+> +    select CMSDK_APB_WATCHDOG
+> +    select IOTKIT_SECCTL
+> +    select IOTKIT_SYSCTL
+> +    select IOTKIT_SYSINFO
+> +    select TZ_MPC
+> +    select TZ_MSC
+> +    select TZ_PPC
+>  
+>  config ARMSSE_CPUID
+>      bool
+> 
+
+Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
