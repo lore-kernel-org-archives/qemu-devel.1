@@ -1,27 +1,28 @@
-Received: from eggs.gnu.org ([209.51.188.92]:54150)
+Received: from eggs.gnu.org ([209.51.188.92]:54863)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1hJfaT-00022Q-83
-	for qemu-devel@nongnu.org; Thu, 25 Apr 2019 10:42:58 -0400
+	(envelope-from <alex.bennee@linaro.org>) id 1hJfdp-0003LO-NT
+	for qemu-devel@nongnu.org; Thu, 25 Apr 2019 10:46:26 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1hJfaR-0002aV-Sd
-	for qemu-devel@nongnu.org; Thu, 25 Apr 2019 10:42:57 -0400
-Received: from mail-wm1-x343.google.com ([2a00:1450:4864:20::343]:35162)
+	(envelope-from <alex.bennee@linaro.org>) id 1hJfdk-0004ct-4f
+	for qemu-devel@nongnu.org; Thu, 25 Apr 2019 10:46:21 -0400
+Received: from mail-wm1-x342.google.com ([2a00:1450:4864:20::342]:35187)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1hJfaR-0002Zo-IZ
-	for qemu-devel@nongnu.org; Thu, 25 Apr 2019 10:42:55 -0400
-Received: by mail-wm1-x343.google.com with SMTP id y197so10987571wmd.0
-	for <qemu-devel@nongnu.org>; Thu, 25 Apr 2019 07:42:55 -0700 (PDT)
+	id 1hJfdi-0004bM-0N
+	for qemu-devel@nongnu.org; Thu, 25 Apr 2019 10:46:18 -0400
+Received: by mail-wm1-x342.google.com with SMTP id y197so11002857wmd.0
+	for <qemu-devel@nongnu.org>; Thu, 25 Apr 2019 07:46:17 -0700 (PDT)
 References: <20190424142714.28460-1-arilou@gmail.com>
+	<20190424142714.28460-2-arilou@gmail.com>
 From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-In-reply-to: <20190424142714.28460-1-arilou@gmail.com>
-Date: Thu, 25 Apr 2019 15:42:53 +0100
-Message-ID: <87wojiuowi.fsf@zen.linaroharston>
+In-reply-to: <20190424142714.28460-2-arilou@gmail.com>
+Date: Thu, 25 Apr 2019 15:46:14 +0100
+Message-ID: <87v9z2uoqx.fsf@zen.linaroharston>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v3 01/20] gdbstub: Add infrastructure to
- parse cmd packets
+Subject: Re: [Qemu-devel] [PATCH v3 02/20] gdbstub: Implement deatch (D pkt)
+ with new infra
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -38,283 +39,133 @@ arilou@gmail.com writes:
 
 > From: Jon Doron <arilou@gmail.com>
 >
-> Signed-off-by: Jon Doron <arilou@gmail.com>
+> Signed-otff-by: Jon Doron <arilou@gmail.com>
+
+mini typo...
+
+(btw you can either create a editor shortcut for adding s-o-b tags or
+use --signoff while re-basing)
+
+Otherwise:
+
+Reviewed-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
+
 > ---
->  gdbstub.c | 215 ++++++++++++++++++++++++++++++++++++++++++++++++++++++
->  1 file changed, 215 insertions(+)
+>  gdbstub.c | 82 +++++++++++++++++++++++++++++--------------------------
+>  1 file changed, 43 insertions(+), 39 deletions(-)
 >
 > diff --git a/gdbstub.c b/gdbstub.c
-> index d54abd17cc..b5bd01b913 100644
+> index b5bd01b913..34e6722a8c 100644
 > --- a/gdbstub.c
 > +++ b/gdbstub.c
-> @@ -1268,6 +1268,221 @@ out:
->      return res;
+> @@ -1435,10 +1435,6 @@ static inline int startswith(const char *string, c=
+onst char *pattern)
+>    return !strncmp(string, pattern, strlen(pattern));
 >  }
 >
-> +typedef union GdbCmdVariant {
-> +    const char *data;
-> +    uint8_t opcode;
-> +    unsigned long val_ul;
-> +    unsigned long long val_ull;
-> +    struct {
-> +        GDBThreadIdKind kind;
-> +        uint32_t pid;
-> +        uint32_t tid;
-> +    } thread_id;
-> +} GdbCmdVariant;
-> +
-> +static const char *cmd_next_param(const char *param, const char delimite=
-r)
-> +{
-> +    const char *delim;
-> +    static char all_delimiters[] =3D ",;:=3D";
-> +    static char no_delimiter[] =3D "\0";
-> +    char curr_delimiters[2] =3D {0};
-> +    const char *delimiters;
-> +
-> +    if (delimiter =3D=3D '?') {
-> +        delimiters =3D all_delimiters;
-> +    } else if (delimiter =3D=3D '0') {
-> +        delimiters =3D no_delimiter;
-> +    } else if (delimiter =3D=3D '.' && *param) {
-> +        return param + 1;
-> +    } else {
-> +        curr_delimiters[0] =3D delimiter;
-> +        delimiters =3D curr_delimiters;
-> +    }
-> +
-> +    while (*param) {
-> +        delim =3D delimiters;
-> +        while (*delim) {
-> +            if (*param =3D=3D *delim) {
-> +                return param + 1;
-> +            }
-> +            delim++;
-> +        }
-> +        param++;
-> +    }
-> +
-> +    return param;
-> +}
-> +
-> +static int cmd_parse_params(const char *data, const char *schema,
-> +                            GdbCmdVariant *params, int *num_params)
-> +{
-> +    int curr_param;
-> +    const char *curr_schema, *curr_data;
-> +
-> +    *num_params =3D 0;
-> +
-> +    if (!schema) {
-> +        return 0;
-> +    }
-> +
-> +    curr_schema =3D schema;
-> +    curr_param =3D 0;
-> +    curr_data =3D data;
-> +    while (curr_schema[0] && curr_schema[1] && *curr_data) {
-> +        switch (curr_schema[0]) {
-> +        case 'l':
-> +            if (qemu_strtoul(curr_data, &curr_data, 16,
-> +                             &params[curr_param].val_ul)) {
-> +                return -EINVAL;
-> +            }
-> +            curr_param++;
-> +            curr_data =3D cmd_next_param(curr_data, curr_schema[1]);
-> +            break;
-> +        case 'L':
-> +            if (qemu_strtou64(curr_data, &curr_data, 16,
-> +                              (uint64_t *)&params[curr_param].val_ull)) {
-> +                return -EINVAL;
-> +            }
-> +            curr_param++;
-> +            curr_data =3D cmd_next_param(curr_data, curr_schema[1]);
-> +            break;
-> +        case 's':
-> +            params[curr_param].data =3D curr_data;
-> +            curr_param++;
-> +            curr_data =3D cmd_next_param(curr_data, curr_schema[1]);
-> +            break;
-> +        case 'o':
-> +            params[curr_param].opcode =3D *(uint8_t *)curr_data;
-> +            curr_param++;
-> +            curr_data =3D cmd_next_param(curr_data, curr_schema[1]);
-> +            break;
-> +        case 't':
-> +            params[curr_param].thread_id.kind =3D
-> +                read_thread_id(curr_data, &curr_data,
-> +                               &params[curr_param].thread_id.pid,
-> +                               &params[curr_param].thread_id.tid);
-> +            curr_param++;
-> +            curr_data =3D cmd_next_param(curr_data, curr_schema[1]);
-> +            break;
-> +        case 'x':
-> +            params[curr_param].data =3D curr_data;
-> +            curr_param++;
-> +            curr_data =3D cmd_next_param(curr_data, curr_schema[1]);
-> +            break;
-> +        case '?':
-> +            curr_data =3D cmd_next_param(curr_data, curr_schema[1]);
-> +            break;
-> +        default:
-> +            return -EINVAL;
-> +        }
-> +        curr_schema +=3D 2;
-> +    }
-> +
-> +    *num_params =3D curr_param;
-> +    return 0;
-> +}
-> +
-> +typedef struct GdbCmdContext {
-> +    GDBState *s;
-> +    GdbCmdVariant *params;
-> +    int num_params;
-> +    uint8_t mem_buf[MAX_PACKET_LENGTH];
-> +    char str_buf[MAX_PACKET_LENGTH + 1];
-> +} GdbCmdContext;
-> +
-> +typedef void (*GdbCmdHandler)(GdbCmdContext *gdb_ctx, void *user_ctx);
-> +
-> +/*
-> + * cmd_startswith -> cmd is compared using startswith
-> + * cmd_full_match -> cmd is compared using strcmp
-
-Doesn't !cmd_full_match imply cmd_startswith?
-
-> + *
-> + *
-> + * schema definitions:
-> + * Each schema parameter entry consists of 2 chars,
-> + * the first char represents the parameter type handling
-> + * the second char represents the delimiter for the next parameter
-> + *
-> + * Currently supported schema types:
-> + * 'l' -> unsigned long (stored in .val_ul)
-> + * 'L' -> unsigned long long (stored in .val_ull)
-> + * 's' -> string (stored in .data)
-> + * 'o' -> single char (stored in .opcode)
-> + * 't' -> thread id (stored in .thread_id)
-> + * 'x' -> xml (stored in .data), must have a ':' delimiter
-> + * '?' -> skip according to delimiter
-> + *
-> + * Currently supported delimiters:
-> + * '?' -> Stop at any delimiter (",;:=3D\0")
-> + * '0' -> Stop at "\0"
-> + * '.' -> Skip 1 char unless reached "\0"
-> + * Any other value is treated as the delimiter value itself
-> + */
-> +typedef struct GdbCmdParseEntry {
-> +    GdbCmdHandler handler;
-> +    const char *cmd;
-> +    union {
-> +        int flags;
-> +        struct {
-> +            int cmd_startswith:1;
-> +            int cmd_full_match:1;
-> +        };
-> +    };
-> +    const char *schema;
-> +} GdbCmdParseEntry;
-> +
-> +static inline int startswith(const char *string, const char *pattern)
-> +{
-> +  return !strncmp(string, pattern, strlen(pattern));
-> +}
-> +
-> +__attribute__((unused)) static int process_string_cmd(
-> +        GDBState *s, void *user_ctx, const char *data,
-> +        GdbCmdParseEntry *cmds, int num_cmds);
-> +
-> +static int process_string_cmd(GDBState *s, void *user_ctx, const char *d=
+> -__attribute__((unused)) static int process_string_cmd(
+> -        GDBState *s, void *user_ctx, const char *data,
+> -        GdbCmdParseEntry *cmds, int num_cmds);
+> -
+>  static int process_string_cmd(GDBState *s, void *user_ctx, const char *d=
 ata,
-> +                              GdbCmdParseEntry *cmds, int num_cmds)
+>                                GdbCmdParseEntry *cmds, int num_cmds)
+>  {
+> @@ -1483,6 +1479,41 @@ static int process_string_cmd(GDBState *s, void *u=
+ser_ctx, const char *data,
+>      return -1;
+>  }
+>
+> +static void handle_detach(GdbCmdContext *gdb_ctx, void *user_ctx)
 > +{
-> +    int i, schema_len, max_num_params;
-> +    GdbCmdContext gdb_ctx;
+> +    GDBProcess *process;
+> +    GDBState *s =3D gdb_ctx->s;
+> +    uint32_t pid =3D 1;
 > +
-> +    if (!cmds) {
-> +        return -1;
+> +    if (s->multiprocess) {
+> +        if (!gdb_ctx->num_params) {
+> +            put_packet(s, "E22");
+> +            return;
+> +        }
+> +
+> +        pid =3D gdb_ctx->params[0].val_ul;
 > +    }
 > +
-> +    for (i =3D 0; i < num_cmds; i++) {
-
-Allocating:
-
-        GdbCmdParseEntry *cmd =3D &cmds[i];
-
-might make the remaining code a little simpler to deal with.
-
-
-> +        if (!cmds[i].handler || !cmds[i].cmd ||
-
-Some of these seem like asserts:
-
-        g_assert(cmd->handler && cmd->cmd);
-
-> +            (cmds[i].cmd_startswith && !startswith(data, cmds[i].cmd)) ||
-> +            (cmds[i].cmd_full_match && strcmp(data, cmds[i].cmd))) {
-
-then we can have the skip test:
-
-        if (cmd->cmd_startswith && !startswith(data, cmd->cmd)) {
-            continue;
-        } else if (strcmp(cmd->cmd, data)!=3D0) {
-            continue;
-        }
-
-
-> +            continue;
-> +        }
+> +    process =3D gdb_get_process(s, pid);
+> +    gdb_process_breakpoint_remove_all(s, process);
+> +    process->attached =3D false;
 > +
-> +        max_num_params =3D 0;
-
-You can set the default when you declare this above
-
-> +        if (cmds[i].schema) {
-> +            schema_len =3D strlen(cmds[i].schema);
-> +            if (schema_len % 2) {
-> +                return -2;
-> +            }
-> +
-> +            max_num_params =3D schema_len / 2;
-> +        }
-> +
-> +        gdb_ctx.params =3D
-> +            (GdbCmdVariant *)alloca(sizeof(*gdb_ctx.params) * max_num_pa=
-rams);
-> +        memset(gdb_ctx.params, 0, sizeof(*gdb_ctx.params) *
-> max_num_params);
-
-You could use the glib function instead:
-
-  gdb_ctx.params =3D g_newa(GdbCmdVariant, max_num_params);
-
-Although you still have to zero it which you could avoid with a g_new0()
-but you'd then have to free the pointer later. Parsing code is fiddly I
-guess...
-
-> +
-> +        if (cmd_parse_params(&data[strlen(cmds[i].cmd)],
-> cmds[i].schema,
-
-Is the strlen appropriate if we have cmd_startswith?
-
-> +                             gdb_ctx.params, &gdb_ctx.num_params)) {
-> +            return -1;
-> +        }
-> +
-> +        gdb_ctx.s =3D s;
-> +        cmds[i].handler(&gdb_ctx, user_ctx);
-> +        return 0;
+> +    if (pid =3D=3D gdb_get_cpu_pid(s, s->c_cpu)) {
+> +        s->c_cpu =3D gdb_first_attached_cpu(s);
 > +    }
 > +
-> +    return -1;
+> +    if (pid =3D=3D gdb_get_cpu_pid(s, s->g_cpu)) {
+> +        s->g_cpu =3D gdb_first_attached_cpu(s);
+> +    }
+> +
+> +    if (!s->c_cpu) {
+> +        /* No more process attached */
+> +        gdb_syscall_mode =3D GDB_SYS_DISABLED;
+> +        gdb_continue(s);
+> +    }
+> +    put_packet(s, "OK");
 > +}
 > +
 >  static int gdb_handle_packet(GDBState *s, const char *line_buf)
 >  {
 >      CPUState *cpu;
+> @@ -1597,42 +1628,15 @@ static int gdb_handle_packet(GDBState *s, const c=
+har *line_buf)
+>          error_report("QEMU: Terminated via GDBstub");
+>          exit(0);
+>      case 'D':
+> -        /* Detach packet */
+> -        pid =3D 1;
+> -
+> -        if (s->multiprocess) {
+> -            unsigned long lpid;
+> -            if (*p !=3D ';') {
+> -                put_packet(s, "E22");
+> -                break;
+> -            }
+> -
+> -            if (qemu_strtoul(p + 1, &p, 16, &lpid)) {
+> -                put_packet(s, "E22");
+> -                break;
+> -            }
+> -
+> -            pid =3D lpid;
+> -        }
+> -
+> -        process =3D gdb_get_process(s, pid);
+> -        gdb_process_breakpoint_remove_all(s, process);
+> -        process->attached =3D false;
+> -
+> -        if (pid =3D=3D gdb_get_cpu_pid(s, s->c_cpu)) {
+> -            s->c_cpu =3D gdb_first_attached_cpu(s);
+> -        }
+> -
+> -        if (pid =3D=3D gdb_get_cpu_pid(s, s->g_cpu)) {
+> -            s->g_cpu =3D gdb_first_attached_cpu(s);
+> -        }
+> -
+> -        if (s->c_cpu =3D=3D NULL) {
+> -            /* No more process attached */
+> -            gdb_syscall_mode =3D GDB_SYS_DISABLED;
+> -            gdb_continue(s);
+> +        {
+> +            static GdbCmdParseEntry deatch_cmd_desc =3D {
+> +                .handler =3D handle_detach,
+> +                .cmd =3D "D",
+> +                .cmd_startswith =3D 1,
+> +                .schema =3D "?.l0"
+> +            };
+> +            process_string_cmd(s, NULL, line_buf, &deatch_cmd_desc, 1);
+>          }
+> -        put_packet(s, "OK");
+>          break;
+>      case 's':
+>          if (*p !=3D '\0') {
 
 
 --
