@@ -6,55 +6,56 @@ X-Spam-Status: No, score=-6.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 25F4BC43218
-	for <qemu-devel@archiver.kernel.org>; Thu, 25 Apr 2019 17:58:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EE247C43218
+	for <qemu-devel@archiver.kernel.org>; Thu, 25 Apr 2019 17:59:25 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 804A6206BF
-	for <qemu-devel@archiver.kernel.org>; Thu, 25 Apr 2019 17:58:57 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 804A6206BF
+	by mail.kernel.org (Postfix) with ESMTPS id 85E98206BF
+	for <qemu-devel@archiver.kernel.org>; Thu, 25 Apr 2019 17:59:26 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 85E98206BF
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:33255 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:33257 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hJie8-0001Vm-1c
-	for qemu-devel@archiver.kernel.org; Thu, 25 Apr 2019 13:58:56 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:41364)
+	id 1hJieb-0001vx-1m
+	for qemu-devel@archiver.kernel.org; Thu, 25 Apr 2019 13:59:25 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:41536)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1hJicN-0000Fm-SP
-	for qemu-devel@nongnu.org; Thu, 25 Apr 2019 13:57:08 -0400
+	(envelope-from <ehabkost@redhat.com>) id 1hJicm-0000bJ-OJ
+	for qemu-devel@nongnu.org; Thu, 25 Apr 2019 13:57:33 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1hJicM-0004vU-Sr
-	for qemu-devel@nongnu.org; Thu, 25 Apr 2019 13:57:07 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:58428)
+	(envelope-from <ehabkost@redhat.com>) id 1hJici-0005FS-RX
+	for qemu-devel@nongnu.org; Thu, 25 Apr 2019 13:57:32 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:58500)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1hJicM-0004uq-Mi
-	for qemu-devel@nongnu.org; Thu, 25 Apr 2019 13:57:06 -0400
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
-	[10.5.11.23])
+	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1hJicb-000595-9A
+	for qemu-devel@nongnu.org; Thu, 25 Apr 2019 13:57:23 -0400
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+	[10.5.11.22])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id DAA6AC0528AC;
-	Thu, 25 Apr 2019 17:57:05 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id 2F46CC051671;
+	Thu, 25 Apr 2019 17:57:20 +0000 (UTC)
 Received: from localhost (ovpn-116-9.gru2.redhat.com [10.97.116.9])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id 6F4EA3DE4;
-	Thu, 25 Apr 2019 17:57:05 +0000 (UTC)
+	by smtp.corp.redhat.com (Postfix) with ESMTP id B4EE61001E6C;
+	Thu, 25 Apr 2019 17:57:19 +0000 (UTC)
 From: Eduardo Habkost <ehabkost@redhat.com>
 To: Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org,
 	Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
-Date: Thu, 25 Apr 2019 14:56:50 -0300
-Message-Id: <20190425175659.24876-3-ehabkost@redhat.com>
+Date: Thu, 25 Apr 2019 14:56:57 -0300
+Message-Id: <20190425175659.24876-10-ehabkost@redhat.com>
 In-Reply-To: <20190425175659.24876-1-ehabkost@redhat.com>
 References: <20190425175659.24876-1-ehabkost@redhat.com>
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
 	(mx1.redhat.com [10.5.110.31]);
-	Thu, 25 Apr 2019 17:57:05 +0000 (UTC)
+	Thu, 25 Apr 2019 17:57:20 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] [PULL 02/11] vl.c: make find_default_machine() local
+Subject: [Qemu-devel] [PULL 09/11] scripts/update-linux-headers: add
+ linux/mman.h
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -66,59 +67,54 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Wei Yang <richardw.yang@linux.intel.com>
+Cc: Zhang Yi <yi.z.zhang@linux.intel.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 Content-Type: text/plain; charset="UTF-8"
-Message-ID: <20190425175650.0kxnMaoMTPAh99o8BcIGBAx-9svAhj74n2YhhtZTZEY@z>
+Message-ID: <20190425175657.5X7JdbZuMRgtyahiSsSNRNuH7zNaQmwFvGRGnY47TSY@z>
 
-From: Wei Yang <richardw.yang@linux.intel.com>
+From: Zhang Yi <yi.z.zhang@linux.intel.com>
 
-Function find_default_machine() is introduced by commit 2c8cffa599b7
-"vl: make find_default_machine externally visible", and it was used
-outside of vl.c until commit a904410af5f1 "pc_sysfw: remove the rom_only
-property".
+Add linux/mman.h,asm/mman.h,asm/mman-common.h to linux-headers,
+So we can use more mmap2 flags.
 
-Commit a904410af5f1 "pc_sysfw: remove the rom_only property" removed the
-only user of find_default_machine() outside vl.c, but neglected to make
-it static. Do that now.
-
-Signed-off-by: Wei Yang <richardw.yang@linux.intel.com>
-
-Message-Id: <20190405064121.23662-2-richardw.yang@linux.intel.com>
-Reviewed-by: Markus Armbruster <armbru@redhat.com>
+Signed-off-by: Zhang Yi <yi.z.zhang@linux.intel.com>
+Message-Id: <f65c78d74859f815aa9c4f97407eb33361a6672c.1549555521.git.yi.z.zhang@linux.intel.com>
 Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
 ---
- include/hw/boards.h | 1 -
- vl.c                | 2 +-
- 2 files changed, 1 insertion(+), 2 deletions(-)
+ scripts/update-linux-headers.sh | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
 
-diff --git a/include/hw/boards.h b/include/hw/boards.h
-index fe1885cbff..6f7916f88f 100644
---- a/include/hw/boards.h
-+++ b/include/hw/boards.h
-@@ -57,7 +57,6 @@ void memory_region_allocate_system_memory(MemoryRegion *mr, Object *owner,
- #define MACHINE_CLASS(klass) \
-     OBJECT_CLASS_CHECK(MachineClass, (klass), TYPE_MACHINE)
+diff --git a/scripts/update-linux-headers.sh b/scripts/update-linux-headers.sh
+index a310a9072b..c3819d2b98 100755
+--- a/scripts/update-linux-headers.sh
++++ b/scripts/update-linux-headers.sh
+@@ -95,7 +95,7 @@ for arch in $ARCHLIST; do
  
--MachineClass *find_default_machine(void);
- extern MachineState *current_machine;
+     rm -rf "$output/linux-headers/asm-$arch"
+     mkdir -p "$output/linux-headers/asm-$arch"
+-    for header in kvm.h unistd.h bitsperlong.h; do
++    for header in kvm.h unistd.h bitsperlong.h mman.h; do
+         cp "$tmpdir/include/asm/$header" "$output/linux-headers/asm-$arch"
+     done
  
- void machine_run_board_init(MachineState *machine);
-diff --git a/vl.c b/vl.c
-index ff5dfb6fbc..c237c9a0ac 100644
---- a/vl.c
-+++ b/vl.c
-@@ -1488,7 +1488,7 @@ static MachineClass *find_machine(const char *name)
-     return mc;
- }
+@@ -139,13 +139,13 @@ done
+ rm -rf "$output/linux-headers/linux"
+ mkdir -p "$output/linux-headers/linux"
+ for header in kvm.h vfio.h vfio_ccw.h vhost.h \
+-              psci.h psp-sev.h userfaultfd.h; do
++              psci.h psp-sev.h userfaultfd.h mman.h; do
+     cp "$tmpdir/include/linux/$header" "$output/linux-headers/linux"
+ done
  
--MachineClass *find_default_machine(void)
-+static MachineClass *find_default_machine(void)
- {
-     GSList *el, *machines = object_class_get_list(TYPE_MACHINE, false);
-     MachineClass *mc = NULL;
+ rm -rf "$output/linux-headers/asm-generic"
+ mkdir -p "$output/linux-headers/asm-generic"
+-for header in unistd.h bitsperlong.h; do
++for header in unistd.h bitsperlong.h mman-common.h mman.h hugetlb_encode.h; do
+     cp "$tmpdir/include/asm-generic/$header" "$output/linux-headers/asm-generic"
+ done
+ 
 -- 
 2.18.0.rc1.1.g3f1ff2140
 
