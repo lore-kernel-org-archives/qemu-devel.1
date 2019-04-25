@@ -1,28 +1,24 @@
-Received: from eggs.gnu.org ([209.51.188.92]:56912)
+Received: from eggs.gnu.org ([209.51.188.92]:33008)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1hJhaA-0004qQ-UT
-	for qemu-devel@nongnu.org; Thu, 25 Apr 2019 12:50:48 -0400
+	(envelope-from <ehabkost@redhat.com>) id 1hJhyr-0002uB-EW
+	for qemu-devel@nongnu.org; Thu, 25 Apr 2019 13:16:18 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1hJha9-0003dv-Uf
-	for qemu-devel@nongnu.org; Thu, 25 Apr 2019 12:50:46 -0400
-Received: from mail-pl1-x644.google.com ([2607:f8b0:4864:20::644]:38842)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1hJha9-0003bc-KI
-	for qemu-devel@nongnu.org; Thu, 25 Apr 2019 12:50:45 -0400
-Received: by mail-pl1-x644.google.com with SMTP id f36so79550plb.5
-	for <qemu-devel@nongnu.org>; Thu, 25 Apr 2019 09:50:45 -0700 (PDT)
-References: <mhng-f65ff93d-20e5-4c4a-919a-c311ae97649d@palmer-si-x1e>
-From: Richard Henderson <richard.henderson@linaro.org>
-Message-ID: <357d260b-4baf-aea8-c332-f77ce2a3e9b2@linaro.org>
-Date: Thu, 25 Apr 2019 09:50:41 -0700
+	(envelope-from <ehabkost@redhat.com>) id 1hJhwt-0002tD-Mg
+	for qemu-devel@nongnu.org; Thu, 25 Apr 2019 13:14:16 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:49810)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1hJhwt-0002sl-HA
+	for qemu-devel@nongnu.org; Thu, 25 Apr 2019 13:14:15 -0400
+Date: Thu, 25 Apr 2019 14:14:06 -0300
+From: Eduardo Habkost <ehabkost@redhat.com>
+Message-ID: <20190425171406.GN18406@habkost.net>
+References: <20190425130939.29674-1-stefanha@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <mhng-f65ff93d-20e5-4c4a-919a-c311ae97649d@palmer-si-x1e>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH for-4.1 4/8] target/riscv: Merge argument
- decode for RVC shifti
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20190425130939.29674-1-stefanha@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v2] virtio: clarify VirtioPCIDeviceTypeInfo
+ usage
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,18 +27,26 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Palmer Dabbelt <palmer@sifive.com>
-Cc: qemu-devel@nongnu.org, Bastian Koppelmann <kbastian@mail.uni-paderborn.de>, Alistair Francis <Alistair.Francis@wdc.com>, qemu-riscv@nongnu.org
+To: Stefan Hajnoczi <stefanha@redhat.com>
+Cc: qemu-devel@nongnu.org, "Michael S. Tsirkin" <mst@redhat.com>, sebastien.boeuf@intel.com
 
-On 4/25/19 9:04 AM, Palmer Dabbelt wrote:
->>  # *** RV64C Standard Extension (Quadrant 2) ***
->> -c_slli            000 .  .....  ..... 10 @c_shift2
->> +slli              000 .  .....  ..... 10 @c_shift2
+On Thu, Apr 25, 2019 at 02:09:39PM +0100, Stefan Hajnoczi wrote:
+> How to use .base_name, .generic_name, .transitional_name, and
+> .non_transitional_name can be confusing.
 > 
-> This is another one where rd=0 is illegal in the compressed ISA, but again we
-> don't appear to handle these correctly before the cleanups.
+> Existing devices have .generic_name but its behavior is somewhat magic.
+> 
+> Devices added to new versions of the VIRTIO specification should forego
+> transitional mode completely and always operate in non-transitional mode
+> because there are no existing drivers for them that require backwards
+> compatibility.
+> 
+> This patch adds comments that hopefully make it easier for developers to
+> decide how to fill out VirtioPCIDeviceTypeInfo.
+> 
+> Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
 
-I see "HINT, rd=0" in the 2.2 documentation for this case.
+Reviewed-by: Eduardo Habkost <ehabkost@redhat.com>
 
-
-r~
+-- 
+Eduardo
