@@ -6,80 +6,80 @@ X-Spam-Status: No, score=-6.7 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
 	SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C3563C43218
-	for <qemu-devel@archiver.kernel.org>; Thu, 25 Apr 2019 16:08:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5ADBAC43218
+	for <qemu-devel@archiver.kernel.org>; Thu, 25 Apr 2019 16:09:20 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E42DD20651
-	for <qemu-devel@archiver.kernel.org>; Thu, 25 Apr 2019 16:08:03 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 48E6E20651
+	for <qemu-devel@archiver.kernel.org>; Thu, 25 Apr 2019 16:09:20 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=sifive.com header.i=@sifive.com header.b="FW9SEU2N"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E42DD20651
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=sifive.com header.i=@sifive.com header.b="YXfOud7H"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 48E6E20651
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=sifive.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:60038 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:60052 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hJguo-0003RH-Mc
-	for qemu-devel@archiver.kernel.org; Thu, 25 Apr 2019 12:08:02 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:44395)
+	id 1hJgw2-0004Ex-Tq
+	for qemu-devel@archiver.kernel.org; Thu, 25 Apr 2019 12:09:18 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:44425)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <palmer@sifive.com>) id 1hJgrC-0000gO-QJ
-	for qemu-devel@nongnu.org; Thu, 25 Apr 2019 12:04:20 -0400
+	(envelope-from <palmer@sifive.com>) id 1hJgrE-0000ho-QC
+	for qemu-devel@nongnu.org; Thu, 25 Apr 2019 12:04:22 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <palmer@sifive.com>) id 1hJgr6-0001eL-WB
-	for qemu-devel@nongnu.org; Thu, 25 Apr 2019 12:04:16 -0400
-Received: from mail-pg1-x541.google.com ([2607:f8b0:4864:20::541]:40702)
+	(envelope-from <palmer@sifive.com>) id 1hJgrC-0001wl-UL
+	for qemu-devel@nongnu.org; Thu, 25 Apr 2019 12:04:20 -0400
+Received: from mail-pf1-x442.google.com ([2607:f8b0:4864:20::442]:41501)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <palmer@sifive.com>) id 1hJgr6-0001cK-O5
-	for qemu-devel@nongnu.org; Thu, 25 Apr 2019 12:04:12 -0400
-Received: by mail-pg1-x541.google.com with SMTP id d31so66664pgl.7
-	for <qemu-devel@nongnu.org>; Thu, 25 Apr 2019 09:04:12 -0700 (PDT)
+	(Exim 4.71) (envelope-from <palmer@sifive.com>) id 1hJgrA-0001ft-VE
+	for qemu-devel@nongnu.org; Thu, 25 Apr 2019 12:04:18 -0400
+Received: by mail-pf1-x442.google.com with SMTP id 188so127511pfd.8
+	for <qemu-devel@nongnu.org>; Thu, 25 Apr 2019 09:04:14 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=sifive.com; s=google;
 	h=date:subject:in-reply-to:cc:from:to:message-id:mime-version
 	:content-transfer-encoding;
-	bh=Rvi9fUQF6R8M0jkwR4Ba35MYTw8XOwV1AzrjSrwHtwY=;
-	b=FW9SEU2N1V+f0FtmWlrWnzPdJZelPXUMT13dLatGyGLZNycUhkcLdE86CJNpQmRG0m
-	mlOAIvR9yfrkAt/KDmwtA6GZ6uBdE9DBq5o0RF0dcKk/m62u+JcEOAWSx/RHPmQNyJLh
-	cJBbG7a0+V77cxBKpUbu/TlqTLJQfGvyvuBv/fDr0vbrf9bakR/sq9nDbgpn3qpTg9tU
-	8/FcQoacX1CFX/o9eT85QZU1h1AL1AI4n1mmrZl8F1jktpsUuw885ysMchVfW6elhwB8
-	9spP/mNgXPRDCUVOWHsYfo5S4AIX3igDyRjEb65Mu34eJBb1/Pcj6C+heL7j+bBO7P7x
-	N4kQ==
+	bh=Ffv7Cww6SjztxnSnRTtiTm5KqU8pupJwNW6ydnXH/OY=;
+	b=YXfOud7H07y4PzyS4WZ8v3Se6C7FPv8ynli8NGhiaz/HhPrLI8a0GUVrFQJIk0G5bX
+	LxpfVEHym0o+CnDpwrBGFRFwnoRSoyCWgPxYAFM491wjbyiR/PJ4qFQQ1bCMxX/Yz96o
+	ivi2Ct7GgENCWwAq0uJ3WQ/eKEsy4IQ3UELm6TUlL4/YbJDJyp09iu+qtSM0LrR6ngSi
+	fx2g51cBu5Oqbtx6Vja9yhr0Oo1HoGbi09ol2XGj36t3vwoNjVvdy9kXgPM7gJgYrCjt
+	Jt8g3ENZJu+15/Niiox5kfmy3c8lNGYSAeCLwy1ai966BS1EYWBR+4A61l4Nj5SplCbR
+	B9Yw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
 	d=1e100.net; s=20161025;
 	h=x-gm-message-state:date:subject:in-reply-to:cc:from:to:message-id
 	:mime-version:content-transfer-encoding;
-	bh=Rvi9fUQF6R8M0jkwR4Ba35MYTw8XOwV1AzrjSrwHtwY=;
-	b=VstFnuQQoXWRFsNsqQNITytPZrP5Pz/HHKCv3r3+bIE7Xpd7wIHvwNy25haKv9ao40
-	lPCpCKRP1l4j3/QtwtsMI5VeFUCfYwgTXsIl60rYi+M7sn+YN4kM8XU86Z82bVYSd/D5
-	mlIPCQShhkIpktew6Cc3FP9d5YUzWZO+i0pw+khx6uFiaLl0c/HOnXVTDhVgFsfJ7u7j
-	5wU9z6RftGsKlNi3gzuRShdk8ZrKJbMxDKlXsnfSfkc49A+AGXZmeqhqcKAtT5tCHfss
-	ad0Gr+x8Q5GCslp2sxrgt9s/GusSpd305JpwkEn/rWtgoG0ayjC9c7j2ks1LC4kKkvbW
-	xOxA==
-X-Gm-Message-State: APjAAAVe8AWyll18gzV/bxD1aTOqM7fWn1G+1siX4WiLu4imn3IMI4MY
-	Evasbbfnidh6mcZK3KtEDrOf/Mk6iGI=
-X-Google-Smtp-Source: APXvYqyWChM/oetsb5//YM4w4Gz+NHuiNzggJkYrcWmrSNCH06gGcAJPtdz8HihF6NjBp27fNNN2lw==
-X-Received: by 2002:a65:5289:: with SMTP id y9mr11769404pgp.52.1556208249530; 
-	Thu, 25 Apr 2019 09:04:09 -0700 (PDT)
+	bh=Ffv7Cww6SjztxnSnRTtiTm5KqU8pupJwNW6ydnXH/OY=;
+	b=hCeN47/JEv83cDKpXTD6hZKYh9HObKCHtpcNX+R15VfACOdJxht9OjqfWycD5KoqPS
+	d1jT/l3IwO1GHkexK08b/WUdahUAFvKrn0HbTHnd77GUHwBzIHAK1ZQftkspkpagxteI
+	5tb9L1lfkmnhF2M1gGhEgH/rTCqFdh7iiQyki1a7fHLa2INPshKtzhYws8NXOJLEyNM4
+	hoNmMwZFvFjPNbQCHt+X2LX1LvzWP1xao4gsF1tLxbTh7gtY5BKdl1jLL6ZQMeD0LXNw
+	Ek+uZydPTr1Tj4CNYAKs/FrNeSq8Sw8M4Pmmp2pxI69Xt4KvVrG6KxaOuqm1dAGsjQj+
+	iE1Q==
+X-Gm-Message-State: APjAAAVgGSiNlu1ndf0CknwfP/wfyTkLZ2tNUQM1qKzX8LujHPyi1Q8H
+	kBcI3mJypbdYomFGZv4mT4Mu+IeFElo=
+X-Google-Smtp-Source: APXvYqwkO++utlmTaExA52ddw6raIRjU8VtdCA6O1H0RsBxyY9fg1B2r/4+hqiG2hLgIRbtF5/OLRw==
+X-Received: by 2002:a65:60ca:: with SMTP id r10mr37846985pgv.64.1556208252818; 
+	Thu, 25 Apr 2019 09:04:12 -0700 (PDT)
 Received: from localhost ([134.134.139.92]) by smtp.gmail.com with ESMTPSA id
-	p17sm32258723pfn.157.2019.04.25.09.04.07
+	h187sm39265979pfc.52.2019.04.25.09.04.11
 	(version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
-	Thu, 25 Apr 2019 09:04:08 -0700 (PDT)
-Date: Thu, 25 Apr 2019 09:04:08 -0700 (PDT)
-X-Google-Original-Date: Thu, 25 Apr 2019 07:57:47 PDT (-0700)
-In-Reply-To: <20190401031155.21293-4-richard.henderson@linaro.org>
+	Thu, 25 Apr 2019 09:04:11 -0700 (PDT)
+Date: Thu, 25 Apr 2019 09:04:11 -0700 (PDT)
+X-Google-Original-Date: Thu, 25 Apr 2019 08:06:37 PDT (-0700)
+In-Reply-To: <20190401031155.21293-5-richard.henderson@linaro.org>
 From: Palmer Dabbelt <palmer@sifive.com>
 To: richard.henderson@linaro.org
-Message-ID: <mhng-3e3866ac-838d-4c70-8dd4-880201b74b8a@palmer-si-x1e>
+Message-ID: <mhng-f65ff93d-20e5-4c4a-919a-c311ae97649d@palmer-si-x1e>
 Mime-Version: 1.0 (MHng)
 Content-Type: text/plain; charset="UTF-8"; format="flowed"
 Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
 	recognized.
-X-Received-From: 2607:f8b0:4864:20::541
-Subject: Re: [Qemu-devel] [PATCH for-4.1 3/8] target/riscv: Merge argument
- sets for insn32 and insn16
+X-Received-From: 2607:f8b0:4864:20::442
+Subject: Re: [Qemu-devel] [PATCH for-4.1 4/8] target/riscv: Merge argument
+ decode for RVC shifti
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -97,417 +97,150 @@ Cc: Bastian Koppelmann <kbastian@mail.uni-paderborn.de>,
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190425160408.UAh1r6LW7sl7gqmgkaEuoVzSWeFz8I8Je0M8K4eXS3I@z>
+Message-ID: <20190425160411.ikJ7ri7kHcWRQfpkoNx_DtKELfFqw4QidFE3k3KHzU0@z>
 
-On Sun, 31 Mar 2019 20:11:50 PDT (-0700), richard.henderson@linaro.org wrote:
-> In some cases this allows us to directly use the insn32
-> translator function.  In some cases we still need a shim.
+On Sun, 31 Mar 2019 20:11:51 PDT (-0700), richard.henderson@linaro.org wrote:
+> Special handling for IMM==0 is the only difference between
+> RVC shifti and RVI shifti.  This can be handled with !function.
 >
 > Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 > ---
->  target/riscv/insn_trans/trans_rvc.inc.c | 144 ++----------------------
->  target/riscv/translate.c                |  13 ++-
->  target/riscv/insn16.decode              |  82 ++++++++------
->  3 files changed, 69 insertions(+), 170 deletions(-)
+>  target/riscv/insn_trans/trans_rvc.inc.c | 47 -------------------------
+>  target/riscv/translate.c                |  6 ++++
+>  target/riscv/insn16.decode              | 12 +++----
+>  3 files changed, 12 insertions(+), 53 deletions(-)
 >
 > diff --git a/target/riscv/insn_trans/trans_rvc.inc.c b/target/riscv/insn_trans/trans_rvc.inc.c
-> index ebcd977b2f..dfb46a2348 100644
+> index dfb46a2348..691b1e2725 100644
 > --- a/target/riscv/insn_trans/trans_rvc.inc.c
 > +++ b/target/riscv/insn_trans/trans_rvc.inc.c
-> @@ -28,18 +28,6 @@ static bool trans_c_addi4spn(DisasContext *ctx, arg_c_addi4spn *a)
->      return trans_addi(ctx, &arg);
+> @@ -97,37 +97,6 @@ static bool trans_c_addi16sp_lui(DisasContext *ctx, arg_c_addi16sp_lui *a)
+>      return false;
 >  }
 >
-> -static bool trans_c_fld(DisasContext *ctx, arg_c_fld *a)
+> -static bool trans_c_srli(DisasContext *ctx, arg_c_srli *a)
 > -{
-> -    arg_fld arg = { .rd = a->rd, .rs1 = a->rs1, .imm = a->uimm };
-> -    return trans_fld(ctx, &arg);
-> -}
-> -
-> -static bool trans_c_lw(DisasContext *ctx, arg_c_lw *a)
-> -{
-> -    arg_lw arg = { .rd = a->rd, .rs1 = a->rs1, .imm = a->uimm };
-> -    return trans_lw(ctx, &arg);
-> -}
-> -
->  static bool trans_c_flw_ld(DisasContext *ctx, arg_c_flw_ld *a)
->  {
->  #ifdef TARGET_RISCV32
-> @@ -47,31 +35,17 @@ static bool trans_c_flw_ld(DisasContext *ctx, arg_c_flw_ld *a)
->      REQUIRE_FPU;
->      REQUIRE_EXT(ctx, RVF);
->
-> -    arg_c_lw tmp;
-> -    decode_insn16_extract_cl_w(&tmp, ctx->opcode);
-> -    arg_flw arg = { .rd = tmp.rd, .rs1 = tmp.rs1, .imm = tmp.uimm };
-> +    arg_i arg;
-> +    decode_insn16_extract_cl_w(&arg, ctx->opcode);
->      return trans_flw(ctx, &arg);
->  #else
->      /* C.LD ( RV64C/RV128C-only ) */
-> -    arg_c_fld tmp;
-> -    decode_insn16_extract_cl_d(&tmp, ctx->opcode);
-> -    arg_ld arg = { .rd = tmp.rd, .rs1 = tmp.rs1, .imm = tmp.uimm };
-> +    arg_i arg;
-> +    decode_insn16_extract_cl_d(&arg, ctx->opcode);
->      return trans_ld(ctx, &arg);
->  #endif
->  }
->
-> -static bool trans_c_fsd(DisasContext *ctx, arg_c_fsd *a)
-> -{
-> -    arg_fsd arg = { .rs1 = a->rs1, .rs2 = a->rs2, .imm = a->uimm };
-> -    return trans_fsd(ctx, &arg);
-> -}
-> -
-> -static bool trans_c_sw(DisasContext *ctx, arg_c_sw *a)
-> -{
-> -    arg_sw arg = { .rs1 = a->rs1, .rs2 = a->rs2, .imm = a->uimm };
-> -    return trans_sw(ctx, &arg);
-> -}
-> -
->  static bool trans_c_fsw_sd(DisasContext *ctx, arg_c_fsw_sd *a)
->  {
->  #ifdef TARGET_RISCV32
-> @@ -79,34 +53,22 @@ static bool trans_c_fsw_sd(DisasContext *ctx, arg_c_fsw_sd *a)
->      REQUIRE_FPU;
->      REQUIRE_EXT(ctx, RVF);
->
-> -    arg_c_sw tmp;
-> -    decode_insn16_extract_cs_w(&tmp, ctx->opcode);
-> -    arg_fsw arg = { .rs1 = tmp.rs1, .rs2 = tmp.rs2, .imm = tmp.uimm };
-> +    arg_s arg;
-> +    decode_insn16_extract_cs_w(&arg, ctx->opcode);
->      return trans_fsw(ctx, &arg);
->  #else
->      /* C.SD ( RV64C/RV128C-only ) */
-> -    arg_c_fsd tmp;
-> -    decode_insn16_extract_cs_d(&tmp, ctx->opcode);
-> -    arg_sd arg = { .rs1 = tmp.rs1, .rs2 = tmp.rs2, .imm = tmp.uimm };
-> +    arg_s arg;
-> +    decode_insn16_extract_cs_d(&arg, ctx->opcode);
->      return trans_sd(ctx, &arg);
->  #endif
->  }
->
-> -static bool trans_c_addi(DisasContext *ctx, arg_c_addi *a)
-> -{
-> -    if (a->imm == 0) {
-> -        /* Hint: insn is valid but does not affect state */
-> -        return true;
+> -    int shamt = a->shamt;
+> -    if (shamt == 0) {
+> -        /* For RV128 a shamt of 0 means a shift by 64 */
+> -        shamt = 64;
 > -    }
-> -    arg_addi arg = { .rd = a->rd, .rs1 = a->rd, .imm = a->imm };
-> -    return trans_addi(ctx, &arg);
-> -}
-> -
->  static bool trans_c_jal_addiw(DisasContext *ctx, arg_c_jal_addiw *a)
->  {
->  #ifdef TARGET_RISCV32
->      /* C.JAL */
-> -    arg_c_j tmp;
-> +    arg_j tmp;
->      decode_insn16_extract_cj(&tmp, ctx->opcode);
->      arg_jal arg = { .rd = 1, .imm = tmp.imm };
->      return trans_jal(ctx, &arg);
-> @@ -117,16 +79,6 @@ static bool trans_c_jal_addiw(DisasContext *ctx, arg_c_jal_addiw *a)
->  #endif
->  }
->
-> -static bool trans_c_li(DisasContext *ctx, arg_c_li *a)
-> -{
-> -    if (a->rd == 0) {
-> -        /* Hint: insn is valid but does not affect state */
-> -        return true;
+> -    /* Ensure, that shamt[5] is zero for RV32 */
+> -    if (shamt >= TARGET_LONG_BITS) {
+> -        return false;
 > -    }
-> -    arg_addi arg = { .rd = a->rd, .rs1 = 0, .imm = a->imm };
-> -    return trans_addi(ctx, &arg);
+> -
+> -    arg_srli arg = { .rd = a->rd, .rs1 = a->rd, .shamt = a->shamt };
+> -    return trans_srli(ctx, &arg);
 > -}
 > -
->  static bool trans_c_addi16sp_lui(DisasContext *ctx, arg_c_addi16sp_lui *a)
->  {
->      if (a->rd == 2) {
-> @@ -177,41 +129,10 @@ static bool trans_c_srai(DisasContext *ctx, arg_c_srai *a)
->      return trans_srai(ctx, &arg);
->  }
+> -static bool trans_c_srai(DisasContext *ctx, arg_c_srai *a)
+> -{
+> -    int shamt = a->shamt;
+> -    if (shamt == 0) {
+> -        /* For RV128 a shamt of 0 means a shift by 64 */
+> -        shamt = 64;
+> -    }
+> -    /* Ensure, that shamt[5] is zero for RV32 */
+> -    if (shamt >= TARGET_LONG_BITS) {
+> -        return false;
+> -    }
+> -
+> -    arg_srai arg = { .rd = a->rd, .rs1 = a->rd, .shamt = a->shamt };
+> -    return trans_srai(ctx, &arg);
+> -}
 >
-> -static bool trans_c_andi(DisasContext *ctx, arg_c_andi *a)
-> -{
-> -    arg_andi arg = { .rd = a->rd, .rs1 = a->rd, .imm = a->imm };
-> -    return trans_andi(ctx, &arg);
-> -}
-> -
-> -static bool trans_c_sub(DisasContext *ctx, arg_c_sub *a)
-> -{
-> -    arg_sub arg = { .rd = a->rd, .rs1 = a->rd, .rs2 = a->rs2 };
-> -    return trans_sub(ctx, &arg);
-> -}
-> -
-> -static bool trans_c_xor(DisasContext *ctx, arg_c_xor *a)
-> -{
-> -    arg_xor arg = { .rd = a->rd, .rs1 = a->rd, .rs2 = a->rs2 };
-> -    return trans_xor(ctx, &arg);
-> -}
-> -
-> -static bool trans_c_or(DisasContext *ctx, arg_c_or *a)
-> -{
-> -    arg_or arg = { .rd = a->rd, .rs1 = a->rd, .rs2 = a->rs2 };
-> -    return trans_or(ctx, &arg);
-> -}
-> -
-> -static bool trans_c_and(DisasContext *ctx, arg_c_and *a)
-> -{
-> -    arg_and arg = { .rd = a->rd, .rs1 = a->rd, .rs2 = a->rs2 };
-> -    return trans_and(ctx, &arg);
-> -}
-> -
 >  static bool trans_c_subw(DisasContext *ctx, arg_c_subw *a)
 >  {
->  #ifdef TARGET_RISCV64
-> -    arg_subw arg = { .rd = a->rd, .rs1 = a->rd, .rs2 = a->rs2 };
-> -    return trans_subw(ctx, &arg);
-> +    return trans_subw(ctx, a);
->  #else
->      return false;
->  #endif
-> @@ -220,31 +141,12 @@ static bool trans_c_subw(DisasContext *ctx, arg_c_subw *a)
->  static bool trans_c_addw(DisasContext *ctx, arg_c_addw *a)
->  {
->  #ifdef TARGET_RISCV64
-> -    arg_addw arg = { .rd = a->rd, .rs1 = a->rd, .rs2 = a->rs2 };
-> -    return trans_addw(ctx, &arg);
-> +    return trans_addw(ctx, a);
->  #else
->      return false;
+> @@ -147,22 +116,6 @@ static bool trans_c_addw(DisasContext *ctx, arg_c_addw *a)
 >  #endif
 >  }
 >
-> -static bool trans_c_j(DisasContext *ctx, arg_c_j *a)
+> -static bool trans_c_slli(DisasContext *ctx, arg_c_slli *a)
 > -{
-> -    arg_jal arg = { .rd = 0, .imm = a->imm };
-> -    return trans_jal(ctx, &arg);
-> -}
+> -    int shamt = a->shamt;
+> -    if (shamt == 0) {
+> -        /* For RV128 a shamt of 0 means a shift by 64 */
+> -        shamt = 64;
+> -    }
+> -    /* Ensure, that shamt[5] is zero for RV32 */
+> -    if (shamt >= TARGET_LONG_BITS) {
+> -        return false;
+> -    }
 > -
-> -static bool trans_c_beqz(DisasContext *ctx, arg_c_beqz *a)
-> -{
-> -    arg_beq arg = { .rs1 = a->rs1, .rs2 = 0, .imm = a->imm };
-> -    return trans_beq(ctx, &arg);
+> -    arg_slli arg = { .rd = a->rd, .rs1 = a->rd, .shamt = a->shamt };
+> -    return trans_slli(ctx, &arg);
 > -}
-> -
-> -static bool trans_c_bnez(DisasContext *ctx, arg_c_bnez *a)
-> -{
-> -    arg_bne arg = { .rs1 = a->rs1, .rs2 = 0, .imm = a->imm };
-> -    return trans_bne(ctx, &arg);
-> -}
-> -
->  static bool trans_c_slli(DisasContext *ctx, arg_c_slli *a)
->  {
->      int shamt = a->shamt;
-> @@ -261,18 +163,6 @@ static bool trans_c_slli(DisasContext *ctx, arg_c_slli *a)
->      return trans_slli(ctx, &arg);
->  }
->
-> -static bool trans_c_fldsp(DisasContext *ctx, arg_c_fldsp *a)
-> -{
-> -    arg_fld arg = { .rd = a->rd, .rs1 = 2, .imm = a->uimm };
-> -    return trans_fld(ctx, &arg);
-> -}
-> -
-> -static bool trans_c_lwsp(DisasContext *ctx, arg_c_lwsp *a)
-> -{
-> -    arg_lw arg = { .rd = a->rd, .rs1 = 2, .imm = a->uimm };
-> -    return trans_lw(ctx, &arg);
-> -}
-
-c.lwsp with rd=0 should be an illegal instruction, but it's not.  We'd need to
-re-introduce the shim to handle that quirk, but since it's not actually a new
-bug I'm OK taking the patch set and fixing that later.
-
 > -
 >  static bool trans_c_flwsp_ldsp(DisasContext *ctx, arg_c_flwsp_ldsp *a)
 >  {
 >  #ifdef TARGET_RISCV32
-> @@ -321,18 +211,6 @@ static bool trans_c_ebreak_jalr_add(DisasContext *ctx, arg_c_ebreak_jalr_add *a)
->      return false;
->  }
->
-> -static bool trans_c_fsdsp(DisasContext *ctx, arg_c_fsdsp *a)
-> -{
-> -    arg_fsd arg = { .rs1 = 2, .rs2 = a->rs2, .imm = a->uimm };
-> -    return trans_fsd(ctx, &arg);
-> -}
-> -
-> -static bool trans_c_swsp(DisasContext *ctx, arg_c_swsp *a)
-> -{
-> -    arg_sw arg = { .rs1 = 2, .rs2 = a->rs2, .imm = a->uimm };
-> -    return trans_sw(ctx, &arg);
-> -}
-> -
->  static bool trans_c_fswsp_sdsp(DisasContext *ctx, arg_c_fswsp_sdsp *a)
->  {
->  #ifdef TARGET_RISCV32
 > diff --git a/target/riscv/translate.c b/target/riscv/translate.c
-> index 7ebd590486..9e016d8e50 100644
+> index 9e016d8e50..a1cd29f80f 100644
 > --- a/target/riscv/translate.c
 > +++ b/target/riscv/translate.c
-> @@ -666,8 +666,19 @@ static bool gen_shift(DisasContext *ctx, arg_r *a,
->  #include "insn_trans/trans_rvd.inc.c"
->  #include "insn_trans/trans_privileged.inc.c"
+> @@ -538,6 +538,12 @@ static int ex_rvc_register(int reg)
+>      return 8 + reg;
+>  }
 >
-> -/* auto-generated decoder*/
-> +/*
-> + * Auto-generated decoder.
-> + * Note that the 16-bit decoder reuses some of the trans_* functions
-> + * initially declared by the 32-bit decoder, which results in duplicate
-> + * declaration warnings.  Suppress them.
-> + */
-> +#pragma GCC diagnostic push
-> +#pragma GCC diagnostic ignored "-Wredundant-decls"
+> +static int ex_rvc_shifti(int imm)
+> +{
+> +    /* For RV128 a shamt of 0 means a shift by 64. */
+> +    return imm ? imm : 64;
+> +}
 > +
->  #include "decode_insn16.inc.c"
-> +
-> +#pragma GCC diagnostic pop
-> +
->  #include "insn_trans/trans_rvc.inc.c"
+>  /* Include the auto-generated decoder for 32 bit insn */
+>  #include "decode_insn32.inc.c"
 >
->  static void decode_opc(DisasContext *ctx)
 > diff --git a/target/riscv/insn16.decode b/target/riscv/insn16.decode
-> index 17cc52cf2a..d0cc778bc9 100644
+> index d0cc778bc9..add9cf3923 100644
 > --- a/target/riscv/insn16.decode
 > +++ b/target/riscv/insn16.decode
-> @@ -40,17 +40,24 @@
->  %imm_lui       12:s1 2:5             !function=ex_shift_12
+> @@ -30,7 +30,7 @@
+>  %imm_cb        12:s1 5:2 2:1 10:2 3:2 !function=ex_shift_1
+>  %imm_cj        12:s1 8:1 9:2 6:1 7:1 2:1 11:1 3:3 !function=ex_shift_1
 >
->
-> +# Argument sets imported from insn32.decode:
-> +&empty                  !extern
-> +&r         rd rs1 rs2   !extern
-> +&i         imm rs1 rd   !extern
-> +&s         imm rs1 rs2  !extern
-> +&j         imm rd       !extern
-> +&b         imm rs2 rs1  !extern
-> +&u         imm rd       !extern
-> +&shift     shamt rs1 rd !extern
->
->  # Argument sets:
->  &cl               rs1 rd
->  &cl_dw     uimm   rs1 rd
-> -&ci        imm        rd
->  &ciw       nzuimm     rd
->  &cs               rs1 rs2
->  &cs_dw     uimm   rs1 rs2
->  &cb        imm    rs1
->  &cr               rd  rs2
-> -&cj       imm
->  &c_shift   shamt      rd
->
->  &c_ld      uimm  rd
-> @@ -61,23 +68,24 @@
->  &cfswsp_sdsp    uimm_fswsp uimm_sdsp rs2
->
->  # Formats 16:
-> -@cr        ....  ..... .....  .. &cr                      rs2=%rs2_5  %rd
-> -@ci        ... . ..... .....  .. &ci     imm=%imm_ci                  %rd
-> +@cr        ....  ..... .....  .. &r      rs2=%rs2_5       rs1=%rd     %rd
-> +@ci        ... . ..... .....  .. &i      imm=%imm_ci      rs1=%rd     %rd
->  @ciw       ...   ........ ... .. &ciw    nzuimm=%nzuimm_ciw           rd=%rs2_3
-> -@cl_d      ... ... ... .. ... .. &cl_dw  uimm=%uimm_cl_d  rs1=%rs1_3  rd=%rs2_3
-> -@cl_w      ... ... ... .. ... .. &cl_dw  uimm=%uimm_cl_w  rs1=%rs1_3  rd=%rs2_3
-> +@cl_d      ... ... ... .. ... .. &i      imm=%uimm_cl_d   rs1=%rs1_3  rd=%rs2_3
-> +@cl_w      ... ... ... .. ... .. &i      imm=%uimm_cl_w   rs1=%rs1_3  rd=%rs2_3
->  @cl        ... ... ... .. ... .. &cl                      rs1=%rs1_3  rd=%rs2_3
->  @cs        ... ... ... .. ... .. &cs                      rs1=%rs1_3  rs2=%rs2_3
-> -@cs_2      ... ... ... .. ... .. &cr                      rd=%rs1_3   rs2=%rs2_3
-> -@cs_d      ... ... ... .. ... .. &cs_dw  uimm=%uimm_cl_d  rs1=%rs1_3  rs2=%rs2_3
-> -@cs_w      ... ... ... .. ... .. &cs_dw  uimm=%uimm_cl_w  rs1=%rs1_3  rs2=%rs2_3
-> -@cb        ... ... ... .. ... .. &cb     imm=%imm_cb      rs1=%rs1_3
-> -@cj        ...    ........... .. &cj     imm=%imm_cj
-> +@cs_2      ... ... ... .. ... .. &r      rs2=%rs2_3       rs1=%rs1_3  rd=%rs1_3
-> +@cs_d      ... ... ... .. ... .. &s      imm=%uimm_cl_d   rs1=%rs1_3  rs2=%rs2_3
-> +@cs_w      ... ... ... .. ... .. &s      imm=%uimm_cl_w   rs1=%rs1_3  rs2=%rs2_3
-> +@cj        ...    ........... .. &j      imm=%imm_cj
-> +@cb_z      ... ... ... .. ... .. &b      imm=%imm_cb      rs1=%rs1_3  rs2=0
->
-> -@c_ld      ... . .....  ..... .. &c_ld     uimm=%uimm_6bit_ld  %rd
-> -@c_lw      ... . .....  ..... .. &c_ld     uimm=%uimm_6bit_lw  %rd
-> -@c_sd      ... . .....  ..... .. &c_sd     uimm=%uimm_6bit_sd  rs2=%rs2_5
-> -@c_sw      ... . .....  ..... .. &c_sd     uimm=%uimm_6bit_sw  rs2=%rs2_5
-> +@c_ldsp    ... . .....  ..... .. &i      imm=%uimm_6bit_ld rs1=2 %rd
-> +@c_lwsp    ... . .....  ..... .. &i      imm=%uimm_6bit_lw rs1=2 %rd
-> +@c_sdsp    ... . .....  ..... .. &s      imm=%uimm_6bit_sd rs1=2 rs2=%rs2_5
-> +@c_swsp    ... . .....  ..... .. &s      imm=%uimm_6bit_sw rs1=2 rs2=%rs2_5
-> +@c_li      ... . .....  ..... .. &i      imm=%imm_ci rs1=0 %rd
->
->  @c_addi16sp_lui ... .  ..... ..... .. &caddi16sp_lui %imm_lui %imm_addi16sp %rd
->  @c_flwsp_ldsp   ... .  ..... ..... .. &cflwsp_ldsp uimm_flwsp=%uimm_6bit_lw \
-> @@ -85,45 +93,47 @@
->  @c_fswsp_sdsp   ... .  ..... ..... .. &cfswsp_sdsp uimm_fswsp=%uimm_6bit_sw \
+> -%nzuimm_6bit   12:1 2:5
+> +%shimm_6bit   12:1 2:5               !function=ex_rvc_shifti
+>  %uimm_6bit_ld 2:3 12:1 5:2           !function=ex_shift_3
+>  %uimm_6bit_lw 2:2 12:1 4:3           !function=ex_shift_2
+>  %uimm_6bit_sd 7:3 10:3               !function=ex_shift_3
+> @@ -94,9 +94,9 @@
 >      uimm_sdsp=%uimm_6bit_sd rs2=%rs2_5
 >
-> -@c_shift        ... . .. ... ..... .. &c_shift rd=%rs1_3 shamt=%nzuimm_6bit
-> -@c_shift2       ... . .. ... ..... .. &c_shift rd=%rd    shamt=%nzuimm_6bit
-> +@c_shift        ... . .. ... ..... .. \
-> +                &shift rd=%rs1_3 rs1=%rs1_3 shamt=%nzuimm_6bit
-> +@c_shift2       ... . .. ... ..... .. \
-> +                &shift rd=%rd rs1=%rd shamt=%nzuimm_6bit
+>  @c_shift        ... . .. ... ..... .. \
+> -                &shift rd=%rs1_3 rs1=%rs1_3 shamt=%nzuimm_6bit
+> +                &shift rd=%rs1_3 rs1=%rs1_3 shamt=%shimm_6bit
+>  @c_shift2       ... . .. ... ..... .. \
+> -                &shift rd=%rd rs1=%rd shamt=%nzuimm_6bit
+> +                &shift rd=%rd rs1=%rd shamt=%shimm_6bit
 >
-> -@c_andi         ... . .. ... ..... .. &ci imm=%imm_ci rd=%rs1_3
-> +@c_andi         ... . .. ... ..... .. &i imm=%imm_ci rs1=%rs1_3 rd=%rs1_3
+>  @c_andi         ... . .. ... ..... .. &i imm=%imm_ci rs1=%rs1_3 rd=%rs1_3
 >
->  # *** RV64C Standard Extension (Quadrant 0) ***
->  c_addi4spn        000    ........ ... 00 @ciw
-> -c_fld             001  ... ... .. ... 00 @cl_d
-> -c_lw              010  ... ... .. ... 00 @cl_w
-> +fld               001  ... ... .. ... 00 @cl_d
-> +lw                010  ... ... .. ... 00 @cl_w
->  c_flw_ld          011  --- ... -- ... 00 @cl    #Note: Must parse uimm manually
-> -c_fsd             101  ... ... .. ... 00 @cs_d
-> -c_sw              110  ... ... .. ... 00 @cs_w
-> +fsd               101  ... ... .. ... 00 @cs_d
-> +sw                110  ... ... .. ... 00 @cs_w
->  c_fsw_sd          111  --- ... -- ... 00 @cs    #Note: Must parse uimm manually
->
->  # *** RV64C Standard Extension (Quadrant 1) ***
-> -c_addi            000 .  .....  ..... 01 @ci
-> +addi              000 .  .....  ..... 01 @ci
+> @@ -114,8 +114,8 @@ addi              000 .  .....  ..... 01 @ci
 >  c_jal_addiw       001 .  .....  ..... 01 @ci #Note: parse rd and/or imm manually
-> -c_li              010 .  .....  ..... 01 @ci
-> +addi              010 .  .....  ..... 01 @c_li
+>  addi              010 .  .....  ..... 01 @c_li
 >  c_addi16sp_lui    011 .  .....  ..... 01 @c_addi16sp_lui # shares opc with C.LUI
->  c_srli            100 . 00 ...  ..... 01 @c_shift
->  c_srai            100 . 01 ...  ..... 01 @c_shift
-> -c_andi            100 . 10 ...  ..... 01 @c_andi
-> -c_sub             100 0 11 ... 00 ... 01 @cs_2
-> -c_xor             100 0 11 ... 01 ... 01 @cs_2
-> -c_or              100 0 11 ... 10 ... 01 @cs_2
-> -c_and             100 0 11 ... 11 ... 01 @cs_2
-> +andi              100 . 10 ...  ..... 01 @c_andi
-> +sub               100 0 11 ... 00 ... 01 @cs_2
-> +xor               100 0 11 ... 01 ... 01 @cs_2
-> +or                100 0 11 ... 10 ... 01 @cs_2
-> +and               100 0 11 ... 11 ... 01 @cs_2
->  c_subw            100 1 11 ... 00 ... 01 @cs_2
->  c_addw            100 1 11 ... 01 ... 01 @cs_2
-> -c_j               101     ........... 01 @cj
-> -c_beqz            110  ... ...  ..... 01 @cb
-> -c_bnez            111  ... ...  ..... 01 @cb
-> +jal               101     ........... 01 @cj    rd=0  # C.J
-> +beq               110  ... ...  ..... 01 @cb_z
-> +bne               111  ... ...  ..... 01 @cb_z
+> -c_srli            100 . 00 ...  ..... 01 @c_shift
+> -c_srai            100 . 01 ...  ..... 01 @c_shift
+> +srli              100 . 00 ...  ..... 01 @c_shift
+> +srai              100 . 01 ...  ..... 01 @c_shift
+>  andi              100 . 10 ...  ..... 01 @c_andi
+>  sub               100 0 11 ... 00 ... 01 @cs_2
+>  xor               100 0 11 ... 01 ... 01 @cs_2
+> @@ -128,7 +128,7 @@ beq               110  ... ...  ..... 01 @cb_z
+>  bne               111  ... ...  ..... 01 @cb_z
 >
 >  # *** RV64C Standard Extension (Quadrant 2) ***
->  c_slli            000 .  .....  ..... 10 @c_shift2
-> -c_fldsp           001 .  .....  ..... 10 @c_ld
-> -c_lwsp            010 .  .....  ..... 10 @c_lw
-> +fld               001 .  .....  ..... 10 @c_ldsp
-> +lw                010 .  .....  ..... 10 @c_lwsp
+> -c_slli            000 .  .....  ..... 10 @c_shift2
+> +slli              000 .  .....  ..... 10 @c_shift2
+
+This is another one where rd=0 is illegal in the compressed ISA, but again we
+don't appear to handle these correctly before the cleanups.
+
+>  fld               001 .  .....  ..... 10 @c_ldsp
+>  lw                010 .  .....  ..... 10 @c_lwsp
 >  c_flwsp_ldsp      011 .  .....  ..... 10 @c_flwsp_ldsp #C.LDSP:RV64;C.FLWSP:RV32
->  c_jr_mv           100 0  .....  ..... 10 @cr
->  c_ebreak_jalr_add 100 1  .....  ..... 10 @cr
-> -c_fsdsp           101   ......  ..... 10 @c_sd
-> -c_swsp            110 .  .....  ..... 10 @c_sw
-> +fsd               101   ......  ..... 10 @c_sdsp
-> +sw                110 .  .....  ..... 10 @c_swsp
->  c_fswsp_sdsp      111 .  .....  ..... 10 @c_fswsp_sdsp #C.SDSP:RV64;C.FSWSP:RV32
 
 Reviewed-by: Palmer Dabbelt <palmer@sifive.com>
 
