@@ -1,28 +1,27 @@
-Received: from eggs.gnu.org ([209.51.188.92]:51928)
+Received: from eggs.gnu.org ([209.51.188.92]:52130)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richardw.yang@linux.intel.com>) id 1hJZdK-0000B4-E2
-	for qemu-devel@nongnu.org; Thu, 25 Apr 2019 04:21:31 -0400
+	(envelope-from <richardw.yang@linux.intel.com>) id 1hJZeZ-00011Y-V0
+	for qemu-devel@nongnu.org; Thu, 25 Apr 2019 04:22:51 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richardw.yang@linux.intel.com>) id 1hJZdG-0006r5-N4
-	for qemu-devel@nongnu.org; Thu, 25 Apr 2019 04:21:28 -0400
-Received: from mga01.intel.com ([192.55.52.88]:22804)
+	(envelope-from <richardw.yang@linux.intel.com>) id 1hJZeY-0007aR-6A
+	for qemu-devel@nongnu.org; Thu, 25 Apr 2019 04:22:47 -0400
+Received: from mga01.intel.com ([192.55.52.88]:22899)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <richardw.yang@linux.intel.com>)
-	id 1hJZdF-0006nA-73
-	for qemu-devel@nongnu.org; Thu, 25 Apr 2019 04:21:26 -0400
-Date: Thu, 25 Apr 2019 16:20:50 +0800
+	id 1hJZeX-0007XN-Gm
+	for qemu-devel@nongnu.org; Thu, 25 Apr 2019 04:22:45 -0400
+Date: Thu, 25 Apr 2019 16:22:11 +0800
 From: Wei Yang <richardw.yang@linux.intel.com>
-Message-ID: <20190425082050.GF24829@richard>
+Message-ID: <20190425082211.GG24829@richard>
 Reply-To: Wei Yang <richardw.yang@linux.intel.com>
 References: <1556170489-131927-1-git-send-email-imammedo@redhat.com>
-	<1556170489-131927-13-git-send-email-imammedo@redhat.com>
+	<1556170489-131927-14-git-send-email-imammedo@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <1556170489-131927-13-git-send-email-imammedo@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v3 12/13] tests: acpi: refactor
- rebuild-expected-aml.sh to dump ACPI tables for a specified list of targets
+In-Reply-To: <1556170489-131927-14-git-send-email-imammedo@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v3 13/13] tests: acpi: print error unable
+ to dump ACPI table during rebuild
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,73 +33,40 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: Igor Mammedov <imammedo@redhat.com>
 Cc: qemu-devel@nongnu.org, Laszlo Ersek <lersek@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Gonglei <arei.gonglei@huawei.com>, Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <philmd@redhat.com>, Shannon Zhao <shannon.zhaosl@gmail.com>, Wei Yang <richardw.yang@linux.intel.com>, Andrew Jones <drjones@redhat.com>, Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>, Ben Warren <ben@skyportsystems.com>
 
-On Thu, Apr 25, 2019 at 07:34:48AM +0200, Igor Mammedov wrote:
->Make initial list contain aarch64 and x86_64 targets.
-
-so i386 is taken out?
-
+On Thu, Apr 25, 2019 at 07:34:49AM +0200, Igor Mammedov wrote:
+>Instead of just asserting print the error that lead to assert first.
+>While at it move assert into rebuild branch, which removes reduntant
+>check done in case of !rebuild branch is taken (the later is taken
+>care of by g_assert_no_error).
 >
 >Signed-off-by: Igor Mammedov <imammedo@redhat.com>
->Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+
+Reviewed-by: Wei Yang <richardw.yang@linux.intel.com>
+
 >---
->v2:
-> * fix up error message (Philippe Mathieu-Daudé <philmd@redhat.com>)
->---
-> tests/data/acpi/rebuild-expected-aml.sh | 23 +++++++++++------------
-> 1 file changed, 11 insertions(+), 12 deletions(-)
+> tests/bios-tables-test.c | 5 ++++-
+> 1 file changed, 4 insertions(+), 1 deletion(-)
 >
->diff --git a/tests/data/acpi/rebuild-expected-aml.sh b/tests/data/acpi/rebuild-expected-aml.sh
->index abdff70..52793f3 100755
->--- a/tests/data/acpi/rebuild-expected-aml.sh
->+++ b/tests/data/acpi/rebuild-expected-aml.sh
->@@ -7,21 +7,12 @@
-> #
-> # Authors:
-> #  Marcel Apfelbaum <marcel.a@redhat.com>
->+#  Igor Mammedov <imammedo@redhat.com>
-> #
-> # This work is licensed under the terms of the GNU GPLv2.
-> # See the COPYING.LIB file in the top-level directory.
+>diff --git a/tests/bios-tables-test.c b/tests/bios-tables-test.c
+>index f117461..5a5d036 100644
+>--- a/tests/bios-tables-test.c
+>+++ b/tests/bios-tables-test.c
+>@@ -199,11 +199,14 @@ static void dump_aml_files(test_data *data, bool rebuild)
+>                                        sdt->aml, ext);
+>             fd = g_open(aml_file, O_WRONLY|O_TRUNC|O_CREAT,
+>                         S_IRUSR|S_IWUSR|S_IRGRP|S_IWGRP|S_IROTH);
+>+            if (fd < 0) {
+>+                perror(aml_file);
+>+            }
+>+            g_assert(fd >= 0);
+>         } else {
+>             fd = g_file_open_tmp("aml-XXXXXX", &sdt->aml_file, &error);
+>             g_assert_no_error(error);
+>         }
+>-        g_assert(fd >= 0);
 > 
->-qemu=
->-
->-if [ -e x86_64-softmmu/qemu-system-x86_64 ]; then
->-    qemu="x86_64-softmmu/qemu-system-x86_64"
->-elif [ -e i386-softmmu/qemu-system-i386 ]; then
->-    qemu="i386-softmmu/qemu-system-i386"
->-else
->-    echo "Run 'make' to build the qemu exectutable!"
->-    echo "Run this script from the build directory."
->-    exit 1;
->-fi
->+qemu_bins="aarch64-softmmu/qemu-system-aarch64 x86_64-softmmu/qemu-system-x86_64"
-> 
-> if [ ! -e "tests/bios-tables-test" ]; then
->     echo "Test: bios-tables-test is required! Run make check before this script."
->@@ -29,6 +20,14 @@ if [ ! -e "tests/bios-tables-test" ]; then
->     exit 1;
-> fi
-> 
->-TEST_ACPI_REBUILD_AML=y QTEST_QEMU_BINARY=$qemu tests/bios-tables-test
->+for qemu in $qemu_bins; do
->+    if [ ! -e $qemu ]; then
->+        echo "Run 'make' to build the following QEMU exectutables: $qemu_bins"
-
-s/exectutables/executables
-
->+        echo "Also, run this script from the build directory."
->+        exit 1;
->+    fi
->+    TEST_ACPI_REBUILD_AML=y QTEST_QEMU_BINARY=$qemu tests/bios-tables-test
->+done
->+
-
-The original behavior is either one executable exist will pass.
-
-But now, either of one doesn't exist will fail. Is this what we expect?
-
-> 
-> echo "The files were rebuilt and can be added to git."
+>         ret = qemu_write_full(fd, sdt->aml, sdt->aml_len);
+>         g_assert(ret == sdt->aml_len);
 >-- 
 >2.7.4
 
