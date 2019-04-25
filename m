@@ -2,84 +2,84 @@ Return-Path: <SRS0=VSQP=S3=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.7 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.7 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS,URIBL_BLOCKED
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C9894C43218
-	for <qemu-devel@archiver.kernel.org>; Thu, 25 Apr 2019 16:11:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7348FC43219
+	for <qemu-devel@archiver.kernel.org>; Thu, 25 Apr 2019 16:12:56 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 17E8B20651
-	for <qemu-devel@archiver.kernel.org>; Thu, 25 Apr 2019 16:11:48 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id B665920651
+	for <qemu-devel@archiver.kernel.org>; Thu, 25 Apr 2019 16:12:56 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=sifive.com header.i=@sifive.com header.b="ESyql5Ds"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 17E8B20651
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=sifive.com header.i=@sifive.com header.b="BmJtYZ8J"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B665920651
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=sifive.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:60104 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:60111 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hJgyQ-0005pb-R9
-	for qemu-devel@archiver.kernel.org; Thu, 25 Apr 2019 12:11:46 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:44542)
+	id 1hJgzX-0006Wt-HO
+	for qemu-devel@archiver.kernel.org; Thu, 25 Apr 2019 12:12:55 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:44624)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <palmer@sifive.com>) id 1hJgrQ-0000rd-JF
-	for qemu-devel@nongnu.org; Thu, 25 Apr 2019 12:04:33 -0400
+	(envelope-from <palmer@sifive.com>) id 1hJgrX-0000wf-Io
+	for qemu-devel@nongnu.org; Thu, 25 Apr 2019 12:04:40 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <palmer@sifive.com>) id 1hJgrK-0002CI-So
-	for qemu-devel@nongnu.org; Thu, 25 Apr 2019 12:04:30 -0400
-Received: from mail-pf1-x441.google.com ([2607:f8b0:4864:20::441]:38897)
+	(envelope-from <palmer@sifive.com>) id 1hJgrW-0002ck-0X
+	for qemu-devel@nongnu.org; Thu, 25 Apr 2019 12:04:39 -0400
+Received: from mail-pf1-x444.google.com ([2607:f8b0:4864:20::444]:46624)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <palmer@sifive.com>) id 1hJgrI-00027g-Sp
-	for qemu-devel@nongnu.org; Thu, 25 Apr 2019 12:04:26 -0400
-Received: by mail-pf1-x441.google.com with SMTP id 10so135896pfo.5
-	for <qemu-devel@nongnu.org>; Thu, 25 Apr 2019 09:04:24 -0700 (PDT)
+	(Exim 4.71) (envelope-from <palmer@sifive.com>) id 1hJgrV-0002EL-GF
+	for qemu-devel@nongnu.org; Thu, 25 Apr 2019 12:04:37 -0400
+Received: by mail-pf1-x444.google.com with SMTP id j11so115129pff.13
+	for <qemu-devel@nongnu.org>; Thu, 25 Apr 2019 09:04:28 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=sifive.com; s=google;
 	h=date:subject:in-reply-to:cc:from:to:message-id:mime-version
 	:content-transfer-encoding;
-	bh=8j4EQ+z4JZAjNtM6a+zyFrsMsBg4l1V04NkmZnAwjo8=;
-	b=ESyql5DsvSimatErQK3eD8CJKnVmiU7vQL6i3JS6r5b8nMTS7p+FRp0SSbTi5nkFdI
-	1794lqTCzs+1pWFcCCjvnWFKE9L27U3BESCe996RoraN2XFfQzCZyIVMRuI+zclC6pta
-	FhUjOzGR6JjymAMdJ/aKcpFQIuVZCKI5ZEYuVI0HtlgkdeGxcnD5JTH4NdDYfBO1F4Sb
-	IquiS/bieV76SQsDz4FHaFLjda+BGu8L2MiAvpyB2BbPDjwgfUFm7TcsViNZAXz9ccoX
-	rYsFauaEaZkCfR2T9ZRi/wlyLduZ9pJRAliBjwfQzMneqiejwERQzjB0UptJMtX8Wjlf
-	rtjQ==
+	bh=nhi46nyzqGvJUsRpUIwXn4Ih230PeA5yaDI3zHPp7Ds=;
+	b=BmJtYZ8J/xD6ihOgyyLGqo61mqPXKAlGpeCk8eMy3BpSMGG2POxmqyAU9N+CSUs7KL
+	8nMAsCjfk8bOCIer2qJCMMc3QD3UVRVHWOzyWTs11A++/MWBVHa09Gjmu9YnQv0OV3Yd
+	4Tc1Sw57j/QoDOWyWi37a6blUJTV0WLMPNtD/V2z7y8VrfD6C3sWrcz5l1cz53B/y/qM
+	ygZgAsk8/gs98MVSfYHMLxHOBQ5cY2BWGyAhnfCfWVj1Wk5kD+vhoCd1l2GFIOiZGzy6
+	Xo9vTJvqXK3xqaEDMS95rcuNe7C9TTNX28rCID6VhlzLG6SQThxOTZgnOjupQ8CcMceT
+	FlZA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
 	d=1e100.net; s=20161025;
 	h=x-gm-message-state:date:subject:in-reply-to:cc:from:to:message-id
 	:mime-version:content-transfer-encoding;
-	bh=8j4EQ+z4JZAjNtM6a+zyFrsMsBg4l1V04NkmZnAwjo8=;
-	b=V3H6aEvnLLR5grLGqMwLwbr1+mk973WJGSYRKq4IXMg4OackClTFBlvgcC9lWab4tf
-	WOdgAGdEM7QiLT0iuQbgBcijAImRuR99RwcUs3OevdVgEYKVKcei4GcqZxUajuikNQ2+
-	dIMVSBj+VNrIYuEZjupVEDCbJQFzMgH5Ov58/jmqkUV6CitJiwUGw8gVB+QWtLy8VMFp
-	SvXlB07eT3djpgZfsG2WgopTwbCr1/hQSlAapC/WGyZbFNjpVq2RhFU3i+CH6MQZmacD
-	B8lMVOaPD1AjHRFcoHcHKj1k+I9Fp7U0W2l5lHjQsOWZK0j0LbxrMUHmFuxFoWNepWzM
-	BCLg==
-X-Gm-Message-State: APjAAAX0zMAF4bQycYDceKb/OD9F6MmTaCFdT0lvDsYR93xmiMAwwcz5
-	Gg+Kw6CnbAI9dorDkhpVfuuEkkaCZc0=
-X-Google-Smtp-Source: APXvYqx8xSCTG1XGFxk7zRdEm709s1kOD+8eYtuOJq4wgWs1k/QRARRUGw1TqDhH6+o3BnN4JcYqcw==
-X-Received: by 2002:a65:6091:: with SMTP id t17mr37648271pgu.328.1556208263357;
-	Thu, 25 Apr 2019 09:04:23 -0700 (PDT)
+	bh=nhi46nyzqGvJUsRpUIwXn4Ih230PeA5yaDI3zHPp7Ds=;
+	b=mdpst+/3NnLdM/GGlwOkO1icJtbKfHFph66M0B9AYcJEmAZGvltKfNxSAWvxc3hGkt
+	DIEq7Z28pFav24NttpfTZvVtrYqjwvIBXFVYH+ZcrU65HE+ZmYyxlQsbwfOKzjA1VOr3
+	byoI1Ui2BV4lq6tBQ9Yd8Uz6PBWguBB8Hph7F8rLK3RqAj018g4K73qlYkFmfDuuSsoY
+	goNTyIlwS/ScGXMy20KVki1tWcUShZr00XdWXsK1pzGfUyRtJLCBd+kb37dTi130T8aw
+	Oeuu+bTmRky/S24TI7uvgwj+o6h0ulzqUtA/lUM52k26srVdT+0Hnck6j5YksG+hsUHt
+	NwqA==
+X-Gm-Message-State: APjAAAUgd4ls2F93TrSyirqJASJr/L1Tjd0IjRK7otnaGqdJPqEuHVE7
+	71xoGSq14ZgBVAVmfbffXcn3O71cH20=
+X-Google-Smtp-Source: APXvYqyIlxn0wfwgG/0VZcBZRmVPftZZeAGxbl4jWf0vnZTBM0WfYIenJQxdICDbQDiZ5BpSsFywlA==
+X-Received: by 2002:a63:d84a:: with SMTP id k10mr37587766pgj.441.1556208266774;
+	Thu, 25 Apr 2019 09:04:26 -0700 (PDT)
 Received: from localhost ([134.134.139.92]) by smtp.gmail.com with ESMTPSA id
-	j19sm30173344pfh.41.2019.04.25.09.04.22
+	a80sm46498455pfj.61.2019.04.25.09.04.25
 	(version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
-	Thu, 25 Apr 2019 09:04:22 -0700 (PDT)
-Date: Thu, 25 Apr 2019 09:04:22 -0700 (PDT)
-X-Google-Original-Date: Thu, 25 Apr 2019 08:50:30 PDT (-0700)
-In-Reply-To: <20190401031155.21293-8-richard.henderson@linaro.org>
+	Thu, 25 Apr 2019 09:04:25 -0700 (PDT)
+Date: Thu, 25 Apr 2019 09:04:25 -0700 (PDT)
+X-Google-Original-Date: Thu, 25 Apr 2019 08:58:24 PDT (-0700)
+In-Reply-To: <20190401031155.21293-1-richard.henderson@linaro.org>
 From: Palmer Dabbelt <palmer@sifive.com>
 To: richard.henderson@linaro.org
-Message-ID: <mhng-70de221d-edd7-4a93-8ab5-e5715e97a049@palmer-si-x1e>
+Message-ID: <mhng-f96f6f0d-cec7-477e-96c8-af5485b43bc7@palmer-si-x1e>
 Mime-Version: 1.0 (MHng)
 Content-Type: text/plain; charset="UTF-8"; format="flowed"
 Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
 	recognized.
-X-Received-From: 2607:f8b0:4864:20::441
-Subject: Re: [Qemu-devel] [PATCH for-4.1 7/8] target/riscv: Split
- gen_arith_imm into functional and temp
+X-Received-From: 2607:f8b0:4864:20::444
+Subject: Re: [Qemu-devel] [PATCH for-4.1 0/8] target/riscv: decodetree
+ improvments
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -97,102 +97,47 @@ Cc: Bastian Koppelmann <kbastian@mail.uni-paderborn.de>,
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190425160422.s208BqVabqn4dYX5sym35cl0gMBOJb8J_zOF2VzOS2k@z>
+Message-ID: <20190425160425.PLd27Xzazp92KvuxeBf_VGHMWmnL_FGNegSg_JGfJFA@z>
 
-On Sun, 31 Mar 2019 20:11:54 PDT (-0700), richard.henderson@linaro.org wrote:
-> The tcg_gen_fooi_tl functions have some immediate constant
-> folding built in, which match up with some of the riscv asm
-> builtin macros, like mv and not.
+On Sun, 31 Mar 2019 20:11:47 PDT (-0700), richard.henderson@linaro.org wrote:
+> There's new support in decodetree for pattern groups.
+> I believe that patch 5, or something close to it, was
+> posted as an RFC as part of the original pattern group
+> patch set, but this cleans that up further.
 >
-> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
-> ---
->  target/riscv/insn_trans/trans_rvi.inc.c | 14 +++++++-------
->  target/riscv/translate.c                | 19 +++++++++++++++++--
->  2 files changed, 24 insertions(+), 9 deletions(-)
 >
-> diff --git a/target/riscv/insn_trans/trans_rvi.inc.c b/target/riscv/insn_trans/trans_rvi.inc.c
-> index caf91f9a05..620df5f323 100644
-> --- a/target/riscv/insn_trans/trans_rvi.inc.c
-> +++ b/target/riscv/insn_trans/trans_rvi.inc.c
-> @@ -223,7 +223,7 @@ static bool trans_sd(DisasContext *ctx, arg_sd *a)
+> r~
 >
->  static bool trans_addi(DisasContext *ctx, arg_addi *a)
->  {
-> -    return gen_arith_imm(ctx, a, &tcg_gen_add_tl);
-> +    return gen_arith_imm_fn(ctx, a, &tcg_gen_addi_tl);
->  }
 >
->  static void gen_slt(TCGv ret, TCGv s1, TCGv s2)
-> @@ -239,25 +239,25 @@ static void gen_sltu(TCGv ret, TCGv s1, TCGv s2)
+> Richard Henderson (8):
+>   target/riscv: Name the argument sets for all of insn32 formats
+>   target/riscv: Use --static-decode for decodetree
+>   target/riscv: Merge argument sets for insn32 and insn16
+>   target/riscv: Merge argument decode for RVC shifti
+>   target/riscv: Use pattern groups in insn16.decode
+>   target/riscv: Split RVC32 and RVC64 insns into separate files
+>   target/riscv: Split gen_arith_imm into functional and temp
+>   target/riscv: Remove spaces from register names
 >
->  static bool trans_slti(DisasContext *ctx, arg_slti *a)
->  {
-> -    return gen_arith_imm(ctx, a, &gen_slt);
-> +    return gen_arith_imm_tl(ctx, a, &gen_slt);
->  }
->
->  static bool trans_sltiu(DisasContext *ctx, arg_sltiu *a)
->  {
-> -    return gen_arith_imm(ctx, a, &gen_sltu);
-> +    return gen_arith_imm_tl(ctx, a, &gen_sltu);
->  }
->
->  static bool trans_xori(DisasContext *ctx, arg_xori *a)
->  {
-> -    return gen_arith_imm(ctx, a, &tcg_gen_xor_tl);
-> +    return gen_arith_imm_fn(ctx, a, &tcg_gen_xori_tl);
->  }
->  static bool trans_ori(DisasContext *ctx, arg_ori *a)
->  {
-> -    return gen_arith_imm(ctx, a, &tcg_gen_or_tl);
-> +    return gen_arith_imm_fn(ctx, a, &tcg_gen_ori_tl);
->  }
->  static bool trans_andi(DisasContext *ctx, arg_andi *a)
->  {
-> -    return gen_arith_imm(ctx, a, &tcg_gen_and_tl);
-> +    return gen_arith_imm_fn(ctx, a, &tcg_gen_andi_tl);
->  }
->  static bool trans_slli(DisasContext *ctx, arg_slli *a)
->  {
-> @@ -364,7 +364,7 @@ static bool trans_and(DisasContext *ctx, arg_and *a)
->  #ifdef TARGET_RISCV64
->  static bool trans_addiw(DisasContext *ctx, arg_addiw *a)
->  {
-> -    return gen_arith_imm(ctx, a, &gen_addw);
-> +    return gen_arith_imm_tl(ctx, a, &gen_addw);
->  }
->
->  static bool trans_slliw(DisasContext *ctx, arg_slliw *a)
-> diff --git a/target/riscv/translate.c b/target/riscv/translate.c
-> index 50d8f58e4b..fb66e886bf 100644
-> --- a/target/riscv/translate.c
-> +++ b/target/riscv/translate.c
-> @@ -547,8 +547,23 @@ static int ex_rvc_shifti(int imm)
->  /* Include the auto-generated decoder for 32 bit insn */
->  #include "decode_insn32.inc.c"
->
-> -static bool gen_arith_imm(DisasContext *ctx, arg_i *a,
-> -                          void(*func)(TCGv, TCGv, TCGv))
-> +static bool gen_arith_imm_fn(DisasContext *ctx, arg_i *a,
-> +                             void (*func)(TCGv, TCGv, target_long))
-> +{
-> +    TCGv source1;
-> +    source1 = tcg_temp_new();
-> +
-> +    gen_get_gpr(source1, a->rs1);
-> +
-> +    (*func)(source1, source1, a->imm);
-> +
-> +    gen_set_gpr(a->rd, source1);
-> +    tcg_temp_free(source1);
-> +    return true;
-> +}
-> +
-> +static bool gen_arith_imm_tl(DisasContext *ctx, arg_i *a,
-> +                             void (*func)(TCGv, TCGv, TCGv))
->  {
->      TCGv source1, source2;
->      source1 = tcg_temp_new();
+>  target/riscv/cpu.c                      |  16 +-
+>  target/riscv/insn_trans/trans_rvc.inc.c | 347 ------------------------
+>  target/riscv/insn_trans/trans_rvi.inc.c |  20 +-
+>  target/riscv/translate.c                |  40 ++-
+>  target/riscv/Makefile.objs              |  15 +-
+>  target/riscv/insn16-32.decode           |  28 ++
+>  target/riscv/insn16-64.decode           |  30 ++
+>  target/riscv/insn16.decode              | 154 ++++++-----
+>  target/riscv/insn32.decode              |  10 +-
+>  9 files changed, 205 insertions(+), 455 deletions(-)
+>  delete mode 100644 target/riscv/insn_trans/trans_rvc.inc.c
+>  create mode 100644 target/riscv/insn16-32.decode
+>  create mode 100644 target/riscv/insn16-64.decode
 
-Reviewed-by: Palmer Dabbelt <palmer@sifive.com>
+Thanks!  I'm happy taking this as it stands, since all those decode issues I
+pointed out aren't regressions in this patch set.  Let me know if you want to
+fix those or if you want me to -- as you can probably tell my email queue is a
+bit long... :)
+
+I've dropped this on my integration branch, but I probably won't submit a pull
+for a week or so.
 
