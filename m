@@ -3,79 +3,79 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
 X-Spam-Status: No, score=-6.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.0
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 038EBC282E3
-	for <qemu-devel@archiver.kernel.org>; Thu, 25 Apr 2019 12:42:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2D5C3C10F03
+	for <qemu-devel@archiver.kernel.org>; Thu, 25 Apr 2019 12:42:47 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8496C20644
-	for <qemu-devel@archiver.kernel.org>; Thu, 25 Apr 2019 12:42:02 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8496C20644
+	by mail.kernel.org (Postfix) with ESMTPS id BF754205F4
+	for <qemu-devel@archiver.kernel.org>; Thu, 25 Apr 2019 12:42:45 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BF754205F4
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:56562 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:56566 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hJdhS-00041w-Tp
-	for qemu-devel@archiver.kernel.org; Thu, 25 Apr 2019 08:42:02 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:47587)
+	id 1hJdiA-0004df-9W
+	for qemu-devel@archiver.kernel.org; Thu, 25 Apr 2019 08:42:46 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:47691)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1hJdgb-0003YV-Bw
-	for qemu-devel@nongnu.org; Thu, 25 Apr 2019 08:41:10 -0400
+	(envelope-from <philmd@redhat.com>) id 1hJdh7-0003xX-AN
+	for qemu-devel@nongnu.org; Thu, 25 Apr 2019 08:41:42 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1hJdgX-0004FK-Mk
-	for qemu-devel@nongnu.org; Thu, 25 Apr 2019 08:41:07 -0400
-Received: from mail-wr1-f66.google.com ([209.85.221.66]:37463)
+	(envelope-from <philmd@redhat.com>) id 1hJdh3-0004Y4-9e
+	for qemu-devel@nongnu.org; Thu, 25 Apr 2019 08:41:38 -0400
+Received: from mail-wr1-f65.google.com ([209.85.221.65]:45029)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1hJdgS-00041K-6T
-	for qemu-devel@nongnu.org; Thu, 25 Apr 2019 08:41:01 -0400
-Received: by mail-wr1-f66.google.com with SMTP id t17so18407688wrr.4
-	for <qemu-devel@nongnu.org>; Thu, 25 Apr 2019 05:40:29 -0700 (PDT)
+	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1hJdh1-0004WC-5x
+	for qemu-devel@nongnu.org; Thu, 25 Apr 2019 08:41:36 -0400
+Received: by mail-wr1-f65.google.com with SMTP id c5so21253110wrs.11
+	for <qemu-devel@nongnu.org>; Thu, 25 Apr 2019 05:41:31 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
 	d=1e100.net; s=20161025;
 	h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
 	:date:user-agent:mime-version:in-reply-to:content-language
 	:content-transfer-encoding;
-	bh=mMrRzSHYgmcbmkmfIcRdlzcQtpFX8lA2YtkAztiOebQ=;
-	b=gfEztkP/wYwusSTDpjOrScsn49xUp1w7F3vabFi3P0ENDVdMCGYWeSDSZFVxQCWCe+
-	oBbjU9xzjplTfaXNVwyLDO+WClVAehE63xVJLkMBu0RqHbFHN+7pw4AgcZGe8sVJ/8Hi
-	Svw4uqfIApB4INSYMCtbqxtjSjTNMg9V7EhvwA6GlblJErm6VpEqldrQdgbMCvPE2ABr
-	IVTgknio2r3+KOMC2JCL5o8CemNkEYBxDctm5omgLaISXMxl/xamLxWHFcpO/AbufHfW
-	QRpov4W2nVCxkPaYrT+QUpH/W5ZB+kd16/d5DmaJfhF9AXERKDEx1AsF3iLzGEaW2CID
-	jOkA==
-X-Gm-Message-State: APjAAAWb4XXWFDKJQA1bE/mw3o6MnBcs5n1pBL5uDqCarGTuiPYsiphH
-	pV9ZO/pAOVymuFbrTWzl8je3rw==
-X-Google-Smtp-Source: APXvYqyez0kwtOqhs+oTTXTS0syzilRyHNiG+y9dydJXvML7WbxFbqi+BAgigGP+m/gYF2K4tl+ERA==
-X-Received: by 2002:a5d:68c4:: with SMTP id p4mr16868704wrw.37.1556196028212; 
-	Thu, 25 Apr 2019 05:40:28 -0700 (PDT)
+	bh=5392qh0zKJqtVdZblSioqLExBd6WO6d454pcitZHKpY=;
+	b=oPNabGyO1DzoVp2zNXp7Ut3eFLVAzOG8vRoexHXM3n3Nln+m/pLX+wxnFWoAocfWfO
+	NzIvJrCd1WjyUsGMJeTHhSAIiqCddoqe+vjIUEbbcIPAG6fCbGepk0NSCbgLoAMGohMd
+	ZFSLuWOZVI+hPlrI7/iH913PucGQ9crioGmyx4SLq/EdoJFxv1wXomqyNl33JMji0csS
+	8gA8fE5yro+oi1M2Z+gcWA2xb/ntaB6izfzWczFjc1aQFtXhjcNVTartsKBKtAZ0mqG6
+	/GwtXgrxZyusf3rqF8j5kxP5acyegMSrD9rIDkfLUMuTwIb3YXTseBIuX1O9IIRYlKpN
+	Kobg==
+X-Gm-Message-State: APjAAAXm6s0MvZY9pZ14pbz4DBGayOV6PHvVQHZETUzTBIHvpHDu6qGO
+	XATW1cWx4VEgHdVYoo+OcwcBbQ==
+X-Google-Smtp-Source: APXvYqzBIT/ZZ2KiNMetzcIIALkLco8VbBO1G9CrZvoXimNEuxS5n0S762p/WMfutHs1IsX1KZB+ZQ==
+X-Received: by 2002:adf:d851:: with SMTP id k17mr6302856wrl.64.1556196090766; 
+	Thu, 25 Apr 2019 05:41:30 -0700 (PDT)
 Received: from [192.168.1.25] (abayonne-654-1-209-122.w109-222.abo.wanadoo.fr.
 	[109.222.216.122]) by smtp.gmail.com with ESMTPSA id
-	v14sm2228201wra.58.2019.04.25.05.40.26
+	o20sm17021064wmh.21.2019.04.25.05.41.29
 	(version=TLS1_3 cipher=AEAD-AES128-GCM-SHA256 bits=128/128);
-	Thu, 25 Apr 2019 05:40:27 -0700 (PDT)
+	Thu, 25 Apr 2019 05:41:30 -0700 (PDT)
 To: Igor Mammedov <imammedo@redhat.com>, qemu-devel@nongnu.org
 References: <1556170489-131927-1-git-send-email-imammedo@redhat.com>
-	<1556170489-131927-11-git-send-email-imammedo@redhat.com>
+	<1556170489-131927-12-git-send-email-imammedo@redhat.com>
 From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
 Openpgp: id=89C1E78F601EE86C867495CBA2A3FD6EDEADC0DE;
 	url=http://pgp.mit.edu/pks/lookup?op=get&search=0xA2A3FD6EDEADC0DE
-Message-ID: <65cd8049-1a10-d25c-5d8a-d69ff6f63db1@redhat.com>
-Date: Thu, 25 Apr 2019 14:40:25 +0200
+Message-ID: <1f64a17a-57e8-448f-ced2-860d137eebaa@redhat.com>
+Date: Thu, 25 Apr 2019 14:41:28 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
 	Thunderbird/60.6.1
 MIME-Version: 1.0
-In-Reply-To: <1556170489-131927-11-git-send-email-imammedo@redhat.com>
+In-Reply-To: <1556170489-131927-12-git-send-email-imammedo@redhat.com>
 Content-Type: text/plain; charset="UTF-8"
 Content-Language: en-US
 Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 	[fuzzy]
-X-Received-From: 209.85.221.66
-Subject: Re: [Qemu-devel] [PATCH v3 10/13] tests: add expected ACPI tables
- for arm/virt board
+X-Received-From: 209.85.221.65
+Subject: Re: [Qemu-devel] [PATCH v3 11/13] tests: acpi: add simple arm/virt
+ testcase
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -95,168 +95,86 @@ Cc: Andrew Jones <drjones@redhat.com>, Ben Warren <ben@skyportsystems.com>,
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190425124025.LgzCkjHxZZOpCNrvjjB4h_-ptwezqxhGrj3M8LDAfgw@z>
+Message-ID: <20190425124128.S2SAVJqxAUzMce0V2bQG_S_IJiFD-E98GF3JfoMrjnI@z>
 
 On 4/25/19 7:34 AM, Igor Mammedov wrote:
+> adds simple arm/virt test case that starts guest with
+> bios-tables-test.aarch64.iso.qcow2 boot image which
+> initializes UefiTestSupport* structure in RAM once
+> guest is booted.
+> 
+>  * see commit: tests: acpi: add acpi_find_rsdp_address_uefi() helper
+> 
 > Signed-off-by: Igor Mammedov <imammedo@redhat.com>
+> Reviewed-by: Laszlo Ersek <lersek@redhat.com>
 
+> Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+Please replace previous R-b by:
+
+Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
 Tested-by: Philippe Mathieu-Daudé <philmd@redhat.com>
 
 > ---
-> this patch is ahead fo "tests: acpi: add simple  arm/virt testcase"
-> to keep 'make check' working during bisection and not to pollute
-> code with binary blobs which are not reviewable.
+> v3:
+>   * use firmware blobs directly from pc-bios directory
+>   * use bios-tables-test.aarch64.iso.qcow2 as test boot image
+>   * drop leftover qtest-uefi-images-aarch64 iMakefile rule from
+>     previos version (Laszlo)
+>   * add Makefile rule to include bios-tables-test into
+>     check-qtest-aarch64 target
+> v2:
+>   * specify in test_data where board's RAM starts and RAM size
 > ---
->  tests/data/acpi/virt/APIC | Bin 0 -> 168 bytes
->  tests/data/acpi/virt/DSDT | Bin 0 -> 18476 bytes
->  tests/data/acpi/virt/FACP | Bin 0 -> 268 bytes
->  tests/data/acpi/virt/GTDT | Bin 0 -> 96 bytes
->  tests/data/acpi/virt/MCFG | Bin 0 -> 60 bytes
->  tests/data/acpi/virt/SPCR | Bin 0 -> 80 bytes
->  6 files changed, 0 insertions(+), 0 deletions(-)
->  create mode 100644 tests/data/acpi/virt/APIC
->  create mode 100644 tests/data/acpi/virt/DSDT
->  create mode 100644 tests/data/acpi/virt/FACP
->  create mode 100644 tests/data/acpi/virt/GTDT
->  create mode 100644 tests/data/acpi/virt/MCFG
->  create mode 100644 tests/data/acpi/virt/SPCR
+>  tests/Makefile.include   |  1 +
+>  tests/bios-tables-test.c | 17 +++++++++++++++++
+>  2 files changed, 18 insertions(+)
 > 
-> diff --git a/tests/data/acpi/virt/APIC b/tests/data/acpi/virt/APIC
-> new file mode 100644
-> index 0000000000000000000000000000000000000000..797dfde2841c51b7e72065602e99ce1714347f0d
-> GIT binary patch
-> literal 168
-> zcmZ<^@N{0mz`($~*~#D8BUr&HBEZ=ZD8>jB1F=Cg4Dd+6SPUF6788)c?E~X6Fu>G{
-> hBZPn~MyPrgD9sGlkD?67;f3451Xcqw&w(L;0RYV=2>}2A
-> 
-> literal 0
-> HcmV?d00001
-> 
-> diff --git a/tests/data/acpi/virt/DSDT b/tests/data/acpi/virt/DSDT
-> new file mode 100644
-> index 0000000000000000000000000000000000000000..20e85c7f89f645c69935c615c07084e221419960
-> GIT binary patch
-> literal 18476
-> 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
-> 
-> literal 0
-> HcmV?d00001
-> 
-> diff --git a/tests/data/acpi/virt/FACP b/tests/data/acpi/virt/FACP
-> new file mode 100644
-> index 0000000000000000000000000000000000000000..27de99f51bfe846b1f8796ace49d83f5b33a1aed
-> GIT binary patch
-> literal 268
-> ycmZ>BbPnKQWME+3?d0$55v<@85#a0w6axw|fY>0Kx<CNcIA#XwTY+i=(L4a*H3tCz
-> 
-> literal 0
-> HcmV?d00001
-> 
-> diff --git a/tests/data/acpi/virt/GTDT b/tests/data/acpi/virt/GTDT
-> new file mode 100644
-> index 0000000000000000000000000000000000000000..10107a65e958ff6495bb8c17d63d0539690f59f6
-> GIT binary patch
-> literal 96
-> zcmZ<{aS2IaU|?Xn>E!S15v<@85#a0&6k`O6f!H7#8OTC8azL5|h^3)?DJYFj0RVOU
-> B2mt^9
-> 
-> literal 0
-> HcmV?d00001
-> 
-> diff --git a/tests/data/acpi/virt/MCFG b/tests/data/acpi/virt/MCFG
-> new file mode 100644
-> index 0000000000000000000000000000000000000000..e8987e1af0ec3829770bf4fe11fab02b06160dd2
-> GIT binary patch
-> literal 60
-> scmeZuc5}C3U|?YMck*}k2v%^42ypfViZKGkKx`0=1Oyx)oc|yS05YNo0RR91
-> 
-> literal 0
-> HcmV?d00001
-> 
-> diff --git a/tests/data/acpi/virt/SPCR b/tests/data/acpi/virt/SPCR
-> new file mode 100644
-> index 0000000000000000000000000000000000000000..377271a0e7817cc21a28c02123a89facad63604f
-> GIT binary patch
-> literal 80
-> zcmWFza1IJ!U|?VpcJg=j2v%^42yhMtiZKGkKx`1r48#l^3?L>agsBLmm>C$E7#RKo
-> I0Z0r60QF4^0RR91
-> 
-> literal 0
-> HcmV?d00001
+> diff --git a/tests/Makefile.include b/tests/Makefile.include
+> index e2432d5..983c8b1 100644
+> --- a/tests/Makefile.include
+> +++ b/tests/Makefile.include
+> @@ -267,6 +267,7 @@ check-qtest-arm-y += tests/hexloader-test$(EXESUF)
+>  check-qtest-aarch64-y = tests/numa-test$(EXESUF)
+>  check-qtest-aarch64-y += tests/boot-serial-test$(EXESUF)
+>  check-qtest-aarch64-y += tests/migration-test$(EXESUF)
+> +check-qtest-aarch64-y += tests/bios-tables-test$(EXESUF)
+>  
+>  check-qtest-microblazeel-y += $(check-qtest-microblaze-y)
+>  
+> diff --git a/tests/bios-tables-test.c b/tests/bios-tables-test.c
+> index 1be55a1..f117461 100644
+> --- a/tests/bios-tables-test.c
+> +++ b/tests/bios-tables-test.c
+> @@ -812,6 +812,21 @@ static void test_acpi_piix4_tcg_dimm_pxm(void)
+>      test_acpi_tcg_dimm_pxm(MACHINE_PC);
+>  }
+>  
+> +static void test_acpi_virt_tcg(void)
+> +{
+> +    test_data data = {
+> +        .machine = "virt",
+> +        .uefi_fl1 = "pc-bios/edk2-aarch64-code.fd",
+> +        .uefi_fl2 = "pc-bios/edk2-arm-vars.fd",
+> +        .cd = "tests/data/uefi-boot-images/bios-tables-test.aarch64.iso.qcow2",
+> +        .ram_start = 0x40000000ULL,
+> +        .scan_len = 128ULL * 1024 * 1024,
+> +    };
+> +
+> +    test_acpi_one("-cpu cortex-a57 ", &data);
+> +    free_test_data(&data);
+> +}
+> +
+>  int main(int argc, char *argv[])
+>  {
+>      const char *arch = qtest_get_arch();
+> @@ -840,6 +855,8 @@ int main(int argc, char *argv[])
+>          qtest_add_func("acpi/q35/numamem", test_acpi_q35_tcg_numamem);
+>          qtest_add_func("acpi/piix4/dimmpxm", test_acpi_piix4_tcg_dimm_pxm);
+>          qtest_add_func("acpi/q35/dimmpxm", test_acpi_q35_tcg_dimm_pxm);
+> +    } else if (strcmp(arch, "aarch64") == 0) {
+> +        qtest_add_func("acpi/virt", test_acpi_virt_tcg);
+>      }
+>      ret = g_test_run();
+>      boot_sector_cleanup(disk);
 > 
 
