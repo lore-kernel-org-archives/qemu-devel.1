@@ -2,94 +2,72 @@ Return-Path: <SRS0=VSQP=S3=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.0 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5F221C43219
-	for <qemu-devel@archiver.kernel.org>; Thu, 25 Apr 2019 15:23:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5B316C43218
+	for <qemu-devel@archiver.kernel.org>; Thu, 25 Apr 2019 15:26:29 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 81CB120644
-	for <qemu-devel@archiver.kernel.org>; Thu, 25 Apr 2019 15:23:39 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="mKnBWZ65"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 81CB120644
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id 8C55620644
+	for <qemu-devel@archiver.kernel.org>; Thu, 25 Apr 2019 15:26:29 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8C55620644
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:59245 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:59296 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hJgDq-0002Jm-6L
-	for qemu-devel@archiver.kernel.org; Thu, 25 Apr 2019 11:23:38 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:33988)
+	id 1hJgGa-0004TL-Ew
+	for qemu-devel@archiver.kernel.org; Thu, 25 Apr 2019 11:26:28 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:35209)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1hJgCQ-0001Mm-Pr
-	for qemu-devel@nongnu.org; Thu, 25 Apr 2019 11:22:11 -0400
+	(envelope-from <bounces@canonical.com>) id 1hJgFm-0003hR-8w
+	for qemu-devel@nongnu.org; Thu, 25 Apr 2019 11:25:39 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1hJfyq-0000pV-RU
-	for qemu-devel@nongnu.org; Thu, 25 Apr 2019 11:08:09 -0400
-Received: from mail-wm1-x341.google.com ([2a00:1450:4864:20::341]:38117)
+	(envelope-from <bounces@canonical.com>) id 1hJgFl-0004zv-1j
+	for qemu-devel@nongnu.org; Thu, 25 Apr 2019 11:25:38 -0400
+Received: from indium.canonical.com ([91.189.90.7]:50012)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1hJfyq-0000mH-JS
-	for qemu-devel@nongnu.org; Thu, 25 Apr 2019 11:08:08 -0400
-Received: by mail-wm1-x341.google.com with SMTP id w15so747290wmc.3
-	for <qemu-devel@nongnu.org>; Thu, 25 Apr 2019 08:08:08 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
-	h=references:user-agent:from:to:cc:subject:in-reply-to:date
-	:message-id:mime-version:content-transfer-encoding;
-	bh=a1bW0YfDvyiOU+XTEQwTwqgGChlogjSKSUy2zTYBGkY=;
-	b=mKnBWZ650P0axDfjfYVcmOomAeVLNsXOHTaHjiyb8wtNG/6yXYB+9fpW1Rp6ofCBK1
-	o61C9Y1vzHbr7gnQRJ6Z+1c0kGIm8/fA+bBcwCQqNmCVHi9MGp+6Zcffcqz8jN996HRG
-	GtoGqN7PuXOdlwiwQ5+inyw3ldnB6QclQnzw8rErX+u2T9MYk38wquVCg1MBLJYLUiUn
-	Hwe07j7ghtSZySK+LRX2whjIgDQX1y4FKod3VoizcoWlM9YM0uJfQb1cWUoWTKptqxCJ
-	FTc3b+v4OZXYzSKnmt5eYejprIZ3GnZaQzXIh6o5QWRzSs1WFujUExh1YWSy7p6CYITi
-	xRTg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=1e100.net; s=20161025;
-	h=x-gm-message-state:references:user-agent:from:to:cc:subject
-	:in-reply-to:date:message-id:mime-version:content-transfer-encoding;
-	bh=a1bW0YfDvyiOU+XTEQwTwqgGChlogjSKSUy2zTYBGkY=;
-	b=AvafMcc3squh7upcrPcH28guC4DCf/V3WweKBXbRqio6pFZmRyd5YvWNMy7j93v2td
-	nnX+GGPuu3jGlZvx+lKSruKcxAwy1vSmf2KUu0IfKYlXh/n5XysS6KdFpli3l50+0ron
-	lnPLdonJr5fMibNCjtGF8q513jZx6dlxkjs6Zfg2L1CmX+M0Elu5J0VIuJRe53/xNndd
-	htcPk9ltmsNyY860/o1hz3LPONZp7BmBz7i9UmZeDFeOwgsEp9zMZIkrcUifiVhN3lpM
-	YfVI+h2IKgkyHrEpOQodtQIhzcZ3PVBIJcUcr7P2qRyYlZ255A9XhWcu8DCAwCYA2RG+
-	/8nw==
-X-Gm-Message-State: APjAAAXuVjCPr6jXt/UNQ2VyF6+svlX7N6ow/f7PEM9SwFux4uVLTC0g
-	CLtQ+2Ql3MbDO2L5LggMFekljA==
-X-Google-Smtp-Source: APXvYqyYSJQD6EEAfDOy/9GQMDRS+J/f49Imkc9/tswIdSGnSHQS2bsIBtQDzQ3Q8n9+21aGheqF3Q==
-X-Received: by 2002:a05:600c:2206:: with SMTP id
-	z6mr3942970wml.36.1556204886501; 
-	Thu, 25 Apr 2019 08:08:06 -0700 (PDT)
-Received: from zen.linaroharston ([81.128.185.34])
-	by smtp.gmail.com with ESMTPSA id
-	v16sm17809566wru.76.2019.04.25.08.08.05
-	(version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
-	Thu, 25 Apr 2019 08:08:05 -0700 (PDT)
-Received: from zen (localhost [127.0.0.1])
-	by zen.linaroharston (Postfix) with ESMTP id 364D81FF87;
-	Thu, 25 Apr 2019 16:08:05 +0100 (BST)
-References: <20190425132636.31636-1-arilou@gmail.com>
-User-agent: mu4e 1.3.1; emacs 26.1
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-To: qemu-devel@nongnu.org
-In-reply-to: <20190425132636.31636-1-arilou@gmail.com>
-Date: Thu, 25 Apr 2019 16:08:05 +0100
-Message-ID: <87o94uunqi.fsf@zen.linaroharston>
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1hJgFk-0004zC-SP
+	for qemu-devel@nongnu.org; Thu, 25 Apr 2019 11:25:36 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1hJgFj-0001KX-K4
+	for <qemu-devel@nongnu.org>; Thu, 25 Apr 2019 15:25:35 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 811772E80C7
+	for <qemu-devel@nongnu.org>; Thu, 25 Apr 2019 15:25:35 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
-	recognized.
-X-Received-From: 2a00:1450:4864:20::341
-Subject: Re: [Qemu-devel] [PATCH v6 00/21] gdbstub: Refactor command packets
- handler
+Date: Thu, 25 Apr 2019 15:19:09 -0000
+From: Saverio Miroddi <1826422@bugs.launchpad.net>
+To: qemu-devel@nongnu.org
+X-Launchpad-Notification-Type: bug
+X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
+X-Launchpad-Bug-Information-Type: Public
+X-Launchpad-Bug-Private: no
+X-Launchpad-Bug-Security-Vulnerability: no
+X-Launchpad-Bug-Commenters: saveriomiroddi
+X-Launchpad-Bug-Reporter: Saverio Miroddi (saveriomiroddi)
+X-Launchpad-Bug-Modifier: Saverio Miroddi (saveriomiroddi)
+Message-Id:
+ <155620554968.6380.13610580395862407350.malonedeb@chaenomeles.canonical.com>
+X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
+X-Launchpad-Message-For: qemu-devel-ml
+Precedence: bulk
+X-Generated-By: Launchpad (canonical.com); Revision="18928";
+	Instance="launchpad-lazr.conf"
+X-Launchpad-Hash: ed843e6952b4181f76ca224d63d5de56b0bbcca1
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 91.189.90.7
+Subject: [Qemu-devel] [Bug 1826422] [NEW] Regression: QEMU 4.0 hangs the
+ host (*bisect included*)
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
-Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -98,25 +76,139 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Jon Doron <arilou@gmail.com>
+Reply-To: Bug 1826422 <1826422@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190425150805.QtMxangRBvsfZ6Ayigm8ComfgvLP5Hrck5KS-lN9KmE@z>
+Message-ID: <20190425151909.dZ2OttRu8TubeEp0mxkzm14nREzCv4t5IiwC47fXL6Y@z>
 
+Public bug reported:
 
-Jon Doron <arilou@gmail.com> writes:
+The commit b2fc91db84470a78f8e93f5b5f913c17188792c8 seemingly introduced
+a regression on my system.
 
-> This patch series refactors the old gdbstub command packets handler
-> with a new infrastructure which should ease extending and adding new
-> and missing gdb command packets.
->
-> version 4-6 changes:
-> - mostly feedback from Richard Henderson
+When I start QEMU, the guest and the host hang (I need a hard reset to
+get back to a working system), before anything shows on the guest.
 
-I admire your keen but I think my comments on v3 still apply so I'll
-wait until the next iteration.
+I use QEMU with GPU passthrough (which worked perfectly until the commit
+above). This is the command I use:
 
---
-Alex Benn=C3=A9e
+```
+/path/to/qemu-system-x86_64
+  -drive if=3Dpflash,format=3Draw,readonly,file=3D/path/to/OVMF_CODE.fd
+  -drive if=3Dpflash,format=3Draw,file=3D/tmp/OVMF_VARS.fd.tmp
+  -enable-kvm
+  -machine q35,accel=3Dkvm,mem-merge=3Doff
+  -cpu host,kvm=3Doff,hv_vendor_id=3Dvgaptrocks,hv_relaxed,hv_spinlocks=3D0=
+x1fff,hv_vapic,hv_time
+  -smp 4,cores=3D4,sockets=3D1,threads=3D1
+  -m 10240
+  -vga none
+  -rtc base=3Dlocaltime
+  -serial none
+  -parallel none
+  -usb
+  -device usb-tablet
+  -device vfio-pci,host=3D01:00.0,multifunction=3Don
+  -device vfio-pci,host=3D01:00.1
+  -device usb-host,vendorid=3D<vid>,productid=3D<pid>
+  -device usb-host,vendorid=3D<vid>,productid=3D<pid>
+  -device usb-host,vendorid=3D<vid>,productid=3D<pid>
+  -device usb-host,vendorid=3D<vid>,productid=3D<pid>
+  -device usb-host,vendorid=3D<vid>,productid=3D<pid>
+  -device usb-host,vendorid=3D<vid>,productid=3D<pid>
+  -device virtio-scsi-pci,id=3Dscsi
+  -drive file=3D/path/to/guest.img,id=3Dhdd1,format=3Dqcow2,if=3Dnone,cache=
+=3Dwriteback
+  -device scsi-hd,drive=3Dhdd1
+  -net nic,model=3Dvirtio
+  -net user,smb=3D/path/to/shared
+```
+
+If I run QEMU without GPU passthrough, it runs fine.
+
+Some details about my system:
+
+- O/S: Mint 19.1 x86-64 (it's based on Ubuntu 18.04)
+- Kernel: 4.15
+- `configure` options: `--target-list=3Dx86_64-softmmu --enable-gtk --enabl=
+e-spice --audio-drv-list=3Dpa`
+- EDK2 version: 1a734ed85fda71630c795832e6d24ea560caf739 (20/Apr/2019)
+- CPU: i7-6700k
+- Motherboard: ASRock Z170 Gaming-ITX/ac
+- VGA: Gigabyte GTX 960 Mini-ITX
+
+** Affects: qemu
+     Importance: Undecided
+         Status: New
+
+-- =
+
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1826422
+
+Title:
+  Regression: QEMU 4.0 hangs the host (*bisect included*)
+
+Status in QEMU:
+  New
+
+Bug description:
+  The commit b2fc91db84470a78f8e93f5b5f913c17188792c8 seemingly
+  introduced a regression on my system.
+
+  When I start QEMU, the guest and the host hang (I need a hard reset to
+  get back to a working system), before anything shows on the guest.
+
+  I use QEMU with GPU passthrough (which worked perfectly until the
+  commit above). This is the command I use:
+
+  ```
+  /path/to/qemu-system-x86_64
+    -drive if=3Dpflash,format=3Draw,readonly,file=3D/path/to/OVMF_CODE.fd
+    -drive if=3Dpflash,format=3Draw,file=3D/tmp/OVMF_VARS.fd.tmp
+    -enable-kvm
+    -machine q35,accel=3Dkvm,mem-merge=3Doff
+    -cpu host,kvm=3Doff,hv_vendor_id=3Dvgaptrocks,hv_relaxed,hv_spinlocks=
+=3D0x1fff,hv_vapic,hv_time
+    -smp 4,cores=3D4,sockets=3D1,threads=3D1
+    -m 10240
+    -vga none
+    -rtc base=3Dlocaltime
+    -serial none
+    -parallel none
+    -usb
+    -device usb-tablet
+    -device vfio-pci,host=3D01:00.0,multifunction=3Don
+    -device vfio-pci,host=3D01:00.1
+    -device usb-host,vendorid=3D<vid>,productid=3D<pid>
+    -device usb-host,vendorid=3D<vid>,productid=3D<pid>
+    -device usb-host,vendorid=3D<vid>,productid=3D<pid>
+    -device usb-host,vendorid=3D<vid>,productid=3D<pid>
+    -device usb-host,vendorid=3D<vid>,productid=3D<pid>
+    -device usb-host,vendorid=3D<vid>,productid=3D<pid>
+    -device virtio-scsi-pci,id=3Dscsi
+    -drive file=3D/path/to/guest.img,id=3Dhdd1,format=3Dqcow2,if=3Dnone,cac=
+he=3Dwriteback
+    -device scsi-hd,drive=3Dhdd1
+    -net nic,model=3Dvirtio
+    -net user,smb=3D/path/to/shared
+  ```
+
+  If I run QEMU without GPU passthrough, it runs fine.
+
+  Some details about my system:
+
+  - O/S: Mint 19.1 x86-64 (it's based on Ubuntu 18.04)
+  - Kernel: 4.15
+  - `configure` options: `--target-list=3Dx86_64-softmmu --enable-gtk --ena=
+ble-spice --audio-drv-list=3Dpa`
+  - EDK2 version: 1a734ed85fda71630c795832e6d24ea560caf739 (20/Apr/2019)
+  - CPU: i7-6700k
+  - Motherboard: ASRock Z170 Gaming-ITX/ac
+  - VGA: Gigabyte GTX 960 Mini-ITX
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1826422/+subscriptions
 
