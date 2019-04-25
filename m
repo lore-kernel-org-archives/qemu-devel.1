@@ -1,21 +1,22 @@
 Received: from eggs.gnu.org ([209.51.188.92]:47203)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1hJX3U-0003hD-6J
-	for qemu-devel@nongnu.org; Thu, 25 Apr 2019 01:36:21 -0400
+	(envelope-from <imammedo@redhat.com>) id 1hJX3W-0003hD-0F
+	for qemu-devel@nongnu.org; Thu, 25 Apr 2019 01:36:23 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1hJX1o-0008Bs-Vz
-	for qemu-devel@nongnu.org; Thu, 25 Apr 2019 01:34:38 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:60018)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1hJX1o-0008BA-LL
+	(envelope-from <imammedo@redhat.com>) id 1hJX1n-0008Aj-Gu
 	for qemu-devel@nongnu.org; Thu, 25 Apr 2019 01:34:36 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:48500)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1hJX1n-000896-8r
+	for qemu-devel@nongnu.org; Thu, 25 Apr 2019 01:34:35 -0400
 From: Igor Mammedov <imammedo@redhat.com>
-Date: Thu, 25 Apr 2019 07:34:37 +0200
-Message-Id: <1556170489-131927-2-git-send-email-imammedo@redhat.com>
-In-Reply-To: <1556170489-131927-1-git-send-email-imammedo@redhat.com>
-References: <1556170489-131927-1-git-send-email-imammedo@redhat.com>
-Subject: [Qemu-devel] [PATCH v3 01/13] tests: acpi: make RSDT test routine
- handle XSDT
+Date: Thu, 25 Apr 2019 07:34:36 +0200
+Message-Id: <1556170489-131927-1-git-send-email-imammedo@redhat.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PATCH v3 00/13] tests: acpi: add UEFI (ARM) testing
+ support
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,104 +28,87 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Laszlo Ersek <lersek@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Gonglei <arei.gonglei@huawei.com>, =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>, Shannon Zhao <shannon.zhaosl@gmail.com>, Wei Yang <richardw.yang@linux.intel.com>, Andrew Jones <drjones@redhat.com>, Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>, Ben Warren <ben@skyportsystems.com>
 
-If RSDP revision is more than 0 fetch table pointed by XSDT
-and fallback to legacy RSDT table otherwise.
+Changelog:
+  - from v2:
+      * rebase on top current master (with UEFI blobs merged)
+      * added a Makefile rule to include bios-tables-test to aarch64 test=
+s by
+        default into 11/13 (kept Reviewed-bys)
+      * other trivial fixes and cleanups (see per patch changelogs)
+  =20
+  - from v1:
+      * rebase on top
+         (1) [PATCH for-4.1 v3 00/12] bundle edk2 platform firmware  with=
+ QEMU
+        let me to drop edk2 images and drop Makefile magic to unpack them=
+,
+        Laszlo's series conveniently does it all for me.
+      * use new path/names for firmware images as supplied by [1]
+      * reorder patches a bit so that UEFI parts would go after generic c=
+hanges
 
-While at it drop unused acpi_get_xsdt_address().
+Series adds support for ACPI tables located above 4G. It adds 64-bit hand=
+ling
+necessary for testing arm/virt board (i.e. might be not complete wrt spec=
+) and
+uses recently merged UEFI (AVMF) firmware/test disk image which provides
+an entry point[1] for fetching ACPI tables (RSDP pointer).
 
-Signed-off-by: Igor Mammedov <imammedo@redhat.com>
----
-PS:
- it doesn't affect existing pc/q35 machines as they use RSDP.revision == 0
- but it will be used by followup patch to enable testing arm/virt
- board which uses provides XSDT table.
----
- tests/acpi-utils.h       |  3 +--
- tests/acpi-utils.c       | 14 +-------------
- tests/bios-tables-test.c | 18 +++++++++++++-----
- 3 files changed, 15 insertions(+), 20 deletions(-)
+Git tree for testing:
+   https://github.com/imammedo/qemu.git acpi_arm_tests_v3
 
-diff --git a/tests/acpi-utils.h b/tests/acpi-utils.h
-index ef388bb..8c68201 100644
---- a/tests/acpi-utils.h
-+++ b/tests/acpi-utils.h
-@@ -46,8 +46,7 @@ typedef struct {
- 
- uint8_t acpi_calc_checksum(const uint8_t *data, int len);
- uint32_t acpi_find_rsdp_address(QTestState *qts);
--uint64_t acpi_get_xsdt_address(uint8_t *rsdp_table);
--void acpi_parse_rsdp_table(QTestState *qts, uint32_t addr, uint8_t *rsdp_table);
-+void acpi_parse_rsdp_table(QTestState *qts, uint64_t addr, uint8_t *rsdp_table);
- void acpi_fetch_table(QTestState *qts, uint8_t **aml, uint32_t *aml_len,
-                       const uint8_t *addr_ptr, const char *sig,
-                       bool verify_checksum);
-diff --git a/tests/acpi-utils.c b/tests/acpi-utils.c
-index cc33b46..9a6d1d3 100644
---- a/tests/acpi-utils.c
-+++ b/tests/acpi-utils.c
-@@ -51,19 +51,7 @@ uint32_t acpi_find_rsdp_address(QTestState *qts)
-     return off;
- }
- 
--uint64_t acpi_get_xsdt_address(uint8_t *rsdp_table)
--{
--    uint64_t xsdt_physical_address;
--    uint8_t revision = rsdp_table[15 /* Revision offset */];
--
--    /* We must have revision 2 if we're looking for an XSDT pointer */
--    g_assert(revision == 2);
--
--    memcpy(&xsdt_physical_address, &rsdp_table[24 /* XsdtAddress offset */], 8);
--    return le64_to_cpu(xsdt_physical_address);
--}
--
--void acpi_parse_rsdp_table(QTestState *qts, uint32_t addr, uint8_t *rsdp_table)
-+void acpi_parse_rsdp_table(QTestState *qts, uint64_t addr, uint8_t *rsdp_table)
- {
-     uint8_t revision;
- 
-diff --git a/tests/bios-tables-test.c b/tests/bios-tables-test.c
-index a506dcb..24bd102 100644
---- a/tests/bios-tables-test.c
-+++ b/tests/bios-tables-test.c
-@@ -107,17 +107,25 @@ static void test_acpi_rsdp_table(test_data *data)
-     }
- }
- 
--static void test_acpi_rsdt_table(test_data *data)
-+static void test_acpi_rxsdt_table(test_data *data)
- {
-+    const char *sig = "RSDT";
-     AcpiSdtTable rsdt = {};
-+    int entry_size = 4;
-+    int addr_off = 16 /* RsdtAddress */;
-     uint8_t *ent;
- 
--    /* read RSDT table */
-+    if (data->rsdp_table[15 /* Revision offset */] != 0) {
-+        addr_off = 24 /* XsdtAddress */;
-+        entry_size = 8;
-+        sig = "XSDT";
-+    }
-+    /* read [RX]SDT table */
-     acpi_fetch_table(data->qts, &rsdt.aml, &rsdt.aml_len,
--                     &data->rsdp_table[16 /* RsdtAddress */], "RSDT", true);
-+                     &data->rsdp_table[addr_off], sig, true);
- 
-     /* Load all tables and add to test list directly RSDT referenced tables */
--    ACPI_FOREACH_RSDT_ENTRY(rsdt.aml, rsdt.aml_len, ent, 4 /* Entry size */) {
-+    ACPI_FOREACH_RSDT_ENTRY(rsdt.aml, rsdt.aml_len, ent, entry_size) {
-         AcpiSdtTable ssdt_table = {};
- 
-         acpi_fetch_table(data->qts, &ssdt_table.aml, &ssdt_table.aml_len, ent,
-@@ -521,7 +529,7 @@ static void test_acpi_one(const char *params, test_data *data)
-     data->tables = g_array_new(false, true, sizeof(AcpiSdtTable));
-     test_acpi_rsdp_address(data);
-     test_acpi_rsdp_table(data);
--    test_acpi_rsdt_table(data);
-+    test_acpi_rxsdt_table(data);
-     test_acpi_fadt_table(data);
- 
-     if (iasl) {
--- 
+Ref to previos vesrsion:
+   [Qemu-devel] [PATCH for 4.1 v2 00/13] tests: acpi: add UEFI (ARM) test=
+ing support
+   https://www.mail-archive.com/qemu-devel@nongnu.org/msg607564.html
+
+CC: Laszlo Ersek <lersek@redhat.com>
+CC: "Michael S. Tsirkin" <mst@redhat.com>
+CC: Gonglei <arei.gonglei@huawei.com>
+CC: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+CC: Shannon Zhao <shannon.zhaosl@gmail.com>
+CC: Wei Yang <richardw.yang@linux.intel.com>
+CC: Andrew Jones <drjones@redhat.com>
+CC: Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>
+CC: Ben Warren <ben@skyportsystems.com>
+
+Igor Mammedov (13):
+  tests: acpi: make RSDT test routine handle XSDT
+  tests: acpi: rename acpi_parse_rsdp_table() into
+    acpi_fetch_rsdp_table()
+  tests: acpi: make pointer to RSDP 64bit
+  tests: acpi: fetch X_DSDT if pointer to DSDT is 0
+  tests: acpi: skip FACS table if board uses hw reduced ACPI profile
+  tests: acpi: move boot_sector_init() into x86 tests branch
+  tests: acpi: add acpi_find_rsdp_address_uefi() helper
+  tests: acpi: add a way to start tests with UEFI firmware
+  tests: acpi: ignore SMBIOS tests when UEFI firmware is used
+  tests: add expected ACPI tables for arm/virt board
+  tests: acpi: add simple arm/virt testcase
+  tests: acpi: refactor rebuild-expected-aml.sh to dump ACPI tables for
+    a specified list of targets
+  tests: acpi: print error unable to dump ACPI table during rebuild
+
+ tests/acpi-utils.h                      |   5 +-
+ tests/Makefile.include                  |   1 +
+ tests/acpi-utils.c                      |  58 ++++++++++----
+ tests/bios-tables-test.c                | 133 ++++++++++++++++++++++++--=
+------
+ tests/data/acpi/rebuild-expected-aml.sh |  23 +++---
+ tests/data/acpi/virt/APIC               | Bin 0 -> 168 bytes
+ tests/data/acpi/virt/DSDT               | Bin 0 -> 18476 bytes
+ tests/data/acpi/virt/FACP               | Bin 0 -> 268 bytes
+ tests/data/acpi/virt/GTDT               | Bin 0 -> 96 bytes
+ tests/data/acpi/virt/MCFG               | Bin 0 -> 60 bytes
+ tests/data/acpi/virt/SPCR               | Bin 0 -> 80 bytes
+ tests/vmgenid-test.c                    |   2 +-
+ 12 files changed, 162 insertions(+), 60 deletions(-)
+ create mode 100644 tests/data/acpi/virt/APIC
+ create mode 100644 tests/data/acpi/virt/DSDT
+ create mode 100644 tests/data/acpi/virt/FACP
+ create mode 100644 tests/data/acpi/virt/GTDT
+ create mode 100644 tests/data/acpi/virt/MCFG
+ create mode 100644 tests/data/acpi/virt/SPCR
+
+--=20
 2.7.4
