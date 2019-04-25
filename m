@@ -1,28 +1,27 @@
-Received: from eggs.gnu.org ([209.51.188.92]:36851)
+Received: from eggs.gnu.org ([209.51.188.92]:37202)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1hJedu-0003jo-TV
-	for qemu-devel@nongnu.org; Thu, 25 Apr 2019 09:42:29 -0400
+	(envelope-from <alex.bennee@linaro.org>) id 1hJeez-0004hs-2e
+	for qemu-devel@nongnu.org; Thu, 25 Apr 2019 09:43:34 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1hJedt-0007bb-Pq
-	for qemu-devel@nongnu.org; Thu, 25 Apr 2019 09:42:26 -0400
-Received: from mail-wm1-x342.google.com ([2a00:1450:4864:20::342]:33472)
+	(envelope-from <alex.bennee@linaro.org>) id 1hJeex-0000ud-66
+	for qemu-devel@nongnu.org; Thu, 25 Apr 2019 09:43:32 -0400
+Received: from mail-wm1-x344.google.com ([2a00:1450:4864:20::344]:50708)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1hJedt-0007aQ-Hz
-	for qemu-devel@nongnu.org; Thu, 25 Apr 2019 09:42:25 -0400
-Received: by mail-wm1-x342.google.com with SMTP id z6so1724213wmi.0
-	for <qemu-devel@nongnu.org>; Thu, 25 Apr 2019 06:42:25 -0700 (PDT)
+	id 1hJeev-0000px-7G
+	for qemu-devel@nongnu.org; Thu, 25 Apr 2019 09:43:31 -0400
+Received: by mail-wm1-x344.google.com with SMTP id 10so9444091wmk.0
+	for <qemu-devel@nongnu.org>; Thu, 25 Apr 2019 06:43:29 -0700 (PDT)
 References: <20190408182748.1238-1-jan.bobek@gmail.com>
-	<20190408182748.1238-4-jan.bobek@gmail.com>
+	<20190408182748.1238-6-jan.bobek@gmail.com>
 From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-In-reply-to: <20190408182748.1238-4-jan.bobek@gmail.com>
-Date: Thu, 25 Apr 2019 14:42:22 +0100
-Message-ID: <871s1qw69t.fsf@zen.linaroharston>
+In-reply-to: <20190408182748.1238-6-jan.bobek@gmail.com>
+Date: Thu, 25 Apr 2019 14:43:26 +0100
+Message-ID: <87zhoeurnl.fsf@zen.linaroharston>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [RISU PATCH 3/5] risu_reginfo_i386: implement
- arch-specific reginfo interface
+Subject: Re: [Qemu-devel] [RISU PATCH 5/5] risu_i386: remove old unused code
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,108 +36,91 @@ Cc: qemu-devel@nongnu.org, Richard Henderson <richard.henderson@linaro.org>, Pet
 
 Jan Bobek <jan.bobek@gmail.com> writes:
 
-> CPU-specific code in risu_reginfo_* is expected to define and export
-> the following symbols:
->
-> - arch_long_opts, arch_extra_help, process_arch_opt
-> - reginfo_size
-> - reginfo_init
-> - reginfo_is_eq
-> - reginfo_dump, reginfo_dump_mismatch
->
-> Make risu_reginfo_i386.c implement this interface.
+> The code being removed is a remnant of the past implementation; it has
+> since been replaced by its more powerful, architecture-independent
+> counterpart in reginfo.c.
 >
 > Signed-off-by: Jan Bobek <jan.bobek@gmail.com>
 
 Reviewed-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
 
 > ---
->  risu_reginfo_i386.c | 48 +++++++++++++++++++++++++++++++++++++++------
->  1 file changed, 42 insertions(+), 6 deletions(-)
+>  risu_i386.c | 58 -----------------------------------------------------
+>  1 file changed, 58 deletions(-)
 >
-> diff --git a/risu_reginfo_i386.c b/risu_reginfo_i386.c
-> index e8d671f..3882261 100644
-> --- a/risu_reginfo_i386.c
-> +++ b/risu_reginfo_i386.c
-> @@ -10,12 +10,28 @@
->   ***********************************************************************=
-*******/
->
->  #include <stdio.h>
-> +#include <stdlib.h>
-> +#include <string.h>
->  #include <ucontext.h>
->
+> diff --git a/risu_i386.c b/risu_i386.c
+> index eb4dff4..14b0db3 100644
+> --- a/risu_i386.c
+> +++ b/risu_i386.c
+> @@ -16,13 +16,6 @@
 >  #include "risu.h"
 >  #include "risu_reginfo_i386.h"
 >
-> -static void fill_reginfo(struct reginfo *ri, ucontext_t * uc)
-> +const struct option * const arch_long_opts;
-> +const char * const arch_extra_help;
-> +
-> +void process_arch_opt(int opt, const char *arg)
-> +{
-> +    abort();
-> +}
-> +
-> +const int reginfo_size(void)
-> +{
-> +    return sizeof(struct reginfo);
-> +}
-> +
-> +/* reginfo_init: initialize with a ucontext */
-> +void reginfo_init(struct reginfo *ri, ucontext_t *uc)
+> -struct reginfo master_ri, apprentice_ri;
+> -
+> -static int insn_is_ud2(uint32_t insn)
+> -{
+> -    return ((insn & 0xffff) =3D=3D 0x0b0f);
+> -}
+> -
+>  void advance_pc(void *vuc)
 >  {
->      int i;
->      for (i =3D 0; i < NGREG; i++) {
-> @@ -51,18 +67,38 @@ static void fill_reginfo(struct reginfo *ri, ucontext=
-_t * uc)
->      ri->faulting_insn =3D *((uint32_t *) uc->uc_mcontext.gregs[REG_EIP]);
->  }
->
-> -static char *regname[] =3D {
-> +/* reginfo_is_eq: compare the reginfo structs, returns nonzero if equal =
-*/
-> +int reginfo_is_eq(struct reginfo *m, struct reginfo *a)
-> +{
-> +    return 0 =3D=3D memcmp(m, a, sizeof(*m));
-> +}
-> +
-> +static const char *const regname[NGREG] =3D {
->      "GS", "FS", "ES", "DS", "EDI", "ESI", "EBP", "ESP",
->      "EBX", "EDX", "ECX", "EAX", "TRAPNO", "ERR", "EIP",
-> -    "CS", "EFL", "UESP", "SS", 0
-> +    "CS", "EFL", "UESP", "SS"
->  };
->
-> -static void dump_reginfo(struct reginfo *ri)
-> +/* reginfo_dump: print state to a stream, returns nonzero on success */
-> +int reginfo_dump(struct reginfo *ri, FILE *f)
+>      ucontext_t *uc =3D (ucontext_t *) vuc;
+> @@ -61,54 +54,3 @@ uintptr_t get_pc(struct reginfo *ri)
 >  {
->      int i;
-> -    fprintf(stderr, "  faulting insn %x\n", ri->faulting_insn);
-> +    fprintf(f, "  faulting insn %x\n", ri->faulting_insn);
->      for (i =3D 0; i < NGREG; i++) {
-> -        fprintf(stderr, "  %s: %x\n", regname[i] ? regname[i] : "???",
-> +        fprintf(f, "  %s: %x\n", regname[i] ? regname[i] : "???",
->                  ri->gregs[i]);
->      }
-> +    return !ferror(f);
-> +}
-> +
-> +int reginfo_dump_mismatch(struct reginfo *m, struct reginfo *a, FILE *f)
-> +{
-> +    int i;
-> +    for (i =3D 0; i < NGREG; i++) {
-> +        if (m->gregs[i] !=3D a->gregs[i]) {
-> +            fprintf(f, "Mismatch: Register %s\n", regname[i] ? regname[i=
-] : "???");
-> +            fprintf(f, "m: [%x] !=3D a: [%x]\n", m->gregs[i], a->gregs[i=
-]);
-> +        }
-> +    }
-> +    return !ferror(f);
+>      return ri->gregs[REG_EIP];
 >  }
+> -
+> -int send_register_info(int sock, void *uc)
+> -{
+> -    struct reginfo ri;
+> -    fill_reginfo(&ri, uc);
+> -    return send_data_pkt(sock, &ri, sizeof(ri));
+> -}
+> -
+> -/* Read register info from the socket and compare it with that from the
+> - * ucontext. Return 0 for match, 1 for end-of-test, 2 for mismatch.
+> - * NB: called from a signal handler.
+> - */
+> -int recv_and_compare_register_info(int sock, void *uc)
+> -{
+> -    int resp;
+> -    fill_reginfo(&master_ri, uc);
+> -    recv_data_pkt(sock, &apprentice_ri, sizeof(apprentice_ri));
+> -    if (memcmp(&master_ri, &apprentice_ri, sizeof(master_ri)) !=3D 0) {
+> -        /* mismatch */
+> -        resp =3D 2;
+> -    } else if (insn_is_ud2(master_ri.faulting_insn)) {
+> -        /* end of test */
+> -        resp =3D 1;
+> -    } else {
+> -        /* either successful match or expected undef */
+> -        resp =3D 0;
+> -    }
+> -    send_response_byte(sock, resp);
+> -    return resp;
+> -}
+> -
+> -/* Print a useful report on the status of the last comparison
+> - * done in recv_and_compare_register_info(). This is called on
+> - * exit, so need not restrict itself to signal-safe functions.
+> - * Should return 0 if it was a good match (ie end of test)
+> - * and 1 for a mismatch.
+> - */
+> -int report_match_status(void)
+> -{
+> -    fprintf(stderr, "match status...\n");
+> -    fprintf(stderr, "master reginfo:\n");
+> -    dump_reginfo(&master_ri);
+> -    fprintf(stderr, "apprentice reginfo:\n");
+> -    dump_reginfo(&apprentice_ri);
+> -    if (memcmp(&master_ri, &apprentice_ri, sizeof(master_ri)) =3D=3D 0) {
+> -        fprintf(stderr, "match!\n");
+> -        return 0;
+> -    }
+> -    fprintf(stderr, "mismatch!\n");
+> -    return 1;
+> -}
 
 
 --
