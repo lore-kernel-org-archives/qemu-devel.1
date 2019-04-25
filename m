@@ -6,55 +6,55 @@ X-Spam-Status: No, score=-6.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B36DCC4321B
-	for <qemu-devel@archiver.kernel.org>; Thu, 25 Apr 2019 13:29:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 37771C4321A
+	for <qemu-devel@archiver.kernel.org>; Thu, 25 Apr 2019 13:32:19 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6C12B212F5
-	for <qemu-devel@archiver.kernel.org>; Thu, 25 Apr 2019 13:29:55 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6C12B212F5
+	by mail.kernel.org (Postfix) with ESMTPS id 6986121537
+	for <qemu-devel@archiver.kernel.org>; Thu, 25 Apr 2019 13:26:27 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6986121537
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:57170 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:57132 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hJeRm-0001JN-Ox
-	for qemu-devel@archiver.kernel.org; Thu, 25 Apr 2019 09:29:54 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:58761)
+	id 1hJeOQ-0006oE-CA
+	for qemu-devel@archiver.kernel.org; Thu, 25 Apr 2019 09:26:26 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:58308)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1hJeKY-0003nj-PL
-	for qemu-devel@nongnu.org; Thu, 25 Apr 2019 09:22:28 -0400
+	(envelope-from <cohuck@redhat.com>) id 1hJeJs-000389-G9
+	for qemu-devel@nongnu.org; Thu, 25 Apr 2019 09:21:45 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1hJeKX-00045N-JG
-	for qemu-devel@nongnu.org; Thu, 25 Apr 2019 09:22:26 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:42446)
+	(envelope-from <cohuck@redhat.com>) id 1hJeJr-0003ba-H3
+	for qemu-devel@nongnu.org; Thu, 25 Apr 2019 09:21:44 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:58768)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <cohuck@redhat.com>)
-	id 1hJeKV-0003xp-PO; Thu, 25 Apr 2019 09:22:25 -0400
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
-	[10.5.11.12])
+	id 1hJeJr-0003bC-8s; Thu, 25 Apr 2019 09:21:43 -0400
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+	[10.5.11.22])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id AFEE53008CDB;
-	Thu, 25 Apr 2019 13:22:13 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id 7FA4B319939F;
+	Thu, 25 Apr 2019 13:21:42 +0000 (UTC)
 Received: from localhost (dhcp-192-187.str.redhat.com [10.33.192.187])
-	by smtp.corp.redhat.com (Postfix) with ESMTPS id 50CDF60BE5;
-	Thu, 25 Apr 2019 13:22:13 +0000 (UTC)
+	by smtp.corp.redhat.com (Postfix) with ESMTPS id 2B0381001E6C;
+	Thu, 25 Apr 2019 13:21:42 +0000 (UTC)
 From: Cornelia Huck <cohuck@redhat.com>
 To: Peter Maydell <peter.maydell@linaro.org>
-Date: Thu, 25 Apr 2019 15:21:31 +0200
-Message-Id: <20190425132134.2839-17-cohuck@redhat.com>
+Date: Thu, 25 Apr 2019 15:21:18 +0200
+Message-Id: <20190425132134.2839-4-cohuck@redhat.com>
 In-Reply-To: <20190425132134.2839-1-cohuck@redhat.com>
 References: <20190425132134.2839-1-cohuck@redhat.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.48]);
-	Thu, 25 Apr 2019 13:22:13 +0000 (UTC)
+	(mx1.redhat.com [10.5.110.41]);
+	Thu, 25 Apr 2019 13:21:42 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] [PULL 16/19] s390-bios: Use control unit type to find
- bootable devices
+Subject: [Qemu-devel] [PULL 03/19] s390-bios: decouple common boot logic
+ from virtio
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -72,114 +72,99 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 Content-Type: text/plain; charset="UTF-8"
-Message-ID: <20190425132131.iXqRK1IulQYQS4_5GUdNdw2mqX90b-odarlBFAAPg4Q@z>
+Message-ID: <20190425132118.59kxc2_7P2QYobYziumotwHr5B6w8Cn-Mkq1O2nY_Rw@z>
 
 From: "Jason J. Herne" <jjherne@linux.ibm.com>
 
-When the user does not specify which device to boot from then we end
-up guessing. Instead of simply grabbing the first available device let's
-be a little bit smarter and only choose devices that might be bootable
-like disk, and not console devices.
+Create a boot_setup function to handle getting boot information from
+the machine/hypervisor. This decouples common boot logic from the
+virtio code path and allows us to make use of it for the real dasd boot
+scenario.
 
 Signed-off-by: Jason J. Herne <jjherne@linux.ibm.com>
-Message-Id: <1554388475-18329-17-git-send-email-jjherne@linux.ibm.com>
-[thuth: Added fix for virtio_is_supported() not being called anymore]
+Acked-by: Halil Pasic <pasic@linux.vnet.ibm.com>
+Reviewed-by: Collin Walling <walling@linux.ibm.com
+Reviewed-by: Thomas Huth <thuth@redhat.com>
+Reviewed-by: Farhan Ali <alifm@linux.ibm.com>
+Reviewed-by: Cornelia Huck <cohuck@redhat.com>
+Message-Id: <1554388475-18329-4-git-send-email-jjherne@linux.ibm.com>
 Signed-off-by: Thomas Huth <thuth@redhat.com>
 ---
- pc-bios/s390-ccw/main.c | 45 ++++++++++++++++++++++++++++++++---------
- 1 file changed, 35 insertions(+), 10 deletions(-)
+ pc-bios/s390-ccw/main.c | 28 ++++++++++++++++++++--------
+ 1 file changed, 20 insertions(+), 8 deletions(-)
 
 diff --git a/pc-bios/s390-ccw/main.c b/pc-bios/s390-ccw/main.c
-index 3c449ad49688..a69c73349e8f 100644
+index e82fe2ce2315..67df42191b94 100644
 --- a/pc-bios/s390-ccw/main.c
 +++ b/pc-bios/s390-ccw/main.c
-@@ -21,6 +21,7 @@ static char loadparm_str[LOADPARM_LEN + 1] = { 0, 0, 0, 0, 0, 0, 0, 0, 0 };
+@@ -14,16 +14,17 @@
+ 
+ char stack[PAGE_SIZE * 8] __attribute__((__aligned__(PAGE_SIZE)));
+ static SubChannelId blk_schid = { .one = 1 };
+-IplParameterBlock iplb __attribute__((__aligned__(PAGE_SIZE)));
+ static char loadparm_str[LOADPARM_LEN + 1] = { 0, 0, 0, 0, 0, 0, 0, 0, 0 };
  QemuIplParameters qipl;
- IplParameterBlock iplb __attribute__((__aligned__(PAGE_SIZE)));
- static bool have_iplb;
-+static uint16_t cutype;
- LowCore const *lowcore; /* Yes, this *is* a pointer to address 0 */
++IplParameterBlock iplb __attribute__((__aligned__(PAGE_SIZE)));
++static bool have_iplb;
  
  #define LOADPARM_PROMPT "PROMPT  "
-@@ -58,11 +59,15 @@ unsigned int get_loadparm_index(void)
-  * subchannel information block (schib) with the connected subchannel's info.
-  * NOTE: The global variable blk_schid is updated to contain the subchannel
-  * information.
-+ *
-+ * If the caller gives dev_no=-1 then the user did not specify a boot device.
-+ * In this case we'll just use the first potentially bootable device we find.
+ #define LOADPARM_EMPTY  "        "
+ #define BOOT_MENU_FLAG_MASK (QIPL_FLAG_BM_OPTS_CMD | QIPL_FLAG_BM_OPTS_ZIPL)
+ 
+ /*
+- * Priniciples of Operations (SA22-7832-09) chapter 17 requires that
++ * Principles of Operations (SA22-7832-09) chapter 17 requires that
+  * a subsystem-identification is at 184-187 and bytes 188-191 are zero
+  * after list-directed-IPL and ccw-IPL.
   */
- static bool find_subch(int dev_no)
+@@ -111,23 +112,33 @@ static void css_setup(void)
+     enable_mss_facility();
+ }
+ 
++/*
++ * Collect various pieces of information from the hypervisor/hardware that
++ * we'll use to determine exactly how we'll boot.
++ */
++static void boot_setup(void)
++{
++    char lpmsg[] = "LOADPARM=[________]\n";
++
++    sclp_get_loadparm_ascii(loadparm_str);
++    memcpy(lpmsg + 10, loadparm_str, 8);
++    sclp_print(lpmsg);
++
++    have_iplb = store_iplb(&iplb);
++}
++
+ static void virtio_setup(void)
  {
      Schib schib;
-     int i, r;
-+    bool is_virtio;
+     int ssid;
+     bool found = false;
+     uint16_t dev_no;
+-    char ldp[] = "LOADPARM=[________]\n";
+     VDev *vdev = virtio_get_device();
+     QemuIplParameters *early_qipl = (QemuIplParameters *)QIPL_ADDRESS;
  
-     for (i = 0; i < 0x10000; i++) {
-         blk_schid.sch_no = i;
-@@ -74,16 +79,39 @@ static bool find_subch(int dev_no)
-             continue;
-         }
- 
--        /* Skip net devices since no IPLB is created and therefore no
--         * network bootloader has been loaded
--         */
-         enable_subchannel(blk_schid);
--        if (virtio_is_supported(blk_schid) &&
--            virtio_get_device_type() == VIRTIO_ID_NET && dev_no < 0) {
--            continue;
-+        cutype = cu_type(blk_schid);
-+
-+        /*
-+         * Note: we always have to run virtio_is_supported() here to make
-+         * sure that the vdev.senseid data gets pre-initialized correctly
-+         */
-+        is_virtio = virtio_is_supported(blk_schid);
-+
-+        /* No specific devno given, just return 1st possibly bootable device */
-+        if (dev_no < 0) {
-+            switch (cutype) {
-+            case CU_TYPE_VIRTIO:
-+                if (is_virtio) {
-+                    /*
-+                     * Skip net devices since no IPLB is created and therefore
-+                     * no network bootloader has been loaded
-+                     */
-+                    if (virtio_get_device_type() != VIRTIO_ID_NET) {
-+                        return true;
-+                    }
-+                }
-+                continue;
-+            case CU_TYPE_DASD_3990:
-+            case CU_TYPE_DASD_2107:
-+                return true;
-+            default:
-+                continue;
-+            }
-         }
- 
--        if ((dev_no < 0) || (schib.pmcw.dev == dev_no)) {
-+        /* Caller asked for a specific devno */
-+        if (schib.pmcw.dev == dev_no) {
-             return true;
-         }
-     }
-@@ -200,15 +228,12 @@ static void virtio_setup(void)
- 
- int main(void)
- {
--    uint16_t cutype;
+-    sclp_get_loadparm_ascii(loadparm_str);
+-    memcpy(ldp + 10, loadparm_str, LOADPARM_LEN);
+-    sclp_print(ldp);
 -
+     memcpy(&qipl, early_qipl, sizeof(QemuIplParameters));
+ 
+-    if (store_iplb(&iplb)) {
++    if (have_iplb) {
+         switch (iplb.pbt) {
+         case S390_IPL_TYPE_CCW:
+             dev_no = iplb.ccw.devno;
+@@ -174,6 +185,7 @@ int main(void)
+ {
      sclp_setup();
      css_setup();
-     boot_setup();
-     find_boot_device();
-     enable_subchannel(blk_schid);
++    boot_setup();
+     virtio_setup();
  
--    cutype = cu_type(blk_schid);
-     switch (cutype) {
-     case CU_TYPE_DASD_3990:
-     case CU_TYPE_DASD_2107:
+     zipl_load(); /* no return */
 -- 
 2.17.2
 
