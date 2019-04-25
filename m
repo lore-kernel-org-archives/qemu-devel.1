@@ -2,88 +2,109 @@ Return-Path: <SRS0=VSQP=S3=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS,USER_AGENT_MUTT
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 38200C10F03
-	for <qemu-devel@archiver.kernel.org>; Thu, 25 Apr 2019 08:39:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8D737C282E3
+	for <qemu-devel@archiver.kernel.org>; Thu, 25 Apr 2019 10:02:18 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id F1E9B20578
-	for <qemu-devel@archiver.kernel.org>; Thu, 25 Apr 2019 08:39:22 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="PAC4QckL"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F1E9B20578
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	by mail.kernel.org (Postfix) with ESMTPS id 628E0217D7
+	for <qemu-devel@archiver.kernel.org>; Thu, 25 Apr 2019 10:02:18 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 628E0217D7
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:53912 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:54654 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hJZuc-0002IP-5t
-	for qemu-devel@archiver.kernel.org; Thu, 25 Apr 2019 04:39:22 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:56306)
+	id 1hJbCr-0005on-DZ
+	for qemu-devel@archiver.kernel.org; Thu, 25 Apr 2019 06:02:17 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:43874)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1hJZtg-0001eT-3v
-	for qemu-devel@nongnu.org; Thu, 25 Apr 2019 04:38:25 -0400
+	(envelope-from <thuth@redhat.com>) id 1hJbAf-0004MG-Mx
+	for qemu-devel@nongnu.org; Thu, 25 Apr 2019 06:00:02 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1hJZte-0000UN-TX
-	for qemu-devel@nongnu.org; Thu, 25 Apr 2019 04:38:24 -0400
-Received: from mail-wm1-x342.google.com ([2a00:1450:4864:20::342]:52377)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1hJZte-0000SP-Jz
-	for qemu-devel@nongnu.org; Thu, 25 Apr 2019 04:38:22 -0400
-Received: by mail-wm1-x342.google.com with SMTP id j13so8207218wmh.2
-	for <qemu-devel@nongnu.org>; Thu, 25 Apr 2019 01:38:22 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
-	h=date:from:to:cc:subject:message-id:references:mime-version
-	:content-disposition:in-reply-to:user-agent;
-	bh=I4s4ozzcRqk3KtPckYEQQUIpVuZ6N5tSF8D4Ej/ks1k=;
-	b=PAC4QckLZJFt3gBfJzxJttnDGt8rpFM5q87HDMr+EA4P2Mq9TIdENIPrgMhv2XdR11
-	rVAgTs38RuPlyLE0AWkf2oZrA3fhS6ATIwU9LqqhQPf5RpI38VZQvtUnjzcR+pw7KocD
-	FNfzIS4zMBqTSpkNG7A173T/+4VBuYfNanziP6+AjWXhzxPCEx48khTHrmgCKDHEqzd5
-	uSBCcM8NnxhT/jq+UNo8ovbZUIZMuuD55w8f1BDmwc7mDmxPocJ1BGcs8KpMXhI5mX6A
-	yk/k1ebflt9cOD7kt+A0Lh5As7T14MUHvsrvzSBSpNJ2TQ4CqOqHW5LR5/JYZlmJ6zzy
-	dScg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=1e100.net; s=20161025;
-	h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-	:mime-version:content-disposition:in-reply-to:user-agent;
-	bh=I4s4ozzcRqk3KtPckYEQQUIpVuZ6N5tSF8D4Ej/ks1k=;
-	b=LlnqahjrVqMKuoAkVEZtEm6bgCj5UwvHwoLFKzglLXBOrI4kcZH8U1HCHRaIyJiGTy
-	vfZC4jatewVKajSA0tZ6D61lUp/BiyvWHbt4V8vsBY6Af6tyq/CwWqDdrbNnlyISBUMr
-	7dkzcDIgOQr6u53tLPmxr4e/e8ywuUqmUxzikk4v8V+Ca1s+5Gmv6DyQ0WdtPqywQrhj
-	vBdymwhJ9Gw2C3437lYVibRHj4sBjm91WF5Im7AqgPeUGvUeWkSX9ZJEXVBBMmuvmF+/
-	O9NmXGRyo6xD5U8TPupYnTxxj9JQ16bZ2vM72Fs+qrqzWtbAfs4SyPWZw4uYA6L9UfxM
-	OEAA==
-X-Gm-Message-State: APjAAAVgE49ifhFqoGxVlpAQRFgKEFBvQs2n2P2jZp/woj3OrQ5Bw82Z
-	luuP9fz+1CC6C9xtmByfcms=
-X-Google-Smtp-Source: APXvYqwMRu9NGfiIh1WfVOk3rBiYKG2/sVIoPaOgCVDAq5FNG4rQbAt1CMnyWUMd0OR6GqYxClbvtA==
-X-Received: by 2002:a1c:ac07:: with SMTP id v7mr2429861wme.49.1556181501217;
-	Thu, 25 Apr 2019 01:38:21 -0700 (PDT)
-Received: from localhost ([51.15.41.238]) by smtp.gmail.com with ESMTPSA id
-	17sm15804999wrk.91.2019.04.25.01.38.20
-	(version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
-	Thu, 25 Apr 2019 01:38:20 -0700 (PDT)
-Date: Thu, 25 Apr 2019 09:38:19 +0100
-From: Stefan Hajnoczi <stefanha@gmail.com>
-To: Liran Alon <liran.alon@oracle.com>
-Message-ID: <20190425083819.GE30231@stefanha-x1.localdomain>
-References: <20190416125912.44001-1-liran.alon@oracle.com>
-	<20190418094101.GA23876@stefanha-x1.localdomain>
-	<17635C1F-A477-4C0F-B052-2948D853E6CD@oracle.com>
+	(envelope-from <thuth@redhat.com>) id 1hJb8c-0000Zr-6K
+	for qemu-devel@nongnu.org; Thu, 25 Apr 2019 05:57:55 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:48066)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1hJb8b-0000Sy-TQ
+	for qemu-devel@nongnu.org; Thu, 25 Apr 2019 05:57:54 -0400
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+	[10.5.11.15])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 41953CAA67;
+	Thu, 25 Apr 2019 09:57:52 +0000 (UTC)
+Received: from thuth.remote.csb (ovpn-116-68.ams2.redhat.com [10.36.116.68])
+	by smtp.corp.redhat.com (Postfix) with ESMTP id 4DB4E5D705;
+	Thu, 25 Apr 2019 09:57:45 +0000 (UTC)
+To: Li Qiang <liq3ea@163.com>, philmd@redhat.com, lersek@redhat.com,
+	kraxel@redhat.com, lvivier@redhat.com, pbonzini@redhat.com
+References: <20190424140643.62457-1-liq3ea@163.com>
+From: Thomas Huth <thuth@redhat.com>
+Openpgp: preference=signencrypt
+Autocrypt: addr=thuth@redhat.com; keydata=
+	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
+Organization: Red Hat
+Message-ID: <2b623811-1be2-159c-0fa6-c548aa9eea82@redhat.com>
+Date: Thu, 25 Apr 2019 11:57:44 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+	Thunderbird/60.6.1
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="EgVrEAR5UttbsTXg"
-Content-Disposition: inline
-In-Reply-To: <17635C1F-A477-4C0F-B052-2948D853E6CD@oracle.com>
-User-Agent: Mutt/1.11.3 (2019-02-01)
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
-	recognized.
-X-Received-From: 2a00:1450:4864:20::342
-Subject: Re: [Qemu-devel] [PATCH v2 0/3] vhost-scsi: Support migration
+In-Reply-To: <20190424140643.62457-1-liq3ea@163.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+	(mx1.redhat.com [10.5.110.38]);
+	Thu, 25 Apr 2019 09:57:52 +0000 (UTC)
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 209.132.183.28
+Subject: Re: [Qemu-devel] [PATCH v2 0/5] fw_cfg_test refactor and add two
+ test cases
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -95,73 +116,45 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: ehabkost@redhat.com, "Michael S. Tsirkin" <mst@redhat.com>,
-	mtosatti@redhat.com, qemu-devel@nongnu.org,
-	bijan.mottahedeh@oracle.com, pbonzini@redhat.com,
-	nir.weiner@oracle.com, rth@twiddle.net
+Cc: liq3ea@gmail.com, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190425083819.WqpYX7GqOH-1Rnf-gQf4Ble-9fXGtVY16_PosoVZS0o@z>
+Message-ID: <20190425095744.VqlsiXa4kj384v7-5_vmWbzwGMVnrn6MKO3x6C3egmE@z>
 
+On 24/04/2019 16.06, Li Qiang wrote:
+> In the disscuss of adding reboot timeout test case:
+> https://lists.gnu.org/archive/html/qemu-devel/2019-04/msg03304.html
+> 
+> Philippe suggested we should uses the only related option for one
+> specific test. However currently we uses one QTestState for all the
+> test cases. In order to achieve Philippe's idea, I split the test case
+> for its own QTestState. As this patchset has changed a lot, I don't bump
+> the version.
+> 
+> Change since v1:
+> Add a patch to store the reboot_timeout as little endian
+> Fix the endian issue per Thomas's review
 
---EgVrEAR5UttbsTXg
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+The test still aborts on a big endian host:
 
-On Wed, Apr 24, 2019 at 07:38:57PM +0300, Liran Alon wrote:
->=20
->=20
-> > On 18 Apr 2019, at 12:41, Stefan Hajnoczi <stefanha@gmail.com> wrote:
-> >=20
-> > On Tue, Apr 16, 2019 at 03:59:09PM +0300, Liran Alon wrote:
-> >> Hi,
-> >>=20
-> >> This patch series aims to add supprot to migrate a VM with a vhost-scs=
-i device.
-> >>=20
-> >> The 1st patch fixes a bug of mistakenly not stopping vhost-scsi backen=
-d when a
-> >> VM is stopped (As happens on migratino pre-copy completion).
-> >>=20
-> >> The 2nd patch adds ability to save/load vhost-scsi device state in VMS=
-tate.
-> >>=20
-> >> The 3rd and final paqtch adds a flag to vhost-scsi which allows admin =
-to specify
-> >> it's setup supports vhost-scsi migratino. For more detailed informatio=
-n on why
-> >> this is valid, see commit message of specific patch.
-> >>=20
-> >> Regards,
-> >> -Liran
-> >=20
-> > Looks fine for vhost_scsi.ko.  I have not checked how this interacts
-> > with vhost-user-scsi.
-> >=20
-> > Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
->=20
-> Gentle Ping.
+$ QTEST_QEMU_BINARY=x86_64-softmmu/qemu-system-x86_64 tests/fw_cfg-test
+/x86_64/fw_cfg/signature: OK
+/x86_64/fw_cfg/id: OK
+/x86_64/fw_cfg/uuid: OK
+/x86_64/fw_cfg/ram_size: OK
+/x86_64/fw_cfg/nographic: OK
+/x86_64/fw_cfg/nb_cpus: OK
+/x86_64/fw_cfg/max_cpus: OK
+/x86_64/fw_cfg/numa: OK
+/x86_64/fw_cfg/boot_menu: OK
+/x86_64/fw_cfg/reboot_timeout: **
+ERROR:/home/thuth/devel/qemu/tests/fw_cfg-test.c:190:test_fw_cfg_reboot_timeout:
+assertion failed (reboot_timeout == 15): (251658240 == 15)
+Aborted
 
-This should go either through Michael's virtio/vhost tree or Paolo's
-SCSI tree.
+251658240 is 0x0F000000, i.e. a byte-swapped 0xf = 15 ... i.e. you still
+got an endianess issue somewhere in the code.
 
-Stefan
-
---EgVrEAR5UttbsTXg
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEcBAEBAgAGBQJcwXH7AAoJEJykq7OBq3PIoZMH/i8cF/6RyjMqK/KE38KeS6fU
-LgcrxlIz5QO6ejRaaRtTsjoMV5ewKrj5lVjUa+i86ONdnx4XTuG22J11QndAWhJD
-26Zl2Hg8uEKi5OdVWoHRe+7XxCzyu5uPRF7Y1Cv64wUBX8qmEdjmkjlB3kOd5l0L
-XEDNMn+fiTi6c4MGfjWjapL+cM/513PVkpRDKa93gcmiTdodi5WOwbu2+7TAOJS6
-S19uQEcthNCzxyOWa2ZqVgkWfeJQCVQ92hT8Upok7JpRXyQkLv3ckQ/Ub7Zet7Md
-6sTBNE3VQ7M+oJDmt0mGDPC5Hc68hJ0oZ2cv6s13FL7dhYk1O+lEtawcVfHS3yo=
-=9V17
------END PGP SIGNATURE-----
-
---EgVrEAR5UttbsTXg--
+ Thomas
 
