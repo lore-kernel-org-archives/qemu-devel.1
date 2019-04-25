@@ -6,78 +6,78 @@ X-Spam-Status: No, score=-6.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 13A38C43218
-	for <qemu-devel@archiver.kernel.org>; Thu, 25 Apr 2019 16:19:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4810EC43218
+	for <qemu-devel@archiver.kernel.org>; Thu, 25 Apr 2019 16:22:29 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6B92E20651
-	for <qemu-devel@archiver.kernel.org>; Thu, 25 Apr 2019 16:19:38 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6B92E20651
+	by mail.kernel.org (Postfix) with ESMTPS id 978CC2077C
+	for <qemu-devel@archiver.kernel.org>; Thu, 25 Apr 2019 16:22:29 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 978CC2077C
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:60224 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:60287 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hJh61-00049J-3c
-	for qemu-devel@archiver.kernel.org; Thu, 25 Apr 2019 12:19:37 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:48555)
+	id 1hJh8m-0006P5-2R
+	for qemu-devel@archiver.kernel.org; Thu, 25 Apr 2019 12:22:28 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:47269)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1hJh49-0002e2-N4
-	for qemu-devel@nongnu.org; Thu, 25 Apr 2019 12:17:42 -0400
+	(envelope-from <philmd@redhat.com>) id 1hJh0d-0007MB-Gs
+	for qemu-devel@nongnu.org; Thu, 25 Apr 2019 12:14:04 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1hJh48-0001v5-MB
-	for qemu-devel@nongnu.org; Thu, 25 Apr 2019 12:17:41 -0400
-Received: from mail-wr1-f67.google.com ([209.85.221.67]:37744)
+	(envelope-from <philmd@redhat.com>) id 1hJh0c-0007Eo-I1
+	for qemu-devel@nongnu.org; Thu, 25 Apr 2019 12:14:03 -0400
+Received: from mail-wr1-f68.google.com ([209.85.221.68]:42954)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1hJh48-0001tk-FP
-	for qemu-devel@nongnu.org; Thu, 25 Apr 2019 12:17:40 -0400
-Received: by mail-wr1-f67.google.com with SMTP id r6so249352wrm.4
-	for <qemu-devel@nongnu.org>; Thu, 25 Apr 2019 09:17:39 -0700 (PDT)
+	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1hJh0c-0007CY-CM
+	for qemu-devel@nongnu.org; Thu, 25 Apr 2019 12:14:02 -0400
+Received: by mail-wr1-f68.google.com with SMTP id g3so189620wrx.9
+	for <qemu-devel@nongnu.org>; Thu, 25 Apr 2019 09:14:01 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
 	d=1e100.net; s=20161025;
 	h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
 	:date:user-agent:mime-version:in-reply-to:content-language
 	:content-transfer-encoding;
-	bh=9qW7zLFfth7jP3Wy/j83eS64gALbJ+VrjdxLUYXJRCM=;
-	b=abDxZdw+n0FtUUMtO09NTPGBGmj5DDYxgXuoDF0UepF6BdWr4gwLmVFSDf3iXg4yV2
-	ZnGiY2NhFHCZkpEQcxqeJ/bIwaIfCYqdUiCWKu6KLCpo0cEpDO7fTAWbvcqXBFgfjtAx
-	+HmY+WcVJRHex17CQtSHdxVtK2rS3geZXtWd0BNLZNmt67wCUaXiOv5a8ogTnv0z+/Sw
-	D+ImMSso+IR/Eq4DtKfD2e13zJtFFofSCibbQRAR4ZrWLv0xVPOldbS0RXynDY50vrgG
-	S6VFFwbgxLKLu6LrQkc26Ey+a2rMt1ENObFgV/XIeiud9RIglr3oa7eI3GXfJOZZchv1
-	Oh4Q==
-X-Gm-Message-State: APjAAAX1rSBuh1N/XGZAVW3efSMoXVaqScDC8TQWe3bQ0Uncd1dLE9en
-	2auQLZbYEj1lx8xJ8UJDeyiFBA==
-X-Google-Smtp-Source: APXvYqzEkG91qkPC/ghozJ0ybpuvSltjZxqlRUcetwGAzsRjgrV9Dk664WUMr4Pvn4ZddrGMPgF64g==
-X-Received: by 2002:adf:f68c:: with SMTP id v12mr10211271wrp.40.1556209058552; 
-	Thu, 25 Apr 2019 09:17:38 -0700 (PDT)
+	bh=XRVpDPjBZmvBUFFN8JJzxRXHwosnKacJS2q315hBj8U=;
+	b=cOZDNZycaR1RaB/vZTo17j1iFAwDH/PZNT5zKkSRbYAEvBjM88d80PX4PQ+xNrm09S
+	h8VebwaTjGsP3gIdobmFpAFjus6wjfV3grPG18sv6Mux/mBLDqZhdGjaw4lqpe7F4uJV
+	lmSE+tRlYJTwPAJvHgcYQj/2epjo5XmytJ/L/4qsIbEO1/Tcibvg8uRs6vZBUCXHNgEC
+	kp/CFNAiib9+gu1zCboPsMK10/5AnQm1ydIq3BUX1iDYNzHv4QHY9FwYcmuew+HLYWUy
+	v/YJdvkh88cqf82HfLlv3hGqlreFR1m1AFP7Z8WgUQtL/IR6iF+p8ic/N0HFpye80mJ8
+	C8Dw==
+X-Gm-Message-State: APjAAAVlbAX2rZh9TSRVlWhDenKQJfaI1hAQMqVNUdFXG7v1T0QCRn2y
+	CofDxwsjIUHWtMpWJ009b7CqEg==
+X-Google-Smtp-Source: APXvYqzJ9Jg6meoIlnDu+knPE4bOE/WCCIyb7RyYry2SlSOqjA63jFL18kuCq2z3rOEa8pPfAbWVgA==
+X-Received: by 2002:a5d:464f:: with SMTP id j15mr4840548wrs.265.1556208841063; 
+	Thu, 25 Apr 2019 09:14:01 -0700 (PDT)
 Received: from [192.168.1.25] (abayonne-654-1-209-122.w109-222.abo.wanadoo.fr.
-	[109.222.216.122]) by smtp.gmail.com with ESMTPSA id
-	o4sm28868699wmo.20.2019.04.25.09.17.36
+	[109.222.216.122])
+	by smtp.gmail.com with ESMTPSA id q3sm575941wre.31.2019.04.25.09.13.59
 	(version=TLS1_3 cipher=AEAD-AES128-GCM-SHA256 bits=128/128);
-	Thu, 25 Apr 2019 09:17:38 -0700 (PDT)
+	Thu, 25 Apr 2019 09:14:00 -0700 (PDT)
 To: Thomas Huth <thuth@redhat.com>, yang.zhong@intel.com,
 	Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org,
 	pbonzini@redhat.com
 References: <20190418180057.3593-1-thuth@redhat.com>
-	<20190418180057.3593-14-thuth@redhat.com>
+	<20190418180057.3593-25-thuth@redhat.com>
 From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
 Openpgp: id=89C1E78F601EE86C867495CBA2A3FD6EDEADC0DE;
 	url=http://pgp.mit.edu/pks/lookup?op=get&search=0xA2A3FD6EDEADC0DE
-Message-ID: <0dc4aa08-a0be-ab33-a717-7b8e488e63fc@redhat.com>
-Date: Thu, 25 Apr 2019 18:17:36 +0200
+Message-ID: <4fcfff75-aa44-e1cc-2e14-38faba3a3e47@redhat.com>
+Date: Thu, 25 Apr 2019 18:13:58 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
 	Thunderbird/60.6.1
 MIME-Version: 1.0
-In-Reply-To: <20190418180057.3593-14-thuth@redhat.com>
+In-Reply-To: <20190418180057.3593-25-thuth@redhat.com>
 Content-Type: text/plain; charset="UTF-8"
 Content-Language: en-US
 Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 	[fuzzy]
-X-Received-From: 209.85.221.67
-Subject: Re: [Qemu-devel] [PATCH for-QEMU-4.1 v5 13/29] hw/arm: Express
- dependencies of xilinx-zynq with Kconfig
+X-Received-From: 209.85.221.68
+Subject: Re: [Qemu-devel] [PATCH for-QEMU-4.1 v5 24/29] hw/arm: Express
+ dependencies for remaining IMX boards with Kconfig
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -106,81 +106,86 @@ Cc: Rob Herring <robh@kernel.org>, Jan Kiszka <jan.kiszka@web.de>,
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190425161736.C09-7SVcjSxpG7UbXCZzqvNbV7GniPSbq48KnX3I8fk@z>
+Message-ID: <20190425161358.fsqw-sVnBN4zMJ9bGEjSakumYspSUjrdboSY8_R_uaY@z>
 
 On 4/18/19 8:00 PM, Thomas Huth wrote:
-> Add Kconfig dependencies for the xilinx-zynq-a9 board.
-> This patch is based on earlier work by Ákos Kovács (i.e.
-> his "hw/arm/Kconfig: Add ARM Kconfig" patch).
+> IMX25, IMX7 and IMX6UL were still missing the Kconfig dependencies.
 > 
 > Signed-off-by: Thomas Huth <thuth@redhat.com>
 
 Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
 
 > ---
->  default-configs/arm-softmmu.mak |  7 +------
->  hw/arm/Kconfig                  | 12 ++++++++++++
->  2 files changed, 13 insertions(+), 6 deletions(-)
+>  default-configs/arm-softmmu.mak |  2 --
+>  hw/arm/Kconfig                  | 19 +++++++++++++++++++
+>  2 files changed, 19 insertions(+), 2 deletions(-)
 > 
 > diff --git a/default-configs/arm-softmmu.mak b/default-configs/arm-softmmu.mak
-> index f39a854f2e..af78e7c892 100644
+> index 1455d083d8..6dc388c43e 100644
 > --- a/default-configs/arm-softmmu.mak
 > +++ b/default-configs/arm-softmmu.mak
-> @@ -19,6 +19,7 @@ CONFIG_STELLARIS=y
->  CONFIG_REALVIEW=y
->  CONFIG_VERSATILE=y
->  CONFIG_VEXPRESS=y
-> +CONFIG_ZYNQ=y
->  CONFIG_MAINSTONE=y
->  CONFIG_GUMSTIX=y
->  CONFIG_SPITZ=y
-> @@ -38,16 +39,11 @@ CONFIG_VIRTIO_MMIO=y
+> @@ -37,7 +37,6 @@ CONFIG_SABRELITE=y
+>  CONFIG_EMCRAFT_SF2=y
 >  
->  CONFIG_NETDUINO2=y
+>  CONFIG_VGA=y
+> -CONFIG_IMX_FEC=y
 >  
-> -CONFIG_PL330=y
-> -CONFIG_CADENCE=y
->  CONFIG_FRAMEBUFFER=y
-> -CONFIG_XILINX_SPIPS=y
-> -CONFIG_ZYNQ_DEVCFG=y
+>  CONFIG_NRF51_SOC=y
 >  
->  CONFIG_DIGIC=y
->  CONFIG_MPS2=y
->  CONFIG_RASPI=y
-> -CONFIG_ZYNQ=y
->  CONFIG_STM32F2XX_TIMER=y
->  CONFIG_STM32F2XX_USART=y
->  CONFIG_STM32F2XX_SYSCFG=y
-> @@ -100,7 +96,6 @@ CONFIG_SMBUS_EEPROM=y
->  CONFIG_GPIO_KEY=y
->  CONFIG_MSF2=y
->  CONFIG_FW_CFG_DMA=y
-> -CONFIG_XILINX_AXI=y
->  CONFIG_PCI_EXPRESS_DESIGNWARE=y
->  
->  CONFIG_STRONGARM=y
+> @@ -49,4 +48,3 @@ CONFIG_PCIE_PORT=y
+>  CONFIG_XIO3130=y
+>  CONFIG_IOH3420=y
+>  CONFIG_I82801B11=y
+> -CONFIG_PCI_EXPRESS_DESIGNWARE=y
 > diff --git a/hw/arm/Kconfig b/hw/arm/Kconfig
-> index 101de74260..785e383411 100644
+> index f5cd63860d..58439c492a 100644
 > --- a/hw/arm/Kconfig
 > +++ b/hw/arm/Kconfig
-> @@ -201,6 +201,18 @@ config VEXPRESS
+> @@ -283,6 +283,10 @@ config XLNX_VERSAL
 >  
->  config ZYNQ
+>  config FSL_IMX25
 >      bool
-> +    select A9MPCORE
-> +    select CADENCE # UART
-> +    select PFLASH_CFI02
-> +    select PL330
-> +    select SDHCI
-> +    select SSI_M25P80
-> +    select USB_EHCI_SYSBUS
-> +    select XILINX # UART
-> +    select XILINX_AXI
-> +    select XILINX_SPI
-> +    select XILINX_SPIPS
-> +    select ZYNQ_DEVCFG
+> +    select IMX
+> +    select IMX_FEC
+> +    select IMX_I2C
+> +    select DS1338
 >  
->  config ARM_V7M
+>  config FSL_IMX31
+>      bool
+> @@ -296,6 +300,7 @@ config FSL_IMX6
+>      select A9MPCORE
+>      select IMX
+>      select IMX_I2C
+> +    select SDHCI
+>  
+>  config ASPEED_SOC
+>      bool
+> @@ -321,12 +326,26 @@ config MPS2
+>  
+>  config FSL_IMX7
+>      bool
+> +    imply PCI_DEVICES
+> +    imply TEST_DEVICES
+> +    select A15MPCORE
+> +    select PCI
+> +    select IMX
+> +    select IMX_FEC
+> +    select IMX_I2C
+> +    select PCI_EXPRESS_DESIGNWARE
+> +    select SDHCI
+>  
+>  config ARM_SMMUV3
+>      bool
+>  
+>  config FSL_IMX6UL
+>      bool
+> +    select A15MPCORE
+> +    select IMX
+> +    select IMX_FEC
+> +    select IMX_I2C
+> +    select SDHCI
+>  
+>  config NRF51_SOC
 >      bool
 > 
 
