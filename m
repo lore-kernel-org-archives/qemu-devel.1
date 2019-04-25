@@ -1,30 +1,23 @@
-Received: from eggs.gnu.org ([209.51.188.92]:54176)
+Received: from eggs.gnu.org ([209.51.188.92]:54321)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <liq3ea@gmail.com>) id 1hJZlq-0005qI-TQ
-	for qemu-devel@nongnu.org; Thu, 25 Apr 2019 04:30:19 -0400
+	(envelope-from <stefanha@gmail.com>) id 1hJZmM-0006MA-4f
+	for qemu-devel@nongnu.org; Thu, 25 Apr 2019 04:30:51 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <liq3ea@gmail.com>) id 1hJZlp-0003Fu-VL
-	for qemu-devel@nongnu.org; Thu, 25 Apr 2019 04:30:18 -0400
-Received: from mail-oi1-x244.google.com ([2607:f8b0:4864:20::244]:36717)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <liq3ea@gmail.com>) id 1hJZlp-0003EQ-Pg
-	for qemu-devel@nongnu.org; Thu, 25 Apr 2019 04:30:17 -0400
-Received: by mail-oi1-x244.google.com with SMTP id l203so16517802oia.3
-	for <qemu-devel@nongnu.org>; Thu, 25 Apr 2019 01:30:17 -0700 (PDT)
+	(envelope-from <stefanha@gmail.com>) id 1hJZmL-0003Za-6r
+	for qemu-devel@nongnu.org; Thu, 25 Apr 2019 04:30:50 -0400
+Date: Thu, 25 Apr 2019 09:30:45 +0100
+From: Stefan Hajnoczi <stefanha@gmail.com>
+Message-ID: <20190425083045.GC30231@stefanha-x1.localdomain>
+References: <c47aea74-cec7-0369-591e-e1b1fdddc3e6@huawei.com>
+	<20190423094217.GC6022@redhat.com>
 MIME-Version: 1.0
-References: <20190420100056.116305-1-liq3ea@163.com>
-	<20190420100056.116305-4-liq3ea@163.com>
-	<a27cd912-4f58-55ac-1aae-e4999fa3d84d@redhat.com>
-	<CAKXe6SJZWs7HtXutX6W3saDhaNDtVPMQEh2+s+9XiM3TtZqLdQ@mail.gmail.com>
-	<20190425081519.n4leez6sz2wlvpla@sirius.home.kraxel.org>
-In-Reply-To: <20190425081519.n4leez6sz2wlvpla@sirius.home.kraxel.org>
-From: Li Qiang <liq3ea@gmail.com>
-Date: Thu, 25 Apr 2019 16:29:39 +0800
-Message-ID: <CAKXe6SKvkJxauOPmBMS+CDPq9NS0qKpydkyOAuS7mHVrA8JVbQ@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH 3/4] tests: fw_cfg: add reboot_timeout test
- case
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="1SQmhf2mF2YjsYvc"
+Content-Disposition: inline
+In-Reply-To: <20190423094217.GC6022@redhat.com>
+Subject: Re: [Qemu-devel]
+ =?utf-8?q?=5BQemu-block=5D__question=EF=BC=9A_Does_?=
+ =?utf-8?q?qemu-pr-helper_have_its_own_log_files=EF=BC=9F?=
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,39 +26,49 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Gerd Hoffmann <kraxel@redhat.com>
-Cc: Thomas Huth <thuth@redhat.com>, Li Qiang <liq3ea@163.com>, lvivier@redhat.com, Paolo Bonzini <pbonzini@redhat.com>, =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>, Laszlo Ersek <lersek@redhat.com>, Qemu Developers <qemu-devel@nongnu.org>
-
-Gerd Hoffmann <kraxel@redhat.com> =E4=BA=8E2019=E5=B9=B44=E6=9C=8825=E6=97=
-=A5=E5=91=A8=E5=9B=9B =E4=B8=8B=E5=8D=884:15=E5=86=99=E9=81=93=EF=BC=9A
-
-> On Wed, Apr 24, 2019 at 09:16:56AM +0800, Li Qiang wrote:
-> > Thomas Huth <thuth@redhat.com> =E4=BA=8E2019=E5=B9=B44=E6=9C=8824=E6=97=
-=A5=E5=91=A8=E4=B8=89 =E4=B8=8A=E5=8D=8812:29=E5=86=99=E9=81=93=EF=BC=9A
-> >
-> > > Is this endianess-safe? Or do you need to byteswap reboot_timeout if
-> the
-> > > host and guest endianess does not match?
-> >
-> > Good question!
-> >
-> > IIUC, the qemu fw_cfg store the 'file' entry data just in byte stream.
->
-> No.  Integers are defined to be little endian.  See fw_cfg_add_i64() for
-> example, there is an explicit cpu_to_le64() call for that.
->
+To: Daniel =?iso-8859-1?Q?P=2E_Berrang=E9?= <berrange@redhat.com>
+Cc: Jie Wang <wangjie88@huawei.com>, "Zhangbo (Oscar)" <oscar.zhangbo@huawei.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org, "Fangyi (C)" <eric.fangyi@huawei.com>
 
 
-Yes, for the fw_cfg 'integer' entry it is stored as little endian.
-But for the fw_cfg 'file' entry interpred as an integer, there is no
-specify the endianess.
+--1SQmhf2mF2YjsYvc
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-Thanks,
-Li Qiang
+On Tue, Apr 23, 2019 at 10:42:17AM +0100, Daniel P. Berrang=C3=A9 wrote:
+> On Tue, Apr 23, 2019 at 11:12:40AM +0800, Jie Wang wrote:
+> > =C2=A0Does qemu-pr-helper have its own log files=EF=BC=9F
+>=20
+> When QEMU launches it, i think it just inherits stdout/err from
+> QEMU itself, so errors appear mixed into QEMU's stdout output.
 
+I thought QEMU does not launch qemu-pr-helper.  Have I missed something?
 
+QEMU ships systemd .service and .socket files for managing
+qemu-pr-helper externally.
 
-> cheers,
->   Gerd
->
->
+> When libvirt launches it, there stdout is connected to /dev/null
+> and stderr is connected to a pipe which libvirt closes almost
+> immediately. This means any errors are lost as any attempt to
+> write to stderr will get EPIPE :-(
+
+For anyone looking at the code:
+src/qemu/qemu_process.c:qemuProcessStartManagedPRDaemon()
+
+Stefan
+
+--1SQmhf2mF2YjsYvc
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEcBAEBAgAGBQJcwXA1AAoJEJykq7OBq3PI/QoH/3PwwjgmRYq6fAoTt4Xu6FBU
+siKILMWL7wMWjzvxUIs+JY2ZeOXbvci6mT0zOvGqhNAiQANKVNhUunze576ZtFlD
+Ug2ePB4AuU3ccwAElR0zpJoneoJMU1T6ksIxLh4V/NwBDtQL1dNYFN7VSulLKxbo
+YMI0BZQ8ky7eZXCx7nSmHgF9BtdjxLqsvPMDtmSkOb6SXpnneTq+6FQRYTImSYEt
+o5Gp/bcc5NTgc67/tGfSPCEl1qqDdEQ6YN/S/mSk8tZkcbqoDpX0J/tpp4oDThI3
+g1o5yFTOHxeExtsk+Vff7bDXg3QRC+0gyn+IFA8XX8opWlOglN89SlR8qZceUL8=
+=0xgx
+-----END PGP SIGNATURE-----
+
+--1SQmhf2mF2YjsYvc--
