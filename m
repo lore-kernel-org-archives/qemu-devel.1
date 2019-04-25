@@ -4,82 +4,82 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-6.7 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+	SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AF928C10F03
-	for <qemu-devel@archiver.kernel.org>; Thu, 25 Apr 2019 03:33:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1FDF6C282DD
+	for <qemu-devel@archiver.kernel.org>; Thu, 25 Apr 2019 03:33:10 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 72471214AE
-	for <qemu-devel@archiver.kernel.org>; Thu, 25 Apr 2019 03:33:04 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id DBDF3214AE
+	for <qemu-devel@archiver.kernel.org>; Thu, 25 Apr 2019 03:33:09 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=sifive.com header.i=@sifive.com header.b="Pmb0L2u2"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 72471214AE
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=sifive.com header.i=@sifive.com header.b="KAqF7EdY"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DBDF3214AE
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=sifive.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:50592 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:50594 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hJV8B-0004TF-NQ
-	for qemu-devel@archiver.kernel.org; Wed, 24 Apr 2019 23:33:03 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:53088)
+	id 1hJV8H-0004ZK-5v
+	for qemu-devel@archiver.kernel.org; Wed, 24 Apr 2019 23:33:09 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:53112)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <palmer@sifive.com>) id 1hJV6n-0003v7-42
-	for qemu-devel@nongnu.org; Wed, 24 Apr 2019 23:31:38 -0400
+	(envelope-from <palmer@sifive.com>) id 1hJV6p-0003va-6r
+	for qemu-devel@nongnu.org; Wed, 24 Apr 2019 23:31:40 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <palmer@sifive.com>) id 1hJV6m-0008QY-04
-	for qemu-devel@nongnu.org; Wed, 24 Apr 2019 23:31:37 -0400
-Received: from mail-pf1-x443.google.com ([2607:f8b0:4864:20::443]:35870)
+	(envelope-from <palmer@sifive.com>) id 1hJV6n-0008Rf-Be
+	for qemu-devel@nongnu.org; Wed, 24 Apr 2019 23:31:39 -0400
+Received: from mail-pg1-x542.google.com ([2607:f8b0:4864:20::542]:41924)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <palmer@sifive.com>) id 1hJV6l-0008OM-N1
-	for qemu-devel@nongnu.org; Wed, 24 Apr 2019 23:31:35 -0400
-Received: by mail-pf1-x443.google.com with SMTP id z5so10394019pfn.3
-	for <qemu-devel@nongnu.org>; Wed, 24 Apr 2019 20:31:35 -0700 (PDT)
+	(Exim 4.71) (envelope-from <palmer@sifive.com>) id 1hJV6n-0008Qq-5i
+	for qemu-devel@nongnu.org; Wed, 24 Apr 2019 23:31:37 -0400
+Received: by mail-pg1-x542.google.com with SMTP id f6so10423836pgs.8
+	for <qemu-devel@nongnu.org>; Wed, 24 Apr 2019 20:31:37 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=sifive.com; s=google;
 	h=date:subject:in-reply-to:cc:from:to:message-id:mime-version
 	:content-transfer-encoding;
-	bh=j1bdBX9DR+a2UlKdjzSodQr+4tFLxRnCT8oGf6airtM=;
-	b=Pmb0L2u2Ffhb3Hm5XnqnV20SVMdfuviL3+Ec1svlyuoYZxoIV0oRgEoUbO8OzJakUk
-	ApRaLYBiwySYuFEvTV4hSlPMhXkRJZRVh5FFVEYj1lqIkesg97NOTTot4LqLoJoLWlOO
-	JQ70Sv+jWbTnDEC2e+cKbEStY+j2DwUlxXRklrJaQFiqP3M3Bsl6NTRiIIOFgUWfkWfG
-	Yagjk9bZ4j6bSOjQQAoRyjCpW4lXYrnwvIiDpHwYV3yqF3tcBTXv5Iwq7m5T+Xx0z460
-	ATE3w2wQLZipnojTGQ2jfJyJZk2EgPEWGO+AS87eGXwj4A7xyYQXVwFG7xspMaj6oZVG
-	uFlg==
+	bh=uUzPpclpaSMI7fsm1VBAyEEh86pyGptcQuyv4nm43AI=;
+	b=KAqF7EdYFsBJirwLbslKpU2tIwbbX7n+JFYFqpqW+7xIl/Qa24pnK4gHTxPcrRBxPI
+	ByFkSs41pV1xx1JB1N7FRJGkINQIb+EQ+d/oZp4W6kdeaeZaqzqi7k5y+EnRs9XoDjfe
+	o1yVLANQs7odegVoz0f3LBkV1uqmZ1GfVGvNamoRjszMP33SPiWc0yhH8gz590dlbZk4
+	c+CiTOflpq6OyCdXZRYGx1kHzGAqIL+EA5bj6+TcxJ1P0P2edVra5dxDO+krnyBgcc0h
+	8EQWFZtTFjx8FFq/8v+7UvtI0J7qZ4Legtv1lebzTH8bnrDQsHDB+z0Yurq+IocqtvVf
+	rvwg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
 	d=1e100.net; s=20161025;
 	h=x-gm-message-state:date:subject:in-reply-to:cc:from:to:message-id
 	:mime-version:content-transfer-encoding;
-	bh=j1bdBX9DR+a2UlKdjzSodQr+4tFLxRnCT8oGf6airtM=;
-	b=WLzxIm8CXRf3DpHgplyhRwY8pGwfTjG8cvR2F95uzteLSgkn/0ioJeKKWghQ+NYrw0
-	J3rdz8fIc9v/gVgbio3AqF1OucsIec8l/p+c+1FKFCGJKCTWa6oCR8+swdtIDJOjROhu
-	XboX0QE2+8TyD5arZHo/JO+O6mGiZyOZOZbg8aOA1r9ixQmTdPqM+itTwmN5QyAXOlaj
-	lRdC76GXY2KqzhoIUO6Fr1/3LgLMG3YnaVvtNQYZ6oWjYoSdi1dUcVyMr4S+JkE8xeuP
-	XQiLJlohsemGTkX6PNgZ+yMGrI1Baw250oQVHr1ey9fOyaCKzTKf1Ck+Ixp9JIe5mhc8
-	+lEw==
-X-Gm-Message-State: APjAAAXYhmlXua27QTZV3pyvcQ7YuGpsnRTUB8Nzisg/n1X8vUCNdvzU
-	eWui9DXaMIq8Cw6++sd0Zs6KnKxFNOzSug==
-X-Google-Smtp-Source: APXvYqzpnrVXT/VtZ5K/2gMhHnvPQCP4Y0ak9DIIAlm25HRQBtR9Cz2sY/jyzmEB/nfUni7NffoUUw==
-X-Received: by 2002:aa7:83d1:: with SMTP id j17mr37569076pfn.78.1556163093368; 
-	Wed, 24 Apr 2019 20:31:33 -0700 (PDT)
+	bh=uUzPpclpaSMI7fsm1VBAyEEh86pyGptcQuyv4nm43AI=;
+	b=DEN5FOZyGKgbxsNYPvxIGzJ6PkVl9s/NZb6237jzattcwCudUjUxg8sNLNpfXSZI/V
+	tDmXi0i0SvaaiMbd16P6B0ITRfx44gbdVx2oQSk9dDOT7zToNS/R8YPXtbrujIWqphjd
+	gw98dq5T1YlVjqqTED77xNG7C1lAFVDQOCNuMKxBpIebJ8dajWW5EtHXn7bIRflJkz4J
+	eRBOXPXUAfLf4EXdL/7zMw+bTrxsgB/pIfMA3hq6g5aeusVgoseeQFLIxBKGq5hmmyvS
+	7nt197RabvkuzqaaA5QsgZc0gxFaF22T47MJ4UwH65GLPc93r9C/yTTqq/LTLGVpbX/x
+	vgHw==
+X-Gm-Message-State: APjAAAVix4d3gaLMcTbduR5t0AcrsRH/qIodIfFqo/zKF8iZXbEohag8
+	ZBknNiUVIY227p0VDAWFFYv7fumgb0zCbw==
+X-Google-Smtp-Source: APXvYqywoH82wXN3iImfWH/690jSk6A11ExwtMAgVL+Ly2AaV7xB5PPhTQ9qa5aw1nNRWud4ITX8Ow==
+X-Received: by 2002:a62:595d:: with SMTP id n90mr8991721pfb.112.1556163095279; 
+	Wed, 24 Apr 2019 20:31:35 -0700 (PDT)
 Received: from localhost ([67.51.191.132]) by smtp.gmail.com with ESMTPSA id
-	b7sm39531840pfj.67.2019.04.24.20.31.32
+	10sm57749606pft.100.2019.04.24.20.31.34
 	(version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
-	Wed, 24 Apr 2019 20:31:32 -0700 (PDT)
-Date: Wed, 24 Apr 2019 20:31:32 -0700 (PDT)
-X-Google-Original-Date: Wed, 24 Apr 2019 16:39:54 PDT (-0700)
-In-Reply-To: <20190401031155.21293-2-richard.henderson@linaro.org>
+	Wed, 24 Apr 2019 20:31:34 -0700 (PDT)
+Date: Wed, 24 Apr 2019 20:31:34 -0700 (PDT)
+X-Google-Original-Date: Wed, 24 Apr 2019 16:40:46 PDT (-0700)
+In-Reply-To: <20190401031155.21293-3-richard.henderson@linaro.org>
 From: Palmer Dabbelt <palmer@sifive.com>
 To: richard.henderson@linaro.org
-Message-ID: <mhng-4fc40e41-5464-469e-9334-1edc4f8294e3@palmer-si-x1e>
+Message-ID: <mhng-d8a9c6b1-6c19-45a3-ba27-f8fc88bdc933@palmer-si-x1e>
 Mime-Version: 1.0 (MHng)
 Content-Type: text/plain; charset="UTF-8"; format="flowed"
 Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
 	recognized.
-X-Received-From: 2607:f8b0:4864:20::443
-Subject: Re: [Qemu-devel] [PATCH for-4.1 1/8] target/riscv: Name the
- argument sets for all of insn32 formats
+X-Received-From: 2607:f8b0:4864:20::542
+Subject: Re: [Qemu-devel] [PATCH for-4.1 2/8] target/riscv: Use
+ --static-decode for decodetree
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -97,55 +97,61 @@ Cc: Bastian Koppelmann <kbastian@mail.uni-paderborn.de>,
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190425033132.u1chwhm1PNST_pMrFfLHLNVVli_AJimkpF5__GTUaMo@z>
+Message-ID: <20190425033134.PkpQWGU4T3B7BbMpTYNHUOy-hqi1H5Dl1uTS9twZvls@z>
 
-On Sun, 31 Mar 2019 20:11:48 PDT (-0700), richard.henderson@linaro.org wrote:
+On Sun, 31 Mar 2019 20:11:49 PDT (-0700), richard.henderson@linaro.org wrote:
+> The generated functions are only used within translate.c
+> and do not need to be global, or declared.
+>
 > Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 > ---
->  target/riscv/insn32.decode | 10 +++++++---
->  1 file changed, 7 insertions(+), 3 deletions(-)
+>  target/riscv/translate.c   | 2 --
+>  target/riscv/Makefile.objs | 8 ++++----
+>  2 files changed, 4 insertions(+), 6 deletions(-)
 >
-> diff --git a/target/riscv/insn32.decode b/target/riscv/insn32.decode
-> index 6f3ab7aa52..77f794ed70 100644
-> --- a/target/riscv/insn32.decode
-> +++ b/target/riscv/insn32.decode
-> @@ -34,9 +34,13 @@
->  %imm_u    12:s20                 !function=ex_shift_12
+> diff --git a/target/riscv/translate.c b/target/riscv/translate.c
+> index dd763647ea..7ebd590486 100644
+> --- a/target/riscv/translate.c
+> +++ b/target/riscv/translate.c
+> @@ -538,7 +538,6 @@ static int ex_rvc_register(int reg)
+>      return 8 + reg;
+>  }
 >
->  # Argument sets:
-> +&empty
-
-If I understand decodetree correctly, this isn't used until patch 5.
-Otherwise,
+> -bool decode_insn32(DisasContext *ctx, uint32_t insn);
+>  /* Include the auto-generated decoder for 32 bit insn */
+>  #include "decode_insn32.inc.c"
+>
+> @@ -667,7 +666,6 @@ static bool gen_shift(DisasContext *ctx, arg_r *a,
+>  #include "insn_trans/trans_rvd.inc.c"
+>  #include "insn_trans/trans_privileged.inc.c"
+>
+> -bool decode_insn16(DisasContext *ctx, uint16_t insn);
+>  /* auto-generated decoder*/
+>  #include "decode_insn16.inc.c"
+>  #include "insn_trans/trans_rvc.inc.c"
+> diff --git a/target/riscv/Makefile.objs b/target/riscv/Makefile.objs
+> index 9c6c109327..c7a1b063ed 100644
+> --- a/target/riscv/Makefile.objs
+> +++ b/target/riscv/Makefile.objs
+> @@ -7,14 +7,14 @@ decode32-$(TARGET_RISCV64) += $(SRC_PATH)/target/riscv/insn32-64.decode
+>
+>  target/riscv/decode_insn32.inc.c: $(decode32-y) $(DECODETREE)
+>  	$(call quiet-command, \
+> -	  $(PYTHON) $(DECODETREE) -o $@ --decode decode_insn32 $(decode32-y), \
+> -	  "GEN", $(TARGET_DIR)$@)
+> +	  $(PYTHON) $(DECODETREE) -o $@ --static-decode decode_insn32 \
+> +          $(decode32-y), "GEN", $(TARGET_DIR)$@)
+>
+>  target/riscv/decode_insn16.inc.c: \
+>    $(SRC_PATH)/target/riscv/insn16.decode $(DECODETREE)
+>  	$(call quiet-command, \
+> -	  $(PYTHON) $(DECODETREE) -o $@ --decode decode_insn16 --insnwidth 16 $<, \
+> -	  "GEN", $(TARGET_DIR)$@)
+> +	  $(PYTHON) $(DECODETREE) -o $@ --static-decode decode_insn16 \
+> +          --insnwidth 16 $<, "GEN", $(TARGET_DIR)$@)
+>
+>  target/riscv/translate.o: target/riscv/decode_insn32.inc.c \
+>  	target/riscv/decode_insn16.inc.c
 
 Reviewed-by: Palmer Dabbelt <palmer@sifive.com>
-
-I don't care enough about this to make you re-spin the patch set, so I'm OK
-taking it as it stands unless there's anything else that crops up as I look
-through the rest of the patches...
-
-Thanks!
-
->  &b    imm rs2 rs1
->  &i    imm rs1 rd
-> +&j    imm rd
->  &r    rd rs1 rs2
-> +&s    imm rs1 rs2
-> +&u    imm rd
->  &shift     shamt rs1 rd
->  &atomic    aq rl rs2 rs1 rd
->
-> @@ -44,9 +48,9 @@
->  @r       .......   ..... ..... ... ..... ....... &r                %rs2 %rs1 %rd
->  @i       ............    ..... ... ..... ....... &i      imm=%imm_i     %rs1 %rd
->  @b       .......   ..... ..... ... ..... ....... &b      imm=%imm_b %rs2 %rs1
-> -@s       .......   ..... ..... ... ..... .......         imm=%imm_s %rs2 %rs1
-> -@u       ....................      ..... .......         imm=%imm_u          %rd
-> -@j       ....................      ..... .......         imm=%imm_j          %rd
-> +@s       .......   ..... ..... ... ..... ....... &s      imm=%imm_s %rs2 %rs1
-> +@u       ....................      ..... ....... &u      imm=%imm_u          %rd
-> +@j       ....................      ..... ....... &j      imm=%imm_j          %rd
->
->  @sh      ......  ...... .....  ... ..... ....... &shift  shamt=%sh10      %rs1 %rd
->  @csr     ............   .....  ... ..... .......               %csr     %rs1 %rd
 
