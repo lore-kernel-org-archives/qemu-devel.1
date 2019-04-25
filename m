@@ -2,82 +2,91 @@ Return-Path: <SRS0=VSQP=S3=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS autolearn=ham
+X-Spam-Status: No, score=-0.7 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DB4E2C43219
-	for <qemu-devel@archiver.kernel.org>; Thu, 25 Apr 2019 16:17:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DCCC8C43219
+	for <qemu-devel@archiver.kernel.org>; Thu, 25 Apr 2019 16:18:55 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 39CB520651
-	for <qemu-devel@archiver.kernel.org>; Thu, 25 Apr 2019 16:17:10 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 39CB520651
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 2411E20651
+	for <qemu-devel@archiver.kernel.org>; Thu, 25 Apr 2019 16:18:56 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="mhcFZvW5"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2411E20651
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:60200 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:60222 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hJh3c-0001dS-PL
-	for qemu-devel@archiver.kernel.org; Thu, 25 Apr 2019 12:17:08 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:47818)
+	id 1hJh5K-0003a8-Qx
+	for qemu-devel@archiver.kernel.org; Thu, 25 Apr 2019 12:18:54 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:47764)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1hJh22-0000Bp-Ik
-	for qemu-devel@nongnu.org; Thu, 25 Apr 2019 12:15:31 -0400
+	(envelope-from <richard.henderson@linaro.org>) id 1hJh1q-0008L2-M2
+	for qemu-devel@nongnu.org; Thu, 25 Apr 2019 12:15:19 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1hJh21-0008Je-Lt
-	for qemu-devel@nongnu.org; Thu, 25 Apr 2019 12:15:30 -0400
-Received: from mail-wm1-f67.google.com ([209.85.128.67]:36961)
+	(envelope-from <richard.henderson@linaro.org>) id 1hJh1p-0008Cr-UI
+	for qemu-devel@nongnu.org; Thu, 25 Apr 2019 12:15:18 -0400
+Received: from mail-pf1-x443.google.com ([2607:f8b0:4864:20::443]:44097)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1hJh21-0008Iz-Fc
-	for qemu-devel@nongnu.org; Thu, 25 Apr 2019 12:15:29 -0400
-Received: by mail-wm1-f67.google.com with SMTP id v14so61283wmf.2
-	for <qemu-devel@nongnu.org>; Thu, 25 Apr 2019 09:15:29 -0700 (PDT)
+	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+	id 1hJh1p-0008BG-N0
+	for qemu-devel@nongnu.org; Thu, 25 Apr 2019 12:15:17 -0400
+Received: by mail-pf1-x443.google.com with SMTP id y13so134679pfm.11
+	for <qemu-devel@nongnu.org>; Thu, 25 Apr 2019 09:15:17 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+	h=subject:to:cc:references:from:openpgp:message-id:date:user-agent
+	:mime-version:in-reply-to:content-language:content-transfer-encoding;
+	bh=7mbYizEmUBiE4p7G0c1ojVSDGX1keCabGEKT8GbczDw=;
+	b=mhcFZvW59E7OrZbqja73JGhbUEsgsNTyhxY6FYiZLYCFTmA11+dnq3oy8eOXOOmtHe
+	6TNgFyRvSAY1e/1PLkNdQ/HzOgKLsPxV5w2JSjUU0GakyWwqT50eT078r0Uql2b/Je/i
+	Bgvxxar/iGLZ3A17/r5h6kNku6HJs+HAi0Vc2V0nKLgZGaLYfr/VWRG5voNzXklQO66g
+	w2SZOPRONIUTXVNAhtPY7+geffZFPdyK8vLk9zRi1Frm3iNxnC2WPBmY+3lxhemBBxSa
+	HcYIUm/sopBvg49I4qBQ5t+9qlMOiOzitS9c4/MKBT2jVDA8fU1kQeFebhhoeSWEshWA
+	JjIA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
 	d=1e100.net; s=20161025;
 	h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
 	:date:user-agent:mime-version:in-reply-to:content-language
 	:content-transfer-encoding;
-	bh=fh8mKWZcw3h5WDOoN6WH2nwuSENuyzzm0jM4adsai34=;
-	b=M2JUqP6Spxs5j70CnkYF4Tw2RiVu6Twom23RQQiT9Lae+jr1VpRBJNMSRk12TGLR7O
-	KpW/i1vfNHyfZ04dNQyptSre0dtmxCxL0AAc9Vkv08rvhr07S0qsTgV4ukyeDHbMEmHz
-	JIWjaCAIUmb9mwB48D2ftwhKJe/JE7PqUozRNgYRqwXuAXTcd/gNm+lwuPipunkCsKis
-	SjUTKTM0n9fArRt0ZWHd8aFwBkcZi9Zarx0dF9ISr9GXFuakYlc74Dj+6g9EoF58pGWy
-	PYEb4980trzZQkK/tWtDkJBaGRMWNsyxLyT7YDbhOH7ljfv2DXzspLjLayCAMAr3rh+U
-	gqIA==
-X-Gm-Message-State: APjAAAUJL9PJhYqx6H7Cgk2niO4B2zpUo6cAvWKLFRgS+NmuyRwMezBA
-	D/8u1elpK5xJU3NqRZWnYaE5iw==
-X-Google-Smtp-Source: APXvYqxc3gLiIEgfSLvtkMqaqVnP9DPMXnHRyLTn4uDQVHbFFh8Ck8DkyKOPFgyOaYoq9xr9kTAXFg==
-X-Received: by 2002:a1c:3cc2:: with SMTP id j185mr4288211wma.26.1556208928341; 
-	Thu, 25 Apr 2019 09:15:28 -0700 (PDT)
-Received: from [192.168.1.25] (abayonne-654-1-209-122.w109-222.abo.wanadoo.fr.
-	[109.222.216.122]) by smtp.gmail.com with ESMTPSA id
-	e16sm29083432wrs.0.2019.04.25.09.15.24
-	(version=TLS1_3 cipher=AEAD-AES128-GCM-SHA256 bits=128/128);
-	Thu, 25 Apr 2019 09:15:27 -0700 (PDT)
-To: Thomas Huth <thuth@redhat.com>, yang.zhong@intel.com,
-	Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org,
-	pbonzini@redhat.com
-References: <20190418180057.3593-1-thuth@redhat.com>
-	<20190418180057.3593-28-thuth@redhat.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Openpgp: id=89C1E78F601EE86C867495CBA2A3FD6EDEADC0DE;
-	url=http://pgp.mit.edu/pks/lookup?op=get&search=0xA2A3FD6EDEADC0DE
-Message-ID: <ccb95efc-acda-6613-6056-08a08f107a9e@redhat.com>
-Date: Thu, 25 Apr 2019 18:15:23 +0200
+	bh=7mbYizEmUBiE4p7G0c1ojVSDGX1keCabGEKT8GbczDw=;
+	b=sXXb2FxPNQukSqe2NuK8n8GdH7YxpKfpF8BPW1xJWxk35AGd9jnJ2icwX7S/m6hYR7
+	X4VIPmOZ+Cxnu7tB/cCGKuuCxaYDoF86nGjnZ2EtME5Q5fchdrzA/J2mR8MvsIUTtpZX
+	pg9DqTbC7+Jx6IK+M4EdOS519hEpOZUrENcAV2JgsB6pb9HQ4/U8bvE9tdZN3yQEe1pj
+	m4eeKYTjey/A+IrKVswW287Ij4teeXdsQh/1oSqV+jcpGq7u/fJCfwIhyVKdfnG1Dc0D
+	Sb9QF4GC301NRCs/bRJV42++VaFBS70XYLZgpwPhIqnbDh1zfwxg/F5bufRnvZ5VypHJ
+	pinA==
+X-Gm-Message-State: APjAAAWawJ8wN9Vh6W4HHXdCyAKZoXjnHPUbk8E0EEIDc4PsZpV5tK8G
+	cvaZgg4smavpkc2GOzPBT3WSAw==
+X-Google-Smtp-Source: APXvYqzugL2NbhFhMIY0fcA85B6PFVrNCHtp/wpSBld+va70aJaEmgSszjVagRy4b93Y2vCJECnXnA==
+X-Received: by 2002:a63:fc43:: with SMTP id r3mr37529685pgk.44.1556208915937; 
+	Thu, 25 Apr 2019 09:15:15 -0700 (PDT)
+Received: from [192.168.1.11] (97-113-179-147.tukw.qwest.net. [97.113.179.147])
+	by smtp.gmail.com with ESMTPSA id
+	g63sm35484217pfc.127.2019.04.25.09.15.14
+	(version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+	Thu, 25 Apr 2019 09:15:15 -0700 (PDT)
+To: Palmer Dabbelt <palmer@sifive.com>
+References: <mhng-3e3866ac-838d-4c70-8dd4-880201b74b8a@palmer-si-x1e>
+From: Richard Henderson <richard.henderson@linaro.org>
+Openpgp: preference=signencrypt
+Message-ID: <c20ee4b9-d6c0-9bce-219b-24d3496cd460@linaro.org>
+Date: Thu, 25 Apr 2019 09:15:13 -0700
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
 	Thunderbird/60.6.1
 MIME-Version: 1.0
-In-Reply-To: <20190418180057.3593-28-thuth@redhat.com>
+In-Reply-To: <mhng-3e3866ac-838d-4c70-8dd4-880201b74b8a@palmer-si-x1e>
 Content-Type: text/plain; charset="UTF-8"
 Content-Language: en-US
 Content-Transfer-Encoding: 8bit
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-	[fuzzy]
-X-Received-From: 209.85.128.67
-Subject: Re: [Qemu-devel] [PATCH for-QEMU-4.1 v5 27/29] hw/arm: Express
- dependencies of the xlnx-versal-virt machine with Kconfig
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+	recognized.
+X-Received-From: 2607:f8b0:4864:20::443
+Subject: Re: [Qemu-devel] [PATCH for-4.1 3/8] target/riscv: Merge argument
+ sets for insn32 and insn16
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -89,51 +98,23 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Rob Herring <robh@kernel.org>, Jan Kiszka <jan.kiszka@web.de>,
-	Igor Mitsyanko <i.mitsyanko@gmail.com>, qemu-block@nongnu.org,
-	"Michael S. Tsirkin" <mst@redhat.com>,
-	Andrey Smirnov <andrew.smirnov@gmail.com>,
-	Alistair Francis <alistair@alistair23.me>,
-	Philippe Mathieu-Daude <f4bug@amsat.org>,
-	Jean-Christophe Dubois <jcd@tribudubois.net>,
-	Beniamino Galvani <b.galvani@gmail.com>, Andrew Jeffery <andrew@aj.id.au>,
-	Cedric Le Goater <clg@kaod.org>, qemu-arm@nongnu.org,
-	Peter Chubb <peter.chubb@nicta.com.au>, Gerd Hoffmann <kraxel@redhat.com>,
-	Antony Pavlov <antonynpavlov@gmail.com>,
-	"Edgar E . Iglesias" <edgar.iglesias@gmail.com>,
-	Subbaraya Sundeep <sundeep.lkml@gmail.com>,
-	John Snow <jsnow@redhat.com>, Joel Stanley <joel@jms.id.au>
+Cc: Bastian Koppelmann <kbastian@mail.uni-paderborn.de>,
+	Alistair Francis <Alistair.Francis@wdc.com>,
+	qemu-devel@nongnu.org, qemu-riscv@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190425161523.JSQe4lotZoVx2a9OlW0fA0vF9iSYUFJIAR_TpkvrgU0@z>
+Message-ID: <20190425161513.ux5AqFfSneB9ow54cigd98pzlU2Bi_5h6vJfFdFxQl4@z>
 
-On 4/18/19 8:00 PM, Thomas Huth wrote:
-> Dependencies have been determined with trial-and-error and by
-> looking at the xlnx-versal.c source file.
-> 
-> Signed-off-by: Thomas Huth <thuth@redhat.com>
+On 4/25/19 9:04 AM, Palmer Dabbelt wrote:
+> c.lwsp with rd=0 should be an illegal instruction, but it's not.  We'd need to
+> re-introduce the shim to handle that quirk, but since it's not actually a new
+> bug I'm OK taking the patch set and fixing that later.
 
-Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+That should be fixable in the decode file, without a shim.
+See patch 5, where I introduce trans_illegal, for doing
+exactly this for c.addi4spn.
 
-> ---
->  hw/arm/Kconfig | 4 ++++
->  1 file changed, 4 insertions(+)
-> 
-> diff --git a/hw/arm/Kconfig b/hw/arm/Kconfig
-> index 32e4cc50e5..22be1e1231 100644
-> --- a/hw/arm/Kconfig
-> +++ b/hw/arm/Kconfig
-> @@ -291,6 +291,10 @@ config XLNX_ZYNQMP_ARM
->  
->  config XLNX_VERSAL
->      bool
-> +    select ARM_GIC
-> +    select PL011
-> +    select CADENCE
-> +    select VIRTIO_MMIO
->  
->  config FSL_IMX25
->      bool
-> 
+
+r~
 
