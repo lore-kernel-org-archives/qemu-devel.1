@@ -2,111 +2,59 @@ Return-Path: <SRS0=VSQP=S3=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED,
+	URIBL_SBL,URIBL_SBL_A autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5303AC10F03
-	for <qemu-devel@archiver.kernel.org>; Thu, 25 Apr 2019 06:02:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 55037C10F03
+	for <qemu-devel@archiver.kernel.org>; Thu, 25 Apr 2019 06:45:30 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 214472077C
-	for <qemu-devel@archiver.kernel.org>; Thu, 25 Apr 2019 06:02:23 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 214472077C
+	by mail.kernel.org (Postfix) with ESMTPS id 1F9AB217FA
+	for <qemu-devel@archiver.kernel.org>; Thu, 25 Apr 2019 06:45:30 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1F9AB217FA
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:52379 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:52775 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hJXSd-0002If-5B
-	for qemu-devel@archiver.kernel.org; Thu, 25 Apr 2019 02:02:21 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:53696)
+	id 1hJY8O-00067E-WD
+	for qemu-devel@archiver.kernel.org; Thu, 25 Apr 2019 02:45:29 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:60918)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1hJXRF-0001dE-Ts
-	for qemu-devel@nongnu.org; Thu, 25 Apr 2019 02:00:54 -0400
+	(envelope-from <ppandit@redhat.com>) id 1hJY6N-0004js-Q2
+	for qemu-devel@nongnu.org; Thu, 25 Apr 2019 02:43:24 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1hJXRE-0000rb-J3
-	for qemu-devel@nongnu.org; Thu, 25 Apr 2019 02:00:53 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:55030)
+	(envelope-from <ppandit@redhat.com>) id 1hJXyy-0004aj-L6
+	for qemu-devel@nongnu.org; Thu, 25 Apr 2019 02:35:46 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:43410)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <thuth@redhat.com>)
-	id 1hJXR3-0000cH-Cn; Thu, 25 Apr 2019 02:00:43 -0400
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
-	[10.5.11.22])
+	(Exim 4.71) (envelope-from <ppandit@redhat.com>) id 1hJXyy-0004YT-Ez
+	for qemu-devel@nongnu.org; Thu, 25 Apr 2019 02:35:44 -0400
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+	[10.5.11.14])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 264953145728;
-	Thu, 25 Apr 2019 06:00:32 +0000 (UTC)
-Received: from thuth.remote.csb (ovpn-116-68.ams2.redhat.com [10.36.116.68])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id E45F41001DDA;
-	Thu, 25 Apr 2019 06:00:24 +0000 (UTC)
-To: Wainer dos Santos Moschetta <wainersm@redhat.com>, qemu-devel@nongnu.org
-References: <20190424103747.10173-1-thuth@redhat.com>
-	<20190424103747.10173-5-thuth@redhat.com>
-	<f9dc291b-7ba2-c6b8-33aa-c8fa3c6d4950@redhat.com>
-From: Thomas Huth <thuth@redhat.com>
-Openpgp: preference=signencrypt
-Autocrypt: addr=thuth@redhat.com; keydata=
-	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
-Organization: Red Hat
-Message-ID: <0300c8cc-d73c-b919-13f7-59f3218a609f@redhat.com>
-Date: Thu, 25 Apr 2019 08:00:23 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
-	Thunderbird/60.6.1
+	by mx1.redhat.com (Postfix) with ESMTPS id 78585C057F3B;
+	Thu, 25 Apr 2019 06:35:41 +0000 (UTC)
+Received: from localhost.localdomain (ovpn-116-47.phx2.redhat.com
+	[10.3.116.47])
+	by smtp.corp.redhat.com (Postfix) with ESMTPS id 843055D9C5;
+	Thu, 25 Apr 2019 06:35:37 +0000 (UTC)
+From: P J P <ppandit@redhat.com>
+To: QEMU Developers <qemu-devel@nongnu.org>
+Date: Thu, 25 Apr 2019 12:05:34 +0530
+Message-Id: <20190425063534.32747-1-ppandit@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <f9dc291b-7ba2-c6b8-33aa-c8fa3c6d4950@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.49]);
-	Thu, 25 Apr 2019 06:00:32 +0000 (UTC)
+	(mx1.redhat.com [10.5.110.32]);
+	Thu, 25 Apr 2019 06:35:41 +0000 (UTC)
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH 4/6] cirrus / travis: Add gnu-sed and bash
- for macOS and FreeBSD
+Subject: [Qemu-devel] [PATCH] qxl: check release info object
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -118,45 +66,82 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Fam Zheng <fam@euphon.net>, Kevin Wolf <kwolf@redhat.com>,
-	Ed Maste <emaste@freebsd.org>, qemu-block@nongnu.org,
-	Peter Maydell <peter.maydell@linaro.org>,
-	=?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
-	Laszlo Ersek <lersek@redhat.com>, Max Reitz <mreitz@redhat.com>,
-	=?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>,
-	Li-Wen Hsu <lwhsu@freebsd.org>
+Cc: Bugs SysSec <bugs-syssec@rub.de>, Gerd Hoffmann <kraxel@redhat.com>,
+	Prasad J Pandit <pjp@fedoraproject.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190425060023.QyZjgWQzfuD091P-jWBHTF2TflGmkF8Qt6Ky91T6Rrk@z>
+Content-Type: text/plain; charset="UTF-8"
+Message-ID: <20190425063534.HEMYGwBz-WplZ86W3b3AH1g2Uu8x1__4DCrvP16pYqE@z>
 
-On 24/04/2019 23.29, Wainer dos Santos Moschetta wrote:
-> Hello Thomas,
->=20
-> On 04/24/2019 07:37 AM, Thomas Huth wrote:
->> We are going to enable the qemu-iotests during "make check" again,
->> and for running the iotests, we need bash and gnu-sed.
->>
->> Signed-off-by: Thomas Huth <thuth@redhat.com>
->> ---
->> =C2=A0 .cirrus.yml | 4 ++--
->> =C2=A0 .travis.yml | 1 +
->> =C2=A0 2 files changed, 3 insertions(+), 2 deletions(-)
->=20
-> It needs to get the Freebsd image [1] updated too, in order to `make
-> BUILD_TARGET=3Dcheck vm-build-freebsd` passes. Here it failed with:
-> ---
-> env: bash: No such file or directory
-> gmake: *** [/var/tmp/qemu-test.6OlDFH/tests/Makefile.include:1101:
-> check-tests/qemu-iotests-quick.sh] Error 1
-> gmake: *** Waiting for unfinished jobs....
-> ---
->=20
-> I'm not sure about the netbsd and openbsd images, they might need bash
-> and gnu-sed as well.
+From: Prasad J Pandit <pjp@fedoraproject.org>
 
-D'oh! Does anybody know what are the correct steps to update these images=
-?
+When releasing spice resources in release_resource() routine,
+if release info object 'ext.info' is null, it leads to null
+pointer dereference. Add check to avoid it.
 
- Thomas
+Reported-by: Bugs SysSec <bugs-syssec@rub.de>
+Signed-off-by: Prasad J Pandit <pjp@fedoraproject.org>
+---
+ hw/display/qxl.c | 3 +++
+ 1 file changed, 3 insertions(+)
+
+=3D=3D=3D
+(process:30785): Spice-WARNING **: 11:43:59.284: memslot.c:68:memslot_val=
+idate_virt: virtual address out of range
+    virt=3D0x555556d247e0+0xbf slot_id=3D0 group_id=3D0
+    slot=3D0x0-0x0 delta=3D0x0
+
+Thread 5 "SPICE Worker" received signal SIGSEGV, Segmentation fault.
+[Switching to Thread 0x7fffdb7ff700 (LWP 30792)]
+interface_release_resource (sin=3D0x555556d12738, ext=3D...) at hw/displa=
+y/qxl.c:785
+785	        QXLCommandExt *cmdext =3D (void *)(intptr_t)(ext.info->id);
+(gdb) bt
+#0  0x0000555555adca68 in interface_release_resource (sin=3D0x555556d1273=
+8, ext=3D...) at hw/display/qxl.c:785
+#1  0x00007ffff74991d5 in red_drawable_unref (red_drawable=3D0x7fffd402a5=
+20) at red-worker.c:100
+#2  0x00007ffff749941c in red_drawable_unref (red_drawable=3D<optimized o=
+ut>) at red-worker.c:229
+#3  0x00007ffff749941c in red_process_display (worker=3Dworker@entry=3D0x=
+555556e2f050, ring_is_empty=3Dring_is_empty@entry=3D0x7fffdb7fe854) at re=
+d-worker.c:229
+#4  0x00007ffff74995f2 in worker_source_dispatch (source=3D<optimized out=
+>, callback=3D<optimized out>, user_data=3D<optimized out>) at red-worker=
+.c:1265
+#5  0x00007ffff7ec906d in g_main_dispatch (context=3D0x555556e38fc0) at g=
+main.c:3182
+#6  0x00007ffff7ec906d in g_main_context_dispatch (context=3Dcontext@entr=
+y=3D0x555556e38fc0) at gmain.c:3847
+#7  0x00007ffff7ec9438 in g_main_context_iterate (context=3D0x555556e38fc=
+0, block=3Dblock@entry=3D1, dispatch=3Ddispatch@entry=3D1, self=3D<optimi=
+zed out>) at gmain.c:3920
+#8  0x00007ffff7ec9762 in g_main_loop_run (loop=3D0x7fffd4002100) at gmai=
+n.c:4116
+#9  0x00007ffff7498dde in red_worker_main (arg=3D0x555556e2f050) at red-w=
+orker.c:1369
+#10 0x00007ffff70e458e in start_thread () at /lib64/libpthread.so.0
+#11 0x00007ffff7013683 in clone () at /lib64/libc.so.6
+(gdb)
+=3D=3D=3D
+
+diff --git a/hw/display/qxl.c b/hw/display/qxl.c
+index c8ce5781e0..632923add2 100644
+--- a/hw/display/qxl.c
++++ b/hw/display/qxl.c
+@@ -777,6 +777,9 @@ static void interface_release_resource(QXLInstance *s=
+in,
+     QXLReleaseRing *ring;
+     uint64_t *item, id;
+=20
++    if (!ext.info) {
++        return;
++    }
+     if (ext.group_id =3D=3D MEMSLOT_GROUP_HOST) {
+         /* host group -> vga mode update request */
+         QXLCommandExt *cmdext =3D (void *)(intptr_t)(ext.info->id);
+--=20
+2.20.1
+
 
