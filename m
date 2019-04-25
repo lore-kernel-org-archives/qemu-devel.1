@@ -2,86 +2,89 @@ Return-Path: <SRS0=VSQP=S3=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.5 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.7 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2A4F5C43219
-	for <qemu-devel@archiver.kernel.org>; Thu, 25 Apr 2019 14:01:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CE104C43219
+	for <qemu-devel@archiver.kernel.org>; Thu, 25 Apr 2019 14:02:12 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 07BF2206BA
-	for <qemu-devel@archiver.kernel.org>; Thu, 25 Apr 2019 14:01:51 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id ADBFC206BA
+	for <qemu-devel@archiver.kernel.org>; Thu, 25 Apr 2019 14:02:12 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="lAZItkvB"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 07BF2206BA
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="w2A3q+Df"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org ADBFC206BA
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:57918 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:57920 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hJewg-0003yq-7F
-	for qemu-devel@archiver.kernel.org; Thu, 25 Apr 2019 10:01:50 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:60699)
+	id 1hJex1-0004Jb-Tv
+	for qemu-devel@archiver.kernel.org; Thu, 25 Apr 2019 10:02:11 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:37636)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <arilou@gmail.com>) id 1hJeQ6-0000EG-Ex
-	for qemu-devel@nongnu.org; Thu, 25 Apr 2019 09:28:11 -0400
+	(envelope-from <alex.bennee@linaro.org>) id 1hJega-00067h-Gp
+	for qemu-devel@nongnu.org; Thu, 25 Apr 2019 09:45:13 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <arilou@gmail.com>) id 1hJeQ5-0001og-LJ
-	for qemu-devel@nongnu.org; Thu, 25 Apr 2019 09:28:10 -0400
-Received: from mail-wm1-x342.google.com ([2a00:1450:4864:20::342]:39578)
+	(envelope-from <alex.bennee@linaro.org>) id 1hJegZ-0002nI-JS
+	for qemu-devel@nongnu.org; Thu, 25 Apr 2019 09:45:12 -0400
+Received: from mail-wr1-x442.google.com ([2a00:1450:4864:20::442]:35651)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <arilou@gmail.com>) id 1hJeQ5-0001ln-Et
-	for qemu-devel@nongnu.org; Thu, 25 Apr 2019 09:28:09 -0400
-Received: by mail-wm1-x342.google.com with SMTP id n25so10602140wmk.4
-	for <qemu-devel@nongnu.org>; Thu, 25 Apr 2019 06:28:09 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
-	h=from:to:cc:subject:date:message-id:in-reply-to:references
-	:mime-version:content-transfer-encoding;
-	bh=L0b6ekwQ+2V0lpxiU3U4YMDKi4QNx+8EvSzJuNBfha8=;
-	b=lAZItkvBwUDzADEYBIM0LD0VXSdPc27TXEQdB+TsWijWJMAKVB94dQXnw7Fqa8FNBy
-	zG8iHbsmpCxsfyBy0q7srAA/QpV6sHplZIEJX1rGj/AqjOHnYSOFEa/upp9h66R5zZh9
-	cCRLEA1YTgrP/GST63qNFyd8CFwJH7KVjqfqMCOhjNEb63b++hQNdGOOIJdvTL3Q9EcC
-	haYVvVazGGdAa3yMwqcYV/3AWGhe5wmwgo3YVWaMfJsqDqSg9+5otOL1C4XOX7c2N3Ga
-	giLFpHoiWR6U7SsxAS8kikcTkxEAllGjsraDrmafa6eEVI5H7i1n7mkiKVCT3RZMXUDw
-	u9Mw==
+	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+	id 1hJegZ-0002m3-C3
+	for qemu-devel@nongnu.org; Thu, 25 Apr 2019 09:45:11 -0400
+Received: by mail-wr1-x442.google.com with SMTP id f7so7826692wrs.2
+	for <qemu-devel@nongnu.org>; Thu, 25 Apr 2019 06:45:11 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+	h=references:user-agent:from:to:cc:subject:in-reply-to:date
+	:message-id:mime-version:content-transfer-encoding;
+	bh=7Rdr+2prk79GSiVzQlNowAT1lxEf1X9LGvL2XtYKt3E=;
+	b=w2A3q+DfMHD2ICAEfUlBI8+NxyQdKFDC4LGitfZPgEhCbF7GwKp3K6GkOepGTgGpXK
+	MO6akM2KGI17XV3irjki78T/EHJu5hpXl23DPMEBsQVgegSVcpbb9KOK9g57CcKBzSR+
+	KYqVquFXR6BMuzF0ZWHEOigfJnel0Wq57iskFVYG8/xKC17qafmYcrI43hYKksGIHWAd
+	qtjAcahGxCQjKulVi5LpcGRjfHqt3eoUorPTIXvPTS260h5KGh77scroPbYIaDJsOGBW
+	srpF5nusazkSXrxbXsAScaHE0zJqsDvJlCfETMbByDIVfsRqtaLmzOC/WW0Y9GBKoJjE
+	1jdw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
 	d=1e100.net; s=20161025;
-	h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
-	:references:mime-version:content-transfer-encoding;
-	bh=L0b6ekwQ+2V0lpxiU3U4YMDKi4QNx+8EvSzJuNBfha8=;
-	b=M86oPHkRYe6OgVmK89wNZE5EDPdTpvjpNa+0FHU5pazelmQwGURIDYG/V6B+cdewu8
-	fFKFnDL2Gh/o4JGWF1qzWm73x7xBL7BhTolKLITdFhrDyfV4evGiZeSu6ukjVKn2JAhr
-	6Rd3nqZf2BQTqazcsGcPhI8E/gv2qXajQWkBSOEBhOwGCLo7xtO9AJXXIIJlkkyXPguV
-	RDsTjHwf2ldQ0Ftm9xZXRhjl4/nsC1lcTd/OcH0QBvHoWtElztGdF7PJXu939HU6T42R
-	N4DfXmUEvma8SbwgOPoRFil+ptUJoLgzp3a7dqhLiSaps0Vp7nBz2nRurD0xPMFMM2yl
-	HhFQ==
-X-Gm-Message-State: APjAAAWqHPfcWTxcvl2c685ZoaT1mmqlvLpGuIGxqrJ4OKdz0YZp+VOL
-	kXDnd/dLbhFVxbU8u84gTZ+fyNTq
-X-Google-Smtp-Source: APXvYqzThWOtFlFpsk5ipejYzlW8N2CD3582XXpON+/+Dcsyfr/dT/4XH9lFSYbZWswj7fguVubznQ==
-X-Received: by 2002:a7b:cc96:: with SMTP id p22mr3730153wma.17.1556198887241; 
-	Thu, 25 Apr 2019 06:28:07 -0700 (PDT)
-Received: from localhost.localdomain (bzq-79-178-247-46.red.bezeqint.net.
-	[79.178.247.46])
-	by smtp.gmail.com with ESMTPSA id y4sm2316540wrt.34.2019.04.25.06.28.02
+	h=x-gm-message-state:references:user-agent:from:to:cc:subject
+	:in-reply-to:date:message-id:mime-version:content-transfer-encoding;
+	bh=7Rdr+2prk79GSiVzQlNowAT1lxEf1X9LGvL2XtYKt3E=;
+	b=tSS9PgKTBTYbCFxyY/rtbX10NSAaUV9RJU67bcEKcCS7qu6vYw0qiGYF4+jrnDxugp
+	suiK722D0e1sYwuvb70LL47pQD+RxvWlXvDbotWlKovWlq6RNA8fFpnZMoodRMgkvS9v
+	n3uNy4/+UwaWwXPgptWuugPf0muKac92gnQBoxkoL/SKUA4qX/1sCHgk6Ydq/FJX26bv
+	iKmR6p+UxzoC3u7IGWFtairEmF9QqTG3CJg/JBDadIYz40/arM4Ct0BhYRJhnD+79vgy
+	MpYYG5o/rlzrLaOAix6R6JFpJIaatWV0e2++h/nBjd2D8rIgvdHj12k5h9lqsgyGkNJj
+	smgw==
+X-Gm-Message-State: APjAAAU3PlwOmgJ6tUKX68GtjpgTnxPu3LUCWIqcc+uxhJCfREZiXZiU
+	v/orTCyuzNKfvdB/sklNnFSB8Q==
+X-Google-Smtp-Source: APXvYqzGwAU8HmmwDhoyQtG3/Vp0v53xDKWSBvNbklDw8X4nWp/tRiVOe+d+5rGIZAzohXh0j0r4fA==
+X-Received: by 2002:a5d:4b92:: with SMTP id b18mr3181781wrt.11.1556199909895; 
+	Thu, 25 Apr 2019 06:45:09 -0700 (PDT)
+Received: from zen.linaroharston ([81.128.185.34])
+	by smtp.gmail.com with ESMTPSA id
+	x192sm35792073wmf.48.2019.04.25.06.45.09
 	(version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
-	Thu, 25 Apr 2019 06:28:04 -0700 (PDT)
-From: Jon Doron <arilou@gmail.com>
-To: qemu-devel@nongnu.org
-Date: Thu, 25 Apr 2019 16:26:31 +0300
-Message-Id: <20190425132636.31636-17-arilou@gmail.com>
-X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20190425132636.31636-1-arilou@gmail.com>
-References: <20190425132636.31636-1-arilou@gmail.com>
+	Thu, 25 Apr 2019 06:45:09 -0700 (PDT)
+Received: from zen (localhost [127.0.0.1])
+	by zen.linaroharston (Postfix) with ESMTP id ADB5E1FF87;
+	Thu, 25 Apr 2019 14:45:08 +0100 (BST)
+References: <20190408182748.1238-1-jan.bobek@gmail.com>
+User-agent: mu4e 1.3.1; emacs 26.1
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+To: Jan Bobek <jan.bobek@gmail.com>
+In-reply-to: <20190408182748.1238-1-jan.bobek@gmail.com>
+Date: Thu, 25 Apr 2019 14:45:08 +0100
+Message-ID: <87y33yurkr.fsf@zen.linaroharston>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
 	recognized.
-X-Received-From: 2a00:1450:4864:20::342
-Subject: [Qemu-devel] [PATCH v6 16/21] gdbstub: Implement step (s pkt) with
- new infra
+X-Received-From: 2a00:1450:4864:20::442
+Subject: Re: [Qemu-devel] [RISU PATCH 0/5] Fix RISU build for i386
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -93,63 +96,34 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Jon Doron <arilou@gmail.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>,
+	Richard Henderson <richard.henderson@linaro.org>,
+	qemu-devel@nongnu.org, Stefan Hajnoczi <stefanha@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Content-Type: text/plain; charset="UTF-8"
-Message-ID: <20190425132631.45WF83I0YMvP6ou6CfRsyU9Ix4ky70JqbnBqiRm_7G4@z>
+Message-ID: <20190425134508.ESqmXHK5cRLSvENo7dsYQGj2mmr4SaJD3ucHyPasjRY@z>
 
-Signed-off-by: Jon Doron <arilou@gmail.com>
----
- gdbstub.c | 25 +++++++++++++++++++------
- 1 file changed, 19 insertions(+), 6 deletions(-)
 
-diff --git a/gdbstub.c b/gdbstub.c
-index 18949120be..809503c20a 100644
---- a/gdbstub.c
-+++ b/gdbstub.c
-@@ -1806,6 +1806,16 @@ static void handle_file_io(GdbCmdContext *gdb_ctx, void *user_ctx)
-     gdb_continue(gdb_ctx->s);
- }
- 
-+static void handle_step(GdbCmdContext *gdb_ctx, void *user_ctx)
-+{
-+    if (gdb_ctx->num_params) {
-+        gdb_set_cpu_pc(gdb_ctx->s, (target_ulong)gdb_ctx->params[0].val_ull);
-+    }
-+
-+    cpu_single_step(gdb_ctx->s->c_cpu, sstep_flags);
-+    gdb_continue(gdb_ctx->s);
-+}
-+
- static int gdb_handle_packet(GDBState *s, const char *line_buf)
- {
-     CPUState *cpu;
-@@ -1938,13 +1948,16 @@ static int gdb_handle_packet(GDBState *s, const char *line_buf)
-         }
-         break;
-     case 's':
--        if (*p != '\0') {
--            addr = strtoull(p, (char **)&p, 16);
--            gdb_set_cpu_pc(s, addr);
-+        {
-+            static const GdbCmdParseEntry step_cmd_desc = {
-+                .handler = handle_step,
-+                .cmd = "s",
-+                .cmd_startswith = 1,
-+                .schema = "L0"
-+            };
-+            cmd_parser = &step_cmd_desc;
-         }
--        cpu_single_step(s->c_cpu, sstep_flags);
--        gdb_continue(s);
--        return RS_IDLE;
-+        break;
-     case 'F':
-         {
-             static const GdbCmdParseEntry file_io_cmd_desc = {
--- 
-2.20.1
+Jan Bobek <jan.bobek@gmail.com> writes:
 
+> Hi all,
+>
+<snip>
+> Thanks,
+> -Jan Bobek
+>
+> P.S. This is my first time using git send-email, so please bear with
+>      me if something goes wrong and/or let me know how I can improve
+>      my future submissions. Thank you!
+
+Looks good to me. Excellent first patch series ;-)
+
+I assume you'll post a v2 once you've integrated Richard's fixups to the
+appropriate patches.
+
+Have you had a chance to look at getting a .risu and risugen working yet?
+
+--
+Alex Benn=C3=A9e
 
