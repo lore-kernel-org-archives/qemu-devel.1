@@ -1,29 +1,31 @@
-Received: from eggs.gnu.org ([209.51.188.92]:36558)
+Received: from eggs.gnu.org ([209.51.188.92]:38331)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1hJiEr-0001Cg-PI
-	for qemu-devel@nongnu.org; Thu, 25 Apr 2019 13:32:50 -0400
+	(envelope-from <ehabkost@redhat.com>) id 1hJiNz-0003Gc-D5
+	for qemu-devel@nongnu.org; Thu, 25 Apr 2019 13:42:17 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1hJiEq-00085G-5e
-	for qemu-devel@nongnu.org; Thu, 25 Apr 2019 13:32:49 -0400
-Received: from mail-pg1-x532.google.com ([2607:f8b0:4864:20::532]:37493)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1hJiEp-00082w-R4
-	for qemu-devel@nongnu.org; Thu, 25 Apr 2019 13:32:48 -0400
-Received: by mail-pg1-x532.google.com with SMTP id e6so192138pgc.4
-	for <qemu-devel@nongnu.org>; Thu, 25 Apr 2019 10:32:47 -0700 (PDT)
-From: Richard Henderson <richard.henderson@linaro.org>
-References: <20190425172636.11128-1-richard.henderson@linaro.org>
-	<20190425172636.11128-3-richard.henderson@linaro.org>
-Message-ID: <03ac8b9b-20ae-e6ec-5647-f679471f4d3b@linaro.org>
-Date: Thu, 25 Apr 2019 10:32:43 -0700
+	(envelope-from <ehabkost@redhat.com>) id 1hJiNy-0000Lu-Cy
+	for qemu-devel@nongnu.org; Thu, 25 Apr 2019 13:42:15 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:35002)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1hJiNy-0000LP-7K
+	for qemu-devel@nongnu.org; Thu, 25 Apr 2019 13:42:14 -0400
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+	[10.5.11.15])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 52C8F1219AF
+	for <qemu-devel@nongnu.org>; Thu, 25 Apr 2019 17:42:13 +0000 (UTC)
+Date: Thu, 25 Apr 2019 14:42:08 -0300
+From: Eduardo Habkost <ehabkost@redhat.com>
+Message-ID: <20190425174208.GO18406@habkost.net>
+References: <20190423212246.3542-1-ehabkost@redhat.com>
+	<20190423212246.3542-2-ehabkost@redhat.com>
+	<b8a8e3fb-281a-7252-4899-859959a97a1d@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20190425172636.11128-3-richard.henderson@linaro.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 2/2] target/riscv: Add checks for several
- RVC reserved operands
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <b8a8e3fb-281a-7252-4899-859959a97a1d@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH 1/3] qapi: SupportStatusInfo struct
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,22 +34,56 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: palmer@sifive.com
+To: Wainer dos Santos Moschetta <wainersm@redhat.com>
+Cc: qemu-devel@nongnu.org, mprivozn@redhat.com, Markus Armbruster <armbru@redhat.com>
 
-On 4/25/19 10:26 AM, Richard Henderson wrote:
->  {
-> +  illegal         011 0  -----  00000 01 # c.addi16sp, RES nzimm=0
->    addi            011 .  00010  ..... 01 @c_addi16sp
->    lui             011 .  .....  ..... 01 @c_lui
->  }
+On Thu, Apr 25, 2019 at 11:20:58AM -0300, Wainer dos Santos Moschetta wrote:
+> Hi Eduardo,
+> 
+> 
+> On 04/23/2019 06:22 PM, Eduardo Habkost wrote:
+> > This struct will be used to represent support and deprecation
+> > status of QEMU features.
+> > 
+> > Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
+> > ---
+> >   qapi/common.json | 24 ++++++++++++++++++++++++
+> >   1 file changed, 24 insertions(+)
+> > 
+> > diff --git a/qapi/common.json b/qapi/common.json
+> > index 99d313ef3b..b59d0dc66b 100644
+> > --- a/qapi/common.json
+> > +++ b/qapi/common.json
+> > @@ -193,3 +193,27 @@
+> >                'ppc64', 'riscv32', 'riscv64', 's390x', 'sh4',
+> >                'sh4eb', 'sparc', 'sparc64', 'tricore', 'unicore32',
+> >                'x86_64', 'xtensa', 'xtensaeb' ] }
+> > +
+> > +##
+> > +# @SupportStatusInfo:
+> > +#
+> > +# Information on support status of a given feature
+> > +# (e.g. machine type)
+> > +#
+> > +# @deprecated: if true, the given feature is deprecated and may be removed
+> > +#              in future versions of QEMU according to the QEMU deprecation
+> > +#              policy.
+> 
+> Eventually management software will need the know the QEMU version the
+> feature is planed for removal. So makes sense to include a field to capture
+> that information as well or do you expect it to be added (as a good
+> practice) in the 'status-message'?
 
-Bah.  I just realized the comment should be more like
+If we really want to provide extra information like version
+numbers, adding a separate field sounds better than using
+status-message.
 
-  # c.addi16sp and c.lui, RES nzimm=0
+But I'm not sure we really want to include this amount of detail
+in the API.  Mentioning explicit version numbers could make
+things more complex for downstream distributions of QEMU that
+include backports and/or have a different deprecation policy.
 
-Otherwise one is led to believe that rd=2 is missing
-from the illegal pattern.
+I'd like to hear opinions from others.
 
-
-r~
+-- 
+Eduardo
