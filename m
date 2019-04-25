@@ -1,29 +1,26 @@
-Received: from eggs.gnu.org ([209.51.188.92]:51615)
+Received: from eggs.gnu.org ([209.51.188.92]:35187)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <srutherford@google.com>) id 1hJS9p-0004T3-QI
-	for qemu-devel@nongnu.org; Wed, 24 Apr 2019 20:22:37 -0400
+	(envelope-from <daniel.santos@pobox.com>) id 1hJTN4-0003Es-H1
+	for qemu-devel@nongnu.org; Wed, 24 Apr 2019 21:40:20 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <srutherford@google.com>) id 1hJS6g-0005h4-0n
-	for qemu-devel@nongnu.org; Wed, 24 Apr 2019 20:19:20 -0400
-Received: from mail-yb1-xb41.google.com ([2607:f8b0:4864:20::b41]:39198)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <srutherford@google.com>)
-	id 1hJS6e-0005gI-0m
-	for qemu-devel@nongnu.org; Wed, 24 Apr 2019 20:19:16 -0400
-Received: by mail-yb1-xb41.google.com with SMTP id x71so7813320ybe.6
-	for <qemu-devel@nongnu.org>; Wed, 24 Apr 2019 17:19:15 -0700 (PDT)
+	(envelope-from <daniel.santos@pobox.com>) id 1hJTN3-0003Zq-5b
+	for qemu-devel@nongnu.org; Wed, 24 Apr 2019 21:40:18 -0400
+Received: from pb-smtp2.pobox.com ([64.147.108.71]:52148)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <daniel.santos@pobox.com>)
+	id 1hJTN1-0003Xo-5x
+	for qemu-devel@nongnu.org; Wed, 24 Apr 2019 21:40:15 -0400
+References: <20190417194821.23017-1-daniel.santos@pobox.com>
+	<CAL1e-=jNcnCgdQM7+qYM_fArLLUET-KtyHEGDboPK_pXqYu+=g@mail.gmail.com>
+From: Daniel Santos <daniel.santos@pobox.com>
+Message-ID: <7c0ac4a2-8947-ddde-dd0c-dd2fa27fd0de@pobox.com>
+Date: Wed, 24 Apr 2019 20:39:38 -0500
 MIME-Version: 1.0
-References: <20190424160942.13567-1-brijesh.singh@amd.com>
-	<CABayD+eYsqT49-Smp0a9OGRt2or_L7LNKHpe-iraM62XzGq5_g@mail.gmail.com>
-	<eee5e112-89bd-331b-6875-34c0712de4cb@amd.com>
-In-Reply-To: <eee5e112-89bd-331b-6875-34c0712de4cb@amd.com>
-From: Steve Rutherford <srutherford@google.com>
-Date: Wed, 24 Apr 2019 17:18:38 -0700
-Message-ID: <CABayD+fy5+QNU8YWsVrfd6jyvPo3AWCBgR-V8iWKzZkWxQY=zA@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
+In-Reply-To: <CAL1e-=jNcnCgdQM7+qYM_fArLLUET-KtyHEGDboPK_pXqYu+=g@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [RFC PATCH v1 00/10] Add AMD SEV guest live
- migration support
+Subject: Re: [Qemu-devel] [PATCH] mips: Fix "Unexpected FPU mode"
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,127 +29,111 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Singh, Brijesh" <brijesh.singh@amd.com>
-Cc: "kvm@vger.kernel.org" <kvm@vger.kernel.org>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>, "H. Peter Anvin" <hpa@zytor.com>, Paolo Bonzini <pbonzini@redhat.com>, =?UTF-8?B?UmFkaW0gS3LEjW3DocWZ?= <rkrcmar@redhat.com>, Joerg Roedel <joro@8bytes.org>, Borislav Petkov <bp@suse.de>, "Lendacky, Thomas" <Thomas.Lendacky@amd.com>, "x86@kernel.org" <x86@kernel.org>, "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+To: Aleksandar Markovic <aleksandar.m.mail@gmail.com>
+Cc: qemu-devel <qemu-devel@nongnu.org>
 
-Do you mean MiB/s, MB/s or Mb/s? Since you are talking about network
-speeds, sometimes these get conflated.
+Hello,
 
-I'm guessing you mean MB/s since you are also using 4kb for page size.
+Sorry for my slow reply.=C2=A0 I don't mind that, as long as I end up bei=
+ng
+shown as the author in git. :)=C2=A0 I've never committed from an email
+before, so I'm not sure how that works.=C2=A0 Does adding another "From: =
+"
+header in the body patch that up with git-am?
 
-On Wed, Apr 24, 2019 at 2:32 PM Singh, Brijesh <brijesh.singh@amd.com>
-wrote:
+I don't know how much I'll be contributing to qemu in the future --
+there are a few crazy things I have considered trying to add and I'll be
+using qemu quite a bit in the future, so this probably won't be my only
+patch.=C2=A0 But in this case, I just *really* needed to get something MI=
+PS
+running on my workstation.
 
+Also, as my big "please note", it would be good for somebody more
+familiar with that code to make sure anything else that isn't explicitly
+initialized will behave correctly after being memset to zero.=C2=A0 When =
+a
+zero is OK, I often add an explicit this.that =3D 0; to clarify the
+intention and just expect gcc to compile it away.
+
+Thanks!
+Daniel
+
+On 4/23/19 1:00 PM, Aleksandar Markovic wrote:
+> On Wed, Apr 17, 2019 at 9:50 PM Daniel Santos <daniel.santos@pobox.com>=
+ wrote:
+>> In load_elf_binary, struct image_info interp_info is used without bein=
+g
+>> properly initialized.  One result is that when the ELF's program heade=
+r
+>> doesn't contain an entry for the ABI flags, then the value of the stru=
+ct
+>> image_info's fp_abi field is set to whatever happened to be in stack
+>> memory at the time.
+>>
+>> This patch both sanitizes interp_info and initializes fp_abi for
+>> TARGET_MIPS to MIPS_ABI_FP_UNKNOWN so that when we don't know the FP
+>> ABI, we don't just blow up.  Currently, this bug is a complete stopper
+>> for some MIPS binaries.
+>>
+>> ***PLEASE NOTE***
+>> There may be other bugs as a result of struct image_info interp_info
+>> fields not being properly initialized -- this patch only addresses the
+>> fp_abi field.  I reccomend somebody who knows the code better than I
+>> audit this function and the whole of that execution path.
+>>
+>> Fixes bug #1825002 and affects 3.1.0 and 4.x, reccomend backporting to
+>> 3.1.0.
+>>
+>> Signed-off-by: Daniel Santos <daniel.santos@pobox.com>
+>> ---
+> Daniel, not knowing that you already send this patch, I included it in =
+another
+> series (with different title and commit message, but the same content):
 >
+> https://lists.gnu.org/archive/html/qemu-devel/2019-04/msg03813.html
 >
-> On 4/24/19 2:15 PM, Steve Rutherford wrote:
-> > On Wed, Apr 24, 2019 at 9:10 AM Singh, Brijesh <brijesh.singh@amd.com>
-> wrote:
-> >>
-> >> The series add support for AMD SEV guest live migration commands. To
-> protect the
-> >> confidentiality of an SEV protected guest memory while in transit we
-> need to
-> >> use the SEV commands defined in SEV API spec [1].
-> >>
-> >> SEV guest VMs have the concept of private and shared memory. Private
-> memory
-> >> is encrypted with the guest-specific key, while shared memory may be
-> encrypted
-> >> with hypervisor key. The commands provided by the SEV FW are meant to
-> be used
-> >> for the private memory only. The patch series introduces a new
-> hypercall.
-> >> The guest OS can use this hypercall to notify the page encryption
-> status.
-> >> If the page is encrypted with guest specific-key then we use SEV
-> command during
-> >> the migration. If page is not encrypted then fallback to default.
-> >>
-> >> The patch adds a new ioctl KVM_GET_PAGE_ENC_BITMAP. The ioctl can be
-> used
-> >> by the qemu to get the page encrypted bitmap. Qemu can consult this
-> bitmap
-> >> during the migration to know whether the page is encrypted.
-> >>
-> >> [1] https://developer.amd.com/wp-content/resources/55766.PDF
-> >>
-> >> The series is tested with the Qemu, I am in process of cleaning
-> >> up the Qemu code and will submit soon.
-> >>
-> >> While implementing the migration I stumbled on the follow question:
-> >>
-> >> - Since there is a guest OS changes required to support the migration,
-> >>    so how do we know whether guest OS is updated? Should we extend KVM
-> >>    capabilities/feature bits to check this?
-> >>
-> >> TODO:
-> >>   - add an ioctl to build encryption bitmap. The encryption bitmap is
-> built during
-> >>     the guest bootup/execution. We should provide an ioctl so that
-> destination
-> >>     can build the bitmap as it receives the pages.
-> >>   - reset the bitmap on guest reboot.
-> >>
-> >> The complete tree with patch is available at:
-> >> https://github.com/codomania/kvm/tree/sev-migration-rfc-v1
-> >>
-> >> Cc: Thomas Gleixner <tglx@linutronix.de>
-> >> Cc: Ingo Molnar <mingo@redhat.com>
-> >> Cc: "H. Peter Anvin" <hpa@zytor.com>
-> >> Cc: Paolo Bonzini <pbonzini@redhat.com>
-> >> Cc: "Radim Kr=C4=8Dm=C3=A1=C5=99" <rkrcmar@redhat.com>
-> >> Cc: Joerg Roedel <joro@8bytes.org>
-> >> Cc: Borislav Petkov <bp@suse.de>
-> >> Cc: Tom Lendacky <thomas.lendacky@amd.com>
-> >> Cc: x86@kernel.org
-> >> Cc: kvm@vger.kernel.org
-> >> Cc: linux-kernel@vger.kernel.org
-> >>
-> >> Brijesh Singh (10):
-> >>    KVM: SVM: Add KVM_SEV SEND_START command
-> >>    KVM: SVM: Add KVM_SEND_UPDATE_DATA command
-> >>    KVM: SVM: Add KVM_SEV_SEND_FINISH command
-> >>    KVM: SVM: Add support for KVM_SEV_RECEIVE_START command
-> >>    KVM: SVM: Add KVM_SEV_RECEIVE_UPDATE_DATA command
-> >>    KVM: SVM: Add KVM_SEV_RECEIVE_FINISH command
-> >>    KVM: x86: Add AMD SEV specific Hypercall3
-> >>    KVM: X86: Introduce KVM_HC_PAGE_ENC_STATUS hypercall
-> >>    KVM: x86: Introduce KVM_GET_PAGE_ENC_BITMAP ioctl
-> >>    mm: x86: Invoke hypercall when page encryption status is changed
-> >>
-> >>   .../virtual/kvm/amd-memory-encryption.rst     | 116 ++++
-> >>   Documentation/virtual/kvm/hypercalls.txt      |  14 +
-> >>   arch/x86/include/asm/kvm_host.h               |   3 +
-> >>   arch/x86/include/asm/kvm_para.h               |  12 +
-> >>   arch/x86/include/asm/mem_encrypt.h            |   3 +
-> >>   arch/x86/kvm/svm.c                            | 560 ++++++++++++++++=
-+-
-> >>   arch/x86/kvm/vmx/vmx.c                        |   1 +
-> >>   arch/x86/kvm/x86.c                            |  17 +
-> >>   arch/x86/mm/mem_encrypt.c                     |  45 +-
-> >>   arch/x86/mm/pageattr.c                        |  15 +
-> >>   include/uapi/linux/kvm.h                      |  51 ++
-> >>   include/uapi/linux/kvm_para.h                 |   1 +
-> >>   12 files changed, 834 insertions(+), 4 deletions(-)
-> >>
-> >> --
-> >> 2.17.1
-> >>
-> >
-> > What's the back-of-the-envelope marginal cost of transferring a 16kB
-> > region from one host to another? I'm interested in what the end to end
-> > migration perf changes look like for this. If you have measured
-> > migration perf, I'm interested in that also.
-> >
+> Please let's track this patch there.
 >
-> I have not done a complete performance analysis yet! From the qemu
-> QMP prompt (query-migration) I am getting ~8mbps throughput from
-> one host to another (this is with 4kb regions). I have been told
-> that increasing the transfer size from 4kb -> 16kb may not give a
-> huge performance gain because at FW level they still operating
-> on 4kb blocks. There is possibility that future FW updates may
-> give a bit better performance on 16kb size.
+> I will change the commit message to bring it closer to the yours versio=
+n
+> in the next version of the series, and I will review the patch from MIP=
+S
+> point of view.
 >
-> -Brijesh
+> Just advice for the future: Before sending patches to qemu-devel,
+> check what are maintainers for the applicable code. There is even a
+> script for that: <qemu-root>/scripts/get_maintainers.pl
 >
+> There are also other rules and conventiones, and all of them are
+> mentioned on the page "How to submit a patch" on QEMU web site.
+>
+> But, in any case, many thanks for discovering and reporting the bug,
+> and even devising the fix!
+>
+> Yours,
+> Aleksandar
+>
+>>  linux-user/elfload.c | 5 +++++
+>>  1 file changed, 5 insertions(+)
+>>
+>> diff --git a/linux-user/elfload.c b/linux-user/elfload.c
+>> index c1a26021f8..7f09d572a2 100644
+>> --- a/linux-user/elfload.c
+>> +++ b/linux-user/elfload.c
+>> @@ -2698,6 +2698,11 @@ int load_elf_binary(struct linux_binprm *bprm, =
+struct image_info *info)
+>>      char *elf_interpreter =3D NULL;
+>>      char *scratch;
+>>
+>> +    memset(&interp_info, 0, sizeof(interp_info));
+>> +#ifdef TARGET_MIPS
+>> +    interp_info.fp_abi =3D MIPS_ABI_FP_UNKNOWN;
+>> +#endif
+>> +
+>>      info->start_mmap =3D (abi_ulong)ELF_START_MMAP;
+>>
+>>      load_elf_image(bprm->filename, bprm->fd, info,
+>> --
+>> 2.19.2
+>>
+>>
