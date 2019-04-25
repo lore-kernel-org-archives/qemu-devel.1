@@ -1,32 +1,24 @@
-Received: from eggs.gnu.org ([209.51.188.92]:49063)
+Received: from eggs.gnu.org ([209.51.188.92]:49555)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1hJbX6-0003MI-3B
-	for qemu-devel@nongnu.org; Thu, 25 Apr 2019 06:23:13 -0400
+	(envelope-from <thuth@redhat.com>) id 1hJbYU-00046q-UC
+	for qemu-devel@nongnu.org; Thu, 25 Apr 2019 06:24:40 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1hJbX4-0004ns-Ne
-	for qemu-devel@nongnu.org; Thu, 25 Apr 2019 06:23:12 -0400
-Received: from mail-wm1-f67.google.com ([209.85.128.67]:38409)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1hJbX4-0004nG-FL
-	for qemu-devel@nongnu.org; Thu, 25 Apr 2019 06:23:10 -0400
-Received: by mail-wm1-f67.google.com with SMTP id w15so9745935wmc.3
-	for <qemu-devel@nongnu.org>; Thu, 25 Apr 2019 03:23:09 -0700 (PDT)
-References: <20190420100056.116305-1-liq3ea@163.com>
-	<20190420100056.116305-4-liq3ea@163.com>
-	<a27cd912-4f58-55ac-1aae-e4999fa3d84d@redhat.com>
-	<CAKXe6SJZWs7HtXutX6W3saDhaNDtVPMQEh2+s+9XiM3TtZqLdQ@mail.gmail.com>
-	<20190425081519.n4leez6sz2wlvpla@sirius.home.kraxel.org>
-	<CAKXe6SKvkJxauOPmBMS+CDPq9NS0qKpydkyOAuS7mHVrA8JVbQ@mail.gmail.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Message-ID: <d773a58b-e33c-fa66-5afc-05bdc85efa53@redhat.com>
-Date: Thu, 25 Apr 2019 12:23:03 +0200
+	(envelope-from <thuth@redhat.com>) id 1hJbYT-0005m9-Oz
+	for qemu-devel@nongnu.org; Thu, 25 Apr 2019 06:24:38 -0400
+From: Thomas Huth <thuth@redhat.com>
+References: <20190424103747.10173-1-thuth@redhat.com>
+	<20190424103747.10173-6-thuth@redhat.com>
+	<6b284aaa-353c-92c1-b01b-21882e7ff9ef@redhat.com>
+	<e8d6cbeb-b1aa-deb1-b7a7-c3c7a3906229@redhat.com>
+Message-ID: <6d98dd44-158e-136b-fc0a-105a0c4a120f@redhat.com>
+Date: Thu, 25 Apr 2019 12:24:24 +0200
 MIME-Version: 1.0
-In-Reply-To: <CAKXe6SKvkJxauOPmBMS+CDPq9NS0qKpydkyOAuS7mHVrA8JVbQ@mail.gmail.com>
+In-Reply-To: <e8d6cbeb-b1aa-deb1-b7a7-c3c7a3906229@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH 3/4] tests: fw_cfg: add reboot_timeout test
- case
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH 5/6] tests: Run the iotests during "make
+ check" again
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,62 +27,79 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Li Qiang <liq3ea@gmail.com>, Gerd Hoffmann <kraxel@redhat.com>, Laszlo Ersek <lersek@redhat.com>
-Cc: Thomas Huth <thuth@redhat.com>, Li Qiang <liq3ea@163.com>, lvivier@redhat.com, Paolo Bonzini <pbonzini@redhat.com>, Qemu Developers <qemu-devel@nongnu.org>
+To: Wainer dos Santos Moschetta <wainersm@redhat.com>, qemu-devel@nongnu.org, Markus Armbruster <armbru@redhat.com>, Christophe Fergeau <cfergeau@redhat.com>
+Cc: Fam Zheng <fam@euphon.net>, Kevin Wolf <kwolf@redhat.com>, Ed Maste <emaste@freebsd.org>, qemu-block@nongnu.org, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>, Max Reitz <mreitz@redhat.com>, =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>, Li-Wen Hsu <lwhsu@freebsd.org>
 
-On 4/25/19 10:29 AM, Li Qiang wrote:
-> 
-> 
-> Gerd Hoffmann <kraxel@redhat.com <mailto:kraxel@redhat.com>> 于2019年4月
-> 25日周四 下午4:15写道：
-> 
->     On Wed, Apr 24, 2019 at 09:16:56AM +0800, Li Qiang wrote:
->     > Thomas Huth <thuth@redhat.com <mailto:thuth@redhat.com>> 于2019年4
->     月24日周三 上午12:29写道：
->     >
->     > > Is this endianess-safe? Or do you need to byteswap
->     reboot_timeout if the
->     > > host and guest endianess does not match?
->     >
->     > Good question!
->     >
->     > IIUC, the qemu fw_cfg store the 'file' entry data just in byte stream.
-> 
->     No.  Integers are defined to be little endian.  See fw_cfg_add_i64() for
->     example, there is an explicit cpu_to_le64() call for that.
-> 
-> 
-> 
-> Yes, for the fw_cfg 'integer' entry it is stored as little endian.
-> But for the fw_cfg 'file' entry interpred as an integer, there is no
-> specify the endianess.
+On 25/04/2019 07.57, Thomas Huth wrote:
+> On 24/04/2019 22.42, Wainer dos Santos Moschetta wrote:
+>> Hi Thomas,
+>>
+>>
+>> On 04/24/2019 07:37 AM, Thomas Huth wrote:
+>>> People often forget to run the iotests before submitting patches or
+>>> pull requests - this is likely due to the fact that we do not run the
+>>> tests during our mandatory "make check" tests yet. Now that we've got
+>>> a new "ci" group of iotests that should be fine to run in every envir=
+on-
+>>> ment, it should be OK to enable the iotests during "make check" again=
+.
+>>> Thus we now run the "ci" tests by default from the qemu-iotests-quick=
+.sh
+>>> script, and only use the former "quick" group (that contains some tes=
+ts
+>>> that are failing in some environments) when the user decided to run
+>>> "make check SPEED=3Dthorough" or something similar.
+>>>
+>>> Signed-off-by: Thomas Huth <thuth@redhat.com>
+>>> ---
+>>> =C2=A0 tests/Makefile.include=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 |=C2=A0 2=
+ +-
+>>> =C2=A0 tests/qemu-iotests-quick.sh | 17 ++++++++++++++++-
+>>> =C2=A0 2 files changed, 17 insertions(+), 2 deletions(-)
+>>
+>> One of Patchew's runners failed with this patch series:
+>> https://patchew.org/QEMU/20190424103747.10173-1-thuth@redhat.com/
+>>
+>> I encountered same failures with `make check` locally on Fedora 29
+>> x86_64 (pulled latest qemu, and configured with defaults and
+>> x86_64-softmmu target):
+>> ---
+>> Not run: 233
+>> Failures: 069 103 114 133 140 143 197 215 226 244
+>=20
+> Ok, thanks for the info. Looks like many tests are failing because qemu=
+-io suddenly prints its program name in front of the error messages? E.g.=
+:
+>=20
+> --- /tmp/qemu-test/src/tests/qemu-iotests/069.out	2019-04-24 16:52:31.0=
+00000000 +0000
+> +++ /tmp/qemu-test/build/tests/qemu-iotests/069.out.bad	2019-04-24 16:5=
+9:13.310226424 +0000
+> @@ -4,5 +4,5 @@
+> =20
+>  Formatting 'TEST_DIR/t.IMGFMT.base', fmt=3DIMGFMT size=3D131072
+>  Formatting 'TEST_DIR/t.IMGFMT', fmt=3DIMGFMT size=3D131072 backing_fil=
+e=3DTEST_DIR/t.IMGFMT.base
+> -can't open device TEST_DIR/t.IMGFMT: Could not open backing file: Coul=
+d not open 'TEST_DIR/t.IMGFMT.base': No such file or directory
+> +qemu-io: can't open device TEST_DIR/t.IMGFMT: Could not open backing f=
+ile: Could not open 'TEST_DIR/t.IMGFMT.base': No such file or directory
+>=20
+> Does anybody from the block folks has a clue what might be going wrong =
+here?
 
-I agree with Li, the endianess of 'reboot-timeout' is not clear.
+It's a regression in the current master branch, not caused by my series.
+The iotests also fail with vanilla master, e.g. reproducible with:
 
->From docs/specs/fw_cfg.txt:
+ cd tests/qemu-iotests
+ ./check -qcow2 069
 
-  === All Other Data Items ===
+It's caused by Christophe's commit here:
 
-  Please consult the QEMU source for the most up-to-date
-  and authoritative list of selector keys and their respective
-  items' purpose, format and writeability.
+ 99e98d7c9fc1a1639fad2c638733b02f4b43aebe
+ qemu-io: Use error_[gs]et_progname()
 
-So checking the git history, this code was introduced in commit
-ac05f3492421, very similar to commit 3d3b8303c6f8 for the
-'boot-menu-wait' entry, which explicitely use little-endian, so I think
-it is safe to consider it little-endian and add a comment about its
-endianess (referring the previous commits in the patch description).
+Christophe, could you please have a look?
 
-Thanks,
-
-Phil.
-
-> 
-> Thanks,
-> Li Qiang
-> 
->  
-> 
->     cheers,
->       Gerd
-> 
+ Thanks,
+  Thomas
