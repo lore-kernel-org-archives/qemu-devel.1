@@ -1,24 +1,24 @@
-Received: from eggs.gnu.org ([209.51.188.92]:60495)
+Received: from eggs.gnu.org ([209.51.188.92]:60549)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <arilou@gmail.com>) id 1hJePj-0008K9-D0
-	for qemu-devel@nongnu.org; Thu, 25 Apr 2019 09:27:48 -0400
+	(envelope-from <arilou@gmail.com>) id 1hJePk-0008Mi-VP
+	for qemu-devel@nongnu.org; Thu, 25 Apr 2019 09:27:49 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <arilou@gmail.com>) id 1hJePi-00014H-DS
-	for qemu-devel@nongnu.org; Thu, 25 Apr 2019 09:27:47 -0400
-Received: from mail-wr1-x444.google.com ([2a00:1450:4864:20::444]:34770)
+	(envelope-from <arilou@gmail.com>) id 1hJePj-00016q-UA
+	for qemu-devel@nongnu.org; Thu, 25 Apr 2019 09:27:48 -0400
+Received: from mail-wm1-x344.google.com ([2a00:1450:4864:20::344]:38318)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <arilou@gmail.com>) id 1hJePi-00011e-61
-	for qemu-devel@nongnu.org; Thu, 25 Apr 2019 09:27:46 -0400
-Received: by mail-wr1-x444.google.com with SMTP id c6so24654912wrm.1
-	for <qemu-devel@nongnu.org>; Thu, 25 Apr 2019 06:27:43 -0700 (PDT)
+	(Exim 4.71) (envelope-from <arilou@gmail.com>) id 1hJePj-00015o-NU
+	for qemu-devel@nongnu.org; Thu, 25 Apr 2019 09:27:47 -0400
+Received: by mail-wm1-x344.google.com with SMTP id w15so263317wmc.3
+	for <qemu-devel@nongnu.org>; Thu, 25 Apr 2019 06:27:47 -0700 (PDT)
 From: Jon Doron <arilou@gmail.com>
-Date: Thu, 25 Apr 2019 16:26:25 +0300
-Message-Id: <20190425132636.31636-11-arilou@gmail.com>
+Date: Thu, 25 Apr 2019 16:26:26 +0300
+Message-Id: <20190425132636.31636-12-arilou@gmail.com>
 In-Reply-To: <20190425132636.31636-1-arilou@gmail.com>
 References: <20190425132636.31636-1-arilou@gmail.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH v6 10/21] gdbstub: Implement get register (p
+Subject: [Qemu-devel] [PATCH v6 11/21] gdbstub: Implement write memory (M
  pkt) with new infra
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
@@ -33,76 +33,77 @@ Cc: Jon Doron <arilou@gmail.com>
 
 Signed-off-by: Jon Doron <arilou@gmail.com>
 ---
- gdbstub.c | 50 ++++++++++++++++++++++++++++++++++++++------------
- 1 file changed, 38 insertions(+), 12 deletions(-)
+ gdbstub.c | 51 +++++++++++++++++++++++++++++++++------------------
+ 1 file changed, 33 insertions(+), 18 deletions(-)
 
 diff --git a/gdbstub.c b/gdbstub.c
-index 49db09ef52..c439b8e796 100644
+index c439b8e796..4522c93fa2 100644
 --- a/gdbstub.c
 +++ b/gdbstub.c
-@@ -1656,6 +1656,36 @@ static void handle_set_reg(GdbCmdContext *gdb_ctx, void *user_ctx)
-     put_packet(gdb_ctx->s, "OK");
+@@ -1686,6 +1686,31 @@ static void handle_get_reg(GdbCmdContext *gdb_ctx, void *user_ctx)
+     put_packet(gdb_ctx->s, gdb_ctx->str_buf);
  }
  
-+static void handle_get_reg(GdbCmdContext *gdb_ctx, void *user_ctx)
++static void handle_write_mem(GdbCmdContext *gdb_ctx, void *user_ctx)
 +{
-+    int reg_size;
-+
-+    /*
-+     * Older gdb are really dumb, and don't use 'g' if 'p' is avaialable.
-+     * This works, but can be very slow.  Anything new enough to
-+     * understand XML also knows how to use this properly.
-+     */
-+    if (!gdb_has_xml) {
-+        put_packet(gdb_ctx->s, "");
++    if (gdb_ctx->num_params < 3) {
++        put_packet(gdb_ctx->s, "E22");
 +        return;
 +    }
 +
-+    if (!gdb_ctx->num_params) {
++    /* hextomem() reads 2*len bytes */
++    if (gdb_ctx->params[1].val_ull > strlen(gdb_ctx->params[2].data) / 2) {
++        put_packet(gdb_ctx->s, "E22");
++        return;
++    }
++
++    hextomem(gdb_ctx->mem_buf, gdb_ctx->params[2].data,
++             gdb_ctx->params[1].val_ull);
++    if (target_memory_rw_debug(gdb_ctx->s->g_cpu, gdb_ctx->params[0].val_ull,
++                               gdb_ctx->mem_buf,
++                               gdb_ctx->params[1].val_ull, true)) {
 +        put_packet(gdb_ctx->s, "E14");
 +        return;
 +    }
 +
-+    reg_size = gdb_read_register(gdb_ctx->s->g_cpu, gdb_ctx->mem_buf,
-+                                 gdb_ctx->params[0].val_ull);
-+    if (!reg_size) {
-+        put_packet(gdb_ctx->s, "E14");
-+        return;
-+    }
-+
-+    memtohex(gdb_ctx->str_buf, gdb_ctx->mem_buf, reg_size);
-+    put_packet(gdb_ctx->s, gdb_ctx->str_buf);
++    put_packet(gdb_ctx->s, "OK");
 +}
 +
  static int gdb_handle_packet(GDBState *s, const char *line_buf)
  {
      CPUState *cpu;
-@@ -1885,18 +1915,14 @@ static int gdb_handle_packet(GDBState *s, const char *line_buf)
+@@ -1894,24 +1919,14 @@ static int gdb_handle_packet(GDBState *s, const char *line_buf)
+         }
+         break;
+     case 'M':
+-        addr = strtoull(p, (char **)&p, 16);
+-        if (*p == ',')
+-            p++;
+-        len = strtoull(p, (char **)&p, 16);
+-        if (*p == ':')
+-            p++;
+-
+-        /* hextomem() reads 2*len bytes */
+-        if (len > strlen(p) / 2) {
+-            put_packet (s, "E22");
+-            break;
+-        }
+-        hextomem(mem_buf, p, len);
+-        if (target_memory_rw_debug(s->g_cpu, addr, mem_buf, len,
+-                                   true) != 0) {
+-            put_packet(s, "E14");
+-        } else {
+-            put_packet(s, "OK");
++        {
++            static const GdbCmdParseEntry write_mem_cmd_desc = {
++                .handler = handle_write_mem,
++                .cmd = "M",
++                .cmd_startswith = 1,
++                .schema = "L,L:s0"
++            };
++            cmd_parser = &write_mem_cmd_desc;
          }
          break;
      case 'p':
--        /* Older gdb are really dumb, and don't use 'g' if 'p' is avaialable.
--           This works, but can be very slow.  Anything new enough to
--           understand XML also knows how to use this properly.  */
--        if (!gdb_has_xml)
--            goto unknown_command;
--        addr = strtoull(p, (char **)&p, 16);
--        reg_size = gdb_read_register(s->g_cpu, mem_buf, addr);
--        if (reg_size) {
--            memtohex(buf, mem_buf, reg_size);
--            put_packet(s, buf);
--        } else {
--            put_packet(s, "E14");
-+        {
-+            static const GdbCmdParseEntry get_reg_cmd_desc = {
-+                .handler = handle_get_reg,
-+                .cmd = "p",
-+                .cmd_startswith = 1,
-+                .schema = "L0"
-+            };
-+            cmd_parser = &get_reg_cmd_desc;
-         }
-         break;
-     case 'P':
 -- 
 2.20.1
