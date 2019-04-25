@@ -1,28 +1,25 @@
-Received: from eggs.gnu.org ([209.51.188.92]:43596)
+Received: from eggs.gnu.org ([209.51.188.92]:44329)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richardw.yang@linux.intel.com>) id 1hJZ1U-00024O-9l
-	for qemu-devel@nongnu.org; Thu, 25 Apr 2019 03:42:25 -0400
+	(envelope-from <thuth@redhat.com>) id 1hJZ3P-0003WY-At
+	for qemu-devel@nongnu.org; Thu, 25 Apr 2019 03:44:24 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richardw.yang@linux.intel.com>) id 1hJYre-0002Lx-77
-	for qemu-devel@nongnu.org; Thu, 25 Apr 2019 03:32:15 -0400
-Received: from mga01.intel.com ([192.55.52.88]:20163)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <richardw.yang@linux.intel.com>)
-	id 1hJYrd-0002Lh-VX
-	for qemu-devel@nongnu.org; Thu, 25 Apr 2019 03:32:14 -0400
-Date: Thu, 25 Apr 2019 15:31:42 +0800
-From: Wei Yang <richardw.yang@linux.intel.com>
-Message-ID: <20190425073142.GA24829@richard>
-Reply-To: Wei Yang <richardw.yang@linux.intel.com>
-References: <1556170489-131927-1-git-send-email-imammedo@redhat.com>
-	<1556170489-131927-4-git-send-email-imammedo@redhat.com>
+	(envelope-from <thuth@redhat.com>) id 1hJZ3N-0007OB-VS
+	for qemu-devel@nongnu.org; Thu, 25 Apr 2019 03:44:23 -0400
+References: <20190424103747.10173-1-thuth@redhat.com>
+	<20190424103747.10173-3-thuth@redhat.com>
+	<20190424112537.GF31388@redhat.com>
+	<c2202c0c-e504-7678-d1f3-6afc67bd2164@redhat.com>
+	<20190424125046.GJ31388@redhat.com>
+From: Thomas Huth <thuth@redhat.com>
+Message-ID: <19e0671e-bb83-8696-0111-804612fa1d12@redhat.com>
+Date: Thu, 25 Apr 2019 09:44:07 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <1556170489-131927-4-git-send-email-imammedo@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v3 03/13] tests: acpi: make pointer to RSDP
- 64bit
+In-Reply-To: <20190424125046.GJ31388@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH 2/6] tests/qemu-iotests/group: Introduce a
+ new "ci" group for CI pipelines
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,66 +28,89 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Igor Mammedov <imammedo@redhat.com>
-Cc: qemu-devel@nongnu.org, Laszlo Ersek <lersek@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Gonglei <arei.gonglei@huawei.com>, Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <philmd@redhat.com>, Shannon Zhao <shannon.zhaosl@gmail.com>, Wei Yang <richardw.yang@linux.intel.com>, Andrew Jones <drjones@redhat.com>, Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>, Ben Warren <ben@skyportsystems.com>
+To: =?UTF-8?Q?Daniel_P=2e_Berrang=c3=a9?= <berrange@redhat.com>
+Cc: qemu-devel@nongnu.org, Fam Zheng <fam@euphon.net>, Kevin Wolf <kwolf@redhat.com>, Ed Maste <emaste@freebsd.org>, qemu-block@nongnu.org, =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>, Max Reitz <mreitz@redhat.com>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>, Li-Wen Hsu <lwhsu@freebsd.org>
 
-On Thu, Apr 25, 2019 at 07:34:39AM +0200, Igor Mammedov wrote:
->In case of UEFI, RSDP doesn't have to be located in lowmem,
->it could be placed at any address. Make sure that test won't
->break if it is placed above the first 4Gb of address space.
->
->PS:
->While at it cleanup some local variables as we don't really
->need them.
->
->Signed-off-by: Igor Mammedov <imammedo@redhat.com>
->Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
->---
->v2:
->  - s/In case of UEFI/In case of UEFI,/ (Laszlo Ersek <lersek@redhat.com>)
->---
-> tests/bios-tables-test.c | 10 ++++------
-> 1 file changed, 4 insertions(+), 6 deletions(-)
->
->diff --git a/tests/bios-tables-test.c b/tests/bios-tables-test.c
->index 2ee044c..c29dcf4 100644
->--- a/tests/bios-tables-test.c
->+++ b/tests/bios-tables-test.c
->@@ -26,7 +26,7 @@
-> typedef struct {
->     const char *machine;
->     const char *variant;
->-    uint32_t rsdp_addr;
->+    uint64_t rsdp_addr;
->     uint8_t rsdp_table[36 /* ACPI 2.0+ RSDP size */];
->     GArray *tables;
->     uint32_t smbios_ep_addr;
->@@ -86,13 +86,11 @@ static void test_acpi_rsdp_address(test_data *data)
-> 
-> static void test_acpi_rsdp_table(test_data *data)
-> {
->-    uint8_t *rsdp_table = data->rsdp_table, revision;
->-    uint32_t addr = data->rsdp_addr;
->+    uint8_t *rsdp_table = data->rsdp_table;
-> 
->-    acpi_fetch_rsdp_table(data->qts, addr, rsdp_table);
->-    revision = rsdp_table[15 /* Revision offset */];
->+    acpi_fetch_rsdp_table(data->qts, data->rsdp_addr, rsdp_table);
+On 24/04/2019 14.50, Daniel P. Berrang=C3=A9 wrote:
+> On Wed, Apr 24, 2019 at 02:37:02PM +0200, Thomas Huth wrote:
+>> On 24/04/2019 13.25, Daniel P. Berrang=C3=A9 wrote:
+>>> On Wed, Apr 24, 2019 at 12:37:43PM +0200, Thomas Huth wrote:
+>>>> Tests in this group are supposed to run in every possible QEMU confi=
+guration.
+>>>> That means they should run with every QEMU binary (also non-x86), wi=
+thout
+>>>> dependencies on an optional features, they must work at least with t=
+he qcow2
+>>>> image format and be able to run on all kind of host filesystems and =
+users
+>>>> (i.e. also as "nobody" or "root").
+>>>>
+>>>> The initial list has been created as a subset of the "quick" group, =
+where
+>>>> I've disabled all tests that are failing with qemu-system-aarch64 or
+>>>> qemu-system-tricore or in one of our CI pipelines.
+>>>>
+>>>> Signed-off-by: Thomas Huth <thuth@redhat.com>
+>>>> ---
+>>>>  tests/qemu-iotests/group | 194 ++++++++++++++++++++----------------=
+---
+>>>>  1 file changed, 102 insertions(+), 92 deletions(-)
+>>>>
+>>>> diff --git a/tests/qemu-iotests/group b/tests/qemu-iotests/group
+>>>> index bae7718380..2ed42dcc14 100644
+>>>> --- a/tests/qemu-iotests/group
+>>>> +++ b/tests/qemu-iotests/group
+>>>> @@ -4,63 +4,73 @@
+>>>>  # - do not start group names with a digit
+>>>>  #
+>>>> =20
+>>>> +#
+>>>> +# Some notes about the groups:
+>>>> +# - Tests in the "quick" group should finish within some few second=
+s
+>>>> +# - Tests in the "ci" group are suitable for running in CI systems.=
+ That
+>>>> +#   means they should run with every QEMU binary (also non-x86), wi=
+th
+>>>> +#   every QEMU configuration (i.e. no dependency on an optional fea=
+ture),
+>>>> +#   at least with the qcow2 image format and all kind of host files=
+ystems
+>>>> +#   and users (i.e. also as "nobody" or "root").
+>>>
+>>> No dependancy on optional features feels a bit restrictive from my PO=
+V.
+>>>
+>>> We have quite alot of testing coverage of stuff that depends on the
+>>> crypto libraries that is important for us to run in "CI". This includ=
+es
+>>> LUKS block drivers, qcow2 with LUKS,  NBD with TLS. Personally I expe=
+ct
+>>> all of those to be tested by CI systems.
+>>>
+>>> IOW for a "CI" group, the bar should be higher than "no optional feat=
+ures"
+>>
+>> Ok, I think I just did not write it properly. What I meant was: the te=
+st
+>> should not *fail* because of a missing feature (what some tests are
+>> unfortunately doing). It's fine if the test detects the missing featur=
+e
+>> and then marks the test as *skip*.
+>=20
+> Ok, this brings back the topic I don't think we ever resolved around ho=
+w
+> to best "detect" features in the iotests. eg if we want to know whether
+> we can use TLS features, how do we decide this ?
+>=20
+> One option is to do a dummy launch of QEMU using TLS & check if it fail=
+s,
+> but that's kind of fragile for CI. A genuine bug in QEMU might cause th=
+is
+> dummy launch to fail, and thus mistakenly skip all the tests instead of
+> failing.
 
-Ok, I think this is the reason you change the second parameter from uint32_t
-to uint64_t in 1st patch.
+Maybe we need a "--dump-features" option for QEMU (or a QMP command)?
+(somewhat similar to "gcc -dumpspecs" for example?)
 
-Maybe we need to move that on to this one?
-
-> 
->-    switch (revision) {
->+    switch (rsdp_table[15 /* Revision offset */]) {
->     case 0: /* ACPI 1.0 RSDP */
->         /* With rev 1, checksum is only for the first 20 bytes */
->         g_assert(!acpi_calc_checksum(rsdp_table,  20));
->-- 
->2.7.4
-
--- 
-Wei Yang
-Help you, Help me
+ Thomas
