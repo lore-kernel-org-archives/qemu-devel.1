@@ -2,93 +2,82 @@ Return-Path: <SRS0=VSQP=S3=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 81E59C43219
-	for <qemu-devel@archiver.kernel.org>; Thu, 25 Apr 2019 22:09:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B446EC43218
+	for <qemu-devel@archiver.kernel.org>; Thu, 25 Apr 2019 22:10:04 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 839F6206BA
-	for <qemu-devel@archiver.kernel.org>; Thu, 25 Apr 2019 22:09:21 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="cUfWIcgH"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 839F6206BA
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	by mail.kernel.org (Postfix) with ESMTPS id CF601206BA
+	for <qemu-devel@archiver.kernel.org>; Thu, 25 Apr 2019 22:10:04 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CF601206BA
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:35732 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:35734 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hJmYS-00022Q-Do
-	for qemu-devel@archiver.kernel.org; Thu, 25 Apr 2019 18:09:20 -0400
+	id 1hJmZ9-0002YK-Mh
+	for qemu-devel@archiver.kernel.org; Thu, 25 Apr 2019 18:10:03 -0400
 Received: from eggs.gnu.org ([209.51.188.92]:35092)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <danielhb413@gmail.com>) id 1hJmWp-0000eg-5U
-	for qemu-devel@nongnu.org; Thu, 25 Apr 2019 18:07:40 -0400
+	(envelope-from <philmd@redhat.com>) id 1hJmXF-0000eg-Eb
+	for qemu-devel@nongnu.org; Thu, 25 Apr 2019 18:08:06 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <danielhb413@gmail.com>) id 1hJmWo-0002VL-64
-	for qemu-devel@nongnu.org; Thu, 25 Apr 2019 18:07:39 -0400
-Received: from mail-qk1-x744.google.com ([2607:f8b0:4864:20::744]:37273)
+	(envelope-from <philmd@redhat.com>) id 1hJmJX-0006YZ-N6
+	for qemu-devel@nongnu.org; Thu, 25 Apr 2019 17:53:57 -0400
+Received: from mail-wr1-f68.google.com ([209.85.221.68]:41721)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <danielhb413@gmail.com>)
-	id 1hJmWo-0002V4-1w
-	for qemu-devel@nongnu.org; Thu, 25 Apr 2019 18:07:38 -0400
-Received: by mail-qk1-x744.google.com with SMTP id c1so755426qkk.4
-	for <qemu-devel@nongnu.org>; Thu, 25 Apr 2019 15:07:38 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
-	h=subject:to:cc:references:from:message-id:date:user-agent
-	:mime-version:in-reply-to:content-transfer-encoding:content-language;
-	bh=VCqOLzcQzOry238anwTWgEnTusWrukckbQ5KfuhSRmY=;
-	b=cUfWIcgHMACeXz4sB+dtbYXC84qBlUh7ZPrdsVtx1gjQmJt1+bdGedirTm4c3tHBL0
-	7CoXxuM0D+VXCPA6ZnH/nz5htV60weN5CofIQvYdcAqXr7/cAi4MLVYyD8CXBQpKoNaf
-	+G4cN5XweP7KfSF017PVZb2IsUr/TsBiwYPXChZD5SGC45VFdXaP2bYCn+phkGNNBrL5
-	z2ntvWbDheyIB4evHBrKTpeCsE85/66R+ScWzrcJbYgmXDRxoe+N2SwIQeMkZbQkdfnf
-	UQzrxs0GiF/8s/JNlHt66GpPIZDu7wwHSqMnHdzN2v8FLAwSb7gilYYq4VtZgBZDJ3rD
-	3+Gg==
+	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1hJmJX-0006XB-52
+	for qemu-devel@nongnu.org; Thu, 25 Apr 2019 17:53:55 -0400
+Received: by mail-wr1-f68.google.com with SMTP id c12so1433446wrt.8
+	for <qemu-devel@nongnu.org>; Thu, 25 Apr 2019 14:53:54 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
 	d=1e100.net; s=20161025;
-	h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-	:user-agent:mime-version:in-reply-to:content-transfer-encoding
-	:content-language;
-	bh=VCqOLzcQzOry238anwTWgEnTusWrukckbQ5KfuhSRmY=;
-	b=WrLKFxMCjYdp47Y8SvDBkPueuR3DnB912I/5jGUqxXZCtpdZntJoznp//dmpYNeJEW
-	JAV4HemUT9GnfNKC7u0LjuK5R8aucnSH6k2ro9g6m/ntwF7ww756qQNKIUbgt6ZVNhcO
-	wfHXrQzvjtfEtviDuBtAtf/n5NUvcQgsSNk7tG16lC+kddM8nxPeJbQ1vupfUBnLI1ke
-	8ry1G72k42WwddrmWtREYTEwPBejlVMirVYYY8/dgVf4oFoFS6MGEKi42OPE5RZYlZVo
-	FKUT5njcwFcN8yfIBkS4IPd3nmEJsAvv1/LuRUA6/sK6mTDUmwl5F6mbTBIU5Vkjb5mW
-	03Rg==
-X-Gm-Message-State: APjAAAUyOM/X37u+k2IcvXZtc1isd/nwHCx7dS8VxXRNgwuHFAuu0AMJ
-	2T23E1c1UUDdR1Q4e56LtWE=
-X-Google-Smtp-Source: APXvYqyFK3w5b2F525U1y9H3Uj6XY5jfHrJpCIxUX8kst9ekdSbH5M6QD3eK2JE5MAUXVfFkVwSCEQ==
-X-Received: by 2002:a05:620a:1014:: with SMTP id
-	z20mr1225313qkj.258.1556230057414; 
-	Thu, 25 Apr 2019 15:07:37 -0700 (PDT)
-Received: from ?IPv6:2804:431:f700:e6ba:b454:b6bb:95ea:4a7d?
-	([2804:431:f700:e6ba:b454:b6bb:95ea:4a7d])
-	by smtp.gmail.com with ESMTPSA id 11sm15646173qtu.5.2019.04.25.15.07.35
-	(version=TLS1_3 cipher=AEAD-AES128-GCM-SHA256 bits=128/128);
-	Thu, 25 Apr 2019 15:07:36 -0700 (PDT)
-To: Wei Yang <richardw.yang@linux.intel.com>, qemu-devel@nongnu.org
-References: <20190424004700.12766-1-richardw.yang@linux.intel.com>
-	<20190424004700.12766-5-richardw.yang@linux.intel.com>
-From: Daniel Henrique Barboza <danielhb413@gmail.com>
-Message-ID: <31fe8ef8-56c0-ee41-4fd4-9197a6b1bbdb@gmail.com>
-Date: Thu, 25 Apr 2019 19:07:33 -0300
+	h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
+	:date:user-agent:mime-version:in-reply-to:content-language
+	:content-transfer-encoding;
+	bh=NaPGrJILZE4qFy8xmfe+rJXg3UuxeRMh9zAw451xYLI=;
+	b=gU5Job3qdeoHM9nbS0tsBsvU8JGJAWNodjRWhxYG3DFL19NkjPDiZVMQtx8H9CJT1S
+	ttO5oPZ7P5enXd5+1dq7pzZJEp9Zh36iTULRQyXX9T6A8fSoMFrRvbidz+LGjXPZjYVY
+	Bbpm8v4uk0Kv8BxqhZya/PV2u2iUdH4vUZlFX+u1HyzgMRJ3o7DOVMJHYneE7HwuXWv2
+	vAf63ZcElfiDsOyYQMZxn8PuFOx70XYjH4L5d9H4V6p6ms8NmIwlqSF5SzTHpZ22hSMA
+	w61MAA5aeGAYuObgubnEpaNNjG/HfonoNAH+HwJpMTYX1VOgbSVRDFSf9cVfgrdclKAP
+	OZhw==
+X-Gm-Message-State: APjAAAWHGcloxrx+stg3HFUk9w41ru3RGTkRVshK7rJtyP4hT2tPUbDJ
+	Lnb80avrFZOjVQTovMGq/FVcMA==
+X-Google-Smtp-Source: APXvYqx/smG8qPLwxxWw4MT4iNvMXZ0AWXam4AerDTF0aClxTkQPz2rG9J1yCzznl8R3j51MWvNiwQ==
+X-Received: by 2002:adf:f70a:: with SMTP id r10mr11613229wrp.96.1556229234042; 
+	Thu, 25 Apr 2019 14:53:54 -0700 (PDT)
+Received: from [192.168.1.25] (abayonne-654-1-209-122.w109-222.abo.wanadoo.fr.
+	[109.222.216.122]) by smtp.gmail.com with ESMTPSA id
+	d10sm5794015wmb.15.2019.04.25.14.53.51
+	(version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+	Thu, 25 Apr 2019 14:53:53 -0700 (PDT)
+To: Thomas Huth <thuth@redhat.com>, yang.zhong@intel.com,
+	Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org,
+	pbonzini@redhat.com
+References: <20190418180057.3593-1-thuth@redhat.com>
+	<20190418180057.3593-20-thuth@redhat.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Openpgp: id=89C1E78F601EE86C867495CBA2A3FD6EDEADC0DE;
+	url=http://pgp.mit.edu/pks/lookup?op=get&search=0xA2A3FD6EDEADC0DE
+Message-ID: <8c7e6aa5-3f74-7c63-486c-80e3e21e9da5@redhat.com>
+Date: Thu, 25 Apr 2019 23:53:51 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
 	Thunderbird/60.6.1
 MIME-Version: 1.0
-In-Reply-To: <20190424004700.12766-5-richardw.yang@linux.intel.com>
-Content-Type: text/plain; charset="UTF-8"; format="flowed"
-Content-Transfer-Encoding: 7bit
+In-Reply-To: <20190418180057.3593-20-thuth@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
 Content-Language: en-US
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
-	recognized.
-X-Received-From: 2607:f8b0:4864:20::744
-Subject: Re: [Qemu-devel] [PATCH 4/4] migration/savevm: wrap into
- qemu_loadvm_state_header()
+Content-Transfer-Encoding: 8bit
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+	[fuzzy]
+X-Received-From: 209.85.221.68
+Subject: Re: [Qemu-devel] [PATCH for-QEMU-4.1 v5 19/29] hw/arm: Express
+ dependencies of the MPS2 boards with Kconfig
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -100,125 +89,112 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: dgilbert@redhat.com, quintela@redhat.com
+Cc: Rob Herring <robh@kernel.org>, Jan Kiszka <jan.kiszka@web.de>,
+	Igor Mitsyanko <i.mitsyanko@gmail.com>, qemu-block@nongnu.org,
+	"Michael S. Tsirkin" <mst@redhat.com>,
+	Andrey Smirnov <andrew.smirnov@gmail.com>,
+	Alistair Francis <alistair@alistair23.me>,
+	Philippe Mathieu-Daude <f4bug@amsat.org>,
+	Jean-Christophe Dubois <jcd@tribudubois.net>,
+	Beniamino Galvani <b.galvani@gmail.com>, Andrew Jeffery <andrew@aj.id.au>,
+	Cedric Le Goater <clg@kaod.org>, qemu-arm@nongnu.org,
+	Peter Chubb <peter.chubb@nicta.com.au>, Gerd Hoffmann <kraxel@redhat.com>,
+	Antony Pavlov <antonynpavlov@gmail.com>,
+	"Edgar E . Iglesias" <edgar.iglesias@gmail.com>,
+	Subbaraya Sundeep <sundeep.lkml@gmail.com>,
+	John Snow <jsnow@redhat.com>, Joel Stanley <joel@jms.id.au>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190425220733.d9aM037RtC_Z1n06CU_MSbAEYyuGNj6dx2XGOnVFIis@z>
+Message-ID: <20190425215351.h2qj7UHHSk9dgFAddmGB9I6IHYJqsxY6p2v5TnHgMcw@z>
 
-
-
-On 4/23/19 9:47 PM, Wei Yang wrote:
-> On source side, we have qemu_savevm_state_header() to send related data,
-> while on the receiving side those steps are scattered in
-> qemu_loadvm_state().
->
-> This patch wrap those related steps into qemu_loadvm_state_header() to
-> make it friendly to read.
->
-> Signed-off-by: Wei Yang <richardw.yang@linux.intel.com>
-
-
-Reviewed-by: Daniel Henrique Barboza <danielhb413@gmail.com>
-
-
+On 4/18/19 8:00 PM, Thomas Huth wrote:
+> Add Kconfig dependencies for the mps2-an* machines.
+> 
+> Signed-off-by: Thomas Huth <thuth@redhat.com>
 > ---
->   migration/savevm.c | 69 +++++++++++++++++++++++++++-------------------
->   1 file changed, 40 insertions(+), 29 deletions(-)
->
-> diff --git a/migration/savevm.c b/migration/savevm.c
-> index a80ae83663..64d23682c6 100644
-> --- a/migration/savevm.c
-> +++ b/migration/savevm.c
-> @@ -2256,6 +2256,43 @@ qemu_loadvm_section_part_end(QEMUFile *f, MigrationIncomingState *mis)
->       return 0;
->   }
->   
-> +static int qemu_loadvm_state_header(QEMUFile *f)
-> +{
-> +    unsigned int v;
-> +    int ret;
-> +
-> +    v = qemu_get_be32(f);
-> +    if (v != QEMU_VM_FILE_MAGIC) {
-> +        error_report("Not a migration stream");
-> +        return -EINVAL;
-> +    }
-> +
-> +    v = qemu_get_be32(f);
-> +    if (v == QEMU_VM_FILE_VERSION_COMPAT) {
-> +        error_report("SaveVM v2 format is obsolete and don't work anymore");
-> +        return -ENOTSUP;
-> +    }
-> +    if (v != QEMU_VM_FILE_VERSION) {
-> +        error_report("Unsupported migration stream version");
-> +        return -ENOTSUP;
-> +    }
-> +
-> +    if (migrate_get_current()->send_configuration) {
-> +        if (qemu_get_byte(f) != QEMU_VM_CONFIGURATION) {
-> +            error_report("Configuration section missing");
-> +            qemu_loadvm_state_cleanup();
-> +            return -EINVAL;
-> +        }
-> +        ret = vmstate_load_state(f, &vmstate_configuration, &savevm_state, 0);
-> +
-> +        if (ret) {
-> +            qemu_loadvm_state_cleanup();
-> +            return ret;
-> +        }
-> +    }
-> +    return 0;
-> +}
-> +
->   static int qemu_loadvm_state_setup(QEMUFile *f)
->   {
->       SaveStateEntry *se;
-> @@ -2403,7 +2440,6 @@ int qemu_loadvm_state(QEMUFile *f)
->   {
->       MigrationIncomingState *mis = migration_incoming_get_current();
->       Error *local_err = NULL;
-> -    unsigned int v;
->       int ret;
->   
->       if (migration_is_blocked(&local_err)) {
-> @@ -2411,34 +2447,9 @@ int qemu_loadvm_state(QEMUFile *f)
->           return -EINVAL;
->       }
->   
-> -    v = qemu_get_be32(f);
-> -    if (v != QEMU_VM_FILE_MAGIC) {
-> -        error_report("Not a migration stream");
-> -        return -EINVAL;
-> -    }
+>  default-configs/arm-softmmu.mak | 20 +-------------------
+>  hw/arm/Kconfig                  | 18 ++++++++++++++++++
+>  2 files changed, 19 insertions(+), 19 deletions(-)
+> 
+> diff --git a/default-configs/arm-softmmu.mak b/default-configs/arm-softmmu.mak
+> index a0b9016e3a..31d31d3f4a 100644
+> --- a/default-configs/arm-softmmu.mak
+> +++ b/default-configs/arm-softmmu.mak
+> @@ -30,6 +30,7 @@ CONFIG_Z2=y
+>  CONFIG_COLLIE=y
+>  CONFIG_ASPEED_SOC=y
+>  CONFIG_NETDUINO2=y
+> +CONFIG_MPS2=y
+>  
+>  CONFIG_VGA=y
+>  CONFIG_SSI_M25P80=y
+> @@ -38,28 +39,9 @@ CONFIG_IMX_FEC=y
+>  CONFIG_FRAMEBUFFER=y
+>  
+>  CONFIG_DIGIC=y
+> -CONFIG_MPS2=y
+>  CONFIG_RASPI=y
+>  CONFIG_NRF51_SOC=y
+>  
+> -CONFIG_CMSDK_APB_TIMER=y
+> -CONFIG_CMSDK_APB_DUALTIMER=y
+> -CONFIG_CMSDK_APB_UART=y
+> -CONFIG_CMSDK_APB_WATCHDOG=y
 > -
-> -    v = qemu_get_be32(f);
-> -    if (v == QEMU_VM_FILE_VERSION_COMPAT) {
-> -        error_report("SaveVM v2 format is obsolete and don't work anymore");
-> -        return -ENOTSUP;
-> -    }
-> -    if (v != QEMU_VM_FILE_VERSION) {
-> -        error_report("Unsupported migration stream version");
-> -        return -ENOTSUP;
-> -    }
+> -CONFIG_MPS2_FPGAIO=y
+> -CONFIG_MPS2_SCC=y
 > -
-> -    if (migrate_get_current()->send_configuration) {
-> -        if (qemu_get_byte(f) != QEMU_VM_CONFIGURATION) {
-> -            error_report("Configuration section missing");
-> -            qemu_loadvm_state_cleanup();
-> -            return -EINVAL;
-> -        }
-> -        ret = vmstate_load_state(f, &vmstate_configuration, &savevm_state, 0);
+> -CONFIG_TZ_MPC=y
+> -CONFIG_TZ_MSC=y
+> -CONFIG_TZ_PPC=y
+> -CONFIG_ARMSSE=y
+> -CONFIG_IOTKIT_SECCTL=y
+> -CONFIG_IOTKIT_SYSCTL=y
+> -CONFIG_IOTKIT_SYSINFO=y
+> -CONFIG_ARMSSE_CPUID=y
+> -CONFIG_ARMSSE_MHU=y
 > -
-> -        if (ret) {
-> -            qemu_loadvm_state_cleanup();
-> -            return ret;
-> -        }
-> +    ret = qemu_loadvm_state_header(f);
-> +    if (ret) {
-> +        return ret;
->       }
->   
->       if (qemu_loadvm_state_setup(f) != 0) {
+>  CONFIG_FSL_IMX6=y
+>  CONFIG_FSL_IMX25=y
+>  CONFIG_FSL_IMX7=y
+> diff --git a/hw/arm/Kconfig b/hw/arm/Kconfig
+> index 2ef5696900..466b143fdf 100644
+> --- a/hw/arm/Kconfig
+> +++ b/hw/arm/Kconfig
+> @@ -301,6 +301,12 @@ config ASPEED_SOC
+>  
+>  config MPS2
+>      bool
+> +    select ARMSSE
+> +    select LAN9118
+> +    select MPS2_FPGAIO
+> +    select MPS2_SCC
+> +    select PL022    # Serial port
+> +    select PL080    # DMA controller
+>  
+>  config FSL_IMX7
+>      bool
+> @@ -340,6 +346,18 @@ config ARM11MPCORE
+>  
+>  config ARMSSE
+>      bool
+> +    select ARMSSE_CPUID
+> +    select ARMSSE_MHU
+> +    select CMSDK_APB_TIMER
+> +    select CMSDK_APB_DUALTIMER
+> +    select CMSDK_APB_UART
+> +    select CMSDK_APB_WATCHDOG
+> +    select IOTKIT_SECCTL
+> +    select IOTKIT_SYSCTL
+> +    select IOTKIT_SYSINFO
+> +    select TZ_MPC
+> +    select TZ_MSC
+> +    select TZ_PPC
+>  
+>  config ARMSSE_CPUID
+>      bool
+> 
 
+Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
 
