@@ -2,79 +2,60 @@ Return-Path: <SRS0=VSQP=S3=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8077CC43218
-	for <qemu-devel@archiver.kernel.org>; Thu, 25 Apr 2019 23:06:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9B4ABC43219
+	for <qemu-devel@archiver.kernel.org>; Thu, 25 Apr 2019 23:08:35 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A0AFE206BF
-	for <qemu-devel@archiver.kernel.org>; Thu, 25 Apr 2019 23:06:45 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A0AFE206BF
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id BE4D420717
+	for <qemu-devel@archiver.kernel.org>; Thu, 25 Apr 2019 23:08:35 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BE4D420717
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=eik.bme.hu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:36352 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:36381 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hJnS0-0002ip-9L
-	for qemu-devel@archiver.kernel.org; Thu, 25 Apr 2019 19:06:44 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:45823)
+	id 1hJnTm-0004AF-8h
+	for qemu-devel@archiver.kernel.org; Thu, 25 Apr 2019 19:08:34 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:45795)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1hJnQ1-0000sq-M0
-	for qemu-devel@nongnu.org; Thu, 25 Apr 2019 19:04:42 -0400
+	(envelope-from <balaton@eik.bme.hu>) id 1hJnQJ-0000sW-L3
+	for qemu-devel@nongnu.org; Thu, 25 Apr 2019 19:05:00 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1hJnH9-0002fU-2q
-	for qemu-devel@nongnu.org; Thu, 25 Apr 2019 18:55:32 -0400
-Received: from mail-wr1-f65.google.com ([209.85.221.65]:34849)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1hJnH7-0002b9-0m
-	for qemu-devel@nongnu.org; Thu, 25 Apr 2019 18:55:30 -0400
-Received: by mail-wr1-f65.google.com with SMTP id f7so1660362wrs.2
-	for <qemu-devel@nongnu.org>; Thu, 25 Apr 2019 15:55:28 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=1e100.net; s=20161025;
-	h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
-	:date:user-agent:mime-version:in-reply-to:content-language
-	:content-transfer-encoding;
-	bh=GBnR7hhSI1h1Wl1I61bB5TonHhPbCOcQK5Tu5KslEms=;
-	b=plG3bITtboSYWyOKLJCeWrWL50CbAZKR/51FNCvHBj3A+qmZjoZ4eLKs8U2ZLxIKEV
-	s625D0uN4GPlN6XpXS2P4PuLeXxbwAiF/lETAHX0etwwp0/AFqUtPVpGg29bNyI046d3
-	cFBk19ys9YqSbzVrFKPlbWIKc+2cvKGLuS3IzcNetEvO96B9wHwaqasRClWcpSjSZtCM
-	xyBjYTQjj2DZP6jc7ZiYmsdX9QYm1RDk4vscm/E4tOMOTMCPV6u1U2tl5SMpJr+U3zc9
-	ye5VADzLP1RZKq3sIj7YlWkt2KPrGLj1VJwC2esU+fx7IbG2lRwfrE6afLVIPLDSfdPP
-	giCw==
-X-Gm-Message-State: APjAAAXfIykbcIuRC2qqiv7eIncTGfOvjSATs9MiYKwZKV8twQ80sKGp
-	C6znWLY83ZiQTB4Ce+fKpHQVJw==
-X-Google-Smtp-Source: APXvYqwrzlDY2UtlKyQtIPp3X43hkY2yZ7W7gNSQV3FsHnWGaN0C3a6j8cAWxQth3oniI/neO0a5SQ==
-X-Received: by 2002:adf:9e86:: with SMTP id a6mr18133522wrf.178.1556232927202; 
-	Thu, 25 Apr 2019 15:55:27 -0700 (PDT)
-Received: from [192.168.1.25] (abayonne-654-1-209-122.w109-222.abo.wanadoo.fr.
-	[109.222.216.122]) by smtp.gmail.com with ESMTPSA id
-	s12sm20560396wmj.42.2019.04.25.15.55.25
-	(version=TLS1_3 cipher=AEAD-AES128-GCM-SHA256 bits=128/128);
-	Thu, 25 Apr 2019 15:55:26 -0700 (PDT)
-To: Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org,
-	Gerd Hoffmann <kraxel@redhat.com>
-References: <20190419075625.24251-1-thuth@redhat.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Openpgp: id=89C1E78F601EE86C867495CBA2A3FD6EDEADC0DE;
-	url=http://pgp.mit.edu/pks/lookup?op=get&search=0xA2A3FD6EDEADC0DE
-Message-ID: <c0ce7a39-9e9f-a7be-c73b-a9c2c05da3af@redhat.com>
-Date: Fri, 26 Apr 2019 00:55:25 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
-	Thunderbird/60.6.1
+	(envelope-from <balaton@eik.bme.hu>) id 1hJnE6-0006Di-30
+	for qemu-devel@nongnu.org; Thu, 25 Apr 2019 18:52:23 -0400
+Received: from zero.eik.bme.hu ([152.66.115.2]:20735)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <balaton@eik.bme.hu>) id 1hJnE5-00068u-Pw
+	for qemu-devel@nongnu.org; Thu, 25 Apr 2019 18:52:22 -0400
+Received: from zero.eik.bme.hu (blah.eik.bme.hu [152.66.115.182])
+	by localhost (Postfix) with SMTP id 869D57456B8;
+	Fri, 26 Apr 2019 00:51:55 +0200 (CEST)
+Received: by zero.eik.bme.hu (Postfix, from userid 432)
+	id E685B7456B7; Fri, 26 Apr 2019 00:51:54 +0200 (CEST)
+Received: from localhost (localhost [127.0.0.1])
+	by zero.eik.bme.hu (Postfix) with ESMTP id DECD174569A;
+	Fri, 26 Apr 2019 00:51:54 +0200 (CEST)
+Date: Fri, 26 Apr 2019 00:51:54 +0200 (CEST)
+From: BALATON Zoltan <balaton@eik.bme.hu>
+To: Gerd Hoffmann <kraxel@redhat.com>
+In-Reply-To: <alpine.BSF.2.21.9999.1904142227580.56442@zero.eik.bme.hu>
+Message-ID: <alpine.BSF.2.21.9999.1904260048210.88235@zero.eik.bme.hu>
+References: <20190409110732.5C5FF7465DB@zero.eik.bme.hu>
+	<08d40ec6-be36-f2e1-d216-6dd9deb5c1e0@redhat.com>
+	<alpine.BSF.2.21.9999.1904142227580.56442@zero.eik.bme.hu>
+User-Agent: Alpine 2.21.9999 (BSF 287 2018-06-16)
 MIME-Version: 1.0
-In-Reply-To: <20190419075625.24251-1-thuth@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-	[fuzzy]
-X-Received-From: 209.85.221.65
-Subject: Re: [Qemu-devel] [PATCH v2 for-4.1 0/2] Fix ohci_die() and move PCI
- code to separate file
+X-detected-operating-system: by eggs.gnu.org: FreeBSD 9.x [fuzzy]
+X-Received-From: 152.66.115.2
+Content-Type: text/plain; charset="UTF-8"; format="flowed"
+Content-Transfer-Encoding: quoted-printable
+X-Content-Filtered-By: Mailman/MimeDel 2.1.21
+Subject: Re: [Qemu-devel] [PATCH] ati-vga: Fix check for blt outside vram
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -86,42 +67,90 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Paolo Bonzini <pbonzini@redhat.com>
+Cc: Andrew Randrianasulu <randrianasulu@gmail.com>,
+	Peter Maydell <peter.maydell@linaro.org>,
+	=?ISO-8859-15?Q?Philippe_Mathieu-Daud=E9?= <philmd@redhat.com>,
+	qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190425225525.SktgpqAMzhYY5xQyMqOLU_bMlH51Z60iqMaCaJ5xa-8@z>
+Message-ID: <20190425225154.Kvmotvn1W736l68o6wdvoKgCMI7Uml6midNujk1bilU@z>
 
-Hi Thomas,
+On Sun, 14 Apr 2019, BALATON Zoltan wrote:
+> On Tue, 9 Apr 2019, Philippe Mathieu-Daud=C3=A9 wrote:
+>> This patch looks 4.0 worthwhile.
+>
+> Now that it seems we'll have another rc, will this get in? Gerd, I thin=
+k you=20
+> have to send a pull request with it for that.
 
-On 4/19/19 9:56 AM, Thomas Huth wrote:
-> First patch fixes a problem with ohci_die(), second patch moves PCI code into
-> a separate file, so that the sysbus OHCI device can also be used without
-> the dependency on the PCI code.
-> 
-> v2: Split the patch into two patches, one for the ohci_die() fix and one
->     for the PCI code movement.
+Ping? This has missed two rc-s. This prevents a crash so you might want t=
+o=20
+queue it for stable as well now.
 
-Way cleaner. I wonder why you don't use a typedef for the void
-(*ohci_die_fn)(struct OHCIState *) prototype.
-Anyway to this series:
-Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
-Tested-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+Regards,
+BALATON Zoltan
 
-> 
-> Thomas Huth (2):
->   hw/usb/hcd-ohci: Do not use PCI functions with sysbus devices in
->     ohci_die()
->   hw/usb/hcd-ohci: Move PCI-related code into a separate file
-> 
->  hw/sh4/Kconfig        |   2 +-
->  hw/usb/Kconfig        |   6 +-
->  hw/usb/Makefile.objs  |   1 +
->  hw/usb/hcd-ohci-pci.c | 163 +++++++++++++++++++++++++++++++
->  hw/usb/hcd-ohci.c     | 219 ++++--------------------------------------
->  hw/usb/hcd-ohci.h     | 104 ++++++++++++++++++++
->  6 files changed, 293 insertions(+), 202 deletions(-)
->  create mode 100644 hw/usb/hcd-ohci-pci.c
->  create mode 100644 hw/usb/hcd-ohci.h
-> 
-
+>
+>> On 4/9/19 12:56 PM, BALATON Zoltan wrote:
+>>> Fix the check preventing calling pixman functions that would access
+>>> memory outside allocated vram. The r128 X driver sometimes seem to tr=
+y
+>>> blits that span outside vram, this check prevents crashing QEMU in
+>>> that case. (The r128 X driver may have problems even on real hardware
+>>> so I'm not sure if it's a client bug or emulation problem but at leas=
+t
+>>> QEMU should survive.)
+>>>=20
+>>> Signed-off-by: BALATON Zoltan <balaton@eik.bme.hu>
+>>> Tested-by: Andrew Randrianasulu <randrianasulu@gmail.com>
+>>> ---
+>>>  hw/display/ati_2d.c | 12 ++++++------
+>>>  1 file changed, 6 insertions(+), 6 deletions(-)
+>>>=20
+>>> diff --git a/hw/display/ati_2d.c b/hw/display/ati_2d.c
+>>> index bc98ba6eeb..fe3ae14864 100644
+>>> --- a/hw/display/ati_2d.c
+>>> +++ b/hw/display/ati_2d.c
+>>> @@ -79,10 +79,10 @@ void ati_2d_blt(ATIVGAState *s)
+>>>                  s->regs.dst_width, s->regs.dst_height);
+>>>          end =3D s->vga.vram_ptr + s->vga.vram_size;
+>>>          if (src_bits >=3D end || dst_bits >=3D end ||
+>>> -            src_bits + (s->regs.src_y + s->regs.dst_height) * src_st=
+ride=20
+>>> +
+>>> -            s->regs.src_x >=3D end ||
+>>> -            dst_bits + (s->regs.dst_y + s->regs.dst_height) * dst_st=
+ride=20
+>>> +
+>>> -            s->regs.dst_x >=3D end) {
+>>> +            src_bits + s->regs.src_x + (s->regs.src_y +=20
+>>> s->regs.dst_height) *
+>>> +            src_stride * sizeof(uint32_t) >=3D end ||
+>>> +            dst_bits + s->regs.dst_x + (s->regs.dst_y +=20
+>>> s->regs.dst_height) *
+>>> +            dst_stride * sizeof(uint32_t) >=3D end) {
+>>>              qemu_log_mask(LOG_UNIMP, "blt outside vram not=20
+>>> implemented\n");
+>>>              return;
+>>>          }
+>>> @@ -140,8 +140,8 @@ void ati_2d_blt(ATIVGAState *s)
+>>>                  filler);
+>>>          end =3D s->vga.vram_ptr + s->vga.vram_size;
+>>>          if (dst_bits >=3D end ||
+>>> -            dst_bits + (s->regs.dst_y + s->regs.dst_height) * dst_st=
+ride=20
+>>> +
+>>> -            s->regs.dst_x >=3D end) {
+>>> +            dst_bits + s->regs.dst_x + (s->regs.dst_y +=20
+>>> s->regs.dst_height) *
+>>> +            dst_stride * sizeof(uint32_t) >=3D end) {
+>>>              qemu_log_mask(LOG_UNIMP, "blt outside vram not=20
+>>> implemented\n");
+>>>              return;
+>>>          }
+>>>=20
+>>=20
+>>=20
+>
+>
