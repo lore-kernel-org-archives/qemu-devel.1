@@ -2,65 +2,90 @@ Return-Path: <SRS0=VSQP=S3=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.4 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,USER_AGENT_MUTT
+X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS,USER_AGENT_MUTT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 63788C10F03
-	for <qemu-devel@archiver.kernel.org>; Thu, 25 Apr 2019 08:25:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 99F1AC10F03
+	for <qemu-devel@archiver.kernel.org>; Thu, 25 Apr 2019 08:27:13 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 23405214AE
-	for <qemu-devel@archiver.kernel.org>; Thu, 25 Apr 2019 08:25:33 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 23405214AE
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.intel.com
+	by mail.kernel.org (Postfix) with ESMTPS id 631D7208E4
+	for <qemu-devel@archiver.kernel.org>; Thu, 25 Apr 2019 08:27:13 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="O9o1BGIu"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 631D7208E4
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:53763 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:53778 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hJZhE-0002m3-D4
-	for qemu-devel@archiver.kernel.org; Thu, 25 Apr 2019 04:25:32 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:52437)
+	id 1hJZiq-0004gi-Id
+	for qemu-devel@archiver.kernel.org; Thu, 25 Apr 2019 04:27:12 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:53131)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richardw.yang@linux.intel.com>) id 1hJZft-0001uL-12
-	for qemu-devel@nongnu.org; Thu, 25 Apr 2019 04:24:10 -0400
+	(envelope-from <stefanha@gmail.com>) id 1hJZhu-0003wy-Fp
+	for qemu-devel@nongnu.org; Thu, 25 Apr 2019 04:26:15 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richardw.yang@linux.intel.com>) id 1hJZfp-0008Nz-UL
-	for qemu-devel@nongnu.org; Thu, 25 Apr 2019 04:24:08 -0400
-Received: from mga12.intel.com ([192.55.52.136]:21131)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <richardw.yang@linux.intel.com>)
-	id 1hJZfm-0008LB-Gq
-	for qemu-devel@nongnu.org; Thu, 25 Apr 2019 04:24:03 -0400
-X-Amp-Result: UNKNOWN
-X-Amp-Original-Verdict: FILE UNKNOWN
-X-Amp-File-Uploaded: False
-Received: from fmsmga002.fm.intel.com ([10.253.24.26])
-	by fmsmga106.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384;
-	25 Apr 2019 01:23:59 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.60,393,1549958400"; d="scan'208";a="164698650"
-Received: from richard.sh.intel.com (HELO localhost) ([10.239.159.54])
-	by fmsmga002.fm.intel.com with ESMTP; 25 Apr 2019 01:23:58 -0700
-Date: Thu, 25 Apr 2019 16:23:31 +0800
-From: Wei Yang <richardw.yang@linux.intel.com>
-To: Igor Mammedov <imammedo@redhat.com>
-Message-ID: <20190425082331.GH24829@richard>
-References: <1556170489-131927-1-git-send-email-imammedo@redhat.com>
-	<1556170489-131927-2-git-send-email-imammedo@redhat.com>
-	<20190425072256.GA24344@richard>
-	<20190425100751.11ac20bf@redhat.com>
+	(envelope-from <stefanha@gmail.com>) id 1hJZht-000193-4g
+	for qemu-devel@nongnu.org; Thu, 25 Apr 2019 04:26:14 -0400
+Received: from mail-wm1-x342.google.com ([2a00:1450:4864:20::342]:40958)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1hJZhs-00018H-U2
+	for qemu-devel@nongnu.org; Thu, 25 Apr 2019 04:26:13 -0400
+Received: by mail-wm1-x342.google.com with SMTP id h11so2422367wmb.5
+	for <qemu-devel@nongnu.org>; Thu, 25 Apr 2019 01:26:12 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+	h=date:from:to:cc:subject:message-id:references:mime-version
+	:content-disposition:in-reply-to:user-agent;
+	bh=NBTmVR1/O+kIGjUae+OFP7wkZ0DUswD/OM6EUZru1RQ=;
+	b=O9o1BGIuWK9bf1E1WJDGXrJNp61DL25HkbFO8lK/2wiDCjG4kKSkzrN34VHZF9HZqV
+	ZyjaECr3oJeXBcc11FvOEOqhiG1MmYoABK58dpDzbRmH+1VA1231neMNk/OA4h17LpnH
+	LtQPDYkc5Vtm5m1V0jX6BOsJoyUPzA9iODnccvm5RbN4w+LL8ujHaB896jrdiIPal1fZ
+	jOMbDga6YSUqgAX5Ov0ZVameFYQZXqV753h9uET47NAOC++ZZVOntJgfx133etC/HVHO
+	iAk9KYalViYtHW70WY0Bdbm0OdX4rqdd4rRVGe6AS9ZeGbJ45U4HOSt+q+/JQ0NYKFcT
+	GZTw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=1e100.net; s=20161025;
+	h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+	:mime-version:content-disposition:in-reply-to:user-agent;
+	bh=NBTmVR1/O+kIGjUae+OFP7wkZ0DUswD/OM6EUZru1RQ=;
+	b=QAcMZj2V7I9WY+6jnFlMINCJlDw+EYi8ootyfx6zHWXjiQdsLbOeMsUQdCgCZ5h8J7
+	bcsNLavjqqn4TT/6sy/yv0EpbYUZ27ybO9M1lpWp9Td4jbgm/E9rU1JfJevrI6CHQ+fG
+	gxiNvSG2qQxOcpcKESicHEMeiVL0yP39X0h5D6mBZ1sLM371hdYwdnDblAMFTwc7S0uB
+	tFQJwuIMZtbxyAlkRuu90k1sB9fQ0lGMU4dpH571KV29kSxrx22V/HJwHsVymqV7enRF
+	1y2S4Xu1y9t3D/tkTddlSHz+LKw+JZVJAg4Xsb2n2uWlqi4Dskntiqg6Om9W7oN5Lo9m
+	RTYA==
+X-Gm-Message-State: APjAAAWwhLL2RyOfm1U+FKWKrqbnbPYMIXvEA0LHe51UNdEdulEr8vHt
+	5srzwmEEYHDIoGg3a5XEuqE=
+X-Google-Smtp-Source: APXvYqyuzeJ9BfQMkfFUQdUty/BHuZqnvfhfjsXAtE89rFSk40ErUPu8eDjGEcCruCiTKdkufcJCmA==
+X-Received: by 2002:a1c:4e19:: with SMTP id g25mr2636429wmh.9.1556180771353;
+	Thu, 25 Apr 2019 01:26:11 -0700 (PDT)
+Received: from localhost ([51.15.41.238])
+	by smtp.gmail.com with ESMTPSA id y4sm1355714wrt.34.2019.04.25.01.26.10
+	(version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
+	Thu, 25 Apr 2019 01:26:10 -0700 (PDT)
+Date: Thu, 25 Apr 2019 09:26:09 +0100
+From: Stefan Hajnoczi <stefanha@gmail.com>
+To: Wei Yang <richardw.yang@linux.intel.com>
+Message-ID: <20190425082609.GB30231@stefanha-x1.localdomain>
+References: <20190422004849.26463-1-richardw.yang@linux.intel.com>
+	<20190422004849.26463-2-richardw.yang@linux.intel.com>
+	<20190423092518.GD32465@stefanha-x1.localdomain>
+	<20190424010105.GA12824@richard>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="9zSXsLTf0vkW971A"
 Content-Disposition: inline
-In-Reply-To: <20190425100751.11ac20bf@redhat.com>
-User-Agent: Mutt/1.10.1 (2018-07-13)
+In-Reply-To: <20190424010105.GA12824@richard>
+User-Agent: Mutt/1.11.3 (2019-02-01)
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
 	recognized.
-X-Received-From: 192.55.52.136
-Subject: Re: [Qemu-devel] [PATCH v3 01/13] tests: acpi: make RSDT test
- routine handle XSDT
+X-Received-From: 2a00:1450:4864:20::342
+Subject: Re: [Qemu-devel] [PATCH v14 1/2] util/mmap-alloc: support MAP_SYNC
+ in qemu_ram_mmap()
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -72,145 +97,91 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Wei Yang <richardw.yang@linux.intel.com>
-Cc: Andrew Jones <drjones@redhat.com>, Ben Warren <ben@skyportsystems.com>,
-	"Michael S. Tsirkin" <mst@redhat.com>,
-	Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <philmd@redhat.com>,
-	qemu-devel@nongnu.org,
-	Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>,
-	Shannon Zhao <shannon.zhaosl@gmail.com>, Gonglei <arei.gonglei@huawei.com>,
-	Wei Yang <richardw.yang@linux.intel.com>, Laszlo Ersek <lersek@redhat.com>
+Cc: pagupta@redhat.com, xiaoguangrong.eric@gmail.com, mst@redhat.com,
+	Haozhong Zhang <haozhong.zhang@intel.com>, qemu-devel@nongnu.org,
+	yi.z.zhang@linux.intel.com, yu.c.zhang@linux.intel.com,
+	Stefan Hajnoczi <stefanha@redhat.com>, pbonzini@redhat.com,
+	imammedo@redhat.com, dan.j.williams@intel.com, ehabkost@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190425082331.KtrRP6138MLX263xzFfHou6e8D_sj14VntwK0MOiD8I@z>
+Message-ID: <20190425082609.rptZX21xCL_5BqOhil6Q4tGuna6hUTv7KiyOwNtMydI@z>
 
-On Thu, Apr 25, 2019 at 10:07:51AM +0200, Igor Mammedov wrote:
->On Thu, 25 Apr 2019 15:22:56 +0800
->Wei Yang <richardw.yang@linux.intel.com> wrote:
->
->> On Thu, Apr 25, 2019 at 07:34:37AM +0200, Igor Mammedov wrote:
->> >If RSDP revision is more than 0 fetch table pointed by XSDT
->> >and fallback to legacy RSDT table otherwise.
->> >
->> >While at it drop unused acpi_get_xsdt_address().  
->> 
->> Would it be proper to split this into another patch?
->
->it should be fine to remove code that's being replaced by new one
->which substitutes the former within the same patch.
->but if you insist I can split it into another patch.
 
-I am fine with this included.
+--9zSXsLTf0vkW971A
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
->
->> >
->> >Signed-off-by: Igor Mammedov <imammedo@redhat.com>
->> >---
->> >PS:
->> > it doesn't affect existing pc/q35 machines as they use RSDP.revision == 0
->> > but it will be used by followup patch to enable testing arm/virt
->> > board which uses provides XSDT table.
->> >---
->> > tests/acpi-utils.h       |  3 +--
->> > tests/acpi-utils.c       | 14 +-------------
->> > tests/bios-tables-test.c | 18 +++++++++++++-----
->> > 3 files changed, 15 insertions(+), 20 deletions(-)
->> >
->> >diff --git a/tests/acpi-utils.h b/tests/acpi-utils.h
->> >index ef388bb..8c68201 100644
->> >--- a/tests/acpi-utils.h
->> >+++ b/tests/acpi-utils.h
->> >@@ -46,8 +46,7 @@ typedef struct {
->> > 
->> > uint8_t acpi_calc_checksum(const uint8_t *data, int len);
->> > uint32_t acpi_find_rsdp_address(QTestState *qts);
->> >-uint64_t acpi_get_xsdt_address(uint8_t *rsdp_table);
->> >-void acpi_parse_rsdp_table(QTestState *qts, uint32_t addr, uint8_t *rsdp_table);
->> >+void acpi_parse_rsdp_table(QTestState *qts, uint64_t addr, uint8_t *rsdp_table);  
->> 
->> Would you mind giving some hint of this change?
->thanks for spotting it. IT certainly doesn't belong to this patch.
->I'll need to recheck if supporting 64bit address fields is done properly
->and find another place where to move this hunk.
->
->> 
->> > void acpi_fetch_table(QTestState *qts, uint8_t **aml, uint32_t *aml_len,
->> >                       const uint8_t *addr_ptr, const char *sig,
->> >                       bool verify_checksum);
->> >diff --git a/tests/acpi-utils.c b/tests/acpi-utils.c
->> >index cc33b46..9a6d1d3 100644
->> >--- a/tests/acpi-utils.c
->> >+++ b/tests/acpi-utils.c
->> >@@ -51,19 +51,7 @@ uint32_t acpi_find_rsdp_address(QTestState *qts)
->> >     return off;
->> > }
->> > 
->> >-uint64_t acpi_get_xsdt_address(uint8_t *rsdp_table)
->> >-{
->> >-    uint64_t xsdt_physical_address;
->> >-    uint8_t revision = rsdp_table[15 /* Revision offset */];
->> >-
->> >-    /* We must have revision 2 if we're looking for an XSDT pointer */
->> >-    g_assert(revision == 2);
->> >-
->> >-    memcpy(&xsdt_physical_address, &rsdp_table[24 /* XsdtAddress offset */], 8);
->> >-    return le64_to_cpu(xsdt_physical_address);
->> >-}
->> >-
->> >-void acpi_parse_rsdp_table(QTestState *qts, uint32_t addr, uint8_t *rsdp_table)
->> >+void acpi_parse_rsdp_table(QTestState *qts, uint64_t addr, uint8_t *rsdp_table)
->> > {
->> >     uint8_t revision;
->> > 
->> >diff --git a/tests/bios-tables-test.c b/tests/bios-tables-test.c
->> >index a506dcb..24bd102 100644
->> >--- a/tests/bios-tables-test.c
->> >+++ b/tests/bios-tables-test.c
->> >@@ -107,17 +107,25 @@ static void test_acpi_rsdp_table(test_data *data)
->> >     }
->> > }
->> > 
->> >-static void test_acpi_rsdt_table(test_data *data)
->> >+static void test_acpi_rxsdt_table(test_data *data)
->> > {
->> >+    const char *sig = "RSDT";
->> >     AcpiSdtTable rsdt = {};
->> >+    int entry_size = 4;
->> >+    int addr_off = 16 /* RsdtAddress */;
->> >     uint8_t *ent;
->> > 
->> >-    /* read RSDT table */
->> >+    if (data->rsdp_table[15 /* Revision offset */] != 0) {
->> >+        addr_off = 24 /* XsdtAddress */;
->> >+        entry_size = 8;
->> >+        sig = "XSDT";
->> >+    }
->> >+    /* read [RX]SDT table */
->> >     acpi_fetch_table(data->qts, &rsdt.aml, &rsdt.aml_len,
->> >-                     &data->rsdp_table[16 /* RsdtAddress */], "RSDT", true);
->> >+                     &data->rsdp_table[addr_off], sig, true);
->> > 
->> >     /* Load all tables and add to test list directly RSDT referenced tables */
->> >-    ACPI_FOREACH_RSDT_ENTRY(rsdt.aml, rsdt.aml_len, ent, 4 /* Entry size */) {
->> >+    ACPI_FOREACH_RSDT_ENTRY(rsdt.aml, rsdt.aml_len, ent, entry_size) {
->> >         AcpiSdtTable ssdt_table = {};
->> > 
->> >         acpi_fetch_table(data->qts, &ssdt_table.aml, &ssdt_table.aml_len, ent,
->> >@@ -521,7 +529,7 @@ static void test_acpi_one(const char *params, test_data *data)
->> >     data->tables = g_array_new(false, true, sizeof(AcpiSdtTable));
->> >     test_acpi_rsdp_address(data);
->> >     test_acpi_rsdp_table(data);
->> >-    test_acpi_rsdt_table(data);
->> >+    test_acpi_rxsdt_table(data);
->> >     test_acpi_fadt_table(data);
->> > 
->> >     if (iasl) {
->> >-- 
->> >2.7.4  
->> 
+On Wed, Apr 24, 2019 at 09:01:05AM +0800, Wei Yang wrote:
+> On Tue, Apr 23, 2019 at 10:25:18AM +0100, Stefan Hajnoczi wrote:
+> [...]
+> >> +#ifdef CONFIG_LINUX
+> >> +#include <linux/mman.h>
+> >> +#else  /* !CONFIG_LINUX */
+> >> +#define MAP_SYNC              0x0
+> >> +#define MAP_SHARED_VALIDATE   0x0
+> >> +#endif /* CONFIG_LINUX */
+> >
+> >MAP_SHARED_VALIDATE is is from 2017:
+> >
+> >  commit 1c9725974074a047f6080eecc62c50a8e840d050
+> >  Author: Dan Williams <dan.j.williams@intel.com>
+> >  Date:   Wed Nov 1 16:36:30 2017 +0100
+> >
+> >    mm: introduce MAP_SHARED_VALIDATE, a mechanism to safely define new =
+mmap flags
+> >
+> >This code fails to compile on Linux hosts with pre-4.15 headers.
+> >
+>=20
+> Ok, qemu build will fail on pre-4.15 linux.
+>=20
+> >Instead you could use the following (even on Linux!):
+> >
+> >  #ifndef MAP_SYNC
+> >  #define MAP_SYNC 0
+> >  #endif
+> >  #ifndef MAP_SHARED_VALIDATE
+> >  #define MAP_SHARED_VALIDATE 0
+> >  #endif
+> >
+> >Either way:
+>=20
+> You mean replace the above code to:
+>=20
+> #ifdef CONFIG_LINUX
+> #include <linux/mman.h>
+> #endif /* CONFIG_LINUX */
+>=20
+> #ifndef MAP_SYNC
+> #define MAP_SYNC 0
+> #endif
+> #ifndef MAP_SHARED_VALIDATE
+> #define MAP_SHARED_VALIDATE 0
+> #endif
 
--- 
-Wei Yang
-Help you, Help me
+Yes, please.
+
+This is not critical but I bet someone will hit this issue when
+compiling a new QEMU on an old host.  This small tweak will save them
+time.
+
+Stefan
+
+--9zSXsLTf0vkW971A
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEcBAEBAgAGBQJcwW8hAAoJEJykq7OBq3PI9/0IAKCQ520Vn7UaLDGx2fhGHq48
+omsvcpTNdimVOCIrB6rb1ZJ81gQ8R7VQX4lqoMADYAcSt+EBI7hSIKMWlgbZBr0r
+cz5Gco4wSXgl+74GnuuNYxjsPK8Zp8a7gyWllas8ls71P9rxjQfkS46bEJFaX2BB
+Hg8a2M5cUsIk0/uT/62puyD9xHSJWS7tT28qoi+R0WKKPKzw2HwaocK44Gddt6ae
+czbQQY4QmzP0+TtgPnObipxJBFF/+jwdSb3meYtujGHotyduYfNyvduQsaxOggiX
+O7riI1xhJVWk4oOglFtjmMD6YwFWA2YvZ0/lXkq5t3/9TDkjCZMnQmNVk7Gp71A=
+=Mev/
+-----END PGP SIGNATURE-----
+
+--9zSXsLTf0vkW971A--
 
