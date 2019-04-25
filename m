@@ -1,28 +1,27 @@
-Received: from eggs.gnu.org ([209.51.188.92]:51046)
+Received: from eggs.gnu.org ([209.51.188.92]:51454)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1hJfM4-0003Jy-Jr
-	for qemu-devel@nongnu.org; Thu, 25 Apr 2019 10:28:05 -0400
+	(envelope-from <liq3ea@gmail.com>) id 1hJfNt-0004IW-Dl
+	for qemu-devel@nongnu.org; Thu, 25 Apr 2019 10:29:58 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1hJfM3-0007u6-Kc
-	for qemu-devel@nongnu.org; Thu, 25 Apr 2019 10:28:04 -0400
-Received: from mail-wr1-f65.google.com ([209.85.221.65]:46710)
+	(envelope-from <liq3ea@gmail.com>) id 1hJfNs-0000ww-2U
+	for qemu-devel@nongnu.org; Thu, 25 Apr 2019 10:29:57 -0400
+Received: from mail-ot1-x342.google.com ([2607:f8b0:4864:20::342]:45807)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1hJfM3-0007tI-Do
-	for qemu-devel@nongnu.org; Thu, 25 Apr 2019 10:28:03 -0400
-Received: by mail-wr1-f65.google.com with SMTP id t17so30576228wrw.13
-	for <qemu-devel@nongnu.org>; Thu, 25 Apr 2019 07:28:03 -0700 (PDT)
-References: <20190418180057.3593-1-thuth@redhat.com>
-	<20190418180057.3593-8-thuth@redhat.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Message-ID: <472cdca7-a01f-632f-bbac-633db846c605@redhat.com>
-Date: Thu, 25 Apr 2019 16:27:58 +0200
+	(Exim 4.71) (envelope-from <liq3ea@gmail.com>) id 1hJfNr-0000wA-Qr
+	for qemu-devel@nongnu.org; Thu, 25 Apr 2019 10:29:56 -0400
+Received: by mail-ot1-x342.google.com with SMTP id e5so19546006otk.12
+	for <qemu-devel@nongnu.org>; Thu, 25 Apr 2019 07:29:55 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20190418180057.3593-8-thuth@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH for-QEMU-4.1 v5 07/29] hw/arm: Express
- dependencies of the fsl-imx31 machine with Kconfig
+References: <20190424140643.62457-1-liq3ea@163.com>
+	<2b623811-1be2-159c-0fa6-c548aa9eea82@redhat.com>
+In-Reply-To: <2b623811-1be2-159c-0fa6-c548aa9eea82@redhat.com>
+From: Li Qiang <liq3ea@gmail.com>
+Date: Thu, 25 Apr 2019 22:29:18 +0800
+Message-ID: <CAKXe6SLXrthYFrQGVQNT4hK1-22wrteMNyygZgx_j=jtDfYC6g@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v2 0/5] fw_cfg_test refactor and add two
+ test cases
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,79 +30,89 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Thomas Huth <thuth@redhat.com>, yang.zhong@intel.com, Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org, pbonzini@redhat.com
-Cc: "Michael S. Tsirkin" <mst@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>, "Edgar E . Iglesias" <edgar.iglesias@gmail.com>, Jean-Christophe Dubois <jcd@tribudubois.net>, Rob Herring <robh@kernel.org>, qemu-block@nongnu.org, Andrey Smirnov <andrew.smirnov@gmail.com>, Joel Stanley <joel@jms.id.au>, Antony Pavlov <antonynpavlov@gmail.com>, Alistair Francis <alistair@alistair23.me>, Beniamino Galvani <b.galvani@gmail.com>, qemu-arm@nongnu.org, Peter Chubb <peter.chubb@nicta.com.au>, Cedric Le Goater <clg@kaod.org>, John Snow <jsnow@redhat.com>, Andrew Jeffery <andrew@aj.id.au>, Philippe Mathieu-Daude <f4bug@amsat.org>, Subbaraya Sundeep <sundeep.lkml@gmail.com>, Igor Mitsyanko <i.mitsyanko@gmail.com>, Jan Kiszka <jan.kiszka@web.de>
+To: Thomas Huth <thuth@redhat.com>
+Cc: Li Qiang <liq3ea@163.com>, =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>, Laszlo Ersek <lersek@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>, lvivier@redhat.com, Paolo Bonzini <pbonzini@redhat.com>, Qemu Developers <qemu-devel@nongnu.org>
 
-On 4/18/19 8:00 PM, Thomas Huth wrote:
-> Add Kconfig dependencies for the fsl-imx31 / kzm machine.
-> This patch is slightly based on earlier work by Ákos Kovács (i.e.
-> his "hw/arm/Kconfig: Add ARM Kconfig" patch).
-> 
-> Signed-off-by: Thomas Huth <thuth@redhat.com>
-> ---
->  default-configs/arm-softmmu.mak | 3 +--
->  hw/arm/Kconfig                  | 4 ++++
->  hw/misc/Kconfig                 | 2 ++
->  3 files changed, 7 insertions(+), 2 deletions(-)
-> 
-> diff --git a/default-configs/arm-softmmu.mak b/default-configs/arm-softmmu.mak
-> index 6195b75f48..7f94811ccb 100644
-> --- a/default-configs/arm-softmmu.mak
-> +++ b/default-configs/arm-softmmu.mak
-> @@ -10,6 +10,7 @@ CONFIG_PCI_TESTDEV=y
->  CONFIG_EXYNOS4=y
->  CONFIG_HIGHBANK=y
->  CONFIG_INTEGRATOR=y
-> +CONFIG_FSL_IMX31=y
->  
->  CONFIG_VGA=y
->  CONFIG_NAND=y
-> @@ -68,7 +69,6 @@ CONFIG_TSC210X=y
->  CONFIG_BLIZZARD=y
->  CONFIG_ONENAND=y
->  CONFIG_TUSB6010=y
-> -CONFIG_IMX=y
->  CONFIG_MAINSTONE=y
->  CONFIG_MPS2=y
->  CONFIG_MUSCA=y
-> @@ -115,7 +115,6 @@ CONFIG_ALLWINNER_A10_PIC=y
->  CONFIG_ALLWINNER_A10=y
->  
->  CONFIG_FSL_IMX6=y
-> -CONFIG_FSL_IMX31=y
->  CONFIG_FSL_IMX25=y
->  CONFIG_FSL_IMX7=y
->  CONFIG_FSL_IMX6UL=y
-> diff --git a/hw/arm/Kconfig b/hw/arm/Kconfig
-> index ad3b1f9b40..9087b7d714 100644
-> --- a/hw/arm/Kconfig
-> +++ b/hw/arm/Kconfig
-> @@ -98,6 +98,10 @@ config FSL_IMX25
->  
->  config FSL_IMX31
->      bool
-> +    select SERIAL
-> +    select IMX
-> +    select IMX_I2C
-> +    select LAN9118
+Thomas Huth <thuth@redhat.com> =E4=BA=8E2019=E5=B9=B44=E6=9C=8825=E6=97=A5=
+=E5=91=A8=E5=9B=9B =E4=B8=8B=E5=8D=885:57=E5=86=99=E9=81=93=EF=BC=9A
 
-Similarly to my comment on patch 6 of this series:
-Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+> On 24/04/2019 16.06, Li Qiang wrote:
+> > In the disscuss of adding reboot timeout test case:
+> > https://lists.gnu.org/archive/html/qemu-devel/2019-04/msg03304.html
+> >
+> > Philippe suggested we should uses the only related option for one
+> > specific test. However currently we uses one QTestState for all the
+> > test cases. In order to achieve Philippe's idea, I split the test case
+> > for its own QTestState. As this patchset has changed a lot, I don't bum=
+p
+> > the version.
+> >
+> > Change since v1:
+> > Add a patch to store the reboot_timeout as little endian
+> > Fix the endian issue per Thomas's review
+>
+> The test still aborts on a big endian host:
+>
+> $ QTEST_QEMU_BINARY=3Dx86_64-softmmu/qemu-system-x86_64 tests/fw_cfg-test
+> /x86_64/fw_cfg/signature: OK
+> /x86_64/fw_cfg/id: OK
+> /x86_64/fw_cfg/uuid: OK
+> /x86_64/fw_cfg/ram_size: OK
+> /x86_64/fw_cfg/nographic: OK
+> /x86_64/fw_cfg/nb_cpus: OK
+> /x86_64/fw_cfg/max_cpus: OK
+> /x86_64/fw_cfg/numa: OK
+> /x86_64/fw_cfg/boot_menu: OK
+> /x86_64/fw_cfg/reboot_timeout: **
+>
+> ERROR:/home/thuth/devel/qemu/tests/fw_cfg-test.c:190:test_fw_cfg_reboot_t=
+imeout:
+> assertion failed (reboot_timeout =3D=3D 15): (251658240 =3D=3D 15)
+> Aborted
+>
+> 251658240 is 0x0F000000, i.e. a byte-swapped 0xf =3D 15 ... i.e. you stil=
+l
+> got an endianess issue somewhere in the code.
+>
 
->  
->  config FSL_IMX6
->      bool
-> diff --git a/hw/misc/Kconfig b/hw/misc/Kconfig
-> index 5f67d0d6d9..385e1b0cec 100644
-> --- a/hw/misc/Kconfig
-> +++ b/hw/misc/Kconfig
-> @@ -76,6 +76,8 @@ config ECCMEMCTL
->  config IMX
->      bool
->      select PTIMER
-> +    select SSI
-> +    select USB_EHCI_SYSBUS
->  
->  config STM32F2XX_SYSCFG
->      bool
-> 
+
+Hmmmm,
+
+I have thought a long time, still can't point where is wrong.
+
+Let's from the result:
+0x0f000000 in the big endian laid as this:
+low ---> high
+0x0f 00 00 00
+
+As I have swapped before the compare so it is read as this:
+low ---> high
+00 00 00 0x0f
+
+However from the store side:
+the 15 in big endian is:
+low ---> high
+00 00 00 0x0f
+
+But Before I store it, I convert it to little endian, so following should
+be stored:
+low ---> high
+0x0f 00 00 00
+
+Do you apply the patch 3 and recompile the qemu binary?
+If it is, I may need your help as I have no big endian host device.
+
+You can debug and  inspect the memory layout and point out where is wrong.
+
+Thanks,
+Li Qiang
+
+
+
+
+
+
+
+>
+>  Thomas
+>
