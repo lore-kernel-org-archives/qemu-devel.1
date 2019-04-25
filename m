@@ -1,21 +1,30 @@
-Received: from eggs.gnu.org ([209.51.188.92]:50855)
+Received: from eggs.gnu.org ([209.51.188.92]:54686)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1hJbcm-0006Uf-1R
-	for qemu-devel@nongnu.org; Thu, 25 Apr 2019 06:29:05 -0400
+	(envelope-from <lersek@redhat.com>) id 1hJbyr-0003TK-36
+	for qemu-devel@nongnu.org; Thu, 25 Apr 2019 06:51:54 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1hJbcj-0000rv-AG
-	for qemu-devel@nongnu.org; Thu, 25 Apr 2019 06:29:02 -0400
-References: <20190131164614.19209-1-cfergeau@redhat.com>
-	<20190131164614.19209-2-cfergeau@redhat.com>
-From: Thomas Huth <thuth@redhat.com>
-Message-ID: <42cbc07b-6525-ef95-69be-14786554b76b@redhat.com>
-Date: Thu, 25 Apr 2019 12:28:39 +0200
+	(envelope-from <lersek@redhat.com>) id 1hJbqs-0000SQ-Mn
+	for qemu-devel@nongnu.org; Thu, 25 Apr 2019 06:43:39 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:46236)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <lersek@redhat.com>) id 1hJbqs-0000QT-HW
+	for qemu-devel@nongnu.org; Thu, 25 Apr 2019 06:43:38 -0400
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+	[10.5.11.14])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id CD77CC0528AC
+	for <qemu-devel@nongnu.org>; Thu, 25 Apr 2019 10:43:37 +0000 (UTC)
+From: Laszlo Ersek <lersek@redhat.com>
+Date: Thu, 25 Apr 2019 12:43:26 +0200
+Message-Id: <20190425104326.12835-3-lersek@redhat.com>
+In-Reply-To: <20190425104326.12835-1-lersek@redhat.com>
+References: <20190425104326.12835-1-lersek@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20190131164614.19209-2-cfergeau@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v7 1/2] qemu-io: Use error_[gs]et_progname()
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PATCH 2/2] tests/uefi-boot-images: report the SMBIOS
+ entry point structures
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,40 +33,49 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Christophe Fergeau <cfergeau@redhat.com>, qemu-devel@nongnu.org, Markus Armbruster <armbru@redhat.com>
-Cc: Stefan Hajnoczi <stefanha@redhat.com>, Qemu-block <qemu-block@nongnu.org>
+To: qemu devel list <qemu-devel@nongnu.org>
+Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>, Igor Mammedov <imammedo@redhat.com>
 
-On 31/01/2019 17.46, Christophe Fergeau wrote:
-> qemu-io reimplements itself what
-> error_get_progname()/error_set_progname() already does.
-> This commit switches it to use this API from qemu-error.h
-> 
-> Signed-off-by: Christophe Fergeau <cfergeau@redhat.com>
-> Reviewed-by: Eric Blake <eblake@redhat.com>
-> Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
+Rebuild the "bios-tables-test" UEFI boot images with the SMBIOS entry
+point reporting that has been added in the previous patch.
 
-This patch causes some qemu-iotests to fail now, e.g.:
+Cc: "Philippe Mathieu-Daud=C3=A9" <philmd@redhat.com>
+Cc: Igor Mammedov <imammedo@redhat.com>
+Launchpad: https://bugs.launchpad.net/qemu/+bug/1821884
+Signed-off-by: Laszlo Ersek <lersek@redhat.com>
+---
+ tests/data/uefi-boot-images/bios-tables-test.aarch64.iso.qcow2 | Bin 117=
+76 -> 12288 bytes
+ tests/data/uefi-boot-images/bios-tables-test.arm.iso.qcow2     | Bin 117=
+76 -> 11776 bytes
+ tests/data/uefi-boot-images/bios-tables-test.i386.iso.qcow2    | Bin 128=
+00 -> 13312 bytes
+ tests/data/uefi-boot-images/bios-tables-test.x86_64.iso.qcow2  | Bin 133=
+12 -> 13312 bytes
+ 4 files changed, 0 insertions(+), 0 deletions(-)
 
-cd tests/qemu-iotests
-./check -qcow2 114
-[...]
-114 0s ... - output mismatch (see 114.out.bad)
---- /home/thuth/devel/qemu/tests/qemu-iotests/114.out	2019-04-23
-16:43:12.000000000 +0200
-+++ /home/thuth/tmp/qemu-build/tests/qemu-iotests/114.out.bad	2019-04-25
-12:27:47.000000000 +0200
-@@ -7,7 +7,7 @@
- cluster_size: 65536
- backing file: TEST_DIR/t.IMGFMT.base
- backing file format: foo
--can't open device TEST_DIR/t.qcow2: Could not open backing file:
-Unknown driver 'foo'
-+qemu-io: can't open device TEST_DIR/t.qcow2: Could not open backing
-file: Unknown driver 'foo'
- no file open, try 'help open'
- read 4096/4096 bytes at offset 0
- 4 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-
-Could you please have a look?
-
- Thomas
+diff --git a/tests/data/uefi-boot-images/bios-tables-test.aarch64.iso.qco=
+w2 b/tests/data/uefi-boot-images/bios-tables-test.aarch64.iso.qcow2
+index ac0b7b1b8f89..d588cf3ebd7d 100644
+Binary files a/tests/data/uefi-boot-images/bios-tables-test.aarch64.iso.q=
+cow2 and b/tests/data/uefi-boot-images/bios-tables-test.aarch64.iso.qcow2=
+ differ
+diff --git a/tests/data/uefi-boot-images/bios-tables-test.arm.iso.qcow2 b=
+/tests/data/uefi-boot-images/bios-tables-test.arm.iso.qcow2
+index d20fa7c81925..552c7a7ddce6 100644
+Binary files a/tests/data/uefi-boot-images/bios-tables-test.arm.iso.qcow2=
+ and b/tests/data/uefi-boot-images/bios-tables-test.arm.iso.qcow2 differ
+diff --git a/tests/data/uefi-boot-images/bios-tables-test.i386.iso.qcow2 =
+b/tests/data/uefi-boot-images/bios-tables-test.i386.iso.qcow2
+index 26c882baeaba..c66ad155196d 100644
+Binary files a/tests/data/uefi-boot-images/bios-tables-test.i386.iso.qcow=
+2 and b/tests/data/uefi-boot-images/bios-tables-test.i386.iso.qcow2 diffe=
+r
+diff --git a/tests/data/uefi-boot-images/bios-tables-test.x86_64.iso.qcow=
+2 b/tests/data/uefi-boot-images/bios-tables-test.x86_64.iso.qcow2
+index 9ec3c1f20bb2..f59e07c85415 100644
+Binary files a/tests/data/uefi-boot-images/bios-tables-test.x86_64.iso.qc=
+ow2 and b/tests/data/uefi-boot-images/bios-tables-test.x86_64.iso.qcow2 d=
+iffer
+--=20
+2.19.1.3.g30247aa5d201
