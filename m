@@ -2,67 +2,90 @@ Return-Path: <SRS0=VSQP=S3=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-4.0 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DAB9AC43219
-	for <qemu-devel@archiver.kernel.org>; Thu, 25 Apr 2019 14:56:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2D990C43219
+	for <qemu-devel@archiver.kernel.org>; Thu, 25 Apr 2019 15:01:56 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id F201B206BF
-	for <qemu-devel@archiver.kernel.org>; Thu, 25 Apr 2019 14:56:18 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F201B206BF
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 4262320891
+	for <qemu-devel@archiver.kernel.org>; Thu, 25 Apr 2019 15:01:56 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="OoYBtvhX"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4262320891
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:58944 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:59013 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hJfnN-0007rG-W5
-	for qemu-devel@archiver.kernel.org; Thu, 25 Apr 2019 10:56:18 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:56922)
+	id 1hJfso-0004Qc-QI
+	for qemu-devel@archiver.kernel.org; Thu, 25 Apr 2019 11:01:54 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:58446)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <wainersm@redhat.com>) id 1hJflt-0006j0-0J
-	for qemu-devel@nongnu.org; Thu, 25 Apr 2019 10:54:46 -0400
+	(envelope-from <alex.bennee@linaro.org>) id 1hJfri-00024A-UM
+	for qemu-devel@nongnu.org; Thu, 25 Apr 2019 11:00:51 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <wainersm@redhat.com>) id 1hJflr-0003Mo-Oy
-	for qemu-devel@nongnu.org; Thu, 25 Apr 2019 10:54:44 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:48014)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <wainersm@redhat.com>) id 1hJflr-0003Ke-GF
-	for qemu-devel@nongnu.org; Thu, 25 Apr 2019 10:54:43 -0400
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
-	[10.5.11.22])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id BC21D7C852
-	for <qemu-devel@nongnu.org>; Thu, 25 Apr 2019 14:54:42 +0000 (UTC)
-Received: from localhost.localdomain (ovpn-122-118.rdu2.redhat.com
-	[10.10.122.118])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id DC3C31001E9E;
-	Thu, 25 Apr 2019 14:54:35 +0000 (UTC)
-To: Eduardo Habkost <ehabkost@redhat.com>, qemu-devel@nongnu.org
-References: <20190423212246.3542-1-ehabkost@redhat.com>
-	<20190423212246.3542-4-ehabkost@redhat.com>
-From: Wainer dos Santos Moschetta <wainersm@redhat.com>
-Message-ID: <a1529434-54e0-0d2e-4275-1c6080c1cffe@redhat.com>
-Date: Thu, 25 Apr 2019 11:54:34 -0300
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:52.0) Gecko/20100101
-	Thunderbird/52.5.2
+	(envelope-from <alex.bennee@linaro.org>) id 1hJfrd-0002Sg-TG
+	for qemu-devel@nongnu.org; Thu, 25 Apr 2019 11:00:46 -0400
+Received: from mail-wm1-x342.google.com ([2a00:1450:4864:20::342]:55129)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+	id 1hJfrd-0002RF-Kx
+	for qemu-devel@nongnu.org; Thu, 25 Apr 2019 11:00:41 -0400
+Received: by mail-wm1-x342.google.com with SMTP id c1so9673922wml.4
+	for <qemu-devel@nongnu.org>; Thu, 25 Apr 2019 08:00:41 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+	h=references:user-agent:from:to:cc:subject:in-reply-to:date
+	:message-id:mime-version:content-transfer-encoding;
+	bh=dehFTAF4Pl2fY8atiaDoD4+qpew/Ir71ep8CuobcJRg=;
+	b=OoYBtvhXX1mwnAPTwzxJEaJl8O514/dyavV6kHaLb0oVfG3sleXGQzaNaAHYfo7fuH
+	hMmJq7DA0+RFPkSr/cF0nBJfUXa9wxEZIQWgT0q+O286oDxCHZilrQIZdag377EsiBQc
+	E9nLbYnti6G8JpvQFsRZFdX64PYpi6QQ85dCxMnMPRLUC82HarCUz0Mi2l+tb9+q2UNP
+	tdzRHkfFe5EKsVIW7Acy6bVuPTmkZnR1WGL3KRA+Ju8NTp3J2lFq30l5SvXgN2QF9lxB
+	fbRyQXPprMG3eWmLSWQ7dbnvekO2sqkNUi0zWxLLInyVjA8w6P6G7DDsNjidFvGu/w49
+	y62w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=1e100.net; s=20161025;
+	h=x-gm-message-state:references:user-agent:from:to:cc:subject
+	:in-reply-to:date:message-id:mime-version:content-transfer-encoding;
+	bh=dehFTAF4Pl2fY8atiaDoD4+qpew/Ir71ep8CuobcJRg=;
+	b=Hvz8WiFgDVrDiCkvMXhwnyzuZODzx8YZs8MM/AtD6DEMjQIhxq5VM3MZaY1bfSU6xM
+	Yn3BqK4CymV6HwuEgAuDiIdprPotKaDb72M6pENnneRL1TJYpfBmPGJJipTBj9pnDD43
+	5nDqvMZMOIEl9x1lPzXqAaVmexD3Q7/31WZwGIvB6+11AmvvJvdZxVGEaayi1SdMso64
+	IUziWDOAk9ThdCnB/JuflrTte6gu0U9D2xMtukr2v6ysj8q4tp4olKQ1uSRr1pnp0r5x
+	8v+1TaaM5M24hUVjIZXL6RoY5kn0DmzWaf0jW67ebA93z1F2j3FhWR/nFfnh3SvFwXS/
+	Z37Q==
+X-Gm-Message-State: APjAAAXJSX1bQta+wDwkNI7MXI6HFK/NO7vNm3OAy53T5ptAPcHPzit/
+	wQNE55UH7Vhf/19n3Qfb+wJtgg==
+X-Google-Smtp-Source: APXvYqx8X3nVu5UFL5E10NjACtZtahtUF/lPa5lXnUi+YEWuRDlgdTG4T24VL8SVi3VRla6rKuzNWQ==
+X-Received: by 2002:a1c:4d04:: with SMTP id o4mr3991241wmh.126.1556204440059; 
+	Thu, 25 Apr 2019 08:00:40 -0700 (PDT)
+Received: from zen.linaroharston ([81.128.185.34])
+	by smtp.gmail.com with ESMTPSA id
+	v1sm23394657wrd.47.2019.04.25.08.00.39
+	(version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
+	Thu, 25 Apr 2019 08:00:39 -0700 (PDT)
+Received: from zen (localhost [127.0.0.1])
+	by zen.linaroharston (Postfix) with ESMTP id E5B8C1FF87;
+	Thu, 25 Apr 2019 16:00:38 +0100 (BST)
+References: <20190424142714.28460-1-arilou@gmail.com>
+User-agent: mu4e 1.3.1; emacs 26.1
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+To: qemu-devel@nongnu.org
+In-reply-to: <20190424142714.28460-1-arilou@gmail.com>
+Date: Thu, 25 Apr 2019 16:00:38 +0100
+Message-ID: <87r29quo2x.fsf@zen.linaroharston>
 MIME-Version: 1.0
-In-Reply-To: <20190423212246.3542-4-ehabkost@redhat.com>
-Content-Type: text/plain; charset="UTF-8"; format="flowed"
-Content-Transfer-Encoding: 7bit
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.27]);
-	Thu, 25 Apr 2019 14:54:42 +0000 (UTC)
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH 3/3] qmp: Add deprecation information to
- query-machines
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+	recognized.
+X-Received-From: 2a00:1450:4864:20::342
+Subject: Re: [Qemu-devel] [PATCH v3 01/20] gdbstub: Add infrastructure to
+ parse cmd packets
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -74,108 +97,30 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: mprivozn@redhat.com, Markus Armbruster <armbru@redhat.com>
+Cc: Jon Doron <arilou@gmail.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190425145434.RKTq91e0jfwVcTEfaAvrpUPyD60Gk0ZqBCOs6H6JTus@z>
+Message-ID: <20190425150038.OOMqFgcS06-t6powrxmHguSfsRlcmTQCE50Hy7fVZyY@z>
 
-Hi Eduardo,
 
-On 04/23/2019 06:22 PM, Eduardo Habkost wrote:
-> Export machine type deprecation information through the
-> query-machines QMP command.  With this, libvirt and management
-> software will be able to show this information to users and/or
-> suggest changes to VM configuration to avoid deprecated machines.
+arilou@gmail.com writes:
+
+> From: Jon Doron <arilou@gmail.com>
 >
-> Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
-> ---
->   qapi/misc.json                     |  5 ++++-
->   vl.c                               |  6 ++++++
->   tests/acceptance/query_machines.py | 27 +++++++++++++++++++++++++++
->   3 files changed, 37 insertions(+), 1 deletion(-)
->   create mode 100644 tests/acceptance/query_machines.py
->
-> diff --git a/qapi/misc.json b/qapi/misc.json
-> index 8b3ca4fdd3..941d251d17 100644
-> --- a/qapi/misc.json
-> +++ b/qapi/misc.json
-> @@ -2018,12 +2018,15 @@
->   #
->   # @hotpluggable-cpus: cpu hotplug via -device is supported (since 2.7.0)
->   #
-> +# @support-status: Support/deprecation status information (since 4.1.0)
-> +#
->   # Since: 1.2.0
->   ##
->   { 'struct': 'MachineInfo',
->     'data': { 'name': 'str', '*alias': 'str',
->               '*is-default': 'bool', 'cpu-max': 'int',
-> -            'hotpluggable-cpus': 'bool'} }
-> +            'hotpluggable-cpus': 'bool',
-> +            'support-status': 'SupportStatusInfo' } }
->   
->   ##
->   # @query-machines:
-> diff --git a/vl.c b/vl.c
-> index 99b857ed2a..ca23d2a404 100644
-> --- a/vl.c
-> +++ b/vl.c
-> @@ -1530,6 +1530,12 @@ MachineInfoList *qmp_query_machines(Error **errp)
->           info->name = g_strdup(mc->name);
->           info->cpu_max = !mc->max_cpus ? 1 : mc->max_cpus;
->           info->hotpluggable_cpus = mc->has_hotpluggable_cpus;
-> +        assert(!mc->support_status.status_message ||
-> +               mc->support_status.has_status_message);
-> +        assert(!mc->support_status.suggested_alternative ||
-> +               mc->support_status.has_suggested_alternative);
-> +        info->support_status =
-> +            QAPI_CLONE(SupportStatusInfo, &mc->support_status);
->   
->           entry = g_malloc0(sizeof(*entry));
->           entry->value = info;
-> diff --git a/tests/acceptance/query_machines.py b/tests/acceptance/query_machines.py
-> new file mode 100644
-> index 0000000000..23a56ea617
-> --- /dev/null
-> +++ b/tests/acceptance/query_machines.py
-> @@ -0,0 +1,27 @@
-> +# Sanity check query-machines QMP command results
-> +#
-> +# Copyright (c) 2019 Red Hat, Inc.
-> +#
-> +# Author:
-> +#  Eduardo Habkost <ehabkost@redhat.com>
-> +#
-> +# This work is licensed under the terms of the GNU GPL, version 2 or
-> +# later.  See the COPYING file in the top-level directory.
-> +
-> +from avocado_qemu import Test
-> +
-> +class QueryMachines(Test):
-> +    def test(self):
+> Signed-off-by: Jon Doron <arilou@gmail.com>
 
-I suggest to use a meaning test case name as it will be displayed with 
-Avocado output. Something like 'test_status_information'.
+Multi-patch series should have a cover letter:
 
-> +        self.vm.launch()
-> +        machines = self.vm.command('query-machines')
+  https://wiki.qemu.org/index.php/Contribute/SubmitAPatch#Include_a_meaning=
+ful_cover_letter
 
-Also I suggest to assert you got at least on machine, so ensure 
-'query-machines' returning nothing doesn't pass unnoticed.
+Overall this looks like a nice improvement to the parsing code. Please
+CC me on the next revision.
 
-- Wainer
+I'm still curious as to what additional commands you plan to implement
+once this is merged?
 
-> +        machinesdict = dict((m['name'], m) for m in machines)
-> +        machinesdict.update((m['alias'], m) for m in machines if 'alias' in m)
-> +        for machine in machines:
-> +            status = machine['support-status']
-> +            if status['deprecated']:
-> +                self.assertTrue(status.get('status-message') or \
-> +                                status.get('suggested-alternative'),
-> +                                "Deprecated machine (%s) must have status-message or suggested-alternative" % (machine['name']))
-> +            if 'suggested-alternative' in status:
-> +                self.assertTrue(status['suggested-alternative'] in machinesdict,
-> +                                "suggested-alternative of %s must point to a valid machine type" % (machine['name']))
-
+--
+Alex Benn=C3=A9e
 
