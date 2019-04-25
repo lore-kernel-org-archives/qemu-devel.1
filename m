@@ -2,92 +2,64 @@ Return-Path: <SRS0=VSQP=S3=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.7 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.4 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,USER_AGENT_MUTT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AF290C43218
-	for <qemu-devel@archiver.kernel.org>; Thu, 25 Apr 2019 17:33:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E0D08C43219
+	for <qemu-devel@archiver.kernel.org>; Thu, 25 Apr 2019 17:43:03 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3D104206BF
-	for <qemu-devel@archiver.kernel.org>; Thu, 25 Apr 2019 17:33:53 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="hmPnb3C7"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3D104206BF
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id 78F0220675
+	for <qemu-devel@archiver.kernel.org>; Thu, 25 Apr 2019 17:43:04 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 78F0220675
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:32999 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:33079 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hJiFr-0001Tn-L8
-	for qemu-devel@archiver.kernel.org; Thu, 25 Apr 2019 13:33:51 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:36558)
+	id 1hJiOk-0003eT-R2
+	for qemu-devel@archiver.kernel.org; Thu, 25 Apr 2019 13:43:02 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:38331)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1hJiEr-0001Cg-PI
-	for qemu-devel@nongnu.org; Thu, 25 Apr 2019 13:32:50 -0400
+	(envelope-from <ehabkost@redhat.com>) id 1hJiNz-0003Gc-D5
+	for qemu-devel@nongnu.org; Thu, 25 Apr 2019 13:42:17 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1hJiEq-00085G-5e
-	for qemu-devel@nongnu.org; Thu, 25 Apr 2019 13:32:49 -0400
-Received: from mail-pg1-x532.google.com ([2607:f8b0:4864:20::532]:37493)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1hJiEp-00082w-R4
-	for qemu-devel@nongnu.org; Thu, 25 Apr 2019 13:32:48 -0400
-Received: by mail-pg1-x532.google.com with SMTP id e6so192138pgc.4
-	for <qemu-devel@nongnu.org>; Thu, 25 Apr 2019 10:32:47 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
-	h=subject:from:to:cc:references:openpgp:message-id:date:user-agent
-	:mime-version:in-reply-to:content-language:content-transfer-encoding;
-	bh=DWOU2if98wQPT++E0rfxCN4CxLiQdLZrRfUTohULfUs=;
-	b=hmPnb3C7+89eZChUShxDLqBfzvnS8brJSWo+jMOkY8fnoecfuV+9h53UeADe52EFfX
-	p4X+4PTkJIjIHY5wNiPYptGaWvMmLFWlsvMDm13XwM6hZMIYksVJ3x+x8ZwzrEOaWji6
-	AjjHtOhAdrkX2gtCv9woMgPikFbKn5SL+tZe/OmCwyc1HQ7zGV5ghSLjuGlJ/pythsil
-	EenAvWFCxDs7RcCvHKaiWGk/0WH9gJx9E4TLlkwod9f+kdlZKZrcQj/uUqekuUo1xz+G
-	8py6Yrj2vEmG7Xi1taSYDtg8A1LM+m7IU4KcvVQUQ5bq43TZmPNov9c7KJfSYxczdwni
-	+S5Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=1e100.net; s=20161025;
-	h=x-gm-message-state:subject:from:to:cc:references:openpgp:message-id
-	:date:user-agent:mime-version:in-reply-to:content-language
-	:content-transfer-encoding;
-	bh=DWOU2if98wQPT++E0rfxCN4CxLiQdLZrRfUTohULfUs=;
-	b=BYyPdwBAvzD9rB3O1motOCUuG4kvIc8UJQNWW4VYjwa8vpaLwkOkzXe6DjnFpnT+S4
-	pcq0bJsoHD8HardheMiqstqPtXJBT4Hpx0/TMUVRZfrOrKkujPwFr6YujrGppAh4OiPX
-	e7t+mey8Hv/4MZYgWRItUIMsU3Et1ExoLe25n/lQUG8XUJRn1HtOpBPYJrDOd3RT5Yxh
-	AEeJGDXJh2nq8MpfZAULcyW2fVaFe0wJ1cQ/R1rpwexCb3s1D6ZW72dibhgEUFQbrFqs
-	BidsrF2O7epFIe1N6JaI7o2dTmpFMPqGARs5iHzG/YoVOIo3z5GU0Z12GKlrI1mwKRS2
-	1IWQ==
-X-Gm-Message-State: APjAAAXkZSQKoSUabEq7DPaeqjvnt4dCN0qwYJEL4IsHtlxU4j9dhQom
-	PkwshMdzqn7O60ocaR1JExMOmQ==
-X-Google-Smtp-Source: APXvYqxR4zuPdnf4hfn73BHHs34M8gODua/tMHdllcN7D7ZpakdhFOIJQqcEUvHNgrcfGJDP2/FeJg==
-X-Received: by 2002:aa7:8145:: with SMTP id d5mr40098645pfn.215.1556213566346; 
-	Thu, 25 Apr 2019 10:32:46 -0700 (PDT)
-Received: from [192.168.1.11] (97-113-179-147.tukw.qwest.net. [97.113.179.147])
-	by smtp.gmail.com with ESMTPSA id
-	g63sm35665243pfc.127.2019.04.25.10.32.45
-	(version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-	Thu, 25 Apr 2019 10:32:45 -0700 (PDT)
-From: Richard Henderson <richard.henderson@linaro.org>
-To: qemu-devel@nongnu.org
-References: <20190425172636.11128-1-richard.henderson@linaro.org>
-	<20190425172636.11128-3-richard.henderson@linaro.org>
-Openpgp: preference=signencrypt
-Message-ID: <03ac8b9b-20ae-e6ec-5647-f679471f4d3b@linaro.org>
-Date: Thu, 25 Apr 2019 10:32:43 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
-	Thunderbird/60.6.1
+	(envelope-from <ehabkost@redhat.com>) id 1hJiNy-0000Lu-Cy
+	for qemu-devel@nongnu.org; Thu, 25 Apr 2019 13:42:15 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:35002)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1hJiNy-0000LP-7K
+	for qemu-devel@nongnu.org; Thu, 25 Apr 2019 13:42:14 -0400
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+	[10.5.11.15])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 52C8F1219AF
+	for <qemu-devel@nongnu.org>; Thu, 25 Apr 2019 17:42:13 +0000 (UTC)
+Received: from localhost (ovpn-116-9.gru2.redhat.com [10.97.116.9])
+	by smtp.corp.redhat.com (Postfix) with ESMTP id B80385D705;
+	Thu, 25 Apr 2019 17:42:10 +0000 (UTC)
+Date: Thu, 25 Apr 2019 14:42:08 -0300
+From: Eduardo Habkost <ehabkost@redhat.com>
+To: Wainer dos Santos Moschetta <wainersm@redhat.com>
+Message-ID: <20190425174208.GO18406@habkost.net>
+References: <20190423212246.3542-1-ehabkost@redhat.com>
+	<20190423212246.3542-2-ehabkost@redhat.com>
+	<b8a8e3fb-281a-7252-4899-859959a97a1d@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20190425172636.11128-3-richard.henderson@linaro.org>
 Content-Type: text/plain; charset="UTF-8"
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
-	recognized.
-X-Received-From: 2607:f8b0:4864:20::532
-Subject: Re: [Qemu-devel] [PATCH 2/2] target/riscv: Add checks for several
- RVC reserved operands
+Content-Disposition: inline
+In-Reply-To: <b8a8e3fb-281a-7252-4899-859959a97a1d@redhat.com>
+User-Agent: Mutt/1.10.1 (2018-07-13)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+	(mx1.redhat.com [10.5.110.38]);
+	Thu, 25 Apr 2019 17:42:13 +0000 (UTC)
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 209.132.183.28
+Subject: Re: [Qemu-devel] [PATCH 1/3] qapi: SupportStatusInfo struct
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -99,26 +71,61 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: palmer@sifive.com
+Cc: mprivozn@redhat.com, qemu-devel@nongnu.org,
+	Markus Armbruster <armbru@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190425173243.3Q5yM3MxVSbiHn7twu_FzEYHM9kDQqKOahUiRyE54ek@z>
+Message-ID: <20190425174208.Kt8QlsRmoXiQ1NaX8c_qO2Pal17VDdnp5a9joP8_0qs@z>
 
-On 4/25/19 10:26 AM, Richard Henderson wrote:
->  {
-> +  illegal         011 0  -----  00000 01 # c.addi16sp, RES nzimm=0
->    addi            011 .  00010  ..... 01 @c_addi16sp
->    lui             011 .  .....  ..... 01 @c_lui
->  }
+On Thu, Apr 25, 2019 at 11:20:58AM -0300, Wainer dos Santos Moschetta wrote:
+> Hi Eduardo,
+> 
+> 
+> On 04/23/2019 06:22 PM, Eduardo Habkost wrote:
+> > This struct will be used to represent support and deprecation
+> > status of QEMU features.
+> > 
+> > Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
+> > ---
+> >   qapi/common.json | 24 ++++++++++++++++++++++++
+> >   1 file changed, 24 insertions(+)
+> > 
+> > diff --git a/qapi/common.json b/qapi/common.json
+> > index 99d313ef3b..b59d0dc66b 100644
+> > --- a/qapi/common.json
+> > +++ b/qapi/common.json
+> > @@ -193,3 +193,27 @@
+> >                'ppc64', 'riscv32', 'riscv64', 's390x', 'sh4',
+> >                'sh4eb', 'sparc', 'sparc64', 'tricore', 'unicore32',
+> >                'x86_64', 'xtensa', 'xtensaeb' ] }
+> > +
+> > +##
+> > +# @SupportStatusInfo:
+> > +#
+> > +# Information on support status of a given feature
+> > +# (e.g. machine type)
+> > +#
+> > +# @deprecated: if true, the given feature is deprecated and may be removed
+> > +#              in future versions of QEMU according to the QEMU deprecation
+> > +#              policy.
+> 
+> Eventually management software will need the know the QEMU version the
+> feature is planed for removal. So makes sense to include a field to capture
+> that information as well or do you expect it to be added (as a good
+> practice) in the 'status-message'?
 
-Bah.  I just realized the comment should be more like
+If we really want to provide extra information like version
+numbers, adding a separate field sounds better than using
+status-message.
 
-  # c.addi16sp and c.lui, RES nzimm=0
+But I'm not sure we really want to include this amount of detail
+in the API.  Mentioning explicit version numbers could make
+things more complex for downstream distributions of QEMU that
+include backports and/or have a different deprecation policy.
 
-Otherwise one is led to believe that rd=2 is missing
-from the illegal pattern.
+I'd like to hear opinions from others.
 
-
-r~
+-- 
+Eduardo
 
