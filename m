@@ -2,72 +2,76 @@ Return-Path: <SRS0=VSQP=S3=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-2.4 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_PASS,URIBL_BLOCKED,USER_AGENT_MUTT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5B316C43218
-	for <qemu-devel@archiver.kernel.org>; Thu, 25 Apr 2019 15:26:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 152F0C43218
+	for <qemu-devel@archiver.kernel.org>; Thu, 25 Apr 2019 15:45:20 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8C55620644
-	for <qemu-devel@archiver.kernel.org>; Thu, 25 Apr 2019 15:26:29 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8C55620644
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
+	by mail.kernel.org (Postfix) with ESMTPS id 3B8D6206C1
+	for <qemu-devel@archiver.kernel.org>; Thu, 25 Apr 2019 15:45:19 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3B8D6206C1
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:59296 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:59473 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hJgGa-0004TL-Ew
-	for qemu-devel@archiver.kernel.org; Thu, 25 Apr 2019 11:26:28 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:35209)
+	id 1hJgYo-0000R9-0B
+	for qemu-devel@archiver.kernel.org; Thu, 25 Apr 2019 11:45:18 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:38843)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1hJgFm-0003hR-8w
-	for qemu-devel@nongnu.org; Thu, 25 Apr 2019 11:25:39 -0400
+	(envelope-from <stefanha@redhat.com>) id 1hJgXz-0008WF-8q
+	for qemu-devel@nongnu.org; Thu, 25 Apr 2019 11:44:28 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1hJgFl-0004zv-1j
-	for qemu-devel@nongnu.org; Thu, 25 Apr 2019 11:25:38 -0400
-Received: from indium.canonical.com ([91.189.90.7]:50012)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1hJgFk-0004zC-SP
-	for qemu-devel@nongnu.org; Thu, 25 Apr 2019 11:25:36 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1hJgFj-0001KX-K4
-	for <qemu-devel@nongnu.org>; Thu, 25 Apr 2019 15:25:35 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 811772E80C7
-	for <qemu-devel@nongnu.org>; Thu, 25 Apr 2019 15:25:35 +0000 (UTC)
+	(envelope-from <stefanha@redhat.com>) id 1hJgXx-00035I-GX
+	for qemu-devel@nongnu.org; Thu, 25 Apr 2019 11:44:27 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:57442)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1hJgXx-000346-80
+	for qemu-devel@nongnu.org; Thu, 25 Apr 2019 11:44:25 -0400
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+	[10.5.11.13])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 5EB3E308950C;
+	Thu, 25 Apr 2019 15:44:23 +0000 (UTC)
+Received: from localhost (ovpn-117-82.ams2.redhat.com [10.36.117.82])
+	by smtp.corp.redhat.com (Postfix) with ESMTP id 846C860852;
+	Thu, 25 Apr 2019 15:44:22 +0000 (UTC)
+Date: Thu, 25 Apr 2019 16:44:21 +0100
+From: Stefan Hajnoczi <stefanha@redhat.com>
+To: Jag Raman <jag.raman@oracle.com>
+Message-ID: <20190425154421.GG17806@stefanha-x1.localdomain>
+References: <20190307072253.9868-1-elena.ufimtseva@oracle.com>
+	<20190307142609.GF2843@stefanha-x1.localdomain>
+	<20190307145120.GF32268@redhat.com>
+	<20190307192727.GG2915@stefanha-x1.localdomain>
+	<BDEBF2EE-DE0F-46CF-B60E-536B3DA9BF77@oracle.com>
+	<20190308095036.GC12318@stefanha-x1.localdomain>
+	<20190326080822.GC21018@stefanha-x1.localdomain>
+	<e5395abf-6b41-46c8-f5af-3210077dfdd5@oracle.com>
+	<CAAdtpL4ztcpf-CTx0fc5T_+VQ+8upHa2pEMoiZPcmBXOO6L3Og@mail.gmail.com>
+	<c945c950-f6f1-7e2a-a6c4-399c9b728288@oracle.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Thu, 25 Apr 2019 15:19:09 -0000
-From: Saverio Miroddi <1826422@bugs.launchpad.net>
-To: qemu-devel@nongnu.org
-X-Launchpad-Notification-Type: bug
-X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
-X-Launchpad-Bug-Information-Type: Public
-X-Launchpad-Bug-Private: no
-X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: saveriomiroddi
-X-Launchpad-Bug-Reporter: Saverio Miroddi (saveriomiroddi)
-X-Launchpad-Bug-Modifier: Saverio Miroddi (saveriomiroddi)
-Message-Id:
- <155620554968.6380.13610580395862407350.malonedeb@chaenomeles.canonical.com>
-X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
-X-Launchpad-Message-For: qemu-devel-ml
-Precedence: bulk
-X-Generated-By: Launchpad (canonical.com); Revision="18928";
-	Instance="launchpad-lazr.conf"
-X-Launchpad-Hash: ed843e6952b4181f76ca224d63d5de56b0bbcca1
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="m972NQjnE83KvVa/"
+Content-Disposition: inline
+In-Reply-To: <c945c950-f6f1-7e2a-a6c4-399c9b728288@oracle.com>
+User-Agent: Mutt/1.11.3 (2019-02-01)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+	(mx1.redhat.com [10.5.110.47]);
+	Thu, 25 Apr 2019 15:44:23 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 91.189.90.7
-Subject: [Qemu-devel] [Bug 1826422] [NEW] Regression: QEMU 4.0 hangs the
- host (*bisect included*)
+X-Received-From: 209.132.183.28
+Subject: Re: [Qemu-devel] [multiprocess RFC PATCH 36/37] multi-process: add
+ the concept description to docs/devel/qemu-multiprocess
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
+Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -76,139 +80,134 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1826422 <1826422@bugs.launchpad.net>
+Cc: Elena Ufimtseva <elena.ufimtseva@oracle.com>,
+	John G Johnson <john.g.johnson@oracle.com>,
+	sstabellini@kernel.org, konrad.wilk@oracle.com,
+	Stefan Hajnoczi <stefanha@gmail.com>,
+	Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <f4bug@amsat.org>,
+	qemu-devel@nongnu.org, ross.lagerwall@citrix.com,
+	liran.alon@oracle.com, kanth.ghatraju@oracle.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190425151909.dZ2OttRu8TubeEp0mxkzm14nREzCv4t5IiwC47fXL6Y@z>
+Message-ID: <20190425154421.WWPAsMtxpNp4lEFtoIlRsbsydgwqeBoXBcCMvqnet4Y@z>
 
-Public bug reported:
 
-The commit b2fc91db84470a78f8e93f5b5f913c17188792c8 seemingly introduced
-a regression on my system.
+--m972NQjnE83KvVa/
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-When I start QEMU, the guest and the host hang (I need a hard reset to
-get back to a working system), before anything shows on the guest.
+On Tue, Apr 23, 2019 at 05:26:33PM -0400, Jag Raman wrote:
+> On 3/26/2019 6:20 PM, Philippe Mathieu-Daud=E9 wrote:
+>=20
+> > > > > Please share the SELinux policy files, containerization scripts, =
+etc.
+> > > > > There is probably a home for them in qemu.git, libvirt.git, or el=
+sewhere
+> > > > > upstream.
+> > > > >=20
+> > > > > We need to find a way to make the sandboxing improvements availab=
+le to
+> > > > > users besides yourself and easily reusable for developers who wis=
+h to
+> > > > > convert additional device models.
+> > >=20
+> >=20
+> > Also for testing this series.
+>=20
+> Hi,
+>=20
+> We are wondering how to deliver the example SELinux policies. I have
+> posted on Fedora's SELinux mailing list to get info. on how to upstream
+> SElinux policy.
+>=20
+> We are developing SELinux Type Enforcements and MCS labels to sandbox
+> the emulation process. Details regarding example Type Enforcement is
+> available below.
+>=20
+> We are also working on changes to libvirt, to launch the remote process
+> and apply MCS labels. Libvirt changes will be posted separately in the
+> future.
+>=20
+> The Type Enforcements for SElinux is available in the pastebin location
+> below (also copied at the end of this email):
+> https://pastebin.com/t1bpS6MY
 
-I use QEMU with GPU passthrough (which worked perfectly until the commit
-above). This is the command I use:
+Can multiple LSI SCSI controllers be launched such that each process
+only has access to a subset of disk images?  Or is the disk image label
+per-VM so that there is no isolation between LSI SCSI controller
+processes for that VM?
 
-```
-/path/to/qemu-system-x86_64
-  -drive if=3Dpflash,format=3Draw,readonly,file=3D/path/to/OVMF_CODE.fd
-  -drive if=3Dpflash,format=3Draw,file=3D/tmp/OVMF_VARS.fd.tmp
-  -enable-kvm
-  -machine q35,accel=3Dkvm,mem-merge=3Doff
-  -cpu host,kvm=3Doff,hv_vendor_id=3Dvgaptrocks,hv_relaxed,hv_spinlocks=3D0=
-x1fff,hv_vapic,hv_time
-  -smp 4,cores=3D4,sockets=3D1,threads=3D1
-  -m 10240
-  -vga none
-  -rtc base=3Dlocaltime
-  -serial none
-  -parallel none
-  -usb
-  -device usb-tablet
-  -device vfio-pci,host=3D01:00.0,multifunction=3Don
-  -device vfio-pci,host=3D01:00.1
-  -device usb-host,vendorid=3D<vid>,productid=3D<pid>
-  -device usb-host,vendorid=3D<vid>,productid=3D<pid>
-  -device usb-host,vendorid=3D<vid>,productid=3D<pid>
-  -device usb-host,vendorid=3D<vid>,productid=3D<pid>
-  -device usb-host,vendorid=3D<vid>,productid=3D<pid>
-  -device usb-host,vendorid=3D<vid>,productid=3D<pid>
-  -device virtio-scsi-pci,id=3Dscsi
-  -drive file=3D/path/to/guest.img,id=3Dhdd1,format=3Dqcow2,if=3Dnone,cache=
-=3Dwriteback
-  -device scsi-hd,drive=3Dhdd1
-  -net nic,model=3Dvirtio
-  -net user,smb=3D/path/to/shared
-```
+My concern with this overall approach is the practicality vs its
+benefits.  Regarding practicality, each emulated device needs to be
+proxied separately.  The QEMU subsystem used by the device also needs to
+be proxied.  Global state, monitor commands, and live migration all
+require code changes to support proxied operation.  This is very
+invasive.
 
-If I run QEMU without GPU passthrough, it runs fine.
+Then each emulated device needs an SELinux policy to achieve the
+benefits of confinement.  I have no idea how to correctly write a policy
+like this and it's likely that developers who contribute a single new
+device will not be proficient in it either.  Writing these policies is a
+rare thing and few people will be good at this.  It also makes me worry
+about how we test and review them.
 
-Some details about my system:
+Despite the efforts required in making this work, all processes still
+effectively have full access to the guest since they can access guest
+RAM.  What I mean is that the device is actually not confined to its
+host process (e.g. LSI SCSI controller process) because it can write
+code to executable guest RAM pages.  The guest will then execute that
+code and therefore all guest I/O (networking, disk, etc) is still
+available indirectly to the "confined" processes.  They are not really
+sandboxed from the outside world, regardless of how strict the SELinux
+policy is :(.
 
-- O/S: Mint 19.1 x86-64 (it's based on Ubuntu 18.04)
-- Kernel: 4.15
-- `configure` options: `--target-list=3Dx86_64-softmmu --enable-gtk --enabl=
-e-spice --audio-drv-list=3Dpa`
-- EDK2 version: 1a734ed85fda71630c795832e6d24ea560caf739 (20/Apr/2019)
-- CPU: i7-6700k
-- Motherboard: ASRock Z170 Gaming-ITX/ac
-- VGA: Gigabyte GTX 960 Mini-ITX
+There are performance issues due to proxying as well, but let's ignore
+them for now and focus on security.
 
-** Affects: qemu
-     Importance: Undecided
-         Status: New
+How do the benefits compare against today's monolithic approach?  If the
+guest exploits monolithic QEMU it has full access to all host files and
+APIs available to QEMU.  However, these are largely just the resources
+that belong to the guest anyway - not resources we are trying to keep
+away from the guest.  With multi-process QEMU each process still has
+access to all guest interfaces via the code injection I mentioned above,
+but the SELinux policy could restrict access to some resources.  But
+this benefit is really small in my opinion, given that the resources
+belong to the guest anyway and the guest can already access them.
 
--- =
+I think you can implement this for a handful of devices as a one-time
+thing, but the invasiveness and the impracticality of getting wide cover
+of QEMU make this approach questionable.
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1826422
+Am I mistaken about the invasiveness or impracticality?
 
-Title:
-  Regression: QEMU 4.0 hangs the host (*bisect included*)
+Am I misunderstanding the security benefits compared to what already
+exists today?
 
-Status in QEMU:
-  New
+A more practical approach is to strip down QEMU (compiling out unused
+devices and features) and to run virtio devices in vhost-user processes
+(e.g. virtio-input, virtio-gpu, virtio-fs).  This achieves similar goals
+without proxy objects or invasive changes to QEMU since the vhost-user
+devices use a different codebase and aren't accessible via the QEMU
+monitor.  The limitation is that existing QEMU code and non-virtio
+devices aren't available in this model.
 
-Bug description:
-  The commit b2fc91db84470a78f8e93f5b5f913c17188792c8 seemingly
-  introduced a regression on my system.
+Stefan
 
-  When I start QEMU, the guest and the host hang (I need a hard reset to
-  get back to a working system), before anything shows on the guest.
+--m972NQjnE83KvVa/
+Content-Type: application/pgp-signature; name="signature.asc"
 
-  I use QEMU with GPU passthrough (which worked perfectly until the
-  commit above). This is the command I use:
+-----BEGIN PGP SIGNATURE-----
 
-  ```
-  /path/to/qemu-system-x86_64
-    -drive if=3Dpflash,format=3Draw,readonly,file=3D/path/to/OVMF_CODE.fd
-    -drive if=3Dpflash,format=3Draw,file=3D/tmp/OVMF_VARS.fd.tmp
-    -enable-kvm
-    -machine q35,accel=3Dkvm,mem-merge=3Doff
-    -cpu host,kvm=3Doff,hv_vendor_id=3Dvgaptrocks,hv_relaxed,hv_spinlocks=
-=3D0x1fff,hv_vapic,hv_time
-    -smp 4,cores=3D4,sockets=3D1,threads=3D1
-    -m 10240
-    -vga none
-    -rtc base=3Dlocaltime
-    -serial none
-    -parallel none
-    -usb
-    -device usb-tablet
-    -device vfio-pci,host=3D01:00.0,multifunction=3Don
-    -device vfio-pci,host=3D01:00.1
-    -device usb-host,vendorid=3D<vid>,productid=3D<pid>
-    -device usb-host,vendorid=3D<vid>,productid=3D<pid>
-    -device usb-host,vendorid=3D<vid>,productid=3D<pid>
-    -device usb-host,vendorid=3D<vid>,productid=3D<pid>
-    -device usb-host,vendorid=3D<vid>,productid=3D<pid>
-    -device usb-host,vendorid=3D<vid>,productid=3D<pid>
-    -device virtio-scsi-pci,id=3Dscsi
-    -drive file=3D/path/to/guest.img,id=3Dhdd1,format=3Dqcow2,if=3Dnone,cac=
-he=3Dwriteback
-    -device scsi-hd,drive=3Dhdd1
-    -net nic,model=3Dvirtio
-    -net user,smb=3D/path/to/shared
-  ```
+iQEcBAEBAgAGBQJcwdXVAAoJEJykq7OBq3PIh6kIAKVBEG/qr1RJmNnqjwxiIuMW
+g0e3uf9nzgBv3dt7ZZWepKTPYAxT3Wu0ZivtTK9dTvTKJa5T6HLgfXId19iNIyvc
+43MHUuMqmK1MSE/5dZEVt1j4pWQikMdWF8PsH9351jFjHYqlwBVPmUj4bBjlvnAF
+DIuazUV0e7XSX5SN9pqT8jPuGfJhrV9HQcDogy9jVuwt0RQg5sExZ4OwRP2gHMvM
+uI5OC/eS+zrLFRWiU6hzEyz3VqV5ffEkmg5qKvFKxHbtNTnArpprcOj4XRbJlW8t
+4Wsg2WaLbDCV5uGWIZKqlcnIoignmS6IrVWPOlNyLx+i3j2d+fIqKNg023R6ccs=
+=6Q+9
+-----END PGP SIGNATURE-----
 
-  If I run QEMU without GPU passthrough, it runs fine.
-
-  Some details about my system:
-
-  - O/S: Mint 19.1 x86-64 (it's based on Ubuntu 18.04)
-  - Kernel: 4.15
-  - `configure` options: `--target-list=3Dx86_64-softmmu --enable-gtk --ena=
-ble-spice --audio-drv-list=3Dpa`
-  - EDK2 version: 1a734ed85fda71630c795832e6d24ea560caf739 (20/Apr/2019)
-  - CPU: i7-6700k
-  - Motherboard: ASRock Z170 Gaming-ITX/ac
-  - VGA: Gigabyte GTX 960 Mini-ITX
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1826422/+subscriptions
+--m972NQjnE83KvVa/--
 
