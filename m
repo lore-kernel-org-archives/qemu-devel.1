@@ -1,20 +1,28 @@
-Received: from eggs.gnu.org ([209.51.188.92]:44250)
+Received: from eggs.gnu.org ([209.51.188.92]:46879)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1hJdOi-0007KN-4r
-	for qemu-devel@nongnu.org; Thu, 25 Apr 2019 08:22:41 -0400
+	(envelope-from <philmd@redhat.com>) id 1hJddG-0002SV-Ml
+	for qemu-devel@nongnu.org; Thu, 25 Apr 2019 08:37:43 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1hJdOg-0000yW-W6
-	for qemu-devel@nongnu.org; Thu, 25 Apr 2019 08:22:40 -0400
-Date: Thu, 25 Apr 2019 14:22:35 +0200
-From: Cornelia Huck <cohuck@redhat.com>
-Message-ID: <20190425142235.1db03b17.cohuck@redhat.com>
-In-Reply-To: <20190412122523.24111-1-thuth@redhat.com>
-References: <20190412122523.24111-1-thuth@redhat.com>
+	(envelope-from <philmd@redhat.com>) id 1hJddE-00021p-Oh
+	for qemu-devel@nongnu.org; Thu, 25 Apr 2019 08:37:42 -0400
+Received: from mail-wm1-f68.google.com ([209.85.128.68]:54476)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1hJddC-00020H-S0
+	for qemu-devel@nongnu.org; Thu, 25 Apr 2019 08:37:39 -0400
+Received: by mail-wm1-f68.google.com with SMTP id c1so9057415wml.4
+	for <qemu-devel@nongnu.org>; Thu, 25 Apr 2019 05:37:38 -0700 (PDT)
+References: <1556170489-131927-1-git-send-email-imammedo@redhat.com>
+	<1556170489-131927-10-git-send-email-imammedo@redhat.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Message-ID: <b0d3f541-ead5-830a-2536-4af67f5845da@redhat.com>
+Date: Thu, 25 Apr 2019 14:37:35 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+In-Reply-To: <1556170489-131927-10-git-send-email-imammedo@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PULL SUBSYSTEM s390-ccw-bios 00/17] vfio-ccw dasd
- ipl support
+Subject: Re: [Qemu-devel] [PATCH v3 09/13] tests: acpi: ignore SMBIOS tests
+ when UEFI firmware is used
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,84 +31,76 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Thomas Huth <thuth@redhat.com>
-Cc: qemu-s390x@nongnu.org, qemu-devel@nongnu.org, jjherne@linux.ibm.com, borntraeger@de.ibm.com
+To: Igor Mammedov <imammedo@redhat.com>, qemu-devel@nongnu.org
+Cc: Laszlo Ersek <lersek@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Gonglei <arei.gonglei@huawei.com>, Shannon Zhao <shannon.zhaosl@gmail.com>, Wei Yang <richardw.yang@linux.intel.com>, Andrew Jones <drjones@redhat.com>, Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>, Ben Warren <ben@skyportsystems.com>
 
-On Fri, 12 Apr 2019 14:25:06 +0200
-Thomas Huth <thuth@redhat.com> wrote:
+Hi Igor,
 
-> This pull request is not for master.
+On 4/25/19 7:34 AM, Igor Mammedov wrote:
+> once FW provides a pointer to SMBIOS entry point like it does for
+> RSDP it should be possible to enable this one the same way.
 > 
->  Hi Cornelia,
+> Signed-off-by: Igor Mammedov <imammedo@redhat.com>
+> Reviewed-by: Laszlo Ersek <lersek@redhat.com>
+> ---
+> v3:
+>   - add ref to a uefi-test-tools feature req into comment (Laszlo)
+> ---
+>  tests/bios-tables-test.c | 11 +++++++++--
+>  1 file changed, 9 insertions(+), 2 deletions(-)
 > 
-> the following changes since commit 532cc6da74ec25b5ba6893b5757c977d54582949:
-> 
->   Update version for v4.0.0-rc3 release (2019-04-10 15:38:59 +0100)
-> 
-> are available in the Git repository at:
-> 
->   https://gitlab.com/huth/qemu.git tags/s390-ccw-bios-2019-04-12
-> 
-> for you to fetch changes up to 4a33fac54665558b7f7a68135c4a4c602eceb72f:
-> 
->   pc-bios/s390: Update firmware images (2019-04-12 12:40:35 +0200)
-> 
-> ----------------------------------------------------------------
-> Support for booting from a vfio-ccw passthrough dasd device
-> ----------------------------------------------------------------
-> 
-> Jason J. Herne (16):
->       s390 vfio-ccw: Add bootindex property and IPLB data
->       s390-bios: decouple cio setup from virtio
->       s390-bios: decouple common boot logic from virtio
->       s390-bios: Clean up cio.h
->       s390-bios: Decouple channel i/o logic from virtio
->       s390-bios: Map low core memory
->       s390-bios: ptr2u32 and u32toptr
->       s390-bios: Support for running format-0/1 channel programs
->       s390-bios: cio error handling
->       s390-bios: Extend find_dev() for non-virtio devices
->       s390-bios: Factor finding boot device out of virtio code path
->       s390-bios: Refactor virtio to run channel programs via cio
->       s390-bios: Use control unit type to determine boot method
->       s390-bios: Add channel command codes/structs needed for dasd-ipl
->       s390-bios: Support booting from real dasd device
->       s390-bios: Use control unit type to find bootable devices
-> 
-> Thomas Huth (1):
->       pc-bios/s390: Update firmware images
-> 
->  MAINTAINERS                  |   2 +
->  docs/devel/s390-dasd-ipl.txt | 133 ++++++++++++++
->  hw/s390x/ipl.c               |  61 +++++--
->  hw/s390x/s390-ccw.c          |   9 +
->  hw/vfio/ccw.c                |   6 +-
->  include/hw/s390x/s390-ccw.h  |   1 +
->  include/hw/s390x/vfio-ccw.h  |  28 +++
->  pc-bios/s390-ccw.img         | Bin 34568 -> 42608 bytes
->  pc-bios/s390-ccw/Makefile    |   2 +-
->  pc-bios/s390-ccw/cio.c       | 423 +++++++++++++++++++++++++++++++++++++++++++
->  pc-bios/s390-ccw/cio.h       | 270 +++++++++++++++++++++------
->  pc-bios/s390-ccw/dasd-ipl.c  | 235 ++++++++++++++++++++++++
->  pc-bios/s390-ccw/dasd-ipl.h  |  16 ++
->  pc-bios/s390-ccw/helper.h    |  31 ++++
->  pc-bios/s390-ccw/libc.h      |  11 ++
->  pc-bios/s390-ccw/main.c      | 190 +++++++++++++------
->  pc-bios/s390-ccw/netboot.mak |   2 +-
->  pc-bios/s390-ccw/netmain.c   |   2 +
->  pc-bios/s390-ccw/s390-arch.h | 103 +++++++++++
->  pc-bios/s390-ccw/s390-ccw.h  |  10 +-
->  pc-bios/s390-ccw/start.S     |  29 +++
->  pc-bios/s390-ccw/virtio.c    |  81 +++------
->  pc-bios/s390-netboot.img     | Bin 54944 -> 67232 bytes
->  tests/boot-serial-test.c     |   2 +-
->  24 files changed, 1446 insertions(+), 201 deletions(-)
->  create mode 100644 docs/devel/s390-dasd-ipl.txt
->  create mode 100644 include/hw/s390x/vfio-ccw.h
->  create mode 100644 pc-bios/s390-ccw/cio.c
->  create mode 100644 pc-bios/s390-ccw/dasd-ipl.c
->  create mode 100644 pc-bios/s390-ccw/dasd-ipl.h
->  create mode 100644 pc-bios/s390-ccw/helper.h
->  create mode 100644 pc-bios/s390-ccw/s390-arch.h
+> diff --git a/tests/bios-tables-test.c b/tests/bios-tables-test.c
+> index 0f24540..1be55a1 100644
+> --- a/tests/bios-tables-test.c
+> +++ b/tests/bios-tables-test.c
+> @@ -573,8 +573,15 @@ static void test_acpi_one(const char *params, test_data *data)
+>          }
+>      }
+>  
+> -    test_smbios_entry_point(data);
+> -    test_smbios_structs(data);
+> +    /*
+> +     * TODO: make SMBIOS tests work with UEFI firmware,
+> +     * Bug on uefi-test-tools to provide entry point:
+> +     * https://bugs.launchpad.net/qemu/+bug/1821884
+> +     */
+> +    if (!use_uefi) {
+> +        test_smbios_entry_point(data);
+> +        test_smbios_structs(data);
+> +    }
 
-Thanks, pulled.
+Now that Laszlo resolved this bug, you can update the SMBIOS tests :)
+
+Without this patch I get:
+
+ERROR:/home/phil/source/qemu/tests/bios-tables-test.c:460:test_smbios_entry_point:
+assertion failed (off < 0x100000): (0x00100000 < 0x00100000)
+
+And the UEFI console shows:
+
+BdsDxe: failed to load Boot0001 "UEFI Misc Device" from
+VenHw(93E34C7E-B50E-11DF-9223-2443DFD72085,00): Not Found
+FatDiskIo: Cache Page OutBound occurred!
+add-symbol-file
+/home/lacos/src/upstream/qemu/tests/uefi-test-tools/Build/UefiTestTools/DEBUG_GCC5/AARCH64/UefiTestToolsPkg/BiosTablesTest/BiosTablesTest/DEBUG/BiosTablesTest.dll
+0x442C3000
+Loading driver at 0x000442C2000 EntryPoint=0x000442C47AC BiosTablesTest.efi
+InstallProtocolInterface: BC62157E-3E33-4FEC-9920-2D3B36D750DF 4654EE18
+ProtectUefiImageCommon - 0x451AA140
+  - 0x00000000442C2000 - 0x0000000000006000
+SetUefiImageMemoryAttributes - 0x00000000442C2000 - 0x0000000000001000
+(0x0000000000004008)
+SetUefiImageMemoryAttributes - 0x00000000442C3000 - 0x0000000000003000
+(0x0000000000020008)
+SetUefiImageMemoryAttributes - 0x00000000442C6000 - 0x0000000000002000
+(0x0000000000004008)
+BdsDxe: starting Boot0002 "UEFI Misc Device 2" from
+PciRoot(0x0)/Pci(0x2,0x0)
+BiosTablesTest: BiosTablesTest=45100000 Rsdp10=0 Rsdp20=44020000
+BiosTablesTest: Smbios21=0 Smbios30=47640000
+BiosTablesTest: press any key to exit
+
+>  
+>      assert(!global_qtest);
+>      qtest_quit(data->qts);
+> 
