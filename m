@@ -6,62 +6,87 @@ X-Spam-Status: No, score=-0.7 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C7CE1C43219
-	for <qemu-devel@archiver.kernel.org>; Thu, 25 Apr 2019 16:47:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 68DDCC43219
+	for <qemu-devel@archiver.kernel.org>; Thu, 25 Apr 2019 16:51:48 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 315A3206BF
-	for <qemu-devel@archiver.kernel.org>; Thu, 25 Apr 2019 16:47:43 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id CA768206BF
+	for <qemu-devel@archiver.kernel.org>; Thu, 25 Apr 2019 16:51:48 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=igalia.com header.i=@igalia.com header.b="r1FAJ0a6"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 315A3206BF
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=igalia.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="p3ZJC91k"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CA768206BF
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:60751 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:60799 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hJhXB-0003LU-NE
-	for qemu-devel@archiver.kernel.org; Thu, 25 Apr 2019 12:47:41 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:56096)
+	id 1hJhb9-0005XN-Ce
+	for qemu-devel@archiver.kernel.org; Thu, 25 Apr 2019 12:51:47 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:56912)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berto@igalia.com>) id 1hJhVv-0002es-TF
-	for qemu-devel@nongnu.org; Thu, 25 Apr 2019 12:46:25 -0400
+	(envelope-from <richard.henderson@linaro.org>) id 1hJhaA-0004qQ-UT
+	for qemu-devel@nongnu.org; Thu, 25 Apr 2019 12:50:48 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berto@igalia.com>) id 1hJhVv-00087K-0c
-	for qemu-devel@nongnu.org; Thu, 25 Apr 2019 12:46:23 -0400
-Received: from fanzine.igalia.com ([91.117.99.155]:54732)
+	(envelope-from <richard.henderson@linaro.org>) id 1hJha9-0003dv-Uf
+	for qemu-devel@nongnu.org; Thu, 25 Apr 2019 12:50:46 -0400
+Received: from mail-pl1-x644.google.com ([2607:f8b0:4864:20::644]:38842)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <berto@igalia.com>)
-	id 1hJhVu-00085q-AA; Thu, 25 Apr 2019 12:46:22 -0400
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=igalia.com;
-	s=20170329; 
-	h=Content-Type:MIME-Version:Message-ID:Date:References:In-Reply-To:Subject:Cc:To:From;
-	bh=rwjaVhS+OKXnDHvpL9TZQxlnLj+yxNk22c7M37T5Bk0=; 
-	b=r1FAJ0a6AqbjSdkevFsexsDJ6EU5V+8fAwa/ZfaW5s/uxDw5xyTWeFl0bLe6SxgDmoZxqiYhDKf4OriIYFaxQI3A7yziBp/UhM6akpZPO3TfuZMsUHsvqgZIEYujzD8Ppb4LzSKOaBtO/bXg9MIjotaniU8fxBMVm+A7Uy0GGWvRr6Yv7CIG0paUh47ixyI22rd3ChknpfG6qmBlXHlOHzs1AUyhAY9R65Th4ZSnrU3okZAEJr0SPdyF9VGqJ814SgW695pHD9nAsLCp0rIV4RzzGF2J/iB/sLLH8dkfcBZ3w4gxH9vXtuOTnbgT9OkvtsfBk6xAjoSTpeWG6M+T4w==;
-Received: from maestria.local.igalia.com ([192.168.10.14] helo=mail.igalia.com)
-	by fanzine.igalia.com with esmtps 
-	(Cipher TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128) (Exim)
-	id 1hJhVn-00068N-P3; Thu, 25 Apr 2019 18:46:15 +0200
-Received: from berto by mail.igalia.com with local (Exim)
-	id 1hJhVn-0005cM-MQ; Thu, 25 Apr 2019 18:46:15 +0200
-From: Alberto Garcia <berto@igalia.com>
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
-	qemu-devel@nongnu.org, qemu-block@nongnu.org
-In-Reply-To: <20190422101900.13897-2-vsementsov@virtuozzo.com>
-References: <20190422101900.13897-1-vsementsov@virtuozzo.com>
-	<20190422101900.13897-2-vsementsov@virtuozzo.com>
-User-Agent: Notmuch/0.18.2 (http://notmuchmail.org) Emacs/24.4.1
-	(i586-pc-linux-gnu)
-Date: Thu, 25 Apr 2019 18:46:15 +0200
-Message-ID: <w51bm0u119k.fsf@maestria.local.igalia.com>
+	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+	id 1hJha9-0003bc-KI
+	for qemu-devel@nongnu.org; Thu, 25 Apr 2019 12:50:45 -0400
+Received: by mail-pl1-x644.google.com with SMTP id f36so79550plb.5
+	for <qemu-devel@nongnu.org>; Thu, 25 Apr 2019 09:50:45 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+	h=subject:to:cc:references:from:openpgp:message-id:date:user-agent
+	:mime-version:in-reply-to:content-language:content-transfer-encoding;
+	bh=6GsEehMrGxTNJ75kS5l1YQNwV0S6GpS3jOZIJxIwfHk=;
+	b=p3ZJC91kQtDtDVtvRhKMnIJ6nU+UB4QRDjpSYk1H1f1k5Xz3ifQECyV+C+ES/ZAUrB
+	n2W74PL+sRUs+Ep8HgRTw2DJWMJuzAeFZP0vEeqKCy8nWzVz5WT3bVs626R+YaBEAH11
+	lnNlugkvi1sADWd2xFrAuJ17+sdqqEbsVRzx2p2PVpCE/Z3PFWjzUkBxvR2mTdKENsdb
+	eUywopeNhrtHTf+aoxVaYkPQc5jzJ/OwuAaLTZywiZU4r2ZGd4PAb+zax3BqN/MQn7sF
+	j3RcifKkdGByuuFjdl8Sy+ajVjSnvl3LK4LjRwy5Lh2QSozY988u9fgZpYcMgl91qf3R
+	3F6g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=1e100.net; s=20161025;
+	h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
+	:date:user-agent:mime-version:in-reply-to:content-language
+	:content-transfer-encoding;
+	bh=6GsEehMrGxTNJ75kS5l1YQNwV0S6GpS3jOZIJxIwfHk=;
+	b=L0fGNG+7tP470gmBtvCMd0MHD08WRit3qtTY4MLcdJi3ngYapyLw2ymxkZL1bGZinl
+	h95oR5/FqzxZuotTbYCNtDoVZc/ECbSc8R4VjL6ZX4guAdiENCiOUCXX6ZoscbLDqNhZ
+	fR+WtOyCkOLzoTlN6lWZnJGFVwWM8s50Pfmv2FkRq2pKkxd5+r5dk4FhhuRGbhiPFoqk
+	Ar3EzCyj9AZuZOLW/LnmColMyaq9vEExRqoPhBHBTCwY91ftyv99COyozVskWnQT/nna
+	jKYSGehyul6seDppRTLS5hWRvWlrQJ9wubJA1kICtGfbr83/1qFy0iLAnFY8d4IVBU+a
+	HhgA==
+X-Gm-Message-State: APjAAAWiqjvhhZpU5dP1eG5jMjpciCR75MHVRf2FjZGkeRNJkVxJuBa/
+	evGi68bsTuE4WOUK898JOWVYKz2J4WQ=
+X-Google-Smtp-Source: APXvYqwvLuO0NnHt07fKSGYZtcoVl3I9CwPGXEcaTnt5LyScge5cXwcCokxRkQakxv6WqqkwSlW96w==
+X-Received: by 2002:a17:902:aa85:: with SMTP id
+	d5mr38983217plr.251.1556211044069; 
+	Thu, 25 Apr 2019 09:50:44 -0700 (PDT)
+Received: from [192.168.1.11] (97-113-179-147.tukw.qwest.net. [97.113.179.147])
+	by smtp.gmail.com with ESMTPSA id l1sm25977016pgp.9.2019.04.25.09.50.42
+	(version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+	Thu, 25 Apr 2019 09:50:43 -0700 (PDT)
+To: Palmer Dabbelt <palmer@sifive.com>
+References: <mhng-f65ff93d-20e5-4c4a-919a-c311ae97649d@palmer-si-x1e>
+From: Richard Henderson <richard.henderson@linaro.org>
+Openpgp: preference=signencrypt
+Message-ID: <357d260b-4baf-aea8-c332-f77ce2a3e9b2@linaro.org>
+Date: Thu, 25 Apr 2019 09:50:41 -0700
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+	Thunderbird/60.6.1
 MIME-Version: 1.0
+In-Reply-To: <mhng-f65ff93d-20e5-4c4a-919a-c311ae97649d@palmer-si-x1e>
 Content-Type: text/plain; charset="UTF-8"
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x (no
-	timestamps) [generic] [fuzzy]
-X-Received-From: 91.117.99.155
-Subject: Re: [Qemu-devel] [PATCH v5 1/3] block: include base when checking
- image chain for block allocation
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+	recognized.
+X-Received-From: 2607:f8b0:4864:20::644
+Subject: Re: [Qemu-devel] [PATCH for-4.1 4/8] target/riscv: Merge argument
+ decode for RVC shifti
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -73,33 +98,24 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: fam@euphon.net, kwolf@redhat.com, vsementsov@virtuozzo.com,
-	wencongyang2@huawei.com, xiechanglong.d@gmail.com,
-	mreitz@redhat.com, stefanha@redhat.com,
-	andrey.shinkevich@virtuozzo.com, den@openvz.org, jsnow@redhat.com
+Cc: Bastian Koppelmann <kbastian@mail.uni-paderborn.de>,
+	Alistair Francis <Alistair.Francis@wdc.com>,
+	qemu-devel@nongnu.org, qemu-riscv@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190425164615.Qve9cuxIjWX0DKO2iXlQWBgL4Z2hB-6qBEz6zG3QqUc@z>
+Message-ID: <20190425165041.3Ij1a5u3SoYnHz4i-BNldathz02OmkkWe-HAjiEjcpQ@z>
 
-On Mon 22 Apr 2019 12:18:58 PM CEST, Vladimir Sementsov-Ogievskiy wrote:
->   * Given an image chain: ... -> [BASE] -> [INTER1] -> [INTER2] -> [TOP]
->   *
->   * Return true if (a prefix of) the given range is allocated in any image
-> - * between BASE and TOP (inclusive).  BASE can be NULL to check if the given
-> - * offset is allocated in any image of the chain.  Return false otherwise,
-> - * or negative errno on failure.
-> + * between BASE and TOP (BASE is only included if include_base is set).
-> + * BASE can be NULL to check if the given offset is allocated in any
-> + * image of the chain.  Return false otherwise, or negative errno on
-> + * failure.
+On 4/25/19 9:04 AM, Palmer Dabbelt wrote:
+>>  # *** RV64C Standard Extension (Quadrant 2) ***
+>> -c_slli            000 .  .....  ..... 10 @c_shift2
+>> +slli              000 .  .....  ..... 10 @c_shift2
+> 
+> This is another one where rd=0 is illegal in the compressed ISA, but again we
+> don't appear to handle these correctly before the cleanups.
 
-This is a pre-existing problem and probably a bit pedantic, but I just
-realized that this description is not quite correct. This function does
-not return true and false (bool), but 1 and 0 (int). This is so in order
-to be able to return < 0 on errors.
+I see "HINT, rd=0" in the 2.2 documentation for this case.
 
-I think I'd replace true and false with 1 and 0 on that message.
 
-Berto
+r~
 
