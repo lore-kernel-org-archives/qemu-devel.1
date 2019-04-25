@@ -2,73 +2,82 @@ Return-Path: <SRS0=VSQP=S3=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.4 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_PASS,URIBL_BLOCKED,USER_AGENT_MUTT autolearn=ham
+X-Spam-Status: No, score=-6.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 152F0C43218
-	for <qemu-devel@archiver.kernel.org>; Thu, 25 Apr 2019 15:45:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4A7A8C43218
+	for <qemu-devel@archiver.kernel.org>; Thu, 25 Apr 2019 15:54:32 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3B8D6206C1
-	for <qemu-devel@archiver.kernel.org>; Thu, 25 Apr 2019 15:45:19 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3B8D6206C1
+	by mail.kernel.org (Postfix) with ESMTPS id 8B7E32067D
+	for <qemu-devel@archiver.kernel.org>; Thu, 25 Apr 2019 15:54:32 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8B7E32067D
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:59473 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:59545 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hJgYo-0000R9-0B
-	for qemu-devel@archiver.kernel.org; Thu, 25 Apr 2019 11:45:18 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:38843)
+	id 1hJghj-0003HV-2z
+	for qemu-devel@archiver.kernel.org; Thu, 25 Apr 2019 11:54:31 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:40806)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1hJgXz-0008WF-8q
-	for qemu-devel@nongnu.org; Thu, 25 Apr 2019 11:44:28 -0400
+	(envelope-from <philmd@redhat.com>) id 1hJggm-0002st-5Y
+	for qemu-devel@nongnu.org; Thu, 25 Apr 2019 11:53:33 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1hJgXx-00035I-GX
-	for qemu-devel@nongnu.org; Thu, 25 Apr 2019 11:44:27 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:57442)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1hJgXx-000346-80
-	for qemu-devel@nongnu.org; Thu, 25 Apr 2019 11:44:25 -0400
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
-	[10.5.11.13])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 5EB3E308950C;
-	Thu, 25 Apr 2019 15:44:23 +0000 (UTC)
-Received: from localhost (ovpn-117-82.ams2.redhat.com [10.36.117.82])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id 846C860852;
-	Thu, 25 Apr 2019 15:44:22 +0000 (UTC)
-Date: Thu, 25 Apr 2019 16:44:21 +0100
-From: Stefan Hajnoczi <stefanha@redhat.com>
-To: Jag Raman <jag.raman@oracle.com>
-Message-ID: <20190425154421.GG17806@stefanha-x1.localdomain>
-References: <20190307072253.9868-1-elena.ufimtseva@oracle.com>
-	<20190307142609.GF2843@stefanha-x1.localdomain>
-	<20190307145120.GF32268@redhat.com>
-	<20190307192727.GG2915@stefanha-x1.localdomain>
-	<BDEBF2EE-DE0F-46CF-B60E-536B3DA9BF77@oracle.com>
-	<20190308095036.GC12318@stefanha-x1.localdomain>
-	<20190326080822.GC21018@stefanha-x1.localdomain>
-	<e5395abf-6b41-46c8-f5af-3210077dfdd5@oracle.com>
-	<CAAdtpL4ztcpf-CTx0fc5T_+VQ+8upHa2pEMoiZPcmBXOO6L3Og@mail.gmail.com>
-	<c945c950-f6f1-7e2a-a6c4-399c9b728288@oracle.com>
+	(envelope-from <philmd@redhat.com>) id 1hJggl-00057u-2Z
+	for qemu-devel@nongnu.org; Thu, 25 Apr 2019 11:53:32 -0400
+Received: from mail-wr1-f66.google.com ([209.85.221.66]:34946)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1hJggk-000578-Rr
+	for qemu-devel@nongnu.org; Thu, 25 Apr 2019 11:53:30 -0400
+Received: by mail-wr1-f66.google.com with SMTP id f7so163969wrs.2
+	for <qemu-devel@nongnu.org>; Thu, 25 Apr 2019 08:53:30 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=1e100.net; s=20161025;
+	h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
+	:date:user-agent:mime-version:in-reply-to:content-language
+	:content-transfer-encoding;
+	bh=yE8k0+31sTN30zo+DkawuBrPvUnsBCgNFhrlkCG9Czs=;
+	b=n/+uo3UoT+BC9Jw8uKAS6kLWtmPCGkgI16TTgoY+LcqJ6wF1tNtTXqm5MNyDWd+qL9
+	EV29tH5rMcaVsQGHnx7D94331vSpdjKtwV3lsai1AzUOFNh/NutOUKVf2pCjN2YNfvhE
+	jex+GfOzf1BV5gElKeLcIow1rgGe+byjgmazoUzzAu1YO+RcaowpV+Qrfiodr05miz69
+	MVcW9rj3WuDxZVH2hS69z3DdMO3nj5fJMN4TcqrfMQUoFDFssA8b7dcbQVcxmtZqVPev
+	vn+VFXzGamgaHzAY1JrbjzJ8jnuUO9skGIdEzIJQSgddNhfIx4RFlzTCS2cPTlbIxnFW
+	4toQ==
+X-Gm-Message-State: APjAAAW+J2UFblqfqJp9/9xVjUTQvbscqLTNve4iR7ff8kJsRt1nvs+Y
+	j/ZXoi2T4TJj6NGVo2TQaemn0Q==
+X-Google-Smtp-Source: APXvYqxzW6smh2M8kgPMl8FN3Oe4eg0oCPWIQk07mRC2pR0VnD/dS6PZKnwzTJeX63ctorDSEMlPaw==
+X-Received: by 2002:a5d:464f:: with SMTP id j15mr4761590wrs.265.1556207609905; 
+	Thu, 25 Apr 2019 08:53:29 -0700 (PDT)
+Received: from [192.168.1.25] (abayonne-654-1-209-122.w109-222.abo.wanadoo.fr.
+	[109.222.216.122])
+	by smtp.gmail.com with ESMTPSA id q3sm498080wre.31.2019.04.25.08.53.27
+	(version=TLS1_3 cipher=AEAD-AES128-GCM-SHA256 bits=128/128);
+	Thu, 25 Apr 2019 08:53:29 -0700 (PDT)
+To: Thomas Huth <thuth@redhat.com>, yang.zhong@intel.com,
+	Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org,
+	pbonzini@redhat.com
+References: <20190418180057.3593-1-thuth@redhat.com>
+	<20190418180057.3593-17-thuth@redhat.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Openpgp: id=89C1E78F601EE86C867495CBA2A3FD6EDEADC0DE;
+	url=http://pgp.mit.edu/pks/lookup?op=get&search=0xA2A3FD6EDEADC0DE
+Message-ID: <98855a34-ff5a-896f-7959-480b89d62833@redhat.com>
+Date: Thu, 25 Apr 2019 17:53:26 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+	Thunderbird/60.6.1
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="m972NQjnE83KvVa/"
-Content-Disposition: inline
-In-Reply-To: <c945c950-f6f1-7e2a-a6c4-399c9b728288@oracle.com>
-User-Agent: Mutt/1.11.3 (2019-02-01)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.47]);
-	Thu, 25 Apr 2019 15:44:23 +0000 (UTC)
+In-Reply-To: <20190418180057.3593-17-thuth@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [multiprocess RFC PATCH 36/37] multi-process: add
- the concept description to docs/devel/qemu-multiprocess
+	[fuzzy]
+X-Received-From: 209.85.221.66
+Subject: Re: [Qemu-devel] [PATCH for-QEMU-4.1 v5 16/29] hw/arm: Express
+ dependencies of the virt machine with Kconfig
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -80,134 +89,137 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Elena Ufimtseva <elena.ufimtseva@oracle.com>,
-	John G Johnson <john.g.johnson@oracle.com>,
-	sstabellini@kernel.org, konrad.wilk@oracle.com,
-	Stefan Hajnoczi <stefanha@gmail.com>,
-	Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <f4bug@amsat.org>,
-	qemu-devel@nongnu.org, ross.lagerwall@citrix.com,
-	liran.alon@oracle.com, kanth.ghatraju@oracle.com
+Cc: Rob Herring <robh@kernel.org>, Jan Kiszka <jan.kiszka@web.de>,
+	Igor Mitsyanko <i.mitsyanko@gmail.com>, qemu-block@nongnu.org,
+	"Michael S. Tsirkin" <mst@redhat.com>,
+	Andrey Smirnov <andrew.smirnov@gmail.com>,
+	Alistair Francis <alistair@alistair23.me>,
+	Philippe Mathieu-Daude <f4bug@amsat.org>,
+	Jean-Christophe Dubois <jcd@tribudubois.net>,
+	Beniamino Galvani <b.galvani@gmail.com>, Andrew Jeffery <andrew@aj.id.au>,
+	Cedric Le Goater <clg@kaod.org>, qemu-arm@nongnu.org,
+	Peter Chubb <peter.chubb@nicta.com.au>, Gerd Hoffmann <kraxel@redhat.com>,
+	Antony Pavlov <antonynpavlov@gmail.com>,
+	"Edgar E . Iglesias" <edgar.iglesias@gmail.com>,
+	Subbaraya Sundeep <sundeep.lkml@gmail.com>,
+	John Snow <jsnow@redhat.com>, Joel Stanley <joel@jms.id.au>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190425154421.WWPAsMtxpNp4lEFtoIlRsbsydgwqeBoXBcCMvqnet4Y@z>
+Message-ID: <20190425155326.Bhg-Xn1aoWFOnQGvbN2-Hbpf8lvHhI9aenmpoEIOc-4@z>
 
+Hi Thomas,
 
---m972NQjnE83KvVa/
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+On 4/18/19 8:00 PM, Thomas Huth wrote:
+> Dependencies have been determined by looking at hw/arm/virt.c
+> 
+> Signed-off-by: Thomas Huth <thuth@redhat.com>
+> ---
+>  default-configs/arm-softmmu.mak | 11 +----------
+>  hw/arm/Kconfig                  | 19 +++++++++++++++++++
+>  hw/arm/Makefile.objs            |  3 ++-
+>  3 files changed, 22 insertions(+), 11 deletions(-)
+> 
+> diff --git a/default-configs/arm-softmmu.mak b/default-configs/arm-softmmu.mak
+> index 2580584281..f440a2b1cd 100644
+> --- a/default-configs/arm-softmmu.mak
+> +++ b/default-configs/arm-softmmu.mak
+> @@ -6,6 +6,7 @@ CONFIG_ARM_V7M=y
+>  # CONFIG_PCI_DEVICES=n
+>  # CONFIG_TEST_DEVICES=n
+>  
+> +CONFIG_ARM_VIRT=y
+>  CONFIG_EXYNOS4=y
+>  CONFIG_HIGHBANK=y
+>  CONFIG_INTEGRATOR=y
+> @@ -32,8 +33,6 @@ CONFIG_VGA=y
+>  CONFIG_SSI_M25P80=y
+>  CONFIG_ALLWINNER_EMAC=y
+>  CONFIG_IMX_FEC=y
+> -CONFIG_PLATFORM_BUS=y
+> -CONFIG_VIRTIO_MMIO=y
+>  
+>  CONFIG_NETDUINO2=y
+>  
+> @@ -68,9 +67,6 @@ CONFIG_IOTKIT_SYSINFO=y
+>  CONFIG_ARMSSE_CPUID=y
+>  CONFIG_ARMSSE_MHU=y
+>  
+> -CONFIG_PCI_EXPRESS=y
+> -CONFIG_PCI_EXPRESS_GENERIC_BRIDGE=y
+> -
+>  CONFIG_ALLWINNER_A10_PIT=y
+>  CONFIG_ALLWINNER_A10_PIC=y
+>  CONFIG_ALLWINNER_A10=y
+> @@ -86,10 +82,5 @@ CONFIG_PCIE_PORT=y
+>  CONFIG_XIO3130=y
+>  CONFIG_IOH3420=y
+>  CONFIG_I82801B11=y
+> -CONFIG_ACPI=y
+> -CONFIG_ARM_VIRT=y
+> -CONFIG_SMBIOS=y
+> -CONFIG_GPIO_KEY=y
+>  CONFIG_MSF2=y
+> -CONFIG_FW_CFG_DMA=y
+>  CONFIG_PCI_EXPRESS_DESIGNWARE=y
+> diff --git a/hw/arm/Kconfig b/hw/arm/Kconfig
+> index abeaa54d88..4d0febf644 100644
+> --- a/hw/arm/Kconfig
+> +++ b/hw/arm/Kconfig
+> @@ -1,6 +1,24 @@
+>  config ARM_VIRT
+>      bool
+> +    imply PCI_DEVICES
 
-On Tue, Apr 23, 2019 at 05:26:33PM -0400, Jag Raman wrote:
-> On 3/26/2019 6:20 PM, Philippe Mathieu-Daud=E9 wrote:
->=20
-> > > > > Please share the SELinux policy files, containerization scripts, =
-etc.
-> > > > > There is probably a home for them in qemu.git, libvirt.git, or el=
-sewhere
-> > > > > upstream.
-> > > > >=20
-> > > > > We need to find a way to make the sandboxing improvements availab=
-le to
-> > > > > users besides yourself and easily reusable for developers who wis=
-h to
-> > > > > convert additional device models.
-> > >=20
-> >=20
-> > Also for testing this series.
->=20
-> Hi,
->=20
-> We are wondering how to deliver the example SELinux policies. I have
-> posted on Fedora's SELinux mailing list to get info. on how to upstream
-> SElinux policy.
->=20
-> We are developing SELinux Type Enforcements and MCS labels to sandbox
-> the emulation process. Details regarding example Type Enforcement is
-> available below.
->=20
-> We are also working on changes to libvirt, to launch the remote process
-> and apply MCS labels. Libvirt changes will be posted separately in the
-> future.
->=20
-> The Type Enforcements for SElinux is available in the pastebin location
-> below (also copied at the end of this email):
-> https://pastebin.com/t1bpS6MY
+Without -nodefaults I get:
+qemu-system-aarch64: Unsupported NIC model: virtio-net-pci
+This is expected.
 
-Can multiple LSI SCSI controllers be launched such that each process
-only has access to a subset of disk images?  Or is the disk image label
-per-VM so that there is no isolation between LSI SCSI controller
-processes for that VM?
+> +    imply TEST_DEVICES
+> +    imply VFIO_AMD_XGBE
+>      imply VFIO_PLATFORM
+> +    imply VFIO_XGMAC
+> +    select A15MPCORE
+> +    select ACPI
+> +    select ARM_SMMUV3
 
-My concern with this overall approach is the practicality vs its
-benefits.  Regarding practicality, each emulated device needs to be
-proxied separately.  The QEMU subsystem used by the device also needs to
-be proxied.  Global state, monitor commands, and live migration all
-require code changes to support proxied operation.  This is very
-invasive.
+You forgot to remove ARM_SMMUV3 from default-configs/aarch64-softmmu.mak.
 
-Then each emulated device needs an SELinux policy to achieve the
-benefits of confinement.  I have no idea how to correctly write a policy
-like this and it's likely that developers who contribute a single new
-device will not be proficient in it either.  Writing these policies is a
-rare thing and few people will be good at this.  It also makes me worry
-about how we test and review them.
+With it removed:
+Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
 
-Despite the efforts required in making this work, all processes still
-effectively have full access to the guest since they can access guest
-RAM.  What I mean is that the device is actually not confined to its
-host process (e.g. LSI SCSI controller process) because it can write
-code to executable guest RAM pages.  The guest will then execute that
-code and therefore all guest I/O (networking, disk, etc) is still
-available indirectly to the "confined" processes.  They are not really
-sandboxed from the outside world, regardless of how strict the SELinux
-policy is :(.
-
-There are performance issues due to proxying as well, but let's ignore
-them for now and focus on security.
-
-How do the benefits compare against today's monolithic approach?  If the
-guest exploits monolithic QEMU it has full access to all host files and
-APIs available to QEMU.  However, these are largely just the resources
-that belong to the guest anyway - not resources we are trying to keep
-away from the guest.  With multi-process QEMU each process still has
-access to all guest interfaces via the code injection I mentioned above,
-but the SELinux policy could restrict access to some resources.  But
-this benefit is really small in my opinion, given that the resources
-belong to the guest anyway and the guest can already access them.
-
-I think you can implement this for a handful of devices as a one-time
-thing, but the invasiveness and the impracticality of getting wide cover
-of QEMU make this approach questionable.
-
-Am I mistaken about the invasiveness or impracticality?
-
-Am I misunderstanding the security benefits compared to what already
-exists today?
-
-A more practical approach is to strip down QEMU (compiling out unused
-devices and features) and to run virtio devices in vhost-user processes
-(e.g. virtio-input, virtio-gpu, virtio-fs).  This achieves similar goals
-without proxy objects or invasive changes to QEMU since the vhost-user
-devices use a different codebase and aren't accessible via the QEMU
-monitor.  The limitation is that existing QEMU code and non-virtio
-devices aren't available in this model.
-
-Stefan
-
---m972NQjnE83KvVa/
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEcBAEBAgAGBQJcwdXVAAoJEJykq7OBq3PIh6kIAKVBEG/qr1RJmNnqjwxiIuMW
-g0e3uf9nzgBv3dt7ZZWepKTPYAxT3Wu0ZivtTK9dTvTKJa5T6HLgfXId19iNIyvc
-43MHUuMqmK1MSE/5dZEVt1j4pWQikMdWF8PsH9351jFjHYqlwBVPmUj4bBjlvnAF
-DIuazUV0e7XSX5SN9pqT8jPuGfJhrV9HQcDogy9jVuwt0RQg5sExZ4OwRP2gHMvM
-uI5OC/eS+zrLFRWiU6hzEyz3VqV5ffEkmg5qKvFKxHbtNTnArpprcOj4XRbJlW8t
-4Wsg2WaLbDCV5uGWIZKqlcnIoignmS6IrVWPOlNyLx+i3j2d+fIqKNg023R6ccs=
-=6Q+9
------END PGP SIGNATURE-----
-
---m972NQjnE83KvVa/--
+> +    select GPIO_KEY
+> +    select FW_CFG_DMA
+> +    select PCI_EXPRESS
+> +    select PCI_EXPRESS_GENERIC_BRIDGE
+> +    select PFLASH_CFI01
+> +    select PL011 # UART
+> +    select PL031 # RTC
+> +    select PL061 # GPIO
+> +    select PLATFORM_BUS
+> +    select SMBIOS
+> +    select VIRTIO_MMIO
+>  
+>  config CHEETAH
+>      bool
+> @@ -298,6 +316,7 @@ config A9MPCORE
+>  
+>  config A15MPCORE
+>      bool
+> +    select ARM_GIC
+>  
+>  config ARM11MPCORE
+>      bool
+> diff --git a/hw/arm/Makefile.objs b/hw/arm/Makefile.objs
+> index 729e711b87..4f591ca487 100644
+> --- a/hw/arm/Makefile.objs
+> +++ b/hw/arm/Makefile.objs
+> @@ -1,4 +1,5 @@
+> -obj-y += boot.o sysbus-fdt.o
+> +obj-y += boot.o
+> +obj-$(CONFIG_PLATFORM_BUS) += sysbus-fdt.o
+>  obj-$(CONFIG_ARM_VIRT) += virt.o
+>  obj-$(CONFIG_ACPI) += virt-acpi-build.o
+>  obj-$(CONFIG_DIGIC) += digic_boards.o
+> 
 
