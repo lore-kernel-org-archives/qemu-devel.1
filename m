@@ -2,89 +2,86 @@ Return-Path: <SRS0=VSQP=S3=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.7 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.5 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CE104C43219
-	for <qemu-devel@archiver.kernel.org>; Thu, 25 Apr 2019 14:02:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 47D1AC43219
+	for <qemu-devel@archiver.kernel.org>; Thu, 25 Apr 2019 14:03:53 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id ADBFC206BA
-	for <qemu-devel@archiver.kernel.org>; Thu, 25 Apr 2019 14:02:12 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 187DB206BA
+	for <qemu-devel@archiver.kernel.org>; Thu, 25 Apr 2019 14:03:53 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="w2A3q+Df"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org ADBFC206BA
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ODiSpjI9"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 187DB206BA
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:57920 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:57976 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hJex1-0004Jb-Tv
-	for qemu-devel@archiver.kernel.org; Thu, 25 Apr 2019 10:02:11 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:37636)
+	id 1hJeye-0005lO-BA
+	for qemu-devel@archiver.kernel.org; Thu, 25 Apr 2019 10:03:52 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:60726)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1hJega-00067h-Gp
-	for qemu-devel@nongnu.org; Thu, 25 Apr 2019 09:45:13 -0400
+	(envelope-from <arilou@gmail.com>) id 1hJeQA-0000IH-Ra
+	for qemu-devel@nongnu.org; Thu, 25 Apr 2019 09:28:15 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1hJegZ-0002nI-JS
-	for qemu-devel@nongnu.org; Thu, 25 Apr 2019 09:45:12 -0400
-Received: from mail-wr1-x442.google.com ([2a00:1450:4864:20::442]:35651)
+	(envelope-from <arilou@gmail.com>) id 1hJeQ9-0001uz-LY
+	for qemu-devel@nongnu.org; Thu, 25 Apr 2019 09:28:14 -0400
+Received: from mail-wr1-x442.google.com ([2a00:1450:4864:20::442]:45884)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1hJegZ-0002m3-C3
-	for qemu-devel@nongnu.org; Thu, 25 Apr 2019 09:45:11 -0400
-Received: by mail-wr1-x442.google.com with SMTP id f7so7826692wrs.2
-	for <qemu-devel@nongnu.org>; Thu, 25 Apr 2019 06:45:11 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
-	h=references:user-agent:from:to:cc:subject:in-reply-to:date
-	:message-id:mime-version:content-transfer-encoding;
-	bh=7Rdr+2prk79GSiVzQlNowAT1lxEf1X9LGvL2XtYKt3E=;
-	b=w2A3q+DfMHD2ICAEfUlBI8+NxyQdKFDC4LGitfZPgEhCbF7GwKp3K6GkOepGTgGpXK
-	MO6akM2KGI17XV3irjki78T/EHJu5hpXl23DPMEBsQVgegSVcpbb9KOK9g57CcKBzSR+
-	KYqVquFXR6BMuzF0ZWHEOigfJnel0Wq57iskFVYG8/xKC17qafmYcrI43hYKksGIHWAd
-	qtjAcahGxCQjKulVi5LpcGRjfHqt3eoUorPTIXvPTS260h5KGh77scroPbYIaDJsOGBW
-	srpF5nusazkSXrxbXsAScaHE0zJqsDvJlCfETMbByDIVfsRqtaLmzOC/WW0Y9GBKoJjE
-	1jdw==
+	(Exim 4.71) (envelope-from <arilou@gmail.com>) id 1hJeQ9-0001to-Ey
+	for qemu-devel@nongnu.org; Thu, 25 Apr 2019 09:28:13 -0400
+Received: by mail-wr1-x442.google.com with SMTP id s15so30299514wra.12
+	for <qemu-devel@nongnu.org>; Thu, 25 Apr 2019 06:28:13 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+	h=from:to:cc:subject:date:message-id:in-reply-to:references
+	:mime-version:content-transfer-encoding;
+	bh=ARCXn+8Wo0U+oiTppL+C49FLsYT2QmTKL0yfmugVNz8=;
+	b=ODiSpjI9Y8k0yDJxezKEU06KXYr8ZFiTnDhNHEXOlrya6CQoB/Twe0yL9EuvD6kTCf
+	HsCOEt8RvPKDiTyYWGtkEOaREU/2m3znhy8hlINdXIxGZ6sht40etleNPvdpDbVHTDmE
+	R2yqJUATdkTPqkYNEwina9uJUFZ3ZpPtVzOvqvHfk6Rt6wjWqNXAG4lQ2Xj1XiQyD85c
+	5s4LTneP4tYXI2SP4IDvvZD0Kiq7ZpdU8GyXHvh9FnL9QjOkIikD2uYESa2MbRm1lJy4
+	NxeJusTEyxkRK7lBgp93Ble36yO1qH3DR4lBwB5YzsvfhpzN9HQjVvEKHPRt0OvPizVb
+	lBmg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
 	d=1e100.net; s=20161025;
-	h=x-gm-message-state:references:user-agent:from:to:cc:subject
-	:in-reply-to:date:message-id:mime-version:content-transfer-encoding;
-	bh=7Rdr+2prk79GSiVzQlNowAT1lxEf1X9LGvL2XtYKt3E=;
-	b=tSS9PgKTBTYbCFxyY/rtbX10NSAaUV9RJU67bcEKcCS7qu6vYw0qiGYF4+jrnDxugp
-	suiK722D0e1sYwuvb70LL47pQD+RxvWlXvDbotWlKovWlq6RNA8fFpnZMoodRMgkvS9v
-	n3uNy4/+UwaWwXPgptWuugPf0muKac92gnQBoxkoL/SKUA4qX/1sCHgk6Ydq/FJX26bv
-	iKmR6p+UxzoC3u7IGWFtairEmF9QqTG3CJg/JBDadIYz40/arM4Ct0BhYRJhnD+79vgy
-	MpYYG5o/rlzrLaOAix6R6JFpJIaatWV0e2++h/nBjd2D8rIgvdHj12k5h9lqsgyGkNJj
-	smgw==
-X-Gm-Message-State: APjAAAU3PlwOmgJ6tUKX68GtjpgTnxPu3LUCWIqcc+uxhJCfREZiXZiU
-	v/orTCyuzNKfvdB/sklNnFSB8Q==
-X-Google-Smtp-Source: APXvYqzGwAU8HmmwDhoyQtG3/Vp0v53xDKWSBvNbklDw8X4nWp/tRiVOe+d+5rGIZAzohXh0j0r4fA==
-X-Received: by 2002:a5d:4b92:: with SMTP id b18mr3181781wrt.11.1556199909895; 
-	Thu, 25 Apr 2019 06:45:09 -0700 (PDT)
-Received: from zen.linaroharston ([81.128.185.34])
-	by smtp.gmail.com with ESMTPSA id
-	x192sm35792073wmf.48.2019.04.25.06.45.09
+	h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+	:references:mime-version:content-transfer-encoding;
+	bh=ARCXn+8Wo0U+oiTppL+C49FLsYT2QmTKL0yfmugVNz8=;
+	b=Vhz11+eeixlq3+ZrOFTIkhXgJXjJpzfrih4qkghuKOx/xoVOnSiVZS59LxMHmw4fEQ
+	yZCnziIDDpnZcAM8zc6lvJwXb3hFiWqnxB5dwanTVHpdJNII/7+rO3ax9HMsFdI8Xr6x
+	sjoprR95snhoNk5nWJGbfTkL4nIuZiMC9dkrnXo9KXXuH+ICBPO9xUDBgK+ULudKz6d9
+	qKeRRe1+T0FMnLdHmEA5sszH9xcST7k6tMH0I39djqd5DDJi9OnheyhiEeaaLvw1xhZd
+	mXqVTOrKHhWzAXYGlduPVEyX+Rud9JDp6baCrUJ9/H1Iy7z00jA9j+cCQrr/IygB60i/
+	KAVw==
+X-Gm-Message-State: APjAAAXUQELTKXx1zoQJdofJ0J7IYNTKqX57KvcSKGc3DEw3v1oDFkgn
+	XZbpIkro6czhmpnN5lqCh0szz2Qs
+X-Google-Smtp-Source: APXvYqz2OndiAsiMrMso/fm2bZL8ZGsqoQns7iogsAzTq5JNCuO98nbmwr2Xf47L1RgZ/CvBtEyEUg==
+X-Received: by 2002:a5d:4b4e:: with SMTP id w14mr21412924wrs.15.1556198891322; 
+	Thu, 25 Apr 2019 06:28:11 -0700 (PDT)
+Received: from localhost.localdomain (bzq-79-178-247-46.red.bezeqint.net.
+	[79.178.247.46])
+	by smtp.gmail.com with ESMTPSA id y4sm2316540wrt.34.2019.04.25.06.28.07
 	(version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
-	Thu, 25 Apr 2019 06:45:09 -0700 (PDT)
-Received: from zen (localhost [127.0.0.1])
-	by zen.linaroharston (Postfix) with ESMTP id ADB5E1FF87;
-	Thu, 25 Apr 2019 14:45:08 +0100 (BST)
-References: <20190408182748.1238-1-jan.bobek@gmail.com>
-User-agent: mu4e 1.3.1; emacs 26.1
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-To: Jan Bobek <jan.bobek@gmail.com>
-In-reply-to: <20190408182748.1238-1-jan.bobek@gmail.com>
-Date: Thu, 25 Apr 2019 14:45:08 +0100
-Message-ID: <87y33yurkr.fsf@zen.linaroharston>
+	Thu, 25 Apr 2019 06:28:08 -0700 (PDT)
+From: Jon Doron <arilou@gmail.com>
+To: qemu-devel@nongnu.org
+Date: Thu, 25 Apr 2019 16:26:32 +0300
+Message-Id: <20190425132636.31636-18-arilou@gmail.com>
+X-Mailer: git-send-email 2.20.1
+In-Reply-To: <20190425132636.31636-1-arilou@gmail.com>
+References: <20190425132636.31636-1-arilou@gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
 	recognized.
 X-Received-From: 2a00:1450:4864:20::442
-Subject: Re: [Qemu-devel] [RISU PATCH 0/5] Fix RISU build for i386
+Subject: [Qemu-devel] [PATCH v6 17/21] gdbstub: Implement v commands with
+ new infra
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -96,34 +93,215 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>,
-	Richard Henderson <richard.henderson@linaro.org>,
-	qemu-devel@nongnu.org, Stefan Hajnoczi <stefanha@redhat.com>
+Cc: Jon Doron <arilou@gmail.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190425134508.ESqmXHK5cRLSvENo7dsYQGj2mmr4SaJD3ucHyPasjRY@z>
+Content-Type: text/plain; charset="UTF-8"
+Message-ID: <20190425132632.opi_QpQz_SCYBL5qFfLIJd2nHfn3xarNT9zZtBmbVKM@z>
 
+Signed-off-by: Jon Doron <arilou@gmail.com>
+---
+ gdbstub.c | 170 +++++++++++++++++++++++++++++++++++-------------------
+ 1 file changed, 110 insertions(+), 60 deletions(-)
 
-Jan Bobek <jan.bobek@gmail.com> writes:
+diff --git a/gdbstub.c b/gdbstub.c
+index 809503c20a..7bc00d7f77 100644
+--- a/gdbstub.c
++++ b/gdbstub.c
+@@ -1816,6 +1816,106 @@ static void handle_step(GdbCmdContext *gdb_ctx, void *user_ctx)
+     gdb_continue(gdb_ctx->s);
+ }
+ 
++static void handle_v_cont_query(GdbCmdContext *gdb_ctx, void *user_ctx)
++{
++    put_packet(gdb_ctx->s, "vCont;c;C;s;S");
++}
++
++static void handle_v_cont(GdbCmdContext *gdb_ctx, void *user_ctx)
++{
++    int res;
++
++    if (!gdb_ctx->num_params) {
++        return;
++    }
++
++    res = gdb_handle_vcont(gdb_ctx->s, gdb_ctx->params[0].data);
++    if ((res == -EINVAL) || (res == -ERANGE)) {
++        put_packet(gdb_ctx->s, "E22");
++    } else if (res) {
++        put_packet(gdb_ctx->s, "\0");
++    }
++}
++
++static void handle_v_attach(GdbCmdContext *gdb_ctx, void *user_ctx)
++{
++    GDBProcess *process;
++    CPUState *cpu;
++    char thread_id[16];
++
++    strcpy(gdb_ctx->str_buf, "E22");
++    if (!gdb_ctx->num_params) {
++        goto cleanup;
++    }
++
++    process = gdb_get_process(gdb_ctx->s, gdb_ctx->params[0].val_ul);
++    if (!process) {
++        goto cleanup;
++    }
++
++    cpu = get_first_cpu_in_process(gdb_ctx->s, process);
++    if (!cpu) {
++        goto cleanup;
++    }
++
++    process->attached = true;
++    gdb_ctx->s->g_cpu = cpu;
++    gdb_ctx->s->c_cpu = cpu;
++
++    gdb_fmt_thread_id(gdb_ctx->s, cpu, thread_id, sizeof(thread_id));
++    snprintf(gdb_ctx->str_buf, sizeof(gdb_ctx->str_buf), "T%02xthread:%s;",
++             GDB_SIGNAL_TRAP, thread_id);
++cleanup:
++    put_packet(gdb_ctx->s, gdb_ctx->str_buf);
++}
++
++static void handle_v_kill(GdbCmdContext *gdb_ctx, void *user_ctx)
++{
++    /* Kill the target */
++    put_packet(gdb_ctx->s, "OK");
++    error_report("QEMU: Terminated via GDBstub");
++    exit(0);
++}
++
++static GdbCmdParseEntry gdb_v_commands_table[] = {
++    /* Order is important if has same prefix */
++    {
++        .handler = handle_v_cont_query,
++        .cmd = "Cont?",
++        .cmd_startswith = 1
++    },
++    {
++        .handler = handle_v_cont,
++        .cmd = "Cont",
++        .cmd_startswith = 1,
++        .schema = "s0"
++    },
++    {
++        .handler = handle_v_attach,
++        .cmd = "Attach;",
++        .cmd_startswith = 1,
++        .schema = "l0"
++    },
++    {
++        .handler = handle_v_kill,
++        .cmd = "Kill;",
++        .cmd_startswith = 1
++    },
++};
++
++static void handle_v_commands(GdbCmdContext *gdb_ctx, void *user_ctx)
++{
++    if (!gdb_ctx->num_params) {
++        return;
++    }
++
++    if (process_string_cmd(gdb_ctx->s, NULL, gdb_ctx->params[0].data,
++                           gdb_v_commands_table,
++                           ARRAY_SIZE(gdb_v_commands_table))) {
++        put_packet(gdb_ctx->s, "");
++    }
++}
++
+ static int gdb_handle_packet(GDBState *s, const char *line_buf)
+ {
+     CPUState *cpu;
+@@ -1823,7 +1923,7 @@ static int gdb_handle_packet(GDBState *s, const char *line_buf)
+     CPUClass *cc;
+     const char *p;
+     uint32_t pid, tid;
+-    int ch, type, res;
++    int ch, type;
+     uint8_t mem_buf[MAX_PACKET_LENGTH];
+     char buf[sizeof(mem_buf) + 1 /* trailing NUL */];
+     char thread_id[16];
+@@ -1872,66 +1972,16 @@ static int gdb_handle_packet(GDBState *s, const char *line_buf)
+         }
+         break;
+     case 'v':
+-        if (strncmp(p, "Cont", 4) == 0) {
+-            p += 4;
+-            if (*p == '?') {
+-                put_packet(s, "vCont;c;C;s;S");
+-                break;
+-            }
+-
+-            res = gdb_handle_vcont(s, p);
+-
+-            if (res) {
+-                if ((res == -EINVAL) || (res == -ERANGE)) {
+-                    put_packet(s, "E22");
+-                    break;
+-                }
+-                goto unknown_command;
+-            }
+-            break;
+-        } else if (strncmp(p, "Attach;", 7) == 0) {
+-            unsigned long pid;
+-
+-            p += 7;
+-
+-            if (qemu_strtoul(p, &p, 16, &pid)) {
+-                put_packet(s, "E22");
+-                break;
+-            }
+-
+-            process = gdb_get_process(s, pid);
+-
+-            if (process == NULL) {
+-                put_packet(s, "E22");
+-                break;
+-            }
+-
+-            cpu = get_first_cpu_in_process(s, process);
+-
+-            if (cpu == NULL) {
+-                /* Refuse to attach an empty process */
+-                put_packet(s, "E22");
+-                break;
+-            }
+-
+-            process->attached = true;
+-
+-            s->g_cpu = cpu;
+-            s->c_cpu = cpu;
+-
+-            snprintf(buf, sizeof(buf), "T%02xthread:%s;", GDB_SIGNAL_TRAP,
+-                     gdb_fmt_thread_id(s, cpu, thread_id, sizeof(thread_id)));
+-
+-            put_packet(s, buf);
+-            break;
+-        } else if (strncmp(p, "Kill;", 5) == 0) {
+-            /* Kill the target */
+-            put_packet(s, "OK");
+-            error_report("QEMU: Terminated via GDBstub");
+-            exit(0);
+-        } else {
+-            goto unknown_command;
++        {
++            static const GdbCmdParseEntry v_cmd_desc = {
++                .handler = handle_v_commands,
++                .cmd = "v",
++                .cmd_startswith = 1,
++                .schema = "s0"
++            };
++            cmd_parser = &v_cmd_desc;
+         }
++        break;
+     case 'k':
+         /* Kill the target */
+         error_report("QEMU: Terminated via GDBstub");
+-- 
+2.20.1
 
-> Hi all,
->
-<snip>
-> Thanks,
-> -Jan Bobek
->
-> P.S. This is my first time using git send-email, so please bear with
->      me if something goes wrong and/or let me know how I can improve
->      my future submissions. Thank you!
-
-Looks good to me. Excellent first patch series ;-)
-
-I assume you'll post a v2 once you've integrated Richard's fixups to the
-appropriate patches.
-
-Have you had a chance to look at getting a .risu and risugen working yet?
-
---
-Alex Benn=C3=A9e
 
