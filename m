@@ -7,47 +7,47 @@ X-Spam-Status: No, score=-8.7 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 39A53C43219
-	for <qemu-devel@archiver.kernel.org>; Fri, 26 Apr 2019 06:12:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3680FC43219
+	for <qemu-devel@archiver.kernel.org>; Fri, 26 Apr 2019 06:12:07 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0A34F206E0
-	for <qemu-devel@archiver.kernel.org>; Fri, 26 Apr 2019 06:12:05 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 0756D206E0
+	for <qemu-devel@archiver.kernel.org>; Fri, 26 Apr 2019 06:12:07 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="YXF4lD2S"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0A34F206E0
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="oTubyzoe"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0756D206E0
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gibson.dropbear.id.au
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:39945 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:39947 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hJu5a-0001p8-FK
-	for qemu-devel@archiver.kernel.org; Fri, 26 Apr 2019 02:12:02 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:60035)
+	id 1hJu5e-0001qP-5h
+	for qemu-devel@archiver.kernel.org; Fri, 26 Apr 2019 02:12:06 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:59984)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1hJu0Z-0005UU-Vp
-	for qemu-devel@nongnu.org; Fri, 26 Apr 2019 02:06:53 -0400
-Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1hJu0Y-0004TT-IW
+	(envelope-from <dgibson@ozlabs.org>) id 1hJu0X-0005SY-Oj
 	for qemu-devel@nongnu.org; Fri, 26 Apr 2019 02:06:51 -0400
-Received: from bilbo.ozlabs.org ([2401:3900:2:1::2]:54761 helo=ozlabs.org)
+Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
+	(envelope-from <dgibson@ozlabs.org>) id 1hJu0W-0004Pa-Dp
+	for qemu-devel@nongnu.org; Fri, 26 Apr 2019 02:06:49 -0400
+Received: from bilbo.ozlabs.org ([2401:3900:2:1::2]:52541 helo=ozlabs.org)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <dgibson@ozlabs.org>)
-	id 1hJu0Y-0004Of-4W; Fri, 26 Apr 2019 02:06:50 -0400
+	id 1hJu0W-0004KA-0X; Fri, 26 Apr 2019 02:06:48 -0400
 Received: by ozlabs.org (Postfix, from userid 1007)
-	id 44r3Tm2Gf8z9sNC; Fri, 26 Apr 2019 16:06:36 +1000 (AEST)
+	id 44r3Tl64t7z9sNF; Fri, 26 Apr 2019 16:06:35 +1000 (AEST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-	d=gibson.dropbear.id.au; s=201602; t=1556258796;
-	bh=6Bi/FEKdFLeLFSqWxVnBjr69I/R0vsKiuX5lnlTia8M=;
+	d=gibson.dropbear.id.au; s=201602; t=1556258795;
+	bh=nqNDqkW1fiFWpWPWQ7vYzgSIzPctpLlz0O+Uu0pu5gU=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=YXF4lD2SZeODoq4PyWfXEmVGSwEisz1sZ74vvgJz/j0D+9qu9Nffnm+JYtdezo3VG
-	1u6zeWHadkiHN5EuVdKLDmUQUFKBqXdQwcoSaaPb1IcklyJqeDS7pcNg3I+sphlli8
-	UqC3K8HZIq9jPGczl8tyv0Np7pb8nsV5Ci7uoPyY=
+	b=oTubyzoebfNg5DQ52bwb1cyeEufMwyEIRLFqh5IGuAvRYOm2bR7o/6oPoGzPd71rQ
+	Nnj2RBl1LYCPftYgis46oLMdKM1my3+CxHl7/zyqKilzlOqldIAOP1CoAja+ux1HVh
+	kdtOkxpVVM58XroNySyM6SvbmVCiUCWTyOvQDUhc=
 From: David Gibson <david@gibson.dropbear.id.au>
 To: peter.maydell@linaro.org
-Date: Fri, 26 Apr 2019 16:06:08 +1000
-Message-Id: <20190426060627.18153-18-david@gibson.dropbear.id.au>
+Date: Fri, 26 Apr 2019 16:06:03 +1000
+Message-Id: <20190426060627.18153-13-david@gibson.dropbear.id.au>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20190426060627.18153-1-david@gibson.dropbear.id.au>
 References: <20190426060627.18153-1-david@gibson.dropbear.id.au>
@@ -57,7 +57,7 @@ Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
 	recognized.
 X-Received-From: 2401:3900:2:1::2
-Subject: [Qemu-devel] [PULL 17/36] target/ppc: Style fixes for misc_helper.c
+Subject: [Qemu-devel] [PULL 12/36] target/ppc: Style fixes for helper_regs.h
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -75,36 +75,46 @@ Cc: gkurz@kaod.org, Greg Kurz <groug@kaod.org>, qemu-devel@nongnu.org,
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190426060608.H2_HVgwn4K9PuuecSHqDU6X7SJgxoIz7sKtjDMVx5Q0@z>
+Message-ID: <20190426060603.laMV3aWachC__AOER17tTDOVAVCRxfYs3bEANhZIxs0@z>
 
 Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
 Reviewed-by: C=C3=A9dric Le Goater <clg@kaod.org>
 Reviewed-by: Greg Kurz <groug@kaod.org>
 ---
- target/ppc/misc_helper.c | 9 +++++----
- 1 file changed, 5 insertions(+), 4 deletions(-)
+ target/ppc/helper_regs.h | 10 ++++++----
+ 1 file changed, 6 insertions(+), 4 deletions(-)
 
-diff --git a/target/ppc/misc_helper.c b/target/ppc/misc_helper.c
-index c65d1ade15..0a81e98ee9 100644
---- a/target/ppc/misc_helper.c
-+++ b/target/ppc/misc_helper.c
-@@ -210,10 +210,11 @@ void ppc_store_msr(CPUPPCState *env, target_ulong v=
-alue)
-     hreg_store_msr(env, value, 0);
- }
+diff --git a/target/ppc/helper_regs.h b/target/ppc/helper_regs.h
+index c863abc0bf..922da76c6c 100644
+--- a/target/ppc/helper_regs.h
++++ b/target/ppc/helper_regs.h
+@@ -44,10 +44,11 @@ static inline void hreg_swap_gpr_tgpr(CPUPPCState *en=
+v)
 =20
--/* This code is lifted from MacOnLinux. It is called whenever
-- * THRM1,2 or 3 is read an fixes up the values in such a way
-- * that will make MacOS not hang. These registers exist on some
-- * 75x and 74xx processors.
-+/*
-+ * This code is lifted from MacOnLinux. It is called whenever THRM1,2
-+ * or 3 is read an fixes up the values in such a way that will make
-+ * MacOS not hang. These registers exist on some 75x and 74xx
-+ * processors.
-  */
- void helper_fixup_thrm(CPUPPCState *env)
+ static inline void hreg_compute_mem_idx(CPUPPCState *env)
  {
+-    /* This is our encoding for server processors. The architecture
++    /*
++     * This is our encoding for server processors. The architecture
+      * specifies that there is no such thing as userspace with
+-     * translation off, however it appears that MacOS does it and
+-     * some 32-bit CPUs support it. Weird...
++     * translation off, however it appears that MacOS does it and some
++     * 32-bit CPUs support it. Weird...
+      *
+      *   0 =3D Guest User space virtual mode
+      *   1 =3D Guest Kernel space virtual mode
+@@ -143,7 +144,8 @@ static inline int hreg_store_msr(CPUPPCState *env, ta=
+rget_ulong value,
+         /* Change the exception prefix on PowerPC 601 */
+         env->excp_prefix =3D ((value >> MSR_EP) & 1) * 0xFFF00000;
+     }
+-    /* If PR=3D1 then EE, IR and DR must be 1
++    /*
++     * If PR=3D1 then EE, IR and DR must be 1
+      *
+      * Note: We only enforce this on 64-bit server processors.
+      * It appears that:
 --=20
 2.20.1
 
