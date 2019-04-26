@@ -1,19 +1,20 @@
-Received: from eggs.gnu.org ([209.51.188.92]:60385)
+Received: from eggs.gnu.org ([209.51.188.92]:60412)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1hJu0u-0005w8-BN
-	for qemu-devel@nongnu.org; Fri, 26 Apr 2019 02:07:13 -0400
+	(envelope-from <dgibson@ozlabs.org>) id 1hJu0x-0005zx-R3
+	for qemu-devel@nongnu.org; Fri, 26 Apr 2019 02:07:17 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1hJu0t-00050I-5S
-	for qemu-devel@nongnu.org; Fri, 26 Apr 2019 02:07:12 -0400
+	(envelope-from <dgibson@ozlabs.org>) id 1hJu0t-00051H-TS
+	for qemu-devel@nongnu.org; Fri, 26 Apr 2019 02:07:14 -0400
 From: David Gibson <david@gibson.dropbear.id.au>
-Date: Fri, 26 Apr 2019 16:06:06 +1000
-Message-Id: <20190426060627.18153-16-david@gibson.dropbear.id.au>
+Date: Fri, 26 Apr 2019 16:06:10 +1000
+Message-Id: <20190426060627.18153-20-david@gibson.dropbear.id.au>
 In-Reply-To: <20190426060627.18153-1-david@gibson.dropbear.id.au>
 References: <20190426060627.18153-1-david@gibson.dropbear.id.au>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 15/36] target/ppc: Style fixes for mem_helper.c
+Subject: [Qemu-devel] [PULL 19/36] target/ppc: Style fixes for
+ mmu-hash64.[ch]
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,94 +30,183 @@ Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
 Reviewed-by: C=C3=A9dric Le Goater <clg@kaod.org>
 Reviewed-by: Greg Kurz <groug@kaod.org>
 ---
- target/ppc/mem_helper.c | 33 +++++++++++++++++++--------------
- 1 file changed, 19 insertions(+), 14 deletions(-)
+ target/ppc/mmu-hash64.c | 68 +++++++++++++++++++++++++----------------
+ 1 file changed, 42 insertions(+), 26 deletions(-)
 
-diff --git a/target/ppc/mem_helper.c b/target/ppc/mem_helper.c
-index 9c5a68579e..5b0f9ee50d 100644
---- a/target/ppc/mem_helper.c
-+++ b/target/ppc/mem_helper.c
-@@ -27,7 +27,7 @@
- #include "internal.h"
- #include "qemu/atomic128.h"
+diff --git a/target/ppc/mmu-hash64.c b/target/ppc/mmu-hash64.c
+index 214149f65b..c74818b2e7 100644
+--- a/target/ppc/mmu-hash64.c
++++ b/target/ppc/mmu-hash64.c
+@@ -30,7 +30,7 @@
+ #include "hw/hw.h"
+ #include "mmu-book3s-v3.h"
 =20
--//#define DEBUG_OP
-+/* #define DEBUG_OP */
+-//#define DEBUG_SLB
++/* #define DEBUG_SLB */
 =20
- static inline bool needs_byteswap(const CPUPPCState *env)
+ #ifdef DEBUG_SLB
+ #  define LOG_SLB(...) qemu_log_mask(CPU_LOG_MMU, __VA_ARGS__)
+@@ -58,9 +58,11 @@ static ppc_slb_t *slb_lookup(PowerPCCPU *cpu, target_u=
+long eaddr)
+=20
+         LOG_SLB("%s: slot %d %016" PRIx64 " %016"
+                     PRIx64 "\n", __func__, n, slb->esid, slb->vsid);
+-        /* We check for 1T matches on all MMUs here - if the MMU
++        /*
++         * We check for 1T matches on all MMUs here - if the MMU
+          * doesn't have 1T segment support, we will have prevented 1T
+-         * entries from being inserted in the slbmte code. */
++         * entries from being inserted in the slbmte code.
++         */
+         if (((slb->esid =3D=3D esid_256M) &&
+              ((slb->vsid & SLB_VSID_B) =3D=3D SLB_VSID_B_256M))
+             || ((slb->esid =3D=3D esid_1T) &&
+@@ -103,7 +105,8 @@ void helper_slbia(CPUPPCState *env)
+=20
+         if (slb->esid & SLB_ESID_V) {
+             slb->esid &=3D ~SLB_ESID_V;
+-            /* XXX: given the fact that segment size is 256 MB or 1TB,
++            /*
++             * XXX: given the fact that segment size is 256 MB or 1TB,
+              *      and we still don't have a tlb_flush_mask(env, n, mas=
+k)
+              *      in QEMU, we just invalidate all TLBs
+              */
+@@ -126,7 +129,8 @@ static void __helper_slbie(CPUPPCState *env, target_u=
+long addr,
+     if (slb->esid & SLB_ESID_V) {
+         slb->esid &=3D ~SLB_ESID_V;
+=20
+-        /* XXX: given the fact that segment size is 256 MB or 1TB,
++        /*
++         * XXX: given the fact that segment size is 256 MB or 1TB,
+          *      and we still don't have a tlb_flush_mask(env, n, mask)
+          *      in QEMU, we just invalidate all TLBs
+          */
+@@ -306,8 +310,10 @@ static int ppc_hash64_pte_prot(PowerPCCPU *cpu,
  {
-@@ -103,10 +103,11 @@ void helper_lsw(CPUPPCState *env, target_ulong addr=
-, uint32_t nb, uint32_t reg)
-     do_lsw(env, addr, nb, reg, GETPC());
- }
-=20
--/* PPC32 specification says we must generate an exception if
-- * rA is in the range of registers to be loaded.
-- * In an other hand, IBM says this is valid, but rA won't be loaded.
-- * For now, I'll follow the spec...
-+/*
-+ * PPC32 specification says we must generate an exception if rA is in
-+ * the range of registers to be loaded.  In an other hand, IBM says
-+ * this is valid, but rA won't be loaded.  For now, I'll follow the
-+ * spec...
-  */
- void helper_lswx(CPUPPCState *env, target_ulong addr, uint32_t reg,
-                  uint32_t ra, uint32_t rb)
-@@ -199,7 +200,8 @@ void helper_dcbzep(CPUPPCState *env, target_ulong add=
-r, uint32_t opcode)
- void helper_icbi(CPUPPCState *env, target_ulong addr)
- {
-     addr &=3D ~(env->dcache_line_size - 1);
--    /* Invalidate one cache line :
+     CPUPPCState *env =3D &cpu->env;
+     unsigned pp, key;
+-    /* Some pp bit combinations have undefined behaviour, so default
+-     * to no access in those cases */
 +    /*
-+     * Invalidate one cache line :
-      * PowerPC specification says this is to be treated like a load
-      * (not a fetch) by the MMU. To be sure it will be so,
-      * do the load "by hand".
-@@ -346,17 +348,19 @@ uint32_t helper_stqcx_be_parallel(CPUPPCState *env,=
- target_ulong addr,
- #define LO_IDX 0
- #endif
++     * Some pp bit combinations have undefined behaviour, so default
++     * to no access in those cases
++     */
+     int prot =3D 0;
 =20
--/* We use msr_le to determine index ordering in a vector.  However,
--   byteswapping is not simply controlled by msr_le.  We also need to tak=
-e
--   into account endianness of the target.  This is done for the little-e=
-ndian
--   PPC64 user-mode target. */
-+/*
-+ * We use msr_le to determine index ordering in a vector.  However,
-+ * byteswapping is not simply controlled by msr_le.  We also need to
-+ * take into account endianness of the target.  This is done for the
-+ * little-endian PPC64 user-mode target.
-+ */
+     key =3D !!(msr_pr ? (slb->vsid & SLB_VSID_KP)
+@@ -376,7 +382,7 @@ static int ppc_hash64_amr_prot(PowerPCCPU *cpu, ppc_h=
+ash_pte64_t pte)
+     }
 =20
- #define LVE(name, access, swap, element)                        \
-     void helper_##name(CPUPPCState *env, ppc_avr_t *r,          \
-                        target_ulong addr)                       \
-     {                                                           \
-         size_t n_elems =3D ARRAY_SIZE(r->element);                \
--        int adjust =3D HI_IDX*(n_elems - 1);                      \
-+        int adjust =3D HI_IDX * (n_elems - 1);                    \
-         int sh =3D sizeof(r->element[0]) >> 1;                    \
-         int index =3D (addr & 0xf) >> sh;                         \
-         if (msr_le) {                                           \
-@@ -476,12 +480,13 @@ VSX_STXVL(stxvll, 1)
+     key =3D HPTE64_R_KEY(pte.pte1);
+-    amrbits =3D (env->spr[SPR_AMR] >> 2*(31 - key)) & 0x3;
++    amrbits =3D (env->spr[SPR_AMR] >> 2 * (31 - key)) & 0x3;
 =20
- void helper_tbegin(CPUPPCState *env)
- {
--    /* As a degenerate implementation, always fail tbegin.  The reason
+     /* fprintf(stderr, "AMR protection: key=3D%d AMR=3D0x%" PRIx64 "\n",=
+ key, */
+     /*         env->spr[SPR_AMR]); */
+@@ -547,8 +553,9 @@ static hwaddr ppc_hash64_pteg_search(PowerPCCPU *cpu,=
+ hwaddr hash,
+             if (*pshift =3D=3D 0) {
+                 continue;
+             }
+-            /* We don't do anything with pshift yet as qemu TLB only dea=
+ls
+-             * with 4K pages anyway
++            /*
++             * We don't do anything with pshift yet as qemu TLB only
++             * deals with 4K pages anyway
+              */
+             pte->pte0 =3D pte0;
+             pte->pte1 =3D pte1;
+@@ -572,8 +579,10 @@ static hwaddr ppc_hash64_htab_lookup(PowerPCCPU *cpu=
+,
+     uint64_t vsid, epnmask, epn, ptem;
+     const PPCHash64SegmentPageSizes *sps =3D slb->sps;
+=20
+-    /* The SLB store path should prevent any bad page size encodings
+-     * getting in there, so: */
 +    /*
-+     * As a degenerate implementation, always fail tbegin.  The reason
-      * given is "Nesting overflow".  The "persistent" bit is set,
-      * providing a hint to the error handler to not retry.  The TFIAR
-      * captures the address of the failure, which is this tbegin
--     * instruction.  Instruction execution will continue with the
--     * next instruction in memory, which is precisely what we want.
-+     * instruction.  Instruction execution will continue with the next
-+     * instruction in memory, which is precisely what we want.
++     * The SLB store path should prevent any bad page size encodings
++     * getting in there, so:
++     */
+     assert(sps);
+=20
+     /* If ISL is set in LPCR we need to clamp the page size to 4K */
+@@ -732,17 +741,20 @@ int ppc_hash64_handle_mmu_fault(PowerPCCPU *cpu, va=
+ddr eaddr,
+=20
+     assert((rwx =3D=3D 0) || (rwx =3D=3D 1) || (rwx =3D=3D 2));
+=20
+-    /* Note on LPCR usage: 970 uses HID4, but our special variant
+-     * of store_spr copies relevant fields into env->spr[SPR_LPCR].
+-     * Similarily we filter unimplemented bits when storing into
+-     * LPCR depending on the MMU version. This code can thus just
+-     * use the LPCR "as-is".
++    /*
++     * Note on LPCR usage: 970 uses HID4, but our special variant of
++     * store_spr copies relevant fields into env->spr[SPR_LPCR].
++     * Similarily we filter unimplemented bits when storing into LPCR
++     * depending on the MMU version. This code can thus just use the
++     * LPCR "as-is".
       */
 =20
-     env->spr[SPR_TEXASR] =3D
+     /* 1. Handle real mode accesses */
+     if (((rwx =3D=3D 2) && (msr_ir =3D=3D 0)) || ((rwx !=3D 2) && (msr_d=
+r =3D=3D 0))) {
+-        /* Translation is supposedly "off"  */
+-        /* In real mode the top 4 effective address bits are (mostly) ig=
+nored */
++        /*
++         * Translation is supposedly "off", but in real mode the top 4
++         * effective address bits are (mostly) ignored
++         */
+         raddr =3D eaddr & 0x0FFFFFFFFFFFFFFFULL;
+=20
+         /* In HV mode, add HRMOR if top EA bit is clear */
+@@ -875,8 +887,10 @@ skip_slb_search:
+     if (rwx =3D=3D 1) {
+         new_pte1 |=3D HPTE64_R_C; /* set changed (dirty) bit */
+     } else {
+-        /* Treat the page as read-only for now, so that a later write
+-         * will pass through this function again to set the C bit */
++        /*
++         * Treat the page as read-only for now, so that a later write
++         * will pass through this function again to set the C bit
++         */
+         prot &=3D ~PAGE_WRITE;
+     }
+=20
+@@ -1023,8 +1037,9 @@ static void ppc_hash64_update_vrma(PowerPCCPU *cpu)
+         return;
+     }
+=20
+-    /* Make one up. Mostly ignore the ESID which will not be
+-     * needed for translation
++    /*
++     * Make one up. Mostly ignore the ESID which will not be needed
++     * for translation
+      */
+     vsid =3D SLB_VSID_VRMA;
+     vrmasd =3D (lpcr & LPCR_VRMASD) >> LPCR_VRMASD_SHIFT;
+@@ -1080,11 +1095,12 @@ void ppc_store_lpcr(PowerPCCPU *cpu, target_ulong=
+ val)
+         }
+         env->spr[SPR_RMOR] =3D ((lpcr >> 41) & 0xffffull) << 26;
+=20
+-        /* XXX We could also write LPID from HID4 here
++        /*
++         * XXX We could also write LPID from HID4 here
+          * but since we don't tag any translation on it
+          * it doesn't actually matter
+-         */
+-        /* XXX For proper emulation of 970 we also need
++         *
++         * XXX For proper emulation of 970 we also need
+          * to dig HRMOR out of HID5
+          */
+         break;
 --=20
 2.20.1
