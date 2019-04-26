@@ -1,25 +1,24 @@
 Received: from eggs.gnu.org ([209.51.188.92]:36831)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1hJzZj-0008Ku-RW
-	for qemu-devel@nongnu.org; Fri, 26 Apr 2019 08:03:32 -0400
+	(envelope-from <david@redhat.com>) id 1hJzZq-0008Ku-JB
+	for qemu-devel@nongnu.org; Fri, 26 Apr 2019 08:03:39 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1hJzQy-0002ym-6i
-	for qemu-devel@nongnu.org; Fri, 26 Apr 2019 07:54:29 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:46316)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1hJzQx-0002sc-9d
-	for qemu-devel@nongnu.org; Fri, 26 Apr 2019 07:54:28 -0400
-Date: Fri, 26 Apr 2019 13:54:12 +0200
-From: Igor Mammedov <imammedo@redhat.com>
-Message-ID: <20190426135412.758769f9@Igors-MacBook-Pro.local>
-In-Reply-To: <1556211116-172721-1-git-send-email-xuwei5@huawei.com>
-References: <1556170489-131927-12-git-send-email-imammedo@redhat.com>
-	<1556211116-172721-1-git-send-email-xuwei5@huawei.com>
+	(envelope-from <david@redhat.com>) id 1hJzOi-0005gU-IG
+	for qemu-devel@nongnu.org; Fri, 26 Apr 2019 07:52:09 -0400
+References: <20190426111003.21246-1-borntraeger@de.ibm.com>
+	<20190426111003.21246-11-borntraeger@de.ibm.com>
+	<71955bba-ef04-1677-b7f0-bb1675bad12a@redhat.com>
+	<07252560-1eed-8fd5-ee94-6bcea6cf99bc@de.ibm.com>
+From: David Hildenbrand <david@redhat.com>
+Message-ID: <10d43e6e-ee8c-cd65-e724-354e0f40c79f@redhat.com>
+Date: Fri, 26 Apr 2019 13:52:05 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v3 11/13] tests: acpi: add simple arm/virt
- testcase
+In-Reply-To: <07252560-1eed-8fd5-ee94-6bcea6cf99bc@de.ibm.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v2 10/10] s390x/cpumodel: wire up 8561 and
+ 8562 as gen15 machines
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,56 +27,61 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: x00249684 <xuwei5@huawei.com>
-Cc: qemu-devel@nongnu.org, shameerali.kolothum.thodi@huawei.com, linuxarm@huawei.com, Andrew Jones <drjones@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, mst@redhat.com
+To: Christian Borntraeger <borntraeger@de.ibm.com>, Cornelia Huck <cohuck@redhat.com>
+Cc: qemu-devel <qemu-devel@nongnu.org>, qemu-s390x <qemu-s390x@nongnu.org>, Halil Pasic <pasic@linux.ibm.com>, Richard Henderson <rth@twiddle.net>, Collin Walling <walling@linux.ibm.com>, "Jason J . Herne" <jjherne@linux.ibm.com>
 
-On Fri, 26 Apr 2019 00:51:56 +0800
-x00249684 <xuwei5@huawei.com> wrote:
+On 26.04.19 13:36, Christian Borntraeger wrote:
+>=20
+>=20
+> On 26.04.19 13:32, David Hildenbrand wrote:
+>> On 26.04.19 13:10, Christian Borntraeger wrote:
+>>> 8561 and 8562 will be gen15 machines. There is no name yet, lets us u=
+se
+>>> the cpu id as base name. Later on we can provide aliases with the pro=
+per
+>>> name.
+>>>
+>>> Signed-off-by: Christian Borntraeger <borntraeger@de.ibm.com>
+>>> ---
+>>>  target/s390x/cpu_models.c | 2 ++
+>>>  1 file changed, 2 insertions(+)
+>>>
+>>> diff --git a/target/s390x/cpu_models.c b/target/s390x/cpu_models.c
+>>> index d683635eb5..dd6415103f 100644
+>>> --- a/target/s390x/cpu_models.c
+>>> +++ b/target/s390x/cpu_models.c
+>>> @@ -83,6 +83,8 @@ static S390CPUDef s390_cpu_defs[] =3D {
+>>>      CPUDEF_INIT(0x3906, 14, 1, 47, 0x08000000U, "z14", "IBM z14 GA1"=
+),
+>>>      CPUDEF_INIT(0x3906, 14, 2, 47, 0x08000000U, "z14.2", "IBM z14 GA=
+2"),
+>>>      CPUDEF_INIT(0x3907, 14, 1, 47, 0x08000000U, "z14ZR1", "IBM z14 M=
+odel ZR1 GA1"),
+>>> +    CPUDEF_INIT(0x8561, 15, 1, 47, 0x08000000U, "8561", "IBM 8561 GA=
+1"),
+>>> +    CPUDEF_INIT(0x8562, 15, 1, 47, 0x08000000U, "8562", "IBM 8562 GA=
+1"),
+>>>  };
+>>
+>> Thinking out loud, I know that official names are not published yet.
+>> Looking at the recent history (z13, z14), my educated guess would be
+>> z15. I guess pretty much everybody would guess that.
+>=20
+> Not sure about trademark aspects - especially if this really becomes z1=
+5. The smaller
+> machine has no real history (ZR1 vs. s vs BC). So I think I would rathe=
+r have a correct
+> number than a partially correct name.
 
-> Hi Igor,
-> 
-> +static void test_acpi_virt_tcg(void)
-> +{
-> +    test_data data = {
-> +        .machine = "virt",
-> +        .uefi_fl1 = "pc-bios/edk2-aarch64-code.fd",
-> +        .uefi_fl2 = "pc-bios/edk2-arm-vars.fd",
-> +        .cd = "tests/data/uefi-boot-images/bios-tables-test.aarch64.iso.qcow2",
-> +        .ram_start = 0x40000000ULL,
-> +        .scan_len = 128ULL * 1024 * 1024,
-> +    };
-> +
-> +    test_acpi_one("-cpu cortex-a57 ", &data);
-> 
-> Replaced the cortex-a57 with host and succesfully tested on the hisilicon arm64 
-> D05 board. Otherwise it failed with "kvm_init_vcpu failed: Invalid argument".
-> Is it possilbe to set the cpu type like numa-test.c?
+We could also use "gen15a" and "gen15b", still better to get than magic
+numbers. (yeah well, they are not magic)
 
-I think it works with numa-test because it uses TCG only but in case of bios-tables-test
-it uses accel="kvm:tcg" to leverage KVM capabilities whenever possible to speed up test.
+If you want to stick with numbers, be aware that cpu numbers are not
+injective, so at some point we will need e.g. "8561.2", just so you're
+aware of the implications.
 
-Now back to our ARM test case, uefi requirement is to use 64bit CPU (hence it was cortex-a57)
-however unlike x86 it obviously breaks since KVM accelerator on ARM host is used
-and it doesn't work with anything other than 'host' cpu model.
+--=20
 
-I think we still want to use KVM whenever possible, but problem lies in that
-user (testcase) doesn't have an idea if KVM accelerator is available and host is 64 CPU.
+Thanks,
 
-to sum up we need to support 2 modes:
-  1. host is 64 ARM, use kvm with -cpu host
-  2. all other cases use tcg with -cpu cortex-a57
-
-I can hack to probe if /dev/kvm is accessible and host is 64 bit and use #1
-otherwise fallback to #2
-or as quick fix do only #2 initially and think about a better solution to #1 
-
-Is there any other suggestions/opinions how to approach issue/proceed.
-
-PS:
-we probably would like to reuse this not only for acpi tests but also for other
-arm/virt test cases that involve running guest code. 
-
-> Thanks!
-> 
-> Best Regards,
-> Wei
+David / dhildenb
