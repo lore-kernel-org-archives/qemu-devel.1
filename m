@@ -2,71 +2,113 @@ Return-Path: <SRS0=QtPl=S4=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.7 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_PASS,URIBL_BLOCKED autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 05E1EC43218
-	for <qemu-devel@archiver.kernel.org>; Fri, 26 Apr 2019 19:31:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 414D4C43218
+	for <qemu-devel@archiver.kernel.org>; Fri, 26 Apr 2019 20:32:47 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C38A720693
-	for <qemu-devel@archiver.kernel.org>; Fri, 26 Apr 2019 19:31:57 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C38A720693
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
+	by mail.kernel.org (Postfix) with ESMTPS id EF12A206BF
+	for <qemu-devel@archiver.kernel.org>; Fri, 26 Apr 2019 20:32:46 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=amdcloud.onmicrosoft.com header.i=@amdcloud.onmicrosoft.com header.b="bYRJhUhB"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EF12A206BF
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=amd.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:51150 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:51705 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hK6Zh-0006WK-4H
-	for qemu-devel@archiver.kernel.org; Fri, 26 Apr 2019 15:31:57 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:42436)
+	id 1hK7WX-0002Wz-V3
+	for qemu-devel@archiver.kernel.org; Fri, 26 Apr 2019 16:32:45 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:53534)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1hK6YW-0005UA-RZ
-	for qemu-devel@nongnu.org; Fri, 26 Apr 2019 15:30:46 -0400
+	(envelope-from <Thomas.Lendacky@amd.com>) id 1hK7Vb-0001wP-UA
+	for qemu-devel@nongnu.org; Fri, 26 Apr 2019 16:31:49 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1hK6YV-0007bq-98
-	for qemu-devel@nongnu.org; Fri, 26 Apr 2019 15:30:44 -0400
-Received: from indium.canonical.com ([91.189.90.7]:34138)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1hK6YV-0007bI-42
-	for qemu-devel@nongnu.org; Fri, 26 Apr 2019 15:30:43 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1hK6YU-0002BH-2p
-	for <qemu-devel@nongnu.org>; Fri, 26 Apr 2019 19:30:42 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 0A1B02E8058
-	for <qemu-devel@nongnu.org>; Fri, 26 Apr 2019 19:30:42 +0000 (UTC)
-MIME-Version: 1.0
+	(envelope-from <Thomas.Lendacky@amd.com>) id 1hK7Va-0008N1-BA
+	for qemu-devel@nongnu.org; Fri, 26 Apr 2019 16:31:47 -0400
+Received: from mail-eopbgr770055.outbound.protection.outlook.com
+	([40.107.77.55]:43030
+	helo=NAM02-SN1-obe.outbound.protection.outlook.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <Thomas.Lendacky@amd.com>)
+	id 1hK7VZ-0008Ls-UE
+	for qemu-devel@nongnu.org; Fri, 26 Apr 2019 16:31:46 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=amdcloud.onmicrosoft.com; s=selector1-amd-com;
+	h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+	bh=1AlyYZmvBYI7NHR8wuYWjdUyI0f6e1UpU6J7jGNHW4I=;
+	b=bYRJhUhBUfllq2EArIqQq9JbKubHKIppNxZER5P0kCSZce39U7NKLEEctdHJTgDErdVhejlwwl0k3ePtwwWBrOIqh2JwZiXEpRHCh3upJq48Y9IUlrl/6iKyKoiz2M5AvPQedyrMDJNQvquc1OgN44f4ONvv8kg8q8C1+R0mLao=
+Received: from DM6PR12MB3163.namprd12.prod.outlook.com (20.179.104.150) by
+	DM6PR12MB3388.namprd12.prod.outlook.com (20.178.198.83) with Microsoft
+	SMTP
+	Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+	15.20.1835.13; Fri, 26 Apr 2019 20:31:41 +0000
+Received: from DM6PR12MB3163.namprd12.prod.outlook.com
+	([fe80::c96d:c1dd:fd7a:ffd6]) by
+	DM6PR12MB3163.namprd12.prod.outlook.com
+	([fe80::c96d:c1dd:fd7a:ffd6%4]) with mapi id 15.20.1835.010;
+	Fri, 26 Apr 2019 20:31:41 +0000
+From: "Lendacky, Thomas" <Thomas.Lendacky@amd.com>
+To: "Singh, Brijesh" <brijesh.singh@amd.com>, "kvm@vger.kernel.org"
+	<kvm@vger.kernel.org>
+Thread-Topic: [RFC PATCH v1 02/10] KVM: SVM: Add KVM_SEND_UPDATE_DATA command
+Thread-Index: AQHU+rgvkOdJQA6hTESs9qid2il0iKZO6KeA
+Date: Fri, 26 Apr 2019 20:31:41 +0000
+Message-ID: <c0cf8d9b-4b47-f578-bc51-29739a3c2f8d@amd.com>
+References: <20190424160942.13567-1-brijesh.singh@amd.com>
+	<20190424160942.13567-3-brijesh.singh@amd.com>
+In-Reply-To: <20190424160942.13567-3-brijesh.singh@amd.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-clientproxiedby: SN4PR0201CA0067.namprd02.prod.outlook.com
+	(2603:10b6:803:20::29) To DM6PR12MB3163.namprd12.prod.outlook.com
+	(2603:10b6:5:182::22)
+authentication-results: spf=none (sender IP is )
+	smtp.mailfrom=Thomas.Lendacky@amd.com; 
+x-ms-exchange-messagesentrepresentingtype: 1
+x-originating-ip: [165.204.78.1]
+x-ms-publictraffictype: Email
+x-ms-office365-filtering-correlation-id: 562f23ae-a4bf-4b9d-8d11-08d6ca8630dc
+x-ms-office365-filtering-ht: Tenant
+x-microsoft-antispam: BCL:0; PCL:0;
+	RULEID:(2390118)(7020095)(4652040)(8989299)(4534185)(4627221)(201703031133081)(201702281549075)(8990200)(5600141)(711020)(4605104)(4618075)(2017052603328)(7193020);
+	SRVR:DM6PR12MB3388; 
+x-ms-traffictypediagnostic: DM6PR12MB3388:
+x-microsoft-antispam-prvs: <DM6PR12MB33880C71109A902D97E444C6EC3E0@DM6PR12MB3388.namprd12.prod.outlook.com>
+x-forefront-prvs: 001968DD50
+x-forefront-antispam-report: SFV:NSPM;
+	SFS:(10009020)(396003)(136003)(39860400002)(346002)(366004)(376002)(189003)(199004)(186003)(14454004)(8936002)(52116002)(446003)(31696002)(110136005)(72206003)(81156014)(8676002)(81166006)(486006)(476003)(478600001)(54906003)(2616005)(71190400001)(99286004)(71200400001)(31686004)(73956011)(316002)(66066001)(6512007)(66476007)(66556008)(64756008)(66946007)(4326008)(53936002)(86362001)(66574012)(6246003)(66446008)(11346002)(6506007)(386003)(97736004)(25786009)(76176011)(7416002)(36756003)(53546011)(14444005)(102836004)(68736007)(256004)(305945005)(7736002)(5660300002)(26005)(229853002)(2906002)(2501003)(6436002)(6486002)(6116002)(3846002);
+	DIR:OUT; SFP:1101; SCL:1; SRVR:DM6PR12MB3388;
+	H:DM6PR12MB3163.namprd12.prod.outlook.com; FPR:; SPF:None;
+	LANG:en; PTR:InfoNoRecords; MX:1; A:1; 
+received-spf: None (protection.outlook.com: amd.com does not designate
+	permitted sender hosts)
+x-ms-exchange-senderadcheck: 1
+x-microsoft-antispam-message-info: nsKcs/rNEyo8R4twCAUzE4LgwjvbZteGI8apSNfimHDI/0j5f4IezN00lQHJwpErTXBm9o9TcuxTiRDju43gw2riuZfSaaNU2ZsVOio6esProI39ApYUNDlWARkfbNRJxCiHluKCejypLTmo8WgwCmJjQ/13kH57DWDJ4B+7ZXcaki47QhUAD5J+2/0Dlntgrpy+Anh0A6xmMWv3Exuv2TRqKs31eKsaDethyIhos0M+qh5CjrzbY+DTnWqPygmOOpjUzg1mGtdyV3ROD0a8yiEbfo5AqnmeFqscZxyoGgEsg3nljPLvVKvdQfqFDgaLG3khgEPD6huP/EW6AjcFZ1Pq5e0oIM1siWtHoMZQbfAHlkXuwI2oZydu8lCslWi/KoOqu0KIpnZwHcbaIN6opbhaECRqLhP0iNPfi+SNl08=
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Fri, 26 Apr 2019 19:22:59 -0000
-From: Ben Wibking <1826599@bugs.launchpad.net>
-To: qemu-devel@nongnu.org
-X-Launchpad-Notification-Type: bug
-X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
-X-Launchpad-Bug-Information-Type: Public
-X-Launchpad-Bug-Private: no
-X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: bwibking
-X-Launchpad-Bug-Reporter: Ben Wibking (bwibking)
-X-Launchpad-Bug-Modifier: Ben Wibking (bwibking)
-Message-Id:
- <155630657999.13303.12667909935236826379.malonedeb@wampee.canonical.com>
-X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
-X-Launchpad-Message-For: qemu-devel-ml
-Precedence: bulk
-X-Generated-By: Launchpad (canonical.com); Revision="18928";
-	Instance="launchpad-lazr.conf"
-X-Launchpad-Hash: 33bfb9a40c6b8e8f6e56879b62f0b217b54197f4
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 91.189.90.7
-Subject: [Qemu-devel] [Bug 1826599] [NEW] qemu crashes with HV_ERROR with
- any guest when using HVF on macos
+Content-ID: <7983347A5E797A48AC78F233FCDD4471@namprd12.prod.outlook.com>
+Content-Transfer-Encoding: base64
+MIME-Version: 1.0
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 562f23ae-a4bf-4b9d-8d11-08d6ca8630dc
+X-MS-Exchange-CrossTenant-originalarrivaltime: 26 Apr 2019 20:31:41.7065 (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM6PR12MB3388
+X-detected-operating-system: by eggs.gnu.org: Windows 7 or 8 [fuzzy]
+X-Received-From: 40.107.77.55
+Subject: Re: [Qemu-devel] [RFC PATCH v1 02/10] KVM: SVM: Add
+ KVM_SEND_UPDATE_DATA command
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
+Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -75,160 +117,162 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1826599 <1826599@bugs.launchpad.net>
+Cc: =?utf-8?B?UmFkaW0gS3LEjW3DocWZ?= <rkrcmar@redhat.com>,
+	Joerg Roedel <joro@8bytes.org>, "x86@kernel.org" <x86@kernel.org>,
+	"qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+	Ingo Molnar <mingo@redhat.com>, "H. Peter Anvin" <hpa@zytor.com>,
+	Paolo Bonzini <pbonzini@redhat.com>, Thomas Gleixner <tglx@linutronix.de>,
+	Borislav Petkov <bp@suse.de>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190426192259.rLABm0YT08AKEPBMHERFqgoT4SlfEBlAE9vfsh-NjF8@z>
+Message-ID: <20190426203141.x0PgvglZfH5lJHbyKrJbJy8zb69fbmF8WZ255l1p408@z>
 
-Public bug reported:
-
-qemu reliably crashes (after some unknown amount of time) for any guest
-I've run on macOS (10.14.4) with HVF acceleration.
-
-I'm using the latest development tree:
-% qemu-system-x86_64 --version
-QEMU emulator version 4.0.50 (v4.0.0-rc4-52-g3284aa1281-dirty)
-Copyright (c) 2003-2019 Fabrice Bellard and the QEMU Project developers
-
-I'm currently running Haiku. After booting and running normally for a
-few minutes, it abruptly crashes and shows this error on stdout (I'm
-including the command line arguments):
-
-+ ISO=3Dhaiku-release-anyboot.iso
-+ ACCEL=3D'-accel hvf -machine type=3Dq35,accel=3Dhvf'
-+ MEM=3D'-m 1G'
-+ SMP=3D'-c 2'
-+ NET=3D'-device virtio-net,netdev=3Dvmnic -netdev user,id=3Dvmnic'
-+ IMG_CD=3D'-cdrom haiku-release-anyboot.iso'
-+ IMG_HDD=3D'-device virtio-scsi-pci,id=3Dscsi -drive if=3Dnone,id=3Dvd0,fi=
-le=3Dhaiku.img,format=3Draw -device scsi-hd,drive=3Dvd0'
-+ DISPLAY=3D'-usb -device usb-tablet'
-+ qemu-system-x86_64 -accel hvf -machine type=3Dq35,accel=3Dhvf -usb -devic=
-e usb-tablet -m 1G -device virtio-net,netdev=3Dvmnic -netdev user,id=3Dvmni=
-c -device virtio-scsi-pci,id=3Dscsi -drive if=3Dnone,id=3Dvd0,file=3Dhaiku.=
-img,format=3Draw -device scsi-hd,drive=3Dvd0
-qemu-system-x86_64: warning: host doesn't support requested feature: CPUID.=
-80000001H:ECX.svm [bit 2]
-qemu-system-x86_64: Error: HV_ERROR
-./qemu-boot.sh: line 19: 67497 Abort trap: 6           qemu-system-x86_64 $=
-ACCEL $CPU $EFI $DISPLAY $MEM $NET $IMG_HDD
-
-** Affects: qemu
-     Importance: Undecided
-         Status: New
-
-** Description changed:
-
-  qemu reliably crashes (after some unknown amount of time) for any guest
-- I've run on macos with HVF acceleration.
-+ I've run on macOS (10.14.4) with HVF acceleration.
-  =
-
-  I'm currently running Haiku. After booting and running normally for a
-  few minutes, it abruptly crashes and shows this error on stdout (I'm
-  including the command line arguments):
-  =
-
-  + ISO=3Dhaiku-release-anyboot.iso
-  + ACCEL=3D'-accel hvf -machine type=3Dq35,accel=3Dhvf'
-  + MEM=3D'-m 1G'
-  + SMP=3D'-c 2'
-  + NET=3D'-device virtio-net,netdev=3Dvmnic -netdev user,id=3Dvmnic'
-  + IMG_CD=3D'-cdrom haiku-release-anyboot.iso'
-  + IMG_HDD=3D'-device virtio-scsi-pci,id=3Dscsi -drive if=3Dnone,id=3Dvd0,=
-file=3Dhaiku.img,format=3Draw -device scsi-hd,drive=3Dvd0'
-  + DISPLAY=3D'-usb -device usb-tablet'
-  + qemu-system-x86_64 -accel hvf -machine type=3Dq35,accel=3Dhvf -usb -dev=
-ice usb-tablet -m 1G -device virtio-net,netdev=3Dvmnic -netdev user,id=3Dvm=
-nic -device virtio-scsi-pci,id=3Dscsi -drive if=3Dnone,id=3Dvd0,file=3Dhaik=
-u.img,format=3Draw -device scsi-hd,drive=3Dvd0
-  qemu-system-x86_64: warning: host doesn't support requested feature: CPUI=
-D.80000001H:ECX.svm [bit 2]
-  qemu-system-x86_64: Error: HV_ERROR
-  ./qemu-boot.sh: line 19: 67497 Abort trap: 6           qemu-system-x86_64=
- $ACCEL $CPU $EFI $DISPLAY $MEM $NET $IMG_HDD
-
-** Description changed:
-
-  qemu reliably crashes (after some unknown amount of time) for any guest
-  I've run on macOS (10.14.4) with HVF acceleration.
-+ =
-
-+ I'm using the latest development tree:
-+ % qemu-system-x86_64 --version
-+ QEMU emulator version 4.0.50 (v4.0.0-rc4-52-g3284aa1281-dirty)
-+ Copyright (c) 2003-2019 Fabrice Bellard and the QEMU Project developers
-  =
-
-  I'm currently running Haiku. After booting and running normally for a
-  few minutes, it abruptly crashes and shows this error on stdout (I'm
-  including the command line arguments):
-  =
-
-  + ISO=3Dhaiku-release-anyboot.iso
-  + ACCEL=3D'-accel hvf -machine type=3Dq35,accel=3Dhvf'
-  + MEM=3D'-m 1G'
-  + SMP=3D'-c 2'
-  + NET=3D'-device virtio-net,netdev=3Dvmnic -netdev user,id=3Dvmnic'
-  + IMG_CD=3D'-cdrom haiku-release-anyboot.iso'
-  + IMG_HDD=3D'-device virtio-scsi-pci,id=3Dscsi -drive if=3Dnone,id=3Dvd0,=
-file=3Dhaiku.img,format=3Draw -device scsi-hd,drive=3Dvd0'
-  + DISPLAY=3D'-usb -device usb-tablet'
-  + qemu-system-x86_64 -accel hvf -machine type=3Dq35,accel=3Dhvf -usb -dev=
-ice usb-tablet -m 1G -device virtio-net,netdev=3Dvmnic -netdev user,id=3Dvm=
-nic -device virtio-scsi-pci,id=3Dscsi -drive if=3Dnone,id=3Dvd0,file=3Dhaik=
-u.img,format=3Draw -device scsi-hd,drive=3Dvd0
-  qemu-system-x86_64: warning: host doesn't support requested feature: CPUI=
-D.80000001H:ECX.svm [bit 2]
-  qemu-system-x86_64: Error: HV_ERROR
-  ./qemu-boot.sh: line 19: 67497 Abort trap: 6           qemu-system-x86_64=
- $ACCEL $CPU $EFI $DISPLAY $MEM $NET $IMG_HDD
-
--- =
-
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1826599
-
-Title:
-  qemu crashes with HV_ERROR with any guest when using HVF on macos
-
-Status in QEMU:
-  New
-
-Bug description:
-  qemu reliably crashes (after some unknown amount of time) for any
-  guest I've run on macOS (10.14.4) with HVF acceleration.
-
-  I'm using the latest development tree:
-  % qemu-system-x86_64 --version
-  QEMU emulator version 4.0.50 (v4.0.0-rc4-52-g3284aa1281-dirty)
-  Copyright (c) 2003-2019 Fabrice Bellard and the QEMU Project developers
-
-  I'm currently running Haiku. After booting and running normally for a
-  few minutes, it abruptly crashes and shows this error on stdout (I'm
-  including the command line arguments):
-
-  + ISO=3Dhaiku-release-anyboot.iso
-  + ACCEL=3D'-accel hvf -machine type=3Dq35,accel=3Dhvf'
-  + MEM=3D'-m 1G'
-  + SMP=3D'-c 2'
-  + NET=3D'-device virtio-net,netdev=3Dvmnic -netdev user,id=3Dvmnic'
-  + IMG_CD=3D'-cdrom haiku-release-anyboot.iso'
-  + IMG_HDD=3D'-device virtio-scsi-pci,id=3Dscsi -drive if=3Dnone,id=3Dvd0,=
-file=3Dhaiku.img,format=3Draw -device scsi-hd,drive=3Dvd0'
-  + DISPLAY=3D'-usb -device usb-tablet'
-  + qemu-system-x86_64 -accel hvf -machine type=3Dq35,accel=3Dhvf -usb -dev=
-ice usb-tablet -m 1G -device virtio-net,netdev=3Dvmnic -netdev user,id=3Dvm=
-nic -device virtio-scsi-pci,id=3Dscsi -drive if=3Dnone,id=3Dvd0,file=3Dhaik=
-u.img,format=3Draw -device scsi-hd,drive=3Dvd0
-  qemu-system-x86_64: warning: host doesn't support requested feature: CPUI=
-D.80000001H:ECX.svm [bit 2]
-  qemu-system-x86_64: Error: HV_ERROR
-  ./qemu-boot.sh: line 19: 67497 Abort trap: 6           qemu-system-x86_64=
- $ACCEL $CPU $EFI $DISPLAY $MEM $NET $IMG_HDD
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1826599/+subscriptions
+T24gNC8yNC8xOSAxMToxMCBBTSwgU2luZ2gsIEJyaWplc2ggd3JvdGU6DQo+IFRoZSBjb21tYW5k
+IGlzIHVzZWQgZm9yIGVuY3J5cHRpbmcgdGhlIGd1ZXN0IG1lbW9yeSByZWdpb24gdXNpbmcgdGhl
+IGVuY3J5cHRpb24NCj4gY29udGV4dCBjcmVhdGVkIHdpdGggS1ZNX1NFVl9TRU5EX1NUQVJULg0K
+PiANCj4gQ2M6IFRob21hcyBHbGVpeG5lciA8dGdseEBsaW51dHJvbml4LmRlPg0KPiBDYzogSW5n
+byBNb2xuYXIgPG1pbmdvQHJlZGhhdC5jb20+DQo+IENjOiAiSC4gUGV0ZXIgQW52aW4iIDxocGFA
+enl0b3IuY29tPg0KPiBDYzogUGFvbG8gQm9uemluaSA8cGJvbnppbmlAcmVkaGF0LmNvbT4NCj4g
+Q2M6ICJSYWRpbSBLcsSNbcOhxZkiIDxya3JjbWFyQHJlZGhhdC5jb20+DQo+IENjOiBKb2VyZyBS
+b2VkZWwgPGpvcm9AOGJ5dGVzLm9yZz4NCj4gQ2M6IEJvcmlzbGF2IFBldGtvdiA8YnBAc3VzZS5k
+ZT4NCj4gQ2M6IFRvbSBMZW5kYWNreSA8dGhvbWFzLmxlbmRhY2t5QGFtZC5jb20+DQo+IENjOiB4
+ODZAa2VybmVsLm9yZw0KPiBDYzoga3ZtQHZnZXIua2VybmVsLm9yZw0KPiBDYzogbGludXgta2Vy
+bmVsQHZnZXIua2VybmVsLm9yZw0KPiBTaWduZWQtb2ZmLWJ5OiBCcmlqZXNoIFNpbmdoIDxicmlq
+ZXNoLnNpbmdoQGFtZC5jb20+DQo+IC0tLQ0KPiAgLi4uL3ZpcnR1YWwva3ZtL2FtZC1tZW1vcnkt
+ZW5jcnlwdGlvbi5yc3QgICAgIHwgIDIzICsrKysNCj4gIGFyY2gveDg2L2t2bS9zdm0uYyAgICAg
+ICAgICAgICAgICAgICAgICAgICAgICB8IDEyOCArKysrKysrKysrKysrKysrKy0NCj4gIGluY2x1
+ZGUvdWFwaS9saW51eC9rdm0uaCAgICAgICAgICAgICAgICAgICAgICB8ICAgOSArKw0KPiAgMyBm
+aWxlcyBjaGFuZ2VkLCAxNTcgaW5zZXJ0aW9ucygrKSwgMyBkZWxldGlvbnMoLSkNCj4gDQo+IGRp
+ZmYgLS1naXQgYS9Eb2N1bWVudGF0aW9uL3ZpcnR1YWwva3ZtL2FtZC1tZW1vcnktZW5jcnlwdGlv
+bi5yc3QgYi9Eb2N1bWVudGF0aW9uL3ZpcnR1YWwva3ZtL2FtZC1tZW1vcnktZW5jcnlwdGlvbi5y
+c3QNCj4gaW5kZXggMzQwYWM0Zjg3MzIxLi5hMDIwOGUxNzE0ODkgMTAwNjQ0DQo+IC0tLSBhL0Rv
+Y3VtZW50YXRpb24vdmlydHVhbC9rdm0vYW1kLW1lbW9yeS1lbmNyeXB0aW9uLnJzdA0KPiArKysg
+Yi9Eb2N1bWVudGF0aW9uL3ZpcnR1YWwva3ZtL2FtZC1tZW1vcnktZW5jcnlwdGlvbi5yc3QNCj4g
+QEAgLTI2Miw2ICsyNjIsMjkgQEAgUmV0dXJuczogMCBvbiBzdWNjZXNzLCAtbmVnYXRpdmUgb24g
+ZXJyb3INCj4gICAgICAgICAgICAgICAgICBfX3UzMiBhbWRfY2VydF9sZW47DQo+ICAgICAgICAg
+IH07DQo+ICANCj4gKzExLiBLVk1fU0VWX1NFTkRfVVBEQVRFX0RBVEENCj4gKy0tLS0tLS0tLS0t
+LS0tLS0tLS0tLS0tLS0tLS0NCj4gKw0KPiArVGhlIEtWTV9TRVZfU0VORF9VUERBVEVfREFUQSBj
+b21tYW5kIGNhbiBiZSB1c2VkIGJ5IHRoZSBoeXBlcnZpc29yIHRvIGVuY3J5cHQgdGhlDQo+ICtv
+dXRnb2luZyBndWVzdCBtZW1vcnkgcmVnaW9uIHdpdGggZW5jcnlwdGlvbiBjb250ZXh0IGNyZWF0
+aW5nIHVzaW5nIEtWTV9TRVZfU0VORF9TVEFSVC4NCg0Kd2l0aCB0aGUgZW5jcnlwdGlvbiBjb250
+ZXh0IGNyZWF0ZWQgdXNpbmcuLi4NCg0KPiArDQo+ICtQYXJhbWV0ZXJzIChpbik6IHN0cnVjdCBr
+dm1fc2V2X3NlbmRfdXBkYXRlX2RhdGENCj4gKw0KPiArUmV0dXJuczogMCBvbiBzdWNjZXNzLCAt
+bmVnYXRpdmUgb24gZXJyb3INCj4gKw0KPiArOjoNCj4gKw0KPiArICAgICAgICBzdHJ1Y3Qga3Zt
+X3Nldl9sYXVuY2hfc2VuZF91cGRhdGVfZGF0YSB7DQo+ICsgICAgICAgICAgICAgICAgX191NjQg
+aGRyX3VhZGRyOyAgICAgICAgLyogdXNlcnNwYWNlIGFkZHJlc3MgY29udGFpbmluZyB0aGUgcGFj
+a2V0IGhlYWRlciAqLw0KPiArICAgICAgICAgICAgICAgIF9fdTMyIGhkcl9sZW47DQo+ICsNCj4g
+KyAgICAgICAgICAgICAgICBfX3U2NCBndWVzdF91YWRkcjsgICAgICAvKiB0aGUgc291cmNlIG1l
+bW9yeSByZWdpb24gdG8gYmUgZW5jcnlwdGVkICovDQo+ICsgICAgICAgICAgICAgICAgX191MzIg
+Z3Vlc3RfbGVuOw0KPiArDQo+ICsgICAgICAgICAgICAgICAgX191NjQgdHJhbnNfdWFkZHI7ICAg
+ICAgLyogdGhlIGRlc3RpdGlvbiBtZW1vcnkgcmVnaW9uICAqLw0KPiArICAgICAgICAgICAgICAg
+IF9fdTMyIHRyYW5zX2xlbjsNCj4gKyAgICAgICAgfTsNCj4gKw0KPiAgUmVmZXJlbmNlcw0KPiAg
+PT09PT09PT09PQ0KPiAgDQo+IGRpZmYgLS1naXQgYS9hcmNoL3g4Ni9rdm0vc3ZtLmMgYi9hcmNo
+L3g4Ni9rdm0vc3ZtLmMNCj4gaW5kZXggNGMyYTIyNWJhNTQ2Li5hMWNmZDM2ZDYxOTUgMTAwNjQ0
+DQo+IC0tLSBhL2FyY2gveDg2L2t2bS9zdm0uYw0KPiArKysgYi9hcmNoL3g4Ni9rdm0vc3ZtLmMN
+Cj4gQEAgLTQxOCw2ICs0MTgsNyBAQCBlbnVtIHsNCj4gIA0KPiAgc3RhdGljIHVuc2lnbmVkIGlu
+dCBtYXhfc2V2X2FzaWQ7DQo+ICBzdGF0aWMgdW5zaWduZWQgaW50IG1pbl9zZXZfYXNpZDsNCj4g
+K3N0YXRpYyB1bnNpZ25lZCBsb25nIG1lX21hc2s7DQoNCnNldl9tZV9tYXNrID8NCg0KPiAgc3Rh
+dGljIHVuc2lnbmVkIGxvbmcgKnNldl9hc2lkX2JpdG1hcDsNCj4gICNkZWZpbmUgX19zbWVfcGFn
+ZV9wYSh4KSBfX3NtZV9zZXQocGFnZV90b19wZm4oeCkgPDwgUEFHRV9TSElGVCkNCj4gIA0KPiBA
+QCAtMTIxNiwxNSArMTIxNywyMSBAQCBzdGF0aWMgaW50IGF2aWNfZ2FfbG9nX25vdGlmaWVyKHUz
+MiBnYV90YWcpDQo+ICBzdGF0aWMgX19pbml0IGludCBzZXZfaGFyZHdhcmVfc2V0dXAodm9pZCkN
+Cj4gIHsNCj4gIAlzdHJ1Y3Qgc2V2X3VzZXJfZGF0YV9zdGF0dXMgKnN0YXR1czsNCj4gKwlpbnQg
+ZWF4LCBlYng7DQo+ICAJaW50IHJjOw0KPiAgDQo+IC0JLyogTWF4aW11bSBudW1iZXIgb2YgZW5j
+cnlwdGVkIGd1ZXN0cyBzdXBwb3J0ZWQgc2ltdWx0YW5lb3VzbHkgKi8NCj4gLQltYXhfc2V2X2Fz
+aWQgPSBjcHVpZF9lY3goMHg4MDAwMDAxRik7DQo+ICsJLyoNCj4gKwkgKiBRdWVyeSB0aGUgbWVt
+b3J5IGVuY3J5cHRpb24gaW5mb3JtYXRpb24uDQo+ICsJICogIEVCWDogIEJpdCAwOjUgUGFnZXRh
+YmxlIGJpdCBwb3NpdGlvbiB1c2VkIHRvIGluZGljYXRlIGVuY3J5cHRpb24gKGFrYSBDYml0KS4N
+Cj4gKwkgKiAgRUNYOiAgTWF4aW11bSBudW1iZXIgb2YgZW5jcnlwdGVkIGd1ZXN0cyBzdXBwb3J0
+ZWQgc2ltdWx0YW5lb3VzbHkuDQo+ICsJICogIEVEWDogIE1pbmltdW0gQVNJRCB2YWx1ZSB0aGF0
+IHNob3VsZCBiZSB1c2VkIGZvciBTRVYgZ3Vlc3QuDQo+ICsJICovDQo+ICsJY3B1aWQoMHg4MDAw
+MDAxZiwgJmVheCwgJmVieCwgJm1heF9zZXZfYXNpZCwgJm1pbl9zZXZfYXNpZCk7DQo+ICANCj4g
+IAlpZiAoIW1heF9zZXZfYXNpZCkNCj4gIAkJcmV0dXJuIDE7DQo+ICANCj4gLQkvKiBNaW5pbXVt
+IEFTSUQgdmFsdWUgdGhhdCBzaG91bGQgYmUgdXNlZCBmb3IgU0VWIGd1ZXN0ICovDQo+ICsJbWVf
+bWFzayA9IDFVTCA8PCAoZWJ4ICYgMHgzZik7DQo+ICAJbWluX3Nldl9hc2lkID0gY3B1aWRfZWR4
+KDB4ODAwMDAwMUYpOw0KDQpZb3UgY2FuIHJlbW92ZSB0aGlzIHNpbmNlIHlvdSBvYnRhaW5lZCBp
+dCB3aXRoIHRoZSBjcHVpZCgpIGNhbGwgYWJvdmUuDQoNCj4gIA0KPiAgCS8qIEluaXRpYWxpemUg
+U0VWIEFTSUQgYml0bWFwICovDQo+IEBAIC03MDUzLDYgKzcwNjAsMTE4IEBAIHN0YXRpYyBpbnQg
+c2V2X3NlbmRfc3RhcnQoc3RydWN0IGt2bSAqa3ZtLCBzdHJ1Y3Qga3ZtX3Nldl9jbWQgKmFyZ3Ap
+DQo+ICAJcmV0dXJuIHJldDsNCj4gIH0NCj4gIA0KPiArc3RhdGljIGludCBzZXZfc2VuZF91cGRh
+dGVfZGF0YShzdHJ1Y3Qga3ZtICprdm0sIHN0cnVjdCBrdm1fc2V2X2NtZCAqYXJncCkNCj4gK3sN
+Cj4gKwlzdHJ1Y3Qga3ZtX3Nldl9pbmZvICpzZXYgPSAmdG9fa3ZtX3N2bShrdm0pLT5zZXZfaW5m
+bzsNCj4gKwlzdHJ1Y3Qgc2V2X2RhdGFfc2VuZF91cGRhdGVfZGF0YSAqZGF0YTsNCj4gKwlzdHJ1
+Y3Qga3ZtX3Nldl9zZW5kX3VwZGF0ZV9kYXRhIHBhcmFtczsNCj4gKwl2b2lkICpoZHIgPSBOVUxM
+LCAqdHJhbnNfZGF0YSA9IE5VTEw7DQo+ICsJc3RydWN0IHBhZ2UgKipndWVzdF9wYWdlID0gTlVM
+TDsNCj4gKwl1bnNpZ25lZCBsb25nIG47DQo+ICsJaW50IHJldCwgb2Zmc2V0Ow0KPiArDQo+ICsJ
+aWYgKCFzZXZfZ3Vlc3Qoa3ZtKSkNCj4gKwkJcmV0dXJuIC1FTk9UVFk7DQo+ICsNCj4gKwlpZiAo
+Y29weV9mcm9tX3VzZXIoJnBhcmFtcywgKHZvaWQgX191c2VyICopKHVpbnRwdHJfdClhcmdwLT5k
+YXRhLA0KPiArCQkJc2l6ZW9mKHN0cnVjdCBrdm1fc2V2X3NlbmRfdXBkYXRlX2RhdGEpKSkNCj4g
+KwkJcmV0dXJuIC1FRkFVTFQ7DQo+ICsNCj4gKwlkYXRhID0ga3phbGxvYyhzaXplb2YoKmRhdGEp
+LCBHRlBfS0VSTkVMKTsNCj4gKwlpZiAoIWRhdGEpDQo+ICsJCXJldHVybiAtRU5PTUVNOw0KPiAr
+DQo+ICsJLyogdXNlcnNwYWNlIHdhbnRzIHRvIHF1ZXJ5IGVpdGhlciBoZWFkZXIgb3IgdHJhbnMg
+bGVuZ3RoICovDQo+ICsJaWYgKCFwYXJhbXMudHJhbnNfbGVuIHx8ICFwYXJhbXMuaGRyX2xlbikN
+Cj4gKwkJZ290byBjbWQ7DQo+ICsNCj4gKwlyZXQgPSAtRUlOVkFMOw0KPiArCWlmICghcGFyYW1z
+LnRyYW5zX3VhZGRyIHx8ICFwYXJhbXMuZ3Vlc3RfdWFkZHIgfHwNCj4gKwkgICAgIXBhcmFtcy5n
+dWVzdF9sZW4gfHwgIXBhcmFtcy5oZHJfdWFkZHIpDQo+ICsJCWdvdG8gZV9mcmVlOw0KPiArDQo+
+ICsJLyogQ2hlY2sgaWYgd2UgYXJlIGNyb3NzaW5nIHRoZSBwYWdlIGJvdW5kcnkgKi8NCj4gKwly
+ZXQgPSAtRUlOVkFMOw0KPiArCW9mZnNldCA9IHBhcmFtcy5ndWVzdF91YWRkciAmIChQQUdFX1NJ
+WkUgLSAxKTsNCj4gKwlpZiAoKHBhcmFtcy5ndWVzdF9sZW4gKyBvZmZzZXQgPiBQQUdFX1NJWkUp
+KQ0KPiArCQlnb3RvIGVfZnJlZTsNCj4gKw0KPiArCXJldCA9IC1FTk9NRU07DQo+ICsJaGRyID0g
+a21hbGxvYyhwYXJhbXMuaGRyX2xlbiwgR0ZQX0tFUk5FTCk7DQo+ICsJaWYgKCFoZHIpDQo+ICsJ
+CWdvdG8gZV9mcmVlOw0KPiArDQo+ICsJZGF0YS0+aGRyX2FkZHJlc3MgPSBfX3BzcF9wYShoZHIp
+Ow0KPiArCWRhdGEtPmhkcl9sZW4gPSBwYXJhbXMuaGRyX2xlbjsNCj4gKw0KPiArCXJldCA9IC1F
+Tk9NRU07DQo+ICsJdHJhbnNfZGF0YSA9IGttYWxsb2MocGFyYW1zLnRyYW5zX2xlbiwgR0ZQX0tF
+Uk5FTCk7DQo+ICsJaWYgKCF0cmFuc19kYXRhKQ0KPiArCQlnb3RvIGVfZnJlZTsNCj4gKw0KPiAr
+CWRhdGEtPnRyYW5zX2FkZHJlc3MgPSBfX3BzcF9wYSh0cmFuc19kYXRhKTsNCj4gKwlkYXRhLT50
+cmFuc19sZW4gPSBwYXJhbXMudHJhbnNfbGVuOw0KPiArDQo+ICsJLyogUGluIGd1ZXN0IG1lbW9y
+eSAqLw0KPiArCXJldCA9IC1FRkFVTFQ7DQo+ICsJZ3Vlc3RfcGFnZSA9IHNldl9waW5fbWVtb3J5
+KGt2bSwgcGFyYW1zLmd1ZXN0X3VhZGRyICYgUEFHRV9NQVNLLA0KPiArCQkJCSAgICBQQUdFX1NJ
+WkUsICZuLCAwKTsNCj4gKwlpZiAoIWd1ZXN0X3BhZ2UpDQo+ICsJCWdvdG8gZV9mcmVlOw0KPiAr
+DQo+ICsJZGF0YS0+Z3Vlc3RfYWRkcmVzcyA9IF9fc21lX3BhZ2VfcGEoZ3Vlc3RfcGFnZVswXSkg
+KyBvZmZzZXQ7DQoNCklmIHRoZSBDLWJpdCBuZWVkcyB0byBiZSBzZXQgcmVnYXJkbGVzcyBiZWxv
+dywgdGhlbiB5b3UgZG9uJ3QgbmVlZCB0aGUNCl9fc21lIHZlcnNpb24gb2YgdGhpcy4NCg0KPiAr
+CWRhdGEtPmd1ZXN0X2xlbiA9IHBhcmFtcy5ndWVzdF9sZW47DQo+ICsNCj4gKwkvKg0KPiArCSAq
+IFRoZSBTRU5EX1VQREFURV9EQVRBIGNvbW1hbmQgcmVxdWlyZXMgQy1iaXQgdG8gYmUgYWx3YXlz
+IHNldC4NCj4gKwkgKiBUaGUgX19zbWVfcGFnZV9wYSgpIHRha2VzIGNhcmUgb2Ygc2V0dGluZyB0
+aGUgQy1iaXQgb25seSB3aGVuIFNNRQ0KPiArCSAqIGlzIGVuYWJsZWQgb24gdGhlIGhvc3QuIEJ1
+dCB3ZSBuZWVkIHRvIHNldCB0aGUgQy1iaXQgcmVnYXJsZXNzIG9mDQoNCnJlZ2FyZGxlc3MNCg0K
+VGhhbmtzLA0KVG9tDQoNCj4gKwkgKiB0aGUgU01FIHN0YXRlLg0KPiArCSAqLw0KPiArCWRhdGEt
+Pmd1ZXN0X2FkZHJlc3MgfD0gbWVfbWFzazsNCj4gKw0KPiArCS8qIGZsdXNoIHRoZSBjYWNoZXMg
+dG8gZW5zdXJlIHRoYXQgRFJBTSBoYXMgcmVjZW50IGNvbnRlbnRzICovDQo+ICsJc2V2X2NsZmx1
+c2hfcGFnZXMoZ3Vlc3RfcGFnZSwgMSk7DQo+ICsNCj4gK2NtZDoNCj4gKwlkYXRhLT5oYW5kbGUg
+PSBzZXYtPmhhbmRsZTsNCj4gKwlyZXQgPSBzZXZfaXNzdWVfY21kKGt2bSwgU0VWX0NNRF9TRU5E
+X1VQREFURV9EQVRBLCBkYXRhLCAmYXJncC0+ZXJyb3IpOw0KPiArDQo+ICsJLyogdXNlcnNwYWNl
+IGFza2VkIGZvciBoZWFkZXIgb3IgdHJhbnMgbGVuZ3RoIGFuZCBGVyByZXNwb25kZWQgd2l0aCBk
+YXRhICovDQo+ICsJaWYgKCFwYXJhbXMudHJhbnNfbGVuIHx8ICFwYXJhbXMuaGRyX2xlbikgew0K
+PiArCQlwYXJhbXMuaGRyX2xlbiA9IGRhdGEtPmhkcl9sZW47DQo+ICsJCXBhcmFtcy50cmFuc19s
+ZW4gPSBkYXRhLT50cmFuc19sZW47DQo+ICsJCWdvdG8gZG9uZTsNCj4gKwl9DQo+ICsNCj4gKwlp
+ZiAocmV0KQ0KPiArCQlnb3RvIGVfdW5waW47DQo+ICsNCj4gKwkvKiBjb3B5IHRyYW5zcG9ydCBi
+dWZmZXIgdG8gdXNlciBzcGFjZSAqLw0KPiArCWlmIChjb3B5X3RvX3VzZXIoKHZvaWQgX191c2Vy
+ICopKHVpbnRwdHJfdClwYXJhbXMudHJhbnNfdWFkZHIsDQo+ICsJCQkgdHJhbnNfZGF0YSwgcGFy
+YW1zLnRyYW5zX2xlbikpIHsNCj4gKwkJcmV0ID0gLUVGQVVMVDsNCj4gKwkJZ290byBlX3VucGlu
+Ow0KPiArCX0NCj4gKw0KPiArCS8qIGNvcHkgcGFja2V0IGhlYWRlciB0byB1c2Vyc3BhY2UgKi8N
+Cj4gKwlpZiAoY29weV90b191c2VyKCh2b2lkIF9fdXNlciAqKSh1aW50cHRyX3QpcGFyYW1zLmhk
+cl91YWRkciwgaGRyLCBwYXJhbXMuaGRyX2xlbikpDQo+ICsJCXJldCA9IC1FRkFVTFQ7DQo+ICsN
+Cj4gK2VfdW5waW46DQo+ICsJc2V2X3VucGluX21lbW9yeShrdm0sIGd1ZXN0X3BhZ2UsIG4pOw0K
+PiArZG9uZToNCj4gKwlpZiAoY29weV90b191c2VyKCh2b2lkIF9fdXNlciAqKSh1aW50cHRyX3Qp
+YXJncC0+ZGF0YSwgJnBhcmFtcywNCj4gKwkJCXNpemVvZihzdHJ1Y3Qga3ZtX3Nldl9zZW5kX3Vw
+ZGF0ZV9kYXRhKSkpDQo+ICsJCXJldCA9IC1FRkFVTFQ7DQo+ICtlX2ZyZWU6DQo+ICsJa2ZyZWUo
+ZGF0YSk7DQo+ICsJa2ZyZWUodHJhbnNfZGF0YSk7DQo+ICsJa2ZyZWUoaGRyKTsNCj4gKw0KPiAr
+CXJldHVybiByZXQ7DQo+ICt9DQo+ICsNCj4gIHN0YXRpYyBpbnQgc3ZtX21lbV9lbmNfb3Aoc3Ry
+dWN0IGt2bSAqa3ZtLCB2b2lkIF9fdXNlciAqYXJncCkNCj4gIHsNCj4gIAlzdHJ1Y3Qga3ZtX3Nl
+dl9jbWQgc2V2X2NtZDsNCj4gQEAgLTcwOTcsNiArNzIxNiw5IEBAIHN0YXRpYyBpbnQgc3ZtX21l
+bV9lbmNfb3Aoc3RydWN0IGt2bSAqa3ZtLCB2b2lkIF9fdXNlciAqYXJncCkNCj4gIAljYXNlIEtW
+TV9TRVZfU0VORF9TVEFSVDoNCj4gIAkJciA9IHNldl9zZW5kX3N0YXJ0KGt2bSwgJnNldl9jbWQp
+Ow0KPiAgCQlicmVhazsNCj4gKwljYXNlIEtWTV9TRVZfU0VORF9VUERBVEVfREFUQToNCj4gKwkJ
+ciA9IHNldl9zZW5kX3VwZGF0ZV9kYXRhKGt2bSwgJnNldl9jbWQpOw0KPiArCQlicmVhazsNCj4g
+IAlkZWZhdWx0Og0KPiAgCQlyID0gLUVJTlZBTDsNCj4gIAkJZ290byBvdXQ7DQo+IGRpZmYgLS1n
+aXQgYS9pbmNsdWRlL3VhcGkvbGludXgva3ZtLmggYi9pbmNsdWRlL3VhcGkvbGludXgva3ZtLmgN
+Cj4gaW5kZXggZjQyNTQxOGJlYzEzLi4wYmVlOTFiYmEzMjkgMTAwNjQ0DQo+IC0tLSBhL2luY2x1
+ZGUvdWFwaS9saW51eC9rdm0uaA0KPiArKysgYi9pbmNsdWRlL3VhcGkvbGludXgva3ZtLmgNCj4g
+QEAgLTE1MzIsNiArMTUzMiwxNSBAQCBzdHJ1Y3Qga3ZtX3Nldl9zZW5kX3N0YXJ0IHsNCj4gIAlf
+X3UzMiBzZXNzaW9uX2xlbjsNCj4gIH07DQo+ICANCj4gK3N0cnVjdCBrdm1fc2V2X3NlbmRfdXBk
+YXRlX2RhdGEgew0KPiArCV9fdTY0IGhkcl91YWRkcjsNCj4gKwlfX3UzMiBoZHJfbGVuOw0KPiAr
+CV9fdTY0IGd1ZXN0X3VhZGRyOw0KPiArCV9fdTMyIGd1ZXN0X2xlbjsNCj4gKwlfX3U2NCB0cmFu
+c191YWRkcjsNCj4gKwlfX3UzMiB0cmFuc19sZW47DQo+ICt9Ow0KPiArDQo+ICAjZGVmaW5lIEtW
+TV9ERVZfQVNTSUdOX0VOQUJMRV9JT01NVQkoMSA8PCAwKQ0KPiAgI2RlZmluZSBLVk1fREVWX0FT
+U0lHTl9QQ0lfMl8zCQkoMSA8PCAxKQ0KPiAgI2RlZmluZSBLVk1fREVWX0FTU0lHTl9NQVNLX0lO
+VFgJKDEgPDwgMikNCj4gDQo=
 
