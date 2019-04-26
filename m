@@ -3,46 +3,55 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
 X-Spam-Status: No, score=-0.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+	MAILING_LIST_MULTI,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 07963C43219
-	for <qemu-devel@archiver.kernel.org>; Fri, 26 Apr 2019 08:11:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B23D8C43219
+	for <qemu-devel@archiver.kernel.org>; Fri, 26 Apr 2019 08:15:16 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id BF42D2077B
-	for <qemu-devel@archiver.kernel.org>; Fri, 26 Apr 2019 08:11:37 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BF42D2077B
+	by mail.kernel.org (Postfix) with ESMTPS id 21BEC2077B
+	for <qemu-devel@archiver.kernel.org>; Fri, 26 Apr 2019 08:15:16 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 21BEC2077B
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:42761 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:42864 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hJvxJ-0000U3-0X
-	for qemu-devel@archiver.kernel.org; Fri, 26 Apr 2019 04:11:37 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:38920)
+	id 1hJw0p-0002i4-2l
+	for qemu-devel@archiver.kernel.org; Fri, 26 Apr 2019 04:15:15 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:40498)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1hJvvz-00084j-1I
-	for qemu-devel@nongnu.org; Fri, 26 Apr 2019 04:10:16 -0400
+	(envelope-from <pbonzini@redhat.com>) id 1hJw06-0002NV-Ax
+	for qemu-devel@nongnu.org; Fri, 26 Apr 2019 04:14:31 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1hJvvx-00066A-Tc
-	for qemu-devel@nongnu.org; Fri, 26 Apr 2019 04:10:15 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:34456)
+	(envelope-from <pbonzini@redhat.com>) id 1hJw04-0001hG-0P
+	for qemu-devel@nongnu.org; Fri, 26 Apr 2019 04:14:29 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:58076)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1hJvvx-00065o-Ks
-	for qemu-devel@nongnu.org; Fri, 26 Apr 2019 04:10:13 -0400
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1hJw03-0001Ua-Au
+	for qemu-devel@nongnu.org; Fri, 26 Apr 2019 04:14:27 -0400
 Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
 	[10.5.11.22])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id D9C63300343D;
-	Fri, 26 Apr 2019 08:10:12 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id 59A36C057F2C;
+	Fri, 26 Apr 2019 08:14:21 +0000 (UTC)
 Received: from [10.36.112.23] (ovpn-112-23.ams2.redhat.com [10.36.112.23])
-	by smtp.corp.redhat.com (Postfix) with ESMTPS id 98913101E7E6;
-	Fri, 26 Apr 2019 08:10:08 +0000 (UTC)
-To: Gary R Hook <ghook@redhat.com>, rhvirt-patches@redhat.com
-References: <20190410000803.1744-1-ghook@redhat.com>
+	by smtp.corp.redhat.com (Postfix) with ESMTPS id 7A3BA1001E7C;
+	Fri, 26 Apr 2019 08:14:19 +0000 (UTC)
+To: Stefan Hajnoczi <stefanha@redhat.com>, Wei Li <wei.d.li@oracle.com>
+References: <5FF901C1-0AA5-4308-A65C-C448D0A2BA63@oracle.com>
+	<20190305172905.GD13806@stefanha-x1.localdomain>
+	<2D7F11D0-4A02-4A0F-961D-854240376B17@oracle.com>
+	<20190401090724.GA643@stefanha-x1.localdomain>
+	<CC372DF3-1AC6-46B5-98A5-21159497034A@oracle.com>
+	<60340EAF-4C85-4798-9999-34F1A37E2086@oracle.com>
+	<898ef1d4-bfa2-9952-8ceb-f1282b85e29c@oracle.com>
+	<20190416092042.GB32709@stefanha-x1.localdomain>
+	<8E5AF770-69ED-4D44-8A25-B51344996D9E@oracle.com>
+	<3F7E854A-3C1D-4204-8C35-893FC0614796@oracle.com>
+	<20190423120453.GF32465@stefanha-x1.localdomain>
 From: Paolo Bonzini <pbonzini@redhat.com>
 Openpgp: preference=signencrypt
 Autocrypt: addr=pbonzini@redhat.com; prefer-encrypt=mutual; keydata=
@@ -100,23 +109,23 @@ Autocrypt: addr=pbonzini@redhat.com; prefer-encrypt=mutual; keydata=
 	DduC0U3xYkfbGAUvbxeepjgzp0uEnBXfPTy09JGpgWbg0w91GyfT/ujKaGd4vxG2Ei+MMNDm
 	S1SMx7wu0evvQ5kT9NPzyq8R2GIhVSiAd2jioGuTjX6AZCFv3ToO53DliFMkVTecLptsXaes
 	uUHgL9dKIfvpm+rNXRn9wAwGjk0X/A==
-Message-ID: <25ce8a04-ba54-3bcf-9413-b560845891ba@redhat.com>
-Date: Fri, 26 Apr 2019 10:10:06 +0200
+Message-ID: <44520476-d6a8-2e3f-1602-388e2e1e874e@redhat.com>
+Date: Fri, 26 Apr 2019 10:14:16 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
 	Thunderbird/60.6.1
 MIME-Version: 1.0
-In-Reply-To: <20190410000803.1744-1-ghook@redhat.com>
+In-Reply-To: <20190423120453.GF32465@stefanha-x1.localdomain>
 Content-Type: text/plain; charset="UTF-8"
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
 X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.48]);
-	Fri, 26 Apr 2019 08:10:12 +0000 (UTC)
+	(mx1.redhat.com [10.5.110.32]);
+	Fri, 26 Apr 2019 08:14:21 +0000 (UTC)
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [RHEL-8.1 virt 0/2] Enable SEV VM to boot with
- assigned PCI device
+Subject: Re: [Qemu-devel] Following up questions related to QEMU and I/O
+ Thread
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -128,62 +137,27 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Richard Henderson <rth@twiddle.net>, Eduardo Habkost <ehabkost@redhat.com>,
-	"Danilo C. L. de Paula" <ddepaula@redhat.com>, qemu-devel@nongnu.org
+Cc: Stefan Hajnoczi <stefanha@gmail.com>, qemu-devel@nongnu.org,
+	Dongli Zhang <dongli.zhang@oracle.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190426081006.3rBoMZrAZYC8OIREFJX1uAO5Mps2h5D_6y_i0jd_9lY@z>
+Message-ID: <20190426081416.xvonVrIGPfGEHf_7HQLqpTfxfq6hpYcUInbBq3LPw-o@z>
 
-On 10/04/19 02:08, Gary R Hook wrote:
-> Bugzilla: https://bugzilla.redhat.com/show_bug.cgi?id=1667249
-> 
-> On an AMD SEV enabled host with an SEV enabled guest, attaching an
-> assigned device to the VM results in a failure to start the VM:
-> 
-> qemu-kvm: -device vfio-pci,host=01:00.0,id=hostdev0,bus=pci.2,addr=0x0: sev_ram_block_added: failed to register region (0x7fd96e6bb000+0x20000) error 'Cannot allocate memory'
-> 
-> In this example the assigned device is a simple Intel 82574L NIC:
-> 
-> 01:00.0 Ethernet controller: Intel Corporation 82574L Gigabit Network Connection
-> 	Subsystem: Intel Corporation Gigabit CT Desktop Adapter
-> 	Flags: bus master, fast devsel, latency 0, IRQ 89, NUMA node 0
-> 	Memory at fb9c0000 (32-bit, non-prefetchable) [size=128K]
-> 	Memory at fb900000 (32-bit, non-prefetchable) [size=512K]
-> 
-> Note that the error indicates the region as (base+size) where a size
-> of 0x20000 is 128K, which matches that of BAR0 for the device.
-> dmesg on the host also reports:
-> 
-> SVM: SEV: Failure locking 32 pages.
-> 
-> SEV guests make use of the RAMBlock notifier in QEMU to add page
-> pinnings for SEV; the kernel side of the call only knows how to pin
-> pages with get_user_pages(), and this currently faults on non-page
-> backed mappings (e.g. the mmap of an MMIO BAR).
-> 
-> To resolve this failure, change the order of the memory region type
-> assignment and avoid pinning device memory regions.
-> 
-> Cc: "Danilo C. L. de Paula" <ddepaula@redhat.com>
-> Cc: Eduardo Habkost <ehabkost@redhat.com>
-> Cc: Paolo Bonzini <pbonzini@redhat.com>
-> Cc: qemu-devel@nongnu.org
-> Cc: Richard Henderson <rth@twiddle.net>
-> 
-> Danilo C. L. de Paula (2):
->   redhat: branching qemu-kvm to rhel-8.1.0
->   redhat: renaming branch to rhel-8.1.0
-> 
-> Gary R Hook (2):
->   Subject: memory: Fix the memory region type assignment order
->   Subject: target/i386: sev: Do not pin the ram device memory region
-> 
->  .gitpublish       |  6 +++---
->  memory.c          |  9 ++++++++-
->  target/i386/sev.c | 11 +++++++++++
->  3 files changed, 22 insertions(+), 4 deletions(-)
-> 
+On 23/04/19 14:04, Stefan Hajnoczi wrote:
+>> In addition, does Virtio-scsi support Batch I/O Submission feature
+>> which may be able to increase the IOPS via reducing the number of
+>> system calls?
+>
+> I don't see obvious batching support in drivers/scsi/virtio_scsi.c.
+> The Linux block layer supports batching but I'm not sure if the SCSI
+> layer does.
 
-Acked-by: Paolo Bonzini <pbonzini@redhat.com>
+I think he's referring to QEMU, in which case yes, virtio-scsi does
+batch I/O submission.  See virtio_scsi_handle_cmd_req_prepare and
+virtio_scsi_handle_cmd_req_submit in hw/scsi/virtio-scsi.c, they do
+blk_io_plug and blk_io_unplug in order to batch I/O requests from QEMU
+to the host kernel.
+
+Paolo
 
