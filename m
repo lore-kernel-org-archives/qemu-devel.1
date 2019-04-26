@@ -4,49 +4,50 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-8.7 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+	SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E99B4C43219
-	for <qemu-devel@archiver.kernel.org>; Fri, 26 Apr 2019 06:14:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EA879C43218
+	for <qemu-devel@archiver.kernel.org>; Fri, 26 Apr 2019 06:14:35 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B9D9B206E0
-	for <qemu-devel@archiver.kernel.org>; Fri, 26 Apr 2019 06:14:33 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id BB0B6206E0
+	for <qemu-devel@archiver.kernel.org>; Fri, 26 Apr 2019 06:14:35 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="UN3tstHb"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B9D9B206E0
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="Sr6bYK6B"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BB0B6206E0
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gibson.dropbear.id.au
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:39973 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:39975 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hJu80-00047O-Qf
-	for qemu-devel@archiver.kernel.org; Fri, 26 Apr 2019 02:14:32 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:59959)
+	id 1hJu82-00049p-TC
+	for qemu-devel@archiver.kernel.org; Fri, 26 Apr 2019 02:14:34 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:60028)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1hJu0X-0005Rl-23
-	for qemu-devel@nongnu.org; Fri, 26 Apr 2019 02:06:50 -0400
+	(envelope-from <dgibson@ozlabs.org>) id 1hJu0Z-0005U9-Jq
+	for qemu-devel@nongnu.org; Fri, 26 Apr 2019 02:06:53 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1hJu0V-0004Na-HS
-	for qemu-devel@nongnu.org; Fri, 26 Apr 2019 02:06:49 -0400
-Received: from ozlabs.org ([203.11.71.1]:42015)
+	(envelope-from <dgibson@ozlabs.org>) id 1hJu0Y-0004St-6k
+	for qemu-devel@nongnu.org; Fri, 26 Apr 2019 02:06:51 -0400
+Received: from ozlabs.org ([203.11.71.1]:32789)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <dgibson@ozlabs.org>)
-	id 1hJu0U-0004Hz-Sq; Fri, 26 Apr 2019 02:06:47 -0400
+	id 1hJu0X-0004Oc-P0; Fri, 26 Apr 2019 02:06:50 -0400
 Received: by ozlabs.org (Postfix, from userid 1007)
-	id 44r3Tk6TXHz9sMQ; Fri, 26 Apr 2019 16:06:34 +1000 (AEST)
+	id 44r3Tm3ll9z9sNR; Fri, 26 Apr 2019 16:06:35 +1000 (AEST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-	d=gibson.dropbear.id.au; s=201602; t=1556258794;
-	bh=CpVDQft0uHqfW1Yh26ZLPa9IQjTyO3ExmmZG59YXhOE=;
+	d=gibson.dropbear.id.au; s=201602; t=1556258796;
+	bh=9WvZ+VQECcATx4JUjFGZZCSnDpliNllpd9YyTPcrgXc=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=UN3tstHbpH9IGERbjehm3l6GqmVWwRG8uE4Cz8eodQlYvhlvhhz01v8aOENHs9fPT
-	J+WGcYmzZk/INPefOPaakDNvGLrp2CUpqWPrGofLshFd5nXkQBjxlZAsthZOhRIK0M
-	HOoLRZzzSRvm/Z3tvFOAGlx1vbk8obqYHxILaDKs=
+	b=Sr6bYK6B4X892fOSswPa5tJPT7odhMTKG8JBsZJnXFuSpa0lr9vmwKJCchdLEPrJ/
+	g/ibSNz6lOGDZt0GdczmCO4l1UHTEg7mPOwC4OT+m4DrqQn3qxB782j92GA/w/nFan
+	vN2HgbuU2u03+x1znhRSGMr9XC/kS789MlyyWOo0=
 From: David Gibson <david@gibson.dropbear.id.au>
 To: peter.maydell@linaro.org
-Date: Fri, 26 Apr 2019 16:06:00 +1000
-Message-Id: <20190426060627.18153-10-david@gibson.dropbear.id.au>
+Date: Fri, 26 Apr 2019 16:06:07 +1000
+Message-Id: <20190426060627.18153-17-david@gibson.dropbear.id.au>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20190426060627.18153-1-david@gibson.dropbear.id.au>
 References: <20190426060627.18153-1-david@gibson.dropbear.id.au>
@@ -55,7 +56,8 @@ Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 203.11.71.1
-Subject: [Qemu-devel] [PULL 09/36] target/ppc: Style fixes for dfp_helper.c
+Subject: [Qemu-devel] [PULL 16/36] target/ppc: Style fixes for
+ mfrom_table.inc.c & mfrom_table_gen.c
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -73,86 +75,61 @@ Cc: gkurz@kaod.org, Greg Kurz <groug@kaod.org>, qemu-devel@nongnu.org,
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190426060600.q7tuwe2OKTWYK-kt7O1HG2w-IDLnvFxykUOuHoWIoYk@z>
+Message-ID: <20190426060607.gOCasPb6iVXcDX6VzdgSOVH-1bA-J1idj-WzHviO3No@z>
 
 Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
 Reviewed-by: C=C3=A9dric Le Goater <clg@kaod.org>
 Reviewed-by: Greg Kurz <groug@kaod.org>
 ---
- target/ppc/dfp_helper.c | 14 +++++++-------
- 1 file changed, 7 insertions(+), 7 deletions(-)
+ target/ppc/mfrom_table.inc.c | 3 +--
+ target/ppc/mfrom_table_gen.c | 8 +++++---
+ 2 files changed, 6 insertions(+), 5 deletions(-)
 
-diff --git a/target/ppc/dfp_helper.c b/target/ppc/dfp_helper.c
-index 9164fe701b..f102177572 100644
---- a/target/ppc/dfp_helper.c
-+++ b/target/ppc/dfp_helper.c
-@@ -1104,19 +1104,19 @@ void helper_##op(CPUPPCState *env, uint64_t *t, u=
-int64_t *b, uint32_t s)     \
-         }                                                               =
-     \
-         }                                                               =
-     \
-                                                                         =
-     \
--    while (offset < (size)/4) {                                         =
-     \
-+    while (offset < (size) / 4) {                                       =
-     \
-         n++;                                                            =
-     \
--        digits[(size)/4-n] =3D dfp_get_bcd_digit_##size(dfp.b64, offset+=
-+);    \
--        if (digits[(size)/4-n] > 10) {                                  =
-     \
-+        digits[(size) / 4 - n] =3D dfp_get_bcd_digit_##size(dfp.b64, off=
-set++); \
-+        if (digits[(size) / 4 - n] > 10) {                              =
-     \
-             dfp_set_FPSCR_flag(&dfp, FP_VX | FP_VXCVI, FPSCR_VE);       =
-     \
-             return;                                                     =
-     \
-         } else {                                                        =
-     \
--            nonzero |=3D (digits[(size)/4-n] > 0);                      =
-       \
-+            nonzero |=3D (digits[(size) / 4 - n] > 0);                  =
-       \
-         }                                                               =
-     \
-     }                                                                   =
-     \
-                                                                         =
-     \
-     if (nonzero) {                                                      =
-     \
--        decNumberSetBCD(&dfp.t, digits+((size)/4)-n, n);                =
-     \
-+        decNumberSetBCD(&dfp.t, digits + ((size) / 4) - n, n);          =
-     \
-     }                                                                   =
-     \
-                                                                         =
-     \
-     if (s && sgn)  {                                                    =
-     \
-@@ -1170,13 +1170,13 @@ DFP_HELPER_XEX(dxexq, 128)
- static void dfp_set_raw_exp_64(uint64_t *t, uint64_t raw)
- {
-     *t &=3D 0x8003ffffffffffffULL;
--    *t |=3D (raw << (63-13));
-+    *t |=3D (raw << (63 - 13));
- }
+diff --git a/target/ppc/mfrom_table.inc.c b/target/ppc/mfrom_table.inc.c
+index 6a1fa375c9..1653b974a4 100644
+--- a/target/ppc/mfrom_table.inc.c
++++ b/target/ppc/mfrom_table.inc.c
+@@ -1,5 +1,4 @@
+-static const uint8_t mfrom_ROM_table[602] =3D
+-{
++static const uint8_t mfrom_ROM_table[602] =3D {
+      77,  77,  76,  76,  75,  75,  74,  74,
+      73,  73,  72,  72,  71,  71,  70,  70,
+      69,  69,  68,  68,  68,  67,  67,  66,
+diff --git a/target/ppc/mfrom_table_gen.c b/target/ppc/mfrom_table_gen.c
+index 631791808e..f96c4268ba 100644
+--- a/target/ppc/mfrom_table_gen.c
++++ b/target/ppc/mfrom_table_gen.c
+@@ -2,7 +2,7 @@
+ #include "qemu/osdep.h"
+ #include <math.h>
 =20
- static void dfp_set_raw_exp_128(uint64_t *t, uint64_t raw)
+-int main (void)
++int main(void)
  {
-     t[HI_IDX] &=3D 0x80003fffffffffffULL;
--    t[HI_IDX] |=3D (raw << (63-17));
-+    t[HI_IDX] |=3D (raw << (63 - 17));
- }
+     double d;
+     uint8_t n;
+@@ -10,7 +10,8 @@ int main (void)
 =20
- #define DFP_HELPER_IEX(op, size)                                        =
-  \
+     printf("static const uint8_t mfrom_ROM_table[602] =3D\n{\n    ");
+     for (i =3D 0; i < 602; i++) {
+-        /* Extremely decomposed:
++        /*
++         * Extremely decomposed:
+          *                    -T0 / 256
+          * T0 =3D 256 * log10(10          + 1.0) + 0.5
+          */
+@@ -23,8 +24,9 @@ int main (void)
+         d +=3D 0.5;
+         n =3D d;
+         printf("%3d, ", n);
+-        if ((i & 7) =3D=3D 7)
++        if ((i & 7) =3D=3D 7) {
+             printf("\n    ");
++        }
+     }
+     printf("\n};\n");
+=20
 --=20
 2.20.1
 
