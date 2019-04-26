@@ -7,57 +7,57 @@ X-Spam-Status: No, score=-8.7 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 96071C43219
-	for <qemu-devel@archiver.kernel.org>; Fri, 26 Apr 2019 06:23:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 72886C43219
+	for <qemu-devel@archiver.kernel.org>; Fri, 26 Apr 2019 06:23:42 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 644F620675
-	for <qemu-devel@archiver.kernel.org>; Fri, 26 Apr 2019 06:23:24 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 2F80820675
+	for <qemu-devel@archiver.kernel.org>; Fri, 26 Apr 2019 06:23:42 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="eHwuYmN8"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 644F620675
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="pvYzw0u/"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2F80820675
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gibson.dropbear.id.au
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:40135 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:40140 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hJuGZ-0005as-Ge
-	for qemu-devel@archiver.kernel.org; Fri, 26 Apr 2019 02:23:23 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:60385)
+	id 1hJuGr-0005q3-7J
+	for qemu-devel@archiver.kernel.org; Fri, 26 Apr 2019 02:23:41 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:60165)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1hJu0u-0005w8-BN
-	for qemu-devel@nongnu.org; Fri, 26 Apr 2019 02:07:13 -0400
+	(envelope-from <dgibson@ozlabs.org>) id 1hJu0d-0005aR-LK
+	for qemu-devel@nongnu.org; Fri, 26 Apr 2019 02:07:00 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1hJu0t-00050I-5S
-	for qemu-devel@nongnu.org; Fri, 26 Apr 2019 02:07:12 -0400
-Received: from bilbo.ozlabs.org ([2401:3900:2:1::2]:54589 helo=ozlabs.org)
+	(envelope-from <dgibson@ozlabs.org>) id 1hJu0b-0004ZK-P9
+	for qemu-devel@nongnu.org; Fri, 26 Apr 2019 02:06:55 -0400
+Received: from ozlabs.org ([203.11.71.1]:53953)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <dgibson@ozlabs.org>)
-	id 1hJu0s-0004PT-FC; Fri, 26 Apr 2019 02:07:11 -0400
+	id 1hJu0b-0004VB-2b; Fri, 26 Apr 2019 02:06:53 -0400
 Received: by ozlabs.org (Postfix, from userid 1007)
-	id 44r3Tm75fHz9sNK; Fri, 26 Apr 2019 16:06:35 +1000 (AEST)
+	id 44r3Tp4vWcz9sNl; Fri, 26 Apr 2019 16:06:38 +1000 (AEST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-	d=gibson.dropbear.id.au; s=201602; t=1556258797;
-	bh=71hNapxXxJkb7FPRMtgPHqs6/xQm5Ig6vi2upazg1nU=;
+	d=gibson.dropbear.id.au; s=201602; t=1556258798;
+	bh=W9sQhKyJrQXMj/mZuUVkZXbL5uKfz7ioG1dbmzOxLGE=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=eHwuYmN8EJgvuJpmwKBft0GCCAxyQx1+R2kUQOL8P84GrPimRd0cbqmYoQT3uEalu
-	TSFLzeteLJ47j2tHrNNL3lfLpBjFxz8LHLq8w8ciKkLaZP2BuGNxA+Q9G4xZ8ndzla
-	EHqS4zJAuy2iCpscY8Ap4HP0HgzfzjH8gm447ArA=
+	b=pvYzw0u/sfJ2xd93yE8Rkc1qivvg+e47X6/ccxrFq7SJZ3IIzJsdaj0Qd3+NTB50L
+	0oXobs8vZfbr4t4mI62A7gnsCQ5ELTBeK/SuhS6AgjZMoeJesG5sjH5BwCMM4KSpn9
+	Fty8AKGc5gh+lQVfiQZpE2XyTkiwp5X1Tg11zn4A=
 From: David Gibson <david@gibson.dropbear.id.au>
 To: peter.maydell@linaro.org
-Date: Fri, 26 Apr 2019 16:06:06 +1000
-Message-Id: <20190426060627.18153-16-david@gibson.dropbear.id.au>
+Date: Fri, 26 Apr 2019 16:06:17 +1000
+Message-Id: <20190426060627.18153-27-david@gibson.dropbear.id.au>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20190426060627.18153-1-david@gibson.dropbear.id.au>
 References: <20190426060627.18153-1-david@gibson.dropbear.id.au>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
-	recognized.
-X-Received-From: 2401:3900:2:1::2
-Subject: [Qemu-devel] [PULL 15/36] target/ppc: Style fixes for mem_helper.c
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 203.11.71.1
+Subject: [Qemu-devel] [PULL 26/36] target/ppc: Style fixes for
+ translate/vmx-impl.inc.c
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -75,101 +75,163 @@ Cc: gkurz@kaod.org, Greg Kurz <groug@kaod.org>, qemu-devel@nongnu.org,
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190426060606.ZxNSqxHGOfXVqfzL5-MwZuijwV47gHasTiXk8dqV6L8@z>
+Message-ID: <20190426060617.azk_hIxKvukR3qcZiPt4GTnS2Eciwf5fks0e-nNC0fo@z>
 
 Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
 Reviewed-by: C=C3=A9dric Le Goater <clg@kaod.org>
 Reviewed-by: Greg Kurz <groug@kaod.org>
 ---
- target/ppc/mem_helper.c | 33 +++++++++++++++++++--------------
- 1 file changed, 19 insertions(+), 14 deletions(-)
+ target/ppc/translate/vmx-impl.inc.c | 26 +++++++++++++++-----------
+ 1 file changed, 15 insertions(+), 11 deletions(-)
 
-diff --git a/target/ppc/mem_helper.c b/target/ppc/mem_helper.c
-index 9c5a68579e..5b0f9ee50d 100644
---- a/target/ppc/mem_helper.c
-+++ b/target/ppc/mem_helper.c
-@@ -27,7 +27,7 @@
- #include "internal.h"
- #include "qemu/atomic128.h"
-=20
--//#define DEBUG_OP
-+/* #define DEBUG_OP */
-=20
- static inline bool needs_byteswap(const CPUPPCState *env)
- {
-@@ -103,10 +103,11 @@ void helper_lsw(CPUPPCState *env, target_ulong addr=
-, uint32_t nb, uint32_t reg)
-     do_lsw(env, addr, nb, reg, GETPC());
+diff --git a/target/ppc/translate/vmx-impl.inc.c b/target/ppc/translate/v=
+mx-impl.inc.c
+index eb10c533ca..bd3ff40e68 100644
+--- a/target/ppc/translate/vmx-impl.inc.c
++++ b/target/ppc/translate/vmx-impl.inc.c
+@@ -15,7 +15,7 @@ static inline TCGv_ptr gen_avr_ptr(int reg)
  }
 =20
--/* PPC32 specification says we must generate an exception if
-- * rA is in the range of registers to be loaded.
-- * In an other hand, IBM says this is valid, but rA won't be loaded.
-- * For now, I'll follow the spec...
-+/*
-+ * PPC32 specification says we must generate an exception if rA is in
-+ * the range of registers to be loaded.  In an other hand, IBM says
-+ * this is valid, but rA won't be loaded.  For now, I'll follow the
-+ * spec...
-  */
- void helper_lswx(CPUPPCState *env, target_ulong addr, uint32_t reg,
-                  uint32_t ra, uint32_t rb)
-@@ -199,7 +200,8 @@ void helper_dcbzep(CPUPPCState *env, target_ulong add=
-r, uint32_t opcode)
- void helper_icbi(CPUPPCState *env, target_ulong addr)
- {
-     addr &=3D ~(env->dcache_line_size - 1);
--    /* Invalidate one cache line :
-+    /*
-+     * Invalidate one cache line :
-      * PowerPC specification says this is to be treated like a load
-      * (not a fetch) by the MMU. To be sure it will be so,
-      * do the load "by hand".
-@@ -346,17 +348,19 @@ uint32_t helper_stqcx_be_parallel(CPUPPCState *env,=
- target_ulong addr,
- #define LO_IDX 0
- #endif
+ #define GEN_VR_LDX(name, opc2, opc3)                                    =
+      \
+-static void glue(gen_, name)(DisasContext *ctx)                         =
+              \
++static void glue(gen_, name)(DisasContext *ctx)                         =
+      \
+ {                                                                       =
+      \
+     TCGv EA;                                                            =
+      \
+     TCGv_i64 avr;                                                       =
+      \
+@@ -28,8 +28,10 @@ static void glue(gen_, name)(DisasContext *ctx)
+     EA =3D tcg_temp_new();                                              =
+        \
+     gen_addr_reg_index(ctx, EA);                                        =
+      \
+     tcg_gen_andi_tl(EA, EA, ~0xf);                                      =
+      \
+-    /* We only need to swap high and low halves. gen_qemu_ld64_i64 does =
+      \
+-       necessary 64-bit byteswap already. */                            =
+      \
++    /*                                                                  =
+      \
++     * We only need to swap high and low halves. gen_qemu_ld64_i64      =
+      \
++     * does necessary 64-bit byteswap already.                          =
+      \
++     */                                                                 =
+      \
+     if (ctx->le_mode) {                                                 =
+      \
+         gen_qemu_ld64_i64(ctx, avr, EA);                                =
+      \
+         set_avr64(rD(ctx->opcode), avr, false);                         =
+      \
+@@ -61,8 +63,10 @@ static void gen_st##name(DisasContext *ctx)           =
+                        \
+     EA =3D tcg_temp_new();                                              =
+        \
+     gen_addr_reg_index(ctx, EA);                                        =
+      \
+     tcg_gen_andi_tl(EA, EA, ~0xf);                                      =
+      \
+-    /* We only need to swap high and low halves. gen_qemu_st64_i64 does =
+      \
+-       necessary 64-bit byteswap already. */                            =
+      \
++    /*                                                                  =
+      \
++     * We only need to swap high and low halves. gen_qemu_st64_i64      =
+      \
++     * does necessary 64-bit byteswap already.                          =
+      \
++     */                                                                 =
+      \
+     if (ctx->le_mode) {                                                 =
+      \
+         get_avr64(avr, rD(ctx->opcode), false);                         =
+      \
+         gen_qemu_st64_i64(ctx, avr, EA);                                =
+      \
+@@ -296,7 +300,7 @@ GEN_VXFORM_V(vnand, MO_64, tcg_gen_gvec_nand, 2, 22);
+ GEN_VXFORM_V(vorc, MO_64, tcg_gen_gvec_orc, 2, 21);
 =20
--/* We use msr_le to determine index ordering in a vector.  However,
--   byteswapping is not simply controlled by msr_le.  We also need to tak=
-e
--   into account endianness of the target.  This is done for the little-e=
-ndian
--   PPC64 user-mode target. */
-+/*
-+ * We use msr_le to determine index ordering in a vector.  However,
-+ * byteswapping is not simply controlled by msr_le.  We also need to
-+ * take into account endianness of the target.  This is done for the
-+ * little-endian PPC64 user-mode target.
-+ */
+ #define GEN_VXFORM(name, opc2, opc3)                                    =
+\
+-static void glue(gen_, name)(DisasContext *ctx)                         =
+        \
++static void glue(gen_, name)(DisasContext *ctx)                         =
+\
+ {                                                                       =
+\
+     TCGv_ptr ra, rb, rd;                                                =
+\
+     if (unlikely(!ctx->altivec_enabled)) {                              =
+\
+@@ -306,7 +310,7 @@ static void glue(gen_, name)(DisasContext *ctx)
+     ra =3D gen_avr_ptr(rA(ctx->opcode));                                =
+  \
+     rb =3D gen_avr_ptr(rB(ctx->opcode));                                =
+  \
+     rd =3D gen_avr_ptr(rD(ctx->opcode));                                =
+  \
+-    gen_helper_##name (rd, ra, rb);                                     =
+\
++    gen_helper_##name(rd, ra, rb);                                      =
+\
+     tcg_temp_free_ptr(ra);                                              =
+\
+     tcg_temp_free_ptr(rb);                                              =
+\
+     tcg_temp_free_ptr(rd);                                              =
+\
+@@ -758,7 +762,7 @@ GEN_VXFORM_DUPI(vspltish, tcg_gen_gvec_dup16i, 6, 13)=
+;
+ GEN_VXFORM_DUPI(vspltisw, tcg_gen_gvec_dup32i, 6, 14);
 =20
- #define LVE(name, access, swap, element)                        \
-     void helper_##name(CPUPPCState *env, ppc_avr_t *r,          \
-                        target_ulong addr)                       \
-     {                                                           \
-         size_t n_elems =3D ARRAY_SIZE(r->element);                \
--        int adjust =3D HI_IDX*(n_elems - 1);                      \
-+        int adjust =3D HI_IDX * (n_elems - 1);                    \
-         int sh =3D sizeof(r->element[0]) >> 1;                    \
-         int index =3D (addr & 0xf) >> sh;                         \
-         if (msr_le) {                                           \
-@@ -476,12 +480,13 @@ VSX_STXVL(stxvll, 1)
+ #define GEN_VXFORM_NOA(name, opc2, opc3)                                =
+\
+-static void glue(gen_, name)(DisasContext *ctx)                         =
+        \
++static void glue(gen_, name)(DisasContext *ctx)                         =
+\
+     {                                                                   =
+\
+         TCGv_ptr rb, rd;                                                =
+\
+         if (unlikely(!ctx->altivec_enabled)) {                          =
+\
+@@ -767,9 +771,9 @@ static void glue(gen_, name)(DisasContext *ctx)
+         }                                                               =
+\
+         rb =3D gen_avr_ptr(rB(ctx->opcode));                            =
+  \
+         rd =3D gen_avr_ptr(rD(ctx->opcode));                            =
+  \
+-        gen_helper_##name (rd, rb);                                     =
+\
++        gen_helper_##name(rd, rb);                                      =
+\
+         tcg_temp_free_ptr(rb);                                          =
+\
+-        tcg_temp_free_ptr(rd);                                         \
++        tcg_temp_free_ptr(rd);                                          =
+\
+     }
 =20
- void helper_tbegin(CPUPPCState *env)
- {
--    /* As a degenerate implementation, always fail tbegin.  The reason
-+    /*
-+     * As a degenerate implementation, always fail tbegin.  The reason
-      * given is "Nesting overflow".  The "persistent" bit is set,
-      * providing a hint to the error handler to not retry.  The TFIAR
-      * captures the address of the failure, which is this tbegin
--     * instruction.  Instruction execution will continue with the
--     * next instruction in memory, which is precisely what we want.
-+     * instruction.  Instruction execution will continue with the next
-+     * instruction in memory, which is precisely what we want.
-      */
-=20
-     env->spr[SPR_TEXASR] =3D
+ #define GEN_VXFORM_NOA_ENV(name, opc2, opc3)                            =
+\
+@@ -943,7 +947,7 @@ static void gen_vsldoi(DisasContext *ctx)
+     rb =3D gen_avr_ptr(rB(ctx->opcode));
+     rd =3D gen_avr_ptr(rD(ctx->opcode));
+     sh =3D tcg_const_i32(VSH(ctx->opcode));
+-    gen_helper_vsldoi (rd, ra, rb, sh);
++    gen_helper_vsldoi(rd, ra, rb, sh);
+     tcg_temp_free_ptr(ra);
+     tcg_temp_free_ptr(rb);
+     tcg_temp_free_ptr(rd);
 --=20
 2.20.1
 
