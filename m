@@ -1,18 +1,28 @@
-Received: from eggs.gnu.org ([209.51.188.92]:60498)
+Received: from eggs.gnu.org ([209.51.188.92]:35191)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1hJxXt-00043x-8O
-	for qemu-devel@nongnu.org; Fri, 26 Apr 2019 05:53:30 -0400
+	(envelope-from <marcandre.lureau@gmail.com>) id 1hJxhK-0000dr-1X
+	for qemu-devel@nongnu.org; Fri, 26 Apr 2019 06:03:17 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1hJxMh-0000Eg-M6
-	for qemu-devel@nongnu.org; Fri, 26 Apr 2019 05:41:56 -0400
-From: Thomas Huth <thuth@redhat.com>
-Message-ID: <dd85fab0-52df-9c2d-e402-28d7ce9867f1@redhat.com>
-Date: Fri, 26 Apr 2019 11:41:47 +0200
+	(envelope-from <marcandre.lureau@gmail.com>) id 1hJxhI-0005X2-Rf
+	for qemu-devel@nongnu.org; Fri, 26 Apr 2019 06:03:13 -0400
+Received: from mail-wr1-x443.google.com ([2a00:1450:4864:20::443]:43237)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <marcandre.lureau@gmail.com>)
+	id 1hJxhI-0005Uw-Gr
+	for qemu-devel@nongnu.org; Fri, 26 Apr 2019 06:03:12 -0400
+Received: by mail-wr1-x443.google.com with SMTP id a12so3582676wrq.10
+	for <qemu-devel@nongnu.org>; Fri, 26 Apr 2019 03:03:12 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: [Qemu-devel] Failing qemu-iotest 005 with raw
+References: <20190423132004.13725-1-marcandre.lureau@redhat.com>
+	<20190423132004.13725-5-marcandre.lureau@redhat.com>
+	<20190426071530.y4eeu6ekx2nzvpar@sirius.home.kraxel.org>
+In-Reply-To: <20190426071530.y4eeu6ekx2nzvpar@sirius.home.kraxel.org>
+From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
+Date: Fri, 26 Apr 2019 12:02:58 +0200
+Message-ID: <CAJ+F1CJrR60CpTp4_tYC4Up2rFZ-7TJ4HBghKSe9VQmUzhKDZw@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v6 04/11] contrib: add vhost-user-input
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -21,38 +31,40 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Qemu-block <qemu-block@nongnu.org>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, Max Reitz <mreitz@redhat.com>, Kevin Wolf <kwolf@redhat.com>, hch@lst.de
+To: Gerd Hoffmann <kraxel@redhat.com>
+Cc: QEMU <qemu-devel@nongnu.org>, "Michael S. Tsirkin" <mst@redhat.com>
+
+Hi
+
+On Fri, Apr 26, 2019 at 9:16 AM Gerd Hoffmann <kraxel@redhat.com> wrote:
+>
+> On Tue, Apr 23, 2019 at 03:19:57PM +0200, Marc-Andr=C3=A9 Lureau wrote:
+> > Add a vhost-user input backend example, based on virtio-input-host
+> > device. It takes an evdev path as argument, and can be associated with
+> > a vhost-user-input device via a UNIX socket:
+> >
+> > $ vhost-user-input -p /dev/input/eventX -s /tmp/vui.sock
+> >
+> > $ qemu ... -chardev socket,id=3Dvuic,path=3D/tmp/vui.sock
+> >   -device vhost-user-input-pci,chardev=3Dvuic
+> >
+> > This example is intentionally not included in $TOOLS, to not be built
+> > and installed by default.
+>
+> I think we should build it by default, so it doesn't bitrot,
+> even if we don't install it by default.
+>
+> > +static int unix_sock_new(char *path)
+> > +{
+>
+> Move to common code?
+>
+
+Better, use existing unix_listen()!
+
+thanks
 
 
-When running iotest 005 with raw, the test currently fails for me:
 
-005         - output mismatch (see 005.out.bad)
---- /home/thuth/devel/qemu/tests/qemu-iotests/005.out	2019-04-23
-16:43:11.000000000 +0200
-+++ /home/thuth/tmp/qemu-build/tests/qemu-iotests/005.out.bad	2019-04-26
-11:34:11.000000000 +0200
-@@ -1,13 +1,12 @@
- QA output created by 005
-
- creating large image
-+qemu-img: TEST_DIR/t.IMGFMT: The image size is too large for file
-format 'IMGFMT'
- Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=5368709120000
-
- small read
--read 4096/4096 bytes at offset 1024
--4 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+read failed: Input/output error
-
- small write
--wrote 4096/4096 bytes at offset 8192
--4 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+write failed: Input/output error
- *** done
-
-
-Could this be fixed somehow, or should the test rather be skipped for
-IMGFMT=raw?
-
- Thomas
+--=20
+Marc-Andr=C3=A9 Lureau
