@@ -2,93 +2,71 @@ Return-Path: <SRS0=QtPl=S4=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.2 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS,USER_AGENT_MUTT
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8F484C43218
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D1F13C43218
 	for <qemu-devel@archiver.kernel.org>; Fri, 26 Apr 2019 20:49:46 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6281B2084F
+	by mail.kernel.org (Postfix) with ESMTPS id 9C2342084F
 	for <qemu-devel@archiver.kernel.org>; Fri, 26 Apr 2019 20:49:46 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6281B2084F
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=alien8.de header.i=@alien8.de header.b="UhdPGQOL"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9C2342084F
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=alien8.de
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:51829 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:51831 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hK7mz-0007zZ-GV
+	id 1hK7mz-0007zl-UD
 	for qemu-devel@archiver.kernel.org; Fri, 26 Apr 2019 16:49:45 -0400
 Received: from eggs.gnu.org ([209.51.188.92]:55678)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1hK7l2-0006dl-6W
-	for qemu-devel@nongnu.org; Fri, 26 Apr 2019 16:47:45 -0400
+	(envelope-from <bp@alien8.de>) id 1hK7l6-0006dl-HN
+	for qemu-devel@nongnu.org; Fri, 26 Apr 2019 16:47:49 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1hK7hK-0007iy-No
-	for qemu-devel@nongnu.org; Fri, 26 Apr 2019 16:43:55 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:54152)
+	(envelope-from <bp@alien8.de>) id 1hK7h2-0007Vf-Gx
+	for qemu-devel@nongnu.org; Fri, 26 Apr 2019 16:43:37 -0400
+Received: from mail.skyhub.de ([2a01:4f8:190:11c2::b:1457]:53928)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mreitz@redhat.com>)
-	id 1hK7hJ-0007i6-72; Fri, 26 Apr 2019 16:43:53 -0400
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
-	[10.5.11.13])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(Exim 4.71) (envelope-from <bp@alien8.de>) id 1hK7h0-0007Qq-2I
+	for qemu-devel@nongnu.org; Fri, 26 Apr 2019 16:43:36 -0400
+Received: from zn.tnic (p200300EC2F0E4E00943B2A4E3B498EBE.dip0.t-ipconnect.de
+	[IPv6:2003:ec:2f0e:4e00:943b:2a4e:3b49:8ebe])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id ED858368E3;
-	Fri, 26 Apr 2019 20:43:51 +0000 (UTC)
-Received: from dresden.str.redhat.com (ovpn-204-82.brq.redhat.com
-	[10.40.204.82])
-	by smtp.corp.redhat.com (Postfix) with ESMTPS id 6C648608CA;
-	Fri, 26 Apr 2019 20:43:50 +0000 (UTC)
-To: Alberto Garcia <berto@igalia.com>, qemu-devel@nongnu.org
-References: <cover.1554985749.git.berto@igalia.com>
-	<9dc45741ca93573c3c782f2333129ee6ed1e9274.1554985749.git.berto@igalia.com>
-From: Max Reitz <mreitz@redhat.com>
-Openpgp: preference=signencrypt
-Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
-	mQENBFXOJlcBCADEyyhOTsoa/2ujoTRAJj4MKA21dkxxELVj3cuILpLTmtachWj7QW+TVG8U
-	/PsMCFbpwsQR7oEy8eHHZwuGQsNpEtNC2G/L8Yka0BIBzv7dEgrPzIu+W3anZXQW4702+uES
-	U29G8TP/NGfXRRHGlbBIH9KNUnOSUD2vRtpOLXkWsV5CN6vQFYgQfFvmp5ZpPeUe6xNplu8V
-	mcTw8OSEDW/ZnxJc8TekCKZSpdzYoxfzjm7xGmZqB18VFwgJZlIibt1HE0EB4w5GsD7x5ekh
-	awIe3RwoZgZDLQMdOitJ1tUc8aqaxvgA4tz6J6st8D8pS//m1gAoYJWGwwIVj1DjTYLtABEB
-	AAG0HU1heCBSZWl0eiA8bXJlaXR6QHJlZGhhdC5jb20+iQFTBBMBCAA9AhsDBQkSzAMABQsJ
-	CAcCBhUICQoLAgQWAgMBAh4BAheABQJVzie5FRhoa3A6Ly9rZXlzLmdudXBnLm5ldAAKCRD0
-	B9sAYdXPQDcIB/9uNkbYEex1rHKz3mr12uxYMwLOOFY9fstP5aoVJQ1nWQVB6m2cfKGdcRe1
-	2/nFaHSNAzT0NnKz2MjhZVmcrpyd2Gp2QyISCfb1FbT82GMtXFj1wiHmPb3CixYmWGQUUh+I
-	AvUqsevLA+WihgBUyaJq/vuDVM1/K9Un+w+Tz5vpeMidlIsTYhcsMhn0L9wlCjoucljvbDy/
-	8C9L2DUdgi3XTa0ORKeflUhdL4gucWoAMrKX2nmPjBMKLgU7WLBc8AtV+84b9OWFML6NEyo4
-	4cP7cM/07VlJK53pqNg5cHtnWwjHcbpGkQvx6RUx6F1My3y52vM24rNUA3+ligVEgPYBuQEN
-	BFXOJlcBCADAmcVUNTWT6yLWQHvxZ0o47KCP8OcLqD+67T0RCe6d0LP8GsWtrJdeDIQk+T+F
-	xO7DolQPS6iQ6Ak2/lJaPX8L0BkEAiMuLCKFU6Bn3lFOkrQeKp3u05wCSV1iKnhg0UPji9V2
-	W5eNfy8F4ZQHpeGUGy+liGXlxqkeRVhLyevUqfU0WgNqAJpfhHSGpBgihUupmyUg7lfUPeRM
-	DzAN1pIqoFuxnN+BRHdAecpsLcbR8sQddXmDg9BpSKozO/JyBmaS1RlquI8HERQoe6EynJhd
-	64aICHDfj61rp+/0jTIcevxIIAzW70IadoS/y3DVIkuhncgDBvGbF3aBtjrJVP+5ABEBAAGJ
-	ASUEGAEIAA8FAlXOJlcCGwwFCRLMAwAACgkQ9AfbAGHVz0CbFwf9F/PXxQR9i4N0iipISYjU
-	sxVdjJOM2TMut+ZZcQ6NSMvhZ0ogQxJ+iEQ5OjnIputKvPVd5U7WRh+4lF1lB/NQGrGZQ1ic
-	alkj6ocscQyFwfib+xIe9w8TG1CVGkII7+TbS5pXHRxZH1niaRpoi/hYtgzkuOPp35jJyqT/
-	/ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
-	bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
-	R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
-Message-ID: <e2d7327f-f9e8-60bf-e135-f38a0c955685@redhat.com>
-Date: Fri, 26 Apr 2019 22:43:48 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
-	Thunderbird/60.6.1
+	by mail.skyhub.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id
+	E91221EC0380; Fri, 26 Apr 2019 22:43:27 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=dkim;
+	t=1556311408;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	content-transfer-encoding:in-reply-to:in-reply-to: references:references;
+	bh=U/CTz5SAE+pabViqpyUk1tFxQ7Z2FiMtt9crX5ZBuxU=;
+	b=UhdPGQOLrAf8IGQf0LFY/S4cUffWG3c4g9ftiz6gJMEqqlTKDul2WnVMT5615oZgOgXDnJ
+	++VBWOsicl1sJqsDfbbe8zvCah3EZWOKI05JbmK2U00zXthBByudvMSRKV7SFtwhqV+Miv
+	zO7NC654c1E1HbrUsIITY8nVh74sj4g=
+Date: Fri, 26 Apr 2019 22:43:27 +0200
+From: Borislav Petkov <bp@alien8.de>
+To: "Singh, Brijesh" <brijesh.singh@amd.com>
+Message-ID: <20190426204327.GM4608@zn.tnic>
+References: <20190424160942.13567-1-brijesh.singh@amd.com>
+	<20190424160942.13567-2-brijesh.singh@amd.com>
+	<20190426141042.GF4608@zn.tnic>
+	<e6f8da38-b8dd-a9c5-a358-5f33b6ea7b37@amd.com>
 MIME-Version: 1.0
-In-Reply-To: <9dc45741ca93573c3c782f2333129ee6ed1e9274.1554985749.git.berto@igalia.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="5dXhesZZVSm11Joonf9d9JnoyZ7XSmDNv"
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.30]);
-	Fri, 26 Apr 2019 20:43:52 +0000 (UTC)
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-X-Content-Filtered-By: Mailman/MimeDel 2.1.21
-Subject: Re: [Qemu-devel] [PATCH for-4.1 v2 1/2] commit: Make base read-only
- if there is an early failure
+Content-Type: text/plain; charset="UTF-8"
+Content-Disposition: inline
+In-Reply-To: <e6f8da38-b8dd-a9c5-a358-5f33b6ea7b37@amd.com>
+User-Agent: Mutt/1.10.1 (2018-07-13)
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+	recognized.
+X-Received-From: 2a01:4f8:190:11c2::b:1457
+Subject: Re: [Qemu-devel] [RFC PATCH v1 01/10] KVM: SVM: Add KVM_SEV
+ SEND_START command
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -100,56 +78,37 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
+Cc: "Lendacky, Thomas" <Thomas.Lendacky@amd.com>,
+	"kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+	Radim =?utf-8?B?S3LEjW3DocWZ?= <rkrcmar@redhat.com>,
+	Joerg Roedel <joro@8bytes.org>, "x86@kernel.org" <x86@kernel.org>,
+	"qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+	Ingo Molnar <mingo@redhat.com>, "H. Peter Anvin" <hpa@zytor.com>,
+	Paolo Bonzini <pbonzini@redhat.com>, Thomas Gleixner <tglx@linutronix.de>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190426204348.zckurTLT9xzhANENA2q0CHGaFjQ2o9RXx7WxQabmAs8@z>
+Message-ID: <20190426204327.X7cQtDnT4eTAIkFVSIiuKiGsP4WdCjpoYUZoSOqJqHA@z>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---5dXhesZZVSm11Joonf9d9JnoyZ7XSmDNv
-From: Max Reitz <mreitz@redhat.com>
-To: Alberto Garcia <berto@igalia.com>, qemu-devel@nongnu.org
-Cc: Eric Blake <eblake@redhat.com>, qemu-block@nongnu.org,
- Kevin Wolf <kwolf@redhat.com>
-Message-ID: <e2d7327f-f9e8-60bf-e135-f38a0c955685@redhat.com>
-Subject: Re: [PATCH for-4.1 v2 1/2] commit: Make base read-only if there is an
- early failure
-References: <cover.1554985749.git.berto@igalia.com>
- <9dc45741ca93573c3c782f2333129ee6ed1e9274.1554985749.git.berto@igalia.com>
-In-Reply-To: <9dc45741ca93573c3c782f2333129ee6ed1e9274.1554985749.git.berto@igalia.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+On Fri, Apr 26, 2019 at 02:29:31PM +0000, Singh, Brijesh wrote:
+> Yes that's doable but I am afraid that caching the value may lead us to
+> wrong path and also divergence from the SEV API spec. The spec says the
+> returned length is a minimum length but its possible that caller can
+> give a bigger buffer and FW will still work with it.
 
-On 11.04.19 14:32, Alberto Garcia wrote:
-> You can reproduce this by passing an invalid filter-node-name (like
-> "1234") to block-commit. In this case the base image is put in
-> read-write mode but is never reset back to read-only.
->=20
-> Signed-off-by: Alberto Garcia <berto@igalia.com>
-> ---
->  block/commit.c | 3 +++
->  1 file changed, 3 insertions(+)
+Does the caller even have a valid reason to give a bigger buffer len?
 
-Reviewed-by: Max Reitz <mreitz@redhat.com>
+I mean I'm still thinking defensively here but maybe the only thing that
+would happen here with a bigger buffer is if the kmalloc() would fail,
+leading to eventual failure of the migration.
 
+If the code limits the allocation to some sane max length, the migration
+won't fail even if userspace gives it too big values...
 
---5dXhesZZVSm11Joonf9d9JnoyZ7XSmDNv
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
+-- 
+Regards/Gruss,
+    Boris.
 
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAlzDbYQACgkQ9AfbAGHV
-z0DXkAf/YqBVOfsS6cIhv/kXge+iuWhJYdlMDV17x+EOfddtXyiMNIuAqhU5JTNu
-TH8o5CcBA8I+p/32z9rDer/OR0R6d2aGcYQTwjxUXkJR3QZIPf6JxU/ZmZovsK+r
-1fjBR/68RP2KFLtsKyZu0ANAwpcR5GsOW5WyaJE4ipDLflK2d9KZApXkbcyjhuWx
-Fi3BiFoE5QpoQVA1OST5hps+iGfhfXCaj/UAigjN1lUWH5TH2qZmdLtcPataurI3
-cMabjO77ALMBd2PsvXxsdHT4Lio5sfMtivzsNKoD+WKPujkwXj1PNWbJBmlG9wq2
-9cFKdlQWGQrI7CN0W3pHZT6TmxvV5Q==
-=HbZE
------END PGP SIGNATURE-----
-
---5dXhesZZVSm11Joonf9d9JnoyZ7XSmDNv--
+Good mailing practices for 400: avoid top-posting and trim the reply.
 
