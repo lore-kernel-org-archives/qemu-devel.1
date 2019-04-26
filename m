@@ -2,63 +2,86 @@ Return-Path: <SRS0=QtPl=S4=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.5 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 17DE4C43218
-	for <qemu-devel@archiver.kernel.org>; Fri, 26 Apr 2019 05:02:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 500F3C43218
+	for <qemu-devel@archiver.kernel.org>; Fri, 26 Apr 2019 05:02:57 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D9183208CA
-	for <qemu-devel@archiver.kernel.org>; Fri, 26 Apr 2019 05:02:54 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D9183208CA
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 203E8206C1
+	for <qemu-devel@archiver.kernel.org>; Fri, 26 Apr 2019 05:02:57 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="kgmoqyCI"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 203E8206C1
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:39330 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:39332 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hJt0g-0007Ik-2G
-	for qemu-devel@archiver.kernel.org; Fri, 26 Apr 2019 01:02:54 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:49001)
+	id 1hJt0i-0007KZ-AC
+	for qemu-devel@archiver.kernel.org; Fri, 26 Apr 2019 01:02:56 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:45320)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pagupta@redhat.com>) id 1hJszF-0006L5-ET
-	for qemu-devel@nongnu.org; Fri, 26 Apr 2019 01:01:26 -0400
+	(envelope-from <arilou@gmail.com>) id 1hJsmf-0000dG-Bz
+	for qemu-devel@nongnu.org; Fri, 26 Apr 2019 00:48:26 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pagupta@redhat.com>) id 1hJszD-0004IQ-Uj
-	for qemu-devel@nongnu.org; Fri, 26 Apr 2019 01:01:25 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:60866)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pagupta@redhat.com>) id 1hJszD-0004Gu-Mk
-	for qemu-devel@nongnu.org; Fri, 26 Apr 2019 01:01:23 -0400
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
-	[10.5.11.13])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 9B3EA30B482B;
-	Fri, 26 Apr 2019 05:01:22 +0000 (UTC)
-Received: from dhcp201-121.englab.pnq.redhat.com (unknown [10.65.16.97])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id 55CD960923;
-	Fri, 26 Apr 2019 05:01:03 +0000 (UTC)
-From: Pankaj Gupta <pagupta@redhat.com>
-To: linux-nvdimm@lists.01.org, linux-kernel@vger.kernel.org,
-	virtualization@lists.linux-foundation.org, kvm@vger.kernel.org,
-	linux-fsdevel@vger.kernel.org, linux-acpi@vger.kernel.org,
-	qemu-devel@nongnu.org, linux-ext4@vger.kernel.org,
-	linux-xfs@vger.kernel.org
-Date: Fri, 26 Apr 2019 10:30:34 +0530
-Message-Id: <20190426050039.17460-2-pagupta@redhat.com>
-In-Reply-To: <20190426050039.17460-1-pagupta@redhat.com>
-References: <20190426050039.17460-1-pagupta@redhat.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.46]);
-	Fri, 26 Apr 2019 05:01:23 +0000 (UTC)
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] [PATCH v7 1/6] libnvdimm: nd_region flush callback
- support
+	(envelope-from <arilou@gmail.com>) id 1hJsb6-0004WP-Db
+	for qemu-devel@nongnu.org; Fri, 26 Apr 2019 00:36:29 -0400
+Received: from mail-wr1-x441.google.com ([2a00:1450:4864:20::441]:43048)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <arilou@gmail.com>) id 1hJsb6-0004Vy-7S
+	for qemu-devel@nongnu.org; Fri, 26 Apr 2019 00:36:28 -0400
+Received: by mail-wr1-x441.google.com with SMTP id a12so2410826wrq.10
+	for <qemu-devel@nongnu.org>; Thu, 25 Apr 2019 21:36:28 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+	h=from:to:cc:subject:date:message-id:in-reply-to:references
+	:mime-version:content-transfer-encoding;
+	bh=C5wVxSSu9B3yjrVL1kbdSqghY5biwyr5/S2ykkoUubY=;
+	b=kgmoqyCIYRjiJsanjHfvhXOXnK9d/A+YXxNeDoiohUdikM5ponc+AdUmcqfFV0d9Lg
+	wXhed/bbYuy4xwLvftaNx6EnFeVvc6oEnvdPRd3Y7HZX18CN2BpyU1DEw379xd3JMmg1
+	IGEeYM7fAFj2x4xKY7gKDli7mNC5WktvIZSnrzp85E0/d+pLsP7Kfzna/PhkmnUK2hix
+	gTZf9nP4UFExxdIPi8edUKmRf9ghY3p0ZMKtmYCsJh5Wv/KXWBoZIISCilrogmYfr8hA
+	+jmTPHmVqXHGl2RsJPWyUIakReK9aLJKXhBS4o+cEb1/fUsG3Fgmlk5BG5cJYHsPd2CY
+	/Y1w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=1e100.net; s=20161025;
+	h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+	:references:mime-version:content-transfer-encoding;
+	bh=C5wVxSSu9B3yjrVL1kbdSqghY5biwyr5/S2ykkoUubY=;
+	b=ucJZAnULqCkGZPcxuPQZo+JvQHJEawa8+fGQLTwH/QPN6EPG/yxLKwY4Q5zANjC5Wg
+	VV33oCAblT6WQtVL5bNUtHU1VSQUVY/tdoskJolsCMgmO3Mh2qXrZhj5lXS1zcm8JrKQ
+	pyARvtnThfgsSd7lGEeN/+JMr9bdj5hLDOzgC42JJA16JnN80n0TAKV/mHIi2LFOkiaU
+	/wSvYKHfdVc4y8l4b2+mlo3bGNvxFgvg5G/RfBCCpPB8BuO6VAqDg7NOJYLL32Mf6bzY
+	JYdiByYM3vSaMwkF+K+11FcltnpetO6s0IdPNB9T0v+5W5d5hMHsjdfTed/JOQPTmwni
+	bDjA==
+X-Gm-Message-State: APjAAAW9KeNbRIrQajgRYztiP8Z8wnTsuLoSxd2ExeO+pTSwz7UYdGcY
+	FQe2ul9+DVOMMhvlXqqp6+v/SpiU
+X-Google-Smtp-Source: APXvYqx+6F/TJJBApYN5dKwOVuVNDH6IEpPXTv0lzsS6nGUEOONWZJwyF8rXeknJGbQrgFfAV+oeGQ==
+X-Received: by 2002:a5d:5542:: with SMTP id g2mr6028705wrw.58.1556253386319;
+	Thu, 25 Apr 2019 21:36:26 -0700 (PDT)
+Received: from localhost.localdomain (bzq-79-178-247-46.red.bezeqint.net.
+	[79.178.247.46])
+	by smtp.gmail.com with ESMTPSA id h5sm3467088wmf.38.2019.04.25.21.36.23
+	(version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
+	Thu, 25 Apr 2019 21:36:24 -0700 (PDT)
+From: Jon Doron <arilou@gmail.com>
+To: qemu-devel@nongnu.org
+Date: Fri, 26 Apr 2019 07:35:47 +0300
+Message-Id: <20190426043558.6888-11-arilou@gmail.com>
+X-Mailer: git-send-email 2.20.1
+In-Reply-To: <20190426043558.6888-1-arilou@gmail.com>
+References: <20190426043558.6888-1-arilou@gmail.com>
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+	recognized.
+X-Received-From: 2a00:1450:4864:20::441
+Subject: [Qemu-devel] [PATCH v7 10/21] gdbstub: Implement get register (p
+ pkt) with new infra
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -70,259 +93,86 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: pagupta@redhat.com, jack@suse.cz, mst@redhat.com, jasowang@redhat.com,
-	david@fromorbit.com, lcapitulino@redhat.com,
-	adilger.kernel@dilger.ca, zwisler@kernel.org,
-	aarcange@redhat.com, dave.jiang@intel.com,
-	darrick.wong@oracle.com, vishal.l.verma@intel.com,
-	david@redhat.com, willy@infradead.org, hch@infradead.org,
-	jmoyer@redhat.com, nilal@redhat.com, lenb@kernel.org,
-	kilobyte@angband.pl, riel@surriel.com, yuval.shaia@oracle.com,
-	stefanha@redhat.com, pbonzini@redhat.com,
-	dan.j.williams@intel.com, kwolf@redhat.com, tytso@mit.edu,
-	xiaoguangrong.eric@gmail.com, cohuck@redhat.com,
-	rjw@rjwysocki.net, imammedo@redhat.com
+Cc: alex.bennee@linaro.org, Jon Doron <arilou@gmail.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 Content-Type: text/plain; charset="UTF-8"
-Message-ID: <20190426050034.G2szpZpX0HlvCNM2yAIPGVB5o09NyKh7z36mHZkNjKw@z>
+Message-ID: <20190426043547.qLdHtt6A2sXpS7OHaO9ggdyiLaU68bOgepBQxX7Z-nM@z>
 
-This patch adds functionality to perform flush from guest
-to host over VIRTIO. We are registering a callback based
-on 'nd_region' type. virtio_pmem driver requires this special
-flush function. For rest of the region types we are registering
-existing flush function. Report error returned by host fsync
-failure to userspace.
-
-Signed-off-by: Pankaj Gupta <pagupta@redhat.com>
+Signed-off-by: Jon Doron <arilou@gmail.com>
 ---
- drivers/acpi/nfit/core.c     |  4 ++--
- drivers/nvdimm/claim.c       |  6 ++++--
- drivers/nvdimm/nd.h          |  1 +
- drivers/nvdimm/pmem.c        | 13 ++++++++-----
- drivers/nvdimm/region_devs.c | 26 ++++++++++++++++++++++++--
- include/linux/libnvdimm.h    |  8 +++++++-
- 6 files changed, 46 insertions(+), 12 deletions(-)
+ gdbstub.c | 50 ++++++++++++++++++++++++++++++++++++++------------
+ 1 file changed, 38 insertions(+), 12 deletions(-)
 
-diff --git a/drivers/acpi/nfit/core.c b/drivers/acpi/nfit/core.c
-index 5a389a4f4f65..08dde76cf459 100644
---- a/drivers/acpi/nfit/core.c
-+++ b/drivers/acpi/nfit/core.c
-@@ -2434,7 +2434,7 @@ static void write_blk_ctl(struct nfit_blk *nfit_blk, unsigned int bw,
- 		offset = to_interleave_offset(offset, mmio);
- 
- 	writeq(cmd, mmio->addr.base + offset);
--	nvdimm_flush(nfit_blk->nd_region);
-+	nvdimm_flush(nfit_blk->nd_region, NULL);
- 
- 	if (nfit_blk->dimm_flags & NFIT_BLK_DCR_LATCH)
- 		readq(mmio->addr.base + offset);
-@@ -2483,7 +2483,7 @@ static int acpi_nfit_blk_single_io(struct nfit_blk *nfit_blk,
- 	}
- 
- 	if (rw)
--		nvdimm_flush(nfit_blk->nd_region);
-+		nvdimm_flush(nfit_blk->nd_region, NULL);
- 
- 	rc = read_blk_stat(nfit_blk, lane) ? -EIO : 0;
- 	return rc;
-diff --git a/drivers/nvdimm/claim.c b/drivers/nvdimm/claim.c
-index fb667bf469c7..13510bae1e6f 100644
---- a/drivers/nvdimm/claim.c
-+++ b/drivers/nvdimm/claim.c
-@@ -263,7 +263,7 @@ static int nsio_rw_bytes(struct nd_namespace_common *ndns,
- 	struct nd_namespace_io *nsio = to_nd_namespace_io(&ndns->dev);
- 	unsigned int sz_align = ALIGN(size + (offset & (512 - 1)), 512);
- 	sector_t sector = offset >> 9;
--	int rc = 0;
-+	int rc = 0, ret = 0;
- 
- 	if (unlikely(!size))
- 		return 0;
-@@ -301,7 +301,9 @@ static int nsio_rw_bytes(struct nd_namespace_common *ndns,
- 	}
- 
- 	memcpy_flushcache(nsio->addr + offset, buf, size);
--	nvdimm_flush(to_nd_region(ndns->dev.parent));
-+	ret = nvdimm_flush(to_nd_region(ndns->dev.parent), NULL);
-+	if (ret)
-+		rc = ret;
- 
- 	return rc;
- }
-diff --git a/drivers/nvdimm/nd.h b/drivers/nvdimm/nd.h
-index a5ac3b240293..0c74d2428bd7 100644
---- a/drivers/nvdimm/nd.h
-+++ b/drivers/nvdimm/nd.h
-@@ -159,6 +159,7 @@ struct nd_region {
- 	struct badblocks bb;
- 	struct nd_interleave_set *nd_set;
- 	struct nd_percpu_lane __percpu *lane;
-+	int (*flush)(struct nd_region *nd_region, struct bio *bio);
- 	struct nd_mapping mapping[0];
- };
- 
-diff --git a/drivers/nvdimm/pmem.c b/drivers/nvdimm/pmem.c
-index bc2f700feef8..f719245da170 100644
---- a/drivers/nvdimm/pmem.c
-+++ b/drivers/nvdimm/pmem.c
-@@ -192,6 +192,7 @@ static blk_status_t pmem_do_bvec(struct pmem_device *pmem, struct page *page,
- 
- static blk_qc_t pmem_make_request(struct request_queue *q, struct bio *bio)
- {
-+	int ret = 0;
- 	blk_status_t rc = 0;
- 	bool do_acct;
- 	unsigned long start;
-@@ -201,7 +202,7 @@ static blk_qc_t pmem_make_request(struct request_queue *q, struct bio *bio)
- 	struct nd_region *nd_region = to_region(pmem);
- 
- 	if (bio->bi_opf & REQ_PREFLUSH)
--		nvdimm_flush(nd_region);
-+		ret = nvdimm_flush(nd_region, bio);
- 
- 	do_acct = nd_iostat_start(bio, &start);
- 	bio_for_each_segment(bvec, bio, iter) {
-@@ -216,7 +217,10 @@ static blk_qc_t pmem_make_request(struct request_queue *q, struct bio *bio)
- 		nd_iostat_end(bio, start);
- 
- 	if (bio->bi_opf & REQ_FUA)
--		nvdimm_flush(nd_region);
-+		ret = nvdimm_flush(nd_region, bio);
-+
-+	if (ret)
-+		bio->bi_status = errno_to_blk_status(ret);
- 
- 	bio_endio(bio);
- 	return BLK_QC_T_NONE;
-@@ -469,7 +473,6 @@ static int pmem_attach_disk(struct device *dev,
- 	}
- 	dax_write_cache(dax_dev, nvdimm_has_cache(nd_region));
- 	pmem->dax_dev = dax_dev;
--
- 	gendev = disk_to_dev(disk);
- 	gendev->groups = pmem_attribute_groups;
- 
-@@ -527,14 +530,14 @@ static int nd_pmem_remove(struct device *dev)
- 		sysfs_put(pmem->bb_state);
- 		pmem->bb_state = NULL;
- 	}
--	nvdimm_flush(to_nd_region(dev->parent));
-+	nvdimm_flush(to_nd_region(dev->parent), NULL);
- 
- 	return 0;
+diff --git a/gdbstub.c b/gdbstub.c
+index 10e3f12a68..e9a3d0c2bc 100644
+--- a/gdbstub.c
++++ b/gdbstub.c
+@@ -1655,6 +1655,36 @@ static void handle_set_reg(GdbCmdContext *gdb_ctx, void *user_ctx)
+     put_packet(gdb_ctx->s, "OK");
  }
  
- static void nd_pmem_shutdown(struct device *dev)
- {
--	nvdimm_flush(to_nd_region(dev->parent));
-+	nvdimm_flush(to_nd_region(dev->parent), NULL);
- }
- 
- static void nd_pmem_notify(struct device *dev, enum nvdimm_event event)
-diff --git a/drivers/nvdimm/region_devs.c b/drivers/nvdimm/region_devs.c
-index b4ef7d9ff22e..e5b59708865e 100644
---- a/drivers/nvdimm/region_devs.c
-+++ b/drivers/nvdimm/region_devs.c
-@@ -295,7 +295,9 @@ static ssize_t deep_flush_store(struct device *dev, struct device_attribute *att
- 		return rc;
- 	if (!flush)
- 		return -EINVAL;
--	nvdimm_flush(nd_region);
-+	rc = nvdimm_flush(nd_region, NULL);
-+	if (rc)
-+		return rc;
- 
- 	return len;
- }
-@@ -1085,6 +1087,11 @@ static struct nd_region *nd_region_create(struct nvdimm_bus *nvdimm_bus,
- 	dev->of_node = ndr_desc->of_node;
- 	nd_region->ndr_size = resource_size(ndr_desc->res);
- 	nd_region->ndr_start = ndr_desc->res->start;
-+	if (ndr_desc->flush)
-+		nd_region->flush = ndr_desc->flush;
-+	else
-+		nd_region->flush = NULL;
-+
- 	nd_device_register(dev);
- 
- 	return nd_region;
-@@ -1125,11 +1132,24 @@ struct nd_region *nvdimm_volatile_region_create(struct nvdimm_bus *nvdimm_bus,
- }
- EXPORT_SYMBOL_GPL(nvdimm_volatile_region_create);
- 
-+int nvdimm_flush(struct nd_region *nd_region, struct bio *bio)
++static void handle_get_reg(GdbCmdContext *gdb_ctx, void *user_ctx)
 +{
-+	int rc = 0;
++    int reg_size;
 +
-+	if (!nd_region->flush)
-+		rc = generic_nvdimm_flush(nd_region);
-+	else {
-+		if (nd_region->flush(nd_region, bio))
-+			rc = -EIO;
-+	}
++    /*
++     * Older gdb are really dumb, and don't use 'g' if 'p' is avaialable.
++     * This works, but can be very slow.  Anything new enough to
++     * understand XML also knows how to use this properly.
++     */
++    if (!gdb_has_xml) {
++        put_packet(gdb_ctx->s, "");
++        return;
++    }
 +
-+	return rc;
++    if (!gdb_ctx->num_params) {
++        put_packet(gdb_ctx->s, "E14");
++        return;
++    }
++
++    reg_size = gdb_read_register(gdb_ctx->s->g_cpu, gdb_ctx->mem_buf,
++                                 gdb_ctx->params[0].val_ull);
++    if (!reg_size) {
++        put_packet(gdb_ctx->s, "E14");
++        return;
++    }
++
++    memtohex(gdb_ctx->str_buf, gdb_ctx->mem_buf, reg_size);
++    put_packet(gdb_ctx->s, gdb_ctx->str_buf);
 +}
- /**
-  * nvdimm_flush - flush any posted write queues between the cpu and pmem media
-  * @nd_region: blk or interleaved pmem region
-  */
--void nvdimm_flush(struct nd_region *nd_region)
-+int generic_nvdimm_flush(struct nd_region *nd_region)
++
+ static int gdb_handle_packet(GDBState *s, const char *line_buf)
  {
- 	struct nd_region_data *ndrd = dev_get_drvdata(&nd_region->dev);
- 	int i, idx;
-@@ -1153,6 +1173,8 @@ void nvdimm_flush(struct nd_region *nd_region)
- 		if (ndrd_get_flush_wpq(ndrd, i, 0))
- 			writeq(1, ndrd_get_flush_wpq(ndrd, i, idx));
- 	wmb();
-+
-+	return 0;
- }
- EXPORT_SYMBOL_GPL(nvdimm_flush);
- 
-diff --git a/include/linux/libnvdimm.h b/include/linux/libnvdimm.h
-index feb342d026f2..a5f369ec3726 100644
---- a/include/linux/libnvdimm.h
-+++ b/include/linux/libnvdimm.h
-@@ -65,6 +65,9 @@ enum {
- 	 */
- 	ND_REGION_PERSIST_MEMCTRL = 2,
- 
-+	/* Platform provides asynchronous flush mechanism */
-+	ND_REGION_ASYNC = 3,
-+
- 	/* mark newly adjusted resources as requiring a label update */
- 	DPA_RESOURCE_ADJUSTED = 1 << 0,
- };
-@@ -121,6 +124,7 @@ struct nd_mapping_desc {
- 	int position;
- };
- 
-+struct nd_region;
- struct nd_region_desc {
- 	struct resource *res;
- 	struct nd_mapping_desc *mapping;
-@@ -133,6 +137,7 @@ struct nd_region_desc {
- 	int target_node;
- 	unsigned long flags;
- 	struct device_node *of_node;
-+	int (*flush)(struct nd_region *nd_region, struct bio *bio);
- };
- 
- struct device;
-@@ -260,7 +265,8 @@ unsigned long nd_blk_memremap_flags(struct nd_blk_region *ndbr);
- unsigned int nd_region_acquire_lane(struct nd_region *nd_region);
- void nd_region_release_lane(struct nd_region *nd_region, unsigned int lane);
- u64 nd_fletcher64(void *addr, size_t len, bool le);
--void nvdimm_flush(struct nd_region *nd_region);
-+int nvdimm_flush(struct nd_region *nd_region, struct bio *bio);
-+int generic_nvdimm_flush(struct nd_region *nd_region);
- int nvdimm_has_flush(struct nd_region *nd_region);
- int nvdimm_has_cache(struct nd_region *nd_region);
- int nvdimm_in_overwrite(struct nvdimm *nvdimm);
+     CPUState *cpu;
+@@ -1884,18 +1914,14 @@ static int gdb_handle_packet(GDBState *s, const char *line_buf)
+         }
+         break;
+     case 'p':
+-        /* Older gdb are really dumb, and don't use 'g' if 'p' is avaialable.
+-           This works, but can be very slow.  Anything new enough to
+-           understand XML also knows how to use this properly.  */
+-        if (!gdb_has_xml)
+-            goto unknown_command;
+-        addr = strtoull(p, (char **)&p, 16);
+-        reg_size = gdb_read_register(s->g_cpu, mem_buf, addr);
+-        if (reg_size) {
+-            memtohex(buf, mem_buf, reg_size);
+-            put_packet(s, buf);
+-        } else {
+-            put_packet(s, "E14");
++        {
++            static const GdbCmdParseEntry get_reg_cmd_desc = {
++                .handler = handle_get_reg,
++                .cmd = "p",
++                .cmd_startswith = 1,
++                .schema = "L0"
++            };
++            cmd_parser = &get_reg_cmd_desc;
+         }
+         break;
+     case 'P':
 -- 
 2.20.1
 
