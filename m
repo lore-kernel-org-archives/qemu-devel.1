@@ -2,87 +2,63 @@ Return-Path: <SRS0=QtPl=S4=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.5 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5B51FC43219
-	for <qemu-devel@archiver.kernel.org>; Fri, 26 Apr 2019 05:00:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 17DE4C43218
+	for <qemu-devel@archiver.kernel.org>; Fri, 26 Apr 2019 05:02:55 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1C407206C1
-	for <qemu-devel@archiver.kernel.org>; Fri, 26 Apr 2019 05:00:45 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="kLtpBCmR"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1C407206C1
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	by mail.kernel.org (Postfix) with ESMTPS id D9183208CA
+	for <qemu-devel@archiver.kernel.org>; Fri, 26 Apr 2019 05:02:54 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D9183208CA
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:39312 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:39330 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hJsya-00058J-9A
-	for qemu-devel@archiver.kernel.org; Fri, 26 Apr 2019 01:00:44 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:45586)
+	id 1hJt0g-0007Ik-2G
+	for qemu-devel@archiver.kernel.org; Fri, 26 Apr 2019 01:02:54 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:49001)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <arilou@gmail.com>) id 1hJsmp-00012o-Q6
-	for qemu-devel@nongnu.org; Fri, 26 Apr 2019 00:48:37 -0400
+	(envelope-from <pagupta@redhat.com>) id 1hJszF-0006L5-ET
+	for qemu-devel@nongnu.org; Fri, 26 Apr 2019 01:01:26 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <arilou@gmail.com>) id 1hJsap-0004Ci-L8
-	for qemu-devel@nongnu.org; Fri, 26 Apr 2019 00:36:13 -0400
-Received: from mail-wr1-x444.google.com ([2a00:1450:4864:20::444]:45149)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <arilou@gmail.com>) id 1hJsao-0004Az-7r
-	for qemu-devel@nongnu.org; Fri, 26 Apr 2019 00:36:11 -0400
-Received: by mail-wr1-x444.google.com with SMTP id s15so2393810wra.12
-	for <qemu-devel@nongnu.org>; Thu, 25 Apr 2019 21:36:10 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
-	h=from:to:cc:subject:date:message-id:in-reply-to:references
-	:mime-version:content-transfer-encoding;
-	bh=9gs1pjZcHlRiuvyF89Xf0dDUFOI/nZh6LcrIM/HDQRg=;
-	b=kLtpBCmRDU9fZaZ4u+zfnDq2IYGmpuz8pRjP9UzKFSjxVYtfyQ1twqL9mSlCGwZ/7I
-	NmN7NAMvQe8QqQz9R+TADR30oh4pk3Cko5t2qZaPf3Xqz9UbxksCgUS6OBEKBWn7G55Z
-	h/oUFGNHE7a2Nghh0kyr4JhSW03JEYDe0fSv9rZ+KZ/6sN90LWAy5upKbrlyCDIk3QmK
-	7lxdZtaTc8v9ICwTI4BLWFweNPjCac65uK5fWFoz/0rFJTKTD4iGlU+nppQsqJKG6fT2
-	u2qVVILTAaiDGJKWDRGZKMM/HOeU1HciYDgm9VCQrKjr+Qj3VmtXdCfgPK4XmXA71UVP
-	Aavg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=1e100.net; s=20161025;
-	h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
-	:references:mime-version:content-transfer-encoding;
-	bh=9gs1pjZcHlRiuvyF89Xf0dDUFOI/nZh6LcrIM/HDQRg=;
-	b=bFtbv2ZWhGGpX0Jh/8pl+vTeRXOqea1msuAgN3nXt1LIwvjsQGo92va70D2cUgjSAu
-	O144KTNOhvaeJATQNGUUd5HyGTATLltcyouiz2wOdrZ7rmQBGpJoLyBp151RCMagPV3E
-	kbGWWaGUXFwGoEHIwPah1ac8UzvgyF3bq9zbWp0h4CHL+Gp/oYZSOVKduLxLo2clNFBy
-	16y7NP2P2WfI4Nd1VNGJppgJA2tt6gbJBqUpY/Mw7cMbDXA7Hz8ZLyKIynY1fbot4KYC
-	Zg00av+YVzncvpHQS0/R40OmesW79KbE8u23om8G6mRVJv5miKeR8YBOkBMIcZp4fAkY
-	Ntng==
-X-Gm-Message-State: APjAAAXasrrFML1e5D1GCcGu2qxex90HTIVouHCrazG+s6W6aem9nSwV
-	1nyqNnxv0aoqp2VyL/oPeEYoZqQ1
-X-Google-Smtp-Source: APXvYqw5ZK+DjJi4ZuSsE7jlnPCnrsBG0mciDgRXXh+ASVEqj+9Zv9ybYi8kv4WdPWu0iNHw33ikTg==
-X-Received: by 2002:a05:6000:11cf:: with SMTP id
-	i15mr27500648wrx.287.1556253368768; 
-	Thu, 25 Apr 2019 21:36:08 -0700 (PDT)
-Received: from localhost.localdomain (bzq-79-178-247-46.red.bezeqint.net.
-	[79.178.247.46])
-	by smtp.gmail.com with ESMTPSA id h5sm3467088wmf.38.2019.04.25.21.36.07
-	(version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
-	Thu, 25 Apr 2019 21:36:07 -0700 (PDT)
-From: Jon Doron <arilou@gmail.com>
-To: qemu-devel@nongnu.org
-Date: Fri, 26 Apr 2019 07:35:38 +0300
-Message-Id: <20190426043558.6888-2-arilou@gmail.com>
-X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20190426043558.6888-1-arilou@gmail.com>
-References: <20190426043558.6888-1-arilou@gmail.com>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
-	recognized.
-X-Received-From: 2a00:1450:4864:20::444
-Subject: [Qemu-devel] [PATCH v7 01/21] gdbstub: Add infrastructure to parse
- cmd packets
+	(envelope-from <pagupta@redhat.com>) id 1hJszD-0004IQ-Uj
+	for qemu-devel@nongnu.org; Fri, 26 Apr 2019 01:01:25 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:60866)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <pagupta@redhat.com>) id 1hJszD-0004Gu-Mk
+	for qemu-devel@nongnu.org; Fri, 26 Apr 2019 01:01:23 -0400
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+	[10.5.11.13])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 9B3EA30B482B;
+	Fri, 26 Apr 2019 05:01:22 +0000 (UTC)
+Received: from dhcp201-121.englab.pnq.redhat.com (unknown [10.65.16.97])
+	by smtp.corp.redhat.com (Postfix) with ESMTP id 55CD960923;
+	Fri, 26 Apr 2019 05:01:03 +0000 (UTC)
+From: Pankaj Gupta <pagupta@redhat.com>
+To: linux-nvdimm@lists.01.org, linux-kernel@vger.kernel.org,
+	virtualization@lists.linux-foundation.org, kvm@vger.kernel.org,
+	linux-fsdevel@vger.kernel.org, linux-acpi@vger.kernel.org,
+	qemu-devel@nongnu.org, linux-ext4@vger.kernel.org,
+	linux-xfs@vger.kernel.org
+Date: Fri, 26 Apr 2019 10:30:34 +0530
+Message-Id: <20190426050039.17460-2-pagupta@redhat.com>
+In-Reply-To: <20190426050039.17460-1-pagupta@redhat.com>
+References: <20190426050039.17460-1-pagupta@redhat.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+	(mx1.redhat.com [10.5.110.46]);
+	Fri, 26 Apr 2019 05:01:23 +0000 (UTC)
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 209.132.183.28
+Subject: [Qemu-devel] [PATCH v7 1/6] libnvdimm: nd_region flush callback
+ support
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -94,229 +70,259 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: alex.bennee@linaro.org, Jon Doron <arilou@gmail.com>
+Cc: pagupta@redhat.com, jack@suse.cz, mst@redhat.com, jasowang@redhat.com,
+	david@fromorbit.com, lcapitulino@redhat.com,
+	adilger.kernel@dilger.ca, zwisler@kernel.org,
+	aarcange@redhat.com, dave.jiang@intel.com,
+	darrick.wong@oracle.com, vishal.l.verma@intel.com,
+	david@redhat.com, willy@infradead.org, hch@infradead.org,
+	jmoyer@redhat.com, nilal@redhat.com, lenb@kernel.org,
+	kilobyte@angband.pl, riel@surriel.com, yuval.shaia@oracle.com,
+	stefanha@redhat.com, pbonzini@redhat.com,
+	dan.j.williams@intel.com, kwolf@redhat.com, tytso@mit.edu,
+	xiaoguangrong.eric@gmail.com, cohuck@redhat.com,
+	rjw@rjwysocki.net, imammedo@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 Content-Type: text/plain; charset="UTF-8"
-Message-ID: <20190426043538.FDdRpEF6FtnSV2K4u8u7l_5yyq9W8MC1UL52_CYyNAM@z>
+Message-ID: <20190426050034.G2szpZpX0HlvCNM2yAIPGVB5o09NyKh7z36mHZkNjKw@z>
 
-Signed-off-by: Jon Doron <arilou@gmail.com>
+This patch adds functionality to perform flush from guest
+to host over VIRTIO. We are registering a callback based
+on 'nd_region' type. virtio_pmem driver requires this special
+flush function. For rest of the region types we are registering
+existing flush function. Report error returned by host fsync
+failure to userspace.
+
+Signed-off-by: Pankaj Gupta <pagupta@redhat.com>
 ---
- gdbstub.c | 200 ++++++++++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 200 insertions(+)
+ drivers/acpi/nfit/core.c     |  4 ++--
+ drivers/nvdimm/claim.c       |  6 ++++--
+ drivers/nvdimm/nd.h          |  1 +
+ drivers/nvdimm/pmem.c        | 13 ++++++++-----
+ drivers/nvdimm/region_devs.c | 26 ++++++++++++++++++++++++--
+ include/linux/libnvdimm.h    |  8 +++++++-
+ 6 files changed, 46 insertions(+), 12 deletions(-)
 
-diff --git a/gdbstub.c b/gdbstub.c
-index d54abd17cc..d5e0f3878a 100644
---- a/gdbstub.c
-+++ b/gdbstub.c
-@@ -1268,6 +1268,206 @@ out:
-     return res;
+diff --git a/drivers/acpi/nfit/core.c b/drivers/acpi/nfit/core.c
+index 5a389a4f4f65..08dde76cf459 100644
+--- a/drivers/acpi/nfit/core.c
++++ b/drivers/acpi/nfit/core.c
+@@ -2434,7 +2434,7 @@ static void write_blk_ctl(struct nfit_blk *nfit_blk, unsigned int bw,
+ 		offset = to_interleave_offset(offset, mmio);
+ 
+ 	writeq(cmd, mmio->addr.base + offset);
+-	nvdimm_flush(nfit_blk->nd_region);
++	nvdimm_flush(nfit_blk->nd_region, NULL);
+ 
+ 	if (nfit_blk->dimm_flags & NFIT_BLK_DCR_LATCH)
+ 		readq(mmio->addr.base + offset);
+@@ -2483,7 +2483,7 @@ static int acpi_nfit_blk_single_io(struct nfit_blk *nfit_blk,
+ 	}
+ 
+ 	if (rw)
+-		nvdimm_flush(nfit_blk->nd_region);
++		nvdimm_flush(nfit_blk->nd_region, NULL);
+ 
+ 	rc = read_blk_stat(nfit_blk, lane) ? -EIO : 0;
+ 	return rc;
+diff --git a/drivers/nvdimm/claim.c b/drivers/nvdimm/claim.c
+index fb667bf469c7..13510bae1e6f 100644
+--- a/drivers/nvdimm/claim.c
++++ b/drivers/nvdimm/claim.c
+@@ -263,7 +263,7 @@ static int nsio_rw_bytes(struct nd_namespace_common *ndns,
+ 	struct nd_namespace_io *nsio = to_nd_namespace_io(&ndns->dev);
+ 	unsigned int sz_align = ALIGN(size + (offset & (512 - 1)), 512);
+ 	sector_t sector = offset >> 9;
+-	int rc = 0;
++	int rc = 0, ret = 0;
+ 
+ 	if (unlikely(!size))
+ 		return 0;
+@@ -301,7 +301,9 @@ static int nsio_rw_bytes(struct nd_namespace_common *ndns,
+ 	}
+ 
+ 	memcpy_flushcache(nsio->addr + offset, buf, size);
+-	nvdimm_flush(to_nd_region(ndns->dev.parent));
++	ret = nvdimm_flush(to_nd_region(ndns->dev.parent), NULL);
++	if (ret)
++		rc = ret;
+ 
+ 	return rc;
+ }
+diff --git a/drivers/nvdimm/nd.h b/drivers/nvdimm/nd.h
+index a5ac3b240293..0c74d2428bd7 100644
+--- a/drivers/nvdimm/nd.h
++++ b/drivers/nvdimm/nd.h
+@@ -159,6 +159,7 @@ struct nd_region {
+ 	struct badblocks bb;
+ 	struct nd_interleave_set *nd_set;
+ 	struct nd_percpu_lane __percpu *lane;
++	int (*flush)(struct nd_region *nd_region, struct bio *bio);
+ 	struct nd_mapping mapping[0];
+ };
+ 
+diff --git a/drivers/nvdimm/pmem.c b/drivers/nvdimm/pmem.c
+index bc2f700feef8..f719245da170 100644
+--- a/drivers/nvdimm/pmem.c
++++ b/drivers/nvdimm/pmem.c
+@@ -192,6 +192,7 @@ static blk_status_t pmem_do_bvec(struct pmem_device *pmem, struct page *page,
+ 
+ static blk_qc_t pmem_make_request(struct request_queue *q, struct bio *bio)
+ {
++	int ret = 0;
+ 	blk_status_t rc = 0;
+ 	bool do_acct;
+ 	unsigned long start;
+@@ -201,7 +202,7 @@ static blk_qc_t pmem_make_request(struct request_queue *q, struct bio *bio)
+ 	struct nd_region *nd_region = to_region(pmem);
+ 
+ 	if (bio->bi_opf & REQ_PREFLUSH)
+-		nvdimm_flush(nd_region);
++		ret = nvdimm_flush(nd_region, bio);
+ 
+ 	do_acct = nd_iostat_start(bio, &start);
+ 	bio_for_each_segment(bvec, bio, iter) {
+@@ -216,7 +217,10 @@ static blk_qc_t pmem_make_request(struct request_queue *q, struct bio *bio)
+ 		nd_iostat_end(bio, start);
+ 
+ 	if (bio->bi_opf & REQ_FUA)
+-		nvdimm_flush(nd_region);
++		ret = nvdimm_flush(nd_region, bio);
++
++	if (ret)
++		bio->bi_status = errno_to_blk_status(ret);
+ 
+ 	bio_endio(bio);
+ 	return BLK_QC_T_NONE;
+@@ -469,7 +473,6 @@ static int pmem_attach_disk(struct device *dev,
+ 	}
+ 	dax_write_cache(dax_dev, nvdimm_has_cache(nd_region));
+ 	pmem->dax_dev = dax_dev;
+-
+ 	gendev = disk_to_dev(disk);
+ 	gendev->groups = pmem_attribute_groups;
+ 
+@@ -527,14 +530,14 @@ static int nd_pmem_remove(struct device *dev)
+ 		sysfs_put(pmem->bb_state);
+ 		pmem->bb_state = NULL;
+ 	}
+-	nvdimm_flush(to_nd_region(dev->parent));
++	nvdimm_flush(to_nd_region(dev->parent), NULL);
+ 
+ 	return 0;
  }
  
-+typedef union GdbCmdVariant {
-+    const char *data;
-+    uint8_t opcode;
-+    unsigned long val_ul;
-+    unsigned long long val_ull;
-+    struct {
-+        GDBThreadIdKind kind;
-+        uint32_t pid;
-+        uint32_t tid;
-+    } thread_id;
-+} GdbCmdVariant;
-+
-+static const char *cmd_next_param(const char *param, const char delimiter)
-+{
-+    static const char all_delimiters[] = ",;:=";
-+    char curr_delimiters[2] = {0};
-+    const char *delimiters;
-+
-+    if (delimiter == '?') {
-+        delimiters = all_delimiters;
-+    } else if (delimiter == '0') {
-+        return strchr(param, '\0');
-+    } else if (delimiter == '.' && *param) {
-+        return param + 1;
-+    } else {
-+        curr_delimiters[0] = delimiter;
-+        delimiters = curr_delimiters;
-+    }
-+
-+    param += strcspn(param, delimiters);
-+    if (*param) {
-+        param++;
-+    }
-+    return param;
-+}
-+
-+static int cmd_parse_params(const char *data, const char *schema,
-+                            GdbCmdVariant *params, int *num_params)
-+{
-+    int curr_param;
-+    const char *curr_schema, *curr_data;
-+
-+    *num_params = 0;
-+
-+    if (!schema) {
-+        return 0;
-+    }
-+
-+    curr_schema = schema;
-+    curr_param = 0;
-+    curr_data = data;
-+    while (curr_schema[0] && curr_schema[1] && *curr_data) {
-+        switch (curr_schema[0]) {
-+        case 'l':
-+            if (qemu_strtoul(curr_data, &curr_data, 16,
-+                             &params[curr_param].val_ul)) {
-+                return -EINVAL;
-+            }
-+            curr_param++;
-+            curr_data = cmd_next_param(curr_data, curr_schema[1]);
-+            break;
-+        case 'L':
-+            if (qemu_strtou64(curr_data, &curr_data, 16,
-+                              (uint64_t *)&params[curr_param].val_ull)) {
-+                return -EINVAL;
-+            }
-+            curr_param++;
-+            curr_data = cmd_next_param(curr_data, curr_schema[1]);
-+            break;
-+        case 's':
-+            params[curr_param].data = curr_data;
-+            curr_param++;
-+            curr_data = cmd_next_param(curr_data, curr_schema[1]);
-+            break;
-+        case 'o':
-+            params[curr_param].opcode = *(uint8_t *)curr_data;
-+            curr_param++;
-+            curr_data = cmd_next_param(curr_data, curr_schema[1]);
-+            break;
-+        case 't':
-+            params[curr_param].thread_id.kind =
-+                read_thread_id(curr_data, &curr_data,
-+                               &params[curr_param].thread_id.pid,
-+                               &params[curr_param].thread_id.tid);
-+            curr_param++;
-+            curr_data = cmd_next_param(curr_data, curr_schema[1]);
-+            break;
-+        case '?':
-+            curr_data = cmd_next_param(curr_data, curr_schema[1]);
-+            break;
-+        default:
-+            return -EINVAL;
-+        }
-+        curr_schema += 2;
-+    }
-+
-+    *num_params = curr_param;
-+    return 0;
-+}
-+
-+typedef struct GdbCmdContext {
-+    GDBState *s;
-+    GdbCmdVariant *params;
-+    int num_params;
-+    uint8_t mem_buf[MAX_PACKET_LENGTH];
-+    char str_buf[MAX_PACKET_LENGTH + 1];
-+} GdbCmdContext;
-+
-+typedef void (*GdbCmdHandler)(GdbCmdContext *gdb_ctx, void *user_ctx);
-+
-+/*
-+ * cmd_startswith -> cmd is compared using startswith
-+ *
-+ *
-+ * schema definitions:
-+ * Each schema parameter entry consists of 2 chars,
-+ * the first char represents the parameter type handling
-+ * the second char represents the delimiter for the next parameter
-+ *
-+ * Currently supported schema types:
-+ * 'l' -> unsigned long (stored in .val_ul)
-+ * 'L' -> unsigned long long (stored in .val_ull)
-+ * 's' -> string (stored in .data)
-+ * 'o' -> single char (stored in .opcode)
-+ * 't' -> thread id (stored in .thread_id)
-+ * '?' -> skip according to delimiter
-+ *
-+ * Currently supported delimiters:
-+ * '?' -> Stop at any delimiter (",;:=\0")
-+ * '0' -> Stop at "\0"
-+ * '.' -> Skip 1 char unless reached "\0"
-+ * Any other value is treated as the delimiter value itself
-+ */
-+typedef struct GdbCmdParseEntry {
-+    GdbCmdHandler handler;
-+    const char *cmd;
-+    union {
-+        int flags;
-+        struct {
-+            int cmd_startswith:1;
-+        };
-+    };
-+    const char *schema;
-+} GdbCmdParseEntry;
-+
-+static inline int startswith(const char *string, const char *pattern)
-+{
-+  return !strncmp(string, pattern, strlen(pattern));
-+}
-+
-+static int process_string_cmd(
-+        GDBState *s, void *user_ctx, const char *data,
-+        const GdbCmdParseEntry *cmds, int num_cmds)
-+        __attribute__((unused));
-+
-+static int process_string_cmd(GDBState *s, void *user_ctx, const char *data,
-+                              const GdbCmdParseEntry *cmds, int num_cmds)
-+{
-+    int i, schema_len, max_num_params = 0;
-+    GdbCmdContext gdb_ctx;
-+
-+    if (!cmds) {
-+        return -1;
-+    }
-+
-+    for (i = 0; i < num_cmds; i++) {
-+        const GdbCmdParseEntry *cmd = &cmds[i];
-+        g_assert(cmd->handler && cmd->cmd);
-+
-+        if ((cmd->cmd_startswith && !startswith(data, cmd->cmd)) ||
-+            (!cmd->cmd_startswith && strcmp(cmd->cmd, data))) {
-+            continue;
-+        }
-+
-+        if (cmd->schema) {
-+            schema_len = strlen(cmd->schema);
-+            if (schema_len % 2) {
-+                return -2;
-+            }
-+
-+            max_num_params = schema_len / 2;
-+        }
-+
-+        gdb_ctx.params =
-+            (GdbCmdVariant *)alloca(sizeof(*gdb_ctx.params) * max_num_params);
-+        memset(gdb_ctx.params, 0, sizeof(*gdb_ctx.params) * max_num_params);
-+
-+        if (cmd_parse_params(&data[strlen(cmd->cmd)], cmd->schema,
-+                             gdb_ctx.params, &gdb_ctx.num_params)) {
-+            return -1;
-+        }
-+
-+        gdb_ctx.s = s;
-+        cmd->handler(&gdb_ctx, user_ctx);
-+        return 0;
-+    }
-+
-+    return -1;
-+}
-+
- static int gdb_handle_packet(GDBState *s, const char *line_buf)
+ static void nd_pmem_shutdown(struct device *dev)
  {
-     CPUState *cpu;
+-	nvdimm_flush(to_nd_region(dev->parent));
++	nvdimm_flush(to_nd_region(dev->parent), NULL);
+ }
+ 
+ static void nd_pmem_notify(struct device *dev, enum nvdimm_event event)
+diff --git a/drivers/nvdimm/region_devs.c b/drivers/nvdimm/region_devs.c
+index b4ef7d9ff22e..e5b59708865e 100644
+--- a/drivers/nvdimm/region_devs.c
++++ b/drivers/nvdimm/region_devs.c
+@@ -295,7 +295,9 @@ static ssize_t deep_flush_store(struct device *dev, struct device_attribute *att
+ 		return rc;
+ 	if (!flush)
+ 		return -EINVAL;
+-	nvdimm_flush(nd_region);
++	rc = nvdimm_flush(nd_region, NULL);
++	if (rc)
++		return rc;
+ 
+ 	return len;
+ }
+@@ -1085,6 +1087,11 @@ static struct nd_region *nd_region_create(struct nvdimm_bus *nvdimm_bus,
+ 	dev->of_node = ndr_desc->of_node;
+ 	nd_region->ndr_size = resource_size(ndr_desc->res);
+ 	nd_region->ndr_start = ndr_desc->res->start;
++	if (ndr_desc->flush)
++		nd_region->flush = ndr_desc->flush;
++	else
++		nd_region->flush = NULL;
++
+ 	nd_device_register(dev);
+ 
+ 	return nd_region;
+@@ -1125,11 +1132,24 @@ struct nd_region *nvdimm_volatile_region_create(struct nvdimm_bus *nvdimm_bus,
+ }
+ EXPORT_SYMBOL_GPL(nvdimm_volatile_region_create);
+ 
++int nvdimm_flush(struct nd_region *nd_region, struct bio *bio)
++{
++	int rc = 0;
++
++	if (!nd_region->flush)
++		rc = generic_nvdimm_flush(nd_region);
++	else {
++		if (nd_region->flush(nd_region, bio))
++			rc = -EIO;
++	}
++
++	return rc;
++}
+ /**
+  * nvdimm_flush - flush any posted write queues between the cpu and pmem media
+  * @nd_region: blk or interleaved pmem region
+  */
+-void nvdimm_flush(struct nd_region *nd_region)
++int generic_nvdimm_flush(struct nd_region *nd_region)
+ {
+ 	struct nd_region_data *ndrd = dev_get_drvdata(&nd_region->dev);
+ 	int i, idx;
+@@ -1153,6 +1173,8 @@ void nvdimm_flush(struct nd_region *nd_region)
+ 		if (ndrd_get_flush_wpq(ndrd, i, 0))
+ 			writeq(1, ndrd_get_flush_wpq(ndrd, i, idx));
+ 	wmb();
++
++	return 0;
+ }
+ EXPORT_SYMBOL_GPL(nvdimm_flush);
+ 
+diff --git a/include/linux/libnvdimm.h b/include/linux/libnvdimm.h
+index feb342d026f2..a5f369ec3726 100644
+--- a/include/linux/libnvdimm.h
++++ b/include/linux/libnvdimm.h
+@@ -65,6 +65,9 @@ enum {
+ 	 */
+ 	ND_REGION_PERSIST_MEMCTRL = 2,
+ 
++	/* Platform provides asynchronous flush mechanism */
++	ND_REGION_ASYNC = 3,
++
+ 	/* mark newly adjusted resources as requiring a label update */
+ 	DPA_RESOURCE_ADJUSTED = 1 << 0,
+ };
+@@ -121,6 +124,7 @@ struct nd_mapping_desc {
+ 	int position;
+ };
+ 
++struct nd_region;
+ struct nd_region_desc {
+ 	struct resource *res;
+ 	struct nd_mapping_desc *mapping;
+@@ -133,6 +137,7 @@ struct nd_region_desc {
+ 	int target_node;
+ 	unsigned long flags;
+ 	struct device_node *of_node;
++	int (*flush)(struct nd_region *nd_region, struct bio *bio);
+ };
+ 
+ struct device;
+@@ -260,7 +265,8 @@ unsigned long nd_blk_memremap_flags(struct nd_blk_region *ndbr);
+ unsigned int nd_region_acquire_lane(struct nd_region *nd_region);
+ void nd_region_release_lane(struct nd_region *nd_region, unsigned int lane);
+ u64 nd_fletcher64(void *addr, size_t len, bool le);
+-void nvdimm_flush(struct nd_region *nd_region);
++int nvdimm_flush(struct nd_region *nd_region, struct bio *bio);
++int generic_nvdimm_flush(struct nd_region *nd_region);
+ int nvdimm_has_flush(struct nd_region *nd_region);
+ int nvdimm_has_cache(struct nd_region *nd_region);
+ int nvdimm_in_overwrite(struct nvdimm *nvdimm);
 -- 
 2.20.1
 
