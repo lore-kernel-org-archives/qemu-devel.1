@@ -2,70 +2,69 @@ Return-Path: <SRS0=QtPl=S4=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B3BD2C43218
-	for <qemu-devel@archiver.kernel.org>; Fri, 26 Apr 2019 16:44:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E9487C43218
+	for <qemu-devel@archiver.kernel.org>; Fri, 26 Apr 2019 16:54:35 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6794E20679
-	for <qemu-devel@archiver.kernel.org>; Fri, 26 Apr 2019 16:44:49 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6794E20679
+	by mail.kernel.org (Postfix) with ESMTPS id BE212206E0
+	for <qemu-devel@archiver.kernel.org>; Fri, 26 Apr 2019 16:54:35 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BE212206E0
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:49556 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:49629 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hK3xw-0001uo-Mr
-	for qemu-devel@archiver.kernel.org; Fri, 26 Apr 2019 12:44:48 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:39420)
+	id 1hK47O-0005Zv-UL
+	for qemu-devel@archiver.kernel.org; Fri, 26 Apr 2019 12:54:34 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:41747)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <lersek@redhat.com>) id 1hK3x3-0001XR-Q7
-	for qemu-devel@nongnu.org; Fri, 26 Apr 2019 12:43:54 -0400
+	(envelope-from <lersek@redhat.com>) id 1hK46b-0005ED-Ff
+	for qemu-devel@nongnu.org; Fri, 26 Apr 2019 12:53:46 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <lersek@redhat.com>) id 1hK3x2-0004on-Mw
-	for qemu-devel@nongnu.org; Fri, 26 Apr 2019 12:43:53 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:48418)
+	(envelope-from <lersek@redhat.com>) id 1hK46a-000377-9y
+	for qemu-devel@nongnu.org; Fri, 26 Apr 2019 12:53:45 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:45884)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <lersek@redhat.com>)
-	id 1hK3x0-0004iy-1l; Fri, 26 Apr 2019 12:43:50 -0400
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
-	[10.5.11.11])
+	(Exim 4.71) (envelope-from <lersek@redhat.com>) id 1hK46Y-00033L-TF
+	for qemu-devel@nongnu.org; Fri, 26 Apr 2019 12:53:43 -0400
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+	[10.5.11.12])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 98FFB308B251;
-	Fri, 26 Apr 2019 16:43:47 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id 6AEBBC085524;
+	Fri, 26 Apr 2019 16:53:41 +0000 (UTC)
 Received: from lacos-laptop-7.usersys.redhat.com (ovpn-121-104.rdu2.redhat.com
 	[10.10.121.104])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id 11A99600C5;
-	Fri, 26 Apr 2019 16:43:37 +0000 (UTC)
-To: Thomas Huth <thuth@redhat.com>,
-	Wainer dos Santos Moschetta <wainersm@redhat.com>, qemu-devel@nongnu.org
-References: <20190424103747.10173-1-thuth@redhat.com>
-	<20190424103747.10173-5-thuth@redhat.com>
-	<f9dc291b-7ba2-c6b8-33aa-c8fa3c6d4950@redhat.com>
-	<0300c8cc-d73c-b919-13f7-59f3218a609f@redhat.com>
+	by smtp.corp.redhat.com (Postfix) with ESMTP id 0CCA160E3D;
+	Fri, 26 Apr 2019 16:53:34 +0000 (UTC)
+To: Gerd Hoffmann <kraxel@redhat.com>, Li Qiang <liq3ea@gmail.com>
+References: <20190420100056.116305-1-liq3ea@163.com>
+	<20190420100056.116305-4-liq3ea@163.com>
+	<a27cd912-4f58-55ac-1aae-e4999fa3d84d@redhat.com>
+	<CAKXe6SJZWs7HtXutX6W3saDhaNDtVPMQEh2+s+9XiM3TtZqLdQ@mail.gmail.com>
+	<20190425081519.n4leez6sz2wlvpla@sirius.home.kraxel.org>
 From: Laszlo Ersek <lersek@redhat.com>
-Message-ID: <13ecf357-d43c-ecc6-012e-bed62008677d@redhat.com>
-Date: Fri, 26 Apr 2019 18:43:36 +0200
+Message-ID: <e5087d25-fc45-84e9-db61-5a4c38f69c74@redhat.com>
+Date: Fri, 26 Apr 2019 18:53:33 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:52.0) Gecko/20100101
 	Thunderbird/52.9.1
 MIME-Version: 1.0
-In-Reply-To: <0300c8cc-d73c-b919-13f7-59f3218a609f@redhat.com>
+In-Reply-To: <20190425081519.n4leez6sz2wlvpla@sirius.home.kraxel.org>
 Content-Type: text/plain; charset="UTF-8"
 Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.47]);
-	Fri, 26 Apr 2019 16:43:47 +0000 (UTC)
+	(mx1.redhat.com [10.5.110.32]);
+	Fri, 26 Apr 2019 16:53:41 +0000 (UTC)
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH 4/6] cirrus / travis: Add gnu-sed and bash
- for macOS and FreeBSD
+Subject: Re: [Qemu-devel] [PATCH 3/4] tests: fw_cfg: add reboot_timeout test
+ case
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -77,63 +76,37 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Fam Zheng <fam@euphon.net>, Kevin Wolf <kwolf@redhat.com>,
-	Ed Maste <emaste@freebsd.org>, qemu-block@nongnu.org,
-	Peter Maydell <peter.maydell@linaro.org>,
-	=?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
-	Max Reitz <mreitz@redhat.com>,
-	=?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>,
-	Li-Wen Hsu <lwhsu@freebsd.org>
+Cc: lvivier@redhat.com, Thomas Huth <thuth@redhat.com>,
+	Li Qiang <liq3ea@163.com>, Qemu Developers <qemu-devel@nongnu.org>,
+	Paolo Bonzini <pbonzini@redhat.com>,
+	=?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190426164336.e4RLoTN3k0WW5_wAjGf3ZNXucVNzV9dvPUxmjsAIWhc@z>
+Message-ID: <20190426165333.oQHZloC9CQUn1FbM1WaJ593wFgO5mxTKzfmgjuJMpdc@z>
 
-(+Dan)
-
-On 04/25/19 08:00, Thomas Huth wrote:
-> On 24/04/2019 23.29, Wainer dos Santos Moschetta wrote:
->> Hello Thomas,
+On 04/25/19 10:15, Gerd Hoffmann wrote:
+> On Wed, Apr 24, 2019 at 09:16:56AM +0800, Li Qiang wrote:
+>> Thomas Huth <thuth@redhat.com> =E4=BA=8E2019=E5=B9=B44=E6=9C=8824=E6=97=
+=A5=E5=91=A8=E4=B8=89 =E4=B8=8A=E5=8D=8812:29=E5=86=99=E9=81=93=EF=BC=9A
 >>
->> On 04/24/2019 07:37 AM, Thomas Huth wrote:
->>> We are going to enable the qemu-iotests during "make check" again,
->>> and for running the iotests, we need bash and gnu-sed.
->>>
->>> Signed-off-by: Thomas Huth <thuth@redhat.com>
->>> ---
->>> =C2=A0 .cirrus.yml | 4 ++--
->>> =C2=A0 .travis.yml | 1 +
->>> =C2=A0 2 files changed, 3 insertions(+), 2 deletions(-)
+>>> Is this endianess-safe? Or do you need to byteswap reboot_timeout if =
+the
+>>> host and guest endianess does not match?
 >>
->> It needs to get the Freebsd image [1] updated too, in order to `make
->> BUILD_TARGET=3Dcheck vm-build-freebsd` passes. Here it failed with:
->> ---
->> env: bash: No such file or directory
->> gmake: *** [/var/tmp/qemu-test.6OlDFH/tests/Makefile.include:1101:
->> check-tests/qemu-iotests-quick.sh] Error 1
->> gmake: *** Waiting for unfinished jobs....
->> ---
+>> Good question!
 >>
->> I'm not sure about the netbsd and openbsd images, they might need bash
->> and gnu-sed as well.
+>> IIUC, the qemu fw_cfg store the 'file' entry data just in byte stream.
 >=20
-> D'oh! Does anybody know what are the correct steps to update these imag=
-es?
+> No.  Integers are defined to be little endian.  See fw_cfg_add_i64() fo=
+r
+> example, there is an explicit cpu_to_le64() call for that.
 
-(1) make the OPENBSD subsystem maintainer care
-
-(2) update <https://wiki.qemu.org/Hosts/BSD>
-
-(3) download the image from download.patchew.org, boot it and update it
-
-(4) upload the image to download.patchew.org
-
-(5) update the "tests/vm/openbsd" script in the QEMU tree in sync
-(checksums, commands etc)
-
-
-I'm fairly sure (1) is necessary; the rest is more or less guesswork on
-my part.
+Endianness may be defined on a case-by-case basis (i.e. if you introduce
+a new named fw_cfg file, you can make its contents whatever you like);
+however, the integer-adding/modifying helper functions do express a
+preference for endianness. Search "include/hw/nvram/fw_cfg.h" for "endian=
+".
 
 Thanks
 Laszlo
