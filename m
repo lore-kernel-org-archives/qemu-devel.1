@@ -1,26 +1,24 @@
-Received: from eggs.gnu.org ([209.51.188.92]:45676)
+Received: from eggs.gnu.org ([209.51.188.92]:47889)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <lersek@redhat.com>) id 1hK4OK-0004wr-8P
-	for qemu-devel@nongnu.org; Fri, 26 Apr 2019 13:12:05 -0400
+	(envelope-from <richard.henderson@linaro.org>) id 1hK4aI-0008Nn-R6
+	for qemu-devel@nongnu.org; Fri, 26 Apr 2019 13:24:27 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <lersek@redhat.com>) id 1hK4OJ-0002zn-3S
-	for qemu-devel@nongnu.org; Fri, 26 Apr 2019 13:12:04 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:26808)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <lersek@redhat.com>) id 1hK4OI-0002yf-Rl
-	for qemu-devel@nongnu.org; Fri, 26 Apr 2019 13:12:03 -0400
-References: <1556170489-131927-1-git-send-email-imammedo@redhat.com>
-	<1556170489-131927-12-git-send-email-imammedo@redhat.com>
-From: Laszlo Ersek <lersek@redhat.com>
-Message-ID: <0676f7d1-5d75-8ff8-a75b-a9ce01a65741@redhat.com>
-Date: Fri, 26 Apr 2019 19:11:50 +0200
+	(envelope-from <richard.henderson@linaro.org>) id 1hK4aH-00066a-Gs
+	for qemu-devel@nongnu.org; Fri, 26 Apr 2019 13:24:26 -0400
+Received: from mail-pg1-x531.google.com ([2607:f8b0:4864:20::531]:44935)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+	id 1hK4aH-0005yZ-8n
+	for qemu-devel@nongnu.org; Fri, 26 Apr 2019 13:24:25 -0400
+Received: by mail-pg1-x531.google.com with SMTP id z16so1922467pgv.11
+	for <qemu-devel@nongnu.org>; Fri, 26 Apr 2019 10:24:25 -0700 (PDT)
+From: Richard Henderson <richard.henderson@linaro.org>
+Date: Fri, 26 Apr 2019 10:24:06 -0700
+Message-Id: <20190426172421.27133-1-richard.henderson@linaro.org>
 MIME-Version: 1.0
-In-Reply-To: <1556170489-131927-12-git-send-email-imammedo@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v3 11/13] tests: acpi: add simple arm/virt
- testcase
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Subject: [Qemu-devel] [PULL 00/15] tcg patch queue
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,92 +27,97 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Igor Mammedov <imammedo@redhat.com>, qemu-devel@nongnu.org
-Cc: "Michael S. Tsirkin" <mst@redhat.com>, Gonglei <arei.gonglei@huawei.com>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>, Shannon Zhao <shannon.zhaosl@gmail.com>, Wei Yang <richardw.yang@linux.intel.com>, Andrew Jones <drjones@redhat.com>, Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>, Ben Warren <ben@skyportsystems.com>
+To: qemu-devel@nongnu.org
+Cc: peter.maydell@linaro.org
 
-On 04/25/19 07:34, Igor Mammedov wrote:
-> adds simple arm/virt test case that starts guest with
-> bios-tables-test.aarch64.iso.qcow2 boot image which
-> initializes UefiTestSupport* structure in RAM once
-> guest is booted.
->=20
->  * see commit: tests: acpi: add acpi_find_rsdp_address_uefi() helper
->=20
-> Signed-off-by: Igor Mammedov <imammedo@redhat.com>
-> Reviewed-by: Laszlo Ersek <lersek@redhat.com>
-> Reviewed-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
-> ---
-> v3:
->   * use firmware blobs directly from pc-bios directory
->   * use bios-tables-test.aarch64.iso.qcow2 as test boot image
->   * drop leftover qtest-uefi-images-aarch64 iMakefile rule from
->     previos version (Laszlo)
->   * add Makefile rule to include bios-tables-test into
->     check-qtest-aarch64 target
-> v2:
->   * specify in test_data where board's RAM starts and RAM size
-> ---
->  tests/Makefile.include   |  1 +
->  tests/bios-tables-test.c | 17 +++++++++++++++++
->  2 files changed, 18 insertions(+)
->=20
-> diff --git a/tests/Makefile.include b/tests/Makefile.include
-> index e2432d5..983c8b1 100644
-> --- a/tests/Makefile.include
-> +++ b/tests/Makefile.include
-> @@ -267,6 +267,7 @@ check-qtest-arm-y +=3D tests/hexloader-test$(EXESUF=
-)
->  check-qtest-aarch64-y =3D tests/numa-test$(EXESUF)
->  check-qtest-aarch64-y +=3D tests/boot-serial-test$(EXESUF)
->  check-qtest-aarch64-y +=3D tests/migration-test$(EXESUF)
-> +check-qtest-aarch64-y +=3D tests/bios-tables-test$(EXESUF)
-> =20
->  check-qtest-microblazeel-y +=3D $(check-qtest-microblaze-y)
-> =20
-> diff --git a/tests/bios-tables-test.c b/tests/bios-tables-test.c
-> index 1be55a1..f117461 100644
-> --- a/tests/bios-tables-test.c
-> +++ b/tests/bios-tables-test.c
-> @@ -812,6 +812,21 @@ static void test_acpi_piix4_tcg_dimm_pxm(void)
->      test_acpi_tcg_dimm_pxm(MACHINE_PC);
->  }
-> =20
-> +static void test_acpi_virt_tcg(void)
-> +{
-> +    test_data data =3D {
-> +        .machine =3D "virt",
-> +        .uefi_fl1 =3D "pc-bios/edk2-aarch64-code.fd",
-> +        .uefi_fl2 =3D "pc-bios/edk2-arm-vars.fd",
-> +        .cd =3D "tests/data/uefi-boot-images/bios-tables-test.aarch64.=
-iso.qcow2",
-> +        .ram_start =3D 0x40000000ULL,
-> +        .scan_len =3D 128ULL * 1024 * 1024,
-> +    };
-> +
-> +    test_acpi_one("-cpu cortex-a57 ", &data);
-> +    free_test_data(&data);
-> +}
-> +
->  int main(int argc, char *argv[])
->  {
->      const char *arch =3D qtest_get_arch();
-> @@ -840,6 +855,8 @@ int main(int argc, char *argv[])
->          qtest_add_func("acpi/q35/numamem", test_acpi_q35_tcg_numamem);
->          qtest_add_func("acpi/piix4/dimmpxm", test_acpi_piix4_tcg_dimm_=
-pxm);
->          qtest_add_func("acpi/q35/dimmpxm", test_acpi_q35_tcg_dimm_pxm)=
-;
-> +    } else if (strcmp(arch, "aarch64") =3D=3D 0) {
-> +        qtest_add_func("acpi/virt", test_acpi_virt_tcg);
->      }
->      ret =3D g_test_run();
->      boot_sector_cleanup(disk);
->=20
+The following changes since commit 3284aa128153750f14a61e8a96fd085e6f2999b6:
 
-Looks good, my R-b stands.
+  Merge remote-tracking branch 'remotes/lersek/tags/edk2-pull-2019-04-22' into staging (2019-04-24 13:19:41 +0100)
 
-(Please let me know if you want me to look at other patches in the
-series... struggling again with email bankruptcy...)
+are available in the Git repository at:
 
-Thanks!
-Laszlo
+  https://github.com/rth7680/qemu.git tags/pull-tcg-20190426
+
+for you to fetch changes up to ef5dae6805cce7b59d129d801bdc5db71bcbd60d:
+
+  cputlb: Fix io_readx() to respect the access_type (2019-04-25 10:40:06 -0700)
+
+----------------------------------------------------------------
+Add tcg_gen_extract2_*.
+Deal with overflow of TranslationBlocks.
+Respect access_type in io_readx.
+
+----------------------------------------------------------------
+David Hildenbrand (1):
+      tcg: Implement tcg_gen_extract2_{i32,i64}
+
+Richard Henderson (13):
+      tcg: Add INDEX_op_extract2_{i32,i64}
+      tcg: Use deposit and extract2 in tcg_gen_shifti_i64
+      tcg: Use extract2 in tcg_gen_deposit_{i32,i64}
+      tcg/i386: Support INDEX_op_extract2_{i32,i64}
+      tcg/arm: Support INDEX_op_extract2_i32
+      tcg/aarch64: Support INDEX_op_extract2_{i32,i64}
+      tcg: Hoist max_insns computation to tb_gen_code
+      tcg: Restart after TB code generation overflow
+      tcg: Restart TB generation after relocation overflow
+      tcg: Restart TB generation after constant pool overflow
+      tcg: Restart TB generation after out-of-line ldst overflow
+      tcg/ppc: Allow the constant pool to overflow at 32k
+      tcg/arm: Restrict constant pool displacement to 12 bits
+
+Shahab Vahedi (1):
+      cputlb: Fix io_readx() to respect the access_type
+
+ include/exec/exec-all.h       |   4 +-
+ include/exec/translator.h     |   3 +-
+ tcg/aarch64/tcg-target.h      |   2 +
+ tcg/arm/tcg-target.h          |   1 +
+ tcg/i386/tcg-target.h         |   2 +
+ tcg/mips/tcg-target.h         |   2 +
+ tcg/ppc/tcg-target.h          |   2 +
+ tcg/riscv/tcg-target.h        |   2 +
+ tcg/s390/tcg-target.h         |   2 +
+ tcg/sparc/tcg-target.h        |   2 +
+ tcg/tcg-op.h                  |   6 ++
+ tcg/tcg-opc.h                 |   2 +
+ tcg/tcg.h                     |  16 +++---
+ tcg/tci/tcg-target.h          |   2 +
+ accel/tcg/cputlb.c            |   5 +-
+ accel/tcg/translate-all.c     |  53 ++++++++++++++---
+ accel/tcg/translator.c        |  15 +----
+ target/alpha/translate.c      |   4 +-
+ target/arm/translate.c        |   4 +-
+ target/cris/translate.c       |  10 +---
+ target/hppa/translate.c       |   5 +-
+ target/i386/translate.c       |   4 +-
+ target/lm32/translate.c       |  10 +---
+ target/m68k/translate.c       |   4 +-
+ target/microblaze/translate.c |  10 +---
+ target/mips/translate.c       |   4 +-
+ target/moxie/translate.c      |  11 +---
+ target/nios2/translate.c      |  14 +----
+ target/openrisc/translate.c   |   4 +-
+ target/ppc/translate.c        |   4 +-
+ target/riscv/translate.c      |   4 +-
+ target/s390x/translate.c      |   4 +-
+ target/sh4/translate.c        |   4 +-
+ target/sparc/translate.c      |   4 +-
+ target/tilegx/translate.c     |  12 +---
+ target/tricore/translate.c    |  16 +-----
+ target/unicore32/translate.c  |  10 +---
+ target/xtensa/translate.c     |   4 +-
+ tcg/aarch64/tcg-target.inc.c  |  27 +++++++--
+ tcg/arm/tcg-target.inc.c      |  98 ++++++++++++++++++--------------
+ tcg/i386/tcg-target.inc.c     |  17 +++++-
+ tcg/mips/tcg-target.inc.c     |   6 +-
+ tcg/optimize.c                |  16 ++++++
+ tcg/ppc/tcg-target.inc.c      |  42 +++++++-------
+ tcg/riscv/tcg-target.inc.c    |  16 ++++--
+ tcg/s390/tcg-target.inc.c     |  20 ++++---
+ tcg/tcg-ldst.inc.c            |  18 +++---
+ tcg/tcg-op.c                  | 129 +++++++++++++++++++++++++++++++++---------
+ tcg/tcg-pool.inc.c            |  12 ++--
+ tcg/tcg.c                     |  85 +++++++++++++++-------------
+ tcg/README                    |   7 +++
+ 51 files changed, 451 insertions(+), 309 deletions(-)
