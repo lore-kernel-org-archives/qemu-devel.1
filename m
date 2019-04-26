@@ -3,48 +3,48 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
 X-Spam-Status: No, score=-0.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+	MAILING_LIST_MULTI,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B09A1C43219
-	for <qemu-devel@archiver.kernel.org>; Fri, 26 Apr 2019 07:59:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 15678C43218
+	for <qemu-devel@archiver.kernel.org>; Fri, 26 Apr 2019 08:03:06 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 84A6D206BA
-	for <qemu-devel@archiver.kernel.org>; Fri, 26 Apr 2019 07:59:34 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 84A6D206BA
+	by mail.kernel.org (Postfix) with ESMTPS id C9956206BA
+	for <qemu-devel@archiver.kernel.org>; Fri, 26 Apr 2019 08:03:05 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C9956206BA
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:41324 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:41954 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hJvld-0007ck-9R
-	for qemu-devel@archiver.kernel.org; Fri, 26 Apr 2019 03:59:33 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:59254)
+	id 1hJvp2-0002nu-Sy
+	for qemu-devel@archiver.kernel.org; Fri, 26 Apr 2019 04:03:04 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:59734)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1hJvkZ-0006gK-La
-	for qemu-devel@nongnu.org; Fri, 26 Apr 2019 03:58:28 -0400
+	(envelope-from <pbonzini@redhat.com>) id 1hJvlh-0007Is-Ce
+	for qemu-devel@nongnu.org; Fri, 26 Apr 2019 03:59:41 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1hJvjT-0001My-L9
-	for qemu-devel@nongnu.org; Fri, 26 Apr 2019 03:57:21 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:38038)
+	(envelope-from <pbonzini@redhat.com>) id 1hJveV-0003d5-CL
+	for qemu-devel@nongnu.org; Fri, 26 Apr 2019 03:52:22 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:54056)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1hJvjP-0001J1-NP
-	for qemu-devel@nongnu.org; Fri, 26 Apr 2019 03:57:17 -0400
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
-	[10.5.11.12])
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1hJveU-0003Xd-GC
+	for qemu-devel@nongnu.org; Fri, 26 Apr 2019 03:52:11 -0400
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+	[10.5.11.16])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 6611037EEA;
-	Fri, 26 Apr 2019 07:57:14 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id 34A9030B2371;
+	Fri, 26 Apr 2019 07:52:08 +0000 (UTC)
 Received: from [10.36.112.23] (ovpn-112-23.ams2.redhat.com [10.36.112.23])
-	by smtp.corp.redhat.com (Postfix) with ESMTPS id EACC560BE5;
-	Fri, 26 Apr 2019 07:57:08 +0000 (UTC)
-To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
-	Chen Zhang <tgfbeta@me.com>, Richard Henderson <rth@twiddle.net>,
-	Eduardo Habkost <ehabkost@redhat.com>
-References: <087F1D9C-109D-41D1-BE2C-CE5D840C981B@me.com>
-	<8a9008f1-34f7-ecb8-9ccb-c129f56236ec@redhat.com>
+	by smtp.corp.redhat.com (Postfix) with ESMTPS id DE7E35C219;
+	Fri, 26 Apr 2019 07:52:02 +0000 (UTC)
+To: =?UTF-8?Q?Daniel_P=2e_Berrang=c3=a9?= <berrange@redhat.com>,
+	Alberto Garcia <berto@igalia.com>
+References: <cover.1550842915.git.berto@igalia.com>
+	<20190423165501.GA27867@redhat.com>
 From: Paolo Bonzini <pbonzini@redhat.com>
 Openpgp: preference=signencrypt
 Autocrypt: addr=pbonzini@redhat.com; prefer-encrypt=mutual; keydata=
@@ -102,22 +102,22 @@ Autocrypt: addr=pbonzini@redhat.com; prefer-encrypt=mutual; keydata=
 	DduC0U3xYkfbGAUvbxeepjgzp0uEnBXfPTy09JGpgWbg0w91GyfT/ujKaGd4vxG2Ei+MMNDm
 	S1SMx7wu0evvQ5kT9NPzyq8R2GIhVSiAd2jioGuTjX6AZCFv3ToO53DliFMkVTecLptsXaes
 	uUHgL9dKIfvpm+rNXRn9wAwGjk0X/A==
-Message-ID: <5a66b5d6-165c-326b-0c68-1078ab49c80e@redhat.com>
-Date: Fri, 26 Apr 2019 09:57:06 +0200
+Message-ID: <b5fe7ed7-c11c-4f36-4973-c86031cbe046@redhat.com>
+Date: Fri, 26 Apr 2019 09:51:58 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
 	Thunderbird/60.6.1
 MIME-Version: 1.0
-In-Reply-To: <8a9008f1-34f7-ecb8-9ccb-c129f56236ec@redhat.com>
+In-Reply-To: <20190423165501.GA27867@redhat.com>
 Content-Type: text/plain; charset="UTF-8"
 Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.29]);
-	Fri, 26 Apr 2019 07:57:14 +0000 (UTC)
+	(mx1.redhat.com [10.5.110.43]);
+	Fri, 26 Apr 2019 07:52:08 +0000 (UTC)
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH] hvf: Add missing break statement
+Subject: Re: [Qemu-devel] [PATCH v3 0/3] char-socket: Fix race condition
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -129,30 +129,66 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-devel@nongnu.org
+Cc: =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>,
+	qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190426075706.JjYBzXmHQZpbqNegKEZxWnN4-Mbg0JPuAH4H2USmBS0@z>
+Message-ID: <20190426075158.7pYDh9aRu_A_19qVIJy51-LAZz57jL7RQz3_f67gCww@z>
 
-On 22/04/19 18:09, Philippe Mathieu-Daud=C3=A9 wrote:
-> Oops... I'm surprised no compiler warned about this yet...
->=20
-> This probably mean:
-> - This code is not covered by Continuous Integration
-> - Upstream maintainers are not building this code
-> - Upstream is not running this code
->=20
-> Please tell me I'm wrong!
+On 23/04/19 18:55, Daniel P. Berrang=C3=A9 wrote:
+> ping - paolo/marc-andr=C3=A9 - unless I'm missing something, it looks l=
+ike
+> this chardev series slipped through the cracks and missed 4.0
 
-Indeed I am not building or running this code since it requires a Mac.
-I am thinking of adding a Patchew builder on macincloud, but I haven't
-done it yet.
-
-However, it is unlikely to be signaled by a compiler---maybe by
-Coverity.  Probably the return value doesn't mean much to the rest of
-the code, the "cpu->halted =3D 1" is what counts.  I have queued the patc=
-h.
+Yeah, it had a bug unfortunately.  I'm looking at it RSN.
 
 Paolo
+
+>=20
+> On Fri, Feb 22, 2019 at 03:46:23PM +0200, Alberto Garcia wrote:
+>> This fixes a race condition in which the tcp_chr_read() ioc handler
+>> can close a connection that is being written to from another thread.
+>>
+>> Note: vhost-user-test still fails if QTEST_VHOST_USER_FIXME is set.
+>>
+>> Berto
+>>
+>> RFC: https://lists.gnu.org/archive/html/qemu-devel/2019-02/msg01510.ht=
+ml
+>>
+>> v1: https://lists.gnu.org/archive/html/qemu-devel/2019-02/msg01834.htm=
+l
+>> - Fixes memory leaks and adds a qemu_idle_add() function
+>>
+>> v2: https://lists.gnu.org/archive/html/qemu-devel/2019-02/msg06137.htm=
+l
+>> - Rebased on top of the current master (fc3dbb90f2eb069801bfb4cfe9cbc)
+>> - Patches 1 and 2: Remove the changes in char-pty.c, they're not
+>>                    needed after the rebase.
+>> - Patch 3: Fix conflicts after the rebase.
+>>
+>> v3:
+>> - Patch 3: Add tcp_chr_disconnect_locked() [Daniel]
+>>
+>> Alberto Garcia (3):
+>>   main-loop: Fix GSource leak in qio_task_thread_worker()
+>>   main-loop: Add qemu_idle_add()
+>>   char-socket: Lock tcp_chr_disconnect() and socket_reconnect_timeout(=
+)
+>>
+>>  chardev/char-socket.c    | 25 +++++++++++++++++++++----
+>>  include/qemu/main-loop.h | 12 ++++++++++++
+>>  io/task.c                |  9 +++------
+>>  util/main-loop.c         |  9 +++++++++
+>>  4 files changed, 45 insertions(+), 10 deletions(-)
+>>
+>> --=20
+>> 2.11.0
+>>
+>=20
+> Regards,
+> Daniel
+>=20
+
 
