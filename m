@@ -1,24 +1,25 @@
-Received: from eggs.gnu.org ([209.51.188.92]:48093)
+Received: from eggs.gnu.org ([209.51.188.92]:53112)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1hK4aa-0000Ak-Bg
-	for qemu-devel@nongnu.org; Fri, 26 Apr 2019 13:24:45 -0400
+	(envelope-from <no-reply@patchew.org>) id 1hK4tV-0008Ij-4B
+	for qemu-devel@nongnu.org; Fri, 26 Apr 2019 13:44:18 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1hK4aZ-0007Kw-2d
-	for qemu-devel@nongnu.org; Fri, 26 Apr 2019 13:24:44 -0400
-Received: from mail-pf1-x444.google.com ([2607:f8b0:4864:20::444]:46667)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1hK4aY-0007GO-S7
-	for qemu-devel@nongnu.org; Fri, 26 Apr 2019 13:24:43 -0400
-Received: by mail-pf1-x444.google.com with SMTP id j11so2024176pff.13
-	for <qemu-devel@nongnu.org>; Fri, 26 Apr 2019 10:24:42 -0700 (PDT)
-From: Richard Henderson <richard.henderson@linaro.org>
-Date: Fri, 26 Apr 2019 10:24:21 -0700
-Message-Id: <20190426172421.27133-16-richard.henderson@linaro.org>
+	(envelope-from <no-reply@patchew.org>) id 1hK4tT-0002tF-NI
+	for qemu-devel@nongnu.org; Fri, 26 Apr 2019 13:44:17 -0400
+Resent-Message-Id: <E1hK4tT-0002tF-NI@eggs.gnu.org>
+Received: from sender4-of-o55.zoho.com ([136.143.188.55]:21536)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
+	id 1hK4tT-0002Pw-FR
+	for qemu-devel@nongnu.org; Fri, 26 Apr 2019 13:44:15 -0400
 In-Reply-To: <20190426172421.27133-1-richard.henderson@linaro.org>
-References: <20190426172421.27133-1-richard.henderson@linaro.org>
-Subject: [Qemu-devel] [PULL 15/15] cputlb: Fix io_readx() to respect the
- access_type
+Message-ID: <155630061924.10667.8214400027023709083@c2072b67cc0c>
+Reply-To: <qemu-devel@nongnu.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+From: no-reply@patchew.org
+Date: Fri, 26 Apr 2019 10:43:40 -0700 (PDT)
+Subject: Re: [Qemu-devel] [PULL 00/15] tcg patch queue
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,45 +28,78 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: peter.maydell@linaro.org, Shahab Vahedi <shahab.vahedi@gmail.com>
+To: richard.henderson@linaro.org
+Cc: fam@euphon.net, qemu-devel@nongnu.org, peter.maydell@linaro.org
 
-From: Shahab Vahedi <shahab.vahedi@gmail.com>
-
-This change adapts io_readx() to its input access_type. Currently
-io_readx() treats any memory access as a read, although it has an
-input argument "MMUAccessType access_type". This results in:
-
-1) Calling the tlb_fill() only with MMU_DATA_LOAD
-2) Considering only entry->addr_read as the tlb_addr
-
-Buglink: https://bugs.launchpad.net/qemu/+bug/1825359
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
-Signed-off-by: Shahab Vahedi <shahab.vahedi@gmail.com>
-Message-Id: <20190420072236.12347-1-shahab.vahedi@gmail.com>
-[rth: Remove assert; fix expression formatting.]
-Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
----
- accel/tcg/cputlb.c | 5 +++--
- 1 file changed, 3 insertions(+), 2 deletions(-)
-
-diff --git a/accel/tcg/cputlb.c b/accel/tcg/cputlb.c
-index 88cc8389e9..f2f618217d 100644
---- a/accel/tcg/cputlb.c
-+++ b/accel/tcg/cputlb.c
-@@ -878,10 +878,11 @@ static uint64_t io_readx(CPUArchState *env, CPUIOTLBEntry *iotlbentry,
-         CPUTLBEntry *entry;
-         target_ulong tlb_addr;
- 
--        tlb_fill(cpu, addr, size, MMU_DATA_LOAD, mmu_idx, retaddr);
-+        tlb_fill(cpu, addr, size, access_type, mmu_idx, retaddr);
- 
-         entry = tlb_entry(env, mmu_idx, addr);
--        tlb_addr = entry->addr_read;
-+        tlb_addr = (access_type == MMU_DATA_LOAD ?
-+                    entry->addr_read : entry->addr_code);
-         if (!(tlb_addr & ~(TARGET_PAGE_MASK | TLB_RECHECK))) {
-             /* RAM access */
-             uintptr_t haddr = addr + entry->addend;
--- 
-2.17.1
+UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDE5MDQyNjE3MjQyMS4yNzEz
+My0xLXJpY2hhcmQuaGVuZGVyc29uQGxpbmFyby5vcmcvCgoKCkhpLAoKVGhpcyBzZXJpZXMgc2Vl
+bXMgdG8gaGF2ZSBzb21lIGNvZGluZyBzdHlsZSBwcm9ibGVtcy4gU2VlIG91dHB1dCBiZWxvdyBm
+b3IKbW9yZSBpbmZvcm1hdGlvbjoKClR5cGU6IHNlcmllcwpNZXNzYWdlLWlkOiAyMDE5MDQyNjE3
+MjQyMS4yNzEzMy0xLXJpY2hhcmQuaGVuZGVyc29uQGxpbmFyby5vcmcKU3ViamVjdDogW1FlbXUt
+ZGV2ZWxdIFtQVUxMIDAwLzE1XSB0Y2cgcGF0Y2ggcXVldWUKCj09PSBURVNUIFNDUklQVCBCRUdJ
+TiA9PT0KIyEvYmluL2Jhc2gKZ2l0IHJldi1wYXJzZSBiYXNlID4gL2Rldi9udWxsIHx8IGV4aXQg
+MApnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVsaW1pdCAwCmdpdCBjb25maWcgLS1sb2Nh
+bCBkaWZmLnJlbmFtZXMgVHJ1ZQpnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5hbGdvcml0aG0gaGlz
+dG9ncmFtCi4vc2NyaXB0cy9jaGVja3BhdGNoLnBsIC0tbWFpbGJhY2sgYmFzZS4uCj09PSBURVNU
+IFNDUklQVCBFTkQgPT09CgpVcGRhdGluZyAzYzhjZjVhOWMyMWZmODc4MjE2NGQxZGVmN2Y0NGJk
+ODg4NzEzMzg0CkZyb20gaHR0cHM6Ly9naXRodWIuY29tL3BhdGNoZXctcHJvamVjdC9xZW11CiAq
+IFtuZXcgdGFnXSAgICAgICAgICAgICAgIHBhdGNoZXcvMjAxOTA0MjYxNzI0MjEuMjcxMzMtMS1y
+aWNoYXJkLmhlbmRlcnNvbkBsaW5hcm8ub3JnIC0+IHBhdGNoZXcvMjAxOTA0MjYxNzI0MjEuMjcx
+MzMtMS1yaWNoYXJkLmhlbmRlcnNvbkBsaW5hcm8ub3JnClN3aXRjaGVkIHRvIGEgbmV3IGJyYW5j
+aCAndGVzdCcKM2I1ZmJhZDI3YSBjcHV0bGI6IEZpeCBpb19yZWFkeCgpIHRvIHJlc3BlY3QgdGhl
+IGFjY2Vzc190eXBlCmI1NTM4YzQ0MWIgdGNnL2FybTogUmVzdHJpY3QgY29uc3RhbnQgcG9vbCBk
+aXNwbGFjZW1lbnQgdG8gMTIgYml0cwpkNDJjNjUxOTIzIHRjZy9wcGM6IEFsbG93IHRoZSBjb25z
+dGFudCBwb29sIHRvIG92ZXJmbG93IGF0IDMyawowYzFiODY4N2IxIHRjZzogUmVzdGFydCBUQiBn
+ZW5lcmF0aW9uIGFmdGVyIG91dC1vZi1saW5lIGxkc3Qgb3ZlcmZsb3cKZTIxYjA1ZmJjOCB0Y2c6
+IFJlc3RhcnQgVEIgZ2VuZXJhdGlvbiBhZnRlciBjb25zdGFudCBwb29sIG92ZXJmbG93CjdjNTY3
+ZmEwMzggdGNnOiBSZXN0YXJ0IFRCIGdlbmVyYXRpb24gYWZ0ZXIgcmVsb2NhdGlvbiBvdmVyZmxv
+dwo4ZWM2MDY5MmZjIHRjZzogUmVzdGFydCBhZnRlciBUQiBjb2RlIGdlbmVyYXRpb24gb3ZlcmZs
+b3cKZTIwNDIyMjM4MiB0Y2c6IEhvaXN0IG1heF9pbnNucyBjb21wdXRhdGlvbiB0byB0Yl9nZW5f
+Y29kZQo0OThjNDU1Mzk1IHRjZy9hYXJjaDY0OiBTdXBwb3J0IElOREVYX29wX2V4dHJhY3QyX3tp
+MzIsIGk2NH0KZTEzMjU3NzQwMCB0Y2cvYXJtOiBTdXBwb3J0IElOREVYX29wX2V4dHJhY3QyX2kz
+MgpjMzEyZmRkYzcyIHRjZy9pMzg2OiBTdXBwb3J0IElOREVYX29wX2V4dHJhY3QyX3tpMzIsIGk2
+NH0KMjkzMTFhYzA5ZSB0Y2c6IFVzZSBleHRyYWN0MiBpbiB0Y2dfZ2VuX2RlcG9zaXRfe2kzMiwg
+aTY0fQoxZGNmNGFiNGYxIHRjZzogVXNlIGRlcG9zaXQgYW5kIGV4dHJhY3QyIGluIHRjZ19nZW5f
+c2hpZnRpX2k2NAoxYWMyYWUyNTFiIHRjZzogQWRkIElOREVYX29wX2V4dHJhY3QyX3tpMzIsaTY0
+fQoxMmU4NGE1NDBkIHRjZzogSW1wbGVtZW50IHRjZ19nZW5fZXh0cmFjdDJfe2kzMiwgaTY0fQoK
+PT09IE9VVFBVVCBCRUdJTiA9PT0KMS8xNSBDaGVja2luZyBjb21taXQgMTJlODRhNTQwZDIxICh0
+Y2c6IEltcGxlbWVudCB0Y2dfZ2VuX2V4dHJhY3QyX3tpMzIsIGk2NH0pCjIvMTUgQ2hlY2tpbmcg
+Y29tbWl0IDFhYzJhZTI1MWIyMSAodGNnOiBBZGQgSU5ERVhfb3BfZXh0cmFjdDJfe2kzMixpNjR9
+KQpFUlJPUjogc3BhY2VzIHJlcXVpcmVkIGFyb3VuZCB0aGF0ICc6JyAoY3R4OlZ4RSkKIzExMTog
+RklMRTogdGNnL29wdGltaXplLmM6MTIwNToKKyAgICAgICAgQ0FTRV9PUF8zMl82NChleHRyYWN0
+Mik6CiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgXgoKdG90YWw6IDEgZXJyb3JzLCAw
+IHdhcm5pbmdzLCAyMDcgbGluZXMgY2hlY2tlZAoKUGF0Y2ggMi8xNSBoYXMgc3R5bGUgcHJvYmxl
+bXMsIHBsZWFzZSByZXZpZXcuICBJZiBhbnkgb2YgdGhlc2UgZXJyb3JzCmFyZSBmYWxzZSBwb3Np
+dGl2ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1haW50YWluZXIsIHNlZQpDSEVDS1BBVENIIGluIE1B
+SU5UQUlORVJTLgoKMy8xNSBDaGVja2luZyBjb21taXQgMWRjZjRhYjRmMWQzICh0Y2c6IFVzZSBk
+ZXBvc2l0IGFuZCBleHRyYWN0MiBpbiB0Y2dfZ2VuX3NoaWZ0aV9pNjQpCjQvMTUgQ2hlY2tpbmcg
+Y29tbWl0IDI5MzExYWMwOWViMCAodGNnOiBVc2UgZXh0cmFjdDIgaW4gdGNnX2dlbl9kZXBvc2l0
+X3tpMzIsIGk2NH0pCjUvMTUgQ2hlY2tpbmcgY29tbWl0IGMzMTJmZGRjNzI5ZiAodGNnL2kzODY6
+IFN1cHBvcnQgSU5ERVhfb3BfZXh0cmFjdDJfe2kzMiwgaTY0fSkKRVJST1I6IHNwYWNlcyByZXF1
+aXJlZCBhcm91bmQgdGhhdCAnOicgKGN0eDpWeEUpCiM0ODogRklMRTogdGNnL2kzODYvdGNnLXRh
+cmdldC5pbmMuYzoyNTkxOgorICAgIE9QXzMyXzY0KGV4dHJhY3QyKToKICAgICAgICAgICAgICAg
+ICAgICAgICBeCgp0b3RhbDogMSBlcnJvcnMsIDAgd2FybmluZ3MsIDUxIGxpbmVzIGNoZWNrZWQK
+ClBhdGNoIDUvMTUgaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55IG9m
+IHRoZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBtYWlu
+dGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KCjYvMTUgQ2hlY2tpbmcgY29t
+bWl0IGUxMzI1Nzc0MDA1OCAodGNnL2FybTogU3VwcG9ydCBJTkRFWF9vcF9leHRyYWN0Ml9pMzIp
+CjcvMTUgQ2hlY2tpbmcgY29tbWl0IDQ5OGM0NTUzOTVkYyAodGNnL2FhcmNoNjQ6IFN1cHBvcnQg
+SU5ERVhfb3BfZXh0cmFjdDJfe2kzMiwgaTY0fSkKOC8xNSBDaGVja2luZyBjb21taXQgZTIwNDIy
+MjM4MmVmICh0Y2c6IEhvaXN0IG1heF9pbnNucyBjb21wdXRhdGlvbiB0byB0Yl9nZW5fY29kZSkK
+OS8xNSBDaGVja2luZyBjb21taXQgOGVjNjA2OTJmY2U0ICh0Y2c6IFJlc3RhcnQgYWZ0ZXIgVEIg
+Y29kZSBnZW5lcmF0aW9uIG92ZXJmbG93KQoxMC8xNSBDaGVja2luZyBjb21taXQgN2M1NjdmYTAz
+ODZkICh0Y2c6IFJlc3RhcnQgVEIgZ2VuZXJhdGlvbiBhZnRlciByZWxvY2F0aW9uIG92ZXJmbG93
+KQoxMS8xNSBDaGVja2luZyBjb21taXQgZTIxYjA1ZmJjODUzICh0Y2c6IFJlc3RhcnQgVEIgZ2Vu
+ZXJhdGlvbiBhZnRlciBjb25zdGFudCBwb29sIG92ZXJmbG93KQoxMi8xNSBDaGVja2luZyBjb21t
+aXQgMGMxYjg2ODdiMTkyICh0Y2c6IFJlc3RhcnQgVEIgZ2VuZXJhdGlvbiBhZnRlciBvdXQtb2Yt
+bGluZSBsZHN0IG92ZXJmbG93KQoxMy8xNSBDaGVja2luZyBjb21taXQgZDQyYzY1MTkyM2FhICh0
+Y2cvcHBjOiBBbGxvdyB0aGUgY29uc3RhbnQgcG9vbCB0byBvdmVyZmxvdyBhdCAzMmspCjE0LzE1
+IENoZWNraW5nIGNvbW1pdCBiNTUzOGM0NDFiMTIgKHRjZy9hcm06IFJlc3RyaWN0IGNvbnN0YW50
+IHBvb2wgZGlzcGxhY2VtZW50IHRvIDEyIGJpdHMpCjE1LzE1IENoZWNraW5nIGNvbW1pdCAzYjVm
+YmFkMjdhNDggKGNwdXRsYjogRml4IGlvX3JlYWR4KCkgdG8gcmVzcGVjdCB0aGUgYWNjZXNzX3R5
+cGUpCj09PSBPVVRQVVQgRU5EID09PQoKVGVzdCBjb21tYW5kIGV4aXRlZCB3aXRoIGNvZGU6IDEK
+CgpUaGUgZnVsbCBsb2cgaXMgYXZhaWxhYmxlIGF0Cmh0dHA6Ly9wYXRjaGV3Lm9yZy9sb2dzLzIw
+MTkwNDI2MTcyNDIxLjI3MTMzLTEtcmljaGFyZC5oZW5kZXJzb25AbGluYXJvLm9yZy90ZXN0aW5n
+LmNoZWNrcGF0Y2gvP3R5cGU9bWVzc2FnZS4KLS0tCkVtYWlsIGdlbmVyYXRlZCBhdXRvbWF0aWNh
+bGx5IGJ5IFBhdGNoZXcgW2h0dHBzOi8vcGF0Y2hldy5vcmcvXS4KUGxlYXNlIHNlbmQgeW91ciBm
+ZWVkYmFjayB0byBwYXRjaGV3LWRldmVsQHJlZGhhdC5jb20=
