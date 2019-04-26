@@ -2,72 +2,83 @@ Return-Path: <SRS0=QtPl=S4=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+X-Spam-Status: No, score=-10.7 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2D150C43219
-	for <qemu-devel@archiver.kernel.org>; Fri, 26 Apr 2019 15:36:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4EC63C43218
+	for <qemu-devel@archiver.kernel.org>; Fri, 26 Apr 2019 15:39:02 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id F3AF82084F
-	for <qemu-devel@archiver.kernel.org>; Fri, 26 Apr 2019 15:36:45 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F3AF82084F
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
+	by mail.kernel.org (Postfix) with ESMTPS id 16987206E0
+	for <qemu-devel@archiver.kernel.org>; Fri, 26 Apr 2019 15:39:02 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="oUUYpNU0"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 16987206E0
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:48553 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:48571 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hK2u5-0006Wq-2v
-	for qemu-devel@archiver.kernel.org; Fri, 26 Apr 2019 11:36:45 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:53277)
+	id 1hK2wG-00084n-Tf
+	for qemu-devel@archiver.kernel.org; Fri, 26 Apr 2019 11:39:00 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:53723)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1hK2t9-00065p-3Z
-	for qemu-devel@nongnu.org; Fri, 26 Apr 2019 11:35:48 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1hK2vP-0007SZ-0b
+	for qemu-devel@nongnu.org; Fri, 26 Apr 2019 11:38:08 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1hK2t8-0004eN-2s
-	for qemu-devel@nongnu.org; Fri, 26 Apr 2019 11:35:47 -0400
-Received: from indium.canonical.com ([91.189.90.7]:37988)
+	(envelope-from <peter.maydell@linaro.org>) id 1hK2vN-0006Cf-1K
+	for qemu-devel@nongnu.org; Fri, 26 Apr 2019 11:38:06 -0400
+Received: from mail-ot1-x32c.google.com ([2607:f8b0:4864:20::32c]:37727)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1hK2t7-0004c7-TT
-	for qemu-devel@nongnu.org; Fri, 26 Apr 2019 11:35:46 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1hK2t4-0004h2-An
-	for <qemu-devel@nongnu.org>; Fri, 26 Apr 2019 15:35:42 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id D951F2E81B0
-	for <qemu-devel@nongnu.org>; Fri, 26 Apr 2019 15:35:36 +0000 (UTC)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1hK2vL-00064Z-9D
+	for qemu-devel@nongnu.org; Fri, 26 Apr 2019 11:38:04 -0400
+Received: by mail-ot1-x32c.google.com with SMTP id r20so1873964otg.4
+	for <qemu-devel@nongnu.org>; Fri, 26 Apr 2019 08:37:55 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+	h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+	:cc; bh=QfHq/CZsEB2O/pBcnC9m2rNIy5/GdqRC+Gqzq+IxEek=;
+	b=oUUYpNU0m5VzlfmOLExaelN11WOW4nC4qskfFNOE3lk9mZWpgd/i1FPM1urudjkA9c
+	e5KutJ8uV+ixwPzbGWI9ti6ZdPG28jTiGaG+aNzeLrd5KjtjgQdXp+mpVZNisducnpU+
+	YmpqdHdLwNmTHUu9W7Kt2/LahacbCDMkZyEdF3GBnuMaXsUQn9CUbS51NaJE9LYedhRR
+	/nyNMjAKScFmekLegs7+Dr+Aha5BRRQ75TS8nQJLT8MTvJnZ1iXj8dqOZTWTUQcoMRnh
+	yUMDybpx6iGDOeH80rgVkDMSWv3EEJWP35ZKlsixFZhEeBVbWaviV5vyhXa+KDgidUtG
+	GCAQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=1e100.net; s=20161025;
+	h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+	:message-id:subject:to:cc;
+	bh=QfHq/CZsEB2O/pBcnC9m2rNIy5/GdqRC+Gqzq+IxEek=;
+	b=jtAB+jwaJ3DwTLS3vS+7kd4azVFlD7/9HIn2nixyDAEaQTrSrsNkJt5JtQRaEpW9z0
+	3lzNdfKE4HW2q4VbNwji+v6PUAZ4Dpnwl5ex4ukyXiIXxfCUzEFHqi9N/Dy7JE+TnK48
+	SXucqglk7CV4+SKlZtlJamvWCsKIyr5nreXL5rf6TS2rGe/xTG3PuKMAtPHonur2mUGA
+	sMRrRSAzGwVvdp8zLEfEPbLHqe2MicbziSNLiC76dF3rfDGT5slp6mJ0DrQrvft3SrVo
+	nMRIDZBd+v7Pskh74EuMZ+DwAJadVKH2gM/NFTYT1NABC7zwuVqFUROY86Fd4UWthmJc
+	Ye0Q==
+X-Gm-Message-State: APjAAAVIMu0kBvysrmBL0bMmo3u83rHeRvJj33VUYRC0Mv00gIaQhIM4
+	yMuVcQfIwHG8X/qTs3c5vh+B1b9i3yEadaBhPtFs7g==
+X-Google-Smtp-Source: APXvYqxgdvtFUZbMumZ4q6KWvBxJ1AcxijyKMjDNq4Sl21N/C87rpHockg0ecHOhNSUFxzQO3ZVUvV4peSXwG3rWgBk=
+X-Received: by 2002:a9d:57c4:: with SMTP id q4mr26113379oti.151.1556293066752; 
+	Fri, 26 Apr 2019 08:37:46 -0700 (PDT)
 MIME-Version: 1.0
+References: <20190425175659.24876-1-ehabkost@redhat.com>
+In-Reply-To: <20190425175659.24876-1-ehabkost@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Fri, 26 Apr 2019 16:37:35 +0100
+Message-ID:
+ <CAFEAcA-9NBHWb9GCsYAHZ6HMw0NTRi3Ms-2171QO1Wnig8256w@mail.gmail.com>
+To: Eduardo Habkost <ehabkost@redhat.com>
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Fri, 26 Apr 2019 15:23:42 -0000
-From: Floyd42 <1826568@bugs.launchpad.net>
-To: qemu-devel@nongnu.org
-X-Launchpad-Notification-Type: bug
-X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
-X-Launchpad-Bug-Information-Type: Public
-X-Launchpad-Bug-Private: no
-X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: axelheider
-X-Launchpad-Bug-Reporter: Floyd42 (axelheider)
-X-Launchpad-Bug-Modifier: Floyd42 (axelheider)
-Message-Id:
- <155629222212.6615.9281610848583512798.malonedeb@chaenomeles.canonical.com>
-X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
-X-Launchpad-Message-For: qemu-devel-ml
-Precedence: bulk
-X-Generated-By: Launchpad (canonical.com); Revision="18928";
-	Instance="launchpad-lazr.conf"
-X-Launchpad-Hash: ecd28b05ed82f21454acba05883c76ce1672e42e
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 91.189.90.7
-Subject: [Qemu-devel] [Bug 1826568] [NEW] RISC-V Disassembler/translator
- instruction decoding disagreement
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+	recognized.
+X-Received-From: 2607:f8b0:4864:20::32c
+Subject: Re: [Qemu-devel] [PULL 00/11] Machine queue, 2019-04-25
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
+Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -76,63 +87,42 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1826568 <1826568@bugs.launchpad.net>
+Cc: QEMU Developers <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190426152342.Euy1KKnMLIEZMq4xnSYrYsOUca76jXOfhVNwWTi1Tk4@z>
+Message-ID: <20190426153735.Z2RYnD9ybhah9QGBxiSOUcOCG8up60zB1JNB1yy6aW0@z>
 
-Public bug reported:
+On Thu, 25 Apr 2019 at 18:57, Eduardo Habkost <ehabkost@redhat.com> wrote:
+>
+> The following changes since commit 3284aa128153750f14a61e8a96fd085e6f2999b6:
+>
+>   Merge remote-tracking branch 'remotes/lersek/tags/edk2-pull-2019-04-22' into staging (2019-04-24 13:19:41 +0100)
+>
+> are available in the Git repository at:
+>
+>   git://github.com/ehabkost/qemu.git tags/machine-next-pull-request
+>
+> for you to fetch changes up to 119906afa5ca610adb87c55ab0d8e53c9104bfc3:
+>
+>   util/mmap-alloc: support MAP_SYNC in qemu_ram_mmap() (2019-04-25 14:17:36 -0300)
+>
+> ----------------------------------------------------------------
+> Machine queue, 2019-04-25
+>
+> * 4.1 machine-types (Cornelia Huck)
+> * Support MAP_SYNC on pmem memory backends (Zhang Yi)
+> * -cpu parsing fixes and cleanups (Eduardo Habkost)
+> * machine initialization cleanups (Wei Yang, Markus Armbruster)
+>
+> ----------------------------------------------------------------
 
 
-When running QEMU V3.1.0 for platform  RISC-V, 64bit, Spike V1.10 with "-d =
-in_asm -singlestep -D qemu_log.txt", my (faulty) test code brought up this =
-message in the logs:
 
-  0x000000008002cade:  051300009517e2bf  illegal         =
+Applied, thanks.
 
-  Disassembler disagrees with translator over instruction decoding
-  Please report this to qemu-devel@nongnu.org
+Please update the changelog at https://wiki.qemu.org/ChangeLog/4.1
+for any user-visible changes.
 
-
-You may want to resolve the disagreement.
-
-Axel
-
-** Affects: qemu
-     Importance: Undecided
-         Status: New
-
--- =
-
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1826568
-
-Title:
-  RISC-V Disassembler/translator instruction decoding disagreement
-
-Status in QEMU:
-  New
-
-Bug description:
-  =
-
-  When running QEMU V3.1.0 for platform  RISC-V, 64bit, Spike V1.10 with "-=
-d in_asm -singlestep -D qemu_log.txt", my (faulty) test code brought up thi=
-s message in the logs:
-
-    0x000000008002cade:  051300009517e2bf  illegal         =
-
-    Disassembler disagrees with translator over instruction decoding
-    Please report this to qemu-devel@nongnu.org
-
-  =
-
-  You may want to resolve the disagreement.
-
-  Axel
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1826568/+subscriptions
+-- PMM
 
