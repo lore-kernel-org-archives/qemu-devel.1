@@ -1,35 +1,35 @@
-Received: from eggs.gnu.org ([209.51.188.92]:50590)
+Received: from eggs.gnu.org ([209.51.188.92]:50639)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <borntraeger@de.ibm.com>) id 1hJyks-0002Qt-1f
-	for qemu-devel@nongnu.org; Fri, 26 Apr 2019 07:10:58 -0400
+	(envelope-from <borntraeger@de.ibm.com>) id 1hJykv-0002Ww-VC
+	for qemu-devel@nongnu.org; Fri, 26 Apr 2019 07:11:03 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <borntraeger@de.ibm.com>) id 1hJyko-0003Ki-Cu
-	for qemu-devel@nongnu.org; Fri, 26 Apr 2019 07:10:56 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:53144)
+	(envelope-from <borntraeger@de.ibm.com>) id 1hJyku-0003Q8-3T
+	for qemu-devel@nongnu.org; Fri, 26 Apr 2019 07:11:01 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:46506
+	helo=mx0a-001b2d01.pphosted.com)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <borntraeger@de.ibm.com>)
-	id 1hJykm-0002lq-EO
-	for qemu-devel@nongnu.org; Fri, 26 Apr 2019 07:10:54 -0400
-Received: from pps.filterd (m0098393.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id
-	x3QB8bDI092104
-	for <qemu-devel@nongnu.org>; Fri, 26 Apr 2019 07:10:12 -0400
-Received: from e34.co.us.ibm.com (e34.co.us.ibm.com [32.97.110.152])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2s3y21n6k9-1
+	id 1hJykt-0003MN-Uq
+	for qemu-devel@nongnu.org; Fri, 26 Apr 2019 07:11:00 -0400
+Received: from pps.filterd (m0098420.ppops.net [127.0.0.1])
+	by mx0b-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id
+	x3QB9ieZ009639
+	for <qemu-devel@nongnu.org>; Fri, 26 Apr 2019 07:10:57 -0400
+Received: from e35.co.us.ibm.com (e35.co.us.ibm.com [32.97.110.153])
+	by mx0b-001b2d01.pphosted.com with ESMTP id 2s3y27dm2k-1
 	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Fri, 26 Apr 2019 07:10:12 -0400
+	for <qemu-devel@nongnu.org>; Fri, 26 Apr 2019 07:10:55 -0400
 Received: from localhost
-	by e34.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+	by e35.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
 	Violators will be prosecuted
 	for <qemu-devel@nongnu.org> from <borntraeger@de.ibm.com>;
-	Fri, 26 Apr 2019 12:10:11 +0100
+	Fri, 26 Apr 2019 12:10:22 +0100
 From: Christian Borntraeger <borntraeger@de.ibm.com>
-Date: Fri, 26 Apr 2019 07:09:56 -0400
+Date: Fri, 26 Apr 2019 07:09:57 -0400
 In-Reply-To: <20190426111003.21246-1-borntraeger@de.ibm.com>
 References: <20190426111003.21246-1-borntraeger@de.ibm.com>
-Message-Id: <20190426111003.21246-4-borntraeger@de.ibm.com>
-Subject: [Qemu-devel] [PATCH v2 03/10] s390x/cpumodel:
- Miscellaneous-Instruction-Extensions Facility 3
+Message-Id: <20190426111003.21246-5-borntraeger@de.ibm.com>
+Subject: [Qemu-devel] [PATCH v2 04/10] s390x/cpumodel: msa9 facility
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -41,39 +41,276 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: Cornelia Huck <cohuck@redhat.com>
 Cc: qemu-devel <qemu-devel@nongnu.org>, qemu-s390x <qemu-s390x@nongnu.org>, David Hildenbrand <david@redhat.com>, Halil Pasic <pasic@linux.ibm.com>, Richard Henderson <rth@twiddle.net>, Collin Walling <walling@linux.ibm.com>, "Jason J . Herne" <jjherne@linux.ibm.com>
 
-Provide the "Miscellaneous-Instruction-Extensions Facility 3" via
-stfle.61.
+Provide the MSA9 facility (stfle.155).
+This also contains pckmo functions for key wrapping. Keep them in a
+separate group to disable those as a block if necessary.
 
 Signed-off-by: Christian Borntraeger <borntraeger@de.ibm.com>
-Reviewed-by: David Hildenbrand <david@redhat.com>
 ---
- target/s390x/cpu_features.c     | 1 +
- target/s390x/cpu_features_def.h | 1 +
- 2 files changed, 2 insertions(+)
+ target/s390x/cpu_features.c     | 32 +++++++++++++++++++++++++
+ target/s390x/cpu_features.h     |  1 +
+ target/s390x/cpu_features_def.h | 31 ++++++++++++++++++++++++
+ target/s390x/cpu_models.c       |  2 ++
+ target/s390x/gen-features.c     | 42 +++++++++++++++++++++++++++++++++
+ target/s390x/kvm.c              |  6 +++++
+ 6 files changed, 114 insertions(+)
 
 diff --git a/target/s390x/cpu_features.c b/target/s390x/cpu_features.c
-index 1843c84aaa..bbd8902087 100644
+index bbd8902087..154e2bb354 100644
 --- a/target/s390x/cpu_features.c
 +++ b/target/s390x/cpu_features.c
-@@ -83,6 +83,7 @@ static const S390FeatDef s390_features[] = {
-     FEAT_INIT("minste2", S390_FEAT_TYPE_STFL, 58, "Miscellaneous-instruction-extensions facility 2"),
-     FEAT_INIT("sema", S390_FEAT_TYPE_STFL, 59, "Semaphore-assist facility"),
-     FEAT_INIT("tsi", S390_FEAT_TYPE_STFL, 60, "Time-slice Instrumentation facility"),
-+    FEAT_INIT("minste3", S390_FEAT_TYPE_STFL, 61, "Miscellaneous-Instruction-Extensions Facility 3"),
-     FEAT_INIT("ri", S390_FEAT_TYPE_STFL, 64, "CPU runtime-instrumentation facility"),
-     FEAT_INIT("zpci", S390_FEAT_TYPE_STFL, 69, "z/PCI facility"),
-     FEAT_INIT("aen", S390_FEAT_TYPE_STFL, 71, "General-purpose-adapter-event-notification facility"),
+@@ -108,6 +108,7 @@ static const S390FeatDef s390_features[] = {
+     FEAT_INIT("irbm", S390_FEAT_TYPE_STFL, 145, "Insert-reference-bits-multiple facility"),
+     FEAT_INIT("msa8-base", S390_FEAT_TYPE_STFL, 146, "Message-security-assist-extension-8 facility (excluding subfunctions)"),
+     FEAT_INIT("cmmnt", S390_FEAT_TYPE_STFL, 147, "CMM: ESSA-enhancement (no translate) facility"),
++    FEAT_INIT("msa9-base", S390_FEAT_TYPE_STFL, 155, "Message-security-assist-extension-9 facility (excluding subfunctions)"),
+     FEAT_INIT("etoken", S390_FEAT_TYPE_STFL, 156, "Etoken facility"),
+ 
+     /* SCLP SCCB Byte 80 - 98  (bit numbers relative to byte-80) */
+@@ -242,6 +243,11 @@ static const S390FeatDef s390_features[] = {
+     FEAT_INIT("pckmo-aes-128", S390_FEAT_TYPE_PCKMO, 18, "PCKMO Encrypted-AES-128-Key"),
+     FEAT_INIT("pckmo-aes-192", S390_FEAT_TYPE_PCKMO, 19, "PCKMO Encrypted-AES-192-Key"),
+     FEAT_INIT("pckmo-aes-256", S390_FEAT_TYPE_PCKMO, 20, "PCKMO Encrypted-AES-256-Key"),
++    FEAT_INIT("pckmo-ecc-p256", S390_FEAT_TYPE_PCKMO, 32, "PCKMO Encrypt-ECC-P256-Key"),
++    FEAT_INIT("pckmo-ecc-p384", S390_FEAT_TYPE_PCKMO, 33, "PCKMO Encrypt-ECC-P384-Key"),
++    FEAT_INIT("pckmo-ecc-p521", S390_FEAT_TYPE_PCKMO, 34, "PCKMO Encrypt-ECC-P521-Key"),
++    FEAT_INIT("pckmo-ecc-ed25519", S390_FEAT_TYPE_PCKMO, 40 , "PCKMO Encrypt-ECC-Ed25519-Key"),
++    FEAT_INIT("pckmo-ecc-ed448", S390_FEAT_TYPE_PCKMO, 41 , "PCKMO Encrypt-ECC-Ed448-Key"),
+ 
+     FEAT_INIT("kmctr-dea", S390_FEAT_TYPE_KMCTR, 1, "KMCTR DEA"),
+     FEAT_INIT("kmctr-tdea-128", S390_FEAT_TYPE_KMCTR, 2, "KMCTR TDEA-128"),
+@@ -298,6 +304,13 @@ static const S390FeatDef s390_features[] = {
+     FEAT_INIT("pcc-xts-aes-256", S390_FEAT_TYPE_PCC, 52, "PCC Compute-XTS-Parameter-Using-AES-256"),
+     FEAT_INIT("pcc-xts-eaes-128", S390_FEAT_TYPE_PCC, 58, "PCC Compute-XTS-Parameter-Using-Encrypted-AES-128"),
+     FEAT_INIT("pcc-xts-eaes-256", S390_FEAT_TYPE_PCC, 60, "PCC Compute-XTS-Parameter-Using-Encrypted-AES-256"),
++    FEAT_INIT("pcc-scalar-mult-p256", S390_FEAT_TYPE_PCC, 64, "PCC Scalar-Multiply-P256"),
++    FEAT_INIT("pcc-scalar-mult-p384", S390_FEAT_TYPE_PCC, 65, "PCC Scalar-Multiply-P384"),
++    FEAT_INIT("pcc-scalar-mult-p521", S390_FEAT_TYPE_PCC, 66, "PCC Scalar-Multiply-P521"),
++    FEAT_INIT("pcc-scalar-mult-ed25519", S390_FEAT_TYPE_PCC, 72, "PCC Scalar-Multiply-Ed25519"),
++    FEAT_INIT("pcc-scalar-mult-ed448", S390_FEAT_TYPE_PCC, 73, "PCC Scalar-Multiply-Ed448"),
++    FEAT_INIT("pcc-scalar-mult-x25519", S390_FEAT_TYPE_PCC, 80, "PCC Scalar-Multiply-X25519"),
++    FEAT_INIT("pcc-scalar-mult-x448", S390_FEAT_TYPE_PCC, 81, "PCC Scalar-Multiply-X448"),
+ 
+     FEAT_INIT("ppno-sha-512-drng", S390_FEAT_TYPE_PPNO, 3, "PPNO SHA-512-DRNG"),
+     FEAT_INIT("prno-trng-qrtcr", S390_FEAT_TYPE_PPNO, 112, "PRNO TRNG-Query-Raw-to-Conditioned-Ratio"),
+@@ -309,6 +322,22 @@ static const S390FeatDef s390_features[] = {
+     FEAT_INIT("kma-gcm-eaes-128", S390_FEAT_TYPE_KMA, 26, "KMA GCM-Encrypted-AES-128"),
+     FEAT_INIT("kma-gcm-eaes-192", S390_FEAT_TYPE_KMA, 27, "KMA GCM-Encrypted-AES-192"),
+     FEAT_INIT("kma-gcm-eaes-256", S390_FEAT_TYPE_KMA, 28, "KMA GCM-Encrypted-AES-256"),
++
++    FEAT_INIT("kdsa-ecdsa-verify-p256", S390_FEAT_TYPE_KDSA, 1, "KDSA ECDSA-Verify-P256"),
++    FEAT_INIT("kdsa-ecdsa-verify-p384", S390_FEAT_TYPE_KDSA, 2, "KDSA ECDSA-Verify-P384"),
++    FEAT_INIT("kdsa-ecdsa-verify-p521", S390_FEAT_TYPE_KDSA, 3, "KDSA ECDSA-Verify-P521"),
++    FEAT_INIT("kdsa-ecdsa-sign-p256", S390_FEAT_TYPE_KDSA, 9, "KDSA ECDSA-Sign-P256"),
++    FEAT_INIT("kdsa-ecdsa-sign-p384", S390_FEAT_TYPE_KDSA, 10, "KDSA ECDSA-Sign-P384"),
++    FEAT_INIT("kdsa-ecdsa-sign-p521", S390_FEAT_TYPE_KDSA, 11, "KDSA ECDSA-Sign-P521"),
++    FEAT_INIT("kdsa-eecdsa-sign-p256", S390_FEAT_TYPE_KDSA, 17, "KDSA Encrypted-ECDSA-Sign-P256"),
++    FEAT_INIT("kdsa-eecdsa-sign-p384", S390_FEAT_TYPE_KDSA, 18, "KDSA Encrypted-ECDSA-Sign-P384"),
++    FEAT_INIT("kdsa-eecdsa-sign-p521", S390_FEAT_TYPE_KDSA, 19, "KDSA Encrypted-ECDSA-Sign-P521"),
++    FEAT_INIT("kdsa-eddsa-verify-ed25519", S390_FEAT_TYPE_KDSA, 32, "KDSA EdDSA-Verify-Ed25519"),
++    FEAT_INIT("kdsa-eddsa-verify-ed448", S390_FEAT_TYPE_KDSA, 36, "KDSA EdDSA-Verify-Ed448"),
++    FEAT_INIT("kdsa-eddsa-sign-ed25519", S390_FEAT_TYPE_KDSA, 40, "KDSA EdDSA-Sign-Ed25519"),
++    FEAT_INIT("kdsa-eddsa-sign-ed448", S390_FEAT_TYPE_KDSA, 44, "KDSA EdDSA-Sign-Ed448"),
++    FEAT_INIT("kdsa-eeddsa-sign-ed25519", S390_FEAT_TYPE_KDSA, 48, "KDSA Encrypted-EdDSA-Sign-Ed25519"),
++    FEAT_INIT("kdsa-eeddsa-sign-ed448", S390_FEAT_TYPE_KDSA, 52, "KDSA Encrypted-EdDSA-Sign-Ed448"),
+ };
+ 
+ const S390FeatDef *s390_feat_def(S390Feat feat)
+@@ -371,6 +400,7 @@ void s390_fill_feat_block(const S390FeatBitmap features, S390FeatType type,
+     case S390_FEAT_TYPE_PCC:
+     case S390_FEAT_TYPE_PPNO:
+     case S390_FEAT_TYPE_KMA:
++    case S390_FEAT_TYPE_KDSA:
+         set_be_bit(0, data); /* query is always available */
+         break;
+     default:
+@@ -466,6 +496,8 @@ static S390FeatGroupDef s390_feature_groups[] = {
+     FEAT_GROUP_INIT("msa6", MSA_EXT_6, "Message-security-assist-extension 6 facility"),
+     FEAT_GROUP_INIT("msa7", MSA_EXT_7, "Message-security-assist-extension 7 facility"),
+     FEAT_GROUP_INIT("msa8", MSA_EXT_8, "Message-security-assist-extension 8 facility"),
++    FEAT_GROUP_INIT("msa9", MSA_EXT_9, "Message-security-assist-extension 9 facility"),
++    FEAT_GROUP_INIT("msa9_pckmo", MSA_EXT_9_PCKMO, "Message-security-assist-extension 9 PCKMO subfunctions"),
+     FEAT_GROUP_INIT("mepochptff", MULTIPLE_EPOCH_PTFF, "PTFF enhancements introduced with Multiple-epoch facility"),
+ };
+ 
+diff --git a/target/s390x/cpu_features.h b/target/s390x/cpu_features.h
+index effe790271..5ffd3db083 100644
+--- a/target/s390x/cpu_features.h
++++ b/target/s390x/cpu_features.h
+@@ -39,6 +39,7 @@ typedef enum {
+     S390_FEAT_TYPE_PCC,
+     S390_FEAT_TYPE_PPNO,
+     S390_FEAT_TYPE_KMA,
++    S390_FEAT_TYPE_KDSA,
+ } S390FeatType;
+ 
+ /* Definition of a CPU feature */
 diff --git a/target/s390x/cpu_features_def.h b/target/s390x/cpu_features_def.h
-index 5fc7e7bf01..31dd678301 100644
+index 31dd678301..030784811b 100644
 --- a/target/s390x/cpu_features_def.h
 +++ b/target/s390x/cpu_features_def.h
-@@ -71,6 +71,7 @@ typedef enum {
-     S390_FEAT_MISC_INSTRUCTION_EXT,
-     S390_FEAT_SEMAPHORE_ASSIST,
-     S390_FEAT_TIME_SLICE_INSTRUMENTATION,
-+    S390_FEAT_MISC_INSTRUCTION_EXT3,
-     S390_FEAT_RUNTIME_INSTRUMENTATION,
-     S390_FEAT_ZPCI,
-     S390_FEAT_ADAPTER_EVENT_NOTIFICATION,
+@@ -96,6 +96,7 @@ typedef enum {
+     S390_FEAT_INSERT_REFERENCE_BITS_MULT,
+     S390_FEAT_MSA_EXT_8,
+     S390_FEAT_CMM_NT,
++    S390_FEAT_MSA_EXT_9,
+     S390_FEAT_ETOKEN,
+ 
+     /* Sclp Conf Char */
+@@ -240,6 +241,11 @@ typedef enum {
+     S390_FEAT_PCKMO_AES_128,
+     S390_FEAT_PCKMO_AES_192,
+     S390_FEAT_PCKMO_AES_256,
++    S390_FEAT_PCKMO_ECC_P256,
++    S390_FEAT_PCKMO_ECC_P384,
++    S390_FEAT_PCKMO_ECC_P521,
++    S390_FEAT_PCKMO_ECC_ED25519,
++    S390_FEAT_PCKMO_ECC_ED448,
+ 
+     /* KMCTR */
+     S390_FEAT_KMCTR_DEA,
+@@ -300,6 +306,13 @@ typedef enum {
+     S390_FEAT_PCC_XTS_AES_256,
+     S390_FEAT_PCC_XTS_EAES_128,
+     S390_FEAT_PCC_XTS_EAES_256,
++    S390_FEAT_PCC_SCALAR_MULT_P256,
++    S390_FEAT_PCC_SCALAR_MULT_P384,
++    S390_FEAT_PCC_SCALAR_MULT_P512,
++    S390_FEAT_PCC_SCALAR_MULT_ED25519,
++    S390_FEAT_PCC_SCALAR_MULT_ED448,
++    S390_FEAT_PCC_SCALAR_MULT_X25519,
++    S390_FEAT_PCC_SCALAR_MULT_X448,
+ 
+     /* PPNO/PRNO */
+     S390_FEAT_PPNO_SHA_512_DRNG,
+@@ -313,6 +326,24 @@ typedef enum {
+     S390_FEAT_KMA_GCM_EAES_128,
+     S390_FEAT_KMA_GCM_EAES_192,
+     S390_FEAT_KMA_GCM_EAES_256,
++
++    /* KDSA */
++    S390_FEAT_ECDSA_VERIFY_P256,
++    S390_FEAT_ECDSA_VERIFY_P384,
++    S390_FEAT_ECDSA_VERIFY_P512,
++    S390_FEAT_ECDSA_SIGN_P256,
++    S390_FEAT_ECDSA_SIGN_P384,
++    S390_FEAT_ECDSA_SIGN_P512,
++    S390_FEAT_EECDSA_SIGN_P256,
++    S390_FEAT_EECDSA_SIGN_P384,
++    S390_FEAT_EECDSA_SIGN_P512,
++    S390_FEAT_EDDSA_VERIFY_ED25519,
++    S390_FEAT_EDDSA_VERIFY_ED448,
++    S390_FEAT_EDDSA_SIGN_ED25519,
++    S390_FEAT_EDDSA_SIGN_ED448,
++    S390_FEAT_EEDDSA_SIGN_ED25519,
++    S390_FEAT_EEDDSA_SIGN_ED448,
++
+     S390_FEAT_MAX,
+ } S390Feat;
+ 
+diff --git a/target/s390x/cpu_models.c b/target/s390x/cpu_models.c
+index b4bb5de635..d683635eb5 100644
+--- a/target/s390x/cpu_models.c
++++ b/target/s390x/cpu_models.c
+@@ -782,6 +782,8 @@ static void check_consistency(const S390CPUModel *model)
+         { S390_FEAT_SIE_CMMA, S390_FEAT_SIE_GSLS },
+         { S390_FEAT_SIE_PFMFI, S390_FEAT_EDAT },
+         { S390_FEAT_MSA_EXT_8, S390_FEAT_MSA_EXT_3 },
++        { S390_FEAT_MSA_EXT_9, S390_FEAT_MSA_EXT_3 },
++        { S390_FEAT_MSA_EXT_9, S390_FEAT_MSA_EXT_4 },
+         { S390_FEAT_MULTIPLE_EPOCH, S390_FEAT_TOD_CLOCK_STEERING },
+         { S390_FEAT_VECTOR_PACKED_DECIMAL, S390_FEAT_VECTOR },
+         { S390_FEAT_VECTOR_ENH, S390_FEAT_VECTOR },
+diff --git a/target/s390x/gen-features.c b/target/s390x/gen-features.c
+index e4739a6b9f..a2f9e2b43f 100644
+--- a/target/s390x/gen-features.c
++++ b/target/s390x/gen-features.c
+@@ -213,6 +213,38 @@
+     S390_FEAT_KMA_GCM_EAES_192, \
+     S390_FEAT_KMA_GCM_EAES_256
+ 
++#define S390_FEAT_GROUP_MSA_EXT_9 \
++    S390_FEAT_MSA_EXT_9, \
++    S390_FEAT_ECDSA_VERIFY_P256, \
++    S390_FEAT_ECDSA_VERIFY_P384, \
++    S390_FEAT_ECDSA_VERIFY_P512, \
++    S390_FEAT_ECDSA_SIGN_P256, \
++    S390_FEAT_ECDSA_SIGN_P384, \
++    S390_FEAT_ECDSA_SIGN_P512, \
++    S390_FEAT_EECDSA_SIGN_P256, \
++    S390_FEAT_EECDSA_SIGN_P384, \
++    S390_FEAT_EECDSA_SIGN_P512, \
++    S390_FEAT_EDDSA_VERIFY_ED25519, \
++    S390_FEAT_EDDSA_VERIFY_ED448, \
++    S390_FEAT_EDDSA_SIGN_ED25519, \
++    S390_FEAT_EDDSA_SIGN_ED448, \
++    S390_FEAT_EEDDSA_SIGN_ED25519, \
++    S390_FEAT_EEDDSA_SIGN_ED448, \
++    S390_FEAT_PCC_SCALAR_MULT_P256, \
++    S390_FEAT_PCC_SCALAR_MULT_P384, \
++    S390_FEAT_PCC_SCALAR_MULT_P512, \
++    S390_FEAT_PCC_SCALAR_MULT_ED25519, \
++    S390_FEAT_PCC_SCALAR_MULT_ED448, \
++    S390_FEAT_PCC_SCALAR_MULT_X25519, \
++    S390_FEAT_PCC_SCALAR_MULT_X448
++
++#define S390_FEAT_GROUP_MSA_EXT_9_PCKMO \
++    S390_FEAT_PCKMO_ECC_P256, \
++    S390_FEAT_PCKMO_ECC_P384, \
++    S390_FEAT_PCKMO_ECC_P521, \
++    S390_FEAT_PCKMO_ECC_ED25519, \
++    S390_FEAT_PCKMO_ECC_ED448
++
+ /* cpu feature groups */
+ static uint16_t group_PLO[] = {
+     S390_FEAT_GROUP_PLO,
+@@ -254,6 +286,14 @@ static uint16_t group_MSA_EXT_8[] = {
+     S390_FEAT_GROUP_MSA_EXT_8,
+ };
+ 
++static uint16_t group_MSA_EXT_9[] = {
++    S390_FEAT_GROUP_MSA_EXT_9,
++};
++
++static uint16_t group_MSA_EXT_9_PCKMO[] = {
++    S390_FEAT_GROUP_MSA_EXT_9_PCKMO,
++};
++
+ /* Base features (in order of release)
+  * Only non-hypervisor managed features belong here.
+  * Base feature sets are static meaning they do not change in future QEMU
+@@ -709,6 +749,8 @@ static FeatGroupDefSpec FeatGroupDef[] = {
+     FEAT_GROUP_INITIALIZER(MSA_EXT_6),
+     FEAT_GROUP_INITIALIZER(MSA_EXT_7),
+     FEAT_GROUP_INITIALIZER(MSA_EXT_8),
++    FEAT_GROUP_INITIALIZER(MSA_EXT_9),
++    FEAT_GROUP_INITIALIZER(MSA_EXT_9_PCKMO),
+     FEAT_GROUP_INITIALIZER(MULTIPLE_EPOCH_PTFF),
+ };
+ 
+diff --git a/target/s390x/kvm.c b/target/s390x/kvm.c
+index 7df7be4a1b..de0b984b68 100644
+--- a/target/s390x/kvm.c
++++ b/target/s390x/kvm.c
+@@ -2073,6 +2073,9 @@ static int query_cpu_subfunc(S390FeatBitmap features)
+     if (test_bit(S390_FEAT_MSA_EXT_8, features)) {
+         s390_add_from_feat_block(features, S390_FEAT_TYPE_KMA, prop.kma);
+     }
++    if (test_bit(S390_FEAT_MSA_EXT_9, features)) {
++        s390_add_from_feat_block(features, S390_FEAT_TYPE_KDSA, prop.kdsa);
++    }
+     return 0;
+ }
+ 
+@@ -2117,6 +2120,9 @@ static int configure_cpu_subfunc(const S390FeatBitmap features)
+     if (test_bit(S390_FEAT_MSA_EXT_8, features)) {
+         s390_fill_feat_block(features, S390_FEAT_TYPE_KMA, prop.kma);
+     }
++    if (test_bit(S390_FEAT_MSA_EXT_9, features)) {
++        s390_fill_feat_block(features, S390_FEAT_TYPE_KDSA, prop.kdsa);
++    }
+     return kvm_vm_ioctl(kvm_state, KVM_SET_DEVICE_ATTR, &attr);
+ }
+ 
 -- 
 2.17.1
