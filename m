@@ -1,25 +1,30 @@
-Received: from eggs.gnu.org ([209.51.188.92]:32848)
+Received: from eggs.gnu.org ([209.51.188.92]:33741)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <lma@suse.com>) id 1hJzEe-0000pL-4a
-	for qemu-devel@nongnu.org; Fri, 26 Apr 2019 07:41:45 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1hJzIm-0002VQ-IK
+	for qemu-devel@nongnu.org; Fri, 26 Apr 2019 07:46:01 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <lma@suse.com>) id 1hJzEc-0000yW-5y
-	for qemu-devel@nongnu.org; Fri, 26 Apr 2019 07:41:44 -0400
-Received: from smtp2.provo.novell.com ([137.65.250.81]:40955)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <lma@suse.com>) id 1hJzEb-0000pj-Rj
-	for qemu-devel@nongnu.org; Fri, 26 Apr 2019 07:41:42 -0400
-References: <4ec13220-0c12-3b87-6a79-49a42a38db01@suse.com>
-	<20190426083830.kj7currufo637loa@sirius.home.kraxel.org>
-From: Lin Ma <lma@suse.com>
-Message-ID: <ef5b2ec7-f796-becd-f488-bb17538e93bb@suse.com>
-Date: Fri, 26 Apr 2019 19:41:30 +0800
+	(envelope-from <peter.maydell@linaro.org>) id 1hJzIl-0007T6-DM
+	for qemu-devel@nongnu.org; Fri, 26 Apr 2019 07:46:00 -0400
+Received: from mail-oi1-x241.google.com ([2607:f8b0:4864:20::241]:46230)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1hJzIh-0007M7-GF
+	for qemu-devel@nongnu.org; Fri, 26 Apr 2019 07:45:57 -0400
+Received: by mail-oi1-x241.google.com with SMTP id l12so2628635oie.13
+	for <qemu-devel@nongnu.org>; Fri, 26 Apr 2019 04:45:49 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20190426083830.kj7currufo637loa@sirius.home.kraxel.org>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 8bit
-Content-Language: en-US
-Subject: Re: [Qemu-devel] About pt-br keyboard layout
+References: <20190103144124.18917-1-stefanha@redhat.com>
+	<CAFEAcA-B_T9E3ezWFXg-wp3RotMjv3-z3qY7hSJZEoqFBqCWnQ@mail.gmail.com>
+	<62b29bc1-cc78-cd64-4377-fc4007ba7189@redhat.com>
+	<20190426091702.GA2071@stefanha-x1.localdomain>
+In-Reply-To: <20190426091702.GA2071@stefanha-x1.localdomain>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Fri, 26 Apr 2019 12:45:37 +0100
+Message-ID: <CAFEAcA8OVKO087uiNvwDGObiaxHAPYHwoXLEN1t5Y4v9B43r9A@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH] Revert "armv7m: Guard against no -kernel
+ argument"
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,38 +33,65 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Gerd Hoffmann <kraxel@redhat.com>
-Cc: qemu-devel@nongnu.org
+To: Stefan Hajnoczi <stefanha@redhat.com>
+Cc: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>, Jim Mussared <jim@groklearning.com>, Julia Suvorova <jusual@mail.ru>, QEMU Developers <qemu-devel@nongnu.org>, Steffen Gortz <qemu.ml@steffen-goertz.de>, qemu-arm <qemu-arm@nongnu.org>, Joel Stanley <joel@jms.id.au>, =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>, Thomas Huth <thuth@redhat.com>
 
-
-On 4/26/19 4:38 PM, Gerd Hoffmann wrote:
-> On Fri, Apr 26, 2019 at 04:09:12PM +0800, Lin Ma wrote:
->> Hi all,
->>
->> While I launch qemu with vnc + pt-br keyboard layout on my pc, If I type
->> shift + 6 in iPXE shell or grub shell via my usual 105-key keyboard,
->> shift + 6 would be mapped to "(apostrophe), But IIUC the correct character
->> should be ¨(diaeresis) in pt-br layout.
->>
->> I'm wondering that is it the expected behavior? In other words, Does it make
->> sense if I want to type multi-character characters(say Ç or ¨) without guest
->> os's help?
-> No.  -k is for translating keysyms back into the correct scancodes,
-> because this is what the (virtual) keyboard passes to the guest.
-> So -k must match the *hosts* keyboard layout.
-So, that means, If I launch qemu with -k pt-br on a host, I need to 
-ensure the keyboard layout
-must be pt-br as well onthathypervisorhost,Then when I connected to this 
-vnc server(qemu)
-throughvncviewer on mylaptop(us keyboard layout), I type shift + 6, I 
-can get¨(diaeresis)
-character, am I right?
-> Translating the scancodes into keysyms again is the job of the guest,
-> so that requires the keymapping you want to use being active in the
-> guest os.  Typically that would be the same you have on the host, but
-> that isn't required.  The guest can work with -- for example -- us
-> layout (like it is often the case in boot loaders).  Behavior should be
-> identical to physical hardware here.
+On Fri, 26 Apr 2019 at 10:17, Stefan Hajnoczi <stefanha@redhat.com> wrote:
 >
-> HTH,
->    Gerd
+> On Thu, Apr 25, 2019 at 08:07:06PM +0200, Philippe Mathieu-Daud=C3=A9 wro=
+te:
+> > Previous to this commit (v3.1), we have:
+> >
+> > $ qemu-system-aarch64 -M netduino2
+> > qemu-system-aarch64: Guest image must be specified (using -kernel)
+> >
+> > Now (v4.0) we get:
+> >
+> > $ qemu-system-aarch64 -M netduino2
+> > qemu: fatal: Lockup: can't escalate 3 to HardFault (current priority -1=
+)
+>
+> A user-friendly error message is needed here.  The check for -kernel was
+> too specific and is not desirable for microbit where we use -device
+> loader.
+
+It's consistent with how many of our other board models work.
+If you try to run them without providing any guest code
+in any way, then they just do something not very useful.
+(For A-profile this used to often be "die with the 'execution
+from something not ROM or RAM' message" and is now "just steam
+through executing garbage and/or taking exceptions in a tight loop.")
+This is how real hardware also works :-)
+
+(Strictly speaking this message appearing is a defect in
+QEMU's emulation -- the 'lockup' state behaviour is architecturally
+well-defined and is supposed to cause the CPU to sit there doing
+continual instruction fetches from a specific (non-valid) address
+until either the system is reset or an NMI handler kicks in which
+might be able to rescue it. We don't bother to emulate this detail
+because lockup is pretty much always a guest bug and the only thing
+I've seen using the lockup behaviour and expecting to recover from it
+is test code.)
+
+> Old boards probably want to continue using -kernel.  New boards like
+> microbit may use just -device loader.  Perhaps there is even a group
+> that wants both options.
+>
+> A solution is to introduce explicit checks so that we can tell the user
+> the appropriate option for the machine type.  I can work on this if you
+> like, but probably won't be able to send a patch until Tuesday.
+
+But it's difficult to tell how to identify whether there's really
+any guest code there. For instance the user might want to start
+QEMU, connect via the gdbstub and load guest code from gdb.
+Or they might be using the generic-loader device. Or they might
+really be using -kernel but with a broken guest image which doesn't
+have a vector table in it, which will result in the same message.
+I guess you could have a heuristic for "if an M-profile CPU is in reset
+and the value it loads for the starting PC is zero and the gdb
+stub is not connected, then print a warning that the guest image
+is missing or there's no vector table" but I'm not a big fan of
+heuristics...
+
+thanks
+-- PMM
