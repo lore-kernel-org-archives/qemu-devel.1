@@ -2,85 +2,64 @@ Return-Path: <SRS0=QtPl=S4=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.7 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,FROM_EXCESS_BASE64,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D9594C43218
-	for <qemu-devel@archiver.kernel.org>; Fri, 26 Apr 2019 12:06:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2DA5AC43218
+	for <qemu-devel@archiver.kernel.org>; Fri, 26 Apr 2019 12:06:13 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A3511206C1
-	for <qemu-devel@archiver.kernel.org>; Fri, 26 Apr 2019 12:06:04 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="sjC5J+up"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A3511206C1
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	by mail.kernel.org (Postfix) with ESMTPS id 00BBC206C1
+	for <qemu-devel@archiver.kernel.org>; Fri, 26 Apr 2019 12:06:12 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 00BBC206C1
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:46118 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:46120 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hJzcB-0001vN-Rj
-	for qemu-devel@archiver.kernel.org; Fri, 26 Apr 2019 08:06:03 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:37003)
+	id 1hJzcK-00023a-4q
+	for qemu-devel@archiver.kernel.org; Fri, 26 Apr 2019 08:06:12 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:36831)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcandre.lureau@gmail.com>) id 1hJzZz-0008W0-Az
-	for qemu-devel@nongnu.org; Fri, 26 Apr 2019 08:03:48 -0400
+	(envelope-from <imammedo@redhat.com>) id 1hJzZj-0008Ku-RW
+	for qemu-devel@nongnu.org; Fri, 26 Apr 2019 08:03:32 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcandre.lureau@gmail.com>) id 1hJzMd-0001kN-Pe
-	for qemu-devel@nongnu.org; Fri, 26 Apr 2019 07:50:00 -0400
-Received: from mail-wm1-x32b.google.com ([2a00:1450:4864:20::32b]:37044)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <marcandre.lureau@gmail.com>)
-	id 1hJzMd-0001jU-E2
-	for qemu-devel@nongnu.org; Fri, 26 Apr 2019 07:49:59 -0400
-Received: by mail-wm1-x32b.google.com with SMTP id y5so3000151wma.2
-	for <qemu-devel@nongnu.org>; Fri, 26 Apr 2019 04:49:59 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
-	h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-	:cc:content-transfer-encoding;
-	bh=101OBzHxvO53GOSETCH8ned8FQ5vmAHL5a2J5kLkOsE=;
-	b=sjC5J+up6z14RG0D2uO9mJsaLYYa2R3vgsC4DXfJ5x+T4QmIOvsNvve/KewQq2lWIX
-	4DBEvY/VMfxxVeqTBZ8Q+rYMrlR8KQ6SQs9QUyKUEJw9N6tsH0d6Vl/ovH42v6PAQ7eu
-	RRnDDJ5N30U7bKcVT96rGQWxxNUcZ33sCtgm8HbbK2BRAbqz4v0w2lLlZuiNC+hJ6Ym9
-	vGU47CZ9uic4YFKlXaJ4KrA+lcmWjELCACxBCc1npg2S/hUukgiLowapnjMPPleg5OTr
-	hRVzhh6xC2yGxjQJtRV1NajE7tdA//OomDcuc9YSTrOpioL5vwwFWH/DBYSKCjKntvv9
-	JHgw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=1e100.net; s=20161025;
-	h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-	:message-id:subject:to:cc:content-transfer-encoding;
-	bh=101OBzHxvO53GOSETCH8ned8FQ5vmAHL5a2J5kLkOsE=;
-	b=al5ezbQgwVBbBLEg14bqnQ+hGfQ8clnY9dWwVdov+hiTO4ADDcaxejtZHAwZgHvL2i
-	WNJrXo0o8bXXO/IXpkqQjyyXr2U1Db8p9wy6LuwtUrMY2mzvvH3imwlTZ6pVKoFfIhni
-	XNjKqWcpUiaLlFkT2udrEA0BaBxPSlfal153rkynJofdS5fkioMjspJ7PieTb4mQEWpj
-	YYONjHznQ5FPh829tmWPf8nlL19M32Tlm7E0qPQyxZTxtI36BGaKuJWWAvQ26XPeag7z
-	HPOE4dicArB8Jk8abHq/CFqogmQb3LClpDEsyRW+WFJbOwyYWA//sWf3wI3a2BfoZap6
-	cuzA==
-X-Gm-Message-State: APjAAAUg7dTAZMHrgYKP10sGbhrt5p2V9bMd6Pqdc2rw3Jc6q49/6BC4
-	1qai76lOTASO1TgDwS5aRSXJSlc7kQP8P2n1Fi4=
-X-Google-Smtp-Source: APXvYqwtPl55MR64c367GBoQUqhdyIcZbkmE4STHM0k0Ck+44u+hfvyFv2x7Dacq0uZiou553eAibvMo58TD3MzEbjI=
-X-Received: by 2002:a1c:be13:: with SMTP id o19mr7348556wmf.19.1556279398050; 
-	Fri, 26 Apr 2019 04:49:58 -0700 (PDT)
+	(envelope-from <imammedo@redhat.com>) id 1hJzQy-0002ym-6i
+	for qemu-devel@nongnu.org; Fri, 26 Apr 2019 07:54:29 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:46316)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1hJzQx-0002sc-9d
+	for qemu-devel@nongnu.org; Fri, 26 Apr 2019 07:54:28 -0400
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+	[10.5.11.14])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 902193008CC7;
+	Fri, 26 Apr 2019 11:54:23 +0000 (UTC)
+Received: from Igors-MacBook-Pro.local (ovpn-112-27.ams2.redhat.com
+	[10.36.112.27])
+	by smtp.corp.redhat.com (Postfix) with ESMTP id 2F66C5DAAF;
+	Fri, 26 Apr 2019 11:54:18 +0000 (UTC)
+Date: Fri, 26 Apr 2019 13:54:12 +0200
+From: Igor Mammedov <imammedo@redhat.com>
+To: x00249684 <xuwei5@huawei.com>
+Message-ID: <20190426135412.758769f9@Igors-MacBook-Pro.local>
+In-Reply-To: <1556211116-172721-1-git-send-email-xuwei5@huawei.com>
+References: <1556170489-131927-12-git-send-email-imammedo@redhat.com>
+	<1556211116-172721-1-git-send-email-xuwei5@huawei.com>
 MIME-Version: 1.0
-References: <20190423132004.13725-1-marcandre.lureau@redhat.com>
-	<20190423132004.13725-6-marcandre.lureau@redhat.com>
-	<20190426072446.r7b7wsm4qghd7pzr@sirius.home.kraxel.org>
-In-Reply-To: <20190426072446.r7b7wsm4qghd7pzr@sirius.home.kraxel.org>
-From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
-Date: Fri, 26 Apr 2019 13:49:46 +0200
-Message-ID:
- <CAJ+F1CKbgb_TkoS_a10qGw7kkTO+EkC4uhreCkOu=k2ut5CAig@mail.gmail.com>
-To: Gerd Hoffmann <kraxel@redhat.com>
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
-	recognized.
-X-Received-From: 2a00:1450:4864:20::32b
-Subject: Re: [Qemu-devel] [PATCH v6 05/11] vhost-user: add
- vhost_user_gpu_set_socket()
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+	(mx1.redhat.com [10.5.110.48]);
+	Fri, 26 Apr 2019 11:54:23 +0000 (UTC)
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 209.132.183.28
+Subject: Re: [Qemu-devel] [PATCH v3 11/13] tests: acpi: add simple arm/virt
+ testcase
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -92,57 +71,63 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: QEMU <qemu-devel@nongnu.org>, "Michael S. Tsirkin" <mst@redhat.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>, Andrew Jones <drjones@redhat.com>,
+	mst@redhat.com, qemu-devel@nongnu.org,
+	shameerali.kolothum.thodi@huawei.com, linuxarm@huawei.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190426114946._aoOUlKABcQXsy3hm3YJaN8T7MAPRTJmFL_hkhhrbRA@z>
+Message-ID: <20190426115412.PCk4UGOoxC9flSq0YVwIvtgLI6aFprvg3reBdTDoons@z>
 
-Hi
+On Fri, 26 Apr 2019 00:51:56 +0800
+x00249684 <xuwei5@huawei.com> wrote:
 
-On Fri, Apr 26, 2019 at 9:33 AM Gerd Hoffmann <kraxel@redhat.com> wrote:
->
-> On Tue, Apr 23, 2019 at 03:19:58PM +0200, Marc-Andr=C3=A9 Lureau wrote:
-> > Add a new vhost-user message to give a unix socket to a vhost-user
-> > backend for GPU display updates.
->
-> Can you split input/gpu into two patch series?
->
-> > +Wire format
-> > +=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-> > +
-> > +Unless specified differently, numbers are in the machine native byte
-> > +order.
-> > +
-> > +A vhost-user-gpu request consists of 2 header fields and a payload.
-> > +
-> > ++---------+------+---------+
-> > +| request | size | payload |
-> > ++---------+------+---------+
-> > +
-> > +Header
-> > +------
-> > +
-> > +:request: ``u32``, type of the request
-> > +
-> > +:size: ``u32``, size of the payload
-> > +
-> > +A reply consists only of a payload, whose content depends on the reque=
-st.
->
-> I'd suggest to use the same format for replies, only with "request"
-> meaning "status" in replies.  Allows for OK/ERROR status in replies,
-> and having a size field in replies too should make things more robust.
-> Also allows for an empty reply (status=3Dok,size=3D0).
+> Hi Igor,
+> 
+> +static void test_acpi_virt_tcg(void)
+> +{
+> +    test_data data = {
+> +        .machine = "virt",
+> +        .uefi_fl1 = "pc-bios/edk2-aarch64-code.fd",
+> +        .uefi_fl2 = "pc-bios/edk2-arm-vars.fd",
+> +        .cd = "tests/data/uefi-boot-images/bios-tables-test.aarch64.iso.qcow2",
+> +        .ram_start = 0x40000000ULL,
+> +        .scan_len = 128ULL * 1024 * 1024,
+> +    };
+> +
+> +    test_acpi_one("-cpu cortex-a57 ", &data);
+> 
+> Replaced the cortex-a57 with host and succesfully tested on the hisilicon arm64 
+> D05 board. Otherwise it failed with "kvm_init_vcpu failed: Invalid argument".
+> Is it possilbe to set the cpu type like numa-test.c?
 
+I think it works with numa-test because it uses TCG only but in case of bios-tables-test
+it uses accel="kvm:tcg" to leverage KVM capabilities whenever possible to speed up test.
 
-That brings more questions and ambiguity imho.
+Now back to our ARM test case, uefi requirement is to use 64bit CPU (hence it was cortex-a57)
+however unlike x86 it obviously breaks since KVM accelerator on ARM host is used
+and it doesn't work with anything other than 'host' cpu model.
 
-Can we leave that for future protocol extensions negotiated with
-GET/SET_PROTOCOL_FEATURES ?
+I think we still want to use KVM whenever possible, but problem lies in that
+user (testcase) doesn't have an idea if KVM accelerator is available and host is 64 CPU.
 
+to sum up we need to support 2 modes:
+  1. host is 64 ARM, use kvm with -cpu host
+  2. all other cases use tcg with -cpu cortex-a57
 
+I can hack to probe if /dev/kvm is accessible and host is 64 bit and use #1
+otherwise fallback to #2
+or as quick fix do only #2 initially and think about a better solution to #1 
 
---
-Marc-Andr=C3=A9 Lureau
+Is there any other suggestions/opinions how to approach issue/proceed.
+
+PS:
+we probably would like to reuse this not only for acpi tests but also for other
+arm/virt test cases that involve running guest code. 
+
+> Thanks!
+> 
+> Best Regards,
+> Wei
+
 
