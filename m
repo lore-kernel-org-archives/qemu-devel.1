@@ -7,78 +7,83 @@ X-Spam-Status: No, score=-8.7 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0AA1DC43219
-	for <qemu-devel@archiver.kernel.org>; Fri, 26 Apr 2019 17:29:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 43F8CC43219
+	for <qemu-devel@archiver.kernel.org>; Fri, 26 Apr 2019 17:29:36 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C654A2146E
-	for <qemu-devel@archiver.kernel.org>; Fri, 26 Apr 2019 17:29:25 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 09FC82146E
+	for <qemu-devel@archiver.kernel.org>; Fri, 26 Apr 2019 17:29:36 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="XCyaTyYk"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C654A2146E
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="xfk8zAr5"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 09FC82146E
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:49956 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:49958 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hK4f7-0003rq-0d
-	for qemu-devel@archiver.kernel.org; Fri, 26 Apr 2019 13:29:25 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:47946)
+	id 1hK4fH-00044f-8H
+	for qemu-devel@archiver.kernel.org; Fri, 26 Apr 2019 13:29:35 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:47984)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1hK4aN-0008QG-CE
-	for qemu-devel@nongnu.org; Fri, 26 Apr 2019 13:24:32 -0400
+	(envelope-from <richard.henderson@linaro.org>) id 1hK4aQ-0008Tq-P0
+	for qemu-devel@nongnu.org; Fri, 26 Apr 2019 13:24:35 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1hK4aM-0006KL-Dd
-	for qemu-devel@nongnu.org; Fri, 26 Apr 2019 13:24:31 -0400
-Received: from mail-pg1-x52d.google.com ([2607:f8b0:4864:20::52d]:40739)
+	(envelope-from <richard.henderson@linaro.org>) id 1hK4aP-0006VT-MA
+	for qemu-devel@nongnu.org; Fri, 26 Apr 2019 13:24:34 -0400
+Received: from mail-pg1-x531.google.com ([2607:f8b0:4864:20::531]:37923)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1hK4aM-0006I7-7S
-	for qemu-devel@nongnu.org; Fri, 26 Apr 2019 13:24:30 -0400
-Received: by mail-pg1-x52d.google.com with SMTP id d31so1929522pgl.7
-	for <qemu-devel@nongnu.org>; Fri, 26 Apr 2019 10:24:30 -0700 (PDT)
+	id 1hK4aP-0006SD-Fh
+	for qemu-devel@nongnu.org; Fri, 26 Apr 2019 13:24:33 -0400
+Received: by mail-pg1-x531.google.com with SMTP id j26so1936424pgl.5
+	for <qemu-devel@nongnu.org>; Fri, 26 Apr 2019 10:24:33 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
-	h=from:to:cc:subject:date:message-id:in-reply-to:references;
-	bh=NUjDwC8rJFYEblahVxs6YiCANModiBNxtQ+zHc0oNPM=;
-	b=XCyaTyYkv+JIF3rby6W/Z1TMey13mh7VXZDoUkH2SZsBSX9LOeO5Nd35mP5Kgt4oO/
-	jpiAGoZmQfZBWYXpke1v2CvdFBMNpFZ0ID/UOg1pvETx27woW0jO52PbCtQBl7WFZmSg
-	u9bdPLQA0Inu54KHZx/rYDsiBEVleqw6KdnsPLXvayDVifEvTmpTQl4KnmJPbuapBjwI
-	fNjv5TI2L49O9CTeKyjjHpYsctfpv5y1AaB8Y/SRl/VxbGoG75mmgpUU/UAdj2dQzg7/
-	+zjaZlqJgJmjRlzJqzxCHDlgwIwGI1ygkEGu6BLpKl+3z8rZtFud+prq8NSfBeuPA0os
-	VhcQ==
+	h=from:to:cc:subject:date:message-id:in-reply-to:references
+	:mime-version:content-transfer-encoding;
+	bh=qG8cIyjXu/sgNDmtduLrdTs106BZZN6hG6Kr2t2NXJo=;
+	b=xfk8zAr56yHDNB6Km7PICzN7QktqkbjB3oJK4JWsnqfeuDPLLbArlx4VS/clmd4hTu
+	6ba7WpAE7fM31v1aKdZPcyDgT9VHAY4vXZFt41Mox95bVZMITnQy0r8iE9kRoSjlwBXM
+	UUMFBbtnmHQOeWdMu1m6h3rR3O19BusieUhGUvdMKDik68/CqO8OpnQTw/et+jswBrxF
+	Fgk/7B3/nqSaFnwzJXM0DWHJ5h5CyAfDLFfM5M6Gb29sN5UEopYvA/4FgISpOibuaKPy
+	4rwBwFz3p9L8bmvvmFTBzAbPs+N4Cj3f6E1Pkmk6aHP6ncP2owjLZUrbmK5TVMPFEjJa
+	81yA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
 	d=1e100.net; s=20161025;
 	h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
-	:references;
-	bh=NUjDwC8rJFYEblahVxs6YiCANModiBNxtQ+zHc0oNPM=;
-	b=daG5bAsFKsQrqs3V1WrQgDc5yOiUrO+ezzP11Wktdzmy38siNT8sDjYhq5/5hzRFfb
-	VDd/11AOSTOPqFmEDSjYhzjngiRUFHg/GcYcFmpCeIG7NcozeReyUwQDzvOcndamC3uV
-	pF0ASLbL+xPIKbosRfNenRwRxspJJvJT7HmrzkT0ptlQKTTR9MehVG+hO4o+0RH30H2v
-	4tOpmefAnwW72vGt310W8ConD9FCpSSwRFaXTjvygQ28ruvP2L0Lh1hAoPB0NYf7vqnt
-	Sq5txowO+rq2Nc1BvKHzSFTbVG2bb5miWYYY01a0dtg2uZcXIZjVxJzF3hHuVwRFi/nc
-	v8dw==
-X-Gm-Message-State: APjAAAUcslubNSkFGWNi7BAoPoL+mvX8BdY19ywk7akhylmUN15hzVLL
-	yA6sbnPOLijisaaXY7Lg9APzugoOID0=
-X-Google-Smtp-Source: APXvYqzhzLCDLvpWR98/aZ2FaT05rU2CLNU4xV8rgc8qzai8gyULHkTsGnV80TEhPEBUK9ZQVSlomQ==
-X-Received: by 2002:a63:e045:: with SMTP id n5mr42541292pgj.230.1556299468293; 
-	Fri, 26 Apr 2019 10:24:28 -0700 (PDT)
+	:references:mime-version:content-transfer-encoding;
+	bh=qG8cIyjXu/sgNDmtduLrdTs106BZZN6hG6Kr2t2NXJo=;
+	b=GF/Wqs5nWAaap6qYGCIaPUcbhpC0oYY5/5lSLQbQ6LjT1JvmsQXo/3RzK7j5PznCN4
+	sT/EAKz5gMGNsDjKFeNcW0fRYzyyfpr5d9lCviyIwOj8J1K4oBYjVVaBxEK30MOx91k7
+	NE+Wmo1IaN6tkcFBVYvcl+08vTwMcbkvNUvdlZr9RXAC9dNtsiTIWcZL8mU9U/MXbQ+Y
+	yPfmOQNXNkNimpQqSzkCs4SYGZWZ1Q/x/fBSnoYjKWrXbu2ZANEnIiTu70jwvS0+P1p/
+	lF0Blw8/G5aJfoqAduantwmnstgTR/jayokIwX9Wso+uAqIFyYczYwmcPGt9FwWjEWuQ
+	WppQ==
+X-Gm-Message-State: APjAAAUts7WD09z9aELc09hceTKk4VKZeYkZRr+ipVOhE5+5glY8KXI+
+	eyJe8DtV3Q49g3kSuiokuxx+qvjfrKo=
+X-Google-Smtp-Source: APXvYqwiIlxtoCAVoSWAplZXOZo/jnVLtMnP28PACmZQfl5yvOWhD2IQRD86sTFAeY3KwxR6WtfBuw==
+X-Received: by 2002:a63:f444:: with SMTP id p4mr44903840pgk.32.1556299472193; 
+	Fri, 26 Apr 2019 10:24:32 -0700 (PDT)
 Received: from localhost.localdomain (97-113-179-147.tukw.qwest.net.
 	[97.113.179.147]) by smtp.gmail.com with ESMTPSA id
-	j5sm7901762pfg.186.2019.04.26.10.24.27
+	j5sm7901762pfg.186.2019.04.26.10.24.31
 	(version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-	Fri, 26 Apr 2019 10:24:27 -0700 (PDT)
+	Fri, 26 Apr 2019 10:24:31 -0700 (PDT)
 From: Richard Henderson <richard.henderson@linaro.org>
 To: qemu-devel@nongnu.org
-Date: Fri, 26 Apr 2019 10:24:10 -0700
-Message-Id: <20190426172421.27133-5-richard.henderson@linaro.org>
+Date: Fri, 26 Apr 2019 10:24:13 -0700
+Message-Id: <20190426172421.27133-8-richard.henderson@linaro.org>
 X-Mailer: git-send-email 2.17.1
 In-Reply-To: <20190426172421.27133-1-richard.henderson@linaro.org>
 References: <20190426172421.27133-1-richard.henderson@linaro.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
 	recognized.
-X-Received-From: 2607:f8b0:4864:20::52d
-Subject: [Qemu-devel] [PULL 04/15] tcg: Use extract2 in tcg_gen_deposit_{i32, i64}
+X-Received-From: 2607:f8b0:4864:20::531
+Subject: [Qemu-devel] [PULL 07/15] tcg/aarch64: Support
+ INDEX_op_extract2_{i32, i64}
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -94,84 +99,73 @@ Cc: peter.maydell@linaro.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Content-Type: text/plain; charset="UTF-8"
-Message-ID: <20190426172410.aKKTtjoJWK5DI--CG8X8iWWBKCY_ies3rDdXGZDqw10@z>
+Message-ID: <20190426172413.Xo7RofqmGqx-lRvlWRi4XXiua3RKZiETP3RowRz_s-Y@z>
 
+Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- tcg/tcg-op.c | 34 ++++++++++++++++++++++++++++++----
- 1 file changed, 30 insertions(+), 4 deletions(-)
+ tcg/aarch64/tcg-target.h     |  4 ++--
+ tcg/aarch64/tcg-target.inc.c | 11 +++++++++++
+ 2 files changed, 13 insertions(+), 2 deletions(-)
 
-diff --git a/tcg/tcg-op.c b/tcg/tcg-op.c
-index fbc70649dd..a00d1df37e 100644
---- a/tcg/tcg-op.c
-+++ b/tcg/tcg-op.c
-@@ -611,9 +611,22 @@ void tcg_gen_deposit_i32(TCGv_i32 ret, TCGv_i32 arg1, TCGv_i32 arg2,
-         return;
-     }
+diff --git a/tcg/aarch64/tcg-target.h b/tcg/aarch64/tcg-target.h
+index 6600a54a02..ce2bb1f90b 100644
+--- a/tcg/aarch64/tcg-target.h
++++ b/tcg/aarch64/tcg-target.h
+@@ -77,7 +77,7 @@ typedef enum {
+ #define TCG_TARGET_HAS_deposit_i32      1
+ #define TCG_TARGET_HAS_extract_i32      1
+ #define TCG_TARGET_HAS_sextract_i32     1
+-#define TCG_TARGET_HAS_extract2_i32     0
++#define TCG_TARGET_HAS_extract2_i32     1
+ #define TCG_TARGET_HAS_movcond_i32      1
+ #define TCG_TARGET_HAS_add2_i32         1
+ #define TCG_TARGET_HAS_sub2_i32         1
+@@ -114,7 +114,7 @@ typedef enum {
+ #define TCG_TARGET_HAS_deposit_i64      1
+ #define TCG_TARGET_HAS_extract_i64      1
+ #define TCG_TARGET_HAS_sextract_i64     1
+-#define TCG_TARGET_HAS_extract2_i64     0
++#define TCG_TARGET_HAS_extract2_i64     1
+ #define TCG_TARGET_HAS_movcond_i64      1
+ #define TCG_TARGET_HAS_add2_i64         1
+ #define TCG_TARGET_HAS_sub2_i64         1
+diff --git a/tcg/aarch64/tcg-target.inc.c b/tcg/aarch64/tcg-target.inc.c
+index d57f9e500f..8b93598bce 100644
+--- a/tcg/aarch64/tcg-target.inc.c
++++ b/tcg/aarch64/tcg-target.inc.c
+@@ -2058,6 +2058,11 @@ static void tcg_out_op(TCGContext *s, TCGOpcode opc,
+         tcg_out_sbfm(s, ext, a0, a1, a2, a2 + args[3] - 1);
+         break;
  
--    mask = (1u << len) - 1;
-     t1 = tcg_temp_new_i32();
- 
-+    if (TCG_TARGET_HAS_extract2_i32) {
-+        if (ofs + len == 32) {
-+            tcg_gen_shli_i32(t1, arg1, len);
-+            tcg_gen_extract2_i32(ret, t1, arg2, len);
-+            goto done;
-+        }
-+        if (ofs == 0) {
-+            tcg_gen_extract2_i32(ret, arg1, arg2, len);
-+            tcg_gen_rotli_i32(ret, ret, len);
-+            goto done;
-+        }
-+    }
++    case INDEX_op_extract2_i64:
++    case INDEX_op_extract2_i32:
++        tcg_out_extr(s, ext, a0, a1, a2, args[3]);
++        break;
 +
-+    mask = (1u << len) - 1;
-     if (ofs + len < 32) {
-         tcg_gen_andi_i32(t1, arg2, mask);
-         tcg_gen_shli_i32(t1, t1, ofs);
-@@ -622,7 +635,7 @@ void tcg_gen_deposit_i32(TCGv_i32 ret, TCGv_i32 arg1, TCGv_i32 arg2,
-     }
-     tcg_gen_andi_i32(ret, arg1, ~(mask << ofs));
-     tcg_gen_or_i32(ret, ret, t1);
--
-+ done:
-     tcg_temp_free_i32(t1);
- }
+     case INDEX_op_add2_i32:
+         tcg_out_addsub2(s, TCG_TYPE_I32, a0, a1, REG0(2), REG0(3),
+                         (int32_t)args[4], args[5], const_args[4],
+@@ -2300,6 +2305,8 @@ static const TCGTargetOpDef *tcg_target_op_def(TCGOpcode op)
+         = { .args_ct_str = { "r", "r", "rAL" } };
+     static const TCGTargetOpDef dep
+         = { .args_ct_str = { "r", "0", "rZ" } };
++    static const TCGTargetOpDef ext2
++        = { .args_ct_str = { "r", "rZ", "rZ" } };
+     static const TCGTargetOpDef movc
+         = { .args_ct_str = { "r", "r", "rA", "rZ", "rZ" } };
+     static const TCGTargetOpDef add2
+@@ -2430,6 +2437,10 @@ static const TCGTargetOpDef *tcg_target_op_def(TCGOpcode op)
+     case INDEX_op_deposit_i64:
+         return &dep;
  
-@@ -2024,9 +2037,22 @@ void tcg_gen_deposit_i64(TCGv_i64 ret, TCGv_i64 arg1, TCGv_i64 arg2,
-         }
-     }
- 
--    mask = (1ull << len) - 1;
-     t1 = tcg_temp_new_i64();
- 
-+    if (TCG_TARGET_HAS_extract2_i64) {
-+        if (ofs + len == 64) {
-+            tcg_gen_shli_i64(t1, arg1, len);
-+            tcg_gen_extract2_i64(ret, t1, arg2, len);
-+            goto done;
-+        }
-+        if (ofs == 0) {
-+            tcg_gen_extract2_i64(ret, arg1, arg2, len);
-+            tcg_gen_rotli_i64(ret, ret, len);
-+            goto done;
-+        }
-+    }
++    case INDEX_op_extract2_i32:
++    case INDEX_op_extract2_i64:
++        return &ext2;
 +
-+    mask = (1ull << len) - 1;
-     if (ofs + len < 64) {
-         tcg_gen_andi_i64(t1, arg2, mask);
-         tcg_gen_shli_i64(t1, t1, ofs);
-@@ -2035,7 +2061,7 @@ void tcg_gen_deposit_i64(TCGv_i64 ret, TCGv_i64 arg1, TCGv_i64 arg2,
-     }
-     tcg_gen_andi_i64(ret, arg1, ~(mask << ofs));
-     tcg_gen_or_i64(ret, ret, t1);
--
-+ done:
-     tcg_temp_free_i64(t1);
- }
- 
+     case INDEX_op_add2_i32:
+     case INDEX_op_add2_i64:
+     case INDEX_op_sub2_i32:
 -- 
 2.17.1
 
