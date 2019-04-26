@@ -2,61 +2,73 @@ Return-Path: <SRS0=QtPl=S4=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.7 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 00EEDC43219
-	for <qemu-devel@archiver.kernel.org>; Fri, 26 Apr 2019 02:10:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 194B7C43218
+	for <qemu-devel@archiver.kernel.org>; Fri, 26 Apr 2019 02:16:37 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id DB944206A3
-	for <qemu-devel@archiver.kernel.org>; Fri, 26 Apr 2019 02:10:53 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DB944206A3
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.intel.com
+	by mail.kernel.org (Postfix) with ESMTPS id EE3CC206A3
+	for <qemu-devel@archiver.kernel.org>; Fri, 26 Apr 2019 02:16:36 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EE3CC206A3
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:37948 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:37985 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hJqKD-0007KC-2E
-	for qemu-devel@archiver.kernel.org; Thu, 25 Apr 2019 22:10:53 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:48397)
+	id 1hJqPk-0000ag-2P
+	for qemu-devel@archiver.kernel.org; Thu, 25 Apr 2019 22:16:36 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:49145)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richardw.yang@linux.intel.com>) id 1hJqJQ-0006yE-Rz
-	for qemu-devel@nongnu.org; Thu, 25 Apr 2019 22:10:05 -0400
+	(envelope-from <bounces@canonical.com>) id 1hJqOl-0008UE-7f
+	for qemu-devel@nongnu.org; Thu, 25 Apr 2019 22:15:36 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richardw.yang@linux.intel.com>) id 1hJqJO-0005ou-Qk
-	for qemu-devel@nongnu.org; Thu, 25 Apr 2019 22:10:04 -0400
-Received: from mga02.intel.com ([134.134.136.20]:22753)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <richardw.yang@linux.intel.com>)
-	id 1hJqJN-0005i8-4k
-	for qemu-devel@nongnu.org; Thu, 25 Apr 2019 22:10:02 -0400
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from fmsmga004.fm.intel.com ([10.253.24.48])
-	by orsmga101.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384;
-	25 Apr 2019 19:09:58 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.60,395,1549958400"; d="scan'208";a="165183624"
-Received: from richard.sh.intel.com (HELO localhost) ([10.239.159.54])
-	by fmsmga004.fm.intel.com with ESMTP; 25 Apr 2019 19:09:57 -0700
-From: Wei Yang <richardw.yang@linux.intel.com>
-To: qemu-devel@nongnu.org
-Date: Fri, 26 Apr 2019 10:09:27 +0800
-Message-Id: <20190426020927.25470-1-richardw.yang@linux.intel.com>
-X-Mailer: git-send-email 2.19.1
+	(envelope-from <bounces@canonical.com>) id 1hJqOk-0005sz-2M
+	for qemu-devel@nongnu.org; Thu, 25 Apr 2019 22:15:35 -0400
+Received: from indium.canonical.com ([91.189.90.7]:40416)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1hJqOj-0005mf-S8
+	for qemu-devel@nongnu.org; Thu, 25 Apr 2019 22:15:34 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1hJqOi-0006Kd-AN
+	for <qemu-devel@nongnu.org>; Fri, 26 Apr 2019 02:15:32 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 30C302E80CB
+	for <qemu-devel@nongnu.org>; Fri, 26 Apr 2019 02:15:32 +0000 (UTC)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
-	recognized.
-X-Received-From: 134.134.136.20
-Subject: [Qemu-devel] [PATCH] memory: correct the comment to
- DIRTY_MEMORY_MIGRATION
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Fri, 26 Apr 2019 02:08:04 -0000
+From: Alex Williamson <alex.l.williamson@gmail.com>
+To: qemu-devel@nongnu.org
+X-Launchpad-Notification-Type: bug
+X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
+X-Launchpad-Bug-Information-Type: Public
+X-Launchpad-Bug-Private: no
+X-Launchpad-Bug-Security-Vulnerability: no
+X-Launchpad-Bug-Commenters: alex-l-williamson saveriomiroddi
+X-Launchpad-Bug-Reporter: Saverio Miroddi (saveriomiroddi)
+X-Launchpad-Bug-Modifier: Alex Williamson (alex-l-williamson)
+References: <155620554968.6380.13610580395862407350.malonedeb@chaenomeles.canonical.com>
+Message-Id:
+ <155624448458.13303.12060995776553744822.malone@wampee.canonical.com>
+X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
+X-Launchpad-Message-For: qemu-devel-ml
+Precedence: bulk
+X-Generated-By: Launchpad (canonical.com); Revision="18928";
+	Instance="launchpad-lazr.conf"
+X-Launchpad-Hash: 6450dcdbe90bd829317554347cafef2951660114
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 91.189.90.7
+Subject: [Qemu-devel] [Bug 1826422] Re: Regression: QEMU 4.0 hangs the host
+ (*bisect included*)
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
-Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -65,43 +77,90 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: pbonzini@redhat.com, Wei Yang <richardw.yang@linux.intel.com>
+Reply-To: Bug 1826422 <1826422@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Content-Type: text/plain; charset="UTF-8"
-Message-ID: <20190426020927.N-ifUZfJ5Ek1LvKNZ3qvKuTshT5bShbCdLoxsnITinw@z>
+Message-ID: <20190426020804.-P-3KyGi06vPWS4QoZkURGv76llqUOn7pYB_Nmih-K4@z>
 
-The dirty bit is DIRTY_MEMORY_MIGRATION. Correct the comment.
+This seems related to INTx (legacy) interrupt mode, which NVIDIA GeForce
+will use by default.  Using regedit in a Windows VM or adjusting
+nvidia.ko module parameters of a Linux VM can enable the driver to use
+MSI, which seems unaffected.  We also have the vfio-pci device option x
+-no-kvm-intx=3Don, which is probably a good compliment to configuring the
+driver to use MSI until we get this figured out, as the Windows driver
+likes to occasional switch MSI off, which would leave you in a bad
+state.  Routing INTx through QEMU would be a performance regression
+though, so while a workaround, having it routed through QEMU and not
+using MSI, is not a great combination.
 
-Signed-off-by: Wei Yang <richardw.yang@linux.intel.com>
----
- memory.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+-- =
 
-diff --git a/memory.c b/memory.c
-index e49369d85d..9d015bfe4c 100644
---- a/memory.c
-+++ b/memory.c
-@@ -2576,7 +2576,7 @@ void memory_global_dirty_log_start(void)
- 
-     MEMORY_LISTENER_CALL_GLOBAL(log_global_start, Forward);
- 
--    /* Refresh DIRTY_LOG_MIGRATION bit.  */
-+    /* Refresh DIRTY_MEMORY_MIGRATION bit.  */
-     memory_region_transaction_begin();
-     memory_region_update_pending = true;
-     memory_region_transaction_commit();
-@@ -2586,7 +2586,7 @@ static void memory_global_dirty_log_do_stop(void)
- {
-     global_dirty_log = false;
- 
--    /* Refresh DIRTY_LOG_MIGRATION bit.  */
-+    /* Refresh DIRTY_MEMORY_MIGRATION bit.  */
-     memory_region_transaction_begin();
-     memory_region_update_pending = true;
-     memory_region_transaction_commit();
--- 
-2.19.1
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1826422
 
+Title:
+  Regression: QEMU 4.0 hangs the host (*bisect included*)
+
+Status in QEMU:
+  New
+
+Bug description:
+  The commit b2fc91db84470a78f8e93f5b5f913c17188792c8 seemingly
+  introduced a regression on my system.
+
+  When I start QEMU, the guest and the host hang (I need a hard reset to
+  get back to a working system), before anything shows on the guest.
+
+  I use QEMU with GPU passthrough (which worked perfectly until the
+  commit above). This is the command I use:
+
+  ```
+  /path/to/qemu-system-x86_64
+    -drive if=3Dpflash,format=3Draw,readonly,file=3D/path/to/OVMF_CODE.fd
+    -drive if=3Dpflash,format=3Draw,file=3D/tmp/OVMF_VARS.fd.tmp
+    -enable-kvm
+    -machine q35,accel=3Dkvm,mem-merge=3Doff
+    -cpu host,kvm=3Doff,hv_vendor_id=3Dvgaptrocks,hv_relaxed,hv_spinlocks=
+=3D0x1fff,hv_vapic,hv_time
+    -smp 4,cores=3D4,sockets=3D1,threads=3D1
+    -m 10240
+    -vga none
+    -rtc base=3Dlocaltime
+    -serial none
+    -parallel none
+    -usb
+    -device usb-tablet
+    -device vfio-pci,host=3D01:00.0,multifunction=3Don
+    -device vfio-pci,host=3D01:00.1
+    -device usb-host,vendorid=3D<vid>,productid=3D<pid>
+    -device usb-host,vendorid=3D<vid>,productid=3D<pid>
+    -device usb-host,vendorid=3D<vid>,productid=3D<pid>
+    -device usb-host,vendorid=3D<vid>,productid=3D<pid>
+    -device usb-host,vendorid=3D<vid>,productid=3D<pid>
+    -device usb-host,vendorid=3D<vid>,productid=3D<pid>
+    -device virtio-scsi-pci,id=3Dscsi
+    -drive file=3D/path/to/guest.img,id=3Dhdd1,format=3Dqcow2,if=3Dnone,cac=
+he=3Dwriteback
+    -device scsi-hd,drive=3Dhdd1
+    -net nic,model=3Dvirtio
+    -net user,smb=3D/path/to/shared
+  ```
+
+  If I run QEMU without GPU passthrough, it runs fine.
+
+  Some details about my system:
+
+  - O/S: Mint 19.1 x86-64 (it's based on Ubuntu 18.04)
+  - Kernel: 4.15
+  - `configure` options: `--target-list=3Dx86_64-softmmu --enable-gtk --ena=
+ble-spice --audio-drv-list=3Dpa`
+  - EDK2 version: 1a734ed85fda71630c795832e6d24ea560caf739 (20/Apr/2019)
+  - CPU: i7-6700k
+  - Motherboard: ASRock Z170 Gaming-ITX/ac
+  - VGA: Gigabyte GTX 960 Mini-ITX
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1826422/+subscriptions
 
