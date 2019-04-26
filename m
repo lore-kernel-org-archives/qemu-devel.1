@@ -1,35 +1,26 @@
-Received: from eggs.gnu.org ([209.51.188.92]:40498)
+Received: from eggs.gnu.org ([209.51.188.92]:44464)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1hJw06-0002NV-Ax
-	for qemu-devel@nongnu.org; Fri, 26 Apr 2019 04:14:31 -0400
+	(envelope-from <pbonzini@redhat.com>) id 1hJwDI-0006O4-QV
+	for qemu-devel@nongnu.org; Fri, 26 Apr 2019 04:28:09 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1hJw04-0001hG-0P
-	for qemu-devel@nongnu.org; Fri, 26 Apr 2019 04:14:29 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:58076)
+	(envelope-from <pbonzini@redhat.com>) id 1hJwDH-0000eY-Oy
+	for qemu-devel@nongnu.org; Fri, 26 Apr 2019 04:28:08 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:60514)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1hJw03-0001Ua-Au
-	for qemu-devel@nongnu.org; Fri, 26 Apr 2019 04:14:27 -0400
-References: <5FF901C1-0AA5-4308-A65C-C448D0A2BA63@oracle.com>
-	<20190305172905.GD13806@stefanha-x1.localdomain>
-	<2D7F11D0-4A02-4A0F-961D-854240376B17@oracle.com>
-	<20190401090724.GA643@stefanha-x1.localdomain>
-	<CC372DF3-1AC6-46B5-98A5-21159497034A@oracle.com>
-	<60340EAF-4C85-4798-9999-34F1A37E2086@oracle.com>
-	<898ef1d4-bfa2-9952-8ceb-f1282b85e29c@oracle.com>
-	<20190416092042.GB32709@stefanha-x1.localdomain>
-	<8E5AF770-69ED-4D44-8A25-B51344996D9E@oracle.com>
-	<3F7E854A-3C1D-4204-8C35-893FC0614796@oracle.com>
-	<20190423120453.GF32465@stefanha-x1.localdomain>
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1hJwDH-0000dK-GW
+	for qemu-devel@nongnu.org; Fri, 26 Apr 2019 04:28:07 -0400
+References: <20190425200051.19906-1-ehabkost@redhat.com>
+	<20190425200051.19906-4-ehabkost@redhat.com>
 From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <44520476-d6a8-2e3f-1602-388e2e1e874e@redhat.com>
-Date: Fri, 26 Apr 2019 10:14:16 +0200
+Message-ID: <bbdf7fb5-8f68-582b-2c57-5cf0a522237d@redhat.com>
+Date: Fri, 26 Apr 2019 10:27:58 +0200
 MIME-Version: 1.0
-In-Reply-To: <20190423120453.GF32465@stefanha-x1.localdomain>
-Content-Type: text/plain; charset=windows-1252
+In-Reply-To: <20190425200051.19906-4-ehabkost@redhat.com>
+Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] Following up questions related to QEMU and I/O
- Thread
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH 3/4] qdev: Don't compile hotplug code in
+ user-mode emulation
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -38,22 +29,66 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefan Hajnoczi <stefanha@redhat.com>, Wei Li <wei.d.li@oracle.com>
-Cc: Stefan Hajnoczi <stefanha@gmail.com>, Dongli Zhang <dongli.zhang@oracle.com>, qemu-devel@nongnu.org
+To: Eduardo Habkost <ehabkost@redhat.com>, qemu-devel@nongnu.org
+Cc: Thomas Huth <thuth@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, Markus Armbruster <armbru@redhat.com>, Like Xu <like.xu@linux.intel.com>
 
-On 23/04/19 14:04, Stefan Hajnoczi wrote:
->> In addition, does Virtio-scsi support Batch I/O Submission feature
->> which may be able to increase the IOPS via reducing the number of
->> system calls?
->
-> I don't see obvious batching support in drivers/scsi/virtio_scsi.c.
-> The Linux block layer supports batching but I'm not sure if the SCSI
-> layer does.
+On 25/04/19 22:00, Eduardo Habkost wrote:
+> diff --git a/hw/core/qdev-hotplug-stubs.c b/hw/core/qdev-hotplug-stubs.c
+> new file mode 100644
+> index 0000000000..c710f23388
+> --- /dev/null
+> +++ b/hw/core/qdev-hotplug-stubs.c
+> @@ -0,0 +1,44 @@
+> +/*
+> + * qdev hotplug handler stubs (for user-mode emulation and unit tests)
 
-I think he's referring to QEMU, in which case yes, virtio-scsi does
-batch I/O submission.  See virtio_scsi_handle_cmd_req_prepare and
-virtio_scsi_handle_cmd_req_submit in hw/scsi/virtio-scsi.c, they do
-blk_io_plug and blk_io_unplug in order to batch I/O requests from QEMU
-to the host kernel.
+Can you explain the issue with unit tests in the commit message?
+
+> + *  Copyright (c) 2019 Red Hat Inc
+> + *
+> + * Authors:
+> + *  Eduardo Habkost <ehabkost@redhat.com>
+> + *
+> + * This library is free software; you can redistribute it and/or
+> + * modify it under the terms of the GNU Lesser General Public
+> + * License as published by the Free Software Foundation; either
+> + * version 2 of the License, or (at your option) any later version.
+> + *
+> + * This library is distributed in the hope that it will be useful,
+> + * but WITHOUT ANY WARRANTY; without even the implied warranty of
+> + * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+> + * Lesser General Public License for more details.
+> + *
+> + * You should have received a copy of the GNU Lesser General Public
+> + * License along with this library; if not, see <http://www.gnu.org/licenses/>.
+> + */
+> +
+> +#include "qemu/osdep.h"
+> +#include "hw/qdev-core.h"
+> +#include "hw/hotplug.h"
+> +
+> +HotplugHandler *qdev_get_hotplug_handler(DeviceState *dev)
+> +{
+> +    return NULL;
+> +}
+> +
+> +void hotplug_handler_pre_plug(HotplugHandler *plug_handler,
+> +                              DeviceState *plugged_dev,
+> +                              Error **errp)
+> +{
+> +    assert(plug_handler == NULL);
+> +}
+> +
+> +void hotplug_handler_plug(HotplugHandler *plug_handler,
+> +                          DeviceState *plugged_dev,
+> +                          Error **errp)
+> +{
+> +    assert(plug_handler == NULL);
+> +}
+
+Would it work if you instead make these functions (and the others in
+hw/core/hotplug.c) inlines in include/hw/hotplug.h?
+
+Then all that remains is qdev_get_hotplug_handler.
 
 Paolo
