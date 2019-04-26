@@ -2,105 +2,84 @@ Return-Path: <SRS0=QtPl=S4=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.7 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,FROM_EXCESS_BASE64,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4648DC43219
-	for <qemu-devel@archiver.kernel.org>; Fri, 26 Apr 2019 09:55:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 83F6DC43218
+	for <qemu-devel@archiver.kernel.org>; Fri, 26 Apr 2019 10:04:22 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1C28420679
-	for <qemu-devel@archiver.kernel.org>; Fri, 26 Apr 2019 09:55:20 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1C28420679
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 4EF452067C
+	for <qemu-devel@archiver.kernel.org>; Fri, 26 Apr 2019 10:04:22 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="h5hqgpKF"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4EF452067C
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:44109 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:44232 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hJxZf-0005M3-A9
-	for qemu-devel@archiver.kernel.org; Fri, 26 Apr 2019 05:55:19 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:60498)
+	id 1hJxiP-0001h9-J8
+	for qemu-devel@archiver.kernel.org; Fri, 26 Apr 2019 06:04:21 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:35191)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1hJxXt-00043x-8O
-	for qemu-devel@nongnu.org; Fri, 26 Apr 2019 05:53:30 -0400
+	(envelope-from <marcandre.lureau@gmail.com>) id 1hJxhK-0000dr-1X
+	for qemu-devel@nongnu.org; Fri, 26 Apr 2019 06:03:17 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1hJxMh-0000Eg-M6
-	for qemu-devel@nongnu.org; Fri, 26 Apr 2019 05:41:56 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:58490)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <thuth@redhat.com>)
-	id 1hJxMg-0000CB-Bq; Fri, 26 Apr 2019 05:41:54 -0400
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
-	[10.5.11.16])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id C4BF4285CC;
-	Fri, 26 Apr 2019 09:41:51 +0000 (UTC)
-Received: from thuth.remote.csb (ovpn-116-16.ams2.redhat.com [10.36.116.16])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id 0AE8966617;
-	Fri, 26 Apr 2019 09:41:49 +0000 (UTC)
-To: Qemu-block <qemu-block@nongnu.org>
-From: Thomas Huth <thuth@redhat.com>
-Openpgp: preference=signencrypt
-Autocrypt: addr=thuth@redhat.com; keydata=
-	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
-Organization: Red Hat
-Message-ID: <dd85fab0-52df-9c2d-e402-28d7ce9867f1@redhat.com>
-Date: Fri, 26 Apr 2019 11:41:47 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
-	Thunderbird/60.6.1
+	(envelope-from <marcandre.lureau@gmail.com>) id 1hJxhI-0005X2-Rf
+	for qemu-devel@nongnu.org; Fri, 26 Apr 2019 06:03:13 -0400
+Received: from mail-wr1-x443.google.com ([2a00:1450:4864:20::443]:43237)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <marcandre.lureau@gmail.com>)
+	id 1hJxhI-0005Uw-Gr
+	for qemu-devel@nongnu.org; Fri, 26 Apr 2019 06:03:12 -0400
+Received: by mail-wr1-x443.google.com with SMTP id a12so3582676wrq.10
+	for <qemu-devel@nongnu.org>; Fri, 26 Apr 2019 03:03:12 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+	h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+	:cc:content-transfer-encoding;
+	bh=V95Jw1Zz4QeJGJUt5uK5iCe9qFMHXSi61Ru3OPtDsyQ=;
+	b=h5hqgpKFFmERjz3YoWAqDaoZQhPQ4e2aVoiaw9bZk1QKaCIjfybPr3P59ecXvoJZCc
+	ZwCzOVZUHM6is22OWh7TNEC+64PlXtOeA0Y26F5efpi+ZF3SkmMOAE84JILBQ5ak4Xav
+	hvx9veZqWr5uCc95k4fGHJBcBLu0KMLNsJ+Hwi5vevx3oV7iVpN344YrfdB0gxy9K9rk
+	2GrDBrxD0QnNX9lXeSlopH9zdzrYk3PTB8Jr6597EF6g9Cz+Va1LfiAKL3O5QJoan3+N
+	OD/W5UyYfWuYwE/Y17zstQPav1w6EVySRgoKjI6INJ67DKa38+iQRlRV6qZ8+QCnBXWO
+	i3aA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=1e100.net; s=20161025;
+	h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+	:message-id:subject:to:cc:content-transfer-encoding;
+	bh=V95Jw1Zz4QeJGJUt5uK5iCe9qFMHXSi61Ru3OPtDsyQ=;
+	b=ts1Iynnmmg0/hxvCxf6XUm8DhdsX+nMjL3x7sMpdDIkUuwaJxZ9iLBsZSs/MAwWqtY
+	NQqcYjDoYqyAYOJVt7qQSdUYNLaWPgsoJjWpasJFsH8WW53jEamwrIz1t5R/3tFlha9D
+	YbYJPgqiNOx4RR+V940hWz2MecQ35V4aXl8IeDdKWncFCAfcAWy8W1n/E0cqfiwugh0u
+	M2do6bQLPfumKGk9xHIobYQHa81pnfrgqsVyBEMKMGxFlAsNpTtCAz3kyF6QQyG1mYgr
+	PFZfPPT41b8Z4W+Z0UksnYdbVXwUdI7dJOOQGgVTguShcNwgGPPwi0o16T/fN1mUBVIM
+	C/Rg==
+X-Gm-Message-State: APjAAAVSdbVNuHslVlSnPxIRRNsBBfC8jjT+tUFI1LSuXeYBeFLX0h7Q
+	oau3eTCBAu61wHLBOZ06tctrT7dDk0g0CG3y9dM=
+X-Google-Smtp-Source: APXvYqxPN4xh7CtTqSHnhMNA2GqZV3fRY8hcpmslw7uXzoumEp6AC/xZ69PBsBn/YRwGAsXVmIZI44A5UKzg0cMzGNo=
+X-Received: by 2002:adf:9042:: with SMTP id h60mr920186wrh.248.1556272991222; 
+	Fri, 26 Apr 2019 03:03:11 -0700 (PDT)
 MIME-Version: 1.0
+References: <20190423132004.13725-1-marcandre.lureau@redhat.com>
+	<20190423132004.13725-5-marcandre.lureau@redhat.com>
+	<20190426071530.y4eeu6ekx2nzvpar@sirius.home.kraxel.org>
+In-Reply-To: <20190426071530.y4eeu6ekx2nzvpar@sirius.home.kraxel.org>
+From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
+Date: Fri, 26 Apr 2019 12:02:58 +0200
+Message-ID:
+ <CAJ+F1CJrR60CpTp4_tYC4Up2rFZ-7TJ4HBghKSe9VQmUzhKDZw@mail.gmail.com>
+To: Gerd Hoffmann <kraxel@redhat.com>
 Content-Type: text/plain; charset="UTF-8"
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.30]);
-	Fri, 26 Apr 2019 09:41:51 +0000 (UTC)
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] Failing qemu-iotest 005 with raw
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+	recognized.
+X-Received-From: 2a00:1450:4864:20::443
+Subject: Re: [Qemu-devel] [PATCH v6 04/11] contrib: add vhost-user-input
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -112,43 +91,44 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, hch@lst.de,
-	QEMU Developers <qemu-devel@nongnu.org>, Max Reitz <mreitz@redhat.com>
+Cc: QEMU <qemu-devel@nongnu.org>, "Michael S. Tsirkin" <mst@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190426094147.dILdkWCZ9PnfKaFtRuwaL9RYI1ExCH5d2uoAdCC-vTY@z>
+Message-ID: <20190426100258.TkjnWazGVQ5rfyP50PuoEPskvSsYOK6H3d6_T8BpIHk@z>
+
+Hi
+
+On Fri, Apr 26, 2019 at 9:16 AM Gerd Hoffmann <kraxel@redhat.com> wrote:
+>
+> On Tue, Apr 23, 2019 at 03:19:57PM +0200, Marc-Andr=C3=A9 Lureau wrote:
+> > Add a vhost-user input backend example, based on virtio-input-host
+> > device. It takes an evdev path as argument, and can be associated with
+> > a vhost-user-input device via a UNIX socket:
+> >
+> > $ vhost-user-input -p /dev/input/eventX -s /tmp/vui.sock
+> >
+> > $ qemu ... -chardev socket,id=3Dvuic,path=3D/tmp/vui.sock
+> >   -device vhost-user-input-pci,chardev=3Dvuic
+> >
+> > This example is intentionally not included in $TOOLS, to not be built
+> > and installed by default.
+>
+> I think we should build it by default, so it doesn't bitrot,
+> even if we don't install it by default.
+>
+> > +static int unix_sock_new(char *path)
+> > +{
+>
+> Move to common code?
+>
+
+Better, use existing unix_listen()!
+
+thanks
 
 
-When running iotest 005 with raw, the test currently fails for me:
 
-005         - output mismatch (see 005.out.bad)
---- /home/thuth/devel/qemu/tests/qemu-iotests/005.out	2019-04-23
-16:43:11.000000000 +0200
-+++ /home/thuth/tmp/qemu-build/tests/qemu-iotests/005.out.bad	2019-04-26
-11:34:11.000000000 +0200
-@@ -1,13 +1,12 @@
- QA output created by 005
-
- creating large image
-+qemu-img: TEST_DIR/t.IMGFMT: The image size is too large for file
-format 'IMGFMT'
- Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=5368709120000
-
- small read
--read 4096/4096 bytes at offset 1024
--4 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+read failed: Input/output error
-
- small write
--wrote 4096/4096 bytes at offset 8192
--4 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+write failed: Input/output error
- *** done
-
-
-Could this be fixed somehow, or should the test rather be skipped for
-IMGFMT=raw?
-
- Thomas
+--=20
+Marc-Andr=C3=A9 Lureau
 
