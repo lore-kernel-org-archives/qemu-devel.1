@@ -4,60 +4,58 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-8.7 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+	SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3680FC43219
-	for <qemu-devel@archiver.kernel.org>; Fri, 26 Apr 2019 06:12:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E99B4C43219
+	for <qemu-devel@archiver.kernel.org>; Fri, 26 Apr 2019 06:14:33 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0756D206E0
-	for <qemu-devel@archiver.kernel.org>; Fri, 26 Apr 2019 06:12:07 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id B9D9B206E0
+	for <qemu-devel@archiver.kernel.org>; Fri, 26 Apr 2019 06:14:33 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="oTubyzoe"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0756D206E0
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="UN3tstHb"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B9D9B206E0
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gibson.dropbear.id.au
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:39947 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:39973 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hJu5e-0001qP-5h
-	for qemu-devel@archiver.kernel.org; Fri, 26 Apr 2019 02:12:06 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:59984)
+	id 1hJu80-00047O-Qf
+	for qemu-devel@archiver.kernel.org; Fri, 26 Apr 2019 02:14:32 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:59959)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1hJu0X-0005SY-Oj
-	for qemu-devel@nongnu.org; Fri, 26 Apr 2019 02:06:51 -0400
+	(envelope-from <dgibson@ozlabs.org>) id 1hJu0X-0005Rl-23
+	for qemu-devel@nongnu.org; Fri, 26 Apr 2019 02:06:50 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1hJu0W-0004Pa-Dp
+	(envelope-from <dgibson@ozlabs.org>) id 1hJu0V-0004Na-HS
 	for qemu-devel@nongnu.org; Fri, 26 Apr 2019 02:06:49 -0400
-Received: from bilbo.ozlabs.org ([2401:3900:2:1::2]:52541 helo=ozlabs.org)
+Received: from ozlabs.org ([203.11.71.1]:42015)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <dgibson@ozlabs.org>)
-	id 1hJu0W-0004KA-0X; Fri, 26 Apr 2019 02:06:48 -0400
+	id 1hJu0U-0004Hz-Sq; Fri, 26 Apr 2019 02:06:47 -0400
 Received: by ozlabs.org (Postfix, from userid 1007)
-	id 44r3Tl64t7z9sNF; Fri, 26 Apr 2019 16:06:35 +1000 (AEST)
+	id 44r3Tk6TXHz9sMQ; Fri, 26 Apr 2019 16:06:34 +1000 (AEST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-	d=gibson.dropbear.id.au; s=201602; t=1556258795;
-	bh=nqNDqkW1fiFWpWPWQ7vYzgSIzPctpLlz0O+Uu0pu5gU=;
+	d=gibson.dropbear.id.au; s=201602; t=1556258794;
+	bh=CpVDQft0uHqfW1Yh26ZLPa9IQjTyO3ExmmZG59YXhOE=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=oTubyzoebfNg5DQ52bwb1cyeEufMwyEIRLFqh5IGuAvRYOm2bR7o/6oPoGzPd71rQ
-	Nnj2RBl1LYCPftYgis46oLMdKM1my3+CxHl7/zyqKilzlOqldIAOP1CoAja+ux1HVh
-	kdtOkxpVVM58XroNySyM6SvbmVCiUCWTyOvQDUhc=
+	b=UN3tstHbpH9IGERbjehm3l6GqmVWwRG8uE4Cz8eodQlYvhlvhhz01v8aOENHs9fPT
+	J+WGcYmzZk/INPefOPaakDNvGLrp2CUpqWPrGofLshFd5nXkQBjxlZAsthZOhRIK0M
+	HOoLRZzzSRvm/Z3tvFOAGlx1vbk8obqYHxILaDKs=
 From: David Gibson <david@gibson.dropbear.id.au>
 To: peter.maydell@linaro.org
-Date: Fri, 26 Apr 2019 16:06:03 +1000
-Message-Id: <20190426060627.18153-13-david@gibson.dropbear.id.au>
+Date: Fri, 26 Apr 2019 16:06:00 +1000
+Message-Id: <20190426060627.18153-10-david@gibson.dropbear.id.au>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20190426060627.18153-1-david@gibson.dropbear.id.au>
 References: <20190426060627.18153-1-david@gibson.dropbear.id.au>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
-	recognized.
-X-Received-From: 2401:3900:2:1::2
-Subject: [Qemu-devel] [PULL 12/36] target/ppc: Style fixes for helper_regs.h
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 203.11.71.1
+Subject: [Qemu-devel] [PULL 09/36] target/ppc: Style fixes for dfp_helper.c
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -75,46 +73,86 @@ Cc: gkurz@kaod.org, Greg Kurz <groug@kaod.org>, qemu-devel@nongnu.org,
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190426060603.laMV3aWachC__AOER17tTDOVAVCRxfYs3bEANhZIxs0@z>
+Message-ID: <20190426060600.q7tuwe2OKTWYK-kt7O1HG2w-IDLnvFxykUOuHoWIoYk@z>
 
 Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
 Reviewed-by: C=C3=A9dric Le Goater <clg@kaod.org>
 Reviewed-by: Greg Kurz <groug@kaod.org>
 ---
- target/ppc/helper_regs.h | 10 ++++++----
- 1 file changed, 6 insertions(+), 4 deletions(-)
+ target/ppc/dfp_helper.c | 14 +++++++-------
+ 1 file changed, 7 insertions(+), 7 deletions(-)
 
-diff --git a/target/ppc/helper_regs.h b/target/ppc/helper_regs.h
-index c863abc0bf..922da76c6c 100644
---- a/target/ppc/helper_regs.h
-+++ b/target/ppc/helper_regs.h
-@@ -44,10 +44,11 @@ static inline void hreg_swap_gpr_tgpr(CPUPPCState *en=
-v)
-=20
- static inline void hreg_compute_mem_idx(CPUPPCState *env)
+diff --git a/target/ppc/dfp_helper.c b/target/ppc/dfp_helper.c
+index 9164fe701b..f102177572 100644
+--- a/target/ppc/dfp_helper.c
++++ b/target/ppc/dfp_helper.c
+@@ -1104,19 +1104,19 @@ void helper_##op(CPUPPCState *env, uint64_t *t, u=
+int64_t *b, uint32_t s)     \
+         }                                                               =
+     \
+         }                                                               =
+     \
+                                                                         =
+     \
+-    while (offset < (size)/4) {                                         =
+     \
++    while (offset < (size) / 4) {                                       =
+     \
+         n++;                                                            =
+     \
+-        digits[(size)/4-n] =3D dfp_get_bcd_digit_##size(dfp.b64, offset+=
++);    \
+-        if (digits[(size)/4-n] > 10) {                                  =
+     \
++        digits[(size) / 4 - n] =3D dfp_get_bcd_digit_##size(dfp.b64, off=
+set++); \
++        if (digits[(size) / 4 - n] > 10) {                              =
+     \
+             dfp_set_FPSCR_flag(&dfp, FP_VX | FP_VXCVI, FPSCR_VE);       =
+     \
+             return;                                                     =
+     \
+         } else {                                                        =
+     \
+-            nonzero |=3D (digits[(size)/4-n] > 0);                      =
+       \
++            nonzero |=3D (digits[(size) / 4 - n] > 0);                  =
+       \
+         }                                                               =
+     \
+     }                                                                   =
+     \
+                                                                         =
+     \
+     if (nonzero) {                                                      =
+     \
+-        decNumberSetBCD(&dfp.t, digits+((size)/4)-n, n);                =
+     \
++        decNumberSetBCD(&dfp.t, digits + ((size) / 4) - n, n);          =
+     \
+     }                                                                   =
+     \
+                                                                         =
+     \
+     if (s && sgn)  {                                                    =
+     \
+@@ -1170,13 +1170,13 @@ DFP_HELPER_XEX(dxexq, 128)
+ static void dfp_set_raw_exp_64(uint64_t *t, uint64_t raw)
  {
--    /* This is our encoding for server processors. The architecture
-+    /*
-+     * This is our encoding for server processors. The architecture
-      * specifies that there is no such thing as userspace with
--     * translation off, however it appears that MacOS does it and
--     * some 32-bit CPUs support it. Weird...
-+     * translation off, however it appears that MacOS does it and some
-+     * 32-bit CPUs support it. Weird...
-      *
-      *   0 =3D Guest User space virtual mode
-      *   1 =3D Guest Kernel space virtual mode
-@@ -143,7 +144,8 @@ static inline int hreg_store_msr(CPUPPCState *env, ta=
-rget_ulong value,
-         /* Change the exception prefix on PowerPC 601 */
-         env->excp_prefix =3D ((value >> MSR_EP) & 1) * 0xFFF00000;
-     }
--    /* If PR=3D1 then EE, IR and DR must be 1
-+    /*
-+     * If PR=3D1 then EE, IR and DR must be 1
-      *
-      * Note: We only enforce this on 64-bit server processors.
-      * It appears that:
+     *t &=3D 0x8003ffffffffffffULL;
+-    *t |=3D (raw << (63-13));
++    *t |=3D (raw << (63 - 13));
+ }
+=20
+ static void dfp_set_raw_exp_128(uint64_t *t, uint64_t raw)
+ {
+     t[HI_IDX] &=3D 0x80003fffffffffffULL;
+-    t[HI_IDX] |=3D (raw << (63-17));
++    t[HI_IDX] |=3D (raw << (63 - 17));
+ }
+=20
+ #define DFP_HELPER_IEX(op, size)                                        =
+  \
 --=20
 2.20.1
 
