@@ -1,19 +1,18 @@
 Received: from eggs.gnu.org ([209.51.188.92]:60498)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <chen.zhang@intel.com>) id 1hJxXl-00043x-Ia
-	for qemu-devel@nongnu.org; Fri, 26 Apr 2019 05:53:22 -0400
+	(envelope-from <thuth@redhat.com>) id 1hJxXt-00043x-8O
+	for qemu-devel@nongnu.org; Fri, 26 Apr 2019 05:53:30 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <chen.zhang@intel.com>) id 1hJxOC-0001GC-UM
-	for qemu-devel@nongnu.org; Fri, 26 Apr 2019 05:43:29 -0400
-Received: from mga18.intel.com ([134.134.136.126]:25745)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <chen.zhang@intel.com>)
-	id 1hJxOC-00016Z-Mr
-	for qemu-devel@nongnu.org; Fri, 26 Apr 2019 05:43:28 -0400
-From: Zhang Chen <chen.zhang@intel.com >
-Date: Fri, 26 Apr 2019 17:39:20 +0800
-Message-Id: <20190426093920.5616-1-chen.zhang@intel.com>
-Subject: [Qemu-devel] [PATCH] MAINTAINERS: Add qemu-options* to related field
+	(envelope-from <thuth@redhat.com>) id 1hJxMh-0000Eg-M6
+	for qemu-devel@nongnu.org; Fri, 26 Apr 2019 05:41:56 -0400
+From: Thomas Huth <thuth@redhat.com>
+Message-ID: <dd85fab0-52df-9c2d-e402-28d7ce9867f1@redhat.com>
+Date: Fri, 26 Apr 2019 11:41:47 +0200
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: [Qemu-devel] Failing qemu-iotest 005 with raw
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,30 +21,38 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>, Markus Armbruster <armbru@redhat.com>, qemu-dev <qemu-devel@nongnu.org>
-Cc: Zhang Chen <zhangckid@gmail.com>, Zhang Chen <chen.zhang@intel.com>
+To: Qemu-block <qemu-block@nongnu.org>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, Max Reitz <mreitz@redhat.com>, Kevin Wolf <kwolf@redhat.com>, hch@lst.de
 
-From: Zhang Chen <chen.zhang@intel.com>
 
-No one to maintain qemu-options related file, add it to Markus's
-Command line option argument parsing field.
+When running iotest 005 with raw, the test currently fails for me:
 
-Signed-off-by: Zhang Chen <chen.zhang@intel.com>
----
- MAINTAINERS | 1 +
- 1 file changed, 1 insertion(+)
+005         - output mismatch (see 005.out.bad)
+--- /home/thuth/devel/qemu/tests/qemu-iotests/005.out	2019-04-23
+16:43:11.000000000 +0200
++++ /home/thuth/tmp/qemu-build/tests/qemu-iotests/005.out.bad	2019-04-26
+11:34:11.000000000 +0200
+@@ -1,13 +1,12 @@
+ QA output created by 005
 
-diff --git a/MAINTAINERS b/MAINTAINERS
-index 23db6f8408..acc3b32f88 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -1800,6 +1800,7 @@ F: tests/test-keyval.c
- F: tests/test-qemu-opts.c
- F: util/keyval.c
- F: util/qemu-option.c
-+F: qemu-options*
- 
- Coverity model
- M: Markus Armbruster <armbru@redhat.com>
--- 
-2.17.GIT
+ creating large image
++qemu-img: TEST_DIR/t.IMGFMT: The image size is too large for file
+format 'IMGFMT'
+ Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=5368709120000
+
+ small read
+-read 4096/4096 bytes at offset 1024
+-4 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
++read failed: Input/output error
+
+ small write
+-wrote 4096/4096 bytes at offset 8192
+-4 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
++write failed: Input/output error
+ *** done
+
+
+Could this be fixed somehow, or should the test rather be skipped for
+IMGFMT=raw?
+
+ Thomas
