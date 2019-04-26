@@ -1,26 +1,34 @@
-Received: from eggs.gnu.org ([209.51.188.92]:49057)
+Received: from eggs.gnu.org ([209.51.188.92]:53547)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1hK0Np-0002aH-V1
-	for qemu-devel@nongnu.org; Fri, 26 Apr 2019 08:55:19 -0400
+	(envelope-from <bounces@canonical.com>) id 1hK0mr-0003H8-Qz
+	for qemu-devel@nongnu.org; Fri, 26 Apr 2019 09:21:10 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1hK0No-0003ov-R7
-	for qemu-devel@nongnu.org; Fri, 26 Apr 2019 08:55:17 -0400
-Date: Fri, 26 Apr 2019 14:55:06 +0200
-From: Cornelia Huck <cohuck@redhat.com>
-Message-ID: <20190426145506.409b53cf.cohuck@redhat.com>
-In-Reply-To: <93f0ecac-47cc-c791-9e32-ad5743489bf3@redhat.com>
-References: <20190426111003.21246-1-borntraeger@de.ibm.com>
-	<20190426111003.21246-11-borntraeger@de.ibm.com>
-	<71955bba-ef04-1677-b7f0-bb1675bad12a@redhat.com>
-	<07252560-1eed-8fd5-ee94-6bcea6cf99bc@de.ibm.com>
-	<10d43e6e-ee8c-cd65-e724-354e0f40c79f@redhat.com>
-	<057d438c-2062-1aa7-887a-918f076911c5@de.ibm.com>
-	<93f0ecac-47cc-c791-9e32-ad5743489bf3@redhat.com>
+	(envelope-from <bounces@canonical.com>) id 1hK0mn-00010c-43
+	for qemu-devel@nongnu.org; Fri, 26 Apr 2019 09:21:07 -0400
+Received: from indium.canonical.com ([91.189.90.7]:58464)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1hK0mm-0000Zm-Ja
+	for qemu-devel@nongnu.org; Fri, 26 Apr 2019 09:21:05 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1hK0mW-0002tD-Ua
+	for <qemu-devel@nongnu.org>; Fri, 26 Apr 2019 13:20:48 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id C8CD52E80CB
+	for <qemu-devel@nongnu.org>; Fri, 26 Apr 2019 13:20:48 +0000 (UTC)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v2 10/10] s390x/cpumodel: wire up 8561 and
- 8562 as gen15 machines
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Fri, 26 Apr 2019 13:11:49 -0000
+From: Alex Williamson <alex.l.williamson@gmail.com>
+Reply-To: Bug 1826422 <1826422@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <155620554968.6380.13610580395862407350.malonedeb@chaenomeles.canonical.com>
+Message-Id: <155628430918.13556.6374404531618745107.malone@gac.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1826422] Re: Regression: QEMU 4.0 hangs the host
+ (*bisect included*)
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,69 +37,80 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Hildenbrand <david@redhat.com>
-Cc: Christian Borntraeger <borntraeger@de.ibm.com>, qemu-devel <qemu-devel@nongnu.org>, qemu-s390x <qemu-s390x@nongnu.org>, Halil Pasic <pasic@linux.ibm.com>, Richard Henderson <rth@twiddle.net>, Collin Walling <walling@linux.ibm.com>, "Jason J . Herne" <jjherne@linux.ibm.com>
+To: qemu-devel@nongnu.org
 
-On Fri, 26 Apr 2019 14:05:30 +0200
-David Hildenbrand <david@redhat.com> wrote:
+The change in QEMU 4.0 is only a change in defaults of the machine type,
+it can be entirely reverted in the VM config with kernel_irqchip=3Don or
+<ioapic driver=3D'kvm'/> with libvirt.  Using a machine type prior to the
+q35 4.0 machine type would also avoid it.  There are no performance
+issues with these configurations that would favor using 3.1 over 4.0.
 
-> On 26.04.19 14:01, Christian Borntraeger wrote:
-> > 
-> > 
-> > On 26.04.19 13:52, David Hildenbrand wrote:  
-> >> On 26.04.19 13:36, Christian Borntraeger wrote:  
-> >>>
-> >>>
-> >>> On 26.04.19 13:32, David Hildenbrand wrote:  
-> >>>> On 26.04.19 13:10, Christian Borntraeger wrote:  
-> >>>>> 8561 and 8562 will be gen15 machines. There is no name yet, lets us use
-> >>>>> the cpu id as base name. Later on we can provide aliases with the proper
-> >>>>> name.
-> >>>>>
-> >>>>> Signed-off-by: Christian Borntraeger <borntraeger@de.ibm.com>
-> >>>>> ---
-> >>>>>  target/s390x/cpu_models.c | 2 ++
-> >>>>>  1 file changed, 2 insertions(+)
-> >>>>>
-> >>>>> diff --git a/target/s390x/cpu_models.c b/target/s390x/cpu_models.c
-> >>>>> index d683635eb5..dd6415103f 100644
-> >>>>> --- a/target/s390x/cpu_models.c
-> >>>>> +++ b/target/s390x/cpu_models.c
-> >>>>> @@ -83,6 +83,8 @@ static S390CPUDef s390_cpu_defs[] = {
-> >>>>>      CPUDEF_INIT(0x3906, 14, 1, 47, 0x08000000U, "z14", "IBM z14 GA1"),
-> >>>>>      CPUDEF_INIT(0x3906, 14, 2, 47, 0x08000000U, "z14.2", "IBM z14 GA2"),
-> >>>>>      CPUDEF_INIT(0x3907, 14, 1, 47, 0x08000000U, "z14ZR1", "IBM z14 Model ZR1 GA1"),
-> >>>>> +    CPUDEF_INIT(0x8561, 15, 1, 47, 0x08000000U, "8561", "IBM 8561 GA1"),
-> >>>>> +    CPUDEF_INIT(0x8562, 15, 1, 47, 0x08000000U, "8562", "IBM 8562 GA1"),
-> >>>>>  };  
-> >>>>
-> >>>> Thinking out loud, I know that official names are not published yet.
-> >>>> Looking at the recent history (z13, z14), my educated guess would be
-> >>>> z15. I guess pretty much everybody would guess that.  
-> >>>
-> >>> Not sure about trademark aspects - especially if this really becomes z15. The smaller
-> >>> machine has no real history (ZR1 vs. s vs BC). So I think I would rather have a correct
-> >>> number than a partially correct name.  
-> >>
-> >> We could also use "gen15a" and "gen15b", still better to get than magic
-> >> numbers. (yeah well, they are not magic)
-> >>
-> >> If you want to stick with numbers, be aware that cpu numbers are not
-> >> injective, so at some point we will need e.g. "8561.2", just so you're
-> >> aware of the implications.  
-> > 
-> > I think whatever we have here is only used internally for expansion (host-model)
-> > and the user will use later the real name when available. (custom). So probably this
-> > does not matter for a long time. But I might be wrong.
-> > I tend to prefer gen15 over z15 but 856x has also its charm.
+-- =
 
-FWIW, I'd prefer gen15 over 856x, but...
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1826422
 
-> >   
-> 
-> Another question would be, can we rename before the next QEMU release,
-> so it will never be officially part of QEMU? Then we don't need aliases
-> after all. Of course, distros have to take care of that as well, but
-> that shouldn't be upstream QEMUs business.
+Title:
+  Regression: QEMU 4.0 hangs the host (*bisect included*)
 
-...if we could do that, I'd like that even better.
+Status in QEMU:
+  New
+
+Bug description:
+  The commit b2fc91db84470a78f8e93f5b5f913c17188792c8 seemingly
+  introduced a regression on my system.
+
+  When I start QEMU, the guest and the host hang (I need a hard reset to
+  get back to a working system), before anything shows on the guest.
+
+  I use QEMU with GPU passthrough (which worked perfectly until the
+  commit above). This is the command I use:
+
+  ```
+  /path/to/qemu-system-x86_64
+    -drive if=3Dpflash,format=3Draw,readonly,file=3D/path/to/OVMF_CODE.fd
+    -drive if=3Dpflash,format=3Draw,file=3D/tmp/OVMF_VARS.fd.tmp
+    -enable-kvm
+    -machine q35,accel=3Dkvm,mem-merge=3Doff
+    -cpu host,kvm=3Doff,hv_vendor_id=3Dvgaptrocks,hv_relaxed,hv_spinlocks=
+=3D0x1fff,hv_vapic,hv_time
+    -smp 4,cores=3D4,sockets=3D1,threads=3D1
+    -m 10240
+    -vga none
+    -rtc base=3Dlocaltime
+    -serial none
+    -parallel none
+    -usb
+    -device usb-tablet
+    -device vfio-pci,host=3D01:00.0,multifunction=3Don
+    -device vfio-pci,host=3D01:00.1
+    -device usb-host,vendorid=3D<vid>,productid=3D<pid>
+    -device usb-host,vendorid=3D<vid>,productid=3D<pid>
+    -device usb-host,vendorid=3D<vid>,productid=3D<pid>
+    -device usb-host,vendorid=3D<vid>,productid=3D<pid>
+    -device usb-host,vendorid=3D<vid>,productid=3D<pid>
+    -device usb-host,vendorid=3D<vid>,productid=3D<pid>
+    -device virtio-scsi-pci,id=3Dscsi
+    -drive file=3D/path/to/guest.img,id=3Dhdd1,format=3Dqcow2,if=3Dnone,cac=
+he=3Dwriteback
+    -device scsi-hd,drive=3Dhdd1
+    -net nic,model=3Dvirtio
+    -net user,smb=3D/path/to/shared
+  ```
+
+  If I run QEMU without GPU passthrough, it runs fine.
+
+  Some details about my system:
+
+  - O/S: Mint 19.1 x86-64 (it's based on Ubuntu 18.04)
+  - Kernel: 4.15
+  - `configure` options: `--target-list=3Dx86_64-softmmu --enable-gtk --ena=
+ble-spice --audio-drv-list=3Dpa`
+  - EDK2 version: 1a734ed85fda71630c795832e6d24ea560caf739 (20/Apr/2019)
+  - CPU: i7-6700k
+  - Motherboard: ASRock Z170 Gaming-ITX/ac
+  - VGA: Gigabyte GTX 960 Mini-ITX
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1826422/+subscriptions
