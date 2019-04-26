@@ -1,24 +1,29 @@
-Received: from eggs.gnu.org ([209.51.188.92]:39420)
+Received: from eggs.gnu.org ([209.51.188.92]:41747)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <lersek@redhat.com>) id 1hK3x3-0001XR-Q7
-	for qemu-devel@nongnu.org; Fri, 26 Apr 2019 12:43:54 -0400
+	(envelope-from <lersek@redhat.com>) id 1hK46b-0005ED-Ff
+	for qemu-devel@nongnu.org; Fri, 26 Apr 2019 12:53:46 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <lersek@redhat.com>) id 1hK3x2-0004on-Mw
-	for qemu-devel@nongnu.org; Fri, 26 Apr 2019 12:43:53 -0400
-References: <20190424103747.10173-1-thuth@redhat.com>
-	<20190424103747.10173-5-thuth@redhat.com>
-	<f9dc291b-7ba2-c6b8-33aa-c8fa3c6d4950@redhat.com>
-	<0300c8cc-d73c-b919-13f7-59f3218a609f@redhat.com>
+	(envelope-from <lersek@redhat.com>) id 1hK46a-000377-9y
+	for qemu-devel@nongnu.org; Fri, 26 Apr 2019 12:53:45 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:45884)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <lersek@redhat.com>) id 1hK46Y-00033L-TF
+	for qemu-devel@nongnu.org; Fri, 26 Apr 2019 12:53:43 -0400
+References: <20190420100056.116305-1-liq3ea@163.com>
+	<20190420100056.116305-4-liq3ea@163.com>
+	<a27cd912-4f58-55ac-1aae-e4999fa3d84d@redhat.com>
+	<CAKXe6SJZWs7HtXutX6W3saDhaNDtVPMQEh2+s+9XiM3TtZqLdQ@mail.gmail.com>
+	<20190425081519.n4leez6sz2wlvpla@sirius.home.kraxel.org>
 From: Laszlo Ersek <lersek@redhat.com>
-Message-ID: <13ecf357-d43c-ecc6-012e-bed62008677d@redhat.com>
-Date: Fri, 26 Apr 2019 18:43:36 +0200
+Message-ID: <e5087d25-fc45-84e9-db61-5a4c38f69c74@redhat.com>
+Date: Fri, 26 Apr 2019 18:53:33 +0200
 MIME-Version: 1.0
-In-Reply-To: <0300c8cc-d73c-b919-13f7-59f3218a609f@redhat.com>
+In-Reply-To: <20190425081519.n4leez6sz2wlvpla@sirius.home.kraxel.org>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH 4/6] cirrus / travis: Add gnu-sed and bash
- for macOS and FreeBSD
+Subject: Re: [Qemu-devel] [PATCH 3/4] tests: fw_cfg: add reboot_timeout test
+ case
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,54 +32,31 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Thomas Huth <thuth@redhat.com>, Wainer dos Santos Moschetta <wainersm@redhat.com>, qemu-devel@nongnu.org
-Cc: Fam Zheng <fam@euphon.net>, Kevin Wolf <kwolf@redhat.com>, Ed Maste <emaste@freebsd.org>, qemu-block@nongnu.org, =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>, Max Reitz <mreitz@redhat.com>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>, Li-Wen Hsu <lwhsu@freebsd.org>, Peter Maydell <peter.maydell@linaro.org>, "Daniel P. Berrange" <berrange@redhat.com>
+To: Gerd Hoffmann <kraxel@redhat.com>, Li Qiang <liq3ea@gmail.com>
+Cc: Thomas Huth <thuth@redhat.com>, Li Qiang <liq3ea@163.com>, lvivier@redhat.com, Paolo Bonzini <pbonzini@redhat.com>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>, Qemu Developers <qemu-devel@nongnu.org>
 
-(+Dan)
-
-On 04/25/19 08:00, Thomas Huth wrote:
-> On 24/04/2019 23.29, Wainer dos Santos Moschetta wrote:
->> Hello Thomas,
+On 04/25/19 10:15, Gerd Hoffmann wrote:
+> On Wed, Apr 24, 2019 at 09:16:56AM +0800, Li Qiang wrote:
+>> Thomas Huth <thuth@redhat.com> =E4=BA=8E2019=E5=B9=B44=E6=9C=8824=E6=97=
+=A5=E5=91=A8=E4=B8=89 =E4=B8=8A=E5=8D=8812:29=E5=86=99=E9=81=93=EF=BC=9A
 >>
->> On 04/24/2019 07:37 AM, Thomas Huth wrote:
->>> We are going to enable the qemu-iotests during "make check" again,
->>> and for running the iotests, we need bash and gnu-sed.
->>>
->>> Signed-off-by: Thomas Huth <thuth@redhat.com>
->>> ---
->>> =C2=A0 .cirrus.yml | 4 ++--
->>> =C2=A0 .travis.yml | 1 +
->>> =C2=A0 2 files changed, 3 insertions(+), 2 deletions(-)
+>>> Is this endianess-safe? Or do you need to byteswap reboot_timeout if =
+the
+>>> host and guest endianess does not match?
 >>
->> It needs to get the Freebsd image [1] updated too, in order to `make
->> BUILD_TARGET=3Dcheck vm-build-freebsd` passes. Here it failed with:
->> ---
->> env: bash: No such file or directory
->> gmake: *** [/var/tmp/qemu-test.6OlDFH/tests/Makefile.include:1101:
->> check-tests/qemu-iotests-quick.sh] Error 1
->> gmake: *** Waiting for unfinished jobs....
->> ---
+>> Good question!
 >>
->> I'm not sure about the netbsd and openbsd images, they might need bash
->> and gnu-sed as well.
+>> IIUC, the qemu fw_cfg store the 'file' entry data just in byte stream.
 >=20
-> D'oh! Does anybody know what are the correct steps to update these imag=
-es?
+> No.  Integers are defined to be little endian.  See fw_cfg_add_i64() fo=
+r
+> example, there is an explicit cpu_to_le64() call for that.
 
-(1) make the OPENBSD subsystem maintainer care
-
-(2) update <https://wiki.qemu.org/Hosts/BSD>
-
-(3) download the image from download.patchew.org, boot it and update it
-
-(4) upload the image to download.patchew.org
-
-(5) update the "tests/vm/openbsd" script in the QEMU tree in sync
-(checksums, commands etc)
-
-
-I'm fairly sure (1) is necessary; the rest is more or less guesswork on
-my part.
+Endianness may be defined on a case-by-case basis (i.e. if you introduce
+a new named fw_cfg file, you can make its contents whatever you like);
+however, the integer-adding/modifying helper functions do express a
+preference for endianness. Search "include/hw/nvram/fw_cfg.h" for "endian=
+".
 
 Thanks
 Laszlo
