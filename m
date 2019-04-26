@@ -2,69 +2,81 @@ Return-Path: <SRS0=QtPl=S4=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_PASS,USER_AGENT_NEOMUTT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EF73CC43219
-	for <qemu-devel@archiver.kernel.org>; Fri, 26 Apr 2019 12:14:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EFB9CC43219
+	for <qemu-devel@archiver.kernel.org>; Fri, 26 Apr 2019 12:16:28 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C309F206BF
-	for <qemu-devel@archiver.kernel.org>; Fri, 26 Apr 2019 12:14:58 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C309F206BF
+	by mail.kernel.org (Postfix) with ESMTPS id C3163206BF
+	for <qemu-devel@archiver.kernel.org>; Fri, 26 Apr 2019 12:16:28 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C3163206BF
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:46258 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:46312 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hJzko-0001oY-3S
-	for qemu-devel@archiver.kernel.org; Fri, 26 Apr 2019 08:14:58 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:38020)
+	id 1hJzmG-0002wK-1K
+	for qemu-devel@archiver.kernel.org; Fri, 26 Apr 2019 08:16:28 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:39918)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1hJzcL-0002gM-AV
-	for qemu-devel@nongnu.org; Fri, 26 Apr 2019 08:06:14 -0400
+	(envelope-from <philmd@redhat.com>) id 1hJzkN-0001fb-87
+	for qemu-devel@nongnu.org; Fri, 26 Apr 2019 08:14:32 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1hJzcK-0001BA-5j
-	for qemu-devel@nongnu.org; Fri, 26 Apr 2019 08:06:13 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:45082)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1hJzcJ-00015C-W2
-	for qemu-devel@nongnu.org; Fri, 26 Apr 2019 08:06:12 -0400
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
-	[10.5.11.13])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 3DB80883B8;
-	Fri, 26 Apr 2019 12:06:02 +0000 (UTC)
-Received: from sirius.home.kraxel.org (ovpn-116-45.ams2.redhat.com
-	[10.36.116.45])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id 39BDF6607D;
-	Fri, 26 Apr 2019 12:05:59 +0000 (UTC)
-Received: by sirius.home.kraxel.org (Postfix, from userid 1000)
-	id 7399011AAA; Fri, 26 Apr 2019 14:05:58 +0200 (CEST)
-Date: Fri, 26 Apr 2019 14:05:58 +0200
-From: Gerd Hoffmann <kraxel@redhat.com>
-To: =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@gmail.com>
-Message-ID: <20190426120558.vh66gugqtvcc6tm5@sirius.home.kraxel.org>
-References: <20190423132004.13725-1-marcandre.lureau@redhat.com>
-	<20190423132004.13725-6-marcandre.lureau@redhat.com>
-	<20190426072446.r7b7wsm4qghd7pzr@sirius.home.kraxel.org>
-	<CAJ+F1CKbgb_TkoS_a10qGw7kkTO+EkC4uhreCkOu=k2ut5CAig@mail.gmail.com>
+	(envelope-from <philmd@redhat.com>) id 1hJzkM-0007LA-AD
+	for qemu-devel@nongnu.org; Fri, 26 Apr 2019 08:14:31 -0400
+Received: from mail-wr1-f66.google.com ([209.85.221.66]:37611)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1hJzkM-0007Ji-4I
+	for qemu-devel@nongnu.org; Fri, 26 Apr 2019 08:14:30 -0400
+Received: by mail-wr1-f66.google.com with SMTP id r6so4175514wrm.4
+	for <qemu-devel@nongnu.org>; Fri, 26 Apr 2019 05:14:28 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=1e100.net; s=20161025;
+	h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
+	:date:user-agent:mime-version:in-reply-to:content-language
+	:content-transfer-encoding;
+	bh=Uc3TUnt2pnnS2LZJnVOQHzvdj8j5WznaFo3G0a0u98g=;
+	b=tKaP1rKuXctsDTfophFhq59jLWW50XcWZjviTkF5tHjhJoYuS7uZm6j8pr4OmKOlXR
+	qvD8dT4AhL9rhpNvHmd0DAPnCp//1WSC5jDFwwjd/Musu/ufuZdmIatR66KlYEO41SGQ
+	X4WjyJFWzuS8fXDOoHYVZDXE4IaXBWUkfBvVr+VLN4LKH4pUM4NhWk7bU/4oTb7E2pxd
+	asn0Sq/sw9IiWasissKN9CSXFnt0+ZH8gZGn9u54EuPVuz27Hp4anS8jWfWpIRUNJbTp
+	jGjRQgMwGB5E4NfWGSM6n+VLKYOh+GXvAkz4RCwGbh0dSDBTGolojkaEkOmEmR/v7ugX
+	4dCA==
+X-Gm-Message-State: APjAAAWQyebxUKfM0MGtZPsh/tVOhzAbuDvzcRI8mlFxEQGQaDiVYqXQ
+	+mZxTTJVpJyprJ6CxqcPjwmMxA==
+X-Google-Smtp-Source: APXvYqxJCR8Ae9pNcdXHFpE5DflHIk2YJn2rynVMu8kx3tkbuvbviPFJoId7XNrh1Xdc4RW0leEt9A==
+X-Received: by 2002:a5d:4483:: with SMTP id j3mr641215wrq.145.1556280867785;
+	Fri, 26 Apr 2019 05:14:27 -0700 (PDT)
+Received: from [192.168.1.25] (abayonne-654-1-209-122.w109-222.abo.wanadoo.fr.
+	[109.222.216.122])
+	by smtp.gmail.com with ESMTPSA id 4sm20517061wmg.12.2019.04.26.05.14.26
+	(version=TLS1_3 cipher=AEAD-AES128-GCM-SHA256 bits=128/128);
+	Fri, 26 Apr 2019 05:14:27 -0700 (PDT)
+To: Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org,
+	Gerd Hoffmann <kraxel@redhat.com>
+References: <20190419075625.24251-1-thuth@redhat.com>
+	<c0ce7a39-9e9f-a7be-c73b-a9c2c05da3af@redhat.com>
+	<e0e3128d-371c-7812-d99f-77af15ef278b@redhat.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Openpgp: id=89C1E78F601EE86C867495CBA2A3FD6EDEADC0DE;
+	url=http://pgp.mit.edu/pks/lookup?op=get&search=0xA2A3FD6EDEADC0DE
+Message-ID: <84638796-204e-3f43-3fe1-f5329e9cd466@redhat.com>
+Date: Fri, 26 Apr 2019 14:14:25 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+	Thunderbird/60.6.1
 MIME-Version: 1.0
+In-Reply-To: <e0e3128d-371c-7812-d99f-77af15ef278b@redhat.com>
 Content-Type: text/plain; charset="UTF-8"
-Content-Disposition: inline
-In-Reply-To: <CAJ+F1CKbgb_TkoS_a10qGw7kkTO+EkC4uhreCkOu=k2ut5CAig@mail.gmail.com>
-User-Agent: NeoMutt/20180716
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.26]);
-	Fri, 26 Apr 2019 12:06:02 +0000 (UTC)
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH v6 05/11] vhost-user: add
- vhost_user_gpu_set_socket()
+	[fuzzy]
+X-Received-From: 209.85.221.66
+Subject: Re: [Qemu-devel] [PATCH v2 for-4.1 0/2] Fix ohci_die() and move PCI
+ code to separate file
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -76,51 +88,67 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: QEMU <qemu-devel@nongnu.org>, "Michael S. Tsirkin" <mst@redhat.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190426120558.4G8re9N29s7I7u11_eGxy29EmpFCTBWfen_YBs-U_Uk@z>
+Message-ID: <20190426121425.dQWid1d-zTAS16z6abUGrO0pbeASliqlr3oXgxTp-CI@z>
 
-  Hi,
-
-> > > +Wire format
-> > > +===========
-> > > +
-> > > +Unless specified differently, numbers are in the machine native byte
-> > > +order.
-> > > +
-> > > +A vhost-user-gpu request consists of 2 header fields and a payload.
-> > > +
-> > > ++---------+------+---------+
-> > > +| request | size | payload |
-> > > ++---------+------+---------+
-> > > +
-> > > +Header
-> > > +------
-> > > +
-> > > +:request: ``u32``, type of the request
-> > > +
-> > > +:size: ``u32``, size of the payload
-> > > +
-> > > +A reply consists only of a payload, whose content depends on the request.
-> >
-> > I'd suggest to use the same format for replies, only with "request"
-> > meaning "status" in replies.  Allows for OK/ERROR status in replies,
-> > and having a size field in replies too should make things more robust.
-> > Also allows for an empty reply (status=ok,size=0).
+On 4/26/19 7:42 AM, Thomas Huth wrote:
+> On 26/04/2019 00.55, Philippe Mathieu-Daudé wrote:
+>> Hi Thomas,
+>>
+>> On 4/19/19 9:56 AM, Thomas Huth wrote:
+>>> First patch fixes a problem with ohci_die(), second patch moves PCI code into
+>>> a separate file, so that the sysbus OHCI device can also be used without
+>>> the dependency on the PCI code.
+>>>
+>>> v2: Split the patch into two patches, one for the ohci_die() fix and one
+>>>     for the PCI code movement.
+>>
+>> Way cleaner. I wonder why you don't use a typedef for the void
+>> (*ohci_die_fn)(struct OHCIState *) prototype.
 > 
+> It does not work in that case:
 > 
-> That brings more questions and ambiguity imho.
+> typedef struct OHCIState {            // <-- struct OHCIState definition
+>     [...]
+>     uint32_t async_td;
+>     bool async_complete;
+> 
+>     void (*ohci_die)(struct OHCIState *ohci); // <-- ohci_die definition
+> } OHCIState;                         // <-- typedef OHCIState definition
+> 
+> The typedef is defined after the ohci_die entry.
 
-What questions for example?
+I was thinking of forward declaration:
 
-> Can we leave that for future protocol extensions negotiated with
-> GET/SET_PROTOCOL_FEATURES ?
+typedef struct OHCIState OHCIState;
 
-I don't think negotiating such a basic protocol change is a good idea.
+typedef void (ohci_die_fn)(OHCIState *ohci);
 
-cheers,
-  Gerd
+struct OHCIState {
+    [...]
+    uint32_t async_td;
+    bool async_complete;
 
+    ohci_die_fn *ohci_die;
+} OHCIState;
+
+static void usb_ohci_init(OHCIState *ohci, DeviceState *dev,
+                          uint32_t num_ports,
+                          dma_addr_t localmem_base,
+                          char *masterbus, uint32_t firstport,
+                          AddressSpace *as,
+                          ohci_die_fn *ohci_die, Error **errp)
+{ ...
+
+> 
+>> Anyway to this series:
+>> Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+>> Tested-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+> 
+>  Thanks!
+>   Thomas
+> 
 
