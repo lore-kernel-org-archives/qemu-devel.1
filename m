@@ -1,25 +1,25 @@
 Received: from eggs.gnu.org ([209.51.188.92]:45317)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <arilou@gmail.com>) id 1hJsme-0000dE-B3
-	for qemu-devel@nongnu.org; Fri, 26 Apr 2019 00:48:25 -0400
+	(envelope-from <arilou@gmail.com>) id 1hJsmh-0000dE-D7
+	for qemu-devel@nongnu.org; Fri, 26 Apr 2019 00:48:30 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <arilou@gmail.com>) id 1hJsb9-0004Z9-Fi
-	for qemu-devel@nongnu.org; Fri, 26 Apr 2019 00:36:32 -0400
-Received: from mail-wr1-x443.google.com ([2a00:1450:4864:20::443]:37174)
+	(envelope-from <arilou@gmail.com>) id 1hJsb0-0004Ob-U1
+	for qemu-devel@nongnu.org; Fri, 26 Apr 2019 00:36:24 -0400
+Received: from mail-wr1-x441.google.com ([2a00:1450:4864:20::441]:33956)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <arilou@gmail.com>) id 1hJsb9-0004YQ-9b
-	for qemu-devel@nongnu.org; Fri, 26 Apr 2019 00:36:31 -0400
-Received: by mail-wr1-x443.google.com with SMTP id r6so2467610wrm.4
-	for <qemu-devel@nongnu.org>; Thu, 25 Apr 2019 21:36:31 -0700 (PDT)
+	(Exim 4.71) (envelope-from <arilou@gmail.com>) id 1hJsay-0004Lu-Ut
+	for qemu-devel@nongnu.org; Fri, 26 Apr 2019 00:36:21 -0400
+Received: by mail-wr1-x441.google.com with SMTP id v16so47489wrp.1
+	for <qemu-devel@nongnu.org>; Thu, 25 Apr 2019 21:36:19 -0700 (PDT)
 From: Jon Doron <arilou@gmail.com>
-Date: Fri, 26 Apr 2019 07:35:48 +0300
-Message-Id: <20190426043558.6888-12-arilou@gmail.com>
+Date: Fri, 26 Apr 2019 07:35:43 +0300
+Message-Id: <20190426043558.6888-7-arilou@gmail.com>
 In-Reply-To: <20190426043558.6888-1-arilou@gmail.com>
 References: <20190426043558.6888-1-arilou@gmail.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH v7 11/21] gdbstub: Implement write memory (M
- pkt) with new infra
+Subject: [Qemu-devel] [PATCH v7 06/21] gdbstub: Implement set_thread (H pkt)
+ with new infra
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,77 +33,112 @@ Cc: alex.bennee@linaro.org, Jon Doron <arilou@gmail.com>
 
 Signed-off-by: Jon Doron <arilou@gmail.com>
 ---
- gdbstub.c | 51 +++++++++++++++++++++++++++++++++------------------
- 1 file changed, 33 insertions(+), 18 deletions(-)
+ gdbstub.c | 79 ++++++++++++++++++++++++++++++++++---------------------
+ 1 file changed, 49 insertions(+), 30 deletions(-)
 
 diff --git a/gdbstub.c b/gdbstub.c
-index e9a3d0c2bc..8dc2e1d507 100644
+index 469aaeb875..21cdaf4678 100644
 --- a/gdbstub.c
 +++ b/gdbstub.c
-@@ -1685,6 +1685,31 @@ static void handle_get_reg(GdbCmdContext *gdb_ctx, void *user_ctx)
-     put_packet(gdb_ctx->s, gdb_ctx->str_buf);
+@@ -1547,6 +1547,47 @@ static void handle_cont_with_sig(GdbCmdContext *gdb_ctx, void *user_ctx)
+     gdb_continue(gdb_ctx->s);
  }
  
-+static void handle_write_mem(GdbCmdContext *gdb_ctx, void *user_ctx)
++static void handle_set_thread(GdbCmdContext *gdb_ctx, void *user_ctx)
 +{
-+    if (gdb_ctx->num_params < 3) {
++    CPUState *cpu;
++
++    if (gdb_ctx->num_params < 2) {
 +        put_packet(gdb_ctx->s, "E22");
 +        return;
 +    }
 +
-+    /* hextomem() reads 2*len bytes */
-+    if (gdb_ctx->params[1].val_ull > strlen(gdb_ctx->params[2].data) / 2) {
++    if (gdb_ctx->params[1].thread_id.kind == GDB_READ_THREAD_ERR) {
 +        put_packet(gdb_ctx->s, "E22");
 +        return;
 +    }
 +
-+    hextomem(gdb_ctx->mem_buf, gdb_ctx->params[2].data,
-+             gdb_ctx->params[1].val_ull);
-+    if (target_memory_rw_debug(gdb_ctx->s->g_cpu, gdb_ctx->params[0].val_ull,
-+                               gdb_ctx->mem_buf,
-+                               gdb_ctx->params[1].val_ull, true)) {
-+        put_packet(gdb_ctx->s, "E14");
++    if (gdb_ctx->params[1].thread_id.kind != GDB_ONE_THREAD) {
++        put_packet(gdb_ctx->s, "OK");
 +        return;
 +    }
 +
-+    put_packet(gdb_ctx->s, "OK");
++    cpu = gdb_get_cpu(gdb_ctx->s, gdb_ctx->params[1].thread_id.pid,
++                      gdb_ctx->params[1].thread_id.tid);
++    if (!cpu) {
++        put_packet(gdb_ctx->s, "E22");
++        return;
++    }
++
++    switch (gdb_ctx->params[0].opcode) {
++    case 'c':
++        gdb_ctx->s->c_cpu = cpu;
++        put_packet(gdb_ctx->s, "OK");
++        break;
++    case 'g':
++        gdb_ctx->s->g_cpu = cpu;
++        put_packet(gdb_ctx->s, "OK");
++        break;
++    default:
++        put_packet(gdb_ctx->s, "E22");
++        break;
++    }
 +}
 +
  static int gdb_handle_packet(GDBState *s, const char *line_buf)
  {
      CPUState *cpu;
-@@ -1893,24 +1918,14 @@ static int gdb_handle_packet(GDBState *s, const char *line_buf)
-         }
+@@ -1560,7 +1601,6 @@ static int gdb_handle_packet(GDBState *s, const char *line_buf)
+     char thread_id[16];
+     uint8_t *registers;
+     target_ulong addr, len;
+-    GDBThreadIdKind thread_kind;
+     const GdbCmdParseEntry *cmd_parser = NULL;
+ 
+     trace_gdbstub_io_command(line_buf);
+@@ -1823,35 +1863,14 @@ static int gdb_handle_packet(GDBState *s, const char *line_buf)
+             put_packet(s, "E22");
          break;
-     case 'M':
--        addr = strtoull(p, (char **)&p, 16);
--        if (*p == ',')
--            p++;
--        len = strtoull(p, (char **)&p, 16);
--        if (*p == ':')
--            p++;
+     case 'H':
+-        type = *p++;
 -
--        /* hextomem() reads 2*len bytes */
--        if (len > strlen(p) / 2) {
--            put_packet (s, "E22");
+-        thread_kind = read_thread_id(p, &p, &pid, &tid);
+-        if (thread_kind == GDB_READ_THREAD_ERR) {
+-            put_packet(s, "E22");
 -            break;
 -        }
--        hextomem(mem_buf, p, len);
--        if (target_memory_rw_debug(s->g_cpu, addr, mem_buf, len,
--                                   true) != 0) {
--            put_packet(s, "E14");
--        } else {
+-
+-        if (thread_kind != GDB_ONE_THREAD) {
 -            put_packet(s, "OK");
+-            break;
+-        }
+-        cpu = gdb_get_cpu(s, pid, tid);
+-        if (cpu == NULL) {
+-            put_packet(s, "E22");
+-            break;
+-        }
+-        switch (type) {
+-        case 'c':
+-            s->c_cpu = cpu;
+-            put_packet(s, "OK");
+-            break;
+-        case 'g':
+-            s->g_cpu = cpu;
+-            put_packet(s, "OK");
+-            break;
+-        default:
+-             put_packet(s, "E22");
+-             break;
 +        {
-+            static const GdbCmdParseEntry write_mem_cmd_desc = {
-+                .handler = handle_write_mem,
-+                .cmd = "M",
++            static const GdbCmdParseEntry set_thread_cmd_desc = {
++                .handler = handle_set_thread,
++                .cmd = "H",
 +                .cmd_startswith = 1,
-+                .schema = "L,L:s0"
++                .schema = "o.t0"
 +            };
-+            cmd_parser = &write_mem_cmd_desc;
++            cmd_parser = &set_thread_cmd_desc;
          }
          break;
-     case 'p':
+     case 'T':
 -- 
 2.20.1
