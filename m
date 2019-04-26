@@ -1,22 +1,21 @@
-Received: from eggs.gnu.org ([209.51.188.92]:56657)
+Received: from eggs.gnu.org ([209.51.188.92]:59436)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1hK5Dg-0007Po-5Z
-	for qemu-devel@nongnu.org; Fri, 26 Apr 2019 14:05:08 -0400
+	(envelope-from <richard.henderson@linaro.org>) id 1hK5UG-00062c-Ej
+	for qemu-devel@nongnu.org; Fri, 26 Apr 2019 14:22:17 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1hK5De-0000FO-4y
-	for qemu-devel@nongnu.org; Fri, 26 Apr 2019 14:05:08 -0400
-References: <20190415144948.78568-1-vsementsov@virtuozzo.com>
-	<20190415144948.78568-4-vsementsov@virtuozzo.com>
-From: Max Reitz <mreitz@redhat.com>
-Message-ID: <6445f4e0-a547-2119-2a1a-db5e5cb8de26@redhat.com>
-Date: Fri, 26 Apr 2019 20:04:52 +0200
-MIME-Version: 1.0
-In-Reply-To: <20190415144948.78568-4-vsementsov@virtuozzo.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="6jpEkXVsm50U3d0pWYJiuhpdIEyHdq95a"
-Subject: Re: [Qemu-devel] [PATCH v6 3/5] block/backup: refactor and tolerate
- unallocated cluster skipping
+	(envelope-from <richard.henderson@linaro.org>) id 1hK5UF-0006Nl-FO
+	for qemu-devel@nongnu.org; Fri, 26 Apr 2019 14:22:16 -0400
+Received: from mail-pg1-x531.google.com ([2607:f8b0:4864:20::531]:45601)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+	id 1hK5UF-0006MG-6u
+	for qemu-devel@nongnu.org; Fri, 26 Apr 2019 14:22:15 -0400
+Received: by mail-pg1-x531.google.com with SMTP id y27so1268154pgl.12
+	for <qemu-devel@nongnu.org>; Fri, 26 Apr 2019 11:22:14 -0700 (PDT)
+From: Richard Henderson <richard.henderson@linaro.org>
+Date: Fri, 26 Apr 2019 11:22:08 -0700
+Message-Id: <20190426182210.10442-1-richard.henderson@linaro.org>
+Subject: [Qemu-devel] [PULL 0/2] target/hppa patch queue
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,55 +24,31 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org
-Cc: kwolf@redhat.com, jsnow@redhat.com, den@openvz.org
+To: qemu-devel@nongnu.org
+Cc: peter.maydell@linaro.org
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---6jpEkXVsm50U3d0pWYJiuhpdIEyHdq95a
-From: Max Reitz <mreitz@redhat.com>
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
- qemu-devel@nongnu.org, qemu-block@nongnu.org
-Cc: kwolf@redhat.com, jsnow@redhat.com, den@openvz.org
-Message-ID: <6445f4e0-a547-2119-2a1a-db5e5cb8de26@redhat.com>
-Subject: Re: [PATCH v6 3/5] block/backup: refactor and tolerate unallocated
- cluster skipping
-References: <20190415144948.78568-1-vsementsov@virtuozzo.com>
- <20190415144948.78568-4-vsementsov@virtuozzo.com>
-In-Reply-To: <20190415144948.78568-4-vsementsov@virtuozzo.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+The following changes since commit 3284aa128153750f14a61e8a96fd085e6f2999b6:
 
-On 15.04.19 16:49, Vladimir Sementsov-Ogievskiy wrote:
-> Split allocation checking to separate function and reduce nesting.
-> Consider bdrv_is_allocated() fail as allocated area, as copying more
-> than needed is not wrong (and we do it anyway) and seems better than
-> fail the whole job. And, most probably we will fail on the next read,
-> if there are real problem with source.
->=20
-> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-> ---
->  block/backup.c | 60 +++++++++++++++++++-------------------------------=
+  Merge remote-tracking branch 'remotes/lersek/tags/edk2-pull-2019-04-22' into staging (2019-04-24 13:19:41 +0100)
 
->  1 file changed, 23 insertions(+), 37 deletions(-)
+are available in the Git repository at:
 
-Reviewed-by: Max Reitz <mreitz@redhat.com>
+  https://github.com/rth7680/qemu.git tags/pull-hppa-20190426
 
+for you to fetch changes up to 647ad90a1eb6c016071d21e4f1e22b9cd4986417:
 
---6jpEkXVsm50U3d0pWYJiuhpdIEyHdq95a
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
+  target/hppa: Always return EXCP_DMAR for protection id trap (2019-04-26 11:09:22 -0700)
 
------BEGIN PGP SIGNATURE-----
+----------------------------------------------------------------
+Implement fast tlb insert insns.
+Fix data tlb exception for pa 1.1.
 
-iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAlzDSEQACgkQ9AfbAGHV
-z0B6Ugf9H6dQBk8pOO9GveBUJtNnWWLcSd90zoGWv132fYUrxURNTEBWKtg1kVCb
-J738Q6Po3iT0ZXBvB5yd6Jv42dRycju04SEfIDixENbYrlH8ny6NtsBGFgORqgjV
-ZChX0ecSPY0MCHEAclKh5lk3otF7Nn4KfhBCaQ+MPZ2K4oHYKTzixAPhrYeaCWSY
-cYf2L7R1jADXOyUNdFVZ4YWy/lKZMvgNk9kH8QIlcv2XXZW08yxjqP6Xdi22HaFB
-PlOxW/23xT+jWUM3+YoGS5DZZUWFs7urBPbfCngWq2nomdfCpp8mlhK6Z7wfXM7g
-t8G1iwyxIg2P5bjKcK9OB5G4i1tZ9w==
-=SCwb
------END PGP SIGNATURE-----
+----------------------------------------------------------------
+Nick Hudson (2):
+      target/hppa: Implement Fast TLB Insert instructions
+      target/hppa: Always return EXCP_DMAR for protection id trap
 
---6jpEkXVsm50U3d0pWYJiuhpdIEyHdq95a--
+ target/hppa/mem_helper.c |  3 +--
+ target/hppa/translate.c  | 54 ++++++++++++++++++++++++++++++++++++++++++++++++
+ target/hppa/insns.decode |  3 +++
+ 3 files changed, 58 insertions(+), 2 deletions(-)
