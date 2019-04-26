@@ -1,24 +1,24 @@
-Received: from eggs.gnu.org ([209.51.188.92]:48019)
+Received: from eggs.gnu.org ([209.51.188.92]:48057)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1hK4aU-000063-Fg
-	for qemu-devel@nongnu.org; Fri, 26 Apr 2019 13:24:39 -0400
+	(envelope-from <richard.henderson@linaro.org>) id 1hK4aX-00009M-Nh
+	for qemu-devel@nongnu.org; Fri, 26 Apr 2019 13:24:45 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1hK4aT-0006nR-70
-	for qemu-devel@nongnu.org; Fri, 26 Apr 2019 13:24:38 -0400
-Received: from mail-pg1-x52a.google.com ([2607:f8b0:4864:20::52a]:41201)
+	(envelope-from <richard.henderson@linaro.org>) id 1hK4aV-000715-Nv
+	for qemu-devel@nongnu.org; Fri, 26 Apr 2019 13:24:41 -0400
+Received: from mail-pl1-x642.google.com ([2607:f8b0:4864:20::642]:38939)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1hK4aT-0006iv-0a
-	for qemu-devel@nongnu.org; Fri, 26 Apr 2019 13:24:37 -0400
-Received: by mail-pg1-x52a.google.com with SMTP id f6so1926257pgs.8
-	for <qemu-devel@nongnu.org>; Fri, 26 Apr 2019 10:24:36 -0700 (PDT)
+	id 1hK4aV-0006ve-EO
+	for qemu-devel@nongnu.org; Fri, 26 Apr 2019 13:24:39 -0400
+Received: by mail-pl1-x642.google.com with SMTP id e92so1881900plb.6
+	for <qemu-devel@nongnu.org>; Fri, 26 Apr 2019 10:24:39 -0700 (PDT)
 From: Richard Henderson <richard.henderson@linaro.org>
-Date: Fri, 26 Apr 2019 10:24:16 -0700
-Message-Id: <20190426172421.27133-11-richard.henderson@linaro.org>
+Date: Fri, 26 Apr 2019 10:24:18 -0700
+Message-Id: <20190426172421.27133-13-richard.henderson@linaro.org>
 In-Reply-To: <20190426172421.27133-1-richard.henderson@linaro.org>
 References: <20190426172421.27133-1-richard.henderson@linaro.org>
-Subject: [Qemu-devel] [PULL 10/15] tcg: Restart TB generation after
- relocation overflow
+Subject: [Qemu-devel] [PULL 12/15] tcg: Restart TB generation after
+ out-of-line ldst overflow
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,176 +30,433 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: peter.maydell@linaro.org
 
-If the TB generates too much code, such that backend relocations
-overflow, try again with a smaller TB.  In support of this, move
-relocation processing from a random place within tcg_out_op, in
-the handling of branch opcodes, to a new function at the end of
-tcg_gen_code.
-
-This is not a complete solution, as there are additional relocs
-generated for out-of-line ldst handling and constant pools.
+This is part c of relocation overflow handling.
 
 Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- tcg/tcg.h | 15 +++++++-------
- tcg/tcg.c | 61 ++++++++++++++++++++++++++-----------------------------
- 2 files changed, 36 insertions(+), 40 deletions(-)
+ tcg/aarch64/tcg-target.inc.c | 16 ++++++++++------
+ tcg/arm/tcg-target.inc.c     | 16 ++++++++++------
+ tcg/i386/tcg-target.inc.c    |  6 ++++--
+ tcg/mips/tcg-target.inc.c    |  6 ++++--
+ tcg/ppc/tcg-target.inc.c     | 14 ++++++++++----
+ tcg/riscv/tcg-target.inc.c   | 16 ++++++++++++----
+ tcg/s390/tcg-target.inc.c    | 20 ++++++++++++--------
+ tcg/tcg-ldst.inc.c           | 18 +++++++++---------
+ tcg/tcg.c                    |  7 ++++---
+ 9 files changed, 75 insertions(+), 44 deletions(-)
 
-diff --git a/tcg/tcg.h b/tcg/tcg.h
-index 50de1cdda3..cfc57110a1 100644
---- a/tcg/tcg.h
-+++ b/tcg/tcg.h
-@@ -238,12 +238,13 @@ typedef uint64_t tcg_insn_unit;
-     do { if (!(X)) { __builtin_unreachable(); } } while (0)
+diff --git a/tcg/aarch64/tcg-target.inc.c b/tcg/aarch64/tcg-target.inc.c
+index 8b93598bce..eefa929948 100644
+--- a/tcg/aarch64/tcg-target.inc.c
++++ b/tcg/aarch64/tcg-target.inc.c
+@@ -1395,14 +1395,15 @@ static inline void tcg_out_adr(TCGContext *s, TCGReg rd, void *target)
+     tcg_out_insn(s, 3406, ADR, rd, offset);
+ }
+ 
+-static void tcg_out_qemu_ld_slow_path(TCGContext *s, TCGLabelQemuLdst *lb)
++static bool tcg_out_qemu_ld_slow_path(TCGContext *s, TCGLabelQemuLdst *lb)
+ {
+     TCGMemOpIdx oi = lb->oi;
+     TCGMemOp opc = get_memop(oi);
+     TCGMemOp size = opc & MO_SIZE;
+ 
+-    bool ok = reloc_pc19(lb->label_ptr[0], s->code_ptr);
+-    tcg_debug_assert(ok);
++    if (!reloc_pc19(lb->label_ptr[0], s->code_ptr)) {
++        return false;
++    }
+ 
+     tcg_out_mov(s, TCG_TYPE_PTR, TCG_REG_X0, TCG_AREG0);
+     tcg_out_mov(s, TARGET_LONG_BITS == 64, TCG_REG_X1, lb->addrlo_reg);
+@@ -1416,16 +1417,18 @@ static void tcg_out_qemu_ld_slow_path(TCGContext *s, TCGLabelQemuLdst *lb)
+     }
+ 
+     tcg_out_goto(s, lb->raddr);
++    return true;
+ }
+ 
+-static void tcg_out_qemu_st_slow_path(TCGContext *s, TCGLabelQemuLdst *lb)
++static bool tcg_out_qemu_st_slow_path(TCGContext *s, TCGLabelQemuLdst *lb)
+ {
+     TCGMemOpIdx oi = lb->oi;
+     TCGMemOp opc = get_memop(oi);
+     TCGMemOp size = opc & MO_SIZE;
+ 
+-    bool ok = reloc_pc19(lb->label_ptr[0], s->code_ptr);
+-    tcg_debug_assert(ok);
++    if (!reloc_pc19(lb->label_ptr[0], s->code_ptr)) {
++        return false;
++    }
+ 
+     tcg_out_mov(s, TCG_TYPE_PTR, TCG_REG_X0, TCG_AREG0);
+     tcg_out_mov(s, TARGET_LONG_BITS == 64, TCG_REG_X1, lb->addrlo_reg);
+@@ -1434,6 +1437,7 @@ static void tcg_out_qemu_st_slow_path(TCGContext *s, TCGLabelQemuLdst *lb)
+     tcg_out_adr(s, TCG_REG_X4, lb->raddr);
+     tcg_out_call(s, qemu_st_helpers[opc & (MO_BSWAP | MO_SIZE)]);
+     tcg_out_goto(s, lb->raddr);
++    return true;
+ }
+ 
+ static void add_qemu_ldst_label(TCGContext *s, bool is_ld, TCGMemOpIdx oi,
+diff --git a/tcg/arm/tcg-target.inc.c b/tcg/arm/tcg-target.inc.c
+index 6873b0cf95..12a65cc9a6 100644
+--- a/tcg/arm/tcg-target.inc.c
++++ b/tcg/arm/tcg-target.inc.c
+@@ -1372,15 +1372,16 @@ static void add_qemu_ldst_label(TCGContext *s, bool is_ld, TCGMemOpIdx oi,
+     label->label_ptr[0] = label_ptr;
+ }
+ 
+-static void tcg_out_qemu_ld_slow_path(TCGContext *s, TCGLabelQemuLdst *lb)
++static bool tcg_out_qemu_ld_slow_path(TCGContext *s, TCGLabelQemuLdst *lb)
+ {
+     TCGReg argreg, datalo, datahi;
+     TCGMemOpIdx oi = lb->oi;
+     TCGMemOp opc = get_memop(oi);
+     void *func;
+ 
+-    bool ok = reloc_pc24(lb->label_ptr[0], s->code_ptr);
+-    tcg_debug_assert(ok);
++    if (!reloc_pc24(lb->label_ptr[0], s->code_ptr)) {
++        return false;
++    }
+ 
+     argreg = tcg_out_arg_reg32(s, TCG_REG_R0, TCG_AREG0);
+     if (TARGET_LONG_BITS == 64) {
+@@ -1432,16 +1433,18 @@ static void tcg_out_qemu_ld_slow_path(TCGContext *s, TCGLabelQemuLdst *lb)
+     }
+ 
+     tcg_out_goto(s, COND_AL, lb->raddr);
++    return true;
+ }
+ 
+-static void tcg_out_qemu_st_slow_path(TCGContext *s, TCGLabelQemuLdst *lb)
++static bool tcg_out_qemu_st_slow_path(TCGContext *s, TCGLabelQemuLdst *lb)
+ {
+     TCGReg argreg, datalo, datahi;
+     TCGMemOpIdx oi = lb->oi;
+     TCGMemOp opc = get_memop(oi);
+ 
+-    bool ok = reloc_pc24(lb->label_ptr[0], s->code_ptr);
+-    tcg_debug_assert(ok);
++    if (!reloc_pc24(lb->label_ptr[0], s->code_ptr)) {
++        return false;
++    }
+ 
+     argreg = TCG_REG_R0;
+     argreg = tcg_out_arg_reg32(s, argreg, TCG_AREG0);
+@@ -1474,6 +1477,7 @@ static void tcg_out_qemu_st_slow_path(TCGContext *s, TCGLabelQemuLdst *lb)
+ 
+     /* Tail-call to the helper, which will return to the fast path.  */
+     tcg_out_goto(s, COND_AL, qemu_st_helpers[opc & (MO_BSWAP | MO_SIZE)]);
++    return true;
+ }
+ #endif /* SOFTMMU */
+ 
+diff --git a/tcg/i386/tcg-target.inc.c b/tcg/i386/tcg-target.inc.c
+index 1fa833840e..d5ed9f1ffd 100644
+--- a/tcg/i386/tcg-target.inc.c
++++ b/tcg/i386/tcg-target.inc.c
+@@ -1730,7 +1730,7 @@ static void add_qemu_ldst_label(TCGContext *s, bool is_ld, bool is_64,
+ /*
+  * Generate code for the slow path for a load at the end of block
+  */
+-static void tcg_out_qemu_ld_slow_path(TCGContext *s, TCGLabelQemuLdst *l)
++static bool tcg_out_qemu_ld_slow_path(TCGContext *s, TCGLabelQemuLdst *l)
+ {
+     TCGMemOpIdx oi = l->oi;
+     TCGMemOp opc = get_memop(oi);
+@@ -1809,12 +1809,13 @@ static void tcg_out_qemu_ld_slow_path(TCGContext *s, TCGLabelQemuLdst *l)
+ 
+     /* Jump to the code corresponding to next IR of qemu_st */
+     tcg_out_jmp(s, l->raddr);
++    return true;
+ }
+ 
+ /*
+  * Generate code for the slow path for a store at the end of block
+  */
+-static void tcg_out_qemu_st_slow_path(TCGContext *s, TCGLabelQemuLdst *l)
++static bool tcg_out_qemu_st_slow_path(TCGContext *s, TCGLabelQemuLdst *l)
+ {
+     TCGMemOpIdx oi = l->oi;
+     TCGMemOp opc = get_memop(oi);
+@@ -1877,6 +1878,7 @@ static void tcg_out_qemu_st_slow_path(TCGContext *s, TCGLabelQemuLdst *l)
+     /* "Tail call" to the helper, with the return address back inline.  */
+     tcg_out_push(s, retaddr);
+     tcg_out_jmp(s, qemu_st_helpers[opc & (MO_BSWAP | MO_SIZE)]);
++    return true;
+ }
+ #elif TCG_TARGET_REG_BITS == 32
+ # define x86_guest_base_seg     0
+diff --git a/tcg/mips/tcg-target.inc.c b/tcg/mips/tcg-target.inc.c
+index 8a92e916dd..412cacdcb9 100644
+--- a/tcg/mips/tcg-target.inc.c
++++ b/tcg/mips/tcg-target.inc.c
+@@ -1338,7 +1338,7 @@ static void add_qemu_ldst_label(TCGContext *s, int is_ld, TCGMemOpIdx oi,
+     }
+ }
+ 
+-static void tcg_out_qemu_ld_slow_path(TCGContext *s, TCGLabelQemuLdst *l)
++static bool tcg_out_qemu_ld_slow_path(TCGContext *s, TCGLabelQemuLdst *l)
+ {
+     TCGMemOpIdx oi = l->oi;
+     TCGMemOp opc = get_memop(oi);
+@@ -1385,9 +1385,10 @@ static void tcg_out_qemu_ld_slow_path(TCGContext *s, TCGLabelQemuLdst *l)
+     } else {
+         tcg_out_opc_reg(s, OPC_OR, v0, TCG_REG_V0, TCG_REG_ZERO);
+     }
++    return true;
+ }
+ 
+-static void tcg_out_qemu_st_slow_path(TCGContext *s, TCGLabelQemuLdst *l)
++static bool tcg_out_qemu_st_slow_path(TCGContext *s, TCGLabelQemuLdst *l)
+ {
+     TCGMemOpIdx oi = l->oi;
+     TCGMemOp opc = get_memop(oi);
+@@ -1435,6 +1436,7 @@ static void tcg_out_qemu_st_slow_path(TCGContext *s, TCGLabelQemuLdst *l)
+     tcg_out_call_int(s, qemu_st_helpers[opc & (MO_BSWAP | MO_SIZE)], true);
+     /* delay slot */
+     tcg_out_mov(s, TCG_TYPE_PTR, tcg_target_call_iarg_regs[0], TCG_AREG0);
++    return true;
+ }
  #endif
  
--typedef struct TCGRelocation {
--    struct TCGRelocation *next;
--    int type;
-+typedef struct TCGRelocation TCGRelocation;
-+struct TCGRelocation {
-+    QSIMPLEQ_ENTRY(TCGRelocation) next;
-     tcg_insn_unit *ptr;
-     intptr_t addend;
--} TCGRelocation; 
-+    int type;
-+};
+diff --git a/tcg/ppc/tcg-target.inc.c b/tcg/ppc/tcg-target.inc.c
+index 773690f1d9..c0923ced4f 100644
+--- a/tcg/ppc/tcg-target.inc.c
++++ b/tcg/ppc/tcg-target.inc.c
+@@ -1653,13 +1653,15 @@ static void add_qemu_ldst_label(TCGContext *s, bool is_ld, TCGMemOpIdx oi,
+     label->label_ptr[0] = lptr;
+ }
  
- typedef struct TCGLabel TCGLabel;
- struct TCGLabel {
-@@ -254,11 +255,9 @@ struct TCGLabel {
-     union {
-         uintptr_t value;
-         tcg_insn_unit *value_ptr;
--        TCGRelocation *first_reloc;
-     } u;
--#ifdef CONFIG_DEBUG_TCG
-+    QSIMPLEQ_HEAD(, TCGRelocation) relocs;
-     QSIMPLEQ_ENTRY(TCGLabel) next;
--#endif
- };
+-static void tcg_out_qemu_ld_slow_path(TCGContext *s, TCGLabelQemuLdst *lb)
++static bool tcg_out_qemu_ld_slow_path(TCGContext *s, TCGLabelQemuLdst *lb)
+ {
+     TCGMemOpIdx oi = lb->oi;
+     TCGMemOp opc = get_memop(oi);
+     TCGReg hi, lo, arg = TCG_REG_R3;
  
- typedef struct TCGPool {
-@@ -691,7 +690,6 @@ struct TCGContext {
- #endif
+-    **lb->label_ptr |= reloc_pc14_val(*lb->label_ptr, s->code_ptr);
++    if (!reloc_pc14(lb->label_ptr[0], s->code_ptr)) {
++        return false;
++    }
  
- #ifdef CONFIG_DEBUG_TCG
--    QSIMPLEQ_HEAD(, TCGLabel) labels;
-     int temps_in_use;
-     int goto_tb_issue_mask;
- #endif
-@@ -729,6 +727,7 @@ struct TCGContext {
-     TCGTemp temps[TCG_MAX_TEMPS]; /* globals first, temps after */
+     tcg_out_mov(s, TCG_TYPE_PTR, arg++, TCG_AREG0);
  
-     QTAILQ_HEAD(, TCGOp) ops, free_ops;
-+    QSIMPLEQ_HEAD(, TCGLabel) labels;
+@@ -1695,16 +1697,19 @@ static void tcg_out_qemu_ld_slow_path(TCGContext *s, TCGLabelQemuLdst *lb)
+     }
  
-     /* Tells which temporary holds a given register.
-        It does not take into account fixed registers */
+     tcg_out_b(s, 0, lb->raddr);
++    return true;
+ }
+ 
+-static void tcg_out_qemu_st_slow_path(TCGContext *s, TCGLabelQemuLdst *lb)
++static bool tcg_out_qemu_st_slow_path(TCGContext *s, TCGLabelQemuLdst *lb)
+ {
+     TCGMemOpIdx oi = lb->oi;
+     TCGMemOp opc = get_memop(oi);
+     TCGMemOp s_bits = opc & MO_SIZE;
+     TCGReg hi, lo, arg = TCG_REG_R3;
+ 
+-    **lb->label_ptr |= reloc_pc14_val(*lb->label_ptr, s->code_ptr);
++    if (!reloc_pc14(lb->label_ptr[0], s->code_ptr)) {
++        return false;
++    }
+ 
+     tcg_out_mov(s, TCG_TYPE_PTR, arg++, TCG_AREG0);
+ 
+@@ -1753,6 +1758,7 @@ static void tcg_out_qemu_st_slow_path(TCGContext *s, TCGLabelQemuLdst *lb)
+     tcg_out_call(s, qemu_st_helpers[opc & (MO_BSWAP | MO_SIZE)]);
+ 
+     tcg_out_b(s, 0, lb->raddr);
++    return true;
+ }
+ #endif /* SOFTMMU */
+ 
+diff --git a/tcg/riscv/tcg-target.inc.c b/tcg/riscv/tcg-target.inc.c
+index b785f4acb7..2932505094 100644
+--- a/tcg/riscv/tcg-target.inc.c
++++ b/tcg/riscv/tcg-target.inc.c
+@@ -1065,7 +1065,7 @@ static void add_qemu_ldst_label(TCGContext *s, int is_ld, TCGMemOpIdx oi,
+     label->label_ptr[0] = label_ptr[0];
+ }
+ 
+-static void tcg_out_qemu_ld_slow_path(TCGContext *s, TCGLabelQemuLdst *l)
++static bool tcg_out_qemu_ld_slow_path(TCGContext *s, TCGLabelQemuLdst *l)
+ {
+     TCGMemOpIdx oi = l->oi;
+     TCGMemOp opc = get_memop(oi);
+@@ -1080,7 +1080,10 @@ static void tcg_out_qemu_ld_slow_path(TCGContext *s, TCGLabelQemuLdst *l)
+     }
+ 
+     /* resolve label address */
+-    patch_reloc(l->label_ptr[0], R_RISCV_BRANCH, (intptr_t) s->code_ptr, 0);
++    if (!patch_reloc(l->label_ptr[0], R_RISCV_BRANCH,
++                     (intptr_t) s->code_ptr, 0)) {
++        return false;
++    }
+ 
+     /* call load helper */
+     tcg_out_mov(s, TCG_TYPE_PTR, a0, TCG_AREG0);
+@@ -1092,9 +1095,10 @@ static void tcg_out_qemu_ld_slow_path(TCGContext *s, TCGLabelQemuLdst *l)
+     tcg_out_mov(s, (opc & MO_SIZE) == MO_64, l->datalo_reg, a0);
+ 
+     tcg_out_goto(s, l->raddr);
++    return true;
+ }
+ 
+-static void tcg_out_qemu_st_slow_path(TCGContext *s, TCGLabelQemuLdst *l)
++static bool tcg_out_qemu_st_slow_path(TCGContext *s, TCGLabelQemuLdst *l)
+ {
+     TCGMemOpIdx oi = l->oi;
+     TCGMemOp opc = get_memop(oi);
+@@ -1111,7 +1115,10 @@ static void tcg_out_qemu_st_slow_path(TCGContext *s, TCGLabelQemuLdst *l)
+     }
+ 
+     /* resolve label address */
+-    patch_reloc(l->label_ptr[0], R_RISCV_BRANCH, (intptr_t) s->code_ptr, 0);
++    if (!patch_reloc(l->label_ptr[0], R_RISCV_BRANCH,
++                     (intptr_t) s->code_ptr, 0)) {
++        return false;
++    }
+ 
+     /* call store helper */
+     tcg_out_mov(s, TCG_TYPE_PTR, a0, TCG_AREG0);
+@@ -1133,6 +1140,7 @@ static void tcg_out_qemu_st_slow_path(TCGContext *s, TCGLabelQemuLdst *l)
+     tcg_out_call(s, qemu_st_helpers[opc & (MO_BSWAP | MO_SSIZE)]);
+ 
+     tcg_out_goto(s, l->raddr);
++    return true;
+ }
+ #endif /* CONFIG_SOFTMMU */
+ 
+diff --git a/tcg/s390/tcg-target.inc.c b/tcg/s390/tcg-target.inc.c
+index 7db90b3bae..3d6150b10e 100644
+--- a/tcg/s390/tcg-target.inc.c
++++ b/tcg/s390/tcg-target.inc.c
+@@ -1609,16 +1609,17 @@ static void add_qemu_ldst_label(TCGContext *s, bool is_ld, TCGMemOpIdx oi,
+     label->label_ptr[0] = label_ptr;
+ }
+ 
+-static void tcg_out_qemu_ld_slow_path(TCGContext *s, TCGLabelQemuLdst *lb)
++static bool tcg_out_qemu_ld_slow_path(TCGContext *s, TCGLabelQemuLdst *lb)
+ {
+     TCGReg addr_reg = lb->addrlo_reg;
+     TCGReg data_reg = lb->datalo_reg;
+     TCGMemOpIdx oi = lb->oi;
+     TCGMemOp opc = get_memop(oi);
+ 
+-    bool ok = patch_reloc(lb->label_ptr[0], R_390_PC16DBL,
+-                          (intptr_t)s->code_ptr, 2);
+-    tcg_debug_assert(ok);
++    if (!patch_reloc(lb->label_ptr[0], R_390_PC16DBL,
++                     (intptr_t)s->code_ptr, 2)) {
++        return false;
++    }
+ 
+     tcg_out_mov(s, TCG_TYPE_PTR, TCG_REG_R2, TCG_AREG0);
+     if (TARGET_LONG_BITS == 64) {
+@@ -1630,18 +1631,20 @@ static void tcg_out_qemu_ld_slow_path(TCGContext *s, TCGLabelQemuLdst *lb)
+     tcg_out_mov(s, TCG_TYPE_I64, data_reg, TCG_REG_R2);
+ 
+     tgen_gotoi(s, S390_CC_ALWAYS, lb->raddr);
++    return true;
+ }
+ 
+-static void tcg_out_qemu_st_slow_path(TCGContext *s, TCGLabelQemuLdst *lb)
++static bool tcg_out_qemu_st_slow_path(TCGContext *s, TCGLabelQemuLdst *lb)
+ {
+     TCGReg addr_reg = lb->addrlo_reg;
+     TCGReg data_reg = lb->datalo_reg;
+     TCGMemOpIdx oi = lb->oi;
+     TCGMemOp opc = get_memop(oi);
+ 
+-    bool ok = patch_reloc(lb->label_ptr[0], R_390_PC16DBL,
+-                          (intptr_t)s->code_ptr, 2);
+-    tcg_debug_assert(ok);
++    if (!patch_reloc(lb->label_ptr[0], R_390_PC16DBL,
++                     (intptr_t)s->code_ptr, 2)) {
++        return false;
++    }
+ 
+     tcg_out_mov(s, TCG_TYPE_PTR, TCG_REG_R2, TCG_AREG0);
+     if (TARGET_LONG_BITS == 64) {
+@@ -1668,6 +1671,7 @@ static void tcg_out_qemu_st_slow_path(TCGContext *s, TCGLabelQemuLdst *lb)
+     tcg_out_call(s, qemu_st_helpers[opc & (MO_BSWAP | MO_SIZE)]);
+ 
+     tgen_gotoi(s, S390_CC_ALWAYS, lb->raddr);
++    return true;
+ }
+ #else
+ static void tcg_prepare_user_ldst(TCGContext *s, TCGReg *addr_reg,
+diff --git a/tcg/tcg-ldst.inc.c b/tcg/tcg-ldst.inc.c
+index 47f41b921b..05f9b3ccd6 100644
+--- a/tcg/tcg-ldst.inc.c
++++ b/tcg/tcg-ldst.inc.c
+@@ -38,19 +38,19 @@ typedef struct TCGLabelQemuLdst {
+  * Generate TB finalization at the end of block
+  */
+ 
+-static void tcg_out_qemu_ld_slow_path(TCGContext *s, TCGLabelQemuLdst *l);
+-static void tcg_out_qemu_st_slow_path(TCGContext *s, TCGLabelQemuLdst *l);
++static bool tcg_out_qemu_ld_slow_path(TCGContext *s, TCGLabelQemuLdst *l);
++static bool tcg_out_qemu_st_slow_path(TCGContext *s, TCGLabelQemuLdst *l);
+ 
+-static bool tcg_out_ldst_finalize(TCGContext *s)
++static int tcg_out_ldst_finalize(TCGContext *s)
+ {
+     TCGLabelQemuLdst *lb;
+ 
+     /* qemu_ld/st slow paths */
+     QSIMPLEQ_FOREACH(lb, &s->ldst_labels, next) {
+-        if (lb->is_ld) {
+-            tcg_out_qemu_ld_slow_path(s, lb);
+-        } else {
+-            tcg_out_qemu_st_slow_path(s, lb);
++        if (lb->is_ld
++            ? !tcg_out_qemu_ld_slow_path(s, lb)
++            : !tcg_out_qemu_st_slow_path(s, lb)) {
++            return -2;
+         }
+ 
+         /* Test for (pending) buffer overflow.  The assumption is that any
+@@ -58,10 +58,10 @@ static bool tcg_out_ldst_finalize(TCGContext *s)
+            the buffer completely.  Thus we can test for overflow after
+            generating code without having to check during generation.  */
+         if (unlikely((void *)s->code_ptr > s->code_gen_highwater)) {
+-            return false;
++            return -1;
+         }
+     }
+-    return true;
++    return 0;
+ }
+ 
+ /*
 diff --git a/tcg/tcg.c b/tcg/tcg.c
-index 5d255166c0..752c45a0ec 100644
+index 0394e8ab34..f7bef51de8 100644
 --- a/tcg/tcg.c
 +++ b/tcg/tcg.c
-@@ -263,37 +263,17 @@ static __attribute__((unused)) inline void tcg_patch64(tcg_insn_unit *p,
- static void tcg_out_reloc(TCGContext *s, tcg_insn_unit *code_ptr, int type,
-                           TCGLabel *l, intptr_t addend)
- {
--    TCGRelocation *r;
-+    TCGRelocation *r = tcg_malloc(sizeof(TCGRelocation));
+@@ -128,7 +128,7 @@ static void tcg_out_call(TCGContext *s, tcg_insn_unit *target);
+ static int tcg_target_const_match(tcg_target_long val, TCGType type,
+                                   const TCGArgConstraint *arg_ct);
+ #ifdef TCG_TARGET_NEED_LDST_LABELS
+-static bool tcg_out_ldst_finalize(TCGContext *s);
++static int tcg_out_ldst_finalize(TCGContext *s);
+ #endif
  
--    if (l->has_value) {
--        /* FIXME: This may break relocations on RISC targets that
--           modify instruction fields in place.  The caller may not have 
--           written the initial value.  */
--        bool ok = patch_reloc(code_ptr, type, l->u.value, addend);
--        tcg_debug_assert(ok);
--    } else {
--        /* add a new relocation entry */
--        r = tcg_malloc(sizeof(TCGRelocation));
--        r->type = type;
--        r->ptr = code_ptr;
--        r->addend = addend;
--        r->next = l->u.first_reloc;
--        l->u.first_reloc = r;
--    }
-+    r->type = type;
-+    r->ptr = code_ptr;
-+    r->addend = addend;
-+    QSIMPLEQ_INSERT_TAIL(&l->relocs, r, next);
- }
+ #define TCG_HIGHWATER 1024
+@@ -4000,8 +4000,9 @@ int tcg_gen_code(TCGContext *s, TranslationBlock *tb)
  
- static void tcg_out_label(TCGContext *s, TCGLabel *l, tcg_insn_unit *ptr)
- {
--    intptr_t value = (intptr_t)ptr;
--    TCGRelocation *r;
--
-     tcg_debug_assert(!l->has_value);
--
--    for (r = l->u.first_reloc; r != NULL; r = r->next) {
--        bool ok = patch_reloc(r->ptr, r->type, value, r->addend);
--        tcg_debug_assert(ok);
--    }
--
-     l->has_value = 1;
-     l->u.value_ptr = ptr;
- }
-@@ -303,16 +283,32 @@ TCGLabel *gen_new_label(void)
-     TCGContext *s = tcg_ctx;
-     TCGLabel *l = tcg_malloc(sizeof(TCGLabel));
- 
--    *l = (TCGLabel){
--        .id = s->nb_labels++
--    };
--#ifdef CONFIG_DEBUG_TCG
-+    memset(l, 0, sizeof(TCGLabel));
-+    l->id = s->nb_labels++;
-+    QSIMPLEQ_INIT(&l->relocs);
-+
-     QSIMPLEQ_INSERT_TAIL(&s->labels, l, next);
--#endif
- 
-     return l;
- }
- 
-+static bool tcg_resolve_relocs(TCGContext *s)
-+{
-+    TCGLabel *l;
-+
-+    QSIMPLEQ_FOREACH(l, &s->labels, next) {
-+        TCGRelocation *r;
-+        uintptr_t value = l->u.value;
-+
-+        QSIMPLEQ_FOREACH(r, &l->relocs, next) {
-+            if (!patch_reloc(r->ptr, r->type, value, r->addend)) {
-+                return false;
-+            }
-+        }
-+    }
-+    return true;
-+}
-+
- static void set_jmp_reset_offset(TCGContext *s, int which)
- {
-     size_t off = tcg_current_code_size(s);
-@@ -1096,9 +1092,7 @@ void tcg_func_start(TCGContext *s)
- 
-     QTAILQ_INIT(&s->ops);
-     QTAILQ_INIT(&s->free_ops);
--#ifdef CONFIG_DEBUG_TCG
-     QSIMPLEQ_INIT(&s->labels);
--#endif
- }
- 
- static inline TCGTemp *tcg_temp_alloc(TCGContext *s)
-@@ -4015,6 +4009,9 @@ int tcg_gen_code(TCGContext *s, TranslationBlock *tb)
-         return -1;
+     /* Generate TB finalization at the end of block */
+ #ifdef TCG_TARGET_NEED_LDST_LABELS
+-    if (!tcg_out_ldst_finalize(s)) {
+-        return -1;
++    i = tcg_out_ldst_finalize(s);
++    if (i < 0) {
++        return i;
      }
  #endif
-+    if (!tcg_resolve_relocs(s)) {
-+        return -2;
-+    }
- 
-     /* flush instruction cache */
-     flush_icache_range((uintptr_t)s->code_buf, (uintptr_t)s->code_ptr);
+ #ifdef TCG_TARGET_NEED_POOL_LABELS
 -- 
 2.17.1
