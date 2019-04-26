@@ -2,81 +2,84 @@ Return-Path: <SRS0=QtPl=S4=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.7 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-0.7 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,FROM_EXCESS_BASE64,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 225B8C43219
-	for <qemu-devel@archiver.kernel.org>; Fri, 26 Apr 2019 13:31:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 96336C4321A
+	for <qemu-devel@archiver.kernel.org>; Fri, 26 Apr 2019 13:48:00 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C8F05206C1
-	for <qemu-devel@archiver.kernel.org>; Fri, 26 Apr 2019 13:31:23 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 5EFBF206E0
+	for <qemu-devel@archiver.kernel.org>; Fri, 26 Apr 2019 13:48:00 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="lot1FEE1"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C8F05206C1
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="rJqaiCGL"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5EFBF206E0
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:47244 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:47436 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hK0wk-00074D-Nv
-	for qemu-devel@archiver.kernel.org; Fri, 26 Apr 2019 09:31:22 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:54984)
+	id 1hK1Cp-00069O-Ak
+	for qemu-devel@archiver.kernel.org; Fri, 26 Apr 2019 09:47:59 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:58185)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1hK0va-0006EZ-Oc
-	for qemu-devel@nongnu.org; Fri, 26 Apr 2019 09:30:11 -0400
+	(envelope-from <marcandre.lureau@gmail.com>) id 1hK1BP-00055N-34
+	for qemu-devel@nongnu.org; Fri, 26 Apr 2019 09:46:32 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1hK0vZ-0001S1-Do
-	for qemu-devel@nongnu.org; Fri, 26 Apr 2019 09:30:10 -0400
-Received: from mail-oi1-x236.google.com ([2607:f8b0:4864:20::236]:45568)
+	(envelope-from <marcandre.lureau@gmail.com>) id 1hK1BO-0000Xw-1P
+	for qemu-devel@nongnu.org; Fri, 26 Apr 2019 09:46:31 -0400
+Received: from mail-wr1-x442.google.com ([2a00:1450:4864:20::442]:36501)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1hK0vZ-0001Qi-7n
-	for qemu-devel@nongnu.org; Fri, 26 Apr 2019 09:30:09 -0400
-Received: by mail-oi1-x236.google.com with SMTP id y84so2877462oia.12
-	for <qemu-devel@nongnu.org>; Fri, 26 Apr 2019 06:30:09 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+	(Exim 4.71) (envelope-from <marcandre.lureau@gmail.com>)
+	id 1hK1BN-0000Xj-RR
+	for qemu-devel@nongnu.org; Fri, 26 Apr 2019 09:46:29 -0400
+Received: by mail-wr1-x442.google.com with SMTP id b1so4575153wru.3
+	for <qemu-devel@nongnu.org>; Fri, 26 Apr 2019 06:46:29 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
 	h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-	:cc; bh=/RxUpHLuuMxiO4r4j/W0gvwekX+jwZXShkY7vkmEwXE=;
-	b=lot1FEE1v8U1HTltpBMAvKVIZ0fNn+tkHgWvuCoUpQQt4ynz11WTVaC0wHJgLS5Jlq
-	r3UORCVZM4CeVyl32nnA0Lc13fSaPgOICvZA13Nk/qU42M28r+BsK18shT/SmpdRMIOq
-	/c58n80I589OycSRGZxxw10Wg+HyhOXthygo/bPseskc8Qaz5KQm03604rgQbOF3prt0
-	qcgm8ojZpN2KUfvXfW1pMS+/ukUE7ryT5bIuXBhtJe/qX4rpHdmux4M7ZVu3e2Tgces3
-	10JNbmzBLFWiJwSzoOc+MY5mbdh5CjIyprz37fvGZEqVWD31/bdA1/yzdfYzV+H2Up4L
-	PZug==
+	:cc:content-transfer-encoding;
+	bh=N9aBppMN8xa5U6yLncJ2KMPyEUkBKyO42x/Uynbu7kU=;
+	b=rJqaiCGLTvwSoBoNhth6TgU/lUpGlKW9Rd4rM9pijh7keGa6eLGsxbGSAc8tvnG55O
+	LidjQVfegmErcw9nQyTOFFLGjwGdJEYX6nKLIY/3+bMW2cGEbGPMG8VcG7Sw75epioDc
+	KGFdkMrUPmnkPsrVuW0xf2KDQN8K6TqFxBMjG5hztKY3C+SopbCdvtfdSlQMZWh73553
+	wXpvF8vrRdhFYiIHcUidPfk5Kg/GNwxG02pyJpnAcfmucX75tVzZFMJV0u0fRgdCTqLk
+	fDI0CVDP7F65wcG8Jre4gJblRqrskzvDx7z7pt/rS9zQ/3aSfDhr+2bGY2tXl+JYpmkC
+	jLVw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
 	d=1e100.net; s=20161025;
 	h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-	:message-id:subject:to:cc;
-	bh=/RxUpHLuuMxiO4r4j/W0gvwekX+jwZXShkY7vkmEwXE=;
-	b=WNtTw+wYeGKvIy6ESkpD0E5tjwkueuTdDYBbeQQUGylsm6Pmr4RsJ68X7kA5ZknpWv
-	jSyj7qRBFRFHFd54YFw4mhg1NPWeP//VjgXdmHEaYpPI000idV/y6OPy8gUq01usnAYs
-	QKGug5cjK+qGHLf4MSd37ygUt4moYX3wr39rcKVBNqerR/OS/8g1TPlR1q0H43EK66Cr
-	tzd5c/JpDAj12JO4C7/TKtgS6AUeQ9oDIcHWV7k5/3v+2SWzu6WbNEybaC2JdHx49lcE
-	VGJe2nHjgunhrA6lVXAwUpCMrI6pzIIeCROKSmjVffSk2J+NZNZAMO5nO7Tzv8r4EGV6
-	BB1w==
-X-Gm-Message-State: APjAAAXvHsFUck9EUeC64e6PkwF35Xe10p5FcWOKKy8J+teFoM3flKSQ
-	1Zgm+YMUh8UeC4UaHFn3poTBDhCr/q7fRc/coASGUQ==
-X-Google-Smtp-Source: APXvYqz+ueveZD+NISqYQhjjWPm6wzly3lyctV8Gb26Eq13GM6+tmv330eBxKPm5RZzwnV4px5oYvIlKIStOMHo4RZI=
-X-Received: by 2002:a05:6808:301:: with SMTP id
-	i1mr4104639oie.163.1556285407747; 
-	Fri, 26 Apr 2019 06:30:07 -0700 (PDT)
+	:message-id:subject:to:cc:content-transfer-encoding;
+	bh=N9aBppMN8xa5U6yLncJ2KMPyEUkBKyO42x/Uynbu7kU=;
+	b=diDgwcLIU4toCbfvgg1skhAyimN+6K77EyN65CNvPAXp3/VxNHlWJAatPkuQuoSl04
+	akCoLUMkeKNCYIQDKFOWiIl7OhtpQESiiR2wfKNUTe4jUXcDaBriFgu059hWdrfzJhJx
+	1r+caPtNNyxoT6V9oRiU4+jGb1bsPSODlhgrKvAvC/Z9tNeMCa8VhX95o6n9bC4idu5r
+	DPruH01hBhMxo3GvGbnwDjq5RKYKuAgm3J9UCis2+6iU7AC6C2d0NhTUSDbszWYvvmJe
+	jOy2If2zHgUc/gaxRaa1SBwUSsaw21ohrYlNWMs5mNWk5AeqRDOTxd0Clv5Y7WFiN+li
+	7jvg==
+X-Gm-Message-State: APjAAAUwdHLSpxbFF4cDbmyMCLl+6adrTZP/PHE3fbCY2m+XpqKkCeul
+	KiNKGXD6pepv9hQb8sZotqLrb5UfmgFQ1gix6Uw=
+X-Google-Smtp-Source: APXvYqxTqjYYSY4ymVitkAJOXj4D8Fowz/z+rWyGmsKTeGaIszwc1i/b8VCZBbQbeZ283AUAqTS3oz6ron0Jcbw1+1w=
+X-Received: by 2002:adf:b641:: with SMTP id i1mr30206806wre.288.1556286388601; 
+	Fri, 26 Apr 2019 06:46:28 -0700 (PDT)
 MIME-Version: 1.0
-References: <20190425132134.2839-1-cohuck@redhat.com>
-In-Reply-To: <20190425132134.2839-1-cohuck@redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri, 26 Apr 2019 14:29:56 +0100
+References: <20190423132004.13725-1-marcandre.lureau@redhat.com>
+	<20190423132004.13725-9-marcandre.lureau@redhat.com>
+	<20190426074645.zgm2lxfpfwdo2nni@sirius.home.kraxel.org>
+In-Reply-To: <20190426074645.zgm2lxfpfwdo2nni@sirius.home.kraxel.org>
+From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
+Date: Fri, 26 Apr 2019 15:46:16 +0200
 Message-ID:
- <CAFEAcA-qj+WqTDi4L9uZZEKD58SYsQ9PHFxM5gJHH0RAApxZJg@mail.gmail.com>
-To: Cornelia Huck <cohuck@redhat.com>
+ <CAJ+F1CKR1z4eB+Pwm5jZ3GSCpqG0N3X-gRqCP_TpqXxfUymPgA@mail.gmail.com>
+To: Gerd Hoffmann <kraxel@redhat.com>
 Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
 	recognized.
-X-Received-From: 2607:f8b0:4864:20::236
-Subject: Re: [Qemu-devel] [PULL 00/19] first batch of s390x patches for 4.1
+X-Received-From: 2a00:1450:4864:20::442
+Subject: Re: [Qemu-devel] [PATCH v6 08/11] contrib: add vhost-user-gpu
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -88,38 +91,107 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-s390x <qemu-s390x@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>
+Cc: QEMU <qemu-devel@nongnu.org>, "Michael S. Tsirkin" <mst@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190426132956.uvC2ejgUSMJJYqLLtNKBOmEjFIO4_Ju6RH3Bp_eSJsc@z>
+Message-ID: <20190426134616.hB7N3onGPUHTLP3bvBTRp8xgEHC4W1KwcS1j_gaRQ0U@z>
 
-On Thu, 25 Apr 2019 at 14:21, Cornelia Huck <cohuck@redhat.com> wrote:
+Hi
+
+On Fri, Apr 26, 2019 at 10:03 AM Gerd Hoffmann <kraxel@redhat.com> wrote:
 >
-> The following changes since commit 3284aa128153750f14a61e8a96fd085e6f2999b6:
+>   Hi,
 >
->   Merge remote-tracking branch 'remotes/lersek/tags/edk2-pull-2019-04-22' into staging (2019-04-24 13:19:41 +0100)
+> > +#ifdef CONFIG_LIBDRM_INTEL
+> > +static bool
+> > +intel_alloc_bo(struct drm_buffer *buf)
+> > +{
+> > +    uint32_t tiling =3D I915_TILING_NONE;
+> > +
+> > +    buf->intel_bo =3D drm_intel_bo_alloc_tiled(buf->dev->bufmgr, "vhos=
+t-user-gpu",
+> > +                                             buf->width, buf->height,
+> > +                                             (buf->bpp / 8), &tiling,
+> > +                                             &buf->stride, 0);
 >
-> are available in the Git repository at:
->
->   https://github.com/cohuck/qemu tags/s390x-20190425
->
-> for you to fetch changes up to 41c3d4269b1c18d12d33c5bf089dace25d08e82e:
->
->   Merge tag 's390-ccw-bios-2019-04-12' into s390-next-staging (2019-04-25 14:09:20 +0200)
->
-> ----------------------------------------------------------------
-> - properly detect page size of initial memory
-> - support for IPL (boot) from ECKD DASD passed through via vfio-ccw
->
-> ----------------------------------------------------------------
+> Why do you go for intel specific code here?
 >
 
+No idea, most likely some functions were lacking when I looked at it.
+GBM is fine now.
 
-Applied, thanks.
+> Can't you do the same with gbm_bo_create() or
+> gbm_bo_create_with_modifiers() ?
 
-Please update the changelog at https://wiki.qemu.org/ChangeLog/4.1
-for any user-visible changes.
+It's not clear to me how to properly use
+gbm_bo_create_with_modifiers(). I went with gbm_bo_create() for now,
+it "works for me".
 
--- PMM
+>
+> > +static bool
+> > +intel_map_bo(struct drm_buffer *buf)
+> > +{
+> > +    if (drm_intel_gem_bo_map_gtt(buf->intel_bo) !=3D 0) {
+> > +        return false;
+> > +    }
+>
+> gbm_bo_map()
+>
+> > +static bool
+> > +intel_export_bo_to_prime(struct drm_buffer *buffer, int *fd)
+> > +{
+> > +    if (drm_intel_bo_gem_export_to_prime(buffer->intel_bo, fd) < 0) {
+> > +        return false;
+> > +    }
+>
+> gbm_bo_get_fd()
+>
+> > +get_pixman_format(uint32_t virtio_gpu_format)
+> > +{
+> > +    switch (virtio_gpu_format) {
+> > +#ifdef HOST_WORDS_BIGENDIAN
+> > +    case VIRTIO_GPU_FORMAT_B8G8R8X8_UNORM:
+> > +        return PIXMAN_b8g8r8x8;
+>
+> Move that to a header for sharing?  Simliar to the bswap helpers?
+
+ack
+
+>
+> > +static void
+> > +virgl_cmd_create_resource_3d(VuGpu *g,
+> > +                             struct virtio_gpu_ctrl_command *cmd)
+> > +{
+> > +    struct virtio_gpu_resource_create_3d c3d;
+> > +    struct virgl_renderer_resource_create_args args;
+> > +
+> > +    VUGPU_FILL_CMD(c3d);
+> > +
+> > +    args.handle =3D c3d.resource_id;
+> > +    args.target =3D c3d.target;
+> > +    args.format =3D c3d.format;
+> > +    args.bind =3D c3d.bind;
+> > +    args.width =3D c3d.width;
+> > +    args.height =3D c3d.height;
+> > +    args.depth =3D c3d.depth;
+> > +    args.array_size =3D c3d.array_size;
+> > +    args.last_level =3D c3d.last_level;
+> > +    args.nr_samples =3D c3d.nr_samples;
+> > +    args.flags =3D c3d.flags;
+> > +    virgl_renderer_resource_create(&args, NULL, 0);
+> > +}
+>
+> The virtio_gpu_resource_create_3d -> virgl_renderer_resource_create_args
+> mapping looks like an opportunity for code sharing too.
+>
+> Hmm, but virgl_renderer_resource_create seems to be the only call with
+> an args struct, so maybe not worth the effort for this single case.
+
+yeah, I will not bother for now
+
+thanks!
+
+--=20
+Marc-Andr=C3=A9 Lureau
 
