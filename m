@@ -1,15 +1,24 @@
-Received: from eggs.gnu.org ([209.51.188.92]:35861)
+Received: from eggs.gnu.org ([209.51.188.92]:38050)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <tiwei.bie@intel.com>) id 1hJuCt-0001pU-AY
-	for qemu-devel@nongnu.org; Fri, 26 Apr 2019 02:19:36 -0400
+	(envelope-from <peterx@redhat.com>) id 1hJuKH-0001W3-BS
+	for qemu-devel@nongnu.org; Fri, 26 Apr 2019 02:27:14 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <tiwei.bie@intel.com>) id 1hJuCj-0007zh-4i
-	for qemu-devel@nongnu.org; Fri, 26 Apr 2019 02:19:29 -0400
-From: Tiwei Bie <tiwei.bie@intel.com>
-Date: Fri, 26 Apr 2019 14:18:15 +0800
-Message-Id: <20190426061815.6384-1-tiwei.bie@intel.com>
-Subject: [Qemu-devel] [PATCH] vhost-user: fix reconnection support for host
- notifier
+	(envelope-from <peterx@redhat.com>) id 1hJuKG-0001NJ-B9
+	for qemu-devel@nongnu.org; Fri, 26 Apr 2019 02:27:13 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:59698)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1hJuKG-0001LD-5Q
+	for qemu-devel@nongnu.org; Fri, 26 Apr 2019 02:27:12 -0400
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+	[10.5.11.22])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 6D1613082B41
+	for <qemu-devel@nongnu.org>; Fri, 26 Apr 2019 06:27:10 +0000 (UTC)
+From: Peter Xu <peterx@redhat.com>
+Date: Fri, 26 Apr 2019 14:27:05 +0800
+Message-Id: <20190426062705.4651-1-peterx@redhat.com>
+Subject: [Qemu-devel] [PATCH] checkpatch: allow SPDX-License-Identifier
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -18,60 +27,33 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: mst@redhat.com, qemu-devel@nongnu.org
-Cc: cunming.liang@intel.com, qemu-stable@nongnu.org
+To: qemu-devel@nongnu.org
+Cc: peterx@redhat.com, Paolo Bonzini <pbonzini@redhat.com>
 
-We need to destroy the host notifiers when cleaning up
-the backend. Otherwise, some resources are not released
-after the connection is closed, and it may prevent the
-external backend from reopening them (e.g. VFIO files)
-during restart.
+According to: https://spdx.org/ids-how, let's still allow QEMU to use
+the SPDX license identifier:
 
-Fixes: 44866521bd6e ("vhost-user: support registering external host notifiers")
-Cc: qemu-stable@nongnu.org
+// SPDX-License-Identifier: ***
 
-Signed-off-by: Tiwei Bie <tiwei.bie@intel.com>
+CC: Paolo Bonzini <pbonzini@redhat.com>
+Signed-off-by: Peter Xu <peterx@redhat.com>
 ---
- hw/virtio/vhost-user.c | 16 ++++++++++++++++
- 1 file changed, 16 insertions(+)
+ scripts/checkpatch.pl | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
 
-diff --git a/hw/virtio/vhost-user.c b/hw/virtio/vhost-user.c
-index 553319c7ac..56656629c0 100644
---- a/hw/virtio/vhost-user.c
-+++ b/hw/virtio/vhost-user.c
-@@ -1454,10 +1454,24 @@ static int vhost_user_backend_init(struct vhost_dev *dev, void *opaque)
- static int vhost_user_backend_cleanup(struct vhost_dev *dev)
- {
-     struct vhost_user *u;
-+    VhostUserState *user;
-+    int i;
+diff --git a/scripts/checkpatch.pl b/scripts/checkpatch.pl
+index 88682cb0a9..c2aaf421da 100755
+--- a/scripts/checkpatch.pl
++++ b/scripts/checkpatch.pl
+@@ -1949,7 +1949,8 @@ sub process {
+ 		}
  
-     assert(dev->vhost_ops->backend_type == VHOST_BACKEND_TYPE_USER);
- 
-     u = dev->opaque;
-+
-+    if (dev->vq_index == 0) {
-+        user = u->user;
-+        for (i = 0; i < VIRTIO_QUEUE_MAX; i++) {
-+            if (user->notifier[i].addr) {
-+                object_unparent(OBJECT(&user->notifier[i].mr));
-+                munmap(user->notifier[i].addr, qemu_real_host_page_size);
-+                user->notifier[i].addr = NULL;
-+            }
-+        }
-+    }
-+
-     if (u->postcopy_notifier.notify) {
-         postcopy_remove_notifier(&u->postcopy_notifier);
-         u->postcopy_notifier.notify = NULL;
-@@ -1881,6 +1895,8 @@ bool vhost_user_init(VhostUserState *user, CharBackend *chr, Error **errp)
-         error_setg(errp, "Cannot initialize vhost-user state");
-         return false;
-     }
-+
-+    memset(user, 0, sizeof(*user));
-     user->chr = chr;
-     return true;
- }
+ # no C99 // comments
+-		if ($line =~ m{//}) {
++		if ($line =~ m{//} &&
++		    $rawline !~ m{// SPDX-License-Identifier: }) {
+ 			ERROR("do not use C99 // comments\n" . $herecurr);
+ 		}
+ 		# Remove C99 comments.
 -- 
 2.17.1
