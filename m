@@ -1,31 +1,26 @@
-Received: from eggs.gnu.org ([209.51.188.92]:42591)
+Received: from eggs.gnu.org ([209.51.188.92]:45676)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <lersek@redhat.com>) id 1hK4AH-0006nb-3Z
-	for qemu-devel@nongnu.org; Fri, 26 Apr 2019 12:57:34 -0400
+	(envelope-from <lersek@redhat.com>) id 1hK4OK-0004wr-8P
+	for qemu-devel@nongnu.org; Fri, 26 Apr 2019 13:12:05 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <lersek@redhat.com>) id 1hK4AG-0006W3-3q
-	for qemu-devel@nongnu.org; Fri, 26 Apr 2019 12:57:33 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:36188)
+	(envelope-from <lersek@redhat.com>) id 1hK4OJ-0002zn-3S
+	for qemu-devel@nongnu.org; Fri, 26 Apr 2019 13:12:04 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:26808)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <lersek@redhat.com>) id 1hK4AF-0006Ti-5T
-	for qemu-devel@nongnu.org; Fri, 26 Apr 2019 12:57:31 -0400
-References: <20190420100056.116305-1-liq3ea@163.com>
-	<20190420100056.116305-4-liq3ea@163.com>
-	<a27cd912-4f58-55ac-1aae-e4999fa3d84d@redhat.com>
-	<CAKXe6SJZWs7HtXutX6W3saDhaNDtVPMQEh2+s+9XiM3TtZqLdQ@mail.gmail.com>
-	<20190425081519.n4leez6sz2wlvpla@sirius.home.kraxel.org>
-	<CAKXe6SKvkJxauOPmBMS+CDPq9NS0qKpydkyOAuS7mHVrA8JVbQ@mail.gmail.com>
-	<d773a58b-e33c-fa66-5afc-05bdc85efa53@redhat.com>
+	(Exim 4.71) (envelope-from <lersek@redhat.com>) id 1hK4OI-0002yf-Rl
+	for qemu-devel@nongnu.org; Fri, 26 Apr 2019 13:12:03 -0400
+References: <1556170489-131927-1-git-send-email-imammedo@redhat.com>
+	<1556170489-131927-12-git-send-email-imammedo@redhat.com>
 From: Laszlo Ersek <lersek@redhat.com>
-Message-ID: <15755c32-3b64-c72d-894b-5a8d55c49873@redhat.com>
-Date: Fri, 26 Apr 2019 18:57:21 +0200
+Message-ID: <0676f7d1-5d75-8ff8-a75b-a9ce01a65741@redhat.com>
+Date: Fri, 26 Apr 2019 19:11:50 +0200
 MIME-Version: 1.0
-In-Reply-To: <d773a58b-e33c-fa66-5afc-05bdc85efa53@redhat.com>
+In-Reply-To: <1556170489-131927-12-git-send-email-imammedo@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH 3/4] tests: fw_cfg: add reboot_timeout test
- case
+Subject: Re: [Qemu-devel] [PATCH v3 11/13] tests: acpi: add simple arm/virt
+ testcase
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,68 +29,92 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>, Li Qiang <liq3ea@gmail.com>, Gerd Hoffmann <kraxel@redhat.com>
-Cc: Thomas Huth <thuth@redhat.com>, Li Qiang <liq3ea@163.com>, lvivier@redhat.com, Paolo Bonzini <pbonzini@redhat.com>, Qemu Developers <qemu-devel@nongnu.org>
+To: Igor Mammedov <imammedo@redhat.com>, qemu-devel@nongnu.org
+Cc: "Michael S. Tsirkin" <mst@redhat.com>, Gonglei <arei.gonglei@huawei.com>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>, Shannon Zhao <shannon.zhaosl@gmail.com>, Wei Yang <richardw.yang@linux.intel.com>, Andrew Jones <drjones@redhat.com>, Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>, Ben Warren <ben@skyportsystems.com>
 
-On 04/25/19 12:23, Philippe Mathieu-Daud=C3=A9 wrote:
-> On 4/25/19 10:29 AM, Li Qiang wrote:
->>
->>
->> Gerd Hoffmann <kraxel@redhat.com <mailto:kraxel@redhat.com>> =E4=BA=8E=
-2019=E5=B9=B44=E6=9C=88
->> 25=E6=97=A5=E5=91=A8=E5=9B=9B =E4=B8=8B=E5=8D=884:15=E5=86=99=E9=81=93=
-=EF=BC=9A
->>
->>     On Wed, Apr 24, 2019 at 09:16:56AM +0800, Li Qiang wrote:
->>     > Thomas Huth <thuth@redhat.com <mailto:thuth@redhat.com>> =E4=BA=8E=
-2019=E5=B9=B44
->>     =E6=9C=8824=E6=97=A5=E5=91=A8=E4=B8=89 =E4=B8=8A=E5=8D=8812:29=E5=86=
-=99=E9=81=93=EF=BC=9A
->>     >
->>     > > Is this endianess-safe? Or do you need to byteswap
->>     reboot_timeout if the
->>     > > host and guest endianess does not match?
->>     >
->>     > Good question!
->>     >
->>     > IIUC, the qemu fw_cfg store the 'file' entry data just in byte s=
-tream.
->>
->>     No.=C2=A0 Integers are defined to be little endian.=C2=A0 See fw_c=
-fg_add_i64() for
->>     example, there is an explicit cpu_to_le64() call for that.
->>
->>
->>
->> Yes, for the fw_cfg 'integer' entry it is stored as little endian.
->> But for the fw_cfg 'file' entry interpred as an integer, there is no
->> specify the endianess.
+On 04/25/19 07:34, Igor Mammedov wrote:
+> adds simple arm/virt test case that starts guest with
+> bios-tables-test.aarch64.iso.qcow2 boot image which
+> initializes UefiTestSupport* structure in RAM once
+> guest is booted.
 >=20
-> I agree with Li, the endianess of 'reboot-timeout' is not clear.
+>  * see commit: tests: acpi: add acpi_find_rsdp_address_uefi() helper
 >=20
-> From docs/specs/fw_cfg.txt:
+> Signed-off-by: Igor Mammedov <imammedo@redhat.com>
+> Reviewed-by: Laszlo Ersek <lersek@redhat.com>
+> Reviewed-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
+> ---
+> v3:
+>   * use firmware blobs directly from pc-bios directory
+>   * use bios-tables-test.aarch64.iso.qcow2 as test boot image
+>   * drop leftover qtest-uefi-images-aarch64 iMakefile rule from
+>     previos version (Laszlo)
+>   * add Makefile rule to include bios-tables-test into
+>     check-qtest-aarch64 target
+> v2:
+>   * specify in test_data where board's RAM starts and RAM size
+> ---
+>  tests/Makefile.include   |  1 +
+>  tests/bios-tables-test.c | 17 +++++++++++++++++
+>  2 files changed, 18 insertions(+)
 >=20
->   =3D=3D=3D All Other Data Items =3D=3D=3D
+> diff --git a/tests/Makefile.include b/tests/Makefile.include
+> index e2432d5..983c8b1 100644
+> --- a/tests/Makefile.include
+> +++ b/tests/Makefile.include
+> @@ -267,6 +267,7 @@ check-qtest-arm-y +=3D tests/hexloader-test$(EXESUF=
+)
+>  check-qtest-aarch64-y =3D tests/numa-test$(EXESUF)
+>  check-qtest-aarch64-y +=3D tests/boot-serial-test$(EXESUF)
+>  check-qtest-aarch64-y +=3D tests/migration-test$(EXESUF)
+> +check-qtest-aarch64-y +=3D tests/bios-tables-test$(EXESUF)
+> =20
+>  check-qtest-microblazeel-y +=3D $(check-qtest-microblaze-y)
+> =20
+> diff --git a/tests/bios-tables-test.c b/tests/bios-tables-test.c
+> index 1be55a1..f117461 100644
+> --- a/tests/bios-tables-test.c
+> +++ b/tests/bios-tables-test.c
+> @@ -812,6 +812,21 @@ static void test_acpi_piix4_tcg_dimm_pxm(void)
+>      test_acpi_tcg_dimm_pxm(MACHINE_PC);
+>  }
+> =20
+> +static void test_acpi_virt_tcg(void)
+> +{
+> +    test_data data =3D {
+> +        .machine =3D "virt",
+> +        .uefi_fl1 =3D "pc-bios/edk2-aarch64-code.fd",
+> +        .uefi_fl2 =3D "pc-bios/edk2-arm-vars.fd",
+> +        .cd =3D "tests/data/uefi-boot-images/bios-tables-test.aarch64.=
+iso.qcow2",
+> +        .ram_start =3D 0x40000000ULL,
+> +        .scan_len =3D 128ULL * 1024 * 1024,
+> +    };
+> +
+> +    test_acpi_one("-cpu cortex-a57 ", &data);
+> +    free_test_data(&data);
+> +}
+> +
+>  int main(int argc, char *argv[])
+>  {
+>      const char *arch =3D qtest_get_arch();
+> @@ -840,6 +855,8 @@ int main(int argc, char *argv[])
+>          qtest_add_func("acpi/q35/numamem", test_acpi_q35_tcg_numamem);
+>          qtest_add_func("acpi/piix4/dimmpxm", test_acpi_piix4_tcg_dimm_=
+pxm);
+>          qtest_add_func("acpi/q35/dimmpxm", test_acpi_q35_tcg_dimm_pxm)=
+;
+> +    } else if (strcmp(arch, "aarch64") =3D=3D 0) {
+> +        qtest_add_func("acpi/virt", test_acpi_virt_tcg);
+>      }
+>      ret =3D g_test_run();
+>      boot_sector_cleanup(disk);
 >=20
->   Please consult the QEMU source for the most up-to-date
->   and authoritative list of selector keys and their respective
->   items' purpose, format and writeability.
->=20
-> So checking the git history, this code was introduced in commit
-> ac05f3492421, very similar to commit 3d3b8303c6f8 for the
-> 'boot-menu-wait' entry, which explicitely use little-endian, so I think
-> it is safe to consider it little-endian and add a comment about its
-> endianess (referring the previous commits in the patch description).
 
-OVMF consumes "boot-menu-wait", so that one must remain LE.
+Looks good, my R-b stands.
 
-OVMF doesn't consume "reboot-timeout", so I can't really comment on it.
-I guess, if a named fw_cfg file that already exists doesn't explicitly
-define the endiannesses of its integer fields, err for safety and opt
-for LE.
+(Please let me know if you want me to look at other patches in the
+series... struggling again with email bankruptcy...)
 
-For new fw_cfg files with integers in them, choose the endianness
-explicitly and document it.
-
-Thanks
+Thanks!
 Laszlo
