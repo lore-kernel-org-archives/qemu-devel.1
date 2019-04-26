@@ -1,22 +1,23 @@
-Received: from eggs.gnu.org ([209.51.188.92]:52369)
+Received: from eggs.gnu.org ([209.51.188.92]:55258)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <chen.zhang@intel.com>) id 1hJwtM-0005E2-Sv
-	for qemu-devel@nongnu.org; Fri, 26 Apr 2019 05:11:37 -0400
+	(envelope-from <stefanha@redhat.com>) id 1hJx8f-0002hR-SG
+	for qemu-devel@nongnu.org; Fri, 26 Apr 2019 05:27:26 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <chen.zhang@intel.com>) id 1hJwtL-0003Pn-V0
-	for qemu-devel@nongnu.org; Fri, 26 Apr 2019 05:11:36 -0400
-Received: from mga04.intel.com ([192.55.52.120]:13455)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <chen.zhang@intel.com>)
-	id 1hJwtL-0003Ob-Me
-	for qemu-devel@nongnu.org; Fri, 26 Apr 2019 05:11:35 -0400
-From: Zhang Chen <chen.zhang@intel.com >
-Date: Fri, 26 Apr 2019 17:07:30 +0800
-Message-Id: <20190426090730.2691-4-chen.zhang@intel.com>
-In-Reply-To: <20190426090730.2691-1-chen.zhang@intel.com>
-References: <20190426090730.2691-1-chen.zhang@intel.com>
-Subject: [Qemu-devel] [PATCH 3/3] qemu-option.hx: Update missed parameter
- for colo-compare
+	(envelope-from <stefanha@redhat.com>) id 1hJwym-00082T-K4
+	for qemu-devel@nongnu.org; Fri, 26 Apr 2019 05:17:13 -0400
+Date: Fri, 26 Apr 2019 10:17:02 +0100
+From: Stefan Hajnoczi <stefanha@redhat.com>
+Message-ID: <20190426091702.GA2071@stefanha-x1.localdomain>
+References: <20190103144124.18917-1-stefanha@redhat.com>
+	<CAFEAcA-B_T9E3ezWFXg-wp3RotMjv3-z3qY7hSJZEoqFBqCWnQ@mail.gmail.com>
+	<62b29bc1-cc78-cd64-4377-fc4007ba7189@redhat.com>
+MIME-Version: 1.0
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="G4iJoqBmSsgzjUCe"
+Content-Disposition: inline
+In-Reply-To: <62b29bc1-cc78-cd64-4377-fc4007ba7189@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH] Revert "armv7m: Guard against no -kernel
+ argument"
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,53 +26,69 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Laurent Vivier <laurent@vivier.eu>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Juan Quintela <quintela@redhat.com>, zhanghailiang <zhang.zhanghailiang@huawei.com>, Markus Armbruster <armbru@redhat.com>, qemu-dev <qemu-devel@nongnu.org>
-Cc: Zhang Chen <zhangckid@gmail.com>, Zhang Chen <chen.zhang@intel.com>
+To: Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <philmd@redhat.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>, Jim Mussared <jim@groklearning.com>, Julia Suvorova <jusual@mail.ru>, QEMU Developers <qemu-devel@nongnu.org>, Steffen Gortz <qemu.ml@steffen-goertz.de>, qemu-arm <qemu-arm@nongnu.org>, Joel Stanley <joel@jms.id.au>, Alex =?iso-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>, Thomas Huth <thuth@redhat.com>
 
-From: Zhang Chen <chen.zhang@intel.com>
 
-We missed the iothread related args in this file.
-This patch is used to fix this issue.
+--G4iJoqBmSsgzjUCe
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-Signed-off-by: Zhang Chen <chen.zhang@intel.com>
----
- qemu-options.hx | 9 ++++++---
- 1 file changed, 6 insertions(+), 3 deletions(-)
+On Thu, Apr 25, 2019 at 08:07:06PM +0200, Philippe Mathieu-Daud=E9 wrote:
+> On 1/4/19 4:16 PM, Peter Maydell wrote:
+> > On Thu, 3 Jan 2019 at 14:41, Stefan Hajnoczi <stefanha@redhat.com> wrot=
+e:
+> >>
+> >> This reverts commit 01fd41ab3fb69971c24a69ed49cde96086d81278.
+> >>
+> >> The generic loader device (-device loader,file=3Dkernel.bin) can be us=
+ed
+> >> to load a kernel instead of the -kernel option.  Some boards have flash
+> >> memory (pflash) that is set via the -pflash or -drive options.
+> >>
+> >> Allow starting QEMU without the -kernel option to accommodate these
+> >> scenarios.
+> >>
+> >> Suggested-by: Peter Maydell <peter.maydell@linaro.org>
+> >> Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
+>=20
+> Previous to this commit (v3.1), we have:
+>=20
+> $ qemu-system-aarch64 -M netduino2
+> qemu-system-aarch64: Guest image must be specified (using -kernel)
+>=20
+> Now (v4.0) we get:
+>=20
+> $ qemu-system-aarch64 -M netduino2
+> qemu: fatal: Lockup: can't escalate 3 to HardFault (current priority -1)
 
-diff --git a/qemu-options.hx b/qemu-options.hx
-index 08749a3391..a4500c99ef 100644
---- a/qemu-options.hx
-+++ b/qemu-options.hx
-@@ -4420,13 +4420,15 @@ Dump the network traffic on netdev @var{dev} to the file specified by
- The file format is libpcap, so it can be analyzed with tools such as tcpdump
- or Wireshark.
- 
--@item -object colo-compare,id=@var{id},primary_in=@var{chardevid},secondary_in=@var{chardevid},outdev=@var{chardevid}[,vnet_hdr_support]
-+@item -object colo-compare,id=@var{id},primary_in=@var{chardevid},secondary_in=@var{chardevid},outdev=@var{chardevid},iothread=@var{id}[,vnet_hdr_support]
- 
- Colo-compare gets packet from primary_in@var{chardevid} and secondary_in@var{chardevid}, than compare primary packet with
- secondary packet. If the packets are same, we will output primary
- packet to outdev@var{chardevid}, else we will notify colo-frame
- do checkpoint and send primary packet to outdev@var{chardevid}.
--if it has the vnet_hdr_support flag, colo compare will send/recv packet with vnet_hdr_len.
-+In order to improve efficiency, we need to put the task of comparison
-+in another thread. If it has the vnet_hdr_support flag, colo compare
-+will send/recv packet with vnet_hdr_len.
- 
- we must use it with the help of filter-mirror and filter-redirector.
- 
-@@ -4441,10 +4443,11 @@ primary:
- -chardev socket,id=compare0-0,host=3.3.3.3,port=9001
- -chardev socket,id=compare_out,host=3.3.3.3,port=9005,server,nowait
- -chardev socket,id=compare_out0,host=3.3.3.3,port=9005
-+-object iothread,id=iothread1
- -object filter-mirror,id=m0,netdev=hn0,queue=tx,outdev=mirror0
- -object filter-redirector,netdev=hn0,id=redire0,queue=rx,indev=compare_out
- -object filter-redirector,netdev=hn0,id=redire1,queue=rx,outdev=compare0
---object colo-compare,id=comp0,primary_in=compare0-0,secondary_in=compare1,outdev=compare_out0
-+-object colo-compare,id=comp0,primary_in=compare0-0,secondary_in=compare1,outdev=compare_out0,iothread=iothread1
- 
- secondary:
- -netdev tap,id=hn0,vhost=off,script=/etc/qemu-ifup,down script=/etc/qemu-ifdown
--- 
-2.17.GIT
+A user-friendly error message is needed here.  The check for -kernel was
+too specific and is not desirable for microbit where we use -device
+loader.
+
+Old boards probably want to continue using -kernel.  New boards like
+microbit may use just -device loader.  Perhaps there is even a group
+that wants both options.
+
+A solution is to introduce explicit checks so that we can tell the user
+the appropriate option for the machine type.  I can work on this if you
+like, but probably won't be able to send a patch until Tuesday.
+
+Stefan
+
+--G4iJoqBmSsgzjUCe
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEcBAEBAgAGBQJcwsyOAAoJEJykq7OBq3PIxrQH/RvZOjp//Ku7wHbPSH6LRX1g
+z7Fhi7/66tL7IDgjvybqRnwV+cH3hIU7bDyOPLK5ec/GHsDrqUlt0FPRXCQZksuo
+AeazNW0YoqO+zI+M/JDZ6JXHMUSjnybtCDkC2ZbYpEKAJ0miSlrjIiKKjbKFPGc0
+WHNsdPz5/KHvxPyD0lmI+7/MHE6B5YpanYr7V+2kDYW+/WhXT6AU99Ge3LxO4VNn
+qC8FP0yRuC5FKHDlhaXw+GldH8sQvv+TUyqODXuBJZY4PF+3DFLhPI7tMizNBERs
+yEgn6jGdtxXveA3RCbVkCfmUi9q9RjOY3n7ubxgCM/49EAztdzxNpT73OYr6od0=
+=WxRV
+-----END PGP SIGNATURE-----
+
+--G4iJoqBmSsgzjUCe--
