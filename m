@@ -1,30 +1,43 @@
-Received: from eggs.gnu.org ([209.51.188.92]:33741)
+Received: from eggs.gnu.org ([209.51.188.92]:36745)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1hJzIm-0002VQ-IK
-	for qemu-devel@nongnu.org; Fri, 26 Apr 2019 07:46:01 -0400
+	(envelope-from <borntraeger@de.ibm.com>) id 1hJzZ1-00088I-PN
+	for qemu-devel@nongnu.org; Fri, 26 Apr 2019 08:02:48 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1hJzIl-0007T6-DM
-	for qemu-devel@nongnu.org; Fri, 26 Apr 2019 07:46:00 -0400
-Received: from mail-oi1-x241.google.com ([2607:f8b0:4864:20::241]:46230)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1hJzIh-0007M7-GF
-	for qemu-devel@nongnu.org; Fri, 26 Apr 2019 07:45:57 -0400
-Received: by mail-oi1-x241.google.com with SMTP id l12so2628635oie.13
-	for <qemu-devel@nongnu.org>; Fri, 26 Apr 2019 04:45:49 -0700 (PDT)
+	(envelope-from <borntraeger@de.ibm.com>) id 1hJzXr-0004cY-AJ
+	for qemu-devel@nongnu.org; Fri, 26 Apr 2019 08:01:36 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:54834)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <borntraeger@de.ibm.com>)
+	id 1hJzXr-0004bG-0F
+	for qemu-devel@nongnu.org; Fri, 26 Apr 2019 08:01:35 -0400
+Received: from pps.filterd (m0098399.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id
+	x3QBtcMX144104
+	for <qemu-devel@nongnu.org>; Fri, 26 Apr 2019 08:01:31 -0400
+Received: from e06smtp05.uk.ibm.com (e06smtp05.uk.ibm.com [195.75.94.101])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2s40xuj6cw-1
+	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Fri, 26 Apr 2019 08:01:31 -0400
+Received: from localhost
+	by e06smtp05.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	Only! Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <borntraeger@de.ibm.com>;
+	Fri, 26 Apr 2019 13:01:29 +0100
+References: <20190426111003.21246-1-borntraeger@de.ibm.com>
+	<20190426111003.21246-11-borntraeger@de.ibm.com>
+	<71955bba-ef04-1677-b7f0-bb1675bad12a@redhat.com>
+	<07252560-1eed-8fd5-ee94-6bcea6cf99bc@de.ibm.com>
+	<10d43e6e-ee8c-cd65-e724-354e0f40c79f@redhat.com>
+From: Christian Borntraeger <borntraeger@de.ibm.com>
+Date: Fri, 26 Apr 2019 14:01:24 +0200
 MIME-Version: 1.0
-References: <20190103144124.18917-1-stefanha@redhat.com>
-	<CAFEAcA-B_T9E3ezWFXg-wp3RotMjv3-z3qY7hSJZEoqFBqCWnQ@mail.gmail.com>
-	<62b29bc1-cc78-cd64-4377-fc4007ba7189@redhat.com>
-	<20190426091702.GA2071@stefanha-x1.localdomain>
-In-Reply-To: <20190426091702.GA2071@stefanha-x1.localdomain>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri, 26 Apr 2019 12:45:37 +0100
-Message-ID: <CAFEAcA8OVKO087uiNvwDGObiaxHAPYHwoXLEN1t5Y4v9B43r9A@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH] Revert "armv7m: Guard against no -kernel
- argument"
+In-Reply-To: <10d43e6e-ee8c-cd65-e724-354e0f40c79f@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Message-Id: <057d438c-2062-1aa7-887a-918f076911c5@de.ibm.com>
+Subject: Re: [Qemu-devel] [PATCH v2 10/10] s390x/cpumodel: wire up 8561 and
+ 8562 as gen15 machines
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,65 +46,54 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefan Hajnoczi <stefanha@redhat.com>
-Cc: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>, Jim Mussared <jim@groklearning.com>, Julia Suvorova <jusual@mail.ru>, QEMU Developers <qemu-devel@nongnu.org>, Steffen Gortz <qemu.ml@steffen-goertz.de>, qemu-arm <qemu-arm@nongnu.org>, Joel Stanley <joel@jms.id.au>, =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>, Thomas Huth <thuth@redhat.com>
+To: David Hildenbrand <david@redhat.com>, Cornelia Huck <cohuck@redhat.com>
+Cc: qemu-devel <qemu-devel@nongnu.org>, qemu-s390x <qemu-s390x@nongnu.org>, Halil Pasic <pasic@linux.ibm.com>, Richard Henderson <rth@twiddle.net>, Collin Walling <walling@linux.ibm.com>, "Jason J . Herne" <jjherne@linux.ibm.com>
 
-On Fri, 26 Apr 2019 at 10:17, Stefan Hajnoczi <stefanha@redhat.com> wrote:
->
-> On Thu, Apr 25, 2019 at 08:07:06PM +0200, Philippe Mathieu-Daud=C3=A9 wro=
-te:
-> > Previous to this commit (v3.1), we have:
-> >
-> > $ qemu-system-aarch64 -M netduino2
-> > qemu-system-aarch64: Guest image must be specified (using -kernel)
-> >
-> > Now (v4.0) we get:
-> >
-> > $ qemu-system-aarch64 -M netduino2
-> > qemu: fatal: Lockup: can't escalate 3 to HardFault (current priority -1=
-)
->
-> A user-friendly error message is needed here.  The check for -kernel was
-> too specific and is not desirable for microbit where we use -device
-> loader.
 
-It's consistent with how many of our other board models work.
-If you try to run them without providing any guest code
-in any way, then they just do something not very useful.
-(For A-profile this used to often be "die with the 'execution
-from something not ROM or RAM' message" and is now "just steam
-through executing garbage and/or taking exceptions in a tight loop.")
-This is how real hardware also works :-)
 
-(Strictly speaking this message appearing is a defect in
-QEMU's emulation -- the 'lockup' state behaviour is architecturally
-well-defined and is supposed to cause the CPU to sit there doing
-continual instruction fetches from a specific (non-valid) address
-until either the system is reset or an NMI handler kicks in which
-might be able to rescue it. We don't bother to emulate this detail
-because lockup is pretty much always a guest bug and the only thing
-I've seen using the lockup behaviour and expecting to recover from it
-is test code.)
+On 26.04.19 13:52, David Hildenbrand wrote:
+> On 26.04.19 13:36, Christian Borntraeger wrote:
+>>
+>>
+>> On 26.04.19 13:32, David Hildenbrand wrote:
+>>> On 26.04.19 13:10, Christian Borntraeger wrote:
+>>>> 8561 and 8562 will be gen15 machines. There is no name yet, lets us use
+>>>> the cpu id as base name. Later on we can provide aliases with the proper
+>>>> name.
+>>>>
+>>>> Signed-off-by: Christian Borntraeger <borntraeger@de.ibm.com>
+>>>> ---
+>>>>  target/s390x/cpu_models.c | 2 ++
+>>>>  1 file changed, 2 insertions(+)
+>>>>
+>>>> diff --git a/target/s390x/cpu_models.c b/target/s390x/cpu_models.c
+>>>> index d683635eb5..dd6415103f 100644
+>>>> --- a/target/s390x/cpu_models.c
+>>>> +++ b/target/s390x/cpu_models.c
+>>>> @@ -83,6 +83,8 @@ static S390CPUDef s390_cpu_defs[] = {
+>>>>      CPUDEF_INIT(0x3906, 14, 1, 47, 0x08000000U, "z14", "IBM z14 GA1"),
+>>>>      CPUDEF_INIT(0x3906, 14, 2, 47, 0x08000000U, "z14.2", "IBM z14 GA2"),
+>>>>      CPUDEF_INIT(0x3907, 14, 1, 47, 0x08000000U, "z14ZR1", "IBM z14 Model ZR1 GA1"),
+>>>> +    CPUDEF_INIT(0x8561, 15, 1, 47, 0x08000000U, "8561", "IBM 8561 GA1"),
+>>>> +    CPUDEF_INIT(0x8562, 15, 1, 47, 0x08000000U, "8562", "IBM 8562 GA1"),
+>>>>  };
+>>>
+>>> Thinking out loud, I know that official names are not published yet.
+>>> Looking at the recent history (z13, z14), my educated guess would be
+>>> z15. I guess pretty much everybody would guess that.
+>>
+>> Not sure about trademark aspects - especially if this really becomes z15. The smaller
+>> machine has no real history (ZR1 vs. s vs BC). So I think I would rather have a correct
+>> number than a partially correct name.
+> 
+> We could also use "gen15a" and "gen15b", still better to get than magic
+> numbers. (yeah well, they are not magic)
+> 
+> If you want to stick with numbers, be aware that cpu numbers are not
+> injective, so at some point we will need e.g. "8561.2", just so you're
+> aware of the implications.
 
-> Old boards probably want to continue using -kernel.  New boards like
-> microbit may use just -device loader.  Perhaps there is even a group
-> that wants both options.
->
-> A solution is to introduce explicit checks so that we can tell the user
-> the appropriate option for the machine type.  I can work on this if you
-> like, but probably won't be able to send a patch until Tuesday.
-
-But it's difficult to tell how to identify whether there's really
-any guest code there. For instance the user might want to start
-QEMU, connect via the gdbstub and load guest code from gdb.
-Or they might be using the generic-loader device. Or they might
-really be using -kernel but with a broken guest image which doesn't
-have a vector table in it, which will result in the same message.
-I guess you could have a heuristic for "if an M-profile CPU is in reset
-and the value it loads for the starting PC is zero and the gdb
-stub is not connected, then print a warning that the guest image
-is missing or there's no vector table" but I'm not a big fan of
-heuristics...
-
-thanks
--- PMM
+I think whatever we have here is only used internally for expansion (host-model)
+and the user will use later the real name when available. (custom). So probably this
+does not matter for a long time. But I might be wrong.
+I tend to prefer gen15 over z15 but 856x has also its charm.
