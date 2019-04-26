@@ -2,122 +2,66 @@ Return-Path: <SRS0=QtPl=S4=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-2.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_PASS,USER_AGENT_NEOMUTT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 15678C43218
-	for <qemu-devel@archiver.kernel.org>; Fri, 26 Apr 2019 08:03:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DF5D8C43219
+	for <qemu-devel@archiver.kernel.org>; Fri, 26 Apr 2019 08:03:19 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C9956206BA
-	for <qemu-devel@archiver.kernel.org>; Fri, 26 Apr 2019 08:03:05 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C9956206BA
+	by mail.kernel.org (Postfix) with ESMTPS id B7265206BA
+	for <qemu-devel@archiver.kernel.org>; Fri, 26 Apr 2019 08:03:19 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B7265206BA
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:41954 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:42022 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hJvp2-0002nu-Sy
-	for qemu-devel@archiver.kernel.org; Fri, 26 Apr 2019 04:03:04 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:59734)
+	id 1hJvpG-0002zE-VQ
+	for qemu-devel@archiver.kernel.org; Fri, 26 Apr 2019 04:03:18 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:60063)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1hJvlh-0007Is-Ce
-	for qemu-devel@nongnu.org; Fri, 26 Apr 2019 03:59:41 -0400
+	(envelope-from <kraxel@redhat.com>) id 1hJvmS-0007ne-UH
+	for qemu-devel@nongnu.org; Fri, 26 Apr 2019 04:00:25 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1hJveV-0003d5-CL
-	for qemu-devel@nongnu.org; Fri, 26 Apr 2019 03:52:22 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:54056)
+	(envelope-from <kraxel@redhat.com>) id 1hJvZM-0007gQ-83
+	for qemu-devel@nongnu.org; Fri, 26 Apr 2019 03:46:53 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:55448)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1hJveU-0003Xd-GC
-	for qemu-devel@nongnu.org; Fri, 26 Apr 2019 03:52:11 -0400
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
-	[10.5.11.16])
+	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1hJvZM-0007fC-1r
+	for qemu-devel@nongnu.org; Fri, 26 Apr 2019 03:46:52 -0400
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+	[10.5.11.15])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 34A9030B2371;
-	Fri, 26 Apr 2019 07:52:08 +0000 (UTC)
-Received: from [10.36.112.23] (ovpn-112-23.ams2.redhat.com [10.36.112.23])
-	by smtp.corp.redhat.com (Postfix) with ESMTPS id DE7E35C219;
-	Fri, 26 Apr 2019 07:52:02 +0000 (UTC)
-To: =?UTF-8?Q?Daniel_P=2e_Berrang=c3=a9?= <berrange@redhat.com>,
-	Alberto Garcia <berto@igalia.com>
-References: <cover.1550842915.git.berto@igalia.com>
-	<20190423165501.GA27867@redhat.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Openpgp: preference=signencrypt
-Autocrypt: addr=pbonzini@redhat.com; prefer-encrypt=mutual; keydata=
-	mQHhBFRCcBIBDqDGsz4K0zZun3jh+U6Z9wNGLKQ0kSFyjN38gMqU1SfP+TUNQepFHb/Gc0E2
-	CxXPkIBTvYY+ZPkoTh5xF9oS1jqI8iRLzouzF8yXs3QjQIZ2SfuCxSVwlV65jotcjD2FTN04
-	hVopm9llFijNZpVIOGUTqzM4U55sdsCcZUluWM6x4HSOdw5F5Utxfp1wOjD/v92Lrax0hjiX
-	DResHSt48q+8FrZzY+AUbkUS+Jm34qjswdrgsC5uxeVcLkBgWLmov2kMaMROT0YmFY6A3m1S
-	P/kXmHDXxhe23gKb3dgwxUTpENDBGcfEzrzilWueOeUWiOcWuFOed/C3SyijBx3Av/lbCsHU
-	Vx6pMycNTdzU1BuAroB+Y3mNEuW56Yd44jlInzG2UOwt9XjjdKkJZ1g0P9dwptwLEgTEd3Fo
-	UdhAQyRXGYO8oROiuh+RZ1lXp6AQ4ZjoyH8WLfTLf5g1EKCTc4C1sy1vQSdzIRu3rBIjAvnC
-	tGZADei1IExLqB3uzXKzZ1BZ+Z8hnt2og9hb7H0y8diYfEk2w3R7wEr+Ehk5NQsT2MPI2QBd
-	wEv1/Aj1DgUHZAHzG1QN9S8wNWQ6K9DqHZTBnI1hUlkp22zCSHK/6FwUCuYp1zcAEQEAAbQj
-	UGFvbG8gQm9uemluaSA8cGJvbnppbmlAcmVkaGF0LmNvbT6JAg0EEwECACMFAlRCcBICGwMH
-	CwkIBwMCAQYVCAIJCgsEFgIDAQIeAQIXgAAKCRB+FRAMzTZpsbceDp9IIN6BIA0Ol7MoB15E
-	11kRz/ewzryFY54tQlMnd4xxfH8MTQ/mm9I482YoSwPMdcWFAKnUX6Yo30tbLiNB8hzaHeRj
-	jx12K+ptqYbg+cevgOtbLAlL9kNgLLcsGqC2829jBCUTVeMSZDrzS97ole/YEez2qFpPnTV0
-	VrRWClWVfYh+JfzpXmgyhbkuwUxNFk421s4Ajp3d8nPPFUGgBG5HOxzkAm7xb1cjAuJ+oi/K
-	CHfkuN+fLZl/u3E/fw7vvOESApLU5o0icVXeakfSz0LsygEnekDbxPnE5af/9FEkXJD5EoYG
-	SEahaEtgNrR4qsyxyAGYgZlS70vkSSYJ+iT2rrwEiDlo31MzRo6Ba2FfHBSJ7lcYdPT7bbk9
-	AO3hlNMhNdUhoQv7M5HsnqZ6unvSHOKmReNaS9egAGdRN0/GPDWr9wroyJ65ZNQsHl9nXBqE
-	AukZNr5oJO5vxrYiAuuTSd6UI/xFkjtkzltG3mw5ao2bBpk/V/YuePrJsnPFHG7NhizrxttB
-	nTuOSCMo45pfHQ+XYd5K1+Cv/NzZFNWscm5htJ0HznY+oOsZvHTyGz3v91pn51dkRYN0otqr
-	bQ4tlFFuVjArBZcapSIe6NV8C4cEiSS5AQ0EVEJxcwEIAK+nUrsUz3aP2aBjIrX3a1+C+39R
-	nctpNIPcJjFJ/8WafRiwcEuLjbvJ/4kyM6K7pWUIQftl1P8Woxwb5nqL7zEFHh5I+hKS3haO
-	5pgco//V0tWBGMKinjqntpd4U4Dl299dMBZ4rRbPvmI8rr63sCENxTnHhTECyHdGFpqSzWzy
-	97rH68uqMpxbUeggVwYkYihZNd8xt1+lf7GWYNEO/QV8ar/qbRPG6PEfiPPHQd/sldGYavmd
-	//o6TQLSJsvJyJDt7KxulnNT8Q2X/OdEuVQsRT5glLaSAeVAABcLAEnNgmCIGkX7TnQF8a6w
-	gHGrZIR9ZCoKvDxAr7RP6mPeS9sAEQEAAYkDEgQYAQIACQUCVEJxcwIbAgEpCRB+FRAMzTZp
-	scBdIAQZAQIABgUCVEJxcwAKCRC/+9JfeMeug/SlCACl7QjRnwHo/VzENWD9G2VpUOd9eRnS
-	DZGQmPo6Mp3Wy8vL7snGFBfRseT9BevXBSkxvtOnUUV2YbyLmolAODqUGzUI8ViF339poOYN
-	i6Ffek0E19IMQ5+CilqJJ2d5ZvRfaq70LA/Ly9jmIwwX4auvXrWl99/2wCkqnWZI+PAepkcX
-	JRD4KY2fsvRi64/aoQmcxTiyyR7q3/52Sqd4EdMfj0niYJV0Xb9nt8G57Dp9v3Ox5JeWZKXS
-	krFqy1qyEIypIrqcMbtXM7LSmiQ8aJRM4ZHYbvgjChJKR4PsKNQZQlMWGUJO4nVFSkrixc9R
-	Z49uIqQK3b3ENB1QkcdMg9cxsB0Onih8zR+Wp1uDZXnz1ekto+EivLQLqvTjCCwLxxJafwKI
-	bqhQ+hGR9jF34EFur5eWt9jJGloEPVv0GgQflQaE+rRGe+3f5ZDgRe5Y/EJVNhBhKcafcbP8
-	MzmLRh3UDnYDwaeguYmxuSlMdjFL96YfhRBXs8tUw6SO9jtCgBvoOIBDCxxAJjShY4KIvEpK
-	b2hSNr8KxzelKKlSXMtB1bbHbQxiQcerAipYiChUHq1raFc3V0eOyCXK205rLtknJHhM5pfG
-	6taABGAMvJgm/MrVILIxvBuERj1FRgcgoXtiBmLEJSb7akcrRlqe3MoPTntSTNvNzAJmfWhd
-	SvP0G1WDLolqvX0OtKMppI91AWVu72f1kolJg43wbaKpRJg1GMkKEI3H+jrrlTBrNl/8e20m
-	TElPRDKzPiowmXeZqFSS1A6Azv0TJoo9as+lWF+P4zCXt40+Zhh5hdHO38EV7vFAVG3iuay6
-	7ToF8Uy7tgc3mdH98WQSmHcn/H5PFYk3xTP3KHB7b0FZPdFPQXBZb9+tJeZBi9gMqcjMch+Y
-	R8dmTcQRQX14bm5nXlBF7VpSOPZMR392LY7wzAvRdhz7aeIUkdO7VelaspFk2nT7wOj1Y6uL
-	nRxQlLkBDQRUQnHuAQgAx4dxXO6/Zun0eVYOnr5GRl76+2UrAAemVv9Yfn2PbDIbxXqLff7o
-	yVJIkw4WdhQIIvvtu5zH24iYjmdfbg8iWpP7NqxUQRUZJEWbx2CRwkMHtOmzQiQ2tSLjKh/c
-	HeyFH68xjeLcinR7jXMrHQK+UCEw6jqi1oeZzGvfmxarUmS0uRuffAb589AJW50kkQK9VD/9
-	QC2FJISSUDnRC0PawGSZDXhmvITJMdD4TjYrePYhSY4uuIV02v028TVAaYbIhxvDY0hUQE4r
-	8ZbGRLn52bEzaIPgl1p/adKfeOUeMReg/CkyzQpmyB1TSk8lDMxQzCYHXAzwnGi8WU9iuE1P
-	0wARAQABiQHzBBgBAgAJBQJUQnHuAhsMAAoJEH4VEAzNNmmxp1EOoJy0uZggJm7gZKeJ7iUp
-	eX4eqUtqelUw6gU2daz2hE/jsxsTbC/w5piHmk1H1VWDKEM4bQBTuiJ0bfo55SWsUNN+c9hh
-	IX+Y8LEe22izK3w7mRpvGcg+/ZRG4DEMHLP6JVsv5GMpoYwYOmHnplOzCXHvmdlW0i6SrMsB
-	Dl9rw4AtIa6bRwWLim1lQ6EM3PWifPrWSUPrPcw4OLSwFk0CPqC4HYv/7ZnASVkR5EERFF3+
-	6iaaVi5OgBd81F1TCvCX2BEyIDRZLJNvX3TOd5FEN+lIrl26xecz876SvcOb5SL5SKg9/rCB
-	ufdPSjojkGFWGziHiFaYhbuI2E+NfWLJtd+ZvWAAV+O0d8vFFSvriy9enJ8kxJwhC0ECbSKF
-	Y+W1eTIhMD3aeAKY90drozWEyHhENf4l/V+Ja5vOnW+gCDQkGt2Y1lJAPPSIqZKvHzGShdh8
-	DduC0U3xYkfbGAUvbxeepjgzp0uEnBXfPTy09JGpgWbg0w91GyfT/ujKaGd4vxG2Ei+MMNDm
-	S1SMx7wu0evvQ5kT9NPzyq8R2GIhVSiAd2jioGuTjX6AZCFv3ToO53DliFMkVTecLptsXaes
-	uUHgL9dKIfvpm+rNXRn9wAwGjk0X/A==
-Message-ID: <b5fe7ed7-c11c-4f36-4973-c86031cbe046@redhat.com>
-Date: Fri, 26 Apr 2019 09:51:58 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
-	Thunderbird/60.6.1
+	by mx1.redhat.com (Postfix) with ESMTPS id 7DA1CC7A16
+	for <qemu-devel@nongnu.org>; Fri, 26 Apr 2019 07:46:50 +0000 (UTC)
+Received: from sirius.home.kraxel.org (ovpn-116-45.ams2.redhat.com
+	[10.36.116.45])
+	by smtp.corp.redhat.com (Postfix) with ESMTP id 0E94A5D70A;
+	Fri, 26 Apr 2019 07:46:45 +0000 (UTC)
+Received: by sirius.home.kraxel.org (Postfix, from userid 1000)
+	id 306E211AAA; Fri, 26 Apr 2019 09:46:45 +0200 (CEST)
+Date: Fri, 26 Apr 2019 09:46:45 +0200
+From: Gerd Hoffmann <kraxel@redhat.com>
+To: =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>
+Message-ID: <20190426074645.zgm2lxfpfwdo2nni@sirius.home.kraxel.org>
+References: <20190423132004.13725-1-marcandre.lureau@redhat.com>
+	<20190423132004.13725-9-marcandre.lureau@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20190423165501.GA27867@redhat.com>
 Content-Type: text/plain; charset="UTF-8"
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+Content-Disposition: inline
+In-Reply-To: <20190423132004.13725-9-marcandre.lureau@redhat.com>
+User-Agent: NeoMutt/20180716
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.43]);
-	Fri, 26 Apr 2019 07:52:08 +0000 (UTC)
-Content-Transfer-Encoding: quoted-printable
+	(mx1.redhat.com [10.5.110.39]);
+	Fri, 26 Apr 2019 07:46:50 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH v3 0/3] char-socket: Fix race condition
+Subject: Re: [Qemu-devel] [PATCH v6 08/11] contrib: add vhost-user-gpu
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -129,66 +73,87 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>,
-	qemu-devel@nongnu.org
+Cc: qemu-devel@nongnu.org, "Michael S. Tsirkin" <mst@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190426075158.7pYDh9aRu_A_19qVIJy51-LAZz57jL7RQz3_f67gCww@z>
+Message-ID: <20190426074645.lcQpAR4uLTnbWyLM_txSUNdou8B-MSQ1F40wF3dxhwU@z>
 
-On 23/04/19 18:55, Daniel P. Berrang=C3=A9 wrote:
-> ping - paolo/marc-andr=C3=A9 - unless I'm missing something, it looks l=
-ike
-> this chardev series slipped through the cracks and missed 4.0
+  Hi,
 
-Yeah, it had a bug unfortunately.  I'm looking at it RSN.
+> +#ifdef CONFIG_LIBDRM_INTEL
+> +static bool
+> +intel_alloc_bo(struct drm_buffer *buf)
+> +{
+> +    uint32_t tiling = I915_TILING_NONE;
+> +
+> +    buf->intel_bo = drm_intel_bo_alloc_tiled(buf->dev->bufmgr, "vhost-user-gpu",
+> +                                             buf->width, buf->height,
+> +                                             (buf->bpp / 8), &tiling,
+> +                                             &buf->stride, 0);
 
-Paolo
+Why do you go for intel specific code here?
 
->=20
-> On Fri, Feb 22, 2019 at 03:46:23PM +0200, Alberto Garcia wrote:
->> This fixes a race condition in which the tcp_chr_read() ioc handler
->> can close a connection that is being written to from another thread.
->>
->> Note: vhost-user-test still fails if QTEST_VHOST_USER_FIXME is set.
->>
->> Berto
->>
->> RFC: https://lists.gnu.org/archive/html/qemu-devel/2019-02/msg01510.ht=
-ml
->>
->> v1: https://lists.gnu.org/archive/html/qemu-devel/2019-02/msg01834.htm=
-l
->> - Fixes memory leaks and adds a qemu_idle_add() function
->>
->> v2: https://lists.gnu.org/archive/html/qemu-devel/2019-02/msg06137.htm=
-l
->> - Rebased on top of the current master (fc3dbb90f2eb069801bfb4cfe9cbc)
->> - Patches 1 and 2: Remove the changes in char-pty.c, they're not
->>                    needed after the rebase.
->> - Patch 3: Fix conflicts after the rebase.
->>
->> v3:
->> - Patch 3: Add tcp_chr_disconnect_locked() [Daniel]
->>
->> Alberto Garcia (3):
->>   main-loop: Fix GSource leak in qio_task_thread_worker()
->>   main-loop: Add qemu_idle_add()
->>   char-socket: Lock tcp_chr_disconnect() and socket_reconnect_timeout(=
-)
->>
->>  chardev/char-socket.c    | 25 +++++++++++++++++++++----
->>  include/qemu/main-loop.h | 12 ++++++++++++
->>  io/task.c                |  9 +++------
->>  util/main-loop.c         |  9 +++++++++
->>  4 files changed, 45 insertions(+), 10 deletions(-)
->>
->> --=20
->> 2.11.0
->>
->=20
-> Regards,
-> Daniel
->=20
+Can't you do the same with gbm_bo_create() or
+gbm_bo_create_with_modifiers() ?
+
+> +static bool
+> +intel_map_bo(struct drm_buffer *buf)
+> +{
+> +    if (drm_intel_gem_bo_map_gtt(buf->intel_bo) != 0) {
+> +        return false;
+> +    }
+
+gbm_bo_map()
+
+> +static bool
+> +intel_export_bo_to_prime(struct drm_buffer *buffer, int *fd)
+> +{
+> +    if (drm_intel_bo_gem_export_to_prime(buffer->intel_bo, fd) < 0) {
+> +        return false;
+> +    }
+
+gbm_bo_get_fd()
+
+> +get_pixman_format(uint32_t virtio_gpu_format)
+> +{
+> +    switch (virtio_gpu_format) {
+> +#ifdef HOST_WORDS_BIGENDIAN
+> +    case VIRTIO_GPU_FORMAT_B8G8R8X8_UNORM:
+> +        return PIXMAN_b8g8r8x8;
+
+Move that to a header for sharing?  Simliar to the bswap helpers?
+
+> +static void
+> +virgl_cmd_create_resource_3d(VuGpu *g,
+> +                             struct virtio_gpu_ctrl_command *cmd)
+> +{
+> +    struct virtio_gpu_resource_create_3d c3d;
+> +    struct virgl_renderer_resource_create_args args;
+> +
+> +    VUGPU_FILL_CMD(c3d);
+> +
+> +    args.handle = c3d.resource_id;
+> +    args.target = c3d.target;
+> +    args.format = c3d.format;
+> +    args.bind = c3d.bind;
+> +    args.width = c3d.width;
+> +    args.height = c3d.height;
+> +    args.depth = c3d.depth;
+> +    args.array_size = c3d.array_size;
+> +    args.last_level = c3d.last_level;
+> +    args.nr_samples = c3d.nr_samples;
+> +    args.flags = c3d.flags;
+> +    virgl_renderer_resource_create(&args, NULL, 0);
+> +}
+
+The virtio_gpu_resource_create_3d -> virgl_renderer_resource_create_args
+mapping looks like an opportunity for code sharing too.
+
+Hmm, but virgl_renderer_resource_create seems to be the only call with
+an args struct, so maybe not worth the effort for this single case.
+
+cheers,
+  Gerd
 
 
