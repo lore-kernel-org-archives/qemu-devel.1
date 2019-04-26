@@ -1,17 +1,21 @@
-Received: from eggs.gnu.org ([209.51.188.92]:42951)
+Received: from eggs.gnu.org ([209.51.188.92]:53703)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1hK9Cx-0000uD-16
-	for qemu-devel@nongnu.org; Fri, 26 Apr 2019 18:20:41 -0400
+	(envelope-from <jsnow@redhat.com>) id 1hK9mJ-0004Qx-1N
+	for qemu-devel@nongnu.org; Fri, 26 Apr 2019 18:57:12 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1hK9Cw-0005Qe-2r
-	for qemu-devel@nongnu.org; Fri, 26 Apr 2019 18:20:38 -0400
+	(envelope-from <jsnow@redhat.com>) id 1hK9mH-0001DW-Vw
+	for qemu-devel@nongnu.org; Fri, 26 Apr 2019 18:57:10 -0400
+References: <20190413152037.6817-1-mreitz@redhat.com>
 From: John Snow <jsnow@redhat.com>
-Date: Fri, 26 Apr 2019 18:15:26 -0400
-Message-Id: <20190426221528.30293-1-jsnow@redhat.com>
+Message-ID: <61bbf7b7-2f4d-bc4d-f8f5-528e3ed2062c@redhat.com>
+Date: Fri, 26 Apr 2019 18:57:03 -0400
 MIME-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v3 0/2] docs/interop/bitmaps: rewrite and
- modernize doc
+In-Reply-To: <20190413152037.6817-1-mreitz@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [Qemu-block] [PATCH for-next 0/2] qemu-img: Make
+ create hint at protocol options
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -20,55 +24,30 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org, qemu-block@nongnu.org
-Cc: John Snow <jsnow@redhat.com>, vsementsov@virtuozzo.com, kchamart@redhat.com, armbru@redhat.com, aliang@redhat.com, nsoffer@redhat.com, Fam Zheng <fam@euphon.net>, qemu-stable@nongnu.org, eblake@redhat.com
+To: Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org
+Cc: Kevin Wolf <kwolf@redhat.com>, qemu-devel@nongnu.org
 
-The documentation as written in the 4.0 release is not quite correct as
-of the 4.0 release; though thanks to backwards compatibility it's not
-quite wrong either. It is suitable for inclusion in 4.0.1, or any
-downstream that packages 4.0.
 
-This patch is an attempt at a nearly full rewrite that revitalizes this
-document to address frequent questions I encounter when discussing the
-API.
 
-V3:
- - Added -W flag to patch 1/2
- - Addressed comments from Vladimir on patch 2/2.
+On 4/13/19 11:20 AM, Max Reitz wrote:
+> https://bugzilla.redhat.com/show_bug.cgi?id=1698863 reports that while
+> "qemu-img create -f raw" supports the "preallocation" option, it is not
+> listed under "-o help".
+> 
+> It turns out it is, but only if you specify a target filename.  Users
+> may not realize this, but a note should help.
+> 
+> 
+> Max Reitz (2):
+>   iotests: Perform the correct test in 082
+>   qemu-img: Make create hint at protocol options
+> 
+>  qemu-img.c                 | 13 ++++++++++++-
+>  tests/qemu-iotests/082     |  5 ++++-
+>  tests/qemu-iotests/082.out | 25 ++++++++++++++++++-------
+>  3 files changed, 34 insertions(+), 9 deletions(-)
+> 
 
-V2:
-  - Split off makefile change into its own little patch.
+Seems like an improvement to me.
 
-  - Addressed (almost) all comments from Vladimir.
-    - Example styling was not reworked.
-  - Renamed all filenames to be consistent throughout the document,
-    fixing a few more file extensions in the process
-  - Reflowed almost all paragraphs to 78 columns for consistency.
-  - Changed a few bulleted lists to paragraphs instead
-  - Changed the big ascii text diagram to a more compact version
-    and clarified its language
-  - While in general I prefer to use en_US spellings, I have
-    replaced "canceled" with "cancelled" so it does not look
-    out of place juxtaposed with BLOCK_JOB_CANCELLED...
-
-Future work that remains to be done:
-
-- Paying heed to blockdev-backup workflows
-- Adding a small migration section explaining the options there
-- Possibly reworking some of the sections that all make their own
-  repeated attempts to clarify time interval discretization and adding
-  a proper treatment of the idea start to finish; this may be neccessary
-  to explain the two below items properly:
-- Differential Backups
-- Pull Backups and NBD
-
-John Snow (2):
-  Makefile: add nit-picky mode to sphinx-build
-  docs/interop/bitmaps: rewrite and modernize doc
-
- docs/interop/bitmaps.rst | 1599 ++++++++++++++++++++++++++++++--------
- Makefile                 |    2 +-
- 2 files changed, 1265 insertions(+), 336 deletions(-)
-
---=20
-2.20.1
+Reviewed-by: John Snow <jsnow@redhat.com>
