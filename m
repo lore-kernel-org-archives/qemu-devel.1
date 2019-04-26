@@ -1,27 +1,24 @@
-Received: from eggs.gnu.org ([209.51.188.92]:34284)
+Received: from eggs.gnu.org ([209.51.188.92]:39420)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <xuwei5@huawei.com>) id 1hK3i3-00057s-FZ
-	for qemu-devel@nongnu.org; Fri, 26 Apr 2019 12:28:24 -0400
+	(envelope-from <lersek@redhat.com>) id 1hK3x3-0001XR-Q7
+	for qemu-devel@nongnu.org; Fri, 26 Apr 2019 12:43:54 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <xuwei5@huawei.com>) id 1hK3i2-0001m9-Cx
-	for qemu-devel@nongnu.org; Fri, 26 Apr 2019 12:28:23 -0400
-Received: from lhrrgout.huawei.com ([185.176.76.210]:45390 helo=huawei.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <xuwei5@huawei.com>) id 1hK3i2-0001kP-70
-	for qemu-devel@nongnu.org; Fri, 26 Apr 2019 12:28:22 -0400
-References: <1556170489-131927-12-git-send-email-imammedo@redhat.com>
-	<1556211116-172721-1-git-send-email-xuwei5@huawei.com>
-	<20190426135412.758769f9@Igors-MacBook-Pro.local>
-From: Wei Xu <xuwei5@hisilicon.com>
-Message-ID: <b87a2b31-0389-2df0-42a6-a1593d437fcd@hisilicon.com>
-Date: Fri, 26 Apr 2019 17:28:10 +0100
+	(envelope-from <lersek@redhat.com>) id 1hK3x2-0004on-Mw
+	for qemu-devel@nongnu.org; Fri, 26 Apr 2019 12:43:53 -0400
+References: <20190424103747.10173-1-thuth@redhat.com>
+	<20190424103747.10173-5-thuth@redhat.com>
+	<f9dc291b-7ba2-c6b8-33aa-c8fa3c6d4950@redhat.com>
+	<0300c8cc-d73c-b919-13f7-59f3218a609f@redhat.com>
+From: Laszlo Ersek <lersek@redhat.com>
+Message-ID: <13ecf357-d43c-ecc6-012e-bed62008677d@redhat.com>
+Date: Fri, 26 Apr 2019 18:43:36 +0200
 MIME-Version: 1.0
-In-Reply-To: <20190426135412.758769f9@Igors-MacBook-Pro.local>
-Content-Type: text/plain; charset="utf-8"
+In-Reply-To: <0300c8cc-d73c-b919-13f7-59f3218a609f@redhat.com>
+Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v3 11/13] tests: acpi: add simple arm/virt
- testcase
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH 4/6] cirrus / travis: Add gnu-sed and bash
+ for macOS and FreeBSD
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,74 +27,54 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Igor Mammedov <imammedo@redhat.com>, x00249684 <xuwei5@huawei.com>
-Cc: qemu-devel@nongnu.org, shameerali.kolothum.thodi@huawei.com, linuxarm@huawei.com, Andrew Jones <drjones@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, mst@redhat.com
+To: Thomas Huth <thuth@redhat.com>, Wainer dos Santos Moschetta <wainersm@redhat.com>, qemu-devel@nongnu.org
+Cc: Fam Zheng <fam@euphon.net>, Kevin Wolf <kwolf@redhat.com>, Ed Maste <emaste@freebsd.org>, qemu-block@nongnu.org, =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>, Max Reitz <mreitz@redhat.com>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>, Li-Wen Hsu <lwhsu@freebsd.org>, Peter Maydell <peter.maydell@linaro.org>, "Daniel P. Berrange" <berrange@redhat.com>
 
-Hi Igor,
+(+Dan)
 
-On 4/26/2019 12:54 PM, Igor Mammedov wrote:
-> On Fri, 26 Apr 2019 00:51:56 +0800
-> x00249684 <xuwei5@huawei.com> wrote:
-> 
->> Hi Igor,
+On 04/25/19 08:00, Thomas Huth wrote:
+> On 24/04/2019 23.29, Wainer dos Santos Moschetta wrote:
+>> Hello Thomas,
 >>
->> +static void test_acpi_virt_tcg(void)
->> +{
->> +    test_data data = {
->> +        .machine = "virt",
->> +        .uefi_fl1 = "pc-bios/edk2-aarch64-code.fd",
->> +        .uefi_fl2 = "pc-bios/edk2-arm-vars.fd",
->> +        .cd = "tests/data/uefi-boot-images/bios-tables-test.aarch64.iso.qcow2",
->> +        .ram_start = 0x40000000ULL,
->> +        .scan_len = 128ULL * 1024 * 1024,
->> +    };
->> +
->> +    test_acpi_one("-cpu cortex-a57 ", &data);
+>> On 04/24/2019 07:37 AM, Thomas Huth wrote:
+>>> We are going to enable the qemu-iotests during "make check" again,
+>>> and for running the iotests, we need bash and gnu-sed.
+>>>
+>>> Signed-off-by: Thomas Huth <thuth@redhat.com>
+>>> ---
+>>> =C2=A0 .cirrus.yml | 4 ++--
+>>> =C2=A0 .travis.yml | 1 +
+>>> =C2=A0 2 files changed, 3 insertions(+), 2 deletions(-)
 >>
->> Replaced the cortex-a57 with host and succesfully tested on the hisilicon arm64 
->> D05 board. Otherwise it failed with "kvm_init_vcpu failed: Invalid argument".
->> Is it possilbe to set the cpu type like numa-test.c?
-> 
-> I think it works with numa-test because it uses TCG only but in case of bios-tables-test
-> it uses accel="kvm:tcg" to leverage KVM capabilities whenever possible to speed up test.
-> 
-> Now back to our ARM test case, uefi requirement is to use 64bit CPU (hence it was cortex-a57)
-> however unlike x86 it obviously breaks since KVM accelerator on ARM host is used
-> and it doesn't work with anything other than 'host' cpu model.
-> 
-> I think we still want to use KVM whenever possible, but problem lies in that
-> user (testcase) doesn't have an idea if KVM accelerator is available and host is 64 CPU.
-> 
-> to sum up we need to support 2 modes:
->   1. host is 64 ARM, use kvm with -cpu host
->   2. all other cases use tcg with -cpu cortex-a57
-> 
-> I can hack to probe if /dev/kvm is accessible and host is 64 bit and use #1
-> otherwise fallback to #2
-> or as quick fix do only #2 initially and think about a better solution to #1 
-
-Thanks!
-Fine to me.
-
-> 
-> Is there any other suggestions/opinions how to approach issue/proceed.
-
-To check the host cpu architecture is ARM or not, maybe we can check the value
-of "CPU implementer" is 0x41 or not from the /proc/cpuinfo.
-
-Best Regards,
-Wei
-
-> 
-> PS:
-> we probably would like to reuse this not only for acpi tests but also for other
-> arm/virt test cases that involve running guest code. 
-> 
->> Thanks!
+>> It needs to get the Freebsd image [1] updated too, in order to `make
+>> BUILD_TARGET=3Dcheck vm-build-freebsd` passes. Here it failed with:
+>> ---
+>> env: bash: No such file or directory
+>> gmake: *** [/var/tmp/qemu-test.6OlDFH/tests/Makefile.include:1101:
+>> check-tests/qemu-iotests-quick.sh] Error 1
+>> gmake: *** Waiting for unfinished jobs....
+>> ---
 >>
->> Best Regards,
->> Wei
-> 
-> 
-> .
-> 
+>> I'm not sure about the netbsd and openbsd images, they might need bash
+>> and gnu-sed as well.
+>=20
+> D'oh! Does anybody know what are the correct steps to update these imag=
+es?
+
+(1) make the OPENBSD subsystem maintainer care
+
+(2) update <https://wiki.qemu.org/Hosts/BSD>
+
+(3) download the image from download.patchew.org, boot it and update it
+
+(4) upload the image to download.patchew.org
+
+(5) update the "tests/vm/openbsd" script in the QEMU tree in sync
+(checksums, commands etc)
+
+
+I'm fairly sure (1) is necessary; the rest is more or less guesswork on
+my part.
+
+Thanks
+Laszlo
