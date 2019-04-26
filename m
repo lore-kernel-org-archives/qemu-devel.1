@@ -1,25 +1,25 @@
-Received: from eggs.gnu.org ([209.51.188.92]:45320)
+Received: from eggs.gnu.org ([209.51.188.92]:45317)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <arilou@gmail.com>) id 1hJsmg-0000dG-CG
+	(envelope-from <arilou@gmail.com>) id 1hJsmg-0000dE-DN
 	for qemu-devel@nongnu.org; Fri, 26 Apr 2019 00:48:27 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <arilou@gmail.com>) id 1hJsb2-0004QU-R0
-	for qemu-devel@nongnu.org; Fri, 26 Apr 2019 00:36:25 -0400
-Received: from mail-wr1-x444.google.com ([2a00:1450:4864:20::444]:39837)
+	(envelope-from <arilou@gmail.com>) id 1hJsb0-0004Oe-U6
+	for qemu-devel@nongnu.org; Fri, 26 Apr 2019 00:36:24 -0400
+Received: from mail-wm1-x341.google.com ([2a00:1450:4864:20::341]:35593)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <arilou@gmail.com>) id 1hJsb0-0004O0-T5
-	for qemu-devel@nongnu.org; Fri, 26 Apr 2019 00:36:23 -0400
-Received: by mail-wr1-x444.google.com with SMTP id a9so2450279wrp.6
-	for <qemu-devel@nongnu.org>; Thu, 25 Apr 2019 21:36:22 -0700 (PDT)
+	(Exim 4.71) (envelope-from <arilou@gmail.com>) id 1hJsaz-0004NO-0I
+	for qemu-devel@nongnu.org; Fri, 26 Apr 2019 00:36:21 -0400
+Received: by mail-wm1-x341.google.com with SMTP id y197so2376521wmd.0
+	for <qemu-devel@nongnu.org>; Thu, 25 Apr 2019 21:36:20 -0700 (PDT)
 From: Jon Doron <arilou@gmail.com>
-Date: Fri, 26 Apr 2019 07:35:45 +0300
-Message-Id: <20190426043558.6888-9-arilou@gmail.com>
+Date: Fri, 26 Apr 2019 07:35:44 +0300
+Message-Id: <20190426043558.6888-8-arilou@gmail.com>
 In-Reply-To: <20190426043558.6888-1-arilou@gmail.com>
 References: <20190426043558.6888-1-arilou@gmail.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH v7 08/21] gdbstub: Implement remove breakpoint
- (z pkt) with new infra
+Subject: [Qemu-devel] [PATCH v7 07/21] gdbstub: Implement insert breakpoint
+ (Z pkt) with new infra
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,18 +33,18 @@ Cc: alex.bennee@linaro.org, Jon Doron <arilou@gmail.com>
 
 Signed-off-by: Jon Doron <arilou@gmail.com>
 ---
- gdbstub.c | 49 ++++++++++++++++++++++++++++++++-----------------
- 1 file changed, 32 insertions(+), 17 deletions(-)
+ gdbstub.c | 33 +++++++++++++++++++++++++++++++++
+ 1 file changed, 33 insertions(+)
 
 diff --git a/gdbstub.c b/gdbstub.c
-index 36c7353a22..b42425b24c 100644
+index 21cdaf4678..36c7353a22 100644
 --- a/gdbstub.c
 +++ b/gdbstub.c
-@@ -1611,6 +1611,29 @@ static void handle_insert_bp(GdbCmdContext *gdb_ctx, void *user_ctx)
-     put_packet(gdb_ctx->s, "E22");
+@@ -1588,6 +1588,29 @@ static void handle_set_thread(GdbCmdContext *gdb_ctx, void *user_ctx)
+     }
  }
  
-+static void handle_remove_bp(GdbCmdContext *gdb_ctx, void *user_ctx)
++static void handle_insert_bp(GdbCmdContext *gdb_ctx, void *user_ctx)
 +{
 +    int res;
 +
@@ -53,7 +53,7 @@ index 36c7353a22..b42425b24c 100644
 +        return;
 +    }
 +
-+    res = gdb_breakpoint_remove(gdb_ctx->params[1].val_ull,
++    res = gdb_breakpoint_insert(gdb_ctx->params[1].val_ull,
 +                                gdb_ctx->params[2].val_ull,
 +                                gdb_ctx->params[0].val_ul);
 +    if (res >= 0) {
@@ -70,38 +70,22 @@ index 36c7353a22..b42425b24c 100644
  static int gdb_handle_packet(GDBState *s, const char *line_buf)
  {
      CPUState *cpu;
-@@ -1877,23 +1900,15 @@ static int gdb_handle_packet(GDBState *s, const char *line_buf)
-         }
+@@ -1843,6 +1866,16 @@ static int gdb_handle_packet(GDBState *s, const char *line_buf)
+         put_packet(s, "OK");
          break;
-     case 'z':
--        type = strtoul(p, (char **)&p, 16);
--        if (*p == ',')
--            p++;
--        addr = strtoull(p, (char **)&p, 16);
--        if (*p == ',')
--            p++;
--        len = strtoull(p, (char **)&p, 16);
--        if (ch == 'Z')
--            res = gdb_breakpoint_insert(addr, len, type);
--        else
--            res = gdb_breakpoint_remove(addr, len, type);
--        if (res >= 0)
--             put_packet(s, "OK");
--        else if (res == -ENOSYS)
--            put_packet(s, "");
--        else
--            put_packet(s, "E22");
+     case 'Z':
 +        {
-+            static const GdbCmdParseEntry remove_bp_cmd_desc = {
-+                .handler = handle_remove_bp,
-+                .cmd = "z",
++            static const GdbCmdParseEntry insert_bp_cmd_desc = {
++                .handler = handle_insert_bp,
++                .cmd = "Z",
 +                .cmd_startswith = 1,
 +                .schema = "l?L?L0"
 +            };
-+            cmd_parser = &remove_bp_cmd_desc;
++            cmd_parser = &insert_bp_cmd_desc;
 +        }
-         break;
-     case 'H':
-         {
++        break;
+     case 'z':
+         type = strtoul(p, (char **)&p, 16);
+         if (*p == ',')
 -- 
 2.20.1
