@@ -7,79 +7,83 @@ X-Spam-Status: No, score=-8.7 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E2037C43218
-	for <qemu-devel@archiver.kernel.org>; Fri, 26 Apr 2019 17:32:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id ADFFEC43218
+	for <qemu-devel@archiver.kernel.org>; Fri, 26 Apr 2019 17:32:26 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id AA8AB2146E
-	for <qemu-devel@archiver.kernel.org>; Fri, 26 Apr 2019 17:32:15 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 6189220652
+	for <qemu-devel@archiver.kernel.org>; Fri, 26 Apr 2019 17:32:26 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="U8gt93oO"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AA8AB2146E
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="MonM3534"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6189220652
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:50015 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:50017 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hK4hr-0006p4-1O
-	for qemu-devel@archiver.kernel.org; Fri, 26 Apr 2019 13:32:15 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:47960)
+	id 1hK4i1-0006yl-MA
+	for qemu-devel@archiver.kernel.org; Fri, 26 Apr 2019 13:32:25 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:48000)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1hK4aO-0008R4-96
-	for qemu-devel@nongnu.org; Fri, 26 Apr 2019 13:24:33 -0400
+	(envelope-from <richard.henderson@linaro.org>) id 1hK4aT-0008WU-90
+	for qemu-devel@nongnu.org; Fri, 26 Apr 2019 13:24:38 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1hK4aN-0006Ll-7Q
-	for qemu-devel@nongnu.org; Fri, 26 Apr 2019 13:24:32 -0400
-Received: from mail-pg1-x533.google.com ([2607:f8b0:4864:20::533]:45495)
+	(envelope-from <richard.henderson@linaro.org>) id 1hK4aR-0006fl-W4
+	for qemu-devel@nongnu.org; Fri, 26 Apr 2019 13:24:37 -0400
+Received: from mail-pg1-x544.google.com ([2607:f8b0:4864:20::544]:36430)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1hK4aN-0006KW-1s
-	for qemu-devel@nongnu.org; Fri, 26 Apr 2019 13:24:31 -0400
-Received: by mail-pg1-x533.google.com with SMTP id y27so1205418pgl.12
-	for <qemu-devel@nongnu.org>; Fri, 26 Apr 2019 10:24:30 -0700 (PDT)
+	id 1hK4aR-0006eX-QF
+	for qemu-devel@nongnu.org; Fri, 26 Apr 2019 13:24:35 -0400
+Received: by mail-pg1-x544.google.com with SMTP id 85so1943132pgc.3
+	for <qemu-devel@nongnu.org>; Fri, 26 Apr 2019 10:24:35 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
-	h=from:to:cc:subject:date:message-id:in-reply-to:references;
-	bh=fs+VAJvIUlV2gQG99NKmKU7MN80ounXs6KwGIvA+I7I=;
-	b=U8gt93oOkgf05Ldlc7W187XUsHmjfwaiPiHczKZ6ujc/igrQYJ/VTHvj0q5i164k46
-	pVvQRbYJ4ko68TYcb+f0fVnfaQ30gnX/ENcIXVdZv8Qg6oVRNMYpJsZdW6d4jkvzISTV
-	ES53r+sSgsS6KB7yhgBx2+Ao7L7Wz/Ck/FOoktl/Lpw+RLwt2yCnG+SZKq+Uhn2+ypas
-	wpnN7JCub/tA+W9cBBMUapIaUzfrvd1b7n8ByL4Y6xv7JlcgQhcNMtQHY9+18Je9ZiG5
-	z8ZMktPJ0FfRv1PcTGXjtGm2kkxHW1gJyoizGppst2RpFT7mnZZp45bhP6ErugomaQqV
-	rUag==
+	h=from:to:cc:subject:date:message-id:in-reply-to:references
+	:mime-version:content-transfer-encoding;
+	bh=3CywljlasHfL8Ycnk57vM6Ac8IPl3XHI/QQlXit0YoU=;
+	b=MonM3534UrqIVvSEtZvvDchMqiEFFiNcO8Y5L+Zei3KnAjWH8Pazvml/voPma/mHjk
+	T65hokEglAPGIhkt6aluCVNkuo6ZZEeiThLz3futfmKVKirRl1K2TIVg/RdaYX6cIS2N
+	D+FXYrqKHhWNBrQ67x/wpg8ZrwwUMqa/KL16biHFcgqy2WJAPyBVGT6xXYQp41q+JHVY
+	xpEXBCzSJt3dw3uGO+u2SdbuIYqpmU07+yBUOaIgucXcAjt45yWBGUKDbV1m+IgBwjNk
+	RxMQ0dtFb7kU1B8j1sgziqu8DohqzIZr1YKBQwPTvLKuxoi/85v9ew1WlY/7NxgOosSM
+	vJlA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
 	d=1e100.net; s=20161025;
 	h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
-	:references;
-	bh=fs+VAJvIUlV2gQG99NKmKU7MN80ounXs6KwGIvA+I7I=;
-	b=XnKqqJsWaWKK1S2OqFVCmzZagYdWYRI4BCP+aG8oa0PXcroQLYYEKqcb78e/6rgUoo
-	vdhC+YOueaE9vhnGGyeID3RblHyvjBVUJdB89oWInHVNvWW8PHUyy81/rB5ESrBJMTv+
-	bOXGl7s9SZ2AQEfwpTICUC3+LtqroX1ZJZFBPxY58gcpgT4n3vCsBE7oQP45iFCNANxU
-	4ufGqKaIVxop8qm1rn/dYASVYfhplZtlAyu0bNr1v8n2zwEPlk5AgTr2kQRE+lUYcYEk
-	UiD6PdZeUimQVV3cbAo2jSn4gce5i7v4goky1TL9JXGTG7DkOKKlK08sfEBkrAGxFxup
-	0lAQ==
-X-Gm-Message-State: APjAAAXpWZ913T1sVepRhD6ycwMJctUIGNIZacFQuMVZtfka/cu1Pa+J
-	J0TDj8ZQ1+lzLzWyVaTlBL6dfoYvE3w=
-X-Google-Smtp-Source: APXvYqwBHdFUjs1+Mz82jS0ZIiWmn9SKlP4vglpVhskcweN38adCAmDCZjwnO2TC/qsLdMJlpfPr9w==
-X-Received: by 2002:a63:e22:: with SMTP id d34mr39717983pgl.251.1556299469717; 
-	Fri, 26 Apr 2019 10:24:29 -0700 (PDT)
+	:references:mime-version:content-transfer-encoding;
+	bh=3CywljlasHfL8Ycnk57vM6Ac8IPl3XHI/QQlXit0YoU=;
+	b=uVxwq4raJ8VQtPov2mrkBFo6t/JoLRrOGOrusdIvQ5BYkkJ6u/rLQxZMHF4jR21TWu
+	s32yW5078ch+SoVh2IiLdGWZ+qCHz5R5J4k0Ph1v1lkMpDhmuWLtl1enSU16WyypMAgm
+	8dNDi0Wbs+pxkNusLDmMH21UJaOUQ9UIKbgXKVU1tl4NcxoPuofN5+HZYkHOG1wFGTpD
+	1X1bZt9EraVdG578V45rgELLYgWX56g0CDWOb5NWDXN8zOPumNdH7+dq3qfn3n3s96pH
+	hq+2k8VSzO7SNB5Ly86EvLo/lhmWtL1V4H8Bb/SOo8LKLNiuBeoei3NatZVJBykyJfiy
+	8qGg==
+X-Gm-Message-State: APjAAAXr7K3JioqAes4ier/rWikL3k9J0Ye7wN0BVL8NEn0NbEyPNVdp
+	mDketjA01jLj4LF2b2BwMn3FgYe4Pcs=
+X-Google-Smtp-Source: APXvYqyHe79xbPrb5NpT4buAHB09RHsBQ2IDeZ0/4aSeixOZSYJbTIDuO7xLUmZbqc+e+U2dY5dybw==
+X-Received: by 2002:a63:cc48:: with SMTP id q8mr15704362pgi.202.1556299474477; 
+	Fri, 26 Apr 2019 10:24:34 -0700 (PDT)
 Received: from localhost.localdomain (97-113-179-147.tukw.qwest.net.
 	[97.113.179.147]) by smtp.gmail.com with ESMTPSA id
-	j5sm7901762pfg.186.2019.04.26.10.24.28
+	j5sm7901762pfg.186.2019.04.26.10.24.33
 	(version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-	Fri, 26 Apr 2019 10:24:28 -0700 (PDT)
+	Fri, 26 Apr 2019 10:24:33 -0700 (PDT)
 From: Richard Henderson <richard.henderson@linaro.org>
 To: qemu-devel@nongnu.org
-Date: Fri, 26 Apr 2019 10:24:11 -0700
-Message-Id: <20190426172421.27133-6-richard.henderson@linaro.org>
+Date: Fri, 26 Apr 2019 10:24:15 -0700
+Message-Id: <20190426172421.27133-10-richard.henderson@linaro.org>
 X-Mailer: git-send-email 2.17.1
 In-Reply-To: <20190426172421.27133-1-richard.henderson@linaro.org>
 References: <20190426172421.27133-1-richard.henderson@linaro.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
 	recognized.
-X-Received-From: 2607:f8b0:4864:20::533
-Subject: [Qemu-devel] [PULL 05/15] tcg/i386: Support INDEX_op_extract2_{i32,
- i64}
+X-Received-From: 2607:f8b0:4864:20::544
+Subject: [Qemu-devel] [PULL 09/15] tcg: Restart after TB code generation
+ overflow
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -95,80 +99,91 @@ Cc: peter.maydell@linaro.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Content-Type: text/plain; charset="UTF-8"
-Message-ID: <20190426172411.euwqXLM7XdnPLmC7IUbJY-ryH_VW8-hMMYuekOfDimo@z>
+Message-ID: <20190426172415.LSTd11-Pv_Ys71Yj35hYgtYeUkyb7T6mNhCwBfaWMvQ@z>
 
+If a TB generates too much code, try again with fewer insns.
+
+Fixes: https://bugs.launchpad.net/bugs/1824853
+Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
 Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- tcg/i386/tcg-target.h     |  4 ++--
- tcg/i386/tcg-target.inc.c | 11 +++++++++++
- 2 files changed, 13 insertions(+), 2 deletions(-)
+ accel/tcg/translate-all.c | 38 ++++++++++++++++++++++++++++++++------
+ tcg/tcg.c                 |  4 ++++
+ 2 files changed, 36 insertions(+), 6 deletions(-)
 
-diff --git a/tcg/i386/tcg-target.h b/tcg/i386/tcg-target.h
-index 2c58eaa9ed..241bf19413 100644
---- a/tcg/i386/tcg-target.h
-+++ b/tcg/i386/tcg-target.h
-@@ -124,7 +124,7 @@ extern bool have_avx2;
- #define TCG_TARGET_HAS_deposit_i32      1
- #define TCG_TARGET_HAS_extract_i32      1
- #define TCG_TARGET_HAS_sextract_i32     1
--#define TCG_TARGET_HAS_extract2_i32     0
-+#define TCG_TARGET_HAS_extract2_i32     1
- #define TCG_TARGET_HAS_movcond_i32      1
- #define TCG_TARGET_HAS_add2_i32         1
- #define TCG_TARGET_HAS_sub2_i32         1
-@@ -163,7 +163,7 @@ extern bool have_avx2;
- #define TCG_TARGET_HAS_deposit_i64      1
- #define TCG_TARGET_HAS_extract_i64      1
- #define TCG_TARGET_HAS_sextract_i64     0
--#define TCG_TARGET_HAS_extract2_i64     0
-+#define TCG_TARGET_HAS_extract2_i64     1
- #define TCG_TARGET_HAS_movcond_i64      1
- #define TCG_TARGET_HAS_add2_i64         1
- #define TCG_TARGET_HAS_sub2_i64         1
-diff --git a/tcg/i386/tcg-target.inc.c b/tcg/i386/tcg-target.inc.c
-index e0670e5098..1fa833840e 100644
---- a/tcg/i386/tcg-target.inc.c
-+++ b/tcg/i386/tcg-target.inc.c
-@@ -452,6 +452,7 @@ static inline int tcg_target_const_match(tcg_target_long val, TCGType type,
- #define OPC_SHUFPS      (0xc6 | P_EXT)
- #define OPC_SHLX        (0xf7 | P_EXT38 | P_DATA16)
- #define OPC_SHRX        (0xf7 | P_EXT38 | P_SIMDF2)
-+#define OPC_SHRD_Ib     (0xac | P_EXT)
- #define OPC_TESTL	(0x85)
- #define OPC_TZCNT       (0xbc | P_EXT | P_SIMDF3)
- #define OPC_UD2         (0x0b | P_EXT)
-@@ -2587,6 +2588,12 @@ static inline void tcg_out_op(TCGContext *s, TCGOpcode opc,
-         }
-         break;
+diff --git a/accel/tcg/translate-all.c b/accel/tcg/translate-all.c
+index 39532fd44c..20b59f93f4 100644
+--- a/accel/tcg/translate-all.c
++++ b/accel/tcg/translate-all.c
+@@ -1722,6 +1722,7 @@ TranslationBlock *tb_gen_code(CPUState *cpu,
+     tb->cflags = cflags;
+     tb->trace_vcpu_dstate = *cpu->trace_dstate;
+     tcg_ctx->tb_cflags = cflags;
++ tb_overflow:
  
-+    OP_32_64(extract2):
-+        /* Note that SHRD outputs to the r/m operand.  */
-+        tcg_out_modrm(s, OPC_SHRD_Ib + rexw, a2, a0);
-+        tcg_out8(s, args[3]);
-+        break;
+ #ifdef CONFIG_PROFILER
+     /* includes aborted translations because of exceptions */
+@@ -1755,14 +1756,39 @@ TranslationBlock *tb_gen_code(CPUState *cpu,
+     ti = profile_getclock();
+ #endif
+ 
+-    /* ??? Overflow could be handled better here.  In particular, we
+-       don't need to re-do gen_intermediate_code, nor should we re-do
+-       the tcg optimization currently hidden inside tcg_gen_code.  All
+-       that should be required is to flush the TBs, allocate a new TB,
+-       re-initialize it per above, and re-do the actual code generation.  */
+     gen_code_size = tcg_gen_code(tcg_ctx, tb);
+     if (unlikely(gen_code_size < 0)) {
+-        goto buffer_overflow;
++        switch (gen_code_size) {
++        case -1:
++            /*
++             * Overflow of code_gen_buffer, or the current slice of it.
++             *
++             * TODO: We don't need to re-do gen_intermediate_code, nor
++             * should we re-do the tcg optimization currently hidden
++             * inside tcg_gen_code.  All that should be required is to
++             * flush the TBs, allocate a new TB, re-initialize it per
++             * above, and re-do the actual code generation.
++             */
++            goto buffer_overflow;
 +
-     case INDEX_op_mb:
-         tcg_out_mb(s, a0);
-         break;
-@@ -2845,6 +2852,7 @@ static const TCGTargetOpDef *tcg_target_op_def(TCGOpcode op)
-     static const TCGTargetOpDef r_0 = { .args_ct_str = { "r", "0" } };
-     static const TCGTargetOpDef r_r_ri = { .args_ct_str = { "r", "r", "ri" } };
-     static const TCGTargetOpDef r_r_re = { .args_ct_str = { "r", "r", "re" } };
-+    static const TCGTargetOpDef r_0_r = { .args_ct_str = { "r", "0", "r" } };
-     static const TCGTargetOpDef r_0_re = { .args_ct_str = { "r", "0", "re" } };
-     static const TCGTargetOpDef r_0_ci = { .args_ct_str = { "r", "0", "ci" } };
-     static const TCGTargetOpDef r_L = { .args_ct_str = { "r", "L" } };
-@@ -2970,6 +2978,9 @@ static const TCGTargetOpDef *tcg_target_op_def(TCGOpcode op)
-     case INDEX_op_ctpop_i32:
-     case INDEX_op_ctpop_i64:
-         return &r_r;
-+    case INDEX_op_extract2_i32:
-+    case INDEX_op_extract2_i64:
-+        return &r_0_r;
- 
-     case INDEX_op_deposit_i32:
-     case INDEX_op_deposit_i64:
++        case -2:
++            /*
++             * The code generated for the TranslationBlock is too large.
++             * The maximum size allowed by the unwind info is 64k.
++             * There may be stricter constraints from relocations
++             * in the tcg backend.
++             *
++             * Try again with half as many insns as we attempted this time.
++             * If a single insn overflows, there's a bug somewhere...
++             */
++            max_insns = tb->icount;
++            assert(max_insns > 1);
++            max_insns /= 2;
++            goto tb_overflow;
++
++        default:
++            g_assert_not_reached();
++        }
+     }
+     search_size = encode_search(tb, (void *)gen_code_buf + gen_code_size);
+     if (unlikely(search_size < 0)) {
+diff --git a/tcg/tcg.c b/tcg/tcg.c
+index c0730f119f..5d255166c0 100644
+--- a/tcg/tcg.c
++++ b/tcg/tcg.c
+@@ -3996,6 +3996,10 @@ int tcg_gen_code(TCGContext *s, TranslationBlock *tb)
+         if (unlikely((void *)s->code_ptr > s->code_gen_highwater)) {
+             return -1;
+         }
++        /* Test for TB overflow, as seen by gen_insn_end_off.  */
++        if (unlikely(tcg_current_code_size(s) > UINT16_MAX)) {
++            return -2;
++        }
+     }
+     tcg_debug_assert(num_insns >= 0);
+     s->gen_insn_end_off[num_insns] = tcg_current_code_size(s);
 -- 
 2.17.1
 
