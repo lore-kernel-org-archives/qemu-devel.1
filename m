@@ -7,47 +7,47 @@ X-Spam-Status: No, score=-8.7 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 12AD7C43218
-	for <qemu-devel@archiver.kernel.org>; Fri, 26 Apr 2019 06:21:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 96071C43219
+	for <qemu-devel@archiver.kernel.org>; Fri, 26 Apr 2019 06:23:24 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C797E206BA
-	for <qemu-devel@archiver.kernel.org>; Fri, 26 Apr 2019 06:21:25 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 644F620675
+	for <qemu-devel@archiver.kernel.org>; Fri, 26 Apr 2019 06:23:24 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="BJR24zGx"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C797E206BA
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="eHwuYmN8"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 644F620675
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gibson.dropbear.id.au
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:40105 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:40135 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hJuEe-0003A0-T0
-	for qemu-devel@archiver.kernel.org; Fri, 26 Apr 2019 02:21:25 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:60130)
+	id 1hJuGZ-0005as-Ge
+	for qemu-devel@archiver.kernel.org; Fri, 26 Apr 2019 02:23:23 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:60385)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1hJu0c-0005Z8-II
-	for qemu-devel@nongnu.org; Fri, 26 Apr 2019 02:07:00 -0400
+	(envelope-from <dgibson@ozlabs.org>) id 1hJu0u-0005w8-BN
+	for qemu-devel@nongnu.org; Fri, 26 Apr 2019 02:07:13 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1hJu0Y-0004UG-TA
-	for qemu-devel@nongnu.org; Fri, 26 Apr 2019 02:06:54 -0400
-Received: from bilbo.ozlabs.org ([2401:3900:2:1::2]:58449 helo=ozlabs.org)
+	(envelope-from <dgibson@ozlabs.org>) id 1hJu0t-00050I-5S
+	for qemu-devel@nongnu.org; Fri, 26 Apr 2019 02:07:12 -0400
+Received: from bilbo.ozlabs.org ([2401:3900:2:1::2]:54589 helo=ozlabs.org)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <dgibson@ozlabs.org>)
-	id 1hJu0Y-0004Od-6F; Fri, 26 Apr 2019 02:06:50 -0400
+	id 1hJu0s-0004PT-FC; Fri, 26 Apr 2019 02:07:11 -0400
 Received: by ozlabs.org (Postfix, from userid 1007)
-	id 44r3Tm0bsrz9sNJ; Fri, 26 Apr 2019 16:06:34 +1000 (AEST)
+	id 44r3Tm75fHz9sNK; Fri, 26 Apr 2019 16:06:35 +1000 (AEST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-	d=gibson.dropbear.id.au; s=201602; t=1556258796;
-	bh=tex7puElr/hdrgW60sKFDFTqZBlhAKgaGYVO6K52Hp0=;
+	d=gibson.dropbear.id.au; s=201602; t=1556258797;
+	bh=71hNapxXxJkb7FPRMtgPHqs6/xQm5Ig6vi2upazg1nU=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=BJR24zGxoOSAc6lMT49QrV/LZHbew3MGKiUdGH94Xwk2bkwtOhloKDtzmEGS7hjuq
-	nizv3gGA+Z54oFrktt5yDDstVKCs6fEvxMbNBf/QoKEJ+m0sWtvKb5BZYruyn7s4r6
-	TM78Ly+TuIK8n2KQGLMaVAjFrTfmM7IYI7PSIZAc=
+	b=eHwuYmN8EJgvuJpmwKBft0GCCAxyQx1+R2kUQOL8P84GrPimRd0cbqmYoQT3uEalu
+	TSFLzeteLJ47j2tHrNNL3lfLpBjFxz8LHLq8w8ciKkLaZP2BuGNxA+Q9G4xZ8ndzla
+	EHqS4zJAuy2iCpscY8Ap4HP0HgzfzjH8gm447ArA=
 From: David Gibson <david@gibson.dropbear.id.au>
 To: peter.maydell@linaro.org
-Date: Fri, 26 Apr 2019 16:06:01 +1000
-Message-Id: <20190426060627.18153-11-david@gibson.dropbear.id.au>
+Date: Fri, 26 Apr 2019 16:06:06 +1000
+Message-Id: <20190426060627.18153-16-david@gibson.dropbear.id.au>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20190426060627.18153-1-david@gibson.dropbear.id.au>
 References: <20190426060627.18153-1-david@gibson.dropbear.id.au>
@@ -57,7 +57,7 @@ Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
 	recognized.
 X-Received-From: 2401:3900:2:1::2
-Subject: [Qemu-devel] [PULL 10/36] target/ppc: Style fixes for excp_helper.c
+Subject: [Qemu-devel] [PULL 15/36] target/ppc: Style fixes for mem_helper.c
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -75,265 +75,101 @@ Cc: gkurz@kaod.org, Greg Kurz <groug@kaod.org>, qemu-devel@nongnu.org,
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190426060601.NxpWm1vn-JsJbumucGBEl0ulHRhffatVx51Hj-yh8o4@z>
+Message-ID: <20190426060606.ZxNSqxHGOfXVqfzL5-MwZuijwV47gHasTiXk8dqV6L8@z>
 
 Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
 Reviewed-by: C=C3=A9dric Le Goater <clg@kaod.org>
 Reviewed-by: Greg Kurz <groug@kaod.org>
 ---
- target/ppc/excp_helper.c | 87 ++++++++++++++++++++++++----------------
- 1 file changed, 53 insertions(+), 34 deletions(-)
+ target/ppc/mem_helper.c | 33 +++++++++++++++++++--------------
+ 1 file changed, 19 insertions(+), 14 deletions(-)
 
-diff --git a/target/ppc/excp_helper.c b/target/ppc/excp_helper.c
-index beafcf1ebd..ec2c177091 100644
---- a/target/ppc/excp_helper.c
-+++ b/target/ppc/excp_helper.c
-@@ -25,9 +25,9 @@
+diff --git a/target/ppc/mem_helper.c b/target/ppc/mem_helper.c
+index 9c5a68579e..5b0f9ee50d 100644
+--- a/target/ppc/mem_helper.c
++++ b/target/ppc/mem_helper.c
+@@ -27,7 +27,7 @@
  #include "internal.h"
- #include "helper_regs.h"
+ #include "qemu/atomic128.h"
 =20
 -//#define DEBUG_OP
--//#define DEBUG_SOFTWARE_TLB
--//#define DEBUG_EXCEPTIONS
 +/* #define DEBUG_OP */
-+/* #define DEBUG_SOFTWARE_TLB */
-+/* #define DEBUG_EXCEPTIONS */
 =20
- #ifdef DEBUG_EXCEPTIONS
- #  define LOG_EXCP(...) qemu_log(__VA_ARGS__)
-@@ -126,8 +126,9 @@ static uint64_t ppc_excp_vector_offset(CPUState *cs, =
-int ail)
-     return offset;
+ static inline bool needs_byteswap(const CPUPPCState *env)
+ {
+@@ -103,10 +103,11 @@ void helper_lsw(CPUPPCState *env, target_ulong addr=
+, uint32_t nb, uint32_t reg)
+     do_lsw(env, addr, nb, reg, GETPC());
  }
 =20
--/* Note that this function should be greatly optimized
-- * when called with a constant excp, from ppc_hw_interrupt
+-/* PPC32 specification says we must generate an exception if
+- * rA is in the range of registers to be loaded.
+- * In an other hand, IBM says this is valid, but rA won't be loaded.
+- * For now, I'll follow the spec...
 +/*
-+ * Note that this function should be greatly optimized when called
-+ * with a constant excp, from ppc_hw_interrupt
++ * PPC32 specification says we must generate an exception if rA is in
++ * the range of registers to be loaded.  In an other hand, IBM says
++ * this is valid, but rA won't be loaded.  For now, I'll follow the
++ * spec...
   */
- static inline void powerpc_excp(PowerPCCPU *cpu, int excp_model, int exc=
-p)
+ void helper_lswx(CPUPPCState *env, target_ulong addr, uint32_t reg,
+                  uint32_t ra, uint32_t rb)
+@@ -199,7 +200,8 @@ void helper_dcbzep(CPUPPCState *env, target_ulong add=
+r, uint32_t opcode)
+ void helper_icbi(CPUPPCState *env, target_ulong addr)
  {
-@@ -147,7 +148,8 @@ static inline void powerpc_excp(PowerPCCPU *cpu, int =
-excp_model, int excp)
-         msr =3D env->msr & ~0x783f0000ULL;
-     }
-=20
--    /* new interrupt handler msr preserves existing HV and ME unless
+     addr &=3D ~(env->dcache_line_size - 1);
+-    /* Invalidate one cache line :
 +    /*
-+     * new interrupt handler msr preserves existing HV and ME unless
-      * explicitly overriden
-      */
-     new_msr =3D env->msr & (((target_ulong)1 << MSR_ME) | MSR_HVB);
-@@ -166,7 +168,8 @@ static inline void powerpc_excp(PowerPCCPU *cpu, int =
-excp_model, int excp)
-         excp =3D powerpc_reset_wakeup(cs, env, excp, &msr);
-     }
-=20
--    /* Exception targetting modifiers
-+    /*
-+     * Exception targetting modifiers
-      *
-      * LPES0 is supported on POWER7/8/9
-      * LPES1 is not supported (old iSeries mode)
-@@ -194,7 +197,8 @@ static inline void powerpc_excp(PowerPCCPU *cpu, int =
-excp_model, int excp)
-         ail =3D 0;
-     }
-=20
--    /* Hypervisor emulation assistance interrupt only exists on server
-+    /*
-+     * Hypervisor emulation assistance interrupt only exists on server
-      * arch 2.05 server or later. We also don't want to generate it if
-      * we don't have HVB in msr_mask (PAPR mode).
-      */
-@@ -229,8 +233,9 @@ static inline void powerpc_excp(PowerPCCPU *cpu, int =
-excp_model, int excp)
-         break;
-     case POWERPC_EXCP_MCHECK:    /* Machine check exception             =
-     */
-         if (msr_me =3D=3D 0) {
--            /* Machine check exception is not enabled.
--             * Enter checkstop state.
-+            /*
-+             * Machine check exception is not enabled.  Enter
-+             * checkstop state.
-              */
-             fprintf(stderr, "Machine check while not allowed. "
-                     "Entering checkstop state\n");
-@@ -242,8 +247,9 @@ static inline void powerpc_excp(PowerPCCPU *cpu, int =
-excp_model, int excp)
-             cpu_interrupt_exittb(cs);
-         }
-         if (env->msr_mask & MSR_HVB) {
--            /* ISA specifies HV, but can be delivered to guest with HV c=
-lear
--             * (e.g., see FWNMI in PAPR).
-+            /*
-+             * ISA specifies HV, but can be delivered to guest with HV
-+             * clear (e.g., see FWNMI in PAPR).
-              */
-             new_msr |=3D (target_ulong)MSR_HVB;
-         }
-@@ -294,9 +300,10 @@ static inline void powerpc_excp(PowerPCCPU *cpu, int=
- excp_model, int excp)
-         break;
-     case POWERPC_EXCP_ALIGN:     /* Alignment exception                 =
-     */
-         /* Get rS/rD and rA from faulting opcode */
--        /* Note: the opcode fields will not be set properly for a direct
--         * store load/store, but nobody cares as nobody actually uses
--         * direct store segments.
-+        /*
-+         * Note: the opcode fields will not be set properly for a
-+         * direct store load/store, but nobody cares as nobody
-+         * actually uses direct store segments.
-          */
-         env->spr[SPR_DSISR] |=3D (env->error_code & 0x03FF0000) >> 16;
-         break;
-@@ -310,7 +317,8 @@ static inline void powerpc_excp(PowerPCCPU *cpu, int =
-excp_model, int excp)
-                 return;
-             }
-=20
--            /* FP exceptions always have NIP pointing to the faulting
-+            /*
-+             * FP exceptions always have NIP pointing to the faulting
-              * instruction, so always use store_next and claim we are
-              * precise in the MSR.
-              */
-@@ -341,7 +349,8 @@ static inline void powerpc_excp(PowerPCCPU *cpu, int =
-excp_model, int excp)
-         dump_syscall(env);
-         lev =3D env->error_code;
-=20
--        /* We need to correct the NIP which in this case is supposed
-+        /*
-+         * We need to correct the NIP which in this case is supposed
-          * to point to the next instruction
-          */
-         env->nip +=3D 4;
-@@ -425,8 +434,9 @@ static inline void powerpc_excp(PowerPCCPU *cpu, int =
-excp_model, int excp)
-             new_msr |=3D ((target_ulong)1 << MSR_ME);
-         }
-         if (env->msr_mask & MSR_HVB) {
--            /* ISA specifies HV, but can be delivered to guest with HV c=
-lear
--             * (e.g., see FWNMI in PAPR, NMI injection in QEMU).
-+            /*
-+             * ISA specifies HV, but can be delivered to guest with HV
-+             * clear (e.g., see FWNMI in PAPR, NMI injection in QEMU).
-              */
-             new_msr |=3D (target_ulong)MSR_HVB;
-         } else {
-@@ -675,7 +685,8 @@ static inline void powerpc_excp(PowerPCCPU *cpu, int =
-excp_model, int excp)
-         env->spr[asrr1] =3D env->spr[srr1];
-     }
-=20
--    /* Sort out endianness of interrupt, this differs depending on the
-+    /*
-+     * Sort out endianness of interrupt, this differs depending on the
-      * CPU, the HV mode, etc...
-      */
- #ifdef TARGET_PPC64
-@@ -716,8 +727,9 @@ static inline void powerpc_excp(PowerPCCPU *cpu, int =
-excp_model, int excp)
-     }
-     vector |=3D env->excp_prefix;
-=20
--    /* AIL only works if there is no HV transition and we are running wi=
-th
--     * translations enabled
-+    /*
-+     * AIL only works if there is no HV transition and we are running
-+     * with translations enabled
-      */
-     if (!((msr >> MSR_IR) & 1) || !((msr >> MSR_DR) & 1) ||
-         ((new_msr & MSR_HVB) && !(msr & MSR_HVB))) {
-@@ -745,8 +757,9 @@ static inline void powerpc_excp(PowerPCCPU *cpu, int =
-excp_model, int excp)
-         }
-     }
++     * Invalidate one cache line :
+      * PowerPC specification says this is to be treated like a load
+      * (not a fetch) by the MMU. To be sure it will be so,
+      * do the load "by hand".
+@@ -346,17 +348,19 @@ uint32_t helper_stqcx_be_parallel(CPUPPCState *env,=
+ target_ulong addr,
+ #define LO_IDX 0
  #endif
--    /* We don't use hreg_store_msr here as already have treated
--     * any special case that could occur. Just store MSR and update hfla=
-gs
-+    /*
-+     * We don't use hreg_store_msr here as already have treated any
-+     * special case that could occur. Just store MSR and update hflags
-      *
-      * Note: We *MUST* not use hreg_store_msr() as-is anyway because it
-      * will prevent setting of the HV bit which some exceptions might ne=
-ed
-@@ -762,8 +775,9 @@ static inline void powerpc_excp(PowerPCCPU *cpu, int =
-excp_model, int excp)
-     /* Reset the reservation */
-     env->reserve_addr =3D -1;
 =20
--    /* Any interrupt is context synchronizing, check if TCG TLB
--     * needs a delayed flush on ppc64
-+    /*
-+     * Any interrupt is context synchronizing, check if TCG TLB needs
-+     * a delayed flush on ppc64
-      */
-     check_tlb_flush(env, false);
- }
-@@ -1015,8 +1029,9 @@ void helper_pminsn(CPUPPCState *env, powerpc_pm_ins=
-n_t insn)
-     cs =3D CPU(ppc_env_get_cpu(env));
-     cs->halted =3D 1;
+-/* We use msr_le to determine index ordering in a vector.  However,
+-   byteswapping is not simply controlled by msr_le.  We also need to tak=
+e
+-   into account endianness of the target.  This is done for the little-e=
+ndian
+-   PPC64 user-mode target. */
++/*
++ * We use msr_le to determine index ordering in a vector.  However,
++ * byteswapping is not simply controlled by msr_le.  We also need to
++ * take into account endianness of the target.  This is done for the
++ * little-endian PPC64 user-mode target.
++ */
 =20
--    /* The architecture specifies that HDEC interrupts are
--     * discarded in PM states
-+    /*
-+     * The architecture specifies that HDEC interrupts are discarded
-+     * in PM states
-      */
-     env->pending_interrupts &=3D ~(1 << PPC_INTERRUPT_HDECR);
+ #define LVE(name, access, swap, element)                        \
+     void helper_##name(CPUPPCState *env, ppc_avr_t *r,          \
+                        target_ulong addr)                       \
+     {                                                           \
+         size_t n_elems =3D ARRAY_SIZE(r->element);                \
+-        int adjust =3D HI_IDX*(n_elems - 1);                      \
++        int adjust =3D HI_IDX * (n_elems - 1);                    \
+         int sh =3D sizeof(r->element[0]) >> 1;                    \
+         int index =3D (addr & 0xf) >> sh;                         \
+         if (msr_le) {                                           \
+@@ -476,12 +480,13 @@ VSX_STXVL(stxvll, 1)
 =20
-@@ -1047,8 +1062,9 @@ static inline void do_rfi(CPUPPCState *env, target_=
-ulong nip, target_ulong msr)
- #if defined(DEBUG_OP)
-     cpu_dump_rfi(env->nip, env->msr);
- #endif
--    /* No need to raise an exception here,
--     * as rfi is always the last insn of a TB
-+    /*
-+     * No need to raise an exception here, as rfi is always the last
-+     * insn of a TB
-      */
-     cpu_interrupt_exittb(cs);
-     /* Reset the reservation */
-@@ -1067,8 +1083,9 @@ void helper_rfi(CPUPPCState *env)
- #if defined(TARGET_PPC64)
- void helper_rfid(CPUPPCState *env)
+ void helper_tbegin(CPUPPCState *env)
  {
--    /* The architeture defines a number of rules for which bits
--     * can change but in practice, we handle this in hreg_store_msr()
+-    /* As a degenerate implementation, always fail tbegin.  The reason
 +    /*
-+     * The architeture defines a number of rules for which bits can
-+     * change but in practice, we handle this in hreg_store_msr()
-      * which will be called by do_rfi(), so there is no need to filter
-      * here
++     * As a degenerate implementation, always fail tbegin.  The reason
+      * given is "Nesting overflow".  The "persistent" bit is set,
+      * providing a hint to the error handler to not retry.  The TFIAR
+      * captures the address of the failure, which is this tbegin
+-     * instruction.  Instruction execution will continue with the
+-     * next instruction in memory, which is precisely what we want.
++     * instruction.  Instruction execution will continue with the next
++     * instruction in memory, which is precisely what we want.
       */
-@@ -1206,9 +1223,11 @@ static int book3s_dbell2irq(target_ulong rb)
- {
-     int msg =3D rb & DBELL_TYPE_MASK;
 =20
--    /* A Directed Hypervisor Doorbell message is sent only if the
-+    /*
-+     * A Directed Hypervisor Doorbell message is sent only if the
-      * message type is 5. All other types are reserved and the
--     * instruction is a no-op */
-+     * instruction is a no-op
-+     */
-     return msg =3D=3D DBELL_TYPE_DBELL_SERVER ? PPC_INTERRUPT_HDOORBELL =
-: -1;
- }
-=20
+     env->spr[SPR_TEXASR] =3D
 --=20
 2.20.1
 
