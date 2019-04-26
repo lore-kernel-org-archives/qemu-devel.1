@@ -2,87 +2,112 @@ Return-Path: <SRS0=QtPl=S4=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.7 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,FROM_EXCESS_BASE64,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7374BC43218
-	for <qemu-devel@archiver.kernel.org>; Fri, 26 Apr 2019 12:17:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 31240C43218
+	for <qemu-devel@archiver.kernel.org>; Fri, 26 Apr 2019 12:21:13 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3C563208C3
-	for <qemu-devel@archiver.kernel.org>; Fri, 26 Apr 2019 12:17:58 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="X+ZltTOO"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3C563208C3
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	by mail.kernel.org (Postfix) with ESMTPS id 03EFF206BF
+	for <qemu-devel@archiver.kernel.org>; Fri, 26 Apr 2019 12:21:12 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 03EFF206BF
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:46351 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:46435 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hJznh-00041Z-G4
-	for qemu-devel@archiver.kernel.org; Fri, 26 Apr 2019 08:17:57 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:40335)
+	id 1hJzqq-0005BZ-8C
+	for qemu-devel@archiver.kernel.org; Fri, 26 Apr 2019 08:21:12 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:41530)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcandre.lureau@gmail.com>) id 1hJzm0-000307-P3
-	for qemu-devel@nongnu.org; Fri, 26 Apr 2019 08:16:13 -0400
+	(envelope-from <thuth@redhat.com>) id 1hJzq2-0004oF-UE
+	for qemu-devel@nongnu.org; Fri, 26 Apr 2019 08:20:23 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcandre.lureau@gmail.com>) id 1hJzlz-0008Vz-T0
-	for qemu-devel@nongnu.org; Fri, 26 Apr 2019 08:16:12 -0400
-Received: from mail-wm1-x342.google.com ([2a00:1450:4864:20::342]:34920)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <marcandre.lureau@gmail.com>)
-	id 1hJzlz-0008V6-KH
-	for qemu-devel@nongnu.org; Fri, 26 Apr 2019 08:16:11 -0400
-Received: by mail-wm1-x342.google.com with SMTP id y197so4132137wmd.0
-	for <qemu-devel@nongnu.org>; Fri, 26 Apr 2019 05:16:11 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
-	h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-	:cc:content-transfer-encoding;
-	bh=5l+cgD5CBGk+exOyIhulFk38XQaDlB3fD3+hXuzegT0=;
-	b=X+ZltTOO0Qw2l+NVJo8FmPc9h5oRoOPltJE8XBBQepGv7zdH2orOpQogVMXovYP13V
-	/0yUOv10gKKotlFlAmqpCPZ4pb+5tNO9Lrvi57hwgmdHBN+ldNRMIoWWgDbKq0zGekkZ
-	jiGwcaR0j+8W10nCXTyhVTxoGX5NSGz9zVngTYiKHyB7HpPvC4x+60nHZr+KT8hKzDNa
-	/Bfk5H4r7aEpON97S/1t0skS0sXyv4ZAdXqwGvhUqgWSMQ5JkZzinVhMjhn09otl3S0m
-	8gSWLXQttOr8EmB+q9uj7L5z/rMKfjXot1ZjgfARQ161Gf9G8ISNKYcGYS/c7z1zYyrW
-	LOVQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=1e100.net; s=20161025;
-	h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-	:message-id:subject:to:cc:content-transfer-encoding;
-	bh=5l+cgD5CBGk+exOyIhulFk38XQaDlB3fD3+hXuzegT0=;
-	b=aIwizq8EHvFp+jifQ7sR/g3+FdGbK6DAwRsgPb18P5pLYFZnYzc6vvFQP0eXiducjt
-	xzR6lxLg3PLzYoVNktc/aQrp6bJtsu5Cl0GfrL+KaXbeYxCxmZuqh47esOyc+h4kHaVR
-	4Q0BAh8IvuCwwa2eUFmJnW/1OS0+T2UkBSog4YINrD+2XqBwSNsld9UcAR+jxAMTBEq7
-	vZnqi8/eTd+xTVdCWPZvMZ9YzUyg1qSNbsoeJZMLkQE3D1nGX9qwPP6TnvmfPaZTYLKK
-	37gFdnrnYAPn+TVnpXjLzWe8Vv9RQWJJAY9bgiH+QE0fohWCqHopppXbHLNMzTutxN2s
-	304Q==
-X-Gm-Message-State: APjAAAXIjF6rvqJJeqoox3MvQfbmVpxhEVeA/yc+Y4yf8q06K9NoKLKt
-	m1aGXjWumqZW/F2VoZCu8zi2cc0gVgxVaWthevU=
-X-Google-Smtp-Source: APXvYqyFS8BFq+a+qj64Nq3Xz1NnNLo+r24+obUsxBI1mqTHTeN+oLDe3VePmFJDtjxsD3PdalRMa3PD5wR9aGp5cyc=
-X-Received: by 2002:a1c:9c14:: with SMTP id f20mr7552635wme.16.1556280970336; 
-	Fri, 26 Apr 2019 05:16:10 -0700 (PDT)
+	(envelope-from <thuth@redhat.com>) id 1hJzq2-0003dP-2m
+	for qemu-devel@nongnu.org; Fri, 26 Apr 2019 08:20:22 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:49818)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1hJzq1-0003cm-Ql
+	for qemu-devel@nongnu.org; Fri, 26 Apr 2019 08:20:22 -0400
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+	[10.5.11.13])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 11B071244E2
+	for <qemu-devel@nongnu.org>; Fri, 26 Apr 2019 12:20:21 +0000 (UTC)
+Received: from thuth.remote.csb (ovpn-116-16.ams2.redhat.com [10.36.116.16])
+	by smtp.corp.redhat.com (Postfix) with ESMTP id B0E856606F;
+	Fri, 26 Apr 2019 12:20:15 +0000 (UTC)
+To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
+	qemu-devel@nongnu.org, Gerd Hoffmann <kraxel@redhat.com>
+References: <20190419075625.24251-1-thuth@redhat.com>
+	<c0ce7a39-9e9f-a7be-c73b-a9c2c05da3af@redhat.com>
+	<e0e3128d-371c-7812-d99f-77af15ef278b@redhat.com>
+	<84638796-204e-3f43-3fe1-f5329e9cd466@redhat.com>
+From: Thomas Huth <thuth@redhat.com>
+Openpgp: preference=signencrypt
+Autocrypt: addr=thuth@redhat.com; keydata=
+	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
+Organization: Red Hat
+Message-ID: <201457a3-d297-16ce-e375-f6ede5679492@redhat.com>
+Date: Fri, 26 Apr 2019 14:20:14 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+	Thunderbird/60.6.1
 MIME-Version: 1.0
-References: <20190423132004.13725-1-marcandre.lureau@redhat.com>
-	<20190423132004.13725-6-marcandre.lureau@redhat.com>
-	<20190426072446.r7b7wsm4qghd7pzr@sirius.home.kraxel.org>
-	<CAJ+F1CKbgb_TkoS_a10qGw7kkTO+EkC4uhreCkOu=k2ut5CAig@mail.gmail.com>
-	<20190426120558.vh66gugqtvcc6tm5@sirius.home.kraxel.org>
-In-Reply-To: <20190426120558.vh66gugqtvcc6tm5@sirius.home.kraxel.org>
-From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
-Date: Fri, 26 Apr 2019 14:15:58 +0200
-Message-ID:
- <CAJ+F1CLE-iwZu4oX69P3r0v_94L+gJEhZH0-U0iYag=oYNN4pg@mail.gmail.com>
-To: Gerd Hoffmann <kraxel@redhat.com>
+In-Reply-To: <84638796-204e-3f43-3fe1-f5329e9cd466@redhat.com>
 Content-Type: text/plain; charset="UTF-8"
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+	(mx1.redhat.com [10.5.110.38]);
+	Fri, 26 Apr 2019 12:20:21 +0000 (UTC)
 Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
-	recognized.
-X-Received-From: 2a00:1450:4864:20::342
-Subject: Re: [Qemu-devel] [PATCH v6 05/11] vhost-user: add
- vhost_user_gpu_set_socket()
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 209.132.183.28
+Subject: Re: [Qemu-devel] [PATCH v2 for-4.1 0/2] Fix ohci_die() and move PCI
+ code to separate file
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -94,73 +119,55 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: QEMU <qemu-devel@nongnu.org>, "Michael S. Tsirkin" <mst@redhat.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190426121558.m_GP1SRCo6oHXVCTsUZ2V8gcAfem4HsQUGzYXGwuWOI@z>
+Message-ID: <20190426122014.nfpgn-JT21z8IKLfs4jMCTwXgkjfXY3CQFR1cfJh7Ig@z>
 
-Hi
+On 26/04/2019 14.14, Philippe Mathieu-Daud=C3=A9 wrote:
+> On 4/26/19 7:42 AM, Thomas Huth wrote:
+>> On 26/04/2019 00.55, Philippe Mathieu-Daud=C3=A9 wrote:
+>>> Hi Thomas,
+>>>
+>>> On 4/19/19 9:56 AM, Thomas Huth wrote:
+>>>> First patch fixes a problem with ohci_die(), second patch moves PCI =
+code into
+>>>> a separate file, so that the sysbus OHCI device can also be used wit=
+hout
+>>>> the dependency on the PCI code.
+>>>>
+>>>> v2: Split the patch into two patches, one for the ohci_die() fix and=
+ one
+>>>>     for the PCI code movement.
+>>>
+>>> Way cleaner. I wonder why you don't use a typedef for the void
+>>> (*ohci_die_fn)(struct OHCIState *) prototype.
+>>
+>> It does not work in that case:
+>>
+>> typedef struct OHCIState {            // <-- struct OHCIState definiti=
+on
+>>     [...]
+>>     uint32_t async_td;
+>>     bool async_complete;
+>>
+>>     void (*ohci_die)(struct OHCIState *ohci); // <-- ohci_die definiti=
+on
+>> } OHCIState;                         // <-- typedef OHCIState definiti=
+on
+>>
+>> The typedef is defined after the ohci_die entry.
+>=20
+> I was thinking of forward declaration:
+>=20
+> typedef struct OHCIState OHCIState;
+>=20
+> typedef void (ohci_die_fn)(OHCIState *ohci);
 
-On Fri, Apr 26, 2019 at 2:06 PM Gerd Hoffmann <kraxel@redhat.com> wrote:
->
->   Hi,
->
-> > > > +Wire format
-> > > > +=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-> > > > +
-> > > > +Unless specified differently, numbers are in the machine native by=
-te
-> > > > +order.
-> > > > +
-> > > > +A vhost-user-gpu request consists of 2 header fields and a payload=
-.
-> > > > +
-> > > > ++---------+------+---------+
-> > > > +| request | size | payload |
-> > > > ++---------+------+---------+
-> > > > +
-> > > > +Header
-> > > > +------
-> > > > +
-> > > > +:request: ``u32``, type of the request
-> > > > +
-> > > > +:size: ``u32``, size of the payload
-> > > > +
-> > > > +A reply consists only of a payload, whose content depends on the r=
-equest.
-> > >
-> > > I'd suggest to use the same format for replies, only with "request"
-> > > meaning "status" in replies.  Allows for OK/ERROR status in replies,
-> > > and having a size field in replies too should make things more robust=
-.
-> > > Also allows for an empty reply (status=3Dok,size=3D0).
-> >
-> >
-> > That brings more questions and ambiguity imho.
->
-> What questions for example?
+Could work, too, but I don't like typedeferities... so unless Gerd
+forces me to use that here, I'd prefer to keep the patch in its current
+shape.
 
-This opens up different kind of possible replies, and error handling.
-
-With current proposal and needs, the reply (or absence of reply) is
-entirely driven by the request.
-
-With your proposal, should all request have a reply? which makes a lot
-more code synchronous, and complicates both sides unnecessarily.
-
->
-> > Can we leave that for future protocol extensions negotiated with
-> > GET/SET_PROTOCOL_FEATURES ?
->
-> I don't think negotiating such a basic protocol change is a good idea.
-
-Well, then I would rather focus on improving protocol negociation,
-rather than adding unnecessary protocol changes.
-
-Given that GET/SET_PROTOCOL_FEATURES is the first messages being sent,
-why couldn't it have flags indicating new protocol revision?
-
---=20
-Marc-Andr=C3=A9 Lureau
+ Thomas
 
