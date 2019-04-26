@@ -1,20 +1,20 @@
-Received: from eggs.gnu.org ([209.51.188.92]:60412)
+Received: from eggs.gnu.org ([209.51.188.92]:60476)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1hJu0x-0005zx-R3
-	for qemu-devel@nongnu.org; Fri, 26 Apr 2019 02:07:17 -0400
+	(envelope-from <dgibson@ozlabs.org>) id 1hJu12-00065V-25
+	for qemu-devel@nongnu.org; Fri, 26 Apr 2019 02:07:21 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1hJu0t-00051H-TS
-	for qemu-devel@nongnu.org; Fri, 26 Apr 2019 02:07:14 -0400
+	(envelope-from <dgibson@ozlabs.org>) id 1hJu10-00059e-47
+	for qemu-devel@nongnu.org; Fri, 26 Apr 2019 02:07:19 -0400
 From: David Gibson <david@gibson.dropbear.id.au>
-Date: Fri, 26 Apr 2019 16:06:10 +1000
-Message-Id: <20190426060627.18153-20-david@gibson.dropbear.id.au>
+Date: Fri, 26 Apr 2019 16:06:15 +1000
+Message-Id: <20190426060627.18153-25-david@gibson.dropbear.id.au>
 In-Reply-To: <20190426060627.18153-1-david@gibson.dropbear.id.au>
 References: <20190426060627.18153-1-david@gibson.dropbear.id.au>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 19/36] target/ppc: Style fixes for
- mmu-hash64.[ch]
+Subject: [Qemu-devel] [PULL 24/36] target/ppc: Style fixes for
+ translate/fp-impl.inc.c
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,183 +30,229 @@ Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
 Reviewed-by: C=C3=A9dric Le Goater <clg@kaod.org>
 Reviewed-by: Greg Kurz <groug@kaod.org>
 ---
- target/ppc/mmu-hash64.c | 68 +++++++++++++++++++++++++----------------
- 1 file changed, 42 insertions(+), 26 deletions(-)
+ target/ppc/translate/fp-impl.inc.c | 52 ++++++++++++++++++------------
+ 1 file changed, 32 insertions(+), 20 deletions(-)
 
-diff --git a/target/ppc/mmu-hash64.c b/target/ppc/mmu-hash64.c
-index 214149f65b..c74818b2e7 100644
---- a/target/ppc/mmu-hash64.c
-+++ b/target/ppc/mmu-hash64.c
-@@ -30,7 +30,7 @@
- #include "hw/hw.h"
- #include "mmu-book3s-v3.h"
+diff --git a/target/ppc/translate/fp-impl.inc.c b/target/ppc/translate/fp=
+-impl.inc.c
+index 0f21a4e477..9dcff947c0 100644
+--- a/target/ppc/translate/fp-impl.inc.c
++++ b/target/ppc/translate/fp-impl.inc.c
+@@ -585,11 +585,13 @@ static void gen_mcrfs(DisasContext *ctx)
+     shift =3D 4 * nibble;
+     tcg_gen_shri_tl(tmp, cpu_fpscr, shift);
+     tcg_gen_trunc_tl_i32(cpu_crf[crfD(ctx->opcode)], tmp);
+-    tcg_gen_andi_i32(cpu_crf[crfD(ctx->opcode)], cpu_crf[crfD(ctx->opcod=
+e)], 0xf);
++    tcg_gen_andi_i32(cpu_crf[crfD(ctx->opcode)], cpu_crf[crfD(ctx->opcod=
+e)],
++                     0xf);
+     tcg_temp_free(tmp);
+     tcg_gen_extu_tl_i64(tnew_fpscr, cpu_fpscr);
+     /* Only the exception bits (including FX) should be cleared if read =
+*/
+-    tcg_gen_andi_i64(tnew_fpscr, tnew_fpscr, ~((0xF << shift) & FP_EX_CL=
+EAR_BITS));
++    tcg_gen_andi_i64(tnew_fpscr, tnew_fpscr,
++                     ~((0xF << shift) & FP_EX_CLEAR_BITS));
+     /* FEX and VX need to be updated, so don't set fpscr directly */
+     tmask =3D tcg_const_i32(1 << nibble);
+     gen_helper_store_fpscr(cpu_env, tnew_fpscr, tmask);
+@@ -735,7 +737,7 @@ static void gen_mtfsfi(DisasContext *ctx)
 =20
--//#define DEBUG_SLB
-+/* #define DEBUG_SLB */
+ /***                         Floating-point load                        =
+   ***/
+ #define GEN_LDF(name, ldop, opc, type)                                  =
+      \
+-static void glue(gen_, name)(DisasContext *ctx)                         =
+              \
++static void glue(gen_, name)(DisasContext *ctx)                         =
+      \
+ {                                                                       =
+      \
+     TCGv EA;                                                            =
+      \
+     TCGv_i64 t0;                                                        =
+      \
+@@ -754,7 +756,7 @@ static void glue(gen_, name)(DisasContext *ctx)
+ }
 =20
- #ifdef DEBUG_SLB
- #  define LOG_SLB(...) qemu_log_mask(CPU_LOG_MMU, __VA_ARGS__)
-@@ -58,9 +58,11 @@ static ppc_slb_t *slb_lookup(PowerPCCPU *cpu, target_u=
-long eaddr)
+ #define GEN_LDUF(name, ldop, opc, type)                                 =
+      \
+-static void glue(gen_, name##u)(DisasContext *ctx)                      =
+              \
++static void glue(gen_, name##u)(DisasContext *ctx)                      =
+      \
+ {                                                                       =
+      \
+     TCGv EA;                                                            =
+      \
+     TCGv_i64 t0;                                                        =
+      \
+@@ -778,7 +780,7 @@ static void glue(gen_, name##u)(DisasContext *ctx)
+ }
 =20
-         LOG_SLB("%s: slot %d %016" PRIx64 " %016"
-                     PRIx64 "\n", __func__, n, slb->esid, slb->vsid);
--        /* We check for 1T matches on all MMUs here - if the MMU
-+        /*
-+         * We check for 1T matches on all MMUs here - if the MMU
-          * doesn't have 1T segment support, we will have prevented 1T
--         * entries from being inserted in the slbmte code. */
-+         * entries from being inserted in the slbmte code.
-+         */
-         if (((slb->esid =3D=3D esid_256M) &&
-              ((slb->vsid & SLB_VSID_B) =3D=3D SLB_VSID_B_256M))
-             || ((slb->esid =3D=3D esid_1T) &&
-@@ -103,7 +105,8 @@ void helper_slbia(CPUPPCState *env)
+ #define GEN_LDUXF(name, ldop, opc, type)                                =
+      \
+-static void glue(gen_, name##ux)(DisasContext *ctx)                     =
+              \
++static void glue(gen_, name##ux)(DisasContext *ctx)                     =
+      \
+ {                                                                       =
+      \
+     TCGv EA;                                                            =
+      \
+     TCGv_i64 t0;                                                        =
+      \
+@@ -802,7 +804,7 @@ static void glue(gen_, name##ux)(DisasContext *ctx)
+ }
 =20
-         if (slb->esid & SLB_ESID_V) {
-             slb->esid &=3D ~SLB_ESID_V;
--            /* XXX: given the fact that segment size is 256 MB or 1TB,
-+            /*
-+             * XXX: given the fact that segment size is 256 MB or 1TB,
-              *      and we still don't have a tlb_flush_mask(env, n, mas=
-k)
-              *      in QEMU, we just invalidate all TLBs
-              */
-@@ -126,7 +129,8 @@ static void __helper_slbie(CPUPPCState *env, target_u=
-long addr,
-     if (slb->esid & SLB_ESID_V) {
-         slb->esid &=3D ~SLB_ESID_V;
-=20
--        /* XXX: given the fact that segment size is 256 MB or 1TB,
-+        /*
-+         * XXX: given the fact that segment size is 256 MB or 1TB,
-          *      and we still don't have a tlb_flush_mask(env, n, mask)
-          *      in QEMU, we just invalidate all TLBs
-          */
-@@ -306,8 +310,10 @@ static int ppc_hash64_pte_prot(PowerPCCPU *cpu,
- {
-     CPUPPCState *env =3D &cpu->env;
-     unsigned pp, key;
--    /* Some pp bit combinations have undefined behaviour, so default
--     * to no access in those cases */
+ #define GEN_LDXF(name, ldop, opc2, opc3, type)                          =
+      \
+-static void glue(gen_, name##x)(DisasContext *ctx)                      =
+              \
++static void glue(gen_, name##x)(DisasContext *ctx)                      =
+      \
+ {                                                                       =
+      \
+     TCGv EA;                                                            =
+      \
+     TCGv_i64 t0;                                                        =
+      \
+@@ -872,8 +874,10 @@ static void gen_lfdp(DisasContext *ctx)
+     EA =3D tcg_temp_new();
+     gen_addr_imm_index(ctx, EA, 0);
+     t0 =3D tcg_temp_new_i64();
+-    /* We only need to swap high and low halves. gen_qemu_ld64_i64 does
+-       necessary 64-bit byteswap already. */
 +    /*
-+     * Some pp bit combinations have undefined behaviour, so default
-+     * to no access in those cases
++     * We only need to swap high and low halves. gen_qemu_ld64_i64
++     * does necessary 64-bit byteswap already.
 +     */
-     int prot =3D 0;
-=20
-     key =3D !!(msr_pr ? (slb->vsid & SLB_VSID_KP)
-@@ -376,7 +382,7 @@ static int ppc_hash64_amr_prot(PowerPCCPU *cpu, ppc_h=
-ash_pte64_t pte)
-     }
-=20
-     key =3D HPTE64_R_KEY(pte.pte1);
--    amrbits =3D (env->spr[SPR_AMR] >> 2*(31 - key)) & 0x3;
-+    amrbits =3D (env->spr[SPR_AMR] >> 2 * (31 - key)) & 0x3;
-=20
-     /* fprintf(stderr, "AMR protection: key=3D%d AMR=3D0x%" PRIx64 "\n",=
- key, */
-     /*         env->spr[SPR_AMR]); */
-@@ -547,8 +553,9 @@ static hwaddr ppc_hash64_pteg_search(PowerPCCPU *cpu,=
- hwaddr hash,
-             if (*pshift =3D=3D 0) {
-                 continue;
-             }
--            /* We don't do anything with pshift yet as qemu TLB only dea=
-ls
--             * with 4K pages anyway
-+            /*
-+             * We don't do anything with pshift yet as qemu TLB only
-+             * deals with 4K pages anyway
-              */
-             pte->pte0 =3D pte0;
-             pte->pte1 =3D pte1;
-@@ -572,8 +579,10 @@ static hwaddr ppc_hash64_htab_lookup(PowerPCCPU *cpu=
-,
-     uint64_t vsid, epnmask, epn, ptem;
-     const PPCHash64SegmentPageSizes *sps =3D slb->sps;
-=20
--    /* The SLB store path should prevent any bad page size encodings
--     * getting in there, so: */
+     if (unlikely(ctx->le_mode)) {
+         gen_qemu_ld64_i64(ctx, t0, EA);
+         set_fpr(rD(ctx->opcode) + 1, t0);
+@@ -904,8 +908,10 @@ static void gen_lfdpx(DisasContext *ctx)
+     EA =3D tcg_temp_new();
+     gen_addr_reg_index(ctx, EA);
+     t0 =3D tcg_temp_new_i64();
+-    /* We only need to swap high and low halves. gen_qemu_ld64_i64 does
+-       necessary 64-bit byteswap already. */
 +    /*
-+     * The SLB store path should prevent any bad page size encodings
-+     * getting in there, so:
++     * We only need to swap high and low halves. gen_qemu_ld64_i64
++     * does necessary 64-bit byteswap already.
 +     */
-     assert(sps);
+     if (unlikely(ctx->le_mode)) {
+         gen_qemu_ld64_i64(ctx, t0, EA);
+         set_fpr(rD(ctx->opcode) + 1, t0);
+@@ -966,7 +972,7 @@ static void gen_lfiwzx(DisasContext *ctx)
+ }
+ /***                         Floating-point store                       =
+   ***/
+ #define GEN_STF(name, stop, opc, type)                                  =
+      \
+-static void glue(gen_, name)(DisasContext *ctx)                         =
+              \
++static void glue(gen_, name)(DisasContext *ctx)                         =
+      \
+ {                                                                       =
+      \
+     TCGv EA;                                                            =
+      \
+     TCGv_i64 t0;                                                        =
+      \
+@@ -985,7 +991,7 @@ static void glue(gen_, name)(DisasContext *ctx)
+ }
 =20
-     /* If ISL is set in LPCR we need to clamp the page size to 4K */
-@@ -732,17 +741,20 @@ int ppc_hash64_handle_mmu_fault(PowerPCCPU *cpu, va=
-ddr eaddr,
+ #define GEN_STUF(name, stop, opc, type)                                 =
+      \
+-static void glue(gen_, name##u)(DisasContext *ctx)                      =
+              \
++static void glue(gen_, name##u)(DisasContext *ctx)                      =
+      \
+ {                                                                       =
+      \
+     TCGv EA;                                                            =
+      \
+     TCGv_i64 t0;                                                        =
+      \
+@@ -1009,7 +1015,7 @@ static void glue(gen_, name##u)(DisasContext *ctx)
+ }
 =20
-     assert((rwx =3D=3D 0) || (rwx =3D=3D 1) || (rwx =3D=3D 2));
+ #define GEN_STUXF(name, stop, opc, type)                                =
+      \
+-static void glue(gen_, name##ux)(DisasContext *ctx)                     =
+              \
++static void glue(gen_, name##ux)(DisasContext *ctx)                     =
+      \
+ {                                                                       =
+      \
+     TCGv EA;                                                            =
+      \
+     TCGv_i64 t0;                                                        =
+      \
+@@ -1033,7 +1039,7 @@ static void glue(gen_, name##ux)(DisasContext *ctx)
+ }
 =20
--    /* Note on LPCR usage: 970 uses HID4, but our special variant
--     * of store_spr copies relevant fields into env->spr[SPR_LPCR].
--     * Similarily we filter unimplemented bits when storing into
--     * LPCR depending on the MMU version. This code can thus just
--     * use the LPCR "as-is".
+ #define GEN_STXF(name, stop, opc2, opc3, type)                          =
+      \
+-static void glue(gen_, name##x)(DisasContext *ctx)                      =
+              \
++static void glue(gen_, name##x)(DisasContext *ctx)                      =
+      \
+ {                                                                       =
+      \
+     TCGv EA;                                                            =
+      \
+     TCGv_i64 t0;                                                        =
+      \
+@@ -1103,8 +1109,10 @@ static void gen_stfdp(DisasContext *ctx)
+     EA =3D tcg_temp_new();
+     t0 =3D tcg_temp_new_i64();
+     gen_addr_imm_index(ctx, EA, 0);
+-    /* We only need to swap high and low halves. gen_qemu_st64_i64 does
+-       necessary 64-bit byteswap already. */
 +    /*
-+     * Note on LPCR usage: 970 uses HID4, but our special variant of
-+     * store_spr copies relevant fields into env->spr[SPR_LPCR].
-+     * Similarily we filter unimplemented bits when storing into LPCR
-+     * depending on the MMU version. This code can thus just use the
-+     * LPCR "as-is".
-      */
-=20
-     /* 1. Handle real mode accesses */
-     if (((rwx =3D=3D 2) && (msr_ir =3D=3D 0)) || ((rwx !=3D 2) && (msr_d=
-r =3D=3D 0))) {
--        /* Translation is supposedly "off"  */
--        /* In real mode the top 4 effective address bits are (mostly) ig=
-nored */
-+        /*
-+         * Translation is supposedly "off", but in real mode the top 4
-+         * effective address bits are (mostly) ignored
-+         */
-         raddr =3D eaddr & 0x0FFFFFFFFFFFFFFFULL;
-=20
-         /* In HV mode, add HRMOR if top EA bit is clear */
-@@ -875,8 +887,10 @@ skip_slb_search:
-     if (rwx =3D=3D 1) {
-         new_pte1 |=3D HPTE64_R_C; /* set changed (dirty) bit */
-     } else {
--        /* Treat the page as read-only for now, so that a later write
--         * will pass through this function again to set the C bit */
-+        /*
-+         * Treat the page as read-only for now, so that a later write
-+         * will pass through this function again to set the C bit
-+         */
-         prot &=3D ~PAGE_WRITE;
-     }
-=20
-@@ -1023,8 +1037,9 @@ static void ppc_hash64_update_vrma(PowerPCCPU *cpu)
-         return;
-     }
-=20
--    /* Make one up. Mostly ignore the ESID which will not be
--     * needed for translation
++     * We only need to swap high and low halves. gen_qemu_st64_i64
++     * does necessary 64-bit byteswap already.
++     */
+     if (unlikely(ctx->le_mode)) {
+         get_fpr(t0, rD(ctx->opcode) + 1);
+         gen_qemu_st64_i64(ctx, t0, EA);
+@@ -1135,8 +1143,10 @@ static void gen_stfdpx(DisasContext *ctx)
+     EA =3D tcg_temp_new();
+     t0 =3D tcg_temp_new_i64();
+     gen_addr_reg_index(ctx, EA);
+-    /* We only need to swap high and low halves. gen_qemu_st64_i64 does
+-       necessary 64-bit byteswap already. */
 +    /*
-+     * Make one up. Mostly ignore the ESID which will not be needed
-+     * for translation
-      */
-     vsid =3D SLB_VSID_VRMA;
-     vrmasd =3D (lpcr & LPCR_VRMASD) >> LPCR_VRMASD_SHIFT;
-@@ -1080,11 +1095,12 @@ void ppc_store_lpcr(PowerPCCPU *cpu, target_ulong=
- val)
-         }
-         env->spr[SPR_RMOR] =3D ((lpcr >> 41) & 0xffffull) << 26;
-=20
--        /* XXX We could also write LPID from HID4 here
-+        /*
-+         * XXX We could also write LPID from HID4 here
-          * but since we don't tag any translation on it
-          * it doesn't actually matter
--         */
--        /* XXX For proper emulation of 970 we also need
-+         *
-+         * XXX For proper emulation of 970 we also need
-          * to dig HRMOR out of HID5
-          */
-         break;
++     * We only need to swap high and low halves. gen_qemu_st64_i64
++     * does necessary 64-bit byteswap already.
++     */
+     if (unlikely(ctx->le_mode)) {
+         get_fpr(t0, rD(ctx->opcode) + 1);
+         gen_qemu_st64_i64(ctx, t0, EA);
+@@ -1204,8 +1214,9 @@ static void gen_lfqu(DisasContext *ctx)
+     gen_addr_add(ctx, t1, t0, 8);
+     gen_qemu_ld64_i64(ctx, t2, t1);
+     set_fpr((rd + 1) % 32, t2);
+-    if (ra !=3D 0)
++    if (ra !=3D 0) {
+         tcg_gen_mov_tl(cpu_gpr[ra], t0);
++    }
+     tcg_temp_free(t0);
+     tcg_temp_free(t1);
+     tcg_temp_free_i64(t2);
+@@ -1229,8 +1240,9 @@ static void gen_lfqux(DisasContext *ctx)
+     gen_qemu_ld64_i64(ctx, t2, t1);
+     set_fpr((rd + 1) % 32, t2);
+     tcg_temp_free(t1);
+-    if (ra !=3D 0)
++    if (ra !=3D 0) {
+         tcg_gen_mov_tl(cpu_gpr[ra], t0);
++    }
+     tcg_temp_free(t0);
+     tcg_temp_free_i64(t2);
+ }
 --=20
 2.20.1
