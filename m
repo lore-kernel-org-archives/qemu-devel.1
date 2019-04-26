@@ -7,56 +7,57 @@ X-Spam-Status: No, score=-8.7 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 012BEC43219
-	for <qemu-devel@archiver.kernel.org>; Fri, 26 Apr 2019 06:35:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 32760C43218
+	for <qemu-devel@archiver.kernel.org>; Fri, 26 Apr 2019 06:36:07 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B3DA9206BA
-	for <qemu-devel@archiver.kernel.org>; Fri, 26 Apr 2019 06:35:23 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id DF8C0206BA
+	for <qemu-devel@archiver.kernel.org>; Fri, 26 Apr 2019 06:36:06 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="anoFuMpe"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B3DA9206BA
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="Xk9RVmRP"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DF8C0206BA
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gibson.dropbear.id.au
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:40346 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:40372 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hJuSA-0000Rr-Vr
-	for qemu-devel@archiver.kernel.org; Fri, 26 Apr 2019 02:35:23 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:60557)
+	id 1hJuSs-00016S-69
+	for qemu-devel@archiver.kernel.org; Fri, 26 Apr 2019 02:36:06 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:60474)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1hJu17-0006CB-K9
-	for qemu-devel@nongnu.org; Fri, 26 Apr 2019 02:07:27 -0400
+	(envelope-from <dgibson@ozlabs.org>) id 1hJu12-00065T-1s
+	for qemu-devel@nongnu.org; Fri, 26 Apr 2019 02:07:22 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1hJu15-0005HY-OD
-	for qemu-devel@nongnu.org; Fri, 26 Apr 2019 02:07:25 -0400
-Received: from ozlabs.org ([203.11.71.1]:38109)
+	(envelope-from <dgibson@ozlabs.org>) id 1hJu0y-00056S-4c
+	for qemu-devel@nongnu.org; Fri, 26 Apr 2019 02:07:19 -0400
+Received: from bilbo.ozlabs.org ([2401:3900:2:1::2]:44319 helo=ozlabs.org)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <dgibson@ozlabs.org>)
-	id 1hJu12-00057G-2H; Fri, 26 Apr 2019 02:07:21 -0400
+	id 1hJu0u-0004Tq-QU; Fri, 26 Apr 2019 02:07:14 -0400
 Received: by ozlabs.org (Postfix, from userid 1007)
-	id 44r3Tq5Lh6z9sP8; Fri, 26 Apr 2019 16:06:39 +1000 (AEST)
+	id 44r3Tn6zRyz9sNm; Fri, 26 Apr 2019 16:06:36 +1000 (AEST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-	d=gibson.dropbear.id.au; s=201602; t=1556258799;
-	bh=cd5Bs8tZ7TldERfRIdDDGoFRY3we0kFl+mxhdqOePgA=;
+	d=gibson.dropbear.id.au; s=201602; t=1556258797;
+	bh=8lYBXpN7Qe0ABRvCl8tg5gJLiygRDm5+zMmDAYCdOkY=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=anoFuMpe7RykRn1/bMvejsfZlnkwPodCG5M+mZQzczVqHqgmJSacmXSewip/wZfxC
-	HfbUmkW8yyp8bv37WsLIaa0dxM6oJoSKMFbv+2xsaQuDCfHyw3XzvIQYszAr0T701I
-	sMH3jdhJ6w6gvvMWxXLo9VAZSXknQpNSsjJcXYWA=
+	b=Xk9RVmRPh7K9PsIp8yYVoWddgdBJDDbW/v9HcmGjzPgbCFy/skpYZr+PY5H5ckOuL
+	iUlKJ3XLXW8sCCr0uwDK+I8mlcPehY+qF/4dnCFIYzbUvUPOeP0W1kC0Lf98tDI44n
+	orU9c21gmU8xlAJBR8bhimVOa44tWV3TyJVY+o3Q=
 From: David Gibson <david@gibson.dropbear.id.au>
 To: peter.maydell@linaro.org
-Date: Fri, 26 Apr 2019 16:06:25 +1000
-Message-Id: <20190426060627.18153-35-david@gibson.dropbear.id.au>
+Date: Fri, 26 Apr 2019 16:06:11 +1000
+Message-Id: <20190426060627.18153-21-david@gibson.dropbear.id.au>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20190426060627.18153-1-david@gibson.dropbear.id.au>
 References: <20190426060627.18153-1-david@gibson.dropbear.id.au>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 203.11.71.1
-Subject: [Qemu-devel] [PULL 34/36] ppc/hash64: Rework R and C bit updates
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+	recognized.
+X-Received-From: 2401:3900:2:1::2
+Subject: [Qemu-devel] [PULL 20/36] target/ppc: Style fixes for mmu_helper.c
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -68,320 +69,364 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: gkurz@kaod.org, qemu-devel@nongnu.org, qemu-ppc@nongnu.org, clg@kaod.org,
+Cc: gkurz@kaod.org, Greg Kurz <groug@kaod.org>, qemu-devel@nongnu.org,
+	qemu-ppc@nongnu.org, clg@kaod.org,
 	David Gibson <david@gibson.dropbear.id.au>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190426060625.e77PHz7MFJl8H8Whu7RjnwqCZBDX3HwyNP9lD-vJ13A@z>
+Message-ID: <20190426060611.-QQYcMXmQwjyvDXaoj7ySaBgkqNfIV-IMQkwylWC3Fs@z>
 
-From: Benjamin Herrenschmidt <benh@kernel.crashing.org>
-
-With MT-TCG, we are now running translation in a racy way, thus
-we need to mimic hardware when it comes to updating the R and
-C bits, by doing byte stores.
-
-The current "store_hpte" abstraction is ill suited for this, we
-replace it with two separate callbacks for setting R and C.
-
-Signed-off-by: Benjamin Herrenschmidt <benh@kernel.crashing.org>
-Signed-off-by: C=C3=A9dric Le Goater <clg@kaod.org>
-Message-Id: <20190411080004.8690-4-clg@kaod.org>
 Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
+Reviewed-by: C=C3=A9dric Le Goater <clg@kaod.org>
+Reviewed-by: Greg Kurz <groug@kaod.org>
 ---
- hw/ppc/spapr.c          | 41 +++++++++++++++++++---
- hw/ppc/spapr_hcall.c    | 13 +++----
- include/hw/ppc/spapr.h  |  2 ++
- target/ppc/cpu.h        |  4 +--
- target/ppc/mmu-hash64.c | 76 ++++++++++++++++++++++++-----------------
- target/ppc/mmu-hash64.h |  2 --
- 6 files changed, 93 insertions(+), 45 deletions(-)
+ target/ppc/mmu_helper.c | 137 ++++++++++++++++++++++++----------------
+ 1 file changed, 84 insertions(+), 53 deletions(-)
 
-diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
-index b81e237635..c56939a43b 100644
---- a/hw/ppc/spapr.c
-+++ b/hw/ppc/spapr.c
-@@ -1520,10 +1520,10 @@ static void spapr_unmap_hptes(PPCVirtualHyperviso=
-r *vhyp,
-     /* Nothing to do for qemu managed HPT */
+diff --git a/target/ppc/mmu_helper.c b/target/ppc/mmu_helper.c
+index ab72473eeb..d226b35739 100644
+--- a/target/ppc/mmu_helper.c
++++ b/target/ppc/mmu_helper.c
+@@ -33,11 +33,11 @@
+ #include "mmu-book3s-v3.h"
+ #include "mmu-radix64.h"
+=20
+-//#define DEBUG_MMU
+-//#define DEBUG_BATS
+-//#define DEBUG_SOFTWARE_TLB
+-//#define DUMP_PAGE_TABLES
+-//#define FLUSH_ALL_TLBS
++/* #define DEBUG_MMU */
++/* #define DEBUG_BATS */
++/* #define DEBUG_SOFTWARE_TLB */
++/* #define DUMP_PAGE_TABLES */
++/* #define FLUSH_ALL_TLBS */
+=20
+ #ifdef DEBUG_MMU
+ #  define LOG_MMU_STATE(cpu) log_cpu_state_mask(CPU_LOG_MMU, (cpu), 0)
+@@ -152,7 +152,8 @@ static int check_prot(int prot, int rw, int access_ty=
+pe)
  }
 =20
--static void spapr_store_hpte(PPCVirtualHypervisor *vhyp, hwaddr ptex,
--                             uint64_t pte0, uint64_t pte1)
-+void spapr_store_hpte(PowerPCCPU *cpu, hwaddr ptex,
-+                      uint64_t pte0, uint64_t pte1)
+ static inline int ppc6xx_tlb_pte_check(mmu_ctx_t *ctx, target_ulong pte0=
+,
+-                                       target_ulong pte1, int h, int rw,=
+ int type)
++                                       target_ulong pte1, int h,
++                                       int rw, int type)
  {
--    SpaprMachineState *spapr =3D SPAPR_MACHINE(vhyp);
-+    SpaprMachineState *spapr =3D SPAPR_MACHINE(cpu->vhyp);
-     hwaddr offset =3D ptex * HASH_PTE_SIZE_64;
-=20
-     if (!spapr->htab) {
-@@ -1551,6 +1551,38 @@ static void spapr_store_hpte(PPCVirtualHypervisor =
-*vhyp, hwaddr ptex,
-     }
- }
-=20
-+static void spapr_hpte_set_c(PPCVirtualHypervisor *vhyp, hwaddr ptex,
-+                             uint64_t pte1)
-+{
-+    hwaddr offset =3D ptex * HASH_PTE_SIZE_64 + 15;
-+    SpaprMachineState *spapr =3D SPAPR_MACHINE(vhyp);
-+
-+    if (!spapr->htab) {
-+        /* There should always be a hash table when this is called */
-+        error_report("spapr_hpte_set_c called with no hash table !");
-+        return;
-+    }
-+
-+    /* The HW performs a non-atomic byte update */
-+    stb_p(spapr->htab + offset, (pte1 & 0xff) | 0x80);
-+}
-+
-+static void spapr_hpte_set_r(PPCVirtualHypervisor *vhyp, hwaddr ptex,
-+                             uint64_t pte1)
-+{
-+    hwaddr offset =3D ptex * HASH_PTE_SIZE_64 + 14;
-+    SpaprMachineState *spapr =3D SPAPR_MACHINE(vhyp);
-+
-+    if (!spapr->htab) {
-+        /* There should always be a hash table when this is called */
-+        error_report("spapr_hpte_set_r called with no hash table !");
-+        return;
-+    }
-+
-+    /* The HW performs a non-atomic byte update */
-+    stb_p(spapr->htab + offset, ((pte1 >> 8) & 0xff) | 0x01);
-+}
-+
- int spapr_hpt_shift_for_ramsize(uint64_t ramsize)
- {
-     int shift;
-@@ -4291,7 +4323,8 @@ static void spapr_machine_class_init(ObjectClass *o=
-c, void *data)
-     vhc->hpt_mask =3D spapr_hpt_mask;
-     vhc->map_hptes =3D spapr_map_hptes;
-     vhc->unmap_hptes =3D spapr_unmap_hptes;
--    vhc->store_hpte =3D spapr_store_hpte;
-+    vhc->hpte_set_c =3D spapr_hpte_set_c;
-+    vhc->hpte_set_r =3D spapr_hpte_set_r;
-     vhc->get_pate =3D spapr_get_pate;
-     vhc->encode_hpt_for_kvm_pr =3D spapr_encode_hpt_for_kvm_pr;
-     xic->ics_get =3D spapr_ics_get;
-diff --git a/hw/ppc/spapr_hcall.c b/hw/ppc/spapr_hcall.c
-index 3534079777..6c16d2b120 100644
---- a/hw/ppc/spapr_hcall.c
-+++ b/hw/ppc/spapr_hcall.c
-@@ -118,7 +118,7 @@ static target_ulong h_enter(PowerPCCPU *cpu, SpaprMac=
-hineState *spapr,
-         ppc_hash64_unmap_hptes(cpu, hptes, ptex, 1);
-     }
-=20
--    ppc_hash64_store_hpte(cpu, ptex + slot, pteh | HPTE64_V_HPTE_DIRTY, =
-ptel);
-+    spapr_store_hpte(cpu, ptex + slot, pteh | HPTE64_V_HPTE_DIRTY, ptel)=
-;
-=20
-     args[0] =3D ptex + slot;
-     return H_SUCCESS;
-@@ -131,7 +131,8 @@ typedef enum {
-     REMOVE_HW =3D 3,
- } RemoveResult;
-=20
--static RemoveResult remove_hpte(PowerPCCPU *cpu, target_ulong ptex,
-+static RemoveResult remove_hpte(PowerPCCPU *cpu
-+                                , target_ulong ptex,
-                                 target_ulong avpn,
-                                 target_ulong flags,
-                                 target_ulong *vp, target_ulong *rp)
-@@ -155,7 +156,7 @@ static RemoveResult remove_hpte(PowerPCCPU *cpu, targ=
-et_ulong ptex,
-     }
-     *vp =3D v;
-     *rp =3D r;
--    ppc_hash64_store_hpte(cpu, ptex, HPTE64_V_HPTE_DIRTY, 0);
-+    spapr_store_hpte(cpu, ptex, HPTE64_V_HPTE_DIRTY, 0);
-     ppc_hash64_tlb_flush_hpte(cpu, ptex, v, r);
-     return REMOVE_SUCCESS;
- }
-@@ -289,13 +290,13 @@ static target_ulong h_protect(PowerPCCPU *cpu, Spap=
-rMachineState *spapr,
-     r |=3D (flags << 55) & HPTE64_R_PP0;
-     r |=3D (flags << 48) & HPTE64_R_KEY_HI;
-     r |=3D flags & (HPTE64_R_PP | HPTE64_R_N | HPTE64_R_KEY_LO);
--    ppc_hash64_store_hpte(cpu, ptex,
--                          (v & ~HPTE64_V_VALID) | HPTE64_V_HPTE_DIRTY, 0=
-);
-+    spapr_store_hpte(cpu, ptex,
-+                     (v & ~HPTE64_V_VALID) | HPTE64_V_HPTE_DIRTY, 0);
-     ppc_hash64_tlb_flush_hpte(cpu, ptex, v, r);
-     /* Flush the tlb */
-     check_tlb_flush(env, true);
-     /* Don't need a memory barrier, due to qemu's global lock */
--    ppc_hash64_store_hpte(cpu, ptex, v | HPTE64_V_HPTE_DIRTY, r);
-+    spapr_store_hpte(cpu, ptex, v | HPTE64_V_HPTE_DIRTY, r);
-     return H_SUCCESS;
- }
-=20
-diff --git a/include/hw/ppc/spapr.h b/include/hw/ppc/spapr.h
-index 9331f5e0b9..7e32f309c2 100644
---- a/include/hw/ppc/spapr.h
-+++ b/include/hw/ppc/spapr.h
-@@ -784,6 +784,8 @@ void spapr_reallocate_hpt(SpaprMachineState *spapr, i=
-nt shift,
-                           Error **errp);
- void spapr_clear_pending_events(SpaprMachineState *spapr);
- int spapr_max_server_number(SpaprMachineState *spapr);
-+void spapr_store_hpte(PowerPCCPU *cpu, hwaddr ptex,
-+                      uint64_t pte0, uint64_t pte1);
-=20
- /* DRC callbacks. */
- void spapr_core_release(DeviceState *dev);
-diff --git a/target/ppc/cpu.h b/target/ppc/cpu.h
-index 8a79db0c43..5e7cf54b2f 100644
---- a/target/ppc/cpu.h
-+++ b/target/ppc/cpu.h
-@@ -1265,8 +1265,8 @@ struct PPCVirtualHypervisorClass {
-     void (*unmap_hptes)(PPCVirtualHypervisor *vhyp,
-                         const ppc_hash_pte64_t *hptes,
-                         hwaddr ptex, int n);
--    void (*store_hpte)(PPCVirtualHypervisor *vhyp, hwaddr ptex,
--                       uint64_t pte0, uint64_t pte1);
-+    void (*hpte_set_c)(PPCVirtualHypervisor *vhyp, hwaddr ptex, uint64_t=
- pte1);
-+    void (*hpte_set_r)(PPCVirtualHypervisor *vhyp, hwaddr ptex, uint64_t=
- pte1);
-     void (*get_pate)(PPCVirtualHypervisor *vhyp, ppc_v3_pate_t *entry);
-     target_ulong (*encode_hpt_for_kvm_pr)(PPCVirtualHypervisor *vhyp);
- };
-diff --git a/target/ppc/mmu-hash64.c b/target/ppc/mmu-hash64.c
-index c74818b2e7..7899eb2918 100644
---- a/target/ppc/mmu-hash64.c
-+++ b/target/ppc/mmu-hash64.c
-@@ -725,6 +725,39 @@ static void ppc_hash64_set_dsi(CPUState *cs, uint64_=
-t dar, uint64_t dsisr)
- }
-=20
-=20
-+static void ppc_hash64_set_r(PowerPCCPU *cpu, hwaddr ptex, uint64_t pte1=
-)
-+{
-+    hwaddr base, offset =3D ptex * HASH_PTE_SIZE_64 + 16;
-+
-+    if (cpu->vhyp) {
-+        PPCVirtualHypervisorClass *vhc =3D
-+            PPC_VIRTUAL_HYPERVISOR_GET_CLASS(cpu->vhyp);
-+        vhc->hpte_set_r(cpu->vhyp, ptex, pte1);
-+        return;
-+    }
-+    base =3D ppc_hash64_hpt_base(cpu);
-+
-+
-+    /* The HW performs a non-atomic byte update */
-+    stb_phys(CPU(cpu)->as, base + offset, ((pte1 >> 8) & 0xff) | 0x01);
-+}
-+
-+static void ppc_hash64_set_c(PowerPCCPU *cpu, hwaddr ptex, uint64_t pte1=
-)
-+{
-+    hwaddr base, offset =3D ptex * HASH_PTE_SIZE_64 + 15;
-+
-+    if (cpu->vhyp) {
-+        PPCVirtualHypervisorClass *vhc =3D
-+            PPC_VIRTUAL_HYPERVISOR_GET_CLASS(cpu->vhyp);
-+        vhc->hpte_set_c(cpu->vhyp, ptex, pte1);
-+        return;
-+    }
-+    base =3D ppc_hash64_hpt_base(cpu);
-+
-+    /* The HW performs a non-atomic byte update */
-+    stb_phys(CPU(cpu)->as, base + offset, (pte1 & 0xff) | 0x80);
-+}
-+
- int ppc_hash64_handle_mmu_fault(PowerPCCPU *cpu, vaddr eaddr,
-                                 int rwx, int mmu_idx)
- {
-@@ -735,7 +768,6 @@ int ppc_hash64_handle_mmu_fault(PowerPCCPU *cpu, vadd=
-r eaddr,
-     hwaddr ptex;
-     ppc_hash_pte64_t pte;
-     int exec_prot, pp_prot, amr_prot, prot;
--    uint64_t new_pte1;
-     const int need_prot[] =3D {PAGE_READ, PAGE_WRITE, PAGE_EXEC};
-     hwaddr raddr;
-=20
-@@ -883,19 +915,19 @@ skip_slb_search:
-=20
-     /* 6. Update PTE referenced and changed bits if necessary */
-=20
--    new_pte1 =3D pte.pte1 | HPTE64_R_R; /* set referenced bit */
--    if (rwx =3D=3D 1) {
--        new_pte1 |=3D HPTE64_R_C; /* set changed (dirty) bit */
--    } else {
--        /*
--         * Treat the page as read-only for now, so that a later write
--         * will pass through this function again to set the C bit
--         */
--        prot &=3D ~PAGE_WRITE;
-+    if (!(pte.pte1 & HPTE64_R_R)) {
-+        ppc_hash64_set_r(cpu, ptex, pte.pte1);
-     }
--
--    if (new_pte1 !=3D pte.pte1) {
--        ppc_hash64_store_hpte(cpu, ptex, pte.pte0, new_pte1);
-+    if (!(pte.pte1 & HPTE64_R_C)) {
-+        if (rwx =3D=3D 1) {
-+            ppc_hash64_set_c(cpu, ptex, pte.pte1);
-+        } else {
+     target_ulong ptem, mmask;
+     int access, ret, pteh, ptev, pp;
+@@ -332,7 +333,8 @@ static inline int ppc6xx_tlb_check(CPUPPCState *env, =
+mmu_ctx_t *ctx,
+                   pte_is_valid(tlb->pte0) ? "valid" : "inval",
+                   tlb->EPN, eaddr, tlb->pte1,
+                   rw ? 'S' : 'L', access_type =3D=3D ACCESS_CODE ? 'I' :=
+ 'D');
+-        switch (ppc6xx_tlb_pte_check(ctx, tlb->pte0, tlb->pte1, 0, rw, a=
+ccess_type)) {
++        switch (ppc6xx_tlb_pte_check(ctx, tlb->pte0, tlb->pte1,
++                                     0, rw, access_type)) {
+         case -3:
+             /* TLB inconsistency */
+             return -1;
+@@ -347,9 +349,11 @@ static inline int ppc6xx_tlb_check(CPUPPCState *env,=
+ mmu_ctx_t *ctx,
+             break;
+         case 0:
+             /* access granted */
+-            /* XXX: we should go on looping to check all TLBs consistenc=
+y
+-             *      but we can speed-up the whole thing as the
+-             *      result would be undefined if TLBs are not consistent=
+.
 +            /*
-+             * Treat the page as read-only for now, so that a later writ=
-e
-+             * will pass through this function again to set the C bit
-+             */
-+            prot &=3D ~PAGE_WRITE;
-+        }
-     }
++             * XXX: we should go on looping to check all TLBs
++             *      consistency but we can speed-up the whole thing as
++             *      the result would be undefined if TLBs are not
++             *      consistent.
+              */
+             ret =3D 0;
+             best =3D nr;
+@@ -550,14 +554,18 @@ static inline int get_segment_6xx_tlb(CPUPPCState *=
+env, mmu_ctx_t *ctx,
+         qemu_log_mask(CPU_LOG_MMU, "direct store...\n");
+         /* Direct-store segment : absolutely *BUGGY* for now */
 =20
-     /* 7. Determine the real address from the PTE */
-@@ -954,24 +986,6 @@ hwaddr ppc_hash64_get_phys_page_debug(PowerPCCPU *cp=
-u, target_ulong addr)
-         & TARGET_PAGE_MASK;
+-        /* Direct-store implies a 32-bit MMU.
++        /*
++         * Direct-store implies a 32-bit MMU.
+          * Check the Segment Register's bus unit ID (BUID).
+          */
+         sr =3D env->sr[eaddr >> 28];
+         if ((sr & 0x1FF00000) >> 20 =3D=3D 0x07f) {
+-            /* Memory-forced I/O controller interface access */
+-            /* If T=3D1 and BUID=3Dx'07F', the 601 performs a memory acc=
+ess
+-             * to SR[28-31] LA[4-31], bypassing all protection mechanism=
+s.
++            /*
++             * Memory-forced I/O controller interface access
++             *
++             * If T=3D1 and BUID=3Dx'07F', the 601 performs a memory
++             * access to SR[28-31] LA[4-31], bypassing all protection
++             * mechanisms.
+              */
+             ctx->raddr =3D ((sr & 0xF) << 28) | (eaddr & 0x0FFFFFFF);
+             ctx->prot =3D PAGE_READ | PAGE_WRITE | PAGE_EXEC;
+@@ -578,9 +586,11 @@ static inline int get_segment_6xx_tlb(CPUPPCState *e=
+nv, mmu_ctx_t *ctx,
+             /* lwarx, ldarx or srwcx. */
+             return -4;
+         case ACCESS_CACHE:
+-            /* dcba, dcbt, dcbtst, dcbf, dcbi, dcbst, dcbz, or icbi */
+-            /* Should make the instruction do no-op.
+-             * As it already do no-op, it's quite easy :-)
++            /*
++             * dcba, dcbt, dcbtst, dcbf, dcbi, dcbst, dcbz, or icbi
++             *
++             * Should make the instruction do no-op.  As it already do
++             * no-op, it's quite easy :-)
+              */
+             ctx->raddr =3D eaddr;
+             return 0;
+@@ -942,12 +952,14 @@ static uint32_t mmubooke206_esr(int mmu_idx, bool r=
+w)
+     return esr;
  }
 =20
--void ppc_hash64_store_hpte(PowerPCCPU *cpu, hwaddr ptex,
--                           uint64_t pte0, uint64_t pte1)
--{
--    hwaddr base;
--    hwaddr offset =3D ptex * HASH_PTE_SIZE_64;
+-/* Get EPID register given the mmu_idx. If this is regular load,
+- * construct the EPID access bits from current processor state  */
 -
--    if (cpu->vhyp) {
--        PPCVirtualHypervisorClass *vhc =3D
--            PPC_VIRTUAL_HYPERVISOR_GET_CLASS(cpu->vhyp);
--        vhc->store_hpte(cpu->vhyp, ptex, pte0, pte1);
--        return;
--    }
--    base =3D ppc_hash64_hpt_base(cpu);
--
--    stq_phys(CPU(cpu)->as, base + offset, pte0);
--    stq_phys(CPU(cpu)->as, base + offset + HASH_PTE_SIZE_64 / 2, pte1);
--}
--
- void ppc_hash64_tlb_flush_hpte(PowerPCCPU *cpu, target_ulong ptex,
-                                target_ulong pte0, target_ulong pte1)
- {
-diff --git a/target/ppc/mmu-hash64.h b/target/ppc/mmu-hash64.h
-index 5be7ad86db..87729d48b3 100644
---- a/target/ppc/mmu-hash64.h
-+++ b/target/ppc/mmu-hash64.h
-@@ -10,8 +10,6 @@ int ppc_store_slb(PowerPCCPU *cpu, target_ulong slot,
- hwaddr ppc_hash64_get_phys_page_debug(PowerPCCPU *cpu, target_ulong addr=
+-/* Get the effective AS and PR bits and the PID. The PID is returned onl=
+y if
+- * EPID load is requested, otherwise the caller must detect the correct =
+EPID.
+- * Return true if valid EPID is returned. */
++/*
++ * Get EPID register given the mmu_idx. If this is regular load,
++ * construct the EPID access bits from current processor state
++ *
++ * Get the effective AS and PR bits and the PID. The PID is returned
++ * only if EPID load is requested, otherwise the caller must detect
++ * the correct EPID.  Return true if valid EPID is returned.
++ */
+ static bool mmubooke206_get_as(CPUPPCState *env,
+                                int mmu_idx, uint32_t *epid_out,
+                                bool *as_out, bool *pr_out)
+@@ -1369,8 +1381,9 @@ static inline int check_physical(CPUPPCState *env, =
+mmu_ctx_t *ctx,
+=20
+     case POWERPC_MMU_SOFT_4xx_Z:
+         if (unlikely(msr_pe !=3D 0)) {
+-            /* 403 family add some particular protections,
+-             * using PBL/PBU registers for accesses with no translation.
++            /*
++             * 403 family add some particular protections, using
++             * PBL/PBU registers for accesses with no translation.
+              */
+             in_plb =3D
+                 /* Check PLB validity */
+@@ -1453,7 +1466,8 @@ static int get_physical_address_wtlb(
+         if (real_mode) {
+             ret =3D check_physical(env, ctx, eaddr, rw);
+         } else {
+-            cpu_abort(CPU(cpu), "PowerPC in real mode do not do any tran=
+slation\n");
++            cpu_abort(CPU(cpu),
++                      "PowerPC in real mode do not do any translation\n"=
 );
- int ppc_hash64_handle_mmu_fault(PowerPCCPU *cpu, vaddr address, int rw,
-                                 int mmu_idx);
--void ppc_hash64_store_hpte(PowerPCCPU *cpu, hwaddr ptex,
--                           uint64_t pte0, uint64_t pte1);
- void ppc_hash64_tlb_flush_hpte(PowerPCCPU *cpu,
-                                target_ulong pte_index,
-                                target_ulong pte0, target_ulong pte1);
+         }
+         return -1;
+     default:
+@@ -1498,9 +1512,10 @@ hwaddr ppc_cpu_get_phys_page_debug(CPUState *cs, v=
+addr addr)
+=20
+     if (unlikely(get_physical_address(env, &ctx, addr, 0, ACCESS_INT) !=3D=
+ 0)) {
+=20
+-        /* Some MMUs have separate TLBs for code and data. If we only tr=
+y an
+-         * ACCESS_INT, we may not be able to read instructions mapped by=
+ code
+-         * TLBs, so we also try a ACCESS_CODE.
++        /*
++         * Some MMUs have separate TLBs for code and data. If we only
++         * try an ACCESS_INT, we may not be able to read instructions
++         * mapped by code TLBs, so we also try a ACCESS_CODE.
+          */
+         if (unlikely(get_physical_address(env, &ctx, addr, 0,
+                                           ACCESS_CODE) !=3D 0)) {
+@@ -1834,8 +1849,9 @@ void helper_store_ibatu(CPUPPCState *env, uint32_t =
+nr, target_ulong value)
+ #if !defined(FLUSH_ALL_TLBS)
+         do_invalidate_BAT(env, env->IBAT[0][nr], mask);
+ #endif
+-        /* When storing valid upper BAT, mask BEPI and BRPN
+-         * and invalidate all TLBs covered by this BAT
++        /*
++         * When storing valid upper BAT, mask BEPI and BRPN and
++         * invalidate all TLBs covered by this BAT
+          */
+         mask =3D (value << 15) & 0x0FFE0000UL;
+         env->IBAT[0][nr] =3D (value & 0x00001FFFUL) |
+@@ -1865,8 +1881,9 @@ void helper_store_dbatu(CPUPPCState *env, uint32_t =
+nr, target_ulong value)
+=20
+     dump_store_bat(env, 'D', 0, nr, value);
+     if (env->DBAT[0][nr] !=3D value) {
+-        /* When storing valid upper BAT, mask BEPI and BRPN
+-         * and invalidate all TLBs covered by this BAT
++        /*
++         * When storing valid upper BAT, mask BEPI and BRPN and
++         * invalidate all TLBs covered by this BAT
+          */
+         mask =3D (value << 15) & 0x0FFE0000UL;
+ #if !defined(FLUSH_ALL_TLBS)
+@@ -1913,8 +1930,9 @@ void helper_store_601_batu(CPUPPCState *env, uint32=
+_t nr, target_ulong value)
+             do_inval =3D 1;
+ #endif
+         }
+-        /* When storing valid upper BAT, mask BEPI and BRPN
+-         * and invalidate all TLBs covered by this BAT
++        /*
++         * When storing valid upper BAT, mask BEPI and BRPN and
++         * invalidate all TLBs covered by this BAT
+          */
+         env->IBAT[0][nr] =3D (value & 0x00001FFFUL) |
+             (value & ~0x0001FFFFUL & ~mask);
+@@ -2027,7 +2045,8 @@ void ppc_tlb_invalidate_one(CPUPPCState *env, targe=
+t_ulong addr)
+ #if defined(TARGET_PPC64)
+     if (env->mmu_model & POWERPC_MMU_64) {
+         /* tlbie invalidate TLBs for all segments */
+-        /* XXX: given the fact that there are too many segments to inval=
+idate,
++        /*
++         * XXX: given the fact that there are too many segments to inval=
+idate,
+          *      and we still don't have a tlb_flush_mask(env, n, mask) i=
+n QEMU,
+          *      we just invalidate all TLBs
+          */
+@@ -2044,10 +2063,11 @@ void ppc_tlb_invalidate_one(CPUPPCState *env, tar=
+get_ulong addr)
+         break;
+     case POWERPC_MMU_32B:
+     case POWERPC_MMU_601:
+-        /* Actual CPUs invalidate entire congruence classes based on the
+-         * geometry of their TLBs and some OSes take that into account,
+-         * we just mark the TLB to be flushed later (context synchronizi=
+ng
+-         * event or sync instruction on 32-bit).
++        /*
++         * Actual CPUs invalidate entire congruence classes based on
++         * the geometry of their TLBs and some OSes take that into
++         * account, we just mark the TLB to be flushed later (context
++         * synchronizing event or sync instruction on 32-bit).
+          */
+         env->tlb_need_flush |=3D TLB_NEED_LOCAL_FLUSH;
+         break;
+@@ -2152,8 +2172,10 @@ void helper_store_sr(CPUPPCState *env, target_ulon=
+g srnum, target_ulong value)
+ #endif
+     if (env->sr[srnum] !=3D value) {
+         env->sr[srnum] =3D value;
+-/* Invalidating 256MB of virtual memory in 4kB pages is way longer than
+-   flusing the whole TLB. */
++        /*
++         * Invalidating 256MB of virtual memory in 4kB pages is way
++         * longer than flusing the whole TLB.
++         */
+ #if !defined(FLUSH_ALL_TLBS) && 0
+         {
+             target_ulong page, end;
+@@ -2264,10 +2286,12 @@ target_ulong helper_rac(CPUPPCState *env, target_=
+ulong addr)
+     int nb_BATs;
+     target_ulong ret =3D 0;
+=20
+-    /* We don't have to generate many instances of this instruction,
++    /*
++     * We don't have to generate many instances of this instruction,
+      * as rac is supervisor only.
++     *
++     * XXX: FIX THIS: Pretend we have no BAT
+      */
+-    /* XXX: FIX THIS: Pretend we have no BAT */
+     nb_BATs =3D env->nb_BATs;
+     env->nb_BATs =3D 0;
+     if (get_physical_address(env, &ctx, addr, 0, ACCESS_INT) =3D=3D 0) {
+@@ -2422,7 +2446,8 @@ void helper_4xx_tlbwe_hi(CPUPPCState *env, target_u=
+long entry,
+     }
+     tlb->size =3D booke_tlb_to_page_size((val >> PPC4XX_TLBHI_SIZE_SHIFT=
+)
+                                        & PPC4XX_TLBHI_SIZE_MASK);
+-    /* We cannot handle TLB size < TARGET_PAGE_SIZE.
++    /*
++     * We cannot handle TLB size < TARGET_PAGE_SIZE.
+      * If this ever occurs, we should implement TARGET_PAGE_BITS_VARY
+      */
+     if ((val & PPC4XX_TLBHI_V) && tlb->size < TARGET_PAGE_SIZE) {
+@@ -2742,7 +2767,8 @@ void helper_booke206_tlbwe(CPUPPCState *env)
+     }
+=20
+     if (tlb->mas1 & MAS1_VALID) {
+-        /* Invalidate the page in QEMU TLB if it was a valid entry.
++        /*
++         * Invalidate the page in QEMU TLB if it was a valid entry.
+          *
+          * In "PowerPC e500 Core Family Reference Manual, Rev. 1",
+          * Section "12.4.2 TLB Write Entry (tlbwe) Instruction":
+@@ -2751,7 +2777,8 @@ void helper_booke206_tlbwe(CPUPPCState *env)
+          * "Note that when an L2 TLB entry is written, it may be displac=
+ing an
+          * already valid entry in the same L2 TLB location (a victim). I=
+f a
+          * valid L1 TLB entry corresponds to the L2 MMU victim entry, th=
+at L1
+-         * TLB entry is automatically invalidated." */
++         * TLB entry is automatically invalidated."
++         */
+         flush_page(env, tlb);
+     }
+=20
+@@ -2777,8 +2804,9 @@ void helper_booke206_tlbwe(CPUPPCState *env)
+     mask |=3D MAS2_ACM | MAS2_VLE | MAS2_W | MAS2_I | MAS2_M | MAS2_G | =
+MAS2_E;
+=20
+     if (!msr_cm) {
+-        /* Executing a tlbwe instruction in 32-bit mode will set
+-         * bits 0:31 of the TLB EPN field to zero.
++        /*
++         * Executing a tlbwe instruction in 32-bit mode will set bits
++         * 0:31 of the TLB EPN field to zero.
+          */
+         mask &=3D 0xffffffff;
+     }
+@@ -3022,10 +3050,13 @@ void helper_check_tlb_flush_global(CPUPPCState *e=
+nv)
+=20
+ /***********************************************************************=
+******/
+=20
+-/* try to fill the TLB and return an exception if error. If retaddr is
+-   NULL, it means that the function was called in C code (i.e. not
+-   from generated code or from helper.c) */
+-/* XXX: fix it to restore all registers */
++/*
++ * try to fill the TLB and return an exception if error. If retaddr is
++ * NULL, it means that the function was called in C code (i.e. not
++ * from generated code or from helper.c)
++ *
++ * XXX: fix it to restore all registers
++ */
+ void tlb_fill(CPUState *cs, target_ulong addr, int size,
+               MMUAccessType access_type, int mmu_idx, uintptr_t retaddr)
+ {
 --=20
 2.20.1
 
