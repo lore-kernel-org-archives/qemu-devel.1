@@ -1,23 +1,28 @@
-Received: from eggs.gnu.org ([209.51.188.92]:33111)
+Received: from eggs.gnu.org ([209.51.188.92]:33412)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richardw.yang@linux.intel.com>) id 1hJosQ-0000hz-MB
-	for qemu-devel@nongnu.org; Thu, 25 Apr 2019 20:38:07 -0400
+	(envelope-from <richardw.yang@linux.intel.com>) id 1hJotu-0001qT-OE
+	for qemu-devel@nongnu.org; Thu, 25 Apr 2019 20:39:39 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richardw.yang@linux.intel.com>) id 1hJosP-0007i0-IN
-	for qemu-devel@nongnu.org; Thu, 25 Apr 2019 20:38:06 -0400
-Received: from mga02.intel.com ([134.134.136.20]:16691)
+	(envelope-from <richardw.yang@linux.intel.com>) id 1hJots-0000yc-2g
+	for qemu-devel@nongnu.org; Thu, 25 Apr 2019 20:39:38 -0400
+Received: from mga04.intel.com ([192.55.52.120]:1806)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <richardw.yang@linux.intel.com>)
-	id 1hJosP-0007fU-AS
-	for qemu-devel@nongnu.org; Thu, 25 Apr 2019 20:38:05 -0400
+	id 1hJotn-0000oX-JU
+	for qemu-devel@nongnu.org; Thu, 25 Apr 2019 20:39:33 -0400
+Date: Fri, 26 Apr 2019 08:39:01 +0800
 From: Wei Yang <richardw.yang@linux.intel.com>
-Date: Fri, 26 Apr 2019 08:36:52 +0800
-Message-Id: <20190426003652.32633-3-richardw.yang@linux.intel.com>
-In-Reply-To: <20190426003652.32633-1-richardw.yang@linux.intel.com>
-References: <20190426003652.32633-1-richardw.yang@linux.intel.com>
+Message-ID: <20190426003901.GA25513@richard>
+Reply-To: Wei Yang <richardw.yang@linux.intel.com>
+References: <20190424004700.12766-1-richardw.yang@linux.intel.com>
+	<20190424004700.12766-2-richardw.yang@linux.intel.com>
+	<e9cd3438-345f-2a68-daec-1ce4cba37ef1@gmail.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH v15 2/2] docs: Added MAP_SYNC documentation
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <e9cd3438-345f-2a68-daec-1ce4cba37ef1@gmail.com>
+Subject: Re: [Qemu-devel] [PATCH 1/4] migration/savevm: remove duplicate
+ check of migration_is_blocked
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,69 +31,61 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: xiaoguangrong.eric@gmail.com, stefanha@redhat.com, pbonzini@redhat.com, pagupta@redhat.com, yu.c.zhang@linux.intel.com, richardw.yang@linux.intel.com, mst@redhat.com, ehabkost@redhat.com, imammedo@redhat.com, dan.j.williams@intel.com, yi.z.zhang@linux.intel.com
+To: Daniel Henrique Barboza <danielhb413@gmail.com>
+Cc: Wei Yang <richardw.yang@linux.intel.com>, qemu-devel@nongnu.org, dgilbert@redhat.com, quintela@redhat.com
 
-From: Zhang Yi <yi.z.zhang@linux.intel.com>
+On Thu, Apr 25, 2019 at 04:20:57PM -0300, Daniel Henrique Barboza wrote:
+>
+>
+>On 4/23/19 9:46 PM, Wei Yang wrote:
+>> Current call flow of save_snapshot is:
+>> 
+>>    save_snapshot
+>>      migration_is_blocked
+>>        qemu_savevm_state
+>>          migration_is_blocked
+>> 
+>> Since qemu_savevm_state is only called in save_snapshot, this means
+>> migration_is_blocked has been already checked.
+>
+>I think it would be a nice touch to add a comment in qemu_savevm_state,
+>saying that the function must be called with migration_is_blocked()
+>context. Just in case someone else in the future ends up re-using the
+>function.
+>
 
-Signed-off-by: Zhang Yi <yi.z.zhang@linux.intel.com>
-Signed-off-by: Wei Yang <richardw.yang@linux.intel.com>
-Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
-Reviewed-by: Pankaj Gupta <pagupta@redhat.com>
-Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
----
- docs/nvdimm.txt | 22 +++++++++++++++++++---
- qemu-options.hx |  5 +++++
- 2 files changed, 24 insertions(+), 3 deletions(-)
+That's reasonable, let me add a comment for qemu_savevm_state().
 
-diff --git a/docs/nvdimm.txt b/docs/nvdimm.txt
-index 7231c2d78f..b531cacd35 100644
---- a/docs/nvdimm.txt
-+++ b/docs/nvdimm.txt
-@@ -144,9 +144,25 @@ Guest Data Persistence
- ----------------------
- 
- Though QEMU supports multiple types of vNVDIMM backends on Linux,
--currently the only one that can guarantee the guest write persistence
--is the device DAX on the real NVDIMM device (e.g., /dev/dax0.0), to
--which all guest access do not involve any host-side kernel cache.
-+the only backend that can guarantee the guest write persistence is:
-+
-+A. DAX device (e.g., /dev/dax0.0, ) or
-+B. DAX file(mounted with dax option)
-+
-+When using B (A file supporting direct mapping of persistent memory)
-+as a backend, write persistence is guaranteed if the host kernel has
-+support for the MAP_SYNC flag in the mmap system call (available
-+since Linux 4.15 and on certain distro kernels) and additionally
-+both 'pmem' and 'share' flags are set to 'on' on the backend.
-+
-+If these conditions are not satisfied i.e. if either 'pmem' or 'share'
-+are not set, if the backend file does not support DAX or if MAP_SYNC
-+is not supported by the host kernel, write persistence is not
-+guaranteed after a system crash. For compatibility reasons, these
-+conditions are ignored if not satisfied. Currently, no way is
-+provided to test for them.
-+For more details, please reference mmap(2) man page:
-+http://man7.org/linux/man-pages/man2/mmap.2.html.
- 
- When using other types of backends, it's suggested to set 'unarmed'
- option of '-device nvdimm' to 'on', which sets the unarmed flag of the
-diff --git a/qemu-options.hx b/qemu-options.hx
-index 08749a3391..bdc74c0620 100644
---- a/qemu-options.hx
-+++ b/qemu-options.hx
-@@ -4233,6 +4233,11 @@ using the SNIA NVM programming model (e.g. Intel NVDIMM).
- If @option{pmem} is set to 'on', QEMU will take necessary operations to
- guarantee the persistence of its own writes to @option{mem-path}
- (e.g. in vNVDIMM label emulation and live migration).
-+Also, we will map the backend-file with MAP_SYNC flag, which ensures the
-+file metadata is in sync for @option{mem-path} in case of host crash
-+or a power failure. MAP_SYNC requires support from both the host kernel
-+(since Linux kernel 4.15) and the filesystem of @option{mem-path} mounted
-+with DAX option.
- 
- @item -object memory-backend-ram,id=@var{id},merge=@var{on|off},dump=@var{on|off},share=@var{on|off},prealloc=@var{on|off},size=@var{size},host-nodes=@var{host-nodes},policy=@var{default|preferred|bind|interleave}
- 
+>
+>Other than that, +1 for less code duplication.
+>
+>
+>Reviewed-by: Daniel Henrique Barboza <danielhb413@gmail.com>
+>
+>
+>
+>
+>> 
+>> Signed-off-by: Wei Yang <richardw.yang@linux.intel.com>
+>> ---
+>>   migration/savevm.c | 4 ----
+>>   1 file changed, 4 deletions(-)
+>> 
+>> diff --git a/migration/savevm.c b/migration/savevm.c
+>> index 92af2471cd..2eea604624 100644
+>> --- a/migration/savevm.c
+>> +++ b/migration/savevm.c
+>> @@ -1412,10 +1412,6 @@ static int qemu_savevm_state(QEMUFile *f, Error **errp)
+>>           return -EINVAL;
+>>       }
+>> -    if (migration_is_blocked(errp)) {
+>> -        return -EINVAL;
+>> -    }
+>> -
+>>       if (migrate_use_block()) {
+>>           error_setg(errp, "Block migration and snapshots are incompatible");
+>>           return -EINVAL;
+
 -- 
-2.19.1
+Wei Yang
+Help you, Help me
