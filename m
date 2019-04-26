@@ -1,31 +1,18 @@
-Received: from eggs.gnu.org ([209.51.188.92]:42247)
+Received: from eggs.gnu.org ([209.51.188.92]:42413)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1hJztM-0006bu-SD
-	for qemu-devel@nongnu.org; Fri, 26 Apr 2019 08:23:49 -0400
+	(envelope-from <antonkuchin@yandex-team.ru>) id 1hJztx-00074U-Fu
+	for qemu-devel@nongnu.org; Fri, 26 Apr 2019 08:24:26 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1hJztL-00061V-Lm
-	for qemu-devel@nongnu.org; Fri, 26 Apr 2019 08:23:48 -0400
-Received: from mail-wr1-f68.google.com ([209.85.221.68]:43672)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1hJztL-00060L-Fz
-	for qemu-devel@nongnu.org; Fri, 26 Apr 2019 08:23:47 -0400
-Received: by mail-wr1-f68.google.com with SMTP id a12so4151873wrq.10
-	for <qemu-devel@nongnu.org>; Fri, 26 Apr 2019 05:23:47 -0700 (PDT)
-References: <20190419075625.24251-1-thuth@redhat.com>
-	<c0ce7a39-9e9f-a7be-c73b-a9c2c05da3af@redhat.com>
-	<e0e3128d-371c-7812-d99f-77af15ef278b@redhat.com>
-	<84638796-204e-3f43-3fe1-f5329e9cd466@redhat.com>
-	<201457a3-d297-16ce-e375-f6ede5679492@redhat.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Message-ID: <58fd604a-7c72-a0f5-14fe-777146ed3d80@redhat.com>
-Date: Fri, 26 Apr 2019 14:23:44 +0200
+	(envelope-from <antonkuchin@yandex-team.ru>) id 1hJztv-0006QT-GL
+	for qemu-devel@nongnu.org; Fri, 26 Apr 2019 08:24:25 -0400
+From: Anton Kuchin <antonkuchin@yandex-team.ru>
+Message-ID: <57c36dca-c4d6-9b70-7799-0be96325d7c5@yandex-team.ru>
+Date: Fri, 26 Apr 2019 15:24:15 +0300
 MIME-Version: 1.0
-In-Reply-To: <201457a3-d297-16ce-e375-f6ede5679492@redhat.com>
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
 Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH v2 for-4.1 0/2] Fix ohci_die() and move PCI
- code to separate file
+Subject: [Qemu-devel] aio context ownership during bdrv_close()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,46 +21,24 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org, Gerd Hoffmann <kraxel@redhat.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>
+To: qemu-block@nongnu.org
+Cc: qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>, Kevin Wolf <kwolf@redhat.com>, =?UTF-8?B?eWMtY29yZSAo0YDQsNGB0YHRi9C70Lo=?= =?UTF-8?B?0LAp?= <yc-core@yandex-team.ru>
 
-On 4/26/19 2:20 PM, Thomas Huth wrote:
-> On 26/04/2019 14.14, Philippe Mathieu-Daudé wrote:
->> On 4/26/19 7:42 AM, Thomas Huth wrote:
->>> On 26/04/2019 00.55, Philippe Mathieu-Daudé wrote:
->>>> Hi Thomas,
->>>>
->>>> On 4/19/19 9:56 AM, Thomas Huth wrote:
->>>>> First patch fixes a problem with ohci_die(), second patch moves PCI code into
->>>>> a separate file, so that the sysbus OHCI device can also be used without
->>>>> the dependency on the PCI code.
->>>>>
->>>>> v2: Split the patch into two patches, one for the ohci_die() fix and one
->>>>>     for the PCI code movement.
->>>>
->>>> Way cleaner. I wonder why you don't use a typedef for the void
->>>> (*ohci_die_fn)(struct OHCIState *) prototype.
->>>
->>> It does not work in that case:
->>>
->>> typedef struct OHCIState {            // <-- struct OHCIState definition
->>>     [...]
->>>     uint32_t async_td;
->>>     bool async_complete;
->>>
->>>     void (*ohci_die)(struct OHCIState *ohci); // <-- ohci_die definition
->>> } OHCIState;                         // <-- typedef OHCIState definition
->>>
->>> The typedef is defined after the ohci_die entry.
->>
->> I was thinking of forward declaration:
->>
->> typedef struct OHCIState OHCIState;
->>
->> typedef void (ohci_die_fn)(OHCIState *ohci);
-> 
-> Could work, too, but I don't like typedeferities... so unless Gerd
-> forces me to use that here, I'd prefer to keep the patch in its current
-> shape.
+I can't figure out ownership of aio context during bdrv_close().
 
-Fine with me ;)
+As far as I understand bdrv_unref() shold be called with acquired aio 
+context to prevent concurrent operations (at least most usages in 
+blockdev.c explicitly acquire and release context, but not all).
+
+But if refcount reaches zero and bs is going to be deleted in 
+bdrv_close() we need to ensure that drain is finished data is flushed 
+and there are no more pending coroutines and bottomhalves, so drain and 
+flush functions can enter coroutine and perform yield in several places. 
+As a result control returns to coroutine caller that will release aio 
+context and when completion bh will continue cleanup process it will be 
+executed without ownership of context. Is this a valid situation?
+
+Moreover if yield happens bs that is being deleted has zero refcount but 
+is still present in lists graph_bdrv_states and all_bdrv_states and can 
+be accidentally accessed. Shouldn't we remove it from these lists ASAP 
+when deletion process starts as we do from monitor_bdrv_states?
