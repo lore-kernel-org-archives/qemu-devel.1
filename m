@@ -1,20 +1,26 @@
-Received: from eggs.gnu.org ([209.51.188.92]:49385)
+Received: from eggs.gnu.org ([209.51.188.92]:51273)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pagupta@redhat.com>) id 1hJt0y-00085M-Tp
-	for qemu-devel@nongnu.org; Fri, 26 Apr 2019 01:03:13 -0400
+	(envelope-from <jcmvbkbc@gmail.com>) id 1hJt8f-0005Qq-MC
+	for qemu-devel@nongnu.org; Fri, 26 Apr 2019 01:11:10 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pagupta@redhat.com>) id 1hJt0x-00061S-VU
-	for qemu-devel@nongnu.org; Fri, 26 Apr 2019 01:03:12 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:45434)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pagupta@redhat.com>) id 1hJt0x-0005zJ-Px
-	for qemu-devel@nongnu.org; Fri, 26 Apr 2019 01:03:11 -0400
-From: Pankaj Gupta <pagupta@redhat.com>
-Date: Fri, 26 Apr 2019 10:30:39 +0530
-Message-Id: <20190426050039.17460-7-pagupta@redhat.com>
-In-Reply-To: <20190426050039.17460-1-pagupta@redhat.com>
-References: <20190426050039.17460-1-pagupta@redhat.com>
-Subject: [Qemu-devel] [PATCH v7 6/6] xfs: disable map_sync for async flush
+	(envelope-from <jcmvbkbc@gmail.com>) id 1hJt8e-0001iW-4E
+	for qemu-devel@nongnu.org; Fri, 26 Apr 2019 01:11:09 -0400
+Received: from mail-yb1-xb43.google.com ([2607:f8b0:4864:20::b43]:46451)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <jcmvbkbc@gmail.com>) id 1hJt8d-0001bm-T8
+	for qemu-devel@nongnu.org; Fri, 26 Apr 2019 01:11:08 -0400
+Received: by mail-yb1-xb43.google.com with SMTP id m5so825358ybk.13
+	for <qemu-devel@nongnu.org>; Thu, 25 Apr 2019 22:11:07 -0700 (PDT)
+MIME-Version: 1.0
+References: <1556110623-655-1-git-send-email-aleksandar.markovic@rt-rk.com>
+	<1556110623-655-2-git-send-email-aleksandar.markovic@rt-rk.com>
+In-Reply-To: <1556110623-655-2-git-send-email-aleksandar.markovic@rt-rk.com>
+From: Max Filippov <jcmvbkbc@gmail.com>
+Date: Thu, 25 Apr 2019 22:10:55 -0700
+Message-ID: <CAMo8BfLGg7RLMR_wLhqrKz=hE-jhgUoLzUxjURwQES-s118xRA@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH v2 1/5] linux-user: Fix support for the
+ SIOCATMARK and SIOCGPGRP ioctls for eXtensa
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,40 +29,55 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: linux-nvdimm@lists.01.org, linux-kernel@vger.kernel.org, virtualization@lists.linux-foundation.org, kvm@vger.kernel.org, linux-fsdevel@vger.kernel.org, linux-acpi@vger.kernel.org, qemu-devel@nongnu.org, linux-ext4@vger.kernel.org, linux-xfs@vger.kernel.org
-Cc: dan.j.williams@intel.com, zwisler@kernel.org, vishal.l.verma@intel.com, dave.jiang@intel.com, mst@redhat.com, jasowang@redhat.com, willy@infradead.org, rjw@rjwysocki.net, hch@infradead.org, lenb@kernel.org, jack@suse.cz, tytso@mit.edu, adilger.kernel@dilger.ca, darrick.wong@oracle.com, lcapitulino@redhat.com, kwolf@redhat.com, imammedo@redhat.com, jmoyer@redhat.com, nilal@redhat.com, riel@surriel.com, stefanha@redhat.com, aarcange@redhat.com, david@redhat.com, david@fromorbit.com, cohuck@redhat.com, xiaoguangrong.eric@gmail.com, pbonzini@redhat.com, kilobyte@angband.pl, yuval.shaia@oracle.com, pagupta@redhat.com
+To: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>
+Cc: qemu-devel <qemu-devel@nongnu.org>, Aurelien Jarno <aurelien@aurel32.net>, Aleksandar Markovic <amarkovic@wavecomp.com>, Aleksandar Rikalo <arikalo@wavecomp.com>, daniel.santos@pobox.com, Laurent Vivier <lvivier@redhat.com>, Thomas Huth <thuth@redhat.com>, =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>
 
-Dont support 'MAP_SYNC' with non-DAX files and DAX files
-with asynchronous dax_device. Virtio pmem provides
-asynchronous host page cache flush mechanism. We don't
-support 'MAP_SYNC' with virtio pmem and xfs.
+On Wed, Apr 24, 2019 at 5:57 AM Aleksandar Markovic
+<aleksandar.markovic@rt-rk.com> wrote:
+> From: Aleksandar Markovic <amarkovic@wavecomp.com>
+>
+> Fix support for the SIOCATMARK and SIOCGPGRP ioctls for eXtensa by
 
-Signed-off-by: Pankaj Gupta <pagupta@redhat.com>
----
- fs/xfs/xfs_file.c | 9 ++++++---
- 1 file changed, 6 insertions(+), 3 deletions(-)
+xtensa is the official name of this architecture, please fix the spelling
+here...
 
-diff --git a/fs/xfs/xfs_file.c b/fs/xfs/xfs_file.c
-index a7ceae90110e..f17652cca5ff 100644
---- a/fs/xfs/xfs_file.c
-+++ b/fs/xfs/xfs_file.c
-@@ -1203,11 +1203,14 @@ xfs_file_mmap(
- 	struct file	*filp,
- 	struct vm_area_struct *vma)
- {
-+	struct dax_device 	*dax_dev;
-+
-+	dax_dev = xfs_find_daxdev_for_inode(file_inode(filp));
- 	/*
--	 * We don't support synchronous mappings for non-DAX files. At least
--	 * until someone comes with a sensible use case.
-+	 * We don't support synchronous mappings for non-DAX files and
-+	 * for DAX files if underneath dax_device is not synchronous.
- 	 */
--	if (!IS_DAX(file_inode(filp)) && (vma->vm_flags & VM_SYNC))
-+	if (!daxdev_mapping_supported(vma, dax_dev))
- 		return -EOPNOTSUPP;
- 
- 	file_accessed(filp);
+> correcting corresponding macro definition.
+>
+> Values for TARGET_SIOCATMARK and TARGET_SIOCGPGRP are determined by
+> Linux kernel. Following relevant lines are from kernel source tree:
+>
+> arch/ia64/include/uapi/asm/sockios.h:#define SIOCATMARK    0x8905
+> arch/mips/include/uapi/asm/sockios.h:#define SIOCATMARK    _IOR('s', 7, int)
+> arch/parisc/include/uapi/asm/sockios.h:#define SIOCATMARK  0x8905
+> arch/sh/include/uapi/asm/sockios.h:#define SIOCATMARK      _IOR('s', 7, int)
+> arch/xtensa/include/uapi/asm/sockios.h:#define SIOCATMARK  _IOR('s', 7, int)
+> arch/alpha/include/uapi/asm/sockios.h:#define SIOCATMARK   _IOR('s', 7, int)
+> arch/sparc/include/uapi/asm/sockios.h:#define SIOCATMARK   0x8905
+> include/uapi/asm-generic/sockios.h:#define SIOCATMARK      0x8905
+>
+> arch/ia64/include/uapi/asm/sockios.h:#define SIOCGPGRP     0x8904
+> arch/mips/include/uapi/asm/sockios.h:#define SIOCGPGRP     _IOR('s', 9, pid_t)
+> arch/parisc/include/uapi/asm/sockios.h:#define SIOCGPGRP   0x8904
+> arch/sh/include/uapi/asm/sockios.h:#define SIOCGPGRP       _IOR('s', 9, pid_t)
+> arch/xtensa/include/uapi/asm/sockios.h:#define SIOCGPGRP   _IOR('s', 9, pid_t)
+> arch/alpha/include/uapi/asm/sockios.h:#define SIOCGPGRP    _IOR('s', 9, pid_t)
+> arch/sparc/include/uapi/asm/sockios.h:#define SIOCGPGRP    0x8904
+> include/uapi/asm-generic/sockios.h:#define SIOCGPGRP       0x8904
+>
+> It is visible that eXtensa should have the same definitions as
+
+...here, and in the subject line.
+
+> alpha, mips and sh4 already do. This patch brings that to the
+> accurate state.
+>
+> Signed-off-by: Aleksandar Markovic <amarkovic@wavecomp.com>
+> ---
+>  linux-user/syscall_defs.h | 3 ++-
+>  1 file changed, 2 insertions(+), 1 deletion(-)
+
+Acked-by: Max Filippov <jcmvbkbc@gmail.com>
+
 -- 
-2.20.1
+Thanks.
+-- Max
