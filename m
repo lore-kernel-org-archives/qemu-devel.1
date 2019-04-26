@@ -1,20 +1,20 @@
-Received: from eggs.gnu.org ([209.51.188.92]:49341)
+Received: from eggs.gnu.org ([209.51.188.92]:49385)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pagupta@redhat.com>) id 1hJt0f-0007ht-CK
-	for qemu-devel@nongnu.org; Fri, 26 Apr 2019 01:02:54 -0400
+	(envelope-from <pagupta@redhat.com>) id 1hJt0y-00085M-Tp
+	for qemu-devel@nongnu.org; Fri, 26 Apr 2019 01:03:13 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pagupta@redhat.com>) id 1hJt0e-0005c7-Dd
-	for qemu-devel@nongnu.org; Fri, 26 Apr 2019 01:02:53 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:41348)
+	(envelope-from <pagupta@redhat.com>) id 1hJt0x-00061S-VU
+	for qemu-devel@nongnu.org; Fri, 26 Apr 2019 01:03:12 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:45434)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pagupta@redhat.com>) id 1hJt0e-0005bh-8I
-	for qemu-devel@nongnu.org; Fri, 26 Apr 2019 01:02:52 -0400
+	(Exim 4.71) (envelope-from <pagupta@redhat.com>) id 1hJt0x-0005zJ-Px
+	for qemu-devel@nongnu.org; Fri, 26 Apr 2019 01:03:11 -0400
 From: Pankaj Gupta <pagupta@redhat.com>
-Date: Fri, 26 Apr 2019 10:30:38 +0530
-Message-Id: <20190426050039.17460-6-pagupta@redhat.com>
+Date: Fri, 26 Apr 2019 10:30:39 +0530
+Message-Id: <20190426050039.17460-7-pagupta@redhat.com>
 In-Reply-To: <20190426050039.17460-1-pagupta@redhat.com>
 References: <20190426050039.17460-1-pagupta@redhat.com>
-Subject: [Qemu-devel] [PATCH v7 5/6] ext4: disable map_sync for async flush
+Subject: [Qemu-devel] [PATCH v7 6/6] xfs: disable map_sync for async flush
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,39 +29,34 @@ Cc: dan.j.williams@intel.com, zwisler@kernel.org, vishal.l.verma@intel.com, dave
 Dont support 'MAP_SYNC' with non-DAX files and DAX files
 with asynchronous dax_device. Virtio pmem provides
 asynchronous host page cache flush mechanism. We don't
-support 'MAP_SYNC' with virtio pmem and ext4.
+support 'MAP_SYNC' with virtio pmem and xfs.
 
 Signed-off-by: Pankaj Gupta <pagupta@redhat.com>
-Reviewed-by: Jan Kara <jack@suse.cz>
 ---
- fs/ext4/file.c | 10 ++++++----
- 1 file changed, 6 insertions(+), 4 deletions(-)
+ fs/xfs/xfs_file.c | 9 ++++++---
+ 1 file changed, 6 insertions(+), 3 deletions(-)
 
-diff --git a/fs/ext4/file.c b/fs/ext4/file.c
-index 98ec11f69cd4..dee549339e13 100644
---- a/fs/ext4/file.c
-+++ b/fs/ext4/file.c
-@@ -360,15 +360,17 @@ static const struct vm_operations_struct ext4_file_vm_ops = {
- static int ext4_file_mmap(struct file *file, struct vm_area_struct *vma)
+diff --git a/fs/xfs/xfs_file.c b/fs/xfs/xfs_file.c
+index a7ceae90110e..f17652cca5ff 100644
+--- a/fs/xfs/xfs_file.c
++++ b/fs/xfs/xfs_file.c
+@@ -1203,11 +1203,14 @@ xfs_file_mmap(
+ 	struct file	*filp,
+ 	struct vm_area_struct *vma)
  {
- 	struct inode *inode = file->f_mapping->host;
-+	struct ext4_sb_info *sbi = EXT4_SB(inode->i_sb);
-+	struct dax_device *dax_dev = sbi->s_daxdev;
- 
--	if (unlikely(ext4_forced_shutdown(EXT4_SB(inode->i_sb))))
-+	if (unlikely(ext4_forced_shutdown(sbi)))
- 		return -EIO;
- 
++	struct dax_device 	*dax_dev;
++
++	dax_dev = xfs_find_daxdev_for_inode(file_inode(filp));
  	/*
 -	 * We don't support synchronous mappings for non-DAX files. At least
 -	 * until someone comes with a sensible use case.
 +	 * We don't support synchronous mappings for non-DAX files and
 +	 * for DAX files if underneath dax_device is not synchronous.
  	 */
--	if (!IS_DAX(file_inode(file)) && (vma->vm_flags & VM_SYNC))
+-	if (!IS_DAX(file_inode(filp)) && (vma->vm_flags & VM_SYNC))
 +	if (!daxdev_mapping_supported(vma, dax_dev))
  		return -EOPNOTSUPP;
  
- 	file_accessed(file);
+ 	file_accessed(filp);
 -- 
 2.20.1
