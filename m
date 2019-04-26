@@ -1,20 +1,19 @@
-Received: from eggs.gnu.org ([209.51.188.92]:60473)
+Received: from eggs.gnu.org ([209.51.188.92]:60557)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1hJu12-00065S-1l
-	for qemu-devel@nongnu.org; Fri, 26 Apr 2019 02:07:22 -0400
+	(envelope-from <dgibson@ozlabs.org>) id 1hJu17-0006CB-K9
+	for qemu-devel@nongnu.org; Fri, 26 Apr 2019 02:07:27 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1hJu0y-00056Y-4v
-	for qemu-devel@nongnu.org; Fri, 26 Apr 2019 02:07:19 -0400
+	(envelope-from <dgibson@ozlabs.org>) id 1hJu15-0005HY-OD
+	for qemu-devel@nongnu.org; Fri, 26 Apr 2019 02:07:25 -0400
 From: David Gibson <david@gibson.dropbear.id.au>
-Date: Fri, 26 Apr 2019 16:06:13 +1000
-Message-Id: <20190426060627.18153-23-david@gibson.dropbear.id.au>
+Date: Fri, 26 Apr 2019 16:06:25 +1000
+Message-Id: <20190426060627.18153-35-david@gibson.dropbear.id.au>
 In-Reply-To: <20190426060627.18153-1-david@gibson.dropbear.id.au>
 References: <20190426060627.18153-1-david@gibson.dropbear.id.au>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 22/36] target/ppc: Style fixes for
- translate_init.inc.c
+Subject: [Qemu-devel] [PULL 34/36] ppc/hash64: Rework R and C bit updates
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,644 +23,314 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: peter.maydell@linaro.org
-Cc: gkurz@kaod.org, clg@kaod.org, qemu-devel@nongnu.org, qemu-ppc@nongnu.org, David Gibson <david@gibson.dropbear.id.au>, Greg Kurz <groug@kaod.org>
+Cc: gkurz@kaod.org, clg@kaod.org, qemu-devel@nongnu.org, qemu-ppc@nongnu.org, Benjamin Herrenschmidt <benh@kernel.crashing.org>, David Gibson <david@gibson.dropbear.id.au>
 
+From: Benjamin Herrenschmidt <benh@kernel.crashing.org>
+
+With MT-TCG, we are now running translation in a racy way, thus
+we need to mimic hardware when it comes to updating the R and
+C bits, by doing byte stores.
+
+The current "store_hpte" abstraction is ill suited for this, we
+replace it with two separate callbacks for setting R and C.
+
+Signed-off-by: Benjamin Herrenschmidt <benh@kernel.crashing.org>
+Signed-off-by: C=C3=A9dric Le Goater <clg@kaod.org>
+Message-Id: <20190411080004.8690-4-clg@kaod.org>
 Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
-Reviewed-by: C=C3=A9dric Le Goater <clg@kaod.org>
-Reviewed-by: Greg Kurz <groug@kaod.org>
 ---
- target/ppc/translate_init.inc.c | 243 +++++++++++++++++++-------------
- 1 file changed, 148 insertions(+), 95 deletions(-)
+ hw/ppc/spapr.c          | 41 +++++++++++++++++++---
+ hw/ppc/spapr_hcall.c    | 13 +++----
+ include/hw/ppc/spapr.h  |  2 ++
+ target/ppc/cpu.h        |  4 +--
+ target/ppc/mmu-hash64.c | 76 ++++++++++++++++++++++++-----------------
+ target/ppc/mmu-hash64.h |  2 --
+ 6 files changed, 93 insertions(+), 45 deletions(-)
 
-diff --git a/target/ppc/translate_init.inc.c b/target/ppc/translate_init.=
-inc.c
-index 20a64f3b77..0394a9ddad 100644
---- a/target/ppc/translate_init.inc.c
-+++ b/target/ppc/translate_init.inc.c
-@@ -41,12 +41,13 @@
- #include "fpu/softfloat.h"
- #include "qapi/qapi-commands-target.h"
-=20
--//#define PPC_DUMP_CPU
--//#define PPC_DEBUG_SPR
--//#define PPC_DUMP_SPR_ACCESSES
-+/* #define PPC_DUMP_CPU */
-+/* #define PPC_DEBUG_SPR */
-+/* #define PPC_DUMP_SPR_ACCESSES */
- /* #define USE_APPLE_GDB */
-=20
--/* Generic callbacks:
-+/*
-+ * Generic callbacks:
-  * do nothing but store/retrieve spr value
-  */
- static void spr_load_dump_spr(int sprn)
-@@ -58,7 +59,7 @@ static void spr_load_dump_spr(int sprn)
- #endif
+diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
+index b81e237635..c56939a43b 100644
+--- a/hw/ppc/spapr.c
++++ b/hw/ppc/spapr.c
+@@ -1520,10 +1520,10 @@ static void spapr_unmap_hptes(PPCVirtualHyperviso=
+r *vhyp,
+     /* Nothing to do for qemu managed HPT */
  }
 =20
--static void spr_read_generic (DisasContext *ctx, int gprn, int sprn)
-+static void spr_read_generic(DisasContext *ctx, int gprn, int sprn)
+-static void spapr_store_hpte(PPCVirtualHypervisor *vhyp, hwaddr ptex,
+-                             uint64_t pte0, uint64_t pte1)
++void spapr_store_hpte(PowerPCCPU *cpu, hwaddr ptex,
++                      uint64_t pte0, uint64_t pte1)
  {
-     gen_load_spr(cpu_gpr[gprn], sprn);
-     spr_load_dump_spr(sprn);
-@@ -230,13 +231,13 @@ static void spr_read_tbu(DisasContext *ctx, int gpr=
-n, int sprn)
+-    SpaprMachineState *spapr =3D SPAPR_MACHINE(vhyp);
++    SpaprMachineState *spapr =3D SPAPR_MACHINE(cpu->vhyp);
+     hwaddr offset =3D ptex * HASH_PTE_SIZE_64;
+=20
+     if (!spapr->htab) {
+@@ -1551,6 +1551,38 @@ static void spapr_store_hpte(PPCVirtualHypervisor =
+*vhyp, hwaddr ptex,
      }
  }
 =20
--__attribute__ (( unused ))
-+ATTRIBUTE_UNUSED
- static void spr_read_atbl(DisasContext *ctx, int gprn, int sprn)
- {
-     gen_helper_load_atbl(cpu_gpr[gprn], cpu_env);
- }
-=20
--__attribute__ (( unused ))
-+ATTRIBUTE_UNUSED
- static void spr_read_atbu(DisasContext *ctx, int gprn, int sprn)
- {
-     gen_helper_load_atbu(cpu_gpr[gprn], cpu_env);
-@@ -267,20 +268,20 @@ static void spr_write_tbu(DisasContext *ctx, int sp=
-rn, int gprn)
-     }
- }
-=20
--__attribute__ (( unused ))
-+ATTRIBUTE_UNUSED
- static void spr_write_atbl(DisasContext *ctx, int sprn, int gprn)
- {
-     gen_helper_store_atbl(cpu_env, cpu_gpr[gprn]);
- }
-=20
--__attribute__ (( unused ))
-+ATTRIBUTE_UNUSED
- static void spr_write_atbu(DisasContext *ctx, int sprn, int gprn)
- {
-     gen_helper_store_atbu(cpu_env, cpu_gpr[gprn]);
- }
-=20
- #if defined(TARGET_PPC64)
--__attribute__ (( unused ))
-+ATTRIBUTE_UNUSED
- static void spr_read_purr(DisasContext *ctx, int gprn, int sprn)
- {
-     gen_helper_load_purr(cpu_gpr[gprn], cpu_env);
-@@ -319,12 +320,16 @@ static void spr_write_hdecr(DisasContext *ctx, int =
-sprn, int gprn)
- /* IBAT0L...IBAT7L */
- static void spr_read_ibat(DisasContext *ctx, int gprn, int sprn)
- {
--    tcg_gen_ld_tl(cpu_gpr[gprn], cpu_env, offsetof(CPUPPCState, IBAT[spr=
-n & 1][(sprn - SPR_IBAT0U) / 2]));
-+    tcg_gen_ld_tl(cpu_gpr[gprn], cpu_env,
-+                  offsetof(CPUPPCState,
-+                           IBAT[sprn & 1][(sprn - SPR_IBAT0U) / 2]));
- }
-=20
- static void spr_read_ibat_h(DisasContext *ctx, int gprn, int sprn)
- {
--    tcg_gen_ld_tl(cpu_gpr[gprn], cpu_env, offsetof(CPUPPCState, IBAT[spr=
-n & 1][((sprn - SPR_IBAT4U) / 2) + 4]));
-+    tcg_gen_ld_tl(cpu_gpr[gprn], cpu_env,
-+                  offsetof(CPUPPCState,
-+                           IBAT[sprn & 1][((sprn - SPR_IBAT4U) / 2) + 4]=
-));
- }
-=20
- static void spr_write_ibatu(DisasContext *ctx, int sprn, int gprn)
-@@ -359,12 +364,16 @@ static void spr_write_ibatl_h(DisasContext *ctx, in=
-t sprn, int gprn)
- /* DBAT0L...DBAT7L */
- static void spr_read_dbat(DisasContext *ctx, int gprn, int sprn)
- {
--    tcg_gen_ld_tl(cpu_gpr[gprn], cpu_env, offsetof(CPUPPCState, DBAT[spr=
-n & 1][(sprn - SPR_DBAT0U) / 2]));
-+    tcg_gen_ld_tl(cpu_gpr[gprn], cpu_env,
-+                  offsetof(CPUPPCState,
-+                           DBAT[sprn & 1][(sprn - SPR_DBAT0U) / 2]));
- }
-=20
- static void spr_read_dbat_h(DisasContext *ctx, int gprn, int sprn)
- {
--    tcg_gen_ld_tl(cpu_gpr[gprn], cpu_env, offsetof(CPUPPCState, DBAT[spr=
-n & 1][((sprn - SPR_DBAT4U) / 2) + 4]));
-+    tcg_gen_ld_tl(cpu_gpr[gprn], cpu_env,
-+                  offsetof(CPUPPCState,
-+                           DBAT[sprn & 1][((sprn - SPR_DBAT4U) / 2) + 4]=
-));
- }
-=20
- static void spr_write_dbatu(DisasContext *ctx, int sprn, int gprn)
-@@ -473,7 +482,9 @@ static void spr_write_hid0_601(DisasContext *ctx, int=
- sprn, int gprn)
- #if !defined(CONFIG_USER_ONLY)
- static void spr_read_601_ubat(DisasContext *ctx, int gprn, int sprn)
- {
--    tcg_gen_ld_tl(cpu_gpr[gprn], cpu_env, offsetof(CPUPPCState, IBAT[spr=
-n & 1][(sprn - SPR_IBAT0U) / 2]));
-+    tcg_gen_ld_tl(cpu_gpr[gprn], cpu_env,
-+                  offsetof(CPUPPCState,
-+                           IBAT[sprn & 1][(sprn - SPR_IBAT0U) / 2]));
- }
-=20
- static void spr_write_601_ubatu(DisasContext *ctx, int sprn, int gprn)
-@@ -532,7 +543,8 @@ static void spr_write_booke_tsr(DisasContext *ctx, in=
-t sprn, int gprn)
- #if !defined(CONFIG_USER_ONLY)
- static void spr_read_403_pbr(DisasContext *ctx, int gprn, int sprn)
- {
--    tcg_gen_ld_tl(cpu_gpr[gprn], cpu_env, offsetof(CPUPPCState, pb[sprn =
-- SPR_403_PBL1]));
-+    tcg_gen_ld_tl(cpu_gpr[gprn], cpu_env,
-+                  offsetof(CPUPPCState, pb[sprn - SPR_403_PBL1]));
- }
-=20
- static void spr_write_403_pbr(DisasContext *ctx, int sprn, int gprn)
-@@ -661,14 +673,20 @@ static inline void vscr_init(CPUPPCState *env, uint=
-32_t val)
-=20
- static inline void _spr_register(CPUPPCState *env, int num,
-                                  const char *name,
--                                 void (*uea_read)(DisasContext *ctx, int=
- gprn, int sprn),
--                                 void (*uea_write)(DisasContext *ctx, in=
-t sprn, int gprn),
-+                                 void (*uea_read)(DisasContext *ctx,
-+                                                  int gprn, int sprn),
-+                                 void (*uea_write)(DisasContext *ctx,
-+                                                   int sprn, int gprn),
- #if !defined(CONFIG_USER_ONLY)
-=20
--                                 void (*oea_read)(DisasContext *ctx, int=
- gprn, int sprn),
--                                 void (*oea_write)(DisasContext *ctx, in=
-t sprn, int gprn),
--                                 void (*hea_read)(DisasContext *opaque, =
-int gprn, int sprn),
--                                 void (*hea_write)(DisasContext *opaque,=
- int sprn, int gprn),
-+                                 void (*oea_read)(DisasContext *ctx,
-+                                                  int gprn, int sprn),
-+                                 void (*oea_write)(DisasContext *ctx,
-+                                                   int sprn, int gprn),
-+                                 void (*hea_read)(DisasContext *opaque,
-+                                                  int gprn, int sprn),
-+                                 void (*hea_write)(DisasContext *opaque,
-+                                                   int sprn, int gprn),
- #endif
- #if defined(CONFIG_KVM)
-                                  uint64_t one_reg_id,
-@@ -678,7 +696,7 @@ static inline void _spr_register(CPUPPCState *env, in=
-t num,
-     ppc_spr_t *spr;
-=20
-     spr =3D &env->spr_cb[num];
--    if (spr->name !=3D NULL ||env-> spr[num] !=3D 0x00000000 ||
-+    if (spr->name !=3D NULL || env->spr[num] !=3D 0x00000000 ||
- #if !defined(CONFIG_USER_ONLY)
-         spr->oea_read !=3D NULL || spr->oea_write !=3D NULL ||
- #endif
-@@ -774,8 +792,10 @@ static void gen_spr_sdr1(CPUPPCState *env)
- {
- #ifndef CONFIG_USER_ONLY
-     if (env->has_hv_mode) {
--        /* SDR1 is a hypervisor resource on CPUs which have a
--         * hypervisor mode */
-+        /*
-+         * SDR1 is a hypervisor resource on CPUs which have a
-+         * hypervisor mode
-+         */
-         spr_register_hv(env, SPR_SDR1, "SDR1",
-                         SPR_NOACCESS, SPR_NOACCESS,
-                         SPR_NOACCESS, SPR_NOACCESS,
-@@ -1123,7 +1143,8 @@ static void spr_write_amr(DisasContext *ctx, int sp=
-rn, int gprn)
-     TCGv t1 =3D tcg_temp_new();
-     TCGv t2 =3D tcg_temp_new();
-=20
--    /* Note, the HV=3D1 PR=3D0 case is handled earlier by simply using
-+    /*
-+     * Note, the HV=3D1 PR=3D0 case is handled earlier by simply using
-      * spr_write_generic for HV mode in the SPR table
-      */
-=20
-@@ -1157,7 +1178,8 @@ static void spr_write_uamor(DisasContext *ctx, int =
-sprn, int gprn)
-     TCGv t1 =3D tcg_temp_new();
-     TCGv t2 =3D tcg_temp_new();
-=20
--    /* Note, the HV=3D1 case is handled earlier by simply using
-+    /*
-+     * Note, the HV=3D1 case is handled earlier by simply using
-      * spr_write_generic for HV mode in the SPR table
-      */
-=20
-@@ -1187,7 +1209,8 @@ static void spr_write_iamr(DisasContext *ctx, int s=
-prn, int gprn)
-     TCGv t1 =3D tcg_temp_new();
-     TCGv t2 =3D tcg_temp_new();
-=20
--    /* Note, the HV=3D1 case is handled earlier by simply using
-+    /*
-+     * Note, the HV=3D1 case is handled earlier by simply using
-      * spr_write_generic for HV mode in the SPR table
-      */
-=20
-@@ -1215,10 +1238,13 @@ static void spr_write_iamr(DisasContext *ctx, int=
- sprn, int gprn)
- static void gen_spr_amr(CPUPPCState *env)
- {
- #ifndef CONFIG_USER_ONLY
--    /* Virtual Page Class Key protection */
--    /* The AMR is accessible either via SPR 13 or SPR 29.  13 is
-+    /*
-+     * Virtual Page Class Key protection
-+     *
-+     * The AMR is accessible either via SPR 13 or SPR 29.  13 is
-      * userspace accessible, 29 is privileged.  So we only need to set
--     * the kvm ONE_REG id on one of them, we use 29 */
-+     * the kvm ONE_REG id on one of them, we use 29
-+     */
-     spr_register(env, SPR_UAMR, "UAMR",
-                  &spr_read_generic, &spr_write_amr,
-                  &spr_read_generic, &spr_write_amr,
-@@ -1902,7 +1928,8 @@ static void gen_spr_BookE206(CPUPPCState *env, uint=
-32_t mas_mask,
-     /* TLB assist registers */
-     /* XXX : not implemented */
-     for (i =3D 0; i < 8; i++) {
--        void (*uea_write)(DisasContext *ctx, int sprn, int gprn) =3D &sp=
-r_write_generic32;
-+        void (*uea_write)(DisasContext *ctx, int sprn, int gprn) =3D
-+            &spr_write_generic32;
-         if (i =3D=3D 2 && (mas_mask & (1 << i)) && (env->insns_flags & P=
-PC_64B)) {
-             uea_write =3D &spr_write_generic;
-         }
-@@ -2798,7 +2825,6 @@ static void gen_spr_8xx(CPUPPCState *env)
-                  0x00000000);
- }
-=20
--// XXX: TODO
- /*
-  * AMR     =3D> SPR 29 (Power 2.04)
-  * CTRL    =3D> SPR 136 (Power 2.04)
-@@ -3344,16 +3370,18 @@ static int check_pow_nocheck(CPUPPCState *env)
-=20
- static int check_pow_hid0(CPUPPCState *env)
- {
--    if (env->spr[SPR_HID0] & 0x00E00000)
-+    if (env->spr[SPR_HID0] & 0x00E00000) {
-         return 1;
-+    }
-=20
-     return 0;
- }
-=20
- static int check_pow_hid0_74xx(CPUPPCState *env)
- {
--    if (env->spr[SPR_HID0] & 0x00600000)
-+    if (env->spr[SPR_HID0] & 0x00600000) {
-         return 1;
-+    }
-=20
-     return 0;
- }
-@@ -4602,7 +4630,8 @@ POWERPC_FAMILY(e200)(ObjectClass *oc, void *data)
-     dc->desc =3D "e200 core";
-     pcc->init_proc =3D init_proc_e200;
-     pcc->check_pow =3D check_pow_hid0;
--    /* XXX: unimplemented instructions:
-+    /*
-+     * XXX: unimplemented instructions:
-      * dcblc
-      * dcbtlst
-      * dcbtstls
-@@ -4797,18 +4826,18 @@ static void init_proc_e500(CPUPPCState *env, int =
-version)
-      * gen_spr_BookE(env, 0x0000000F0000FD7FULL);
-      */
-     switch (version) {
--        case fsl_e500v1:
--        case fsl_e500v2:
--        default:
--            ivor_mask =3D 0x0000000F0000FFFFULL;
--            break;
--        case fsl_e500mc:
--        case fsl_e5500:
--            ivor_mask =3D 0x000003FE0000FFFFULL;
--            break;
--        case fsl_e6500:
--            ivor_mask =3D 0x000003FF0000FFFFULL;
--            break;
-+    case fsl_e500v1:
-+    case fsl_e500v2:
-+    default:
-+        ivor_mask =3D 0x0000000F0000FFFFULL;
-+        break;
-+    case fsl_e500mc:
-+    case fsl_e5500:
-+        ivor_mask =3D 0x000003FE0000FFFFULL;
-+        break;
-+    case fsl_e6500:
-+        ivor_mask =3D 0x000003FF0000FFFFULL;
-+        break;
-     }
-     gen_spr_BookE(env, ivor_mask);
-     gen_spr_usprg3(env);
-@@ -4848,7 +4877,8 @@ static void init_proc_e500(CPUPPCState *env, int ve=
-rsion)
-         tlbncfg[1] =3D 0x40028040;
-         break;
-     default:
--        cpu_abort(CPU(cpu), "Unknown CPU: " TARGET_FMT_lx "\n", env->spr=
-[SPR_PVR]);
-+        cpu_abort(CPU(cpu), "Unknown CPU: " TARGET_FMT_lx "\n",
-+                  env->spr[SPR_PVR]);
-     }
- #endif
-     /* Cache sizes */
-@@ -4872,7 +4902,8 @@ static void init_proc_e500(CPUPPCState *env, int ve=
-rsion)
-         l1cfg1 |=3D 0x0B83820;
-         break;
-     default:
--        cpu_abort(CPU(cpu), "Unknown CPU: " TARGET_FMT_lx "\n", env->spr=
-[SPR_PVR]);
-+        cpu_abort(CPU(cpu), "Unknown CPU: " TARGET_FMT_lx "\n",
-+                  env->spr[SPR_PVR]);
-     }
-     gen_spr_BookE206(env, 0x000000DF, tlbncfg, mmucfg);
-     /* XXX : not implemented */
-@@ -5252,7 +5283,8 @@ static void init_proc_601(CPUPPCState *env)
-                  0x00000000);
-     /* Memory management */
-     init_excp_601(env);
--    /* XXX: beware that dcache line size is 64=20
-+    /*
-+     * XXX: beware that dcache line size is 64
-      *      but dcbz uses 32 bytes "sectors"
-      * XXX: this breaks clcs instruction !
-      */
-@@ -5789,7 +5821,8 @@ static void init_proc_750(CPUPPCState *env)
-                  0x00000000);
-     /* Memory management */
-     gen_low_BATs(env);
--    /* XXX: high BATs are also present but are known to be bugged on
-+    /*
-+     * XXX: high BATs are also present but are known to be bugged on
-      *      die version 1.x
-      */
-     init_excp_7x0(env);
-@@ -5971,7 +6004,8 @@ POWERPC_FAMILY(750cl)(ObjectClass *oc, void *data)
-     dc->desc =3D "PowerPC 750 CL";
-     pcc->init_proc =3D init_proc_750cl;
-     pcc->check_pow =3D check_pow_hid0;
--    /* XXX: not implemented:
-+    /*
-+     * XXX: not implemented:
-      * cache lock instructions:
-      * dcbz_l
-      * floating point paired instructions
-@@ -7569,8 +7603,10 @@ static void gen_spr_book3s_altivec(CPUPPCState *en=
-v)
-                      &spr_read_generic, &spr_write_generic,
-                      KVM_REG_PPC_VRSAVE, 0x00000000);
-=20
--    /* Can't find information on what this should be on reset.  This
--     * value is the one used by 74xx processors. */
-+    /*
-+     * Can't find information on what this should be on reset.  This
-+     * value is the one used by 74xx processors.
-+     */
-     vscr_init(env, 0x00010000);
- }
-=20
-@@ -8975,8 +9011,9 @@ static void init_ppc_proc(PowerPCCPU *cpu)
-=20
-     env->irq_inputs =3D NULL;
-     /* Set all exception vectors to an invalid address */
--    for (i =3D 0; i < POWERPC_EXCP_NB; i++)
-+    for (i =3D 0; i < POWERPC_EXCP_NB; i++) {
-         env->excp_vectors[i] =3D (target_ulong)(-1ULL);
-+    }
-     env->ivor_mask =3D 0x00000000;
-     env->ivpr_mask =3D 0x00000000;
-     /* Default MMU definitions */
-@@ -9108,8 +9145,9 @@ static void init_ppc_proc(PowerPCCPU *cpu)
- #if !defined(CONFIG_USER_ONLY)
-     if (env->nb_tlb !=3D 0) {
-         int nb_tlb =3D env->nb_tlb;
--        if (env->id_tlbs !=3D 0)
-+        if (env->id_tlbs !=3D 0) {
-             nb_tlb *=3D 2;
-+        }
-         switch (env->tlb_type) {
-         case TLB_6XX:
-             env->tlb.tlb6 =3D g_new0(ppc6xx_tlb_t, nb_tlb);
-@@ -9201,8 +9239,9 @@ static void fill_new_table(opc_handler_t **table, i=
-nt len)
- {
-     int i;
-=20
--    for (i =3D 0; i < len; i++)
-+    for (i =3D 0; i < len; i++) {
-         table[i] =3D &invalid_handler;
-+    }
- }
-=20
- static int create_new_table(opc_handler_t **table, unsigned char idx)
-@@ -9219,8 +9258,9 @@ static int create_new_table(opc_handler_t **table, =
-unsigned char idx)
- static int insert_in_table(opc_handler_t **table, unsigned char idx,
-                             opc_handler_t *handler)
- {
--    if (table[idx] !=3D &invalid_handler)
-+    if (table[idx] !=3D &invalid_handler) {
-         return -1;
-+    }
-     table[idx] =3D handler;
-=20
-     return 0;
-@@ -9341,17 +9381,20 @@ static int register_insn(opc_handler_t **ppc_opco=
-des, opcode_t *insn)
-                 }
-             } else {
-                 if (register_dblind_insn(ppc_opcodes, insn->opc1, insn->=
-opc2,
--                                         insn->opc3, &insn->handler) < 0=
-)
-+                                         insn->opc3, &insn->handler) < 0=
-) {
-                     return -1;
-+                }
-             }
-         } else {
-             if (register_ind_insn(ppc_opcodes, insn->opc1,
--                                  insn->opc2, &insn->handler) < 0)
-+                                  insn->opc2, &insn->handler) < 0) {
-                 return -1;
-+            }
-         }
-     } else {
--        if (register_direct_insn(ppc_opcodes, insn->opc1, &insn->handler=
-) < 0)
-+        if (register_direct_insn(ppc_opcodes, insn->opc1, &insn->handler=
-) < 0) {
-             return -1;
-+        }
-     }
-=20
-     return 0;
-@@ -9363,8 +9406,9 @@ static int test_opcode_table(opc_handler_t **table,=
- int len)
-=20
-     for (i =3D 0, count =3D 0; i < len; i++) {
-         /* Consistency fixup */
--        if (table[i] =3D=3D NULL)
-+        if (table[i] =3D=3D NULL) {
-             table[i] =3D &invalid_handler;
-+        }
-         if (table[i] !=3D &invalid_handler) {
-             if (is_indirect_opcode(table[i])) {
-                 tmp =3D test_opcode_table(ind_table(table[i]),
-@@ -9386,8 +9430,9 @@ static int test_opcode_table(opc_handler_t **table,=
- int len)
-=20
- static void fix_opcode_tables(opc_handler_t **ppc_opcodes)
- {
--    if (test_opcode_table(ppc_opcodes, PPC_CPU_OPCODES_LEN) =3D=3D 0)
-+    if (test_opcode_table(ppc_opcodes, PPC_CPU_OPCODES_LEN) =3D=3D 0) {
-         printf("*** WARNING: no opcode defined !\n");
-+    }
- }
-=20
- /***********************************************************************=
-******/
-@@ -9726,14 +9771,15 @@ static int ppc_fixup_cpu(PowerPCCPU *cpu)
- {
-     CPUPPCState *env =3D &cpu->env;
-=20
--    /* TCG doesn't (yet) emulate some groups of instructions that
--     * are implemented on some otherwise supported CPUs (e.g. VSX
--     * and decimal floating point instructions on POWER7).  We
--     * remove unsupported instruction groups from the cpu state's
--     * instruction masks and hope the guest can cope.  For at
--     * least the pseries machine, the unavailability of these
--     * instructions can be advertised to the guest via the device
--     * tree. */
-+    /*
-+     * TCG doesn't (yet) emulate some groups of instructions that are
-+     * implemented on some otherwise supported CPUs (e.g. VSX and
-+     * decimal floating point instructions on POWER7).  We remove
-+     * unsupported instruction groups from the cpu state's instruction
-+     * masks and hope the guest can cope.  For at least the pseries
-+     * machine, the unavailability of these instructions can be
-+     * advertised to the guest via the device tree.
-+     */
-     if ((env->insns_flags & ~PPC_TCG_INSNS)
-         || (env->insns_flags2 & ~PPC_TCG_INSNS2)) {
-         warn_report("Disabling some instructions which are not "
-@@ -9928,31 +9974,37 @@ static void ppc_cpu_realize(DeviceState *dev, Err=
-or **errp)
-                "    Bus model        : %s\n",
-                excp_model, bus_model);
-         printf("    MSR features     :\n");
--        if (env->flags & POWERPC_FLAG_SPE)
-+        if (env->flags & POWERPC_FLAG_SPE) {
-             printf("                        signal processing engine ena=
-ble"
-                    "\n");
--        else if (env->flags & POWERPC_FLAG_VRE)
-+        } else if (env->flags & POWERPC_FLAG_VRE) {
-             printf("                        vector processor enable\n");
--        if (env->flags & POWERPC_FLAG_TGPR)
-+        }
-+        if (env->flags & POWERPC_FLAG_TGPR) {
-             printf("                        temporary GPRs\n");
--        else if (env->flags & POWERPC_FLAG_CE)
-+        } else if (env->flags & POWERPC_FLAG_CE) {
-             printf("                        critical input enable\n");
--        if (env->flags & POWERPC_FLAG_SE)
-+        }
-+        if (env->flags & POWERPC_FLAG_SE) {
-             printf("                        single-step trace mode\n");
--        else if (env->flags & POWERPC_FLAG_DWE)
-+        } else if (env->flags & POWERPC_FLAG_DWE) {
-             printf("                        debug wait enable\n");
--        else if (env->flags & POWERPC_FLAG_UBLE)
-+        } else if (env->flags & POWERPC_FLAG_UBLE) {
-             printf("                        user BTB lock enable\n");
--        if (env->flags & POWERPC_FLAG_BE)
-+        }
-+        if (env->flags & POWERPC_FLAG_BE) {
-             printf("                        branch-step trace mode\n");
--        else if (env->flags & POWERPC_FLAG_DE)
-+        } else if (env->flags & POWERPC_FLAG_DE) {
-             printf("                        debug interrupt enable\n");
--        if (env->flags & POWERPC_FLAG_PX)
-+        }
-+        if (env->flags & POWERPC_FLAG_PX) {
-             printf("                        inclusive protection\n");
--        else if (env->flags & POWERPC_FLAG_PMM)
-+        } else if (env->flags & POWERPC_FLAG_PMM) {
-             printf("                        performance monitor mark\n")=
-;
--        if (env->flags =3D=3D POWERPC_FLAG_NONE)
-+        }
-+        if (env->flags =3D=3D POWERPC_FLAG_NONE) {
-             printf("                        none\n");
-+        }
-         printf("    Time-base/decrementer clock source: %s\n",
-                env->flags & POWERPC_FLAG_RTC_CLK ? "RTC clock" : "bus cl=
-ock");
-         dump_ppc_insns(env);
-@@ -10094,8 +10146,9 @@ static ObjectClass *ppc_cpu_class_by_name(const c=
-har *name)
-     const char *p;
-     unsigned long pvr;
-=20
--    /* Lookup by PVR if cpu_model is valid 8 digit hex number
--     * (excl: 0x prefix if present)
-+    /*
-+     * Lookup by PVR if cpu_model is valid 8 digit hex number (excl:
-+     * 0x prefix if present)
-      */
-     if (!qemu_strtoul(name, &p, 16, &pvr)) {
-         int len =3D p - name;
-@@ -10439,14 +10492,14 @@ static void ppc_cpu_instance_init(Object *obj)
-     env->bfd_mach =3D pcc->bfd_mach;
-     env->check_pow =3D pcc->check_pow;
-=20
--    /* Mark HV mode as supported if the CPU has an MSR_HV bit
--     * in the msr_mask. The mask can later be cleared by PAPR
--     * mode but the hv mode support will remain, thus enforcing
--     * that we cannot use priv. instructions in guest in PAPR
--     * mode. For 970 we currently simply don't set HV in msr_mask
--     * thus simulating an "Apple mode" 970. If we ever want to
--     * support 970 HV mode, we'll have to add a processor attribute
--     * of some sort.
-+    /*
-+     * Mark HV mode as supported if the CPU has an MSR_HV bit in the
-+     * msr_mask. The mask can later be cleared by PAPR mode but the hv
-+     * mode support will remain, thus enforcing that we cannot use
-+     * priv. instructions in guest in PAPR mode. For 970 we currently
-+     * simply don't set HV in msr_mask thus simulating an "Apple mode"
-+     * 970. If we ever want to support 970 HV mode, we'll have to add
-+     * a processor attribute of some sort.
-      */
- #if !defined(CONFIG_USER_ONLY)
-     env->has_hv_mode =3D !!(env->msr_mask & MSR_HVB);
-@@ -10573,7 +10626,7 @@ static void ppc_cpu_class_init(ObjectClass *oc, v=
-oid *data)
-     cc->tcg_initialize =3D ppc_translate_init;
- #endif
-     cc->disas_set_info =3D ppc_disas_set_info;
--=20
++static void spapr_hpte_set_c(PPCVirtualHypervisor *vhyp, hwaddr ptex,
++                             uint64_t pte1)
++{
++    hwaddr offset =3D ptex * HASH_PTE_SIZE_64 + 15;
++    SpaprMachineState *spapr =3D SPAPR_MACHINE(vhyp);
 +
-     dc->fw_name =3D "PowerPC,UNKNOWN";
++    if (!spapr->htab) {
++        /* There should always be a hash table when this is called */
++        error_report("spapr_hpte_set_c called with no hash table !");
++        return;
++    }
++
++    /* The HW performs a non-atomic byte update */
++    stb_p(spapr->htab + offset, (pte1 & 0xff) | 0x80);
++}
++
++static void spapr_hpte_set_r(PPCVirtualHypervisor *vhyp, hwaddr ptex,
++                             uint64_t pte1)
++{
++    hwaddr offset =3D ptex * HASH_PTE_SIZE_64 + 14;
++    SpaprMachineState *spapr =3D SPAPR_MACHINE(vhyp);
++
++    if (!spapr->htab) {
++        /* There should always be a hash table when this is called */
++        error_report("spapr_hpte_set_r called with no hash table !");
++        return;
++    }
++
++    /* The HW performs a non-atomic byte update */
++    stb_p(spapr->htab + offset, ((pte1 >> 8) & 0xff) | 0x01);
++}
++
+ int spapr_hpt_shift_for_ramsize(uint64_t ramsize)
+ {
+     int shift;
+@@ -4291,7 +4323,8 @@ static void spapr_machine_class_init(ObjectClass *o=
+c, void *data)
+     vhc->hpt_mask =3D spapr_hpt_mask;
+     vhc->map_hptes =3D spapr_map_hptes;
+     vhc->unmap_hptes =3D spapr_unmap_hptes;
+-    vhc->store_hpte =3D spapr_store_hpte;
++    vhc->hpte_set_c =3D spapr_hpte_set_c;
++    vhc->hpte_set_r =3D spapr_hpte_set_r;
+     vhc->get_pate =3D spapr_get_pate;
+     vhc->encode_hpt_for_kvm_pr =3D spapr_encode_hpt_for_kvm_pr;
+     xic->ics_get =3D spapr_ics_get;
+diff --git a/hw/ppc/spapr_hcall.c b/hw/ppc/spapr_hcall.c
+index 3534079777..6c16d2b120 100644
+--- a/hw/ppc/spapr_hcall.c
++++ b/hw/ppc/spapr_hcall.c
+@@ -118,7 +118,7 @@ static target_ulong h_enter(PowerPCCPU *cpu, SpaprMac=
+hineState *spapr,
+         ppc_hash64_unmap_hptes(cpu, hptes, ptex, 1);
+     }
+=20
+-    ppc_hash64_store_hpte(cpu, ptex + slot, pteh | HPTE64_V_HPTE_DIRTY, =
+ptel);
++    spapr_store_hpte(cpu, ptex + slot, pteh | HPTE64_V_HPTE_DIRTY, ptel)=
+;
+=20
+     args[0] =3D ptex + slot;
+     return H_SUCCESS;
+@@ -131,7 +131,8 @@ typedef enum {
+     REMOVE_HW =3D 3,
+ } RemoveResult;
+=20
+-static RemoveResult remove_hpte(PowerPCCPU *cpu, target_ulong ptex,
++static RemoveResult remove_hpte(PowerPCCPU *cpu
++                                , target_ulong ptex,
+                                 target_ulong avpn,
+                                 target_ulong flags,
+                                 target_ulong *vp, target_ulong *rp)
+@@ -155,7 +156,7 @@ static RemoveResult remove_hpte(PowerPCCPU *cpu, targ=
+et_ulong ptex,
+     }
+     *vp =3D v;
+     *rp =3D r;
+-    ppc_hash64_store_hpte(cpu, ptex, HPTE64_V_HPTE_DIRTY, 0);
++    spapr_store_hpte(cpu, ptex, HPTE64_V_HPTE_DIRTY, 0);
+     ppc_hash64_tlb_flush_hpte(cpu, ptex, v, r);
+     return REMOVE_SUCCESS;
+ }
+@@ -289,13 +290,13 @@ static target_ulong h_protect(PowerPCCPU *cpu, Spap=
+rMachineState *spapr,
+     r |=3D (flags << 55) & HPTE64_R_PP0;
+     r |=3D (flags << 48) & HPTE64_R_KEY_HI;
+     r |=3D flags & (HPTE64_R_PP | HPTE64_R_N | HPTE64_R_KEY_LO);
+-    ppc_hash64_store_hpte(cpu, ptex,
+-                          (v & ~HPTE64_V_VALID) | HPTE64_V_HPTE_DIRTY, 0=
+);
++    spapr_store_hpte(cpu, ptex,
++                     (v & ~HPTE64_V_VALID) | HPTE64_V_HPTE_DIRTY, 0);
+     ppc_hash64_tlb_flush_hpte(cpu, ptex, v, r);
+     /* Flush the tlb */
+     check_tlb_flush(env, true);
+     /* Don't need a memory barrier, due to qemu's global lock */
+-    ppc_hash64_store_hpte(cpu, ptex, v | HPTE64_V_HPTE_DIRTY, r);
++    spapr_store_hpte(cpu, ptex, v | HPTE64_V_HPTE_DIRTY, r);
+     return H_SUCCESS;
  }
 =20
+diff --git a/include/hw/ppc/spapr.h b/include/hw/ppc/spapr.h
+index 9331f5e0b9..7e32f309c2 100644
+--- a/include/hw/ppc/spapr.h
++++ b/include/hw/ppc/spapr.h
+@@ -784,6 +784,8 @@ void spapr_reallocate_hpt(SpaprMachineState *spapr, i=
+nt shift,
+                           Error **errp);
+ void spapr_clear_pending_events(SpaprMachineState *spapr);
+ int spapr_max_server_number(SpaprMachineState *spapr);
++void spapr_store_hpte(PowerPCCPU *cpu, hwaddr ptex,
++                      uint64_t pte0, uint64_t pte1);
+=20
+ /* DRC callbacks. */
+ void spapr_core_release(DeviceState *dev);
+diff --git a/target/ppc/cpu.h b/target/ppc/cpu.h
+index 8a79db0c43..5e7cf54b2f 100644
+--- a/target/ppc/cpu.h
++++ b/target/ppc/cpu.h
+@@ -1265,8 +1265,8 @@ struct PPCVirtualHypervisorClass {
+     void (*unmap_hptes)(PPCVirtualHypervisor *vhyp,
+                         const ppc_hash_pte64_t *hptes,
+                         hwaddr ptex, int n);
+-    void (*store_hpte)(PPCVirtualHypervisor *vhyp, hwaddr ptex,
+-                       uint64_t pte0, uint64_t pte1);
++    void (*hpte_set_c)(PPCVirtualHypervisor *vhyp, hwaddr ptex, uint64_t=
+ pte1);
++    void (*hpte_set_r)(PPCVirtualHypervisor *vhyp, hwaddr ptex, uint64_t=
+ pte1);
+     void (*get_pate)(PPCVirtualHypervisor *vhyp, ppc_v3_pate_t *entry);
+     target_ulong (*encode_hpt_for_kvm_pr)(PPCVirtualHypervisor *vhyp);
+ };
+diff --git a/target/ppc/mmu-hash64.c b/target/ppc/mmu-hash64.c
+index c74818b2e7..7899eb2918 100644
+--- a/target/ppc/mmu-hash64.c
++++ b/target/ppc/mmu-hash64.c
+@@ -725,6 +725,39 @@ static void ppc_hash64_set_dsi(CPUState *cs, uint64_=
+t dar, uint64_t dsisr)
+ }
+=20
+=20
++static void ppc_hash64_set_r(PowerPCCPU *cpu, hwaddr ptex, uint64_t pte1=
+)
++{
++    hwaddr base, offset =3D ptex * HASH_PTE_SIZE_64 + 16;
++
++    if (cpu->vhyp) {
++        PPCVirtualHypervisorClass *vhc =3D
++            PPC_VIRTUAL_HYPERVISOR_GET_CLASS(cpu->vhyp);
++        vhc->hpte_set_r(cpu->vhyp, ptex, pte1);
++        return;
++    }
++    base =3D ppc_hash64_hpt_base(cpu);
++
++
++    /* The HW performs a non-atomic byte update */
++    stb_phys(CPU(cpu)->as, base + offset, ((pte1 >> 8) & 0xff) | 0x01);
++}
++
++static void ppc_hash64_set_c(PowerPCCPU *cpu, hwaddr ptex, uint64_t pte1=
+)
++{
++    hwaddr base, offset =3D ptex * HASH_PTE_SIZE_64 + 15;
++
++    if (cpu->vhyp) {
++        PPCVirtualHypervisorClass *vhc =3D
++            PPC_VIRTUAL_HYPERVISOR_GET_CLASS(cpu->vhyp);
++        vhc->hpte_set_c(cpu->vhyp, ptex, pte1);
++        return;
++    }
++    base =3D ppc_hash64_hpt_base(cpu);
++
++    /* The HW performs a non-atomic byte update */
++    stb_phys(CPU(cpu)->as, base + offset, (pte1 & 0xff) | 0x80);
++}
++
+ int ppc_hash64_handle_mmu_fault(PowerPCCPU *cpu, vaddr eaddr,
+                                 int rwx, int mmu_idx)
+ {
+@@ -735,7 +768,6 @@ int ppc_hash64_handle_mmu_fault(PowerPCCPU *cpu, vadd=
+r eaddr,
+     hwaddr ptex;
+     ppc_hash_pte64_t pte;
+     int exec_prot, pp_prot, amr_prot, prot;
+-    uint64_t new_pte1;
+     const int need_prot[] =3D {PAGE_READ, PAGE_WRITE, PAGE_EXEC};
+     hwaddr raddr;
+=20
+@@ -883,19 +915,19 @@ skip_slb_search:
+=20
+     /* 6. Update PTE referenced and changed bits if necessary */
+=20
+-    new_pte1 =3D pte.pte1 | HPTE64_R_R; /* set referenced bit */
+-    if (rwx =3D=3D 1) {
+-        new_pte1 |=3D HPTE64_R_C; /* set changed (dirty) bit */
+-    } else {
+-        /*
+-         * Treat the page as read-only for now, so that a later write
+-         * will pass through this function again to set the C bit
+-         */
+-        prot &=3D ~PAGE_WRITE;
++    if (!(pte.pte1 & HPTE64_R_R)) {
++        ppc_hash64_set_r(cpu, ptex, pte.pte1);
+     }
+-
+-    if (new_pte1 !=3D pte.pte1) {
+-        ppc_hash64_store_hpte(cpu, ptex, pte.pte0, new_pte1);
++    if (!(pte.pte1 & HPTE64_R_C)) {
++        if (rwx =3D=3D 1) {
++            ppc_hash64_set_c(cpu, ptex, pte.pte1);
++        } else {
++            /*
++             * Treat the page as read-only for now, so that a later writ=
+e
++             * will pass through this function again to set the C bit
++             */
++            prot &=3D ~PAGE_WRITE;
++        }
+     }
+=20
+     /* 7. Determine the real address from the PTE */
+@@ -954,24 +986,6 @@ hwaddr ppc_hash64_get_phys_page_debug(PowerPCCPU *cp=
+u, target_ulong addr)
+         & TARGET_PAGE_MASK;
+ }
+=20
+-void ppc_hash64_store_hpte(PowerPCCPU *cpu, hwaddr ptex,
+-                           uint64_t pte0, uint64_t pte1)
+-{
+-    hwaddr base;
+-    hwaddr offset =3D ptex * HASH_PTE_SIZE_64;
+-
+-    if (cpu->vhyp) {
+-        PPCVirtualHypervisorClass *vhc =3D
+-            PPC_VIRTUAL_HYPERVISOR_GET_CLASS(cpu->vhyp);
+-        vhc->store_hpte(cpu->vhyp, ptex, pte0, pte1);
+-        return;
+-    }
+-    base =3D ppc_hash64_hpt_base(cpu);
+-
+-    stq_phys(CPU(cpu)->as, base + offset, pte0);
+-    stq_phys(CPU(cpu)->as, base + offset + HASH_PTE_SIZE_64 / 2, pte1);
+-}
+-
+ void ppc_hash64_tlb_flush_hpte(PowerPCCPU *cpu, target_ulong ptex,
+                                target_ulong pte0, target_ulong pte1)
+ {
+diff --git a/target/ppc/mmu-hash64.h b/target/ppc/mmu-hash64.h
+index 5be7ad86db..87729d48b3 100644
+--- a/target/ppc/mmu-hash64.h
++++ b/target/ppc/mmu-hash64.h
+@@ -10,8 +10,6 @@ int ppc_store_slb(PowerPCCPU *cpu, target_ulong slot,
+ hwaddr ppc_hash64_get_phys_page_debug(PowerPCCPU *cpu, target_ulong addr=
+);
+ int ppc_hash64_handle_mmu_fault(PowerPCCPU *cpu, vaddr address, int rw,
+                                 int mmu_idx);
+-void ppc_hash64_store_hpte(PowerPCCPU *cpu, hwaddr ptex,
+-                           uint64_t pte0, uint64_t pte1);
+ void ppc_hash64_tlb_flush_hpte(PowerPCCPU *cpu,
+                                target_ulong pte_index,
+                                target_ulong pte0, target_ulong pte1);
 --=20
 2.20.1
