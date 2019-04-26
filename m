@@ -2,98 +2,112 @@ Return-Path: <SRS0=QtPl=S4=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2751BC43219
-	for <qemu-devel@archiver.kernel.org>; Fri, 26 Apr 2019 11:21:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B3080C43218
+	for <qemu-devel@archiver.kernel.org>; Fri, 26 Apr 2019 11:21:40 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D762F206C1
-	for <qemu-devel@archiver.kernel.org>; Fri, 26 Apr 2019 11:21:10 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D762F206C1
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=de.ibm.com
+	by mail.kernel.org (Postfix) with ESMTPS id 7825A206C1
+	for <qemu-devel@archiver.kernel.org>; Fri, 26 Apr 2019 11:21:40 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7825A206C1
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:45108 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:45115 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hJyuk-0003PL-3x
-	for qemu-devel@archiver.kernel.org; Fri, 26 Apr 2019 07:21:10 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:50834)
+	id 1hJyvD-0003rI-N6
+	for qemu-devel@archiver.kernel.org; Fri, 26 Apr 2019 07:21:39 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:53940)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <borntraeger@de.ibm.com>) id 1hJylG-0002vK-LY
-	for qemu-devel@nongnu.org; Fri, 26 Apr 2019 07:11:23 -0400
+	(envelope-from <david@redhat.com>) id 1hJyrv-0001aI-GF
+	for qemu-devel@nongnu.org; Fri, 26 Apr 2019 07:18:16 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <borntraeger@de.ibm.com>) id 1hJylE-0003kn-3M
-	for qemu-devel@nongnu.org; Fri, 26 Apr 2019 07:11:22 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:52760)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <borntraeger@de.ibm.com>)
-	id 1hJylD-0002pu-OM
-	for qemu-devel@nongnu.org; Fri, 26 Apr 2019 07:11:20 -0400
-Received: from pps.filterd (m0098410.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id
-	x3QB8bTG102062
-	for <qemu-devel@nongnu.org>; Fri, 26 Apr 2019 07:10:16 -0400
-Received: from e34.co.us.ibm.com (e34.co.us.ibm.com [32.97.110.152])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2s40uj035d-1
-	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Fri, 26 Apr 2019 07:10:16 -0400
-Received: from localhost
-	by e34.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
-	Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <borntraeger@de.ibm.com>;
-	Fri, 26 Apr 2019 12:10:15 +0100
-Received: from b03cxnp08028.gho.boulder.ibm.com (9.17.130.20)
-	by e34.co.us.ibm.com (192.168.1.134) with IBM ESMTP SMTP Gateway:
-	Authorized Use Only! Violators will be prosecuted; 
-	(version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
-	Fri, 26 Apr 2019 12:10:13 +0100
-Received: from b03ledav006.gho.boulder.ibm.com
-	(b03ledav006.gho.boulder.ibm.com [9.17.130.237])
-	by b03cxnp08028.gho.boulder.ibm.com (8.14.9/8.14.9/NCO v10.0) with
-	ESMTP id x3QBABHT66650322
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256
-	verify=OK); Fri, 26 Apr 2019 11:10:11 GMT
-Received: from b03ledav006.gho.boulder.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 8DB30C6055;
-	Fri, 26 Apr 2019 11:10:11 +0000 (GMT)
-Received: from b03ledav006.gho.boulder.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id C6BEEC6057;
-	Fri, 26 Apr 2019 11:10:10 +0000 (GMT)
-Received: from localhost.localdomain (unknown [9.114.17.106])
-	by b03ledav006.gho.boulder.ibm.com (Postfix) with ESMTP;
-	Fri, 26 Apr 2019 11:10:10 +0000 (GMT)
-From: Christian Borntraeger <borntraeger@de.ibm.com>
-To: Cornelia Huck <cohuck@redhat.com>
-Date: Fri, 26 Apr 2019 07:10:00 -0400
-X-Mailer: git-send-email 2.17.1
-In-Reply-To: <20190426111003.21246-1-borntraeger@de.ibm.com>
+	(envelope-from <david@redhat.com>) id 1hJyrt-0003JL-Mg
+	for qemu-devel@nongnu.org; Fri, 26 Apr 2019 07:18:15 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:59526)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <david@redhat.com>)
+	id 1hJyrt-0003HG-Eg; Fri, 26 Apr 2019 07:18:13 -0400
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+	[10.5.11.15])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id A854F81227;
+	Fri, 26 Apr 2019 11:18:11 +0000 (UTC)
+Received: from [10.36.117.165] (ovpn-117-165.ams2.redhat.com [10.36.117.165])
+	by smtp.corp.redhat.com (Postfix) with ESMTP id 0C04B5D717;
+	Fri, 26 Apr 2019 11:18:09 +0000 (UTC)
+To: Christian Borntraeger <borntraeger@de.ibm.com>,
+	Cornelia Huck <cohuck@redhat.com>
 References: <20190426111003.21246-1-borntraeger@de.ibm.com>
-X-TM-AS-GCONF: 00
-x-cbid: 19042611-0016-0000-0000-000009A74D06
-X-IBM-SpamModules-Scores: 
-X-IBM-SpamModules-Versions: BY=3.00010998; HX=3.00000242; KW=3.00000007;
-	PH=3.00000004; SC=3.00000285; SDB=6.01194611; UDB=6.00626339;
-	IPR=6.00975446; 
-	MB=3.00026606; MTD=3.00000008; XFM=3.00000015; UTC=2019-04-26 11:10:14
-X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
-x-cbparentid: 19042611-0017-0000-0000-000042F775AA
-Message-Id: <20190426111003.21246-8-borntraeger@de.ibm.com>
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:, ,
-	definitions=2019-04-26_07:, , signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
-	priorityscore=1501
-	malwarescore=0 suspectscore=0 phishscore=0 bulkscore=0 spamscore=0
-	clxscore=1015 lowpriorityscore=0 mlxscore=0 impostorscore=0
-	mlxlogscore=999 adultscore=0 classifier=spam adjust=0 reason=mlx
-	scancount=1 engine=8.0.1-1810050000 definitions=main-1904260078
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic]
-X-Received-From: 148.163.156.1
-Subject: [Qemu-devel] [PATCH v2 07/10] s390x/cpumodel: add
- Deflate-conversion facility
+	<20190426111003.21246-10-borntraeger@de.ibm.com>
+From: David Hildenbrand <david@redhat.com>
+Openpgp: preference=signencrypt
+Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
+	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
+	SE+xAvmumFBY
+Organization: Red Hat GmbH
+Message-ID: <c07b4807-787b-3420-1cae-fb29f56dd9b4@redhat.com>
+Date: Fri, 26 Apr 2019 13:18:09 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+	Thunderbird/60.6.1
+MIME-Version: 1.0
+In-Reply-To: <20190426111003.21246-10-borntraeger@de.ibm.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+	(mx1.redhat.com [10.5.110.25]);
+	Fri, 26 Apr 2019 11:18:11 +0000 (UTC)
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 209.132.183.28
+Subject: Re: [Qemu-devel] [PATCH v2 09/10] s390x/cpumodel: disable csske and
+ bpb from gen15 cpu models onwards
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -106,174 +120,67 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 Cc: "Jason J . Herne" <jjherne@linux.ibm.com>,
-	Collin Walling <walling@linux.ibm.com>,
-	David Hildenbrand <david@redhat.com>, qemu-devel <qemu-devel@nongnu.org>,
+	Collin Walling <walling@linux.ibm.com>, qemu-devel <qemu-devel@nongnu.org>,
 	Halil Pasic <pasic@linux.ibm.com>, qemu-s390x <qemu-s390x@nongnu.org>,
 	Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Content-Type: text/plain; charset="UTF-8"
-Message-ID: <20190426111000.zeHenH7Oh4wEZ0CHlaB3PfrGpiI4Jeb7ChCBrTp0kks@z>
+Message-ID: <20190426111809.bC6kxM72iIMb37AxANSsS8_SRmUoJUE4qINQBadzNt4@z>
 
-add the deflate conversion facility.
+On 26.04.19 13:10, Christian Borntraeger wrote:
+> These facilities are deprecated and no longer needed.
+> 
+> Signed-off-by: Christian Borntraeger <borntraeger@de.ibm.com>
+> ---
+>  target/s390x/gen-features.c | 12 ++++++++++++
+>  1 file changed, 12 insertions(+)
+> 
+> diff --git a/target/s390x/gen-features.c b/target/s390x/gen-features.c
+> index 6260f56dc1..c346b76bdf 100644
+> --- a/target/s390x/gen-features.c
+> +++ b/target/s390x/gen-features.c
+> @@ -13,6 +13,7 @@
+>  
+>  #include <inttypes.h>
+>  #include <stdio.h>
+> +#include <string.h>
+>  #include "cpu_features_def.h"
+>  
+>  #define ARRAY_SIZE(array) (sizeof(array) / sizeof(array[0]))
+> @@ -833,6 +834,11 @@ static void set_bits(uint64_t list[], BitSpec bits)
+>      }
+>  }
+>  
+> +static inline void clear_bit(uint64_t list[], unsigned long nr)
+> +{
+> +    list[nr / 64] &= ~(1ULL << (nr % 64));
+> +}
+> +
+>  static void print_feature_defs(void)
+>  {
+>      uint64_t base_feat[S390_FEAT_MAX / 64 + 1] = {};
+> @@ -843,6 +849,12 @@ static void print_feature_defs(void)
+>      printf("\n/* CPU model feature list data */\n");
+>  
+>      for (i = 0; i < ARRAY_SIZE(CpuFeatDef); i++) {
+> +        /* With gen15 CSSKE and BPB are deprecated */
+> +        if (strcmp(CpuFeatDef[i].name, "S390_FEAT_LIST_GEN15_GA1") == 0) {
+> +            clear_bit(base_feat, S390_FEAT_CONDITIONAL_SSKE);
+> +            clear_bit(default_feat, S390_FEAT_CONDITIONAL_SSKE);
+> +            clear_bit(default_feat, S390_FEAT_BPB);
+> +        }
+>          set_bits(base_feat, CpuFeatDef[i].base_bits);
+>          /* add the base to the default features */
+>          set_bits(default_feat, CpuFeatDef[i].base_bits);
+> 
 
-Signed-off-by: Christian Borntraeger <borntraeger@de.ibm.com>
----
- target/s390x/cpu_features.c     |  9 +++++++++
- target/s390x/cpu_features.h     |  1 +
- target/s390x/cpu_features_def.h |  7 +++++++
- target/s390x/gen-features.c     | 12 ++++++++++++
- target/s390x/kvm.c              |  6 ++++++
- 5 files changed, 35 insertions(+)
+Can you squash that into the previous patch, so it doesn't look like the
+case model is suddenly changed?
 
-diff --git a/target/s390x/cpu_features.c b/target/s390x/cpu_features.c
-index 1d19b3072e..f64f581c86 100644
---- a/target/s390x/cpu_features.c
-+++ b/target/s390x/cpu_features.c
-@@ -110,6 +110,7 @@ static const S390FeatDef s390_features[] = {
-     FEAT_INIT("cmmnt", S390_FEAT_TYPE_STFL, 147, "CMM: ESSA-enhancement (no translate) facility"),
-     FEAT_INIT("vxeh2", S390_FEAT_TYPE_STFL, 148, "Vector Enhancements facility 2"),
-     FEAT_INIT("esort-base", S390_FEAT_TYPE_STFL, 150, "Enhanced-sort facility (excluding subfunctions)"),
-+    FEAT_INIT("deflate-base", S390_FEAT_TYPE_STFL, 151, "Deflate-conversion facility (excluding subfunctions)"),
-     FEAT_INIT("vxbeh", S390_FEAT_TYPE_STFL, 152, "Vector BCD enhancements facility 1"),
-     FEAT_INIT("msa9-base", S390_FEAT_TYPE_STFL, 155, "Message-security-assist-extension-9 facility (excluding subfunctions)"),
-     FEAT_INIT("etoken", S390_FEAT_TYPE_STFL, 156, "Etoken facility"),
-@@ -347,6 +348,11 @@ static const S390FeatDef s390_features[] = {
-     FEAT_INIT("sortl-32", S390_FEAT_TYPE_SORTL, 130, "SORTL 32 input lists"),
-     FEAT_INIT("sortl-128", S390_FEAT_TYPE_SORTL, 132, "SORTL 128 input lists"),
-     FEAT_INIT("sortl-f0", S390_FEAT_TYPE_SORTL, 192, "SORTL format 0 parameter-block"),
-+
-+    FEAT_INIT("dfltcc-gdht", S390_FEAT_TYPE_DFLTCC, 1, "DFLTCC GDHT"),
-+    FEAT_INIT("dfltcc-cmpr", S390_FEAT_TYPE_DFLTCC, 2, "DFLTCC CMPR"),
-+    FEAT_INIT("dfltcc-xpnd", S390_FEAT_TYPE_DFLTCC, 4, "DFLTCC XPND"),
-+    FEAT_INIT("dfltcc-f0", S390_FEAT_TYPE_DFLTCC, 192, "DFLTCC format 0 parameter-block"),
- };
- 
- const S390FeatDef *s390_feat_def(S390Feat feat)
-@@ -411,6 +417,7 @@ void s390_fill_feat_block(const S390FeatBitmap features, S390FeatType type,
-     case S390_FEAT_TYPE_KMA:
-     case S390_FEAT_TYPE_KDSA:
-     case S390_FEAT_TYPE_SORTL:
-+    case S390_FEAT_TYPE_DFLTCC:
-         set_be_bit(0, data); /* query is always available */
-         break;
-     default:
-@@ -439,6 +446,7 @@ void s390_add_from_feat_block(S390FeatBitmap features, S390FeatType type,
-        break;
-     case S390_FEAT_TYPE_PLO:
-     case S390_FEAT_TYPE_SORTL:
-+    case S390_FEAT_TYPE_DFLTCC:
-        nr_bits = 256;
-        break;
-     default:
-@@ -511,6 +519,7 @@ static S390FeatGroupDef s390_feature_groups[] = {
-     FEAT_GROUP_INIT("msa9_pckmo", MSA_EXT_9_PCKMO, "Message-security-assist-extension 9 PCKMO subfunctions"),
-     FEAT_GROUP_INIT("mepochptff", MULTIPLE_EPOCH_PTFF, "PTFF enhancements introduced with Multiple-epoch facility"),
-     FEAT_GROUP_INIT("esort", ENH_SORT, "Enhanced-sort facility"),
-+    FEAT_GROUP_INIT("deflate", DEFLATE_CONVERSION, "Deflate-conversion facility"),
- };
- 
- const S390FeatGroupDef *s390_feat_group_def(S390FeatGroup group)
-diff --git a/target/s390x/cpu_features.h b/target/s390x/cpu_features.h
-index 3b8c5b25dd..da695a8346 100644
---- a/target/s390x/cpu_features.h
-+++ b/target/s390x/cpu_features.h
-@@ -41,6 +41,7 @@ typedef enum {
-     S390_FEAT_TYPE_KMA,
-     S390_FEAT_TYPE_KDSA,
-     S390_FEAT_TYPE_SORTL,
-+    S390_FEAT_TYPE_DFLTCC,
- } S390FeatType;
- 
- /* Definition of a CPU feature */
-diff --git a/target/s390x/cpu_features_def.h b/target/s390x/cpu_features_def.h
-index bb8585847f..292b17b35d 100644
---- a/target/s390x/cpu_features_def.h
-+++ b/target/s390x/cpu_features_def.h
-@@ -98,6 +98,7 @@ typedef enum {
-     S390_FEAT_CMM_NT,
-     S390_FEAT_VECTOR_ENH2,
-     S390_FEAT_ESORT_BASE,
-+    S390_FEAT_DEFLATE_BASE,
-     S390_FEAT_VECTOR_BCD_ENH,
-     S390_FEAT_MSA_EXT_9,
-     S390_FEAT_ETOKEN,
-@@ -354,6 +355,12 @@ typedef enum {
-     S390_FEAT_SORTL_128,
-     S390_FEAT_SORTL_F0,
- 
-+    /* DEFLATE */
-+    S390_FEAT_DEFLATE_GHDT,
-+    S390_FEAT_DEFLATE_CMPR,
-+    S390_FEAT_DEFLATE_XPND,
-+    S390_FEAT_DEFLATE_F0,
-+
-     S390_FEAT_MAX,
- } S390Feat;
- 
-diff --git a/target/s390x/gen-features.c b/target/s390x/gen-features.c
-index 0a62cc5631..8fc2e8e72f 100644
---- a/target/s390x/gen-features.c
-+++ b/target/s390x/gen-features.c
-@@ -254,6 +254,13 @@
-     S390_FEAT_SORTL_F0
- 
- 
-+#define S390_FEAT_GROUP_DEFLATE_CONVERSION \
-+    S390_FEAT_DEFLATE_BASE, \
-+    S390_FEAT_DEFLATE_GHDT, \
-+    S390_FEAT_DEFLATE_CMPR, \
-+    S390_FEAT_DEFLATE_XPND, \
-+    S390_FEAT_DEFLATE_F0
-+
- /* cpu feature groups */
- static uint16_t group_PLO[] = {
-     S390_FEAT_GROUP_PLO,
-@@ -307,6 +314,10 @@ static uint16_t group_ENH_SORT[] = {
-     S390_FEAT_GROUP_ENH_SORT,
- };
- 
-+static uint16_t group_DEFLATE_CONVERSION[] = {
-+    S390_FEAT_GROUP_DEFLATE_CONVERSION,
-+};
-+
- /* Base features (in order of release)
-  * Only non-hypervisor managed features belong here.
-  * Base feature sets are static meaning they do not change in future QEMU
-@@ -766,6 +777,7 @@ static FeatGroupDefSpec FeatGroupDef[] = {
-     FEAT_GROUP_INITIALIZER(MSA_EXT_9_PCKMO),
-     FEAT_GROUP_INITIALIZER(MULTIPLE_EPOCH_PTFF),
-     FEAT_GROUP_INITIALIZER(ENH_SORT),
-+    FEAT_GROUP_INITIALIZER(DEFLATE_CONVERSION),
- };
- 
- #define QEMU_FEAT_INITIALIZER(_name)                   \
-diff --git a/target/s390x/kvm.c b/target/s390x/kvm.c
-index f91f436a31..e5e2b691f2 100644
---- a/target/s390x/kvm.c
-+++ b/target/s390x/kvm.c
-@@ -2079,6 +2079,9 @@ static int query_cpu_subfunc(S390FeatBitmap features)
-     if (test_bit(S390_FEAT_ESORT_BASE, features)) {
-         s390_add_from_feat_block(features, S390_FEAT_TYPE_SORTL, prop.sortl);
-     }
-+    if (test_bit(S390_FEAT_DEFLATE_BASE, features)) {
-+        s390_add_from_feat_block(features, S390_FEAT_TYPE_DFLTCC, prop.dfltcc);
-+    }
-     return 0;
- }
- 
-@@ -2129,6 +2132,9 @@ static int configure_cpu_subfunc(const S390FeatBitmap features)
-     if (test_bit(S390_FEAT_ESORT_BASE, features)) {
-         s390_fill_feat_block(features, S390_FEAT_TYPE_SORTL, prop.sortl);
-     }
-+    if (test_bit(S390_FEAT_DEFLATE_BASE, features)) {
-+        s390_fill_feat_block(features, S390_FEAT_TYPE_DFLTCC, prop.dfltcc);
-+    }
-     return kvm_vm_ioctl(kvm_state, KVM_SET_DEVICE_ATTR, &attr);
- }
- 
 -- 
-2.17.1
 
+Thanks,
+
+David / dhildenb
 
