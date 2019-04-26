@@ -7,71 +7,71 @@ X-Spam-Status: No, score=-8.5 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
 	SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1D4C0C43219
-	for <qemu-devel@archiver.kernel.org>; Fri, 26 Apr 2019 04:50:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BC4ADC43218
+	for <qemu-devel@archiver.kernel.org>; Fri, 26 Apr 2019 04:50:12 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E6075206BF
-	for <qemu-devel@archiver.kernel.org>; Fri, 26 Apr 2019 04:50:08 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 8F048206BF
+	for <qemu-devel@archiver.kernel.org>; Fri, 26 Apr 2019 04:50:12 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="o8jtLmGM"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E6075206BF
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="HNzEwa2N"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8F048206BF
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:39104 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:39106 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hJsoJ-00025E-T9
-	for qemu-devel@archiver.kernel.org; Fri, 26 Apr 2019 00:50:07 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:45317)
+	id 1hJsoN-0002E9-OB
+	for qemu-devel@archiver.kernel.org; Fri, 26 Apr 2019 00:50:11 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:45320)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <arilou@gmail.com>) id 1hJsmS-0000dE-Ss
-	for qemu-devel@nongnu.org; Fri, 26 Apr 2019 00:48:13 -0400
+	(envelope-from <arilou@gmail.com>) id 1hJsma-0000dG-DV
+	for qemu-devel@nongnu.org; Fri, 26 Apr 2019 00:48:21 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <arilou@gmail.com>) id 1hJsbW-00051t-5E
-	for qemu-devel@nongnu.org; Fri, 26 Apr 2019 00:36:55 -0400
-Received: from mail-wm1-x343.google.com ([2a00:1450:4864:20::343]:37711)
+	(envelope-from <arilou@gmail.com>) id 1hJsbO-0004pp-1H
+	for qemu-devel@nongnu.org; Fri, 26 Apr 2019 00:36:46 -0400
+Received: from mail-wm1-x344.google.com ([2a00:1450:4864:20::344]:40454)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <arilou@gmail.com>) id 1hJsbV-00050J-VC
-	for qemu-devel@nongnu.org; Fri, 26 Apr 2019 00:36:54 -0400
-Received: by mail-wm1-x343.google.com with SMTP id y5so1352434wma.2
-	for <qemu-devel@nongnu.org>; Thu, 25 Apr 2019 21:36:53 -0700 (PDT)
+	(Exim 4.71) (envelope-from <arilou@gmail.com>) id 1hJsbN-0004ph-Rg
+	for qemu-devel@nongnu.org; Fri, 26 Apr 2019 00:36:45 -0400
+Received: by mail-wm1-x344.google.com with SMTP id h11so2331908wmb.5
+	for <qemu-devel@nongnu.org>; Thu, 25 Apr 2019 21:36:45 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
 	h=from:to:cc:subject:date:message-id:in-reply-to:references
 	:mime-version:content-transfer-encoding;
-	bh=NvRXYl/vjqrIbJL0BHzsmEe5eGi5MjJ6JeUBkCbtEUs=;
-	b=o8jtLmGMTg/j6FrH5qMGrYRokarNWfduHVYdcA4l3xtFrJBSYzcinmoONSD8seG9QB
-	wuXP+t/2XlqehNvAYQouCzK4pzKeKriAVJ1y/zkVbCy20DQFmu2W81ZOxPcKcfqQ4nvp
-	5fokp5lUhWW51b21kUDLpdFh6aKM1/yYMPGxTuMZmAIIOzQO7E0GaosfQHcoB8laTKwO
-	sfJ7StEZxVMPZNLBpbT5bqLltehh0cOy/Q64kWxwNQjgHI53xHcNaH+38W7AqGKIlgKQ
-	IjdYboGyD8uYDBGJwLKrZl84x267f5EwjiERroq5m0tqyZa61AxSpvtsAHdq7IxTZDUo
-	ngaQ==
+	bh=EShIhnyclfVo57FnSdW5zX6W2mQ/1wfNmEis7PfWfkY=;
+	b=HNzEwa2Nxqpej16GQ5d2qNjgFjBlQH0uqqIPgcirFaL34jxlcAFZ/bLLU/zT3LDq4u
+	JuYTXWUGL8yTCXyTPLD9WnFyRxSCEgEL2K7w23ZkzwhJ9YdL/n++xMLWoTIr209QVdol
+	3W2F6jg+7iL45iSxs+4SBW2FoH8D2IdXW5i5awh1P3RcX9Q527ccXw5dlB52gWIGZy/M
+	pyauS1V7RDC3hCum1SenQb9UI9c/ga5eP9RFF1sVR/XGCZlhgOqY49fDktQfYdcWDlpb
+	yjTWR5Cv1ie+udoGodF3VWdef7dPd7isa1d7T7jpA6XOx/jbLIrheP2PCn+V9VcsJniq
+	ZVGQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
 	d=1e100.net; s=20161025;
 	h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
 	:references:mime-version:content-transfer-encoding;
-	bh=NvRXYl/vjqrIbJL0BHzsmEe5eGi5MjJ6JeUBkCbtEUs=;
-	b=q+Gr+gAOgLcv04i27QOs8yn8XQ7JvXWTAe7Y1xSh1HTbOqYkBnBAMrKDYKTfy7MKL4
-	BwCaEJmy1PXu6RJSluZftV6Z2cpIcuFDk7eTUMSjLjtBDAzAS3HbcJ4NaJoJuD3Wx80g
-	kor8h98Hyhx2KABLywv+rEzgToPYQeM2xrrZ02VLJwJMTCkn4f+88lxfbSuyPoDZs7vi
-	wRFjXt4aXTSl47HRudRxyfot/wf7mn0BIGYQMPxZ0NGmO34MCORgCtWlp1EsSJxoY075
-	yT/7At01eNcF7m57ZlXzngpwGSD3IS1LATCI+wJ0xfcpXXq2GqkE0rPDo9eDA9Vokd+i
-	CCAg==
-X-Gm-Message-State: APjAAAUSMKIvhdagi/Otal9VfA+R3NtgbizDXC0h1Z/IdTpVnhJxafOI
-	Vc5dsITO3FSLBe5u+TTwWg2/FTZq
-X-Google-Smtp-Source: APXvYqz0YHwHacXZGEZGCrgf/kWATQGqcMYEDMdTRX8XT/4inL2vVcroUITGoNCf3bA1lcuLqizuNg==
-X-Received: by 2002:a1c:7e10:: with SMTP id z16mr6298258wmc.117.1556253412396; 
-	Thu, 25 Apr 2019 21:36:52 -0700 (PDT)
+	bh=EShIhnyclfVo57FnSdW5zX6W2mQ/1wfNmEis7PfWfkY=;
+	b=CkfHkmLdS5bAJrW2yiqXi3bxc0gNq7DK7IbKF4bn6+T9Cp5IOTiIpBE8tSMQZko4sE
+	7AKP6frMMWvX+l7UMMMYtdJSGtI2LCOk00t99Ig0Qh3GZhSTPK6VsON6eOM/9P5TJTwp
+	TxcSW2xtFAGlqCxtTZ1OfnupNFFJ2Gh/0H8WWY9IOdjIevkyhNMvCAV5KyFrdR/RAGws
+	CKmegzDQZlvWgiGXFJ0jcP3iAYbHfr23Xo32OaurZggChwVveQhNQGkO5GBdPRRyirly
+	pyqKm81i4pleoXcP1wo1fJDkMb7RIiLcnhf0fV1XVDIunUqii+9oBDgG7WOhCA3zT2/b
+	yTNA==
+X-Gm-Message-State: APjAAAWtqwHS9qEAhprhR4S4MxUHFD1041QRoJsz8+r2i9cxZPke15pA
+	okuLpQuSZPVamDNrGwx6sPeYrXSz
+X-Google-Smtp-Source: APXvYqwBLp/t7BAGM6ZRRHdjlu3iJYxA4T1kyxdub4rArJXGfgUbmy5XS7EH4JHyaFaOv8AmHls8Tg==
+X-Received: by 2002:a1c:1903:: with SMTP id 3mr5959439wmz.103.1556253404373;
+	Thu, 25 Apr 2019 21:36:44 -0700 (PDT)
 Received: from localhost.localdomain (bzq-79-178-247-46.red.bezeqint.net.
 	[79.178.247.46])
-	by smtp.gmail.com with ESMTPSA id h5sm3467088wmf.38.2019.04.25.21.36.50
+	by smtp.gmail.com with ESMTPSA id h5sm3467088wmf.38.2019.04.25.21.36.42
 	(version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
-	Thu, 25 Apr 2019 21:36:51 -0700 (PDT)
+	Thu, 25 Apr 2019 21:36:43 -0700 (PDT)
 From: Jon Doron <arilou@gmail.com>
 To: qemu-devel@nongnu.org
-Date: Fri, 26 Apr 2019 07:35:57 +0300
-Message-Id: <20190426043558.6888-21-arilou@gmail.com>
+Date: Fri, 26 Apr 2019 07:35:53 +0300
+Message-Id: <20190426043558.6888-17-arilou@gmail.com>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20190426043558.6888-1-arilou@gmail.com>
 References: <20190426043558.6888-1-arilou@gmail.com>
@@ -79,9 +79,9 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
 	recognized.
-X-Received-From: 2a00:1450:4864:20::343
-Subject: [Qemu-devel] [PATCH v7 20/21] gdbstub: Implement target halted (?
- pkt) with new infra
+X-Received-From: 2a00:1450:4864:20::344
+Subject: [Qemu-devel] [PATCH v7 16/21] gdbstub: Implement step (s pkt) with
+ new infra
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -98,73 +98,57 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 Content-Type: text/plain; charset="UTF-8"
-Message-ID: <20190426043557.U84YhsN52APRoqWu-7NJ4Fix6GRvtRyhCSwLAOBzwhs@z>
+Message-ID: <20190426043553.xTYRN_ZTiZT81Li1iDWIplwhb-Gotaf93Kfu5fNp9JY@z>
 
 Signed-off-by: Jon Doron <arilou@gmail.com>
 ---
- gdbstub.c | 36 ++++++++++++++++++++++++++----------
- 1 file changed, 26 insertions(+), 10 deletions(-)
+ gdbstub.c | 25 +++++++++++++++++++------
+ 1 file changed, 19 insertions(+), 6 deletions(-)
 
 diff --git a/gdbstub.c b/gdbstub.c
-index 2fd0d66f4d..d678191705 100644
+index 9fe130f30d..9b0556f8be 100644
 --- a/gdbstub.c
 +++ b/gdbstub.c
-@@ -2239,13 +2239,30 @@ static void handle_gen_set(GdbCmdContext *gdb_ctx, void *user_ctx)
-     put_packet(gdb_ctx->s, "");
+@@ -1805,6 +1805,16 @@ static void handle_file_io(GdbCmdContext *gdb_ctx, void *user_ctx)
+     gdb_continue(gdb_ctx->s);
  }
  
-+static void handle_target_halt(GdbCmdContext *gdb_ctx, void *user_ctx)
++static void handle_step(GdbCmdContext *gdb_ctx, void *user_ctx)
 +{
-+    char thread_id[16];
++    if (gdb_ctx->num_params) {
++        gdb_set_cpu_pc(gdb_ctx->s, (target_ulong)gdb_ctx->params[0].val_ull);
++    }
 +
-+    /* TODO: Make this return the correct value for user-mode.  */
-+    gdb_fmt_thread_id(gdb_ctx->s, gdb_ctx->s->c_cpu, thread_id,
-+                      sizeof(thread_id));
-+    snprintf(gdb_ctx->str_buf, sizeof(gdb_ctx->str_buf), "T%02xthread:%s;",
-+             GDB_SIGNAL_TRAP, thread_id);
-+    put_packet(gdb_ctx->s, gdb_ctx->str_buf);
-+    /*
-+     * Remove all the breakpoints when this query is issued,
-+     * because gdb is doing and initial connect and the state
-+     * should be cleaned up.
-+     */
-+    gdb_breakpoint_remove_all();
++    cpu_single_step(gdb_ctx->s->c_cpu, sstep_flags);
++    gdb_continue(gdb_ctx->s);
 +}
 +
  static int gdb_handle_packet(GDBState *s, const char *line_buf)
  {
-     const char *p;
-     int ch;
-     uint8_t mem_buf[MAX_PACKET_LENGTH];
-     char buf[sizeof(mem_buf) + 1 /* trailing NUL */];
--    char thread_id[16];
-     const GdbCmdParseEntry *cmd_parser = NULL;
- 
-     trace_gdbstub_io_command(line_buf);
-@@ -2257,15 +2274,14 @@ static int gdb_handle_packet(GDBState *s, const char *line_buf)
-         put_packet(s, "OK");
+     CPUState *cpu;
+@@ -1937,13 +1947,16 @@ static int gdb_handle_packet(GDBState *s, const char *line_buf)
+         }
          break;
-     case '?':
--        /* TODO: Make this return the correct value for user-mode.  */
--        snprintf(buf, sizeof(buf), "T%02xthread:%s;", GDB_SIGNAL_TRAP,
--                 gdb_fmt_thread_id(s, s->c_cpu, thread_id, sizeof(thread_id)));
--        put_packet(s, buf);
--        /* Remove all the breakpoints when this query is issued,
--         * because gdb is doing and initial connect and the state
--         * should be cleaned up.
--         */
--        gdb_breakpoint_remove_all();
+     case 's':
+-        if (*p != '\0') {
+-            addr = strtoull(p, (char **)&p, 16);
+-            gdb_set_cpu_pc(s, addr);
 +        {
-+            static const GdbCmdParseEntry target_halted_cmd_desc = {
-+                .handler = handle_target_halt,
-+                .cmd = "?",
-+                .cmd_startswith = 1
++            static const GdbCmdParseEntry step_cmd_desc = {
++                .handler = handle_step,
++                .cmd = "s",
++                .cmd_startswith = 1,
++                .schema = "L0"
 +            };
-+            cmd_parser = &target_halted_cmd_desc;
-+        }
-         break;
-     case 'c':
++            cmd_parser = &step_cmd_desc;
+         }
+-        cpu_single_step(s->c_cpu, sstep_flags);
+-        gdb_continue(s);
+-        return RS_IDLE;
++        break;
+     case 'F':
          {
+             static const GdbCmdParseEntry file_io_cmd_desc = {
 -- 
 2.20.1
 
