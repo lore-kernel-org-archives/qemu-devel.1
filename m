@@ -1,22 +1,27 @@
 Received: from eggs.gnu.org ([209.51.188.92]:55678)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1hK7l2-0006dl-6W
-	for qemu-devel@nongnu.org; Fri, 26 Apr 2019 16:47:45 -0400
+	(envelope-from <bp@alien8.de>) id 1hK7l6-0006dl-HN
+	for qemu-devel@nongnu.org; Fri, 26 Apr 2019 16:47:49 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1hK7hK-0007iy-No
-	for qemu-devel@nongnu.org; Fri, 26 Apr 2019 16:43:55 -0400
-References: <cover.1554985749.git.berto@igalia.com>
-	<9dc45741ca93573c3c782f2333129ee6ed1e9274.1554985749.git.berto@igalia.com>
-From: Max Reitz <mreitz@redhat.com>
-Message-ID: <e2d7327f-f9e8-60bf-e135-f38a0c955685@redhat.com>
-Date: Fri, 26 Apr 2019 22:43:48 +0200
+	(envelope-from <bp@alien8.de>) id 1hK7h2-0007Vf-Gx
+	for qemu-devel@nongnu.org; Fri, 26 Apr 2019 16:43:37 -0400
+Received: from mail.skyhub.de ([2a01:4f8:190:11c2::b:1457]:53928)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <bp@alien8.de>) id 1hK7h0-0007Qq-2I
+	for qemu-devel@nongnu.org; Fri, 26 Apr 2019 16:43:36 -0400
+Date: Fri, 26 Apr 2019 22:43:27 +0200
+From: Borislav Petkov <bp@alien8.de>
+Message-ID: <20190426204327.GM4608@zn.tnic>
+References: <20190424160942.13567-1-brijesh.singh@amd.com>
+	<20190424160942.13567-2-brijesh.singh@amd.com>
+	<20190426141042.GF4608@zn.tnic>
+	<e6f8da38-b8dd-a9c5-a358-5f33b6ea7b37@amd.com>
 MIME-Version: 1.0
-In-Reply-To: <9dc45741ca93573c3c782f2333129ee6ed1e9274.1554985749.git.berto@igalia.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="5dXhesZZVSm11Joonf9d9JnoyZ7XSmDNv"
-Subject: Re: [Qemu-devel] [PATCH for-4.1 v2 1/2] commit: Make base read-only
- if there is an early failure
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <e6f8da38-b8dd-a9c5-a358-5f33b6ea7b37@amd.com>
+Subject: Re: [Qemu-devel] [RFC PATCH v1 01/10] KVM: SVM: Add KVM_SEV
+ SEND_START command
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,52 +30,26 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alberto Garcia <berto@igalia.com>, qemu-devel@nongnu.org
-Cc: Eric Blake <eblake@redhat.com>, qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>
+To: "Singh, Brijesh" <brijesh.singh@amd.com>
+Cc: "kvm@vger.kernel.org" <kvm@vger.kernel.org>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>, "H. Peter Anvin" <hpa@zytor.com>, Paolo Bonzini <pbonzini@redhat.com>, Radim =?utf-8?B?S3LEjW3DocWZ?= <rkrcmar@redhat.com>, Joerg Roedel <joro@8bytes.org>, "Lendacky, Thomas" <Thomas.Lendacky@amd.com>, "x86@kernel.org" <x86@kernel.org>, "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---5dXhesZZVSm11Joonf9d9JnoyZ7XSmDNv
-From: Max Reitz <mreitz@redhat.com>
-To: Alberto Garcia <berto@igalia.com>, qemu-devel@nongnu.org
-Cc: Eric Blake <eblake@redhat.com>, qemu-block@nongnu.org,
- Kevin Wolf <kwolf@redhat.com>
-Message-ID: <e2d7327f-f9e8-60bf-e135-f38a0c955685@redhat.com>
-Subject: Re: [PATCH for-4.1 v2 1/2] commit: Make base read-only if there is an
- early failure
-References: <cover.1554985749.git.berto@igalia.com>
- <9dc45741ca93573c3c782f2333129ee6ed1e9274.1554985749.git.berto@igalia.com>
-In-Reply-To: <9dc45741ca93573c3c782f2333129ee6ed1e9274.1554985749.git.berto@igalia.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+On Fri, Apr 26, 2019 at 02:29:31PM +0000, Singh, Brijesh wrote:
+> Yes that's doable but I am afraid that caching the value may lead us to
+> wrong path and also divergence from the SEV API spec. The spec says the
+> returned length is a minimum length but its possible that caller can
+> give a bigger buffer and FW will still work with it.
 
-On 11.04.19 14:32, Alberto Garcia wrote:
-> You can reproduce this by passing an invalid filter-node-name (like
-> "1234") to block-commit. In this case the base image is put in
-> read-write mode but is never reset back to read-only.
->=20
-> Signed-off-by: Alberto Garcia <berto@igalia.com>
-> ---
->  block/commit.c | 3 +++
->  1 file changed, 3 insertions(+)
+Does the caller even have a valid reason to give a bigger buffer len?
 
-Reviewed-by: Max Reitz <mreitz@redhat.com>
+I mean I'm still thinking defensively here but maybe the only thing that
+would happen here with a bigger buffer is if the kmalloc() would fail,
+leading to eventual failure of the migration.
 
+If the code limits the allocation to some sane max length, the migration
+won't fail even if userspace gives it too big values...
 
---5dXhesZZVSm11Joonf9d9JnoyZ7XSmDNv
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
+-- 
+Regards/Gruss,
+    Boris.
 
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAlzDbYQACgkQ9AfbAGHV
-z0DXkAf/YqBVOfsS6cIhv/kXge+iuWhJYdlMDV17x+EOfddtXyiMNIuAqhU5JTNu
-TH8o5CcBA8I+p/32z9rDer/OR0R6d2aGcYQTwjxUXkJR3QZIPf6JxU/ZmZovsK+r
-1fjBR/68RP2KFLtsKyZu0ANAwpcR5GsOW5WyaJE4ipDLflK2d9KZApXkbcyjhuWx
-Fi3BiFoE5QpoQVA1OST5hps+iGfhfXCaj/UAigjN1lUWH5TH2qZmdLtcPataurI3
-cMabjO77ALMBd2PsvXxsdHT4Lio5sfMtivzsNKoD+WKPujkwXj1PNWbJBmlG9wq2
-9cFKdlQWGQrI7CN0W3pHZT6TmxvV5Q==
-=HbZE
------END PGP SIGNATURE-----
-
---5dXhesZZVSm11Joonf9d9JnoyZ7XSmDNv--
+Good mailing practices for 400: avoid top-posting and trim the reply.
