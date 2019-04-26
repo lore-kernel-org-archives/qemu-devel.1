@@ -1,26 +1,28 @@
-Received: from eggs.gnu.org ([209.51.188.92]:55329)
+Received: from eggs.gnu.org ([209.51.188.92]:56207)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <chen.zhang@intel.com>) id 1hJx8k-0002lB-Ly
-	for qemu-devel@nongnu.org; Fri, 26 Apr 2019 05:27:31 -0400
+	(envelope-from <marcandre.lureau@gmail.com>) id 1hJxA8-0004WV-1J
+	for qemu-devel@nongnu.org; Fri, 26 Apr 2019 05:28:57 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <chen.zhang@intel.com>) id 1hJx5G-0005Ef-6E
-	for qemu-devel@nongnu.org; Fri, 26 Apr 2019 05:23:55 -0400
-Received: from mga11.intel.com ([192.55.52.93]:18735)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <chen.zhang@intel.com>)
-	id 1hJx5F-0005DJ-Te
-	for qemu-devel@nongnu.org; Fri, 26 Apr 2019 05:23:54 -0400
-From: "Zhang, Chen" <chen.zhang@intel.com>
-Date: Fri, 26 Apr 2019 09:23:47 +0000
-Message-ID: <9CFF81C0F6B98A43A459C9EDAD400D78060E0DCF@shsmsx102.ccr.corp.intel.com>
-References: <20190426034015.4696-1-chen.zhang@intel.com>
-In-Reply-To: <20190426034015.4696-1-chen.zhang@intel.com>
-Content-Language: en-US
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+	(envelope-from <marcandre.lureau@gmail.com>) id 1hJxA7-0000iG-21
+	for qemu-devel@nongnu.org; Fri, 26 Apr 2019 05:28:55 -0400
+Received: from mail-wm1-x341.google.com ([2a00:1450:4864:20::341]:39173)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <marcandre.lureau@gmail.com>)
+	id 1hJxA6-0000hI-Nh
+	for qemu-devel@nongnu.org; Fri, 26 Apr 2019 05:28:54 -0400
+Received: by mail-wm1-x341.google.com with SMTP id n25so3376560wmk.4
+	for <qemu-devel@nongnu.org>; Fri, 26 Apr 2019 02:28:54 -0700 (PDT)
 MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [PATCH] migration/colo.c: Remove redundant input
- parameter
+References: <20190423132004.13725-1-marcandre.lureau@redhat.com>
+	<20190423132004.13725-3-marcandre.lureau@redhat.com>
+	<20190426071152.fxsicstylxa3bk3e@sirius.home.kraxel.org>
+In-Reply-To: <20190426071152.fxsicstylxa3bk3e@sirius.home.kraxel.org>
+From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
+Date: Fri, 26 Apr 2019 11:28:41 +0200
+Message-ID: <CAJ+F1C+C4hLMSPRiW9kKD8ADLaxwddd-gx2pUVo90uOgA1zsLw@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v6 02/11] Add vhost-user-input-pci
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,74 +31,61 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Laurent Vivier <laurent@vivier.eu>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Juan Quintela <quintela@redhat.com>, zhanghailiang <zhang.zhanghailiang@huawei.com>, qemu-dev <qemu-devel@nongnu.org>
-Cc: Zhang Chen <zhangckid@gmail.com>
+To: Gerd Hoffmann <kraxel@redhat.com>
+Cc: QEMU <qemu-devel@nongnu.org>, "Michael S. Tsirkin" <mst@redhat.com>
 
-This patch have been integrated in this series:
-http://lists.nongnu.org/archive/html/qemu-devel/2019-04/msg04520.html
-Please review it at this link.
+Hi
 
-Thanks
-Zhang Chen
+On Fri, Apr 26, 2019 at 9:12 AM Gerd Hoffmann <kraxel@redhat.com> wrote:
+>
+> > +static void vhost_input_get_config(VirtIODevice *vdev, uint8_t *config=
+_data)
+> > +{
+> > +    VirtIOInput *vinput =3D VIRTIO_INPUT(vdev);
+> > +    VHostUserInput *vhi =3D VHOST_USER_INPUT(vdev);
+> > +    int ret;
+> > +
+> > +    memset(config_data, 0, vinput->cfg_size);
+> > +
+> > +    ret =3D vhost_dev_get_config(&vhi->vhost->dev, config_data, vinput=
+->cfg_size);
+> > +    if (ret) {
+> > +        error_report("vhost-user-input: get device config space failed=
+");
+> > +        return;
+> > +    }
+> > +}
+> > +
+> > +static void vhost_input_set_config(VirtIODevice *vdev,
+> > +                                   const uint8_t *config_data)
+> > +{
+> > +    VHostUserInput *vhi =3D VHOST_USER_INPUT(vdev);
+> > +    int ret;
+> > +
+> > +    ret =3D vhost_dev_set_config(&vhi->vhost->dev, config_data,
+> > +                               0, sizeof(virtio_input_config),
+> > +                               VHOST_SET_CONFIG_TYPE_MASTER);
+> > +    if (ret) {
+> > +        error_report("vhost-user-input: set device config space failed=
+");
+> > +        return;
+> > +    }
+> > +
+> > +    virtio_notify_config(vdev);
+> > +}
+>
+> These two look rather generic, the only virtio-input specific thing is
+> the config space size.  Can we store the size somewhere, then move the
+> functions to common vhost-user code?
+
+vhost-user-input is simple, vhost-user-gpu is fiddling with the config
+on qemu side.
+
+virtio-input set_config() calls virtio_notify_config(), while
+virtio-gpu does not (vhost-user versions copy that).
+
+There isn't much code to share at this point.
 
 
-> -----Original Message-----
-> From: Zhang, Chen
-> Sent: Friday, April 26, 2019 11:40 AM
-> To: Laurent Vivier <laurent@vivier.eu>; Dr. David Alan Gilbert
-> <dgilbert@redhat.com>; Juan Quintela <quintela@redhat.com>; zhanghailiang
-> <zhang.zhanghailiang@huawei.com>; qemu-dev <qemu-devel@nongnu.org>
-> Cc: Zhang Chen <zhangckid@gmail.com>; Zhang, Chen <chen.zhang@intel.com>
-> Subject: [PATCH] migration/colo.c: Remove redundant input parameter
->=20
-> From: Zhang Chen <chen.zhang@intel.com>
->=20
-> The colo_do_failover no need the input parameter.
->=20
-> Signed-off-by: Zhang Chen <chen.zhang@intel.com>
-> ---
->  include/migration/colo.h  | 2 +-
->  migration/colo-failover.c | 2 +-
->  migration/colo.c          | 2 +-
->  3 files changed, 3 insertions(+), 3 deletions(-)
->=20
-> diff --git a/include/migration/colo.h b/include/migration/colo.h index
-> 99ce17aca7..ddebe0ad27 100644
-> --- a/include/migration/colo.h
-> +++ b/include/migration/colo.h
-> @@ -37,7 +37,7 @@ bool migration_incoming_in_colo_state(void);
->  COLOMode get_colo_mode(void);
->=20
->  /* failover */
-> -void colo_do_failover(MigrationState *s);
-> +void colo_do_failover(void);
->=20
->  void colo_checkpoint_notify(void *opaque);  #endif diff --git a/migratio=
-n/colo-
-> failover.c b/migration/colo-failover.c index 4854a96c92..e9ca0b4774 10064=
-4
-> --- a/migration/colo-failover.c
-> +++ b/migration/colo-failover.c
-> @@ -39,7 +39,7 @@ static void colo_failover_bh(void *opaque)
->          return;
->      }
->=20
-> -    colo_do_failover(NULL);
-> +    colo_do_failover();
->  }
->=20
->  void failover_request_active(Error **errp) diff --git a/migration/colo.c
-> b/migration/colo.c index 238a6d62c7..8c1644091f 100644
-> --- a/migration/colo.c
-> +++ b/migration/colo.c
-> @@ -193,7 +193,7 @@ COLOMode get_colo_mode(void)
->      }
->  }
->=20
-> -void colo_do_failover(MigrationState *s)
-> +void colo_do_failover(void)
->  {
->      /* Make sure VM stopped while failover happened. */
->      if (!colo_runstate_is_stopped()) {
-> --
-> 2.17.GIT
+--=20
+Marc-Andr=C3=A9 Lureau
