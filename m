@@ -1,24 +1,26 @@
-Received: from eggs.gnu.org ([209.51.188.92]:48633)
+Received: from eggs.gnu.org ([209.51.188.92]:49729)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1hJwZd-0005ux-De
-	for qemu-devel@nongnu.org; Fri, 26 Apr 2019 04:51:14 -0400
+	(envelope-from <like.xu@linux.intel.com>) id 1hJwdl-0008BK-6F
+	for qemu-devel@nongnu.org; Fri, 26 Apr 2019 04:55:30 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1hJwNP-0003hy-4L
-	for qemu-devel@nongnu.org; Fri, 26 Apr 2019 04:38:36 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:53242)
+	(envelope-from <like.xu@linux.intel.com>) id 1hJwdj-0002dS-Fx
+	for qemu-devel@nongnu.org; Fri, 26 Apr 2019 04:55:29 -0400
+Received: from mga05.intel.com ([192.55.52.43]:40051)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1hJwNO-0003hF-Rm
-	for qemu-devel@nongnu.org; Fri, 26 Apr 2019 04:38:35 -0400
-Date: Fri, 26 Apr 2019 10:38:30 +0200
-From: Gerd Hoffmann <kraxel@redhat.com>
-Message-ID: <20190426083830.kj7currufo637loa@sirius.home.kraxel.org>
-References: <4ec13220-0c12-3b87-6a79-49a42a38db01@suse.com>
+	(Exim 4.71) (envelope-from <like.xu@linux.intel.com>)
+	id 1hJwdh-0002YF-Id
+	for qemu-devel@nongnu.org; Fri, 26 Apr 2019 04:55:27 -0400
+References: <20190425200051.19906-1-ehabkost@redhat.com>
+From: Like Xu <like.xu@linux.intel.com>
+Message-ID: <1428e157-aa6d-02fc-94c9-97e948e3654d@linux.intel.com>
+Date: Fri, 26 Apr 2019 16:55:17 +0800
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-In-Reply-To: <4ec13220-0c12-3b87-6a79-49a42a38db01@suse.com>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] About pt-br keyboard layout
+In-Reply-To: <20190425200051.19906-1-ehabkost@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH 0/4] Remove some qdev_get_machine() calls
+ from CONFIG_USER_ONLY
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,35 +29,84 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Lin Ma <lma@suse.com>
-Cc: qemu-devel@nongnu.org, berrange@redhat.com
+To: Eduardo Habkost <ehabkost@redhat.com>, qemu-devel@nongnu.org
+Cc: Peter Maydell <peter.maydell@linaro.org>, Thomas Huth <thuth@redhat.com>, Markus Armbruster <armbru@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
 
-On Fri, Apr 26, 2019 at 04:09:12PM +0800, Lin Ma wrote:
-> Hi all,
->=20
-> While I launch qemu with vnc + pt-br keyboard layout on my pc, If I typ=
-e
-> shift + 6 in iPXE shell or grub shell via my usual 105-key keyboard,
-> shift + 6 would be mapped to "(apostrophe), But IIUC the correct charac=
-ter
-> should be =A8(diaeresis) in pt-br layout.
->=20
-> I'm wondering that is it the expected behavior? In other words, Does it=
- make
-> sense if I want to type multi-character characters(say =C7 or =A8) with=
-out guest
-> os's help?
+On 2019/4/26 4:00, Eduardo Habkost wrote:
+> This series moves some qdev code outside qdev.o, so it can be
+> compiled only in CONFIG_SOFTMMU.
+> 
+> The code being moved includes two qdev_get_machine() calls, so
+> this will make it easier to move qdev_get_machine() to
+> CONFIG_SOFTMMU later.
+> 
+> After this series, there's one remaining qdev_get_machine() call
+> that seems more difficult to remove:
+> 
+>      static void device_set_realized(Object *obj, bool value, Error **errp)
+>      {
+>          /* [...] */
+>          if (!obj->parent) {
+>              gchar *name = g_strdup_printf("device[%d]", unattached_count++);
+> 
+>              object_property_add_child(container_get(qdev_get_machine(),
+>                                                      "/unattached"),
+>                                        name, obj, &error_abort);
+>              unattached_parent = true;
+>              g_free(name);
+>          }
+>          /* [...] */
+>      }
+> 
 
-No.  -k is for translating keysyms back into the correct scancodes,
-because this is what the (virtual) keyboard passes to the guest.
-So -k must match the *hosts* keyboard layout.
+I may have an experimental patch to fix device_set_realized issue:
 
-Translating the scancodes into keysyms again is the job of the guest,
-so that requires the keymapping you want to use being active in the
-guest os.  Typically that would be the same you have on the host, but
-that isn't required.  The guest can work with -- for example -- us
-layout (like it is often the case in boot loaders).  Behavior should be
-identical to physical hardware here.
+1. in qdev_get_machine():
+replace
+	dev = container_get(object_get_root(), "/machine");
+with
+	dev = object_resolve_path("/machine", NULL);
 
-HTH,
-  Gerd
+2. in device_set_realized():
+
+Using
+	Object *container = qdev_get_machine() ?
+		qdev_get_machine() : object_get_root();
+and pass it to
+	object_property_add_child(
+		container_get(container, "/unattached"),
+		name, obj, &error_abort);
+
+With this fix, we could say the qdev_get_machine() does
+return the "/machine" object (or null) not a confused "/container".
+
+We could continue to use qdev_get_machine() in system emulation mode,
+getting rid of its surprising side effect as Markus said.
+
+The return value of qdev_get_machine() in user-only mode
+is the same object returned by object_get_root(),
+so no semantic changes.
+
+
+> This one is tricky because on system emulation mode it needs
+> "/machine" to already exist, but in user-only mode it needs to
+> implicitly create a "/machine" container.
+> 
+> Eduardo Habkost (4):
+>    machine: Move gpio code to hw/core/gpio.c
+>    move qdev hotplug code to qdev-hotplug.c
+>    qdev: Don't compile hotplug code in user-mode emulation
+>    qdev-hotplug: Don't check type of qdev_get_machine()
+> 
+>   hw/core/bus.c                |  11 --
+>   hw/core/gpio.c               | 206 ++++++++++++++++++++++++++++++++
+>   hw/core/qdev-hotplug-stubs.c |  44 +++++++
+>   hw/core/qdev-hotplug.c       |  64 ++++++++++
+>   hw/core/qdev.c               | 219 -----------------------------------
+>   hw/core/Makefile.objs        |   5 +-
+>   tests/Makefile.include       |   3 +-
+>   7 files changed, 320 insertions(+), 232 deletions(-)
+>   create mode 100644 hw/core/gpio.c
+>   create mode 100644 hw/core/qdev-hotplug-stubs.c
+>   create mode 100644 hw/core/qdev-hotplug.c
+> 
