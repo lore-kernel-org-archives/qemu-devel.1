@@ -1,25 +1,25 @@
 Received: from eggs.gnu.org ([209.51.188.92]:45320)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <arilou@gmail.com>) id 1hJsma-0000dG-DV
-	for qemu-devel@nongnu.org; Fri, 26 Apr 2019 00:48:21 -0400
+	(envelope-from <arilou@gmail.com>) id 1hJsmc-0000dG-BY
+	for qemu-devel@nongnu.org; Fri, 26 Apr 2019 00:48:23 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <arilou@gmail.com>) id 1hJsbO-0004pp-1H
-	for qemu-devel@nongnu.org; Fri, 26 Apr 2019 00:36:46 -0400
-Received: from mail-wm1-x344.google.com ([2a00:1450:4864:20::344]:40454)
+	(envelope-from <arilou@gmail.com>) id 1hJsbL-0004oQ-R5
+	for qemu-devel@nongnu.org; Fri, 26 Apr 2019 00:36:44 -0400
+Received: from mail-wm1-x344.google.com ([2a00:1450:4864:20::344]:55978)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <arilou@gmail.com>) id 1hJsbN-0004ph-Rg
-	for qemu-devel@nongnu.org; Fri, 26 Apr 2019 00:36:45 -0400
-Received: by mail-wm1-x344.google.com with SMTP id h11so2331908wmb.5
-	for <qemu-devel@nongnu.org>; Thu, 25 Apr 2019 21:36:45 -0700 (PDT)
+	(Exim 4.71) (envelope-from <arilou@gmail.com>) id 1hJsbL-0004nU-Kc
+	for qemu-devel@nongnu.org; Fri, 26 Apr 2019 00:36:43 -0400
+Received: by mail-wm1-x344.google.com with SMTP id o25so1976540wmf.5
+	for <qemu-devel@nongnu.org>; Thu, 25 Apr 2019 21:36:43 -0700 (PDT)
 From: Jon Doron <arilou@gmail.com>
-Date: Fri, 26 Apr 2019 07:35:53 +0300
-Message-Id: <20190426043558.6888-17-arilou@gmail.com>
+Date: Fri, 26 Apr 2019 07:35:52 +0300
+Message-Id: <20190426043558.6888-16-arilou@gmail.com>
 In-Reply-To: <20190426043558.6888-1-arilou@gmail.com>
 References: <20190426043558.6888-1-arilou@gmail.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH v7 16/21] gdbstub: Implement step (s pkt) with
- new infra
+Subject: [Qemu-devel] [PATCH v7 15/21] gdbstub: Implement file io (F pkt)
+ with new infra
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,52 +33,88 @@ Cc: alex.bennee@linaro.org, Jon Doron <arilou@gmail.com>
 
 Signed-off-by: Jon Doron <arilou@gmail.com>
 ---
- gdbstub.c | 25 +++++++++++++++++++------
- 1 file changed, 19 insertions(+), 6 deletions(-)
+ gdbstub.c | 62 +++++++++++++++++++++++++++++++++++--------------------
+ 1 file changed, 40 insertions(+), 22 deletions(-)
 
 diff --git a/gdbstub.c b/gdbstub.c
-index 9fe130f30d..9b0556f8be 100644
+index 3478ac778d..9fe130f30d 100644
 --- a/gdbstub.c
 +++ b/gdbstub.c
-@@ -1805,6 +1805,16 @@ static void handle_file_io(GdbCmdContext *gdb_ctx, void *user_ctx)
-     gdb_continue(gdb_ctx->s);
+@@ -1772,6 +1772,39 @@ static void handle_read_all_regs(GdbCmdContext *gdb_ctx, void *user_ctx)
+     put_packet(gdb_ctx->s, gdb_ctx->str_buf);
  }
  
-+static void handle_step(GdbCmdContext *gdb_ctx, void *user_ctx)
++static void handle_file_io(GdbCmdContext *gdb_ctx, void *user_ctx)
 +{
-+    if (gdb_ctx->num_params) {
-+        gdb_set_cpu_pc(gdb_ctx->s, (target_ulong)gdb_ctx->params[0].val_ull);
++    int num_syscall_params;
++    GdbCmdVariant syscall_params[3] = {};
++
++    if (!gdb_ctx->num_params) {
++        return;
 +    }
 +
-+    cpu_single_step(gdb_ctx->s->c_cpu, sstep_flags);
++    if (cmd_parse_params(gdb_ctx->params[0].data, "L,L,o0", syscall_params,
++                         &num_syscall_params)) {
++        return;
++    }
++
++    if (!num_syscall_params) {
++        return;
++    }
++
++    if (gdb_ctx->s->current_syscall_cb) {
++        gdb_ctx->s->current_syscall_cb(gdb_ctx->s->c_cpu,
++                                       (target_ulong)syscall_params[0].val_ull,
++                                       (target_ulong)syscall_params[1].val_ull);
++        gdb_ctx->s->current_syscall_cb = NULL;
++    }
++
++    if (syscall_params[2].opcode == (uint8_t)'C') {
++        put_packet(gdb_ctx->s, "T02");
++        return;
++    }
++
 +    gdb_continue(gdb_ctx->s);
 +}
 +
  static int gdb_handle_packet(GDBState *s, const char *line_buf)
  {
      CPUState *cpu;
-@@ -1937,13 +1947,16 @@ static int gdb_handle_packet(GDBState *s, const char *line_buf)
-         }
-         break;
-     case 's':
--        if (*p != '\0') {
--            addr = strtoull(p, (char **)&p, 16);
--            gdb_set_cpu_pc(s, addr);
-+        {
-+            static const GdbCmdParseEntry step_cmd_desc = {
-+                .handler = handle_step,
-+                .cmd = "s",
-+                .cmd_startswith = 1,
-+                .schema = "L0"
-+            };
-+            cmd_parser = &step_cmd_desc;
-         }
--        cpu_single_step(s->c_cpu, sstep_flags);
--        gdb_continue(s);
--        return RS_IDLE;
-+        break;
+@@ -1913,28 +1946,13 @@ static int gdb_handle_packet(GDBState *s, const char *line_buf)
+         return RS_IDLE;
      case 'F':
          {
-             static const GdbCmdParseEntry file_io_cmd_desc = {
+-            target_ulong ret;
+-            target_ulong err;
+-
+-            ret = strtoull(p, (char **)&p, 16);
+-            if (*p == ',') {
+-                p++;
+-                err = strtoull(p, (char **)&p, 16);
+-            } else {
+-                err = 0;
+-            }
+-            if (*p == ',')
+-                p++;
+-            type = *p;
+-            if (s->current_syscall_cb) {
+-                s->current_syscall_cb(s->c_cpu, ret, err);
+-                s->current_syscall_cb = NULL;
+-            }
+-            if (type == 'C') {
+-                put_packet(s, "T02");
+-            } else {
+-                gdb_continue(s);
+-            }
++            static const GdbCmdParseEntry file_io_cmd_desc = {
++                .handler = handle_file_io,
++                .cmd = "F",
++                .cmd_startswith = 1,
++                .schema = "s0"
++            };
++            cmd_parser = &file_io_cmd_desc;
+         }
+         break;
+     case 'g':
 -- 
 2.20.1
