@@ -2,62 +2,72 @@ Return-Path: <SRS0=QtPl=S4=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.7 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C2EA6C43218
-	for <qemu-devel@archiver.kernel.org>; Fri, 26 Apr 2019 03:45:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 00177C43219
+	for <qemu-devel@archiver.kernel.org>; Fri, 26 Apr 2019 04:18:09 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A6095206C1
-	for <qemu-devel@archiver.kernel.org>; Fri, 26 Apr 2019 03:45:38 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A6095206C1
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=intel.com
+	by mail.kernel.org (Postfix) with ESMTPS id CB3822077B
+	for <qemu-devel@archiver.kernel.org>; Fri, 26 Apr 2019 04:18:09 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CB3822077B
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:38656 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:38865 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hJrnt-0007Qx-U6
-	for qemu-devel@archiver.kernel.org; Thu, 25 Apr 2019 23:45:37 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:34932)
+	id 1hJsJM-0007kb-Ti
+	for qemu-devel@archiver.kernel.org; Fri, 26 Apr 2019 00:18:08 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:39447)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <chen.zhang@intel.com>) id 1hJrmp-0006hS-QL
-	for qemu-devel@nongnu.org; Thu, 25 Apr 2019 23:44:32 -0400
+	(envelope-from <bounces@canonical.com>) id 1hJsIY-0007Cy-2m
+	for qemu-devel@nongnu.org; Fri, 26 Apr 2019 00:17:19 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <chen.zhang@intel.com>) id 1hJrmo-0007cY-Js
-	for qemu-devel@nongnu.org; Thu, 25 Apr 2019 23:44:31 -0400
-Received: from mga01.intel.com ([192.55.52.88]:24922)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <chen.zhang@intel.com>)
-	id 1hJrmo-0007bC-Ay
-	for qemu-devel@nongnu.org; Thu, 25 Apr 2019 23:44:30 -0400
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from orsmga002.jf.intel.com ([10.7.209.21])
-	by fmsmga101.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384;
-	25 Apr 2019 20:44:28 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.60,396,1549958400"; d="scan'208";a="153871762"
-Received: from unknown (HELO localhost.localdomain) ([10.239.13.19])
-	by orsmga002.jf.intel.com with ESMTP; 25 Apr 2019 20:44:26 -0700
-From: Zhang Chen <chen.zhang@intel.com >
-To: Laurent Vivier <laurent@vivier.eu>,
-	"Dr. David Alan Gilbert" <dgilbert@redhat.com>,
-	Juan Quintela <quintela@redhat.com>,
-	zhanghailiang <zhang.zhanghailiang@huawei.com>,
-	qemu-dev <qemu-devel@nongnu.org>
-Date: Fri, 26 Apr 2019 11:40:28 +0800
-Message-Id: <20190426034028.4794-1-chen.zhang@intel.com>
-X-Mailer: git-send-email 2.17.GIT
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
-	recognized.
-X-Received-From: 192.55.52.88
-Subject: [Qemu-devel] [PATCH] migration/colo.h: Remove obsolete codes
+	(envelope-from <bounces@canonical.com>) id 1hJsH0-0005ZZ-2C
+	for qemu-devel@nongnu.org; Fri, 26 Apr 2019 00:15:44 -0400
+Received: from indium.canonical.com ([91.189.90.7]:54924)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1hJsGz-0005Xp-T5
+	for qemu-devel@nongnu.org; Fri, 26 Apr 2019 00:15:42 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1hJsGt-0007Up-9m
+	for <qemu-devel@nongnu.org>; Fri, 26 Apr 2019 04:15:35 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 483482E802D
+	for <qemu-devel@nongnu.org>; Fri, 26 Apr 2019 04:15:35 +0000 (UTC)
+MIME-Version: 1.0
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Fri, 26 Apr 2019 04:05:30 -0000
+From: Alex Williamson <alex.l.williamson@gmail.com>
+To: qemu-devel@nongnu.org
+X-Launchpad-Notification-Type: bug
+X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
+X-Launchpad-Bug-Information-Type: Public
+X-Launchpad-Bug-Private: no
+X-Launchpad-Bug-Security-Vulnerability: no
+X-Launchpad-Bug-Commenters: alex-l-williamson saveriomiroddi
+X-Launchpad-Bug-Reporter: Saverio Miroddi (saveriomiroddi)
+X-Launchpad-Bug-Modifier: Alex Williamson (alex-l-williamson)
+References: <155620554968.6380.13610580395862407350.malonedeb@chaenomeles.canonical.com>
+Message-Id: <155625153051.13521.3781365974240105751.malone@gac.canonical.com>
+X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
+X-Launchpad-Message-For: qemu-devel-ml
+Precedence: bulk
+X-Generated-By: Launchpad (canonical.com); Revision="18928";
+	Instance="launchpad-lazr.conf"
+X-Launchpad-Hash: 60c8c5787ad673f19929d686219bb0e128f4e270
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 91.189.90.7
+Subject: [Qemu-devel] [Bug 1826422] Re: Regression: QEMU 4.0 hangs the host
+ (*bisect included*)
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
-Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -66,34 +76,84 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Zhang Chen <chen.zhang@intel.com>, Zhang Chen <zhangckid@gmail.com>
+Reply-To: Bug 1826422 <1826422@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Content-Type: text/plain; charset="UTF-8"
-Message-ID: <20190426034028.qYN66fhrCHnVOMFan-Rw_T95QRNKYVcZkX1bfiNB0qY@z>
+Message-ID: <20190426040530.N7nHKHY2vG--JpcvK36uOWkF8a71k-SPFp--xUK4nsY@z>
 
-From: Zhang Chen <chen.zhang@intel.com>
+Not just NVIDIA, forcing a NIC to use INTx also fails and it's apparent
+from the host that the device is stuck with DisINTx+.  Looks like the
+resampling mechanism that allows KVM to unmask the interrupt is broken
+with split irqchip.
 
-Signed-off-by: Zhang Chen <chen.zhang@intel.com>
----
- include/migration/colo.h | 2 --
- 1 file changed, 2 deletions(-)
+-- =
 
-diff --git a/include/migration/colo.h b/include/migration/colo.h
-index ddebe0ad27..f6fbe23ec9 100644
---- a/include/migration/colo.h
-+++ b/include/migration/colo.h
-@@ -22,8 +22,6 @@ enum colo_event {
-     COLO_EVENT_FAILOVER,
- };
- 
--void colo_info_init(void);
--
- void migrate_start_colo_process(MigrationState *s);
- bool migration_in_colo_state(void);
- 
--- 
-2.17.GIT
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1826422
 
+Title:
+  Regression: QEMU 4.0 hangs the host (*bisect included*)
+
+Status in QEMU:
+  New
+
+Bug description:
+  The commit b2fc91db84470a78f8e93f5b5f913c17188792c8 seemingly
+  introduced a regression on my system.
+
+  When I start QEMU, the guest and the host hang (I need a hard reset to
+  get back to a working system), before anything shows on the guest.
+
+  I use QEMU with GPU passthrough (which worked perfectly until the
+  commit above). This is the command I use:
+
+  ```
+  /path/to/qemu-system-x86_64
+    -drive if=3Dpflash,format=3Draw,readonly,file=3D/path/to/OVMF_CODE.fd
+    -drive if=3Dpflash,format=3Draw,file=3D/tmp/OVMF_VARS.fd.tmp
+    -enable-kvm
+    -machine q35,accel=3Dkvm,mem-merge=3Doff
+    -cpu host,kvm=3Doff,hv_vendor_id=3Dvgaptrocks,hv_relaxed,hv_spinlocks=
+=3D0x1fff,hv_vapic,hv_time
+    -smp 4,cores=3D4,sockets=3D1,threads=3D1
+    -m 10240
+    -vga none
+    -rtc base=3Dlocaltime
+    -serial none
+    -parallel none
+    -usb
+    -device usb-tablet
+    -device vfio-pci,host=3D01:00.0,multifunction=3Don
+    -device vfio-pci,host=3D01:00.1
+    -device usb-host,vendorid=3D<vid>,productid=3D<pid>
+    -device usb-host,vendorid=3D<vid>,productid=3D<pid>
+    -device usb-host,vendorid=3D<vid>,productid=3D<pid>
+    -device usb-host,vendorid=3D<vid>,productid=3D<pid>
+    -device usb-host,vendorid=3D<vid>,productid=3D<pid>
+    -device usb-host,vendorid=3D<vid>,productid=3D<pid>
+    -device virtio-scsi-pci,id=3Dscsi
+    -drive file=3D/path/to/guest.img,id=3Dhdd1,format=3Dqcow2,if=3Dnone,cac=
+he=3Dwriteback
+    -device scsi-hd,drive=3Dhdd1
+    -net nic,model=3Dvirtio
+    -net user,smb=3D/path/to/shared
+  ```
+
+  If I run QEMU without GPU passthrough, it runs fine.
+
+  Some details about my system:
+
+  - O/S: Mint 19.1 x86-64 (it's based on Ubuntu 18.04)
+  - Kernel: 4.15
+  - `configure` options: `--target-list=3Dx86_64-softmmu --enable-gtk --ena=
+ble-spice --audio-drv-list=3Dpa`
+  - EDK2 version: 1a734ed85fda71630c795832e6d24ea560caf739 (20/Apr/2019)
+  - CPU: i7-6700k
+  - Motherboard: ASRock Z170 Gaming-ITX/ac
+  - VGA: Gigabyte GTX 960 Mini-ITX
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1826422/+subscriptions
 
