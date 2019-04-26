@@ -2,60 +2,61 @@ Return-Path: <SRS0=QtPl=S4=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.7 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+X-Spam-Status: No, score=-8.7 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A6A85C43218
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E7B3BC43219
 	for <qemu-devel@archiver.kernel.org>; Fri, 26 Apr 2019 06:08:56 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5F4DB2077B
+	by mail.kernel.org (Postfix) with ESMTPS id B91DC206E0
 	for <qemu-devel@archiver.kernel.org>; Fri, 26 Apr 2019 06:08:56 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="AzrkH+rE"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5F4DB2077B
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="ATEStrUI"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B91DC206E0
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gibson.dropbear.id.au
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:39889 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:39887 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hJu2Z-00079x-Hz
+	id 1hJu2Z-00078t-U8
 	for qemu-devel@archiver.kernel.org; Fri, 26 Apr 2019 02:08:55 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:59920)
+Received: from eggs.gnu.org ([209.51.188.92]:59884)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1hJu0V-0005ND-N9
-	for qemu-devel@nongnu.org; Fri, 26 Apr 2019 02:06:50 -0400
+	(envelope-from <dgibson@ozlabs.org>) id 1hJu0T-0005Mx-Qk
+	for qemu-devel@nongnu.org; Fri, 26 Apr 2019 02:06:46 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1hJu0U-0004LF-B4
-	for qemu-devel@nongnu.org; Fri, 26 Apr 2019 02:06:47 -0400
-Received: from bilbo.ozlabs.org ([2401:3900:2:1::2]:42127 helo=ozlabs.org)
+	(envelope-from <dgibson@ozlabs.org>) id 1hJu0S-0004Gv-Nz
+	for qemu-devel@nongnu.org; Fri, 26 Apr 2019 02:06:45 -0400
+Received: from ozlabs.org ([203.11.71.1]:45171)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <dgibson@ozlabs.org>)
-	id 1hJu0T-00045G-LE; Fri, 26 Apr 2019 02:06:46 -0400
+	id 1hJu0R-00042T-5z; Fri, 26 Apr 2019 02:06:44 -0400
 Received: by ozlabs.org (Postfix, from userid 1007)
-	id 44r3Tj3F17z9s7T; Fri, 26 Apr 2019 16:06:33 +1000 (AEST)
+	id 44r3Tk1kmRz9s9N; Fri, 26 Apr 2019 16:06:33 +1000 (AEST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-	d=gibson.dropbear.id.au; s=201602; t=1556258793;
-	bh=YiF83U10HspPkh4k21L8pMuJ9eOJLS4CklLRBa9tW0c=;
-	h=From:To:Cc:Subject:Date:From;
-	b=AzrkH+rEIjaFKcA8Y/Fcb6jQrd6DAvadjWFFotFafjKWq7ET4YIzR1fIyHRzREK6a
-	K2vWnWQDl/kwn0Viw2wSsiFt/49FL+1mGlquBmTWmOmk6VM50yvy+PYeDsQCqp0Pfv
-	ZogdxPNmY2ztiFqBW7ua0gla8dDaTqDYdxf8kI1s=
+	d=gibson.dropbear.id.au; s=201602; t=1556258794;
+	bh=6Ag/QVok6X8QbcCfqfvcwtXbf9oCeHbgRVcFV9il+Ws=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=ATEStrUI4np4kfJK1xz36/2v9iDvOC7GFFREwl2ubJNeFFfV8kbFD0AeCTppK/fm9
+	sie8C52YNnR3NvDJPiFO//m07DfXb1vdol+Lnixlwg4jWVeCaGRMXUAePRbC2U456x
+	ComzIwN8o7znq3OxpCwlL2D7aXGo31mXlLiN788c=
 From: David Gibson <david@gibson.dropbear.id.au>
 To: peter.maydell@linaro.org
-Date: Fri, 26 Apr 2019 16:05:51 +1000
-Message-Id: <20190426060627.18153-1-david@gibson.dropbear.id.au>
+Date: Fri, 26 Apr 2019 16:05:55 +1000
+Message-Id: <20190426060627.18153-5-david@gibson.dropbear.id.au>
 X-Mailer: git-send-email 2.20.1
+In-Reply-To: <20190426060627.18153-1-david@gibson.dropbear.id.au>
+References: <20190426060627.18153-1-david@gibson.dropbear.id.au>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
-	recognized.
-X-Received-From: 2401:3900:2:1::2
-Subject: [Qemu-devel] [PULL 00/36] ppc-for-4.1 queue 20190426
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 203.11.71.1
+Subject: [Qemu-devel] [PULL 04/36] spapr/irq: remove spapr_ics_create()
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -72,138 +73,97 @@ Cc: gkurz@kaod.org, David Gibson <david@gibson.dropbear.id.au>,
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190426060551.LvDMZ8xS5kXtS_nDi7GOWewnbfUots138BbVxJ7VxRM@z>
+Message-ID: <20190426060555.tgl73psf1kGKtkTUwnzKziEoqF_jHJ0A3P4W5yfBuvY@z>
 
-The following changes since commit 3284aa128153750f14a61e8a96fd085e6f2999=
-b6:
+From: C=C3=A9dric Le Goater <clg@kaod.org>
 
-  Merge remote-tracking branch 'remotes/lersek/tags/edk2-pull-2019-04-22'=
- into staging (2019-04-24 13:19:41 +0100)
+spapr_ics_create() is only called once. Merge it in spapr_irq_init_xics()
+and simplify a bit the error handling by using 'error_fatal' .
 
-are available in the Git repository at:
+Signed-off-by: C=C3=A9dric Le Goater <clg@kaod.org>
+Message-Id: <20190321144914.19934-13-clg@kaod.org>
+Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
+---
+ hw/ppc/spapr_irq.c | 44 ++++++++++++++------------------------------
+ 1 file changed, 14 insertions(+), 30 deletions(-)
 
-  git://github.com/dgibson/qemu.git tags/ppc-for-4.1-20190426
+diff --git a/hw/ppc/spapr_irq.c b/hw/ppc/spapr_irq.c
+index 0a84e4cf63..b1f79ea9de 100644
+--- a/hw/ppc/spapr_irq.c
++++ b/hw/ppc/spapr_irq.c
+@@ -67,36 +67,11 @@ void spapr_irq_msi_reset(SpaprMachineState *spapr)
+  * XICS IRQ backend.
+  */
+=20
+-static ICSState *spapr_ics_create(SpaprMachineState *spapr,
+-                                  int nr_irqs, Error **errp)
+-{
+-    Error *local_err =3D NULL;
+-    Object *obj;
+-
+-    obj =3D object_new(TYPE_ICS_SIMPLE);
+-    object_property_add_child(OBJECT(spapr), "ics", obj, &error_abort);
+-    object_property_add_const_link(obj, ICS_PROP_XICS, OBJECT(spapr),
+-                                   &error_abort);
+-    object_property_set_int(obj, nr_irqs, "nr-irqs", &local_err);
+-    if (local_err) {
+-        goto error;
+-    }
+-    object_property_set_bool(obj, true, "realized", &local_err);
+-    if (local_err) {
+-        goto error;
+-    }
+-
+-    return ICS_BASE(obj);
+-
+-error:
+-    error_propagate(errp, local_err);
+-    return NULL;
+-}
+-
+ static void spapr_irq_init_xics(SpaprMachineState *spapr, int nr_irqs,
+                                 Error **errp)
+ {
+     MachineState *machine =3D MACHINE(spapr);
++    Object *obj;
+     Error *local_err =3D NULL;
+     bool xics_kvm =3D false;
+=20
+@@ -108,7 +83,8 @@ static void spapr_irq_init_xics(SpaprMachineState *spa=
+pr, int nr_irqs,
+         if (machine_kernel_irqchip_required(machine) && !xics_kvm) {
+             error_prepend(&local_err,
+                           "kernel_irqchip requested but unavailable: ");
+-            goto error;
++            error_propagate(errp, local_err);
++            return;
+         }
+         error_free(local_err);
+         local_err =3D NULL;
+@@ -118,10 +94,18 @@ static void spapr_irq_init_xics(SpaprMachineState *s=
+papr, int nr_irqs,
+         xics_spapr_init(spapr);
+     }
+=20
+-    spapr->ics =3D spapr_ics_create(spapr, nr_irqs, &local_err);
++    obj =3D object_new(TYPE_ICS_SIMPLE);
++    object_property_add_child(OBJECT(spapr), "ics", obj, &error_abort);
++    object_property_add_const_link(obj, ICS_PROP_XICS, OBJECT(spapr),
++                                   &error_fatal);
++    object_property_set_int(obj, nr_irqs, "nr-irqs",  &error_fatal);
++    object_property_set_bool(obj, true, "realized", &local_err);
++    if (local_err) {
++        error_propagate(errp, local_err);
++        return;
++    }
+=20
+-error:
+-    error_propagate(errp, local_err);
++    spapr->ics =3D ICS_BASE(obj);
+ }
+=20
+ #define ICS_IRQ_FREE(ics, srcno)   \
+--=20
+2.20.1
 
-for you to fetch changes up to aaef873b130f4f9c78f8e97b69c235c81b8b8b88:
-
-  target/ppc: improve performance of large BAT invalidations (2019-04-26 =
-11:37:57 +1000)
-
-----------------------------------------------------------------
-ppc patch queue 2019-04-26
-
-Here's the first ppc target pull request for qemu-4.1.  This has a
-number of things that have accumulated while qemu-4.0 was frozen.
-
- * A number of emulated MMU improvements from Ben Herrenschmidt
-
- * Assorted cleanups fro Greg Kurz
-
- * A large set of mostly mechanical cleanups from me to make target/ppc
-   much closer to compliant with the modern coding style
-
- * Support for passthrough of NVIDIA GPUs using NVLink2
-
-As well as some other assorted fixes.
-
-----------------------------------------------------------------
-Alexey Kardashevskiy (1):
-      spapr: Support NVIDIA V100 GPU with NVLink2
-
-Artyom Tarasenko (1):
-      target/ppc: improve performance of large BAT invalidations
-
-Benjamin Herrenschmidt (4):
-      target/ppc: Don't check UPRT in radix mode when in HV real mode
-      ppc/spapr: Use proper HPTE accessors for H_READ
-      ppc/hash64: Rework R and C bit updates
-      ppc/hash32: Rework R and C bit updates
-
-C=C3=A9dric Le Goater (2):
-      spapr/rtas: modify spapr_rtas_register() to remove RTAS handlers
-      spapr/irq: remove spapr_ics_create()
-
-David Gibson (23):
-      target/ppc: Style fixes for ppc-models.[ch]
-      target/ppc: Style fixes for cpu.[ch]
-      target/ppc: Style fixes for int_helper.c
-      target/ppc: Style fixes for fpu_helper.c
-      target/ppc: Style fixes for dfp_helper.c
-      target/ppc: Style fixes for excp_helper.c
-      target/ppc: Style fixes for gdbstub.c
-      target/ppc: Style fixes for helper_regs.h
-      target/ppc: Style fixes for kvm_ppc.h and kvm.c
-      target/ppc: Style fixes for machine.c
-      target/ppc: Style fixes for mem_helper.c
-      target/ppc: Style fixes for mfrom_table.inc.c & mfrom_table_gen.c
-      target/ppc: Style fixes for misc_helper.c
-      target/ppc: Style fixes for mmu-hash32.[ch]
-      target/ppc: Style fixes for mmu-hash64.[ch]
-      target/ppc: Style fixes for mmu_helper.c
-      target/ppc: Style fixes for monitor.c
-      target/ppc: Style fixes for translate_init.inc.c
-      target/ppc: Style fixes for translate.c
-      target/ppc: Style fixes for translate/fp-impl.inc.c
-      target/ppc: Style fixes for translate/vsx-impl.inc.c
-      target/ppc: Style fixes for translate/vmx-impl.inc.c
-      target/ppc: Style fixes for translate/spe-impl.inc.c
-
-Greg Kurz (4):
-      spapr_pci: Get rid of duplicate code for node name creation
-      spapr: Drop duplicate PCI swizzle code
-      target/ppc/trace-events: Fix trivial typo
-      target/ppc/kvm: Convert DPRINTF to traces
-
-Philippe Mathieu-Daud=C3=A9 (1):
-      hw/ppc/prep: Drop useless inclusion of "hw/input/i8042.h"
-
- hw/pci/pci.c                        |   2 +-
- hw/ppc/Makefile.objs                |   2 +-
- hw/ppc/prep.c                       |   1 -
- hw/ppc/spapr.c                      |  89 ++++++-
- hw/ppc/spapr_hcall.c                |  24 +-
- hw/ppc/spapr_irq.c                  |  44 +---
- hw/ppc/spapr_pci.c                  |  48 ++--
- hw/ppc/spapr_pci_nvlink2.c          | 450 ++++++++++++++++++++++++++++++=
-++
- hw/ppc/spapr_rtas.c                 |   2 +-
- hw/vfio/pci-quirks.c                | 131 ++++++++++
- hw/vfio/pci.c                       |  14 +
- hw/vfio/pci.h                       |   2 +
- hw/vfio/trace-events                |   4 +
- include/hw/pci-host/spapr.h         |  45 ++++
- include/hw/pci/pci.h                |   4 +
- include/hw/ppc/spapr.h              |  11 +-
- target/ppc/cpu-models.c             |   2 +-
- target/ppc/cpu-models.h             |   3 +-
- target/ppc/cpu.h                    | 241 +++++++++--------
- target/ppc/dfp_helper.c             |  14 +-
- target/ppc/excp_helper.c            |  87 ++++---
- target/ppc/fpu_helper.c             | 134 ++++++----
- target/ppc/gdbstub.c                |  34 +--
- target/ppc/helper_regs.h            |  10 +-
- target/ppc/int_helper.c             |  70 ++---
- target/ppc/kvm.c                    | 244 +++++++++--------
- target/ppc/kvm_ppc.h                |   3 +-
- target/ppc/machine.c                | 106 +++++---
- target/ppc/mem_helper.c             |  33 ++-
- target/ppc/mfrom_table.inc.c        |   3 +-
- target/ppc/mfrom_table_gen.c        |   8 +-
- target/ppc/misc_helper.c            |   9 +-
- target/ppc/mmu-hash32.c             |  59 +++--
- target/ppc/mmu-hash64.c             | 136 ++++++----
- target/ppc/mmu-hash64.h             |   2 -
- target/ppc/mmu-radix64.c            |  16 +-
- target/ppc/mmu_helper.c             | 144 +++++++----
- target/ppc/monitor.c                |  11 +-
- target/ppc/trace-events             |  29 ++-
- target/ppc/translate.c              | 504 ++++++++++++++++++++++--------=
-------
- target/ppc/translate/fp-impl.inc.c  |  52 ++--
- target/ppc/translate/spe-impl.inc.c |  14 +-
- target/ppc/translate/vmx-impl.inc.c |  26 +-
- target/ppc/translate/vsx-impl.inc.c |  15 +-
- target/ppc/translate_init.inc.c     | 243 ++++++++++-------
- 45 files changed, 2152 insertions(+), 973 deletions(-)
- create mode 100644 hw/ppc/spapr_pci_nvlink2.c
 
