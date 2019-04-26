@@ -2,81 +2,85 @@ Return-Path: <SRS0=QtPl=S4=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.7 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+X-Spam-Status: No, score=-8.7 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 32565C43219
-	for <qemu-devel@archiver.kernel.org>; Fri, 26 Apr 2019 18:23:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5A3CCC43219
+	for <qemu-devel@archiver.kernel.org>; Fri, 26 Apr 2019 18:23:57 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0122D2077B
-	for <qemu-devel@archiver.kernel.org>; Fri, 26 Apr 2019 18:23:55 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 289F92077B
+	for <qemu-devel@archiver.kernel.org>; Fri, 26 Apr 2019 18:23:57 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="KmjYLKym"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0122D2077B
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="ejoz1qIQ"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 289F92077B
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:50535 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:50537 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hK5Vr-0007Eq-0a
-	for qemu-devel@archiver.kernel.org; Fri, 26 Apr 2019 14:23:55 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:59436)
+	id 1hK5Vs-0007G7-C3
+	for qemu-devel@archiver.kernel.org; Fri, 26 Apr 2019 14:23:56 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:59443)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1hK5UG-00062c-Ej
+	(envelope-from <richard.henderson@linaro.org>) id 1hK5UG-00063p-NG
 	for qemu-devel@nongnu.org; Fri, 26 Apr 2019 14:22:17 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1hK5UF-0006Nl-FO
+	(envelope-from <richard.henderson@linaro.org>) id 1hK5UF-0006Nr-Fi
 	for qemu-devel@nongnu.org; Fri, 26 Apr 2019 14:22:16 -0400
-Received: from mail-pg1-x531.google.com ([2607:f8b0:4864:20::531]:45601)
+Received: from mail-pf1-x431.google.com ([2607:f8b0:4864:20::431]:47053)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1hK5UF-0006MG-6u
+	id 1hK5UF-0006Mb-8m
 	for qemu-devel@nongnu.org; Fri, 26 Apr 2019 14:22:15 -0400
-Received: by mail-pg1-x531.google.com with SMTP id y27so1268154pgl.12
+Received: by mail-pf1-x431.google.com with SMTP id j11so2091608pff.13
 	for <qemu-devel@nongnu.org>; Fri, 26 Apr 2019 11:22:14 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
-	h=from:to:cc:subject:date:message-id;
-	bh=Kp2L1oreruJAhVUQEiaYQt7zH1VfopMJ2io4yjBh/iM=;
-	b=KmjYLKym0CDhxc48BGLXITyf9IXBig7GEun/ZeuAppcOZ7qM/imlQDOkLigsJEQ9/H
-	einZTq+Ho4vqhRRNRsHhmq6N7uUMk+/vwylZYNiXj3E2sKihaK7kP/7AoAxHQJA+eZ2l
-	5RmCk86jdfbaiU4DWCZy/DpI0BzDaM4ERHdNPpiEVNXXlX0ucRn9WB0R4TU2uIdTZWTQ
-	YuiCVBWF9yuZ7mtlQMGnitDsEMxoAVBqb042BeyV9uOvPrqQmp/MTXeakcnosBP2eDKz
-	vSNWvTQ3FCbHWB5VKpHBqcFCgCXCL+J7PCm1OgTMqu06hM5+9A9S69BT2Zzu1yHuxKTM
-	ANCw==
+	h=from:to:cc:subject:date:message-id:in-reply-to:references;
+	bh=oU5HGPgJ+DQOZUnHAyoa1yAy/pkjT0xbkkdnad1zEYs=;
+	b=ejoz1qIQ6WVHzQnSYm1TtP0hrHqwyuFm0PbitYelaH26diVMwvlALWYRjyI+k72jh5
+	F2Yw7nEuB6iQb5YRwl11V6cbIGQanUmgrBdfbT66VPQXFnpD14GCF7hZwpBX5JCpnPrc
+	6DfHQkxvMifu+f/V5xnUZIAb83qsOBGI9UCtCGDiZjF4+qa2rpQja/2MWx6bd7FBzA0E
+	USSNTGJp3NG8bJ140+Edfiv6dhPwGNQeZ/DmLuFVGleyVlN9S026YXBKMt/iYY1KZEmQ
+	ikZ/l+0LeKLHAs4ikgP4HUjmCJFsnA4X+MrnYysqxlbLAD+bHuopJIbvTbX4t4lFLPp+
+	NJpg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
 	d=1e100.net; s=20161025;
-	h=x-gm-message-state:from:to:cc:subject:date:message-id;
-	bh=Kp2L1oreruJAhVUQEiaYQt7zH1VfopMJ2io4yjBh/iM=;
-	b=bnK+uMGg2dBHn44e6DHQjbtJkbZa3ZtKbOGDUczsGdi8/0vMWXBB/bTGkrC3YWUaPq
-	PkUGQMDyHe36Hkei+5eVk1PDpUYqrDP/ah0BjNFtPyUJZb16UMEHaYS8YkjjXqSSlJJA
-	16eH279myVrVhu3X2xWK+2qLWPtFzqmLL6kk70mDyxEWn2PznKfQYvXRqbZWoAqhTgf/
-	tVb8bqrpfcp99pvO+AM/lVF5kS+0SdnlH2utwBuJ1xj+/4s9w5fNqDd26VUp0RZIT3YO
-	91/eeqQB5j85B+yU8fhtVc+aUeiZDfM/NtcKS4G7AzIqdKdzjEq9Zbq3eFSwdZY4b4nD
-	SoiA==
-X-Gm-Message-State: APjAAAW+LXX0onhNe01UCR+XkVS+xsO1hA1F8sNoUxixnFuUUuTc4XHV
-	3hYS6Ubld2Gvutiokjk48KUpbjEVVUs=
-X-Google-Smtp-Source: APXvYqyJeBWyo1AqKpsLMOg6/q+q2hpXfiO/c5FdKAB45DnLWAmKmTRQGLGh2e+5SntxrfN3KaUr6g==
-X-Received: by 2002:a63:6983:: with SMTP id
-	e125mr42170841pgc.370.1556302932138; 
-	Fri, 26 Apr 2019 11:22:12 -0700 (PDT)
+	h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+	:references;
+	bh=oU5HGPgJ+DQOZUnHAyoa1yAy/pkjT0xbkkdnad1zEYs=;
+	b=iX0uCjO/XPTTB4oh+hBCZZnMM1KM1uW6hYixRi8JPyZQcuNbFcFVT+6xIHn8LhLIQv
+	Y079sw4Qecnz6dcQhJR15B4ytdfOAYPF3CO9hXKi2AbY+yXF0tOoDgSHtoJsKAsV4XPX
+	9//NK8zPtTGV6YOx4j318B8bxGS6tniDcnmpLmQvHeaCgPnKlF+u/JWWokcXUAaaWPxG
+	189tQkQH6UGArNx9qVd39ybDVBUGzGnrAsumi+mHMmZLENw1Ru2ZznDhtMCTggx2qlOo
+	h2EcIrnK7xguskVTj9jbVZeGRWAjdmRo4IDDk/0FVVQYkNZW5ApMIgw4n6xyy/jXckJg
+	QJYw==
+X-Gm-Message-State: APjAAAWFE6ywNIaW9nkPwKVBuQuyAtIRDnMjnI8zFOKihf2ptVPp6aln
+	jq8G/4NWAV/c5Vf/Tp7SDpyNKMwU8ks=
+X-Google-Smtp-Source: APXvYqzrz37qj71Q456w2bpgKckkIT/Wjm8eOzIIryCjFZFFcAL3wH2NhWcJl9akAvUPxFT0GgNe1Q==
+X-Received: by 2002:a62:7089:: with SMTP id
+	l131mr49804065pfc.158.1556302933326; 
+	Fri, 26 Apr 2019 11:22:13 -0700 (PDT)
 Received: from localhost.localdomain (97-113-179-147.tukw.qwest.net.
 	[97.113.179.147]) by smtp.gmail.com with ESMTPSA id
-	c28sm15977095pgm.42.2019.04.26.11.22.11
+	c28sm15977095pgm.42.2019.04.26.11.22.12
 	(version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-	Fri, 26 Apr 2019 11:22:11 -0700 (PDT)
+	Fri, 26 Apr 2019 11:22:12 -0700 (PDT)
 From: Richard Henderson <richard.henderson@linaro.org>
 To: qemu-devel@nongnu.org
-Date: Fri, 26 Apr 2019 11:22:08 -0700
-Message-Id: <20190426182210.10442-1-richard.henderson@linaro.org>
+Date: Fri, 26 Apr 2019 11:22:09 -0700
+Message-Id: <20190426182210.10442-2-richard.henderson@linaro.org>
 X-Mailer: git-send-email 2.17.1
+In-Reply-To: <20190426182210.10442-1-richard.henderson@linaro.org>
+References: <20190426182210.10442-1-richard.henderson@linaro.org>
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
 	recognized.
-X-Received-From: 2607:f8b0:4864:20::531
-Subject: [Qemu-devel] [PULL 0/2] target/hppa patch queue
+X-Received-From: 2607:f8b0:4864:20::431
+Subject: [Qemu-devel] [PULL 1/2] target/hppa: Implement Fast TLB Insert
+ instructions
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -88,36 +92,110 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: peter.maydell@linaro.org
+Cc: Nick Hudson <skrll@netbsd.org>, peter.maydell@linaro.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 Content-Type: text/plain; charset="UTF-8"
-Message-ID: <20190426182208.oMDAnrAvVmMtTvSA_kzDTguo4McnJsGa-BcD7jiSOnE@z>
+Message-ID: <20190426182209.r5NFJba5gxVQZBFRumQ83nVsRoLr1xUoUsG6h4H9V1I@z>
 
-The following changes since commit 3284aa128153750f14a61e8a96fd085e6f2999b6:
+From: Nick Hudson <skrll@netbsd.org>
 
-  Merge remote-tracking branch 'remotes/lersek/tags/edk2-pull-2019-04-22' into staging (2019-04-24 13:19:41 +0100)
+These instructions are present on pcxl and pcxl2 machines,
+and are used by NetBSD and OpenBSD.  See
 
-are available in the Git repository at:
+     https://parisc.wiki.kernel.org/images-parisc/a/a9/Pcxl2_ers.pdf
+     page 13-9 (195/206)
 
-  https://github.com/rth7680/qemu.git tags/pull-hppa-20190426
-
-for you to fetch changes up to 647ad90a1eb6c016071d21e4f1e22b9cd4986417:
-
-  target/hppa: Always return EXCP_DMAR for protection id trap (2019-04-26 11:09:22 -0700)
-
-----------------------------------------------------------------
-Implement fast tlb insert insns.
-Fix data tlb exception for pa 1.1.
-
-----------------------------------------------------------------
-Nick Hudson (2):
-      target/hppa: Implement Fast TLB Insert instructions
-      target/hppa: Always return EXCP_DMAR for protection id trap
-
- target/hppa/mem_helper.c |  3 +--
- target/hppa/translate.c  | 54 ++++++++++++++++++++++++++++++++++++++++++++++++
+Signed-off-by: Nick Hudson <skrll@netbsd.org>
+Message-Id: <20190423063621.8203-2-nick.hudson@gmx.co.uk>
+[rth: Use extending loads, locally managed temporaries.]
+Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+---
+ target/hppa/translate.c  | 54 ++++++++++++++++++++++++++++++++++++++++
  target/hppa/insns.decode |  3 +++
- 3 files changed, 58 insertions(+), 2 deletions(-)
+ 2 files changed, 57 insertions(+)
+
+diff --git a/target/hppa/translate.c b/target/hppa/translate.c
+index 43b74367ea..aa140c6c72 100644
+--- a/target/hppa/translate.c
++++ b/target/hppa/translate.c
+@@ -2518,6 +2518,60 @@ static bool trans_pxtlbx(DisasContext *ctx, arg_pxtlbx *a)
+ #endif
+ }
+ 
++/*
++ * Implement the pcxl and pcxl2 Fast TLB Insert instructions.
++ * See
++ *     https://parisc.wiki.kernel.org/images-parisc/a/a9/Pcxl2_ers.pdf
++ *     page 13-9 (195/206)
++ */
++static bool trans_ixtlbxf(DisasContext *ctx, arg_ixtlbxf *a)
++{
++    CHECK_MOST_PRIVILEGED(EXCP_PRIV_OPR);
++#ifndef CONFIG_USER_ONLY
++    TCGv_tl addr, atl, stl;
++    TCGv_reg reg;
++
++    nullify_over(ctx);
++
++    /*
++     * FIXME:
++     *  if (not (pcxl or pcxl2))
++     *    return gen_illegal(ctx);
++     *
++     * Note for future: these are 32-bit systems; no hppa64.
++     */
++
++    atl = tcg_temp_new_tl(ctx);
++    stl = tcg_temp_new_tl(ctx);
++    addr = tcg_temp_new_tl(ctx);
++
++    tcg_gen_ld32u_i64(stl, cpu_env,
++                      a->data ? offsetof(CPUHPPAState, cr[CR_ISR])
++                      : offsetof(CPUHPPAState, cr[CR_IIASQ]));
++    tcg_gen_ld32u_i64(atl, cpu_env,
++                      a->data ? offsetof(CPUHPPAState, cr[CR_IOR])
++                      : offsetof(CPUHPPAState, cr[CR_IIAOQ]));
++    tcg_gen_shli_i64(stl, stl, 32);
++    tcg_gen_or_tl(addr, atl, stl);
++    tcg_temp_free_tl(atl);
++    tcg_temp_free_tl(stl);
++
++    reg = load_gpr(ctx, a->r);
++    if (a->addr) {
++        gen_helper_itlba(cpu_env, addr, reg);
++    } else {
++        gen_helper_itlbp(cpu_env, addr, reg);
++    }
++    tcg_temp_free_tl(addr);
++
++    /* Exit TB for TLB change if mmu is enabled.  */
++    if (ctx->tb_flags & PSW_C) {
++        ctx->base.is_jmp = DISAS_IAQ_N_STALE;
++    }
++    return nullify_end(ctx);
++#endif
++}
++
+ static bool trans_lpa(DisasContext *ctx, arg_ldst *a)
+ {
+     CHECK_MOST_PRIVILEGED(EXCP_PRIV_OPR);
+diff --git a/target/hppa/insns.decode b/target/hppa/insns.decode
+index 098370c2f0..f0dd71dd08 100644
+--- a/target/hppa/insns.decode
++++ b/target/hppa/insns.decode
+@@ -133,6 +133,9 @@ ixtlbx          000001 b:5 r:5 sp:2 0100000 addr:1 0 00000      data=1
+ ixtlbx          000001 b:5 r:5 ... 000000 addr:1 0 00000        \
+                 sp=%assemble_sr3x data=0
+ 
++# pcxl and pcxl2 Fast TLB Insert instructions
++ixtlbxf         000001 00000 r:5 00 0 data:1 01000 addr:1 0 00000
++
+ pxtlbx          000001 b:5 x:5 sp:2 0100100 local:1 m:1 -----   data=1
+ pxtlbx          000001 b:5 x:5 ... 000100 local:1 m:1 -----     \
+                 sp=%assemble_sr3x data=0
+-- 
+2.17.1
+
 
