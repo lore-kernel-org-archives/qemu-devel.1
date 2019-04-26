@@ -1,25 +1,35 @@
-Received: from eggs.gnu.org ([209.51.188.92]:38920)
+Received: from eggs.gnu.org ([209.51.188.92]:40498)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1hJvvz-00084j-1I
-	for qemu-devel@nongnu.org; Fri, 26 Apr 2019 04:10:16 -0400
+	(envelope-from <pbonzini@redhat.com>) id 1hJw06-0002NV-Ax
+	for qemu-devel@nongnu.org; Fri, 26 Apr 2019 04:14:31 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1hJvvx-00066A-Tc
-	for qemu-devel@nongnu.org; Fri, 26 Apr 2019 04:10:15 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:34456)
+	(envelope-from <pbonzini@redhat.com>) id 1hJw04-0001hG-0P
+	for qemu-devel@nongnu.org; Fri, 26 Apr 2019 04:14:29 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:58076)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1hJvvx-00065o-Ks
-	for qemu-devel@nongnu.org; Fri, 26 Apr 2019 04:10:13 -0400
-References: <20190410000803.1744-1-ghook@redhat.com>
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1hJw03-0001Ua-Au
+	for qemu-devel@nongnu.org; Fri, 26 Apr 2019 04:14:27 -0400
+References: <5FF901C1-0AA5-4308-A65C-C448D0A2BA63@oracle.com>
+	<20190305172905.GD13806@stefanha-x1.localdomain>
+	<2D7F11D0-4A02-4A0F-961D-854240376B17@oracle.com>
+	<20190401090724.GA643@stefanha-x1.localdomain>
+	<CC372DF3-1AC6-46B5-98A5-21159497034A@oracle.com>
+	<60340EAF-4C85-4798-9999-34F1A37E2086@oracle.com>
+	<898ef1d4-bfa2-9952-8ceb-f1282b85e29c@oracle.com>
+	<20190416092042.GB32709@stefanha-x1.localdomain>
+	<8E5AF770-69ED-4D44-8A25-B51344996D9E@oracle.com>
+	<3F7E854A-3C1D-4204-8C35-893FC0614796@oracle.com>
+	<20190423120453.GF32465@stefanha-x1.localdomain>
 From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <25ce8a04-ba54-3bcf-9413-b560845891ba@redhat.com>
-Date: Fri, 26 Apr 2019 10:10:06 +0200
+Message-ID: <44520476-d6a8-2e3f-1602-388e2e1e874e@redhat.com>
+Date: Fri, 26 Apr 2019 10:14:16 +0200
 MIME-Version: 1.0
-In-Reply-To: <20190410000803.1744-1-ghook@redhat.com>
-Content-Type: text/plain; charset=utf-8
+In-Reply-To: <20190423120453.GF32465@stefanha-x1.localdomain>
+Content-Type: text/plain; charset=windows-1252
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [RHEL-8.1 virt 0/2] Enable SEV VM to boot with
- assigned PCI device
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] Following up questions related to QEMU and I/O
+ Thread
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,57 +38,22 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Gary R Hook <ghook@redhat.com>, rhvirt-patches@redhat.com
-Cc: "Danilo C. L. de Paula" <ddepaula@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, qemu-devel@nongnu.org, Richard Henderson <rth@twiddle.net>
+To: Stefan Hajnoczi <stefanha@redhat.com>, Wei Li <wei.d.li@oracle.com>
+Cc: Stefan Hajnoczi <stefanha@gmail.com>, Dongli Zhang <dongli.zhang@oracle.com>, qemu-devel@nongnu.org
 
-On 10/04/19 02:08, Gary R Hook wrote:
-> Bugzilla: https://bugzilla.redhat.com/show_bug.cgi?id=1667249
-> 
-> On an AMD SEV enabled host with an SEV enabled guest, attaching an
-> assigned device to the VM results in a failure to start the VM:
-> 
-> qemu-kvm: -device vfio-pci,host=01:00.0,id=hostdev0,bus=pci.2,addr=0x0: sev_ram_block_added: failed to register region (0x7fd96e6bb000+0x20000) error 'Cannot allocate memory'
-> 
-> In this example the assigned device is a simple Intel 82574L NIC:
-> 
-> 01:00.0 Ethernet controller: Intel Corporation 82574L Gigabit Network Connection
-> 	Subsystem: Intel Corporation Gigabit CT Desktop Adapter
-> 	Flags: bus master, fast devsel, latency 0, IRQ 89, NUMA node 0
-> 	Memory at fb9c0000 (32-bit, non-prefetchable) [size=128K]
-> 	Memory at fb900000 (32-bit, non-prefetchable) [size=512K]
-> 
-> Note that the error indicates the region as (base+size) where a size
-> of 0x20000 is 128K, which matches that of BAR0 for the device.
-> dmesg on the host also reports:
-> 
-> SVM: SEV: Failure locking 32 pages.
-> 
-> SEV guests make use of the RAMBlock notifier in QEMU to add page
-> pinnings for SEV; the kernel side of the call only knows how to pin
-> pages with get_user_pages(), and this currently faults on non-page
-> backed mappings (e.g. the mmap of an MMIO BAR).
-> 
-> To resolve this failure, change the order of the memory region type
-> assignment and avoid pinning device memory regions.
-> 
-> Cc: "Danilo C. L. de Paula" <ddepaula@redhat.com>
-> Cc: Eduardo Habkost <ehabkost@redhat.com>
-> Cc: Paolo Bonzini <pbonzini@redhat.com>
-> Cc: qemu-devel@nongnu.org
-> Cc: Richard Henderson <rth@twiddle.net>
-> 
-> Danilo C. L. de Paula (2):
->   redhat: branching qemu-kvm to rhel-8.1.0
->   redhat: renaming branch to rhel-8.1.0
-> 
-> Gary R Hook (2):
->   Subject: memory: Fix the memory region type assignment order
->   Subject: target/i386: sev: Do not pin the ram device memory region
-> 
->  .gitpublish       |  6 +++---
->  memory.c          |  9 ++++++++-
->  target/i386/sev.c | 11 +++++++++++
->  3 files changed, 22 insertions(+), 4 deletions(-)
-> 
+On 23/04/19 14:04, Stefan Hajnoczi wrote:
+>> In addition, does Virtio-scsi support Batch I/O Submission feature
+>> which may be able to increase the IOPS via reducing the number of
+>> system calls?
+>
+> I don't see obvious batching support in drivers/scsi/virtio_scsi.c.
+> The Linux block layer supports batching but I'm not sure if the SCSI
+> layer does.
 
-Acked-by: Paolo Bonzini <pbonzini@redhat.com>
+I think he's referring to QEMU, in which case yes, virtio-scsi does
+batch I/O submission.  See virtio_scsi_handle_cmd_req_prepare and
+virtio_scsi_handle_cmd_req_submit in hw/scsi/virtio-scsi.c, they do
+blk_io_plug and blk_io_unplug in order to batch I/O requests from QEMU
+to the host kernel.
+
+Paolo
