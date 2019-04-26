@@ -4,60 +4,59 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-8.7 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+	SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BA3EFC43218
-	for <qemu-devel@archiver.kernel.org>; Fri, 26 Apr 2019 06:15:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 17383C43218
+	for <qemu-devel@archiver.kernel.org>; Fri, 26 Apr 2019 06:16:02 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 68C06206E0
-	for <qemu-devel@archiver.kernel.org>; Fri, 26 Apr 2019 06:15:26 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id D3082206E0
+	for <qemu-devel@archiver.kernel.org>; Fri, 26 Apr 2019 06:16:01 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="EXrlh7Ea"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 68C06206E0
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="oU4uuH3g"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D3082206E0
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gibson.dropbear.id.au
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:39980 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:40013 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hJu8r-0004xi-HE
-	for qemu-devel@archiver.kernel.org; Fri, 26 Apr 2019 02:15:25 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:60031)
+	id 1hJu9Q-0005OT-Tr
+	for qemu-devel@archiver.kernel.org; Fri, 26 Apr 2019 02:16:01 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:60039)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1hJu0Z-0005UE-Lh
-	for qemu-devel@nongnu.org; Fri, 26 Apr 2019 02:06:55 -0400
+	(envelope-from <dgibson@ozlabs.org>) id 1hJu0a-0005Uk-7D
+	for qemu-devel@nongnu.org; Fri, 26 Apr 2019 02:06:53 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1hJu0V-0004OG-Qh
-	for qemu-devel@nongnu.org; Fri, 26 Apr 2019 02:06:51 -0400
-Received: from bilbo.ozlabs.org ([2401:3900:2:1::2]:35989 helo=ozlabs.org)
+	(envelope-from <dgibson@ozlabs.org>) id 1hJu0Y-0004Tj-Lh
+	for qemu-devel@nongnu.org; Fri, 26 Apr 2019 02:06:52 -0400
+Received: from ozlabs.org ([203.11.71.1]:50607)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <dgibson@ozlabs.org>)
-	id 1hJu0V-0004HO-2P; Fri, 26 Apr 2019 02:06:47 -0400
+	id 1hJu0Y-0004Pf-8t; Fri, 26 Apr 2019 02:06:50 -0400
 Received: by ozlabs.org (Postfix, from userid 1007)
-	id 44r3Tk4j0gz9sBr; Fri, 26 Apr 2019 16:06:34 +1000 (AEST)
+	id 44r3Tn1NdQz9sNM; Fri, 26 Apr 2019 16:06:36 +1000 (AEST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-	d=gibson.dropbear.id.au; s=201602; t=1556258794;
-	bh=XNckpG/gouMFRLclE2bybEtFxTI+8k+8aYpaeWNDa0o=;
+	d=gibson.dropbear.id.au; s=201602; t=1556258797;
+	bh=kDfYjlvVQdJieRr+Nh8b7xVvL3ct73J87Iz8hXJMJNw=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=EXrlh7EapzZ8zFSksON6ICDGx8o2C+4mpcUotIyoGXW1pjvyI/bofAw26BXMUzPq8
-	Zp6ktSJTof5MxdE6zKRo181iQbCQpFvNyiuK9tkEbX4GuLR/kYX5BYFeQJP5uQBCyA
-	yAmNSDXQOA+TYBI5Rjfd2LQ/4LZxSva12aKuHjlo=
+	b=oU4uuH3gfyTgT/HGaQVCem7+8Fp+MWNxwwJ3buPOf9QQWtoqYkMeOKoKqZqdMUldZ
+	zJnmknbxc0xz/+B4o57UcpV6kxoHViVEs5w4cFAwIbL5aJQRmX4qUl8TQL6nzN3b0B
+	kLD2Qfv9ofeDHmx3JhqnBlc2p6dHvjafSem9qK7o=
 From: David Gibson <david@gibson.dropbear.id.au>
 To: peter.maydell@linaro.org
-Date: Fri, 26 Apr 2019 16:05:59 +1000
-Message-Id: <20190426060627.18153-9-david@gibson.dropbear.id.au>
+Date: Fri, 26 Apr 2019 16:06:09 +1000
+Message-Id: <20190426060627.18153-19-david@gibson.dropbear.id.au>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20190426060627.18153-1-david@gibson.dropbear.id.au>
 References: <20190426060627.18153-1-david@gibson.dropbear.id.au>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
-	recognized.
-X-Received-From: 2401:3900:2:1::2
-Subject: [Qemu-devel] [PULL 08/36] target/ppc: Style fixes for fpu_helper.c
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 203.11.71.1
+Subject: [Qemu-devel] [PULL 18/36] target/ppc: Style fixes for
+ mmu-hash32.[ch]
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -75,485 +74,72 @@ Cc: gkurz@kaod.org, Greg Kurz <groug@kaod.org>, qemu-devel@nongnu.org,
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190426060559.rgrhFfF-dI0EwFtObK-H2TexmJ6feyXfD44-7aPfnZI@z>
+Message-ID: <20190426060609.wRQ245S7lbzUSq0SBsS_7LvZurt3IquVTVXIPObjgmo@z>
 
 Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
 Reviewed-by: C=C3=A9dric Le Goater <clg@kaod.org>
 Reviewed-by: Greg Kurz <groug@kaod.org>
 ---
- target/ppc/fpu_helper.c | 134 +++++++++++++++++++++++++---------------
- 1 file changed, 83 insertions(+), 51 deletions(-)
+ target/ppc/mmu-hash32.c | 22 ++++++++++++++--------
+ 1 file changed, 14 insertions(+), 8 deletions(-)
 
-diff --git a/target/ppc/fpu_helper.c b/target/ppc/fpu_helper.c
-index 2ed4f42275..0b7308f539 100644
---- a/target/ppc/fpu_helper.c
-+++ b/target/ppc/fpu_helper.c
-@@ -90,10 +90,12 @@ uint32_t helper_tosingle(uint64_t arg)
-         ret  =3D extract64(arg, 62, 2) << 30;
-         ret |=3D extract64(arg, 29, 30);
-     } else {
--        /* Zero or Denormal result.  If the exponent is in bounds for
--         * a single-precision denormal result, extract the proper bits.
--         * If the input is not zero, and the exponent is out of bounds,
--         * then the result is undefined; this underflows to zero.
+diff --git a/target/ppc/mmu-hash32.c b/target/ppc/mmu-hash32.c
+index e8562a7c87..3f4dee835e 100644
+--- a/target/ppc/mmu-hash32.c
++++ b/target/ppc/mmu-hash32.c
+@@ -27,7 +27,7 @@
+ #include "mmu-hash32.h"
+ #include "exec/log.h"
+=20
+-//#define DEBUG_BAT
++/* #define DEBUG_BAT */
+=20
+ #ifdef DEBUG_BATS
+ #  define LOG_BATS(...) qemu_log_mask(CPU_LOG_MMU, __VA_ARGS__)
+@@ -228,8 +228,10 @@ static int ppc_hash32_direct_store(PowerPCCPU *cpu, =
+target_ulong sr,
+     qemu_log_mask(CPU_LOG_MMU, "direct store...\n");
+=20
+     if ((sr & 0x1FF00000) >> 20 =3D=3D 0x07f) {
+-        /* Memory-forced I/O controller interface access */
+-        /* If T=3D1 and BUID=3Dx'07F', the 601 performs a memory access
 +        /*
-+         * Zero or Denormal result.  If the exponent is in bounds for
-+         * a single-precision denormal result, extract the proper
-+         * bits.  If the input is not zero, and the exponent is out of
-+         * bounds, then the result is undefined; this underflows to
-+         * zero.
++         * Memory-forced I/O controller interface access
++         *
++         * If T=3D1 and BUID=3Dx'07F', the 601 performs a memory access
+          * to SR[28-31] LA[4-31], bypassing all protection mechanisms.
           */
-         ret =3D extract64(arg, 63, 1) << 31;
-         if (unlikely(exp >=3D 874)) {
-@@ -1090,7 +1092,7 @@ uint32_t helper_ftsqrt(uint64_t frb)
-             fe_flag =3D 1;
-         } else if (unlikely(float64_is_neg(frb))) {
-             fe_flag =3D 1;
--        } else if (!float64_is_zero(frb) && (e_b <=3D (-1022+52))) {
-+        } else if (!float64_is_zero(frb) && (e_b <=3D (-1022 + 52))) {
-             fe_flag =3D 1;
+         *raddr =3D ((sr & 0xF) << 28) | (eaddr & 0x0FFFFFFF);
+@@ -265,9 +267,11 @@ static int ppc_hash32_direct_store(PowerPCCPU *cpu, =
+target_ulong sr,
          }
+         return 1;
+     case ACCESS_CACHE:
+-        /* dcba, dcbt, dcbtst, dcbf, dcbi, dcbst, dcbz, or icbi */
+-        /* Should make the instruction do no-op.
+-         * As it already do no-op, it's quite easy :-)
++        /*
++         * dcba, dcbt, dcbtst, dcbf, dcbi, dcbst, dcbz, or icbi
++         *
++         * Should make the instruction do no-op.  As it already do
++         * no-op, it's quite easy :-)
+          */
+         *raddr =3D eaddr;
+         return 0;
+@@ -519,8 +523,10 @@ int ppc_hash32_handle_mmu_fault(PowerPCCPU *cpu, vad=
+dr eaddr, int rwx,
+     if (rwx =3D=3D 1) {
+         new_pte1 |=3D HPTE32_R_C; /* set changed (dirty) bit */
+     } else {
+-        /* Treat the page as read-only for now, so that a later write
+-         * will pass through this function again to set the C bit */
++        /*
++         * Treat the page as read-only for now, so that a later write
++         * will pass through this function again to set the C bit
++         */
+         prot &=3D ~PAGE_WRITE;
+     }
 =20
-@@ -1789,7 +1791,8 @@ uint32_t helper_efdcmpeq(CPUPPCState *env, uint64_t=
- op1, uint64_t op2)
- #define float64_to_float64(x, env) x
-=20
-=20
--/* VSX_ADD_SUB - VSX floating point add/subract
-+/*
-+ * VSX_ADD_SUB - VSX floating point add/subract
-  *   name  - instruction mnemonic
-  *   op    - operation (add or sub)
-  *   nels  - number of elements (1, 2 or 4)
-@@ -1872,7 +1875,8 @@ void helper_xsaddqp(CPUPPCState *env, uint32_t opco=
-de)
-     do_float_check_status(env, GETPC());
- }
-=20
--/* VSX_MUL - VSX floating point multiply
-+/*
-+ * VSX_MUL - VSX floating point multiply
-  *   op    - instruction mnemonic
-  *   nels  - number of elements (1, 2 or 4)
-  *   tp    - type (float32 or float64)
-@@ -1950,7 +1954,8 @@ void helper_xsmulqp(CPUPPCState *env, uint32_t opco=
-de)
-     do_float_check_status(env, GETPC());
- }
-=20
--/* VSX_DIV - VSX floating point divide
-+/*
-+ * VSX_DIV - VSX floating point divide
-  *   op    - instruction mnemonic
-  *   nels  - number of elements (1, 2 or 4)
-  *   tp    - type (float32 or float64)
-@@ -2034,7 +2039,8 @@ void helper_xsdivqp(CPUPPCState *env, uint32_t opco=
-de)
-     do_float_check_status(env, GETPC());
- }
-=20
--/* VSX_RE  - VSX floating point reciprocal estimate
-+/*
-+ * VSX_RE  - VSX floating point reciprocal estimate
-  *   op    - instruction mnemonic
-  *   nels  - number of elements (1, 2 or 4)
-  *   tp    - type (float32 or float64)
-@@ -2075,7 +2081,8 @@ VSX_RE(xsresp, 1, float64, VsrD(0), 1, 1)
- VSX_RE(xvredp, 2, float64, VsrD(i), 0, 0)
- VSX_RE(xvresp, 4, float32, VsrW(i), 0, 0)
-=20
--/* VSX_SQRT - VSX floating point square root
-+/*
-+ * VSX_SQRT - VSX floating point square root
-  *   op    - instruction mnemonic
-  *   nels  - number of elements (1, 2 or 4)
-  *   tp    - type (float32 or float64)
-@@ -2124,7 +2131,8 @@ VSX_SQRT(xssqrtsp, 1, float64, VsrD(0), 1, 1)
- VSX_SQRT(xvsqrtdp, 2, float64, VsrD(i), 0, 0)
- VSX_SQRT(xvsqrtsp, 4, float32, VsrW(i), 0, 0)
-=20
--/* VSX_RSQRTE - VSX floating point reciprocal square root estimate
-+/*
-+ *VSX_RSQRTE - VSX floating point reciprocal square root estimate
-  *   op    - instruction mnemonic
-  *   nels  - number of elements (1, 2 or 4)
-  *   tp    - type (float32 or float64)
-@@ -2174,7 +2182,8 @@ VSX_RSQRTE(xsrsqrtesp, 1, float64, VsrD(0), 1, 1)
- VSX_RSQRTE(xvrsqrtedp, 2, float64, VsrD(i), 0, 0)
- VSX_RSQRTE(xvrsqrtesp, 4, float32, VsrW(i), 0, 0)
-=20
--/* VSX_TDIV - VSX floating point test for divide
-+/*
-+ * VSX_TDIV - VSX floating point test for divide
-  *   op    - instruction mnemonic
-  *   nels  - number of elements (1, 2 or 4)
-  *   tp    - type (float32 or float64)
-@@ -2207,18 +2216,20 @@ void helper_##op(CPUPPCState *env, uint32_t opcod=
-e)                     \
-             if (unlikely(tp##_is_any_nan(xa.fld) ||                     =
-\
-                          tp##_is_any_nan(xb.fld))) {                    =
-\
-                 fe_flag =3D 1;                                          =
-  \
--            } else if ((e_b <=3D emin) || (e_b >=3D (emax-2))) {        =
-    \
-+            } else if ((e_b <=3D emin) || (e_b >=3D (emax - 2))) {      =
-    \
-                 fe_flag =3D 1;                                          =
-  \
-             } else if (!tp##_is_zero(xa.fld) &&                         =
-\
-                        (((e_a - e_b) >=3D emax) ||                      =
-  \
--                        ((e_a - e_b) <=3D (emin+1)) ||                  =
-  \
--                         (e_a <=3D (emin+nbits)))) {                    =
-  \
-+                        ((e_a - e_b) <=3D (emin + 1)) ||                =
-  \
-+                        (e_a <=3D (emin + nbits)))) {                   =
-  \
-                 fe_flag =3D 1;                                          =
-  \
-             }                                                           =
-\
-                                                                         =
-\
-             if (unlikely(tp##_is_zero_or_denormal(xb.fld))) {           =
-\
--                /* XB is not zero because of the above check and */     =
-\
--                /* so must be denormalized.                      */     =
-\
-+                /*                                                      =
-\
-+                 * XB is not zero because of the above check and so     =
-\
-+                 * must be denormalized.                                =
-\
-+                 */                                                     =
-\
-                 fg_flag =3D 1;                                          =
-  \
-             }                                                           =
-\
-         }                                                               =
-\
-@@ -2231,7 +2242,8 @@ VSX_TDIV(xstdivdp, 1, float64, VsrD(0), -1022, 1023=
-, 52)
- VSX_TDIV(xvtdivdp, 2, float64, VsrD(i), -1022, 1023, 52)
- VSX_TDIV(xvtdivsp, 4, float32, VsrW(i), -126, 127, 23)
-=20
--/* VSX_TSQRT - VSX floating point test for square root
-+/*
-+ * VSX_TSQRT - VSX floating point test for square root
-  *   op    - instruction mnemonic
-  *   nels  - number of elements (1, 2 or 4)
-  *   tp    - type (float32 or float64)
-@@ -2266,13 +2278,15 @@ void helper_##op(CPUPPCState *env, uint32_t opcod=
-e)                     \
-             } else if (unlikely(tp##_is_neg(xb.fld))) {                 =
-\
-                 fe_flag =3D 1;                                          =
-  \
-             } else if (!tp##_is_zero(xb.fld) &&                         =
-\
--                      (e_b <=3D (emin+nbits))) {                        =
-  \
-+                       (e_b <=3D (emin + nbits))) {                     =
-  \
-                 fe_flag =3D 1;                                          =
-  \
-             }                                                           =
-\
-                                                                         =
-\
-             if (unlikely(tp##_is_zero_or_denormal(xb.fld))) {           =
-\
--                /* XB is not zero because of the above check and */     =
-\
--                /* therefore must be denormalized.               */     =
-\
-+                /*                                                      =
-\
-+                 * XB is not zero because of the above check and        =
-\
-+                 * therefore must be denormalized.                      =
-\
-+                 */                                                     =
-\
-                 fg_flag =3D 1;                                          =
-  \
-             }                                                           =
-\
-         }                                                               =
-\
-@@ -2285,7 +2299,8 @@ VSX_TSQRT(xstsqrtdp, 1, float64, VsrD(0), -1022, 52=
-)
- VSX_TSQRT(xvtsqrtdp, 2, float64, VsrD(i), -1022, 52)
- VSX_TSQRT(xvtsqrtsp, 4, float32, VsrW(i), -126, 23)
-=20
--/* VSX_MADD - VSX floating point muliply/add variations
-+/*
-+ * VSX_MADD - VSX floating point muliply/add variations
-  *   op    - instruction mnemonic
-  *   nels  - number of elements (1, 2 or 4)
-  *   tp    - type (float32 or float64)
-@@ -2322,8 +2337,10 @@ void helper_##op(CPUPPCState *env, uint32_t opcode=
-)                           \
-         float_status tstat =3D env->fp_status;                          =
-        \
-         set_float_exception_flags(0, &tstat);                           =
-      \
-         if (r2sp && (tstat.float_rounding_mode =3D=3D float_round_neares=
-t_even)) {\
--            /* Avoid double rounding errors by rounding the intermediate=
- */   \
--            /* result to odd.                                           =
- */   \
-+            /*                                                          =
-      \
-+             * Avoid double rounding errors by rounding the intermediate=
-      \
-+             * result to odd.                                           =
-      \
-+             */                                                         =
-      \
-             set_float_rounding_mode(float_round_to_zero, &tstat);       =
-      \
-             xt_out.fld =3D tp##_muladd(xa.fld, b->fld, c->fld,          =
-        \
-                                        maddflgs, &tstat);               =
-      \
-@@ -2388,7 +2405,8 @@ VSX_MADD(xvnmaddmsp, 4, float32, VsrW(i), NMADD_FLG=
-S, 0, 0, 0)
- VSX_MADD(xvnmsubasp, 4, float32, VsrW(i), NMSUB_FLGS, 1, 0, 0)
- VSX_MADD(xvnmsubmsp, 4, float32, VsrW(i), NMSUB_FLGS, 0, 0, 0)
-=20
--/* VSX_SCALAR_CMP_DP - VSX scalar floating point compare double precisio=
-n
-+/*
-+ * VSX_SCALAR_CMP_DP - VSX scalar floating point compare double precisio=
-n
-  *   op    - instruction mnemonic
-  *   cmp   - comparison operation
-  *   exp   - expected result of comparison
-@@ -2604,7 +2622,8 @@ void helper_##op(CPUPPCState *env, uint32_t opcode)=
-                     \
- VSX_SCALAR_CMPQ(xscmpoqp, 1)
- VSX_SCALAR_CMPQ(xscmpuqp, 0)
-=20
--/* VSX_MAX_MIN - VSX floating point maximum/minimum
-+/*
-+ * VSX_MAX_MIN - VSX floating point maximum/minimum
-  *   name  - instruction mnemonic
-  *   op    - operation (max or min)
-  *   nels  - number of elements (1, 2 or 4)
-@@ -2733,7 +2752,8 @@ void helper_##name(CPUPPCState *env, uint32_t opcod=
-e)                         \
- VSX_MAX_MINJ(xsmaxjdp, 1);
- VSX_MAX_MINJ(xsminjdp, 0);
-=20
--/* VSX_CMP - VSX floating point compare
-+/*
-+ * VSX_CMP - VSX floating point compare
-  *   op    - instruction mnemonic
-  *   nels  - number of elements (1, 2 or 4)
-  *   tp    - type (float32 or float64)
-@@ -2778,7 +2798,7 @@ void helper_##op(CPUPPCState *env, uint32_t opcode)=
-                       \
-     }                                                                   =
-  \
-                                                                         =
-  \
-     putVSR(xT(opcode), &xt, env);                                       =
-  \
--    if ((opcode >> (31-21)) & 1) {                                      =
-  \
-+    if ((opcode >> (31 - 21)) & 1) {                                    =
-  \
-         env->crf[6] =3D (all_true ? 0x8 : 0) | (all_false ? 0x2 : 0);   =
-    \
-     }                                                                   =
-  \
-     do_float_check_status(env, GETPC());                                =
-  \
-@@ -2793,7 +2813,8 @@ VSX_CMP(xvcmpgesp, 4, float32, VsrW(i), le, 1, 1)
- VSX_CMP(xvcmpgtsp, 4, float32, VsrW(i), lt, 1, 1)
- VSX_CMP(xvcmpnesp, 4, float32, VsrW(i), eq, 0, 0)
-=20
--/* VSX_CVT_FP_TO_FP - VSX floating point/floating point conversion
-+/*
-+ * VSX_CVT_FP_TO_FP - VSX floating point/floating point conversion
-  *   op    - instruction mnemonic
-  *   nels  - number of elements (1, 2 or 4)
-  *   stp   - source type (float32 or float64)
-@@ -2829,10 +2850,11 @@ void helper_##op(CPUPPCState *env, uint32_t opcod=
-e)                \
-=20
- VSX_CVT_FP_TO_FP(xscvdpsp, 1, float64, float32, VsrD(0), VsrW(0), 1)
- VSX_CVT_FP_TO_FP(xscvspdp, 1, float32, float64, VsrW(0), VsrD(0), 1)
--VSX_CVT_FP_TO_FP(xvcvdpsp, 2, float64, float32, VsrD(i), VsrW(2*i), 0)
--VSX_CVT_FP_TO_FP(xvcvspdp, 2, float32, float64, VsrW(2*i), VsrD(i), 0)
-+VSX_CVT_FP_TO_FP(xvcvdpsp, 2, float64, float32, VsrD(i), VsrW(2 * i), 0)
-+VSX_CVT_FP_TO_FP(xvcvspdp, 2, float32, float64, VsrW(2 * i), VsrD(i), 0)
-=20
--/* VSX_CVT_FP_TO_FP_VECTOR - VSX floating point/floating point conversio=
-n
-+/*
-+ * VSX_CVT_FP_TO_FP_VECTOR - VSX floating point/floating point conversio=
-n
-  *   op    - instruction mnemonic
-  *   nels  - number of elements (1, 2 or 4)
-  *   stp   - source type (float32 or float64)
-@@ -2868,7 +2890,8 @@ void helper_##op(CPUPPCState *env, uint32_t opcode)=
-                       \
-=20
- VSX_CVT_FP_TO_FP_VECTOR(xscvdpqp, 1, float64, float128, VsrD(0), f128, 1=
-)
-=20
--/* VSX_CVT_FP_TO_FP_HP - VSX floating point/floating point conversion
-+/*
-+ * VSX_CVT_FP_TO_FP_HP - VSX floating point/floating point conversion
-  *                       involving one half precision value
-  *   op    - instruction mnemonic
-  *   nels  - number of elements (1, 2 or 4)
-@@ -2953,7 +2976,8 @@ uint64_t helper_xscvspdpn(CPUPPCState *env, uint64_=
-t xb)
-     return float32_to_float64(xb >> 32, &tstat);
- }
-=20
--/* VSX_CVT_FP_TO_INT - VSX floating point to integer conversion
-+/*
-+ * VSX_CVT_FP_TO_INT - VSX floating point to integer conversion
-  *   op    - instruction mnemonic
-  *   nels  - number of elements (1, 2 or 4)
-  *   stp   - source type (float32 or float64)
-@@ -2996,17 +3020,18 @@ VSX_CVT_FP_TO_INT(xscvdpuxds, 1, float64, uint64,=
- VsrD(0), VsrD(0), 0ULL)
- VSX_CVT_FP_TO_INT(xscvdpuxws, 1, float64, uint32, VsrD(0), VsrW(1), 0U)
- VSX_CVT_FP_TO_INT(xvcvdpsxds, 2, float64, int64, VsrD(i), VsrD(i), \
-                   0x8000000000000000ULL)
--VSX_CVT_FP_TO_INT(xvcvdpsxws, 2, float64, int32, VsrD(i), VsrW(2*i), \
-+VSX_CVT_FP_TO_INT(xvcvdpsxws, 2, float64, int32, VsrD(i), VsrW(2 * i), \
-                   0x80000000U)
- VSX_CVT_FP_TO_INT(xvcvdpuxds, 2, float64, uint64, VsrD(i), VsrD(i), 0ULL=
-)
--VSX_CVT_FP_TO_INT(xvcvdpuxws, 2, float64, uint32, VsrD(i), VsrW(2*i), 0U=
-)
--VSX_CVT_FP_TO_INT(xvcvspsxds, 2, float32, int64, VsrW(2*i), VsrD(i), \
-+VSX_CVT_FP_TO_INT(xvcvdpuxws, 2, float64, uint32, VsrD(i), VsrW(2 * i), =
-0U)
-+VSX_CVT_FP_TO_INT(xvcvspsxds, 2, float32, int64, VsrW(2 * i), VsrD(i), \
-                   0x8000000000000000ULL)
- VSX_CVT_FP_TO_INT(xvcvspsxws, 4, float32, int32, VsrW(i), VsrW(i), 0x800=
-00000U)
--VSX_CVT_FP_TO_INT(xvcvspuxds, 2, float32, uint64, VsrW(2*i), VsrD(i), 0U=
-LL)
-+VSX_CVT_FP_TO_INT(xvcvspuxds, 2, float32, uint64, VsrW(2 * i), VsrD(i), =
-0ULL)
- VSX_CVT_FP_TO_INT(xvcvspuxws, 4, float32, uint32, VsrW(i), VsrW(i), 0U)
-=20
--/* VSX_CVT_FP_TO_INT_VECTOR - VSX floating point to integer conversion
-+/*
-+ * VSX_CVT_FP_TO_INT_VECTOR - VSX floating point to integer conversion
-  *   op    - instruction mnemonic
-  *   stp   - source type (float32 or float64)
-  *   ttp   - target type (int32, uint32, int64 or uint64)
-@@ -3040,7 +3065,8 @@ VSX_CVT_FP_TO_INT_VECTOR(xscvqpswz, float128, int32=
-, f128, VsrD(0),          \
- VSX_CVT_FP_TO_INT_VECTOR(xscvqpudz, float128, uint64, f128, VsrD(0), 0x0=
-ULL)
- VSX_CVT_FP_TO_INT_VECTOR(xscvqpuwz, float128, uint32, f128, VsrD(0), 0x0=
-ULL)
-=20
--/* VSX_CVT_INT_TO_FP - VSX integer to floating point conversion
-+/*
-+ * VSX_CVT_INT_TO_FP - VSX integer to floating point conversion
-  *   op    - instruction mnemonic
-  *   nels  - number of elements (1, 2 or 4)
-  *   stp   - source type (int32, uint32, int64 or uint64)
-@@ -3079,14 +3105,15 @@ VSX_CVT_INT_TO_FP(xscvsxdsp, 1, int64, float64, V=
-srD(0), VsrD(0), 1, 1)
- VSX_CVT_INT_TO_FP(xscvuxdsp, 1, uint64, float64, VsrD(0), VsrD(0), 1, 1)
- VSX_CVT_INT_TO_FP(xvcvsxddp, 2, int64, float64, VsrD(i), VsrD(i), 0, 0)
- VSX_CVT_INT_TO_FP(xvcvuxddp, 2, uint64, float64, VsrD(i), VsrD(i), 0, 0)
--VSX_CVT_INT_TO_FP(xvcvsxwdp, 2, int32, float64, VsrW(2*i), VsrD(i), 0, 0=
-)
--VSX_CVT_INT_TO_FP(xvcvuxwdp, 2, uint64, float64, VsrW(2*i), VsrD(i), 0, =
-0)
--VSX_CVT_INT_TO_FP(xvcvsxdsp, 2, int64, float32, VsrD(i), VsrW(2*i), 0, 0=
-)
--VSX_CVT_INT_TO_FP(xvcvuxdsp, 2, uint64, float32, VsrD(i), VsrW(2*i), 0, =
-0)
-+VSX_CVT_INT_TO_FP(xvcvsxwdp, 2, int32, float64, VsrW(2 * i), VsrD(i), 0,=
- 0)
-+VSX_CVT_INT_TO_FP(xvcvuxwdp, 2, uint64, float64, VsrW(2 * i), VsrD(i), 0=
-, 0)
-+VSX_CVT_INT_TO_FP(xvcvsxdsp, 2, int64, float32, VsrD(i), VsrW(2 * i), 0,=
- 0)
-+VSX_CVT_INT_TO_FP(xvcvuxdsp, 2, uint64, float32, VsrD(i), VsrW(2 * i), 0=
-, 0)
- VSX_CVT_INT_TO_FP(xvcvsxwsp, 4, int32, float32, VsrW(i), VsrW(i), 0, 0)
- VSX_CVT_INT_TO_FP(xvcvuxwsp, 4, uint32, float32, VsrW(i), VsrW(i), 0, 0)
-=20
--/* VSX_CVT_INT_TO_FP_VECTOR - VSX integer to floating point conversion
-+/*
-+ * VSX_CVT_INT_TO_FP_VECTOR - VSX integer to floating point conversion
-  *   op    - instruction mnemonic
-  *   stp   - source type (int32, uint32, int64 or uint64)
-  *   ttp   - target type (float32 or float64)
-@@ -3111,13 +3138,15 @@ void helper_##op(CPUPPCState *env, uint32_t opcod=
-e)                     \
- VSX_CVT_INT_TO_FP_VECTOR(xscvsdqp, int64, float128, VsrD(0), f128)
- VSX_CVT_INT_TO_FP_VECTOR(xscvudqp, uint64, float128, VsrD(0), f128)
-=20
--/* For "use current rounding mode", define a value that will not be one =
-of
-- * the existing rounding model enums.
-+/*
-+ * For "use current rounding mode", define a value that will not be
-+ * one of the existing rounding model enums.
-  */
- #define FLOAT_ROUND_CURRENT (float_round_nearest_even + float_round_down=
- + \
-   float_round_up + float_round_to_zero)
-=20
--/* VSX_ROUND - VSX floating point round
-+/*
-+ * VSX_ROUND - VSX floating point round
-  *   op    - instruction mnemonic
-  *   nels  - number of elements (1, 2 or 4)
-  *   tp    - type (float32 or float64)
-@@ -3150,9 +3179,11 @@ void helper_##op(CPUPPCState *env, uint32_t opcode=
-)                    \
-         }                                                              \
-     }                                                                  \
-                                                                        \
--    /* If this is not a "use current rounding mode" instruction,       \
-+    /*                                                                 \
-+     * If this is not a "use current rounding mode" instruction,       \
-      * then inhibit setting of the XX bit and restore rounding         \
--     * mode from FPSCR */                                              \
-+     * mode from FPSCR                                                 \
-+     */                                                                \
-     if (rmode !=3D FLOAT_ROUND_CURRENT) {                               =
- \
-         fpscr_set_rounding_mode(env);                                  \
-         env->fp_status.float_exception_flags &=3D ~float_flag_inexact;  =
- \
-@@ -3234,7 +3265,8 @@ void helper_xvxsigsp(CPUPPCState *env, uint32_t opc=
-ode)
-     putVSR(xT(opcode), &xt, env);
- }
-=20
--/* VSX_TEST_DC - VSX floating point test data class
-+/*
-+ * VSX_TEST_DC - VSX floating point test data class
-  *   op    - instruction mnemonic
-  *   nels  - number of elements (1, 2 or 4)
-  *   xbn   - VSR register number
 --=20
 2.20.1
 
