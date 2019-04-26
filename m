@@ -1,26 +1,22 @@
-Received: from eggs.gnu.org ([209.51.188.92]:55385)
+Received: from eggs.gnu.org ([209.51.188.92]:55543)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1hJyvE-0004CG-J3
-	for qemu-devel@nongnu.org; Fri, 26 Apr 2019 07:21:41 -0400
+	(envelope-from <david@redhat.com>) id 1hJyvK-0004H8-Je
+	for qemu-devel@nongnu.org; Fri, 26 Apr 2019 07:21:47 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1hJyvD-0000KT-6k
-	for qemu-devel@nongnu.org; Fri, 26 Apr 2019 07:21:40 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:58396)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1hJyvC-0000Gm-Vg
-	for qemu-devel@nongnu.org; Fri, 26 Apr 2019 07:21:39 -0400
-Date: Fri, 26 Apr 2019 08:21:35 -0300
-From: Eduardo Habkost <ehabkost@redhat.com>
-Message-ID: <20190426112135.GA30873@habkost.net>
-References: <20190425200051.19906-1-ehabkost@redhat.com>
-	<20190425200051.19906-4-ehabkost@redhat.com>
-	<bbdf7fb5-8f68-582b-2c57-5cf0a522237d@redhat.com>
+	(envelope-from <david@redhat.com>) id 1hJyvJ-0000dz-Mr
+	for qemu-devel@nongnu.org; Fri, 26 Apr 2019 07:21:46 -0400
+References: <20190426111003.21246-1-borntraeger@de.ibm.com>
+	<20190426111003.21246-11-borntraeger@de.ibm.com>
+From: David Hildenbrand <david@redhat.com>
+Message-ID: <f0984d7f-9a9e-49fd-1466-0b2d1fa8a058@redhat.com>
+Date: Fri, 26 Apr 2019 13:21:42 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <bbdf7fb5-8f68-582b-2c57-5cf0a522237d@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH 3/4] qdev: Don't compile hotplug code in
- user-mode emulation
+In-Reply-To: <20190426111003.21246-11-borntraeger@de.ibm.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v2 10/10] s390x/cpumodel: wire up 8561 and
+ 8562 as gen15 machines
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,78 +25,39 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: qemu-devel@nongnu.org, Thomas Huth <thuth@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, Markus Armbruster <armbru@redhat.com>, Like Xu <like.xu@linux.intel.com>
+To: Christian Borntraeger <borntraeger@de.ibm.com>, Cornelia Huck <cohuck@redhat.com>
+Cc: qemu-devel <qemu-devel@nongnu.org>, qemu-s390x <qemu-s390x@nongnu.org>, Halil Pasic <pasic@linux.ibm.com>, Richard Henderson <rth@twiddle.net>, Collin Walling <walling@linux.ibm.com>, "Jason J . Herne" <jjherne@linux.ibm.com>
 
-On Fri, Apr 26, 2019 at 10:27:58AM +0200, Paolo Bonzini wrote:
-> On 25/04/19 22:00, Eduardo Habkost wrote:
-> > diff --git a/hw/core/qdev-hotplug-stubs.c b/hw/core/qdev-hotplug-stubs.c
-> > new file mode 100644
-> > index 0000000000..c710f23388
-> > --- /dev/null
-> > +++ b/hw/core/qdev-hotplug-stubs.c
-> > @@ -0,0 +1,44 @@
-> > +/*
-> > + * qdev hotplug handler stubs (for user-mode emulation and unit tests)
+On 26.04.19 13:10, Christian Borntraeger wrote:
+> 8561 and 8562 will be gen15 machines. There is no name yet, lets us use
+> the cpu id as base name. Later on we can provide aliases with the proper
+> name.
 > 
-> Can you explain the issue with unit tests in the commit message?
-
-I don't think there are issues with unit tests.  I just thought
-it was pointless to link qdev-hotplug.o into unit tests binaries
-if no hotplug handler object is created by them.
-
-What do you think?  Should I keep qdev-hotplug.o and hotplug.o in
-the unit tests binaries?
-
+> Signed-off-by: Christian Borntraeger <borntraeger@de.ibm.com>
+> ---
+>  target/s390x/cpu_models.c | 2 ++
+>  1 file changed, 2 insertions(+)
 > 
-> > + *  Copyright (c) 2019 Red Hat Inc
-> > + *
-> > + * Authors:
-> > + *  Eduardo Habkost <ehabkost@redhat.com>
-> > + *
-> > + * This library is free software; you can redistribute it and/or
-> > + * modify it under the terms of the GNU Lesser General Public
-> > + * License as published by the Free Software Foundation; either
-> > + * version 2 of the License, or (at your option) any later version.
-> > + *
-> > + * This library is distributed in the hope that it will be useful,
-> > + * but WITHOUT ANY WARRANTY; without even the implied warranty of
-> > + * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-> > + * Lesser General Public License for more details.
-> > + *
-> > + * You should have received a copy of the GNU Lesser General Public
-> > + * License along with this library; if not, see <http://www.gnu.org/licenses/>.
-> > + */
-> > +
-> > +#include "qemu/osdep.h"
-> > +#include "hw/qdev-core.h"
-> > +#include "hw/hotplug.h"
-> > +
-> > +HotplugHandler *qdev_get_hotplug_handler(DeviceState *dev)
-> > +{
-> > +    return NULL;
-> > +}
-> > +
-> > +void hotplug_handler_pre_plug(HotplugHandler *plug_handler,
-> > +                              DeviceState *plugged_dev,
-> > +                              Error **errp)
-> > +{
-> > +    assert(plug_handler == NULL);
-> > +}
-> > +
-> > +void hotplug_handler_plug(HotplugHandler *plug_handler,
-> > +                          DeviceState *plugged_dev,
-> > +                          Error **errp)
-> > +{
-> > +    assert(plug_handler == NULL);
-> > +}
+> diff --git a/target/s390x/cpu_models.c b/target/s390x/cpu_models.c
+> index d683635eb5..dd6415103f 100644
+> --- a/target/s390x/cpu_models.c
+> +++ b/target/s390x/cpu_models.c
+> @@ -83,6 +83,8 @@ static S390CPUDef s390_cpu_defs[] = {
+>      CPUDEF_INIT(0x3906, 14, 1, 47, 0x08000000U, "z14", "IBM z14 GA1"),
+>      CPUDEF_INIT(0x3906, 14, 2, 47, 0x08000000U, "z14.2", "IBM z14 GA2"),
+>      CPUDEF_INIT(0x3907, 14, 1, 47, 0x08000000U, "z14ZR1", "IBM z14 Model ZR1 GA1"),
+> +    CPUDEF_INIT(0x8561, 15, 1, 47, 0x08000000U, "8561", "IBM 8561 GA1"),
+> +    CPUDEF_INIT(0x8562, 15, 1, 47, 0x08000000U, "8562", "IBM 8562 GA1"),
+>  };
+>  
+>  #define QEMU_MAX_CPU_TYPE 0x2827
 > 
-> Would it work if you instead make these functions (and the others in
-> hw/core/hotplug.c) inlines in include/hw/hotplug.h?
-> 
-> Then all that remains is qdev_get_hotplug_handler.
 
-I think that would work.  I'll do that in v2, thanks!
+Can you fixup the comment at the beginning of the definitions, stating
+that base features of new HW are no longer a superset?
 
 -- 
-Eduardo
+
+Thanks,
+
+David / dhildenb
