@@ -1,41 +1,25 @@
-Received: from eggs.gnu.org ([209.51.188.92]:59880)
+Received: from eggs.gnu.org ([209.51.188.92]:32848)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <borntraeger@de.ibm.com>) id 1hJz9l-0007Qn-UR
-	for qemu-devel@nongnu.org; Fri, 26 Apr 2019 07:36:42 -0400
+	(envelope-from <lma@suse.com>) id 1hJzEe-0000pL-4a
+	for qemu-devel@nongnu.org; Fri, 26 Apr 2019 07:41:45 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <borntraeger@de.ibm.com>) id 1hJz9k-0002Ay-Ki
-	for qemu-devel@nongnu.org; Fri, 26 Apr 2019 07:36:41 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:55112)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <borntraeger@de.ibm.com>)
-	id 1hJz9i-00029b-T7
-	for qemu-devel@nongnu.org; Fri, 26 Apr 2019 07:36:40 -0400
-Received: from pps.filterd (m0098409.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id
-	x3QBTghe043158
-	for <qemu-devel@nongnu.org>; Fri, 26 Apr 2019 07:36:35 -0400
-Received: from e06smtp04.uk.ibm.com (e06smtp04.uk.ibm.com [195.75.94.100])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2s3yffmxr8-1
-	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Fri, 26 Apr 2019 07:36:34 -0400
-Received: from localhost
-	by e06smtp04.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
-	Only! Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <borntraeger@de.ibm.com>;
-	Fri, 26 Apr 2019 12:36:32 +0100
-References: <20190426111003.21246-1-borntraeger@de.ibm.com>
-	<20190426111003.21246-11-borntraeger@de.ibm.com>
-	<71955bba-ef04-1677-b7f0-bb1675bad12a@redhat.com>
-From: Christian Borntraeger <borntraeger@de.ibm.com>
-Date: Fri, 26 Apr 2019 13:36:27 +0200
+	(envelope-from <lma@suse.com>) id 1hJzEc-0000yW-5y
+	for qemu-devel@nongnu.org; Fri, 26 Apr 2019 07:41:44 -0400
+Received: from smtp2.provo.novell.com ([137.65.250.81]:40955)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <lma@suse.com>) id 1hJzEb-0000pj-Rj
+	for qemu-devel@nongnu.org; Fri, 26 Apr 2019 07:41:42 -0400
+References: <4ec13220-0c12-3b87-6a79-49a42a38db01@suse.com>
+	<20190426083830.kj7currufo637loa@sirius.home.kraxel.org>
+From: Lin Ma <lma@suse.com>
+Message-ID: <ef5b2ec7-f796-becd-f488-bb17538e93bb@suse.com>
+Date: Fri, 26 Apr 2019 19:41:30 +0800
 MIME-Version: 1.0
-In-Reply-To: <71955bba-ef04-1677-b7f0-bb1675bad12a@redhat.com>
-Content-Type: text/plain; charset=utf-8
+In-Reply-To: <20190426083830.kj7currufo637loa@sirius.home.kraxel.org>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 8bit
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Message-Id: <07252560-1eed-8fd5-ee94-6bcea6cf99bc@de.ibm.com>
-Subject: Re: [Qemu-devel] [PATCH v2 10/10] s390x/cpumodel: wire up 8561 and
- 8562 as gen15 machines
+Subject: Re: [Qemu-devel] About pt-br keyboard layout
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -44,57 +28,38 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Hildenbrand <david@redhat.com>, Cornelia Huck <cohuck@redhat.com>
-Cc: qemu-devel <qemu-devel@nongnu.org>, qemu-s390x <qemu-s390x@nongnu.org>, Halil Pasic <pasic@linux.ibm.com>, Richard Henderson <rth@twiddle.net>, Collin Walling <walling@linux.ibm.com>, "Jason J . Herne" <jjherne@linux.ibm.com>
+To: Gerd Hoffmann <kraxel@redhat.com>
+Cc: qemu-devel@nongnu.org
 
 
-
-On 26.04.19 13:32, David Hildenbrand wrote:
-> On 26.04.19 13:10, Christian Borntraeger wrote:
->> 8561 and 8562 will be gen15 machines. There is no name yet, lets us use
->> the cpu id as base name. Later on we can provide aliases with the proper
->> name.
+On 4/26/19 4:38 PM, Gerd Hoffmann wrote:
+> On Fri, Apr 26, 2019 at 04:09:12PM +0800, Lin Ma wrote:
+>> Hi all,
 >>
->> Signed-off-by: Christian Borntraeger <borntraeger@de.ibm.com>
->> ---
->>  target/s390x/cpu_models.c | 2 ++
->>  1 file changed, 2 insertions(+)
+>> While I launch qemu with vnc + pt-br keyboard layout on my pc, If I type
+>> shift + 6 in iPXE shell or grub shell via my usual 105-key keyboard,
+>> shift + 6 would be mapped to "(apostrophe), But IIUC the correct character
+>> should be ¨(diaeresis) in pt-br layout.
 >>
->> diff --git a/target/s390x/cpu_models.c b/target/s390x/cpu_models.c
->> index d683635eb5..dd6415103f 100644
->> --- a/target/s390x/cpu_models.c
->> +++ b/target/s390x/cpu_models.c
->> @@ -83,6 +83,8 @@ static S390CPUDef s390_cpu_defs[] = {
->>      CPUDEF_INIT(0x3906, 14, 1, 47, 0x08000000U, "z14", "IBM z14 GA1"),
->>      CPUDEF_INIT(0x3906, 14, 2, 47, 0x08000000U, "z14.2", "IBM z14 GA2"),
->>      CPUDEF_INIT(0x3907, 14, 1, 47, 0x08000000U, "z14ZR1", "IBM z14 Model ZR1 GA1"),
->> +    CPUDEF_INIT(0x8561, 15, 1, 47, 0x08000000U, "8561", "IBM 8561 GA1"),
->> +    CPUDEF_INIT(0x8562, 15, 1, 47, 0x08000000U, "8562", "IBM 8562 GA1"),
->>  };
-> 
-> Thinking out loud, I know that official names are not published yet.
-> Looking at the recent history (z13, z14), my educated guess would be
-> z15. I guess pretty much everybody would guess that.
-
-Not sure about trademark aspects - especially if this really becomes z15. The smaller
-machine has no real history (ZR1 vs. s vs BC). So I think I would rather have a correct
-number than a partially correct name.
-
-> 
-> So I wonder if using "z15" and e.g. "z15ZR1" or "z15s" would be easier
-> to have, although in the end maybe not correct (whatever names smart
-> people are able to come up with, history told us that consistent naming
-> does not seem to be one of the core strengths of CPU marketing people in
-> general).
-> 
-> So if we need aliases either way, and z15 is easier to understand than
-> "8561" for any user, what about going forward with that and introducing
-> actual alias later on? We can tag the names to be inofficial.
-> 
-> CPUDEF_INIT(0x8561, 15, 1, 47, 0x08000000U, "z15", "Inofficial name for
-> gen15 model 1 GA1 (8561)"),
-> CPUDEF_INIT(0x8562, 15, 1, 47, 0x08000000U, "z15ZR1", "Inofficial name
-> for gen15 model 2 GA1 (8562)"),
-> 
-> (please don't eat me alive)
-> 
+>> I'm wondering that is it the expected behavior? In other words, Does it make
+>> sense if I want to type multi-character characters(say Ç or ¨) without guest
+>> os's help?
+> No.  -k is for translating keysyms back into the correct scancodes,
+> because this is what the (virtual) keyboard passes to the guest.
+> So -k must match the *hosts* keyboard layout.
+So, that means, If I launch qemu with -k pt-br on a host, I need to 
+ensure the keyboard layout
+must be pt-br as well onthathypervisorhost,Then when I connected to this 
+vnc server(qemu)
+throughvncviewer on mylaptop(us keyboard layout), I type shift + 6, I 
+can get¨(diaeresis)
+character, am I right?
+> Translating the scancodes into keysyms again is the job of the guest,
+> so that requires the keymapping you want to use being active in the
+> guest os.  Typically that would be the same you have on the host, but
+> that isn't required.  The guest can work with -- for example -- us
+> layout (like it is often the case in boot loaders).  Behavior should be
+> identical to physical hardware here.
+>
+> HTH,
+>    Gerd
