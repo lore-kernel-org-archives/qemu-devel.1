@@ -1,33 +1,30 @@
-Received: from eggs.gnu.org ([209.51.188.92]:58583)
+Received: from eggs.gnu.org ([209.51.188.92]:59523)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.williamson@redhat.com>) id 1hK7zZ-0004nT-4H
-	for qemu-devel@nongnu.org; Fri, 26 Apr 2019 17:02:46 -0400
+	(envelope-from <Thomas.Lendacky@amd.com>) id 1hK85J-00083b-4l
+	for qemu-devel@nongnu.org; Fri, 26 Apr 2019 17:08:42 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.williamson@redhat.com>) id 1hK7zX-0003c7-QP
-	for qemu-devel@nongnu.org; Fri, 26 Apr 2019 17:02:44 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:38904)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <alex.williamson@redhat.com>)
-	id 1hK7zX-0003bX-Ki
-	for qemu-devel@nongnu.org; Fri, 26 Apr 2019 17:02:43 -0400
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
-	[10.5.11.15])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 608F38E3D4
-	for <qemu-devel@nongnu.org>; Fri, 26 Apr 2019 21:02:42 +0000 (UTC)
-Date: Fri, 26 Apr 2019 15:02:36 -0600
-From: Alex Williamson <alex.williamson@redhat.com>
-Message-ID: <20190426150236.1af2ff08@x1.home>
-In-Reply-To: <20190426132744.2b594bf5@x1.home>
-References: <20181220054037.24320-1-peterx@redhat.com>
-	<20181220054037.24320-2-peterx@redhat.com>
-	<20190426132744.2b594bf5@x1.home>
+	(envelope-from <Thomas.Lendacky@amd.com>) id 1hK85H-0000tm-9W
+	for qemu-devel@nongnu.org; Fri, 26 Apr 2019 17:08:40 -0400
+Received: from mail-eopbgr740048.outbound.protection.outlook.com
+	([40.107.74.48]:19646
+	helo=NAM01-BN3-obe.outbound.protection.outlook.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <Thomas.Lendacky@amd.com>)
+	id 1hK85G-0000s7-QW
+	for qemu-devel@nongnu.org; Fri, 26 Apr 2019 17:08:39 -0400
+From: "Lendacky, Thomas" <Thomas.Lendacky@amd.com>
+Date: Fri, 26 Apr 2019 21:08:36 +0000
+Message-ID: <69ccf6be-26d5-8766-b9b1-c18221902386@amd.com>
+References: <20190424160942.13567-1-brijesh.singh@amd.com>
+	<20190424160942.13567-5-brijesh.singh@amd.com>
+In-Reply-To: <20190424160942.13567-5-brijesh.singh@amd.com>
+Content-Language: en-US
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <53FEE1F74FBC2A4FBBE5B4BB15D16687@namprd12.prod.outlook.com>
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v2 1/3] q35: set split kernel irqchip as
- default
+Subject: Re: [Qemu-devel] [RFC PATCH v1 04/10] KVM: SVM: Add support for
+ KVM_SEV_RECEIVE_START command
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,49 +33,114 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Xu <peterx@redhat.com>
-Cc: qemu-devel@nongnu.org, Igor Mammedov <imammedo@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, "Michael S . Tsirkin" <mst@redhat.com>
+To: "Singh, Brijesh" <brijesh.singh@amd.com>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>
+Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>, "H. Peter Anvin" <hpa@zytor.com>, Paolo Bonzini <pbonzini@redhat.com>, =?utf-8?B?UmFkaW0gS3LEjW3DocWZ?= <rkrcmar@redhat.com>, Joerg Roedel <joro@8bytes.org>, Borislav Petkov <bp@suse.de>, "x86@kernel.org" <x86@kernel.org>, "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
 
-On Fri, 26 Apr 2019 13:27:44 -0600
-Alex Williamson <alex.williamson@redhat.com> wrote:
-
-> On Thu, 20 Dec 2018 13:40:35 +0800
-> Peter Xu <peterx@redhat.com> wrote:
-> 
-> > Starting from QEMU 4.0, let's specify "split" as the default value for
-> > kernel-irqchip.
-> > 
-> > So for QEMU>=4.0 we'll have: allowed=Y,required=N,split=Y
-> >    for QEMU<=3.1 we'll have: allowed=Y,required=N,split=N
-> >    (omitting all the "kernel_irqchip_" prefix)
-> > 
-> > Note that this will let the default q35 machine type to depend on
-> > Linux version 4.4 or newer because that's where split irqchip is
-> > introduced in kernel.  But it's fine since we're boosting supported
-> > Linux version for QEMU 4.0 to around Linux 4.5.  For more information
-> > please refer to the discussion on AMD's RDTSCP:
-> > 
-> >   https://lore.kernel.org/lkml/20181210181328.GA762@zn.tnic/  
-> 
-> It looks like this broke INTx for vfio-pci, see:
-> 
-> https://bugs.launchpad.net/qemu/+bug/1826422
-> 
-> In my testing it looks like KVM advertises supporting the KVM_IRQFD
-> resample feature, but vfio never gets the unmask notification, so the
-> device remains with DisINTx set and no further interrupts are
-> generated.  Do we expect KVM's IRQFD with resampler to work in the
-> split IRQ mode?  We can certainly hope that "high performance" devices
-> use MSI or MSI/X, but this would be quite a performance regression with
-> split mode if our userspace bypass for INTx goes away.  Thanks,
-
-arch/x86/kvm/lapic.c:kvm_ioapic_send_eoi() dumps to userspace before
-kvm_ioapic_update_eoi() can handle the irq_ack_notifier_list via
-kvm_notify_acked_gsi(), so it looks like KVM really ought to return an
-error when trying to register a resample IRQFD when irqchip_split(),
-but do we have better options?  EOI handling in QEMU is pretty much
-non-existent and even if it was in place, it's a big performance
-regression for vfio INTx handling.  Is a split irqchip that retains
-performant resampling (EOI) support possible?  Thanks,
-
-Alex
+T24gNC8yNC8xOSAxMToxMCBBTSwgU2luZ2gsIEJyaWplc2ggd3JvdGU6DQo+IFRoZSBjb21tYW5k
+IGlzIHVzZWQgdG8gY3JlYXRlIGVuY3J5cHRpb24gY29udGV4dCBmb3IgdGhlIGluY29taW5nDQoN
+CmNyZWF0ZSB0aGUgZW5jcnlwdGlvbiBjb250ZXh0IGZvciBhbiBpbmNvbWluZw0KDQo+IFNFViBn
+dWVzdC4gVGhlIGVuY3J5cHRpb24gY29udGV4dCBjYW4gYmUgbGF0ZXIgdW51c2VkIGJ5IHRoZSBo
+eXBlcnZpc29yDQoNCmNhbiBiZSBsYXRlciB1c2VkIGJ5DQoNCj4gdG8gaW1wb3J0IHRoZSBpbmNv
+bWluZyBkYXRhIGludG8gdGhlIFNFViBndWVzdCBtZW1vcnkgc3BhY2UuDQo+IA0KPiBDYzogVGhv
+bWFzIEdsZWl4bmVyIDx0Z2x4QGxpbnV0cm9uaXguZGU+DQo+IENjOiBJbmdvIE1vbG5hciA8bWlu
+Z29AcmVkaGF0LmNvbT4NCj4gQ2M6ICJILiBQZXRlciBBbnZpbiIgPGhwYUB6eXRvci5jb20+DQo+
+IENjOiBQYW9sbyBCb256aW5pIDxwYm9uemluaUByZWRoYXQuY29tPg0KPiBDYzogIlJhZGltIEty
+xI1tw6HFmSIgPHJrcmNtYXJAcmVkaGF0LmNvbT4NCj4gQ2M6IEpvZXJnIFJvZWRlbCA8am9yb0A4
+Ynl0ZXMub3JnPg0KPiBDYzogQm9yaXNsYXYgUGV0a292IDxicEBzdXNlLmRlPg0KPiBDYzogVG9t
+IExlbmRhY2t5IDx0aG9tYXMubGVuZGFja3lAYW1kLmNvbT4NCj4gQ2M6IHg4NkBrZXJuZWwub3Jn
+DQo+IENjOiBrdm1Admdlci5rZXJuZWwub3JnDQo+IENjOiBsaW51eC1rZXJuZWxAdmdlci5rZXJu
+ZWwub3JnDQo+IFNpZ25lZC1vZmYtYnk6IEJyaWplc2ggU2luZ2ggPGJyaWplc2guc2luZ2hAYW1k
+LmNvbT4NCj4gLS0tDQo+ICAuLi4vdmlydHVhbC9rdm0vYW1kLW1lbW9yeS1lbmNyeXB0aW9uLnJz
+dCAgICAgfCAyOSArKysrKysrDQo+ICBhcmNoL3g4Ni9rdm0vc3ZtLmMgICAgICAgICAgICAgICAg
+ICAgICAgICAgICAgfCA4MCArKysrKysrKysrKysrKysrKysrDQo+ICBpbmNsdWRlL3VhcGkvbGlu
+dXgva3ZtLmggICAgICAgICAgICAgICAgICAgICAgfCAgOSArKysNCj4gIDMgZmlsZXMgY2hhbmdl
+ZCwgMTE4IGluc2VydGlvbnMoKykNCj4gDQo+IGRpZmYgLS1naXQgYS9Eb2N1bWVudGF0aW9uL3Zp
+cnR1YWwva3ZtL2FtZC1tZW1vcnktZW5jcnlwdGlvbi5yc3QgYi9Eb2N1bWVudGF0aW9uL3ZpcnR1
+YWwva3ZtL2FtZC1tZW1vcnktZW5jcnlwdGlvbi5yc3QNCj4gaW5kZXggMDA2ODMyMjU2YWUzLi5h
+Y2RmZjI0NTQ2NDkgMTAwNjQ0DQo+IC0tLSBhL0RvY3VtZW50YXRpb24vdmlydHVhbC9rdm0vYW1k
+LW1lbW9yeS1lbmNyeXB0aW9uLnJzdA0KPiArKysgYi9Eb2N1bWVudGF0aW9uL3ZpcnR1YWwva3Zt
+L2FtZC1tZW1vcnktZW5jcnlwdGlvbi5yc3QNCj4gQEAgLTI5Myw2ICsyOTMsMzUgQEAgaXNzdWVk
+IGJ5IHRoZSBoeXBlcnZpc29yIHRvIGRlbGV0ZSB0aGUgZW5jcnlwdGlvbiBjb250ZXh0Lg0KPiAg
+DQo+ICBSZXR1cm5zOiAwIG9uIHN1Y2Nlc3MsIC1uZWdhdGl2ZSBvbiBlcnJvcg0KPiAgDQo+ICsx
+My4gS1ZNX1NFVl9SRUNFSVZFX1NUQVJUDQo+ICstLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0NCj4g
+Kw0KPiArVGhlIEtWTV9TRVZfUkVDRUlWRV9TVEFSVCBjb21tYW5kIGlzIHVzZWQgZm9yIGNyZWF0
+aW5nIHRoZSBtZW1vcnkgZW5jcnlwdGlvbg0KPiArY29udGV4dCBmb3IgYW4gaW5jb21pbmcgU0VW
+IGd1ZXN0LiBUbyBjcmVhdGUgdGhlIGVuY3J5cHRpb24gY29udGV4dCwgdXNlciBtdXN0DQoNCnRo
+ZSB1c2VyIG11c3QNCg0KVGhhbmtzLA0KVG9tDQoNCj4gK3Byb3ZpZGUgYSBndWVzdCBwb2xpY3ks
+IHRoZSBwbGF0Zm9ybSBwdWJsaWMgRGlmZmllLUhlbGxtYW4gKFBESCkga2V5IGFuZCBzZXNzaW9u
+DQo+ICtpbmZvcm1hdGlvbi4NCj4gKw0KPiArUGFyYW1ldGVyczogc3RydWN0ICBrdm1fc2V2X3Jl
+Y2VpdmVfc3RhcnQgKGluL291dCkNCj4gKw0KPiArUmV0dXJuczogMCBvbiBzdWNjZXNzLCAtbmVn
+YXRpdmUgb24gZXJyb3INCj4gKw0KPiArOjoNCj4gKw0KPiArICAgICAgICBzdHJ1Y3Qga3ZtX3Nl
+dl9yZWNlaXZlX3N0YXJ0IHsNCj4gKyAgICAgICAgICAgICAgICBfX3UzMiBoYW5kbGU7ICAgICAg
+ICAgICAvKiBpZiB6ZXJvIHRoZW4gZmlybXdhcmUgY3JlYXRlcyBhIG5ldyBoYW5kbGUgKi8NCj4g
+KyAgICAgICAgICAgICAgICBfX3UzMiBwb2xpY3k7ICAgICAgICAgICAvKiBndWVzdCdzIHBvbGlj
+eSAqLw0KPiArDQo+ICsgICAgICAgICAgICAgICAgX191NjQgcGRoX3VhZGRyOyAgICAgICAgIC8q
+IHVzZXJzcGFjZSBhZGRyZXNzIHBvaW50aW5nIHRvIHRoZSBQREgga2V5ICovDQo+ICsgICAgICAg
+ICAgICAgICAgX191MzIgZGhfbGVuOw0KPiArDQo+ICsgICAgICAgICAgICAgICAgX191NjQgc2Vz
+c2lvbl9hZGRyOyAgICAgLyogdXNlcnNwYWNlIGFkZHJlc3Mgd2hpY2ggcG9pbnRzIHRvIHRoZSBn
+dWVzdCBzZXNzaW9uIGluZm9ybWF0aW9uICovDQo+ICsgICAgICAgICAgICAgICAgX191MzIgc2Vz
+c2lvbl9sZW47DQo+ICsgICAgICAgIH07DQo+ICsNCj4gK09uIHN1Y2Nlc3MsIHRoZSAnaGFuZGxl
+JyBmaWVsZCBjb250YWlucyBhIG5ldyBoYW5kbGUgYW5kIG9uIGVycm9yLCBhIG5lZ2F0aXZlIHZh
+bHVlLg0KPiArDQo+ICtGb3IgbW9yZSBkZXRhaWxzLCBzZWUgU0VWIHNwZWMgU2VjdGlvbiA2LjEy
+Lg0KPiArDQo+ICBSZWZlcmVuY2VzDQo+ICA9PT09PT09PT09DQo+ICANCj4gZGlmZiAtLWdpdCBh
+L2FyY2gveDg2L2t2bS9zdm0uYyBiL2FyY2gveDg2L2t2bS9zdm0uYw0KPiBpbmRleCAyNjNmM2M3
+ZGVhZTcuLmE3ZGNmMTliYWVmYiAxMDA2NDQNCj4gLS0tIGEvYXJjaC94ODYva3ZtL3N2bS5jDQo+
+ICsrKyBiL2FyY2gveDg2L2t2bS9zdm0uYw0KPiBAQCAtNzE5Miw2ICs3MTkyLDgzIEBAIHN0YXRp
+YyBpbnQgc2V2X3NlbmRfZmluaXNoKHN0cnVjdCBrdm0gKmt2bSwgc3RydWN0IGt2bV9zZXZfY21k
+ICphcmdwKQ0KPiAgCXJldHVybiByZXQ7DQo+ICB9DQo+ICANCj4gK3N0YXRpYyBpbnQgc2V2X3Jl
+Y2VpdmVfc3RhcnQoc3RydWN0IGt2bSAqa3ZtLCBzdHJ1Y3Qga3ZtX3Nldl9jbWQgKmFyZ3ApDQo+
+ICt7DQo+ICsJc3RydWN0IGt2bV9zZXZfaW5mbyAqc2V2ID0gJnRvX2t2bV9zdm0oa3ZtKS0+c2V2
+X2luZm87DQo+ICsJc3RydWN0IHNldl9kYXRhX3JlY2VpdmVfc3RhcnQgKnN0YXJ0Ow0KPiArCXN0
+cnVjdCBrdm1fc2V2X3JlY2VpdmVfc3RhcnQgcGFyYW1zOw0KPiArCWludCAqZXJyb3IgPSAmYXJn
+cC0+ZXJyb3I7DQo+ICsJdm9pZCAqc2Vzc2lvbl9kYXRhID0gTlVMTDsNCj4gKwl2b2lkICpwZGhf
+ZGF0YSA9IE5VTEw7DQo+ICsJaW50IHJldDsNCj4gKw0KPiArCWlmICghc2V2X2d1ZXN0KGt2bSkp
+DQo+ICsJCXJldHVybiAtRU5PVFRZOw0KPiArDQo+ICsJLyogR2V0IHBhcmFtZXRlciBmcm9tIHRo
+ZSB1c2VyICovDQo+ICsJaWYgKGNvcHlfZnJvbV91c2VyKCZwYXJhbXMsICh2b2lkIF9fdXNlciAq
+KSh1aW50cHRyX3QpYXJncC0+ZGF0YSwNCj4gKwkJCXNpemVvZihzdHJ1Y3Qga3ZtX3Nldl9yZWNl
+aXZlX3N0YXJ0KSkpDQo+ICsJCXJldHVybiAtRUZBVUxUOw0KPiArDQo+ICsJaWYgKCFwYXJhbXMu
+cGRoX3VhZGRyIHx8ICFwYXJhbXMucGRoX2xlbiB8fA0KPiArCSAgICAhcGFyYW1zLnNlc3Npb25f
+dWFkZHIgfHwgIXBhcmFtcy5zZXNzaW9uX2xlbikNCj4gKwkJcmV0dXJuIC1FSU5WQUw7DQo+ICsN
+Cj4gKwlzdGFydCA9IGt6YWxsb2Moc2l6ZW9mKCpzdGFydCksIEdGUF9LRVJORUwpOw0KPiArCWlm
+ICghc3RhcnQpDQo+ICsJCXJldHVybiAtRU5PTUVNOw0KPiArDQo+ICsJc3RhcnQtPmhhbmRsZSA9
+IHBhcmFtcy5oYW5kbGU7DQo+ICsJc3RhcnQtPnBvbGljeSA9IHBhcmFtcy5wb2xpY3k7DQo+ICsN
+Cj4gKwlwZGhfZGF0YSA9IHBzcF9jb3B5X3VzZXJfYmxvYihwYXJhbXMucGRoX3VhZGRyLCBwYXJh
+bXMucGRoX2xlbik7DQo+ICsJaWYgKElTX0VSUihwZGhfZGF0YSkpIHsNCj4gKwkJcmV0ID0gUFRS
+X0VSUihwZGhfZGF0YSk7DQo+ICsJCWdvdG8gZV9mcmVlOw0KPiArCX0NCj4gKw0KPiArCXN0YXJ0
+LT5wZGhfY2VydF9hZGRyZXNzID0gX19wc3BfcGEocGRoX2RhdGEpOw0KPiArCXN0YXJ0LT5wZGhf
+Y2VydF9sZW4gPSBwYXJhbXMucGRoX2xlbjsNCj4gKw0KPiArCXNlc3Npb25fZGF0YSA9IHBzcF9j
+b3B5X3VzZXJfYmxvYihwYXJhbXMuc2Vzc2lvbl91YWRkciwgcGFyYW1zLnNlc3Npb25fbGVuKTsN
+Cj4gKwlpZiAoSVNfRVJSKHNlc3Npb25fZGF0YSkpIHsNCj4gKwkJcmV0ID0gUFRSX0VSUihzZXNz
+aW9uX2RhdGEpOw0KPiArCQlnb3RvIGVfZnJlZV9wZGg7DQo+ICsJfQ0KPiArDQo+ICsJc3RhcnQt
+PnNlc3Npb25fYWRkcmVzcyA9IF9fcHNwX3BhKHNlc3Npb25fZGF0YSk7DQo+ICsJc3RhcnQtPnNl
+c3Npb25fbGVuID0gcGFyYW1zLnNlc3Npb25fbGVuOw0KPiArDQo+ICsJLyogY3JlYXRlIG1lbW9y
+eSBlbmNyeXB0aW9uIGNvbnRleHQgKi8NCj4gKwlyZXQgPSBfX3Nldl9pc3N1ZV9jbWQoYXJncC0+
+c2V2X2ZkLCBTRVZfQ01EX1JFQ0VJVkVfU1RBUlQsIHN0YXJ0LCBlcnJvcik7DQo+ICsJaWYgKHJl
+dCkNCj4gKwkJZ290byBlX2ZyZWVfc2Vzc2lvbjsNCj4gKw0KPiArCS8qIEJpbmQgQVNJRCB0byB0
+aGlzIGd1ZXN0ICovDQo+ICsJcmV0ID0gc2V2X2JpbmRfYXNpZChrdm0sIHN0YXJ0LT5oYW5kbGUs
+IGVycm9yKTsNCj4gKwlpZiAocmV0KQ0KPiArCQlnb3RvIGVfZnJlZV9zZXNzaW9uOw0KPiArDQo+
+ICsJcGFyYW1zLmhhbmRsZSA9IHN0YXJ0LT5oYW5kbGU7DQo+ICsJaWYgKGNvcHlfdG9fdXNlcigo
+dm9pZCBfX3VzZXIgKikodWludHB0cl90KWFyZ3AtPmRhdGEsDQo+ICsJCQkgJnBhcmFtcywgc2l6
+ZW9mKHN0cnVjdCBrdm1fc2V2X3JlY2VpdmVfc3RhcnQpKSkgew0KPiArCQlyZXQgPSAtRUZBVUxU
+Ow0KPiArCQlzZXZfdW5iaW5kX2FzaWQoa3ZtLCBzdGFydC0+aGFuZGxlKTsNCj4gKwkJZ290byBl
+X2ZyZWVfc2Vzc2lvbjsNCj4gKwl9DQo+ICsNCj4gKwlzZXYtPmhhbmRsZSA9IHN0YXJ0LT5oYW5k
+bGU7DQo+ICsJc2V2LT5mZCA9IGFyZ3AtPnNldl9mZDsNCj4gKw0KPiArZV9mcmVlX3Nlc3Npb246
+DQo+ICsJa2ZyZWUoc2Vzc2lvbl9kYXRhKTsNCj4gK2VfZnJlZV9wZGg6DQo+ICsJa2ZyZWUocGRo
+X2RhdGEpOw0KPiArZV9mcmVlOg0KPiArCWtmcmVlKHN0YXJ0KTsNCj4gKwlyZXR1cm4gcmV0Ow0K
+PiArfQ0KPiArDQo+ICBzdGF0aWMgaW50IHN2bV9tZW1fZW5jX29wKHN0cnVjdCBrdm0gKmt2bSwg
+dm9pZCBfX3VzZXIgKmFyZ3ApDQo+ICB7DQo+ICAJc3RydWN0IGt2bV9zZXZfY21kIHNldl9jbWQ7
+DQo+IEBAIC03MjQyLDYgKzczMTksOSBAQCBzdGF0aWMgaW50IHN2bV9tZW1fZW5jX29wKHN0cnVj
+dCBrdm0gKmt2bSwgdm9pZCBfX3VzZXIgKmFyZ3ApDQo+ICAJY2FzZSBLVk1fU0VWX1NFTkRfRklO
+SVNIOg0KPiAgCQlyID0gc2V2X3NlbmRfZmluaXNoKGt2bSwgJnNldl9jbWQpOw0KPiAgCQlicmVh
+azsNCj4gKwljYXNlIEtWTV9TRVZfUkVDRUlWRV9TVEFSVDoNCj4gKwkJciA9IHNldl9yZWNlaXZl
+X3N0YXJ0KGt2bSwgJnNldl9jbWQpOw0KPiArCQlicmVhazsNCj4gIAlkZWZhdWx0Og0KPiAgCQly
+ID0gLUVJTlZBTDsNCj4gIAkJZ290byBvdXQ7DQo+IGRpZmYgLS1naXQgYS9pbmNsdWRlL3VhcGkv
+bGludXgva3ZtLmggYi9pbmNsdWRlL3VhcGkvbGludXgva3ZtLmgNCj4gaW5kZXggMGJlZTkxYmJh
+MzI5Li5mZWU3NWJmMWZkOTAgMTAwNjQ0DQo+IC0tLSBhL2luY2x1ZGUvdWFwaS9saW51eC9rdm0u
+aA0KPiArKysgYi9pbmNsdWRlL3VhcGkvbGludXgva3ZtLmgNCj4gQEAgLTE1NDEsNiArMTU0MSwx
+NSBAQCBzdHJ1Y3Qga3ZtX3Nldl9zZW5kX3VwZGF0ZV9kYXRhIHsNCj4gIAlfX3UzMiB0cmFuc19s
+ZW47DQo+ICB9Ow0KPiAgDQo+ICtzdHJ1Y3Qga3ZtX3Nldl9yZWNlaXZlX3N0YXJ0IHsNCj4gKwlf
+X3UzMiBoYW5kbGU7DQo+ICsJX191MzIgcG9saWN5Ow0KPiArCV9fdTY0IHBkaF91YWRkcjsNCj4g
+KwlfX3UzMiBwZGhfbGVuOw0KPiArCV9fdTY0IHNlc3Npb25fdWFkZHI7DQo+ICsJX191MzIgc2Vz
+c2lvbl9sZW47DQo+ICt9Ow0KPiArDQo+ICAjZGVmaW5lIEtWTV9ERVZfQVNTSUdOX0VOQUJMRV9J
+T01NVQkoMSA8PCAwKQ0KPiAgI2RlZmluZSBLVk1fREVWX0FTU0lHTl9QQ0lfMl8zCQkoMSA8PCAx
+KQ0KPiAgI2RlZmluZSBLVk1fREVWX0FTU0lHTl9NQVNLX0lOVFgJKDEgPDwgMikNCj4gDQo=
