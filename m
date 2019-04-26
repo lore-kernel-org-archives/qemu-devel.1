@@ -7,72 +7,71 @@ X-Spam-Status: No, score=-8.5 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
 	SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CFC3BC43219
-	for <qemu-devel@archiver.kernel.org>; Fri, 26 Apr 2019 04:55:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 20A04C43219
+	for <qemu-devel@archiver.kernel.org>; Fri, 26 Apr 2019 04:55:35 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 92817206C1
-	for <qemu-devel@archiver.kernel.org>; Fri, 26 Apr 2019 04:55:23 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id E665A206C1
+	for <qemu-devel@archiver.kernel.org>; Fri, 26 Apr 2019 04:55:34 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="RfWqfyN/"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 92817206C1
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="uwg1RQYs"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E665A206C1
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:39192 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:39211 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hJstO-0007eO-OO
-	for qemu-devel@archiver.kernel.org; Fri, 26 Apr 2019 00:55:22 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:45320)
+	id 1hJsta-0007xC-44
+	for qemu-devel@archiver.kernel.org; Fri, 26 Apr 2019 00:55:34 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:45317)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <arilou@gmail.com>) id 1hJsmQ-0000dG-Ls
-	for qemu-devel@nongnu.org; Fri, 26 Apr 2019 00:48:12 -0400
+	(envelope-from <arilou@gmail.com>) id 1hJsmf-0000dE-E5
+	for qemu-devel@nongnu.org; Fri, 26 Apr 2019 00:48:26 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <arilou@gmail.com>) id 1hJsbV-00051f-Vb
-	for qemu-devel@nongnu.org; Fri, 26 Apr 2019 00:36:55 -0400
-Received: from mail-wm1-x342.google.com ([2a00:1450:4864:20::342]:55978)
+	(envelope-from <arilou@gmail.com>) id 1hJsb3-0004Rr-Fl
+	for qemu-devel@nongnu.org; Fri, 26 Apr 2019 00:36:26 -0400
+Received: from mail-wr1-x444.google.com ([2a00:1450:4864:20::444]:40707)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <arilou@gmail.com>) id 1hJsbV-000500-KW
-	for qemu-devel@nongnu.org; Fri, 26 Apr 2019 00:36:53 -0400
-Received: by mail-wm1-x342.google.com with SMTP id o25so1976920wmf.5
-	for <qemu-devel@nongnu.org>; Thu, 25 Apr 2019 21:36:52 -0700 (PDT)
+	(Exim 4.71) (envelope-from <arilou@gmail.com>) id 1hJsb3-0004Q5-9U
+	for qemu-devel@nongnu.org; Fri, 26 Apr 2019 00:36:25 -0400
+Received: by mail-wr1-x444.google.com with SMTP id h4so2438658wre.7
+	for <qemu-devel@nongnu.org>; Thu, 25 Apr 2019 21:36:25 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
 	h=from:to:cc:subject:date:message-id:in-reply-to:references
 	:mime-version:content-transfer-encoding;
-	bh=9rzWu4duvgFxDEBnKAIuNQA/7quDWlJb65aR2J7JxiI=;
-	b=RfWqfyN/Cw7pOgOhJ/VJ07jo2awjYfHJZ1SJdCxvaOfilMh7iKmJA3zEidiBwH2K7l
-	DDokAraT/ykto/txQIn27XiLRh3LmTp6J6Zrd05ubejeclwPBCSC71FLNvAkpA8YbfjC
-	HB/dwEsFZw0ZUFuhmoWHnxez3sZ/j+xBYkNZqvsG9yjEdpHkfI7fIYWE47Fv2l4EsgYy
-	h4Uaw9/d7pjxVddGFNQyR7wQscYtERvaUnM78vTg5/vHX1pBZN7Jx40YYvWAKPBcaVMl
-	Cj13eUjPJ4n+OeJAbv+GRngqVW/naJGIAakF0oIpCSErF35r/u3RnZ/dONrSELO+x0xU
-	dYLg==
+	bh=6OoH0VZvs5cN/77prjtAmvXUSegJODVLc//0yGYVjjY=;
+	b=uwg1RQYsgwBPEOxFTvFOaDqh6ZEi2lTBJyr+fRp43kx+QeD/E0S9N4UfiFgLfrL9ty
+	vSLK160mzxUZE6ULWZfQi1sHyAjFGRWkhYQDPKGk+mF3MiirK3XqbVCTSIsUoGOaCISW
+	QixASgsdtwMG0jaIp7ZYtfvwSDvL8JuiCD6gcE8//S3tXhziW2KKzY+Wylsv/UK8kFl/
+	BdqLYgNlXqnRebdxU4oxO6RuJNNWESfPsBoI73GbhrOB4jelr5nMeOYgab5l9ce5+dcK
+	spajNVfD5cgR/P9HoKY+cYr+BABTYK5avc9x+4q82M8l5ndjzZAHBjq/QxtqMi1W2z+N
+	frZw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
 	d=1e100.net; s=20161025;
 	h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
 	:references:mime-version:content-transfer-encoding;
-	bh=9rzWu4duvgFxDEBnKAIuNQA/7quDWlJb65aR2J7JxiI=;
-	b=sGETZ5yOD78hKbiv0C6SZmL6KNwkJ+MMR6akgcUXmFpmHgkeh15vXr7COtT5tDpJ7O
-	MNfMWK9S8Vn2stijk9vF++zcaeXQdiUnIaRF7BdkOP38D5sMe9MUemq4EQ6HULDg7L5n
-	FdP5LHKcMp0ulfyK8ftVFhfw6A5lhgWypIESt1x3taS3gZ3DtFr72YOiQbnK9E/fv4Zi
-	kh+1r2DzW4wLNJrzwTW4eFtnvyQ/uoKJ/dwn7BnturwSYVHkI1ol9a5/6H/eGeG4sNM0
-	qKynLV3cNwksvfB5qd8TZh95KtWMbJmumPKzE8ScvYcggft0VaFWUM1V9zX3EuaxaLoc
-	Y7hQ==
-X-Gm-Message-State: APjAAAUMofQ8kZETNs4I/V9gp2CmdfEu19IUrh1G1bBbfUGI7HK8reYm
-	YnGjpWfXh2iZkWRsW/hhCuypylrS
-X-Google-Smtp-Source: APXvYqxLcg57tph2cT0oxYCCYdu9XwBkgHtNQHh+glHXPLyNxgmKqfX+3A4FGey6Qq8TPQr7hgPEPg==
-X-Received: by 2002:a05:600c:d7:: with SMTP id
-	u23mr6411802wmm.30.1556253410716; 
-	Thu, 25 Apr 2019 21:36:50 -0700 (PDT)
+	bh=6OoH0VZvs5cN/77prjtAmvXUSegJODVLc//0yGYVjjY=;
+	b=PqE9AMNPiAkpUtyJuBnEmjuTBTF6WqGTSHvxKC/Djkb4gjvvvXjpudt0NQIqrYmsDZ
+	iFmPxGee4WXgHz0fwFgqfMe/5xc7NJtq83m2BXmUcJ1Jr2ymDwmTEOlUTtStASgfSkho
+	Tj/vlElM+LRATJn34aKJ6nPGmSD1AQAZ9jYwtFavI2UFfFsf23y5ck5r4XTgV9HZjARG
+	VbA3C5cZ+D1bJW814Pcj99KI2tE8cd7Zk+TBYSanJHlRSSxEUThoOrvZejfzvU09BXxT
+	egi2VwPKzBbB+otD8ELZBkUqKYdLsIOM3H6gLjVYcxFkxAjuWb2gF4WJiwM0GrYITqyR
+	eFSg==
+X-Gm-Message-State: APjAAAV7WNUKxXpOkxzTzid9N6m5ffdI4pZHxNAX/K7YGNkpUJCRSaeT
+	7OdjOZkaq4lyJRDLWZNoxl7ztV0z
+X-Google-Smtp-Source: APXvYqyDOwg9VcXu3GWfwvVg4nX+8CwandTAo9p4prMmapUow+j7CPrCT/E5eDL5+I4Q47WPX17Nfg==
+X-Received: by 2002:adf:ec4e:: with SMTP id w14mr5479137wrn.53.1556253383464; 
+	Thu, 25 Apr 2019 21:36:23 -0700 (PDT)
 Received: from localhost.localdomain (bzq-79-178-247-46.red.bezeqint.net.
 	[79.178.247.46])
-	by smtp.gmail.com with ESMTPSA id h5sm3467088wmf.38.2019.04.25.21.36.48
+	by smtp.gmail.com with ESMTPSA id h5sm3467088wmf.38.2019.04.25.21.36.21
 	(version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
-	Thu, 25 Apr 2019 21:36:49 -0700 (PDT)
+	Thu, 25 Apr 2019 21:36:22 -0700 (PDT)
 From: Jon Doron <arilou@gmail.com>
 To: qemu-devel@nongnu.org
-Date: Fri, 26 Apr 2019 07:35:56 +0300
-Message-Id: <20190426043558.6888-20-arilou@gmail.com>
+Date: Fri, 26 Apr 2019 07:35:46 +0300
+Message-Id: <20190426043558.6888-10-arilou@gmail.com>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20190426043558.6888-1-arilou@gmail.com>
 References: <20190426043558.6888-1-arilou@gmail.com>
@@ -80,8 +79,8 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
 	recognized.
-X-Received-From: 2a00:1450:4864:20::342
-Subject: [Qemu-devel] [PATCH v7 19/21] gdbstub: Implement generic set (Q
+X-Received-From: 2a00:1450:4864:20::444
+Subject: [Qemu-devel] [PATCH v7 09/21] gdbstub: Implement set register (P
  pkt) with new infra
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
@@ -99,259 +98,70 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 Content-Type: text/plain; charset="UTF-8"
-Message-ID: <20190426043556.48o2kczYA50ZsUuEzJZpXQq_sG-PtbG4_t74eFPO0yI@z>
+Message-ID: <20190426043546.rodz4IjGHxRL9xulp8-GPnKS5CkefDLUE9oHzxPk-LU@z>
 
 Signed-off-by: Jon Doron <arilou@gmail.com>
 ---
- gdbstub.c | 213 +++++++-----------------------------------------------
- 1 file changed, 25 insertions(+), 188 deletions(-)
+ gdbstub.c | 39 ++++++++++++++++++++++++++++++---------
+ 1 file changed, 30 insertions(+), 9 deletions(-)
 
 diff --git a/gdbstub.c b/gdbstub.c
-index 83ae8738cc..2fd0d66f4d 100644
+index b42425b24c..10e3f12a68 100644
 --- a/gdbstub.c
 +++ b/gdbstub.c
-@@ -1130,14 +1130,6 @@ static GDBThreadIdKind read_thread_id(const char *buf, const char **end_buf,
-     return GDB_ONE_THREAD;
+@@ -1634,6 +1634,27 @@ static void handle_remove_bp(GdbCmdContext *gdb_ctx, void *user_ctx)
+     put_packet(gdb_ctx->s, "E22");
  }
  
--static int is_query_packet(const char *p, const char *query, char separator)
--{
--    unsigned int query_len = strlen(query);
--
--    return strncmp(p, query, query_len) == 0 &&
--        (p[query_len] == '\0' || p[query_len] == separator);
--}
--
- /**
-  * gdb_handle_vcont - Parses and handles a vCont packet.
-  * returns -ENOTSUP if a command is unsupported, -EINVAL or -ERANGE if there is
-@@ -2232,18 +2224,28 @@ static void handle_gen_query(GdbCmdContext *gdb_ctx, void *user_ctx)
-     }
- }
- 
-+static void handle_gen_set(GdbCmdContext *gdb_ctx, void *user_ctx)
++static void handle_set_reg(GdbCmdContext *gdb_ctx, void *user_ctx)
 +{
-+    if (!gdb_ctx->num_params) {
++    int reg_size;
++
++    if (!gdb_has_xml) {
++        put_packet(gdb_ctx->s, "");
 +        return;
 +    }
 +
-+    if (!process_string_cmd(gdb_ctx->s, NULL, gdb_ctx->params[0].data,
-+                            gdb_gen_query_set_common_table,
-+                            ARRAY_SIZE(gdb_gen_query_set_common_table))) {
++    if (gdb_ctx->num_params < 2) {
++        put_packet(gdb_ctx->s, "");
 +        return;
 +    }
 +
-+    put_packet(gdb_ctx->s, "");
++    reg_size = strlen(gdb_ctx->params[1].data) / 2;
++    hextomem(gdb_ctx->mem_buf, gdb_ctx->params[1].data, reg_size);
++    gdb_write_register(gdb_ctx->s->g_cpu, gdb_ctx->mem_buf,
++                       gdb_ctx->params[0].val_ull);
++    put_packet(gdb_ctx->s, "OK");
 +}
 +
  static int gdb_handle_packet(GDBState *s, const char *line_buf)
  {
--    CPUState *cpu;
--    GDBProcess *process;
--    CPUClass *cc;
-     const char *p;
--    uint32_t pid, tid;
--    int ch, type;
-+    int ch;
-     uint8_t mem_buf[MAX_PACKET_LENGTH];
-     char buf[sizeof(mem_buf) + 1 /* trailing NUL */];
-     char thread_id[16];
--    target_ulong addr, len;
-     const GdbCmdParseEntry *cmd_parser = NULL;
- 
-     trace_gdbstub_io_command(line_buf);
-@@ -2456,182 +2458,17 @@ static int gdb_handle_packet(GDBState *s, const char *line_buf)
+     CPUState *cpu;
+@@ -1878,15 +1899,15 @@ static int gdb_handle_packet(GDBState *s, const char *line_buf)
          }
          break;
-     case 'Q':
--        /* parse any 'q' packets here */
--        if (!strcmp(p,"qemu.sstepbits")) {
--            /* Query Breakpoint bit definitions */
--            snprintf(buf, sizeof(buf), "ENABLE=%x,NOIRQ=%x,NOTIMER=%x",
--                     SSTEP_ENABLE,
--                     SSTEP_NOIRQ,
--                     SSTEP_NOTIMER);
--            put_packet(s, buf);
--            break;
--        } else if (is_query_packet(p, "qemu.sstep", '=')) {
--            /* Display or change the sstep_flags */
--            p += 10;
--            if (*p != '=') {
--                /* Display current setting */
--                snprintf(buf, sizeof(buf), "0x%x", sstep_flags);
--                put_packet(s, buf);
--                break;
--            }
+     case 'P':
+-        if (!gdb_has_xml)
+-            goto unknown_command;
+-        addr = strtoull(p, (char **)&p, 16);
+-        if (*p == '=')
 -            p++;
--            type = strtoul(p, (char **)&p, 16);
--            sstep_flags = type;
--            put_packet(s, "OK");
--            break;
--        } else if (strcmp(p,"C") == 0) {
--            /*
--             * "Current thread" remains vague in the spec, so always return
--             * the first thread of the current process (gdb returns the
--             * first thread).
--             */
--            cpu = get_first_cpu_in_process(s, gdb_get_cpu_process(s, s->g_cpu));
--            snprintf(buf, sizeof(buf), "QC%s",
--                     gdb_fmt_thread_id(s, cpu, thread_id, sizeof(thread_id)));
--            put_packet(s, buf);
--            break;
--        } else if (strcmp(p,"fThreadInfo") == 0) {
--            s->query_cpu = gdb_first_attached_cpu(s);
--            goto report_cpuinfo;
--        } else if (strcmp(p,"sThreadInfo") == 0) {
--        report_cpuinfo:
--            if (s->query_cpu) {
--                snprintf(buf, sizeof(buf), "m%s",
--                         gdb_fmt_thread_id(s, s->query_cpu,
--                                       thread_id, sizeof(thread_id)));
--                put_packet(s, buf);
--                s->query_cpu = gdb_next_attached_cpu(s, s->query_cpu);
--            } else
--                put_packet(s, "l");
--            break;
--        } else if (strncmp(p,"ThreadExtraInfo,", 16) == 0) {
--            if (read_thread_id(p + 16, &p, &pid, &tid) == GDB_READ_THREAD_ERR) {
--                put_packet(s, "E22");
--                break;
--            }
--            cpu = gdb_get_cpu(s, pid, tid);
--            if (cpu != NULL) {
--                cpu_synchronize_state(cpu);
--
--                if (s->multiprocess && (s->process_num > 1)) {
--                    /* Print the CPU model and name in multiprocess mode */
--                    ObjectClass *oc = object_get_class(OBJECT(cpu));
--                    const char *cpu_model = object_class_get_name(oc);
--                    char *cpu_name =
--                        object_get_canonical_path_component(OBJECT(cpu));
--                    len = snprintf((char *)mem_buf, sizeof(buf) / 2,
--                                   "%s %s [%s]", cpu_model, cpu_name,
--                                   cpu->halted ? "halted " : "running");
--                    g_free(cpu_name);
--                } else {
--                    /* memtohex() doubles the required space */
--                    len = snprintf((char *)mem_buf, sizeof(buf) / 2,
--                                   "CPU#%d [%s]", cpu->cpu_index,
--                                   cpu->halted ? "halted " : "running");
--                }
--                trace_gdbstub_op_extra_info((char *)mem_buf);
--                memtohex(buf, mem_buf, len);
--                put_packet(s, buf);
--            }
--            break;
--        }
--#ifdef CONFIG_USER_ONLY
--        else if (strcmp(p, "Offsets") == 0) {
--            TaskState *ts = s->c_cpu->opaque;
--
--            snprintf(buf, sizeof(buf),
--                     "Text=" TARGET_ABI_FMT_lx ";Data=" TARGET_ABI_FMT_lx
--                     ";Bss=" TARGET_ABI_FMT_lx,
--                     ts->info->code_offset,
--                     ts->info->data_offset,
--                     ts->info->data_offset);
--            put_packet(s, buf);
--            break;
--        }
--#else /* !CONFIG_USER_ONLY */
--        else if (strncmp(p, "Rcmd,", 5) == 0) {
--            int len = strlen(p + 5);
--
--            if ((len % 2) != 0) {
--                put_packet(s, "E01");
--                break;
--            }
--            len = len / 2;
--            hextomem(mem_buf, p + 5, len);
--            mem_buf[len++] = 0;
--            qemu_chr_be_write(s->mon_chr, mem_buf, len);
--            put_packet(s, "OK");
--            break;
--        }
--#endif /* !CONFIG_USER_ONLY */
--        if (is_query_packet(p, "Supported", ':')) {
--            snprintf(buf, sizeof(buf), "PacketSize=%x", MAX_PACKET_LENGTH);
--            cc = CPU_GET_CLASS(first_cpu);
--            if (cc->gdb_core_xml_file != NULL) {
--                pstrcat(buf, sizeof(buf), ";qXfer:features:read+");
--            }
--
--            if (strstr(p, "multiprocess+")) {
--                s->multiprocess = true;
--            }
--            pstrcat(buf, sizeof(buf), ";multiprocess+");
--
--            put_packet(s, buf);
--            break;
--        }
--        if (strncmp(p, "Xfer:features:read:", 19) == 0) {
--            const char *xml;
--            target_ulong total_len;
--
--            process = gdb_get_cpu_process(s, s->g_cpu);
--            cc = CPU_GET_CLASS(s->g_cpu);
--            if (cc->gdb_core_xml_file == NULL) {
--                goto unknown_command;
--            }
--
--            gdb_has_xml = true;
--            p += 19;
--            xml = get_feature_xml(s, p, &p, process);
--            if (!xml) {
--                snprintf(buf, sizeof(buf), "E00");
--                put_packet(s, buf);
--                break;
--            }
--
--            if (*p == ':')
--                p++;
--            addr = strtoul(p, (char **)&p, 16);
--            if (*p == ',')
--                p++;
--            len = strtoul(p, (char **)&p, 16);
--
--            total_len = strlen(xml);
--            if (addr > total_len) {
--                snprintf(buf, sizeof(buf), "E00");
--                put_packet(s, buf);
--                break;
--            }
--            if (len > (MAX_PACKET_LENGTH - 5) / 2)
--                len = (MAX_PACKET_LENGTH - 5) / 2;
--            if (len < total_len - addr) {
--                buf[0] = 'm';
--                len = memtox(buf + 1, xml + addr, len);
--            } else {
--                buf[0] = 'l';
--                len = memtox(buf + 1, xml + addr, total_len - addr);
--            }
--            put_packet_binary(s, buf, len + 1, true);
--            break;
--        }
--        if (is_query_packet(p, "Attached", ':')) {
--            put_packet(s, GDB_ATTACHED);
--            break;
+-        reg_size = strlen(p) / 2;
+-        hextomem(mem_buf, p, reg_size);
+-        gdb_write_register(s->g_cpu, mem_buf, addr);
+-        put_packet(s, "OK");
 +        {
-+            static const GdbCmdParseEntry gen_set_cmd_desc = {
-+                .handler = handle_gen_set,
-+                .cmd = "Q",
++            static const GdbCmdParseEntry set_reg_cmd_desc = {
++                .handler = handle_set_reg,
++                .cmd = "P",
 +                .cmd_startswith = 1,
-+                .schema = "s0"
++                .schema = "L?s0"
 +            };
-+            cmd_parser = &gen_set_cmd_desc;
-         }
--        /* Unrecognised 'q' command.  */
--        goto unknown_command;
--
-+        break;
-     default:
--    unknown_command:
-         /* put empty packet */
-         buf[0] = '\0';
-         put_packet(s, buf);
++            cmd_parser = &set_reg_cmd_desc;
++        }
+         break;
+     case 'Z':
+         {
 -- 
 2.20.1
 
