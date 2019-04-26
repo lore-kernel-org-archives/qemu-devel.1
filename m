@@ -1,32 +1,34 @@
-Received: from eggs.gnu.org ([209.51.188.92]:51893)
+Received: from eggs.gnu.org ([209.51.188.92]:52030)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1hJvLz-0006q6-NO
-	for qemu-devel@nongnu.org; Fri, 26 Apr 2019 03:33:04 -0400
+	(envelope-from <bounces@canonical.com>) id 1hJvMD-0006wm-Hm
+	for qemu-devel@nongnu.org; Fri, 26 Apr 2019 03:33:21 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1hJvE7-0003gV-Ka
-	for qemu-devel@nongnu.org; Fri, 26 Apr 2019 03:24:56 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:53104)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1hJvE6-0003d4-Ow
-	for qemu-devel@nongnu.org; Fri, 26 Apr 2019 03:24:54 -0400
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
-	[10.5.11.13])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 3A9B1308B79B
-	for <qemu-devel@nongnu.org>; Fri, 26 Apr 2019 07:24:52 +0000 (UTC)
-Date: Fri, 26 Apr 2019 09:24:46 +0200
-From: Gerd Hoffmann <kraxel@redhat.com>
-Message-ID: <20190426072446.r7b7wsm4qghd7pzr@sirius.home.kraxel.org>
-References: <20190423132004.13725-1-marcandre.lureau@redhat.com>
-	<20190423132004.13725-6-marcandre.lureau@redhat.com>
+	(envelope-from <bounces@canonical.com>) id 1hJvA9-0005Hs-KP
+	for qemu-devel@nongnu.org; Fri, 26 Apr 2019 03:20:52 -0400
+Received: from indium.canonical.com ([91.189.90.7]:55976)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1hJvA3-0004xK-V1
+	for qemu-devel@nongnu.org; Fri, 26 Apr 2019 03:20:45 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1hJvA2-0006gT-DX
+	for <qemu-devel@nongnu.org>; Fri, 26 Apr 2019 07:20:42 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 609482E80CB
+	for <qemu-devel@nongnu.org>; Fri, 26 Apr 2019 07:20:42 +0000 (UTC)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-In-Reply-To: <20190423132004.13725-6-marcandre.lureau@redhat.com>
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v6 05/11] vhost-user: add
- vhost_user_gpu_set_socket()
+Date: Fri, 26 Apr 2019 07:08:02 -0000
+From: Saverio Miroddi <1826422@bugs.launchpad.net>
+Reply-To: Bug 1826422 <1826422@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <155620554968.6380.13610580395862407350.malonedeb@chaenomeles.canonical.com>
+Message-Id: <155626248204.13844.2151474197903937040.malone@gac.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1826422] Re: Regression: QEMU 4.0 hangs the host
+ (*bisect included*)
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,41 +37,86 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>
-Cc: qemu-devel@nongnu.org, "Michael S. Tsirkin" <mst@redhat.com>
+To: qemu-devel@nongnu.org
 
-On Tue, Apr 23, 2019 at 03:19:58PM +0200, Marc-Andr=E9 Lureau wrote:
-> Add a new vhost-user message to give a unix socket to a vhost-user
-> backend for GPU display updates.
+ok, so, if I understand correctly, the workaround is:
 
-Can you split input/gpu into two patch series?
+- set `x-no-kvm-intx=3Don` and enable MSI in the guest (via regedit or
+module params)
 
-> +Wire format
-> +=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-> +
-> +Unless specified differently, numbers are in the machine native byte
-> +order.
-> +
-> +A vhost-user-gpu request consists of 2 header fields and a payload.
-> +
-> ++---------+------+---------+
-> +| request | size | payload |
-> ++---------+------+---------+
-> +
-> +Header
-> +------
-> +
-> +:request: ``u32``, type of the request
-> +
-> +:size: ``u32``, size of the payload
-> +
-> +A reply consists only of a payload, whose content depends on the reque=
-st.
+which may lead to a performance regression (at least under certain
+circumstances).
 
-I'd suggest to use the same format for replies, only with "request"
-meaning "status" in replies.  Allows for OK/ERROR status in replies,
-and having a size field in replies too should make things more robust.
-Also allows for an empty reply (status=3Dok,size=3D0).
+Is it therefore preferrable, performance and configuration-wise, to use
+QEMU 3.1.0, if there are no 4.0.0 feature requirements, until this issue
+is sorted out?
 
-cheers,
-  Gerd
+-- =
+
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1826422
+
+Title:
+  Regression: QEMU 4.0 hangs the host (*bisect included*)
+
+Status in QEMU:
+  New
+
+Bug description:
+  The commit b2fc91db84470a78f8e93f5b5f913c17188792c8 seemingly
+  introduced a regression on my system.
+
+  When I start QEMU, the guest and the host hang (I need a hard reset to
+  get back to a working system), before anything shows on the guest.
+
+  I use QEMU with GPU passthrough (which worked perfectly until the
+  commit above). This is the command I use:
+
+  ```
+  /path/to/qemu-system-x86_64
+    -drive if=3Dpflash,format=3Draw,readonly,file=3D/path/to/OVMF_CODE.fd
+    -drive if=3Dpflash,format=3Draw,file=3D/tmp/OVMF_VARS.fd.tmp
+    -enable-kvm
+    -machine q35,accel=3Dkvm,mem-merge=3Doff
+    -cpu host,kvm=3Doff,hv_vendor_id=3Dvgaptrocks,hv_relaxed,hv_spinlocks=
+=3D0x1fff,hv_vapic,hv_time
+    -smp 4,cores=3D4,sockets=3D1,threads=3D1
+    -m 10240
+    -vga none
+    -rtc base=3Dlocaltime
+    -serial none
+    -parallel none
+    -usb
+    -device usb-tablet
+    -device vfio-pci,host=3D01:00.0,multifunction=3Don
+    -device vfio-pci,host=3D01:00.1
+    -device usb-host,vendorid=3D<vid>,productid=3D<pid>
+    -device usb-host,vendorid=3D<vid>,productid=3D<pid>
+    -device usb-host,vendorid=3D<vid>,productid=3D<pid>
+    -device usb-host,vendorid=3D<vid>,productid=3D<pid>
+    -device usb-host,vendorid=3D<vid>,productid=3D<pid>
+    -device usb-host,vendorid=3D<vid>,productid=3D<pid>
+    -device virtio-scsi-pci,id=3Dscsi
+    -drive file=3D/path/to/guest.img,id=3Dhdd1,format=3Dqcow2,if=3Dnone,cac=
+he=3Dwriteback
+    -device scsi-hd,drive=3Dhdd1
+    -net nic,model=3Dvirtio
+    -net user,smb=3D/path/to/shared
+  ```
+
+  If I run QEMU without GPU passthrough, it runs fine.
+
+  Some details about my system:
+
+  - O/S: Mint 19.1 x86-64 (it's based on Ubuntu 18.04)
+  - Kernel: 4.15
+  - `configure` options: `--target-list=3Dx86_64-softmmu --enable-gtk --ena=
+ble-spice --audio-drv-list=3Dpa`
+  - EDK2 version: 1a734ed85fda71630c795832e6d24ea560caf739 (20/Apr/2019)
+  - CPU: i7-6700k
+  - Motherboard: ASRock Z170 Gaming-ITX/ac
+  - VGA: Gigabyte GTX 960 Mini-ITX
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1826422/+subscriptions
