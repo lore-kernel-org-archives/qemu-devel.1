@@ -1,24 +1,26 @@
-Received: from eggs.gnu.org ([209.51.188.92]:54788)
+Received: from eggs.gnu.org ([209.51.188.92]:55385)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1hJyuC-0003M8-4K
-	for qemu-devel@nongnu.org; Fri, 26 Apr 2019 07:20:37 -0400
+	(envelope-from <ehabkost@redhat.com>) id 1hJyvE-0004CG-J3
+	for qemu-devel@nongnu.org; Fri, 26 Apr 2019 07:21:41 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1hJyuA-0007EV-V1
-	for qemu-devel@nongnu.org; Fri, 26 Apr 2019 07:20:36 -0400
-References: <20190426111003.21246-1-borntraeger@de.ibm.com>
-	<20190426111003.21246-10-borntraeger@de.ibm.com>
-	<c07b4807-787b-3420-1cae-fb29f56dd9b4@redhat.com>
-	<41f2c4a5-7f40-3155-ba8c-e92d0c80b53e@de.ibm.com>
-From: David Hildenbrand <david@redhat.com>
-Message-ID: <5971a515-53ee-de49-ebe0-6773ce3d4496@redhat.com>
-Date: Fri, 26 Apr 2019 13:20:31 +0200
+	(envelope-from <ehabkost@redhat.com>) id 1hJyvD-0000KT-6k
+	for qemu-devel@nongnu.org; Fri, 26 Apr 2019 07:21:40 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:58396)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1hJyvC-0000Gm-Vg
+	for qemu-devel@nongnu.org; Fri, 26 Apr 2019 07:21:39 -0400
+Date: Fri, 26 Apr 2019 08:21:35 -0300
+From: Eduardo Habkost <ehabkost@redhat.com>
+Message-ID: <20190426112135.GA30873@habkost.net>
+References: <20190425200051.19906-1-ehabkost@redhat.com>
+	<20190425200051.19906-4-ehabkost@redhat.com>
+	<bbdf7fb5-8f68-582b-2c57-5cf0a522237d@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <41f2c4a5-7f40-3155-ba8c-e92d0c80b53e@de.ibm.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v2 09/10] s390x/cpumodel: disable csske and
- bpb from gen15 cpu models onwards
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <bbdf7fb5-8f68-582b-2c57-5cf0a522237d@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH 3/4] qdev: Don't compile hotplug code in
+ user-mode emulation
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,70 +29,78 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Christian Borntraeger <borntraeger@de.ibm.com>, Cornelia Huck <cohuck@redhat.com>
-Cc: qemu-devel <qemu-devel@nongnu.org>, qemu-s390x <qemu-s390x@nongnu.org>, Halil Pasic <pasic@linux.ibm.com>, Richard Henderson <rth@twiddle.net>, Collin Walling <walling@linux.ibm.com>, "Jason J . Herne" <jjherne@linux.ibm.com>
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: qemu-devel@nongnu.org, Thomas Huth <thuth@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, Markus Armbruster <armbru@redhat.com>, Like Xu <like.xu@linux.intel.com>
 
-On 26.04.19 13:18, Christian Borntraeger wrote:
+On Fri, Apr 26, 2019 at 10:27:58AM +0200, Paolo Bonzini wrote:
+> On 25/04/19 22:00, Eduardo Habkost wrote:
+> > diff --git a/hw/core/qdev-hotplug-stubs.c b/hw/core/qdev-hotplug-stubs.c
+> > new file mode 100644
+> > index 0000000000..c710f23388
+> > --- /dev/null
+> > +++ b/hw/core/qdev-hotplug-stubs.c
+> > @@ -0,0 +1,44 @@
+> > +/*
+> > + * qdev hotplug handler stubs (for user-mode emulation and unit tests)
 > 
-> 
-> On 26.04.19 13:18, David Hildenbrand wrote:
->> On 26.04.19 13:10, Christian Borntraeger wrote:
->>> These facilities are deprecated and no longer needed.
->>>
->>> Signed-off-by: Christian Borntraeger <borntraeger@de.ibm.com>
->>> ---
->>>  target/s390x/gen-features.c | 12 ++++++++++++
->>>  1 file changed, 12 insertions(+)
->>>
->>> diff --git a/target/s390x/gen-features.c b/target/s390x/gen-features.c
->>> index 6260f56dc1..c346b76bdf 100644
->>> --- a/target/s390x/gen-features.c
->>> +++ b/target/s390x/gen-features.c
->>> @@ -13,6 +13,7 @@
->>>  
->>>  #include <inttypes.h>
->>>  #include <stdio.h>
->>> +#include <string.h>
->>>  #include "cpu_features_def.h"
->>>  
->>>  #define ARRAY_SIZE(array) (sizeof(array) / sizeof(array[0]))
->>> @@ -833,6 +834,11 @@ static void set_bits(uint64_t list[], BitSpec bits)
->>>      }
->>>  }
->>>  
->>> +static inline void clear_bit(uint64_t list[], unsigned long nr)
->>> +{
->>> +    list[nr / 64] &= ~(1ULL << (nr % 64));
->>> +}
->>> +
->>>  static void print_feature_defs(void)
->>>  {
->>>      uint64_t base_feat[S390_FEAT_MAX / 64 + 1] = {};
->>> @@ -843,6 +849,12 @@ static void print_feature_defs(void)
->>>      printf("\n/* CPU model feature list data */\n");
->>>  
->>>      for (i = 0; i < ARRAY_SIZE(CpuFeatDef); i++) {
->>> +        /* With gen15 CSSKE and BPB are deprecated */
->>> +        if (strcmp(CpuFeatDef[i].name, "S390_FEAT_LIST_GEN15_GA1") == 0) {
->>> +            clear_bit(base_feat, S390_FEAT_CONDITIONAL_SSKE);
->>> +            clear_bit(default_feat, S390_FEAT_CONDITIONAL_SSKE);
->>> +            clear_bit(default_feat, S390_FEAT_BPB);
->>> +        }
->>>          set_bits(base_feat, CpuFeatDef[i].base_bits);
->>>          /* add the base to the default features */
->>>          set_bits(default_feat, CpuFeatDef[i].base_bits);
->>>
->>
->> Can you squash that into the previous patch, so it doesn't look like the
->> case model is suddenly changed?
-> 
-> can do. I wanted it to be separate for better review.
-> 
+> Can you explain the issue with unit tests in the commit message?
 
-Makes perfect sense.
+I don't think there are issues with unit tests.  I just thought
+it was pointless to link qdev-hotplug.o into unit tests binaries
+if no hotplug handler object is created by them.
+
+What do you think?  Should I keep qdev-hotplug.o and hotplug.o in
+the unit tests binaries?
+
+> 
+> > + *  Copyright (c) 2019 Red Hat Inc
+> > + *
+> > + * Authors:
+> > + *  Eduardo Habkost <ehabkost@redhat.com>
+> > + *
+> > + * This library is free software; you can redistribute it and/or
+> > + * modify it under the terms of the GNU Lesser General Public
+> > + * License as published by the Free Software Foundation; either
+> > + * version 2 of the License, or (at your option) any later version.
+> > + *
+> > + * This library is distributed in the hope that it will be useful,
+> > + * but WITHOUT ANY WARRANTY; without even the implied warranty of
+> > + * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+> > + * Lesser General Public License for more details.
+> > + *
+> > + * You should have received a copy of the GNU Lesser General Public
+> > + * License along with this library; if not, see <http://www.gnu.org/licenses/>.
+> > + */
+> > +
+> > +#include "qemu/osdep.h"
+> > +#include "hw/qdev-core.h"
+> > +#include "hw/hotplug.h"
+> > +
+> > +HotplugHandler *qdev_get_hotplug_handler(DeviceState *dev)
+> > +{
+> > +    return NULL;
+> > +}
+> > +
+> > +void hotplug_handler_pre_plug(HotplugHandler *plug_handler,
+> > +                              DeviceState *plugged_dev,
+> > +                              Error **errp)
+> > +{
+> > +    assert(plug_handler == NULL);
+> > +}
+> > +
+> > +void hotplug_handler_plug(HotplugHandler *plug_handler,
+> > +                          DeviceState *plugged_dev,
+> > +                          Error **errp)
+> > +{
+> > +    assert(plug_handler == NULL);
+> > +}
+> 
+> Would it work if you instead make these functions (and the others in
+> hw/core/hotplug.c) inlines in include/hw/hotplug.h?
+> 
+> Then all that remains is qdev_get_hotplug_handler.
+
+I think that would work.  I'll do that in v2, thanks!
 
 -- 
-
-Thanks,
-
-David / dhildenb
+Eduardo
