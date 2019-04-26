@@ -1,25 +1,25 @@
-Received: from eggs.gnu.org ([209.51.188.92]:45317)
+Received: from eggs.gnu.org ([209.51.188.92]:45320)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <arilou@gmail.com>) id 1hJsmc-0000dE-Bq
-	for qemu-devel@nongnu.org; Fri, 26 Apr 2019 00:48:23 -0400
+	(envelope-from <arilou@gmail.com>) id 1hJsme-0000dG-Ac
+	for qemu-devel@nongnu.org; Fri, 26 Apr 2019 00:48:25 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <arilou@gmail.com>) id 1hJsbG-0004hO-6t
-	for qemu-devel@nongnu.org; Fri, 26 Apr 2019 00:36:39 -0400
-Received: from mail-wr1-x444.google.com ([2a00:1450:4864:20::444]:39838)
+	(envelope-from <arilou@gmail.com>) id 1hJsbC-0004bb-MD
+	for qemu-devel@nongnu.org; Fri, 26 Apr 2019 00:36:35 -0400
+Received: from mail-wr1-x443.google.com ([2a00:1450:4864:20::443]:41406)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <arilou@gmail.com>) id 1hJsbG-0004ff-0X
-	for qemu-devel@nongnu.org; Fri, 26 Apr 2019 00:36:38 -0400
-Received: by mail-wr1-x444.google.com with SMTP id a9so2450912wrp.6
-	for <qemu-devel@nongnu.org>; Thu, 25 Apr 2019 21:36:37 -0700 (PDT)
+	(Exim 4.71) (envelope-from <arilou@gmail.com>) id 1hJsbC-0004bG-GM
+	for qemu-devel@nongnu.org; Fri, 26 Apr 2019 00:36:34 -0400
+Received: by mail-wr1-x443.google.com with SMTP id c12so2425687wrt.8
+	for <qemu-devel@nongnu.org>; Thu, 25 Apr 2019 21:36:34 -0700 (PDT)
 From: Jon Doron <arilou@gmail.com>
-Date: Fri, 26 Apr 2019 07:35:50 +0300
-Message-Id: <20190426043558.6888-14-arilou@gmail.com>
+Date: Fri, 26 Apr 2019 07:35:49 +0300
+Message-Id: <20190426043558.6888-13-arilou@gmail.com>
 In-Reply-To: <20190426043558.6888-1-arilou@gmail.com>
 References: <20190426043558.6888-1-arilou@gmail.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH v7 13/21] gdbstub: Implement write all
- registers (G pkt) with new infra
+Subject: [Qemu-devel] [PATCH v7 12/21] gdbstub: Implement read memory (m
+ pkt) with new infra
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,75 +33,74 @@ Cc: alex.bennee@linaro.org, Jon Doron <arilou@gmail.com>
 
 Signed-off-by: Jon Doron <arilou@gmail.com>
 ---
- gdbstub.c | 41 +++++++++++++++++++++++++++++++----------
- 1 file changed, 31 insertions(+), 10 deletions(-)
+ gdbstub.c | 48 ++++++++++++++++++++++++++++++++----------------
+ 1 file changed, 32 insertions(+), 16 deletions(-)
 
 diff --git a/gdbstub.c b/gdbstub.c
-index daa602edc3..adfe39b3a3 100644
+index 8dc2e1d507..daa602edc3 100644
 --- a/gdbstub.c
 +++ b/gdbstub.c
-@@ -1734,6 +1734,29 @@ static void handle_read_mem(GdbCmdContext *gdb_ctx, void *user_ctx)
-     put_packet(gdb_ctx->s, gdb_ctx->str_buf);
+@@ -1710,6 +1710,30 @@ static void handle_write_mem(GdbCmdContext *gdb_ctx, void *user_ctx)
+     put_packet(gdb_ctx->s, "OK");
  }
  
-+static void handle_write_all_regs(GdbCmdContext *gdb_ctx, void *user_ctx)
++static void handle_read_mem(GdbCmdContext *gdb_ctx, void *user_ctx)
 +{
-+    target_ulong addr, len;
-+    uint8_t *registers;
-+    int reg_size;
-+
-+    if (!gdb_ctx->num_params) {
++    if (gdb_ctx->num_params < 2) {
++        put_packet(gdb_ctx->s, "E22");
 +        return;
 +    }
 +
-+    cpu_synchronize_state(gdb_ctx->s->g_cpu);
-+    registers = gdb_ctx->mem_buf;
-+    len = strlen(gdb_ctx->params[0].data) / 2;
-+    hextomem(registers, gdb_ctx->params[0].data, len);
-+    for (addr = 0; addr < gdb_ctx->s->g_cpu->gdb_num_g_regs && len > 0;
-+         addr++) {
-+        reg_size = gdb_write_register(gdb_ctx->s->g_cpu, registers, addr);
-+        len -= reg_size;
-+        registers += reg_size;
++    /* memtohex() doubles the required space */
++    if (gdb_ctx->params[1].val_ull > MAX_PACKET_LENGTH / 2) {
++        put_packet(gdb_ctx->s, "E22");
++        return;
 +    }
-+    put_packet(gdb_ctx->s, "OK");
++
++    if (target_memory_rw_debug(gdb_ctx->s->g_cpu, gdb_ctx->params[0].val_ull,
++                               gdb_ctx->mem_buf,
++                               gdb_ctx->params[1].val_ull, false)) {
++        put_packet(gdb_ctx->s, "E14");
++        return;
++    }
++
++    memtohex(gdb_ctx->str_buf, gdb_ctx->mem_buf, gdb_ctx->params[1].val_ull);
++    put_packet(gdb_ctx->s, gdb_ctx->str_buf);
 +}
 +
  static int gdb_handle_packet(GDBState *s, const char *line_buf)
  {
      CPUState *cpu;
-@@ -1745,7 +1768,6 @@ static int gdb_handle_packet(GDBState *s, const char *line_buf)
-     uint8_t mem_buf[MAX_PACKET_LENGTH];
-     char buf[sizeof(mem_buf) + 1 /* trailing NUL */];
-     char thread_id[16];
--    uint8_t *registers;
-     target_ulong addr, len;
-     const GdbCmdParseEntry *cmd_parser = NULL;
- 
-@@ -1911,16 +1933,15 @@ static int gdb_handle_packet(GDBState *s, const char *line_buf)
-         put_packet(s, buf);
-         break;
-     case 'G':
--        cpu_synchronize_state(s->g_cpu);
--        registers = mem_buf;
--        len = strlen(p) / 2;
--        hextomem((uint8_t *)registers, p, len);
--        for (addr = 0; addr < s->g_cpu->gdb_num_g_regs && len > 0; addr++) {
--            reg_size = gdb_write_register(s->g_cpu, registers, addr);
--            len -= reg_size;
--            registers += reg_size;
-+        {
-+            static const GdbCmdParseEntry write_all_regs_cmd_desc = {
-+                .handler = handle_write_all_regs,
-+                .cmd = "G",
-+                .cmd_startswith = 1,
-+                .schema = "s0"
-+            };
-+            cmd_parser = &write_all_regs_cmd_desc;
-         }
--        put_packet(s, "OK");
+@@ -1899,22 +1923,14 @@ static int gdb_handle_packet(GDBState *s, const char *line_buf)
+         put_packet(s, "OK");
          break;
      case 'm':
-         {
+-        addr = strtoull(p, (char **)&p, 16);
+-        if (*p == ',')
+-            p++;
+-        len = strtoull(p, NULL, 16);
+-
+-        /* memtohex() doubles the required space */
+-        if (len > MAX_PACKET_LENGTH / 2) {
+-            put_packet (s, "E22");
+-            break;
+-        }
+-
+-        if (target_memory_rw_debug(s->g_cpu, addr, mem_buf, len, false) != 0) {
+-            put_packet (s, "E14");
+-        } else {
+-            memtohex(buf, mem_buf, len);
+-            put_packet(s, buf);
++        {
++            static const GdbCmdParseEntry read_mem_cmd_desc = {
++                .handler = handle_read_mem,
++                .cmd = "m",
++                .cmd_startswith = 1,
++                .schema = "L,L0"
++            };
++            cmd_parser = &read_mem_cmd_desc;
+         }
+         break;
+     case 'M':
 -- 
 2.20.1
