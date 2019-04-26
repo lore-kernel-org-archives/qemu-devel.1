@@ -1,25 +1,27 @@
-Received: from eggs.gnu.org ([209.51.188.92]:43671)
+Received: from eggs.gnu.org ([209.51.188.92]:45844)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1hJzyl-0001Uw-77
-	for qemu-devel@nongnu.org; Fri, 26 Apr 2019 08:29:24 -0400
+	(envelope-from <marcandre.lureau@gmail.com>) id 1hK09r-0005R1-QX
+	for qemu-devel@nongnu.org; Fri, 26 Apr 2019 08:40:53 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1hJzyj-0001k6-Pz
-	for qemu-devel@nongnu.org; Fri, 26 Apr 2019 08:29:23 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:51568)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1hJzyj-0001jj-HB
-	for qemu-devel@nongnu.org; Fri, 26 Apr 2019 08:29:21 -0400
-Date: Fri, 26 Apr 2019 14:29:08 +0200
-From: Igor Mammedov <imammedo@redhat.com>
-Message-ID: <20190426142908.5d63d530@Igors-MacBook-Pro.local>
-In-Reply-To: <20190425225610.28350-2-Janakarajan.Natarajan@amd.com>
-References: <20190425225610.28350-1-Janakarajan.Natarajan@amd.com>
-	<20190425225610.28350-2-Janakarajan.Natarajan@amd.com>
+	(envelope-from <marcandre.lureau@gmail.com>) id 1hK09q-0001MP-4I
+	for qemu-devel@nongnu.org; Fri, 26 Apr 2019 08:40:51 -0400
+Received: from mail-wr1-x443.google.com ([2a00:1450:4864:20::443]:40068)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <marcandre.lureau@gmail.com>)
+	id 1hK09p-0001Lh-RN
+	for qemu-devel@nongnu.org; Fri, 26 Apr 2019 08:40:50 -0400
+Received: by mail-wr1-x443.google.com with SMTP id h4so4250078wre.7
+	for <qemu-devel@nongnu.org>; Fri, 26 Apr 2019 05:40:49 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 1/3] ram-encrypted-notifier: Introduce a
- RAM block encrypted notifier
+References: <20190426102437.16189-1-marcandre.lureau@redhat.com>
+	<20190426102437.16189-4-marcandre.lureau@redhat.com>
+In-Reply-To: <20190426102437.16189-4-marcandre.lureau@redhat.com>
+From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
+Date: Fri, 26 Apr 2019 14:40:36 +0200
+Message-ID: <CAJ+F1CJwO49yybyt34vCAKKR41FAsTFVcUuj5qtp1sV+TVpEmQ@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH 3/6] Add vhost-user-backend
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,217 +30,355 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Natarajan, Janakarajan" <Janakarajan.Natarajan@amd.com>
-Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, Richard Henderson <rth@twiddle.net>, Paolo Bonzini <pbonzini@redhat.com>, "Michael S .
-	Tsirkin" <mst@redhat.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, Eduardo Habkost <ehabkost@redhat.com>, "Singh, Brijesh" <brijesh.singh@amd.com>
+To: QEMU <qemu-devel@nongnu.org>
+Cc: Gerd Hoffmann <kraxel@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>
 
-On Thu, 25 Apr 2019 22:58:18 +0000
-"Natarajan, Janakarajan" <Janakarajan.Natarajan@amd.com> wrote:
+Hi
 
-> A client can register to this notifier to know whether the newly added or
-> removed memory region is marked as encrypted. This information is needed
-> for the SEV guest launch. In SEV guest, some memory regions may contain
-> encrypted data (e.g guest RAM). The memory region which contains the
-> encrypted data should be registered/unregistered using the
-> KVM_MEMORY_{REG,UNREG}_ENCRYPTED ioctl.
-> 
-> Signed-off-by: Janakarajan Natarajan <Janakarajan.Natarajan@amd.com>
+On Fri, Apr 26, 2019 at 12:27 PM Marc-Andr=C3=A9 Lureau
+<marcandre.lureau@redhat.com> wrote:
+>
+> Create a vhost-user-backend object that holds a connection to a
+> vhost-user backend (or "slave" process) and can be referenced from
+> virtio devices that support it. See later patches for input & gpu
+> usage.
+>
+> Note: a previous iteration of this object made it user-creatable, and
+> allowed managed sub-process spawning, but that has been dropped for
+> now.
+>
+> Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 > ---
->  exec.c                 |  1 +
->  include/exec/memory.h  | 18 ++++++++++++++++++
->  include/exec/ramlist.h | 19 +++++++++++++++++++
->  memory.c               | 16 ++++++++++++++++
->  numa.c                 | 33 +++++++++++++++++++++++++++++++++
->  stubs/ram-block.c      |  8 ++++++++
->  6 files changed, 95 insertions(+)
-> 
-> diff --git a/exec.c b/exec.c
-> index 2646207661..a02c394e48 100644
-> --- a/exec.c
-> +++ b/exec.c
-> @@ -79,6 +79,7 @@
->   * are protected by the ramlist lock.
->   */
->  RAMList ram_list = { .blocks = QLIST_HEAD_INITIALIZER(ram_list.blocks) };
-> +RAMBlockEncryptedNotifierList ram_block_encrypted_notifier_list;
->  
->  static MemoryRegion *system_memory;
->  static MemoryRegion *system_io;
-> diff --git a/include/exec/memory.h b/include/exec/memory.h
-> index 9144a47f57..ae720ff511 100644
-> --- a/include/exec/memory.h
-> +++ b/include/exec/memory.h
-> @@ -374,6 +374,7 @@ struct MemoryRegion {
->      bool terminates;
->      bool ram_device;
->      bool enabled;
-> +    bool encrypted;
->      bool warning_printed; /* For reservations */
->      uint8_t vga_logging_count;
->      MemoryRegion *alias;
-> @@ -1131,6 +1132,23 @@ int memory_region_iommu_attrs_to_index(IOMMUMemoryRegion *iommu_mr,
->   */
->  int memory_region_iommu_num_indexes(IOMMUMemoryRegion *iommu_mr);
->  
-> +/**
-> + * memory_region_mark_encrypted: marks the memory region as encrypted and
-> + * lets the listeners of encrypted ram know that a memory region containing
-> + * encrypted ram block has been added
+>  include/sysemu/vhost-user-backend.h |  57 ++++++++
+>  backends/vhost-user.c               | 209 ++++++++++++++++++++++++++++
+>  MAINTAINERS                         |   2 +
+>  backends/Makefile.objs              |   2 +
+>  4 files changed, 270 insertions(+)
+>  create mode 100644 include/sysemu/vhost-user-backend.h
+>  create mode 100644 backends/vhost-user.c
+>
+> diff --git a/include/sysemu/vhost-user-backend.h b/include/sysemu/vhost-u=
+ser-backend.h
+> new file mode 100644
+> index 0000000000..9abf8f06a1
+> --- /dev/null
+> +++ b/include/sysemu/vhost-user-backend.h
+> @@ -0,0 +1,57 @@
+> +/*
+> + * QEMU vhost-user backend
 > + *
-> + * @mr: the memory region
-> + */
-> +void memory_region_mark_encrypted(MemoryRegion *mr);
-> +
-> +/**
-> + * memory_region_is_encrypted: returns if the memory region was marked as
-> + * encrypted when it was created
+> + * Copyright (C) 2018 Red Hat Inc
 > + *
-> + * @mr: the memory region
+> + * Authors:
+> + *  Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+> + *
+> + * This work is licensed under the terms of the GNU GPL, version 2 or la=
+ter.
+> + * See the COPYING file in the top-level directory.
 > + */
-> +bool memory_region_is_encrypted(MemoryRegion *mr);
+> +#ifndef QEMU_VHOST_USER_BACKEND_H
+> +#define QEMU_VHOST_USER_BACKEND_H
 > +
->  /**
->   * memory_region_name: get a memory region's name
->   *
-> diff --git a/include/exec/ramlist.h b/include/exec/ramlist.h
-> index bc4faa1b00..5349f27fa5 100644
-> --- a/include/exec/ramlist.h
-> +++ b/include/exec/ramlist.h
-> @@ -7,6 +7,7 @@
->  #include "qemu/rcu_queue.h"
->  
->  typedef struct RAMBlockNotifier RAMBlockNotifier;
-> +typedef struct RAMBlockEncryptedNotifier RAMBlockEncryptedNotifier;
->  
->  #define DIRTY_MEMORY_VGA       0
->  #define DIRTY_MEMORY_CODE      1
-> @@ -55,6 +56,11 @@ typedef struct RAMList {
->  } RAMList;
->  extern RAMList ram_list;
->  
-> +typedef struct RAMBlockEncryptedNotifierList {
-> +    QLIST_HEAD(, RAMBlockEncryptedNotifier) ram_block_notifiers;
-> +} RAMBlockEncryptedNotifierList;
-> +extern RAMBlockEncryptedNotifierList ram_block_encrypted_notifier_list;
+> +#include "qom/object.h"
+> +#include "exec/memory.h"
+> +#include "qemu/option.h"
+> +#include "qemu/bitmap.h"
+> +#include "hw/virtio/vhost.h"
+> +#include "hw/virtio/vhost-user.h"
+> +#include "chardev/char-fe.h"
+> +#include "io/channel.h"
 > +
->  /* Should be holding either ram_list.mutex, or the RCU lock. */
->  #define  INTERNAL_RAMBLOCK_FOREACH(block)  \
->      QLIST_FOREACH_RCU(block, &ram_list.blocks, next)
-> @@ -70,6 +76,14 @@ struct RAMBlockNotifier {
->      QLIST_ENTRY(RAMBlockNotifier) next;
->  };
->  
-> +struct RAMBlockEncryptedNotifier {
-> +    void (*ram_block_encrypted_added)(RAMBlockEncryptedNotifier *n,
-> +                                      void *host, size_t size);
-> +    void (*ram_block_encrypted_removed)(RAMBlockEncryptedNotifier *n,
-> +                                        void *host, size_t size);
-> +    QLIST_ENTRY(RAMBlockEncryptedNotifier) next;
+> +#define TYPE_VHOST_USER_BACKEND "vhost-user-backend"
+> +#define VHOST_USER_BACKEND(obj) \
+> +    OBJECT_CHECK(VhostUserBackend, (obj), TYPE_VHOST_USER_BACKEND)
+> +#define VHOST_USER_BACKEND_GET_CLASS(obj) \
+> +    OBJECT_GET_CLASS(VhostUserBackendClass, (obj), TYPE_VHOST_USER_BACKE=
+ND)
+> +#define VHOST_USER_BACKEND_CLASS(klass) \
+> +    OBJECT_CLASS_CHECK(VhostUserBackendClass, (klass), TYPE_VHOST_USER_B=
+ACKEND)
+> +
+> +typedef struct VhostUserBackend VhostUserBackend;
+> +typedef struct VhostUserBackendClass VhostUserBackendClass;
+> +
+> +struct VhostUserBackendClass {
+> +    ObjectClass parent_class;
 > +};
 > +
->  void ram_block_notifier_add(RAMBlockNotifier *n);
->  void ram_block_notifier_remove(RAMBlockNotifier *n);
->  void ram_block_notify_add(void *host, size_t size);
-> @@ -77,4 +91,9 @@ void ram_block_notify_remove(void *host, size_t size);
->  
->  void ram_block_dump(Monitor *mon);
->  
-> +void ram_block_encrypted_notifier_add(RAMBlockEncryptedNotifier *n);
-> +void ram_block_encrypted_notifier_remove(RAMBlockEncryptedNotifier *n);
-> +void ram_block_encrypted_notify_add(void *host, size_t size);
-> +void ram_block_encrypted_notify_remove(void *host, size_t size);
+> +struct VhostUserBackend {
+> +    /* private */
+> +    Object parent;
 > +
->  #endif /* RAMLIST_H */
-> diff --git a/memory.c b/memory.c
-> index bb2b71ee38..eca02d369b 100644
-> --- a/memory.c
-> +++ b/memory.c
-> @@ -2009,6 +2009,22 @@ int memory_region_iommu_num_indexes(IOMMUMemoryRegion *iommu_mr)
->      return imrc->num_indexes(iommu_mr);
->  }
->  
-> +void memory_region_mark_encrypted(MemoryRegion *mr)
+> +    char *chr_name;
+> +    CharBackend chr;
+> +    VhostUserState vhost_user;
+> +    struct vhost_dev dev;
+> +    VirtIODevice *vdev;
+> +    bool started;
+> +    bool completed;
+> +};
+> +
+> +int vhost_user_backend_dev_init(VhostUserBackend *b, VirtIODevice *vdev,
+> +                                unsigned nvqs, Error **errp);
+> +void vhost_user_backend_start(VhostUserBackend *b);
+> +void vhost_user_backend_stop(VhostUserBackend *b);
+> +
+> +#endif
+> diff --git a/backends/vhost-user.c b/backends/vhost-user.c
+> new file mode 100644
+> index 0000000000..2b055544a7
+> --- /dev/null
+> +++ b/backends/vhost-user.c
+> @@ -0,0 +1,209 @@
+> +/*
+> + * QEMU vhost-user backend
+> + *
+> + * Copyright (C) 2018 Red Hat Inc
+> + *
+> + * Authors:
+> + *  Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+> + *
+> + * This work is licensed under the terms of the GNU GPL, version 2 or la=
+ter.
+> + * See the COPYING file in the top-level directory.
+> + */
+> +
+> +
+> +#include "qemu/osdep.h"
+> +#include "hw/qdev.h"
+> +#include "qapi/error.h"
+> +#include "qapi/qmp/qerror.h"
+> +#include "qemu/error-report.h"
+> +#include "qom/object_interfaces.h"
+> +#include "sysemu/vhost-user-backend.h"
+> +#include "sysemu/kvm.h"
+> +#include "io/channel-command.h"
+> +#include "hw/virtio/virtio-bus.h"
+> +
+> +static bool
+> +ioeventfd_enabled(void)
 > +{
-> +    RAMBlock *block = mr->ram_block;
+> +    return kvm_enabled() && kvm_eventfds_enabled();
+> +}
 > +
-> +    mr->encrypted = kvm_memcrypt_enabled();
+> +int
+> +vhost_user_backend_dev_init(VhostUserBackend *b, VirtIODevice *vdev,
+> +                            unsigned nvqs, Error **errp)
+> +{
+> +    int ret;
 > +
-> +    if (mr->encrypted) {
-> +        ram_block_encrypted_notify_add(block->host, block->max_length);
+> +    assert(!b->vdev && vdev);
+> +
+> +    if (!ioeventfd_enabled()) {
+> +        error_setg(errp, "vhost initialization failed: requires kvm");
+> +        return -1;
 > +    }
+> +
+> +    if (!vhost_user_init(&b->vhost_user, &b->chr, errp)) {
+> +        return -1;
+> +    }
+> +
+> +    b->vdev =3D vdev;
+> +    b->dev.nvqs =3D nvqs;
+> +    b->dev.vqs =3D g_new(struct vhost_virtqueue, nvqs);
+> +
+> +    ret =3D vhost_dev_init(&b->dev, &b->vhost_user, VHOST_BACKEND_TYPE_U=
+SER, 0);
+> +    if (ret < 0) {
+> +        error_setg_errno(errp, -ret, "vhost initialization failed");
+> +        return -1;
+> +    }
+> +
+> +    return 0;
 > +}
 > +
-> +bool memory_region_is_encrypted(MemoryRegion *mr)
+> +void
+> +vhost_user_backend_start(VhostUserBackend *b)
 > +{
-> +    return mr->encrypted;
+> +    BusState *qbus =3D BUS(qdev_get_parent_bus(DEVICE(b->vdev)));
+> +    VirtioBusClass *k =3D VIRTIO_BUS_GET_CLASS(qbus);
+> +    int ret, i ;
+> +
+> +    if (b->started) {
+> +        return;
+> +    }
+> +
+> +    if (!k->set_guest_notifiers) {
+> +        error_report("binding does not support guest notifiers");
+> +        return;
+> +    }
+> +
+> +    ret =3D vhost_dev_enable_notifiers(&b->dev, b->vdev);
+> +    if (ret < 0) {
+> +        return;
+> +    }
+> +
+> +    ret =3D k->set_guest_notifiers(qbus->parent, b->dev.nvqs, true);
+> +    if (ret < 0) {
+> +        error_report("Error binding guest notifier");
+> +        goto err_host_notifiers;
+> +    }
+> +
+> +    b->dev.acked_features =3D b->vdev->guest_features;
+> +    ret =3D vhost_dev_start(&b->dev, b->vdev);
+> +    if (ret < 0) {
+> +        error_report("Error start vhost dev");
+> +        goto err_guest_notifiers;
+> +    }
+> +
+> +    /* guest_notifier_mask/pending not used yet, so just unmask
+> +     * everything here.  virtio-pci will do the right thing by
+> +     * enabling/disabling irqfd.
+> +     */
+> +    for (i =3D 0; i < b->dev.nvqs; i++) {
+> +        vhost_virtqueue_mask(&b->dev, b->vdev,
+> +                             b->dev.vq_index + i, false);
+> +    }
+> +
+> +    b->started =3D true;
+> +    return;
+> +
+> +err_guest_notifiers:
+> +    k->set_guest_notifiers(qbus->parent, b->dev.nvqs, false);
+> +err_host_notifiers:
+> +    vhost_dev_disable_notifiers(&b->dev, b->vdev);
 > +}
 > +
->  void memory_region_set_log(MemoryRegion *mr, bool log, unsigned client)
->  {
->      uint8_t mask = 1 << client;
-> diff --git a/numa.c b/numa.c
-> index 3875e1efda..08601366c5 100644
-> --- a/numa.c
-> +++ b/numa.c
+> +void
+> +vhost_user_backend_stop(VhostUserBackend *b)
+> +{
+> +    BusState *qbus =3D BUS(qdev_get_parent_bus(DEVICE(b->vdev)));
+> +    VirtioBusClass *k =3D VIRTIO_BUS_GET_CLASS(qbus);
+> +    int ret =3D 0;
+> +
+> +    if (!b->started) {
+> +        return;
+> +    }
+> +
+> +    vhost_dev_stop(&b->dev, b->vdev);
+> +
+> +    if (k->set_guest_notifiers) {
+> +        ret =3D k->set_guest_notifiers(qbus->parent,
+> +                                     b->dev.nvqs, false);
+> +        if (ret < 0) {
+> +            error_report("vhost guest notifier cleanup failed: %d", ret)=
+;
+> +        }
+> +    }
+> +    assert(ret >=3D 0);
+> +
+> +    vhost_dev_disable_notifiers(&b->dev, b->vdev);
+> +    b->started =3D false;
+> +}
+> +
+> +static void set_chardev(Object *obj, const char *value, Error **errp)
+> +{
+> +    VhostUserBackend *b =3D VHOST_USER_BACKEND(obj);
+> +    Chardev *chr;
+> +
+> +    if (b->completed) {
+> +        error_setg(errp, QERR_PERMISSION_DENIED);
+> +        return;
+> +    }
+> +
+> +    g_free(b->chr_name);
+> +    b->chr_name =3D g_strdup(value);
+> +
+> +    chr =3D qemu_chr_find(b->chr_name);
+> +    if (chr =3D=3D NULL) {
+> +        error_set(errp, ERROR_CLASS_DEVICE_NOT_FOUND,
+> +                  "Chardev '%s' not found", b->chr_name);
+> +        return;
+> +    }
+> +
+> +    if (!qemu_chr_fe_init(&b->chr, chr, errp)) {
+> +        return;
+> +    }
+> +
+> +    b->completed =3D true;
+> +    /* could call vhost_dev_init() so early message can be exchanged */
+> +}
+> +
+> +static char *get_chardev(Object *obj, Error **errp)
+> +{
+> +    VhostUserBackend *b =3D VHOST_USER_BACKEND(obj);
+> +    Chardev *chr =3D qemu_chr_fe_get_driver(&b->chr);
+> +
+> +    if (chr && chr->label) {
+> +        return g_strdup(chr->label);
+> +    }
+> +
+> +    return NULL;
+> +}
+> +
+> +static void vhost_user_backend_init(Object *obj)
+> +{
+> +    object_property_add_str(obj, "chardev", get_chardev, set_chardev, NU=
+LL);
+> +}
+> +
+> +static void vhost_user_backend_finalize(Object *obj)
+> +{
+> +    VhostUserBackend *b =3D VHOST_USER_BACKEND(obj);
+> +
+> +    g_free(b->dev.vqs);
+> +    g_free(b->chr_name);
+> +
+> +    vhost_user_cleanup(&b->vhost_user);
+> +    qemu_chr_fe_deinit(&b->chr, true);
+> +}
+> +
+> +static const TypeInfo vhost_user_backend_info =3D {
+> +    .name =3D TYPE_VHOST_USER_BACKEND,
+> +    .parent =3D TYPE_OBJECT,
+> +    .instance_size =3D sizeof(VhostUserBackend),
+> +    .instance_init =3D vhost_user_backend_init,
+> +    .instance_finalize =3D vhost_user_backend_finalize,
+> +    .class_size =3D sizeof(VhostUserBackendClass),
+> +};
+> +
+> +static void register_types(void)
+> +{
+> +    type_register_static(&vhost_user_backend_info);
+> +}
+> +
+> +type_init(register_types);
+> diff --git a/MAINTAINERS b/MAINTAINERS
+> index 23db6f8408..c48f13f877 100644
+> --- a/MAINTAINERS
+> +++ b/MAINTAINERS
+> @@ -1469,6 +1469,8 @@ F: hw/*/*vhost*
+>  F: docs/interop/vhost-user.json
+>  F: docs/interop/vhost-user.txt
+>  F: contrib/vhost-user-*/
+> +F: backends/vhost-user.c
+> +F: include/sysemu/vhost-user-backend.h
+>
+>  virtio
+>  M: Michael S. Tsirkin <mst@redhat.com>
+> diff --git a/backends/Makefile.objs b/backends/Makefile.objs
+> index ff619d31b4..5d9df08552 100644
+> --- a/backends/Makefile.objs
+> +++ b/backends/Makefile.objs
+> @@ -14,4 +14,6 @@ common-obj-y +=3D cryptodev-vhost.o
+>  common-obj-$(CONFIG_VHOST_CRYPTO) +=3D cryptodev-vhost-user.o
+>  endif
+>
+> +common-obj-$(CONFIG_VHOST_USER) +=3D vhost-user.o
 
-looks like wrong file to put RAMBlock code in. I though that we should put it in exec.c
+This should be changed back to "$(call
+land,$(CONFIG_VHOST_USER),$(CONFIG_VIRTIO))"
 
-> @@ -638,6 +638,39 @@ MemdevList *qmp_query_memdev(Error **errp)
->      return list;
->  }
->  
-> +void ram_block_encrypted_notifier_add(RAMBlockEncryptedNotifier *n)
-> +{
-> +    QLIST_INSERT_HEAD(&ram_block_encrypted_notifier_list.ram_block_notifiers,
-> +                      n, next);
-> +}
+(I wonder if CONFIG_VHOST_USER could depend on CONFIG_VIRTIO somewhere
+else though)
+
 > +
-> +void ram_block_encrypted_notifier_remove(RAMBlockEncryptedNotifier *n)
-> +{
-> +    QLIST_REMOVE(n, next);
-> +}
-> +
-> +void ram_block_encrypted_notify_add(void *host, size_t size)
-> +{
-> +    RAMBlockEncryptedNotifier *notifier;
-> +
-> +    QLIST_FOREACH(notifier,
-> +                  &ram_block_encrypted_notifier_list.ram_block_notifiers,
-> +                  next) {
-> +        notifier->ram_block_encrypted_added(notifier, host, size);
-> +    }
-> +}
-> +
-> +void ram_block_encrypted_notify_remove(void *host, size_t size)
-> +{
-> +    RAMBlockEncryptedNotifier *notifier;
-> +
-> +    QLIST_FOREACH(notifier,
-> +                  &ram_block_encrypted_notifier_list.ram_block_notifiers,
-> +                  next) {
-> +        notifier->ram_block_encrypted_removed(notifier, host, size);
-> +    }
-> +}
-> +
->  void ram_block_notifier_add(RAMBlockNotifier *n)
->  {
->      QLIST_INSERT_HEAD(&ram_list.ramblock_notifiers, n, next);
-> diff --git a/stubs/ram-block.c b/stubs/ram-block.c
-> index 73c0a3ee08..0f68922feb 100644
-> --- a/stubs/ram-block.c
-> +++ b/stubs/ram-block.c
-> @@ -25,6 +25,14 @@ void ram_block_notifier_remove(RAMBlockNotifier *n)
->  {
->  }
->  
-> +void ram_block_encrypted_notifier_add(RAMBlockEncryptedNotifier *n)
-> +{
-> +}
-> +
-> +void ram_block_encrypted_notifier_remove(RAMBlockEncryptedNotifier *n)
-> +{
-> +}
-> +
->  int qemu_ram_foreach_block(RAMBlockIterFunc func, void *opaque)
->  {
->      return 0;
+>  common-obj-$(CONFIG_LINUX) +=3D hostmem-memfd.o
+> --
+> 2.21.0.313.ge35b8cb8e2
+>
+>
+
+
+--=20
+Marc-Andr=C3=A9 Lureau
