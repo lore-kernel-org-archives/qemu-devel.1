@@ -1,21 +1,21 @@
-Received: from eggs.gnu.org ([209.51.188.92]:52077)
+Received: from eggs.gnu.org ([209.51.188.92]:53153)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <sw@weilnetz.de>) id 1hKS22-0007Dn-HT
-	for qemu-devel@nongnu.org; Sat, 27 Apr 2019 14:26:39 -0400
+	(envelope-from <samuel.thibault@ens-lyon.org>) id 1hKS8c-0000Gu-UD
+	for qemu-devel@nongnu.org; Sat, 27 Apr 2019 14:33:28 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <sw@weilnetz.de>) id 1hKS1y-0004mP-IL
-	for qemu-devel@nongnu.org; Sat, 27 Apr 2019 14:26:36 -0400
-References: <20190427161322.24642-1-philmd@redhat.com>
-From: Stefan Weil <sw@weilnetz.de>
-Message-ID: <3f85f099-c650-b9d2-53cd-9c17f97708d7@weilnetz.de>
-Date: Sat, 27 Apr 2019 20:26:26 +0200
+	(envelope-from <samuel.thibault@ens-lyon.org>) id 1hKS8c-00059a-49
+	for qemu-devel@nongnu.org; Sat, 27 Apr 2019 14:33:26 -0400
+Received: from hera.aquilenet.fr ([185.233.100.1]:40776)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <samuel.thibault@ens-lyon.org>)
+	id 1hKS8b-00057p-UH
+	for qemu-devel@nongnu.org; Sat, 27 Apr 2019 14:33:26 -0400
+From: Samuel Thibault <samuel.thibault@ens-lyon.org>
+Date: Sat, 27 Apr 2019 20:33:05 +0200
+Message-Id: <20190427183307.12796-1-samuel.thibault@ens-lyon.org>
 MIME-Version: 1.0
-In-Reply-To: <20190427161322.24642-1-philmd@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: de-DE
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH] Makefile: Let the 'clean' rule remove
- qemu-ga.exe on Windows hosts
+Subject: [Qemu-devel] [PATCHv4 0/2] ui/curses: BSD portability fixes
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,41 +24,27 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>, qemu-devel@nongnu.org
-Cc: Michael Roth <mdroth@linux.vnet.ibm.com>, qemu-trivial@nongnu.org
+To: qemu-devel@nongnu.org
+Cc: Samuel Thibault <samuel.thibault@ens-lyon.org>, kraxel@redhat.com, kamil@netbsd.org
 
-On 27.04.19 18:13, Philippe Mathieu-Daud=C3=A9 wrote:
-> Commit 48ff7a625b36 added the QEMU Guest Agent tool with the
-> optional ".exe" suffix for Windows hosts, but forgot to use
-> this suffix in the 'clean' rule. Calling this rule let a dangling
-> executable in the build directory.
-> Correct this by using the proper optional suffix.
->=20
-> Fixes: 48ff7a625b36
-> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
-> ---
->  Makefile | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
->=20
-> diff --git a/Makefile b/Makefile
-> index 626a04d305c..07bfa26536a 100644
-> --- a/Makefile
-> +++ b/Makefile
-> @@ -639,7 +639,7 @@ clean:
->  		! -path ./roms/edk2/BaseTools/Source/Python/UPT/Dll/sqlite3.dll \
->  		-exec rm {} +
->  	rm -f $(edk2-decompressed)
-> -	rm -f $(filter-out %.tlb,$(TOOLS)) $(HELPERS-y) qemu-ga TAGS cscope.*=
- *.pod *~ */*~
-> +	rm -f $(filter-out %.tlb,$(TOOLS)) $(HELPERS-y) qemu-ga$(EXESUF) TAGS=
- cscope.* *.pod *~ */*~
->  	rm -f fsdev/*.pod scsi/*.pod
->  	rm -f qemu-img-cmds.h
->  	rm -f ui/shader/*-vert.h ui/shader/*-frag.h
->=20
+BSD needs a few fixes for wide character manipulations.
 
-Reviewed-by: Stefan Weil <sw@weilnetz.de>
+Difference with v1:
+- Fix unitialized value in error message
 
-Thank you!
+Difference with v2:
+- Add cchar_t manipulation fix
 
-Stefan
+Difference with v3:
+- use mbrtowc/wcrtomb instead of mbtowc/wctomb
+- use MB_LEN_MAX instead of MB_CUR_MAX to avoid using a VLA.
+
+Samuel Thibault (2):
+  ui/curses: do not assume wchar_t contains unicode
+  ui/curses: manipulate cchar_t with standard curses functions
+
+ ui/curses.c | 194 ++++++++++++++++++++++++++++++++++------------------
+ 1 file changed, 126 insertions(+), 68 deletions(-)
+
+--=20
+2.20.1
