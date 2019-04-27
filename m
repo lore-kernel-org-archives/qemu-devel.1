@@ -5,74 +5,55 @@ X-Spam-Level:
 X-Spam-Status: No, score=-0.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	MAILING_LIST_MULTI,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 92E2BC43218
-	for <qemu-devel@archiver.kernel.org>; Sat, 27 Apr 2019 14:47:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AB0D5C43219
+	for <qemu-devel@archiver.kernel.org>; Sat, 27 Apr 2019 14:47:19 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 66617208C2
-	for <qemu-devel@archiver.kernel.org>; Sat, 27 Apr 2019 14:47:16 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 66617208C2
+	by mail.kernel.org (Postfix) with ESMTPS id 7886E205F4
+	for <qemu-devel@archiver.kernel.org>; Sat, 27 Apr 2019 14:47:19 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7886E205F4
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:32904 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:32906 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hKObj-0007Gc-KQ
-	for qemu-devel@archiver.kernel.org; Sat, 27 Apr 2019 10:47:15 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:43514)
+	id 1hKObm-0007JJ-KS
+	for qemu-devel@archiver.kernel.org; Sat, 27 Apr 2019 10:47:18 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:43576)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1hKOZk-0005dm-NK
-	for qemu-devel@nongnu.org; Sat, 27 Apr 2019 10:45:16 -0400
+	(envelope-from <philmd@redhat.com>) id 1hKOZq-0005eR-8P
+	for qemu-devel@nongnu.org; Sat, 27 Apr 2019 10:45:19 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1hKOYN-0000uN-Np
-	for qemu-devel@nongnu.org; Sat, 27 Apr 2019 10:43:48 -0400
-Received: from mail-wr1-f66.google.com ([209.85.221.66]:39207)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1hKOYM-0000lA-3M
-	for qemu-devel@nongnu.org; Sat, 27 Apr 2019 10:43:47 -0400
-Received: by mail-wr1-f66.google.com with SMTP id a9so8649456wrp.6
-	for <qemu-devel@nongnu.org>; Sat, 27 Apr 2019 07:43:42 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=1e100.net; s=20161025;
-	h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
-	:date:user-agent:mime-version:in-reply-to:content-language
-	:content-transfer-encoding;
-	bh=myvxdpIz6Bf/uHazotd12k+Gu63g/6u5sqwMkEzhSBY=;
-	b=amJEIEQQtG6sqp5++htrRFtckR2Fj01kelLlRrD7ectf/nw2xHD/tuYgZPQMoSRb9i
-	VjxthkevANPbML/lc2IUd/rRVlQ++8vQzXdgrRF/cnW0j1yWKzAjR4wphBZ0GCk1/6Pg
-	C+QGNCxC+nvQjD437f9tyXv9aCo1MolY3/txT3Veg8ZSwMW2axyZ+SiKh8UVtd3Gy7je
-	Z2xDqHlgDX2pFKnUXtlRDi69czBOnMnKbznFcRICgyZ7gl5Nn/buc7XV4Z++7onEWddE
-	iLW5QckXzftAhDOQpp7dq/U82UPtJG/ec2Aj895FEEb9pHek4kuEZ38dOqLpkWc89Nog
-	6WcA==
-X-Gm-Message-State: APjAAAXuPmehAD+TUB3f8FdNx8Uret+GwY5DXpB2S9ycXW27/T/FWeOD
-	KUlvtwrDfHSV/hMbInJoIvmE7A==
-X-Google-Smtp-Source: APXvYqylhb8woQIKj5mvF/g9lqF1ZoXKl4cW7i00YEPc6x01JU9Mt2y7bYRmcU4/Gf53bZbW/8Sieg==
-X-Received: by 2002:adf:ce0b:: with SMTP id p11mr30468380wrn.196.1556376221111;
-	Sat, 27 Apr 2019 07:43:41 -0700 (PDT)
-Received: from [192.168.1.33] (193.red-88-21-103.staticip.rima-tde.net.
-	[88.21.103.193]) by smtp.gmail.com with ESMTPSA id
-	u189sm38011370wme.25.2019.04.27.07.43.40
-	(version=TLS1_3 cipher=AEAD-AES128-GCM-SHA256 bits=128/128);
-	Sat, 27 Apr 2019 07:43:40 -0700 (PDT)
+	(envelope-from <philmd@redhat.com>) id 1hKOVJ-0004iz-B5
+	for qemu-devel@nongnu.org; Sat, 27 Apr 2019 10:40:38 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:51800)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1hKOVJ-0004hS-5l
+	for qemu-devel@nongnu.org; Sat, 27 Apr 2019 10:40:37 -0400
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+	[10.5.11.22])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id E29B930B0862;
+	Sat, 27 Apr 2019 14:40:35 +0000 (UTC)
+Received: from x1w.redhat.com (ovpn-204-83.brq.redhat.com [10.40.204.83])
+	by smtp.corp.redhat.com (Postfix) with ESMTPS id 8D8401001E81;
+	Sat, 27 Apr 2019 14:40:27 +0000 (UTC)
+From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
 To: qemu-devel@nongnu.org
-References: <20190427144025.22880-1-philmd@redhat.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Openpgp: id=89C1E78F601EE86C867495CBA2A3FD6EDEADC0DE;
-	url=http://pgp.mit.edu/pks/lookup?op=get&search=0xA2A3FD6EDEADC0DE
-Message-ID: <6e3003f3-3d96-c1be-6890-baa2c61d34dc@redhat.com>
-Date: Sat, 27 Apr 2019 16:43:39 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
-	Thunderbird/60.6.1
+Date: Sat, 27 Apr 2019 16:40:22 +0200
+Message-Id: <20190427144025.22880-1-philmd@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20190427144025.22880-1-philmd@redhat.com>
 Content-Type: text/plain; charset="UTF-8"
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+	(mx1.redhat.com [10.5.110.43]);
+	Sat, 27 Apr 2019 14:40:36 +0000 (UTC)
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-	[fuzzy]
-X-Received-From: 209.85.221.66
-Subject: Re: [Qemu-devel] [PATCH 0/3] hw/i386/acpi: Improve build modularity
+X-Received-From: 209.132.183.28
+Subject: [Qemu-devel] [PATCH 0/3] hw/i386/acpi: Improve build modularity
  (isapc/q35/...)
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
@@ -89,36 +70,33 @@ Cc: Yang Zhong <yang.zhong@intel.com>, Thomas Huth <thuth@redhat.com>,
 	Samuel Ortiz <sameo@linux.intel.com>,
 	"Michael S. Tsirkin" <mst@redhat.com>, Igor Mammedov <imammedo@redhat.com>,
 	Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>,
+	=?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
 	Eduardo Habkost <ehabkost@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190427144339.2lVtzQULMl8lNdcfYxdtNqzUBXQtaFYm686QDGgkjFM@z>
+Message-ID: <20190427144022.kqQ3bno8a6tn_tl7m7jYiL-5VWR5HMHPq7S0VSL0ygg@z>
 
-On 4/27/19 4:40 PM, Philippe Mathieu-Daudé wrote:
-> This series allow to build the ISAPC/Q35 machines independently.
+This series allow to build the ISAPC/Q35 machines independently.
 
-Oops I guess I forgot:
-Based-on: 20190427141905.20393-1-philmd@redhat.com
-(i440fx is not a machine)
-https://lists.gnu.org/archive/html/qemu-devel/2019-04/msg04673.html
+Regards,
 
-> 
-> Regards,
-> 
-> Phil.
-> 
-> Philippe Mathieu-Daudé (3):
->   hw/acpi/piix4: Move TYPE_PIIX4_PM to a public header
->   hw/i386/acpi: Add object_resolve_type_unambiguous to improve
->     modularity
->   hw/i386/acpi: Assert a pointer is not null BEFORE using it
-> 
->  hw/acpi/piix4.c         | 13 -------------
->  hw/i386/acpi-build.c    | 22 +++++++++++++++++-----
->  hw/isa/lpc_ich9.c       | 11 -----------
->  include/hw/acpi/piix4.h |  2 +-
->  include/hw/i386/ich9.h  |  2 --
->  5 files changed, 18 insertions(+), 32 deletions(-)
-> 
+Phil.
+
+Philippe Mathieu-Daud=C3=A9 (3):
+  hw/acpi/piix4: Move TYPE_PIIX4_PM to a public header
+  hw/i386/acpi: Add object_resolve_type_unambiguous to improve
+    modularity
+  hw/i386/acpi: Assert a pointer is not null BEFORE using it
+
+ hw/acpi/piix4.c         | 13 -------------
+ hw/i386/acpi-build.c    | 22 +++++++++++++++++-----
+ hw/isa/lpc_ich9.c       | 11 -----------
+ include/hw/acpi/piix4.h |  2 +-
+ include/hw/i386/ich9.h  |  2 --
+ 5 files changed, 18 insertions(+), 32 deletions(-)
+
+--=20
+2.20.1
+
 
