@@ -2,60 +2,69 @@ Return-Path: <SRS0=rME2=S5=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=FROM_EXCESS_BASE64,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7D951C43218
-	for <qemu-devel@archiver.kernel.org>; Sat, 27 Apr 2019 15:46:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A64FBC43218
+	for <qemu-devel@archiver.kernel.org>; Sat, 27 Apr 2019 15:50:20 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4CE8E2146E
-	for <qemu-devel@archiver.kernel.org>; Sat, 27 Apr 2019 15:46:48 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4CE8E2146E
+	by mail.kernel.org (Postfix) with ESMTPS id 77BB02077B
+	for <qemu-devel@archiver.kernel.org>; Sat, 27 Apr 2019 15:50:20 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 77BB02077B
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:33437 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:33464 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hKPXL-0003wc-Cn
-	for qemu-devel@archiver.kernel.org; Sat, 27 Apr 2019 11:46:47 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:54049)
+	id 1hKPal-00053g-H9
+	for qemu-devel@archiver.kernel.org; Sat, 27 Apr 2019 11:50:19 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:54779)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1hKPWN-0003ZZ-6U
-	for qemu-devel@nongnu.org; Sat, 27 Apr 2019 11:45:48 -0400
+	(envelope-from <mlureau@redhat.com>) id 1hKPZt-0004cl-Sd
+	for qemu-devel@nongnu.org; Sat, 27 Apr 2019 11:49:26 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1hKPWL-0002QL-VQ
-	for qemu-devel@nongnu.org; Sat, 27 Apr 2019 11:45:46 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:44838)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <thuth@redhat.com>)
-	id 1hKPWL-0002PN-QV; Sat, 27 Apr 2019 11:45:45 -0400
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
-	[10.5.11.16])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 4B31C368E3;
-	Sat, 27 Apr 2019 15:45:44 +0000 (UTC)
-Received: from thuth.com (ovpn-116-26.ams2.redhat.com [10.36.116.26])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id CE3B04BC;
-	Sat, 27 Apr 2019 15:45:42 +0000 (UTC)
-From: Thomas Huth <thuth@redhat.com>
-To: Richard Henderson <rth@twiddle.net>, qemu-devel@nongnu.org,
-	Paolo Bonzini <pbonzini@redhat.com>
-Date: Sat, 27 Apr 2019 17:45:39 +0200
-Message-Id: <20190427154539.11336-1-thuth@redhat.com>
+	(envelope-from <mlureau@redhat.com>) id 1hKPZs-0005TF-KM
+	for qemu-devel@nongnu.org; Sat, 27 Apr 2019 11:49:25 -0400
+Received: from mail-oi1-f194.google.com ([209.85.167.194]:42409)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <mlureau@redhat.com>) id 1hKPZq-0005Ow-NC
+	for qemu-devel@nongnu.org; Sat, 27 Apr 2019 11:49:24 -0400
+Received: by mail-oi1-f194.google.com with SMTP id k9so2251794oig.9
+	for <qemu-devel@nongnu.org>; Sat, 27 Apr 2019 08:49:19 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=1e100.net; s=20161025;
+	h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+	:message-id:subject:to:cc:content-transfer-encoding;
+	bh=LIr9v/5M6fO4CtXKlASHeE0FiimF1F6pBPcyNslDlv4=;
+	b=czxFBswyVsoqLiH8qTSY5m8KhrcgIzeeshbXs+Q0lZ0ZcikzuuffCmgZ+GV0cVOtJg
+	tyeC4o4Src6KEuuScBVJ6A2TS2T0/7YFeK6ghMzorK7LxnnvcWo+TnrRm8oOesZyzzIZ
+	1uZxHEGy5ZUt1shjmgiKRqDLIB5TGCDYNrOE8Fz3+kwV2UBIMqqbg1GQznvrDFVCvznS
+	izBD3+rPyGHgsBQucY1zkFmKKTsragwzLeTmI7GWzIHULj0Sa3RK/krFEf5K+cE1Wuu1
+	v0o7wFHiCRWGAy4qZOEfmgeAGnByZT//Yx51aJjiqU+o1WSXkyh6t+VBUnRKjZTDWQaS
+	sUqQ==
+X-Gm-Message-State: APjAAAVYIhQzBQVjDCoxbJShaxFI25Xz/wkcN0Wq/RSB2Mfbhnl5uRmo
+	1fuKBmPqffBPRQm994ob2gFv8eIiZrzVjEVYqqna8g==
+X-Google-Smtp-Source: APXvYqzqgh6o+Ks8QkANWEnwOfQ3XRZW4wrhKpPypuaAAG9Pvt8awtSPBs1WngKmhpubzlo+3+2HW1uI4/f7PPXADPs=
+X-Received: by 2002:aca:1106:: with SMTP id 6mr9726047oir.46.1556380158813;
+	Sat, 27 Apr 2019 08:49:18 -0700 (PDT)
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.30]);
-	Sat, 27 Apr 2019 15:45:44 +0000 (UTC)
+References: <20190427131857.11600-1-philmd@redhat.com>
+In-Reply-To: <20190427131857.11600-1-philmd@redhat.com>
+From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@redhat.com>
+Date: Sat, 27 Apr 2019 17:49:07 +0200
+Message-ID:
+ <CAMxuvayZ-woUZPxnav8EXSVGGADxeJjhDs1bgzPAzNLMGFgTsA@mail.gmail.com>
+To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] [PATCH] configure: Add -Wno-typedef-redefinition to
- CFLAGS (for Clang)
+	[fuzzy]
+X-Received-From: 209.85.167.194
+Subject: Re: [Qemu-devel] [PATCH] hw/tpm: Only build tpm_ppi.o if any of
+ TPM_TIS/TPM_CRB is built
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -67,52 +76,48 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-trivial@nongnu.org
+Cc: qemu-devel <qemu-devel@nongnu.org>, Stefan Berger <stefanb@linux.ibm.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Content-Type: text/plain; charset="UTF-8"
-Message-ID: <20190427154539.otr0JUg-wicGGk-_Syni-VENt1d8CMx9OQkB6mepjTo@z>
+Message-ID: <20190427154907.J0c4epWWY8KNCi6OV779RTqwRlpxQMYJFIsVhIZOL7Y@z>
 
-Without the -Wno-typedef-redefinition option, clang complains if a typede=
-f
-gets redefined in gnu99 mode (since this is officially a C11 feature). Th=
-is
-used to also happen with older versions of GCC, but since we've bumped ou=
-r
-minimum GCC version to 4.8, all versions of GCC that we support do not se=
-em
-to issue this warning in gnu99 mode anymore. So this has become a common
-problem for people who only test their code with GCC - they do not notice
-the issue until they submit their patches and suddenly patchew or a
-maintainer complains.
+Hi
 
-Now that we do not urgently need to keep the code clean from typedef
-redefintions anymore with recent versions of GCC, we can ease the
-situation with clang, too, and simply shut these warnings off for good.
+On Sat, Apr 27, 2019 at 3:19 PM Philippe Mathieu-Daud=C3=A9
+<philmd@redhat.com> wrote:
+>
+> The TPM Physical Presence Interface routines are only used
+> by the CRB/TIS interfaces. Do not compile this file if any
+> of them is built.
+>
+> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
 
-Signed-off-by: Thomas Huth <thuth@redhat.com>
----
- configure | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 
-diff --git a/configure b/configure
-index 2cc365be51..8e15dc9870 100755
---- a/configure
-+++ b/configure
-@@ -1917,7 +1917,7 @@ gcc_flags=3D"-Wformat-security -Wformat-y2k -Winit-=
-self -Wignored-qualifiers $gcc_
- gcc_flags=3D"-Wno-missing-include-dirs -Wempty-body -Wnested-externs $gc=
-c_flags"
- gcc_flags=3D"-Wendif-labels -Wno-shift-negative-value $gcc_flags"
- gcc_flags=3D"-Wno-initializer-overrides -Wexpansion-to-defined $gcc_flag=
-s"
--gcc_flags=3D"-Wno-string-plus-int $gcc_flags"
-+gcc_flags=3D"-Wno-string-plus-int -Wno-typedef-redefinition $gcc_flags"
- # Note that we do not add -Werror to gcc_flags here, because that would
- # enable it for all configure tests. If a configure test failed due
- # to -Werror this would just silently disable some features,
---=20
-2.21.0
+> ---
+> Marc-Andr=C3=A9:
+>   You might want to add yourself as reviewer/maintainer of TPM ;)
 
+yes, I suppose Stefan wouldn't mind having me as R: :)
+
+> ---
+>  hw/tpm/Makefile.objs | 4 ++--
+>  1 file changed, 2 insertions(+), 2 deletions(-)
+>
+> diff --git a/hw/tpm/Makefile.objs b/hw/tpm/Makefile.objs
+> index 700c8786228..de0b85d02ae 100644
+> --- a/hw/tpm/Makefile.objs
+> +++ b/hw/tpm/Makefile.objs
+> @@ -1,5 +1,5 @@
+> -common-obj-y +=3D tpm_util.o
+> -obj-y +=3D tpm_ppi.o
+> +common-obj-$(CONFIG_TPM) +=3D tpm_util.o
+> +obj-$(call lor,$(CONFIG_TPM_TIS),$(CONFIG_TPM_CRB)) +=3D tpm_ppi.o
+>  common-obj-$(CONFIG_TPM_TIS) +=3D tpm_tis.o
+>  common-obj-$(CONFIG_TPM_CRB) +=3D tpm_crb.o
+>  common-obj-$(CONFIG_TPM_PASSTHROUGH) +=3D tpm_passthrough.o
+> --
+> 2.20.1
+>
 
