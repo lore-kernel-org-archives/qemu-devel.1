@@ -2,88 +2,111 @@ Return-Path: <SRS0=rME2=S5=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED autolearn=ham
+X-Spam-Status: No, score=-6.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 07E23C43219
-	for <qemu-devel@archiver.kernel.org>; Sat, 27 Apr 2019 18:06:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BB8AEC43218
+	for <qemu-devel@archiver.kernel.org>; Sat, 27 Apr 2019 18:27:37 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id AF662206C1
-	for <qemu-devel@archiver.kernel.org>; Sat, 27 Apr 2019 18:06:37 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gmx.net header.i=@gmx.net header.b="apXjUghC"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AF662206C1
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gmx.com
+	by mail.kernel.org (Postfix) with ESMTPS id 859CD2087C
+	for <qemu-devel@archiver.kernel.org>; Sat, 27 Apr 2019 18:27:37 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 859CD2087C
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=weilnetz.de
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:34935 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:35129 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hKRif-0001qN-0D
-	for qemu-devel@archiver.kernel.org; Sat, 27 Apr 2019 14:06:37 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:48635)
-	by lists.gnu.org with esmtp (Exim 4.71) (envelope-from <n54@gmx.com>)
-	id 1hKRhE-0000x3-AG
-	for qemu-devel@nongnu.org; Sat, 27 Apr 2019 14:05:09 -0400
+	id 1hKS2y-0007cF-J9
+	for qemu-devel@archiver.kernel.org; Sat, 27 Apr 2019 14:27:36 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:52077)
+	by lists.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <sw@weilnetz.de>) id 1hKS22-0007Dn-HT
+	for qemu-devel@nongnu.org; Sat, 27 Apr 2019 14:26:39 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <n54@gmx.com>) id 1hKRhD-0003oo-91
-	for qemu-devel@nongnu.org; Sat, 27 Apr 2019 14:05:08 -0400
-Received: from mout.gmx.net ([212.227.15.19]:52079)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <n54@gmx.com>)
-	id 1hKRhB-0003iH-6i; Sat, 27 Apr 2019 14:05:05 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=gmx.net;
-	s=badeba3b8450; t=1556388299;
-	bh=jY88WQasQiPnj0WAm8vlInHUNvBM17XiJDolgz3lzUA=;
-	h=X-UI-Sender-Class:Subject:To:Cc:References:From:Date:In-Reply-To;
-	b=apXjUghCKcjdPbGK0Yd9Y9YHnx/YYONBiWYy+WUQ1U1Z6iWLg8m3U1vSWA5j2utkU
-	3iN7kpifTj0qMV9j/owkIzYlYou0xtC8xtsu0FVaMOW6HB9sBp8gFboWsXf60Z3JtT
-	kUsksViv/dwLuFt6e2f1Vh7qDwkcGujtGFpN1WSU=
-X-UI-Sender-Class: 01bb95c1-4bf8-414a-932a-4f6e2808ef9c
-Received: from [192.168.0.241] ([89.71.135.231]) by mail.gmx.com (mrgmx003
-	[212.227.17.184]) with ESMTPSA (Nemesis) id 0Ma1Mt-1h4pwy0zgl-00Lkg0;
-	Sat, 27 Apr 2019 20:04:59 +0200
-To: Samuel Thibault <samuel.thibault@gnu.org>
-References: <20190427163007.5113-1-samuel.thibault@ens-lyon.org>
-	<20190427163007.5113-3-samuel.thibault@ens-lyon.org>
-	<73079d95-cf99-e0e3-c464-4568622f0008@gmx.com>
-	<20190427175708.76nq4w2mdexb4gkp@function>
-From: Kamil Rytarowski <n54@gmx.com>
-Message-ID: <331bee21-743c-5eb8-9c6d-77a23b2dc607@gmx.com>
-Date: Sat, 27 Apr 2019 20:05:32 +0200
-User-Agent: Mozilla/5.0 (X11; NetBSD amd64; rv:52.0) Gecko/20100101
-	Thunderbird/52.9.1
+	(envelope-from <sw@weilnetz.de>) id 1hKS1y-0004mP-IL
+	for qemu-devel@nongnu.org; Sat, 27 Apr 2019 14:26:36 -0400
+Received: from mail.weilnetz.de ([37.120.169.71]:60430
+	helo=v2201612906741603.powersrv.de)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <sw@weilnetz.de>)
+	id 1hKS1x-0004VW-4q; Sat, 27 Apr 2019 14:26:34 -0400
+Received: from localhost (localhost [127.0.0.1])
+	by v2201612906741603.powersrv.de (Postfix) with ESMTP id 1D45CDAD847;
+	Sat, 27 Apr 2019 20:26:28 +0200 (CEST)
+X-Virus-Scanned: Debian amavisd-new at v2201612906741603.powersrv.de
+Received: from v2201612906741603.powersrv.de ([127.0.0.1])
+	by localhost (v2201612906741603.powersrv.de [127.0.0.1]) (amavisd-new,
+	port 10024)
+	with ESMTP id M1BinkcFnZni; Sat, 27 Apr 2019 20:26:27 +0200 (CEST)
+Received: from [192.168.178.24] (p57B42786.dip0.t-ipconnect.de [87.180.39.134])
+	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
+	key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest
+	SHA256) (No client certificate requested)
+	by v2201612906741603.powersrv.de (Postfix) with ESMTPSA id 285AEDA3367; 
+	Sat, 27 Apr 2019 20:26:27 +0200 (CEST)
+To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
+	qemu-devel@nongnu.org
+References: <20190427161322.24642-1-philmd@redhat.com>
+From: Stefan Weil <sw@weilnetz.de>
+Openpgp: preference=signencrypt
+Autocrypt: addr=sw@weilnetz.de; prefer-encrypt=mutual; keydata=
+	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
+Message-ID: <3f85f099-c650-b9d2-53cd-9c17f97708d7@weilnetz.de>
+Date: Sat, 27 Apr 2019 20:26:26 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+	Thunderbird/60.6.1
 MIME-Version: 1.0
-In-Reply-To: <20190427175708.76nq4w2mdexb4gkp@function>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="4f07vlMXqZ0yimzlM1zmTIzaDzdSDtzOb"
-X-Provags-ID: V03:K1:CF8xvBWokTWujylVlNCGcNGTxJQc9NdY0c0SBd+QiMOgNLs2dmB
-	4sE919UzPz1AQLxbtdn+JCipeJIDTZ6kgpyEp8F4vtCbRagW00SiPyKv7jcd5D5GZdLjf+w
-	QgTYEGlzkDiN9ucASCNIN9LPgIhMR47bRnQtOk+qb3XKq2woaORz+73ihxYOoAzi9o3Ab3r
-	WoUxboAXhobzXEqzXUZhw==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:84yRF+cmKZ4=:dxdIX1pqSNvHDtbq/iJgiO
-	cOTVV0sjBak+PAtLya9stSfaYTf/VfCmgbgP4lNO2AUItgcTSGFJsaENMd9eZcrgfagd9dcNF
-	AIhAdQpF0G/na8d3vgH0GL0QgyGFwi1J+zuh2ZDRJwxYHTl/XhnRhgNVGoYwF24RkfhkisSK1
-	Pr+btZou/qZnvhjcOdS/RoM18PVv3k/soW08a2EozzzRraMn3dtAQJJs8x3c+Ix6zJ9E0koWm
-	e0H4fXFE8U7bvkQBb9qLz2pdMrvENp2ydTYn2rVq2E/L0NWwG02EaqAhwLQaLPvXcmbDxnZZK
-	OtT0voB8M0cFj1dYPi04iX7R+AAukyfvewgbI7zM86YfbV3XjDikGc/hy1/vXDzUgeALdL4a/
-	SfRYCC3PJX1pjcHiqvNP8bATQnfvS5za+smpwgvkIiVoPu+PfPRwEww0H01P7Mu60M7kRp6C7
-	4RJWyCbmOo5y97Z2I033lAMHeaE7XCfLHd5HImhrxLo2EyDNBMY8aRP2OKgd1aHe7U++K+2HT
-	Rreg3N9xGurGWrWAScF1Vq/sezLCZdqT/I1Jow0kOBnfB1PWh0y03jgiOpKNc0YDTvAYUosIb
-	8QS+YobPl70BzjrKyZShx/qk2jX6LOPZ0fEqWm2xt1LW1kgYU7usFiOCpg4yVPtokbHwpY1ys
-	XGcBXNHlOhnuZfDL+xXHta4UotuejPlvz3tVJPK+dqTKDTkr+05nT4GiGwSiTvBqSy13vBUu4
-	wndOhZrFCIjrRO+qcdyRkM0hXfrM6SqH1UBAwLQBUaPlE6CUuHc/C2Wi/dMHywJwTqwVwTtzQ
-	I6usCoC6ffxyjnwd8URjJ8kPB9uXMl1yWUoD3yN5Iax+o0ZFCN86mWBgbK6Pgvn3gvM9c9cqP
-	Ag7CZSrbtK49uTOaychFoTzu62v652DGTSifcCqZU=
+In-Reply-To: <20190427161322.24642-1-philmd@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Language: de-DE
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 212.227.15.19
-X-Content-Filtered-By: Mailman/MimeDel 2.1.21
-Subject: Re: [Qemu-devel] [PATCHv3 1/2] ui/curses: Do not assume wchar_t
- contains unicode
+X-Received-From: 37.120.169.71
+Subject: Re: [Qemu-devel] [PATCH] Makefile: Let the 'clean' rule remove
+ qemu-ga.exe on Windows hosts
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -95,116 +118,45 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: kamil@netbsd.org, qemu-devel@nongnu.org, kraxel@redhat.com
+Cc: qemu-trivial@nongnu.org, Michael Roth <mdroth@linux.vnet.ibm.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190427180532.qZqmx_24adqTFjG8fAcBZRZfC4Lbq_PlPLGFkW98Rsk@z>
+Message-ID: <20190427182626.fx43KKwAyExQAvbm3ZrUk66cFAH8p0qy2FQEmMh_3eU@z>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---4f07vlMXqZ0yimzlM1zmTIzaDzdSDtzOb
-From: Kamil Rytarowski <n54@gmx.com>
-To: Samuel Thibault <samuel.thibault@gnu.org>
-Cc: kamil@netbsd.org, qemu-devel@nongnu.org, kraxel@redhat.com
-Message-ID: <331bee21-743c-5eb8-9c6d-77a23b2dc607@gmx.com>
-Subject: Re: [Qemu-devel] [PATCHv3 1/2] ui/curses: Do not assume wchar_t
- contains unicode
-References: <20190427163007.5113-1-samuel.thibault@ens-lyon.org>
- <20190427163007.5113-3-samuel.thibault@ens-lyon.org>
- <73079d95-cf99-e0e3-c464-4568622f0008@gmx.com>
- <20190427175708.76nq4w2mdexb4gkp@function>
-In-Reply-To: <20190427175708.76nq4w2mdexb4gkp@function>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-
-On 27.04.2019 19:57, Samuel Thibault wrote:
-> Kamil Rytarowski, le sam. 27 avril 2019 19:36:40 +0200, a ecrit:
->> On 27.04.2019 18:30, Samuel Thibault wrote:
->>> E.g. BSD and Solaris even use locale-specific encoding there.
->>>
->>> We thus have to go through the native multibyte representation and us=
-e
->>> mbtowc/wctomb to make a proper conversion.
->>>
->>> Signed-off-by: Samuel Thibault <samuel.thibault@ens-lyon.org>
->>
->> Both patches work for me on NetBSD/amd64 8.99.37 for qemu-system-x86_6=
-4.
->> Borders are printed correctly.
->>
->> Regarding the patch I'm not sure whether to use MB_LEN_MAX or MB_CUR_M=
-AX?
+On 27.04.19 18:13, Philippe Mathieu-Daud=C3=A9 wrote:
+> Commit 48ff7a625b36 added the QEMU Guest Agent tool with the
+> optional ".exe" suffix for Windows hosts, but forgot to use
+> this suffix in the 'clean' rule. Calling this rule let a dangling
+> executable in the build directory.
+> Correct this by using the proper optional suffix.
 >=20
-> I don't know if qemu can afford VLA?
+> Fixes: 48ff7a625b36
+> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+> ---
+>  Makefile | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+>=20
+> diff --git a/Makefile b/Makefile
+> index 626a04d305c..07bfa26536a 100644
+> --- a/Makefile
+> +++ b/Makefile
+> @@ -639,7 +639,7 @@ clean:
+>  		! -path ./roms/edk2/BaseTools/Source/Python/UPT/Dll/sqlite3.dll \
+>  		-exec rm {} +
+>  	rm -f $(edk2-decompressed)
+> -	rm -f $(filter-out %.tlb,$(TOOLS)) $(HELPERS-y) qemu-ga TAGS cscope.*=
+ *.pod *~ */*~
+> +	rm -f $(filter-out %.tlb,$(TOOLS)) $(HELPERS-y) qemu-ga$(EXESUF) TAGS=
+ cscope.* *.pod *~ */*~
+>  	rm -f fsdev/*.pod scsi/*.pod
+>  	rm -f qemu-img-cmds.h
+>  	rm -f ui/shader/*-vert.h ui/shader/*-frag.h
 >=20
 
-It's better to avoid VLA and pick MB_LEN_MAX.
+Reviewed-by: Stefan Weil <sw@weilnetz.de>
 
->> I'm also unsure whether to reset conversion state between a multibyte
->> character and wide character, with: `mbtowc(NULL, 0, 0);`. It's
->> recommended to use in code examples examples. I think it doesn't make
->> any harm to use it.
->=20
-> Mmm, better yet, we should actually use mbrtowc and wcrtomb. I have
-> fixed this in my tree.
->=20
+Thank you!
 
-This is even better.
-
->> I'm not sure if this is related, but "qemu-system-hppa -curses" is
->> broken for me. I didn't use it in the past as it just recently acquire=
-d
->> NetBSD guest support.
->>
->> (lldb) bt
->> libcurses.so.7`mvwadd_wchnstr(win=3D0x0000000000000000, y=3D<unavailab=
-le>,
->> x=3D<unavailable>, wchstr=3D0x00007f7fffffe020, n=3D0) at add_wchstr.c=
-:123
->>   * frame #2: 0x000000000078629e
->> qemu-system-hppa`curses_update(dcl=3D0x00007f7ff7bd8bc0, x=3D0, y=3D0,=
- w=3D79,
->> h=3D24) at curses.c:86:9
->>     frame #3: 0x0000000000753dae
->> qemu-system-hppa`dpy_text_update(con=3D0x00007f7ff7bae580, x=3D0, y=3D=
-0, w=3D79,
->=20
->> (lldb) p screenpad
->> (WINDOW *) $2 =3D 0x0000000000000000
->=20
-> I don't think this is related at all, screenpad management is another
-> matter.
->=20
-
-OK! I will treat it as an independent issue and try to address it.
-
-> Samuel
->=20
-
-
-
---4f07vlMXqZ0yimzlM1zmTIzaDzdSDtzOb
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQJABAEBCAAqFiEELaxVpweEzw+lMDwuS7MI6bAudmwFAlzEme0MHG41NEBnbXgu
-Y29tAAoJEEuzCOmwLnZs/T0P/2Lasgx+NsnT1qP86Bh2fydL9xkFBnln7CxoERe6
-QGTSsZpeAXmHsnrLO8N3fGMSg5lZ2XirFPImikYRFLLbEx/coj84hj+NEGP0mk8q
-PArk+lTNVDkHtkHgvMr5ieBfk0CcI6yChP1Z8qPBhbuZlBONOSw2/idOSKLaa/q2
-OS8eFzKupFyHFKZG3JziSAJU9ShFR7w82ENj3MKV8+SOB8iimdGriKqmL+Z8dktu
-Sa+7a54KpgW7ZCJQwFsYn+ClfuoTi1qcTTnL06LIwhIvTDIQPPYtvlzNdlA9F/PF
-oPCRcptXKcEwL+1TxnhC7rDP1ageFWouHWJX58FpRmX2FUBNLScAS7cebbU8nb71
-0yZPw9Why18uZq8wbUqHQrPy72Eo/8PBz+j+8OhBMmny1kZp3ouLAK3z/Z/G1LQX
-O4KxigY291pNlz0RxVxHm2GnogbdrYkRriMRYwNt7PVgjkkcHEePiQjHXl5dmVBI
-Flh7Z674cNHDd/dDuWXmQM9LN4CqN+SH1jYk8lc34qPcjMAoIF2sJCSgfnD4Drnz
-6Pc/KCj4IXIMd0liLkcjw2IGHyZVpp4f4+6Z3ugnhKUYWjELs75fZCqVNCR073kV
-SV/jMS2cuqmjEO8XIe6hwGtVrQcc0YgFDEDo04CzuekzSJPgpp5xUFZCZKbJ+UrW
-T65r
-=7iq5
------END PGP SIGNATURE-----
-
---4f07vlMXqZ0yimzlM1zmTIzaDzdSDtzOb--
+Stefan
 
