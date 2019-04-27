@@ -1,21 +1,22 @@
-Received: from eggs.gnu.org ([209.51.188.92]:34125)
+Received: from eggs.gnu.org ([209.51.188.92]:37261)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1hKQL4-0001bR-CL
-	for qemu-devel@nongnu.org; Sat, 27 Apr 2019 12:38:11 -0400
+	(envelope-from <philmd@redhat.com>) id 1hKQeR-0008IV-UZ
+	for qemu-devel@nongnu.org; Sat, 27 Apr 2019 12:58:12 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1hKQ7v-0000oA-DL
-	for qemu-devel@nongnu.org; Sat, 27 Apr 2019 12:24:36 -0400
-Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
-	<philippe.mathieu.daude@gmail.com>
-From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
-Date: Sat, 27 Apr 2019 18:24:29 +0200
-Message-Id: <20190427162429.3617-1-f4bug@amsat.org>
+	(envelope-from <philmd@redhat.com>) id 1hKQbg-00074B-WE
+	for qemu-devel@nongnu.org; Sat, 27 Apr 2019 12:55:22 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:41680)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1hKQbe-000729-RL
+	for qemu-devel@nongnu.org; Sat, 27 Apr 2019 12:55:20 -0400
+From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
+Date: Sat, 27 Apr 2019 18:55:02 +0200
+Message-Id: <20190427165504.29846-1-philmd@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH] hw/sparc/leon3: Allow load of uImage firmwares
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PATCH 0/2] hw/acpi: Improve build modularity
+ (targeting MIPS/PPC)
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,62 +25,29 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-trivial@nongnu.org, qemu-devel@nongnu.org
-Cc: KONRAD Frederic <frederic.konrad@adacore.com>, Stefan Hajnoczi <stefanha@redhat.com>, Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, Fabien Chouteau <chouteau@adacore.com>, Artyom Tarasenko <atar4qemu@gmail.com>, =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>, =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
+To: qemu-devel@nongnu.org
+Cc: "Michael S. Tsirkin" <mst@redhat.com>, David Gibson <david@gibson.dropbear.id.au>, Samuel Ortiz <sameo@linux.intel.com>, Aleksandar Rikalo <arikalo@wavecomp.com>, =?UTF-8?q?Herv=C3=A9=20Poussineau?= <hpoussin@reactos.org>, Aleksandar Markovic <amarkovic@wavecomp.com>, Yang Zhong <yang.zhong@intel.com>, Thomas Huth <thuth@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Aurelien Jarno <aurelien@aurel32.net>, Igor Mammedov <imammedo@redhat.com>, =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
 
-From: Philippe Mathieu-Daudé <philmd@redhat.com>
+Hi,
 
-Currently the Leon3 machine doesn't allow to load legacy u-boot images:
+This series is not related to the previous one I just send:
+hw/i386/acpi: Improve build modularity (isapc/q35/...)
+https://lists.gnu.org/archive/html/qemu-devel/2019-04/msg04678.html
 
-  $ qemu-system-sparc -M leon3_generic -d in_asm \
-      -kernel HelenOS-0.6.0-sparc32-leon3.bin
-  qemu-system-sparc: could not load kernel 'HelenOS-0.6.0-sparc32-leon3.bin'
+While the first only concern X86 (changes within the architecture),
+this one allow the core ACPI feature to be used by the MIPS and
+PPC archs (specific series will follow).
 
-  $ file HelenOS-0.6.0-sparc32-leon3.bin
-  HelenOS-0.6.0-sparc32-leon3.bin: u-boot legacy uImage, HelenOS-0.6.0,\
-    Linux/ARM, OS Kernel Image (Not compressed), 2424229 bytes,\
-    Sun Dec 21 19:18:09 2014,\
-    Load Address: 0x40000000, Entry Point: 0x40000000,\
-    Header CRC: 0x8BCFA236, Data CRC: 0x37AD87DF
+Regards,
 
-Since QEMU can load uImages, add the necessary code,
-so the Leon3 machine can load these images:
+Phil.
 
-  $ qemu-system-sparc -M leon3_generic -d in_asm \
-      -kernel HelenOS-0.6.0-sparc32-leon3.bin
-  ----------------
-  IN:
-  0x40000000:  b  0x400007a8
-  0x40000004:  nop
-  ----------------
-  IN:
-  0x400007a8:  save  %sp, -136, %sp
-  0x400007ac:  call  0x40000020
-  0x400007b0:  sethi  %hi(0x4000b800), %i1
-  ...
+Philippe Mathieu-Daud=C3=A9 (2):
+  hw/acpi: Simplify the Makefile logic
+  hw/acpi: Always build the acpi/core.o file
 
-Tested with the following firmware:
-http://www.helenos.org/releases/HelenOS-0.6.0-sparc32-leon3.bin
+ hw/acpi/Makefile.objs | 13 ++++---------
+ 1 file changed, 4 insertions(+), 9 deletions(-)
 
-Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
----
- hw/sparc/leon3.c | 4 ++++
- 1 file changed, 4 insertions(+)
-
-diff --git a/hw/sparc/leon3.c b/hw/sparc/leon3.c
-index 774639af33..0383b17c29 100644
---- a/hw/sparc/leon3.c
-+++ b/hw/sparc/leon3.c
-@@ -193,6 +193,10 @@ static void leon3_generic_hw_init(MachineState *machine)
-         kernel_size = load_elf(kernel_filename, NULL, NULL, NULL,
-                                &entry, NULL, NULL,
-                                1 /* big endian */, EM_SPARC, 0, 0);
-+        if (kernel_size < 0) {
-+            kernel_size = load_uimage(kernel_filename, NULL, &entry,
-+                                      NULL, NULL, NULL);
-+        }
-         if (kernel_size < 0) {
-             error_report("could not load kernel '%s'", kernel_filename);
-             exit(1);
--- 
-2.19.1
+--=20
+2.20.1
