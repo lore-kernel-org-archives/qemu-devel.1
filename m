@@ -1,34 +1,16 @@
-Received: from eggs.gnu.org ([209.51.188.92]:42251)
+Received: from eggs.gnu.org ([209.51.188.92]:45548)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1hKIPO-0003pD-51
-	for qemu-devel@nongnu.org; Sat, 27 Apr 2019 04:10:07 -0400
+	(envelope-from <sgarzare@redhat.com>) id 1hKLdL-00067H-FJ
+	for qemu-devel@nongnu.org; Sat, 27 Apr 2019 07:36:44 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1hKIPM-0000uF-Te
-	for qemu-devel@nongnu.org; Sat, 27 Apr 2019 04:10:06 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:45218)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1hKIPM-0000sL-LX
-	for qemu-devel@nongnu.org; Sat, 27 Apr 2019 04:10:04 -0400
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
-	[10.5.11.16])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 6DF5F316EB7F
-	for <qemu-devel@nongnu.org>; Sat, 27 Apr 2019 08:10:02 +0000 (UTC)
-From: Paolo Bonzini <pbonzini@redhat.com>
-References: <20181220054037.24320-1-peterx@redhat.com>
-	<20181220054037.24320-2-peterx@redhat.com>
-	<20190426132744.2b594bf5@x1.home> <20190426150236.1af2ff08@x1.home>
-	<94415012.15677076.1556342950794.JavaMail.zimbra@redhat.com>
-Message-ID: <daded638-42f1-9bc3-8c36-66b0fbba9438@redhat.com>
-Date: Sat, 27 Apr 2019 10:09:51 +0200
+	(envelope-from <sgarzare@redhat.com>) id 1hKLdJ-0005N7-Sb
+	for qemu-devel@nongnu.org; Sat, 27 Apr 2019 07:36:43 -0400
+From: Stefano Garzarella <sgarzare@redhat.com>
+Date: Sat, 27 Apr 2019 13:36:25 +0200
+Message-Id: <20190427113625.46594-1-sgarzare@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <94415012.15677076.1556342950794.JavaMail.zimbra@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v2 1/3] q35: set split kernel irqchip as
- default
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PATCH] block/rbd: add preallocation support
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,153 +19,273 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alex Williamson <alex.williamson@redhat.com>
-Cc: Peter Xu <peterx@redhat.com>, qemu-devel@nongnu.org, Igor Mammedov <imammedo@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, "Michael S . Tsirkin" <mst@redhat.com>
+To: qemu-devel@nongnu.org
+Cc: qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>, Josh Durgin <jdurgin@redhat.com>, Eric Blake <eblake@redhat.com>, Markus Armbruster <armbru@redhat.com>, Max Reitz <mreitz@redhat.com>
 
-On 27/04/19 07:29, Paolo Bonzini wrote:
-> 
->>> In my testing it looks like KVM advertises supporting the KVM_IRQFD
->>> resample feature, but vfio never gets the unmask notification, so the
->>> device remains with DisINTx set and no further interrupts are
->>> generated.  Do we expect KVM's IRQFD with resampler to work in the
->>> split IRQ mode?  We can certainly hope that "high performance" devices
->>> use MSI or MSI/X, but this would be quite a performance regression with
->>> split mode if our userspace bypass for INTx goes away.  Thanks,
->>
->> arch/x86/kvm/lapic.c:kvm_ioapic_send_eoi() dumps to userspace before
->> kvm_ioapic_update_eoi() can handle the irq_ack_notifier_list via
->> kvm_notify_acked_gsi(),
-> 
-> That wouldn't help because kvm_ioapic_update_eoi would not even be
-> able to access vcpu->kvm->arch.vioapic (it's NULL).
-> 
-> The following untested patch would signal the resamplefd in kvm_ioapic_send_eoi,
-> before requesting the exit to userspace.  However I am not sure how QEMU
-> sets up the VFIO eventfds: if I understand correctly, when VFIO writes again to
-> the irq eventfd, the interrupt request would not reach the userspace IOAPIC, but
-> only the in-kernel LAPIC.  That would be incorrect, and if my understanding is
-> correct we need to trigger resampling from hw/intc/ioapic.c.
+This patch adds the support of preallocation (off/full) for the RBD
+block driver.
+If available, we use rbd_writesame() to quickly fill the image when
+full preallocation is required.
 
-Actually it's worse: because you're bypassing IOAPIC when raising the
-irq, the IOAPIC's remote_irr for example will not be set.  So split
-irqchip currently must disable the intx fast path completely.
+Signed-off-by: Stefano Garzarella <sgarzare@redhat.com>
+---
+ block/rbd.c          | 149 ++++++++++++++++++++++++++++++++++++++-----
+ qapi/block-core.json |   4 +-
+ 2 files changed, 136 insertions(+), 17 deletions(-)
 
-I guess we could also reimplement irqfd and resamplefd in the userspace
-IOAPIC, and run the listener in a separate thread (using "-object
-iothread" on the command line and AioContext in the code).
-
-Paolo
-
-> 
-> Something like:
-> 
-> 1) VFIO uses kvm_irqchip_add_irqfd_notifier_gsi instead of KVM_IRQFD directly
-> 
-> 2) add a NotifierList in kvm_irqchip_assign_irqfd
-> 
-> 3) if kvm_irqchip_is_split(), register a corresponding Notifier in ioapic.c which
-> stores the resamplefd as an EventNotifier*
-> 
-> 4) ioapic_eoi_broadcast writes to the resamplefd
-> 
-> BTW, how do non-x86 platforms handle intx resampling?
-> 
-> Paolo
-> 
-> ---- 8< -----
-> From: Paolo Bonzini <pbonzini@redhat.com>
-> Subject: [PATCH WIP] kvm: lapic: run ack notifiers for userspace IOAPIC routes
-> 
-> diff --git a/arch/x86/kvm/ioapic.h b/arch/x86/kvm/ioapic.h
-> index ea1a4e0297da..be337e06e3fd 100644
-> --- a/arch/x86/kvm/ioapic.h
-> +++ b/arch/x86/kvm/ioapic.h
-> @@ -135,4 +135,6 @@ void kvm_ioapic_scan_entry(struct kvm_vcpu *vcpu,
->  			   ulong *ioapic_handled_vectors);
->  void kvm_scan_ioapic_routes(struct kvm_vcpu *vcpu,
->  			    ulong *ioapic_handled_vectors);
-> +void kvm_notify_userspace_ioapic_routes(struct kvm *kvm, int vector);
-> +
->  #endif
-> diff --git a/arch/x86/kvm/irq_comm.c b/arch/x86/kvm/irq_comm.c
-> index 3cc3b2d130a0..46ea79a0dd8a 100644
-> --- a/arch/x86/kvm/irq_comm.c
-> +++ b/arch/x86/kvm/irq_comm.c
-> @@ -435,6 +435,34 @@ void kvm_scan_ioapic_routes(struct kvm_vcpu *vcpu,
->  	srcu_read_unlock(&kvm->irq_srcu, idx);
->  }
->  
-> +void kvm_notify_userspace_ioapic_routes(struct kvm *kvm, int vector)
-> +{
-> +        struct kvm_kernel_irq_routing_entry *entry;
-> +        struct kvm_irq_routing_table *table;
-> +        u32 i, nr_ioapic_pins;
-> +        int idx;
-> +
-> +        idx = srcu_read_lock(&kvm->irq_srcu);
-> +        table = srcu_dereference(kvm->irq_routing, &kvm->irq_srcu);
-> +        nr_ioapic_pins = min_t(u32, table->nr_rt_entries,
-> +                               kvm->arch.nr_reserved_ioapic_pins);
-> +
-> +	for (i = 0; i < nr_ioapic_pins; i++) {
-> +                hlist_for_each_entry(entry, &table->map[i], link) {
-> +                        struct kvm_lapic_irq irq;
-> +
-> +                        if (entry->type != KVM_IRQ_ROUTING_MSI)
-> +                                continue;
-> +
-> +			kvm_set_msi_irq(kvm, entry, &irq);
-> +			if (irq.level && irq.vector == vector)
-> +				kvm_notify_acked_gsi(kvm, i);
-> +		}
-> +	}
-> +
-> +	srcu_read_unlock(&kvm->irq_srcu, idx);
-> +}
-> +
->  void kvm_arch_irq_routing_update(struct kvm *kvm)
->  {
->  	kvm_hv_irq_routing_update(kvm);
-> diff --git a/arch/x86/kvm/lapic.c b/arch/x86/kvm/lapic.c
-> index 9f089e2e09d0..8f8e76d77925 100644
-> --- a/arch/x86/kvm/lapic.c
-> +++ b/arch/x86/kvm/lapic.c
-> @@ -1142,6 +1142,7 @@ static bool kvm_ioapic_handles_vector(struct kvm_lapic *apic, int vector)
->  
->  static void kvm_ioapic_send_eoi(struct kvm_lapic *apic, int vector)
->  {
-> +	struct kvm_vcpu *vcpu = apic->vcpu;
->  	int trigger_mode;
->  
->  	/* Eoi the ioapic only if the ioapic doesn't own the vector. */
-> @@ -1149,9 +1150,10 @@ static void kvm_ioapic_send_eoi(struct kvm_lapic *apic, int vector)
->  		return;
->  
->  	/* Request a KVM exit to inform the userspace IOAPIC. */
-> -	if (irqchip_split(apic->vcpu->kvm)) {
-> -		apic->vcpu->arch.pending_ioapic_eoi = vector;
-> -		kvm_make_request(KVM_REQ_IOAPIC_EOI_EXIT, apic->vcpu);
-> +	if (irqchip_split(vcpu->kvm)) {
-> +		kvm_notify_userspace_ioapic_routes(vcpu->kvm, vector);
-> +		vcpu->arch.pending_ioapic_eoi = vector;
-> +		kvm_make_request(KVM_REQ_IOAPIC_EOI_EXIT, vcpu);
->  		return;
->  	}
->  
-> @@ -1160,7 +1162,7 @@ static void kvm_ioapic_send_eoi(struct kvm_lapic *apic, int vector)
->  	else
->  		trigger_mode = IOAPIC_EDGE_TRIG;
->  
-> -	kvm_ioapic_update_eoi(apic->vcpu, vector, trigger_mode);
-> +	kvm_ioapic_update_eoi(vcpu, vector, trigger_mode);
->  }
->  
->  static int apic_set_eoi(struct kvm_lapic *apic)
-> 
-> 
->> so it looks like KVM really ought to return an
->> error when trying to register a resample IRQFD when irqchip_split(),
->> but do we have better options?  EOI handling in QEMU is pretty much
->> non-existent and even if it was in place, it's a big performance
->> regression for vfio INTx handling.  Is a split irqchip that retains
->> performant resampling (EOI) support possible?  Thanks,
+diff --git a/block/rbd.c b/block/rbd.c
+index 0c549c9935..29dd1bb040 100644
+--- a/block/rbd.c
++++ b/block/rbd.c
+@@ -13,6 +13,7 @@
+=20
+ #include "qemu/osdep.h"
+=20
++#include "qemu/units.h"
+ #include <rbd/librbd.h>
+ #include "qapi/error.h"
+ #include "qemu/error-report.h"
+@@ -331,6 +332,110 @@ static void qemu_rbd_memset(RADOSCB *rcb, int64_t o=
+ffs)
+     }
+ }
+=20
++static int qemu_rbd_do_truncate(rbd_image_t image, int64_t offset,
++                                PreallocMode prealloc, Error **errp)
++{
++    uint64_t current_length;
++    char *buf =3D NULL;
++    int ret;
++
++    ret =3D rbd_get_size(image, &current_length);
++    if (ret < 0) {
++        error_setg_errno(errp, -ret, "Failed to get file length");
++        goto out;
++    }
++
++    if (current_length > offset && prealloc !=3D PREALLOC_MODE_OFF) {
++        error_setg(errp, "Cannot use preallocation for shrinking files")=
+;
++        ret =3D -ENOTSUP;
++        goto out;
++    }
++
++    switch (prealloc) {
++    case PREALLOC_MODE_FULL: {
++        uint64_t current_offset =3D current_length;
++        int buf_size =3D 64 * KiB;
++        ssize_t bytes;
++
++        buf =3D g_malloc(buf_size);
++        /*
++         * Some versions of rbd_writesame() discards writes of buffers w=
+ith
++         * all zeroes. In order to avoid this behaviour, we set the firs=
+t byte
++         * to one.
++         */
++        buf[0] =3D 1;
++
++        ret =3D rbd_resize(image, offset);
++        if (ret < 0) {
++            error_setg_errno(errp, -ret, "Failed to resize file");
++            goto out;
++        }
++
++#ifdef LIBRBD_SUPPORTS_WRITESAME
++        while (offset - current_offset > buf_size) {
++            /*
++             * rbd_writesame() supports only request where the size of t=
+he
++             * operation is multiple of buffer size and it must be less =
+or
++             * equal to INT_MAX.
++             */
++            bytes =3D MIN(offset - current_offset, INT_MAX);
++            bytes -=3D bytes % buf_size;
++
++            bytes =3D rbd_writesame(image, current_offset, bytes, buf, b=
+uf_size,
++                                  0);
++            if (bytes < 0) {
++                ret =3D bytes;
++                error_setg_errno(errp, -ret,
++                                 "Failed to write for preallocation");
++                goto out;
++            }
++
++            current_offset +=3D bytes;
++        }
++#endif /* LIBRBD_SUPPORTS_WRITESAME */
++
++        while (current_offset < offset) {
++            bytes =3D rbd_write(image, current_offset,
++                              MIN(offset - current_offset, buf_size), bu=
+f);
++            if (bytes < 0) {
++                ret =3D bytes;
++                error_setg_errno(errp, -ret,
++                                 "Failed to write for preallocation");
++                goto out;
++            }
++
++            current_offset +=3D bytes;
++        }
++
++        ret =3D rbd_flush(image);
++        if (ret < 0) {
++            error_setg_errno(errp, -ret, "Failed to flush the file");
++            goto out;
++        }
++
++        break;
++    }
++    case PREALLOC_MODE_OFF:
++        ret =3D rbd_resize(image, offset);
++        if (ret < 0) {
++            error_setg_errno(errp, -ret, "Failed to resize file");
++            goto out;
++        }
++        break;
++    default:
++        error_setg(errp, "Unsupported preallocation mode: %s",
++                   PreallocMode_str(prealloc));
++        ret =3D -ENOTSUP;
++        goto out;
++    }
++
++    ret =3D 0;
++
++out:
++    g_free(buf);
++    return ret;
++}
++
+ static QemuOptsList runtime_opts =3D {
+     .name =3D "rbd",
+     .head =3D QTAILQ_HEAD_INITIALIZER(runtime_opts.head),
+@@ -376,6 +481,7 @@ static int qemu_rbd_do_create(BlockdevCreateOptions *=
+options,
+     BlockdevCreateOptionsRbd *opts =3D &options->u.rbd;
+     rados_t cluster;
+     rados_ioctx_t io_ctx;
++    rbd_image_t image;
+     int obj_order =3D 0;
+     int ret;
+=20
+@@ -404,13 +510,21 @@ static int qemu_rbd_do_create(BlockdevCreateOptions=
+ *options,
+         return ret;
+     }
+=20
+-    ret =3D rbd_create(io_ctx, opts->location->image, opts->size, &obj_o=
+rder);
++    ret =3D rbd_create(io_ctx, opts->location->image, 0, &obj_order);
+     if (ret < 0) {
+         error_setg_errno(errp, -ret, "error rbd create");
+         goto out;
+     }
+=20
+-    ret =3D 0;
++    ret =3D rbd_open(io_ctx, opts->location->image, &image, NULL);
++    if (ret < 0) {
++        error_setg_errno(errp, -ret, "error rbd open");
++        goto out;
++    }
++
++    ret =3D qemu_rbd_do_truncate(image, opts->size, opts->preallocation,=
+ errp);
++
++    rbd_close(image);
+ out:
+     rados_ioctx_destroy(io_ctx);
+     rados_shutdown(cluster);
+@@ -431,6 +545,7 @@ static int coroutine_fn qemu_rbd_co_create_opts(const=
+ char *filename,
+     BlockdevOptionsRbd *loc;
+     Error *local_err =3D NULL;
+     const char *keypairs, *password_secret;
++    char *prealloc;
+     QDict *options =3D NULL;
+     int ret =3D 0;
+=20
+@@ -449,6 +564,16 @@ static int coroutine_fn qemu_rbd_co_create_opts(cons=
+t char *filename,
+                                                    BLOCK_OPT_CLUSTER_SIZ=
+E, 0);
+     rbd_opts->has_cluster_size =3D (rbd_opts->cluster_size !=3D 0);
+=20
++    prealloc =3D qemu_opt_get_del(opts, BLOCK_OPT_PREALLOC);
++    rbd_opts->preallocation =3D qapi_enum_parse(&PreallocMode_lookup, pr=
+ealloc,
++                                              PREALLOC_MODE_OFF, &local_=
+err);
++    g_free(prealloc);
++    if (local_err) {
++        ret =3D -EINVAL;
++        error_propagate(errp, local_err);
++        goto exit;
++    }
++
+     options =3D qdict_new();
+     qemu_rbd_parse_filename(filename, options, &local_err);
+     if (local_err) {
+@@ -1052,21 +1177,8 @@ static int coroutine_fn qemu_rbd_co_truncate(Block=
+DriverState *bs,
+                                              Error **errp)
+ {
+     BDRVRBDState *s =3D bs->opaque;
+-    int r;
+-
+-    if (prealloc !=3D PREALLOC_MODE_OFF) {
+-        error_setg(errp, "Unsupported preallocation mode '%s'",
+-                   PreallocMode_str(prealloc));
+-        return -ENOTSUP;
+-    }
+-
+-    r =3D rbd_resize(s->image, offset);
+-    if (r < 0) {
+-        error_setg_errno(errp, -r, "Failed to resize file");
+-        return r;
+-    }
+=20
+-    return 0;
++    return qemu_rbd_do_truncate(s->image, offset, prealloc, errp);
+ }
+=20
+ static int qemu_rbd_snap_create(BlockDriverState *bs,
+@@ -1219,6 +1331,11 @@ static QemuOptsList qemu_rbd_create_opts =3D {
+             .type =3D QEMU_OPT_SIZE,
+             .help =3D "RBD object size"
+         },
++        {
++            .name =3D BLOCK_OPT_PREALLOC,
++            .type =3D QEMU_OPT_STRING,
++            .help =3D "Preallocation mode (allowed values: off, full)"
++        },
+         {
+             .name =3D "password-secret",
+             .type =3D QEMU_OPT_STRING,
+diff --git a/qapi/block-core.json b/qapi/block-core.json
+index 7ccbfff9d0..db25a4065b 100644
+--- a/qapi/block-core.json
++++ b/qapi/block-core.json
+@@ -4277,13 +4277,15 @@
+ #                   point to a snapshot.
+ # @size             Size of the virtual disk in bytes
+ # @cluster-size     RBD object size
++# @preallocation    Preallocation mode (allowed values: off, full)
+ #
+ # Since: 2.12
+ ##
+ { 'struct': 'BlockdevCreateOptionsRbd',
+   'data': { 'location':         'BlockdevOptionsRbd',
+             'size':             'size',
+-            '*cluster-size' :   'size' } }
++            '*cluster-size' :   'size',
++            '*preallocation':   'PreallocMode' } }
+=20
+ ##
+ # @BlockdevVmdkSubformat:
+--=20
+2.20.1
