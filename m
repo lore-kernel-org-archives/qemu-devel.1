@@ -1,26 +1,26 @@
-Received: from eggs.gnu.org ([209.51.188.92]:54779)
+Received: from eggs.gnu.org ([209.51.188.92]:55389)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mlureau@redhat.com>) id 1hKPZt-0004cl-Sd
-	for qemu-devel@nongnu.org; Sat, 27 Apr 2019 11:49:26 -0400
+	(envelope-from <no-reply@patchew.org>) id 1hKPd3-0006QS-3Z
+	for qemu-devel@nongnu.org; Sat, 27 Apr 2019 11:52:42 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mlureau@redhat.com>) id 1hKPZs-0005TF-KM
-	for qemu-devel@nongnu.org; Sat, 27 Apr 2019 11:49:25 -0400
-Received: from mail-oi1-f194.google.com ([209.85.167.194]:42409)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <mlureau@redhat.com>) id 1hKPZq-0005Ow-NC
-	for qemu-devel@nongnu.org; Sat, 27 Apr 2019 11:49:24 -0400
-Received: by mail-oi1-f194.google.com with SMTP id k9so2251794oig.9
-	for <qemu-devel@nongnu.org>; Sat, 27 Apr 2019 08:49:19 -0700 (PDT)
+	(envelope-from <no-reply@patchew.org>) id 1hKPd1-0007dl-PJ
+	for qemu-devel@nongnu.org; Sat, 27 Apr 2019 11:52:41 -0400
+Resent-Message-Id: <E1hKPd1-0007dl-PJ@eggs.gnu.org>
+Received: from sender4-of-o55.zoho.com ([136.143.188.55]:21582)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
+	id 1hKPd1-0007cx-Hi
+	for qemu-devel@nongnu.org; Sat, 27 Apr 2019 11:52:39 -0400
+In-Reply-To: <20190427153031.5119-1-samuel.thibault@ens-lyon.org>
+Message-ID: <155638031671.10667.7688967011446219214@c2072b67cc0c>
+Reply-To: <qemu-devel@nongnu.org>
 MIME-Version: 1.0
-References: <20190427131857.11600-1-philmd@redhat.com>
-In-Reply-To: <20190427131857.11600-1-philmd@redhat.com>
-From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@redhat.com>
-Date: Sat, 27 Apr 2019 17:49:07 +0200
-Message-ID: <CAMxuvayZ-woUZPxnav8EXSVGGADxeJjhDs1bgzPAzNLMGFgTsA@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH] hw/tpm: Only build tpm_ppi.o if any of
- TPM_TIS/TPM_CRB is built
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+From: no-reply@patchew.org
+Date: Sat, 27 Apr 2019 08:51:58 -0700 (PDT)
+Subject: Re: [Qemu-devel] [PATCH] curses: Do not assume wchar_t contains
+ unicode
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,44 +29,25 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>
-Cc: qemu-devel <qemu-devel@nongnu.org>, Stefan Berger <stefanb@linux.ibm.com>
+To: samuel.thibault@ens-lyon.org
+Cc: fam@euphon.net, qemu-devel@nongnu.org, kamil@netbsd.org, kraxel@redhat.com
 
-Hi
-
-On Sat, Apr 27, 2019 at 3:19 PM Philippe Mathieu-Daud=C3=A9
-<philmd@redhat.com> wrote:
->
-> The TPM Physical Presence Interface routines are only used
-> by the CRB/TIS interfaces. Do not compile this file if any
-> of them is built.
->
-> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
-
-Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
-
-> ---
-> Marc-Andr=C3=A9:
->   You might want to add yourself as reviewer/maintainer of TPM ;)
-
-yes, I suppose Stefan wouldn't mind having me as R: :)
-
-> ---
->  hw/tpm/Makefile.objs | 4 ++--
->  1 file changed, 2 insertions(+), 2 deletions(-)
->
-> diff --git a/hw/tpm/Makefile.objs b/hw/tpm/Makefile.objs
-> index 700c8786228..de0b85d02ae 100644
-> --- a/hw/tpm/Makefile.objs
-> +++ b/hw/tpm/Makefile.objs
-> @@ -1,5 +1,5 @@
-> -common-obj-y +=3D tpm_util.o
-> -obj-y +=3D tpm_ppi.o
-> +common-obj-$(CONFIG_TPM) +=3D tpm_util.o
-> +obj-$(call lor,$(CONFIG_TPM_TIS),$(CONFIG_TPM_CRB)) +=3D tpm_ppi.o
->  common-obj-$(CONFIG_TPM_TIS) +=3D tpm_tis.o
->  common-obj-$(CONFIG_TPM_CRB) +=3D tpm_crb.o
->  common-obj-$(CONFIG_TPM_PASSTHROUGH) +=3D tpm_passthrough.o
-> --
-> 2.20.1
->
+UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDE5MDQyNzE1MzAzMS41MTE5
+LTEtc2FtdWVsLnRoaWJhdWx0QGVucy1seW9uLm9yZy8KCgoKSGksCgpUaGlzIHNlcmllcyBmYWls
+ZWQgdGhlIGFzYW4gYnVpbGQgdGVzdC4gUGxlYXNlIGZpbmQgdGhlIHRlc3RpbmcgY29tbWFuZHMg
+YW5kCnRoZWlyIG91dHB1dCBiZWxvdy4gSWYgeW91IGhhdmUgRG9ja2VyIGluc3RhbGxlZCwgeW91
+IGNhbiBwcm9iYWJseSByZXByb2R1Y2UgaXQKbG9jYWxseS4KCj09PSBURVNUIFNDUklQVCBCRUdJ
+TiA9PT0KIyEvYmluL2Jhc2gKdGltZSBtYWtlIGRvY2tlci10ZXN0LWRlYnVnQGZlZG9yYSBUQVJH
+RVRfTElTVD14ODZfNjQtc29mdG1tdSBKPTE0IE5FVFdPUks9MQo9PT0gVEVTVCBTQ1JJUFQgRU5E
+ID09PQoKICBBUyAgICAgIG9wdGlvbnJvbS9saW51eGJvb3QubwogIEFTICAgICAgb3B0aW9ucm9t
+L2t2bXZhcGljLm8KICBBUyAgICAgIG9wdGlvbnJvbS9wdmgubwovdG1wL3FlbXUtdGVzdC9zcmMv
+dWkvY3Vyc2VzLmM6NDgyOjI1OiBlcnJvcjogdmFyaWFibGUgJ3VjaCcgaXMgdW5pbml0aWFsaXpl
+ZCB3aGVuIHVzZWQgaGVyZSBbLVdlcnJvciwtV3VuaW5pdGlhbGl6ZWRdCiAgICAgICAgICAgICAg
+ICAgICAgICAgIHVjaCwgc3RyZXJyb3IoZXJybm8pKTsKICAgICAgICAgICAgICAgICAgICAgICAg
+Xn5+Ci90bXAvcWVtdS10ZXN0L3NyYy91aS9jdXJzZXMuYzo0NzM6MTc6IG5vdGU6IGluaXRpYWxp
+emUgdGhlIHZhcmlhYmxlICd1Y2gnIHRvIHNpbGVuY2UgdGhpcyB3YXJuaW5nCgoKVGhlIGZ1bGwg
+bG9nIGlzIGF2YWlsYWJsZSBhdApodHRwOi8vcGF0Y2hldy5vcmcvbG9ncy8yMDE5MDQyNzE1MzAz
+MS41MTE5LTEtc2FtdWVsLnRoaWJhdWx0QGVucy1seW9uLm9yZy90ZXN0aW5nLmFzYW4vP3R5cGU9
+bWVzc2FnZS4KLS0tCkVtYWlsIGdlbmVyYXRlZCBhdXRvbWF0aWNhbGx5IGJ5IFBhdGNoZXcgW2h0
+dHBzOi8vcGF0Y2hldy5vcmcvXS4KUGxlYXNlIHNlbmQgeW91ciBmZWVkYmFjayB0byBwYXRjaGV3
+LWRldmVsQHJlZGhhdC5jb20=
