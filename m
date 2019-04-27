@@ -1,17 +1,26 @@
-Received: from eggs.gnu.org ([209.51.188.92]:54049)
+Received: from eggs.gnu.org ([209.51.188.92]:54779)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1hKPWN-0003ZZ-6U
-	for qemu-devel@nongnu.org; Sat, 27 Apr 2019 11:45:48 -0400
+	(envelope-from <mlureau@redhat.com>) id 1hKPZt-0004cl-Sd
+	for qemu-devel@nongnu.org; Sat, 27 Apr 2019 11:49:26 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1hKPWL-0002QL-VQ
-	for qemu-devel@nongnu.org; Sat, 27 Apr 2019 11:45:46 -0400
-From: Thomas Huth <thuth@redhat.com>
-Date: Sat, 27 Apr 2019 17:45:39 +0200
-Message-Id: <20190427154539.11336-1-thuth@redhat.com>
+	(envelope-from <mlureau@redhat.com>) id 1hKPZs-0005TF-KM
+	for qemu-devel@nongnu.org; Sat, 27 Apr 2019 11:49:25 -0400
+Received: from mail-oi1-f194.google.com ([209.85.167.194]:42409)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <mlureau@redhat.com>) id 1hKPZq-0005Ow-NC
+	for qemu-devel@nongnu.org; Sat, 27 Apr 2019 11:49:24 -0400
+Received: by mail-oi1-f194.google.com with SMTP id k9so2251794oig.9
+	for <qemu-devel@nongnu.org>; Sat, 27 Apr 2019 08:49:19 -0700 (PDT)
 MIME-Version: 1.0
+References: <20190427131857.11600-1-philmd@redhat.com>
+In-Reply-To: <20190427131857.11600-1-philmd@redhat.com>
+From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@redhat.com>
+Date: Sat, 27 Apr 2019 17:49:07 +0200
+Message-ID: <CAMxuvayZ-woUZPxnav8EXSVGGADxeJjhDs1bgzPAzNLMGFgTsA@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH] configure: Add -Wno-typedef-redefinition to
- CFLAGS (for Clang)
+Subject: Re: [Qemu-devel] [PATCH] hw/tpm: Only build tpm_ppi.o if any of
+ TPM_TIS/TPM_CRB is built
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -20,46 +29,44 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Richard Henderson <rth@twiddle.net>, qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>
-Cc: qemu-trivial@nongnu.org
+To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>
+Cc: qemu-devel <qemu-devel@nongnu.org>, Stefan Berger <stefanb@linux.ibm.com>
 
-Without the -Wno-typedef-redefinition option, clang complains if a typede=
-f
-gets redefined in gnu99 mode (since this is officially a C11 feature). Th=
-is
-used to also happen with older versions of GCC, but since we've bumped ou=
-r
-minimum GCC version to 4.8, all versions of GCC that we support do not se=
-em
-to issue this warning in gnu99 mode anymore. So this has become a common
-problem for people who only test their code with GCC - they do not notice
-the issue until they submit their patches and suddenly patchew or a
-maintainer complains.
+Hi
 
-Now that we do not urgently need to keep the code clean from typedef
-redefintions anymore with recent versions of GCC, we can ease the
-situation with clang, too, and simply shut these warnings off for good.
+On Sat, Apr 27, 2019 at 3:19 PM Philippe Mathieu-Daud=C3=A9
+<philmd@redhat.com> wrote:
+>
+> The TPM Physical Presence Interface routines are only used
+> by the CRB/TIS interfaces. Do not compile this file if any
+> of them is built.
+>
+> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
 
-Signed-off-by: Thomas Huth <thuth@redhat.com>
----
- configure | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 
-diff --git a/configure b/configure
-index 2cc365be51..8e15dc9870 100755
---- a/configure
-+++ b/configure
-@@ -1917,7 +1917,7 @@ gcc_flags=3D"-Wformat-security -Wformat-y2k -Winit-=
-self -Wignored-qualifiers $gcc_
- gcc_flags=3D"-Wno-missing-include-dirs -Wempty-body -Wnested-externs $gc=
-c_flags"
- gcc_flags=3D"-Wendif-labels -Wno-shift-negative-value $gcc_flags"
- gcc_flags=3D"-Wno-initializer-overrides -Wexpansion-to-defined $gcc_flag=
-s"
--gcc_flags=3D"-Wno-string-plus-int $gcc_flags"
-+gcc_flags=3D"-Wno-string-plus-int -Wno-typedef-redefinition $gcc_flags"
- # Note that we do not add -Werror to gcc_flags here, because that would
- # enable it for all configure tests. If a configure test failed due
- # to -Werror this would just silently disable some features,
---=20
-2.21.0
+> ---
+> Marc-Andr=C3=A9:
+>   You might want to add yourself as reviewer/maintainer of TPM ;)
+
+yes, I suppose Stefan wouldn't mind having me as R: :)
+
+> ---
+>  hw/tpm/Makefile.objs | 4 ++--
+>  1 file changed, 2 insertions(+), 2 deletions(-)
+>
+> diff --git a/hw/tpm/Makefile.objs b/hw/tpm/Makefile.objs
+> index 700c8786228..de0b85d02ae 100644
+> --- a/hw/tpm/Makefile.objs
+> +++ b/hw/tpm/Makefile.objs
+> @@ -1,5 +1,5 @@
+> -common-obj-y +=3D tpm_util.o
+> -obj-y +=3D tpm_ppi.o
+> +common-obj-$(CONFIG_TPM) +=3D tpm_util.o
+> +obj-$(call lor,$(CONFIG_TPM_TIS),$(CONFIG_TPM_CRB)) +=3D tpm_ppi.o
+>  common-obj-$(CONFIG_TPM_TIS) +=3D tpm_tis.o
+>  common-obj-$(CONFIG_TPM_CRB) +=3D tpm_crb.o
+>  common-obj-$(CONFIG_TPM_PASSTHROUGH) +=3D tpm_passthrough.o
+> --
+> 2.20.1
+>
