@@ -2,88 +2,64 @@ Return-Path: <SRS0=rME2=S5=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.7 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-8.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B04DFC43219
-	for <qemu-devel@archiver.kernel.org>; Sat, 27 Apr 2019 16:40:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 97E3FC43218
+	for <qemu-devel@archiver.kernel.org>; Sat, 27 Apr 2019 16:40:23 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7921F2077B
-	for <qemu-devel@archiver.kernel.org>; Sat, 27 Apr 2019 16:40:09 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="fzYMbmKj"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7921F2077B
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=amsat.org
+	by mail.kernel.org (Postfix) with ESMTPS id 6C6C82077B
+	for <qemu-devel@archiver.kernel.org>; Sat, 27 Apr 2019 16:40:23 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6C6C82077B
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=ens-lyon.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:34062 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:34064 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hKQMy-0002nd-Gg
-	for qemu-devel@archiver.kernel.org; Sat, 27 Apr 2019 12:40:08 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:33815)
+	id 1hKQNC-0002yZ-Ha
+	for qemu-devel@archiver.kernel.org; Sat, 27 Apr 2019 12:40:22 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:33736)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1hKQKj-0001Ae-W9
-	for qemu-devel@nongnu.org; Sat, 27 Apr 2019 12:37:51 -0400
+	(envelope-from <samuel.thibault@ens-lyon.org>) id 1hKQKi-00017g-56
+	for qemu-devel@nongnu.org; Sat, 27 Apr 2019 12:37:49 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1hKQCk-0002Zn-6A
-	for qemu-devel@nongnu.org; Sat, 27 Apr 2019 12:29:35 -0400
-Received: from mail-wr1-x444.google.com ([2a00:1450:4864:20::444]:34915)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1hKQCg-0002DN-Fw; Sat, 27 Apr 2019 12:29:32 -0400
-Received: by mail-wr1-x444.google.com with SMTP id f7so401194wrs.2;
-	Sat, 27 Apr 2019 09:29:24 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
-	h=sender:from:to:cc:subject:date:message-id:mime-version
-	:content-transfer-encoding;
-	bh=cM53TFy+cLxuAVp+u99gBNQH0UQPiHbTPlBKpdnp7e8=;
-	b=fzYMbmKjZa8mj9y7ezoteOVuh8SiF2cXtkvEtoccGxHAtWOBpIoPWccHqXIkZ4m/hX
-	+XWhw9WeAR+YW52m60qHR9JKLIieOvhRhvs+XhZQH48ZZ7LEsTBD4R0m2+ThT6SIdeHM
-	o7Mnl+gsQ7EvoKiFYL2rSYWVCmld7GW7b7nVJRMs+rp9CTsBqTIBloO8WPAVy8U5PgAX
-	sOeaiprh1VeeW+rN792bCp8hfQvqdBdrECnClvZ171KoxcZTfXJFMZ5khA02+UuFMOrb
-	gFZqP+RpK99SbukXkqrEwjHgwSqtm0O6zLtidRKO+SU2wMps+OSweRQC3+AEqPaMq+G8
-	gcjA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=1e100.net; s=20161025;
-	h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
-	:mime-version:content-transfer-encoding;
-	bh=cM53TFy+cLxuAVp+u99gBNQH0UQPiHbTPlBKpdnp7e8=;
-	b=Y7xOEP8tx5/CbnALxTOFXCUINuodFrgnH17VI7KK39I1REbAG9K5AZ6Zle1joprhxF
-	/2gyoaEy+VKUXKu9V/BQ4dQNDfXcBwMFgGwkfa8k0U6oyJhffrGB8ItBRuWoU7PYFLjl
-	Ops4IPs+nbBKi1OD300qVn0Lm28DVzSRii5xXedo0i0gpsXN9t9WhXkxXNn024zOu/pT
-	OYuvO+0WA5NAiI2Ld04cP3m4UzJZYjacM7KvrG7BjJgxi4fZwBSzzZm59KlO35JyY1e6
-	ffLnaBfUi9SmjP6s6UL3VqBZV5aOYP8Ygg/qp6yRox3IvjT940rKi6xJwps2+33rojn4
-	ocGA==
-X-Gm-Message-State: APjAAAVHx2rTUcPSSPEG0QYlK9gQHqCbemoVkMyp2pD1SD1c3Ctg5rwc
-	961TYMfupZCmQ+aeh9MAdyLoZqftGQg=
-X-Google-Smtp-Source: APXvYqzHSQerxUooMq92BVnN+0DIwngNkW7/wCnuHXmE1nEIJC98tzGCvkLnqbfHu9itmhv5KHcxVA==
-X-Received: by 2002:adf:edc8:: with SMTP id v8mr4588408wro.206.1556382563905; 
-	Sat, 27 Apr 2019 09:29:23 -0700 (PDT)
-Received: from x1.local (193.red-88-21-103.staticip.rima-tde.net.
-	[88.21.103.193]) by smtp.gmail.com with ESMTPSA id
-	s12sm24733986wmj.42.2019.04.27.09.29.22
-	(version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-	Sat, 27 Apr 2019 09:29:23 -0700 (PDT)
-From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
-To: qemu-trivial@nongnu.org,
-	qemu-devel@nongnu.org
-Date: Sat, 27 Apr 2019 18:29:21 +0200
-Message-Id: <20190427162922.4207-1-f4bug@amsat.org>
-X-Mailer: git-send-email 2.19.1
+	(envelope-from <samuel.thibault@ens-lyon.org>) id 1hKQDZ-0004zV-8k
+	for qemu-devel@nongnu.org; Sat, 27 Apr 2019 12:30:27 -0400
+Received: from hera.aquilenet.fr ([2a0c:e300::1]:47166)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <samuel.thibault@ens-lyon.org>)
+	id 1hKQDT-0004U7-IV
+	for qemu-devel@nongnu.org; Sat, 27 Apr 2019 12:30:23 -0400
+Received: from localhost (localhost [127.0.0.1])
+	by hera.aquilenet.fr (Postfix) with ESMTP id 253FB3D9F;
+	Sat, 27 Apr 2019 18:30:13 +0200 (CEST)
+X-Virus-Scanned: Debian amavisd-new at aquilenet.fr
+Received: from hera.aquilenet.fr ([127.0.0.1])
+	by localhost (hera.aquilenet.fr [127.0.0.1]) (amavisd-new, port 10024)
+	with ESMTP id v7LqIpfBdojU; Sat, 27 Apr 2019 18:30:12 +0200 (CEST)
+Received: from function (105.251.129.77.rev.sfr.net [77.129.251.105])
+	by hera.aquilenet.fr (Postfix) with ESMTPSA id 073863DA4;
+	Sat, 27 Apr 2019 18:30:10 +0200 (CEST)
+Received: from samy by function with local (Exim 4.92)
+	(envelope-from <samuel.thibault@ens-lyon.org>)
+	id 1hKQDI-0001LK-Pc; Sat, 27 Apr 2019 18:30:08 +0200
+From: Samuel Thibault <samuel.thibault@ens-lyon.org>
+To: qemu-devel@nongnu.org
+Date: Sat, 27 Apr 2019 18:30:07 +0200
+Message-Id: <20190427163007.5113-4-samuel.thibault@ens-lyon.org>
+X-Mailer: git-send-email 2.20.1
+In-Reply-To: <20190427163007.5113-1-samuel.thibault@ens-lyon.org>
+References: <20190427163007.5113-1-samuel.thibault@ens-lyon.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 8bit
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
 	recognized.
-X-Received-From: 2a00:1450:4864:20::444
-Subject: [Qemu-devel] [PATCH v2] hw/sparc/leon3: Allow load of uImage
- firmwares
+X-Received-From: 2a0c:e300::1
+Subject: [Qemu-devel] [PATCHv3 2/2] ui/curses: manipulate cchar_t with
+ standard curses functions
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -95,72 +71,134 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>,
-	=?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>,
-	Fabien Chouteau <chouteau@adacore.com>,
-	KONRAD Frederic <frederic.konrad@adacore.com>,
-	Stefan Hajnoczi <stefanha@redhat.com>,
-	Artyom Tarasenko <atar4qemu@gmail.com>
+Cc: Samuel Thibault <samuel.thibault@ens-lyon.org>, kamil@netbsd.org,
+	kraxel@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190427162921.a3L5Tu3bwsjgLWURZlOOCcKFH8uWZsKswaFFZ5EFoBs@z>
+Content-Type: text/plain; charset="UTF-8"
+Message-ID: <20190427163007.i8wksasq83k2pAuD-Td0sM273MR9XdEpML2jSpcUEH0@z>
 
-Currently the Leon3 machine doesn't allow to load legacy u-boot images:
+The chars/attr fields are curses internals, setcchar and getcchar have
+to be used instead.
 
-  $ qemu-system-sparc -M leon3_generic -d in_asm \
-      -kernel HelenOS-0.6.0-sparc32-leon3.bin
-  qemu-system-sparc: could not load kernel 'HelenOS-0.6.0-sparc32-leon3.bin'
-
-  $ file HelenOS-0.6.0-sparc32-leon3.bin
-  HelenOS-0.6.0-sparc32-leon3.bin: u-boot legacy uImage, HelenOS-0.6.0,\
-    Linux/ARM, OS Kernel Image (Not compressed), 2424229 bytes,\
-    Sun Dec 21 19:18:09 2014,\
-    Load Address: 0x40000000, Entry Point: 0x40000000,\
-    Header CRC: 0x8BCFA236, Data CRC: 0x37AD87DF
-
-Since QEMU can load uImages, add the necessary code,
-so the Leon3 machine can load these images:
-
-  $ qemu-system-sparc -M leon3_generic -d in_asm \
-      -kernel HelenOS-0.6.0-sparc32-leon3.bin
-  ----------------
-  IN:
-  0x40000000:  b  0x400007a8
-  0x40000004:  nop
-  ----------------
-  IN:
-  0x400007a8:  save  %sp, -136, %sp
-  0x400007ac:  call  0x40000020
-  0x400007b0:  sethi  %hi(0x4000b800), %i1
-  ...
-
-Tested with the following firmware:
-http://www.helenos.org/releases/HelenOS-0.6.0-sparc32-leon3.bin
-
-Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+Signed-off-by: Samuel Thibault <samuel.thibault@ens-lyon.org>
 ---
-v2: Fixed GIT_AUTHOR_EMAIL
----
- hw/sparc/leon3.c | 4 ++++
- 1 file changed, 4 insertions(+)
+ ui/curses.c | 43 +++++++++++++++++++++++++++++--------------
+ 1 file changed, 29 insertions(+), 14 deletions(-)
 
-diff --git a/hw/sparc/leon3.c b/hw/sparc/leon3.c
-index 774639af33..0383b17c29 100644
---- a/hw/sparc/leon3.c
-+++ b/hw/sparc/leon3.c
-@@ -193,6 +193,10 @@ static void leon3_generic_hw_init(MachineState *machine)
-         kernel_size = load_elf(kernel_filename, NULL, NULL, NULL,
-                                &entry, NULL, NULL,
-                                1 /* big endian */, EM_SPARC, 0, 0);
-+        if (kernel_size < 0) {
-+            kernel_size = load_uimage(kernel_filename, NULL, &entry,
-+                                      NULL, NULL, NULL);
-+        }
-         if (kernel_size < 0) {
-             error_report("could not load kernel '%s'", kernel_filename);
-             exit(1);
--- 
-2.19.1
+diff --git a/ui/curses.c b/ui/curses.c
+index 395f9545e9..bc0d77a2a8 100644
+--- a/ui/curses.c
++++ b/ui/curses.c
+@@ -66,20 +66,22 @@ static void curses_update(DisplayChangeListener *dcl,
+ {
+     console_ch_t *line;
+     cchar_t curses_line[width];
++    wchar_t wch[CCHARW_MAX];
++    attr_t attrs;
++    short colors;
++    int ret;
+=20
+     line =3D screen + y * width;
+     for (h +=3D y; y < h; y ++, line +=3D width) {
+         for (x =3D 0; x < width; x++) {
+             chtype ch =3D line[x] & 0xff;
+             chtype at =3D line[x] & ~0xff;
+-            if (vga_to_curses[ch].chars[0]) {
+-                curses_line[x] =3D vga_to_curses[ch];
+-            } else {
+-                curses_line[x] =3D (cchar_t) {
+-                    .chars[0] =3D ch,
+-                };
++            ret =3D getcchar(&vga_to_curses[ch], wch, &attrs, &colors, N=
+ULL);
++            if (ret =3D=3D ERR || wch[0] =3D=3D 0) {
++                wch[0] =3D ch;
++                wch[1] =3D 0;
+             }
+-            curses_line[x].attr |=3D at;
++            setcchar(&curses_line[x], wch, at, 0, NULL);
+         }
+         mvwadd_wchnstr(screenpad, y, 0, curses_line, width);
+     }
+@@ -412,7 +414,7 @@ static void curses_atexit(void)
+ static void convert_ucs(unsigned char fch, uint16_t uch, iconv_t conv)
+ {
+     char mbch[MB_CUR_MAX];
+-    wchar_t wch;
++    wchar_t wch[2];
+     char *puch, *pmbch;
+     size_t such, smbch;
+=20
+@@ -428,20 +430,22 @@ static void convert_ucs(unsigned char fch, uint16_t=
+ uch, iconv_t conv)
+         return;
+     }
+=20
+-    if (mbtowc(&wch, mbch, sizeof(mbch) - smbch) =3D=3D -1) {
++    if (mbtowc(&wch[0], mbch, sizeof(mbch) - smbch) =3D=3D -1) {
+         fprintf(stderr, "Could not convert 0x%04x "
+                         "from a multibyte character to wchar_t: %s\n",
+                         uch, strerror(errno));
+         return;
+     }
+-    vga_to_curses[fch].chars[0] =3D wch;
++
++    wch[1] =3D 0;
++    setcchar(&vga_to_curses[fch], wch, 0, 0, NULL);
+ }
+=20
+ /* Setup wchar glyph for one font character */
+ static void convert_font(unsigned char fch, iconv_t conv)
+ {
+     char mbch[MB_CUR_MAX];
+-    wchar_t wch;
++    wchar_t wch[2];
+     char *pfch, *pmbch;
+     size_t sfch, smbch;
+=20
+@@ -457,13 +461,15 @@ static void convert_font(unsigned char fch, iconv_t=
+ conv)
+         return;
+     }
+=20
+-    if (mbtowc(&wch, mbch, sizeof(mbch) - smbch) =3D=3D -1) {
++    if (mbtowc(&wch[0], mbch, sizeof(mbch) - smbch) =3D=3D -1) {
+         fprintf(stderr, "Could not convert font glyph 0x%02x "
+                         "from a multibyte character to wchar_t: %s\n",
+                         fch, strerror(errno));
+         return;
+     }
+-    vga_to_curses[fch].chars[0] =3D wch;
++
++    wch[1] =3D 0;
++    setcchar(&vga_to_curses[fch], wch, 0, 0, NULL);
+ }
+=20
+ /* Convert one wchar to UCS-2 */
+@@ -586,7 +592,16 @@ static void font_setup(void)
+     if (strcmp(nl_langinfo(CODESET), "UTF-8")) {
+         /* Non-Unicode capable, use termcap equivalents for those availa=
+ble */
+         for (i =3D 0; i <=3D 0xFF; i++) {
+-            switch (get_ucs(vga_to_curses[i].chars[0], nativecharset_to_=
+ucs2)) {
++            wchar_t wch[CCHARW_MAX];
++            attr_t attr;
++            short color;
++            int ret;
++
++            ret =3D getcchar(&vga_to_curses[i], wch, &attr, &color, NULL=
+);
++            if (ret =3D=3D ERR)
++                continue;
++
++            switch (get_ucs(wch[0], nativecharset_to_ucs2)) {
+             case 0x00a3:
+                 vga_to_curses[i] =3D *WACS_STERLING;
+                 break;
+--=20
+2.20.1
 
 
