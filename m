@@ -1,22 +1,25 @@
-Received: from eggs.gnu.org ([209.51.188.92]:44243)
+Received: from eggs.gnu.org ([209.51.188.92]:46100)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1hKObJ-0007Mq-Mg
-	for qemu-devel@nongnu.org; Sat, 27 Apr 2019 10:46:50 -0400
+	(envelope-from <thuth@redhat.com>) id 1hKOe6-0001Bb-HQ
+	for qemu-devel@nongnu.org; Sat, 27 Apr 2019 10:49:43 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1hKObH-0003K1-P0
-	for qemu-devel@nongnu.org; Sat, 27 Apr 2019 10:46:49 -0400
-References: <20190427141459.19728-1-philmd@redhat.com>
-	<20190427141459.19728-4-philmd@redhat.com>
+	(envelope-from <thuth@redhat.com>) id 1hKOe5-0006sI-MV
+	for qemu-devel@nongnu.org; Sat, 27 Apr 2019 10:49:42 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:37178)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1hKOe5-0006rT-E3
+	for qemu-devel@nongnu.org; Sat, 27 Apr 2019 10:49:41 -0400
+References: <20190427141905.20393-1-philmd@redhat.com>
 From: Thomas Huth <thuth@redhat.com>
-Message-ID: <bb31dd2a-8cd6-0dfe-a71f-4c47ec3d9687@redhat.com>
-Date: Sat, 27 Apr 2019 16:46:38 +0200
+Message-ID: <2f8710be-0005-a8dc-ac28-c572e55f2d20@redhat.com>
+Date: Sat, 27 Apr 2019 16:49:33 +0200
 MIME-Version: 1.0
-In-Reply-To: <20190427141459.19728-4-philmd@redhat.com>
+In-Reply-To: <20190427141905.20393-1-philmd@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH 3/3] hw/dma: Do not build the xlnx_dpdma
- device for the MicroBlaze machines
+Subject: Re: [Qemu-devel] [PATCH] hw/i386: The i440fx is not a machine,
+ remove it from the machine list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,31 +28,25 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>, qemu-arm@nongnu.org, qemu-devel@nongnu.org
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Alistair Francis <alistair@alistair23.me>, Peter Maydell <peter.maydell@linaro.org>, "Edgar E. Iglesias" <edgar.iglesias@gmail.com>, QEMU Trivial <qemu-trivial@nongnu.org>
+To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>, qemu-devel@nongnu.org
+Cc: "Michael S. Tsirkin" <mst@redhat.com>, Richard Henderson <rth@twiddle.net>, Paolo Bonzini <pbonzini@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
 
-On 27/04/2019 16.14, Philippe Mathieu-Daud=C3=A9 wrote:
-> The xlnx_dpdma device is only used by the ZynqMP AArch64 machine
-> (not the MicroBlaze PMU). Remove it from the ZynqMP generic objects.
-> (Note, this entry was duplicated for the AArch64).
+On 27/04/2019 16.19, Philippe Mathieu-Daud=C3=A9 wrote:
+> When building with CONFIG_ISAPC=3Dn and CONFIG_I440FX=3Dy we get:
 >=20
-> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
-> ---
->  hw/dma/Makefile.objs | 1 -
->  1 file changed, 1 deletion(-)
+>   $ make subdir-x86_64-softmmu
+>   [...]
+>   /usr/bin/ld: hw/i386/pc_piix.o: in function `pc_init1':
+>   /source/qemu/hw/i386/pc_piix.c:261: undefined reference to `isa_ide_i=
+nit'
+>   /usr/bin/ld: /source/qemu/hw/i386/pc_piix.c:261: undefined reference =
+to `isa_ide_init'
+>   collect2: error: ld returned 1 exit status
+>   make[1]: *** [Makefile:204: qemu-system-x86_64] Error 1
 >=20
-> diff --git a/hw/dma/Makefile.objs b/hw/dma/Makefile.objs
-> index 79affecc390..a5b1276f52a 100644
-> --- a/hw/dma/Makefile.objs
-> +++ b/hw/dma/Makefile.objs
-> @@ -8,7 +8,6 @@ common-obj-$(CONFIG_XILINX_AXI) +=3D xilinx_axidma.o
->  common-obj-$(CONFIG_ZYNQ_DEVCFG) +=3D xlnx-zynq-devcfg.o
->  common-obj-$(CONFIG_ETRAXFS) +=3D etraxfs_dma.o
->  common-obj-$(CONFIG_STP2000) +=3D sparc32_dma.o
-> -obj-$(CONFIG_XLNX_ZYNQMP) +=3D xlnx_dpdma.o
->  obj-$(CONFIG_XLNX_ZYNQMP_ARM) +=3D xlnx_dpdma.o
->  common-obj-$(CONFIG_XLNX_ZYNQMP_ARM) +=3D xlnx-zdma.o
-> =20
->=20
+> This is because the I440FX device is a North Bridge, not a machine.
 
-Reviewed-by: Thomas Huth <thuth@redhat.com>
+Really? I thought CONFIG_I440FX was there to configure the
+"pc-i440fx-x.y" machine types?
+
+ Thomas
