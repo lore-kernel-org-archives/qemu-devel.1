@@ -2,72 +2,61 @@ Return-Path: <SRS0=rME2=S5=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+X-Spam-Status: No, score=-2.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1FF3EC43219
-	for <qemu-devel@archiver.kernel.org>; Sat, 27 Apr 2019 16:43:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0F721C43219
+	for <qemu-devel@archiver.kernel.org>; Sat, 27 Apr 2019 16:43:12 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E218F206A3
-	for <qemu-devel@archiver.kernel.org>; Sat, 27 Apr 2019 16:43:00 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E218F206A3
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=amsat.org
+	by mail.kernel.org (Postfix) with ESMTPS id C79A2206A3
+	for <qemu-devel@archiver.kernel.org>; Sat, 27 Apr 2019 16:43:11 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C79A2206A3
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=ens-lyon.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:34124 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:34126 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hKQPg-0005RZ-VQ
-	for qemu-devel@archiver.kernel.org; Sat, 27 Apr 2019 12:42:57 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:33815)
+	id 1hKQPv-0005bX-3Y
+	for qemu-devel@archiver.kernel.org; Sat, 27 Apr 2019 12:43:11 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:33835)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1hKQKw-0001Ae-7h
-	for qemu-devel@nongnu.org; Sat, 27 Apr 2019 12:38:03 -0400
+	(envelope-from <samuel.thibault@ens-lyon.org>) id 1hKQKj-0001C0-UL
+	for qemu-devel@nongnu.org; Sat, 27 Apr 2019 12:37:50 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1hKQAX-00057R-8F
-	for qemu-devel@nongnu.org; Sat, 27 Apr 2019 12:27:17 -0400
-Received: from mail-yw1-f50.google.com ([209.85.161.50]:39213)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1hKQAV-0004ye-5b; Sat, 27 Apr 2019 12:27:15 -0400
-Received: by mail-yw1-f50.google.com with SMTP id x204so2270796ywg.6;
-	Sat, 27 Apr 2019 09:27:12 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=1e100.net; s=20161025;
-	h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-	:message-id:subject:to:cc:content-transfer-encoding;
-	bh=uqoxPsgFwcAEy1xyP9m8aUmcsILjiHBcVsasaxC7RrY=;
-	b=NYo4QQ0CpsQKKjB9a6Tvp3c/8ciL9eYFiYFD0btKLCjFoUV7qMENmMle8FNngw7zAj
-	qipCmMq+3UTAjAkY60+Gdb/CuSFy9Dri9ZS6yBxprx2SNXTNzi1+97UkMcXZaBJkuOYc
-	r2Tn/mjgUAQ7Z9JAbc3zeae61LuOX67xfoKfLYnhMUz2VWplTEUXE2XBb56357SAnqxm
-	E1uMHFLn8uQB0snVsxaFGeZ6YzrTQ9pAG3Hh14Sni5V0whYfgAWsScdNDMqUbRISgDbi
-	Wxw0deAF3f6O+tt3s24fu4fnHQ1b00xpIfkZ5oYZVqh81wRj855WunxooHGs4VmmZJta
-	PPZg==
-X-Gm-Message-State: APjAAAXgp2zWjGgQiTfN3DfK4HTpCrLzgkir07sSqytPunyqm97bJBnr
-	FiRUUcAFdl+kFhpgTf/KzPkxVMW2AqQCyqR52o0ZavDr
-X-Google-Smtp-Source: APXvYqzBKZNoT3lk/JLlaxpyFByjBjqZI7zgCFTikVv3EDy+ZgIp3r8pjJpwHa3AlDjgvR8pO9+/tvbO+DaKAtIIaTQ=
-X-Received: by 2002:a0d:d547:: with SMTP id x68mr30755670ywd.356.1556382431231;
-	Sat, 27 Apr 2019 09:27:11 -0700 (PDT)
+	(envelope-from <samuel.thibault@ens-lyon.org>) id 1hKQDZ-0004zN-8B
+	for qemu-devel@nongnu.org; Sat, 27 Apr 2019 12:30:27 -0400
+Received: from hera.aquilenet.fr ([2a0c:e300::1]:47158)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <samuel.thibault@ens-lyon.org>)
+	id 1hKQDT-0004TM-F3
+	for qemu-devel@nongnu.org; Sat, 27 Apr 2019 12:30:22 -0400
+Received: from localhost (localhost [127.0.0.1])
+	by hera.aquilenet.fr (Postfix) with ESMTP id 7FF9C3DA3;
+	Sat, 27 Apr 2019 18:30:11 +0200 (CEST)
+X-Virus-Scanned: Debian amavisd-new at aquilenet.fr
+Received: from hera.aquilenet.fr ([127.0.0.1])
+	by localhost (hera.aquilenet.fr [127.0.0.1]) (amavisd-new, port 10024)
+	with ESMTP id 30eFL6wCaQF1; Sat, 27 Apr 2019 18:30:10 +0200 (CEST)
+Received: from function (105.251.129.77.rev.sfr.net [77.129.251.105])
+	by hera.aquilenet.fr (Postfix) with ESMTPSA id CE8E33D59;
+	Sat, 27 Apr 2019 18:30:10 +0200 (CEST)
+Received: from samy by function with local (Exim 4.92)
+	(envelope-from <samuel.thibault@ens-lyon.org>)
+	id 1hKQDI-0001LE-Ct; Sat, 27 Apr 2019 18:30:08 +0200
+From: Samuel Thibault <samuel.thibault@ens-lyon.org>
+To: qemu-devel@nongnu.org
+Date: Sat, 27 Apr 2019 18:30:04 +0200
+Message-Id: <20190427163007.5113-1-samuel.thibault@ens-lyon.org>
+X-Mailer: git-send-email 2.20.1
 MIME-Version: 1.0
-References: <20190427162429.3617-1-f4bug@amsat.org>
-In-Reply-To: <20190427162429.3617-1-f4bug@amsat.org>
-From: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>
-Date: Sat, 27 Apr 2019 18:27:00 +0200
-Message-ID:
- <CAAdtpL5=iiuD4ifCzs_kRE3LTq_u11z2J9qa=K8TpOHvxdBy+A@mail.gmail.com>
-To: QEMU Trivial <qemu-trivial@nongnu.org>, 
-	"qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>
-Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-	[fuzzy]
-X-Received-From: 209.85.161.50
-Subject: Re: [Qemu-devel] [PATCH] hw/sparc/leon3: Allow load of uImage
- firmwares
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+	recognized.
+X-Received-From: 2a0c:e300::1
+Subject: [Qemu-devel] [PATCHv3 0/2] ui/curses: BSD portability fixes
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -79,22 +68,30 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>,
-	=?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>,
-	Fabien Chouteau <chouteau@adacore.com>,
-	KONRAD Frederic <frederic.konrad@adacore.com>,
-	Stefan Hajnoczi <stefanha@redhat.com>,
-	=?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>,
-	Artyom Tarasenko <atar4qemu@gmail.com>
+Cc: Samuel Thibault <samuel.thibault@ens-lyon.org>, kamil@netbsd.org,
+	kraxel@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190427162700.0uP7dhv2bGanRT0ptY7cAYH566QLDf0BnJLBYv2L4M4@z>
+Content-Type: text/plain; charset="UTF-8"
+Message-ID: <20190427163004.ltUalvzoGzAF6MS_1UXC30iKSsIJoSmqgE_Plkz5zpw@z>
 
-On Sat, Apr 27, 2019 at 6:24 PM Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.or=
-g> wrote:
->
-> From: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+BSD needs a few fixes for wide character manipulations.
 
-Grrr sent from wrong computer.
+Difference with v1:
+- Fix unitialized value in error message
+
+Difference with v2:
+- Add cchar_t manipulation fix
+
+Samuel Thibault (2):
+  ui/curses: do not assume wchar_t contains unicode
+  ui/curses: manipulate cchar_t with standard curses functions
+
+ ui/curses.c | 188 +++++++++++++++++++++++++++++++++-------------------
+ 1 file changed, 120 insertions(+), 68 deletions(-)
+
+--=20
+2.20.1
+
 
