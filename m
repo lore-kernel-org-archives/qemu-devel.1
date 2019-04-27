@@ -5,74 +5,63 @@ X-Spam-Level:
 X-Spam-Status: No, score=-0.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	MAILING_LIST_MULTI,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 83DBCC43219
-	for <qemu-devel@archiver.kernel.org>; Sat, 27 Apr 2019 04:25:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BBDB4C43219
+	for <qemu-devel@archiver.kernel.org>; Sat, 27 Apr 2019 04:52:58 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 49F88206BF
-	for <qemu-devel@archiver.kernel.org>; Sat, 27 Apr 2019 04:25:41 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 49F88206BF
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 8D0CB2077B
+	for <qemu-devel@archiver.kernel.org>; Sat, 27 Apr 2019 04:52:58 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8D0CB2077B
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=patchew.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:55433 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:55612 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hKEuC-0005Yo-6x
-	for qemu-devel@archiver.kernel.org; Sat, 27 Apr 2019 00:25:40 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:40052)
+	id 1hKFKb-00065E-LF
+	for qemu-devel@archiver.kernel.org; Sat, 27 Apr 2019 00:52:57 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:45689)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1hKEtM-0004qY-N8
-	for qemu-devel@nongnu.org; Sat, 27 Apr 2019 00:24:49 -0400
+	(envelope-from <no-reply@patchew.org>) id 1hKFJm-0005iv-Ol
+	for qemu-devel@nongnu.org; Sat, 27 Apr 2019 00:52:07 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1hKEtL-0005wM-Na
-	for qemu-devel@nongnu.org; Sat, 27 Apr 2019 00:24:48 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:43704)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1hKEtL-0005uz-Hc
-	for qemu-devel@nongnu.org; Sat, 27 Apr 2019 00:24:47 -0400
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
-	[10.5.11.23])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id EB00530B27BE;
-	Sat, 27 Apr 2019 04:24:45 +0000 (UTC)
-Received: from colo-mx.corp.redhat.com
-	(colo-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.21])
-	by smtp.corp.redhat.com (Postfix) with ESMTPS id DCBE427BA2;
-	Sat, 27 Apr 2019 04:24:45 +0000 (UTC)
-Received: from zmail18.collab.prod.int.phx2.redhat.com
-	(zmail18.collab.prod.int.phx2.redhat.com [10.5.83.21])
-	by colo-mx.corp.redhat.com (Postfix) with ESMTP id B04843FB10;
-	Sat, 27 Apr 2019 04:24:45 +0000 (UTC)
-Date: Sat, 27 Apr 2019 00:24:45 -0400 (EDT)
-From: Paolo Bonzini <pbonzini@redhat.com>
-To: Wei Li <wei.d.li@oracle.com>
-Message-ID: <825292440.15675844.1556339085478.JavaMail.zimbra@redhat.com>
-In-Reply-To: <7044D39A-8D7B-41F7-B8C3-DC2214E6826A@oracle.com>
-References: <5FF901C1-0AA5-4308-A65C-C448D0A2BA63@oracle.com>
-	<898ef1d4-bfa2-9952-8ceb-f1282b85e29c@oracle.com>
-	<20190416092042.GB32709@stefanha-x1.localdomain>
-	<8E5AF770-69ED-4D44-8A25-B51344996D9E@oracle.com>
-	<3F7E854A-3C1D-4204-8C35-893FC0614796@oracle.com>
-	<20190423120453.GF32465@stefanha-x1.localdomain>
-	<44520476-d6a8-2e3f-1602-388e2e1e874e@redhat.com>
-	<7044D39A-8D7B-41F7-B8C3-DC2214E6826A@oracle.com>
+	(envelope-from <no-reply@patchew.org>) id 1hKFJl-0001x0-IC
+	for qemu-devel@nongnu.org; Sat, 27 Apr 2019 00:52:06 -0400
+Resent-Date: Sat, 27 Apr 2019 00:52:06 -0400
+Resent-Message-Id: <E1hKFJl-0001x0-IC@eggs.gnu.org>
+Received: from sender-of-o52.zoho.com ([135.84.80.217]:21447)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
+	id 1hKFJl-0001uV-AK
+	for qemu-devel@nongnu.org; Sat, 27 Apr 2019 00:52:05 -0400
+ARC-Seal: i=1; a=rsa-sha256; t=1556340682; cv=none; d=zoho.com; s=zohoarc; 
+	b=ATseLp4JPesc0fwihLCXc9yx7bRBhLvaAr1Zw+6ktryAP2zUGi4XfxipYbCHzbN0u6j62eDjdUQ+Cwxv584hemLqA/OOUDObnXQ6hFAGOcZ5m0WHkFnChH3AAdakGIcivsPD/SWfNlVhuh/DtkTGAoUcPXczo8+BsE4DZZnqfcQ=
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zoho.com;
+	s=zohoarc; t=1556340682;
+	h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:Reply-To:Subject:To:ARC-Authentication-Results;
+	bh=wxiNfJ/NEWS10fPHrEFwHObw+EXdp6Nn0Ka5I1mlpFk=; 
+	b=omS7hW5/Tll8/HZ+0wCtAV+vyMFQ9f57lkKPPv88PRngPW+InQ9Diep9grlWGZ4EsDgSh8tdDmkiBggx197qL1OgEvgXZc0RMklKdMTKdDBHuv3GyuLLOrmN6WhHWjHRr3O3V6kJxZq9v4ETJxkxH6/AzWqfGz8N3KegdYiumnc=
+ARC-Authentication-Results: i=1; mx.zoho.com; dkim=pass  header.i=patchew.org;
+	spf=pass  smtp.mailfrom=no-reply@patchew.org;
+	dmarc=pass header.from=<no-reply@patchew.org>
+	header.from=<no-reply@patchew.org>
+Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by
+	mx.zohomail.com with SMTPS id 1556340680213998.6261578673107;
+	Fri, 26 Apr 2019 21:51:20 -0700 (PDT)
+In-Reply-To: <20190424103747.10173-1-thuth@redhat.com>
+Message-ID: <155634067827.10667.1234958122204251178@c2072b67cc0c>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 7bit
-X-Originating-IP: [93.56.166.5, 10.4.196.15, 10.5.101.130, 10.4.195.24]
-Thread-Topic: [Qemu-devel] Following up questions related to QEMU and I/O
-	Thread
-Thread-Index: nrya/PIFCrUmu8omI+ihQgdYpvhqFg==
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.48]);
-	Sat, 27 Apr 2019 04:24:46 +0000 (UTC)
+Content-Transfer-Encoding: base64
+Resent-From: 
+From: no-reply@patchew.org
+To: thuth@redhat.com
+Date: Fri, 26 Apr 2019 21:51:20 -0700 (PDT)
+X-ZohoMailClient: External
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] Following up questions related to QEMU and I/O
- Thread
+X-Received-From: 135.84.80.217
+Subject: Re: [Qemu-devel] [PATCH 0/6] tests/qemu-iotests: Run basic iotests
+ during "make check"
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -84,26 +73,26 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Stefan Hajnoczi <stefanha@gmail.com>, qemu-devel@nongnu.org,
-	Stefan Hajnoczi <stefanha@redhat.com>,
-	Dongli Zhang <dongli.zhang@oracle.com>
+Reply-To: qemu-devel@nongnu.org
+Cc: fam@euphon.net, kwolf@redhat.com, emaste@freebsd.org, qemu-block@nongnu.org,
+	philmd@redhat.com, qemu-devel@nongnu.org, mreitz@redhat.com,
+	alex.bennee@linaro.org, lwhsu@freebsd.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190427042445.yrGk3SnaRcx5w1GPDAjiiPiA95STQMTfun6z4jwLOrs@z>
+Message-ID: <20190427045120.alzA7zKel8D28xOWBvVb8MRzeO1I2CruBVnjE_Zdk2E@z>
 
+UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDE5MDQyNDEwMzc0Ny4xMDE3
+My0xLXRodXRoQHJlZGhhdC5jb20vCgoKCkhpLAoKVGhpcyBzZXJpZXMgZmFpbGVkIHRoZSBhc2Fu
+IGJ1aWxkIHRlc3QuIFBsZWFzZSBmaW5kIHRoZSB0ZXN0aW5nIGNvbW1hbmRzIGFuZAp0aGVpciBv
+dXRwdXQgYmVsb3cuIElmIHlvdSBoYXZlIERvY2tlciBpbnN0YWxsZWQsIHlvdSBjYW4gcHJvYmFi
+bHkgcmVwcm9kdWNlIGl0CmxvY2FsbHkuCgo9PT0gVEVTVCBTQ1JJUFQgQkVHSU4gPT09CiMhL2Jp
+bi9iYXNoCnRpbWUgbWFrZSBkb2NrZXItdGVzdC1kZWJ1Z0BmZWRvcmEgVEFSR0VUX0xJU1Q9eDg2
+XzY0LXNvZnRtbXUgSj0xNCBORVRXT1JLPTEKPT09IFRFU1QgU0NSSVBUIEVORCA9PT0KCgoKClRo
+ZSBmdWxsIGxvZyBpcyBhdmFpbGFibGUgYXQKaHR0cDovL3BhdGNoZXcub3JnL2xvZ3MvMjAxOTA0
+MjQxMDM3NDcuMTAxNzMtMS10aHV0aEByZWRoYXQuY29tL3Rlc3RpbmcuYXNhbi8/dHlwZT1tZXNz
+YWdlLgotLS0KRW1haWwgZ2VuZXJhdGVkIGF1dG9tYXRpY2FsbHkgYnkgUGF0Y2hldyBbaHR0cHM6
+Ly9wYXRjaGV3Lm9yZy9dLgpQbGVhc2Ugc2VuZCB5b3VyIGZlZWRiYWNrIHRvIHBhdGNoZXctZGV2
+ZWxAcmVkaGF0LmNvbQ==
 
-> Thanks Stefan and Paolo for your response and advice!
-> 
-> Hi Paolo,
-> 
-> As to the virtio-scsi batch I/O submission feature in QEMU which you
-> mentioned, is this feature turned on by default in QEMU 2.9 or there is a
-> tunable parameters to turn on/off the feature?
-
-Yes, it is available by default since 2.2.0.  It cannot be turned off, however
-it is only possible to batch I/O with aio=native (and, since 2.12.0, with the NVMe
-backend).
-
-Paolo
 
