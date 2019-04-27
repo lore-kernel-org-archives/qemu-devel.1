@@ -6,64 +6,76 @@ X-Spam-Status: No, score=-6.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BE78AC43218
-	for <qemu-devel@archiver.kernel.org>; Sat, 27 Apr 2019 12:44:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9519BC43219
+	for <qemu-devel@archiver.kernel.org>; Sat, 27 Apr 2019 13:04:51 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8104A2146E
-	for <qemu-devel@archiver.kernel.org>; Sat, 27 Apr 2019 12:44:36 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8104A2146E
+	by mail.kernel.org (Postfix) with ESMTPS id 6619B2087C
+	for <qemu-devel@archiver.kernel.org>; Sat, 27 Apr 2019 13:04:51 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6619B2087C
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:59890 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:60102 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hKMh1-00038H-Ei
-	for qemu-devel@archiver.kernel.org; Sat, 27 Apr 2019 08:44:35 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:54776)
+	id 1hKN0c-0006dY-3O
+	for qemu-devel@archiver.kernel.org; Sat, 27 Apr 2019 09:04:50 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:57608)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jdillama@redhat.com>) id 1hKMgB-0002m3-1S
-	for qemu-devel@nongnu.org; Sat, 27 Apr 2019 08:43:44 -0400
+	(envelope-from <philmd@redhat.com>) id 1hKMzm-0006MQ-OO
+	for qemu-devel@nongnu.org; Sat, 27 Apr 2019 09:03:59 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jdillama@redhat.com>) id 1hKMg9-0005bl-1b
-	for qemu-devel@nongnu.org; Sat, 27 Apr 2019 08:43:42 -0400
-Received: from mail-ed1-f66.google.com ([209.85.208.66]:46745)
+	(envelope-from <philmd@redhat.com>) id 1hKMzl-0006Ba-Ib
+	for qemu-devel@nongnu.org; Sat, 27 Apr 2019 09:03:58 -0400
+Received: from mail-wm1-f65.google.com ([209.85.128.65]:52348)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <jdillama@redhat.com>) id 1hKMg8-0005Ze-RC
-	for qemu-devel@nongnu.org; Sat, 27 Apr 2019 08:43:40 -0400
-Received: by mail-ed1-f66.google.com with SMTP id d1so5324996edd.13
-	for <qemu-devel@nongnu.org>; Sat, 27 Apr 2019 05:43:38 -0700 (PDT)
+	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1hKMzl-0006AA-9x
+	for qemu-devel@nongnu.org; Sat, 27 Apr 2019 09:03:57 -0400
+Received: by mail-wm1-f65.google.com with SMTP id j13so7416128wmh.2
+	for <qemu-devel@nongnu.org>; Sat, 27 Apr 2019 06:03:56 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
 	d=1e100.net; s=20161025;
-	h=x-gm-message-state:mime-version:references:in-reply-to:reply-to
-	:from:date:message-id:subject:to:cc;
-	bh=Wjcqiomxzchn3GeGVxpCjV2jRFfwS4U6cDxzk5KBTE8=;
-	b=Ak8IBQAePevPERD8fNBw4MVZLCmQ82KJNIdlksD4Wk5355L1S3YxQi1stUDLL6x6sW
-	r2ni/70Qmzdb0SSaSrelg6aQkWFO/8PyUA7nMTAECFCV2llVzmRSfLEJ4kDMbTKr3h4Q
-	kCzMtu7D8doxtb82ee8LGJIGaCmRFA8CzoamLKG+yr0wQr7akpUNENadFSyJwvMH3Ooz
-	cEgz2zK9MkamMw6HwImQ0Y+LujyUBnKcAhtMuxi1oagg+YXmKVEeeXwo4QhzKGJtNTQA
-	E2GD8Pje8CXvBLDmPxHeV3XNDTzgnlUZUjk0ibzyXT98ASVZLMYdRLUncvaTiaJ56FYd
-	SrPw==
-X-Gm-Message-State: APjAAAVR2BXKzv4MOp+EBlkVaYV0nm7gzXenO1OeMqQJdrwTuzzN3kAQ
-	qZ851ak8F9lQSNQzcHKsD6CVeczuliiGz5/1R5KPKw==
-X-Google-Smtp-Source: APXvYqySiNN079T+IovFpsIT+gIFvfkyq4BGUcJUB2qS/u2r/GNZ+E6PlsapbfnMm98cF7wFdyYbX7VF9OOvzcZJsFU=
-X-Received: by 2002:a50:f78b:: with SMTP id h11mr27600533edn.143.1556369017688;
-	Sat, 27 Apr 2019 05:43:37 -0700 (PDT)
+	h=x-gm-message-state:subject:to:references:from:openpgp:message-id
+	:date:user-agent:mime-version:in-reply-to:content-language
+	:content-transfer-encoding;
+	bh=gGWH6wXoykgf3T7JRQOE/awKnBMa+zWsN6qD2ifoWKU=;
+	b=USu8OLV/DV86IXM3QPbhilaAlUA8sG8Pw3Ngut6HGAUF2AGQSYXaJImt6eOJt3JZLI
+	DxG2TWprNomBMlnSEdfMEJYNUWjuj2hU7rjqSuoKXBga3lzdF8aQ610XmLUL+ZMaGBcS
+	gUipWPgEd2KDnBBjNGP8nPV+1rcNsLIdxiD700zNTrUCqe/RA02r7E35s6+7xoIjGjhr
+	6VdWXO5m9pMTapx5b0K7gzwaEEofc/xUeiT0FA5qaYlde+rJOkXR72j9Cx9mrv/syZAw
+	WY+C52qHISn+OpWjxp/2TNwhXnZOyYsHA4epv1Ba8Y4EMbcEX4ZhJPTQjibV5LLQ28Zq
+	TdHA==
+X-Gm-Message-State: APjAAAXzN4OirDHBSR1sPUYBsF3CZ5TKsT6Qx4Tns3COCcj2kWpSu+1y
+	tbnnT1fHAhbTKn4Y8TcitGnfxVZoZR6zlw==
+X-Google-Smtp-Source: APXvYqwZ/LZ/zasvzm1gxbqO9xTvi1SeSiONW9ZXLjmBqLgufaGNdyEEQ2+MkRF0ScVjgp9/ZxpEdw==
+X-Received: by 2002:a1c:f70e:: with SMTP id v14mr11977026wmh.74.1556370234591; 
+	Sat, 27 Apr 2019 06:03:54 -0700 (PDT)
+Received: from [192.168.1.33] (193.red-88-21-103.staticip.rima-tde.net.
+	[88.21.103.193])
+	by smtp.gmail.com with ESMTPSA id q25sm4411065wmj.3.2019.04.27.06.03.53
+	(version=TLS1_3 cipher=AEAD-AES128-GCM-SHA256 bits=128/128);
+	Sat, 27 Apr 2019 06:03:53 -0700 (PDT)
+To: Richard Henderson <richard.henderson@linaro.org>, qemu-devel@nongnu.org
+References: <20190427005124.12756-1-richard.henderson@linaro.org>
+	<20190427005124.12756-2-richard.henderson@linaro.org>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Openpgp: id=89C1E78F601EE86C867495CBA2A3FD6EDEADC0DE;
+	url=http://pgp.mit.edu/pks/lookup?op=get&search=0xA2A3FD6EDEADC0DE
+Message-ID: <64849861-0d2f-efbe-85ea-2b1076d8d8d9@redhat.com>
+Date: Sat, 27 Apr 2019 15:03:52 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+	Thunderbird/60.6.1
 MIME-Version: 1.0
-References: <20190427113625.46594-1-sgarzare@redhat.com>
-In-Reply-To: <20190427113625.46594-1-sgarzare@redhat.com>
-From: Jason Dillaman <jdillama@redhat.com>
-Date: Sat, 27 Apr 2019 08:43:26 -0400
-Message-ID:
- <CA+aFP1BtbjrzitLz7PW_b-kuYU7WSOiMs5jVfUBC=M3zEuBcew@mail.gmail.com>
-To: Stefano Garzarella <sgarzare@redhat.com>
+In-Reply-To: <20190427005124.12756-2-richard.henderson@linaro.org>
 Content-Type: text/plain; charset="UTF-8"
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 	[fuzzy]
-X-Received-From: 209.85.208.66
-Subject: Re: [Qemu-devel] [Qemu-block] [PATCH] block/rbd: add preallocation
- support
+X-Received-From: 209.85.128.65
+Subject: Re: [Qemu-devel] [PATCH 1/2] target/alpha: Clean up
+ alpha_cpu_dump_state
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -75,288 +87,74 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: dillaman@redhat.com
-Cc: Kevin Wolf <kwolf@redhat.com>, Josh Durgin <jdurgin@redhat.com>,
-	qemu-block <qemu-block@nongnu.org>, Markus Armbruster <armbru@redhat.com>,
-	qemu-devel <qemu-devel@nongnu.org>, Max Reitz <mreitz@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190427124326.R4SE4g_4PB67ofyBAagO7rCB4l7wtJwuFNssRdNW-gY@z>
+Message-ID: <20190427130352.xgCSJlZB2tiQdAHSqG2fr4Twwb1DJDXergyIqaRuS7Q@z>
 
-On Sat, Apr 27, 2019 at 7:37 AM Stefano Garzarella <sgarzare@redhat.com> wrote:
->
-> This patch adds the support of preallocation (off/full) for the RBD
-> block driver.
-> If available, we use rbd_writesame() to quickly fill the image when
-> full preallocation is required.
->
-> Signed-off-by: Stefano Garzarella <sgarzare@redhat.com>
+On 4/27/19 2:51 AM, Richard Henderson wrote:
+> Drop the "RI" and "FIR" prefixes; use only the normal linux names.
+> Add the FPCR to the dump.
+> 
+> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 > ---
->  block/rbd.c          | 149 ++++++++++++++++++++++++++++++++++++++-----
->  qapi/block-core.json |   4 +-
->  2 files changed, 136 insertions(+), 17 deletions(-)
->
-> diff --git a/block/rbd.c b/block/rbd.c
-> index 0c549c9935..29dd1bb040 100644
-> --- a/block/rbd.c
-> +++ b/block/rbd.c
-> @@ -13,6 +13,7 @@
->
->  #include "qemu/osdep.h"
->
-> +#include "qemu/units.h"
->  #include <rbd/librbd.h>
->  #include "qapi/error.h"
->  #include "qemu/error-report.h"
-> @@ -331,6 +332,110 @@ static void qemu_rbd_memset(RADOSCB *rcb, int64_t offs)
->      }
->  }
->
-> +static int qemu_rbd_do_truncate(rbd_image_t image, int64_t offset,
-> +                                PreallocMode prealloc, Error **errp)
-> +{
-> +    uint64_t current_length;
-> +    char *buf = NULL;
-> +    int ret;
-> +
-> +    ret = rbd_get_size(image, &current_length);
-> +    if (ret < 0) {
-> +        error_setg_errno(errp, -ret, "Failed to get file length");
-> +        goto out;
-> +    }
-> +
-> +    if (current_length > offset && prealloc != PREALLOC_MODE_OFF) {
-> +        error_setg(errp, "Cannot use preallocation for shrinking files");
-> +        ret = -ENOTSUP;
-> +        goto out;
-> +    }
-> +
-> +    switch (prealloc) {
-> +    case PREALLOC_MODE_FULL: {
-> +        uint64_t current_offset = current_length;
-> +        int buf_size = 64 * KiB;
-
-This should probably be 512B or 4KiB (which is the smallest striped
-unit size). Not only will this avoid sending unnecessary zeroes to the
-backing cluster, writesame silently turns into a standard write if
-your buffer isn't properly aligned with the min(object size, stripe
-unit size).
-
-> +        ssize_t bytes;
-> +
-> +        buf = g_malloc(buf_size);
-> +        /*
-> +         * Some versions of rbd_writesame() discards writes of buffers with
-> +         * all zeroes. In order to avoid this behaviour, we set the first byte
-> +         * to one.
-> +         */
-> +        buf[0] = 1;
-
-You could also use "rados_conf_set(cluster,
-"rbd_discard_on_zeroed_write_same", "false").
-
-> +        ret = rbd_resize(image, offset);
-> +        if (ret < 0) {
-> +            error_setg_errno(errp, -ret, "Failed to resize file");
-> +            goto out;
-> +        }
-> +
-> +#ifdef LIBRBD_SUPPORTS_WRITESAME
-> +        while (offset - current_offset > buf_size) {
-> +            /*
-> +             * rbd_writesame() supports only request where the size of the
-> +             * operation is multiple of buffer size and it must be less or
-> +             * equal to INT_MAX.
-> +             */
-> +            bytes = MIN(offset - current_offset, INT_MAX);
-> +            bytes -= bytes % buf_size;
-
-Using the default object size of 4MiB, this write size would result in
-up to 512 concurrent ops to the backing cluster. Perhaps the size
-should be bounded such that only a dozen or so concurrent requests are
-issued per write, always rounded next largest object / stripe period
-size. librbd and the rbd CLI usually try to bound themselves to the
-value in the "rbd_concurrent_management_ops" configuration setting
-(currently defaults to 10).
-
-> +            bytes = rbd_writesame(image, current_offset, bytes, buf, buf_size,
-> +                                  0);
-> +            if (bytes < 0) {
-> +                ret = bytes;
-> +                error_setg_errno(errp, -ret,
-> +                                 "Failed to write for preallocation");
-> +                goto out;
-> +            }
-> +
-> +            current_offset += bytes;
-> +        }
-> +#endif /* LIBRBD_SUPPORTS_WRITESAME */
-> +
-> +        while (current_offset < offset) {
-> +            bytes = rbd_write(image, current_offset,
-> +                              MIN(offset - current_offset, buf_size), buf);
-> +            if (bytes < 0) {
-> +                ret = bytes;
-> +                error_setg_errno(errp, -ret,
-> +                                 "Failed to write for preallocation");
-> +                goto out;
-> +            }
-> +
-> +            current_offset += bytes;
-> +        }
-> +
-> +        ret = rbd_flush(image);
-> +        if (ret < 0) {
-> +            error_setg_errno(errp, -ret, "Failed to flush the file");
-> +            goto out;
-> +        }
-> +
-> +        break;
-> +    }
-> +    case PREALLOC_MODE_OFF:
-> +        ret = rbd_resize(image, offset);
-> +        if (ret < 0) {
-> +            error_setg_errno(errp, -ret, "Failed to resize file");
-> +            goto out;
-> +        }
-> +        break;
-> +    default:
-> +        error_setg(errp, "Unsupported preallocation mode: %s",
-> +                   PreallocMode_str(prealloc));
-> +        ret = -ENOTSUP;
-> +        goto out;
-> +    }
-> +
-> +    ret = 0;
-> +
-> +out:
-> +    g_free(buf);
-> +    return ret;
-> +}
-> +
->  static QemuOptsList runtime_opts = {
->      .name = "rbd",
->      .head = QTAILQ_HEAD_INITIALIZER(runtime_opts.head),
-> @@ -376,6 +481,7 @@ static int qemu_rbd_do_create(BlockdevCreateOptions *options,
->      BlockdevCreateOptionsRbd *opts = &options->u.rbd;
->      rados_t cluster;
->      rados_ioctx_t io_ctx;
-> +    rbd_image_t image;
->      int obj_order = 0;
->      int ret;
->
-> @@ -404,13 +510,21 @@ static int qemu_rbd_do_create(BlockdevCreateOptions *options,
->          return ret;
->      }
->
-> -    ret = rbd_create(io_ctx, opts->location->image, opts->size, &obj_order);
-> +    ret = rbd_create(io_ctx, opts->location->image, 0, &obj_order);
->      if (ret < 0) {
->          error_setg_errno(errp, -ret, "error rbd create");
->          goto out;
->      }
->
-> -    ret = 0;
-> +    ret = rbd_open(io_ctx, opts->location->image, &image, NULL);
-> +    if (ret < 0) {
-> +        error_setg_errno(errp, -ret, "error rbd open");
-> +        goto out;
-> +    }
-> +
-> +    ret = qemu_rbd_do_truncate(image, opts->size, opts->preallocation, errp);
-> +
-> +    rbd_close(image);
->  out:
->      rados_ioctx_destroy(io_ctx);
->      rados_shutdown(cluster);
-> @@ -431,6 +545,7 @@ static int coroutine_fn qemu_rbd_co_create_opts(const char *filename,
->      BlockdevOptionsRbd *loc;
->      Error *local_err = NULL;
->      const char *keypairs, *password_secret;
-> +    char *prealloc;
->      QDict *options = NULL;
->      int ret = 0;
->
-> @@ -449,6 +564,16 @@ static int coroutine_fn qemu_rbd_co_create_opts(const char *filename,
->                                                     BLOCK_OPT_CLUSTER_SIZE, 0);
->      rbd_opts->has_cluster_size = (rbd_opts->cluster_size != 0);
->
-> +    prealloc = qemu_opt_get_del(opts, BLOCK_OPT_PREALLOC);
-> +    rbd_opts->preallocation = qapi_enum_parse(&PreallocMode_lookup, prealloc,
-> +                                              PREALLOC_MODE_OFF, &local_err);
-> +    g_free(prealloc);
-> +    if (local_err) {
-> +        ret = -EINVAL;
-> +        error_propagate(errp, local_err);
-> +        goto exit;
-> +    }
-> +
->      options = qdict_new();
->      qemu_rbd_parse_filename(filename, options, &local_err);
->      if (local_err) {
-> @@ -1052,21 +1177,8 @@ static int coroutine_fn qemu_rbd_co_truncate(BlockDriverState *bs,
->                                               Error **errp)
+>  target/alpha/helper.c | 19 ++++++++++---------
+>  1 file changed, 10 insertions(+), 9 deletions(-)
+> 
+> diff --git a/target/alpha/helper.c b/target/alpha/helper.c
+> index 7201576aae..31de9593b6 100644
+> --- a/target/alpha/helper.c
+> +++ b/target/alpha/helper.c
+> @@ -429,32 +429,33 @@ bool alpha_cpu_exec_interrupt(CPUState *cs, int interrupt_request)
+>  
+>  void alpha_cpu_dump_state(CPUState *cs, FILE *f, int flags)
 >  {
->      BDRVRBDState *s = bs->opaque;
-> -    int r;
-> -
-> -    if (prealloc != PREALLOC_MODE_OFF) {
-> -        error_setg(errp, "Unsupported preallocation mode '%s'",
-> -                   PreallocMode_str(prealloc));
-> -        return -ENOTSUP;
-> -    }
-> -
-> -    r = rbd_resize(s->image, offset);
-> -    if (r < 0) {
-> -        error_setg_errno(errp, -r, "Failed to resize file");
-> -        return r;
-> -    }
->
-> -    return 0;
-> +    return qemu_rbd_do_truncate(s->image, offset, prealloc, errp);
+> -    static const char *linux_reg_names[] = {
+> -        "v0 ", "t0 ", "t1 ", "t2 ", "t3 ", "t4 ", "t5 ", "t6 ",
+> -        "t7 ", "s0 ", "s1 ", "s2 ", "s3 ", "s4 ", "s5 ", "fp ",
+> -        "a0 ", "a1 ", "a2 ", "a3 ", "a4 ", "a5 ", "t8 ", "t9 ",
+> -        "t10", "t11", "ra ", "t12", "at ", "gp ", "sp ", "zero",
+> +    static const char linux_reg_names[31][4] = {
+> +        "v0",  "t0",  "t1", "t2",  "t3", "t4", "t5", "t6",
+> +        "t7",  "s0",  "s1", "s2",  "s3", "s4", "s5", "fp",
+> +        "a0",  "a1",  "a2", "a3",  "a4", "a5", "t8", "t9",
+> +        "t10", "t11", "ra", "t12", "at", "gp", "sp"
+>      };
+>      AlphaCPU *cpu = ALPHA_CPU(cs);
+>      CPUAlphaState *env = &cpu->env;
+>      int i;
+>  
+> -    qemu_fprintf(f, "     PC  " TARGET_FMT_lx "      PS  %02x\n",
+> +    qemu_fprintf(f, "PC      " TARGET_FMT_lx " PS      %02x\n",
+>                   env->pc, extract32(env->flags, ENV_FLAG_PS_SHIFT, 8));
+>      for (i = 0; i < 31; i++) {
+> -        qemu_fprintf(f, "IR%02d %s " TARGET_FMT_lx "%c", i,
+> +        qemu_fprintf(f, "%-8s" TARGET_FMT_lx "%c",
+
+I often wondered was this useful for (I mean, one would focus on one or
+another, but having both displayed was not helpful IMO). Now the output
+looks clearer, thanks!
+
+Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+Tested-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+
+>                       linux_reg_names[i], cpu_alpha_load_gr(env, i),
+>                       (i % 3) == 2 ? '\n' : ' ');
+>      }
+>  
+> -    qemu_fprintf(f, "lock_a   " TARGET_FMT_lx " lock_v   " TARGET_FMT_lx "\n",
+> +    qemu_fprintf(f, "lock_a  " TARGET_FMT_lx " lock_v  " TARGET_FMT_lx "\n",
+>                   env->lock_addr, env->lock_value);
+>  
+>      if (flags & CPU_DUMP_FPU) {
+>          for (i = 0; i < 31; i++) {
+> -            qemu_fprintf(f, "FIR%02d    %016" PRIx64 "%c", i, env->fir[i],
+> +            qemu_fprintf(f, "f%-7d%016" PRIx64 "%c", i, env->fir[i],
+>                           (i % 3) == 2 ? '\n' : ' ');
+>          }
+> +        qemu_fprintf(f, "fpcr    %016" PRIx64 "\n", cpu_alpha_load_fpcr(env));
+>      }
+>      qemu_fprintf(f, "\n");
 >  }
->
->  static int qemu_rbd_snap_create(BlockDriverState *bs,
-> @@ -1219,6 +1331,11 @@ static QemuOptsList qemu_rbd_create_opts = {
->              .type = QEMU_OPT_SIZE,
->              .help = "RBD object size"
->          },
-> +        {
-> +            .name = BLOCK_OPT_PREALLOC,
-> +            .type = QEMU_OPT_STRING,
-> +            .help = "Preallocation mode (allowed values: off, full)"
-> +        },
->          {
->              .name = "password-secret",
->              .type = QEMU_OPT_STRING,
-> diff --git a/qapi/block-core.json b/qapi/block-core.json
-> index 7ccbfff9d0..db25a4065b 100644
-> --- a/qapi/block-core.json
-> +++ b/qapi/block-core.json
-> @@ -4277,13 +4277,15 @@
->  #                   point to a snapshot.
->  # @size             Size of the virtual disk in bytes
->  # @cluster-size     RBD object size
-> +# @preallocation    Preallocation mode (allowed values: off, full)
->  #
->  # Since: 2.12
->  ##
->  { 'struct': 'BlockdevCreateOptionsRbd',
->    'data': { 'location':         'BlockdevOptionsRbd',
->              'size':             'size',
-> -            '*cluster-size' :   'size' } }
-> +            '*cluster-size' :   'size',
-> +            '*preallocation':   'PreallocMode' } }
->
->  ##
->  # @BlockdevVmdkSubformat:
-> --
-> 2.20.1
->
->
-
-
--- 
-Jason
+> 
 
