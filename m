@@ -5,42 +5,42 @@ X-Spam-Level:
 X-Spam-Status: No, score=-0.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	MAILING_LIST_MULTI,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4FB48C43219
-	for <qemu-devel@archiver.kernel.org>; Sun, 28 Apr 2019 15:22:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 34E7CC43219
+	for <qemu-devel@archiver.kernel.org>; Sun, 28 Apr 2019 15:44:38 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 104C520679
-	for <qemu-devel@archiver.kernel.org>; Sun, 28 Apr 2019 15:22:33 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 104C520679
+	by mail.kernel.org (Postfix) with ESMTPS id 08D832067C
+	for <qemu-devel@archiver.kernel.org>; Sun, 28 Apr 2019 15:44:37 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 08D832067C
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:45406 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:45568 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hKldR-00083Y-AC
-	for qemu-devel@archiver.kernel.org; Sun, 28 Apr 2019 11:22:33 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:37944)
+	id 1hKlym-0004pL-Tt
+	for qemu-devel@archiver.kernel.org; Sun, 28 Apr 2019 11:44:36 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:46568)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1hKlcg-0007ic-Hv
-	for qemu-devel@nongnu.org; Sun, 28 Apr 2019 11:21:47 -0400
+	(envelope-from <thuth@redhat.com>) id 1hKlxu-0004Qn-PM
+	for qemu-devel@nongnu.org; Sun, 28 Apr 2019 11:43:43 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1hKlce-0000V9-Ku
-	for qemu-devel@nongnu.org; Sun, 28 Apr 2019 11:21:46 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:51116)
+	(envelope-from <thuth@redhat.com>) id 1hKlxt-0005PX-Q5
+	for qemu-devel@nongnu.org; Sun, 28 Apr 2019 11:43:42 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:53272)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <thuth@redhat.com>)
-	id 1hKlcY-0000SK-Tv; Sun, 28 Apr 2019 11:21:40 -0400
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
-	[10.5.11.14])
+	id 1hKlxr-0005Oj-Mh; Sun, 28 Apr 2019 11:43:39 -0400
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+	[10.5.11.16])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 0393430018C2;
-	Sun, 28 Apr 2019 15:21:38 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id 6DE13307B4A7;
+	Sun, 28 Apr 2019 15:43:38 +0000 (UTC)
 Received: from thuth.remote.csb (ovpn-116-50.ams2.redhat.com [10.36.116.50])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id C2E7A5D9CA;
-	Sun, 28 Apr 2019 15:21:35 +0000 (UTC)
-To: Qemu-block <qemu-block@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>
+	by smtp.corp.redhat.com (Postfix) with ESMTP id C48C44D1;
+	Sun, 28 Apr 2019 15:43:36 +0000 (UTC)
+To: QEMU Developers <qemu-devel@nongnu.org>, Qemu-block <qemu-block@nongnu.org>
 From: Thomas Huth <thuth@redhat.com>
 Openpgp: preference=signencrypt
 Autocrypt: addr=thuth@redhat.com; keydata=
@@ -86,21 +86,21 @@ Autocrypt: addr=thuth@redhat.com; keydata=
 	rCELuGwT9hsYkUPjVd4lfylN3mzEc6iAv/wwjsc0DRTSQCpXT3v2ymTAsRKrVaEZLibTXaf+
 	WslxWek3xNYRiqwwWAJuL652eAlxUgQ5ZS+fXBRTiQpJ+F26I/2lccScRd9G5w==
 Organization: Red Hat
-Message-ID: <e3e75fd5-661e-95ab-d7d6-f9a7bf6548d4@redhat.com>
-Date: Sun, 28 Apr 2019 17:21:34 +0200
+Message-ID: <d9016c33-ef8f-7e79-d15f-4220c67efb10@redhat.com>
+Date: Sun, 28 Apr 2019 17:43:35 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
 	Thunderbird/60.6.1
 MIME-Version: 1.0
 Content-Type: text/plain; charset="UTF-8"
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
 	(mx1.redhat.com [10.5.110.46]);
-	Sun, 28 Apr 2019 15:21:38 +0000 (UTC)
+	Sun, 28 Apr 2019 15:43:38 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] Failing QEMU iotest 221
+Subject: [Qemu-devel] Failing qemu-iotest 211 with -vdi
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -116,40 +116,35 @@ Cc: Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190428152134.EucTs57g-E-2Zmb_GcC7iApKF6niigW_CfKw0iUWNXA@z>
+Message-ID: <20190428154335.byySCh4r-uE0TdKAkXugBOqgYj2iSOoCqjK1aWAO8KM@z>
 
-QEMU iotest 221 is failing for me, too, when I run it with -raw:
+QEMU iotest 211 is failing for me, too, when I run it with -vdi:
 
-tests/qemu-iotests$ ./check -raw 221
+tests/qemu-iotests$ ./check -vdi 211
 QEMU          -- "/home/thuth/tmp/qemu-build/tests/qemu-iotests/../../x86_64-softmmu/qemu-system-x86_64" -nodefaults -machine accel=qtest
 QEMU_IMG      -- "/home/thuth/tmp/qemu-build/tests/qemu-iotests/../../qemu-img" 
-QEMU_IO       -- "/home/thuth/tmp/qemu-build/tests/qemu-iotests/../../qemu-io"  --cache writeback -f raw
+QEMU_IO       -- "/home/thuth/tmp/qemu-build/tests/qemu-iotests/../../qemu-io"  --cache writeback -f vdi
 QEMU_NBD      -- "/home/thuth/tmp/qemu-build/tests/qemu-iotests/../../qemu-nbd" 
-IMGFMT        -- raw
+IMGFMT        -- vdi
 IMGPROTO      -- file
 PLATFORM      -- Linux/x86_64 thuth 3.10.0-957.10.1.el7.x86_64
 TEST_DIR      -- /home/thuth/tmp/qemu-build/tests/qemu-iotests/scratch
 SOCKET_SCM_HELPER -- /home/thuth/tmp/qemu-build/tests/qemu-iotests/socket_scm_helper
 
-221         - output mismatch (see 221.out.bad)
---- /home/thuth/devel/qemu/tests/qemu-iotests/221.out	2019-04-23 16:43:12.000000000 +0200
-+++ /home/thuth/tmp/qemu-build/tests/qemu-iotests/221.out.bad	2019-04-28 17:18:52.000000000 +0200
-@@ -7,10 +7,10 @@
- [{ "start": 0, "length": 43520, "depth": 0, "zero": true, "data": false, "offset": OFFSET}]
- wrote 1/1 bytes at offset 43008
- 1 bytes, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
--[{ "start": 0, "length": 40960, "depth": 0, "zero": true, "data": false, "offset": OFFSET},
--{ "start": 40960, "length": 2049, "depth": 0, "zero": false, "data": true, "offset": OFFSET},
-+[{ "start": 0, "length": 43008, "depth": 0, "zero": true, "data": false, "offset": OFFSET},
-+{ "start": 43008, "length": 1, "depth": 0, "zero": false, "data": true, "offset": OFFSET},
- { "start": 43009, "length": 511, "depth": 0, "zero": true, "data": false, "offset": OFFSET}]
--[{ "start": 0, "length": 40960, "depth": 0, "zero": true, "data": false, "offset": OFFSET},
--{ "start": 40960, "length": 2049, "depth": 0, "zero": false, "data": true, "offset": OFFSET},
-+[{ "start": 0, "length": 43008, "depth": 0, "zero": true, "data": false, "offset": OFFSET},
-+{ "start": 43008, "length": 1, "depth": 0, "zero": false, "data": true, "offset": OFFSET},
- { "start": 43009, "length": 511, "depth": 0, "zero": true, "data": false, "offset": OFFSET}]
- *** done
-Failures: 221
+211         - output mismatch (see 211.out.bad)
+--- /home/thuth/devel/qemu/tests/qemu-iotests/211.out	2019-04-23 16:43:12.000000000 +0200
++++ /home/thuth/tmp/qemu-build/tests/qemu-iotests/211.out.bad	2019-04-28 17:41:19.000000000 +0200
+@@ -55,8 +55,7 @@
+ virtual size: 32M (33554432 bytes)
+ cluster_size: 1048576
+ 
+-[{ "start": 0, "length": 3072, "depth": 0, "zero": false, "data": true, "offset": 1024},
+-{ "start": 3072, "length": 33551360, "depth": 0, "zero": true, "data": true, "offset": 4096}]
++[{ "start": 0, "length": 33554432, "depth": 0, "zero": true, "data": true, "offset": 1024}]
+ 
+ === Invalid BlockdevRef ===
+ 
+Failures: 211
 Failed 1 of 1 tests
 
 Any ideas how to fix this?
