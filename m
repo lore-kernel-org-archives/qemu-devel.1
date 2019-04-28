@@ -1,22 +1,24 @@
-Received: from eggs.gnu.org ([209.51.188.92]:57066)
+Received: from eggs.gnu.org ([209.51.188.92]:57082)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1hKdbG-0008PP-Nq
-	for qemu-devel@nongnu.org; Sun, 28 Apr 2019 02:47:47 -0400
+	(envelope-from <philmd@redhat.com>) id 1hKdbM-0008RV-IT
+	for qemu-devel@nongnu.org; Sun, 28 Apr 2019 02:47:54 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1hKdbE-0005Yz-W6
-	for qemu-devel@nongnu.org; Sun, 28 Apr 2019 02:47:46 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:44080)
+	(envelope-from <philmd@redhat.com>) id 1hKdbL-0005fp-9Y
+	for qemu-devel@nongnu.org; Sun, 28 Apr 2019 02:47:52 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:38114)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1hKdbE-0005Yk-R8
-	for qemu-devel@nongnu.org; Sun, 28 Apr 2019 02:47:44 -0400
+	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1hKdbK-0005e6-Sz
+	for qemu-devel@nongnu.org; Sun, 28 Apr 2019 02:47:51 -0400
 From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
-Date: Sun, 28 Apr 2019 08:47:25 +0200
-Message-Id: <20190428064731.29913-1-philmd@redhat.com>
+Date: Sun, 28 Apr 2019 08:47:26 +0200
+Message-Id: <20190428064731.29913-2-philmd@redhat.com>
+In-Reply-To: <20190428064731.29913-1-philmd@redhat.com>
+References: <20190428064731.29913-1-philmd@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v2 0/6] hw/acpi: Improve build modularity
- (targeting MIPS/PPC)
+Subject: [Qemu-devel] [PATCH v2 1/6] hw/acpi: Move the IPMI stub to the
+ stubs/ directory
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,44 +30,59 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Aleksandar Markovic <amarkovic@wavecomp.com>, Aleksandar Rikalo <arikalo@wavecomp.com>, "Michael S. Tsirkin" <mst@redhat.com>, Aurelien Jarno <aurelien@aurel32.net>, Paolo Bonzini <pbonzini@redhat.com>, Igor Mammedov <imammedo@redhat.com>, Corey Minyard <minyard@acm.org>, =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
 
-Hi,
+Move the IPMI stub file to the stubs/ directory to simplify the
+hw/acpi Makefile.
 
-This series is not related to the previous one I just send:
-hw/i386/acpi: Improve build modularity (isapc/q35/...)
-https://lists.gnu.org/archive/html/qemu-devel/2019-04/msg04678.html
-
-While the first only concern X86 (changes within the architecture),
-this one allow the core ACPI feature to be used by the MIPS and
-PPC archs (specific series will follow).
-
-v2:
-- Fixed IPMI build error (patchew)
-- Added possibility to build without ACPI (X86)
-
-v1: https://lists.gnu.org/archive/html/qemu-devel/2019-04/msg04696.html
-
-Regards,
-
-Phil.
-
-Philippe Mathieu-Daud=C3=A9 (6):
-  hw/acpi: Move the IPMI stub to the stubs/ directory
-  hw/acpi: Move the ACPI stub to the stubs/ directory
-  hw/acpi: Simplify the Makefile logic
-  hw/acpi: Always build the 'core' ACPI functions
-  stubs: Add missing ACPI symbols
-  vl: Do not set acpi_enabled when ACPI is disabled at build time
-
- MAINTAINERS                         |  2 ++
- hw/acpi/Makefile.objs               | 22 +++++++---------------
- hw/acpi/core.c                      |  1 +
- stubs/Makefile.objs                 |  2 ++
- hw/acpi/acpi-stub.c =3D> stubs/acpi.c |  6 ++++++
- hw/acpi/ipmi-stub.c =3D> stubs/ipmi.c |  0
- vl.c                                |  1 -
- 7 files changed, 18 insertions(+), 16 deletions(-)
- rename hw/acpi/acpi-stub.c =3D> stubs/acpi.c (93%)
+Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+---
+ MAINTAINERS                         | 1 +
+ hw/acpi/Makefile.objs               | 3 +--
+ stubs/Makefile.objs                 | 1 +
+ hw/acpi/ipmi-stub.c =3D> stubs/ipmi.c | 0
+ 4 files changed, 3 insertions(+), 2 deletions(-)
  rename hw/acpi/ipmi-stub.c =3D> stubs/ipmi.c (100%)
 
+diff --git a/MAINTAINERS b/MAINTAINERS
+index 23db6f8408a..e1681eca5cb 100644
+--- a/MAINTAINERS
++++ b/MAINTAINERS
+@@ -1309,6 +1309,7 @@ S: Maintained
+ F: include/hw/ipmi/*
+ F: hw/ipmi/*
+ F: hw/smbios/smbios_type_38.c
++F: stubs/ipmi.c
+ F: tests/ipmi*
+ T: git https://github.com/cminyard/qemu.git master-ipmi-rebase
+=20
+diff --git a/hw/acpi/Makefile.objs b/hw/acpi/Makefile.objs
+index 2d46e3789ae..4e302feb885 100644
+--- a/hw/acpi/Makefile.objs
++++ b/hw/acpi/Makefile.objs
+@@ -14,8 +14,7 @@ common-obj-y +=3D aml-build.o
+ common-obj-$(CONFIG_TPM) +=3D tpm.o
+=20
+ common-obj-$(CONFIG_IPMI) +=3D ipmi.o
+-common-obj-$(call lnot,$(CONFIG_IPMI)) +=3D ipmi-stub.o
+ else
+ common-obj-y +=3D acpi-stub.o
+ endif
+-common-obj-$(CONFIG_ALL) +=3D acpi-stub.o ipmi-stub.o
++common-obj-$(CONFIG_ALL) +=3D acpi-stub.o
+diff --git a/stubs/Makefile.objs b/stubs/Makefile.objs
+index 269dfa58326..36bb9ff0b1d 100644
+--- a/stubs/Makefile.objs
++++ b/stubs/Makefile.objs
+@@ -9,6 +9,7 @@ stub-obj-y +=3D error-printf.o
+ stub-obj-y +=3D fdset.o
+ stub-obj-y +=3D gdbstub.o
+ stub-obj-y +=3D get-vm-name.o
++stub-obj-y +=3D ipmi.o
+ stub-obj-y +=3D iothread.o
+ stub-obj-y +=3D iothread-lock.o
+ stub-obj-y +=3D is-daemonized.o
+diff --git a/hw/acpi/ipmi-stub.c b/stubs/ipmi.c
+similarity index 100%
+rename from hw/acpi/ipmi-stub.c
+rename to stubs/ipmi.c
 --=20
 2.20.1
