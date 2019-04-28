@@ -6,44 +6,46 @@ X-Spam-Status: No, score=-6.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 31E91C43218
-	for <qemu-devel@archiver.kernel.org>; Sun, 28 Apr 2019 22:34:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AE7BDC43218
+	for <qemu-devel@archiver.kernel.org>; Sun, 28 Apr 2019 22:56:25 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E039520679
-	for <qemu-devel@archiver.kernel.org>; Sun, 28 Apr 2019 22:34:58 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E039520679
+	by mail.kernel.org (Postfix) with ESMTPS id 62F4620675
+	for <qemu-devel@archiver.kernel.org>; Sun, 28 Apr 2019 22:56:25 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 62F4620675
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:49163 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:49340 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hKsNu-0000nU-5S
-	for qemu-devel@archiver.kernel.org; Sun, 28 Apr 2019 18:34:58 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:47765)
+	id 1hKsie-0005PC-JQ
+	for qemu-devel@archiver.kernel.org; Sun, 28 Apr 2019 18:56:24 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:50098)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1hKsN0-0000RF-MM
-	for qemu-devel@nongnu.org; Sun, 28 Apr 2019 18:34:03 -0400
+	(envelope-from <mreitz@redhat.com>) id 1hKshp-0004i5-UV
+	for qemu-devel@nongnu.org; Sun, 28 Apr 2019 18:55:35 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1hKsLj-00075I-Mo
-	for qemu-devel@nongnu.org; Sun, 28 Apr 2019 18:32:45 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:40240)
+	(envelope-from <mreitz@redhat.com>) id 1hKsho-0007Iq-K0
+	for qemu-devel@nongnu.org; Sun, 28 Apr 2019 18:55:33 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:52444)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <mreitz@redhat.com>)
-	id 1hKsLh-00073S-Ub; Sun, 28 Apr 2019 18:32:42 -0400
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
-	[10.5.11.22])
+	id 1hKshl-0007H3-JH; Sun, 28 Apr 2019 18:55:29 -0400
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+	[10.5.11.15])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 3916F309178C;
-	Sun, 28 Apr 2019 22:32:39 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id B32D78830E;
+	Sun, 28 Apr 2019 22:55:27 +0000 (UTC)
 Received: from dresden.str.redhat.com (ovpn-204-32.brq.redhat.com
 	[10.40.204.32])
-	by smtp.corp.redhat.com (Postfix) with ESMTPS id E827C10018E0;
-	Sun, 28 Apr 2019 22:32:36 +0000 (UTC)
-To: Denis Plotnikov <dplotnikov@virtuozzo.com>, kwolf@redhat.com
-References: <20190205090825.14059-1-dplotnikov@virtuozzo.com>
+	by smtp.corp.redhat.com (Postfix) with ESMTPS id B865A5D6A9;
+	Sun, 28 Apr 2019 22:55:23 +0000 (UTC)
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
+	qemu-devel@nongnu.org, qemu-block@nongnu.org
+References: <20190402153730.54145-1-vsementsov@virtuozzo.com>
+	<20190402153730.54145-2-vsementsov@virtuozzo.com>
 From: Max Reitz <mreitz@redhat.com>
 Openpgp: preference=signencrypt
 Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
@@ -70,23 +72,24 @@ Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
 	/ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
 	bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
 	R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
-Message-ID: <cd22d738-d09c-4e2f-5ec6-8d3d34e2b341@redhat.com>
-Date: Mon, 29 Apr 2019 00:32:34 +0200
+Message-ID: <fe340a80-f918-7999-fb75-4b129162bd89@redhat.com>
+Date: Mon, 29 Apr 2019 00:55:22 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
 	Thunderbird/60.6.1
 MIME-Version: 1.0
-In-Reply-To: <20190205090825.14059-1-dplotnikov@virtuozzo.com>
+In-Reply-To: <20190402153730.54145-2-vsementsov@virtuozzo.com>
 Content-Type: multipart/signed; micalg=pgp-sha256;
 	protocol="application/pgp-signature";
-	boundary="6S5hCFRNsHRbRe9kOzQF3AWHoioq0dCDV"
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+	boundary="nkDe19NtnX0dms35SobhN9BjQiGecCibO"
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.41]);
-	Sun, 28 Apr 2019 22:32:39 +0000 (UTC)
+	(mx1.redhat.com [10.5.110.28]);
+	Sun, 28 Apr 2019 22:55:28 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
 X-Content-Filtered-By: Mailman/MimeDel 2.1.21
-Subject: Re: [Qemu-devel] [PATCH] [RFC] qcow2: add compression type feature
+Subject: Re: [Qemu-devel] [PATCH v5 01/10] tests/perf: Test qemu-img convert
+ from raw to encrypted qcow2
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -98,154 +101,133 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org, den@virtuozzo.com
+Cc: kwolf@redhat.com, pbonzini@redhat.com, berto@igalia.com, den@openvz.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190428223234.SDT9p1ZMjXq7CZaDxMyltbJCo8epSzH0okyyCxCorG8@z>
+Message-ID: <20190428225522.B6J8eJ7SjdqzKf-1z8fwmHQOy4xvAu6HRI8vrty1Qhk@z>
 
 This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---6S5hCFRNsHRbRe9kOzQF3AWHoioq0dCDV
+--nkDe19NtnX0dms35SobhN9BjQiGecCibO
 From: Max Reitz <mreitz@redhat.com>
-To: Denis Plotnikov <dplotnikov@virtuozzo.com>, kwolf@redhat.com
-Cc: qemu-block@nongnu.org, qemu-devel@nongnu.org, den@virtuozzo.com,
- eblake@redhat.com
-Message-ID: <cd22d738-d09c-4e2f-5ec6-8d3d34e2b341@redhat.com>
-Subject: Re: [PATCH] [RFC] qcow2: add compression type feature
-References: <20190205090825.14059-1-dplotnikov@virtuozzo.com>
-In-Reply-To: <20190205090825.14059-1-dplotnikov@virtuozzo.com>
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
+ qemu-devel@nongnu.org, qemu-block@nongnu.org
+Cc: kwolf@redhat.com, berto@igalia.com, pbonzini@redhat.com, den@openvz.org,
+ berrange@redhat.com
+Message-ID: <fe340a80-f918-7999-fb75-4b129162bd89@redhat.com>
+Subject: Re: [PATCH v5 01/10] tests/perf: Test qemu-img convert from raw to
+ encrypted qcow2
+References: <20190402153730.54145-1-vsementsov@virtuozzo.com>
+ <20190402153730.54145-2-vsementsov@virtuozzo.com>
+In-Reply-To: <20190402153730.54145-2-vsementsov@virtuozzo.com>
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
 
-On 05.02.19 10:08, Denis Plotnikov wrote:
-> The patch adds some preparation parts for incompatible compression type=
-
-> feature into QCOW2 header that indicates that *all* compressed clusters=
-
-> must be (de)compressed using a certain compression type.
->=20
-> It is implied that the compression type is set on the image creation an=
-d
-> can be changed only later by image convertion, thus the only compressio=
-n
-> algorithm is used for the image.
->=20
-> The plan is to add support for ZSTD and then may be something more effe=
-ctive
-> in the future.
->=20
-> ZSDT compression algorithm consumes 3-5 times less CPU power with a
-> comparable comression ratio with zlib. It would be wise to use it for
-> data compression f.e. for backups.
->=20
-> The default compression is ZLIB.
->=20
-> Signed-off-by: Denis Plotnikov <dplotnikov@virtuozzo.com>
+On 02.04.19 17:37, Vladimir Sementsov-Ogievskiy wrote:
+> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 > ---
->  block/qcow2.c | 25 +++++++++++++++++++++++++
->  block/qcow2.h | 26 ++++++++++++++++++++++----
->  2 files changed, 47 insertions(+), 4 deletions(-)
+>  tests/perf/block/qcow2/convert-to-encrypted | 48 +++++++++++++++++++++=
 
-Are there plans to pursue this further?
+>  1 file changed, 48 insertions(+)
+>  create mode 100755 tests/perf/block/qcow2/convert-to-encrypted
 
-[...]
+Thanks for the test case, but I don=E2=80=99t know whether this is the ri=
+ght way
+to include it.
 
-> diff --git a/block/qcow2.h b/block/qcow2.h
-> index 32cce9eee2..fdde5bbefd 100644
-> --- a/block/qcow2.h
-> +++ b/block/qcow2.h
-> @@ -112,6 +112,10 @@
->  #define QCOW2_OPT_REFCOUNT_CACHE_SIZE "refcount-cache-size"
->  #define QCOW2_OPT_CACHE_CLEAN_INTERVAL "cache-clean-interval"
-> =20
-> +/* Compression types */
-> +#define QCOW2_COMPRESSION_TYPE_ZLIB    0
-> +#define QCOW2_COMPRESSION_TYPE_ZSTD    1
-
-We probably want QAPI types anyway (qemu-img info should report the
-compression type), so I think we could use them instead.
-
->  typedef struct QCowHeader {
->      uint32_t magic;
->      uint32_t version;
-> @@ -197,10 +201,13 @@ enum {
-> =20
->  /* Incompatible feature bits */
->  enum {
-> -    QCOW2_INCOMPAT_DIRTY_BITNR   =3D 0,
-> -    QCOW2_INCOMPAT_CORRUPT_BITNR =3D 1,
-> -    QCOW2_INCOMPAT_DIRTY         =3D 1 << QCOW2_INCOMPAT_DIRTY_BITNR,
-> -    QCOW2_INCOMPAT_CORRUPT       =3D 1 << QCOW2_INCOMPAT_CORRUPT_BITNR=
-,
-> +    QCOW2_INCOMPAT_DIRTY_BITNR            =3D 0,
-> +    QCOW2_INCOMPAT_CORRUPT_BITNR          =3D 1,
-> +    QCOW2_INCOMPAT_COMPRESSION_TYPE_BITNR =3D 2,
-> +    QCOW2_INCOMPAT_DIRTY                  =3D 1 << QCOW2_INCOMPAT_DIRT=
-Y_BITNR,
-> +    QCOW2_INCOMPAT_CORRUPT                =3D 1 << QCOW2_INCOMPAT_CORR=
-UPT_BITNR,
-> +    QCOW2_INCOMPAT_COMPRESSION_TYPE       =3D
-> +                                    1 << QCOW2_INCOMPAT_COMPRESSION_TY=
-PE_BITNR,
-> =20
->      QCOW2_INCOMPAT_MASK          =3D QCOW2_INCOMPAT_DIRTY
->                                   | QCOW2_INCOMPAT_CORRUPT,
-
-This mask needs to be expanded by QCOW2_INCOMPAT_COMPRESSION_TYPE.
-
-> @@ -256,6 +263,10 @@ typedef struct Qcow2BitmapHeaderExt {
->      uint64_t bitmap_directory_offset;
->  } QEMU_PACKED Qcow2BitmapHeaderExt;
-> =20
-> +typedef struct Qcow2CompressionTypeExt {
-> +    uint32_t compression_type;
-> +} QEMU_PACKED Qcow2CompressionTypeExt;
-> +
->  typedef struct BDRVQcow2State {
->      int cluster_bits;
->      int cluster_size;
-> @@ -340,6 +351,13 @@ typedef struct BDRVQcow2State {
-> =20
->      CoQueue compress_wait_queue;
->      int nb_compress_threads;
-> +    /**
-> +     * Compression type used for the image. Default: 0 - ZLIB
-> +     * The image compression type is set on image creation.
-> +     * The only way to change the compression type is to convert the i=
-mage
-> +     * with the desired compresion type set
-
-*compression
-
-And, well, ideally qemu-img amend could perform this operation, too.
+A concrete problem is that it doesn=E2=80=99t work with out-of-tree build=
+s (I
+only do out-of-tree builds).  I wonder whether it would be possible and
+make sense (I have no idea) to add a subdirectory "perf" to the iotests
+and reuse its infrastructure?  Those tests wouldn=E2=80=99t run by defaul=
+t.
 
 Max
 
-> +     */
-> +    uint32_t compression_type;
->  } BDRVQcow2State;
-> =20
->  typedef struct Qcow2COWRegion {
+> diff --git a/tests/perf/block/qcow2/convert-to-encrypted b/tests/perf/b=
+lock/qcow2/convert-to-encrypted
+> new file mode 100755
+> index 0000000000..7a6b7b1cab
+> --- /dev/null
+> +++ b/tests/perf/block/qcow2/convert-to-encrypted
+> @@ -0,0 +1,48 @@
+> +#!/bin/bash
+> +#
+> +# Test qemu-img convert from raw to encrypted qcow2
+> +#
+> +# Copyright (c) 2019 Virtuozzo International GmbH. All rights reserved=
+=2E
+> +#
+> +# This program is free software; you can redistribute it and/or modify=
+
+> +# it under the terms of the GNU General Public License as published by=
+
+> +# the Free Software Foundation; either version 2 of the License, or
+> +# (at your option) any later version.
+> +#
+> +# This program is distributed in the hope that it will be useful,
+> +# but WITHOUT ANY WARRANTY; without even the implied warranty of
+> +# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+> +# GNU General Public License for more details.
+> +#
+> +# You should have received a copy of the GNU General Public License
+> +# along with this program.  If not, see <http://www.gnu.org/licenses/>=
+=2E
+> +#
+> +
+> +if [ "$#" -lt 2 ]; then
+> +    echo "Usage: $0 SOURCE_FILE DESTINATION_FILE [additional qemu-img =
+convert parameters]"
+> +    exit 1
+> +fi
+> +
+> +ROOT_DIR=3D"$( cd "$( dirname "${BASH_SOURCE[0]}" )/../../../.." >/dev=
+/null 2>&1 && pwd )"
+> +QEMU_IMG=3D"$ROOT_DIR/qemu-img"
+> +QEMU_IO=3D"$ROOT_DIR/qemu-io"
+> +
+> +size=3D1G
+> +
+> +src=3D"$1"
+> +shift
+> +
+> +dst=3D"$1"
+> +shift
+> +
+> +(
+> +# create source
+> +$QEMU_IMG create -f raw "$src" $size
+> +$QEMU_IO -f raw -c "write -P 0xa 0 $size" "$src"
+> +
+> +# create target
+> +$QEMU_IMG create -f qcow2 --object secret,id=3Dsec0,data=3Dtest -o enc=
+rypt.format=3Dluks,encrypt.key-secret=3Dsec0 "$dst" $size
+> +) > /dev/null
+> +
+> +# test with additional parameters left in $@
+> +/usr/bin/time -f %e $QEMU_IMG convert "$@" -f raw --object secret,id=3D=
+sec0,data=3Dtest --target-image-opts -n "$src" "driver=3Dqcow2,file.filen=
+ame=3D$dst,encrypt.key-secret=3Dsec0"
 >=20
 
 
 
---6S5hCFRNsHRbRe9kOzQF3AWHoioq0dCDV
+--nkDe19NtnX0dms35SobhN9BjQiGecCibO
 Content-Type: application/pgp-signature; name="signature.asc"
 Content-Description: OpenPGP digital signature
 Content-Disposition: attachment; filename="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAlzGKgIACgkQ9AfbAGHV
-z0B0/Qf/a9epd/IVJODcHCMTjUeoOlsFDEgxj4KIdlFk/Rjzse7P4nIFqr4QmY6l
-WYPE/1lZOUBQ/3DIuosc2vktphIQoImjN7W0W7JEZdV0ptAL4vqFIeCraRI7BeVz
-KQExc3Ozugq+LT/jYWwTlMOAaFvVwQy2Zm00kp5k1Ev3QRjzBiH5SSH+qLZBMeza
-i6fS+U8k9RistuvJE1lyksbZqxUaLi7Zd+Be5fT4MV4hUKfsD10B+cmmUexlu6E1
-Ts/Ahr7SjNyH7JAPFE3evWscj3DMl0Xvs/vGG0MLx6cTU4yJTgshubSHgdHHhr8y
-gSRB9S12bIniXa2w98VERif97Dx3dg==
-=j6ah
+iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAlzGL1oACgkQ9AfbAGHV
+z0Dv1gf9Fgb33NPbFmkgMoU+ruqbe1qnNS2ijYN+zyLQ4/STFN3HmTCgYydagZr1
+c11XUgm1+DPpQRwAX+mc3vKCsHI6paoPDCnq55VssKd3Tx2mkygTrC6AIUdWBojJ
+flA/sizxYXGq0QAY7I3UbTFoLlbBJ2ABhwQ2rVPoNrlqcMNLmLwlKYaXXRFHR02b
+zXXFdib9IMqOB4ijLO9EoWNIa+UbLOwGlYpfkRbSawxgMtjT1veOfAa0UYfGsYU/
+Pz1m2XHzfRUSt49qLe3bx37aukbakyX//VrrCs4pPynBzMujz8Pc37ZtJbXVTCWR
++g2p3/02n1dMllNC2RACQgY/E/wcSA==
+=gH2V
 -----END PGP SIGNATURE-----
 
---6S5hCFRNsHRbRe9kOzQF3AWHoioq0dCDV--
+--nkDe19NtnX0dms35SobhN9BjQiGecCibO--
 
