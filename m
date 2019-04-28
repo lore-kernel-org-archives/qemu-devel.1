@@ -2,71 +2,69 @@ Return-Path: <SRS0=GiFh=S6=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.7 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.7 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 75276C43218
-	for <qemu-devel@archiver.kernel.org>; Sun, 28 Apr 2019 03:38:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DE00CC43218
+	for <qemu-devel@archiver.kernel.org>; Sun, 28 Apr 2019 03:40:16 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3C4D52077B
-	for <qemu-devel@archiver.kernel.org>; Sun, 28 Apr 2019 03:38:55 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 9D02E2077B
+	for <qemu-devel@archiver.kernel.org>; Sun, 28 Apr 2019 03:40:16 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=me.com header.i=@me.com header.b="2bujfJh8"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3C4D52077B
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=me.com header.i=@me.com header.b="4llB6g3R"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9D02E2077B
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=nongnu.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:39239 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:39262 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hKaeU-0002kc-BM
-	for qemu-devel@archiver.kernel.org; Sat, 27 Apr 2019 23:38:54 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:33558)
+	id 1hKafo-0003fy-05
+	for qemu-devel@archiver.kernel.org; Sat, 27 Apr 2019 23:40:16 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:33545)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <tgfbeta@me.com>) id 1hKacy-0001sr-OL
+	(envelope-from <tgfbeta@me.com>) id 1hKacz-0001sm-4c
 	for qemu-devel@nongnu.org; Sat, 27 Apr 2019 23:37:22 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <tgfbeta@me.com>) id 1hKaXE-0005t0-Is
-	for qemu-devel@nongnu.org; Sat, 27 Apr 2019 23:31:26 -0400
-Received: from pv50p00im-ztdg10011301.me.com ([17.58.6.40]:21651)
+	(envelope-from <tgfbeta@me.com>) id 1hKaVt-00051a-E3
+	for qemu-devel@nongnu.org; Sat, 27 Apr 2019 23:30:02 -0400
+Received: from pv50p00im-ztdg10011901.me.com ([17.58.6.50]:35124)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <tgfbeta@me.com>) id 1hKaXE-0005sU-AO
-	for qemu-devel@nongnu.org; Sat, 27 Apr 2019 23:31:24 -0400
+	(Exim 4.71) (envelope-from <tgfbeta@me.com>) id 1hKaVt-00050l-5f
+	for qemu-devel@nongnu.org; Sat, 27 Apr 2019 23:30:01 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=me.com; s=04042017;
-	t=1556422283; bh=RaCyOJ8X3bdfgOf1c7VF+2sH9Xvo3ugHJ8Wxturnu8Q=;
-	h=From:Message-Id:Content-Type:Mime-Version:Subject:Date:To;
-	b=2bujfJh8HjOMI5zStrAOJi4mJW2JhxvTqXHvRIohcAEJ+zc27sTiEmGeuSY0MOeNM
-	Y9eBdgyZbcz9YG8FbeTQoxwJP+rXCCST2uTYivDi1r2fSNnz5Xq3fapSr//xmKoXkz
-	+7MTadXJbFtcQaYvjs1KBOJiDopoBp7jItMqpulF/UFV0PHUNFf7BsbPdeCBr+Z2p2
-	NPq1e7JM+g1LAa5zlw2A/r8GjwT/e0kCQZCYPBpu5I6saW/HkhiNc5cCe4DucdwWp4
-	b51t6I2Mn4N1JGinFRRHD8VU80oBwpS3+nfha/EegFOP0F6IC0Koe0QZ0OyAltmPj9
-	1RxZMvORaJPRA==
+	t=1556422199; bh=vKEhVoXlBYyH8XNx4TvLasowpT7v8MJAtuQDfP8V/6U=;
+	h=From:Content-Type:Mime-Version:Subject:Message-Id:Date:To;
+	b=4llB6g3RBfCtc+LKICDJMz6qyP4DwYwQw3ODrdnbDE6jqFaro01T7tTZmOdOgQWpo
+	9nTWzWF9GDjRqaA5nUk1sTfWe+pLY2YxtDNF+mTDBZZZvpWtdwsUBi/0De43NdM5yq
+	chrvdoepVlD50xRx0SQ/JF0DSUCSQPskld0YKE+qhE2HMTfuth8mLK8DqBjrTGDRRm
+	sFBH87CDjbxmqFVdhhhvq5YMKBuACagMlXgx9ac61T5c2ow4ib5ywQGdlEid30ikP7
+	OYuQ9pdLKIDzsJfE0TkVuNLXbgR63itj3s1N0UiceErXeAiZYErdKsYejqmeR9TrDB
+	GzJep4koQ+4rQ==
 Received: from [172.18.2.102] (unknown [36.106.167.46])
-	by pv50p00im-ztdg10011301.me.com (Postfix) with ESMTPSA id C94CE6400FC; 
-	Sun, 28 Apr 2019 03:31:20 +0000 (UTC)
-Message-Id: <F07AA414-D6D4-4CAE-B56D-AF2D1B5259D4@me.com>
+	by pv50p00im-ztdg10011901.me.com (Postfix) with ESMTPSA id 4DAE2800011; 
+	Sun, 28 Apr 2019 03:29:58 +0000 (UTC)
 Mime-Version: 1.0 (Mac OS X Mail 12.2 \(3445.102.3\))
-Date: Sun, 28 Apr 2019 11:31:17 +0800
-In-Reply-To: <4EAA64FC-AA22-4B01-8BC4-49DAC694963B@me.com>
+Message-Id: <4EAA64FC-AA22-4B01-8BC4-49DAC694963B@me.com>
+Date: Sun, 28 Apr 2019 11:29:54 +0800
 To: Peter Maydell <peter.maydell@linaro.org>, Gerd Hoffmann <kraxel@redhat.com>
-References: <4EAA64FC-AA22-4B01-8BC4-49DAC694963B@me.com>
 X-Mailer: Apple Mail (2.3445.102.3)
 X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:, ,
 	definitions=2019-04-28_03:, , signatures=0
 X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=0
 	malwarescore=0
 	phishscore=0 bulkscore=0 spamscore=0 clxscore=1015 mlxscore=0
-	mlxlogscore=999 adultscore=0 classifier=spam adjust=0 reason=mlx
+	mlxlogscore=724 adultscore=0 classifier=spam adjust=0 reason=mlx
 	scancount=1 engine=8.0.1-1812120000 definitions=main-1904280022
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 17.58.6.40
+X-Received-From: 17.58.6.50
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 X-Content-Filtered-By: Mailman/MimeDel 2.1.21
-Subject: [Qemu-devel] [PATCH RESEND 1/2] ui/cocoa: Fix absolute input device
- grabbing issue on Mojave
+Subject: [Qemu-devel] [PATCH RESEND 0/2] ui/cocoa: Fix absolute and relative
+ input issues on Mojave
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -84,109 +82,18 @@ Cc: qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190428033117.AG1A3d8TNxTFUYj2n2FM1X5_FlII56nEB1AFJowojgA@z>
+Message-ID: <20190428032954.VINEtsJMhAXKqp-W7qg2T9oVs_sLREgj9-viA7un_Ag@z>
 
-This patches fixed boundary check methods for cursor in normal and
-fullscreen modes with/without Zoom-to-Fit on Mojave.
+The following patches fixed absolute and relative input device issues on =
+macOS Mojave.
 
-On Mojave, absolute input device, i.e. tablet, had trouble re-grabbing
-the cursor in re-entry into the virtual screen area. In some cases,
-the `window` property of NSEvent object was nil after exit of cursor,
-meaning that the `-locationInWindow` method would return value in screen
-coordinates. The current implementation used raw locations frrom NSEvent
-without considering whether the value was for the window coordinates or
-the macOS screen coordinates, nor the zooming factor for Zoom-to-Fit in
-fullscreen mode.
+Chen Zhang (2):
+  ui/cocoa: Fix absolute input device grabbing issue on Mojave
+  ui/cocoa: Fix mouse grabbing in fullscreen mode for relative input
+    device
 
-In fullscreen mode, the fullscreen cocoa window might not be the key
-window, therefore the location of event in virtual coordinates should
-suffice.
+ ui/cocoa.m | 50 +++++++++++++++++++++++++++++++++++++++++++++++---
+ 1 file changed, 47 insertions(+), 3 deletions(-)
 
-Note: CGRect, -convertRectToScreen: and -convertRectFromScreen: were
-used in coordinates conversion for compatibility reason.
-
-Signed-off-by: Chen Zhang <tgfbeta@me.com <mailto:tgfbeta@me.com>>
----
-ui/cocoa.m | 43 +++++++++++++++++++++++++++++++++++++++++--
-1 file changed, 41 insertions(+), 2 deletions(-)
-
-diff --git a/ui/cocoa.m b/ui/cocoa.m
-index 420b2411c1..474d44cb9f 100644
---- a/ui/cocoa.m
-+++ b/ui/cocoa.m
-@@ -405,6 +405,41 @@ QemuCocoaView *cocoaView;
-    return (p.x > -1 && p.x < screen.width && p.y > -1 && p.y < =
-screen.height);
-}
-
-+/* Get location of event and convert to virtual screen coordinate */
-+- (CGPoint) screenLocationOfEvent:(NSEvent *)ev
-+{
-+    NSWindow *eventWindow =3D [ev window];
-+    // XXX: Use CGRect and -convertRectFromScreen: to support macOS =
-10.10
-+    CGRect r =3D CGRectZero;
-+    r.origin =3D [ev locationInWindow];
-+    if (!eventWindow) {
-+        if (!isFullscreen) {
-+            return [[self window] convertRectFromScreen:r].origin;
-+        } else {
-+            CGPoint locationInSelfWindow =3D [[self window] =
-convertRectFromScreen:r].origin;
-+            CGPoint loc =3D [self convertPoint:locationInSelfWindow =
-fromView:nil];
-+            if (stretch_video) {
-+                loc.x /=3D cdx;
-+                loc.y /=3D cdy;
-+            }
-+            return loc;
-+        }
-+    } else if ([[self window] isEqual:eventWindow]) {
-+        if (!isFullscreen) {
-+            return r.origin;
-+        } else {
-+            CGPoint loc =3D [self convertPoint:r.origin fromView:nil];
-+            if (stretch_video) {
-+                loc.x /=3D cdx;
-+                loc.y /=3D cdy;
-+            }
-+            return loc;
-+        }
-+    } else {
-+        return [[self window] convertRectFromScreen:[eventWindow =
-convertRectToScreen:r]].origin;
-+    }
-+}
-+
-- (void) hideCursor
-{
-    if (!cursor_hide) {
-@@ -704,7 +739,8 @@ QemuCocoaView *cocoaView;
-    int keycode =3D 0;
-    bool mouse_event =3D false;
-    static bool switched_to_fullscreen =3D false;
--    NSPoint p =3D [event locationInWindow];
-+    // Location of event in virtual screen coordinates
-+    NSPoint p =3D [self screenLocationOfEvent:event];
-
-    switch ([event type]) {
-        case NSEventTypeFlagsChanged:
-@@ -815,7 +851,10 @@ QemuCocoaView *cocoaView;
-            break;
-        case NSEventTypeMouseMoved:
-            if (isAbsoluteEnabled) {
--                if (![self screenContainsPoint:p] || ![[self window] =
-isKeyWindow]) {
-+                // Cursor re-entered into a window might generate =
-events bound to screen coordinates
-+                // and `nil` window property, and in full screen mode, =
-current window might not be
-+                // key window, where event location alone should =
-suffice.
-+                if (![self screenContainsPoint:p] || !([[self window] =
-isKeyWindow] || isFullscreen)) {
-                    if (isMouseGrabbed) {
-                        [self ungrabMouse];
-                    }
 --=20
 2.19.2=
