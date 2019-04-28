@@ -3,60 +3,60 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
 X-Spam-Status: No, score=-6.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.0
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2C6BAC4321A
-	for <qemu-devel@archiver.kernel.org>; Sun, 28 Apr 2019 15:59:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6B0F7C43218
+	for <qemu-devel@archiver.kernel.org>; Sun, 28 Apr 2019 16:03:05 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E018F206A3
-	for <qemu-devel@archiver.kernel.org>; Sun, 28 Apr 2019 15:59:55 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E018F206A3
+	by mail.kernel.org (Postfix) with ESMTPS id 23B292067D
+	for <qemu-devel@archiver.kernel.org>; Sun, 28 Apr 2019 16:03:05 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 23B292067D
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:45736 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:45864 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hKmDa-00030U-Ay
-	for qemu-devel@archiver.kernel.org; Sun, 28 Apr 2019 11:59:54 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:52604)
+	id 1hKmGe-0005I8-9a
+	for qemu-devel@archiver.kernel.org; Sun, 28 Apr 2019 12:03:04 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:52606)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1hKm9U-000864-Re
+	(envelope-from <thuth@redhat.com>) id 1hKm9V-00086M-2W
 	for qemu-devel@nongnu.org; Sun, 28 Apr 2019 11:55:42 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1hKm9T-00058p-Du
-	for qemu-devel@nongnu.org; Sun, 28 Apr 2019 11:55:40 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:53132)
+	(envelope-from <thuth@redhat.com>) id 1hKm9T-000591-PT
+	for qemu-devel@nongnu.org; Sun, 28 Apr 2019 11:55:41 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:56918)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <thuth@redhat.com>)
-	id 1hKm9N-00052V-VM; Sun, 28 Apr 2019 11:55:35 -0400
+	id 1hKm9Q-00053p-CH; Sun, 28 Apr 2019 11:55:37 -0400
 Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
 	[10.5.11.23])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 1C6E72DC379;
-	Sun, 28 Apr 2019 15:55:32 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id E9C56369CD;
+	Sun, 28 Apr 2019 15:55:34 +0000 (UTC)
 Received: from thuth.com (ovpn-116-50.ams2.redhat.com [10.36.116.50])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id 9364E28989;
-	Sun, 28 Apr 2019 15:55:29 +0000 (UTC)
+	by smtp.corp.redhat.com (Postfix) with ESMTP id 66E1F28988;
+	Sun, 28 Apr 2019 15:55:32 +0000 (UTC)
 From: Thomas Huth <thuth@redhat.com>
 To: qemu-devel@nongnu.org
-Date: Sun, 28 Apr 2019 17:54:50 +0200
-Message-Id: <20190428155451.15653-8-thuth@redhat.com>
+Date: Sun, 28 Apr 2019 17:54:51 +0200
+Message-Id: <20190428155451.15653-9-thuth@redhat.com>
 In-Reply-To: <20190428155451.15653-1-thuth@redhat.com>
 References: <20190428155451.15653-1-thuth@redhat.com>
 MIME-Version: 1.0
 X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.29]);
-	Sun, 28 Apr 2019 15:55:32 +0000 (UTC)
+	(mx1.redhat.com [10.5.110.30]);
+	Sun, 28 Apr 2019 15:55:35 +0000 (UTC)
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] [PATCH v2 7/8] tests/qemu-iotests/group: Re-use the
- "auto" group for tests that can always run
+Subject: [Qemu-devel] [PATCH v2 8/8] tests: Run the iotests during "make
+ check" again
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -80,337 +80,157 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 Content-Type: text/plain; charset="UTF-8"
-Message-ID: <20190428155450.At9ffujs6tvKCByIAPIvqOZWDWn4NzlsyhiixPK5yOM@z>
+Message-ID: <20190428155451.KE6mkd8upNUmqAArW9NjaEWtaINlvwe3Pph8yX7FxN8@z>
 
-Currently, all tests are in the "auto" group. This is a little bit pointl=
-ess.
-OTOH, we need a group for the tests that we can automatically run during
-"make check" each time, too. Tests in this new group are supposed to run
-with every possible QEMU configuration, for example they must run with ev=
-ery
-QEMU binary (also non-x86), without failing when an optional features is
-missing (but reporting "skip" is ok), and be able to run on all kind of h=
-ost
-filesystems and users (i.e. also as "nobody" or "root").
-So let's use the "auto" group for this class of tests now. The initial
-list has been determined by running the iotests with non-x86 QEMU targets
-and with our CI pipelines on Gitlab, Cirrus-CI and Travis (i.e. including
-macOS and FreeBSD).
+People often forget to run the iotests before submitting patches or
+pull requests - this is likely due to the fact that we do not run the
+tests during our mandatory "make check" tests yet. Now that we've got
+a proper "auto" group of iotests that should be fine to run in every
+environment, we can enable the iotests during "make check" again by
+running the "auto" tests by default from the check-block.sh script.
+
+Some cases still need to be checked first, though: iotests need bash
+and GNU sed (otherwise they fail), and if gprof is enabled, it spoils
+the output of some test cases causing them to fail. So if we detect
+that one of the required programs is missing or that gprof is enabled,
+we still have to skip the iotests to avoid failures.
+
+And finally, since we are using check-block.sh now again, this patch also
+removes the qemu-iotests-quick.sh script since we do not need that anymor=
+e
+(and having two shell wrapper scripts around the block tests seem
+rather confusing than helpful).
 
 Signed-off-by: Thomas Huth <thuth@redhat.com>
 ---
- tests/qemu-iotests/group | 169 +++++++++++++++++++++------------------
- 1 file changed, 91 insertions(+), 78 deletions(-)
+ tests/Makefile.include      |  8 +++----
+ tests/check-block.sh        | 44 ++++++++++++++++++++++++++++---------
+ tests/qemu-iotests-quick.sh |  8 -------
+ 3 files changed, 38 insertions(+), 22 deletions(-)
+ delete mode 100755 tests/qemu-iotests-quick.sh
 
-diff --git a/tests/qemu-iotests/group b/tests/qemu-iotests/group
-index bae7718380..4d0b6ae256 100644
---- a/tests/qemu-iotests/group
-+++ b/tests/qemu-iotests/group
-@@ -1,8 +1,21 @@
- #
- # QA groups control file
- # Defines test groups
-+#
-+# Some notes about the groups:
-+#
- # - do not start group names with a digit
- #
-+# - quick : Tests in this group should finish within some few seconds.
-+#
-+# - img : Tests in this group can be used to excercise the qemu-img tool=
-.
-+#
-+# - auto : Tests in this group are used during "make check" and should b=
-e
-+#   runnable in any case. That means they should run with every QEMU bin=
-ary
-+#   (also non-x86), with every QEMU configuration (i.e. must not fail if
-+#   an optional feature is not compiled in - but reporting a "skip" is o=
-k),
-+#   and work all kind of host filesystems and users (e.g. "nobody" or "r=
-oot").
-+#
+diff --git a/tests/Makefile.include b/tests/Makefile.include
+index e2432d5e77..3bb7793d4a 100644
+--- a/tests/Makefile.include
++++ b/tests/Makefile.include
+@@ -140,7 +140,7 @@ check-unit-y +=3D tests/test-uuid$(EXESUF)
+ check-unit-y +=3D tests/ptimer-test$(EXESUF)
+ check-unit-y +=3D tests/test-qapi-util$(EXESUF)
 =20
- #
- # test-group association ... one line per test
-@@ -32,11 +45,11 @@
- 023 rw auto
- 024 rw backing auto quick
- 025 rw auto quick
--026 rw blkdbg auto
-+026 rw blkdbg
- 027 rw auto quick
- 028 rw backing auto quick
- 029 rw auto quick
--030 rw auto backing
-+030 rw backing
- 031 rw auto quick
- 032 rw auto quick
- 033 rw auto quick
-@@ -46,35 +59,35 @@
- 037 rw auto backing quick
- 038 rw auto backing quick
- 039 rw auto quick
--040 rw auto
--041 rw auto backing
-+040 rw
-+041 rw backing
- 042 rw auto quick
- 043 rw auto backing
--044 rw auto
--045 rw auto quick
-+044 rw
-+045 rw quick
- 046 rw auto aio quick
- 047 rw auto quick
- 048 img auto quick
- 049 rw auto
- 050 rw auto backing quick
--051 rw auto
-+051 rw
- 052 rw auto backing quick
- 053 rw auto quick
- 054 rw auto quick
--055 rw auto
--056 rw auto backing
--057 rw auto
--058 rw auto quick
-+055 rw
-+056 rw backing
-+057 rw
-+058 rw quick
- 059 rw auto quick
- 060 rw auto quick
- 061 rw auto
- 062 rw auto quick
- 063 rw auto quick
- 064 rw auto quick
--065 rw auto quick
-+065 rw quick
- 066 rw auto quick
--067 rw auto quick
--068 rw auto quick
-+067 rw quick
-+068 rw quick
- 069 rw auto quick
- 070 rw auto quick
- 071 rw auto quick
-@@ -91,18 +104,18 @@
- 082 rw auto quick
- 083 rw auto
- 084 img auto quick
--085 rw auto
-+085 rw
- 086 rw auto quick
--087 rw auto quick
-+087 rw quick
- 088 rw auto quick
- 089 rw auto quick
- 090 rw auto quick
- 091 rw auto migration
- 092 rw auto quick
--093 auto
-+093=20
- 094 rw auto quick
--095 rw auto quick
--096 rw auto quick
-+095 rw quick
-+096 rw quick
- 097 rw auto backing
- 098 rw auto backing quick
- 099 rw auto quick
-@@ -118,60 +131,60 @@
- 109 rw auto
- 110 rw auto backing quick
- 111 rw auto quick
--112 rw auto
-+112 rw
- 113 rw auto quick
- 114 rw auto quick
--115 rw auto
-+115 rw
- 116 rw auto quick
- 117 rw auto
--118 rw auto
-+118 rw
- 119 rw auto quick
- 120 rw auto quick
--121 rw auto
-+121 rw
- 122 rw auto
- 123 rw auto quick
--124 rw auto backing
--125 rw auto
-+124 rw backing
-+125 rw
- 126 rw auto backing
--127 rw auto backing quick
-+127 rw backing quick
- 128 rw auto quick
--129 rw auto quick
-+129 rw quick
- 130 rw auto quick
- 131 rw auto quick
--132 rw auto quick
-+132 rw quick
- 133 auto quick
- 134 rw auto quick
- 135 rw auto
--136 rw auto
-+136 rw
- 137 rw auto
- 138 rw auto quick
--139 rw auto quick
-+139 rw quick
- 140 rw auto quick
- 141 rw auto quick
- 142 auto
- 143 auto quick
--144 rw auto quick
--145 auto quick
-+144 rw quick
-+145 quick
- 146 auto quick
--147 auto
--148 rw auto quick
-+147 img
-+148 rw quick
- 149 rw auto sudo
- 150 rw auto quick
--151 rw auto
--152 rw auto quick
--153 rw auto quick
-+151 rw
-+152 rw quick
-+153 rw quick
- 154 rw auto backing quick
--155 rw auto
-+155 rw
- 156 rw auto quick
--157 auto
-+157 quick
- 158 rw auto quick
- 159 rw auto quick
- 160 rw auto quick
- 161 rw auto quick
- 162 auto quick
--163 rw auto
--165 rw auto quick
--169 rw auto quick migration
-+163 rw
-+165 rw quick
-+169 rw quick migration
- 170 rw auto quick
- 171 rw auto quick
- 172 auto
-@@ -180,71 +193,71 @@
- 175 auto quick
- 176 rw auto backing
- 177 rw auto quick
--178 auto
-+178 img
- 179 rw auto quick
- 181 rw auto migration
--182 rw auto quick
--183 rw auto migration
-+182 rw quick
-+183 rw migration
- 184 rw auto quick
--185 rw auto
-+185 rw
- 186 rw auto
- 187 rw auto
--188 rw auto quick
--189 rw auto
-+188 rw quick
-+189 rw
- 190 rw auto quick
- 191 rw auto
- 192 rw auto quick
--194 rw auto migration quick
-+194 rw migration quick
- 195 rw auto quick
--196 rw auto quick migration
-+196 rw quick migration
- 197 rw auto quick
--198 rw auto
--199 rw auto migration
--200 rw auto
-+198 rw
-+199 rw migration
-+200 rw
- 201 rw auto migration
--202 rw auto quick
--203 rw auto migration
--204 rw auto quick
--205 rw auto quick
--206 rw auto
-+202 rw quick
-+203 rw migration
-+204 rw quick
-+205 rw quick
-+206 rw
- 207 rw auto
--208 rw auto quick
--209 rw auto quick
-+208 rw quick
-+209 rw quick
- 210 rw auto
- 211 rw auto quick
- 212 rw auto quick
- 213 rw auto quick
- 214 rw auto
- 215 rw auto quick
--216 rw auto quick
-+216 rw quick
- 217 rw auto quick
--218 rw auto quick
--219 rw auto
-+218 rw quick
-+219 rw
- 220 rw auto
- 221 rw auto quick
--222 rw auto quick
--223 rw auto quick
--224 rw auto quick
-+222 rw quick
-+223 rw quick
-+224 rw quick
- 225 rw auto quick
- 226 auto quick
--227 auto quick
--228 rw auto quick
-+227 quick
-+228 rw quick
- 229 auto quick
- 231 auto quick
--232 auto quick
-+232 quick
- 233 auto quick
--234 auto quick migration
--235 auto quick
--236 auto quick
-+234 quick migration
-+235 quick
-+236 quick
- 237 rw auto quick
--238 auto quick
-+238 quick
- 239 rw auto quick
--240 auto quick
-+240 quick
- 241 rw auto quick
--242 rw auto quick
-+242 rw quick
- 243 rw auto quick
- 244 rw auto quick
--245 rw auto
--246 rw auto quick
-+245 rw
-+246 rw quick
- 247 rw auto quick
--248 rw auto quick
-+248 rw quick
+-check-block-$(CONFIG_POSIX) +=3D tests/qemu-iotests-quick.sh
++check-block-$(CONFIG_POSIX) +=3D tests/check-block.sh
+=20
+ # All QTests for now are POSIX-only, but the dependencies are
+ # really in libqtest, not in the testcases themselves.
+@@ -1096,8 +1096,8 @@ clean-tcg: $(CLEAN_TCG_TARGET_RULES)
+=20
+ QEMU_IOTESTS_HELPERS-$(call land,$(CONFIG_SOFTMMU),$(CONFIG_LINUX)) =3D =
+tests/qemu-iotests/socket_scm_helper$(EXESUF)
+=20
+-.PHONY: check-tests/qemu-iotests-quick.sh
+-check-tests/qemu-iotests-quick.sh: tests/qemu-iotests-quick.sh qemu-img$=
+(EXESUF) qemu-io$(EXESUF) qemu-nbd$(EXESUF) $(QEMU_IOTESTS_HELPERS-y)
++.PHONY: check-tests/check-block.sh
++check-tests/check-block.sh: tests/check-block.sh qemu-img$(EXESUF) qemu-=
+io$(EXESUF) qemu-nbd$(EXESUF) $(QEMU_IOTESTS_HELPERS-y)
+ 	$<
+=20
+ .PHONY: $(patsubst %, check-%, $(check-qapi-schema-y))
+@@ -1168,7 +1168,7 @@ check-acceptance: check-venv $(TESTS_RESULTS_DIR)
+ check-qapi-schema: $(patsubst %,check-%, $(check-qapi-schema-y)) check-t=
+ests/qapi-schema/doc-good.texi
+ check-qtest: $(patsubst %,check-qtest-%, $(QTEST_TARGETS))
+ check-block: $(patsubst %,check-%, $(check-block-y))
+-check: check-qapi-schema check-unit check-softfloat check-qtest check-de=
+codetree
++check: check-qapi-schema check-unit check-softfloat check-qtest check-de=
+codetree check-block
+ check-clean:
+ 	rm -rf $(check-unit-y) tests/*.o $(QEMU_IOTESTS_HELPERS-y)
+ 	rm -rf $(sort $(foreach target,$(SYSEMU_TARGET_LIST), $(check-qtest-$(t=
+arget)-y)) $(check-qtest-generic-y))
+diff --git a/tests/check-block.sh b/tests/check-block.sh
+index f3d12fd602..3b971d6cf4 100755
+--- a/tests/check-block.sh
++++ b/tests/check-block.sh
+@@ -1,24 +1,48 @@
+ #!/bin/sh
+=20
+-FORMAT_LIST=3D"raw qcow2 qed vmdk vpc"
++# Honor the SPEED environment variable, just like we do it for the qtest=
+s.
++if [ "$SPEED" =3D "slow" ]; then
++    format_list=3D"raw qcow2"
++    group=3D
++elif [ "$SPEED" =3D "thorough" ]; then
++    format_list=3D"raw qcow2 qed vmdk vpc"
++    group=3D
++else
++    format_list=3Dqcow2
++    group=3D"-g auto"
++fi
++
+ if [ "$#" -ne 0 ]; then
+-    FORMAT_LIST=3D"$@"
++    format_list=3D"$@"
++fi
++
++if grep -q "TARGET_GPROF=3Dy" *-softmmu/config-target.mak 2>/dev/null ; =
+then
++    echo "GPROF is enabled =3D=3D> Not running the qemu-iotests."
++    exit 0
+ fi
+=20
+-export QEMU_PROG=3D"$PWD/x86_64-softmmu/qemu-system-x86_64"
+-export QEMU_IMG_PROG=3D"$PWD/qemu-img"
+-export QEMU_IO_PROG=3D"$PWD/qemu-io"
++if [ -z "$(find . -name 'qemu-system-*' -print)" ]; then
++    echo "No qemu-system binary available =3D=3D> Not running the qemu-i=
+otests."
++    exit 0
++fi
++
++if ! command -v bash >/dev/null 2>&1 ; then
++    echo "bash not available =3D=3D> Not running the qemu-iotests."
++    exit 0
++fi
+=20
+-if [ ! -x $QEMU_PROG ]; then
+-    echo "'make check-block' requires qemu-system-x86_64"
+-    exit 1
++if ! (sed --version | grep 'GNU sed') > /dev/null 2>&1 ; then
++    if ! command -v gsed >/dev/null 2>&1; then
++        echo "GNU sed not available =3D=3D> Not running the qemu-iotests=
+."
++        exit 0
++    fi
+ fi
+=20
+ cd tests/qemu-iotests
+=20
+ ret=3D0
+-for FMT in $FORMAT_LIST ; do
+-    ./check -T -nocache -$FMT || ret=3D1
++for fmt in $format_list ; do
++    ./check -$fmt $group || ret=3D1
+ done
+=20
+ exit $ret
+diff --git a/tests/qemu-iotests-quick.sh b/tests/qemu-iotests-quick.sh
+deleted file mode 100755
+index 0e554bb972..0000000000
+--- a/tests/qemu-iotests-quick.sh
++++ /dev/null
+@@ -1,8 +0,0 @@
+-#!/bin/sh
+-
+-cd tests/qemu-iotests
+-
+-ret=3D0
+-TEST_DIR=3D${TEST_DIR:-/tmp/qemu-iotests-quick-$$} ./check -T -qcow2 -g =
+quick || ret=3D1
+-
+-exit $ret
 --=20
 2.21.0
 
