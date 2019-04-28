@@ -3,104 +3,59 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
 X-Spam-Status: No, score=-0.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+	MAILING_LIST_MULTI,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 34E7CC43219
-	for <qemu-devel@archiver.kernel.org>; Sun, 28 Apr 2019 15:44:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 97F82C43218
+	for <qemu-devel@archiver.kernel.org>; Sun, 28 Apr 2019 15:57:07 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 08D832067C
-	for <qemu-devel@archiver.kernel.org>; Sun, 28 Apr 2019 15:44:37 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 08D832067C
+	by mail.kernel.org (Postfix) with ESMTPS id 58DB02067D
+	for <qemu-devel@archiver.kernel.org>; Sun, 28 Apr 2019 15:57:07 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 58DB02067D
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:45568 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:45706 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hKlym-0004pL-Tt
-	for qemu-devel@archiver.kernel.org; Sun, 28 Apr 2019 11:44:36 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:46568)
+	id 1hKmAr-0000eX-8L
+	for qemu-devel@archiver.kernel.org; Sun, 28 Apr 2019 11:57:06 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:52399)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1hKlxu-0004Qn-PM
-	for qemu-devel@nongnu.org; Sun, 28 Apr 2019 11:43:43 -0400
+	(envelope-from <thuth@redhat.com>) id 1hKm94-0007h6-NE
+	for qemu-devel@nongnu.org; Sun, 28 Apr 2019 11:55:16 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1hKlxt-0005PX-Q5
-	for qemu-devel@nongnu.org; Sun, 28 Apr 2019 11:43:42 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:53272)
+	(envelope-from <thuth@redhat.com>) id 1hKm93-0004rW-6d
+	for qemu-devel@nongnu.org; Sun, 28 Apr 2019 11:55:14 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:32904)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <thuth@redhat.com>)
-	id 1hKlxr-0005Oj-Mh; Sun, 28 Apr 2019 11:43:39 -0400
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
-	[10.5.11.16])
+	id 1hKm8x-0004ml-NR; Sun, 28 Apr 2019 11:55:09 -0400
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+	[10.5.11.23])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 6DE13307B4A7;
-	Sun, 28 Apr 2019 15:43:38 +0000 (UTC)
-Received: from thuth.remote.csb (ovpn-116-50.ams2.redhat.com [10.36.116.50])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id C48C44D1;
-	Sun, 28 Apr 2019 15:43:36 +0000 (UTC)
-To: QEMU Developers <qemu-devel@nongnu.org>, Qemu-block <qemu-block@nongnu.org>
+	by mx1.redhat.com (Postfix) with ESMTPS id 32E5759447;
+	Sun, 28 Apr 2019 15:55:04 +0000 (UTC)
+Received: from thuth.com (ovpn-116-50.ams2.redhat.com [10.36.116.50])
+	by smtp.corp.redhat.com (Postfix) with ESMTP id 5976728988;
+	Sun, 28 Apr 2019 15:54:55 +0000 (UTC)
 From: Thomas Huth <thuth@redhat.com>
-Openpgp: preference=signencrypt
-Autocrypt: addr=thuth@redhat.com; keydata=
-	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
-Organization: Red Hat
-Message-ID: <d9016c33-ef8f-7e79-d15f-4220c67efb10@redhat.com>
-Date: Sun, 28 Apr 2019 17:43:35 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
-	Thunderbird/60.6.1
+To: qemu-devel@nongnu.org
+Date: Sun, 28 Apr 2019 17:54:43 +0200
+Message-Id: <20190428155451.15653-1-thuth@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="UTF-8"
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.46]);
-	Sun, 28 Apr 2019 15:43:38 +0000 (UTC)
+	(mx1.redhat.com [10.5.110.39]);
+	Sun, 28 Apr 2019 15:55:04 +0000 (UTC)
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] Failing qemu-iotest 211 with -vdi
+Subject: [Qemu-devel] [PATCH v2 0/8] tests/qemu-iotests: Run basic iotests
+ during "make check"
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -112,42 +67,189 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>
+Cc: Fam Zheng <fam@euphon.net>, Kevin Wolf <kwolf@redhat.com>,
+	Ed Maste <emaste@freebsd.org>, qemu-block@nongnu.org,
+	=?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
+	Markus Armbruster <armbru@redhat.com>,
+	Christophe Fergeau <cfergeau@redhat.com>, Max Reitz <mreitz@redhat.com>,
+	=?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
+	Wainer dos Santos Moschetta <wainersm@redhat.com>,
+	Li-Wen Hsu <lwhsu@freebsd.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190428154335.byySCh4r-uE0TdKAkXugBOqgYj2iSOoCqjK1aWAO8KM@z>
+Message-ID: <20190428155443.CzUvooTYcvzVVQHEAh3Xu0QRft_6OX7tAhfOmBeakFc@z>
 
-QEMU iotest 211 is failing for me, too, when I run it with -vdi:
+People often forget to run the iotests before submitting patches or
+pull requests - this is likely due to the fact that we do not run the
+tests during our mandatory "make check" tests yet.
+This patch series now changes the "auto" group to only include tests
+that should be safe to run in all CI environments (including FreeBSD
+and macOS!). Thus these iotests can now always be run during "make
+check" automatically, too.
 
-tests/qemu-iotests$ ./check -vdi 211
-QEMU          -- "/home/thuth/tmp/qemu-build/tests/qemu-iotests/../../x86_64-softmmu/qemu-system-x86_64" -nodefaults -machine accel=qtest
-QEMU_IMG      -- "/home/thuth/tmp/qemu-build/tests/qemu-iotests/../../qemu-img" 
-QEMU_IO       -- "/home/thuth/tmp/qemu-build/tests/qemu-iotests/../../qemu-io"  --cache writeback -f vdi
-QEMU_NBD      -- "/home/thuth/tmp/qemu-build/tests/qemu-iotests/../../qemu-nbd" 
-IMGFMT        -- vdi
-IMGPROTO      -- file
-PLATFORM      -- Linux/x86_64 thuth 3.10.0-957.10.1.el7.x86_64
-TEST_DIR      -- /home/thuth/tmp/qemu-build/tests/qemu-iotests/scratch
-SOCKET_SCM_HELPER -- /home/thuth/tmp/qemu-build/tests/qemu-iotests/socket_scm_helper
+v2:
+ - Use "auto" group instead of adding a new "ci" group
+ - Adjusted the tests that are run automatically (after doing lots
+   of CI runs on cirrus-ci.com, gitlab and travis)
+ - Added patch to fix the current regression with the "qemu-io:"
+   prefix in the master branch
+ - Added a fix for iotest 005 on ext4 filesystems (skip it there)
 
-211         - output mismatch (see 211.out.bad)
---- /home/thuth/devel/qemu/tests/qemu-iotests/211.out	2019-04-23 16:43:12.000000000 +0200
-+++ /home/thuth/tmp/qemu-build/tests/qemu-iotests/211.out.bad	2019-04-28 17:41:19.000000000 +0200
-@@ -55,8 +55,7 @@
- virtual size: 32M (33554432 bytes)
- cluster_size: 1048576
- 
--[{ "start": 0, "length": 3072, "depth": 0, "zero": false, "data": true, "offset": 1024},
--{ "start": 3072, "length": 33551360, "depth": 0, "zero": true, "data": true, "offset": 4096}]
-+[{ "start": 0, "length": 33554432, "depth": 0, "zero": true, "data": true, "offset": 1024}]
- 
- === Invalid BlockdevRef ===
- 
-Failures: 211
-Failed 1 of 1 tests
+Thomas Huth (8):
+  tests/qemu-iotests: Fix output of qemu-io related tests
+  tests/qemu-iotests/005: Add a sanity check for large sparse file
+    support
+  tests/qemu-iotests/check: Pick a default machine if necessary
+  tests/qemu-iotests: Do not hard-code the path to bash
+  cirrus / travis: Add gnu-sed and bash for macOS and FreeBSD
+  tests/qemu-iotests: Remove the "_supported_os Linux" line from many
+    tests
+  tests/qemu-iotests/group: Re-use the "auto" group for tests that can
+    always run
+  tests: Run the iotests during "make check" again
 
-Any ideas how to fix this?
+ .cirrus.yml                 |   4 +-
+ .travis.yml                 |   1 +
+ tests/Makefile.include      |   8 +-
+ tests/check-block.sh        |  44 +++++++---
+ tests/qemu-iotests-quick.sh |   8 --
+ tests/qemu-iotests/001      |   1 -
+ tests/qemu-iotests/002      |   1 -
+ tests/qemu-iotests/003      |   1 -
+ tests/qemu-iotests/004      |   1 -
+ tests/qemu-iotests/005      |   9 ++
+ tests/qemu-iotests/007      |   1 -
+ tests/qemu-iotests/008      |   1 -
+ tests/qemu-iotests/009      |   1 -
+ tests/qemu-iotests/010      |   1 -
+ tests/qemu-iotests/011      |   1 -
+ tests/qemu-iotests/012      |   1 -
+ tests/qemu-iotests/015      |   1 -
+ tests/qemu-iotests/017      |   1 -
+ tests/qemu-iotests/020      |   1 -
+ tests/qemu-iotests/021      |   1 -
+ tests/qemu-iotests/022      |   1 -
+ tests/qemu-iotests/025      |   1 -
+ tests/qemu-iotests/026      |   1 -
+ tests/qemu-iotests/026.out  | 168 +++++++++++++++++------------------
+ tests/qemu-iotests/027      |   1 -
+ tests/qemu-iotests/029      |   1 -
+ tests/qemu-iotests/031      |   1 -
+ tests/qemu-iotests/032      |   1 -
+ tests/qemu-iotests/033      |   1 -
+ tests/qemu-iotests/035      |   1 -
+ tests/qemu-iotests/036      |   1 -
+ tests/qemu-iotests/037      |   1 -
+ tests/qemu-iotests/042      |   1 -
+ tests/qemu-iotests/043      |   1 -
+ tests/qemu-iotests/046      |   1 -
+ tests/qemu-iotests/047      |   1 -
+ tests/qemu-iotests/049      |   1 -
+ tests/qemu-iotests/050      |   1 -
+ tests/qemu-iotests/051      |   1 -
+ tests/qemu-iotests/052      |   1 -
+ tests/qemu-iotests/053      |   1 -
+ tests/qemu-iotests/054      |   1 -
+ tests/qemu-iotests/060.out  |   6 +-
+ tests/qemu-iotests/062      |   1 -
+ tests/qemu-iotests/063      |   1 -
+ tests/qemu-iotests/066      |   1 -
+ tests/qemu-iotests/067      |   1 -
+ tests/qemu-iotests/068      |   1 -
+ tests/qemu-iotests/069      |   1 -
+ tests/qemu-iotests/069.out  |   2 +-
+ tests/qemu-iotests/070.out  |   2 +-
+ tests/qemu-iotests/071      |   1 -
+ tests/qemu-iotests/072      |   1 -
+ tests/qemu-iotests/073      |   1 -
+ tests/qemu-iotests/075.out  |  14 +--
+ tests/qemu-iotests/076.out  |   6 +-
+ tests/qemu-iotests/078.out  |  12 +--
+ tests/qemu-iotests/079      |   1 -
+ tests/qemu-iotests/080.out  |  40 ++++-----
+ tests/qemu-iotests/081.out  |   2 +-
+ tests/qemu-iotests/082      |   1 -
+ tests/qemu-iotests/085      |   1 -
+ tests/qemu-iotests/088.out  |  12 +--
+ tests/qemu-iotests/089      |   1 -
+ tests/qemu-iotests/090      |   1 -
+ tests/qemu-iotests/094      |   1 -
+ tests/qemu-iotests/095      |   1 -
+ tests/qemu-iotests/098      |   1 -
+ tests/qemu-iotests/102      |   1 -
+ tests/qemu-iotests/103      |   1 -
+ tests/qemu-iotests/103.out  |  14 +--
+ tests/qemu-iotests/104      |   1 -
+ tests/qemu-iotests/105      |   1 -
+ tests/qemu-iotests/107      |   1 -
+ tests/qemu-iotests/110      |   1 -
+ tests/qemu-iotests/111      |   1 -
+ tests/qemu-iotests/112      |   1 -
+ tests/qemu-iotests/114      |   1 -
+ tests/qemu-iotests/114.out  |   2 +-
+ tests/qemu-iotests/115      |   1 -
+ tests/qemu-iotests/116.out  |  14 +--
+ tests/qemu-iotests/117      |   1 -
+ tests/qemu-iotests/120      |   1 -
+ tests/qemu-iotests/125      |   1 -
+ tests/qemu-iotests/126      |   1 -
+ tests/qemu-iotests/127      |   1 -
+ tests/qemu-iotests/131.out  |   2 +-
+ tests/qemu-iotests/133      |   1 -
+ tests/qemu-iotests/133.out  |  30 +++----
+ tests/qemu-iotests/134      |   1 -
+ tests/qemu-iotests/137.out  |  28 +++---
+ tests/qemu-iotests/140.out  |   2 +-
+ tests/qemu-iotests/142      |   1 -
+ tests/qemu-iotests/143      |   1 -
+ tests/qemu-iotests/143.out  |   2 +-
+ tests/qemu-iotests/144      |   1 -
+ tests/qemu-iotests/145      |   1 -
+ tests/qemu-iotests/153      |   1 -
+ tests/qemu-iotests/153.out  |  30 +++----
+ tests/qemu-iotests/156      |   1 -
+ tests/qemu-iotests/157      |   1 -
+ tests/qemu-iotests/158      |   1 -
+ tests/qemu-iotests/159      |   1 -
+ tests/qemu-iotests/162      |   1 -
+ tests/qemu-iotests/170      |   1 -
+ tests/qemu-iotests/173      |   1 -
+ tests/qemu-iotests/182      |   1 -
+ tests/qemu-iotests/183      |   1 -
+ tests/qemu-iotests/186      |   1 -
+ tests/qemu-iotests/187      |   1 -
+ tests/qemu-iotests/187.out  |   6 +-
+ tests/qemu-iotests/188.out  |   2 +-
+ tests/qemu-iotests/190      |   1 -
+ tests/qemu-iotests/191      |   1 -
+ tests/qemu-iotests/192      |   1 -
+ tests/qemu-iotests/195      |   1 -
+ tests/qemu-iotests/197      |   1 -
+ tests/qemu-iotests/197.out  |   2 +-
+ tests/qemu-iotests/200      |   1 -
+ tests/qemu-iotests/205      |   2 +-
+ tests/qemu-iotests/214      |   1 -
+ tests/qemu-iotests/215      |   1 -
+ tests/qemu-iotests/215.out  |   2 +-
+ tests/qemu-iotests/217      |   1 -
+ tests/qemu-iotests/226.out  |  16 ++--
+ tests/qemu-iotests/227      |   1 -
+ tests/qemu-iotests/231      |   1 -
+ tests/qemu-iotests/233      |   1 -
+ tests/qemu-iotests/239      |   2 +-
+ tests/qemu-iotests/240      |   3 +-
+ tests/qemu-iotests/241      |   2 +-
+ tests/qemu-iotests/243      |   2 +-
+ tests/qemu-iotests/244      |   2 +-
+ tests/qemu-iotests/244.out  |  10 +--
+ tests/qemu-iotests/247      |   1 -
+ tests/qemu-iotests/check    |  13 ++-
+ tests/qemu-iotests/group    | 169 +++++++++++++++++++-----------------
+ 137 files changed, 372 insertions(+), 421 deletions(-)
+ delete mode 100755 tests/qemu-iotests-quick.sh
 
- Thomas
+--=20
+2.21.0
+
 
