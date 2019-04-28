@@ -6,58 +6,57 @@ X-Spam-Status: No, score=-6.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4A0F2C43219
-	for <qemu-devel@archiver.kernel.org>; Sun, 28 Apr 2019 06:53:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F02FEC43218
+	for <qemu-devel@archiver.kernel.org>; Sun, 28 Apr 2019 06:53:21 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1846F206E0
-	for <qemu-devel@archiver.kernel.org>; Sun, 28 Apr 2019 06:53:08 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1846F206E0
+	by mail.kernel.org (Postfix) with ESMTPS id 7FF49206E0
+	for <qemu-devel@archiver.kernel.org>; Sun, 28 Apr 2019 06:53:21 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7FF49206E0
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:40674 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:40676 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hKdgR-0004K4-CI
-	for qemu-devel@archiver.kernel.org; Sun, 28 Apr 2019 02:53:07 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:57185)
+	id 1hKdge-0004VU-Hi
+	for qemu-devel@archiver.kernel.org; Sun, 28 Apr 2019 02:53:20 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:57153)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1hKdbj-0000OR-Q9
-	for qemu-devel@nongnu.org; Sun, 28 Apr 2019 02:48:16 -0400
+	(envelope-from <philmd@redhat.com>) id 1hKdbf-0000K2-94
+	for qemu-devel@nongnu.org; Sun, 28 Apr 2019 02:48:12 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1hKdbi-0006Nf-TI
-	for qemu-devel@nongnu.org; Sun, 28 Apr 2019 02:48:15 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:41252)
+	(envelope-from <philmd@redhat.com>) id 1hKdbe-0006Aj-Bl
+	for qemu-devel@nongnu.org; Sun, 28 Apr 2019 02:48:11 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:44862)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1hKdbi-0006KE-NK
-	for qemu-devel@nongnu.org; Sun, 28 Apr 2019 02:48:14 -0400
+	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1hKdbe-0006AH-6W
+	for qemu-devel@nongnu.org; Sun, 28 Apr 2019 02:48:10 -0400
 Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
 	[10.5.11.16])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id EE77C81F35;
-	Sun, 28 Apr 2019 06:48:13 +0000 (UTC)
-Received: from x1w.redhat.com (ovpn-204-62.brq.redhat.com [10.40.204.62])
-	by smtp.corp.redhat.com (Postfix) with ESMTPS id 430EC171EE;
+	by mx1.redhat.com (Postfix) with ESMTPS id 731B73082E8F;
 	Sun, 28 Apr 2019 06:48:09 +0000 (UTC)
+Received: from x1w.redhat.com (ovpn-204-62.brq.redhat.com [10.40.204.62])
+	by smtp.corp.redhat.com (Postfix) with ESMTPS id 10E1A171EE;
+	Sun, 28 Apr 2019 06:48:06 +0000 (UTC)
 From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
 To: qemu-devel@nongnu.org
-Date: Sun, 28 Apr 2019 08:47:31 +0200
-Message-Id: <20190428064731.29913-7-philmd@redhat.com>
+Date: Sun, 28 Apr 2019 08:47:30 +0200
+Message-Id: <20190428064731.29913-6-philmd@redhat.com>
 In-Reply-To: <20190428064731.29913-1-philmd@redhat.com>
 References: <20190428064731.29913-1-philmd@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="UTF-8"
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.25]);
-	Sun, 28 Apr 2019 06:48:14 +0000 (UTC)
+	(mx1.redhat.com [10.5.110.46]);
+	Sun, 28 Apr 2019 06:48:09 +0000 (UTC)
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] [PATCH v2 6/6] vl: Do not set acpi_enabled when ACPI
- is disabled at build time
+Subject: [Qemu-devel] [PATCH v2 5/6] stubs: Add missing ACPI symbols
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -78,59 +77,41 @@ Cc: Corey Minyard <minyard@acm.org>, "Michael S. Tsirkin" <mst@redhat.com>,
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190428064731.EXAwxOQnbu9Mbd8iqXnE9gB7LH-f7Y0YpEKJTkju7eo@z>
+Message-ID: <20190428064730.VL_jEo43ht-sUCLChTZ8WqNMH9aZ_WlYUBBPaFNSNpo@z>
 
-When building with CONFIG_ACPI disabled, the 'acpi_enabled' is
-still initialized to '1' (enabled).
+When building with ACPI disabled, we get:
 
-Remove the confusion by moving the variable to hw/core/acpi.c,
-and adding a similar stub.
+  /usr/bin/ld: hw/i386/pc.o: in function `bochs_bios_init':
+  /source/qemu/hw/i386/pc.c:1017: undefined reference to `acpi_tables_len=
+'
+  /usr/bin/ld: /source/qemu/hw/i386/pc.c:1017: undefined reference to `ac=
+pi_tables'
+  collect2: error: ld returned 1 exit status
+  make[1]: *** [Makefile:204: qemu-system-x86_64] Error 1
+
+These symbols are indeed declared as extern in "hw/acpi/acpi.h".
+Add them as stub to satisfy the linker.
 
 Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
 ---
- hw/acpi/core.c | 1 +
- stubs/acpi.c   | 2 ++
- vl.c           | 1 -
- 3 files changed, 3 insertions(+), 1 deletion(-)
+ stubs/acpi.c | 4 ++++
+ 1 file changed, 4 insertions(+)
 
-diff --git a/hw/acpi/core.c b/hw/acpi/core.c
-index 9ed1629f367..b2730aec8a0 100644
---- a/hw/acpi/core.c
-+++ b/hw/acpi/core.c
-@@ -59,6 +59,7 @@ static const char unsigned dfl_hdr[ACPI_TABLE_HDR_SIZE =
-- ACPI_TABLE_PFX_SIZE] =3D
-     "QEMU\1\0\0\0"           /* ASL compiler ID (4), version (4) */
-     ;
-=20
-+int acpi_enabled =3D 1;
- char unsigned *acpi_tables;
- size_t acpi_tables_len;
-=20
 diff --git a/stubs/acpi.c b/stubs/acpi.c
-index cd0119f9fb1..f1ef6b8e795 100644
+index 4c9d081ed48..cd0119f9fb1 100644
 --- a/stubs/acpi.c
 +++ b/stubs/acpi.c
-@@ -23,6 +23,8 @@
+@@ -23,6 +23,10 @@
  #include "qapi/qmp/qerror.h"
  #include "hw/acpi/acpi.h"
 =20
-+int acpi_enabled;
++size_t acpi_tables_len;
 +
- size_t acpi_tables_len;
-=20
- char unsigned *acpi_tables;
-diff --git a/vl.c b/vl.c
-index ff5dfb6fbc3..c9364b4ec10 100644
---- a/vl.c
-+++ b/vl.c
-@@ -166,7 +166,6 @@ int smp_cpus;
- unsigned int max_cpus;
- int smp_cores =3D 1;
- int smp_threads =3D 1;
--int acpi_enabled =3D 1;
- int no_hpet =3D 0;
- int fd_bootchk =3D 1;
- static int no_reboot;
++char unsigned *acpi_tables;
++
+ void acpi_table_add(const QemuOpts *opts, Error **errp)
+ {
+     error_setg(errp, QERR_UNSUPPORTED);
 --=20
 2.20.1
 
