@@ -7,75 +7,77 @@ X-Spam-Status: No, score=-10.7 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	MENTIONS_GIT_HOSTING,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6F57AC43219
-	for <qemu-devel@archiver.kernel.org>; Sun, 28 Apr 2019 14:55:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BE5B4C43219
+	for <qemu-devel@archiver.kernel.org>; Sun, 28 Apr 2019 14:56:53 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3671C206A3
-	for <qemu-devel@archiver.kernel.org>; Sun, 28 Apr 2019 14:55:45 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 857C1206A3
+	for <qemu-devel@archiver.kernel.org>; Sun, 28 Apr 2019 14:56:53 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="V9bahf7h"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3671C206A3
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="kw5k/Snv"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 857C1206A3
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:45136 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:45142 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hKlDU-0006en-If
-	for qemu-devel@archiver.kernel.org; Sun, 28 Apr 2019 10:55:44 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:32855)
+	id 1hKlEa-0007ft-P6
+	for qemu-devel@archiver.kernel.org; Sun, 28 Apr 2019 10:56:52 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:33271)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1hKlBK-0005WD-Gg
-	for qemu-devel@nongnu.org; Sun, 28 Apr 2019 10:53:31 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1hKlDj-00070i-Sf
+	for qemu-devel@nongnu.org; Sun, 28 Apr 2019 10:56:01 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1hKlBJ-0002ZN-AQ
-	for qemu-devel@nongnu.org; Sun, 28 Apr 2019 10:53:30 -0400
-Received: from mail-ot1-x32c.google.com ([2607:f8b0:4864:20::32c]:39615)
+	(envelope-from <peter.maydell@linaro.org>) id 1hKlDi-0003Vp-MN
+	for qemu-devel@nongnu.org; Sun, 28 Apr 2019 10:55:59 -0400
+Received: from mail-ot1-x32b.google.com ([2607:f8b0:4864:20::32b]:35306)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1hKlBI-0002Z8-Vx
-	for qemu-devel@nongnu.org; Sun, 28 Apr 2019 10:53:29 -0400
-Received: by mail-ot1-x32c.google.com with SMTP id o39so6551272ota.6
-	for <qemu-devel@nongnu.org>; Sun, 28 Apr 2019 07:53:28 -0700 (PDT)
+	id 1hKlDi-0003VO-FL
+	for qemu-devel@nongnu.org; Sun, 28 Apr 2019 10:55:58 -0400
+Received: by mail-ot1-x32b.google.com with SMTP id g24so1943569otq.2
+	for <qemu-devel@nongnu.org>; Sun, 28 Apr 2019 07:55:57 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
 	h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-	:cc; bh=knfDboze1yL9LZpqRb0mBdEU12Qtwc3mPrS6JgKVUaE=;
-	b=V9bahf7hdkAcGUvj9NKKFSSI/TFm4gli8/4HPcCpqVyFjXEo9fXpK2nKX9jt9fQhwQ
-	yHKp8oVCACpbz6omE837TrNBqdd31RcgvfXi1glhCpEZ45DjU1R4waYRBnqABbcE6eOc
-	7fGsBO5fJdwP/pcio8GdlS9EACUqucoDPL+tY8BytfmPbFWn5AgE8wJ/IstO8Fbpgp/h
-	gGXAOTjsl5b4vb+tDR34SZ7COmOsb/v7rVzh2WWtij86ohBATnX/VA5AaRsXvE5OXAfC
-	MjtrzEcI185nKAGI45EIB/FDOREEACNHjTD6oP1ieMBeoA3p4qCEAKonfup/yjnySmu5
-	fQNw==
+	:cc:content-transfer-encoding;
+	bh=9iML0q+Y2zXHOTw7pF90C39acLonSMJzVN+fT/f4m2s=;
+	b=kw5k/SnvEsAVgBAUagQSG66bW4b7ItEKTvZLaKR+TPGLMiYQ/8DWRImB+h7U9bR/Lz
+	7EArx4UtQAB4j9MB9PZXKoe6WtAUtgqdENwK+8OH0UmFTBUGm7FfesLvrXARntxWCwUb
+	mOu5fMiSwwrxju6lKnY3iOKwYO6o8/FKbDELJ8Df4Fg8/Jpsa/6OuaH+0aUiG/ndI9rf
+	wuasFpW46k+hczwn4sB0PgpWUI+WX7xdYHqMR9Lu96/OuQyCkrpY544mkb4SIqDCZ3oM
+	A1sxdqf6UreD9b7KLg+hFRleZ/3F3iwALvhrSG46Kc3DHUeBkWV85hNOq+6OeOMKoDRL
+	iUAg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
 	d=1e100.net; s=20161025;
 	h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-	:message-id:subject:to:cc;
-	bh=knfDboze1yL9LZpqRb0mBdEU12Qtwc3mPrS6JgKVUaE=;
-	b=Jrljp4j1h+7epJJOm0sfKYyNyDkl3VCVjdX64B4fBDWJNzmhUjKKhFYLnbwD+tRGtt
-	03J31T58qCiKO8RIVU8pbm96SRl5J0qKfccdyX/EMesiw/F8yhCqWt3Pw5gxNR72bXdo
-	IA6zPO9dvp+pIyyZlIos9gy1dqyEa3PII498B6xPnvzc3WhmpZ2ZvQHK+jGm8zsDsjQ7
-	37GCWlRB2/HJC1SVwW5nwaO7m0QQnDTfIY+vfu4XqvhT3NK5FtNffDHojm8wFAg86avW
-	I6+anP8i9k7bw8yoEFr7eBkoxSVFBl+wuGGp88QC1+ystrZbzHsIM657tKiJI1Cm3h69
-	WZYA==
-X-Gm-Message-State: APjAAAVtSzVAMvPWUK55DE/bnc5lbzBLwfrBvrgMDFcqH1/1WFWcFYlH
-	BqvV1avjpDvrJ15Dotl24PYuDnf5SPtYPqyZJ0u6kQ==
-X-Google-Smtp-Source: APXvYqwkF8Aj5qnKOBilX5llzBsPqPAXSMSvycvhEEq7NDOytJ8PalQP9FlJ80OL2MsiSYo015I5GDbWnoPkh71bDwQ=
-X-Received: by 2002:a9d:360b:: with SMTP id w11mr8918401otb.238.1556463207726; 
-	Sun, 28 Apr 2019 07:53:27 -0700 (PDT)
+	:message-id:subject:to:cc:content-transfer-encoding;
+	bh=9iML0q+Y2zXHOTw7pF90C39acLonSMJzVN+fT/f4m2s=;
+	b=NjPU5vWgjKkgoDbEWLCW+//xgzwwvF93PN0vjhFxV7x/sy2kw5C8JJk0fdWR0tMhhb
+	biRtvSrlhyAqoNVAWBj/G51UM61zdrll9O/pP+W8nu8w5I/53DRCoKkq7yQUcCYZz3c2
+	i6S61iKIouZ7WSqylADxVHMJYnnZOFHnpibLtlaHObdDiHK02eTxFL3I50bi1UHEhEkE
+	qfdEvuRHhTOLggFPag3Dtuksnex/xWn55gkM2w0Y2izsMwO+HIvTOEGygHyQUnH6oOoo
+	T9H0CrrTDm15wPNNOEdPDivX7k7BqL3zEwNJO19OJV8Jr1YJkVSIbmbCUV1FTfmylh+t
+	hVkA==
+X-Gm-Message-State: APjAAAWRGuCNnVd1ZQOyJq6WRy0/OKfBTfdrNRmm+cYPAjqbTmwjFI0u
+	GHmCHh7tAONEcjilWwsnojr0kj9QHaOqwZW9m6jJdujXqR0=
+X-Google-Smtp-Source: APXvYqweZMZhS9zcUaWPMx2+ir2Yl2I+2wbkZj+5ztHh2CcMtmwhIu5FBgbA/Y1ApvBGHpBaIaUjNJ597Proes0Twpc=
+X-Received: by 2002:a9d:6156:: with SMTP id c22mr5570575otk.363.1556463357027; 
+	Sun, 28 Apr 2019 07:55:57 -0700 (PDT)
 MIME-Version: 1.0
-References: <20190426172421.27133-1-richard.henderson@linaro.org>
-In-Reply-To: <20190426172421.27133-1-richard.henderson@linaro.org>
+References: <20190426182210.10442-1-richard.henderson@linaro.org>
+In-Reply-To: <20190426182210.10442-1-richard.henderson@linaro.org>
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Sun, 28 Apr 2019 15:53:16 +0100
+Date: Sun, 28 Apr 2019 15:55:45 +0100
 Message-ID:
- <CAFEAcA_iXkJVSgYmkBui0-PXBXqrNFnonaxsRo7gwGNHL1e3yA@mail.gmail.com>
+ <CAFEAcA8BwY07Z9NdnVy=FS78kEYzQgw8AzU=7g+w3kOtBtKCgw@mail.gmail.com>
 To: Richard Henderson <richard.henderson@linaro.org>
 Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
 	recognized.
-X-Received-From: 2607:f8b0:4864:20::32c
-Subject: Re: [Qemu-devel] [PULL 00/15] tcg patch queue
+X-Received-From: 2607:f8b0:4864:20::32b
+Subject: Re: [Qemu-devel] [PULL 0/2] target/hppa patch queue
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -91,36 +93,66 @@ Cc: QEMU Developers <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190428145316.fGk5kzq3BSK_oG8KrMyMCSBGAPWW5vcxwOO2ELNcLkM@z>
+Message-ID: <20190428145545.igHD66C9VImjlpeLaX8TfIjgLtUSsg-HWW9nrFo7nIw@z>
 
-On Fri, 26 Apr 2019 at 18:24, Richard Henderson
+On Fri, 26 Apr 2019 at 19:22, Richard Henderson
 <richard.henderson@linaro.org> wrote:
 >
-> The following changes since commit 3284aa128153750f14a61e8a96fd085e6f2999b6:
+> The following changes since commit 3284aa128153750f14a61e8a96fd085e6f2999=
+b6:
 >
->   Merge remote-tracking branch 'remotes/lersek/tags/edk2-pull-2019-04-22' into staging (2019-04-24 13:19:41 +0100)
+>   Merge remote-tracking branch 'remotes/lersek/tags/edk2-pull-2019-04-22'=
+ into staging (2019-04-24 13:19:41 +0100)
 >
 > are available in the Git repository at:
 >
->   https://github.com/rth7680/qemu.git tags/pull-tcg-20190426
+>   https://github.com/rth7680/qemu.git tags/pull-hppa-20190426
 >
-> for you to fetch changes up to ef5dae6805cce7b59d129d801bdc5db71bcbd60d:
+> for you to fetch changes up to 647ad90a1eb6c016071d21e4f1e22b9cd4986417:
 >
->   cputlb: Fix io_readx() to respect the access_type (2019-04-25 10:40:06 -0700)
->
-> ----------------------------------------------------------------
-> Add tcg_gen_extract2_*.
-> Deal with overflow of TranslationBlocks.
-> Respect access_type in io_readx.
+>   target/hppa: Always return EXCP_DMAR for protection id trap (2019-04-26=
+ 11:09:22 -0700)
 >
 > ----------------------------------------------------------------
+> Implement fast tlb insert insns.
+> Fix data tlb exception for pa 1.1.
+>
+> ----------------------------------------------------------------
 
+Hi; this doesn't seem to build:
 
+/home/pm215/qemu/target/hppa/translate.c: In function =E2=80=98trans_ixtlbx=
+f=E2=80=99:
+/home/pm215/qemu/target/hppa/translate.c:2544:5: error: too many
+arguments to function =E2=80=98tcg_temp_new_i64=E2=80=99
+     atl =3D tcg_temp_new_tl(ctx);
+     ^
+In file included from /home/pm215/qemu/tcg/tcg-op.h:28:0,
+                 from /home/pm215/qemu/target/hppa/translate.c:25:
+/home/pm215/qemu/tcg/tcg.h:975:24: note: declared here
+ static inline TCGv_i64 tcg_temp_new_i64(void)
+                        ^
+/home/pm215/qemu/target/hppa/translate.c:2545:5: error: too many
+arguments to function =E2=80=98tcg_temp_new_i64=E2=80=99
+     stl =3D tcg_temp_new_tl(ctx);
+     ^
+In file included from /home/pm215/qemu/tcg/tcg-op.h:28:0,
+                 from /home/pm215/qemu/target/hppa/translate.c:25:
+/home/pm215/qemu/tcg/tcg.h:975:24: note: declared here
+ static inline TCGv_i64 tcg_temp_new_i64(void)
+                        ^
+/home/pm215/qemu/target/hppa/translate.c:2546:5: error: too many
+arguments to function =E2=80=98tcg_temp_new_i64=E2=80=99
+     addr =3D tcg_temp_new_tl(ctx);
+     ^
+In file included from /home/pm215/qemu/tcg/tcg-op.h:28:0,
+                 from /home/pm215/qemu/target/hppa/translate.c:25:
+/home/pm215/qemu/tcg/tcg.h:975:24: note: declared here
+ static inline TCGv_i64 tcg_temp_new_i64(void)
+                        ^
 
-Applied, thanks.
+(maybe a conflict with your other pullreq I just applied?)
 
-Please update the changelog at https://wiki.qemu.org/ChangeLog/4.1
-for any user-visible changes.
-
+thanks
 -- PMM
 
