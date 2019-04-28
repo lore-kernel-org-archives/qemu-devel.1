@@ -2,82 +2,59 @@ Return-Path: <SRS0=GiFh=S6=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.7 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-8.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BE5B4C43219
-	for <qemu-devel@archiver.kernel.org>; Sun, 28 Apr 2019 14:56:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D1983C43218
+	for <qemu-devel@archiver.kernel.org>; Sun, 28 Apr 2019 15:06:09 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 857C1206A3
-	for <qemu-devel@archiver.kernel.org>; Sun, 28 Apr 2019 14:56:53 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="kw5k/Snv"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 857C1206A3
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id 8E72C206A3
+	for <qemu-devel@archiver.kernel.org>; Sun, 28 Apr 2019 15:06:09 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8E72C206A3
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=ilande.co.uk
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:45142 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:45256 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hKlEa-0007ft-P6
-	for qemu-devel@archiver.kernel.org; Sun, 28 Apr 2019 10:56:52 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:33271)
+	id 1hKlNX-0001tN-Rg
+	for qemu-devel@archiver.kernel.org; Sun, 28 Apr 2019 11:06:07 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:34825)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1hKlDj-00070i-Sf
-	for qemu-devel@nongnu.org; Sun, 28 Apr 2019 10:56:01 -0400
+	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1hKlM3-0000zS-B6
+	for qemu-devel@nongnu.org; Sun, 28 Apr 2019 11:04:36 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1hKlDi-0003Vp-MN
-	for qemu-devel@nongnu.org; Sun, 28 Apr 2019 10:55:59 -0400
-Received: from mail-ot1-x32b.google.com ([2607:f8b0:4864:20::32b]:35306)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1hKlDi-0003VO-FL
-	for qemu-devel@nongnu.org; Sun, 28 Apr 2019 10:55:58 -0400
-Received: by mail-ot1-x32b.google.com with SMTP id g24so1943569otq.2
-	for <qemu-devel@nongnu.org>; Sun, 28 Apr 2019 07:55:57 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
-	h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-	:cc:content-transfer-encoding;
-	bh=9iML0q+Y2zXHOTw7pF90C39acLonSMJzVN+fT/f4m2s=;
-	b=kw5k/SnvEsAVgBAUagQSG66bW4b7ItEKTvZLaKR+TPGLMiYQ/8DWRImB+h7U9bR/Lz
-	7EArx4UtQAB4j9MB9PZXKoe6WtAUtgqdENwK+8OH0UmFTBUGm7FfesLvrXARntxWCwUb
-	mOu5fMiSwwrxju6lKnY3iOKwYO6o8/FKbDELJ8Df4Fg8/Jpsa/6OuaH+0aUiG/ndI9rf
-	wuasFpW46k+hczwn4sB0PgpWUI+WX7xdYHqMR9Lu96/OuQyCkrpY544mkb4SIqDCZ3oM
-	A1sxdqf6UreD9b7KLg+hFRleZ/3F3iwALvhrSG46Kc3DHUeBkWV85hNOq+6OeOMKoDRL
-	iUAg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=1e100.net; s=20161025;
-	h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-	:message-id:subject:to:cc:content-transfer-encoding;
-	bh=9iML0q+Y2zXHOTw7pF90C39acLonSMJzVN+fT/f4m2s=;
-	b=NjPU5vWgjKkgoDbEWLCW+//xgzwwvF93PN0vjhFxV7x/sy2kw5C8JJk0fdWR0tMhhb
-	biRtvSrlhyAqoNVAWBj/G51UM61zdrll9O/pP+W8nu8w5I/53DRCoKkq7yQUcCYZz3c2
-	i6S61iKIouZ7WSqylADxVHMJYnnZOFHnpibLtlaHObdDiHK02eTxFL3I50bi1UHEhEkE
-	qfdEvuRHhTOLggFPag3Dtuksnex/xWn55gkM2w0Y2izsMwO+HIvTOEGygHyQUnH6oOoo
-	T9H0CrrTDm15wPNNOEdPDivX7k7BqL3zEwNJO19OJV8Jr1YJkVSIbmbCUV1FTfmylh+t
-	hVkA==
-X-Gm-Message-State: APjAAAWRGuCNnVd1ZQOyJq6WRy0/OKfBTfdrNRmm+cYPAjqbTmwjFI0u
-	GHmCHh7tAONEcjilWwsnojr0kj9QHaOqwZW9m6jJdujXqR0=
-X-Google-Smtp-Source: APXvYqweZMZhS9zcUaWPMx2+ir2Yl2I+2wbkZj+5ztHh2CcMtmwhIu5FBgbA/Y1ApvBGHpBaIaUjNJ597Proes0Twpc=
-X-Received: by 2002:a9d:6156:: with SMTP id c22mr5570575otk.363.1556463357027; 
-	Sun, 28 Apr 2019 07:55:57 -0700 (PDT)
-MIME-Version: 1.0
-References: <20190426182210.10442-1-richard.henderson@linaro.org>
-In-Reply-To: <20190426182210.10442-1-richard.henderson@linaro.org>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Sun, 28 Apr 2019 15:55:45 +0100
-Message-ID:
- <CAFEAcA8BwY07Z9NdnVy=FS78kEYzQgw8AzU=7g+w3kOtBtKCgw@mail.gmail.com>
-To: Richard Henderson <richard.henderson@linaro.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
-	recognized.
-X-Received-From: 2607:f8b0:4864:20::32b
-Subject: Re: [Qemu-devel] [PULL 0/2] target/hppa patch queue
+	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1hKlM1-00080W-0f
+	for qemu-devel@nongnu.org; Sun, 28 Apr 2019 11:04:35 -0400
+Received: from mail.ilande.co.uk ([46.43.2.167]:53032
+	helo=mail.default.ilande.uk0.bigv.io)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <mark.cave-ayland@ilande.co.uk>)
+	id 1hKlLy-0007tB-53; Sun, 28 Apr 2019 11:04:31 -0400
+Received: from host86-175-31-255.range86-175.btcentralplus.com
+	([86.175.31.255] helo=kentang.home)
+	by mail.default.ilande.uk0.bigv.io with esmtpsa
+	(TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128) (Exim 4.89)
+	(envelope-from <mark.cave-ayland@ilande.co.uk>)
+	id 1hKkxK-0005tp-CA; Sun, 28 Apr 2019 15:39:02 +0100
+From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+To: qemu-devel@nongnu.org, qemu-ppc@nongnu.org, david@gibson.dropbear.id.au,
+	rth@twiddle.net, gkurz@kaod.org
+Date: Sun, 28 Apr 2019 15:38:41 +0100
+Message-Id: <20190428143845.11810-11-mark.cave-ayland@ilande.co.uk>
+X-Mailer: git-send-email 2.11.0
+In-Reply-To: <20190428143845.11810-1-mark.cave-ayland@ilande.co.uk>
+References: <20190428143845.11810-1-mark.cave-ayland@ilande.co.uk>
+X-SA-Exim-Connect-IP: 86.175.31.255
+X-SA-Exim-Mail-From: mark.cave-ayland@ilande.co.uk
+X-SA-Exim-Version: 4.2.1 (built Tue, 02 Aug 2016 21:08:31 +0000)
+X-SA-Exim-Scanned: Yes (on mail.default.ilande.uk0.bigv.io)
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 46.43.2.167
+Subject: [Qemu-devel] [PATCH 10/14] target/ppc: introduce
+ GEN_VSX_HELPER_R2_AB macro to fpu_helper.c
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -89,70 +66,117 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: QEMU Developers <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190428145545.igHD66C9VImjlpeLaX8TfIjgLtUSsg-HWW9nrFo7nIw@z>
+Content-Type: text/plain; charset="UTF-8"
+Message-ID: <20190428143841.0PTwNXt61IFCFeqkTWm6OrJxhX9Ugh8QKbslEnoFbAM@z>
 
-On Fri, 26 Apr 2019 at 19:22, Richard Henderson
-<richard.henderson@linaro.org> wrote:
->
-> The following changes since commit 3284aa128153750f14a61e8a96fd085e6f2999=
-b6:
->
->   Merge remote-tracking branch 'remotes/lersek/tags/edk2-pull-2019-04-22'=
- into staging (2019-04-24 13:19:41 +0100)
->
-> are available in the Git repository at:
->
->   https://github.com/rth7680/qemu.git tags/pull-hppa-20190426
->
-> for you to fetch changes up to 647ad90a1eb6c016071d21e4f1e22b9cd4986417:
->
->   target/hppa: Always return EXCP_DMAR for protection id trap (2019-04-26=
- 11:09:22 -0700)
->
-> ----------------------------------------------------------------
-> Implement fast tlb insert insns.
-> Fix data tlb exception for pa 1.1.
->
-> ----------------------------------------------------------------
+Rather than perform the VSR register decoding within the helper itself,
+introduce a new GEN_VSX_HELPER_R2_AB macro which performs the decode based
+upon rA and rB at translation time.
 
-Hi; this doesn't seem to build:
+Signed-off-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+---
+ target/ppc/fpu_helper.c             | 10 ++++------
+ target/ppc/helper.h                 |  6 +++---
+ target/ppc/translate/vsx-impl.inc.c | 24 +++++++++++++++++++++---
+ 3 files changed, 28 insertions(+), 12 deletions(-)
 
-/home/pm215/qemu/target/hppa/translate.c: In function =E2=80=98trans_ixtlbx=
-f=E2=80=99:
-/home/pm215/qemu/target/hppa/translate.c:2544:5: error: too many
-arguments to function =E2=80=98tcg_temp_new_i64=E2=80=99
-     atl =3D tcg_temp_new_tl(ctx);
-     ^
-In file included from /home/pm215/qemu/tcg/tcg-op.h:28:0,
-                 from /home/pm215/qemu/target/hppa/translate.c:25:
-/home/pm215/qemu/tcg/tcg.h:975:24: note: declared here
- static inline TCGv_i64 tcg_temp_new_i64(void)
-                        ^
-/home/pm215/qemu/target/hppa/translate.c:2545:5: error: too many
-arguments to function =E2=80=98tcg_temp_new_i64=E2=80=99
-     stl =3D tcg_temp_new_tl(ctx);
-     ^
-In file included from /home/pm215/qemu/tcg/tcg-op.h:28:0,
-                 from /home/pm215/qemu/target/hppa/translate.c:25:
-/home/pm215/qemu/tcg/tcg.h:975:24: note: declared here
- static inline TCGv_i64 tcg_temp_new_i64(void)
-                        ^
-/home/pm215/qemu/target/hppa/translate.c:2546:5: error: too many
-arguments to function =E2=80=98tcg_temp_new_i64=E2=80=99
-     addr =3D tcg_temp_new_tl(ctx);
-     ^
-In file included from /home/pm215/qemu/tcg/tcg-op.h:28:0,
-                 from /home/pm215/qemu/target/hppa/translate.c:25:
-/home/pm215/qemu/tcg/tcg.h:975:24: note: declared here
- static inline TCGv_i64 tcg_temp_new_i64(void)
-                        ^
+diff --git a/target/ppc/fpu_helper.c b/target/ppc/fpu_helper.c
+index b26a1f1494..370b1d2c46 100644
+--- a/target/ppc/fpu_helper.c
++++ b/target/ppc/fpu_helper.c
+@@ -2434,10 +2434,9 @@ void helper_xscmpexpdp(CPUPPCState *env, uint32_t opcode,
+     do_float_check_status(env, GETPC());
+ }
+ 
+-void helper_xscmpexpqp(CPUPPCState *env, uint32_t opcode)
++void helper_xscmpexpqp(CPUPPCState *env, uint32_t opcode,
++                       ppc_vsr_t *xa, ppc_vsr_t *xb)
+ {
+-    ppc_vsr_t *xa = &env->vsr[rA(opcode) + 32];
+-    ppc_vsr_t *xb = &env->vsr[rB(opcode) + 32];
+     int64_t exp_a, exp_b;
+     uint32_t cc;
+ 
+@@ -2513,10 +2512,9 @@ VSX_SCALAR_CMP(xscmpodp, 1)
+ VSX_SCALAR_CMP(xscmpudp, 0)
+ 
+ #define VSX_SCALAR_CMPQ(op, ordered)                                    \
+-void helper_##op(CPUPPCState *env, uint32_t opcode)                     \
++void helper_##op(CPUPPCState *env, uint32_t opcode,                     \
++                 ppc_vsr_t *xa, ppc_vsr_t *xb)                          \
+ {                                                                       \
+-    ppc_vsr_t *xa = &env->vsr[rA(opcode) + 32];                         \
+-    ppc_vsr_t *xb = &env->vsr[rB(opcode) + 32];                         \
+     uint32_t cc = 0;                                                    \
+     bool vxsnan_flag = false, vxvc_flag = false;                        \
+                                                                         \
+diff --git a/target/ppc/helper.h b/target/ppc/helper.h
+index cea56ece30..167d6e45fd 100644
+--- a/target/ppc/helper.h
++++ b/target/ppc/helper.h
+@@ -402,11 +402,11 @@ DEF_HELPER_5(xscmpgtdp, void, env, i32, vsr, vsr, vsr)
+ DEF_HELPER_5(xscmpgedp, void, env, i32, vsr, vsr, vsr)
+ DEF_HELPER_5(xscmpnedp, void, env, i32, vsr, vsr, vsr)
+ DEF_HELPER_4(xscmpexpdp, void, env, i32, vsr, vsr)
+-DEF_HELPER_2(xscmpexpqp, void, env, i32)
++DEF_HELPER_4(xscmpexpqp, void, env, i32, vsr, vsr)
+ DEF_HELPER_4(xscmpodp, void, env, i32, vsr, vsr)
+ DEF_HELPER_4(xscmpudp, void, env, i32, vsr, vsr)
+-DEF_HELPER_2(xscmpoqp, void, env, i32)
+-DEF_HELPER_2(xscmpuqp, void, env, i32)
++DEF_HELPER_4(xscmpoqp, void, env, i32, vsr, vsr)
++DEF_HELPER_4(xscmpuqp, void, env, i32, vsr, vsr)
+ DEF_HELPER_5(xsmaxdp, void, env, i32, vsr, vsr, vsr)
+ DEF_HELPER_5(xsmindp, void, env, i32, vsr, vsr, vsr)
+ DEF_HELPER_5(xsmaxcdp, void, env, i32, vsr, vsr, vsr)
+diff --git a/target/ppc/translate/vsx-impl.inc.c b/target/ppc/translate/vsx-impl.inc.c
+index f304c11538..51d4e0cdd6 100644
+--- a/target/ppc/translate/vsx-impl.inc.c
++++ b/target/ppc/translate/vsx-impl.inc.c
+@@ -1041,6 +1041,24 @@ static void gen_##name(DisasContext *ctx)                                     \
+     tcg_temp_free_ptr(xb);                                                    \
+ }
+ 
++#define GEN_VSX_HELPER_R2_AB(name, op1, op2, inval, type)                     \
++static void gen_##name(DisasContext *ctx)                                     \
++{                                                                             \
++    TCGv_i32 opc;                                                             \
++    TCGv_ptr xa, xb;                                                          \
++    if (unlikely(!ctx->vsx_enabled)) {                                        \
++        gen_exception(ctx, POWERPC_EXCP_VSXU);                                \
++        return;                                                               \
++    }                                                                         \
++    opc = tcg_const_i32(ctx->opcode);                                         \
++    xa = gen_vsr_ptr(rA(ctx->opcode) + 32);                                   \
++    xb = gen_vsr_ptr(rB(ctx->opcode) + 32);                                   \
++    gen_helper_##name(cpu_env, opc, xa, xb);                                  \
++    tcg_temp_free_i32(opc);                                                   \
++    tcg_temp_free_ptr(xa);                                                    \
++    tcg_temp_free_ptr(xb);                                                    \
++}
++
+ #define GEN_VSX_HELPER_XT_XB_ENV(name, op1, op2, inval, type) \
+ static void gen_##name(DisasContext *ctx)                     \
+ {                                                             \
+@@ -1084,11 +1102,11 @@ GEN_VSX_HELPER_X3(xscmpgtdp, 0x0C, 0x01, 0, PPC2_ISA300)
+ GEN_VSX_HELPER_X3(xscmpgedp, 0x0C, 0x02, 0, PPC2_ISA300)
+ GEN_VSX_HELPER_X3(xscmpnedp, 0x0C, 0x03, 0, PPC2_ISA300)
+ GEN_VSX_HELPER_X2_AB(xscmpexpdp, 0x0C, 0x07, 0, PPC2_ISA300)
+-GEN_VSX_HELPER_2(xscmpexpqp, 0x04, 0x05, 0, PPC2_ISA300)
++GEN_VSX_HELPER_R2_AB(xscmpexpqp, 0x04, 0x05, 0, PPC2_ISA300)
+ GEN_VSX_HELPER_X2_AB(xscmpodp, 0x0C, 0x05, 0, PPC2_VSX)
+ GEN_VSX_HELPER_X2_AB(xscmpudp, 0x0C, 0x04, 0, PPC2_VSX)
+-GEN_VSX_HELPER_2(xscmpoqp, 0x04, 0x04, 0, PPC2_VSX)
+-GEN_VSX_HELPER_2(xscmpuqp, 0x04, 0x14, 0, PPC2_VSX)
++GEN_VSX_HELPER_R2_AB(xscmpoqp, 0x04, 0x04, 0, PPC2_VSX)
++GEN_VSX_HELPER_R2_AB(xscmpuqp, 0x04, 0x14, 0, PPC2_VSX)
+ GEN_VSX_HELPER_X3(xsmaxdp, 0x00, 0x14, 0, PPC2_VSX)
+ GEN_VSX_HELPER_X3(xsmindp, 0x00, 0x15, 0, PPC2_VSX)
+ GEN_VSX_HELPER_R3(xsmaxcdp, 0x00, 0x10, 0, PPC2_ISA300)
+-- 
+2.11.0
 
-(maybe a conflict with your other pullreq I just applied?)
-
-thanks
--- PMM
 
