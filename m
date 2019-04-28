@@ -2,94 +2,107 @@ Return-Path: <SRS0=GiFh=S6=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AE7BDC43218
-	for <qemu-devel@archiver.kernel.org>; Sun, 28 Apr 2019 22:56:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CF693C43218
+	for <qemu-devel@archiver.kernel.org>; Sun, 28 Apr 2019 23:35:43 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 62F4620675
-	for <qemu-devel@archiver.kernel.org>; Sun, 28 Apr 2019 22:56:25 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 62F4620675
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 99DEC20656
+	for <qemu-devel@archiver.kernel.org>; Sun, 28 Apr 2019 23:35:43 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 99DEC20656
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.ibm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:49340 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:49627 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hKsie-0005PC-JQ
-	for qemu-devel@archiver.kernel.org; Sun, 28 Apr 2019 18:56:24 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:50098)
+	id 1hKtKg-0004VS-GC
+	for qemu-devel@archiver.kernel.org; Sun, 28 Apr 2019 19:35:42 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:55084)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1hKshp-0004i5-UV
-	for qemu-devel@nongnu.org; Sun, 28 Apr 2019 18:55:35 -0400
+	(envelope-from <stefanb@linux.ibm.com>) id 1hKtJr-00047G-In
+	for qemu-devel@nongnu.org; Sun, 28 Apr 2019 19:34:52 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1hKsho-0007Iq-K0
-	for qemu-devel@nongnu.org; Sun, 28 Apr 2019 18:55:33 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:52444)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mreitz@redhat.com>)
-	id 1hKshl-0007H3-JH; Sun, 28 Apr 2019 18:55:29 -0400
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
-	[10.5.11.15])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id B32D78830E;
-	Sun, 28 Apr 2019 22:55:27 +0000 (UTC)
-Received: from dresden.str.redhat.com (ovpn-204-32.brq.redhat.com
-	[10.40.204.32])
-	by smtp.corp.redhat.com (Postfix) with ESMTPS id B865A5D6A9;
-	Sun, 28 Apr 2019 22:55:23 +0000 (UTC)
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
-	qemu-devel@nongnu.org, qemu-block@nongnu.org
-References: <20190402153730.54145-1-vsementsov@virtuozzo.com>
-	<20190402153730.54145-2-vsementsov@virtuozzo.com>
-From: Max Reitz <mreitz@redhat.com>
-Openpgp: preference=signencrypt
-Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
-	mQENBFXOJlcBCADEyyhOTsoa/2ujoTRAJj4MKA21dkxxELVj3cuILpLTmtachWj7QW+TVG8U
-	/PsMCFbpwsQR7oEy8eHHZwuGQsNpEtNC2G/L8Yka0BIBzv7dEgrPzIu+W3anZXQW4702+uES
-	U29G8TP/NGfXRRHGlbBIH9KNUnOSUD2vRtpOLXkWsV5CN6vQFYgQfFvmp5ZpPeUe6xNplu8V
-	mcTw8OSEDW/ZnxJc8TekCKZSpdzYoxfzjm7xGmZqB18VFwgJZlIibt1HE0EB4w5GsD7x5ekh
-	awIe3RwoZgZDLQMdOitJ1tUc8aqaxvgA4tz6J6st8D8pS//m1gAoYJWGwwIVj1DjTYLtABEB
-	AAG0HU1heCBSZWl0eiA8bXJlaXR6QHJlZGhhdC5jb20+iQFTBBMBCAA9AhsDBQkSzAMABQsJ
-	CAcCBhUICQoLAgQWAgMBAh4BAheABQJVzie5FRhoa3A6Ly9rZXlzLmdudXBnLm5ldAAKCRD0
-	B9sAYdXPQDcIB/9uNkbYEex1rHKz3mr12uxYMwLOOFY9fstP5aoVJQ1nWQVB6m2cfKGdcRe1
-	2/nFaHSNAzT0NnKz2MjhZVmcrpyd2Gp2QyISCfb1FbT82GMtXFj1wiHmPb3CixYmWGQUUh+I
-	AvUqsevLA+WihgBUyaJq/vuDVM1/K9Un+w+Tz5vpeMidlIsTYhcsMhn0L9wlCjoucljvbDy/
-	8C9L2DUdgi3XTa0ORKeflUhdL4gucWoAMrKX2nmPjBMKLgU7WLBc8AtV+84b9OWFML6NEyo4
-	4cP7cM/07VlJK53pqNg5cHtnWwjHcbpGkQvx6RUx6F1My3y52vM24rNUA3+ligVEgPYBuQEN
-	BFXOJlcBCADAmcVUNTWT6yLWQHvxZ0o47KCP8OcLqD+67T0RCe6d0LP8GsWtrJdeDIQk+T+F
-	xO7DolQPS6iQ6Ak2/lJaPX8L0BkEAiMuLCKFU6Bn3lFOkrQeKp3u05wCSV1iKnhg0UPji9V2
-	W5eNfy8F4ZQHpeGUGy+liGXlxqkeRVhLyevUqfU0WgNqAJpfhHSGpBgihUupmyUg7lfUPeRM
-	DzAN1pIqoFuxnN+BRHdAecpsLcbR8sQddXmDg9BpSKozO/JyBmaS1RlquI8HERQoe6EynJhd
-	64aICHDfj61rp+/0jTIcevxIIAzW70IadoS/y3DVIkuhncgDBvGbF3aBtjrJVP+5ABEBAAGJ
-	ASUEGAEIAA8FAlXOJlcCGwwFCRLMAwAACgkQ9AfbAGHVz0CbFwf9F/PXxQR9i4N0iipISYjU
-	sxVdjJOM2TMut+ZZcQ6NSMvhZ0ogQxJ+iEQ5OjnIputKvPVd5U7WRh+4lF1lB/NQGrGZQ1ic
-	alkj6ocscQyFwfib+xIe9w8TG1CVGkII7+TbS5pXHRxZH1niaRpoi/hYtgzkuOPp35jJyqT/
-	/ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
-	bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
-	R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
-Message-ID: <fe340a80-f918-7999-fb75-4b129162bd89@redhat.com>
-Date: Mon, 29 Apr 2019 00:55:22 +0200
+	(envelope-from <stefanb@linux.ibm.com>) id 1hKtJn-0002PS-OY
+	for qemu-devel@nongnu.org; Sun, 28 Apr 2019 19:34:51 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:49252)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <stefanb@linux.ibm.com>)
+	id 1hKtJm-0002OG-54
+	for qemu-devel@nongnu.org; Sun, 28 Apr 2019 19:34:47 -0400
+Received: from pps.filterd (m0098409.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id
+	x3SNYK8R048954
+	for <qemu-devel@nongnu.org>; Sun, 28 Apr 2019 19:34:40 -0400
+Received: from e32.co.us.ibm.com (e32.co.us.ibm.com [32.97.110.150])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2s5efbvgvt-1
+	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Sun, 28 Apr 2019 19:34:40 -0400
+Received: from localhost
+	by e32.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+	Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <stefanb@linux.ibm.com>;
+	Mon, 29 Apr 2019 00:34:40 +0100
+Received: from b03cxnp08027.gho.boulder.ibm.com (9.17.130.19)
+	by e32.co.us.ibm.com (192.168.1.132) with IBM ESMTP SMTP Gateway:
+	Authorized Use Only! Violators will be prosecuted; 
+	(version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
+	Mon, 29 Apr 2019 00:34:37 +0100
+Received: from b03ledav002.gho.boulder.ibm.com
+	(b03ledav002.gho.boulder.ibm.com [9.17.130.233])
+	by b03cxnp08027.gho.boulder.ibm.com (8.14.9/8.14.9/NCO v10.0) with
+	ESMTP id x3SNYaZn63438910
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256
+	verify=OK); Sun, 28 Apr 2019 23:34:37 GMT
+Received: from b03ledav002.gho.boulder.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id DD85513604F;
+	Sun, 28 Apr 2019 23:34:36 +0000 (GMT)
+Received: from b03ledav002.gho.boulder.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 70ED0136055;
+	Sun, 28 Apr 2019 23:34:36 +0000 (GMT)
+Received: from sbct-3.pok.ibm.com (unknown [9.47.158.153])
+	by b03ledav002.gho.boulder.ibm.com (Postfix) with ESMTP;
+	Sun, 28 Apr 2019 23:34:36 +0000 (GMT)
+To: =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>,
+	=?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+References: <20190427131857.11600-1-philmd@redhat.com>
+	<CAMxuvayZ-woUZPxnav8EXSVGGADxeJjhDs1bgzPAzNLMGFgTsA@mail.gmail.com>
+From: Stefan Berger <stefanb@linux.ibm.com>
+Date: Sun, 28 Apr 2019 19:34:35 -0400
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
-	Thunderbird/60.6.1
+	Thunderbird/60.3.1
 MIME-Version: 1.0
-In-Reply-To: <20190402153730.54145-2-vsementsov@virtuozzo.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="nkDe19NtnX0dms35SobhN9BjQiGecCibO"
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.28]);
-	Sun, 28 Apr 2019 22:55:28 +0000 (UTC)
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-X-Content-Filtered-By: Mailman/MimeDel 2.1.21
-Subject: Re: [Qemu-devel] [PATCH v5 01/10] tests/perf: Test qemu-img convert
- from raw to encrypted qcow2
+In-Reply-To: <CAMxuvayZ-woUZPxnav8EXSVGGADxeJjhDs1bgzPAzNLMGFgTsA@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"; format="flowed"
+Content-Language: en-MW
+X-TM-AS-GCONF: 00
+x-cbid: 19042823-0004-0000-0000-0000150510B6
+X-IBM-SpamModules-Scores: 
+X-IBM-SpamModules-Versions: BY=3.00011013; HX=3.00000242; KW=3.00000007;
+	PH=3.00000004; SC=3.00000285; SDB=6.01195805; UDB=6.00627064;
+	IPR=6.00976654; 
+	MB=3.00026638; MTD=3.00000008; XFM=3.00000015; UTC=2019-04-28 23:34:39
+X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
+x-cbparentid: 19042823-0005-0000-0000-00008B7083D6
+Message-Id: <173af15e-881e-89a0-77c5-a937abc682cb@linux.ibm.com>
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:, ,
+	definitions=2019-04-28_15:, , signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+	priorityscore=1501
+	malwarescore=0 suspectscore=0 phishscore=0 bulkscore=0 spamscore=0
+	clxscore=1015 lowpriorityscore=0 mlxscore=0 impostorscore=0
+	mlxlogscore=967 adultscore=0 classifier=spam adjust=0 reason=mlx
+	scancount=1 engine=8.0.1-1810050000 definitions=main-1904280172
+Content-Transfer-Encoding: quoted-printable
+X-MIME-Autoconverted: from 8bit to quoted-printable by
+	mx0a-001b2d01.pphosted.com id x3SNYK8R048954
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic]
+X-Received-From: 148.163.156.1
+Subject: Re: [Qemu-devel] [PATCH] hw/tpm: Only build tpm_ppi.o if any of
+ TPM_TIS/TPM_CRB is built
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -101,133 +114,30 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: kwolf@redhat.com, pbonzini@redhat.com, berto@igalia.com, den@openvz.org
+Cc: qemu-devel <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190428225522.B6J8eJ7SjdqzKf-1z8fwmHQOy4xvAu6HRI8vrty1Qhk@z>
+Message-ID: <20190428233435.QTN7nWzy8k-fWgfV42PGf_danzWZi6bUhiyiSQYcuyk@z>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---nkDe19NtnX0dms35SobhN9BjQiGecCibO
-From: Max Reitz <mreitz@redhat.com>
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
- qemu-devel@nongnu.org, qemu-block@nongnu.org
-Cc: kwolf@redhat.com, berto@igalia.com, pbonzini@redhat.com, den@openvz.org,
- berrange@redhat.com
-Message-ID: <fe340a80-f918-7999-fb75-4b129162bd89@redhat.com>
-Subject: Re: [PATCH v5 01/10] tests/perf: Test qemu-img convert from raw to
- encrypted qcow2
-References: <20190402153730.54145-1-vsementsov@virtuozzo.com>
- <20190402153730.54145-2-vsementsov@virtuozzo.com>
-In-Reply-To: <20190402153730.54145-2-vsementsov@virtuozzo.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+On 4/27/19 11:49 AM, Marc-Andr=C3=A9 Lureau wrote:
+> Hi
+>
+> On Sat, Apr 27, 2019 at 3:19 PM Philippe Mathieu-Daud=C3=A9
+> <philmd@redhat.com> wrote:
+>> The TPM Physical Presence Interface routines are only used
+>> by the CRB/TIS interfaces. Do not compile this file if any
+>> of them is built.
+>>
+>> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+> Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+>
+>> ---
+>> Marc-Andr=C3=A9:
+>>    You might want to add yourself as reviewer/maintainer of TPM ;)
+> yes, I suppose Stefan wouldn't mind having me as R: :)
 
-On 02.04.19 17:37, Vladimir Sementsov-Ogievskiy wrote:
-> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-> ---
->  tests/perf/block/qcow2/convert-to-encrypted | 48 +++++++++++++++++++++=
-
->  1 file changed, 48 insertions(+)
->  create mode 100755 tests/perf/block/qcow2/convert-to-encrypted
-
-Thanks for the test case, but I don=E2=80=99t know whether this is the ri=
-ght way
-to include it.
-
-A concrete problem is that it doesn=E2=80=99t work with out-of-tree build=
-s (I
-only do out-of-tree builds).  I wonder whether it would be possible and
-make sense (I have no idea) to add a subdirectory "perf" to the iotests
-and reuse its infrastructure?  Those tests wouldn=E2=80=99t run by defaul=
-t.
-
-Max
-
-> diff --git a/tests/perf/block/qcow2/convert-to-encrypted b/tests/perf/b=
-lock/qcow2/convert-to-encrypted
-> new file mode 100755
-> index 0000000000..7a6b7b1cab
-> --- /dev/null
-> +++ b/tests/perf/block/qcow2/convert-to-encrypted
-> @@ -0,0 +1,48 @@
-> +#!/bin/bash
-> +#
-> +# Test qemu-img convert from raw to encrypted qcow2
-> +#
-> +# Copyright (c) 2019 Virtuozzo International GmbH. All rights reserved=
-=2E
-> +#
-> +# This program is free software; you can redistribute it and/or modify=
-
-> +# it under the terms of the GNU General Public License as published by=
-
-> +# the Free Software Foundation; either version 2 of the License, or
-> +# (at your option) any later version.
-> +#
-> +# This program is distributed in the hope that it will be useful,
-> +# but WITHOUT ANY WARRANTY; without even the implied warranty of
-> +# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-> +# GNU General Public License for more details.
-> +#
-> +# You should have received a copy of the GNU General Public License
-> +# along with this program.  If not, see <http://www.gnu.org/licenses/>=
-=2E
-> +#
-> +
-> +if [ "$#" -lt 2 ]; then
-> +    echo "Usage: $0 SOURCE_FILE DESTINATION_FILE [additional qemu-img =
-convert parameters]"
-> +    exit 1
-> +fi
-> +
-> +ROOT_DIR=3D"$( cd "$( dirname "${BASH_SOURCE[0]}" )/../../../.." >/dev=
-/null 2>&1 && pwd )"
-> +QEMU_IMG=3D"$ROOT_DIR/qemu-img"
-> +QEMU_IO=3D"$ROOT_DIR/qemu-io"
-> +
-> +size=3D1G
-> +
-> +src=3D"$1"
-> +shift
-> +
-> +dst=3D"$1"
-> +shift
-> +
-> +(
-> +# create source
-> +$QEMU_IMG create -f raw "$src" $size
-> +$QEMU_IO -f raw -c "write -P 0xa 0 $size" "$src"
-> +
-> +# create target
-> +$QEMU_IMG create -f qcow2 --object secret,id=3Dsec0,data=3Dtest -o enc=
-rypt.format=3Dluks,encrypt.key-secret=3Dsec0 "$dst" $size
-> +) > /dev/null
-> +
-> +# test with additional parameters left in $@
-> +/usr/bin/time -f %e $QEMU_IMG convert "$@" -f raw --object secret,id=3D=
-sec0,data=3Dtest --target-image-opts -n "$src" "driver=3Dqcow2,file.filen=
-ame=3D$dst,encrypt.key-secret=3Dsec0"
->=20
+I don't mind.
 
 
-
---nkDe19NtnX0dms35SobhN9BjQiGecCibO
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAlzGL1oACgkQ9AfbAGHV
-z0Dv1gf9Fgb33NPbFmkgMoU+ruqbe1qnNS2ijYN+zyLQ4/STFN3HmTCgYydagZr1
-c11XUgm1+DPpQRwAX+mc3vKCsHI6paoPDCnq55VssKd3Tx2mkygTrC6AIUdWBojJ
-flA/sizxYXGq0QAY7I3UbTFoLlbBJ2ABhwQ2rVPoNrlqcMNLmLwlKYaXXRFHR02b
-zXXFdib9IMqOB4ijLO9EoWNIa+UbLOwGlYpfkRbSawxgMtjT1veOfAa0UYfGsYU/
-Pz1m2XHzfRUSt49qLe3bx37aukbakyX//VrrCs4pPynBzMujz8Pc37ZtJbXVTCWR
-+g2p3/02n1dMllNC2RACQgY/E/wcSA==
-=gH2V
------END PGP SIGNATURE-----
-
---nkDe19NtnX0dms35SobhN9BjQiGecCibO--
 
