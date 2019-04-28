@@ -1,39 +1,15 @@
-Received: from eggs.gnu.org ([209.51.188.92]:55195)
+Received: from eggs.gnu.org ([209.51.188.92]:58697)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanb@linux.ibm.com>) id 1hKkZn-000776-Gk
-	for qemu-devel@nongnu.org; Sun, 28 Apr 2019 10:14:44 -0400
+	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1hKl0p-000603-C0
+	for qemu-devel@nongnu.org; Sun, 28 Apr 2019 10:42:40 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanb@linux.ibm.com>) id 1hKkZl-00085i-N5
-	for qemu-devel@nongnu.org; Sun, 28 Apr 2019 10:14:43 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:39464)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <stefanb@linux.ibm.com>)
-	id 1hKkZj-00084X-JG
-	for qemu-devel@nongnu.org; Sun, 28 Apr 2019 10:14:41 -0400
-Received: from pps.filterd (m0098393.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id
-	x3SE3nw1124981
-	for <qemu-devel@nongnu.org>; Sun, 28 Apr 2019 10:14:36 -0400
-Received: from e32.co.us.ibm.com (e32.co.us.ibm.com [32.97.110.150])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2s5421dbcb-1
-	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Sun, 28 Apr 2019 10:14:36 -0400
-Received: from localhost
-	by e32.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
-	Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <stefanb@linux.ibm.com>;
-	Sun, 28 Apr 2019 15:14:35 +0100
-References: <20190424094557.28404-1-thuth@redhat.com>
-From: Stefan Berger <stefanb@linux.ibm.com>
-Date: Sun, 28 Apr 2019 10:14:31 -0400
-MIME-Version: 1.0
-In-Reply-To: <20190424094557.28404-1-thuth@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
-Content-Language: en-MW
-Message-Id: <1cc6c6b6-df8f-3278-8996-ee67d2f620b9@linux.ibm.com>
-Subject: Re: [Qemu-devel] [PATCH] tests/tpm-tests: Use g_test_skip() to mark
- skipped tests
+	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1hKl0o-000554-Aq
+	for qemu-devel@nongnu.org; Sun, 28 Apr 2019 10:42:39 -0400
+From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+Date: Sun, 28 Apr 2019 15:38:31 +0100
+Message-Id: <20190428143845.11810-1-mark.cave-ayland@ilande.co.uk>
+Subject: [Qemu-devel] [PATCH 00/14] target/ppc: remove getVSR()/putVSR() and
+ further tidy-up
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -42,29 +18,56 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org
-Cc: pbonzini@redhat.com, lvivier@redhat.com
+To: qemu-devel@nongnu.org, qemu-ppc@nongnu.org, david@gibson.dropbear.id.au, rth@twiddle.net, gkurz@kaod.org
 
-On 4/24/19 5:45 AM, Thomas Huth wrote:
-> Since we do not use gtester anymore (which had a bug here),
-> we can now use g_test_skip() to mark skipped tests.
->
-> Signed-off-by: Thomas Huth <thuth@redhat.com>
-Reviewed-by: Stefan Berger <stefanb@linux.ibm.com>
-> ---
->   tests/tpm-tests.c | 2 +-
->   1 file changed, 1 insertion(+), 1 deletion(-)
->
-> diff --git a/tests/tpm-tests.c b/tests/tpm-tests.c
-> index 582ec0cfd4..e640777aa9 100644
-> --- a/tests/tpm-tests.c
-> +++ b/tests/tpm-tests.c
-> @@ -22,7 +22,7 @@ static bool
->   tpm_test_swtpm_skip(void)
->   {
->       if (!tpm_util_swtpm_has_tpm2()) {
-> -        g_test_message("swtpm not in PATH or missing --tpm2 support");
-> +        g_test_skip("swtpm not in PATH or missing --tpm2 support");
->           return true;
->       }
->   
+With the conversion of PPC VSX registers to host endian during the 4.0 development
+cycle, the VSX helpers getVSR() and putVSR() which were used to convert between big
+endian and host endian (and are currently just a no-op) can now be removed. This
+eliminates an extra copy for each VSX source and destination register at runtime.
+
+Patches 1-3 do the elimination work on a per-file basis and switch VSX register
+accesses to be via pointers rather than on copies managed using getVSR()/putVSR().
+
+After this patches 4-12 change the VSX registers to be passed to helpers via pointers
+rather than register number so that the decode of the vector register pointers occurs
+at translation time instead of at runtime. This matches how VMX instructions are
+currently decoded.
+
+Finally patches 13 and 14 perform some additional tidy-up around decoding registers
+at translation time instead of runtime for VSX_REST_DC and VSX_FMADD.
+
+Greg: I've added you as CC since you managed to find a bug in my last series. This
+one is much more mechanical, but if you are able to confirm this doesn't introduce
+any regressions in your test images then that would be great.
+
+Signed-off-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+
+
+Mark Cave-Ayland (14):
+  target/ppc: remove getVSR()/putVSR() from fpu_helper.c
+  target/ppc: remove getVSR()/putVSR() from mem_helper.c
+  target/ppc: remove getVSR()/putVSR() from int_helper.c
+  target/ppc: introduce GEN_VSX_HELPER_X3 macro to fpu_helper.c
+  target/ppc: introduce GEN_VSX_HELPER_X2 macro to fpu_helper.c
+  target/ppc: introduce GEN_VSX_HELPER_X2_AB macro to fpu_helper.c
+  target/ppc: introduce GEN_VSX_HELPER_X1 macro to fpu_helper.c
+  target/ppc: introduce GEN_VSX_HELPER_R3 macro to fpu_helper.c
+  target/ppc: introduce GEN_VSX_HELPER_R2 macro to fpu_helper.c
+  target/ppc: introduce GEN_VSX_HELPER_R2_AB macro to fpu_helper.c
+  target/ppc: decode target register in VSX_VECTOR_LOAD_STORE_LENGTH at
+    translation time
+  target/ppc: decode target register in VSX_EXTRACT_INSERT at
+    translation time
+  target/ppc: improve VSX_TEST_DC with new generator macros
+  target/ppc: improve VSX_FMADD with new GEN_VSX_HELPER_VSX_MADD macro
+
+ target/ppc/fpu_helper.c             | 745 +++++++++++++++---------------------
+ target/ppc/helper.h                 | 344 +++++++++--------
+ target/ppc/int_helper.c             |  24 +-
+ target/ppc/internal.h               |  12 -
+ target/ppc/mem_helper.c             |  22 +-
+ target/ppc/translate/vsx-impl.inc.c | 523 ++++++++++++++++---------
+ 6 files changed, 842 insertions(+), 828 deletions(-)
+
+-- 
+2.11.0
