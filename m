@@ -1,18 +1,19 @@
-Received: from eggs.gnu.org ([209.51.188.92]:52399)
+Received: from eggs.gnu.org ([209.51.188.92]:52432)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1hKm94-0007h6-NE
-	for qemu-devel@nongnu.org; Sun, 28 Apr 2019 11:55:16 -0400
+	(envelope-from <thuth@redhat.com>) id 1hKm97-0007ju-KG
+	for qemu-devel@nongnu.org; Sun, 28 Apr 2019 11:55:18 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1hKm93-0004rW-6d
-	for qemu-devel@nongnu.org; Sun, 28 Apr 2019 11:55:14 -0400
+	(envelope-from <thuth@redhat.com>) id 1hKm96-0004t7-Nk
+	for qemu-devel@nongnu.org; Sun, 28 Apr 2019 11:55:17 -0400
 From: Thomas Huth <thuth@redhat.com>
-Date: Sun, 28 Apr 2019 17:54:43 +0200
-Message-Id: <20190428155451.15653-1-thuth@redhat.com>
+Date: Sun, 28 Apr 2019 17:54:46 +0200
+Message-Id: <20190428155451.15653-4-thuth@redhat.com>
+In-Reply-To: <20190428155451.15653-1-thuth@redhat.com>
+References: <20190428155451.15653-1-thuth@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v2 0/8] tests/qemu-iotests: Run basic iotests
- during "make check"
+Subject: [Qemu-devel] [PATCH v2 3/8] tests/qemu-iotests/check: Pick a
+ default machine if necessary
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,174 +25,47 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Fam Zheng <fam@euphon.net>, qemu-block@nongnu.org, Eric Blake <eblake@redhat.com>, Ed Maste <emaste@freebsd.org>, Christophe Fergeau <cfergeau@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, Li-Wen Hsu <lwhsu@freebsd.org>, =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>, Wainer dos Santos Moschetta <wainersm@redhat.com>, Markus Armbruster <armbru@redhat.com>, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
 
-People often forget to run the iotests before submitting patches or
-pull requests - this is likely due to the fact that we do not run the
-tests during our mandatory "make check" tests yet.
-This patch series now changes the "auto" group to only include tests
-that should be safe to run in all CI environments (including FreeBSD
-and macOS!). Thus these iotests can now always be run during "make
-check" automatically, too.
+qemu-system-arm, qemu-system-aarch64 and qemu-system-tricore do not have
+a default machine, so when running the qemu-iotests with such a binary,
+lots of tests are failing. Fix it by picking a default machine in the
+"check" script instead.
 
-v2:
- - Use "auto" group instead of adding a new "ci" group
- - Adjusted the tests that are run automatically (after doing lots
-   of CI runs on cirrus-ci.com, gitlab and travis)
- - Added patch to fix the current regression with the "qemu-io:"
-   prefix in the master branch
- - Added a fix for iotest 005 on ext4 filesystems (skip it there)
+Signed-off-by: Thomas Huth <thuth@redhat.com>
+---
+ tests/qemu-iotests/check | 13 ++++++++++++-
+ 1 file changed, 12 insertions(+), 1 deletion(-)
 
-Thomas Huth (8):
-  tests/qemu-iotests: Fix output of qemu-io related tests
-  tests/qemu-iotests/005: Add a sanity check for large sparse file
-    support
-  tests/qemu-iotests/check: Pick a default machine if necessary
-  tests/qemu-iotests: Do not hard-code the path to bash
-  cirrus / travis: Add gnu-sed and bash for macOS and FreeBSD
-  tests/qemu-iotests: Remove the "_supported_os Linux" line from many
-    tests
-  tests/qemu-iotests/group: Re-use the "auto" group for tests that can
-    always run
-  tests: Run the iotests during "make check" again
-
- .cirrus.yml                 |   4 +-
- .travis.yml                 |   1 +
- tests/Makefile.include      |   8 +-
- tests/check-block.sh        |  44 +++++++---
- tests/qemu-iotests-quick.sh |   8 --
- tests/qemu-iotests/001      |   1 -
- tests/qemu-iotests/002      |   1 -
- tests/qemu-iotests/003      |   1 -
- tests/qemu-iotests/004      |   1 -
- tests/qemu-iotests/005      |   9 ++
- tests/qemu-iotests/007      |   1 -
- tests/qemu-iotests/008      |   1 -
- tests/qemu-iotests/009      |   1 -
- tests/qemu-iotests/010      |   1 -
- tests/qemu-iotests/011      |   1 -
- tests/qemu-iotests/012      |   1 -
- tests/qemu-iotests/015      |   1 -
- tests/qemu-iotests/017      |   1 -
- tests/qemu-iotests/020      |   1 -
- tests/qemu-iotests/021      |   1 -
- tests/qemu-iotests/022      |   1 -
- tests/qemu-iotests/025      |   1 -
- tests/qemu-iotests/026      |   1 -
- tests/qemu-iotests/026.out  | 168 +++++++++++++++++------------------
- tests/qemu-iotests/027      |   1 -
- tests/qemu-iotests/029      |   1 -
- tests/qemu-iotests/031      |   1 -
- tests/qemu-iotests/032      |   1 -
- tests/qemu-iotests/033      |   1 -
- tests/qemu-iotests/035      |   1 -
- tests/qemu-iotests/036      |   1 -
- tests/qemu-iotests/037      |   1 -
- tests/qemu-iotests/042      |   1 -
- tests/qemu-iotests/043      |   1 -
- tests/qemu-iotests/046      |   1 -
- tests/qemu-iotests/047      |   1 -
- tests/qemu-iotests/049      |   1 -
- tests/qemu-iotests/050      |   1 -
- tests/qemu-iotests/051      |   1 -
- tests/qemu-iotests/052      |   1 -
- tests/qemu-iotests/053      |   1 -
- tests/qemu-iotests/054      |   1 -
- tests/qemu-iotests/060.out  |   6 +-
- tests/qemu-iotests/062      |   1 -
- tests/qemu-iotests/063      |   1 -
- tests/qemu-iotests/066      |   1 -
- tests/qemu-iotests/067      |   1 -
- tests/qemu-iotests/068      |   1 -
- tests/qemu-iotests/069      |   1 -
- tests/qemu-iotests/069.out  |   2 +-
- tests/qemu-iotests/070.out  |   2 +-
- tests/qemu-iotests/071      |   1 -
- tests/qemu-iotests/072      |   1 -
- tests/qemu-iotests/073      |   1 -
- tests/qemu-iotests/075.out  |  14 +--
- tests/qemu-iotests/076.out  |   6 +-
- tests/qemu-iotests/078.out  |  12 +--
- tests/qemu-iotests/079      |   1 -
- tests/qemu-iotests/080.out  |  40 ++++-----
- tests/qemu-iotests/081.out  |   2 +-
- tests/qemu-iotests/082      |   1 -
- tests/qemu-iotests/085      |   1 -
- tests/qemu-iotests/088.out  |  12 +--
- tests/qemu-iotests/089      |   1 -
- tests/qemu-iotests/090      |   1 -
- tests/qemu-iotests/094      |   1 -
- tests/qemu-iotests/095      |   1 -
- tests/qemu-iotests/098      |   1 -
- tests/qemu-iotests/102      |   1 -
- tests/qemu-iotests/103      |   1 -
- tests/qemu-iotests/103.out  |  14 +--
- tests/qemu-iotests/104      |   1 -
- tests/qemu-iotests/105      |   1 -
- tests/qemu-iotests/107      |   1 -
- tests/qemu-iotests/110      |   1 -
- tests/qemu-iotests/111      |   1 -
- tests/qemu-iotests/112      |   1 -
- tests/qemu-iotests/114      |   1 -
- tests/qemu-iotests/114.out  |   2 +-
- tests/qemu-iotests/115      |   1 -
- tests/qemu-iotests/116.out  |  14 +--
- tests/qemu-iotests/117      |   1 -
- tests/qemu-iotests/120      |   1 -
- tests/qemu-iotests/125      |   1 -
- tests/qemu-iotests/126      |   1 -
- tests/qemu-iotests/127      |   1 -
- tests/qemu-iotests/131.out  |   2 +-
- tests/qemu-iotests/133      |   1 -
- tests/qemu-iotests/133.out  |  30 +++----
- tests/qemu-iotests/134      |   1 -
- tests/qemu-iotests/137.out  |  28 +++---
- tests/qemu-iotests/140.out  |   2 +-
- tests/qemu-iotests/142      |   1 -
- tests/qemu-iotests/143      |   1 -
- tests/qemu-iotests/143.out  |   2 +-
- tests/qemu-iotests/144      |   1 -
- tests/qemu-iotests/145      |   1 -
- tests/qemu-iotests/153      |   1 -
- tests/qemu-iotests/153.out  |  30 +++----
- tests/qemu-iotests/156      |   1 -
- tests/qemu-iotests/157      |   1 -
- tests/qemu-iotests/158      |   1 -
- tests/qemu-iotests/159      |   1 -
- tests/qemu-iotests/162      |   1 -
- tests/qemu-iotests/170      |   1 -
- tests/qemu-iotests/173      |   1 -
- tests/qemu-iotests/182      |   1 -
- tests/qemu-iotests/183      |   1 -
- tests/qemu-iotests/186      |   1 -
- tests/qemu-iotests/187      |   1 -
- tests/qemu-iotests/187.out  |   6 +-
- tests/qemu-iotests/188.out  |   2 +-
- tests/qemu-iotests/190      |   1 -
- tests/qemu-iotests/191      |   1 -
- tests/qemu-iotests/192      |   1 -
- tests/qemu-iotests/195      |   1 -
- tests/qemu-iotests/197      |   1 -
- tests/qemu-iotests/197.out  |   2 +-
- tests/qemu-iotests/200      |   1 -
- tests/qemu-iotests/205      |   2 +-
- tests/qemu-iotests/214      |   1 -
- tests/qemu-iotests/215      |   1 -
- tests/qemu-iotests/215.out  |   2 +-
- tests/qemu-iotests/217      |   1 -
- tests/qemu-iotests/226.out  |  16 ++--
- tests/qemu-iotests/227      |   1 -
- tests/qemu-iotests/231      |   1 -
- tests/qemu-iotests/233      |   1 -
- tests/qemu-iotests/239      |   2 +-
- tests/qemu-iotests/240      |   3 +-
- tests/qemu-iotests/241      |   2 +-
- tests/qemu-iotests/243      |   2 +-
- tests/qemu-iotests/244      |   2 +-
- tests/qemu-iotests/244.out  |  10 +--
- tests/qemu-iotests/247      |   1 -
- tests/qemu-iotests/check    |  13 ++-
- tests/qemu-iotests/group    | 169 +++++++++++++++++++-----------------
- 137 files changed, 372 insertions(+), 421 deletions(-)
- delete mode 100755 tests/qemu-iotests-quick.sh
-
+diff --git a/tests/qemu-iotests/check b/tests/qemu-iotests/check
+index f9c24b6753..922c5d1d3d 100755
+--- a/tests/qemu-iotests/check
++++ b/tests/qemu-iotests/check
+@@ -130,7 +130,6 @@ export CACHEMODE=3D"writeback"
+ export QEMU_IO_OPTIONS=3D""
+ export QEMU_IO_OPTIONS_NO_FMT=3D""
+ export CACHEMODE_IS_DEFAULT=3Dtrue
+-export QEMU_OPTIONS=3D"-nodefaults -machine accel=3Dqtest"
+ export VALGRIND_QEMU=3D
+ export IMGKEYSECRET=3D
+ export IMGOPTSSYNTAX=3Dfalse
+@@ -564,6 +563,18 @@ then
+ fi
+ export QEMU_PROG=3D"$(type -p "$QEMU_PROG")"
+=20
++case "$QEMU_PROG" in
++    *qemu-system-arm|*qemu-system-aarch64)
++        export QEMU_OPTIONS=3D"-nodefaults -machine virt,accel=3Dqtest"
++        ;;
++    *qemu-system-tricore)
++        export QEMU_OPTIONS=3D"-nodefaults -machine tricore_testboard,ac=
+cel=3Dqtest"
++        ;;
++    *)
++        export QEMU_OPTIONS=3D"-nodefaults -machine accel=3Dqtest"
++        ;;
++esac
++
+ if [ -z "$QEMU_IMG_PROG" ]; then
+     if [ -x "$build_iotests/qemu-img" ]; then
+         export QEMU_IMG_PROG=3D"$build_iotests/qemu-img"
 --=20
 2.21.0
