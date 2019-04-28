@@ -1,22 +1,40 @@
-Received: from eggs.gnu.org ([209.51.188.92]:49840)
+Received: from eggs.gnu.org ([209.51.188.92]:55106)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1hKjuk-00080S-Tq
-	for qemu-devel@nongnu.org; Sun, 28 Apr 2019 09:32:19 -0400
+	(envelope-from <stefanb@linux.ibm.com>) id 1hKkZB-0006xB-2W
+	for qemu-devel@nongnu.org; Sun, 28 Apr 2019 10:14:05 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1hKjuj-0006bA-3b
-	for qemu-devel@nongnu.org; Sun, 28 Apr 2019 09:32:18 -0400
-References: <dd85fab0-52df-9c2d-e402-28d7ce9867f1@redhat.com>
-	<20190426105301.GA20769@localhost.localdomain>
-	<eca8f98a-6f39-837a-6d55-606d881c44ed@redhat.com>
-From: Thomas Huth <thuth@redhat.com>
-Message-ID: <1a0a2413-0858-7722-1a25-cbd36f563af1@redhat.com>
-Date: Sun, 28 Apr 2019 15:32:01 +0200
+	(envelope-from <stefanb@linux.ibm.com>) id 1hKkZ9-0007tQ-4L
+	for qemu-devel@nongnu.org; Sun, 28 Apr 2019 10:14:05 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:57104
+	helo=mx0a-001b2d01.pphosted.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <stefanb@linux.ibm.com>)
+	id 1hKkZ7-0007rL-5r
+	for qemu-devel@nongnu.org; Sun, 28 Apr 2019 10:14:01 -0400
+Received: from pps.filterd (m0098414.ppops.net [127.0.0.1])
+	by mx0b-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id
+	x3SE3m0M108135
+	for <qemu-devel@nongnu.org>; Sun, 28 Apr 2019 10:13:57 -0400
+Received: from e34.co.us.ibm.com (e34.co.us.ibm.com [32.97.110.152])
+	by mx0b-001b2d01.pphosted.com with ESMTP id 2s54cgvq9f-1
+	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Sun, 28 Apr 2019 10:13:57 -0400
+Received: from localhost
+	by e34.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+	Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <stefanb@linux.ibm.com>;
+	Sun, 28 Apr 2019 15:13:56 +0100
+References: <20190427131857.11600-1-philmd@redhat.com>
+From: Stefan Berger <stefanb@linux.ibm.com>
+Date: Sun, 28 Apr 2019 10:13:51 -0400
 MIME-Version: 1.0
-In-Reply-To: <eca8f98a-6f39-837a-6d55-606d881c44ed@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature";
-	boundary="IOVGY1Kmh5SMMqCSX7Xlfn931guTI8uCo"
-Subject: Re: [Qemu-devel] Failing qemu-iotest 005 with raw
+In-Reply-To: <20190427131857.11600-1-philmd@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-MW
+Message-Id: <719d89b9-c206-7a55-6230-2a2a65d69007@linux.ibm.com>
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH] hw/tpm: Only build tpm_ppi.o if any of
+ TPM_TIS/TPM_CRB is built
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,69 +43,35 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>, Kevin Wolf <kwolf@redhat.com>
-Cc: hch@lst.de, QEMU Developers <qemu-devel@nongnu.org>, Qemu-block <qemu-block@nongnu.org>, Max Reitz <mreitz@redhat.com>
+To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>, qemu-devel@nongnu.org, =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---IOVGY1Kmh5SMMqCSX7Xlfn931guTI8uCo
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-
-On 28/04/2019 04.36, Eric Blake wrote:
-> On 4/26/19 5:53 AM, Kevin Wolf wrote:
->=20
->>>  creating large image
->>> +qemu-img: TEST_DIR/t.IMGFMT: The image size is too large for file
->>> format 'IMGFMT'
->>>  Formatting 'TEST_DIR/t.IMGFMT', fmt=3DIMGFMT size=3D5368709120000
->>> [...]
->>>
->>> Could this be fixed somehow, or should the test rather be skipped for=
-
->>> IMGFMT=3Draw?
->>
->> The test passes for me on XFS. Looks like the raw driver can handle
->> large image files, but your host filesystem can't.
->>
->> We would have to check whether the host filesystem can support large
->> files and skip the test if it can't. I'm not sure how to do that. But
->> actually, this isn't testing anything interesting for raw, so just
->> unconditionally disabling the test for raw could be reasonable enough.=
-
->=20
-> iotest 220 in commit 3b94c343 can serve as such an example (it skips th=
-e
-> test on at least ext4, while passing on tmpfs which allows larger spars=
-e
-> files).
-
-That should do the trick, thanks. I'll send a patch.
-
- Thomas
+On 4/27/19 9:18 AM, Philippe Mathieu-Daud=C3=A9 wrote:
+> The TPM Physical Presence Interface routines are only used
+> by the CRB/TIS interfaces. Do not compile this file if any
+> of them is built.
+>
+> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
 
 
---IOVGY1Kmh5SMMqCSX7Xlfn931guTI8uCo
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
+Reviewed-by: Stefan Berger <stefanb@linux.ibm.com>
 
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2.0.22 (GNU/Linux)
 
-iQIcBAEBAgAGBQJcxatYAAoJEC7Z13T+cC21bTQP/jKQvjGfJv+f5CzVwJtpU6z4
-JLPE3kWtNW0QgaFRnuP93gQE53/VldJeB9Hdc7+22Y9Cb1yO8Ps5kcNaa0+Ciflb
-4x0vfI890kBv5H0aR5vJLHvSwP4i4l/Nk/lRTYnucK2vEuSbOcJniDeILt4pJEOs
-smSjLd0xxLvuxL2kdx05Tvoc34hrc7qiDvdeuet1XtCoQzqjAjDmCJzDAKmvmiDl
-ichpbqwyHvHXdD3novPPC+HZcND29GqDj12pgZxlmwU3G2DR/tOUFPt7UqiPP7Hl
-SnZfUfB1RLWexxctWZ+2/ICRP3DqhgM7dObxiySB3qBKDBJbmwDIhVofW+1RlnKl
-e121CmMF2j9lZOGjmKMTJLVv5wWHzWRjXXeOkBAL/TsSv0t6UzGkQBRJEiNfZh94
-G2/OlGDEXnAFkoYRPJm9/1/esYKys3eej/rTr4j94bxB3TElSajASTzgbmvS7D4y
-7ehsWz29mWRgqfsORiH6guOeQonfnqOimZ0uLugr6b3+jm36Db3NugJArU797AtX
-TdYG5py9VVLeA0/1RbuAICWzNaN0TVjG3r5NCQty6Lss9YdBj8cdm9S4qV3ErCGW
-gFv2zc3j8g8GglA2Nj3KponS741BLf8suPv6XYsHTnfymReSKnMd9Zj1VLlMTIuv
-yUkjZbuHwP7pLEMsPJSB
-=5CK2
------END PGP SIGNATURE-----
-
---IOVGY1Kmh5SMMqCSX7Xlfn931guTI8uCo--
+> ---
+> Marc-Andr=C3=A9:
+>    You might want to add yourself as reviewer/maintainer of TPM ;)
+> ---
+>   hw/tpm/Makefile.objs | 4 ++--
+>   1 file changed, 2 insertions(+), 2 deletions(-)
+>
+> diff --git a/hw/tpm/Makefile.objs b/hw/tpm/Makefile.objs
+> index 700c8786228..de0b85d02ae 100644
+> --- a/hw/tpm/Makefile.objs
+> +++ b/hw/tpm/Makefile.objs
+> @@ -1,5 +1,5 @@
+> -common-obj-y +=3D tpm_util.o
+> -obj-y +=3D tpm_ppi.o
+> +common-obj-$(CONFIG_TPM) +=3D tpm_util.o
+> +obj-$(call lor,$(CONFIG_TPM_TIS),$(CONFIG_TPM_CRB)) +=3D tpm_ppi.o
+>   common-obj-$(CONFIG_TPM_TIS) +=3D tpm_tis.o
+>   common-obj-$(CONFIG_TPM_CRB) +=3D tpm_crb.o
+>   common-obj-$(CONFIG_TPM_PASSTHROUGH) +=3D tpm_passthrough.o
