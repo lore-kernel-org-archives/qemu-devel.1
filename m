@@ -1,33 +1,22 @@
-Received: from eggs.gnu.org ([209.51.188.92]:42457)
+Received: from eggs.gnu.org ([209.51.188.92]:57066)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1hKbXm-0004B5-VC
-	for qemu-devel@nongnu.org; Sun, 28 Apr 2019 00:36:04 -0400
+	(envelope-from <philmd@redhat.com>) id 1hKdbG-0008PP-Nq
+	for qemu-devel@nongnu.org; Sun, 28 Apr 2019 02:47:47 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1hKbSl-0005cW-Hs
-	for qemu-devel@nongnu.org; Sun, 28 Apr 2019 00:30:52 -0400
-Received: from indium.canonical.com ([91.189.90.7]:54372)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1hKbSl-0005cG-Ci
-	for qemu-devel@nongnu.org; Sun, 28 Apr 2019 00:30:51 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1hKbSk-0007mn-0g
-	for <qemu-devel@nongnu.org>; Sun, 28 Apr 2019 04:30:50 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id EF6862E8060
-	for <qemu-devel@nongnu.org>; Sun, 28 Apr 2019 04:30:49 +0000 (UTC)
+	(envelope-from <philmd@redhat.com>) id 1hKdbE-0005Yz-W6
+	for qemu-devel@nongnu.org; Sun, 28 Apr 2019 02:47:46 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:44080)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1hKdbE-0005Yk-R8
+	for qemu-devel@nongnu.org; Sun, 28 Apr 2019 02:47:44 -0400
+From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
+Date: Sun, 28 Apr 2019 08:47:25 +0200
+Message-Id: <20190428064731.29913-1-philmd@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Date: Sun, 28 Apr 2019 04:17:20 -0000
-From: Launchpad Bug Tracker <1556044@bugs.launchpad.net>
-Reply-To: Bug 1556044 <1556044@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <20160311113437.1236.81872.malonedeb@gac.canonical.com>
-Message-Id: <155642504101.20856.8680258730787593942.malone@loganberry.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1556044] Re: Redox GUI hangs with 100% CPU on ARM
+Subject: [Qemu-devel] [PATCH v2 0/6] hw/acpi: Improve build modularity
+ (targeting MIPS/PPC)
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,35 +26,46 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
+Cc: Aleksandar Markovic <amarkovic@wavecomp.com>, Aleksandar Rikalo <arikalo@wavecomp.com>, "Michael S. Tsirkin" <mst@redhat.com>, Aurelien Jarno <aurelien@aurel32.net>, Paolo Bonzini <pbonzini@redhat.com>, Igor Mammedov <imammedo@redhat.com>, Corey Minyard <minyard@acm.org>, =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
 
-[Expired for QEMU because there has been no activity for 60 days.]
+Hi,
 
-** Changed in: qemu
-       Status: Incomplete =3D> Expired
+This series is not related to the previous one I just send:
+hw/i386/acpi: Improve build modularity (isapc/q35/...)
+https://lists.gnu.org/archive/html/qemu-devel/2019-04/msg04678.html
 
--- =
+While the first only concern X86 (changes within the architecture),
+this one allow the core ACPI feature to be used by the MIPS and
+PPC archs (specific series will follow).
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1556044
+v2:
+- Fixed IPMI build error (patchew)
+- Added possibility to build without ACPI (X86)
 
-Title:
-  Redox GUI hangs with 100% CPU on ARM
+v1: https://lists.gnu.org/archive/html/qemu-devel/2019-04/msg04696.html
 
-Status in QEMU:
-  Expired
+Regards,
 
-Bug description:
-  Booting into Redox OS cli on ARM with qemu-system-i386 works fine.
-  However, starting the Redox GUI (orbital) brings up the graphical
-  interface and then starts using 100% CPU. I'd guess it's related to
-  mouse detection and handling.
+Phil.
 
-  The OS image is fully usable on x86.
+Philippe Mathieu-Daud=C3=A9 (6):
+  hw/acpi: Move the IPMI stub to the stubs/ directory
+  hw/acpi: Move the ACPI stub to the stubs/ directory
+  hw/acpi: Simplify the Makefile logic
+  hw/acpi: Always build the 'core' ACPI functions
+  stubs: Add missing ACPI symbols
+  vl: Do not set acpi_enabled when ACPI is disabled at build time
 
-  =
+ MAINTAINERS                         |  2 ++
+ hw/acpi/Makefile.objs               | 22 +++++++---------------
+ hw/acpi/core.c                      |  1 +
+ stubs/Makefile.objs                 |  2 ++
+ hw/acpi/acpi-stub.c =3D> stubs/acpi.c |  6 ++++++
+ hw/acpi/ipmi-stub.c =3D> stubs/ipmi.c |  0
+ vl.c                                |  1 -
+ 7 files changed, 18 insertions(+), 16 deletions(-)
+ rename hw/acpi/acpi-stub.c =3D> stubs/acpi.c (93%)
+ rename hw/acpi/ipmi-stub.c =3D> stubs/ipmi.c (100%)
 
-  https://www.dropbox.com/s/u6v2k9wzcuiycfo/redox-disk.img.xz?dl=3D0
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1556044/+subscriptions
+--=20
+2.20.1
