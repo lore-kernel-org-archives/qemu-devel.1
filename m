@@ -6,44 +6,44 @@ X-Spam-Status: No, score=-8.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED,
 	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D1983C43218
-	for <qemu-devel@archiver.kernel.org>; Sun, 28 Apr 2019 15:06:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4E7A7C43219
+	for <qemu-devel@archiver.kernel.org>; Sun, 28 Apr 2019 15:06:36 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8E72C206A3
-	for <qemu-devel@archiver.kernel.org>; Sun, 28 Apr 2019 15:06:09 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8E72C206A3
+	by mail.kernel.org (Postfix) with ESMTPS id 1CFD0206A3
+	for <qemu-devel@archiver.kernel.org>; Sun, 28 Apr 2019 15:06:36 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1CFD0206A3
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=ilande.co.uk
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:45256 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:45258 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hKlNX-0001tN-Rg
-	for qemu-devel@archiver.kernel.org; Sun, 28 Apr 2019 11:06:07 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:34825)
+	id 1hKlNw-0002J8-Cz
+	for qemu-devel@archiver.kernel.org; Sun, 28 Apr 2019 11:06:35 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:34853)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1hKlM3-0000zS-B6
-	for qemu-devel@nongnu.org; Sun, 28 Apr 2019 11:04:36 -0400
+	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1hKlM7-00010P-Dh
+	for qemu-devel@nongnu.org; Sun, 28 Apr 2019 11:04:40 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1hKlM1-00080W-0f
-	for qemu-devel@nongnu.org; Sun, 28 Apr 2019 11:04:35 -0400
-Received: from mail.ilande.co.uk ([46.43.2.167]:53032
+	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1hKlM5-0008BJ-G2
+	for qemu-devel@nongnu.org; Sun, 28 Apr 2019 11:04:39 -0400
+Received: from mail.ilande.co.uk ([46.43.2.167]:53040
 	helo=mail.default.ilande.uk0.bigv.io)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <mark.cave-ayland@ilande.co.uk>)
-	id 1hKlLy-0007tB-53; Sun, 28 Apr 2019 11:04:31 -0400
+	id 1hKlM5-00086O-Aa; Sun, 28 Apr 2019 11:04:37 -0400
 Received: from host86-175-31-255.range86-175.btcentralplus.com
 	([86.175.31.255] helo=kentang.home)
 	by mail.default.ilande.uk0.bigv.io with esmtpsa
 	(TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128) (Exim 4.89)
 	(envelope-from <mark.cave-ayland@ilande.co.uk>)
-	id 1hKkxK-0005tp-CA; Sun, 28 Apr 2019 15:39:02 +0100
+	id 1hKkxK-0005tp-Rc; Sun, 28 Apr 2019 15:39:03 +0100
 From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
 To: qemu-devel@nongnu.org, qemu-ppc@nongnu.org, david@gibson.dropbear.id.au,
 	rth@twiddle.net, gkurz@kaod.org
-Date: Sun, 28 Apr 2019 15:38:41 +0100
-Message-Id: <20190428143845.11810-11-mark.cave-ayland@ilande.co.uk>
+Date: Sun, 28 Apr 2019 15:38:42 +0100
+Message-Id: <20190428143845.11810-12-mark.cave-ayland@ilande.co.uk>
 X-Mailer: git-send-email 2.11.0
 In-Reply-To: <20190428143845.11810-1-mark.cave-ayland@ilande.co.uk>
 References: <20190428143845.11810-1-mark.cave-ayland@ilande.co.uk>
@@ -53,8 +53,8 @@ X-SA-Exim-Version: 4.2.1 (built Tue, 02 Aug 2016 21:08:31 +0000)
 X-SA-Exim-Scanned: Yes (on mail.default.ilande.uk0.bigv.io)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 46.43.2.167
-Subject: [Qemu-devel] [PATCH 10/14] target/ppc: introduce
- GEN_VSX_HELPER_R2_AB macro to fpu_helper.c
+Subject: [Qemu-devel] [PATCH 11/14] target/ppc: decode target register in
+ VSX_VECTOR_LOAD_STORE_LENGTH at translation time
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -70,112 +70,89 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 Content-Type: text/plain; charset="UTF-8"
-Message-ID: <20190428143841.0PTwNXt61IFCFeqkTWm6OrJxhX9Ugh8QKbslEnoFbAM@z>
-
-Rather than perform the VSR register decoding within the helper itself,
-introduce a new GEN_VSX_HELPER_R2_AB macro which performs the decode based
-upon rA and rB at translation time.
+Message-ID: <20190428143842.d64m5IFxeR5Zdgn99lJ5sE4DyabXb9nwLpfZh2qpTqY@z>
 
 Signed-off-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
 ---
- target/ppc/fpu_helper.c             | 10 ++++------
- target/ppc/helper.h                 |  6 +++---
- target/ppc/translate/vsx-impl.inc.c | 24 +++++++++++++++++++++---
- 3 files changed, 28 insertions(+), 12 deletions(-)
+ target/ppc/helper.h                 | 8 ++++----
+ target/ppc/mem_helper.c             | 6 ++----
+ target/ppc/translate/vsx-impl.inc.c | 7 ++++---
+ 3 files changed, 10 insertions(+), 11 deletions(-)
 
-diff --git a/target/ppc/fpu_helper.c b/target/ppc/fpu_helper.c
-index b26a1f1494..370b1d2c46 100644
---- a/target/ppc/fpu_helper.c
-+++ b/target/ppc/fpu_helper.c
-@@ -2434,10 +2434,9 @@ void helper_xscmpexpdp(CPUPPCState *env, uint32_t opcode,
-     do_float_check_status(env, GETPC());
- }
- 
--void helper_xscmpexpqp(CPUPPCState *env, uint32_t opcode)
-+void helper_xscmpexpqp(CPUPPCState *env, uint32_t opcode,
-+                       ppc_vsr_t *xa, ppc_vsr_t *xb)
- {
--    ppc_vsr_t *xa = &env->vsr[rA(opcode) + 32];
--    ppc_vsr_t *xb = &env->vsr[rB(opcode) + 32];
-     int64_t exp_a, exp_b;
-     uint32_t cc;
- 
-@@ -2513,10 +2512,9 @@ VSX_SCALAR_CMP(xscmpodp, 1)
- VSX_SCALAR_CMP(xscmpudp, 0)
- 
- #define VSX_SCALAR_CMPQ(op, ordered)                                    \
--void helper_##op(CPUPPCState *env, uint32_t opcode)                     \
-+void helper_##op(CPUPPCState *env, uint32_t opcode,                     \
-+                 ppc_vsr_t *xa, ppc_vsr_t *xb)                          \
- {                                                                       \
--    ppc_vsr_t *xa = &env->vsr[rA(opcode) + 32];                         \
--    ppc_vsr_t *xb = &env->vsr[rB(opcode) + 32];                         \
-     uint32_t cc = 0;                                                    \
-     bool vxsnan_flag = false, vxvc_flag = false;                        \
-                                                                         \
 diff --git a/target/ppc/helper.h b/target/ppc/helper.h
-index cea56ece30..167d6e45fd 100644
+index 167d6e45fd..5f844cc968 100644
 --- a/target/ppc/helper.h
 +++ b/target/ppc/helper.h
-@@ -402,11 +402,11 @@ DEF_HELPER_5(xscmpgtdp, void, env, i32, vsr, vsr, vsr)
- DEF_HELPER_5(xscmpgedp, void, env, i32, vsr, vsr, vsr)
- DEF_HELPER_5(xscmpnedp, void, env, i32, vsr, vsr, vsr)
- DEF_HELPER_4(xscmpexpdp, void, env, i32, vsr, vsr)
--DEF_HELPER_2(xscmpexpqp, void, env, i32)
-+DEF_HELPER_4(xscmpexpqp, void, env, i32, vsr, vsr)
- DEF_HELPER_4(xscmpodp, void, env, i32, vsr, vsr)
- DEF_HELPER_4(xscmpudp, void, env, i32, vsr, vsr)
--DEF_HELPER_2(xscmpoqp, void, env, i32)
--DEF_HELPER_2(xscmpuqp, void, env, i32)
-+DEF_HELPER_4(xscmpoqp, void, env, i32, vsr, vsr)
-+DEF_HELPER_4(xscmpuqp, void, env, i32, vsr, vsr)
- DEF_HELPER_5(xsmaxdp, void, env, i32, vsr, vsr, vsr)
- DEF_HELPER_5(xsmindp, void, env, i32, vsr, vsr, vsr)
- DEF_HELPER_5(xsmaxcdp, void, env, i32, vsr, vsr, vsr)
+@@ -291,10 +291,10 @@ DEF_HELPER_3(stvebx, void, env, avr, tl)
+ DEF_HELPER_3(stvehx, void, env, avr, tl)
+ DEF_HELPER_3(stvewx, void, env, avr, tl)
+ #if defined(TARGET_PPC64)
+-DEF_HELPER_4(lxvl, void, env, tl, tl, tl)
+-DEF_HELPER_4(lxvll, void, env, tl, tl, tl)
+-DEF_HELPER_4(stxvl, void, env, tl, tl, tl)
+-DEF_HELPER_4(stxvll, void, env, tl, tl, tl)
++DEF_HELPER_4(lxvl, void, env, tl, vsr, tl)
++DEF_HELPER_4(lxvll, void, env, tl, vsr, tl)
++DEF_HELPER_4(stxvl, void, env, tl, vsr, tl)
++DEF_HELPER_4(stxvll, void, env, tl, vsr, tl)
+ #endif
+ DEF_HELPER_4(vsumsws, void, env, avr, avr, avr)
+ DEF_HELPER_4(vsum2sws, void, env, avr, avr, avr)
+diff --git a/target/ppc/mem_helper.c b/target/ppc/mem_helper.c
+index 4dfa7ee23f..f3426315d2 100644
+--- a/target/ppc/mem_helper.c
++++ b/target/ppc/mem_helper.c
+@@ -415,9 +415,8 @@ STVE(stvewx, cpu_stl_data_ra, bswap32, u32)
+ 
+ #define VSX_LXVL(name, lj)                                              \
+ void helper_##name(CPUPPCState *env, target_ulong addr,                 \
+-                   target_ulong xt, target_ulong rb)                    \
++                   ppc_vsr_t *r, target_ulong rb)                       \
+ {                                                                       \
+-    ppc_vsr_t *r = &env->vsr[xt];                                       \
+     int nb = GET_NB(env->gpr[rb]);                                      \
+     int i;                                                              \
+                                                                         \
+@@ -444,9 +443,8 @@ VSX_LXVL(lxvll, 1)
+ 
+ #define VSX_STXVL(name, lj)                                       \
+ void helper_##name(CPUPPCState *env, target_ulong addr,           \
+-                   target_ulong xt, target_ulong rb)              \
++                   ppc_vsr_t *r, target_ulong rb)                 \
+ {                                                                 \
+-    ppc_vsr_t *r = &env->vsr[xt];                                 \
+     int nb = GET_NB(env->gpr[rb]);                                \
+     int i;                                                        \
+                                                                   \
 diff --git a/target/ppc/translate/vsx-impl.inc.c b/target/ppc/translate/vsx-impl.inc.c
-index f304c11538..51d4e0cdd6 100644
+index 51d4e0cdd6..7c79ec22dd 100644
 --- a/target/ppc/translate/vsx-impl.inc.c
 +++ b/target/ppc/translate/vsx-impl.inc.c
-@@ -1041,6 +1041,24 @@ static void gen_##name(DisasContext *ctx)                                     \
-     tcg_temp_free_ptr(xb);                                                    \
+@@ -297,7 +297,8 @@ VSX_VECTOR_LOAD_STORE(stxvx, st_i64, 1)
+ #define VSX_VECTOR_LOAD_STORE_LENGTH(name)                      \
+ static void gen_##name(DisasContext *ctx)                       \
+ {                                                               \
+-    TCGv EA, xt, rb;                                            \
++    TCGv EA, rb;                                                \
++    TCGv_ptr xt;                                                \
+                                                                 \
+     if (xT(ctx->opcode) < 32) {                                 \
+         if (unlikely(!ctx->vsx_enabled)) {                      \
+@@ -313,12 +314,12 @@ static void gen_##name(DisasContext *ctx)                       \
+     EA = tcg_temp_new();                                        \
+     gen_set_access_type(ctx, ACCESS_INT);                       \
+     gen_addr_register(ctx, EA);                                 \
+-    xt = tcg_const_tl(xT(ctx->opcode));                         \
++    xt = gen_vsr_ptr(xT(ctx->opcode));                          \
+     rb = tcg_const_tl(rB(ctx->opcode));                         \
+     gen_helper_##name(cpu_env, EA, xt, rb);                     \
+     tcg_temp_free(EA);                                          \
+-    tcg_temp_free(xt);                                          \
+     tcg_temp_free(rb);                                          \
++    tcg_temp_free_ptr(xt);                                      \
  }
  
-+#define GEN_VSX_HELPER_R2_AB(name, op1, op2, inval, type)                     \
-+static void gen_##name(DisasContext *ctx)                                     \
-+{                                                                             \
-+    TCGv_i32 opc;                                                             \
-+    TCGv_ptr xa, xb;                                                          \
-+    if (unlikely(!ctx->vsx_enabled)) {                                        \
-+        gen_exception(ctx, POWERPC_EXCP_VSXU);                                \
-+        return;                                                               \
-+    }                                                                         \
-+    opc = tcg_const_i32(ctx->opcode);                                         \
-+    xa = gen_vsr_ptr(rA(ctx->opcode) + 32);                                   \
-+    xb = gen_vsr_ptr(rB(ctx->opcode) + 32);                                   \
-+    gen_helper_##name(cpu_env, opc, xa, xb);                                  \
-+    tcg_temp_free_i32(opc);                                                   \
-+    tcg_temp_free_ptr(xa);                                                    \
-+    tcg_temp_free_ptr(xb);                                                    \
-+}
-+
- #define GEN_VSX_HELPER_XT_XB_ENV(name, op1, op2, inval, type) \
- static void gen_##name(DisasContext *ctx)                     \
- {                                                             \
-@@ -1084,11 +1102,11 @@ GEN_VSX_HELPER_X3(xscmpgtdp, 0x0C, 0x01, 0, PPC2_ISA300)
- GEN_VSX_HELPER_X3(xscmpgedp, 0x0C, 0x02, 0, PPC2_ISA300)
- GEN_VSX_HELPER_X3(xscmpnedp, 0x0C, 0x03, 0, PPC2_ISA300)
- GEN_VSX_HELPER_X2_AB(xscmpexpdp, 0x0C, 0x07, 0, PPC2_ISA300)
--GEN_VSX_HELPER_2(xscmpexpqp, 0x04, 0x05, 0, PPC2_ISA300)
-+GEN_VSX_HELPER_R2_AB(xscmpexpqp, 0x04, 0x05, 0, PPC2_ISA300)
- GEN_VSX_HELPER_X2_AB(xscmpodp, 0x0C, 0x05, 0, PPC2_VSX)
- GEN_VSX_HELPER_X2_AB(xscmpudp, 0x0C, 0x04, 0, PPC2_VSX)
--GEN_VSX_HELPER_2(xscmpoqp, 0x04, 0x04, 0, PPC2_VSX)
--GEN_VSX_HELPER_2(xscmpuqp, 0x04, 0x14, 0, PPC2_VSX)
-+GEN_VSX_HELPER_R2_AB(xscmpoqp, 0x04, 0x04, 0, PPC2_VSX)
-+GEN_VSX_HELPER_R2_AB(xscmpuqp, 0x04, 0x14, 0, PPC2_VSX)
- GEN_VSX_HELPER_X3(xsmaxdp, 0x00, 0x14, 0, PPC2_VSX)
- GEN_VSX_HELPER_X3(xsmindp, 0x00, 0x15, 0, PPC2_VSX)
- GEN_VSX_HELPER_R3(xsmaxcdp, 0x00, 0x10, 0, PPC2_ISA300)
+ VSX_VECTOR_LOAD_STORE_LENGTH(lxvl)
 -- 
 2.11.0
 
