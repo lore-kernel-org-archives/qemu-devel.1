@@ -1,113 +1,58 @@
-Return-Path: <SRS0=msIk=TG=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.kernel.org@kernel.org>
+Return-Path: <SRS0=GiFh=S6=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.kernel.org@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-11.9 required=3.0
+	tests=HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_PASS autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C5731C04A6B
-	for <qemu-devel@archiver.kernel.org>; Mon,  6 May 2019 10:03:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BE750C43219
+	for <qemu-devel@archiver.kernel.org>; Sun, 28 Apr 2019 13:28:49 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8C3A7206BF
-	for <qemu-devel@archiver.kernel.org>; Mon,  6 May 2019 10:03:16 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8C3A7206BF
+	by mail.kernel.org (Postfix) with ESMTPS id 7DD0C206A3
+	for <qemu-devel@archiver.kernel.org>; Sun, 28 Apr 2019 13:28:49 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7DD0C206A3
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:53743 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:44264 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hNaSp-0006nr-K0
-	for qemu-devel@archiver.kernel.org; Mon, 06 May 2019 06:03:15 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:42857)
+	id 1hKjrM-0006su-NT
+	for qemu-devel@archiver.kernel.org; Sun, 28 Apr 2019 09:28:48 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:49264)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1hNaRh-0006T6-NA
-	for qemu-devel@nongnu.org; Mon, 06 May 2019 06:02:10 -0400
+	(envelope-from <ybettan@redhat.com>) id 1hKjqX-0006bY-6q
+	for qemu-devel@nongnu.org; Sun, 28 Apr 2019 09:27:59 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1hNaRg-0004TI-H1
-	for qemu-devel@nongnu.org; Mon, 06 May 2019 06:02:05 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:51832)
+	(envelope-from <ybettan@redhat.com>) id 1hKjqV-0004vg-2o
+	for qemu-devel@nongnu.org; Sun, 28 Apr 2019 09:27:57 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:59610)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <david@redhat.com>)
-	id 1hNaRg-0004SL-8N; Mon, 06 May 2019 06:02:04 -0400
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
-	[10.5.11.16])
+	(Exim 4.71) (envelope-from <ybettan@redhat.com>) id 1hKjqU-0004u7-Qm
+	for qemu-devel@nongnu.org; Sun, 28 Apr 2019 09:27:55 -0400
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+	[10.5.11.13])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 2F50330832F2;
-	Mon,  6 May 2019 10:02:03 +0000 (UTC)
-Received: from [10.36.116.76] (ovpn-116-76.ams2.redhat.com [10.36.116.76])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id A12ED5C8A4;
-	Mon,  6 May 2019 10:01:59 +0000 (UTC)
-To: "Jason J. Herne" <jjherne@linux.ibm.com>, qemu-devel@nongnu.org,
-	qemu-s390x@nongnu.org, cohuck@redhat.com, thuth@redhat.com,
-	alifm@linux.ibm.com, borntraeger@de.ibm.com
-References: <1556543381-12671-1-git-send-email-jjherne@linux.ibm.com>
-From: David Hildenbrand <david@redhat.com>
-Openpgp: preference=signencrypt
-Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
-	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
-	SE+xAvmumFBY
-Organization: Red Hat GmbH
-Message-ID: <daad75f0-c8bb-1c9f-5b43-afa828601c42@redhat.com>
-Date: Mon, 6 May 2019 12:01:58 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
-	Thunderbird/60.6.1
-MIME-Version: 1.0
-In-Reply-To: <1556543381-12671-1-git-send-email-jjherne@linux.ibm.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+	by mx1.redhat.com (Postfix) with ESMTPS id 115A081DE6;
+	Sun, 28 Apr 2019 13:27:52 +0000 (UTC)
+Received: from localhost.localdomain (unknown [10.35.206.39])
+	by smtp.corp.redhat.com (Postfix) with ESMTP id EE02D17989;
+	Sun, 28 Apr 2019 13:27:47 +0000 (UTC)
+From: Yoni Bettan <ybettan@redhat.com>
+To: qemu-devel@nongnu.org
+Date: Sun, 28 Apr 2019 16:26:31 +0300
+Message-Id: <20190428132631.37430-1-ybettan@redhat.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.44]);
-	Mon, 06 May 2019 10:02:03 +0000 (UTC)
+	(mx1.redhat.com [10.5.110.25]);
+	Sun, 28 Apr 2019 13:27:52 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [qemu-s390x] [PATCH] s390-bios: Skip bootmap
- signature entries
+Subject: [Qemu-devel] [PATCH V1] Introducing virtio-example.
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -119,99 +64,413 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: stefanha@gmail.com, Yoni Bettan <ybettan@redhat.com>, ailan@redhat.com,
+	ehabkost@redhat.com, "Michael S. Tsirkin" <mst@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
+Content-Type: text/plain; charset="UTF-8"
+Message-ID: <20190428132631.jrYQPnCrRxcnkbmQJmUO11vlDU2zy7OKPpcaUq5VyBs@z>
 
-On 29.04.19 15:09, Jason J. Herne wrote:
-> Newer versions of zipl have the ability to write signature entries to the boot
-> script for secure boot. We don't yet support secure boot, but we need to skip
-> over signature entries while reading the boot script in order to maintain our
-> ability to boot guest operating systems that have a secure bootloader.
-> 
-> Signed-off-by: Jason J. Herne <jjherne@linux.ibm.com>
-> Reviewed-by: Farhan Ali <alifm@linux.ibm.com>
-> ---
->  pc-bios/s390-ccw/bootmap.c | 19 +++++++++++++++++--
->  pc-bios/s390-ccw/bootmap.h | 10 ++++++----
->  2 files changed, 23 insertions(+), 6 deletions(-)
-> 
-> diff --git a/pc-bios/s390-ccw/bootmap.c b/pc-bios/s390-ccw/bootmap.c
-> index 7aef65a..d13b7cb 100644
-> --- a/pc-bios/s390-ccw/bootmap.c
-> +++ b/pc-bios/s390-ccw/bootmap.c
-> @@ -254,7 +254,14 @@ static void run_eckd_boot_script(block_number_t bmt_block_nr,
->      memset(sec, FREE_SPACE_FILLER, sizeof(sec));
->      read_block(block_nr, sec, "Cannot read Boot Map Script");
->  
-> -    for (i = 0; bms->entry[i].type == BOOT_SCRIPT_LOAD; i++) {
-> +    for (i = 0; bms->entry[i].type == BOOT_SCRIPT_LOAD ||
-> +                bms->entry[i].type == BOOT_SCRIPT_SIGNATURE; i++) {
-> +
-> +        /* We don't support secure boot yet, so we skip signature entries */
-> +        if (bms->entry[i].type == BOOT_SCRIPT_SIGNATURE) {
-> +            continue;
-> +        }
-> +
->          address = bms->entry[i].address.load_address;
->          block_nr = eckd_block_num(&bms->entry[i].blkptr.xeckd.bptr.chs);
->  
-> @@ -489,7 +496,15 @@ static void zipl_run(ScsiBlockPtr *pte)
->  
->      /* Load image(s) into RAM */
->      entry = (ComponentEntry *)(&header[1]);
-> -    while (entry->component_type == ZIPL_COMP_ENTRY_LOAD) {
-> +    while (entry->component_type == ZIPL_COMP_ENTRY_LOAD ||
-> +           entry->component_type == ZIPL_COMP_ENTRY_SIGNATURE) {
-> +
-> +        /* We don't support secure boot yet, so we skip signature entries */
-> +        if (entry->component_type == ZIPL_COMP_ENTRY_SIGNATURE) {
-> +            entry++;
-> +            continue;
-> +        }
-> +
->          zipl_load_segment(entry);
->  
->          entry++;
-> diff --git a/pc-bios/s390-ccw/bootmap.h b/pc-bios/s390-ccw/bootmap.h
-> index a085212..94f53a5 100644
-> --- a/pc-bios/s390-ccw/bootmap.h
-> +++ b/pc-bios/s390-ccw/bootmap.h
-> @@ -98,8 +98,9 @@ typedef struct ScsiMbr {
->  #define ZIPL_COMP_HEADER_IPL    0x00
->  #define ZIPL_COMP_HEADER_DUMP   0x01
->  
-> -#define ZIPL_COMP_ENTRY_LOAD    0x02
-> -#define ZIPL_COMP_ENTRY_EXEC    0x01
-> +#define ZIPL_COMP_ENTRY_EXEC      0x01
-> +#define ZIPL_COMP_ENTRY_LOAD      0x02
-> +#define ZIPL_COMP_ENTRY_SIGNATURE 0x03
->  
->  typedef struct XEckdMbr {
->      uint8_t magic[4];   /* == "xIPL"        */
-> @@ -117,8 +118,9 @@ typedef struct BootMapScriptEntry {
->      BootMapPointer blkptr;
->      uint8_t pad[7];
->      uint8_t type;   /* == BOOT_SCRIPT_* */
-> -#define BOOT_SCRIPT_EXEC 0x01
-> -#define BOOT_SCRIPT_LOAD 0x02
-> +#define BOOT_SCRIPT_EXEC      0x01
-> +#define BOOT_SCRIPT_LOAD      0x02
-> +#define BOOT_SCRIPT_SIGNATURE 0x03
->      union {
->          uint64_t load_address;
->          uint64_t load_psw;
-> 
+The main goal is to create an example to be used as template or
+guideline for contributors when they wish to create a new virtio
+device and to document "the right way" to do so.
 
-Naive question from me:
+It consists of several parts:
 
-Can't we place the signatures somewhere else, and instead associate them
-with entries? This avoids breaking backwards compatibility for the sake
-of signatures we want unmodified zipl loaders to ignore.
+    1. The device specification
+        * it can be found in the device header
+        * it will hopefully be added to the official virtio specification
 
+    2. The device implementation for Qemu-KVM hypervisor
+        * this patch content
+
+    3. The device driver for linux
+        * it will hopefully be added to linux
+        * for now it can be found at https://github.com/ybettan/\
+                QemuDeviceDrivers/blob/master/virtio/virtio_example_driver.c
+
+    4. A blog on virtio
+        * introducing the virtio concept
+        * gives some motivation for virtio-devices to be used
+        * bring extra documentation on "how to write":
+            - device specification
+            - device implementation
+            - device driver for linux
+        * it can be found at https://howtovms.wordpress.com
+
+Signed-off-by: Yoni Bettan <ybettan@redhat.com>
+---
+
+RFC -> V1:
+    
+    * Updated the commit message to be more informative about the full
+      working flow.
+
+    * Added the device specification to the device header.
+
+    * Removed the PCI-ID given for the device.
+      This was done by forcing the device to be in modern-only mode therefore
+      the PCI-ID is now generated automatically.
+    
+    * Made all requests consist of both input and output buffer instead
+      of separating them into 2 different requests.
+
+    * Made the device IO deal with integers instead of strings.
+      The user have read/write access to the device using sysfs,
+      therefore the driver's input are strings, in the RFC version
+      those strings where passed directly to the device and the integer
+      conversion was done inside the device, now the driver is handling those
+      conversions and the device is unaware of them.
+
+    * Added more documentation for the get_features() function.
+
+    * Simplified the error propagation in virtio_example_pci_realize()
+      function.
+
+    * Removed all code of previous previous patch from standard-headers.
+
+
+ hw/virtio/Makefile.objs            |   1 +
+ hw/virtio/virtio-example.c         | 110 +++++++++++++++++++++++++++++
+ hw/virtio/virtio-pci.c             |  47 ++++++++++++
+ hw/virtio/virtio-pci.h             |  14 ++++
+ include/hw/virtio/virtio-example.h |  92 ++++++++++++++++++++++++
+ 5 files changed, 264 insertions(+)
+ create mode 100644 hw/virtio/virtio-example.c
+ create mode 100644 include/hw/virtio/virtio-example.h
+
+diff --git a/hw/virtio/Makefile.objs b/hw/virtio/Makefile.objs
+index 1b2799cfd8..7a6fb2505c 100644
+--- a/hw/virtio/Makefile.objs
++++ b/hw/virtio/Makefile.objs
+@@ -7,6 +7,7 @@ common-obj-$(CONFIG_VIRTIO_PCI) += virtio-pci.o
+ common-obj-$(CONFIG_VIRTIO_MMIO) += virtio-mmio.o
+ obj-$(CONFIG_VIRTIO_BALLOON) += virtio-balloon.o
+ obj-$(CONFIG_VIRTIO_CRYPTO) += virtio-crypto.o
++obj-$(CONFIG_VIRTIO_CRYPTO) += virtio-example.o
+ obj-$(call land,$(CONFIG_VIRTIO_CRYPTO),$(CONFIG_VIRTIO_PCI)) += virtio-crypto-pci.o
+ 
+ obj-$(CONFIG_LINUX) += vhost.o vhost-backend.o vhost-user.o
+diff --git a/hw/virtio/virtio-example.c b/hw/virtio/virtio-example.c
+new file mode 100644
+index 0000000000..fd72f7c3a5
+--- /dev/null
++++ b/hw/virtio/virtio-example.c
+@@ -0,0 +1,110 @@
++/*
++ * A virtio device example.
++ *
++ * Copyright 2019 Red Hat, Inc.
++ * Copyright 2019 Yoni Bettan <ybettan@redhat.com>
++ *
++ * This work is licensed under the terms of the GNU GPL, version 2 or
++ * (at your option) any later version.  See the COPYING file in the
++ * top-level directory.
++ */
++
++#include "qemu/osdep.h"
++#include "qemu/iov.h"
++#include "hw/virtio/virtio.h"
++#include "hw/virtio/virtio-example.h"
++
++
++/*
++ * this function is called when the driver 'kick' the virtqueue.
++ * since we can have more than 1 virtqueue we need the vq argument in order to
++ * know which one was kicked by the driver.
++ */
++static void handle_input(VirtIODevice *vdev, VirtQueue *vq)
++{
++    VirtQueueElement *elem;
++    int data;
++
++    /*
++     * get the virtqueue element sent from the driver.
++     * in_sg are the driver inputs (device outputs)
++     * out_sg are the driver output (device input)
++     */
++    elem = virtqueue_pop(vq, sizeof(VirtQueueElement));
++
++    /* read the driver output sg (device input sg) into a buffer */
++    iov_to_buf(elem->out_sg, elem->out_num, 0, &data, sizeof(int));
++
++    /* process the data */
++    data++;
++
++    /* write the result to the driver input sg (device output sg) */
++    iov_from_buf(elem->in_sg, elem->in_num, 0, &data, sizeof(int));
++
++    /* push back the result into the virtqueue */
++    virtqueue_push(vq, elem, 1);
++
++    /* interrupt the driver */
++    virtio_notify(vdev, vq);
++
++    return;
++}
++
++/*
++ * This function gets the host features as a parameter and add to it all the
++ * features supported by the device.
++ * This example-device has no currently defined feature bits but we still need
++ * this function because when a device is plugged this function is called to
++ * check the features offer by the device so it must exist and return the
++ * host features without any change.
++ */
++static uint64_t
++get_features(VirtIODevice *vdev, uint64_t features, Error **errp)
++{
++    return features;
++}
++
++static void virtio_example_device_realize(DeviceState *dev, Error **errp)
++{
++    VirtIODevice *vdev = VIRTIO_DEVICE(dev);
++    VirtIOEXAMPLE *vexmp = VIRTIO_EXAMPLE(dev);
++
++    /* common virtio device initialization */
++    virtio_init(vdev, "virtio-example", VIRTIO_ID_EXAMPLE, 0);
++
++    /* this device suppot 1 virtqueue */
++    vexmp->vq = virtio_add_queue(vdev, 1, handle_input);
++}
++
++static void virtio_example_device_unrealize(DeviceState *dev, Error **errp)
++{
++    VirtIODevice *vdev = VIRTIO_DEVICE(dev);
++
++    /* common virtio device cleanup */
++    virtio_cleanup(vdev);
++}
++
++static void virtio_example_class_init(ObjectClass *klass, void *data)
++{
++    DeviceClass *dc = DEVICE_CLASS(klass);
++    VirtioDeviceClass *vdc = VIRTIO_DEVICE_CLASS(klass);
++
++    set_bit(DEVICE_CATEGORY_MISC, dc->categories);
++    vdc->realize = virtio_example_device_realize;
++    vdc->unrealize = virtio_example_device_unrealize;
++    vdc->get_features = get_features;
++}
++
++static const TypeInfo virtio_example_info = {
++    .name = TYPE_VIRTIO_EXAMPLE,
++    .parent = TYPE_VIRTIO_DEVICE,
++    .instance_size = sizeof(VirtIOEXAMPLE),
++    .class_init = virtio_example_class_init,
++};
++
++static void virtio_register_types(void)
++{
++    type_register_static(&virtio_example_info);
++}
++
++type_init(virtio_register_types)
+diff --git a/hw/virtio/virtio-pci.c b/hw/virtio/virtio-pci.c
+index 3a01fe90f0..36333168ad 100644
+--- a/hw/virtio/virtio-pci.c
++++ b/hw/virtio/virtio-pci.c
+@@ -2521,6 +2521,52 @@ static const TypeInfo virtio_rng_pci_info = {
+     .class_init    = virtio_rng_pci_class_init,
+ };
+ 
++/* virtio-example-pci */
++
++static void virtio_example_pci_realize(VirtIOPCIProxy *vpci_dev, Error **errp)
++{
++    VirtIOExamplePCI *vexmp = VIRTIO_EXAMPLE_PCI(vpci_dev);
++    DeviceState *vdev = DEVICE(&vexmp->vdev);
++
++    qdev_set_parent_bus(vdev, BUS(&vpci_dev->bus));
++    /*
++     * force modern-only mode on the device, now a PCI-ID will be generated
++     * automatically according to the VIRTIO-ID.
++     */
++    virtio_pci_force_virtio_1(vpci_dev);
++    object_property_set_bool(OBJECT(vdev), true, "realized", errp);
++}
++
++static void virtio_example_pci_class_init(ObjectClass *klass, void *data)
++{
++    DeviceClass *dc = DEVICE_CLASS(klass);
++    VirtioPCIClass *k = VIRTIO_PCI_CLASS(klass);
++    PCIDeviceClass *pcidev_k = PCI_DEVICE_CLASS(klass);
++
++    k->realize = virtio_example_pci_realize;
++    set_bit(DEVICE_CATEGORY_MISC, dc->categories);
++
++    pcidev_k->vendor_id = PCI_VENDOR_ID_REDHAT_QUMRANET;
++    pcidev_k->revision = VIRTIO_PCI_ABI_VERSION;
++    pcidev_k->class_id = PCI_CLASS_OTHERS;
++}
++
++static void virtio_example_initfn(Object *obj)
++{
++    VirtIOExamplePCI *dev = VIRTIO_EXAMPLE_PCI(obj);
++
++    virtio_instance_init_common(obj, &dev->vdev, sizeof(dev->vdev),
++                                TYPE_VIRTIO_EXAMPLE);
++}
++
++static const TypeInfo virtio_example_pci_info = {
++    .name          = TYPE_VIRTIO_EXAMPLE_PCI,
++    .parent        = TYPE_VIRTIO_PCI,
++    .instance_size = sizeof(VirtIOExamplePCI),
++    .instance_init = virtio_example_initfn,
++    .class_init    = virtio_example_pci_class_init,
++};
++
+ /* virtio-input-pci */
+ 
+ static Property virtio_input_pci_properties[] = {
+@@ -2693,6 +2739,7 @@ static const TypeInfo virtio_pci_bus_info = {
+ static void virtio_pci_register_types(void)
+ {
+     type_register_static(&virtio_rng_pci_info);
++    type_register_static(&virtio_example_pci_info);
+     type_register_static(&virtio_input_pci_info);
+     type_register_static(&virtio_input_hid_pci_info);
+     type_register_static(&virtio_keyboard_pci_info);
+diff --git a/hw/virtio/virtio-pci.h b/hw/virtio/virtio-pci.h
+index 813082b0d7..db3f5ec17d 100644
+--- a/hw/virtio/virtio-pci.h
++++ b/hw/virtio/virtio-pci.h
+@@ -19,6 +19,7 @@
+ #include "hw/virtio/virtio-blk.h"
+ #include "hw/virtio/virtio-net.h"
+ #include "hw/virtio/virtio-rng.h"
++#include "hw/virtio/virtio-example.h"
+ #include "hw/virtio/virtio-serial.h"
+ #include "hw/virtio/virtio-scsi.h"
+ #include "hw/virtio/virtio-balloon.h"
+@@ -51,6 +52,7 @@ typedef struct VHostSCSIPCI VHostSCSIPCI;
+ typedef struct VHostUserSCSIPCI VHostUserSCSIPCI;
+ typedef struct VHostUserBlkPCI VHostUserBlkPCI;
+ typedef struct VirtIORngPCI VirtIORngPCI;
++typedef struct VirtIOExamplePCI VirtIOExamplePCI;
+ typedef struct VirtIOInputPCI VirtIOInputPCI;
+ typedef struct VirtIOInputHIDPCI VirtIOInputHIDPCI;
+ typedef struct VirtIOInputHostPCI VirtIOInputHostPCI;
+@@ -339,6 +341,18 @@ struct VirtIORngPCI {
+     VirtIORNG vdev;
+ };
+ 
++/*
++ * virtio-example-pci: This extends VirtioPCIProxy.
++ */
++#define TYPE_VIRTIO_EXAMPLE_PCI "virtio-example-pci"
++#define VIRTIO_EXAMPLE_PCI(obj) \
++        OBJECT_CHECK(VirtIOExamplePCI, (obj), TYPE_VIRTIO_EXAMPLE_PCI)
++
++struct VirtIOExamplePCI {
++    VirtIOPCIProxy parent_obj;
++    VirtIOEXAMPLE vdev;
++};
++
+ /*
+  * virtio-input-pci: This extends VirtioPCIProxy.
+  */
+diff --git a/include/hw/virtio/virtio-example.h b/include/hw/virtio/virtio-example.h
+new file mode 100644
+index 0000000000..48397af4e1
+--- /dev/null
++++ b/include/hw/virtio/virtio-example.h
+@@ -0,0 +1,92 @@
++/*
++ * Virtio EXAMPLE Support
++ *
++ * Copyright Red Hat, Inc. 2019
++ * Copyright Yoni Bettan <ybettan@redhat.com>
++ *
++ * This work is licensed under the terms of the GNU GPL, version 2 or
++ * (at your option) any later version.  See the COPYING file in the
++ * top-level directory.
++ */
++
++
++/*
++ * ============================================================================
++ *                             Device specification
++ * ============================================================================
++ *
++ * 5.2 Example Device
++ *
++ * The virtio example device is a simple virtual block device. Read and write
++ * requests are placed in the queue, and serviced (probably out of order) by
++ * the device except where noted.
++ *
++ * 5.2.1 Device ID
++ *
++ * 21
++ *
++ * 5.2.2 Virtqueues
++ *
++ * 0 requestq
++ *
++ * 5.2.3 Feature bits
++ *
++ * None currently defined.
++ *
++ * 5.2.4 Device configuration layout
++ *
++ * None currently defined.
++ *
++ * 5.2.5 Device Initialization
++ *
++ * 1. The virtqueue is initialized.
++ *
++ * 5.2.6 Device Operation
++ *
++ * When the driver need computation, it places a request that consist of both
++ * input and output buffer into the queue.
++ * The first buffer is used as an input for the device and contain a single
++ * integer, represented by 4 or 8 bytes (depends on the architecture), and the
++ * second is given for the device to fill the result in it.
++ *
++ * The device is increasing this integer by 1, meaning the LSB will be
++ * increased by 1 and if needed the carry will be carried to the next byte.
++ *
++ * If the device get a number that is out of the range of an integer only the
++ * lower bytes that fit the size of an integer will represent the input and the
++ * upper bytes will be ignored.
++ * If the result is out of range then only the lower bytes will be written as
++ * result as well.
++ *
++ * 5.2.6.1 Driver Requirements: Device Operation
++ *
++ * The driver MUST place the 2 buffers in the same request in order to make a
++ * request atomically handled by the device, the first buffer contains the
++ * input and should be read-only and the second should be empty and write-only.
++ *
++ * 5.2.6.2 Device Requirements: Device Operation
++ *
++ * The device MUST place the result inside the output buffer allocated by the
++ * driver.
++ */
++
++#ifndef QEMU_VIRTIO_EXAMPLE_H
++#define QEMU_VIRTIO_EXAMPLE_H
++
++#define VIRTIO_ID_EXAMPLE 21
++
++#define TYPE_VIRTIO_EXAMPLE "virtio-example-device"
++#define VIRTIO_EXAMPLE(obj) \
++        OBJECT_CHECK(VirtIOEXAMPLE, (obj), TYPE_VIRTIO_EXAMPLE)
++#define VIRTIO_EXAMPLE_GET_PARENT_CLASS(obj) \
++        OBJECT_GET_PARENT_CLASS(obj, TYPE_VIRTIO_EXAMPLE)
++
++typedef struct VirtIOEXAMPLE {
++    VirtIODevice parent_obj;
++
++    /* Only one vq - guest puts buffer(s) on it when it needs computation */
++    VirtQueue *vq;
++
++} VirtIOEXAMPLE;
++
++#endif
 -- 
+2.17.2
 
-Thanks,
-
-David / dhildenb
 
