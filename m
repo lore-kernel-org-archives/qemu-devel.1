@@ -1,22 +1,40 @@
-Received: from eggs.gnu.org ([209.51.188.92]:50098)
+Received: from eggs.gnu.org ([209.51.188.92]:55084)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1hKshp-0004i5-UV
-	for qemu-devel@nongnu.org; Sun, 28 Apr 2019 18:55:35 -0400
+	(envelope-from <stefanb@linux.ibm.com>) id 1hKtJr-00047G-In
+	for qemu-devel@nongnu.org; Sun, 28 Apr 2019 19:34:52 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1hKsho-0007Iq-K0
-	for qemu-devel@nongnu.org; Sun, 28 Apr 2019 18:55:33 -0400
-References: <20190402153730.54145-1-vsementsov@virtuozzo.com>
-	<20190402153730.54145-2-vsementsov@virtuozzo.com>
-From: Max Reitz <mreitz@redhat.com>
-Message-ID: <fe340a80-f918-7999-fb75-4b129162bd89@redhat.com>
-Date: Mon, 29 Apr 2019 00:55:22 +0200
+	(envelope-from <stefanb@linux.ibm.com>) id 1hKtJn-0002PS-OY
+	for qemu-devel@nongnu.org; Sun, 28 Apr 2019 19:34:51 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:49252)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <stefanb@linux.ibm.com>)
+	id 1hKtJm-0002OG-54
+	for qemu-devel@nongnu.org; Sun, 28 Apr 2019 19:34:47 -0400
+Received: from pps.filterd (m0098409.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id
+	x3SNYK8R048954
+	for <qemu-devel@nongnu.org>; Sun, 28 Apr 2019 19:34:40 -0400
+Received: from e32.co.us.ibm.com (e32.co.us.ibm.com [32.97.110.150])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2s5efbvgvt-1
+	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Sun, 28 Apr 2019 19:34:40 -0400
+Received: from localhost
+	by e32.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+	Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <stefanb@linux.ibm.com>;
+	Mon, 29 Apr 2019 00:34:40 +0100
+References: <20190427131857.11600-1-philmd@redhat.com>
+	<CAMxuvayZ-woUZPxnav8EXSVGGADxeJjhDs1bgzPAzNLMGFgTsA@mail.gmail.com>
+From: Stefan Berger <stefanb@linux.ibm.com>
+Date: Sun, 28 Apr 2019 19:34:35 -0400
 MIME-Version: 1.0
-In-Reply-To: <20190402153730.54145-2-vsementsov@virtuozzo.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="nkDe19NtnX0dms35SobhN9BjQiGecCibO"
-Subject: Re: [Qemu-devel] [PATCH v5 01/10] tests/perf: Test qemu-img convert
- from raw to encrypted qcow2
+In-Reply-To: <CAMxuvayZ-woUZPxnav8EXSVGGADxeJjhDs1bgzPAzNLMGFgTsA@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-MW
+Message-Id: <173af15e-881e-89a0-77c5-a937abc682cb@linux.ibm.com>
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH] hw/tpm: Only build tpm_ppi.o if any of
+ TPM_TIS/TPM_CRB is built
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,129 +43,24 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org
-Cc: kwolf@redhat.com, berto@igalia.com, pbonzini@redhat.com, den@openvz.org, berrange@redhat.com
+To: =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Cc: qemu-devel <qemu-devel@nongnu.org>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---nkDe19NtnX0dms35SobhN9BjQiGecCibO
-From: Max Reitz <mreitz@redhat.com>
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
- qemu-devel@nongnu.org, qemu-block@nongnu.org
-Cc: kwolf@redhat.com, berto@igalia.com, pbonzini@redhat.com, den@openvz.org,
- berrange@redhat.com
-Message-ID: <fe340a80-f918-7999-fb75-4b129162bd89@redhat.com>
-Subject: Re: [PATCH v5 01/10] tests/perf: Test qemu-img convert from raw to
- encrypted qcow2
-References: <20190402153730.54145-1-vsementsov@virtuozzo.com>
- <20190402153730.54145-2-vsementsov@virtuozzo.com>
-In-Reply-To: <20190402153730.54145-2-vsementsov@virtuozzo.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+On 4/27/19 11:49 AM, Marc-Andr=C3=A9 Lureau wrote:
+> Hi
+>
+> On Sat, Apr 27, 2019 at 3:19 PM Philippe Mathieu-Daud=C3=A9
+> <philmd@redhat.com> wrote:
+>> The TPM Physical Presence Interface routines are only used
+>> by the CRB/TIS interfaces. Do not compile this file if any
+>> of them is built.
+>>
+>> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+> Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+>
+>> ---
+>> Marc-Andr=C3=A9:
+>>    You might want to add yourself as reviewer/maintainer of TPM ;)
+> yes, I suppose Stefan wouldn't mind having me as R: :)
 
-On 02.04.19 17:37, Vladimir Sementsov-Ogievskiy wrote:
-> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-> ---
->  tests/perf/block/qcow2/convert-to-encrypted | 48 +++++++++++++++++++++=
-
->  1 file changed, 48 insertions(+)
->  create mode 100755 tests/perf/block/qcow2/convert-to-encrypted
-
-Thanks for the test case, but I don=E2=80=99t know whether this is the ri=
-ght way
-to include it.
-
-A concrete problem is that it doesn=E2=80=99t work with out-of-tree build=
-s (I
-only do out-of-tree builds).  I wonder whether it would be possible and
-make sense (I have no idea) to add a subdirectory "perf" to the iotests
-and reuse its infrastructure?  Those tests wouldn=E2=80=99t run by defaul=
-t.
-
-Max
-
-> diff --git a/tests/perf/block/qcow2/convert-to-encrypted b/tests/perf/b=
-lock/qcow2/convert-to-encrypted
-> new file mode 100755
-> index 0000000000..7a6b7b1cab
-> --- /dev/null
-> +++ b/tests/perf/block/qcow2/convert-to-encrypted
-> @@ -0,0 +1,48 @@
-> +#!/bin/bash
-> +#
-> +# Test qemu-img convert from raw to encrypted qcow2
-> +#
-> +# Copyright (c) 2019 Virtuozzo International GmbH. All rights reserved=
-=2E
-> +#
-> +# This program is free software; you can redistribute it and/or modify=
-
-> +# it under the terms of the GNU General Public License as published by=
-
-> +# the Free Software Foundation; either version 2 of the License, or
-> +# (at your option) any later version.
-> +#
-> +# This program is distributed in the hope that it will be useful,
-> +# but WITHOUT ANY WARRANTY; without even the implied warranty of
-> +# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-> +# GNU General Public License for more details.
-> +#
-> +# You should have received a copy of the GNU General Public License
-> +# along with this program.  If not, see <http://www.gnu.org/licenses/>=
-=2E
-> +#
-> +
-> +if [ "$#" -lt 2 ]; then
-> +    echo "Usage: $0 SOURCE_FILE DESTINATION_FILE [additional qemu-img =
-convert parameters]"
-> +    exit 1
-> +fi
-> +
-> +ROOT_DIR=3D"$( cd "$( dirname "${BASH_SOURCE[0]}" )/../../../.." >/dev=
-/null 2>&1 && pwd )"
-> +QEMU_IMG=3D"$ROOT_DIR/qemu-img"
-> +QEMU_IO=3D"$ROOT_DIR/qemu-io"
-> +
-> +size=3D1G
-> +
-> +src=3D"$1"
-> +shift
-> +
-> +dst=3D"$1"
-> +shift
-> +
-> +(
-> +# create source
-> +$QEMU_IMG create -f raw "$src" $size
-> +$QEMU_IO -f raw -c "write -P 0xa 0 $size" "$src"
-> +
-> +# create target
-> +$QEMU_IMG create -f qcow2 --object secret,id=3Dsec0,data=3Dtest -o enc=
-rypt.format=3Dluks,encrypt.key-secret=3Dsec0 "$dst" $size
-> +) > /dev/null
-> +
-> +# test with additional parameters left in $@
-> +/usr/bin/time -f %e $QEMU_IMG convert "$@" -f raw --object secret,id=3D=
-sec0,data=3Dtest --target-image-opts -n "$src" "driver=3Dqcow2,file.filen=
-ame=3D$dst,encrypt.key-secret=3Dsec0"
->=20
-
-
-
---nkDe19NtnX0dms35SobhN9BjQiGecCibO
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAlzGL1oACgkQ9AfbAGHV
-z0Dv1gf9Fgb33NPbFmkgMoU+ruqbe1qnNS2ijYN+zyLQ4/STFN3HmTCgYydagZr1
-c11XUgm1+DPpQRwAX+mc3vKCsHI6paoPDCnq55VssKd3Tx2mkygTrC6AIUdWBojJ
-flA/sizxYXGq0QAY7I3UbTFoLlbBJ2ABhwQ2rVPoNrlqcMNLmLwlKYaXXRFHR02b
-zXXFdib9IMqOB4ijLO9EoWNIa+UbLOwGlYpfkRbSawxgMtjT1veOfAa0UYfGsYU/
-Pz1m2XHzfRUSt49qLe3bx37aukbakyX//VrrCs4pPynBzMujz8Pc37ZtJbXVTCWR
-+g2p3/02n1dMllNC2RACQgY/E/wcSA==
-=gH2V
------END PGP SIGNATURE-----
-
---nkDe19NtnX0dms35SobhN9BjQiGecCibO--
+I don't mind.
