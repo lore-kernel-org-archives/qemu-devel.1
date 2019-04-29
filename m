@@ -2,81 +2,80 @@ Return-Path: <SRS0=sEuR=S7=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-4.0 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0C9DAC43219
-	for <qemu-devel@archiver.kernel.org>; Mon, 29 Apr 2019 14:07:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6A6D7C43219
+	for <qemu-devel@archiver.kernel.org>; Mon, 29 Apr 2019 14:09:07 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C9F762177B
-	for <qemu-devel@archiver.kernel.org>; Mon, 29 Apr 2019 14:07:56 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="l6G461sJ"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C9F762177B
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id 3C91A2084B
+	for <qemu-devel@archiver.kernel.org>; Mon, 29 Apr 2019 14:09:07 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3C91A2084B
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:58116 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:58122 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hL6wm-0003RB-4v
-	for qemu-devel@archiver.kernel.org; Mon, 29 Apr 2019 10:07:56 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:39586)
+	id 1hL6xu-00043C-Cs
+	for qemu-devel@archiver.kernel.org; Mon, 29 Apr 2019 10:09:06 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:39760)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1hL6w2-00039k-CG
-	for qemu-devel@nongnu.org; Mon, 29 Apr 2019 10:07:11 -0400
+	(envelope-from <philmd@redhat.com>) id 1hL6x4-0003hL-D0
+	for qemu-devel@nongnu.org; Mon, 29 Apr 2019 10:08:15 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1hL6w0-0003Ru-Bi
-	for qemu-devel@nongnu.org; Mon, 29 Apr 2019 10:07:10 -0400
-Received: from mail-ot1-x343.google.com ([2607:f8b0:4864:20::343]:39886)
+	(envelope-from <philmd@redhat.com>) id 1hL6wy-0004UP-Tj
+	for qemu-devel@nongnu.org; Mon, 29 Apr 2019 10:08:11 -0400
+Received: from mail-wr1-f67.google.com ([209.85.221.67]:38709)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1hL6vy-0003Nd-R5
-	for qemu-devel@nongnu.org; Mon, 29 Apr 2019 10:07:07 -0400
-Received: by mail-ot1-x343.google.com with SMTP id o39so8702442ota.6
-	for <qemu-devel@nongnu.org>; Mon, 29 Apr 2019 07:07:06 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
-	h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-	:cc; bh=mRVUcmLKkBgEhGP7RGgRcEUeoSuw53AOfhH7wwH1/uY=;
-	b=l6G461sJJweSJGvBVy83wdPj/9znNGRKnPuDnHCVcVgJzNtcngfnv0tGvVQ5tr36MA
-	rUTRS3nnp6MLqroKgsAm946g/JozKUMipxsvVQiJMsNoGeE6PZ9PuPC0oAxNm/8b5D3I
-	g0yHPP7R+/FLxzYkQbC0tKPsfpX1eZcrymgW2pS5wga9WBbSq2CfUKeUVZ+FeY/H+54J
-	j5ARWh4f0gQsFaMeZgp8X593nHk7e3388uz1Q99kDxv64xt3IduYr34W3IBk/shMMRYz
-	BfmwLrdY+OeSV7g8U+8l27XJ9iFGyoglv1cxJpdNT1nZCyvRCxn1IE92q8x2LOxJUiaZ
-	huLw==
+	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1hL6ww-0004Ov-Is
+	for qemu-devel@nongnu.org; Mon, 29 Apr 2019 10:08:07 -0400
+Received: by mail-wr1-f67.google.com with SMTP id k16so16276434wrn.5
+	for <qemu-devel@nongnu.org>; Mon, 29 Apr 2019 07:08:04 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
 	d=1e100.net; s=20161025;
-	h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-	:message-id:subject:to:cc;
-	bh=mRVUcmLKkBgEhGP7RGgRcEUeoSuw53AOfhH7wwH1/uY=;
-	b=Q+O2iuyGfl4HvU9jTQ1akKF1v59na0q+EUQKSgvPcqO1ho8TF16IokJ9Fv0XKqssG7
-	SBhtNrJPl6PQ7h0altYUOlRHkqMDFaxFwjUr5c6pL2kuFGOsKGxGgasnnzBAIeJ1+h9V
-	XS5l0NHH4LRq68aQ6h3trdUSdIaZD3M04QONBCMaB7WXheIHRS55KWMHtJScF0rXTKlP
-	/yOhMCltzn/RsWqQrtcakHEieYwhPXACRhBC5Krof434ctr67L0qQiYmO0cde58hCPvt
-	QDq9R5RjnfX89MPSRFq/mDI8zy7qToycn2/T7NMgLJf6aaTT5NS+tCH/Qu1IB03cGBEG
-	fY5w==
-X-Gm-Message-State: APjAAAXfWPP1taQjq+LgusYpXFFw93Hc5rAmGUCi5GtRpLAqUWwfpm9e
-	VSydp4HPgaI6SfQ85HKoE27TNYcEttxscO//NiPOIA==
-X-Google-Smtp-Source: APXvYqy0iPdYd7mwrais5EsC7fdfVJ1gsPoIQni9b4q3BWyMyYQTTVYSsKxmn9dNgfTNWOaMh9v717YpeTg/rCYftQo=
-X-Received: by 2002:a9d:360b:: with SMTP id w11mr12169382otb.238.1556546825105;
-	Mon, 29 Apr 2019 07:07:05 -0700 (PDT)
+	h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
+	:date:user-agent:mime-version:in-reply-to:content-language
+	:content-transfer-encoding;
+	bh=NnB+7Fe/bWKy2oL1S8rkMjv1OJabmYV3r9bg6a8LEB0=;
+	b=IyTkRwRogRcIJXq/rr9Qa3/J2/XaHO7uNdhZq4LJP4Wft0zUUisrhs64yJMhLJV0Z6
+	2tMZt3XK/Ui/XM9BNcCkcmI3qC2mUWkhHjA+XLEvGW9qvh20s96VDJXPKs5FG71Dv6kk
+	ngZnyw/DVv7TdyWhPcqeZJ6Rrymc9RMWzusWzV50CQCWjyQqHva+c2JRgDK/Uy3JZ+YN
+	pkL6yvdhf3RGM6zNPmIqMQtD2LFTWw3RT8AOFVAYKm5+g6c5RmL5GPAIiZJg+2/LurIn
+	K8CwTqAAFYFk271YiwTkncnK3qpqXOz0K5QmLNNikgzMAJVt0dLljaBifSCF2VmVrMTT
+	ptiQ==
+X-Gm-Message-State: APjAAAWvNW97/DcBlLCjkNIdRUwyYerJpE/tcwmh0sbqA5lLB8p1i7rl
+	ploxi+RoLhquBHnonBkl6GIEig==
+X-Google-Smtp-Source: APXvYqw4QxllvMzuAgpAOqIAnV/G9+92omiqivO3o2TmGU5Sy4BCgCEPh2R2MfWt2VvFkRJD2qPw2g==
+X-Received: by 2002:a5d:6542:: with SMTP id z2mr37243740wrv.217.1556546884087; 
+	Mon, 29 Apr 2019 07:08:04 -0700 (PDT)
+Received: from [192.168.1.33] (193.red-88-21-103.staticip.rima-tde.net.
+	[88.21.103.193]) by smtp.gmail.com with ESMTPSA id
+	m17sm15742039wrq.27.2019.04.29.07.08.03
+	(version=TLS1_3 cipher=AEAD-AES128-GCM-SHA256 bits=128/128);
+	Mon, 29 Apr 2019 07:08:03 -0700 (PDT)
+To: =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>,
+	qemu-devel@nongnu.org
+References: <20190429134757.13570-1-marcandre.lureau@redhat.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Openpgp: id=89C1E78F601EE86C867495CBA2A3FD6EDEADC0DE;
+	url=http://pgp.mit.edu/pks/lookup?op=get&search=0xA2A3FD6EDEADC0DE
+Message-ID: <c20eda65-a2db-97bf-3439-73f7e6c0f400@redhat.com>
+Date: Mon, 29 Apr 2019 16:08:02 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+	Thunderbird/60.6.1
 MIME-Version: 1.0
-References: <20190328230404.12909-1-richard.henderson@linaro.org>
-	<20190328230404.12909-10-richard.henderson@linaro.org>
-In-Reply-To: <20190328230404.12909-10-richard.henderson@linaro.org>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Mon, 29 Apr 2019 15:06:54 +0100
-Message-ID:
- <CAFEAcA8hSByAHAiX8j2LzucCsaMEBM=_T3MJh7-D-QVw-Y6K4Q@mail.gmail.com>
-To: Richard Henderson <richard.henderson@linaro.org>
+In-Reply-To: <20190429134757.13570-1-marcandre.lureau@redhat.com>
 Content-Type: text/plain; charset="UTF-8"
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
-	recognized.
-X-Received-From: 2607:f8b0:4864:20::343
-Subject: Re: [Qemu-devel] [PATCH for-4.1 v2 09/36] target/arm: Use env_cpu,
- env_archcpu
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+	[fuzzy]
+X-Received-From: 209.85.221.67
+Subject: Re: [Qemu-devel] [PATCH] vl: fix -sandbox parsing crash when
+ seccomp support is disabled
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -88,26 +87,72 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: QEMU Developers <qemu-devel@nongnu.org>
+Cc: otubo@redhat.com, Paolo Bonzini <pbonzini@redhat.com>,
+	david@gibson.dropbear.id.au
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190429140654.fnOeevTNY7ZS_5WHd1lctg7A_s4rqktWxuVT8LvVT-4@z>
+Message-ID: <20190429140802.zZlb0NOJdGZ6-Y9DAzZSmVn4Nk1L_1fgl-_y9awVElw@z>
 
-On Thu, 28 Mar 2019 at 23:51, Richard Henderson
-<richard.henderson@linaro.org> wrote:
->
-> Combined uses of CPU(arm_env_get_cpu()) were failures to use
-> the more proper, ENV_GET_CPU macro, now replaced by env_cpu.
->
-> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+On 4/29/19 3:47 PM, Marc-André Lureau wrote:
+> $ ./x86_64-softmmu/qemu-system-x86_64 -sandbox off
+> qemu-system-x86_64: -sandbox off: There is no option group 'sandbox'
+> Segmentation fault
+> 
+> Commit 5780760f5e ("seccomp: check TSYNC host capability") wrapped one
+> use of the sandbox option group to produce a sensible error, it didn't
+> do the same for another call to qemu_opts_parse_noisily():
+> 
+> (gdb) bt
+>     at util/qemu-option.c:829
+>  #0  0x00000000105b36d8 in opts_parse (list=0x0, params=0x3ffffffffab5 "off", permit_abbrev=true, defaults=false, errp=0x3ffffffff080)
+>      at util/qemu-option.c:829
+>  #1  0x00000000105b3b74 in qemu_opts_parse_noisily (list=<optimized out>, params=<optimized out>, permit_abbrev=<optimized out>) at util/qemu-option.c:890
+>  #2  0x0000000010024964 in main (argc=<optimized out>, argv=<optimized out>, envp=<optimized out>) at vl.c:3589
+> 
+> Fixes: 5780760f5ea6163939a5dabe7427318b4f07d1a2
+> Cc: david@gibson.dropbear.id.au
+> Cc: otubo@redhat.com
+> Signed-off-by: Marc-André Lureau <marcandre.lureau@redhat.com>
+
+Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+Tested-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+
 > ---
-
-Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
-
-(though I imagine that this will need updating when the
-M-profile fp patchset hits master.)
-
-thanks
--- PMM
+>  vl.c | 18 ++++++++++--------
+>  1 file changed, 10 insertions(+), 8 deletions(-)
+> 
+> diff --git a/vl.c b/vl.c
+> index 4019a4387d..5fc4994d3c 100644
+> --- a/vl.c
+> +++ b/vl.c
+> @@ -3866,17 +3866,19 @@ int main(int argc, char **argv, char **envp)
+>                  qtest_log = optarg;
+>                  break;
+>              case QEMU_OPTION_sandbox:
+> -#ifdef CONFIG_SECCOMP
+> -                opts = qemu_opts_parse_noisily(qemu_find_opts("sandbox"),
+> -                                               optarg, true);
+> +                olist = qemu_find_opts("sandbox");
+> +                if (!olist) {
+> +#ifndef CONFIG_SECCOMP
+> +                    error_report("-sandbox support is not enabled "
+> +                                 "in this QEMU binary");
+> +#endif
+> +                    exit(1);
+> +                }
+> +
+> +                opts = qemu_opts_parse_noisily(olist, optarg, true);
+>                  if (!opts) {
+>                      exit(1);
+>                  }
+> -#else
+> -                error_report("-sandbox support is not enabled "
+> -                             "in this QEMU binary");
+> -                exit(1);
+> -#endif
+>                  break;
+>              case QEMU_OPTION_add_fd:
+>  #ifndef _WIN32
+> 
 
