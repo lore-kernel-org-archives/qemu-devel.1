@@ -2,80 +2,75 @@ Return-Path: <SRS0=sEuR=S7=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED
+X-Spam-Status: No, score=-8.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,USER_AGENT_NEOMUTT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8EB9DC43219
-	for <qemu-devel@archiver.kernel.org>; Mon, 29 Apr 2019 12:44:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8F7CDC43219
+	for <qemu-devel@archiver.kernel.org>; Mon, 29 Apr 2019 12:48:29 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 440032075E
-	for <qemu-devel@archiver.kernel.org>; Mon, 29 Apr 2019 12:44:47 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 440032075E
+	by mail.kernel.org (Postfix) with ESMTPS id 4A1832075E
+	for <qemu-devel@archiver.kernel.org>; Mon, 29 Apr 2019 12:48:29 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4A1832075E
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:57149 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:57205 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hL5eI-0006U6-HV
-	for qemu-devel@archiver.kernel.org; Mon, 29 Apr 2019 08:44:46 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:47762)
+	id 1hL5hs-0007n4-JM
+	for qemu-devel@archiver.kernel.org; Mon, 29 Apr 2019 08:48:28 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:48489)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1hL5dU-00065t-Sf
-	for qemu-devel@nongnu.org; Mon, 29 Apr 2019 08:43:59 -0400
+	(envelope-from <sgarzare@redhat.com>) id 1hL5h0-0007Sn-Cd
+	for qemu-devel@nongnu.org; Mon, 29 Apr 2019 08:47:35 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1hL5dS-0007wv-Ov
-	for qemu-devel@nongnu.org; Mon, 29 Apr 2019 08:43:56 -0400
-Received: from mail-wr1-f67.google.com ([209.85.221.67]:46664)
+	(envelope-from <sgarzare@redhat.com>) id 1hL5gu-0001UV-Pg
+	for qemu-devel@nongnu.org; Mon, 29 Apr 2019 08:47:34 -0400
+Received: from mail-wr1-f65.google.com ([209.85.221.65]:42983)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1hL5dS-0007wM-Fj
-	for qemu-devel@nongnu.org; Mon, 29 Apr 2019 08:43:54 -0400
-Received: by mail-wr1-f67.google.com with SMTP id t17so15762853wrw.13
-	for <qemu-devel@nongnu.org>; Mon, 29 Apr 2019 05:43:54 -0700 (PDT)
+	(Exim 4.71) (envelope-from <sgarzare@redhat.com>) id 1hL5gp-0001N6-Lh
+	for qemu-devel@nongnu.org; Mon, 29 Apr 2019 08:47:26 -0400
+Received: by mail-wr1-f65.google.com with SMTP id l2so178922wrb.9
+	for <qemu-devel@nongnu.org>; Mon, 29 Apr 2019 05:47:21 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
 	d=1e100.net; s=20161025;
-	h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
-	:date:user-agent:mime-version:in-reply-to:content-language
-	:content-transfer-encoding;
-	bh=AAYWNkVct9tqFaLxMg50uXnXO58inDuOjoqIopciLz4=;
-	b=YheVFlB8tJllxfnuZV34zITZLdt+YVpo3MSDWx4o8iRjgN6z5A1xP1Wm2YEhkCHKoY
-	DuRWVzrge3rn426bfe3Bo/uPrVSYy2uU+LedDsbWQPYtRCcyp6liCrbLoGNkpCihy17A
-	BXIowas4vxfR0aQUawwP1UeRDLwwQTwAs4+l+dUkkZ18f4/HfsaR8QJO5F1mVrTo4Cii
-	kt9rXjvGRtCESgGPjxlwIgI29zXuWWHLV1LUYtoSwoRzmtPUS+p5Tkw3jJ0UmPZvEFQV
-	ORNEIjMOGqHqD5CBP8rbuSzIB4+TxQ0J8dLAjM3m2pT+QE3WT1bv1BWL+bi0hafw7xUu
-	rD4w==
-X-Gm-Message-State: APjAAAUi5vnQExLeE0MPq2ThvR8Qge1U72gjy0ZK9fvA3NcAitHUkOoo
-	aiHfN7L6aGSSJxQijjbOeXd4jg==
-X-Google-Smtp-Source: APXvYqxwjU6h4RWAMwtDDj6E1GuZCHet8e8TbMEeis+uAFAZgZSCXyCo3lxXI3Ky4hYRNq8BAQv9Bg==
-X-Received: by 2002:adf:de8d:: with SMTP id w13mr10942997wrl.26.1556541833185; 
-	Mon, 29 Apr 2019 05:43:53 -0700 (PDT)
-Received: from [192.168.1.33] (193.red-88-21-103.staticip.rima-tde.net.
-	[88.21.103.193])
-	by smtp.gmail.com with ESMTPSA id b11sm938403wmh.29.2019.04.29.05.43.52
-	(version=TLS1_3 cipher=AEAD-AES128-GCM-SHA256 bits=128/128);
-	Mon, 29 Apr 2019 05:43:52 -0700 (PDT)
-To: Alistair Francis <alistair@alistair23.me>,
-	"qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
-References: <cover.1556515687.git.alistair@alistair23.me>
-	<PSXP216MB027793B449E7DAAB995E0F33DD390@PSXP216MB0277.KORP216.PROD.OUTLOOK.COM>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Openpgp: id=89C1E78F601EE86C867495CBA2A3FD6EDEADC0DE;
-	url=http://pgp.mit.edu/pks/lookup?op=get&search=0xA2A3FD6EDEADC0DE
-Message-ID: <1c2303a0-62bf-53ce-e91c-b45a95a91376@redhat.com>
-Date: Mon, 29 Apr 2019 14:43:51 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
-	Thunderbird/60.6.1
+	h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+	:mime-version:content-disposition:in-reply-to:user-agent;
+	bh=HoyUcymL/tT+m1uZIFf3h/Ds8eSMaraOUR51j00DwYE=;
+	b=U26QrsfFz1VnS3Zd2CJ/gI+GY0ILdpXp70tYjMVvHfVebkKKoKdgHQrTCdVjjWIhvN
+	h0IQBdMzGemNv9FI2Sysnrxw14RVdVJhdNJbZwPDSZ67nITG7y7DCtz8JQa17Gr3r4RX
+	TIx/Z9UvsWt+f1S3GQ39vJNRbyZ0AlS5TP2eLGcWNNi7S1S52IeR5uQmgsVcm4LRCGyq
+	rj7u4I8Tan/mP4OEQBtVtJE7Aa19FtrGTDCIa5ac6fq+jD0/mp8QQ8vCmHYID8uSORUD
+	sR09jaYYW7Tq9wUJoib/SJ67NrLWNGhcV3+g6kN1U+9tESeTrUTK1yHUcAfpvsP2uXaL
+	fpbg==
+X-Gm-Message-State: APjAAAVSlYjHzu0vcFo0X/v+3+KkV1PdVtzV3KBkQ9HMpVpKGk1BxWXm
+	PgfaxlWNelgdHNMD3FYuqkABQA==
+X-Google-Smtp-Source: APXvYqz/SPIP3yswS4sJ8AlIwKERmWF16OishOxHnpSkO/YPlqdXEfd5VOGhFiEUUIhXfNeRrZbn0w==
+X-Received: by 2002:adf:8b0b:: with SMTP id n11mr2526269wra.149.1556542040539; 
+	Mon, 29 Apr 2019 05:47:20 -0700 (PDT)
+Received: from steredhat (host35-203-static.12-87-b.business.telecomitalia.it.
+	[87.12.203.35])
+	by smtp.gmail.com with ESMTPSA id f1sm2405280wrc.93.2019.04.29.05.47.19
+	(version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
+	Mon, 29 Apr 2019 05:47:19 -0700 (PDT)
+Date: Mon, 29 Apr 2019 14:47:12 +0200
+From: Stefano Garzarella <sgarzare@redhat.com>
+To: dillaman@redhat.com
+Message-ID: <20190429124712.mmxnpdkkbzhlbmxm@steredhat>
+References: <20190427113625.46594-1-sgarzare@redhat.com>
+	<CA+aFP1BtbjrzitLz7PW_b-kuYU7WSOiMs5jVfUBC=M3zEuBcew@mail.gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <PSXP216MB027793B449E7DAAB995E0F33DD390@PSXP216MB0277.KORP216.PROD.OUTLOOK.COM>
 Content-Type: text/plain; charset="UTF-8"
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
+In-Reply-To: <CA+aFP1BtbjrzitLz7PW_b-kuYU7WSOiMs5jVfUBC=M3zEuBcew@mail.gmail.com>
+User-Agent: NeoMutt/20180716
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 	[fuzzy]
-X-Received-From: 209.85.221.67
-Subject: Re: [Qemu-devel] [PATCH v1 4/5] hw/arm: Add the STM32F4xx SoC
+X-Received-From: 209.85.221.65
+Subject: Re: [Qemu-devel] [Qemu-block] [PATCH] block/rbd: add preallocation
+ support
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -87,461 +82,128 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "alistair23@gmail.com" <alistair23@gmail.com>
+Cc: Kevin Wolf <kwolf@redhat.com>, Josh Durgin <jdurgin@redhat.com>,
+	qemu-block <qemu-block@nongnu.org>, Markus Armbruster <armbru@redhat.com>,
+	qemu-devel <qemu-devel@nongnu.org>, Max Reitz <mreitz@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190429124351.SIrkpO0aS7IcVREIYjCXMCJLkWEtHtHV2rJoVjrfVLA@z>
+Message-ID: <20190429124712.BPhPT3pA1hyMoPu0x-Yagm2JqD40vnQJyaGfc1tS5rw@z>
 
-On 4/29/19 7:33 AM, Alistair Francis wrote:
-> Signed-off-by: Alistair Francis <alistair@alistair23.me>
-> ---
->  MAINTAINERS                     |   8 +
->  default-configs/arm-softmmu.mak |   1 +
->  hw/arm/Kconfig                  |   3 +
->  hw/arm/Makefile.objs            |   1 +
->  hw/arm/stm32f405_soc.c          | 292 ++++++++++++++++++++++++++++++++
->  include/hw/arm/stm32f405_soc.h  |  70 ++++++++
->  6 files changed, 375 insertions(+)
->  create mode 100644 hw/arm/stm32f405_soc.c
->  create mode 100644 include/hw/arm/stm32f405_soc.h
+On Sat, Apr 27, 2019 at 08:43:26AM -0400, Jason Dillaman wrote:
+> On Sat, Apr 27, 2019 at 7:37 AM Stefano Garzarella <sgarzare@redhat.com> wrote:
+> >
+> > This patch adds the support of preallocation (off/full) for the RBD
+> > block driver.
+> > If available, we use rbd_writesame() to quickly fill the image when
+> > full preallocation is required.
+> >
+> > Signed-off-by: Stefano Garzarella <sgarzare@redhat.com>
+> > ---
+> >  block/rbd.c          | 149 ++++++++++++++++++++++++++++++++++++++-----
+> >  qapi/block-core.json |   4 +-
+> >  2 files changed, 136 insertions(+), 17 deletions(-)
+> >
+> > diff --git a/block/rbd.c b/block/rbd.c
+> > index 0c549c9935..29dd1bb040 100644
+> > --- a/block/rbd.c
+> > +++ b/block/rbd.c
+> > @@ -13,6 +13,7 @@
+> >
+> >  #include "qemu/osdep.h"
+> >
+> > +#include "qemu/units.h"
+> >  #include <rbd/librbd.h>
+> >  #include "qapi/error.h"
+> >  #include "qemu/error-report.h"
+> > @@ -331,6 +332,110 @@ static void qemu_rbd_memset(RADOSCB *rcb, int64_t offs)
+> >      }
+> >  }
+> >
+> > +static int qemu_rbd_do_truncate(rbd_image_t image, int64_t offset,
+> > +                                PreallocMode prealloc, Error **errp)
+> > +{
+> > +    uint64_t current_length;
+> > +    char *buf = NULL;
+> > +    int ret;
+> > +
+> > +    ret = rbd_get_size(image, &current_length);
+> > +    if (ret < 0) {
+> > +        error_setg_errno(errp, -ret, "Failed to get file length");
+> > +        goto out;
+> > +    }
+> > +
+> > +    if (current_length > offset && prealloc != PREALLOC_MODE_OFF) {
+> > +        error_setg(errp, "Cannot use preallocation for shrinking files");
+> > +        ret = -ENOTSUP;
+> > +        goto out;
+> > +    }
+> > +
+> > +    switch (prealloc) {
+> > +    case PREALLOC_MODE_FULL: {
+> > +        uint64_t current_offset = current_length;
+> > +        int buf_size = 64 * KiB;
 > 
-> diff --git a/MAINTAINERS b/MAINTAINERS
-> index dabbfccf9c..c9772735cf 100644
-> --- a/MAINTAINERS
-> +++ b/MAINTAINERS
-> @@ -803,6 +803,14 @@ F: hw/adc/*
->  F: hw/ssi/stm32f2xx_spi.c
->  F: include/hw/*/stm32*.h
->  
-> +STM32F405
-> +M: Alistair Francis <alistair@alistair23.me>
-> +M: Peter Maydell <peter.maydell@linaro.org>
-> +S: Maintained
-> +F: hw/arm/stm32f405_soc.c
-> +F: hw/misc/stm32f4xx_syscfg.c
-> +F: hw/misc/stm32f4xx_exti.c
-> +
->  Netduino 2
->  M: Alistair Francis <alistair@alistair23.me>
->  M: Peter Maydell <peter.maydell@linaro.org>
-> diff --git a/default-configs/arm-softmmu.mak b/default-configs/arm-softmmu.mak
-> index 8eb57de211..e079f10624 100644
-> --- a/default-configs/arm-softmmu.mak
-> +++ b/default-configs/arm-softmmu.mak
-> @@ -98,6 +98,7 @@ CONFIG_STM32F2XX_SPI=y
->  CONFIG_STM32F205_SOC=y
->  CONFIG_STM32F4XX_SYSCFG=y
->  CONFIG_STM32F4XX_EXTI=y
-> +CONFIG_STM32F405_SOC=y
->  CONFIG_NRF51_SOC=y
->  
->  CONFIG_CMSDK_APB_TIMER=y
-> diff --git a/hw/arm/Kconfig b/hw/arm/Kconfig
-> index d298fbdc89..3a98bce15a 100644
-> --- a/hw/arm/Kconfig
-> +++ b/hw/arm/Kconfig
-> @@ -62,6 +62,9 @@ config RASPI
->  config STM32F205_SOC
->      bool
->  
-> +config STM32F405_SOC
-> +    bool
-> +
->  config XLNX_ZYNQMP_ARM
->      bool
->  
-> diff --git a/hw/arm/Makefile.objs b/hw/arm/Makefile.objs
-> index fa57c7c770..36c3ff54c3 100644
-> --- a/hw/arm/Makefile.objs
-> +++ b/hw/arm/Makefile.objs
-> @@ -26,6 +26,7 @@ obj-$(CONFIG_STRONGARM) += strongarm.o
->  obj-$(CONFIG_ALLWINNER_A10) += allwinner-a10.o cubieboard.o
->  obj-$(CONFIG_RASPI) += bcm2835_peripherals.o bcm2836.o raspi.o
->  obj-$(CONFIG_STM32F205_SOC) += stm32f205_soc.o
-> +obj-$(CONFIG_STM32F405_SOC) += stm32f405_soc.o
->  obj-$(CONFIG_XLNX_ZYNQMP_ARM) += xlnx-zynqmp.o xlnx-zcu102.o
->  obj-$(CONFIG_XLNX_VERSAL) += xlnx-versal.o xlnx-versal-virt.o
->  obj-$(CONFIG_FSL_IMX25) += fsl-imx25.o imx25_pdk.o
-> diff --git a/hw/arm/stm32f405_soc.c b/hw/arm/stm32f405_soc.c
-> new file mode 100644
-> index 0000000000..83adec51a2
-> --- /dev/null
-> +++ b/hw/arm/stm32f405_soc.c
-> @@ -0,0 +1,292 @@
-> +/*
-> + * STM32F405 SoC
-> + *
-> + * Copyright (c) 2014 Alistair Francis <alistair@alistair23.me>
-
-2019?
-
-> + *
-> + * Permission is hereby granted, free of charge, to any person obtaining a copy
-> + * of this software and associated documentation files (the "Software"), to deal
-> + * in the Software without restriction, including without limitation the rights
-> + * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-> + * copies of the Software, and to permit persons to whom the Software is
-> + * furnished to do so, subject to the following conditions:
-> + *
-> + * The above copyright notice and this permission notice shall be included in
-> + * all copies or substantial portions of the Software.
-> + *
-> + * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-> + * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-> + * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
-> + * THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-> + * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-> + * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-> + * THE SOFTWARE.
-> + */
-> +
-> +#include "qemu/osdep.h"
-> +#include "qapi/error.h"
-> +#include "qemu-common.h"
-> +#include "hw/arm/arm.h"
-> +#include "exec/address-spaces.h"
-> +#include "hw/arm/stm32f405_soc.h"
-> +#include "hw/misc/unimp.h"
-> +
-> +#define SYSCFG_ADD                     0x40013800
-> +static const uint32_t usart_addr[] = { 0x40011000, 0x40004400, 0x40004800,
-> +                                       0x40004C00, 0x40005000, 0x40011400,
-> +                                       0x40007800, 0x40007C00 };
-> +/* At the moment only Timer 2 to 5 are modelled */
-> +static const uint32_t timer_addr[] = { 0x40000000, 0x40000400,
-> +                                       0x40000800, 0x40000C00 };
-> +#define ADC_ADDR                       0x40012000
-> +static const uint32_t spi_addr[] =   { 0x40013000, 0x40003800, 0x40003C00,
-> +                                       0x40013400, 0x40015000, 0x40015400 };
-> +#define EXTI_ADDR                      0x40013C00
-> +
-> +#define SYSCFG_IRQ               71
-> +static const int usart_irq[] = { 37, 38, 39, 52, 53, 71, 82, 83 };
-> +static const int timer_irq[] = { 28, 29, 30, 50 };
-> +#define ADC_IRQ 18
-> +static const int spi_irq[] =   { 35, 36, 51, 0, 0, 0 };
-> +static const int exti_irq[] =  { 6, 7, 8, 9, 10, 23, 23, 23, 23, 23, 40,
-> +                                 40, 40, 40, 40, 40} ;
-> +
-> +
-> +static void stm32f405_soc_initfn(Object *obj)
-> +{
-> +    STM32F405State *s = STM32F405_SOC(obj);
-> +    int i;
-> +
-> +    sysbus_init_child_obj(obj, "armv7m", &s->armv7m, sizeof(s->armv7m),
-> +                          TYPE_ARMV7M);
-> +
-> +    sysbus_init_child_obj(obj, "syscfg", &s->syscfg, sizeof(s->syscfg),
-> +                          TYPE_STM32F4XX_SYSCFG);
-> +
-> +    for (i = 0; i < STM_NUM_USARTS; i++) {
-> +        sysbus_init_child_obj(obj, "usart[*]", &s->usart[i],
-> +                              sizeof(s->usart[i]), TYPE_STM32F2XX_USART);
-> +    }
-> +
-> +    for (i = 0; i < STM_NUM_TIMERS; i++) {
-> +        sysbus_init_child_obj(obj, "timer[*]", &s->timer[i],
-> +                              sizeof(s->timer[i]), TYPE_STM32F2XX_TIMER);
-> +    }
-> +
-> +    s->adc_irqs = OR_IRQ(object_new(TYPE_OR_IRQ));
-> +
-> +    for (i = 0; i < STM_NUM_ADCS; i++) {
-> +        sysbus_init_child_obj(obj, "adc[*]", &s->adc[i], sizeof(s->adc[i]),
-> +                              TYPE_STM32F2XX_ADC);
-> +    }
-> +
-> +    for (i = 0; i < STM_NUM_SPIS; i++) {
-> +        sysbus_init_child_obj(obj, "spi[*]", &s->spi[i], sizeof(s->spi[i]),
-> +                              TYPE_STM32F2XX_SPI);
-> +    }
-> +
-> +    sysbus_init_child_obj(obj, "exti", &s->exti, sizeof(s->exti),
-> +                          TYPE_STM32F4XX_EXTI);
-> +}
-> +
-> +static void stm32f405_soc_realize(DeviceState *dev_soc, Error **errp)
-> +{
-> +    STM32F405State *s = STM32F405_SOC(dev_soc);
-> +    DeviceState *dev, *armv7m;
-> +    SysBusDevice *busdev;
-> +    Error *err = NULL;
-> +    int i;
-> +
-> +    MemoryRegion *system_memory = get_system_memory();
-> +    MemoryRegion *sram = g_new(MemoryRegion, 1);
-> +    MemoryRegion *flash = g_new(MemoryRegion, 1);
-> +    MemoryRegion *flash_alias = g_new(MemoryRegion, 1);
-> +
-> +    memory_region_init_ram(flash, NULL, "STM32F405.flash", FLASH_SIZE,
-> +                           &error_fatal);
-> +    memory_region_init_alias(flash_alias, NULL, "STM32F405.flash.alias",
-> +                             flash, 0, FLASH_SIZE);
-> +
-> +    memory_region_set_readonly(flash, true);
-> +    memory_region_set_readonly(flash_alias, true);
-> +
-> +    memory_region_add_subregion(system_memory, FLASH_BASE_ADDRESS, flash);
-> +    memory_region_add_subregion(system_memory, 0, flash_alias);
-> +
-> +    memory_region_init_ram(sram, NULL, "STM32F405.sram", SRAM_SIZE,
-> +                           &error_fatal);
-> +    memory_region_add_subregion(system_memory, SRAM_BASE_ADDRESS, sram);
-> +
-> +    armv7m = DEVICE(&s->armv7m);
-> +    qdev_prop_set_uint32(armv7m, "num-irq", 96);
-> +    qdev_prop_set_string(armv7m, "cpu-type", s->cpu_type);
-> +    qdev_prop_set_bit(armv7m, "enable-bitband", true);
-> +    object_property_set_link(OBJECT(&s->armv7m), OBJECT(get_system_memory()),
-> +                                     "memory", &error_abort);
-> +    object_property_set_bool(OBJECT(&s->armv7m), true, "realized", &err);
-> +    if (err != NULL) {
-> +        error_propagate(errp, err);
-> +        return;
-> +    }
-> +
-> +    /* System configuration controller */
-> +    dev = DEVICE(&s->syscfg);
-> +    object_property_set_bool(OBJECT(&s->syscfg), true, "realized", &err);
-> +    if (err != NULL) {
-> +        error_propagate(errp, err);
-> +        return;
-> +    }
-> +    busdev = SYS_BUS_DEVICE(dev);
-> +    sysbus_mmio_map(busdev, 0, SYSCFG_ADD);
-> +    sysbus_connect_irq(busdev, 0, qdev_get_gpio_in(armv7m, SYSCFG_IRQ));
-> +
-> +    /* Attach UART (uses USART registers) and USART controllers */
-> +    for (i = 0; i < STM_NUM_USARTS; i++) {
-> +        dev = DEVICE(&(s->usart[i]));
-> +        qdev_prop_set_chr(dev, "chardev", serial_hd(i));
-> +        object_property_set_bool(OBJECT(&s->usart[i]), true, "realized", &err);
-> +        if (err != NULL) {
-> +            error_propagate(errp, err);
-> +            return;
-> +        }
-> +        busdev = SYS_BUS_DEVICE(dev);
-> +        sysbus_mmio_map(busdev, 0, usart_addr[i]);
-> +        sysbus_connect_irq(busdev, 0, qdev_get_gpio_in(armv7m, usart_irq[i]));
-> +    }
-> +
-> +    /* Timer 2 to 5 */
-> +    for (i = 0; i < STM_NUM_TIMERS; i++) {
-> +        dev = DEVICE(&(s->timer[i]));
-> +        qdev_prop_set_uint64(dev, "clock-frequency", 1000000000);
-> +        object_property_set_bool(OBJECT(&s->timer[i]), true, "realized", &err);
-> +        if (err != NULL) {
-> +            error_propagate(errp, err);
-> +            return;
-> +        }
-> +        busdev = SYS_BUS_DEVICE(dev);
-> +        sysbus_mmio_map(busdev, 0, timer_addr[i]);
-> +        sysbus_connect_irq(busdev, 0, qdev_get_gpio_in(armv7m, timer_irq[i]));
-> +    }
-> +
-> +    /* ADC device, the IRQs are ORed together */
-> +    object_property_set_int(OBJECT(s->adc_irqs), STM_NUM_ADCS,
-> +                            "num-lines", &err);
-> +    object_property_set_bool(OBJECT(s->adc_irqs), true, "realized", &err);
-> +    if (err != NULL) {
-> +        error_propagate(errp, err);
-> +        return;
-> +    }
-> +    qdev_connect_gpio_out(DEVICE(s->adc_irqs), 0,
-> +                          qdev_get_gpio_in(armv7m, ADC_IRQ));
-> +
-> +    dev = DEVICE(&(s->adc[i]));
-> +    object_property_set_bool(OBJECT(&s->adc[i]), true, "realized", &err);
-> +    if (err != NULL) {
-> +        error_propagate(errp, err);
-> +        return;
-> +    }
-> +    busdev = SYS_BUS_DEVICE(dev);
-> +    sysbus_mmio_map(busdev, 0, ADC_ADDR);
-> +    sysbus_connect_irq(busdev, 0,
-> +                       qdev_get_gpio_in(DEVICE(s->adc_irqs), i));
-> +
-> +    /* SPI devices */
-> +    for (i = 0; i < STM_NUM_SPIS; i++) {
-> +        dev = DEVICE(&(s->spi[i]));
-> +        object_property_set_bool(OBJECT(&s->spi[i]), true, "realized", &err);
-> +        if (err != NULL) {
-> +            error_propagate(errp, err);
-> +            return;
-> +        }
-> +        busdev = SYS_BUS_DEVICE(dev);
-> +        sysbus_mmio_map(busdev, 0, spi_addr[i]);
-> +        sysbus_connect_irq(busdev, 0, qdev_get_gpio_in(armv7m, spi_irq[i]));
-> +    }
-> +
-> +    /* EXTI device */
-> +    dev = DEVICE(&s->exti);
-> +    object_property_set_bool(OBJECT(&s->exti), true, "realized", &err);
-> +    if (err != NULL) {
-> +        error_propagate(errp, err);
-> +        return;
-> +    }
-> +    busdev = SYS_BUS_DEVICE(dev);
-> +    sysbus_mmio_map(busdev, 0, EXTI_ADDR);
-> +    for (i = 0; i < 16; i++) {
-> +        sysbus_connect_irq(busdev, i, qdev_get_gpio_in(armv7m, exti_irq[i]));
-> +    }
-> +    for (i = 0; i < 16; i++) {
-> +        qdev_connect_gpio_out(DEVICE(&s->syscfg), i, qdev_get_gpio_in(dev, i));
-> +    }
-> +
-> +    create_unimplemented_device("timer[6]",    0x40001000, 0x400 - 1);
-
-You shouldn't need to remove the last byte...
-
-> +    create_unimplemented_device("timer[7]",    0x40001400, 0x400 - 1);
-> +    create_unimplemented_device("timer[12]",   0x40001800, 0x400 - 1);
-> +    create_unimplemented_device("timer[13]",   0x40001C00, 0x400 - 1);
-> +    create_unimplemented_device("timer[14]",   0x40002000, 0x400 - 1);
-> +    create_unimplemented_device("RTC and BKP", 0x40002800, 0x400 - 1);
-> +    create_unimplemented_device("WWDG",        0x40002C00, 0x400 - 1);
-> +    create_unimplemented_device("IWDG",        0x40003000, 0x400 - 1);
-> +    create_unimplemented_device("I2S2ext",     0x40003000, 0x400 - 1);
-> +    create_unimplemented_device("I2S3ext",     0x40004000, 0x400 - 1);
-> +    create_unimplemented_device("I2C1",        0x40005400, 0x400 - 1);
-> +    create_unimplemented_device("I2C2",        0x40005800, 0x400 - 1);
-> +    create_unimplemented_device("I2C3",        0x40005C00, 0x400 - 1);
-> +    create_unimplemented_device("CAN1",        0x40006400, 0x400 - 1);
-> +    create_unimplemented_device("CAN2",        0x40006800, 0x400 - 1);
-> +    create_unimplemented_device("PWR",         0x40007000, 0x400 - 1);
-> +    create_unimplemented_device("DAC",         0x40007400, 0x400 - 1);
-> +    create_unimplemented_device("timer[1]",    0x40010000, 0x400 - 1);
-> +    create_unimplemented_device("timer[8]",    0x40010400, 0x400 - 1);
-> +    create_unimplemented_device("SDIO",        0x40012C00, 0x400 - 1);
-> +    create_unimplemented_device("timer[9]",    0x40014000, 0x400 - 1);
-> +    create_unimplemented_device("timer[10]",   0x40014400, 0x400 - 1);
-> +    create_unimplemented_device("timer[11]",   0x40014800, 0x400 - 1);
-> +    create_unimplemented_device("GPIOA",       0x40020000, 0x400 - 1);
-> +    create_unimplemented_device("GPIOB",       0x40020400, 0x400 - 1);
-> +    create_unimplemented_device("GPIOC",       0x40020800, 0x400 - 1);
-> +    create_unimplemented_device("GPIOD",       0x40020C00, 0x400 - 1);
-> +    create_unimplemented_device("GPIOE",       0x40021000, 0x400 - 1);
-> +    create_unimplemented_device("GPIOF",       0x40021400, 0x400 - 1);
-> +    create_unimplemented_device("GPIOG",       0x40021800, 0x400 - 1);
-> +    create_unimplemented_device("GPIOH",       0x40021C00, 0x400 - 1);
-> +    create_unimplemented_device("GPIOI",       0x40022000, 0x400 - 1);
-> +    create_unimplemented_device("CRC",         0x40023000, 0x400 - 1);
-> +    create_unimplemented_device("RCC",         0x40023800, 0x400 - 1);
-> +    create_unimplemented_device("Flash Int",   0x40023C00, 0x400 - 1);
-> +    create_unimplemented_device("BKPSRAM",     0x40024000, 0x400 - 1);
-> +    create_unimplemented_device("DMA1",        0x40026000, 0x400 - 1);
-> +    create_unimplemented_device("DMA2",        0x40026400, 0x400 - 1);
-> +    create_unimplemented_device("Ethernet",    0x40028000, 0x1400 - 1);
-> +    create_unimplemented_device("USB OTG HS",  0x40040000, 0x30000 - 1);
-> +    create_unimplemented_device("USB OTG FS",  0x50000000, 0x31000 - 1);
-> +    create_unimplemented_device("DCMI",        0x50050000, 0x400 - 1);
-> +    create_unimplemented_device("RNG",         0x50060800, 0x400 - 1);
-> +}
-> +
-> +static Property stm32f405_soc_properties[] = {
-> +    DEFINE_PROP_STRING("cpu-type", STM32F405State, cpu_type),
-> +    DEFINE_PROP_END_OF_LIST(),
-> +};
-> +
-> +static void stm32f405_soc_class_init(ObjectClass *klass, void *data)
-> +{
-> +    DeviceClass *dc = DEVICE_CLASS(klass);
-> +
-> +    dc->realize = stm32f405_soc_realize;
-> +    dc->props = stm32f405_soc_properties;
-> +}
-> +
-> +static const TypeInfo stm32f405_soc_info = {
-> +    .name          = TYPE_STM32F405_SOC,
-> +    .parent        = TYPE_SYS_BUS_DEVICE,
-> +    .instance_size = sizeof(STM32F405State),
-> +    .instance_init = stm32f405_soc_initfn,
-> +    .class_init    = stm32f405_soc_class_init,
-> +};
-> +
-> +static void stm32f405_soc_types(void)
-> +{
-> +    type_register_static(&stm32f405_soc_info);
-> +}
-> +
-> +type_init(stm32f405_soc_types)
-> diff --git a/include/hw/arm/stm32f405_soc.h b/include/hw/arm/stm32f405_soc.h
-> new file mode 100644
-> index 0000000000..f0aec53d32
-> --- /dev/null
-> +++ b/include/hw/arm/stm32f405_soc.h
-> @@ -0,0 +1,70 @@
-> +/*
-> + * STM32F405 SoC
-> + *
-> + * Copyright (c) 2014 Alistair Francis <alistair@alistair23.me>
-> + *
-> + * Permission is hereby granted, free of charge, to any person obtaining a copy
-> + * of this software and associated documentation files (the "Software"), to deal
-> + * in the Software without restriction, including without limitation the rights
-> + * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-> + * copies of the Software, and to permit persons to whom the Software is
-> + * furnished to do so, subject to the following conditions:
-> + *
-> + * The above copyright notice and this permission notice shall be included in
-> + * all copies or substantial portions of the Software.
-> + *
-> + * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-> + * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-> + * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
-> + * THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-> + * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-> + * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-> + * THE SOFTWARE.
-> + */
-> +
-> +#ifndef HW_ARM_STM32F405_SOC_H
-> +#define HW_ARM_STM32F405_SOC_H
-> +
-> +#include "hw/misc/stm32f4xx_syscfg.h"
-> +#include "hw/timer/stm32f2xx_timer.h"
-> +#include "hw/char/stm32f2xx_usart.h"
-> +#include "hw/adc/stm32f2xx_adc.h"
-> +#include "hw/misc/stm32f4xx_exti.h"
-> +#include "hw/or-irq.h"
-> +#include "hw/ssi/stm32f2xx_spi.h"
-> +#include "hw/arm/armv7m.h"
-> +
-> +#define TYPE_STM32F405_SOC "stm32f405-soc"
-> +#define STM32F405_SOC(obj) \
-> +    OBJECT_CHECK(STM32F405State, (obj), TYPE_STM32F405_SOC)
-> +
-> +#define STM_NUM_USARTS 7
-> +#define STM_NUM_TIMERS 4
-> +#define STM_NUM_ADCS 6
-> +#define STM_NUM_SPIS 6
-> +
-> +#define FLASH_BASE_ADDRESS 0x08000000
-> +#define FLASH_SIZE (1024 * 1024)
-> +#define SRAM_BASE_ADDRESS 0x20000000
-> +#define SRAM_SIZE (192 * 1024)
-> +
-> +typedef struct STM32F405State {
-> +    /*< private >*/
-> +    SysBusDevice parent_obj;
-> +    /*< public >*/
-> +
-> +    char *cpu_type;
-> +
-> +    ARMv7MState armv7m;
-> +
-> +    STM32F4xxSyscfgState syscfg;
-> +    STM32F4xxExtiState exti;
-> +    STM32F2XXUsartState usart[STM_NUM_USARTS];
-> +    STM32F2XXTimerState timer[STM_NUM_TIMERS];
-> +    STM32F2XXADCState adc[STM_NUM_ADCS];
-> +    STM32F2XXSPIState spi[STM_NUM_SPIS];
-> +
-> +    qemu_or_irq *adc_irqs;
-> +} STM32F405State;
-> +
-> +#endif
+> This should probably be 512B or 4KiB (which is the smallest striped
+> unit size). Not only will this avoid sending unnecessary zeroes to the
+> backing cluster, writesame silently turns into a standard write if
+> your buffer isn't properly aligned with the min(object size, stripe
+> unit size).
 > 
+
+Okay, I'll change it on v2.
+Should we query about the "stripe_unit" size or we simply use the
+smallest allowed?
+
+> > +        ssize_t bytes;
+> > +
+> > +        buf = g_malloc(buf_size);
+> > +        /*
+> > +         * Some versions of rbd_writesame() discards writes of buffers with
+> > +         * all zeroes. In order to avoid this behaviour, we set the first byte
+> > +         * to one.
+> > +         */
+> > +        buf[0] = 1;
+> 
+> You could also use "rados_conf_set(cluster,
+> "rbd_discard_on_zeroed_write_same", "false").
+> 
+
+I tried it, but it is not supported on all versions. (eg. I have Ceph
+v12.2.11 on my Fedora 29 and it is not supported, but rbd_writesame() is
+available)
+
+Maybe we can use both: "rbd_discard_on_zeroed_write_same = false" and
+"buf[0] = 1"
+
+> > +        ret = rbd_resize(image, offset);
+> > +        if (ret < 0) {
+> > +            error_setg_errno(errp, -ret, "Failed to resize file");
+> > +            goto out;
+> > +        }
+> > +
+> > +#ifdef LIBRBD_SUPPORTS_WRITESAME
+> > +        while (offset - current_offset > buf_size) {
+> > +            /*
+> > +             * rbd_writesame() supports only request where the size of the
+> > +             * operation is multiple of buffer size and it must be less or
+> > +             * equal to INT_MAX.
+> > +             */
+> > +            bytes = MIN(offset - current_offset, INT_MAX);
+> > +            bytes -= bytes % buf_size;
+> 
+> Using the default object size of 4MiB, this write size would result in
+> up to 512 concurrent ops to the backing cluster. Perhaps the size
+> should be bounded such that only a dozen or so concurrent requests are
+> issued per write, always rounded next largest object / stripe period
+> size. librbd and the rbd CLI usually try to bound themselves to the
+> value in the "rbd_concurrent_management_ops" configuration setting
+> (currently defaults to 10).
+> 
+
+Do you suggest to use "rbd_concurrent_management_ops" to limit
+concurrent requests or use a new QEMU parameters for the RBD driver?
+
+Thanks for your comments,
+Stefano
 
