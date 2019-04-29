@@ -2,82 +2,84 @@ Return-Path: <SRS0=sEuR=S7=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-4.0 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D21C9C43219
-	for <qemu-devel@archiver.kernel.org>; Mon, 29 Apr 2019 15:10:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 473BCC43219
+	for <qemu-devel@archiver.kernel.org>; Mon, 29 Apr 2019 15:11:23 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8E5D7205ED
-	for <qemu-devel@archiver.kernel.org>; Mon, 29 Apr 2019 15:10:05 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="f7gwRO35"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8E5D7205ED
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id 0688E205ED
+	for <qemu-devel@archiver.kernel.org>; Mon, 29 Apr 2019 15:11:22 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0688E205ED
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:58958 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:59008 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hL7uu-0006sO-Rc
-	for qemu-devel@archiver.kernel.org; Mon, 29 Apr 2019 11:10:04 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:55015)
+	id 1hL7wA-0007yI-6P
+	for qemu-devel@archiver.kernel.org; Mon, 29 Apr 2019 11:11:22 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:54782)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1hL7tX-000612-SY
-	for qemu-devel@nongnu.org; Mon, 29 Apr 2019 11:08:40 -0400
+	(envelope-from <philmd@redhat.com>) id 1hL7tN-0005tL-Ob
+	for qemu-devel@nongnu.org; Mon, 29 Apr 2019 11:08:31 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1hL7tW-0007Gq-R5
-	for qemu-devel@nongnu.org; Mon, 29 Apr 2019 11:08:39 -0400
-Received: from mail-oi1-x243.google.com ([2607:f8b0:4864:20::243]:38532)
+	(envelope-from <philmd@redhat.com>) id 1hL7tM-00076a-9m
+	for qemu-devel@nongnu.org; Mon, 29 Apr 2019 11:08:29 -0400
+Received: from mail-wr1-f68.google.com ([209.85.221.68]:44213)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1hL7tW-0007GD-HY
-	for qemu-devel@nongnu.org; Mon, 29 Apr 2019 11:08:38 -0400
-Received: by mail-oi1-x243.google.com with SMTP id t70so2998782oif.5
-	for <qemu-devel@nongnu.org>; Mon, 29 Apr 2019 08:08:38 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
-	h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-	:cc; bh=oaj/Q476RPh8i4O2hmuKjzl8b61Lxp7vRWMQFhARyW4=;
-	b=f7gwRO35feKzdKG6Om0eu3dX0fCtGyOGuq16nxeo89Ov3vfdOFS+F3kd9JrquVP+M+
-	omFCsOsgDqlkLoOhEaX7P0komOmM2XinEKPhs9rfb15r0YcvpWgHBWWyKkKpQ0PLlqdt
-	RdpQGtVk3LAwQ8mjV1j9XYSPoLIlRjTh6qvmhFSVHDajvyYxr1+A1Jg0dSc4FuxAFSG3
-	PLBsKGNr9zlLqiua8WUZZjqQo9vu1x/YCcFwKhKWW345HClOChVObuJ4l03wdI75eY4x
-	QEe9yZ6r1Lwg2cjf2feo6vEUiq6VCtzIKuVtNAUmdT35nouGwiStboXre/YMR033X+c5
-	v3OQ==
+	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1hL7tM-0006Q1-0Z
+	for qemu-devel@nongnu.org; Mon, 29 Apr 2019 11:08:28 -0400
+Received: by mail-wr1-f68.google.com with SMTP id c5so16545119wrs.11
+	for <qemu-devel@nongnu.org>; Mon, 29 Apr 2019 08:07:54 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
 	d=1e100.net; s=20161025;
-	h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-	:message-id:subject:to:cc;
-	bh=oaj/Q476RPh8i4O2hmuKjzl8b61Lxp7vRWMQFhARyW4=;
-	b=B8F9pfdNgvTatAuzZPLhBksRKUiFEDEp/g8TaB0BgPY0vCEY8jSjrlzBdm33QCpcAb
-	mS4R3OgqYqGatOx3o1RMsoleMOld4SnySCseFrWaxsHiPNL5Un7Mx0jL595N4w84ZWbC
-	t2FDWSvORQnpqK4DZFVVuEfmefJ6sQlFK9nkZYBcMT+zEvZF4o4U/2/cKNJHRHTL0lh8
-	1h/GPgo1odWbLlWGpwy4gddfq12PJokvzsERgzJlxr7sMuyDjE7dpQfZhiUIbPL0pyas
-	uejMW2g/y9IvmBvUUvjholCsMSE6FfaEwaU8abnq1joyttAn5+O3kh7pGGgII3W05dM0
-	FD3Q==
-X-Gm-Message-State: APjAAAUK7dAkgVC72H/ufNEwxlIO2V4y1GEAwc1ys/ZU8Y+I5rXYT86U
-	KGA/7EgeNFWBl+TMwqpYosfDd54ejLMq4SGVLeRFpQ==
-X-Google-Smtp-Source: APXvYqzI7MR0cyvHb/uKyKVGFbeeTSOzZrgSoEltY7hnZkWiesr+OC3RkxWjrK24TeniBGW9yqHeHEBEiEhkLLUcqt8=
-X-Received: by 2002:a05:6808:301:: with SMTP id
-	i1mr13252879oie.163.1556550517368; 
-	Mon, 29 Apr 2019 08:08:37 -0700 (PDT)
+	h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
+	:date:user-agent:mime-version:in-reply-to:content-language
+	:content-transfer-encoding;
+	bh=MpDgiLgJ9RRXgUs7sB2muXL9gf9ys+AyRP6KFcSBe2g=;
+	b=kLHCIdByFmmVtsLYYWaSabMcAze9VneUmhG3X3EEsMpjSwuztKOPxIktkbqa3dif2W
+	+JanifTTZY90BbTrhS6lvxrRij03SVewvexs0jNZU6yQJsF/05vwWQ2BoBVyJrrkI/wT
+	e4GOHy4ps/aPBM0lsdEysxqGy+9Jm6xtOiGu4yYUEtcEitmnvmLKMksFyum06dHMugsR
+	6mjilEOoff7hy95sez9i9LhG1yd2PJ3a1KOh4lAYGxd+WWZL4E3ZnmFB+alHdErZxeJj
+	qu5aAyHLypOplF6cbOQhuScMHA0CYCssT9MATlB4QJtvgJUSQdQ9OH4Vt1tG2nS88lEJ
+	ntMw==
+X-Gm-Message-State: APjAAAXT4QRBDVCY7wOjiW6XJR6VwVmkvNBqfu1NKyPG966yOTif/jXd
+	icGk0ke4r2vTMdx+rOYu8KU6Mg==
+X-Google-Smtp-Source: APXvYqwjTrm88f5VUi+f7MCLkauYaswQp2D7ydZ4HwTVXJDIPPRndQ17lyHzANbbwqmfVbzTqp7ETQ==
+X-Received: by 2002:adf:f749:: with SMTP id z9mr25511737wrp.218.1556550473246; 
+	Mon, 29 Apr 2019 08:07:53 -0700 (PDT)
+Received: from [192.168.1.33] (193.red-88-21-103.staticip.rima-tde.net.
+	[88.21.103.193]) by smtp.gmail.com with ESMTPSA id
+	10sm32295838wmd.23.2019.04.29.08.07.52
+	(version=TLS1_3 cipher=AEAD-AES128-GCM-SHA256 bits=128/128);
+	Mon, 29 Apr 2019 08:07:52 -0700 (PDT)
+To: Stefan Hajnoczi <stefanha@redhat.com>,
+	Peter Maydell <peter.maydell@linaro.org>
+References: <20190103144124.18917-1-stefanha@redhat.com>
+	<CAFEAcA-B_T9E3ezWFXg-wp3RotMjv3-z3qY7hSJZEoqFBqCWnQ@mail.gmail.com>
+	<62b29bc1-cc78-cd64-4377-fc4007ba7189@redhat.com>
+	<20190426091702.GA2071@stefanha-x1.localdomain>
+	<CAFEAcA8OVKO087uiNvwDGObiaxHAPYHwoXLEN1t5Y4v9B43r9A@mail.gmail.com>
+	<20190429122819.GB7587@stefanha-x1.localdomain>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Openpgp: id=89C1E78F601EE86C867495CBA2A3FD6EDEADC0DE;
+	url=http://pgp.mit.edu/pks/lookup?op=get&search=0xA2A3FD6EDEADC0DE
+Message-ID: <738394de-bd75-4ef3-10ef-de8cd07891de@redhat.com>
+Date: Mon, 29 Apr 2019 17:07:51 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+	Thunderbird/60.6.1
 MIME-Version: 1.0
-References: <20190328230404.12909-1-richard.henderson@linaro.org>
-	<20190328230404.12909-34-richard.henderson@linaro.org>
-In-Reply-To: <20190328230404.12909-34-richard.henderson@linaro.org>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Mon, 29 Apr 2019 16:08:25 +0100
-Message-ID:
- <CAFEAcA955xbF1i9E73a0GD_oJDyDbGBbLcCO+5jdUuANguR1pw@mail.gmail.com>
-To: Richard Henderson <richard.henderson@linaro.org>
+In-Reply-To: <20190429122819.GB7587@stefanha-x1.localdomain>
 Content-Type: text/plain; charset="UTF-8"
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
-	recognized.
-X-Received-From: 2607:f8b0:4864:20::243
-Subject: Re: [Qemu-devel] [PATCH for-4.1 v2 33/36] cpu: Move the softmmu tlb
- to CPUNegativeOffsetState
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+	[fuzzy]
+X-Received-From: 209.85.221.68
+Subject: Re: [Qemu-devel] [PATCH] Revert "armv7m: Guard against no -kernel
+ argument"
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -89,25 +91,60 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: QEMU Developers <qemu-devel@nongnu.org>
+Cc: Jim Mussared <jim@groklearning.com>,
+	=?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>,
+	QEMU Developers <qemu-devel@nongnu.org>,
+	Steffen Gortz <qemu.ml@steffen-goertz.de>,
+	qemu-arm <qemu-arm@nongnu.org>, Joel Stanley <joel@jms.id.au>,
+	Thomas Huth <thuth@redhat.com>, Julia Suvorova <jusual@mail.ru>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190429150825.ZOZyMRiUz_91VpbBgewHpPxsHSxGZntezwx2nb-jELU@z>
+Message-ID: <20190429150751.xw33xDiE9useM1eb-v4COYaAy6haYF_x60gIE52B1Os@z>
 
-On Thu, 28 Mar 2019 at 23:26, Richard Henderson
-<richard.henderson@linaro.org> wrote:
->
-> We have for some time had code within the tcg backends to
-> handle large positive offsets from env.  This move makes
-> sure that need not happen.  Indeed, we are able to assert
-> at build time that simple offsets suffice for all hosts.
->
-> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
-> ---
 
-Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
 
-thanks
--- PMM
+On 4/29/19 2:28 PM, Stefan Hajnoczi wrote:
+> On Fri, Apr 26, 2019 at 12:45:37PM +0100, Peter Maydell wrote:
+>> On Fri, 26 Apr 2019 at 10:17, Stefan Hajnoczi <stefanha@redhat.com> wrote:
+>>> On Thu, Apr 25, 2019 at 08:07:06PM +0200, Philippe Mathieu-Daudé wrote:
+>>> Old boards probably want to continue using -kernel.  New boards like
+>>> microbit may use just -device loader.  Perhaps there is even a group
+>>> that wants both options.
+>>>
+>>> A solution is to introduce explicit checks so that we can tell the user
+>>> the appropriate option for the machine type.  I can work on this if you
+>>> like, but probably won't be able to send a patch until Tuesday.
+>>
+>> But it's difficult to tell how to identify whether there's really
+>> any guest code there. For instance the user might want to start
+>> QEMU, connect via the gdbstub and load guest code from gdb.
+>> Or they might be using the generic-loader device. Or they might
+>> really be using -kernel but with a broken guest image which doesn't
+>> have a vector table in it, which will result in the same message.
+>> I guess you could have a heuristic for "if an M-profile CPU is in reset
+>> and the value it loads for the starting PC is zero and the gdb
+>> stub is not connected, then print a warning that the guest image
+>> is missing or there's no vector table" but I'm not a big fan of
+>> heuristics...
+> 
+> I was going to add a function to check kernel_filename and the presence
+> of -device loader.  Then each machine type init function would call the
+> function with flags indicating which modes are allowed:
+> 
+>   /* Allow both -kernel and -device loader */
+>   check_kernel_loaded(KERNEL_CMDLINE | KERNEL_LOADER);
+> 
+>   /* Allow only -kernel */
+>   check_kernel_loaded(KERNEL_CMDLINE);
+> 
+>   /* Allow only -device loader */
+>   check_kernel_loaded(KERNEL_LOADER);
+> 
+> This doesn't support the gdbstub use case you've described though.  No
+> heuristics but a bit inflexible.
+> What do you think?
+
+We can check for QEMU_OPTION_gdb/QEMU_OPTION_s, if present display
+warning, else display error? Or no warning at all...
 
