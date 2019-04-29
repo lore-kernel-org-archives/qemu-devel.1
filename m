@@ -2,75 +2,79 @@ Return-Path: <SRS0=sEuR=S7=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,USER_AGENT_NEOMUTT
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.7 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8F7CDC43219
-	for <qemu-devel@archiver.kernel.org>; Mon, 29 Apr 2019 12:48:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1B5F5C43219
+	for <qemu-devel@archiver.kernel.org>; Mon, 29 Apr 2019 12:54:57 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4A1832075E
-	for <qemu-devel@archiver.kernel.org>; Mon, 29 Apr 2019 12:48:29 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4A1832075E
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id D51C02063F
+	for <qemu-devel@archiver.kernel.org>; Mon, 29 Apr 2019 12:54:56 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=jms.id.au header.i=@jms.id.au header.b="jrCA7bbs"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D51C02063F
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=jms.id.au
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:57205 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:57276 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hL5hs-0007n4-JM
-	for qemu-devel@archiver.kernel.org; Mon, 29 Apr 2019 08:48:28 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:48489)
+	id 1hL5o7-0001Yx-Oq
+	for qemu-devel@archiver.kernel.org; Mon, 29 Apr 2019 08:54:55 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:50708)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <sgarzare@redhat.com>) id 1hL5h0-0007Sn-Cd
-	for qemu-devel@nongnu.org; Mon, 29 Apr 2019 08:47:35 -0400
+	(envelope-from <joel.stan@gmail.com>) id 1hL5nH-0001Ch-7e
+	for qemu-devel@nongnu.org; Mon, 29 Apr 2019 08:54:04 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <sgarzare@redhat.com>) id 1hL5gu-0001UV-Pg
-	for qemu-devel@nongnu.org; Mon, 29 Apr 2019 08:47:34 -0400
-Received: from mail-wr1-f65.google.com ([209.85.221.65]:42983)
+	(envelope-from <joel.stan@gmail.com>) id 1hL5nF-0005u5-Pp
+	for qemu-devel@nongnu.org; Mon, 29 Apr 2019 08:54:03 -0400
+Received: from mail-qt1-x844.google.com ([2607:f8b0:4864:20::844]:42304)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <sgarzare@redhat.com>) id 1hL5gp-0001N6-Lh
-	for qemu-devel@nongnu.org; Mon, 29 Apr 2019 08:47:26 -0400
-Received: by mail-wr1-f65.google.com with SMTP id l2so178922wrb.9
-	for <qemu-devel@nongnu.org>; Mon, 29 Apr 2019 05:47:21 -0700 (PDT)
+	(Exim 4.71) (envelope-from <joel.stan@gmail.com>)
+	id 1hL5nF-0005tg-C3; Mon, 29 Apr 2019 08:54:01 -0400
+Received: by mail-qt1-x844.google.com with SMTP id p20so11668255qtc.9;
+	Mon, 29 Apr 2019 05:54:00 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=jms.id.au; s=google;
+	h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+	:cc; bh=lB18pEzl0Tg8zg65WCwpHy2hjsy9JyOMljdQvpZbb/c=;
+	b=jrCA7bbsAL7pN2qn11KNcCfFC5kSUIyyFUFEIGjuSO/ANYSc/URbbDmvvemEJPVZF7
+	kaiuYUoMD/f8VBTyooJT1QMylzeG5w971hR9IY5CKfOeQF9rBbvyNrnEq+BHTHpIZDCZ
+	4FxRGYh/+0m/ZUGDuybf8k6HI/tT7V+Ld6Ukg=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
 	d=1e100.net; s=20161025;
-	h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-	:mime-version:content-disposition:in-reply-to:user-agent;
-	bh=HoyUcymL/tT+m1uZIFf3h/Ds8eSMaraOUR51j00DwYE=;
-	b=U26QrsfFz1VnS3Zd2CJ/gI+GY0ILdpXp70tYjMVvHfVebkKKoKdgHQrTCdVjjWIhvN
-	h0IQBdMzGemNv9FI2Sysnrxw14RVdVJhdNJbZwPDSZ67nITG7y7DCtz8JQa17Gr3r4RX
-	TIx/Z9UvsWt+f1S3GQ39vJNRbyZ0AlS5TP2eLGcWNNi7S1S52IeR5uQmgsVcm4LRCGyq
-	rj7u4I8Tan/mP4OEQBtVtJE7Aa19FtrGTDCIa5ac6fq+jD0/mp8QQ8vCmHYID8uSORUD
-	sR09jaYYW7Tq9wUJoib/SJ67NrLWNGhcV3+g6kN1U+9tESeTrUTK1yHUcAfpvsP2uXaL
-	fpbg==
-X-Gm-Message-State: APjAAAVSlYjHzu0vcFo0X/v+3+KkV1PdVtzV3KBkQ9HMpVpKGk1BxWXm
-	PgfaxlWNelgdHNMD3FYuqkABQA==
-X-Google-Smtp-Source: APXvYqz/SPIP3yswS4sJ8AlIwKERmWF16OishOxHnpSkO/YPlqdXEfd5VOGhFiEUUIhXfNeRrZbn0w==
-X-Received: by 2002:adf:8b0b:: with SMTP id n11mr2526269wra.149.1556542040539; 
-	Mon, 29 Apr 2019 05:47:20 -0700 (PDT)
-Received: from steredhat (host35-203-static.12-87-b.business.telecomitalia.it.
-	[87.12.203.35])
-	by smtp.gmail.com with ESMTPSA id f1sm2405280wrc.93.2019.04.29.05.47.19
-	(version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
-	Mon, 29 Apr 2019 05:47:19 -0700 (PDT)
-Date: Mon, 29 Apr 2019 14:47:12 +0200
-From: Stefano Garzarella <sgarzare@redhat.com>
-To: dillaman@redhat.com
-Message-ID: <20190429124712.mmxnpdkkbzhlbmxm@steredhat>
-References: <20190427113625.46594-1-sgarzare@redhat.com>
-	<CA+aFP1BtbjrzitLz7PW_b-kuYU7WSOiMs5jVfUBC=M3zEuBcew@mail.gmail.com>
+	h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+	:message-id:subject:to:cc;
+	bh=lB18pEzl0Tg8zg65WCwpHy2hjsy9JyOMljdQvpZbb/c=;
+	b=oY65irJpIB0cA1J3IPdNob/BhrX+ULRAtbqBc2WFSgpFPrVhsrr2jjKMZJnEK4R94s
+	/e46aqK5YmjklempX+YEn00DB0N+ZvIYmflYQnMHPWq6fh++IqY8GmCCX8MC8OO5o1gt
+	FSA7icsXKNmG4ED655QIQtXlhowcDvwFJktomT04xBGNYi8G3fiWxA0Nq5Vb7wxzfBqK
+	RjIWX9/FeD+zx7nfxUdEBxC8J16q5E1UblvLO1ogg4s0HGll0kGejZWFiRVWqvZnhdQU
+	lO37+BJjm+skxmjeGEhHmvUV2nH2EAl7Q2HiIF3xO6M/ZUgXuNpWfUeTCKIWfEgHIWNc
+	vClg==
+X-Gm-Message-State: APjAAAW9Ei2ckfwPfSqHDkglZK4PDesl5C74oxrSIuocsvBsMyc/J+uF
+	D8Bi6eFaHcqCyVGIR2ozHoeVCYhQdWlYc5ESjww=
+X-Google-Smtp-Source: APXvYqzEhJhjTKUMWByG/CtGyr2sIsU7aUNGY0W++RiIfDr3GdmLeSXbvwmCsngkwuGmleZExNAt5qwzA+603zeHUK4=
+X-Received: by 2002:ac8:169b:: with SMTP id r27mr34536234qtj.235.1556542439964;
+	Mon, 29 Apr 2019 05:53:59 -0700 (PDT)
 MIME-Version: 1.0
+References: <20190103144124.18917-1-stefanha@redhat.com>
+	<CAFEAcA-B_T9E3ezWFXg-wp3RotMjv3-z3qY7hSJZEoqFBqCWnQ@mail.gmail.com>
+	<62b29bc1-cc78-cd64-4377-fc4007ba7189@redhat.com>
+	<20190426091702.GA2071@stefanha-x1.localdomain>
+In-Reply-To: <20190426091702.GA2071@stefanha-x1.localdomain>
+From: Joel Stanley <joel@jms.id.au>
+Date: Mon, 29 Apr 2019 12:53:48 +0000
+Message-ID:
+ <CACPK8Xc5KgiaYCTs=8ceRu_hV=vC3M6pGV0=7jJNsbuz2a6LDA@mail.gmail.com>
+To: Stefan Hajnoczi <stefanha@redhat.com>
 Content-Type: text/plain; charset="UTF-8"
-Content-Disposition: inline
-In-Reply-To: <CA+aFP1BtbjrzitLz7PW_b-kuYU7WSOiMs5jVfUBC=M3zEuBcew@mail.gmail.com>
-User-Agent: NeoMutt/20180716
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-	[fuzzy]
-X-Received-From: 209.85.221.65
-Subject: Re: [Qemu-devel] [Qemu-block] [PATCH] block/rbd: add preallocation
- support
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+	recognized.
+X-Received-From: 2607:f8b0:4864:20::844
+Subject: Re: [Qemu-devel] [PATCH] Revert "armv7m: Guard against no -kernel
+ argument"
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -82,128 +86,42 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, Josh Durgin <jdurgin@redhat.com>,
-	qemu-block <qemu-block@nongnu.org>, Markus Armbruster <armbru@redhat.com>,
-	qemu-devel <qemu-devel@nongnu.org>, Max Reitz <mreitz@redhat.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>,
+	Jim Mussared <jim@groklearning.com>,
+	=?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>,
+	Julia Suvorova <jusual@mail.ru>, QEMU Developers <qemu-devel@nongnu.org>,
+	Steffen Gortz <qemu.ml@steffen-goertz.de>,
+	qemu-arm <qemu-arm@nongnu.org>, Thomas Huth <thuth@redhat.com>,
+	=?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190429124712.BPhPT3pA1hyMoPu0x-Yagm2JqD40vnQJyaGfc1tS5rw@z>
+Message-ID: <20190429125348.RnoY9-HEPFM0GE9b9AzKiprlF1Zcui8M1qlFburilzU@z>
 
-On Sat, Apr 27, 2019 at 08:43:26AM -0400, Jason Dillaman wrote:
-> On Sat, Apr 27, 2019 at 7:37 AM Stefano Garzarella <sgarzare@redhat.com> wrote:
-> >
-> > This patch adds the support of preallocation (off/full) for the RBD
-> > block driver.
-> > If available, we use rbd_writesame() to quickly fill the image when
-> > full preallocation is required.
-> >
-> > Signed-off-by: Stefano Garzarella <sgarzare@redhat.com>
-> > ---
-> >  block/rbd.c          | 149 ++++++++++++++++++++++++++++++++++++++-----
-> >  qapi/block-core.json |   4 +-
-> >  2 files changed, 136 insertions(+), 17 deletions(-)
-> >
-> > diff --git a/block/rbd.c b/block/rbd.c
-> > index 0c549c9935..29dd1bb040 100644
-> > --- a/block/rbd.c
-> > +++ b/block/rbd.c
-> > @@ -13,6 +13,7 @@
-> >
-> >  #include "qemu/osdep.h"
-> >
-> > +#include "qemu/units.h"
-> >  #include <rbd/librbd.h>
-> >  #include "qapi/error.h"
-> >  #include "qemu/error-report.h"
-> > @@ -331,6 +332,110 @@ static void qemu_rbd_memset(RADOSCB *rcb, int64_t offs)
-> >      }
-> >  }
-> >
-> > +static int qemu_rbd_do_truncate(rbd_image_t image, int64_t offset,
-> > +                                PreallocMode prealloc, Error **errp)
-> > +{
-> > +    uint64_t current_length;
-> > +    char *buf = NULL;
-> > +    int ret;
-> > +
-> > +    ret = rbd_get_size(image, &current_length);
-> > +    if (ret < 0) {
-> > +        error_setg_errno(errp, -ret, "Failed to get file length");
-> > +        goto out;
-> > +    }
-> > +
-> > +    if (current_length > offset && prealloc != PREALLOC_MODE_OFF) {
-> > +        error_setg(errp, "Cannot use preallocation for shrinking files");
-> > +        ret = -ENOTSUP;
-> > +        goto out;
-> > +    }
-> > +
-> > +    switch (prealloc) {
-> > +    case PREALLOC_MODE_FULL: {
-> > +        uint64_t current_offset = current_length;
-> > +        int buf_size = 64 * KiB;
-> 
-> This should probably be 512B or 4KiB (which is the smallest striped
-> unit size). Not only will this avoid sending unnecessary zeroes to the
-> backing cluster, writesame silently turns into a standard write if
-> your buffer isn't properly aligned with the min(object size, stripe
-> unit size).
-> 
+On Fri, 26 Apr 2019 at 09:17, Stefan Hajnoczi <stefanha@redhat.com> wrote:
+>
+> A user-friendly error message is needed here.  The check for -kernel was
+> too specific and is not desirable for microbit where we use -device
+> loader.
+>
+> Old boards probably want to continue using -kernel.  New boards like
+> microbit may use just -device loader.  Perhaps there is even a group
+> that wants both options.
 
-Okay, I'll change it on v2.
-Should we query about the "stripe_unit" size or we simply use the
-smallest allowed?
+FWIW, I used -kernel exclusively when working on the microbit model.
+Other users may chose to use the device loader/hex file.
 
-> > +        ssize_t bytes;
-> > +
-> > +        buf = g_malloc(buf_size);
-> > +        /*
-> > +         * Some versions of rbd_writesame() discards writes of buffers with
-> > +         * all zeroes. In order to avoid this behaviour, we set the first byte
-> > +         * to one.
-> > +         */
-> > +        buf[0] = 1;
-> 
-> You could also use "rados_conf_set(cluster,
-> "rbd_discard_on_zeroed_write_same", "false").
-> 
+I am all for usability, but getting rid of the ability to use -kernel
+on some machine types would be a step in the wrong direction.
 
-I tried it, but it is not supported on all versions. (eg. I have Ceph
-v12.2.11 on my Fedora 29 and it is not supported, but rbd_writesame() is
-available)
+Cheers,
 
-Maybe we can use both: "rbd_discard_on_zeroed_write_same = false" and
-"buf[0] = 1"
+Joel
 
-> > +        ret = rbd_resize(image, offset);
-> > +        if (ret < 0) {
-> > +            error_setg_errno(errp, -ret, "Failed to resize file");
-> > +            goto out;
-> > +        }
-> > +
-> > +#ifdef LIBRBD_SUPPORTS_WRITESAME
-> > +        while (offset - current_offset > buf_size) {
-> > +            /*
-> > +             * rbd_writesame() supports only request where the size of the
-> > +             * operation is multiple of buffer size and it must be less or
-> > +             * equal to INT_MAX.
-> > +             */
-> > +            bytes = MIN(offset - current_offset, INT_MAX);
-> > +            bytes -= bytes % buf_size;
-> 
-> Using the default object size of 4MiB, this write size would result in
-> up to 512 concurrent ops to the backing cluster. Perhaps the size
-> should be bounded such that only a dozen or so concurrent requests are
-> issued per write, always rounded next largest object / stripe period
-> size. librbd and the rbd CLI usually try to bound themselves to the
-> value in the "rbd_concurrent_management_ops" configuration setting
-> (currently defaults to 10).
-> 
-
-Do you suggest to use "rbd_concurrent_management_ops" to limit
-concurrent requests or use a new QEMU parameters for the RBD driver?
-
-Thanks for your comments,
-Stefano
+>
+> A solution is to introduce explicit checks so that we can tell the user
+> the appropriate option for the machine type.  I can work on this if you
+> like, but probably won't be able to send a patch until Tuesday.
+>
+> Stefan
 
