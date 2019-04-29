@@ -2,81 +2,76 @@ Return-Path: <SRS0=sEuR=S7=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-4.0 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,USER_AGENT_NEOMUTT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B51C6C43219
-	for <qemu-devel@archiver.kernel.org>; Mon, 29 Apr 2019 14:05:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A9135C43219
+	for <qemu-devel@archiver.kernel.org>; Mon, 29 Apr 2019 14:05:54 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7EABE215EA
-	for <qemu-devel@archiver.kernel.org>; Mon, 29 Apr 2019 14:05:19 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="H+6RLkCE"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7EABE215EA
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id 7965C21670
+	for <qemu-devel@archiver.kernel.org>; Mon, 29 Apr 2019 14:05:54 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7965C21670
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:58061 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:58098 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hL6uE-0001mB-Fu
-	for qemu-devel@archiver.kernel.org; Mon, 29 Apr 2019 10:05:18 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:39022)
+	id 1hL6un-0002GD-QS
+	for qemu-devel@archiver.kernel.org; Mon, 29 Apr 2019 10:05:53 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:39150)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1hL6t6-0001Kj-Tg
-	for qemu-devel@nongnu.org; Mon, 29 Apr 2019 10:04:09 -0400
+	(envelope-from <sgarzare@redhat.com>) id 1hL6tV-0001VK-BW
+	for qemu-devel@nongnu.org; Mon, 29 Apr 2019 10:04:34 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1hL6t4-0000LP-Ux
-	for qemu-devel@nongnu.org; Mon, 29 Apr 2019 10:04:08 -0400
-Received: from mail-ot1-x342.google.com ([2607:f8b0:4864:20::342]:45128)
+	(envelope-from <sgarzare@redhat.com>) id 1hL6tU-0000kQ-23
+	for qemu-devel@nongnu.org; Mon, 29 Apr 2019 10:04:33 -0400
+Received: from mail-wr1-f65.google.com ([209.85.221.65]:45549)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1hL6t4-0000Gd-PK
-	for qemu-devel@nongnu.org; Mon, 29 Apr 2019 10:04:06 -0400
-Received: by mail-ot1-x342.google.com with SMTP id e5so8656929otk.12
-	for <qemu-devel@nongnu.org>; Mon, 29 Apr 2019 07:04:04 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
-	h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-	:cc; bh=9gB9u4fZWMKhyWWcA+AdpSevho1krQKQMacS6plvRBw=;
-	b=H+6RLkCEU0t7nYbJ/xWmK5t0/hycr2TQrHvR49a6fBqbWyP86qTQppQHwfYwkYurce
-	kquerF7JAbBKSzwM7iCvmzsl+ijK2Qb00dt/pm8NahJ1/JkijNPASrHzwn+RC8P9HQja
-	grk0dnPQ4gHYodn5YwAmCsumJUGflO9ivM5qAfR5H7KMcSvadIvY/Ug7szT6+pF+amnV
-	J5V4zm9rqF3Dzur4/lxm84vptjqs4ASYijEsvRcnmgf/pe1GyxuFKJ4N80s7BUMGjVk9
-	5iAZrrmEQaHccNXIZbiitCDIZzWrx/ZqpOcoLLtcYHGyaF8xVGKMwzNH1zIeM38x1jOh
-	pT9Q==
+	(Exim 4.71) (envelope-from <sgarzare@redhat.com>) id 1hL6tT-0000jB-RF
+	for qemu-devel@nongnu.org; Mon, 29 Apr 2019 10:04:31 -0400
+Received: by mail-wr1-f65.google.com with SMTP id s15so16210064wra.12
+	for <qemu-devel@nongnu.org>; Mon, 29 Apr 2019 07:04:31 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
 	d=1e100.net; s=20161025;
-	h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-	:message-id:subject:to:cc;
-	bh=9gB9u4fZWMKhyWWcA+AdpSevho1krQKQMacS6plvRBw=;
-	b=mW5XZCjUPNopIpNqBe06jGJgHnrvmP75ZHXxd7UTYlXFxAufFIYW+4Eh7zNnhrFHy2
-	8Nh148QmnwuN1M69RarZZut8httOWCeICWXFvTlpr311B3aQUgRr57mlPZEa9owJQTQW
-	FDobhGhBHdrYtKSF+6SEBaNvicE267VM5mJmWUnDn5pYaW+7jufsdIbpx3qa3t+E+yJu
-	mixJcZwpgJjUetJRlwkFORNwKN4/sVRNVh9BRipRTF4bEgm42N+0PL82uv0LufGK5eTD
-	1+9Ew6VHWlnuhrfSQjEkTdpTeAAU+NVSp3FYZhiLf9hjj3iRjY/q6lR9ykb4xYvt5kr0
-	LsYQ==
-X-Gm-Message-State: APjAAAVhX7KMUAy7MOqxrIHCrBwdwTVP+ENzVqQgZ6uzFMsAd0ooxu7N
-	GcyQhh2AIZJKZlzhAuHZCDVRd+DbqbjZ4w6bMkBNNA==
-X-Google-Smtp-Source: APXvYqzlz7MbFfGip+7h1FKYjtPxbtkaxDBneoSrUYzIUGc7tila20cFPOE8yJ26eKNpEtPQAoLSaitF5uFN0eFnUI8=
-X-Received: by 2002:a9d:404:: with SMTP id 4mr36473313otc.352.1556546642727;
-	Mon, 29 Apr 2019 07:04:02 -0700 (PDT)
+	h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+	:mime-version:content-disposition:in-reply-to:user-agent;
+	bh=zUVOHjLu+1Hwep77hFuKbQlr8COu0/5kr4ihIdjSvDU=;
+	b=EZpJEONdlnPE5lSTo7i4CbV/9zULFmdpuAvTpbyYPKJWdydLBV3Z/vGj1tqzz7R8Vx
+	XzFoohxQU+GHO6reN8ZIjRIyO7A9ltXK/AGNB/7pKoIoVYAvy+gYYo6JH41GZDNlJhOM
+	8dJ5vNAHkPl1oXv2HIhGc+ElU0viZwv7QrGkG354eKYgqc2BrPZl18BjpX5juc6xh+2b
+	bdNIk/e8fPAE515w5UpG+TtYSQcWVxiqlOkxwI5hlSLhMj7Bd1SCETYU2C0LcYWnLbhF
+	d8N38wotdvrMbjBfm2tg2yUudJyMlJDH2F6Qgq3sytVNSjHQwt2sMSBNBH/z/QaPyM1r
+	5tTg==
+X-Gm-Message-State: APjAAAVxUSSIQvNdGSsNhUk1r3kHhCHvebWV5hoWyjM6L/DlgLJnCD6z
+	UJfP9UkIrtF58hS2GIHWedU92Q==
+X-Google-Smtp-Source: APXvYqy/BJkxHBf3VP7WKWuluNpSEP0unUbpOvvi3pWh03c4wPfEYBnYsU73DZhWxDDu+EVqbnHaJQ==
+X-Received: by 2002:a5d:410f:: with SMTP id l15mr14769084wrp.6.1556546670519; 
+	Mon, 29 Apr 2019 07:04:30 -0700 (PDT)
+Received: from steredhat (host35-203-static.12-87-b.business.telecomitalia.it.
+	[87.12.203.35]) by smtp.gmail.com with ESMTPSA id
+	z6sm14605061wrw.87.2019.04.29.07.04.29
+	(version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
+	Mon, 29 Apr 2019 07:04:29 -0700 (PDT)
+Date: Mon, 29 Apr 2019 16:04:27 +0200
+From: Stefano Garzarella <sgarzare@redhat.com>
+To: Kevin Wolf <kwolf@redhat.com>
+Message-ID: <20190429140427.6tfpvdzza3io46g5@steredhat>
+References: <20190411105025.97397-1-sgarzare@redhat.com>
+	<20190411105025.97397-2-sgarzare@redhat.com>
+	<20190429102510.GD8492@localhost.localdomain>
 MIME-Version: 1.0
-References: <20190328230404.12909-1-richard.henderson@linaro.org>
-	<20190328230404.12909-9-richard.henderson@linaro.org>
-In-Reply-To: <20190328230404.12909-9-richard.henderson@linaro.org>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Mon, 29 Apr 2019 15:03:51 +0100
-Message-ID:
- <CAFEAcA-ha4XBihDiYG131HVQSq8N7ZrhbsdbBAACdwYh4QA4uw@mail.gmail.com>
-To: Richard Henderson <richard.henderson@linaro.org>
 Content-Type: text/plain; charset="UTF-8"
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
-	recognized.
-X-Received-From: 2607:f8b0:4864:20::342
-Subject: Re: [Qemu-devel] [PATCH for-4.1 v2 08/36] target/alpha: Use env_cpu,
- env_archcpu
+Content-Disposition: inline
+In-Reply-To: <20190429102510.GD8492@localhost.localdomain>
+User-Agent: NeoMutt/20180716
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+	[fuzzy]
+X-Received-From: 209.85.221.65
+Subject: Re: [Qemu-devel] [PATCH RFC 1/1] block/rbd: increase dynamically
+ the image size
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -88,28 +83,90 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: QEMU Developers <qemu-devel@nongnu.org>
+Cc: Josh Durgin <jdurgin@redhat.com>, qemu-devel@nongnu.org,
+	qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190429140351.HxHlSebvleV28L1qLE9ehdHCHPpfE51WFaB08ztwhQw@z>
+Message-ID: <20190429140427.CW3zdyefF0O8og5txwWhi1JuI_Ilm6h0mten9hCa-lE@z>
 
-On Thu, 28 Mar 2019 at 23:23, Richard Henderson
-<richard.henderson@linaro.org> wrote:
->
-> With exactly one exception, most uses of alpha_env_get_cpu
-> were failures to use the more proper, ENV_GET_CPU macro,
-> now replaced by env_cpu.
->
-> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
-> ---
->  target/alpha/cpu.h          | 5 -----
->  linux-user/alpha/cpu_loop.c | 2 +-
->  target/alpha/helper.c       | 8 +++-----
->  target/alpha/sys_helper.c   | 8 ++++----
->  4 files changed, 8 insertions(+), 15 deletions(-)
-Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
+On Mon, Apr 29, 2019 at 12:25:10PM +0200, Kevin Wolf wrote:
+> Am 11.04.2019 um 12:50 hat Stefano Garzarella geschrieben:
+> > RBD APIs don't allow us to write more than the size set with rbd_create()
+> > or rbd_resize().
+> > In order to support growing images (eg. qcow2), we resize the image
+> > before RW operations that exceed the current size.
+> > 
+> > Buglink: https://bugzilla.redhat.com/show_bug.cgi?id=1171007
+> > Signed-off-by: Stefano Garzarella <sgarzare@redhat.com>
+> > ---
+> >  block/rbd.c | 25 +++++++++++++++++++++++++
+> >  1 file changed, 25 insertions(+)
+> > 
+> > diff --git a/block/rbd.c b/block/rbd.c
+> > index 0c549c9935..228658e20a 100644
+> > --- a/block/rbd.c
+> > +++ b/block/rbd.c
+> > @@ -102,6 +102,7 @@ typedef struct BDRVRBDState {
+> >      rbd_image_t image;
+> >      char *image_name;
+> >      char *snap;
+> > +    uint64_t image_size;
+> >  } BDRVRBDState;
+> 
+> Can't we use bs->total_sectors instead of adding a new image_size field?
 
-thanks
--- PMM
+I'm not sure we can use bs->total_sectors. IIUC, for example, it doesn't
+take care of bytes used by QCOW2 metadata.
+
+> 
+> >  static int qemu_rbd_connect(rados_t *cluster, rados_ioctx_t *io_ctx,
+> > @@ -777,6 +778,14 @@ static int qemu_rbd_open(BlockDriverState *bs, QDict *options, int flags,
+> >          goto failed_open;
+> >      }
+> >  
+> > +    r = rbd_get_size(s->image, &s->image_size);
+> > +    if (r < 0) {
+> > +        error_setg_errno(errp, -r, "error reading image size from %s",
+> > +                         s->image_name);
+> > +        rbd_close(s->image);
+> > +        goto failed_open;
+> > +    }
+> > +
+> >      /* If we are using an rbd snapshot, we must be r/o, otherwise
+> >       * leave as-is */
+> >      if (s->snap != NULL) {
+> > @@ -921,6 +930,20 @@ static BlockAIOCB *rbd_start_aio(BlockDriverState *bs,
+> >          rcb->buf = acb->bounce;
+> >      }
+> >  
+> > +    /*
+> > +     * RBD APIs don't allow us to write more than actual size, so in order
+> > +     * to support growing images, we resize the image before RW operations
+> > +     * that exceed the current size.
+> > +     */
+> > +    if (s->image_size < off + size) {
+> > +        r = rbd_resize(s->image, off + size);
+> > +        if (r < 0) {
+> > +            goto failed;
+> > +        }
+> > +
+> > +        s->image_size = off + size;
+> > +    }
+> 
+> This doesn't check the request type, so it's actually not limited to RW
+> operations, but even reads will try to resize the image. This is at
+> least surprising. For regular files, file-posix extends the file for
+> write requests, but for reads it returns a zeroed buffer without
+> actually changing the file size.
+
+Yes, I'll change the behaviour in the v2.
+
+I did some tries (i.e. using qemu-io and reading more than bytes used) and
+the RBD driver didn't receive 'read' requests that exceed the current
+size, maybe because it is managed in the QCOW2 protocol, but of course
+I'll handle also in the RBD driver.
+
+Thanks,
+Stefano
 
