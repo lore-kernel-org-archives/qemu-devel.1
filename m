@@ -2,74 +2,96 @@ Return-Path: <SRS0=sEuR=S7=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_PASS,URIBL_BLOCKED autolearn=ham
+X-Spam-Status: No, score=-0.7 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EA17BC43219
-	for <qemu-devel@archiver.kernel.org>; Mon, 29 Apr 2019 20:12:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1A087C43219
+	for <qemu-devel@archiver.kernel.org>; Mon, 29 Apr 2019 20:14:10 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id BA70D2067D
-	for <qemu-devel@archiver.kernel.org>; Mon, 29 Apr 2019 20:12:50 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BA70D2067D
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=fnordpol.de
+	by mail.kernel.org (Postfix) with ESMTPS id D467E2067D
+	for <qemu-devel@archiver.kernel.org>; Mon, 29 Apr 2019 20:14:09 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="FH3tsPSE"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D467E2067D
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:34680 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:34696 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hLCdt-0006aX-Kp
-	for qemu-devel@archiver.kernel.org; Mon, 29 Apr 2019 16:12:49 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:44375)
+	id 1hLCfB-0007ON-2b
+	for qemu-devel@archiver.kernel.org; Mon, 29 Apr 2019 16:14:09 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:44931)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1hLCcG-0005kG-O7
-	for qemu-devel@nongnu.org; Mon, 29 Apr 2019 16:11:10 -0400
+	(envelope-from <richard.henderson@linaro.org>) id 1hLCeJ-000737-NT
+	for qemu-devel@nongnu.org; Mon, 29 Apr 2019 16:13:16 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1hLCcF-0006Qk-D4
-	for qemu-devel@nongnu.org; Mon, 29 Apr 2019 16:11:08 -0400
-Received: from indium.canonical.com ([91.189.90.7]:50754)
+	(envelope-from <richard.henderson@linaro.org>) id 1hLCeG-000054-Bk
+	for qemu-devel@nongnu.org; Mon, 29 Apr 2019 16:13:13 -0400
+Received: from mail-pf1-x444.google.com ([2607:f8b0:4864:20::444]:34155)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1hLCcF-0006Ni-6S
-	for qemu-devel@nongnu.org; Mon, 29 Apr 2019 16:11:07 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1hLCcD-0007KN-GX
-	for <qemu-devel@nongnu.org>; Mon, 29 Apr 2019 20:11:05 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 63FC42E80CB
-	for <qemu-devel@nongnu.org>; Mon, 29 Apr 2019 20:11:05 +0000 (UTC)
+	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+	id 1hLCeC-0008Tt-VU
+	for qemu-devel@nongnu.org; Mon, 29 Apr 2019 16:13:10 -0400
+Received: by mail-pf1-x444.google.com with SMTP id b3so5888460pfd.1
+	for <qemu-devel@nongnu.org>; Mon, 29 Apr 2019 13:13:07 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+	h=subject:to:cc:references:from:openpgp:message-id:date:user-agent
+	:mime-version:in-reply-to:content-language:content-transfer-encoding;
+	bh=agP0JAe/1SalvrM8Hz9cA86krK6jtIPxmLJeNcu7hUk=;
+	b=FH3tsPSEQG5to1PlwMI1QS9s1CXqyYPE6D+WeCdUwVqFYQDRGF8cTG6NrW8WjcVLRK
+	tuF7yUKzZqJcve84S9dn1VRs42MMERgDzLFwsXmaZPaGfM0XAqG1GstFNxNLv3IgoebT
+	WWBm85iGYbxC0HHAMzh6hsiA05LCyZoaUF86/tbwzgGyHNo8FNcg57cS3sT+mxtv3Bku
+	Td+agq9tK1FJEIZq1tUY3T8LQQwaoeQc9UqeZIiSvLXChraD/oBGymPEnJ8foXwtfs4n
+	fKxiwYLEobbQVTzUhIquHYfYQm95N9QM3HnY/6j7IRzerk7NtQWuVLmFvbXJY/3CJU21
+	/soQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=1e100.net; s=20161025;
+	h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
+	:date:user-agent:mime-version:in-reply-to:content-language
+	:content-transfer-encoding;
+	bh=agP0JAe/1SalvrM8Hz9cA86krK6jtIPxmLJeNcu7hUk=;
+	b=ulAChGDwC+Mo18E08sNm/wXwLlc3rBHldRSgnFIL60zFxQO5tILYcynR7Z8K8sAkxz
+	6EgXDitmT6TOGpFJAuX0yi9pOkMfcm6RqQckNEW6qSncE2D20MkAVgREyRdsn3xv6iyi
+	1+7eDGDxIW1X6A2zyzYRevoo8lIT9C64XMaWP2DEIcnlUnc6IBQVwqvM728rxrGBU3kc
+	ETp7dT5vWUUAfcLsFz3WGuAVWA71M9qdVD9Kg6twr5kXEaaxYadCXSQho7Mi1LR0RoUS
+	+ey7M5f2vKWptLhM1A3yNWKFWqceK1JkCXScYnyH6lJxPnhgWQEAc0bnuRdmfjVx5POc
+	7vqw==
+X-Gm-Message-State: APjAAAVhOkZ+Xl4oJFZjvHrmCBbdimWncC3D4AAk82kZjKPjHVpHhBA9
+	udHqj5ODLQUZy0HxqT5qK69EzQ==
+X-Google-Smtp-Source: APXvYqw1kOOqeQdOAm73tBJLFHr0OokXjzQNUmCxMZNq/nluIrqDzvn4RiEa0e+nuCF9vf3O9Pwbfg==
+X-Received: by 2002:a62:5915:: with SMTP id n21mr10019448pfb.180.1556568784979;
+	Mon, 29 Apr 2019 13:13:04 -0700 (PDT)
+Received: from [192.168.1.11] (97-113-179-147.tukw.qwest.net. [97.113.179.147])
+	by smtp.gmail.com with ESMTPSA id
+	j22sm18538187pfi.139.2019.04.29.13.13.03
+	(version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+	Mon, 29 Apr 2019 13:13:04 -0700 (PDT)
+To: Peter Maydell <peter.maydell@linaro.org>
+References: <20190330005900.17282-1-richard.henderson@linaro.org>
+	<20190330005900.17282-3-richard.henderson@linaro.org>
+	<CAFEAcA98_q1yx==QkHO1HiJA8cJqGv8k5OrCU5W=dC3ZWNPY=w@mail.gmail.com>
+From: Richard Henderson <richard.henderson@linaro.org>
+Openpgp: preference=signencrypt
+Message-ID: <920a0801-ed1d-23e8-9975-43d4d185707e@linaro.org>
+Date: Mon, 29 Apr 2019 13:12:59 -0700
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+	Thunderbird/60.6.1
 MIME-Version: 1.0
+In-Reply-To: <CAFEAcA98_q1yx==QkHO1HiJA8cJqGv8k5OrCU5W=dC3ZWNPY=w@mail.gmail.com>
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Mon, 29 Apr 2019 19:58:21 -0000
-From: Hans <zem@fnordpol.de>
-To: qemu-devel@nongnu.org
-X-Launchpad-Notification-Type: bug
-X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
-X-Launchpad-Bug-Tags: glusterfs qemu
-X-Launchpad-Bug-Information-Type: Public
-X-Launchpad-Bug-Private: no
-X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: jnsnow zem-g
-X-Launchpad-Bug-Reporter: Hans (zem-g)
-X-Launchpad-Bug-Modifier: Hans (zem-g)
-References: <153763821634.24720.16203204034487714411.malonedeb@gac.canonical.com>
-Message-Id:
- <155656790115.14210.15040106919751685952.malone@gac.canonical.com>
-X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
-X-Launchpad-Message-For: qemu-devel-ml
-Precedence: bulk
-X-Generated-By: Launchpad (canonical.com); Revision="18928";
-	Instance="launchpad-lazr.conf"
-X-Launchpad-Hash: d3c6172d7863872f95430beba2de41723addb072
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 91.189.90.7
-Subject: [Qemu-devel] [Bug 1793904] Re: files are randomly overwritten by
- Zero Bytes
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+	recognized.
+X-Received-From: 2607:f8b0:4864:20::444
+Subject: Re: [Qemu-devel] [PATCH v4 2/4] linux-user: Set PAGE_TARGET_1 for
+ TARGET_PROT_BTI
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
+Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -78,133 +100,29 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1793904 <1793904@bugs.launchpad.net>
+Cc: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>,
+	QEMU Developers <qemu-devel@nongnu.org>,
+	Ramana Radhakrishnan <ramana.radhakrishnan@arm.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190429195821.MjuZHUpf8U8A_ACW-2ymmkHFNhvaQLz1F5Lo3XQk3Go@z>
+Message-ID: <20190429201259.ss3VUJuEUNm6ZtsWoeN4WoGjCUtfuX0A2aYSAUBaaoM@z>
 
-Please note the updates on:
+On 4/29/19 9:21 AM, Peter Maydell wrote:
+> This looks ok code-wise, but we'd need to hide it behind
+> a defaults-to-off x-something property if we wanted to
+> commit it before the kernel ABI is fixed.
 
-https://bugzilla.redhat.com/show_bug.cgi?id=3D1701736
+I'm not intending to change the user-level abi, only the
+internal abi within qemu, for handling of the elf notes.
 
-It turns out that you can reproduce the broken images on glusterfs fuse
-mounts by using:
+You think this should be done differently, so that there's
+zero possibility of a user-level setting the relevant bit?
 
-                aio=3Dnative
-                cache=3Dnone,
-                write-cache=3Don
+> Do we also need to handle this in mprotect() ?
 
-
-I have a set of vms running here on my fedora 29 desktop providing a test g=
-lusterfs and a vm to reproduce the bug, at least for the current ovirt case=
-. =
+Not until there's a kernel abi.
 
 
-** Bug watch added: Red Hat Bugzilla #1701736
-   https://bugzilla.redhat.com/show_bug.cgi?id=3D1701736
-
--- =
-
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1793904
-
-Title:
-  files are randomly overwritten by Zero Bytes
-
-Status in QEMU:
-  New
-
-Bug description:
-  Hello together,
-
-  I am currently tracking down a "Hard to reproduce" bug on my systems
-  that I first discovered during gitlab installation:
-
-  =
-
-  Here is the Text from the Gitlab Bug https://gitlab.com/gitlab-org/gitlab=
--ce/issues/51023
-  -------------------------------------------------------------------------=
----------------------
-
-  Steps to reproduce
-
-  I still do not have all the steps together to reproduce, so far it is:
-  apt install gitlab-ce and
-  gitlab-rake backup:recovery
-  Then it works for some time before it fails.
-
-  What is the current bug behavior?
-
-  I have a 12 hour old Installation of gitlab ce 11.2.3-ce.0 for debian
-  stretch on a fresh debian stretch system together with our imported
-  data. However it turns out that some gitlab related files contain Zero
-  bytes instead of actual data.
-
-  root@gitlab:~# xxd -l 16 /opt/gitlab/bin/gitlab-ctl
-  00000000: 0000 0000 0000 0000 0000 0000 0000 0000  ................
-
-  This behaviour is somewhat strange because it was working for a few
-  minutes/hours. I did write a shell script to find out which files are
-  affected of this memory loss. It turns out that only files located
-  under /opt/gitlab are affected, if I rule out files like
-  /var/log/faillog and some postgresql table files.
-
-  What I find even stranger is that it does not seem to affect
-  Logfiles/databases/git_repositorys but application files, like .rb
-  scripts. and not all of them. No non gitlab package is affected.
-
-  What is the expected correct behavior?
-  Binarys and .rb files should stay as they are.
-
-  Possible fixes
-
-  I am still investigating, I hope that it is not an infrastructure problem=
- (libvirt/qemu/glusterfs) it can still be one but the point that files of /=
-opt/gitlab are affected and not any logfile and that we to not have similar=
- problems with any other system leads me to the application for now.
-  If I would have used docker the same problem might have caused a reboot o=
-f the container.
-  But for the Debian package it is a bit of work to recover. That is all a =
-workaround, however.
-  -------------------------------------------------------------------------=
---------------------
-
-  I do have found 2 more systems having the same problem with different
-  software:
-
-  root@erp:~# xxd -l 16 /usr/share/perl/5.26.2/constant.pm
-  00000000: 0000 0000 0000 0000 0000 0000 0000 0000  ................
-
-  The Filesize itself is, compared with another machine 00001660 Bytes
-  for both the corrupted and the intact file. It looks to me from the
-  outside that if some data in the qcow2 file is written too many bytes
-  get written so it sometimes overwites data of existing files located
-  right after the position in memory where the write goes to.
-
-  I would like to rule out Linux+Ext4 filesystems because I find it
-  highly unlikely that such an error keeps undiscovered in that part of
-  the environment for long. I think the same might go for qemu.
-
-  Which leaves qemu, gemu+gluster:// mount, qcow2 volumes, glusterfs,
-  network. So I am now going to check if I can find any system which
-  gets its volumes via fusermount instead of gluster:// path if the
-  error is gone there. This may take a while.
-
-  =
-
-  ----- some software versions---------------
-
-  QEMU emulator version 2.12.0 (Debian 1:2.12+dfsg-3)
-  Copyright (c) 2003-2017 Fabrice Bellard and the QEMU Project developers
-
-  libvirt-daemon-driver-storage-gluster/testing,unstable,now 4.6.0-2
-  amd64 [installed]
-
-  ii  glusterfs-client   4.1.3-1        amd64
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1793904/+subscriptions
+r~
 
