@@ -2,143 +2,86 @@ Return-Path: <SRS0=sEuR=S7=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-0.5 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS,URIBL_BLOCKED
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 67932C43219
-	for <qemu-devel@archiver.kernel.org>; Mon, 29 Apr 2019 13:47:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B135DC43219
+	for <qemu-devel@archiver.kernel.org>; Mon, 29 Apr 2019 13:48:48 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2C20B20652
-	for <qemu-devel@archiver.kernel.org>; Mon, 29 Apr 2019 13:47:16 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2C20B20652
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=de.ibm.com
+	by mail.kernel.org (Postfix) with ESMTPS id 6514020652
+	for <qemu-devel@archiver.kernel.org>; Mon, 29 Apr 2019 13:48:48 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="dCBYGsQg"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6514020652
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:57841 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:57863 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hL6cl-0001mb-Dh
-	for qemu-devel@archiver.kernel.org; Mon, 29 Apr 2019 09:47:15 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:34725)
+	id 1hL6eF-0002qz-IL
+	for qemu-devel@archiver.kernel.org; Mon, 29 Apr 2019 09:48:47 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:35052)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <borntraeger@de.ibm.com>) id 1hL6bJ-0000g2-2Q
-	for qemu-devel@nongnu.org; Mon, 29 Apr 2019 09:45:45 -0400
+	(envelope-from <liq3ea@gmail.com>) id 1hL6cU-0001tM-Fy
+	for qemu-devel@nongnu.org; Mon, 29 Apr 2019 09:47:01 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <borntraeger@de.ibm.com>) id 1hL6bH-000421-2f
-	for qemu-devel@nongnu.org; Mon, 29 Apr 2019 09:45:44 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:39510
-	helo=mx0a-001b2d01.pphosted.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <borntraeger@de.ibm.com>)
-	id 1hL6bF-00040g-8t
-	for qemu-devel@nongnu.org; Mon, 29 Apr 2019 09:45:42 -0400
-Received: from pps.filterd (m0098420.ppops.net [127.0.0.1])
-	by mx0b-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id
-	x3TDiTTN102683
-	for <qemu-devel@nongnu.org>; Mon, 29 Apr 2019 09:45:39 -0400
-Received: from e06smtp04.uk.ibm.com (e06smtp04.uk.ibm.com [195.75.94.100])
-	by mx0b-001b2d01.pphosted.com with ESMTP id 2s61tq9sh7-1
-	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Mon, 29 Apr 2019 09:45:39 -0400
-Received: from localhost
-	by e06smtp04.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
-	Only! Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <borntraeger@de.ibm.com>;
-	Mon, 29 Apr 2019 14:45:37 +0100
-Received: from b06cxnps3075.portsmouth.uk.ibm.com (9.149.109.195)
-	by e06smtp04.uk.ibm.com (192.168.101.134) with IBM ESMTP SMTP Gateway:
-	Authorized Use Only! Violators will be prosecuted; 
-	(version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
-	Mon, 29 Apr 2019 14:45:35 +0100
-Received: from d06av24.portsmouth.uk.ibm.com (d06av24.portsmouth.uk.ibm.com
-	[9.149.105.60])
-	by b06cxnps3075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with
-	ESMTP id x3TDjYGZ50593886
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256
-	verify=OK); Mon, 29 Apr 2019 13:45:34 GMT
-Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id E7FF742059;
-	Mon, 29 Apr 2019 13:45:33 +0000 (GMT)
-Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 0C01F42045;
-	Mon, 29 Apr 2019 13:45:33 +0000 (GMT)
-Received: from oc7455500831.ibm.com (unknown [9.152.96.198])
-	by d06av24.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-	Mon, 29 Apr 2019 13:45:32 +0000 (GMT)
-To: Cornelia Huck <cohuck@redhat.com>, "Jason J. Herne" <jjherne@linux.ibm.com>
-References: <1556543381-12671-1-git-send-email-jjherne@linux.ibm.com>
-	<20190429154003.7f8fc423.cohuck@redhat.com>
-From: Christian Borntraeger <borntraeger@de.ibm.com>
-Openpgp: preference=signencrypt
-Autocrypt: addr=borntraeger@de.ibm.com; prefer-encrypt=mutual; keydata=
-	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
-	syiRa+UVlsKmx1hsEg==
-Date: Mon, 29 Apr 2019 15:45:31 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
-	Thunderbird/60.6.1
+	(envelope-from <liq3ea@gmail.com>) id 1hL6cT-0004lD-2K
+	for qemu-devel@nongnu.org; Mon, 29 Apr 2019 09:46:58 -0400
+Received: from mail-ot1-x343.google.com ([2607:f8b0:4864:20::343]:33746)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <liq3ea@gmail.com>) id 1hL6cS-0004kl-Rr
+	for qemu-devel@nongnu.org; Mon, 29 Apr 2019 09:46:57 -0400
+Received: by mail-ot1-x343.google.com with SMTP id s11so4313740otp.0
+	for <qemu-devel@nongnu.org>; Mon, 29 Apr 2019 06:46:56 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+	h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+	:cc; bh=iRHVWts3e7/t109RrtYO+BrIcnmQY+KSYIcD2rPesoE=;
+	b=dCBYGsQgCaAMzJCbit3coC6Wr0Sojb7GHPVUURFMPxq4jQQ1oBYJ6/6IfzKHKZtnZU
+	ZLCQoJVfHVRZW+vjcI0ujEDrEbdg3U/ojzAVs58kzoCxwcAqAAu2VtWjG3rXhyyPn+gA
+	qIgixzYtgEJY2SLDpUZCM2v+XCRQ5zFgQlNBhBmvHS7ebwn2XNdUuv8YdeLVtnQBgniM
+	ZA1MeDTVI5IjOej5Y9DyZ8akxOreWTS5dzB9EY2vAX2eCqvEUS6kb3/A231moPvwcnCz
+	naaJnR3B5knJSI39ZapzLDlErVQbqNNKQds/7Q3OAl++JTtKrDBlIgZznSuEJ0O8sglH
+	9h0Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=1e100.net; s=20161025;
+	h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+	:message-id:subject:to:cc;
+	bh=iRHVWts3e7/t109RrtYO+BrIcnmQY+KSYIcD2rPesoE=;
+	b=BHLMa0TzS+2ZMysPxO4EQM5eC8tDXSZniE9Gd7GPCS+/ELN+EjML8JOo8qSpagM9Zh
+	49ULz2e1e0ctUWTZ6JA/lXzEpweQrO77Vuj3hydILM5GZ+QK4aVtdUQZPfW0YYaQ8Spx
+	QDsLKzP7dR1ywMd8vxcKbHqh+RucSTq+obYNw4fJOVH+cO6oCyYnkVyuPMU74zocAIVV
+	Casd1Ng8T+w9hkDdh95VKdB9BG3KTLCFczoskyfui5Z8KOU/IF9G+c3fioyZpFj5O1lP
+	X0Sqprr/dmrpZHLC0EYhP8eZs+PA4Zrf1St4vS2F/KsWTSiJ+OaOjfFgAioHhoKVxAOp
+	LoyA==
+X-Gm-Message-State: APjAAAUXjYcaEPT4JR/ZCMqJ9L0yfI89BsMS1/r8wz2Pv3BtIlZGmqoF
+	EPVBSuAMJ3g5SgxoEnlissXVO2TIcWqZX4mdvGg=
+X-Google-Smtp-Source: APXvYqwhoM5MG9MD4DLU2zLBoJP9Ajnm4ASljyyMjor2muIxDPeyhU2WwlVqy9J4LM1bm/tNZi3YngGrfKr1JBFASK4=
+X-Received: by 2002:a9d:62d2:: with SMTP id z18mr5417016otk.221.1556545615946; 
+	Mon, 29 Apr 2019 06:46:55 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20190429154003.7f8fc423.cohuck@redhat.com>
+References: <20190424140643.62457-1-liq3ea@163.com>
+	<2b623811-1be2-159c-0fa6-c548aa9eea82@redhat.com>
+	<CAKXe6SLXrthYFrQGVQNT4hK1-22wrteMNyygZgx_j=jtDfYC6g@mail.gmail.com>
+	<CAKXe6SL8XWMg1x8qztepjypgqdmXpZDj0G0AHU+BLV8OsbRjOg@mail.gmail.com>
+	<b1d3be69-a315-d990-45bc-daa02036b887@redhat.com>
+In-Reply-To: <b1d3be69-a315-d990-45bc-daa02036b887@redhat.com>
+From: Li Qiang <liq3ea@gmail.com>
+Date: Mon, 29 Apr 2019 21:46:19 +0800
+Message-ID:
+ <CAKXe6SLZbgfh63ra-vrSAZQ7fzZYOUENkXCv+7j=+tdwbNYpBA@mail.gmail.com>
+To: Thomas Huth <thuth@redhat.com>
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+	recognized.
+X-Received-From: 2607:f8b0:4864:20::343
 Content-Type: text/plain; charset="UTF-8"
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-x-cbid: 19042913-0016-0000-0000-0000027683F3
-X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
-x-cbparentid: 19042913-0017-0000-0000-000032D30A72
-Message-Id: <ef10a003-3eb8-df60-bfb1-bc99bfd6b7af@de.ibm.com>
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:, ,
-	definitions=2019-04-29_07:, , signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
-	priorityscore=1501
-	malwarescore=0 suspectscore=0 phishscore=0 bulkscore=0 spamscore=0
-	clxscore=1015 lowpriorityscore=0 mlxscore=0 impostorscore=0
-	mlxlogscore=986 adultscore=0 classifier=spam adjust=0 reason=mlx
-	scancount=1 engine=8.0.1-1810050000 definitions=main-1904290098
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic]
-X-Received-From: 148.163.158.5
-Subject: Re: [Qemu-devel] [PATCH] s390-bios: Skip bootmap signature entries
+Content-Transfer-Encoding: quoted-printable
+X-Content-Filtered-By: Mailman/MimeDel 2.1.21
+Subject: Re: [Qemu-devel] [PATCH v2 0/5] fw_cfg_test refactor and add two
+ test cases
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -150,38 +93,139 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: thuth@redhat.com, Stefan Haberland <sth@linux.vnet.ibm.com>,
-	alifm@linux.ibm.com, qemu-devel@nongnu.org,
-	Peter Oberparleiter <oberpar@linux.ibm.com>, qemu-s390x@nongnu.org
+Cc: lvivier@redhat.com, Laszlo Ersek <lersek@redhat.com>,
+	Li Qiang <liq3ea@163.com>, Qemu Developers <qemu-devel@nongnu.org>,
+	Gerd Hoffmann <kraxel@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
+	=?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190429134531.kxeomkQ0pbLNrtgn2c-3HJ3Be9bTZtdSREo3GUqeCsQ@z>
+Message-ID: <20190429134619.KQzW1zc5ce0zJlYux8e2yh9YSeiihF6Hlj0yn6EVtk0@z>
+
+Thomas Huth <thuth@redhat.com> =E4=BA=8E2019=E5=B9=B44=E6=9C=8829=E6=97=A5=
+=E5=91=A8=E4=B8=80 =E4=B8=8B=E5=8D=889:18=E5=86=99=E9=81=93=EF=BC=9A
+
+> On 29/04/2019 07.09, Li Qiang wrote:
+> >
+> >
+> > Li Qiang <liq3ea@gmail.com <mailto:liq3ea@gmail.com>> =E4=BA=8E2019=E5=
+=B9=B44=E6=9C=8825=E6=97=A5=E5=91=A8
+> > =E5=9B=9B =E4=B8=8B=E5=8D=8810:29=E5=86=99=E9=81=93=EF=BC=9A
+> >
+> >
+> >
+> >     Thomas Huth <thuth@redhat.com <mailto:thuth@redhat.com>> =E4=BA=8E2=
+019=E5=B9=B44=E6=9C=88
+> >     25=E6=97=A5=E5=91=A8=E5=9B=9B =E4=B8=8B=E5=8D=885:57=E5=86=99=E9=81=
+=93=EF=BC=9A
+> >
+> >         On 24/04/2019 16.06, Li Qiang wrote:
+> >         > In the disscuss of adding reboot timeout test case:
+> >         >
+> >
+> https://lists.gnu.org/archive/html/qemu-devel/2019-04/msg03304.html
+> >         >
+> >         > Philippe suggested we should uses the only related option for
+> one
+> >         > specific test. However currently we uses one QTestState for
+> >         all the
+> >         > test cases. In order to achieve Philippe's idea, I split the
+> >         test case
+> >         > for its own QTestState. As this patchset has changed a lot, I
+> >         don't bump
+> >         > the version.
+> >         >
+> >         > Change since v1:
+> >         > Add a patch to store the reboot_timeout as little endian
+> >         > Fix the endian issue per Thomas's review
+> >
+> >         The test still aborts on a big endian host:
+> >
+> >         $ QTEST_QEMU_BINARY=3Dx86_64-softmmu/qemu-system-x86_64
+> >         tests/fw_cfg-test
+> >         /x86_64/fw_cfg/signature: OK
+> >         /x86_64/fw_cfg/id: OK
+> >         /x86_64/fw_cfg/uuid: OK
+> >         /x86_64/fw_cfg/ram_size: OK
+> >         /x86_64/fw_cfg/nographic: OK
+> >         /x86_64/fw_cfg/nb_cpus: OK
+> >         /x86_64/fw_cfg/max_cpus: OK
+> >         /x86_64/fw_cfg/numa: OK
+> >         /x86_64/fw_cfg/boot_menu: OK
+> >         /x86_64/fw_cfg/reboot_timeout: **
+> >
+>  ERROR:/home/thuth/devel/qemu/tests/fw_cfg-test.c:190:test_fw_cfg_reboot_=
+timeout:
+> >         assertion failed (reboot_timeout =3D=3D 15): (251658240 =3D=3D =
+15)
+> >         Aborted
+> >
+> >         251658240 is 0x0F000000, i.e. a byte-swapped 0xf =3D 15 ... i.e=
+.
+> >         you still
+> >         got an endianess issue somewhere in the code.
+> >
+> >
+> >
+> >     Hmmmm,
+> >
+> >     I have thought a long time, still can't point where is wrong.
+> >
+> >     Let's from the result:
+> >     0x0f000000 in the big endian laid as this:
+> >     low ---> high
+> >     0x0f 00 00 00
+> >
+> >     As I have swapped before the compare so it is read as this:
+> >     low ---> high
+> >     00 00 00 0x0f
+> >
+> >     However from the store side:
+> >     the 15 in big endian is:
+> >     low ---> high
+> >     00 00 00 0x0f
+> >
+> >     But Before I store it, I convert it to little endian, so following
+> >     should be stored:
+> >     low ---> high
+> >     0x0f 00 00 00
+> >
+> >     Do you apply the patch 3 and recompile the qemu binary?
+> >
+> >
+> >
+> > Hello Thomas,
+> > I have tested again this and just store it as big endian(so that the
+> > store/load has different endianness),
+> > I don't see any error.
+>
+> Uh, now this is embarrassing... I just tried again to see whether I
+> could find the issue, but now the test passes without problems!
+> I guess I simply only did a "make tests/fw_cfg-test" before and forgot
+> to recompile qemu itself. Big sorry for this!
+>
+> Anyway, patch series works fine for me, so for the series:
+>
+> Tested-by: Thomas Huth <thuth@redhat.com>
+>
+>
+
+OK, Thanks Thomas.
+
+Philippe maybe you can take a look at this series and merge it.
+
+Thanks,
+Li Qiang
 
 
 
-On 29.04.19 15:40, Cornelia Huck wrote:
-> On Mon, 29 Apr 2019 09:09:41 -0400
-> "Jason J. Herne" <jjherne@linux.ibm.com> wrote:
-> 
->> Newer versions of zipl have the ability to write signature entries to the boot
->> script for secure boot. We don't yet support secure boot, but we need to skip
->> over signature entries while reading the boot script in order to maintain our
->> ability to boot guest operating systems that have a secure bootloader.
->>
->> Signed-off-by: Jason J. Herne <jjherne@linux.ibm.com>
->> Reviewed-by: Farhan Ali <alifm@linux.ibm.com>
->> ---
->>  pc-bios/s390-ccw/bootmap.c | 19 +++++++++++++++++--
->>  pc-bios/s390-ccw/bootmap.h | 10 ++++++----
->>  2 files changed, 23 insertions(+), 6 deletions(-)
-> 
-> Skipping something that we don't have support for yet, but that doesn't
-> hinder normal operation sounds reasonable; but can you point me to the
-> relevant commit implementing this in zipl or some documentation? I
-> haven't been able to find something like that in the s390-tools git
-> tree.
 
-the s390-tools update is currently in preparation, adding Stefan and Peter.
-
-
+> > Also, can we add these test sceneries(big-endian host) in our CI? so
+> > that the bot can report for every commit.
+>
+> Patchew only runs on x86, but Peter has some big endian hosts for his
+> acceptance tests - so problems should be found during PULL requests at
+> least.
+>
+>  Thomas
+>
