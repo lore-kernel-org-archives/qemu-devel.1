@@ -1,31 +1,32 @@
-Received: from eggs.gnu.org ([209.51.188.92]:34538)
+Received: from eggs.gnu.org ([209.51.188.92]:34512)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1hL9ex-000504-Az
+	(envelope-from <peter.maydell@linaro.org>) id 1hL9ew-0004yI-8s
 	for qemu-devel@nongnu.org; Mon, 29 Apr 2019 13:01:46 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1hL9eu-0006op-35
-	for qemu-devel@nongnu.org; Mon, 29 Apr 2019 13:01:42 -0400
-Received: from mail-wm1-x333.google.com ([2a00:1450:4864:20::333]:40399)
+	(envelope-from <peter.maydell@linaro.org>) id 1hL9et-0006ng-8i
+	for qemu-devel@nongnu.org; Mon, 29 Apr 2019 13:01:41 -0400
+Received: from mail-wr1-x42a.google.com ([2a00:1450:4864:20::42a]:34431)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1hL9et-0006SV-CU
-	for qemu-devel@nongnu.org; Mon, 29 Apr 2019 13:01:39 -0400
-Received: by mail-wm1-x333.google.com with SMTP id h11so153997wmb.5
-	for <qemu-devel@nongnu.org>; Mon, 29 Apr 2019 10:00:56 -0700 (PDT)
+	id 1hL9er-0006gT-Mq
+	for qemu-devel@nongnu.org; Mon, 29 Apr 2019 13:01:38 -0400
+Received: by mail-wr1-x42a.google.com with SMTP id v16so14714668wrp.1
+	for <qemu-devel@nongnu.org>; Mon, 29 Apr 2019 10:01:27 -0700 (PDT)
 Received: from orth.archaic.org.uk (orth.archaic.org.uk. [81.2.115.148])
-	by smtp.gmail.com with ESMTPSA id a13sm36896wmj.39.2019.04.29.10.00.54
+	by smtp.gmail.com with ESMTPSA id a13sm36896wmj.39.2019.04.29.10.01.25
 	for <qemu-devel@nongnu.org>
 	(version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-	Mon, 29 Apr 2019 10:00:54 -0700 (PDT)
+	Mon, 29 Apr 2019 10:01:25 -0700 (PDT)
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Mon, 29 Apr 2019 18:00:06 +0100
-Message-Id: <20190429170030.11323-19-peter.maydell@linaro.org>
+Date: Mon, 29 Apr 2019 18:00:30 +0100
+Message-Id: <20190429170030.11323-43-peter.maydell@linaro.org>
 In-Reply-To: <20190429170030.11323-1-peter.maydell@linaro.org>
 References: <20190429170030.11323-1-peter.maydell@linaro.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PULL 18/42] target/arm: Handle floating point
- registers in exception return
+Subject: [Qemu-devel] [PULL 42/42] hw/devices: Move SMSC 91C111 declaration
+ into a new header
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,199 +37,150 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-Handle floating point registers in exception return.
-This corresponds to pseudocode functions ValidateExceptionReturn(),
-ExceptionReturn(), PopStack() and ConsumeExcStackFrame().
+From: Philippe Mathieu-Daudé <philmd@redhat.com>
 
+This commit finally deletes "hw/devices.h".
+
+Reviewed-by: Markus Armbruster <armbru@redhat.com>
+Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+Message-id: 20190412165416.7977-13-philmd@redhat.com
 Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
-Message-id: 20190416125744.27770-16-peter.maydell@linaro.org
 ---
- target/arm/helper.c | 142 +++++++++++++++++++++++++++++++++++++++++++-
- 1 file changed, 141 insertions(+), 1 deletion(-)
+ include/hw/devices.h       | 11 -----------
+ include/hw/net/smc91c111.h | 19 +++++++++++++++++++
+ hw/arm/gumstix.c           |  2 +-
+ hw/arm/integratorcp.c      |  2 +-
+ hw/arm/mainstone.c         |  2 +-
+ hw/arm/realview.c          |  2 +-
+ hw/arm/versatilepb.c       |  2 +-
+ hw/net/smc91c111.c         |  2 +-
+ 8 files changed, 25 insertions(+), 17 deletions(-)
+ delete mode 100644 include/hw/devices.h
+ create mode 100644 include/hw/net/smc91c111.h
 
-diff --git a/target/arm/helper.c b/target/arm/helper.c
-index c7b1a8d231d..14604f49a4c 100644
---- a/target/arm/helper.c
-+++ b/target/arm/helper.c
-@@ -8447,6 +8447,8 @@ static void do_v7m_exception_exit(ARMCPU *cpu)
-     bool rettobase = false;
-     bool exc_secure = false;
-     bool return_to_secure;
-+    bool ftype;
-+    bool restore_s16_s31;
- 
-     /* If we're not in Handler mode then jumps to magic exception-exit
-      * addresses don't have magic behaviour. However for the v8M
-@@ -8484,6 +8486,16 @@ static void do_v7m_exception_exit(ARMCPU *cpu)
-                       excret);
-     }
- 
-+    ftype = excret & R_V7M_EXCRET_FTYPE_MASK;
+diff --git a/include/hw/devices.h b/include/hw/devices.h
+deleted file mode 100644
+index ebc45c87997..00000000000
+--- a/include/hw/devices.h
++++ /dev/null
+@@ -1,11 +0,0 @@
+-#ifndef QEMU_DEVICES_H
+-#define QEMU_DEVICES_H
+-
+-/* Devices that have nowhere better to go.  */
+-
+-#include "hw/hw.h"
+-
+-/* smc91c111.c */
+-void smc91c111_init(NICInfo *, uint32_t, qemu_irq);
+-
+-#endif
+diff --git a/include/hw/net/smc91c111.h b/include/hw/net/smc91c111.h
+new file mode 100644
+index 00000000000..a66ba4112f8
+--- /dev/null
++++ b/include/hw/net/smc91c111.h
+@@ -0,0 +1,19 @@
++/*
++ * SMSC 91C111 Ethernet interface emulation
++ *
++ * Copyright (c) 2005 CodeSourcery, LLC.
++ * Written by Paul Brook
++ *
++ * This work is licensed under the terms of the GNU GPL, version 2 or later.
++ * See the COPYING file in the top-level directory.
++ */
 +
-+    if (!arm_feature(env, ARM_FEATURE_VFP) && !ftype) {
-+        qemu_log_mask(LOG_GUEST_ERROR, "M profile: zero FTYPE in exception "
-+                      "exit PC value 0x%" PRIx32 " is UNPREDICTABLE "
-+                      "if FPU not present\n",
-+                      excret);
-+        ftype = true;
-+    }
++#ifndef HW_NET_SMC91C111_H
++#define HW_NET_SMC91C111_H
 +
-     if (arm_feature(env, ARM_FEATURE_M_SECURITY)) {
-         /* EXC_RETURN.ES validation check (R_SMFL). We must do this before
-          * we pick which FAULTMASK to clear.
-@@ -8584,6 +8596,30 @@ static void do_v7m_exception_exit(ARMCPU *cpu)
-      */
-     write_v7m_control_spsel_for_secstate(env, return_to_sp_process, exc_secure);
- 
-+    /*
-+     * Clear scratch FP values left in caller saved registers; this
-+     * must happen before any kind of tail chaining.
-+     */
-+    if ((env->v7m.fpccr[M_REG_S] & R_V7M_FPCCR_CLRONRET_MASK) &&
-+        (env->v7m.control[M_REG_S] & R_V7M_CONTROL_FPCA_MASK)) {
-+        if (env->v7m.fpccr[M_REG_S] & R_V7M_FPCCR_LSPACT_MASK) {
-+            env->v7m.sfsr |= R_V7M_SFSR_LSERR_MASK;
-+            armv7m_nvic_set_pending(env->nvic, ARMV7M_EXCP_SECURE, false);
-+            qemu_log_mask(CPU_LOG_INT, "...taking SecureFault on existing "
-+                          "stackframe: error during lazy state deactivation\n");
-+            v7m_exception_taken(cpu, excret, true, false);
-+            return;
-+        } else {
-+            /* Clear s0..s15 and FPSCR */
-+            int i;
++#include "hw/irq.h"
++#include "net/net.h"
 +
-+            for (i = 0; i < 16; i += 2) {
-+                *aa32_vfp_dreg(env, i / 2) = 0;
-+            }
-+            vfp_set_fpscr(env, 0);
-+        }
-+    }
++void smc91c111_init(NICInfo *, uint32_t, qemu_irq);
 +
-     if (sfault) {
-         env->v7m.sfsr |= R_V7M_SFSR_INVER_MASK;
-         armv7m_nvic_set_pending(env->nvic, ARMV7M_EXCP_SECURE, false);
-@@ -8745,8 +8781,105 @@ static void do_v7m_exception_exit(ARMCPU *cpu)
-             }
-         }
- 
-+        if (!ftype) {
-+            /* FP present and we need to handle it */
-+            if (!return_to_secure &&
-+                (env->v7m.fpccr[M_REG_S] & R_V7M_FPCCR_LSPACT_MASK)) {
-+                armv7m_nvic_set_pending(env->nvic, ARMV7M_EXCP_SECURE, false);
-+                env->v7m.sfsr |= R_V7M_SFSR_LSERR_MASK;
-+                qemu_log_mask(CPU_LOG_INT,
-+                              "...taking SecureFault on existing stackframe: "
-+                              "Secure LSPACT set but exception return is "
-+                              "not to secure state\n");
-+                v7m_exception_taken(cpu, excret, true, false);
-+                return;
-+            }
-+
-+            restore_s16_s31 = return_to_secure &&
-+                (env->v7m.fpccr[M_REG_S] & R_V7M_FPCCR_TS_MASK);
-+
-+            if (env->v7m.fpccr[return_to_secure] & R_V7M_FPCCR_LSPACT_MASK) {
-+                /* State in FPU is still valid, just clear LSPACT */
-+                env->v7m.fpccr[return_to_secure] &= ~R_V7M_FPCCR_LSPACT_MASK;
-+            } else {
-+                int i;
-+                uint32_t fpscr;
-+                bool cpacr_pass, nsacr_pass;
-+
-+                cpacr_pass = v7m_cpacr_pass(env, return_to_secure,
-+                                            return_to_priv);
-+                nsacr_pass = return_to_secure ||
-+                    extract32(env->v7m.nsacr, 10, 1);
-+
-+                if (!cpacr_pass) {
-+                    armv7m_nvic_set_pending(env->nvic, ARMV7M_EXCP_USAGE,
-+                                            return_to_secure);
-+                    env->v7m.cfsr[return_to_secure] |= R_V7M_CFSR_NOCP_MASK;
-+                    qemu_log_mask(CPU_LOG_INT,
-+                                  "...taking UsageFault on existing "
-+                                  "stackframe: CPACR.CP10 prevents unstacking "
-+                                  "FP regs\n");
-+                    v7m_exception_taken(cpu, excret, true, false);
-+                    return;
-+                } else if (!nsacr_pass) {
-+                    armv7m_nvic_set_pending(env->nvic, ARMV7M_EXCP_USAGE, true);
-+                    env->v7m.cfsr[M_REG_S] |= R_V7M_CFSR_INVPC_MASK;
-+                    qemu_log_mask(CPU_LOG_INT,
-+                                  "...taking Secure UsageFault on existing "
-+                                  "stackframe: NSACR.CP10 prevents unstacking "
-+                                  "FP regs\n");
-+                    v7m_exception_taken(cpu, excret, true, false);
-+                    return;
-+                }
-+
-+                for (i = 0; i < (restore_s16_s31 ? 32 : 16); i += 2) {
-+                    uint32_t slo, shi;
-+                    uint64_t dn;
-+                    uint32_t faddr = frameptr + 0x20 + 4 * i;
-+
-+                    if (i >= 16) {
-+                        faddr += 8; /* Skip the slot for the FPSCR */
-+                    }
-+
-+                    pop_ok = pop_ok &&
-+                        v7m_stack_read(cpu, &slo, faddr, mmu_idx) &&
-+                        v7m_stack_read(cpu, &shi, faddr + 4, mmu_idx);
-+
-+                    if (!pop_ok) {
-+                        break;
-+                    }
-+
-+                    dn = (uint64_t)shi << 32 | slo;
-+                    *aa32_vfp_dreg(env, i / 2) = dn;
-+                }
-+                pop_ok = pop_ok &&
-+                    v7m_stack_read(cpu, &fpscr, frameptr + 0x60, mmu_idx);
-+                if (pop_ok) {
-+                    vfp_set_fpscr(env, fpscr);
-+                }
-+                if (!pop_ok) {
-+                    /*
-+                     * These regs are 0 if security extension present;
-+                     * otherwise merely UNKNOWN. We zero always.
-+                     */
-+                    for (i = 0; i < (restore_s16_s31 ? 32 : 16); i += 2) {
-+                        *aa32_vfp_dreg(env, i / 2) = 0;
-+                    }
-+                    vfp_set_fpscr(env, 0);
-+                }
-+            }
-+        }
-+        env->v7m.control[M_REG_S] = FIELD_DP32(env->v7m.control[M_REG_S],
-+                                               V7M_CONTROL, FPCA, !ftype);
-+
-         /* Commit to consuming the stack frame */
-         frameptr += 0x20;
-+        if (!ftype) {
-+            frameptr += 0x48;
-+            if (restore_s16_s31) {
-+                frameptr += 0x40;
-+            }
-+        }
-         /* Undo stack alignment (the SPREALIGN bit indicates that the original
-          * pre-exception SP was not 8-aligned and we added a padding word to
-          * align it, so we undo this by ORing in the bit that increases it
-@@ -8759,7 +8892,14 @@ static void do_v7m_exception_exit(ARMCPU *cpu)
-         *frame_sp_p = frameptr;
-     }
-     /* This xpsr_write() will invalidate frame_sp_p as it may switch stack */
--    xpsr_write(env, xpsr, ~XPSR_SPREALIGN);
-+    xpsr_write(env, xpsr, ~(XPSR_SPREALIGN | XPSR_SFPA));
-+
-+    if (env->v7m.secure) {
-+        bool sfpa = xpsr & XPSR_SFPA;
-+
-+        env->v7m.control[M_REG_S] = FIELD_DP32(env->v7m.control[M_REG_S],
-+                                               V7M_CONTROL, SFPA, sfpa);
-+    }
- 
-     /* The restored xPSR exception field will be zero if we're
-      * resuming in Thread mode. If that doesn't match what the
++#endif
+diff --git a/hw/arm/gumstix.c b/hw/arm/gumstix.c
+index 79886ce3787..343cbfd7da8 100644
+--- a/hw/arm/gumstix.c
++++ b/hw/arm/gumstix.c
+@@ -40,7 +40,7 @@
+ #include "hw/arm/pxa.h"
+ #include "net/net.h"
+ #include "hw/block/flash.h"
+-#include "hw/devices.h"
++#include "hw/net/smc91c111.h"
+ #include "hw/boards.h"
+ #include "exec/address-spaces.h"
+ #include "sysemu/qtest.h"
+diff --git a/hw/arm/integratorcp.c b/hw/arm/integratorcp.c
+index 4eceebb9ea7..0b6f24465e4 100644
+--- a/hw/arm/integratorcp.c
++++ b/hw/arm/integratorcp.c
+@@ -12,10 +12,10 @@
+ #include "qemu-common.h"
+ #include "cpu.h"
+ #include "hw/sysbus.h"
+-#include "hw/devices.h"
+ #include "hw/boards.h"
+ #include "hw/arm/arm.h"
+ #include "hw/misc/arm_integrator_debug.h"
++#include "hw/net/smc91c111.h"
+ #include "net/net.h"
+ #include "exec/address-spaces.h"
+ #include "sysemu/sysemu.h"
+diff --git a/hw/arm/mainstone.c b/hw/arm/mainstone.c
+index e96738ad267..c1cec590379 100644
+--- a/hw/arm/mainstone.c
++++ b/hw/arm/mainstone.c
+@@ -18,7 +18,7 @@
+ #include "hw/arm/pxa.h"
+ #include "hw/arm/arm.h"
+ #include "net/net.h"
+-#include "hw/devices.h"
++#include "hw/net/smc91c111.h"
+ #include "hw/boards.h"
+ #include "hw/block/flash.h"
+ #include "hw/sysbus.h"
+diff --git a/hw/arm/realview.c b/hw/arm/realview.c
+index e9983c87639..05a244df255 100644
+--- a/hw/arm/realview.c
++++ b/hw/arm/realview.c
+@@ -14,8 +14,8 @@
+ #include "hw/sysbus.h"
+ #include "hw/arm/arm.h"
+ #include "hw/arm/primecell.h"
+-#include "hw/devices.h"
+ #include "hw/net/lan9118.h"
++#include "hw/net/smc91c111.h"
+ #include "hw/pci/pci.h"
+ #include "net/net.h"
+ #include "sysemu/sysemu.h"
+diff --git a/hw/arm/versatilepb.c b/hw/arm/versatilepb.c
+index d67181810a6..25166e15171 100644
+--- a/hw/arm/versatilepb.c
++++ b/hw/arm/versatilepb.c
+@@ -13,7 +13,7 @@
+ #include "cpu.h"
+ #include "hw/sysbus.h"
+ #include "hw/arm/arm.h"
+-#include "hw/devices.h"
++#include "hw/net/smc91c111.h"
+ #include "net/net.h"
+ #include "sysemu/sysemu.h"
+ #include "hw/pci/pci.h"
+diff --git a/hw/net/smc91c111.c b/hw/net/smc91c111.c
+index 99da2d92973..d19ea0750d3 100644
+--- a/hw/net/smc91c111.c
++++ b/hw/net/smc91c111.c
+@@ -10,7 +10,7 @@
+ #include "qemu/osdep.h"
+ #include "hw/sysbus.h"
+ #include "net/net.h"
+-#include "hw/devices.h"
++#include "hw/net/smc91c111.h"
+ #include "qemu/log.h"
+ /* For crc32 */
+ #include <zlib.h>
 -- 
 2.20.1
