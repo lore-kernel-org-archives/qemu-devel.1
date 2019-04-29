@@ -2,108 +2,85 @@ Return-Path: <SRS0=sEuR=S7=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.7 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.5 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS,URIBL_BLOCKED
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 61653C43219
-	for <qemu-devel@archiver.kernel.org>; Mon, 29 Apr 2019 04:53:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 96AE8C43219
+	for <qemu-devel@archiver.kernel.org>; Mon, 29 Apr 2019 05:19:18 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 274572087B
-	for <qemu-devel@archiver.kernel.org>; Mon, 29 Apr 2019 04:53:53 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 58B082075E
+	for <qemu-devel@archiver.kernel.org>; Mon, 29 Apr 2019 05:19:18 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="M0+5Jt8I"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 274572087B
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="X9cbeCq1"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 58B082075E
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:52027 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:52233 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hKyIa-0006eO-Ec
-	for qemu-devel@archiver.kernel.org; Mon, 29 Apr 2019 00:53:52 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:38960)
+	id 1hKyhB-0002mp-9V
+	for qemu-devel@archiver.kernel.org; Mon, 29 Apr 2019 01:19:17 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:42529)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1hKyHN-0005wU-4V
-	for qemu-devel@nongnu.org; Mon, 29 Apr 2019 00:52:38 -0400
+	(envelope-from <liq3ea@gmail.com>) id 1hKyg9-0002F6-TE
+	for qemu-devel@nongnu.org; Mon, 29 Apr 2019 01:18:15 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1hKy8E-0004Ae-J8
-	for qemu-devel@nongnu.org; Mon, 29 Apr 2019 00:43:12 -0400
-Received: from mail-eopbgr120131.outbound.protection.outlook.com
-	([40.107.12.131]:36095
-	helo=FRA01-PR2-obe.outbound.protection.outlook.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
-	id 1hKy8E-0004AA-27
-	for qemu-devel@nongnu.org; Mon, 29 Apr 2019 00:43:10 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=virtuozzo.com;
-	s=selector1;
-	h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
-	bh=iS0fGSYXDq2cz27uTYQf7O3KhpaZI0P/KP7c0wbux7M=;
-	b=M0+5Jt8ItlXFAw1CKbwWsOuO2oZB8g4+M7oTHLrSazXVsCUNlpF9q2hSamRD8jDxqopyxaVGx8rXDUXEPkJWTy/D9/ubwUUokkF7I3SAKrYgSl7fcG+KR8dphf7rCqON0yD/i5oxM7XtMYD4EkGT/yJ4YXCDZK6jfHCIHL2AUbU=
-Received: from PR2PR08MB4684.eurprd08.prod.outlook.com (52.133.109.209) by
-	PR2PR08MB4905.eurprd08.prod.outlook.com (52.133.108.11) with Microsoft
-	SMTP
-	Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
-	15.20.1835.12; Mon, 29 Apr 2019 04:43:06 +0000
-Received: from PR2PR08MB4684.eurprd08.prod.outlook.com
-	([fe80::88d7:ecf0:1120:f1a1]) by
-	PR2PR08MB4684.eurprd08.prod.outlook.com
-	([fe80::88d7:ecf0:1120:f1a1%3]) with mapi id 15.20.1835.018;
-	Mon, 29 Apr 2019 04:43:06 +0000
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-To: Yury Kotov <yury-kotov@yandex-team.ru>, Paolo Bonzini <pbonzini@redhat.com>
-Thread-Topic: [PATCH] trace: fix runstate tracing
-Thread-Index: AQHU/BnM0hnfPx/fNEyBHjg8M7/yw6ZSk9wA
-Date: Mon, 29 Apr 2019 04:43:06 +0000
-Message-ID: <79d19dc9-f312-bb19-3895-781e48e21056@virtuozzo.com>
-References: <20190426102115.30002-1-yury-kotov@yandex-team.ru>
-In-Reply-To: <20190426102115.30002-1-yury-kotov@yandex-team.ru>
-Accept-Language: ru-RU, en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-clientproxiedby: HE1PR02CA0097.eurprd02.prod.outlook.com
-	(2603:10a6:7:29::26) To PR2PR08MB4684.eurprd08.prod.outlook.com
-	(2603:10a6:101:22::17)
-authentication-results: spf=none (sender IP is )
-	smtp.mailfrom=vsementsov@virtuozzo.com; 
-x-ms-exchange-messagesentrepresentingtype: 1
-x-tagtoolbar-keys: D20190429074304026
-x-originating-ip: [185.231.240.5]
-x-ms-publictraffictype: Email
-x-ms-office365-filtering-correlation-id: 594b1232-d071-4666-81d8-08d6cc5d2bd5
-x-microsoft-antispam: BCL:0; PCL:0;
-	RULEID:(2390118)(7020095)(4652040)(8989299)(4534185)(4627221)(201703031133081)(201702281549075)(8990200)(5600141)(711020)(4605104)(2017052603328)(7193020);
-	SRVR:PR2PR08MB4905; 
-x-ms-traffictypediagnostic: PR2PR08MB4905:
-x-microsoft-antispam-prvs: <PR2PR08MB4905D30E7CA311C3BD2C6A9BC1390@PR2PR08MB4905.eurprd08.prod.outlook.com>
-x-ms-oob-tlc-oobclassifiers: OLM:3968;
-x-forefront-prvs: 0022134A87
-x-forefront-antispam-report: SFV:NSPM;
-	SFS:(10019020)(376002)(366004)(396003)(346002)(39830400003)(136003)(199004)(189003)(6436002)(6512007)(97736004)(66946007)(53936002)(26005)(66446008)(66476007)(66556008)(6506007)(186003)(229853002)(66066001)(6486002)(386003)(31696002)(4744005)(305945005)(478600001)(7736002)(64756008)(73956011)(86362001)(486006)(2616005)(11346002)(102836004)(476003)(71190400001)(71200400001)(14454004)(446003)(8936002)(81166006)(81156014)(8676002)(6116002)(99286004)(76176011)(316002)(31686004)(3846002)(110136005)(6246003)(36756003)(68736007)(256004)(14444005)(2906002)(52116002)(25786009)(4326008)(5660300002);
-	DIR:OUT; SFP:1102; SCL:1; SRVR:PR2PR08MB4905;
-	H:PR2PR08MB4684.eurprd08.prod.outlook.com; FPR:; SPF:None;
-	LANG:en; PTR:InfoNoRecords; A:1; MX:1; 
-received-spf: None (protection.outlook.com: virtuozzo.com does not designate
-	permitted sender hosts)
-x-ms-exchange-senderadcheck: 1
-x-microsoft-antispam-message-info: fYICsibXRvRxbHxjdZX8qv4rCGJTuYM+Cv8GNJ13qmtGRt3mzaMNuycDslL26HbXOTu+wnUbI2brBJT4ivAZlhr/vgaGM04TxuB8FuI5LRWEFbiD1/cSHAm48ki/DntKuXgeLM6QaOb1gG1TcGg3oQ+GyrdXUpryaomnZyAtrrbTHsbrNXbMsIOuxaJVjodgkJf/+8qxrSNeOC6A9gyx5oZLBoF3xgc6+wk/rLq+/zJIhIy4/MeFi3f0/J0EgJQMw6s/2BacQ/zFfkoORvnd1aXTCgwp7RmIJZvbKwC3miB/RAWaXGfgXu6Kby7SBk8eQ2EUxc5iMjzOLOHvy57k0x6exRLmnQlASPWHGZ8x/irhLJdtdz9OON5IfvNEeSpKFS5H8XumGjyS0MvRMVhf5p0qj0yakP0DGhs5Pk+MtRY=
-Content-Type: text/plain; charset="UTF-8"
-Content-ID: <CBBD6E7B70AB8743A18F514BBC486E35@eurprd08.prod.outlook.com>
-Content-Transfer-Encoding: base64
+	(envelope-from <liq3ea@gmail.com>) id 1hKyYj-0006vq-R4
+	for qemu-devel@nongnu.org; Mon, 29 Apr 2019 01:10:35 -0400
+Received: from mail-oi1-x241.google.com ([2607:f8b0:4864:20::241]:40593)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <liq3ea@gmail.com>) id 1hKyYj-0006sa-Je
+	for qemu-devel@nongnu.org; Mon, 29 Apr 2019 01:10:33 -0400
+Received: by mail-oi1-x241.google.com with SMTP id y64so1789756oia.7
+	for <qemu-devel@nongnu.org>; Sun, 28 Apr 2019 22:10:27 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+	h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+	:cc; bh=yG14rhIN4V/CX5S5vdSMOyanm1VEbDywtWE7TAUNMNM=;
+	b=X9cbeCq1ru06P3BPYbJwuYc5XlLyk1EN+ph3jTBrXDryXCAe1ZewQAgRqtXdJGibmy
+	gojScX9TjBv5Wjd6uEYru3bnAjK9ASVbwkYs8LReAwj5NxMD9TXmCgG9EvTAez02gUDO
+	yh0U5G+95BC5ao9TmgbPle0zLlj1Mwuelg76VHmYm5CYBNL4s5Z9/z1J3QlHaSVV5G7z
+	uErCf0QUAeDH17r7SH7PbxgT6RTh74oObH7ouo1P/8Vgi6w73EEg+hMrDNZYlRooNUsS
+	ux2fo1BQTX8ZTWS+qA4RYkbmvwJvGP9dVkK+j7KDDoeMm/Gf9POWmpup4GYCAgbzBbAx
+	Oi9A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=1e100.net; s=20161025;
+	h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+	:message-id:subject:to:cc;
+	bh=yG14rhIN4V/CX5S5vdSMOyanm1VEbDywtWE7TAUNMNM=;
+	b=aI7gJZPn8WBQNvDX2ZulYVrFdcKojZLvuSNG7sdeLlYPz2GN7lZlNHkExI19pWdHju
+	pJnKzDPgWdl/Z/xr8XAg0uP8VcCkxfk+DZn8JybqcsvQcLhdNym7K/jd/zvnwpUpS5O5
+	x4ua8X6iCV/KifxyfA6n6UmMSax7RDOMYVsS1PE5a83n5IFQvvujmc8ay++9Qk/+G9f2
+	IoTopO2W7XQUeYVSVPtVb+jikPbbNHb4xYDuWhfYLYkf3SHbR9VpCsu5EK2uGVmfuWFd
+	MNqO96EWMdvG69buVe8SYIlwV5UCw30CoWpM0vKnFrtld6zXxLtXUBfEuziSrXor26PD
+	qkDA==
+X-Gm-Message-State: APjAAAWqduJZAmNNQDgF4pMvBOUhHzLkv2opMrzONhvU9Crq29KaHG7L
+	YKMSqQWMcV/1tzfmk85eKpf5j0tSLi3g2H3AqaY=
+X-Google-Smtp-Source: APXvYqzwkHtfheB1F3sm9CzyjmRuTrVRRdyaqfPDvMkpzF7OU/T4AH3SOBavrMYkK2Q+AH6NPZy3RUqbycVackc6Gw8=
+X-Received: by 2002:aca:e18b:: with SMTP id
+	y133mr15432372oig.157.1556514626979; 
+	Sun, 28 Apr 2019 22:10:26 -0700 (PDT)
 MIME-Version: 1.0
-X-OriginatorOrg: virtuozzo.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 594b1232-d071-4666-81d8-08d6cc5d2bd5
-X-MS-Exchange-CrossTenant-originalarrivaltime: 29 Apr 2019 04:43:06.2884 (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 0bc7f26d-0264-416e-a6fc-8352af79c58f
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: PR2PR08MB4905
-X-detected-operating-system: by eggs.gnu.org: Windows 7 or 8 [fuzzy]
-X-Received-From: 40.107.12.131
-Subject: Re: [Qemu-devel] [PATCH] trace: fix runstate tracing
+References: <20190424140643.62457-1-liq3ea@163.com>
+	<2b623811-1be2-159c-0fa6-c548aa9eea82@redhat.com>
+	<CAKXe6SLXrthYFrQGVQNT4hK1-22wrteMNyygZgx_j=jtDfYC6g@mail.gmail.com>
+In-Reply-To: <CAKXe6SLXrthYFrQGVQNT4hK1-22wrteMNyygZgx_j=jtDfYC6g@mail.gmail.com>
+From: Li Qiang <liq3ea@gmail.com>
+Date: Mon, 29 Apr 2019 13:09:51 +0800
+Message-ID:
+ <CAKXe6SL8XWMg1x8qztepjypgqdmXpZDj0G0AHU+BLV8OsbRjOg@mail.gmail.com>
+To: Thomas Huth <thuth@redhat.com>
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+	recognized.
+X-Received-From: 2607:f8b0:4864:20::241
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Content-Filtered-By: Mailman/MimeDel 2.1.21
+Subject: Re: [Qemu-devel] [PATCH v2 0/5] fw_cfg_test refactor and add two
+ test cases
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -115,26 +92,120 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+Cc: lvivier@redhat.com, Laszlo Ersek <lersek@redhat.com>,
+	Li Qiang <liq3ea@163.com>, Qemu Developers <qemu-devel@nongnu.org>,
+	Gerd Hoffmann <kraxel@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
+	=?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190429044306.HjIs_nanmnFNQeu_NizPrLoFz_XczV0j1ZBh0IC2Mxw@z>
+Message-ID: <20190429050951.mWoPwoFLbkeBcwkkJx9zh5P1Fr205KkEyk1HTO-1v74@z>
 
-T29wcywgbXkgZmF1bHQsIHNvcnJ5OiggVGhhbmsgeW91IGZvciBmaXhpbmchDQoNCk1heSBiZSBh
-ZGRlZCwgdGhhdCBpdCBpcyBicm9rZW4gc2luY2UgZmYxMmUzYWUzZDAuDQoNClJldmlld2VkLWJ5
-OiBWbGFkaW1pciBTZW1lbnRzb3YtT2dpZXZza2l5IDx2c2VtZW50c292QHZpcnR1b3p6by5jb20+
-DQoNCjI2LjA0LjIwMTkgMTM6MjEsIFl1cnkgS290b3Ygd3JvdGU6DQo+IFNpZ25lZC1vZmYtYnk6
-IFl1cnkgS290b3YgPHl1cnkta290b3ZAeWFuZGV4LXRlYW0ucnU+DQo+IC0tLQ0KPiAgIHZsLmMg
-fCAyICstDQo+ICAgMSBmaWxlIGNoYW5nZWQsIDEgaW5zZXJ0aW9uKCspLCAxIGRlbGV0aW9uKC0p
-DQo+IA0KPiBkaWZmIC0tZ2l0IGEvdmwuYyBiL3ZsLmMNCj4gaW5kZXggZmY1ZGZiNmZiYy4uYWQ5
-YjE4MWU1NyAxMDA2NDQNCj4gLS0tIGEvdmwuYw0KPiArKysgYi92bC5jDQo+IEBAIC03MjUsNyAr
-NzI1LDcgQEAgdm9pZCBydW5zdGF0ZV9zZXQoUnVuU3RhdGUgbmV3X3N0YXRlKQ0KPiAgICAgICBh
-c3NlcnQobmV3X3N0YXRlIDwgUlVOX1NUQVRFX19NQVgpOw0KPiAgIA0KPiAgICAgICB0cmFjZV9y
-dW5zdGF0ZV9zZXQoY3VycmVudF9ydW5fc3RhdGUsIFJ1blN0YXRlX3N0cihjdXJyZW50X3J1bl9z
-dGF0ZSksDQo+IC0gICAgICAgICAgICAgICAgICAgICAgIG5ld19zdGF0ZSwgUnVuU3RhdGVfc3Ry
-KGN1cnJlbnRfcnVuX3N0YXRlKSk7DQo+ICsgICAgICAgICAgICAgICAgICAgICAgIG5ld19zdGF0
-ZSwgUnVuU3RhdGVfc3RyKG5ld19zdGF0ZSkpOw0KPiAgIA0KPiAgICAgICBpZiAoY3VycmVudF9y
-dW5fc3RhdGUgPT0gbmV3X3N0YXRlKSB7DQo+ICAgICAgICAgICByZXR1cm47DQo+IA0KDQoNCi0t
-IA0KQmVzdCByZWdhcmRzLA0KVmxhZGltaXINCg==
+Li Qiang <liq3ea@gmail.com> =E4=BA=8E2019=E5=B9=B44=E6=9C=8825=E6=97=A5=E5=
+=91=A8=E5=9B=9B =E4=B8=8B=E5=8D=8810:29=E5=86=99=E9=81=93=EF=BC=9A
 
+>
+>
+> Thomas Huth <thuth@redhat.com> =E4=BA=8E2019=E5=B9=B44=E6=9C=8825=E6=97=
+=A5=E5=91=A8=E5=9B=9B =E4=B8=8B=E5=8D=885:57=E5=86=99=E9=81=93=EF=BC=9A
+>
+>> On 24/04/2019 16.06, Li Qiang wrote:
+>> > In the disscuss of adding reboot timeout test case:
+>> > https://lists.gnu.org/archive/html/qemu-devel/2019-04/msg03304.html
+>> >
+>> > Philippe suggested we should uses the only related option for one
+>> > specific test. However currently we uses one QTestState for all the
+>> > test cases. In order to achieve Philippe's idea, I split the test case
+>> > for its own QTestState. As this patchset has changed a lot, I don't bu=
+mp
+>> > the version.
+>> >
+>> > Change since v1:
+>> > Add a patch to store the reboot_timeout as little endian
+>> > Fix the endian issue per Thomas's review
+>>
+>> The test still aborts on a big endian host:
+>>
+>> $ QTEST_QEMU_BINARY=3Dx86_64-softmmu/qemu-system-x86_64 tests/fw_cfg-tes=
+t
+>> /x86_64/fw_cfg/signature: OK
+>> /x86_64/fw_cfg/id: OK
+>> /x86_64/fw_cfg/uuid: OK
+>> /x86_64/fw_cfg/ram_size: OK
+>> /x86_64/fw_cfg/nographic: OK
+>> /x86_64/fw_cfg/nb_cpus: OK
+>> /x86_64/fw_cfg/max_cpus: OK
+>> /x86_64/fw_cfg/numa: OK
+>> /x86_64/fw_cfg/boot_menu: OK
+>> /x86_64/fw_cfg/reboot_timeout: **
+>>
+>> ERROR:/home/thuth/devel/qemu/tests/fw_cfg-test.c:190:test_fw_cfg_reboot_=
+timeout:
+>> assertion failed (reboot_timeout =3D=3D 15): (251658240 =3D=3D 15)
+>> Aborted
+>>
+>> 251658240 is 0x0F000000, i.e. a byte-swapped 0xf =3D 15 ... i.e. you sti=
+ll
+>> got an endianess issue somewhere in the code.
+>>
+>
+>
+> Hmmmm,
+>
+> I have thought a long time, still can't point where is wrong.
+>
+> Let's from the result:
+> 0x0f000000 in the big endian laid as this:
+> low ---> high
+> 0x0f 00 00 00
+>
+> As I have swapped before the compare so it is read as this:
+> low ---> high
+> 00 00 00 0x0f
+>
+> However from the store side:
+> the 15 in big endian is:
+> low ---> high
+> 00 00 00 0x0f
+>
+> But Before I store it, I convert it to little endian, so following should
+> be stored:
+> low ---> high
+> 0x0f 00 00 00
+>
+> Do you apply the patch 3 and recompile the qemu binary?
+>
+
+
+Hello Thomas,
+I have tested again this and just store it as big endian(so that the
+store/load has different endianness),
+I don't see any error.
+
+Also, can we add these test sceneries(big-endian host) in our CI? so that
+the bot can report for every commit.
+
+
+Thanks,
+Li Qiang
+
+
+
+If it is, I may need your help as I have no big endian host device.
+>
+> You can debug and  inspect the memory layout and point out where is wrong=
+.
+>
+> Thanks,
+> Li Qiang
+>
+>
+>
+>
+>
+>
+>
+>>
+>>  Thomas
+>>
+>
