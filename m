@@ -1,21 +1,40 @@
-Received: from eggs.gnu.org ([209.51.188.92]:34485)
+Received: from eggs.gnu.org ([209.51.188.92]:34725)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kchamart@redhat.com>) id 1hL6ag-00007B-Mt
-	for qemu-devel@nongnu.org; Mon, 29 Apr 2019 09:45:08 -0400
+	(envelope-from <borntraeger@de.ibm.com>) id 1hL6bJ-0000g2-2Q
+	for qemu-devel@nongnu.org; Mon, 29 Apr 2019 09:45:45 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kchamart@redhat.com>) id 1hL6af-0003cN-GF
-	for qemu-devel@nongnu.org; Mon, 29 Apr 2019 09:45:06 -0400
-Date: Mon, 29 Apr 2019 15:44:54 +0200
-From: Kashyap Chamarthy <kchamart@redhat.com>
-Message-ID: <20190429134454.GB4675@paraplu>
-References: <20190426221528.30293-1-jsnow@redhat.com>
-	<20190426221528.30293-3-jsnow@redhat.com>
+	(envelope-from <borntraeger@de.ibm.com>) id 1hL6bH-000421-2f
+	for qemu-devel@nongnu.org; Mon, 29 Apr 2019 09:45:44 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:39510
+	helo=mx0a-001b2d01.pphosted.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <borntraeger@de.ibm.com>)
+	id 1hL6bF-00040g-8t
+	for qemu-devel@nongnu.org; Mon, 29 Apr 2019 09:45:42 -0400
+Received: from pps.filterd (m0098420.ppops.net [127.0.0.1])
+	by mx0b-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id
+	x3TDiTTN102683
+	for <qemu-devel@nongnu.org>; Mon, 29 Apr 2019 09:45:39 -0400
+Received: from e06smtp04.uk.ibm.com (e06smtp04.uk.ibm.com [195.75.94.100])
+	by mx0b-001b2d01.pphosted.com with ESMTP id 2s61tq9sh7-1
+	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Mon, 29 Apr 2019 09:45:39 -0400
+Received: from localhost
+	by e06smtp04.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	Only! Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <borntraeger@de.ibm.com>;
+	Mon, 29 Apr 2019 14:45:37 +0100
+References: <1556543381-12671-1-git-send-email-jjherne@linux.ibm.com>
+	<20190429154003.7f8fc423.cohuck@redhat.com>
+From: Christian Borntraeger <borntraeger@de.ibm.com>
+Date: Mon, 29 Apr 2019 15:45:31 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20190426221528.30293-3-jsnow@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v3 2/2] docs/interop/bitmaps: rewrite and
- modernize doc
+In-Reply-To: <20190429154003.7f8fc423.cohuck@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Message-Id: <ef10a003-3eb8-df60-bfb1-bc99bfd6b7af@de.ibm.com>
+Subject: Re: [Qemu-devel] [PATCH] s390-bios: Skip bootmap signature entries
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,46 +43,31 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: John Snow <jsnow@redhat.com>
-Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org, vsementsov@virtuozzo.com, armbru@redhat.com, aliang@redhat.com, nsoffer@redhat.com, Fam Zheng <fam@euphon.net>, qemu-stable@nongnu.org, eblake@redhat.com
+To: Cornelia Huck <cohuck@redhat.com>, "Jason J. Herne" <jjherne@linux.ibm.com>
+Cc: qemu-devel@nongnu.org, qemu-s390x@nongnu.org, thuth@redhat.com, alifm@linux.ibm.com, Peter Oberparleiter <oberpar@linux.ibm.com>, Stefan Haberland <sth@linux.vnet.ibm.com>
 
-On Fri, Apr 26, 2019 at 06:15:28PM -0400, John Snow wrote:
-> This just about rewrites the entirety of the bitmaps.rst document to
-> make it consistent with the 4.0 release. I have added new features seen
-> in the 4.0 release, as well as tried to clarify some points that keep
-> coming up when discussing this feature both in-house and upstream.
+
+
+On 29.04.19 15:40, Cornelia Huck wrote:
+> On Mon, 29 Apr 2019 09:09:41 -0400
+> "Jason J. Herne" <jjherne@linux.ibm.com> wrote:
 > 
-> Yes, it's a lot longer, mostly due to examples. I get a bit chatty.
-> I could use a good editor to help reign in my chattiness.
+>> Newer versions of zipl have the ability to write signature entries to the boot
+>> script for secure boot. We don't yet support secure boot, but we need to skip
+>> over signature entries while reading the boot script in order to maintain our
+>> ability to boot guest operating systems that have a secure bootloader.
+>>
+>> Signed-off-by: Jason J. Herne <jjherne@linux.ibm.com>
+>> Reviewed-by: Farhan Ali <alifm@linux.ibm.com>
+>> ---
+>>  pc-bios/s390-ccw/bootmap.c | 19 +++++++++++++++++--
+>>  pc-bios/s390-ccw/bootmap.h | 10 ++++++----
+>>  2 files changed, 23 insertions(+), 6 deletions(-)
 > 
-> It does not yet cover pull backups or migration details, but I intend to
-> keep extending this document to cover those cases.
-> 
-> Please try compiling it with sphinx and look at the rendered output, I
-> don't have hosting to share my copy at present. 
+> Skipping something that we don't have support for yet, but that doesn't
+> hinder normal operation sounds reasonable; but can you point me to the
+> relevant commit implementing this in zipl or some documentation? I
+> haven't been able to find something like that in the s390-tools git
+> tree.
 
-FWIW, here's a public rendering (with the "Alabaster" Sphinx theme) with
-your v3 applied:
-
-    https://kashyapc.fedorapeople.org/QEMU-Docs-v4.0.0-143-g1cb2ca0415/_build/html/docs/interop/bitmaps.html
-
-Thanks for the overhaul.  Afraid, I've been just too swamped to be able
-to look at this in detail, much as I'd love to.  I will slowly catch up.
-
-    - - -
-
-(Note to self: send to the list the text-to-rST converted QEMU docs
-sitting locally on a Git branch.)
-
-[...]
-
-> I think this new layout reads nicer in the HTML format than the old
-> one did, at the expense of looking less readable in the source tree
-> itself (though not completely unmanagable. We did decide to convert it
-> from Markdown to ReST, after all, so I am going all-in on ReST.)
-
-[...]
-
-
--- 
-/kashyap
+the s390-tools update is currently in preparation, adding Stefan and Peter.
