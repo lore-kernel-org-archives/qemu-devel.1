@@ -2,69 +2,72 @@ Return-Path: <SRS0=sEuR=S7=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+X-Spam-Status: No, score=-13.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+	INCLUDES_PATCH,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 10C5EC43218
-	for <qemu-devel@archiver.kernel.org>; Mon, 29 Apr 2019 00:51:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 98BB1C43219
+	for <qemu-devel@archiver.kernel.org>; Mon, 29 Apr 2019 00:52:38 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C2CD620656
-	for <qemu-devel@archiver.kernel.org>; Mon, 29 Apr 2019 00:51:57 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 5C0D020652
+	for <qemu-devel@archiver.kernel.org>; Mon, 29 Apr 2019 00:52:38 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=foxmail.com header.i=@foxmail.com header.b="e2QDdsON"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C2CD620656
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=foxmail.com header.i=@foxmail.com header.b="aZIPijFX"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5C0D020652
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=foxmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:50193 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:50195 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hKuWT-0000za-3q
-	for qemu-devel@archiver.kernel.org; Sun, 28 Apr 2019 20:51:57 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:35962)
+	id 1hKuX7-0001Qc-IJ
+	for qemu-devel@archiver.kernel.org; Sun, 28 Apr 2019 20:52:37 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:33681)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <driver1998@foxmail.com>) id 1hKuUu-0007yY-Sm
-	for qemu-devel@nongnu.org; Sun, 28 Apr 2019 20:50:21 -0400
+	(envelope-from <driver1998@foxmail.com>) id 1hKuIi-0007js-BJ
+	for qemu-devel@nongnu.org; Sun, 28 Apr 2019 20:37:45 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <driver1998@foxmail.com>) id 1hKuUt-0003Q6-DS
-	for qemu-devel@nongnu.org; Sun, 28 Apr 2019 20:50:20 -0400
-Received: from smtpbg444.qq.com ([183.3.255.70]:53817 helo=qq.com)
+	(envelope-from <driver1998@foxmail.com>) id 1hKuD7-0001yY-HK
+	for qemu-devel@nongnu.org; Sun, 28 Apr 2019 20:31:59 -0400
+Received: from smtpbgbr2.qq.com ([54.207.22.56]:50330)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <driver1998@foxmail.com>)
-	id 1hKuUs-0003OX-PW
-	for qemu-devel@nongnu.org; Sun, 28 Apr 2019 20:50:19 -0400
+	id 1hKuD4-0001j8-8I
+	for qemu-devel@nongnu.org; Sun, 28 Apr 2019 20:31:56 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=foxmail.com;
-	s=s201512; t=1556499011;
-	bh=dqvlNrFHF0QzJ9M/Wv6KFcc8KkDVEUdemKH5UxHNPkg=;
+	s=s201512; t=1556497901;
+	bh=6oRnU2BcdGDtPE9iy7KsdHPQRg/PEb0sJ/jEVMvHFo0=;
 	h=From:To:Subject:Date:Message-Id;
-	b=e2QDdsONAnJccJZ45g12j7Pi/sD6r7o+aHkGNPC5ZI26h9iH1CEgU6kMLAG0oW9wi
-	bwqbPLnDyf3kCYB/WhUrAsSj43F1qrgcM29Qka7knSgaptUXBJAFZ9JjiSY+HjxqUz
-	wWr4ER2QApM8cMnCxXcM21XPESGuPkeHA/3GTZIE=
-X-QQ-mid: esmtp7t1556498004tpl5bojps
+	b=aZIPijFX0X/7CgEsEL90yjccURgwOM/+A1pKpFOr9q319um6UeNaR2VG4TdbWPxw+
+	dYERMorMMhBsKk+uElURgIbYk5NAdtZC/DuGSxeI4riCv7uVMtE0dEgords5UTBRwp
+	4rGvJPYhaXMttx3hLVOPr04myk0QH+mGYaXAFeME=
+X-QQ-mid: esmtp6t1556497899t8yxfv82s
 Received: from localhost (unknown [183.63.119.27])
 	by esmtp4.qq.com (ESMTP) with 
-	id ; Mon, 29 Apr 2019 08:33:23 +0800 (CST)
+	id ; Mon, 29 Apr 2019 08:31:39 +0800 (CST)
 X-QQ-SSF: B100000000000030F7F00F00000000O
-X-QQ-FEAT: 6ugjij1k5i9hVwgfwgz5ACZ6LpJ71RRgvOgafeJq5MsTn2uqeQQ4ZBl5/UASU
-	yF4W4AHt803cFe9BVc7RTelwTGtIVlkVsotR+mAHGUgWARUKIcWk4MuqWIs1/qUv19R6TZS
-	+APvePOfPG+n49DFmgqqPfupzk2swAWbPHkgyhUzX70wnGnZdMyiQwAbOPYJC8GXXyTyCrK
-	vJPzrUUrDIkUJb2MNbC/pjym+iUB1Wo2go7XrZlMouVkC0V9UFwc6RwwBo2ZBcxWt4Z7e95
-	lfU3usJmMk1vjnb5ZLJjqvTRfITZhh0DgU2w==
+X-QQ-FEAT: WzbxStTePJ13/a+InIYkATG89/rAYwUtroxFcvvVFG3Fyfhd+dJNlSIBtHQV4
+	bq/AIZaiNF8g0CUXwhq1Cxg2SAklzBRnAfmoe6lXpa7DhcBpHFZ2G6dez5WkjpwTeo2PBBd
+	2Son0pXglRkFQa1NVqIKwXL81JQ6M7La0leU7zKxRVaTmnZQMdauJehF0O0yHGXNP1IC43U
+	qMo71gvSkKCjzxE0MHwtmtsJSAkvtkg3EGKs2TxvZOGJpPP9kqxsDoLYTaWSQS6VgO55ECA
+	Ir2POVmy7y+ebaso1CrMi4KUp452oD+JO8UohQLcfPptsb
 X-QQ-GoodBg: 0
 From: driver1998 <driver1998@foxmail.com>
-To: qemu-devel@nongnu.org
-Date: Mon, 29 Apr 2019 00:33:22 +0000
-Message-Id: <20190429003322.22908-1-driver1998@foxmail.com>
+To: samuel.thibault@ens-lyon.org,
+	mst@redhat.com
+Date: Mon, 29 Apr 2019 00:31:12 +0000
+Message-Id: <20190429003112.22808-1-driver1998@foxmail.com>
 X-Mailer: git-send-email 2.17.1
 X-QQ-SENDSIZE: 520
-Feedback-ID: esmtp:foxmail.com:bgweb:bgweb117
+Feedback-ID: esmtp:foxmail.com:bgforeign:bgforeign4
+X-QQ-Bgrelay: 1
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x
-X-Received-From: 183.3.255.70
-Subject: [Qemu-devel] [PATCH 3/4] util/cacheinfo.c: Use uintptr_t instead of
- unsigned long in AArch64 arch_cache_info()
+X-Received-From: 54.207.22.56
+X-Mailman-Approved-At: Sun, 28 Apr 2019 20:49:05 -0400
+Subject: [Qemu-devel] [PATCH 1/4] Initial Windows on ARM (AArch64 64-Bit)
+ host support
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -76,43 +79,88 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: driver1998 <driver1998@foxmail.com>
+Cc: driver1998 <driver1998@foxmail.com>, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 Content-Type: text/plain; charset="UTF-8"
-Message-ID: <20190429003322.6tt99nhSssqvQ-TMSePE4l_6_fsRWY3dkhPaeqv28fA@z>
+Message-ID: <20190429003112.ReIIOdeNFIrm-c8FSc111Rjqkjgi25qzkbtNw1lovUY@z>
 
-Windows ARM64 uses LLP64 model, which breaks current assumptions.
+This series of patches is for initial support of Windows 10 on ARM as a QEMU host.
+Currently only TCG intepreter is working correctly, it crashes when TCG JIT is enabled.
+For now we assume it is built using the clang aarch64-w64-mingw32 toolchain, you can get a prebuilt toolchain at https://github.com/mstorsjo/llvm-mingw.
+
+QEMU_PACKED: Remove gcc_struct attribute in Windows non x86 targets
+This attribute is for x86 only, and it generates an warning on ARM64 Clang/MinGW targets.
 
 Signed-off-by: driver1998 <driver1998@foxmail.com>
 ---
- util/cacheinfo.c | 4 +++-
- 1 file changed, 3 insertions(+), 1 deletion(-)
+ contrib/libvhost-user/libvhost-user.h | 2 +-
+ include/qemu/compiler.h               | 2 +-
+ scripts/cocci-macro-file.h            | 7 ++++++-
+ slirp/src/util.h                      | 2 +-
+ 4 files changed, 9 insertions(+), 4 deletions(-)
 
-diff --git a/util/cacheinfo.c b/util/cacheinfo.c
-index 3cd080b83d..a815cb0722 100644
---- a/util/cacheinfo.c
-+++ b/util/cacheinfo.c
-@@ -107,7 +107,7 @@ static void sys_cache_info(int *isize, int *dsize)
- static void arch_cache_info(int *isize, int *dsize)
- {
-     if (*isize == 0 || *dsize == 0) {
--        unsigned long ctr;
-+        uintptr_t ctr;
+diff --git a/contrib/libvhost-user/libvhost-user.h b/contrib/libvhost-user/libvhost-user.h
+index 414ceb0a2f..78b33306e8 100644
+--- a/contrib/libvhost-user/libvhost-user.h
++++ b/contrib/libvhost-user/libvhost-user.h
+@@ -148,7 +148,7 @@ typedef struct VhostUserInflight {
+     uint16_t queue_size;
+ } VhostUserInflight;
  
-         /* The real cache geometry is in CCSIDR_EL1/CLIDR_EL1/CSSELR_EL1,
-            but (at least under Linux) these are marked protected by the
-@@ -120,6 +120,8 @@ static void arch_cache_info(int *isize, int *dsize)
-         if (*dsize == 0) {
-             *dsize = 4 << ((ctr >> 16) & 0xf);
-         }
+-#if defined(_WIN32)
++#if defined(_WIN32) && (defined(__x86_64__) || defined(__i386__))
+ # define VU_PACKED __attribute__((gcc_struct, packed))
+ #else
+ # define VU_PACKED __attribute__((packed))
+diff --git a/include/qemu/compiler.h b/include/qemu/compiler.h
+index 296b2fd572..09fc44cca4 100644
+--- a/include/qemu/compiler.h
++++ b/include/qemu/compiler.h
+@@ -28,7 +28,7 @@
+ 
+ #define QEMU_SENTINEL __attribute__((sentinel))
+ 
+-#if defined(_WIN32)
++#if defined(_WIN32) && (defined(__x86_64__) || defined(__i386__))
+ # define QEMU_PACKED __attribute__((gcc_struct, packed))
+ #else
+ # define QEMU_PACKED __attribute__((packed))
+diff --git a/scripts/cocci-macro-file.h b/scripts/cocci-macro-file.h
+index e485cdccae..c6bbc05ba3 100644
+--- a/scripts/cocci-macro-file.h
++++ b/scripts/cocci-macro-file.h
+@@ -23,7 +23,12 @@
+ #define QEMU_NORETURN __attribute__ ((__noreturn__))
+ #define QEMU_WARN_UNUSED_RESULT __attribute__((warn_unused_result))
+ #define QEMU_SENTINEL __attribute__((sentinel))
+-#define QEMU_PACKED __attribute__((gcc_struct, packed))
 +
-+        printf("%d %d\n", *isize, *dsize);
-     }
- }
++#if defined(_WIN32) && (defined(__x86_64__) || defined(__i386__))
++# define QEMU_PACKED __attribute__((gcc_struct, packed))
++#else
++# define QEMU_PACKED __attribute__((packed))
++#endif
  
+ #define cat(x,y) x ## y
+ #define cat2(x,y) cat(x,y)
+diff --git a/slirp/src/util.h b/slirp/src/util.h
+index 01f1e0e068..278828fe3f 100644
+--- a/slirp/src/util.h
++++ b/slirp/src/util.h
+@@ -43,7 +43,7 @@
+ #include <netinet/in.h>
+ #endif
+ 
+-#if defined(_WIN32)
++#if defined(_WIN32) && (defined(__x86_64__) || defined(__i386__))
+ # define SLIRP_PACKED __attribute__((gcc_struct, packed))
+ #else
+ # define SLIRP_PACKED __attribute__((packed))
 -- 
 2.17.1
+
+
 
 
