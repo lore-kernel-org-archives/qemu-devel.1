@@ -1,35 +1,26 @@
-Received: from eggs.gnu.org ([209.51.188.92]:47889)
+Received: from eggs.gnu.org ([209.51.188.92]:48291)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <wei.d.li@oracle.com>) id 1hLAW9-0007eQ-GC
-	for qemu-devel@nongnu.org; Mon, 29 Apr 2019 13:56:42 -0400
+	(envelope-from <no-reply@patchew.org>) id 1hLAY1-0000d0-Is
+	for qemu-devel@nongnu.org; Mon, 29 Apr 2019 13:58:38 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <wei.d.li@oracle.com>) id 1hLAW8-00057S-IO
-	for qemu-devel@nongnu.org; Mon, 29 Apr 2019 13:56:41 -0400
-Received: from userp2120.oracle.com ([156.151.31.85]:39338)
+	(envelope-from <no-reply@patchew.org>) id 1hLAY0-000695-G6
+	for qemu-devel@nongnu.org; Mon, 29 Apr 2019 13:58:37 -0400
+Resent-Message-Id: <E1hLAY0-000695-G6@eggs.gnu.org>
+Received: from sender-of-o53.zoho.com ([135.84.80.218]:21867)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <wei.d.li@oracle.com>) id 1hLAW8-00057C-AT
-	for qemu-devel@nongnu.org; Mon, 29 Apr 2019 13:56:40 -0400
-Date: Mon, 29 Apr 2019 10:56:31 -0700
-From: Wei Li <wei.d.li@oracle.com>
-Message-ID: <1A278B43-AA26-43B4-B6C2-17231E780BBE@oracle.com>
-References: <2D7F11D0-4A02-4A0F-961D-854240376B17@oracle.com>
-	<20190401090724.GA643@stefanha-x1.localdomain>
-	<CC372DF3-1AC6-46B5-98A5-21159497034A@oracle.com>
-	<60340EAF-4C85-4798-9999-34F1A37E2086@oracle.com>
-	<898ef1d4-bfa2-9952-8ceb-f1282b85e29c@oracle.com>
-	<20190416092042.GB32709@stefanha-x1.localdomain>
-	<8E5AF770-69ED-4D44-8A25-B51344996D9E@oracle.com>
-	<3F7E854A-3C1D-4204-8C35-893FC0614796@oracle.com>
-	<20190423120453.GF32465@stefanha-x1.localdomain>
-	<44520476-d6a8-2e3f-1602-388e2e1e874e@redhat.com>
-	<20190429134048.GH7587@stefanha-x1.localdomain>
-In-Reply-To: <20190429134048.GH7587@stefanha-x1.localdomain>
-Mime-version: 1.0
-Content-type: text/plain;
-	charset="UTF-8"
-Content-transfer-encoding: quoted-printable
-Subject: Re: [Qemu-devel] Following up questions related to QEMU and I/O
- Thread
+	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
+	id 1hLAY0-00068X-6p
+	for qemu-devel@nongnu.org; Mon, 29 Apr 2019 13:58:36 -0400
+In-Reply-To: <1556523569-44480-1-git-send-email-longpeng2@huawei.com>
+Message-ID: <155656069051.10667.7616511989657327762@c2072b67cc0c>
+Reply-To: <qemu-devel@nongnu.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+From: no-reply@patchew.org
+Date: Mon, 29 Apr 2019 10:58:12 -0700 (PDT)
+Subject: Re: [Qemu-devel] [PATCH] usb/xchi: avoid trigger assertion if guest
+ write wrong epid
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -38,45 +29,18 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefan Hajnoczi <stefanha@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
-Cc: Stefan Hajnoczi <stefanha@gmail.com>, Dongli Zhang <dongli.zhang@oracle.com>, qemu-devel@nongnu.org
+To: longpeng2@huawei.com
+Cc: fam@euphon.net, kraxel@redhat.com, arei.gonglei@huawei.com, qemu-devel@nongnu.org
 
-Thanks Stefan!
-
-Does this mean the performance could be improved via adding Batch I/O submi=
-ssion support in Guest driver side which will be able to reduce the number o=
-f virtqueue kicks?
-
-Thanks,
-Wei
-
-=EF=BB=BFOn 4/29/19, 6:40 AM, "Stefan Hajnoczi" <stefanha@redhat.com> wrote:
-
-    On Fri, Apr 26, 2019 at 10:14:16AM +0200, Paolo Bonzini wrote:
-    > On 23/04/19 14:04, Stefan Hajnoczi wrote:
-    > >> In addition, does Virtio-scsi support Batch I/O Submission feature
-    > >> which may be able to increase the IOPS via reducing the number of
-    > >> system calls?
-    > >
-    > > I don't see obvious batching support in drivers/scsi/virtio_scsi.c.
-    > > The Linux block layer supports batching but I'm not sure if the SCS=
-I
-    > > layer does.
-    >=20
-    > I think he's referring to QEMU, in which case yes, virtio-scsi does
-    > batch I/O submission.  See virtio_scsi_handle_cmd_req_prepare and
-    > virtio_scsi_handle_cmd_req_submit in hw/scsi/virtio-scsi.c, they do
-    > blk_io_plug and blk_io_unplug in order to batch I/O requests from QEM=
-U
-    > to the host kernel.
-   =20
-    This isn't fully effective since the guest driver kicks once per
-    request.  Therefore QEMU-level batching you mentioned only works if QEM=
-U
-    is slower at handling virtqueue kicks than the guest is at submitting
-    requests.
-   =20
-    I wonder if this is something that can be improved.
-   =20
-    Stefan
-   =20
+UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8xNTU2NTIzNTY5LTQ0NDgwLTEt
+Z2l0LXNlbmQtZW1haWwtbG9uZ3BlbmcyQGh1YXdlaS5jb20vCgoKCkhpLAoKVGhpcyBzZXJpZXMg
+ZmFpbGVkIHRoZSBhc2FuIGJ1aWxkIHRlc3QuIFBsZWFzZSBmaW5kIHRoZSB0ZXN0aW5nIGNvbW1h
+bmRzIGFuZAp0aGVpciBvdXRwdXQgYmVsb3cuIElmIHlvdSBoYXZlIERvY2tlciBpbnN0YWxsZWQs
+IHlvdSBjYW4gcHJvYmFibHkgcmVwcm9kdWNlIGl0CmxvY2FsbHkuCgo9PT0gVEVTVCBTQ1JJUFQg
+QkVHSU4gPT09CiMhL2Jpbi9iYXNoCnRpbWUgbWFrZSBkb2NrZXItdGVzdC1kZWJ1Z0BmZWRvcmEg
+VEFSR0VUX0xJU1Q9eDg2XzY0LXNvZnRtbXUgSj0xNCBORVRXT1JLPTEKPT09IFRFU1QgU0NSSVBU
+IEVORCA9PT0KCgoKClRoZSBmdWxsIGxvZyBpcyBhdmFpbGFibGUgYXQKaHR0cDovL3BhdGNoZXcu
+b3JnL2xvZ3MvMTU1NjUyMzU2OS00NDQ4MC0xLWdpdC1zZW5kLWVtYWlsLWxvbmdwZW5nMkBodWF3
+ZWkuY29tL3Rlc3RpbmcuYXNhbi8/dHlwZT1tZXNzYWdlLgotLS0KRW1haWwgZ2VuZXJhdGVkIGF1
+dG9tYXRpY2FsbHkgYnkgUGF0Y2hldyBbaHR0cHM6Ly9wYXRjaGV3Lm9yZy9dLgpQbGVhc2Ugc2Vu
+ZCB5b3VyIGZlZWRiYWNrIHRvIHBhdGNoZXctZGV2ZWxAcmVkaGF0LmNvbQ==
