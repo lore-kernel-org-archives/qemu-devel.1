@@ -7,72 +7,72 @@ X-Spam-Status: No, score=-8.7 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EC29CC43219
-	for <qemu-devel@archiver.kernel.org>; Mon, 29 Apr 2019 17:11:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 19BE1C43219
+	for <qemu-devel@archiver.kernel.org>; Mon, 29 Apr 2019 17:12:20 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A5B1920675
-	for <qemu-devel@archiver.kernel.org>; Mon, 29 Apr 2019 17:11:21 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id D830F20675
+	for <qemu-devel@archiver.kernel.org>; Mon, 29 Apr 2019 17:12:19 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="XDAHvEjd"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A5B1920675
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="YajaLebr"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D830F20675
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:60740 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:60748 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hL9oG-0004Jf-RG
-	for qemu-devel@archiver.kernel.org; Mon, 29 Apr 2019 13:11:20 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:34252)
+	id 1hL9pD-0005NZ-5c
+	for qemu-devel@archiver.kernel.org; Mon, 29 Apr 2019 13:12:19 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:34160)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1hL9ei-0004jH-BI
-	for qemu-devel@nongnu.org; Mon, 29 Apr 2019 13:01:29 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1hL9eN-0004Pl-Uf
+	for qemu-devel@nongnu.org; Mon, 29 Apr 2019 13:01:10 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1hL9eb-0006eT-Jq
-	for qemu-devel@nongnu.org; Mon, 29 Apr 2019 13:01:24 -0400
-Received: from mail-wm1-x329.google.com ([2a00:1450:4864:20::329]:51172)
+	(envelope-from <peter.maydell@linaro.org>) id 1hL9eI-0006VI-GK
+	for qemu-devel@nongnu.org; Mon, 29 Apr 2019 13:01:04 -0400
+Received: from mail-wr1-x442.google.com ([2a00:1450:4864:20::442]:36483)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1hL9eX-0006U9-6t
-	for qemu-devel@nongnu.org; Mon, 29 Apr 2019 13:01:17 -0400
-Received: by mail-wm1-x329.google.com with SMTP id p21so187329wmc.0
-	for <qemu-devel@nongnu.org>; Mon, 29 Apr 2019 10:01:00 -0700 (PDT)
+	id 1hL9eE-0006Bn-GO
+	for qemu-devel@nongnu.org; Mon, 29 Apr 2019 13:01:00 -0400
+Received: by mail-wr1-x442.google.com with SMTP id o4so5177805wra.3
+	for <qemu-devel@nongnu.org>; Mon, 29 Apr 2019 10:00:42 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
 	h=from:to:subject:date:message-id:in-reply-to:references:mime-version
 	:content-transfer-encoding;
-	bh=Q3Ee1+54sOesgJGYn7eLSZCuI1wdhlP4qNiUzPDch70=;
-	b=XDAHvEjdLxxJWFG4HqJ3e3SBjvPGIZ5fWEs9XY7gD/Qs8MuV2pDem6YGQq1nKt+Zw+
-	y5ApPbLDoM70k5v1TQqUXnBRczhvcmE7ElMi8nGwJMTUWILE7/MIPDppYvpKHVdwP2zW
-	5mnYWx/F4iPQ+v0EwXgvHLbkMXNki9++yJ3JALGH5qSMHEN+i6WjYvmxrG5F0X0tDRIP
-	3egLcGwyTjs9CKcvYfTcPlcL6UAOwlkWm5gD8FrAAH53AB7t1noCn45IKC1m6lLbINTD
-	tvg8nY7eRi9rRORbJouS108QnXzHAZGoyXoB3IYqB+Mbjej/TQs2o6qqU0oqVFqiUAkN
-	KTHw==
+	bh=3hCqKWhEs+uyed/mP56baIBgXAfI++APiWRLJhSExvw=;
+	b=YajaLebr2q7j6iLHUun3YVVHQEIWyb80UqcvVMn6EM5JmrAR1gJy5nmEDSyzlrcewv
+	4SdG2atfrQAWnqPEKOqq24P+eQ9Lt28jnwqKVN5oiEP8BpKgIz9o+PCoefSmV3767DWY
+	3vu9vRwOAkqM7MZR7LzSSKfBvTqWQxoW84xRX/MDcaiBgbkiietxVRrerECTNd4K/kHx
+	1GAzVLMDgC6U8pky+XP1aRBb/WwZHRvCTqOKn9peQxz4KBlViwfJRE8BDGpawKxON/1W
+	mLtDmhCUOtUdRdeGapzyqlwyvq1N06VH+eDGw1xVquEq/YAo6vPA0VGLnGvdeGJ5d3Gk
+	UrnQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
 	d=1e100.net; s=20161025;
 	h=x-gm-message-state:from:to:subject:date:message-id:in-reply-to
 	:references:mime-version:content-transfer-encoding;
-	bh=Q3Ee1+54sOesgJGYn7eLSZCuI1wdhlP4qNiUzPDch70=;
-	b=HeGtlqX89iW1CXGwKxEWW3jUhST5GelHJpeCa2CFSz1Yp+I/9yMdiVVWv+Mhk0z9oo
-	YsZJD6li9+rMDTLe/2NKeLxGzvkZf88vHSNJ4Oy6l9ecl3tYI6JJUh4Mq8Seb7bwp2+V
-	DsXST51j2CWQ1z8eoSDCcqBWmDy7CzFUMPKprSZDBMNg0YzGZkYBAVqXAYViiC2QmWRB
-	h/G1mvMmdI+fzyzBKR8XVkwm1VxzCn72S6qA2WKsLh4Hogtfc9RVqk/dUf90qYyQykmS
-	y7smNqyGKgEqhitr88hvl215EfCtHd9T1NvZhicr04OAgYWtn4Gu/Tu5pxEVyJUGgtLt
-	Aj5Q==
-X-Gm-Message-State: APjAAAWpFDXNPJbwKkq14crLhX6nDM5T3Jlv5ztijU0rRAsERUpYOkFq
-	WrQKezxUbYQYvZeUTc222CLfj6rmsUA=
-X-Google-Smtp-Source: APXvYqwZD7SCos6YR7axKZsSXv2SpP4j4F8eJo6uwAkE4Eg3Mg6DW5+yfn9t7iixHJkKJdnxDf3k0w==
-X-Received: by 2002:a1c:7512:: with SMTP id o18mr57784wmc.68.1556557259075;
-	Mon, 29 Apr 2019 10:00:59 -0700 (PDT)
+	bh=3hCqKWhEs+uyed/mP56baIBgXAfI++APiWRLJhSExvw=;
+	b=O8R9vhNeNvRwP7Ni8IOKCbpfY+tyx4agg/ZBiIVqDCunGLjuDVnMIvTAKBK5kPoPuF
+	NcfeQRNso0oC0qo5whgbqoVhM8rkRVtZ8GPOoDFgWm3DAo4eEFNoXcsXxQuovH/ry+0E
+	AgpTnUEpGKS8hQFWL+BHki8cBMXsVG/kDL6yP+25weU3xkOmxIWQKGG08R0DcybstAsx
+	OToDTeAG1dhhGkSJcaoRroBzPmlNSOWq4vx1i221WbhutLspPSmdJX3DG8dLC/RyWAql
+	gmsyyrQvv64QJTv3KPOVfwh964kzWvIVl4EIpfglijwhKxDGTs7E5l5EFP9Mqo7nCTzL
+	QgLw==
+X-Gm-Message-State: APjAAAUWAHsuqmND8YMMbtkvjTUtw2WRUIdmK98+PFDVDu5SQLS7r6hQ
+	Pq8VeSOntHMno/bd7lIpIYvXnQYD6fY=
+X-Google-Smtp-Source: APXvYqwzyHH1SLKerq7Uy9ZpnU6kU3kdfj6LA0T5koz25AD5rd0842mkiXb7MiwG+ve3zJpsJJ46yA==
+X-Received: by 2002:adf:db05:: with SMTP id s5mr10651136wri.247.1556557241813; 
+	Mon, 29 Apr 2019 10:00:41 -0700 (PDT)
 Received: from orth.archaic.org.uk (orth.archaic.org.uk. [81.2.115.148])
-	by smtp.gmail.com with ESMTPSA id a13sm36896wmj.39.2019.04.29.10.00.57
+	by smtp.gmail.com with ESMTPSA id a13sm36896wmj.39.2019.04.29.10.00.40
 	for <qemu-devel@nongnu.org>
 	(version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-	Mon, 29 Apr 2019 10:00:58 -0700 (PDT)
+	Mon, 29 Apr 2019 10:00:41 -0700 (PDT)
 From: Peter Maydell <peter.maydell@linaro.org>
 To: qemu-devel@nongnu.org
-Date: Mon, 29 Apr 2019 18:00:09 +0100
-Message-Id: <20190429170030.11323-22-peter.maydell@linaro.org>
+Date: Mon, 29 Apr 2019 17:59:55 +0100
+Message-Id: <20190429170030.11323-8-peter.maydell@linaro.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20190429170030.11323-1-peter.maydell@linaro.org>
 References: <20190429170030.11323-1-peter.maydell@linaro.org>
@@ -80,9 +80,9 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
 	recognized.
-X-Received-From: 2a00:1450:4864:20::329
-Subject: [Qemu-devel] [PULL 21/42] target/arm: Set FPCCR.S when executing
- M-profile floating point insns
+X-Received-From: 2a00:1450:4864:20::442
+Subject: [Qemu-devel] [PULL 07/42] target/arm: Disable most VFP sysregs for
+ M-profile
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -98,111 +98,62 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 Content-Type: text/plain; charset="UTF-8"
-Message-ID: <20190429170009.yuGBdyGO0Y4q7f6t0tS3YuQ_e0NmI6p9-yprVOP2gcA@z>
+Message-ID: <20190429165955.yDEuSYcvo_wLZkf6hQ0pTq-FK3jcbDlP9SgDwce-4So@z>
 
-The M-profile FPCCR.S bit indicates the security status of
-the floating point context. In the pseudocode ExecuteFPCheck()
-function it is unconditionally set to match the current
-security state whenever a floating point instruction is
-executed.
-
-Implement this by adding a new TB flag which tracks whether
-FPCCR.S is different from the current security state, so
-that we only need to emit the code to update it in the
-less-common case when it is not already set correctly.
-
-Note that we will add the handling for the other work done
-by ExecuteFPCheck() in later commits.
+The only "system register" that M-profile floating point exposes
+via the VMRS/VMRS instructions is FPSCR, and it does not have
+the odd special case for rd==15. Add a check to ensure we only
+expose FPSCR.
 
 Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
-Message-id: 20190416125744.27770-19-peter.maydell@linaro.org
+Message-id: 20190416125744.27770-5-peter.maydell@linaro.org
 ---
- target/arm/cpu.h       |  2 ++
- target/arm/translate.h |  1 +
- target/arm/helper.c    |  5 +++++
- target/arm/translate.c | 20 ++++++++++++++++++++
- 4 files changed, 28 insertions(+)
+ target/arm/translate.c | 19 +++++++++++++++++--
+ 1 file changed, 17 insertions(+), 2 deletions(-)
 
-diff --git a/target/arm/cpu.h b/target/arm/cpu.h
-index 99ccb4824d4..a2cf9aae3a1 100644
---- a/target/arm/cpu.h
-+++ b/target/arm/cpu.h
-@@ -3153,6 +3153,8 @@ FIELD(TBFLAG_A32, NS, 6, 1)
- FIELD(TBFLAG_A32, VFPEN, 7, 1)
- FIELD(TBFLAG_A32, CONDEXEC, 8, 8)
- FIELD(TBFLAG_A32, SCTLR_B, 16, 1)
-+/* For M profile only, set if FPCCR.S does not match current security state */
-+FIELD(TBFLAG_A32, FPCCR_S_WRONG, 20, 1)
- /* For M profile only, Handler (ie not Thread) mode */
- FIELD(TBFLAG_A32, HANDLER, 21, 1)
- /* For M profile only, whether we should generate stack-limit checks */
-diff --git a/target/arm/translate.h b/target/arm/translate.h
-index 984617786d6..93abff645ad 100644
---- a/target/arm/translate.h
-+++ b/target/arm/translate.h
-@@ -40,6 +40,7 @@ typedef struct DisasContext {
-     bool v7m_handler_mode;
-     bool v8m_secure; /* true if v8M and we're in Secure mode */
-     bool v8m_stackcheck; /* true if we need to perform v8M stack limit checks */
-+    bool v8m_fpccr_s_wrong; /* true if v8M FPCCR.S != v8m_secure */
-     /* Immediate value in AArch32 SVC insn; must be set if is_jmp == DISAS_SWI
-      * so that top level loop can generate correct syndrome information.
-      */
-diff --git a/target/arm/helper.c b/target/arm/helper.c
-index 9be5fe581df..8290f56c658 100644
---- a/target/arm/helper.c
-+++ b/target/arm/helper.c
-@@ -13417,6 +13417,11 @@ void cpu_get_tb_cpu_state(CPUARMState *env, target_ulong *pc,
-         flags = FIELD_DP32(flags, TBFLAG_A32, STACKCHECK, 1);
-     }
- 
-+    if (arm_feature(env, ARM_FEATURE_M_SECURITY) &&
-+        FIELD_EX32(env->v7m.fpccr[M_REG_S], V7M_FPCCR, S) != env->v7m.secure) {
-+        flags = FIELD_DP32(flags, TBFLAG_A32, FPCCR_S_WRONG, 1);
-+    }
-+
-     *pflags = flags;
-     *cs_base = 0;
- }
 diff --git a/target/arm/translate.c b/target/arm/translate.c
-index ffaa4f1e095..f0332ac19ec 100644
+index 4ea4018e2b8..a9784535069 100644
 --- a/target/arm/translate.c
 +++ b/target/arm/translate.c
-@@ -3421,6 +3421,25 @@ static int disas_vfp_insn(DisasContext *s, uint32_t insn)
-         }
-     }
+@@ -3513,12 +3513,27 @@ static int disas_vfp_insn(DisasContext *s, uint32_t insn)
+                     }
+                 }
+             } else { /* !dp */
++                bool is_sysreg;
++
+                 if ((insn & 0x6f) != 0x00)
+                     return 1;
+                 rn = VFP_SREG_N(insn);
++
++                is_sysreg = extract32(insn, 21, 1);
++
++                if (arm_dc_feature(s, ARM_FEATURE_M)) {
++                    /*
++                     * The only M-profile VFP vmrs/vmsr sysreg is FPSCR.
++                     * Writes to R15 are UNPREDICTABLE; we choose to undef.
++                     */
++                    if (is_sysreg && (rd == 15 || (rn >> 1) != ARM_VFP_FPSCR)) {
++                        return 1;
++                    }
++                }
++
+                 if (insn & ARM_CP_RW_BIT) {
+                     /* vfp->arm */
+-                    if (insn & (1 << 21)) {
++                    if (is_sysreg) {
+                         /* system register */
+                         rn >>= 1;
  
-+    if (arm_dc_feature(s, ARM_FEATURE_M)) {
-+        /* Handle M-profile lazy FP state mechanics */
-+
-+        /* Update ownership of FP context: set FPCCR.S to match current state */
-+        if (s->v8m_fpccr_s_wrong) {
-+            TCGv_i32 tmp;
-+
-+            tmp = load_cpu_field(v7m.fpccr[M_REG_S]);
-+            if (s->v8m_secure) {
-+                tcg_gen_ori_i32(tmp, tmp, R_V7M_FPCCR_S_MASK);
-+            } else {
-+                tcg_gen_andi_i32(tmp, tmp, ~R_V7M_FPCCR_S_MASK);
-+            }
-+            store_cpu_field(tmp, v7m.fpccr[M_REG_S]);
-+            /* Don't need to do this for any further FP insns in this TB */
-+            s->v8m_fpccr_s_wrong = false;
-+        }
-+    }
-+
-     if (extract32(insn, 28, 4) == 0xf) {
-         /*
-          * Encodings with T=1 (Thumb) or unconditional (ARM):
-@@ -13341,6 +13360,7 @@ static void arm_tr_init_disas_context(DisasContextBase *dcbase, CPUState *cs)
-     dc->v8m_secure = arm_feature(env, ARM_FEATURE_M_SECURITY) &&
-         regime_is_secure(env, dc->mmu_idx);
-     dc->v8m_stackcheck = FIELD_EX32(tb_flags, TBFLAG_A32, STACKCHECK);
-+    dc->v8m_fpccr_s_wrong = FIELD_EX32(tb_flags, TBFLAG_A32, FPCCR_S_WRONG);
-     dc->cp_regs = cpu->cp_regs;
-     dc->features = env->features;
- 
+@@ -3585,7 +3600,7 @@ static int disas_vfp_insn(DisasContext *s, uint32_t insn)
+                     }
+                 } else {
+                     /* arm->vfp */
+-                    if (insn & (1 << 21)) {
++                    if (is_sysreg) {
+                         rn >>= 1;
+                         /* system register */
+                         switch (rn) {
 -- 
 2.20.1
 
