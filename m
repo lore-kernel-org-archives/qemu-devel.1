@@ -2,71 +2,63 @@ Return-Path: <SRS0=sEuR=S7=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_PASS,USER_AGENT_NEOMUTT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 12801C43219
-	for <qemu-devel@archiver.kernel.org>; Mon, 29 Apr 2019 07:13:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 65339C43219
+	for <qemu-devel@archiver.kernel.org>; Mon, 29 Apr 2019 07:14:35 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D9D5F2053B
-	for <qemu-devel@archiver.kernel.org>; Mon, 29 Apr 2019 07:13:47 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D9D5F2053B
+	by mail.kernel.org (Postfix) with ESMTPS id 356882053B
+	for <qemu-devel@archiver.kernel.org>; Mon, 29 Apr 2019 07:14:35 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 356882053B
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:53268 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:53272 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hL0Tz-0002XD-1X
-	for qemu-devel@archiver.kernel.org; Mon, 29 Apr 2019 03:13:47 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:41909)
+	id 1hL0Uk-0002zp-GH
+	for qemu-devel@archiver.kernel.org; Mon, 29 Apr 2019 03:14:34 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:41977)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1hL0T5-00029x-M5
-	for qemu-devel@nongnu.org; Mon, 29 Apr 2019 03:12:52 -0400
+	(envelope-from <cohuck@redhat.com>) id 1hL0TW-0002OG-46
+	for qemu-devel@nongnu.org; Mon, 29 Apr 2019 03:13:19 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1hL0T4-000068-PM
-	for qemu-devel@nongnu.org; Mon, 29 Apr 2019 03:12:51 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:45648)
+	(envelope-from <cohuck@redhat.com>) id 1hL0TV-0000GH-3o
+	for qemu-devel@nongnu.org; Mon, 29 Apr 2019 03:13:18 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:42126)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1hL0T3-0008UJ-Vm
-	for qemu-devel@nongnu.org; Mon, 29 Apr 2019 03:12:50 -0400
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
-	[10.5.11.23])
+	(Exim 4.71) (envelope-from <cohuck@redhat.com>) id 1hL0TU-0000Fv-UO
+	for qemu-devel@nongnu.org; Mon, 29 Apr 2019 03:13:17 -0400
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+	[10.5.11.13])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id E18BF308425C;
-	Mon, 29 Apr 2019 07:12:46 +0000 (UTC)
-Received: from sirius.home.kraxel.org (ovpn-116-45.ams2.redhat.com
-	[10.36.116.45])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id 1212845B5;
-	Mon, 29 Apr 2019 07:12:44 +0000 (UTC)
-Received: by sirius.home.kraxel.org (Postfix, from userid 1000)
-	id 41EA011AAA; Mon, 29 Apr 2019 09:12:43 +0200 (CEST)
-Date: Mon, 29 Apr 2019 09:12:43 +0200
-From: Gerd Hoffmann <kraxel@redhat.com>
-To: =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@gmail.com>
-Message-ID: <20190429071243.icqw3qbzcxbcz7ph@sirius.home.kraxel.org>
-References: <20190423132004.13725-1-marcandre.lureau@redhat.com>
-	<20190423132004.13725-6-marcandre.lureau@redhat.com>
-	<20190426072446.r7b7wsm4qghd7pzr@sirius.home.kraxel.org>
-	<CAJ+F1CKbgb_TkoS_a10qGw7kkTO+EkC4uhreCkOu=k2ut5CAig@mail.gmail.com>
-	<20190426120558.vh66gugqtvcc6tm5@sirius.home.kraxel.org>
-	<CAJ+F1CLE-iwZu4oX69P3r0v_94L+gJEhZH0-U0iYag=oYNN4pg@mail.gmail.com>
+	by mx1.redhat.com (Postfix) with ESMTPS id 4B53E307D92F;
+	Mon, 29 Apr 2019 07:13:15 +0000 (UTC)
+Received: from gondolin (dhcp-192-187.str.redhat.com [10.33.192.187])
+	by smtp.corp.redhat.com (Postfix) with ESMTP id 3B989608C2;
+	Mon, 29 Apr 2019 07:13:11 +0000 (UTC)
+Date: Mon, 29 Apr 2019 09:13:09 +0200
+From: Cornelia Huck <cohuck@redhat.com>
+To: Philippe =?UTF-8?B?TWF0aGlldS1EYXVkw6k=?= <philmd@redhat.com>
+Message-ID: <20190429091309.24c240d4.cohuck@redhat.com>
+In-Reply-To: <20190427135642.16464-1-philmd@redhat.com>
+References: <20190427135642.16464-1-philmd@redhat.com>
+Organization: Red Hat GmbH
 MIME-Version: 1.0
 Content-Type: text/plain; charset="UTF-8"
-Content-Disposition: inline
-In-Reply-To: <CAJ+F1CLE-iwZu4oX69P3r0v_94L+gJEhZH0-U0iYag=oYNN4pg@mail.gmail.com>
-User-Agent: NeoMutt/20180716
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+Content-Transfer-Encoding: quoted-printable
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.40]);
-	Mon, 29 Apr 2019 07:12:47 +0000 (UTC)
+	(mx1.redhat.com [10.5.110.48]);
+	Mon, 29 Apr 2019 07:13:15 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH v6 05/11] vhost-user: add
- vhost_user_gpu_set_socket()
+Subject: Re: [Qemu-devel] [PATCH] qom/object: Display more helpful message
+ when an object type is missing
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -78,63 +70,66 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: QEMU <qemu-devel@nongnu.org>, "Michael S. Tsirkin" <mst@redhat.com>
+Cc: Markus Armbruster <armbru@redhat.com>,
+	Eduardo Habkost <ehabkost@redhat.com>,
+	Andreas =?UTF-8?B?RsOkcmJlcg==?= <afaerber@suse.de>, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190429071243.-PwDcEL7sRrKsiGP7_9xHdBr64of7bY5c0VgDhcsLCs@z>
+Message-ID: <20190429071309.wfPddQ58-4_cBS5FfpITESgMbl0UoQdNUX_VrztyIEk@z>
 
-  Hi,
+On Sat, 27 Apr 2019 15:56:42 +0200
+Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com> wrote:
 
-> > What questions for example?
-> 
-> This opens up different kind of possible replies, and error handling.
-> 
-> With current proposal and needs, the reply (or absence of reply) is
-> entirely driven by the request.
-> 
-> With your proposal, should all request have a reply?
+> When writing a new board, adding device which uses other devices
+> (container) or simply refactoring, one can discover the hard way
+> his machine misses some devices. In the case of containers, the
+> error is not obvious:
+>=20
+>   $ qemu-system-microblaze -M xlnx-zynqmp-pmu
+>   **
+>   ERROR:/source/qemu/qom/object.c:454:object_initialize_with_type: assert=
+ion failed: (type !=3D NULL)
+>   Aborted (core dumped)
+>=20
+> And we have to look at the coredump to figure the error:
+>=20
+>   (gdb) bt
+>   #1  0x00007f84773cf895 in abort () at /lib64/libc.so.6
+>   #2  0x00007f847961fb53 in  () at /lib64/libglib-2.0.so.0
+>   #3  0x00007f847967a4de in g_assertion_message_expr () at /lib64/libglib=
+-2.0.so.0
+>   #4  0x000055c4bcac6c11 in object_initialize_with_type (data=3Ddata@entr=
+y=3D0x55c4bdf239e0, size=3Dsize@entry=3D2464, type=3D<optimized out>) at /s=
+ource/qemu/qom/object.c:454
+>   #5  0x000055c4bcac6e6d in object_initialize (data=3Ddata@entry=3D0x55c4=
+bdf239e0, size=3Dsize@entry=3D2464, typename=3Dtypename@entry=3D0x55c4bcc7c=
+643 "xlnx.zynqmp_ipi") at /source/qemu/qom/object.c:474
+>   #6  0x000055c4bc9ea474 in xlnx_zynqmp_pmu_init (machine=3D0x55c4bdd4600=
+0) at /source/qemu/hw/microblaze/xlnx-zynqmp-pmu.c:176
+>   #7  0x000055c4bca3b6cb in machine_run_board_init (machine=3D0x55c4bdd46=
+000) at /source/qemu/hw/core/machine.c:1030
+>   #8  0x000055c4bc95f6d2 in main (argc=3D<optimized out>, argv=3D<optimiz=
+ed out>, envp=3D<optimized out>) at /source/qemu/vl.c:4479
+>=20
+> Since the caller knows the type name requested, we can simply display it
+> to ease development.
+>=20
+> With this patch applied we get:
+>=20
+>   $ qemu-system-microblaze -M xlnx-zynqmp-pmu
+>   qemu-system-microblaze: missing object type 'xlnx.zynqmp_ipi'
+>   Aborted (core dumped)
+>=20
+> Since the assert(type) check in object_initialize_with_type() is
+> now impossible, remove it.
+>=20
+> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+> ---
+>  qom/object.c | 7 ++++++-
+>  1 file changed, 6 insertions(+), 1 deletion(-)
 
-Yes.
+Way more helpful error message :)
 
-> which makes a lot
-> more code synchronous,
-
-Why?  You don't have to wait for the reply before sending the next
-request.
-
-Adding a request id to the messages might be useful, so it is possible
-to wait for a reply to a specific message without having to keeping
-track of all in-flight messages.
-
-> and complicates both sides unnecessarily.
-
-Having headers in the reply allows it to process them in generic code.
-There is a size header for the reply, so you can parse the stream
-without knowing what replay to expect.  You can use the status field to
-indicate the payload, simliar to virtio-gpu which has response code
-OK_NODATA, some OK_$whatpayload and some ERR_$failure codes.
-
-You can dispatch based on the response/status code and run *fully*
-asynchronous without too much trouble.
-
-> > > Can we leave that for future protocol extensions negotiated with
-> > > GET/SET_PROTOCOL_FEATURES ?
-> >
-> > I don't think negotiating such a basic protocol change is a good idea.
-> 
-> Well, then I would rather focus on improving protocol negociation,
-> rather than adding unnecessary protocol changes.
-> 
-> Given that GET/SET_PROTOCOL_FEATURES is the first messages being sent,
-> why couldn't it have flags indicating new protocol revision?
-
-A properly structed reply allows a different approach in reply
-processing (see above).  But that only works if it is in the protocol
-right from the start.  As add-on feature it can't provide the benefits
-because the reply parser must be able to handle both protocol variants.
-
-cheers,
-  Gerd
-
+Reviewed-by: Cornelia Huck <cohuck@redhat.com>
 
