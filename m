@@ -2,67 +2,81 @@ Return-Path: <SRS0=sEuR=S7=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-1.2 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_PASS,UNWANTED_LANGUAGE_BODY,URIBL_BLOCKED autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0BF2DC43219
-	for <qemu-devel@archiver.kernel.org>; Mon, 29 Apr 2019 14:24:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 080B5C04AA6
+	for <qemu-devel@archiver.kernel.org>; Mon, 29 Apr 2019 14:26:22 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D38912087B
-	for <qemu-devel@archiver.kernel.org>; Mon, 29 Apr 2019 14:24:42 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D38912087B
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id C41BA214AF
+	for <qemu-devel@archiver.kernel.org>; Mon, 29 Apr 2019 14:26:21 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="m2K41pSV"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C41BA214AF
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:58347 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:58395 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hL7D0-0006am-1i
-	for qemu-devel@archiver.kernel.org; Mon, 29 Apr 2019 10:24:42 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:43066)
+	id 1hL7Eb-0007rb-1t
+	for qemu-devel@archiver.kernel.org; Mon, 29 Apr 2019 10:26:21 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:44023)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.williamson@redhat.com>) id 1hL79i-0004Dl-Gj
-	for qemu-devel@nongnu.org; Mon, 29 Apr 2019 10:21:20 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1hL7Cq-0006n0-Bq
+	for qemu-devel@nongnu.org; Mon, 29 Apr 2019 10:24:33 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.williamson@redhat.com>) id 1hL79h-000145-ET
-	for qemu-devel@nongnu.org; Mon, 29 Apr 2019 10:21:18 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:41534)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <alex.williamson@redhat.com>)
-	id 1hL79h-00011s-6E
-	for qemu-devel@nongnu.org; Mon, 29 Apr 2019 10:21:17 -0400
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
-	[10.5.11.23])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 4131E81E10
-	for <qemu-devel@nongnu.org>; Mon, 29 Apr 2019 14:21:13 +0000 (UTC)
-Received: from x1.home (ovpn-116-122.phx2.redhat.com [10.3.116.122])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id 7EB7957AA;
-	Mon, 29 Apr 2019 14:21:08 +0000 (UTC)
-Date: Mon, 29 Apr 2019 08:21:06 -0600
-From: Alex Williamson <alex.williamson@redhat.com>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <20190429082106.4fd59e77@x1.home>
-In-Reply-To: <daded638-42f1-9bc3-8c36-66b0fbba9438@redhat.com>
-References: <20181220054037.24320-1-peterx@redhat.com>
-	<20181220054037.24320-2-peterx@redhat.com>
-	<20190426132744.2b594bf5@x1.home> <20190426150236.1af2ff08@x1.home>
-	<94415012.15677076.1556342950794.JavaMail.zimbra@redhat.com>
-	<daded638-42f1-9bc3-8c36-66b0fbba9438@redhat.com>
-Organization: Red Hat
+	(envelope-from <peter.maydell@linaro.org>) id 1hL7Cp-0003Wv-JP
+	for qemu-devel@nongnu.org; Mon, 29 Apr 2019 10:24:32 -0400
+Received: from mail-oi1-x241.google.com ([2607:f8b0:4864:20::241]:46303)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1hL7Cp-0003VB-Dk
+	for qemu-devel@nongnu.org; Mon, 29 Apr 2019 10:24:31 -0400
+Received: by mail-oi1-x241.google.com with SMTP id d62so2551914oib.13
+	for <qemu-devel@nongnu.org>; Mon, 29 Apr 2019 07:24:30 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+	h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+	:cc; bh=qfL/jiZiaa1afIbW1Y75/pGT0ejZ9b3bDsD9oyWRqKM=;
+	b=m2K41pSVQHcMoC3tIA8n9vWY5CegFhwipq3LQzUqo5qHgvoGF1DIXI4eHUjKyxPL1K
+	3j2j3Emzcq1Qf+NX6JPjYKIrnFSc67KB76haQsWqscbFOl1PWOMa0SvfeEVbV5L1ANoL
+	YZawy1FiwcbS/uaEYXsyKuxg94SMWDLhSkLRDOwbHDi5ITBepPoMS3A+pEV6+GHDu+Mp
+	OxcNlKWZbM3SOeefnG6aBkyqMvUWqRK0hZVobY0otS0rMlN/mVmqCn+2JE5ay7FypoV6
+	11Wu0yX4ThFM+cVA9jcaZcv3AG1Y64ChuZSpu/nuCPIcdy8Kj7eef5kIjW/aX1RxrgCF
+	ShNQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=1e100.net; s=20161025;
+	h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+	:message-id:subject:to:cc;
+	bh=qfL/jiZiaa1afIbW1Y75/pGT0ejZ9b3bDsD9oyWRqKM=;
+	b=CZyGhjDg9T5YFwh6ftQS4zJNuQ1vummdZm+bXLRJi0EyVqF4SJVEkgKa2XKuUQDUbr
+	Yl5hlj2i/pZ6+f0dTjxlZtxKscb8VJss+mrR1DNWFrVSVFA2fdpMGjuNMmwDrAyOpsZz
+	IY9hD6mAzukjsx6a1TBVX3nbtPZ+DRp6Xg1uUOlcNNtXmWLV2DLL4YZLW9HZlDRNkXh+
+	0DWh5+6ypbV1CqzW9EK1ckACL5OSaGunBOu1tXLjN91s++xh7tyAVcxq2YPdzpzkIwym
+	G0oT6kXMtj5VkU0umcvAQ6NpySeWAphoopDvN2OzU+Yo/+cOdZJPUlNRqfKsHu6XgAea
+	dNPw==
+X-Gm-Message-State: APjAAAVlvSznZJ2l919JHnyqHPAEgFIRu2j17DJP3615p4F3js8xTwoK
+	7I3bnb+KBGgaQRiruftuyd7Xumvh25PfncaGMO7eBw==
+X-Google-Smtp-Source: APXvYqxgEmoWt7rb5zO1N3C/Q2W/vF8y24SS4Fl1ORYmNcIXpPmkzXp2oY4L+eJqOLSzPbvOeQDWOKVIDdASY1nxQoU=
+X-Received: by 2002:aca:b3c2:: with SMTP id c185mr16940405oif.98.1556547869435;
+	Mon, 29 Apr 2019 07:24:29 -0700 (PDT)
 MIME-Version: 1.0
+References: <20190328230404.12909-1-richard.henderson@linaro.org>
+	<20190328230404.12909-26-richard.henderson@linaro.org>
+In-Reply-To: <20190328230404.12909-26-richard.henderson@linaro.org>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Mon, 29 Apr 2019 15:24:17 +0100
+Message-ID:
+ <CAFEAcA97ksktpBxpAtTB+WufL0hosBm1n2k6X=LurHQQMO14bw@mail.gmail.com>
+To: Richard Henderson <richard.henderson@linaro.org>
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.25]);
-	Mon, 29 Apr 2019 14:21:13 +0000 (UTC)
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH v2 1/3] q35: set split kernel irqchip as
- default
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+	recognized.
+X-Received-From: 2607:f8b0:4864:20::241
+Subject: Re: [Qemu-devel] [PATCH for-4.1 v2 25/36] target/tilegx: Use env_cpu
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -74,73 +88,25 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Igor Mammedov <imammedo@redhat.com>, "Michael S .
-	Tsirkin" <mst@redhat.com>, qemu-devel@nongnu.org,
-	Peter Xu <peterx@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190429142106.oIx518eUa54A3ZVZSifSHih-Z-S7ptB7pxlOXjzDBIg@z>
+Message-ID: <20190429142417.7E8kLnqe_7A6w3sYacBmrc21A0DXrl-de2IlkRcmRng@z>
 
-On Sat, 27 Apr 2019 10:09:51 +0200
-Paolo Bonzini <pbonzini@redhat.com> wrote:
+On Thu, 28 Mar 2019 at 23:34, Richard Henderson
+<richard.henderson@linaro.org> wrote:
+>
+> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+> ---
+>  target/tilegx/cpu.h          | 5 -----
+>  linux-user/tilegx/cpu_loop.c | 2 +-
+>  target/tilegx/helper.c       | 2 +-
+>  3 files changed, 2 insertions(+), 7 deletions(-)
+>
 
-> On 27/04/19 07:29, Paolo Bonzini wrote:
-> >   
-> >>> In my testing it looks like KVM advertises supporting the KVM_IRQFD
-> >>> resample feature, but vfio never gets the unmask notification, so the
-> >>> device remains with DisINTx set and no further interrupts are
-> >>> generated.  Do we expect KVM's IRQFD with resampler to work in the
-> >>> split IRQ mode?  We can certainly hope that "high performance" devices
-> >>> use MSI or MSI/X, but this would be quite a performance regression with
-> >>> split mode if our userspace bypass for INTx goes away.  Thanks,  
-> >>
-> >> arch/x86/kvm/lapic.c:kvm_ioapic_send_eoi() dumps to userspace before
-> >> kvm_ioapic_update_eoi() can handle the irq_ack_notifier_list via
-> >> kvm_notify_acked_gsi(),  
-> > 
-> > That wouldn't help because kvm_ioapic_update_eoi would not even be
-> > able to access vcpu->kvm->arch.vioapic (it's NULL).
-> > 
-> > The following untested patch would signal the resamplefd in kvm_ioapic_send_eoi,
-> > before requesting the exit to userspace.  However I am not sure how QEMU
-> > sets up the VFIO eventfds: if I understand correctly, when VFIO writes again to
-> > the irq eventfd, the interrupt request would not reach the userspace IOAPIC, but
-> > only the in-kernel LAPIC.  That would be incorrect, and if my understanding is
-> > correct we need to trigger resampling from hw/intc/ioapic.c.  
-> 
-> Actually it's worse: because you're bypassing IOAPIC when raising the
-> irq, the IOAPIC's remote_irr for example will not be set.  So split
-> irqchip currently must disable the intx fast path completely.
-> 
-> I guess we could also reimplement irqfd and resamplefd in the userspace
-> IOAPIC, and run the listener in a separate thread (using "-object
-> iothread" on the command line and AioContext in the code).
+Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
 
-This sounds like a performance regression vs KVM irqchip any way we
-slice it.  Was this change a mistake?  Without KVM support, the
-universal support in QEMU kicks in, where device mmaps are disabled
-when an INTx occurs, forcing trapped access to the device, and we
-assume that the next access is in response to an interrupt and trigger
-our own internal EOI and re-enable mmaps.  A timer acts as a
-catch-all.  Needless to say, this is functional but not fast.  It would
-be a massive performance regression for devices depending on INTx and
-previously using the KVM bypass to switch to this.  INTx is largely
-considered a legacy interrupt, so non-x86 archs don't encounter it as
-often, S390 even explicitly disables INTx support.  ARM and POWER
-likely just don't see a lot of these devices, but nearly all devices
-(except SR-IOV VFs) on x86 expect an INTx fallback mode and some
-drivers may run the device in INTx for compatibility.  This split
-irqchip change was likely fine for "enterprise" users concerned only
-with modern high speed devices, but very much not for device assignment
-used for compatibility use cases or commodity hardware users.
-
-What's a good 4.0.1 strategy to resolve this?  Re-instate KVM irqchip
-as the Q35 default?  I can't see that simply switching to current QEMU
-handling is a viable option for performance?  What about 4.1?  We could
-certainly improve EOI support in QEMU, there's essentially no support
-currently, but it seems like an uphill battle for an iothread based
-userspace ioapic to ever compare to KVM handling?  Thanks,
-
-Alex
+thanks
+-- PMM
 
