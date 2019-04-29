@@ -2,81 +2,68 @@ Return-Path: <SRS0=sEuR=S7=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.7 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.4 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_PASS,T_HK_NAME_DR,USER_AGENT_MUTT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BA4C1C43219
-	for <qemu-devel@archiver.kernel.org>; Mon, 29 Apr 2019 16:22:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B3D6BC43219
+	for <qemu-devel@archiver.kernel.org>; Mon, 29 Apr 2019 16:23:44 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7D93920675
-	for <qemu-devel@archiver.kernel.org>; Mon, 29 Apr 2019 16:22:30 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="f9Pqgb50"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7D93920675
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id 72FEC20675
+	for <qemu-devel@archiver.kernel.org>; Mon, 29 Apr 2019 16:23:44 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 72FEC20675
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:60203 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:60213 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hL92w-0007d4-0O
-	for qemu-devel@archiver.kernel.org; Mon, 29 Apr 2019 12:22:26 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:54990)
+	id 1hL94B-0008HQ-Lf
+	for qemu-devel@archiver.kernel.org; Mon, 29 Apr 2019 12:23:43 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:55222)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1hL921-0007JS-Qe
-	for qemu-devel@nongnu.org; Mon, 29 Apr 2019 12:21:30 -0400
+	(envelope-from <dgilbert@redhat.com>) id 1hL93E-0007pj-9c
+	for qemu-devel@nongnu.org; Mon, 29 Apr 2019 12:22:45 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1hL920-0004P5-QI
-	for qemu-devel@nongnu.org; Mon, 29 Apr 2019 12:21:29 -0400
-Received: from mail-oi1-x244.google.com ([2607:f8b0:4864:20::244]:43184)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1hL920-0004OW-LK
-	for qemu-devel@nongnu.org; Mon, 29 Apr 2019 12:21:28 -0400
-Received: by mail-oi1-x244.google.com with SMTP id t81so8764829oig.10
-	for <qemu-devel@nongnu.org>; Mon, 29 Apr 2019 09:21:28 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
-	h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-	:cc; bh=VJVL6BPQsrCJJueZOike/rijh0mL7PdTU4J2YQQx9kg=;
-	b=f9Pqgb506sPzwLukHaFLxBEeick5GdOnqV89HZ52Rx3E+QHSvowZihS57cWVzBFzWy
-	VFa3uN62Zv0t3lnswSuiSGJdYjTWjMRsctYnfeZTjx4PPvlxkKIUSTO1MorohMm1h53K
-	ktXxp+HBqwLvRAJU1l/WEqTMPclLhwjM5DqOEMsbLUnbJz2j/CgEmW9cRHqOuWn0cClq
-	oyTZf2RFJUZE7tbgG6IZlzM4YJP2mGqp7e/yjOgBW6BaPQ4FLjSZruoxtezzbLh0qPLz
-	dI5P0N4lPzHfHDWbYe9FYR8trHf9Od0odbVnQcxz/cUXgwQDZhDLvj3dVu0s6V5LctFn
-	k4Dg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=1e100.net; s=20161025;
-	h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-	:message-id:subject:to:cc;
-	bh=VJVL6BPQsrCJJueZOike/rijh0mL7PdTU4J2YQQx9kg=;
-	b=RuRG3qeYYeVFQA87Vr6Zp5NaxqGbj2urg3IW1j4aJxBgUuVRmWC740ojv/hRGwnjR7
-	vqbz3FIx2aUG5Y7wx/30nWGj1KP8vQuTerHedEvw/qRYO8T5aGYn4yrEuzc4cNwVPDof
-	zx3ZvtCTS3isyJ0x/OawWNe/xMQ2IJkbEiLOFGbfnv1ztONC4kdTah5vjzOnD6Put4be
-	kC/tzha07B0pLwSUJT3mN3EX4glQma+tj1s6jrwv9tYzKG/1UZj6CPTR3ymZ0EudOzKB
-	UMoE1qSMsMlHn/j/Hev5oeVeGxJkWCmx+MCiK0UOK0o6SXei5Jw9XhRCkedTSuYw3pAD
-	QOZw==
-X-Gm-Message-State: APjAAAVTb+KBM4GJos0XgrrJLPGcOddMsuzyCV+guF9Puhys0v8CUgq+
-	/gxaGDcb69XudjIS9hraXvN1HBrpHg90+nt70t9c3A==
-X-Google-Smtp-Source: APXvYqztsDIOfo73N/jc8KehmvvUBvc3GuNI+cWZAZ92xfhh6xYADUtHNLcnDGFKFfXl/uL8K9oFy3zK4tPFJSvJX0k=
-X-Received: by 2002:aca:ab12:: with SMTP id u18mr4189054oie.48.1556554887971; 
-	Mon, 29 Apr 2019 09:21:27 -0700 (PDT)
+	(envelope-from <dgilbert@redhat.com>) id 1hL93C-0005F2-MC
+	for qemu-devel@nongnu.org; Mon, 29 Apr 2019 12:22:44 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:53958)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1hL93C-0005Dh-A2
+	for qemu-devel@nongnu.org; Mon, 29 Apr 2019 12:22:42 -0400
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+	[10.5.11.16])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 202362D7E5;
+	Mon, 29 Apr 2019 16:22:40 +0000 (UTC)
+Received: from work-vm (ovpn-117-192.ams2.redhat.com [10.36.117.192])
+	by smtp.corp.redhat.com (Postfix) with ESMTPS id 6E45E5C205;
+	Mon, 29 Apr 2019 16:22:39 +0000 (UTC)
+Date: Mon, 29 Apr 2019 17:22:37 +0100
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+To: fengyd <fengyd81@gmail.com>
+Message-ID: <20190429162236.GJ2748@work-vm>
+References: <CACnvu8YKqaZA7XSD41=SQrUL7h9YafJMgKPe5cJZd3XZ3zrSNw@mail.gmail.com>
+	<20190415145358.GA2893@work-vm>
+	<CACnvu8a5DjAUhfAGmi6GtpD1V2hfoNLTkKEgbsFuL_6GrRc+pg@mail.gmail.com>
+	<CACnvu8Y9Ub5PAOt18ukzvOoDxmfzwvygWWwOZaT5Q2Eig6YFTw@mail.gmail.com>
+	<20190416084738.GA3123@work-vm>
+	<CACnvu8Y7OQSYgGUXm5+bdB0owwmm+gSDpuaGQn=5QNhB5wcjvQ@mail.gmail.com>
+	<CACnvu8aWowPEo=0fE+CXbdp+g9LFvxSNjRsAHdQiQzvJfoYjsQ@mail.gmail.com>
 MIME-Version: 1.0
-References: <20190330005900.17282-1-richard.henderson@linaro.org>
-	<20190330005900.17282-3-richard.henderson@linaro.org>
-In-Reply-To: <20190330005900.17282-3-richard.henderson@linaro.org>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Mon, 29 Apr 2019 17:21:16 +0100
-Message-ID:
- <CAFEAcA98_q1yx==QkHO1HiJA8cJqGv8k5OrCU5W=dC3ZWNPY=w@mail.gmail.com>
-To: Richard Henderson <richard.henderson@linaro.org>
 Content-Type: text/plain; charset="UTF-8"
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
-	recognized.
-X-Received-From: 2607:f8b0:4864:20::244
-Subject: Re: [Qemu-devel] [PATCH v4 2/4] linux-user: Set PAGE_TARGET_1 for
- TARGET_PROT_BTI
+Content-Disposition: inline
+In-Reply-To: <CACnvu8aWowPEo=0fE+CXbdp+g9LFvxSNjRsAHdQiQzvJfoYjsQ@mail.gmail.com>
+User-Agent: Mutt/1.11.4 (2019-03-13)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+	(mx1.redhat.com [10.5.110.30]);
+	Mon, 29 Apr 2019 16:22:40 +0000 (UTC)
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 209.132.183.28
+Subject: Re: [Qemu-devel] Fwd: How live migration work for vhost-user
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -88,32 +75,151 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>,
-	QEMU Developers <qemu-devel@nongnu.org>,
-	Ramana Radhakrishnan <ramana.radhakrishnan@arm.com>
+Cc: qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190429162116.lSJvoAkH5dLCO5h7M-n8q-MHuuxtUlBgCb3BsZrLb0o@z>
+Message-ID: <20190429162237.gnyeORhB_G0R_MUR9NTQ-7oIIGGChvABVpUgNmQXnbw@z>
 
-On Sat, 30 Mar 2019 at 00:59, Richard Henderson
-<richard.henderson@linaro.org> wrote:
->
-> There is agreement that there will be a mmap/mprotect bit,
-> although no word yet on the value or the name.   Invent a
-> name to make forward progress.
->
-> The PAGE_TARGET_1 bit, is qemu internal, and allows the
-> target something to query from the guest page tables.
->
-> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+* fengyd (fengyd81@gmail.com) wrote:
+> Hi,
+> 
+> For vhost,  *last_avail_idx*  is maintained in vhost_virtqueue
+> but during live migration, *last_avail_idx*  is fetched from VirtQueue.
+> Do you know how these two *last_avail_idx *are synchronized?
+> 
+> virtio_load related code which is called during live migration:
+> 
+> * vdev->vq[i].inuse = (uint16_t)(vdev->vq[i].last_avail_idx -*
+> *                                vdev->vq[i].used_idx);*
+> *            if (vdev->vq[i].inuse > vdev->vq[i].vring.num) {*
+> *                error_report("VQ %d size 0x%x < last_avail_idx 0x%x - "*
+> *                             "used_idx 0x%x",*
+> *                             i, vdev->vq[i].vring.num,*
+> *                             vdev->vq[i].last_avail_idx,*
 
-This looks ok code-wise, but we'd need to hide it behind
-a defaults-to-off x-something property if we wanted to
-commit it before the kernel ABI is fixed.
+I don't know that code well; but I think the answer is that since the
+queues themselves are in guest memory, the guest memory is migrated
+by the normal migration code and so the queues version of last_avail_idx
+should be correct.  The 'log' mechanism I previously mentioned will
+need to make sure the queue pages are marked dirty to make sure these
+are updated correctly.
 
-Do we also need to handle this in mprotect() ?
+Dave
 
-thanks
--- PMM
+> 
+> 
+> Thanks
+> 
+> On Tue, 23 Apr 2019 at 14:20, fengyd <fengyd81@gmail.com> wrote:
+> 
+> > Hi,
+> >
+> > I want to add some log to qemu-kvm-ev.
+> > Do you know how to compile qemu-kvm-ev from source code?
+> >
+> > Thanks
+> >
+> > Yafeng
+> >
+> > On Tue, 16 Apr 2019 at 16:47, Dr. David Alan Gilbert <dgilbert@redhat.com>
+> > wrote:
+> >
+> >> * fengyd (fengyd81@gmail.com) wrote:
+> >> > ---------- Forwarded message ---------
+> >> > From: fengyd <fengyd81@gmail.com>
+> >> > Date: Tue, 16 Apr 2019 at 09:17
+> >> > Subject: Re: [Qemu-devel] How live migration work for vhost-user
+> >> > To: Dr. David Alan Gilbert <dgilbert@redhat.com>
+> >> >
+> >> >
+> >> > Hi,
+> >> >
+> >> > Any special feature needs to be supported on guest driver?
+> >> > Because it's OK for standard Linux VM, but not OK for our VM where
+> >> virtio
+> >> > is  implemented by ourself.
+> >>
+> >> I'm not sure; you do have to support that 'log' mechanism but I don't
+> >> know what else is needed.
+> >>
+> >> > And with qemu-kvm-ev-2.6, live migration can work with our VM where
+> >> virtio
+> >> > is  implemented by ourself.
+> >>
+> >> 2.6 is pretty old, so there's a lot of changes - not sure what's
+> >> relevant.
+> >>
+> >> Dave
+> >>
+> >> > Thanks
+> >> > Yafeng
+> >> >
+> >> > On Mon, 15 Apr 2019 at 22:54, Dr. David Alan Gilbert <
+> >> dgilbert@redhat.com>
+> >> > wrote:
+> >> >
+> >> > > * fengyd (fengyd81@gmail.com) wrote:
+> >> > > > Hi,
+> >> > > >
+> >> > > > During live migration,  the folloing log can see in
+> >> nova-compute.log in
+> >> > > my
+> >> > > > environment:
+> >> > > >  ERROR nova.virt.libvirt.driver
+> >> [req-039a85e1-e7a1-4a63-bc6d-c4b9a044aab6
+> >> > > > 0cdab20dc79f4bc6ae5790e7b4a898ac 3363c319773549178acc67f32c78310e -
+> >> > > default
+> >> > > > default] [instance: 5ec719f4-1865-4afe-a207-3d9fae22c410] Live
+> >> Migration
+> >> > > > failure: internal error: qemu unexpectedly closed the monitor:
+> >> > > > 2019-04-15T02:58:22.213897Z qemu-kvm: VQ 0
+> >> > > > size 0x100 < last_avail_idx 0x1e - used_idx 0x23
+> >> > > >
+> >> > > > It's OK for standard Linux VM, but not OK for our VM where virtio is
+> >> > > > implemented by ourself.
+> >> > > > KVM version as follow:
+> >> > > > qemu-kvm-common-ev-2.12.0-18.el7_6.3.1.x86_64
+> >> > > > qemu-kvm-ev-2.12.0-18.el7_6.3.1.x86_64
+> >> > > > libvirt-daemon-kvm-3.9.0-14.2.el7.centos.ncir.8.x86_64
+> >> > > >
+> >> > > > Do you know what's the difference between virtio and vhost-user
+> >> during
+> >> > > > migration?
+> >> > > > The function virtio_load in Qemu is called for virtio and vhost-user
+> >> > > during
+> >> > > > migration.
+> >> > > > For virtio,  last_avail_idx  and used_idx are stored in Qemu, Qemu
+> >> is
+> >> > > > responsible for updating their values accordingly
+> >> > > > For vhost-user, last_avail_idx  and used_idx are stored in
+> >> vhost-user
+> >> > > app,
+> >> > > > eg. DPDK, not in Qemu?
+> >> > > > How does migration work for vhost-user?
+> >> > >
+> >> > > I don't know the details, but my understanding is that vhost-user
+> >> > > tells the vhost-user client about an area of 'log' memory, where the
+> >> > > vhost-user client must mark pages as dirty.
+> >> > >
+> >> > > In the qemu source, see docs/interop/vhost-user.txt and see
+> >> > > the VHOST_SET_LOG_BASE and VHOST_USER_SET_LOG_FD calls.
+> >> > >
+> >> > > If the client correctly marks the areas as dirty, then qemu
+> >> > > should resend those pages across.
+> >> > >
+> >> > >
+> >> > > Dave
+> >> > >
+> >> > > > Thanks in advance
+> >> > > > Yafeng
+> >> > > --
+> >> > > Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+> >> > >
+> >> --
+> >> Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+> >>
+> >
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
 
