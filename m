@@ -2,113 +2,85 @@ Return-Path: <SRS0=sEuR=S7=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS autolearn=ham autolearn_force=no
+X-Spam-Status: No, score=-12.5 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CE442C43219
-	for <qemu-devel@archiver.kernel.org>; Mon, 29 Apr 2019 16:10:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5B236C43219
+	for <qemu-devel@archiver.kernel.org>; Mon, 29 Apr 2019 16:12:05 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9130020673
-	for <qemu-devel@archiver.kernel.org>; Mon, 29 Apr 2019 16:10:03 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9130020673
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 20BA420673
+	for <qemu-devel@archiver.kernel.org>; Mon, 29 Apr 2019 16:12:05 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ipfEL11j"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 20BA420673
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:60019 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:60071 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hL8qw-0000RH-SC
-	for qemu-devel@archiver.kernel.org; Mon, 29 Apr 2019 12:10:02 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:46058)
+	id 1hL8su-0001n9-Dg
+	for qemu-devel@archiver.kernel.org; Mon, 29 Apr 2019 12:12:04 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:48668)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1hL8kL-0004Dc-Qd
-	for qemu-devel@nongnu.org; Mon, 29 Apr 2019 12:03:14 -0400
+	(envelope-from <stefanha@gmail.com>) id 1hL8rk-0001BH-Sn
+	for qemu-devel@nongnu.org; Mon, 29 Apr 2019 12:10:54 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1hL8kK-0005uc-Pd
-	for qemu-devel@nongnu.org; Mon, 29 Apr 2019 12:03:13 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:42836)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <thuth@redhat.com>)
-	id 1hL8k8-0005dS-De; Mon, 29 Apr 2019 12:03:00 -0400
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
-	[10.5.11.12])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id DBC942D7ED;
-	Mon, 29 Apr 2019 16:02:56 +0000 (UTC)
-Received: from thuth.remote.csb (ovpn-116-111.ams2.redhat.com [10.36.116.111])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id B7A3260BE0;
-	Mon, 29 Apr 2019 16:02:43 +0000 (UTC)
-To: Peter Maydell <peter.maydell@linaro.org>
-References: <20190418180057.3593-1-thuth@redhat.com>
-	<20190418180057.3593-17-thuth@redhat.com>
-	<98855a34-ff5a-896f-7959-480b89d62833@redhat.com>
-	<b78d5517-5f23-6028-6726-b60f916f22fd@redhat.com>
-	<CAFEAcA8xWTwbU6RSBbQkF2j5OfozEq9g3Pq83KyYG_J1CqGM-A@mail.gmail.com>
-From: Thomas Huth <thuth@redhat.com>
-Openpgp: preference=signencrypt
-Autocrypt: addr=thuth@redhat.com; keydata=
-	xsFNBFH7eUwBEACzyOXKU+5Pcs6wNpKzrlJwzRl3VGZt95VCdb+FgoU9g11m7FWcOafrVRwU
-	yYkTm9+7zBUc0sW5AuPGR/dp3pSLX/yFWsA/UB4nJsHqgDvDU7BImSeiTrnpMOTXb7Arw2a2
-	4CflIyFqjCpfDM4MuTmzTjXq4Uov1giGE9X6viNo1pxyEpd7PanlKNnf4PqEQp06X4IgUacW
-	tSGj6Gcns1bCuHV8OPWLkf4hkRnu8hdL6i60Yxz4E6TqlrpxsfYwLXgEeswPHOA6Mn4Cso9O
-	0lewVYfFfsmokfAVMKWzOl1Sr0KGI5T9CpmRfAiSHpthhHWnECcJFwl72NTi6kUcUzG4se81
-	O6n9d/kTj7pzTmBdfwuOZ0YUSqcqs0W+l1NcASSYZQaDoD3/SLk+nqVeCBB4OnYOGhgmIHNW
-	0CwMRO/GK+20alxzk//V9GmIM2ACElbfF8+Uug3pqiHkVnKqM7W9/S1NH2qmxB6zMiJUHlTH
-	gnVeZX0dgH27mzstcF786uPcdEqS0KJuxh2kk5IvUSL3Qn3ZgmgdxBMyCPciD/1cb7/Ahazr
-	3ThHQXSHXkH/aDXdfLsKVuwDzHLVSkdSnZdt5HHh75/NFHxwaTlydgfHmFFwodK8y/TjyiGZ
-	zg2Kje38xnz8zKn9iesFBCcONXS7txENTzX0z80WKBhK+XSFJwARAQABzRxUaG9tYXMgSHV0
-	aCA8dGguaHV0aEBnbXguZGU+wsF7BBMBAgAlAhsDBgsJCAcDAgYVCAIJCgsEFgIDAQIeAQIX
-	gAUCUfuWKwIZAQAKCRAu2dd0/nAttbe/EACb9hafyOb2FmhUqeAiBORSsUifFacQ7laVjcgR
-	I4um8CSHvxijYftpkM2EdAtmXIKgbNDpQoXcWLXB9lu9mLgTO4DVT00TRR65ikn3FCWcyT74
-	ENTOzRKyKLsDCjhXKPblTPIQbYAUCOWElcyAPm0ERd62fA/rKNxgIiNo/l4UODOMoOJm2/Ox
-	ZoTckW68Eqv7k9L7m7j+Hn3hoDTjAmcCBJt+j7pOhzWvCbqoNOIH8C8qvPaNlrba+R/K6jkO
-	6jZkTbYQpGIofEQJ/TNn38IsNGpI1ALTHWFtoMxp3j2Imz0REO6dRE2fHRN8sVlHgkoeGhmY
-	NbDsDE1jFQOEObFnu0euk//7BXU7tGOHckVAZ8T1smiRPHfQU7UEH2a/grndxJ+PNeM5w7n2
-	l+FN3cf2KgPotCK2s9MjSdZA7C5e3rFYO8lqiqTJKvc62vqp3e7B0Kjyy5/QtzSOejBij2QL
-	xkKSFNtxIz4MtuxN8e3IDQNxsKry3nF7R4MDvouXlMo6wP9KuyNWb+vFJt9GtbgfDMIFVamp
-	ZfhEWzWRJH4VgksENA4K/BzjEHCcbTUb1TFsiB1VRnBPJ0SqlvifnfKk6HcpkDk6Pg8Q5FOJ
-	gbNHrdgXsm+m/9GF2zUUr+rOlhVbK23TUqKqPfwnD7uxjpakVcJnsVCFqJpZi1F/ga9IN87B
-	TQRR+3lMARAAtp831HniPHb9AuKq3wj83ujZK8lH5RLrfVsB4X1wi47bwo56BqhXpR/zxPTR
-	eOFT0gnbw9UkphVc7uk/alnXMDEmgvnuxv89PwIQX6k3qLABeV7ykJQG/WT5HQ6+2DdGtVw3
-	2vjYAPiWQeETsgWRRQMDR0/hwp8s8tL/UodwYCScH6Vxx9pdy353L1fK4Bb9G73a+9FPjp9l
-	x+WwKTsltVqSBuSjyZQ3c3EE8qbTidXZxB38JwARH8yN3TX+t65cbBqLl/zRUUUTapHQpUEd
-	yoAsHIml32e4q+3xdLtTdlLi7FgPBItSazcqZPjEcYW73UAuLcmQmfJlQ5PkDiuqcitn+KzH
-	/1pqsTU7QFZjbmSMJyXY0TDErOFuMOjf20b6arcpEqse1V3IKrb+nqqA2azboRm3pEANLAJw
-	iVTwK3qwGRgK5ut6N/Znv20VEHkFUsRAZoOusrIRfR5HFDxlXguAdEz8M/hxXFYYXqOoaCYy
-	6pJxTjy0Y/tIfmS/g9Bnp8qg9wsrsnk0+XRnDVPak++G3Uq9tJPwpJbyO0vcqEI3vAXkAB7X
-	VXLzvFwi66RrsPUoDkuzj+aCNumtOePDOCpXQGPpKl+l1aYRMN/+lNSk3+1sVuc2C07WnYyE
-	gV/cbEVklPmKrNwu6DeUyD0qI/bVzKMWZAiB1r56hsGeyYcAEQEAAcLBXwQYAQIACQUCUft5
-	TAIbDAAKCRAu2dd0/nAttYTwEACLAS/THRqXRKb17PQmKwZHerUvZm2klo+lwQ3wNQBHUJAT
-	p2R9ULexyXrJPqjUpy7+voz+FcKiuQBTKyieiIxO46oMxsbXGZ70o3gxjxdYdgimUD6U8PPd
-	JH8tfAL4BR5FZNjspcnscN2jgbF4OrpDeOLyBaj6HPmElNPtECHWCaf1xbIFsZxSDGMA6cUh
-	0uX3Q8VI7JN1AR2cfiIRY7NrIlWYucJxyKjO3ivWm69nCtsHiJ0wcF8KlVo7F2eLaufo0K8A
-	ynL8SHMF3VEyxsXOP2f1UR9T2Ur30MXcTBpjUxml1TX3RWY5uH89Js/jlIugBwuAmacJ7JYh
-	lTg6sF/GNc4nPb4kk2yktNWTade+TzsllYlJPaorD2Qe8qX0iFUhFC6y9+O6mP4ZvWoYapp9
-	ezYNuebMgEr93ob1+4sFg3812wNP01WqsGtWCJHnPv/JoonFdMzD/bIkXGEJMk6ks2kxQQZq
-	g6Ik/s/vxOfao/xCn8nHt7GwvVy41795hzK6tbSl+BuyCRp0vfPRP34OnK7+jR2nvQpJu/pU
-	rCELuGwT9hsYkUPjVd4lfylN3mzEc6iAv/wwjsc0DRTSQCpXT3v2ymTAsRKrVaEZLibTXaf+
-	WslxWek3xNYRiqwwWAJuL652eAlxUgQ5ZS+fXBRTiQpJ+F26I/2lccScRd9G5w==
-Organization: Red Hat
-Message-ID: <3f8cad24-3eb9-4c05-063e-196e27184f90@redhat.com>
-Date: Mon, 29 Apr 2019 18:02:42 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
-	Thunderbird/60.6.1
+	(envelope-from <stefanha@gmail.com>) id 1hL8rj-0003qM-Ty
+	for qemu-devel@nongnu.org; Mon, 29 Apr 2019 12:10:52 -0400
+Received: from mail-it1-x136.google.com ([2607:f8b0:4864:20::136]:40012)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1hL8rj-0003pL-Md
+	for qemu-devel@nongnu.org; Mon, 29 Apr 2019 12:10:51 -0400
+Received: by mail-it1-x136.google.com with SMTP id k64so9777174itb.5
+	for <qemu-devel@nongnu.org>; Mon, 29 Apr 2019 09:10:51 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+	h=from:to:cc:subject:date:message-id:mime-version
+	:content-transfer-encoding;
+	bh=3t8thYSykPOt3evLHsj2Me359Tq+7SnvH1AtuRkDAoI=;
+	b=ipfEL11jzs82Frpm2omtLpEsaA1SdoRmY+4+TNvIR61IAc1P+qMU+QHQRI3mU9pn+P
+	0amqrspqXgsag1eYZXPzeZ+8RyrNdx+Y8vpgZv9v+GBBxa0Mjd8oRGEAkPFQlVRtoMOw
+	KhRDyFvorEAkA/vBib/03XVj+5sXqF8jAlvz1avQMGDLao1n8MBLnNjfjKuSEXpoP1Zh
+	rvi4yFEN5sIjD+JLWDz6FK5pIa4BQYz/0mA3UTjYqA1LEhL5irBE6qZ+f0anBWVYs3VP
+	xn3RIE4L3+WodCHBnqyD2LsU87UDYiRk97Is5ZHq8hjzebUvXmmlUBlu5Rw6GAaPRnhj
+	2diw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=1e100.net; s=20161025;
+	h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+	:content-transfer-encoding;
+	bh=3t8thYSykPOt3evLHsj2Me359Tq+7SnvH1AtuRkDAoI=;
+	b=dlcNpHqLvQ9zMQVApnT5PVpzgKd6s/MIou8BMiH5wVHlAEpA5jdyb3yC+o8sZbT3fd
+	tmVDc3LnZ+oQWH/nBA2RxeaIYM+Bt0FGBeLm1Mza0yRgqK4qaLCsi8erwi1kgRTYKzLI
+	ki75wJihjLax2k6gVC9vCkQPFKQK57iGlC60bJLTwIhvzuOYiOyEDJAxvYY8hAsny3p7
+	bZZHJFA1thO4hk7MIrMu72Mr5Z362Sba7mtB9AhcSCcGAeNdAHWFzzK0l1CHFEyscfkT
+	xQL51FRxFNWYGkmhX+p/54o3CBOdRNX9RpwfNd7v+kiqy8yiPnmWOMU2Vm1Hh4J5wYe/
+	+gNw==
+X-Gm-Message-State: APjAAAWzyoc7kGXuU6p7OyZa/Jj4FmTHqOJCtSs+717X7tiOodrpOIia
+	lb1u5v7yrKTwjKS9iaYr2WCVqEGpktE=
+X-Google-Smtp-Source: APXvYqxXWBFM0CKSf0BcE/68lR7YePynb5mh2HHBS3Caalv1d1lHcrTKLpkFkYNK66ZD460FYITeHA==
+X-Received: by 2002:a24:4d06:: with SMTP id l6mr18718224itb.140.1556554249996; 
+	Mon, 29 Apr 2019 09:10:49 -0700 (PDT)
+Received: from localhost
+	(CPE64777d5479c3-CM64777d5479c0.cpe.net.cable.rogers.com.
+	[99.228.64.175])
+	by smtp.gmail.com with ESMTPSA id 15sm16278734itm.6.2019.04.29.09.10.48
+	(version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
+	Mon, 29 Apr 2019 09:10:49 -0700 (PDT)
+From: Stefan Hajnoczi <stefanha@gmail.com>
+To: qemu-devel@nongnu.org
+Date: Mon, 29 Apr 2019 12:10:45 -0400
+Message-Id: <20190429161046.10527-1-stefanha@gmail.com>
+X-Mailer: git-send-email 2.20.1
 MIME-Version: 1.0
-In-Reply-To: <CAFEAcA8xWTwbU6RSBbQkF2j5OfozEq9g3Pq83KyYG_J1CqGM-A@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.30]);
-	Mon, 29 Apr 2019 16:02:57 +0000 (UTC)
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH for-QEMU-4.1 v5 16/29] hw/arm: Express
- dependencies of the virt machine with Kconfig
+Content-Transfer-Encoding: 8bit
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+	recognized.
+X-Received-From: 2607:f8b0:4864:20::136
+Subject: [Qemu-devel] [PULL 0/1] Tracing patches
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -120,58 +92,38 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Jan Kiszka <jan.kiszka@web.de>, "Michael S. Tsirkin" <mst@redhat.com>,
-	QEMU Developers <qemu-devel@nongnu.org>, Gerd Hoffmann <kraxel@redhat.com>,
-	"Edgar E . Iglesias" <edgar.iglesias@gmail.com>,
-	Subbaraya Sundeep <sundeep.lkml@gmail.com>,
-	Yang Zhong <yang.zhong@intel.com>, Rob Herring <robh@kernel.org>,
-	Qemu-block <qemu-block@nongnu.org>,
-	Andrey Smirnov <andrew.smirnov@gmail.com>,
-	Antony Pavlov <antonynpavlov@gmail.com>,
-	=?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
-	Joel Stanley <joel@jms.id.au>, Alistair Francis <alistair@alistair23.me>,
-	Beniamino Galvani <b.galvani@gmail.com>, qemu-arm <qemu-arm@nongnu.org>,
-	Peter Chubb <peter.chubb@nicta.com.au>,
-	Cedric Le Goater <clg@kaod.org>, John Snow <jsnow@redhat.com>,
-	Andrew Jeffery <andrew@aj.id.au>, Philippe Mathieu-Daude <f4bug@amsat.org>,
-	Jean-Christophe Dubois <jcd@tribudubois.net>,
-	Igor Mitsyanko <i.mitsyanko@gmail.com>, Paolo Bonzini <pbonzini@redhat.com>
+Cc: Stefan Hajnoczi <stefanha@gmail.com>, Paolo Bonzini <pbonzini@redhat.com>,
+	Peter Maydell <peter.maydell@linaro.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190429160242.8htJUoH7lPSCu2A8tjHimqdABIW8D-ykGxTmo4hyI1w@z>
+Content-Type: text/plain; charset="UTF-8"
+Message-ID: <20190429161045.0CujDOgrgt9YSkhCOkuTiNcluRimbawjdI0VPyz2IgY@z>
 
-On 29/04/2019 17.53, Peter Maydell wrote:
-> On Mon, 29 Apr 2019 at 16:34, Thomas Huth <thuth@redhat.com> wrote:
->>
->> On 25/04/2019 17.53, Philippe Mathieu-Daud=C3=A9 wrote:
->>> Hi Thomas,
->>>
->>> On 4/18/19 8:00 PM, Thomas Huth wrote:
->>>> Dependencies have been determined by looking at hw/arm/virt.c
->>>>
->>>> Signed-off-by: Thomas Huth <thuth@redhat.com>
->>>> ---
->>>>  default-configs/arm-softmmu.mak | 11 +----------
->>>>  hw/arm/Kconfig                  | 19 +++++++++++++++++++
->>>>  hw/arm/Makefile.objs            |  3 ++-
->>>>  3 files changed, 22 insertions(+), 11 deletions(-)
->=20
->>> Without -nodefaults I get:
->>> qemu-system-aarch64: Unsupported NIC model: virtio-net-pci
->>> This is expected.
->>
->> Yes, it should still work with "-nic none" or "-nodefaults".
->=20
-> Er, if you need either -nic none or -nodefaults after this
-> patch then this would be a change in behaviour, which seems
-> wrong to me.
+The following changes since commit e0fb2c3d89aa77057ac4aa073e01f4ca484449b0:
 
-No worry, this only applies to compiling builds where you run "configure
- --without-default-devices". For normal builds, virtio-net should still
-be included fine. ... at least I hope this is what Philippe was talking
-about ... but for me it's working fine when I run "configure" normally.
+  Merge remote-tracking branch 'remotes/rth/tags/pull-tcg-20190426' into staging (2019-04-28 11:43:10 +0100)
 
- Thomas
+are available in the Git repository at:
+
+  https://github.com/stefanha/qemu.git tags/tracing-pull-request
+
+for you to fetch changes up to b1939fcd438b7140cb8f2685dee026bb112819d7:
+
+  trace: fix runstate tracing (2019-04-29 11:57:19 -0400)
+
+----------------------------------------------------------------
+Pull request
+
+----------------------------------------------------------------
+
+Yury Kotov (1):
+  trace: fix runstate tracing
+
+ vl.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+-- 
+2.20.1
 
 
