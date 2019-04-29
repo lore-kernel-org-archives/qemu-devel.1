@@ -1,32 +1,33 @@
-Received: from eggs.gnu.org ([209.51.188.92]:55160)
+Received: from eggs.gnu.org ([209.51.188.92]:55162)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1hKz2d-0003Rf-63
+	(envelope-from <bounces@canonical.com>) id 1hKz2d-0003Rg-73
 	for qemu-devel@nongnu.org; Mon, 29 Apr 2019 01:41:28 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1hKz2b-00027P-0Y
+	(envelope-from <bounces@canonical.com>) id 1hKz2b-00027O-0h
 	for qemu-devel@nongnu.org; Mon, 29 Apr 2019 01:41:26 -0400
-Received: from indium.canonical.com ([91.189.90.7]:57460)
+Received: from indium.canonical.com ([91.189.90.7]:57452)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1hKz2T-0001tF-Tl
-	for qemu-devel@nongnu.org; Mon, 29 Apr 2019 01:41:19 -0400
+	id 1hKz2U-0001tC-Ic
+	for qemu-devel@nongnu.org; Mon, 29 Apr 2019 01:41:20 -0400
 Received: from loganberry.canonical.com ([91.189.90.37])
 	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1hKz23-0002P0-Dp
+	id 1hKz23-0002T3-S6
 	for <qemu-devel@nongnu.org>; Mon, 29 Apr 2019 05:40:51 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 3FE042E80D3
+	by loganberry.canonical.com (Postfix) with ESMTP id C3C4B2E80CB
 	for <qemu-devel@nongnu.org>; Mon, 29 Apr 2019 05:40:51 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Mon, 29 Apr 2019 05:25:33 -0000
+Date: Mon, 29 Apr 2019 05:27:16 -0000
 From: Amol Surati <1826827@bugs.launchpad.net>
 Reply-To: Bug 1826827 <1826827@bugs.launchpad.net>
 Sender: bounces@canonical.com
-Message-Id: <155651553398.6774.264581366962353554.malonedeb@chaenomeles.canonical.com>
+References: <155651553398.6774.264581366962353554.malonedeb@chaenomeles.canonical.com>
+Message-Id: <155651563682.16851.8355822594995728428.malone@soybean.canonical.com>
 Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1826827] [NEW] dtc crash;
+Subject: [Qemu-devel] [Bug 1826827] Re: dtc crash;
  pnv_dt_serial cannot find lpc's phandle
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
@@ -38,81 +39,135 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-Public bug reported:
+** Attachment added: "the powernv dtb"
+   https://bugs.launchpad.net/qemu/+bug/1826827/+attachment/5259834/+files/=
+dtb
 
-Qemu version:
-QEMU emulator version 4.0.50 (v4.0.0-142-ge0fb2c3d89)
-Copyright (c) 2003-2019 Fabrice Bellard and the QEMU Project developers
+** Description changed:
 
-dtc version:
-Version: DTC 1.5.0-g5c3513f6
+- pnv_dt_serial has a line which is supposed to set the interrupt-parent
+- of the "isa-serial@i3f8" node to the phandle of "lpc@0".
++ Qemu version:
++ QEMU emulator version 4.0.50 (v4.0.0-142-ge0fb2c3d89)
++ Copyright (c) 2003-2019 Fabrice Bellard and the QEMU Project developers
++ =
 
--------------------------------------------------------------------------
-pnv_dt_serial has a line which is supposed to set the interrupt-parent of t=
-he "isa-serial@i3f8" node to the phandle of "lpc@0".
++ dtc version:
++ Version: DTC 1.5.0-g5c3513f6
++ =
 
-To that end, it calls fdt_get_phandle as shown below:
-_FDT((fdt_setprop_cell(fdt, node, "interrupt-parent", fdt_get_phandle(fdt, =
-lpc_off))));
++ =
 
-The function fdt_get_phandle fails to find the property "phandle" (or
-"linux,phandle") for the lpc node. Consequently, pnv_dt_serial sets the
-interrupt-parent to 0.
++ -------------------------------------------------------------------------
++ pnv_dt_serial has a line which is supposed to set the interrupt-parent of=
+ the "isa-serial@i3f8" node to the phandle of "lpc@0".
+  =
 
-Now boot the qemu-system-ppc64 powernv machine, and extract the fdt by
-using the qemu monitor's pmemsave command, taking help of the OPAL
-firmware's messages to locate the fdt in the physical ram.
+  To that end, it calls fdt_get_phandle as shown below:
+  _FDT((fdt_setprop_cell(fdt, node, "interrupt-parent", fdt_get_phandle(fdt=
+, lpc_off))));
+  =
 
-qemu-system-ppc64 -m 1g -machine powernv,num-chips=3D1 \
--cpu power9 -smp 2,cores=3D2,threads=3D1 -accel tcg,thread=3Dmulti \
--kernel ./vmlinux \
--append 'disable_radix' \
--serial mon:stdio -nographic -nodefaults
+  The function fdt_get_phandle fails to find the property "phandle" (or
+  "linux,phandle") for the lpc node. Consequently, pnv_dt_serial sets the
+  interrupt-parent to 0.
+  =
 
-The kernel vmlinux contains nothing but a single instruction which loops
-infintely, so that we can gather OPAL's messages, especially the one
-below:
+- =
 
-[    0.168845963,5] INIT: Starting kernel at 0x20000000, fdt at
-0x304b0b70 14404 bytes
+- =
 
-Once the fdt is dumped to a file, run the following:
+  Now boot the qemu-system-ppc64 powernv machine, and extract the fdt by
+  using the qemu monitor's pmemsave command, taking help of the OPAL
+  firmware's messages to locate the fdt in the physical ram.
+  =
 
-'dtc -O dtb -I dts -o out.dts dtb'
+- qemu-system-ppc64 -m 1g -machine powernv,num-chips=3D1 \  =
 
-After a few warnings, the dtc application crashes because an assertion
-was fired.
+- -cpu power9 -smp 2,cores=3D2,threads=3D1 -accel tcg,thread=3Dmulti \     =
+             =
 
-out.dts: Warning (unit_address_vs_reg): /lpcm-opb@6030000000000/lpc@0: node=
+- -kernel ./vmlinux \                                                      =
+       =
+
+- -append 'disable_radix' \                                                =
+       =
+
+- -serial mon:stdio -nographic -nodefaults =
+
++ qemu-system-ppc64 -m 1g -machine powernv,num-chips=3D1 \
++ -cpu power9 -smp 2,cores=3D2,threads=3D1 -accel tcg,thread=3Dmulti \
++ -kernel ./vmlinux \
++ -append 'disable_radix' \
++ -serial mon:stdio -nographic -nodefaults
+  =
+
+  The kernel vmlinux contains nothing but a single instruction which loops
+  infintely, so that we can gather OPAL's messages, especially the one
+  below:
+  =
+
+  [    0.168845963,5] INIT: Starting kernel at 0x20000000, fdt at
+  0x304b0b70 14404 bytes
+  =
+
+- =
+
+- =
+
+  Once the fdt is dumped to a file, run the following:
+  =
+
+  'dtc -O dtb -I dts -o out.dts dtb'
+  =
+
+- =
+
+- After a few warnings, the dtc application crashes because an assertion wa=
+s fired.
++ After a few warnings, the dtc application crashes because an assertion
++ was fired.
+  =
+
+  1.dts: Warning (unit_address_vs_reg): /lpcm-opb@6030000000000/lpc@0: node=
  has a unit name, but no reg property
-out.dts: Warning (simple_bus_reg): /lpcm-opb@6030000000000/lpc@0: missing o=
+  1.dts: Warning (simple_bus_reg): /lpcm-opb@6030000000000/lpc@0: missing o=
 r empty reg/ranges property
-out.dts: Warning (avoid_unnecessary_addr_size): /ibm,opal: unnecessary #add=
+  1.dts: Warning (avoid_unnecessary_addr_size): /ibm,opal: unnecessary #add=
 ress-cells/#size-cells without "ranges" or child "reg" property
-out.dts: Warning (unique_unit_address): /interrupt-controller@0: duplicate =
+  1.dts: Warning (unique_unit_address): /interrupt-controller@0: duplicate =
 unit-address (also used in node /memory@0)
-out.dts: Warning (chosen_node_stdout_path): /chosen:linux,stdout-path: Use =
+  1.dts: Warning (chosen_node_stdout_path): /chosen:linux,stdout-path: Use =
 'stdout-path' instead
-dtc: livetree.c:575: get_node_by_phandle: Assertion `generate_fixups' faile=
-d.
-Aborted (core dumped)
+  dtc: livetree.c:575: get_node_by_phandle: Assertion `generate_fixups' fai=
+led.
+  Aborted (core dumped)
+  =
 
-The assertion is fired because get_node_by_phandle receives a phandle
-value of 0, which is unexpected, unless fixups are needed (They are not,
-when running the dtc command).
+- =
 
-Back inside pnv_dt_serial, if the line that sets "interrupt-parent" for
-the serial device node is commented out, the dtc crash is prevented.
-Looking at hw/ppc/e500.c, it takes care of allocating necessary phandle
-values in the nodes, so a similar method can be adopted for powernv.
+  The assertion is fired because get_node_by_phandle receives a phandle
+  value of 0, which is unexpected, unless fixups are needed (They are not,
+  when running the dtc command).
+  =
 
-The dtb is attached.
+- =
 
-Edit: Add version, Correct filenames.
+- =
 
-** Affects: qemu
-     Importance: Undecided
-         Status: New
+- Back inside pnv_dt_serial, if the line that sets "interrupt-parent" for t=
+he serial device node is commented out, the dtc crash is prevented. Looking=
+ at hw/ppc/e500.c, it takes care of allocating necessary phandle values in =
+the nodes, so a similar method can be adopted for powernv.
+- =
+
++ Back inside pnv_dt_serial, if the line that sets "interrupt-parent" for
++ the serial device node is commented out, the dtc crash is prevented.
++ Looking at hw/ppc/e500.c, it takes care of allocating necessary phandle
++ values in the nodes, so a similar method can be adopted for powernv.
+  =
+
+  The dtb is attached.
 
 -- =
 
