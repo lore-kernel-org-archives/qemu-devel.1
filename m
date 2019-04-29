@@ -1,26 +1,26 @@
-Received: from eggs.gnu.org ([209.51.188.92]:54101)
+Received: from eggs.gnu.org ([209.51.188.92]:51632)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1hL7qY-0003hU-Ry
-	for qemu-devel@nongnu.org; Mon, 29 Apr 2019 11:05:37 -0400
+	(envelope-from <alistair@alistair23.me>) id 1hKyqx-0004vT-Qt
+	for qemu-devel@nongnu.org; Mon, 29 Apr 2019 01:29:24 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1hL7qX-0004mz-GL
-	for qemu-devel@nongnu.org; Mon, 29 Apr 2019 11:05:34 -0400
-Resent-Message-Id: <E1hL7qX-0004mz-GL@eggs.gnu.org>
-Received: from sender-of-o53.zoho.com ([135.84.80.218]:21845)
+	(envelope-from <alistair@alistair23.me>) id 1hKyqw-0003QC-VR
+	for qemu-devel@nongnu.org; Mon, 29 Apr 2019 01:29:23 -0400
+Received: from mail-oln040092255024.outbound.protection.outlook.com
+	([40.92.255.24]:6038
+	helo=APC01-HK2-obe.outbound.protection.outlook.com)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
-	id 1hL7qV-0004gD-Eb
-	for qemu-devel@nongnu.org; Mon, 29 Apr 2019 11:05:32 -0400
-In-Reply-To: <1556523569-44480-1-git-send-email-longpeng2@huawei.com>
-Message-ID: <155655030568.10667.13700938703853199260@c2072b67cc0c>
-Reply-To: <qemu-devel@nongnu.org>
+	(Exim 4.71) (envelope-from <alistair@alistair23.me>)
+	id 1hKyqw-0003Ow-KT
+	for qemu-devel@nongnu.org; Mon, 29 Apr 2019 01:29:22 -0400
+From: Alistair Francis <alistair@alistair23.me>
+Date: Mon, 29 Apr 2019 05:29:17 +0000
+Message-ID: <PSXP216MB0277275ABAB6858751227C2ADD390@PSXP216MB0277.KORP216.PROD.OUTLOOK.COM>
+Content-Language: en-US
+Content-Type: text/plain; charset="iso-8859-1"
+Content-Transfer-Encoding: quoted-printable
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Mon, 29 Apr 2019 08:05:06 -0700 (PDT)
-Subject: Re: [Qemu-devel] [PATCH] usb/xchi: avoid trigger assertion if guest
- write wrong epid
+Subject: [Qemu-devel] [PATCH v1 0/5] Add the STM32F405 and Netduino Plus 2
+ machine
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,18 +29,52 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: longpeng2@huawei.com
-Cc: fam@euphon.net, kraxel@redhat.com, arei.gonglei@huawei.com, qemu-devel@nongnu.org
+To: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+Cc: "alistair23@gmail.com" <alistair23@gmail.com>
 
-UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8xNTU2NTIzNTY5LTQ0NDgwLTEt
-Z2l0LXNlbmQtZW1haWwtbG9uZ3BlbmcyQGh1YXdlaS5jb20vCgoKCkhpLAoKVGhpcyBzZXJpZXMg
-ZmFpbGVkIHRoZSBkb2NrZXItbWluZ3dAZmVkb3JhIGJ1aWxkIHRlc3QuIFBsZWFzZSBmaW5kIHRo
-ZSB0ZXN0aW5nIGNvbW1hbmRzIGFuZAp0aGVpciBvdXRwdXQgYmVsb3cuIElmIHlvdSBoYXZlIERv
-Y2tlciBpbnN0YWxsZWQsIHlvdSBjYW4gcHJvYmFibHkgcmVwcm9kdWNlIGl0CmxvY2FsbHkuCgo9
-PT0gVEVTVCBTQ1JJUFQgQkVHSU4gPT09CiMhL2Jpbi9iYXNoCnRpbWUgbWFrZSBkb2NrZXItdGVz
-dC1taW5nd0BmZWRvcmEgU0hPV19FTlY9MSBKPTE0IE5FVFdPUks9MQo9PT0gVEVTVCBTQ1JJUFQg
-RU5EID09PQoKCgoKVGhlIGZ1bGwgbG9nIGlzIGF2YWlsYWJsZSBhdApodHRwOi8vcGF0Y2hldy5v
-cmcvbG9ncy8xNTU2NTIzNTY5LTQ0NDgwLTEtZ2l0LXNlbmQtZW1haWwtbG9uZ3BlbmcyQGh1YXdl
-aS5jb20vdGVzdGluZy5kb2NrZXItbWluZ3dAZmVkb3JhLz90eXBlPW1lc3NhZ2UuCi0tLQpFbWFp
-bCBnZW5lcmF0ZWQgYXV0b21hdGljYWxseSBieSBQYXRjaGV3IFtodHRwczovL3BhdGNoZXcub3Jn
-L10uClBsZWFzZSBzZW5kIHlvdXIgZmVlZGJhY2sgdG8gcGF0Y2hldy1kZXZlbEByZWRoYXQuY29t
+
+Now that the Arm-M4 CPU has been added to QEMU we can add the Netduino
+Plus 2 machine. This is very similar to the STM32F205 and Netduino 2 SoC
+and machine.
+
+
+Alistair Francis (5):
+  armv7m: Allow entry information to be returned
+  hw/misc: Add the STM32F4xx Sysconfig device
+  hw/misc: Add the STM32F4xx EXTI device
+  hw/arm: Add the STM32F4xx SoC
+  hw/arm: Add the Netduino Plus 2
+
+ MAINTAINERS                        |  14 ++
+ default-configs/arm-softmmu.mak    |   4 +
+ hw/arm/Kconfig                     |   6 +
+ hw/arm/Makefile.objs               |   2 +
+ hw/arm/armv7m.c                    |   6 +-
+ hw/arm/microbit.c                  |   2 +-
+ hw/arm/mps2-tz.c                   |   3 +-
+ hw/arm/mps2.c                      |   2 +-
+ hw/arm/msf2-som.c                  |   2 +-
+ hw/arm/musca.c                     |   3 +-
+ hw/arm/netduino2.c                 |   2 +-
+ hw/arm/netduinoplus2.c             |  77 ++++++++
+ hw/arm/stellaris.c                 |   3 +-
+ hw/arm/stm32f405_soc.c             | 292 +++++++++++++++++++++++++++++
+ hw/misc/Kconfig                    |   6 +
+ hw/misc/Makefile.objs              |   2 +
+ hw/misc/stm32f4xx_exti.c           | 175 +++++++++++++++++
+ hw/misc/stm32f4xx_syscfg.c         | 275 +++++++++++++++++++++++++++
+ include/hw/arm/arm.h               |   4 +-
+ include/hw/arm/stm32f405_soc.h     |  70 +++++++
+ include/hw/misc/stm32f4xx_exti.h   |  57 ++++++
+ include/hw/misc/stm32f4xx_syscfg.h |  62 ++++++
+ 22 files changed, 1058 insertions(+), 11 deletions(-)
+ create mode 100644 hw/arm/netduinoplus2.c
+ create mode 100644 hw/arm/stm32f405_soc.c
+ create mode 100644 hw/misc/stm32f4xx_exti.c
+ create mode 100644 hw/misc/stm32f4xx_syscfg.c
+ create mode 100644 include/hw/arm/stm32f405_soc.h
+ create mode 100644 include/hw/misc/stm32f4xx_exti.h
+ create mode 100644 include/hw/misc/stm32f4xx_syscfg.h
+
+--=20
+2.21.0
