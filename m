@@ -1,26 +1,27 @@
-Received: from eggs.gnu.org ([209.51.188.92]:48291)
+Received: from eggs.gnu.org ([209.51.188.92]:48704)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1hLAY1-0000d0-Is
-	for qemu-devel@nongnu.org; Mon, 29 Apr 2019 13:58:38 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1hLAZY-0001VT-HT
+	for qemu-devel@nongnu.org; Mon, 29 Apr 2019 14:00:13 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1hLAY0-000695-G6
-	for qemu-devel@nongnu.org; Mon, 29 Apr 2019 13:58:37 -0400
-Resent-Message-Id: <E1hLAY0-000695-G6@eggs.gnu.org>
-Received: from sender-of-o53.zoho.com ([135.84.80.218]:21867)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
-	id 1hLAY0-00068X-6p
-	for qemu-devel@nongnu.org; Mon, 29 Apr 2019 13:58:36 -0400
-In-Reply-To: <1556523569-44480-1-git-send-email-longpeng2@huawei.com>
-Message-ID: <155656069051.10667.7616511989657327762@c2072b67cc0c>
-Reply-To: <qemu-devel@nongnu.org>
+	(envelope-from <peter.maydell@linaro.org>) id 1hLAZX-0006xA-Kl
+	for qemu-devel@nongnu.org; Mon, 29 Apr 2019 14:00:12 -0400
+Received: from mail-oi1-x244.google.com ([2607:f8b0:4864:20::244]:39227)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1hLAZX-0006wO-FC
+	for qemu-devel@nongnu.org; Mon, 29 Apr 2019 14:00:11 -0400
+Received: by mail-oi1-x244.google.com with SMTP id n187so9046950oih.6
+	for <qemu-devel@nongnu.org>; Mon, 29 Apr 2019 11:00:11 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Mon, 29 Apr 2019 10:58:12 -0700 (PDT)
-Subject: Re: [Qemu-devel] [PATCH] usb/xchi: avoid trigger assertion if guest
- write wrong epid
+References: <20190403034358.21999-1-richard.henderson@linaro.org>
+	<20190403034358.21999-19-richard.henderson@linaro.org>
+In-Reply-To: <20190403034358.21999-19-richard.henderson@linaro.org>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Mon, 29 Apr 2019 18:59:59 +0100
+Message-ID: <CAFEAcA9aOWheZjUCBMh3Bo8zvpeb1e9TvwKroG3Oo6cU1+0NdA@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH 18/26] target/sh4: Convert to
+ CPUClass::tlb_fill
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,18 +30,17 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: longpeng2@huawei.com
-Cc: fam@euphon.net, kraxel@redhat.com, arei.gonglei@huawei.com, qemu-devel@nongnu.org
+To: Richard Henderson <richard.henderson@linaro.org>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, Aurelien Jarno <aurelien@aurel32.net>
 
-UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8xNTU2NTIzNTY5LTQ0NDgwLTEt
-Z2l0LXNlbmQtZW1haWwtbG9uZ3BlbmcyQGh1YXdlaS5jb20vCgoKCkhpLAoKVGhpcyBzZXJpZXMg
-ZmFpbGVkIHRoZSBhc2FuIGJ1aWxkIHRlc3QuIFBsZWFzZSBmaW5kIHRoZSB0ZXN0aW5nIGNvbW1h
-bmRzIGFuZAp0aGVpciBvdXRwdXQgYmVsb3cuIElmIHlvdSBoYXZlIERvY2tlciBpbnN0YWxsZWQs
-IHlvdSBjYW4gcHJvYmFibHkgcmVwcm9kdWNlIGl0CmxvY2FsbHkuCgo9PT0gVEVTVCBTQ1JJUFQg
-QkVHSU4gPT09CiMhL2Jpbi9iYXNoCnRpbWUgbWFrZSBkb2NrZXItdGVzdC1kZWJ1Z0BmZWRvcmEg
-VEFSR0VUX0xJU1Q9eDg2XzY0LXNvZnRtbXUgSj0xNCBORVRXT1JLPTEKPT09IFRFU1QgU0NSSVBU
-IEVORCA9PT0KCgoKClRoZSBmdWxsIGxvZyBpcyBhdmFpbGFibGUgYXQKaHR0cDovL3BhdGNoZXcu
-b3JnL2xvZ3MvMTU1NjUyMzU2OS00NDQ4MC0xLWdpdC1zZW5kLWVtYWlsLWxvbmdwZW5nMkBodWF3
-ZWkuY29tL3Rlc3RpbmcuYXNhbi8/dHlwZT1tZXNzYWdlLgotLS0KRW1haWwgZ2VuZXJhdGVkIGF1
-dG9tYXRpY2FsbHkgYnkgUGF0Y2hldyBbaHR0cHM6Ly9wYXRjaGV3Lm9yZy9dLgpQbGVhc2Ugc2Vu
-ZCB5b3VyIGZlZWRiYWNrIHRvIHBhdGNoZXctZGV2ZWxAcmVkaGF0LmNvbQ==
+On Wed, 3 Apr 2019 at 05:01, Richard Henderson
+<richard.henderson@linaro.org> wrote:
+>
+> Cc: Aurelien Jarno <aurelien@aurel32.net>
+> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+> ---
+
+Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
+
+thanks
+-- PMM
