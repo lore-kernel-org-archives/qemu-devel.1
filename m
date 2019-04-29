@@ -2,83 +2,80 @@ Return-Path: <SRS0=sEuR=S7=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-12.7 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 22031C43219
-	for <qemu-devel@archiver.kernel.org>; Mon, 29 Apr 2019 20:57:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B50F3C43219
+	for <qemu-devel@archiver.kernel.org>; Mon, 29 Apr 2019 21:59:23 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id DBB792067D
-	for <qemu-devel@archiver.kernel.org>; Mon, 29 Apr 2019 20:57:15 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DBB792067D
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 7E242215EA
+	for <qemu-devel@archiver.kernel.org>; Mon, 29 Apr 2019 21:59:23 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="rwDIZMEs"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7E242215EA
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:35290 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:35848 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hLDKt-0003Q7-4d
-	for qemu-devel@archiver.kernel.org; Mon, 29 Apr 2019 16:57:15 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:53373)
+	id 1hLEJ0-0003TI-O7
+	for qemu-devel@archiver.kernel.org; Mon, 29 Apr 2019 17:59:22 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:36434)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1hLDJp-0002ws-9j
-	for qemu-devel@nongnu.org; Mon, 29 Apr 2019 16:56:10 -0400
+	(envelope-from <richard.henderson@linaro.org>) id 1hLEIB-00036M-TV
+	for qemu-devel@nongnu.org; Mon, 29 Apr 2019 17:58:32 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1hLDJo-0006ks-6L
-	for qemu-devel@nongnu.org; Mon, 29 Apr 2019 16:56:09 -0400
-Received: from mail-wm1-f66.google.com ([209.85.128.66]:35958)
+	(envelope-from <richard.henderson@linaro.org>) id 1hLEIA-0005y7-Sn
+	for qemu-devel@nongnu.org; Mon, 29 Apr 2019 17:58:31 -0400
+Received: from mail-pg1-x530.google.com ([2607:f8b0:4864:20::530]:36619)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1hLDJo-0006je-09
-	for qemu-devel@nongnu.org; Mon, 29 Apr 2019 16:56:08 -0400
-Received: by mail-wm1-f66.google.com with SMTP id h18so1058910wml.1
-	for <qemu-devel@nongnu.org>; Mon, 29 Apr 2019 13:56:07 -0700 (PDT)
+	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+	id 1hLEIA-0005xj-N6
+	for qemu-devel@nongnu.org; Mon, 29 Apr 2019 17:58:30 -0400
+Received: by mail-pg1-x530.google.com with SMTP id 85so5818517pgc.3
+	for <qemu-devel@nongnu.org>; Mon, 29 Apr 2019 14:58:30 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+	h=from:to:cc:subject:date:message-id;
+	bh=BSejnZmTBgmRIVkic80VSsvAmUgxgYcicE1r6mcOOmk=;
+	b=rwDIZMEsuJzUpVp9oy0inWEmFqosWhuQpvwRYwFL4xWwewGgxEjb+gWYyPiBpTnKmY
+	O5F6RU27wD/0+qLJpdF36DPlfnh4Qr/YJaJ1QwzlpCfNvrD7i6aFN4LJ6SkOch68S/Qu
+	JqabxWE9PXFfPsNfpZqV7GsErKS2l4O3kuqKjp+dr3+ftGHzMnDh51sXyB/X55i6kFQR
+	yxSqEy86j0MXBzgtYthFd2apO8yGZ13JR/Rv0en9jIjGGjpDV12c/kdYUVDyq54/vWcD
+	CiKpcHp+ANhzH2Ina9caC1ckHiF2d3vtyUKNFvGClx5IMLCt6si0xPVMRl+7wNCIfl5T
+	dKIg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
 	d=1e100.net; s=20161025;
-	h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
-	:date:user-agent:mime-version:in-reply-to:content-language
-	:content-transfer-encoding;
-	bh=BEMr4HbLOWMg3VTbSJU5yEbI0WrJuAavWVGkqW17nUg=;
-	b=E9OjAWXw6cTC13G+rJTqeZPC8kKTqIvr895MgVaOMz8p6+mhyQw8NZUypesWdHAjZW
-	GCUDpgufPDQynIxn4bfqQ0sVFEieDr0xxgOqQppgcVQuybCcqgifuCzVO1N5G2mSFjnT
-	KIZ7iwK9b5WY1q1gwVULug1fxULYn5D09LIvLkmKczYOBSBhJHHs37tw5SBN/4jI+v5r
-	pUTG2mSL7VJBOsAZ1hZLxqqa19t/0/Pld6+y6XqFwgRGrpNjhDFTgFBNAdGF/C0bqeaJ
-	KaVRz75BtRXatTsMyJXVrWqSzYW0rl5WH+tpV5dPGvsXJc1VBzOgHVRyVRIoodE5VAqG
-	lZwA==
-X-Gm-Message-State: APjAAAVyHGqThUBNQik4vcSlRCf+720MBfhQzKXTsyP4nxASpdDfJpEo
-	/bGMSDdRK32HTb67Hu77Dak5Yw==
-X-Google-Smtp-Source: APXvYqwAc+sVcvV6PGUw8hbXANPpp4eRbHm8eX4OBOZuMnhsdt99p0PzvB8x5ZpsmcixN+W+F3K8Ww==
-X-Received: by 2002:a1c:f901:: with SMTP id x1mr671049wmh.136.1556571366678;
-	Mon, 29 Apr 2019 13:56:06 -0700 (PDT)
-Received: from [192.168.1.37] (193.red-88-21-103.staticip.rima-tde.net.
-	[88.21.103.193]) by smtp.gmail.com with ESMTPSA id
-	r29sm3417914wra.56.2019.04.29.13.56.04
-	(version=TLS1_3 cipher=AEAD-AES128-GCM-SHA256 bits=128/128);
-	Mon, 29 Apr 2019 13:56:05 -0700 (PDT)
-To: Thomas Huth <thuth@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, 
-	qemu-devel@nongnu.org, pbonzini@redhat.com
-References: <20190418180057.3593-1-thuth@redhat.com>
-	<20190418180057.3593-11-thuth@redhat.com>
-	<377a2033-504b-a84d-0eb0-765de81af730@redhat.com>
-	<fe977ebc-3ec7-fbf5-7a72-c9418286f0f1@redhat.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Openpgp: id=89C1E78F601EE86C867495CBA2A3FD6EDEADC0DE;
-	url=http://pgp.mit.edu/pks/lookup?op=get&search=0xA2A3FD6EDEADC0DE
-Message-ID: <d06a1288-277f-050e-e16f-e62b82a284c9@redhat.com>
-Date: Mon, 29 Apr 2019 22:56:04 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
-	Thunderbird/60.6.1
-MIME-Version: 1.0
-In-Reply-To: <fe977ebc-3ec7-fbf5-7a72-c9418286f0f1@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-	[fuzzy]
-X-Received-From: 209.85.128.66
-Subject: Re: [Qemu-devel] [PATCH for-QEMU-4.1 v5 10/29] hw/arm: Express
- dependencies of stellaris with Kconfig
+	h=x-gm-message-state:from:to:cc:subject:date:message-id;
+	bh=BSejnZmTBgmRIVkic80VSsvAmUgxgYcicE1r6mcOOmk=;
+	b=W5olZiXgo8OOw0zANjfCiHuiuFGpW6MKtv/nK5yPyRafH2I06H0OnU9dRAm+S+j8Vz
+	sQ7JuZyQcektXzSXt7eqzf+wJLemx+d5iKAwh6d8w+o8AF1SLQiBrAxnQGb+flz51YTv
+	4KD4XzkDSPl81JeaxxWpxaS0IshB7LjyXziWsOwtGu2spePEwN+zfp8HYCpcsOAtlGqc
+	AAET2IOhvbBqjvTVcf+UIuEX640FQy99637dO9b4s1LGZkZk81+wloGMiCIEArebJonk
+	PrdhCIFtc3KlkIUZpt0kgYaE+dsF5ZrSqvR8npqzTG4skoJZXiQMts7slXznXUIQzlTa
+	hHfQ==
+X-Gm-Message-State: APjAAAVXAJoMveHWKwnPGAPAQZWSaMiE70ZPHjIFayYSX4YoaSxG/klU
+	uf9mzvR3prb293XeAOCJCqXCwYcw+q8=
+X-Google-Smtp-Source: APXvYqxFrDySx/LIzO24dMYO4Xt4Vp3NlVHdgnwbM0R7hF09QZ6HcAyJRvkctwtM6c1PBcUKUXKOjA==
+X-Received: by 2002:aa7:9148:: with SMTP id 8mr35242545pfi.176.1556575108763; 
+	Mon, 29 Apr 2019 14:58:28 -0700 (PDT)
+Received: from localhost.localdomain (97-113-18-231.tukw.qwest.net.
+	[97.113.18.231]) by smtp.gmail.com with ESMTPSA id
+	v1sm60686010pff.81.2019.04.29.14.58.26
+	(version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+	Mon, 29 Apr 2019 14:58:27 -0700 (PDT)
+From: Richard Henderson <richard.henderson@linaro.org>
+To: qemu-devel@nongnu.org
+Date: Mon, 29 Apr 2019 14:58:21 -0700
+Message-Id: <20190429215821.10079-1-richard.henderson@linaro.org>
+X-Mailer: git-send-email 2.17.1
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+	recognized.
+X-Received-From: 2607:f8b0:4864:20::530
+Subject: [Qemu-devel] [PULL v2 0/2] target/hppa patch queue
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -90,102 +87,38 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Rob Herring <robh@kernel.org>, Jan Kiszka <jan.kiszka@web.de>,
-	Igor Mitsyanko <i.mitsyanko@gmail.com>, qemu-block@nongnu.org,
-	"Michael S. Tsirkin" <mst@redhat.com>,
-	Andrey Smirnov <andrew.smirnov@gmail.com>,
-	Alistair Francis <alistair@alistair23.me>,
-	Philippe Mathieu-Daude <f4bug@amsat.org>,
-	Jean-Christophe Dubois <jcd@tribudubois.net>,
-	Beniamino Galvani <b.galvani@gmail.com>, Andrew Jeffery <andrew@aj.id.au>,
-	Cedric Le Goater <clg@kaod.org>, qemu-arm@nongnu.org,
-	Peter Chubb <peter.chubb@nicta.com.au>, Gerd Hoffmann <kraxel@redhat.com>,
-	Antony Pavlov <antonynpavlov@gmail.com>,
-	"Edgar E . Iglesias" <edgar.iglesias@gmail.com>,
-	Subbaraya Sundeep <sundeep.lkml@gmail.com>,
-	John Snow <jsnow@redhat.com>, Joel Stanley <joel@jms.id.au>
+Cc: peter.maydell@linaro.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190429205604.dNqmi-9b_GDw9wEmWlsVu3YnqJ68GzuVHqPXiD9vU2Q@z>
+Content-Type: text/plain; charset="UTF-8"
+Message-ID: <20190429215821.pRHoGg9naECoL5JE-nboqAZj7YpxijDsX1TB8MxLu7I@z>
 
-On 4/29/19 9:25 PM, Thomas Huth wrote:
-> On 25/04/2019 23.41, Philippe Mathieu-Daudé wrote:
->> Hi Thomas,
->>
->> On 4/18/19 8:00 PM, Thomas Huth wrote:
->>> This patch is slightly based on earlier work by Ákos Kovács (i.e.
->>> his "hw/arm/Kconfig: Add ARM Kconfig" patch).
->>>
->>> Signed-off-by: Thomas Huth <thuth@redhat.com>
->>> ---
->>>  default-configs/arm-softmmu.mak |  7 +------
->>>  hw/arm/Kconfig                  | 10 ++++++++++
->>>  2 files changed, 11 insertions(+), 6 deletions(-)
->>>
->>> diff --git a/default-configs/arm-softmmu.mak b/default-configs/arm-softmmu.mak
->>> index b7ed3c530b..3f82d635e4 100644
->>> --- a/default-configs/arm-softmmu.mak
->>> +++ b/default-configs/arm-softmmu.mak
->>> @@ -16,6 +16,7 @@ CONFIG_MUSCA=y
->>>  CONFIG_CHEETAH=y
->>>  CONFIG_SX1=y
->>>  CONFIG_NSERIES=y
->>> +CONFIG_STELLARIS=y
->>>  
->>>  CONFIG_VGA=y
->>>  CONFIG_NAND=y
->>> @@ -24,16 +25,10 @@ CONFIG_SERIAL=y
->>>  CONFIG_MAX7310=y
->>>  CONFIG_TMP421=y
->>>  CONFIG_PCA9552=y
->>> -CONFIG_STELLARIS=y
->>> -CONFIG_STELLARIS_INPUT=y
->>> -CONFIG_STELLARIS_ENET=y
->>> -CONFIG_SSD0303=y
->>> -CONFIG_SSD0323=y
->>>  CONFIG_DDC=y
->>>  CONFIG_SII9022=y
->>>  CONFIG_ADS7846=y
->>>  CONFIG_MAX111X=y
->>> -CONFIG_SSI_SD=y
->>>  CONFIG_SSI_M25P80=y
->>>  CONFIG_ALLWINNER_EMAC=y
->>>  CONFIG_IMX_FEC=y
->>> diff --git a/hw/arm/Kconfig b/hw/arm/Kconfig
->>> index 71126254ff..b91503f5a6 100644
->>> --- a/hw/arm/Kconfig
->>> +++ b/hw/arm/Kconfig
->>> @@ -91,6 +91,16 @@ config REALVIEW
->>>  
->>>  config STELLARIS
->>>      bool
->>> +    select ARM_V7M
->>> +    select I2C
->>> +    select PL011 # UART
->>> +    select PL022 # Serial port
->>> +    select PL061 # GPIO
->>> +    select SSD0303 # OLED display
->>> +    select SSD0323 # OLED display
->>> +    select SSI_SD
->>> +    select STELLARIS_INPUT
->>> +    select STELLARIS_ENET # ethernet
->>
->> This one misses CMSDK_APB_WATCHDOG:
->>
->> $ qemu-system-aarch64 -M lm3s811evb
->> qemu-system-aarch64: Unknown device 'luminary-watchdog' for default sysbus
->> Aborted (core dumped)
-> 
-> Oh, well, looks like this has just been added recently in commit
-> 566528f823d1a2e9e, likely after I assembled and tested the initial
-> version of this patch...
+Rebased for v2.
 
-Ah yes, correct! This happens when we take too long to review a series,
-and since this one is huge, I was keeping procrastinating...
+The following changes since commit 82b2865e0d0ea4c1001e9e7ed7920bcc0458f6de:
 
-> Thanks for catching it, I'll apply your fix in v6!
-> 
->  Thomas
-> 
+  Merge remote-tracking branch 'remotes/pmaydell/tags/pull-target-arm-20190429' into staging (2019-04-29 18:05:56 +0100)
+
+are available in the Git repository at:
+
+  https://github.com/rth7680/qemu.git tags/pull-hppa-20190429
+
+for you to fetch changes up to affdb7e6ba23f8160cb88e11f83db54a35f03d6b:
+
+  target/hppa: Always return EXCP_DMAR for protection id trap (2019-04-29 14:43:39 -0700)
+
+----------------------------------------------------------------
+Implement fast tlb insert insns.
+Fix data tlb exception for pa 1.1.
+
+----------------------------------------------------------------
+Nick Hudson (2):
+      target/hppa: Implement Fast TLB Insert instructions
+      target/hppa: Always return EXCP_DMAR for protection id trap
+
+ target/hppa/mem_helper.c |  3 +--
+ target/hppa/translate.c  | 54 ++++++++++++++++++++++++++++++++++++++++++++++++
+ target/hppa/insns.decode |  3 +++
+ 3 files changed, 58 insertions(+), 2 deletions(-)
 
