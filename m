@@ -1,28 +1,32 @@
-Received: from eggs.gnu.org ([209.51.188.92]:53360)
+Received: from eggs.gnu.org ([209.51.188.92]:55792)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jdillama@redhat.com>) id 1hL5tv-0004bx-DS
-	for qemu-devel@nongnu.org; Mon, 29 Apr 2019 09:01:00 -0400
+	(envelope-from <jjherne@linux.ibm.com>) id 1hL62b-0006c4-69
+	for qemu-devel@nongnu.org; Mon, 29 Apr 2019 09:09:54 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jdillama@redhat.com>) id 1hL5tj-00028j-HB
-	for qemu-devel@nongnu.org; Mon, 29 Apr 2019 09:00:52 -0400
-Received: from mail-ed1-f68.google.com ([209.85.208.68]:45228)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <jdillama@redhat.com>) id 1hL5tj-000265-8N
-	for qemu-devel@nongnu.org; Mon, 29 Apr 2019 09:00:43 -0400
-Received: by mail-ed1-f68.google.com with SMTP id g57so2468565edc.12
-	for <qemu-devel@nongnu.org>; Mon, 29 Apr 2019 06:00:38 -0700 (PDT)
-MIME-Version: 1.0
-References: <20190427113625.46594-1-sgarzare@redhat.com>
-	<CA+aFP1BtbjrzitLz7PW_b-kuYU7WSOiMs5jVfUBC=M3zEuBcew@mail.gmail.com>
-	<20190429124712.mmxnpdkkbzhlbmxm@steredhat>
-In-Reply-To: <20190429124712.mmxnpdkkbzhlbmxm@steredhat>
-Reply-To: dillaman@redhat.com
-From: Jason Dillaman <jdillama@redhat.com>
-Date: Mon, 29 Apr 2019 09:00:26 -0400
-Message-ID: <CA+aFP1Cmc+3TcYJr73jYRmtCWNTAWBcjEtn+Afe7DKZqUYp7=g@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [Qemu-block] [PATCH] block/rbd: add preallocation
- support
+	(envelope-from <jjherne@linux.ibm.com>) id 1hL62Y-0008Sa-GD
+	for qemu-devel@nongnu.org; Mon, 29 Apr 2019 09:09:53 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:48050)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <jjherne@linux.ibm.com>)
+	id 1hL62Y-0008R0-5m
+	for qemu-devel@nongnu.org; Mon, 29 Apr 2019 09:09:50 -0400
+Received: from pps.filterd (m0098399.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id
+	x3TD4b28093327
+	for <qemu-devel@nongnu.org>; Mon, 29 Apr 2019 09:09:46 -0400
+Received: from e33.co.us.ibm.com (e33.co.us.ibm.com [32.97.110.151])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2s60w0tt73-1
+	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Mon, 29 Apr 2019 09:09:46 -0400
+Received: from localhost
+	by e33.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+	Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <jjherne@linux.ibm.com>;
+	Mon, 29 Apr 2019 14:09:45 +0100
+From: "Jason J. Herne" <jjherne@linux.ibm.com>
+Date: Mon, 29 Apr 2019 09:09:41 -0400
+Message-Id: <1556543381-12671-1-git-send-email-jjherne@linux.ibm.com>
+Subject: [Qemu-devel] [PATCH] s390-bios: Skip bootmap signature entries
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,138 +35,84 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefano Garzarella <sgarzare@redhat.com>
-Cc: qemu-devel <qemu-devel@nongnu.org>, Kevin Wolf <kwolf@redhat.com>, Josh Durgin <jdurgin@redhat.com>, qemu-block <qemu-block@nongnu.org>, Markus Armbruster <armbru@redhat.com>, Max Reitz <mreitz@redhat.com>
+To: qemu-devel@nongnu.org, qemu-s390x@nongnu.org, cohuck@redhat.com, thuth@redhat.com, alifm@linux.ibm.com, borntraeger@de.ibm.com
 
-On Mon, Apr 29, 2019 at 8:47 AM Stefano Garzarella <sgarzare@redhat.com> wrote:
->
-> On Sat, Apr 27, 2019 at 08:43:26AM -0400, Jason Dillaman wrote:
-> > On Sat, Apr 27, 2019 at 7:37 AM Stefano Garzarella <sgarzare@redhat.com> wrote:
-> > >
-> > > This patch adds the support of preallocation (off/full) for the RBD
-> > > block driver.
-> > > If available, we use rbd_writesame() to quickly fill the image when
-> > > full preallocation is required.
-> > >
-> > > Signed-off-by: Stefano Garzarella <sgarzare@redhat.com>
-> > > ---
-> > >  block/rbd.c          | 149 ++++++++++++++++++++++++++++++++++++++-----
-> > >  qapi/block-core.json |   4 +-
-> > >  2 files changed, 136 insertions(+), 17 deletions(-)
-> > >
-> > > diff --git a/block/rbd.c b/block/rbd.c
-> > > index 0c549c9935..29dd1bb040 100644
-> > > --- a/block/rbd.c
-> > > +++ b/block/rbd.c
-> > > @@ -13,6 +13,7 @@
-> > >
-> > >  #include "qemu/osdep.h"
-> > >
-> > > +#include "qemu/units.h"
-> > >  #include <rbd/librbd.h>
-> > >  #include "qapi/error.h"
-> > >  #include "qemu/error-report.h"
-> > > @@ -331,6 +332,110 @@ static void qemu_rbd_memset(RADOSCB *rcb, int64_t offs)
-> > >      }
-> > >  }
-> > >
-> > > +static int qemu_rbd_do_truncate(rbd_image_t image, int64_t offset,
-> > > +                                PreallocMode prealloc, Error **errp)
-> > > +{
-> > > +    uint64_t current_length;
-> > > +    char *buf = NULL;
-> > > +    int ret;
-> > > +
-> > > +    ret = rbd_get_size(image, &current_length);
-> > > +    if (ret < 0) {
-> > > +        error_setg_errno(errp, -ret, "Failed to get file length");
-> > > +        goto out;
-> > > +    }
-> > > +
-> > > +    if (current_length > offset && prealloc != PREALLOC_MODE_OFF) {
-> > > +        error_setg(errp, "Cannot use preallocation for shrinking files");
-> > > +        ret = -ENOTSUP;
-> > > +        goto out;
-> > > +    }
-> > > +
-> > > +    switch (prealloc) {
-> > > +    case PREALLOC_MODE_FULL: {
-> > > +        uint64_t current_offset = current_length;
-> > > +        int buf_size = 64 * KiB;
-> >
-> > This should probably be 512B or 4KiB (which is the smallest striped
-> > unit size). Not only will this avoid sending unnecessary zeroes to the
-> > backing cluster, writesame silently turns into a standard write if
-> > your buffer isn't properly aligned with the min(object size, stripe
-> > unit size).
-> >
->
-> Okay, I'll change it on v2.
-> Should we query about the "stripe_unit" size or we simply use the
-> smallest allowed?
+Newer versions of zipl have the ability to write signature entries to the boot
+script for secure boot. We don't yet support secure boot, but we need to skip
+over signature entries while reading the boot script in order to maintain our
+ability to boot guest operating systems that have a secure bootloader.
 
-Technically we don't prevent a user from choosing terrible stripe unit
-sizes (e.g. 1 byte), so you are probably safe to just use 4KiB.
+Signed-off-by: Jason J. Herne <jjherne@linux.ibm.com>
+Reviewed-by: Farhan Ali <alifm@linux.ibm.com>
+---
+ pc-bios/s390-ccw/bootmap.c | 19 +++++++++++++++++--
+ pc-bios/s390-ccw/bootmap.h | 10 ++++++----
+ 2 files changed, 23 insertions(+), 6 deletions(-)
 
-> > > +        ssize_t bytes;
-> > > +
-> > > +        buf = g_malloc(buf_size);
-> > > +        /*
-> > > +         * Some versions of rbd_writesame() discards writes of buffers with
-> > > +         * all zeroes. In order to avoid this behaviour, we set the first byte
-> > > +         * to one.
-> > > +         */
-> > > +        buf[0] = 1;
-> >
-> > You could also use "rados_conf_set(cluster,
-> > "rbd_discard_on_zeroed_write_same", "false").
-> >
->
-> I tried it, but it is not supported on all versions. (eg. I have Ceph
-> v12.2.11 on my Fedora 29 and it is not supported, but rbd_writesame() is
-> available)
->
-> Maybe we can use both: "rbd_discard_on_zeroed_write_same = false" and
-> "buf[0] = 1"
-
-Probably not worth the effort if it's not supported across all releases.
-
-> > > +        ret = rbd_resize(image, offset);
-> > > +        if (ret < 0) {
-> > > +            error_setg_errno(errp, -ret, "Failed to resize file");
-> > > +            goto out;
-> > > +        }
-> > > +
-> > > +#ifdef LIBRBD_SUPPORTS_WRITESAME
-> > > +        while (offset - current_offset > buf_size) {
-> > > +            /*
-> > > +             * rbd_writesame() supports only request where the size of the
-> > > +             * operation is multiple of buffer size and it must be less or
-> > > +             * equal to INT_MAX.
-> > > +             */
-> > > +            bytes = MIN(offset - current_offset, INT_MAX);
-> > > +            bytes -= bytes % buf_size;
-> >
-> > Using the default object size of 4MiB, this write size would result in
-> > up to 512 concurrent ops to the backing cluster. Perhaps the size
-> > should be bounded such that only a dozen or so concurrent requests are
-> > issued per write, always rounded next largest object / stripe period
-> > size. librbd and the rbd CLI usually try to bound themselves to the
-> > value in the "rbd_concurrent_management_ops" configuration setting
-> > (currently defaults to 10).
-> >
->
-> Do you suggest to use "rbd_concurrent_management_ops" to limit
-> concurrent requests or use a new QEMU parameters for the RBD driver?
-
-I think it would be nicer to just query the
-"rbd_concurrent_management_ops" limit to derive your writesame size
-since the Ceph cluster admin can globally set that option to match the
-available parallelism of the cluster.
-
-> Thanks for your comments,
-> Stefano
-
-
+diff --git a/pc-bios/s390-ccw/bootmap.c b/pc-bios/s390-ccw/bootmap.c
+index 7aef65a..d13b7cb 100644
+--- a/pc-bios/s390-ccw/bootmap.c
++++ b/pc-bios/s390-ccw/bootmap.c
+@@ -254,7 +254,14 @@ static void run_eckd_boot_script(block_number_t bmt_block_nr,
+     memset(sec, FREE_SPACE_FILLER, sizeof(sec));
+     read_block(block_nr, sec, "Cannot read Boot Map Script");
+ 
+-    for (i = 0; bms->entry[i].type == BOOT_SCRIPT_LOAD; i++) {
++    for (i = 0; bms->entry[i].type == BOOT_SCRIPT_LOAD ||
++                bms->entry[i].type == BOOT_SCRIPT_SIGNATURE; i++) {
++
++        /* We don't support secure boot yet, so we skip signature entries */
++        if (bms->entry[i].type == BOOT_SCRIPT_SIGNATURE) {
++            continue;
++        }
++
+         address = bms->entry[i].address.load_address;
+         block_nr = eckd_block_num(&bms->entry[i].blkptr.xeckd.bptr.chs);
+ 
+@@ -489,7 +496,15 @@ static void zipl_run(ScsiBlockPtr *pte)
+ 
+     /* Load image(s) into RAM */
+     entry = (ComponentEntry *)(&header[1]);
+-    while (entry->component_type == ZIPL_COMP_ENTRY_LOAD) {
++    while (entry->component_type == ZIPL_COMP_ENTRY_LOAD ||
++           entry->component_type == ZIPL_COMP_ENTRY_SIGNATURE) {
++
++        /* We don't support secure boot yet, so we skip signature entries */
++        if (entry->component_type == ZIPL_COMP_ENTRY_SIGNATURE) {
++            entry++;
++            continue;
++        }
++
+         zipl_load_segment(entry);
+ 
+         entry++;
+diff --git a/pc-bios/s390-ccw/bootmap.h b/pc-bios/s390-ccw/bootmap.h
+index a085212..94f53a5 100644
+--- a/pc-bios/s390-ccw/bootmap.h
++++ b/pc-bios/s390-ccw/bootmap.h
+@@ -98,8 +98,9 @@ typedef struct ScsiMbr {
+ #define ZIPL_COMP_HEADER_IPL    0x00
+ #define ZIPL_COMP_HEADER_DUMP   0x01
+ 
+-#define ZIPL_COMP_ENTRY_LOAD    0x02
+-#define ZIPL_COMP_ENTRY_EXEC    0x01
++#define ZIPL_COMP_ENTRY_EXEC      0x01
++#define ZIPL_COMP_ENTRY_LOAD      0x02
++#define ZIPL_COMP_ENTRY_SIGNATURE 0x03
+ 
+ typedef struct XEckdMbr {
+     uint8_t magic[4];   /* == "xIPL"        */
+@@ -117,8 +118,9 @@ typedef struct BootMapScriptEntry {
+     BootMapPointer blkptr;
+     uint8_t pad[7];
+     uint8_t type;   /* == BOOT_SCRIPT_* */
+-#define BOOT_SCRIPT_EXEC 0x01
+-#define BOOT_SCRIPT_LOAD 0x02
++#define BOOT_SCRIPT_EXEC      0x01
++#define BOOT_SCRIPT_LOAD      0x02
++#define BOOT_SCRIPT_SIGNATURE 0x03
+     union {
+         uint64_t load_address;
+         uint64_t load_psw;
 -- 
-Jason
+2.7.4
