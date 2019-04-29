@@ -1,31 +1,32 @@
-Received: from eggs.gnu.org ([209.51.188.92]:32952)
+Received: from eggs.gnu.org ([209.51.188.92]:34091)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <brijesh.singh@amd.com>) id 1hL9Xj-00020F-U9
-	for qemu-devel@nongnu.org; Mon, 29 Apr 2019 12:54:17 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1hL9eB-0004DP-Ka
+	for qemu-devel@nongnu.org; Mon, 29 Apr 2019 13:00:56 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <brijesh.singh@amd.com>) id 1hL9Xi-00035Q-0c
-	for qemu-devel@nongnu.org; Mon, 29 Apr 2019 12:54:15 -0400
-Received: from mail-eopbgr800081.outbound.protection.outlook.com
-	([40.107.80.81]:19482
-	helo=NAM03-DM3-obe.outbound.protection.outlook.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <brijesh.singh@amd.com>)
-	id 1hL9Xf-00033y-3h
-	for qemu-devel@nongnu.org; Mon, 29 Apr 2019 12:54:12 -0400
-From: "Singh, Brijesh" <brijesh.singh@amd.com>
-Date: Mon, 29 Apr 2019 16:54:08 +0000
-Message-ID: <0883651a-ac95-022a-1a16-978ddb2cc35d@amd.com>
-References: <20190424160942.13567-1-brijesh.singh@amd.com>
-	<20190424160942.13567-3-brijesh.singh@amd.com>
-	<c0cf8d9b-4b47-f578-bc51-29739a3c2f8d@amd.com>
-In-Reply-To: <c0cf8d9b-4b47-f578-bc51-29739a3c2f8d@amd.com>
-Content-Language: en-US
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <ED6640A095C20241AFFA51CB3FF8F15E@namprd12.prod.outlook.com>
-Content-Transfer-Encoding: base64
+	(envelope-from <peter.maydell@linaro.org>) id 1hL9e6-0006PE-Oz
+	for qemu-devel@nongnu.org; Mon, 29 Apr 2019 13:00:52 -0400
+Received: from mail-wr1-x430.google.com ([2a00:1450:4864:20::430]:34428)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1hL9e4-00069E-19
+	for qemu-devel@nongnu.org; Mon, 29 Apr 2019 13:00:48 -0400
+Received: by mail-wr1-x430.google.com with SMTP id v16so14710340wrp.1
+	for <qemu-devel@nongnu.org>; Mon, 29 Apr 2019 10:00:36 -0700 (PDT)
+Received: from orth.archaic.org.uk (orth.archaic.org.uk. [81.2.115.148])
+	by smtp.gmail.com with ESMTPSA id a13sm36896wmj.39.2019.04.29.10.00.34
+	for <qemu-devel@nongnu.org>
+	(version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+	Mon, 29 Apr 2019 10:00:34 -0700 (PDT)
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Mon, 29 Apr 2019 17:59:50 +0100
+Message-Id: <20190429170030.11323-3-peter.maydell@linaro.org>
+In-Reply-To: <20190429170030.11323-1-peter.maydell@linaro.org>
+References: <20190429170030.11323-1-peter.maydell@linaro.org>
 MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [RFC PATCH v1 02/10] KVM: SVM: Add
- KVM_SEND_UPDATE_DATA command
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Subject: [Qemu-devel] [PULL 02/42] hw/ssi/xilinx_spips: Avoid variable
+ length array
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,69 +35,42 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Lendacky, Thomas" <Thomas.Lendacky@amd.com>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>
-Cc: "Singh, Brijesh" <brijesh.singh@amd.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>, "H. Peter Anvin" <hpa@zytor.com>, Paolo Bonzini <pbonzini@redhat.com>, =?utf-8?B?UmFkaW0gS3LEjW3DocWZ?= <rkrcmar@redhat.com>, Joerg Roedel <joro@8bytes.org>, Borislav Petkov <bp@suse.de>, "x86@kernel.org" <x86@kernel.org>, "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+To: qemu-devel@nongnu.org
 
-DQoNCk9uIDQvMjYvMTkgMzozMSBQTSwgTGVuZGFja3ksIFRob21hcyB3cm90ZToNCi4uLg0KDQo+
-PiAgIA0KPj4gICBzdGF0aWMgdW5zaWduZWQgaW50IG1heF9zZXZfYXNpZDsNCj4+ICAgc3RhdGlj
-IHVuc2lnbmVkIGludCBtaW5fc2V2X2FzaWQ7DQo+PiArc3RhdGljIHVuc2lnbmVkIGxvbmcgbWVf
-bWFzazsNCj4gDQo+IHNldl9tZV9tYXNrID8NCj4gDQoNCkFncmVlZC4NCg0KPj4gICBzdGF0aWMg
-dW5zaWduZWQgbG9uZyAqc2V2X2FzaWRfYml0bWFwOw0KPj4gICAjZGVmaW5lIF9fc21lX3BhZ2Vf
-cGEoeCkgX19zbWVfc2V0KHBhZ2VfdG9fcGZuKHgpIDw8IFBBR0VfU0hJRlQpDQo+PiAgIA0KPj4g
-QEAgLTEyMTYsMTUgKzEyMTcsMjEgQEAgc3RhdGljIGludCBhdmljX2dhX2xvZ19ub3RpZmllcih1
-MzIgZ2FfdGFnKQ0KPj4gICBzdGF0aWMgX19pbml0IGludCBzZXZfaGFyZHdhcmVfc2V0dXAodm9p
-ZCkNCj4+ICAgew0KPj4gICAJc3RydWN0IHNldl91c2VyX2RhdGFfc3RhdHVzICpzdGF0dXM7DQo+
-PiArCWludCBlYXgsIGVieDsNCj4+ICAgCWludCByYzsNCj4+ICAgDQo+PiAtCS8qIE1heGltdW0g
-bnVtYmVyIG9mIGVuY3J5cHRlZCBndWVzdHMgc3VwcG9ydGVkIHNpbXVsdGFuZW91c2x5ICovDQo+
-PiAtCW1heF9zZXZfYXNpZCA9IGNwdWlkX2VjeCgweDgwMDAwMDFGKTsNCj4+ICsJLyoNCj4+ICsJ
-ICogUXVlcnkgdGhlIG1lbW9yeSBlbmNyeXB0aW9uIGluZm9ybWF0aW9uLg0KPj4gKwkgKiAgRUJY
-OiAgQml0IDA6NSBQYWdldGFibGUgYml0IHBvc2l0aW9uIHVzZWQgdG8gaW5kaWNhdGUgZW5jcnlw
-dGlvbiAoYWthIENiaXQpLg0KPj4gKwkgKiAgRUNYOiAgTWF4aW11bSBudW1iZXIgb2YgZW5jcnlw
-dGVkIGd1ZXN0cyBzdXBwb3J0ZWQgc2ltdWx0YW5lb3VzbHkuDQo+PiArCSAqICBFRFg6ICBNaW5p
-bXVtIEFTSUQgdmFsdWUgdGhhdCBzaG91bGQgYmUgdXNlZCBmb3IgU0VWIGd1ZXN0Lg0KPj4gKwkg
-Ki8NCj4+ICsJY3B1aWQoMHg4MDAwMDAxZiwgJmVheCwgJmVieCwgJm1heF9zZXZfYXNpZCwgJm1p
-bl9zZXZfYXNpZCk7DQo+PiAgIA0KPj4gICAJaWYgKCFtYXhfc2V2X2FzaWQpDQo+PiAgIAkJcmV0
-dXJuIDE7DQo+PiAgIA0KPj4gLQkvKiBNaW5pbXVtIEFTSUQgdmFsdWUgdGhhdCBzaG91bGQgYmUg
-dXNlZCBmb3IgU0VWIGd1ZXN0ICovDQo+PiArCW1lX21hc2sgPSAxVUwgPDwgKGVieCAmIDB4M2Yp
-Ow0KPj4gICAJbWluX3Nldl9hc2lkID0gY3B1aWRfZWR4KDB4ODAwMDAwMUYpOw0KPiANCj4gWW91
-IGNhbiByZW1vdmUgdGhpcyBzaW5jZSB5b3Ugb2J0YWluZWQgaXQgd2l0aCB0aGUgY3B1aWQoKSBj
-YWxsIGFib3ZlLg0KPiANCg0KSSB0aG91Z2h0IEkgcmVtb3ZlZCBpdCBidXQuLiBJIHdpbGwgdGFr
-ZSBjYXJlIGluIG5leHQgcmV2Lg0KDQo+PiAgIA0KPj4gICAJLyogSW5pdGlhbGl6ZSBTRVYgQVNJ
-RCBiaXRtYXAgKi8NCj4+IEBAIC03MDUzLDYgKzcwNjAsMTE4IEBAIHN0YXRpYyBpbnQgc2V2X3Nl
-bmRfc3RhcnQoc3RydWN0IGt2bSAqa3ZtLCBzdHJ1Y3Qga3ZtX3Nldl9jbWQgKmFyZ3ApDQo+PiAg
-IAlyZXR1cm4gcmV0Ow0KPj4gICB9DQo+PiAgIA0KPj4gK3N0YXRpYyBpbnQgc2V2X3NlbmRfdXBk
-YXRlX2RhdGEoc3RydWN0IGt2bSAqa3ZtLCBzdHJ1Y3Qga3ZtX3Nldl9jbWQgKmFyZ3ApDQo+PiAr
-ew0KPj4gKwlzdHJ1Y3Qga3ZtX3Nldl9pbmZvICpzZXYgPSAmdG9fa3ZtX3N2bShrdm0pLT5zZXZf
-aW5mbzsNCj4+ICsJc3RydWN0IHNldl9kYXRhX3NlbmRfdXBkYXRlX2RhdGEgKmRhdGE7DQo+PiAr
-CXN0cnVjdCBrdm1fc2V2X3NlbmRfdXBkYXRlX2RhdGEgcGFyYW1zOw0KPj4gKwl2b2lkICpoZHIg
-PSBOVUxMLCAqdHJhbnNfZGF0YSA9IE5VTEw7DQo+PiArCXN0cnVjdCBwYWdlICoqZ3Vlc3RfcGFn
-ZSA9IE5VTEw7DQo+PiArCXVuc2lnbmVkIGxvbmcgbjsNCj4+ICsJaW50IHJldCwgb2Zmc2V0Ow0K
-Pj4gKw0KPj4gKwlpZiAoIXNldl9ndWVzdChrdm0pKQ0KPj4gKwkJcmV0dXJuIC1FTk9UVFk7DQo+
-PiArDQo+PiArCWlmIChjb3B5X2Zyb21fdXNlcigmcGFyYW1zLCAodm9pZCBfX3VzZXIgKikodWlu
-dHB0cl90KWFyZ3AtPmRhdGEsDQo+PiArCQkJc2l6ZW9mKHN0cnVjdCBrdm1fc2V2X3NlbmRfdXBk
-YXRlX2RhdGEpKSkNCj4+ICsJCXJldHVybiAtRUZBVUxUOw0KPj4gKw0KPj4gKwlkYXRhID0ga3ph
-bGxvYyhzaXplb2YoKmRhdGEpLCBHRlBfS0VSTkVMKTsNCj4+ICsJaWYgKCFkYXRhKQ0KPj4gKwkJ
-cmV0dXJuIC1FTk9NRU07DQo+PiArDQo+PiArCS8qIHVzZXJzcGFjZSB3YW50cyB0byBxdWVyeSBl
-aXRoZXIgaGVhZGVyIG9yIHRyYW5zIGxlbmd0aCAqLw0KPj4gKwlpZiAoIXBhcmFtcy50cmFuc19s
-ZW4gfHwgIXBhcmFtcy5oZHJfbGVuKQ0KPj4gKwkJZ290byBjbWQ7DQo+PiArDQo+PiArCXJldCA9
-IC1FSU5WQUw7DQo+PiArCWlmICghcGFyYW1zLnRyYW5zX3VhZGRyIHx8ICFwYXJhbXMuZ3Vlc3Rf
-dWFkZHIgfHwNCj4+ICsJICAgICFwYXJhbXMuZ3Vlc3RfbGVuIHx8ICFwYXJhbXMuaGRyX3VhZGRy
-KQ0KPj4gKwkJZ290byBlX2ZyZWU7DQo+PiArDQo+PiArCS8qIENoZWNrIGlmIHdlIGFyZSBjcm9z
-c2luZyB0aGUgcGFnZSBib3VuZHJ5ICovDQo+PiArCXJldCA9IC1FSU5WQUw7DQo+PiArCW9mZnNl
-dCA9IHBhcmFtcy5ndWVzdF91YWRkciAmIChQQUdFX1NJWkUgLSAxKTsNCj4+ICsJaWYgKChwYXJh
-bXMuZ3Vlc3RfbGVuICsgb2Zmc2V0ID4gUEFHRV9TSVpFKSkNCj4+ICsJCWdvdG8gZV9mcmVlOw0K
-Pj4gKw0KPj4gKwlyZXQgPSAtRU5PTUVNOw0KPj4gKwloZHIgPSBrbWFsbG9jKHBhcmFtcy5oZHJf
-bGVuLCBHRlBfS0VSTkVMKTsNCj4+ICsJaWYgKCFoZHIpDQo+PiArCQlnb3RvIGVfZnJlZTsNCj4+
-ICsNCj4+ICsJZGF0YS0+aGRyX2FkZHJlc3MgPSBfX3BzcF9wYShoZHIpOw0KPj4gKwlkYXRhLT5o
-ZHJfbGVuID0gcGFyYW1zLmhkcl9sZW47DQo+PiArDQo+PiArCXJldCA9IC1FTk9NRU07DQo+PiAr
-CXRyYW5zX2RhdGEgPSBrbWFsbG9jKHBhcmFtcy50cmFuc19sZW4sIEdGUF9LRVJORUwpOw0KPj4g
-KwlpZiAoIXRyYW5zX2RhdGEpDQo+PiArCQlnb3RvIGVfZnJlZTsNCj4+ICsNCj4+ICsJZGF0YS0+
-dHJhbnNfYWRkcmVzcyA9IF9fcHNwX3BhKHRyYW5zX2RhdGEpOw0KPj4gKwlkYXRhLT50cmFuc19s
-ZW4gPSBwYXJhbXMudHJhbnNfbGVuOw0KPj4gKw0KPj4gKwkvKiBQaW4gZ3Vlc3QgbWVtb3J5ICov
-DQo+PiArCXJldCA9IC1FRkFVTFQ7DQo+PiArCWd1ZXN0X3BhZ2UgPSBzZXZfcGluX21lbW9yeShr
-dm0sIHBhcmFtcy5ndWVzdF91YWRkciAmIFBBR0VfTUFTSywNCj4+ICsJCQkJICAgIFBBR0VfU0la
-RSwgJm4sIDApOw0KPj4gKwlpZiAoIWd1ZXN0X3BhZ2UpDQo+PiArCQlnb3RvIGVfZnJlZTsNCj4+
-ICsNCj4+ICsJZGF0YS0+Z3Vlc3RfYWRkcmVzcyA9IF9fc21lX3BhZ2VfcGEoZ3Vlc3RfcGFnZVsw
-XSkgKyBvZmZzZXQ7DQo+IA0KPiBJZiB0aGUgQy1iaXQgbmVlZHMgdG8gYmUgc2V0IHJlZ2FyZGxl
-c3MgYmVsb3csIHRoZW4geW91IGRvbid0IG5lZWQgdGhlDQo+IF9fc21lIHZlcnNpb24gb2YgdGhp
-cy4NCj4gDQoNCk5vdGVkLg0KDQo=
+In the stripe8() function we use a variable length array; however
+we know that the maximum length required is MAX_NUM_BUSSES. Use
+a fixed-length array and an assert instead.
+
+Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+Reviewed-by: Francisco Iglesias <frasse.iglesias@gmail.com>
+Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
+Reviewed-by: Stefano Garzarella <sgarzare@redhat.com>
+Message-id: 20190328152635.2794-1-peter.maydell@linaro.org
+---
+ hw/ssi/xilinx_spips.c | 6 ++++--
+ 1 file changed, 4 insertions(+), 2 deletions(-)
+
+diff --git a/hw/ssi/xilinx_spips.c b/hw/ssi/xilinx_spips.c
+index 16f88f74029..c615058cc1b 100644
+--- a/hw/ssi/xilinx_spips.c
++++ b/hw/ssi/xilinx_spips.c
+@@ -429,12 +429,14 @@ static void xlnx_zynqmp_qspips_reset(DeviceState *d)
+ 
+ static inline void stripe8(uint8_t *x, int num, bool dir)
+ {
+-    uint8_t r[num];
+-    memset(r, 0, sizeof(uint8_t) * num);
++    uint8_t r[MAX_NUM_BUSSES];
+     int idx[2] = {0, 0};
+     int bit[2] = {0, 7};
+     int d = dir;
+ 
++    assert(num <= MAX_NUM_BUSSES);
++    memset(r, 0, sizeof(uint8_t) * num);
++
+     for (idx[0] = 0; idx[0] < num; ++idx[0]) {
+         for (bit[0] = 7; bit[0] >= 0; bit[0]--) {
+             r[idx[!d]] |= x[idx[d]] & 1 << bit[d] ? 1 << bit[!d] : 0;
+-- 
+2.20.1
