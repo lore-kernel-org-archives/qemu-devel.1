@@ -1,27 +1,25 @@
-Received: from eggs.gnu.org ([209.51.188.92]:42126)
+Received: from eggs.gnu.org ([209.51.188.92]:43328)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1hL5C4-00057a-Nb
-	for qemu-devel@nongnu.org; Mon, 29 Apr 2019 08:15:37 -0400
+	(envelope-from <dgilbert@redhat.com>) id 1hL5I1-0007HB-Rf
+	for qemu-devel@nongnu.org; Mon, 29 Apr 2019 08:21:46 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1hL5Bt-0004jJ-5A
-	for qemu-devel@nongnu.org; Mon, 29 Apr 2019 08:15:29 -0400
-Received: from mail-ot1-x344.google.com ([2607:f8b0:4864:20::344]:43233)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1hL5Bq-0004hO-HD
-	for qemu-devel@nongnu.org; Mon, 29 Apr 2019 08:15:24 -0400
-Received: by mail-ot1-x344.google.com with SMTP id u15so8343513otq.10
-	for <qemu-devel@nongnu.org>; Mon, 29 Apr 2019 05:15:21 -0700 (PDT)
+	(envelope-from <dgilbert@redhat.com>) id 1hL5Hz-0000Kr-V5
+	for qemu-devel@nongnu.org; Mon, 29 Apr 2019 08:21:45 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:36032)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1hL5Hz-0000JF-Lq
+	for qemu-devel@nongnu.org; Mon, 29 Apr 2019 08:21:43 -0400
+Date: Mon, 29 Apr 2019 13:21:36 +0100
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Message-ID: <20190429122136.GE2748@work-vm>
+References: <20190426090730.2691-1-chen.zhang@intel.com>
+	<20190426090730.2691-2-chen.zhang@intel.com>
 MIME-Version: 1.0
-References: <20190427133028.12874-1-philmd@redhat.com>
-In-Reply-To: <20190427133028.12874-1-philmd@redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Mon, 29 Apr 2019 13:15:09 +0100
-Message-ID: <CAFEAcA9ezbte4fq_Wyic3tv9+bnkQJGq9REuvxie+QCQpNL3bw@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH] hw/dma: Compile the bcm2835_dma device as
- common object
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20190426090730.2691-2-chen.zhang@intel.com>
+Subject: Re: [Qemu-devel] [PATCH 1/3] migration/colo.c: Remove redundant
+ input parameter
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,35 +28,65 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, Andrew Baumann <Andrew.Baumann@microsoft.com>, qemu-arm <qemu-arm@nongnu.org>
+To: Zhang Chen <chen.zhang@intel.com>
+Cc: Laurent Vivier <laurent@vivier.eu>, Juan Quintela <quintela@redhat.com>, zhanghailiang <zhang.zhanghailiang@huawei.com>, Markus Armbruster <armbru@redhat.com>, qemu-dev <qemu-devel@nongnu.org>, Zhang Chen <zhangckid@gmail.com>
 
-On Sat, 27 Apr 2019 at 14:30, Philippe Mathieu-Daud=C3=A9 <philmd@redhat.co=
-m> wrote:
->
-> This device is used by both ARM (BCM2836, for raspi2) and AArch64
-> (BCM2837, for raspi3) targets, and is not CPU-specific.
-> Move it to common object, so we build it once for all targets.
->
-> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+* Zhang Chen (chen.zhang@intel.com) wrote:
+> From: Zhang Chen <chen.zhang@intel.com>
+> 
+> The colo_do_failover no need the input parameter.
+> 
+> Signed-off-by: Zhang Chen <chen.zhang@intel.com>
+
+Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+
 > ---
->  hw/dma/Makefile.objs | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
->
-> diff --git a/hw/dma/Makefile.objs b/hw/dma/Makefile.objs
-> index 79affecc390..8b39f9c6004 100644
-> --- a/hw/dma/Makefile.objs
-> +++ b/hw/dma/Makefile.objs
-> @@ -14,4 +14,4 @@ common-obj-$(CONFIG_XLNX_ZYNQMP_ARM) +=3D xlnx-zdma.o
->
->  obj-$(CONFIG_OMAP) +=3D omap_dma.o soc_dma.o
->  obj-$(CONFIG_PXA2XX) +=3D pxa2xx_dma.o
-> -obj-$(CONFIG_RASPI) +=3D bcm2835_dma.o
-> +common-obj-$(CONFIG_RASPI) +=3D bcm2835_dma.o
-
-
-
-
-Applied to target-arm.next, thanks.
-
--- PMM
+>  include/migration/colo.h  | 2 +-
+>  migration/colo-failover.c | 2 +-
+>  migration/colo.c          | 2 +-
+>  3 files changed, 3 insertions(+), 3 deletions(-)
+> 
+> diff --git a/include/migration/colo.h b/include/migration/colo.h
+> index 99ce17aca7..ddebe0ad27 100644
+> --- a/include/migration/colo.h
+> +++ b/include/migration/colo.h
+> @@ -37,7 +37,7 @@ bool migration_incoming_in_colo_state(void);
+>  COLOMode get_colo_mode(void);
+>  
+>  /* failover */
+> -void colo_do_failover(MigrationState *s);
+> +void colo_do_failover(void);
+>  
+>  void colo_checkpoint_notify(void *opaque);
+>  #endif
+> diff --git a/migration/colo-failover.c b/migration/colo-failover.c
+> index 4854a96c92..e9ca0b4774 100644
+> --- a/migration/colo-failover.c
+> +++ b/migration/colo-failover.c
+> @@ -39,7 +39,7 @@ static void colo_failover_bh(void *opaque)
+>          return;
+>      }
+>  
+> -    colo_do_failover(NULL);
+> +    colo_do_failover();
+>  }
+>  
+>  void failover_request_active(Error **errp)
+> diff --git a/migration/colo.c b/migration/colo.c
+> index 238a6d62c7..8c1644091f 100644
+> --- a/migration/colo.c
+> +++ b/migration/colo.c
+> @@ -193,7 +193,7 @@ COLOMode get_colo_mode(void)
+>      }
+>  }
+>  
+> -void colo_do_failover(MigrationState *s)
+> +void colo_do_failover(void)
+>  {
+>      /* Make sure VM stopped while failover happened. */
+>      if (!colo_runstate_is_stopped()) {
+> -- 
+> 2.17.GIT
+> 
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
