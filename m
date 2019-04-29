@@ -2,83 +2,74 @@ Return-Path: <SRS0=sEuR=S7=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.7 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-3.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_PASS,URIBL_BLOCKED autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B50F3C43219
-	for <qemu-devel@archiver.kernel.org>; Mon, 29 Apr 2019 21:59:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1714CC43219
+	for <qemu-devel@archiver.kernel.org>; Mon, 29 Apr 2019 22:31:37 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7E242215EA
-	for <qemu-devel@archiver.kernel.org>; Mon, 29 Apr 2019 21:59:23 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="rwDIZMEs"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7E242215EA
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id DCAD42067D
+	for <qemu-devel@archiver.kernel.org>; Mon, 29 Apr 2019 22:31:36 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DCAD42067D
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:35848 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:36102 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hLEJ0-0003TI-O7
-	for qemu-devel@archiver.kernel.org; Mon, 29 Apr 2019 17:59:22 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:36434)
+	id 1hLEoB-00081o-Ru
+	for qemu-devel@archiver.kernel.org; Mon, 29 Apr 2019 18:31:35 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:41529)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1hLEIB-00036M-TV
-	for qemu-devel@nongnu.org; Mon, 29 Apr 2019 17:58:32 -0400
+	(envelope-from <bounces@canonical.com>) id 1hLEnM-0007gv-Mx
+	for qemu-devel@nongnu.org; Mon, 29 Apr 2019 18:30:45 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1hLEIA-0005y7-Sn
-	for qemu-devel@nongnu.org; Mon, 29 Apr 2019 17:58:31 -0400
-Received: from mail-pg1-x530.google.com ([2607:f8b0:4864:20::530]:36619)
+	(envelope-from <bounces@canonical.com>) id 1hLEnL-0003YT-Hs
+	for qemu-devel@nongnu.org; Mon, 29 Apr 2019 18:30:44 -0400
+Received: from indium.canonical.com ([91.189.90.7]:40794)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1hLEIA-0005xj-N6
-	for qemu-devel@nongnu.org; Mon, 29 Apr 2019 17:58:30 -0400
-Received: by mail-pg1-x530.google.com with SMTP id 85so5818517pgc.3
-	for <qemu-devel@nongnu.org>; Mon, 29 Apr 2019 14:58:30 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
-	h=from:to:cc:subject:date:message-id;
-	bh=BSejnZmTBgmRIVkic80VSsvAmUgxgYcicE1r6mcOOmk=;
-	b=rwDIZMEsuJzUpVp9oy0inWEmFqosWhuQpvwRYwFL4xWwewGgxEjb+gWYyPiBpTnKmY
-	O5F6RU27wD/0+qLJpdF36DPlfnh4Qr/YJaJ1QwzlpCfNvrD7i6aFN4LJ6SkOch68S/Qu
-	JqabxWE9PXFfPsNfpZqV7GsErKS2l4O3kuqKjp+dr3+ftGHzMnDh51sXyB/X55i6kFQR
-	yxSqEy86j0MXBzgtYthFd2apO8yGZ13JR/Rv0en9jIjGGjpDV12c/kdYUVDyq54/vWcD
-	CiKpcHp+ANhzH2Ina9caC1ckHiF2d3vtyUKNFvGClx5IMLCt6si0xPVMRl+7wNCIfl5T
-	dKIg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=1e100.net; s=20161025;
-	h=x-gm-message-state:from:to:cc:subject:date:message-id;
-	bh=BSejnZmTBgmRIVkic80VSsvAmUgxgYcicE1r6mcOOmk=;
-	b=W5olZiXgo8OOw0zANjfCiHuiuFGpW6MKtv/nK5yPyRafH2I06H0OnU9dRAm+S+j8Vz
-	sQ7JuZyQcektXzSXt7eqzf+wJLemx+d5iKAwh6d8w+o8AF1SLQiBrAxnQGb+flz51YTv
-	4KD4XzkDSPl81JeaxxWpxaS0IshB7LjyXziWsOwtGu2spePEwN+zfp8HYCpcsOAtlGqc
-	AAET2IOhvbBqjvTVcf+UIuEX640FQy99637dO9b4s1LGZkZk81+wloGMiCIEArebJonk
-	PrdhCIFtc3KlkIUZpt0kgYaE+dsF5ZrSqvR8npqzTG4skoJZXiQMts7slXznXUIQzlTa
-	hHfQ==
-X-Gm-Message-State: APjAAAVXAJoMveHWKwnPGAPAQZWSaMiE70ZPHjIFayYSX4YoaSxG/klU
-	uf9mzvR3prb293XeAOCJCqXCwYcw+q8=
-X-Google-Smtp-Source: APXvYqxFrDySx/LIzO24dMYO4Xt4Vp3NlVHdgnwbM0R7hF09QZ6HcAyJRvkctwtM6c1PBcUKUXKOjA==
-X-Received: by 2002:aa7:9148:: with SMTP id 8mr35242545pfi.176.1556575108763; 
-	Mon, 29 Apr 2019 14:58:28 -0700 (PDT)
-Received: from localhost.localdomain (97-113-18-231.tukw.qwest.net.
-	[97.113.18.231]) by smtp.gmail.com with ESMTPSA id
-	v1sm60686010pff.81.2019.04.29.14.58.26
-	(version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-	Mon, 29 Apr 2019 14:58:27 -0700 (PDT)
-From: Richard Henderson <richard.henderson@linaro.org>
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1hLEnL-0003XQ-CF
+	for qemu-devel@nongnu.org; Mon, 29 Apr 2019 18:30:43 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1hLEnJ-0002XH-Qe
+	for <qemu-devel@nongnu.org>; Mon, 29 Apr 2019 22:30:41 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id C86F72E80CB
+	for <qemu-devel@nongnu.org>; Mon, 29 Apr 2019 22:30:41 +0000 (UTC)
+MIME-Version: 1.0
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Mon, 29 Apr 2019 22:15:46 -0000
+From: Erik Kline <1814352@bugs.launchpad.net>
 To: qemu-devel@nongnu.org
-Date: Mon, 29 Apr 2019 14:58:21 -0700
-Message-Id: <20190429215821.10079-1-richard.henderson@linaro.org>
-X-Mailer: git-send-email 2.17.1
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
-	recognized.
-X-Received-From: 2607:f8b0:4864:20::530
-Subject: [Qemu-devel] [PULL v2 0/2] target/hppa patch queue
+X-Launchpad-Notification-Type: bug
+X-Launchpad-Bug: product=qemu; status=Confirmed; importance=Undecided;
+	assignee=None; 
+X-Launchpad-Bug-Tags: linux-user
+X-Launchpad-Bug-Information-Type: Public
+X-Launchpad-Bug-Private: no
+X-Launchpad-Bug-Security-Vulnerability: no
+X-Launchpad-Bug-Commenters: ekline pmaydell
+X-Launchpad-Bug-Reporter: Erik Kline (ekline)
+X-Launchpad-Bug-Modifier: Erik Kline (ekline)
+References: <154907151753.31178.12938166708527410326.malonedeb@gac.canonical.com>
+Message-Id: <155657614636.14210.8511574090523893603.malone@gac.canonical.com>
+X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
+X-Launchpad-Message-For: qemu-devel-ml
+Precedence: bulk
+X-Generated-By: Launchpad (canonical.com); Revision="18928";
+	Instance="launchpad-lazr.conf"
+X-Launchpad-Hash: 51a8eb265e9a9935f88962433e5a55ffcc3741d9
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 91.189.90.7
+Subject: [Qemu-devel] [Bug 1814352] Re: SIOCGIFNAME takes a struct ifreq not
+ an integer
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
-Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -87,38 +78,57 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: peter.maydell@linaro.org
+Reply-To: Bug 1814352 <1814352@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Content-Type: text/plain; charset="UTF-8"
-Message-ID: <20190429215821.pRHoGg9naECoL5JE-nboqAZj7YpxijDsX1TB8MxLu7I@z>
+Message-ID: <20190429221546.FFxN1egL20HTpGiNAay5pzs6XKh9I0isXqFweHDjxFY@z>
 
-Rebased for v2.
+Please let me know if further work or another patch submission is
+required.
 
-The following changes since commit 82b2865e0d0ea4c1001e9e7ed7920bcc0458f6de:
+-- =
 
-  Merge remote-tracking branch 'remotes/pmaydell/tags/pull-target-arm-20190429' into staging (2019-04-29 18:05:56 +0100)
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1814352
 
-are available in the Git repository at:
+Title:
+  SIOCGIFNAME takes a struct ifreq not an integer
 
-  https://github.com/rth7680/qemu.git tags/pull-hppa-20190429
+Status in QEMU:
+  Confirmed
 
-for you to fetch changes up to affdb7e6ba23f8160cb88e11f83db54a35f03d6b:
+Bug description:
+  The ioctl SIOCGIFNAME takes a pointer to a struct ifreq, not an
+  integer.  This leads to if_indextoname() not correctly returning
+  interface names (well, not if they're longer than 4 characters
+  including the trailing NULL ;-).
 
-  target/hppa: Always return EXCP_DMAR for protection id trap (2019-04-29 14:43:39 -0700)
+  This is observed on v3.1.0.
 
-----------------------------------------------------------------
-Implement fast tlb insert insns.
-Fix data tlb exception for pa 1.1.
+  The following one-line patch will be sent to the qemu-devel mailing
+  list:
 
-----------------------------------------------------------------
-Nick Hudson (2):
-      target/hppa: Implement Fast TLB Insert instructions
-      target/hppa: Always return EXCP_DMAR for protection id trap
+  """
+  diff --git a/linux-user/ioctls.h b/linux-user/ioctls.h
+  index ae8951625f..37501f575c 100644
+  --- a/linux-user/ioctls.h
+  +++ b/linux-user/ioctls.h
+  @@ -178,7 +178,7 @@
+   #endif /* CONFIG_USBFS */
+   =
 
- target/hppa/mem_helper.c |  3 +--
- target/hppa/translate.c  | 54 ++++++++++++++++++++++++++++++++++++++++++++++++
- target/hppa/insns.decode |  3 +++
- 3 files changed, 58 insertions(+), 2 deletions(-)
+     IOCTL(SIOCATMARK, IOC_R, MK_PTR(TYPE_INT))
+  -  IOCTL(SIOCGIFNAME, IOC_RW, MK_PTR(TYPE_INT))
+  +  IOCTL(SIOCGIFNAME, IOC_RW, MK_PTR(MK_STRUCT(STRUCT_int_ifreq)))
+     IOCTL(SIOCGIFFLAGS, IOC_W | IOC_R, MK_PTR(MK_STRUCT(STRUCT_short_ifreq=
+)))
+     IOCTL(SIOCSIFFLAGS, IOC_W, MK_PTR(MK_STRUCT(STRUCT_short_ifreq)))
+     IOCTL(SIOCGIFADDR, IOC_W | IOC_R, MK_PTR(MK_STRUCT(STRUCT_sockaddr_ifr=
+eq)))
+  """
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1814352/+subscriptions
 
