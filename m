@@ -7,78 +7,78 @@ X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
 	SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E9C64C43219
-	for <qemu-devel@archiver.kernel.org>; Mon, 29 Apr 2019 17:46:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5EC79C43219
+	for <qemu-devel@archiver.kernel.org>; Mon, 29 Apr 2019 17:48:14 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B481620652
-	for <qemu-devel@archiver.kernel.org>; Mon, 29 Apr 2019 17:46:49 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id D6B2F20673
+	for <qemu-devel@archiver.kernel.org>; Mon, 29 Apr 2019 17:48:13 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="gFoKaeSq"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B481620652
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="uYus/O/J"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D6B2F20673
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:33070 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:33082 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hLAMa-0001iV-Qy
-	for qemu-devel@archiver.kernel.org; Mon, 29 Apr 2019 13:46:49 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:41664)
+	id 1hLANx-0002nL-0l
+	for qemu-devel@archiver.kernel.org; Mon, 29 Apr 2019 13:48:13 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:42068)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alistair23@gmail.com>) id 1hLA5j-0004TG-Tx
-	for qemu-devel@nongnu.org; Mon, 29 Apr 2019 13:29:24 -0400
+	(envelope-from <alistair23@gmail.com>) id 1hLA74-0005jz-Oy
+	for qemu-devel@nongnu.org; Mon, 29 Apr 2019 13:30:47 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alistair23@gmail.com>) id 1hLA5j-0006Ae-2N
-	for qemu-devel@nongnu.org; Mon, 29 Apr 2019 13:29:23 -0400
-Received: from mail-lj1-x242.google.com ([2a00:1450:4864:20::242]:46677)
+	(envelope-from <alistair23@gmail.com>) id 1hLA73-0006lQ-Qh
+	for qemu-devel@nongnu.org; Mon, 29 Apr 2019 13:30:46 -0400
+Received: from mail-lj1-x244.google.com ([2a00:1450:4864:20::244]:40418)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <alistair23@gmail.com>)
-	id 1hLA5g-000699-VZ; Mon, 29 Apr 2019 13:29:21 -0400
-Received: by mail-lj1-x242.google.com with SMTP id h21so10092400ljk.13;
-	Mon, 29 Apr 2019 10:29:20 -0700 (PDT)
+	id 1hLA71-0006k7-LP; Mon, 29 Apr 2019 13:30:43 -0400
+Received: by mail-lj1-x244.google.com with SMTP id t10so9102007ljg.7;
+	Mon, 29 Apr 2019 10:30:43 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
 	h=mime-version:references:in-reply-to:from:date:message-id:subject:to
 	:cc:content-transfer-encoding;
-	bh=gLS9I0ngHrnn3Ujgur6YQTjnpkUCsdPWux+YrreoIwE=;
-	b=gFoKaeSqqjjUIfHjdi1V2wL1DTbZocQbM+iMoydPFobJyCX4QOGfKyEzHalbfAhjJ/
-	dKcVa+3jzEnBXATmT2hH3xNVuPDPShGAzqbI3ZD3Ynv6iyyu3pCi7mZJR7+sFdfRcVaC
-	qkgcVSyTVnGvh1MnlFfZp+Mywd4WzcaElsqor1NEzMLwWuk+6JGILYNYodytP3ZxhZEN
-	3j2VCZTXyZ1EhhsKD68CzRFFAHFWOhcAPklJBQ5TXjM9uE+wSKjQZP/Z3uGNunEH6zWH
-	Y21b9FjGypkJTfS060SrlxvymIcOtq/icBZYRC0sMbDFAuymvKwg+NpTWE2sUWEX3cPj
-	rffg==
+	bh=D0CsyVuEeijjtNrn3BRdbHVTNz74u9iotAEhTxxMyXM=;
+	b=uYus/O/JfNBTN/acpE1d/z1mxuuuypqXzI7iegKxHMRGiUhFfMJ+iQehbIK2KRO5qk
+	NJe8Lvr+0bj98gF4ww0qMwRG7FIJnw3pULMkPVFZypDLBPATY2HTiT2y9LzYwuvicn83
+	CVPDHiv2E+Awgn5Qkii/kC3cgZxR+SU1xSs+60FRpiz8LgW3VjcSBv0zaW4Qj3Kx3uHe
+	S0OSRcusH1imkaoCgFLOVFXd6OnJ4cuz05szWixL0uRzyEA+Q13dntbz/9QxXsk6vBjK
+	6tRLKGaZcfjap6MnOWhrJwLSiogND1A9gp4zHXKMupIQyhj1moDhEnppbpVfEpXlsxOO
+	SW2w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
 	d=1e100.net; s=20161025;
 	h=x-gm-message-state:mime-version:references:in-reply-to:from:date
 	:message-id:subject:to:cc:content-transfer-encoding;
-	bh=gLS9I0ngHrnn3Ujgur6YQTjnpkUCsdPWux+YrreoIwE=;
-	b=mRPzG9wrgiHq8cqEOuNzkmIp35/SFpGueDsfTZSyiKYrt9iOEzEgGPhmwNRnVtNtdM
-	nDEg7QIqV0GuBlBribqUCEKVIP/tsYRpcWw4FLrH0Jds3CPejZMnKH2h6Bj524oZ9ZeX
-	RJvMVgbrkn3thbOqlvj0by7lW74QYfwthFg1uWStBQnoYUWKvaJwamkwrYY2Jy2uUxwL
-	z3XFG8MlSGPT0TS2tET4FHOLmWbO9+lRvxQkngF56VQBeMzpbmq2aGlVcci5HIKtYiSN
-	WIfrGEsx2fCrKOhNbTpXsDvmufBLXK5fB4x5uKSHn0KW/kRe0JUnQUbRdUgsEVVt1j0n
-	q0GA==
-X-Gm-Message-State: APjAAAWqyMwoVrtdhCu53rIVXj5vk4bdTmBN+8oqQp9e2RBtfq8JiAEm
-	Nkq4+HTdShDhl4tqIXOBlLhGf4+appEJbNUv7nc=
-X-Google-Smtp-Source: APXvYqzjKJq/IiKV40YCEvMQ8p/Y5F0hP8AtMspqS3Rb/YofohBvrhK1M/MMq9KiQD4shENx0kZm2FaD3OuK7mjpXPs=
-X-Received: by 2002:a2e:5b97:: with SMTP id m23mr4739150lje.99.1556558958689; 
-	Mon, 29 Apr 2019 10:29:18 -0700 (PDT)
+	bh=D0CsyVuEeijjtNrn3BRdbHVTNz74u9iotAEhTxxMyXM=;
+	b=mRvZ0GDoIKnsWNlNgE06zY4IwjGE4YOG0wSV3H4L38+Yx/ut2blsMTxMX1HfntzTr0
+	OSJhwIkm05AlH8RTcAidLC4tqf1/Z6JNlV+PuWBFHfgOBJ0TpA5GrFBchG4mdA37DkAe
+	La+UW0YI3A2lHSA0XXQanXfrUUreZuewpYFBkgldOhluxwcHpm2zShpL9LHKV9yyCp5y
+	g2oBtmLm9SOG4yEohM3WXD1aB46nypM4ILtsz6RrVRLsoj/rUH+o3F7NKsC+iF07Lpc9
+	skdOKmNJjsnIOlwp44xYDGgIFYdcpE+fswZ9t9ScZRKI/cugQqHDT7+yNHgylQ++cV9w
+	hLIg==
+X-Gm-Message-State: APjAAAWSftElRvP0smBOWuwf4s6eAMkpY8eMoWviEDZjBKThBuU2BVEe
+	O81as/BGTLikMAc2fXXKcWX/+z2NJSBDejNK5g5WIX91
+X-Google-Smtp-Source: APXvYqyFNaAZT8rDRO+Sgxic7DRX0iIDQVrmY1xV35w8UuXxRyQl/r/I7M5ZKnx59LMGuHs5VaDQ5jyP/QjU/mtXeZ8=
+X-Received: by 2002:a2e:824b:: with SMTP id j11mr6798990ljh.197.1556559042610; 
+	Mon, 29 Apr 2019 10:30:42 -0700 (PDT)
 MIME-Version: 1.0
 References: <20190427141459.19728-1-philmd@redhat.com>
-	<20190427141459.19728-2-philmd@redhat.com>
-In-Reply-To: <20190427141459.19728-2-philmd@redhat.com>
+	<20190427141459.19728-4-philmd@redhat.com>
+In-Reply-To: <20190427141459.19728-4-philmd@redhat.com>
 From: Alistair Francis <alistair23@gmail.com>
-Date: Mon, 29 Apr 2019 10:28:49 -0700
+Date: Mon, 29 Apr 2019 10:30:12 -0700
 Message-ID:
- <CAKmqyKOESUfmvHY73k6NsnZ0Gr9LXuHwOUDSn2vXQGXRfmWkOA@mail.gmail.com>
+ <CAKmqyKN=WFU3fGDM_t1tnwH6E7dPSpHBUBoWSzZiLe7tf7p8FA@mail.gmail.com>
 To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
 	recognized.
-X-Received-From: 2a00:1450:4864:20::242
-Subject: Re: [Qemu-devel] [PATCH 1/3] hw/Kconfig: Move the generic
- XLNX_ZYNQMP to the root hw/Kconfig
+X-Received-From: 2a00:1450:4864:20::244
+Subject: Re: [Qemu-devel] [PATCH 3/3] hw/dma: Do not build the xlnx_dpdma
+ device for the MicroBlaze machines
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -98,13 +98,14 @@ Cc: Peter Maydell <peter.maydell@linaro.org>, Thomas Huth <thuth@redhat.com>,
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190429172849.lt8DXLj6oUVCO7pUsLFT0zb6iKFPtuztUZPlpr9Fcf0@z>
+Message-ID: <20190429173012.w_J_fZ44LburX_i_pTK09kTuI11uomJXH1XsbZCbTbk@z>
 
 On Sat, Apr 27, 2019 at 7:15 AM Philippe Mathieu-Daud=C3=A9
 <philmd@redhat.com> wrote:
 >
-> The XLNX_ZYNQMP config is used in multiple subdirectories
-> (timer, intc). Move it to the root hw/Kconfig.
+> The xlnx_dpdma device is only used by the ZynqMP AArch64 machine
+> (not the MicroBlaze PMU). Remove it from the ZynqMP generic objects.
+> (Note, this entry was duplicated for the AArch64).
 >
 > Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
 
@@ -113,35 +114,21 @@ Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
 Alistair
 
 > ---
->  hw/Kconfig       | 3 +++
->  hw/timer/Kconfig | 3 ---
->  2 files changed, 3 insertions(+), 3 deletions(-)
+>  hw/dma/Makefile.objs | 1 -
+>  1 file changed, 1 deletion(-)
 >
-> diff --git a/hw/Kconfig b/hw/Kconfig
-> index 88b9f150070..c3c78f43eb5 100644
-> --- a/hw/Kconfig
-> +++ b/hw/Kconfig
-> @@ -72,3 +72,6 @@ config XILINX
->  config XILINX_AXI
->      bool
->      select PTIMER # for hw/dma/xilinx_axidma.c
-> +
-> +config XLNX_ZYNQMP
-> +    bool
-> diff --git a/hw/timer/Kconfig b/hw/timer/Kconfig
-> index 51921eb63f1..eefc95f35ec 100644
-> --- a/hw/timer/Kconfig
-> +++ b/hw/timer/Kconfig
-> @@ -34,9 +34,6 @@ config TWL92230
->      bool
->      depends on I2C
+> diff --git a/hw/dma/Makefile.objs b/hw/dma/Makefile.objs
+> index 79affecc390..a5b1276f52a 100644
+> --- a/hw/dma/Makefile.objs
+> +++ b/hw/dma/Makefile.objs
+> @@ -8,7 +8,6 @@ common-obj-$(CONFIG_XILINX_AXI) +=3D xilinx_axidma.o
+>  common-obj-$(CONFIG_ZYNQ_DEVCFG) +=3D xlnx-zynq-devcfg.o
+>  common-obj-$(CONFIG_ETRAXFS) +=3D etraxfs_dma.o
+>  common-obj-$(CONFIG_STP2000) +=3D sparc32_dma.o
+> -obj-$(CONFIG_XLNX_ZYNQMP) +=3D xlnx_dpdma.o
+>  obj-$(CONFIG_XLNX_ZYNQMP_ARM) +=3D xlnx_dpdma.o
+>  common-obj-$(CONFIG_XLNX_ZYNQMP_ARM) +=3D xlnx-zdma.o
 >
-> -config XLNX_ZYNQMP
-> -    bool
-> -
->  config ALTERA_TIMER
->      bool
->      select PTIMER
 > --
 > 2.20.1
 >
