@@ -2,93 +2,74 @@ Return-Path: <SRS0=sEuR=S7=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-5.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_PASS,URIBL_BLOCKED autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5C491C43219
-	for <qemu-devel@archiver.kernel.org>; Mon, 29 Apr 2019 19:47:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EA17BC43219
+	for <qemu-devel@archiver.kernel.org>; Mon, 29 Apr 2019 20:12:50 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1FD21215EA
-	for <qemu-devel@archiver.kernel.org>; Mon, 29 Apr 2019 19:47:45 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1FD21215EA
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id BA70D2067D
+	for <qemu-devel@archiver.kernel.org>; Mon, 29 Apr 2019 20:12:50 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BA70D2067D
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=fnordpol.de
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:34402 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:34680 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hLCFc-000884-8t
-	for qemu-devel@archiver.kernel.org; Mon, 29 Apr 2019 15:47:44 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:39873)
+	id 1hLCdt-0006aX-Kp
+	for qemu-devel@archiver.kernel.org; Mon, 29 Apr 2019 16:12:49 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:44375)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1hLCEa-0007bk-4c
-	for qemu-devel@nongnu.org; Mon, 29 Apr 2019 15:46:41 -0400
+	(envelope-from <bounces@canonical.com>) id 1hLCcG-0005kG-O7
+	for qemu-devel@nongnu.org; Mon, 29 Apr 2019 16:11:10 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1hLCEY-0000cQ-T1
-	for qemu-devel@nongnu.org; Mon, 29 Apr 2019 15:46:39 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:50094)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>)
-	id 1hLCES-0000WG-EG; Mon, 29 Apr 2019 15:46:32 -0400
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
-	[10.5.11.13])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 0F03581E06;
-	Mon, 29 Apr 2019 19:46:26 +0000 (UTC)
-Received: from [10.3.116.15] (ovpn-116-15.phx2.redhat.com [10.3.116.15])
-	by smtp.corp.redhat.com (Postfix) with ESMTPS id 64A8B226E8;
-	Mon, 29 Apr 2019 19:46:23 +0000 (UTC)
-To: Alberto Garcia <berto@igalia.com>, qemu-devel@nongnu.org
-References: <cover.1556562150.git.berto@igalia.com>
-From: Eric Blake <eblake@redhat.com>
-Openpgp: preference=signencrypt
-Autocrypt: addr=eblake@redhat.com; keydata=
-	xsBNBEvHyWwBCACw7DwsQIh0kAbUXyqhfiKAKOTVu6OiMGffw2w90Ggrp4bdVKmCaEXlrVLU
-	xphBM8mb+wsFkU+pq9YR621WXo9REYVIl0FxKeQo9dyQBZ/XvmUMka4NOmHtFg74nvkpJFCD
-	TUNzmqfcjdKhfFV0d7P/ixKQeZr2WP1xMcjmAQY5YvQ2lUoHP43m8TtpB1LkjyYBCodd+LkV
-	GmCx2Bop1LSblbvbrOm2bKpZdBPjncRNob73eTpIXEutvEaHH72LzpzksfcKM+M18cyRH+nP
-	sAd98xIbVjm3Jm4k4d5oQyE2HwOur+trk2EcxTgdp17QapuWPwMfhaNq3runaX7x34zhABEB
-	AAHNHkVyaWMgQmxha2UgPGVibGFrZUByZWRoYXQuY29tPsLAegQTAQgAJAIbAwULCQgHAwUV
-	CgkICwUWAgMBAAIeAQIXgAUCS8fL9QIZAQAKCRCnoWtKJSdDahBHCACbl/5FGkUqJ89GAjeX
-	RjpAeJtdKhujir0iS4CMSIng7fCiGZ0fNJCpL5RpViSo03Q7l37ss+No+dJI8KtAp6ID+PMz
-	wTJe5Egtv/KGUKSDvOLYJ9WIIbftEObekP+GBpWP2+KbpADsc7EsNd70sYxExD3liwVJYqLc
-	Rw7so1PEIFp+Ni9A1DrBR5NaJBnno2PHzHPTS9nmZVYm/4I32qkLXOcdX0XElO8VPDoVobG6
-	gELf4v/vIImdmxLh/w5WctUpBhWWIfQDvSOW2VZDOihm7pzhQodr3QP/GDLfpK6wI7exeu3P
-	pfPtqwa06s1pae3ad13mZGzkBdNKs1HEm8x6zsBNBEvHyWwBCADGkMFzFjmmyqAEn5D+Mt4P
-	zPdO8NatsDw8Qit3Rmzu+kUygxyYbz52ZO40WUu7EgQ5kDTOeRPnTOd7awWDQcl1gGBXgrkR
-	pAlQ0l0ReO57Q0eglFydLMi5bkwYhfY+TwDPMh3aOP5qBXkm4qIYSsxb8A+i00P72AqFb9Q7
-	3weG/flxSPApLYQE5qWGSXjOkXJv42NGS6o6gd4RmD6Ap5e8ACo1lSMPfTpGzXlt4aRkBfvb
-	NCfNsQikLZzFYDLbQgKBA33BDeV6vNJ9Cj0SgEGOkYyed4I6AbU0kIy1hHAm1r6+sAnEdIKj
-	cHi3xWH/UPrZW5flM8Kqo14OTDkI9EtlABEBAAHCwF8EGAEIAAkFAkvHyWwCGwwACgkQp6Fr
-	SiUnQ2q03wgAmRFGDeXzc58NX0NrDijUu0zx3Lns/qZ9VrkSWbNZBFjpWKaeL1fdVeE4TDGm
-	I5mRRIsStjQzc2R9b+2VBUhlAqY1nAiBDv0Qnt+9cLiuEICeUwlyl42YdwpmY0ELcy5+u6wz
-	mK/jxrYOpzXKDwLq5k4X+hmGuSNWWAN3gHiJqmJZPkhFPUIozZUCeEc76pS/IUN72NfprZmF
-	Dp6/QDjDFtfS39bHSWXKVZUbqaMPqlj/z6Ugk027/3GUjHHr8WkeL1ezWepYDY7WSoXwfoAL
-	2UXYsMAr/uUncSKlfjvArhsej0S4zbqim2ZY6S8aRWw94J3bSvJR+Nwbs34GPTD4Pg==
-Organization: Red Hat, Inc.
-Message-ID: <af631418-7a2b-db53-21ee-66b305912ae7@redhat.com>
-Date: Mon, 29 Apr 2019 14:46:22 -0500
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
-	Thunderbird/60.6.1
+	(envelope-from <bounces@canonical.com>) id 1hLCcF-0006Qk-D4
+	for qemu-devel@nongnu.org; Mon, 29 Apr 2019 16:11:08 -0400
+Received: from indium.canonical.com ([91.189.90.7]:50754)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1hLCcF-0006Ni-6S
+	for qemu-devel@nongnu.org; Mon, 29 Apr 2019 16:11:07 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1hLCcD-0007KN-GX
+	for <qemu-devel@nongnu.org>; Mon, 29 Apr 2019 20:11:05 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 63FC42E80CB
+	for <qemu-devel@nongnu.org>; Mon, 29 Apr 2019 20:11:05 +0000 (UTC)
 MIME-Version: 1.0
-In-Reply-To: <cover.1556562150.git.berto@igalia.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="5uwl9wD1oXuwOiUlMpw2HiANXgstrxY0B"
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.25]);
-	Mon, 29 Apr 2019 19:46:27 +0000 (UTC)
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Mon, 29 Apr 2019 19:58:21 -0000
+From: Hans <zem@fnordpol.de>
+To: qemu-devel@nongnu.org
+X-Launchpad-Notification-Type: bug
+X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
+X-Launchpad-Bug-Tags: glusterfs qemu
+X-Launchpad-Bug-Information-Type: Public
+X-Launchpad-Bug-Private: no
+X-Launchpad-Bug-Security-Vulnerability: no
+X-Launchpad-Bug-Commenters: jnsnow zem-g
+X-Launchpad-Bug-Reporter: Hans (zem-g)
+X-Launchpad-Bug-Modifier: Hans (zem-g)
+References: <153763821634.24720.16203204034487714411.malonedeb@gac.canonical.com>
+Message-Id:
+ <155656790115.14210.15040106919751685952.malone@gac.canonical.com>
+X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
+X-Launchpad-Message-For: qemu-devel-ml
+Precedence: bulk
+X-Generated-By: Launchpad (canonical.com); Revision="18928";
+	Instance="launchpad-lazr.conf"
+X-Launchpad-Hash: d3c6172d7863872f95430beba2de41723addb072
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-X-Content-Filtered-By: Mailman/MimeDel 2.1.21
-Subject: Re: [Qemu-devel] [PATCH 0/5] Remove bdrv_read() and bdrv_write()
+X-Received-From: 91.189.90.7
+Subject: [Qemu-devel] [Bug 1793904] Re: files are randomly overwritten by
+ Zero Bytes
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
-Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -97,79 +78,133 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org,
-	Max Reitz <mreitz@redhat.com>
+Reply-To: Bug 1793904 <1793904@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190429194622.D-R1RNhZoNsdSCuhDXMUzkUGl1cTPFSsFC25SsdnNuw@z>
+Message-ID: <20190429195821.MjuZHUpf8U8A_ACW-2ymmkHFNhvaQLz1F5Lo3XQk3Go@z>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---5uwl9wD1oXuwOiUlMpw2HiANXgstrxY0B
-From: Eric Blake <eblake@redhat.com>
-To: Alberto Garcia <berto@igalia.com>, qemu-devel@nongnu.org
-Cc: qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>,
- Kevin Wolf <kwolf@redhat.com>
-Message-ID: <af631418-7a2b-db53-21ee-66b305912ae7@redhat.com>
-Subject: Re: [PATCH 0/5] Remove bdrv_read() and bdrv_write()
-References: <cover.1556562150.git.berto@igalia.com>
-In-Reply-To: <cover.1556562150.git.berto@igalia.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+Please note the updates on:
 
-On 4/29/19 1:42 PM, Alberto Garcia wrote:
-> Hi,
->=20
-> this API only had a few users left so it can be easily removed.
+https://bugzilla.redhat.com/show_bug.cgi?id=3D1701736
 
-Sounds very similar to my earlier attempt at the same:
+It turns out that you can reproduce the broken images on glusterfs fuse
+mounts by using:
 
-https://lists.gnu.org/archive/html/qemu-devel/2018-11/msg02769.html
-
->=20
-> Regards,
->=20
-> Berto
->=20
-> Alberto Garcia (5):
->   qcow2: Replace bdrv_write() with bdrv_pwrite()
->   vdi: Replace bdrv_{read,write}() with bdrv_{pread,pwrite}()
->   vvfat: Replace bdrv_{read,write}() with bdrv_{pread,pwrite}()
->   block: Remove bdrv_read() and bdrv_write()
->   qcow2: Remove BDRVQcow2State.cluster_sectors
->=20
->  block/io.c             | 36 ------------------------------------
->  block/qcow2-refcount.c |  4 ++--
->  block/qcow2.c          |  1 -
->  block/qcow2.h          |  1 -
->  block/vdi.c            | 11 ++++++-----
->  block/vvfat.c          | 10 ++++++----
->  include/block/block.h  |  4 ----
->  7 files changed, 14 insertions(+), 53 deletions(-)
->=20
-
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3226
-Virtualization:  qemu.org | libvirt.org
+                aio=3Dnative
+                cache=3Dnone,
+                write-cache=3Don
 
 
---5uwl9wD1oXuwOiUlMpw2HiANXgstrxY0B
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
+I have a set of vms running here on my fedora 29 desktop providing a test g=
+lusterfs and a vm to reproduce the bug, at least for the current ovirt case=
+. =
 
------BEGIN PGP SIGNATURE-----
 
-iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlzHVI4ACgkQp6FrSiUn
-Q2oAbQf+Ifmt7tpHibthsi2s8c2UNtq++QEXo0WF2TtWgKSYOAzLxOXlyy9NXiPQ
-Z1C8nJPs3pXmiMolIM7dTiW54PFohZiVR91ZV3AymUlKeuCytos7+orgOm/G0S+9
-deneW6j9stAJPp6voKuXi0r6O8rWszyJDQI8sx4JgmgjfQGAvnTnnxNMkNojhR2v
-rVxEl1z3oxtNs2FWsnsw7MqFBHSvWTsdVtSsje9d/lystjuw6V7b7HcgmQAZ0QmQ
-oU75C9UBOKeHjtfaXUjvAsT1t71rEp7q2ZUVcVTDxrPyo4dsJW9scDzr9hYWQaIz
-AZrtoeB8/RR7BIb0ehW7EgRUyC/PXQ==
-=CWgE
------END PGP SIGNATURE-----
+** Bug watch added: Red Hat Bugzilla #1701736
+   https://bugzilla.redhat.com/show_bug.cgi?id=3D1701736
 
---5uwl9wD1oXuwOiUlMpw2HiANXgstrxY0B--
+-- =
+
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1793904
+
+Title:
+  files are randomly overwritten by Zero Bytes
+
+Status in QEMU:
+  New
+
+Bug description:
+  Hello together,
+
+  I am currently tracking down a "Hard to reproduce" bug on my systems
+  that I first discovered during gitlab installation:
+
+  =
+
+  Here is the Text from the Gitlab Bug https://gitlab.com/gitlab-org/gitlab=
+-ce/issues/51023
+  -------------------------------------------------------------------------=
+---------------------
+
+  Steps to reproduce
+
+  I still do not have all the steps together to reproduce, so far it is:
+  apt install gitlab-ce and
+  gitlab-rake backup:recovery
+  Then it works for some time before it fails.
+
+  What is the current bug behavior?
+
+  I have a 12 hour old Installation of gitlab ce 11.2.3-ce.0 for debian
+  stretch on a fresh debian stretch system together with our imported
+  data. However it turns out that some gitlab related files contain Zero
+  bytes instead of actual data.
+
+  root@gitlab:~# xxd -l 16 /opt/gitlab/bin/gitlab-ctl
+  00000000: 0000 0000 0000 0000 0000 0000 0000 0000  ................
+
+  This behaviour is somewhat strange because it was working for a few
+  minutes/hours. I did write a shell script to find out which files are
+  affected of this memory loss. It turns out that only files located
+  under /opt/gitlab are affected, if I rule out files like
+  /var/log/faillog and some postgresql table files.
+
+  What I find even stranger is that it does not seem to affect
+  Logfiles/databases/git_repositorys but application files, like .rb
+  scripts. and not all of them. No non gitlab package is affected.
+
+  What is the expected correct behavior?
+  Binarys and .rb files should stay as they are.
+
+  Possible fixes
+
+  I am still investigating, I hope that it is not an infrastructure problem=
+ (libvirt/qemu/glusterfs) it can still be one but the point that files of /=
+opt/gitlab are affected and not any logfile and that we to not have similar=
+ problems with any other system leads me to the application for now.
+  If I would have used docker the same problem might have caused a reboot o=
+f the container.
+  But for the Debian package it is a bit of work to recover. That is all a =
+workaround, however.
+  -------------------------------------------------------------------------=
+--------------------
+
+  I do have found 2 more systems having the same problem with different
+  software:
+
+  root@erp:~# xxd -l 16 /usr/share/perl/5.26.2/constant.pm
+  00000000: 0000 0000 0000 0000 0000 0000 0000 0000  ................
+
+  The Filesize itself is, compared with another machine 00001660 Bytes
+  for both the corrupted and the intact file. It looks to me from the
+  outside that if some data in the qcow2 file is written too many bytes
+  get written so it sometimes overwites data of existing files located
+  right after the position in memory where the write goes to.
+
+  I would like to rule out Linux+Ext4 filesystems because I find it
+  highly unlikely that such an error keeps undiscovered in that part of
+  the environment for long. I think the same might go for qemu.
+
+  Which leaves qemu, gemu+gluster:// mount, qcow2 volumes, glusterfs,
+  network. So I am now going to check if I can find any system which
+  gets its volumes via fusermount instead of gluster:// path if the
+  error is gone there. This may take a while.
+
+  =
+
+  ----- some software versions---------------
+
+  QEMU emulator version 2.12.0 (Debian 1:2.12+dfsg-3)
+  Copyright (c) 2003-2017 Fabrice Bellard and the QEMU Project developers
+
+  libvirt-daemon-driver-storage-gluster/testing,unstable,now 4.6.0-2
+  amd64 [installed]
+
+  ii  glusterfs-client   4.1.3-1        amd64
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1793904/+subscriptions
 
