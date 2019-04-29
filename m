@@ -1,28 +1,19 @@
-Received: from eggs.gnu.org ([209.51.188.92]:51986)
+Received: from eggs.gnu.org ([209.51.188.92]:56769)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1hLAsO-0006Ta-Fy
-	for qemu-devel@nongnu.org; Mon, 29 Apr 2019 14:19:41 -0400
+	(envelope-from <berto@igalia.com>) id 1hLBF2-0003Hh-6G
+	for qemu-devel@nongnu.org; Mon, 29 Apr 2019 14:43:05 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1hLAsN-00017D-L5
-	for qemu-devel@nongnu.org; Mon, 29 Apr 2019 14:19:40 -0400
-Received: from mail-wr1-f66.google.com ([209.85.221.66]:42260)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1hLAsN-00016u-8K
-	for qemu-devel@nongnu.org; Mon, 29 Apr 2019 14:19:39 -0400
-Received: by mail-wr1-f66.google.com with SMTP id l2so1778636wrb.9
-	for <qemu-devel@nongnu.org>; Mon, 29 Apr 2019 11:19:39 -0700 (PDT)
-References: <20190412165416.7977-1-philmd@redhat.com>
-	<CAFEAcA90Pv=zEqaonGV=c022T=CYMo11nkqNwBnGgocESnBNmA@mail.gmail.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Message-ID: <f56687f4-434e-0e6d-77a8-fec6c33c9a62@redhat.com>
-Date: Mon, 29 Apr 2019 20:19:36 +0200
-MIME-Version: 1.0
-In-Reply-To: <CAFEAcA90Pv=zEqaonGV=c022T=CYMo11nkqNwBnGgocESnBNmA@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [Qemu-arm] [PATCH v3 00/12] hw: Remove
- "hw/devices.h"
+	(envelope-from <berto@igalia.com>) id 1hLBF1-0002R2-68
+	for qemu-devel@nongnu.org; Mon, 29 Apr 2019 14:43:03 -0400
+From: Alberto Garcia <berto@igalia.com>
+Date: Mon, 29 Apr 2019 20:42:36 +0200
+Message-Id: <74e443f4cd78fb5afa8d184af5be19de3691af38.1556562150.git.berto@igalia.com>
+In-Reply-To: <cover.1556562150.git.berto@igalia.com>
+References: <cover.1556562150.git.berto@igalia.com>
+In-Reply-To: <cover.1556562150.git.berto@igalia.com>
+References: <cover.1556562150.git.berto@igalia.com>
+Subject: [Qemu-devel] [PATCH 1/5] qcow2: Replace bdrv_write() with
+ bdrv_pwrite()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,28 +22,31 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, Markus Armbruster <armbru@redhat.com>, Thomas Huth <thuth@redhat.com>, Igor Mitsyanko <i.mitsyanko@gmail.com>, qemu-arm <qemu-arm@nongnu.org>, Jan Kiszka <jan.kiszka@web.de>, Andrzej Zaborowski <balrogg@gmail.com>
+To: qemu-devel@nongnu.org
+Cc: Alberto Garcia <berto@igalia.com>, qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Eric Blake <eblake@redhat.com>
 
-On 4/29/19 6:51 PM, Peter Maydell wrote:
-> On Fri, 12 Apr 2019 at 17:55, Philippe Mathieu-Daudé <philmd@redhat.com> wrote:
->>
->> Hi,
->>
->> As his first comment describes itself, the "hw/devices.h" contains
->> declarations for "Devices that have nowhere better to go."
->> This series remove it, creating new headers for devices covered there.
->> MAINTAINERS is updated.
->> I also included 2 cleanups while working on this, in "qemu/typedefs.h"
->> and "hw/net/ne2000-isa.h" header guard.
->>
->> v3:
->> - rebased
->> - added 2 patches suggested by Markus
->> - addressed Markus review comments
->> - added Markus's R-b
-> 
-> Since these are almost all arm devices I'll take this via the
-> target-arm tree (I'm going to make a pullreq later today).
+There's only one bdrv_write() call left in the qcow2 code, and it can
+be trivially replaced with the byte-based bdrv_pwrite().
 
-Thanks Peter!
+Signed-off-by: Alberto Garcia <berto@igalia.com>
+---
+ block/qcow2-refcount.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/block/qcow2-refcount.c b/block/qcow2-refcount.c
+index e0fe322500..83f66eed7a 100644
+--- a/block/qcow2-refcount.c
++++ b/block/qcow2-refcount.c
+@@ -2409,8 +2409,8 @@ write_refblocks:
+         on_disk_refblock = (void *)((char *) *refcount_table +
+                                     refblock_index * s->cluster_size);
+ 
+-        ret = bdrv_write(bs->file, refblock_offset / BDRV_SECTOR_SIZE,
+-                         on_disk_refblock, s->cluster_sectors);
++        ret = bdrv_pwrite(bs->file, refblock_offset, on_disk_refblock,
++                          s->cluster_size);
+         if (ret < 0) {
+             fprintf(stderr, "ERROR writing refblock: %s\n", strerror(-ret));
+             goto fail;
+-- 
+2.11.0
