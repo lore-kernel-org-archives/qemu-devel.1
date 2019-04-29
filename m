@@ -1,34 +1,48 @@
-Received: from eggs.gnu.org ([209.51.188.92]:33382)
+Received: from eggs.gnu.org ([209.51.188.92]:33322)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1hL2Gp-0001YM-9L
-	for qemu-devel@nongnu.org; Mon, 29 Apr 2019 05:08:20 -0400
+	(envelope-from <borntraeger@de.ibm.com>) id 1hL2Gs-0001VE-2I
+	for qemu-devel@nongnu.org; Mon, 29 Apr 2019 05:08:23 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1hL27V-0006qa-Mi
-	for qemu-devel@nongnu.org; Mon, 29 Apr 2019 04:58:43 -0400
-Received: from mail-eopbgr90102.outbound.protection.outlook.com
-	([40.107.9.102]:13280
-	helo=FRA01-MR2-obe.outbound.protection.outlook.com)
+	(envelope-from <borntraeger@de.ibm.com>) id 1hL24x-00062R-R6
+	for qemu-devel@nongnu.org; Mon, 29 Apr 2019 04:56:04 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:40126)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
-	id 1hL27V-0006qO-FL
-	for qemu-devel@nongnu.org; Mon, 29 Apr 2019 04:58:41 -0400
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Date: Mon, 29 Apr 2019 08:58:37 +0000
-Message-ID: <ccc8393b-8b59-63ce-c3c3-618d52cfca3e@virtuozzo.com>
-References: <20190423113028.GD30014@wheatley>
-	<20190423121218.GF9041@localhost.localdomain>
-	<20190423142648.GA2967@wheatley>
-	<20190423150845.GG9041@localhost.localdomain>
-	<aeb62174-5aad-676e-792d-e71d694dbd1e@virtuozzo.com>
-	<20190424071917.GA15891@linux.fritz.box>
-	<20190429072734.GC8818@wheatley>
-In-Reply-To: <20190429072734.GC8818@wheatley>
-Content-Language: en-US
-Content-Type: text/plain; charset="Windows-1252"
-Content-ID: <19541D4B6E50424AB46AFCE1AE986AC4@eurprd08.prod.outlook.com>
-Content-Transfer-Encoding: quoted-printable
+	(Exim 4.71) (envelope-from <borntraeger@de.ibm.com>)
+	id 1hL24x-000622-GW
+	for qemu-devel@nongnu.org; Mon, 29 Apr 2019 04:56:03 -0400
+Received: from pps.filterd (m0098409.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id
+	x3T8rlCm049534
+	for <qemu-devel@nongnu.org>; Mon, 29 Apr 2019 04:56:00 -0400
+Received: from e06smtp04.uk.ibm.com (e06smtp04.uk.ibm.com [195.75.94.100])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2s5vdqm58j-1
+	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Mon, 29 Apr 2019 04:56:00 -0400
+Received: from localhost
+	by e06smtp04.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	Only! Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <borntraeger@de.ibm.com>;
+	Mon, 29 Apr 2019 09:55:58 +0100
+References: <20190426111003.21246-1-borntraeger@de.ibm.com>
+	<20190426111003.21246-11-borntraeger@de.ibm.com>
+	<71955bba-ef04-1677-b7f0-bb1675bad12a@redhat.com>
+	<07252560-1eed-8fd5-ee94-6bcea6cf99bc@de.ibm.com>
+	<10d43e6e-ee8c-cd65-e724-354e0f40c79f@redhat.com>
+	<057d438c-2062-1aa7-887a-918f076911c5@de.ibm.com>
+	<93f0ecac-47cc-c791-9e32-ad5743489bf3@redhat.com>
+	<20190426145506.409b53cf.cohuck@redhat.com>
+	<7157e9b3-4432-32cc-9327-22e0d0124987@de.ibm.com>
+	<20190429105332.14434866.cohuck@redhat.com>
+From: Christian Borntraeger <borntraeger@de.ibm.com>
+Date: Mon, 29 Apr 2019 10:55:53 +0200
 MIME-Version: 1.0
-Subject: Re: [Qemu-devel] Possibly incorrect data sparsification by qemu-img
+In-Reply-To: <20190429105332.14434866.cohuck@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Message-Id: <b3e4dda2-2a74-718e-102d-14532607ddb3@de.ibm.com>
+Subject: Re: [Qemu-devel] [qemu-s390x] [PATCH v2 10/10] s390x/cpumodel: wire
+ up 8561 and 8562 as gen15 machines
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,174 +51,88 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Martin Kletzander <mkletzan@redhat.com>, Kevin Wolf <kwolf@redhat.com>
-Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, Richard Jones <rjones@redhat.com>
+To: Cornelia Huck <cohuck@redhat.com>
+Cc: David Hildenbrand <david@redhat.com>, "Jason J . Herne" <jjherne@linux.ibm.com>, Collin Walling <walling@linux.ibm.com>, qemu-devel <qemu-devel@nongnu.org>, Halil Pasic <pasic@linux.ibm.com>, qemu-s390x <qemu-s390x@nongnu.org>, Richard Henderson <rth@twiddle.net>
 
-29.04.2019 10:27, Martin Kletzander wrote:
-> On Wed, Apr 24, 2019 at 09:19:17AM +0200, Kevin Wolf wrote:
->> Am 24.04.2019 um 08:40 hat Vladimir Sementsov-Ogievskiy geschrieben:
->>> 23.04.2019 18:08, Kevin Wolf wrote:
->>> > Am 23.04.2019 um 16:26 hat Martin Kletzander geschrieben:
->>> >> On Tue, Apr 23, 2019 at 02:12:18PM +0200, Kevin Wolf wrote:
->>> >>> Am 23.04.2019 um 13:30 hat Martin Kletzander geschrieben:
->>> >>>> Hi,
->>> >>>>
->>> >>>> I am using qemu-img with nbdkit to transfer a disk image and the u=
-pdate it with
->>> >>>> extra data from newer snapshots.=A0 The end image cannot be transf=
-erred because
->>> >>>> the snapshots will be created later than the first transfer and we=
- want to save
->>> >>>> some time up front.=A0 You might think of it as a continuous synch=
-ronisation.=A0 It
->>> >>>> looks something like this:
->>> >>>>
->>> >>>> I first transfer the whole image:
->>> >>>>
->>> >>>>=A0=A0 qemu-img convert -p $nbd disk.raw
->>> >>>>
->>> >>>> Where `$nbd` is something along the lines of `nbd+unix:///?socket=
-=3Dnbdkit.sock`
->>> >>>>
->>> >>>> Then, after the next snapshot is created, I can update it thanks t=
-o the `-n`
->>> >>>> parameter (the $nbd now points to the newer snapshot with unchange=
-d data looking
->>> >>>> like holes in the file):
->>> >>>>
->>> >>>>=A0=A0 qemu-img convert -p -n $nbd disk.raw
->>> >>>>
->>> >>>> This is fast and efficient as it uses block status nbd extension, =
-so it only
->>> >>>> transfers new data.
->>> >>>
->>> >>> This is an implementation detail. Don't rely on it. What you're doi=
-ng is
->>> >>> abusing 'qemu-img convert', so problems like what you describe are =
-to be
->>> >>> expected.
->>> >>>
->>> >>>> This can be done over and over again to keep the local
->>> >>>> `disk.raw` image up to date with the latest remote snapshot.
->>> >>>>
->>> >>>> However, when the guest OS zeroes some of the data and it gets wri=
-tten into the
->>> >>>> snapshot, qemu-img scans for those zeros and does not write them t=
-o the
->>> >>>> destination image.=A0 Checking the output of `qemu-img map --outpu=
-t=3Djson $nbd`
->>> >>>> shows that the zeroed data is properly marked as `data: true`.
->>> >>>>
->>> >>>> Using `-S 0` would write zeros even where the holes are, effective=
-ly overwriting
->>> >>>> the data from the last snapshot even though they should not be cha=
-nged.
->>> >>>>
->>> >>>> Having gone through some workarounds I would like there to be anot=
-her way.=A0 I
->>> >>>> know this is far from the typical usage of qemu-img, but is this r=
-eally the
->>> >>>> expected behaviour or is this just something nobody really needed =
-before?=A0 If it
->>> >>>> is the former, would it be possible to have a parameter that would=
- control this
->>> >>>> behaviour?=A0 If the latter is the case, can that behaviour be cha=
-nged so that it
->>> >>>> properly replicates the data when `-n` parameter is used?
->>> >>>>
->>> >>>> Basically the only thing we need is to either:
->>> >>>>
->>> >>>> 1) write zeros where they actually are or
->>> >>>>
->>> >>>> 2) turn off explicit sparsification without requesting dense image=
- (basically
->>> >>>>=A0=A0=A0=A0 sparsify only the par that is reported as hole on the =
-source) or
->>> >>>>
->>> >>>> 3) ideally, just FALLOC_FL_PUNCH_HOLE in places where source did r=
-eport data,
->>> >>>>=A0=A0=A0=A0 but qemu-img found they are all zeros (or source repor=
-ted HOLE+ZERO which, I
->>> >>>>=A0=A0=A0=A0 believe, is effectively the same)
->>> >>>>
->>> >>>> If you want to try this out, I found the easiest reproducible way =
-is using
->>> >>>> nbdkit's data plugin, which can simulate whatever source image you=
- like.
->>> >>>
->>> >>> I think what you _really_ want is a commit block job. The problem i=
-s
->>> >>> just that you don't have a proper backing file chain, but just a bu=
-nch
->>> >>> of NBD connections.
->>> >>>
->>> >>> Can't you get an NBD connection that already provides the condensed=
- form
->>> >>> of the whole snapshot chain directly at the source? If the NBD serv=
-er
->>> >>> was QEMU, this would actually be easier than providing each snapsho=
-t
->>> >>> individually.
->>> >>>
->>> >>> If this isn't possible, I think you need to replicate the backing c=
-hain
->>> >>> on the destination instead of converting into the same image again =
-and
->>> >>> again so that qemu-img knows that it must take existing data of the
->>> >>> backing file into consideration:
->>> >>>
->>> >>>=A0=A0=A0=A0 qemu-img convert -O qcow2 nbd://... base.qcow2
->>> >>>=A0=A0=A0=A0 qemu-img convert -O qcow2 -F qcow2 -B base.qcow2 nbd://=
-... overlay1.qcow2
->>> >>>=A0=A0=A0=A0 qemu-img convert -O qcow2 -F qcow2 -B overlay1.qcow2 nb=
-d://... overlay2.qcow2
->>> >>>=A0=A0=A0=A0 ...
+
+
+On 29.04.19 10:53, Cornelia Huck wrote:
+> On Mon, 29 Apr 2019 09:51:39 +0200
+> Christian Borntraeger <borntraeger@de.ibm.com> wrote:
+> 
+>> On 26.04.19 14:55, Cornelia Huck wrote:
+>>> On Fri, 26 Apr 2019 14:05:30 +0200
+>>> David Hildenbrand <david@redhat.com> wrote:
+>>>   
+>>>> On 26.04.19 14:01, Christian Borntraeger wrote:  
+>>>>>
+>>>>>
+>>>>> On 26.04.19 13:52, David Hildenbrand wrote:    
+>>>>>> On 26.04.19 13:36, Christian Borntraeger wrote:    
+>>>>>>>
+>>>>>>>
+>>>>>>> On 26.04.19 13:32, David Hildenbrand wrote:    
+>>>>>>>> On 26.04.19 13:10, Christian Borntraeger wrote:    
+>>>>>>>>> 8561 and 8562 will be gen15 machines. There is no name yet, lets us use
+>>>>>>>>> the cpu id as base name. Later on we can provide aliases with the proper
+>>>>>>>>> name.
+>>>>>>>>>
+>>>>>>>>> Signed-off-by: Christian Borntraeger <borntraeger@de.ibm.com>
+>>>>>>>>> ---
+>>>>>>>>>  target/s390x/cpu_models.c | 2 ++
+>>>>>>>>>  1 file changed, 2 insertions(+)
+>>>>>>>>>
+>>>>>>>>> diff --git a/target/s390x/cpu_models.c b/target/s390x/cpu_models.c
+>>>>>>>>> index d683635eb5..dd6415103f 100644
+>>>>>>>>> --- a/target/s390x/cpu_models.c
+>>>>>>>>> +++ b/target/s390x/cpu_models.c
+>>>>>>>>> @@ -83,6 +83,8 @@ static S390CPUDef s390_cpu_defs[] = {
+>>>>>>>>>      CPUDEF_INIT(0x3906, 14, 1, 47, 0x08000000U, "z14", "IBM z14 GA1"),
+>>>>>>>>>      CPUDEF_INIT(0x3906, 14, 2, 47, 0x08000000U, "z14.2", "IBM z14 GA2"),
+>>>>>>>>>      CPUDEF_INIT(0x3907, 14, 1, 47, 0x08000000U, "z14ZR1", "IBM z14 Model ZR1 GA1"),
+>>>>>>>>> +    CPUDEF_INIT(0x8561, 15, 1, 47, 0x08000000U, "8561", "IBM 8561 GA1"),
+>>>>>>>>> +    CPUDEF_INIT(0x8562, 15, 1, 47, 0x08000000U, "8562", "IBM 8562 GA1"),
+>>>>>>>>>  };    
+>>>>>>>>
+>>>>>>>> Thinking out loud, I know that official names are not published yet.
+>>>>>>>> Looking at the recent history (z13, z14), my educated guess would be
+>>>>>>>> z15. I guess pretty much everybody would guess that.    
+>>>>>>>
+>>>>>>> Not sure about trademark aspects - especially if this really becomes z15. The smaller
+>>>>>>> machine has no real history (ZR1 vs. s vs BC). So I think I would rather have a correct
+>>>>>>> number than a partially correct name.    
+>>>>>>
+>>>>>> We could also use "gen15a" and "gen15b", still better to get than magic
+>>>>>> numbers. (yeah well, they are not magic)
+>>>>>>
+>>>>>> If you want to stick with numbers, be aware that cpu numbers are not
+>>>>>> injective, so at some point we will need e.g. "8561.2", just so you're
+>>>>>> aware of the implications.    
+>>>>>
+>>>>> I think whatever we have here is only used internally for expansion (host-model)
+>>>>> and the user will use later the real name when available. (custom). So probably this
+>>>>> does not matter for a long time. But I might be wrong.
+>>>>> I tend to prefer gen15 over z15 but 856x has also its charm.  
 >>>
->=20
-> So I spoke too soon.=A0 This approach fixed the one thing that I was stru=
-ggling with, but broke the rest, because it completely replicates the last =
-image even when the source provides proper allocation data.=A0 Best to show=
- with an illustration:
->=20
->  =A0$ rm -f disk.img snap.img
->  =A0$ dd if=3D/dev/urandom of=3Ddisk.img bs=3D2M count=3D1
->  =A0$ dd if=3D/dev/zero of=3Dsnap.img bs=3D1M count=3D1
->  =A0$ truncate -s 2M snap.img
->  =A0$ qemu-img map --output=3Djson snap.img
->  =A0[{ "start": 0, "length": 1048576, "depth": 0, "zero": false, "data": =
-true, "offset": 0},
->  =A0{ "start": 1048576, "length": 1048576, "depth": 0, "zero": true, "dat=
-a": false, "offset": 1048576}]
->  =A0$ qemu-img convert -f raw -O qcow2 disk.img disk.qcow2
->  =A0$ qemu-img convert -f raw -O qcow2 -B disk.qcow2 snap.img snap.qcow2
->  =A0$ qemu-img convert -f qcow2 -O raw snap.qcow2 output.raw
->  =A0$ hexdump -C output.raw
->  =A000000000=A0 00 00 00 00 00 00 00 00=A0 00 00 00 00 00 00 00 00=A0 |..=
-..............|
->  =A0*
->  =A000200000
->=20
+>>> FWIW, I'd prefer gen15 over 856x, but...  
+>>
+>> I actually think that the cpu id would be a nice name for expansion because it is
+>> guarenteed to stay and it is unique and it allows to have a different content (if
+>> that would be necessary) for 2 gen15 machines.
+>>>   
+>>>>>     
+>>>>
+>>>> Another question would be, can we rename before the next QEMU release,
+>>>> so it will never be officially part of QEMU? Then we don't need aliases
+>>>> after all. Of course, distros have to take care of that as well, but
+>>>> that shouldn't be upstream QEMUs business.  
+>>>
+>>> ...if we could do that, I'd like that even better.  
+>>
+>> I dont think that I know the name in time before the next release.
+>> So lets go with gen15a/gen15b or 8561/8562?
+> 
+> I always have trouble remembering number combinations, so I'd vote for
+> gen15a/gen15b if the official names are not an option.
 
-
-Raw file holes and qcow2 unallocated clusters are not the same thing. Raw h=
-oles are reported
-as zero=3Dtrue (as we see in map output), and this considered "allocated" i=
-n terms of backing-chain.
-And convert will mark corresponding clusters to be ZERO (not UNALLOCATED) i=
-n target qcow2.
-
-But when you export qcow2 with unallocated clusters through NBD, unallocate=
-d clusters should be
-reported as zero=3Dfalse data=3Dfalse, and qemu-img will convert them to UN=
-ALLOCATED (not ZERO)
-clusters in target qcow2 and it should work.
-
-In qcow2 ZERO and UNALLOCATED clusters works like this:
-ZERO: on write - allocate clusters and write data, on read - return zeroes
-UNALLOCATED: on write -allocate clusters and write data, on read - read fro=
-m backing file if we have it, otherwise return zeroes
-
-
---=20
-Best regards,
-Vladimir
+OK, I will respin with gen15a/gen15b.
