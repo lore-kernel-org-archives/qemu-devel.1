@@ -1,29 +1,27 @@
-Received: from eggs.gnu.org ([209.51.188.92]:34932)
+Received: from eggs.gnu.org ([209.51.188.92]:36110)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1hL8Px-0002yD-IZ
-	for qemu-devel@nongnu.org; Mon, 29 Apr 2019 11:42:10 -0400
+	(envelope-from <stefanha@gmail.com>) id 1hL8VR-00046M-8g
+	for qemu-devel@nongnu.org; Mon, 29 Apr 2019 11:47:51 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1hL8Pw-0002bn-4A
-	for qemu-devel@nongnu.org; Mon, 29 Apr 2019 11:42:09 -0400
-Received: from mail-wm1-f65.google.com ([209.85.128.65]:38772)
+	(envelope-from <stefanha@gmail.com>) id 1hL8VP-0007Z1-2M
+	for qemu-devel@nongnu.org; Mon, 29 Apr 2019 11:47:49 -0400
+Received: from mail-io1-xd42.google.com ([2607:f8b0:4864:20::d42]:46624)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1hL8Pt-0002Wt-Ry
-	for qemu-devel@nongnu.org; Mon, 29 Apr 2019 11:42:06 -0400
-Received: by mail-wm1-f65.google.com with SMTP id w15so16460332wmc.3
-	for <qemu-devel@nongnu.org>; Mon, 29 Apr 2019 08:42:02 -0700 (PDT)
-References: <20190422195020.1494-1-philmd@redhat.com>
-	<20190422195020.1494-4-philmd@redhat.com>
-	<0f78535e-e137-67f1-17bd-7a4ca4b03cae@redhat.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Message-ID: <193e09a9-da42-1fe1-3ef1-313d6835b66b@redhat.com>
-Date: Mon, 29 Apr 2019 17:41:59 +0200
+	(Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1hL8VO-0007Xh-Rz
+	for qemu-devel@nongnu.org; Mon, 29 Apr 2019 11:47:47 -0400
+Received: by mail-io1-xd42.google.com with SMTP id p23so9331411iol.13
+	for <qemu-devel@nongnu.org>; Mon, 29 Apr 2019 08:47:46 -0700 (PDT)
+Date: Mon, 29 Apr 2019 11:47:33 -0400
+From: Stefan Hajnoczi <stefanha@gmail.com>
+Message-ID: <20190429154733.GA13640@stefanha-x1.localdomain>
+References: <155619222209.13917.4120344041326080857.malonedeb@gac.canonical.com>
 MIME-Version: 1.0
-In-Reply-To: <0f78535e-e137-67f1-17bd-7a4ca4b03cae@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH v3 3/7] hw/i386: Extract fw_cfg definitions
- to local "fw_cfg.h"
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="+HP7ph2BbKc20aGI"
+Content-Disposition: inline
+In-Reply-To: <155619222209.13917.4120344041326080857.malonedeb@gac.canonical.com>
+Subject: Re: [Qemu-devel] [Bug 1826393] [NEW] QEMU 3.1.0 stuck waiting for
+ 800ms (5 times slower) in pre-bios phase
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,131 +30,250 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Laszlo Ersek <lersek@redhat.com>, qemu-devel@nongnu.org
-Cc: Eduardo Habkost <ehabkost@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, qemu-ppc@nongnu.org, Gerd Hoffmann <kraxel@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Artyom Tarasenko <atar4qemu@gmail.com>, David Gibson <david@gibson.dropbear.id.au>, Thomas Huth <thuth@redhat.com>, Peter Maydell <peter.maydell@linaro.org>
+To: Bug 1826393 <1826393@bugs.launchpad.net>
+Cc: qemu-devel@nongnu.org, kraxel@redhat.com, sgarzare@redhat.com
 
-Hi Laszlo,
 
-On 4/23/19 8:38 PM, Laszlo Ersek wrote:
-> On 04/22/19 21:50, Philippe Mathieu-Daudé wrote:
->> Extract the architecture-specific fw_cfg definitions to "fw_cfg.h".
->>
->> Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
->> ---
->>  hw/i386/fw_cfg.h | 20 ++++++++++++++++++++
->>  hw/i386/pc.c     |  7 +------
->>  2 files changed, 21 insertions(+), 6 deletions(-)
->>  create mode 100644 hw/i386/fw_cfg.h
->>
->> diff --git a/hw/i386/fw_cfg.h b/hw/i386/fw_cfg.h
->> new file mode 100644
->> index 00000000000..17a4bc32f22
->> --- /dev/null
->> +++ b/hw/i386/fw_cfg.h
->> @@ -0,0 +1,20 @@
->> +/*
->> + * QEMU fw_cfg helpers (X86 specific)
->> + *
->> + * Copyright (c) 2003-2004 Fabrice Bellard
->> + *
->> + * SPDX-License-Identifier: MIT
->> + */
-> 
-> (1) This is a new file -- I understand it could be plain code movement,
-> but shouldn't you add your (= RH's) copyright notice too (beyond Fabrice's)?
+--+HP7ph2BbKc20aGI
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-I asked few people on IRC, than googled and finally kept this link
-(understable enough for me):
-https://en.wikipedia.org/wiki/Derivative_work#When_does_derivative-work_copyright_apply?
+On Thu, Apr 25, 2019 at 11:37:02AM -0000, Waldemar Kozaczuk wrote:
+> Public bug reported:
+>=20
+> Yesterday I have upgraded my laptop from Ubuntu 18.10 to 19.04 and that
+> way got newer QEMU 3.1.0 along vs QEMU 2.12.0 before. I have noticed
+> that everytime I start QEMU to run OSv, QEMU seems to hand noticably
+> longer (~1 second) before showing SeaBIOS output. I have tried all kind
+> of combinations to get rid of that pause and nothing helped.
+>=20
+> Here is my start command:
+> time qemu-system-x86_64 -m 256M -smp 1 -nographic -nodefaults \
+>  -device virtio-blk-pci,id=3Dblk0,bootindex=3D0,drive=3Dhd0,scsi=3Doff \
+>  -drive file=3Dusr.img,if=3Dnone,id=3Dhd0,cache=3Dnone,aio=3Dthre\
+>  -enable-kvm \
+>  -cpu host,+x2apic -chardev stdio,mux=3Don,id=3Dstdio,signal=3Doff \
+>  -mon chardev=3Dstdio,mode=3Dreadline -device isa-serial,chardev=3Dstdio
+>=20
+> It looks like qemu process starts, waits almost a second for something
+> and then print SeaBIOS splashscreen and continues boot:
+>=20
+> --> waits here
+> SeaBIOS (version 1.12.0-1)
+> Booting from Hard Disk..OSv v0.53.0-6-gc8395118
+> 	disk read (real mode): 27.25ms, (+27.25ms)
+> 	uncompress lzloader.elf: 46.22ms, (+18.97ms)
+> 	TLS initialization: 46.79ms, (+0.57ms)
+> 	.init functions: 47.82ms, (+1.03ms)
+> 	SMP launched: 48.08ms, (+0.26ms)
+> 	VFS initialized: 49.25ms, (+1.17ms)
+> 	Network initialized: 49.48ms, (+0.24ms)
+> 	pvpanic done: 49.57ms, (+0.08ms)
+> 	pci enumerated: 52.42ms, (+2.85ms)
+> 	drivers probe: 52.42ms, (+0.00ms)
+> 	drivers loaded: 55.33ms, (+2.90ms)
+> 	ROFS mounted: 56.37ms, (+1.04ms)
+> 	Total time: 56.37ms, (+0.00ms)
+> Found optarg
+> dev  etc  hello  libenviron.so	libvdso.so  proc  tmp  tools  usr
+>=20
+> real	0m0.935s
+> user	0m0.426s
+> sys	0m0.490s
+>=20
+> With version 2.12.0 I used to see real below 200ms. So it seems qemu
+> slowed down 5 times.
+>=20
+> I ran strace -tt against it and I have noticed a pause here:
+> ...
+> 07:31:41.848579 futex(0x55c4a2fd34c0, FUTEX_WAKE_PRIVATE, 1) =3D 0
+> 07:31:41.848604 futex(0x55c4a2ff6308, FUTEX_WAIT_PRIVATE, 0, NULL) =3D 0
+> 07:31:41.848649 ioctl(10, KVM_SET_PIT2, 0x7ffdd272d1f0) =3D 0
+> 07:31:41.848674 ioctl(9, KVM_CHECK_EXTENSION, KVM_CAP_KVMCLOCK_CTRL) =3D 1
+> 07:31:41.848699 ioctl(10, KVM_SET_CLOCK, 0x7ffdd272d230) =3D 0
+> 07:31:41.848724 futex(0x55c4a49a9a9c, FUTEX_WAKE_PRIVATE, 2147483647) =3D=
+ 1
+> 07:31:41.848747 getpid()                =3D 5162
+> 07:31:41.848769 tgkill(5162, 5166, SIGUSR1) =3D 0
+> 07:31:41.848791 futex(0x55c4a2fd34c0, FUTEX_WAKE_PRIVATE, 1) =3D 0
+> 07:31:41.848814 futex(0x55c4a49a9a98, FUTEX_WAKE_PRIVATE, 2147483647) =3D=
+ 1
+> 07:31:41.848837 getpid()                =3D 5162
+> 07:31:41.848858 tgkill(5162, 5166, SIGUSR1) =3D 0
+> 07:31:41.848889 write(8, "\1\0\0\0\0\0\0\0", 8) =3D 8
+> 07:31:41.848919 futex(0x55c4a2fd34c0, FUTEX_WAKE_PRIVATE, 1) =3D 1
+> 07:31:41.848943 ppoll([{fd=3D0, events=3DPOLLIN}, {fd=3D4, events=3DPOLLI=
+N}, {fd=3D5, events=3DPOLLIN}, {fd=3D7, events=3DPOLLIN},=20
+> {fd=3D8, events=3DPOLLIN}], 5, {tv_sec=3D0, tv_nsec=3D0}, NULL, 8) =3D 1 =
+([{fd=3D8, revents=3DPOLLIN}], left {tv_sec=3D0, tv_nsec=3D0
+> })
+> 07:31:41.849003 futex(0x55c4a2fd34c0, FUTEX_WAIT_PRIVATE, 2, NULL) =3D -1=
+ EAGAIN (Resource temporarily unavailable)
+> 07:31:41.849031 read(8, "\5\0\0\0\0\0\0\0", 16) =3D 8
+> 07:31:41.849064 futex(0x55c4a2fd34c0, FUTEX_WAKE_PRIVATE, 1) =3D 0
+> 07:31:41.849086 ppoll([{fd=3D0, events=3DPOLLIN}, {fd=3D4, events=3DPOLLI=
+N}, {fd=3D5, events=3DPOLLIN}, {fd=3D7, events=3DPOLLIN},=20
+> {fd=3D8, events=3DPOLLIN}], 5, {tv_sec=3D0, tv_nsec=3D984624000}, NULL, 8=
+) =3D 1 ([{fd=3D7, revents=3DPOLLIN}], left {tv_sec=3D0, t
+> v_nsec=3D190532609})
+>=20
+> --> waits for almost 800ms
+>=20
+> 07:31:42.643272 futex(0x55c4a2fd34c0, FUTEX_WAIT_PRIVATE, 2, NULL) =3D 0
+> 07:31:42.643522 read(7, "\1\0\0\0\0\0\0\0", 512) =3D 8
+> 07:31:42.643625 futex(0x55c4a2fd34c0, FUTEX_WAKE_PRIVATE, 1) =3D 1
+> 07:31:42.643646 ppoll([{fd=3D0, events=3DPOLLIN}, {fd=3D4, events=3DPOLLI=
+N}, {fd=3D5, events=3DPOLLIN}, {fd=3D7, events=3DPOLLIN},=20
+> {fd=3D8, events=3DPOLLIN}], 5, {tv_sec=3D0, tv_nsec=3D190066000}, NULL, 8=
+) =3D 2 ([{fd=3D4, revents=3DPOLLIN}, {fd=3D8, revents=3DPOL
+> LIN}], left {tv_sec=3D0, tv_nsec=3D189909632})
+> 07:31:42.643836 futex(0x55c4a2fd34c0, FUTEX_WAIT_PRIVATE, 2, NULL) =3D -1=
+ EAGAIN (Resource temporarily unavailable)
+> 07:31:42.643859 read(8, "\2\0\0\0\0\0\0\0", 16) =3D 8
+> 07:31:42.643880 futex(0x55c4a2fd34c0, FUTEX_WAKE_PRIVATE, 1) =3D 1
+>=20
+> ...
+>=20
+> when I run same command using qemu 3.0.5 that I still happen to have on
+> the same machine that I built directly from source I see total boot time
+> at around 200ms. It seems like a regression.
 
-  US Copyright Office Circular 14: Derivative Works notes that:
+Please try building QEMU 4.0.0 from source:
 
-   [...] To be copyrightable, a derivative work must be different
-   enough from the original to be regarded as a "new work" or
-   must contain a substantial amount of new material. Making minor
-   changes or additions of little substance to a preexisting work
-   will not qualify the work as a new version for copyright
-   purposes. [...]
+  https://download.qemu.org/qemu-4.0.0.tar.xz
 
-Since I'm simply moving lines of code with no logical modification, I
-understood it is not sufficient to add a new copyright entry...
+> ** Affects: qemu
+>      Importance: Undecided
+>          Status: New
+>=20
+> --=20
+> You received this bug notification because you are a member of qemu-
+> devel-ml, which is subscribed to QEMU.
+> https://bugs.launchpad.net/bugs/1826393
+>=20
+> Title:
+>   QEMU 3.1.0 stuck waiting for 800ms (5 times slower) in pre-bios phase
+>=20
+> Status in QEMU:
+>   New
+>=20
+> Bug description:
+>   Yesterday I have upgraded my laptop from Ubuntu 18.10 to 19.04 and
+>   that way got newer QEMU 3.1.0 along vs QEMU 2.12.0 before. I have
+>   noticed that everytime I start QEMU to run OSv, QEMU seems to hand
+>   noticably longer (~1 second) before showing SeaBIOS output. I have
+>   tried all kind of combinations to get rid of that pause and nothing
+>   helped.
+>=20
+>   Here is my start command:
+>   time qemu-system-x86_64 -m 256M -smp 1 -nographic -nodefaults \
+>    -device virtio-blk-pci,id=3Dblk0,bootindex=3D0,drive=3Dhd0,scsi=3Doff \
+>    -drive file=3Dusr.img,if=3Dnone,id=3Dhd0,cache=3Dnone,aio=3Dthre\
+>    -enable-kvm \
+>    -cpu host,+x2apic -chardev stdio,mux=3Don,id=3Dstdio,signal=3Doff \
+>    -mon chardev=3Dstdio,mode=3Dreadline -device isa-serial,chardev=3Dstdio
+>=20
+>   It looks like qemu process starts, waits almost a second for something
+>   and then print SeaBIOS splashscreen and continues boot:
+>=20
+>   --> waits here
+>   SeaBIOS (version 1.12.0-1)
+>   Booting from Hard Disk..OSv v0.53.0-6-gc8395118
+>   	disk read (real mode): 27.25ms, (+27.25ms)
+>   	uncompress lzloader.elf: 46.22ms, (+18.97ms)
+>   	TLS initialization: 46.79ms, (+0.57ms)
+>   	.init functions: 47.82ms, (+1.03ms)
+>   	SMP launched: 48.08ms, (+0.26ms)
+>   	VFS initialized: 49.25ms, (+1.17ms)
+>   	Network initialized: 49.48ms, (+0.24ms)
+>   	pvpanic done: 49.57ms, (+0.08ms)
+>   	pci enumerated: 52.42ms, (+2.85ms)
+>   	drivers probe: 52.42ms, (+0.00ms)
+>   	drivers loaded: 55.33ms, (+2.90ms)
+>   	ROFS mounted: 56.37ms, (+1.04ms)
+>   	Total time: 56.37ms, (+0.00ms)
+>   Found optarg
+>   dev  etc  hello  libenviron.so	libvdso.so  proc  tmp  tools  usr
+>=20
+>   real	0m0.935s
+>   user	0m0.426s
+>   sys	0m0.490s
+>=20
+>   With version 2.12.0 I used to see real below 200ms. So it seems qemu
+>   slowed down 5 times.
+>=20
+>   I ran strace -tt against it and I have noticed a pause here:
+>   ...
+>   07:31:41.848579 futex(0x55c4a2fd34c0, FUTEX_WAKE_PRIVATE, 1) =3D 0
+>   07:31:41.848604 futex(0x55c4a2ff6308, FUTEX_WAIT_PRIVATE, 0, NULL) =3D 0
+>   07:31:41.848649 ioctl(10, KVM_SET_PIT2, 0x7ffdd272d1f0) =3D 0
+>   07:31:41.848674 ioctl(9, KVM_CHECK_EXTENSION, KVM_CAP_KVMCLOCK_CTRL) =
+=3D 1
+>   07:31:41.848699 ioctl(10, KVM_SET_CLOCK, 0x7ffdd272d230) =3D 0
+>   07:31:41.848724 futex(0x55c4a49a9a9c, FUTEX_WAKE_PRIVATE, 2147483647) =
+=3D 1
+>   07:31:41.848747 getpid()                =3D 5162
+>   07:31:41.848769 tgkill(5162, 5166, SIGUSR1) =3D 0
+>   07:31:41.848791 futex(0x55c4a2fd34c0, FUTEX_WAKE_PRIVATE, 1) =3D 0
+>   07:31:41.848814 futex(0x55c4a49a9a98, FUTEX_WAKE_PRIVATE, 2147483647) =
+=3D 1
+>   07:31:41.848837 getpid()                =3D 5162
+>   07:31:41.848858 tgkill(5162, 5166, SIGUSR1) =3D 0
+>   07:31:41.848889 write(8, "\1\0\0\0\0\0\0\0", 8) =3D 8
+>   07:31:41.848919 futex(0x55c4a2fd34c0, FUTEX_WAKE_PRIVATE, 1) =3D 1
+>   07:31:41.848943 ppoll([{fd=3D0, events=3DPOLLIN}, {fd=3D4, events=3DPOL=
+LIN}, {fd=3D5, events=3DPOLLIN}, {fd=3D7, events=3DPOLLIN},=20
+>   {fd=3D8, events=3DPOLLIN}], 5, {tv_sec=3D0, tv_nsec=3D0}, NULL, 8) =3D =
+1 ([{fd=3D8, revents=3DPOLLIN}], left {tv_sec=3D0, tv_nsec=3D0
+>   })
+>   07:31:41.849003 futex(0x55c4a2fd34c0, FUTEX_WAIT_PRIVATE, 2, NULL) =3D =
+-1 EAGAIN (Resource temporarily unavailable)
+>   07:31:41.849031 read(8, "\5\0\0\0\0\0\0\0", 16) =3D 8
+>   07:31:41.849064 futex(0x55c4a2fd34c0, FUTEX_WAKE_PRIVATE, 1) =3D 0
+>   07:31:41.849086 ppoll([{fd=3D0, events=3DPOLLIN}, {fd=3D4, events=3DPOL=
+LIN}, {fd=3D5, events=3DPOLLIN}, {fd=3D7, events=3DPOLLIN},=20
+>   {fd=3D8, events=3DPOLLIN}], 5, {tv_sec=3D0, tv_nsec=3D984624000}, NULL,=
+ 8) =3D 1 ([{fd=3D7, revents=3DPOLLIN}], left {tv_sec=3D0, t
+>   v_nsec=3D190532609})
+>=20
+>   --> waits for almost 800ms
+>=20
+>   07:31:42.643272 futex(0x55c4a2fd34c0, FUTEX_WAIT_PRIVATE, 2, NULL) =3D 0
+>   07:31:42.643522 read(7, "\1\0\0\0\0\0\0\0", 512) =3D 8
+>   07:31:42.643625 futex(0x55c4a2fd34c0, FUTEX_WAKE_PRIVATE, 1) =3D 1
+>   07:31:42.643646 ppoll([{fd=3D0, events=3DPOLLIN}, {fd=3D4, events=3DPOL=
+LIN}, {fd=3D5, events=3DPOLLIN}, {fd=3D7, events=3DPOLLIN},=20
+>   {fd=3D8, events=3DPOLLIN}], 5, {tv_sec=3D0, tv_nsec=3D190066000}, NULL,=
+ 8) =3D 2 ([{fd=3D4, revents=3DPOLLIN}, {fd=3D8, revents=3DPOL
+>   LIN}], left {tv_sec=3D0, tv_nsec=3D189909632})
+>   07:31:42.643836 futex(0x55c4a2fd34c0, FUTEX_WAIT_PRIVATE, 2, NULL) =3D =
+-1 EAGAIN (Resource temporarily unavailable)
+>   07:31:42.643859 read(8, "\2\0\0\0\0\0\0\0", 16) =3D 8
+>   07:31:42.643880 futex(0x55c4a2fd34c0, FUTEX_WAKE_PRIVATE, 1) =3D 1
+>=20
+>   ...
+>=20
+>   when I run same command using qemu 3.0.5 that I still happen to have
+>   on the same machine that I built directly from source I see total boot
+>   time at around 200ms. It seems like a regression.
+>=20
+> To manage notifications about this bug go to:
+> https://bugs.launchpad.net/qemu/+bug/1826393/+subscriptions
+>=20
 
-> (2) I admit I'm confused by the difference between:
-> - include/hw/i386/*.h
-> - hw/i386/*.h
-> 
-> One could say that the latter is "internal" (compare e.g.
-> "intel_iommu.h" from the former and "intel_iommu_internal.h" from the
-> latter) -- but then, as a counter-example, we have *both* "ioapic.h" and
-> "ioapic_internal.h" under the former!
+--+HP7ph2BbKc20aGI
+Content-Type: application/pgp-signature; name="signature.asc"
 
-There is a slow effort to keep API namespaces as simple/strict as
-possible, but the cleaning is taking time :)
+-----BEGIN PGP SIGNATURE-----
 
-- hw/i386/*.h contains declarations used by
-  hw/i386/{.,kvm,xen,../hyperv}*.c
+iQEcBAEBAgAGBQJcxxyVAAoJEJykq7OBq3PIWtEH/jdtBbX8fxYUJUmIwD5FBbrS
+QS2byotiO9Qbu6lUaX83zecoZBy2GLgbeNHECEp64VmSZcWuqKJTksDzBK8GDWta
+8o56j/+qlj6/x6D+SWxAIe+5drwnhcJkZNTzJFFTX1Kw7lnpB9eQD+ChpSsiNHGF
+5Zduhwuy/VX+FBQbURe5IZc2ULmT+mhqfHKeSpWfhE+o0yzKuR4mFnOOU3H5Ezk9
+Qc+QwvboJDI7i7DD3TuJ5izB/I4ggGZcyhpjj4YMU9omrtOpnWrHFOdMnuZUNQ+6
+PGEUXhFS3s7QOR74r8teyjmbT/kHTGyyHgg86Ybt16fUr406NIsJwS536XsUlH4=
+=9Qsf
+-----END PGP SIGNATURE-----
 
-- include/hw/i386/*.h contains declaration of X86-specific devices which
-  are not located in hw/i386:
-
-  - hw/acpi (this will be cleaned with merging NEMU patches)
-  - hw/intc (apic, ioapic)
-  - hw/timer (hpet)
-  - hw/isa (southbridge, superio)
-  - hw/pci-host (northbridge)
-
-I am spending my personal time cleaning this, since it is not a project
-priority, so it is taking me a lot.
-
->> +
->> +#ifndef HW_I386_FW_CFG_H
->> +#define HW_I386_FW_CFG_H
->> +
->> +#include "hw/nvram/fw_cfg.h"
->> +
->> +#define FW_CFG_ACPI_TABLES      (FW_CFG_ARCH_LOCAL + 0)
->> +#define FW_CFG_SMBIOS_ENTRIES   (FW_CFG_ARCH_LOCAL + 1)
->> +#define FW_CFG_IRQ0_OVERRIDE    (FW_CFG_ARCH_LOCAL + 2)
->> +#define FW_CFG_E820_TABLE       (FW_CFG_ARCH_LOCAL + 3)
->> +#define FW_CFG_HPET             (FW_CFG_ARCH_LOCAL + 4)
->> +
->> +#endif
->> diff --git a/hw/i386/pc.c b/hw/i386/pc.c
->> index f2c15bf1f2c..acb8fd9667d 100644
->> --- a/hw/i386/pc.c
->> +++ b/hw/i386/pc.c
->> @@ -30,6 +30,7 @@
->>  #include "hw/char/parallel.h"
->>  #include "hw/i386/apic.h"
->>  #include "hw/i386/topology.h"
->> +#include "hw/i386/fw_cfg.h"
->>  #include "sysemu/cpus.h"
->>  #include "hw/block/fdc.h"
->>  #include "hw/ide.h"
->> @@ -88,12 +89,6 @@
->>  #define DPRINTF(fmt, ...)
->>  #endif
->>  
->> -#define FW_CFG_ACPI_TABLES (FW_CFG_ARCH_LOCAL + 0)
->> -#define FW_CFG_SMBIOS_ENTRIES (FW_CFG_ARCH_LOCAL + 1)
->> -#define FW_CFG_IRQ0_OVERRIDE (FW_CFG_ARCH_LOCAL + 2)
->> -#define FW_CFG_E820_TABLE (FW_CFG_ARCH_LOCAL + 3)
->> -#define FW_CFG_HPET (FW_CFG_ARCH_LOCAL + 4)
->> -
->>  #define E820_NR_ENTRIES		16
->>  
->>  struct e820_entry {
->>
-> 
-> I'm not insisting on any particular code changes here, just please
-> consider (1) and (2) above in some way. (Stating why the code is fine
-> as-is is OK by me too.)
-> 
-> Reviewed-by: Laszlo Ersek <lersek@redhat.com>
-
-Thanks!
-
-> 
-> Thanks
-> Laszlo
-> 
+--+HP7ph2BbKc20aGI--
