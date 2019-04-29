@@ -6,95 +6,95 @@ X-Spam-Status: No, score=-8.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,USER_AGENT_GIT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6448BC43219
-	for <qemu-devel@archiver.kernel.org>; Mon, 29 Apr 2019 05:34:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 019D6C43219
+	for <qemu-devel@archiver.kernel.org>; Mon, 29 Apr 2019 05:35:15 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 23771206BF
-	for <qemu-devel@archiver.kernel.org>; Mon, 29 Apr 2019 05:34:56 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 23771206BF
+	by mail.kernel.org (Postfix) with ESMTPS id AB3B2206BF
+	for <qemu-devel@archiver.kernel.org>; Mon, 29 Apr 2019 05:35:14 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AB3B2206BF
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=alistair23.me
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:52387 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:52391 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hKywJ-0007ZH-BZ
-	for qemu-devel@archiver.kernel.org; Mon, 29 Apr 2019 01:34:55 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:52505)
+	id 1hKywc-0007ou-0Y
+	for qemu-devel@archiver.kernel.org; Mon, 29 Apr 2019 01:35:14 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:52555)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alistair@alistair23.me>) id 1hKyuO-0006OL-Va
-	for qemu-devel@nongnu.org; Mon, 29 Apr 2019 01:32:58 -0400
+	(envelope-from <alistair@alistair23.me>) id 1hKyua-0006Uv-NS
+	for qemu-devel@nongnu.org; Mon, 29 Apr 2019 01:33:10 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alistair@alistair23.me>) id 1hKyuN-0005C7-29
-	for qemu-devel@nongnu.org; Mon, 29 Apr 2019 01:32:56 -0400
-Received: from mail-oln040092254067.outbound.protection.outlook.com
-	([40.92.254.67]:65345
-	helo=APC01-PU1-obe.outbound.protection.outlook.com)
+	(envelope-from <alistair@alistair23.me>) id 1hKyuY-0005JZ-O1
+	for qemu-devel@nongnu.org; Mon, 29 Apr 2019 01:33:08 -0400
+Received: from mail-oln040092253089.outbound.protection.outlook.com
+	([40.92.253.89]:12303
+	helo=APC01-SG2-obe.outbound.protection.outlook.com)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <alistair@alistair23.me>)
-	id 1hKyuL-00059w-Lw
-	for qemu-devel@nongnu.org; Mon, 29 Apr 2019 01:32:54 -0400
+	id 1hKyuW-0005FM-Vj
+	for qemu-devel@nongnu.org; Mon, 29 Apr 2019 01:33:06 -0400
 Received: from SG2APC01FT020.eop-APC01.prod.protection.outlook.com
-	(10.152.250.60) by SG2APC01HT019.eop-APC01.prod.protection.outlook.com
-	(10.152.251.58) with Microsoft SMTP Server (version=TLS1_2,
+	(10.152.250.60) by SG2APC01HT158.eop-APC01.prod.protection.outlook.com
+	(10.152.250.237) with Microsoft SMTP Server (version=TLS1_2,
 	cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id 15.20.1835.13;
-	Mon, 29 Apr 2019 05:32:45 +0000
+	Mon, 29 Apr 2019 05:32:59 +0000
 Received: from PSXP216MB0277.KORP216.PROD.OUTLOOK.COM (10.152.250.59) by
 	SG2APC01FT020.mail.protection.outlook.com (10.152.250.219) with
 	Microsoft SMTP Server (version=TLS1_2,
 	cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id
-	15.20.1835.13 via Frontend Transport; Mon, 29 Apr 2019 05:32:45 +0000
+	15.20.1835.13 via Frontend Transport; Mon, 29 Apr 2019 05:32:59 +0000
 Received: from PSXP216MB0277.KORP216.PROD.OUTLOOK.COM
 	([fe80::d5cf:d2af:3aea:e2a3]) by PSXP216MB0277.KORP216.PROD.OUTLOOK.COM
 	([fe80::d5cf:d2af:3aea:e2a3%3]) with mapi id 15.20.1835.018;
-	Mon, 29 Apr 2019 05:32:45 +0000
+	Mon, 29 Apr 2019 05:32:59 +0000
 From: Alistair Francis <alistair@alistair23.me>
 To: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
-Thread-Topic: [PATCH v1 1/5] armv7m: Allow entry information to be returned
-Thread-Index: AQHU/kz5MoXWFw84ikmnMMJNVLzLcA==
-Date: Mon, 29 Apr 2019 05:32:45 +0000
+Thread-Topic: [PATCH v1 2/5] hw/misc: Add the STM32F4xx Sysconfig device
+Thread-Index: AQHU/k0BMFoeC1advEGt/ueaNNAP6A==
+Date: Mon, 29 Apr 2019 05:32:59 +0000
 Message-ID:
- <PSXP216MB0277192E4A6C255E30EFE627DD390@PSXP216MB0277.KORP216.PROD.OUTLOOK.COM>
+ <PSXP216MB02776A12DAB1C4523F67837EDD390@PSXP216MB0277.KORP216.PROD.OUTLOOK.COM>
 References: <cover.1556515687.git.alistair@alistair23.me>
 In-Reply-To: <cover.1556515687.git.alistair@alistair23.me>
 Accept-Language: en-AU, en-US
 Content-Language: en-US
 X-MS-Has-Attach: 
 X-MS-TNEF-Correlator: 
-x-clientproxiedby: BYAPR07CA0092.namprd07.prod.outlook.com
-	(2603:10b6:a03:12b::33) To PSXP216MB0277.KORP216.PROD.OUTLOOK.COM
+x-clientproxiedby: BYAPR07CA0085.namprd07.prod.outlook.com
+	(2603:10b6:a03:12b::26) To PSXP216MB0277.KORP216.PROD.OUTLOOK.COM
 	(2603:1096:300:a::18)
-x-incomingtopheadermarker: OriginalChecksum:15E670DBA218DAB19B3684070D6244FA4870A181AB0A568286D579F97E07AC65;
-	UpperCasedChecksum:C89B6D528A49E47541505FC97990DE83E253DEC630FAB7EC35EB2D7466A26649;
-	SizeAsReceived:7537; Count:50
+x-incomingtopheadermarker: OriginalChecksum:CC9C6B26FD2B4856CDDD263752216D868D54C8ADF40B38B190F4C9BCF3667EB6;
+	UpperCasedChecksum:D59C5DEC00F3D1A6BE4C43C2CD41DC67F89B651235A2EE86247CD6722A27F47D;
+	SizeAsReceived:7532; Count:50
 x-ms-exchange-messagesentrepresentingtype: 1
 x-mailer: git-send-email 2.21.0
-x-tmn: [nNbDb3OTioxMIxt1Ic59is7dYMpDiUQj+CMrzL1pNyUbwaDMpdNSRmbp+4J++f6M]
-x-microsoft-original-message-id: <114729bb106dbc14480880ca4b91c3fbe8eb3783.1556515687.git.alistair@alistair23.me>
+x-tmn: [6+VXW3L/nAI98AX8b6O1wcoZaBy3jmz+A4sCqcR8c4g6HzG8EiW14dt83+w2rtOV]
+x-microsoft-original-message-id: <b2efe4fe2b25ca19cfc40defa39f9e120a5f5fa6.1556515687.git.alistair@alistair23.me>
 x-ms-publictraffictype: Email
 x-incomingheadercount: 50
 x-eopattributedmessage: 0
 x-microsoft-antispam: BCL:0; PCL:0;
 	RULEID:(2390118)(5050001)(7020095)(20181119110)(201702061078)(5061506573)(5061507331)(1603103135)(2017031320274)(2017031323274)(2017031324274)(2017031322404)(1601125500)(1603101475)(1701031045);
-	SRVR:SG2APC01HT019; 
-x-ms-traffictypediagnostic: SG2APC01HT019:
-x-microsoft-antispam-message-info: wWFWoVgzGAPioU1lMgiN0MVTbZr1GU5vmo68hQLDbRd1i58+pRys2PltvT9ut5tJfnIWtYWwHOxXH0H/HQhpPXC0cBATpIDqNB3zzUQYRoDFOkqKRi3OiaPZ5ebsvUN+IRiVV3m2F2zBm6K0/i35YK1FXv21MgNfRLmlVUdHk+tb3j9h2gcGuMToFzQrnwz1
+	SRVR:SG2APC01HT158; 
+x-ms-traffictypediagnostic: SG2APC01HT158:
+x-microsoft-antispam-message-info: e+hMhq56QaaTWif9GKqsxNPL9T8e3msS/CWDkist0vX2SKckQFIm75+8Td2OlOCAykxdJRzxM0/JxZOhrQjI2XdtAr3Z9QjTZsfsOcR1O+kRahlkIEGtCg0z5qcrypmFtqz1jwTb+bl6fe5vy+Y8QBLMOrQ1G9x7OazJJUO5M1rYJpFVgB09VRzxfX+9WkJh
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 MIME-Version: 1.0
 X-OriginatorOrg: outlook.com
 X-MS-Exchange-CrossTenant-RMS-PersistedConsumerOrg: 00000000-0000-0000-0000-000000000000
-X-MS-Exchange-CrossTenant-Network-Message-Id: c3c6f30f-a90c-43b3-e112-08d6cc641b79
+X-MS-Exchange-CrossTenant-Network-Message-Id: 5ea4dbbf-b2f0-4ef1-e2b0-08d6cc6423c1
 X-MS-Exchange-CrossTenant-rms-persistedconsumerorg: 00000000-0000-0000-0000-000000000000
-X-MS-Exchange-CrossTenant-originalarrivaltime: 29 Apr 2019 05:32:45.4396 (UTC)
+X-MS-Exchange-CrossTenant-originalarrivaltime: 29 Apr 2019 05:32:59.4293 (UTC)
 X-MS-Exchange-CrossTenant-fromentityheader: Internet
 X-MS-Exchange-CrossTenant-id: 84df9e7f-e9f6-40af-b435-aaaaaaaaaaaa
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SG2APC01HT019
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SG2APC01HT158
 X-detected-operating-system: by eggs.gnu.org: Windows 7 or 8 [fuzzy]
-X-Received-From: 40.92.254.67
-Subject: [Qemu-devel] [PATCH v1 1/5] armv7m: Allow entry information to be
- returned
+X-Received-From: 40.92.253.89
+Subject: [Qemu-devel] [PATCH v1 2/5] hw/misc: Add the STM32F4xx Sysconfig
+ device
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -110,177 +110,432 @@ Cc: "alistair23@gmail.com" <alistair23@gmail.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190429053245.L3axQh7WBO5LrsMtxPrjoLgJBSulnyKIo1AO58186cs@z>
-
-Allow the kernel's entry point information to be returned when loading a
-kernel.
+Message-ID: <20190429053259.i3UjTZjlJhbxN4q6LPrP2wrca3lJL8jwl3cMuB48TRM@z>
 
 Signed-off-by: Alistair Francis <alistair@alistair23.me>
 ---
- hw/arm/armv7m.c      | 6 +++---
- hw/arm/microbit.c    | 2 +-
- hw/arm/mps2-tz.c     | 3 ++-
- hw/arm/mps2.c        | 2 +-
- hw/arm/msf2-som.c    | 2 +-
- hw/arm/musca.c       | 3 ++-
- hw/arm/netduino2.c   | 2 +-
- hw/arm/stellaris.c   | 3 ++-
- include/hw/arm/arm.h | 4 +++-
- 9 files changed, 16 insertions(+), 11 deletions(-)
+ default-configs/arm-softmmu.mak    |   1 +
+ hw/misc/Kconfig                    |   3 +
+ hw/misc/Makefile.objs              |   1 +
+ hw/misc/stm32f4xx_syscfg.c         | 275 +++++++++++++++++++++++++++++
+ include/hw/misc/stm32f4xx_syscfg.h |  62 +++++++
+ 5 files changed, 342 insertions(+)
+ create mode 100644 hw/misc/stm32f4xx_syscfg.c
+ create mode 100644 include/hw/misc/stm32f4xx_syscfg.h
 
-diff --git a/hw/arm/armv7m.c b/hw/arm/armv7m.c
-index c4b2a9a1f5..a52328f188 100644
---- a/hw/arm/armv7m.c
-+++ b/hw/arm/armv7m.c
-@@ -286,10 +286,10 @@ static void armv7m_reset(void *opaque)
-     cpu_reset(CPU(cpu));
- }
+diff --git a/default-configs/arm-softmmu.mak b/default-configs/arm-softmmu.=
+mak
+index 613d19a06d..c5cfdb857d 100644
+--- a/default-configs/arm-softmmu.mak
++++ b/default-configs/arm-softmmu.mak
+@@ -96,6 +96,7 @@ CONFIG_STM32F2XX_SYSCFG=3Dy
+ CONFIG_STM32F2XX_ADC=3Dy
+ CONFIG_STM32F2XX_SPI=3Dy
+ CONFIG_STM32F205_SOC=3Dy
++CONFIG_STM32F4XX_SYSCFG=3Dy
+ CONFIG_NRF51_SOC=3Dy
 =20
--void armv7m_load_kernel(ARMCPU *cpu, const char *kernel_filename, int mem_=
-size)
-+void armv7m_load_kernel(ARMCPU *cpu, const char *kernel_filename, int mem_=
-size,
-+                        uint64_t *entry)
- {
-     int image_size;
--    uint64_t entry;
-     uint64_t lowaddr;
-     int big_endian;
-     AddressSpace *as;
-@@ -311,7 +311,7 @@ void armv7m_load_kernel(ARMCPU *cpu, const char *kernel=
-_filename, int mem_size)
+ CONFIG_CMSDK_APB_TIMER=3Dy
+diff --git a/hw/misc/Kconfig b/hw/misc/Kconfig
+index 5f67d0d6d9..c6ff39aeeb 100644
+--- a/hw/misc/Kconfig
++++ b/hw/misc/Kconfig
+@@ -80,6 +80,9 @@ config IMX
+ config STM32F2XX_SYSCFG
+     bool
 =20
-     if (kernel_filename) {
-         image_size =3D load_elf_as(kernel_filename, NULL, NULL, NULL,
--                                 &entry, &lowaddr,
-+                                 entry, &lowaddr,
-                                  NULL, big_endian, EM_ARM, 1, 0, as);
-         if (image_size < 0) {
-             image_size =3D load_image_targphys_as(kernel_filename, 0,
-diff --git a/hw/arm/microbit.c b/hw/arm/microbit.c
-index da67bf6d9d..03147750f1 100644
---- a/hw/arm/microbit.c
-+++ b/hw/arm/microbit.c
-@@ -58,7 +58,7 @@ static void microbit_init(MachineState *machine)
-                                         mr, -1);
++config STM32F4XX_SYSCFG
++    bool
++
+ config MIPS_ITU
+     bool
 =20
-     armv7m_load_kernel(ARM_CPU(first_cpu), machine->kernel_filename,
--                       NRF51_SOC(soc)->flash_size);
-+                       NRF51_SOC(soc)->flash_size, NULL);
- }
-=20
- static void microbit_machine_class_init(ObjectClass *oc, void *data)
-diff --git a/hw/arm/mps2-tz.c b/hw/arm/mps2-tz.c
-index f79f090a4a..f6dc7dce2a 100644
---- a/hw/arm/mps2-tz.c
-+++ b/hw/arm/mps2-tz.c
-@@ -613,7 +613,8 @@ static void mps2tz_common_init(MachineState *machine)
-=20
-     create_unimplemented_device("FPGA NS PC", 0x48007000, 0x1000);
-=20
--    armv7m_load_kernel(ARM_CPU(first_cpu), machine->kernel_filename, 0x400=
-000);
-+    armv7m_load_kernel(ARM_CPU(first_cpu), machine->kernel_filename, 0x400=
-000,
-+                       NULL);
- }
-=20
- static void mps2_tz_idau_check(IDAUInterface *ii, uint32_t address,
-diff --git a/hw/arm/mps2.c b/hw/arm/mps2.c
-index e3d698ba6c..55d2273a54 100644
---- a/hw/arm/mps2.c
-+++ b/hw/arm/mps2.c
-@@ -328,7 +328,7 @@ static void mps2_common_init(MachineState *machine)
-     system_clock_scale =3D NANOSECONDS_PER_SECOND / SYSCLK_FRQ;
-=20
-     armv7m_load_kernel(ARM_CPU(first_cpu), machine->kernel_filename,
--                       0x400000);
-+                       0x400000, NULL);
- }
-=20
- static void mps2_class_init(ObjectClass *oc, void *data)
-diff --git a/hw/arm/msf2-som.c b/hw/arm/msf2-som.c
-index 2432b5e935..f81be74716 100644
---- a/hw/arm/msf2-som.c
-+++ b/hw/arm/msf2-som.c
-@@ -92,7 +92,7 @@ static void emcraft_sf2_s2s010_init(MachineState *machine=
-)
-     sysbus_connect_irq(SYS_BUS_DEVICE(&soc->spi[0]), 1, cs_line);
-=20
-     armv7m_load_kernel(ARM_CPU(first_cpu), machine->kernel_filename,
--                       soc->envm_size);
-+                       soc->envm_size, NULL);
- }
-=20
- static void emcraft_sf2_machine_init(MachineClass *mc)
-diff --git a/hw/arm/musca.c b/hw/arm/musca.c
-index 23aff43f4b..59460ba090 100644
---- a/hw/arm/musca.c
-+++ b/hw/arm/musca.c
-@@ -589,7 +589,8 @@ static void musca_init(MachineState *machine)
-                                                      "cfg_sec_resp", 0));
-     }
-=20
--    armv7m_load_kernel(ARM_CPU(first_cpu), machine->kernel_filename, 0x200=
-0000);
-+    armv7m_load_kernel(ARM_CPU(first_cpu), machine->kernel_filename, 0x200=
-0000,
-+                       NULL);
- }
-=20
- static void musca_class_init(ObjectClass *oc, void *data)
-diff --git a/hw/arm/netduino2.c b/hw/arm/netduino2.c
-index f936017d4a..38a6d8fdd1 100644
---- a/hw/arm/netduino2.c
-+++ b/hw/arm/netduino2.c
-@@ -38,7 +38,7 @@ static void netduino2_init(MachineState *machine)
-     object_property_set_bool(OBJECT(dev), true, "realized", &error_fatal);
-=20
-     armv7m_load_kernel(ARM_CPU(first_cpu), machine->kernel_filename,
--                       FLASH_SIZE);
-+                       FLASH_SIZE, NULL);
- }
-=20
- static void netduino2_machine_init(MachineClass *mc)
-diff --git a/hw/arm/stellaris.c b/hw/arm/stellaris.c
-index 05f86749f4..276b1acc46 100644
---- a/hw/arm/stellaris.c
-+++ b/hw/arm/stellaris.c
-@@ -1459,7 +1459,8 @@ static void stellaris_init(MachineState *ms, stellari=
-s_board_info *board)
-     create_unimplemented_device("hibernation", 0x400fc000, 0x1000);
-     create_unimplemented_device("flash-control", 0x400fd000, 0x1000);
-=20
--    armv7m_load_kernel(ARM_CPU(first_cpu), ms->kernel_filename, flash_size=
-);
-+    armv7m_load_kernel(ARM_CPU(first_cpu), ms->kernel_filename, flash_size=
+diff --git a/hw/misc/Makefile.objs b/hw/misc/Makefile.objs
+index c71e07ae35..1413b1f232 100644
+--- a/hw/misc/Makefile.objs
++++ b/hw/misc/Makefile.objs
+@@ -57,6 +57,7 @@ obj-$(CONFIG_SLAVIO) +=3D slavio_misc.o
+ obj-$(CONFIG_ZYNQ) +=3D zynq_slcr.o
+ obj-$(CONFIG_ZYNQ) +=3D zynq-xadc.o
+ obj-$(CONFIG_STM32F2XX_SYSCFG) +=3D stm32f2xx_syscfg.o
++obj-$(CONFIG_STM32F4XX_SYSCFG) +=3D stm32f4xx_syscfg.o
+ obj-$(CONFIG_MIPS_CPS) +=3D mips_cmgcr.o
+ obj-$(CONFIG_MIPS_CPS) +=3D mips_cpc.o
+ obj-$(CONFIG_MIPS_ITU) +=3D mips_itu.o
+diff --git a/hw/misc/stm32f4xx_syscfg.c b/hw/misc/stm32f4xx_syscfg.c
+new file mode 100644
+index 0000000000..c0aaeeaf6c
+--- /dev/null
++++ b/hw/misc/stm32f4xx_syscfg.c
+@@ -0,0 +1,275 @@
++/*
++ * STM32F4xx SYSCFG
++ *
++ * Copyright (c) 2014 Alistair Francis <alistair@alistair23.me>
++ *
++ * Permission is hereby granted, free of charge, to any person obtaining a=
+ copy
++ * of this software and associated documentation files (the "Software"), t=
+o deal
++ * in the Software without restriction, including without limitation the r=
+ights
++ * to use, copy, modify, merge, publish, distribute, sublicense, and/or se=
+ll
++ * copies of the Software, and to permit persons to whom the Software is
++ * furnished to do so, subject to the following conditions:
++ *
++ * The above copyright notice and this permission notice shall be included=
+ in
++ * all copies or substantial portions of the Software.
++ *
++ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS=
+ OR
++ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY=
 ,
-+                       NULL);
- }
-=20
- /* FIXME: Figure out how to generate these from stellaris_boards.  */
-diff --git a/include/hw/arm/arm.h b/include/hw/arm/arm.h
-index ffed39252d..10f7e10d95 100644
---- a/include/hw/arm/arm.h
-+++ b/include/hw/arm/arm.h
-@@ -28,12 +28,14 @@ typedef enum {
-  * @cpu: CPU
-  * @kernel_filename: file to load
-  * @mem_size: mem_size: maximum image size to load
-+ * @entry: location of the kernel's entry point
-  *
-  * Load the guest image for an ARMv7M system. This must be called by
-  * any ARMv7M board. (This is necessary to ensure that the CPU resets
-  * correctly on system reset, as well as for kernel loading.)
-  */
--void armv7m_load_kernel(ARMCPU *cpu, const char *kernel_filename, int mem_=
-size);
-+void armv7m_load_kernel(ARMCPU *cpu, const char *kernel_filename, int mem_=
-size,
-+                        uint64_t *entry);
-=20
- /* arm_boot.c */
- struct arm_boot_info {
++ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
++ * THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OT=
+HER
++ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING=
+ FROM,
++ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS =
+IN
++ * THE SOFTWARE.
++ */
++
++#include "qemu/osdep.h"
++#include "qemu/log.h"
++#include "hw/misc/stm32f4xx_syscfg.h"
++
++#ifndef STM_SYSCFG_ERR_DEBUG
++#define STM_SYSCFG_ERR_DEBUG 0
++#endif
++
++#define DB_PRINT_L(lvl, fmt, args...) do { \
++    if (STM_SYSCFG_ERR_DEBUG >=3D lvl) { \
++        qemu_log("%s: " fmt, __func__, ## args); \
++    } \
++} while (0)
++
++#define DB_PRINT(fmt, args...) DB_PRINT_L(1, fmt, ## args)
++
++static void stm32f4xx_syscfg_reset(DeviceState *dev)
++{
++    STM32F4xxSyscfgState *s =3D STM32F4XX_SYSCFG(dev);
++
++    s->syscfg_memrmp =3D 0x00000000;
++    s->syscfg_pmc =3D 0x00000000;
++    s->syscfg_exticr1 =3D 0x00000000;
++    s->syscfg_exticr2 =3D 0x00000000;
++    s->syscfg_exticr3 =3D 0x00000000;
++    s->syscfg_exticr4 =3D 0x00000000;
++    s->syscfg_cmpcr =3D 0x00000000;
++}
++
++static void stm32f4xx_syscfg_set_irq(void *opaque, int irq, int level)
++{
++    STM32F4xxSyscfgState *s =3D opaque;
++    uint8_t config;
++
++    DB_PRINT("Interupt: GPIO: %d, Line: %d; Level: %d\n", irq / 16,
++             irq % 16, level);
++
++    config =3D irq / 16;
++
++    switch (irq % 16) {
++    case 0:
++        if ((s->syscfg_exticr1 & 0xF) =3D=3D config) {
++            qemu_set_irq(s->gpio_out[0], level);
++            DB_PRINT("Pulse EXTI: 0\n");
++        }
++        break;
++    case 1:
++        if (((s->syscfg_exticr1 & 0xF0) >> 4) =3D=3D config) {
++            qemu_set_irq(s->gpio_out[1], level);
++            DB_PRINT("Pulse EXTI: 1\n");
++        }
++        break;
++    case 2:
++        if (((s->syscfg_exticr1 & 0xF00) >> 8) =3D=3D config) {
++            qemu_set_irq(s->gpio_out[2], level);
++            DB_PRINT("Pulse EXTI: 2\n");
++        }
++        break;
++    case 3:
++        if (((s->syscfg_exticr1 & 0xF000) >> 12) =3D=3D config) {
++            qemu_set_irq(s->gpio_out[3], level);
++            DB_PRINT("Pulse EXTI: 3\n");
++        }
++        break;
++    case 4:
++        if ((s->syscfg_exticr2 & 0xF) =3D=3D config) {
++            qemu_set_irq(s->gpio_out[4], level);
++            DB_PRINT("Pulse EXTI: 4\n");
++        }
++        break;
++    case 5:
++        if (((s->syscfg_exticr2 & 0xF0) >> 4) =3D=3D config) {
++            qemu_set_irq(s->gpio_out[5], level);
++            DB_PRINT("Pulse EXTI: 5\n");
++        }
++        break;
++    case 6:
++        if (((s->syscfg_exticr2 & 0xF00) >> 8) =3D=3D config) {
++            qemu_set_irq(s->gpio_out[6], level);
++            DB_PRINT("Pulse EXTI: 6\n");
++        }
++        break;
++    case 7:
++        if (((s->syscfg_exticr2 & 0xF000) >> 12) =3D=3D config) {
++            qemu_set_irq(s->gpio_out[7], level);
++            DB_PRINT("Pulse EXTI: 7\n");
++        }
++        break;
++    case 8:
++        if ((s->syscfg_exticr3 & 0xF) =3D=3D config) {
++            qemu_set_irq(s->gpio_out[8], level);
++            DB_PRINT("Pulse EXTI: 8\n");
++        }
++        break;
++    case 9:
++        if (((s->syscfg_exticr3 & 0xF0) >> 4) =3D=3D config) {
++            qemu_set_irq(s->gpio_out[9], level);
++            DB_PRINT("Pulse EXTI: 9\n");
++        }
++        break;
++    case 10:
++        if (((s->syscfg_exticr3 & 0xF00) >> 8) =3D=3D config) {
++            qemu_set_irq(s->gpio_out[10], level);
++            DB_PRINT("Pulse EXTI: 10\n");
++        }
++        break;
++    case 11:
++        if (((s->syscfg_exticr3 & 0xF000) >> 12) =3D=3D config) {
++            qemu_set_irq(s->gpio_out[11], level);
++            DB_PRINT("Pulse EXTI: 11\n");
++        }
++        break;
++    case 12:
++        if ((s->syscfg_exticr4 & 0xF) =3D=3D config) {
++            qemu_set_irq(s->gpio_out[12], level);
++            DB_PRINT("Pulse EXTI: 12\n");
++        }
++        break;
++    case 13:
++        if (((s->syscfg_exticr4 & 0xF0) >> 4) =3D=3D config) {
++            qemu_set_irq(s->gpio_out[13], level);
++            DB_PRINT("Pulse EXTI: 13\n");
++        }
++        break;
++    case 14:
++        if (((s->syscfg_exticr4 & 0xF00) >> 8) =3D=3D config) {
++            qemu_set_irq(s->gpio_out[14], level);
++            DB_PRINT("Pulse EXTI: 14\n");
++        }
++        break;
++    case 15:
++        if (((s->syscfg_exticr4 & 0xF000) >> 12) =3D=3D config) {
++            qemu_set_irq(s->gpio_out[15], level);
++            DB_PRINT("Pulse EXTI: 15\n");
++        }
++        break;
++    }
++}
++
++static uint64_t stm32f4xx_syscfg_read(void *opaque, hwaddr addr,
++                                     unsigned int size)
++{
++    STM32F4xxSyscfgState *s =3D opaque;
++
++    DB_PRINT("0x%"HWADDR_PRIx"\n", addr);
++
++    switch (addr) {
++    case SYSCFG_MEMRMP:
++        return s->syscfg_memrmp;
++    case SYSCFG_PMC:
++        return s->syscfg_pmc;
++    case SYSCFG_EXTICR1:
++        return s->syscfg_exticr1;
++    case SYSCFG_EXTICR2:
++        return s->syscfg_exticr2;
++    case SYSCFG_EXTICR3:
++        return s->syscfg_exticr3;
++    case SYSCFG_EXTICR4:
++        return s->syscfg_exticr4;
++    case SYSCFG_CMPCR:
++        return s->syscfg_cmpcr;
++    default:
++        qemu_log_mask(LOG_GUEST_ERROR,
++                      "%s: Bad offset 0x%"HWADDR_PRIx"\n", __func__, addr)=
+;
++        return 0;
++    }
++
++    return 0;
++}
++
++static void stm32f4xx_syscfg_write(void *opaque, hwaddr addr,
++                       uint64_t val64, unsigned int size)
++{
++    STM32F4xxSyscfgState *s =3D opaque;
++    uint32_t value =3D val64;
++
++    DB_PRINT("0x%x, 0x%"HWADDR_PRIx"\n", value, addr);
++
++    switch (addr) {
++    case SYSCFG_MEMRMP:
++        qemu_log_mask(LOG_UNIMP,
++                      "%s: Changeing the memory mapping isn't supported " =
+\
++                      "in QEMU\n", __func__);
++        return;
++    case SYSCFG_PMC:
++        qemu_log_mask(LOG_UNIMP,
++                      "%s: Changeing the memory mapping isn't supported " =
+\
++                      "in QEMU\n", __func__);
++        return;
++    case SYSCFG_EXTICR1:
++        s->syscfg_exticr1 =3D (value & 0xFFFF);
++        return;
++    case SYSCFG_EXTICR2:
++        s->syscfg_exticr2 =3D (value & 0xFFFF);
++        return;
++    case SYSCFG_EXTICR3:
++        s->syscfg_exticr3 =3D (value & 0xFFFF);
++        return;
++    case SYSCFG_EXTICR4:
++        s->syscfg_exticr4 =3D (value & 0xFFFF);
++        return;
++    case SYSCFG_CMPCR:
++        s->syscfg_cmpcr =3D value;
++        return;
++    default:
++        qemu_log_mask(LOG_GUEST_ERROR,
++                      "%s: Bad offset 0x%"HWADDR_PRIx"\n", __func__, addr)=
+;
++    }
++}
++
++static const MemoryRegionOps stm32f4xx_syscfg_ops =3D {
++    .read =3D stm32f4xx_syscfg_read,
++    .write =3D stm32f4xx_syscfg_write,
++    .endianness =3D DEVICE_NATIVE_ENDIAN,
++};
++
++static void stm32f4xx_syscfg_init(Object *obj)
++{
++    STM32F4xxSyscfgState *s =3D STM32F4XX_SYSCFG(obj);
++
++    sysbus_init_irq(SYS_BUS_DEVICE(obj), &s->irq);
++
++    memory_region_init_io(&s->mmio, obj, &stm32f4xx_syscfg_ops, s,
++                          TYPE_STM32F4XX_SYSCFG, 0x400);
++    sysbus_init_mmio(SYS_BUS_DEVICE(obj), &s->mmio);
++
++    qdev_init_gpio_in(DEVICE(obj), stm32f4xx_syscfg_set_irq, 16 * 9);
++    qdev_init_gpio_out(DEVICE(obj), s->gpio_out, 16);
++}
++
++static void stm32f4xx_syscfg_class_init(ObjectClass *klass, void *data)
++{
++    DeviceClass *dc =3D DEVICE_CLASS(klass);
++
++    dc->reset =3D stm32f4xx_syscfg_reset;
++}
++
++static const TypeInfo stm32f4xx_syscfg_info =3D {
++    .name          =3D TYPE_STM32F4XX_SYSCFG,
++    .parent        =3D TYPE_SYS_BUS_DEVICE,
++    .instance_size =3D sizeof(STM32F4xxSyscfgState),
++    .instance_init =3D stm32f4xx_syscfg_init,
++    .class_init    =3D stm32f4xx_syscfg_class_init,
++};
++
++static void stm32f4xx_syscfg_register_types(void)
++{
++    type_register_static(&stm32f4xx_syscfg_info);
++}
++
++type_init(stm32f4xx_syscfg_register_types)
+diff --git a/include/hw/misc/stm32f4xx_syscfg.h b/include/hw/misc/stm32f4xx=
+_syscfg.h
+new file mode 100644
+index 0000000000..790f60746f
+--- /dev/null
++++ b/include/hw/misc/stm32f4xx_syscfg.h
+@@ -0,0 +1,62 @@
++/*
++ * STM32F4xx SYSCFG
++ *
++ * Copyright (c) 2014 Alistair Francis <alistair@alistair23.me>
++ *
++ * Permission is hereby granted, free of charge, to any person obtaining a=
+ copy
++ * of this software and associated documentation files (the "Software"), t=
+o deal
++ * in the Software without restriction, including without limitation the r=
+ights
++ * to use, copy, modify, merge, publish, distribute, sublicense, and/or se=
+ll
++ * copies of the Software, and to permit persons to whom the Software is
++ * furnished to do so, subject to the following conditions:
++ *
++ * The above copyright notice and this permission notice shall be included=
+ in
++ * all copies or substantial portions of the Software.
++ *
++ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS=
+ OR
++ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY=
+,
++ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
++ * THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OT=
+HER
++ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING=
+ FROM,
++ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS =
+IN
++ * THE SOFTWARE.
++ */
++
++#ifndef HW_STM_SYSCFG_H
++#define HW_STM_SYSCFG_H
++
++#include "hw/sysbus.h"
++#include "hw/hw.h"
++
++#define SYSCFG_MEMRMP  0x00
++#define SYSCFG_PMC     0x04
++#define SYSCFG_EXTICR1 0x08
++#define SYSCFG_EXTICR2 0x0C
++#define SYSCFG_EXTICR3 0x10
++#define SYSCFG_EXTICR4 0x14
++#define SYSCFG_CMPCR   0x20
++
++#define TYPE_STM32F4XX_SYSCFG "stm32f4xx-syscfg"
++#define STM32F4XX_SYSCFG(obj) \
++    OBJECT_CHECK(STM32F4xxSyscfgState, (obj), TYPE_STM32F4XX_SYSCFG)
++
++typedef struct {
++    /* <private> */
++    SysBusDevice parent_obj;
++
++    /* <public> */
++    MemoryRegion mmio;
++
++    uint32_t syscfg_memrmp;
++    uint32_t syscfg_pmc;
++    uint32_t syscfg_exticr1;
++    uint32_t syscfg_exticr2;
++    uint32_t syscfg_exticr3;
++    uint32_t syscfg_exticr4;
++    uint32_t syscfg_cmpcr;
++
++    qemu_irq irq;
++    qemu_irq gpio_out[16];
++} STM32F4xxSyscfgState;
++
++#endif
 --=20
 2.21.0
 
