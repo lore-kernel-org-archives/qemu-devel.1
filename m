@@ -2,66 +2,84 @@ Return-Path: <SRS0=sEuR=S7=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_PASS,URIBL_BLOCKED autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.7 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS,URIBL_BLOCKED
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C0991C43219
-	for <qemu-devel@archiver.kernel.org>; Mon, 29 Apr 2019 09:37:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E5663C43219
+	for <qemu-devel@archiver.kernel.org>; Mon, 29 Apr 2019 09:38:09 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6F69720673
-	for <qemu-devel@archiver.kernel.org>; Mon, 29 Apr 2019 09:37:44 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6F69720673
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=patchew.org
+	by mail.kernel.org (Postfix) with ESMTPS id A00B820673
+	for <qemu-devel@archiver.kernel.org>; Mon, 29 Apr 2019 09:38:09 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=greensocs.com header.i=@greensocs.com header.b="hM05rltD"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A00B820673
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=greensocs.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:54807 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:54809 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hL2jI-0006AV-3R
-	for qemu-devel@archiver.kernel.org; Mon, 29 Apr 2019 05:37:44 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:41050)
+	id 1hL2jg-0006P7-Rd
+	for qemu-devel@archiver.kernel.org; Mon, 29 Apr 2019 05:38:08 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:41122)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1hL2hm-000581-Rq
-	for qemu-devel@nongnu.org; Mon, 29 Apr 2019 05:36:12 -0400
+	(envelope-from <damien.hedde@greensocs.com>) id 1hL2i2-0005IW-Ly
+	for qemu-devel@nongnu.org; Mon, 29 Apr 2019 05:36:28 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1hL2hk-0002A5-Va
-	for qemu-devel@nongnu.org; Mon, 29 Apr 2019 05:36:10 -0400
-Resent-Date: Mon, 29 Apr 2019 05:36:10 -0400
-Resent-Message-Id: <E1hL2hk-0002A5-Va@eggs.gnu.org>
-Received: from sender4-of-o55.zoho.com ([136.143.188.55]:21587)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
-	id 1hL2hj-000267-5w
-	for qemu-devel@nongnu.org; Mon, 29 Apr 2019 05:36:08 -0400
-ARC-Seal: i=1; a=rsa-sha256; t=1556530537; cv=none; d=zoho.com; s=zohoarc; 
-	b=aHwOAeQ1l13Mc75Dbwe89EUPb3rzqEcx5HdEwq2IbGZwucnZnApMn2tFwpNWA3tyqgREs2Q0zE3QKwWWg7wQWs1CCH8cTPcocx5ZAmKdqmzel5cMPLhNKlwgDK+ssFFPm8etYW0xKIm3nacnOMuBSs+WAI3fA10ImiaDbtiCkSk=
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zoho.com;
-	s=zohoarc; t=1556530537;
-	h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:Reply-To:Subject:To:ARC-Authentication-Results;
-	bh=LfKADzUmqHR+tpWEP6snu0Z2tBxY6bnUW3Co23ON7uc=; 
-	b=Wiuwtq3FCRopg0wmi9v5UoLXntPYmo6PBUpvWVdY+ZXyLfAsbFWeiyvLO6jGV6mQ27VUk40HpdqMIP0ITxJtEbFN3DphzZ84SpSisiB96Ztb7jYErMXmU0VEP1RsgtDjGgfg6al5JTxzm1tgFFCmW9P8ksyKiJ88izZODeqDJZY=
-ARC-Authentication-Results: i=1; mx.zoho.com; dkim=pass  header.i=patchew.org;
-	spf=pass  smtp.mailfrom=no-reply@patchew.org;
-	dmarc=pass header.from=<no-reply@patchew.org>
-	header.from=<no-reply@patchew.org>
-Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by
-	mx.zohomail.com with SMTPS id 1556530536105342.6876277833179;
-	Mon, 29 Apr 2019 02:35:36 -0700 (PDT)
-In-Reply-To: <20190429090250.7648-1-borntraeger@de.ibm.com>
-Message-ID: <155653053428.10667.12031505390564804635@c2072b67cc0c>
+	(envelope-from <damien.hedde@greensocs.com>) id 1hL2i0-0002Ir-Vf
+	for qemu-devel@nongnu.org; Mon, 29 Apr 2019 05:36:26 -0400
+Received: from beetle.greensocs.com ([5.135.226.135]:52236)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <damien.hedde@greensocs.com>)
+	id 1hL2hw-0002EQ-Tk; Mon, 29 Apr 2019 05:36:21 -0400
+Received: from [172.16.11.119] (unknown [172.16.11.119])
+	by beetle.greensocs.com (Postfix) with ESMTPSA id A34CE96EF5;
+	Mon, 29 Apr 2019 09:36:15 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=greensocs.com;
+	s=mail; t=1556530576;
+	h=from:from:sender:reply-to:subject:subject:date:date:
+	message-id:message-id:to:to:cc:cc:mime-version:mime-version:
+	content-type:content-type:
+	content-transfer-encoding:content-transfer-encoding:
+	in-reply-to:in-reply-to:references:references;
+	bh=6gAS3z2legQvPM0Yx3NPLWicOne8yXXV0O4yESMftqk=;
+	b=hM05rltDUjzrC0e0WxHJ1P1lx+drlmkzCBaJ51fgv/HgS3XN6m6Mg0CuvnlZvy4qoqAxOD
+	LQTBy4DhZGCkoX6lY3N8M3xcjjqNGu359hmox2I5AyNiW5sn1QfDt+TIL469dRkDT6bOej
+	dlBb+HmdvaOcXVHXjHZq5oZpydILMbE=
+To: qemu-devel@nongnu.org
+References: <cover.1553510737.git.damien.hedde@greensocs.com>
+From: Damien Hedde <damien.hedde@greensocs.com>
+Message-ID: <bf7dcbc7-5dc6-6269-87e9-44f027946cd9@greensocs.com>
+Date: Mon, 29 Apr 2019 11:36:14 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+	Thunderbird/60.5.3
 MIME-Version: 1.0
+In-Reply-To: <cover.1553510737.git.damien.hedde@greensocs.com>
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: base64
-Resent-From: 
-From: no-reply@patchew.org
-To: borntraeger@de.ibm.com
-Date: Mon, 29 Apr 2019 02:35:36 -0700 (PDT)
-X-ZohoMailClient: External
+Content-Language: en-US-large
+Content-Transfer-Encoding: 7bit
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=greensocs.com; 
+	s=mail; t=1556530576;
+	h=from:from:sender:reply-to:subject:subject:date:date:
+	message-id:message-id:to:to:cc:cc:mime-version:mime-version:
+	content-type:content-type:
+	content-transfer-encoding:content-transfer-encoding:
+	in-reply-to:in-reply-to:references:references;
+	bh=6gAS3z2legQvPM0Yx3NPLWicOne8yXXV0O4yESMftqk=;
+	b=EjC8WjUJiBTRf35LXOH9eUPAOnPf9r3zIykBENsv+dZCSRwQ4VzIjTM+Be/EnEdTEFqd38
+	/CgSOyQbTq+nSfuojQwWW3KgPzx0xon3NXt836RdeXrkOD8kjLpYMRGsSnQAff5pV7PwtL
+	thXeOWt1xEGZm/4iwAvWCkXzcQz0OKk=
+ARC-Seal: i=1; s=mail; d=greensocs.com; t=1556530576; a=rsa-sha256; cv=none;
+	b=FfJhbFlGwBKMmww58HVHRrT1QW6JeXqgi/jECpSK1xUk/+umU8IGpX+xoexr0R9qWcyYWu
+	WlhZSn+guSqMf5gMHM48D3ooLvBp77ybhJ91pQHHTgNLZT0XIK677200hR47aad7V5H331
+	JTB33DJra6KZeOr493wDmjrwZvMCeCk=
+ARC-Authentication-Results: i=1; ORIGINATING;
+	auth=pass smtp.auth=damien smtp.mailfrom=damien.hedde@greensocs.com
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 136.143.188.55
-Subject: Re: [Qemu-devel] [PATCH v3 0/9] s390x: new guest features
+X-Received-From: 5.135.226.135
+Subject: Re: [Qemu-devel] [RFC 00/17] multi-phase reset mechanism
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -73,224 +91,211 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: qemu-devel@nongnu.org
-Cc: fam@euphon.net, jjherne@linux.ibm.com, walling@linux.ibm.com,
-	david@redhat.com, cohuck@redhat.com, qemu-devel@nongnu.org,
-	pasic@linux.ibm.com, qemu-s390x@nongnu.org, rth@twiddle.net
+Cc: edgar.iglesias@xilinx.com, peter.maydell@linaro.org,
+	mark.burton@greensocs.com, qemu-arm@nongnu.org,
+	alistair.francis@wdc.com, pbonzini@redhat.com,
+	marcandre.lureau@redhat.com, philmd@redhat.com, luc.michel@greensocs.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190429093536.FOqCDEga0FcaXwAjfm2RZBQ4D3lXwfFO5FCK-hIW1JM@z>
+Message-ID: <20190429093614.DTUaO5tj4q-f6xLn8a98GNgXLZTk4Bqd42NGpahYzp8@z>
 
-UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDE5MDQyOTA5MDI1MC43NjQ4
-LTEtYm9ybnRyYWVnZXJAZGUuaWJtLmNvbS8KCgoKSGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBo
-YXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1zLiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3Jl
-IGluZm9ybWF0aW9uOgoKVHlwZTogc2VyaWVzCk1lc3NhZ2UtaWQ6IDIwMTkwNDI5MDkwMjUwLjc2
-NDgtMS1ib3JudHJhZWdlckBkZS5pYm0uY29tClN1YmplY3Q6IFtRZW11LWRldmVsXSBbUEFUQ0gg
-djMgMC85XSBzMzkweDogbmV3IGd1ZXN0IGZlYXR1cmVzCgo9PT0gVEVTVCBTQ1JJUFQgQkVHSU4g
-PT09CiMhL2Jpbi9iYXNoCmdpdCByZXYtcGFyc2UgYmFzZSA+IC9kZXYvbnVsbCB8fCBleGl0IDAK
-Z2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYucmVuYW1lbGltaXQgMApnaXQgY29uZmlnIC0tbG9jYWwg
-ZGlmZi5yZW5hbWVzIFRydWUKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYuYWxnb3JpdGhtIGhpc3Rv
-Z3JhbQouL3NjcmlwdHMvY2hlY2twYXRjaC5wbCAtLW1haWxiYWNrIGJhc2UuLgo9PT0gVEVTVCBT
-Q1JJUFQgRU5EID09PQoKVXBkYXRpbmcgM2M4Y2Y1YTljMjFmZjg3ODIxNjRkMWRlZjdmNDRiZDg4
-ODcxMzM4NApGcm9tIGh0dHBzOi8vZ2l0aHViLmNvbS9wYXRjaGV3LXByb2plY3QvcWVtdQogdCBb
-dGFnIHVwZGF0ZV0gICAgICAgICAgICBwYXRjaGV3LzIwMTkwNDI2MjIxNTI4LjMwMjkzLTEtanNu
-b3dAcmVkaGF0LmNvbSAtPiBwYXRjaGV3LzIwMTkwNDI2MjIxNTI4LjMwMjkzLTEtanNub3dAcmVk
-aGF0LmNvbQogdCBbdGFnIHVwZGF0ZV0gICAgICAgICAgICBwYXRjaGV3LzIwMTkwNDI5MDkwMjUw
-Ljc2NDgtMS1ib3JudHJhZWdlckBkZS5pYm0uY29tIC0+IHBhdGNoZXcvMjAxOTA0MjkwOTAyNTAu
-NzY0OC0xLWJvcm50cmFlZ2VyQGRlLmlibS5jb20KU3dpdGNoZWQgdG8gYSBuZXcgYnJhbmNoICd0
-ZXN0JwoxNjIwYmRmODVhIHMzOTB4L2NwdW1vZGVsOiB3aXJlIHVwIDg1NjEgYW5kIDg1NjIgYXMg
-Z2VuMTUgbWFjaGluZXMKOWYzNTBiZWE2NiBzMzkweC9jcHVtb2RlbDogYWRkIGdlbjE1IGRlZmlu
-dGlvbnMKNzZhOGJlYmZlZCBzMzkweC9jcHVtb2RlbDogYWRkIERlZmxhdGUtY29udmVyc2lvbiBm
-YWNpbGl0eQo0NTNhZDFlYzE2IHMzOTB4L2NwdW1vZGVsOiBlbmhhbmNlZCBzb3J0IGZhY2lsaXR5
-CjViMDg3OWU3NDUgczM5MHgvY3B1bW9kZWw6IHZlY3RvciBlbmhhbmNlbWVudHMKOGZkNjA0NTU5
-MyBzMzkweC9jcHVtb2RlbDogbXNhOSBmYWNpbGl0eQpkN2ZiM2RmMzAwIHMzOTB4L2NwdW1vZGVs
-OiBNaXNjZWxsYW5lb3VzLUluc3RydWN0aW9uLUV4dGVuc2lvbnMgRmFjaWxpdHkgMwphZTQ0NmFi
-YWI3IHMzOTB4L2NwdW1vZGVsOiBpZ25vcmUgY3Nza2UgZm9yIGV4cGFuc2lvbgo2NGExNzcyNDVj
-IGxpbnV4IGhlYWRlciBzeW5jCgo9PT0gT1VUUFVUIEJFR0lOID09PQoxLzkgQ2hlY2tpbmcgY29t
-bWl0IDY0YTE3NzI0NWNmNCAobGludXggaGVhZGVyIHN5bmMpCjIvOSBDaGVja2luZyBjb21taXQg
-YWU0NDZhYmFiNzRiIChzMzkweC9jcHVtb2RlbDogaWdub3JlIGNzc2tlIGZvciBleHBhbnNpb24p
-CjMvOSBDaGVja2luZyBjb21taXQgZDdmYjNkZjMwMDc3IChzMzkweC9jcHVtb2RlbDogTWlzY2Vs
-bGFuZW91cy1JbnN0cnVjdGlvbi1FeHRlbnNpb25zIEZhY2lsaXR5IDMpCkVSUk9SOiBsaW5lIG92
-ZXIgOTAgY2hhcmFjdGVycwojMjI6IEZJTEU6IHRhcmdldC9zMzkweC9jcHVfZmVhdHVyZXMuYzo4
-NjoKKyAgICBGRUFUX0lOSVQoIm1pbnN0ZTMiLCBTMzkwX0ZFQVRfVFlQRV9TVEZMLCA2MSwgIk1p
-c2NlbGxhbmVvdXMtSW5zdHJ1Y3Rpb24tRXh0ZW5zaW9ucyBGYWNpbGl0eSAzIiksCgp0b3RhbDog
-MSBlcnJvcnMsIDAgd2FybmluZ3MsIDE0IGxpbmVzIGNoZWNrZWQKClBhdGNoIDMvOSBoYXMgc3R5
-bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZpZXcuICBJZiBhbnkgb2YgdGhlc2UgZXJyb3JzCmFyZSBm
-YWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1haW50YWluZXIsIHNlZQpDSEVDS1BB
-VENIIGluIE1BSU5UQUlORVJTLgoKNC85IENoZWNraW5nIGNvbW1pdCA4ZmQ2MDQ1NTkzNDEgKHMz
-OTB4L2NwdW1vZGVsOiBtc2E5IGZhY2lsaXR5KQpFUlJPUjogbGluZSBvdmVyIDkwIGNoYXJhY3Rl
-cnMKIzIyOiBGSUxFOiB0YXJnZXQvczM5MHgvY3B1X2ZlYXR1cmVzLmM6MTExOgorICAgIEZFQVRf
-SU5JVCgibXNhOS1iYXNlIiwgUzM5MF9GRUFUX1RZUEVfU1RGTCwgMTU1LCAiTWVzc2FnZS1zZWN1
-cml0eS1hc3Npc3QtZXh0ZW5zaW9uLTkgZmFjaWxpdHkgKGV4Y2x1ZGluZyBzdWJmdW5jdGlvbnMp
-IiksCgpXQVJOSU5HOiBsaW5lIG92ZXIgODAgY2hhcmFjdGVycwojMzA6IEZJTEU6IHRhcmdldC9z
-MzkweC9jcHVfZmVhdHVyZXMuYzoyNDY6CisgICAgRkVBVF9JTklUKCJwY2ttby1lY2MtcDI1NiIs
-IFMzOTBfRkVBVF9UWVBFX1BDS01PLCAzMiwgIlBDS01PIEVuY3J5cHQtRUNDLVAyNTYtS2V5Iiks
-CgpXQVJOSU5HOiBsaW5lIG92ZXIgODAgY2hhcmFjdGVycwojMzE6IEZJTEU6IHRhcmdldC9zMzkw
-eC9jcHVfZmVhdHVyZXMuYzoyNDc6CisgICAgRkVBVF9JTklUKCJwY2ttby1lY2MtcDM4NCIsIFMz
-OTBfRkVBVF9UWVBFX1BDS01PLCAzMywgIlBDS01PIEVuY3J5cHQtRUNDLVAzODQtS2V5IiksCgpX
-QVJOSU5HOiBsaW5lIG92ZXIgODAgY2hhcmFjdGVycwojMzI6IEZJTEU6IHRhcmdldC9zMzkweC9j
-cHVfZmVhdHVyZXMuYzoyNDg6CisgICAgRkVBVF9JTklUKCJwY2ttby1lY2MtcDUyMSIsIFMzOTBf
-RkVBVF9UWVBFX1BDS01PLCAzNCwgIlBDS01PIEVuY3J5cHQtRUNDLVA1MjEtS2V5IiksCgpFUlJP
-UjogbGluZSBvdmVyIDkwIGNoYXJhY3RlcnMKIzMzOiBGSUxFOiB0YXJnZXQvczM5MHgvY3B1X2Zl
-YXR1cmVzLmM6MjQ5OgorICAgIEZFQVRfSU5JVCgicGNrbW8tZWNjLWVkMjU1MTkiLCBTMzkwX0ZF
-QVRfVFlQRV9QQ0tNTywgNDAgLCAiUENLTU8gRW5jcnlwdC1FQ0MtRWQyNTUxOS1LZXkiKSwKCkVS
-Uk9SOiBsaW5lIG92ZXIgOTAgY2hhcmFjdGVycwojMzQ6IEZJTEU6IHRhcmdldC9zMzkweC9jcHVf
-ZmVhdHVyZXMuYzoyNTA6CisgICAgRkVBVF9JTklUKCJwY2ttby1lY2MtZWQ0NDgiLCBTMzkwX0ZF
-QVRfVFlQRV9QQ0tNTywgNDEgLCAiUENLTU8gRW5jcnlwdC1FQ0MtRWQ0NDgtS2V5IiksCgpXQVJO
-SU5HOiBsaW5lIG92ZXIgODAgY2hhcmFjdGVycwojNDI6IEZJTEU6IHRhcmdldC9zMzkweC9jcHVf
-ZmVhdHVyZXMuYzozMDc6CisgICAgRkVBVF9JTklUKCJwY2Mtc2NhbGFyLW11bHQtcDI1NiIsIFMz
-OTBfRkVBVF9UWVBFX1BDQywgNjQsICJQQ0MgU2NhbGFyLU11bHRpcGx5LVAyNTYiKSwKCldBUk5J
-Tkc6IGxpbmUgb3ZlciA4MCBjaGFyYWN0ZXJzCiM0MzogRklMRTogdGFyZ2V0L3MzOTB4L2NwdV9m
-ZWF0dXJlcy5jOjMwODoKKyAgICBGRUFUX0lOSVQoInBjYy1zY2FsYXItbXVsdC1wMzg0IiwgUzM5
-MF9GRUFUX1RZUEVfUENDLCA2NSwgIlBDQyBTY2FsYXItTXVsdGlwbHktUDM4NCIpLAoKV0FSTklO
-RzogbGluZSBvdmVyIDgwIGNoYXJhY3RlcnMKIzQ0OiBGSUxFOiB0YXJnZXQvczM5MHgvY3B1X2Zl
-YXR1cmVzLmM6MzA5OgorICAgIEZFQVRfSU5JVCgicGNjLXNjYWxhci1tdWx0LXA1MjEiLCBTMzkw
-X0ZFQVRfVFlQRV9QQ0MsIDY2LCAiUENDIFNjYWxhci1NdWx0aXBseS1QNTIxIiksCgpFUlJPUjog
-bGluZSBvdmVyIDkwIGNoYXJhY3RlcnMKIzQ1OiBGSUxFOiB0YXJnZXQvczM5MHgvY3B1X2ZlYXR1
-cmVzLmM6MzEwOgorICAgIEZFQVRfSU5JVCgicGNjLXNjYWxhci1tdWx0LWVkMjU1MTkiLCBTMzkw
-X0ZFQVRfVFlQRV9QQ0MsIDcyLCAiUENDIFNjYWxhci1NdWx0aXBseS1FZDI1NTE5IiksCgpFUlJP
-UjogbGluZSBvdmVyIDkwIGNoYXJhY3RlcnMKIzQ2OiBGSUxFOiB0YXJnZXQvczM5MHgvY3B1X2Zl
-YXR1cmVzLmM6MzExOgorICAgIEZFQVRfSU5JVCgicGNjLXNjYWxhci1tdWx0LWVkNDQ4IiwgUzM5
-MF9GRUFUX1RZUEVfUENDLCA3MywgIlBDQyBTY2FsYXItTXVsdGlwbHktRWQ0NDgiKSwKCkVSUk9S
-OiBsaW5lIG92ZXIgOTAgY2hhcmFjdGVycwojNDc6IEZJTEU6IHRhcmdldC9zMzkweC9jcHVfZmVh
-dHVyZXMuYzozMTI6CisgICAgRkVBVF9JTklUKCJwY2Mtc2NhbGFyLW11bHQteDI1NTE5IiwgUzM5
-MF9GRUFUX1RZUEVfUENDLCA4MCwgIlBDQyBTY2FsYXItTXVsdGlwbHktWDI1NTE5IiksCgpXQVJO
-SU5HOiBsaW5lIG92ZXIgODAgY2hhcmFjdGVycwojNDg6IEZJTEU6IHRhcmdldC9zMzkweC9jcHVf
-ZmVhdHVyZXMuYzozMTM6CisgICAgRkVBVF9JTklUKCJwY2Mtc2NhbGFyLW11bHQteDQ0OCIsIFMz
-OTBfRkVBVF9UWVBFX1BDQywgODEsICJQQ0MgU2NhbGFyLU11bHRpcGx5LVg0NDgiKSwKCldBUk5J
-Tkc6IGxpbmUgb3ZlciA4MCBjaGFyYWN0ZXJzCiM1NzogRklMRTogdGFyZ2V0L3MzOTB4L2NwdV9m
-ZWF0dXJlcy5jOjMyNjoKKyAgICBGRUFUX0lOSVQoImtkc2EtZWNkc2EtdmVyaWZ5LXAyNTYiLCBT
-MzkwX0ZFQVRfVFlQRV9LRFNBLCAxLCAiS0RTQSBFQ0RTQS1WZXJpZnktUDI1NiIpLAoKV0FSTklO
-RzogbGluZSBvdmVyIDgwIGNoYXJhY3RlcnMKIzU4OiBGSUxFOiB0YXJnZXQvczM5MHgvY3B1X2Zl
-YXR1cmVzLmM6MzI3OgorICAgIEZFQVRfSU5JVCgia2RzYS1lY2RzYS12ZXJpZnktcDM4NCIsIFMz
-OTBfRkVBVF9UWVBFX0tEU0EsIDIsICJLRFNBIEVDRFNBLVZlcmlmeS1QMzg0IiksCgpXQVJOSU5H
-OiBsaW5lIG92ZXIgODAgY2hhcmFjdGVycwojNTk6IEZJTEU6IHRhcmdldC9zMzkweC9jcHVfZmVh
-dHVyZXMuYzozMjg6CisgICAgRkVBVF9JTklUKCJrZHNhLWVjZHNhLXZlcmlmeS1wNTIxIiwgUzM5
-MF9GRUFUX1RZUEVfS0RTQSwgMywgIktEU0EgRUNEU0EtVmVyaWZ5LVA1MjEiKSwKCldBUk5JTkc6
-IGxpbmUgb3ZlciA4MCBjaGFyYWN0ZXJzCiM2MDogRklMRTogdGFyZ2V0L3MzOTB4L2NwdV9mZWF0
-dXJlcy5jOjMyOToKKyAgICBGRUFUX0lOSVQoImtkc2EtZWNkc2Etc2lnbi1wMjU2IiwgUzM5MF9G
-RUFUX1RZUEVfS0RTQSwgOSwgIktEU0EgRUNEU0EtU2lnbi1QMjU2IiksCgpXQVJOSU5HOiBsaW5l
-IG92ZXIgODAgY2hhcmFjdGVycwojNjE6IEZJTEU6IHRhcmdldC9zMzkweC9jcHVfZmVhdHVyZXMu
-YzozMzA6CisgICAgRkVBVF9JTklUKCJrZHNhLWVjZHNhLXNpZ24tcDM4NCIsIFMzOTBfRkVBVF9U
-WVBFX0tEU0EsIDEwLCAiS0RTQSBFQ0RTQS1TaWduLVAzODQiKSwKCldBUk5JTkc6IGxpbmUgb3Zl
-ciA4MCBjaGFyYWN0ZXJzCiM2MjogRklMRTogdGFyZ2V0L3MzOTB4L2NwdV9mZWF0dXJlcy5jOjMz
-MToKKyAgICBGRUFUX0lOSVQoImtkc2EtZWNkc2Etc2lnbi1wNTIxIiwgUzM5MF9GRUFUX1RZUEVf
-S0RTQSwgMTEsICJLRFNBIEVDRFNBLVNpZ24tUDUyMSIpLAoKRVJST1I6IGxpbmUgb3ZlciA5MCBj
-aGFyYWN0ZXJzCiM2MzogRklMRTogdGFyZ2V0L3MzOTB4L2NwdV9mZWF0dXJlcy5jOjMzMjoKKyAg
-ICBGRUFUX0lOSVQoImtkc2EtZWVjZHNhLXNpZ24tcDI1NiIsIFMzOTBfRkVBVF9UWVBFX0tEU0Es
-IDE3LCAiS0RTQSBFbmNyeXB0ZWQtRUNEU0EtU2lnbi1QMjU2IiksCgpFUlJPUjogbGluZSBvdmVy
-IDkwIGNoYXJhY3RlcnMKIzY0OiBGSUxFOiB0YXJnZXQvczM5MHgvY3B1X2ZlYXR1cmVzLmM6MzMz
-OgorICAgIEZFQVRfSU5JVCgia2RzYS1lZWNkc2Etc2lnbi1wMzg0IiwgUzM5MF9GRUFUX1RZUEVf
-S0RTQSwgMTgsICJLRFNBIEVuY3J5cHRlZC1FQ0RTQS1TaWduLVAzODQiKSwKCkVSUk9SOiBsaW5l
-IG92ZXIgOTAgY2hhcmFjdGVycwojNjU6IEZJTEU6IHRhcmdldC9zMzkweC9jcHVfZmVhdHVyZXMu
-YzozMzQ6CisgICAgRkVBVF9JTklUKCJrZHNhLWVlY2RzYS1zaWduLXA1MjEiLCBTMzkwX0ZFQVRf
-VFlQRV9LRFNBLCAxOSwgIktEU0EgRW5jcnlwdGVkLUVDRFNBLVNpZ24tUDUyMSIpLAoKRVJST1I6
-IGxpbmUgb3ZlciA5MCBjaGFyYWN0ZXJzCiM2NjogRklMRTogdGFyZ2V0L3MzOTB4L2NwdV9mZWF0
-dXJlcy5jOjMzNToKKyAgICBGRUFUX0lOSVQoImtkc2EtZWRkc2EtdmVyaWZ5LWVkMjU1MTkiLCBT
-MzkwX0ZFQVRfVFlQRV9LRFNBLCAzMiwgIktEU0EgRWREU0EtVmVyaWZ5LUVkMjU1MTkiKSwKCkVS
-Uk9SOiBsaW5lIG92ZXIgOTAgY2hhcmFjdGVycwojNjc6IEZJTEU6IHRhcmdldC9zMzkweC9jcHVf
-ZmVhdHVyZXMuYzozMzY6CisgICAgRkVBVF9JTklUKCJrZHNhLWVkZHNhLXZlcmlmeS1lZDQ0OCIs
-IFMzOTBfRkVBVF9UWVBFX0tEU0EsIDM2LCAiS0RTQSBFZERTQS1WZXJpZnktRWQ0NDgiKSwKCkVS
-Uk9SOiBsaW5lIG92ZXIgOTAgY2hhcmFjdGVycwojNjg6IEZJTEU6IHRhcmdldC9zMzkweC9jcHVf
-ZmVhdHVyZXMuYzozMzc6CisgICAgRkVBVF9JTklUKCJrZHNhLWVkZHNhLXNpZ24tZWQyNTUxOSIs
-IFMzOTBfRkVBVF9UWVBFX0tEU0EsIDQwLCAiS0RTQSBFZERTQS1TaWduLUVkMjU1MTkiKSwKCldB
-Uk5JTkc6IGxpbmUgb3ZlciA4MCBjaGFyYWN0ZXJzCiM2OTogRklMRTogdGFyZ2V0L3MzOTB4L2Nw
-dV9mZWF0dXJlcy5jOjMzODoKKyAgICBGRUFUX0lOSVQoImtkc2EtZWRkc2Etc2lnbi1lZDQ0OCIs
-IFMzOTBfRkVBVF9UWVBFX0tEU0EsIDQ0LCAiS0RTQSBFZERTQS1TaWduLUVkNDQ4IiksCgpFUlJP
-UjogbGluZSBvdmVyIDkwIGNoYXJhY3RlcnMKIzcwOiBGSUxFOiB0YXJnZXQvczM5MHgvY3B1X2Zl
-YXR1cmVzLmM6MzM5OgorICAgIEZFQVRfSU5JVCgia2RzYS1lZWRkc2Etc2lnbi1lZDI1NTE5Iiwg
-UzM5MF9GRUFUX1RZUEVfS0RTQSwgNDgsICJLRFNBIEVuY3J5cHRlZC1FZERTQS1TaWduLUVkMjU1
-MTkiKSwKCkVSUk9SOiBsaW5lIG92ZXIgOTAgY2hhcmFjdGVycwojNzE6IEZJTEU6IHRhcmdldC9z
-MzkweC9jcHVfZmVhdHVyZXMuYzozNDA6CisgICAgRkVBVF9JTklUKCJrZHNhLWVlZGRzYS1zaWdu
-LWVkNDQ4IiwgUzM5MF9GRUFUX1RZUEVfS0RTQSwgNTIsICJLRFNBIEVuY3J5cHRlZC1FZERTQS1T
-aWduLUVkNDQ4IiksCgpXQVJOSU5HOiBsaW5lIG92ZXIgODAgY2hhcmFjdGVycwojODc6IEZJTEU6
-IHRhcmdldC9zMzkweC9jcHVfZmVhdHVyZXMuYzo0OTk6CisgICAgRkVBVF9HUk9VUF9JTklUKCJt
-c2E5IiwgTVNBX0VYVF85LCAiTWVzc2FnZS1zZWN1cml0eS1hc3Npc3QtZXh0ZW5zaW9uIDkgZmFj
-aWxpdHkiKSwKCkVSUk9SOiBsaW5lIG92ZXIgOTAgY2hhcmFjdGVycwojODg6IEZJTEU6IHRhcmdl
-dC9zMzkweC9jcHVfZmVhdHVyZXMuYzo1MDA6CisgICAgRkVBVF9HUk9VUF9JTklUKCJtc2E5X3Bj
-a21vIiwgTVNBX0VYVF85X1BDS01PLCAiTWVzc2FnZS1zZWN1cml0eS1hc3Npc3QtZXh0ZW5zaW9u
-IDkgUENLTU8gc3ViZnVuY3Rpb25zIiksCgpFUlJPUjogTWFjcm9zIHdpdGggY29tcGxleCB2YWx1
-ZXMgc2hvdWxkIGJlIGVuY2xvc2VkIGluIHBhcmVudGhlc2lzCiMxODg6IEZJTEU6IHRhcmdldC9z
-MzkweC9nZW4tZmVhdHVyZXMuYzoyMTY6CisjZGVmaW5lIFMzOTBfRkVBVF9HUk9VUF9NU0FfRVhU
-XzkgXAorICAgIFMzOTBfRkVBVF9NU0FfRVhUXzksIFwKKyAgICBTMzkwX0ZFQVRfRUNEU0FfVkVS
-SUZZX1AyNTYsIFwKKyAgICBTMzkwX0ZFQVRfRUNEU0FfVkVSSUZZX1AzODQsIFwKKyAgICBTMzkw
-X0ZFQVRfRUNEU0FfVkVSSUZZX1A1MTIsIFwKKyAgICBTMzkwX0ZFQVRfRUNEU0FfU0lHTl9QMjU2
-LCBcCisgICAgUzM5MF9GRUFUX0VDRFNBX1NJR05fUDM4NCwgXAorICAgIFMzOTBfRkVBVF9FQ0RT
-QV9TSUdOX1A1MTIsIFwKKyAgICBTMzkwX0ZFQVRfRUVDRFNBX1NJR05fUDI1NiwgXAorICAgIFMz
-OTBfRkVBVF9FRUNEU0FfU0lHTl9QMzg0LCBcCisgICAgUzM5MF9GRUFUX0VFQ0RTQV9TSUdOX1A1
-MTIsIFwKKyAgICBTMzkwX0ZFQVRfRUREU0FfVkVSSUZZX0VEMjU1MTksIFwKKyAgICBTMzkwX0ZF
-QVRfRUREU0FfVkVSSUZZX0VENDQ4LCBcCisgICAgUzM5MF9GRUFUX0VERFNBX1NJR05fRUQyNTUx
-OSwgXAorICAgIFMzOTBfRkVBVF9FRERTQV9TSUdOX0VENDQ4LCBcCisgICAgUzM5MF9GRUFUX0VF
-RERTQV9TSUdOX0VEMjU1MTksIFwKKyAgICBTMzkwX0ZFQVRfRUVERFNBX1NJR05fRUQ0NDgsIFwK
-KyAgICBTMzkwX0ZFQVRfUENDX1NDQUxBUl9NVUxUX1AyNTYsIFwKKyAgICBTMzkwX0ZFQVRfUEND
-X1NDQUxBUl9NVUxUX1AzODQsIFwKKyAgICBTMzkwX0ZFQVRfUENDX1NDQUxBUl9NVUxUX1A1MTIs
-IFwKKyAgICBTMzkwX0ZFQVRfUENDX1NDQUxBUl9NVUxUX0VEMjU1MTksIFwKKyAgICBTMzkwX0ZF
-QVRfUENDX1NDQUxBUl9NVUxUX0VENDQ4LCBcCisgICAgUzM5MF9GRUFUX1BDQ19TQ0FMQVJfTVVM
-VF9YMjU1MTksIFwKKyAgICBTMzkwX0ZFQVRfUENDX1NDQUxBUl9NVUxUX1g0NDgKCkVSUk9SOiBN
-YWNyb3Mgd2l0aCBjb21wbGV4IHZhbHVlcyBzaG91bGQgYmUgZW5jbG9zZWQgaW4gcGFyZW50aGVz
-aXMKIzIxMzogRklMRTogdGFyZ2V0L3MzOTB4L2dlbi1mZWF0dXJlcy5jOjI0MToKKyNkZWZpbmUg
-UzM5MF9GRUFUX0dST1VQX01TQV9FWFRfOV9QQ0tNTyBcCisgICAgUzM5MF9GRUFUX1BDS01PX0VD
-Q19QMjU2LCBcCisgICAgUzM5MF9GRUFUX1BDS01PX0VDQ19QMzg0LCBcCisgICAgUzM5MF9GRUFU
-X1BDS01PX0VDQ19QNTIxLCBcCisgICAgUzM5MF9GRUFUX1BDS01PX0VDQ19FRDI1NTE5LCBcCisg
-ICAgUzM5MF9GRUFUX1BDS01PX0VDQ19FRDQ0OAoKdG90YWw6IDE3IGVycm9ycywgMTUgd2Fybmlu
-Z3MsIDIxNiBsaW5lcyBjaGVja2VkCgpQYXRjaCA0LzkgaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVh
-c2UgcmV2aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJl
-cG9ydCB0aGVtIHRvIHRoZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVS
-Uy4KCjUvOSBDaGVja2luZyBjb21taXQgNWIwODc5ZTc0NTU0IChzMzkweC9jcHVtb2RlbDogdmVj
-dG9yIGVuaGFuY2VtZW50cykKV0FSTklORzogbGluZSBvdmVyIDgwIGNoYXJhY3RlcnMKIzIxOiBG
-SUxFOiB0YXJnZXQvczM5MHgvY3B1X2ZlYXR1cmVzLmM6MTExOgorICAgIEZFQVRfSU5JVCgidnhl
-aDIiLCBTMzkwX0ZFQVRfVFlQRV9TVEZMLCAxNDgsICJWZWN0b3IgRW5oYW5jZW1lbnRzIGZhY2ls
-aXR5IDIiKSwKCldBUk5JTkc6IGxpbmUgb3ZlciA4MCBjaGFyYWN0ZXJzCiMyMjogRklMRTogdGFy
-Z2V0L3MzOTB4L2NwdV9mZWF0dXJlcy5jOjExMjoKKyAgICBGRUFUX0lOSVQoInZ4YmVoIiwgUzM5
-MF9GRUFUX1RZUEVfU1RGTCwgMTUyLCAiVmVjdG9yIEJDRCBlbmhhbmNlbWVudHMgZmFjaWxpdHkg
-MSIpLAoKdG90YWw6IDAgZXJyb3JzLCAyIHdhcm5pbmdzLCAxNiBsaW5lcyBjaGVja2VkCgpQYXRj
-aCA1LzkgaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55IG9mIHRoZXNl
-IGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBtYWludGFpbmVy
-LCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KNi85IENoZWNraW5nIGNvbW1pdCA0NTNh
-ZDFlYzE2NjIgKHMzOTB4L2NwdW1vZGVsOiBlbmhhbmNlZCBzb3J0IGZhY2lsaXR5KQpFUlJPUjog
-bGluZSBvdmVyIDkwIGNoYXJhY3RlcnMKIzIxOiBGSUxFOiB0YXJnZXQvczM5MHgvY3B1X2ZlYXR1
-cmVzLmM6MTEyOgorICAgIEZFQVRfSU5JVCgiZXNvcnQtYmFzZSIsIFMzOTBfRkVBVF9UWVBFX1NU
-RkwsIDE1MCwgIkVuaGFuY2VkLXNvcnQgZmFjaWxpdHkgKGV4Y2x1ZGluZyBzdWJmdW5jdGlvbnMp
-IiksCgpXQVJOSU5HOiBsaW5lIG92ZXIgODAgY2hhcmFjdGVycwojMzQ6IEZJTEU6IHRhcmdldC9z
-MzkweC9jcHVfZmVhdHVyZXMuYzozNDk6CisgICAgRkVBVF9JTklUKCJzb3J0bC1mMCIsIFMzOTBf
-RkVBVF9UWVBFX1NPUlRMLCAxOTIsICJTT1JUTCBmb3JtYXQgMCBwYXJhbWV0ZXItYmxvY2siKSwK
-CkVSUk9SOiBNYWNyb3Mgd2l0aCBjb21wbGV4IHZhbHVlcyBzaG91bGQgYmUgZW5jbG9zZWQgaW4g
-cGFyZW50aGVzaXMKIzEwODogRklMRTogdGFyZ2V0L3MzOTB4L2dlbi1mZWF0dXJlcy5jOjI0ODoK
-KyNkZWZpbmUgUzM5MF9GRUFUX0dST1VQX0VOSF9TT1JUIFwKKyAgICBTMzkwX0ZFQVRfRVNPUlRf
-QkFTRSwgXAorICAgIFMzOTBfRkVBVF9TT1JUTF9TRkxSLCBcCisgICAgUzM5MF9GRUFUX1NPUlRM
-X1NWTFIsIFwKKyAgICBTMzkwX0ZFQVRfU09SVExfMzIsIFwKKyAgICBTMzkwX0ZFQVRfU09SVExf
-MTI4LCBcCisgICAgUzM5MF9GRUFUX1NPUlRMX0YwCgp0b3RhbDogMiBlcnJvcnMsIDEgd2Fybmlu
-Z3MsIDExNyBsaW5lcyBjaGVja2VkCgpQYXRjaCA2LzkgaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVh
-c2UgcmV2aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJl
-cG9ydCB0aGVtIHRvIHRoZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVS
-Uy4KCjcvOSBDaGVja2luZyBjb21taXQgNzZhOGJlYmZlZDVmIChzMzkweC9jcHVtb2RlbDogYWRk
-IERlZmxhdGUtY29udmVyc2lvbiBmYWNpbGl0eSkKRVJST1I6IGxpbmUgb3ZlciA5MCBjaGFyYWN0
-ZXJzCiMyMDogRklMRTogdGFyZ2V0L3MzOTB4L2NwdV9mZWF0dXJlcy5jOjExMzoKKyAgICBGRUFU
-X0lOSVQoImRlZmxhdGUtYmFzZSIsIFMzOTBfRkVBVF9UWVBFX1NURkwsIDE1MSwgIkRlZmxhdGUt
-Y29udmVyc2lvbiBmYWNpbGl0eSAoZXhjbHVkaW5nIHN1YmZ1bmN0aW9ucykiKSwKCldBUk5JTkc6
-IGxpbmUgb3ZlciA4MCBjaGFyYWN0ZXJzCiMzMjogRklMRTogdGFyZ2V0L3MzOTB4L2NwdV9mZWF0
-dXJlcy5jOjM1NToKKyAgICBGRUFUX0lOSVQoImRmbHRjYy1mMCIsIFMzOTBfRkVBVF9UWVBFX0RG
-TFRDQywgMTkyLCAiREZMVENDIGZvcm1hdCAwIHBhcmFtZXRlci1ibG9jayIpLAoKV0FSTklORzog
-bGluZSBvdmVyIDgwIGNoYXJhY3RlcnMKIzU2OiBGSUxFOiB0YXJnZXQvczM5MHgvY3B1X2ZlYXR1
-cmVzLmM6NTIyOgorICAgIEZFQVRfR1JPVVBfSU5JVCgiZGVmbGF0ZSIsIERFRkxBVEVfQ09OVkVS
-U0lPTiwgIkRlZmxhdGUtY29udmVyc2lvbiBmYWNpbGl0eSIpLAoKRVJST1I6IE1hY3JvcyB3aXRo
-IGNvbXBsZXggdmFsdWVzIHNob3VsZCBiZSBlbmNsb3NlZCBpbiBwYXJlbnRoZXNpcwojMTA1OiBG
-SUxFOiB0YXJnZXQvczM5MHgvZ2VuLWZlYXR1cmVzLmM6MjU3OgorI2RlZmluZSBTMzkwX0ZFQVRf
-R1JPVVBfREVGTEFURV9DT05WRVJTSU9OIFwKKyAgICBTMzkwX0ZFQVRfREVGTEFURV9CQVNFLCBc
-CisgICAgUzM5MF9GRUFUX0RFRkxBVEVfR0hEVCwgXAorICAgIFMzOTBfRkVBVF9ERUZMQVRFX0NN
-UFIsIFwKKyAgICBTMzkwX0ZFQVRfREVGTEFURV9YUE5ELCBcCisgICAgUzM5MF9GRUFUX0RFRkxB
-VEVfRjAKCnRvdGFsOiAyIGVycm9ycywgMiB3YXJuaW5ncywgMTEzIGxpbmVzIGNoZWNrZWQKClBh
-dGNoIDcvOSBoYXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZpZXcuICBJZiBhbnkgb2YgdGhl
-c2UgZXJyb3JzCmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1haW50YWlu
-ZXIsIHNlZQpDSEVDS1BBVENIIGluIE1BSU5UQUlORVJTLgoKOC85IENoZWNraW5nIGNvbW1pdCA5
-ZjM1MGJlYTY2NzAgKHMzOTB4L2NwdW1vZGVsOiBhZGQgZ2VuMTUgZGVmaW50aW9ucykKOS85IENo
-ZWNraW5nIGNvbW1pdCAxNjIwYmRmODVhYjggKHMzOTB4L2NwdW1vZGVsOiB3aXJlIHVwIDg1NjEg
-YW5kIDg1NjIgYXMgZ2VuMTUgbWFjaGluZXMpCj09PSBPVVRQVVQgRU5EID09PQoKVGVzdCBjb21t
-YW5kIGV4aXRlZCB3aXRoIGNvZGU6IDEKCgpUaGUgZnVsbCBsb2cgaXMgYXZhaWxhYmxlIGF0Cmh0
-dHA6Ly9wYXRjaGV3Lm9yZy9sb2dzLzIwMTkwNDI5MDkwMjUwLjc2NDgtMS1ib3JudHJhZWdlckBk
-ZS5pYm0uY29tL3Rlc3RpbmcuY2hlY2twYXRjaC8/dHlwZT1tZXNzYWdlLgotLS0KRW1haWwgZ2Vu
-ZXJhdGVkIGF1dG9tYXRpY2FsbHkgYnkgUGF0Y2hldyBbaHR0cHM6Ly9wYXRjaGV3Lm9yZy9dLgpQ
-bGVhc2Ugc2VuZCB5b3VyIGZlZWRiYWNrIHRvIHBhdGNoZXctZGV2ZWxAcmVkaGF0LmNvbQ==
+Hi All,
 
+Any comment about this ?
+
+Thanks,
+Damien
+
+On 3/25/19 12:01 PM, Damien Hedde wrote:
+> Hi all,
+> 
+> This series is a proposal to implement the multi-phase reset we've discussed
+> here (https://lists.gnu.org/archive/html/qemu-devel/2018-10/msg00310.html) and
+> more recently there
+> (https://lists.gnu.org/archive/html/qemu-devel/2019-03/msg00081.html).
+> 
+> To summarize, we need a multi-phase reset to allow for a more complex
+> initialization of a platform. In particular we need to "propagate" a clock
+> tree, but we have to ensure that every device is initialized first.
+> 
+> To solve this problem, the following 3-phases reset mechanism is proposed (I've
+> removed the 4th given our last discussion).
+> 
+> #DESCRIPTION
+> 
+> INIT PHASE: Reset the object internal state, put a resetting flag and do the
+>     same for the reset subtree. No side effect on other devices to guarantee
+>     that, in a reset domain, everything get initialized first. This corresponds
+>     mostly to what is currently done in the device/bus reset method.
+> 
+> HOLD PHASE: This phase allows to control a reset with a I/O. When a I/O control
+>     a reset procedure based on the I/O level (not edge), we may need to assert
+>     the reset, wait some time, and finally de-assert the reset. The consequence
+>     is that such a device can stay in a "resetting state" and may need to show
+>     this state to other devices through its outputs. For example, a clock
+>     controller will typically shutdown its clocks when it is in resetting state.
+> 
+> EXIT PHASE (previously named 'release'): This phase sets outputs to state after
+>      reset. For a clock controller it starts the clocks. It also clears the
+>      "resetting" flag. A device should not react to inputs until this flag has
+>      been cleared. During this phase, outputs are propagated in the reset domain
+>      (and outside the reset domain).
+> 
+> To implement this, this series add a Resettable interface containing 3 methods:
+> one for each phase. The init phase's method takes a boolean argument allowing to
+> distinguish cold and warm resets.
+> 
+> In this series, Device and Bus implement the interface. A vmstate description
+> subsection is added to allow migration of reset related state for device.
+> 3 methods (one per phase) are also added in Device's class. They correspond to
+> the local part (see the code example below) of the reset. They avoid device
+> specialization to have to handle the sub-domain part and "resetting" state.
+> 
+> Functions to add gpio control over the reset are added. It is possible to add
+> an active low/high reset pin to control the warm reset and an active low/high
+> power gating pin to control the cold reset.
+> 
+> The bus/device reset tree is converted to this 3-phases mechanism. I also
+> added a new ResetDomain object which is just a Resettable container. It is
+> used to have a global "system reset domain" to handle main 3-phases reset and
+> replace the current single-phase-reset handler mechanism.
+> 
+> As an example, in the xilinx_zynq machine, I've converted the slcr (the resets
+> and clocks controller device) and the uart peripheral to this 3-phases reset
+> mechanism. Gpio are added between the devices to transmit reset control from
+> the slcr to the uarts.
+> 
+> All changes have been made so that existing reset behavior is not modified.
+> 
+> #INTERFACE CHOICE
+> 
+> To be honest, I have some doubt about the interface. I've kept it minimal and
+> the consequence is implementation is complex (and kind of duplicated in every
+> base implementation like Device or Bus). One of the problem is the `resetting`
+> flag, which in practical must be a counter to handle reset "reentrance".
+> Indeed nothing forbids to reset some device that is already held in "resetting"
+> state by some other means. As an example, in the zynq machine, there can be 
+> a global/system reset while an uart is reset by the slcr. It it also possible
+> to cold and warm resets triggered concurrently.
+> 
+> The Resettable methods implementation have to looks this (methods are called
+> with iothread locked):
+> ```
+> void init_phase(Device *dev, bool cold)
+> {
+>     /* call sub-resettable init phases */
+> 
+>     dev->resetting += 1;
+>     /* do local init phase (eg: state reset) */
+> }
+> void hold_phase(Device *dev)
+> {
+>     /* call sub-resettable hold phases */
+> 
+>     /* do local hold phase (eg: set some I/O level) */
+> }
+> void exit_phase(Device *dev)
+> {
+>     /* call sub-resettable exit phases (independently of resetting value since,
+>        every resettable have its own resetting counter) */
+>    
+>     dev->resetting -= 1;
+>     if (dev->resetting == 0) {
+>         /* do local exit phase (eg: set some I/O level) only if the device is
+>            really leaving the resetting state */
+>     }
+> }
+> ```
+> Since I don't think specialization should care about sub-resettable and the
+> resetting counter, I've added the local init/hold/exit phases as DeviceClass
+> methods.
+> Otherwise, I see two other solutions:
+> + keep the interface as it is
+> + add some state knowledge in the interface (with some kind of get_state method)
+>   so that resetting counter and some kind of sub-resettable list are handled in
+>   the common code in the interface. The 3 methods will then handle only the local
+>   actions.
+> + have 6 methods in the interface, one for the local actions, one for the
+>   sub-resettable so that sub-resettable is not handled in the common code. And we
+>   need also a get_resetting method to access/update the counter.
+> 
+> #DEVICE RESET CHOICE
+> 
+> The Device is a special case, it has 2 reset entry point: `qdev_reset_all` and
+> `device_reset`. The latter doing a device reset only, while the former also
+> reset all buses hierarchy under the device.
+> 
+> I choose the put the sub-buses into the device reset domain, so that the
+> behavior of the resettable interface on Device is the same as qdev_reset_all.
+> I don't know if `device_reset` has some real meaning (resetting only the
+> Device). It is not often used and I think every time it is used there is no
+> sub-buses so the behavior is the same for both functions.
+> 
+> If I am mistaken about putting buses into device reset domain, it is possible
+> to make a special bus-hierarchy-reset-domain for every Device/Bus that differs
+> from the Resettable interface on Device/Bus.
+> 
+> # SYSBUS SUPPORT
+> 
+> Regarding the sysbus support Edgar mentioned in the prevous discussion: In this
+> series, there is no support in sysbus base class for disabling memory regions.
+> Having each sysbus device specialization, in every memory region handler, to
+> check if `resetting` is set or not is not user-friendly. But for we can't 
+> modify memory region `enabled` flags since devices may already set/unset them.
+> Maybe we could have some kind of super-switch to disable all memory regions in
+> a sysbus device but I don't know how this could be done.
+> 
+> The series is organised as follow:
+> Patches 1 and 2 adds Resettable interface and ResetDomain object.
+> Patches 3 to 7 converts Device and Bus to Resettable.
+> Patches 8 to 12 handles the global system reset domain
+> Patches 13 to 17 do the zynq implementation (patch 13 is an already-reviewed
+> patch from the clock api patch series)
+> 
+> Thank you for your feedback,
+> Damien
+> 
+> Damien Hedde (17):
+>   Create Resettable QOM interface
+>   Create the ResetDomain QOM object
+>   make Device and Bus Resettable
+>   Add local reset methods in Device class
+>   add vmstate description for device reset state
+>   Add function to control reset with gpio inputs
+>   convert qdev/bus_reset_all to Resettable
+>   Add a global ResetDomain object for system emulation
+>   global ResetDomain support for legacy reset handlers
+>   Delete the system ResetDomain at the end of emulation
+>   Put orphan buses in system reset domain
+>   Put default sysbus in system reset domain
+>   hw/misc/zynq_slcr: use standard register definition
+>   convert cadence_uart to 3-phases reset
+>   Convert zynq's slcr to 3-phases reset
+>   Add uart reset support in zynq_slcr
+>   Connect the uart reset gpios in the zynq platform
+> 
+>  hw/arm/xilinx_zynq.c           |  14 +-
+>  hw/char/cadence_uart.c         |  48 ++-
+>  hw/core/Makefile.objs          |   3 +
+>  hw/core/bus.c                  |  64 +++-
+>  hw/core/qdev-vmstate.c         |  27 ++
+>  hw/core/qdev.c                 | 166 ++++++++++-
+>  hw/core/reset-domain.c         | 121 ++++++++
+>  hw/core/reset.c                | 149 +++++++++-
+>  hw/core/resettable.c           |  69 +++++
+>  hw/misc/zynq_slcr.c            | 515 ++++++++++++++++++---------------
+>  include/hw/char/cadence_uart.h |  10 +-
+>  include/hw/qdev-core.h         |  97 +++++++
+>  include/hw/reset-domain.h      |  49 ++++
+>  include/hw/resettable.h        |  83 ++++++
+>  include/sysemu/reset.h         |  47 +++
+>  vl.c                           |   3 +-
+>  16 files changed, 1195 insertions(+), 270 deletions(-)
+>  create mode 100644 hw/core/qdev-vmstate.c
+>  create mode 100644 hw/core/reset-domain.c
+>  create mode 100644 hw/core/resettable.c
+>  create mode 100644 include/hw/reset-domain.h
+>  create mode 100644 include/hw/resettable.h
+> 
 
