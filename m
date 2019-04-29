@@ -1,33 +1,34 @@
-Received: from eggs.gnu.org ([209.51.188.92]:46488)
+Received: from eggs.gnu.org ([209.51.188.92]:46684)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <wei.d.li@oracle.com>) id 1hLAPN-0003h6-3X
-	for qemu-devel@nongnu.org; Mon, 29 Apr 2019 13:49:41 -0400
+	(envelope-from <bounces@canonical.com>) id 1hLAQK-0004QZ-1t
+	for qemu-devel@nongnu.org; Mon, 29 Apr 2019 13:50:41 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <wei.d.li@oracle.com>) id 1hLAPM-0002J4-9V
-	for qemu-devel@nongnu.org; Mon, 29 Apr 2019 13:49:41 -0400
-Received: from userp2120.oracle.com ([156.151.31.85]:59800)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <wei.d.li@oracle.com>) id 1hLAPM-0002IH-0P
-	for qemu-devel@nongnu.org; Mon, 29 Apr 2019 13:49:40 -0400
-Date: Mon, 29 Apr 2019 10:49:31 -0700
-From: Wei Li <wei.d.li@oracle.com>
-Message-ID: <F5614236-1B07-421B-8FE6-90129297014F@oracle.com>
-References: <5FF901C1-0AA5-4308-A65C-C448D0A2BA63@oracle.com>
-	<898ef1d4-bfa2-9952-8ceb-f1282b85e29c@oracle.com>
-	<20190416092042.GB32709@stefanha-x1.localdomain>
-	<8E5AF770-69ED-4D44-8A25-B51344996D9E@oracle.com>
-	<3F7E854A-3C1D-4204-8C35-893FC0614796@oracle.com>
-	<20190423120453.GF32465@stefanha-x1.localdomain>
-	<44520476-d6a8-2e3f-1602-388e2e1e874e@redhat.com>
-	<7044D39A-8D7B-41F7-B8C3-DC2214E6826A@oracle.com>
-	<825292440.15675844.1556339085478.JavaMail.zimbra@redhat.com>
-In-Reply-To: <825292440.15675844.1556339085478.JavaMail.zimbra@redhat.com>
-Mime-version: 1.0
-Content-type: text/plain;
-	charset="UTF-8"
-Content-transfer-encoding: quoted-printable
-Subject: Re: [Qemu-devel] Following up questions related to QEMU and I/O
- Thread
+	(envelope-from <bounces@canonical.com>) id 1hLAQI-0002jb-Ua
+	for qemu-devel@nongnu.org; Mon, 29 Apr 2019 13:50:40 -0400
+Received: from indium.canonical.com ([91.189.90.7]:33006)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1hLAQI-0002j4-PM
+	for qemu-devel@nongnu.org; Mon, 29 Apr 2019 13:50:38 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1hLAQF-0001rn-Mi
+	for <qemu-devel@nongnu.org>; Mon, 29 Apr 2019 17:50:35 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 6510D2E80CB
+	for <qemu-devel@nongnu.org>; Mon, 29 Apr 2019 17:50:35 +0000 (UTC)
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Mon, 29 Apr 2019 17:41:54 -0000
+From: Ben Wibking <1826599@bugs.launchpad.net>
+Reply-To: Bug 1826599 <1826599@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <155630657999.13303.12667909935236826379.malonedeb@wampee.canonical.com>
+Message-Id: <155655971582.16809.10243298635293953218.launchpad@soybean.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1826599] Re: qemu crashes with HV_ERROR with any
+ guest when using HVF on macos
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,35 +37,57 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: Stefan Hajnoczi <stefanha@redhat.com>, Stefan Hajnoczi <stefanha@gmail.com>, Dongli Zhang <dongli.zhang@oracle.com>, qemu-devel@nongnu.org
+To: qemu-devel@nongnu.org
 
-Thanks Paolo for your clarification!
+*** This bug is a duplicate of bug 1818937 ***
+    https://bugs.launchpad.net/bugs/1818937
 
-Just wanted to double confirm, does this mean batch I/O submission won't ap=
-ply to aio=3Dthreads (which is the default mode)?
+** This bug has been marked a duplicate of bug 1818937
+   Crash with HV_ERROR on macOS host
 
-Thanks,
-Wei
+-- =
 
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1826599
 
-=EF=BB=BFOn 4/26/19, 9:25 PM, "Paolo Bonzini" <pbonzini@redhat.com> wrote:
+Title:
+  qemu crashes with HV_ERROR with any guest when using HVF on macos
 
-   =20
-    > Thanks Stefan and Paolo for your response and advice!
-    >=20
-    > Hi Paolo,
-    >=20
-    > As to the virtio-scsi batch I/O submission feature in QEMU which you
-    > mentioned, is this feature turned on by default in QEMU 2.9 or there =
-is a
-    > tunable parameters to turn on/off the feature?
-   =20
-    Yes, it is available by default since 2.2.0.  It cannot be turned off, =
-however
-    it is only possible to batch I/O with aio=3Dnative (and, since 2.12.0, wi=
-th the NVMe
-    backend).
-   =20
-    Paolo
-   =20
+Status in QEMU:
+  New
+
+Bug description:
+  qemu reliably crashes (after some unknown amount of time) for any
+  guest I've run on macOS (10.14.4) with HVF acceleration.
+
+  I'm using the latest development tree:
+  % qemu-system-x86_64 --version
+  QEMU emulator version 4.0.50 (v4.0.0-rc4-52-g3284aa1281-dirty)
+  Copyright (c) 2003-2019 Fabrice Bellard and the QEMU Project developers
+
+  I'm currently running Haiku. After booting and running normally for a
+  few minutes, it abruptly crashes and shows this error on stdout (I'm
+  including the command line arguments):
+
+  + ISO=3Dhaiku-release-anyboot.iso
+  + ACCEL=3D'-accel hvf -machine type=3Dq35,accel=3Dhvf'
+  + MEM=3D'-m 1G'
+  + SMP=3D'-c 2'
+  + NET=3D'-device virtio-net,netdev=3Dvmnic -netdev user,id=3Dvmnic'
+  + IMG_CD=3D'-cdrom haiku-release-anyboot.iso'
+  + IMG_HDD=3D'-device virtio-scsi-pci,id=3Dscsi -drive if=3Dnone,id=3Dvd0,=
+file=3Dhaiku.img,format=3Draw -device scsi-hd,drive=3Dvd0'
+  + DISPLAY=3D'-usb -device usb-tablet'
+  + qemu-system-x86_64 -accel hvf -machine type=3Dq35,accel=3Dhvf -usb -dev=
+ice usb-tablet -m 1G -device virtio-net,netdev=3Dvmnic -netdev user,id=3Dvm=
+nic -device virtio-scsi-pci,id=3Dscsi -drive if=3Dnone,id=3Dvd0,file=3Dhaik=
+u.img,format=3Draw -device scsi-hd,drive=3Dvd0
+  qemu-system-x86_64: warning: host doesn't support requested feature: CPUI=
+D.80000001H:ECX.svm [bit 2]
+  qemu-system-x86_64: Error: HV_ERROR
+  ./qemu-boot.sh: line 19: 67497 Abort trap: 6           qemu-system-x86_64=
+ $ACCEL $CPU $EFI $DISPLAY $MEM $NET $IMG_HDD
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1826599/+subscriptions
