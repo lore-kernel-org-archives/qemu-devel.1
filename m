@@ -2,70 +2,97 @@ Return-Path: <SRS0=sEuR=S7=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.1 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,
+	UNWANTED_LANGUAGE_BODY,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 20D53C43219
-	for <qemu-devel@archiver.kernel.org>; Mon, 29 Apr 2019 13:01:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 92F02C43219
+	for <qemu-devel@archiver.kernel.org>; Mon, 29 Apr 2019 13:10:48 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id CD88020652
-	for <qemu-devel@archiver.kernel.org>; Mon, 29 Apr 2019 13:01:57 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CD88020652
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 64ABA2084B
+	for <qemu-devel@archiver.kernel.org>; Mon, 29 Apr 2019 13:10:48 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 64ABA2084B
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.ibm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:57413 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:57504 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hL5uv-0005JK-54
-	for qemu-devel@archiver.kernel.org; Mon, 29 Apr 2019 09:01:57 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:53360)
+	id 1hL63T-00077Y-LK
+	for qemu-devel@archiver.kernel.org; Mon, 29 Apr 2019 09:10:47 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:55792)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jdillama@redhat.com>) id 1hL5tv-0004bx-DS
-	for qemu-devel@nongnu.org; Mon, 29 Apr 2019 09:01:00 -0400
+	(envelope-from <jjherne@linux.ibm.com>) id 1hL62b-0006c4-69
+	for qemu-devel@nongnu.org; Mon, 29 Apr 2019 09:09:54 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jdillama@redhat.com>) id 1hL5tj-00028j-HB
-	for qemu-devel@nongnu.org; Mon, 29 Apr 2019 09:00:52 -0400
-Received: from mail-ed1-f68.google.com ([209.85.208.68]:45228)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <jdillama@redhat.com>) id 1hL5tj-000265-8N
-	for qemu-devel@nongnu.org; Mon, 29 Apr 2019 09:00:43 -0400
-Received: by mail-ed1-f68.google.com with SMTP id g57so2468565edc.12
-	for <qemu-devel@nongnu.org>; Mon, 29 Apr 2019 06:00:38 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=1e100.net; s=20161025;
-	h=x-gm-message-state:mime-version:references:in-reply-to:reply-to
-	:from:date:message-id:subject:to:cc;
-	bh=+9tJhA2irlXwQOzpG5XxMYL3RU0jaBhrylLEAAbP6SY=;
-	b=FTwsMmX4msjDPmTYB3qTYnHt9oJFzNFwghBITjsoQsS5SbuE+PCxUJlBA+l7r6KMOY
-	KkvV38lqYyRO66kZBxWB4Adstqv3M97ogoUC02Gg9X6C1dhg2FCD0NJ0IWkEaCiYDL4/
-	MfjCKeX86bt+s++GJPXsxgn6Z5vTG5mc7d/QU1pE9h0GEWKB1u79rCGnW4Ptsw50vTz8
-	sAg+BvTYre4EMY1HxIv5am5DjXNQz/JWbKBdgKifKycD/OzmUw6mMdQ9QGd+5Kl2fhvO
-	lFJoZlXIT3xFLFOfv0gpSb8FojGFVA3hauKg0xeiNH7lmvl6G7DRmzCh0gAyPY88GZHC
-	WFvw==
-X-Gm-Message-State: APjAAAWPWzEC0CgGwnuu/TDYYHFwJWe2MZ5MpmKiAS9bSIbeZhV3Z87I
-	qqURTQ72nXKfQEqg6b43GmV2bLhuFNGlLCszoI7x9A==
-X-Google-Smtp-Source: APXvYqwuzwNFW3lbf9ocXH+uxkriHKVumAbWxMNUvMfSCcmqLhddLAGsrXqdgu6kz4oEQF+cU9cRbUwjGGe0prwOpl0=
-X-Received: by 2002:a50:acc6:: with SMTP id x64mr38541086edc.141.1556542837538;
-	Mon, 29 Apr 2019 06:00:37 -0700 (PDT)
-MIME-Version: 1.0
-References: <20190427113625.46594-1-sgarzare@redhat.com>
-	<CA+aFP1BtbjrzitLz7PW_b-kuYU7WSOiMs5jVfUBC=M3zEuBcew@mail.gmail.com>
-	<20190429124712.mmxnpdkkbzhlbmxm@steredhat>
-In-Reply-To: <20190429124712.mmxnpdkkbzhlbmxm@steredhat>
-From: Jason Dillaman <jdillama@redhat.com>
-Date: Mon, 29 Apr 2019 09:00:26 -0400
-Message-ID:
- <CA+aFP1Cmc+3TcYJr73jYRmtCWNTAWBcjEtn+Afe7DKZqUYp7=g@mail.gmail.com>
-To: Stefano Garzarella <sgarzare@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-	[fuzzy]
-X-Received-From: 209.85.208.68
-Subject: Re: [Qemu-devel] [Qemu-block] [PATCH] block/rbd: add preallocation
- support
+	(envelope-from <jjherne@linux.ibm.com>) id 1hL62Y-0008Sa-GD
+	for qemu-devel@nongnu.org; Mon, 29 Apr 2019 09:09:53 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:48050)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <jjherne@linux.ibm.com>)
+	id 1hL62Y-0008R0-5m
+	for qemu-devel@nongnu.org; Mon, 29 Apr 2019 09:09:50 -0400
+Received: from pps.filterd (m0098399.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id
+	x3TD4b28093327
+	for <qemu-devel@nongnu.org>; Mon, 29 Apr 2019 09:09:46 -0400
+Received: from e33.co.us.ibm.com (e33.co.us.ibm.com [32.97.110.151])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2s60w0tt73-1
+	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Mon, 29 Apr 2019 09:09:46 -0400
+Received: from localhost
+	by e33.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+	Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <jjherne@linux.ibm.com>;
+	Mon, 29 Apr 2019 14:09:45 +0100
+Received: from b03cxnp08028.gho.boulder.ibm.com (9.17.130.20)
+	by e33.co.us.ibm.com (192.168.1.133) with IBM ESMTP SMTP Gateway:
+	Authorized Use Only! Violators will be prosecuted; 
+	(version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
+	Mon, 29 Apr 2019 14:09:44 +0100
+Received: from b03ledav002.gho.boulder.ibm.com
+	(b03ledav002.gho.boulder.ibm.com [9.17.130.233])
+	by b03cxnp08028.gho.boulder.ibm.com (8.14.9/8.14.9/NCO v10.0) with
+	ESMTP id x3TD9gul2621718
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256
+	verify=OK); Mon, 29 Apr 2019 13:09:42 GMT
+Received: from b03ledav002.gho.boulder.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id A7A39136053;
+	Mon, 29 Apr 2019 13:09:42 +0000 (GMT)
+Received: from b03ledav002.gho.boulder.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 13027136059;
+	Mon, 29 Apr 2019 13:09:42 +0000 (GMT)
+Received: from jason-laptop.endicott.ibm.com (unknown [9.60.75.221])
+	by b03ledav002.gho.boulder.ibm.com (Postfix) with ESMTP;
+	Mon, 29 Apr 2019 13:09:41 +0000 (GMT)
+From: "Jason J. Herne" <jjherne@linux.ibm.com>
+To: qemu-devel@nongnu.org, qemu-s390x@nongnu.org, cohuck@redhat.com,
+	thuth@redhat.com, alifm@linux.ibm.com, borntraeger@de.ibm.com
+Date: Mon, 29 Apr 2019 09:09:41 -0400
+X-Mailer: git-send-email 2.7.4
+X-TM-AS-GCONF: 00
+x-cbid: 19042913-0036-0000-0000-00000AB044D9
+X-IBM-SpamModules-Scores: 
+X-IBM-SpamModules-Versions: BY=3.00011017; HX=3.00000242; KW=3.00000007;
+	PH=3.00000004; SC=3.00000285; SDB=6.01196077; UDB=6.00627227;
+	IPR=6.00976926; 
+	MB=3.00026647; MTD=3.00000008; XFM=3.00000015; UTC=2019-04-29 13:09:45
+X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
+x-cbparentid: 19042913-0037-0000-0000-00004B932355
+Message-Id: <1556543381-12671-1-git-send-email-jjherne@linux.ibm.com>
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:, ,
+	definitions=2019-04-29_07:, , signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+	priorityscore=1501
+	malwarescore=0 suspectscore=2 phishscore=0 bulkscore=0 spamscore=0
+	clxscore=1015 lowpriorityscore=0 mlxscore=0 impostorscore=0
+	mlxlogscore=999 adultscore=0 classifier=spam adjust=0 reason=mlx
+	scancount=1 engine=8.0.1-1810050000 definitions=main-1904290094
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic]
+X-Received-From: 148.163.156.1
+Subject: [Qemu-devel] [PATCH] s390-bios: Skip bootmap signature entries
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -77,145 +104,90 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: dillaman@redhat.com
-Cc: Kevin Wolf <kwolf@redhat.com>, Josh Durgin <jdurgin@redhat.com>,
-	qemu-block <qemu-block@nongnu.org>, Markus Armbruster <armbru@redhat.com>,
-	qemu-devel <qemu-devel@nongnu.org>, Max Reitz <mreitz@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190429130026.pwChVcD2BTSV0gBQrV0glCO330YWRpVVlsgoXrNkOUw@z>
+Content-Type: text/plain; charset="UTF-8"
+Message-ID: <20190429130941.NWjoUGVYj080lxg2jVk2UqhyPnat3GskUT96z6Mhv6A@z>
 
-On Mon, Apr 29, 2019 at 8:47 AM Stefano Garzarella <sgarzare@redhat.com> wrote:
->
-> On Sat, Apr 27, 2019 at 08:43:26AM -0400, Jason Dillaman wrote:
-> > On Sat, Apr 27, 2019 at 7:37 AM Stefano Garzarella <sgarzare@redhat.com> wrote:
-> > >
-> > > This patch adds the support of preallocation (off/full) for the RBD
-> > > block driver.
-> > > If available, we use rbd_writesame() to quickly fill the image when
-> > > full preallocation is required.
-> > >
-> > > Signed-off-by: Stefano Garzarella <sgarzare@redhat.com>
-> > > ---
-> > >  block/rbd.c          | 149 ++++++++++++++++++++++++++++++++++++++-----
-> > >  qapi/block-core.json |   4 +-
-> > >  2 files changed, 136 insertions(+), 17 deletions(-)
-> > >
-> > > diff --git a/block/rbd.c b/block/rbd.c
-> > > index 0c549c9935..29dd1bb040 100644
-> > > --- a/block/rbd.c
-> > > +++ b/block/rbd.c
-> > > @@ -13,6 +13,7 @@
-> > >
-> > >  #include "qemu/osdep.h"
-> > >
-> > > +#include "qemu/units.h"
-> > >  #include <rbd/librbd.h>
-> > >  #include "qapi/error.h"
-> > >  #include "qemu/error-report.h"
-> > > @@ -331,6 +332,110 @@ static void qemu_rbd_memset(RADOSCB *rcb, int64_t offs)
-> > >      }
-> > >  }
-> > >
-> > > +static int qemu_rbd_do_truncate(rbd_image_t image, int64_t offset,
-> > > +                                PreallocMode prealloc, Error **errp)
-> > > +{
-> > > +    uint64_t current_length;
-> > > +    char *buf = NULL;
-> > > +    int ret;
-> > > +
-> > > +    ret = rbd_get_size(image, &current_length);
-> > > +    if (ret < 0) {
-> > > +        error_setg_errno(errp, -ret, "Failed to get file length");
-> > > +        goto out;
-> > > +    }
-> > > +
-> > > +    if (current_length > offset && prealloc != PREALLOC_MODE_OFF) {
-> > > +        error_setg(errp, "Cannot use preallocation for shrinking files");
-> > > +        ret = -ENOTSUP;
-> > > +        goto out;
-> > > +    }
-> > > +
-> > > +    switch (prealloc) {
-> > > +    case PREALLOC_MODE_FULL: {
-> > > +        uint64_t current_offset = current_length;
-> > > +        int buf_size = 64 * KiB;
-> >
-> > This should probably be 512B or 4KiB (which is the smallest striped
-> > unit size). Not only will this avoid sending unnecessary zeroes to the
-> > backing cluster, writesame silently turns into a standard write if
-> > your buffer isn't properly aligned with the min(object size, stripe
-> > unit size).
-> >
->
-> Okay, I'll change it on v2.
-> Should we query about the "stripe_unit" size or we simply use the
-> smallest allowed?
+Newer versions of zipl have the ability to write signature entries to the boot
+script for secure boot. We don't yet support secure boot, but we need to skip
+over signature entries while reading the boot script in order to maintain our
+ability to boot guest operating systems that have a secure bootloader.
 
-Technically we don't prevent a user from choosing terrible stripe unit
-sizes (e.g. 1 byte), so you are probably safe to just use 4KiB.
+Signed-off-by: Jason J. Herne <jjherne@linux.ibm.com>
+Reviewed-by: Farhan Ali <alifm@linux.ibm.com>
+---
+ pc-bios/s390-ccw/bootmap.c | 19 +++++++++++++++++--
+ pc-bios/s390-ccw/bootmap.h | 10 ++++++----
+ 2 files changed, 23 insertions(+), 6 deletions(-)
 
-> > > +        ssize_t bytes;
-> > > +
-> > > +        buf = g_malloc(buf_size);
-> > > +        /*
-> > > +         * Some versions of rbd_writesame() discards writes of buffers with
-> > > +         * all zeroes. In order to avoid this behaviour, we set the first byte
-> > > +         * to one.
-> > > +         */
-> > > +        buf[0] = 1;
-> >
-> > You could also use "rados_conf_set(cluster,
-> > "rbd_discard_on_zeroed_write_same", "false").
-> >
->
-> I tried it, but it is not supported on all versions. (eg. I have Ceph
-> v12.2.11 on my Fedora 29 and it is not supported, but rbd_writesame() is
-> available)
->
-> Maybe we can use both: "rbd_discard_on_zeroed_write_same = false" and
-> "buf[0] = 1"
-
-Probably not worth the effort if it's not supported across all releases.
-
-> > > +        ret = rbd_resize(image, offset);
-> > > +        if (ret < 0) {
-> > > +            error_setg_errno(errp, -ret, "Failed to resize file");
-> > > +            goto out;
-> > > +        }
-> > > +
-> > > +#ifdef LIBRBD_SUPPORTS_WRITESAME
-> > > +        while (offset - current_offset > buf_size) {
-> > > +            /*
-> > > +             * rbd_writesame() supports only request where the size of the
-> > > +             * operation is multiple of buffer size and it must be less or
-> > > +             * equal to INT_MAX.
-> > > +             */
-> > > +            bytes = MIN(offset - current_offset, INT_MAX);
-> > > +            bytes -= bytes % buf_size;
-> >
-> > Using the default object size of 4MiB, this write size would result in
-> > up to 512 concurrent ops to the backing cluster. Perhaps the size
-> > should be bounded such that only a dozen or so concurrent requests are
-> > issued per write, always rounded next largest object / stripe period
-> > size. librbd and the rbd CLI usually try to bound themselves to the
-> > value in the "rbd_concurrent_management_ops" configuration setting
-> > (currently defaults to 10).
-> >
->
-> Do you suggest to use "rbd_concurrent_management_ops" to limit
-> concurrent requests or use a new QEMU parameters for the RBD driver?
-
-I think it would be nicer to just query the
-"rbd_concurrent_management_ops" limit to derive your writesame size
-since the Ceph cluster admin can globally set that option to match the
-available parallelism of the cluster.
-
-> Thanks for your comments,
-> Stefano
-
-
+diff --git a/pc-bios/s390-ccw/bootmap.c b/pc-bios/s390-ccw/bootmap.c
+index 7aef65a..d13b7cb 100644
+--- a/pc-bios/s390-ccw/bootmap.c
++++ b/pc-bios/s390-ccw/bootmap.c
+@@ -254,7 +254,14 @@ static void run_eckd_boot_script(block_number_t bmt_block_nr,
+     memset(sec, FREE_SPACE_FILLER, sizeof(sec));
+     read_block(block_nr, sec, "Cannot read Boot Map Script");
+ 
+-    for (i = 0; bms->entry[i].type == BOOT_SCRIPT_LOAD; i++) {
++    for (i = 0; bms->entry[i].type == BOOT_SCRIPT_LOAD ||
++                bms->entry[i].type == BOOT_SCRIPT_SIGNATURE; i++) {
++
++        /* We don't support secure boot yet, so we skip signature entries */
++        if (bms->entry[i].type == BOOT_SCRIPT_SIGNATURE) {
++            continue;
++        }
++
+         address = bms->entry[i].address.load_address;
+         block_nr = eckd_block_num(&bms->entry[i].blkptr.xeckd.bptr.chs);
+ 
+@@ -489,7 +496,15 @@ static void zipl_run(ScsiBlockPtr *pte)
+ 
+     /* Load image(s) into RAM */
+     entry = (ComponentEntry *)(&header[1]);
+-    while (entry->component_type == ZIPL_COMP_ENTRY_LOAD) {
++    while (entry->component_type == ZIPL_COMP_ENTRY_LOAD ||
++           entry->component_type == ZIPL_COMP_ENTRY_SIGNATURE) {
++
++        /* We don't support secure boot yet, so we skip signature entries */
++        if (entry->component_type == ZIPL_COMP_ENTRY_SIGNATURE) {
++            entry++;
++            continue;
++        }
++
+         zipl_load_segment(entry);
+ 
+         entry++;
+diff --git a/pc-bios/s390-ccw/bootmap.h b/pc-bios/s390-ccw/bootmap.h
+index a085212..94f53a5 100644
+--- a/pc-bios/s390-ccw/bootmap.h
++++ b/pc-bios/s390-ccw/bootmap.h
+@@ -98,8 +98,9 @@ typedef struct ScsiMbr {
+ #define ZIPL_COMP_HEADER_IPL    0x00
+ #define ZIPL_COMP_HEADER_DUMP   0x01
+ 
+-#define ZIPL_COMP_ENTRY_LOAD    0x02
+-#define ZIPL_COMP_ENTRY_EXEC    0x01
++#define ZIPL_COMP_ENTRY_EXEC      0x01
++#define ZIPL_COMP_ENTRY_LOAD      0x02
++#define ZIPL_COMP_ENTRY_SIGNATURE 0x03
+ 
+ typedef struct XEckdMbr {
+     uint8_t magic[4];   /* == "xIPL"        */
+@@ -117,8 +118,9 @@ typedef struct BootMapScriptEntry {
+     BootMapPointer blkptr;
+     uint8_t pad[7];
+     uint8_t type;   /* == BOOT_SCRIPT_* */
+-#define BOOT_SCRIPT_EXEC 0x01
+-#define BOOT_SCRIPT_LOAD 0x02
++#define BOOT_SCRIPT_EXEC      0x01
++#define BOOT_SCRIPT_LOAD      0x02
++#define BOOT_SCRIPT_SIGNATURE 0x03
+     union {
+         uint64_t load_address;
+         uint64_t load_psw;
 -- 
-Jason
+2.7.4
+
 
