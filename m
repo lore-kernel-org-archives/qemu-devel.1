@@ -2,93 +2,93 @@ Return-Path: <SRS0=sEuR=S7=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-0.7 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8CB9BC43219
-	for <qemu-devel@archiver.kernel.org>; Mon, 29 Apr 2019 20:17:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E35C9C43219
+	for <qemu-devel@archiver.kernel.org>; Mon, 29 Apr 2019 20:19:46 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4CB0A2067D
-	for <qemu-devel@archiver.kernel.org>; Mon, 29 Apr 2019 20:17:53 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4CB0A2067D
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id ACAA72067D
+	for <qemu-devel@archiver.kernel.org>; Mon, 29 Apr 2019 20:19:46 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="OMso3o1P"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org ACAA72067D
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:34749 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:34759 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hLCim-0000i8-II
-	for qemu-devel@archiver.kernel.org; Mon, 29 Apr 2019 16:17:52 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:45728)
+	id 1hLCkb-0001oA-Rv
+	for qemu-devel@archiver.kernel.org; Mon, 29 Apr 2019 16:19:45 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:46015)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1hLChj-0008Ud-Fx
-	for qemu-devel@nongnu.org; Mon, 29 Apr 2019 16:16:48 -0400
+	(envelope-from <richard.henderson@linaro.org>) id 1hLCjS-0001ON-7O
+	for qemu-devel@nongnu.org; Mon, 29 Apr 2019 16:18:35 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1hLChi-0001iK-CB
-	for qemu-devel@nongnu.org; Mon, 29 Apr 2019 16:16:47 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:56525)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mreitz@redhat.com>)
-	id 1hLChf-0001gY-Kk; Mon, 29 Apr 2019 16:16:43 -0400
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
-	[10.5.11.23])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 6FB033082B69;
-	Mon, 29 Apr 2019 20:16:42 +0000 (UTC)
-Received: from dresden.str.redhat.com (ovpn-204-144.brq.redhat.com
-	[10.40.204.144])
-	by smtp.corp.redhat.com (Postfix) with ESMTPS id 4669957A4;
-	Mon, 29 Apr 2019 20:16:40 +0000 (UTC)
-To: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
-References: <20190311165017.32247-1-kwolf@redhat.com>
-	<20190311165017.32247-11-kwolf@redhat.com>
-From: Max Reitz <mreitz@redhat.com>
+	(envelope-from <richard.henderson@linaro.org>) id 1hLCjR-0002Xu-Bu
+	for qemu-devel@nongnu.org; Mon, 29 Apr 2019 16:18:34 -0400
+Received: from mail-pf1-x442.google.com ([2607:f8b0:4864:20::442]:44717)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+	id 1hLCjR-0002XN-5L
+	for qemu-devel@nongnu.org; Mon, 29 Apr 2019 16:18:33 -0400
+Received: by mail-pf1-x442.google.com with SMTP id y13so5868215pfm.11
+	for <qemu-devel@nongnu.org>; Mon, 29 Apr 2019 13:18:32 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+	h=subject:to:cc:references:from:openpgp:message-id:date:user-agent
+	:mime-version:in-reply-to:content-language:content-transfer-encoding;
+	bh=ft/KOVnG6O94OG6rxuFLn26qfqBK/eTTYlPhfxU1/wE=;
+	b=OMso3o1PsoMehPq2kbmqIxAJJqrBbNbbHCiVpRZAtiHH42OvqbtFAHBtdbwx/oOubw
+	i6JgM8WVRgF1Fma9Qj3fgO0fVu9ZZv2Kcne+pSlD0GM2NZkJDvufG1mBterYOcgq5A5n
+	wR/1G6S5ss1ht/+m5vhDEI0WGbaFQTH4Zdg7oaNzsPb3AnbFZokZdsD9l9HnFKltbD67
+	7xRqvl3jEPgvDSOXCog48VDCuAH9Nwk6VseSSj1aULtM9UVB3MdvkNlNBEk+II4c+4Jp
+	G0Esa5cNYZIapnfG33F3OhkV3qFLT5vvfK7sQ4olupc0EJI25/YiAUzf8Yyv7WVyHB6a
+	fayg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=1e100.net; s=20161025;
+	h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
+	:date:user-agent:mime-version:in-reply-to:content-language
+	:content-transfer-encoding;
+	bh=ft/KOVnG6O94OG6rxuFLn26qfqBK/eTTYlPhfxU1/wE=;
+	b=KUiU6UsosRhmxAm2LXvDfEU01TwXyikB3E9JPVCHq1jcoEyrqWpwQXCVm8v31eJkqG
+	YTxiJ2KUWEqCyJwq+WF45E42tdx8dIgJ6LpMB8mgW3nRT6SZhdtNVMIjyD9wF0WDyvE8
+	Ub5briRpMgtyrA/Ino/HO/6hgBJPfCgv8qTGwvJmUDq/7rpt8P90wHidmZuaQqHFaD2Q
+	/1nBZdqTUDavYL5m8YTnB4U9qM7t+GrPkmIoEMzgKd2LSGN2ULk3nyDD13v91K+v7SDz
+	4j5GWqgdymjX/2Gd8m1oY61IHCvUXLBx1eVhJDATZA3ENzPLoWkjgF3iZE8WgsDl9qkn
+	nMug==
+X-Gm-Message-State: APjAAAVnvTtBnEd34Esk2/S7tHAGEfDWTnuV6e8uRCI6RM4cfW/PnYXN
+	UNuLP7uKtA+l4zh8PxllKpot9w==
+X-Google-Smtp-Source: APXvYqwYBlLmXNBCceFPacMxPCWGQieEvsBrnYdT7mO7PTp2rIe8OCk5hUgbYaW//dM4mzMUrnNNkw==
+X-Received: by 2002:a62:ed10:: with SMTP id u16mr64765832pfh.187.1556569109574;
+	Mon, 29 Apr 2019 13:18:29 -0700 (PDT)
+Received: from [192.168.1.11] (97-113-179-147.tukw.qwest.net. [97.113.179.147])
+	by smtp.gmail.com with ESMTPSA id
+	t3sm31894022pgu.78.2019.04.29.13.18.27
+	(version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+	Mon, 29 Apr 2019 13:18:28 -0700 (PDT)
+To: Peter Maydell <peter.maydell@linaro.org>
+References: <20190330005900.17282-1-richard.henderson@linaro.org>
+	<20190330005900.17282-4-richard.henderson@linaro.org>
+	<CAFEAcA-3qrQXk9iMY_9VZSLzdnn=EzzYOqhe61UQKYn-w__3Zw@mail.gmail.com>
+From: Richard Henderson <richard.henderson@linaro.org>
 Openpgp: preference=signencrypt
-Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
-	mQENBFXOJlcBCADEyyhOTsoa/2ujoTRAJj4MKA21dkxxELVj3cuILpLTmtachWj7QW+TVG8U
-	/PsMCFbpwsQR7oEy8eHHZwuGQsNpEtNC2G/L8Yka0BIBzv7dEgrPzIu+W3anZXQW4702+uES
-	U29G8TP/NGfXRRHGlbBIH9KNUnOSUD2vRtpOLXkWsV5CN6vQFYgQfFvmp5ZpPeUe6xNplu8V
-	mcTw8OSEDW/ZnxJc8TekCKZSpdzYoxfzjm7xGmZqB18VFwgJZlIibt1HE0EB4w5GsD7x5ekh
-	awIe3RwoZgZDLQMdOitJ1tUc8aqaxvgA4tz6J6st8D8pS//m1gAoYJWGwwIVj1DjTYLtABEB
-	AAG0HU1heCBSZWl0eiA8bXJlaXR6QHJlZGhhdC5jb20+iQFTBBMBCAA9AhsDBQkSzAMABQsJ
-	CAcCBhUICQoLAgQWAgMBAh4BAheABQJVzie5FRhoa3A6Ly9rZXlzLmdudXBnLm5ldAAKCRD0
-	B9sAYdXPQDcIB/9uNkbYEex1rHKz3mr12uxYMwLOOFY9fstP5aoVJQ1nWQVB6m2cfKGdcRe1
-	2/nFaHSNAzT0NnKz2MjhZVmcrpyd2Gp2QyISCfb1FbT82GMtXFj1wiHmPb3CixYmWGQUUh+I
-	AvUqsevLA+WihgBUyaJq/vuDVM1/K9Un+w+Tz5vpeMidlIsTYhcsMhn0L9wlCjoucljvbDy/
-	8C9L2DUdgi3XTa0ORKeflUhdL4gucWoAMrKX2nmPjBMKLgU7WLBc8AtV+84b9OWFML6NEyo4
-	4cP7cM/07VlJK53pqNg5cHtnWwjHcbpGkQvx6RUx6F1My3y52vM24rNUA3+ligVEgPYBuQEN
-	BFXOJlcBCADAmcVUNTWT6yLWQHvxZ0o47KCP8OcLqD+67T0RCe6d0LP8GsWtrJdeDIQk+T+F
-	xO7DolQPS6iQ6Ak2/lJaPX8L0BkEAiMuLCKFU6Bn3lFOkrQeKp3u05wCSV1iKnhg0UPji9V2
-	W5eNfy8F4ZQHpeGUGy+liGXlxqkeRVhLyevUqfU0WgNqAJpfhHSGpBgihUupmyUg7lfUPeRM
-	DzAN1pIqoFuxnN+BRHdAecpsLcbR8sQddXmDg9BpSKozO/JyBmaS1RlquI8HERQoe6EynJhd
-	64aICHDfj61rp+/0jTIcevxIIAzW70IadoS/y3DVIkuhncgDBvGbF3aBtjrJVP+5ABEBAAGJ
-	ASUEGAEIAA8FAlXOJlcCGwwFCRLMAwAACgkQ9AfbAGHVz0CbFwf9F/PXxQR9i4N0iipISYjU
-	sxVdjJOM2TMut+ZZcQ6NSMvhZ0ogQxJ+iEQ5OjnIputKvPVd5U7WRh+4lF1lB/NQGrGZQ1ic
-	alkj6ocscQyFwfib+xIe9w8TG1CVGkII7+TbS5pXHRxZH1niaRpoi/hYtgzkuOPp35jJyqT/
-	/ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
-	bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
-	R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
-Message-ID: <03585bce-afb0-cd39-9732-7946fa1b03fc@redhat.com>
-Date: Mon, 29 Apr 2019 22:16:39 +0200
+Message-ID: <a3da11b9-b2e2-2222-1194-437c7ccad61d@linaro.org>
+Date: Mon, 29 Apr 2019 13:18:23 -0700
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
 	Thunderbird/60.6.1
 MIME-Version: 1.0
-In-Reply-To: <20190311165017.32247-11-kwolf@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="UwYAwpf3FIGPA23cfN0gdzurn9fdoRaNS"
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.45]);
-	Mon, 29 Apr 2019 20:16:42 +0000 (UTC)
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-X-Content-Filtered-By: Mailman/MimeDel 2.1.21
-Subject: Re: [Qemu-devel] [Qemu-block] [PATCH v2 10/10] file-posix: Make
- auto-read-only dynamic
+In-Reply-To: <CAFEAcA-3qrQXk9iMY_9VZSLzdnn=EzzYOqhe61UQKYn-w__3Zw@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+	recognized.
+X-Received-From: 2607:f8b0:4864:20::442
+Subject: Re: [Qemu-devel] [PATCH v4 3/4] linux-user: Parse
+ NT_GNU_PROPERTY_TYPE_0 notes
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -100,105 +100,33 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-devel@nongnu.org
+Cc: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>,
+	QEMU Developers <qemu-devel@nongnu.org>,
+	Ramana Radhakrishnan <ramana.radhakrishnan@arm.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190429201639.bUS_Cw69ivxyaTWH1_9m3Gputs81JLZb1_eAwVdT6vM@z>
+Message-ID: <20190429201823.egcss9DIKtd6RtUlO0ufrhAlxW1s_YwJ1Jr14Exz40U@z>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---UwYAwpf3FIGPA23cfN0gdzurn9fdoRaNS
-From: Max Reitz <mreitz@redhat.com>
-To: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
-Cc: qemu-devel@nongnu.org
-Message-ID: <03585bce-afb0-cd39-9732-7946fa1b03fc@redhat.com>
-Subject: Re: [Qemu-block] [PATCH v2 10/10] file-posix: Make auto-read-only
- dynamic
-References: <20190311165017.32247-1-kwolf@redhat.com>
- <20190311165017.32247-11-kwolf@redhat.com>
-In-Reply-To: <20190311165017.32247-11-kwolf@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+On 4/29/19 9:17 AM, Peter Maydell wrote:
+>> +        struct elf_phdr *eppnt = phdr + i;
+>> +
+>> +        switch (eppnt->p_type) {
+>> +        case PT_LOAD:
+>> +            {
+> 
+> I think you have an extra layer of indent here that we usually
+> don't do for switch statement cases.
 
-On 11.03.19 17:50, Kevin Wolf wrote:
-> Until now, with auto-read-only=3Don we tried to open the file read-writ=
-e
-> first and if that failed, read-only was tried. This is actually not goo=
-d
-> enough for libvirt, which gives QEMU SELinux permissions for read-write=
+No, that indent is exactly right for a compound statement
+not associated with an if/while/whatnot.
 
-> only as soon as it actually intends to write to the image. So we need t=
-o
-> be able to switch between read-only and read-write at runtime.
->=20
-> This patch makes auto-read-only dynamic, i.e. the file is opened
-> read-only as long as no user of the node has requested write
-> permissions, but it is automatically reopened read-write as soon as the=
+> #define GNU0_MAGIC const_le32('G' | 'N' << 8 | 'U' << 16)
+> 
+> and then you can avoid the #ifdef HOST_WORDS_BIGENDIAN?
 
-> first writer is attached. Conversely, if the last writer goes away, the=
-
-> file is reopened read-only again.
->=20
-> bs->read_only is no longer set for auto-read-only=3Don files even if th=
-e
-> file descriptor is opened read-only because it will be transparently
-> upgraded as soon as a writer is attached. This changes the output of
-> qemu-iotests 232.
->=20
-> Signed-off-by: Kevin Wolf <kwolf@redhat.com>
-> ---
->  block/file-posix.c         | 36 +++++++++++++++++-------------------
->  tests/qemu-iotests/232.out | 12 ++++++------
->  2 files changed, 23 insertions(+), 25 deletions(-)
-
-https://bugzilla.redhat.com/show_bug.cgi?id=3D1703793 seems to be caused
-by this patch: When the mirror job completes, it drops all permissions
-on its target BB with an &error_abort.  As of this patch, this may
-result in file-posix attempting to reopen the FD, which may fail.
-
-There are two problems I can see: First, the previous patch should have
-updated s->open_flags along with s->fd when the FD is switched.  As it
-is now, s->open_flags is not updated, so it stays on O_RDONLY and every
-time the permissions are checked, the FD is reconfigured and then switche=
-d.
-
-That's simple to fix, just add BDRVRawState.perm_change_flags and set it
-to open_flags after raw_reconfigure_getfd() returned a ret !=3D s->fd
-(when s->perm_change_fd is set).
-
-That fixes the problem of file-posix attempting to reopen the FD to
-O_RDWR all the time, which caused the crash.
-
-But that gives us another crash, because now dropping the permissions
-(correctly) reopens the FD to O_RDONLY, with the exact same implications
-as above: If the target becomes unavailable, opening the new FD will
-fail, and qemu will crash.
-
-I don't know what to do about this.  In the spirit of "dropping
-permissions should always work", I presume raw_reconfigure_getfd()
-should just return the old FD if it had more permissions than the new
-one would have.  But if the user issues an explicit reopen command, they
-probably want such an error to be reported.
-
-Max
+Sure.
 
 
---UwYAwpf3FIGPA23cfN0gdzurn9fdoRaNS
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAlzHW6cACgkQ9AfbAGHV
-z0AYnAf/e31fEFmLPwebhQ54XUV7sQY3UbPuQZmRgkRhybqBZlkS9wLuVcSxs6Kx
-AXk9yibnxgKkEveYM/DVC//xkuoF6Vw43Auh23G6+mIhtg/i5Yd1lH4PiLVP3LKl
-KHeg3JOrd/i2bU2GEIZ+NbMNNHpRlkTL4Kci7wtIS3CLqircxsG3Io2QkwnCFx8a
-ARJrLDavh6AFSInSbAxliMPCDyVmBopgrmcCkb2dhlg2IBNcVLadVvR+k2OLINzh
-1N2e73blfDbz1x5jluSOkIXbbjbvLr8JaYxH2FNwDb4mW7MUt1XnkUy/0LI/a+nr
-vAtFFCq2V3QAF7PJL8Z6rvjFEIBJMQ==
-=j151
------END PGP SIGNATURE-----
-
---UwYAwpf3FIGPA23cfN0gdzurn9fdoRaNS--
+r~
 
