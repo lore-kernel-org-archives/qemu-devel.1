@@ -1,27 +1,33 @@
-Received: from eggs.gnu.org ([209.51.188.92]:52815)
+Received: from eggs.gnu.org ([209.51.188.92]:55160)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alistair@alistair23.me>) id 1hKyvE-00076O-Im
-	for qemu-devel@nongnu.org; Mon, 29 Apr 2019 01:33:52 -0400
+	(envelope-from <bounces@canonical.com>) id 1hKz2d-0003Rf-63
+	for qemu-devel@nongnu.org; Mon, 29 Apr 2019 01:41:28 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alistair@alistair23.me>) id 1hKyvD-0005n7-A4
-	for qemu-devel@nongnu.org; Mon, 29 Apr 2019 01:33:48 -0400
-Received: from mail-oln040092255063.outbound.protection.outlook.com
-	([40.92.255.63]:54848
-	helo=APC01-HK2-obe.outbound.protection.outlook.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <alistair@alistair23.me>)
-	id 1hKyvC-0005lA-Tz
-	for qemu-devel@nongnu.org; Mon, 29 Apr 2019 01:33:47 -0400
-From: Alistair Francis <alistair@alistair23.me>
-Date: Mon, 29 Apr 2019 05:33:38 +0000
-Message-ID: <PSXP216MB02771957D4B9C5A15914D05FDD390@PSXP216MB0277.KORP216.PROD.OUTLOOK.COM>
-References: <cover.1556515687.git.alistair@alistair23.me>
-In-Reply-To: <cover.1556515687.git.alistair@alistair23.me>
-Content-Language: en-US
-Content-Type: text/plain; charset="iso-8859-1"
-Content-Transfer-Encoding: quoted-printable
+	(envelope-from <bounces@canonical.com>) id 1hKz2b-00027P-0Y
+	for qemu-devel@nongnu.org; Mon, 29 Apr 2019 01:41:26 -0400
+Received: from indium.canonical.com ([91.189.90.7]:57460)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1hKz2T-0001tF-Tl
+	for qemu-devel@nongnu.org; Mon, 29 Apr 2019 01:41:19 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1hKz23-0002P0-Dp
+	for <qemu-devel@nongnu.org>; Mon, 29 Apr 2019 05:40:51 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 3FE042E80D3
+	for <qemu-devel@nongnu.org>; Mon, 29 Apr 2019 05:40:51 +0000 (UTC)
 MIME-Version: 1.0
-Subject: [Qemu-devel] [PATCH v1 5/5] hw/arm: Add the Netduino Plus 2
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Mon, 29 Apr 2019 05:25:33 -0000
+From: Amol Surati <1826827@bugs.launchpad.net>
+Reply-To: Bug 1826827 <1826827@bugs.launchpad.net>
+Sender: bounces@canonical.com
+Message-Id: <155651553398.6774.264581366962353554.malonedeb@chaenomeles.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1826827] [NEW] dtc crash;
+ pnv_dt_serial cannot find lpc's phandle
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,167 +36,167 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
-Cc: "alistair23@gmail.com" <alistair23@gmail.com>
+To: qemu-devel@nongnu.org
 
-Signed-off-by: Alistair Francis <alistair@alistair23.me>
----
- MAINTAINERS                     |  6 +++
- default-configs/arm-softmmu.mak |  1 +
- hw/arm/Kconfig                  |  3 ++
- hw/arm/Makefile.objs            |  1 +
- hw/arm/netduinoplus2.c          | 77 +++++++++++++++++++++++++++++++++
- 5 files changed, 88 insertions(+)
- create mode 100644 hw/arm/netduinoplus2.c
+Public bug reported:
 
-diff --git a/MAINTAINERS b/MAINTAINERS
-index c9772735cf..9b0af5a0b0 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -817,6 +817,12 @@ M: Peter Maydell <peter.maydell@linaro.org>
- S: Maintained
- F: hw/arm/netduino2.c
-=20
-+Netduino Plus 2
-+M: Alistair Francis <alistair@alistair23.me>
-+M: Peter Maydell <peter.maydell@linaro.org>
-+S: Maintained
-+F: hw/arm/netduinoplus2.c
-+
- SmartFusion2
- M: Subbaraya Sundeep <sundeep.lkml@gmail.com>
- M: Peter Maydell <peter.maydell@linaro.org>
-diff --git a/default-configs/arm-softmmu.mak b/default-configs/arm-softmmu.=
-mak
-index e079f10624..1e2c82f201 100644
---- a/default-configs/arm-softmmu.mak
-+++ b/default-configs/arm-softmmu.mak
-@@ -46,6 +46,7 @@ CONFIG_A15MPCORE=3Dy
-=20
- CONFIG_ARM_V7M=3Dy
- CONFIG_NETDUINO2=3Dy
-+CONFIG_NETDUINOPLUS2=3Dy
-=20
- CONFIG_ARM_GIC=3Dy
- CONFIG_ARM_TIMER=3Dy
-diff --git a/hw/arm/Kconfig b/hw/arm/Kconfig
-index 3a98bce15a..13fc779308 100644
---- a/hw/arm/Kconfig
-+++ b/hw/arm/Kconfig
-@@ -26,6 +26,9 @@ config MUSICPAL
- config NETDUINO2
-     bool
-=20
-+config NETDUINOPLUS2
-+    bool
-+
- config NSERIES
-     bool
-=20
-diff --git a/hw/arm/Makefile.objs b/hw/arm/Makefile.objs
-index 36c3ff54c3..1f216f4d93 100644
---- a/hw/arm/Makefile.objs
-+++ b/hw/arm/Makefile.objs
-@@ -8,6 +8,7 @@ obj-$(CONFIG_INTEGRATOR) +=3D integratorcp.o
- obj-$(CONFIG_MAINSTONE) +=3D mainstone.o
- obj-$(CONFIG_MUSICPAL) +=3D musicpal.o
- obj-$(CONFIG_NETDUINO2) +=3D netduino2.o
-+obj-$(CONFIG_NETDUINOPLUS2) +=3D netduinoplus2.o
- obj-$(CONFIG_NSERIES) +=3D nseries.o
- obj-$(CONFIG_OMAP) +=3D omap_sx1.o palm.o
- obj-$(CONFIG_PXA2XX) +=3D gumstix.o spitz.o tosa.o z2.o
-diff --git a/hw/arm/netduinoplus2.c b/hw/arm/netduinoplus2.c
-new file mode 100644
-index 0000000000..1f585cf09f
---- /dev/null
-+++ b/hw/arm/netduinoplus2.c
-@@ -0,0 +1,77 @@
-+/*
-+ * Netduino Plus 2 Machine Model
-+ *
-+ * Copyright (c) 2014 Alistair Francis <alistair@alistair23.me>
-+ *
-+ * Permission is hereby granted, free of charge, to any person obtaining a=
- copy
-+ * of this software and associated documentation files (the "Software"), t=
-o deal
-+ * in the Software without restriction, including without limitation the r=
-ights
-+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or se=
-ll
-+ * copies of the Software, and to permit persons to whom the Software is
-+ * furnished to do so, subject to the following conditions:
-+ *
-+ * The above copyright notice and this permission notice shall be included=
- in
-+ * all copies or substantial portions of the Software.
-+ *
-+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS=
- OR
-+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY=
-,
-+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
-+ * THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OT=
-HER
-+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING=
- FROM,
-+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS =
-IN
-+ * THE SOFTWARE.
-+ */
-+
-+#include "qemu/osdep.h"
-+#include "qapi/error.h"
-+#include "hw/boards.h"
-+#include "qemu/error-report.h"
-+#include "hw/arm/stm32f405_soc.h"
-+#include "hw/arm/arm.h"
-+
-+typedef struct ARMV7MResetArgs {
-+    ARMCPU *cpu;
-+    uint32_t reset_sp;
-+    uint32_t reset_pc;
-+} ARMV7MResetArgs;
-+
-+static void armv7m_reset(void *opaque)
-+{
-+    ARMV7MResetArgs *args =3D opaque;
-+
-+    cpu_reset(CPU(args->cpu));
-+
-+    args->cpu->env.regs[13] =3D args->reset_sp & 0xFFFFFFFC;
-+    args->cpu->env.thumb =3D args->reset_pc & 1;
-+    args->cpu->env.regs[15] =3D args->reset_pc & ~1;
-+}
-+
-+static void netduinoplus2_init(MachineState *machine)
-+{
-+    DeviceState *dev;
-+    ARMV7MResetArgs reset_args;
-+    uint64_t entry;
-+
-+    dev =3D qdev_create(NULL, TYPE_STM32F405_SOC);
-+    qdev_prop_set_string(dev, "cpu-type", ARM_CPU_TYPE_NAME("cortex-m4"));
-+    object_property_set_bool(OBJECT(dev), true, "realized", &error_fatal);
-+
-+    armv7m_load_kernel(ARM_CPU(first_cpu), machine->kernel_filename,
-+                       FLASH_SIZE, &entry);
-+
-+    reset_args =3D (ARMV7MResetArgs) {
-+        .cpu =3D ARM_CPU(first_cpu),
-+        .reset_pc =3D entry,
-+        .reset_sp =3D (SRAM_BASE_ADDRESS + (SRAM_SIZE * 2) / 3),
-+    };
-+    qemu_register_reset(armv7m_reset,
-+                        g_memdup(&reset_args, sizeof(reset_args)));
-+}
-+
-+static void netduinoplus2_machine_init(MachineClass *mc)
-+{
-+    mc->desc =3D "Netduino Plus 2 Machine";
-+    mc->init =3D netduinoplus2_init;
-+}
-+
-+DEFINE_MACHINE("netduinoplus2", netduinoplus2_machine_init)
---=20
-2.21.0
+Qemu version:
+QEMU emulator version 4.0.50 (v4.0.0-142-ge0fb2c3d89)
+Copyright (c) 2003-2019 Fabrice Bellard and the QEMU Project developers
+
+dtc version:
+Version: DTC 1.5.0-g5c3513f6
+
+-------------------------------------------------------------------------
+pnv_dt_serial has a line which is supposed to set the interrupt-parent of t=
+he "isa-serial@i3f8" node to the phandle of "lpc@0".
+
+To that end, it calls fdt_get_phandle as shown below:
+_FDT((fdt_setprop_cell(fdt, node, "interrupt-parent", fdt_get_phandle(fdt, =
+lpc_off))));
+
+The function fdt_get_phandle fails to find the property "phandle" (or
+"linux,phandle") for the lpc node. Consequently, pnv_dt_serial sets the
+interrupt-parent to 0.
+
+Now boot the qemu-system-ppc64 powernv machine, and extract the fdt by
+using the qemu monitor's pmemsave command, taking help of the OPAL
+firmware's messages to locate the fdt in the physical ram.
+
+qemu-system-ppc64 -m 1g -machine powernv,num-chips=3D1 \
+-cpu power9 -smp 2,cores=3D2,threads=3D1 -accel tcg,thread=3Dmulti \
+-kernel ./vmlinux \
+-append 'disable_radix' \
+-serial mon:stdio -nographic -nodefaults
+
+The kernel vmlinux contains nothing but a single instruction which loops
+infintely, so that we can gather OPAL's messages, especially the one
+below:
+
+[    0.168845963,5] INIT: Starting kernel at 0x20000000, fdt at
+0x304b0b70 14404 bytes
+
+Once the fdt is dumped to a file, run the following:
+
+'dtc -O dtb -I dts -o out.dts dtb'
+
+After a few warnings, the dtc application crashes because an assertion
+was fired.
+
+out.dts: Warning (unit_address_vs_reg): /lpcm-opb@6030000000000/lpc@0: node=
+ has a unit name, but no reg property
+out.dts: Warning (simple_bus_reg): /lpcm-opb@6030000000000/lpc@0: missing o=
+r empty reg/ranges property
+out.dts: Warning (avoid_unnecessary_addr_size): /ibm,opal: unnecessary #add=
+ress-cells/#size-cells without "ranges" or child "reg" property
+out.dts: Warning (unique_unit_address): /interrupt-controller@0: duplicate =
+unit-address (also used in node /memory@0)
+out.dts: Warning (chosen_node_stdout_path): /chosen:linux,stdout-path: Use =
+'stdout-path' instead
+dtc: livetree.c:575: get_node_by_phandle: Assertion `generate_fixups' faile=
+d.
+Aborted (core dumped)
+
+The assertion is fired because get_node_by_phandle receives a phandle
+value of 0, which is unexpected, unless fixups are needed (They are not,
+when running the dtc command).
+
+Back inside pnv_dt_serial, if the line that sets "interrupt-parent" for
+the serial device node is commented out, the dtc crash is prevented.
+Looking at hw/ppc/e500.c, it takes care of allocating necessary phandle
+values in the nodes, so a similar method can be adopted for powernv.
+
+The dtb is attached.
+
+Edit: Add version, Correct filenames.
+
+** Affects: qemu
+     Importance: Undecided
+         Status: New
+
+-- =
+
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1826827
+
+Title:
+  dtc crash; pnv_dt_serial cannot find lpc's phandle
+
+Status in QEMU:
+  New
+
+Bug description:
+  Qemu version:
+  QEMU emulator version 4.0.50 (v4.0.0-142-ge0fb2c3d89)
+  Copyright (c) 2003-2019 Fabrice Bellard and the QEMU Project developers
+
+  dtc version:
+  Version: DTC 1.5.0-g5c3513f6
+
+  -------------------------------------------------------------------------
+  pnv_dt_serial has a line which is supposed to set the interrupt-parent of=
+ the "isa-serial@i3f8" node to the phandle of "lpc@0".
+
+  To that end, it calls fdt_get_phandle as shown below:
+  _FDT((fdt_setprop_cell(fdt, node, "interrupt-parent", fdt_get_phandle(fdt=
+, lpc_off))));
+
+  The function fdt_get_phandle fails to find the property "phandle" (or
+  "linux,phandle") for the lpc node. Consequently, pnv_dt_serial sets
+  the interrupt-parent to 0.
+
+  Now boot the qemu-system-ppc64 powernv machine, and extract the fdt by
+  using the qemu monitor's pmemsave command, taking help of the OPAL
+  firmware's messages to locate the fdt in the physical ram.
+
+  qemu-system-ppc64 -m 1g -machine powernv,num-chips=3D1 \
+  -cpu power9 -smp 2,cores=3D2,threads=3D1 -accel tcg,thread=3Dmulti \
+  -kernel ./vmlinux \
+  -append 'disable_radix' \
+  -serial mon:stdio -nographic -nodefaults
+
+  The kernel vmlinux contains nothing but a single instruction which
+  loops infintely, so that we can gather OPAL's messages, especially the
+  one below:
+
+  [    0.168845963,5] INIT: Starting kernel at 0x20000000, fdt at
+  0x304b0b70 14404 bytes
+
+  Once the fdt is dumped to a file, run the following:
+
+  'dtc -O dtb -I dts -o out.dts dtb'
+
+  After a few warnings, the dtc application crashes because an assertion
+  was fired.
+
+  out.dts: Warning (unit_address_vs_reg): /lpcm-opb@6030000000000/lpc@0: no=
+de has a unit name, but no reg property
+  out.dts: Warning (simple_bus_reg): /lpcm-opb@6030000000000/lpc@0: missing=
+ or empty reg/ranges property
+  out.dts: Warning (avoid_unnecessary_addr_size): /ibm,opal: unnecessary #a=
+ddress-cells/#size-cells without "ranges" or child "reg" property
+  out.dts: Warning (unique_unit_address): /interrupt-controller@0: duplicat=
+e unit-address (also used in node /memory@0)
+  out.dts: Warning (chosen_node_stdout_path): /chosen:linux,stdout-path: Us=
+e 'stdout-path' instead
+  dtc: livetree.c:575: get_node_by_phandle: Assertion `generate_fixups' fai=
+led.
+  Aborted (core dumped)
+
+  The assertion is fired because get_node_by_phandle receives a phandle
+  value of 0, which is unexpected, unless fixups are needed (They are
+  not, when running the dtc command).
+
+  Back inside pnv_dt_serial, if the line that sets "interrupt-parent"
+  for the serial device node is commented out, the dtc crash is
+  prevented. Looking at hw/ppc/e500.c, it takes care of allocating
+  necessary phandle values in the nodes, so a similar method can be
+  adopted for powernv.
+
+  The dtb is attached.
+
+  Edit: Add version, Correct filenames.
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1826827/+subscriptions
