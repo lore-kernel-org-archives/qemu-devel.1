@@ -7,83 +7,83 @@ X-Spam-Status: No, score=-8.7 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AB2EDC43219
-	for <qemu-devel@archiver.kernel.org>; Mon, 29 Apr 2019 17:28:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0EBECC43219
+	for <qemu-devel@archiver.kernel.org>; Mon, 29 Apr 2019 17:30:13 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 744112075E
-	for <qemu-devel@archiver.kernel.org>; Mon, 29 Apr 2019 17:28:43 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id C149E2075E
+	for <qemu-devel@archiver.kernel.org>; Mon, 29 Apr 2019 17:30:12 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="kG1MXo4S"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 744112075E
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="Uk2e4CRZ"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C149E2075E
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:60987 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:32774 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hLA54-0003DP-O6
-	for qemu-devel@archiver.kernel.org; Mon, 29 Apr 2019 13:28:42 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:34429)
+	id 1hLA6V-0004nN-U8
+	for qemu-devel@archiver.kernel.org; Mon, 29 Apr 2019 13:30:11 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:34569)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1hL9et-0004uX-AG
-	for qemu-devel@nongnu.org; Mon, 29 Apr 2019 13:01:40 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1hL9f0-00051k-8R
+	for qemu-devel@nongnu.org; Mon, 29 Apr 2019 13:01:47 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1hL9er-0006mr-OU
-	for qemu-devel@nongnu.org; Mon, 29 Apr 2019 13:01:39 -0400
-Received: from mail-wr1-x42e.google.com ([2a00:1450:4864:20::42e]:40485)
+	(envelope-from <peter.maydell@linaro.org>) id 1hL9ev-0006pZ-CF
+	for qemu-devel@nongnu.org; Mon, 29 Apr 2019 13:01:43 -0400
+Received: from mail-wm1-x32d.google.com ([2a00:1450:4864:20::32d]:37627)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1hL9eq-0006fx-6N
-	for qemu-devel@nongnu.org; Mon, 29 Apr 2019 13:01:36 -0400
-Received: by mail-wr1-x42e.google.com with SMTP id h4so17116702wre.7
-	for <qemu-devel@nongnu.org>; Mon, 29 Apr 2019 10:01:26 -0700 (PDT)
+	id 1hL9et-0006V7-PH
+	for qemu-devel@nongnu.org; Mon, 29 Apr 2019 13:01:40 -0400
+Received: by mail-wm1-x32d.google.com with SMTP id y5so180516wma.2
+	for <qemu-devel@nongnu.org>; Mon, 29 Apr 2019 10:01:02 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
 	h=from:to:subject:date:message-id:in-reply-to:references:mime-version
 	:content-transfer-encoding;
-	bh=dtay1t/8F0wroE/4gRl+DMjWaRAg1S7IMqSKkwsLaCo=;
-	b=kG1MXo4S3I1ItrI3uyPt/Hj6W21N7HbTD9J7HHhFeC0tBAcCvNsImuMAmnETWXcwfQ
-	oCmjxudfPApUFH1g3pv5o2PfaWJKwQJZIn8UXg2eckn+aLFWgNqUc3jmIwB3vs1REqWI
-	gcPykMS2Vw9HoGbdSY/QSWthnl2d7IirC3riEeuvcpAYJ/HI3bmXym4c8CQLxfc7gp/P
-	6i/gI34DAElDG/P2n0zXoZOebsZPCPCLhsIVParDdqHrvuXvswxhdZVwLqeaiQQEU7pA
-	cyYZxEnJLhsqhs21gxTeoDCdcsJyn+EG5j4gzwVhpJHpDiPhix0qMJ+Fu0GtiYNPfCCl
-	G6Pg==
+	bh=vtBrTkFqiiSUWIPlpjuEnbusTdYc8K9uQ2c0Vb5XVQ8=;
+	b=Uk2e4CRZPxAmSSrRaATC4bj6htBawTpqAtVcIXO0RmmcWD801AWkhUB6Jk5O4x7BzF
+	NMQ1MyJAiU/R5OmK6sOWUEG0+JZnHx5YGmNb9OXUREzKiGjJdiP/emcNHBenk/TJGC5U
+	+U0xWtJSyWgfMTlRltGK242Qya2MDhZUO29vgpVyrKBgvngFPK+ee+ca3og7SkV24vi/
+	vQtVcpFcUGY4ktwArg0o2SgHNugWl8kR4zE+JWhEku/bMIt44buA5V8Xy6JYOFZvkOQD
+	QLMnFetkrXKYnVOWMm6VuCVz0LITYrdNc/qrWPTCZLhGxoGR+t6chTeVqFRs/HsaCIqy
+	1WjQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
 	d=1e100.net; s=20161025;
 	h=x-gm-message-state:from:to:subject:date:message-id:in-reply-to
 	:references:mime-version:content-transfer-encoding;
-	bh=dtay1t/8F0wroE/4gRl+DMjWaRAg1S7IMqSKkwsLaCo=;
-	b=Vfw8EjJxT13n09CTHnA3F+vSUR5SDmac1TsoyjeGAeAVwxn8e1o58m0RY6Rhsx/AfY
-	kXEIGv21IE/BL4y27uaAnxNLPJGCoOVSD/6yPpV4CkKWBmDHm66DTcrvzqc+splrPBNf
-	NxLvj9RIpNF8ad9TWpWejXEVUnwSHToTtKJkWZhd2IAfARrTA4xcj6C+mkoRWWuQYT8b
-	z8eTEg8l2SxjJy5P3WyI78jGAj78ZUMAjgdo+rWR5MDxb2Bba7yZaTr4Cp2wFGl1UpHx
-	j4PrHZLkuLfb9+Rqb1lIgf/x1lLRLEQgj8CBKIWYUf0j2DIZAOyZ+oOlSWVag8+rk3Pf
-	DI8Q==
-X-Gm-Message-State: APjAAAUloQhlhsrsameaoBQQFvNvJRfVKYBkiLu4ZICf5RCO+DByoCe7
-	4Wh0+DoyDrEUAxKpNyJJC8y5xS0/iw4=
-X-Google-Smtp-Source: APXvYqxL0dUPCywfeqB1pvGKiX0JjqbiYDcPGNmoDgbMFGWFIKSkGYPAjRWiwl6VEKXMhQzeGNrq+g==
-X-Received: by 2002:adf:f14e:: with SMTP id y14mr25310800wro.276.1556557285145;
-	Mon, 29 Apr 2019 10:01:25 -0700 (PDT)
+	bh=vtBrTkFqiiSUWIPlpjuEnbusTdYc8K9uQ2c0Vb5XVQ8=;
+	b=lVq5NzSQfzVmGmC3fcPOslfUygbsXjGGpaOJtg2ypU0uU06oqXu93omdcnsFknxTuA
+	Bqy8q/rDr5K/IAq7F6NveC6D+t6Ylpc9IZfatOghMIaamgnVR9upAjiAqQ6EXdz59pbr
+	FsNeWHEhVPKM9RYwh86R2JswMpiN9fmN1Dasu81UmYy5tr2dYrhZbuBhSfIwq5TEBa4D
+	2IyooY/b5C0xpZ4avCEHVg5AHkkRJ4qEghPBZotIlhc9yYSld/0JMpMINw4Eg6KUjg5q
+	NW+qImlvBx4fYrx13F+2/Ywrm0+Y5BziWVDHbgevaQZEBepZY6WGHblDFZcn2nMh2qfG
+	/MOQ==
+X-Gm-Message-State: APjAAAVqdSoHT/TDpWk3NxV6A/cdFsWkxfCIEdyFslTeOZK5EXmBpft4
+	cMqvCCIsIjty6Pkkiw+xxl4FmAmDYSU=
+X-Google-Smtp-Source: APXvYqzN7kdeCZN21w2pHZ8e0/pf907Js9EG7r59Nz6GUIXDsBFKGlk64k7miJx65164Zt9ii4u/2A==
+X-Received: by 2002:a05:600c:204f:: with SMTP id
+	p15mr42988wmg.150.1556557261716; 
+	Mon, 29 Apr 2019 10:01:01 -0700 (PDT)
 Received: from orth.archaic.org.uk (orth.archaic.org.uk. [81.2.115.148])
-	by smtp.gmail.com with ESMTPSA id a13sm36896wmj.39.2019.04.29.10.01.23
+	by smtp.gmail.com with ESMTPSA id a13sm36896wmj.39.2019.04.29.10.01.00
 	for <qemu-devel@nongnu.org>
 	(version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-	Mon, 29 Apr 2019 10:01:24 -0700 (PDT)
+	Mon, 29 Apr 2019 10:01:00 -0700 (PDT)
 From: Peter Maydell <peter.maydell@linaro.org>
 To: qemu-devel@nongnu.org
-Date: Mon, 29 Apr 2019 18:00:29 +0100
-Message-Id: <20190429170030.11323-42-peter.maydell@linaro.org>
+Date: Mon, 29 Apr 2019 18:00:11 +0100
+Message-Id: <20190429170030.11323-24-peter.maydell@linaro.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20190429170030.11323-1-peter.maydell@linaro.org>
 References: <20190429170030.11323-1-peter.maydell@linaro.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
 	recognized.
-X-Received-From: 2a00:1450:4864:20::42e
-Subject: [Qemu-devel] [PULL 41/42] hw/net/lan9118: Export TYPE_LAN9118 and
- use it instead of hardcoded string
+X-Received-From: 2a00:1450:4864:20::32d
+Subject: [Qemu-devel] [PULL 23/42] target/arm: New helper function
+ arm_v7m_mmu_idx_all()
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -98,88 +98,82 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190429170029.7_Mn30_FAefTYKRFdhYdCJLjRCRON-2_byS2G8_cEYU@z>
+Content-Type: text/plain; charset="UTF-8"
+Message-ID: <20190429170011.pQlRSXolNDr9pQmX4jegA7u7lRo-LwShXknsEl0L_vI@z>
 
-From: Philippe Mathieu-Daudé <philmd@redhat.com>
+Add a new helper function which returns the MMU index to use
+for v7M, where the caller specifies all of the security
+state, privilege level and whether the execution priority
+is negative, and reimplement the existing
+arm_v7m_mmu_idx_for_secstate_and_priv() in terms of it.
 
-Reviewed-by: Markus Armbruster <armbru@redhat.com>
-Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
-Message-id: 20190412165416.7977-12-philmd@redhat.com
+We are going to need this for the lazy-FP-stacking code.
+
 Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+Message-id: 20190416125744.27770-21-peter.maydell@linaro.org
 ---
- include/hw/net/lan9118.h | 2 ++
- hw/arm/exynos4_boards.c  | 3 ++-
- hw/arm/mps2-tz.c         | 3 ++-
- hw/net/lan9118.c         | 1 -
- 4 files changed, 6 insertions(+), 3 deletions(-)
+ target/arm/cpu.h    |  7 +++++++
+ target/arm/helper.c | 14 +++++++++++---
+ 2 files changed, 18 insertions(+), 3 deletions(-)
 
-diff --git a/include/hw/net/lan9118.h b/include/hw/net/lan9118.h
-index d13d8cd3d22..500acb4c143 100644
---- a/include/hw/net/lan9118.h
-+++ b/include/hw/net/lan9118.h
-@@ -14,6 +14,8 @@
- #include "hw/irq.h"
- #include "net/net.h"
- 
-+#define TYPE_LAN9118 "lan9118"
-+
- void lan9118_init(NICInfo *, uint32_t, qemu_irq);
- 
- #endif
-diff --git a/hw/arm/exynos4_boards.c b/hw/arm/exynos4_boards.c
-index 750162cc95a..ea8100f65a8 100644
---- a/hw/arm/exynos4_boards.c
-+++ b/hw/arm/exynos4_boards.c
-@@ -32,6 +32,7 @@
- #include "hw/arm/arm.h"
- #include "exec/address-spaces.h"
- #include "hw/arm/exynos4210.h"
-+#include "hw/net/lan9118.h"
- #include "hw/boards.h"
- 
- #undef DEBUG
-@@ -92,7 +93,7 @@ static void lan9215_init(uint32_t base, qemu_irq irq)
-     /* This should be a 9215 but the 9118 is close enough */
-     if (nd_table[0].used) {
-         qemu_check_nic_model(&nd_table[0], "lan9118");
--        dev = qdev_create(NULL, "lan9118");
-+        dev = qdev_create(NULL, TYPE_LAN9118);
-         qdev_set_nic_properties(dev, &nd_table[0]);
-         qdev_prop_set_uint32(dev, "mode_16bit", 1);
-         qdev_init_nofail(dev);
-diff --git a/hw/arm/mps2-tz.c b/hw/arm/mps2-tz.c
-index f79f090a4ac..7832408bb70 100644
---- a/hw/arm/mps2-tz.c
-+++ b/hw/arm/mps2-tz.c
-@@ -56,6 +56,7 @@
- #include "hw/arm/armsse.h"
- #include "hw/dma/pl080.h"
- #include "hw/ssi/pl022.h"
-+#include "hw/net/lan9118.h"
- #include "net/net.h"
- #include "hw/core/split-irq.h"
- 
-@@ -244,7 +245,7 @@ static MemoryRegion *make_eth_dev(MPS2TZMachineState *mms, void *opaque,
-      * except that it doesn't support the checksum-offload feature.
-      */
-     qemu_check_nic_model(nd, "lan9118");
--    mms->lan9118 = qdev_create(NULL, "lan9118");
-+    mms->lan9118 = qdev_create(NULL, TYPE_LAN9118);
-     qdev_set_nic_properties(mms->lan9118, nd);
-     qdev_init_nofail(mms->lan9118);
- 
-diff --git a/hw/net/lan9118.c b/hw/net/lan9118.c
-index a428b16eda5..b29e3fee49f 100644
---- a/hw/net/lan9118.c
-+++ b/hw/net/lan9118.c
-@@ -175,7 +175,6 @@ static const VMStateDescription vmstate_lan9118_packet = {
+diff --git a/target/arm/cpu.h b/target/arm/cpu.h
+index d4996a4d204..920cf367020 100644
+--- a/target/arm/cpu.h
++++ b/target/arm/cpu.h
+@@ -2911,6 +2911,13 @@ static inline int arm_mmu_idx_to_el(ARMMMUIdx mmu_idx)
      }
- };
+ }
  
--#define TYPE_LAN9118 "lan9118"
- #define LAN9118(obj) OBJECT_CHECK(lan9118_state, (obj), TYPE_LAN9118)
++/*
++ * Return the MMU index for a v7M CPU with all relevant information
++ * manually specified.
++ */
++ARMMMUIdx arm_v7m_mmu_idx_all(CPUARMState *env,
++                              bool secstate, bool priv, bool negpri);
++
+ /* Return the MMU index for a v7M CPU in the specified security and
+  * privilege state.
+  */
+diff --git a/target/arm/helper.c b/target/arm/helper.c
+index 84e3790a9de..1ed5f1a2513 100644
+--- a/target/arm/helper.c
++++ b/target/arm/helper.c
+@@ -13230,8 +13230,8 @@ int fp_exception_el(CPUARMState *env, int cur_el)
+     return 0;
+ }
  
- typedef struct {
+-ARMMMUIdx arm_v7m_mmu_idx_for_secstate_and_priv(CPUARMState *env,
+-                                                bool secstate, bool priv)
++ARMMMUIdx arm_v7m_mmu_idx_all(CPUARMState *env,
++                              bool secstate, bool priv, bool negpri)
+ {
+     ARMMMUIdx mmu_idx = ARM_MMU_IDX_M;
+ 
+@@ -13239,7 +13239,7 @@ ARMMMUIdx arm_v7m_mmu_idx_for_secstate_and_priv(CPUARMState *env,
+         mmu_idx |= ARM_MMU_IDX_M_PRIV;
+     }
+ 
+-    if (armv7m_nvic_neg_prio_requested(env->nvic, secstate)) {
++    if (negpri) {
+         mmu_idx |= ARM_MMU_IDX_M_NEGPRI;
+     }
+ 
+@@ -13250,6 +13250,14 @@ ARMMMUIdx arm_v7m_mmu_idx_for_secstate_and_priv(CPUARMState *env,
+     return mmu_idx;
+ }
+ 
++ARMMMUIdx arm_v7m_mmu_idx_for_secstate_and_priv(CPUARMState *env,
++                                                bool secstate, bool priv)
++{
++    bool negpri = armv7m_nvic_neg_prio_requested(env->nvic, secstate);
++
++    return arm_v7m_mmu_idx_all(env, secstate, priv, negpri);
++}
++
+ /* Return the MMU index for a v7M CPU in the specified security state */
+ ARMMMUIdx arm_v7m_mmu_idx_for_secstate(CPUARMState *env, bool secstate)
+ {
 -- 
 2.20.1
 
