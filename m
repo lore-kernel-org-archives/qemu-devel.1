@@ -2,79 +2,64 @@ Return-Path: <SRS0=sEuR=S7=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.4 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,USER_AGENT_MUTT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5B977C43219
-	for <qemu-devel@archiver.kernel.org>; Mon, 29 Apr 2019 11:18:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 77145C43219
+	for <qemu-devel@archiver.kernel.org>; Mon, 29 Apr 2019 11:22:47 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2B8662087B
-	for <qemu-devel@archiver.kernel.org>; Mon, 29 Apr 2019 11:18:12 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2B8662087B
+	by mail.kernel.org (Postfix) with ESMTPS id 0A60B2084B
+	for <qemu-devel@archiver.kernel.org>; Mon, 29 Apr 2019 11:22:46 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0A60B2084B
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:55906 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:55949 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hL4IU-0006oq-Ur
-	for qemu-devel@archiver.kernel.org; Mon, 29 Apr 2019 07:18:10 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:60332)
+	id 1hL4Mw-00087J-2U
+	for qemu-devel@archiver.kernel.org; Mon, 29 Apr 2019 07:22:46 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:60989)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1hL4HP-0006Im-Ec
-	for qemu-devel@nongnu.org; Mon, 29 Apr 2019 07:17:04 -0400
+	(envelope-from <kwolf@redhat.com>) id 1hL4Lz-0007bi-FX
+	for qemu-devel@nongnu.org; Mon, 29 Apr 2019 07:21:48 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1hL4HO-0005Rn-Gj
-	for qemu-devel@nongnu.org; Mon, 29 Apr 2019 07:17:03 -0400
-Received: from mail-wr1-f68.google.com ([209.85.221.68]:33437)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1hL4HO-0005Pr-Av
-	for qemu-devel@nongnu.org; Mon, 29 Apr 2019 07:17:02 -0400
-Received: by mail-wr1-f68.google.com with SMTP id s18so15498015wrp.0
-	for <qemu-devel@nongnu.org>; Mon, 29 Apr 2019 04:17:00 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=1e100.net; s=20161025;
-	h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
-	:date:user-agent:mime-version:in-reply-to:content-language
-	:content-transfer-encoding;
-	bh=EZ/ZPjDElQp3m4rft9gqMh4FXrIs9TtJim2N6VsVzXc=;
-	b=p7GysH66k+ag3G7U6gXuft1kSsdIt9GTZk/YKrmTjKOpZT9xAewYHHdkaQDShjhREa
-	WdftAwKqQwtvEDTfaF9KmGFPO82yptWsazkQiwsKLYJxcPyEbung/avZoZ1SfO9gaCvw
-	1SqoVJuhRt4frVMOoSD0W0Ed6GMuSrugsvu9wRANF/bWucA7hDKZo+yrr/bjsavDy/8V
-	+xNMkF84CfxRtoDJNmAz4zL8c7RIvSxML+MMQOR1+pl4YuYuWp7CUZoOo7Lb2rGi4xne
-	U1y82RMaS4RIVyRAW5dFciE1mdGjeghk1eXyr+mKEqGm7xPB/P32A59KKWVt/vZtvmEL
-	lrFA==
-X-Gm-Message-State: APjAAAX22CZN0YySLkOjAfM1nonnSxn4/JP8fh7TPzPTwLUdldCifQsj
-	KLygO0h13Y80bgGtDlxuudIXVzfSo3U=
-X-Google-Smtp-Source: APXvYqzsvA5vREVnsZQBuiZfNqmCDCrnhy7Q0eDVTs+6jEYxjlH8vq3kmfbFZeqwa4D4il82ebshAg==
-X-Received: by 2002:a5d:4fc1:: with SMTP id h1mr12538868wrw.303.1556536619628; 
-	Mon, 29 Apr 2019 04:16:59 -0700 (PDT)
-Received: from [192.168.1.37] (193.red-88-21-103.staticip.rima-tde.net.
-	[88.21.103.193]) by smtp.gmail.com with ESMTPSA id
-	e10sm18926098wra.52.2019.04.29.04.16.58
-	(version=TLS1_3 cipher=AEAD-AES128-GCM-SHA256 bits=128/128);
-	Mon, 29 Apr 2019 04:16:58 -0700 (PDT)
-To: "Longpeng(Mike)" <longpeng2@huawei.com>, kraxel@redhat.com
-References: <1556523569-44480-1-git-send-email-longpeng2@huawei.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Openpgp: id=89C1E78F601EE86C867495CBA2A3FD6EDEADC0DE;
-	url=http://pgp.mit.edu/pks/lookup?op=get&search=0xA2A3FD6EDEADC0DE
-Message-ID: <7e19e93d-9ad4-51a8-3c1e-ed4d1672a47f@redhat.com>
-Date: Mon, 29 Apr 2019 13:16:57 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
-	Thunderbird/60.6.1
+	(envelope-from <kwolf@redhat.com>) id 1hL4Ly-0008HU-Ii
+	for qemu-devel@nongnu.org; Mon, 29 Apr 2019 07:21:47 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:53304)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <kwolf@redhat.com>)
+	id 1hL4Lw-0008FX-C8; Mon, 29 Apr 2019 07:21:44 -0400
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+	[10.5.11.16])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 779C4821D9;
+	Mon, 29 Apr 2019 11:21:43 +0000 (UTC)
+Received: from localhost.localdomain (ovpn-116-63.ams2.redhat.com
+	[10.36.116.63])
+	by smtp.corp.redhat.com (Postfix) with ESMTPS id 6CDC46928F;
+	Mon, 29 Apr 2019 11:21:42 +0000 (UTC)
+Date: Mon, 29 Apr 2019 13:21:40 +0200
+From: Kevin Wolf <kwolf@redhat.com>
+To: qemu-block@nongnu.org
+Message-ID: <20190429112140.GF8492@localhost.localdomain>
+References: <20190429105741.31033-1-kwolf@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <1556523569-44480-1-git-send-email-longpeng2@huawei.com>
 Content-Type: text/plain; charset="UTF-8"
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
+In-Reply-To: <20190429105741.31033-1-kwolf@redhat.com>
+User-Agent: Mutt/1.11.3 (2019-02-01)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+	(mx1.redhat.com [10.5.110.28]);
+	Mon, 29 Apr 2019 11:21:43 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-	[fuzzy]
-X-Received-From: 209.85.221.68
-Subject: Re: [Qemu-devel] [PATCH] usb/xchi: avoid trigger assertion if guest
- write wrong epid
+X-Received-From: 209.132.183.28
+Subject: Re: [Qemu-devel] [PATCH] qcow2: Fix qcow2_make_empty() with
+ external data file
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -86,105 +71,55 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Gonglei <arei.gonglei@huawei.com>, qemu-devel@nongnu.org
+Cc: qemu-devel@nongnu.org, qemu-stable@nongnu.org, mreitz@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190429111657.Lv7uJSNd4OJD77Yp6exalvnNX4CEclZlbprdgDtHwCQ@z>
+Message-ID: <20190429112140.Jh6fbeg3ne9OtkYLChjInYcu1_rxBuQ-52rb8zo6FaM@z>
 
-Hi Mike,
-
-On 4/29/19 9:39 AM, Longpeng(Mike) wrote:
-> From: Longpeng <longpeng2@huawei.com>
+Am 29.04.2019 um 12:57 hat Kevin Wolf geschrieben:
+> make_completely_empty() is an optimisated path for bdrv_make_empty()
+> where completely new metadata is created inside the image file instead
+> of going through all clusters and discarding them. For an external data
+> file, however, we actually need to do discard operations on the data
+> file; just overwriting the qcow2 file doesn't get rid of the data.
 > 
-> we found the following core in our environment:
-> 0  0x00007fc6b06c2237 in raise ()
-> 1  0x00007fc6b06c3928 in abort ()
-> 2  0x00007fc6b06bb056 in __assert_fail_base ()
-> 3  0x00007fc6b06bb102 in __assert_fail ()
-> 4  0x0000000000702e36 in xhci_kick_ep (...)
-
-  5 xhci_doorbell_write?
-
-> 6  0x000000000047767f in access_with_adjusted_size (...)
-> 7  0x000000000047944d in memory_region_dispatch_write (...)
-> 8  0x000000000042df17 in address_space_write_continue (...)
-> 10 0x000000000043084d in address_space_rw (...)
-> 11 0x000000000047451b in kvm_cpu_exec (cpu=cpu@entry=0x1ab11b0)
-> 12 0x000000000045dcf5 in qemu_kvm_cpu_thread_fn (arg=0x1ab11b0)
-> 13 0x0000000000870631 in qemu_thread_start (args=args@entry=0x1acfb50)
-> 14 0x00000000008959a7 in thread_entry_for_hotfix (pthread_cb=<optimized out>)
-> 15 0x00007fc6b0a60dd5 in start_thread ()
-> 16 0x00007fc6b078a59d in clone ()
-> (gdb) bt
-> (gdb) f 5
-
-This is the frame you removed...
-
-> (gdb) p /x tmp
-> $9 = 0x62481a00 <-- last byte 0x00 is @epid
-
-I don't see 'tmp' in xhci_doorbell_write().
-
-Can you use trace events?
-
-There we have trace_usb_xhci_doorbell_write().
-
+> The necessary slow path with an explicit discard operation already
+> exists for other cases. Use it for external data files, too.
 > 
-> xhci_doorbell_write() already check the upper bound of @slotid an @epid,
-> it also need to check the lower bound.
-> 
-> Cc: Gonglei <arei.gonglei@huawei.com>
-> Signed-off-by: Longpeng <longpeng2@huawei.com>
+> Cc: qemu-stable@nongnu.org
+> Signed-off-by: Kevin Wolf <kwolf@redhat.com>
 > ---
->  hw/usb/hcd-xhci.c | 4 ++--
->  1 file changed, 2 insertions(+), 2 deletions(-)
+>  block/qcow2.c | 3 ++-
+>  1 file changed, 2 insertions(+), 1 deletion(-)
 > 
-> diff --git a/hw/usb/hcd-xhci.c b/hw/usb/hcd-xhci.c
-> index ec28bee..b4e6bfc 100644
-> --- a/hw/usb/hcd-xhci.c
-> +++ b/hw/usb/hcd-xhci.c
-> @@ -3135,9 +3135,9 @@ static void xhci_doorbell_write(void *ptr, hwaddr reg,
+> diff --git a/block/qcow2.c b/block/qcow2.c
+> index 7fbef97aab..097fde56f9 100644
+> --- a/block/qcow2.c
+> +++ b/block/qcow2.c
+> @@ -4384,7 +4384,8 @@ static int qcow2_make_empty(BlockDriverState *bs)
+>  
+>      if (s->qcow_version >= 3 && !s->snapshots && !s->nb_bitmaps &&
+>          3 + l1_clusters <= s->refcount_block_size &&
+> -        s->crypt_method_header != QCOW_CRYPT_LUKS) {
+> +        s->crypt_method_header != QCOW_CRYPT_LUKS &&
+> +        !has_data_file(bs)) {
+>          /* The following function only works for qcow2 v3 images (it
+>           * requires the dirty flag) and only as long as there are no
+>           * features that reserve extra clusters (such as snapshots,
 
-Expanding the diff:
+Oops, I hadn't everything committed yet. I'll add a comment change as
+well:
 
-       if (reg == 0) {
-           if (val == 0) {
-               xhci_process_commands(xhci);
-           } else {
-               DPRINTF("xhci: bad doorbell 0 write: 0x%x\n",
-                       (uint32_t)val);
-           }
->      } else {
->          epid = val & 0xff;
->          streamid = (val >> 16) & 0xffff;
-> -        if (reg > xhci->numslots) {
-> +        if (reg == 0 || reg > xhci->numslots) {
+          * LUKS header, or persistent bitmaps), because it completely
+          * empties the image.  Furthermore, the L1 table and three
+          * additional clusters (image header, refcount table, one
+-         * refcount block) have to fit inside one refcount block. */
++         * refcount block) have to fit inside one refcount block. It
++         * only resets the image file, i.e. does not work with an
++         * external data file. */
+         return make_completely_empty(bs);
+     }
 
-So 'reg' can not be zero here...
-
->              DPRINTF("xhci: bad doorbell %d\n", (int)reg);
-> -        } else if (epid > 31) {
-> +        } else if (epid == 0 || epid > 31) {
-
-Here neither.
-
->              DPRINTF("xhci: bad doorbell %d write: 0x%x\n",
->                      (int)reg, (uint32_t)val);
->          } else {
-> 
-
-Isn't it the other line that triggered the assertion?
-
-static void xhci_kick_ep(XHCIState *xhci, unsigned int slotid,
-                         unsigned int epid, unsigned int streamid)
-{
-    XHCIEPContext *epctx;
-
-    assert(slotid >= 1 && slotid <= xhci->numslots); // <===
-    assert(epid >= 1 && epid <= 31);
-
-Regards,
-
-Phil.
+Kevin
 
