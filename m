@@ -1,26 +1,39 @@
-Received: from eggs.gnu.org ([209.51.188.92]:36174)
+Received: from eggs.gnu.org ([209.51.188.92]:39857)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <longpeng2@huawei.com>) id 1hL4gb-0004R2-1Z
-	for qemu-devel@nongnu.org; Mon, 29 Apr 2019 07:43:06 -0400
+	(envelope-from <borntraeger@de.ibm.com>) id 1hL51X-00015l-VP
+	for qemu-devel@nongnu.org; Mon, 29 Apr 2019 08:04:45 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <longpeng2@huawei.com>) id 1hL4gZ-0007ke-25
-	for qemu-devel@nongnu.org; Mon, 29 Apr 2019 07:43:04 -0400
-Received: from szxga07-in.huawei.com ([45.249.212.35]:36586 helo=huawei.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <longpeng2@huawei.com>)
-	id 1hL4gV-0007cW-Se
-	for qemu-devel@nongnu.org; Mon, 29 Apr 2019 07:43:01 -0400
-Message-ID: <5CC6E333.90108@huawei.com>
-Date: Mon, 29 Apr 2019 19:42:43 +0800
-From: "Longpeng (Mike)" <longpeng2@huawei.com>
+	(envelope-from <borntraeger@de.ibm.com>) id 1hL51V-0006TE-UE
+	for qemu-devel@nongnu.org; Mon, 29 Apr 2019 08:04:43 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:46996)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <borntraeger@de.ibm.com>)
+	id 1hL51T-0006Qu-SH
+	for qemu-devel@nongnu.org; Mon, 29 Apr 2019 08:04:40 -0400
+Received: from pps.filterd (m0098404.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id
+	x3TC4WUV001004
+	for <qemu-devel@nongnu.org>; Mon, 29 Apr 2019 08:04:35 -0400
+Received: from e06smtp01.uk.ibm.com (e06smtp01.uk.ibm.com [195.75.94.97])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2s5wub7nmn-1
+	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Mon, 29 Apr 2019 08:04:34 -0400
+Received: from localhost
+	by e06smtp01.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	Only! Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <borntraeger@de.ibm.com>;
+	Mon, 29 Apr 2019 13:04:22 +0100
+References: <20190424103747.10173-1-thuth@redhat.com>
+From: Christian Borntraeger <borntraeger@de.ibm.com>
+Date: Mon, 29 Apr 2019 14:04:15 +0200
 MIME-Version: 1.0
-References: <1556523569-44480-1-git-send-email-longpeng2@huawei.com>
-	<7e19e93d-9ad4-51a8-3c1e-ed4d1672a47f@redhat.com>
-In-Reply-To: <7e19e93d-9ad4-51a8-3c1e-ed4d1672a47f@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH] usb/xchi: avoid trigger assertion if guest
- write wrong epid
+In-Reply-To: <20190424103747.10173-1-thuth@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Message-Id: <bde669dd-ba2d-cf93-be65-731d294b8a23@de.ibm.com>
+Subject: Re: [Qemu-devel] [PATCH 0/6] tests/qemu-iotests: Run basic iotests
+ during "make check"
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,168 +42,170 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?B?UGhpbGlwcGUgTWF0aGlldS1EYXVkw6k=?= <philmd@redhat.com>
-Cc: kraxel@redhat.com, Gonglei <arei.gonglei@huawei.com>, qemu-devel@nongnu.org
+To: Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org
+Cc: Fam Zheng <fam@euphon.net>, Kevin Wolf <kwolf@redhat.com>, Ed Maste <emaste@freebsd.org>, qemu-block@nongnu.org, =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>, Max Reitz <mreitz@redhat.com>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>, Li-Wen Hsu <lwhsu@freebsd.org>
 
-Hi Philippe,
+On 24.04.19 12:37, Thomas Huth wrote:
+> People often forget to run the iotests before submitting patches or
+> pull requests - this is likely due to the fact that we do not run the
+> tests during our mandatory "make check" tests yet.
+> This patch series now introduces a new "ci" iotests group that should
+> be safe to run in all CI environments (including FreeBSD and macOS!).
+> Thus these iotests can now always be run during "make check" automati-
+> cally, too.
 
-On 2019/4/29 19:16, Philippe Mathieu-Daud=C3=A9 wrote:
+Given that the iotests have been broken heavily immediately after the 4.0
+release (e.g. by a qemu-io change) consider the series
 
-> Hi Mike,
->=20
-> On 4/29/19 9:39 AM, Longpeng(Mike) wrote:
->> From: Longpeng <longpeng2@huawei.com>
->>
->> we found the following core in our environment:
->> 0  0x00007fc6b06c2237 in raise ()
->> 1  0x00007fc6b06c3928 in abort ()
->> 2  0x00007fc6b06bb056 in __assert_fail_base ()
->> 3  0x00007fc6b06bb102 in __assert_fail ()
->> 4  0x0000000000702e36 in xhci_kick_ep (...)
->=20
->   5 xhci_doorbell_write?
->=20
->> 6  0x000000000047767f in access_with_adjusted_size (...)
->> 7  0x000000000047944d in memory_region_dispatch_write (...)
->> 8  0x000000000042df17 in address_space_write_continue (...)
->> 10 0x000000000043084d in address_space_rw (...)
->> 11 0x000000000047451b in kvm_cpu_exec (cpu=3Dcpu@entry=3D0x1ab11b0)
->> 12 0x000000000045dcf5 in qemu_kvm_cpu_thread_fn (arg=3D0x1ab11b0)
->> 13 0x0000000000870631 in qemu_thread_start (args=3Dargs@entry=3D0x1acf=
-b50)
->> 14 0x00000000008959a7 in thread_entry_for_hotfix (pthread_cb=3D<optimi=
-zed out>)
->> 15 0x00007fc6b0a60dd5 in start_thread ()
->> 16 0x00007fc6b078a59d in clone ()
->> (gdb) bt
->> (gdb) f 5
->=20
-> This is the frame you removed...
->=20
->> (gdb) p /x tmp
->> $9 =3D 0x62481a00 <-- last byte 0x00 is @epid
->=20
-> I don't see 'tmp' in xhci_doorbell_write().
->=20
-> Can you use trace events?
->=20
-> There we have trace_usb_xhci_doorbell_write().
->=20
-
-Sorry , I'm careless to remove the important information.
+Acked-by: Christian Borntraeger <borntraeger@de.ibm.com>
 
 
-This is our whole frame:
-
-(gdb) bt
-#0  0x00007fc6b06c2237 in raise () from /usr/lib64/libc.so.6
-#1  0x00007fc6b06c3928 in abort () from /usr/lib64/libc.so.6
-#2  0x00007fc6b06bb056 in __assert_fail_base () from /usr/lib64/libc.so.6
-#3  0x00007fc6b06bb102 in __assert_fail () from /usr/lib64/libc.so.6
-#4  0x0000000000702e36 in xhci_kick_ep (...)
-#5  0x000000000047897a in memory_region_write_accessor (...)
-#6  0x000000000047767f in access_with_adjusted_size (...)
-#7  0x000000000047944d in memory_region_dispatch_write
-(mr=3Dmr@entry=3D0x7fc6a0138df0, addr=3Daddr@entry=3D156, data=3D16488924=
-16,
-size=3Dsize@entry=3D4, attrs=3Dattrs@entry=3D...)
-#8  0x000000000042df17 in address_space_write_continue (...)
-#9  0x00000000004302d5 in address_space_write (...)
-#10 0x000000000043084d in address_space_rw (...)
-#11 0x000000000047451b in kvm_cpu_exec (...)
-#12 0x000000000045dcf5 in qemu_kvm_cpu_thread_fn (arg=3D0x1ab11b0)
-#13 0x0000000000870631 in qemu_thread_start (args=3Dargs@entry=3D0x1acfb5=
-0)
-#14 0x00000000008959a7 in thread_entry_for_hotfix (pthread_cb=3D<optimize=
-d out>)
-#15 0x00007fc6b0a60dd5 in start_thread () from /usr/lib64/libpthread.so.0
-#16 0x00007fc6b078a59d in clone () from /usr/lib64/libc.so.6
-
-(gdb) f 5
-#5  0x000000000047897a in memory_region_write_accessor (...)
-529	    mr->ops->write(mr->opaque, addr, tmp, size);
-(gdb) p /x tmp
-$9 =3D 0x62481a00
-
-
-static void xhci_doorbell_write(void *ptr, hwaddr reg,
-                                uint64_t val, unsigned size)
-So, the @val is 0x62481a00, and the last byte is epid, right?
-
->>
->> xhci_doorbell_write() already check the upper bound of @slotid an @epi=
-d,
->> it also need to check the lower bound.
->>
->> Cc: Gonglei <arei.gonglei@huawei.com>
->> Signed-off-by: Longpeng <longpeng2@huawei.com>
->> ---
->>  hw/usb/hcd-xhci.c | 4 ++--
->>  1 file changed, 2 insertions(+), 2 deletions(-)
->>
->> diff --git a/hw/usb/hcd-xhci.c b/hw/usb/hcd-xhci.c
->> index ec28bee..b4e6bfc 100644
->> --- a/hw/usb/hcd-xhci.c
->> +++ b/hw/usb/hcd-xhci.c
->> @@ -3135,9 +3135,9 @@ static void xhci_doorbell_write(void *ptr, hwadd=
-r reg,
->=20
-> Expanding the diff:
->=20
->        if (reg =3D=3D 0) {
->            if (val =3D=3D 0) {
->                xhci_process_commands(xhci);
->            } else {
->                DPRINTF("xhci: bad doorbell 0 write: 0x%x\n",
->                        (uint32_t)val);
->            }
->>      } else {
->>          epid =3D val & 0xff;
->>          streamid =3D (val >> 16) & 0xffff;
->> -        if (reg > xhci->numslots) {
->> +        if (reg =3D=3D 0 || reg > xhci->numslots) {
->=20
-> So 'reg' can not be zero here...
->=20
-
-Oh, you're right.
-
->>              DPRINTF("xhci: bad doorbell %d\n", (int)reg);
->> -        } else if (epid > 31) {
->> +        } else if (epid =3D=3D 0 || epid > 31) {
->=20
-> Here neither.
->=20
-
-In our frame, the epid is zero. The @val is from guest which is untrusted=
-, when
-this problem happened, I saw it wrote many invalid value, not only usb bu=
-t also
-other devices.
-
->>              DPRINTF("xhci: bad doorbell %d write: 0x%x\n",
->>                      (int)reg, (uint32_t)val);
->>          } else {
->>
->=20
-> Isn't it the other line that triggered the assertion?
->=20
-> static void xhci_kick_ep(XHCIState *xhci, unsigned int slotid,
->                          unsigned int epid, unsigned int streamid)
-> {
->     XHCIEPContext *epctx;
->=20
->     assert(slotid >=3D 1 && slotid <=3D xhci->numslots); // <=3D=3D=3D
->     assert(epid >=3D 1 && epid <=3D 31);
->=20
-> Regards,
->=20
-> Phil.
->=20
->=20
->=20
-
-
---=20
-Regards,
-Longpeng(Mike)
+> 
+> Thomas Huth (6):
+>   tests/qemu-iotests/check: Pick a default machine if necessary
+>   tests/qemu-iotests/group: Introduce a new "ci" group for CI pipelines
+>   tests/qemu-iotests: Do not hard-code the path to bash
+>   cirrus / travis: Add gnu-sed and bash for macOS and FreeBSD
+>   tests: Run the iotests during "make check" again
+>   tests/qemu-iotests: Remove the "_supported_os Linux" line from many
+>     tests
+> 
+>  .cirrus.yml                 |   4 +-
+>  .travis.yml                 |   1 +
+>  tests/Makefile.include      |   2 +-
+>  tests/qemu-iotests-quick.sh |  17 +++-
+>  tests/qemu-iotests/001      |   1 -
+>  tests/qemu-iotests/002      |   1 -
+>  tests/qemu-iotests/003      |   1 -
+>  tests/qemu-iotests/004      |   1 -
+>  tests/qemu-iotests/005      |   1 -
+>  tests/qemu-iotests/007      |   1 -
+>  tests/qemu-iotests/008      |   1 -
+>  tests/qemu-iotests/009      |   1 -
+>  tests/qemu-iotests/010      |   1 -
+>  tests/qemu-iotests/011      |   1 -
+>  tests/qemu-iotests/012      |   1 -
+>  tests/qemu-iotests/013      |   1 -
+>  tests/qemu-iotests/014      |   1 -
+>  tests/qemu-iotests/015      |   1 -
+>  tests/qemu-iotests/017      |   1 -
+>  tests/qemu-iotests/020      |   1 -
+>  tests/qemu-iotests/021      |   1 -
+>  tests/qemu-iotests/022      |   1 -
+>  tests/qemu-iotests/023      |   1 -
+>  tests/qemu-iotests/025      |   1 -
+>  tests/qemu-iotests/026      |   1 -
+>  tests/qemu-iotests/027      |   1 -
+>  tests/qemu-iotests/028      |   1 -
+>  tests/qemu-iotests/029      |   1 -
+>  tests/qemu-iotests/031      |   1 -
+>  tests/qemu-iotests/032      |   1 -
+>  tests/qemu-iotests/033      |   1 -
+>  tests/qemu-iotests/035      |   1 -
+>  tests/qemu-iotests/036      |   1 -
+>  tests/qemu-iotests/037      |   1 -
+>  tests/qemu-iotests/042      |   1 -
+>  tests/qemu-iotests/043      |   1 -
+>  tests/qemu-iotests/046      |   1 -
+>  tests/qemu-iotests/047      |   1 -
+>  tests/qemu-iotests/049      |   1 -
+>  tests/qemu-iotests/050      |   1 -
+>  tests/qemu-iotests/051      |   1 -
+>  tests/qemu-iotests/052      |   1 -
+>  tests/qemu-iotests/053      |   1 -
+>  tests/qemu-iotests/054      |   1 -
+>  tests/qemu-iotests/060      |   1 -
+>  tests/qemu-iotests/061      |   1 -
+>  tests/qemu-iotests/062      |   1 -
+>  tests/qemu-iotests/063      |   1 -
+>  tests/qemu-iotests/066      |   1 -
+>  tests/qemu-iotests/067      |   1 -
+>  tests/qemu-iotests/068      |   1 -
+>  tests/qemu-iotests/069      |   1 -
+>  tests/qemu-iotests/071      |   1 -
+>  tests/qemu-iotests/072      |   1 -
+>  tests/qemu-iotests/073      |   1 -
+>  tests/qemu-iotests/079      |   1 -
+>  tests/qemu-iotests/080      |   1 -
+>  tests/qemu-iotests/082      |   1 -
+>  tests/qemu-iotests/085      |   1 -
+>  tests/qemu-iotests/089      |   1 -
+>  tests/qemu-iotests/090      |   1 -
+>  tests/qemu-iotests/091      |   1 -
+>  tests/qemu-iotests/094      |   1 -
+>  tests/qemu-iotests/095      |   1 -
+>  tests/qemu-iotests/097      |   1 -
+>  tests/qemu-iotests/098      |   1 -
+>  tests/qemu-iotests/102      |   1 -
+>  tests/qemu-iotests/103      |   1 -
+>  tests/qemu-iotests/104      |   1 -
+>  tests/qemu-iotests/105      |   1 -
+>  tests/qemu-iotests/107      |   1 -
+>  tests/qemu-iotests/110      |   1 -
+>  tests/qemu-iotests/111      |   1 -
+>  tests/qemu-iotests/112      |   1 -
+>  tests/qemu-iotests/114      |   1 -
+>  tests/qemu-iotests/115      |   1 -
+>  tests/qemu-iotests/117      |   1 -
+>  tests/qemu-iotests/120      |   1 -
+>  tests/qemu-iotests/121      |   1 -
+>  tests/qemu-iotests/122      |   1 -
+>  tests/qemu-iotests/125      |   1 -
+>  tests/qemu-iotests/126      |   1 -
+>  tests/qemu-iotests/127      |   1 -
+>  tests/qemu-iotests/130      |   1 -
+>  tests/qemu-iotests/133      |   1 -
+>  tests/qemu-iotests/134      |   1 -
+>  tests/qemu-iotests/137      |   1 -
+>  tests/qemu-iotests/138      |   1 -
+>  tests/qemu-iotests/141      |   1 -
+>  tests/qemu-iotests/142      |   1 -
+>  tests/qemu-iotests/143      |   1 -
+>  tests/qemu-iotests/144      |   1 -
+>  tests/qemu-iotests/145      |   1 -
+>  tests/qemu-iotests/153      |   1 -
+>  tests/qemu-iotests/156      |   1 -
+>  tests/qemu-iotests/157      |   1 -
+>  tests/qemu-iotests/158      |   1 -
+>  tests/qemu-iotests/159      |   1 -
+>  tests/qemu-iotests/161      |   1 -
+>  tests/qemu-iotests/162      |   1 -
+>  tests/qemu-iotests/170      |   1 -
+>  tests/qemu-iotests/172      |   1 -
+>  tests/qemu-iotests/173      |   1 -
+>  tests/qemu-iotests/176      |   1 -
+>  tests/qemu-iotests/178      |   1 -
+>  tests/qemu-iotests/181      |   1 -
+>  tests/qemu-iotests/182      |   1 -
+>  tests/qemu-iotests/183      |   1 -
+>  tests/qemu-iotests/185      |   1 -
+>  tests/qemu-iotests/186      |   1 -
+>  tests/qemu-iotests/187      |   1 -
+>  tests/qemu-iotests/189      |   1 -
+>  tests/qemu-iotests/190      |   1 -
+>  tests/qemu-iotests/191      |   1 -
+>  tests/qemu-iotests/192      |   1 -
+>  tests/qemu-iotests/195      |   1 -
+>  tests/qemu-iotests/197      |   1 -
+>  tests/qemu-iotests/198      |   1 -
+>  tests/qemu-iotests/200      |   1 -
+>  tests/qemu-iotests/201      |   1 -
+>  tests/qemu-iotests/214      |   1 -
+>  tests/qemu-iotests/215      |   1 -
+>  tests/qemu-iotests/217      |   1 -
+>  tests/qemu-iotests/220      |   1 -
+>  tests/qemu-iotests/227      |   1 -
+>  tests/qemu-iotests/229      |   1 -
+>  tests/qemu-iotests/231      |   1 -
+>  tests/qemu-iotests/232      |   1 -
+>  tests/qemu-iotests/233      |   1 -
+>  tests/qemu-iotests/239      |   2 +-
+>  tests/qemu-iotests/240      |   3 +-
+>  tests/qemu-iotests/241      |   2 +-
+>  tests/qemu-iotests/243      |   2 +-
+>  tests/qemu-iotests/244      |   2 +-
+>  tests/qemu-iotests/247      |   1 -
+>  tests/qemu-iotests/check    |  13 ++-
+>  tests/qemu-iotests/group    | 194 +++++++++++++++++++-----------------
+>  137 files changed, 139 insertions(+), 229 deletions(-)
+> 
