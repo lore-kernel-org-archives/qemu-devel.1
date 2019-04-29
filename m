@@ -6,63 +6,107 @@ X-Spam-Status: No, score=-6.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 13A06C04AA6
-	for <qemu-devel@archiver.kernel.org>; Mon, 29 Apr 2019 19:14:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C0129C43219
+	for <qemu-devel@archiver.kernel.org>; Mon, 29 Apr 2019 19:25:48 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id DBE7620675
-	for <qemu-devel@archiver.kernel.org>; Mon, 29 Apr 2019 19:14:13 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DBE7620675
+	by mail.kernel.org (Postfix) with ESMTPS id 837F72067D
+	for <qemu-devel@archiver.kernel.org>; Mon, 29 Apr 2019 19:25:48 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 837F72067D
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:34000 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:34153 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hLBjA-0005Kb-9k
-	for qemu-devel@archiver.kernel.org; Mon, 29 Apr 2019 15:14:12 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:33734)
+	id 1hLBuN-0008GV-Iw
+	for qemu-devel@archiver.kernel.org; Mon, 29 Apr 2019 15:25:47 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:35658)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <lvivier@redhat.com>) id 1hLBiL-0004yh-A8
-	for qemu-devel@nongnu.org; Mon, 29 Apr 2019 15:13:22 -0400
+	(envelope-from <david@redhat.com>) id 1hLBtW-0007t8-Gd
+	for qemu-devel@nongnu.org; Mon, 29 Apr 2019 15:24:56 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <lvivier@redhat.com>) id 1hLBiJ-00088O-A2
-	for qemu-devel@nongnu.org; Mon, 29 Apr 2019 15:13:21 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:38849)
+	(envelope-from <david@redhat.com>) id 1hLBtU-0005Nx-K7
+	for qemu-devel@nongnu.org; Mon, 29 Apr 2019 15:24:54 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:38012)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <lvivier@redhat.com>) id 1hLBiI-00087m-7p
-	for qemu-devel@nongnu.org; Mon, 29 Apr 2019 15:13:19 -0400
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
-	[10.5.11.11])
+	(Exim 4.71) (envelope-from <david@redhat.com>)
+	id 1hLBtU-0005N1-Ba; Mon, 29 Apr 2019 15:24:52 -0400
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+	[10.5.11.14])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id A95E35D5EF;
-	Mon, 29 Apr 2019 19:13:15 +0000 (UTC)
-Received: from [10.40.205.1] (unknown [10.40.205.1])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id 5F6EF87CC;
-	Mon, 29 Apr 2019 19:13:10 +0000 (UTC)
-To: =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@gmail.com>
-References: <20190429134757.13570-1-marcandre.lureau@redhat.com>
-	<6f4b8998-341a-9169-b368-db4a6b00b65d@redhat.com>
-	<CAJ+F1C+aXyC8UAaCKU7sD9LTZPDEaYhSufp9auxipxavDj3F+A@mail.gmail.com>
-From: Laurent Vivier <lvivier@redhat.com>
-Message-ID: <b34321fc-2c10-d930-c735-5490e704a101@redhat.com>
-Date: Mon, 29 Apr 2019 21:13:09 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:52.0) Gecko/20100101
-	Thunderbird/52.8.0
+	by mx1.redhat.com (Postfix) with ESMTPS id 821A8307BCB3;
+	Mon, 29 Apr 2019 19:24:51 +0000 (UTC)
+Received: from [10.36.116.41] (ovpn-116-41.ams2.redhat.com [10.36.116.41])
+	by smtp.corp.redhat.com (Postfix) with ESMTP id 6B31F18686;
+	Mon, 29 Apr 2019 19:24:49 +0000 (UTC)
+To: Christian Borntraeger <borntraeger@de.ibm.com>,
+	Cornelia Huck <cohuck@redhat.com>
+References: <20190429090250.7648-1-borntraeger@de.ibm.com>
+	<20190429090250.7648-5-borntraeger@de.ibm.com>
+From: David Hildenbrand <david@redhat.com>
+Openpgp: preference=signencrypt
+Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
+	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
+	SE+xAvmumFBY
+Organization: Red Hat GmbH
+Message-ID: <0ad32bcf-0132-3905-3220-0f50e26937c3@redhat.com>
+Date: Mon, 29 Apr 2019 21:24:48 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+	Thunderbird/60.6.1
 MIME-Version: 1.0
-In-Reply-To: <CAJ+F1C+aXyC8UAaCKU7sD9LTZPDEaYhSufp9auxipxavDj3F+A@mail.gmail.com>
+In-Reply-To: <20190429090250.7648-5-borntraeger@de.ibm.com>
 Content-Type: text/plain; charset="UTF-8"
 Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.39]);
-	Mon, 29 Apr 2019 19:13:15 +0000 (UTC)
+	(mx1.redhat.com [10.5.110.49]);
+	Mon, 29 Apr 2019 19:24:51 +0000 (UTC)
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH] vl: fix -sandbox parsing crash when
- seccomp support is disabled
+Subject: Re: [Qemu-devel] [PATCH v3 4/9] s390x/cpumodel: msa9 facility
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -74,79 +118,298 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Eduardo Otubo <otubo@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
-	QEMU <qemu-devel@nongnu.org>, David Gibson <david@gibson.dropbear.id.au>
+Cc: "Jason J . Herne" <jjherne@linux.ibm.com>,
+	Collin Walling <walling@linux.ibm.com>, qemu-devel <qemu-devel@nongnu.org>,
+	Halil Pasic <pasic@linux.ibm.com>, qemu-s390x <qemu-s390x@nongnu.org>,
+	Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190429191309.hFChDrCzdd5FdYaIzzkwfJNWuIJc0q1p7tESqXuxz5E@z>
+Message-ID: <20190429192448.1ehgzDQtiApg8B-iP50lvVw6NyQDkGBMxN_FCHWTDr8@z>
 
-On 29/04/2019 16:46, Marc-Andr=C3=A9 Lureau wrote:
-> Hi
+On 29.04.19 11:02, Christian Borntraeger wrote:
+> Provide the MSA9 facility (stfle.155).
+> This also contains pckmo functions for key wrapping. Keep them in a
+> separate group to disable those as a block if necessary.
 >=20
-> On Mon, Apr 29, 2019 at 4:26 PM Laurent Vivier <lvivier@redhat.com> wro=
-te:
->>
->> On 29/04/2019 15:47, Marc-Andr=C3=A9 Lureau wrote:
->>> $ ./x86_64-softmmu/qemu-system-x86_64 -sandbox off
->>> qemu-system-x86_64: -sandbox off: There is no option group 'sandbox'
->>> Segmentation fault
->>>
->>> Commit 5780760f5e ("seccomp: check TSYNC host capability") wrapped on=
-e
->>> use of the sandbox option group to produce a sensible error, it didn'=
-t
->>> do the same for another call to qemu_opts_parse_noisily():
->>>
->>> (gdb) bt
->>>     at util/qemu-option.c:829
->>>  #0  0x00000000105b36d8 in opts_parse (list=3D0x0, params=3D0x3ffffff=
-ffab5 "off", permit_abbrev=3Dtrue, defaults=3Dfalse, errp=3D0x3ffffffff08=
-0)
->>>      at util/qemu-option.c:829
->>>  #1  0x00000000105b3b74 in qemu_opts_parse_noisily (list=3D<optimized=
- out>, params=3D<optimized out>, permit_abbrev=3D<optimized out>) at util=
-/qemu-option.c:890
->>>  #2  0x0000000010024964 in main (argc=3D<optimized out>, argv=3D<opti=
-mized out>, envp=3D<optimized out>) at vl.c:3589
->>>
->>> Fixes: 5780760f5ea6163939a5dabe7427318b4f07d1a2
->>> Cc: david@gibson.dropbear.id.au
->>> Cc: otubo@redhat.com
->>> Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
->>> ---
->>>  vl.c | 18 ++++++++++--------
->>>  1 file changed, 10 insertions(+), 8 deletions(-)
->>>
->>> diff --git a/vl.c b/vl.c
->>> index 4019a4387d..5fc4994d3c 100644
->>> --- a/vl.c
->>> +++ b/vl.c
->>> @@ -3866,17 +3866,19 @@ int main(int argc, char **argv, char **envp)
->>>                  qtest_log =3D optarg;
->>>                  break;
->>>              case QEMU_OPTION_sandbox:
->>> -#ifdef CONFIG_SECCOMP
->>> -                opts =3D qemu_opts_parse_noisily(qemu_find_opts("san=
-dbox"),
->>> -                                               optarg, true);
->>> +                olist =3D qemu_find_opts("sandbox");
->>> +                if (!olist) {
->>> +#ifndef CONFIG_SECCOMP
->>
->> Why do you move the #ifdef? We have two separate error cases here.
->> And it seems better no to check for "-sandbox" when seccomp is disable=
-d.
+> Signed-off-by: Christian Borntraeger <borntraeger@de.ibm.com>
+> ---
+>  target/s390x/cpu_features.c     | 32 +++++++++++++++++++++++++
+>  target/s390x/cpu_features.h     |  1 +
+>  target/s390x/cpu_features_def.h | 31 ++++++++++++++++++++++++
+>  target/s390x/cpu_models.c       |  2 ++
+>  target/s390x/gen-features.c     | 42 +++++++++++++++++++++++++++++++++
+>  target/s390x/kvm.c              |  6 +++++
+>  6 files changed, 114 insertions(+)
 >=20
-> I tried to remove the #ifdef altogether to simplify the code, then
-> realized the error message could be useful.
->=20
-> I don't think it's a problem to lookup "-sandbox" when seccomp is disab=
-led.
->=20
+> diff --git a/target/s390x/cpu_features.c b/target/s390x/cpu_features.c
+> index bbd8902087..154e2bb354 100644
+> --- a/target/s390x/cpu_features.c
+> +++ b/target/s390x/cpu_features.c
+> @@ -108,6 +108,7 @@ static const S390FeatDef s390_features[] =3D {
+>      FEAT_INIT("irbm", S390_FEAT_TYPE_STFL, 145, "Insert-reference-bits=
+-multiple facility"),
+>      FEAT_INIT("msa8-base", S390_FEAT_TYPE_STFL, 146, "Message-security=
+-assist-extension-8 facility (excluding subfunctions)"),
+>      FEAT_INIT("cmmnt", S390_FEAT_TYPE_STFL, 147, "CMM: ESSA-enhancemen=
+t (no translate) facility"),
+> +    FEAT_INIT("msa9-base", S390_FEAT_TYPE_STFL, 155, "Message-security=
+-assist-extension-9 facility (excluding subfunctions)"),
+>      FEAT_INIT("etoken", S390_FEAT_TYPE_STFL, 156, "Etoken facility"),
+> =20
+>      /* SCLP SCCB Byte 80 - 98  (bit numbers relative to byte-80) */
+> @@ -242,6 +243,11 @@ static const S390FeatDef s390_features[] =3D {
+>      FEAT_INIT("pckmo-aes-128", S390_FEAT_TYPE_PCKMO, 18, "PCKMO Encryp=
+ted-AES-128-Key"),
+>      FEAT_INIT("pckmo-aes-192", S390_FEAT_TYPE_PCKMO, 19, "PCKMO Encryp=
+ted-AES-192-Key"),
+>      FEAT_INIT("pckmo-aes-256", S390_FEAT_TYPE_PCKMO, 20, "PCKMO Encryp=
+ted-AES-256-Key"),
+> +    FEAT_INIT("pckmo-ecc-p256", S390_FEAT_TYPE_PCKMO, 32, "PCKMO Encry=
+pt-ECC-P256-Key"),
+> +    FEAT_INIT("pckmo-ecc-p384", S390_FEAT_TYPE_PCKMO, 33, "PCKMO Encry=
+pt-ECC-P384-Key"),
+> +    FEAT_INIT("pckmo-ecc-p521", S390_FEAT_TYPE_PCKMO, 34, "PCKMO Encry=
+pt-ECC-P521-Key"),
+> +    FEAT_INIT("pckmo-ecc-ed25519", S390_FEAT_TYPE_PCKMO, 40 , "PCKMO E=
+ncrypt-ECC-Ed25519-Key"),
+> +    FEAT_INIT("pckmo-ecc-ed448", S390_FEAT_TYPE_PCKMO, 41 , "PCKMO Enc=
+rypt-ECC-Ed448-Key"),
+> =20
+>      FEAT_INIT("kmctr-dea", S390_FEAT_TYPE_KMCTR, 1, "KMCTR DEA"),
+>      FEAT_INIT("kmctr-tdea-128", S390_FEAT_TYPE_KMCTR, 2, "KMCTR TDEA-1=
+28"),
+> @@ -298,6 +304,13 @@ static const S390FeatDef s390_features[] =3D {
+>      FEAT_INIT("pcc-xts-aes-256", S390_FEAT_TYPE_PCC, 52, "PCC Compute-=
+XTS-Parameter-Using-AES-256"),
+>      FEAT_INIT("pcc-xts-eaes-128", S390_FEAT_TYPE_PCC, 58, "PCC Compute=
+-XTS-Parameter-Using-Encrypted-AES-128"),
+>      FEAT_INIT("pcc-xts-eaes-256", S390_FEAT_TYPE_PCC, 60, "PCC Compute=
+-XTS-Parameter-Using-Encrypted-AES-256"),
+> +    FEAT_INIT("pcc-scalar-mult-p256", S390_FEAT_TYPE_PCC, 64, "PCC Sca=
+lar-Multiply-P256"),
+> +    FEAT_INIT("pcc-scalar-mult-p384", S390_FEAT_TYPE_PCC, 65, "PCC Sca=
+lar-Multiply-P384"),
+> +    FEAT_INIT("pcc-scalar-mult-p521", S390_FEAT_TYPE_PCC, 66, "PCC Sca=
+lar-Multiply-P521"),
+> +    FEAT_INIT("pcc-scalar-mult-ed25519", S390_FEAT_TYPE_PCC, 72, "PCC =
+Scalar-Multiply-Ed25519"),
+> +    FEAT_INIT("pcc-scalar-mult-ed448", S390_FEAT_TYPE_PCC, 73, "PCC Sc=
+alar-Multiply-Ed448"),
+> +    FEAT_INIT("pcc-scalar-mult-x25519", S390_FEAT_TYPE_PCC, 80, "PCC S=
+calar-Multiply-X25519"),
+> +    FEAT_INIT("pcc-scalar-mult-x448", S390_FEAT_TYPE_PCC, 81, "PCC Sca=
+lar-Multiply-X448"),
+> =20
+>      FEAT_INIT("ppno-sha-512-drng", S390_FEAT_TYPE_PPNO, 3, "PPNO SHA-5=
+12-DRNG"),
+>      FEAT_INIT("prno-trng-qrtcr", S390_FEAT_TYPE_PPNO, 112, "PRNO TRNG-=
+Query-Raw-to-Conditioned-Ratio"),
+> @@ -309,6 +322,22 @@ static const S390FeatDef s390_features[] =3D {
+>      FEAT_INIT("kma-gcm-eaes-128", S390_FEAT_TYPE_KMA, 26, "KMA GCM-Enc=
+rypted-AES-128"),
+>      FEAT_INIT("kma-gcm-eaes-192", S390_FEAT_TYPE_KMA, 27, "KMA GCM-Enc=
+rypted-AES-192"),
+>      FEAT_INIT("kma-gcm-eaes-256", S390_FEAT_TYPE_KMA, 28, "KMA GCM-Enc=
+rypted-AES-256"),
+> +
+> +    FEAT_INIT("kdsa-ecdsa-verify-p256", S390_FEAT_TYPE_KDSA, 1, "KDSA =
+ECDSA-Verify-P256"),
+> +    FEAT_INIT("kdsa-ecdsa-verify-p384", S390_FEAT_TYPE_KDSA, 2, "KDSA =
+ECDSA-Verify-P384"),
+> +    FEAT_INIT("kdsa-ecdsa-verify-p521", S390_FEAT_TYPE_KDSA, 3, "KDSA =
+ECDSA-Verify-P521"),
+> +    FEAT_INIT("kdsa-ecdsa-sign-p256", S390_FEAT_TYPE_KDSA, 9, "KDSA EC=
+DSA-Sign-P256"),
+> +    FEAT_INIT("kdsa-ecdsa-sign-p384", S390_FEAT_TYPE_KDSA, 10, "KDSA E=
+CDSA-Sign-P384"),
+> +    FEAT_INIT("kdsa-ecdsa-sign-p521", S390_FEAT_TYPE_KDSA, 11, "KDSA E=
+CDSA-Sign-P521"),
+> +    FEAT_INIT("kdsa-eecdsa-sign-p256", S390_FEAT_TYPE_KDSA, 17, "KDSA =
+Encrypted-ECDSA-Sign-P256"),
+> +    FEAT_INIT("kdsa-eecdsa-sign-p384", S390_FEAT_TYPE_KDSA, 18, "KDSA =
+Encrypted-ECDSA-Sign-P384"),
+> +    FEAT_INIT("kdsa-eecdsa-sign-p521", S390_FEAT_TYPE_KDSA, 19, "KDSA =
+Encrypted-ECDSA-Sign-P521"),
+> +    FEAT_INIT("kdsa-eddsa-verify-ed25519", S390_FEAT_TYPE_KDSA, 32, "K=
+DSA EdDSA-Verify-Ed25519"),
+> +    FEAT_INIT("kdsa-eddsa-verify-ed448", S390_FEAT_TYPE_KDSA, 36, "KDS=
+A EdDSA-Verify-Ed448"),
+> +    FEAT_INIT("kdsa-eddsa-sign-ed25519", S390_FEAT_TYPE_KDSA, 40, "KDS=
+A EdDSA-Sign-Ed25519"),
+> +    FEAT_INIT("kdsa-eddsa-sign-ed448", S390_FEAT_TYPE_KDSA, 44, "KDSA =
+EdDSA-Sign-Ed448"),
+> +    FEAT_INIT("kdsa-eeddsa-sign-ed25519", S390_FEAT_TYPE_KDSA, 48, "KD=
+SA Encrypted-EdDSA-Sign-Ed25519"),
+> +    FEAT_INIT("kdsa-eeddsa-sign-ed448", S390_FEAT_TYPE_KDSA, 52, "KDSA=
+ Encrypted-EdDSA-Sign-Ed448"),
+>  };
+> =20
+>  const S390FeatDef *s390_feat_def(S390Feat feat)
+> @@ -371,6 +400,7 @@ void s390_fill_feat_block(const S390FeatBitmap feat=
+ures, S390FeatType type,
+>      case S390_FEAT_TYPE_PCC:
+>      case S390_FEAT_TYPE_PPNO:
+>      case S390_FEAT_TYPE_KMA:
+> +    case S390_FEAT_TYPE_KDSA:
+>          set_be_bit(0, data); /* query is always available */
+>          break;
+>      default:
+> @@ -466,6 +496,8 @@ static S390FeatGroupDef s390_feature_groups[] =3D {
+>      FEAT_GROUP_INIT("msa6", MSA_EXT_6, "Message-security-assist-extens=
+ion 6 facility"),
+>      FEAT_GROUP_INIT("msa7", MSA_EXT_7, "Message-security-assist-extens=
+ion 7 facility"),
+>      FEAT_GROUP_INIT("msa8", MSA_EXT_8, "Message-security-assist-extens=
+ion 8 facility"),
+> +    FEAT_GROUP_INIT("msa9", MSA_EXT_9, "Message-security-assist-extens=
+ion 9 facility"),
+> +    FEAT_GROUP_INIT("msa9_pckmo", MSA_EXT_9_PCKMO, "Message-security-a=
+ssist-extension 9 PCKMO subfunctions"),
+>      FEAT_GROUP_INIT("mepochptff", MULTIPLE_EPOCH_PTFF, "PTFF enhanceme=
+nts introduced with Multiple-epoch facility"),
+>  };
+> =20
+> diff --git a/target/s390x/cpu_features.h b/target/s390x/cpu_features.h
+> index effe790271..5ffd3db083 100644
+> --- a/target/s390x/cpu_features.h
+> +++ b/target/s390x/cpu_features.h
+> @@ -39,6 +39,7 @@ typedef enum {
+>      S390_FEAT_TYPE_PCC,
+>      S390_FEAT_TYPE_PPNO,
+>      S390_FEAT_TYPE_KMA,
+> +    S390_FEAT_TYPE_KDSA,
+>  } S390FeatType;
+> =20
+>  /* Definition of a CPU feature */
+> diff --git a/target/s390x/cpu_features_def.h b/target/s390x/cpu_feature=
+s_def.h
+> index 31dd678301..030784811b 100644
+> --- a/target/s390x/cpu_features_def.h
+> +++ b/target/s390x/cpu_features_def.h
+> @@ -96,6 +96,7 @@ typedef enum {
+>      S390_FEAT_INSERT_REFERENCE_BITS_MULT,
+>      S390_FEAT_MSA_EXT_8,
+>      S390_FEAT_CMM_NT,
+> +    S390_FEAT_MSA_EXT_9,
+>      S390_FEAT_ETOKEN,
+> =20
+>      /* Sclp Conf Char */
+> @@ -240,6 +241,11 @@ typedef enum {
+>      S390_FEAT_PCKMO_AES_128,
+>      S390_FEAT_PCKMO_AES_192,
+>      S390_FEAT_PCKMO_AES_256,
+> +    S390_FEAT_PCKMO_ECC_P256,
+> +    S390_FEAT_PCKMO_ECC_P384,
+> +    S390_FEAT_PCKMO_ECC_P521,
+> +    S390_FEAT_PCKMO_ECC_ED25519,
+> +    S390_FEAT_PCKMO_ECC_ED448,
+> =20
+>      /* KMCTR */
+>      S390_FEAT_KMCTR_DEA,
+> @@ -300,6 +306,13 @@ typedef enum {
+>      S390_FEAT_PCC_XTS_AES_256,
+>      S390_FEAT_PCC_XTS_EAES_128,
+>      S390_FEAT_PCC_XTS_EAES_256,
+> +    S390_FEAT_PCC_SCALAR_MULT_P256,
+> +    S390_FEAT_PCC_SCALAR_MULT_P384,
+> +    S390_FEAT_PCC_SCALAR_MULT_P512,
+> +    S390_FEAT_PCC_SCALAR_MULT_ED25519,
+> +    S390_FEAT_PCC_SCALAR_MULT_ED448,
+> +    S390_FEAT_PCC_SCALAR_MULT_X25519,
+> +    S390_FEAT_PCC_SCALAR_MULT_X448,
+> =20
+>      /* PPNO/PRNO */
+>      S390_FEAT_PPNO_SHA_512_DRNG,
+> @@ -313,6 +326,24 @@ typedef enum {
+>      S390_FEAT_KMA_GCM_EAES_128,
+>      S390_FEAT_KMA_GCM_EAES_192,
+>      S390_FEAT_KMA_GCM_EAES_256,
+> +
+> +    /* KDSA */
+> +    S390_FEAT_ECDSA_VERIFY_P256,
+> +    S390_FEAT_ECDSA_VERIFY_P384,
+> +    S390_FEAT_ECDSA_VERIFY_P512,
+> +    S390_FEAT_ECDSA_SIGN_P256,
+> +    S390_FEAT_ECDSA_SIGN_P384,
+> +    S390_FEAT_ECDSA_SIGN_P512,
+> +    S390_FEAT_EECDSA_SIGN_P256,
+> +    S390_FEAT_EECDSA_SIGN_P384,
+> +    S390_FEAT_EECDSA_SIGN_P512,
+> +    S390_FEAT_EDDSA_VERIFY_ED25519,
+> +    S390_FEAT_EDDSA_VERIFY_ED448,
+> +    S390_FEAT_EDDSA_SIGN_ED25519,
+> +    S390_FEAT_EDDSA_SIGN_ED448,
+> +    S390_FEAT_EEDDSA_SIGN_ED25519,
+> +    S390_FEAT_EEDDSA_SIGN_ED448,
+> +
+>      S390_FEAT_MAX,
+>  } S390Feat;
+> =20
+> diff --git a/target/s390x/cpu_models.c b/target/s390x/cpu_models.c
+> index b4bb5de635..d683635eb5 100644
+> --- a/target/s390x/cpu_models.c
+> +++ b/target/s390x/cpu_models.c
+> @@ -782,6 +782,8 @@ static void check_consistency(const S390CPUModel *m=
+odel)
+>          { S390_FEAT_SIE_CMMA, S390_FEAT_SIE_GSLS },
+>          { S390_FEAT_SIE_PFMFI, S390_FEAT_EDAT },
+>          { S390_FEAT_MSA_EXT_8, S390_FEAT_MSA_EXT_3 },
+> +        { S390_FEAT_MSA_EXT_9, S390_FEAT_MSA_EXT_3 },
+> +        { S390_FEAT_MSA_EXT_9, S390_FEAT_MSA_EXT_4 },
+>          { S390_FEAT_MULTIPLE_EPOCH, S390_FEAT_TOD_CLOCK_STEERING },
+>          { S390_FEAT_VECTOR_PACKED_DECIMAL, S390_FEAT_VECTOR },
+>          { S390_FEAT_VECTOR_ENH, S390_FEAT_VECTOR },
+> diff --git a/target/s390x/gen-features.c b/target/s390x/gen-features.c
+> index e4739a6b9f..a2f9e2b43f 100644
+> --- a/target/s390x/gen-features.c
+> +++ b/target/s390x/gen-features.c
+> @@ -213,6 +213,38 @@
+>      S390_FEAT_KMA_GCM_EAES_192, \
+>      S390_FEAT_KMA_GCM_EAES_256
+> =20
+> +#define S390_FEAT_GROUP_MSA_EXT_9 \
+> +    S390_FEAT_MSA_EXT_9, \
+> +    S390_FEAT_ECDSA_VERIFY_P256, \
+> +    S390_FEAT_ECDSA_VERIFY_P384, \
+> +    S390_FEAT_ECDSA_VERIFY_P512, \
+> +    S390_FEAT_ECDSA_SIGN_P256, \
+> +    S390_FEAT_ECDSA_SIGN_P384, \
+> +    S390_FEAT_ECDSA_SIGN_P512, \
+> +    S390_FEAT_EECDSA_SIGN_P256, \
+> +    S390_FEAT_EECDSA_SIGN_P384, \
+> +    S390_FEAT_EECDSA_SIGN_P512, \
+> +    S390_FEAT_EDDSA_VERIFY_ED25519, \
+> +    S390_FEAT_EDDSA_VERIFY_ED448, \
+> +    S390_FEAT_EDDSA_SIGN_ED25519, \
+> +    S390_FEAT_EDDSA_SIGN_ED448, \
+> +    S390_FEAT_EEDDSA_SIGN_ED25519, \
+> +    S390_FEAT_EEDDSA_SIGN_ED448, \
+> +    S390_FEAT_PCC_SCALAR_MULT_P256, \
+> +    S390_FEAT_PCC_SCALAR_MULT_P384, \
+> +    S390_FEAT_PCC_SCALAR_MULT_P512, \
+> +    S390_FEAT_PCC_SCALAR_MULT_ED25519, \
+> +    S390_FEAT_PCC_SCALAR_MULT_ED448, \
+> +    S390_FEAT_PCC_SCALAR_MULT_X25519, \
+> +    S390_FEAT_PCC_SCALAR_MULT_X448
+> +
+> +#define S390_FEAT_GROUP_MSA_EXT_9_PCKMO \
+> +    S390_FEAT_PCKMO_ECC_P256, \
+> +    S390_FEAT_PCKMO_ECC_P384, \
+> +    S390_FEAT_PCKMO_ECC_P521, \
+> +    S390_FEAT_PCKMO_ECC_ED25519, \
+> +    S390_FEAT_PCKMO_ECC_ED448
+> +
 
-ok, so:
+Just wondering, why keep the PCKMO ones separate, but not e.g. PCC ?
 
-Reviewed-by: Laurent Vivier <lvivier@redhat.com>
+Many subfunctions, luckily we have feature groups.
 
+Reviewed-by: David Hildenbrand <david@redhat.com>
+
+--=20
+
+Thanks,
+
+David / dhildenb
 
