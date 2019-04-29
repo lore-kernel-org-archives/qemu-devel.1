@@ -1,20 +1,29 @@
-Received: from eggs.gnu.org ([209.51.188.92]:35962)
+Received: from eggs.gnu.org ([209.51.188.92]:45423)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <driver1998@foxmail.com>) id 1hKuUu-0007yY-Sm
-	for qemu-devel@nongnu.org; Sun, 28 Apr 2019 20:50:21 -0400
+	(envelope-from <programmingkidx@gmail.com>) id 1hKvpJ-0006zk-0W
+	for qemu-devel@nongnu.org; Sun, 28 Apr 2019 22:15:30 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <driver1998@foxmail.com>) id 1hKuUt-0003Q6-DS
-	for qemu-devel@nongnu.org; Sun, 28 Apr 2019 20:50:20 -0400
-Received: from smtpbg444.qq.com ([183.3.255.70]:53817 helo=qq.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <driver1998@foxmail.com>)
-	id 1hKuUs-0003OX-PW
-	for qemu-devel@nongnu.org; Sun, 28 Apr 2019 20:50:19 -0400
-From: driver1998 <driver1998@foxmail.com>
-Date: Mon, 29 Apr 2019 00:33:22 +0000
-Message-Id: <20190429003322.22908-1-driver1998@foxmail.com>
-Subject: [Qemu-devel] [PATCH 3/4] util/cacheinfo.c: Use uintptr_t instead of
- unsigned long in AArch64 arch_cache_info()
+	(envelope-from <programmingkidx@gmail.com>) id 1hKvpD-0002yh-7Y
+	for qemu-devel@nongnu.org; Sun, 28 Apr 2019 22:15:25 -0400
+Received: from mail-io1-xd2f.google.com ([2607:f8b0:4864:20::d2f]:36006)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <programmingkidx@gmail.com>)
+	id 1hKvp8-0002xT-Jq
+	for qemu-devel@nongnu.org; Sun, 28 Apr 2019 22:15:20 -0400
+Received: by mail-io1-xd2f.google.com with SMTP id d19so7670973ioc.3
+	for <qemu-devel@nongnu.org>; Sun, 28 Apr 2019 19:15:17 -0700 (PDT)
+Received: from [192.168.0.2] (d14-69-20-184.try.wideopenwest.com.
+	[69.14.184.20]) by smtp.gmail.com with ESMTPSA id
+	e19sm9463643ioc.13.2019.04.28.19.15.15 for <qemu-devel@nongnu.org>
+	(version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+	Sun, 28 Apr 2019 19:15:15 -0700 (PDT)
+From: Programmingkid <programmingkidx@gmail.com>
+Content-Type: text/plain; charset=us-ascii
+Content-Transfer-Encoding: quoted-printable
+Mime-Version: 1.0 (Mac OS X Mail 10.3 \(3273\))
+Message-Id: <47019F45-9440-44BF-BFEF-0A35F7F230E3@gmail.com>
+Date: Sun, 28 Apr 2019 22:15:13 -0400
+Subject: [Qemu-devel] Apple Hypervisor - unimplemented handler
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,37 +32,27 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: driver1998 <driver1998@foxmail.com>
+To: QEMU Developers <qemu-devel@nongnu.org>
 
-Windows ARM64 uses LLP64 model, which breaks current assumptions.
+When running Windows 7 using "-M accel=3Dhvf --cpu host", Windows 7 =
+would crash. What was printed to the console was this:
 
-Signed-off-by: driver1998 <driver1998@foxmail.com>
----
- util/cacheinfo.c | 4 +++-
- 1 file changed, 3 insertions(+), 1 deletion(-)
+Unimplemented handler (fffff8000c0c2050) for 0 (f c3)=20
 
-diff --git a/util/cacheinfo.c b/util/cacheinfo.c
-index 3cd080b83d..a815cb0722 100644
---- a/util/cacheinfo.c
-+++ b/util/cacheinfo.c
-@@ -107,7 +107,7 @@ static void sys_cache_info(int *isize, int *dsize)
- static void arch_cache_info(int *isize, int *dsize)
- {
-     if (*isize == 0 || *dsize == 0) {
--        unsigned long ctr;
-+        uintptr_t ctr;
- 
-         /* The real cache geometry is in CCSIDR_EL1/CLIDR_EL1/CSSELR_EL1,
-            but (at least under Linux) these are marked protected by the
-@@ -120,6 +120,8 @@ static void arch_cache_info(int *isize, int *dsize)
-         if (*dsize == 0) {
-             *dsize = 4 << ((ctr >> 16) & 0xf);
-         }
-+
-+        printf("%d %d\n", *isize, *dsize);
-     }
- }
- 
--- 
-2.17.1
+This message is from target/i386/hvf/x86_emu.c. The c3 seems to indicate =
+this is a problem with the MOVNTI or RETN instruction.
+
+This is the webpage I used for figuring out this: =
+http://ref.x86asm.net/coder32.html. A search of the page shows another =
+instruction with the c3 opcode called RETN. So I'm not 100% sure which =
+instruction is the problem instruction.
+
+In the file target/i386/hvf/x86_decode.c, this line of code makes me =
+think it is RETN:
+
+{0xc3, X86_DECODE_RET_NEAR, 0, false, NULL,
+     NULL, NULL, NULL, NULL, RFLAGS_MASK_NONE}
+
+Any help with this issue would be appreciated.
+
+Thank you.=
