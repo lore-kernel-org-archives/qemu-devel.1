@@ -2,113 +2,87 @@ Return-Path: <SRS0=sEuR=S7=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.5 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EC5BFC43219
-	for <qemu-devel@archiver.kernel.org>; Mon, 29 Apr 2019 16:13:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D8659C43219
+	for <qemu-devel@archiver.kernel.org>; Mon, 29 Apr 2019 16:14:10 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A70F020673
-	for <qemu-devel@archiver.kernel.org>; Mon, 29 Apr 2019 16:13:46 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A70F020673
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id A02F020673
+	for <qemu-devel@archiver.kernel.org>; Mon, 29 Apr 2019 16:14:10 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="HQ+75C5C"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A02F020673
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:60095 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:60101 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hL8uX-0003Ba-RW
-	for qemu-devel@archiver.kernel.org; Mon, 29 Apr 2019 12:13:45 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:50119)
+	id 1hL8uv-0003Y8-UJ
+	for qemu-devel@archiver.kernel.org; Mon, 29 Apr 2019 12:14:09 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:48836)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1hL8t3-000294-6E
-	for qemu-devel@nongnu.org; Mon, 29 Apr 2019 12:12:14 -0400
+	(envelope-from <stefanha@gmail.com>) id 1hL8rp-0001Eq-9p
+	for qemu-devel@nongnu.org; Mon, 29 Apr 2019 12:10:58 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1hL8t1-0005Ko-7k
-	for qemu-devel@nongnu.org; Mon, 29 Apr 2019 12:12:13 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:36244)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <thuth@redhat.com>)
-	id 1hL8su-00052m-0d; Mon, 29 Apr 2019 12:12:04 -0400
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
-	[10.5.11.23])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 752833007C43;
-	Mon, 29 Apr 2019 16:11:53 +0000 (UTC)
-Received: from thuth.remote.csb (ovpn-116-111.ams2.redhat.com [10.36.116.111])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id 9F69228D08;
-	Mon, 29 Apr 2019 16:11:03 +0000 (UTC)
-To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
-	yang.zhong@intel.com, Peter Maydell <peter.maydell@linaro.org>,
-	qemu-devel@nongnu.org, pbonzini@redhat.com
-References: <20190418180057.3593-1-thuth@redhat.com>
-	<20190418180057.3593-23-thuth@redhat.com>
-	<b042daff-8b05-08e7-5386-1b89f05ad984@redhat.com>
-From: Thomas Huth <thuth@redhat.com>
-Openpgp: preference=signencrypt
-Autocrypt: addr=thuth@redhat.com; keydata=
-	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
-Organization: Red Hat
-Message-ID: <7559b0e3-f752-09a5-2e8d-a40d0ade23e1@redhat.com>
-Date: Mon, 29 Apr 2019 18:11:02 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
-	Thunderbird/60.6.1
+	(envelope-from <stefanha@gmail.com>) id 1hL8ro-0003w8-CI
+	for qemu-devel@nongnu.org; Mon, 29 Apr 2019 12:10:57 -0400
+Received: from mail-io1-xd2e.google.com ([2607:f8b0:4864:20::d2e]:44660)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1hL8ro-0003vp-7s
+	for qemu-devel@nongnu.org; Mon, 29 Apr 2019 12:10:56 -0400
+Received: by mail-io1-xd2e.google.com with SMTP id r71so9416749iod.11
+	for <qemu-devel@nongnu.org>; Mon, 29 Apr 2019 09:10:56 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+	h=from:to:cc:subject:date:message-id:in-reply-to:references
+	:mime-version:content-transfer-encoding;
+	bh=4VLnEBOIrNsmLlfpoPUK7E2/ZiMjfNK4XWC8HwWuZF0=;
+	b=HQ+75C5C4cIWtOufjUa9Gwp7N1yK5QlqJiWtehmpS/Md//SlChHt6F7fFdfaTgNMxY
+	Vw1dm3j+zq3xftlbh/kiPQqseY/T8hXwQoHjhE7hnBkMSGTQKz6yiIZm4v3g0zLKGoSO
+	QSST2XYKxvxqGqFT1nXJf2C7g/VmdonWfF8hOxlOKV/Xb8KiU07HscFMzeTF9apRtuiC
+	/HxSpBCe3RSgLqnaUHOEc83EIXSO2wf3gf6UlmXsbPBCZezwdk9WOuFq4r21/bA3w+Jb
+	imbnJe11Q4CsTzSQJmGgPBHdLqyKIWEkgnbqkvp+/bDSd2Xzuw+VxbjrkelRx/WwxIo4
+	N63w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=1e100.net; s=20161025;
+	h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+	:references:mime-version:content-transfer-encoding;
+	bh=4VLnEBOIrNsmLlfpoPUK7E2/ZiMjfNK4XWC8HwWuZF0=;
+	b=XhDuSnZYEEL6xcgDsB36ny9MBjGUf7Bg7ZHTZgpP9mlEM7Wvxztk39+r4FDCXTsqds
+	u1vdF9O2UFykuvQwo28a8/QHjK5fgACe6KftvXDw32hmiIN1e6RaFYVBn5hJ9F49OFkO
+	84YhZIdpH8s0o4ScRZ1nRC346XNyfBcw+lrkOGqQpQeGUoloy6nGEkUvMgcHFJNmLaFO
+	0/MgA+v2WvZUlz3x8z3ZEEADp8w8vl2KX+OWgKluie/2XVYRz7eq6ldHE/HF8kqsTMQr
+	0/OX3gQH35cyIw1HoDzfk9SzLguf7fIfFjwXI2lsT0gZW5yRhmNiC/IPz0urPyxt8vEE
+	2SvA==
+X-Gm-Message-State: APjAAAVUrYKHzDmZFoGzg7ef//LmJMGzeoQ8JvGgK0q8H5/WwkOeVGE8
+	sg3w1Cxc3m14DzoNrWnTsEPvmdujWS8=
+X-Google-Smtp-Source: APXvYqzJVTuZ7CP/gAQH0SARLGgffw7VYSGS99nU18yGkqXHPDWbrHfjzXu2314ZQsawWQtkEGdVCw==
+X-Received: by 2002:a5d:9ccc:: with SMTP id w12mr29240069iow.253.1556554255253;
+	Mon, 29 Apr 2019 09:10:55 -0700 (PDT)
+Received: from localhost
+	(CPE64777d5479c3-CM64777d5479c0.cpe.net.cable.rogers.com.
+	[99.228.64.175]) by smtp.gmail.com with ESMTPSA id
+	64sm15706201ite.42.2019.04.29.09.10.51
+	(version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
+	Mon, 29 Apr 2019 09:10:54 -0700 (PDT)
+From: Stefan Hajnoczi <stefanha@gmail.com>
+To: qemu-devel@nongnu.org
+Date: Mon, 29 Apr 2019 12:10:46 -0400
+Message-Id: <20190429161046.10527-2-stefanha@gmail.com>
+X-Mailer: git-send-email 2.20.1
+In-Reply-To: <20190429161046.10527-1-stefanha@gmail.com>
+References: <20190429161046.10527-1-stefanha@gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <b042daff-8b05-08e7-5386-1b89f05ad984@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.40]);
-	Mon, 29 Apr 2019 16:11:53 +0000 (UTC)
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH for-QEMU-4.1 v5 22/29] hw/arm: Express
- dependencies of sabrelite with Kconfig
+Content-Transfer-Encoding: 8bit
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+	recognized.
+X-Received-From: 2607:f8b0:4864:20::d2e
+Subject: [Qemu-devel] [PULL 1/1] trace: fix runstate tracing
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -120,87 +94,41 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Rob Herring <robh@kernel.org>, Jan Kiszka <jan.kiszka@web.de>,
-	Igor Mitsyanko <i.mitsyanko@gmail.com>, qemu-block@nongnu.org,
-	"Michael S. Tsirkin" <mst@redhat.com>,
-	Andrey Smirnov <andrew.smirnov@gmail.com>,
-	Alistair Francis <alistair@alistair23.me>,
-	Philippe Mathieu-Daude <f4bug@amsat.org>,
-	Jean-Christophe Dubois <jcd@tribudubois.net>,
-	Beniamino Galvani <b.galvani@gmail.com>, Andrew Jeffery <andrew@aj.id.au>,
-	Cedric Le Goater <clg@kaod.org>, qemu-arm@nongnu.org,
-	Peter Chubb <peter.chubb@nicta.com.au>, Gerd Hoffmann <kraxel@redhat.com>,
-	Antony Pavlov <antonynpavlov@gmail.com>,
-	"Edgar E . Iglesias" <edgar.iglesias@gmail.com>,
-	Subbaraya Sundeep <sundeep.lkml@gmail.com>,
-	John Snow <jsnow@redhat.com>, Joel Stanley <joel@jms.id.au>
+Cc: Yury Kotov <yury-kotov@yandex-team.ru>, Paolo Bonzini <pbonzini@redhat.com>,
+	Stefan Hajnoczi <stefanha@gmail.com>,
+	Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
+	Peter Maydell <peter.maydell@linaro.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190429161102.oLEMusTGr9Xm92ENr1V6n42H8keKoS7ZojG-FuC64rw@z>
+Content-Type: text/plain; charset="UTF-8"
+Message-ID: <20190429161046.HDFkAXnJp7boQHVqsFBaUHItxyCttBxD1c3fKi1INoY@z>
 
-On 25/04/2019 18.43, Philippe Mathieu-Daud=C3=A9 wrote:
-> Hi Thomas,
->=20
-> On 4/18/19 8:00 PM, Thomas Huth wrote:
->> Add Kconfig dependencies for the Sabrelite / iMX6 machine.
->>
->> Signed-off-by: Thomas Huth <thuth@redhat.com>
->> ---
->>  default-configs/arm-softmmu.mak | 4 +---
->>  hw/arm/Kconfig                  | 7 +++++++
->>  hw/arm/Makefile.objs            | 3 ++-
->>  3 files changed, 10 insertions(+), 4 deletions(-)
->>
->> diff --git a/default-configs/arm-softmmu.mak b/default-configs/arm-sof=
-tmmu.mak
->> index 76508e3910..ef7dd7156a 100644
->> --- a/default-configs/arm-softmmu.mak
->> +++ b/default-configs/arm-softmmu.mak
->> @@ -33,6 +33,7 @@ CONFIG_NETDUINO2=3Dy
->>  CONFIG_MPS2=3Dy
->>  CONFIG_RASPI=3Dy
->>  CONFIG_DIGIC=3Dy
->> +CONFIG_SABRELITE=3Dy
->> =20
->>  CONFIG_VGA=3Dy
->>  CONFIG_SSI_M25P80=3Dy
->> @@ -40,13 +41,10 @@ CONFIG_IMX_FEC=3Dy
->> =20
->>  CONFIG_NRF51_SOC=3Dy
->> =20
->> -CONFIG_FSL_IMX6=3Dy
->>  CONFIG_FSL_IMX25=3Dy
->>  CONFIG_FSL_IMX7=3Dy
->>  CONFIG_FSL_IMX6UL=3Dy
->> =20
->> -CONFIG_IMX_I2C=3Dy
->> -
->>  CONFIG_PCIE_PORT=3Dy
->>  CONFIG_XIO3130=3Dy
->>  CONFIG_IOH3420=3Dy
->> diff --git a/hw/arm/Kconfig b/hw/arm/Kconfig
->> index 059fb8282c..065c7acf1b 100644
->> --- a/hw/arm/Kconfig
->> +++ b/hw/arm/Kconfig
->> @@ -177,6 +177,10 @@ config REALVIEW
->>      select DS1338 # I2C RTC+NVRAM
->>      select USB_OHCI
->> =20
->> +config SABRELITE
->> +    bool
->> +    select FSL_IMX6
->=20
-> This one crashes:
->=20
-> $ qemu-system-aarch64 -display none -M sabrelite
-> ERROR:/source/qemu/qom/object.c:454:object_initialize_with_type:
-> assertion failed: (type !=3D NULL)
-> Aborted (core dumped)
+From: Yury Kotov <yury-kotov@yandex-team.ru>
 
-Weird, I was pretty sure to have tested all boards individually ... I
-must accidentally have skipped this one. Thanks a lot for testing, I'll
-fix it in v6.
+Signed-off-by: Yury Kotov <yury-kotov@yandex-team.ru>
+Reviewed-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Message-id: 20190426102115.30002-1-yury-kotov@yandex-team.ru
+Message-Id: <20190426102115.30002-1-yury-kotov@yandex-team.ru>
+Signed-off-by: Stefan Hajnoczi <stefanha@gmail.com>
+---
+ vl.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
- Thomas
+diff --git a/vl.c b/vl.c
+index 4019a4387d..d9fea0a119 100644
+--- a/vl.c
++++ b/vl.c
+@@ -725,7 +725,7 @@ void runstate_set(RunState new_state)
+     assert(new_state < RUN_STATE__MAX);
+ 
+     trace_runstate_set(current_run_state, RunState_str(current_run_state),
+-                       new_state, RunState_str(current_run_state));
++                       new_state, RunState_str(new_state));
+ 
+     if (current_run_state == new_state) {
+         return;
+-- 
+2.20.1
+
 
