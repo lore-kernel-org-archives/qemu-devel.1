@@ -1,19 +1,26 @@
-Received: from eggs.gnu.org ([209.51.188.92]:33466)
+Received: from eggs.gnu.org ([209.51.188.92]:33568)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1hL6Vz-0005Rs-HW
-	for qemu-devel@nongnu.org; Mon, 29 Apr 2019 09:40:16 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1hL6WG-0005a8-1D
+	for qemu-devel@nongnu.org; Mon, 29 Apr 2019 09:40:32 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1hL6Vy-00019E-MO
-	for qemu-devel@nongnu.org; Mon, 29 Apr 2019 09:40:15 -0400
-Date: Mon, 29 Apr 2019 15:40:03 +0200
-From: Cornelia Huck <cohuck@redhat.com>
-Message-ID: <20190429154003.7f8fc423.cohuck@redhat.com>
-In-Reply-To: <1556543381-12671-1-git-send-email-jjherne@linux.ibm.com>
-References: <1556543381-12671-1-git-send-email-jjherne@linux.ibm.com>
+	(envelope-from <peter.maydell@linaro.org>) id 1hL6WF-0001Hc-4P
+	for qemu-devel@nongnu.org; Mon, 29 Apr 2019 09:40:31 -0400
+Received: from mail-ot1-x341.google.com ([2607:f8b0:4864:20::341]:42509)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1hL6WC-0001Er-GE
+	for qemu-devel@nongnu.org; Mon, 29 Apr 2019 09:40:30 -0400
+Received: by mail-ot1-x341.google.com with SMTP id f23so8583475otl.9
+	for <qemu-devel@nongnu.org>; Mon, 29 Apr 2019 06:40:25 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH] s390-bios: Skip bootmap signature entries
+References: <20190328230404.12909-1-richard.henderson@linaro.org>
+	<20190328230404.12909-4-richard.henderson@linaro.org>
+In-Reply-To: <20190328230404.12909-4-richard.henderson@linaro.org>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Mon, 29 Apr 2019 14:40:13 +0100
+Message-ID: <CAFEAcA8q2ZTvFco28XTqgfMq9LQDJg6m9Dq98Y+N2xKYR1zJqQ@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH for-4.1 v2 03/36] tcg: Create struct CPUTLB
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,26 +29,21 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Jason J. Herne" <jjherne@linux.ibm.com>
-Cc: qemu-devel@nongnu.org, qemu-s390x@nongnu.org, thuth@redhat.com, alifm@linux.ibm.com, borntraeger@de.ibm.com
+To: Richard Henderson <richard.henderson@linaro.org>
+Cc: QEMU Developers <qemu-devel@nongnu.org>
 
-On Mon, 29 Apr 2019 09:09:41 -0400
-"Jason J. Herne" <jjherne@linux.ibm.com> wrote:
-
-> Newer versions of zipl have the ability to write signature entries to the boot
-> script for secure boot. We don't yet support secure boot, but we need to skip
-> over signature entries while reading the boot script in order to maintain our
-> ability to boot guest operating systems that have a secure bootloader.
-> 
-> Signed-off-by: Jason J. Herne <jjherne@linux.ibm.com>
-> Reviewed-by: Farhan Ali <alifm@linux.ibm.com>
+On Thu, 28 Mar 2019 at 23:52, Richard Henderson
+<richard.henderson@linaro.org> wrote:
+>
+> Move all softmmu tlb data into this structure.  Arrange the
+> members so that we are able to place mask+table together and
+> at a smaller absolute offset from ENV.
+>
+> Acked-by: Alistair Francis <alistair.francis@wdc.com>
+> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 > ---
->  pc-bios/s390-ccw/bootmap.c | 19 +++++++++++++++++--
->  pc-bios/s390-ccw/bootmap.h | 10 ++++++----
->  2 files changed, 23 insertions(+), 6 deletions(-)
 
-Skipping something that we don't have support for yet, but that doesn't
-hinder normal operation sounds reasonable; but can you point me to the
-relevant commit implementing this in zipl or some documentation? I
-haven't been able to find something like that in the s390-tools git
-tree.
+Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
+
+thanks
+-- PMM
