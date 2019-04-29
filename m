@@ -1,24 +1,26 @@
-Received: from eggs.gnu.org ([209.51.188.92]:48836)
+Received: from eggs.gnu.org ([209.51.188.92]:49175)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1hL8rp-0001Eq-9p
-	for qemu-devel@nongnu.org; Mon, 29 Apr 2019 12:10:58 -0400
+	(envelope-from <stefanha@gmail.com>) id 1hL8sJ-0001Z4-2n
+	for qemu-devel@nongnu.org; Mon, 29 Apr 2019 12:11:28 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1hL8ro-0003w8-CI
-	for qemu-devel@nongnu.org; Mon, 29 Apr 2019 12:10:57 -0400
-Received: from mail-io1-xd2e.google.com ([2607:f8b0:4864:20::d2e]:44660)
+	(envelope-from <stefanha@gmail.com>) id 1hL8sI-0004VQ-6V
+	for qemu-devel@nongnu.org; Mon, 29 Apr 2019 12:11:27 -0400
+Received: from mail-it1-x143.google.com ([2607:f8b0:4864:20::143]:37567)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1hL8ro-0003vp-7s
-	for qemu-devel@nongnu.org; Mon, 29 Apr 2019 12:10:56 -0400
-Received: by mail-io1-xd2e.google.com with SMTP id r71so9416749iod.11
-	for <qemu-devel@nongnu.org>; Mon, 29 Apr 2019 09:10:56 -0700 (PDT)
+	(Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1hL8sI-0004Un-1d
+	for qemu-devel@nongnu.org; Mon, 29 Apr 2019 12:11:26 -0400
+Received: by mail-it1-x143.google.com with SMTP id r85so8493596itc.2
+	for <qemu-devel@nongnu.org>; Mon, 29 Apr 2019 09:11:25 -0700 (PDT)
+Date: Mon, 29 Apr 2019 12:11:20 -0400
 From: Stefan Hajnoczi <stefanha@gmail.com>
-Date: Mon, 29 Apr 2019 12:10:46 -0400
-Message-Id: <20190429161046.10527-2-stefanha@gmail.com>
-In-Reply-To: <20190429161046.10527-1-stefanha@gmail.com>
-References: <20190429161046.10527-1-stefanha@gmail.com>
+Message-ID: <20190429161120.GB13640@stefanha-x1.localdomain>
+References: <20190426102115.30002-1-yury-kotov@yandex-team.ru>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PULL 1/1] trace: fix runstate tracing
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="0ntfKIWw70PvrIHh"
+Content-Disposition: inline
+In-Reply-To: <20190426102115.30002-1-yury-kotov@yandex-team.ru>
+Subject: Re: [Qemu-devel] [PATCH] trace: fix runstate tracing
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,32 +29,37 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, Yury Kotov <yury-kotov@yandex-team.ru>, Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, Stefan Hajnoczi <stefanha@gmail.com>
+To: Yury Kotov <yury-kotov@yandex-team.ru>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, qemu-devel@nongnu.org
 
-From: Yury Kotov <yury-kotov@yandex-team.ru>
 
-Signed-off-by: Yury Kotov <yury-kotov@yandex-team.ru>
-Reviewed-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Message-id: 20190426102115.30002-1-yury-kotov@yandex-team.ru
-Message-Id: <20190426102115.30002-1-yury-kotov@yandex-team.ru>
-Signed-off-by: Stefan Hajnoczi <stefanha@gmail.com>
----
- vl.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+--0ntfKIWw70PvrIHh
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 
-diff --git a/vl.c b/vl.c
-index 4019a4387d..d9fea0a119 100644
---- a/vl.c
-+++ b/vl.c
-@@ -725,7 +725,7 @@ void runstate_set(RunState new_state)
-     assert(new_state < RUN_STATE__MAX);
- 
-     trace_runstate_set(current_run_state, RunState_str(current_run_state),
--                       new_state, RunState_str(current_run_state));
-+                       new_state, RunState_str(new_state));
- 
-     if (current_run_state == new_state) {
-         return;
--- 
-2.20.1
+On Fri, Apr 26, 2019 at 01:21:15PM +0300, Yury Kotov wrote:
+> Signed-off-by: Yury Kotov <yury-kotov@yandex-team.ru>
+> ---
+>  vl.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+
+Thanks, applied to my tracing tree:
+https://github.com/stefanha/qemu/commits/tracing
+
+Stefan
+
+--0ntfKIWw70PvrIHh
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEcBAEBAgAGBQJcxyIoAAoJEJykq7OBq3PIg3YIAMLlT+gFEqniDXEKkxbgx/TW
+6xHsK4UAjWJoArZNOU5O2OTeQnePER5H7OaxamBANxEcfUpNruQ/kYpB+42ckv8i
+f4zCIOkDawvR7fAAEERtHoyzjTvFrLD89MLFfPulPXJXTSe7Td/d2idwrnVWWXZZ
+qojQmNtftU3txc0+m5jZjHeLwnUeXSsEr9qAFziEHvd9Sr0x8/EOmM4sM1NUzSMu
+BucSVueEi91kkiHPGk0YXWr1Z1F3VCDhFUCemr+4jT2DpZ8coO4+IhlOMWBYgKfZ
+vwWI3Yb6OyZVaKukmAxW/avxa9pczL7V+enV2Lo/Gq6LWjXVrk53+ZSjW1YEBng=
+=V70O
+-----END PGP SIGNATURE-----
+
+--0ntfKIWw70PvrIHh--
