@@ -1,27 +1,28 @@
-Received: from eggs.gnu.org ([209.51.188.92]:51533)
+Received: from eggs.gnu.org ([209.51.188.92]:51986)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1hLAqN-0005l8-2u
-	for qemu-devel@nongnu.org; Mon, 29 Apr 2019 14:17:40 -0400
+	(envelope-from <philmd@redhat.com>) id 1hLAsO-0006Ta-Fy
+	for qemu-devel@nongnu.org; Mon, 29 Apr 2019 14:19:41 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1hLAqM-0008UU-5V
-	for qemu-devel@nongnu.org; Mon, 29 Apr 2019 14:17:35 -0400
-Received: from mail-oi1-x243.google.com ([2607:f8b0:4864:20::243]:42118)
+	(envelope-from <philmd@redhat.com>) id 1hLAsN-00017D-L5
+	for qemu-devel@nongnu.org; Mon, 29 Apr 2019 14:19:40 -0400
+Received: from mail-wr1-f66.google.com ([209.85.221.66]:42260)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1hLAqL-0008UO-Uy
-	for qemu-devel@nongnu.org; Mon, 29 Apr 2019 14:17:34 -0400
-Received: by mail-oi1-x243.google.com with SMTP id k9so6076002oig.9
-	for <qemu-devel@nongnu.org>; Mon, 29 Apr 2019 11:17:33 -0700 (PDT)
+	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1hLAsN-00016u-8K
+	for qemu-devel@nongnu.org; Mon, 29 Apr 2019 14:19:39 -0400
+Received: by mail-wr1-f66.google.com with SMTP id l2so1778636wrb.9
+	for <qemu-devel@nongnu.org>; Mon, 29 Apr 2019 11:19:39 -0700 (PDT)
+References: <20190412165416.7977-1-philmd@redhat.com>
+	<CAFEAcA90Pv=zEqaonGV=c022T=CYMo11nkqNwBnGgocESnBNmA@mail.gmail.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Message-ID: <f56687f4-434e-0e6d-77a8-fec6c33c9a62@redhat.com>
+Date: Mon, 29 Apr 2019 20:19:36 +0200
 MIME-Version: 1.0
-References: <20190318134019.23729-1-peter.maydell@linaro.org>
-	<41b21196-5401-898d-4afc-6fffa71d09dd@collabora.com>
-	<498af98a-5be0-a589-c7b5-246c4d0ee7ef@collabora.com>
-In-Reply-To: <498af98a-5be0-a589-c7b5-246c4d0ee7ef@collabora.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Mon, 29 Apr 2019 19:17:21 +0100
-Message-ID: <CAFEAcA-fzPzZFV_orPL84syTdTqrseHUiwuba9vzrNgz95BHGA@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH] configure: Remove --source-path option
+In-Reply-To: <CAFEAcA90Pv=zEqaonGV=c022T=CYMo11nkqNwBnGgocESnBNmA@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [Qemu-arm] [PATCH v3 00/12] hw: Remove
+ "hw/devices.h"
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,18 +31,28 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Antonio Ospite <antonio.ospite@collabora.com>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, "patches@linaro.org" <patches@linaro.org>, =?UTF-8?Q?Daniel_P_=2E_Berrang=C3=A9?= <berrange@redhat.com>
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, Markus Armbruster <armbru@redhat.com>, Thomas Huth <thuth@redhat.com>, Igor Mitsyanko <i.mitsyanko@gmail.com>, qemu-arm <qemu-arm@nongnu.org>, Jan Kiszka <jan.kiszka@web.de>, Andrzej Zaborowski <balrogg@gmail.com>
 
-On Thu, 25 Apr 2019 at 17:42, Antonio Ospite
-<antonio.ospite@collabora.com> wrote:
-> Now that 4.0 has been released, maybe we can move on with this minor change.
->
-> I will send a fix for https://bugs.launchpad.net/qemu/+bug/1817345 after
-> this patch lands.
+On 4/29/19 6:51 PM, Peter Maydell wrote:
+> On Fri, 12 Apr 2019 at 17:55, Philippe Mathieu-Daudé <philmd@redhat.com> wrote:
+>>
+>> Hi,
+>>
+>> As his first comment describes itself, the "hw/devices.h" contains
+>> declarations for "Devices that have nowhere better to go."
+>> This series remove it, creating new headers for devices covered there.
+>> MAINTAINERS is updated.
+>> I also included 2 cleanups while working on this, in "qemu/typedefs.h"
+>> and "hw/net/ne2000-isa.h" header guard.
+>>
+>> v3:
+>> - rebased
+>> - added 2 patches suggested by Markus
+>> - addressed Markus review comments
+>> - added Markus's R-b
+> 
+> Since these are almost all arm devices I'll take this via the
+> target-arm tree (I'm going to make a pullreq later today).
 
-This patch has just gone in to master, so that should be ok
-for you to rebase your patch on now.
-
-thanks
--- PMM
+Thanks Peter!
