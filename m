@@ -4,85 +4,85 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-8.7 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+	SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 19788C43219
-	for <qemu-devel@archiver.kernel.org>; Mon, 29 Apr 2019 17:12:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8D5E4C43219
+	for <qemu-devel@archiver.kernel.org>; Mon, 29 Apr 2019 17:13:13 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D33D320675
-	for <qemu-devel@archiver.kernel.org>; Mon, 29 Apr 2019 17:12:52 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 42CDB20675
+	for <qemu-devel@archiver.kernel.org>; Mon, 29 Apr 2019 17:13:13 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="wCCTAaRB"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D33D320675
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="ZNoAkVBO"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 42CDB20675
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:60756 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:60758 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hL9pj-0005tP-UU
-	for qemu-devel@archiver.kernel.org; Mon, 29 Apr 2019 13:12:51 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:34361)
+	id 1hL9q4-0006EQ-G5
+	for qemu-devel@archiver.kernel.org; Mon, 29 Apr 2019 13:13:12 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:34307)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1hL9er-0004r4-3J
-	for qemu-devel@nongnu.org; Mon, 29 Apr 2019 13:01:38 -0400
-Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1hL9eo-0006kA-1z
+	(envelope-from <peter.maydell@linaro.org>) id 1hL9eo-0004pj-31
 	for qemu-devel@nongnu.org; Mon, 29 Apr 2019 13:01:35 -0400
-Received: from mail-wr1-x436.google.com ([2a00:1450:4864:20::436]:44818)
+Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
+	(envelope-from <peter.maydell@linaro.org>) id 1hL9em-0006iu-Ck
+	for qemu-devel@nongnu.org; Mon, 29 Apr 2019 13:01:33 -0400
+Received: from mail-wr1-x429.google.com ([2a00:1450:4864:20::429]:46342)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1hL9em-0006cV-Rc
-	for qemu-devel@nongnu.org; Mon, 29 Apr 2019 13:01:33 -0400
-Received: by mail-wr1-x436.google.com with SMTP id c5so17086369wrs.11
-	for <qemu-devel@nongnu.org>; Mon, 29 Apr 2019 10:01:17 -0700 (PDT)
+	id 1hL9ej-0006Ul-24
+	for qemu-devel@nongnu.org; Mon, 29 Apr 2019 13:01:30 -0400
+Received: by mail-wr1-x429.google.com with SMTP id t17so17057979wrw.13
+	for <qemu-devel@nongnu.org>; Mon, 29 Apr 2019 10:01:01 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
 	h=from:to:subject:date:message-id:in-reply-to:references:mime-version
 	:content-transfer-encoding;
-	bh=2w1w44sHa+uGj5LPkXGrx5V7+QcLrNYXNtLTn7rWBUg=;
-	b=wCCTAaRBwxllhOkltURIAQRY0ESCgvD21au8gnkNMCuvo31ypW1FimSakFu2zamD2L
-	+aKQzv0VTGsc5bMhiw49Da2hXLGYmdN+EmApeEKuzI93YBkx/26X96mPRLtHRvkooKMZ
-	OrlDEpyuY2zHp7ErM7buNpARisgPzMZjOTfYVYE9RRU/n8rxQgL6tLf8Ku8vYxrszapL
-	ffg7heLgc3wHUUy2cRNimMeaMcf0c9WKdP09L92rFQ3XH9SyLjBrkPKeyaIAP1ApHpdu
-	Gh8VON4DqfN+zy6tCxEBiR1CbJqWVcz5O/2vRS8Jwwj51Fp5kTdz42iV+YFHa+EKBCE/
-	Fr5A==
+	bh=Y4C5w6/Db1LmG76galdQjy2nSXocsVdE6jJGAF1IatQ=;
+	b=ZNoAkVBOkxZGhs6L30olMYcaz8GVjoWJ/4WY1zFEUSSGUa8LJ+5KrWnlvlIBjWCxx5
+	GrKLsuCvjh0o57H1CRaCyf2ciZsgFmjKeqRoro6L28uWO07BKj6YeSHzQcnZg0TUF8Vo
+	pZf/++7mu3T8gcZg/iW/MZi4lY7CqdCU05iM695fFgeO4dyQNFELW2h/ZnqGk4TIc054
+	P2RtU/Iwn51HibUH0S8zKGXIbs+B632kpbhUD4TMIh86hSIng/mLBq09Lxu80e4DClB9
+	nT40cUC4W73akvObErQnVPIkxf2zyDSS9V1F39SnY7rfRvV8dImpTlae3d3ifU+CfmWI
+	afIQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
 	d=1e100.net; s=20161025;
 	h=x-gm-message-state:from:to:subject:date:message-id:in-reply-to
 	:references:mime-version:content-transfer-encoding;
-	bh=2w1w44sHa+uGj5LPkXGrx5V7+QcLrNYXNtLTn7rWBUg=;
-	b=Xu8EVohGvxwNKCEgqVvOB1lXV8/qiwmn7TaUey4HYv9HtsQt1sYK0gvb6YNGL3O9zq
-	fNyT6DV54XvOdGHxWLVKqZE46unmmLCrV3nIQxIY0sTZtOnNYZ7NeLrSrdV5oAjGFqRB
-	SXqD57g16iurQ9SXmtx8KluSjji3ytvwjOHh2oWC1gi2kKo/HoPWNd+o5ijAXRptIXqM
-	QkNxxMdJnKwd/Xk6k5npCHe8TXReqPa76zJ5gUFlbet3UIzNlUYizR6AY9jZNjzPy1Ev
-	a0qLstVbuUxFwKEsC4IZyop2kOzKl0A6r5UCuXpxpOw389yLRdrR3Mg8Qikacl05WAAS
-	Q9SQ==
-X-Gm-Message-State: APjAAAUYnWiOPbHZDW2H5jC7mOITDM2Ccu/wSioJWZUB81u7KcLPg8xt
-	CEg4ZnWfUl3Bkqyh67oXQ+IOSyWzuoE=
-X-Google-Smtp-Source: APXvYqwqq17zDjXVIiweWdAykw64lKdyLDPBcM2IFqR/Lt6u3w45UIZxynbJZgHvBOu05oyNiPvYmA==
-X-Received: by 2002:a5d:66c3:: with SMTP id k3mr5832383wrw.104.1556557276407; 
-	Mon, 29 Apr 2019 10:01:16 -0700 (PDT)
+	bh=Y4C5w6/Db1LmG76galdQjy2nSXocsVdE6jJGAF1IatQ=;
+	b=Fy4Ksji+Aa9qqYGR6fe/nA7GxmK+Tn6QZDTntEHVCSJPJjbr2KdvhnfWGIuDAle+6W
+	zU2BMJAzTJVmgstKBfkyVYjDXSV1d8+Q6Egr+9179dm+3WSvtvPZlNtIioNaKInjSvl0
+	b0CpHMIRa43fZ3YZ+cwU+cekQoxdYtMLapMilAjDI83wp4qqUg2TofXH/GN9hf6amMDT
+	yZ6sGvZWGE7boIcOzpowhjmBGv22A46jU10P2Dop7ot4xhcENkF0zqs7g0UERV2PWhHn
+	n5lJLO3zRQvqfFfwXdvnmiuCNIiy9WoBur+kcz9W6GpkgBb8C2L9wX6BnXy947epDOi4
+	Vaug==
+X-Gm-Message-State: APjAAAVW7ISEdtY1w2ijPLsk490XYQsfhWvOa/qaxoqezSfQdO/Pqwz6
+	q7Bk3l4RWg7FbeqUw1J0h14KJgDOtuM=
+X-Google-Smtp-Source: APXvYqzOq9DHnATOpPmenF7y0ItEYI6idclmn8+HmKh2m9yqVZ7wvn+A8vacgxERp8pMN4hWyz2MQQ==
+X-Received: by 2002:adf:80ec:: with SMTP id 99mr32850268wrl.55.1556557260376; 
+	Mon, 29 Apr 2019 10:01:00 -0700 (PDT)
 Received: from orth.archaic.org.uk (orth.archaic.org.uk. [81.2.115.148])
-	by smtp.gmail.com with ESMTPSA id a13sm36896wmj.39.2019.04.29.10.01.15
+	by smtp.gmail.com with ESMTPSA id a13sm36896wmj.39.2019.04.29.10.00.59
 	for <qemu-devel@nongnu.org>
 	(version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-	Mon, 29 Apr 2019 10:01:15 -0700 (PDT)
+	Mon, 29 Apr 2019 10:00:59 -0700 (PDT)
 From: Peter Maydell <peter.maydell@linaro.org>
 To: qemu-devel@nongnu.org
-Date: Mon, 29 Apr 2019 18:00:22 +0100
-Message-Id: <20190429170030.11323-35-peter.maydell@linaro.org>
+Date: Mon, 29 Apr 2019 18:00:10 +0100
+Message-Id: <20190429170030.11323-23-peter.maydell@linaro.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20190429170030.11323-1-peter.maydell@linaro.org>
 References: <20190429170030.11323-1-peter.maydell@linaro.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
 	recognized.
-X-Received-From: 2a00:1450:4864:20::436
-Subject: [Qemu-devel] [PULL 34/42] hw/devices: Move TC6393XB declarations
- into a new header
+X-Received-From: 2a00:1450:4864:20::429
+Subject: [Qemu-devel] [PULL 22/42] target/arm: Activate M-profile floating
+ point context when FPCCR.ASPEN is set
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -97,109 +97,126 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190429170022.grKyAtV7D37xgKQMkrGWq8fE6CJfFhX7oKNcMDRlq_c@z>
+Content-Type: text/plain; charset="UTF-8"
+Message-ID: <20190429170010.cQ5SPigdKFFZE7Lu7XYK9p9QBlayZavDFM94-nAJZxw@z>
 
-From: Philippe Mathieu-Daudé <philmd@redhat.com>
+The M-profile FPCCR.ASPEN bit indicates that automatic floating-point
+context preservation is enabled. Before executing any floating-point
+instruction, if FPCCR.ASPEN is set and the CONTROL FPCA/SFPA bits
+indicate that there is no active floating point context then we
+must create a new context (by initializing FPSCR and setting
+FPCA/SFPA to indicate that the context is now active). In the
+pseudocode this is handled by ExecuteFPCheck().
 
-Reviewed-by: Markus Armbruster <armbru@redhat.com>
-Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
-Message-id: 20190412165416.7977-5-philmd@redhat.com
+Implement this with a new TB flag which tracks whether we
+need to create a new FP context.
+
 Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+Message-id: 20190416125744.27770-20-peter.maydell@linaro.org
 ---
- include/hw/devices.h          |  6 ------
- include/hw/display/tc6393xb.h | 24 ++++++++++++++++++++++++
- hw/arm/tosa.c                 |  2 +-
- hw/display/tc6393xb.c         |  2 +-
- MAINTAINERS                   |  1 +
- 5 files changed, 27 insertions(+), 8 deletions(-)
- create mode 100644 include/hw/display/tc6393xb.h
+ target/arm/cpu.h       |  2 ++
+ target/arm/translate.h |  1 +
+ target/arm/helper.c    | 13 +++++++++++++
+ target/arm/translate.c | 29 +++++++++++++++++++++++++++++
+ 4 files changed, 45 insertions(+)
 
-diff --git a/include/hw/devices.h b/include/hw/devices.h
-index 0850f697451..1e2141caad1 100644
---- a/include/hw/devices.h
-+++ b/include/hw/devices.h
-@@ -50,10 +50,4 @@ void *tahvo_init(qemu_irq irq, int betty);
+diff --git a/target/arm/cpu.h b/target/arm/cpu.h
+index a2cf9aae3a1..d4996a4d204 100644
+--- a/target/arm/cpu.h
++++ b/target/arm/cpu.h
+@@ -3153,6 +3153,8 @@ FIELD(TBFLAG_A32, NS, 6, 1)
+ FIELD(TBFLAG_A32, VFPEN, 7, 1)
+ FIELD(TBFLAG_A32, CONDEXEC, 8, 8)
+ FIELD(TBFLAG_A32, SCTLR_B, 16, 1)
++/* For M profile only, set if we must create a new FP context */
++FIELD(TBFLAG_A32, NEW_FP_CTXT_NEEDED, 19, 1)
+ /* For M profile only, set if FPCCR.S does not match current security state */
+ FIELD(TBFLAG_A32, FPCCR_S_WRONG, 20, 1)
+ /* For M profile only, Handler (ie not Thread) mode */
+diff --git a/target/arm/translate.h b/target/arm/translate.h
+index 93abff645ad..ed8ae2e7e3b 100644
+--- a/target/arm/translate.h
++++ b/target/arm/translate.h
+@@ -41,6 +41,7 @@ typedef struct DisasContext {
+     bool v8m_secure; /* true if v8M and we're in Secure mode */
+     bool v8m_stackcheck; /* true if we need to perform v8M stack limit checks */
+     bool v8m_fpccr_s_wrong; /* true if v8M FPCCR.S != v8m_secure */
++    bool v7m_new_fp_ctxt_needed; /* ASPEN set but no active FP context */
+     /* Immediate value in AArch32 SVC insn; must be set if is_jmp == DISAS_SWI
+      * so that top level loop can generate correct syndrome information.
+      */
+diff --git a/target/arm/helper.c b/target/arm/helper.c
+index 8290f56c658..84e3790a9de 100644
+--- a/target/arm/helper.c
++++ b/target/arm/helper.c
+@@ -13422,6 +13422,19 @@ void cpu_get_tb_cpu_state(CPUARMState *env, target_ulong *pc,
+         flags = FIELD_DP32(flags, TBFLAG_A32, FPCCR_S_WRONG, 1);
+     }
  
- void retu_key_event(void *retu, int state);
++    if (arm_feature(env, ARM_FEATURE_M) &&
++        (env->v7m.fpccr[env->v7m.secure] & R_V7M_FPCCR_ASPEN_MASK) &&
++        (!(env->v7m.control[M_REG_S] & R_V7M_CONTROL_FPCA_MASK) ||
++         (env->v7m.secure &&
++          !(env->v7m.control[M_REG_S] & R_V7M_CONTROL_SFPA_MASK)))) {
++        /*
++         * ASPEN is set, but FPCA/SFPA indicate that there is no active
++         * FP context; we must create a new FP context before executing
++         * any FP insn.
++         */
++        flags = FIELD_DP32(flags, TBFLAG_A32, NEW_FP_CTXT_NEEDED, 1);
++    }
++
+     *pflags = flags;
+     *cs_base = 0;
+ }
+diff --git a/target/arm/translate.c b/target/arm/translate.c
+index f0332ac19ec..edb66e7be8e 100644
+--- a/target/arm/translate.c
++++ b/target/arm/translate.c
+@@ -3438,6 +3438,33 @@ static int disas_vfp_insn(DisasContext *s, uint32_t insn)
+             /* Don't need to do this for any further FP insns in this TB */
+             s->v8m_fpccr_s_wrong = false;
+         }
++
++        if (s->v7m_new_fp_ctxt_needed) {
++            /*
++             * Create new FP context by updating CONTROL.FPCA, CONTROL.SFPA
++             * and the FPSCR.
++             */
++            TCGv_i32 control, fpscr;
++            uint32_t bits = R_V7M_CONTROL_FPCA_MASK;
++
++            fpscr = load_cpu_field(v7m.fpdscr[s->v8m_secure]);
++            gen_helper_vfp_set_fpscr(cpu_env, fpscr);
++            tcg_temp_free_i32(fpscr);
++            /*
++             * We don't need to arrange to end the TB, because the only
++             * parts of FPSCR which we cache in the TB flags are the VECLEN
++             * and VECSTRIDE, and those don't exist for M-profile.
++             */
++
++            if (s->v8m_secure) {
++                bits |= R_V7M_CONTROL_SFPA_MASK;
++            }
++            control = load_cpu_field(v7m.control[M_REG_S]);
++            tcg_gen_ori_i32(control, control, bits);
++            store_cpu_field(control, v7m.control[M_REG_S]);
++            /* Don't need to do this for any further FP insns in this TB */
++            s->v7m_new_fp_ctxt_needed = false;
++        }
+     }
  
--/* tc6393xb.c */
--typedef struct TC6393xbState TC6393xbState;
--TC6393xbState *tc6393xb_init(struct MemoryRegion *sysmem,
--                             uint32_t base, qemu_irq irq);
--qemu_irq tc6393xb_l3v_get(TC6393xbState *s);
--
- #endif
-diff --git a/include/hw/display/tc6393xb.h b/include/hw/display/tc6393xb.h
-new file mode 100644
-index 00000000000..5c4da91f80d
---- /dev/null
-+++ b/include/hw/display/tc6393xb.h
-@@ -0,0 +1,24 @@
-+/*
-+ * Toshiba TC6393XB I/O Controller.
-+ * Found in Sharp Zaurus SL-6000 (tosa) or some
-+ * Toshiba e-Series PDAs.
-+ *
-+ * Copyright (c) 2007 Hervé Poussineau
-+ *
-+ * This work is licensed under the terms of the GNU GPL, version 2 or later.
-+ * See the COPYING file in the top-level directory.
-+ */
-+
-+#ifndef HW_DISPLAY_TC6393XB_H
-+#define HW_DISPLAY_TC6393XB_H
-+
-+#include "exec/memory.h"
-+#include "hw/irq.h"
-+
-+typedef struct TC6393xbState TC6393xbState;
-+
-+TC6393xbState *tc6393xb_init(struct MemoryRegion *sysmem,
-+                             uint32_t base, qemu_irq irq);
-+qemu_irq tc6393xb_l3v_get(TC6393xbState *s);
-+
-+#endif
-diff --git a/hw/arm/tosa.c b/hw/arm/tosa.c
-index eef9d427e76..9a1247797fe 100644
---- a/hw/arm/tosa.c
-+++ b/hw/arm/tosa.c
-@@ -16,10 +16,10 @@
- #include "hw/hw.h"
- #include "hw/arm/pxa.h"
- #include "hw/arm/arm.h"
--#include "hw/devices.h"
- #include "hw/arm/sharpsl.h"
- #include "hw/pcmcia.h"
- #include "hw/boards.h"
-+#include "hw/display/tc6393xb.h"
- #include "hw/i2c/i2c.h"
- #include "hw/ssi/ssi.h"
- #include "hw/sysbus.h"
-diff --git a/hw/display/tc6393xb.c b/hw/display/tc6393xb.c
-index 6d133d9a66c..0b7c59cde7d 100644
---- a/hw/display/tc6393xb.c
-+++ b/hw/display/tc6393xb.c
-@@ -14,7 +14,7 @@
- #include "qapi/error.h"
- #include "qemu/host-utils.h"
- #include "hw/hw.h"
--#include "hw/devices.h"
-+#include "hw/display/tc6393xb.h"
- #include "hw/block/flash.h"
- #include "ui/console.h"
- #include "ui/pixel_ops.h"
-diff --git a/MAINTAINERS b/MAINTAINERS
-index dabbfccf9c5..51eecd0ac19 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -714,6 +714,7 @@ F: hw/misc/mst_fpga.c
- F: hw/misc/max111x.c
- F: include/hw/arm/pxa.h
- F: include/hw/arm/sharpsl.h
-+F: include/hw/display/tc6393xb.h
+     if (extract32(insn, 28, 4) == 0xf) {
+@@ -13361,6 +13388,8 @@ static void arm_tr_init_disas_context(DisasContextBase *dcbase, CPUState *cs)
+         regime_is_secure(env, dc->mmu_idx);
+     dc->v8m_stackcheck = FIELD_EX32(tb_flags, TBFLAG_A32, STACKCHECK);
+     dc->v8m_fpccr_s_wrong = FIELD_EX32(tb_flags, TBFLAG_A32, FPCCR_S_WRONG);
++    dc->v7m_new_fp_ctxt_needed =
++        FIELD_EX32(tb_flags, TBFLAG_A32, NEW_FP_CTXT_NEEDED);
+     dc->cp_regs = cpu->cp_regs;
+     dc->features = env->features;
  
- SABRELITE / i.MX6
- M: Peter Maydell <peter.maydell@linaro.org>
 -- 
 2.20.1
 
