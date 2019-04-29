@@ -7,81 +7,83 @@ X-Spam-Status: No, score=-8.7 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D918EC43219
-	for <qemu-devel@archiver.kernel.org>; Mon, 29 Apr 2019 17:03:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0D804C43219
+	for <qemu-devel@archiver.kernel.org>; Mon, 29 Apr 2019 17:04:05 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7F6BD2087B
-	for <qemu-devel@archiver.kernel.org>; Mon, 29 Apr 2019 17:03:24 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id C61D42087B
+	for <qemu-devel@archiver.kernel.org>; Mon, 29 Apr 2019 17:04:04 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="lUc1o1dT"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7F6BD2087B
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="iJYgOnzH"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C61D42087B
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:60619 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:60621 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hL9gZ-0006Dr-ML
-	for qemu-devel@archiver.kernel.org; Mon, 29 Apr 2019 13:03:23 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:34096)
+	id 1hL9hD-0006qI-TE
+	for qemu-devel@archiver.kernel.org; Mon, 29 Apr 2019 13:04:03 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:34091)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1hL9eB-0004DV-OY
-	for qemu-devel@nongnu.org; Mon, 29 Apr 2019 13:00:57 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1hL9eB-0004DP-Ka
+	for qemu-devel@nongnu.org; Mon, 29 Apr 2019 13:00:56 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1hL9e7-0006Pp-CZ
-	for qemu-devel@nongnu.org; Mon, 29 Apr 2019 13:00:54 -0400
-Received: from mail-wm1-x32d.google.com ([2a00:1450:4864:20::32d]:55625)
+	(envelope-from <peter.maydell@linaro.org>) id 1hL9e6-0006PE-Oz
+	for qemu-devel@nongnu.org; Mon, 29 Apr 2019 13:00:52 -0400
+Received: from mail-wr1-x430.google.com ([2a00:1450:4864:20::430]:34428)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1hL9e4-00068o-1P
-	for qemu-devel@nongnu.org; Mon, 29 Apr 2019 13:00:49 -0400
-Received: by mail-wm1-x32d.google.com with SMTP id o25so147888wmf.5
-	for <qemu-devel@nongnu.org>; Mon, 29 Apr 2019 10:00:35 -0700 (PDT)
+	id 1hL9e4-00069E-19
+	for qemu-devel@nongnu.org; Mon, 29 Apr 2019 13:00:48 -0400
+Received: by mail-wr1-x430.google.com with SMTP id v16so14710340wrp.1
+	for <qemu-devel@nongnu.org>; Mon, 29 Apr 2019 10:00:36 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
 	h=from:to:subject:date:message-id:in-reply-to:references:mime-version
 	:content-transfer-encoding;
-	bh=7gNx0IkPrqecANacnRtmZJpa8hlM9XJ8QCX31q2yhf0=;
-	b=lUc1o1dTXpXImCMu1rUH/Jlu4+DceyeuNsD/QJSYgBKop5HN5/f5i3mBr7l8AsdAiX
-	obzjxGVg7KvqDb949nGkv9zO6K9sFTKtSux8O1Fr/WeHcwCbMOFGZhOuQGLHmFFbV76R
-	y+f9/VMoscRpd0HJm3k37Q8gV4A9Frh7337VDgZnymRgyCRd047eQzTI9FcFZLoT/w4h
-	3q15Z6SRyO0VBoOlpSb7T3wfcNYRswwstnx/VzTebhdy6WLH1F25hbmgsqnK5PWV+Dzp
-	mwui6Wa3Tyg/X3eTTgU6EhV028vSIhXxy2FXnlA2MOLSBUqZkvJyFxvqq+q/bAbKoU6P
-	IcTQ==
+	bh=PoBbqKnm48icKHr+pnJggpSaSU4ZKCdGTaxhpvXU0VQ=;
+	b=iJYgOnzHanS8MCyf/Y/TsyhGhNhp8j68clu7GSzxkV8oyNeseLQdQN2j6h2tpNu428
+	tMJgG9tAwIJyWypDVL0m3M8m5uxisI4BK++pkqnj/BFNkWe9UouweFt7uUdWNqZPaBNU
+	GrTsYbXNg3p9cvoM/1f05Z/1rbvdtYK1WwknUBdbA7cCwjv4dyAsysyBh/Fu35/W+wLa
+	2FCIcu7uHQ8jNGBlgbjpH5Sx0dZfInLkrp2l4HXipqSwUV8ks6EPRUFLcUcLu3C6lNF2
+	+lboKxs6Wu8lvz2YWaG2vZVyiaEiLmtfxdqX+pmSk70urzxEPQeqhcEuSWYkigVgn70M
+	m6Eg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
 	d=1e100.net; s=20161025;
 	h=x-gm-message-state:from:to:subject:date:message-id:in-reply-to
 	:references:mime-version:content-transfer-encoding;
-	bh=7gNx0IkPrqecANacnRtmZJpa8hlM9XJ8QCX31q2yhf0=;
-	b=VyDXjRu8VRxyFExB8ykOKuk06Cug3iONNJB22iiDFkNKHQmrNl4AsprDuDSb3gRqQb
-	4t14svbzZMm6psjHAC9Ly4dz1v3O4CH2EqB9k/0eAwDC65PXXzZip6nNdu7jip214aV5
-	xZ9J7HNrgCFfAPzSpHvZDeQPnNWK5M2OfMtc4B9Jf5xhoKPya3FD//VtA7ElR+Ivsg2+
-	NsI/H9joea8puMqUi7i7zvNsq7481igW2hvadvDUBMay1GsO070Sx4GA535EjSdkn2aH
-	5lLtRwUCtRXWC4HXURSk8wDLvs9Z3ExBcNPkO3zYgDPMdIcqWiE2IAnqhfDUTHchzTO5
-	kv1Q==
-X-Gm-Message-State: APjAAAW7nLXBsnVQN9jyQfqIhQ1ldkIjUmH+OMLqgA8zt0+ZhYo+WK0Q
-	NW8Yqr9eqSqwmNI2Y4C+5KsQtBijckE=
-X-Google-Smtp-Source: APXvYqwDXPeLsYEBr64knlXZa4K6Q7Zz5oZ5nxuEj+8ZkFBDjkBxNTRIQ2PAX6c7VhcbPIOTXWr1Pg==
-X-Received: by 2002:a1c:4c09:: with SMTP id z9mr22225wmf.87.1556557234291;
-	Mon, 29 Apr 2019 10:00:34 -0700 (PDT)
+	bh=PoBbqKnm48icKHr+pnJggpSaSU4ZKCdGTaxhpvXU0VQ=;
+	b=g5r6EJyAIAC0CaVmsqwQvMlMAXFLrChPAruHlylFJgIkz3AraZBg56p3/vSEe3ssMG
+	t8ljKC49TZXSjOx0mCYsLDHjS5Oylq2SAaB7d+D59K/k40iTSGv4hgGbAWHQ2F69kguo
+	OgjcPJSI3Lbdtvzf3twrSpH5rmMk2gwDKz8sZEp3AoXkonLnwYNrFJ927/898e83/po/
+	iVt804+IkNQ1RYLXd6QymDgEbdNUFFtxxKbKOhsm69qyXZ/TYg6LTvvLHqAjQxEJBzur
+	K/sW3IN025h86cHOeLRW5OJL6xqW7H0Js2eZoj0F4ube9hIeSdmuHAUcrteNez9vf/mE
+	aVTA==
+X-Gm-Message-State: APjAAAX59OWf0uMrnie6DZvV6NQ47kRNdELOFNl551teCO6ZigH+JqZS
+	12oaIfxVrsgY5eOxyhhXJM2bfdA2V5E=
+X-Google-Smtp-Source: APXvYqwFfkZebByq1LtSNfImSnhxYhHdNH0ZZTRptRdaE5tiXQ6g+wYUybsaLQZuT1uI/IlCFmzQSQ==
+X-Received: by 2002:a5d:410f:: with SMTP id l15mr15384783wrp.6.1556557235470; 
+	Mon, 29 Apr 2019 10:00:35 -0700 (PDT)
 Received: from orth.archaic.org.uk (orth.archaic.org.uk. [81.2.115.148])
-	by smtp.gmail.com with ESMTPSA id a13sm36896wmj.39.2019.04.29.10.00.33
+	by smtp.gmail.com with ESMTPSA id a13sm36896wmj.39.2019.04.29.10.00.34
 	for <qemu-devel@nongnu.org>
 	(version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-	Mon, 29 Apr 2019 10:00:33 -0700 (PDT)
+	Mon, 29 Apr 2019 10:00:34 -0700 (PDT)
 From: Peter Maydell <peter.maydell@linaro.org>
 To: qemu-devel@nongnu.org
-Date: Mon, 29 Apr 2019 17:59:49 +0100
-Message-Id: <20190429170030.11323-2-peter.maydell@linaro.org>
+Date: Mon, 29 Apr 2019 17:59:50 +0100
+Message-Id: <20190429170030.11323-3-peter.maydell@linaro.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20190429170030.11323-1-peter.maydell@linaro.org>
 References: <20190429170030.11323-1-peter.maydell@linaro.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
 	recognized.
-X-Received-From: 2a00:1450:4864:20::32d
-Subject: [Qemu-devel] [PULL 01/42] hw/arm/smmuv3: Remove SMMUNotifierNode
+X-Received-From: 2a00:1450:4864:20::430
+Subject: [Qemu-devel] [PULL 02/42] hw/ssi/xilinx_spips: Avoid variable
+ length array
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -96,129 +98,43 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Content-Type: text/plain; charset="UTF-8"
-Message-ID: <20190429165949.CTDTQnwHQHAOORYWUePHYx5505gEIylpIwLa4yUOR30@z>
+Message-ID: <20190429165950.OpsTVXje4K-0auotJUZ-vGpDhD1W_uPycdH6koF4ur8@z>
 
-From: Eric Auger <eric.auger@redhat.com>
+In the stripe8() function we use a variable length array; however
+we know that the maximum length required is MAX_NUM_BUSSES. Use
+a fixed-length array and an assert instead.
 
-The SMMUNotifierNode struct is not necessary and brings extra
-complexity so let's remove it. We now directly track the SMMUDevices
-which have registered IOMMU MR notifiers.
-
-This is inspired from the same transformation on intel-iommu
-done in commit b4a4ba0d68f50f218ee3957b6638dbee32a5eeef
-("intel-iommu: remove IntelIOMMUNotifierNode")
-
-Signed-off-by: Eric Auger <eric.auger@redhat.com>
-Reviewed-by: Peter Xu <peterx@redhat.com>
-Message-id: 20190409160219.19026-1-eric.auger@redhat.com
 Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+Reviewed-by: Francisco Iglesias <frasse.iglesias@gmail.com>
+Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
+Reviewed-by: Stefano Garzarella <sgarzare@redhat.com>
+Message-id: 20190328152635.2794-1-peter.maydell@linaro.org
 ---
- include/hw/arm/smmu-common.h |  8 ++------
- hw/arm/smmu-common.c         |  6 +++---
- hw/arm/smmuv3.c              | 28 +++++++---------------------
- 3 files changed, 12 insertions(+), 30 deletions(-)
+ hw/ssi/xilinx_spips.c | 6 ++++--
+ 1 file changed, 4 insertions(+), 2 deletions(-)
 
-diff --git a/include/hw/arm/smmu-common.h b/include/hw/arm/smmu-common.h
-index b07cadd0ef9..2c7fbf42025 100644
---- a/include/hw/arm/smmu-common.h
-+++ b/include/hw/arm/smmu-common.h
-@@ -80,13 +80,9 @@ typedef struct SMMUDevice {
-     AddressSpace       as;
-     uint32_t           cfg_cache_hits;
-     uint32_t           cfg_cache_misses;
-+    QLIST_ENTRY(SMMUDevice) next;
- } SMMUDevice;
+diff --git a/hw/ssi/xilinx_spips.c b/hw/ssi/xilinx_spips.c
+index 16f88f74029..c615058cc1b 100644
+--- a/hw/ssi/xilinx_spips.c
++++ b/hw/ssi/xilinx_spips.c
+@@ -429,12 +429,14 @@ static void xlnx_zynqmp_qspips_reset(DeviceState *d)
  
--typedef struct SMMUNotifierNode {
--    SMMUDevice *sdev;
--    QLIST_ENTRY(SMMUNotifierNode) next;
--} SMMUNotifierNode;
--
- typedef struct SMMUPciBus {
-     PCIBus       *bus;
-     SMMUDevice   *pbdev[0]; /* Parent array is sparse, so dynamically alloc */
-@@ -108,7 +104,7 @@ typedef struct SMMUState {
-     GHashTable *iotlb;
-     SMMUPciBus *smmu_pcibus_by_bus_num[SMMU_PCI_BUS_MAX];
-     PCIBus *pci_bus;
--    QLIST_HEAD(, SMMUNotifierNode) notifiers_list;
-+    QLIST_HEAD(, SMMUDevice) devices_with_notifiers;
-     uint8_t bus_num;
-     PCIBus *primary_bus;
- } SMMUState;
-diff --git a/hw/arm/smmu-common.c b/hw/arm/smmu-common.c
-index bbf4b8721a3..e94be6db6c1 100644
---- a/hw/arm/smmu-common.c
-+++ b/hw/arm/smmu-common.c
-@@ -412,10 +412,10 @@ inline void smmu_inv_notifiers_mr(IOMMUMemoryRegion *mr)
- /* Unmap all notifiers of all mr's */
- void smmu_inv_notifiers_all(SMMUState *s)
+ static inline void stripe8(uint8_t *x, int num, bool dir)
  {
--    SMMUNotifierNode *node;
-+    SMMUDevice *sdev;
+-    uint8_t r[num];
+-    memset(r, 0, sizeof(uint8_t) * num);
++    uint8_t r[MAX_NUM_BUSSES];
+     int idx[2] = {0, 0};
+     int bit[2] = {0, 7};
+     int d = dir;
  
--    QLIST_FOREACH(node, &s->notifiers_list, next) {
--        smmu_inv_notifiers_mr(&node->sdev->iommu);
-+    QLIST_FOREACH(sdev, &s->devices_with_notifiers, next) {
-+        smmu_inv_notifiers_mr(&sdev->iommu);
-     }
- }
- 
-diff --git a/hw/arm/smmuv3.c b/hw/arm/smmuv3.c
-index 8c4e99fecc6..fd8ec7860ee 100644
---- a/hw/arm/smmuv3.c
-+++ b/hw/arm/smmuv3.c
-@@ -828,10 +828,10 @@ static void smmuv3_notify_iova(IOMMUMemoryRegion *mr,
- /* invalidate an asid/iova tuple in all mr's */
- static void smmuv3_inv_notifiers_iova(SMMUState *s, int asid, dma_addr_t iova)
- {
--    SMMUNotifierNode *node;
-+    SMMUDevice *sdev;
- 
--    QLIST_FOREACH(node, &s->notifiers_list, next) {
--        IOMMUMemoryRegion *mr = &node->sdev->iommu;
-+    QLIST_FOREACH(sdev, &s->devices_with_notifiers, next) {
-+        IOMMUMemoryRegion *mr = &sdev->iommu;
-         IOMMUNotifier *n;
- 
-         trace_smmuv3_inv_notifiers_iova(mr->parent_obj.name, asid, iova);
-@@ -1472,8 +1472,6 @@ static void smmuv3_notify_flag_changed(IOMMUMemoryRegion *iommu,
-     SMMUDevice *sdev = container_of(iommu, SMMUDevice, iommu);
-     SMMUv3State *s3 = sdev->smmu;
-     SMMUState *s = &(s3->smmu_state);
--    SMMUNotifierNode *node = NULL;
--    SMMUNotifierNode *next_node = NULL;
- 
-     if (new & IOMMU_NOTIFIER_MAP) {
-         int bus_num = pci_bus_num(sdev->bus);
-@@ -1485,22 +1483,10 @@ static void smmuv3_notify_flag_changed(IOMMUMemoryRegion *iommu,
- 
-     if (old == IOMMU_NOTIFIER_NONE) {
-         trace_smmuv3_notify_flag_add(iommu->parent_obj.name);
--        node = g_malloc0(sizeof(*node));
--        node->sdev = sdev;
--        QLIST_INSERT_HEAD(&s->notifiers_list, node, next);
--        return;
--    }
--
--    /* update notifier node with new flags */
--    QLIST_FOREACH_SAFE(node, &s->notifiers_list, next, next_node) {
--        if (node->sdev == sdev) {
--            if (new == IOMMU_NOTIFIER_NONE) {
--                trace_smmuv3_notify_flag_del(iommu->parent_obj.name);
--                QLIST_REMOVE(node, next);
--                g_free(node);
--            }
--            return;
--        }
-+        QLIST_INSERT_HEAD(&s->devices_with_notifiers, sdev, next);
-+    } else if (new == IOMMU_NOTIFIER_NONE) {
-+        trace_smmuv3_notify_flag_del(iommu->parent_obj.name);
-+        QLIST_REMOVE(sdev, next);
-     }
- }
- 
++    assert(num <= MAX_NUM_BUSSES);
++    memset(r, 0, sizeof(uint8_t) * num);
++
+     for (idx[0] = 0; idx[0] < num; ++idx[0]) {
+         for (bit[0] = 7; bit[0] >= 0; bit[0]--) {
+             r[idx[!d]] |= x[idx[d]] & 1 << bit[d] ? 1 << bit[!d] : 0;
 -- 
 2.20.1
 
