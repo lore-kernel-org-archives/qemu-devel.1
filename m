@@ -1,16 +1,16 @@
-Received: from eggs.gnu.org ([209.51.188.92]:50867)
+Received: from eggs.gnu.org ([209.51.188.92]:51947)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1hKynP-0003yA-4J
-	for qemu-devel@nongnu.org; Mon, 29 Apr 2019 01:25:44 -0400
+	(envelope-from <thuth@redhat.com>) id 1hKysT-0005ac-5g
+	for qemu-devel@nongnu.org; Mon, 29 Apr 2019 01:30:58 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1hKynN-0001ht-TV
-	for qemu-devel@nongnu.org; Mon, 29 Apr 2019 01:25:43 -0400
-References: <155646780285.10667.18275282182893876584@c2072b67cc0c>
+	(envelope-from <thuth@redhat.com>) id 1hKysS-0004E8-0L
+	for qemu-devel@nongnu.org; Mon, 29 Apr 2019 01:30:57 -0400
+References: <155650963851.10667.10736189532511840020@c2072b67cc0c>
 From: Thomas Huth <thuth@redhat.com>
-Message-ID: <9c290579-45b2-88f5-2b1f-6af0db5a8e1f@redhat.com>
-Date: Mon, 29 Apr 2019 07:25:15 +0200
+Message-ID: <ec0fad50-140c-0bf4-3421-d4e3d2d12dea@redhat.com>
+Date: Mon, 29 Apr 2019 07:30:42 +0200
 MIME-Version: 1.0
-In-Reply-To: <155646780285.10667.18275282182893876584@c2072b67cc0c>
+In-Reply-To: <155650963851.10667.10736189532511840020@c2072b67cc0c>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
@@ -27,55 +27,44 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: fam@euphon.net, kwolf@redhat.com, emaste@freebsd.org, qemu-block@nongnu.org, philmd@redhat.com, armbru@redhat.com, cfergeau@redhat.com, mreitz@redhat.com, alex.bennee@linaro.org, wainersm@redhat.com, lwhsu@freebsd.org
 
-On 28/04/2019 18.10, no-reply@patchew.org wrote:
+On 29/04/2019 05.47, no-reply@patchew.org wrote:
 > Patchew URL: https://patchew.org/QEMU/20190428155451.15653-1-thuth@redhat.com/
 > 
-> 
-> 
-> Hi,
-> 
-> This series seems to have some coding style problems. See output below for
-> more information:
-> 
-> Type: series
-> Message-id: 20190428155451.15653-1-thuth@redhat.com
-> Subject: [Qemu-devel] [PATCH v2 0/8] tests/qemu-iotests: Run basic iotests during "make check"
+> This series failed the asan build test. Please find the testing commands and
+> their output below. If you have Docker installed, you can probably reproduce it
+> locally.
 > 
 > === TEST SCRIPT BEGIN ===
 > #!/bin/bash
-> git rev-parse base > /dev/null || exit 0
-> git config --local diff.renamelimit 0
-> git config --local diff.renames True
-> git config --local diff.algorithm histogram
-> ./scripts/checkpatch.pl --mailback base..
+> time make docker-test-debug@fedora TARGET_LIST=x86_64-softmmu J=14 NETWORK=1
 > === TEST SCRIPT END ===
 > 
-> Updating 3c8cf5a9c21ff8782164d1def7f44bd888713384
-> From https://github.com/patchew-project/qemu
->  * [new tag]               patchew/20190428155451.15653-1-thuth@redhat.com -> patchew/20190428155451.15653-1-thuth@redhat.com
-> Switched to a new branch 'test'
-> 7bb09e08a3 tests: Run the iotests during "make check" again
-> 3d905a091e tests/qemu-iotests/group: Re-use the "auto" group for tests that can always run
-> 565003ac8a tests/qemu-iotests: Remove the "_supported_os Linux" line from many tests
-> fb27dba3d9 cirrus / travis: Add gnu-sed and bash for macOS and FreeBSD
-> 02ac8a4bf6 tests/qemu-iotests: Do not hard-code the path to bash
-> 34c6a891ea tests/qemu-iotests/check: Pick a default machine if necessary
-> d091edf7c1 tests/qemu-iotests/005: Add a sanity check for large sparse file support
-> 3cf4caa193 tests/qemu-iotests: Fix output of qemu-io related tests
-> 
-> === OUTPUT BEGIN ===
-> 1/8 Checking commit 3cf4caa193cc (tests/qemu-iotests: Fix output of qemu-io related tests)
-> 2/8 Checking commit d091edf7c1ef (tests/qemu-iotests/005: Add a sanity check for large sparse file support)
-> 3/8 Checking commit 34c6a891ea6e (tests/qemu-iotests/check: Pick a default machine if necessary)
-> 4/8 Checking commit 02ac8a4bf608 (tests/qemu-iotests: Do not hard-code the path to bash)
-> 5/8 Checking commit fb27dba3d9f0 (cirrus / travis: Add gnu-sed and bash for macOS and FreeBSD)
-> 6/8 Checking commit 565003ac8a70 (tests/qemu-iotests: Remove the "_supported_os Linux" line from many tests)
-> 7/8 Checking commit 3d905a091e64 (tests/qemu-iotests/group: Re-use the "auto" group for tests that can always run)
-> ERROR: trailing whitespace
-> #125: FILE: tests/qemu-iotests/group:115:
-> +093 $
+> The full log is available at
+> http://patchew.org/logs/20190428155451.15653-1-thuth@redhat.com/testing.asan/?type=message.
 
-Not an error: The trailing whitespace is currently required for the
-parsing code in the "check" script.
+The asan test failed since it could not check out the repository ...
+a networking problem?
+
+Anyway, looks like there was a real bug here:
+
+ https://patchew.org/logs/20190428155451.15653-1-thuth@redhat.com/testing.docker-clang@ubuntu/?type=message
+
+Test 162 failed with:
+
+162         - output mismatch (see 162.out.bad)
+--- /tmp/qemu-test/src/tests/qemu-iotests/162.out	2019-04-28 16:09:31.000000000 +0000
++++ /tmp/qemu-test/build/tests/qemu-iotests/162.out.bad	2019-04-28 16:24:21.669646149 +0000
+@@ -6,7 +6,9 @@
+ image: nbd+unix://?socket=42
+ 
+ === SSH ===
++qemu-img: warning: GLib: getpwuid_r(): failed due to unknown user id (1003)
+ qemu-img: Could not open 'json:{"driver": "ssh", "host": "localhost", "port": "0", "path": "/foo"}': Failed to connect socket: Connection refused
++qemu-img: warning: GLib: getpwuid_r(): failed due to unknown user id (1003)
+ qemu-img: Could not open 'driver=ssh,host=localhost,port=0,path=/foo': Failed to connect socket: Connection refused
+ qemu-img: Could not open 'json:{"driver": "ssh", "host": "localhost", "port": 0.42, "path": "/foo"}': Parameter 'port' expects a number
+ qemu-img: Could not open 'driver=ssh,host=localhost,port=0.42,path=/foo': Parameter 'port' expects a number
+
+... I think I'll remove 162 from the "auto" group to avoid this.
 
  Thomas
