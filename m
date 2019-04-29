@@ -2,72 +2,114 @@ Return-Path: <SRS0=sEuR=S7=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.7 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7C40CC43219
-	for <qemu-devel@archiver.kernel.org>; Mon, 29 Apr 2019 17:52:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9C507C43219
+	for <qemu-devel@archiver.kernel.org>; Mon, 29 Apr 2019 17:57:37 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5366F2087B
-	for <qemu-devel@archiver.kernel.org>; Mon, 29 Apr 2019 17:52:39 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5366F2087B
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
+	by mail.kernel.org (Postfix) with ESMTPS id 6098C20675
+	for <qemu-devel@archiver.kernel.org>; Mon, 29 Apr 2019 17:57:37 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="AttrM7nR"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6098C20675
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=oracle.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:33153 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:33199 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hLASE-0005ps-Im
-	for qemu-devel@archiver.kernel.org; Mon, 29 Apr 2019 13:52:38 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:46728)
+	id 1hLAX2-00085u-IC
+	for qemu-devel@archiver.kernel.org; Mon, 29 Apr 2019 13:57:36 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:47889)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1hLAQS-0004YQ-PW
-	for qemu-devel@nongnu.org; Mon, 29 Apr 2019 13:50:49 -0400
+	(envelope-from <wei.d.li@oracle.com>) id 1hLAW9-0007eQ-GC
+	for qemu-devel@nongnu.org; Mon, 29 Apr 2019 13:56:42 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1hLAQR-0002lv-Hy
-	for qemu-devel@nongnu.org; Mon, 29 Apr 2019 13:50:48 -0400
-Received: from indium.canonical.com ([91.189.90.7]:33612)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1hLAQR-0002lO-CE
-	for qemu-devel@nongnu.org; Mon, 29 Apr 2019 13:50:47 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1hLAQM-00027G-Vr
-	for <qemu-devel@nongnu.org>; Mon, 29 Apr 2019 17:50:43 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 7052D2E80EB
-	for <qemu-devel@nongnu.org>; Mon, 29 Apr 2019 17:50:40 +0000 (UTC)
-MIME-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Mon, 29 Apr 2019 17:40:52 -0000
-From: Ben Wibking <1818937@bugs.launchpad.net>
-To: qemu-devel@nongnu.org
-X-Launchpad-Notification-Type: bug
-X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
-X-Launchpad-Bug-Tags: crash hvf macos
-X-Launchpad-Bug-Information-Type: Public
-X-Launchpad-Bug-Private: no
-X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: bwibking cuser2
-X-Launchpad-Bug-Reporter: Chen Zhang (cuser2)
-X-Launchpad-Bug-Modifier: Ben Wibking (bwibking)
-References: <155192472106.28960.15645485731508389788.malonedeb@chaenomeles.canonical.com>
-Message-Id:
- <155655965273.7051.11571422786261284957.malone@chaenomeles.canonical.com>
-X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
-X-Launchpad-Message-For: qemu-devel-ml
-Precedence: bulk
-X-Generated-By: Launchpad (canonical.com); Revision="18928";
-	Instance="launchpad-lazr.conf"
-X-Launchpad-Hash: 84ebde4dbad0eff55bc49bf4918db67d232a43f4
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 91.189.90.7
-Subject: [Qemu-devel] [Bug 1818937] Re: Crash with HV_ERROR on macOS host
+	(envelope-from <wei.d.li@oracle.com>) id 1hLAW8-00057S-IO
+	for qemu-devel@nongnu.org; Mon, 29 Apr 2019 13:56:41 -0400
+Received: from userp2120.oracle.com ([156.151.31.85]:39338)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <wei.d.li@oracle.com>) id 1hLAW8-00057C-AT
+	for qemu-devel@nongnu.org; Mon, 29 Apr 2019 13:56:40 -0400
+Received: from pps.filterd (userp2120.oracle.com [127.0.0.1])
+	by userp2120.oracle.com (8.16.0.27/8.16.0.27) with SMTP id
+	x3THra5w123126; Mon, 29 Apr 2019 17:56:38 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com;
+	h=date : subject : from
+	: to : cc : message-id : references : in-reply-to : mime-version :
+	content-type : content-transfer-encoding; s=corp-2018-07-02;
+	bh=xSXQUYOgcKeqrez2deabmhq8qafM0cEGHbMauWY3gX4=;
+	b=AttrM7nRNkJwVLGpVRc6CAMfZCZ7uG8KH/lUJ4H56heshOK8lqWbdJtWFWcxPKeVgaPB
+	J+wtypMqKK3UdPEoNnU6XcDA+pb9rYYBxZbZW69kww5WO7D1o6EygB3YlgeIDGOFJzLJ
+	T/nKgre1OPYyWOuvp+0HWTVv9UyHh800WisqqisukkYgbPfqwhpps4TyjLcUV/sGP6Us
+	D4hGallz6RYkhMA2J8jWL/d/4sacSouVsaDVEsi2aE/39IytcHapLauJDcz/XPHufd0o
+	pcPsw9yEd6wRdshOrBHBaoZkir4RDECWCMSp60UXKVGfvMXwLFs63qyGKL+ptLU+Wcgd
+	Rg== 
+Received: from userp3020.oracle.com (userp3020.oracle.com [156.151.31.79])
+	by userp2120.oracle.com with ESMTP id 2s4fqpyx51-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Mon, 29 Apr 2019 17:56:38 +0000
+Received: from pps.filterd (userp3020.oracle.com [127.0.0.1])
+	by userp3020.oracle.com (8.16.0.27/8.16.0.27) with SMTP id
+	x3THsw2n172533; Mon, 29 Apr 2019 17:56:38 GMT
+Received: from userv0121.oracle.com (userv0121.oracle.com [156.151.31.72])
+	by userp3020.oracle.com with ESMTP id 2s5u50hq5j-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Mon, 29 Apr 2019 17:56:37 +0000
+Received: from abhmp0015.oracle.com (abhmp0015.oracle.com [141.146.116.21])
+	by userv0121.oracle.com (8.14.4/8.13.8) with ESMTP id x3THuaLI014889;
+	Mon, 29 Apr 2019 17:56:37 GMT
+Received: from [10.74.107.66] (/10.74.107.66)
+	by default (Oracle Beehive Gateway v4.0)
+	with ESMTP ; Mon, 29 Apr 2019 10:56:36 -0700
+User-Agent: Microsoft-MacOutlook/10.15.0.190115
+Date: Mon, 29 Apr 2019 10:56:31 -0700
+From: Wei Li <wei.d.li@oracle.com>
+To: Stefan Hajnoczi <stefanha@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <1A278B43-AA26-43B4-B6C2-17231E780BBE@oracle.com>
+Thread-Topic: [Qemu-devel] Following up questions related to QEMU and I/O
+	Thread
+References: <2D7F11D0-4A02-4A0F-961D-854240376B17@oracle.com>
+	<20190401090724.GA643@stefanha-x1.localdomain>
+	<CC372DF3-1AC6-46B5-98A5-21159497034A@oracle.com>
+	<60340EAF-4C85-4798-9999-34F1A37E2086@oracle.com>
+	<898ef1d4-bfa2-9952-8ceb-f1282b85e29c@oracle.com>
+	<20190416092042.GB32709@stefanha-x1.localdomain>
+	<8E5AF770-69ED-4D44-8A25-B51344996D9E@oracle.com>
+	<3F7E854A-3C1D-4204-8C35-893FC0614796@oracle.com>
+	<20190423120453.GF32465@stefanha-x1.localdomain>
+	<44520476-d6a8-2e3f-1602-388e2e1e874e@redhat.com>
+	<20190429134048.GH7587@stefanha-x1.localdomain>
+In-Reply-To: <20190429134048.GH7587@stefanha-x1.localdomain>
+Mime-version: 1.0
+Content-type: text/plain; charset="UTF-8"
+Content-transfer-encoding: quoted-printable
+X-Proofpoint-Virus-Version: vendor=nai engine=5900 definitions=9242
+	signatures=668685
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=0
+	malwarescore=0
+	phishscore=0 bulkscore=0 spamscore=0 mlxscore=0 mlxlogscore=999
+	adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+	engine=8.0.1-1810050000 definitions=main-1904290122
+X-Proofpoint-Virus-Version: vendor=nai engine=5900 definitions=9242
+	signatures=668685
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0
+	priorityscore=1501 malwarescore=0
+	suspectscore=0 phishscore=0 bulkscore=0 spamscore=0 clxscore=1015
+	lowpriorityscore=0 mlxscore=0 impostorscore=0 mlxlogscore=999
+	adultscore=0
+	classifier=spam adjust=0 reason=mlx scancount=1 engine=8.0.1-1810050000
+	definitions=main-1904290122
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic]
+X-Received-From: 156.151.31.85
+Subject: Re: [Qemu-devel] Following up questions related to QEMU and I/O
+ Thread
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
+Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -76,90 +118,52 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1818937 <1818937@bugs.launchpad.net>
+Cc: Stefan Hajnoczi <stefanha@gmail.com>, qemu-devel@nongnu.org,
+	Dongli Zhang <dongli.zhang@oracle.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190429174052.r2FNIVgFOxV3RbPQw8OoLWuwMC86o9EDRSmqOSy8psE@z>
+Message-ID: <20190429175631.mfb_ARpShGU-UeUQLZ7_A0Toeh7nb3dL_tinVqko_Kw@z>
 
-^This is on version:
+Thanks Stefan!
 
-% qemu-system-x86_64 --version
-QEMU emulator version 4.0.50 (v4.0.0-rc4-52-g3284aa1281-dirty)
-Copyright (c) 2003-2019 Fabrice Bellard and the QEMU Project developers
+Does this mean the performance could be improved via adding Batch I/O submi=
+ssion support in Guest driver side which will be able to reduce the number o=
+f virtqueue kicks?
 
--- =
+Thanks,
+Wei
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1818937
+=EF=BB=BFOn 4/29/19, 6:40 AM, "Stefan Hajnoczi" <stefanha@redhat.com> wrote:
 
-Title:
-  Crash with HV_ERROR on macOS host
+    On Fri, Apr 26, 2019 at 10:14:16AM +0200, Paolo Bonzini wrote:
+    > On 23/04/19 14:04, Stefan Hajnoczi wrote:
+    > >> In addition, does Virtio-scsi support Batch I/O Submission feature
+    > >> which may be able to increase the IOPS via reducing the number of
+    > >> system calls?
+    > >
+    > > I don't see obvious batching support in drivers/scsi/virtio_scsi.c.
+    > > The Linux block layer supports batching but I'm not sure if the SCS=
+I
+    > > layer does.
+    >=20
+    > I think he's referring to QEMU, in which case yes, virtio-scsi does
+    > batch I/O submission.  See virtio_scsi_handle_cmd_req_prepare and
+    > virtio_scsi_handle_cmd_req_submit in hw/scsi/virtio-scsi.c, they do
+    > blk_io_plug and blk_io_unplug in order to batch I/O requests from QEM=
+U
+    > to the host kernel.
+   =20
+    This isn't fully effective since the guest driver kicks once per
+    request.  Therefore QEMU-level batching you mentioned only works if QEM=
+U
+    is slower at handling virtqueue kicks than the guest is at submitting
+    requests.
+   =20
+    I wonder if this is something that can be improved.
+   =20
+    Stefan
+   =20
 
-Status in QEMU:
-  New
 
-Bug description:
-  On macOS host running Windows 10 guest, qemu crashed with error
-  message: Error: HV_ERROR.
-
-  Host: macOS Mojave 10.14.3 (18D109) Late 2014 Mac mini presumably Core i5=
- 4278U.
-  QEMU: git commit a3e3b0a7bd5de211a62cdf2d6c12b96d3c403560
-  QEMU parameter: qemu-system-x86_64 -m 3000 -drive file=3Ddisk.img,if=3Dvi=
-rtio,discard=3Dunmap -accel hvf -soundhw hda -smp 3
-
-  thread list
-  Process 56054 stopped
-    thread #1: tid =3D 0x2ffec8, 0x00007fff48d0805a vImage`vLookupTable_Pla=
-nar16 + 970, queue =3D 'com.apple.main-thread'
-    thread #2: tid =3D 0x2ffecc, 0x00007fff79d6d7de libsystem_kernel.dylib`=
-__psynch_cvwait + 10
-    thread #3: tid =3D 0x2ffecd, 0x00007fff79d715aa libsystem_kernel.dylib`=
-__select + 10
-    thread #4: tid =3D 0x2ffece, 0x00007fff79d71d9a libsystem_kernel.dylib`=
-__sigwait + 10
-  * thread #6: tid =3D 0x2ffed0, 0x00007fff79d7023e libsystem_kernel.dylib`=
-__pthread_kill + 10, stop reason =3D signal SIGABRT
-    thread #7: tid =3D 0x2ffed1, 0x00007fff79d6d7de libsystem_kernel.dylib`=
-__psynch_cvwait + 10
-    thread #8: tid =3D 0x2ffed2, 0x00007fff79d6d7de libsystem_kernel.dylib`=
-__psynch_cvwait + 10
-    thread #11: tid =3D 0x2fff34, 0x00007fff79d6a17a libsystem_kernel.dylib=
-`mach_msg_trap + 10, name =3D 'com.apple.NSEventThread'
-    thread #30: tid =3D 0x300c04, 0x00007fff79e233f8 libsystem_pthread.dyli=
-b`start_wqthread
-    thread #31: tid =3D 0x300c16, 0x00007fff79e233f8 libsystem_pthread.dyli=
-b`start_wqthread
-    thread #32: tid =3D 0x300c17, 0x0000000000000000
-    thread #33: tid =3D 0x300c93, 0x00007fff79d6d7de libsystem_kernel.dylib=
-`__psynch_cvwait + 10
-
-  =
-
-  Crashed thread:
-
-  * thread #6, stop reason =3D signal SIGABRT
-    * frame #0: 0x00007fff79d7023e libsystem_kernel.dylib`__pthread_kill + =
-10
-      frame #1: 0x00007fff79e26c1c libsystem_pthread.dylib`pthread_kill + 2=
-85
-      frame #2: 0x00007fff79cd91c9 libsystem_c.dylib`abort + 127
-      frame #3: 0x000000010baa476d qemu-system-x86_64`assert_hvf_ok(ret=3D<=
-unavailable>) at hvf.c:106 [opt]
-      frame #4: 0x000000010baa4c8f qemu-system-x86_64`hvf_vcpu_exec(cpu=3D0=
-x00007f8e5283de00) at hvf.c:681 [opt]
-      frame #5: 0x000000010b988423 qemu-system-x86_64`qemu_hvf_cpu_thread_f=
-n(arg=3D0x00007f8e5283de00) at cpus.c:1636 [opt]
-      frame #6: 0x000000010bd9dfce qemu-system-x86_64`qemu_thread_start(arg=
-s=3D<unavailable>) at qemu-thread-posix.c:502 [opt]
-      frame #7: 0x00007fff79e24305 libsystem_pthread.dylib`_pthread_body + =
-126
-      frame #8: 0x00007fff79e2726f libsystem_pthread.dylib`_pthread_start +=
- 70
-      frame #9: 0x00007fff79e23415 libsystem_pthread.dylib`thread_start + 13
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1818937/+subscriptions
 
