@@ -2,82 +2,83 @@ Return-Path: <SRS0=sEuR=S7=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.0 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 33514C04AA6
-	for <qemu-devel@archiver.kernel.org>; Mon, 29 Apr 2019 17:46:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E9C64C43219
+	for <qemu-devel@archiver.kernel.org>; Mon, 29 Apr 2019 17:46:49 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id F26B120652
-	for <qemu-devel@archiver.kernel.org>; Mon, 29 Apr 2019 17:46:00 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id B481620652
+	for <qemu-devel@archiver.kernel.org>; Mon, 29 Apr 2019 17:46:49 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="sVSsBnJI"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F26B120652
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="gFoKaeSq"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B481620652
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:33068 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:33070 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hLALo-0001G4-A0
-	for qemu-devel@archiver.kernel.org; Mon, 29 Apr 2019 13:46:00 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:44847)
+	id 1hLAMa-0001iV-Qy
+	for qemu-devel@archiver.kernel.org; Mon, 29 Apr 2019 13:46:49 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:41664)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1hLAI4-00070j-Jo
-	for qemu-devel@nongnu.org; Mon, 29 Apr 2019 13:42:09 -0400
+	(envelope-from <alistair23@gmail.com>) id 1hLA5j-0004TG-Tx
+	for qemu-devel@nongnu.org; Mon, 29 Apr 2019 13:29:24 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1hLAI3-0005EH-HP
-	for qemu-devel@nongnu.org; Mon, 29 Apr 2019 13:42:08 -0400
-Received: from mail-oi1-x243.google.com ([2607:f8b0:4864:20::243]:35257)
+	(envelope-from <alistair23@gmail.com>) id 1hLA5j-0006Ae-2N
+	for qemu-devel@nongnu.org; Mon, 29 Apr 2019 13:29:23 -0400
+Received: from mail-lj1-x242.google.com ([2a00:1450:4864:20::242]:46677)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1hLAI3-00059s-Ak
-	for qemu-devel@nongnu.org; Mon, 29 Apr 2019 13:42:07 -0400
-Received: by mail-oi1-x243.google.com with SMTP id w197so9021900oia.2
-	for <qemu-devel@nongnu.org>; Mon, 29 Apr 2019 10:42:01 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+	(Exim 4.71) (envelope-from <alistair23@gmail.com>)
+	id 1hLA5g-000699-VZ; Mon, 29 Apr 2019 13:29:21 -0400
+Received: by mail-lj1-x242.google.com with SMTP id h21so10092400ljk.13;
+	Mon, 29 Apr 2019 10:29:20 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
 	h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-	:cc; bh=TbQQeoVuWlL6uw2HCqjR19lGYYJs6/Qda8ZujnN+WTE=;
-	b=sVSsBnJIZdtEkNJqyy8kSb4Nxfk/4XrReh3QV/xtufqirBPjEqSu/B5BAqSWQIiRmT
-	7wFWcg5euStqe0d1X8FU5MFpjh+vQSI9MzhY+XkWV4IpOCOBb/iK83qxc0Ug4SFmzHNB
-	e6/xIcrGgAFQg+HVNZupGOLKtx1nB2rfxg+hrbYT6r55RBLDQt6cRCdBh5VBCU2TX9va
-	KRzo34Kwv3aYK6xOkqxxPZMV9/5X2q0r++8UO9ugTXj4OsbcQvt5mmrGhDWoPpKZL0rX
-	xVMIrJB0wPOu1MMbKhUXbMeSsGjVLUuyxBh4apryJ9ZVV2etePuGCLU3uV9s5cyerciX
-	+uyA==
+	:cc:content-transfer-encoding;
+	bh=gLS9I0ngHrnn3Ujgur6YQTjnpkUCsdPWux+YrreoIwE=;
+	b=gFoKaeSqqjjUIfHjdi1V2wL1DTbZocQbM+iMoydPFobJyCX4QOGfKyEzHalbfAhjJ/
+	dKcVa+3jzEnBXATmT2hH3xNVuPDPShGAzqbI3ZD3Ynv6iyyu3pCi7mZJR7+sFdfRcVaC
+	qkgcVSyTVnGvh1MnlFfZp+Mywd4WzcaElsqor1NEzMLwWuk+6JGILYNYodytP3ZxhZEN
+	3j2VCZTXyZ1EhhsKD68CzRFFAHFWOhcAPklJBQ5TXjM9uE+wSKjQZP/Z3uGNunEH6zWH
+	Y21b9FjGypkJTfS060SrlxvymIcOtq/icBZYRC0sMbDFAuymvKwg+NpTWE2sUWEX3cPj
+	rffg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
 	d=1e100.net; s=20161025;
 	h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-	:message-id:subject:to:cc;
-	bh=TbQQeoVuWlL6uw2HCqjR19lGYYJs6/Qda8ZujnN+WTE=;
-	b=PYdaX2sZ3i1ZsGPD8WkZLXw/bJ//cz+R4JvAJY0zr4IrEj1VPC7j36VY3mTrt9qZ/E
-	HVpnyUEox3nSnTkc+U3doQH7hJQo1w1hrOqx3O5EWlqTszGqD0Ciw191+wTwjaYyf4g3
-	+UheUpmjHMX6uREhhquOJN/h4dMmfB6VXk6zww4udbOC3q4RQWU/gPfZehN8YSJ1B208
-	c9hdMDmO24IR9C5u/GywvcUpRSgm9RFq8AwmuBnCGJexqjk66ZcaWYrnrVHfBRrktHeA
-	aFA/iWD9WjIRE0preo9kCwv5mK2+YhJzqDygwHZw9Zb6vyig7TDI8gpnfrPl9aS0WQYp
-	k5zA==
-X-Gm-Message-State: APjAAAX4Ad7AdhxSOtH8Bka1KKDnpy//WeVOYm0ZmkYEmqLvLwarW3MT
-	hrgXqISsUNA1pHroLA8cvtTurfqsE3zBaPKPmxs6jsFoRd8=
-X-Google-Smtp-Source: APXvYqzyTYQjBXy2JLivoUHD3pBz2VE+Vv5rXzaBJUDA5R0z3NeZYxiCZ+6sJ64zIFcRwGhiH++gxV9+j5ghqD0s+OA=
-X-Received: by 2002:a05:6808:301:: with SMTP id
-	i1mr148150oie.163.1556559720863; 
-	Mon, 29 Apr 2019 10:42:00 -0700 (PDT)
+	:message-id:subject:to:cc:content-transfer-encoding;
+	bh=gLS9I0ngHrnn3Ujgur6YQTjnpkUCsdPWux+YrreoIwE=;
+	b=mRPzG9wrgiHq8cqEOuNzkmIp35/SFpGueDsfTZSyiKYrt9iOEzEgGPhmwNRnVtNtdM
+	nDEg7QIqV0GuBlBribqUCEKVIP/tsYRpcWw4FLrH0Jds3CPejZMnKH2h6Bj524oZ9ZeX
+	RJvMVgbrkn3thbOqlvj0by7lW74QYfwthFg1uWStBQnoYUWKvaJwamkwrYY2Jy2uUxwL
+	z3XFG8MlSGPT0TS2tET4FHOLmWbO9+lRvxQkngF56VQBeMzpbmq2aGlVcci5HIKtYiSN
+	WIfrGEsx2fCrKOhNbTpXsDvmufBLXK5fB4x5uKSHn0KW/kRe0JUnQUbRdUgsEVVt1j0n
+	q0GA==
+X-Gm-Message-State: APjAAAWqyMwoVrtdhCu53rIVXj5vk4bdTmBN+8oqQp9e2RBtfq8JiAEm
+	Nkq4+HTdShDhl4tqIXOBlLhGf4+appEJbNUv7nc=
+X-Google-Smtp-Source: APXvYqzjKJq/IiKV40YCEvMQ8p/Y5F0hP8AtMspqS3Rb/YofohBvrhK1M/MMq9KiQD4shENx0kZm2FaD3OuK7mjpXPs=
+X-Received: by 2002:a2e:5b97:: with SMTP id m23mr4739150lje.99.1556558958689; 
+	Mon, 29 Apr 2019 10:29:18 -0700 (PDT)
 MIME-Version: 1.0
-References: <20190403034358.21999-1-richard.henderson@linaro.org>
-	<20190403034358.21999-27-richard.henderson@linaro.org>
-In-Reply-To: <20190403034358.21999-27-richard.henderson@linaro.org>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Mon, 29 Apr 2019 18:41:49 +0100
+References: <20190427141459.19728-1-philmd@redhat.com>
+	<20190427141459.19728-2-philmd@redhat.com>
+In-Reply-To: <20190427141459.19728-2-philmd@redhat.com>
+From: Alistair Francis <alistair23@gmail.com>
+Date: Mon, 29 Apr 2019 10:28:49 -0700
 Message-ID:
- <CAFEAcA_TJJ7V3apxmGvhoiRk2dxzT77SapcyMuopGwqmeQoosw@mail.gmail.com>
-To: Richard Henderson <richard.henderson@linaro.org>
+ <CAKmqyKOESUfmvHY73k6NsnZ0Gr9LXuHwOUDSn2vXQGXRfmWkOA@mail.gmail.com>
+To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>
 Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
 	recognized.
-X-Received-From: 2607:f8b0:4864:20::243
-Subject: Re: [Qemu-devel] [PATCH 26/26] tcg: Use tlb_fill probe from
- tlb_vaddr_to_host
+X-Received-From: 2a00:1450:4864:20::242
+Subject: Re: [Qemu-devel] [PATCH 1/3] hw/Kconfig: Move the generic
+ XLNX_ZYNQMP to the root hw/Kconfig
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -89,53 +90,60 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: QEMU Developers <qemu-devel@nongnu.org>
+Cc: Peter Maydell <peter.maydell@linaro.org>, Thomas Huth <thuth@redhat.com>,
+	Alistair Francis <alistair@alistair23.me>,
+	"qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>,
+	qemu-arm <qemu-arm@nongnu.org>, Paolo Bonzini <pbonzini@redhat.com>,
+	"Edgar E. Iglesias" <edgar.iglesias@gmail.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190429174149.-nTgC-eIGGYp0jhhbbTa-76gwCLUcsx381AmIHyumKY@z>
+Message-ID: <20190429172849.lt8DXLj6oUVCO7pUsLFT0zb6iKFPtuztUZPlpr9Fcf0@z>
 
-On Wed, 3 Apr 2019 at 05:05, Richard Henderson
-<richard.henderson@linaro.org> wrote:
+On Sat, Apr 27, 2019 at 7:15 AM Philippe Mathieu-Daud=C3=A9
+<philmd@redhat.com> wrote:
 >
-> Most of the existing users would continue around a loop which
-> would fault the tlb entry in via a normal load/store.  But for
-> SVE we have a true non-faulting case which requires the new
-> probing form of tlb_fill.
+> The XLNX_ZYNQMP config is used in multiple subdirectories
+> (timer, intc). Move it to the root hw/Kconfig.
+>
+> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
 
-So am I right in thinking that this fixes a bug where we
-previously would mark a load as faulted if the memory happened
-not to be in the TLB, whereas now we will correctly pull in the
-TLB entry and do the load ?
+Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
 
-(Since guest code ought to be handling the "non-first-load
-faulted" case by looping round or otherwise arranging to
-retry, nothing in practice would have noticed this bug, right?)
+Alistair
 
-> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 > ---
->  include/exec/cpu_ldst.h | 40 ++++--------------------
->  accel/tcg/cputlb.c      | 69 ++++++++++++++++++++++++++++++++++++-----
->  target/arm/sve_helper.c |  6 +---
->  3 files changed, 68 insertions(+), 47 deletions(-)
+>  hw/Kconfig       | 3 +++
+>  hw/timer/Kconfig | 3 ---
+>  2 files changed, 3 insertions(+), 3 deletions(-)
 >
-> diff --git a/include/exec/cpu_ldst.h b/include/exec/cpu_ldst.h
-> index d78041d7a0..be8c3f4da2 100644
-> --- a/include/exec/cpu_ldst.h
-> +++ b/include/exec/cpu_ldst.h
-> @@ -440,43 +440,15 @@ static inline CPUTLBEntry *tlb_entry(CPUArchState *env, uintptr_t mmu_idx,
->   * This is the equivalent of the initial fast-path code used by
->   * TCG backends for guest load and store accesses.
->   */
-
-The doc comment which this is the last two lines of needs
-updating, I think -- with the changed implementation it's
-no longer just the equivalent of the fast-path bit of code,
-and it doesn't return NULL on a TLB miss any more.
-
-Otherwise
-Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
-
-thanks
--- PMM
+> diff --git a/hw/Kconfig b/hw/Kconfig
+> index 88b9f150070..c3c78f43eb5 100644
+> --- a/hw/Kconfig
+> +++ b/hw/Kconfig
+> @@ -72,3 +72,6 @@ config XILINX
+>  config XILINX_AXI
+>      bool
+>      select PTIMER # for hw/dma/xilinx_axidma.c
+> +
+> +config XLNX_ZYNQMP
+> +    bool
+> diff --git a/hw/timer/Kconfig b/hw/timer/Kconfig
+> index 51921eb63f1..eefc95f35ec 100644
+> --- a/hw/timer/Kconfig
+> +++ b/hw/timer/Kconfig
+> @@ -34,9 +34,6 @@ config TWL92230
+>      bool
+>      depends on I2C
+>
+> -config XLNX_ZYNQMP
+> -    bool
+> -
+>  config ALTERA_TIMER
+>      bool
+>      select PTIMER
+> --
+> 2.20.1
+>
+>
 
