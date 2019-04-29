@@ -1,31 +1,31 @@
-Received: from eggs.gnu.org ([209.51.188.92]:34251)
+Received: from eggs.gnu.org ([209.51.188.92]:34307)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1hL9ei-0004jG-BK
-	for qemu-devel@nongnu.org; Mon, 29 Apr 2019 13:01:29 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1hL9eo-0004pj-31
+	for qemu-devel@nongnu.org; Mon, 29 Apr 2019 13:01:35 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1hL9eb-0006ec-Ju
-	for qemu-devel@nongnu.org; Mon, 29 Apr 2019 13:01:24 -0400
-Received: from mail-wr1-x430.google.com ([2a00:1450:4864:20::430]:40481)
+	(envelope-from <peter.maydell@linaro.org>) id 1hL9em-0006iu-Ck
+	for qemu-devel@nongnu.org; Mon, 29 Apr 2019 13:01:33 -0400
+Received: from mail-wr1-x429.google.com ([2a00:1450:4864:20::429]:46342)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1hL9eX-0006Cj-79
-	for qemu-devel@nongnu.org; Mon, 29 Apr 2019 13:01:17 -0400
-Received: by mail-wr1-x430.google.com with SMTP id h4so17113350wre.7
-	for <qemu-devel@nongnu.org>; Mon, 29 Apr 2019 10:00:44 -0700 (PDT)
+	id 1hL9ej-0006Ul-24
+	for qemu-devel@nongnu.org; Mon, 29 Apr 2019 13:01:30 -0400
+Received: by mail-wr1-x429.google.com with SMTP id t17so17057979wrw.13
+	for <qemu-devel@nongnu.org>; Mon, 29 Apr 2019 10:01:01 -0700 (PDT)
 Received: from orth.archaic.org.uk (orth.archaic.org.uk. [81.2.115.148])
-	by smtp.gmail.com with ESMTPSA id a13sm36896wmj.39.2019.04.29.10.00.41
+	by smtp.gmail.com with ESMTPSA id a13sm36896wmj.39.2019.04.29.10.00.59
 	for <qemu-devel@nongnu.org>
 	(version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-	Mon, 29 Apr 2019 10:00:42 -0700 (PDT)
+	Mon, 29 Apr 2019 10:00:59 -0700 (PDT)
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Mon, 29 Apr 2019 17:59:56 +0100
-Message-Id: <20190429170030.11323-9-peter.maydell@linaro.org>
+Date: Mon, 29 Apr 2019 18:00:10 +0100
+Message-Id: <20190429170030.11323-23-peter.maydell@linaro.org>
 In-Reply-To: <20190429170030.11323-1-peter.maydell@linaro.org>
 References: <20190429170030.11323-1-peter.maydell@linaro.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PULL 08/42] target/arm: Honour M-profile FP enable
- bits
+Subject: [Qemu-devel] [PULL 22/42] target/arm: Activate M-profile floating
+ point context when FPCCR.ASPEN is set
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,137 +36,122 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-Like AArch64, M-profile floating point has no FPEXC enable
-bit to gate floating point; so always set the VFPEN TB flag.
+The M-profile FPCCR.ASPEN bit indicates that automatic floating-point
+context preservation is enabled. Before executing any floating-point
+instruction, if FPCCR.ASPEN is set and the CONTROL FPCA/SFPA bits
+indicate that there is no active floating point context then we
+must create a new context (by initializing FPSCR and setting
+FPCA/SFPA to indicate that the context is now active). In the
+pseudocode this is handled by ExecuteFPCheck().
 
-M-profile also has CPACR and NSACR similar to A-profile;
-they behave slightly differently:
- * the CPACR is banked between Secure and Non-Secure
- * if the NSACR forces a trap then this is taken to
-   the Secure state, not the Non-Secure state
-
-Honour the CPACR and NSACR settings. The NSACR handling
-requires us to borrow the exception.target_el field
-(usually meaningless for M profile) to distinguish the
-NOCP UsageFault taken to Secure state from the more
-usual fault taken to the current security state.
+Implement this with a new TB flag which tracks whether we
+need to create a new FP context.
 
 Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
-Message-id: 20190416125744.27770-6-peter.maydell@linaro.org
+Message-id: 20190416125744.27770-20-peter.maydell@linaro.org
 ---
- target/arm/helper.c    | 55 +++++++++++++++++++++++++++++++++++++++---
- target/arm/translate.c | 10 ++++++--
- 2 files changed, 60 insertions(+), 5 deletions(-)
+ target/arm/cpu.h       |  2 ++
+ target/arm/translate.h |  1 +
+ target/arm/helper.c    | 13 +++++++++++++
+ target/arm/translate.c | 29 +++++++++++++++++++++++++++++
+ 4 files changed, 45 insertions(+)
 
+diff --git a/target/arm/cpu.h b/target/arm/cpu.h
+index a2cf9aae3a1..d4996a4d204 100644
+--- a/target/arm/cpu.h
++++ b/target/arm/cpu.h
+@@ -3153,6 +3153,8 @@ FIELD(TBFLAG_A32, NS, 6, 1)
+ FIELD(TBFLAG_A32, VFPEN, 7, 1)
+ FIELD(TBFLAG_A32, CONDEXEC, 8, 8)
+ FIELD(TBFLAG_A32, SCTLR_B, 16, 1)
++/* For M profile only, set if we must create a new FP context */
++FIELD(TBFLAG_A32, NEW_FP_CTXT_NEEDED, 19, 1)
+ /* For M profile only, set if FPCCR.S does not match current security state */
+ FIELD(TBFLAG_A32, FPCCR_S_WRONG, 20, 1)
+ /* For M profile only, Handler (ie not Thread) mode */
+diff --git a/target/arm/translate.h b/target/arm/translate.h
+index 93abff645ad..ed8ae2e7e3b 100644
+--- a/target/arm/translate.h
++++ b/target/arm/translate.h
+@@ -41,6 +41,7 @@ typedef struct DisasContext {
+     bool v8m_secure; /* true if v8M and we're in Secure mode */
+     bool v8m_stackcheck; /* true if we need to perform v8M stack limit checks */
+     bool v8m_fpccr_s_wrong; /* true if v8M FPCCR.S != v8m_secure */
++    bool v7m_new_fp_ctxt_needed; /* ASPEN set but no active FP context */
+     /* Immediate value in AArch32 SVC insn; must be set if is_jmp == DISAS_SWI
+      * so that top level loop can generate correct syndrome information.
+      */
 diff --git a/target/arm/helper.c b/target/arm/helper.c
-index 57ef75b3fcb..c3d5fe09cdc 100644
+index 8290f56c658..84e3790a9de 100644
 --- a/target/arm/helper.c
 +++ b/target/arm/helper.c
-@@ -7556,6 +7556,25 @@ uint32_t arm_phys_excp_target_el(CPUState *cs, uint32_t excp_idx,
-     return target_el;
- }
- 
-+/*
-+ * Return true if the v7M CPACR permits access to the FPU for the specified
-+ * security state and privilege level.
-+ */
-+static bool v7m_cpacr_pass(CPUARMState *env, bool is_secure, bool is_priv)
-+{
-+    switch (extract32(env->v7m.cpacr[is_secure], 20, 2)) {
-+    case 0:
-+    case 2: /* UNPREDICTABLE: we treat like 0 */
-+        return false;
-+    case 1:
-+        return is_priv;
-+    case 3:
-+        return true;
-+    default:
-+        g_assert_not_reached();
-+    }
-+}
-+
- static bool v7m_stack_write(ARMCPU *cpu, uint32_t addr, uint32_t value,
-                             ARMMMUIdx mmu_idx, bool ignfault)
- {
-@@ -8815,9 +8834,23 @@ void arm_v7m_cpu_do_interrupt(CPUState *cs)
-         env->v7m.cfsr[env->v7m.secure] |= R_V7M_CFSR_UNDEFINSTR_MASK;
-         break;
-     case EXCP_NOCP:
--        armv7m_nvic_set_pending(env->nvic, ARMV7M_EXCP_USAGE, env->v7m.secure);
--        env->v7m.cfsr[env->v7m.secure] |= R_V7M_CFSR_NOCP_MASK;
-+    {
-+        /*
-+         * NOCP might be directed to something other than the current
-+         * security state if this fault is because of NSACR; we indicate
-+         * the target security state using exception.target_el.
-+         */
-+        int target_secstate;
-+
-+        if (env->exception.target_el == 3) {
-+            target_secstate = M_REG_S;
-+        } else {
-+            target_secstate = env->v7m.secure;
-+        }
-+        armv7m_nvic_set_pending(env->nvic, ARMV7M_EXCP_USAGE, target_secstate);
-+        env->v7m.cfsr[target_secstate] |= R_V7M_CFSR_NOCP_MASK;
-         break;
-+    }
-     case EXCP_INVSTATE:
-         armv7m_nvic_set_pending(env->nvic, ARMV7M_EXCP_USAGE, env->v7m.secure);
-         env->v7m.cfsr[env->v7m.secure] |= R_V7M_CFSR_INVSTATE_MASK;
-@@ -12751,6 +12784,22 @@ int fp_exception_el(CPUARMState *env, int cur_el)
-         return 0;
+@@ -13422,6 +13422,19 @@ void cpu_get_tb_cpu_state(CPUARMState *env, target_ulong *pc,
+         flags = FIELD_DP32(flags, TBFLAG_A32, FPCCR_S_WRONG, 1);
      }
  
-+    if (arm_feature(env, ARM_FEATURE_M)) {
-+        /* CPACR can cause a NOCP UsageFault taken to current security state */
-+        if (!v7m_cpacr_pass(env, env->v7m.secure, cur_el != 0)) {
-+            return 1;
-+        }
-+
-+        if (arm_feature(env, ARM_FEATURE_M_SECURITY) && !env->v7m.secure) {
-+            if (!extract32(env->v7m.nsacr, 10, 1)) {
-+                /* FP insns cause a NOCP UsageFault taken to Secure */
-+                return 3;
-+            }
-+        }
-+
-+        return 0;
++    if (arm_feature(env, ARM_FEATURE_M) &&
++        (env->v7m.fpccr[env->v7m.secure] & R_V7M_FPCCR_ASPEN_MASK) &&
++        (!(env->v7m.control[M_REG_S] & R_V7M_CONTROL_FPCA_MASK) ||
++         (env->v7m.secure &&
++          !(env->v7m.control[M_REG_S] & R_V7M_CONTROL_SFPA_MASK)))) {
++        /*
++         * ASPEN is set, but FPCA/SFPA indicate that there is no active
++         * FP context; we must create a new FP context before executing
++         * any FP insn.
++         */
++        flags = FIELD_DP32(flags, TBFLAG_A32, NEW_FP_CTXT_NEEDED, 1);
 +    }
 +
-     /* The CPACR controls traps to EL1, or PL1 if we're 32 bit:
-      * 0, 2 : trap EL0 and EL1/PL1 accesses
-      * 1    : trap only EL0 accesses
-@@ -12938,7 +12987,7 @@ void cpu_get_tb_cpu_state(CPUARMState *env, target_ulong *pc,
-         flags = FIELD_DP32(flags, TBFLAG_A32, SCTLR_B, arm_sctlr_b(env));
-         flags = FIELD_DP32(flags, TBFLAG_A32, NS, !access_secure_reg(env));
-         if (env->vfp.xregs[ARM_VFP_FPEXC] & (1 << 30)
--            || arm_el_is_aa64(env, 1)) {
-+            || arm_el_is_aa64(env, 1) || arm_feature(env, ARM_FEATURE_M)) {
-             flags = FIELD_DP32(flags, TBFLAG_A32, VFPEN, 1);
-         }
-         flags = FIELD_DP32(flags, TBFLAG_A32, XSCALE_CPAR, env->cp15.c15_cpar);
+     *pflags = flags;
+     *cs_base = 0;
+ }
 diff --git a/target/arm/translate.c b/target/arm/translate.c
-index a9784535069..6a11921d0b8 100644
+index f0332ac19ec..edb66e7be8e 100644
 --- a/target/arm/translate.c
 +++ b/target/arm/translate.c
-@@ -3399,8 +3399,14 @@ static int disas_vfp_insn(DisasContext *s, uint32_t insn)
-      * for attempts to execute invalid vfp/neon encodings with FP disabled.
-      */
-     if (s->fp_excp_el) {
--        gen_exception_insn(s, 4, EXCP_UDEF,
--                           syn_fp_access_trap(1, 0xe, false), s->fp_excp_el);
-+        if (arm_dc_feature(s, ARM_FEATURE_M)) {
-+            gen_exception_insn(s, 4, EXCP_NOCP, syn_uncategorized(),
-+                               s->fp_excp_el);
-+        } else {
-+            gen_exception_insn(s, 4, EXCP_UDEF,
-+                               syn_fp_access_trap(1, 0xe, false),
-+                               s->fp_excp_el);
+@@ -3438,6 +3438,33 @@ static int disas_vfp_insn(DisasContext *s, uint32_t insn)
+             /* Don't need to do this for any further FP insns in this TB */
+             s->v8m_fpccr_s_wrong = false;
+         }
++
++        if (s->v7m_new_fp_ctxt_needed) {
++            /*
++             * Create new FP context by updating CONTROL.FPCA, CONTROL.SFPA
++             * and the FPSCR.
++             */
++            TCGv_i32 control, fpscr;
++            uint32_t bits = R_V7M_CONTROL_FPCA_MASK;
++
++            fpscr = load_cpu_field(v7m.fpdscr[s->v8m_secure]);
++            gen_helper_vfp_set_fpscr(cpu_env, fpscr);
++            tcg_temp_free_i32(fpscr);
++            /*
++             * We don't need to arrange to end the TB, because the only
++             * parts of FPSCR which we cache in the TB flags are the VECLEN
++             * and VECSTRIDE, and those don't exist for M-profile.
++             */
++
++            if (s->v8m_secure) {
++                bits |= R_V7M_CONTROL_SFPA_MASK;
++            }
++            control = load_cpu_field(v7m.control[M_REG_S]);
++            tcg_gen_ori_i32(control, control, bits);
++            store_cpu_field(control, v7m.control[M_REG_S]);
++            /* Don't need to do this for any further FP insns in this TB */
++            s->v7m_new_fp_ctxt_needed = false;
 +        }
-         return 0;
      }
+ 
+     if (extract32(insn, 28, 4) == 0xf) {
+@@ -13361,6 +13388,8 @@ static void arm_tr_init_disas_context(DisasContextBase *dcbase, CPUState *cs)
+         regime_is_secure(env, dc->mmu_idx);
+     dc->v8m_stackcheck = FIELD_EX32(tb_flags, TBFLAG_A32, STACKCHECK);
+     dc->v8m_fpccr_s_wrong = FIELD_EX32(tb_flags, TBFLAG_A32, FPCCR_S_WRONG);
++    dc->v7m_new_fp_ctxt_needed =
++        FIELD_EX32(tb_flags, TBFLAG_A32, NEW_FP_CTXT_NEEDED);
+     dc->cp_regs = cpu->cp_regs;
+     dc->features = env->features;
  
 -- 
 2.20.1
