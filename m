@@ -1,32 +1,33 @@
-Received: from eggs.gnu.org ([209.51.188.92]:52948)
+Received: from eggs.gnu.org ([209.51.188.92]:52983)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1hL7mj-0000mO-2j
-	for qemu-devel@nongnu.org; Mon, 29 Apr 2019 11:01:38 -0400
+	(envelope-from <brijesh.singh@amd.com>) id 1hL7mt-0000s4-23
+	for qemu-devel@nongnu.org; Mon, 29 Apr 2019 11:01:48 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1hL7mf-0001hU-CI
-	for qemu-devel@nongnu.org; Mon, 29 Apr 2019 11:01:37 -0400
-Received: from mail-qt1-f177.google.com ([209.85.160.177]:33900)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1hL7mV-0001bU-VQ
-	for qemu-devel@nongnu.org; Mon, 29 Apr 2019 11:01:27 -0400
-Received: by mail-qt1-f177.google.com with SMTP id j6so12307043qtq.1
-	for <qemu-devel@nongnu.org>; Mon, 29 Apr 2019 08:01:17 -0700 (PDT)
-Date: Mon, 29 Apr 2019 11:01:14 -0400
-From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <20190429105933-mutt-send-email-mst@kernel.org>
-References: <20190423132004.13725-1-marcandre.lureau@redhat.com>
-	<20190423132004.13725-6-marcandre.lureau@redhat.com>
-	<20190426072446.r7b7wsm4qghd7pzr@sirius.home.kraxel.org>
-	<CAJ+F1CKbgb_TkoS_a10qGw7kkTO+EkC4uhreCkOu=k2ut5CAig@mail.gmail.com>
-	<20190426120558.vh66gugqtvcc6tm5@sirius.home.kraxel.org>
-	<CAJ+F1CLE-iwZu4oX69P3r0v_94L+gJEhZH0-U0iYag=oYNN4pg@mail.gmail.com>
-	<20190429071243.icqw3qbzcxbcz7ph@sirius.home.kraxel.org>
+	(envelope-from <brijesh.singh@amd.com>) id 1hL7mr-0001nR-Nx
+	for qemu-devel@nongnu.org; Mon, 29 Apr 2019 11:01:46 -0400
+Received: from mail-dm3nam05on060a.outbound.protection.outlook.com
+	([2a01:111:f400:fe51::60a]:25248
+	helo=NAM05-DM3-obe.outbound.protection.outlook.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <brijesh.singh@amd.com>)
+	id 1hL7mn-0001i9-1T
+	for qemu-devel@nongnu.org; Mon, 29 Apr 2019 11:01:43 -0400
+From: "Singh, Brijesh" <brijesh.singh@amd.com>
+Date: Mon, 29 Apr 2019 15:01:24 +0000
+Message-ID: <2b63d983-a622-3bec-e6ac-abfd024e19c0@amd.com>
+References: <20190424160942.13567-1-brijesh.singh@amd.com>
+	<20190424160942.13567-2-brijesh.singh@amd.com>
+	<20190426141042.GF4608@zn.tnic>
+	<e6f8da38-b8dd-a9c5-a358-5f33b6ea7b37@amd.com>
+	<20190426204327.GM4608@zn.tnic>
+In-Reply-To: <20190426204327.GM4608@zn.tnic>
+Content-Language: en-US
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <E3227EC2AE78DB4BAA12F54AF5A7CF89@namprd12.prod.outlook.com>
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20190429071243.icqw3qbzcxbcz7ph@sirius.home.kraxel.org>
-Subject: Re: [Qemu-devel] [PATCH v6 05/11] vhost-user: add
- vhost_user_gpu_set_socket()
+Subject: Re: [Qemu-devel] [RFC PATCH v1 01/10] KVM: SVM: Add KVM_SEV
+ SEND_START command
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,65 +36,28 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Gerd Hoffmann <kraxel@redhat.com>
-Cc: =?iso-8859-1?Q?Marc-Andr=E9?= Lureau <marcandre.lureau@gmail.com>, QEMU <qemu-devel@nongnu.org>
+To: Borislav Petkov <bp@alien8.de>
+Cc: "Singh, Brijesh" <brijesh.singh@amd.com>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>, "H.
+	Peter Anvin" <hpa@zytor.com>, Paolo Bonzini <pbonzini@redhat.com>, =?utf-8?B?UmFkaW0gS3LEjW3DocWZ?= <rkrcmar@redhat.com>, Joerg Roedel <joro@8bytes.org>, "Lendacky, Thomas" <Thomas.Lendacky@amd.com>, "x86@kernel.org" <x86@kernel.org>, "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
 
-On Mon, Apr 29, 2019 at 09:12:43AM +0200, Gerd Hoffmann wrote:
->   Hi,
-> 
-> > > What questions for example?
-> > 
-> > This opens up different kind of possible replies, and error handling.
-> > 
-> > With current proposal and needs, the reply (or absence of reply) is
-> > entirely driven by the request.
-> > 
-> > With your proposal, should all request have a reply?
-> 
-> Yes.
-> 
-> > which makes a lot
-> > more code synchronous,
-> 
-> Why?  You don't have to wait for the reply before sending the next
-> request.
-> 
-> Adding a request id to the messages might be useful, so it is possible
-> to wait for a reply to a specific message without having to keeping
-> track of all in-flight messages.
-> 
-> > and complicates both sides unnecessarily.
-> 
-> Having headers in the reply allows it to process them in generic code.
-> There is a size header for the reply, so you can parse the stream
-> without knowing what replay to expect.  You can use the status field to
-> indicate the payload, simliar to virtio-gpu which has response code
-> OK_NODATA, some OK_$whatpayload and some ERR_$failure codes.
-> 
-> You can dispatch based on the response/status code and run *fully*
-> asynchronous without too much trouble.
-> 
-> > > > Can we leave that for future protocol extensions negotiated with
-> > > > GET/SET_PROTOCOL_FEATURES ?
-> > >
-> > > I don't think negotiating such a basic protocol change is a good idea.
-> > 
-> > Well, then I would rather focus on improving protocol negociation,
-> > rather than adding unnecessary protocol changes.
-> > 
-> > Given that GET/SET_PROTOCOL_FEATURES is the first messages being sent,
-> > why couldn't it have flags indicating new protocol revision?
-> 
-> A properly structed reply allows a different approach in reply
-> processing (see above).  But that only works if it is in the protocol
-> right from the start.  As add-on feature it can't provide the benefits
-> because the reply parser must be able to handle both protocol variants.
-> 
-> cheers,
->   Gerd
-
-I think it can in theory - but if we know we want a feature we should
-just add it as mandatory. More options does imply more overhead.
-
--- 
-MST
+DQoNCk9uIDQvMjYvMTkgMzo0MyBQTSwgQm9yaXNsYXYgUGV0a292IHdyb3RlOg0KPiBPbiBGcmks
+IEFwciAyNiwgMjAxOSBhdCAwMjoyOTozMVBNICswMDAwLCBTaW5naCwgQnJpamVzaCB3cm90ZToN
+Cj4+IFllcyB0aGF0J3MgZG9hYmxlIGJ1dCBJIGFtIGFmcmFpZCB0aGF0IGNhY2hpbmcgdGhlIHZh
+bHVlIG1heSBsZWFkIHVzIHRvDQo+PiB3cm9uZyBwYXRoIGFuZCBhbHNvIGRpdmVyZ2VuY2UgZnJv
+bSB0aGUgU0VWIEFQSSBzcGVjLiBUaGUgc3BlYyBzYXlzIHRoZQ0KPj4gcmV0dXJuZWQgbGVuZ3Ro
+IGlzIGEgbWluaW11bSBsZW5ndGggYnV0IGl0cyBwb3NzaWJsZSB0aGF0IGNhbGxlciBjYW4NCj4+
+IGdpdmUgYSBiaWdnZXIgYnVmZmVyIGFuZCBGVyB3aWxsIHN0aWxsIHdvcmsgd2l0aCBpdC4NCj4g
+DQo+IERvZXMgdGhlIGNhbGxlciBldmVuIGhhdmUgYSB2YWxpZCByZWFzb24gdG8gZ2l2ZSBhIGJp
+Z2dlciBidWZmZXIgbGVuPw0KPiANCg0KDQpQcmFjdGljYWxseSBJIGRvbid0IHNlZSBhbnkgcmVh
+c29uIHdoeSBjYWxsZXIgd291bGQgZG8gdGhhdCBidXQNCnRoZW9yZXRpY2FsbHkgaXQgY2FuLiBJ
+ZiB3ZSBjYWNoZSB0aGUgbGVuIHRoZW4gd2UgYWxzbyBuZWVkIHRvIGNvbnNpZGVyDQphZGRpbmcg
+YW5vdGhlciBmbGFnIHRvIGhpbnQgd2hldGhlciB1c2Vyc3BhY2UgZXZlciByZXF1ZXN0ZWQgbGVu
+Z3RoLg0KZS5nIGFuIGFwcGxpY2F0aW9uIGNhbiBjb21wdXRlIHRoZSBsZW5ndGggb2Ygc2Vzc2lv
+biBibG9iIGJ5IGxvb2tpbmcgYXQNCnRoZSBBUEkgdmVyc2lvbiBhbmQgc3BlYyBhbmQgbWF5IG5l
+dmVyIHF1ZXJ5IHRoZSBsZW5ndGguDQoNCg0KPiBJIG1lYW4gSSdtIHN0aWxsIHRoaW5raW5nIGRl
+ZmVuc2l2ZWx5IGhlcmUgYnV0IG1heWJlIHRoZSBvbmx5IHRoaW5nIHRoYXQNCj4gd291bGQgaGFw
+cGVuIGhlcmUgd2l0aCBhIGJpZ2dlciBidWZmZXIgaXMgaWYgdGhlIGttYWxsb2MoKSB3b3VsZCBm
+YWlsLA0KPiBsZWFkaW5nIHRvIGV2ZW50dWFsIGZhaWx1cmUgb2YgdGhlIG1pZ3JhdGlvbi4NCj4g
+DQo+IElmIHRoZSBjb2RlIGxpbWl0cyB0aGUgYWxsb2NhdGlvbiB0byBzb21lIHNhbmUgbWF4IGxl
+bmd0aCwgdGhlIG1pZ3JhdGlvbg0KPiB3b24ndCBmYWlsIGV2ZW4gaWYgdXNlcnNwYWNlIGdpdmVz
+IGl0IHRvbyBiaWcgdmFsdWVzLi4uDQo+IA0K
