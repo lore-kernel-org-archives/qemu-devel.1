@@ -2,79 +2,83 @@ Return-Path: <SRS0=sEuR=S7=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.7 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-4.0 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1B5F5C43219
-	for <qemu-devel@archiver.kernel.org>; Mon, 29 Apr 2019 12:54:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AF3BEC43219
+	for <qemu-devel@archiver.kernel.org>; Mon, 29 Apr 2019 12:58:29 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D51C02063F
-	for <qemu-devel@archiver.kernel.org>; Mon, 29 Apr 2019 12:54:56 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 71FD120652
+	for <qemu-devel@archiver.kernel.org>; Mon, 29 Apr 2019 12:58:29 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=jms.id.au header.i=@jms.id.au header.b="jrCA7bbs"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D51C02063F
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=jms.id.au
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="dRVEbeIc"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 71FD120652
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:57276 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:57316 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hL5o7-0001Yx-Oq
-	for qemu-devel@archiver.kernel.org; Mon, 29 Apr 2019 08:54:55 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:50708)
+	id 1hL5rY-0002oq-N9
+	for qemu-devel@archiver.kernel.org; Mon, 29 Apr 2019 08:58:28 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:52190)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <joel.stan@gmail.com>) id 1hL5nH-0001Ch-7e
-	for qemu-devel@nongnu.org; Mon, 29 Apr 2019 08:54:04 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1hL5qe-0002UC-1k
+	for qemu-devel@nongnu.org; Mon, 29 Apr 2019 08:57:33 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <joel.stan@gmail.com>) id 1hL5nF-0005u5-Pp
-	for qemu-devel@nongnu.org; Mon, 29 Apr 2019 08:54:03 -0400
-Received: from mail-qt1-x844.google.com ([2607:f8b0:4864:20::844]:42304)
+	(envelope-from <peter.maydell@linaro.org>) id 1hL5qa-0000Ez-P4
+	for qemu-devel@nongnu.org; Mon, 29 Apr 2019 08:57:31 -0400
+Received: from mail-ot1-x333.google.com ([2607:f8b0:4864:20::333]:35502)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <joel.stan@gmail.com>)
-	id 1hL5nF-0005tg-C3; Mon, 29 Apr 2019 08:54:01 -0400
-Received: by mail-qt1-x844.google.com with SMTP id p20so11668255qtc.9;
-	Mon, 29 Apr 2019 05:54:00 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=jms.id.au; s=google;
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1hL5qa-0000C7-6u
+	for qemu-devel@nongnu.org; Mon, 29 Apr 2019 08:57:28 -0400
+Received: by mail-ot1-x333.google.com with SMTP id g24so3880201otq.2
+	for <qemu-devel@nongnu.org>; Mon, 29 Apr 2019 05:57:24 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
 	h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-	:cc; bh=lB18pEzl0Tg8zg65WCwpHy2hjsy9JyOMljdQvpZbb/c=;
-	b=jrCA7bbsAL7pN2qn11KNcCfFC5kSUIyyFUFEIGjuSO/ANYSc/URbbDmvvemEJPVZF7
-	kaiuYUoMD/f8VBTyooJT1QMylzeG5w971hR9IY5CKfOeQF9rBbvyNrnEq+BHTHpIZDCZ
-	4FxRGYh/+0m/ZUGDuybf8k6HI/tT7V+Ld6Ukg=
+	:cc:content-transfer-encoding;
+	bh=oyDIA6PLfDNq2lbYxMZkPb4Q1h89dIJQCbTu5C4UahM=;
+	b=dRVEbeIcoYYkZuzbrTVuF5Ci1bY8aNsEFrTz7Us8gsHff3/pCxXu9DGcWFmAAdbO4j
+	JuW09+T0L18ZsRfVyqZh1PLbcRSEXhs3Y+rET4+iAamrlMvndnj5I4mkMmRUyYJAV0VC
+	Qdw0UnUqjN4RZjx6tCmssV4xdbVirUqCA30e6cQpU4f1Ei9tHoJX56GpAMuYAFVDg7Vp
+	+vHWj/uk5bzCrnAp7hkfYCGFjFmXGe0sqhE79dknlBEJ+LlTZIrNlDQhu4NR9hfWmihV
+	llTbGUj0oj5QXEljJxyBItoZmvZ6DduSFSg70J2KkBHh7u1J/OGYNv5jXhxajsBA5o8P
+	vMqA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
 	d=1e100.net; s=20161025;
 	h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-	:message-id:subject:to:cc;
-	bh=lB18pEzl0Tg8zg65WCwpHy2hjsy9JyOMljdQvpZbb/c=;
-	b=oY65irJpIB0cA1J3IPdNob/BhrX+ULRAtbqBc2WFSgpFPrVhsrr2jjKMZJnEK4R94s
-	/e46aqK5YmjklempX+YEn00DB0N+ZvIYmflYQnMHPWq6fh++IqY8GmCCX8MC8OO5o1gt
-	FSA7icsXKNmG4ED655QIQtXlhowcDvwFJktomT04xBGNYi8G3fiWxA0Nq5Vb7wxzfBqK
-	RjIWX9/FeD+zx7nfxUdEBxC8J16q5E1UblvLO1ogg4s0HGll0kGejZWFiRVWqvZnhdQU
-	lO37+BJjm+skxmjeGEhHmvUV2nH2EAl7Q2HiIF3xO6M/ZUgXuNpWfUeTCKIWfEgHIWNc
-	vClg==
-X-Gm-Message-State: APjAAAW9Ei2ckfwPfSqHDkglZK4PDesl5C74oxrSIuocsvBsMyc/J+uF
-	D8Bi6eFaHcqCyVGIR2ozHoeVCYhQdWlYc5ESjww=
-X-Google-Smtp-Source: APXvYqzEhJhjTKUMWByG/CtGyr2sIsU7aUNGY0W++RiIfDr3GdmLeSXbvwmCsngkwuGmleZExNAt5qwzA+603zeHUK4=
-X-Received: by 2002:ac8:169b:: with SMTP id r27mr34536234qtj.235.1556542439964;
-	Mon, 29 Apr 2019 05:53:59 -0700 (PDT)
+	:message-id:subject:to:cc:content-transfer-encoding;
+	bh=oyDIA6PLfDNq2lbYxMZkPb4Q1h89dIJQCbTu5C4UahM=;
+	b=UI4EwOT+tPnGSTczBdcFAKKn8fSsdMOSiW6nxAoOCnDnaf4d9nJJCsvuKpbxUpfhnL
+	8DpJlhG8c8UALintNlDoi1eDuauxhWsOuLw92sPrk8/hd9wbbX6dP7kSsQ7UU1Mds62J
+	qutBKLQd8RDkqEVbYJF9V8O661j2KJYvR3SkqwoVG26rkBv1PtNQT6GjfdUa7EoxWmGt
+	O0Gl6RTplLV78tpTgiwqSi6ddGnUaDK2rCKnMhNUuJcMyJ2SAxk2XoGN5XV7eqgL5dLK
+	zhRkGaHaT5Q0pnTgOh/UopPQCCNLcmVsxKcRLCnYmc/Dp7eUJqRIi2X1ug6MVCYwwr8n
+	pwYQ==
+X-Gm-Message-State: APjAAAXTDQFtsETtvp3hF6WBKZ31oCMvwhwuUSZZ8Ygm92sa/F/rve5Z
+	n75fdTCLiw4SrPMGkFPQq/eBmBSEaz9VBWRPmReDmw==
+X-Google-Smtp-Source: APXvYqyhWmkR0v5jZWFFPEryQfvGyKJPv72cp2g+LeA4rXSKgAQziCCUxZq9ybjh/9vq0k0v7PXL9a/AXbQk9A3BGI8=
+X-Received: by 2002:a9d:61c6:: with SMTP id h6mr1066373otk.316.1556542644020; 
+	Mon, 29 Apr 2019 05:57:24 -0700 (PDT)
 MIME-Version: 1.0
-References: <20190103144124.18917-1-stefanha@redhat.com>
-	<CAFEAcA-B_T9E3ezWFXg-wp3RotMjv3-z3qY7hSJZEoqFBqCWnQ@mail.gmail.com>
-	<62b29bc1-cc78-cd64-4377-fc4007ba7189@redhat.com>
-	<20190426091702.GA2071@stefanha-x1.localdomain>
-In-Reply-To: <20190426091702.GA2071@stefanha-x1.localdomain>
-From: Joel Stanley <joel@jms.id.au>
-Date: Mon, 29 Apr 2019 12:53:48 +0000
+References: <20190315032629.21234-1-richard.henderson@linaro.org>
+	<20190315032629.21234-2-richard.henderson@linaro.org>
+In-Reply-To: <20190315032629.21234-2-richard.henderson@linaro.org>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Mon, 29 Apr 2019 13:57:13 +0100
 Message-ID:
- <CACPK8Xc5KgiaYCTs=8ceRu_hV=vC3M6pGV0=7jJNsbuz2a6LDA@mail.gmail.com>
-To: Stefan Hajnoczi <stefanha@redhat.com>
+ <CAFEAcA_zP=KXXtiRn3AbpT6Dcjcjh3RNS1k+AB3TYZYBLOpiSw@mail.gmail.com>
+To: Richard Henderson <richard.henderson@linaro.org>
 Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
 	recognized.
-X-Received-From: 2607:f8b0:4864:20::844
-Subject: Re: [Qemu-devel] [PATCH] Revert "armv7m: Guard against no -kernel
- argument"
+X-Received-From: 2607:f8b0:4864:20::333
+Subject: Re: [Qemu-devel] [PATCH v3 01/23] crypto: Merge crypto-obj-y into
+ libqemuutil.a
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -86,42 +90,68 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>,
-	Jim Mussared <jim@groklearning.com>,
-	=?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>,
-	Julia Suvorova <jusual@mail.ru>, QEMU Developers <qemu-devel@nongnu.org>,
-	Steffen Gortz <qemu.ml@steffen-goertz.de>,
-	qemu-arm <qemu-arm@nongnu.org>, Thomas Huth <thuth@redhat.com>,
-	=?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190429125348.RnoY9-HEPFM0GE9b9AzKiprlF1Zcui8M1qlFburilzU@z>
+Message-ID: <20190429125713.ITbcwGoEc7Js3F1SoLaviKZLn9WPNAkBSf0odW_SMzs@z>
 
-On Fri, 26 Apr 2019 at 09:17, Stefan Hajnoczi <stefanha@redhat.com> wrote:
+On Fri, 15 Mar 2019 at 03:49, Richard Henderson
+<richard.henderson@linaro.org> wrote:
 >
-> A user-friendly error message is needed here.  The check for -kernel was
-> too specific and is not desirable for microbit where we use -device
-> loader.
+> We will shortly need this in the user-only binaries, so drop the split
+> into system and tools binaries.  This also means that crypto-aes-obj-y
+> can be merged back into crypto-obj-y.
 >
-> Old boards probably want to continue using -kernel.  New boards like
-> microbit may use just -device loader.  Perhaps there is even a group
-> that wants both options.
+> Cc: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
+> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+> ---
+>  Makefile             | 12 +++++-------
+>  Makefile.objs        |  8 ++------
+>  Makefile.target      |  4 ----
+>  configure            |  9 +++------
+>  crypto/Makefile.objs |  5 +----
+>  5 files changed, 11 insertions(+), 27 deletions(-)
 
-FWIW, I used -kernel exclusively when working on the microbit model.
-Other users may chose to use the device loader/hex file.
+This patch breaks a --static configure for me:
 
-I am all for usability, but getting rid of the ability to use -kernel
-on some machine types would be a step in the wrong direction.
+e104462:bionic:qemu$ (cd build/all-linux-static/ && '../../configure'
+'--cc=3Dccache gcc' '--enable-debug' '--static' '--disable-system'
+'--disable-tools')
 
-Cheers,
+ERROR: sizeof(size_t) doesn't match GLIB_SIZEOF_SIZE_T.
+       You probably need to set PKG_CONFIG_LIBDIR
+       to point to the right pkg-config files for your
+       build target
 
-Joel
+The error message is bogus, but the problem is that we
+tried to build one of the test programs like this:
 
->
-> A solution is to introduce explicit checks so that we can tell the user
-> the appropriate option for the machine type.  I can work on this if you
-> like, but probably won't be able to send a patch until Tuesday.
->
-> Stefan
+ccache gcc -pthread -I/usr/include/glib-2.0
+-I/usr/lib/x86_64-linux-gnu/glib-2.0/include -m64 -mcx16 -D_GNU_SOURCE
+-D_FILE_OFFSET_BITS=3D64 -D_LARGEFILE_SOURCE -Wstrict-prototypes
+-Wredundant-decls -Wall -Wundef -Wwrite-strings -Wmissing-prototypes
+-fno-strict-aliasing -fno-common -fwrapv -std=3Dgnu99
+-Wexpansion-to-defined -Wendif-labels -Wno-shift-negative-value
+-Wno-missing-include-dirs -Wempty-body -Wnested-externs
+-Wformat-security -Wformat-y2k -Winit-self -Wignored-qualifiers
+-Wold-style-declaration -Wold-style-definition -Wtype-limits
+-fstack-protector-strong -I/usr/include/p11-kit-1
+-I/usr/include/libpng16 -g -o config-temp/qemu-conf.exe
+config-temp/qemu-conf.c -m64 -static -g -lgthread-2.0 -pthread
+-lglib-2.0 -pthread -lpcre -pthread -lnettle -lgnutls -lgmp
+/usr/lib/x86_64-linux-gnu/libunistring.so -lidn2 -lhogweed -lgmp
+-lnettle -ltasn1 -lp11-kit -lz
+gcc: error: /usr/lib/x86_64-linux-gnu/libunistring.so: No such file or dire=
+ctory
+
+which is almost certainly because we're now including
+a bunch of extra libraries in the link for the static
+linux-user binaries which don't work statically linked.
+(In particular one of them looks to have a bogus
+pkg-config which puts a .so file in the link line for
+a static link...)
+
+thanks
+-- PMM
 
