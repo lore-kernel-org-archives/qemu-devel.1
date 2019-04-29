@@ -1,20 +1,20 @@
-Received: from eggs.gnu.org ([209.51.188.92]:41122)
+Received: from eggs.gnu.org ([209.51.188.92]:42161)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <damien.hedde@greensocs.com>) id 1hL2i2-0005IW-Ly
-	for qemu-devel@nongnu.org; Mon, 29 Apr 2019 05:36:28 -0400
+	(envelope-from <no-reply@patchew.org>) id 1hL2mi-0007Ln-TZ
+	for qemu-devel@nongnu.org; Mon, 29 Apr 2019 05:41:18 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <damien.hedde@greensocs.com>) id 1hL2i0-0002Ir-Vf
-	for qemu-devel@nongnu.org; Mon, 29 Apr 2019 05:36:26 -0400
-References: <cover.1553510737.git.damien.hedde@greensocs.com>
-From: Damien Hedde <damien.hedde@greensocs.com>
-Message-ID: <bf7dcbc7-5dc6-6269-87e9-44f027946cd9@greensocs.com>
-Date: Mon, 29 Apr 2019 11:36:14 +0200
+	(envelope-from <no-reply@patchew.org>) id 1hL2mg-0005Bk-QV
+	for qemu-devel@nongnu.org; Mon, 29 Apr 2019 05:41:16 -0400
+Resent-Message-Id: <E1hL2mg-0005Bk-QV@eggs.gnu.org>
+In-Reply-To: <20190429090250.7648-1-borntraeger@de.ibm.com>
+Message-ID: <155653084905.10667.10987298957083357398@c2072b67cc0c>
+Reply-To: <qemu-devel@nongnu.org>
 MIME-Version: 1.0
-In-Reply-To: <cover.1553510737.git.damien.hedde@greensocs.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US-large
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [RFC 00/17] multi-phase reset mechanism
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+From: no-reply@patchew.org
+Date: Mon, 29 Apr 2019 02:40:50 -0700 (PDT)
+Subject: Re: [Qemu-devel] [PATCH v3 0/9] s390x: new guest features
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,204 +23,214 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: edgar.iglesias@xilinx.com, peter.maydell@linaro.org, mark.burton@greensocs.com, qemu-arm@nongnu.org, alistair.francis@wdc.com, marcandre.lureau@redhat.com, pbonzini@redhat.com, philmd@redhat.com, luc.michel@greensocs.com
+To: borntraeger@de.ibm.com
+Cc: fam@euphon.net, cohuck@redhat.com, jjherne@linux.ibm.com, walling@linux.ibm.com, david@redhat.com, qemu-devel@nongnu.org, pasic@linux.ibm.com, qemu-s390x@nongnu.org, rth@twiddle.net
 
-Hi All,
-
-Any comment about this ?
-
-Thanks,
-Damien
-
-On 3/25/19 12:01 PM, Damien Hedde wrote:
-> Hi all,
-> 
-> This series is a proposal to implement the multi-phase reset we've discussed
-> here (https://lists.gnu.org/archive/html/qemu-devel/2018-10/msg00310.html) and
-> more recently there
-> (https://lists.gnu.org/archive/html/qemu-devel/2019-03/msg00081.html).
-> 
-> To summarize, we need a multi-phase reset to allow for a more complex
-> initialization of a platform. In particular we need to "propagate" a clock
-> tree, but we have to ensure that every device is initialized first.
-> 
-> To solve this problem, the following 3-phases reset mechanism is proposed (I've
-> removed the 4th given our last discussion).
-> 
-> #DESCRIPTION
-> 
-> INIT PHASE: Reset the object internal state, put a resetting flag and do the
->     same for the reset subtree. No side effect on other devices to guarantee
->     that, in a reset domain, everything get initialized first. This corresponds
->     mostly to what is currently done in the device/bus reset method.
-> 
-> HOLD PHASE: This phase allows to control a reset with a I/O. When a I/O control
->     a reset procedure based on the I/O level (not edge), we may need to assert
->     the reset, wait some time, and finally de-assert the reset. The consequence
->     is that such a device can stay in a "resetting state" and may need to show
->     this state to other devices through its outputs. For example, a clock
->     controller will typically shutdown its clocks when it is in resetting state.
-> 
-> EXIT PHASE (previously named 'release'): This phase sets outputs to state after
->      reset. For a clock controller it starts the clocks. It also clears the
->      "resetting" flag. A device should not react to inputs until this flag has
->      been cleared. During this phase, outputs are propagated in the reset domain
->      (and outside the reset domain).
-> 
-> To implement this, this series add a Resettable interface containing 3 methods:
-> one for each phase. The init phase's method takes a boolean argument allowing to
-> distinguish cold and warm resets.
-> 
-> In this series, Device and Bus implement the interface. A vmstate description
-> subsection is added to allow migration of reset related state for device.
-> 3 methods (one per phase) are also added in Device's class. They correspond to
-> the local part (see the code example below) of the reset. They avoid device
-> specialization to have to handle the sub-domain part and "resetting" state.
-> 
-> Functions to add gpio control over the reset are added. It is possible to add
-> an active low/high reset pin to control the warm reset and an active low/high
-> power gating pin to control the cold reset.
-> 
-> The bus/device reset tree is converted to this 3-phases mechanism. I also
-> added a new ResetDomain object which is just a Resettable container. It is
-> used to have a global "system reset domain" to handle main 3-phases reset and
-> replace the current single-phase-reset handler mechanism.
-> 
-> As an example, in the xilinx_zynq machine, I've converted the slcr (the resets
-> and clocks controller device) and the uart peripheral to this 3-phases reset
-> mechanism. Gpio are added between the devices to transmit reset control from
-> the slcr to the uarts.
-> 
-> All changes have been made so that existing reset behavior is not modified.
-> 
-> #INTERFACE CHOICE
-> 
-> To be honest, I have some doubt about the interface. I've kept it minimal and
-> the consequence is implementation is complex (and kind of duplicated in every
-> base implementation like Device or Bus). One of the problem is the `resetting`
-> flag, which in practical must be a counter to handle reset "reentrance".
-> Indeed nothing forbids to reset some device that is already held in "resetting"
-> state by some other means. As an example, in the zynq machine, there can be 
-> a global/system reset while an uart is reset by the slcr. It it also possible
-> to cold and warm resets triggered concurrently.
-> 
-> The Resettable methods implementation have to looks this (methods are called
-> with iothread locked):
-> ```
-> void init_phase(Device *dev, bool cold)
-> {
->     /* call sub-resettable init phases */
-> 
->     dev->resetting += 1;
->     /* do local init phase (eg: state reset) */
-> }
-> void hold_phase(Device *dev)
-> {
->     /* call sub-resettable hold phases */
-> 
->     /* do local hold phase (eg: set some I/O level) */
-> }
-> void exit_phase(Device *dev)
-> {
->     /* call sub-resettable exit phases (independently of resetting value since,
->        every resettable have its own resetting counter) */
->    
->     dev->resetting -= 1;
->     if (dev->resetting == 0) {
->         /* do local exit phase (eg: set some I/O level) only if the device is
->            really leaving the resetting state */
->     }
-> }
-> ```
-> Since I don't think specialization should care about sub-resettable and the
-> resetting counter, I've added the local init/hold/exit phases as DeviceClass
-> methods.
-> Otherwise, I see two other solutions:
-> + keep the interface as it is
-> + add some state knowledge in the interface (with some kind of get_state method)
->   so that resetting counter and some kind of sub-resettable list are handled in
->   the common code in the interface. The 3 methods will then handle only the local
->   actions.
-> + have 6 methods in the interface, one for the local actions, one for the
->   sub-resettable so that sub-resettable is not handled in the common code. And we
->   need also a get_resetting method to access/update the counter.
-> 
-> #DEVICE RESET CHOICE
-> 
-> The Device is a special case, it has 2 reset entry point: `qdev_reset_all` and
-> `device_reset`. The latter doing a device reset only, while the former also
-> reset all buses hierarchy under the device.
-> 
-> I choose the put the sub-buses into the device reset domain, so that the
-> behavior of the resettable interface on Device is the same as qdev_reset_all.
-> I don't know if `device_reset` has some real meaning (resetting only the
-> Device). It is not often used and I think every time it is used there is no
-> sub-buses so the behavior is the same for both functions.
-> 
-> If I am mistaken about putting buses into device reset domain, it is possible
-> to make a special bus-hierarchy-reset-domain for every Device/Bus that differs
-> from the Resettable interface on Device/Bus.
-> 
-> # SYSBUS SUPPORT
-> 
-> Regarding the sysbus support Edgar mentioned in the prevous discussion: In this
-> series, there is no support in sysbus base class for disabling memory regions.
-> Having each sysbus device specialization, in every memory region handler, to
-> check if `resetting` is set or not is not user-friendly. But for we can't 
-> modify memory region `enabled` flags since devices may already set/unset them.
-> Maybe we could have some kind of super-switch to disable all memory regions in
-> a sysbus device but I don't know how this could be done.
-> 
-> The series is organised as follow:
-> Patches 1 and 2 adds Resettable interface and ResetDomain object.
-> Patches 3 to 7 converts Device and Bus to Resettable.
-> Patches 8 to 12 handles the global system reset domain
-> Patches 13 to 17 do the zynq implementation (patch 13 is an already-reviewed
-> patch from the clock api patch series)
-> 
-> Thank you for your feedback,
-> Damien
-> 
-> Damien Hedde (17):
->   Create Resettable QOM interface
->   Create the ResetDomain QOM object
->   make Device and Bus Resettable
->   Add local reset methods in Device class
->   add vmstate description for device reset state
->   Add function to control reset with gpio inputs
->   convert qdev/bus_reset_all to Resettable
->   Add a global ResetDomain object for system emulation
->   global ResetDomain support for legacy reset handlers
->   Delete the system ResetDomain at the end of emulation
->   Put orphan buses in system reset domain
->   Put default sysbus in system reset domain
->   hw/misc/zynq_slcr: use standard register definition
->   convert cadence_uart to 3-phases reset
->   Convert zynq's slcr to 3-phases reset
->   Add uart reset support in zynq_slcr
->   Connect the uart reset gpios in the zynq platform
-> 
->  hw/arm/xilinx_zynq.c           |  14 +-
->  hw/char/cadence_uart.c         |  48 ++-
->  hw/core/Makefile.objs          |   3 +
->  hw/core/bus.c                  |  64 +++-
->  hw/core/qdev-vmstate.c         |  27 ++
->  hw/core/qdev.c                 | 166 ++++++++++-
->  hw/core/reset-domain.c         | 121 ++++++++
->  hw/core/reset.c                | 149 +++++++++-
->  hw/core/resettable.c           |  69 +++++
->  hw/misc/zynq_slcr.c            | 515 ++++++++++++++++++---------------
->  include/hw/char/cadence_uart.h |  10 +-
->  include/hw/qdev-core.h         |  97 +++++++
->  include/hw/reset-domain.h      |  49 ++++
->  include/hw/resettable.h        |  83 ++++++
->  include/sysemu/reset.h         |  47 +++
->  vl.c                           |   3 +-
->  16 files changed, 1195 insertions(+), 270 deletions(-)
->  create mode 100644 hw/core/qdev-vmstate.c
->  create mode 100644 hw/core/reset-domain.c
->  create mode 100644 hw/core/resettable.c
->  create mode 100644 include/hw/reset-domain.h
->  create mode 100644 include/hw/resettable.h
-> 
+UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDE5MDQyOTA5MDI1MC43NjQ4
+LTEtYm9ybnRyYWVnZXJAZGUuaWJtLmNvbS8KCgoKSGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBo
+YXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1zLiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3Jl
+IGluZm9ybWF0aW9uOgoKVHlwZTogc2VyaWVzCk1lc3NhZ2UtaWQ6IDIwMTkwNDI5MDkwMjUwLjc2
+NDgtMS1ib3JudHJhZWdlckBkZS5pYm0uY29tClN1YmplY3Q6IFtRZW11LWRldmVsXSBbUEFUQ0gg
+djMgMC85XSBzMzkweDogbmV3IGd1ZXN0IGZlYXR1cmVzCgo9PT0gVEVTVCBTQ1JJUFQgQkVHSU4g
+PT09CiMhL2Jpbi9iYXNoCmdpdCByZXYtcGFyc2UgYmFzZSA+IC9kZXYvbnVsbCB8fCBleGl0IDAK
+Z2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYucmVuYW1lbGltaXQgMApnaXQgY29uZmlnIC0tbG9jYWwg
+ZGlmZi5yZW5hbWVzIFRydWUKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYuYWxnb3JpdGhtIGhpc3Rv
+Z3JhbQouL3NjcmlwdHMvY2hlY2twYXRjaC5wbCAtLW1haWxiYWNrIGJhc2UuLgo9PT0gVEVTVCBT
+Q1JJUFQgRU5EID09PQoKVXBkYXRpbmcgM2M4Y2Y1YTljMjFmZjg3ODIxNjRkMWRlZjdmNDRiZDg4
+ODcxMzM4NApGcm9tIGh0dHBzOi8vZ2l0aHViLmNvbS9wYXRjaGV3LXByb2plY3QvcWVtdQogdCBb
+dGFnIHVwZGF0ZV0gICAgICAgICAgICBwYXRjaGV3LzIwMTkwNDI5MDkwMjUwLjc2NDgtMS1ib3Ju
+dHJhZWdlckBkZS5pYm0uY29tIC0+IHBhdGNoZXcvMjAxOTA0MjkwOTAyNTAuNzY0OC0xLWJvcm50
+cmFlZ2VyQGRlLmlibS5jb20KU3dpdGNoZWQgdG8gYSBuZXcgYnJhbmNoICd0ZXN0JwpmODc0MGQ1
+YjY4IHMzOTB4L2NwdW1vZGVsOiB3aXJlIHVwIDg1NjEgYW5kIDg1NjIgYXMgZ2VuMTUgbWFjaGlu
+ZXMKOGI2ZmFkYWNlYiBzMzkweC9jcHVtb2RlbDogYWRkIGdlbjE1IGRlZmludGlvbnMKMDhjODFm
+ZTQzMyBzMzkweC9jcHVtb2RlbDogYWRkIERlZmxhdGUtY29udmVyc2lvbiBmYWNpbGl0eQpiOGJl
+ZDJiMzI4IHMzOTB4L2NwdW1vZGVsOiBlbmhhbmNlZCBzb3J0IGZhY2lsaXR5CmUwODk0OGZkZDQg
+czM5MHgvY3B1bW9kZWw6IHZlY3RvciBlbmhhbmNlbWVudHMKNWM4MjNmMDEyZCBzMzkweC9jcHVt
+b2RlbDogbXNhOSBmYWNpbGl0eQphZWZkOTc2ZjI2IHMzOTB4L2NwdW1vZGVsOiBNaXNjZWxsYW5l
+b3VzLUluc3RydWN0aW9uLUV4dGVuc2lvbnMgRmFjaWxpdHkgMwo4YTg5ZjU2MTczIHMzOTB4L2Nw
+dW1vZGVsOiBpZ25vcmUgY3Nza2UgZm9yIGV4cGFuc2lvbgowNGRjMDkzNDkzIGxpbnV4IGhlYWRl
+ciBzeW5jCgo9PT0gT1VUUFVUIEJFR0lOID09PQoxLzkgQ2hlY2tpbmcgY29tbWl0IDA0ZGMwOTM0
+OTNlNCAobGludXggaGVhZGVyIHN5bmMpCjIvOSBDaGVja2luZyBjb21taXQgOGE4OWY1NjE3Mzkw
+IChzMzkweC9jcHVtb2RlbDogaWdub3JlIGNzc2tlIGZvciBleHBhbnNpb24pCjMvOSBDaGVja2lu
+ZyBjb21taXQgYWVmZDk3NmYyNjdjIChzMzkweC9jcHVtb2RlbDogTWlzY2VsbGFuZW91cy1JbnN0
+cnVjdGlvbi1FeHRlbnNpb25zIEZhY2lsaXR5IDMpCkVSUk9SOiBsaW5lIG92ZXIgOTAgY2hhcmFj
+dGVycwojMjI6IEZJTEU6IHRhcmdldC9zMzkweC9jcHVfZmVhdHVyZXMuYzo4NjoKKyAgICBGRUFU
+X0lOSVQoIm1pbnN0ZTMiLCBTMzkwX0ZFQVRfVFlQRV9TVEZMLCA2MSwgIk1pc2NlbGxhbmVvdXMt
+SW5zdHJ1Y3Rpb24tRXh0ZW5zaW9ucyBGYWNpbGl0eSAzIiksCgp0b3RhbDogMSBlcnJvcnMsIDAg
+d2FybmluZ3MsIDE0IGxpbmVzIGNoZWNrZWQKClBhdGNoIDMvOSBoYXMgc3R5bGUgcHJvYmxlbXMs
+IHBsZWFzZSByZXZpZXcuICBJZiBhbnkgb2YgdGhlc2UgZXJyb3JzCmFyZSBmYWxzZSBwb3NpdGl2
+ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1haW50YWluZXIsIHNlZQpDSEVDS1BBVENIIGluIE1BSU5U
+QUlORVJTLgoKNC85IENoZWNraW5nIGNvbW1pdCA1YzgyM2YwMTJkNjQgKHMzOTB4L2NwdW1vZGVs
+OiBtc2E5IGZhY2lsaXR5KQpFUlJPUjogbGluZSBvdmVyIDkwIGNoYXJhY3RlcnMKIzIyOiBGSUxF
+OiB0YXJnZXQvczM5MHgvY3B1X2ZlYXR1cmVzLmM6MTExOgorICAgIEZFQVRfSU5JVCgibXNhOS1i
+YXNlIiwgUzM5MF9GRUFUX1RZUEVfU1RGTCwgMTU1LCAiTWVzc2FnZS1zZWN1cml0eS1hc3Npc3Qt
+ZXh0ZW5zaW9uLTkgZmFjaWxpdHkgKGV4Y2x1ZGluZyBzdWJmdW5jdGlvbnMpIiksCgpXQVJOSU5H
+OiBsaW5lIG92ZXIgODAgY2hhcmFjdGVycwojMzA6IEZJTEU6IHRhcmdldC9zMzkweC9jcHVfZmVh
+dHVyZXMuYzoyNDY6CisgICAgRkVBVF9JTklUKCJwY2ttby1lY2MtcDI1NiIsIFMzOTBfRkVBVF9U
+WVBFX1BDS01PLCAzMiwgIlBDS01PIEVuY3J5cHQtRUNDLVAyNTYtS2V5IiksCgpXQVJOSU5HOiBs
+aW5lIG92ZXIgODAgY2hhcmFjdGVycwojMzE6IEZJTEU6IHRhcmdldC9zMzkweC9jcHVfZmVhdHVy
+ZXMuYzoyNDc6CisgICAgRkVBVF9JTklUKCJwY2ttby1lY2MtcDM4NCIsIFMzOTBfRkVBVF9UWVBF
+X1BDS01PLCAzMywgIlBDS01PIEVuY3J5cHQtRUNDLVAzODQtS2V5IiksCgpXQVJOSU5HOiBsaW5l
+IG92ZXIgODAgY2hhcmFjdGVycwojMzI6IEZJTEU6IHRhcmdldC9zMzkweC9jcHVfZmVhdHVyZXMu
+YzoyNDg6CisgICAgRkVBVF9JTklUKCJwY2ttby1lY2MtcDUyMSIsIFMzOTBfRkVBVF9UWVBFX1BD
+S01PLCAzNCwgIlBDS01PIEVuY3J5cHQtRUNDLVA1MjEtS2V5IiksCgpFUlJPUjogbGluZSBvdmVy
+IDkwIGNoYXJhY3RlcnMKIzMzOiBGSUxFOiB0YXJnZXQvczM5MHgvY3B1X2ZlYXR1cmVzLmM6MjQ5
+OgorICAgIEZFQVRfSU5JVCgicGNrbW8tZWNjLWVkMjU1MTkiLCBTMzkwX0ZFQVRfVFlQRV9QQ0tN
+TywgNDAgLCAiUENLTU8gRW5jcnlwdC1FQ0MtRWQyNTUxOS1LZXkiKSwKCkVSUk9SOiBsaW5lIG92
+ZXIgOTAgY2hhcmFjdGVycwojMzQ6IEZJTEU6IHRhcmdldC9zMzkweC9jcHVfZmVhdHVyZXMuYzoy
+NTA6CisgICAgRkVBVF9JTklUKCJwY2ttby1lY2MtZWQ0NDgiLCBTMzkwX0ZFQVRfVFlQRV9QQ0tN
+TywgNDEgLCAiUENLTU8gRW5jcnlwdC1FQ0MtRWQ0NDgtS2V5IiksCgpXQVJOSU5HOiBsaW5lIG92
+ZXIgODAgY2hhcmFjdGVycwojNDI6IEZJTEU6IHRhcmdldC9zMzkweC9jcHVfZmVhdHVyZXMuYzoz
+MDc6CisgICAgRkVBVF9JTklUKCJwY2Mtc2NhbGFyLW11bHQtcDI1NiIsIFMzOTBfRkVBVF9UWVBF
+X1BDQywgNjQsICJQQ0MgU2NhbGFyLU11bHRpcGx5LVAyNTYiKSwKCldBUk5JTkc6IGxpbmUgb3Zl
+ciA4MCBjaGFyYWN0ZXJzCiM0MzogRklMRTogdGFyZ2V0L3MzOTB4L2NwdV9mZWF0dXJlcy5jOjMw
+ODoKKyAgICBGRUFUX0lOSVQoInBjYy1zY2FsYXItbXVsdC1wMzg0IiwgUzM5MF9GRUFUX1RZUEVf
+UENDLCA2NSwgIlBDQyBTY2FsYXItTXVsdGlwbHktUDM4NCIpLAoKV0FSTklORzogbGluZSBvdmVy
+IDgwIGNoYXJhY3RlcnMKIzQ0OiBGSUxFOiB0YXJnZXQvczM5MHgvY3B1X2ZlYXR1cmVzLmM6MzA5
+OgorICAgIEZFQVRfSU5JVCgicGNjLXNjYWxhci1tdWx0LXA1MjEiLCBTMzkwX0ZFQVRfVFlQRV9Q
+Q0MsIDY2LCAiUENDIFNjYWxhci1NdWx0aXBseS1QNTIxIiksCgpFUlJPUjogbGluZSBvdmVyIDkw
+IGNoYXJhY3RlcnMKIzQ1OiBGSUxFOiB0YXJnZXQvczM5MHgvY3B1X2ZlYXR1cmVzLmM6MzEwOgor
+ICAgIEZFQVRfSU5JVCgicGNjLXNjYWxhci1tdWx0LWVkMjU1MTkiLCBTMzkwX0ZFQVRfVFlQRV9Q
+Q0MsIDcyLCAiUENDIFNjYWxhci1NdWx0aXBseS1FZDI1NTE5IiksCgpFUlJPUjogbGluZSBvdmVy
+IDkwIGNoYXJhY3RlcnMKIzQ2OiBGSUxFOiB0YXJnZXQvczM5MHgvY3B1X2ZlYXR1cmVzLmM6MzEx
+OgorICAgIEZFQVRfSU5JVCgicGNjLXNjYWxhci1tdWx0LWVkNDQ4IiwgUzM5MF9GRUFUX1RZUEVf
+UENDLCA3MywgIlBDQyBTY2FsYXItTXVsdGlwbHktRWQ0NDgiKSwKCkVSUk9SOiBsaW5lIG92ZXIg
+OTAgY2hhcmFjdGVycwojNDc6IEZJTEU6IHRhcmdldC9zMzkweC9jcHVfZmVhdHVyZXMuYzozMTI6
+CisgICAgRkVBVF9JTklUKCJwY2Mtc2NhbGFyLW11bHQteDI1NTE5IiwgUzM5MF9GRUFUX1RZUEVf
+UENDLCA4MCwgIlBDQyBTY2FsYXItTXVsdGlwbHktWDI1NTE5IiksCgpXQVJOSU5HOiBsaW5lIG92
+ZXIgODAgY2hhcmFjdGVycwojNDg6IEZJTEU6IHRhcmdldC9zMzkweC9jcHVfZmVhdHVyZXMuYzoz
+MTM6CisgICAgRkVBVF9JTklUKCJwY2Mtc2NhbGFyLW11bHQteDQ0OCIsIFMzOTBfRkVBVF9UWVBF
+X1BDQywgODEsICJQQ0MgU2NhbGFyLU11bHRpcGx5LVg0NDgiKSwKCldBUk5JTkc6IGxpbmUgb3Zl
+ciA4MCBjaGFyYWN0ZXJzCiM1NzogRklMRTogdGFyZ2V0L3MzOTB4L2NwdV9mZWF0dXJlcy5jOjMy
+NjoKKyAgICBGRUFUX0lOSVQoImtkc2EtZWNkc2EtdmVyaWZ5LXAyNTYiLCBTMzkwX0ZFQVRfVFlQ
+RV9LRFNBLCAxLCAiS0RTQSBFQ0RTQS1WZXJpZnktUDI1NiIpLAoKV0FSTklORzogbGluZSBvdmVy
+IDgwIGNoYXJhY3RlcnMKIzU4OiBGSUxFOiB0YXJnZXQvczM5MHgvY3B1X2ZlYXR1cmVzLmM6MzI3
+OgorICAgIEZFQVRfSU5JVCgia2RzYS1lY2RzYS12ZXJpZnktcDM4NCIsIFMzOTBfRkVBVF9UWVBF
+X0tEU0EsIDIsICJLRFNBIEVDRFNBLVZlcmlmeS1QMzg0IiksCgpXQVJOSU5HOiBsaW5lIG92ZXIg
+ODAgY2hhcmFjdGVycwojNTk6IEZJTEU6IHRhcmdldC9zMzkweC9jcHVfZmVhdHVyZXMuYzozMjg6
+CisgICAgRkVBVF9JTklUKCJrZHNhLWVjZHNhLXZlcmlmeS1wNTIxIiwgUzM5MF9GRUFUX1RZUEVf
+S0RTQSwgMywgIktEU0EgRUNEU0EtVmVyaWZ5LVA1MjEiKSwKCldBUk5JTkc6IGxpbmUgb3ZlciA4
+MCBjaGFyYWN0ZXJzCiM2MDogRklMRTogdGFyZ2V0L3MzOTB4L2NwdV9mZWF0dXJlcy5jOjMyOToK
+KyAgICBGRUFUX0lOSVQoImtkc2EtZWNkc2Etc2lnbi1wMjU2IiwgUzM5MF9GRUFUX1RZUEVfS0RT
+QSwgOSwgIktEU0EgRUNEU0EtU2lnbi1QMjU2IiksCgpXQVJOSU5HOiBsaW5lIG92ZXIgODAgY2hh
+cmFjdGVycwojNjE6IEZJTEU6IHRhcmdldC9zMzkweC9jcHVfZmVhdHVyZXMuYzozMzA6CisgICAg
+RkVBVF9JTklUKCJrZHNhLWVjZHNhLXNpZ24tcDM4NCIsIFMzOTBfRkVBVF9UWVBFX0tEU0EsIDEw
+LCAiS0RTQSBFQ0RTQS1TaWduLVAzODQiKSwKCldBUk5JTkc6IGxpbmUgb3ZlciA4MCBjaGFyYWN0
+ZXJzCiM2MjogRklMRTogdGFyZ2V0L3MzOTB4L2NwdV9mZWF0dXJlcy5jOjMzMToKKyAgICBGRUFU
+X0lOSVQoImtkc2EtZWNkc2Etc2lnbi1wNTIxIiwgUzM5MF9GRUFUX1RZUEVfS0RTQSwgMTEsICJL
+RFNBIEVDRFNBLVNpZ24tUDUyMSIpLAoKRVJST1I6IGxpbmUgb3ZlciA5MCBjaGFyYWN0ZXJzCiM2
+MzogRklMRTogdGFyZ2V0L3MzOTB4L2NwdV9mZWF0dXJlcy5jOjMzMjoKKyAgICBGRUFUX0lOSVQo
+Imtkc2EtZWVjZHNhLXNpZ24tcDI1NiIsIFMzOTBfRkVBVF9UWVBFX0tEU0EsIDE3LCAiS0RTQSBF
+bmNyeXB0ZWQtRUNEU0EtU2lnbi1QMjU2IiksCgpFUlJPUjogbGluZSBvdmVyIDkwIGNoYXJhY3Rl
+cnMKIzY0OiBGSUxFOiB0YXJnZXQvczM5MHgvY3B1X2ZlYXR1cmVzLmM6MzMzOgorICAgIEZFQVRf
+SU5JVCgia2RzYS1lZWNkc2Etc2lnbi1wMzg0IiwgUzM5MF9GRUFUX1RZUEVfS0RTQSwgMTgsICJL
+RFNBIEVuY3J5cHRlZC1FQ0RTQS1TaWduLVAzODQiKSwKCkVSUk9SOiBsaW5lIG92ZXIgOTAgY2hh
+cmFjdGVycwojNjU6IEZJTEU6IHRhcmdldC9zMzkweC9jcHVfZmVhdHVyZXMuYzozMzQ6CisgICAg
+RkVBVF9JTklUKCJrZHNhLWVlY2RzYS1zaWduLXA1MjEiLCBTMzkwX0ZFQVRfVFlQRV9LRFNBLCAx
+OSwgIktEU0EgRW5jcnlwdGVkLUVDRFNBLVNpZ24tUDUyMSIpLAoKRVJST1I6IGxpbmUgb3ZlciA5
+MCBjaGFyYWN0ZXJzCiM2NjogRklMRTogdGFyZ2V0L3MzOTB4L2NwdV9mZWF0dXJlcy5jOjMzNToK
+KyAgICBGRUFUX0lOSVQoImtkc2EtZWRkc2EtdmVyaWZ5LWVkMjU1MTkiLCBTMzkwX0ZFQVRfVFlQ
+RV9LRFNBLCAzMiwgIktEU0EgRWREU0EtVmVyaWZ5LUVkMjU1MTkiKSwKCkVSUk9SOiBsaW5lIG92
+ZXIgOTAgY2hhcmFjdGVycwojNjc6IEZJTEU6IHRhcmdldC9zMzkweC9jcHVfZmVhdHVyZXMuYzoz
+MzY6CisgICAgRkVBVF9JTklUKCJrZHNhLWVkZHNhLXZlcmlmeS1lZDQ0OCIsIFMzOTBfRkVBVF9U
+WVBFX0tEU0EsIDM2LCAiS0RTQSBFZERTQS1WZXJpZnktRWQ0NDgiKSwKCkVSUk9SOiBsaW5lIG92
+ZXIgOTAgY2hhcmFjdGVycwojNjg6IEZJTEU6IHRhcmdldC9zMzkweC9jcHVfZmVhdHVyZXMuYzoz
+Mzc6CisgICAgRkVBVF9JTklUKCJrZHNhLWVkZHNhLXNpZ24tZWQyNTUxOSIsIFMzOTBfRkVBVF9U
+WVBFX0tEU0EsIDQwLCAiS0RTQSBFZERTQS1TaWduLUVkMjU1MTkiKSwKCldBUk5JTkc6IGxpbmUg
+b3ZlciA4MCBjaGFyYWN0ZXJzCiM2OTogRklMRTogdGFyZ2V0L3MzOTB4L2NwdV9mZWF0dXJlcy5j
+OjMzODoKKyAgICBGRUFUX0lOSVQoImtkc2EtZWRkc2Etc2lnbi1lZDQ0OCIsIFMzOTBfRkVBVF9U
+WVBFX0tEU0EsIDQ0LCAiS0RTQSBFZERTQS1TaWduLUVkNDQ4IiksCgpFUlJPUjogbGluZSBvdmVy
+IDkwIGNoYXJhY3RlcnMKIzcwOiBGSUxFOiB0YXJnZXQvczM5MHgvY3B1X2ZlYXR1cmVzLmM6MzM5
+OgorICAgIEZFQVRfSU5JVCgia2RzYS1lZWRkc2Etc2lnbi1lZDI1NTE5IiwgUzM5MF9GRUFUX1RZ
+UEVfS0RTQSwgNDgsICJLRFNBIEVuY3J5cHRlZC1FZERTQS1TaWduLUVkMjU1MTkiKSwKCkVSUk9S
+OiBsaW5lIG92ZXIgOTAgY2hhcmFjdGVycwojNzE6IEZJTEU6IHRhcmdldC9zMzkweC9jcHVfZmVh
+dHVyZXMuYzozNDA6CisgICAgRkVBVF9JTklUKCJrZHNhLWVlZGRzYS1zaWduLWVkNDQ4IiwgUzM5
+MF9GRUFUX1RZUEVfS0RTQSwgNTIsICJLRFNBIEVuY3J5cHRlZC1FZERTQS1TaWduLUVkNDQ4Iiks
+CgpXQVJOSU5HOiBsaW5lIG92ZXIgODAgY2hhcmFjdGVycwojODc6IEZJTEU6IHRhcmdldC9zMzkw
+eC9jcHVfZmVhdHVyZXMuYzo0OTk6CisgICAgRkVBVF9HUk9VUF9JTklUKCJtc2E5IiwgTVNBX0VY
+VF85LCAiTWVzc2FnZS1zZWN1cml0eS1hc3Npc3QtZXh0ZW5zaW9uIDkgZmFjaWxpdHkiKSwKCkVS
+Uk9SOiBsaW5lIG92ZXIgOTAgY2hhcmFjdGVycwojODg6IEZJTEU6IHRhcmdldC9zMzkweC9jcHVf
+ZmVhdHVyZXMuYzo1MDA6CisgICAgRkVBVF9HUk9VUF9JTklUKCJtc2E5X3Bja21vIiwgTVNBX0VY
+VF85X1BDS01PLCAiTWVzc2FnZS1zZWN1cml0eS1hc3Npc3QtZXh0ZW5zaW9uIDkgUENLTU8gc3Vi
+ZnVuY3Rpb25zIiksCgpFUlJPUjogTWFjcm9zIHdpdGggY29tcGxleCB2YWx1ZXMgc2hvdWxkIGJl
+IGVuY2xvc2VkIGluIHBhcmVudGhlc2lzCiMxODg6IEZJTEU6IHRhcmdldC9zMzkweC9nZW4tZmVh
+dHVyZXMuYzoyMTY6CisjZGVmaW5lIFMzOTBfRkVBVF9HUk9VUF9NU0FfRVhUXzkgXAorICAgIFMz
+OTBfRkVBVF9NU0FfRVhUXzksIFwKKyAgICBTMzkwX0ZFQVRfRUNEU0FfVkVSSUZZX1AyNTYsIFwK
+KyAgICBTMzkwX0ZFQVRfRUNEU0FfVkVSSUZZX1AzODQsIFwKKyAgICBTMzkwX0ZFQVRfRUNEU0Ff
+VkVSSUZZX1A1MTIsIFwKKyAgICBTMzkwX0ZFQVRfRUNEU0FfU0lHTl9QMjU2LCBcCisgICAgUzM5
+MF9GRUFUX0VDRFNBX1NJR05fUDM4NCwgXAorICAgIFMzOTBfRkVBVF9FQ0RTQV9TSUdOX1A1MTIs
+IFwKKyAgICBTMzkwX0ZFQVRfRUVDRFNBX1NJR05fUDI1NiwgXAorICAgIFMzOTBfRkVBVF9FRUNE
+U0FfU0lHTl9QMzg0LCBcCisgICAgUzM5MF9GRUFUX0VFQ0RTQV9TSUdOX1A1MTIsIFwKKyAgICBT
+MzkwX0ZFQVRfRUREU0FfVkVSSUZZX0VEMjU1MTksIFwKKyAgICBTMzkwX0ZFQVRfRUREU0FfVkVS
+SUZZX0VENDQ4LCBcCisgICAgUzM5MF9GRUFUX0VERFNBX1NJR05fRUQyNTUxOSwgXAorICAgIFMz
+OTBfRkVBVF9FRERTQV9TSUdOX0VENDQ4LCBcCisgICAgUzM5MF9GRUFUX0VFRERTQV9TSUdOX0VE
+MjU1MTksIFwKKyAgICBTMzkwX0ZFQVRfRUVERFNBX1NJR05fRUQ0NDgsIFwKKyAgICBTMzkwX0ZF
+QVRfUENDX1NDQUxBUl9NVUxUX1AyNTYsIFwKKyAgICBTMzkwX0ZFQVRfUENDX1NDQUxBUl9NVUxU
+X1AzODQsIFwKKyAgICBTMzkwX0ZFQVRfUENDX1NDQUxBUl9NVUxUX1A1MTIsIFwKKyAgICBTMzkw
+X0ZFQVRfUENDX1NDQUxBUl9NVUxUX0VEMjU1MTksIFwKKyAgICBTMzkwX0ZFQVRfUENDX1NDQUxB
+Ul9NVUxUX0VENDQ4LCBcCisgICAgUzM5MF9GRUFUX1BDQ19TQ0FMQVJfTVVMVF9YMjU1MTksIFwK
+KyAgICBTMzkwX0ZFQVRfUENDX1NDQUxBUl9NVUxUX1g0NDgKCkVSUk9SOiBNYWNyb3Mgd2l0aCBj
+b21wbGV4IHZhbHVlcyBzaG91bGQgYmUgZW5jbG9zZWQgaW4gcGFyZW50aGVzaXMKIzIxMzogRklM
+RTogdGFyZ2V0L3MzOTB4L2dlbi1mZWF0dXJlcy5jOjI0MToKKyNkZWZpbmUgUzM5MF9GRUFUX0dS
+T1VQX01TQV9FWFRfOV9QQ0tNTyBcCisgICAgUzM5MF9GRUFUX1BDS01PX0VDQ19QMjU2LCBcCisg
+ICAgUzM5MF9GRUFUX1BDS01PX0VDQ19QMzg0LCBcCisgICAgUzM5MF9GRUFUX1BDS01PX0VDQ19Q
+NTIxLCBcCisgICAgUzM5MF9GRUFUX1BDS01PX0VDQ19FRDI1NTE5LCBcCisgICAgUzM5MF9GRUFU
+X1BDS01PX0VDQ19FRDQ0OAoKdG90YWw6IDE3IGVycm9ycywgMTUgd2FybmluZ3MsIDIxNiBsaW5l
+cyBjaGVja2VkCgpQYXRjaCA0LzkgaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAg
+SWYgYW55IG9mIHRoZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRv
+IHRoZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KCjUvOSBDaGVj
+a2luZyBjb21taXQgZTA4OTQ4ZmRkNDQ4IChzMzkweC9jcHVtb2RlbDogdmVjdG9yIGVuaGFuY2Vt
+ZW50cykKV0FSTklORzogbGluZSBvdmVyIDgwIGNoYXJhY3RlcnMKIzIxOiBGSUxFOiB0YXJnZXQv
+czM5MHgvY3B1X2ZlYXR1cmVzLmM6MTExOgorICAgIEZFQVRfSU5JVCgidnhlaDIiLCBTMzkwX0ZF
+QVRfVFlQRV9TVEZMLCAxNDgsICJWZWN0b3IgRW5oYW5jZW1lbnRzIGZhY2lsaXR5IDIiKSwKCldB
+Uk5JTkc6IGxpbmUgb3ZlciA4MCBjaGFyYWN0ZXJzCiMyMjogRklMRTogdGFyZ2V0L3MzOTB4L2Nw
+dV9mZWF0dXJlcy5jOjExMjoKKyAgICBGRUFUX0lOSVQoInZ4YmVoIiwgUzM5MF9GRUFUX1RZUEVf
+U1RGTCwgMTUyLCAiVmVjdG9yIEJDRCBlbmhhbmNlbWVudHMgZmFjaWxpdHkgMSIpLAoKdG90YWw6
+IDAgZXJyb3JzLCAyIHdhcm5pbmdzLCAxNiBsaW5lcyBjaGVja2VkCgpQYXRjaCA1LzkgaGFzIHN0
+eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVycm9ycwphcmUg
+ZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQ
+QVRDSCBpbiBNQUlOVEFJTkVSUy4KNi85IENoZWNraW5nIGNvbW1pdCBiOGJlZDJiMzI4NDAgKHMz
+OTB4L2NwdW1vZGVsOiBlbmhhbmNlZCBzb3J0IGZhY2lsaXR5KQpFUlJPUjogbGluZSBvdmVyIDkw
+IGNoYXJhY3RlcnMKIzIxOiBGSUxFOiB0YXJnZXQvczM5MHgvY3B1X2ZlYXR1cmVzLmM6MTEyOgor
+ICAgIEZFQVRfSU5JVCgiZXNvcnQtYmFzZSIsIFMzOTBfRkVBVF9UWVBFX1NURkwsIDE1MCwgIkVu
+aGFuY2VkLXNvcnQgZmFjaWxpdHkgKGV4Y2x1ZGluZyBzdWJmdW5jdGlvbnMpIiksCgpXQVJOSU5H
+OiBsaW5lIG92ZXIgODAgY2hhcmFjdGVycwojMzQ6IEZJTEU6IHRhcmdldC9zMzkweC9jcHVfZmVh
+dHVyZXMuYzozNDk6CisgICAgRkVBVF9JTklUKCJzb3J0bC1mMCIsIFMzOTBfRkVBVF9UWVBFX1NP
+UlRMLCAxOTIsICJTT1JUTCBmb3JtYXQgMCBwYXJhbWV0ZXItYmxvY2siKSwKCkVSUk9SOiBNYWNy
+b3Mgd2l0aCBjb21wbGV4IHZhbHVlcyBzaG91bGQgYmUgZW5jbG9zZWQgaW4gcGFyZW50aGVzaXMK
+IzEwODogRklMRTogdGFyZ2V0L3MzOTB4L2dlbi1mZWF0dXJlcy5jOjI0ODoKKyNkZWZpbmUgUzM5
+MF9GRUFUX0dST1VQX0VOSF9TT1JUIFwKKyAgICBTMzkwX0ZFQVRfRVNPUlRfQkFTRSwgXAorICAg
+IFMzOTBfRkVBVF9TT1JUTF9TRkxSLCBcCisgICAgUzM5MF9GRUFUX1NPUlRMX1NWTFIsIFwKKyAg
+ICBTMzkwX0ZFQVRfU09SVExfMzIsIFwKKyAgICBTMzkwX0ZFQVRfU09SVExfMTI4LCBcCisgICAg
+UzM5MF9GRUFUX1NPUlRMX0YwCgp0b3RhbDogMiBlcnJvcnMsIDEgd2FybmluZ3MsIDExNyBsaW5l
+cyBjaGVja2VkCgpQYXRjaCA2LzkgaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAg
+SWYgYW55IG9mIHRoZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRv
+IHRoZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KCjcvOSBDaGVj
+a2luZyBjb21taXQgMDhjODFmZTQzMzIzIChzMzkweC9jcHVtb2RlbDogYWRkIERlZmxhdGUtY29u
+dmVyc2lvbiBmYWNpbGl0eSkKRVJST1I6IGxpbmUgb3ZlciA5MCBjaGFyYWN0ZXJzCiMyMDogRklM
+RTogdGFyZ2V0L3MzOTB4L2NwdV9mZWF0dXJlcy5jOjExMzoKKyAgICBGRUFUX0lOSVQoImRlZmxh
+dGUtYmFzZSIsIFMzOTBfRkVBVF9UWVBFX1NURkwsIDE1MSwgIkRlZmxhdGUtY29udmVyc2lvbiBm
+YWNpbGl0eSAoZXhjbHVkaW5nIHN1YmZ1bmN0aW9ucykiKSwKCldBUk5JTkc6IGxpbmUgb3ZlciA4
+MCBjaGFyYWN0ZXJzCiMzMjogRklMRTogdGFyZ2V0L3MzOTB4L2NwdV9mZWF0dXJlcy5jOjM1NToK
+KyAgICBGRUFUX0lOSVQoImRmbHRjYy1mMCIsIFMzOTBfRkVBVF9UWVBFX0RGTFRDQywgMTkyLCAi
+REZMVENDIGZvcm1hdCAwIHBhcmFtZXRlci1ibG9jayIpLAoKV0FSTklORzogbGluZSBvdmVyIDgw
+IGNoYXJhY3RlcnMKIzU2OiBGSUxFOiB0YXJnZXQvczM5MHgvY3B1X2ZlYXR1cmVzLmM6NTIyOgor
+ICAgIEZFQVRfR1JPVVBfSU5JVCgiZGVmbGF0ZSIsIERFRkxBVEVfQ09OVkVSU0lPTiwgIkRlZmxh
+dGUtY29udmVyc2lvbiBmYWNpbGl0eSIpLAoKRVJST1I6IE1hY3JvcyB3aXRoIGNvbXBsZXggdmFs
+dWVzIHNob3VsZCBiZSBlbmNsb3NlZCBpbiBwYXJlbnRoZXNpcwojMTA1OiBGSUxFOiB0YXJnZXQv
+czM5MHgvZ2VuLWZlYXR1cmVzLmM6MjU3OgorI2RlZmluZSBTMzkwX0ZFQVRfR1JPVVBfREVGTEFU
+RV9DT05WRVJTSU9OIFwKKyAgICBTMzkwX0ZFQVRfREVGTEFURV9CQVNFLCBcCisgICAgUzM5MF9G
+RUFUX0RFRkxBVEVfR0hEVCwgXAorICAgIFMzOTBfRkVBVF9ERUZMQVRFX0NNUFIsIFwKKyAgICBT
+MzkwX0ZFQVRfREVGTEFURV9YUE5ELCBcCisgICAgUzM5MF9GRUFUX0RFRkxBVEVfRjAKCnRvdGFs
+OiAyIGVycm9ycywgMiB3YXJuaW5ncywgMTEzIGxpbmVzIGNoZWNrZWQKClBhdGNoIDcvOSBoYXMg
+c3R5bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZpZXcuICBJZiBhbnkgb2YgdGhlc2UgZXJyb3JzCmFy
+ZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1haW50YWluZXIsIHNlZQpDSEVD
+S1BBVENIIGluIE1BSU5UQUlORVJTLgoKOC85IENoZWNraW5nIGNvbW1pdCA4YjZmYWRhY2ViMjIg
+KHMzOTB4L2NwdW1vZGVsOiBhZGQgZ2VuMTUgZGVmaW50aW9ucykKOS85IENoZWNraW5nIGNvbW1p
+dCBmODc0MGQ1YjY4NzAgKHMzOTB4L2NwdW1vZGVsOiB3aXJlIHVwIDg1NjEgYW5kIDg1NjIgYXMg
+Z2VuMTUgbWFjaGluZXMpCj09PSBPVVRQVVQgRU5EID09PQoKVGVzdCBjb21tYW5kIGV4aXRlZCB3
+aXRoIGNvZGU6IDEKCgpUaGUgZnVsbCBsb2cgaXMgYXZhaWxhYmxlIGF0Cmh0dHA6Ly9wYXRjaGV3
+Lm9yZy9sb2dzLzIwMTkwNDI5MDkwMjUwLjc2NDgtMS1ib3JudHJhZWdlckBkZS5pYm0uY29tL3Rl
+c3RpbmcuY2hlY2twYXRjaC8/dHlwZT1tZXNzYWdlLgotLS0KRW1haWwgZ2VuZXJhdGVkIGF1dG9t
+YXRpY2FsbHkgYnkgUGF0Y2hldyBbaHR0cHM6Ly9wYXRjaGV3Lm9yZy9dLgpQbGVhc2Ugc2VuZCB5
+b3VyIGZlZWRiYWNrIHRvIHBhdGNoZXctZGV2ZWxAcmVkaGF0LmNvbQ==
