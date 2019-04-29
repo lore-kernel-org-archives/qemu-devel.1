@@ -1,27 +1,27 @@
-Received: from eggs.gnu.org ([209.51.188.92]:55682)
+Received: from eggs.gnu.org ([209.51.188.92]:56220)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1hL7va-0007hp-Bn
-	for qemu-devel@nongnu.org; Mon, 29 Apr 2019 11:10:47 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1hL7xJ-0000uN-IX
+	for qemu-devel@nongnu.org; Mon, 29 Apr 2019 11:12:34 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1hL7vZ-0000eg-4k
-	for qemu-devel@nongnu.org; Mon, 29 Apr 2019 11:10:46 -0400
-Received: from mail-wm1-f66.google.com ([209.85.128.66]:39008)
+	(envelope-from <peter.maydell@linaro.org>) id 1hL7xI-0002ha-J6
+	for qemu-devel@nongnu.org; Mon, 29 Apr 2019 11:12:33 -0400
+Received: from mail-ot1-x342.google.com ([2607:f8b0:4864:20::342]:42183)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1hL7vY-0000dj-TN
-	for qemu-devel@nongnu.org; Mon, 29 Apr 2019 11:10:45 -0400
-Received: by mail-wm1-f66.google.com with SMTP id n25so1343254wmk.4
-	for <qemu-devel@nongnu.org>; Mon, 29 Apr 2019 08:10:44 -0700 (PDT)
-References: <155655030568.10667.13700938703853199260@c2072b67cc0c>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Message-ID: <223a0019-d3c6-45de-1926-a84f5b595a9f@redhat.com>
-Date: Mon, 29 Apr 2019 17:10:42 +0200
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1hL7xI-0002cF-E4
+	for qemu-devel@nongnu.org; Mon, 29 Apr 2019 11:12:32 -0400
+Received: by mail-ot1-x342.google.com with SMTP id f23so8895982otl.9
+	for <qemu-devel@nongnu.org>; Mon, 29 Apr 2019 08:12:32 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <155655030568.10667.13700938703853199260@c2072b67cc0c>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH] usb/xchi: avoid trigger assertion if guest
- write wrong epid
+References: <20190328230404.12909-1-richard.henderson@linaro.org>
+	<155381739615.24.12240723664123883584@76452e4e88f2>
+In-Reply-To: <155381739615.24.12240723664123883584@76452e4e88f2>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Mon, 29 Apr 2019 16:12:20 +0100
+Message-ID: <CAFEAcA9cyZAHj9DRgq6dXsFXGNLKcEOXCndLYTpf9b+EGHnr0g@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH for-4.1 v2 00/36] tcg: Move the softmmu tlb
+ to CPUNegativeOffsetState
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,40 +30,23 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org, no-reply@patchew.org, longpeng2@huawei.com
-Cc: fam@euphon.net, arei.gonglei@huawei.com, kraxel@redhat.com, patchew-devel@redhat.com
+To: QEMU Developers <qemu-devel@nongnu.org>
+Cc: Richard Henderson <richard.henderson@linaro.org>, Fam Zheng <fam@euphon.net>
 
-Hi Paolo, Fam.
+On Fri, 29 Mar 2019 at 00:44, <no-reply@patchew.org> wrote:
+>
+> Patchew URL: https://patchew.org/QEMU/20190328230404.12909-1-richard.henderson@linaro.org/
+>
+>
+>
+> Hi,
+>
+> This series seems to have some coding style problems. See output below for
+> more information:
 
-On 4/29/19 5:05 PM, no-reply@patchew.org wrote:
-> Patchew URL: https://patchew.org/QEMU/1556523569-44480-1-git-send-email-longpeng2@huawei.com/
-[...]
-> This series failed the docker-mingw@fedora build test. Please find the testing commands and
-> their output below. If you have Docker installed, you can probably reproduce it
-> locally.
-[...]
-> The full log is available at
-> http://patchew.org/logs/1556523569-44480-1-git-send-email-longpeng2@huawei.com/testing.docker-mingw@fedora/?type=message.
+Richard -- at least some of these checkpatch nits look like
+they're real rather than false positives: could you have a look
+through them and fold in fixes where appropriate?
 
-Weird patchew error:
-
-Updating 3c8cf5a9c21ff8782164d1def7f44bd888713384
->From https://github.com/patchew-project/qemu
- - [tag update]
-patchew/1554321185-2825-1-git-send-email-sandra@codesourcery.com ->
-patchew/1554321185-2825-1-git-send-email-sandra@codesourcery.com
- * [new tag]
-patchew/1556523569-44480-1-git-send-email-longpeng2@huawei.com ->
-patchew/1556523569-44480-1-git-send-email-longpeng2@huawei.com
-[...]
-error: rev-list died of signal 9
-fatal: remote did not send all necessary objects
-fatal: The remote end hung up unexpectedly
-
-Traceback (most recent call last):
-  File "patchew-tester/src/patchew-cli", line 521, in test_one
-    git_clone_repo(clone, r["repo"], r["head"], logf, True)
-  File "patchew-tester/src/patchew-cli", line 53, in git_clone_repo
-    subprocess.check_call(clone_cmd, stderr=logf, stdout=logf)
-  File "/usr/lib64/python3.4/subprocess.py", line 558, in check_call
-    raise CalledProcessError(retcode, cmd)
+thanks
+-- PMM
