@@ -2,52 +2,72 @@ Return-Path: <SRS0=sEuR=S7=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.4 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_PASS,USER_AGENT_MUTT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4F524C43219
-	for <qemu-devel@archiver.kernel.org>; Mon, 29 Apr 2019 09:18:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7391BC43219
+	for <qemu-devel@archiver.kernel.org>; Mon, 29 Apr 2019 09:18:33 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 20F3D20578
-	for <qemu-devel@archiver.kernel.org>; Mon, 29 Apr 2019 09:18:20 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 20F3D20578
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
+	by mail.kernel.org (Postfix) with ESMTPS id 345ED20578
+	for <qemu-devel@archiver.kernel.org>; Mon, 29 Apr 2019 09:18:33 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 345ED20578
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:54505 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:54507 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hL2QV-0001oB-Bv
-	for qemu-devel@archiver.kernel.org; Mon, 29 Apr 2019 05:18:19 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:34070)
+	id 1hL2Qi-0001vG-Cc
+	for qemu-devel@archiver.kernel.org; Mon, 29 Apr 2019 05:18:32 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:36212)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1hL2HL-0002RJ-Hu
-	for qemu-devel@nongnu.org; Mon, 29 Apr 2019 05:08:52 -0400
+	(envelope-from <mkletzan@redhat.com>) id 1hL2OW-0000gE-74
+	for qemu-devel@nongnu.org; Mon, 29 Apr 2019 05:16:17 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1hL2HJ-0003vW-Jv
-	for qemu-devel@nongnu.org; Mon, 29 Apr 2019 05:08:51 -0400
-Received: from relay.sw.ru ([185.231.240.75]:32884)
+	(envelope-from <mkletzan@redhat.com>) id 1hL2OU-00087q-Qg
+	for qemu-devel@nongnu.org; Mon, 29 Apr 2019 05:16:16 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:47332)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
-	id 1hL2HH-0003sP-LY; Mon, 29 Apr 2019 05:08:49 -0400
-Received: from [10.28.8.145] (helo=kvm.sw.ru)
-	by relay.sw.ru with esmtp (Exim 4.91)
-	(envelope-from <vsementsov@virtuozzo.com>)
-	id 1hL2HE-0002jV-10; Mon, 29 Apr 2019 12:08:44 +0300
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-To: qemu-devel@nongnu.org,
-	qemu-block@nongnu.org
-Date: Mon, 29 Apr 2019 12:08:40 +0300
-Message-Id: <20190429090842.57910-4-vsementsov@virtuozzo.com>
-X-Mailer: git-send-email 2.18.0
-In-Reply-To: <20190429090842.57910-1-vsementsov@virtuozzo.com>
-References: <20190429090842.57910-1-vsementsov@virtuozzo.com>
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x
-X-Received-From: 185.231.240.75
-Subject: [Qemu-devel] [PATCH v7 3/5] block/backup: refactor and tolerate
- unallocated cluster skipping
+	(Exim 4.71) (envelope-from <mkletzan@redhat.com>) id 1hL2OU-00087S-Ho
+	for qemu-devel@nongnu.org; Mon, 29 Apr 2019 05:16:14 -0400
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+	[10.5.11.15])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 44BE7C057F47;
+	Mon, 29 Apr 2019 09:16:13 +0000 (UTC)
+Received: from caroline (unknown [10.43.2.67])
+	by smtp.corp.redhat.com (Postfix) with ESMTPS id E13C35D71B;
+	Mon, 29 Apr 2019 09:16:12 +0000 (UTC)
+Received: by caroline (Postfix, from userid 1000)
+	id 97D3A120066; Mon, 29 Apr 2019 11:16:11 +0200 (CEST)
+Date: Mon, 29 Apr 2019 11:16:11 +0200
+From: Martin Kletzander <mkletzan@redhat.com>
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Message-ID: <20190429091611.GE8818@wheatley>
+References: <20190423113028.GD30014@wheatley>
+	<20190423121218.GF9041@localhost.localdomain>
+	<20190423142648.GA2967@wheatley>
+	<20190423150845.GG9041@localhost.localdomain>
+	<aeb62174-5aad-676e-792d-e71d694dbd1e@virtuozzo.com>
+	<20190424071917.GA15891@linux.fritz.box>
+	<20190429072734.GC8818@wheatley>
+	<ccc8393b-8b59-63ce-c3c3-618d52cfca3e@virtuozzo.com>
+MIME-Version: 1.0
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature"; boundary="eheScQNz3K90DVRs"
+Content-Disposition: inline
+In-Reply-To: <ccc8393b-8b59-63ce-c3c3-618d52cfca3e@virtuozzo.com>
+User-Agent: Mutt/1.11.4 (2019-03-13)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+	(mx1.redhat.com [10.5.110.32]);
+	Mon, 29 Apr 2019 09:16:13 +0000 (UTC)
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 209.132.183.28
+Subject: Re: [Qemu-devel] Possibly incorrect data sparsification by qemu-img
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -59,111 +79,214 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: kwolf@redhat.com, den@openvz.org, vsementsov@virtuozzo.com,
-	jsnow@redhat.com, mreitz@redhat.com
+Cc: Kevin Wolf <kwolf@redhat.com>,
+	"qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
+	Richard Jones <rjones@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Content-Type: text/plain; charset="UTF-8"
-Message-ID: <20190429090840.vVuoRFSU7Ve8v9aplAWsskWjIa3jduC7TQBpjIKl5h0@z>
+Message-ID: <20190429091611.QRCTJ1woC6mccJjmrt1BSS5F-WOH5H6i2S05cg5UU0k@z>
 
-Split allocation checking to separate function and reduce nesting.
-Consider bdrv_is_allocated() fail as allocated area, as copying more
-than needed is not wrong (and we do it anyway) and seems better than
-fail the whole job. And, most probably we will fail on the next read,
-if there are real problem with source.
 
-Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Reviewed-by: Max Reitz <mreitz@redhat.com>
----
- block/backup.c | 60 +++++++++++++++++++-------------------------------
- 1 file changed, 23 insertions(+), 37 deletions(-)
+--eheScQNz3K90DVRs
+Content-Type: text/plain; charset=iso-8859-1; format=flowed
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-diff --git a/block/backup.c b/block/backup.c
-index 510fc54f98..298e85f1a9 100644
---- a/block/backup.c
-+++ b/block/backup.c
-@@ -377,6 +377,22 @@ static bool coroutine_fn yield_and_check(BackupBlockJob *job)
-     return false;
- }
- 
-+static bool bdrv_is_unallocated_range(BlockDriverState *bs,
-+                                      int64_t offset, int64_t bytes)
-+{
-+    int64_t end = offset + bytes;
-+
-+    while (offset < end && !bdrv_is_allocated(bs, offset, bytes, &bytes)) {
-+        if (bytes == 0) {
-+            return true;
-+        }
-+        offset += bytes;
-+        bytes = end - offset;
-+    }
-+
-+    return offset >= end;
-+}
-+
- static int coroutine_fn backup_run_incremental(BackupBlockJob *job)
- {
-     int ret;
-@@ -462,49 +478,19 @@ static int coroutine_fn backup_run(Job *job, Error **errp)
-         for (offset = 0; offset < s->len;
-              offset += s->cluster_size) {
-             bool error_is_read;
--            int alloced = 0;
- 
-             if (yield_and_check(s)) {
-                 break;
-             }
- 
--            if (s->sync_mode == MIRROR_SYNC_MODE_TOP) {
--                int i;
--                int64_t n;
--
--                /* Check to see if these blocks are already in the
--                 * backing file. */
--
--                for (i = 0; i < s->cluster_size;) {
--                    /* bdrv_is_allocated() only returns true/false based
--                     * on the first set of sectors it comes across that
--                     * are are all in the same state.
--                     * For that reason we must verify each sector in the
--                     * backup cluster length.  We end up copying more than
--                     * needed but at some point that is always the case. */
--                    alloced =
--                        bdrv_is_allocated(bs, offset + i,
--                                          s->cluster_size - i, &n);
--                    i += n;
--
--                    if (alloced || n == 0) {
--                        break;
--                    }
--                }
--
--                /* If the above loop never found any sectors that are in
--                 * the topmost image, skip this backup. */
--                if (alloced == 0) {
--                    continue;
--                }
--            }
--            /* FULL sync mode we copy the whole drive. */
--            if (alloced < 0) {
--                ret = alloced;
--            } else {
--                ret = backup_do_cow(s, offset, s->cluster_size,
--                                    &error_is_read, false);
-+            if (s->sync_mode == MIRROR_SYNC_MODE_TOP &&
-+                bdrv_is_unallocated_range(bs, offset, s->cluster_size))
-+            {
-+                continue;
-             }
-+
-+            ret = backup_do_cow(s, offset, s->cluster_size,
-+                                &error_is_read, false);
-             if (ret < 0) {
-                 /* Depending on error action, fail now or retry cluster */
-                 BlockErrorAction action =
--- 
-2.18.0
+On Mon, Apr 29, 2019 at 08:58:37AM +0000, Vladimir Sementsov-Ogievskiy wrot=
+e:
+>29.04.2019 10:27, Martin Kletzander wrote:
+>> On Wed, Apr 24, 2019 at 09:19:17AM +0200, Kevin Wolf wrote:
+>>> Am 24.04.2019 um 08:40 hat Vladimir Sementsov-Ogievskiy geschrieben:
+>>>> 23.04.2019 18:08, Kevin Wolf wrote:
+>>>> > Am 23.04.2019 um 16:26 hat Martin Kletzander geschrieben:
+>>>> >> On Tue, Apr 23, 2019 at 02:12:18PM +0200, Kevin Wolf wrote:
+>>>> >>> Am 23.04.2019 um 13:30 hat Martin Kletzander geschrieben:
+>>>> >>>> Hi,
+>>>> >>>>
+>>>> >>>> I am using qemu-img with nbdkit to transfer a disk image and the =
+update it with
+>>>> >>>> extra data from newer snapshots.=A0 The end image cannot be trans=
+ferred because
+>>>> >>>> the snapshots will be created later than the first transfer and w=
+e want to save
+>>>> >>>> some time up front.=A0 You might think of it as a continuous sync=
+hronisation.=A0 It
+>>>> >>>> looks something like this:
+>>>> >>>>
+>>>> >>>> I first transfer the whole image:
+>>>> >>>>
+>>>> >>>>=A0=A0 qemu-img convert -p $nbd disk.raw
+>>>> >>>>
+>>>> >>>> Where `$nbd` is something along the lines of `nbd+unix:///?socket=
+=3Dnbdkit.sock`
+>>>> >>>>
+>>>> >>>> Then, after the next snapshot is created, I can update it thanks =
+to the `-n`
+>>>> >>>> parameter (the $nbd now points to the newer snapshot with unchang=
+ed data looking
+>>>> >>>> like holes in the file):
+>>>> >>>>
+>>>> >>>>=A0=A0 qemu-img convert -p -n $nbd disk.raw
+>>>> >>>>
+>>>> >>>> This is fast and efficient as it uses block status nbd extension,=
+ so it only
+>>>> >>>> transfers new data.
+>>>> >>>
+>>>> >>> This is an implementation detail. Don't rely on it. What you're do=
+ing is
+>>>> >>> abusing 'qemu-img convert', so problems like what you describe are=
+ to be
+>>>> >>> expected.
+>>>> >>>
+>>>> >>>> This can be done over and over again to keep the local
+>>>> >>>> `disk.raw` image up to date with the latest remote snapshot.
+>>>> >>>>
+>>>> >>>> However, when the guest OS zeroes some of the data and it gets wr=
+itten into the
+>>>> >>>> snapshot, qemu-img scans for those zeros and does not write them =
+to the
+>>>> >>>> destination image.=A0 Checking the output of `qemu-img map --outp=
+ut=3Djson $nbd`
+>>>> >>>> shows that the zeroed data is properly marked as `data: true`.
+>>>> >>>>
+>>>> >>>> Using `-S 0` would write zeros even where the holes are, effectiv=
+ely overwriting
+>>>> >>>> the data from the last snapshot even though they should not be ch=
+anged.
+>>>> >>>>
+>>>> >>>> Having gone through some workarounds I would like there to be ano=
+ther way.=A0 I
+>>>> >>>> know this is far from the typical usage of qemu-img, but is this =
+really the
+>>>> >>>> expected behaviour or is this just something nobody really needed=
+ before?=A0 If it
+>>>> >>>> is the former, would it be possible to have a parameter that woul=
+d control this
+>>>> >>>> behaviour?=A0 If the latter is the case, can that behaviour be ch=
+anged so that it
+>>>> >>>> properly replicates the data when `-n` parameter is used?
+>>>> >>>>
+>>>> >>>> Basically the only thing we need is to either:
+>>>> >>>>
+>>>> >>>> 1) write zeros where they actually are or
+>>>> >>>>
+>>>> >>>> 2) turn off explicit sparsification without requesting dense imag=
+e (basically
+>>>> >>>>=A0=A0=A0=A0 sparsify only the par that is reported as hole on the=
+ source) or
+>>>> >>>>
+>>>> >>>> 3) ideally, just FALLOC_FL_PUNCH_HOLE in places where source did =
+report data,
+>>>> >>>>=A0=A0=A0=A0 but qemu-img found they are all zeros (or source repo=
+rted HOLE+ZERO which, I
+>>>> >>>>=A0=A0=A0=A0 believe, is effectively the same)
+>>>> >>>>
+>>>> >>>> If you want to try this out, I found the easiest reproducible way=
+ is using
+>>>> >>>> nbdkit's data plugin, which can simulate whatever source image yo=
+u like.
+>>>> >>>
+>>>> >>> I think what you _really_ want is a commit block job. The problem =
+is
+>>>> >>> just that you don't have a proper backing file chain, but just a b=
+unch
+>>>> >>> of NBD connections.
+>>>> >>>
+>>>> >>> Can't you get an NBD connection that already provides the condense=
+d form
+>>>> >>> of the whole snapshot chain directly at the source? If the NBD ser=
+ver
+>>>> >>> was QEMU, this would actually be easier than providing each snapsh=
+ot
+>>>> >>> individually.
+>>>> >>>
+>>>> >>> If this isn't possible, I think you need to replicate the backing =
+chain
+>>>> >>> on the destination instead of converting into the same image again=
+ and
+>>>> >>> again so that qemu-img knows that it must take existing data of the
+>>>> >>> backing file into consideration:
+>>>> >>>
+>>>> >>>=A0=A0=A0=A0 qemu-img convert -O qcow2 nbd://... base.qcow2
+>>>> >>>=A0=A0=A0=A0 qemu-img convert -O qcow2 -F qcow2 -B base.qcow2 nbd:/=
+/... overlay1.qcow2
+>>>> >>>=A0=A0=A0=A0 qemu-img convert -O qcow2 -F qcow2 -B overlay1.qcow2 n=
+bd://... overlay2.qcow2
+>>>> >>>=A0=A0=A0=A0 ...
+>>>>
+>>
+>> So I spoke too soon.=A0 This approach fixed the one thing that I was str=
+uggling with, but broke the rest, because it completely replicates the last=
+ image even when the source provides proper allocation data.=A0 Best to sho=
+w with an illustration:
+>>
+>>  =A0$ rm -f disk.img snap.img
+>>  =A0$ dd if=3D/dev/urandom of=3Ddisk.img bs=3D2M count=3D1
+>>  =A0$ dd if=3D/dev/zero of=3Dsnap.img bs=3D1M count=3D1
+>>  =A0$ truncate -s 2M snap.img
+>>  =A0$ qemu-img map --output=3Djson snap.img
+>>  =A0[{ "start": 0, "length": 1048576, "depth": 0, "zero": false, "data":=
+ true, "offset": 0},
+>>  =A0{ "start": 1048576, "length": 1048576, "depth": 0, "zero": true, "da=
+ta": false, "offset": 1048576}]
+>>  =A0$ qemu-img convert -f raw -O qcow2 disk.img disk.qcow2
+>>  =A0$ qemu-img convert -f raw -O qcow2 -B disk.qcow2 snap.img snap.qcow2
+>>  =A0$ qemu-img convert -f qcow2 -O raw snap.qcow2 output.raw
+>>  =A0$ hexdump -C output.raw
+>>  =A000000000=A0 00 00 00 00 00 00 00 00=A0 00 00 00 00 00 00 00 00=A0 |.=
+=2E..............|
+>>  =A0*
+>>  =A000200000
+>>
+>
+>
+>Raw file holes and qcow2 unallocated clusters are not the same thing. Raw =
+holes are reported
+>as zero=3Dtrue (as we see in map output), and this considered "allocated" =
+in terms of backing-chain.
+>And convert will mark corresponding clusters to be ZERO (not UNALLOCATED) =
+in target qcow2.
+>
+>But when you export qcow2 with unallocated clusters through NBD, unallocat=
+ed clusters should be
+>reported as zero=3Dfalse data=3Dfalse, and qemu-img will convert them to U=
+NALLOCATED (not ZERO)
+>clusters in target qcow2 and it should work.
+>
+>In qcow2 ZERO and UNALLOCATED clusters works like this:
+>ZERO: on write - allocate clusters and write data, on read - return zeroes
+>UNALLOCATED: on write -allocate clusters and write data, on read - read fr=
+om backing file if we have it, otherwise return zeroes
+>
 
+Oh, thanks for the clarification, this makes sense.  I'll try it out and wi=
+ll see.
+
+>
+>--=20
+>Best regards,
+>Vladimir
+
+--eheScQNz3K90DVRs
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAABCAAdFiEEiXAnXDYdKAaCyvS1CB/CnyQXht0FAlzGwNsACgkQCB/CnyQX
+ht0GgBAAs+/z+XxlcD8DeNCQ+3pTHDc8v1RlaDE5xZsg1OmCZz1XVZGq7xQe+JVX
+dsAkZ8to9TIAU8/UWqSkpwAOUr93L0Io61T0sjZsd3hmK+J40sMJLCPOcBH33kOz
+Y1ztmeIeN6JlBiO6iJzuuM+hEuZWa2AsySYDb6QPAuPOQ01E56t7DCKjIP60x/hq
+U133rvnLApFseqWoiWNbvrwx9vL9988T/gU9a8gcPEYvPwflGooTCV/GNtJlaM4W
+UoUSoi2mECCbRoIycwSzvMkcKqGpMIYVRi51Sd13WydXMmyxFzMECwPVxWmfT5tf
+03q/kL18n4txSd9lud013830aGlcmpIzZajdHV5tvmOufoZB80spDeL9NWXcfTwI
+22XRgQ6WXiKjvr0NsbC0Kb4e0bK75f5w6hv1xFCOBvJWzdWRTfHwxyWxqLZmscfj
+7showC1MEpt51qErJWGm7QnmG6Gfj/kLtNvrZq+Ib0HQ+iXUk7zwDg+VnZf/YSLu
+Q4xwJNkr7bAmldbeP4hxUjNs8pVuHx1CZns3UqlYa8yOE5Z+IaiEPCh4e8NwFzbA
+T7UgqzkhTIlyLdDnaksEYBznbBMx5nSvjigVQG8VLgegI+iXyJ4ZIt9XJSn9inmq
+x5aAaol8+iziu0SXH3wN/Lruny7F9vrreYS/hFFLpSNnk8CTZ0E=
+=Y8dX
+-----END PGP SIGNATURE-----
+
+--eheScQNz3K90DVRs--
 
