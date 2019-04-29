@@ -1,21 +1,20 @@
-Received: from eggs.gnu.org ([209.51.188.92]:34123)
+Received: from eggs.gnu.org ([209.51.188.92]:33681)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1hKuK0-0003Ec-Fa
-	for qemu-devel@nongnu.org; Sun, 28 Apr 2019 20:39:05 -0400
+	(envelope-from <driver1998@foxmail.com>) id 1hKuIb-0007js-1v
+	for qemu-devel@nongnu.org; Sun, 28 Apr 2019 20:37:38 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1hKuJz-0005oC-E2
-	for qemu-devel@nongnu.org; Sun, 28 Apr 2019 20:39:04 -0400
-From: Max Reitz <mreitz@redhat.com>
-References: <20190402153730.54145-1-vsementsov@virtuozzo.com>
-	<2292e073-b32e-a2db-59d5-755ddcf31417@redhat.com>
-Message-ID: <4b9a1a65-6107-ceec-8da8-acfe0d95a151@redhat.com>
-Date: Mon, 29 Apr 2019 02:38:56 +0200
-MIME-Version: 1.0
-In-Reply-To: <2292e073-b32e-a2db-59d5-755ddcf31417@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="Qsj9sux6gNz1BcXq7mdyuUd9HGDfgRGNz"
-Subject: Re: [Qemu-devel] [PATCH v5 00/10] qcow2: encryption threads
+	(envelope-from <driver1998@foxmail.com>) id 1hKuEu-0003Di-QN
+	for qemu-devel@nongnu.org; Sun, 28 Apr 2019 20:33:49 -0400
+Received: from smtpbgeu2.qq.com ([18.194.254.142]:58104)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <driver1998@foxmail.com>)
+	id 1hKuEu-0003Co-HZ
+	for qemu-devel@nongnu.org; Sun, 28 Apr 2019 20:33:48 -0400
+From: driver1998 <driver1998@foxmail.com>
+Date: Mon, 29 Apr 2019 00:33:39 +0000
+Message-Id: <20190429003339.22956-1-driver1998@foxmail.com>
+Subject: [Qemu-devel] [PATCH 4/4] include/qemu/osdep.h: Move the
+ __USE_MINGW_ANSI_STDIO define up to avoid confliction.
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,48 +23,40 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org
-Cc: kwolf@redhat.com, berto@igalia.com, pbonzini@redhat.com, den@openvz.org, berrange@redhat.com
+To: qemu-devel@nongnu.org
+Cc: driver1998 <driver1998@foxmail.com>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---Qsj9sux6gNz1BcXq7mdyuUd9HGDfgRGNz
-From: Max Reitz <mreitz@redhat.com>
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
- qemu-devel@nongnu.org, qemu-block@nongnu.org
-Cc: kwolf@redhat.com, berto@igalia.com, pbonzini@redhat.com, den@openvz.org,
- berrange@redhat.com
-Message-ID: <4b9a1a65-6107-ceec-8da8-acfe0d95a151@redhat.com>
-Subject: Re: [PATCH v5 00/10] qcow2: encryption threads
-References: <20190402153730.54145-1-vsementsov@virtuozzo.com>
- <2292e073-b32e-a2db-59d5-755ddcf31417@redhat.com>
-In-Reply-To: <2292e073-b32e-a2db-59d5-755ddcf31417@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+Signed-off-by: driver1998 <driver1998@foxmail.com>
+---
+ include/qemu/osdep.h | 10 +++++-----
+ 1 file changed, 5 insertions(+), 5 deletions(-)
 
-On 29.04.19 02:37, Max Reitz wrote:
-> On 02.04.19 17:37, Vladimir Sementsov-Ogievskiy wrote:
->> v5: rebase on master, some conflicts resolved due to data-file feature=
-
-
-(Forgot to note that I'll look at the more interesting patches in this
-series later today.  I just got so hung up on the benchmark...)
-
-
---Qsj9sux6gNz1BcXq7mdyuUd9HGDfgRGNz
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAlzGR6AACgkQ9AfbAGHV
-z0Dw4gf/fgdDNz/mahIMu6tMOu+Ns7bORjmpGBu9q4vbLolurLdBBi0ZwE+QaCkm
-R0aoBCwygppK5yd5EOTdQmzrWbjlZXWzfWMBgNHazJl0d2KMGw4VoBKadcpOZ54x
-3VH042vpWem0c0Tw5h65hIdi2h0bw+GadadidclTKAALs/XvjPQVBcglfWXg97Bs
-Sm7ZTLFphT/qNBm2d524YGhoVkMrQP7nh92SQzwHG52jploUpbjjay4huOenEXxs
-eK7NbYMexLH+kg+iyTQvr6sIX/XvpnXHb5sDScO60AAJBT1+oItEpCxfmZ1hskH7
-2p9GwShKH80Z2/1ApJ4pDJEK81tTWQ==
-=mTPv
------END PGP SIGNATURE-----
-
---Qsj9sux6gNz1BcXq7mdyuUd9HGDfgRGNz--
+diff --git a/include/qemu/osdep.h b/include/qemu/osdep.h
+index 303d315c5d..af2b91f0b8 100644
+--- a/include/qemu/osdep.h
++++ b/include/qemu/osdep.h
+@@ -85,17 +85,17 @@ extern int daemon(int, int);
+ #endif
+ #endif
+ 
++/* enable C99/POSIX format strings (needs mingw32-runtime 3.15 or later) */
++#ifdef __MINGW32__
++#define __USE_MINGW_ANSI_STDIO 1
++#endif
++
+ #include <stdarg.h>
+ #include <stddef.h>
+ #include <stdbool.h>
+ #include <stdint.h>
+ #include <sys/types.h>
+ #include <stdlib.h>
+-
+-/* enable C99/POSIX format strings (needs mingw32-runtime 3.15 or later) */
+-#ifdef __MINGW32__
+-#define __USE_MINGW_ANSI_STDIO 1
+-#endif
+ #include <stdio.h>
+ 
+ #include <string.h>
+-- 
+2.17.1
