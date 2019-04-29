@@ -1,22 +1,35 @@
-Received: from eggs.gnu.org ([209.51.188.92]:58268)
+Received: from eggs.gnu.org ([209.51.188.92]:59537)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1hL9Hy-0005VL-Cr
-	for qemu-devel@nongnu.org; Mon, 29 Apr 2019 12:37:59 -0400
+	(envelope-from <brijesh.singh@amd.com>) id 1hL9Nu-0007b3-81
+	for qemu-devel@nongnu.org; Mon, 29 Apr 2019 12:44:07 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1hL9Hx-0003H8-Hc
-	for qemu-devel@nongnu.org; Mon, 29 Apr 2019 12:37:58 -0400
-References: <20190402153730.54145-1-vsementsov@virtuozzo.com>
-	<20190402153730.54145-8-vsementsov@virtuozzo.com>
-From: Max Reitz <mreitz@redhat.com>
-Message-ID: <44be7ef0-9a4f-4c44-44eb-81f341ca7ea6@redhat.com>
-Date: Mon, 29 Apr 2019 18:37:48 +0200
+	(envelope-from <brijesh.singh@amd.com>) id 1hL9Nq-0005Su-DU
+	for qemu-devel@nongnu.org; Mon, 29 Apr 2019 12:44:06 -0400
+Received: from mail-eopbgr680047.outbound.protection.outlook.com
+	([40.107.68.47]:44045
+	helo=NAM04-BN3-obe.outbound.protection.outlook.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <brijesh.singh@amd.com>)
+	id 1hL9No-0005RQ-EP
+	for qemu-devel@nongnu.org; Mon, 29 Apr 2019 12:44:02 -0400
+From: "Singh, Brijesh" <brijesh.singh@amd.com>
+Date: Mon, 29 Apr 2019 16:43:53 +0000
+Message-ID: <9d330734-02cf-9d21-e26f-56fe9d16fa03@amd.com>
+References: <20190424160942.13567-1-brijesh.singh@amd.com>
+	<20190424160942.13567-2-brijesh.singh@amd.com>
+	<20190426141042.GF4608@zn.tnic>
+	<e6f8da38-b8dd-a9c5-a358-5f33b6ea7b37@amd.com>
+	<20190426204327.GM4608@zn.tnic>
+	<2b63d983-a622-3bec-e6ac-abfd024e19c0@amd.com>
+	<20190429163602.GE2324@zn.tnic>
+In-Reply-To: <20190429163602.GE2324@zn.tnic>
+Content-Language: en-US
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <47D67942F49E49489E04543939504C08@namprd12.prod.outlook.com>
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-In-Reply-To: <20190402153730.54145-8-vsementsov@virtuozzo.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="JXdF4KU0CfyKBVC4L3MRCZcbyEEsggoWF"
-Subject: Re: [Qemu-devel] [PATCH v5 07/10] qcow2: qcow2_co_preadv: improve
- locking
+Subject: Re: [Qemu-devel] [RFC PATCH v1 01/10] KVM: SVM: Add KVM_SEV
+ SEND_START command
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,83 +38,12 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org
-Cc: kwolf@redhat.com, berto@igalia.com, pbonzini@redhat.com, den@openvz.org, berrange@redhat.com
+To: Borislav Petkov <bp@alien8.de>
+Cc: "Singh, Brijesh" <brijesh.singh@amd.com>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>, "H.
+	Peter Anvin" <hpa@zytor.com>, Paolo Bonzini <pbonzini@redhat.com>, =?utf-8?B?UmFkaW0gS3LEjW3DocWZ?= <rkrcmar@redhat.com>, Joerg Roedel <joro@8bytes.org>, "Lendacky, Thomas" <Thomas.Lendacky@amd.com>, "x86@kernel.org" <x86@kernel.org>, "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---JXdF4KU0CfyKBVC4L3MRCZcbyEEsggoWF
-From: Max Reitz <mreitz@redhat.com>
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
- qemu-devel@nongnu.org, qemu-block@nongnu.org
-Cc: kwolf@redhat.com, berto@igalia.com, pbonzini@redhat.com, den@openvz.org,
- berrange@redhat.com
-Message-ID: <44be7ef0-9a4f-4c44-44eb-81f341ca7ea6@redhat.com>
-Subject: Re: [PATCH v5 07/10] qcow2: qcow2_co_preadv: improve locking
-References: <20190402153730.54145-1-vsementsov@virtuozzo.com>
- <20190402153730.54145-8-vsementsov@virtuozzo.com>
-In-Reply-To: <20190402153730.54145-8-vsementsov@virtuozzo.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-
-On 02.04.19 17:37, Vladimir Sementsov-Ogievskiy wrote:
-> Background: decryption will be done in threads, to take benefit of it,
-> we should move it out of the lock first.
-
-=2E..which is safe after your commit c972fa123c73501b4, I presume.
-
-(At first glance, the patched looked a bit weird to me because it
-doesn't give a reason why dropping the lock around
-qcrypto_block_decrypt() would be OK.)
-
-> But let's go further: it turns out, that for locking around switch
-> cases we have only two variants: when we just do memset(0) not
-> releasing the lock (it is useless) and when we actually can handle the
-> whole case out of the lock. So, refactor the whole thing to reduce
-> locked code region and make it clean.
->=20
-> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-> Reviewed-by: Alberto Garcia <berto@igalia.com>
-> ---
->  block/qcow2.c | 46 ++++++++++++++++++++++------------------------
->  1 file changed, 22 insertions(+), 24 deletions(-)
->=20
-> diff --git a/block/qcow2.c b/block/qcow2.c
-> index 46e8e39da5..fcf92a7eb6 100644
-> --- a/block/qcow2.c
-> +++ b/block/qcow2.c
-> @@ -1983,6 +1983,7 @@ static coroutine_fn int qcow2_co_preadv(BlockDriv=
-erState *bs, uint64_t offset,
-> =20
->          ret =3D qcow2_get_cluster_offset(bs, offset, &cur_bytes, &clus=
-ter_offset);
-
-Isn't this the only function in the loop that actually needs the lock?
-Wouldn't it make more sense to just take it around this call?
-
-Max
-
->          if (ret < 0) {
-> +            qemu_co_mutex_unlock(&s->lock);
->              goto fail;
->          }
-> =20
-
-
---JXdF4KU0CfyKBVC4L3MRCZcbyEEsggoWF
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAlzHKF0ACgkQ9AfbAGHV
-z0A+9QgAtIBFhVDZ5ETQW6JEvtyg7d89UEJ2DNsQYi3I1TRq17mjE2AByIikcMgv
-yfiMRh5k9IHjMq4296Ilsu5ijwswPtMIgwDFcDVe5MyH/HeexICVT3J0eWbS3kZ8
-sdYJQRTTMAaKl2yS5CrxCqiOup1CtT//71Hk5w4CvYHaAejQPpqgEc4IdCb07jCr
-ThhAFueMelTBl7Rhx5bKT7MgNwlG7GiYshTlyGDUSyTSEdK+Tahdxi5JAREkyG5L
-/6C+69sk+UQe6JIZ10W7072NXItcCs0fZZh6eDFrFJYnzY6FYuGy/AyS0I02kk3B
-RibeNLKZdFpBpAyuElIjazFYdC0wDQ==
-=YJY7
------END PGP SIGNATURE-----
-
---JXdF4KU0CfyKBVC4L3MRCZcbyEEsggoWF--
+DQoNCk9uIDQvMjkvMTkgMTE6MzYgQU0sIEJvcmlzbGF2IFBldGtvdiB3cm90ZToNCj4gU28gd2hh
+dCBhYm91dCB0aGlzPyBMaW1pdGluZyB0byBhIHNhbmUgbGVuZ3RoLi4uDQoNClN1cmUsIHdlIGhh
+dmUgZGVmaW5lZCBhIFNFVl9GV19CTE9CX01BWF9TSVpFIGFuZCBjYW4gdXNlIGl0IHRvIGxpbWl0
+DQp0aGUgYmxvYiBjb3B5IHNpemUuIEkgd2lsbCBkbyB0aGlzIGluIG5leHQgcmV2LiB0aGFua3MN
+Cg0KLUJyaWplc2gNCg==
