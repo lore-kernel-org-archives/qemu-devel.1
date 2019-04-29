@@ -1,26 +1,23 @@
-Received: from eggs.gnu.org ([209.51.188.92]:49175)
+Received: from eggs.gnu.org ([209.51.188.92]:50119)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1hL8sJ-0001Z4-2n
-	for qemu-devel@nongnu.org; Mon, 29 Apr 2019 12:11:28 -0400
+	(envelope-from <thuth@redhat.com>) id 1hL8t3-000294-6E
+	for qemu-devel@nongnu.org; Mon, 29 Apr 2019 12:12:14 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1hL8sI-0004VQ-6V
-	for qemu-devel@nongnu.org; Mon, 29 Apr 2019 12:11:27 -0400
-Received: from mail-it1-x143.google.com ([2607:f8b0:4864:20::143]:37567)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1hL8sI-0004Un-1d
-	for qemu-devel@nongnu.org; Mon, 29 Apr 2019 12:11:26 -0400
-Received: by mail-it1-x143.google.com with SMTP id r85so8493596itc.2
-	for <qemu-devel@nongnu.org>; Mon, 29 Apr 2019 09:11:25 -0700 (PDT)
-Date: Mon, 29 Apr 2019 12:11:20 -0400
-From: Stefan Hajnoczi <stefanha@gmail.com>
-Message-ID: <20190429161120.GB13640@stefanha-x1.localdomain>
-References: <20190426102115.30002-1-yury-kotov@yandex-team.ru>
+	(envelope-from <thuth@redhat.com>) id 1hL8t1-0005Ko-7k
+	for qemu-devel@nongnu.org; Mon, 29 Apr 2019 12:12:13 -0400
+References: <20190418180057.3593-1-thuth@redhat.com>
+	<20190418180057.3593-23-thuth@redhat.com>
+	<b042daff-8b05-08e7-5386-1b89f05ad984@redhat.com>
+From: Thomas Huth <thuth@redhat.com>
+Message-ID: <7559b0e3-f752-09a5-2e8d-a40d0ade23e1@redhat.com>
+Date: Mon, 29 Apr 2019 18:11:02 +0200
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="0ntfKIWw70PvrIHh"
-Content-Disposition: inline
-In-Reply-To: <20190426102115.30002-1-yury-kotov@yandex-team.ru>
-Subject: Re: [Qemu-devel] [PATCH] trace: fix runstate tracing
+In-Reply-To: <b042daff-8b05-08e7-5386-1b89f05ad984@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH for-QEMU-4.1 v5 22/29] hw/arm: Express
+ dependencies of sabrelite with Kconfig
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,37 +26,70 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Yury Kotov <yury-kotov@yandex-team.ru>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, qemu-devel@nongnu.org
+To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>, yang.zhong@intel.com, Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org, pbonzini@redhat.com
+Cc: "Michael S. Tsirkin" <mst@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>, "Edgar E . Iglesias" <edgar.iglesias@gmail.com>, Jean-Christophe Dubois <jcd@tribudubois.net>, Rob Herring <robh@kernel.org>, qemu-block@nongnu.org, Andrey Smirnov <andrew.smirnov@gmail.com>, Joel Stanley <joel@jms.id.au>, Antony Pavlov <antonynpavlov@gmail.com>, Alistair Francis <alistair@alistair23.me>, Beniamino Galvani <b.galvani@gmail.com>, qemu-arm@nongnu.org, Peter Chubb <peter.chubb@nicta.com.au>, Cedric Le Goater <clg@kaod.org>, John Snow <jsnow@redhat.com>, Andrew Jeffery <andrew@aj.id.au>, Philippe Mathieu-Daude <f4bug@amsat.org>, Subbaraya Sundeep <sundeep.lkml@gmail.com>, Igor Mitsyanko <i.mitsyanko@gmail.com>, Jan Kiszka <jan.kiszka@web.de>
 
+On 25/04/2019 18.43, Philippe Mathieu-Daud=C3=A9 wrote:
+> Hi Thomas,
+>=20
+> On 4/18/19 8:00 PM, Thomas Huth wrote:
+>> Add Kconfig dependencies for the Sabrelite / iMX6 machine.
+>>
+>> Signed-off-by: Thomas Huth <thuth@redhat.com>
+>> ---
+>>  default-configs/arm-softmmu.mak | 4 +---
+>>  hw/arm/Kconfig                  | 7 +++++++
+>>  hw/arm/Makefile.objs            | 3 ++-
+>>  3 files changed, 10 insertions(+), 4 deletions(-)
+>>
+>> diff --git a/default-configs/arm-softmmu.mak b/default-configs/arm-sof=
+tmmu.mak
+>> index 76508e3910..ef7dd7156a 100644
+>> --- a/default-configs/arm-softmmu.mak
+>> +++ b/default-configs/arm-softmmu.mak
+>> @@ -33,6 +33,7 @@ CONFIG_NETDUINO2=3Dy
+>>  CONFIG_MPS2=3Dy
+>>  CONFIG_RASPI=3Dy
+>>  CONFIG_DIGIC=3Dy
+>> +CONFIG_SABRELITE=3Dy
+>> =20
+>>  CONFIG_VGA=3Dy
+>>  CONFIG_SSI_M25P80=3Dy
+>> @@ -40,13 +41,10 @@ CONFIG_IMX_FEC=3Dy
+>> =20
+>>  CONFIG_NRF51_SOC=3Dy
+>> =20
+>> -CONFIG_FSL_IMX6=3Dy
+>>  CONFIG_FSL_IMX25=3Dy
+>>  CONFIG_FSL_IMX7=3Dy
+>>  CONFIG_FSL_IMX6UL=3Dy
+>> =20
+>> -CONFIG_IMX_I2C=3Dy
+>> -
+>>  CONFIG_PCIE_PORT=3Dy
+>>  CONFIG_XIO3130=3Dy
+>>  CONFIG_IOH3420=3Dy
+>> diff --git a/hw/arm/Kconfig b/hw/arm/Kconfig
+>> index 059fb8282c..065c7acf1b 100644
+>> --- a/hw/arm/Kconfig
+>> +++ b/hw/arm/Kconfig
+>> @@ -177,6 +177,10 @@ config REALVIEW
+>>      select DS1338 # I2C RTC+NVRAM
+>>      select USB_OHCI
+>> =20
+>> +config SABRELITE
+>> +    bool
+>> +    select FSL_IMX6
+>=20
+> This one crashes:
+>=20
+> $ qemu-system-aarch64 -display none -M sabrelite
+> ERROR:/source/qemu/qom/object.c:454:object_initialize_with_type:
+> assertion failed: (type !=3D NULL)
+> Aborted (core dumped)
 
---0ntfKIWw70PvrIHh
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+Weird, I was pretty sure to have tested all boards individually ... I
+must accidentally have skipped this one. Thanks a lot for testing, I'll
+fix it in v6.
 
-On Fri, Apr 26, 2019 at 01:21:15PM +0300, Yury Kotov wrote:
-> Signed-off-by: Yury Kotov <yury-kotov@yandex-team.ru>
-> ---
->  vl.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
-
-Thanks, applied to my tracing tree:
-https://github.com/stefanha/qemu/commits/tracing
-
-Stefan
-
---0ntfKIWw70PvrIHh
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEcBAEBAgAGBQJcxyIoAAoJEJykq7OBq3PIg3YIAMLlT+gFEqniDXEKkxbgx/TW
-6xHsK4UAjWJoArZNOU5O2OTeQnePER5H7OaxamBANxEcfUpNruQ/kYpB+42ckv8i
-f4zCIOkDawvR7fAAEERtHoyzjTvFrLD89MLFfPulPXJXTSe7Td/d2idwrnVWWXZZ
-qojQmNtftU3txc0+m5jZjHeLwnUeXSsEr9qAFziEHvd9Sr0x8/EOmM4sM1NUzSMu
-BucSVueEi91kkiHPGk0YXWr1Z1F3VCDhFUCemr+4jT2DpZ8coO4+IhlOMWBYgKfZ
-vwWI3Yb6OyZVaKukmAxW/avxa9pczL7V+enV2Lo/Gq6LWjXVrk53+ZSjW1YEBng=
-=V70O
------END PGP SIGNATURE-----
-
---0ntfKIWw70PvrIHh--
+ Thomas
