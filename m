@@ -1,23 +1,28 @@
-Received: from eggs.gnu.org ([209.51.188.92]:50119)
+Received: from eggs.gnu.org ([209.51.188.92]:52969)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1hL8t3-000294-6E
-	for qemu-devel@nongnu.org; Mon, 29 Apr 2019 12:12:14 -0400
+	(envelope-from <dgilbert@redhat.com>) id 1hL8vt-0004bu-Dg
+	for qemu-devel@nongnu.org; Mon, 29 Apr 2019 12:15:10 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1hL8t1-0005Ko-7k
-	for qemu-devel@nongnu.org; Mon, 29 Apr 2019 12:12:13 -0400
-References: <20190418180057.3593-1-thuth@redhat.com>
-	<20190418180057.3593-23-thuth@redhat.com>
-	<b042daff-8b05-08e7-5386-1b89f05ad984@redhat.com>
-From: Thomas Huth <thuth@redhat.com>
-Message-ID: <7559b0e3-f752-09a5-2e8d-a40d0ade23e1@redhat.com>
-Date: Mon, 29 Apr 2019 18:11:02 +0200
+	(envelope-from <dgilbert@redhat.com>) id 1hL8vr-0008Ky-RR
+	for qemu-devel@nongnu.org; Mon, 29 Apr 2019 12:15:09 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:58274)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1hL8vr-0008Hj-Ct
+	for qemu-devel@nongnu.org; Mon, 29 Apr 2019 12:15:07 -0400
+Date: Mon, 29 Apr 2019 17:15:02 +0100
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Message-ID: <20190429161502.GI2748@work-vm>
+References: <CACnvu8YKqaZA7XSD41=SQrUL7h9YafJMgKPe5cJZd3XZ3zrSNw@mail.gmail.com>
+	<20190415145358.GA2893@work-vm>
+	<CACnvu8a5DjAUhfAGmi6GtpD1V2hfoNLTkKEgbsFuL_6GrRc+pg@mail.gmail.com>
+	<CACnvu8Y9Ub5PAOt18ukzvOoDxmfzwvygWWwOZaT5Q2Eig6YFTw@mail.gmail.com>
+	<20190416084738.GA3123@work-vm>
+	<CACnvu8Y7OQSYgGUXm5+bdB0owwmm+gSDpuaGQn=5QNhB5wcjvQ@mail.gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <b042daff-8b05-08e7-5386-1b89f05ad984@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH for-QEMU-4.1 v5 22/29] hw/arm: Express
- dependencies of sabrelite with Kconfig
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CACnvu8Y7OQSYgGUXm5+bdB0owwmm+gSDpuaGQn=5QNhB5wcjvQ@mail.gmail.com>
+Subject: Re: [Qemu-devel] Fwd: How live migration work for vhost-user
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,70 +31,117 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>, yang.zhong@intel.com, Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org, pbonzini@redhat.com
-Cc: "Michael S. Tsirkin" <mst@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>, "Edgar E . Iglesias" <edgar.iglesias@gmail.com>, Jean-Christophe Dubois <jcd@tribudubois.net>, Rob Herring <robh@kernel.org>, qemu-block@nongnu.org, Andrey Smirnov <andrew.smirnov@gmail.com>, Joel Stanley <joel@jms.id.au>, Antony Pavlov <antonynpavlov@gmail.com>, Alistair Francis <alistair@alistair23.me>, Beniamino Galvani <b.galvani@gmail.com>, qemu-arm@nongnu.org, Peter Chubb <peter.chubb@nicta.com.au>, Cedric Le Goater <clg@kaod.org>, John Snow <jsnow@redhat.com>, Andrew Jeffery <andrew@aj.id.au>, Philippe Mathieu-Daude <f4bug@amsat.org>, Subbaraya Sundeep <sundeep.lkml@gmail.com>, Igor Mitsyanko <i.mitsyanko@gmail.com>, Jan Kiszka <jan.kiszka@web.de>
+To: fengyd <fengyd81@gmail.com>
+Cc: qemu-devel@nongnu.org
 
-On 25/04/2019 18.43, Philippe Mathieu-Daud=C3=A9 wrote:
-> Hi Thomas,
->=20
-> On 4/18/19 8:00 PM, Thomas Huth wrote:
->> Add Kconfig dependencies for the Sabrelite / iMX6 machine.
->>
->> Signed-off-by: Thomas Huth <thuth@redhat.com>
->> ---
->>  default-configs/arm-softmmu.mak | 4 +---
->>  hw/arm/Kconfig                  | 7 +++++++
->>  hw/arm/Makefile.objs            | 3 ++-
->>  3 files changed, 10 insertions(+), 4 deletions(-)
->>
->> diff --git a/default-configs/arm-softmmu.mak b/default-configs/arm-sof=
-tmmu.mak
->> index 76508e3910..ef7dd7156a 100644
->> --- a/default-configs/arm-softmmu.mak
->> +++ b/default-configs/arm-softmmu.mak
->> @@ -33,6 +33,7 @@ CONFIG_NETDUINO2=3Dy
->>  CONFIG_MPS2=3Dy
->>  CONFIG_RASPI=3Dy
->>  CONFIG_DIGIC=3Dy
->> +CONFIG_SABRELITE=3Dy
->> =20
->>  CONFIG_VGA=3Dy
->>  CONFIG_SSI_M25P80=3Dy
->> @@ -40,13 +41,10 @@ CONFIG_IMX_FEC=3Dy
->> =20
->>  CONFIG_NRF51_SOC=3Dy
->> =20
->> -CONFIG_FSL_IMX6=3Dy
->>  CONFIG_FSL_IMX25=3Dy
->>  CONFIG_FSL_IMX7=3Dy
->>  CONFIG_FSL_IMX6UL=3Dy
->> =20
->> -CONFIG_IMX_I2C=3Dy
->> -
->>  CONFIG_PCIE_PORT=3Dy
->>  CONFIG_XIO3130=3Dy
->>  CONFIG_IOH3420=3Dy
->> diff --git a/hw/arm/Kconfig b/hw/arm/Kconfig
->> index 059fb8282c..065c7acf1b 100644
->> --- a/hw/arm/Kconfig
->> +++ b/hw/arm/Kconfig
->> @@ -177,6 +177,10 @@ config REALVIEW
->>      select DS1338 # I2C RTC+NVRAM
->>      select USB_OHCI
->> =20
->> +config SABRELITE
->> +    bool
->> +    select FSL_IMX6
->=20
-> This one crashes:
->=20
-> $ qemu-system-aarch64 -display none -M sabrelite
-> ERROR:/source/qemu/qom/object.c:454:object_initialize_with_type:
-> assertion failed: (type !=3D NULL)
-> Aborted (core dumped)
+* fengyd (fengyd81@gmail.com) wrote:
+> Hi,
+> 
+> I want to add some log to qemu-kvm-ev.
+> Do you know how to compile qemu-kvm-ev from source code?
 
-Weird, I was pretty sure to have tested all boards individually ... I
-must accidentally have skipped this one. Thanks a lot for testing, I'll
-fix it in v6.
+That's our downstream package build; it should build fine with rpmbuild,
+or you can configure and build it like any other qemu.
 
- Thomas
+Dave
+
+> Thanks
+> 
+> Yafeng
+> 
+> On Tue, 16 Apr 2019 at 16:47, Dr. David Alan Gilbert <dgilbert@redhat.com>
+> wrote:
+> 
+> > * fengyd (fengyd81@gmail.com) wrote:
+> > > ---------- Forwarded message ---------
+> > > From: fengyd <fengyd81@gmail.com>
+> > > Date: Tue, 16 Apr 2019 at 09:17
+> > > Subject: Re: [Qemu-devel] How live migration work for vhost-user
+> > > To: Dr. David Alan Gilbert <dgilbert@redhat.com>
+> > >
+> > >
+> > > Hi,
+> > >
+> > > Any special feature needs to be supported on guest driver?
+> > > Because it's OK for standard Linux VM, but not OK for our VM where virtio
+> > > is  implemented by ourself.
+> >
+> > I'm not sure; you do have to support that 'log' mechanism but I don't
+> > know what else is needed.
+> >
+> > > And with qemu-kvm-ev-2.6, live migration can work with our VM where
+> > virtio
+> > > is  implemented by ourself.
+> >
+> > 2.6 is pretty old, so there's a lot of changes - not sure what's
+> > relevant.
+> >
+> > Dave
+> >
+> > > Thanks
+> > > Yafeng
+> > >
+> > > On Mon, 15 Apr 2019 at 22:54, Dr. David Alan Gilbert <
+> > dgilbert@redhat.com>
+> > > wrote:
+> > >
+> > > > * fengyd (fengyd81@gmail.com) wrote:
+> > > > > Hi,
+> > > > >
+> > > > > During live migration,  the folloing log can see in nova-compute.log
+> > in
+> > > > my
+> > > > > environment:
+> > > > >  ERROR nova.virt.libvirt.driver
+> > [req-039a85e1-e7a1-4a63-bc6d-c4b9a044aab6
+> > > > > 0cdab20dc79f4bc6ae5790e7b4a898ac 3363c319773549178acc67f32c78310e -
+> > > > default
+> > > > > default] [instance: 5ec719f4-1865-4afe-a207-3d9fae22c410] Live
+> > Migration
+> > > > > failure: internal error: qemu unexpectedly closed the monitor:
+> > > > > 2019-04-15T02:58:22.213897Z qemu-kvm: VQ 0
+> > > > > size 0x100 < last_avail_idx 0x1e - used_idx 0x23
+> > > > >
+> > > > > It's OK for standard Linux VM, but not OK for our VM where virtio is
+> > > > > implemented by ourself.
+> > > > > KVM version as follow:
+> > > > > qemu-kvm-common-ev-2.12.0-18.el7_6.3.1.x86_64
+> > > > > qemu-kvm-ev-2.12.0-18.el7_6.3.1.x86_64
+> > > > > libvirt-daemon-kvm-3.9.0-14.2.el7.centos.ncir.8.x86_64
+> > > > >
+> > > > > Do you know what's the difference between virtio and vhost-user
+> > during
+> > > > > migration?
+> > > > > The function virtio_load in Qemu is called for virtio and vhost-user
+> > > > during
+> > > > > migration.
+> > > > > For virtio,  last_avail_idx  and used_idx are stored in Qemu, Qemu is
+> > > > > responsible for updating their values accordingly
+> > > > > For vhost-user, last_avail_idx  and used_idx are stored in vhost-user
+> > > > app,
+> > > > > eg. DPDK, not in Qemu?
+> > > > > How does migration work for vhost-user?
+> > > >
+> > > > I don't know the details, but my understanding is that vhost-user
+> > > > tells the vhost-user client about an area of 'log' memory, where the
+> > > > vhost-user client must mark pages as dirty.
+> > > >
+> > > > In the qemu source, see docs/interop/vhost-user.txt and see
+> > > > the VHOST_SET_LOG_BASE and VHOST_USER_SET_LOG_FD calls.
+> > > >
+> > > > If the client correctly marks the areas as dirty, then qemu
+> > > > should resend those pages across.
+> > > >
+> > > >
+> > > > Dave
+> > > >
+> > > > > Thanks in advance
+> > > > > Yafeng
+> > > > --
+> > > > Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+> > > >
+> > --
+> > Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+> >
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
