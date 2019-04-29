@@ -2,71 +2,71 @@ Return-Path: <SRS0=sEuR=S7=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+X-Spam-Status: No, score=-7.7 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,UPPERCASE_50_75,
+	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C2DADC43219
-	for <qemu-devel@archiver.kernel.org>; Mon, 29 Apr 2019 00:50:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 20879C43219
+	for <qemu-devel@archiver.kernel.org>; Mon, 29 Apr 2019 00:50:30 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7F5FC20656
-	for <qemu-devel@archiver.kernel.org>; Mon, 29 Apr 2019 00:50:22 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id DCC7020656
+	for <qemu-devel@archiver.kernel.org>; Mon, 29 Apr 2019 00:50:29 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=foxmail.com header.i=@foxmail.com header.b="G4Bra5hP"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7F5FC20656
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=foxmail.com header.i=@foxmail.com header.b="OAr3Lks0"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DCC7020656
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=foxmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:50161 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:50169 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hKuUv-0007jL-Gv
-	for qemu-devel@archiver.kernel.org; Sun, 28 Apr 2019 20:50:21 -0400
+	id 1hKuV3-0007lU-3v
+	for qemu-devel@archiver.kernel.org; Sun, 28 Apr 2019 20:50:29 -0400
 Received: from eggs.gnu.org ([209.51.188.92]:33681)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <driver1998@foxmail.com>) id 1hKuIb-0007js-1v
-	for qemu-devel@nongnu.org; Sun, 28 Apr 2019 20:37:38 -0400
+	(envelope-from <driver1998@foxmail.com>) id 1hKuIg-0007js-4z
+	for qemu-devel@nongnu.org; Sun, 28 Apr 2019 20:37:43 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <driver1998@foxmail.com>) id 1hKuEu-0003Di-QN
-	for qemu-devel@nongnu.org; Sun, 28 Apr 2019 20:33:49 -0400
-Received: from smtpbgeu2.qq.com ([18.194.254.142]:58104)
+	(envelope-from <driver1998@foxmail.com>) id 1hKuDu-0002s6-SY
+	for qemu-devel@nongnu.org; Sun, 28 Apr 2019 20:32:47 -0400
+Received: from smtpbgau1.qq.com ([54.206.16.166]:60015)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <driver1998@foxmail.com>)
-	id 1hKuEu-0003Co-HZ
-	for qemu-devel@nongnu.org; Sun, 28 Apr 2019 20:33:48 -0400
+	id 1hKuDu-0002qf-7N
+	for qemu-devel@nongnu.org; Sun, 28 Apr 2019 20:32:46 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=foxmail.com;
-	s=s201512; t=1556498021;
-	bh=OQUpm2nii0l0T7ZEKjxuy7zi4jinxy/6ImWCIvZNhCk=;
+	s=s201512; t=1556497956;
+	bh=gerxQDe02AMpDBIHhMgCswR4djHrmypAHaU/w5+GbGc=;
 	h=From:To:Subject:Date:Message-Id;
-	b=G4Bra5hPvQagCaAqKfjYvKCZICN1tqByoUKirWHqNWgdOJYhq0PnTiTLVBxmZc1xU
-	5zkMv94XKLKQfmrGFaZowyGI9K83kFi3X2RSbngK+yEhLGvOjyu5X4PAq28EhPpMcK
-	zA7gWyN78E7155higXW6SCSzeMn8OdtTsG1yhCFg=
-X-QQ-mid: esmtp6t1556498020t34rq6i76
+	b=OAr3Lks0NwAd7taLLL3ZNiXCJyrsdwpVOEdE3X6L6Z9IIUFywNyq8w2CSwfnWAzY4
+	yyxg2WR9awFNbXxIUc9mNkcsRaSPQq1kORe5ol4cSmLJza7YN3qXrw6+YJXkU+jh3T
+	7askQ0heK/7wiqLYOzPsapIahOoy40GIPVFiDJNI=
+X-QQ-mid: esmtp5t1556497955tpz6kda8i
 Received: from localhost (unknown [183.63.119.27])
 	by esmtp4.qq.com (ESMTP) with 
-	id ; Mon, 29 Apr 2019 08:33:40 +0800 (CST)
+	id ; Mon, 29 Apr 2019 08:32:34 +0800 (CST)
 X-QQ-SSF: B100000000000030F7F00F00000000O
-X-QQ-FEAT: 7DSX613YSL5DqXSjOqoxYZ1SQOvSPGNf5qMZ+hWJ/Ke2KpWrdWBm722tMJbrO
-	eS3QzTgT4A8fqPBBRp6JryMAB+66ziGLjii2cCdVO/Bi7eBrzCHjkWi3pO+Oycq69xESEEH
-	Vz2N6L/LhzHKmvLxbG/wxlhjlLDH6CBRzBJbyi5ZxDkWpMYkKEo0nvl+Ey9DXiWglQbZ/Jz
-	PKHarQLKJjDKAcyHO5OkUUnjXs6r2/S7d9M7PqzHTRpRM/3AQlFuQKfYOwmt8ZhSl9NgZb8
-	bUm1Y6GxB/aavMAva2cAKqHxrj/tzd17Q+gw==
+X-QQ-FEAT: 6ugjij1k5i+U+MtU1Gig6Z/DKHduD8fjPl7gcoOWmCmUcIse7eLArPs2XM3wB
+	QS7xxcEWrxf2j9+s40N2P68zs1u1sY9+IiGHZLP/aAj4c64RVyq16iN7RG/fHu8bAfALdo7
+	+paxam6vKJl/GsCxXRhXl8m9xicMNcGC/zH+D2m6h2P4wZuIv1HkKfAzxuFnZM9mTHFM7I5
+	0//U932Ihh6d0x6fBtlYrwLsPSVbKs84p4bFLEvhAvUy2o8d1A+Pt/67iIs6JPx9hmdEkun
+	zrI++UTjH0DdEgwd6FqTBjrKaxIR5lmMplXg==
 X-QQ-GoodBg: 0
 From: driver1998 <driver1998@foxmail.com>
-To: qemu-devel@nongnu.org
-Date: Mon, 29 Apr 2019 00:33:39 +0000
-Message-Id: <20190429003339.22956-1-driver1998@foxmail.com>
+To: mdroth@linux.vnet.ibm.com
+Date: Mon, 29 Apr 2019 00:32:23 +0000
+Message-Id: <20190429003223.22856-1-driver1998@foxmail.com>
 X-Mailer: git-send-email 2.17.1
 X-QQ-SENDSIZE: 520
 Feedback-ID: esmtp:foxmail.com:bgforeign:bgforeign4
 X-QQ-Bgrelay: 1
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 18.194.254.142
-X-Mailman-Approved-At: Sun, 28 Apr 2019 20:49:02 -0400
-Subject: [Qemu-devel] [PATCH 4/4] include/qemu/osdep.h: Move the
- __USE_MINGW_ANSI_STDIO define up to avoid confliction.
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x
+X-Received-From: 54.206.16.166
+X-Mailman-Approved-At: Sun, 28 Apr 2019 20:49:03 -0400
+Subject: [Qemu-devel] [PATCH 2/4] qga: Fix an enum conversion warning in
+ commands-win32.c, hit by clang.
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -78,45 +78,72 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: driver1998 <driver1998@foxmail.com>
+Cc: driver1998 <driver1998@foxmail.com>, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 Content-Type: text/plain; charset="UTF-8"
-Message-ID: <20190429003339.5a4PkKCz7ZRvXq0MTQvUBnW-Q9qHqtxwGgJNGiN-Ax4@z>
+Message-ID: <20190429003223.uwM-RuZWLwxb0AzHcmlBc_wBin0d6kDfu_DMCxIZGk0@z>
 
 Signed-off-by: driver1998 <driver1998@foxmail.com>
 ---
- include/qemu/osdep.h | 10 +++++-----
- 1 file changed, 5 insertions(+), 5 deletions(-)
+ qga/commands-win32.c | 35 ++++++++++++++++++-----------------
+ 1 file changed, 18 insertions(+), 17 deletions(-)
 
-diff --git a/include/qemu/osdep.h b/include/qemu/osdep.h
-index 303d315c5d..af2b91f0b8 100644
---- a/include/qemu/osdep.h
-+++ b/include/qemu/osdep.h
-@@ -85,17 +85,17 @@ extern int daemon(int, int);
- #endif
- #endif
+diff --git a/qga/commands-win32.c b/qga/commands-win32.c
+index d40d61f605..4cdd2950bf 100644
+--- a/qga/commands-win32.c
++++ b/qga/commands-win32.c
+@@ -458,23 +458,24 @@ void qmp_guest_file_flush(int64_t handle, Error **errp)
+ #ifdef CONFIG_QGA_NTDDSCSI
  
-+/* enable C99/POSIX format strings (needs mingw32-runtime 3.15 or later) */
-+#ifdef __MINGW32__
-+#define __USE_MINGW_ANSI_STDIO 1
-+#endif
-+
- #include <stdarg.h>
- #include <stddef.h>
- #include <stdbool.h>
- #include <stdint.h>
- #include <sys/types.h>
- #include <stdlib.h>
--
--/* enable C99/POSIX format strings (needs mingw32-runtime 3.15 or later) */
--#ifdef __MINGW32__
--#define __USE_MINGW_ANSI_STDIO 1
--#endif
- #include <stdio.h>
+ static STORAGE_BUS_TYPE win2qemu[] = {
+-    [BusTypeUnknown] = GUEST_DISK_BUS_TYPE_UNKNOWN,
+-    [BusTypeScsi] = GUEST_DISK_BUS_TYPE_SCSI,
+-    [BusTypeAtapi] = GUEST_DISK_BUS_TYPE_IDE,
+-    [BusTypeAta] = GUEST_DISK_BUS_TYPE_IDE,
+-    [BusType1394] = GUEST_DISK_BUS_TYPE_IEEE1394,
+-    [BusTypeSsa] = GUEST_DISK_BUS_TYPE_SSA,
+-    [BusTypeFibre] = GUEST_DISK_BUS_TYPE_SSA,
+-    [BusTypeUsb] = GUEST_DISK_BUS_TYPE_USB,
+-    [BusTypeRAID] = GUEST_DISK_BUS_TYPE_RAID,
+-    [BusTypeiScsi] = GUEST_DISK_BUS_TYPE_ISCSI,
+-    [BusTypeSas] = GUEST_DISK_BUS_TYPE_SAS,
+-    [BusTypeSata] = GUEST_DISK_BUS_TYPE_SATA,
+-    [BusTypeSd] =  GUEST_DISK_BUS_TYPE_SD,
+-    [BusTypeMmc] = GUEST_DISK_BUS_TYPE_MMC,
++    [BusTypeUnknown] = (STORAGE_BUS_TYPE)GUEST_DISK_BUS_TYPE_UNKNOWN,
++    [BusTypeScsi] = (STORAGE_BUS_TYPE)GUEST_DISK_BUS_TYPE_SCSI,
++    [BusTypeAtapi] = (STORAGE_BUS_TYPE)GUEST_DISK_BUS_TYPE_IDE,
++    [BusTypeAta] = (STORAGE_BUS_TYPE)GUEST_DISK_BUS_TYPE_IDE,
++    [BusType1394] = (STORAGE_BUS_TYPE)GUEST_DISK_BUS_TYPE_IEEE1394,
++    [BusTypeSsa] = (STORAGE_BUS_TYPE)GUEST_DISK_BUS_TYPE_SSA,
++    [BusTypeFibre] = (STORAGE_BUS_TYPE)GUEST_DISK_BUS_TYPE_SSA,
++    [BusTypeUsb] = (STORAGE_BUS_TYPE)GUEST_DISK_BUS_TYPE_USB,
++    [BusTypeRAID] = (STORAGE_BUS_TYPE)GUEST_DISK_BUS_TYPE_RAID,
++    [BusTypeiScsi] = (STORAGE_BUS_TYPE)GUEST_DISK_BUS_TYPE_ISCSI,
++    [BusTypeSas] = (STORAGE_BUS_TYPE)GUEST_DISK_BUS_TYPE_SAS,
++    [BusTypeSata] = (STORAGE_BUS_TYPE)GUEST_DISK_BUS_TYPE_SATA,
++    [BusTypeSd] =  (STORAGE_BUS_TYPE)GUEST_DISK_BUS_TYPE_SD,
++    [BusTypeMmc] = (STORAGE_BUS_TYPE)GUEST_DISK_BUS_TYPE_MMC,
+ #if (_WIN32_WINNT >= 0x0601)
+-    [BusTypeVirtual] = GUEST_DISK_BUS_TYPE_VIRTUAL,
+-    [BusTypeFileBackedVirtual] = GUEST_DISK_BUS_TYPE_FILE_BACKED_VIRTUAL,
++    [BusTypeVirtual] = (STORAGE_BUS_TYPE)GUEST_DISK_BUS_TYPE_VIRTUAL,
++    [BusTypeFileBackedVirtual] =
++        (STORAGE_BUS_TYPE)GUEST_DISK_BUS_TYPE_FILE_BACKED_VIRTUAL,
+ #endif
+ };
  
- #include <string.h>
+@@ -483,7 +484,7 @@ static GuestDiskBusType find_bus_type(STORAGE_BUS_TYPE bus)
+     if (bus >= ARRAY_SIZE(win2qemu) || (int)bus < 0) {
+         return GUEST_DISK_BUS_TYPE_UNKNOWN;
+     }
+-    return win2qemu[(int)bus];
++    return (GuestDiskBusType)win2qemu[(int)bus];
+ }
+ 
+ DEFINE_GUID(GUID_DEVINTERFACE_DISK,
 -- 
 2.17.1
 
