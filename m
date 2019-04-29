@@ -4,85 +4,85 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-8.7 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+	SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 19BE1C43219
-	for <qemu-devel@archiver.kernel.org>; Mon, 29 Apr 2019 17:12:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 19788C43219
+	for <qemu-devel@archiver.kernel.org>; Mon, 29 Apr 2019 17:12:53 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D830F20675
-	for <qemu-devel@archiver.kernel.org>; Mon, 29 Apr 2019 17:12:19 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id D33D320675
+	for <qemu-devel@archiver.kernel.org>; Mon, 29 Apr 2019 17:12:52 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="YajaLebr"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D830F20675
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="wCCTAaRB"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D33D320675
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:60748 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:60756 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hL9pD-0005NZ-5c
-	for qemu-devel@archiver.kernel.org; Mon, 29 Apr 2019 13:12:19 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:34160)
+	id 1hL9pj-0005tP-UU
+	for qemu-devel@archiver.kernel.org; Mon, 29 Apr 2019 13:12:51 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:34361)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1hL9eN-0004Pl-Uf
-	for qemu-devel@nongnu.org; Mon, 29 Apr 2019 13:01:10 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1hL9er-0004r4-3J
+	for qemu-devel@nongnu.org; Mon, 29 Apr 2019 13:01:38 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1hL9eI-0006VI-GK
-	for qemu-devel@nongnu.org; Mon, 29 Apr 2019 13:01:04 -0400
-Received: from mail-wr1-x442.google.com ([2a00:1450:4864:20::442]:36483)
+	(envelope-from <peter.maydell@linaro.org>) id 1hL9eo-0006kA-1z
+	for qemu-devel@nongnu.org; Mon, 29 Apr 2019 13:01:35 -0400
+Received: from mail-wr1-x436.google.com ([2a00:1450:4864:20::436]:44818)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1hL9eE-0006Bn-GO
-	for qemu-devel@nongnu.org; Mon, 29 Apr 2019 13:01:00 -0400
-Received: by mail-wr1-x442.google.com with SMTP id o4so5177805wra.3
-	for <qemu-devel@nongnu.org>; Mon, 29 Apr 2019 10:00:42 -0700 (PDT)
+	id 1hL9em-0006cV-Rc
+	for qemu-devel@nongnu.org; Mon, 29 Apr 2019 13:01:33 -0400
+Received: by mail-wr1-x436.google.com with SMTP id c5so17086369wrs.11
+	for <qemu-devel@nongnu.org>; Mon, 29 Apr 2019 10:01:17 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
 	h=from:to:subject:date:message-id:in-reply-to:references:mime-version
 	:content-transfer-encoding;
-	bh=3hCqKWhEs+uyed/mP56baIBgXAfI++APiWRLJhSExvw=;
-	b=YajaLebr2q7j6iLHUun3YVVHQEIWyb80UqcvVMn6EM5JmrAR1gJy5nmEDSyzlrcewv
-	4SdG2atfrQAWnqPEKOqq24P+eQ9Lt28jnwqKVN5oiEP8BpKgIz9o+PCoefSmV3767DWY
-	3vu9vRwOAkqM7MZR7LzSSKfBvTqWQxoW84xRX/MDcaiBgbkiietxVRrerECTNd4K/kHx
-	1GAzVLMDgC6U8pky+XP1aRBb/WwZHRvCTqOKn9peQxz4KBlViwfJRE8BDGpawKxON/1W
-	mLtDmhCUOtUdRdeGapzyqlwyvq1N06VH+eDGw1xVquEq/YAo6vPA0VGLnGvdeGJ5d3Gk
-	UrnQ==
+	bh=2w1w44sHa+uGj5LPkXGrx5V7+QcLrNYXNtLTn7rWBUg=;
+	b=wCCTAaRBwxllhOkltURIAQRY0ESCgvD21au8gnkNMCuvo31ypW1FimSakFu2zamD2L
+	+aKQzv0VTGsc5bMhiw49Da2hXLGYmdN+EmApeEKuzI93YBkx/26X96mPRLtHRvkooKMZ
+	OrlDEpyuY2zHp7ErM7buNpARisgPzMZjOTfYVYE9RRU/n8rxQgL6tLf8Ku8vYxrszapL
+	ffg7heLgc3wHUUy2cRNimMeaMcf0c9WKdP09L92rFQ3XH9SyLjBrkPKeyaIAP1ApHpdu
+	Gh8VON4DqfN+zy6tCxEBiR1CbJqWVcz5O/2vRS8Jwwj51Fp5kTdz42iV+YFHa+EKBCE/
+	Fr5A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
 	d=1e100.net; s=20161025;
 	h=x-gm-message-state:from:to:subject:date:message-id:in-reply-to
 	:references:mime-version:content-transfer-encoding;
-	bh=3hCqKWhEs+uyed/mP56baIBgXAfI++APiWRLJhSExvw=;
-	b=O8R9vhNeNvRwP7Ni8IOKCbpfY+tyx4agg/ZBiIVqDCunGLjuDVnMIvTAKBK5kPoPuF
-	NcfeQRNso0oC0qo5whgbqoVhM8rkRVtZ8GPOoDFgWm3DAo4eEFNoXcsXxQuovH/ry+0E
-	AgpTnUEpGKS8hQFWL+BHki8cBMXsVG/kDL6yP+25weU3xkOmxIWQKGG08R0DcybstAsx
-	OToDTeAG1dhhGkSJcaoRroBzPmlNSOWq4vx1i221WbhutLspPSmdJX3DG8dLC/RyWAql
-	gmsyyrQvv64QJTv3KPOVfwh964kzWvIVl4EIpfglijwhKxDGTs7E5l5EFP9Mqo7nCTzL
-	QgLw==
-X-Gm-Message-State: APjAAAUWAHsuqmND8YMMbtkvjTUtw2WRUIdmK98+PFDVDu5SQLS7r6hQ
-	Pq8VeSOntHMno/bd7lIpIYvXnQYD6fY=
-X-Google-Smtp-Source: APXvYqwzyHH1SLKerq7Uy9ZpnU6kU3kdfj6LA0T5koz25AD5rd0842mkiXb7MiwG+ve3zJpsJJ46yA==
-X-Received: by 2002:adf:db05:: with SMTP id s5mr10651136wri.247.1556557241813; 
-	Mon, 29 Apr 2019 10:00:41 -0700 (PDT)
+	bh=2w1w44sHa+uGj5LPkXGrx5V7+QcLrNYXNtLTn7rWBUg=;
+	b=Xu8EVohGvxwNKCEgqVvOB1lXV8/qiwmn7TaUey4HYv9HtsQt1sYK0gvb6YNGL3O9zq
+	fNyT6DV54XvOdGHxWLVKqZE46unmmLCrV3nIQxIY0sTZtOnNYZ7NeLrSrdV5oAjGFqRB
+	SXqD57g16iurQ9SXmtx8KluSjji3ytvwjOHh2oWC1gi2kKo/HoPWNd+o5ijAXRptIXqM
+	QkNxxMdJnKwd/Xk6k5npCHe8TXReqPa76zJ5gUFlbet3UIzNlUYizR6AY9jZNjzPy1Ev
+	a0qLstVbuUxFwKEsC4IZyop2kOzKl0A6r5UCuXpxpOw389yLRdrR3Mg8Qikacl05WAAS
+	Q9SQ==
+X-Gm-Message-State: APjAAAUYnWiOPbHZDW2H5jC7mOITDM2Ccu/wSioJWZUB81u7KcLPg8xt
+	CEg4ZnWfUl3Bkqyh67oXQ+IOSyWzuoE=
+X-Google-Smtp-Source: APXvYqwqq17zDjXVIiweWdAykw64lKdyLDPBcM2IFqR/Lt6u3w45UIZxynbJZgHvBOu05oyNiPvYmA==
+X-Received: by 2002:a5d:66c3:: with SMTP id k3mr5832383wrw.104.1556557276407; 
+	Mon, 29 Apr 2019 10:01:16 -0700 (PDT)
 Received: from orth.archaic.org.uk (orth.archaic.org.uk. [81.2.115.148])
-	by smtp.gmail.com with ESMTPSA id a13sm36896wmj.39.2019.04.29.10.00.40
+	by smtp.gmail.com with ESMTPSA id a13sm36896wmj.39.2019.04.29.10.01.15
 	for <qemu-devel@nongnu.org>
 	(version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-	Mon, 29 Apr 2019 10:00:41 -0700 (PDT)
+	Mon, 29 Apr 2019 10:01:15 -0700 (PDT)
 From: Peter Maydell <peter.maydell@linaro.org>
 To: qemu-devel@nongnu.org
-Date: Mon, 29 Apr 2019 17:59:55 +0100
-Message-Id: <20190429170030.11323-8-peter.maydell@linaro.org>
+Date: Mon, 29 Apr 2019 18:00:22 +0100
+Message-Id: <20190429170030.11323-35-peter.maydell@linaro.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20190429170030.11323-1-peter.maydell@linaro.org>
 References: <20190429170030.11323-1-peter.maydell@linaro.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
 	recognized.
-X-Received-From: 2a00:1450:4864:20::442
-Subject: [Qemu-devel] [PULL 07/42] target/arm: Disable most VFP sysregs for
- M-profile
+X-Received-From: 2a00:1450:4864:20::436
+Subject: [Qemu-devel] [PULL 34/42] hw/devices: Move TC6393XB declarations
+ into a new header
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -97,63 +97,109 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Content-Type: text/plain; charset="UTF-8"
-Message-ID: <20190429165955.yDEuSYcvo_wLZkf6hQ0pTq-FK3jcbDlP9SgDwce-4So@z>
+Message-ID: <20190429170022.grKyAtV7D37xgKQMkrGWq8fE6CJfFhX7oKNcMDRlq_c@z>
 
-The only "system register" that M-profile floating point exposes
-via the VMRS/VMRS instructions is FPSCR, and it does not have
-the odd special case for rd==15. Add a check to ensure we only
-expose FPSCR.
+From: Philippe Mathieu-Daudé <philmd@redhat.com>
 
+Reviewed-by: Markus Armbruster <armbru@redhat.com>
+Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+Message-id: 20190412165416.7977-5-philmd@redhat.com
 Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
-Message-id: 20190416125744.27770-5-peter.maydell@linaro.org
 ---
- target/arm/translate.c | 19 +++++++++++++++++--
- 1 file changed, 17 insertions(+), 2 deletions(-)
+ include/hw/devices.h          |  6 ------
+ include/hw/display/tc6393xb.h | 24 ++++++++++++++++++++++++
+ hw/arm/tosa.c                 |  2 +-
+ hw/display/tc6393xb.c         |  2 +-
+ MAINTAINERS                   |  1 +
+ 5 files changed, 27 insertions(+), 8 deletions(-)
+ create mode 100644 include/hw/display/tc6393xb.h
 
-diff --git a/target/arm/translate.c b/target/arm/translate.c
-index 4ea4018e2b8..a9784535069 100644
---- a/target/arm/translate.c
-+++ b/target/arm/translate.c
-@@ -3513,12 +3513,27 @@ static int disas_vfp_insn(DisasContext *s, uint32_t insn)
-                     }
-                 }
-             } else { /* !dp */
-+                bool is_sysreg;
-+
-                 if ((insn & 0x6f) != 0x00)
-                     return 1;
-                 rn = VFP_SREG_N(insn);
-+
-+                is_sysreg = extract32(insn, 21, 1);
-+
-+                if (arm_dc_feature(s, ARM_FEATURE_M)) {
-+                    /*
-+                     * The only M-profile VFP vmrs/vmsr sysreg is FPSCR.
-+                     * Writes to R15 are UNPREDICTABLE; we choose to undef.
-+                     */
-+                    if (is_sysreg && (rd == 15 || (rn >> 1) != ARM_VFP_FPSCR)) {
-+                        return 1;
-+                    }
-+                }
-+
-                 if (insn & ARM_CP_RW_BIT) {
-                     /* vfp->arm */
--                    if (insn & (1 << 21)) {
-+                    if (is_sysreg) {
-                         /* system register */
-                         rn >>= 1;
+diff --git a/include/hw/devices.h b/include/hw/devices.h
+index 0850f697451..1e2141caad1 100644
+--- a/include/hw/devices.h
++++ b/include/hw/devices.h
+@@ -50,10 +50,4 @@ void *tahvo_init(qemu_irq irq, int betty);
  
-@@ -3585,7 +3600,7 @@ static int disas_vfp_insn(DisasContext *s, uint32_t insn)
-                     }
-                 } else {
-                     /* arm->vfp */
--                    if (insn & (1 << 21)) {
-+                    if (is_sysreg) {
-                         rn >>= 1;
-                         /* system register */
-                         switch (rn) {
+ void retu_key_event(void *retu, int state);
+ 
+-/* tc6393xb.c */
+-typedef struct TC6393xbState TC6393xbState;
+-TC6393xbState *tc6393xb_init(struct MemoryRegion *sysmem,
+-                             uint32_t base, qemu_irq irq);
+-qemu_irq tc6393xb_l3v_get(TC6393xbState *s);
+-
+ #endif
+diff --git a/include/hw/display/tc6393xb.h b/include/hw/display/tc6393xb.h
+new file mode 100644
+index 00000000000..5c4da91f80d
+--- /dev/null
++++ b/include/hw/display/tc6393xb.h
+@@ -0,0 +1,24 @@
++/*
++ * Toshiba TC6393XB I/O Controller.
++ * Found in Sharp Zaurus SL-6000 (tosa) or some
++ * Toshiba e-Series PDAs.
++ *
++ * Copyright (c) 2007 Hervé Poussineau
++ *
++ * This work is licensed under the terms of the GNU GPL, version 2 or later.
++ * See the COPYING file in the top-level directory.
++ */
++
++#ifndef HW_DISPLAY_TC6393XB_H
++#define HW_DISPLAY_TC6393XB_H
++
++#include "exec/memory.h"
++#include "hw/irq.h"
++
++typedef struct TC6393xbState TC6393xbState;
++
++TC6393xbState *tc6393xb_init(struct MemoryRegion *sysmem,
++                             uint32_t base, qemu_irq irq);
++qemu_irq tc6393xb_l3v_get(TC6393xbState *s);
++
++#endif
+diff --git a/hw/arm/tosa.c b/hw/arm/tosa.c
+index eef9d427e76..9a1247797fe 100644
+--- a/hw/arm/tosa.c
++++ b/hw/arm/tosa.c
+@@ -16,10 +16,10 @@
+ #include "hw/hw.h"
+ #include "hw/arm/pxa.h"
+ #include "hw/arm/arm.h"
+-#include "hw/devices.h"
+ #include "hw/arm/sharpsl.h"
+ #include "hw/pcmcia.h"
+ #include "hw/boards.h"
++#include "hw/display/tc6393xb.h"
+ #include "hw/i2c/i2c.h"
+ #include "hw/ssi/ssi.h"
+ #include "hw/sysbus.h"
+diff --git a/hw/display/tc6393xb.c b/hw/display/tc6393xb.c
+index 6d133d9a66c..0b7c59cde7d 100644
+--- a/hw/display/tc6393xb.c
++++ b/hw/display/tc6393xb.c
+@@ -14,7 +14,7 @@
+ #include "qapi/error.h"
+ #include "qemu/host-utils.h"
+ #include "hw/hw.h"
+-#include "hw/devices.h"
++#include "hw/display/tc6393xb.h"
+ #include "hw/block/flash.h"
+ #include "ui/console.h"
+ #include "ui/pixel_ops.h"
+diff --git a/MAINTAINERS b/MAINTAINERS
+index dabbfccf9c5..51eecd0ac19 100644
+--- a/MAINTAINERS
++++ b/MAINTAINERS
+@@ -714,6 +714,7 @@ F: hw/misc/mst_fpga.c
+ F: hw/misc/max111x.c
+ F: include/hw/arm/pxa.h
+ F: include/hw/arm/sharpsl.h
++F: include/hw/display/tc6393xb.h
+ 
+ SABRELITE / i.MX6
+ M: Peter Maydell <peter.maydell@linaro.org>
 -- 
 2.20.1
 
