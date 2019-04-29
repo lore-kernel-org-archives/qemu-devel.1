@@ -2,81 +2,109 @@ Return-Path: <SRS0=sEuR=S7=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-4.0 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.7 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BA081C43219
-	for <qemu-devel@archiver.kernel.org>; Mon, 29 Apr 2019 17:50:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 642AEC43219
+	for <qemu-devel@archiver.kernel.org>; Mon, 29 Apr 2019 17:51:07 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 82D2E2087B
-	for <qemu-devel@archiver.kernel.org>; Mon, 29 Apr 2019 17:50:03 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 2B7CC20675
+	for <qemu-devel@archiver.kernel.org>; Mon, 29 Apr 2019 17:51:07 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="kDZo1hZX"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 82D2E2087B
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="M6q4kxPI"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2B7CC20675
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=oracle.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:33100 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:33136 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hLAPi-0003hg-Rk
-	for qemu-devel@archiver.kernel.org; Mon, 29 Apr 2019 13:50:02 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:46077)
+	id 1hLAQk-0004Qg-8h
+	for qemu-devel@archiver.kernel.org; Mon, 29 Apr 2019 13:51:06 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:46488)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1hLANc-0002hJ-Jv
-	for qemu-devel@nongnu.org; Mon, 29 Apr 2019 13:47:53 -0400
+	(envelope-from <wei.d.li@oracle.com>) id 1hLAPN-0003h6-3X
+	for qemu-devel@nongnu.org; Mon, 29 Apr 2019 13:49:41 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1hLANb-00012d-Qk
-	for qemu-devel@nongnu.org; Mon, 29 Apr 2019 13:47:52 -0400
-Received: from mail-ot1-x343.google.com ([2607:f8b0:4864:20::343]:43568)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1hLANb-00012I-Jl
-	for qemu-devel@nongnu.org; Mon, 29 Apr 2019 13:47:51 -0400
-Received: by mail-ot1-x343.google.com with SMTP id u15so9403186otq.10
-	for <qemu-devel@nongnu.org>; Mon, 29 Apr 2019 10:47:51 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
-	h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-	:cc; bh=kyj3yaotyScuvoTgwqky4+dB3dXTDqqjbwvr+4CaU9E=;
-	b=kDZo1hZXw+3N8IrFtZdq2A/ewG+Dm820y+Gvp9o3gnyOJZM97wb2xBnnNxxTxA2Gw0
-	82zpKC7T+myr/naOD1a0zjgreTHMTgBDjbO4NK77IV4+5QsWIdMn42vZOB4aYUf81gwN
-	68CK7nbBKcD5mwEyn9McxHcYoqkcn3wqMcjvFKLwAAarkZoUTSSoOQXhYqkbjcylv+u8
-	OSB4H8L2WvEOcMQkBI9s09Z102qOnWoh7rfxPppNLdf/o691SHELSxC6cyXUSVbuQOkg
-	N77DPmgQP4X1pcb8jzdcJz4z4gi0YZ82nhtH4Rpr6bVaJObQR+r/GNb6uBrM7XNL42i2
-	hHRQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=1e100.net; s=20161025;
-	h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-	:message-id:subject:to:cc;
-	bh=kyj3yaotyScuvoTgwqky4+dB3dXTDqqjbwvr+4CaU9E=;
-	b=iLjA4Z/m0EZkT2ve9OX0tFjjASvdtfyBPW+3QWE5edSwR4t+tfXQppl08xyN7lGOAg
-	Vn7191VsOHxDStVO0WmWc3DTHxvi5QOozqet24bf431iomWRLP/9PtNJ4v+0Jlh4PpOA
-	iElj2HL0xH5FR1Y39k3UAnRhgY2WJF9Q/hfbQj4z/7fcu0FZxE2P2Ybj8+RR/pC3Q7/i
-	MWb44GIDVkth4H91nOIkoHNkXnyRM0r78xlAU/WpeHKSiIACMdDYFkHLO6Sanj1H1ssZ
-	fP4ZxemLz9+3YQnZtlvQrdcWxjUc5A85xAcIKImAC7v+prBKjfmqqFia99cUQA6vuaGj
-	iMvA==
-X-Gm-Message-State: APjAAAXhv3wAMgTEzV7SSsPpW4h+FMRq2IoR8q/Rzd7tzzU/K4TYhYi8
-	0tJTOXbqWoFZ29gp0Y8JlJ67imvaLb7KffjSU57BRg==
-X-Google-Smtp-Source: APXvYqw6nAa/gUl/3iw6MMDX6noXQy+1uzWTZvOf/U8GQim5Rt4H7zq6YTgJB6yqO6JB5edG4/EbghcfLglEwn56dyo=
-X-Received: by 2002:a9d:404:: with SMTP id 4mr37277375otc.352.1556560070661;
-	Mon, 29 Apr 2019 10:47:50 -0700 (PDT)
-MIME-Version: 1.0
-References: <20190403034358.21999-1-richard.henderson@linaro.org>
-	<20190403034358.21999-4-richard.henderson@linaro.org>
-In-Reply-To: <20190403034358.21999-4-richard.henderson@linaro.org>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Mon, 29 Apr 2019 18:47:39 +0100
-Message-ID:
- <CAFEAcA8tZwmzrvvEv+Gx=AzdtNs_S+5vBkVQ2hqExzBxeDk=vA@mail.gmail.com>
-To: Richard Henderson <richard.henderson@linaro.org>
-Content-Type: text/plain; charset="UTF-8"
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
-	recognized.
-X-Received-From: 2607:f8b0:4864:20::343
-Subject: Re: [Qemu-devel] [PATCH 03/26] target/alpha: Convert to
- CPUClass::tlb_fill
+	(envelope-from <wei.d.li@oracle.com>) id 1hLAPM-0002J4-9V
+	for qemu-devel@nongnu.org; Mon, 29 Apr 2019 13:49:41 -0400
+Received: from userp2120.oracle.com ([156.151.31.85]:59800)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <wei.d.li@oracle.com>) id 1hLAPM-0002IH-0P
+	for qemu-devel@nongnu.org; Mon, 29 Apr 2019 13:49:40 -0400
+Received: from pps.filterd (userp2120.oracle.com [127.0.0.1])
+	by userp2120.oracle.com (8.16.0.27/8.16.0.27) with SMTP id
+	x3THcuNn111240; Mon, 29 Apr 2019 17:49:35 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com;
+	h=date : subject : from
+	: to : cc : message-id : references : in-reply-to : mime-version :
+	content-type : content-transfer-encoding; s=corp-2018-07-02;
+	bh=p4YwyUI+aCRK1s3fYxNR/1/nvu2p3mfUoKcVGbVcTHI=;
+	b=M6q4kxPItBESjdSpyRqhgcmLlzMJSjYZlik5qMYxpXWxn0HPPwSNv5c8pPWCj+Sf33Ho
+	Q2micd2uHCkRKbAUdxDxeJYcY0nweHOjh/u8Gcdm02Scn8OBh5/QfP87EdPb3j7PDJ98
+	Aqwu7SUrklRTLTeLm4bhUwGSIIMNwhK+RnNSwqFIDZ4xDaNs6Eh/BW9gC165GdJo7u8p
+	JJSwmaGkaFrN2lie51Drk38VZE5mYNN+5Qdk4IYRYXEEgxhBqIOKXBQea62jQ/9SYwLM
+	2DW6eFWOHVjwujaNn7fXRrJ+89U2DwM8QIflQH8dTEH9vYzg0Ay522G7oBmFQsHu2fu0
+	8g== 
+Received: from userp3030.oracle.com (userp3030.oracle.com [156.151.31.80])
+	by userp2120.oracle.com with ESMTP id 2s4fqpyw0e-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Mon, 29 Apr 2019 17:49:35 +0000
+Received: from pps.filterd (userp3030.oracle.com [127.0.0.1])
+	by userp3030.oracle.com (8.16.0.27/8.16.0.27) with SMTP id
+	x3THnZVk194770; Mon, 29 Apr 2019 17:49:35 GMT
+Received: from aserv0122.oracle.com (aserv0122.oracle.com [141.146.126.236])
+	by userp3030.oracle.com with ESMTP id 2s4yy93kcj-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Mon, 29 Apr 2019 17:49:34 +0000
+Received: from abhmp0007.oracle.com (abhmp0007.oracle.com [141.146.116.13])
+	by aserv0122.oracle.com (8.14.4/8.14.4) with ESMTP id x3THnXHn023129;
+	Mon, 29 Apr 2019 17:49:33 GMT
+Received: from [10.74.107.66] (/10.74.107.66)
+	by default (Oracle Beehive Gateway v4.0)
+	with ESMTP ; Mon, 29 Apr 2019 10:49:33 -0700
+User-Agent: Microsoft-MacOutlook/10.15.0.190115
+Date: Mon, 29 Apr 2019 10:49:31 -0700
+From: Wei Li <wei.d.li@oracle.com>
+To: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <F5614236-1B07-421B-8FE6-90129297014F@oracle.com>
+Thread-Topic: [Qemu-devel] Following up questions related to QEMU and I/O
+	Thread
+References: <5FF901C1-0AA5-4308-A65C-C448D0A2BA63@oracle.com>
+	<898ef1d4-bfa2-9952-8ceb-f1282b85e29c@oracle.com>
+	<20190416092042.GB32709@stefanha-x1.localdomain>
+	<8E5AF770-69ED-4D44-8A25-B51344996D9E@oracle.com>
+	<3F7E854A-3C1D-4204-8C35-893FC0614796@oracle.com>
+	<20190423120453.GF32465@stefanha-x1.localdomain>
+	<44520476-d6a8-2e3f-1602-388e2e1e874e@redhat.com>
+	<7044D39A-8D7B-41F7-B8C3-DC2214E6826A@oracle.com>
+	<825292440.15675844.1556339085478.JavaMail.zimbra@redhat.com>
+In-Reply-To: <825292440.15675844.1556339085478.JavaMail.zimbra@redhat.com>
+Mime-version: 1.0
+Content-type: text/plain; charset="UTF-8"
+Content-transfer-encoding: quoted-printable
+X-Proofpoint-Virus-Version: vendor=nai engine=5900 definitions=9242
+	signatures=668685
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=0
+	malwarescore=0
+	phishscore=0 bulkscore=0 spamscore=0 mlxscore=0 mlxlogscore=897
+	adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+	engine=8.0.1-1810050000 definitions=main-1904290121
+X-Proofpoint-Virus-Version: vendor=nai engine=5900 definitions=9242
+	signatures=668685
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0
+	priorityscore=1501 malwarescore=0
+	suspectscore=0 phishscore=0 bulkscore=0 spamscore=0 clxscore=1015
+	lowpriorityscore=0 mlxscore=0 impostorscore=0 mlxlogscore=919
+	adultscore=0
+	classifier=spam adjust=0 reason=mlx scancount=1 engine=8.0.1-1810050000
+	definitions=main-1904290121
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic]
+X-Received-From: 156.151.31.85
+Subject: Re: [Qemu-devel] Following up questions related to QEMU and I/O
+ Thread
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -88,25 +116,43 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: QEMU Developers <qemu-devel@nongnu.org>
+Cc: Stefan Hajnoczi <stefanha@gmail.com>, qemu-devel@nongnu.org,
+	Stefan Hajnoczi <stefanha@redhat.com>,
+	Dongli Zhang <dongli.zhang@oracle.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190429174739.H4u_5atALtsNxYp_xU9dOiyWFB6Hpod438vWSnYSkgk@z>
+Message-ID: <20190429174931.nV-hji_DBLvmac50AVl7Wb8AKKxdVlB2kSc5bhXTUQk@z>
 
-On Wed, 3 Apr 2019 at 04:49, Richard Henderson
-<richard.henderson@linaro.org> wrote:
->
-> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
-> ---
->  target/alpha/cpu.h        |  5 ++--
->  target/alpha/cpu.c        |  5 ++--
->  target/alpha/helper.c     | 50 +++++++++++++++++++++++----------------
->  target/alpha/mem_helper.c | 16 -------------
->  4 files changed, 35 insertions(+), 41 deletions(-)
+Thanks Paolo for your clarification!
 
-Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
+Just wanted to double confirm, does this mean batch I/O submission won't ap=
+ply to aio=3Dthreads (which is the default mode)?
 
-thanks
--- PMM
+Thanks,
+Wei
+
+
+=EF=BB=BFOn 4/26/19, 9:25 PM, "Paolo Bonzini" <pbonzini@redhat.com> wrote:
+
+   =20
+    > Thanks Stefan and Paolo for your response and advice!
+    >=20
+    > Hi Paolo,
+    >=20
+    > As to the virtio-scsi batch I/O submission feature in QEMU which you
+    > mentioned, is this feature turned on by default in QEMU 2.9 or there =
+is a
+    > tunable parameters to turn on/off the feature?
+   =20
+    Yes, it is available by default since 2.2.0.  It cannot be turned off, =
+however
+    it is only possible to batch I/O with aio=3Dnative (and, since 2.12.0, wi=
+th the NVMe
+    backend).
+   =20
+    Paolo
+   =20
+
+
 
