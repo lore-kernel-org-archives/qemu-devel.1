@@ -2,72 +2,94 @@ Return-Path: <SRS0=sEuR=S7=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.2 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS,USER_AGENT_MUTT
+X-Spam-Status: No, score=-6.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 67EBEC43219
-	for <qemu-devel@archiver.kernel.org>; Mon, 29 Apr 2019 16:37:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2D29FC43219
+	for <qemu-devel@archiver.kernel.org>; Mon, 29 Apr 2019 16:39:27 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2E02520675
-	for <qemu-devel@archiver.kernel.org>; Mon, 29 Apr 2019 16:37:10 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=alien8.de header.i=@alien8.de header.b="HIYiXKVA"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2E02520675
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=alien8.de
+	by mail.kernel.org (Postfix) with ESMTPS id E0D1A2075E
+	for <qemu-devel@archiver.kernel.org>; Mon, 29 Apr 2019 16:39:26 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E0D1A2075E
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:60351 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:60370 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hL9HB-00051K-4P
-	for qemu-devel@archiver.kernel.org; Mon, 29 Apr 2019 12:37:09 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:57936)
+	id 1hL9JO-0006EM-6F
+	for qemu-devel@archiver.kernel.org; Mon, 29 Apr 2019 12:39:26 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:58268)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bp@alien8.de>) id 1hL9GI-0004hp-LV
-	for qemu-devel@nongnu.org; Mon, 29 Apr 2019 12:36:15 -0400
+	(envelope-from <mreitz@redhat.com>) id 1hL9Hy-0005VL-Cr
+	for qemu-devel@nongnu.org; Mon, 29 Apr 2019 12:37:59 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bp@alien8.de>) id 1hL9GH-0002hE-JH
-	for qemu-devel@nongnu.org; Mon, 29 Apr 2019 12:36:14 -0400
-Received: from mail.skyhub.de ([5.9.137.197]:56048)
+	(envelope-from <mreitz@redhat.com>) id 1hL9Hx-0003H8-Hc
+	for qemu-devel@nongnu.org; Mon, 29 Apr 2019 12:37:58 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:40470)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <bp@alien8.de>) id 1hL9GH-0002dK-2V
-	for qemu-devel@nongnu.org; Mon, 29 Apr 2019 12:36:13 -0400
-Received: from zn.tnic (p200300EC2F073600329C23FFFEA6A903.dip0.t-ipconnect.de
-	[IPv6:2003:ec:2f07:3600:329c:23ff:fea6:a903])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(Exim 4.71) (envelope-from <mreitz@redhat.com>)
+	id 1hL9Hv-0003GC-5h; Mon, 29 Apr 2019 12:37:55 -0400
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+	[10.5.11.22])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.skyhub.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id
-	B87D01EC027B; Mon, 29 Apr 2019 18:36:03 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=dkim;
-	t=1556555763;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	content-transfer-encoding:in-reply-to:in-reply-to: references:references;
-	bh=fismiO90X9ow0flqEFvKG4xZhSvKMbYdUPumKyUhM9Q=;
-	b=HIYiXKVApvDpTbHt+PlhAFHoIKD7hjuzVMbirqjxzgyuu3MmYXciLwQeByWfBXIi8n7ZGG
-	JmqEiMLFwgc5z7qaUypuJWTpYU3D/FWlSEOzl2WFSZfumc32qPYes0/yxrryhUSKtuex8Y
-	eN+dlETiFUgSwoU/eKGsdygENq9nAQY=
-Date: Mon, 29 Apr 2019 18:36:02 +0200
-From: Borislav Petkov <bp@alien8.de>
-To: "Singh, Brijesh" <brijesh.singh@amd.com>
-Message-ID: <20190429163602.GE2324@zn.tnic>
-References: <20190424160942.13567-1-brijesh.singh@amd.com>
-	<20190424160942.13567-2-brijesh.singh@amd.com>
-	<20190426141042.GF4608@zn.tnic>
-	<e6f8da38-b8dd-a9c5-a358-5f33b6ea7b37@amd.com>
-	<20190426204327.GM4608@zn.tnic>
-	<2b63d983-a622-3bec-e6ac-abfd024e19c0@amd.com>
+	by mx1.redhat.com (Postfix) with ESMTPS id 637B48762E;
+	Mon, 29 Apr 2019 16:37:53 +0000 (UTC)
+Received: from dresden.str.redhat.com (ovpn-204-144.brq.redhat.com
+	[10.40.204.144])
+	by smtp.corp.redhat.com (Postfix) with ESMTPS id 3965B10021B4;
+	Mon, 29 Apr 2019 16:37:51 +0000 (UTC)
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
+	qemu-devel@nongnu.org, qemu-block@nongnu.org
+References: <20190402153730.54145-1-vsementsov@virtuozzo.com>
+	<20190402153730.54145-8-vsementsov@virtuozzo.com>
+From: Max Reitz <mreitz@redhat.com>
+Openpgp: preference=signencrypt
+Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
+	mQENBFXOJlcBCADEyyhOTsoa/2ujoTRAJj4MKA21dkxxELVj3cuILpLTmtachWj7QW+TVG8U
+	/PsMCFbpwsQR7oEy8eHHZwuGQsNpEtNC2G/L8Yka0BIBzv7dEgrPzIu+W3anZXQW4702+uES
+	U29G8TP/NGfXRRHGlbBIH9KNUnOSUD2vRtpOLXkWsV5CN6vQFYgQfFvmp5ZpPeUe6xNplu8V
+	mcTw8OSEDW/ZnxJc8TekCKZSpdzYoxfzjm7xGmZqB18VFwgJZlIibt1HE0EB4w5GsD7x5ekh
+	awIe3RwoZgZDLQMdOitJ1tUc8aqaxvgA4tz6J6st8D8pS//m1gAoYJWGwwIVj1DjTYLtABEB
+	AAG0HU1heCBSZWl0eiA8bXJlaXR6QHJlZGhhdC5jb20+iQFTBBMBCAA9AhsDBQkSzAMABQsJ
+	CAcCBhUICQoLAgQWAgMBAh4BAheABQJVzie5FRhoa3A6Ly9rZXlzLmdudXBnLm5ldAAKCRD0
+	B9sAYdXPQDcIB/9uNkbYEex1rHKz3mr12uxYMwLOOFY9fstP5aoVJQ1nWQVB6m2cfKGdcRe1
+	2/nFaHSNAzT0NnKz2MjhZVmcrpyd2Gp2QyISCfb1FbT82GMtXFj1wiHmPb3CixYmWGQUUh+I
+	AvUqsevLA+WihgBUyaJq/vuDVM1/K9Un+w+Tz5vpeMidlIsTYhcsMhn0L9wlCjoucljvbDy/
+	8C9L2DUdgi3XTa0ORKeflUhdL4gucWoAMrKX2nmPjBMKLgU7WLBc8AtV+84b9OWFML6NEyo4
+	4cP7cM/07VlJK53pqNg5cHtnWwjHcbpGkQvx6RUx6F1My3y52vM24rNUA3+ligVEgPYBuQEN
+	BFXOJlcBCADAmcVUNTWT6yLWQHvxZ0o47KCP8OcLqD+67T0RCe6d0LP8GsWtrJdeDIQk+T+F
+	xO7DolQPS6iQ6Ak2/lJaPX8L0BkEAiMuLCKFU6Bn3lFOkrQeKp3u05wCSV1iKnhg0UPji9V2
+	W5eNfy8F4ZQHpeGUGy+liGXlxqkeRVhLyevUqfU0WgNqAJpfhHSGpBgihUupmyUg7lfUPeRM
+	DzAN1pIqoFuxnN+BRHdAecpsLcbR8sQddXmDg9BpSKozO/JyBmaS1RlquI8HERQoe6EynJhd
+	64aICHDfj61rp+/0jTIcevxIIAzW70IadoS/y3DVIkuhncgDBvGbF3aBtjrJVP+5ABEBAAGJ
+	ASUEGAEIAA8FAlXOJlcCGwwFCRLMAwAACgkQ9AfbAGHVz0CbFwf9F/PXxQR9i4N0iipISYjU
+	sxVdjJOM2TMut+ZZcQ6NSMvhZ0ogQxJ+iEQ5OjnIputKvPVd5U7WRh+4lF1lB/NQGrGZQ1ic
+	alkj6ocscQyFwfib+xIe9w8TG1CVGkII7+TbS5pXHRxZH1niaRpoi/hYtgzkuOPp35jJyqT/
+	/ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
+	bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
+	R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
+Message-ID: <44be7ef0-9a4f-4c44-44eb-81f341ca7ea6@redhat.com>
+Date: Mon, 29 Apr 2019 18:37:48 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+	Thunderbird/60.6.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
-Content-Disposition: inline
-In-Reply-To: <2b63d983-a622-3bec-e6ac-abfd024e19c0@amd.com>
-User-Agent: Mutt/1.10.1 (2018-07-13)
+In-Reply-To: <20190402153730.54145-8-vsementsov@virtuozzo.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="JXdF4KU0CfyKBVC4L3MRCZcbyEEsggoWF"
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+	(mx1.redhat.com [10.5.110.26]);
+	Mon, 29 Apr 2019 16:37:54 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 5.9.137.197
-Subject: Re: [Qemu-devel] [RFC PATCH v1 01/10] KVM: SVM: Add KVM_SEV
- SEND_START command
+X-Received-From: 209.132.183.28
+X-Content-Filtered-By: Mailman/MimeDel 2.1.21
+Subject: Re: [Qemu-devel] [PATCH v5 07/10] qcow2: qcow2_co_preadv: improve
+ locking
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -79,38 +101,87 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "Lendacky, Thomas" <Thomas.Lendacky@amd.com>,
-	"kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-	Radim =?utf-8?B?S3LEjW3DocWZ?= <rkrcmar@redhat.com>,
-	Joerg Roedel <joro@8bytes.org>, "x86@kernel.org" <x86@kernel.org>,
-	"qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	Ingo Molnar <mingo@redhat.com>, "H. Peter Anvin" <hpa@zytor.com>,
-	Paolo Bonzini <pbonzini@redhat.com>, Thomas Gleixner <tglx@linutronix.de>
+Cc: kwolf@redhat.com, pbonzini@redhat.com, berto@igalia.com, den@openvz.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190429163602.OxKNqxJ28gfg1EhB_33BErT6pTmorQWLW84zoZIHpGQ@z>
+Message-ID: <20190429163748.fh2ZJZTxqcj6zF3jYrUzSYFyDS2Zh0YY_gwMcwZRUsY@z>
 
-On Mon, Apr 29, 2019 at 03:01:24PM +0000, Singh, Brijesh wrote:
-> Practically I don't see any reason why caller would do that but
-> theoretically it can. If we cache the len then we also need to consider
-> adding another flag to hint whether userspace ever requested length.
-> e.g an application can compute the length of session blob by looking at
-> the API version and spec and may never query the length.
-> 
-> > I mean I'm still thinking defensively here but maybe the only thing that
-> > would happen here with a bigger buffer is if the kmalloc() would fail,
-> > leading to eventual failure of the migration.
-> > 
-> > If the code limits the allocation to some sane max length, the migration
-> > won't fail even if userspace gives it too big values...
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--JXdF4KU0CfyKBVC4L3MRCZcbyEEsggoWF
+From: Max Reitz <mreitz@redhat.com>
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
+ qemu-devel@nongnu.org, qemu-block@nongnu.org
+Cc: kwolf@redhat.com, berto@igalia.com, pbonzini@redhat.com, den@openvz.org,
+ berrange@redhat.com
+Message-ID: <44be7ef0-9a4f-4c44-44eb-81f341ca7ea6@redhat.com>
+Subject: Re: [PATCH v5 07/10] qcow2: qcow2_co_preadv: improve locking
+References: <20190402153730.54145-1-vsementsov@virtuozzo.com>
+ <20190402153730.54145-8-vsementsov@virtuozzo.com>
+In-Reply-To: <20190402153730.54145-8-vsementsov@virtuozzo.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-So what about this? Limiting to a sane length...
+On 02.04.19 17:37, Vladimir Sementsov-Ogievskiy wrote:
+> Background: decryption will be done in threads, to take benefit of it,
+> we should move it out of the lock first.
 
--- 
-Regards/Gruss,
-    Boris.
+=2E..which is safe after your commit c972fa123c73501b4, I presume.
 
-Good mailing practices for 400: avoid top-posting and trim the reply.
+(At first glance, the patched looked a bit weird to me because it
+doesn't give a reason why dropping the lock around
+qcrypto_block_decrypt() would be OK.)
+
+> But let's go further: it turns out, that for locking around switch
+> cases we have only two variants: when we just do memset(0) not
+> releasing the lock (it is useless) and when we actually can handle the
+> whole case out of the lock. So, refactor the whole thing to reduce
+> locked code region and make it clean.
+>=20
+> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+> Reviewed-by: Alberto Garcia <berto@igalia.com>
+> ---
+>  block/qcow2.c | 46 ++++++++++++++++++++++------------------------
+>  1 file changed, 22 insertions(+), 24 deletions(-)
+>=20
+> diff --git a/block/qcow2.c b/block/qcow2.c
+> index 46e8e39da5..fcf92a7eb6 100644
+> --- a/block/qcow2.c
+> +++ b/block/qcow2.c
+> @@ -1983,6 +1983,7 @@ static coroutine_fn int qcow2_co_preadv(BlockDriv=
+erState *bs, uint64_t offset,
+> =20
+>          ret =3D qcow2_get_cluster_offset(bs, offset, &cur_bytes, &clus=
+ter_offset);
+
+Isn't this the only function in the loop that actually needs the lock?
+Wouldn't it make more sense to just take it around this call?
+
+Max
+
+>          if (ret < 0) {
+> +            qemu_co_mutex_unlock(&s->lock);
+>              goto fail;
+>          }
+> =20
+
+
+--JXdF4KU0CfyKBVC4L3MRCZcbyEEsggoWF
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAlzHKF0ACgkQ9AfbAGHV
+z0A+9QgAtIBFhVDZ5ETQW6JEvtyg7d89UEJ2DNsQYi3I1TRq17mjE2AByIikcMgv
+yfiMRh5k9IHjMq4296Ilsu5ijwswPtMIgwDFcDVe5MyH/HeexICVT3J0eWbS3kZ8
+sdYJQRTTMAaKl2yS5CrxCqiOup1CtT//71Hk5w4CvYHaAejQPpqgEc4IdCb07jCr
+ThhAFueMelTBl7Rhx5bKT7MgNwlG7GiYshTlyGDUSyTSEdK+Tahdxi5JAREkyG5L
+/6C+69sk+UQe6JIZ10W7072NXItcCs0fZZh6eDFrFJYnzY6FYuGy/AyS0I02kk3B
+RibeNLKZdFpBpAyuElIjazFYdC0wDQ==
+=YJY7
+-----END PGP SIGNATURE-----
+
+--JXdF4KU0CfyKBVC4L3MRCZcbyEEsggoWF--
 
