@@ -1,27 +1,29 @@
-Received: from eggs.gnu.org ([209.51.188.92]:55812)
+Received: from eggs.gnu.org ([209.51.188.92]:57936)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <sgarzare@redhat.com>) id 1hL95r-0000pV-JZ
-	for qemu-devel@nongnu.org; Mon, 29 Apr 2019 12:25:28 -0400
+	(envelope-from <bp@alien8.de>) id 1hL9GI-0004hp-LV
+	for qemu-devel@nongnu.org; Mon, 29 Apr 2019 12:36:15 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <sgarzare@redhat.com>) id 1hL95p-0006Ir-Kv
-	for qemu-devel@nongnu.org; Mon, 29 Apr 2019 12:25:27 -0400
-Received: from mail-wr1-f65.google.com ([209.85.221.65]:35147)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <sgarzare@redhat.com>) id 1hL95p-0006I4-DJ
-	for qemu-devel@nongnu.org; Mon, 29 Apr 2019 12:25:25 -0400
-Received: by mail-wr1-f65.google.com with SMTP id f7so8450060wrs.2
-	for <qemu-devel@nongnu.org>; Mon, 29 Apr 2019 09:25:23 -0700 (PDT)
-Date: Mon, 29 Apr 2019 18:25:19 +0200
-From: Stefano Garzarella <sgarzare@redhat.com>
-Message-ID: <20190429162519.s7twbo5jiiylzdfj@steredhat>
-References: <155619222209.13917.4120344041326080857.malonedeb@gac.canonical.com>
-	<20190429154733.GA13640@stefanha-x1.localdomain>
+	(envelope-from <bp@alien8.de>) id 1hL9GH-0002hE-JH
+	for qemu-devel@nongnu.org; Mon, 29 Apr 2019 12:36:14 -0400
+Received: from mail.skyhub.de ([5.9.137.197]:56048)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <bp@alien8.de>) id 1hL9GH-0002dK-2V
+	for qemu-devel@nongnu.org; Mon, 29 Apr 2019 12:36:13 -0400
+Date: Mon, 29 Apr 2019 18:36:02 +0200
+From: Borislav Petkov <bp@alien8.de>
+Message-ID: <20190429163602.GE2324@zn.tnic>
+References: <20190424160942.13567-1-brijesh.singh@amd.com>
+	<20190424160942.13567-2-brijesh.singh@amd.com>
+	<20190426141042.GF4608@zn.tnic>
+	<e6f8da38-b8dd-a9c5-a358-5f33b6ea7b37@amd.com>
+	<20190426204327.GM4608@zn.tnic>
+	<2b63d983-a622-3bec-e6ac-abfd024e19c0@amd.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20190429154733.GA13640@stefanha-x1.localdomain>
-Subject: Re: [Qemu-devel] [Bug 1826393] [NEW] QEMU 3.1.0 stuck waiting for
- 800ms (5 times slower) in pre-bios phase
+In-Reply-To: <2b63d983-a622-3bec-e6ac-abfd024e19c0@amd.com>
+Subject: Re: [Qemu-devel] [RFC PATCH v1 01/10] KVM: SVM: Add KVM_SEV
+ SEND_START command
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,25 +32,27 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Bug 1826393 <1826393@bugs.launchpad.net>
-Cc: Stefan Hajnoczi <stefanha@gmail.com>, qemu-devel@nongnu.org, kraxel@redhat.com
+To: "Singh, Brijesh" <brijesh.singh@amd.com>
+Cc: "kvm@vger.kernel.org" <kvm@vger.kernel.org>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>, "H. Peter Anvin" <hpa@zytor.com>, Paolo Bonzini <pbonzini@redhat.com>, Radim =?utf-8?B?S3LEjW3DocWZ?= <rkrcmar@redhat.com>, Joerg Roedel <joro@8bytes.org>, "Lendacky, Thomas" <Thomas.Lendacky@amd.com>, "x86@kernel.org" <x86@kernel.org>, "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
 
-On Mon, Apr 29, 2019 at 11:47:33AM -0400, Stefan Hajnoczi wrote:
-> On Thu, Apr 25, 2019 at 11:37:02AM -0000, Waldemar Kozaczuk wrote:
+On Mon, Apr 29, 2019 at 03:01:24PM +0000, Singh, Brijesh wrote:
+> Practically I don't see any reason why caller would do that but
+> theoretically it can. If we cache the len then we also need to consider
+> adding another flag to hint whether userspace ever requested length.
+> e.g an application can compute the length of session blob by looking at
+> the API version and spec and may never query the length.
 > 
-> Please try building QEMU 4.0.0 from source:
-> 
->   https://download.qemu.org/qemu-4.0.0.tar.xz
-> 
+> > I mean I'm still thinking defensively here but maybe the only thing that
+> > would happen here with a bigger buffer is if the kmalloc() would fail,
+> > leading to eventual failure of the migration.
+> > 
+> > If the code limits the allocation to some sane max length, the migration
+> > won't fail even if userspace gives it too big values...
 
-It seems that is related to an issue with some TPM timeouts found in
-SeaBIOS 1.12.0:
-https://www.mail-archive.com/qemu-devel@nongnu.org/msg575060.html
+So what about this? Limiting to a sane length...
 
-As Stefan suggested the new QEMU 4.0.0 should not have this issue since
-it is shipped with SeaBIOS 1.12.1 (where the fix is applied).
+-- 
+Regards/Gruss,
+    Boris.
 
-If you want to use QEMU 3.1.0 with the new SeaBIOS, you can download it
-and use the '-bios' parameter:
-    $ wget https://github.com/qemu/qemu/blob/v4.0.0/pc-bios/bios-256k.bin
-    $ qemu-system-x86_64 -bios /path/to/bios-256k.bin ...
+Good mailing practices for 400: avoid top-posting and trim the reply.
