@@ -1,32 +1,28 @@
-Received: from eggs.gnu.org ([209.51.188.92]:55792)
+Received: from eggs.gnu.org ([209.51.188.92]:57386)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jjherne@linux.ibm.com>) id 1hL62b-0006c4-69
-	for qemu-devel@nongnu.org; Mon, 29 Apr 2019 09:09:54 -0400
+	(envelope-from <thuth@redhat.com>) id 1hL6Af-0000Js-KT
+	for qemu-devel@nongnu.org; Mon, 29 Apr 2019 09:18:14 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jjherne@linux.ibm.com>) id 1hL62Y-0008Sa-GD
-	for qemu-devel@nongnu.org; Mon, 29 Apr 2019 09:09:53 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:48050)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <jjherne@linux.ibm.com>)
-	id 1hL62Y-0008R0-5m
-	for qemu-devel@nongnu.org; Mon, 29 Apr 2019 09:09:50 -0400
-Received: from pps.filterd (m0098399.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id
-	x3TD4b28093327
-	for <qemu-devel@nongnu.org>; Mon, 29 Apr 2019 09:09:46 -0400
-Received: from e33.co.us.ibm.com (e33.co.us.ibm.com [32.97.110.151])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2s60w0tt73-1
-	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Mon, 29 Apr 2019 09:09:46 -0400
-Received: from localhost
-	by e33.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
-	Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <jjherne@linux.ibm.com>;
-	Mon, 29 Apr 2019 14:09:45 +0100
-From: "Jason J. Herne" <jjherne@linux.ibm.com>
-Date: Mon, 29 Apr 2019 09:09:41 -0400
-Message-Id: <1556543381-12671-1-git-send-email-jjherne@linux.ibm.com>
-Subject: [Qemu-devel] [PATCH] s390-bios: Skip bootmap signature entries
+	(envelope-from <thuth@redhat.com>) id 1hL6Ae-0004uB-AB
+	for qemu-devel@nongnu.org; Mon, 29 Apr 2019 09:18:13 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:60940)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1hL6Ae-0004tR-1x
+	for qemu-devel@nongnu.org; Mon, 29 Apr 2019 09:18:12 -0400
+References: <20190424140643.62457-1-liq3ea@163.com>
+	<2b623811-1be2-159c-0fa6-c548aa9eea82@redhat.com>
+	<CAKXe6SLXrthYFrQGVQNT4hK1-22wrteMNyygZgx_j=jtDfYC6g@mail.gmail.com>
+	<CAKXe6SL8XWMg1x8qztepjypgqdmXpZDj0G0AHU+BLV8OsbRjOg@mail.gmail.com>
+From: Thomas Huth <thuth@redhat.com>
+Message-ID: <b1d3be69-a315-d990-45bc-daa02036b887@redhat.com>
+Date: Mon, 29 Apr 2019 15:18:02 +0200
+MIME-Version: 1.0
+In-Reply-To: <CAKXe6SL8XWMg1x8qztepjypgqdmXpZDj0G0AHU+BLV8OsbRjOg@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v2 0/5] fw_cfg_test refactor and add two
+ test cases
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,84 +31,117 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org, qemu-s390x@nongnu.org, cohuck@redhat.com, thuth@redhat.com, alifm@linux.ibm.com, borntraeger@de.ibm.com
+To: Li Qiang <liq3ea@gmail.com>
+Cc: Li Qiang <liq3ea@163.com>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>, Laszlo Ersek <lersek@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>, lvivier@redhat.com, Paolo Bonzini <pbonzini@redhat.com>, Qemu Developers <qemu-devel@nongnu.org>
 
-Newer versions of zipl have the ability to write signature entries to the boot
-script for secure boot. We don't yet support secure boot, but we need to skip
-over signature entries while reading the boot script in order to maintain our
-ability to boot guest operating systems that have a secure bootloader.
+On 29/04/2019 07.09, Li Qiang wrote:
+>=20
+>=20
+> Li Qiang <liq3ea@gmail.com <mailto:liq3ea@gmail.com>> =E4=BA=8E2019=E5=B9=
+=B44=E6=9C=8825=E6=97=A5=E5=91=A8
+> =E5=9B=9B =E4=B8=8B=E5=8D=8810:29=E5=86=99=E9=81=93=EF=BC=9A
+>=20
+>=20
+>=20
+>     Thomas Huth <thuth@redhat.com <mailto:thuth@redhat.com>> =E4=BA=8E2=
+019=E5=B9=B44=E6=9C=88
+>     25=E6=97=A5=E5=91=A8=E5=9B=9B =E4=B8=8B=E5=8D=885:57=E5=86=99=E9=81=
+=93=EF=BC=9A
+>=20
+>         On 24/04/2019 16.06, Li Qiang wrote:
+>         > In the disscuss of adding reboot timeout test case:
+>         >
+>         https://lists.gnu.org/archive/html/qemu-devel/2019-04/msg03304.=
+html
+>         >
+>         > Philippe suggested we should uses the only related option for=
+ one
+>         > specific test. However currently we uses one QTestState for
+>         all the
+>         > test cases. In order to achieve Philippe's idea, I split the
+>         test case
+>         > for its own QTestState. As this patchset has changed a lot, I
+>         don't bump
+>         > the version.
+>         >
+>         > Change since v1:
+>         > Add a patch to store the reboot_timeout as little endian
+>         > Fix the endian issue per Thomas's review
+>=20
+>         The test still aborts on a big endian host:
+>=20
+>         $ QTEST_QEMU_BINARY=3Dx86_64-softmmu/qemu-system-x86_64
+>         tests/fw_cfg-test
+>         /x86_64/fw_cfg/signature: OK
+>         /x86_64/fw_cfg/id: OK
+>         /x86_64/fw_cfg/uuid: OK
+>         /x86_64/fw_cfg/ram_size: OK
+>         /x86_64/fw_cfg/nographic: OK
+>         /x86_64/fw_cfg/nb_cpus: OK
+>         /x86_64/fw_cfg/max_cpus: OK
+>         /x86_64/fw_cfg/numa: OK
+>         /x86_64/fw_cfg/boot_menu: OK
+>         /x86_64/fw_cfg/reboot_timeout: **
+>         ERROR:/home/thuth/devel/qemu/tests/fw_cfg-test.c:190:test_fw_cf=
+g_reboot_timeout:
+>         assertion failed (reboot_timeout =3D=3D 15): (251658240 =3D=3D =
+15)
+>         Aborted
+>=20
+>         251658240 is 0x0F000000, i.e. a byte-swapped 0xf =3D 15 ... i.e=
+.
+>         you still
+>         got an endianess issue somewhere in the code.
+>=20
+>=20
+>=20
+>     Hmmmm,
+>=20
+>     I have thought a long time, still can't point where is wrong.
+>=20
+>     Let's from the result:=C2=A0
+>     0x0f000000 in the big endian laid as this:
+>     low ---> high
+>     0x0f 00 00 00
+>=20
+>     As I have swapped before the compare so it is read as this:
+>     low ---> high
+>     00 00 00 0x0f
+>=20
+>     However from the store side:
+>     the 15 in big endian is:
+>     low ---> high
+>     00 00 00 0x0f
+>=20
+>     But Before I store it, I convert it to little endian, so following
+>     should be stored:
+>     low ---> high
+>     0x0f 00 00 00
+>=20
+>     Do you apply the patch 3 and recompile the qemu binary?
+>=20
+>=20
+>=20
+> Hello Thomas,=C2=A0
+> I have tested again this and just store it as big endian(so that the
+> store/load has different endianness),=C2=A0
+> I don't see any error.=C2=A0
 
-Signed-off-by: Jason J. Herne <jjherne@linux.ibm.com>
-Reviewed-by: Farhan Ali <alifm@linux.ibm.com>
----
- pc-bios/s390-ccw/bootmap.c | 19 +++++++++++++++++--
- pc-bios/s390-ccw/bootmap.h | 10 ++++++----
- 2 files changed, 23 insertions(+), 6 deletions(-)
+Uh, now this is embarrassing... I just tried again to see whether I
+could find the issue, but now the test passes without problems!
+I guess I simply only did a "make tests/fw_cfg-test" before and forgot
+to recompile qemu itself. Big sorry for this!
 
-diff --git a/pc-bios/s390-ccw/bootmap.c b/pc-bios/s390-ccw/bootmap.c
-index 7aef65a..d13b7cb 100644
---- a/pc-bios/s390-ccw/bootmap.c
-+++ b/pc-bios/s390-ccw/bootmap.c
-@@ -254,7 +254,14 @@ static void run_eckd_boot_script(block_number_t bmt_block_nr,
-     memset(sec, FREE_SPACE_FILLER, sizeof(sec));
-     read_block(block_nr, sec, "Cannot read Boot Map Script");
- 
--    for (i = 0; bms->entry[i].type == BOOT_SCRIPT_LOAD; i++) {
-+    for (i = 0; bms->entry[i].type == BOOT_SCRIPT_LOAD ||
-+                bms->entry[i].type == BOOT_SCRIPT_SIGNATURE; i++) {
-+
-+        /* We don't support secure boot yet, so we skip signature entries */
-+        if (bms->entry[i].type == BOOT_SCRIPT_SIGNATURE) {
-+            continue;
-+        }
-+
-         address = bms->entry[i].address.load_address;
-         block_nr = eckd_block_num(&bms->entry[i].blkptr.xeckd.bptr.chs);
- 
-@@ -489,7 +496,15 @@ static void zipl_run(ScsiBlockPtr *pte)
- 
-     /* Load image(s) into RAM */
-     entry = (ComponentEntry *)(&header[1]);
--    while (entry->component_type == ZIPL_COMP_ENTRY_LOAD) {
-+    while (entry->component_type == ZIPL_COMP_ENTRY_LOAD ||
-+           entry->component_type == ZIPL_COMP_ENTRY_SIGNATURE) {
-+
-+        /* We don't support secure boot yet, so we skip signature entries */
-+        if (entry->component_type == ZIPL_COMP_ENTRY_SIGNATURE) {
-+            entry++;
-+            continue;
-+        }
-+
-         zipl_load_segment(entry);
- 
-         entry++;
-diff --git a/pc-bios/s390-ccw/bootmap.h b/pc-bios/s390-ccw/bootmap.h
-index a085212..94f53a5 100644
---- a/pc-bios/s390-ccw/bootmap.h
-+++ b/pc-bios/s390-ccw/bootmap.h
-@@ -98,8 +98,9 @@ typedef struct ScsiMbr {
- #define ZIPL_COMP_HEADER_IPL    0x00
- #define ZIPL_COMP_HEADER_DUMP   0x01
- 
--#define ZIPL_COMP_ENTRY_LOAD    0x02
--#define ZIPL_COMP_ENTRY_EXEC    0x01
-+#define ZIPL_COMP_ENTRY_EXEC      0x01
-+#define ZIPL_COMP_ENTRY_LOAD      0x02
-+#define ZIPL_COMP_ENTRY_SIGNATURE 0x03
- 
- typedef struct XEckdMbr {
-     uint8_t magic[4];   /* == "xIPL"        */
-@@ -117,8 +118,9 @@ typedef struct BootMapScriptEntry {
-     BootMapPointer blkptr;
-     uint8_t pad[7];
-     uint8_t type;   /* == BOOT_SCRIPT_* */
--#define BOOT_SCRIPT_EXEC 0x01
--#define BOOT_SCRIPT_LOAD 0x02
-+#define BOOT_SCRIPT_EXEC      0x01
-+#define BOOT_SCRIPT_LOAD      0x02
-+#define BOOT_SCRIPT_SIGNATURE 0x03
-     union {
-         uint64_t load_address;
-         uint64_t load_psw;
--- 
-2.7.4
+Anyway, patch series works fine for me, so for the series:
+
+Tested-by: Thomas Huth <thuth@redhat.com>
+
+> Also, can we add these test=C2=A0sceneries(big-endian host) in our CI? =
+so
+> that the bot can report for every commit.
+
+Patchew only runs on x86, but Peter has some big endian hosts for his
+acceptance tests - so problems should be found during PULL requests at
+least.
+
+ Thomas
