@@ -2,49 +2,55 @@ Return-Path: <SRS0=sEuR=S7=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1BFD9C43219
-	for <qemu-devel@archiver.kernel.org>; Mon, 29 Apr 2019 10:25:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D0E3AC43219
+	for <qemu-devel@archiver.kernel.org>; Mon, 29 Apr 2019 10:26:55 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D29E62147A
-	for <qemu-devel@archiver.kernel.org>; Mon, 29 Apr 2019 10:25:04 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D29E62147A
+	by mail.kernel.org (Postfix) with ESMTPS id 7E1EA2087B
+	for <qemu-devel@archiver.kernel.org>; Mon, 29 Apr 2019 10:26:55 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7E1EA2087B
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:55247 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:55305 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hL3T6-000800-29
-	for qemu-devel@archiver.kernel.org; Mon, 29 Apr 2019 06:25:04 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:48482)
+	id 1hL3Us-0001ng-NM
+	for qemu-devel@archiver.kernel.org; Mon, 29 Apr 2019 06:26:54 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:48530)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1hL3R6-0006df-MV
-	for qemu-devel@nongnu.org; Mon, 29 Apr 2019 06:23:01 -0400
+	(envelope-from <david@redhat.com>) id 1hL3R9-0006gF-Ch
+	for qemu-devel@nongnu.org; Mon, 29 Apr 2019 06:23:04 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1hL3Mu-0006rF-Qj
-	for qemu-devel@nongnu.org; Mon, 29 Apr 2019 06:18:41 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:56134)
+	(envelope-from <david@redhat.com>) id 1hL3Kn-0005oO-Qe
+	for qemu-devel@nongnu.org; Mon, 29 Apr 2019 06:16:30 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:33743)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <david@redhat.com>)
-	id 1hL3Mu-0006qt-Id; Mon, 29 Apr 2019 06:18:40 -0400
+	id 1hL3Kn-0005na-IT; Mon, 29 Apr 2019 06:16:29 -0400
 Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
 	[10.5.11.15])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id BF2343082162;
-	Mon, 29 Apr 2019 10:18:39 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id 96E50C0B2004;
+	Mon, 29 Apr 2019 10:16:26 +0000 (UTC)
 Received: from [10.36.118.17] (unknown [10.36.118.17])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id 99F945D71D;
-	Mon, 29 Apr 2019 10:18:34 +0000 (UTC)
+	by smtp.corp.redhat.com (Postfix) with ESMTP id 4EFD85D71D;
+	Mon, 29 Apr 2019 10:16:23 +0000 (UTC)
 To: Christian Borntraeger <borntraeger@de.ibm.com>,
 	Cornelia Huck <cohuck@redhat.com>
-References: <20190429090250.7648-1-borntraeger@de.ibm.com>
-	<20190429090250.7648-9-borntraeger@de.ibm.com>
+References: <20190426111003.21246-1-borntraeger@de.ibm.com>
+	<20190426111003.21246-11-borntraeger@de.ibm.com>
+	<71955bba-ef04-1677-b7f0-bb1675bad12a@redhat.com>
+	<07252560-1eed-8fd5-ee94-6bcea6cf99bc@de.ibm.com>
+	<10d43e6e-ee8c-cd65-e724-354e0f40c79f@redhat.com>
+	<057d438c-2062-1aa7-887a-918f076911c5@de.ibm.com>
+	<93f0ecac-47cc-c791-9e32-ad5743489bf3@redhat.com>
+	<20190426145506.409b53cf.cohuck@redhat.com>
+	<7157e9b3-4432-32cc-9327-22e0d0124987@de.ibm.com>
 From: David Hildenbrand <david@redhat.com>
 Openpgp: preference=signencrypt
 Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
@@ -91,22 +97,23 @@ Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
 	+8Umfre0Xt4713VxMygW0PnQt5aSQdMD58jHFxTk092mU+yIHj5LeYgvwSgZN4airXk5yRXl
 	SE+xAvmumFBY
 Organization: Red Hat GmbH
-Message-ID: <87f1441f-f081-e693-065c-b930fba588da@redhat.com>
-Date: Mon, 29 Apr 2019 12:18:32 +0200
+Message-ID: <fcf4a57e-efa5-557e-e38a-6ad2c253ef14@redhat.com>
+Date: Mon, 29 Apr 2019 12:16:22 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
 	Thunderbird/60.6.1
 MIME-Version: 1.0
-In-Reply-To: <20190429090250.7648-9-borntraeger@de.ibm.com>
+In-Reply-To: <7157e9b3-4432-32cc-9327-22e0d0124987@de.ibm.com>
 Content-Type: text/plain; charset="UTF-8"
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.47]);
-	Mon, 29 Apr 2019 10:18:39 +0000 (UTC)
+	(mx1.redhat.com [10.5.110.31]);
+	Mon, 29 Apr 2019 10:16:26 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH v3 8/9] s390x/cpumodel: add gen15 defintions
+Subject: Re: [Qemu-devel] [qemu-s390x] [PATCH v2 10/10] s390x/cpumodel: wire
+ up 8561 and 8562 as gen15 machines
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -125,114 +132,13 @@ Cc: "Jason J . Herne" <jjherne@linux.ibm.com>,
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190429101832.dlciRxIGmQ5D2gXxX84vAlCBl3BvhKy8K9O3EUtzRSY@z>
+Message-ID: <20190429101622.NW-qjBYNunHcPMf3wMCU8OjaA4dZt69S7ELe_iLzVoQ@z>
 
-On 29.04.19 11:02, Christian Borntraeger wrote:
-> add several new features (msa9, sort, deflate, additional vector
-> instructions, new general purpose instructions) to generation 15.
-> 
-> Also disable csske and bpb from the default and base models >=15.
-> This will allow to migrate gen15 machines to future machines that
-> do not have these features.
-> 
-> Signed-off-by: Christian Borntraeger <borntraeger@de.ibm.com>
-> ---
->  target/s390x/gen-features.c | 37 +++++++++++++++++++++++++++++++++++++
->  1 file changed, 37 insertions(+)
-> 
-> diff --git a/target/s390x/gen-features.c b/target/s390x/gen-features.c
-> index 8fc2e8e72f..c346b76bdf 100644
-> --- a/target/s390x/gen-features.c
-> +++ b/target/s390x/gen-features.c
-> @@ -13,6 +13,7 @@
->  
->  #include <inttypes.h>
->  #include <stdio.h>
-> +#include <string.h>
->  #include "cpu_features_def.h"
->  
->  #define ARRAY_SIZE(array) (sizeof(array) / sizeof(array[0]))
-> @@ -419,6 +420,10 @@ static uint16_t base_GEN14_GA1[] = {
->  
->  #define base_GEN14_GA2 EmptyFeat
->  
-> +static uint16_t base_GEN15_GA1[] = {
-> +    S390_FEAT_MISC_INSTRUCTION_EXT3,
-> +};
-> +
->  /* Full features (in order of release)
->   * Automatically includes corresponding base features.
->   * Full features are all features this hardware supports even if kvm/QEMU do not
-> @@ -548,6 +553,16 @@ static uint16_t full_GEN14_GA1[] = {
->  
->  #define full_GEN14_GA2 EmptyFeat
->  
-> +static uint16_t full_GEN15_GA1[] = {
-> +    S390_FEAT_VECTOR_ENH2,
-> +    S390_FEAT_GROUP_ENH_SORT,
-> +    S390_FEAT_GROUP_DEFLATE_CONVERSION,
-> +    S390_FEAT_VECTOR_BCD_ENH,
-> +    S390_FEAT_GROUP_MSA_EXT_9,
-> +    S390_FEAT_GROUP_MSA_EXT_9_PCKMO,
-> +    S390_FEAT_ETOKEN,
-> +};
-> +
->  /* Default features (in order of release)
->   * Automatically includes corresponding base features.
->   * Default features are all features this version of QEMU supports for this
-> @@ -624,6 +639,16 @@ static uint16_t default_GEN14_GA1[] = {
->  
->  #define default_GEN14_GA2 EmptyFeat
->  
-> +static uint16_t default_GEN15_GA1[] = {
-> +    S390_FEAT_VECTOR_ENH2,
-> +    S390_FEAT_GROUP_ENH_SORT,
-> +    S390_FEAT_GROUP_DEFLATE_CONVERSION,
-> +    S390_FEAT_VECTOR_BCD_ENH,
-> +    S390_FEAT_GROUP_MSA_EXT_9,
-> +    S390_FEAT_GROUP_MSA_EXT_9_PCKMO,
-> +    S390_FEAT_ETOKEN,
-> +};
-> +
->  /* QEMU (CPU model) features */
->  
->  static uint16_t qemu_V2_11[] = {
-> @@ -740,6 +765,7 @@ static CpuFeatDefSpec CpuFeatDef[] = {
->      CPU_FEAT_INITIALIZER(GEN13_GA2),
->      CPU_FEAT_INITIALIZER(GEN14_GA1),
->      CPU_FEAT_INITIALIZER(GEN14_GA2),
-> +    CPU_FEAT_INITIALIZER(GEN15_GA1),
->  };
->  
->  #define FEAT_GROUP_INITIALIZER(_name)                  \
-> @@ -808,6 +834,11 @@ static void set_bits(uint64_t list[], BitSpec bits)
->      }
->  }
->  
-> +static inline void clear_bit(uint64_t list[], unsigned long nr)
-> +{
-> +    list[nr / 64] &= ~(1ULL << (nr % 64));
-> +}
-> +
->  static void print_feature_defs(void)
->  {
->      uint64_t base_feat[S390_FEAT_MAX / 64 + 1] = {};
-> @@ -818,6 +849,12 @@ static void print_feature_defs(void)
->      printf("\n/* CPU model feature list data */\n");
->  
->      for (i = 0; i < ARRAY_SIZE(CpuFeatDef); i++) {
-> +        /* With gen15 CSSKE and BPB are deprecated */
-> +        if (strcmp(CpuFeatDef[i].name, "S390_FEAT_LIST_GEN15_GA1") == 0) {
-> +            clear_bit(base_feat, S390_FEAT_CONDITIONAL_SSKE);
-> +            clear_bit(default_feat, S390_FEAT_CONDITIONAL_SSKE);
-> +            clear_bit(default_feat, S390_FEAT_BPB);
-> +        }
->          set_bits(base_feat, CpuFeatDef[i].base_bits);
->          /* add the base to the default features */
->          set_bits(default_feat, CpuFeatDef[i].base_bits);
+> I dont think that I know the name in time before the next release.
+> So lets go with gen15a/gen15b or 8561/8562?
 > 
 
-Reviewed-by: David Hildenbrand <david@redhat.com>
+We can still fixup if the names happen to be known earlier.
 
 -- 
 
