@@ -1,31 +1,31 @@
-Received: from eggs.gnu.org ([209.51.188.92]:51453)
+Received: from eggs.gnu.org ([209.51.188.92]:55847)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1hL1M0-0005TK-9C
-	for qemu-devel@nongnu.org; Mon, 29 Apr 2019 04:09:37 -0400
+	(envelope-from <bounces@canonical.com>) id 1hL1lz-0002UF-SW
+	for qemu-devel@nongnu.org; Mon, 29 Apr 2019 04:36:29 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1hL18Z-0003zV-15
-	for qemu-devel@nongnu.org; Mon, 29 Apr 2019 03:55:44 -0400
-Received: from indium.canonical.com ([91.189.90.7]:48578)
+	(envelope-from <bounces@canonical.com>) id 1hL1gV-0001kQ-3A
+	for qemu-devel@nongnu.org; Mon, 29 Apr 2019 04:30:48 -0400
+Received: from indium.canonical.com ([91.189.90.7]:56054)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1hL18Y-0003wk-RX
-	for qemu-devel@nongnu.org; Mon, 29 Apr 2019 03:55:42 -0400
+	id 1hL1gU-0001ha-TP
+	for qemu-devel@nongnu.org; Mon, 29 Apr 2019 04:30:47 -0400
 Received: from loganberry.canonical.com ([91.189.90.37])
 	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1hL18W-0006cM-S7
-	for <qemu-devel@nongnu.org>; Mon, 29 Apr 2019 07:55:40 +0000
+	id 1hL1gT-0002a5-FJ
+	for <qemu-devel@nongnu.org>; Mon, 29 Apr 2019 08:30:45 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id C3B782E80CB
-	for <qemu-devel@nongnu.org>; Mon, 29 Apr 2019 07:55:40 +0000 (UTC)
+	by loganberry.canonical.com (Postfix) with ESMTP id 728092E80CD
+	for <qemu-devel@nongnu.org>; Mon, 29 Apr 2019 08:30:45 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Mon, 29 Apr 2019 07:41:10 -0000
-From: Chris Vesters <1824331@bugs.launchpad.net>
+Date: Mon, 29 Apr 2019 08:22:33 -0000
+From: Thomas Huth <1824331@bugs.launchpad.net>
 Reply-To: Bug 1824331 <1824331@bugs.launchpad.net>
 Sender: bounces@canonical.com
 References: <155498138051.14327.16445763241902233861.malonedeb@gac.canonical.com>
-Message-Id: <155652367099.6812.4270205984808839011.malone@chaenomeles.canonical.com>
+Message-Id: <155652615477.13565.3143922007110099792.launchpad@wampee.canonical.com>
 Errors-To: bounces@canonical.com
 Subject: [Qemu-devel] [Bug 1824331] Re: Qemu Crashes
 List-Id: <qemu-devel.nongnu.org>
@@ -38,9 +38,8 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-We tested our situation with Qemu 4.0 and we are unable to reproduce the is=
-sue.
-So it looks like the issue has been fixed in a more recent version.
+** Changed in: qemu
+       Status: Incomplete =3D> Fix Released
 
 -- =
 
@@ -52,7 +51,7 @@ Title:
   Qemu Crashes
 
 Status in QEMU:
-  Incomplete
+  Fix Released
 
 Bug description:
   A high volume of communication (UDPv4) between the host and Qemu causes i=
