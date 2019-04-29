@@ -2,61 +2,113 @@ Return-Path: <SRS0=sEuR=S7=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3CE96C43219
-	for <qemu-devel@archiver.kernel.org>; Mon, 29 Apr 2019 16:10:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CE442C43219
+	for <qemu-devel@archiver.kernel.org>; Mon, 29 Apr 2019 16:10:03 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0E7FF20673
-	for <qemu-devel@archiver.kernel.org>; Mon, 29 Apr 2019 16:10:00 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0E7FF20673
+	by mail.kernel.org (Postfix) with ESMTPS id 9130020673
+	for <qemu-devel@archiver.kernel.org>; Mon, 29 Apr 2019 16:10:03 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9130020673
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:60017 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:60019 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hL8qt-0000PE-9X
-	for qemu-devel@archiver.kernel.org; Mon, 29 Apr 2019 12:09:59 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:47537)
+	id 1hL8qw-0000RH-SC
+	for qemu-devel@archiver.kernel.org; Mon, 29 Apr 2019 12:10:02 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:46058)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1hL8pZ-000839-EY
-	for qemu-devel@nongnu.org; Mon, 29 Apr 2019 12:08:38 -0400
+	(envelope-from <thuth@redhat.com>) id 1hL8kL-0004Dc-Qd
+	for qemu-devel@nongnu.org; Mon, 29 Apr 2019 12:03:14 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1hL8pY-0001YO-HW
-	for qemu-devel@nongnu.org; Mon, 29 Apr 2019 12:08:37 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:44052)
+	(envelope-from <thuth@redhat.com>) id 1hL8kK-0005uc-Pd
+	for qemu-devel@nongnu.org; Mon, 29 Apr 2019 12:03:13 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:42836)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <cohuck@redhat.com>)
-	id 1hL8pY-0001Ta-AN; Mon, 29 Apr 2019 12:08:36 -0400
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
-	[10.5.11.13])
+	(Exim 4.71) (envelope-from <thuth@redhat.com>)
+	id 1hL8k8-0005dS-De; Mon, 29 Apr 2019 12:03:00 -0400
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+	[10.5.11.12])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 9C2BD7FDE5;
-	Mon, 29 Apr 2019 16:08:23 +0000 (UTC)
-Received: from gondolin (dhcp-192-187.str.redhat.com [10.33.192.187])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id 1058817A64;
-	Mon, 29 Apr 2019 16:08:19 +0000 (UTC)
-Date: Mon, 29 Apr 2019 18:08:17 +0200
-From: Cornelia Huck <cohuck@redhat.com>
-To: Christian Borntraeger <borntraeger@de.ibm.com>
-Message-ID: <20190429180817.540c2f82.cohuck@redhat.com>
-In-Reply-To: <20190429090250.7648-1-borntraeger@de.ibm.com>
-References: <20190429090250.7648-1-borntraeger@de.ibm.com>
-Organization: Red Hat GmbH
+	by mx1.redhat.com (Postfix) with ESMTPS id DBC942D7ED;
+	Mon, 29 Apr 2019 16:02:56 +0000 (UTC)
+Received: from thuth.remote.csb (ovpn-116-111.ams2.redhat.com [10.36.116.111])
+	by smtp.corp.redhat.com (Postfix) with ESMTP id B7A3260BE0;
+	Mon, 29 Apr 2019 16:02:43 +0000 (UTC)
+To: Peter Maydell <peter.maydell@linaro.org>
+References: <20190418180057.3593-1-thuth@redhat.com>
+	<20190418180057.3593-17-thuth@redhat.com>
+	<98855a34-ff5a-896f-7959-480b89d62833@redhat.com>
+	<b78d5517-5f23-6028-6726-b60f916f22fd@redhat.com>
+	<CAFEAcA8xWTwbU6RSBbQkF2j5OfozEq9g3Pq83KyYG_J1CqGM-A@mail.gmail.com>
+From: Thomas Huth <thuth@redhat.com>
+Openpgp: preference=signencrypt
+Autocrypt: addr=thuth@redhat.com; keydata=
+	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
+Organization: Red Hat
+Message-ID: <3f8cad24-3eb9-4c05-063e-196e27184f90@redhat.com>
+Date: Mon, 29 Apr 2019 18:02:42 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+	Thunderbird/60.6.1
 MIME-Version: 1.0
+In-Reply-To: <CAFEAcA8xWTwbU6RSBbQkF2j5OfozEq9g3Pq83KyYG_J1CqGM-A@mail.gmail.com>
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.27]);
-	Mon, 29 Apr 2019 16:08:23 +0000 (UTC)
+	(mx1.redhat.com [10.5.110.30]);
+	Mon, 29 Apr 2019 16:02:57 +0000 (UTC)
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH v3 0/9] s390x: new guest features
+Subject: Re: [Qemu-devel] [PATCH for-QEMU-4.1 v5 16/29] hw/arm: Express
+ dependencies of the virt machine with Kconfig
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -68,57 +120,58 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "Jason J . Herne" <jjherne@linux.ibm.com>,
-	Collin Walling <walling@linux.ibm.com>,
-	David Hildenbrand <david@redhat.com>, qemu-devel <qemu-devel@nongnu.org>,
-	Halil Pasic <pasic@linux.ibm.com>, qemu-s390x <qemu-s390x@nongnu.org>,
-	Richard Henderson <rth@twiddle.net>
+Cc: Jan Kiszka <jan.kiszka@web.de>, "Michael S. Tsirkin" <mst@redhat.com>,
+	QEMU Developers <qemu-devel@nongnu.org>, Gerd Hoffmann <kraxel@redhat.com>,
+	"Edgar E . Iglesias" <edgar.iglesias@gmail.com>,
+	Subbaraya Sundeep <sundeep.lkml@gmail.com>,
+	Yang Zhong <yang.zhong@intel.com>, Rob Herring <robh@kernel.org>,
+	Qemu-block <qemu-block@nongnu.org>,
+	Andrey Smirnov <andrew.smirnov@gmail.com>,
+	Antony Pavlov <antonynpavlov@gmail.com>,
+	=?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
+	Joel Stanley <joel@jms.id.au>, Alistair Francis <alistair@alistair23.me>,
+	Beniamino Galvani <b.galvani@gmail.com>, qemu-arm <qemu-arm@nongnu.org>,
+	Peter Chubb <peter.chubb@nicta.com.au>,
+	Cedric Le Goater <clg@kaod.org>, John Snow <jsnow@redhat.com>,
+	Andrew Jeffery <andrew@aj.id.au>, Philippe Mathieu-Daude <f4bug@amsat.org>,
+	Jean-Christophe Dubois <jcd@tribudubois.net>,
+	Igor Mitsyanko <i.mitsyanko@gmail.com>, Paolo Bonzini <pbonzini@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190429160817.kaoBB1TDLyVxh0gdue2zcIhuHqSgWYr6LI_5f-MPDis@z>
+Message-ID: <20190429160242.8htJUoH7lPSCu2A8tjHimqdABIW8D-ykGxTmo4hyI1w@z>
 
-On Mon, 29 Apr 2019 05:02:41 -0400
-Christian Borntraeger <borntraeger@de.ibm.com> wrote:
+On 29/04/2019 17.53, Peter Maydell wrote:
+> On Mon, 29 Apr 2019 at 16:34, Thomas Huth <thuth@redhat.com> wrote:
+>>
+>> On 25/04/2019 17.53, Philippe Mathieu-Daud=C3=A9 wrote:
+>>> Hi Thomas,
+>>>
+>>> On 4/18/19 8:00 PM, Thomas Huth wrote:
+>>>> Dependencies have been determined by looking at hw/arm/virt.c
+>>>>
+>>>> Signed-off-by: Thomas Huth <thuth@redhat.com>
+>>>> ---
+>>>>  default-configs/arm-softmmu.mak | 11 +----------
+>>>>  hw/arm/Kconfig                  | 19 +++++++++++++++++++
+>>>>  hw/arm/Makefile.objs            |  3 ++-
+>>>>  3 files changed, 22 insertions(+), 11 deletions(-)
+>=20
+>>> Without -nodefaults I get:
+>>> qemu-system-aarch64: Unsupported NIC model: virtio-net-pci
+>>> This is expected.
+>>
+>> Yes, it should still work with "-nic none" or "-nodefaults".
+>=20
+> Er, if you need either -nic none or -nodefaults after this
+> patch then this would be a change in behaviour, which seems
+> wrong to me.
 
-> Adding gen15.
-> 
-> v2->v3: - merge  deprecation patch into gen 15 patch
-> 	- fix comments
-> 	- use gen15a and gen15b instead of cpuid
-> v1->v2: - rework csske deprecation
-> 	- white space fixes
-> 	- also require msa4 for msa9
-> 
-> Christian Borntraeger (9):
->   linux header sync
+No worry, this only applies to compiling builds where you run "configure
+ --without-default-devices". For normal builds, virtio-net should still
+be included fine. ... at least I hope this is what Philippe was talking
+about ... but for me it's working fine when I run "configure" normally.
 
-I think we can do that sync once the companion kernel series hits the
-kvm next branch.
+ Thomas
 
->   s390x/cpumodel: ignore csske for expansion
->   s390x/cpumodel: Miscellaneous-Instruction-Extensions Facility 3
->   s390x/cpumodel: msa9 facility
-
-This seems to be the only patch that does not yet have a R-b from David
--- David, do you plan to review this one as well?
-
->   s390x/cpumodel: vector enhancements
->   s390x/cpumodel: enhanced sort facility
->   s390x/cpumodel: add Deflate-conversion facility
->   s390x/cpumodel: add gen15 defintions
->   s390x/cpumodel: wire up 8561 and 8562 as gen15 machines
-> 
->  linux-headers/asm-s390/kvm.h    |   5 +-
->  target/s390x/cpu_features.c     |  54 ++++++++++++++++
->  target/s390x/cpu_features.h     |   3 +
->  target/s390x/cpu_features_def.h |  49 +++++++++++++++
->  target/s390x/cpu_models.c       |  13 ++--
->  target/s390x/gen-features.c     | 105 ++++++++++++++++++++++++++++++++
->  target/s390x/kvm.c              |  18 ++++++
->  7 files changed, 242 insertions(+), 5 deletions(-)
-> 
-
-Only thing I noticed were some minor typos in some commit messages, I
-can fix up while applying.
 
