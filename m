@@ -2,47 +2,46 @@ Return-Path: <SRS0=sEuR=S7=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2BF5EC43219
-	for <qemu-devel@archiver.kernel.org>; Mon, 29 Apr 2019 05:26:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 04429C43219
+	for <qemu-devel@archiver.kernel.org>; Mon, 29 Apr 2019 05:32:02 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D77DC206BF
-	for <qemu-devel@archiver.kernel.org>; Mon, 29 Apr 2019 05:26:34 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D77DC206BF
+	by mail.kernel.org (Postfix) with ESMTPS id B6FDC206BF
+	for <qemu-devel@archiver.kernel.org>; Mon, 29 Apr 2019 05:32:01 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B6FDC206BF
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:52307 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:52368 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hKyoE-0004LN-3H
-	for qemu-devel@archiver.kernel.org; Mon, 29 Apr 2019 01:26:34 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:50867)
+	id 1hKytV-0005vn-0p
+	for qemu-devel@archiver.kernel.org; Mon, 29 Apr 2019 01:32:01 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:51947)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1hKynP-0003yA-4J
-	for qemu-devel@nongnu.org; Mon, 29 Apr 2019 01:25:44 -0400
+	(envelope-from <thuth@redhat.com>) id 1hKysT-0005ac-5g
+	for qemu-devel@nongnu.org; Mon, 29 Apr 2019 01:30:58 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1hKynN-0001ht-TV
-	for qemu-devel@nongnu.org; Mon, 29 Apr 2019 01:25:43 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:51364)
+	(envelope-from <thuth@redhat.com>) id 1hKysS-0004E8-0L
+	for qemu-devel@nongnu.org; Mon, 29 Apr 2019 01:30:57 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:52452)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <thuth@redhat.com>)
-	id 1hKynE-0001X4-UN; Mon, 29 Apr 2019 01:25:35 -0400
+	id 1hKysP-0004CN-Hh; Mon, 29 Apr 2019 01:30:53 -0400
 Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
 	[10.5.11.12])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 856323086215;
-	Mon, 29 Apr 2019 05:25:25 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id 35B46308425C;
+	Mon, 29 Apr 2019 05:30:52 +0000 (UTC)
 Received: from thuth.remote.csb (ovpn-116-111.ams2.redhat.com [10.36.116.111])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id 61C7C1391A;
-	Mon, 29 Apr 2019 05:25:15 +0000 (UTC)
+	by smtp.corp.redhat.com (Postfix) with ESMTP id E98B36B48E;
+	Mon, 29 Apr 2019 05:30:43 +0000 (UTC)
 To: qemu-devel@nongnu.org
-References: <155646780285.10667.18275282182893876584@c2072b67cc0c>
+References: <155650963851.10667.10736189532511840020@c2072b67cc0c>
 From: Thomas Huth <thuth@redhat.com>
 Openpgp: preference=signencrypt
 Autocrypt: addr=thuth@redhat.com; keydata=
@@ -88,19 +87,19 @@ Autocrypt: addr=thuth@redhat.com; keydata=
 	rCELuGwT9hsYkUPjVd4lfylN3mzEc6iAv/wwjsc0DRTSQCpXT3v2ymTAsRKrVaEZLibTXaf+
 	WslxWek3xNYRiqwwWAJuL652eAlxUgQ5ZS+fXBRTiQpJ+F26I/2lccScRd9G5w==
 Organization: Red Hat
-Message-ID: <9c290579-45b2-88f5-2b1f-6af0db5a8e1f@redhat.com>
-Date: Mon, 29 Apr 2019 07:25:15 +0200
+Message-ID: <ec0fad50-140c-0bf4-3421-d4e3d2d12dea@redhat.com>
+Date: Mon, 29 Apr 2019 07:30:42 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
 	Thunderbird/60.6.1
 MIME-Version: 1.0
-In-Reply-To: <155646780285.10667.18275282182893876584@c2072b67cc0c>
+In-Reply-To: <155650963851.10667.10736189532511840020@c2072b67cc0c>
 Content-Type: text/plain; charset="UTF-8"
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.42]);
-	Mon, 29 Apr 2019 05:25:25 +0000 (UTC)
+	(mx1.redhat.com [10.5.110.40]);
+	Mon, 29 Apr 2019 05:30:52 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
 Subject: Re: [Qemu-devel] [PATCH v2 0/8] tests/qemu-iotests: Run basic
@@ -123,58 +122,47 @@ Cc: fam@euphon.net, kwolf@redhat.com, emaste@freebsd.org, qemu-block@nongnu.org,
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190429052515.WMc7GhZb9PowS_Ozmr9-ddugZvmURV8VVaYuBvC1fyw@z>
+Message-ID: <20190429053042.IMN-AQotf6STgUf8uz5dMr3vvFEAnRD36-IJqLvBMxM@z>
 
-On 28/04/2019 18.10, no-reply@patchew.org wrote:
+On 29/04/2019 05.47, no-reply@patchew.org wrote:
 > Patchew URL: https://patchew.org/QEMU/20190428155451.15653-1-thuth@redhat.com/
 > 
-> 
-> 
-> Hi,
-> 
-> This series seems to have some coding style problems. See output below for
-> more information:
-> 
-> Type: series
-> Message-id: 20190428155451.15653-1-thuth@redhat.com
-> Subject: [Qemu-devel] [PATCH v2 0/8] tests/qemu-iotests: Run basic iotests during "make check"
+> This series failed the asan build test. Please find the testing commands and
+> their output below. If you have Docker installed, you can probably reproduce it
+> locally.
 > 
 > === TEST SCRIPT BEGIN ===
 > #!/bin/bash
-> git rev-parse base > /dev/null || exit 0
-> git config --local diff.renamelimit 0
-> git config --local diff.renames True
-> git config --local diff.algorithm histogram
-> ./scripts/checkpatch.pl --mailback base..
+> time make docker-test-debug@fedora TARGET_LIST=x86_64-softmmu J=14 NETWORK=1
 > === TEST SCRIPT END ===
 > 
-> Updating 3c8cf5a9c21ff8782164d1def7f44bd888713384
-> From https://github.com/patchew-project/qemu
->  * [new tag]               patchew/20190428155451.15653-1-thuth@redhat.com -> patchew/20190428155451.15653-1-thuth@redhat.com
-> Switched to a new branch 'test'
-> 7bb09e08a3 tests: Run the iotests during "make check" again
-> 3d905a091e tests/qemu-iotests/group: Re-use the "auto" group for tests that can always run
-> 565003ac8a tests/qemu-iotests: Remove the "_supported_os Linux" line from many tests
-> fb27dba3d9 cirrus / travis: Add gnu-sed and bash for macOS and FreeBSD
-> 02ac8a4bf6 tests/qemu-iotests: Do not hard-code the path to bash
-> 34c6a891ea tests/qemu-iotests/check: Pick a default machine if necessary
-> d091edf7c1 tests/qemu-iotests/005: Add a sanity check for large sparse file support
-> 3cf4caa193 tests/qemu-iotests: Fix output of qemu-io related tests
-> 
-> === OUTPUT BEGIN ===
-> 1/8 Checking commit 3cf4caa193cc (tests/qemu-iotests: Fix output of qemu-io related tests)
-> 2/8 Checking commit d091edf7c1ef (tests/qemu-iotests/005: Add a sanity check for large sparse file support)
-> 3/8 Checking commit 34c6a891ea6e (tests/qemu-iotests/check: Pick a default machine if necessary)
-> 4/8 Checking commit 02ac8a4bf608 (tests/qemu-iotests: Do not hard-code the path to bash)
-> 5/8 Checking commit fb27dba3d9f0 (cirrus / travis: Add gnu-sed and bash for macOS and FreeBSD)
-> 6/8 Checking commit 565003ac8a70 (tests/qemu-iotests: Remove the "_supported_os Linux" line from many tests)
-> 7/8 Checking commit 3d905a091e64 (tests/qemu-iotests/group: Re-use the "auto" group for tests that can always run)
-> ERROR: trailing whitespace
-> #125: FILE: tests/qemu-iotests/group:115:
-> +093 $
+> The full log is available at
+> http://patchew.org/logs/20190428155451.15653-1-thuth@redhat.com/testing.asan/?type=message.
 
-Not an error: The trailing whitespace is currently required for the
-parsing code in the "check" script.
+The asan test failed since it could not check out the repository ...
+a networking problem?
+
+Anyway, looks like there was a real bug here:
+
+ https://patchew.org/logs/20190428155451.15653-1-thuth@redhat.com/testing.docker-clang@ubuntu/?type=message
+
+Test 162 failed with:
+
+162         - output mismatch (see 162.out.bad)
+--- /tmp/qemu-test/src/tests/qemu-iotests/162.out	2019-04-28 16:09:31.000000000 +0000
++++ /tmp/qemu-test/build/tests/qemu-iotests/162.out.bad	2019-04-28 16:24:21.669646149 +0000
+@@ -6,7 +6,9 @@
+ image: nbd+unix://?socket=42
+ 
+ === SSH ===
++qemu-img: warning: GLib: getpwuid_r(): failed due to unknown user id (1003)
+ qemu-img: Could not open 'json:{"driver": "ssh", "host": "localhost", "port": "0", "path": "/foo"}': Failed to connect socket: Connection refused
++qemu-img: warning: GLib: getpwuid_r(): failed due to unknown user id (1003)
+ qemu-img: Could not open 'driver=ssh,host=localhost,port=0,path=/foo': Failed to connect socket: Connection refused
+ qemu-img: Could not open 'json:{"driver": "ssh", "host": "localhost", "port": 0.42, "path": "/foo"}': Parameter 'port' expects a number
+ qemu-img: Could not open 'driver=ssh,host=localhost,port=0.42,path=/foo': Parameter 'port' expects a number
+
+... I think I'll remove 162 from the "auto" group to avoid this.
 
  Thomas
 
