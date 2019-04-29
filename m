@@ -1,35 +1,21 @@
-Received: from eggs.gnu.org ([209.51.188.92]:48371)
+Received: from eggs.gnu.org ([209.51.188.92]:49511)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <sgarzare@redhat.com>) id 1hL3RK-0006W5-IW
-	for qemu-devel@nongnu.org; Mon, 29 Apr 2019 06:23:16 -0400
+	(envelope-from <kwolf@redhat.com>) id 1hL3Ti-0000Ua-MQ
+	for qemu-devel@nongnu.org; Mon, 29 Apr 2019 06:25:44 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <sgarzare@redhat.com>) id 1hL3Fv-0003A9-KE
-	for qemu-devel@nongnu.org; Mon, 29 Apr 2019 06:11:28 -0400
-Received: from mail-wr1-f65.google.com ([209.85.221.65]:46007)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <sgarzare@redhat.com>) id 1hL3Fv-000398-E5
-	for qemu-devel@nongnu.org; Mon, 29 Apr 2019 06:11:27 -0400
-Received: by mail-wr1-f65.google.com with SMTP id s15so15106412wra.12
-	for <qemu-devel@nongnu.org>; Mon, 29 Apr 2019 03:11:24 -0700 (PDT)
-Date: Mon, 29 Apr 2019 12:11:20 +0200
-From: Stefano Garzarella <sgarzare@redhat.com>
-Message-ID: <20190429101120.bu5djv7pbwippq46@steredhat>
-References: <20190414132008.uxoia6avdpp4jov6@steredhat.homenet.telecomitalia.it>
-	<CA+aFP1D8VYcnwWpB=4PzAdBKr+YK-r8bSwzKKUCkH7jT3kVvoQ@mail.gmail.com>
-	<20190415080452.GA6031@localhost.localdomain>
-	<20190417073438.r57lemi6emu4x3ld@steredhat>
-	<20190417080443.GA8330@localhost.localdomain>
-	<20190419122356.7dmwwdbtnzgimydw@steredhat>
-	<20190423075619.GB9041@localhost.localdomain>
-	<20190423082657.mzulhihpv6rhgiww@steredhat>
-	<20190423083805.GC9041@localhost.localdomain>
-	<20190429095855.GC8492@localhost.localdomain>
+	(envelope-from <kwolf@redhat.com>) id 1hL3Th-0003Hb-DK
+	for qemu-devel@nongnu.org; Mon, 29 Apr 2019 06:25:42 -0400
+Date: Mon, 29 Apr 2019 12:25:10 +0200
+From: Kevin Wolf <kwolf@redhat.com>
+Message-ID: <20190429102510.GD8492@localhost.localdomain>
+References: <20190411105025.97397-1-sgarzare@redhat.com>
+	<20190411105025.97397-2-sgarzare@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20190429095855.GC8492@localhost.localdomain>
-Subject: Re: [Qemu-devel] [Qemu-block] [PATCH RFC 1/1] block/rbd: increase
- dynamically the image size
+In-Reply-To: <20190411105025.97397-2-sgarzare@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH RFC 1/1] block/rbd: increase dynamically
+ the image size
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -38,20 +24,72 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Kevin Wolf <kwolf@redhat.com>
-Cc: Josh Durgin <jdurgin@redhat.com>, qemu-devel <qemu-devel@nongnu.org>, qemu-block <qemu-block@nongnu.org>, Max Reitz <mreitz@redhat.com>
+To: Stefano Garzarella <sgarzare@redhat.com>
+Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>, Josh Durgin <jdurgin@redhat.com>
 
-On Mon, Apr 29, 2019 at 11:58:55AM +0200, Kevin Wolf wrote:
+Am 11.04.2019 um 12:50 hat Stefano Garzarella geschrieben:
+> RBD APIs don't allow us to write more than the size set with rbd_create()
+> or rbd_resize().
+> In order to support growing images (eg. qcow2), we resize the image
+> before RW operations that exceed the current size.
 > 
-> Hm, this is an RFC patch, which suggests that it wasn't originally meant
-> to be merged as it is. Are you going to send a new version, or did it
-> turn out to be exactly what we want and the "RFC" tag was a mistake?
+> Buglink: https://bugzilla.redhat.com/show_bug.cgi?id=1171007
+> Signed-off-by: Stefano Garzarella <sgarzare@redhat.com>
+> ---
+>  block/rbd.c | 25 +++++++++++++++++++++++++
+>  1 file changed, 25 insertions(+)
+> 
+> diff --git a/block/rbd.c b/block/rbd.c
+> index 0c549c9935..228658e20a 100644
+> --- a/block/rbd.c
+> +++ b/block/rbd.c
+> @@ -102,6 +102,7 @@ typedef struct BDRVRBDState {
+>      rbd_image_t image;
+>      char *image_name;
+>      char *snap;
+> +    uint64_t image_size;
+>  } BDRVRBDState;
 
-I put the "RFC" tag because I was not sure about this patch, but after
-your comments and some tests on the rbd_resize() impact, I think that
-it turns out exactly what we want.
+Can't we use bs->total_sectors instead of adding a new image_size field?
 
-If you agree, you can queue it as is.
+>  static int qemu_rbd_connect(rados_t *cluster, rados_ioctx_t *io_ctx,
+> @@ -777,6 +778,14 @@ static int qemu_rbd_open(BlockDriverState *bs, QDict *options, int flags,
+>          goto failed_open;
+>      }
+>  
+> +    r = rbd_get_size(s->image, &s->image_size);
+> +    if (r < 0) {
+> +        error_setg_errno(errp, -r, "error reading image size from %s",
+> +                         s->image_name);
+> +        rbd_close(s->image);
+> +        goto failed_open;
+> +    }
+> +
+>      /* If we are using an rbd snapshot, we must be r/o, otherwise
+>       * leave as-is */
+>      if (s->snap != NULL) {
+> @@ -921,6 +930,20 @@ static BlockAIOCB *rbd_start_aio(BlockDriverState *bs,
+>          rcb->buf = acb->bounce;
+>      }
+>  
+> +    /*
+> +     * RBD APIs don't allow us to write more than actual size, so in order
+> +     * to support growing images, we resize the image before RW operations
+> +     * that exceed the current size.
+> +     */
+> +    if (s->image_size < off + size) {
+> +        r = rbd_resize(s->image, off + size);
+> +        if (r < 0) {
+> +            goto failed;
+> +        }
+> +
+> +        s->image_size = off + size;
+> +    }
 
-Thanks,
-Stefano
+This doesn't check the request type, so it's actually not limited to RW
+operations, but even reads will try to resize the image. This is at
+least surprising. For regular files, file-posix extends the file for
+write requests, but for reads it returns a zeroed buffer without
+actually changing the file size.
+
+Kevin
