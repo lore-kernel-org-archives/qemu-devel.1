@@ -1,35 +1,27 @@
-Received: from eggs.gnu.org ([209.51.188.92]:43066)
+Received: from eggs.gnu.org ([209.51.188.92]:43086)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.williamson@redhat.com>) id 1hL79i-0004Dl-Gj
-	for qemu-devel@nongnu.org; Mon, 29 Apr 2019 10:21:20 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1hL79l-0004En-RR
+	for qemu-devel@nongnu.org; Mon, 29 Apr 2019 10:21:22 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.williamson@redhat.com>) id 1hL79h-000145-ET
-	for qemu-devel@nongnu.org; Mon, 29 Apr 2019 10:21:18 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:41534)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <alex.williamson@redhat.com>)
-	id 1hL79h-00011s-6E
-	for qemu-devel@nongnu.org; Mon, 29 Apr 2019 10:21:17 -0400
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
-	[10.5.11.23])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 4131E81E10
-	for <qemu-devel@nongnu.org>; Mon, 29 Apr 2019 14:21:13 +0000 (UTC)
-Date: Mon, 29 Apr 2019 08:21:06 -0600
-From: Alex Williamson <alex.williamson@redhat.com>
-Message-ID: <20190429082106.4fd59e77@x1.home>
-In-Reply-To: <daded638-42f1-9bc3-8c36-66b0fbba9438@redhat.com>
-References: <20181220054037.24320-1-peterx@redhat.com>
-	<20181220054037.24320-2-peterx@redhat.com>
-	<20190426132744.2b594bf5@x1.home> <20190426150236.1af2ff08@x1.home>
-	<94415012.15677076.1556342950794.JavaMail.zimbra@redhat.com>
-	<daded638-42f1-9bc3-8c36-66b0fbba9438@redhat.com>
+	(envelope-from <peter.maydell@linaro.org>) id 1hL79l-00015l-1K
+	for qemu-devel@nongnu.org; Mon, 29 Apr 2019 10:21:21 -0400
+Received: from mail-oi1-x22d.google.com ([2607:f8b0:4864:20::22d]:34119)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1hL79k-00015I-TQ
+	for qemu-devel@nongnu.org; Mon, 29 Apr 2019 10:21:20 -0400
+Received: by mail-oi1-x22d.google.com with SMTP id v10so8442032oib.1
+	for <qemu-devel@nongnu.org>; Mon, 29 Apr 2019 07:21:20 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v2 1/3] q35: set split kernel irqchip as
- default
+References: <20190328230404.12909-1-richard.henderson@linaro.org>
+	<20190328230404.12909-23-richard.henderson@linaro.org>
+In-Reply-To: <20190328230404.12909-23-richard.henderson@linaro.org>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Mon, 29 Apr 2019 15:21:08 +0100
+Message-ID: <CAFEAcA8phrZnNDN7aFJfMXDbBoyWFA4-=bORFemYY6yQNfKWsQ@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH for-4.1 v2 22/36] target/s390x: Use env_cpu,
+ env_archcpu
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -38,68 +30,30 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: Peter Xu <peterx@redhat.com>, qemu-devel@nongnu.org, Igor Mammedov <imammedo@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, "Michael S .
-	Tsirkin" <mst@redhat.com>
+To: Richard Henderson <richard.henderson@linaro.org>
+Cc: QEMU Developers <qemu-devel@nongnu.org>
 
-On Sat, 27 Apr 2019 10:09:51 +0200
-Paolo Bonzini <pbonzini@redhat.com> wrote:
+On Thu, 28 Mar 2019 at 23:35, Richard Henderson
+<richard.henderson@linaro.org> wrote:
+>
+> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+> ---
+>  target/s390x/cpu.h          |  5 ----
+>  linux-user/s390x/cpu_loop.c |  2 +-
+>  target/s390x/cc_helper.c    |  5 ++--
+>  target/s390x/diag.c         |  2 +-
+>  target/s390x/excp_helper.c  |  6 ++---
+>  target/s390x/fpu_helper.c   |  4 +--
+>  target/s390x/helper.c       |  7 +++---
+>  target/s390x/int_helper.c   |  3 +--
+>  target/s390x/interrupt.c    |  6 ++---
+>  target/s390x/mem_helper.c   | 28 ++++++++-------------
+>  target/s390x/misc_helper.c  | 50 ++++++++++++++++++-------------------
+>  target/s390x/mmu_helper.c   |  8 +++---
+>  target/s390x/sigp.c         |  4 +--
+>  13 files changed, 56 insertions(+), 74 deletions(-)
 
-> On 27/04/19 07:29, Paolo Bonzini wrote:
-> >   
-> >>> In my testing it looks like KVM advertises supporting the KVM_IRQFD
-> >>> resample feature, but vfio never gets the unmask notification, so the
-> >>> device remains with DisINTx set and no further interrupts are
-> >>> generated.  Do we expect KVM's IRQFD with resampler to work in the
-> >>> split IRQ mode?  We can certainly hope that "high performance" devices
-> >>> use MSI or MSI/X, but this would be quite a performance regression with
-> >>> split mode if our userspace bypass for INTx goes away.  Thanks,  
-> >>
-> >> arch/x86/kvm/lapic.c:kvm_ioapic_send_eoi() dumps to userspace before
-> >> kvm_ioapic_update_eoi() can handle the irq_ack_notifier_list via
-> >> kvm_notify_acked_gsi(),  
-> > 
-> > That wouldn't help because kvm_ioapic_update_eoi would not even be
-> > able to access vcpu->kvm->arch.vioapic (it's NULL).
-> > 
-> > The following untested patch would signal the resamplefd in kvm_ioapic_send_eoi,
-> > before requesting the exit to userspace.  However I am not sure how QEMU
-> > sets up the VFIO eventfds: if I understand correctly, when VFIO writes again to
-> > the irq eventfd, the interrupt request would not reach the userspace IOAPIC, but
-> > only the in-kernel LAPIC.  That would be incorrect, and if my understanding is
-> > correct we need to trigger resampling from hw/intc/ioapic.c.  
-> 
-> Actually it's worse: because you're bypassing IOAPIC when raising the
-> irq, the IOAPIC's remote_irr for example will not be set.  So split
-> irqchip currently must disable the intx fast path completely.
-> 
-> I guess we could also reimplement irqfd and resamplefd in the userspace
-> IOAPIC, and run the listener in a separate thread (using "-object
-> iothread" on the command line and AioContext in the code).
+Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
 
-This sounds like a performance regression vs KVM irqchip any way we
-slice it.  Was this change a mistake?  Without KVM support, the
-universal support in QEMU kicks in, where device mmaps are disabled
-when an INTx occurs, forcing trapped access to the device, and we
-assume that the next access is in response to an interrupt and trigger
-our own internal EOI and re-enable mmaps.  A timer acts as a
-catch-all.  Needless to say, this is functional but not fast.  It would
-be a massive performance regression for devices depending on INTx and
-previously using the KVM bypass to switch to this.  INTx is largely
-considered a legacy interrupt, so non-x86 archs don't encounter it as
-often, S390 even explicitly disables INTx support.  ARM and POWER
-likely just don't see a lot of these devices, but nearly all devices
-(except SR-IOV VFs) on x86 expect an INTx fallback mode and some
-drivers may run the device in INTx for compatibility.  This split
-irqchip change was likely fine for "enterprise" users concerned only
-with modern high speed devices, but very much not for device assignment
-used for compatibility use cases or commodity hardware users.
-
-What's a good 4.0.1 strategy to resolve this?  Re-instate KVM irqchip
-as the Q35 default?  I can't see that simply switching to current QEMU
-handling is a viable option for performance?  What about 4.1?  We could
-certainly improve EOI support in QEMU, there's essentially no support
-currently, but it seems like an uphill battle for an iothread based
-userspace ioapic to ever compare to KVM handling?  Thanks,
-
-Alex
+thanks
+-- PMM
