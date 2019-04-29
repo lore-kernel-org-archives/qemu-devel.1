@@ -1,21 +1,19 @@
-Received: from eggs.gnu.org ([209.51.188.92]:49511)
+Received: from eggs.gnu.org ([209.51.188.92]:52214)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1hL3Ti-0000Ua-MQ
-	for qemu-devel@nongnu.org; Mon, 29 Apr 2019 06:25:44 -0400
+	(envelope-from <kwolf@redhat.com>) id 1hL3kJ-00051C-TH
+	for qemu-devel@nongnu.org; Mon, 29 Apr 2019 06:42:53 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1hL3Th-0003Hb-DK
-	for qemu-devel@nongnu.org; Mon, 29 Apr 2019 06:25:42 -0400
-Date: Mon, 29 Apr 2019 12:25:10 +0200
+	(envelope-from <kwolf@redhat.com>) id 1hL3fx-0004TZ-Tp
+	for qemu-devel@nongnu.org; Mon, 29 Apr 2019 06:38:22 -0400
+Date: Mon, 29 Apr 2019 12:38:16 +0200
 From: Kevin Wolf <kwolf@redhat.com>
-Message-ID: <20190429102510.GD8492@localhost.localdomain>
-References: <20190411105025.97397-1-sgarzare@redhat.com>
-	<20190411105025.97397-2-sgarzare@redhat.com>
+Message-ID: <20190429103816.GE8492@localhost.localdomain>
+References: <57c36dca-c4d6-9b70-7799-0be96325d7c5@yandex-team.ru>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20190411105025.97397-2-sgarzare@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH RFC 1/1] block/rbd: increase dynamically
- the image size
+In-Reply-To: <57c36dca-c4d6-9b70-7799-0be96325d7c5@yandex-team.ru>
+Subject: Re: [Qemu-devel] aio context ownership during bdrv_close()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,72 +22,50 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefano Garzarella <sgarzare@redhat.com>
-Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>, Josh Durgin <jdurgin@redhat.com>
+To: Anton Kuchin <antonkuchin@yandex-team.ru>
+Cc: qemu-block@nongnu.org, qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>, yc-core =?utf-8?B?KNGA0LDRgdGB0YvQu9C60LAp?= <yc-core@yandex-team.ru>
 
-Am 11.04.2019 um 12:50 hat Stefano Garzarella geschrieben:
-> RBD APIs don't allow us to write more than the size set with rbd_create()
-> or rbd_resize().
-> In order to support growing images (eg. qcow2), we resize the image
-> before RW operations that exceed the current size.
+Am 26.04.2019 um 14:24 hat Anton Kuchin geschrieben:
+> I can't figure out ownership of aio context during bdrv_close().
 > 
-> Buglink: https://bugzilla.redhat.com/show_bug.cgi?id=1171007
-> Signed-off-by: Stefano Garzarella <sgarzare@redhat.com>
-> ---
->  block/rbd.c | 25 +++++++++++++++++++++++++
->  1 file changed, 25 insertions(+)
-> 
-> diff --git a/block/rbd.c b/block/rbd.c
-> index 0c549c9935..228658e20a 100644
-> --- a/block/rbd.c
-> +++ b/block/rbd.c
-> @@ -102,6 +102,7 @@ typedef struct BDRVRBDState {
->      rbd_image_t image;
->      char *image_name;
->      char *snap;
-> +    uint64_t image_size;
->  } BDRVRBDState;
+> As far as I understand bdrv_unref() shold be called with acquired aio
+> context to prevent concurrent operations (at least most usages in blockdev.c
+> explicitly acquire and release context, but not all).
 
-Can't we use bs->total_sectors instead of adding a new image_size field?
+I think the theory is like this:
 
->  static int qemu_rbd_connect(rados_t *cluster, rados_ioctx_t *io_ctx,
-> @@ -777,6 +778,14 @@ static int qemu_rbd_open(BlockDriverState *bs, QDict *options, int flags,
->          goto failed_open;
->      }
->  
-> +    r = rbd_get_size(s->image, &s->image_size);
-> +    if (r < 0) {
-> +        error_setg_errno(errp, -r, "error reading image size from %s",
-> +                         s->image_name);
-> +        rbd_close(s->image);
-> +        goto failed_open;
-> +    }
-> +
->      /* If we are using an rbd snapshot, we must be r/o, otherwise
->       * leave as-is */
->      if (s->snap != NULL) {
-> @@ -921,6 +930,20 @@ static BlockAIOCB *rbd_start_aio(BlockDriverState *bs,
->          rcb->buf = acb->bounce;
->      }
->  
-> +    /*
-> +     * RBD APIs don't allow us to write more than actual size, so in order
-> +     * to support growing images, we resize the image before RW operations
-> +     * that exceed the current size.
-> +     */
-> +    if (s->image_size < off + size) {
-> +        r = rbd_resize(s->image, off + size);
-> +        if (r < 0) {
-> +            goto failed;
-> +        }
-> +
-> +        s->image_size = off + size;
-> +    }
+1. bdrv_unref() can only be called from the main thread
 
-This doesn't check the request type, so it's actually not limited to RW
-operations, but even reads will try to resize the image. This is at
-least surprising. For regular files, file-posix extends the file for
-write requests, but for reads it returns a zeroed buffer without
-actually changing the file size.
+2. A block node for which bdrv_close() is called has no references. If
+   there are no more parents that keep it in a non-default iothread,
+   they should be in the main AioContext. So no locks need to be taken
+   during bdrv_close().
+
+In practice, 2. is not fully true today, even though block devices do
+stop their dataplane and move the block nodes back to the main
+AioContext on shutdown. I am currently working on some fixes related to
+this, afterwards the situation should be better.
+
+> But if refcount reaches zero and bs is going to be deleted in bdrv_close()
+> we need to ensure that drain is finished data is flushed and there are no
+> more pending coroutines and bottomhalves, so drain and flush functions can
+> enter coroutine and perform yield in several places. As a result control
+> returns to coroutine caller that will release aio context and when
+> completion bh will continue cleanup process it will be executed without
+> ownership of context. Is this a valid situation?
+
+Do you have an example where this happens?
+
+Normally, leaving the coroutine means that the AioContext lock is
+released, but it is later reentered from the same AioContext, so the
+lock will be taken again.
+
+> Moreover if yield happens bs that is being deleted has zero refcount but is
+> still present in lists graph_bdrv_states and all_bdrv_states and can be
+> accidentally accessed. Shouldn't we remove it from these lists ASAP when
+> deletion process starts as we do from monitor_bdrv_states?
+
+Hm, I think it should only disappear when the image file is actually
+closed. But in practice, it probably makes little difference either way.
 
 Kevin
