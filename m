@@ -1,32 +1,31 @@
-Received: from eggs.gnu.org ([209.51.188.92]:34363)
+Received: from eggs.gnu.org ([209.51.188.92]:34374)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1hL9er-0004r5-3R
+	(envelope-from <peter.maydell@linaro.org>) id 1hL9er-0004re-HB
 	for qemu-devel@nongnu.org; Mon, 29 Apr 2019 13:01:38 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1hL9en-0006jr-Ps
-	for qemu-devel@nongnu.org; Mon, 29 Apr 2019 13:01:35 -0400
-Received: from mail-wm1-x32d.google.com ([2a00:1450:4864:20::32d]:55173)
+	(envelope-from <peter.maydell@linaro.org>) id 1hL9eo-0006kj-HI
+	for qemu-devel@nongnu.org; Mon, 29 Apr 2019 13:01:36 -0400
+Received: from mail-wm1-x333.google.com ([2a00:1450:4864:20::333]:39766)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1hL9em-0006bE-CE
-	for qemu-devel@nongnu.org; Mon, 29 Apr 2019 13:01:32 -0400
-Received: by mail-wm1-x32d.google.com with SMTP id b10so156608wmj.4
-	for <qemu-devel@nongnu.org>; Mon, 29 Apr 2019 10:01:14 -0700 (PDT)
+	id 1hL9eo-0006A7-2D
+	for qemu-devel@nongnu.org; Mon, 29 Apr 2019 13:01:34 -0400
+Received: by mail-wm1-x333.google.com with SMTP id n25so161295wmk.4
+	for <qemu-devel@nongnu.org>; Mon, 29 Apr 2019 10:00:39 -0700 (PDT)
 Received: from orth.archaic.org.uk (orth.archaic.org.uk. [81.2.115.148])
-	by smtp.gmail.com with ESMTPSA id a13sm36896wmj.39.2019.04.29.10.01.12
+	by smtp.gmail.com with ESMTPSA id a13sm36896wmj.39.2019.04.29.10.00.36
 	for <qemu-devel@nongnu.org>
 	(version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-	Mon, 29 Apr 2019 10:01:12 -0700 (PDT)
+	Mon, 29 Apr 2019 10:00:37 -0700 (PDT)
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Mon, 29 Apr 2019 18:00:20 +0100
-Message-Id: <20190429170030.11323-33-peter.maydell@linaro.org>
+Date: Mon, 29 Apr 2019 17:59:52 +0100
+Message-Id: <20190429170030.11323-5-peter.maydell@linaro.org>
 In-Reply-To: <20190429170030.11323-1-peter.maydell@linaro.org>
 References: <20190429170030.11323-1-peter.maydell@linaro.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PULL 32/42] hw/arm/nseries: Use TYPE_TMP105 instead
- of hardcoded string
+Subject: [Qemu-devel] [PULL 04/42] target/arm: Make sure M-profile FPSCR
+ RES0 bits are not settable
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,37 +36,36 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-From: Philippe Mathieu-Daudé <philmd@redhat.com>
+Enforce that for M-profile various FPSCR bits which are RES0 there
+but have defined meanings on A-profile are never settable. This
+ensures that M-profile code can't enable the A-profile behaviour
+(notably vector length/stride handling) by accident.
 
-Suggested-by: Markus Armbruster <armbru@redhat.com>
-Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
-Message-id: 20190412165416.7977-3-philmd@redhat.com
-Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
 Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+Message-id: 20190416125744.27770-2-peter.maydell@linaro.org
 ---
- hw/arm/nseries.c | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
+ target/arm/vfp_helper.c | 8 ++++++++
+ 1 file changed, 8 insertions(+)
 
-diff --git a/hw/arm/nseries.c b/hw/arm/nseries.c
-index 906b7ca22d4..2b710c3d49f 100644
---- a/hw/arm/nseries.c
-+++ b/hw/arm/nseries.c
-@@ -31,6 +31,7 @@
- #include "hw/boards.h"
- #include "hw/i2c/i2c.h"
- #include "hw/devices.h"
-+#include "hw/misc/tmp105.h"
- #include "hw/block/flash.h"
- #include "hw/hw.h"
- #include "hw/bt.h"
-@@ -218,7 +219,7 @@ static void n8x0_i2c_setup(struct n800_s *s)
-     qemu_register_powerdown_notifier(&n8x0_system_powerdown_notifier);
+diff --git a/target/arm/vfp_helper.c b/target/arm/vfp_helper.c
+index 2468fc16294..7a46d991486 100644
+--- a/target/arm/vfp_helper.c
++++ b/target/arm/vfp_helper.c
+@@ -105,6 +105,14 @@ void HELPER(vfp_set_fpscr)(CPUARMState *env, uint32_t val)
+         val &= ~FPCR_FZ16;
+     }
  
-     /* Attach a TMP105 PM chip (A0 wired to ground) */
--    dev = i2c_create_slave(i2c, "tmp105", N8X0_TMP105_ADDR);
-+    dev = i2c_create_slave(i2c, TYPE_TMP105, N8X0_TMP105_ADDR);
-     qdev_connect_gpio_out(dev, 0, tmp_irq);
- }
- 
++    if (arm_feature(env, ARM_FEATURE_M)) {
++        /*
++         * M profile FPSCR is RES0 for the QC, STRIDE, FZ16, LEN bits
++         * and also for the trapped-exception-handling bits IxE.
++         */
++        val &= 0xf7c0009f;
++    }
++
+     /*
+      * We don't implement trapped exception handling, so the
+      * trap enable bits, IDE|IXE|UFE|OFE|DZE|IOE are all RAZ/WI (not RES0!)
 -- 
 2.20.1
