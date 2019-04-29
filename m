@@ -2,49 +2,49 @@ Return-Path: <SRS0=sEuR=S7=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0B852C43219
-	for <qemu-devel@archiver.kernel.org>; Mon, 29 Apr 2019 13:19:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6B2B8C43219
+	for <qemu-devel@archiver.kernel.org>; Mon, 29 Apr 2019 13:22:41 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id BB90E2053B
-	for <qemu-devel@archiver.kernel.org>; Mon, 29 Apr 2019 13:19:04 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BB90E2053B
+	by mail.kernel.org (Postfix) with ESMTPS id 2FCAF205F4
+	for <qemu-devel@archiver.kernel.org>; Mon, 29 Apr 2019 13:22:41 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2FCAF205F4
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:57555 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:57592 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hL6BU-0000bf-27
-	for qemu-devel@archiver.kernel.org; Mon, 29 Apr 2019 09:19:04 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:57386)
+	id 1hL6Ey-0001fH-H9
+	for qemu-devel@archiver.kernel.org; Mon, 29 Apr 2019 09:22:40 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:58017)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1hL6Af-0000Js-KT
-	for qemu-devel@nongnu.org; Mon, 29 Apr 2019 09:18:14 -0400
+	(envelope-from <thuth@redhat.com>) id 1hL6E9-0001HD-Q6
+	for qemu-devel@nongnu.org; Mon, 29 Apr 2019 09:21:50 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1hL6Ae-0004uB-AB
-	for qemu-devel@nongnu.org; Mon, 29 Apr 2019 09:18:13 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:60940)
+	(envelope-from <thuth@redhat.com>) id 1hL6E8-0006wA-NA
+	for qemu-devel@nongnu.org; Mon, 29 Apr 2019 09:21:49 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:43976)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1hL6Ae-0004tR-1x
-	for qemu-devel@nongnu.org; Mon, 29 Apr 2019 09:18:12 -0400
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
-	[10.5.11.16])
+	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1hL6E8-0006vj-Eg
+	for qemu-devel@nongnu.org; Mon, 29 Apr 2019 09:21:48 -0400
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+	[10.5.11.15])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 05C5E1556B;
-	Mon, 29 Apr 2019 13:18:10 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id B231F3007C43;
+	Mon, 29 Apr 2019 13:21:47 +0000 (UTC)
 Received: from thuth.remote.csb (ovpn-116-111.ams2.redhat.com [10.36.116.111])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id D38D317257;
-	Mon, 29 Apr 2019 13:18:03 +0000 (UTC)
-To: Li Qiang <liq3ea@gmail.com>
-References: <20190424140643.62457-1-liq3ea@163.com>
-	<2b623811-1be2-159c-0fa6-c548aa9eea82@redhat.com>
-	<CAKXe6SLXrthYFrQGVQNT4hK1-22wrteMNyygZgx_j=jtDfYC6g@mail.gmail.com>
-	<CAKXe6SL8XWMg1x8qztepjypgqdmXpZDj0G0AHU+BLV8OsbRjOg@mail.gmail.com>
+	by smtp.corp.redhat.com (Postfix) with ESMTP id 6A8E65D6A9;
+	Mon, 29 Apr 2019 13:21:41 +0000 (UTC)
+To: David Gibson <david@gibson.dropbear.id.au>,
+	=?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>
+References: <20180830143348.10595-1-marcandre.lureau@redhat.com>
+	<20181213032452.GA25689@umbus.fritz.box>
 From: Thomas Huth <thuth@redhat.com>
 Openpgp: preference=signencrypt
 Autocrypt: addr=thuth@redhat.com; keydata=
@@ -90,23 +90,22 @@ Autocrypt: addr=thuth@redhat.com; keydata=
 	rCELuGwT9hsYkUPjVd4lfylN3mzEc6iAv/wwjsc0DRTSQCpXT3v2ymTAsRKrVaEZLibTXaf+
 	WslxWek3xNYRiqwwWAJuL652eAlxUgQ5ZS+fXBRTiQpJ+F26I/2lccScRd9G5w==
 Organization: Red Hat
-Message-ID: <b1d3be69-a315-d990-45bc-daa02036b887@redhat.com>
-Date: Mon, 29 Apr 2019 15:18:02 +0200
+Message-ID: <0942d4a4-f264-fd42-0b2d-994c331a000c@redhat.com>
+Date: Mon, 29 Apr 2019 15:21:32 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
 	Thunderbird/60.6.1
 MIME-Version: 1.0
-In-Reply-To: <CAKXe6SL8XWMg1x8qztepjypgqdmXpZDj0G0AHU+BLV8OsbRjOg@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+In-Reply-To: <20181213032452.GA25689@umbus.fritz.box>
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature";
+	boundary="OOs2s2PrFc2V10gfGUCZqVrIFnSMCxOaz"
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.29]);
-	Mon, 29 Apr 2019 13:18:11 +0000 (UTC)
-Content-Transfer-Encoding: quoted-printable
+	(mx1.redhat.com [10.5.110.40]);
+	Mon, 29 Apr 2019 13:21:47 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH v2 0/5] fw_cfg_test refactor and add two
- test cases
+Subject: Re: [Qemu-devel] [PATCH] seccomp: check TSYNC host capability
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -118,124 +117,88 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: lvivier@redhat.com, Laszlo Ersek <lersek@redhat.com>,
-	Li Qiang <liq3ea@163.com>, Qemu Developers <qemu-devel@nongnu.org>,
-	Gerd Hoffmann <kraxel@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
-	=?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Cc: otubo@redhat.com, qemu-devel@nongnu.org,
+	Andrea Bolognani <abologna@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190429131802.whscNufd477lL-7F1IraSeesc1IfnnAqVyVV07p__ao@z>
+Message-ID: <20190429132132.o-p3sHQpFxfcs00cNJUSHgNcIH_nO3dwW3viNU5sJRo@z>
 
-On 29/04/2019 07.09, Li Qiang wrote:
->=20
->=20
-> Li Qiang <liq3ea@gmail.com <mailto:liq3ea@gmail.com>> =E4=BA=8E2019=E5=B9=
-=B44=E6=9C=8825=E6=97=A5=E5=91=A8
-> =E5=9B=9B =E4=B8=8B=E5=8D=8810:29=E5=86=99=E9=81=93=EF=BC=9A
->=20
->=20
->=20
->     Thomas Huth <thuth@redhat.com <mailto:thuth@redhat.com>> =E4=BA=8E2=
-019=E5=B9=B44=E6=9C=88
->     25=E6=97=A5=E5=91=A8=E5=9B=9B =E4=B8=8B=E5=8D=885:57=E5=86=99=E9=81=
-=93=EF=BC=9A
->=20
->         On 24/04/2019 16.06, Li Qiang wrote:
->         > In the disscuss of adding reboot timeout test case:
->         >
->         https://lists.gnu.org/archive/html/qemu-devel/2019-04/msg03304.=
-html
->         >
->         > Philippe suggested we should uses the only related option for=
- one
->         > specific test. However currently we uses one QTestState for
->         all the
->         > test cases. In order to achieve Philippe's idea, I split the
->         test case
->         > for its own QTestState. As this patchset has changed a lot, I
->         don't bump
->         > the version.
->         >
->         > Change since v1:
->         > Add a patch to store the reboot_timeout as little endian
->         > Fix the endian issue per Thomas's review
->=20
->         The test still aborts on a big endian host:
->=20
->         $ QTEST_QEMU_BINARY=3Dx86_64-softmmu/qemu-system-x86_64
->         tests/fw_cfg-test
->         /x86_64/fw_cfg/signature: OK
->         /x86_64/fw_cfg/id: OK
->         /x86_64/fw_cfg/uuid: OK
->         /x86_64/fw_cfg/ram_size: OK
->         /x86_64/fw_cfg/nographic: OK
->         /x86_64/fw_cfg/nb_cpus: OK
->         /x86_64/fw_cfg/max_cpus: OK
->         /x86_64/fw_cfg/numa: OK
->         /x86_64/fw_cfg/boot_menu: OK
->         /x86_64/fw_cfg/reboot_timeout: **
->         ERROR:/home/thuth/devel/qemu/tests/fw_cfg-test.c:190:test_fw_cf=
-g_reboot_timeout:
->         assertion failed (reboot_timeout =3D=3D 15): (251658240 =3D=3D =
-15)
->         Aborted
->=20
->         251658240 is 0x0F000000, i.e. a byte-swapped 0xf =3D 15 ... i.e=
-.
->         you still
->         got an endianess issue somewhere in the code.
->=20
->=20
->=20
->     Hmmmm,
->=20
->     I have thought a long time, still can't point where is wrong.
->=20
->     Let's from the result:=C2=A0
->     0x0f000000 in the big endian laid as this:
->     low ---> high
->     0x0f 00 00 00
->=20
->     As I have swapped before the compare so it is read as this:
->     low ---> high
->     00 00 00 0x0f
->=20
->     However from the store side:
->     the 15 in big endian is:
->     low ---> high
->     00 00 00 0x0f
->=20
->     But Before I store it, I convert it to little endian, so following
->     should be stored:
->     low ---> high
->     0x0f 00 00 00
->=20
->     Do you apply the patch 3 and recompile the qemu binary?
->=20
->=20
->=20
-> Hello Thomas,=C2=A0
-> I have tested again this and just store it as big endian(so that the
-> store/load has different endianness),=C2=A0
-> I don't see any error.=C2=A0
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--OOs2s2PrFc2V10gfGUCZqVrIFnSMCxOaz
+Content-Type: text/plain; charset=windows-1252
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
 
-Uh, now this is embarrassing... I just tried again to see whether I
-could find the issue, but now the test passes without problems!
-I guess I simply only did a "make tests/fw_cfg-test" before and forgot
-to recompile qemu itself. Big sorry for this!
+On 13/12/2018 04.24, David Gibson wrote:
+> On Thu, Aug 30, 2018 at 04:33:48PM +0200, Marc-Andr=E9 Lureau wrote:
+>> Remove -sandbox option if the host is not capable of TSYNC, since the
+>> sandbox will fail at setup time otherwise. This will help libvirt, for=
 
-Anyway, patch series works fine for me, so for the series:
+>> ex, to figure out if -sandbox will work.
+>>
+>> Signed-off-by: Marc-Andr=E9 Lureau <marcandre.lureau@redhat.com>
+>=20
+> This seems to have introduced a regression, which I found when
+> preparing a ppc pull request.  Specifically when running with RHEL7 on
+> a POWER host, using "-sandbox off" which one of my tests did, causes a
+> cryptic error followed by a SEGV:
+>=20
+> $ ./ppc64-softmmu/qemu-system-ppc64 -sandbox off
+> qemu-system-ppc64: -sandbox off: There is no option group 'sandbox'
+> Segmentation fault
+> $ ./x86_64-softmmu/qemu-system-x86_64 -sandbox off
+> qemu-system-x86_64: -sandbox off: There is no option group 'sandbox'
+> Segmentation fault
+>=20
+> I think the problem is that while this wrapped one use of the sandbox
+> option group to produce a sensible error, it didn't do the same for
+> another call to qemu_opts_parse_noisily():
+>=20
+> (gdb) bt
+> #0  0x00000000105b36d8 in opts_parse (list=3D0x0, params=3D0x3ffffffffa=
+b5 "off", permit_abbrev=3Dtrue, defaults=3Dfalse, errp=3D0x3ffffffff080)
+>     at util/qemu-option.c:829
+> #1  0x00000000105b3b74 in qemu_opts_parse_noisily (list=3D<optimized ou=
+t>, params=3D<optimized out>, permit_abbrev=3D<optimized out>) at util/qe=
+mu-option.c:890
+> #2  0x0000000010024964 in main (argc=3D<optimized out>, argv=3D<optimiz=
+ed out>, envp=3D<optimized out>) at vl.c:3589
+>=20
+> I'm guessing RHEL7 triggers it because that has a version of
+> libseccomp that doesn't support the feature needed to complete
+> registration (maybe on ppc host only; I haven't had a chance to try on
+> an x86 RHEL7 host).
 
-Tested-by: Thomas Huth <thuth@redhat.com>
-
-> Also, can we add these test=C2=A0sceneries(big-endian host) in our CI? =
-so
-> that the bot can report for every commit.
-
-Patchew only runs on x86, but Peter has some big endian hosts for his
-acceptance tests - so problems should be found during PULL requests at
-least.
+Andrea reported the same issue again today with QEMU v4.0 ...
+Marc-Andr=E9, have you ever had another look into this issue?
 
  Thomas
+
+
+
+--OOs2s2PrFc2V10gfGUCZqVrIFnSMCxOaz
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2.0.22 (GNU/Linux)
+
+iQIcBAEBAgAGBQJcxvpkAAoJEC7Z13T+cC21GDAQAI0wQTB/cTSp52kJW+pesPkp
+MXGBy2jfe9T/3hSJg7dRIpkq2AfKoGG9ORSKo6Dztlh+k5GlJGv5MWfy1eNjCRqT
+diJgadtpmbxa+ntrLZR90eqYI4aHEqbpbsZsSMBhEbfSRyZCoY6R6DIhih/coCx2
+85NasoXBybzYNvHFNNmpr0tzFMIFI+huW5tmv62Gsq4HiF47XchXBAccQKINteP/
+OhWN5XJWDl/AP/zhC+us43DvpLglGrN2cYSvxtLnQQo5TY+ZvTBEMqiXzaWTzUbA
+OIgcW8SAS0NrP8/0RUsgDug7PsGzq76tG3O6hUL8Gux560v/sp4eEfaSjdC6U3xs
+VA4ft+ggtUI4zInQUIDyw/QAzKd27nmPlwgDSO6zowwk5pPFON+7qp2UoJuYiIDN
+qvKYLttvBLrTa1vE7eMVHaTn2SKpQ+4jbGCFU7tI6EZJ0REpDgkng9UrniC6Goam
+L6ZdldkTWxPl/swEYY89n1M3DrvhJ5LMM157EXN/9YxmqbNCqoSkNyi1iGiDAUEZ
+RuQX1heQssKMuDU653+SxKWqW/YnHSZYbFkb4wgt8CIbOKAwKtk//VEamYLzEaqt
+7ga47EFdgpi0HcZovhdJKonZfoJcrnaEgNak//SvK4OIs8gkairK1Ai7OfQxeGk5
+upLG9vctfsd0a5Hd9RYD
+=BuqW
+-----END PGP SIGNATURE-----
+
+--OOs2s2PrFc2V10gfGUCZqVrIFnSMCxOaz--
 
