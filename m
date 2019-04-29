@@ -2,80 +2,78 @@ Return-Path: <SRS0=sEuR=S7=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.7 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS,URIBL_BLOCKED
+X-Spam-Status: No, score=-8.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,USER_AGENT_NEOMUTT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 62ACEC43219
-	for <qemu-devel@archiver.kernel.org>; Mon, 29 Apr 2019 15:56:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6775AC43219
+	for <qemu-devel@archiver.kernel.org>; Mon, 29 Apr 2019 15:57:34 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 270812063F
-	for <qemu-devel@archiver.kernel.org>; Mon, 29 Apr 2019 15:56:18 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="KrmEmvH4"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 270812063F
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id 2A2432064A
+	for <qemu-devel@archiver.kernel.org>; Mon, 29 Apr 2019 15:57:34 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2A2432064A
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:59613 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:59628 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hL8dd-00083w-Es
-	for qemu-devel@archiver.kernel.org; Mon, 29 Apr 2019 11:56:17 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:39011)
+	id 1hL8er-0000fk-G5
+	for qemu-devel@archiver.kernel.org; Mon, 29 Apr 2019 11:57:33 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:39098)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1hL8co-0007RT-G1
-	for qemu-devel@nongnu.org; Mon, 29 Apr 2019 11:55:27 -0400
+	(envelope-from <sgarzare@redhat.com>) id 1hL8dI-0007tu-GM
+	for qemu-devel@nongnu.org; Mon, 29 Apr 2019 11:55:57 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1hL8cn-0007a5-60
-	for qemu-devel@nongnu.org; Mon, 29 Apr 2019 11:55:26 -0400
-Received: from mail-ot1-x341.google.com ([2607:f8b0:4864:20::341]:45158)
+	(envelope-from <sgarzare@redhat.com>) id 1hL8dH-0007sC-8Z
+	for qemu-devel@nongnu.org; Mon, 29 Apr 2019 11:55:56 -0400
+Received: from mail-wr1-f65.google.com ([209.85.221.65]:33776)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1hL8cn-0007ZO-1d
-	for qemu-devel@nongnu.org; Mon, 29 Apr 2019 11:55:25 -0400
-Received: by mail-ot1-x341.google.com with SMTP id a10so253272otl.12
-	for <qemu-devel@nongnu.org>; Mon, 29 Apr 2019 08:55:24 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
-	h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-	:cc; bh=sZad7pqPaqxv8J0C49FcSl+C1cBSPKCJl77xw4EoB30=;
-	b=KrmEmvH4mbjkiit4vzV7L3ldUP5g1HKVoFiPkhJzTELC6E9fIzjeylKjAFavh31SQJ
-	ji6vRJCYFv4OXocu58LTUcDcCE2VA3gu1wqbmdC4s6YyeqFdSdRJmPK1FrgCJV1I4SP9
-	7hH9AhER0wHVw3fJ602k2sC3tTK9JpAR2ooChBgr2YOmNDRd5QdLRuXqh0OoWESldK8q
-	GUe70m0qOcl2vulLK0PJpEShDagmBFAzWpxH5P4Q5a3NUvAoe7eFb6Iuq7bpQhSrdVFb
-	0QT+fofuCwDdgT3rpbGEeEiLDDFaKsJB/H3A7/yUtacIlcLOMoHDbNZ63pPpp8eOMoJu
-	z3Ug==
+	(Exim 4.71) (envelope-from <sgarzare@redhat.com>) id 1hL8dD-0007oc-Fu
+	for qemu-devel@nongnu.org; Mon, 29 Apr 2019 11:55:53 -0400
+Received: by mail-wr1-f65.google.com with SMTP id s18so16881220wrp.0
+	for <qemu-devel@nongnu.org>; Mon, 29 Apr 2019 08:55:50 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
 	d=1e100.net; s=20161025;
-	h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-	:message-id:subject:to:cc;
-	bh=sZad7pqPaqxv8J0C49FcSl+C1cBSPKCJl77xw4EoB30=;
-	b=ld1j8lPZuJoJraLevqmJoNc8mawSSsVblUoa6BvWiXfugxKv/v+w0yjX7rTK8OvI0b
-	pzvPZFSDHIQM8OR9JJKWLJ6l5hsnJuPveJ/OFGPk3pIWyWmnj3eDEZvBUxLJcGw6guwK
-	3xWoxwxWfKh2i35CK3OPQN5We54+7GqPyMQg6xmF7jZwFhiPbkR4OTtg+hippn8zl/YA
-	eZjLbWxjU/eUABGQblgsU/ovU3rtTn2ez6e1k/6d995dxll31C166JPLubgRjCv8oNZ7
-	XzB+hhv3/YxPTbjqL0pJE+lhuniR5m7AyZ9b74fKhztfTreFRk6rfwnPxt/XU3caTF5w
-	vfLA==
-X-Gm-Message-State: APjAAAWN6V0ZvmhkDFPwU68z82EJgNk2YFaq3k383rHsDJBhCKlrR9Ge
-	dVxsDDo5K/+LonnbQI5qIgi3zYEsZIMkVubiu5KwMw==
-X-Google-Smtp-Source: APXvYqyC8Hv+ceMR6M0uk13VESCJh9gbjGmfwGHzFR9DDQYPGU2Xz46XOcCCB1lDIrOQe+sejh4dq90yi3wQ6coFNIM=
-X-Received: by 2002:a9d:61c6:: with SMTP id h6mr1679663otk.316.1556553323951; 
-	Mon, 29 Apr 2019 08:55:23 -0700 (PDT)
+	h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+	:mime-version:content-disposition:in-reply-to:user-agent;
+	bh=ILsergqfW1RQzuTYl5lwHg1XTor6XjOtRRu8lmYrI4U=;
+	b=bkgAsehNtCmE/car3FCVyrRiJRfvrA8wjqjoRStLixxchQetxBobxmuxj0nNyudg5W
+	4q838q88ennRa1w9QH0W2G9PJmo14NkRVdh1cYslliDvmzxXGVjgyCCDjZMHHIe/pK0D
+	DWd0GD1pXtRW/nCKZbadPQbUd1jjdM1NqOIpsjdPOddnQ6CcS2WONR+/S75puBtulIUW
+	zygzfAtjpOCyhnXUM2L2vQKVrdOzlS0YZtMVK0PnRsZRqVNWeQyZw990Sk1U6HKmBWGL
+	h6cjy+VGxOBFyV+69BXH9FZm5+pHCj2gTi+BJutivzvwdHlSxDrq0PP5XKKEMu1K9OnX
+	rmug==
+X-Gm-Message-State: APjAAAVqGbL4leAQUN5Tr1BClxCsOUxzle/Ag0V9QgIPjP8IXHV1D6FB
+	5uQYi+upmK+QxZ1a/u/VMtwvuw==
+X-Google-Smtp-Source: APXvYqwi9lONC53YyQdyfXy/VCVPri6iN5LIQU4vQWYZTTjEqDI/WruIyQcFNK9kGnkpLxZ+VyJ2yg==
+X-Received: by 2002:adf:dbc1:: with SMTP id e1mr25216406wrj.203.1556553349585; 
+	Mon, 29 Apr 2019 08:55:49 -0700 (PDT)
+Received: from steredhat (host35-203-static.12-87-b.business.telecomitalia.it.
+	[87.12.203.35]) by smtp.gmail.com with ESMTPSA id
+	c11sm25122530wrs.86.2019.04.29.08.55.48
+	(version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
+	Mon, 29 Apr 2019 08:55:48 -0700 (PDT)
+Date: Mon, 29 Apr 2019 17:55:46 +0200
+From: Stefano Garzarella <sgarzare@redhat.com>
+To: Kevin Wolf <kwolf@redhat.com>
+Message-ID: <20190429155546.3yous37l7vokkutb@steredhat>
+References: <20190411105025.97397-1-sgarzare@redhat.com>
+	<20190411105025.97397-2-sgarzare@redhat.com>
+	<20190429102510.GD8492@localhost.localdomain>
+	<20190429140427.6tfpvdzza3io46g5@steredhat>
+	<20190429143014.GG8492@localhost.localdomain>
 MIME-Version: 1.0
-References: <1554321185-2825-1-git-send-email-sandra@codesourcery.com>
-In-Reply-To: <1554321185-2825-1-git-send-email-sandra@codesourcery.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Mon, 29 Apr 2019 16:55:13 +0100
-Message-ID:
- <CAFEAcA_X+rmREYo_HRjKwwNmUGG4vEeb6s=5eLb3MudmEsUH=A@mail.gmail.com>
-To: Sandra Loosemore <sandra@codesourcery.com>
 Content-Type: text/plain; charset="UTF-8"
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
-	recognized.
-X-Received-From: 2607:f8b0:4864:20::341
-Subject: Re: [Qemu-devel] [PATCH v7 0/2] Nios II generic board config and
- semihosting
+Content-Disposition: inline
+In-Reply-To: <20190429143014.GG8492@localhost.localdomain>
+User-Agent: NeoMutt/20180716
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+	[fuzzy]
+X-Received-From: 209.85.221.65
+Subject: Re: [Qemu-devel] [PATCH RFC 1/1] block/rbd: increase dynamically
+ the image size
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -87,30 +85,111 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Marek Vasut <marex@denx.de>, Chris Wulff <crwulff@gmail.com>,
-	QEMU Developers <qemu-devel@nongnu.org>
+Cc: Josh Durgin <jdurgin@redhat.com>, qemu-devel@nongnu.org,
+	qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190429155513.MjjiTA1C-NzOzvrabyAo7QM3KR_j85YA56bLQ7NH1O4@z>
+Message-ID: <20190429155546.M3ULSThe4eSsZcaPXskmYDYNDSe1PHiPd3TNaI9dqNY@z>
 
-On Wed, 3 Apr 2019 at 20:53, Sandra Loosemore <sandra@codesourcery.com> wrote:
->
-> This is the seventh version of the patch series last posted here:
-> http://lists.nongnu.org/archive/html/qemu-devel/2019-03/msg06255.html
->
-> Changes since v6:
-> - Fixed block comment formatting for QEMU style.
-> - Fixed fixme for interrupt handler (now added to libgloss BSP).
-> - Added link to libgloss semihosting documentation.
->
-> Sandra Loosemore (2):
->   Add generic Nios II board.
->   Add Nios II semihosting support.
+On Mon, Apr 29, 2019 at 04:30:14PM +0200, Kevin Wolf wrote:
+> Am 29.04.2019 um 16:04 hat Stefano Garzarella geschrieben:
+> > On Mon, Apr 29, 2019 at 12:25:10PM +0200, Kevin Wolf wrote:
+> > > Am 11.04.2019 um 12:50 hat Stefano Garzarella geschrieben:
+> > > > RBD APIs don't allow us to write more than the size set with rbd_create()
+> > > > or rbd_resize().
+> > > > In order to support growing images (eg. qcow2), we resize the image
+> > > > before RW operations that exceed the current size.
+> > > > 
+> > > > Buglink: https://bugzilla.redhat.com/show_bug.cgi?id=1171007
+> > > > Signed-off-by: Stefano Garzarella <sgarzare@redhat.com>
+> > > > ---
+> > > >  block/rbd.c | 25 +++++++++++++++++++++++++
+> > > >  1 file changed, 25 insertions(+)
+> > > > 
+> > > > diff --git a/block/rbd.c b/block/rbd.c
+> > > > index 0c549c9935..228658e20a 100644
+> > > > --- a/block/rbd.c
+> > > > +++ b/block/rbd.c
+> > > > @@ -102,6 +102,7 @@ typedef struct BDRVRBDState {
+> > > >      rbd_image_t image;
+> > > >      char *image_name;
+> > > >      char *snap;
+> > > > +    uint64_t image_size;
+> > > >  } BDRVRBDState;
+> > > 
+> > > Can't we use bs->total_sectors instead of adding a new image_size field?
+> > 
+> > I'm not sure we can use bs->total_sectors. IIUC, for example, it doesn't
+> > take care of bytes used by QCOW2 metadata.
+> 
+> bs->total_sectors for the rbd BLockDriverState is the image file size,
+> not the virtual disk size.
+> 
+> The only reason not to use it would be if we need byte granularity
+> rather than 512 byte granularity. But I don't think it's a problem to
+> round up offsets to the next 512 bytes (BDRV_SECTOR_SIZE) boundary.
+> 
 
-Since Nios II doesn't have anybody actively handling
-pull requests for it right now, I've applied these patches
-directly to master -- thanks!
+I tried and it works as you told me :) I'll remove the image_size in the
+v2.
 
--- PMM
+> > > >  static int qemu_rbd_connect(rados_t *cluster, rados_ioctx_t *io_ctx,
+> > > > @@ -777,6 +778,14 @@ static int qemu_rbd_open(BlockDriverState *bs, QDict *options, int flags,
+> > > >          goto failed_open;
+> > > >      }
+> > > >  
+> > > > +    r = rbd_get_size(s->image, &s->image_size);
+> > > > +    if (r < 0) {
+> > > > +        error_setg_errno(errp, -r, "error reading image size from %s",
+> > > > +                         s->image_name);
+> > > > +        rbd_close(s->image);
+> > > > +        goto failed_open;
+> > > > +    }
+> > > > +
+> > > >      /* If we are using an rbd snapshot, we must be r/o, otherwise
+> > > >       * leave as-is */
+> > > >      if (s->snap != NULL) {
+> > > > @@ -921,6 +930,20 @@ static BlockAIOCB *rbd_start_aio(BlockDriverState *bs,
+> > > >          rcb->buf = acb->bounce;
+> > > >      }
+> > > >  
+> > > > +    /*
+> > > > +     * RBD APIs don't allow us to write more than actual size, so in order
+> > > > +     * to support growing images, we resize the image before RW operations
+> > > > +     * that exceed the current size.
+> > > > +     */
+> > > > +    if (s->image_size < off + size) {
+> > > > +        r = rbd_resize(s->image, off + size);
+> > > > +        if (r < 0) {
+> > > > +            goto failed;
+> > > > +        }
+> > > > +
+> > > > +        s->image_size = off + size;
+> > > > +    }
+> > > 
+> > > This doesn't check the request type, so it's actually not limited to RW
+> > > operations, but even reads will try to resize the image. This is at
+> > > least surprising. For regular files, file-posix extends the file for
+> > > write requests, but for reads it returns a zeroed buffer without
+> > > actually changing the file size.
+> > 
+> > Yes, I'll change the behaviour in the v2.
+> > 
+> > I did some tries (i.e. using qemu-io and reading more than bytes used) and
+> > the RBD driver didn't receive 'read' requests that exceed the current
+> > size, maybe because it is managed in the QCOW2 protocol, but of course
+> > I'll handle also in the RBD driver.
+> 
+> I don't remember the exact scenario where it happened, but I know I
+> implemented it for file-posix to fix a bug. Maybe it actually doesn't
+> happen any more because we have made other changes in the meantime, but
+> I'm not sure.
+> 
+
+Thanks for the details, I'll check better if we can avoid it, otherwise
+I'll take care of this in the RBD driver.
+
+Cheers,
+Stefano
 
