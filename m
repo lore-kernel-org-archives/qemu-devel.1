@@ -2,92 +2,81 @@ Return-Path: <SRS0=sEuR=S7=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-4.0 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AF685C004C9
-	for <qemu-devel@archiver.kernel.org>; Mon, 29 Apr 2019 14:42:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 94FE0C43219
+	for <qemu-devel@archiver.kernel.org>; Mon, 29 Apr 2019 14:44:16 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 71D8520656
-	for <qemu-devel@archiver.kernel.org>; Mon, 29 Apr 2019 14:42:46 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 71D8520656
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 548F520673
+	for <qemu-devel@archiver.kernel.org>; Mon, 29 Apr 2019 14:44:16 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="aNtOy65G"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 548F520673
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:58603 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:58617 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hL7UT-0000KQ-Q4
-	for qemu-devel@archiver.kernel.org; Mon, 29 Apr 2019 10:42:45 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:47800)
+	id 1hL7Vv-0001Fs-Lr
+	for qemu-devel@archiver.kernel.org; Mon, 29 Apr 2019 10:44:15 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:48451)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1hL7SY-0007gv-Bt
-	for qemu-devel@nongnu.org; Mon, 29 Apr 2019 10:40:47 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1hL7V9-0000tE-U0
+	for qemu-devel@nongnu.org; Mon, 29 Apr 2019 10:43:28 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1hL7SX-0006U0-HX
-	for qemu-devel@nongnu.org; Mon, 29 Apr 2019 10:40:46 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:34860)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>)
-	id 1hL7SV-0006SB-BR; Mon, 29 Apr 2019 10:40:43 -0400
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
-	[10.5.11.14])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id DD9B63086229;
-	Mon, 29 Apr 2019 14:40:41 +0000 (UTC)
-Received: from [10.3.116.15] (ovpn-116-15.phx2.redhat.com [10.3.116.15])
-	by smtp.corp.redhat.com (Postfix) with ESMTPS id 4444F6B621;
-	Mon, 29 Apr 2019 14:40:41 +0000 (UTC)
-To: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
-References: <20190429105741.31033-1-kwolf@redhat.com>
-	<20190429112140.GF8492@localhost.localdomain>
-From: Eric Blake <eblake@redhat.com>
-Openpgp: preference=signencrypt
-Autocrypt: addr=eblake@redhat.com; keydata=
-	xsBNBEvHyWwBCACw7DwsQIh0kAbUXyqhfiKAKOTVu6OiMGffw2w90Ggrp4bdVKmCaEXlrVLU
-	xphBM8mb+wsFkU+pq9YR621WXo9REYVIl0FxKeQo9dyQBZ/XvmUMka4NOmHtFg74nvkpJFCD
-	TUNzmqfcjdKhfFV0d7P/ixKQeZr2WP1xMcjmAQY5YvQ2lUoHP43m8TtpB1LkjyYBCodd+LkV
-	GmCx2Bop1LSblbvbrOm2bKpZdBPjncRNob73eTpIXEutvEaHH72LzpzksfcKM+M18cyRH+nP
-	sAd98xIbVjm3Jm4k4d5oQyE2HwOur+trk2EcxTgdp17QapuWPwMfhaNq3runaX7x34zhABEB
-	AAHNHkVyaWMgQmxha2UgPGVibGFrZUByZWRoYXQuY29tPsLAegQTAQgAJAIbAwULCQgHAwUV
-	CgkICwUWAgMBAAIeAQIXgAUCS8fL9QIZAQAKCRCnoWtKJSdDahBHCACbl/5FGkUqJ89GAjeX
-	RjpAeJtdKhujir0iS4CMSIng7fCiGZ0fNJCpL5RpViSo03Q7l37ss+No+dJI8KtAp6ID+PMz
-	wTJe5Egtv/KGUKSDvOLYJ9WIIbftEObekP+GBpWP2+KbpADsc7EsNd70sYxExD3liwVJYqLc
-	Rw7so1PEIFp+Ni9A1DrBR5NaJBnno2PHzHPTS9nmZVYm/4I32qkLXOcdX0XElO8VPDoVobG6
-	gELf4v/vIImdmxLh/w5WctUpBhWWIfQDvSOW2VZDOihm7pzhQodr3QP/GDLfpK6wI7exeu3P
-	pfPtqwa06s1pae3ad13mZGzkBdNKs1HEm8x6zsBNBEvHyWwBCADGkMFzFjmmyqAEn5D+Mt4P
-	zPdO8NatsDw8Qit3Rmzu+kUygxyYbz52ZO40WUu7EgQ5kDTOeRPnTOd7awWDQcl1gGBXgrkR
-	pAlQ0l0ReO57Q0eglFydLMi5bkwYhfY+TwDPMh3aOP5qBXkm4qIYSsxb8A+i00P72AqFb9Q7
-	3weG/flxSPApLYQE5qWGSXjOkXJv42NGS6o6gd4RmD6Ap5e8ACo1lSMPfTpGzXlt4aRkBfvb
-	NCfNsQikLZzFYDLbQgKBA33BDeV6vNJ9Cj0SgEGOkYyed4I6AbU0kIy1hHAm1r6+sAnEdIKj
-	cHi3xWH/UPrZW5flM8Kqo14OTDkI9EtlABEBAAHCwF8EGAEIAAkFAkvHyWwCGwwACgkQp6Fr
-	SiUnQ2q03wgAmRFGDeXzc58NX0NrDijUu0zx3Lns/qZ9VrkSWbNZBFjpWKaeL1fdVeE4TDGm
-	I5mRRIsStjQzc2R9b+2VBUhlAqY1nAiBDv0Qnt+9cLiuEICeUwlyl42YdwpmY0ELcy5+u6wz
-	mK/jxrYOpzXKDwLq5k4X+hmGuSNWWAN3gHiJqmJZPkhFPUIozZUCeEc76pS/IUN72NfprZmF
-	Dp6/QDjDFtfS39bHSWXKVZUbqaMPqlj/z6Ugk027/3GUjHHr8WkeL1ezWepYDY7WSoXwfoAL
-	2UXYsMAr/uUncSKlfjvArhsej0S4zbqim2ZY6S8aRWw94J3bSvJR+Nwbs34GPTD4Pg==
-Organization: Red Hat, Inc.
-Message-ID: <ab303a48-a796-4550-f6cf-cff2674d2ee9@redhat.com>
-Date: Mon, 29 Apr 2019 09:40:40 -0500
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
-	Thunderbird/60.6.1
+	(envelope-from <peter.maydell@linaro.org>) id 1hL7V8-0008MQ-Qz
+	for qemu-devel@nongnu.org; Mon, 29 Apr 2019 10:43:27 -0400
+Received: from mail-ot1-x341.google.com ([2607:f8b0:4864:20::341]:33147)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1hL7V7-0008DQ-2G
+	for qemu-devel@nongnu.org; Mon, 29 Apr 2019 10:43:26 -0400
+Received: by mail-ot1-x341.google.com with SMTP id s11so4502833otp.0
+	for <qemu-devel@nongnu.org>; Mon, 29 Apr 2019 07:43:22 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+	h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+	:cc; bh=DFIJe8okj5jTgfUUyxnm6Ek5eIOppwKEa4ZITVL+KpI=;
+	b=aNtOy65GB3GB1aav0KSA5UT8jk1v98+FqdYoCxixiNdukl9+EStUI45/upfZdsjda9
+	EJxDGa+itPSA9kUZEOxOUOR6g0d0WM2gWm+1ANBV1OZqxJfSlg50PC0QEDorzGhPpNMf
+	gipj/BiZGPGiR4HuACHSrKoih6oUxK1yMqyixzob3V5x8yGlQE2fOG4+cFSgRvC57ENB
+	rFIlOn9MBYKIPpsiY2w99rP9nmBEprdKq+KhF1xthxbh9jrVQRspqLCOWgvgVON0y0nm
+	x+F5p73Uireh94Y9kB9pdTXYw6N9UOLjY2svStPI3BKImvcx3SJFfThI9oaAW2TzwS/t
+	SeNw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=1e100.net; s=20161025;
+	h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+	:message-id:subject:to:cc;
+	bh=DFIJe8okj5jTgfUUyxnm6Ek5eIOppwKEa4ZITVL+KpI=;
+	b=YzkIEljW2rBOPBSfxHRmSbW85n1RwZRI7k8jn2uShCx8svfO/WYj7kH1YcOodH9RJF
+	vrRumThMacQgZ2MaJih+oyPYri1GIEPhMj22cH/QU0Kl2l4qiJmz/l68OoUeL3YatoZD
+	Hry3100s/HUxKNBLGKCvGe96wkO1x94eJRZBh6GNBfviHnNO/CI20tIAFK0TmUnqcp0s
+	FWGAQTARI62Ukikh2P5B19B/FpMbhQzaUFmBXkU1CgHcOO87ZG9cBvGWT8j/qtBoRlDm
+	UqxhigZOSUisYCXzyJ538N1uuFd56Sazo4q2spry42r8ZMJG4OwaF+lfxU2sBn2gBWiI
+	imdQ==
+X-Gm-Message-State: APjAAAUnkXFoPSG//nTMzBQKvl0GPZ3+FQHuGcWu1Ke/W+2qj/Wcuwhq
+	zDgmIQaqj7GD0MB7T8NVWmrJkqF8gKV29kFIU4zku3ioTTM=
+X-Google-Smtp-Source: APXvYqyXzj3k6KMLe4VBSPbS0cvoRyp0Tmk9U7Co4hxO8g+2UnRiLVvGjkcopg17gU9JGqXTt0DpX86PAuz+4YePwNo=
+X-Received: by 2002:a9d:57c4:: with SMTP id q4mr4240282oti.151.1556549002178; 
+	Mon, 29 Apr 2019 07:43:22 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20190429112140.GF8492@localhost.localdomain>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="E017uU8EB5L5gMdQwB2ku4OLLIBmljN1J"
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.42]);
-	Mon, 29 Apr 2019 14:40:41 +0000 (UTC)
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-X-Content-Filtered-By: Mailman/MimeDel 2.1.21
-Subject: Re: [Qemu-devel] [PATCH] qcow2: Fix qcow2_make_empty() with
- external data file
+References: <20190328230404.12909-1-richard.henderson@linaro.org>
+	<20190328230404.12909-32-richard.henderson@linaro.org>
+In-Reply-To: <20190328230404.12909-32-richard.henderson@linaro.org>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Mon, 29 Apr 2019 15:43:11 +0100
+Message-ID:
+ <CAFEAcA9nWq44C=m3exNJBO-YpheGRdzzAL529uCaFtUNGCWGkQ@mail.gmail.com>
+To: Richard Henderson <richard.henderson@linaro.org>
+Content-Type: text/plain; charset="UTF-8"
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+	recognized.
+X-Received-From: 2607:f8b0:4864:20::341
+Subject: Re: [Qemu-devel] [PATCH for-4.1 v2 31/36] cpu: Introduce
+ CPUNegativeOffsetState
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -99,74 +88,39 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: mreitz@redhat.com, qemu-devel@nongnu.org, qemu-stable@nongnu.org
+Cc: QEMU Developers <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190429144040.rPU_vQZQJz6xLEwcjJCvGJfb9fpS3cbFS2FTv8hehBo@z>
+Message-ID: <20190429144311.C3SG2Ue5Jo5Qk7cQPipjjuqczzIb0wvBvxUS8CaILfA@z>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---E017uU8EB5L5gMdQwB2ku4OLLIBmljN1J
-From: Eric Blake <eblake@redhat.com>
-To: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
-Cc: qemu-devel@nongnu.org, qemu-stable@nongnu.org, mreitz@redhat.com
-Message-ID: <ab303a48-a796-4550-f6cf-cff2674d2ee9@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH] qcow2: Fix qcow2_make_empty() with external
- data file
-References: <20190429105741.31033-1-kwolf@redhat.com>
- <20190429112140.GF8492@localhost.localdomain>
-In-Reply-To: <20190429112140.GF8492@localhost.localdomain>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+On Thu, 28 Mar 2019 at 23:35, Richard Henderson
+<richard.henderson@linaro.org> wrote:
+>
+> Nothing in there so far, but all of the plumbing done
+> within the target ArchCPU state.
+>
+> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 
-On 4/29/19 6:21 AM, Kevin Wolf wrote:
-> Am 29.04.2019 um 12:57 hat Kevin Wolf geschrieben:
->> make_completely_empty() is an optimisated path for bdrv_make_empty()
->> where completely new metadata is created inside the image file instead=
+> +/*
+> + * This structure must be placed in ArchCPU immedately
+> + * before CPUArchState, as a field named "neg".
+> + */
+> +typedef struct CPUNegativeOffsetState {
+> +    /* Empty */
+> +} CPUNegativeOffsetState;
 
->> of going through all clusters and discarding them. For an external dat=
-a
->> file, however, we actually need to do discard operations on the data
->> file; just overwriting the qcow2 file doesn't get rid of the data.
->>
->> The necessary slow path with an explicit discard operation already
->> exists for other cases. Use it for external data files, too.
->>
->> Cc: qemu-stable@nongnu.org
->> Signed-off-by: Kevin Wolf <kwolf@redhat.com>
->> ---
->>  block/qcow2.c | 3 ++-
->>  1 file changed, 2 insertions(+), 1 deletion(-)
+It would be nice if we could do a compile-time assert that
+ offsetof(CPUArchState, neg) + sizeof(CPUNegativeOffsetState)
+  == offsetof(CPUArchState, env)
 
-> Oops, I hadn't everything committed yet. I'll add a comment change as
-> well:
+but I guess the possibility of within-struct padding
+between the two structs makes that dubious. Or does our
+generated code rely on there being no padding between neg
+and env anyway ?
 
-With the comment change squashed in,
-Reviewed-by: Eric Blake <eblake@redhat.com>
+Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
 
-
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3226
-Virtualization:  qemu.org | libvirt.org
-
-
---E017uU8EB5L5gMdQwB2ku4OLLIBmljN1J
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlzHDOgACgkQp6FrSiUn
-Q2qMsAgAqgRilOeU4bC8M60cyBLAU91O55BfbS5aMVZNNflMLV0QWhAkXSYwziuP
-7om7wElQgdEy6ywES/85/LieA/PiwXpjZP/wg0wYHjq0NMXxzfP6Nt+g1hGF8d7K
-juePCbhWwxkkkARt1jOxb+iQf013Yaa4K2tesSy1/BbX14twt9lctd3O8W2umLmV
-GUNx46VLZa29yJhkESfsqd60XwryvDB+j78RhMb6twlc3I7eXToevpFNasAi1eWt
-h5LyYb/PxPhptzTQQI/ZV02/eH+02T66jE40vpAD5SslZjGK+o+y7n62if7T/tyA
-2kuozWz4b/9vBA5J75cAy3nXmahYmw==
-=qo7b
------END PGP SIGNATURE-----
-
---E017uU8EB5L5gMdQwB2ku4OLLIBmljN1J--
+thanks
+-- PMM
 
