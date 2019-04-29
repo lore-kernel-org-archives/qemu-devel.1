@@ -1,25 +1,26 @@
-Received: from eggs.gnu.org ([209.51.188.92]:43939)
+Received: from eggs.gnu.org ([209.51.188.92]:44023)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <lvivier@redhat.com>) id 1hL7CY-0006ZV-K7
-	for qemu-devel@nongnu.org; Mon, 29 Apr 2019 10:24:15 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1hL7Cq-0006n0-Bq
+	for qemu-devel@nongnu.org; Mon, 29 Apr 2019 10:24:33 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <lvivier@redhat.com>) id 1hL7CX-0003IQ-JI
-	for qemu-devel@nongnu.org; Mon, 29 Apr 2019 10:24:14 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:37684)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <lvivier@redhat.com>) id 1hL7CX-0003FV-AS
-	for qemu-devel@nongnu.org; Mon, 29 Apr 2019 10:24:13 -0400
-References: <20190429134757.13570-1-marcandre.lureau@redhat.com>
-From: Laurent Vivier <lvivier@redhat.com>
-Message-ID: <6f4b8998-341a-9169-b368-db4a6b00b65d@redhat.com>
-Date: Mon, 29 Apr 2019 16:24:02 +0200
+	(envelope-from <peter.maydell@linaro.org>) id 1hL7Cp-0003Wv-JP
+	for qemu-devel@nongnu.org; Mon, 29 Apr 2019 10:24:32 -0400
+Received: from mail-oi1-x241.google.com ([2607:f8b0:4864:20::241]:46303)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1hL7Cp-0003VB-Dk
+	for qemu-devel@nongnu.org; Mon, 29 Apr 2019 10:24:31 -0400
+Received: by mail-oi1-x241.google.com with SMTP id d62so2551914oib.13
+	for <qemu-devel@nongnu.org>; Mon, 29 Apr 2019 07:24:30 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20190429134757.13570-1-marcandre.lureau@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH] vl: fix -sandbox parsing crash when
- seccomp support is disabled
+References: <20190328230404.12909-1-richard.henderson@linaro.org>
+	<20190328230404.12909-26-richard.henderson@linaro.org>
+In-Reply-To: <20190328230404.12909-26-richard.henderson@linaro.org>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Mon, 29 Apr 2019 15:24:17 +0100
+Message-ID: <CAFEAcA97ksktpBxpAtTB+WufL0hosBm1n2k6X=LurHQQMO14bw@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH for-4.1 v2 25/36] target/tilegx: Use env_cpu
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,55 +29,21 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>, qemu-devel@nongnu.org
-Cc: otubo@redhat.com, Paolo Bonzini <pbonzini@redhat.com>, david@gibson.dropbear.id.au
+To: Richard Henderson <richard.henderson@linaro.org>
+Cc: QEMU Developers <qemu-devel@nongnu.org>
 
-On 29/04/2019 15:47, Marc-Andr=C3=A9 Lureau wrote:
-> $ ./x86_64-softmmu/qemu-system-x86_64 -sandbox off
-> qemu-system-x86_64: -sandbox off: There is no option group 'sandbox'
-> Segmentation fault
->=20
-> Commit 5780760f5e ("seccomp: check TSYNC host capability") wrapped one
-> use of the sandbox option group to produce a sensible error, it didn't
-> do the same for another call to qemu_opts_parse_noisily():
->=20
-> (gdb) bt
->     at util/qemu-option.c:829
->  #0  0x00000000105b36d8 in opts_parse (list=3D0x0, params=3D0x3ffffffff=
-ab5 "off", permit_abbrev=3Dtrue, defaults=3Dfalse, errp=3D0x3ffffffff080)
->      at util/qemu-option.c:829
->  #1  0x00000000105b3b74 in qemu_opts_parse_noisily (list=3D<optimized o=
-ut>, params=3D<optimized out>, permit_abbrev=3D<optimized out>) at util/q=
-emu-option.c:890
->  #2  0x0000000010024964 in main (argc=3D<optimized out>, argv=3D<optimi=
-zed out>, envp=3D<optimized out>) at vl.c:3589
->=20
-> Fixes: 5780760f5ea6163939a5dabe7427318b4f07d1a2
-> Cc: david@gibson.dropbear.id.au
-> Cc: otubo@redhat.com
-> Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+On Thu, 28 Mar 2019 at 23:34, Richard Henderson
+<richard.henderson@linaro.org> wrote:
+>
+> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 > ---
->  vl.c | 18 ++++++++++--------
->  1 file changed, 10 insertions(+), 8 deletions(-)
->=20
-> diff --git a/vl.c b/vl.c
-> index 4019a4387d..5fc4994d3c 100644
-> --- a/vl.c
-> +++ b/vl.c
-> @@ -3866,17 +3866,19 @@ int main(int argc, char **argv, char **envp)
->                  qtest_log =3D optarg;
->                  break;
->              case QEMU_OPTION_sandbox:
-> -#ifdef CONFIG_SECCOMP
-> -                opts =3D qemu_opts_parse_noisily(qemu_find_opts("sandb=
-ox"),
-> -                                               optarg, true);
-> +                olist =3D qemu_find_opts("sandbox");
-> +                if (!olist) {
-> +#ifndef CONFIG_SECCOMP
+>  target/tilegx/cpu.h          | 5 -----
+>  linux-user/tilegx/cpu_loop.c | 2 +-
+>  target/tilegx/helper.c       | 2 +-
+>  3 files changed, 2 insertions(+), 7 deletions(-)
+>
 
-Why do you move the #ifdef? We have two separate error cases here.
-And it seems better no to check for "-sandbox" when seccomp is disabled.
+Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
 
-Thanks,
-Laurent
+thanks
+-- PMM
