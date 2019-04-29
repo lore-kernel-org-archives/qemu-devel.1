@@ -2,72 +2,99 @@ Return-Path: <SRS0=sEuR=S7=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.4 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_PASS,USER_AGENT_MUTT autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-8.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7391BC43219
-	for <qemu-devel@archiver.kernel.org>; Mon, 29 Apr 2019 09:18:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 37CD2C43219
+	for <qemu-devel@archiver.kernel.org>; Mon, 29 Apr 2019 09:20:22 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 345ED20578
-	for <qemu-devel@archiver.kernel.org>; Mon, 29 Apr 2019 09:18:33 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 345ED20578
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 0B75B20578
+	for <qemu-devel@archiver.kernel.org>; Mon, 29 Apr 2019 09:20:22 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0B75B20578
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=de.ibm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:54507 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:54530 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hL2Qi-0001vG-Cc
-	for qemu-devel@archiver.kernel.org; Mon, 29 Apr 2019 05:18:32 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:36212)
+	id 1hL2ST-0003Aa-8o
+	for qemu-devel@archiver.kernel.org; Mon, 29 Apr 2019 05:20:21 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:33538)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mkletzan@redhat.com>) id 1hL2OW-0000gE-74
-	for qemu-devel@nongnu.org; Mon, 29 Apr 2019 05:16:17 -0400
+	(envelope-from <borntraeger@de.ibm.com>) id 1hL2GX-0001k0-98
+	for qemu-devel@nongnu.org; Mon, 29 Apr 2019 05:08:04 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mkletzan@redhat.com>) id 1hL2OU-00087q-Qg
-	for qemu-devel@nongnu.org; Mon, 29 Apr 2019 05:16:16 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:47332)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mkletzan@redhat.com>) id 1hL2OU-00087S-Ho
-	for qemu-devel@nongnu.org; Mon, 29 Apr 2019 05:16:14 -0400
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
-	[10.5.11.15])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 44BE7C057F47;
-	Mon, 29 Apr 2019 09:16:13 +0000 (UTC)
-Received: from caroline (unknown [10.43.2.67])
-	by smtp.corp.redhat.com (Postfix) with ESMTPS id E13C35D71B;
-	Mon, 29 Apr 2019 09:16:12 +0000 (UTC)
-Received: by caroline (Postfix, from userid 1000)
-	id 97D3A120066; Mon, 29 Apr 2019 11:16:11 +0200 (CEST)
-Date: Mon, 29 Apr 2019 11:16:11 +0200
-From: Martin Kletzander <mkletzan@redhat.com>
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Message-ID: <20190429091611.GE8818@wheatley>
-References: <20190423113028.GD30014@wheatley>
-	<20190423121218.GF9041@localhost.localdomain>
-	<20190423142648.GA2967@wheatley>
-	<20190423150845.GG9041@localhost.localdomain>
-	<aeb62174-5aad-676e-792d-e71d694dbd1e@virtuozzo.com>
-	<20190424071917.GA15891@linux.fritz.box>
-	<20190429072734.GC8818@wheatley>
-	<ccc8393b-8b59-63ce-c3c3-618d52cfca3e@virtuozzo.com>
-MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="eheScQNz3K90DVRs"
-Content-Disposition: inline
-In-Reply-To: <ccc8393b-8b59-63ce-c3c3-618d52cfca3e@virtuozzo.com>
-User-Agent: Mutt/1.11.4 (2019-03-13)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.32]);
-	Mon, 29 Apr 2019 09:16:13 +0000 (UTC)
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] Possibly incorrect data sparsification by qemu-img
+	(envelope-from <borntraeger@de.ibm.com>) id 1hL2Bf-0000M0-PY
+	for qemu-devel@nongnu.org; Mon, 29 Apr 2019 05:03:00 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:34730
+	helo=mx0a-001b2d01.pphosted.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <borntraeger@de.ibm.com>)
+	id 1hL2Bf-0000LL-L1
+	for qemu-devel@nongnu.org; Mon, 29 Apr 2019 05:02:59 -0400
+Received: from pps.filterd (m0098416.ppops.net [127.0.0.1])
+	by mx0b-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id
+	x3T8rbrp194010
+	for <qemu-devel@nongnu.org>; Mon, 29 Apr 2019 05:02:58 -0400
+Received: from e35.co.us.ibm.com (e35.co.us.ibm.com [32.97.110.153])
+	by mx0b-001b2d01.pphosted.com with ESMTP id 2s5vh6mdaj-1
+	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Mon, 29 Apr 2019 05:02:58 -0400
+Received: from localhost
+	by e35.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+	Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <borntraeger@de.ibm.com>;
+	Mon, 29 Apr 2019 10:02:57 +0100
+Received: from b03cxnp08025.gho.boulder.ibm.com (9.17.130.17)
+	by e35.co.us.ibm.com (192.168.1.135) with IBM ESMTP SMTP Gateway:
+	Authorized Use Only! Violators will be prosecuted; 
+	(version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
+	Mon, 29 Apr 2019 10:02:55 +0100
+Received: from b03ledav006.gho.boulder.ibm.com
+	(b03ledav006.gho.boulder.ibm.com [9.17.130.237])
+	by b03cxnp08025.gho.boulder.ibm.com (8.14.9/8.14.9/NCO v10.0) with
+	ESMTP id x3T92rdu8913230
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256
+	verify=OK); Mon, 29 Apr 2019 09:02:53 GMT
+Received: from b03ledav006.gho.boulder.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 45BFDC605A;
+	Mon, 29 Apr 2019 09:02:53 +0000 (GMT)
+Received: from b03ledav006.gho.boulder.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 830B7C6055;
+	Mon, 29 Apr 2019 09:02:52 +0000 (GMT)
+Received: from localhost.localdomain (unknown [9.114.17.106])
+	by b03ledav006.gho.boulder.ibm.com (Postfix) with ESMTP;
+	Mon, 29 Apr 2019 09:02:52 +0000 (GMT)
+From: Christian Borntraeger <borntraeger@de.ibm.com>
+To: Cornelia Huck <cohuck@redhat.com>
+Date: Mon, 29 Apr 2019 05:02:43 -0400
+X-Mailer: git-send-email 2.17.1
+In-Reply-To: <20190429090250.7648-1-borntraeger@de.ibm.com>
+References: <20190429090250.7648-1-borntraeger@de.ibm.com>
+X-TM-AS-GCONF: 00
+x-cbid: 19042909-0012-0000-0000-0000172D2F4B
+X-IBM-SpamModules-Scores: 
+X-IBM-SpamModules-Versions: BY=3.00011015; HX=3.00000242; KW=3.00000007;
+	PH=3.00000004; SC=3.00000285; SDB=6.01195994; UDB=6.00627178;
+	IPR=6.00976843; 
+	MB=3.00026644; MTD=3.00000008; XFM=3.00000015; UTC=2019-04-29 09:02:56
+X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
+x-cbparentid: 19042909-0013-0000-0000-0000570CB785
+Message-Id: <20190429090250.7648-3-borntraeger@de.ibm.com>
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:, ,
+	definitions=2019-04-29_04:, , signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+	priorityscore=1501
+	malwarescore=0 suspectscore=0 phishscore=0 bulkscore=0 spamscore=0
+	clxscore=1015 lowpriorityscore=0 mlxscore=0 impostorscore=0
+	mlxlogscore=999 adultscore=0 classifier=spam adjust=0 reason=mlx
+	scancount=1 engine=8.0.1-1810050000 definitions=main-1904290066
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic]
+X-Received-From: 148.163.158.5
+Subject: [Qemu-devel] [PATCH v3 2/9] s390x/cpumodel: ignore csske for
+ expansion
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -79,214 +106,41 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>,
-	"qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
-	Richard Jones <rjones@redhat.com>
+Cc: "Jason J . Herne" <jjherne@linux.ibm.com>,
+	Collin Walling <walling@linux.ibm.com>,
+	David Hildenbrand <david@redhat.com>, qemu-devel <qemu-devel@nongnu.org>,
+	Halil Pasic <pasic@linux.ibm.com>, qemu-s390x <qemu-s390x@nongnu.org>,
+	Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190429091611.QRCTJ1woC6mccJjmrt1BSS5F-WOH5H6i2S05cg5UU0k@z>
+Content-Type: text/plain; charset="UTF-8"
+Message-ID: <20190429090243.uhqLFBvZd9YZR6i7qSIvYQR_SndoAp9uGNPnuTvcWF4@z>
 
+csske will be removed in a future machine. Ignore it for expanding the
+cpu model. Otherwise qemu falls back to z9.
 
---eheScQNz3K90DVRs
-Content-Type: text/plain; charset=iso-8859-1; format=flowed
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+Signed-off-by: Christian Borntraeger <borntraeger@de.ibm.com>
+Cc: qemu-stable@nongnu.org
+Reviewed-by: David Hildenbrand <david@redhat.com>
+---
+ target/s390x/cpu_models.c | 2 ++
+ 1 file changed, 2 insertions(+)
 
-On Mon, Apr 29, 2019 at 08:58:37AM +0000, Vladimir Sementsov-Ogievskiy wrot=
-e:
->29.04.2019 10:27, Martin Kletzander wrote:
->> On Wed, Apr 24, 2019 at 09:19:17AM +0200, Kevin Wolf wrote:
->>> Am 24.04.2019 um 08:40 hat Vladimir Sementsov-Ogievskiy geschrieben:
->>>> 23.04.2019 18:08, Kevin Wolf wrote:
->>>> > Am 23.04.2019 um 16:26 hat Martin Kletzander geschrieben:
->>>> >> On Tue, Apr 23, 2019 at 02:12:18PM +0200, Kevin Wolf wrote:
->>>> >>> Am 23.04.2019 um 13:30 hat Martin Kletzander geschrieben:
->>>> >>>> Hi,
->>>> >>>>
->>>> >>>> I am using qemu-img with nbdkit to transfer a disk image and the =
-update it with
->>>> >>>> extra data from newer snapshots.=A0 The end image cannot be trans=
-ferred because
->>>> >>>> the snapshots will be created later than the first transfer and w=
-e want to save
->>>> >>>> some time up front.=A0 You might think of it as a continuous sync=
-hronisation.=A0 It
->>>> >>>> looks something like this:
->>>> >>>>
->>>> >>>> I first transfer the whole image:
->>>> >>>>
->>>> >>>>=A0=A0 qemu-img convert -p $nbd disk.raw
->>>> >>>>
->>>> >>>> Where `$nbd` is something along the lines of `nbd+unix:///?socket=
-=3Dnbdkit.sock`
->>>> >>>>
->>>> >>>> Then, after the next snapshot is created, I can update it thanks =
-to the `-n`
->>>> >>>> parameter (the $nbd now points to the newer snapshot with unchang=
-ed data looking
->>>> >>>> like holes in the file):
->>>> >>>>
->>>> >>>>=A0=A0 qemu-img convert -p -n $nbd disk.raw
->>>> >>>>
->>>> >>>> This is fast and efficient as it uses block status nbd extension,=
- so it only
->>>> >>>> transfers new data.
->>>> >>>
->>>> >>> This is an implementation detail. Don't rely on it. What you're do=
-ing is
->>>> >>> abusing 'qemu-img convert', so problems like what you describe are=
- to be
->>>> >>> expected.
->>>> >>>
->>>> >>>> This can be done over and over again to keep the local
->>>> >>>> `disk.raw` image up to date with the latest remote snapshot.
->>>> >>>>
->>>> >>>> However, when the guest OS zeroes some of the data and it gets wr=
-itten into the
->>>> >>>> snapshot, qemu-img scans for those zeros and does not write them =
-to the
->>>> >>>> destination image.=A0 Checking the output of `qemu-img map --outp=
-ut=3Djson $nbd`
->>>> >>>> shows that the zeroed data is properly marked as `data: true`.
->>>> >>>>
->>>> >>>> Using `-S 0` would write zeros even where the holes are, effectiv=
-ely overwriting
->>>> >>>> the data from the last snapshot even though they should not be ch=
-anged.
->>>> >>>>
->>>> >>>> Having gone through some workarounds I would like there to be ano=
-ther way.=A0 I
->>>> >>>> know this is far from the typical usage of qemu-img, but is this =
-really the
->>>> >>>> expected behaviour or is this just something nobody really needed=
- before?=A0 If it
->>>> >>>> is the former, would it be possible to have a parameter that woul=
-d control this
->>>> >>>> behaviour?=A0 If the latter is the case, can that behaviour be ch=
-anged so that it
->>>> >>>> properly replicates the data when `-n` parameter is used?
->>>> >>>>
->>>> >>>> Basically the only thing we need is to either:
->>>> >>>>
->>>> >>>> 1) write zeros where they actually are or
->>>> >>>>
->>>> >>>> 2) turn off explicit sparsification without requesting dense imag=
-e (basically
->>>> >>>>=A0=A0=A0=A0 sparsify only the par that is reported as hole on the=
- source) or
->>>> >>>>
->>>> >>>> 3) ideally, just FALLOC_FL_PUNCH_HOLE in places where source did =
-report data,
->>>> >>>>=A0=A0=A0=A0 but qemu-img found they are all zeros (or source repo=
-rted HOLE+ZERO which, I
->>>> >>>>=A0=A0=A0=A0 believe, is effectively the same)
->>>> >>>>
->>>> >>>> If you want to try this out, I found the easiest reproducible way=
- is using
->>>> >>>> nbdkit's data plugin, which can simulate whatever source image yo=
-u like.
->>>> >>>
->>>> >>> I think what you _really_ want is a commit block job. The problem =
-is
->>>> >>> just that you don't have a proper backing file chain, but just a b=
-unch
->>>> >>> of NBD connections.
->>>> >>>
->>>> >>> Can't you get an NBD connection that already provides the condense=
-d form
->>>> >>> of the whole snapshot chain directly at the source? If the NBD ser=
-ver
->>>> >>> was QEMU, this would actually be easier than providing each snapsh=
-ot
->>>> >>> individually.
->>>> >>>
->>>> >>> If this isn't possible, I think you need to replicate the backing =
-chain
->>>> >>> on the destination instead of converting into the same image again=
- and
->>>> >>> again so that qemu-img knows that it must take existing data of the
->>>> >>> backing file into consideration:
->>>> >>>
->>>> >>>=A0=A0=A0=A0 qemu-img convert -O qcow2 nbd://... base.qcow2
->>>> >>>=A0=A0=A0=A0 qemu-img convert -O qcow2 -F qcow2 -B base.qcow2 nbd:/=
-/... overlay1.qcow2
->>>> >>>=A0=A0=A0=A0 qemu-img convert -O qcow2 -F qcow2 -B overlay1.qcow2 n=
-bd://... overlay2.qcow2
->>>> >>>=A0=A0=A0=A0 ...
->>>>
->>
->> So I spoke too soon.=A0 This approach fixed the one thing that I was str=
-uggling with, but broke the rest, because it completely replicates the last=
- image even when the source provides proper allocation data.=A0 Best to sho=
-w with an illustration:
->>
->>  =A0$ rm -f disk.img snap.img
->>  =A0$ dd if=3D/dev/urandom of=3Ddisk.img bs=3D2M count=3D1
->>  =A0$ dd if=3D/dev/zero of=3Dsnap.img bs=3D1M count=3D1
->>  =A0$ truncate -s 2M snap.img
->>  =A0$ qemu-img map --output=3Djson snap.img
->>  =A0[{ "start": 0, "length": 1048576, "depth": 0, "zero": false, "data":=
- true, "offset": 0},
->>  =A0{ "start": 1048576, "length": 1048576, "depth": 0, "zero": true, "da=
-ta": false, "offset": 1048576}]
->>  =A0$ qemu-img convert -f raw -O qcow2 disk.img disk.qcow2
->>  =A0$ qemu-img convert -f raw -O qcow2 -B disk.qcow2 snap.img snap.qcow2
->>  =A0$ qemu-img convert -f qcow2 -O raw snap.qcow2 output.raw
->>  =A0$ hexdump -C output.raw
->>  =A000000000=A0 00 00 00 00 00 00 00 00=A0 00 00 00 00 00 00 00 00=A0 |.=
-=2E..............|
->>  =A0*
->>  =A000200000
->>
->
->
->Raw file holes and qcow2 unallocated clusters are not the same thing. Raw =
-holes are reported
->as zero=3Dtrue (as we see in map output), and this considered "allocated" =
-in terms of backing-chain.
->And convert will mark corresponding clusters to be ZERO (not UNALLOCATED) =
-in target qcow2.
->
->But when you export qcow2 with unallocated clusters through NBD, unallocat=
-ed clusters should be
->reported as zero=3Dfalse data=3Dfalse, and qemu-img will convert them to U=
-NALLOCATED (not ZERO)
->clusters in target qcow2 and it should work.
->
->In qcow2 ZERO and UNALLOCATED clusters works like this:
->ZERO: on write - allocate clusters and write data, on read - return zeroes
->UNALLOCATED: on write -allocate clusters and write data, on read - read fr=
-om backing file if we have it, otherwise return zeroes
->
+diff --git a/target/s390x/cpu_models.c b/target/s390x/cpu_models.c
+index e5afa15512..b4bb5de635 100644
+--- a/target/s390x/cpu_models.c
++++ b/target/s390x/cpu_models.c
+@@ -1322,6 +1322,8 @@ static void init_ignored_base_feat(void)
+          S390_FEAT_KM_TDEA_192,
+          S390_FEAT_KIMD_SHA_1,
+          S390_FEAT_KLMD_SHA_1,
++         /* CSSKE is deprecated on newer generations */
++         S390_FEAT_CONDITIONAL_SSKE,
+     };
+     int i;
+ 
+-- 
+2.17.1
 
-Oh, thanks for the clarification, this makes sense.  I'll try it out and wi=
-ll see.
-
->
->--=20
->Best regards,
->Vladimir
-
---eheScQNz3K90DVRs
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAABCAAdFiEEiXAnXDYdKAaCyvS1CB/CnyQXht0FAlzGwNsACgkQCB/CnyQX
-ht0GgBAAs+/z+XxlcD8DeNCQ+3pTHDc8v1RlaDE5xZsg1OmCZz1XVZGq7xQe+JVX
-dsAkZ8to9TIAU8/UWqSkpwAOUr93L0Io61T0sjZsd3hmK+J40sMJLCPOcBH33kOz
-Y1ztmeIeN6JlBiO6iJzuuM+hEuZWa2AsySYDb6QPAuPOQ01E56t7DCKjIP60x/hq
-U133rvnLApFseqWoiWNbvrwx9vL9988T/gU9a8gcPEYvPwflGooTCV/GNtJlaM4W
-UoUSoi2mECCbRoIycwSzvMkcKqGpMIYVRi51Sd13WydXMmyxFzMECwPVxWmfT5tf
-03q/kL18n4txSd9lud013830aGlcmpIzZajdHV5tvmOufoZB80spDeL9NWXcfTwI
-22XRgQ6WXiKjvr0NsbC0Kb4e0bK75f5w6hv1xFCOBvJWzdWRTfHwxyWxqLZmscfj
-7showC1MEpt51qErJWGm7QnmG6Gfj/kLtNvrZq+Ib0HQ+iXUk7zwDg+VnZf/YSLu
-Q4xwJNkr7bAmldbeP4hxUjNs8pVuHx1CZns3UqlYa8yOE5Z+IaiEPCh4e8NwFzbA
-T7UgqzkhTIlyLdDnaksEYBznbBMx5nSvjigVQG8VLgegI+iXyJ4ZIt9XJSn9inmq
-x5aAaol8+iziu0SXH3wN/Lruny7F9vrreYS/hFFLpSNnk8CTZ0E=
-=Y8dX
------END PGP SIGNATURE-----
-
---eheScQNz3K90DVRs--
 
