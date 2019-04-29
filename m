@@ -1,33 +1,35 @@
-Received: from eggs.gnu.org ([209.51.188.92]:33382)
+Received: from eggs.gnu.org ([209.51.188.92]:33538)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <borntraeger@de.ibm.com>) id 1hL2GX-0001YM-FU
-	for qemu-devel@nongnu.org; Mon, 29 Apr 2019 05:08:04 -0400
+	(envelope-from <borntraeger@de.ibm.com>) id 1hL2GW-0001k0-5o
+	for qemu-devel@nongnu.org; Mon, 29 Apr 2019 05:08:01 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <borntraeger@de.ibm.com>) id 1hL2Bf-0000Lo-Lb
-	for qemu-devel@nongnu.org; Mon, 29 Apr 2019 05:03:00 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:34690
+	(envelope-from <borntraeger@de.ibm.com>) id 1hL2Bh-0000OC-MN
+	for qemu-devel@nongnu.org; Mon, 29 Apr 2019 05:03:03 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:39304
 	helo=mx0a-001b2d01.pphosted.com)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <borntraeger@de.ibm.com>)
-	id 1hL2Bf-0000LA-GR
-	for qemu-devel@nongnu.org; Mon, 29 Apr 2019 05:02:59 -0400
-Received: from pps.filterd (m0098416.ppops.net [127.0.0.1])
+	id 1hL2Bh-0000Nc-HX
+	for qemu-devel@nongnu.org; Mon, 29 Apr 2019 05:03:01 -0400
+Received: from pps.filterd (m0098420.ppops.net [127.0.0.1])
 	by mx0b-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id
-	x3T8rauS193912
-	for <qemu-devel@nongnu.org>; Mon, 29 Apr 2019 05:02:56 -0400
-Received: from e34.co.us.ibm.com (e34.co.us.ibm.com [32.97.110.152])
-	by mx0b-001b2d01.pphosted.com with ESMTP id 2s5vh6md90-1
+	x3T8rf3P057851
+	for <qemu-devel@nongnu.org>; Mon, 29 Apr 2019 05:03:01 -0400
+Received: from e33.co.us.ibm.com (e33.co.us.ibm.com [32.97.110.151])
+	by mx0b-001b2d01.pphosted.com with ESMTP id 2s5w0gb67h-1
 	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Mon, 29 Apr 2019 05:02:55 -0400
+	for <qemu-devel@nongnu.org>; Mon, 29 Apr 2019 05:03:00 -0400
 Received: from localhost
-	by e34.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+	by e33.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
 	Violators will be prosecuted
 	for <qemu-devel@nongnu.org> from <borntraeger@de.ibm.com>;
-	Mon, 29 Apr 2019 10:02:54 +0100
+	Mon, 29 Apr 2019 10:02:59 +0100
 From: Christian Borntraeger <borntraeger@de.ibm.com>
-Date: Mon, 29 Apr 2019 05:02:41 -0400
-Message-Id: <20190429090250.7648-1-borntraeger@de.ibm.com>
-Subject: [Qemu-devel] [PATCH v3 0/9] s390x: new guest features
+Date: Mon, 29 Apr 2019 05:02:46 -0400
+In-Reply-To: <20190429090250.7648-1-borntraeger@de.ibm.com>
+References: <20190429090250.7648-1-borntraeger@de.ibm.com>
+Message-Id: <20190429090250.7648-6-borntraeger@de.ibm.com>
+Subject: [Qemu-devel] [PATCH v3 5/9] s390x/cpumodel: vector enhancements
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -39,34 +41,40 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: Cornelia Huck <cohuck@redhat.com>
 Cc: qemu-devel <qemu-devel@nongnu.org>, qemu-s390x <qemu-s390x@nongnu.org>, David Hildenbrand <david@redhat.com>, Halil Pasic <pasic@linux.ibm.com>, Richard Henderson <rth@twiddle.net>, Collin Walling <walling@linux.ibm.com>, "Jason J . Herne" <jjherne@linux.ibm.com>
 
-Adding gen15.
+Add vector enhancements to the cpu model.
 
-v2->v3: - merge  deprecation patch into gen 15 patch
-	- fix comments
-	- use gen15a and gen15b instead of cpuid
-v1->v2: - rework csske deprecation
-	- white space fixes
-	- also require msa4 for msa9
+Signed-off-by: Christian Borntraeger <borntraeger@de.ibm.com>
+Reviewed-by: David Hildenbrand <david@redhat.com>
+---
+ target/s390x/cpu_features.c     | 2 ++
+ target/s390x/cpu_features_def.h | 2 ++
+ 2 files changed, 4 insertions(+)
 
-Christian Borntraeger (9):
-  linux header sync
-  s390x/cpumodel: ignore csske for expansion
-  s390x/cpumodel: Miscellaneous-Instruction-Extensions Facility 3
-  s390x/cpumodel: msa9 facility
-  s390x/cpumodel: vector enhancements
-  s390x/cpumodel: enhanced sort facility
-  s390x/cpumodel: add Deflate-conversion facility
-  s390x/cpumodel: add gen15 defintions
-  s390x/cpumodel: wire up 8561 and 8562 as gen15 machines
-
- linux-headers/asm-s390/kvm.h    |   5 +-
- target/s390x/cpu_features.c     |  54 ++++++++++++++++
- target/s390x/cpu_features.h     |   3 +
- target/s390x/cpu_features_def.h |  49 +++++++++++++++
- target/s390x/cpu_models.c       |  13 ++--
- target/s390x/gen-features.c     | 105 ++++++++++++++++++++++++++++++++
- target/s390x/kvm.c              |  18 ++++++
- 7 files changed, 242 insertions(+), 5 deletions(-)
-
+diff --git a/target/s390x/cpu_features.c b/target/s390x/cpu_features.c
+index 154e2bb354..35873253be 100644
+--- a/target/s390x/cpu_features.c
++++ b/target/s390x/cpu_features.c
+@@ -108,6 +108,8 @@ static const S390FeatDef s390_features[] = {
+     FEAT_INIT("irbm", S390_FEAT_TYPE_STFL, 145, "Insert-reference-bits-multiple facility"),
+     FEAT_INIT("msa8-base", S390_FEAT_TYPE_STFL, 146, "Message-security-assist-extension-8 facility (excluding subfunctions)"),
+     FEAT_INIT("cmmnt", S390_FEAT_TYPE_STFL, 147, "CMM: ESSA-enhancement (no translate) facility"),
++    FEAT_INIT("vxeh2", S390_FEAT_TYPE_STFL, 148, "Vector Enhancements facility 2"),
++    FEAT_INIT("vxbeh", S390_FEAT_TYPE_STFL, 152, "Vector BCD enhancements facility 1"),
+     FEAT_INIT("msa9-base", S390_FEAT_TYPE_STFL, 155, "Message-security-assist-extension-9 facility (excluding subfunctions)"),
+     FEAT_INIT("etoken", S390_FEAT_TYPE_STFL, 156, "Etoken facility"),
+ 
+diff --git a/target/s390x/cpu_features_def.h b/target/s390x/cpu_features_def.h
+index 030784811b..ce2223c9d7 100644
+--- a/target/s390x/cpu_features_def.h
++++ b/target/s390x/cpu_features_def.h
+@@ -96,6 +96,8 @@ typedef enum {
+     S390_FEAT_INSERT_REFERENCE_BITS_MULT,
+     S390_FEAT_MSA_EXT_8,
+     S390_FEAT_CMM_NT,
++    S390_FEAT_VECTOR_ENH2,
++    S390_FEAT_VECTOR_BCD_ENH,
+     S390_FEAT_MSA_EXT_9,
+     S390_FEAT_ETOKEN,
+ 
 -- 
 2.17.1
