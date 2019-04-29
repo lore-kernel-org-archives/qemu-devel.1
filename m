@@ -2,52 +2,110 @@ Return-Path: <SRS0=sEuR=S7=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.7 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,
+	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EB84AC004C9
-	for <qemu-devel@archiver.kernel.org>; Mon, 29 Apr 2019 09:29:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C20C7C43219
+	for <qemu-devel@archiver.kernel.org>; Mon, 29 Apr 2019 09:31:44 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id AAD0D206BF
-	for <qemu-devel@archiver.kernel.org>; Mon, 29 Apr 2019 09:29:13 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AAD0D206BF
+	by mail.kernel.org (Postfix) with ESMTPS id 7552F206BF
+	for <qemu-devel@archiver.kernel.org>; Mon, 29 Apr 2019 09:31:44 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="OcWZaEJ3"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7552F206BF
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:54686 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:54738 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hL2b2-0001Rg-VX
-	for qemu-devel@archiver.kernel.org; Mon, 29 Apr 2019 05:29:13 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:34072)
+	id 1hL2dT-0003Vg-Dv
+	for qemu-devel@archiver.kernel.org; Mon, 29 Apr 2019 05:31:43 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:39444)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1hL2HL-0002RL-Hz
-	for qemu-devel@nongnu.org; Mon, 29 Apr 2019 05:08:53 -0400
+	(envelope-from <vsementsov@virtuozzo.com>) id 1hL2c5-0002ai-8k
+	for qemu-devel@nongnu.org; Mon, 29 Apr 2019 05:30:18 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1hL2HJ-0003vM-Id
-	for qemu-devel@nongnu.org; Mon, 29 Apr 2019 05:08:51 -0400
-Received: from relay.sw.ru ([185.231.240.75]:32874)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(envelope-from <vsementsov@virtuozzo.com>) id 1hL2c4-0006v2-7y
+	for qemu-devel@nongnu.org; Mon, 29 Apr 2019 05:30:17 -0400
+Received: from mail-eopbgr90131.outbound.protection.outlook.com
+	([40.107.9.131]:54240
+	helo=FRA01-MR2-obe.outbound.protection.outlook.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
-	id 1hL2HH-0003sS-H8; Mon, 29 Apr 2019 05:08:49 -0400
-Received: from [10.28.8.145] (helo=kvm.sw.ru)
-	by relay.sw.ru with esmtp (Exim 4.91)
-	(envelope-from <vsementsov@virtuozzo.com>)
-	id 1hL2HD-0002jV-Rt; Mon, 29 Apr 2019 12:08:43 +0300
+	id 1hL2bz-0006cf-DY; Mon, 29 Apr 2019 05:30:12 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=virtuozzo.com;
+	s=selector1;
+	h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+	bh=lM5Jbw/dW/94FAZyNJf2cZ1qtnrlc54gK6Egq7dxnrQ=;
+	b=OcWZaEJ3rBROkjgrTfnrL/YGBdsSN5d96HppoWnVVgov2KLoJ87mYAFzBiD84ZxuMr71wO4aeCK0b/zxO8mqmx8oOJz2NLKWste8tLpSoUtEUIGUqPt8Z5+mgRxSHJKy8dXHLieeIMxRjBjejDbJPaPgf8/EfDS1xGHV3M/MqYY=
+Received: from PR2PR08MB4684.eurprd08.prod.outlook.com (52.133.109.209) by
+	PR2PR08MB5227.eurprd08.prod.outlook.com (52.133.110.86) with Microsoft
+	SMTP
+	Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+	15.20.1835.12; Mon, 29 Apr 2019 09:30:07 +0000
+Received: from PR2PR08MB4684.eurprd08.prod.outlook.com
+	([fe80::88d7:ecf0:1120:f1a1]) by
+	PR2PR08MB4684.eurprd08.prod.outlook.com
+	([fe80::88d7:ecf0:1120:f1a1%3]) with mapi id 15.20.1835.018;
+	Mon, 29 Apr 2019 09:30:07 +0000
 From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-To: qemu-devel@nongnu.org,
-	qemu-block@nongnu.org
-Date: Mon, 29 Apr 2019 12:08:39 +0300
-Message-Id: <20190429090842.57910-3-vsementsov@virtuozzo.com>
-X-Mailer: git-send-email 2.18.0
-In-Reply-To: <20190429090842.57910-1-vsementsov@virtuozzo.com>
-References: <20190429090842.57910-1-vsementsov@virtuozzo.com>
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x
-X-Received-From: 185.231.240.75
-Subject: [Qemu-devel] [PATCH v7 2/5] block/backup: move to copy_bitmap with
- granularity
+To: John Snow <jsnow@redhat.com>, "qemu-devel@nongnu.org"
+	<qemu-devel@nongnu.org>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>
+Thread-Topic: [PATCH v3 2/2] docs/interop/bitmaps: rewrite and modernize doc
+Thread-Index: AQHU/H2U/J65RWWtG0CTD3msFDjHwKZS40UA
+Date: Mon, 29 Apr 2019 09:30:07 +0000
+Message-ID: <2bc77854-242f-87a7-b09d-7f23dbec108f@virtuozzo.com>
+References: <20190426221528.30293-1-jsnow@redhat.com>
+	<20190426221528.30293-3-jsnow@redhat.com>
+In-Reply-To: <20190426221528.30293-3-jsnow@redhat.com>
+Accept-Language: ru-RU, en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-clientproxiedby: HE1P191CA0009.EURP191.PROD.OUTLOOK.COM (2603:10a6:3:cf::19)
+	To PR2PR08MB4684.eurprd08.prod.outlook.com
+	(2603:10a6:101:22::17)
+authentication-results: spf=none (sender IP is )
+	smtp.mailfrom=vsementsov@virtuozzo.com; 
+x-ms-exchange-messagesentrepresentingtype: 1
+x-tagtoolbar-keys: D20190429123004533
+x-originating-ip: [185.231.240.5]
+x-ms-publictraffictype: Email
+x-ms-office365-filtering-correlation-id: c5a1270b-a83c-4228-af53-08d6cc854476
+x-microsoft-antispam: BCL:0; PCL:0;
+	RULEID:(2390118)(7020095)(4652040)(8989299)(4534185)(4627221)(201703031133081)(201702281549075)(8990200)(5600141)(711020)(4605104)(2017052603328)(7193020);
+	SRVR:PR2PR08MB5227; 
+x-ms-traffictypediagnostic: PR2PR08MB5227:
+x-microsoft-antispam-prvs: <PR2PR08MB52273A23A7C96AE504490537C1390@PR2PR08MB5227.eurprd08.prod.outlook.com>
+x-ms-oob-tlc-oobclassifiers: OLM:9508;
+x-forefront-prvs: 0022134A87
+x-forefront-antispam-report: SFV:NSPM;
+	SFS:(10019020)(376002)(136003)(366004)(39840400004)(346002)(396003)(199004)(189003)(6116002)(76176011)(3846002)(52116002)(71200400001)(71190400001)(36756003)(6512007)(7736002)(97736004)(256004)(110136005)(2616005)(476003)(446003)(11346002)(2906002)(99286004)(54906003)(478600001)(31686004)(486006)(186003)(316002)(7416002)(14454004)(6506007)(81156014)(386003)(102836004)(26005)(6436002)(66066001)(6246003)(73956011)(81166006)(8676002)(66556008)(25786009)(5660300002)(2501003)(66476007)(2201001)(8936002)(4326008)(31696002)(229853002)(6486002)(53936002)(86362001)(64756008)(305945005)(66946007)(68736007)(66446008);
+	DIR:OUT; SFP:1102; SCL:1; SRVR:PR2PR08MB5227;
+	H:PR2PR08MB4684.eurprd08.prod.outlook.com; FPR:; SPF:None;
+	LANG:en; PTR:InfoNoRecords; A:1; MX:1; 
+received-spf: None (protection.outlook.com: virtuozzo.com does not designate
+	permitted sender hosts)
+x-ms-exchange-senderadcheck: 1
+x-microsoft-antispam-message-info: AEQjZHvNLkkVrn86XV+TlF2hMcyMi4Fatj07mzBqUS6c5gTDI8RjUadYFX/IGr9xUzy9J8+NQYwtFukKY8F8VaCt8CBAzIXRnfmj8eb/4np+ZS7Nm6hXc+6O22aLZd4gJ40rB5JqdsTicEN1aflkS7XK7nr9lGavEnXs4L/BxZn9s4gr3ChbnWNffiATTs06YCMcpLTKhwRZXYLHjnrdA+5+39823wCazxN3GG/BSl3lTYhwBLvCq1KCO7c/CA05Vc5AtqqTRyOWzzAMIlmpPPySW0wjsBIyvEexU4qlKwRdqcaCprMSPmoWBpRROwSM/1OnPaNZpOJpt0R13ZX3qcWB8hpsWQbx7ypaTvCsY6tNNtQ1qKSZXuseXC3kPcWLND3RowAtEvyEwjIJOFseHv3m7CjXP7XMUUlswz5mbfk=
+Content-Type: text/plain; charset="UTF-8"
+Content-ID: <B3845AC2D2D8BE40AF1E10CBF2576A02@eurprd08.prod.outlook.com>
+Content-Transfer-Encoding: base64
+MIME-Version: 1.0
+X-OriginatorOrg: virtuozzo.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: c5a1270b-a83c-4228-af53-08d6cc854476
+X-MS-Exchange-CrossTenant-originalarrivaltime: 29 Apr 2019 09:30:07.3951 (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 0bc7f26d-0264-416e-a6fc-8352af79c58f
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: PR2PR08MB5227
+X-detected-operating-system: by eggs.gnu.org: Windows 7 or 8 [fuzzy]
+X-Received-From: 40.107.9.131
+Subject: Re: [Qemu-devel] [PATCH v3 2/2] docs/interop/bitmaps: rewrite and
+ modernize doc
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -59,193 +117,35 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: kwolf@redhat.com, den@openvz.org, vsementsov@virtuozzo.com,
-	jsnow@redhat.com, mreitz@redhat.com
+Cc: Fam Zheng <fam@euphon.net>, "aliang@redhat.com" <aliang@redhat.com>,
+	"kchamart@redhat.com" <kchamart@redhat.com>,
+	"qemu-stable@nongnu.org" <qemu-stable@nongnu.org>,
+	"armbru@redhat.com" <armbru@redhat.com>,
+	"nsoffer@redhat.com" <nsoffer@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Content-Type: text/plain; charset="UTF-8"
-Message-ID: <20190429090839.ZQ5WakmIHnhZTHj7-rbIcbah8vxDCUlUAsP-VXesFX8@z>
+Message-ID: <20190429093007.pDqYeoRg_UQKU6GQhYjN55zJ_Kn5RcuvwAhZRcGExAw@z>
 
-We are going to share this bitmap between backup and backup-top filter
-driver, so let's share something more meaningful. It also simplifies
-some calculations.
-
-Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Reviewed-by: Max Reitz <mreitz@redhat.com>
----
- block/backup.c | 48 +++++++++++++++++++++++-------------------------
- 1 file changed, 23 insertions(+), 25 deletions(-)
-
-diff --git a/block/backup.c b/block/backup.c
-index d9f5db18ac..510fc54f98 100644
---- a/block/backup.c
-+++ b/block/backup.c
-@@ -113,7 +113,8 @@ static int coroutine_fn backup_cow_with_bounce_buffer(BackupBlockJob *job,
-     int read_flags = is_write_notifier ? BDRV_REQ_NO_SERIALISING : 0;
-     int write_flags = job->serialize_target_writes ? BDRV_REQ_SERIALISING : 0;
- 
--    hbitmap_reset(job->copy_bitmap, start / job->cluster_size, 1);
-+    assert(QEMU_IS_ALIGNED(start, job->cluster_size));
-+    hbitmap_reset(job->copy_bitmap, start, job->cluster_size);
-     nbytes = MIN(job->cluster_size, job->len - start);
-     if (!*bounce_buffer) {
-         *bounce_buffer = blk_blockalign(blk, job->cluster_size);
-@@ -147,7 +148,7 @@ static int coroutine_fn backup_cow_with_bounce_buffer(BackupBlockJob *job,
- 
-     return nbytes;
- fail:
--    hbitmap_set(job->copy_bitmap, start / job->cluster_size, 1);
-+    hbitmap_set(job->copy_bitmap, start, job->cluster_size);
-     return ret;
- 
- }
-@@ -167,16 +168,15 @@ static int coroutine_fn backup_cow_with_offload(BackupBlockJob *job,
-     int write_flags = job->serialize_target_writes ? BDRV_REQ_SERIALISING : 0;
- 
-     assert(QEMU_IS_ALIGNED(job->copy_range_size, job->cluster_size));
-+    assert(QEMU_IS_ALIGNED(start, job->cluster_size));
-     nbytes = MIN(job->copy_range_size, end - start);
-     nr_clusters = DIV_ROUND_UP(nbytes, job->cluster_size);
--    hbitmap_reset(job->copy_bitmap, start / job->cluster_size,
--                  nr_clusters);
-+    hbitmap_reset(job->copy_bitmap, start, job->cluster_size * nr_clusters);
-     ret = blk_co_copy_range(blk, start, job->target, start, nbytes,
-                             read_flags, write_flags);
-     if (ret < 0) {
-         trace_backup_do_cow_copy_range_fail(job, start, ret);
--        hbitmap_set(job->copy_bitmap, start / job->cluster_size,
--                    nr_clusters);
-+        hbitmap_set(job->copy_bitmap, start, job->cluster_size * nr_clusters);
-         return ret;
-     }
- 
-@@ -204,7 +204,7 @@ static int coroutine_fn backup_do_cow(BackupBlockJob *job,
-     cow_request_begin(&cow_request, job, start, end);
- 
-     while (start < end) {
--        if (!hbitmap_get(job->copy_bitmap, start / job->cluster_size)) {
-+        if (!hbitmap_get(job->copy_bitmap, start)) {
-             trace_backup_do_cow_skip(job, start);
-             start += job->cluster_size;
-             continue; /* already copied */
-@@ -300,6 +300,11 @@ static void backup_clean(Job *job)
-     assert(s->target);
-     blk_unref(s->target);
-     s->target = NULL;
-+
-+    if (s->copy_bitmap) {
-+        hbitmap_free(s->copy_bitmap);
-+        s->copy_bitmap = NULL;
-+    }
- }
- 
- static void backup_attached_aio_context(BlockJob *job, AioContext *aio_context)
-@@ -312,7 +317,6 @@ static void backup_attached_aio_context(BlockJob *job, AioContext *aio_context)
- void backup_do_checkpoint(BlockJob *job, Error **errp)
- {
-     BackupBlockJob *backup_job = container_of(job, BackupBlockJob, common);
--    int64_t len;
- 
-     assert(block_job_driver(job) == &backup_job_driver);
- 
-@@ -322,8 +326,7 @@ void backup_do_checkpoint(BlockJob *job, Error **errp)
-         return;
-     }
- 
--    len = DIV_ROUND_UP(backup_job->len, backup_job->cluster_size);
--    hbitmap_set(backup_job->copy_bitmap, 0, len);
-+    hbitmap_set(backup_job->copy_bitmap, 0, backup_job->len);
- }
- 
- static void backup_drain(BlockJob *job)
-@@ -378,16 +381,16 @@ static int coroutine_fn backup_run_incremental(BackupBlockJob *job)
- {
-     int ret;
-     bool error_is_read;
--    int64_t cluster;
-+    int64_t offset;
-     HBitmapIter hbi;
- 
-     hbitmap_iter_init(&hbi, job->copy_bitmap, 0);
--    while ((cluster = hbitmap_iter_next(&hbi)) != -1) {
-+    while ((offset = hbitmap_iter_next(&hbi)) != -1) {
-         do {
-             if (yield_and_check(job)) {
-                 return 0;
-             }
--            ret = backup_do_cow(job, cluster * job->cluster_size,
-+            ret = backup_do_cow(job, offset,
-                                 job->cluster_size, &error_is_read, false);
-             if (ret < 0 && backup_error_action(job, error_is_read, -ret) ==
-                            BLOCK_ERROR_ACTION_REPORT)
-@@ -409,12 +412,9 @@ static void backup_incremental_init_copy_bitmap(BackupBlockJob *job)
-     while (bdrv_dirty_bitmap_next_dirty_area(job->sync_bitmap,
-                                              &offset, &bytes))
-     {
--        uint64_t cluster = offset / job->cluster_size;
--        uint64_t end_cluster = DIV_ROUND_UP(offset + bytes, job->cluster_size);
-+        hbitmap_set(job->copy_bitmap, offset, bytes);
- 
--        hbitmap_set(job->copy_bitmap, cluster, end_cluster - cluster);
--
--        offset = end_cluster * job->cluster_size;
-+        offset += bytes;
-         if (offset >= job->len) {
-             break;
-         }
-@@ -423,30 +423,27 @@ static void backup_incremental_init_copy_bitmap(BackupBlockJob *job)
- 
-     /* TODO job_progress_set_remaining() would make more sense */
-     job_progress_update(&job->common.job,
--        job->len - hbitmap_count(job->copy_bitmap) * job->cluster_size);
-+        job->len - hbitmap_count(job->copy_bitmap));
- }
- 
- static int coroutine_fn backup_run(Job *job, Error **errp)
- {
-     BackupBlockJob *s = container_of(job, BackupBlockJob, common.job);
-     BlockDriverState *bs = blk_bs(s->common.blk);
--    int64_t offset, nb_clusters;
-+    int64_t offset;
-     int ret = 0;
- 
-     QLIST_INIT(&s->inflight_reqs);
-     qemu_co_rwlock_init(&s->flush_rwlock);
- 
--    nb_clusters = DIV_ROUND_UP(s->len, s->cluster_size);
-     job_progress_set_remaining(job, s->len);
- 
--    s->copy_bitmap = hbitmap_alloc(nb_clusters, 0);
-     if (s->sync_mode == MIRROR_SYNC_MODE_INCREMENTAL) {
-         backup_incremental_init_copy_bitmap(s);
-     } else {
--        hbitmap_set(s->copy_bitmap, 0, nb_clusters);
-+        hbitmap_set(s->copy_bitmap, 0, s->len);
-     }
- 
--
-     s->before_write.notify = backup_before_write_notify;
-     bdrv_add_before_write_notifier(bs, &s->before_write);
- 
-@@ -527,7 +524,6 @@ static int coroutine_fn backup_run(Job *job, Error **errp)
-     /* wait until pending backup_do_cow() calls have completed */
-     qemu_co_rwlock_wrlock(&s->flush_rwlock);
-     qemu_co_rwlock_unlock(&s->flush_rwlock);
--    hbitmap_free(s->copy_bitmap);
- 
-     return ret;
- }
-@@ -678,6 +674,8 @@ BlockJob *backup_job_create(const char *job_id, BlockDriverState *bs,
-     } else {
-         job->cluster_size = MAX(BACKUP_CLUSTER_SIZE_DEFAULT, bdi.cluster_size);
-     }
-+
-+    job->copy_bitmap = hbitmap_alloc(len, ctz32(job->cluster_size));
-     job->use_copy_range = true;
-     job->copy_range_size = MIN_NON_ZERO(blk_get_max_transfer(job->common.blk),
-                                         blk_get_max_transfer(job->target));
--- 
-2.18.0
-
+MjcuMDQuMjAxOSAxOjE1LCBKb2huIFNub3cgd3JvdGU6DQo+IFRoaXMganVzdCBhYm91dCByZXdy
+aXRlcyB0aGUgZW50aXJldHkgb2YgdGhlIGJpdG1hcHMucnN0IGRvY3VtZW50IHRvDQo+IG1ha2Ug
+aXQgY29uc2lzdGVudCB3aXRoIHRoZSA0LjAgcmVsZWFzZS4gSSBoYXZlIGFkZGVkIG5ldyBmZWF0
+dXJlcyBzZWVuDQo+IGluIHRoZSA0LjAgcmVsZWFzZSwgYXMgd2VsbCBhcyB0cmllZCB0byBjbGFy
+aWZ5IHNvbWUgcG9pbnRzIHRoYXQga2VlcA0KPiBjb21pbmcgdXAgd2hlbiBkaXNjdXNzaW5nIHRo
+aXMgZmVhdHVyZSBib3RoIGluLWhvdXNlIGFuZCB1cHN0cmVhbS4NCj4gDQo+IFllcywgaXQncyBh
+IGxvdCBsb25nZXIsIG1vc3RseSBkdWUgdG8gZXhhbXBsZXMuIEkgZ2V0IGEgYml0IGNoYXR0eS4N
+Cj4gSSBjb3VsZCB1c2UgYSBnb29kIGVkaXRvciB0byBoZWxwIHJlaWduIGluIG15IGNoYXR0aW5l
+c3MuDQo+IA0KPiBJdCBkb2VzIG5vdCB5ZXQgY292ZXIgcHVsbCBiYWNrdXBzIG9yIG1pZ3JhdGlv
+biBkZXRhaWxzLCBidXQgSSBpbnRlbmQgdG8NCj4ga2VlcCBleHRlbmRpbmcgdGhpcyBkb2N1bWVu
+dCB0byBjb3ZlciB0aG9zZSBjYXNlcy4NCj4gDQo+IFBsZWFzZSB0cnkgY29tcGlsaW5nIGl0IHdp
+dGggc3BoaW54IGFuZCBsb29rIGF0IHRoZSByZW5kZXJlZCBvdXRwdXQsIEkNCj4gZG9uJ3QgaGF2
+ZSBob3N0aW5nIHRvIHNoYXJlIG15IGNvcHkgYXQgcHJlc2VudC4gSSB0aGluayB0aGlzIG5ldyBs
+YXlvdXQNCj4gcmVhZHMgbmljZXIgaW4gdGhlIEhUTUwgZm9ybWF0IHRoYW4gdGhlIG9sZCBvbmUg
+ZGlkLCBhdCB0aGUgZXhwZW5zZSBvZg0KPiBsb29raW5nIGxlc3MgcmVhZGFibGUgaW4gdGhlIHNv
+dXJjZSB0cmVlIGl0c2VsZiAodGhvdWdoIG5vdCBjb21wbGV0ZWx5DQo+IHVubWFuYWdhYmxlLiBX
+ZSBkaWQgZGVjaWRlIHRvIGNvbnZlcnQgaXQgZnJvbSBNYXJrZG93biB0byBSZVNULCBhZnRlcg0K
+PiBhbGwsIHNvIEkgYW0gZ29pbmcgYWxsLWluIG9uIFJlU1QuKQ0KPiANCj4gU2lnbmVkLW9mZi1i
+eTogSm9obiBTbm93PGpzbm93QHJlZGhhdC5jb20+DQoNClJldmlld2VkLWJ5OiBWbGFkaW1pciBT
+ZW1lbnRzb3YtT2dpZXZza2l5IDx2c2VtZW50c292QHZpcnR1b3p6by5jb20+DQoNCi0tIA0KQmVz
+dCByZWdhcmRzLA0KVmxhZGltaXINCg==
 
