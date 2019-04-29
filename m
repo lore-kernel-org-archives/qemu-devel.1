@@ -1,30 +1,32 @@
-Received: from eggs.gnu.org ([209.51.188.92]:34753)
+Received: from eggs.gnu.org ([209.51.188.92]:34754)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1hL9fQ-0005WJ-Af
+	(envelope-from <peter.maydell@linaro.org>) id 1hL9fQ-0005WK-Ab
 	for qemu-devel@nongnu.org; Mon, 29 Apr 2019 13:02:13 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1hL9fO-00075Y-7T
+	(envelope-from <peter.maydell@linaro.org>) id 1hL9fO-00075R-78
 	for qemu-devel@nongnu.org; Mon, 29 Apr 2019 13:02:12 -0400
-Received: from mail-wm1-x332.google.com ([2a00:1450:4864:20::332]:51179)
+Received: from mail-wm1-x32e.google.com ([2a00:1450:4864:20::32e]:55632)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1hL9fM-0006PQ-6O
+	id 1hL9fM-0006ao-5N
 	for qemu-devel@nongnu.org; Mon, 29 Apr 2019 13:02:10 -0400
-Received: by mail-wm1-x332.google.com with SMTP id p21so186668wmc.0
-	for <qemu-devel@nongnu.org>; Mon, 29 Apr 2019 10:00:51 -0700 (PDT)
+Received: by mail-wm1-x32e.google.com with SMTP id o25so150876wmf.5
+	for <qemu-devel@nongnu.org>; Mon, 29 Apr 2019 10:01:13 -0700 (PDT)
 Received: from orth.archaic.org.uk (orth.archaic.org.uk. [81.2.115.148])
-	by smtp.gmail.com with ESMTPSA id a13sm36896wmj.39.2019.04.29.10.00.49
+	by smtp.gmail.com with ESMTPSA id a13sm36896wmj.39.2019.04.29.10.01.11
 	for <qemu-devel@nongnu.org>
 	(version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-	Mon, 29 Apr 2019 10:00:49 -0700 (PDT)
+	Mon, 29 Apr 2019 10:01:11 -0700 (PDT)
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Mon, 29 Apr 2019 18:00:02 +0100
-Message-Id: <20190429170030.11323-15-peter.maydell@linaro.org>
+Date: Mon, 29 Apr 2019 18:00:19 +0100
+Message-Id: <20190429170030.11323-32-peter.maydell@linaro.org>
 In-Reply-To: <20190429170030.11323-1-peter.maydell@linaro.org>
 References: <20190429170030.11323-1-peter.maydell@linaro.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PULL 14/42] target/arm: Implement v7m_update_fpccr()
+Subject: [Qemu-devel] [PULL 31/42] hw/arm/aspeed: Use
+ TYPE_TMP105/TYPE_PCA9552 instead of hardcoded string
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,173 +37,67 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-Implement the code which updates the FPCCR register on an
-exception entry where we are going to use lazy FP stacking.
-We have to defer to the NVIC to determine whether the
-various exceptions are currently ready or not.
+From: Philippe Mathieu-Daudé <philmd@redhat.com>
 
+Reviewed-by: Thomas Huth <thuth@redhat.com>
+Reviewed-by: Cédric Le Goater <clg@kaod.org>
+Reviewed-by: Markus Armbruster <armbru@redhat.com>
+Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+Message-id: 20190412165416.7977-2-philmd@redhat.com
 Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
-Message-id: 20190416125744.27770-12-peter.maydell@linaro.org
 ---
- target/arm/cpu.h      | 14 +++++++++
- hw/intc/armv7m_nvic.c | 34 ++++++++++++++++++++++
- target/arm/helper.c   | 67 ++++++++++++++++++++++++++++++++++++++++++-
- 3 files changed, 114 insertions(+), 1 deletion(-)
+ hw/arm/aspeed.c | 13 +++++++++----
+ 1 file changed, 9 insertions(+), 4 deletions(-)
 
-diff --git a/target/arm/cpu.h b/target/arm/cpu.h
-index 67e4e95d440..eb989d773af 100644
---- a/target/arm/cpu.h
-+++ b/target/arm/cpu.h
-@@ -2044,6 +2044,20 @@ void armv7m_nvic_acknowledge_irq(void *opaque);
-  * (Ignoring -1, this is the same as the RETTOBASE value before completion.)
-  */
- int armv7m_nvic_complete_irq(void *opaque, int irq, bool secure);
-+/**
-+ * armv7m_nvic_get_ready_status(void *opaque, int irq, bool secure)
-+ * @opaque: the NVIC
-+ * @irq: the exception number to mark pending
-+ * @secure: false for non-banked exceptions or for the nonsecure
-+ * version of a banked exception, true for the secure version of a banked
-+ * exception.
-+ *
-+ * Return whether an exception is "ready", i.e. whether the exception is
-+ * enabled and is configured at a priority which would allow it to
-+ * interrupt the current execution priority. This controls whether the
-+ * RDY bit for it in the FPCCR is set.
-+ */
-+bool armv7m_nvic_get_ready_status(void *opaque, int irq, bool secure);
- /**
-  * armv7m_nvic_raw_execution_priority: return the raw execution priority
-  * @opaque: the NVIC
-diff --git a/hw/intc/armv7m_nvic.c b/hw/intc/armv7m_nvic.c
-index 5eb438f5409..53b4631dace 100644
---- a/hw/intc/armv7m_nvic.c
-+++ b/hw/intc/armv7m_nvic.c
-@@ -746,6 +746,40 @@ int armv7m_nvic_complete_irq(void *opaque, int irq, bool secure)
-     return ret;
+diff --git a/hw/arm/aspeed.c b/hw/arm/aspeed.c
+index 996812498dc..1c23ebd9925 100644
+--- a/hw/arm/aspeed.c
++++ b/hw/arm/aspeed.c
+@@ -19,6 +19,8 @@
+ #include "hw/arm/aspeed_soc.h"
+ #include "hw/boards.h"
+ #include "hw/i2c/smbus_eeprom.h"
++#include "hw/misc/pca9552.h"
++#include "hw/misc/tmp105.h"
+ #include "qemu/log.h"
+ #include "sysemu/block-backend.h"
+ #include "hw/loader.h"
+@@ -267,7 +269,8 @@ static void ast2500_evb_i2c_init(AspeedBoardState *bmc)
+                           eeprom_buf);
+ 
+     /* The AST2500 EVB expects a LM75 but a TMP105 is compatible */
+-    i2c_create_slave(aspeed_i2c_get_bus(DEVICE(&soc->i2c), 7), "tmp105", 0x4d);
++    i2c_create_slave(aspeed_i2c_get_bus(DEVICE(&soc->i2c), 7),
++                     TYPE_TMP105, 0x4d);
+ 
+     /* The AST2500 EVB does not have an RTC. Let's pretend that one is
+      * plugged on the I2C bus header */
+@@ -288,13 +291,15 @@ static void witherspoon_bmc_i2c_init(AspeedBoardState *bmc)
+     AspeedSoCState *soc = &bmc->soc;
+     uint8_t *eeprom_buf = g_malloc0(8 * 1024);
+ 
+-    i2c_create_slave(aspeed_i2c_get_bus(DEVICE(&soc->i2c), 3), "pca9552", 0x60);
++    i2c_create_slave(aspeed_i2c_get_bus(DEVICE(&soc->i2c), 3), TYPE_PCA9552,
++                     0x60);
+ 
+     i2c_create_slave(aspeed_i2c_get_bus(DEVICE(&soc->i2c), 4), "tmp423", 0x4c);
+     i2c_create_slave(aspeed_i2c_get_bus(DEVICE(&soc->i2c), 5), "tmp423", 0x4c);
+ 
+     /* The Witherspoon expects a TMP275 but a TMP105 is compatible */
+-    i2c_create_slave(aspeed_i2c_get_bus(DEVICE(&soc->i2c), 9), "tmp105", 0x4a);
++    i2c_create_slave(aspeed_i2c_get_bus(DEVICE(&soc->i2c), 9), TYPE_TMP105,
++                     0x4a);
+ 
+     /* The witherspoon board expects Epson RX8900 I2C RTC but a ds1338 is
+      * good enough */
+@@ -302,7 +307,7 @@ static void witherspoon_bmc_i2c_init(AspeedBoardState *bmc)
+ 
+     smbus_eeprom_init_one(aspeed_i2c_get_bus(DEVICE(&soc->i2c), 11), 0x51,
+                           eeprom_buf);
+-    i2c_create_slave(aspeed_i2c_get_bus(DEVICE(&soc->i2c), 11), "pca9552",
++    i2c_create_slave(aspeed_i2c_get_bus(DEVICE(&soc->i2c), 11), TYPE_PCA9552,
+                      0x60);
  }
  
-+bool armv7m_nvic_get_ready_status(void *opaque, int irq, bool secure)
-+{
-+    /*
-+     * Return whether an exception is "ready", i.e. it is enabled and is
-+     * configured at a priority which would allow it to interrupt the
-+     * current execution priority.
-+     *
-+     * irq and secure have the same semantics as for armv7m_nvic_set_pending():
-+     * for non-banked exceptions secure is always false; for banked exceptions
-+     * it indicates which of the exceptions is required.
-+     */
-+    NVICState *s = (NVICState *)opaque;
-+    bool banked = exc_is_banked(irq);
-+    VecInfo *vec;
-+    int running = nvic_exec_prio(s);
-+
-+    assert(irq > ARMV7M_EXCP_RESET && irq < s->num_irq);
-+    assert(!secure || banked);
-+
-+    /*
-+     * HardFault is an odd special case: we always check against -1,
-+     * even if we're secure and HardFault has priority -3; we never
-+     * need to check for enabled state.
-+     */
-+    if (irq == ARMV7M_EXCP_HARD) {
-+        return running > -1;
-+    }
-+
-+    vec = (banked && secure) ? &s->sec_vectors[irq] : &s->vectors[irq];
-+
-+    return vec->enabled &&
-+        exc_group_prio(s, vec->prio, secure) < running;
-+}
-+
- /* callback when external interrupt line is changed */
- static void set_irq_level(void *opaque, int n, int level)
- {
-diff --git a/target/arm/helper.c b/target/arm/helper.c
-index 6e55da5c482..547898581a2 100644
---- a/target/arm/helper.c
-+++ b/target/arm/helper.c
-@@ -8177,6 +8177,71 @@ static void v7m_exception_taken(ARMCPU *cpu, uint32_t lr, bool dotailchain,
-     env->thumb = addr & 1;
- }
- 
-+static void v7m_update_fpccr(CPUARMState *env, uint32_t frameptr,
-+                             bool apply_splim)
-+{
-+    /*
-+     * Like the pseudocode UpdateFPCCR: save state in FPCAR and FPCCR
-+     * that we will need later in order to do lazy FP reg stacking.
-+     */
-+    bool is_secure = env->v7m.secure;
-+    void *nvic = env->nvic;
-+    /*
-+     * Some bits are unbanked and live always in fpccr[M_REG_S]; some bits
-+     * are banked and we want to update the bit in the bank for the
-+     * current security state; and in one case we want to specifically
-+     * update the NS banked version of a bit even if we are secure.
-+     */
-+    uint32_t *fpccr_s = &env->v7m.fpccr[M_REG_S];
-+    uint32_t *fpccr_ns = &env->v7m.fpccr[M_REG_NS];
-+    uint32_t *fpccr = &env->v7m.fpccr[is_secure];
-+    bool hfrdy, bfrdy, mmrdy, ns_ufrdy, s_ufrdy, sfrdy, monrdy;
-+
-+    env->v7m.fpcar[is_secure] = frameptr & ~0x7;
-+
-+    if (apply_splim && arm_feature(env, ARM_FEATURE_V8)) {
-+        bool splimviol;
-+        uint32_t splim = v7m_sp_limit(env);
-+        bool ign = armv7m_nvic_neg_prio_requested(nvic, is_secure) &&
-+            (env->v7m.ccr[is_secure] & R_V7M_CCR_STKOFHFNMIGN_MASK);
-+
-+        splimviol = !ign && frameptr < splim;
-+        *fpccr = FIELD_DP32(*fpccr, V7M_FPCCR, SPLIMVIOL, splimviol);
-+    }
-+
-+    *fpccr = FIELD_DP32(*fpccr, V7M_FPCCR, LSPACT, 1);
-+
-+    *fpccr_s = FIELD_DP32(*fpccr_s, V7M_FPCCR, S, is_secure);
-+
-+    *fpccr = FIELD_DP32(*fpccr, V7M_FPCCR, USER, arm_current_el(env) == 0);
-+
-+    *fpccr = FIELD_DP32(*fpccr, V7M_FPCCR, THREAD,
-+                        !arm_v7m_is_handler_mode(env));
-+
-+    hfrdy = armv7m_nvic_get_ready_status(nvic, ARMV7M_EXCP_HARD, false);
-+    *fpccr_s = FIELD_DP32(*fpccr_s, V7M_FPCCR, HFRDY, hfrdy);
-+
-+    bfrdy = armv7m_nvic_get_ready_status(nvic, ARMV7M_EXCP_BUS, false);
-+    *fpccr_s = FIELD_DP32(*fpccr_s, V7M_FPCCR, BFRDY, bfrdy);
-+
-+    mmrdy = armv7m_nvic_get_ready_status(nvic, ARMV7M_EXCP_MEM, is_secure);
-+    *fpccr = FIELD_DP32(*fpccr, V7M_FPCCR, MMRDY, mmrdy);
-+
-+    ns_ufrdy = armv7m_nvic_get_ready_status(nvic, ARMV7M_EXCP_USAGE, false);
-+    *fpccr_ns = FIELD_DP32(*fpccr_ns, V7M_FPCCR, UFRDY, ns_ufrdy);
-+
-+    monrdy = armv7m_nvic_get_ready_status(nvic, ARMV7M_EXCP_DEBUG, false);
-+    *fpccr_s = FIELD_DP32(*fpccr_s, V7M_FPCCR, MONRDY, monrdy);
-+
-+    if (arm_feature(env, ARM_FEATURE_M_SECURITY)) {
-+        s_ufrdy = armv7m_nvic_get_ready_status(nvic, ARMV7M_EXCP_USAGE, true);
-+        *fpccr_s = FIELD_DP32(*fpccr_s, V7M_FPCCR, UFRDY, s_ufrdy);
-+
-+        sfrdy = armv7m_nvic_get_ready_status(nvic, ARMV7M_EXCP_SECURE, false);
-+        *fpccr_s = FIELD_DP32(*fpccr_s, V7M_FPCCR, SFRDY, sfrdy);
-+    }
-+}
-+
- static bool v7m_push_stack(ARMCPU *cpu)
- {
-     /* Do the "set up stack frame" part of exception entry,
-@@ -8324,7 +8389,7 @@ static bool v7m_push_stack(ARMCPU *cpu)
-                 }
-             } else {
-                 /* Lazy stacking enabled, save necessary info to stack later */
--                /* TODO : equivalent of UpdateFPCCR() pseudocode */
-+                v7m_update_fpccr(env, frameptr + 0x20, true);
-             }
-         }
-     }
 -- 
 2.20.1
