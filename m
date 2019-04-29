@@ -2,72 +2,116 @@ Return-Path: <SRS0=sEuR=S7=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4CA43C43219
-	for <qemu-devel@archiver.kernel.org>; Mon, 29 Apr 2019 16:12:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EC5BFC43219
+	for <qemu-devel@archiver.kernel.org>; Mon, 29 Apr 2019 16:13:46 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1CAC720673
-	for <qemu-devel@archiver.kernel.org>; Mon, 29 Apr 2019 16:12:07 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1CAC720673
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
+	by mail.kernel.org (Postfix) with ESMTPS id A70F020673
+	for <qemu-devel@archiver.kernel.org>; Mon, 29 Apr 2019 16:13:46 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A70F020673
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:60074 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:60095 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hL8sw-0001p2-Be
-	for qemu-devel@archiver.kernel.org; Mon, 29 Apr 2019 12:12:06 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:48741)
+	id 1hL8uX-0003Ba-RW
+	for qemu-devel@archiver.kernel.org; Mon, 29 Apr 2019 12:13:45 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:50119)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1hL8rl-0001BQ-Vw
-	for qemu-devel@nongnu.org; Mon, 29 Apr 2019 12:10:55 -0400
+	(envelope-from <thuth@redhat.com>) id 1hL8t3-000294-6E
+	for qemu-devel@nongnu.org; Mon, 29 Apr 2019 12:12:14 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1hL8rk-0003r3-HR
-	for qemu-devel@nongnu.org; Mon, 29 Apr 2019 12:10:53 -0400
-Received: from indium.canonical.com ([91.189.90.7]:54294)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1hL8rk-0003pY-Bo
-	for qemu-devel@nongnu.org; Mon, 29 Apr 2019 12:10:52 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1hL8rj-0000ie-4c
-	for <qemu-devel@nongnu.org>; Mon, 29 Apr 2019 16:10:51 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 1BF2B2E80C0
-	for <qemu-devel@nongnu.org>; Mon, 29 Apr 2019 16:10:51 +0000 (UTC)
+	(envelope-from <thuth@redhat.com>) id 1hL8t1-0005Ko-7k
+	for qemu-devel@nongnu.org; Mon, 29 Apr 2019 12:12:13 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:36244)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <thuth@redhat.com>)
+	id 1hL8su-00052m-0d; Mon, 29 Apr 2019 12:12:04 -0400
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+	[10.5.11.23])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 752833007C43;
+	Mon, 29 Apr 2019 16:11:53 +0000 (UTC)
+Received: from thuth.remote.csb (ovpn-116-111.ams2.redhat.com [10.36.116.111])
+	by smtp.corp.redhat.com (Postfix) with ESMTP id 9F69228D08;
+	Mon, 29 Apr 2019 16:11:03 +0000 (UTC)
+To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
+	yang.zhong@intel.com, Peter Maydell <peter.maydell@linaro.org>,
+	qemu-devel@nongnu.org, pbonzini@redhat.com
+References: <20190418180057.3593-1-thuth@redhat.com>
+	<20190418180057.3593-23-thuth@redhat.com>
+	<b042daff-8b05-08e7-5386-1b89f05ad984@redhat.com>
+From: Thomas Huth <thuth@redhat.com>
+Openpgp: preference=signencrypt
+Autocrypt: addr=thuth@redhat.com; keydata=
+	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
+Organization: Red Hat
+Message-ID: <7559b0e3-f752-09a5-2e8d-a40d0ade23e1@redhat.com>
+Date: Mon, 29 Apr 2019 18:11:02 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+	Thunderbird/60.6.1
 MIME-Version: 1.0
+In-Reply-To: <b042daff-8b05-08e7-5386-1b89f05ad984@redhat.com>
 Content-Type: text/plain; charset="UTF-8"
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+	(mx1.redhat.com [10.5.110.40]);
+	Mon, 29 Apr 2019 16:11:53 +0000 (UTC)
 Content-Transfer-Encoding: quoted-printable
-Date: Mon, 29 Apr 2019 15:59:17 -0000
-From: Saverio Miroddi <1826422@bugs.launchpad.net>
-To: qemu-devel@nongnu.org
-X-Launchpad-Notification-Type: bug
-X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
-X-Launchpad-Bug-Information-Type: Public
-X-Launchpad-Bug-Private: no
-X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: alex-l-williamson saveriomiroddi
-X-Launchpad-Bug-Reporter: Saverio Miroddi (saveriomiroddi)
-X-Launchpad-Bug-Modifier: Saverio Miroddi (saveriomiroddi)
-References: <155620554968.6380.13610580395862407350.malonedeb@chaenomeles.canonical.com>
-Message-Id:
- <155655355758.13521.14088057509460114159.malone@gac.canonical.com>
-X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
-X-Launchpad-Message-For: qemu-devel-ml
-Precedence: bulk
-X-Generated-By: Launchpad (canonical.com); Revision="18928";
-	Instance="launchpad-lazr.conf"
-X-Launchpad-Hash: 2e134f1d120829fe2d23a87e9e65b6e3efb0f047
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 91.189.90.7
-Subject: [Qemu-devel] [Bug 1826422] Re: Regression: QEMU 4.0 hangs the host
- (*bisect included*)
+X-Received-From: 209.132.183.28
+Subject: Re: [Qemu-devel] [PATCH for-QEMU-4.1 v5 22/29] hw/arm: Express
+ dependencies of sabrelite with Kconfig
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
+Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -76,88 +120,87 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1826422 <1826422@bugs.launchpad.net>
+Cc: Rob Herring <robh@kernel.org>, Jan Kiszka <jan.kiszka@web.de>,
+	Igor Mitsyanko <i.mitsyanko@gmail.com>, qemu-block@nongnu.org,
+	"Michael S. Tsirkin" <mst@redhat.com>,
+	Andrey Smirnov <andrew.smirnov@gmail.com>,
+	Alistair Francis <alistair@alistair23.me>,
+	Philippe Mathieu-Daude <f4bug@amsat.org>,
+	Jean-Christophe Dubois <jcd@tribudubois.net>,
+	Beniamino Galvani <b.galvani@gmail.com>, Andrew Jeffery <andrew@aj.id.au>,
+	Cedric Le Goater <clg@kaod.org>, qemu-arm@nongnu.org,
+	Peter Chubb <peter.chubb@nicta.com.au>, Gerd Hoffmann <kraxel@redhat.com>,
+	Antony Pavlov <antonynpavlov@gmail.com>,
+	"Edgar E . Iglesias" <edgar.iglesias@gmail.com>,
+	Subbaraya Sundeep <sundeep.lkml@gmail.com>,
+	John Snow <jsnow@redhat.com>, Joel Stanley <joel@jms.id.au>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190429155917.NilRKIdf5vgUrRACjaivMT2MIE4awcJrhfm-SAtWIig@z>
+Message-ID: <20190429161102.oLEMusTGr9Xm92ENr1V6n42H8keKoS7ZojG-FuC64rw@z>
 
-> The change in QEMU 4.0 is only a change in defaults of the machine
-type, it can be entirely reverted in the VM config with
-kernel_irqchip=3Don or <ioapic driver=3D'kvm'/> with libvirt. Using a
-machine type prior to the q35 4.0 machine type would also avoid it.
-There are no performance issues with these configurations that would
-favor using 3.1 over 4.0.
+On 25/04/2019 18.43, Philippe Mathieu-Daud=C3=A9 wrote:
+> Hi Thomas,
+>=20
+> On 4/18/19 8:00 PM, Thomas Huth wrote:
+>> Add Kconfig dependencies for the Sabrelite / iMX6 machine.
+>>
+>> Signed-off-by: Thomas Huth <thuth@redhat.com>
+>> ---
+>>  default-configs/arm-softmmu.mak | 4 +---
+>>  hw/arm/Kconfig                  | 7 +++++++
+>>  hw/arm/Makefile.objs            | 3 ++-
+>>  3 files changed, 10 insertions(+), 4 deletions(-)
+>>
+>> diff --git a/default-configs/arm-softmmu.mak b/default-configs/arm-sof=
+tmmu.mak
+>> index 76508e3910..ef7dd7156a 100644
+>> --- a/default-configs/arm-softmmu.mak
+>> +++ b/default-configs/arm-softmmu.mak
+>> @@ -33,6 +33,7 @@ CONFIG_NETDUINO2=3Dy
+>>  CONFIG_MPS2=3Dy
+>>  CONFIG_RASPI=3Dy
+>>  CONFIG_DIGIC=3Dy
+>> +CONFIG_SABRELITE=3Dy
+>> =20
+>>  CONFIG_VGA=3Dy
+>>  CONFIG_SSI_M25P80=3Dy
+>> @@ -40,13 +41,10 @@ CONFIG_IMX_FEC=3Dy
+>> =20
+>>  CONFIG_NRF51_SOC=3Dy
+>> =20
+>> -CONFIG_FSL_IMX6=3Dy
+>>  CONFIG_FSL_IMX25=3Dy
+>>  CONFIG_FSL_IMX7=3Dy
+>>  CONFIG_FSL_IMX6UL=3Dy
+>> =20
+>> -CONFIG_IMX_I2C=3Dy
+>> -
+>>  CONFIG_PCIE_PORT=3Dy
+>>  CONFIG_XIO3130=3Dy
+>>  CONFIG_IOH3420=3Dy
+>> diff --git a/hw/arm/Kconfig b/hw/arm/Kconfig
+>> index 059fb8282c..065c7acf1b 100644
+>> --- a/hw/arm/Kconfig
+>> +++ b/hw/arm/Kconfig
+>> @@ -177,6 +177,10 @@ config REALVIEW
+>>      select DS1338 # I2C RTC+NVRAM
+>>      select USB_OHCI
+>> =20
+>> +config SABRELITE
+>> +    bool
+>> +    select FSL_IMX6
+>=20
+> This one crashes:
+>=20
+> $ qemu-system-aarch64 -display none -M sabrelite
+> ERROR:/source/qemu/qom/object.c:454:object_initialize_with_type:
+> assertion failed: (type !=3D NULL)
+> Aborted (core dumped)
 
-Thanks for the detailed answer :-)
+Weird, I was pretty sure to have tested all boards individually ... I
+must accidentally have skipped this one. Thanks a lot for testing, I'll
+fix it in v6.
 
--- =
-
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1826422
-
-Title:
-  Regression: QEMU 4.0 hangs the host (*bisect included*)
-
-Status in QEMU:
-  New
-
-Bug description:
-  The commit b2fc91db84470a78f8e93f5b5f913c17188792c8 seemingly
-  introduced a regression on my system.
-
-  When I start QEMU, the guest and the host hang (I need a hard reset to
-  get back to a working system), before anything shows on the guest.
-
-  I use QEMU with GPU passthrough (which worked perfectly until the
-  commit above). This is the command I use:
-
-  ```
-  /path/to/qemu-system-x86_64
-    -drive if=3Dpflash,format=3Draw,readonly,file=3D/path/to/OVMF_CODE.fd
-    -drive if=3Dpflash,format=3Draw,file=3D/tmp/OVMF_VARS.fd.tmp
-    -enable-kvm
-    -machine q35,accel=3Dkvm,mem-merge=3Doff
-    -cpu host,kvm=3Doff,hv_vendor_id=3Dvgaptrocks,hv_relaxed,hv_spinlocks=
-=3D0x1fff,hv_vapic,hv_time
-    -smp 4,cores=3D4,sockets=3D1,threads=3D1
-    -m 10240
-    -vga none
-    -rtc base=3Dlocaltime
-    -serial none
-    -parallel none
-    -usb
-    -device usb-tablet
-    -device vfio-pci,host=3D01:00.0,multifunction=3Don
-    -device vfio-pci,host=3D01:00.1
-    -device usb-host,vendorid=3D<vid>,productid=3D<pid>
-    -device usb-host,vendorid=3D<vid>,productid=3D<pid>
-    -device usb-host,vendorid=3D<vid>,productid=3D<pid>
-    -device usb-host,vendorid=3D<vid>,productid=3D<pid>
-    -device usb-host,vendorid=3D<vid>,productid=3D<pid>
-    -device usb-host,vendorid=3D<vid>,productid=3D<pid>
-    -device virtio-scsi-pci,id=3Dscsi
-    -drive file=3D/path/to/guest.img,id=3Dhdd1,format=3Dqcow2,if=3Dnone,cac=
-he=3Dwriteback
-    -device scsi-hd,drive=3Dhdd1
-    -net nic,model=3Dvirtio
-    -net user,smb=3D/path/to/shared
-  ```
-
-  If I run QEMU without GPU passthrough, it runs fine.
-
-  Some details about my system:
-
-  - O/S: Mint 19.1 x86-64 (it's based on Ubuntu 18.04)
-  - Kernel: 4.15
-  - `configure` options: `--target-list=3Dx86_64-softmmu --enable-gtk --ena=
-ble-spice --audio-drv-list=3Dpa`
-  - EDK2 version: 1a734ed85fda71630c795832e6d24ea560caf739 (20/Apr/2019)
-  - CPU: i7-6700k
-  - Motherboard: ASRock Z170 Gaming-ITX/ac
-  - VGA: Gigabyte GTX 960 Mini-ITX
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1826422/+subscriptions
+ Thomas
 
