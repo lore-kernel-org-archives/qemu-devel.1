@@ -1,24 +1,28 @@
-Received: from eggs.gnu.org ([209.51.188.92]:38924)
+Received: from eggs.gnu.org ([209.51.188.92]:38960)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1hKyH9-0005wH-JG
-	for qemu-devel@nongnu.org; Mon, 29 Apr 2019 00:52:24 -0400
+	(envelope-from <vsementsov@virtuozzo.com>) id 1hKyHN-0005wU-4V
+	for qemu-devel@nongnu.org; Mon, 29 Apr 2019 00:52:38 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1hKyFG-00069Q-3G
-	for qemu-devel@nongnu.org; Mon, 29 Apr 2019 00:50:27 -0400
+	(envelope-from <vsementsov@virtuozzo.com>) id 1hKy8E-0004Ae-J8
+	for qemu-devel@nongnu.org; Mon, 29 Apr 2019 00:43:12 -0400
+Received: from mail-eopbgr120131.outbound.protection.outlook.com
+	([40.107.12.131]:36095
+	helo=FRA01-PR2-obe.outbound.protection.outlook.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
+	id 1hKy8E-0004AA-27
+	for qemu-devel@nongnu.org; Mon, 29 Apr 2019 00:43:10 -0400
 From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Date: Mon, 29 Apr 2019 04:49:56 +0000
-Message-ID: <2e608d6a-8dce-aee8-15e4-a9830a2afd6b@virtuozzo.com>
-References: <20190415144948.78568-1-vsementsov@virtuozzo.com>
-	<20190415144948.78568-6-vsementsov@virtuozzo.com>
-	<4f5ed0c3-83d0-bcbe-5866-e0aab67f188f@redhat.com>
-In-Reply-To: <4f5ed0c3-83d0-bcbe-5866-e0aab67f188f@redhat.com>
+Date: Mon, 29 Apr 2019 04:43:06 +0000
+Message-ID: <79d19dc9-f312-bb19-3895-781e48e21056@virtuozzo.com>
+References: <20190426102115.30002-1-yury-kotov@yandex-team.ru>
+In-Reply-To: <20190426102115.30002-1-yury-kotov@yandex-team.ru>
 Content-Language: en-US
 Content-Type: text/plain; charset="utf-8"
-Content-ID: <12A8C8B25D813F4D8A98F0648E02E6F6@eurprd08.prod.outlook.com>
+Content-ID: <CBBD6E7B70AB8743A18F514BBC486E35@eurprd08.prod.outlook.com>
 Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [PATCH v6 5/5] block/backup: refactor: split out
- backup_calculate_cluster_size
+Subject: Re: [Qemu-devel] [PATCH] trace: fix runstate tracing
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,21 +31,22 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Max Reitz <mreitz@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>
-Cc: "kwolf@redhat.com" <kwolf@redhat.com>, "jsnow@redhat.com" <jsnow@redhat.com>, Denis Lunev <den@virtuozzo.com>
+To: Yury Kotov <yury-kotov@yandex-team.ru>, Paolo Bonzini <pbonzini@redhat.com>
+Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
 
-MjYuMDQuMjAxOSAyMTozMCwgTWF4IFJlaXR6IHdyb3RlOg0KPiBPbiAxNS4wNC4xOSAxNjo0OSwg
-VmxhZGltaXIgU2VtZW50c292LU9naWV2c2tpeSB3cm90ZToNCj4+IFNwbGl0IG91dCBjbHVzdGVy
-X3NpemUgY2FsY3VsYXRpb24uIE1vdmUgY29weS1iaXRtYXAgY3JlYXRpb24gYWJvdmUNCj4+IGJs
-b2NrLWpvYiBjcmVhdGlvbiwgYXMgd2UgYXJlIGdvaW5nIHRvIHNoYXJlIGl0IHdpdGggdXBjb21p
-bmcNCj4+IGJhY2t1cC10b3AgZmlsdGVyLCB3aGljaCBhbHNvIHNob3VsZCBiZSBjcmVhdGVkIGJl
-Zm9yZSBhY3R1YWwgYmxvY2sgam9iDQo+PiBjcmVhdGlvbi4NCj4+DQo+PiBBbHNvLCB3aGlsZSBi
-ZWluZyBoZXJlLCBkcm9wIHVubmVjZXNzYXJ5ICJnb3RvIGVycm9yIiBmcm9tDQo+PiBiZHJ2X2dl
-dGxlbmd0aCBlcnJvciBwYXRoLg0KPiANCj4gSXQgaXNu4oCZdCB1bm5lY2Vzc2FyeSwgdGhvdWdo
-LiAgQmVmb3JlIHRoaXMsIHdlIGludm9rZQ0KPiBiZHJ2X2RpcnR5X2JpdG1hcF9jcmVhdGVfc3Vj
-Y2Vzc29yKCksIHNvIHRoZSBlcnJvciBwYXRoIGhhcyB0byBjbGVhbg0KPiB0aGF0IHVwIHdpdGgg
-YmRydl9yZWNsYWltX2RpcnR5X2JpdG1hcCgpLg0KPiANCj4gTWF4DQo+IA0KDQpPb3BzLCB3aWxs
-IHJlc2VuZC4gSSB3YXMgbG9va2luZyBhdCBwcmV2aW91cyBwbGFpbiAicmV0dXJuIE5VTEwiLCBi
-dXQgbWlzc2VkDQp0aGF0IGluICJpZiIgYnJhbmNoIHdlIGRvIHRoaW5nIHRvIGJlIHJvbGxlZC1i
-YWNrIG9uIGZhaWwuDQoNClRoYW5rIHlvdSBmb3IgcmV2aWV3IQ0KDQotLSANCkJlc3QgcmVnYXJk
-cywNClZsYWRpbWlyDQo=
+T29wcywgbXkgZmF1bHQsIHNvcnJ5OiggVGhhbmsgeW91IGZvciBmaXhpbmchDQoNCk1heSBiZSBh
+ZGRlZCwgdGhhdCBpdCBpcyBicm9rZW4gc2luY2UgZmYxMmUzYWUzZDAuDQoNClJldmlld2VkLWJ5
+OiBWbGFkaW1pciBTZW1lbnRzb3YtT2dpZXZza2l5IDx2c2VtZW50c292QHZpcnR1b3p6by5jb20+
+DQoNCjI2LjA0LjIwMTkgMTM6MjEsIFl1cnkgS290b3Ygd3JvdGU6DQo+IFNpZ25lZC1vZmYtYnk6
+IFl1cnkgS290b3YgPHl1cnkta290b3ZAeWFuZGV4LXRlYW0ucnU+DQo+IC0tLQ0KPiAgIHZsLmMg
+fCAyICstDQo+ICAgMSBmaWxlIGNoYW5nZWQsIDEgaW5zZXJ0aW9uKCspLCAxIGRlbGV0aW9uKC0p
+DQo+IA0KPiBkaWZmIC0tZ2l0IGEvdmwuYyBiL3ZsLmMNCj4gaW5kZXggZmY1ZGZiNmZiYy4uYWQ5
+YjE4MWU1NyAxMDA2NDQNCj4gLS0tIGEvdmwuYw0KPiArKysgYi92bC5jDQo+IEBAIC03MjUsNyAr
+NzI1LDcgQEAgdm9pZCBydW5zdGF0ZV9zZXQoUnVuU3RhdGUgbmV3X3N0YXRlKQ0KPiAgICAgICBh
+c3NlcnQobmV3X3N0YXRlIDwgUlVOX1NUQVRFX19NQVgpOw0KPiAgIA0KPiAgICAgICB0cmFjZV9y
+dW5zdGF0ZV9zZXQoY3VycmVudF9ydW5fc3RhdGUsIFJ1blN0YXRlX3N0cihjdXJyZW50X3J1bl9z
+dGF0ZSksDQo+IC0gICAgICAgICAgICAgICAgICAgICAgIG5ld19zdGF0ZSwgUnVuU3RhdGVfc3Ry
+KGN1cnJlbnRfcnVuX3N0YXRlKSk7DQo+ICsgICAgICAgICAgICAgICAgICAgICAgIG5ld19zdGF0
+ZSwgUnVuU3RhdGVfc3RyKG5ld19zdGF0ZSkpOw0KPiAgIA0KPiAgICAgICBpZiAoY3VycmVudF9y
+dW5fc3RhdGUgPT0gbmV3X3N0YXRlKSB7DQo+ICAgICAgICAgICByZXR1cm47DQo+IA0KDQoNCi0t
+IA0KQmVzdCByZWdhcmRzLA0KVmxhZGltaXINCg==
