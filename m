@@ -2,81 +2,79 @@ Return-Path: <SRS0=sEuR=S7=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.7 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS,URIBL_BLOCKED
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CFA13C43219
-	for <qemu-devel@archiver.kernel.org>; Mon, 29 Apr 2019 18:18:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 082D9C43219
+	for <qemu-devel@archiver.kernel.org>; Mon, 29 Apr 2019 18:20:47 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9348A215EA
-	for <qemu-devel@archiver.kernel.org>; Mon, 29 Apr 2019 18:18:47 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="q4Rv5CMC"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9348A215EA
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id D0CA22075E
+	for <qemu-devel@archiver.kernel.org>; Mon, 29 Apr 2019 18:20:46 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D0CA22075E
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:33413 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:33459 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hLArW-000666-Nt
-	for qemu-devel@archiver.kernel.org; Mon, 29 Apr 2019 14:18:46 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:51533)
+	id 1hLAtS-00078Y-3k
+	for qemu-devel@archiver.kernel.org; Mon, 29 Apr 2019 14:20:46 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:51986)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1hLAqN-0005l8-2u
-	for qemu-devel@nongnu.org; Mon, 29 Apr 2019 14:17:40 -0400
+	(envelope-from <philmd@redhat.com>) id 1hLAsO-0006Ta-Fy
+	for qemu-devel@nongnu.org; Mon, 29 Apr 2019 14:19:41 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1hLAqM-0008UU-5V
-	for qemu-devel@nongnu.org; Mon, 29 Apr 2019 14:17:35 -0400
-Received: from mail-oi1-x243.google.com ([2607:f8b0:4864:20::243]:42118)
+	(envelope-from <philmd@redhat.com>) id 1hLAsN-00017D-L5
+	for qemu-devel@nongnu.org; Mon, 29 Apr 2019 14:19:40 -0400
+Received: from mail-wr1-f66.google.com ([209.85.221.66]:42260)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1hLAqL-0008UO-Uy
-	for qemu-devel@nongnu.org; Mon, 29 Apr 2019 14:17:34 -0400
-Received: by mail-oi1-x243.google.com with SMTP id k9so6076002oig.9
-	for <qemu-devel@nongnu.org>; Mon, 29 Apr 2019 11:17:33 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
-	h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-	:cc; bh=V/dfdmr1zai6GxTGpwqqi2vcy70wnP5fwf7FK/6FQGY=;
-	b=q4Rv5CMC98nVoRBjyOMAiWm9SDiYXbmS/4U2HSlGXOjbF0CxePUElqyxuAaNUMNeyg
-	S9p304JTuEgLW5ewOfs5+jgx4BIBPizjwPmeqGCLPEsdohxkE3770VSENzIc8nG36V4y
-	IvlZDGLanlmpEjY04kwLNEL8yk89U4O1psvEOOiSrdTlefKel8m7T+rCy/5zbMK8dauk
-	GROhNV2yM2naY/wchkLXxuNhAwgl5hG9gF4jWRdQkPNFoYa2Wc7b+4gnrhY/Jv81/moT
-	azJUKIR9+MevFjfvydTtZApUQdrVcTNbLRebHFIf6xKNsvatk7xmZXPhrPQjJig848gS
-	rvnw==
+	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1hLAsN-00016u-8K
+	for qemu-devel@nongnu.org; Mon, 29 Apr 2019 14:19:39 -0400
+Received: by mail-wr1-f66.google.com with SMTP id l2so1778636wrb.9
+	for <qemu-devel@nongnu.org>; Mon, 29 Apr 2019 11:19:39 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
 	d=1e100.net; s=20161025;
-	h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-	:message-id:subject:to:cc;
-	bh=V/dfdmr1zai6GxTGpwqqi2vcy70wnP5fwf7FK/6FQGY=;
-	b=qU8XgCEOZnjo9h7Gvq6OzMCXaZlm+DKHJ0gjlLM0Q7LMhSJO7YBtWI0g+621avyi3O
-	U1yHRLGGzrO++WyO8BxJV3CHiWoxbWWF5hTom1zf5zrvaQcRd0cAdTvRIE0dLXE6vpcJ
-	A2ftscvuWfefZT2rm0ImiDVN9EdVOsP1bXYOBU42gCiVJOxIYfiS0EFM8smH+iyqWbnn
-	BQZ3b4ZizoOtGU8w4FbU7FXE/Tn15YbGHwNHDSW9eLUpmfmMi605/GMnw8mirN4mXFIt
-	XsGlgpMhHBVVI7MnF2bhNyrdRKL5XUddwLSfvVXm585JwRXTWTHE4lg4IPMgR5Krqefu
-	g2/w==
-X-Gm-Message-State: APjAAAU8hT7rIMbuELx48kIplrkw/V8rxJTCroGGRo4vrRwmsJT8r0y+
-	FjgAuE6EAjm221nKNRbELUDUgTrgv/3fUKSL/SwPFYBXE3s=
-X-Google-Smtp-Source: APXvYqzSjr82e7GYF0dIEVppqzSQYn7BT1/0Yx6ArvUOw0fOHKiN/xMDtdoadz7B2D9mw2pBdkjOlvrjhQ8z8d72xGk=
-X-Received: by 2002:aca:4b04:: with SMTP id y4mr81974oia.170.1556561852905;
-	Mon, 29 Apr 2019 11:17:32 -0700 (PDT)
+	h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
+	:date:user-agent:mime-version:in-reply-to:content-language
+	:content-transfer-encoding;
+	bh=b8JrVvmhx3q26IahqjD6E/5G69SfIzP3Kim3EOowCVU=;
+	b=XY2/TPs4jZnJbNXIdP+sVdqyxIlJfWJoQFtfMW9/vRCXebnnWecbmfJrc7U+YIAsrH
+	NXnitqFfuX7Q7ZpGN4GWw0v3Kvm6sC2QN8P9ATdj81ysg2DSHkljn+osyL0BsHBDn3CE
+	tHnybFRhA6KdKipyIg4vGDPlWyBJKA1OVESM4d5NURBTQfrke7TOiAB5tdgMEtpn2mFh
+	z0sl4r2sELHlYgP9alDjgN/DQfxgimq4e3ToGeFK7xavmP0TrU1/l9FRcgdKDVEjsjYo
+	P4NJV/iQrNjciNoZECZoYXMRU7OBeGQO7cPBUV5A/yQUswIK5xBrmSH0lYBtvkBtAyvB
+	gBAg==
+X-Gm-Message-State: APjAAAXCPbZa88zoCcHj+mmhd2f6WxWO7zdwup+ADx0RYBQuSmCoVygN
+	oPmbcTsjw3MB42OX5VsrQkBItg==
+X-Google-Smtp-Source: APXvYqyEuqHPju9Rtbx3VhVmXLstxB/H3C8kzfLB42m/o7r+PmJo9AXB1izqtxVMBOEeDVgtisdrqg==
+X-Received: by 2002:adf:b64e:: with SMTP id i14mr19509426wre.72.1556561978272; 
+	Mon, 29 Apr 2019 11:19:38 -0700 (PDT)
+Received: from [192.168.1.33] (193.red-88-21-103.staticip.rima-tde.net.
+	[88.21.103.193]) by smtp.gmail.com with ESMTPSA id
+	e6sm25705557wrc.96.2019.04.29.11.19.37
+	(version=TLS1_3 cipher=AEAD-AES128-GCM-SHA256 bits=128/128);
+	Mon, 29 Apr 2019 11:19:37 -0700 (PDT)
+To: Peter Maydell <peter.maydell@linaro.org>
+References: <20190412165416.7977-1-philmd@redhat.com>
+	<CAFEAcA90Pv=zEqaonGV=c022T=CYMo11nkqNwBnGgocESnBNmA@mail.gmail.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Openpgp: id=89C1E78F601EE86C867495CBA2A3FD6EDEADC0DE;
+	url=http://pgp.mit.edu/pks/lookup?op=get&search=0xA2A3FD6EDEADC0DE
+Message-ID: <f56687f4-434e-0e6d-77a8-fec6c33c9a62@redhat.com>
+Date: Mon, 29 Apr 2019 20:19:36 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+	Thunderbird/60.6.1
 MIME-Version: 1.0
-References: <20190318134019.23729-1-peter.maydell@linaro.org>
-	<41b21196-5401-898d-4afc-6fffa71d09dd@collabora.com>
-	<498af98a-5be0-a589-c7b5-246c4d0ee7ef@collabora.com>
-In-Reply-To: <498af98a-5be0-a589-c7b5-246c4d0ee7ef@collabora.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Mon, 29 Apr 2019 19:17:21 +0100
-Message-ID:
- <CAFEAcA-fzPzZFV_orPL84syTdTqrseHUiwuba9vzrNgz95BHGA@mail.gmail.com>
-To: Antonio Ospite <antonio.ospite@collabora.com>
+In-Reply-To: <CAFEAcA90Pv=zEqaonGV=c022T=CYMo11nkqNwBnGgocESnBNmA@mail.gmail.com>
 Content-Type: text/plain; charset="UTF-8"
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
-	recognized.
-X-Received-From: 2607:f8b0:4864:20::243
-Subject: Re: [Qemu-devel] [PATCH] configure: Remove --source-path option
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+	[fuzzy]
+X-Received-From: 209.85.221.66
+Subject: Re: [Qemu-devel] [Qemu-arm] [PATCH v3 00/12] hw: Remove
+ "hw/devices.h"
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -88,23 +86,35 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: QEMU Developers <qemu-devel@nongnu.org>,
-	"patches@linaro.org" <patches@linaro.org>
+Cc: Thomas Huth <thuth@redhat.com>, Igor Mitsyanko <i.mitsyanko@gmail.com>,
+	QEMU Developers <qemu-devel@nongnu.org>,
+	Markus Armbruster <armbru@redhat.com>,
+	qemu-arm <qemu-arm@nongnu.org>, Jan Kiszka <jan.kiszka@web.de>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190429181721.HY4GOUuNKz_nDDlxrhuk-VQ_K8USbErrrjEVvsfpCDQ@z>
+Message-ID: <20190429181936.rNRm8UnoqmLDBxLSVA_yKDZqQrn0ZfG4utXTr7J8YFI@z>
 
-On Thu, 25 Apr 2019 at 17:42, Antonio Ospite
-<antonio.ospite@collabora.com> wrote:
-> Now that 4.0 has been released, maybe we can move on with this minor change.
->
-> I will send a fix for https://bugs.launchpad.net/qemu/+bug/1817345 after
-> this patch lands.
+On 4/29/19 6:51 PM, Peter Maydell wrote:
+> On Fri, 12 Apr 2019 at 17:55, Philippe Mathieu-Daudé <philmd@redhat.com> wrote:
+>>
+>> Hi,
+>>
+>> As his first comment describes itself, the "hw/devices.h" contains
+>> declarations for "Devices that have nowhere better to go."
+>> This series remove it, creating new headers for devices covered there.
+>> MAINTAINERS is updated.
+>> I also included 2 cleanups while working on this, in "qemu/typedefs.h"
+>> and "hw/net/ne2000-isa.h" header guard.
+>>
+>> v3:
+>> - rebased
+>> - added 2 patches suggested by Markus
+>> - addressed Markus review comments
+>> - added Markus's R-b
+> 
+> Since these are almost all arm devices I'll take this via the
+> target-arm tree (I'm going to make a pullreq later today).
 
-This patch has just gone in to master, so that should be ok
-for you to rebase your patch on now.
-
-thanks
--- PMM
+Thanks Peter!
 
