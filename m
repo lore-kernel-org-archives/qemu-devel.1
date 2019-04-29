@@ -1,30 +1,30 @@
-Received: from eggs.gnu.org ([209.51.188.92]:36149)
+Received: from eggs.gnu.org ([209.51.188.92]:38219)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1hL8VW-00047L-9x
-	for qemu-devel@nongnu.org; Mon, 29 Apr 2019 11:47:55 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1hL8bU-0006YG-Ky
+	for qemu-devel@nongnu.org; Mon, 29 Apr 2019 11:54:06 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1hL8VV-0007fx-Cm
-	for qemu-devel@nongnu.org; Mon, 29 Apr 2019 11:47:54 -0400
-Received: from mail-pf1-x443.google.com ([2607:f8b0:4864:20::443]:42577)
+	(envelope-from <peter.maydell@linaro.org>) id 1hL8bS-0006UW-PJ
+	for qemu-devel@nongnu.org; Mon, 29 Apr 2019 11:54:04 -0400
+Received: from mail-oi1-x243.google.com ([2607:f8b0:4864:20::243]:39385)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1hL8VV-0007db-3m
-	for qemu-devel@nongnu.org; Mon, 29 Apr 2019 11:47:53 -0400
-Received: by mail-pf1-x443.google.com with SMTP id w25so5497426pfi.9
-	for <qemu-devel@nongnu.org>; Mon, 29 Apr 2019 08:47:52 -0700 (PDT)
-References: <20190328230404.12909-1-richard.henderson@linaro.org>
-	<20190328230404.12909-37-richard.henderson@linaro.org>
-	<CAFEAcA-an2BRh+Ji0y-6P9e_3=Z22CDVSMJ1RAEXefa-MFZdFw@mail.gmail.com>
-From: Richard Henderson <richard.henderson@linaro.org>
-Message-ID: <fdd4967a-7e65-1497-9377-456232f12d00@linaro.org>
-Date: Mon, 29 Apr 2019 08:42:55 -0700
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1hL8bR-0006TK-1A
+	for qemu-devel@nongnu.org; Mon, 29 Apr 2019 11:54:01 -0400
+Received: by mail-oi1-x243.google.com with SMTP id n187so8695704oih.6
+	for <qemu-devel@nongnu.org>; Mon, 29 Apr 2019 08:53:59 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <CAFEAcA-an2BRh+Ji0y-6P9e_3=Z22CDVSMJ1RAEXefa-MFZdFw@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH for-4.1 v2 36/36] tcg/arm: Use LDRD to load
- tlb mask+table
+References: <20190418180057.3593-1-thuth@redhat.com>
+	<20190418180057.3593-17-thuth@redhat.com>
+	<98855a34-ff5a-896f-7959-480b89d62833@redhat.com>
+	<b78d5517-5f23-6028-6726-b60f916f22fd@redhat.com>
+In-Reply-To: <b78d5517-5f23-6028-6726-b60f916f22fd@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Mon, 29 Apr 2019 16:53:48 +0100
+Message-ID: <CAFEAcA8xWTwbU6RSBbQkF2j5OfozEq9g3Pq83KyYG_J1CqGM-A@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH for-QEMU-4.1 v5 16/29] hw/arm: Express
+ dependencies of the virt machine with Kconfig
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,30 +33,33 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: QEMU Developers <qemu-devel@nongnu.org>
+To: Thomas Huth <thuth@redhat.com>
+Cc: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>, Yang Zhong <yang.zhong@intel.com>, QEMU Developers <qemu-devel@nongnu.org>, Paolo Bonzini <pbonzini@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>, "Edgar E . Iglesias" <edgar.iglesias@gmail.com>, Jean-Christophe Dubois <jcd@tribudubois.net>, Rob Herring <robh@kernel.org>, Qemu-block <qemu-block@nongnu.org>, Andrey Smirnov <andrew.smirnov@gmail.com>, Joel Stanley <joel@jms.id.au>, Antony Pavlov <antonynpavlov@gmail.com>, Alistair Francis <alistair@alistair23.me>, Beniamino Galvani <b.galvani@gmail.com>, qemu-arm <qemu-arm@nongnu.org>, Peter Chubb <peter.chubb@nicta.com.au>, Cedric Le Goater <clg@kaod.org>, John Snow <jsnow@redhat.com>, Andrew Jeffery <andrew@aj.id.au>, Philippe Mathieu-Daude <f4bug@amsat.org>, Subbaraya Sundeep <sundeep.lkml@gmail.com>, Igor Mitsyanko <i.mitsyanko@gmail.com>, Jan Kiszka <jan.kiszka@web.de>
 
-On 4/29/19 8:00 AM, Peter Maydell wrote:
-> On Thu, 28 Mar 2019 at 23:23, Richard Henderson
-> <richard.henderson@linaro.org> wrote:
->>
->> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
->> ---
->>  tcg/arm/tcg-target.inc.c | 109 +++++++++++++++++++--------------------
->>  1 file changed, 52 insertions(+), 57 deletions(-)
-> 
-> I think this would be easier to understand if the commit message
-> included what the old and new generated code fragments looked like.
+On Mon, 29 Apr 2019 at 16:34, Thomas Huth <thuth@redhat.com> wrote:
+>
+> On 25/04/2019 17.53, Philippe Mathieu-Daud=C3=A9 wrote:
+> > Hi Thomas,
+> >
+> > On 4/18/19 8:00 PM, Thomas Huth wrote:
+> >> Dependencies have been determined by looking at hw/arm/virt.c
+> >>
+> >> Signed-off-by: Thomas Huth <thuth@redhat.com>
+> >> ---
+> >>  default-configs/arm-softmmu.mak | 11 +----------
+> >>  hw/arm/Kconfig                  | 19 +++++++++++++++++++
+> >>  hw/arm/Makefile.objs            |  3 ++-
+> >>  3 files changed, 22 insertions(+), 11 deletions(-)
 
-Fair enough.  This change is complicated by having
-to rearrange register usage, so that we ldrd into r0+r1
-instead of ldr into r1+r2, etc.  Just this once it would
-have been easier in thumb2.  ;-)
+> > Without -nodefaults I get:
+> > qemu-system-aarch64: Unsupported NIC model: virtio-net-pci
+> > This is expected.
+>
+> Yes, it should still work with "-nic none" or "-nodefaults".
 
-> The same remark about a compile-time check that mask and
-> table are where we expect from patch 35 applies here too.
+Er, if you need either -nic none or -nodefaults after this
+patch then this would be a change in behaviour, which seems
+wrong to me.
 
-Ok.
-
-
-r~
+thanks
+-- PMM
