@@ -1,22 +1,28 @@
-Received: from eggs.gnu.org ([209.51.188.92]:50708)
+Received: from eggs.gnu.org ([209.51.188.92]:52190)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <joel.stan@gmail.com>) id 1hL5nH-0001Ch-7e
-	for qemu-devel@nongnu.org; Mon, 29 Apr 2019 08:54:04 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1hL5qe-0002UC-1k
+	for qemu-devel@nongnu.org; Mon, 29 Apr 2019 08:57:33 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <joel.stan@gmail.com>) id 1hL5nF-0005u5-Pp
-	for qemu-devel@nongnu.org; Mon, 29 Apr 2019 08:54:03 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1hL5qa-0000Ez-P4
+	for qemu-devel@nongnu.org; Mon, 29 Apr 2019 08:57:31 -0400
+Received: from mail-ot1-x333.google.com ([2607:f8b0:4864:20::333]:35502)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1hL5qa-0000C7-6u
+	for qemu-devel@nongnu.org; Mon, 29 Apr 2019 08:57:28 -0400
+Received: by mail-ot1-x333.google.com with SMTP id g24so3880201otq.2
+	for <qemu-devel@nongnu.org>; Mon, 29 Apr 2019 05:57:24 -0700 (PDT)
 MIME-Version: 1.0
-References: <20190103144124.18917-1-stefanha@redhat.com>
-	<CAFEAcA-B_T9E3ezWFXg-wp3RotMjv3-z3qY7hSJZEoqFBqCWnQ@mail.gmail.com>
-	<62b29bc1-cc78-cd64-4377-fc4007ba7189@redhat.com>
-	<20190426091702.GA2071@stefanha-x1.localdomain>
-In-Reply-To: <20190426091702.GA2071@stefanha-x1.localdomain>
-From: Joel Stanley <joel@jms.id.au>
-Date: Mon, 29 Apr 2019 12:53:48 +0000
-Message-ID: <CACPK8Xc5KgiaYCTs=8ceRu_hV=vC3M6pGV0=7jJNsbuz2a6LDA@mail.gmail.com>
+References: <20190315032629.21234-1-richard.henderson@linaro.org>
+	<20190315032629.21234-2-richard.henderson@linaro.org>
+In-Reply-To: <20190315032629.21234-2-richard.henderson@linaro.org>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Mon, 29 Apr 2019 13:57:13 +0100
+Message-ID: <CAFEAcA_zP=KXXtiRn3AbpT6Dcjcjh3RNS1k+AB3TYZYBLOpiSw@mail.gmail.com>
 Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH] Revert "armv7m: Guard against no -kernel
- argument"
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v3 01/23] crypto: Merge crypto-obj-y into
+ libqemuutil.a
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,32 +31,64 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefan Hajnoczi <stefanha@redhat.com>
-Cc: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, Jim Mussared <jim@groklearning.com>, Julia Suvorova <jusual@mail.ru>, QEMU Developers <qemu-devel@nongnu.org>, Steffen Gortz <qemu.ml@steffen-goertz.de>, qemu-arm <qemu-arm@nongnu.org>, =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>, Thomas Huth <thuth@redhat.com>
+To: Richard Henderson <richard.henderson@linaro.org>
+Cc: QEMU Developers <qemu-devel@nongnu.org>
 
-On Fri, 26 Apr 2019 at 09:17, Stefan Hajnoczi <stefanha@redhat.com> wrote:
+On Fri, 15 Mar 2019 at 03:49, Richard Henderson
+<richard.henderson@linaro.org> wrote:
 >
-> A user-friendly error message is needed here.  The check for -kernel was
-> too specific and is not desirable for microbit where we use -device
-> loader.
+> We will shortly need this in the user-only binaries, so drop the split
+> into system and tools binaries.  This also means that crypto-aes-obj-y
+> can be merged back into crypto-obj-y.
 >
-> Old boards probably want to continue using -kernel.  New boards like
-> microbit may use just -device loader.  Perhaps there is even a group
-> that wants both options.
+> Cc: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
+> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+> ---
+>  Makefile             | 12 +++++-------
+>  Makefile.objs        |  8 ++------
+>  Makefile.target      |  4 ----
+>  configure            |  9 +++------
+>  crypto/Makefile.objs |  5 +----
+>  5 files changed, 11 insertions(+), 27 deletions(-)
 
-FWIW, I used -kernel exclusively when working on the microbit model.
-Other users may chose to use the device loader/hex file.
+This patch breaks a --static configure for me:
 
-I am all for usability, but getting rid of the ability to use -kernel
-on some machine types would be a step in the wrong direction.
+e104462:bionic:qemu$ (cd build/all-linux-static/ && '../../configure'
+'--cc=3Dccache gcc' '--enable-debug' '--static' '--disable-system'
+'--disable-tools')
 
-Cheers,
+ERROR: sizeof(size_t) doesn't match GLIB_SIZEOF_SIZE_T.
+       You probably need to set PKG_CONFIG_LIBDIR
+       to point to the right pkg-config files for your
+       build target
 
-Joel
+The error message is bogus, but the problem is that we
+tried to build one of the test programs like this:
 
->
-> A solution is to introduce explicit checks so that we can tell the user
-> the appropriate option for the machine type.  I can work on this if you
-> like, but probably won't be able to send a patch until Tuesday.
->
-> Stefan
+ccache gcc -pthread -I/usr/include/glib-2.0
+-I/usr/lib/x86_64-linux-gnu/glib-2.0/include -m64 -mcx16 -D_GNU_SOURCE
+-D_FILE_OFFSET_BITS=3D64 -D_LARGEFILE_SOURCE -Wstrict-prototypes
+-Wredundant-decls -Wall -Wundef -Wwrite-strings -Wmissing-prototypes
+-fno-strict-aliasing -fno-common -fwrapv -std=3Dgnu99
+-Wexpansion-to-defined -Wendif-labels -Wno-shift-negative-value
+-Wno-missing-include-dirs -Wempty-body -Wnested-externs
+-Wformat-security -Wformat-y2k -Winit-self -Wignored-qualifiers
+-Wold-style-declaration -Wold-style-definition -Wtype-limits
+-fstack-protector-strong -I/usr/include/p11-kit-1
+-I/usr/include/libpng16 -g -o config-temp/qemu-conf.exe
+config-temp/qemu-conf.c -m64 -static -g -lgthread-2.0 -pthread
+-lglib-2.0 -pthread -lpcre -pthread -lnettle -lgnutls -lgmp
+/usr/lib/x86_64-linux-gnu/libunistring.so -lidn2 -lhogweed -lgmp
+-lnettle -ltasn1 -lp11-kit -lz
+gcc: error: /usr/lib/x86_64-linux-gnu/libunistring.so: No such file or dire=
+ctory
+
+which is almost certainly because we're now including
+a bunch of extra libraries in the link for the static
+linux-user binaries which don't work statically linked.
+(In particular one of them looks to have a bogus
+pkg-config which puts a .so file in the link line for
+a static link...)
+
+thanks
+-- PMM
