@@ -2,63 +2,99 @@ Return-Path: <SRS0=sEuR=S7=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.4 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_PASS,USER_AGENT_MUTT autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-8.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 84EB9C43219
-	for <qemu-devel@archiver.kernel.org>; Mon, 29 Apr 2019 08:52:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D0338C43219
+	for <qemu-devel@archiver.kernel.org>; Mon, 29 Apr 2019 09:10:05 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5775D20645
-	for <qemu-devel@archiver.kernel.org>; Mon, 29 Apr 2019 08:52:58 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5775D20645
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id A495020578
+	for <qemu-devel@archiver.kernel.org>; Mon, 29 Apr 2019 09:10:05 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A495020578
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=de.ibm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:54226 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:54363 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hL21x-0007pZ-LH
-	for qemu-devel@archiver.kernel.org; Mon, 29 Apr 2019 04:52:57 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:58832)
+	id 1hL2IW-00031b-Cb
+	for qemu-devel@archiver.kernel.org; Mon, 29 Apr 2019 05:10:04 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:33257)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1hL21A-0007XK-2I
-	for qemu-devel@nongnu.org; Mon, 29 Apr 2019 04:52:08 -0400
+	(envelope-from <borntraeger@de.ibm.com>) id 1hL2GP-0001Sg-CK
+	for qemu-devel@nongnu.org; Mon, 29 Apr 2019 05:07:56 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1hL217-0004Rn-QY
-	for qemu-devel@nongnu.org; Mon, 29 Apr 2019 04:52:06 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:38260)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <kwolf@redhat.com>)
-	id 1hL215-0004QQ-54; Mon, 29 Apr 2019 04:52:03 -0400
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
-	[10.5.11.15])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 087C45946E;
-	Mon, 29 Apr 2019 08:52:01 +0000 (UTC)
-Received: from localhost.localdomain (ovpn-116-63.ams2.redhat.com
-	[10.36.116.63])
-	by smtp.corp.redhat.com (Postfix) with ESMTPS id EE7795D6A9;
-	Mon, 29 Apr 2019 08:51:59 +0000 (UTC)
-Date: Mon, 29 Apr 2019 10:51:57 +0200
-From: Kevin Wolf <kwolf@redhat.com>
-To: qemu-block@nongnu.org
-Message-ID: <20190429085157.GA8492@localhost.localdomain>
-References: <20190415155452.5115-1-kwolf@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
-Content-Disposition: inline
-In-Reply-To: <20190415155452.5115-1-kwolf@redhat.com>
-User-Agent: Mutt/1.11.3 (2019-02-01)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.39]);
-	Mon, 29 Apr 2019 08:52:01 +0000 (UTC)
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH 0/4] qcow2: Preallocation fixes
+	(envelope-from <borntraeger@de.ibm.com>) id 1hL2Bl-0000RL-40
+	for qemu-devel@nongnu.org; Mon, 29 Apr 2019 05:03:06 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:35082
+	helo=mx0a-001b2d01.pphosted.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <borntraeger@de.ibm.com>)
+	id 1hL2Bk-0000Qv-Vs
+	for qemu-devel@nongnu.org; Mon, 29 Apr 2019 05:03:05 -0400
+Received: from pps.filterd (m0098421.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id
+	x3T8sMvG075269
+	for <qemu-devel@nongnu.org>; Mon, 29 Apr 2019 05:03:04 -0400
+Received: from e33.co.us.ibm.com (e33.co.us.ibm.com [32.97.110.151])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2s5vfvv883-1
+	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Mon, 29 Apr 2019 05:03:04 -0400
+Received: from localhost
+	by e33.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+	Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <borntraeger@de.ibm.com>;
+	Mon, 29 Apr 2019 10:03:03 +0100
+Received: from b03cxnp08025.gho.boulder.ibm.com (9.17.130.17)
+	by e33.co.us.ibm.com (192.168.1.133) with IBM ESMTP SMTP Gateway:
+	Authorized Use Only! Violators will be prosecuted; 
+	(version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
+	Mon, 29 Apr 2019 10:03:01 +0100
+Received: from b03ledav006.gho.boulder.ibm.com
+	(b03ledav006.gho.boulder.ibm.com [9.17.130.237])
+	by b03cxnp08025.gho.boulder.ibm.com (8.14.9/8.14.9/NCO v10.0) with
+	ESMTP id x3T92x1027721972
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256
+	verify=OK); Mon, 29 Apr 2019 09:02:59 GMT
+Received: from b03ledav006.gho.boulder.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id A4BAFC6055;
+	Mon, 29 Apr 2019 09:02:59 +0000 (GMT)
+Received: from b03ledav006.gho.boulder.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id E1FD4C6059;
+	Mon, 29 Apr 2019 09:02:58 +0000 (GMT)
+Received: from localhost.localdomain (unknown [9.114.17.106])
+	by b03ledav006.gho.boulder.ibm.com (Postfix) with ESMTP;
+	Mon, 29 Apr 2019 09:02:58 +0000 (GMT)
+From: Christian Borntraeger <borntraeger@de.ibm.com>
+To: Cornelia Huck <cohuck@redhat.com>
+Date: Mon, 29 Apr 2019 05:02:50 -0400
+X-Mailer: git-send-email 2.17.1
+In-Reply-To: <20190429090250.7648-1-borntraeger@de.ibm.com>
+References: <20190429090250.7648-1-borntraeger@de.ibm.com>
+X-TM-AS-GCONF: 00
+x-cbid: 19042909-0036-0000-0000-00000AB0313E
+X-IBM-SpamModules-Scores: 
+X-IBM-SpamModules-Versions: BY=3.00011015; HX=3.00000242; KW=3.00000007;
+	PH=3.00000004; SC=3.00000285; SDB=6.01195994; UDB=6.00627178;
+	IPR=6.00976844; 
+	MB=3.00026644; MTD=3.00000008; XFM=3.00000015; UTC=2019-04-29 09:03:03
+X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
+x-cbparentid: 19042909-0037-0000-0000-00004B9299AB
+Message-Id: <20190429090250.7648-10-borntraeger@de.ibm.com>
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:, ,
+	definitions=2019-04-29_04:, , signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+	priorityscore=1501
+	malwarescore=0 suspectscore=0 phishscore=0 bulkscore=0 spamscore=0
+	clxscore=1015 lowpriorityscore=0 mlxscore=0 impostorscore=0
+	mlxlogscore=999 adultscore=0 classifier=spam adjust=0 reason=mlx
+	scancount=1 engine=8.0.1-1810050000 definitions=main-1904290066
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic]
+X-Received-From: 148.163.158.5
+Subject: [Qemu-devel] [PATCH v3 9/9] s390x/cpumodel: wire up 8561 and 8562
+ as gen15 machines
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -70,20 +106,54 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-devel@nongnu.org, mreitz@redhat.com
+Cc: "Jason J . Herne" <jjherne@linux.ibm.com>,
+	Collin Walling <walling@linux.ibm.com>,
+	David Hildenbrand <david@redhat.com>, qemu-devel <qemu-devel@nongnu.org>,
+	Halil Pasic <pasic@linux.ibm.com>, qemu-s390x <qemu-s390x@nongnu.org>,
+	Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190429085157.GJD-h0xr6l7lDGansqUHi_kY_EyPLIMoO6oGzQtP088@z>
+Content-Type: text/plain; charset="UTF-8"
+Message-ID: <20190429090250.B6Kzl6O-4btZl9UGRDIx9ki_CJCpL79bWD3UqgwRRMM@z>
 
-Am 15.04.2019 um 17:54 hat Kevin Wolf geschrieben:
-> Kevin Wolf (4):
->   qcow2: Avoid COW during metadata preallocation
->   qcow2: Fix preallocation bdrv_pwrite to wrong file
->   qcow2: Add errp to preallocate_co()
->   qcow2: Fix full preallocation with external data file
+8561 and 8562 will be gen15 machines. There is no name yet, lets us use
+gen15a and gen15tb as base name. Later on we can provide aliases with
+the proper name.
 
-Applied the remaining patches to the block branch.
+Signed-off-by: Christian Borntraeger <borntraeger@de.ibm.com>
+---
+ target/s390x/cpu_models.c | 9 +++++----
+ 1 file changed, 5 insertions(+), 4 deletions(-)
 
-Kevin
+diff --git a/target/s390x/cpu_models.c b/target/s390x/cpu_models.c
+index d683635eb5..21ea819483 100644
+--- a/target/s390x/cpu_models.c
++++ b/target/s390x/cpu_models.c
+@@ -43,10 +43,9 @@
+     }
+ 
+ /*
+- * CPU definiton list in order of release. For now, base features of a
+- * following release are always a subset of base features of the previous
+- * release. Same is correct for the other feature sets.
+- * A BC release always follows the corresponding EC release.
++ * CPU definition list in order of release. Up to generation 14 base features
++ * of a following release have been a superset of the previous release. With
++ * generation 15 one base feature and one optional feature have been deprecated.
+  */
+ static S390CPUDef s390_cpu_defs[] = {
+     CPUDEF_INIT(0x2064, 7, 1, 38, 0x00000000U, "z900", "IBM zSeries 900 GA1"),
+@@ -83,6 +82,8 @@ static S390CPUDef s390_cpu_defs[] = {
+     CPUDEF_INIT(0x3906, 14, 1, 47, 0x08000000U, "z14", "IBM z14 GA1"),
+     CPUDEF_INIT(0x3906, 14, 2, 47, 0x08000000U, "z14.2", "IBM z14 GA2"),
+     CPUDEF_INIT(0x3907, 14, 1, 47, 0x08000000U, "z14ZR1", "IBM z14 Model ZR1 GA1"),
++    CPUDEF_INIT(0x8561, 15, 1, 47, 0x08000000U, "gen15a", "IBM 8561 GA1"),
++    CPUDEF_INIT(0x8562, 15, 1, 47, 0x08000000U, "gen15b", "IBM 8562 GA1"),
+ };
+ 
+ #define QEMU_MAX_CPU_TYPE 0x2827
+-- 
+2.17.1
+
 
