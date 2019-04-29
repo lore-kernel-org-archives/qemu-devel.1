@@ -1,27 +1,27 @@
-Received: from eggs.gnu.org ([209.51.188.92]:39586)
+Received: from eggs.gnu.org ([209.51.188.92]:39760)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1hL6w2-00039k-CG
-	for qemu-devel@nongnu.org; Mon, 29 Apr 2019 10:07:11 -0400
+	(envelope-from <philmd@redhat.com>) id 1hL6x4-0003hL-D0
+	for qemu-devel@nongnu.org; Mon, 29 Apr 2019 10:08:15 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1hL6w0-0003Ru-Bi
-	for qemu-devel@nongnu.org; Mon, 29 Apr 2019 10:07:10 -0400
-Received: from mail-ot1-x343.google.com ([2607:f8b0:4864:20::343]:39886)
+	(envelope-from <philmd@redhat.com>) id 1hL6wy-0004UP-Tj
+	for qemu-devel@nongnu.org; Mon, 29 Apr 2019 10:08:11 -0400
+Received: from mail-wr1-f67.google.com ([209.85.221.67]:38709)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1hL6vy-0003Nd-R5
-	for qemu-devel@nongnu.org; Mon, 29 Apr 2019 10:07:07 -0400
-Received: by mail-ot1-x343.google.com with SMTP id o39so8702442ota.6
-	for <qemu-devel@nongnu.org>; Mon, 29 Apr 2019 07:07:06 -0700 (PDT)
+	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1hL6ww-0004Ov-Is
+	for qemu-devel@nongnu.org; Mon, 29 Apr 2019 10:08:07 -0400
+Received: by mail-wr1-f67.google.com with SMTP id k16so16276434wrn.5
+	for <qemu-devel@nongnu.org>; Mon, 29 Apr 2019 07:08:04 -0700 (PDT)
+References: <20190429134757.13570-1-marcandre.lureau@redhat.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Message-ID: <c20eda65-a2db-97bf-3439-73f7e6c0f400@redhat.com>
+Date: Mon, 29 Apr 2019 16:08:02 +0200
 MIME-Version: 1.0
-References: <20190328230404.12909-1-richard.henderson@linaro.org>
-	<20190328230404.12909-10-richard.henderson@linaro.org>
-In-Reply-To: <20190328230404.12909-10-richard.henderson@linaro.org>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Mon, 29 Apr 2019 15:06:54 +0100
-Message-ID: <CAFEAcA8hSByAHAiX8j2LzucCsaMEBM=_T3MJh7-D-QVw-Y6K4Q@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH for-4.1 v2 09/36] target/arm: Use env_cpu,
- env_archcpu
+In-Reply-To: <20190429134757.13570-1-marcandre.lureau@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH] vl: fix -sandbox parsing crash when
+ seccomp support is disabled
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,22 +30,67 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Richard Henderson <richard.henderson@linaro.org>
-Cc: QEMU Developers <qemu-devel@nongnu.org>
+To: =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>, qemu-devel@nongnu.org
+Cc: otubo@redhat.com, Paolo Bonzini <pbonzini@redhat.com>, david@gibson.dropbear.id.au
 
-On Thu, 28 Mar 2019 at 23:51, Richard Henderson
-<richard.henderson@linaro.org> wrote:
->
-> Combined uses of CPU(arm_env_get_cpu()) were failures to use
-> the more proper, ENV_GET_CPU macro, now replaced by env_cpu.
->
-> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+On 4/29/19 3:47 PM, Marc-André Lureau wrote:
+> $ ./x86_64-softmmu/qemu-system-x86_64 -sandbox off
+> qemu-system-x86_64: -sandbox off: There is no option group 'sandbox'
+> Segmentation fault
+> 
+> Commit 5780760f5e ("seccomp: check TSYNC host capability") wrapped one
+> use of the sandbox option group to produce a sensible error, it didn't
+> do the same for another call to qemu_opts_parse_noisily():
+> 
+> (gdb) bt
+>     at util/qemu-option.c:829
+>  #0  0x00000000105b36d8 in opts_parse (list=0x0, params=0x3ffffffffab5 "off", permit_abbrev=true, defaults=false, errp=0x3ffffffff080)
+>      at util/qemu-option.c:829
+>  #1  0x00000000105b3b74 in qemu_opts_parse_noisily (list=<optimized out>, params=<optimized out>, permit_abbrev=<optimized out>) at util/qemu-option.c:890
+>  #2  0x0000000010024964 in main (argc=<optimized out>, argv=<optimized out>, envp=<optimized out>) at vl.c:3589
+> 
+> Fixes: 5780760f5ea6163939a5dabe7427318b4f07d1a2
+> Cc: david@gibson.dropbear.id.au
+> Cc: otubo@redhat.com
+> Signed-off-by: Marc-André Lureau <marcandre.lureau@redhat.com>
+
+Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+Tested-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+
 > ---
-
-Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
-
-(though I imagine that this will need updating when the
-M-profile fp patchset hits master.)
-
-thanks
--- PMM
+>  vl.c | 18 ++++++++++--------
+>  1 file changed, 10 insertions(+), 8 deletions(-)
+> 
+> diff --git a/vl.c b/vl.c
+> index 4019a4387d..5fc4994d3c 100644
+> --- a/vl.c
+> +++ b/vl.c
+> @@ -3866,17 +3866,19 @@ int main(int argc, char **argv, char **envp)
+>                  qtest_log = optarg;
+>                  break;
+>              case QEMU_OPTION_sandbox:
+> -#ifdef CONFIG_SECCOMP
+> -                opts = qemu_opts_parse_noisily(qemu_find_opts("sandbox"),
+> -                                               optarg, true);
+> +                olist = qemu_find_opts("sandbox");
+> +                if (!olist) {
+> +#ifndef CONFIG_SECCOMP
+> +                    error_report("-sandbox support is not enabled "
+> +                                 "in this QEMU binary");
+> +#endif
+> +                    exit(1);
+> +                }
+> +
+> +                opts = qemu_opts_parse_noisily(olist, optarg, true);
+>                  if (!opts) {
+>                      exit(1);
+>                  }
+> -#else
+> -                error_report("-sandbox support is not enabled "
+> -                             "in this QEMU binary");
+> -                exit(1);
+> -#endif
+>                  break;
+>              case QEMU_OPTION_add_fd:
+>  #ifndef _WIN32
+> 
