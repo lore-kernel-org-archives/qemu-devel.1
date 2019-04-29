@@ -1,28 +1,28 @@
-Received: from eggs.gnu.org ([209.51.188.92]:38960)
+Received: from eggs.gnu.org ([209.51.188.92]:42529)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1hKyHN-0005wU-4V
-	for qemu-devel@nongnu.org; Mon, 29 Apr 2019 00:52:38 -0400
+	(envelope-from <liq3ea@gmail.com>) id 1hKyg9-0002F6-TE
+	for qemu-devel@nongnu.org; Mon, 29 Apr 2019 01:18:15 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1hKy8E-0004Ae-J8
-	for qemu-devel@nongnu.org; Mon, 29 Apr 2019 00:43:12 -0400
-Received: from mail-eopbgr120131.outbound.protection.outlook.com
-	([40.107.12.131]:36095
-	helo=FRA01-PR2-obe.outbound.protection.outlook.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
-	id 1hKy8E-0004AA-27
-	for qemu-devel@nongnu.org; Mon, 29 Apr 2019 00:43:10 -0400
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Date: Mon, 29 Apr 2019 04:43:06 +0000
-Message-ID: <79d19dc9-f312-bb19-3895-781e48e21056@virtuozzo.com>
-References: <20190426102115.30002-1-yury-kotov@yandex-team.ru>
-In-Reply-To: <20190426102115.30002-1-yury-kotov@yandex-team.ru>
-Content-Language: en-US
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <CBBD6E7B70AB8743A18F514BBC486E35@eurprd08.prod.outlook.com>
-Content-Transfer-Encoding: base64
+	(envelope-from <liq3ea@gmail.com>) id 1hKyYj-0006vq-R4
+	for qemu-devel@nongnu.org; Mon, 29 Apr 2019 01:10:35 -0400
+Received: from mail-oi1-x241.google.com ([2607:f8b0:4864:20::241]:40593)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <liq3ea@gmail.com>) id 1hKyYj-0006sa-Je
+	for qemu-devel@nongnu.org; Mon, 29 Apr 2019 01:10:33 -0400
+Received: by mail-oi1-x241.google.com with SMTP id y64so1789756oia.7
+	for <qemu-devel@nongnu.org>; Sun, 28 Apr 2019 22:10:27 -0700 (PDT)
 MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [PATCH] trace: fix runstate tracing
+References: <20190424140643.62457-1-liq3ea@163.com>
+	<2b623811-1be2-159c-0fa6-c548aa9eea82@redhat.com>
+	<CAKXe6SLXrthYFrQGVQNT4hK1-22wrteMNyygZgx_j=jtDfYC6g@mail.gmail.com>
+In-Reply-To: <CAKXe6SLXrthYFrQGVQNT4hK1-22wrteMNyygZgx_j=jtDfYC6g@mail.gmail.com>
+From: Li Qiang <liq3ea@gmail.com>
+Date: Mon, 29 Apr 2019 13:09:51 +0800
+Message-ID: <CAKXe6SL8XWMg1x8qztepjypgqdmXpZDj0G0AHU+BLV8OsbRjOg@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v2 0/5] fw_cfg_test refactor and add two
+ test cases
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,22 +31,114 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Yury Kotov <yury-kotov@yandex-team.ru>, Paolo Bonzini <pbonzini@redhat.com>
-Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+To: Thomas Huth <thuth@redhat.com>
+Cc: Li Qiang <liq3ea@163.com>, =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>, Laszlo Ersek <lersek@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>, lvivier@redhat.com, Paolo Bonzini <pbonzini@redhat.com>, Qemu Developers <qemu-devel@nongnu.org>
 
-T29wcywgbXkgZmF1bHQsIHNvcnJ5OiggVGhhbmsgeW91IGZvciBmaXhpbmchDQoNCk1heSBiZSBh
-ZGRlZCwgdGhhdCBpdCBpcyBicm9rZW4gc2luY2UgZmYxMmUzYWUzZDAuDQoNClJldmlld2VkLWJ5
-OiBWbGFkaW1pciBTZW1lbnRzb3YtT2dpZXZza2l5IDx2c2VtZW50c292QHZpcnR1b3p6by5jb20+
-DQoNCjI2LjA0LjIwMTkgMTM6MjEsIFl1cnkgS290b3Ygd3JvdGU6DQo+IFNpZ25lZC1vZmYtYnk6
-IFl1cnkgS290b3YgPHl1cnkta290b3ZAeWFuZGV4LXRlYW0ucnU+DQo+IC0tLQ0KPiAgIHZsLmMg
-fCAyICstDQo+ICAgMSBmaWxlIGNoYW5nZWQsIDEgaW5zZXJ0aW9uKCspLCAxIGRlbGV0aW9uKC0p
-DQo+IA0KPiBkaWZmIC0tZ2l0IGEvdmwuYyBiL3ZsLmMNCj4gaW5kZXggZmY1ZGZiNmZiYy4uYWQ5
-YjE4MWU1NyAxMDA2NDQNCj4gLS0tIGEvdmwuYw0KPiArKysgYi92bC5jDQo+IEBAIC03MjUsNyAr
-NzI1LDcgQEAgdm9pZCBydW5zdGF0ZV9zZXQoUnVuU3RhdGUgbmV3X3N0YXRlKQ0KPiAgICAgICBh
-c3NlcnQobmV3X3N0YXRlIDwgUlVOX1NUQVRFX19NQVgpOw0KPiAgIA0KPiAgICAgICB0cmFjZV9y
-dW5zdGF0ZV9zZXQoY3VycmVudF9ydW5fc3RhdGUsIFJ1blN0YXRlX3N0cihjdXJyZW50X3J1bl9z
-dGF0ZSksDQo+IC0gICAgICAgICAgICAgICAgICAgICAgIG5ld19zdGF0ZSwgUnVuU3RhdGVfc3Ry
-KGN1cnJlbnRfcnVuX3N0YXRlKSk7DQo+ICsgICAgICAgICAgICAgICAgICAgICAgIG5ld19zdGF0
-ZSwgUnVuU3RhdGVfc3RyKG5ld19zdGF0ZSkpOw0KPiAgIA0KPiAgICAgICBpZiAoY3VycmVudF9y
-dW5fc3RhdGUgPT0gbmV3X3N0YXRlKSB7DQo+ICAgICAgICAgICByZXR1cm47DQo+IA0KDQoNCi0t
-IA0KQmVzdCByZWdhcmRzLA0KVmxhZGltaXINCg==
+Li Qiang <liq3ea@gmail.com> =E4=BA=8E2019=E5=B9=B44=E6=9C=8825=E6=97=A5=E5=
+=91=A8=E5=9B=9B =E4=B8=8B=E5=8D=8810:29=E5=86=99=E9=81=93=EF=BC=9A
+
+>
+>
+> Thomas Huth <thuth@redhat.com> =E4=BA=8E2019=E5=B9=B44=E6=9C=8825=E6=97=
+=A5=E5=91=A8=E5=9B=9B =E4=B8=8B=E5=8D=885:57=E5=86=99=E9=81=93=EF=BC=9A
+>
+>> On 24/04/2019 16.06, Li Qiang wrote:
+>> > In the disscuss of adding reboot timeout test case:
+>> > https://lists.gnu.org/archive/html/qemu-devel/2019-04/msg03304.html
+>> >
+>> > Philippe suggested we should uses the only related option for one
+>> > specific test. However currently we uses one QTestState for all the
+>> > test cases. In order to achieve Philippe's idea, I split the test case
+>> > for its own QTestState. As this patchset has changed a lot, I don't bu=
+mp
+>> > the version.
+>> >
+>> > Change since v1:
+>> > Add a patch to store the reboot_timeout as little endian
+>> > Fix the endian issue per Thomas's review
+>>
+>> The test still aborts on a big endian host:
+>>
+>> $ QTEST_QEMU_BINARY=3Dx86_64-softmmu/qemu-system-x86_64 tests/fw_cfg-tes=
+t
+>> /x86_64/fw_cfg/signature: OK
+>> /x86_64/fw_cfg/id: OK
+>> /x86_64/fw_cfg/uuid: OK
+>> /x86_64/fw_cfg/ram_size: OK
+>> /x86_64/fw_cfg/nographic: OK
+>> /x86_64/fw_cfg/nb_cpus: OK
+>> /x86_64/fw_cfg/max_cpus: OK
+>> /x86_64/fw_cfg/numa: OK
+>> /x86_64/fw_cfg/boot_menu: OK
+>> /x86_64/fw_cfg/reboot_timeout: **
+>>
+>> ERROR:/home/thuth/devel/qemu/tests/fw_cfg-test.c:190:test_fw_cfg_reboot_=
+timeout:
+>> assertion failed (reboot_timeout =3D=3D 15): (251658240 =3D=3D 15)
+>> Aborted
+>>
+>> 251658240 is 0x0F000000, i.e. a byte-swapped 0xf =3D 15 ... i.e. you sti=
+ll
+>> got an endianess issue somewhere in the code.
+>>
+>
+>
+> Hmmmm,
+>
+> I have thought a long time, still can't point where is wrong.
+>
+> Let's from the result:
+> 0x0f000000 in the big endian laid as this:
+> low ---> high
+> 0x0f 00 00 00
+>
+> As I have swapped before the compare so it is read as this:
+> low ---> high
+> 00 00 00 0x0f
+>
+> However from the store side:
+> the 15 in big endian is:
+> low ---> high
+> 00 00 00 0x0f
+>
+> But Before I store it, I convert it to little endian, so following should
+> be stored:
+> low ---> high
+> 0x0f 00 00 00
+>
+> Do you apply the patch 3 and recompile the qemu binary?
+>
+
+
+Hello Thomas,
+I have tested again this and just store it as big endian(so that the
+store/load has different endianness),
+I don't see any error.
+
+Also, can we add these test sceneries(big-endian host) in our CI? so that
+the bot can report for every commit.
+
+
+Thanks,
+Li Qiang
+
+
+
+If it is, I may need your help as I have no big endian host device.
+>
+> You can debug and  inspect the memory layout and point out where is wrong=
+.
+>
+> Thanks,
+> Li Qiang
+>
+>
+>
+>
+>
+>
+>
+>>
+>>  Thomas
+>>
+>
