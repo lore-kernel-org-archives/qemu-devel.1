@@ -1,31 +1,28 @@
-Received: from eggs.gnu.org ([209.51.188.92]:52998)
+Received: from eggs.gnu.org ([209.51.188.92]:53360)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1hL5s3-0003LZ-QL
-	for qemu-devel@nongnu.org; Mon, 29 Apr 2019 08:59:00 -0400
+	(envelope-from <jdillama@redhat.com>) id 1hL5tv-0004bx-DS
+	for qemu-devel@nongnu.org; Mon, 29 Apr 2019 09:01:00 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1hL5s2-00018h-KQ
-	for qemu-devel@nongnu.org; Mon, 29 Apr 2019 08:58:59 -0400
-Received: from mail-oi1-x244.google.com ([2607:f8b0:4864:20::244]:43756)
+	(envelope-from <jdillama@redhat.com>) id 1hL5tj-00028j-HB
+	for qemu-devel@nongnu.org; Mon, 29 Apr 2019 09:00:52 -0400
+Received: from mail-ed1-f68.google.com ([209.85.208.68]:45228)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1hL5s1-00018J-VK
-	for qemu-devel@nongnu.org; Mon, 29 Apr 2019 08:58:58 -0400
-Received: by mail-oi1-x244.google.com with SMTP id t81so8153681oig.10
-	for <qemu-devel@nongnu.org>; Mon, 29 Apr 2019 05:58:57 -0700 (PDT)
+	(Exim 4.71) (envelope-from <jdillama@redhat.com>) id 1hL5tj-000265-8N
+	for qemu-devel@nongnu.org; Mon, 29 Apr 2019 09:00:43 -0400
+Received: by mail-ed1-f68.google.com with SMTP id g57so2468565edc.12
+	for <qemu-devel@nongnu.org>; Mon, 29 Apr 2019 06:00:38 -0700 (PDT)
 MIME-Version: 1.0
-References: <20190103144124.18917-1-stefanha@redhat.com>
-	<CAFEAcA-B_T9E3ezWFXg-wp3RotMjv3-z3qY7hSJZEoqFBqCWnQ@mail.gmail.com>
-	<62b29bc1-cc78-cd64-4377-fc4007ba7189@redhat.com>
-	<20190426091702.GA2071@stefanha-x1.localdomain>
-	<CAFEAcA8OVKO087uiNvwDGObiaxHAPYHwoXLEN1t5Y4v9B43r9A@mail.gmail.com>
-	<20190429122819.GB7587@stefanha-x1.localdomain>
-In-Reply-To: <20190429122819.GB7587@stefanha-x1.localdomain>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Mon, 29 Apr 2019 13:58:46 +0100
-Message-ID: <CAFEAcA9_=a72BAmyb0eJhLF_nYLhRb_O7e=__MPazQ0nLC9Tmw@mail.gmail.com>
+References: <20190427113625.46594-1-sgarzare@redhat.com>
+	<CA+aFP1BtbjrzitLz7PW_b-kuYU7WSOiMs5jVfUBC=M3zEuBcew@mail.gmail.com>
+	<20190429124712.mmxnpdkkbzhlbmxm@steredhat>
+In-Reply-To: <20190429124712.mmxnpdkkbzhlbmxm@steredhat>
+Reply-To: dillaman@redhat.com
+From: Jason Dillaman <jdillama@redhat.com>
+Date: Mon, 29 Apr 2019 09:00:26 -0400
+Message-ID: <CA+aFP1Cmc+3TcYJr73jYRmtCWNTAWBcjEtn+Afe7DKZqUYp7=g@mail.gmail.com>
 Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH] Revert "armv7m: Guard against no -kernel
- argument"
+Subject: Re: [Qemu-devel] [Qemu-block] [PATCH] block/rbd: add preallocation
+ support
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,28 +31,138 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefan Hajnoczi <stefanha@redhat.com>
-Cc: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>, Jim Mussared <jim@groklearning.com>, Julia Suvorova <jusual@mail.ru>, QEMU Developers <qemu-devel@nongnu.org>, Steffen Gortz <qemu.ml@steffen-goertz.de>, qemu-arm <qemu-arm@nongnu.org>, Joel Stanley <joel@jms.id.au>, =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>, Thomas Huth <thuth@redhat.com>
+To: Stefano Garzarella <sgarzare@redhat.com>
+Cc: qemu-devel <qemu-devel@nongnu.org>, Kevin Wolf <kwolf@redhat.com>, Josh Durgin <jdurgin@redhat.com>, qemu-block <qemu-block@nongnu.org>, Markus Armbruster <armbru@redhat.com>, Max Reitz <mreitz@redhat.com>
 
-On Mon, 29 Apr 2019 at 13:28, Stefan Hajnoczi <stefanha@redhat.com> wrote:
+On Mon, Apr 29, 2019 at 8:47 AM Stefano Garzarella <sgarzare@redhat.com> wrote:
 >
-> On Fri, Apr 26, 2019 at 12:45:37PM +0100, Peter Maydell wrote:
-> I was going to add a function to check kernel_filename and the presence
-> of -device loader.  Then each machine type init function would call the
-> function with flags indicating which modes are allowed:
+> On Sat, Apr 27, 2019 at 08:43:26AM -0400, Jason Dillaman wrote:
+> > On Sat, Apr 27, 2019 at 7:37 AM Stefano Garzarella <sgarzare@redhat.com> wrote:
+> > >
+> > > This patch adds the support of preallocation (off/full) for the RBD
+> > > block driver.
+> > > If available, we use rbd_writesame() to quickly fill the image when
+> > > full preallocation is required.
+> > >
+> > > Signed-off-by: Stefano Garzarella <sgarzare@redhat.com>
+> > > ---
+> > >  block/rbd.c          | 149 ++++++++++++++++++++++++++++++++++++++-----
+> > >  qapi/block-core.json |   4 +-
+> > >  2 files changed, 136 insertions(+), 17 deletions(-)
+> > >
+> > > diff --git a/block/rbd.c b/block/rbd.c
+> > > index 0c549c9935..29dd1bb040 100644
+> > > --- a/block/rbd.c
+> > > +++ b/block/rbd.c
+> > > @@ -13,6 +13,7 @@
+> > >
+> > >  #include "qemu/osdep.h"
+> > >
+> > > +#include "qemu/units.h"
+> > >  #include <rbd/librbd.h>
+> > >  #include "qapi/error.h"
+> > >  #include "qemu/error-report.h"
+> > > @@ -331,6 +332,110 @@ static void qemu_rbd_memset(RADOSCB *rcb, int64_t offs)
+> > >      }
+> > >  }
+> > >
+> > > +static int qemu_rbd_do_truncate(rbd_image_t image, int64_t offset,
+> > > +                                PreallocMode prealloc, Error **errp)
+> > > +{
+> > > +    uint64_t current_length;
+> > > +    char *buf = NULL;
+> > > +    int ret;
+> > > +
+> > > +    ret = rbd_get_size(image, &current_length);
+> > > +    if (ret < 0) {
+> > > +        error_setg_errno(errp, -ret, "Failed to get file length");
+> > > +        goto out;
+> > > +    }
+> > > +
+> > > +    if (current_length > offset && prealloc != PREALLOC_MODE_OFF) {
+> > > +        error_setg(errp, "Cannot use preallocation for shrinking files");
+> > > +        ret = -ENOTSUP;
+> > > +        goto out;
+> > > +    }
+> > > +
+> > > +    switch (prealloc) {
+> > > +    case PREALLOC_MODE_FULL: {
+> > > +        uint64_t current_offset = current_length;
+> > > +        int buf_size = 64 * KiB;
+> >
+> > This should probably be 512B or 4KiB (which is the smallest striped
+> > unit size). Not only will this avoid sending unnecessary zeroes to the
+> > backing cluster, writesame silently turns into a standard write if
+> > your buffer isn't properly aligned with the min(object size, stripe
+> > unit size).
+> >
 >
->   /* Allow both -kernel and -device loader */
->   check_kernel_loaded(KERNEL_CMDLINE | KERNEL_LOADER);
->
->   /* Allow only -kernel */
->   check_kernel_loaded(KERNEL_CMDLINE);
->
->   /* Allow only -device loader */
->   check_kernel_loaded(KERNEL_LOADER);
+> Okay, I'll change it on v2.
+> Should we query about the "stripe_unit" size or we simply use the
+> smallest allowed?
 
-Every machine should permit -device loader: the point
-of it is that it is entirely generic and works the same
-way on every machine.
+Technically we don't prevent a user from choosing terrible stripe unit
+sizes (e.g. 1 byte), so you are probably safe to just use 4KiB.
 
-thanks
--- PMM
+> > > +        ssize_t bytes;
+> > > +
+> > > +        buf = g_malloc(buf_size);
+> > > +        /*
+> > > +         * Some versions of rbd_writesame() discards writes of buffers with
+> > > +         * all zeroes. In order to avoid this behaviour, we set the first byte
+> > > +         * to one.
+> > > +         */
+> > > +        buf[0] = 1;
+> >
+> > You could also use "rados_conf_set(cluster,
+> > "rbd_discard_on_zeroed_write_same", "false").
+> >
+>
+> I tried it, but it is not supported on all versions. (eg. I have Ceph
+> v12.2.11 on my Fedora 29 and it is not supported, but rbd_writesame() is
+> available)
+>
+> Maybe we can use both: "rbd_discard_on_zeroed_write_same = false" and
+> "buf[0] = 1"
+
+Probably not worth the effort if it's not supported across all releases.
+
+> > > +        ret = rbd_resize(image, offset);
+> > > +        if (ret < 0) {
+> > > +            error_setg_errno(errp, -ret, "Failed to resize file");
+> > > +            goto out;
+> > > +        }
+> > > +
+> > > +#ifdef LIBRBD_SUPPORTS_WRITESAME
+> > > +        while (offset - current_offset > buf_size) {
+> > > +            /*
+> > > +             * rbd_writesame() supports only request where the size of the
+> > > +             * operation is multiple of buffer size and it must be less or
+> > > +             * equal to INT_MAX.
+> > > +             */
+> > > +            bytes = MIN(offset - current_offset, INT_MAX);
+> > > +            bytes -= bytes % buf_size;
+> >
+> > Using the default object size of 4MiB, this write size would result in
+> > up to 512 concurrent ops to the backing cluster. Perhaps the size
+> > should be bounded such that only a dozen or so concurrent requests are
+> > issued per write, always rounded next largest object / stripe period
+> > size. librbd and the rbd CLI usually try to bound themselves to the
+> > value in the "rbd_concurrent_management_ops" configuration setting
+> > (currently defaults to 10).
+> >
+>
+> Do you suggest to use "rbd_concurrent_management_ops" to limit
+> concurrent requests or use a new QEMU parameters for the RBD driver?
+
+I think it would be nicer to just query the
+"rbd_concurrent_management_ops" limit to derive your writesame size
+since the Ceph cluster admin can globally set that option to match the
+available parallelism of the cluster.
+
+> Thanks for your comments,
+> Stefano
+
+
+-- 
+Jason
