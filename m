@@ -1,20 +1,20 @@
-Received: from eggs.gnu.org ([209.51.188.92]:55837)
+Received: from eggs.gnu.org ([209.51.188.92]:55915)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1hLN0y-00082W-AP
-	for qemu-devel@nongnu.org; Tue, 30 Apr 2019 03:17:21 -0400
+	(envelope-from <thuth@redhat.com>) id 1hLN17-00086z-GV
+	for qemu-devel@nongnu.org; Tue, 30 Apr 2019 03:17:30 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1hLN0w-00057K-BV
-	for qemu-devel@nongnu.org; Tue, 30 Apr 2019 03:17:20 -0400
+	(envelope-from <thuth@redhat.com>) id 1hLN16-0005Ab-LQ
+	for qemu-devel@nongnu.org; Tue, 30 Apr 2019 03:17:29 -0400
 From: Thomas Huth <thuth@redhat.com>
-Date: Tue, 30 Apr 2019 09:13:50 +0200
-Message-Id: <20190430071405.16714-16-thuth@redhat.com>
+Date: Tue, 30 Apr 2019 09:13:51 +0200
+Message-Id: <20190430071405.16714-17-thuth@redhat.com>
 In-Reply-To: <20190430071405.16714-1-thuth@redhat.com>
 References: <20190430071405.16714-1-thuth@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v6 15/30] hw/arm: Express dependencies of
- collie with Kconfig
+Subject: [Qemu-devel] [PATCH v6 16/30] hw/arm: Express dependencies of the
+ aspeed boards with Kconfig
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,68 +26,68 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: yang.zhong@intel.com, Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org, pbonzini@redhat.com
 Cc: Beniamino Galvani <b.galvani@gmail.com>, Rob Herring <robh@kernel.org>, Aurelien Jarno <aurelien@aurel32.net>, Cedric Le Goater <clg@kaod.org>, Jan Kiszka <jan.kiszka@web.de>, qemu-arm@nongnu.org, Andrzej Zaborowski <balrogg@gmail.com>, John Snow <jsnow@redhat.com>, Igor Mitsyanko <i.mitsyanko@gmail.com>, Joel Stanley <joel@jms.id.au>, Peter Chubb <peter.chubb@nicta.com.au>, "Edgar E . Iglesias" <edgar.iglesias@gmail.com>, Antony Pavlov <antonynpavlov@gmail.com>, qemu-block@nongnu.org, Jean-Christophe Dubois <jcd@tribudubois.net>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, Philippe Mathieu-Daude <f4bug@amsat.org>, Alistair Francis <alistair@alistair23.me>, "Michael S. Tsirkin" <mst@redhat.com>, Subbaraya Sundeep <sundeep.lkml@gmail.com>, Andrew Jeffery <andrew@aj.id.au>, Andrey Smirnov <andrew.smirnov@gmail.com>, Gerd Hoffmann <kraxel@redhat.com>
 
-Add Kconfig dependencies for the Strongarm collie machine.
-This patch is based on earlier work by =C3=81kos Kov=C3=A1cs (i.e.
-his "hw/arm/Kconfig: Add ARM Kconfig" patch).
+Dependencies have been determined by looking at hw/arm/aspeed.c
 
+Reviewed-by: C=C3=A9dric Le Goater <clg@kaod.org>
 Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
 Tested-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
 Signed-off-by: Thomas Huth <thuth@redhat.com>
 ---
- default-configs/arm-softmmu.mak | 3 +--
- hw/arm/Kconfig                  | 7 +++++++
- hw/arm/Makefile.objs            | 2 +-
- 3 files changed, 9 insertions(+), 3 deletions(-)
+ default-configs/arm-softmmu.mak |  7 +------
+ hw/arm/Kconfig                  | 10 ++++++++++
+ 2 files changed, 11 insertions(+), 6 deletions(-)
 
 diff --git a/default-configs/arm-softmmu.mak b/default-configs/arm-softmm=
 u.mak
-index af78e7c892..25e8f717ac 100644
+index 25e8f717ac..2580584281 100644
 --- a/default-configs/arm-softmmu.mak
 +++ b/default-configs/arm-softmmu.mak
-@@ -25,6 +25,7 @@ CONFIG_GUMSTIX=3Dy
- CONFIG_SPITZ=3Dy
+@@ -26,15 +26,12 @@ CONFIG_SPITZ=3Dy
  CONFIG_TOSA=3Dy
  CONFIG_Z2=3Dy
-+CONFIG_COLLIE=3Dy
+ CONFIG_COLLIE=3Dy
++CONFIG_ASPEED_SOC=3Dy
 =20
  CONFIG_VGA=3Dy
- CONFIG_TMP421=3Dy
-@@ -97,5 +98,3 @@ CONFIG_GPIO_KEY=3Dy
+-CONFIG_TMP421=3Dy
+-CONFIG_PCA9552=3Dy
+ CONFIG_SSI_M25P80=3Dy
+ CONFIG_ALLWINNER_EMAC=3Dy
+ CONFIG_IMX_FEC=3Dy
+-CONFIG_FTGMAC100=3Dy
+-CONFIG_DS1338=3Dy
+ CONFIG_PLATFORM_BUS=3Dy
+ CONFIG_VIRTIO_MMIO=3Dy
+=20
+@@ -92,8 +89,6 @@ CONFIG_I82801B11=3Dy
+ CONFIG_ACPI=3Dy
+ CONFIG_ARM_VIRT=3Dy
+ CONFIG_SMBIOS=3Dy
+-CONFIG_ASPEED_SOC=3Dy
+-CONFIG_SMBUS_EEPROM=3Dy
+ CONFIG_GPIO_KEY=3Dy
  CONFIG_MSF2=3Dy
  CONFIG_FW_CFG_DMA=3Dy
- CONFIG_PCI_EXPRESS_DESIGNWARE=3Dy
--
--CONFIG_STRONGARM=3Dy
 diff --git a/hw/arm/Kconfig b/hw/arm/Kconfig
-index dfdc1b1fd6..a507144d9a 100644
+index a507144d9a..95ac0b540e 100644
 --- a/hw/arm/Kconfig
 +++ b/hw/arm/Kconfig
-@@ -169,6 +169,13 @@ config STELLARIS
+@@ -255,6 +255,16 @@ config FSL_IMX6
 =20
- config STRONGARM
+ config ASPEED_SOC
      bool
-+    select PXA2XX
-+
-+config COLLIE
-+    bool
-+    select PFLASH_CFI01
-+    select ZAURUS  # scoop
-+    select STRONGARM
++    select DS1338
++    select FTGMAC100
++    select I2C
++    select PCA9552
++    select SERIAL
++    select SMBUS_EEPROM
++    select SSI
++    select SSI_M25P80
++    select TMP105
++    select TMP421
 =20
- config SX1
+ config MPS2
      bool
-diff --git a/hw/arm/Makefile.objs b/hw/arm/Makefile.objs
-index 00328d1b0b..729e711b87 100644
---- a/hw/arm/Makefile.objs
-+++ b/hw/arm/Makefile.objs
-@@ -17,7 +17,7 @@ obj-$(CONFIG_TOSA) +=3D tosa.o
- obj-$(CONFIG_Z2) +=3D z2.o
- obj-$(CONFIG_REALVIEW) +=3D realview.o
- obj-$(CONFIG_STELLARIS) +=3D stellaris.o
--obj-$(CONFIG_STRONGARM) +=3D collie.o
-+obj-$(CONFIG_COLLIE) +=3D collie.o
- obj-$(CONFIG_VERSATILE) +=3D versatilepb.o
- obj-$(CONFIG_VEXPRESS) +=3D vexpress.o
- obj-$(CONFIG_ZYNQ) +=3D xilinx_zynq.o
 --=20
 2.21.0
