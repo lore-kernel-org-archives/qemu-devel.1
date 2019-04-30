@@ -1,24 +1,26 @@
-Received: from eggs.gnu.org ([209.51.188.92]:48198)
+Received: from eggs.gnu.org ([209.51.188.92]:52550)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1hLOWM-0001KK-P9
-	for qemu-devel@nongnu.org; Tue, 30 Apr 2019 04:53:52 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1hLOuY-0006Ki-BB
+	for qemu-devel@nongnu.org; Tue, 30 Apr 2019 05:18:51 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1hLOWL-0007l8-GZ
-	for qemu-devel@nongnu.org; Tue, 30 Apr 2019 04:53:50 -0400
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Date: Tue, 30 Apr 2019 08:53:41 +0000
-Message-ID: <8e928f60-f2b2-6e05-bf16-5578941bfd8b@virtuozzo.com>
-References: <20190402153730.54145-1-vsementsov@virtuozzo.com>
-	<20190402153730.54145-2-vsementsov@virtuozzo.com>
-	<fe340a80-f918-7999-fb75-4b129162bd89@redhat.com>
-In-Reply-To: <fe340a80-f918-7999-fb75-4b129162bd89@redhat.com>
-Content-Language: en-US
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <E7BFF8061BD00942A3BC910F2401377C@eurprd08.prod.outlook.com>
-Content-Transfer-Encoding: base64
+	(envelope-from <peter.maydell@linaro.org>) id 1hLOuX-00079e-GK
+	for qemu-devel@nongnu.org; Tue, 30 Apr 2019 05:18:50 -0400
+Received: from mail-oi1-x241.google.com ([2607:f8b0:4864:20::241]:45334)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1hLOuX-000794-BJ
+	for qemu-devel@nongnu.org; Tue, 30 Apr 2019 05:18:49 -0400
+Received: by mail-oi1-x241.google.com with SMTP id t189so7636760oih.12
+	for <qemu-devel@nongnu.org>; Tue, 30 Apr 2019 02:18:49 -0700 (PDT)
 MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [PATCH v5 01/10] tests/perf: Test qemu-img convert
- from raw to encrypted qcow2
+References: <1556614240-36369-1-git-send-email-like.xu@linux.intel.com>
+In-Reply-To: <1556614240-36369-1-git-send-email-like.xu@linux.intel.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Tue, 30 Apr 2019 10:18:37 +0100
+Message-ID: <CAFEAcA-SFrcbQMdv19tJw_baGR8c_ngR2CtsgZKVXMALOo=zoA@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH] hw/arm/fsl-imx: move cpus initialization
+ to realize time after smp_cpus check
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,67 +29,21 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Max Reitz <mreitz@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>
-Cc: "kwolf@redhat.com" <kwolf@redhat.com>, "berto@igalia.com" <berto@igalia.com>, "pbonzini@redhat.com" <pbonzini@redhat.com>, Denis Lunev <den@virtuozzo.com>, "berrange@redhat.com" <berrange@redhat.com>
+To: Like Xu <like.xu@linux.intel.com>
+Cc: qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>, Jean-Christophe Dubois <jcd@tribudubois.net>, Andrey Smirnov <andrew.smirnov@gmail.com>, Igor Mammedov <imammedo@redhat.com>
 
-MjkuMDQuMjAxOSAxOjU1LCBNYXggUmVpdHogd3JvdGU6DQo+IE9uIDAyLjA0LjE5IDE3OjM3LCBW
-bGFkaW1pciBTZW1lbnRzb3YtT2dpZXZza2l5IHdyb3RlOg0KPj4gU2lnbmVkLW9mZi1ieTogVmxh
-ZGltaXIgU2VtZW50c292LU9naWV2c2tpeSA8dnNlbWVudHNvdkB2aXJ0dW96em8uY29tPg0KPj4g
-LS0tDQo+PiAgIHRlc3RzL3BlcmYvYmxvY2svcWNvdzIvY29udmVydC10by1lbmNyeXB0ZWQgfCA0
-OCArKysrKysrKysrKysrKysrKysrKysNCj4+ICAgMSBmaWxlIGNoYW5nZWQsIDQ4IGluc2VydGlv
-bnMoKykNCj4+ICAgY3JlYXRlIG1vZGUgMTAwNzU1IHRlc3RzL3BlcmYvYmxvY2svcWNvdzIvY29u
-dmVydC10by1lbmNyeXB0ZWQNCj4gDQo+IFRoYW5rcyBmb3IgdGhlIHRlc3QgY2FzZSwgYnV0IEkg
-ZG9u4oCZdCBrbm93IHdoZXRoZXIgdGhpcyBpcyB0aGUgcmlnaHQgd2F5DQo+IHRvIGluY2x1ZGUg
-aXQuDQo+IA0KPiBBIGNvbmNyZXRlIHByb2JsZW0gaXMgdGhhdCBpdCBkb2VzbuKAmXQgd29yayB3
-aXRoIG91dC1vZi10cmVlIGJ1aWxkcyAoSQ0KPiBvbmx5IGRvIG91dC1vZi10cmVlIGJ1aWxkcyku
-ICBJIHdvbmRlciB3aGV0aGVyIGl0IHdvdWxkIGJlIHBvc3NpYmxlIGFuZA0KPiBtYWtlIHNlbnNl
-IChJIGhhdmUgbm8gaWRlYSkgdG8gYWRkIGEgc3ViZGlyZWN0b3J5ICJwZXJmIiB0byB0aGUgaW90
-ZXN0cw0KPiBhbmQgcmV1c2UgaXRzIGluZnJhc3RydWN0dXJlPyAgVGhvc2UgdGVzdHMgd291bGRu
-4oCZdCBydW4gYnkgZGVmYXVsdC4NCj4gDQoNCkhvbmVzdGx5LCBJIGRvbid0IHJlYWxseSBsaWtl
-IGV4aXN0aW5nIGlvdGVzdHMgaW5mcmFzdHJ1Y3R1cmUsIGJvdW5kIHRvIGNoZWNrDQpzY3JpcHQs
-IHdoaWNoIEkgZG9uJ3QgbGlrZSB0b28gKGFuZCBhbnkgb3RoZXIgbGFyZ2Ugc2NyaXB0IGluIGJh
-c2gsIHNvcnJ5IDooLi4NCg0KV2hhdCBkbyB5b3UgbWVhbj8gWW91IGhhdmUgZW52IHZhcmlhYmxl
-cyBRRU1VX0lNRywgZXRjLCBhbmQgd2FudCB0aGVtIHRvIGJlDQphY2NlcHRlZCBieSBzY3JpcHQ/
-DQoNCkknZCBwcmVmZXIgdG8gY29tbWl0IHNvbWV0aGluZyBzaW1wbGUgYW5kIHNlcGFyYXRlLCB0
-byBiZSBhYmxlIHRvIGJ1aWxkIHVwDQppbmZyYXN0cnVjdHVyZSBhcm91bmQgaXQgZ3JhZHVhbGx5
-Li4gRmluYWxseSwgSSB3YW50IGEgc2ltcGxlIHdheSB0byBydW4NCmEgc2V0IG9mIHBlcmYgdGVz
-dHMgb24gYSBzZXQgb2YgZ2l0IGNvbW1pdHMgYW5kIGdldCBhbiBodG1sIGFuZCBhc2NpaQ0KdGFi
-bGVzIG9mIHBlcmZvcm1hbmNlIGNvbXBhcmlzb24gYmV0d2VlbiB0aGVzZSBjb21taXRzLg0KDQo+
-IA0KPj4gZGlmZiAtLWdpdCBhL3Rlc3RzL3BlcmYvYmxvY2svcWNvdzIvY29udmVydC10by1lbmNy
-eXB0ZWQgYi90ZXN0cy9wZXJmL2Jsb2NrL3Fjb3cyL2NvbnZlcnQtdG8tZW5jcnlwdGVkDQo+PiBu
-ZXcgZmlsZSBtb2RlIDEwMDc1NQ0KPj4gaW5kZXggMDAwMDAwMDAwMC4uN2E2YjdiMWNhYg0KPj4g
-LS0tIC9kZXYvbnVsbA0KPj4gKysrIGIvdGVzdHMvcGVyZi9ibG9jay9xY293Mi9jb252ZXJ0LXRv
-LWVuY3J5cHRlZA0KPj4gQEAgLTAsMCArMSw0OCBAQA0KPj4gKyMhL2Jpbi9iYXNoDQo+PiArIw0K
-Pj4gKyMgVGVzdCBxZW11LWltZyBjb252ZXJ0IGZyb20gcmF3IHRvIGVuY3J5cHRlZCBxY293Mg0K
-Pj4gKyMNCj4+ICsjIENvcHlyaWdodCAoYykgMjAxOSBWaXJ0dW96em8gSW50ZXJuYXRpb25hbCBH
-bWJILiBBbGwgcmlnaHRzIHJlc2VydmVkLg0KPj4gKyMNCj4+ICsjIFRoaXMgcHJvZ3JhbSBpcyBm
-cmVlIHNvZnR3YXJlOyB5b3UgY2FuIHJlZGlzdHJpYnV0ZSBpdCBhbmQvb3IgbW9kaWZ5DQo+PiAr
-IyBpdCB1bmRlciB0aGUgdGVybXMgb2YgdGhlIEdOVSBHZW5lcmFsIFB1YmxpYyBMaWNlbnNlIGFz
-IHB1Ymxpc2hlZCBieQ0KPj4gKyMgdGhlIEZyZWUgU29mdHdhcmUgRm91bmRhdGlvbjsgZWl0aGVy
-IHZlcnNpb24gMiBvZiB0aGUgTGljZW5zZSwgb3INCj4+ICsjIChhdCB5b3VyIG9wdGlvbikgYW55
-IGxhdGVyIHZlcnNpb24uDQo+PiArIw0KPj4gKyMgVGhpcyBwcm9ncmFtIGlzIGRpc3RyaWJ1dGVk
-IGluIHRoZSBob3BlIHRoYXQgaXQgd2lsbCBiZSB1c2VmdWwsDQo+PiArIyBidXQgV0lUSE9VVCBB
-TlkgV0FSUkFOVFk7IHdpdGhvdXQgZXZlbiB0aGUgaW1wbGllZCB3YXJyYW50eSBvZg0KPj4gKyMg
-TUVSQ0hBTlRBQklMSVRZIG9yIEZJVE5FU1MgRk9SIEEgUEFSVElDVUxBUiBQVVJQT1NFLiAgU2Vl
-IHRoZQ0KPj4gKyMgR05VIEdlbmVyYWwgUHVibGljIExpY2Vuc2UgZm9yIG1vcmUgZGV0YWlscy4N
-Cj4+ICsjDQo+PiArIyBZb3Ugc2hvdWxkIGhhdmUgcmVjZWl2ZWQgYSBjb3B5IG9mIHRoZSBHTlUg
-R2VuZXJhbCBQdWJsaWMgTGljZW5zZQ0KPj4gKyMgYWxvbmcgd2l0aCB0aGlzIHByb2dyYW0uICBJ
-ZiBub3QsIHNlZSA8aHR0cDovL3d3dy5nbnUub3JnL2xpY2Vuc2VzLz4uDQo+PiArIw0KPj4gKw0K
-Pj4gK2lmIFsgIiQjIiAtbHQgMiBdOyB0aGVuDQo+PiArICAgIGVjaG8gIlVzYWdlOiAkMCBTT1VS
-Q0VfRklMRSBERVNUSU5BVElPTl9GSUxFIFthZGRpdGlvbmFsIHFlbXUtaW1nIGNvbnZlcnQgcGFy
-YW1ldGVyc10iDQo+PiArICAgIGV4aXQgMQ0KPj4gK2ZpDQo+PiArDQo+PiArUk9PVF9ESVI9IiQo
-IGNkICIkKCBkaXJuYW1lICIke0JBU0hfU09VUkNFWzBdfSIgKS8uLi8uLi8uLi8uLiIgPi9kZXYv
-bnVsbCAyPiYxICYmIHB3ZCApIg0KPj4gK1FFTVVfSU1HPSIkUk9PVF9ESVIvcWVtdS1pbWciDQo+
-PiArUUVNVV9JTz0iJFJPT1RfRElSL3FlbXUtaW8iDQo+PiArDQo+PiArc2l6ZT0xRw0KPj4gKw0K
-Pj4gK3NyYz0iJDEiDQo+PiArc2hpZnQNCj4+ICsNCj4+ICtkc3Q9IiQxIg0KPj4gK3NoaWZ0DQo+
-PiArDQo+PiArKA0KPj4gKyMgY3JlYXRlIHNvdXJjZQ0KPj4gKyRRRU1VX0lNRyBjcmVhdGUgLWYg
-cmF3ICIkc3JjIiAkc2l6ZQ0KPj4gKyRRRU1VX0lPIC1mIHJhdyAtYyAid3JpdGUgLVAgMHhhIDAg
-JHNpemUiICIkc3JjIg0KPj4gKw0KPj4gKyMgY3JlYXRlIHRhcmdldA0KPj4gKyRRRU1VX0lNRyBj
-cmVhdGUgLWYgcWNvdzIgLS1vYmplY3Qgc2VjcmV0LGlkPXNlYzAsZGF0YT10ZXN0IC1vIGVuY3J5
-cHQuZm9ybWF0PWx1a3MsZW5jcnlwdC5rZXktc2VjcmV0PXNlYzAgIiRkc3QiICRzaXplDQo+PiAr
-KSA+IC9kZXYvbnVsbA0KPj4gKw0KPj4gKyMgdGVzdCB3aXRoIGFkZGl0aW9uYWwgcGFyYW1ldGVy
-cyBsZWZ0IGluICRADQo+PiArL3Vzci9iaW4vdGltZSAtZiAlZSAkUUVNVV9JTUcgY29udmVydCAi
-JEAiIC1mIHJhdyAtLW9iamVjdCBzZWNyZXQsaWQ9c2VjMCxkYXRhPXRlc3QgLS10YXJnZXQtaW1h
-Z2Utb3B0cyAtbiAiJHNyYyIgImRyaXZlcj1xY293MixmaWxlLmZpbGVuYW1lPSRkc3QsZW5jcnlw
-dC5rZXktc2VjcmV0PXNlYzAiDQo+Pg0KPiANCj4gDQoNCg0KLS0gDQpCZXN0IHJlZ2FyZHMsDQpW
-bGFkaW1pcg0K
+On Tue, 30 Apr 2019 at 09:52, Like Xu <like.xu@linux.intel.com> wrote:
+>
+> If "smp_cpus> FSL_IMX6_NUM_CPUS" fails in *_realize(), there is no need to
+> initialize the CPUs in *_init(). So it could be better to create all cpus
+> after the validity in *_realize(). On the other hand, it makes the usages
+> of global variable smp_cpus more centrally for maintenance.
+
+I'm not a great fan of this. I think that where possible
+we should init child objects in the parent's init
+function, and realize them in the realize function.
+There are a few cases where we're forced to do the
+child init in realize, but this doesn't seem like one of them.
+
+thanks
+-- PMM
