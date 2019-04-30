@@ -1,19 +1,27 @@
-Received: from eggs.gnu.org ([209.51.188.92]:50743)
+Received: from eggs.gnu.org ([209.51.188.92]:50848)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1hLUzd-0003s3-KL
-	for qemu-devel@nongnu.org; Tue, 30 Apr 2019 11:48:30 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1hLV08-0004JK-Ni
+	for qemu-devel@nongnu.org; Tue, 30 Apr 2019 11:49:01 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1hLUzb-0005S7-FY
-	for qemu-devel@nongnu.org; Tue, 30 Apr 2019 11:48:29 -0400
-From: Kevin Wolf <kwolf@redhat.com>
-Date: Tue, 30 Apr 2019 17:42:19 +0200
-Message-Id: <20190430154244.30083-3-kwolf@redhat.com>
-In-Reply-To: <20190430154244.30083-1-kwolf@redhat.com>
-References: <20190430154244.30083-1-kwolf@redhat.com>
+	(envelope-from <peter.maydell@linaro.org>) id 1hLV07-0005kF-IC
+	for qemu-devel@nongnu.org; Tue, 30 Apr 2019 11:49:00 -0400
+Received: from mail-oi1-x244.google.com ([2607:f8b0:4864:20::244]:32825)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1hLV07-0005ja-Bh
+	for qemu-devel@nongnu.org; Tue, 30 Apr 2019 11:48:59 -0400
+Received: by mail-oi1-x244.google.com with SMTP id l1so9789694oib.0
+	for <qemu-devel@nongnu.org>; Tue, 30 Apr 2019 08:48:58 -0700 (PDT)
 MIME-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 02/27] block: Fix AioContext switch for bs->drv
- == NULL
+References: <cover.1556515687.git.alistair@alistair23.me>
+	<PSXP216MB0277D0653D098FF32C5DC07DDD390@PSXP216MB0277.KORP216.PROD.OUTLOOK.COM>
+In-Reply-To: <PSXP216MB0277D0653D098FF32C5DC07DDD390@PSXP216MB0277.KORP216.PROD.OUTLOOK.COM>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Tue, 30 Apr 2019 16:48:47 +0100
+Message-ID: <CAFEAcA_T7-+de9=V=hnku9f0BXdpLfz6wLFFZYp9LyYDx2KLCw@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH v1 3/5] hw/misc: Add the STM32F4xx EXTI
+ device
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,132 +30,126 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-block@nongnu.org
-Cc: kwolf@redhat.com, qemu-devel@nongnu.org
+To: Alistair Francis <alistair@alistair23.me>
+Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "alistair23@gmail.com" <alistair23@gmail.com>
 
-Even for block nodes with bs->drv =3D=3D NULL, we can't just ignore a
-bdrv_set_aio_context() call. Leaving the node in its old context can
-mean that it's still in an iothread context in bdrv_close_all() during
-shutdown, resulting in an attempted unlock of the AioContext lock which
-we don't hold.
+On Mon, 29 Apr 2019 at 06:37, Alistair Francis <alistair@alistair23.me> wrote:
+>
+> Signed-off-by: Alistair Francis <alistair@alistair23.me>
+> ---
+>  default-configs/arm-softmmu.mak  |   1 +
+>  hw/misc/Kconfig                  |   3 +
+>  hw/misc/Makefile.objs            |   1 +
+>  hw/misc/stm32f4xx_exti.c         | 175 +++++++++++++++++++++++++++++++
+>  include/hw/misc/stm32f4xx_exti.h |  57 ++++++++++
+>  5 files changed, 237 insertions(+)
+>  create mode 100644 hw/misc/stm32f4xx_exti.c
+>  create mode 100644 include/hw/misc/stm32f4xx_exti.h
 
-This is an example stack trace of a related crash:
+Minor comments here only.
 
- #0  0x00007ffff59da57f in raise () at /lib64/libc.so.6
- #1  0x00007ffff59c4895 in abort () at /lib64/libc.so.6
- #2  0x0000555555b97b1e in error_exit (err=3D<optimized out>, msg=3Dmsg@e=
-ntry=3D0x555555d386d0 <__func__.19059> "qemu_mutex_unlock_impl") at util/=
-qemu-thread-posix.c:36
- #3  0x0000555555b97f7f in qemu_mutex_unlock_impl (mutex=3Dmutex@entry=3D=
-0x5555568002f0, file=3Dfile@entry=3D0x555555d378df "util/async.c", line=3D=
-line@entry=3D507) at util/qemu-thread-posix.c:97
- #4  0x0000555555b92f55 in aio_context_release (ctx=3Dctx@entry=3D0x55555=
-6800290) at util/async.c:507
- #5  0x0000555555b05cf8 in bdrv_prwv_co (child=3Dchild@entry=3D0x7fffc800=
-12f0, offset=3Doffset@entry=3D131072, qiov=3Dqiov@entry=3D0x7fffffffd4f0,=
- is_write=3Dis_write@entry=3Dtrue, flags=3Dflags@entry=3D0)
-         at block/io.c:833
- #6  0x0000555555b060a9 in bdrv_pwritev (qiov=3D0x7fffffffd4f0, offset=3D=
-131072, child=3D0x7fffc80012f0) at block/io.c:990
- #7  0x0000555555b060a9 in bdrv_pwrite (child=3D0x7fffc80012f0, offset=3D=
-131072, buf=3D<optimized out>, bytes=3D<optimized out>) at block/io.c:990
- #8  0x0000555555ae172b in qcow2_cache_entry_flush (bs=3Dbs@entry=3D0x555=
-556810680, c=3Dc@entry=3D0x5555568cc740, i=3Di@entry=3D0) at block/qcow2-=
-cache.c:51
- #9  0x0000555555ae18dd in qcow2_cache_write (bs=3Dbs@entry=3D0x555556810=
-680, c=3D0x5555568cc740) at block/qcow2-cache.c:248
- #10 0x0000555555ae15de in qcow2_cache_flush (bs=3D0x555556810680, c=3D<o=
-ptimized out>) at block/qcow2-cache.c:259
- #11 0x0000555555ae16b1 in qcow2_cache_flush_dependency (c=3D0x5555568a17=
-00, c=3D0x5555568a1700, bs=3D0x555556810680) at block/qcow2-cache.c:194
- #12 0x0000555555ae16b1 in qcow2_cache_entry_flush (bs=3Dbs@entry=3D0x555=
-556810680, c=3Dc@entry=3D0x5555568a1700, i=3Di@entry=3D0) at block/qcow2-=
-cache.c:194
- #13 0x0000555555ae18dd in qcow2_cache_write (bs=3Dbs@entry=3D0x555556810=
-680, c=3D0x5555568a1700) at block/qcow2-cache.c:248
- #14 0x0000555555ae15de in qcow2_cache_flush (bs=3Dbs@entry=3D0x555556810=
-680, c=3D<optimized out>) at block/qcow2-cache.c:259
- #15 0x0000555555ad242c in qcow2_inactivate (bs=3Dbs@entry=3D0x5555568106=
-80) at block/qcow2.c:2124
- #16 0x0000555555ad2590 in qcow2_close (bs=3D0x555556810680) at block/qco=
-w2.c:2153
- #17 0x0000555555ab0c62 in bdrv_close (bs=3D0x555556810680) at block.c:33=
-58
- #18 0x0000555555ab0c62 in bdrv_delete (bs=3D0x555556810680) at block.c:3=
-542
- #19 0x0000555555ab0c62 in bdrv_unref (bs=3D0x555556810680) at block.c:45=
-98
- #20 0x0000555555af4d72 in blk_remove_bs (blk=3Dblk@entry=3D0x5555568103d=
-0) at block/block-backend.c:785
- #21 0x0000555555af4dbb in blk_remove_all_bs () at block/block-backend.c:=
-483
- #22 0x0000555555aae02f in bdrv_close_all () at block.c:3412
- #23 0x00005555557f9796 in main (argc=3D<optimized out>, argv=3D<optimize=
-d out>, envp=3D<optimized out>) at vl.c:4776
+(If Thomas's kconfig patchset gets into master before this
+there might be some minor fixups required to the kconfig
+stuff, but it shouldn't be too hard to adapt.)
 
-The reproducer I used is a qcow2 image on gluster volume, where the
-virtual disk size (4 GB) is larger than the gluster volume size (64M),
-so we can easily trigger an ENOSPC. This backend is assigned to a
-virtio-blk device using an iothread, and then from the guest a
-'dd if=3D/dev/zero of=3D/dev/vda bs=3D1G count=3D1' causes the VM to stop
-because of an I/O error. qemu_gluster_co_flush_to_disk() sets
-bs->drv =3D NULL on error, so when virtio-blk stops the dataplane, the
-block nodes stay in the iothread AioContext. A 'quit' monitor command
-issued from this paused state crashes the process.
+> +#include "qemu/osdep.h"
+> +#include "hw/sysbus.h"
+> +#include "qemu/log.h"
+> +#include "hw/misc/stm32f4xx_exti.h"
+> +
+> +#ifndef STM_EXTI_ERR_DEBUG
+> +#define STM_EXTI_ERR_DEBUG 0
+> +#endif
+> +
+> +#define DB_PRINT_L(lvl, fmt, args...) do { \
+> +    if (STM_EXTI_ERR_DEBUG >= lvl) { \
+> +        qemu_log("%s: " fmt, __func__, ## args); \
+> +    } \
+> +} while (0)
+> +
+> +#define DB_PRINT(fmt, args...) DB_PRINT_L(1, fmt, ## args)
 
-Fixes: https://bugzilla.redhat.com/show_bug.cgi?id=3D1631227
-Cc: qemu-stable@nongnu.org
-Signed-off-by: Kevin Wolf <kwolf@redhat.com>
-Reviewed-by: Eric Blake <eblake@redhat.com>
-Reviewed-by: Max Reitz <mreitz@redhat.com>
-Reviewed-by: Stefano Garzarella <sgarzare@redhat.com>
----
- block.c | 12 ++----------
- 1 file changed, 2 insertions(+), 10 deletions(-)
+Could we use a tracepoint instead?
 
-diff --git a/block.c b/block.c
-index 16615bc876..9ae5c0ed2f 100644
---- a/block.c
-+++ b/block.c
-@@ -5672,10 +5672,6 @@ void bdrv_detach_aio_context(BlockDriverState *bs)
-     BdrvAioNotifier *baf, *baf_tmp;
-     BdrvChild *child;
-=20
--    if (!bs->drv) {
--        return;
--    }
--
-     assert(!bs->walking_aio_notifiers);
-     bs->walking_aio_notifiers =3D true;
-     QLIST_FOREACH_SAFE(baf, &bs->aio_notifiers, list, baf_tmp) {
-@@ -5690,7 +5686,7 @@ void bdrv_detach_aio_context(BlockDriverState *bs)
-      */
-     bs->walking_aio_notifiers =3D false;
-=20
--    if (bs->drv->bdrv_detach_aio_context) {
-+    if (bs->drv && bs->drv->bdrv_detach_aio_context) {
-         bs->drv->bdrv_detach_aio_context(bs);
-     }
-     QLIST_FOREACH(child, &bs->children, next) {
-@@ -5709,10 +5705,6 @@ void bdrv_attach_aio_context(BlockDriverState *bs,
-     BdrvAioNotifier *ban, *ban_tmp;
-     BdrvChild *child;
-=20
--    if (!bs->drv) {
--        return;
--    }
--
-     if (bs->quiesce_counter) {
-         aio_disable_external(new_context);
-     }
-@@ -5722,7 +5714,7 @@ void bdrv_attach_aio_context(BlockDriverState *bs,
-     QLIST_FOREACH(child, &bs->children, next) {
-         bdrv_attach_aio_context(child->bs, new_context);
-     }
--    if (bs->drv->bdrv_attach_aio_context) {
-+    if (bs->drv && bs->drv->bdrv_attach_aio_context) {
-         bs->drv->bdrv_attach_aio_context(bs, new_context);
-     }
-=20
---=20
-2.20.1
+> +
+> +#define NUM_GPIO_EVENT_IN_LINES 16
+> +#define NUM_INTERRUPT_OUT_LINES 16
+> +
+> +static void stm32f4xx_exti_reset(DeviceState *dev)
+> +{
+> +    STM32F4xxExtiState *s = STM32F4XX_EXTI(dev);
+> +
+> +    s->exti_imr = 0x00000000;
+> +    s->exti_emr = 0x00000000;
+> +    s->exti_rtsr = 0x00000000;
+> +    s->exti_ftsr = 0x00000000;
+> +    s->exti_swier = 0x00000000;
+> +    s->exti_pr = 0x00000000;
+> +}
+> +
+> +static void stm32f4xx_exti_set_irq(void *opaque, int irq, int level)
+> +{
+> +    STM32F4xxExtiState *s = opaque;
+> +
+> +    DB_PRINT("Set EXTI: %d to %d\n", irq, level);
+> +
+> +    if (level) {
+> +        qemu_irq_pulse(s->irq[irq]);
+> +        s->exti_pr |= 1 << irq;
+> +    }
+> +}
+
+Just to check -- this should definitely be a pulse? I'm always
+a little bit wary of uses of qemu_irq_pulse(), though some
+hardware does pulse IRQ lines rather than holding them until
+dismissed.
+
+> +static void stm32f4xx_exti_init(Object *obj)
+> +{
+> +    STM32F4xxExtiState *s = STM32F4XX_EXTI(obj);
+> +    int i;
+> +
+> +    s->irq = g_new0(qemu_irq, NUM_INTERRUPT_OUT_LINES);
+
+You could just have the array be inline in the
+STM32F4xxExtiState rather than allocating it separately,
+right?
+
+> +    for (i = 0; i < NUM_INTERRUPT_OUT_LINES; i++) {
+> +        sysbus_init_irq(SYS_BUS_DEVICE(obj), &s->irq[i]);
+> +    }
+> +
+> +    memory_region_init_io(&s->mmio, obj, &stm32f4xx_exti_ops, s,
+> +                          TYPE_STM32F4XX_EXTI, 0x400);
+> +    sysbus_init_mmio(SYS_BUS_DEVICE(obj), &s->mmio);
+> +
+> +    qdev_init_gpio_in(DEVICE(obj), stm32f4xx_exti_set_irq,
+> +                      NUM_GPIO_EVENT_IN_LINES);
+> +}
+> +
+> +static void stm32f4xx_exti_class_init(ObjectClass *klass, void *data)
+> +{
+> +    DeviceClass *dc = DEVICE_CLASS(klass);
+> +
+> +    dc->reset = stm32f4xx_exti_reset;
+
+This one's missing vmstate too.
+
+> +}
+> +
+> +static const TypeInfo stm32f4xx_exti_info = {
+> +    .name          = TYPE_STM32F4XX_EXTI,
+> +    .parent        = TYPE_SYS_BUS_DEVICE,
+> +    .instance_size = sizeof(STM32F4xxExtiState),
+> +    .instance_init = stm32f4xx_exti_init,
+> +    .class_init    = stm32f4xx_exti_class_init,
+> +};
+> +
+> +static void stm32f4xx_exti_register_types(void)
+> +{
+> +    type_register_static(&stm32f4xx_exti_info);
+> +}
+> +
+
+thanks
+-- PMM
