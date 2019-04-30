@@ -1,26 +1,26 @@
-Received: from eggs.gnu.org ([209.51.188.92]:41582)
+Received: from eggs.gnu.org ([209.51.188.92]:41944)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1hLSJ0-0003lB-PH
-	for qemu-devel@nongnu.org; Tue, 30 Apr 2019 08:56:19 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1hLSKi-0004v4-K3
+	for qemu-devel@nongnu.org; Tue, 30 Apr 2019 08:58:05 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1hLSIz-00084I-Kd
-	for qemu-devel@nongnu.org; Tue, 30 Apr 2019 08:56:18 -0400
-Received: from mail-wm1-f65.google.com ([209.85.128.65]:38484)
+	(envelope-from <peter.maydell@linaro.org>) id 1hLSKe-0000Wn-PZ
+	for qemu-devel@nongnu.org; Tue, 30 Apr 2019 08:58:04 -0400
+Received: from mail-oi1-x242.google.com ([2607:f8b0:4864:20::242]:37887)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1hLSIz-000838-Ev
-	for qemu-devel@nongnu.org; Tue, 30 Apr 2019 08:56:17 -0400
-Received: by mail-wm1-f65.google.com with SMTP id w15so3724307wmc.3
-	for <qemu-devel@nongnu.org>; Tue, 30 Apr 2019 05:56:16 -0700 (PDT)
-References: <20190430115404.18483-1-pl@kamp.de>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Message-ID: <1667a919-9d20-14ca-fd72-e4d3074fd4a0@redhat.com>
-Date: Tue, 30 Apr 2019 14:56:13 +0200
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1hLSKb-0000VW-Ev
+	for qemu-devel@nongnu.org; Tue, 30 Apr 2019 08:57:58 -0400
+Received: by mail-oi1-x242.google.com with SMTP id k6so11137332oic.4
+	for <qemu-devel@nongnu.org>; Tue, 30 Apr 2019 05:57:55 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20190430115404.18483-1-pl@kamp.de>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH RESEND] megasas: fix mapped frame size
+References: <20190223023957.18865-1-richard.henderson@linaro.org>
+In-Reply-To: <20190223023957.18865-1-richard.henderson@linaro.org>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Tue, 30 Apr 2019 13:57:44 +0100
+Message-ID: <CAFEAcA-30AuFEP6hYE-CEFTr7wosAi6Mugrp=FH-xWx4X-pNww@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH+RFC 0/6] target/arm: Define cortex-a{73, 75,
+ 76}
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,40 +29,34 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Lieven <pl@kamp.de>, qemu-devel@nongnu.org
-Cc: fam@euphon.net, pbonzini@redhat.com, hare@suse.com, qemu-stable@nongnu.org
+To: Richard Henderson <richard.henderson@linaro.org>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>
 
-On 4/30/19 1:54 PM, Peter Lieven wrote:
-> the current value of 1024 bytes (16 * MFI_FRAME_SIZE) we map is not enough to hold
-> the maximum number of scatter gather elements we advertise. We actually need a
-> maximum of 2048 bytes. This is 128 max sg elements * 16 bytes (sizeof (union mfi_sgl)).
+On Sat, 23 Feb 2019 at 02:40, Richard Henderson
+<richard.henderson@linaro.org> wrote:
+>
+> There have been several announcements since the a72.
+>
+> The a75 and a76 entries are RFC because, while they boot with a 3.15
+> kernel, they do not boot with a 5.0-rc7 kernel.  I'm really not sure
+> where things have gone off the rails.  It'll take some more serious
+> tracing to figure out what went wrong.
+>
+> I post this now mostly to get feedback on patch 5.  Should we do
+> more to elide *all* of the aa32 system registers for that case?
 
-Looking at megasas_map_sgl(), we indeed accept up to MEGASAS_MAX_SGE
-iov_count. Broken since ever then?
+We should make sure we don't expose non-existent sysregs to
+EL0, but it's harmless to define aa32 PL1_RW sysregs in
+an AArch64-only-for-EL1-and-up CPU -- the guest is just never
+able to access them. (This is the inverse of the way we define
+a lot of AArch64 sysregs for AArch32 CPUs).
 
-Fixes: e8f943c3bcc2
-> 
-> Cc: qemu-stable@nongnu.org
-> Signed-off-by: Peter Lieven <pl@kamp.de>
-> Reviewed-by: Hannes Reinecke <hare@suse.com>
+The thing to watch out for here is that where we have AArch32 and
+AArch64 aliases of each other, we tend to define one as the
+"real thing" and the other as the alias, which matters for
+migration. If we've used the AArch32 version as the "real thing"
+then we can't just skip the definition or we'll drop the register
+state from the migration stream entirely.
 
-Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
-
-> ---
->  hw/scsi/megasas.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
-> 
-> diff --git a/hw/scsi/megasas.c b/hw/scsi/megasas.c
-> index a56317e026..5ad762de23 100644
-> --- a/hw/scsi/megasas.c
-> +++ b/hw/scsi/megasas.c
-> @@ -477,7 +477,7 @@ static MegasasCmd *megasas_enqueue_frame(MegasasState *s,
->  {
->      PCIDevice *pcid = PCI_DEVICE(s);
->      MegasasCmd *cmd = NULL;
-> -    int frame_size = MFI_FRAME_SIZE * 16;
-> +    int frame_size = MEGASAS_MAX_SGE * sizeof(union mfi_sgl);
->      hwaddr frame_size_p = frame_size;
->      unsigned long index;
->  
-> 
+thanks
+-- PMM
