@@ -2,81 +2,81 @@ Return-Path: <SRS0=TP+Q=TA=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.7 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-4.0 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B4189C43219
-	for <qemu-devel@archiver.kernel.org>; Tue, 30 Apr 2019 10:02:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AD365C43219
+	for <qemu-devel@archiver.kernel.org>; Tue, 30 Apr 2019 10:03:13 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 78B832075E
-	for <qemu-devel@archiver.kernel.org>; Tue, 30 Apr 2019 10:02:05 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 7287B2075E
+	for <qemu-devel@archiver.kernel.org>; Tue, 30 Apr 2019 10:03:13 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="kCoKr8Fz"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 78B832075E
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="Eg/EgRlJ"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7287B2075E
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:42483 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:42491 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hLPaO-0006x8-Hd
-	for qemu-devel@archiver.kernel.org; Tue, 30 Apr 2019 06:02:04 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:60501)
+	id 1hLPbU-0007fO-Nu
+	for qemu-devel@archiver.kernel.org; Tue, 30 Apr 2019 06:03:12 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:60755)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1hLPYv-0005xR-MG
-	for qemu-devel@nongnu.org; Tue, 30 Apr 2019 06:00:34 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1hLPa0-0006yB-Kv
+	for qemu-devel@nongnu.org; Tue, 30 Apr 2019 06:01:45 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1hLPYu-00082Q-2C
-	for qemu-devel@nongnu.org; Tue, 30 Apr 2019 06:00:33 -0400
-Received: from mail-oi1-x22c.google.com ([2607:f8b0:4864:20::22c]:35857)
+	(envelope-from <peter.maydell@linaro.org>) id 1hLPZz-0000Qo-QF
+	for qemu-devel@nongnu.org; Tue, 30 Apr 2019 06:01:40 -0400
+Received: from mail-ot1-x343.google.com ([2607:f8b0:4864:20::343]:38316)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1hLPYt-00081h-QQ
-	for qemu-devel@nongnu.org; Tue, 30 Apr 2019 06:00:32 -0400
-Received: by mail-oi1-x22c.google.com with SMTP id l203so10766918oia.3
-	for <qemu-devel@nongnu.org>; Tue, 30 Apr 2019 03:00:31 -0700 (PDT)
+	id 1hLPZz-0000QG-LB
+	for qemu-devel@nongnu.org; Tue, 30 Apr 2019 06:01:39 -0400
+Received: by mail-ot1-x343.google.com with SMTP id t20so11370100otl.5
+	for <qemu-devel@nongnu.org>; Tue, 30 Apr 2019 03:01:39 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
 	h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-	:cc; bh=1amBxHWYeyjf2TTxMgKsHlw6zt8kc/0nGjMrnEpK1pc=;
-	b=kCoKr8FzTga0enzLVuPEc4qmlJZI4I7HbmLYZU/Vt04l03hOMmLEMWdUapB84Gl8TZ
-	T6Rh94SerDHKDD6CaOgBdwOR+SNWHrWWDoeiTSkSDk7CvKnuSG2oWwZklCwOM+iRRcTI
-	lBVYp4ipyN0pTGHXP7AuJU3mgGL6N0FABnio5d30NYqdzXopiz12XVqF4ZWszaYfQs0e
-	Pocqjo8/gbJvSqRJYhIFa97X6AmrbBgl8lcLzyYvWYwXrUnIhHYFtMnEYzPpZe8jXhth
-	s+ksCb6K/8qJiCwSjS9ws+//NXVsHLGLAmrovn7+sfHN8HFSfbHGN9MoohY/AuCIvmmO
-	3d+A==
+	:cc; bh=U+GwrWRHCBvmXJ+7cFR88HiAyigcUsYkiCeUHZnB+2g=;
+	b=Eg/EgRlJh6U0Zz/rpafHirX2V+2f9oL2LABNX3oP5XaTgsOIyEuulGLfnRPYaCwo7c
+	hv0D4B6UB3pv/yKTN1j5MaDQwM0qpSMgftAZpeSOqgStX2rk5ljzfTCN0qEKz0l7Y4Gg
+	AgElWGuAJ0dHjP/qgTvne2i4YT9/+oWfrqftqtK8HP5jw64NQocr3+0V0RJne+7zh2YK
+	PBMzFFPpHP2IQveiNSfREpabQ9G1HfYcJFB7TbeiUMfhxxNp5j2TmqwyCdMcIGA5sTkH
+	+8LiuQPenQ5OtVsGLIF0ly6Y/p11HLBkTkfu2qRjN8DoBRS5P5HmkXhPAHos7ssyS4PI
+	zK3A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
 	d=1e100.net; s=20161025;
 	h=x-gm-message-state:mime-version:references:in-reply-to:from:date
 	:message-id:subject:to:cc;
-	bh=1amBxHWYeyjf2TTxMgKsHlw6zt8kc/0nGjMrnEpK1pc=;
-	b=Onv6hKSmYnyUby6g/DQlcSv7FFU6SCf09Gfxj45/aL36ehgkiPwbii5JHd0goJihZU
-	rlhxCWb7ZisEZIt0HPACAjEpltK237XUs12zcuvCgDJToY6UE1W0l+Y8goW747YZKOnu
-	3pBkcOgPx3unktXQ940BvzdFGn+pb7NevvGBgbvq1ehf807c9grLIU2+n/Yqzdq7Mxje
-	IQK6uG9hP6UTDqnMO9PciZ/k/MOiAhnXIL21mhR4bmv3xnavcrsqPiWDXkImXDlBXLlC
-	1k883EOM+I79HA4qeJgg4CXJwyx3ec3CJqco59gHfRHee9Do8FD733LtMXr1zc/Ui9ma
-	oMOw==
-X-Gm-Message-State: APjAAAV2K7umI5+5PgK+PiB4xhFzt31XuEzbuO8rjmytXx0U7J7gr3W1
-	K23aKf2OSM6JyNhHmQGfXMxgnkAl0Dd8sUHxQQmU+A==
-X-Google-Smtp-Source: APXvYqwOW6IR0y4Rk9dweli57U3H3bR2PSVLL9hzukoZhiIcU9MC16R3nlMlxfo6dK21/wQBbb1RzWGBBRYXtnkXAWY=
-X-Received: by 2002:a05:6808:301:: with SMTP id
-	i1mr2366562oie.163.1556618430152; 
-	Tue, 30 Apr 2019 03:00:30 -0700 (PDT)
+	bh=U+GwrWRHCBvmXJ+7cFR88HiAyigcUsYkiCeUHZnB+2g=;
+	b=hnrAkKTFP1o5G8pvpXksVC88a5CdKdTb0n8MmREpNJOPw41ZODFCcrOilzlQ0XYd+C
+	NZ990PLNpBHetU1ZHCHQNZolUe1BPEE3qAMiinZ1zwvbPFa7Pe4Kv0q6c6lUYaNeUSxM
+	qjNzNjJ+urWYlknENZm6WQ/qRJ+ewNXjZxDwQz9skue0YYMa0OlxFYWEQ1xXw4xWEqZ+
+	j+jXpu5sGBOkjun4GnhwDfrXIh5vnP+0cXSf4AyF0Fi0UKT5eG42jkOHsSu73cDKErMz
+	J8ikBwisY4DbBCp+pdVWrQKNmymDxsAKpRqgkhwtpf6GL7LHZLG8xGvY8AgNKoYHJRgb
+	ACIQ==
+X-Gm-Message-State: APjAAAWGg7MyS1zjmQ5qdKAjjU9pH/JcJVuH9xFaF/a0a5Y83VU0HrIp
+	/NHXVlf5elxDhV9KYvIu0pNQj3dXk7v+jpzcXMzQBA==
+X-Google-Smtp-Source: APXvYqzxFNsow/8/OpiSF5Nfvq5dbleb7knD4R9acGbK+va5xU6xF1SwmF69wtY2vptW1332Wvcn+kr193K2JPjyMmA=
+X-Received: by 2002:a9d:61c6:: with SMTP id h6mr4329189otk.316.1556618498784; 
+	Tue, 30 Apr 2019 03:01:38 -0700 (PDT)
 MIME-Version: 1.0
-References: <20190429215821.10079-1-richard.henderson@linaro.org>
-In-Reply-To: <20190429215821.10079-1-richard.henderson@linaro.org>
+References: <20190403034358.21999-1-richard.henderson@linaro.org>
+	<20190403034358.21999-21-richard.henderson@linaro.org>
+In-Reply-To: <20190403034358.21999-21-richard.henderson@linaro.org>
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 30 Apr 2019 11:00:19 +0100
+Date: Tue, 30 Apr 2019 11:01:28 +0100
 Message-ID:
- <CAFEAcA9S21wftfXwLV5T3bX2p=R4RnMkpWvxqTA1su4QvoZb7g@mail.gmail.com>
+ <CAFEAcA9gdgx5Ri3OmahgT68ViTzxhDhE5VcmXH5rYjjnNAWSug@mail.gmail.com>
 To: Richard Henderson <richard.henderson@linaro.org>
 Content-Type: text/plain; charset="UTF-8"
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
 	recognized.
-X-Received-From: 2607:f8b0:4864:20::22c
-Subject: Re: [Qemu-devel] [PULL v2 0/2] target/hppa patch queue
+X-Received-From: 2607:f8b0:4864:20::343
+Subject: Re: [Qemu-devel] [PATCH 20/26] target/tilegx: Convert to
+ CPUClass::tlb_fill
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -92,34 +92,18 @@ Cc: QEMU Developers <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190430100019.QgmajAXr_6RqCrIDYaIOhNY5vh5pOe_8WO3xIlZiTUI@z>
+Message-ID: <20190430100128.Jn7XHb689hho-pF--4fKF6Ut6DgZ4WBWrC8AHJN8ItE@z>
 
-On Mon, 29 Apr 2019 at 22:58, Richard Henderson
+On Wed, 3 Apr 2019 at 05:03, Richard Henderson
 <richard.henderson@linaro.org> wrote:
 >
-> Rebased for v2.
->
-> The following changes since commit 82b2865e0d0ea4c1001e9e7ed7920bcc0458f6de:
->
->   Merge remote-tracking branch 'remotes/pmaydell/tags/pull-target-arm-20190429' into staging (2019-04-29 18:05:56 +0100)
->
-> are available in the Git repository at:
->
->   https://github.com/rth7680/qemu.git tags/pull-hppa-20190429
->
-> for you to fetch changes up to affdb7e6ba23f8160cb88e11f83db54a35f03d6b:
->
->   target/hppa: Always return EXCP_DMAR for protection id trap (2019-04-29 14:43:39 -0700)
->
-> ----------------------------------------------------------------
-> Implement fast tlb insert insns.
-> Fix data tlb exception for pa 1.1.
->
+> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+> ---
+>  target/tilegx/cpu.c | 11 +++++++----
+>  1 file changed, 7 insertions(+), 4 deletions(-)
 
-Applied, thanks.
+Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
 
-Please update the changelog at https://wiki.qemu.org/ChangeLog/4.1
-for any user-visible changes.
-
+thanks
 -- PMM
 
