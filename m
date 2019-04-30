@@ -1,26 +1,26 @@
-Received: from eggs.gnu.org ([209.51.188.92]:40891)
+Received: from eggs.gnu.org ([209.51.188.92]:41582)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1hLSFW-0002Uz-Gc
-	for qemu-devel@nongnu.org; Tue, 30 Apr 2019 08:52:43 -0400
+	(envelope-from <philmd@redhat.com>) id 1hLSJ0-0003lB-PH
+	for qemu-devel@nongnu.org; Tue, 30 Apr 2019 08:56:19 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1hLSFV-0005bt-CR
-	for qemu-devel@nongnu.org; Tue, 30 Apr 2019 08:52:42 -0400
-Received: from mail-ot1-x343.google.com ([2607:f8b0:4864:20::343]:37056)
+	(envelope-from <philmd@redhat.com>) id 1hLSIz-00084I-Kd
+	for qemu-devel@nongnu.org; Tue, 30 Apr 2019 08:56:18 -0400
+Received: from mail-wm1-f65.google.com ([209.85.128.65]:38484)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1hLSFV-0005bc-6y
-	for qemu-devel@nongnu.org; Tue, 30 Apr 2019 08:52:41 -0400
-Received: by mail-ot1-x343.google.com with SMTP id r20so10627824otg.4
-	for <qemu-devel@nongnu.org>; Tue, 30 Apr 2019 05:52:41 -0700 (PDT)
+	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1hLSIz-000838-Ev
+	for qemu-devel@nongnu.org; Tue, 30 Apr 2019 08:56:17 -0400
+Received: by mail-wm1-f65.google.com with SMTP id w15so3724307wmc.3
+	for <qemu-devel@nongnu.org>; Tue, 30 Apr 2019 05:56:16 -0700 (PDT)
+References: <20190430115404.18483-1-pl@kamp.de>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Message-ID: <1667a919-9d20-14ca-fd72-e4d3074fd4a0@redhat.com>
+Date: Tue, 30 Apr 2019 14:56:13 +0200
 MIME-Version: 1.0
-References: <20190223023957.18865-1-richard.henderson@linaro.org>
-	<20190223023957.18865-5-richard.henderson@linaro.org>
-In-Reply-To: <20190223023957.18865-5-richard.henderson@linaro.org>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 30 Apr 2019 13:52:29 +0100
-Message-ID: <CAFEAcA8ReupPYke_F48WhCHttGD7T-yV2GiwmGVCVAa+S+7tuA@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [RFC 4/6] target/arm: Define cortex-a75
+In-Reply-To: <20190430115404.18483-1-pl@kamp.de>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH RESEND] megasas: fix mapped frame size
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,72 +29,40 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Richard Henderson <richard.henderson@linaro.org>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>
+To: Peter Lieven <pl@kamp.de>, qemu-devel@nongnu.org
+Cc: fam@euphon.net, pbonzini@redhat.com, hare@suse.com, qemu-stable@nongnu.org
 
-On Sat, 23 Feb 2019 at 02:40, Richard Henderson
-<richard.henderson@linaro.org> wrote:
->
-> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+On 4/30/19 1:54 PM, Peter Lieven wrote:
+> the current value of 1024 bytes (16 * MFI_FRAME_SIZE) we map is not enough to hold
+> the maximum number of scatter gather elements we advertise. We actually need a
+> maximum of 2048 bytes. This is 128 max sg elements * 16 bytes (sizeof (union mfi_sgl)).
+
+Looking at megasas_map_sgl(), we indeed accept up to MEGASAS_MAX_SGE
+iov_count. Broken since ever then?
+
+Fixes: e8f943c3bcc2
+> 
+> Cc: qemu-stable@nongnu.org
+> Signed-off-by: Peter Lieven <pl@kamp.de>
+> Reviewed-by: Hannes Reinecke <hare@suse.com>
+
+Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+
 > ---
->  hw/arm/virt.c      |  1 +
->  target/arm/cpu64.c | 58 ++++++++++++++++++++++++++++++++++++++++++++++
->  2 files changed, 59 insertions(+)
->
-> diff --git a/hw/arm/virt.c b/hw/arm/virt.c
-> index c69a734878..06a155724c 100644
-> --- a/hw/arm/virt.c
-> +++ b/hw/arm/virt.c
-> @@ -174,6 +174,7 @@ static const char *valid_cpus[] = {
->      ARM_CPU_TYPE_NAME("cortex-a57"),
->      ARM_CPU_TYPE_NAME("cortex-a72"),
->      ARM_CPU_TYPE_NAME("cortex-a73"),
-> +    ARM_CPU_TYPE_NAME("cortex-a75"),
->      ARM_CPU_TYPE_NAME("host"),
->      ARM_CPU_TYPE_NAME("max"),
->  };
-> diff --git a/target/arm/cpu64.c b/target/arm/cpu64.c
-> index d34aa3af75..325e0ecf17 100644
-> --- a/target/arm/cpu64.c
-> +++ b/target/arm/cpu64.c
-> @@ -312,6 +312,63 @@ static void aarch64_a73_initfn(Object *obj)
->      define_arm_cp_regs(cpu, cortex_aXX_cp_reginfo);
->  }
->
-> +static void aarch64_a75_initfn(Object *obj)
-> +{
-> +    ARMCPU *cpu = ARM_CPU(obj);
->
-
-
-> +    cpu->reset_sctlr = 0x00c50838; /* ??? can't find it in a75 trm */
-
-There are a couple of things interacting here.
-Firstly, I think that architecturally the reset values
-(and how much is actually a defined value rather than
-UNKNOWN) can differ between SCTLR_EL1/2/3, plus the 32-bit
-vs 64-bit have different values for a few bits, but we try
-to just shoehorn everything into a single reset_sctlr field
-(see https://lists.gnu.org/archive/html/qemu-devel/2018-10/msg01559.html
-and surrounding messages in that thread for discussion).
-
-Secondly, for the cortex-a75,
-https://developer.arm.com/docs/100403/latest/part-b-register-descriptions/aarch64-system-registers/sctlr_el3-system-control-register-el3
-
-does specify the reset value for SCTLR_EL3:
-bit 25 is controlled by an external signal (aka a
-QOM property for us), bits 12 2 and 0 are specified
-to reset to 0, and every other bit resets to an
-UNKNOWN value. I would suggest that we make the
-RES0 bits 0, the RES1 bits 1, and use 0 for all the
-other UNKNOWN bits.
-
-SCTLR_EL1 is similar (if resetting into EL1)
-https://developer.arm.com/docs/100403/latest/part-b-register-descriptions/aarch64-system-registers/sctlr_el1-system-control-register-el1
-with the slight wrinkle that you need to also check
-the architectural spec for some bits, eg bit 0 has
-no reset value listed in the TRM but architecturally
-is required to reset to 0 if resetting into EL1.
-
-thanks
--- PMM
+>  hw/scsi/megasas.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+> diff --git a/hw/scsi/megasas.c b/hw/scsi/megasas.c
+> index a56317e026..5ad762de23 100644
+> --- a/hw/scsi/megasas.c
+> +++ b/hw/scsi/megasas.c
+> @@ -477,7 +477,7 @@ static MegasasCmd *megasas_enqueue_frame(MegasasState *s,
+>  {
+>      PCIDevice *pcid = PCI_DEVICE(s);
+>      MegasasCmd *cmd = NULL;
+> -    int frame_size = MFI_FRAME_SIZE * 16;
+> +    int frame_size = MEGASAS_MAX_SGE * sizeof(union mfi_sgl);
+>      hwaddr frame_size_p = frame_size;
+>      unsigned long index;
+>  
+> 
