@@ -1,26 +1,27 @@
 Received: from eggs.gnu.org ([209.51.188.92]:34750)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1hLPpW-0001Py-Ih
-	for qemu-devel@nongnu.org; Tue, 30 Apr 2019 06:17:43 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1hLPpi-0001Py-W4
+	for qemu-devel@nongnu.org; Tue, 30 Apr 2019 06:17:56 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1hLPn4-0000of-Hf
-	for qemu-devel@nongnu.org; Tue, 30 Apr 2019 06:15:11 -0400
-Received: from mail-wm1-f66.google.com ([209.85.128.66]:54168)
+	(envelope-from <peter.maydell@linaro.org>) id 1hLPjX-00076Q-It
+	for qemu-devel@nongnu.org; Tue, 30 Apr 2019 06:11:32 -0400
+Received: from mail-ot1-x343.google.com ([2607:f8b0:4864:20::343]:39098)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1hLPn4-0000mV-Au
-	for qemu-devel@nongnu.org; Tue, 30 Apr 2019 06:15:10 -0400
-Received: by mail-wm1-f66.google.com with SMTP id 26so3147055wmj.3
-	for <qemu-devel@nongnu.org>; Tue, 30 Apr 2019 03:15:10 -0700 (PDT)
-References: <20190428110258.86681-1-liboxuan@connect.hku.hk>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Message-ID: <a683a29f-ea7b-aaf9-258f-68f4ffcd9b96@redhat.com>
-Date: Tue, 30 Apr 2019 12:15:07 +0200
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1hLPjX-000765-DC
+	for qemu-devel@nongnu.org; Tue, 30 Apr 2019 06:11:31 -0400
+Received: by mail-ot1-x343.google.com with SMTP id o39so113584ota.6
+	for <qemu-devel@nongnu.org>; Tue, 30 Apr 2019 03:11:31 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20190428110258.86681-1-liboxuan@connect.hku.hk>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH] virtio-mmio: Always compile debug prints
+References: <20190403034358.21999-1-richard.henderson@linaro.org>
+	<20190403034358.21999-24-richard.henderson@linaro.org>
+In-Reply-To: <20190403034358.21999-24-richard.henderson@linaro.org>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Tue, 30 Apr 2019 11:11:19 +0100
+Message-ID: <CAFEAcA_FZHKXJHg4819JOZkwwhE44Vx874GKrnxRrOau1HhzRw@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH 23/26] target/xtensa: Convert to
+ CPUClass::tlb_fill
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,73 +30,78 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Boxuan Li <liboxuan@connect.hku.hk>, qemu-devel@nongnu.org
-Cc: qemu-trivial@nongnu.org
+To: Richard Henderson <richard.henderson@linaro.org>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, Max Filippov <jcmvbkbc@gmail.com>
 
-Hi Li,
-
-On 4/28/19 1:02 PM, Boxuan Li wrote:
-> Wrap printf calls inside debug macros (DPRINTF) in `if` statement, and
-> change output to stderr as well. This will ensure that printf function
-> will always compile and prevent bitrot of the format strings.
-
-There is an effort in QEMU to replace the obsolete DPRINTF() macros by
-trace events (which prevent format strings bitroting).
-
-You can read more about tracing in docs/devel/tracing.txt,
-
-and I recomment you to look at the following recent convertions in the
-repository history:
-
-commit 8d83cbf1015f547cd9336881e6b62ae2ca293849
-Author: Greg Kurz <groug@kaod.org>
-Date:   Fri Apr 5 10:05:24 2019 +0200
-
-    target/ppc/kvm: Convert DPRINTF to traces
-
-commit dd849ef2c9d57a329c6001c58dbdf49de712349c
-Author: Peter Maydell <peter.maydell@linaro.org>
-Date:   Thu Feb 21 18:17:46 2019 +0000
-
-    hw/timer/pl031: Convert to using trace events
-
-    Convert the debug printing in the PL031 device to use trace events,
-
-Regards,
-
-Phil.
-
-> Signed-off-by: Boxuan Li <liboxuan@connect.hku.hk>
+On Wed, 3 Apr 2019 at 05:00, Richard Henderson
+<richard.henderson@linaro.org> wrote:
+>
+> Cc: Max Filippov <jcmvbkbc@gmail.com>
+> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 > ---
->  hw/virtio/virtio-mmio.c | 17 ++++++++---------
->  1 file changed, 8 insertions(+), 9 deletions(-)
-> 
-> diff --git a/hw/virtio/virtio-mmio.c b/hw/virtio/virtio-mmio.c
-> index 5807aa87fe..693b3c9eb4 100644
-> --- a/hw/virtio/virtio-mmio.c
-> +++ b/hw/virtio/virtio-mmio.c
-> @@ -28,15 +28,14 @@
->  #include "hw/virtio/virtio-bus.h"
->  #include "qemu/error-report.h"
->  
-> -/* #define DEBUG_VIRTIO_MMIO */
+>  target/xtensa/cpu.h    |  5 +--
+>  target/xtensa/cpu.c    |  5 ++-
+>  target/xtensa/helper.c | 74 +++++++++++++++++++++---------------------
+>  3 files changed, 42 insertions(+), 42 deletions(-)
+
+> -#ifdef CONFIG_USER_ONLY
 > -
-> -#ifdef DEBUG_VIRTIO_MMIO
-> -
-> -#define DPRINTF(fmt, ...) \
-> -do { printf("virtio_mmio: " fmt , ## __VA_ARGS__); } while (0)
-> -#else
-> -#define DPRINTF(fmt, ...) do {} while (0)
-> -#endif
-> +#define DEBUG_VIRTIO_MMIO 0
+> -int xtensa_cpu_handle_mmu_fault(CPUState *cs, vaddr address, int size, int rw,
+> -                                int mmu_idx)
+> +bool xtensa_cpu_tlb_fill(CPUState *cs, vaddr address, int size,
+> +                         MMUAccessType access_type, int mmu_idx,
+> +                         bool probe, uintptr_t retaddr)
+>  {
+>      XtensaCPU *cpu = XTENSA_CPU(cs);
+>      CPUXtensaState *env = &cpu->env;
+> +    target_ulong vaddr = address;
+> +    int ret;
+>
+> -    qemu_log_mask(CPU_LOG_INT,
+> -                  "%s: rw = %d, address = 0x%08" VADDR_PRIx ", size = %d\n",
+> -                  __func__, rw, address, size);
+> -    env->sregs[EXCVADDR] = address;
+> -    env->sregs[EXCCAUSE] = rw ? STORE_PROHIBITED_CAUSE : LOAD_PROHIBITED_CAUSE;
+> -    cs->exception_index = EXC_USER;
+> -    return 1;
+
+Previously we set exception_index to EXC_USER...
+
+> +#ifdef CONFIG_USER_ONLY
+> +    ret = (access_type == MMU_DATA_STORE ?
+> +           STORE_PROHIBITED_CAUSE : LOAD_PROHIBITED_CAUSE);
+> +#else
+> +    uint32_t paddr;
+> +    uint32_t page_size;
+> +    unsigned access;
 > +
-> +#define DPRINTF(fmt, ...)                                            \
-> +    do {                                                             \
-> +        if (DEBUG_VIRTIO_MMIO) {                                     \
-> +            fprintf(stderr, "virtio_mmio: " fmt , ## __VA_ARGS__);   \
-> +        }                                                            \
-> +    } while (0)
->  
->  /* QOM macros */
->  /* virtio-mmio-bus */
-> 
+> +    ret = xtensa_get_physical_addr(env, true, vaddr, access_type, mmu_idx,
+> +                                   &paddr, &page_size, &access);
+> +
+> +    qemu_log_mask(CPU_LOG_MMU, "%s(%08x, %d, %d) -> %08x, ret = %d\n",
+> +                  __func__, vaddr, access_type, mmu_idx, paddr, ret);
+> +
+> +    if (ret == 0) {
+> +        tlb_set_page(cs, vaddr & TARGET_PAGE_MASK, paddr & TARGET_PAGE_MASK,
+> +                     access, mmu_idx, page_size);
+> +        return true;
+> +    }
+> +    if (probe) {
+> +        return false;
+> +    }
+> +#endif
+> +
+> +    cpu_restore_state(cs, retaddr, true);
+> +    HELPER(exception_cause_vaddr)(env, env->pc, ret, vaddr);
+
+...but now we'll set it to whatever exception_cause_vaddr does,
+which is something more complicated based on the state of
+env->sregs[PS].
+
+We'll also end up setting env->sregs[PS] bits and env->pc, which
+the old code did not. (In particular since we set the PS_EXCM bit,
+the second time we take an exception won't we then end up
+setting exception_index to EXC_DOUBLE, not EXC_USER ?)
+
+thanks
+-- PMM
