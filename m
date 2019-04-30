@@ -6,112 +6,89 @@ X-Spam-Status: No, score=-6.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0D314C43219
-	for <qemu-devel@archiver.kernel.org>; Tue, 30 Apr 2019 20:39:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4734BC43219
+	for <qemu-devel@archiver.kernel.org>; Tue, 30 Apr 2019 20:39:26 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id BD9252080C
-	for <qemu-devel@archiver.kernel.org>; Tue, 30 Apr 2019 20:39:21 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BD9252080C
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
+	by mail.kernel.org (Postfix) with ESMTPS id 073312080C
+	for <qemu-devel@archiver.kernel.org>; Tue, 30 Apr 2019 20:39:25 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 073312080C
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:53001 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:53003 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hLZX6-0003ZH-Qg
-	for qemu-devel@archiver.kernel.org; Tue, 30 Apr 2019 16:39:20 -0400
+	id 1hLZXB-0003ex-60
+	for qemu-devel@archiver.kernel.org; Tue, 30 Apr 2019 16:39:25 -0400
 Received: from eggs.gnu.org ([209.51.188.92]:52932)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1hLZVC-0002Jh-RO
-	for qemu-devel@nongnu.org; Tue, 30 Apr 2019 16:37:23 -0400
+	(envelope-from <eblake@redhat.com>) id 1hLZVG-0002Jh-Bi
+	for qemu-devel@nongnu.org; Tue, 30 Apr 2019 16:37:27 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1hLZUw-0003qI-QM
-	for qemu-devel@nongnu.org; Tue, 30 Apr 2019 16:37:07 -0400
-Received: from mout.kundenserver.de ([217.72.192.74]:34833)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <laurent@vivier.eu>)
-	id 1hLZUw-0003pp-8F; Tue, 30 Apr 2019 16:37:06 -0400
-Received: from [192.168.100.1] ([78.238.229.36]) by mrelayeu.kundenserver.de
-	(mreue108 [213.165.67.119]) with ESMTPSA (Nemesis) id
-	1MlNl5-1guBhT36dx-00lo0t; Tue, 30 Apr 2019 22:36:46 +0200
+	(envelope-from <eblake@redhat.com>) id 1hLZUt-0003ov-CT
+	for qemu-devel@nongnu.org; Tue, 30 Apr 2019 16:37:04 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:52858)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <eblake@redhat.com>)
+	id 1hLZUt-0003od-3m; Tue, 30 Apr 2019 16:37:03 -0400
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+	[10.5.11.14])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 037A03088B64;
+	Tue, 30 Apr 2019 20:37:02 +0000 (UTC)
+Received: from [10.3.116.15] (ovpn-116-15.phx2.redhat.com [10.3.116.15])
+	by smtp.corp.redhat.com (Postfix) with ESMTPS id C59806DA84;
+	Tue, 30 Apr 2019 20:36:58 +0000 (UTC)
 To: Alistair Francis <Alistair.Francis@wdc.com>,
 	"qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
 References: <cover.1556650594.git.alistair.francis@wdc.com>
-	<6bfa446eb7c351b5d867eb4158198231af724b11.1556650594.git.alistair.francis@wdc.com>
-From: Laurent Vivier <laurent@vivier.eu>
+	<f2aaec5b3c12a8512cd7078f3a5d1230906d80ea.1556650594.git.alistair.francis@wdc.com>
+From: Eric Blake <eblake@redhat.com>
 Openpgp: preference=signencrypt
-Autocrypt: addr=laurent@vivier.eu; prefer-encrypt=mutual; keydata=
-	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
-Message-ID: <d4dd0758-64af-e249-1f1b-b52af014b404@vivier.eu>
-Date: Tue, 30 Apr 2019 22:36:44 +0200
+Autocrypt: addr=eblake@redhat.com; keydata=
+	xsBNBEvHyWwBCACw7DwsQIh0kAbUXyqhfiKAKOTVu6OiMGffw2w90Ggrp4bdVKmCaEXlrVLU
+	xphBM8mb+wsFkU+pq9YR621WXo9REYVIl0FxKeQo9dyQBZ/XvmUMka4NOmHtFg74nvkpJFCD
+	TUNzmqfcjdKhfFV0d7P/ixKQeZr2WP1xMcjmAQY5YvQ2lUoHP43m8TtpB1LkjyYBCodd+LkV
+	GmCx2Bop1LSblbvbrOm2bKpZdBPjncRNob73eTpIXEutvEaHH72LzpzksfcKM+M18cyRH+nP
+	sAd98xIbVjm3Jm4k4d5oQyE2HwOur+trk2EcxTgdp17QapuWPwMfhaNq3runaX7x34zhABEB
+	AAHNHkVyaWMgQmxha2UgPGVibGFrZUByZWRoYXQuY29tPsLAegQTAQgAJAIbAwULCQgHAwUV
+	CgkICwUWAgMBAAIeAQIXgAUCS8fL9QIZAQAKCRCnoWtKJSdDahBHCACbl/5FGkUqJ89GAjeX
+	RjpAeJtdKhujir0iS4CMSIng7fCiGZ0fNJCpL5RpViSo03Q7l37ss+No+dJI8KtAp6ID+PMz
+	wTJe5Egtv/KGUKSDvOLYJ9WIIbftEObekP+GBpWP2+KbpADsc7EsNd70sYxExD3liwVJYqLc
+	Rw7so1PEIFp+Ni9A1DrBR5NaJBnno2PHzHPTS9nmZVYm/4I32qkLXOcdX0XElO8VPDoVobG6
+	gELf4v/vIImdmxLh/w5WctUpBhWWIfQDvSOW2VZDOihm7pzhQodr3QP/GDLfpK6wI7exeu3P
+	pfPtqwa06s1pae3ad13mZGzkBdNKs1HEm8x6zsBNBEvHyWwBCADGkMFzFjmmyqAEn5D+Mt4P
+	zPdO8NatsDw8Qit3Rmzu+kUygxyYbz52ZO40WUu7EgQ5kDTOeRPnTOd7awWDQcl1gGBXgrkR
+	pAlQ0l0ReO57Q0eglFydLMi5bkwYhfY+TwDPMh3aOP5qBXkm4qIYSsxb8A+i00P72AqFb9Q7
+	3weG/flxSPApLYQE5qWGSXjOkXJv42NGS6o6gd4RmD6Ap5e8ACo1lSMPfTpGzXlt4aRkBfvb
+	NCfNsQikLZzFYDLbQgKBA33BDeV6vNJ9Cj0SgEGOkYyed4I6AbU0kIy1hHAm1r6+sAnEdIKj
+	cHi3xWH/UPrZW5flM8Kqo14OTDkI9EtlABEBAAHCwF8EGAEIAAkFAkvHyWwCGwwACgkQp6Fr
+	SiUnQ2q03wgAmRFGDeXzc58NX0NrDijUu0zx3Lns/qZ9VrkSWbNZBFjpWKaeL1fdVeE4TDGm
+	I5mRRIsStjQzc2R9b+2VBUhlAqY1nAiBDv0Qnt+9cLiuEICeUwlyl42YdwpmY0ELcy5+u6wz
+	mK/jxrYOpzXKDwLq5k4X+hmGuSNWWAN3gHiJqmJZPkhFPUIozZUCeEc76pS/IUN72NfprZmF
+	Dp6/QDjDFtfS39bHSWXKVZUbqaMPqlj/z6Ugk027/3GUjHHr8WkeL1ezWepYDY7WSoXwfoAL
+	2UXYsMAr/uUncSKlfjvArhsej0S4zbqim2ZY6S8aRWw94J3bSvJR+Nwbs34GPTD4Pg==
+Organization: Red Hat, Inc.
+Message-ID: <6650d0b8-1c5c-a8ea-ef92-a69ad50f7d8b@redhat.com>
+Date: Tue, 30 Apr 2019 15:36:57 -0500
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
 	Thunderbird/60.6.1
 MIME-Version: 1.0
-In-Reply-To: <6bfa446eb7c351b5d867eb4158198231af724b11.1556650594.git.alistair.francis@wdc.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-X-Provags-ID: V03:K1:BHdSY5TgBdqLll+pRTQR/lnauQwyBlHiNbfGXIPtc6xRvhzTdZb
-	WlqGCbkoUma5AEiejapMzH/1mxp4TyV+JKjJjio336NXBKKvnK6yh0ksJrqLmzCGfgLH2o6
-	fmD1Mi9Ej8qSC8i8jwTxCWfxWgNMvL/M5MDxj8erEU+hqX1BUtQD2a2eGTtBtcYLvyxyNHr
-	trbxDh7dQnGTYX0F8VvuQ==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:WNPtVJ/m6D8=:EieDAfJLMuiNzYRJikwv6V
-	Ycel46fqyGMyBOa6p86dh7IHrYV61vs3ENX6vxc3YoBvMROpPcQrDx7uH9HpvUaYUUfVKCxo+
-	12lDQtFpLAe5aNmkOjPSExRitXuWGjzh37BPqM+O7Kb/91MQKFeWxYZ8H2bhKNP/LT2WOMYrp
-	gKD45NBDOseaxNjCWwoUAFBZj8umycXLAqzgFR6BINpIIrw0vLqoBkknmi3ASYQ+CJneWAVme
-	0IDj07AQguSvCclNXA4DBhFi6DVFklxrsiRoOL1YnTO5NIe5+ajQ1JvOJrzVyPgHTTU57ztks
-	Ow4wXHxdpZk2oJJ1opG3TsxdDlQtpVeLY//3oN9LZvUCaTewlxuPVrw972MAxqJzRdTzK5uYg
-	kbuJ3c1qYcF9bPWgoBCpAsRGFbRanjwlvrFTwmc3PmfT9PRbu+4/6hSspTwBCinquSm7K58OO
-	S+TcW00Ot8IHCCJJNXoK8dCB78Sf8EpdvhfkDW6mcNuheWQkxa/aBakS8DhsnpXg1F6dv/sxn
-	2CVzsTScC5UF+KEwaZMpBiic+AA6Q0uN89ToQpHWx/qqACo6VybXcRQUcjW0COQkeWb4UgLLg
-	yBOR2jCE58uogDzZgCAx3mop5SvbHhL4XM2EamsT2/XFmdGwdOsGm25tFnEaEw6J/whsXvSQV
-	MvxQlVtCW1pouYMS4SL4vAoQFm8c5XWMcT28SrGBKTSTuZU0DBZzSq/mTx1tPd5N1GLe4Eja0
-	niYBcmNyipSBqFjDwDKFlrj3z64lw0u6tKBCBNcuGR9e1VEE4iiVN3GYoBc=
+In-Reply-To: <f2aaec5b3c12a8512cd7078f3a5d1230906d80ea.1556650594.git.alistair.francis@wdc.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="ygvcqInAwtIo00JF4xF60WCVo3qUrdqID"
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+	(mx1.redhat.com [10.5.110.42]);
+	Tue, 30 Apr 2019 20:37:02 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 217.72.192.74
-Subject: Re: [Qemu-devel] [PATCH v1 5/5] linux-user/elfload: Fix GCC 9 build
- warnings
+X-Received-From: 209.132.183.28
+X-Content-Filtered-By: Mailman/MimeDel 2.1.21
+Subject: Re: [Qemu-devel] [PATCH v1 3/5] hw/usb/dev-mtp: Fix GCC 9 build
+ warning
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -126,59 +103,107 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 Cc: "qemu-trivial@nongnu.org" <qemu-trivial@nongnu.org>,
 	"alistair23@gmail.com" <alistair23@gmail.com>,
 	"riku.voipio@iki.fi" <riku.voipio@iki.fi>,
+	"laurent@vivier.eu" <laurent@vivier.eu>,
 	"kraxel@redhat.com" <kraxel@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190430203644.MX7ELFuevxD5oNegcqCG6rxIMx6eOLHmX9aTi-sdQ2Y@z>
+Message-ID: <20190430203657.7VX2wBR8R5wrSCLpX1C_6vLEmgljslfL03UfHki_if4@z>
 
-Le 30/04/2019 à 22:09, Alistair Francis a écrit :
-> Fix this warning when building with GCC9 on Fedora 30:
-> In function ‘strncpy’,
->     inlined from ‘fill_psinfo’ at /home/alistair/qemu/linux-user/elfload.c:3208:12,
->     inlined from ‘fill_note_info’ at /home/alistair/qemu/linux-user/elfload.c:3390:5,
->     inlined from ‘elf_core_dump’ at /home/alistair/qemu/linux-user/elfload.c:3539:9:
-> /usr/include/bits/string_fortified.h:106:10: error: ‘__builtin_strncpy’ specified bound 16 equals destination size [-Werror=stringop-truncation]
->   106 |   return __builtin___strncpy_chk (__dest, __src, __len, __bos (__dest));
->       |          ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-> 
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--ygvcqInAwtIo00JF4xF60WCVo3qUrdqID
+From: Eric Blake <eblake@redhat.com>
+To: Alistair Francis <Alistair.Francis@wdc.com>,
+ "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+Cc: "qemu-trivial@nongnu.org" <qemu-trivial@nongnu.org>,
+ "riku.voipio@iki.fi" <riku.voipio@iki.fi>,
+ "laurent@vivier.eu" <laurent@vivier.eu>,
+ "kraxel@redhat.com" <kraxel@redhat.com>,
+ "alistair23@gmail.com" <alistair23@gmail.com>
+Message-ID: <6650d0b8-1c5c-a8ea-ef92-a69ad50f7d8b@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v1 3/5] hw/usb/dev-mtp: Fix GCC 9 build
+ warning
+References: <cover.1556650594.git.alistair.francis@wdc.com>
+ <f2aaec5b3c12a8512cd7078f3a5d1230906d80ea.1556650594.git.alistair.francis@wdc.com>
+In-Reply-To: <f2aaec5b3c12a8512cd7078f3a5d1230906d80ea.1556650594.git.alistair.francis@wdc.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+
+On 4/30/19 3:09 PM, Alistair Francis wrote:
+> Fix this warning with GCC 9 on Fedora 30:
+> hw/usb/dev-mtp.c:1715:36: error: taking address of packed member of =E2=
+=80=98struct <anonymous>=E2=80=99 may result in an unaligned pointer valu=
+e [-Werror=3Daddress-of-packed-member]
+>  1715 |                             dataset->filename);
+>       |                             ~~~~~~~^~~~~~~~~~
+>=20
 > Signed-off-by: Alistair Francis <alistair.francis@wdc.com>
 > ---
->  linux-user/elfload.c | 4 ++--
->  1 file changed, 2 insertions(+), 2 deletions(-)
-> 
-> diff --git a/linux-user/elfload.c b/linux-user/elfload.c
-> index c1a26021f8..cbb7fc10fa 100644
-> --- a/linux-user/elfload.c
-> +++ b/linux-user/elfload.c
-> @@ -3206,7 +3206,7 @@ static int fill_psinfo(struct target_elf_prpsinfo *psinfo, const TaskState *ts)
+>  hw/usb/dev-mtp.c | 13 +++++++++++++
+>  1 file changed, 13 insertions(+)
+>=20
+> diff --git a/hw/usb/dev-mtp.c b/hw/usb/dev-mtp.c
+> index 99548b012d..6de85d99e6 100644
+> --- a/hw/usb/dev-mtp.c
+> +++ b/hw/usb/dev-mtp.c
+> @@ -1711,9 +1711,22 @@ static void usb_mtp_write_metadata(MTPState *s, =
+uint64_t dlen)
+>      assert(!s->write_pending);
+>      assert(p !=3D NULL);
+> =20
+> +/*
+> + * We are about to access a packed struct. We are confident that the p=
+ointer
+> + * address won't be unalligned, so we ignore GCC warnings.
 
-       /*
-        * Using strncpy here is fine: at max-length,
->       * this field is not NUL-terminated.
->       */>      (void) strncpy(psinfo->pr_fname, base_filename,
-> -                   sizeof(psinfo->pr_fname));
-> +                   sizeof(psinfo->pr_fname) - 1);
+unaligned
 
-Read the comment above :)
+Aren't there other potential proposed patches floating around for this
+issue that do not involve messing with pragmas?
 
->  
->      g_free(base_filename);
->      bswap_psinfo(psinfo);
-> @@ -3389,7 +3389,7 @@ static int fill_note_info(struct elf_note_info *info,
->                sizeof (*info->prstatus), info->prstatus);
->      fill_psinfo(info->psinfo, ts);
->      fill_note(&info->notes[1], "CORE", NT_PRPSINFO,
-> -              sizeof (*info->psinfo), info->psinfo);
-> +              sizeof(*info->psinfo) - 1, info->psinfo);
+> + */
+> +#if defined(CONFIG_PRAGMA_DIAGNOSTIC_AVAILABLE) && QEMU_GNUC_PREREQ(9,=
+ 0)
+> +#pragma GCC diagnostic push
+> +#pragma GCC diagnostic ignored "-Waddress-of-packed-member"
+> +#endif
+> +
+>      filename =3D utf16_to_str(MIN(dataset->length, filename_chars),
+>                              dataset->filename);
+> =20
+> +#if defined(CONFIG_PRAGMA_DIAGNOSTIC_AVAILABLE) && QEMU_GNUC_PREREQ(9,=
+ 0)
+> +#pragma GCC diagnostic pop
+> +#endif
+> +
+>      if (strchr(filename, '/')) {
+>          usb_mtp_queue_result(s, RES_PARAMETER_NOT_SUPPORTED, d->trans,=
 
-Why?
+>                               0, 0, 0, 0);
+>=20
 
->      fill_auxv_note(&info->notes[2], ts);
->      info->numnote = 3;
->  
-> 
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3226
+Virtualization:  qemu.org | libvirt.org
 
-Thanks,
-Laurent
+
+--ygvcqInAwtIo00JF4xF60WCVo3qUrdqID
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlzIsekACgkQp6FrSiUn
+Q2p4+wf/RgBhkn0HTl4PgCsaDlkgRu5sszuTi/mtEY7TfuV5l5gu8ez3f23n2/CW
+VWg09kOgTtH9vTvtPjpGE1QLJYIomZISIEW/d7rHoDHo8YuE8Kq7BmD5GFE+QTpl
+CvWs26jWs2wKUtHsZG4ZmTWc1JxQDm5GKEtAh2Sf8/DglaGAyMIFn/AYrGk7+0Yu
+NmGXrVeYyxJeG+zBndyFF/A1X7i4DqkZgaLFXe+dZLTTCXeIkZh+ep00237SfMZC
+anT99KaaD/yxqTplZlt2iFz4CDz6+lQfFx6ByelRSnzLmLohZmMGkw9tSikddGv+
+rKdUqiR9uLSpxPWFkEe4C8XShC0Mrg==
+=Z5LF
+-----END PGP SIGNATURE-----
+
+--ygvcqInAwtIo00JF4xF60WCVo3qUrdqID--
 
