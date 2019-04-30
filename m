@@ -1,26 +1,26 @@
-Received: from eggs.gnu.org ([209.51.188.92]:43795)
+Received: from eggs.gnu.org ([209.51.188.92]:43918)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1hLQZJ-0003q8-G6
-	for qemu-devel@nongnu.org; Tue, 30 Apr 2019 07:05:02 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1hLQZm-000478-9G
+	for qemu-devel@nongnu.org; Tue, 30 Apr 2019 07:05:31 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1hLQZH-0000B9-J6
-	for qemu-devel@nongnu.org; Tue, 30 Apr 2019 07:05:00 -0400
-Received: from mail-oi1-x244.google.com ([2607:f8b0:4864:20::244]:43239)
+	(envelope-from <peter.maydell@linaro.org>) id 1hLQSN-00034v-4N
+	for qemu-devel@nongnu.org; Tue, 30 Apr 2019 06:57:52 -0400
+Received: from mail-ot1-x344.google.com ([2607:f8b0:4864:20::344]:34550)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1hLQZH-00009h-13
-	for qemu-devel@nongnu.org; Tue, 30 Apr 2019 07:04:59 -0400
-Received: by mail-oi1-x244.google.com with SMTP id t81so10850720oig.10
-	for <qemu-devel@nongnu.org>; Tue, 30 Apr 2019 04:04:58 -0700 (PDT)
+	id 1hLQSM-00034Z-UV
+	for qemu-devel@nongnu.org; Tue, 30 Apr 2019 06:57:51 -0400
+Received: by mail-ot1-x344.google.com with SMTP id n15so5413775ota.1
+	for <qemu-devel@nongnu.org>; Tue, 30 Apr 2019 03:57:50 -0700 (PDT)
 MIME-Version: 1.0
 References: <20190403034358.21999-1-richard.henderson@linaro.org>
-	<20190403034358.21999-11-richard.henderson@linaro.org>
-In-Reply-To: <20190403034358.21999-11-richard.henderson@linaro.org>
+	<20190403034358.21999-12-richard.henderson@linaro.org>
+In-Reply-To: <20190403034358.21999-12-richard.henderson@linaro.org>
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 30 Apr 2019 12:04:46 +0100
-Message-ID: <CAFEAcA8RQt83x008=+6J2ijUomL=7Ou3qF-=2sWmp9-K57sS-w@mail.gmail.com>
+Date: Tue, 30 Apr 2019 11:57:39 +0100
+Message-ID: <CAFEAcA8ezBN_=9UCfnvsYDfGCK7w1SL3Rpg0wg=6V5-deMuJUA@mail.gmail.com>
 Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH 10/26] target/microblaze: Convert to
+Subject: Re: [Qemu-devel] [PATCH 11/26] target/mips: Convert to
  CPUClass::tlb_fill
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
@@ -31,96 +31,167 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: Richard Henderson <richard.henderson@linaro.org>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, "Edgar E . Iglesias" <edgar.iglesias@gmail.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, Aleksandar Rikalo <arikalo@wavecomp.com>, Aleksandar Markovic <amarkovic@wavecomp.com>
 
-On Wed, 3 Apr 2019 at 04:52, Richard Henderson
+On Wed, 3 Apr 2019 at 04:58, Richard Henderson
 <richard.henderson@linaro.org> wrote:
 >
-> Cc: Edgar E. Iglesias <edgar.iglesias@gmail.com>
+> Note that env->active_tc.PC is removed from the qemu_log as that value
+> is garbage.  The PC isn't recovered until cpu_restore_state, called from
+> cpu_loop_exit_restore, called from do_raise_exception_err.
+>
+> Cc: Aleksandar Markovic <amarkovic@wavecomp.com>
+> Cc: Aleksandar Rikalo <arikalo@wavecomp.com>
 > Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
-
-
-
-> -#if defined(CONFIG_USER_ONLY)
-> +bool mb_cpu_tlb_fill(CPUState *cs, vaddr address, int size,
-> +                     MMUAccessType access_type, int mmu_idx,
-> +                     bool probe, uintptr_t retaddr)
-> +{
-> +    MicroBlazeCPU *cpu = MICROBLAZE_CPU(cs);
-> +    CPUMBState *env = &cpu->env;
+> ---
+>  target/mips/internal.h  |   5 +-
+>  target/mips/cpu.c       |   5 +-
+>  target/mips/helper.c    | 115 +++++++++++++++++++---------------------
+>  target/mips/op_helper.c |  15 ------
+>  4 files changed, 61 insertions(+), 79 deletions(-)
+>
+> diff --git a/target/mips/internal.h b/target/mips/internal.h
+> index 8f6fc919d5..5ec9d0bd65 100644
+> --- a/target/mips/internal.h
+> +++ b/target/mips/internal.h
+> @@ -203,8 +203,9 @@ void cpu_mips_start_count(CPUMIPSState *env);
+>  void cpu_mips_stop_count(CPUMIPSState *env);
+>
+>  /* helper.c */
+> -int mips_cpu_handle_mmu_fault(CPUState *cpu, vaddr address, int size, int rw,
+> -                              int mmu_idx);
+> +bool mips_cpu_tlb_fill(CPUState *cs, vaddr address, int size,
+> +                       MMUAccessType access_type, int mmu_idx,
+> +                       bool probe, uintptr_t retaddr);
+>
+>  /* op_helper.c */
+>  uint32_t float_class_s(uint32_t arg, float_status *fst);
+> diff --git a/target/mips/cpu.c b/target/mips/cpu.c
+> index e217fb3e36..ebdb834b97 100644
+> --- a/target/mips/cpu.c
+> +++ b/target/mips/cpu.c
+> @@ -197,9 +197,8 @@ static void mips_cpu_class_init(ObjectClass *c, void *data)
+>      cc->synchronize_from_tb = mips_cpu_synchronize_from_tb;
+>      cc->gdb_read_register = mips_cpu_gdb_read_register;
+>      cc->gdb_write_register = mips_cpu_gdb_write_register;
+> -#ifdef CONFIG_USER_ONLY
+> -    cc->handle_mmu_fault = mips_cpu_handle_mmu_fault;
+> -#else
+> +    cc->tlb_fill = mips_cpu_tlb_fill;
+> +#ifndef CONFIG_USER_ONLY
+>      cc->do_unassigned_access = mips_cpu_unassigned_access;
+>      cc->do_unaligned_access = mips_cpu_do_unaligned_access;
+>      cc->get_phys_page_debug = mips_cpu_get_phys_page_debug;
+> diff --git a/target/mips/helper.c b/target/mips/helper.c
+> index c44cdca3b5..7fe0ba4754 100644
+> --- a/target/mips/helper.c
+> +++ b/target/mips/helper.c
+> @@ -874,85 +874,82 @@ refill:
+>  #endif
+>  #endif
+>
+> -int mips_cpu_handle_mmu_fault(CPUState *cs, vaddr address, int size, int rw,
+> -                              int mmu_idx)
+> +bool mips_cpu_tlb_fill(CPUState *cs, vaddr address, int size,
+> +                       MMUAccessType access_type, int mmu_idx,
+> +                       bool probe, uintptr_t retaddr)
+>  {
+>      MIPSCPU *cpu = MIPS_CPU(cs);
+>      CPUMIPSState *env = &cpu->env;
+> -#if !defined(CONFIG_USER_ONLY)
+> +    int ret = TLBRET_NOMATCH;
 > +
 > +#ifndef CONFIG_USER_ONLY
-> +    uint32_t vaddr, paddr;
-> +    struct microblaze_mmu_lookup lu;
-> +    unsigned int hit;
-> +    int prot;
-> +
-> +    if (mmu_idx == MMU_NOMMU_IDX) {
-> +        /* MMU disabled or not available.  */
-> +        address &= TARGET_PAGE_MASK;
-> +        prot = PAGE_BITS;
-> +        tlb_set_page(cs, address, address, prot, mmu_idx, TARGET_PAGE_SIZE);
+>      hwaddr physical;
+>      int prot;
+> -    int access_type;
+> -#endif
+> -    int ret = 0;
+> +    int mips_access_type = ACCESS_INT;
+>
+> -#if 0
+> -    log_cpu_state(cs, 0);
+> -#endif
+>      qemu_log_mask(CPU_LOG_MMU,
+> -              "%s pc " TARGET_FMT_lx " ad %" VADDR_PRIx " rw %d mmu_idx %d\n",
+> -              __func__, env->active_tc.PC, address, rw, mmu_idx);
+> +                  "%s ad %" VADDR_PRIx " rw %d mmu_idx %d\n",
+> +                  __func__, address, access_type, mmu_idx);
+>
+>      /* data access */
+> -#if !defined(CONFIG_USER_ONLY)
+>      /* XXX: put correct access by using cpu_restore_state() correctly */
+> -    access_type = ACCESS_INT;
+> -    ret = get_physical_address(env, &physical, &prot,
+> -                               address, rw, access_type, mmu_idx);
+> -    switch (ret) {
+> -    case TLBRET_MATCH:
+> +    ret = get_physical_address(env, &physical, &prot, address,
+> +                               access_type, mips_access_type, mmu_idx);
+> +    if (ret == TLBRET_MATCH) {
+>          qemu_log_mask(CPU_LOG_MMU,
+>                        "%s address=%" VADDR_PRIx " physical " TARGET_FMT_plx
+>                        " prot %d\n", __func__, address, physical, prot);
+> -        break;
+> -    default:
+> -        qemu_log_mask(CPU_LOG_MMU,
+> -                      "%s address=%" VADDR_PRIx " ret %d\n", __func__, address,
+> -                      ret);
+> -        break;
+> -    }
+> -    if (ret == TLBRET_MATCH) {
+>          tlb_set_page(cs, address & TARGET_PAGE_MASK,
+>                       physical & TARGET_PAGE_MASK, prot | PAGE_EXEC,
+>                       mmu_idx, TARGET_PAGE_SIZE);
+> -        ret = 0;
+> -    } else if (ret < 0)
+> -#endif
+> -    {
+> -#if !defined(CONFIG_USER_ONLY)
+> -#if !defined(TARGET_MIPS64)
+> -        if ((ret == TLBRET_NOMATCH) && (env->tlb->nb_tlb > 1)) {
+> -            /*
+> -             * Memory reads during hardware page table walking are performed
+> -             * as if they were kernel-mode load instructions.
+> -             */
+> -            int mode = (env->hflags & MIPS_HFLAG_KSU);
+> -            bool ret_walker;
+> -            env->hflags &= ~MIPS_HFLAG_KSU;
+> -            ret_walker = page_table_walk_refill(env, address, rw, mmu_idx);
+> -            env->hflags |= mode;
+> -            if (ret_walker) {
+> -                ret = get_physical_address(env, &physical, &prot,
+> -                                           address, rw, access_type, mmu_idx);
+> -                if (ret == TLBRET_MATCH) {
+> -                    tlb_set_page(cs, address & TARGET_PAGE_MASK,
+> -                            physical & TARGET_PAGE_MASK, prot | PAGE_EXEC,
+> -                            mmu_idx, TARGET_PAGE_SIZE);
+> -                    ret = 0;
+> -                    return ret;
+> -                }
+> -            }
+> -        }
+> -#endif
+> -#endif
+> -        raise_mmu_exception(env, address, rw, ret);
+> -        ret = 1;
 > +        return true;
-> +    }
-> +
-> +    hit = mmu_translate(&env->mmu, &lu, address, access_type, mmu_idx);
-> +    if (likely(hit)) {
-> +        vaddr = address & TARGET_PAGE_MASK;
-> +        paddr = lu.paddr + vaddr - lu.vaddr;
-> +
-> +        qemu_log_mask(CPU_LOG_MMU, "MMU map mmu=%d v=%x p=%x prot=%x\n",
-> +                      mmu_idx, vaddr, paddr, lu.prot);
-> +        tlb_set_page(cs, vaddr, paddr, lu.prot, mmu_idx, TARGET_PAGE_SIZE);
-> +        return true;
-> +    }
-> +
-> +    /* TLB miss.  */
-> +    if (probe) {
-> +        return false;
-> +    }
-> +
-> +    qemu_log_mask(CPU_LOG_MMU, "mmu=%d miss v=%" VADDR_PRIx "\n",
-> +                  mmu_idx, address);
-> +
-> +    switch (lu.err) {
-> +    case ERR_PROT:
-> +        env->sregs[SR_ESR] = access_type == MMU_INST_FETCH ? 17 : 16;
-> +        env->sregs[SR_ESR] |= (access_type == MMU_DATA_STORE) << 10;
-> +        break;
-> +    case ERR_MISS:
-> +        env->sregs[SR_ESR] = access_type == MMU_INST_FETCH ? 19 : 18;
-> +        env->sregs[SR_ESR] |= (access_type == MMU_DATA_STORE) << 10;
-> +        break;
-> +    default:
-> +        g_assert_not_reached();
-> +    }
-> +
-> +    if (cs->exception_index == EXCP_MMU) {
-> +        cpu_abort(cs, "recursive faults\n");
-> +    }
-> +#endif
-> +
-> +    env->sregs[SR_EAR] = address;
-> +    cs->exception_index = EXCP_MMU;
-> +    cpu_loop_exit_restore(cs, retaddr);
-> +}
+>      }
+>
+> -    return ret;
+> +    qemu_log_mask(CPU_LOG_MMU, "%s address=%" VADDR_PRIx " ret %d\n",
+> +                  __func__, address, ret);
 
-
-> -int mb_cpu_handle_mmu_fault(CPUState *cs, vaddr address, int size, int rw,
-> -                            int mmu_idx)
-> -{
-> -    cs->exception_index = 0xaa;
-> -    cpu_dump_state(cs, stderr, fprintf, 0);
-> -    return 1;
-> -}
-> -
-> -#else /* !CONFIG_USER_ONLY */
-
-For the user-mode case we used to set cs->exception_state to 0xaa,
-but now we set it to EXCP_MMU. We also set SR_EAR which we didn't
-previously.
-
-Otherwise the refactoring looks ok.
+I think this patch is right, but it was too awkward to
+review because it's got a bunch of other changes mixed
+up with the refactoring. For instance the old code
+has a fairly straightforward "switch (ret) { ... }"
+where it does a qemu_log_mask() either for the
+TLBRET_MATCH case or for the failure case, whereas I
+think this code now prints the failure case logging
+of 'ret' in both cases. If you want to change the logging
+can you do that as a separate patch so that the refactor
+patch is a no-behaviour-change one ?
 
 thanks
 -- PMM
