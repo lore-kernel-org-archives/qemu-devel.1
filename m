@@ -1,27 +1,19 @@
-Received: from eggs.gnu.org ([209.51.188.92]:49656)
+Received: from eggs.gnu.org ([209.51.188.92]:50743)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1hLUwJ-0000zB-SN
-	for qemu-devel@nongnu.org; Tue, 30 Apr 2019 11:45:05 -0400
+	(envelope-from <kwolf@redhat.com>) id 1hLUzd-0003s3-KL
+	for qemu-devel@nongnu.org; Tue, 30 Apr 2019 11:48:30 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1hLUwI-00033O-At
-	for qemu-devel@nongnu.org; Tue, 30 Apr 2019 11:45:03 -0400
-Received: from mail-oi1-x244.google.com ([2607:f8b0:4864:20::244]:34604)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1hLUwI-00032k-3a
-	for qemu-devel@nongnu.org; Tue, 30 Apr 2019 11:45:02 -0400
-Received: by mail-oi1-x244.google.com with SMTP id v10so11650482oib.1
-	for <qemu-devel@nongnu.org>; Tue, 30 Apr 2019 08:45:01 -0700 (PDT)
+	(envelope-from <kwolf@redhat.com>) id 1hLUzb-0005S7-FY
+	for qemu-devel@nongnu.org; Tue, 30 Apr 2019 11:48:29 -0400
+From: Kevin Wolf <kwolf@redhat.com>
+Date: Tue, 30 Apr 2019 17:42:19 +0200
+Message-Id: <20190430154244.30083-3-kwolf@redhat.com>
+In-Reply-To: <20190430154244.30083-1-kwolf@redhat.com>
+References: <20190430154244.30083-1-kwolf@redhat.com>
 MIME-Version: 1.0
-References: <cover.1556515687.git.alistair@alistair23.me>
-	<PSXP216MB02776A12DAB1C4523F67837EDD390@PSXP216MB0277.KORP216.PROD.OUTLOOK.COM>
-In-Reply-To: <PSXP216MB02776A12DAB1C4523F67837EDD390@PSXP216MB0277.KORP216.PROD.OUTLOOK.COM>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 30 Apr 2019 16:44:49 +0100
-Message-ID: <CAFEAcA_GZKA4STSLGaOqPYBF7Fohj4+8Zf1MqqLmyB76imCtJA@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH v1 2/5] hw/misc: Add the STM32F4xx
- Sysconfig device
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PULL 02/27] block: Fix AioContext switch for bs->drv
+ == NULL
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,296 +22,132 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alistair Francis <alistair@alistair23.me>
-Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "alistair23@gmail.com" <alistair23@gmail.com>
+To: qemu-block@nongnu.org
+Cc: kwolf@redhat.com, qemu-devel@nongnu.org
 
-On Mon, 29 Apr 2019 at 06:35, Alistair Francis <alistair@alistair23.me> wrote:
->
-> Signed-off-by: Alistair Francis <alistair@alistair23.me>
-> ---
->  default-configs/arm-softmmu.mak    |   1 +
->  hw/misc/Kconfig                    |   3 +
->  hw/misc/Makefile.objs              |   1 +
->  hw/misc/stm32f4xx_syscfg.c         | 275 +++++++++++++++++++++++++++++
->  include/hw/misc/stm32f4xx_syscfg.h |  62 +++++++
->  5 files changed, 342 insertions(+)
->  create mode 100644 hw/misc/stm32f4xx_syscfg.c
->  create mode 100644 include/hw/misc/stm32f4xx_syscfg.h
+Even for block nodes with bs->drv =3D=3D NULL, we can't just ignore a
+bdrv_set_aio_context() call. Leaving the node in its old context can
+mean that it's still in an iothread context in bdrv_close_all() during
+shutdown, resulting in an attempted unlock of the AioContext lock which
+we don't hold.
 
-> +
-> +#include "qemu/osdep.h"
-> +#include "qemu/log.h"
-> +#include "hw/misc/stm32f4xx_syscfg.h"
-> +
-> +#ifndef STM_SYSCFG_ERR_DEBUG
-> +#define STM_SYSCFG_ERR_DEBUG 0
-> +#endif
-> +
-> +#define DB_PRINT_L(lvl, fmt, args...) do { \
-> +    if (STM_SYSCFG_ERR_DEBUG >= lvl) { \
-> +        qemu_log("%s: " fmt, __func__, ## args); \
-> +    } \
-> +} while (0)
-> +
-> +#define DB_PRINT(fmt, args...) DB_PRINT_L(1, fmt, ## args)
+This is an example stack trace of a related crash:
 
-I think we should prefer to use a tracepoint rather than qemu_log here.
+ #0  0x00007ffff59da57f in raise () at /lib64/libc.so.6
+ #1  0x00007ffff59c4895 in abort () at /lib64/libc.so.6
+ #2  0x0000555555b97b1e in error_exit (err=3D<optimized out>, msg=3Dmsg@e=
+ntry=3D0x555555d386d0 <__func__.19059> "qemu_mutex_unlock_impl") at util/=
+qemu-thread-posix.c:36
+ #3  0x0000555555b97f7f in qemu_mutex_unlock_impl (mutex=3Dmutex@entry=3D=
+0x5555568002f0, file=3Dfile@entry=3D0x555555d378df "util/async.c", line=3D=
+line@entry=3D507) at util/qemu-thread-posix.c:97
+ #4  0x0000555555b92f55 in aio_context_release (ctx=3Dctx@entry=3D0x55555=
+6800290) at util/async.c:507
+ #5  0x0000555555b05cf8 in bdrv_prwv_co (child=3Dchild@entry=3D0x7fffc800=
+12f0, offset=3Doffset@entry=3D131072, qiov=3Dqiov@entry=3D0x7fffffffd4f0,=
+ is_write=3Dis_write@entry=3Dtrue, flags=3Dflags@entry=3D0)
+         at block/io.c:833
+ #6  0x0000555555b060a9 in bdrv_pwritev (qiov=3D0x7fffffffd4f0, offset=3D=
+131072, child=3D0x7fffc80012f0) at block/io.c:990
+ #7  0x0000555555b060a9 in bdrv_pwrite (child=3D0x7fffc80012f0, offset=3D=
+131072, buf=3D<optimized out>, bytes=3D<optimized out>) at block/io.c:990
+ #8  0x0000555555ae172b in qcow2_cache_entry_flush (bs=3Dbs@entry=3D0x555=
+556810680, c=3Dc@entry=3D0x5555568cc740, i=3Di@entry=3D0) at block/qcow2-=
+cache.c:51
+ #9  0x0000555555ae18dd in qcow2_cache_write (bs=3Dbs@entry=3D0x555556810=
+680, c=3D0x5555568cc740) at block/qcow2-cache.c:248
+ #10 0x0000555555ae15de in qcow2_cache_flush (bs=3D0x555556810680, c=3D<o=
+ptimized out>) at block/qcow2-cache.c:259
+ #11 0x0000555555ae16b1 in qcow2_cache_flush_dependency (c=3D0x5555568a17=
+00, c=3D0x5555568a1700, bs=3D0x555556810680) at block/qcow2-cache.c:194
+ #12 0x0000555555ae16b1 in qcow2_cache_entry_flush (bs=3Dbs@entry=3D0x555=
+556810680, c=3Dc@entry=3D0x5555568a1700, i=3Di@entry=3D0) at block/qcow2-=
+cache.c:194
+ #13 0x0000555555ae18dd in qcow2_cache_write (bs=3Dbs@entry=3D0x555556810=
+680, c=3D0x5555568a1700) at block/qcow2-cache.c:248
+ #14 0x0000555555ae15de in qcow2_cache_flush (bs=3Dbs@entry=3D0x555556810=
+680, c=3D<optimized out>) at block/qcow2-cache.c:259
+ #15 0x0000555555ad242c in qcow2_inactivate (bs=3Dbs@entry=3D0x5555568106=
+80) at block/qcow2.c:2124
+ #16 0x0000555555ad2590 in qcow2_close (bs=3D0x555556810680) at block/qco=
+w2.c:2153
+ #17 0x0000555555ab0c62 in bdrv_close (bs=3D0x555556810680) at block.c:33=
+58
+ #18 0x0000555555ab0c62 in bdrv_delete (bs=3D0x555556810680) at block.c:3=
+542
+ #19 0x0000555555ab0c62 in bdrv_unref (bs=3D0x555556810680) at block.c:45=
+98
+ #20 0x0000555555af4d72 in blk_remove_bs (blk=3Dblk@entry=3D0x5555568103d=
+0) at block/block-backend.c:785
+ #21 0x0000555555af4dbb in blk_remove_all_bs () at block/block-backend.c:=
+483
+ #22 0x0000555555aae02f in bdrv_close_all () at block.c:3412
+ #23 0x00005555557f9796 in main (argc=3D<optimized out>, argv=3D<optimize=
+d out>, envp=3D<optimized out>) at vl.c:4776
 
-> +
-> +static void stm32f4xx_syscfg_reset(DeviceState *dev)
-> +{
-> +    STM32F4xxSyscfgState *s = STM32F4XX_SYSCFG(dev);
-> +
-> +    s->syscfg_memrmp = 0x00000000;
-> +    s->syscfg_pmc = 0x00000000;
-> +    s->syscfg_exticr1 = 0x00000000;
-> +    s->syscfg_exticr2 = 0x00000000;
-> +    s->syscfg_exticr3 = 0x00000000;
-> +    s->syscfg_exticr4 = 0x00000000;
-> +    s->syscfg_cmpcr = 0x00000000;
-> +}
-> +
-> +static void stm32f4xx_syscfg_set_irq(void *opaque, int irq, int level)
-> +{
-> +    STM32F4xxSyscfgState *s = opaque;
-> +    uint8_t config;
-> +
-> +    DB_PRINT("Interupt: GPIO: %d, Line: %d; Level: %d\n", irq / 16,
-> +             irq % 16, level);
-> +
-> +    config = irq / 16;
-> +
-> +    switch (irq % 16) {
-> +    case 0:
-> +        if ((s->syscfg_exticr1 & 0xF) == config) {
-> +            qemu_set_irq(s->gpio_out[0], level);
-> +            DB_PRINT("Pulse EXTI: 0\n");
-> +        }
-> +        break;
-> +    case 1:
-> +        if (((s->syscfg_exticr1 & 0xF0) >> 4) == config) {
-> +            qemu_set_irq(s->gpio_out[1], level);
-> +            DB_PRINT("Pulse EXTI: 1\n");
-> +        }
-> +        break;
+The reproducer I used is a qcow2 image on gluster volume, where the
+virtual disk size (4 GB) is larger than the gluster volume size (64M),
+so we can easily trigger an ENOSPC. This backend is assigned to a
+virtio-blk device using an iothread, and then from the guest a
+'dd if=3D/dev/zero of=3D/dev/vda bs=3D1G count=3D1' causes the VM to stop
+because of an I/O error. qemu_gluster_co_flush_to_disk() sets
+bs->drv =3D NULL on error, so when virtio-blk stops the dataplane, the
+block nodes stay in the iothread AioContext. A 'quit' monitor command
+issued from this paused state crashes the process.
 
-This seems all rather repetitive. If you use an
-array syscfg_exticr[] rather than 4 separate fields you
-can replace this whole switch with something like:
+Fixes: https://bugzilla.redhat.com/show_bug.cgi?id=3D1631227
+Cc: qemu-stable@nongnu.org
+Signed-off-by: Kevin Wolf <kwolf@redhat.com>
+Reviewed-by: Eric Blake <eblake@redhat.com>
+Reviewed-by: Max Reitz <mreitz@redhat.com>
+Reviewed-by: Stefano Garzarella <sgarzare@redhat.com>
+---
+ block.c | 12 ++----------
+ 1 file changed, 2 insertions(+), 10 deletions(-)
 
-    int icrreg = irq / 4;
-    int startbit = (irq & 3) * 4;
-    if (extract32(s->syscfg_exticr[icrreg], startbit, 4) == config) {
-       qemu_set_irq(s->gpio_out[irq], level);
-       DB_PRINT("Pulse EXTI: %d\n", irq);
-    }
-
-> +    case 2:
-> +        if (((s->syscfg_exticr1 & 0xF00) >> 8) == config) {
-> +            qemu_set_irq(s->gpio_out[2], level);
-> +            DB_PRINT("Pulse EXTI: 2\n");
-> +        }
-> +        break;
-> +    case 3:
-> +        if (((s->syscfg_exticr1 & 0xF000) >> 12) == config) {
-> +            qemu_set_irq(s->gpio_out[3], level);
-> +            DB_PRINT("Pulse EXTI: 3\n");
-> +        }
-> +        break;
-> +    case 4:
-> +        if ((s->syscfg_exticr2 & 0xF) == config) {
-> +            qemu_set_irq(s->gpio_out[4], level);
-> +            DB_PRINT("Pulse EXTI: 4\n");
-> +        }
-> +        break;
-> +    case 5:
-> +        if (((s->syscfg_exticr2 & 0xF0) >> 4) == config) {
-> +            qemu_set_irq(s->gpio_out[5], level);
-> +            DB_PRINT("Pulse EXTI: 5\n");
-> +        }
-> +        break;
-> +    case 6:
-> +        if (((s->syscfg_exticr2 & 0xF00) >> 8) == config) {
-> +            qemu_set_irq(s->gpio_out[6], level);
-> +            DB_PRINT("Pulse EXTI: 6\n");
-> +        }
-> +        break;
-> +    case 7:
-> +        if (((s->syscfg_exticr2 & 0xF000) >> 12) == config) {
-> +            qemu_set_irq(s->gpio_out[7], level);
-> +            DB_PRINT("Pulse EXTI: 7\n");
-> +        }
-> +        break;
-> +    case 8:
-> +        if ((s->syscfg_exticr3 & 0xF) == config) {
-> +            qemu_set_irq(s->gpio_out[8], level);
-> +            DB_PRINT("Pulse EXTI: 8\n");
-> +        }
-> +        break;
-> +    case 9:
-> +        if (((s->syscfg_exticr3 & 0xF0) >> 4) == config) {
-> +            qemu_set_irq(s->gpio_out[9], level);
-> +            DB_PRINT("Pulse EXTI: 9\n");
-> +        }
-> +        break;
-> +    case 10:
-> +        if (((s->syscfg_exticr3 & 0xF00) >> 8) == config) {
-> +            qemu_set_irq(s->gpio_out[10], level);
-> +            DB_PRINT("Pulse EXTI: 10\n");
-> +        }
-> +        break;
-> +    case 11:
-> +        if (((s->syscfg_exticr3 & 0xF000) >> 12) == config) {
-> +            qemu_set_irq(s->gpio_out[11], level);
-> +            DB_PRINT("Pulse EXTI: 11\n");
-> +        }
-> +        break;
-> +    case 12:
-> +        if ((s->syscfg_exticr4 & 0xF) == config) {
-> +            qemu_set_irq(s->gpio_out[12], level);
-> +            DB_PRINT("Pulse EXTI: 12\n");
-> +        }
-> +        break;
-> +    case 13:
-> +        if (((s->syscfg_exticr4 & 0xF0) >> 4) == config) {
-> +            qemu_set_irq(s->gpio_out[13], level);
-> +            DB_PRINT("Pulse EXTI: 13\n");
-> +        }
-> +        break;
-> +    case 14:
-> +        if (((s->syscfg_exticr4 & 0xF00) >> 8) == config) {
-> +            qemu_set_irq(s->gpio_out[14], level);
-> +            DB_PRINT("Pulse EXTI: 14\n");
-> +        }
-> +        break;
-> +    case 15:
-> +        if (((s->syscfg_exticr4 & 0xF000) >> 12) == config) {
-> +            qemu_set_irq(s->gpio_out[15], level);
-> +            DB_PRINT("Pulse EXTI: 15\n");
-> +        }
-> +        break;
-> +    }
-> +}
-> +
-> +static uint64_t stm32f4xx_syscfg_read(void *opaque, hwaddr addr,
-> +                                     unsigned int size)
-> +{
-> +    STM32F4xxSyscfgState *s = opaque;
-> +
-> +    DB_PRINT("0x%"HWADDR_PRIx"\n", addr);
-> +
-> +    switch (addr) {
-> +    case SYSCFG_MEMRMP:
-> +        return s->syscfg_memrmp;
-> +    case SYSCFG_PMC:
-> +        return s->syscfg_pmc;
-> +    case SYSCFG_EXTICR1:
-> +        return s->syscfg_exticr1;
-> +    case SYSCFG_EXTICR2:
-> +        return s->syscfg_exticr2;
-> +    case SYSCFG_EXTICR3:
-> +        return s->syscfg_exticr3;
-> +    case SYSCFG_EXTICR4:
-> +        return s->syscfg_exticr4;
-> +    case SYSCFG_CMPCR:
-> +        return s->syscfg_cmpcr;
-> +    default:
-> +        qemu_log_mask(LOG_GUEST_ERROR,
-> +                      "%s: Bad offset 0x%"HWADDR_PRIx"\n", __func__, addr);
-> +        return 0;
-> +    }
-> +
-> +    return 0;
-
-This return statement is unreachable.
-
-> +}
-> +
-> +static void stm32f4xx_syscfg_write(void *opaque, hwaddr addr,
-> +                       uint64_t val64, unsigned int size)
-> +{
-> +    STM32F4xxSyscfgState *s = opaque;
-> +    uint32_t value = val64;
-> +
-> +    DB_PRINT("0x%x, 0x%"HWADDR_PRIx"\n", value, addr);
-> +
-> +    switch (addr) {
-> +    case SYSCFG_MEMRMP:
-> +        qemu_log_mask(LOG_UNIMP,
-> +                      "%s: Changeing the memory mapping isn't supported " \
-> +                      "in QEMU\n", __func__);
-> +        return;
-> +    case SYSCFG_PMC:
-> +        qemu_log_mask(LOG_UNIMP,
-> +                      "%s: Changeing the memory mapping isn't supported " \
-> +                      "in QEMU\n", __func__);
-
-"Changing" in both these.
-
-> +        return;
-> +    case SYSCFG_EXTICR1:
-> +        s->syscfg_exticr1 = (value & 0xFFFF);
-> +        return;
-> +    case SYSCFG_EXTICR2:
-> +        s->syscfg_exticr2 = (value & 0xFFFF);
-> +        return;
-> +    case SYSCFG_EXTICR3:
-> +        s->syscfg_exticr3 = (value & 0xFFFF);
-> +        return;
-> +    case SYSCFG_EXTICR4:
-> +        s->syscfg_exticr4 = (value & 0xFFFF);
-> +        return;
-> +    case SYSCFG_CMPCR:
-> +        s->syscfg_cmpcr = value;
-> +        return;
-> +    default:
-> +        qemu_log_mask(LOG_GUEST_ERROR,
-> +                      "%s: Bad offset 0x%"HWADDR_PRIx"\n", __func__, addr);
-> +    }
-> +}
-> +
-> +static const MemoryRegionOps stm32f4xx_syscfg_ops = {
-> +    .read = stm32f4xx_syscfg_read,
-> +    .write = stm32f4xx_syscfg_write,
-> +    .endianness = DEVICE_NATIVE_ENDIAN,
-> +};
-> +
-> +static void stm32f4xx_syscfg_init(Object *obj)
-> +{
-> +    STM32F4xxSyscfgState *s = STM32F4XX_SYSCFG(obj);
-> +
-> +    sysbus_init_irq(SYS_BUS_DEVICE(obj), &s->irq);
-> +
-> +    memory_region_init_io(&s->mmio, obj, &stm32f4xx_syscfg_ops, s,
-> +                          TYPE_STM32F4XX_SYSCFG, 0x400);
-> +    sysbus_init_mmio(SYS_BUS_DEVICE(obj), &s->mmio);
-> +
-> +    qdev_init_gpio_in(DEVICE(obj), stm32f4xx_syscfg_set_irq, 16 * 9);
-> +    qdev_init_gpio_out(DEVICE(obj), s->gpio_out, 16);
-> +}
-> +
-> +static void stm32f4xx_syscfg_class_init(ObjectClass *klass, void *data)
-> +{
-> +    DeviceClass *dc = DEVICE_CLASS(klass);
-> +
-> +    dc->reset = stm32f4xx_syscfg_reset;
-
-This is missing the vmstate for migration.
-
-> +}
-> +
-> +static const TypeInfo stm32f4xx_syscfg_info = {
-> +    .name          = TYPE_STM32F4XX_SYSCFG,
-> +    .parent        = TYPE_SYS_BUS_DEVICE,
-> +    .instance_size = sizeof(STM32F4xxSyscfgState),
-> +    .instance_init = stm32f4xx_syscfg_init,
-> +    .class_init    = stm32f4xx_syscfg_class_init,
-> +};
-> +
-> +static void stm32f4xx_syscfg_register_types(void)
-> +{
-> +    type_register_static(&stm32f4xx_syscfg_info);
-> +}
-
-thanks
--- PMM
+diff --git a/block.c b/block.c
+index 16615bc876..9ae5c0ed2f 100644
+--- a/block.c
++++ b/block.c
+@@ -5672,10 +5672,6 @@ void bdrv_detach_aio_context(BlockDriverState *bs)
+     BdrvAioNotifier *baf, *baf_tmp;
+     BdrvChild *child;
+=20
+-    if (!bs->drv) {
+-        return;
+-    }
+-
+     assert(!bs->walking_aio_notifiers);
+     bs->walking_aio_notifiers =3D true;
+     QLIST_FOREACH_SAFE(baf, &bs->aio_notifiers, list, baf_tmp) {
+@@ -5690,7 +5686,7 @@ void bdrv_detach_aio_context(BlockDriverState *bs)
+      */
+     bs->walking_aio_notifiers =3D false;
+=20
+-    if (bs->drv->bdrv_detach_aio_context) {
++    if (bs->drv && bs->drv->bdrv_detach_aio_context) {
+         bs->drv->bdrv_detach_aio_context(bs);
+     }
+     QLIST_FOREACH(child, &bs->children, next) {
+@@ -5709,10 +5705,6 @@ void bdrv_attach_aio_context(BlockDriverState *bs,
+     BdrvAioNotifier *ban, *ban_tmp;
+     BdrvChild *child;
+=20
+-    if (!bs->drv) {
+-        return;
+-    }
+-
+     if (bs->quiesce_counter) {
+         aio_disable_external(new_context);
+     }
+@@ -5722,7 +5714,7 @@ void bdrv_attach_aio_context(BlockDriverState *bs,
+     QLIST_FOREACH(child, &bs->children, next) {
+         bdrv_attach_aio_context(child->bs, new_context);
+     }
+-    if (bs->drv->bdrv_attach_aio_context) {
++    if (bs->drv && bs->drv->bdrv_attach_aio_context) {
+         bs->drv->bdrv_attach_aio_context(bs, new_context);
+     }
+=20
+--=20
+2.20.1
