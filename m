@@ -2,80 +2,80 @@ Return-Path: <SRS0=TP+Q=TA=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.0 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.7 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1055EC43219
-	for <qemu-devel@archiver.kernel.org>; Tue, 30 Apr 2019 12:07:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 663E7C43219
+	for <qemu-devel@archiver.kernel.org>; Tue, 30 Apr 2019 12:15:00 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id CA316205ED
-	for <qemu-devel@archiver.kernel.org>; Tue, 30 Apr 2019 12:07:25 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 2E01F205ED
+	for <qemu-devel@archiver.kernel.org>; Tue, 30 Apr 2019 12:15:00 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="quzOgku0"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CA316205ED
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="uxZ4kX3I"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2E01F205ED
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:46040 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:46347 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hLRXg-0001OQ-UI
-	for qemu-devel@archiver.kernel.org; Tue, 30 Apr 2019 08:07:24 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:59886)
+	id 1hLRf1-0003sl-BT
+	for qemu-devel@archiver.kernel.org; Tue, 30 Apr 2019 08:14:59 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:33789)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1hLRWV-0000pO-JQ
-	for qemu-devel@nongnu.org; Tue, 30 Apr 2019 08:06:12 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1hLRe4-0003Rq-HS
+	for qemu-devel@nongnu.org; Tue, 30 Apr 2019 08:14:01 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1hLRWU-0001p9-CM
-	for qemu-devel@nongnu.org; Tue, 30 Apr 2019 08:06:11 -0400
-Received: from mail-ot1-x342.google.com ([2607:f8b0:4864:20::342]:41620)
+	(envelope-from <peter.maydell@linaro.org>) id 1hLRe3-0006E3-PC
+	for qemu-devel@nongnu.org; Tue, 30 Apr 2019 08:14:00 -0400
+Received: from mail-ot1-x341.google.com ([2607:f8b0:4864:20::341]:38113)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1hLRWU-0001os-7B
-	for qemu-devel@nongnu.org; Tue, 30 Apr 2019 08:06:10 -0400
-Received: by mail-ot1-x342.google.com with SMTP id g8so10637220otl.8
-	for <qemu-devel@nongnu.org>; Tue, 30 Apr 2019 05:06:10 -0700 (PDT)
+	id 1hLRe3-0006Dj-Hl
+	for qemu-devel@nongnu.org; Tue, 30 Apr 2019 08:13:59 -0400
+Received: by mail-ot1-x341.google.com with SMTP id t20so11671751otl.5
+	for <qemu-devel@nongnu.org>; Tue, 30 Apr 2019 05:13:59 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
 	h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-	:cc; bh=ctw1PmSs/FscVIAd8xMc+XKKLMdL9xM/Hxw+Ecx6PVY=;
-	b=quzOgku0i5Ak/XgMVl7+bhROh2NnYsiXsVvKFospcObCqGr+4ih8WflYbEMYAQyc9F
-	8owXy4Qt7jl1uiE1WLSGIF5UbN0SCxjWqczXdoKqgoJ/wcNXafRe/A0nUueCvfmm0xXN
-	1BdaoGYF8bJCzr2ZNJQsgU0PcmtOlxCYV5ZeKiTPYhrlbHzrloNGfuYkz+05E8DWx5rI
-	4hprpDm8cmqoGDlILmahK1lXpzlQ5nNhObdB07sLZnug5g8il4fyn+Ey24bZhtLEprFE
-	yX8toTWl1MRAT+FzWvyffI2Prez7sf4ylMIYe1MFmkfN0tLlAlUSliBg2FGLYKZvAodm
-	0NOw==
+	:cc; bh=tBFGrtCvRe3qXCdriNdtDe+GT5lrhT/ZfxDEF1Nm24A=;
+	b=uxZ4kX3I8V2BSTgRSnOOUvVkTkFDxDew8Ud6xatg/vnLRLB/d7HxK/itZ/+khD+SCF
+	JKtUcjqHTVz5D5aURGvg7iIK3az61WHgTAHlnwTdAJs05xpPwoa2DPrGYkTjhiBiAQ0n
+	AJda37GjK30/HfQcRE9szZk9dxyguTzzIdGG7dJaOo9SQH+/8Q5REvBxwa80oa5rIELK
+	BNF8udPY3Boos/fkO2pP+GzjE4H1Pzfez1ex7dEUVfa7bGr9KYm1yok/D0RTZgQtr1Rz
+	Tp/mgvI1bfQnKz6jzq7k8SYpxKqJ24tcqgzgQPgBIhe2ldFUUrQjy7w1kNQobwpSSLav
+	Qv8A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
 	d=1e100.net; s=20161025;
 	h=x-gm-message-state:mime-version:references:in-reply-to:from:date
 	:message-id:subject:to:cc;
-	bh=ctw1PmSs/FscVIAd8xMc+XKKLMdL9xM/Hxw+Ecx6PVY=;
-	b=Dqm7URbYrmlip3GcRPyW6+rj1P5MoGf+N6FvqwTxn+ZTFcKDWpRr4y7D3tAFeejCos
-	GJMvTrDcmGPlBTpyJRyjuQGpO0004gW/Nz+nhbJPN/aBMvmTDnaQT7hridDb8XpgBn30
-	nxX0QKnheAYw/hZI4sga5tg088ePAuql7H00Bnv+yE1j9JslxypkarN/DA/7e2+Z2nMx
-	F6Rd9zMPF5d4zVub2Wmqbg0H05A+/KefgvUUlGB7sFvWwxKcvYcmofyQpTqAi6+7noly
-	VQ8JjzCD9a9H17f4BrvPoKiFZ91Dmtsj1LOS2u8joTgV5Fmb2qvv4xJDC2S+uiKFkIJf
-	jlMw==
-X-Gm-Message-State: APjAAAXIGYcrBO8cfFBxnYuye06HKvOL0M2CcS3Bdu+IPA63+P9rtx81
-	aE1/KDrk8PvXSQVEmusOjTuuamyyvc5WSsQct7m1hw==
-X-Google-Smtp-Source: APXvYqy+UuUTLwpIUo6zBBmx2kt5ghFlftUB17CgnWjhMHe1WueaDKz55LsP9FnY98fLAO2gCJRFE44ymKYF56pMjFM=
-X-Received: by 2002:a9d:6156:: with SMTP id c22mr12058752otk.363.1556625969476;
-	Tue, 30 Apr 2019 05:06:09 -0700 (PDT)
+	bh=tBFGrtCvRe3qXCdriNdtDe+GT5lrhT/ZfxDEF1Nm24A=;
+	b=PWQ6DJovO779schDyGBcuJ683i8qBf9Hl5tFftpee+XaOmNRQtdMIulQR7jI4RJhDR
+	0ZmHfIj/CEMtF/OOpjYamfO6fO7MzXDdLJV6iqU9FoGqNvTiI0r9Tv0sVL3GM0SUNon8
+	PU3ZDd5zXNHCuHWBGgHzSAwrNlmAPVrxNA2B8g9wbOJ5j/2SllZO9k3v+RrD8F6MjRLl
+	XyxbLhTrIqCUIGtTUyKCJ1i+/zkLbUeRjPvsjt4no6hGG+9joLG7vIXJ3imOTPd0NUOU
+	LR+idsqF5SBZ/ktVgO3TYu3sZYcUOXeXorerhz2zlsPa93jwzp9AvMoghTHlk1KgE/eC
+	lTKg==
+X-Gm-Message-State: APjAAAUIARbM+33MOTH7BBAfk3d+4QG2se/vhDfeYuUR1u11HZk8zZb5
+	rZJny6BxG3LiVUI8I/pcghm7BcRhNxJiI3rZI0EohQ==
+X-Google-Smtp-Source: APXvYqzl6T5tbe0NPgKuL6HaMZzVFMuvD5aWyQdbmVDMNPYGPRjeVzQkFmpET8aaa7FZ/ME2p1AfEUfWnfxgQyVVgwA=
+X-Received: by 2002:a9d:6156:: with SMTP id c22mr12086101otk.363.1556626438544;
+	Tue, 30 Apr 2019 05:13:58 -0700 (PDT)
 MIME-Version: 1.0
-References: <20190430031238.40499-1-yangchuanlong@huawei.com>
-In-Reply-To: <20190430031238.40499-1-yangchuanlong@huawei.com>
+References: <20190223023957.18865-1-richard.henderson@linaro.org>
+	<20190223023957.18865-2-richard.henderson@linaro.org>
+In-Reply-To: <20190223023957.18865-2-richard.henderson@linaro.org>
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 30 Apr 2019 13:05:58 +0100
+Date: Tue, 30 Apr 2019 13:13:47 +0100
 Message-ID:
- <CAFEAcA-HkovdX3XayW22=wJ2i0cECV_Jm3OjTv3zsHLMhgsKDQ@mail.gmail.com>
-To: Yang Chuanlong <yangchuanlong@huawei.com>
+ <CAFEAcA_Uco_Uczy1Ut5RCETtXVxrRpEE35MKHv0mDPYZeFE-mQ@mail.gmail.com>
+To: Richard Henderson <richard.henderson@linaro.org>
 Content-Type: text/plain; charset="UTF-8"
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
 	recognized.
-X-Received-From: 2607:f8b0:4864:20::342
-Subject: Re: [Qemu-devel] [PATCH v1] target/arm/arm-powerctl: mask the cpuid
- with affinity bits when get cpu
+X-Received-From: 2607:f8b0:4864:20::341
+Subject: Re: [Qemu-devel] [PATCH 1/6] target/arm: Implement ID_PFR2
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -87,54 +87,26 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: QEMU Developers <qemu-devel@nongnu.org>,
-	gengdongjiu <gengdongjiu@huawei.com>
+Cc: =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>,
+	QEMU Developers <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190430120558.JunCvAhUXmAC9qNM3G0orzJMiyFczzKxhHpU7BxtDVE@z>
+Message-ID: <20190430121347.A7rDyD5TYhquEmRZNsTi-9ywXTWk5nQG5ynBWU6hLE0@z>
 
-On Tue, 30 Apr 2019 at 04:22, Yang Chuanlong <yangchuanlong@huawei.com> wrote:
+On Sat, 23 Feb 2019 at 02:40, Richard Henderson
+<richard.henderson@linaro.org> wrote:
 >
-> Currently, the cpuid passed from the device tree may still contain
-> non-affinity fields, which will cause arm_set_cpu_on failure.
-> Therefore, we mask the cpuid with affinity fields here to
-> improve qemu compatibility.
+> This was defined at some point before ARMv8.4, and will
+> shortly be used by new processor descriptions.
 >
-> Signed-off-by: Yang Chuanlong <yangchuanlong@huawei.com>
+> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 > ---
->  target/arm/arm-powerctl.c | 8 +++++++-
->  1 file changed, 7 insertions(+), 1 deletion(-)
->
-> diff --git a/target/arm/arm-powerctl.c b/target/arm/arm-powerctl.c
-> index f77a950db6..ef9fec0b4d 100644
-> --- a/target/arm/arm-powerctl.c
-> +++ b/target/arm/arm-powerctl.c
-> @@ -31,7 +31,13 @@ CPUState *arm_get_cpu_by_id(uint64_t id)
->  {
->      CPUState *cpu;
->
-> -    DPRINTF("cpu %" PRId64 "\n", id);
-> +#ifdef TARGET_AARCH64
-> +    id &= ARM64_AFFINITY_MASK;
-> +#else
-> +    id &= ARM32_AFFINITY_MASK;
-> +#endif
-> +
-> +    DPRINTF("cpu %" PRId64 " after mask affinity\n", id);
->
->      CPU_FOREACH(cpu) {
->          ARMCPU *armcpu = ARM_CPU(cpu);
+>  target/arm/cpu.h    | 1 +
+>  target/arm/helper.c | 4 ++--
+>  2 files changed, 3 insertions(+), 2 deletions(-)
 
-Hi -- could you explain what the code path is where we
-end up passing a wrong value into this function? I'm
-wondering if this is the best place to fix it, or if maybe
-the calling function is at fault.
-
-Also, you can't use #ifdef TARGET_AARCH64 here to distinguish
-a 64-bit from a 32-bit CPU, because the qemu-system-aarch64
-binary (which is built with TARGET_AARCH64) also supports all
-the 32-bit CPUs.
+Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
 
 thanks
 -- PMM
