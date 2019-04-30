@@ -1,27 +1,21 @@
-Received: from eggs.gnu.org ([209.51.188.92]:34750)
+Received: from eggs.gnu.org ([209.51.188.92]:34978)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1hLPq7-0001Py-2D
-	for qemu-devel@nongnu.org; Tue, 30 Apr 2019 06:18:19 -0400
+	(envelope-from <kwolf@redhat.com>) id 1hLPq7-0001iV-9s
+	for qemu-devel@nongnu.org; Tue, 30 Apr 2019 06:18:20 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1hLPc5-0002Ro-MD
-	for qemu-devel@nongnu.org; Tue, 30 Apr 2019 06:03:50 -0400
-Received: from mail-ot1-x344.google.com ([2607:f8b0:4864:20::344]:46788)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1hLPc5-0002RR-Gg
-	for qemu-devel@nongnu.org; Tue, 30 Apr 2019 06:03:49 -0400
-Received: by mail-ot1-x344.google.com with SMTP id 77so5193694otu.13
-	for <qemu-devel@nongnu.org>; Tue, 30 Apr 2019 03:03:49 -0700 (PDT)
+	(envelope-from <kwolf@redhat.com>) id 1hLPbk-0002Hl-AR
+	for qemu-devel@nongnu.org; Tue, 30 Apr 2019 06:03:29 -0400
+Date: Tue, 30 Apr 2019 12:03:22 +0200
+From: Kevin Wolf <kwolf@redhat.com>
+Message-ID: <20190430100322.GB5607@linux.fritz.box>
+References: <cover.1556562150.git.berto@igalia.com>
+	<e5e1571c583874454760dc738ef3ea3470ea96e7.1556562150.git.berto@igalia.com>
 MIME-Version: 1.0
-References: <20190403034358.21999-1-richard.henderson@linaro.org>
-	<20190403034358.21999-22-richard.henderson@linaro.org>
-In-Reply-To: <20190403034358.21999-22-richard.henderson@linaro.org>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 30 Apr 2019 11:03:37 +0100
-Message-ID: <CAFEAcA_6-1+Pk8k7Wr8bVjWsLnNwyVp4R0TyYiPvcBy_o8ZmWA@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH 21/26] target/tricore: Convert to
- CPUClass::tlb_fill
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <e5e1571c583874454760dc738ef3ea3470ea96e7.1556562150.git.berto@igalia.com>
+Subject: Re: [Qemu-devel] [PATCH 2/5] vdi: Replace bdrv_{read,
+ write}() with bdrv_{pread, pwrite}()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,22 +24,77 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Richard Henderson <richard.henderson@linaro.org>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, Bastian Koppelmann <kbastian@mail.uni-paderborn.de>
+To: Alberto Garcia <berto@igalia.com>
+Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>, Eric Blake <eblake@redhat.com>
 
-On Wed, 3 Apr 2019 at 04:58, Richard Henderson
-<richard.henderson@linaro.org> wrote:
->
-> Cc: Bastian Koppelmann <kbastian@mail.uni-paderborn.de>
-> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+Am 29.04.2019 um 20:42 hat Alberto Garcia geschrieben:
+> There's only a couple of bdrv_read() and bdrv_write() calls left in
+> the vdi code, and they can be trivially replaced with the byte-based
+> bdrv_pread() and bdrv_pwrite().
+> 
+> Signed-off-by: Alberto Garcia <berto@igalia.com>
 > ---
->  target/tricore/cpu.h       |  6 +++---
->  target/tricore/cpu.c       |  1 +
->  target/tricore/helper.c    | 27 +++++++++++++++++++--------
->  target/tricore/op_helper.c | 26 --------------------------
->  4 files changed, 23 insertions(+), 37 deletions(-)
->
-Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
+>  block/vdi.c | 11 ++++++-----
+>  1 file changed, 6 insertions(+), 5 deletions(-)
+> 
+> diff --git a/block/vdi.c b/block/vdi.c
+> index e1c42ad732..8d849b2754 100644
+> --- a/block/vdi.c
+> +++ b/block/vdi.c
+> @@ -384,7 +384,7 @@ static int vdi_open(BlockDriverState *bs, QDict *options, int flags,
+>  
+>      logout("\n");
+>  
+> -    ret = bdrv_read(bs->file, 0, (uint8_t *)&header, 1);
+> +    ret = bdrv_pread(bs->file, 0, (uint8_t *)&header, sizeof(header));
 
-thanks
--- PMM
+Maybe worth adding this after the VdiHeader declaration?
+
+QEMU_BUILD_BUG_ON(sizeof(VdiHeader) != 512);
+
+>      if (ret < 0) {
+>          goto fail;
+>      }
+> @@ -484,8 +484,8 @@ static int vdi_open(BlockDriverState *bs, QDict *options, int flags,
+>          goto fail;
+>      }
+>  
+> -    ret = bdrv_read(bs->file, s->bmap_sector, (uint8_t *)s->bmap,
+> -                    bmap_size);
+> +    ret = bdrv_pread(bs->file, header.offset_bmap, (uint8_t *)s->bmap,
+> +                     bmap_size * SECTOR_SIZE);
+>      if (ret < 0) {
+>          goto fail_free_bmap;
+>      }
+> @@ -704,7 +704,7 @@ nonallocating_write:
+>          assert(VDI_IS_ALLOCATED(bmap_first));
+>          *header = s->header;
+>          vdi_header_to_le(header);
+> -        ret = bdrv_write(bs->file, 0, block, 1);
+> +        ret = bdrv_pwrite(bs->file, 0, block, sizeof(*block));
+
+block is uint8_t*, so sizeof(*block) == 1. This is not what you want.
+(qemu-iotests catches this pretty early.)
+
+>          g_free(block);
+>          block = NULL;
+>  
+> @@ -722,7 +722,8 @@ nonallocating_write:
+>          base = ((uint8_t *)&s->bmap[0]) + bmap_first * SECTOR_SIZE;
+>          logout("will write %u block map sectors starting from entry %u\n",
+>                 n_sectors, bmap_first);
+> -        ret = bdrv_write(bs->file, offset, base, n_sectors);
+> +        ret = bdrv_pwrite(bs->file, offset * SECTOR_SIZE, base,
+> +                          n_sectors * SECTOR_SIZE);
+>      }
+>  
+>      return ret;
+
+Let's avoid returning a non-zero positive number in the success case
+here. bdrv_driver_pwritev() checks ret == 0 for BDRV_REQ_FUA emulation,
+and its callers don't expect positive results either.
+
+Maybe we should actually assert() in bdrv_driver_preadv/pwritev() that
+the result is <= 0.
+
+Kevin
