@@ -3,44 +3,43 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
 X-Spam-Status: No, score=-6.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.0
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 77689C43219
-	for <qemu-devel@archiver.kernel.org>; Tue, 30 Apr 2019 20:44:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A050DC43219
+	for <qemu-devel@archiver.kernel.org>; Tue, 30 Apr 2019 20:45:43 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3910E2080C
-	for <qemu-devel@archiver.kernel.org>; Tue, 30 Apr 2019 20:44:07 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3910E2080C
+	by mail.kernel.org (Postfix) with ESMTPS id 601292080C
+	for <qemu-devel@archiver.kernel.org>; Tue, 30 Apr 2019 20:45:43 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 601292080C
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:53087 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:53140 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hLZbi-0007oy-EV
-	for qemu-devel@archiver.kernel.org; Tue, 30 Apr 2019 16:44:06 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:54464)
+	id 1hLZdG-0000n8-JF
+	for qemu-devel@archiver.kernel.org; Tue, 30 Apr 2019 16:45:42 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:52932)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1hLZZb-0006MG-98
-	for qemu-devel@nongnu.org; Tue, 30 Apr 2019 16:41:56 -0400
+	(envelope-from <laurent@vivier.eu>) id 1hLZVT-0002Jh-8o
+	for qemu-devel@nongnu.org; Tue, 30 Apr 2019 16:37:40 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1hLZZa-0005vQ-5G
-	for qemu-devel@nongnu.org; Tue, 30 Apr 2019 16:41:55 -0400
-Received: from mout.kundenserver.de ([217.72.192.75]:52793)
+	(envelope-from <laurent@vivier.eu>) id 1hLZNB-0007j6-My
+	for qemu-devel@nongnu.org; Tue, 30 Apr 2019 16:29:06 -0400
+Received: from mout.kundenserver.de ([212.227.17.13]:33235)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <laurent@vivier.eu>)
-	id 1hLZZW-0005tC-26; Tue, 30 Apr 2019 16:41:51 -0400
+	id 1hLZNA-0007gS-7P; Tue, 30 Apr 2019 16:29:04 -0400
 Received: from [192.168.100.1] ([78.238.229.36]) by mrelayeu.kundenserver.de
-	(mreue106 [213.165.67.119]) with ESMTPSA (Nemesis) id
-	1MekKJ-1gncKL181l-00apK1; Tue, 30 Apr 2019 22:41:28 +0200
-From: Laurent Vivier <laurent@vivier.eu>
+	(mreue107 [213.165.67.119]) with ESMTPSA (Nemesis) id
+	1MgNtR-1gqMLI42iF-00hwDw; Tue, 30 Apr 2019 22:28:48 +0200
 To: Alistair Francis <Alistair.Francis@wdc.com>,
 	"qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
 References: <cover.1556650594.git.alistair.francis@wdc.com>
 	<f2aaec5b3c12a8512cd7078f3a5d1230906d80ea.1556650594.git.alistair.francis@wdc.com>
-	<900dab1c-d200-18fa-530b-43c3d6f017a5@vivier.eu>
+From: Laurent Vivier <laurent@vivier.eu>
 Openpgp: preference=signencrypt
 Autocrypt: addr=laurent@vivier.eu; prefer-encrypt=mutual; keydata=
 	mQINBFYFJhkBEAC2me7w2+RizYOKZM+vZCx69GTewOwqzHrrHSG07MUAxJ6AY29/+HYf6EY2
@@ -84,33 +83,33 @@ Autocrypt: addr=laurent@vivier.eu; prefer-encrypt=mutual; keydata=
 	OpKgu3nD0ahBDqANU/ZmNNarBJEwvM2vfusmNnWm3QMIwxNuJghRyuFfx694Im1js0ZY3LEU
 	JGSHFG4ZynA+ZFUPA6Xf0wHeJOxGKCGIyeKORsteIqgnkINW9fnKJw2pgk8qHkwVc3Vu+wGS
 	ZiJK0xFusPQehjWTHn9WjMG1zvQ5TQQHxau/2FkP45+nRPco6vVFQe8JmgtRF8WFJA==
-Message-ID: <5f1c936c-c250-5f64-ccca-1940cc9124d5@vivier.eu>
-Date: Tue, 30 Apr 2019 22:41:26 +0200
+Message-ID: <900dab1c-d200-18fa-530b-43c3d6f017a5@vivier.eu>
+Date: Tue, 30 Apr 2019 22:28:45 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
 	Thunderbird/60.6.1
 MIME-Version: 1.0
-In-Reply-To: <900dab1c-d200-18fa-530b-43c3d6f017a5@vivier.eu>
+In-Reply-To: <f2aaec5b3c12a8512cd7078f3a5d1230906d80ea.1556650594.git.alistair.francis@wdc.com>
 Content-Type: text/plain; charset="UTF-8"
 Content-Language: en-US
 Content-Transfer-Encoding: 8bit
-X-Provags-ID: V03:K1:QeF4mcDtsdUs/aU2n5t4oUomSPgyg231u9cY61avzm1XmqT1I0x
-	JK0pYMX4I1UAI4/L4CZxofwNFaGdg28HNzpej6rIpyPbZPypQguyhdpO20tcXq3GZp/1rHg
-	W0yUPoky9ev14YSbxTckf15ok5ueO3TUX50nwjZQCKQdkR4gJu19+REjbLdJUcGMACIc+9M
-	zYN978U0vuOxXcu5lTEjw==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:8f/VyoJRmoo=:SO9rzexhiGMSwQnVVYJo0o
-	Obq0Lc/Z13YYtwb3Y+TpPmZIRoIfpa0G4b2RwSqBvx62bozEQb+O0XQgf5/oTr9kstKzgLAuB
-	F+qCH9ZrbJ8sXIAXIGAAiaI1WVqQxG/8GIFQcgrF5/2GwI1vOZ68h7HWgStUOY3dDQGrVibDO
-	WJxWK51/t8/VZQxDT9KO+2DEk/3oN6gIsCRNYfJdPc9kRG2Q2yADG5SdFLIaMBn2mcERFC887
-	tM9AhPt/ip9U1fM/NrgScuFsWW2ZAeVuvfmFBOr5Q3bLMtQc42fUqnozIrsilkcezD2Iv5AX1
-	n9Ep7928tDaLBIpZ1fnJ65wf3VOW0jO7RPqYD6YuIuAwmfJsiFMsTlvYHfH9Y0zNPzXK0tQLf
-	FkO6knv4YikyApwKKseUhN8KrZs9oQelliCqtMtCBWp8zNe5t25CFDbHDA7GWji01cxrRT3oT
-	KTPmUaOK6vZKjzrFpi1j6zPuUcEOsGvuCmohNBsHI7byH/bkAVpdK8YaDLetTiTMnVyCF7Klp
-	V8wBelU4q5mK6mKI3EDtijkCq82n/wfRVNxThxSzzY0unMOdDKGJqFCJTPV2SUl+dRqtwqIKb
-	G69dVVZDq5UxPkt9Pfnmc1fDa4gi0QMBenh74KgnWhX4CLr4Yea9Jv3hiuWe8v76YabQEvRuT
-	yReIgONeV4VWkNP2mxtuzppkm3OwtE8aY5DpCAIDhjyX6v5Y/olgbR2yCncD1ehTzLlAHcEXP
-	gGQ7rUGwBpmhz89RGfce2dDKHrO616WdMDWZNGjdUQsKxxO0SZmRvGFWOIM=
+X-Provags-ID: V03:K1:NAjklGYOJLhHZWTrVju8QDS1DQ/LqXofz3E8OeNjfw8lbcPW9In
+	PthZnrp/NhGwFwmeaSCbHhyel8vJhoMY+EMia4kSwLzrMI7cbZKr+5/Yjkh89H1EeqsWI17
+	xh9sXOLOKeipuHLA9H1UU3+id6ET/CQKaUzDLneaNxUpNfynfFaQRXZrL5Ujj1O0NT1eAaL
+	G6Zf4j/3xXABFwSHCUe2g==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:A+o4WqsibQs=:+MQuFOWtWJqdRY+mjXDgU3
+	3Smwcz6u9ksH+zxtVI4XbaVxEPGq6GblqyHGfvY7rKg7CQBATcH0X6eIcgFeolua22Z+3gv6u
+	ScXVzCawo49xJ0z2h2M6v+szyHTOIvOByH/q81NOp3qAx5+UXfjqE7hU1VZwMVdoysaH++Clx
+	qz9/TQeB4INcuL2Um/POZMoFCvbffqwWDqVtkFCwyc6EE22qOON+xX2/v/5DKBKL8ouYrBG+K
+	sL122C11mYol1Dzrk3KNLKPDcrxfSzKtk7K5R0johuldz79+X8ghz3z2eTp5AU8K04WysVDnb
+	fbs97hs/tFKksZdPEQrucKr7dLdIL7e343WgClZX7iSnmi26aleTWyhfy8qA4yWUiPVkugNGP
+	4i87Gbyr6DVvnAIR7WxevoRWFALL8PGH/zjO4gDhD2co1pOc8IGe2XLRYD6jXLgX9779NqKtE
+	5esObWwEqvHc+1Ie6vmMeihebYkxDBfkdI7hGH5UlKW/4ulPh9Kt5eVZa0N38dMB12SEpqQJg
+	dvkki3hRm76TCL4A1ioD7qstUSEqqQuxG8IU3VxLrY6Xz7Xi3j5on12jy+FPk+Vd+BMcPeKIx
+	ssp4MRlSN0FSR7S3T61ElkgjEwoQmWP7Wxc/i5amyB/nBjNbEgzj4jWEHa+Fy69O98M3pK35c
+	Kg4BgX2DmeHqDKrZ8/PGLePtCr3KHn2Ie3GpADC2TYbDcYXrU6ODjtjNCnr5UHFMi/iAZfww/
+	MHXgCkiarSPcdmTVuEnhuwY+2wqz5TIXYK11A1exucIDAzWSpvhgKhQusds=
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 217.72.192.75
+X-Received-From: 212.227.17.13
 Subject: Re: [Qemu-devel] [PATCH v1 3/5] hw/usb/dev-mtp: Fix GCC 9 build
  warning
 X-BeenThere: qemu-devel@nongnu.org
@@ -131,59 +130,53 @@ Cc: "qemu-trivial@nongnu.org" <qemu-trivial@nongnu.org>,
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190430204126.iMj0WXvWaNTPwua2wWai92rxFXuwBNGxUMSf9t1BrMk@z>
+Message-ID: <20190430202845.rM0V6rhtGVI0zk-mm-2BFehDZ-N4kYTmW297YOksyJM@z>
 
-Le 30/04/2019 à 22:28, Laurent Vivier a écrit :
-> Le 30/04/2019 à 22:09, Alistair Francis a écrit :
->> Fix this warning with GCC 9 on Fedora 30:
->> hw/usb/dev-mtp.c:1715:36: error: taking address of packed member of ‘struct <anonymous>’ may result in an unaligned pointer value [-Werror=address-of-packed-member]
->>  1715 |                             dataset->filename);
->>       |                             ~~~~~~~^~~~~~~~~~
->>
->> Signed-off-by: Alistair Francis <alistair.francis@wdc.com>
->> ---
->>  hw/usb/dev-mtp.c | 13 +++++++++++++
->>  1 file changed, 13 insertions(+)
->>
->> diff --git a/hw/usb/dev-mtp.c b/hw/usb/dev-mtp.c
->> index 99548b012d..6de85d99e6 100644
->> --- a/hw/usb/dev-mtp.c
->> +++ b/hw/usb/dev-mtp.c
->> @@ -1711,9 +1711,22 @@ static void usb_mtp_write_metadata(MTPState *s, uint64_t dlen)
->>      assert(!s->write_pending);
->>      assert(p != NULL);
->>  
->> +/*
->> + * We are about to access a packed struct. We are confident that the pointer
->> + * address won't be unalligned, so we ignore GCC warnings.
->> + */
->> +#if defined(CONFIG_PRAGMA_DIAGNOSTIC_AVAILABLE) && QEMU_GNUC_PREREQ(9, 0)
->> +#pragma GCC diagnostic push
->> +#pragma GCC diagnostic ignored "-Waddress-of-packed-member"
->> +#endif
->> +
->>      filename = utf16_to_str(MIN(dataset->length, filename_chars),
->>                              dataset->filename);
->>  
->> +#if defined(CONFIG_PRAGMA_DIAGNOSTIC_AVAILABLE) && QEMU_GNUC_PREREQ(9, 0)
->> +#pragma GCC diagnostic pop
->> +#endif
->> +
->>      if (strchr(filename, '/')) {
->>          usb_mtp_queue_result(s, RES_PARAMETER_NOT_SUPPORTED, d->trans,
->>                               0, 0, 0, 0);
->>
+Le 30/04/2019 à 22:09, Alistair Francis a écrit :
+> Fix this warning with GCC 9 on Fedora 30:
+> hw/usb/dev-mtp.c:1715:36: error: taking address of packed member of ‘struct <anonymous>’ may result in an unaligned pointer value [-Werror=address-of-packed-member]
+>  1715 |                             dataset->filename);
+>       |                             ~~~~~~~^~~~~~~~~~
 > 
-> You should move and use PRAGMA_DISABLE_PACKED_WARNING and
-> PRAGMA_REENABLE_PACKED_WARNING from linux-user/qemu.h.
+> Signed-off-by: Alistair Francis <alistair.francis@wdc.com>
+> ---
+>  hw/usb/dev-mtp.c | 13 +++++++++++++
+>  1 file changed, 13 insertions(+)
 > 
-> It has laready been very well tested :)
+> diff --git a/hw/usb/dev-mtp.c b/hw/usb/dev-mtp.c
+> index 99548b012d..6de85d99e6 100644
+> --- a/hw/usb/dev-mtp.c
+> +++ b/hw/usb/dev-mtp.c
+> @@ -1711,9 +1711,22 @@ static void usb_mtp_write_metadata(MTPState *s, uint64_t dlen)
+>      assert(!s->write_pending);
+>      assert(p != NULL);
+>  
+> +/*
+> + * We are about to access a packed struct. We are confident that the pointer
+> + * address won't be unalligned, so we ignore GCC warnings.
+> + */
+> +#if defined(CONFIG_PRAGMA_DIAGNOSTIC_AVAILABLE) && QEMU_GNUC_PREREQ(9, 0)
+> +#pragma GCC diagnostic push
+> +#pragma GCC diagnostic ignored "-Waddress-of-packed-member"
+> +#endif
+> +
+>      filename = utf16_to_str(MIN(dataset->length, filename_chars),
+>                              dataset->filename);
+>  
+> +#if defined(CONFIG_PRAGMA_DIAGNOSTIC_AVAILABLE) && QEMU_GNUC_PREREQ(9, 0)
+> +#pragma GCC diagnostic pop
+> +#endif
+> +
+>      if (strchr(filename, '/')) {
+>          usb_mtp_queue_result(s, RES_PARAMETER_NOT_SUPPORTED, d->trans,
+>                               0, 0, 0, 0);
+> 
 
+You should move and use PRAGMA_DISABLE_PACKED_WARNING and
+PRAGMA_REENABLE_PACKED_WARNING from linux-user/qemu.h.
 
-Oh, they are for clang and a false positive, so forget my comment (and
-the following one)
+It has laready been very well tested :)
 
 Thanks,
 Laurent
-
 
