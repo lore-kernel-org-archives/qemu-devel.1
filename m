@@ -1,30 +1,22 @@
-Received: from eggs.gnu.org ([209.51.188.92]:60430)
+Received: from eggs.gnu.org ([209.51.188.92]:60662)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1hLbui-0008Dj-Gl
-	for qemu-devel@nongnu.org; Tue, 30 Apr 2019 19:11:53 -0400
+	(envelope-from <jsnow@redhat.com>) id 1hLbwM-0000RJ-Rg
+	for qemu-devel@nongnu.org; Tue, 30 Apr 2019 19:13:35 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1hLbuh-0007y2-KO
-	for qemu-devel@nongnu.org; Tue, 30 Apr 2019 19:11:52 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:53348)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1hLbuh-0007xo-Ce
-	for qemu-devel@nongnu.org; Tue, 30 Apr 2019 19:11:51 -0400
-References: <20190426003652.32633-1-richardw.yang@linux.intel.com>
-	<20190426003652.32633-2-richardw.yang@linux.intel.com>
-	<20190430204636.GK28722@habkost.net>
-	<20190430223618.lyl3ribm7gg5haa5@master>
-	<20190430224816.GL28722@habkost.net>
-	<20190430185011-mutt-send-email-mst@kernel.org>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <86e00247-588c-37c1-0737-82614a8f18c0@redhat.com>
-Date: Wed, 1 May 2019 01:11:34 +0200
+	(envelope-from <jsnow@redhat.com>) id 1hLbwL-0000rN-Nn
+	for qemu-devel@nongnu.org; Tue, 30 Apr 2019 19:13:34 -0400
+References: <20181116184324.8093-1-jsnow@redhat.com>
+	<4bc81482-fab6-80dd-f684-4ffde4241dce@virtuozzo.com>
+From: John Snow <jsnow@redhat.com>
+Message-ID: <cb6469ca-9ba3-1ac7-7c3e-9e6c8c53e55f@redhat.com>
+Date: Tue, 30 Apr 2019 19:08:24 -0400
 MIME-Version: 1.0
-In-Reply-To: <20190430185011-mutt-send-email-mst@kernel.org>
+In-Reply-To: <4bc81482-fab6-80dd-f684-4ffde4241dce@virtuozzo.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v15 1/2] util/mmap-alloc: support MAP_SYNC
- in qemu_ram_mmap()
+Subject: Re: [Qemu-devel] [PATCH] migration/block-dirty-bitmap: Silence
+ coverity CID 1390625
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,19 +25,52 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Michael S. Tsirkin" <mst@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>
-Cc: Wei Yang <richard.weiyang@gmail.com>, Wei Yang <richardw.yang@linux.intel.com>, pagupta@redhat.com, xiaoguangrong.eric@gmail.com, Haozhong Zhang <haozhong.zhang@intel.com>, qemu-devel@nongnu.org, yi.z.zhang@linux.intel.com, yu.c.zhang@linux.intel.com, stefanha@redhat.com, imammedo@redhat.com, dan.j.williams@intel.com
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+Cc: Stefan Hajnoczi <stefanha@redhat.com>
 
-On 01/05/19 00:50, Michael S. Tsirkin wrote:
->> Stefan, did you hit a build failure, or it was just theoretical?
+
+
+On 11/20/18 10:15 AM, Vladimir Sementsov-Ogievskiy wrote:
+> 16.11.2018 21:43, John Snow wrote:
+>> Coverity warns that backing_bs() could give us a NULL pointer, which
+>> we then use without checking that it isn't.
 >>
->> linux-headers/*/mman.h is updated by "linux-headers: add
->> linux/mman.h" (commit 8cf108c5d159).  If the build really fails,
->> something else is broken in our build system.
-> I think it's for non-linux hosts. linux-headers/ is only used
-> on linux hosts.
+>> In our loop condition, we check bs && bs->drv as a point of habit, but
+>> by nature of the block graph, we cannot have null bs pointers here.
+>>
+>> This loop skips only implicit nodes, which always have children, so
+>> this loop should never encounter a null value.
+> 
 
-Yes, it is.  Maybe the #ifndef/#define  part should be only used for
-non-Linux.
+I let this drop again :)
 
-Paolo
+> You mean, always have backing (not file for ex.)? Should we at least add a comment
+> near "bool implicit;" that the node must have backing..
+> 
+> Do we have filters, using 'file' child instead of backing, will we want to auto insert them, and therefore mark them with implicit=true?
+> 
+
+I actually have no idea. I guess this is the sort of thing we actually
+really want a dedicated kind of API for. "Find first non-filter" seems
+like a common use case that we'd want.
+
+[But maybe I'll avoid this problem.]
+
+> And one more thing:
+> So, it's looks like a wrong way to search for all block-nodes, instead of looping through backing chain to the first not-implicit bds, we must recursively explore the whole block graph, to find _all_ the bitmaps.
+> 
+
+Looking at this again after not having done so for so long -- I guess
+that bdrv_first/bdrv_next only iterate over *top level* BDSes and not
+any children thereof. You're right, even the method here isn't quite
+correct. We want to find ALL nodes, wherever they are.
+
+query_named_block_nodes uses an implementation in block.c to accomplish
+this because the API is not public.... or, it wasn't, but it looks like
+we have bdrv_next_all_states now, and we could use this to just find ALL
+of the bdrv nodes.
+
+Ehm.... let me send something a little more RFC-caliber that should
+address your concern (as well as Peter's) here.
+
+--js
