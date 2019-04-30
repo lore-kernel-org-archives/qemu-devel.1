@@ -1,22 +1,29 @@
-Received: from eggs.gnu.org ([209.51.188.92]:39072)
+Received: from eggs.gnu.org ([209.51.188.92]:40104)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1hLQ6v-00050d-Lj
-	for qemu-devel@nongnu.org; Tue, 30 Apr 2019 06:35:43 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1hLQBx-0006gy-DW
+	for qemu-devel@nongnu.org; Tue, 30 Apr 2019 06:40:54 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1hLQ6u-00065I-09
-	for qemu-devel@nongnu.org; Tue, 30 Apr 2019 06:35:41 -0400
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Date: Tue, 30 Apr 2019 10:35:32 +0000
-Message-ID: <b9adec87-7818-02e0-518f-50d25130c093@virtuozzo.com>
-References: <20190428100052.GA63525@localhost>
-In-Reply-To: <20190428100052.GA63525@localhost>
-Content-Language: en-US
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <8E37B85F717D1346BAFA2716C14CD9B2@eurprd08.prod.outlook.com>
-Content-Transfer-Encoding: base64
+	(envelope-from <peter.maydell@linaro.org>) id 1hLQBw-00017G-GH
+	for qemu-devel@nongnu.org; Tue, 30 Apr 2019 06:40:53 -0400
+Received: from mail-ot1-x341.google.com ([2607:f8b0:4864:20::341]:37200)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1hLQBw-000171-A9
+	for qemu-devel@nongnu.org; Tue, 30 Apr 2019 06:40:52 -0400
+Received: by mail-ot1-x341.google.com with SMTP id r20so10305914otg.4
+	for <qemu-devel@nongnu.org>; Tue, 30 Apr 2019 03:40:52 -0700 (PDT)
 MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [PATCH 0/2] buffer and delay backup COW write
- operation
+References: <20190330005900.17282-1-richard.henderson@linaro.org>
+	<20190330005900.17282-3-richard.henderson@linaro.org>
+	<CAFEAcA98_q1yx==QkHO1HiJA8cJqGv8k5OrCU5W=dC3ZWNPY=w@mail.gmail.com>
+	<920a0801-ed1d-23e8-9975-43d4d185707e@linaro.org>
+In-Reply-To: <920a0801-ed1d-23e8-9975-43d4d185707e@linaro.org>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Tue, 30 Apr 2019 11:40:40 +0100
+Message-ID: <CAFEAcA-=JyNF94OTq+rJRVxbfhJ_B6=fLm93s+y0ScX9Uyfngw@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH v4 2/4] linux-user: Set PAGE_TARGET_1 for
+ TARGET_PROT_BTI
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,73 +32,32 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "qemu-block@nongnu.org" <qemu-block@nongnu.org>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, John Snow <jsnow@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, Wen Congyang <wencongyang2@huawei.com>, Xie Changlong <xiechanglong.d@gmail.com>, Markus Armbruster <armbru@redhat.com>, Eric Blake <eblake@redhat.com>, Fam Zheng <fam@euphon.net>
+To: Richard Henderson <richard.henderson@linaro.org>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>, Ramana Radhakrishnan <ramana.radhakrishnan@arm.com>
 
-MjguMDQuMjAxOSAxMzowMSwgTGlhbmcgTGkgd3JvdGU6DQo+IElmIHRoZSBiYWNrdXAgdGFyZ2V0
-IGlzIGEgc2xvdyBkZXZpY2UgbGlrZSBjZXBoIHJiZCwgdGhlIGJhY2t1cA0KPiBwcm9jZXNzIHdp
-bGwgYWZmZWN0IGd1ZXN0IEJMSyB3cml0ZSBJTyBwZXJmb3JtYW5jZSBzZXJpb3VzbHksDQo+IGl0
-J3MgY2F1c2UgYnkgdGhlIGRyYXdiYWNrIG9mIENPVyBtZWNoYW5pc20sIGlmIGd1ZXN0IG92ZXJ3
-cml0ZSB0aGUNCj4gYmFja3VwIEJMSyBhcmVhLCB0aGUgSU8gY2FuIG9ubHkgYmUgcHJvY2Vzc2Vk
-IGFmdGVyIHRoZSBkYXRhIGhhcw0KPiBiZWVuIHdyaXR0ZW4gdG8gYmFja3VwIHRhcmdldC4NCj4g
-VGhlIGltcGFjdCBjYW4gYmUgcmVsaWV2ZWQgYnkgYnVmZmVyaW5nIGRhdGEgcmVhZCBmcm9tIGJh
-Y2t1cA0KPiBzb3VyY2UgYW5kIHdyaXRpbmcgdG8gYmFja3VwIHRhcmdldCBsYXRlciwgc28gdGhl
-IGd1ZXN0IEJMSyB3cml0ZQ0KPiBJTyBjYW4gYmUgcHJvY2Vzc2VkIGluIHRpbWUuDQo+IERhdGEg
-YXJlYSB3aXRoIG5vIG92ZXJ3cml0ZSB3aWxsIGJlIHByb2Nlc3MgbGlrZSBiZWZvcmUgd2l0aG91
-dA0KPiBidWZmZXJpbmcsIGluIG1vc3QgY2FzZSwgd2UgZG9uJ3QgbmVlZCBhIHZlcnkgbGFyZ2Ug
-YnVmZmVyLg0KPiANCj4gQW4gZmlvIHRlc3Qgd2FzIGRvbmUgd2hlbiB0aGUgYmFja3VwIHdhcyBn
-b2luZyBvbiwgdGhlIHRlc3QgcmVzdXQNCj4gc2hvdyBhIG9idmlvdXMgcGVyZm9ybWFuY2UgaW1w
-cm92ZW1lbnQgYnkgYnVmZmVyaW5nLg0KDQpIaSBMaWFuZyENCg0KR29vZCB0aGluZy4gU29tZXRo
-aW5nIGxpa2UgdGhpcyBJJ3ZlIGJyaWVmbHkgbWVudGlvbmVkIGluIG15IEtWTSBGb3J1bSAyMDE4
-DQpyZXBvcnQgYXMgIlJBTSBDYWNoZSIsIGFuZCBJJ2QgcmVhbGx5IHByZWZlciB0aGlzIGZ1bmN0
-aW9uYWxpdHkgdG8gYmUgYSBzZXBhcmF0ZQ0KZmlsdGVyLCBpbnN0ZWFkIG9mIGNvbXBsaWNhdGlv
-biBvZiBiYWNrdXAgY29kZS4gRnVydGhlciBtb3JlLCB3cml0ZSBub3RpZmllcnMNCndpbGwgZ28g
-YXdheSBmcm9tIGJhY2t1cCBjb2RlLCBhZnRlciBteSBiYWNrdXAtdG9wIHNlcmllcyBtZXJnZWQu
-DQoNCnY1OiBodHRwczovL2xpc3RzLmdudS5vcmcvYXJjaGl2ZS9odG1sL3FlbXUtZGV2ZWwvMjAx
-OC0xMi9tc2cwNjIxMS5odG1sDQphbmQgc2VwYXJhdGVkIHByZXBhcmluZyByZWZhY3RvcmluZyB2
-NzogaHR0cHM6Ly9saXN0cy5nbnUub3JnL2FyY2hpdmUvaHRtbC9xZW11LWRldmVsLzIwMTktMDQv
-bXNnMDQ4MTMuaHRtbA0KDQpSQU0gQ2FjaGUgc2hvdWxkIGJlIGEgZmlsdGVyIGRyaXZlciwgd2l0
-aCBhbiBpbi1tZW1vcnkgYnVmZmVyKHMpIGZvciBkYXRhIHdyaXR0ZW4gdG8gaXQNCmFuZCB3aXRo
-IGFiaWxpdHkgdG8gZmx1c2ggZGF0YSB0byB1bmRlcmx5aW5nIGJhY2tpbmcgZmlsZS4NCg0KQWxz
-bywgaGVyZSBpcyBhbm90aGVyIGFwcHJvYWNoIGZvciB0aGUgcHJvYmxlbSwgd2hpY2ggaGVscHMg
-aWYgZ3Vlc3Qgd3JpdGluZyBhY3Rpdml0eQ0KaXMgcmVhbGx5IGhpZ2ggYW5kIGxvbmcgYW5kIGJ1
-ZmZlciB3aWxsIGJlIGZpbGxlZCBhbmQgcGVyZm9ybWFuY2Ugd2lsbCBkZWNyZWFzZSBhbnl3YXk6
-DQoNCjEuIENyZWF0ZSBsb2NhbCB0ZW1wb3JhcnkgaW1hZ2UsIGFuZCBDT1dzIHdpbGwgZ28gdG8g
-aXQuIChwcmV2aW91c2x5IGNvbnNpZGVyZWQgb24gbGlzdCwgdGhhdCB3ZSBzaG91bGQgY2FsbA0K
-dGhlc2UgYmFja3VwIG9wZXJhdGlvbnMgaXNzdWVkIGJ5IGd1ZXN0IHdyaXRlcyBDQlcgPSBjb3B5
-LWJlZm9yZS13cml0ZSwgYXMgY29weS1vbi13cml0ZQ0KaXMgZ2VuZXJhbGx5IGFub3RoZXIgdGhp
-bmcsIGFuZCB1c2luZyB0aGlzIHRlcm0gaW4gYmFja3VwIGlzIGNvbmZ1c2luZykuDQoNCjIuIFdl
-IGFsc28gc2V0IG9yaWdpbmFsIGRpc2sgYXMgYSBiYWNraW5nIGZvciB0ZW1wb3JhcnkgaW1hZ2Us
-IGFuZCBzdGFydCBhbm90aGVyIGJhY2t1cCBmcm9tDQp0ZW1wb3JhcnkgdG8gcmVhbCB0YXJnZXQu
-DQoNClRoaXMgc2NoZW1lIGlzIGFsbW9zdCBwb3NzaWJsZSBub3csIHlvdSBuZWVkIHRvIHN0YXJ0
-IGJhY2t1cChzeW5jPW5vbmUpIGZyb20gc291cmNlIHRvIHRlbXAsDQp0byBkbyBbMV0uIFNvbWUg
-cGF0Y2hlcyBhcmUgc3RpbGwgbmVlZGVkIHRvIGFsbG93IHN1Y2ggc2NoZW1lLiBJIGRpZG4ndCBz
-ZW5kIHRoZW0sIGFzIEkgd2FudA0KbXkgb3RoZXIgYmFja3VwIHBhdGNoZXMgZ28gZmlyc3QgYW55
-d2F5LiBCdXQgSSBjYW4uIE9uIHRoZSBvdGhlciBoYW5kIGlmIGFwcHJvYWNoIHdpdGggaW4tbWVt
-b3J5DQpidWZmZXIgd29ya3MgZm9yIHlvdSBpdCBtYXkgYmUgYmV0dGVyLg0KDQpBbHNvLCBJJ20g
-bm90IHN1cmUgZm9yIG5vdywgc2hvdWxkIHdlIHJlYWxseSBkbyB0aGlzIHRoaW5nIHRocm91Z2gg
-dHdvIGJhY2t1cCBqb2JzLCBvciB3ZSBqdXN0DQpuZWVkIG9uZSBzZXBhcmF0ZSBiYWNrdXAtdG9w
-IGZpbHRlciBhbmQgb25lIGJhY2t1cCBqb2Igd2l0aG91dCBmaWx0ZXIsIG9yIHdlIG5lZWQgYW4g
-YWRkaXRpb25hbA0KcGFyYW1ldGVyIGZvciBiYWNrdXAgam9iIHRvIHNldCBjYWNoZS1ibG9jay1u
-b2RlLg0KDQo+IA0KPiBUZXN0IHJlc3VsdCgxR0IgYnVmZmVyKToNCj4gPT09PT09PT09PT09PT09
-PT09PT09PT09DQo+IGZpbyBzZXR0aW5nOg0KPiBbcmFuZG9tLXdyaXRlcnNdDQo+IGlvZW5naW5l
-PWxpYmFpbw0KPiBpb2RlcHRoPTgNCj4gcnc9cmFuZHdyaXRlDQo+IGJzPTMyaw0KPiBkaXJlY3Q9
-MQ0KPiBzaXplPTFHDQo+IG51bWpvYnM9MQ0KPiANCj4gcmVzdWx0Og0KPiAgICAgICAgICAgICAg
-ICAgICAgICAgIElPUFMgICAgICAgIEFWRyBsYXRlbmN5DQo+ICAgICAgICAgbm8gYmFja3VwOiAg
-ICAgMTkzODkgICAgICAgICA0MTAgdXMNCj4gICAgICAgICAgICBiYWNrdXA6ICAgICAgMTQwMiAg
-ICAgICAgNTcwMiB1cw0KPiBiYWNrdXAgdy8gYnVmZmVyOiAgICAgIDg2ODQgICAgICAgICA5MTgg
-dXMNCj4gPT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PQ0KPiAN
-Cj4gQ2M6IEpvaG4gU25vdyA8anNub3dAcmVkaGF0LmNvbT4NCj4gQ2M6IEtldmluIFdvbGYgPGt3
-b2xmQHJlZGhhdC5jb20+DQo+IENjOiBNYXggUmVpdHogPG1yZWl0ekByZWRoYXQuY29tPg0KPiBD
-YzogV2VuIENvbmd5YW5nIDx3ZW5jb25neWFuZzJAaHVhd2VpLmNvbT4NCj4gQ2M6IFhpZSBDaGFu
-Z2xvbmcgPHhpZWNoYW5nbG9uZy5kQGdtYWlsLmNvbT4NCj4gQ2M6IE1hcmt1cyBBcm1icnVzdGVy
-IDxhcm1icnVAcmVkaGF0LmNvbT4NCj4gQ2M6IEVyaWMgQmxha2UgPGVibGFrZUByZWRoYXQuY29t
-Pg0KPiBDYzogRmFtIFpoZW5nIDxmYW1AZXVwaG9uLm5ldD4NCj4gDQo+IExpYW5nIExpICgyKToN
-Cj4gICAgYmFja3VwOiBidWZmZXIgQ09XIHJlcXVlc3QgYW5kIGRlbGF5IHRoZSB3cml0ZSBvcGVy
-YXRpb24NCj4gICAgcWFwaTogYWRkIGludGVyZmFjZSBmb3Igc2V0dGluZyBiYWNrdXAgY293IGJ1
-ZmZlciBzaXplDQo+IA0KPiAgIGJsb2NrL2JhY2t1cC5jICAgICAgICAgICAgfCAxMTggKysrKysr
-KysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKystLS0tLQ0KPiAgIGJsb2NrL3JlcGxp
-Y2F0aW9uLmMgICAgICAgfCAgIDIgKy0NCj4gICBibG9ja2Rldi5jICAgICAgICAgICAgICAgIHwg
-ICA1ICsrDQo+ICAgaW5jbHVkZS9ibG9jay9ibG9ja19pbnQuaCB8ICAgMiArDQo+ICAgcWFwaS9i
-bG9jay1jb3JlLmpzb24gICAgICB8ICAgNSArKw0KPiAgIDUgZmlsZXMgY2hhbmdlZCwgMTE4IGlu
-c2VydGlvbnMoKyksIDE0IGRlbGV0aW9ucygtKQ0KPiANCg0KDQotLSANCkJlc3QgcmVnYXJkcywN
-ClZsYWRpbWlyDQo=
+On Mon, 29 Apr 2019 at 21:13, Richard Henderson
+<richard.henderson@linaro.org> wrote:
+>
+> On 4/29/19 9:21 AM, Peter Maydell wrote:
+> > This looks ok code-wise, but we'd need to hide it behind
+> > a defaults-to-off x-something property if we wanted to
+> > commit it before the kernel ABI is fixed.
+>
+> I'm not intending to change the user-level abi, only the
+> internal abi within qemu, for handling of the elf notes.
+
+You're changing target_mmap(), which is used by the
+guest mmap syscall, though, right?
+
+> You think this should be done differently, so that there's
+> zero possibility of a user-level setting the relevant bit?
+
+I think that we shouldn't allow guest binaries written
+to the ad-hoc TARGET_PROT_BTI ABI to work without an
+explicit x-something command line argument to QEMU, to
+indicate that the user knows they're doing something
+odd and that these binaries won't always continue to work
+in future QEMU versions.
+
+thanks
+-- PMM
