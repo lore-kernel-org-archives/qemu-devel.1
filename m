@@ -1,19 +1,24 @@
-Received: from eggs.gnu.org ([209.51.188.92]:47560)
+Received: from eggs.gnu.org ([209.51.188.92]:48225)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <paul.c.lai@intel.com>) id 1hLWUr-0002xI-AS
-	for qemu-devel@nongnu.org; Tue, 30 Apr 2019 13:24:51 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1hLWXE-0005MF-Pe
+	for qemu-devel@nongnu.org; Tue, 30 Apr 2019 13:27:18 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <paul.c.lai@intel.com>) id 1hLWUp-0002KH-AU
-	for qemu-devel@nongnu.org; Tue, 30 Apr 2019 13:24:49 -0400
-Received: from mga14.intel.com ([192.55.52.115]:64486)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <paul.c.lai@intel.com>)
-	id 1hLWUo-0002G2-K4
-	for qemu-devel@nongnu.org; Tue, 30 Apr 2019 13:24:47 -0400
-From: Paul Lai <paul.c.lai@intel.com>
-Date: Tue, 30 Apr 2019 10:22:36 -0700
-Message-Id: <20190430172236.14325-1-paul.c.lai@intel.com>
-Subject: [Qemu-devel] [PATCH] Introduce SnowRidge CPU model
+	(envelope-from <peter.maydell@linaro.org>) id 1hLWXD-0003lI-JU
+	for qemu-devel@nongnu.org; Tue, 30 Apr 2019 13:27:16 -0400
+Received: from mail-ot1-x330.google.com ([2607:f8b0:4864:20::330]:38999)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1hLWXD-0003kn-Eu
+	for qemu-devel@nongnu.org; Tue, 30 Apr 2019 13:27:15 -0400
+Received: by mail-ot1-x330.google.com with SMTP id o39so1398561ota.6
+	for <qemu-devel@nongnu.org>; Tue, 30 Apr 2019 10:27:15 -0700 (PDT)
+MIME-Version: 1.0
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Tue, 30 Apr 2019 18:27:03 +0100
+Message-ID: <CAFEAcA9BCXuOxaFaHvT0bDnb+7e_vYuhxspjokRp19G+SUf+MA@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: [Qemu-devel] Spreading the load on QEMU pullreq handling and
+ release work
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,101 +27,85 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: wei.w.wang@intel.com, tao3.xu@intel.com, luwei.kang@intel.com, paul.c.lai@intel.com
+To: QEMU Developers <qemu-devel@nongnu.org>
+Cc: Michael Roth <mdroth@linux.vnet.ibm.com>, Markus Armbruster <armbru@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <richard.henderson@linaro.org>, =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>, Stefan Hajnoczi <stefanha@redhat.com>
 
-SnowRidge CPU supports Accelerator Infrastrcture Architecture (MOVDIRI,
-MOVDIR64B), CLDEMOTE and SPLIT_LOCK_DISABLE.
+For most releases in the past five years, I've been handling the
+work of applying pull requests, tagging release candidates, and
+so on. (For one or two releases somebody else has done this when
+I've been off on holiday.) This takes up a fair chunk of my time
+during the actual "release" phase of a cycle, and it also
+represents a "bus factor" issue for the project if I'm the only
+person doing this. I'd like to try to spread this work out a bit
+between more people.
 
-MOVDIRI, MOVDIR64B, and CLDEMOTE are found via CPUID.
-The availability of SPLIT_LOCK_DISABLE is check via msr access
+Specifically, where I'd like to get to is that we have a rota of
+three people doing this, which at our "three releases a year"
+pace means any one person only has to handle one release cycle
+a year.
 
-References can be found in either:
- https://software.intel.com/en-us/articles/intel-sdm
- https://software.intel.com/en-us/download/intel-architecture-instruction-set-extensions-and-future-features-programming-reference
+Part of this move is going to require moving away from some of the
+ad-hoc scripting and testing that I currently do on a selection of
+personal and work machines and instead using machines that can be
+used by other project members.  (One recent suggestion is that
+perhaps the gitlab CI might be a useful place to start, since it
+allows us to provide custom build workers rather than only doing
+x86 host testing.)
 
-Signed-off-by: Paul Lai <paul.c.lai@intel.com>
-Tested-by: Tao3 Xu <tao3.xu@intel.com>
----
- target/i386/cpu.c | 66 +++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 66 insertions(+)
+For the moment I'd like to ask for in-principle volunteers
+to be on the release-handling rota.
 
-diff --git a/target/i386/cpu.c b/target/i386/cpu.c
-index d6bb57d210..e81da09709 100644
---- a/target/i386/cpu.c
-+++ b/target/i386/cpu.c
-@@ -2663,6 +2663,72 @@ static X86CPUDefinition builtin_x86_defs[] = {
-         .xlevel = 0x80000008,
-         .model_id = "Intel Xeon Processor (Icelake)",
-     },
-+    {
-+        .name = "SnowRidge",
-+        .level = 27,
-+        .vendor = CPUID_VENDOR_INTEL,
-+        .family = 6,
-+        .model = 134,
-+        .stepping = 1,
-+        .features[FEAT_1_EDX] =
-+	    /* missing: CPUID_PN CPUID_IA64 */
-+            /* missing: CPUID_DTS, CPUID_HT, CPUID_TM, CPUID_PBE */
-+            CPUID_FP87 | CPUID_VME | CPUID_DE| CPUID_PSE |
-+            CPUID_TSC | CPUID_MSR | CPUID_PAE | CPUID_MCE |
-+            CPUID_CX8 | CPUID_APIC | CPUID_SEP |
-+            CPUID_MTRR | CPUID_PGE | CPUID_MCA | CPUID_CMOV |
-+            CPUID_PAT | CPUID_PSE36 | /* CPUID_PN | */ CPUID_CLFLUSH |
-+            CPUID_MMX |
-+            CPUID_FXSR | CPUID_SSE | CPUID_SSE2,
-+        .features[FEAT_1_ECX] =
-+            CPUID_EXT_SSE3 | CPUID_EXT_PCLMULQDQ | CPUID_EXT_MONITOR |
-+            CPUID_EXT_VMX |
-+            CPUID_EXT_SSSE3 |
-+            CPUID_EXT_CX16 |
-+            CPUID_EXT_SSE41 |
-+            CPUID_EXT_SSE42 | CPUID_EXT_X2APIC | CPUID_EXT_MOVBE | CPUID_EXT_POPCNT |
-+            CPUID_EXT_TSC_DEADLINE_TIMER | CPUID_EXT_AES | CPUID_EXT_XSAVE |
-+            CPUID_EXT_RDRAND,
-+        .features[FEAT_8000_0001_EDX] =
-+            CPUID_EXT2_SYSCALL |
-+            CPUID_EXT2_NX |
-+            CPUID_EXT2_PDPE1GB | CPUID_EXT2_RDTSCP |
-+            CPUID_EXT2_LM,
-+        .features[FEAT_8000_0001_ECX] =
-+            CPUID_EXT3_LAHF_LM |
-+            CPUID_EXT3_3DNOWPREFETCH,
-+        .features[FEAT_7_0_EBX] =
-+            CPUID_7_0_EBX_FSGSBASE |
-+            CPUID_7_0_EBX_SMEP |
-+            CPUID_7_0_EBX_ERMS |
-+            CPUID_7_0_EBX_MPX |  /* missing bits 13, 15 */
-+            CPUID_7_0_EBX_RDSEED |
-+            CPUID_7_0_EBX_SMAP | CPUID_7_0_EBX_CLFLUSHOPT |
-+            CPUID_7_0_EBX_CLWB |
-+            CPUID_7_0_EBX_SHA_NI,
-+        .features[FEAT_7_0_ECX] =
-+            CPUID_7_0_ECX_UMIP |
-+            /* missing bit 5 */
-+            CPUID_7_0_ECX_GFNI |
-+            CPUID_7_0_ECX_MOVDIRI | CPUID_7_0_ECX_CLDEMOTE |
-+            CPUID_7_0_ECX_MOVDIR64B,
-+        .features[FEAT_7_0_EDX] =
-+            CPUID_7_0_EDX_SPEC_CTRL |
-+            CPUID_7_0_EDX_ARCH_CAPABILITIES | CPUID_7_0_EDX_SPEC_CTRL_SSBD, /* missing bit 30 */
-+        /* Missing: XSAVES (not supported by some Linux versions,
-+                * including v4.1 to v4.12).
-+                * KVM doesn't yet expose any XSAVES state save component,
-+                * and the only one defined in Skylake (processor tracing)
-+                * probably will block migration anyway.
-+                */
-+        .features[FEAT_XSAVE] =
-+            CPUID_XSAVE_XSAVEOPT | CPUID_XSAVE_XSAVEC |
-+            CPUID_XSAVE_XGETBV1,
-+        .features[FEAT_6_EAX] =
-+            CPUID_6_EAX_ARAT,
-+        .xlevel = 0x80000008,
-+        .model_id = "Intel Atom Processor (SnowRidge)",
-+    },
-     {
-         .name = "KnightsMill",
-         .level = 0xd,
--- 
-2.17.2
+The work involves:
+ * the mechanical process of actually processing pullreq
+   emails and applying them
+ * letting people know about failures, which can mean some
+   investigation of exactly why something has failed to
+   distinguish problems with the pull from preexisting
+   intermittent failures from infrastructure issues
+ * more careful by-hand scrutiny of pull requests from
+   submaintainers who haven't done it before or who don't make
+   pull requests often (checking for missing signoffs, weirdly
+   malformed pull requests, patches that shouldn't be in the
+   pull, etc)
+ * maintenance of what I guess will need to be a shared
+   project GPG keyring to add submaintainer keys (there's
+   a judgement call required for whether a new key is
+   sufficiently trusted, working with the submaintainer to
+   ask them to try to get more signatures if possible, etc)
+ * curating the "Planning" wiki page where we record things
+   not yet fixed in the current release, including chasing
+   people for fixes for RC bugs, asking around if anything
+   ought to go in, tracking potential RC issues that crop up
+   on the mailing list, etc
+ * making sure we correctly raise the "is this important
+   enough to go in" bar for pull requests during the release
+   candidate phase by scrutinizing pull requests and if
+   necessary pushing back on submaintainers
+ * likely some other things I have forgotten
+
+Since there is a definite human judgement required here, this
+isn't going to be a fully automatable process[*], and it would
+be best done by people who've got a reasonably long history of
+working with the project (both from a trust perspective and
+because they have the experience to make the judgement calls
+required).
+
+[*] It could quite possibly be automated a bit more than I
+currently do it, though. I'm also open to the idea that maybe we
+should do less gatekeeping at the apply-pull stage and instead
+delegate to submaintainers to make the right judgements, though
+in my experience there is usually at least one pullreq
+submitted late in the rc process which has stuff in it that
+should not go in at that point...
+
+NB: at the moment there is a split in handling of release
+candidates and the release, where I do the tagging of an rc in
+git, and Michael Roth then rolls tarballs and makes
+announcements of the rc or final release. Michael -- is that
+work something you'd like to spread around between more people
+or are you happy to continue to do it all?
+
+So, any volunteers (from anybody, not just people on the cc list) ?
+
+thanks
+-- PMM
