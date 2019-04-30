@@ -1,18 +1,27 @@
-Received: from eggs.gnu.org ([209.51.188.92]:49176)
+Received: from eggs.gnu.org ([209.51.188.92]:49656)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1hLUv8-0008Ms-Vg
-	for qemu-devel@nongnu.org; Tue, 30 Apr 2019 11:43:52 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1hLUwJ-0000zB-SN
+	for qemu-devel@nongnu.org; Tue, 30 Apr 2019 11:45:05 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1hLUv7-0002Is-Ep
-	for qemu-devel@nongnu.org; Tue, 30 Apr 2019 11:43:50 -0400
-From: Kevin Wolf <kwolf@redhat.com>
-Date: Tue, 30 Apr 2019 17:42:44 +0200
-Message-Id: <20190430154244.30083-28-kwolf@redhat.com>
-In-Reply-To: <20190430154244.30083-1-kwolf@redhat.com>
-References: <20190430154244.30083-1-kwolf@redhat.com>
+	(envelope-from <peter.maydell@linaro.org>) id 1hLUwI-00033O-At
+	for qemu-devel@nongnu.org; Tue, 30 Apr 2019 11:45:03 -0400
+Received: from mail-oi1-x244.google.com ([2607:f8b0:4864:20::244]:34604)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1hLUwI-00032k-3a
+	for qemu-devel@nongnu.org; Tue, 30 Apr 2019 11:45:02 -0400
+Received: by mail-oi1-x244.google.com with SMTP id v10so11650482oib.1
+	for <qemu-devel@nongnu.org>; Tue, 30 Apr 2019 08:45:01 -0700 (PDT)
 MIME-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 27/27] block/qed: add missed coroutine_fn markers
+References: <cover.1556515687.git.alistair@alistair23.me>
+	<PSXP216MB02776A12DAB1C4523F67837EDD390@PSXP216MB0277.KORP216.PROD.OUTLOOK.COM>
+In-Reply-To: <PSXP216MB02776A12DAB1C4523F67837EDD390@PSXP216MB0277.KORP216.PROD.OUTLOOK.COM>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Tue, 30 Apr 2019 16:44:49 +0100
+Message-ID: <CAFEAcA_GZKA4STSLGaOqPYBF7Fohj4+8Zf1MqqLmyB76imCtJA@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH v1 2/5] hw/misc: Add the STM32F4xx
+ Sysconfig device
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -21,234 +30,296 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-block@nongnu.org
-Cc: kwolf@redhat.com, qemu-devel@nongnu.org
+To: Alistair Francis <alistair@alistair23.me>
+Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "alistair23@gmail.com" <alistair23@gmail.com>
 
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+On Mon, 29 Apr 2019 at 06:35, Alistair Francis <alistair@alistair23.me> wrote:
+>
+> Signed-off-by: Alistair Francis <alistair@alistair23.me>
+> ---
+>  default-configs/arm-softmmu.mak    |   1 +
+>  hw/misc/Kconfig                    |   3 +
+>  hw/misc/Makefile.objs              |   1 +
+>  hw/misc/stm32f4xx_syscfg.c         | 275 +++++++++++++++++++++++++++++
+>  include/hw/misc/stm32f4xx_syscfg.h |  62 +++++++
+>  5 files changed, 342 insertions(+)
+>  create mode 100644 hw/misc/stm32f4xx_syscfg.c
+>  create mode 100644 include/hw/misc/stm32f4xx_syscfg.h
 
-qed_read_table and qed_write_table use coroutine-only interfaces but
-are not marked coroutine_fn. Happily, they are called only from
-coroutine context, so we only need to add missed markers.
+> +
+> +#include "qemu/osdep.h"
+> +#include "qemu/log.h"
+> +#include "hw/misc/stm32f4xx_syscfg.h"
+> +
+> +#ifndef STM_SYSCFG_ERR_DEBUG
+> +#define STM_SYSCFG_ERR_DEBUG 0
+> +#endif
+> +
+> +#define DB_PRINT_L(lvl, fmt, args...) do { \
+> +    if (STM_SYSCFG_ERR_DEBUG >= lvl) { \
+> +        qemu_log("%s: " fmt, __func__, ## args); \
+> +    } \
+> +} while (0)
+> +
+> +#define DB_PRINT(fmt, args...) DB_PRINT_L(1, fmt, ## args)
 
-Reported-by: Kevin Wolf <kwolf@redhat.com>
-Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Signed-off-by: Kevin Wolf <kwolf@redhat.com>
----
- block/qed.h       | 28 ++++++++++++++++------------
- block/qed-check.c |  4 ++--
- block/qed-table.c | 33 ++++++++++++++++++++-------------
- block/qed.c       |  5 +++--
- 4 files changed, 41 insertions(+), 29 deletions(-)
+I think we should prefer to use a tracepoint rather than qemu_log here.
 
-diff --git a/block/qed.h b/block/qed.h
-index f35341f134..42c115d822 100644
---- a/block/qed.h
-+++ b/block/qed.h
-@@ -201,17 +201,21 @@ void qed_commit_l2_cache_entry(L2TableCache *l2_cac=
-he, CachedL2Table *l2_table);
- /**
-  * Table I/O functions
-  */
--int qed_read_l1_table_sync(BDRVQEDState *s);
--int qed_write_l1_table(BDRVQEDState *s, unsigned int index, unsigned int=
- n);
--int qed_write_l1_table_sync(BDRVQEDState *s, unsigned int index,
--                            unsigned int n);
--int qed_read_l2_table_sync(BDRVQEDState *s, QEDRequest *request,
--                           uint64_t offset);
--int qed_read_l2_table(BDRVQEDState *s, QEDRequest *request, uint64_t off=
-set);
--int qed_write_l2_table(BDRVQEDState *s, QEDRequest *request,
--                       unsigned int index, unsigned int n, bool flush);
--int qed_write_l2_table_sync(BDRVQEDState *s, QEDRequest *request,
--                            unsigned int index, unsigned int n, bool flu=
-sh);
-+int coroutine_fn qed_read_l1_table_sync(BDRVQEDState *s);
-+int coroutine_fn qed_write_l1_table(BDRVQEDState *s, unsigned int index,
-+                                    unsigned int n);
-+int coroutine_fn qed_write_l1_table_sync(BDRVQEDState *s, unsigned int i=
-ndex,
-+                                         unsigned int n);
-+int coroutine_fn qed_read_l2_table_sync(BDRVQEDState *s, QEDRequest *req=
-uest,
-+                                        uint64_t offset);
-+int coroutine_fn qed_read_l2_table(BDRVQEDState *s, QEDRequest *request,
-+                                   uint64_t offset);
-+int coroutine_fn qed_write_l2_table(BDRVQEDState *s, QEDRequest *request=
-,
-+                                    unsigned int index, unsigned int n,
-+                                    bool flush);
-+int coroutine_fn qed_write_l2_table_sync(BDRVQEDState *s, QEDRequest *re=
-quest,
-+                                         unsigned int index, unsigned in=
-t n,
-+                                         bool flush);
-=20
- /**
-  * Cluster functions
-@@ -223,7 +227,7 @@ int coroutine_fn qed_find_cluster(BDRVQEDState *s, QE=
-DRequest *request,
- /**
-  * Consistency check
-  */
--int qed_check(BDRVQEDState *s, BdrvCheckResult *result, bool fix);
-+int coroutine_fn qed_check(BDRVQEDState *s, BdrvCheckResult *result, boo=
-l fix);
-=20
- QEDTable *qed_alloc_table(BDRVQEDState *s);
-=20
-diff --git a/block/qed-check.c b/block/qed-check.c
-index 0edac03159..418033ee24 100644
---- a/block/qed-check.c
-+++ b/block/qed-check.c
-@@ -106,7 +106,7 @@ static unsigned int qed_check_l2_table(QEDCheck *chec=
-k, QEDTable *table)
- /**
-  * Descend tables and check each cluster is referenced once only
-  */
--static int qed_check_l1_table(QEDCheck *check, QEDTable *table)
-+static int coroutine_fn qed_check_l1_table(QEDCheck *check, QEDTable *ta=
-ble)
- {
-     BDRVQEDState *s =3D check->s;
-     unsigned int i, num_invalid_l1 =3D 0;
-@@ -218,7 +218,7 @@ static void qed_check_mark_clean(BDRVQEDState *s, Bdr=
-vCheckResult *result)
- }
-=20
- /* Called with table_lock held.  */
--int qed_check(BDRVQEDState *s, BdrvCheckResult *result, bool fix)
-+int coroutine_fn qed_check(BDRVQEDState *s, BdrvCheckResult *result, boo=
-l fix)
- {
-     QEDCheck check =3D {
-         .s =3D s,
-diff --git a/block/qed-table.c b/block/qed-table.c
-index cf30edd977..405d446cbe 100644
---- a/block/qed-table.c
-+++ b/block/qed-table.c
-@@ -19,7 +19,8 @@
- #include "qemu/bswap.h"
-=20
- /* Called with table_lock held.  */
--static int qed_read_table(BDRVQEDState *s, uint64_t offset, QEDTable *ta=
-ble)
-+static int coroutine_fn qed_read_table(BDRVQEDState *s, uint64_t offset,
-+                                       QEDTable *table)
- {
-     unsigned int bytes =3D s->header.cluster_size * s->header.table_size=
-;
-=20
-@@ -60,8 +61,9 @@ out:
-  *
-  * Called with table_lock held.
-  */
--static int qed_write_table(BDRVQEDState *s, uint64_t offset, QEDTable *t=
-able,
--                           unsigned int index, unsigned int n, bool flus=
-h)
-+static int coroutine_fn qed_write_table(BDRVQEDState *s, uint64_t offset=
-,
-+                                        QEDTable *table, unsigned int in=
-dex,
-+                                        unsigned int n, bool flush)
- {
-     unsigned int sector_mask =3D BDRV_SECTOR_SIZE / sizeof(uint64_t) - 1=
-;
-     unsigned int start, end, i;
-@@ -109,27 +111,29 @@ out:
-     return ret;
- }
-=20
--int qed_read_l1_table_sync(BDRVQEDState *s)
-+int coroutine_fn qed_read_l1_table_sync(BDRVQEDState *s)
- {
-     return qed_read_table(s, s->header.l1_table_offset, s->l1_table);
- }
-=20
- /* Called with table_lock held.  */
--int qed_write_l1_table(BDRVQEDState *s, unsigned int index, unsigned int=
- n)
-+int coroutine_fn qed_write_l1_table(BDRVQEDState *s, unsigned int index,
-+                                    unsigned int n)
- {
-     BLKDBG_EVENT(s->bs->file, BLKDBG_L1_UPDATE);
-     return qed_write_table(s, s->header.l1_table_offset,
-                            s->l1_table, index, n, false);
- }
-=20
--int qed_write_l1_table_sync(BDRVQEDState *s, unsigned int index,
--                            unsigned int n)
-+int coroutine_fn qed_write_l1_table_sync(BDRVQEDState *s, unsigned int i=
-ndex,
-+                                         unsigned int n)
- {
-     return qed_write_l1_table(s, index, n);
- }
-=20
- /* Called with table_lock held.  */
--int qed_read_l2_table(BDRVQEDState *s, QEDRequest *request, uint64_t off=
-set)
-+int coroutine_fn qed_read_l2_table(BDRVQEDState *s, QEDRequest *request,
-+                                   uint64_t offset)
- {
-     int ret;
-=20
-@@ -166,22 +170,25 @@ int qed_read_l2_table(BDRVQEDState *s, QEDRequest *=
-request, uint64_t offset)
-     return ret;
- }
-=20
--int qed_read_l2_table_sync(BDRVQEDState *s, QEDRequest *request, uint64_=
-t offset)
-+int coroutine_fn qed_read_l2_table_sync(BDRVQEDState *s, QEDRequest *req=
-uest,
-+                                        uint64_t offset)
- {
-     return qed_read_l2_table(s, request, offset);
- }
-=20
- /* Called with table_lock held.  */
--int qed_write_l2_table(BDRVQEDState *s, QEDRequest *request,
--                       unsigned int index, unsigned int n, bool flush)
-+int coroutine_fn qed_write_l2_table(BDRVQEDState *s, QEDRequest *request=
-,
-+                                    unsigned int index, unsigned int n,
-+                                    bool flush)
- {
-     BLKDBG_EVENT(s->bs->file, BLKDBG_L2_UPDATE);
-     return qed_write_table(s, request->l2_table->offset,
-                            request->l2_table->table, index, n, flush);
- }
-=20
--int qed_write_l2_table_sync(BDRVQEDState *s, QEDRequest *request,
--                            unsigned int index, unsigned int n, bool flu=
-sh)
-+int coroutine_fn qed_write_l2_table_sync(BDRVQEDState *s, QEDRequest *re=
-quest,
-+                                         unsigned int index, unsigned in=
-t n,
-+                                         bool flush)
- {
-     return qed_write_l2_table(s, request, index, n, flush);
- }
-diff --git a/block/qed.c b/block/qed.c
-index 912edaf56a..dcdcd62b4a 100644
---- a/block/qed.c
-+++ b/block/qed.c
-@@ -1604,8 +1604,9 @@ static void coroutine_fn bdrv_qed_co_invalidate_cac=
-he(BlockDriverState *bs,
-     }
- }
-=20
--static int bdrv_qed_co_check(BlockDriverState *bs, BdrvCheckResult *resu=
-lt,
--                             BdrvCheckMode fix)
-+static int coroutine_fn bdrv_qed_co_check(BlockDriverState *bs,
-+                                          BdrvCheckResult *result,
-+                                          BdrvCheckMode fix)
- {
-     BDRVQEDState *s =3D bs->opaque;
-     int ret;
---=20
-2.20.1
+> +
+> +static void stm32f4xx_syscfg_reset(DeviceState *dev)
+> +{
+> +    STM32F4xxSyscfgState *s = STM32F4XX_SYSCFG(dev);
+> +
+> +    s->syscfg_memrmp = 0x00000000;
+> +    s->syscfg_pmc = 0x00000000;
+> +    s->syscfg_exticr1 = 0x00000000;
+> +    s->syscfg_exticr2 = 0x00000000;
+> +    s->syscfg_exticr3 = 0x00000000;
+> +    s->syscfg_exticr4 = 0x00000000;
+> +    s->syscfg_cmpcr = 0x00000000;
+> +}
+> +
+> +static void stm32f4xx_syscfg_set_irq(void *opaque, int irq, int level)
+> +{
+> +    STM32F4xxSyscfgState *s = opaque;
+> +    uint8_t config;
+> +
+> +    DB_PRINT("Interupt: GPIO: %d, Line: %d; Level: %d\n", irq / 16,
+> +             irq % 16, level);
+> +
+> +    config = irq / 16;
+> +
+> +    switch (irq % 16) {
+> +    case 0:
+> +        if ((s->syscfg_exticr1 & 0xF) == config) {
+> +            qemu_set_irq(s->gpio_out[0], level);
+> +            DB_PRINT("Pulse EXTI: 0\n");
+> +        }
+> +        break;
+> +    case 1:
+> +        if (((s->syscfg_exticr1 & 0xF0) >> 4) == config) {
+> +            qemu_set_irq(s->gpio_out[1], level);
+> +            DB_PRINT("Pulse EXTI: 1\n");
+> +        }
+> +        break;
+
+This seems all rather repetitive. If you use an
+array syscfg_exticr[] rather than 4 separate fields you
+can replace this whole switch with something like:
+
+    int icrreg = irq / 4;
+    int startbit = (irq & 3) * 4;
+    if (extract32(s->syscfg_exticr[icrreg], startbit, 4) == config) {
+       qemu_set_irq(s->gpio_out[irq], level);
+       DB_PRINT("Pulse EXTI: %d\n", irq);
+    }
+
+> +    case 2:
+> +        if (((s->syscfg_exticr1 & 0xF00) >> 8) == config) {
+> +            qemu_set_irq(s->gpio_out[2], level);
+> +            DB_PRINT("Pulse EXTI: 2\n");
+> +        }
+> +        break;
+> +    case 3:
+> +        if (((s->syscfg_exticr1 & 0xF000) >> 12) == config) {
+> +            qemu_set_irq(s->gpio_out[3], level);
+> +            DB_PRINT("Pulse EXTI: 3\n");
+> +        }
+> +        break;
+> +    case 4:
+> +        if ((s->syscfg_exticr2 & 0xF) == config) {
+> +            qemu_set_irq(s->gpio_out[4], level);
+> +            DB_PRINT("Pulse EXTI: 4\n");
+> +        }
+> +        break;
+> +    case 5:
+> +        if (((s->syscfg_exticr2 & 0xF0) >> 4) == config) {
+> +            qemu_set_irq(s->gpio_out[5], level);
+> +            DB_PRINT("Pulse EXTI: 5\n");
+> +        }
+> +        break;
+> +    case 6:
+> +        if (((s->syscfg_exticr2 & 0xF00) >> 8) == config) {
+> +            qemu_set_irq(s->gpio_out[6], level);
+> +            DB_PRINT("Pulse EXTI: 6\n");
+> +        }
+> +        break;
+> +    case 7:
+> +        if (((s->syscfg_exticr2 & 0xF000) >> 12) == config) {
+> +            qemu_set_irq(s->gpio_out[7], level);
+> +            DB_PRINT("Pulse EXTI: 7\n");
+> +        }
+> +        break;
+> +    case 8:
+> +        if ((s->syscfg_exticr3 & 0xF) == config) {
+> +            qemu_set_irq(s->gpio_out[8], level);
+> +            DB_PRINT("Pulse EXTI: 8\n");
+> +        }
+> +        break;
+> +    case 9:
+> +        if (((s->syscfg_exticr3 & 0xF0) >> 4) == config) {
+> +            qemu_set_irq(s->gpio_out[9], level);
+> +            DB_PRINT("Pulse EXTI: 9\n");
+> +        }
+> +        break;
+> +    case 10:
+> +        if (((s->syscfg_exticr3 & 0xF00) >> 8) == config) {
+> +            qemu_set_irq(s->gpio_out[10], level);
+> +            DB_PRINT("Pulse EXTI: 10\n");
+> +        }
+> +        break;
+> +    case 11:
+> +        if (((s->syscfg_exticr3 & 0xF000) >> 12) == config) {
+> +            qemu_set_irq(s->gpio_out[11], level);
+> +            DB_PRINT("Pulse EXTI: 11\n");
+> +        }
+> +        break;
+> +    case 12:
+> +        if ((s->syscfg_exticr4 & 0xF) == config) {
+> +            qemu_set_irq(s->gpio_out[12], level);
+> +            DB_PRINT("Pulse EXTI: 12\n");
+> +        }
+> +        break;
+> +    case 13:
+> +        if (((s->syscfg_exticr4 & 0xF0) >> 4) == config) {
+> +            qemu_set_irq(s->gpio_out[13], level);
+> +            DB_PRINT("Pulse EXTI: 13\n");
+> +        }
+> +        break;
+> +    case 14:
+> +        if (((s->syscfg_exticr4 & 0xF00) >> 8) == config) {
+> +            qemu_set_irq(s->gpio_out[14], level);
+> +            DB_PRINT("Pulse EXTI: 14\n");
+> +        }
+> +        break;
+> +    case 15:
+> +        if (((s->syscfg_exticr4 & 0xF000) >> 12) == config) {
+> +            qemu_set_irq(s->gpio_out[15], level);
+> +            DB_PRINT("Pulse EXTI: 15\n");
+> +        }
+> +        break;
+> +    }
+> +}
+> +
+> +static uint64_t stm32f4xx_syscfg_read(void *opaque, hwaddr addr,
+> +                                     unsigned int size)
+> +{
+> +    STM32F4xxSyscfgState *s = opaque;
+> +
+> +    DB_PRINT("0x%"HWADDR_PRIx"\n", addr);
+> +
+> +    switch (addr) {
+> +    case SYSCFG_MEMRMP:
+> +        return s->syscfg_memrmp;
+> +    case SYSCFG_PMC:
+> +        return s->syscfg_pmc;
+> +    case SYSCFG_EXTICR1:
+> +        return s->syscfg_exticr1;
+> +    case SYSCFG_EXTICR2:
+> +        return s->syscfg_exticr2;
+> +    case SYSCFG_EXTICR3:
+> +        return s->syscfg_exticr3;
+> +    case SYSCFG_EXTICR4:
+> +        return s->syscfg_exticr4;
+> +    case SYSCFG_CMPCR:
+> +        return s->syscfg_cmpcr;
+> +    default:
+> +        qemu_log_mask(LOG_GUEST_ERROR,
+> +                      "%s: Bad offset 0x%"HWADDR_PRIx"\n", __func__, addr);
+> +        return 0;
+> +    }
+> +
+> +    return 0;
+
+This return statement is unreachable.
+
+> +}
+> +
+> +static void stm32f4xx_syscfg_write(void *opaque, hwaddr addr,
+> +                       uint64_t val64, unsigned int size)
+> +{
+> +    STM32F4xxSyscfgState *s = opaque;
+> +    uint32_t value = val64;
+> +
+> +    DB_PRINT("0x%x, 0x%"HWADDR_PRIx"\n", value, addr);
+> +
+> +    switch (addr) {
+> +    case SYSCFG_MEMRMP:
+> +        qemu_log_mask(LOG_UNIMP,
+> +                      "%s: Changeing the memory mapping isn't supported " \
+> +                      "in QEMU\n", __func__);
+> +        return;
+> +    case SYSCFG_PMC:
+> +        qemu_log_mask(LOG_UNIMP,
+> +                      "%s: Changeing the memory mapping isn't supported " \
+> +                      "in QEMU\n", __func__);
+
+"Changing" in both these.
+
+> +        return;
+> +    case SYSCFG_EXTICR1:
+> +        s->syscfg_exticr1 = (value & 0xFFFF);
+> +        return;
+> +    case SYSCFG_EXTICR2:
+> +        s->syscfg_exticr2 = (value & 0xFFFF);
+> +        return;
+> +    case SYSCFG_EXTICR3:
+> +        s->syscfg_exticr3 = (value & 0xFFFF);
+> +        return;
+> +    case SYSCFG_EXTICR4:
+> +        s->syscfg_exticr4 = (value & 0xFFFF);
+> +        return;
+> +    case SYSCFG_CMPCR:
+> +        s->syscfg_cmpcr = value;
+> +        return;
+> +    default:
+> +        qemu_log_mask(LOG_GUEST_ERROR,
+> +                      "%s: Bad offset 0x%"HWADDR_PRIx"\n", __func__, addr);
+> +    }
+> +}
+> +
+> +static const MemoryRegionOps stm32f4xx_syscfg_ops = {
+> +    .read = stm32f4xx_syscfg_read,
+> +    .write = stm32f4xx_syscfg_write,
+> +    .endianness = DEVICE_NATIVE_ENDIAN,
+> +};
+> +
+> +static void stm32f4xx_syscfg_init(Object *obj)
+> +{
+> +    STM32F4xxSyscfgState *s = STM32F4XX_SYSCFG(obj);
+> +
+> +    sysbus_init_irq(SYS_BUS_DEVICE(obj), &s->irq);
+> +
+> +    memory_region_init_io(&s->mmio, obj, &stm32f4xx_syscfg_ops, s,
+> +                          TYPE_STM32F4XX_SYSCFG, 0x400);
+> +    sysbus_init_mmio(SYS_BUS_DEVICE(obj), &s->mmio);
+> +
+> +    qdev_init_gpio_in(DEVICE(obj), stm32f4xx_syscfg_set_irq, 16 * 9);
+> +    qdev_init_gpio_out(DEVICE(obj), s->gpio_out, 16);
+> +}
+> +
+> +static void stm32f4xx_syscfg_class_init(ObjectClass *klass, void *data)
+> +{
+> +    DeviceClass *dc = DEVICE_CLASS(klass);
+> +
+> +    dc->reset = stm32f4xx_syscfg_reset;
+
+This is missing the vmstate for migration.
+
+> +}
+> +
+> +static const TypeInfo stm32f4xx_syscfg_info = {
+> +    .name          = TYPE_STM32F4XX_SYSCFG,
+> +    .parent        = TYPE_SYS_BUS_DEVICE,
+> +    .instance_size = sizeof(STM32F4xxSyscfgState),
+> +    .instance_init = stm32f4xx_syscfg_init,
+> +    .class_init    = stm32f4xx_syscfg_class_init,
+> +};
+> +
+> +static void stm32f4xx_syscfg_register_types(void)
+> +{
+> +    type_register_static(&stm32f4xx_syscfg_info);
+> +}
+
+thanks
+-- PMM
