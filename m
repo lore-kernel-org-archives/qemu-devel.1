@@ -2,81 +2,80 @@ Return-Path: <SRS0=TP+Q=TA=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.7 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.0 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A63E2C43219
-	for <qemu-devel@archiver.kernel.org>; Tue, 30 Apr 2019 12:05:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1055EC43219
+	for <qemu-devel@archiver.kernel.org>; Tue, 30 Apr 2019 12:07:26 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6B4EC2075E
-	for <qemu-devel@archiver.kernel.org>; Tue, 30 Apr 2019 12:05:56 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id CA316205ED
+	for <qemu-devel@archiver.kernel.org>; Tue, 30 Apr 2019 12:07:25 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="KRakDecw"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6B4EC2075E
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="quzOgku0"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CA316205ED
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:45783 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:46040 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hLRWD-0008Tz-A0
-	for qemu-devel@archiver.kernel.org; Tue, 30 Apr 2019 08:05:53 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:57084)
+	id 1hLRXg-0001OQ-UI
+	for qemu-devel@archiver.kernel.org; Tue, 30 Apr 2019 08:07:24 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:59886)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1hLROj-0002f6-IK
-	for qemu-devel@nongnu.org; Tue, 30 Apr 2019 07:58:10 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1hLRWV-0000pO-JQ
+	for qemu-devel@nongnu.org; Tue, 30 Apr 2019 08:06:12 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1hLROi-0005Gz-If
-	for qemu-devel@nongnu.org; Tue, 30 Apr 2019 07:58:09 -0400
-Received: from mail-ot1-x343.google.com ([2607:f8b0:4864:20::343]:37990)
+	(envelope-from <peter.maydell@linaro.org>) id 1hLRWU-0001p9-CM
+	for qemu-devel@nongnu.org; Tue, 30 Apr 2019 08:06:11 -0400
+Received: from mail-ot1-x342.google.com ([2607:f8b0:4864:20::342]:41620)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1hLROi-0005Et-C4
-	for qemu-devel@nongnu.org; Tue, 30 Apr 2019 07:58:08 -0400
-Received: by mail-ot1-x343.google.com with SMTP id t20so11629075otl.5
-	for <qemu-devel@nongnu.org>; Tue, 30 Apr 2019 04:58:08 -0700 (PDT)
+	id 1hLRWU-0001os-7B
+	for qemu-devel@nongnu.org; Tue, 30 Apr 2019 08:06:10 -0400
+Received: by mail-ot1-x342.google.com with SMTP id g8so10637220otl.8
+	for <qemu-devel@nongnu.org>; Tue, 30 Apr 2019 05:06:10 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
 	h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-	:cc; bh=tk8COTEyjthIF0Jp1cfA+pEDRboxt604+/zaiAyN2ak=;
-	b=KRakDecwcBqQ2OkY2KEXO4PdfIihuAJP3bHyFjrr2bESmhkyM1sZ5a3qYlbjS+eKFY
-	JbxiXOTdtm69fVkQFpVgtqqqXrDdFhFbkr3Gg15BQlGJIEYILvT7l7+x5UpQRkCnW08D
-	OxrbNYalZVg0CL48GfkHkceAOuR4Wzq1A7aDZsbtOF8qIBLH0pTUWg1z6l4iRmkLYkhW
-	yZt8fBaidtbDk673NTaiVxZdDVNYo+QwefdSJcHMwWWeSbbgVTb02FvnSa/1CmRt1oFY
-	/hPHFxLTzZfp/uel3cJz5KmP++qoTPo3eayBxX2xvPP+/7zAXxRop8I0phwRMXQ5YG2W
-	gDFQ==
+	:cc; bh=ctw1PmSs/FscVIAd8xMc+XKKLMdL9xM/Hxw+Ecx6PVY=;
+	b=quzOgku0i5Ak/XgMVl7+bhROh2NnYsiXsVvKFospcObCqGr+4ih8WflYbEMYAQyc9F
+	8owXy4Qt7jl1uiE1WLSGIF5UbN0SCxjWqczXdoKqgoJ/wcNXafRe/A0nUueCvfmm0xXN
+	1BdaoGYF8bJCzr2ZNJQsgU0PcmtOlxCYV5ZeKiTPYhrlbHzrloNGfuYkz+05E8DWx5rI
+	4hprpDm8cmqoGDlILmahK1lXpzlQ5nNhObdB07sLZnug5g8il4fyn+Ey24bZhtLEprFE
+	yX8toTWl1MRAT+FzWvyffI2Prez7sf4ylMIYe1MFmkfN0tLlAlUSliBg2FGLYKZvAodm
+	0NOw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
 	d=1e100.net; s=20161025;
 	h=x-gm-message-state:mime-version:references:in-reply-to:from:date
 	:message-id:subject:to:cc;
-	bh=tk8COTEyjthIF0Jp1cfA+pEDRboxt604+/zaiAyN2ak=;
-	b=XjVJ7ki3BDopOI1dkz8JeiacT/MI2WH409CZ9RchrWmmSRT9f12eOrssAqZAiKSJJ7
-	oIyOJeksp8qVX7qxji0bCghsIJfY5zw6XXs3pjpZXDe6osi7lRhM+ae1iY82rei2X6UC
-	UIi9bLp7cMktbf6VTqERQlCT33GerL05HCEqvOIse2x5ffonI9bKpW8QY9rcTdVvZcJJ
-	vj/OVGymTMiocaPrJa2xUpUCbRM55L15//u9WHl7YGz+iqa8dCqo5joIZUZmJc2y0Ngj
-	wCDuB+STquE+ApCojeZbY+xtsEWf4Gy2g5DKfpRKsg13R+mFSJD3ns2sk75WPW76s9dm
-	JPyA==
-X-Gm-Message-State: APjAAAUvu/47Uq0n9V9yQuYw3anKyb/NEL6ta7BwHOgHGNLxsxmcfvTQ
-	hU0ku6mmHEn2Gi9YzaDMlL8qbjz6vlZ/ObIGtyV9Ww==
-X-Google-Smtp-Source: APXvYqzaBT2MVCZArf8k4THSgl6eKioQcmL30D2EoK47ms45EHbBLYigl4yiyerJfB3yHHjlnT3EzzY6AnHvPXv2Aa4=
-X-Received: by 2002:a9d:404:: with SMTP id 4mr39916317otc.352.1556625487129;
-	Tue, 30 Apr 2019 04:58:07 -0700 (PDT)
+	bh=ctw1PmSs/FscVIAd8xMc+XKKLMdL9xM/Hxw+Ecx6PVY=;
+	b=Dqm7URbYrmlip3GcRPyW6+rj1P5MoGf+N6FvqwTxn+ZTFcKDWpRr4y7D3tAFeejCos
+	GJMvTrDcmGPlBTpyJRyjuQGpO0004gW/Nz+nhbJPN/aBMvmTDnaQT7hridDb8XpgBn30
+	nxX0QKnheAYw/hZI4sga5tg088ePAuql7H00Bnv+yE1j9JslxypkarN/DA/7e2+Z2nMx
+	F6Rd9zMPF5d4zVub2Wmqbg0H05A+/KefgvUUlGB7sFvWwxKcvYcmofyQpTqAi6+7noly
+	VQ8JjzCD9a9H17f4BrvPoKiFZ91Dmtsj1LOS2u8joTgV5Fmb2qvv4xJDC2S+uiKFkIJf
+	jlMw==
+X-Gm-Message-State: APjAAAXIGYcrBO8cfFBxnYuye06HKvOL0M2CcS3Bdu+IPA63+P9rtx81
+	aE1/KDrk8PvXSQVEmusOjTuuamyyvc5WSsQct7m1hw==
+X-Google-Smtp-Source: APXvYqy+UuUTLwpIUo6zBBmx2kt5ghFlftUB17CgnWjhMHe1WueaDKz55LsP9FnY98fLAO2gCJRFE44ymKYF56pMjFM=
+X-Received: by 2002:a9d:6156:: with SMTP id c22mr12058752otk.363.1556625969476;
+	Tue, 30 Apr 2019 05:06:09 -0700 (PDT)
 MIME-Version: 1.0
-References: <20190403034358.21999-1-richard.henderson@linaro.org>
-	<20190403034358.21999-6-richard.henderson@linaro.org>
-In-Reply-To: <20190403034358.21999-6-richard.henderson@linaro.org>
+References: <20190430031238.40499-1-yangchuanlong@huawei.com>
+In-Reply-To: <20190430031238.40499-1-yangchuanlong@huawei.com>
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 30 Apr 2019 12:57:56 +0100
+Date: Tue, 30 Apr 2019 13:05:58 +0100
 Message-ID:
- <CAFEAcA-LJfcTp2BNtug3XM39jTUQSEu3wNrgYmJih6cvPubShg@mail.gmail.com>
-To: Richard Henderson <richard.henderson@linaro.org>
+ <CAFEAcA-HkovdX3XayW22=wJ2i0cECV_Jm3OjTv3zsHLMhgsKDQ@mail.gmail.com>
+To: Yang Chuanlong <yangchuanlong@huawei.com>
 Content-Type: text/plain; charset="UTF-8"
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
 	recognized.
-X-Received-From: 2607:f8b0:4864:20::343
-Subject: Re: [Qemu-devel] [PATCH 05/26] target/cris: Convert to
- CPUClass::tlb_fill
+X-Received-From: 2607:f8b0:4864:20::342
+Subject: Re: [Qemu-devel] [PATCH v1] target/arm/arm-powerctl: mask the cpuid
+ with affinity bits when get cpu
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -88,62 +87,54 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "Edgar E . Iglesias" <edgar.iglesias@gmail.com>,
-	QEMU Developers <qemu-devel@nongnu.org>
+Cc: QEMU Developers <qemu-devel@nongnu.org>,
+	gengdongjiu <gengdongjiu@huawei.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190430115756.Bed9SQqsw6u4hFpA_L3rE61B8d4nQwf0dsJwVxK4kb8@z>
+Message-ID: <20190430120558.JunCvAhUXmAC9qNM3G0orzJMiyFczzKxhHpU7BxtDVE@z>
 
-On Wed, 3 Apr 2019 at 04:46, Richard Henderson
-<richard.henderson@linaro.org> wrote:
+On Tue, 30 Apr 2019 at 04:22, Yang Chuanlong <yangchuanlong@huawei.com> wrote:
 >
-> Cc: Edgar E. Iglesias <edgar.iglesias@gmail.com>
-> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+> Currently, the cpuid passed from the device tree may still contain
+> non-affinity fields, which will cause arm_set_cpu_on failure.
+> Therefore, we mask the cpuid with affinity fields here to
+> improve qemu compatibility.
+>
+> Signed-off-by: Yang Chuanlong <yangchuanlong@huawei.com>
 > ---
->  target/cris/cpu.h       |  5 +--
->  target/cris/cpu.c       |  5 ++-
->  target/cris/helper.c    | 67 +++++++++++++++++++++++------------------
->  target/cris/op_helper.c | 28 -----------------
->  4 files changed, 42 insertions(+), 63 deletions(-)
-
-> -int cris_cpu_handle_mmu_fault(CPUState *cs, vaddr address, int size, int rw,
-> -                              int mmu_idx)
-> +bool cris_cpu_tlb_fill(CPUState *cs, vaddr address, int size,
-> +                       MMUAccessType access_type, int mmu_idx,
-> +                       bool probe, uintptr_t retaddr)
->  {
->      CRISCPU *cpu = CRIS_CPU(cs);
+>  target/arm/arm-powerctl.c | 8 +++++++-
+>  1 file changed, 7 insertions(+), 1 deletion(-)
 >
->      cs->exception_index = 0xaa;
->      cpu->env.pregs[PR_EDA] = address;
-> -    cpu_dump_state(cs, stderr, fprintf, 0);
-> -    return 1;
-> +    cpu_loop_exit_restore(cs, retaddr);
+> diff --git a/target/arm/arm-powerctl.c b/target/arm/arm-powerctl.c
+> index f77a950db6..ef9fec0b4d 100644
+> --- a/target/arm/arm-powerctl.c
+> +++ b/target/arm/arm-powerctl.c
+> @@ -31,7 +31,13 @@ CPUState *arm_get_cpu_by_id(uint64_t id)
+>  {
+>      CPUState *cpu;
+>
+> -    DPRINTF("cpu %" PRId64 "\n", id);
+> +#ifdef TARGET_AARCH64
+> +    id &= ARM64_AFFINITY_MASK;
+> +#else
+> +    id &= ARM32_AFFINITY_MASK;
+> +#endif
+> +
+> +    DPRINTF("cpu %" PRId64 " after mask affinity\n", id);
+>
+>      CPU_FOREACH(cpu) {
+>          ARMCPU *armcpu = ARM_CPU(cpu);
 
-You might mention in the commit message that we removed the
-cpu_dump_state().
+Hi -- could you explain what the code path is where we
+end up passing a wrong value into this function? I'm
+wondering if this is the best place to fix it, or if maybe
+the calling function is at fault.
 
-> +    env->pregs[PR_EDA] = address;
-> +    cs->exception_index = EXCP_BUSFAULT;
-> +    env->fault_vector = res.bf_vec;
-> +    if (retaddr) {
-> +        if (cpu_restore_state(cs, retaddr, true)) {
-> +            /* Evaluate flags after retranslation. */
-> +            helper_top_evaluate_flags(env);
-
-Side note because the old code does the same thing, but it seems
-weird that we have to manually recalculate the flags here -- I
-would expect cpu_restore_state() to actually restore the state
-(presumably by having restore_state_to_opc() do the fixing up
-of the flags?).
-
-> +        }
-> +    }
-> +    cpu_loop_exit(cs);
-> +}
-
-Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
+Also, you can't use #ifdef TARGET_AARCH64 here to distinguish
+a 64-bit from a 32-bit CPU, because the qemu-system-aarch64
+binary (which is built with TARGET_AARCH64) also supports all
+the 32-bit CPUs.
 
 thanks
 -- PMM
