@@ -2,85 +2,91 @@ Return-Path: <SRS0=TP+Q=TA=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.3 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,FROM_LOCAL_NOVOWEL,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
-	SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8F2DFC43219
-	for <qemu-devel@archiver.kernel.org>; Tue, 30 Apr 2019 18:18:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 44BB1C43219
+	for <qemu-devel@archiver.kernel.org>; Tue, 30 Apr 2019 18:26:22 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5B5B020854
-	for <qemu-devel@archiver.kernel.org>; Tue, 30 Apr 2019 18:18:03 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="XbkE8FAe"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5B5B020854
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	by mail.kernel.org (Postfix) with ESMTPS id 16CB720835
+	for <qemu-devel@archiver.kernel.org>; Tue, 30 Apr 2019 18:26:22 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 16CB720835
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:51480 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:51556 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hLXKM-0004Xb-LA
-	for qemu-devel@archiver.kernel.org; Tue, 30 Apr 2019 14:18:02 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:57664)
+	id 1hLXSO-0006Qe-Rs
+	for qemu-devel@archiver.kernel.org; Tue, 30 Apr 2019 14:26:20 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:59769)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jcmvbkbc@gmail.com>) id 1hLXGn-00028Y-Jy
-	for qemu-devel@nongnu.org; Tue, 30 Apr 2019 14:14:23 -0400
+	(envelope-from <eblake@redhat.com>) id 1hLXRa-00065D-MN
+	for qemu-devel@nongnu.org; Tue, 30 Apr 2019 14:25:31 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jcmvbkbc@gmail.com>) id 1hLXGm-0007cG-IP
-	for qemu-devel@nongnu.org; Tue, 30 Apr 2019 14:14:21 -0400
-Received: from mail-yw1-xc42.google.com ([2607:f8b0:4864:20::c42]:35691)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <jcmvbkbc@gmail.com>) id 1hLXGm-0007c8-EF
-	for qemu-devel@nongnu.org; Tue, 30 Apr 2019 14:14:20 -0400
-Received: by mail-yw1-xc42.google.com with SMTP id n188so4014133ywe.2
-	for <qemu-devel@nongnu.org>; Tue, 30 Apr 2019 11:14:20 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
-	h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-	:cc; bh=OF++BaEMEJ5gY6r5y6fed/DGSTPbm2jtOVugo40BZDo=;
-	b=XbkE8FAeeKuLgGflxTdofRTFFHGZmFZoMaXSf+CkLdCr8Y0rRl/FaHR6HiCFI2pg/q
-	sCvcVmDE62J4RcyWYx7aVArxaiyundNkkqdKbTsou6B0ENbACxgNqZFntT3m4ohycmbZ
-	39ZZZ5LgGlbXE79USd1tmNnGAWzxdKJO6aChITZ0/xtkNBsu2n4KeHaE7VIMoeBOmoH7
-	wZ2LTf/rf+f6gip6J3vQsnQYbeJcjOAan8aTEb0cB3Yp/ulrHD0RzmcmrMsuHHiq3i3V
-	9uH2FSPG8zDHcXjpZ9LYGIar3Vk6bDsQEOCwyIKuvKO9lcSZ/9Bg5RLQNxTrBh4lvkU8
-	Eq2w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=1e100.net; s=20161025;
-	h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-	:message-id:subject:to:cc;
-	bh=OF++BaEMEJ5gY6r5y6fed/DGSTPbm2jtOVugo40BZDo=;
-	b=s7XNAuinkAzxH/BWuEO3DxHjiEOxFC2g452b0MdFbTG0VTNbVi2mcY0xSAKByCAt8p
-	KTAF1QUxtvN862V23XHe6mjRfobBtlpdYCv9DdJeXPYJkHLYBxy+j7aJ71NLUrQFLvjx
-	q3ESh9o7QGWMbh130hFP30UJ0p5SBMI8ShOeuqlf5ziyhzaYxt+xiE2eWtjjmtbs5KdW
-	QaDrEn8gijEPf+LYcU0RfuOPlivtSLLnVGa3d86LvV13lK6D5WPsk1cxqutoptlBTwFU
-	29gTkIx6o7PfAn2ZGWbhqM3QmW7Y1x36MEgVCF/FNP8AqDdjzS8Ca1RCq9HSxvS7kGhz
-	LCgg==
-X-Gm-Message-State: APjAAAUtWoMzOTCMzGl1YT/H1l0PsGljMhBshK/jTDMhzLxDr2LhStr/
-	bXWC3I/ak0AcbQ+IoAjQuVpkpSEdNQfGVyvOgQo=
-X-Google-Smtp-Source: APXvYqwIQH4msqJ31+JMY7CqnpYTJwBJDthAJwMp4cDmbEAm/xQdeoy85lWhEaGjc+HDQHD4862jte7bajZYex4P2t4=
-X-Received: by 2002:a81:a38a:: with SMTP id
-	a132mr12625978ywh.126.1556648059890; 
-	Tue, 30 Apr 2019 11:14:19 -0700 (PDT)
+	(envelope-from <eblake@redhat.com>) id 1hLXRZ-0007Vk-LY
+	for qemu-devel@nongnu.org; Tue, 30 Apr 2019 14:25:30 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:45240)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1hLXRZ-0007UP-D9
+	for qemu-devel@nongnu.org; Tue, 30 Apr 2019 14:25:29 -0400
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+	[10.5.11.11])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id A8FD5309703F;
+	Tue, 30 Apr 2019 18:25:27 +0000 (UTC)
+Received: from [10.3.116.15] (ovpn-116-15.phx2.redhat.com [10.3.116.15])
+	by smtp.corp.redhat.com (Postfix) with ESMTPS id 35026D1C4;
+	Tue, 30 Apr 2019 18:25:27 +0000 (UTC)
+To: Cao Jiaxi <driver1998@foxmail.com>, mdroth@linux.vnet.ibm.com
+References: <20190430181257.1265-1-driver1998@foxmail.com>
+From: Eric Blake <eblake@redhat.com>
+Openpgp: preference=signencrypt
+Autocrypt: addr=eblake@redhat.com; keydata=
+	xsBNBEvHyWwBCACw7DwsQIh0kAbUXyqhfiKAKOTVu6OiMGffw2w90Ggrp4bdVKmCaEXlrVLU
+	xphBM8mb+wsFkU+pq9YR621WXo9REYVIl0FxKeQo9dyQBZ/XvmUMka4NOmHtFg74nvkpJFCD
+	TUNzmqfcjdKhfFV0d7P/ixKQeZr2WP1xMcjmAQY5YvQ2lUoHP43m8TtpB1LkjyYBCodd+LkV
+	GmCx2Bop1LSblbvbrOm2bKpZdBPjncRNob73eTpIXEutvEaHH72LzpzksfcKM+M18cyRH+nP
+	sAd98xIbVjm3Jm4k4d5oQyE2HwOur+trk2EcxTgdp17QapuWPwMfhaNq3runaX7x34zhABEB
+	AAHNHkVyaWMgQmxha2UgPGVibGFrZUByZWRoYXQuY29tPsLAegQTAQgAJAIbAwULCQgHAwUV
+	CgkICwUWAgMBAAIeAQIXgAUCS8fL9QIZAQAKCRCnoWtKJSdDahBHCACbl/5FGkUqJ89GAjeX
+	RjpAeJtdKhujir0iS4CMSIng7fCiGZ0fNJCpL5RpViSo03Q7l37ss+No+dJI8KtAp6ID+PMz
+	wTJe5Egtv/KGUKSDvOLYJ9WIIbftEObekP+GBpWP2+KbpADsc7EsNd70sYxExD3liwVJYqLc
+	Rw7so1PEIFp+Ni9A1DrBR5NaJBnno2PHzHPTS9nmZVYm/4I32qkLXOcdX0XElO8VPDoVobG6
+	gELf4v/vIImdmxLh/w5WctUpBhWWIfQDvSOW2VZDOihm7pzhQodr3QP/GDLfpK6wI7exeu3P
+	pfPtqwa06s1pae3ad13mZGzkBdNKs1HEm8x6zsBNBEvHyWwBCADGkMFzFjmmyqAEn5D+Mt4P
+	zPdO8NatsDw8Qit3Rmzu+kUygxyYbz52ZO40WUu7EgQ5kDTOeRPnTOd7awWDQcl1gGBXgrkR
+	pAlQ0l0ReO57Q0eglFydLMi5bkwYhfY+TwDPMh3aOP5qBXkm4qIYSsxb8A+i00P72AqFb9Q7
+	3weG/flxSPApLYQE5qWGSXjOkXJv42NGS6o6gd4RmD6Ap5e8ACo1lSMPfTpGzXlt4aRkBfvb
+	NCfNsQikLZzFYDLbQgKBA33BDeV6vNJ9Cj0SgEGOkYyed4I6AbU0kIy1hHAm1r6+sAnEdIKj
+	cHi3xWH/UPrZW5flM8Kqo14OTDkI9EtlABEBAAHCwF8EGAEIAAkFAkvHyWwCGwwACgkQp6Fr
+	SiUnQ2q03wgAmRFGDeXzc58NX0NrDijUu0zx3Lns/qZ9VrkSWbNZBFjpWKaeL1fdVeE4TDGm
+	I5mRRIsStjQzc2R9b+2VBUhlAqY1nAiBDv0Qnt+9cLiuEICeUwlyl42YdwpmY0ELcy5+u6wz
+	mK/jxrYOpzXKDwLq5k4X+hmGuSNWWAN3gHiJqmJZPkhFPUIozZUCeEc76pS/IUN72NfprZmF
+	Dp6/QDjDFtfS39bHSWXKVZUbqaMPqlj/z6Ugk027/3GUjHHr8WkeL1ezWepYDY7WSoXwfoAL
+	2UXYsMAr/uUncSKlfjvArhsej0S4zbqim2ZY6S8aRWw94J3bSvJR+Nwbs34GPTD4Pg==
+Organization: Red Hat, Inc.
+Message-ID: <b2f0fc78-f9ca-ae2c-d800-9b25d220b7dd@redhat.com>
+Date: Tue, 30 Apr 2019 13:25:26 -0500
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+	Thunderbird/60.6.1
 MIME-Version: 1.0
-References: <20190403034358.21999-1-richard.henderson@linaro.org>
-	<20190403034358.21999-24-richard.henderson@linaro.org>
-	<CAFEAcA_FZHKXJHg4819JOZkwwhE44Vx874GKrnxRrOau1HhzRw@mail.gmail.com>
-	<CAMo8BfJVdDvYWEdN_08ed5OKBGXc+U8kSbmWaSWY9WCuvDj2pw@mail.gmail.com>
-	<bd57c22c-1bdc-80b4-0415-565117f6ae3e@linaro.org>
-In-Reply-To: <bd57c22c-1bdc-80b4-0415-565117f6ae3e@linaro.org>
-From: Max Filippov <jcmvbkbc@gmail.com>
-Date: Tue, 30 Apr 2019 11:14:08 -0700
-Message-ID:
- <CAMo8BfJsC9aPYUhi5Rg6SAXT4dhaZaU=dqy=um+aBJtnPMSwdA@mail.gmail.com>
-To: Richard Henderson <richard.henderson@linaro.org>
-Content-Type: text/plain; charset="UTF-8"
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
-	recognized.
-X-Received-From: 2607:f8b0:4864:20::c42
-Subject: Re: [Qemu-devel] [PATCH 23/26] target/xtensa: Convert to
- CPUClass::tlb_fill
+In-Reply-To: <20190430181257.1265-1-driver1998@foxmail.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="4YPsYRHHENTZMhR1MGcFHMat1EonXw0Qv"
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+	(mx1.redhat.com [10.5.110.43]);
+	Tue, 30 Apr 2019 18:25:27 +0000 (UTC)
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 209.132.183.28
+X-Content-Filtered-By: Mailman/MimeDel 2.1.21
+Subject: Re: [Qemu-devel] [PATCH v2 2/4] qga: Fix an enum conversion warning
+ in commands-win32.c, hit by clang.
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -92,42 +98,86 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>,
-	QEMU Developers <qemu-devel@nongnu.org>
+Cc: qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190430181408.y-ByxqIuJ_eHMbal67PG_Bhds6zV9fAqbwfPKTUVs3E@z>
+Message-ID: <20190430182526.M2GhVMckdPyjtzQ7FIkb-y-xJQ0GCoqxXKkUO2D3JRM@z>
 
-On Tue, Apr 30, 2019 at 10:44 AM Richard Henderson
-<richard.henderson@linaro.org> wrote:
-> On 4/30/19 10:32 AM, Max Filippov wrote:
-> > On Tue, Apr 30, 2019 at 3:11 AM Peter Maydell <peter.maydell@linaro.org> wrote:
-> >> ...but now we'll set it to whatever exception_cause_vaddr does,
-> >> which is something more complicated based on the state of
-> >> env->sregs[PS].
-> >>
-> >> We'll also end up setting env->sregs[PS] bits and env->pc, which
-> >> the old code did not. (In particular since we set the PS_EXCM bit,
-> >> the second time we take an exception won't we then end up
-> >> setting exception_index to EXC_DOUBLE, not EXC_USER ?)
-> >
-> > I guess it doesn't matter, because linux-user userspace never handles
-> > exceptions. PS, PC and similar must be fixed up by the linux-user
-> > exception handler. But I haven't tested it.
->
-> It does handle exceptions, in linux-user/xtensa/cpu_loop.c.
-> And Peter's right that I should have kept EXC_USER.
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--4YPsYRHHENTZMhR1MGcFHMat1EonXw0Qv
+From: Eric Blake <eblake@redhat.com>
+To: Cao Jiaxi <driver1998@foxmail.com>, mdroth@linux.vnet.ibm.com
+Cc: qemu-devel@nongnu.org
+Message-ID: <b2f0fc78-f9ca-ae2c-d800-9b25d220b7dd@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v2 2/4] qga: Fix an enum conversion warning
+ in commands-win32.c, hit by clang.
+References: <20190430181257.1265-1-driver1998@foxmail.com>
+In-Reply-To: <20190430181257.1265-1-driver1998@foxmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-PC must also either be preserved or restored from the EPC1
-in the cpu_loop for the SYSCALL_CAUSE.
+On 4/30/19 1:12 PM, Cao Jiaxi wrote:
+> Signed-off-by: Cao Jiaxi <driver1998@foxmail.com>
+> ---
+>  qga/commands-win32.c | 35 ++++++++++++++++++-----------------
+>  1 file changed, 18 insertions(+), 17 deletions(-)
 
-> > Richard, is there a branch with this series available somewhere?
-> https://github.com/rth7680/qemu/tree/tcg-tlb-fill
+Can you paste the actual warning message you were getting?
 
-Thanks, I'll try it.
+>=20
+> diff --git a/qga/commands-win32.c b/qga/commands-win32.c
+> index d40d61f605..4cdd2950bf 100644
+> --- a/qga/commands-win32.c
+> +++ b/qga/commands-win32.c
+> @@ -458,23 +458,24 @@ void qmp_guest_file_flush(int64_t handle, Error *=
+*errp)
+>  #ifdef CONFIG_QGA_NTDDSCSI
+> =20
+>  static STORAGE_BUS_TYPE win2qemu[] =3D {
+> -    [BusTypeUnknown] =3D GUEST_DISK_BUS_TYPE_UNKNOWN,
 
--- 
-Thanks.
--- Max
+> +    [BusTypeUnknown] =3D (STORAGE_BUS_TYPE)GUEST_DISK_BUS_TYPE_UNKNOWN=
+,
+
+This adds lots of explicit casts. Are they actually necessary? Without
+seeing the actual warning, it seems fishy to have to be this explicit.
+
+
+> @@ -483,7 +484,7 @@ static GuestDiskBusType find_bus_type(STORAGE_BUS_T=
+YPE bus)
+>      if (bus >=3D ARRAY_SIZE(win2qemu) || (int)bus < 0) {
+>          return GUEST_DISK_BUS_TYPE_UNKNOWN;
+>      }
+> -    return win2qemu[(int)bus];
+> +    return (GuestDiskBusType)win2qemu[(int)bus];
+
+Or is it complaining that GuestDiskBusType and STORAGE_BUS_TYPE are
+distinct types, and that we are indeed cross-assigning between the two
+enums because we intentionally want them to share values?
+
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3226
+Virtualization:  qemu.org | libvirt.org
+
+
+--4YPsYRHHENTZMhR1MGcFHMat1EonXw0Qv
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlzIkxYACgkQp6FrSiUn
+Q2qvSQf/c0U5e7lgfwgoomKqIePk/5fdFoELN2yvvCIe5TWnwJCp7X1oqlPwxNUg
+WAmgVNaPFL84K7tM7kqSFszfKoc/nLPbzLu/2WD/+5cGdBorP3Sgz140j9fxAlEI
+CpSo8sIilCy1sw710fGheBs0evc3t4bfNNgvL5VeUj8D1Ji94fxQuhC0MpKO4agT
+VGjqM2qMIX3bhnXoZ4cOn2jzQ3IHDqjo0hUYntTjZc65Qo0MESmEAOqS7cfhclfm
+KP2cRf8Ss3wDct6H2DFyuWLQP1UV/LGqB6FfVJi82jjZibeQ1wghzlcIKElUt/cl
+EtuF33767f4goDBl5wdQFRSFPE0x1g==
+=IgVz
+-----END PGP SIGNATURE-----
+
+--4YPsYRHHENTZMhR1MGcFHMat1EonXw0Qv--
 
