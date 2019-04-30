@@ -7,79 +7,79 @@ X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
 	SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1BC1DC43219
-	for <qemu-devel@archiver.kernel.org>; Tue, 30 Apr 2019 21:05:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 44DF1C43219
+	for <qemu-devel@archiver.kernel.org>; Tue, 30 Apr 2019 21:06:00 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D52A72081C
-	for <qemu-devel@archiver.kernel.org>; Tue, 30 Apr 2019 21:05:39 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 0CB1D2081C
+	for <qemu-devel@archiver.kernel.org>; Tue, 30 Apr 2019 21:06:00 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Ju8Z2rKk"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D52A72081C
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="tEh3qQNP"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0CB1D2081C
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:53413 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:53437 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hLZwY-00046e-OH
-	for qemu-devel@archiver.kernel.org; Tue, 30 Apr 2019 17:05:38 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:58654)
+	id 1hLZwt-0004TK-6g
+	for qemu-devel@archiver.kernel.org; Tue, 30 Apr 2019 17:05:59 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:58566)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alistair23@gmail.com>) id 1hLZuV-0002ix-R0
-	for qemu-devel@nongnu.org; Tue, 30 Apr 2019 17:03:32 -0400
+	(envelope-from <alistair23@gmail.com>) id 1hLZuX-0002hi-JU
+	for qemu-devel@nongnu.org; Tue, 30 Apr 2019 17:03:34 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alistair23@gmail.com>) id 1hLZuU-0001tK-B3
-	for qemu-devel@nongnu.org; Tue, 30 Apr 2019 17:03:31 -0400
-Received: from mail-lf1-x141.google.com ([2a00:1450:4864:20::141]:33292)
+	(envelope-from <alistair23@gmail.com>) id 1hLZs6-0000RJ-Sy
+	for qemu-devel@nongnu.org; Tue, 30 Apr 2019 17:01:03 -0400
+Received: from mail-lf1-x141.google.com ([2a00:1450:4864:20::141]:35238)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <alistair23@gmail.com>)
-	id 1hLZuT-0001rz-Uw; Tue, 30 Apr 2019 17:03:30 -0400
-Received: by mail-lf1-x141.google.com with SMTP id j11so11965604lfm.0;
-	Tue, 30 Apr 2019 14:03:29 -0700 (PDT)
+	id 1hLZs6-0000Pw-Lp; Tue, 30 Apr 2019 17:01:02 -0400
+Received: by mail-lf1-x141.google.com with SMTP id j20so11959749lfh.2;
+	Tue, 30 Apr 2019 14:01:01 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
 	h=mime-version:references:in-reply-to:from:date:message-id:subject:to
 	:cc:content-transfer-encoding;
-	bh=Uz2HnqzsfMYSzCruClG78wktLuutjoRm8r0Nw9+5Gfs=;
-	b=Ju8Z2rKkAuS54kZbtGZqjTE0p1pln4WPSzPCajwL8zA/ARQY1U6XcZbDNDIaAZAqit
-	YO57za1EaYATGvoWlGJkALjRG/k3HWWqBzdLps1RxHdA1koxOlCtqi01RMH/LIQGoDdS
-	J9QUj1cdL/wvTb7m0A1/RqAkn2D9zGpWEzTv4z5tUAJTMYDRF6qWIzfo/c33pjJQWIVS
-	KHOvpRKK+bYgvhUhXSI0Ly31kygnu9E5086xlmLGpWShGvxWHvd0Gm7EJbmxJvSoopih
-	AuVZfWCjnjA757InKHMo8tQEhEe/rnQFMe4lHmK0suCBhQXD8QgmwHD3PulJFX02EUCu
-	regw==
+	bh=05LJbDiyXnwkAcbMIJxpRQIyxurjkjMdMF29cuB89K8=;
+	b=tEh3qQNPRvO3PW+wMD0zZhtCeCXWUQN8rhxkT/sIBUb9/lt10IEQ6Rro0EIeKi7gY3
+	VoQEBW63qfWqKcTNYYooO/8pGExppWAd6zQEzf//+XP/hpy5LVS+HZORFSramMN6arI0
+	JGOJVsmgr77igqWfB+exh8YUCu9wIinH11j512T4+3P/2yU/Y7WydI2Sa4rhNkChWKcL
+	nJa6dgDD9qnOppnlx7L/0FraQb481J8jKkvZNoFHO7ZOrIEKlDzfi+GLgyPDFFikW0w4
+	YhwHH7SwMdyjc7Oszee6NAchQohNdMd/VWQTDuXct5kqgu0UBGt+1xLScftclU4oKNxf
+	pP6A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
 	d=1e100.net; s=20161025;
 	h=x-gm-message-state:mime-version:references:in-reply-to:from:date
 	:message-id:subject:to:cc:content-transfer-encoding;
-	bh=Uz2HnqzsfMYSzCruClG78wktLuutjoRm8r0Nw9+5Gfs=;
-	b=OrKipJtj3/R2mdM7NQNjfp8Uln3oaQNhg9HXFIBNjTJEU1Inewfo6ww73123L6xNb4
-	8Bho49b143H4g5B7pF9zBhljMD+vgBei6T7XKhccy+jv/OISGV8nWWpU/N+2zWsHMtxG
-	jUr5gQtUxy6tnbkiTcD9PgzUUAwj4dEUNT7kIbLIYteqK9O8+NF9zTZ5O+5wNtt4Z8Rx
-	8w+JKEFzSxdogr5bOCpg+HrprEOlNibONFGn6mQZtfshiGqSivfBdSwHTueIQgDS820c
-	mGuWmcu4UxfPxgp4libpAnTZ9DbXHNuhIf6Vv4VxjKZGsJ+ZNBcatmbLz6D+YDVOiXw9
-	Ek+w==
-X-Gm-Message-State: APjAAAUxhH5Xv0bWpeiydKqP/kIVqUSQ2K0BSF1XzQ/bqzhSGIH4AyTy
-	tKJMMVdzHc5zKcn4cZ2Ag1B27WiJxLsChWVQEok=
-X-Google-Smtp-Source: APXvYqwvi4tgNYTFY8RDwuk2Vo+Xfn8V8rmlHs/7ijQzeOQPis4+svRO+zEWpy65styUAmVWWXLKet2Gsw+kMRItHTs=
-X-Received: by 2002:ac2:523a:: with SMTP id i26mr32047730lfl.118.1556658208840;
-	Tue, 30 Apr 2019 14:03:28 -0700 (PDT)
+	bh=05LJbDiyXnwkAcbMIJxpRQIyxurjkjMdMF29cuB89K8=;
+	b=UZXpTSLMgNOmp+8kcoSO6seHXZh1qB6yJMvenmzz6kLZmAWl9OCCJgV2CSlBbpGJy6
+	5Cl9EePyjYuyfXy59c2OLnevExrPf9m5i/ypsjwdV57m1t+g7m9Gs2HIyZvCDedB/QYV
+	KgoML7iUQUnXhE0l4MiUd472em/KKXqv4PccXgY/b+6lXEKq8XBavurC5/qL1rTBi3nk
+	cSS8gIIGzp8ZKcLWBx3/IbnfISdnu/SqSevpUfG9qfRraFrNUsQzeo2w4WIBLOMLbQA1
+	1jObcPh28pwnPsvkDoN4GL5hToKX/qve6Row19EdlNbBgzFn1KkmqoYhiMhv1GrkxsFv
+	v3VA==
+X-Gm-Message-State: APjAAAWeVWd9j7IPyRsSftSsqmEbLkKgrlIS55l8P1cZTQBOy++hnpBA
+	MDTREVR/LI5qnbg5s7zrh21cqxq9xp3zahhNgNc=
+X-Google-Smtp-Source: APXvYqzmnlnPHMIP048CAjD0sDZKNE/a9CApOcdMrGHS5BOIia7EP7V40BAY+buhKM4kHtgdWJs0YFST+QzNNMHtrJ8=
+X-Received: by 2002:a19:1949:: with SMTP id 70mr28585768lfz.103.1556658059595; 
+	Tue, 30 Apr 2019 14:00:59 -0700 (PDT)
 MIME-Version: 1.0
 References: <cover.1556650594.git.alistair.francis@wdc.com>
-	<6bfa446eb7c351b5d867eb4158198231af724b11.1556650594.git.alistair.francis@wdc.com>
-	<d4dd0758-64af-e249-1f1b-b52af014b404@vivier.eu>
-In-Reply-To: <d4dd0758-64af-e249-1f1b-b52af014b404@vivier.eu>
+	<c4768a18309b3918715f96a1f5b2a9a264a5a9e4.1556650594.git.alistair.francis@wdc.com>
+	<8ca522c7-d1dd-fe05-f8ab-031b72a9fbef@vivier.eu>
+In-Reply-To: <8ca522c7-d1dd-fe05-f8ab-031b72a9fbef@vivier.eu>
 From: Alistair Francis <alistair23@gmail.com>
-Date: Tue, 30 Apr 2019 14:01:35 -0700
+Date: Tue, 30 Apr 2019 13:59:06 -0700
 Message-ID:
- <CAKmqyKNx2r93-ASC0dAZJvu_36dV69sRj92-m6G9zXqLdc2sag@mail.gmail.com>
+ <CAKmqyKNRO7ESNmngtV3b8EjZfiuuu9QQm6avfwUuGe=NtpS46A@mail.gmail.com>
 To: Laurent Vivier <laurent@vivier.eu>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
 	recognized.
 X-Received-From: 2a00:1450:4864:20::141
-Subject: Re: [Qemu-devel] [PATCH v1 5/5] linux-user/elfload: Fix GCC 9 build
- warnings
+Subject: Re: [Qemu-devel] [PATCH v1 2/5] hw/usb/hcd-xhci: Fix GCC 9 build
+ warning
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -99,76 +99,70 @@ Cc: "qemu-trivial@nongnu.org" <qemu-trivial@nongnu.org>,
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190430210135.aPoO3ydrg-5ot-H6kEBUzoosk4YiuxqjC4h0HVyI1Zs@z>
+Message-ID: <20190430205906.RQ-nQNDAOV0aHUlB8jYxSFWAzVaVry97yRRX-MtmOB0@z>
 
-On Tue, Apr 30, 2019 at 1:36 PM Laurent Vivier <laurent@vivier.eu> wrote:
+On Tue, Apr 30, 2019 at 1:24 PM Laurent Vivier <laurent@vivier.eu> wrote:
 >
 > Le 30/04/2019 =C3=A0 22:09, Alistair Francis a =C3=A9crit :
-> > Fix this warning when building with GCC9 on Fedora 30:
-> > In function =E2=80=98strncpy=E2=80=99,
-> >     inlined from =E2=80=98fill_psinfo=E2=80=99 at /home/alistair/qemu/l=
-inux-user/elfload.c:3208:12,
-> >     inlined from =E2=80=98fill_note_info=E2=80=99 at /home/alistair/qem=
-u/linux-user/elfload.c:3390:5,
-> >     inlined from =E2=80=98elf_core_dump=E2=80=99 at /home/alistair/qemu=
-/linux-user/elfload.c:3539:9:
-> > /usr/include/bits/string_fortified.h:106:10: error: =E2=80=98__builtin_=
-strncpy=E2=80=99 specified bound 16 equals destination size [-Werror=3Dstri=
-ngop-truncation]
-> >   106 |   return __builtin___strncpy_chk (__dest, __src, __len, __bos (=
-__dest));
-> >       |          ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~=
-~~~~~~~~
-> >
-> > Signed-off-by: Alistair Francis <alistair.francis@wdc.com>
-> > ---
-> >  linux-user/elfload.c | 4 ++--
-> >  1 file changed, 2 insertions(+), 2 deletions(-)
-> >
-> > diff --git a/linux-user/elfload.c b/linux-user/elfload.c
-> > index c1a26021f8..cbb7fc10fa 100644
-> > --- a/linux-user/elfload.c
-> > +++ b/linux-user/elfload.c
-> > @@ -3206,7 +3206,7 @@ static int fill_psinfo(struct target_elf_prpsinfo=
- *psinfo, const TaskState *ts)
+> > Fix this build warning with GCC 9 on Fedora 30:
+> > hw/usb/hcd-xhci.c:3339:66: error: =E2=80=98%d=E2=80=99 directive output=
+ may be truncated writing between 1 and 10 bytes into a region of size 5 [-=
+Werror=3Dformat-truncation=3D]
+> >  3339 |             snprintf(port->name, sizeof(port->name), "usb2 port=
+ #%d", i+1);
+> >       |                                                                =
+  ^~
+> > hw/usb/hcd-xhci.c:3339:54: note: directive argument in the range [1, 21=
+47483647]
+> >  3339 |             snprintf(port->name, sizeof(port->name), "usb2 port=
+ #%d", i+1);
 >
->        /*
->         * Using strncpy here is fine: at max-length,
-> >       * this field is not NUL-terminated.
-> >       */>      (void) strncpy(psinfo->pr_fname, base_filename,
-> > -                   sizeof(psinfo->pr_fname));
-> > +                   sizeof(psinfo->pr_fname) - 1);
+> "i" cannot be greater than 15.
 >
-> Read the comment above :)
+> perhaps an "assert(i <=3D MAX(MAXPORTS_2, MAXPORTS_3))" can fix the warni=
+ng ?
 
-GCC can't read the comment though. The only other option I can think
-of is using a pragma, which I avoided using unless I had to. Would you
-prefer a pragma here? Or do you have a better solution?
-
->
-> >
-> >      g_free(base_filename);
-> >      bswap_psinfo(psinfo);
-> > @@ -3389,7 +3389,7 @@ static int fill_note_info(struct elf_note_info *i=
-nfo,
-> >                sizeof (*info->prstatus), info->prstatus);
-> >      fill_psinfo(info->psinfo, ts);
-> >      fill_note(&info->notes[1], "CORE", NT_PRPSINFO,
-> > -              sizeof (*info->psinfo), info->psinfo);
-> > +              sizeof(*info->psinfo) - 1, info->psinfo);
->
-> Why?
-
-Same issue as above.
+It does seem to stop the warnings, I'll change this patch to use a g_assert=
+().
 
 Alistair
 
 >
-> >      fill_auxv_note(&info->notes[2], ts);
-> >      info->numnote =3D 3;
+> Thanks,
+> Laurent
+>
+> >       |                                                      ^~~~~~~~~~=
+~~~~~
+> > In file included from /usr/include/stdio.h:867,
+> >                  from /home/alistair/qemu/include/qemu/osdep.h:99,
+> >                  from hw/usb/hcd-xhci.c:21:
+> > /usr/include/bits/stdio2.h:67:10: note: =E2=80=98__builtin___snprintf_c=
+hk=E2=80=99 output between 13 and 22 bytes into a destination of size 16
+> >    67 |   return __builtin___snprintf_chk (__s, __n, __USE_FORTIFY_LEVE=
+L - 1,
+> >       |          ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~=
+~~~~~~
+> >    68 |        __bos (__s), __fmt, __va_arg_pack ());
+> >       |        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+> >
+> > Signed-off-by: Alistair Francis <alistair.francis@wdc.com>
+> > ---
+> >  hw/usb/hcd-xhci.h | 2 +-
+> >  1 file changed, 1 insertion(+), 1 deletion(-)
+> >
+> > diff --git a/hw/usb/hcd-xhci.h b/hw/usb/hcd-xhci.h
+> > index 240caa4e51..9e4988abb6 100644
+> > --- a/hw/usb/hcd-xhci.h
+> > +++ b/hw/usb/hcd-xhci.h
+> > @@ -133,7 +133,7 @@ typedef struct XHCIPort {
+> >      uint32_t portnr;
+> >      USBPort  *uport;
+> >      uint32_t speedmask;
+> > -    char name[16];
+> > +    char name[24];
+> >      MemoryRegion mem;
+> >  } XHCIPort;
 > >
 > >
 >
-> Thanks,
-> Laurent
 
