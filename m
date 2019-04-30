@@ -1,21 +1,24 @@
 Received: from eggs.gnu.org ([209.51.188.92]:34978)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1hLPq7-0001iV-9s
-	for qemu-devel@nongnu.org; Tue, 30 Apr 2019 06:18:20 -0400
+	(envelope-from <vsementsov@virtuozzo.com>) id 1hLPq8-0001iV-Gg
+	for qemu-devel@nongnu.org; Tue, 30 Apr 2019 06:18:21 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1hLPbk-0002Hl-AR
-	for qemu-devel@nongnu.org; Tue, 30 Apr 2019 06:03:29 -0400
-Date: Tue, 30 Apr 2019 12:03:22 +0200
-From: Kevin Wolf <kwolf@redhat.com>
-Message-ID: <20190430100322.GB5607@linux.fritz.box>
-References: <cover.1556562150.git.berto@igalia.com>
-	<e5e1571c583874454760dc738ef3ea3470ea96e7.1556562150.git.berto@igalia.com>
+	(envelope-from <vsementsov@virtuozzo.com>) id 1hLPbW-0002B8-UK
+	for qemu-devel@nongnu.org; Tue, 30 Apr 2019 06:03:16 -0400
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Date: Tue, 30 Apr 2019 10:03:08 +0000
+Message-ID: <4dabb261-f2d1-b6e0-8d97-ace159b87a54@virtuozzo.com>
+References: <20190423125706.26989-1-vsementsov@virtuozzo.com>
+	<20190423125706.26989-3-vsementsov@virtuozzo.com>
+	<20190430092437.jbecehdkqa4zdavd@steredhat>
+In-Reply-To: <20190430092437.jbecehdkqa4zdavd@steredhat>
+Content-Language: en-US
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <0D5930E6165D1446B5843BC93F12F60C@eurprd08.prod.outlook.com>
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <e5e1571c583874454760dc738ef3ea3470ea96e7.1556562150.git.berto@igalia.com>
-Subject: Re: [Qemu-devel] [PATCH 2/5] vdi: Replace bdrv_{read,
- write}() with bdrv_{pread, pwrite}()
+Subject: Re: [Qemu-devel] [PATCH v5 2/3] block/io: bdrv_pdiscard: support
+ int64_t bytes parameter
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,77 +27,71 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alberto Garcia <berto@igalia.com>
-Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>, Eric Blake <eblake@redhat.com>
+To: Stefano Garzarella <sgarzare@redhat.com>
+Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>, "kwolf@redhat.com" <kwolf@redhat.com>, "fam@euphon.net" <fam@euphon.net>, Denis Lunev <den@virtuozzo.com>, "mreitz@redhat.com" <mreitz@redhat.com>, "stefanha@redhat.com" <stefanha@redhat.com>
 
-Am 29.04.2019 um 20:42 hat Alberto Garcia geschrieben:
-> There's only a couple of bdrv_read() and bdrv_write() calls left in
-> the vdi code, and they can be trivially replaced with the byte-based
-> bdrv_pread() and bdrv_pwrite().
-> 
-> Signed-off-by: Alberto Garcia <berto@igalia.com>
-> ---
->  block/vdi.c | 11 ++++++-----
->  1 file changed, 6 insertions(+), 5 deletions(-)
-> 
-> diff --git a/block/vdi.c b/block/vdi.c
-> index e1c42ad732..8d849b2754 100644
-> --- a/block/vdi.c
-> +++ b/block/vdi.c
-> @@ -384,7 +384,7 @@ static int vdi_open(BlockDriverState *bs, QDict *options, int flags,
->  
->      logout("\n");
->  
-> -    ret = bdrv_read(bs->file, 0, (uint8_t *)&header, 1);
-> +    ret = bdrv_pread(bs->file, 0, (uint8_t *)&header, sizeof(header));
-
-Maybe worth adding this after the VdiHeader declaration?
-
-QEMU_BUILD_BUG_ON(sizeof(VdiHeader) != 512);
-
->      if (ret < 0) {
->          goto fail;
->      }
-> @@ -484,8 +484,8 @@ static int vdi_open(BlockDriverState *bs, QDict *options, int flags,
->          goto fail;
->      }
->  
-> -    ret = bdrv_read(bs->file, s->bmap_sector, (uint8_t *)s->bmap,
-> -                    bmap_size);
-> +    ret = bdrv_pread(bs->file, header.offset_bmap, (uint8_t *)s->bmap,
-> +                     bmap_size * SECTOR_SIZE);
->      if (ret < 0) {
->          goto fail_free_bmap;
->      }
-> @@ -704,7 +704,7 @@ nonallocating_write:
->          assert(VDI_IS_ALLOCATED(bmap_first));
->          *header = s->header;
->          vdi_header_to_le(header);
-> -        ret = bdrv_write(bs->file, 0, block, 1);
-> +        ret = bdrv_pwrite(bs->file, 0, block, sizeof(*block));
-
-block is uint8_t*, so sizeof(*block) == 1. This is not what you want.
-(qemu-iotests catches this pretty early.)
-
->          g_free(block);
->          block = NULL;
->  
-> @@ -722,7 +722,8 @@ nonallocating_write:
->          base = ((uint8_t *)&s->bmap[0]) + bmap_first * SECTOR_SIZE;
->          logout("will write %u block map sectors starting from entry %u\n",
->                 n_sectors, bmap_first);
-> -        ret = bdrv_write(bs->file, offset, base, n_sectors);
-> +        ret = bdrv_pwrite(bs->file, offset * SECTOR_SIZE, base,
-> +                          n_sectors * SECTOR_SIZE);
->      }
->  
->      return ret;
-
-Let's avoid returning a non-zero positive number in the success case
-here. bdrv_driver_pwritev() checks ret == 0 for BDRV_REQ_FUA emulation,
-and its callers don't expect positive results either.
-
-Maybe we should actually assert() in bdrv_driver_preadv/pwritev() that
-the result is <= 0.
-
-Kevin
+MzAuMDQuMjAxOSAxMjoyNCwgU3RlZmFubyBHYXJ6YXJlbGxhIHdyb3RlOg0KPiBPbiBUdWUsIEFw
+ciAyMywgMjAxOSBhdCAwMzo1NzowNVBNICswMzAwLCBWbGFkaW1pciBTZW1lbnRzb3YtT2dpZXZz
+a2l5IHdyb3RlOg0KPj4gVGhpcyBmaXhlcyBhdCBsZWFzdCBvbmUgb3ZlcmZsb3cgaW4gcWNvdzJf
+cHJvY2Vzc19kaXNjYXJkcywgd2hpY2gNCj4+IHBhc3NlcyA2NGJpdCByZWdpb24gbGVuZ3RoIHRv
+IGJkcnZfcGRpc2NhcmQgd2hlcmUgYnl0ZXMgKG9yIHNlY3RvcnMgaW4NCj4+IHRoZSBwYXN0KSBw
+YXJhbWV0ZXIgaXMgaW50IHNpbmNlIGl0cyBpbnRyb2R1Y3Rpb24gaW4gMGI5MTlmYWUuDQo+Pg0K
+Pj4gU2lnbmVkLW9mZi1ieTogVmxhZGltaXIgU2VtZW50c292LU9naWV2c2tpeSA8dnNlbWVudHNv
+dkB2aXJ0dW96em8uY29tPg0KPj4gLS0tDQo+PiAgIGluY2x1ZGUvYmxvY2svYmxvY2suaCB8ICA0
+ICsrLS0NCj4+ICAgYmxvY2svaW8uYyAgICAgICAgICAgIHwgMTYgKysrKysrKystLS0tLS0tLQ0K
+Pj4gICAyIGZpbGVzIGNoYW5nZWQsIDEwIGluc2VydGlvbnMoKyksIDEwIGRlbGV0aW9ucygtKQ0K
+Pj4NCj4+IGRpZmYgLS1naXQgYS9pbmNsdWRlL2Jsb2NrL2Jsb2NrLmggYi9pbmNsdWRlL2Jsb2Nr
+L2Jsb2NrLmgNCj4+IGluZGV4IGM3YTI2MTk5YWEuLjY5ZmExODg2N2UgMTAwNjQ0DQo+PiAtLS0g
+YS9pbmNsdWRlL2Jsb2NrL2Jsb2NrLmgNCj4+ICsrKyBiL2luY2x1ZGUvYmxvY2svYmxvY2suaA0K
+Pj4gQEAgLTQzMiw4ICs0MzIsOCBAQCB2b2lkIGJkcnZfZHJhaW5fYWxsKHZvaWQpOw0KPj4gICAg
+ICAgQUlPX1dBSVRfV0hJTEUoYmRydl9nZXRfYWlvX2NvbnRleHQoYnNfKSwgICAgICAgICAgICAg
+IFwNCj4+ICAgICAgICAgICAgICAgICAgICAgIGNvbmQpOyB9KQ0KPj4gICANCj4+IC1pbnQgYmRy
+dl9wZGlzY2FyZChCZHJ2Q2hpbGQgKmNoaWxkLCBpbnQ2NF90IG9mZnNldCwgaW50IGJ5dGVzKTsN
+Cj4+IC1pbnQgYmRydl9jb19wZGlzY2FyZChCZHJ2Q2hpbGQgKmNoaWxkLCBpbnQ2NF90IG9mZnNl
+dCwgaW50IGJ5dGVzKTsNCj4+ICtpbnQgYmRydl9wZGlzY2FyZChCZHJ2Q2hpbGQgKmNoaWxkLCBp
+bnQ2NF90IG9mZnNldCwgaW50NjRfdCBieXRlcyk7DQo+PiAraW50IGJkcnZfY29fcGRpc2NhcmQo
+QmRydkNoaWxkICpjaGlsZCwgaW50NjRfdCBvZmZzZXQsIGludDY0X3QgYnl0ZXMpOw0KPj4gICBp
+bnQgYmRydl9oYXNfemVyb19pbml0XzEoQmxvY2tEcml2ZXJTdGF0ZSAqYnMpOw0KPj4gICBpbnQg
+YmRydl9oYXNfemVyb19pbml0KEJsb2NrRHJpdmVyU3RhdGUgKmJzKTsNCj4+ICAgYm9vbCBiZHJ2
+X3VuYWxsb2NhdGVkX2Jsb2Nrc19hcmVfemVybyhCbG9ja0RyaXZlclN0YXRlICpicyk7DQo+PiBk
+aWZmIC0tZ2l0IGEvYmxvY2svaW8uYyBiL2Jsb2NrL2lvLmMNCj4+IGluZGV4IGRmYzE1M2I4ZDgu
+LjE2YjZjNWQ4NTUgMTAwNjQ0DQo+PiAtLS0gYS9ibG9jay9pby5jDQo+PiArKysgYi9ibG9jay9p
+by5jDQo+PiBAQCAtMjY1Myw3ICsyNjUzLDcgQEAgaW50IGJkcnZfZmx1c2goQmxvY2tEcml2ZXJT
+dGF0ZSAqYnMpDQo+PiAgIHR5cGVkZWYgc3RydWN0IERpc2NhcmRDbyB7DQo+PiAgICAgICBCZHJ2
+Q2hpbGQgKmNoaWxkOw0KPj4gICAgICAgaW50NjRfdCBvZmZzZXQ7DQo+PiAtICAgIGludCBieXRl
+czsNCj4+ICsgICAgaW50NjRfdCBieXRlczsNCj4+ICAgICAgIGludCByZXQ7DQo+PiAgIH0gRGlz
+Y2FyZENvOw0KPj4gICBzdGF0aWMgdm9pZCBjb3JvdXRpbmVfZm4gYmRydl9wZGlzY2FyZF9jb19l
+bnRyeSh2b2lkICpvcGFxdWUpDQo+PiBAQCAtMjY2NCwxNCArMjY2NCwxNSBAQCBzdGF0aWMgdm9p
+ZCBjb3JvdXRpbmVfZm4gYmRydl9wZGlzY2FyZF9jb19lbnRyeSh2b2lkICpvcGFxdWUpDQo+PiAg
+ICAgICBhaW9fd2FpdF9raWNrKCk7DQo+PiAgIH0NCj4+ICAgDQo+PiAtaW50IGNvcm91dGluZV9m
+biBiZHJ2X2NvX3BkaXNjYXJkKEJkcnZDaGlsZCAqY2hpbGQsIGludDY0X3Qgb2Zmc2V0LCBpbnQg
+Ynl0ZXMpDQo+PiAraW50IGNvcm91dGluZV9mbiBiZHJ2X2NvX3BkaXNjYXJkKEJkcnZDaGlsZCAq
+Y2hpbGQsIGludDY0X3Qgb2Zmc2V0LA0KPj4gKyAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
+ICAgICBpbnQ2NF90IGJ5dGVzKQ0KPj4gICB7DQo+PiAgICAgICBCZHJ2VHJhY2tlZFJlcXVlc3Qg
+cmVxOw0KPj4gICAgICAgaW50IG1heF9wZGlzY2FyZCwgcmV0Ow0KPj4gICAgICAgaW50IGhlYWQs
+IHRhaWwsIGFsaWduOw0KPj4gICAgICAgQmxvY2tEcml2ZXJTdGF0ZSAqYnMgPSBjaGlsZC0+YnM7
+DQo+PiAgIA0KPj4gLSAgICBpZiAoIWJzIHx8ICFicy0+ZHJ2KSB7DQo+PiArICAgIGlmICghYnMg
+fHwgIWJzLT5kcnYgfHwgIWJkcnZfaXNfaW5zZXJ0ZWQoYnMpKSB7DQo+IA0KPiBTaG91bGQgd2Ug
+ZGVzY3JpYmUgdGhpcyBjaGFuZ2UgaW4gdGhlIGNvbW1pdCBtZXNzYWdlPw0KDQpIb25lc3RseSwg
+ZG9uJ3Qgd2FudCB0byByZXNlbmQgdGhlIHNlcmllcyBmb3IgdGhpcy4NCg0KPiBJSVVDIHlvdSBh
+ZGRlZCB0aGlzIGNoZWNrIGJlY2F1c2UgeW91IHJlbW92ZWQgYmRydl9jaGVja19ieXRlX3JlcXVl
+c3QoKQ0KPiBiZWxvdywNCj4gDQo+IE1heWJlIHdlIGNhbiBhbHNvIHJlbW92ZSAnIWJzLT5kcnYn
+LCBzaW5jZSBpdCBpcyBjaGVja2VkIGluDQo+IGJkcnZfaXNfaW5zZXJ0ZWQoKS4NCg0KSG1tLCBv
+biB2NCBLZXZpbiBjb21tZW50ZWQsIHRoYXQgYmRydl9pc19pbnNlcnRlZCBub3QgbmVlZGVkLCBh
+bmQsIGFzIEkgdW5kZXJzdGFuZCwgbm90IG9ubHkNCmluIGJkcnZfY29fcGRpc2NhcmQgaXQgc2hv
+dWxkIGJlIHJlbW92ZWQsIGJ1dCBpdCBtYXkgYmUgZG9uZSBsYXRlci4gU28sIEknZCBwcmVmZXIg
+dG8ga2VlcCBpdA0KYXMgaXMgZm9yIG5vdy4NCg0KPiANCj4+ICAgICAgICAgICByZXR1cm4gLUVO
+T01FRElVTTsNCj4+ICAgICAgIH0NCj4+ICAgDQo+PiBAQCAtMjY3OSw5ICsyNjgwLDggQEAgaW50
+IGNvcm91dGluZV9mbiBiZHJ2X2NvX3BkaXNjYXJkKEJkcnZDaGlsZCAqY2hpbGQsIGludDY0X3Qg
+b2Zmc2V0LCBpbnQgYnl0ZXMpDQo+PiAgICAgICAgICAgcmV0dXJuIC1FUEVSTTsNCj4+ICAgICAg
+IH0NCj4+ICAgDQo+PiAtICAgIHJldCA9IGJkcnZfY2hlY2tfYnl0ZV9yZXF1ZXN0KGJzLCBvZmZz
+ZXQsIGJ5dGVzKTsNCj4+IC0gICAgaWYgKHJldCA8IDApIHsNCj4+IC0gICAgICAgIHJldHVybiBy
+ZXQ7DQo+PiArICAgIGlmIChvZmZzZXQgPCAwIHx8IGJ5dGVzIDwgMCB8fCBieXRlcyA+IElOVDY0
+X01BWCAtIG9mZnNldCkgew0KPj4gKyAgICAgICAgcmV0dXJuIC1FSU87DQo+PiAgICAgICB9DQo+
+IA0KPiBTaG91bGQgd2UgY2hlY2sgaWYgJ2J5dGVzJyBpcyBncmVhdGVyIHRoYW4NCj4gJ0JEUlZf
+UkVRVUVTVF9NQVhfU0VDVE9SUyA8PCBCRFJWX1NFQ1RPUl9CSVRTJz8NCj4gDQoNCk5vLCBhcyB3
+ZSBhcmUgY29udHJhcml3aXNlIHRyeWluZyB0byBzdXBwb3J0IGxhcmdlIGJ5dGVzIHBhcmFtZXRl
+ciBpbiBiZHJ2X2NvX3BkaXNjYXJkLCB3aGljaCB3aWxsDQpleGNlZWQgbWF4IHJlcXVlc3QuIElm
+IEBieXRlcyBpcyBsYXJnZSwgaXQgd2lsbCBiZSBkaXZpZGVkIGludG8gc2V2ZXJhbCBzbWFsbGVy
+IHJlcXVlc3RzIGluIHRoZQ0KZm9sbG93aW5nIGxvb3AuDQoNCg0KLS0gDQpCZXN0IHJlZ2FyZHMs
+DQpWbGFkaW1pcg0K
