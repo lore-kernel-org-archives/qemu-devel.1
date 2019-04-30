@@ -1,28 +1,19 @@
-Received: from eggs.gnu.org ([209.51.188.92]:45316)
+Received: from eggs.gnu.org ([209.51.188.92]:47560)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <yuval.shaia@oracle.com>) id 1hLWNI-0005PB-E2
-	for qemu-devel@nongnu.org; Tue, 30 Apr 2019 13:17:01 -0400
+	(envelope-from <paul.c.lai@intel.com>) id 1hLWUr-0002xI-AS
+	for qemu-devel@nongnu.org; Tue, 30 Apr 2019 13:24:51 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <yuval.shaia@oracle.com>) id 1hLWNG-0006rA-Jl
-	for qemu-devel@nongnu.org; Tue, 30 Apr 2019 13:17:00 -0400
-Received: from userp2130.oracle.com ([156.151.31.86]:39136)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <yuval.shaia@oracle.com>)
-	id 1hLWNE-0006pa-Mb
-	for qemu-devel@nongnu.org; Tue, 30 Apr 2019 13:16:58 -0400
-Date: Tue, 30 Apr 2019 20:16:37 +0300
-From: Yuval Shaia <yuval.shaia@oracle.com>
-Message-ID: <20190430171635.GA2937@lap1>
-References: <20190411110157.14252-1-yuval.shaia@oracle.com>
-	<20190411190215.2163572e.cohuck@redhat.com>
-	<20190415103546.GA6854@lap1>
-	<e73e03c2-ea2b-6ffc-cd23-e8e44d42ce80@suse.de>
-	<20190422060034.GA27901@mtr-leonro.mtl.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20190422060034.GA27901@mtr-leonro.mtl.com>
-Subject: Re: [Qemu-devel] [RFC 0/3] VirtIO RDMA
+	(envelope-from <paul.c.lai@intel.com>) id 1hLWUp-0002KH-AU
+	for qemu-devel@nongnu.org; Tue, 30 Apr 2019 13:24:49 -0400
+Received: from mga14.intel.com ([192.55.52.115]:64486)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <paul.c.lai@intel.com>)
+	id 1hLWUo-0002G2-K4
+	for qemu-devel@nongnu.org; Tue, 30 Apr 2019 13:24:47 -0400
+From: Paul Lai <paul.c.lai@intel.com>
+Date: Tue, 30 Apr 2019 10:22:36 -0700
+Message-Id: <20190430172236.14325-1-paul.c.lai@intel.com>
+Subject: [Qemu-devel] [PATCH] Introduce SnowRidge CPU model
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,117 +22,101 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Leon Romanovsky <leon@kernel.org>
-Cc: Hannes Reinecke <hare@suse.de>, Cornelia Huck <cohuck@redhat.com>, mst@redhat.com, linux-rdma@vger.kernel.org, qemu-devel@nongnu.org, virtualization@lists.linux-foundation.org, jgg@mellanox.com
+To: qemu-devel@nongnu.org
+Cc: wei.w.wang@intel.com, tao3.xu@intel.com, luwei.kang@intel.com, paul.c.lai@intel.com
 
-On Mon, Apr 22, 2019 at 09:00:34AM +0300, Leon Romanovsky wrote:
-> On Fri, Apr 19, 2019 at 01:16:06PM +0200, Hannes Reinecke wrote:
-> > On 4/15/19 12:35 PM, Yuval Shaia wrote:
-> > > On Thu, Apr 11, 2019 at 07:02:15PM +0200, Cornelia Huck wrote:
-> > > > On Thu, 11 Apr 2019 14:01:54 +0300
-> > > > Yuval Shaia <yuval.shaia@oracle.com> wrote:
-> > > >
-> > > > > Data center backends use more and more RDMA or RoCE devices and more and
-> > > > > more software runs in virtualized environment.
-> > > > > There is a need for a standard to enable RDMA/RoCE on Virtual Machines.
-> > > > >
-> > > > > Virtio is the optimal solution since is the de-facto para-virtualizaton
-> > > > > technology and also because the Virtio specification
-> > > > > allows Hardware Vendors to support Virtio protocol natively in order to
-> > > > > achieve bare metal performance.
-> > > > >
-> > > > > This RFC is an effort to addresses challenges in defining the RDMA/RoCE
-> > > > > Virtio Specification and a look forward on possible implementation
-> > > > > techniques.
-> > > > >
-> > > > > Open issues/Todo list:
-> > > > > List is huge, this is only start point of the project.
-> > > > > Anyway, here is one example of item in the list:
-> > > > > - Multi VirtQ: Every QP has two rings and every CQ has one. This means that
-> > > > >    in order to support for example 32K QPs we will need 64K VirtQ. Not sure
-> > > > >    that this is reasonable so one option is to have one for all and
-> > > > >    multiplex the traffic on it. This is not good approach as by design it
-> > > > >    introducing an optional starvation. Another approach would be multi
-> > > > >    queues and round-robin (for example) between them.
-> > > > >
-> > Typically there will be a one-to-one mapping between QPs and CPUs (on the
-> > guest). So while one would need to be prepared to support quite some QPs,
-> > the expectation is that the actual number of QPs used will be rather low.
-> > In a similar vein, multiplexing QPs would be defeating the purpose, as the
-> > overall idea was to have _independent_ QPs to enhance parallelism.
-> >
-> > > > > Expectations from this posting:
-> > > > > In general, any comment is welcome, starting from hey, drop this as it is a
-> > > > > very bad idea, to yeah, go ahead, we really want it.
-> > > > > Idea here is that since it is not a minor effort i first want to know if
-> > > > > there is some sort interest in the community for such device.
-> > > >
-> > > > My first reaction is: Sounds sensible, but it would be good to have a
-> > > > spec for this :)
-> > > >
-> > > > You'll need a spec if you want this to go forward anyway, so at least a
-> > > > sketch would be good to answer questions such as how many virtqueues
-> > > > you use for which purpose, what is actually put on the virtqueues,
-> > > > whether there are negotiable features, and what the expectations for
-> > > > the device and the driver are. It also makes it easier to understand
-> > > > how this is supposed to work in practice.
-> > > >
-> > > > If folks agree that this sounds useful, the next step would be to
-> > > > reserve an id for the device type.
-> > >
-> > > Thanks for the tips, will sure do that, it is that first i wanted to make
-> > > sure there is a use case here.
-> > >
-> > > Waiting for any feedback from the community.
-> > >
-> > I really do like the ides; in fact, it saved me from coding a similar thing
-> > myself :-)
-> >
-> > However, I'm still curious about the overall intent of this driver. Where
-> > would the I/O be routed _to_ ?
-> > It's nice that we have a virtualized driver, but this driver is
-> > intended to do I/O (even if it doesn't _do_ any I/O ATM :-)
-> > And this I/O needs to be send to (and possibly received from)
-> > something.
-> >
-> > So what exactly is this something?
-> > An existing piece of HW on the host?
-> > If so, wouldn't it be more efficient to use vfio, either by using SR-IOV or
-> > by using virtio-mdev?
-> >
-> > Another guest?
-> > If so, how would we route the I/O from one guest to the other?
-> > Shared memory? Implementing a full-blown RDMA switch in qemu?
-> >
-> > Oh, and I would _love_ to have a discussion about this at KVM Forum.
-> > Maybe I'll manage to whip up guest-to-guest RDMA connection using ivshmem
-> > ... let's see.
-> 
-> Following success in previous years to transfer ideas into code,
-> we started to prepare RDMA miniconference in LPC 2019, which will
-> be co-located with Kernel Summit and networking track.
-> 
-> I'm confident that such broad audience of kernel developers
-> will be good fit for such discussion.
+SnowRidge CPU supports Accelerator Infrastrcture Architecture (MOVDIRI,
+MOVDIR64B), CLDEMOTE and SPLIT_LOCK_DISABLE.
 
-Just posted a proposal for a talk at Linux Plumbers.
+MOVDIRI, MOVDIR64B, and CLDEMOTE are found via CPUID.
+The availability of SPLIT_LOCK_DISABLE is check via msr access
 
-> 
-> Previous years:
-> 2016: https://www.spinics.net/lists/linux-rdma/msg43074.html
-> 2017: https://lwn.net/Articles/734163/
-> 2018: It was so full in audience and intensive that I failed to
-> summarize it :(
-> 
-> Thanks
-> 
-> >
-> > Cheers,
-> >
-> > Hannes
-> > --
-> > Dr. Hannes Reinecke            Teamlead Storage & Networking
-> > hare@suse.de                              +49 911 74053 688
-> > SUSE LINUX GmbH, Maxfeldstr. 5, 90409 N??rnberg
-> > GF: Felix Imend??rffer, Mary Higgins, Sri Rasiah
-> > HRB 21284 (AG N??rnberg)
+References can be found in either:
+ https://software.intel.com/en-us/articles/intel-sdm
+ https://software.intel.com/en-us/download/intel-architecture-instruction-set-extensions-and-future-features-programming-reference
+
+Signed-off-by: Paul Lai <paul.c.lai@intel.com>
+Tested-by: Tao3 Xu <tao3.xu@intel.com>
+---
+ target/i386/cpu.c | 66 +++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 66 insertions(+)
+
+diff --git a/target/i386/cpu.c b/target/i386/cpu.c
+index d6bb57d210..e81da09709 100644
+--- a/target/i386/cpu.c
++++ b/target/i386/cpu.c
+@@ -2663,6 +2663,72 @@ static X86CPUDefinition builtin_x86_defs[] = {
+         .xlevel = 0x80000008,
+         .model_id = "Intel Xeon Processor (Icelake)",
+     },
++    {
++        .name = "SnowRidge",
++        .level = 27,
++        .vendor = CPUID_VENDOR_INTEL,
++        .family = 6,
++        .model = 134,
++        .stepping = 1,
++        .features[FEAT_1_EDX] =
++	    /* missing: CPUID_PN CPUID_IA64 */
++            /* missing: CPUID_DTS, CPUID_HT, CPUID_TM, CPUID_PBE */
++            CPUID_FP87 | CPUID_VME | CPUID_DE| CPUID_PSE |
++            CPUID_TSC | CPUID_MSR | CPUID_PAE | CPUID_MCE |
++            CPUID_CX8 | CPUID_APIC | CPUID_SEP |
++            CPUID_MTRR | CPUID_PGE | CPUID_MCA | CPUID_CMOV |
++            CPUID_PAT | CPUID_PSE36 | /* CPUID_PN | */ CPUID_CLFLUSH |
++            CPUID_MMX |
++            CPUID_FXSR | CPUID_SSE | CPUID_SSE2,
++        .features[FEAT_1_ECX] =
++            CPUID_EXT_SSE3 | CPUID_EXT_PCLMULQDQ | CPUID_EXT_MONITOR |
++            CPUID_EXT_VMX |
++            CPUID_EXT_SSSE3 |
++            CPUID_EXT_CX16 |
++            CPUID_EXT_SSE41 |
++            CPUID_EXT_SSE42 | CPUID_EXT_X2APIC | CPUID_EXT_MOVBE | CPUID_EXT_POPCNT |
++            CPUID_EXT_TSC_DEADLINE_TIMER | CPUID_EXT_AES | CPUID_EXT_XSAVE |
++            CPUID_EXT_RDRAND,
++        .features[FEAT_8000_0001_EDX] =
++            CPUID_EXT2_SYSCALL |
++            CPUID_EXT2_NX |
++            CPUID_EXT2_PDPE1GB | CPUID_EXT2_RDTSCP |
++            CPUID_EXT2_LM,
++        .features[FEAT_8000_0001_ECX] =
++            CPUID_EXT3_LAHF_LM |
++            CPUID_EXT3_3DNOWPREFETCH,
++        .features[FEAT_7_0_EBX] =
++            CPUID_7_0_EBX_FSGSBASE |
++            CPUID_7_0_EBX_SMEP |
++            CPUID_7_0_EBX_ERMS |
++            CPUID_7_0_EBX_MPX |  /* missing bits 13, 15 */
++            CPUID_7_0_EBX_RDSEED |
++            CPUID_7_0_EBX_SMAP | CPUID_7_0_EBX_CLFLUSHOPT |
++            CPUID_7_0_EBX_CLWB |
++            CPUID_7_0_EBX_SHA_NI,
++        .features[FEAT_7_0_ECX] =
++            CPUID_7_0_ECX_UMIP |
++            /* missing bit 5 */
++            CPUID_7_0_ECX_GFNI |
++            CPUID_7_0_ECX_MOVDIRI | CPUID_7_0_ECX_CLDEMOTE |
++            CPUID_7_0_ECX_MOVDIR64B,
++        .features[FEAT_7_0_EDX] =
++            CPUID_7_0_EDX_SPEC_CTRL |
++            CPUID_7_0_EDX_ARCH_CAPABILITIES | CPUID_7_0_EDX_SPEC_CTRL_SSBD, /* missing bit 30 */
++        /* Missing: XSAVES (not supported by some Linux versions,
++                * including v4.1 to v4.12).
++                * KVM doesn't yet expose any XSAVES state save component,
++                * and the only one defined in Skylake (processor tracing)
++                * probably will block migration anyway.
++                */
++        .features[FEAT_XSAVE] =
++            CPUID_XSAVE_XSAVEOPT | CPUID_XSAVE_XSAVEC |
++            CPUID_XSAVE_XGETBV1,
++        .features[FEAT_6_EAX] =
++            CPUID_6_EAX_ARAT,
++        .xlevel = 0x80000008,
++        .model_id = "Intel Atom Processor (SnowRidge)",
++    },
+     {
+         .name = "KnightsMill",
+         .level = 0xd,
+-- 
+2.17.2
