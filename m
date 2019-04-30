@@ -1,24 +1,17 @@
-Received: from eggs.gnu.org ([209.51.188.92]:34325)
+Received: from eggs.gnu.org ([209.51.188.92]:34334)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <prvs=01690f4a8=Alistair.Francis@wdc.com>)
-	id 1hLcAy-0002jy-54
-	for qemu-devel@nongnu.org; Tue, 30 Apr 2019 19:28:41 -0400
+	(envelope-from <jsnow@redhat.com>) id 1hLcBJ-0002jz-Gv
+	for qemu-devel@nongnu.org; Tue, 30 Apr 2019 19:29:02 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <prvs=01690f4a8=Alistair.Francis@wdc.com>)
-	id 1hLcAo-0005x5-FJ
-	for qemu-devel@nongnu.org; Tue, 30 Apr 2019 19:28:31 -0400
-From: Alistair Francis <Alistair.Francis@wdc.com>
-Date: Tue, 30 Apr 2019 23:28:22 +0000
-Message-ID: <002f222d86322a66276de39cb29796acffe384c1.1556666645.git.alistair.francis@wdc.com>
-References: <cover.1556666645.git.alistair.francis@wdc.com>
-In-Reply-To: <cover.1556666645.git.alistair.francis@wdc.com>
-Content-Language: en-US
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <7DACA981F99FAD42A18EF4D27F084E13@namprd04.prod.outlook.com>
-Content-Transfer-Encoding: base64
+	(envelope-from <jsnow@redhat.com>) id 1hLbyR-0001YQ-Ry
+	for qemu-devel@nongnu.org; Tue, 30 Apr 2019 19:15:44 -0400
+From: John Snow <jsnow@redhat.com>
+Date: Tue, 30 Apr 2019 19:15:36 -0400
+Message-Id: <20190430231536.25353-1-jsnow@redhat.com>
 MIME-Version: 1.0
-Subject: [Qemu-devel] [PATCH v2 1/5] util/qemu-sockets: Fix GCC 9 build
- warnings
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PATCH RFC] migration/dirty-bitmaps: change bitmap
+ enumeration method
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,33 +20,66 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
-Cc: Alistair Francis <Alistair.Francis@wdc.com>, "alistair23@gmail.com" <alistair23@gmail.com>, "kraxel@redhat.com" <kraxel@redhat.com>, "berrange@redhat.com" <berrange@redhat.com>, "riku.voipio@iki.fi" <riku.voipio@iki.fi>, "laurent@vivier.eu" <laurent@vivier.eu>, "qemu-trivial@nongnu.org" <qemu-trivial@nongnu.org>
+To: qemu-devel@nongnu.org
+Cc: qemu-block@nongnu.org, Juan Quintela <quintela@redhat.com>, vsementsov@virtuozzo.com, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Fam Zheng <fam@euphon.net>, Stefan Hajnoczi <stefanha@redhat.com>, John Snow <jsnow@redhat.com>
 
-Rml4IHRoaXMgd2FybmluZyB3aGVuIGJ1aWxkaW5nIHdpdGggR0NDOSBvbiBGZWRvcmEgMzA6DQpJ
-biBmdW5jdGlvbiDigJhzdHJuY3B54oCZLA0KICAgIGlubGluZWQgZnJvbSDigJh1bml4X2Nvbm5l
-Y3Rfc2FkZHIuaXNyYS4w4oCZIGF0IHV0aWwvcWVtdS1zb2NrZXRzLmM6OTI1OjU6DQovdXNyL2lu
-Y2x1ZGUvYml0cy9zdHJpbmdfZm9ydGlmaWVkLmg6MTA2OjEwOiBlcnJvcjog4oCYX19idWlsdGlu
-X3N0cm5jcHnigJkgc3BlY2lmaWVkIGJvdW5kIDEwOCBlcXVhbHMgZGVzdGluYXRpb24gc2l6ZSBb
-LVdlcnJvcj1zdHJpbmdvcC10cnVuY2F0aW9uXQ0KICAxMDYgfCAgIHJldHVybiBfX2J1aWx0aW5f
-X19zdHJuY3B5X2NoayAoX19kZXN0LCBfX3NyYywgX19sZW4sIF9fYm9zIChfX2Rlc3QpKTsNCiAg
-ICAgIHwgICAgICAgICAgXn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+
-fn5+fn5+fn5+fn5+fn5+fn5+fn4NCkluIGZ1bmN0aW9uIOKAmHN0cm5jcHnigJksDQogICAgaW5s
-aW5lZCBmcm9tIOKAmHVuaXhfbGlzdGVuX3NhZGRyLmlzcmEuMOKAmSBhdCB1dGlsL3FlbXUtc29j
-a2V0cy5jOjg4MDo1Og0KDQpTaWduZWQtb2ZmLWJ5OiBBbGlzdGFpciBGcmFuY2lzIDxhbGlzdGFp
-ci5mcmFuY2lzQHdkYy5jb20+DQotLS0NCiB1dGlsL3FlbXUtc29ja2V0cy5jIHwgNCArKy0tDQog
-MSBmaWxlIGNoYW5nZWQsIDIgaW5zZXJ0aW9ucygrKSwgMiBkZWxldGlvbnMoLSkNCg0KZGlmZiAt
-LWdpdCBhL3V0aWwvcWVtdS1zb2NrZXRzLmMgYi91dGlsL3FlbXUtc29ja2V0cy5jDQppbmRleCA5
-NzA1MDUxNjkwLi44YzMzMjI5NThmIDEwMDY0NA0KLS0tIGEvdXRpbC9xZW11LXNvY2tldHMuYw0K
-KysrIGIvdXRpbC9xZW11LXNvY2tldHMuYw0KQEAgLTgyOSw3ICs4MjksNyBAQCBzdGF0aWMgaW50
-IHVuaXhfbGlzdGVuX3NhZGRyKFVuaXhTb2NrZXRBZGRyZXNzICpzYWRkciwNCiAgICAgc3RydWN0
-IHNvY2thZGRyX3VuIHVuOw0KICAgICBpbnQgc29jaywgZmQ7DQogICAgIGNoYXIgKnBhdGhidWYg
-PSBOVUxMOw0KLSAgICBjb25zdCBjaGFyICpwYXRoOw0KKyAgICBjb25zdCBjaGFyICpwYXRoIFFF
-TVVfTk9OU1RSSU5HOw0KIA0KICAgICBzb2NrID0gcWVtdV9zb2NrZXQoUEZfVU5JWCwgU09DS19T
-VFJFQU0sIDApOw0KICAgICBpZiAoc29jayA8IDApIHsNCkBAIC05MjIsNyArOTIyLDcgQEAgc3Rh
-dGljIGludCB1bml4X2Nvbm5lY3Rfc2FkZHIoVW5peFNvY2tldEFkZHJlc3MgKnNhZGRyLCBFcnJv
-ciAqKmVycnApDQogDQogICAgIG1lbXNldCgmdW4sIDAsIHNpemVvZih1bikpOw0KICAgICB1bi5z
-dW5fZmFtaWx5ID0gQUZfVU5JWDsNCi0gICAgc3RybmNweSh1bi5zdW5fcGF0aCwgc2FkZHItPnBh
-dGgsIHNpemVvZih1bi5zdW5fcGF0aCkpOw0KKyAgICBtZW1jcHkodW4uc3VuX3BhdGgsIHNhZGRy
-LT5wYXRoLCBNSU4oc3RybGVuKHNhZGRyLT5wYXRoKSwgc2l6ZW9mKHVuLnN1bl9wYXRoKSkpOw0K
-IA0KICAgICAvKiBjb25uZWN0IHRvIHBlZXIgKi8NCiAgICAgZG8gew0KLS0gDQoyLjIxLjANCg0K
+Shift from looking at every root BDS to *every* BDS.
+Tested only lightly via iotests.
+
+Counter-examples that break this approach welcome.
+---
+ migration/block-dirty-bitmap.c | 14 ++++----------
+ 1 file changed, 4 insertions(+), 10 deletions(-)
+
+diff --git a/migration/block-dirty-bitmap.c b/migration/block-dirty-bitma=
+p.c
+index d1bb863cb6..4a896a09eb 100644
+--- a/migration/block-dirty-bitmap.c
++++ b/migration/block-dirty-bitmap.c
+@@ -273,7 +273,6 @@ static int init_dirty_bitmap_migration(void)
+     BlockDriverState *bs;
+     BdrvDirtyBitmap *bitmap;
+     DirtyBitmapMigBitmapState *dbms;
+-    BdrvNextIterator it;
+     Error *local_err =3D NULL;
+=20
+     dirty_bitmap_mig_state.bulk_completed =3D false;
+@@ -281,13 +280,8 @@ static int init_dirty_bitmap_migration(void)
+     dirty_bitmap_mig_state.prev_bitmap =3D NULL;
+     dirty_bitmap_mig_state.no_bitmaps =3D false;
+=20
+-    for (bs =3D bdrv_first(&it); bs; bs =3D bdrv_next(&it)) {
+-        const char *drive_name =3D bdrv_get_device_or_node_name(bs);
+-
+-        /* skip automatically inserted nodes */
+-        while (bs && bs->drv && bs->implicit) {
+-            bs =3D backing_bs(bs);
+-        }
++    for (bs =3D bdrv_next_all_states(NULL); bs; bs =3D bdrv_next_all_sta=
+tes(bs)) {
++        const char *name =3D bdrv_get_device_or_node_name(bs);
+=20
+         for (bitmap =3D bdrv_dirty_bitmap_next(bs, NULL); bitmap;
+              bitmap =3D bdrv_dirty_bitmap_next(bs, bitmap))
+@@ -296,7 +290,7 @@ static int init_dirty_bitmap_migration(void)
+                 continue;
+             }
+=20
+-            if (drive_name =3D=3D NULL) {
++            if (!name || strcmp(name, "") =3D=3D 0) {
+                 error_report("Found bitmap '%s' in unnamed node %p. It c=
+an't "
+                              "be migrated", bdrv_dirty_bitmap_name(bitma=
+p), bs);
+                 goto fail;
+@@ -313,7 +307,7 @@ static int init_dirty_bitmap_migration(void)
+=20
+             dbms =3D g_new0(DirtyBitmapMigBitmapState, 1);
+             dbms->bs =3D bs;
+-            dbms->node_name =3D drive_name;
++            dbms->node_name =3D name;
+             dbms->bitmap =3D bitmap;
+             dbms->total_sectors =3D bdrv_nb_sectors(bs);
+             dbms->sectors_per_chunk =3D CHUNK_SIZE * 8 *
+--=20
+2.20.1
