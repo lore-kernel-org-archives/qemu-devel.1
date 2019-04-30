@@ -1,21 +1,32 @@
-Received: from eggs.gnu.org ([209.51.188.92]:39130)
+Received: from eggs.gnu.org ([209.51.188.92]:39742)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1hLUHp-0007Te-BB
-	for qemu-devel@nongnu.org; Tue, 30 Apr 2019 11:03:18 -0400
+	(envelope-from <berrange@redhat.com>) id 1hLUKe-00007i-TL
+	for qemu-devel@nongnu.org; Tue, 30 Apr 2019 11:06:10 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1hLUHo-0004mN-7n
-	for qemu-devel@nongnu.org; Tue, 30 Apr 2019 11:03:13 -0400
-References: <20190428110258.86681-1-liboxuan@connect.hku.hk>
-	<a683a29f-ea7b-aaf9-258f-68f4ffcd9b96@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <5fe13664-cabc-6fc9-7437-285cc1452944@redhat.com>
-Date: Tue, 30 Apr 2019 10:03:05 -0500
+	(envelope-from <berrange@redhat.com>) id 1hLUKc-0005vn-WA
+	for qemu-devel@nongnu.org; Tue, 30 Apr 2019 11:06:08 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:51030)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1hLUKb-0005tM-1e
+	for qemu-devel@nongnu.org; Tue, 30 Apr 2019 11:06:06 -0400
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+	[10.5.11.15])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 12E97C057F9C
+	for <qemu-devel@nongnu.org>; Tue, 30 Apr 2019 15:06:04 +0000 (UTC)
+Date: Tue, 30 Apr 2019 16:05:56 +0100
+From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+Message-ID: <20190430150556.GA2423@redhat.com>
+Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+References: <20190430131919.GN6818@redhat.com> <20190430144546.GA3065@work-vm>
 MIME-Version: 1.0
-In-Reply-To: <a683a29f-ea7b-aaf9-258f-68f4ffcd9b96@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="2MqIhRHehvafaaPeCANYMcdExHqA49PDl"
-Subject: Re: [Qemu-devel] [PATCH] virtio-mmio: Always compile debug prints
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20190430144546.GA3065@work-vm>
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] QMP; unsigned 64-bit ints;
+ JSON standards compliance
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,122 +35,140 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>, Boxuan Li <liboxuan@connect.hku.hk>, qemu-devel@nongnu.org
-Cc: qemu-trivial@nongnu.org
+To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Cc: qemu-devel@nongnu.org, libvir-list@redhat.com, =?utf-8?Q?J=C3=A1n?= Tomko <jtomko@redhat.com>, Markus Armbruster <armbru@redhat.com>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---2MqIhRHehvafaaPeCANYMcdExHqA49PDl
-From: Eric Blake <eblake@redhat.com>
-To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
- Boxuan Li <liboxuan@connect.hku.hk>, qemu-devel@nongnu.org
-Cc: qemu-trivial@nongnu.org
-Message-ID: <5fe13664-cabc-6fc9-7437-285cc1452944@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH] virtio-mmio: Always compile debug prints
-References: <20190428110258.86681-1-liboxuan@connect.hku.hk>
- <a683a29f-ea7b-aaf9-258f-68f4ffcd9b96@redhat.com>
-In-Reply-To: <a683a29f-ea7b-aaf9-258f-68f4ffcd9b96@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-
-On 4/30/19 5:15 AM, Philippe Mathieu-Daud=C3=A9 wrote:
-> Hi Li,
+On Tue, Apr 30, 2019 at 03:45:46PM +0100, Dr. David Alan Gilbert wrote:
+> * Daniel P. Berrang=C3=A9 (berrange@redhat.com) wrote:
+> > The QEMU  QMP service is based on JSON which is nice because that is =
+a
+> > widely supported "standard" data format.....
+> >=20
+> > ....except QEMU's implementation (and indeed most impls) are not stri=
+ctly
+> > standards compliant.
+> >=20
+> > Specifically the problem is around representing 64-bit integers, whet=
+her
+> > signed or unsigned.
+> >=20
+> > The JSON standard declares that largest integer is 2^53-1 and the
+> > likewise the smallest is -(2^53-1):
+> >=20
+> >   http://www.ecma-international.org/ecma-262/6.0/index.html#sec-numbe=
+r.max_safe_integer
+> >=20
+> > A crazy limit inherited from its javascript origins IIUC.
 >=20
-> On 4/28/19 1:02 PM, Boxuan Li wrote:
->> Wrap printf calls inside debug macros (DPRINTF) in `if` statement, and=
+> Ewwww.
 
->> change output to stderr as well. This will ensure that printf function=
+Looking a bit deeper it seems this limit comes from the use of double
+precision floating point for storing integers. 2^53-1 is the largest
+integer value that can be stored in a 64-bit float without loss of
+precision.
 
->> will always compile and prevent bitrot of the format strings.
+The Golang JSON parser decodes JSON numbers to float64 by default so
+will have this precision limitation too, though at least they provide
+a backdoor for custom parsing from the original serialized representation=
+.
+
+> > QEMU, and indeed many applications, want to handle 64-bit integers.
+> > The C JSON library impls have traditionally mapped integers to the
+> > data type 'long long int' which gives a min/max of  -(2^63) / 2^63-1.
+> >=20
+> > QEMU however /really/ needs 64-bit unsigned integers, ie a max 2^64-1=
+.
+> >=20
+> > Libvirt has historically used the YAJL library which uses 'long long =
+int'
+> > and thus can't officially go beyond 2^63-1 values. Fortunately it let=
+s
+> > libvirt get at the raw json string, so libvirt can re-parse the value
+> > to get an 'unsigned long long'.
+> >=20
+> > We recently tried to switch to Jansson because YAJL has a dead upstre=
+am
+> > for many years and countless unanswered bugs & patches. Unfortunately=
+ we
+> > forgot about this need for 2^64-1 max, and Jansson also uses 'long lo=
+ng int'
+> > and raises a fatal parse error for unsigned 64-bit values above 2^63-=
+1. It
+> > also provides no backdoor for libvirt todo its own integer parsing. T=
+hus
+> > we had to abort our switch to jansson as it broke parsing QEMU's JSON=
+:
+> >=20
+> >   https://bugzilla.redhat.com/show_bug.cgi?id=3D1614569
+> >=20
+> > Other JSON libraries we've investigated have similar problems. I imag=
+ine
+> > the same may well be true of non-C based JOSN impls, though I've not
+> > investigated in any detail.
+> >=20
+> > Essentially libvirt is stuck with either using the dead YAJL library
+> > forever, or writing its own JSON parser (most likely copying QEMU's
+> > JSON code into libvirt's git).
+> >=20
+> > This feels like a very unappealing situation to be in as not being
+> > able to use a JSON library of our choice is loosing one of the key
+> > benefits of using a standard data format.
+> >=20
+> > Thus I'd like to see a solution to this to allow QMP to be reliably
+> > consumed by any JSON library that exists.
+> >=20
+> > I can think of some options:
+> >=20
+> >   1. Encode unsigned 64-bit integers as signed 64-bit integers.
+> >=20
+> >      This follows the example that most C libraries map JSON ints
+> >      to 'long long int'. This is still relying on undefined
+> >      behaviour as apps don't need to support > 2^53-1.
+> >=20
+> >      Apps would need to cast back to 'unsigned long long' for
+> >      those QMP fields they know are supposed to be unsigned.
+> >=20
+> >=20
+> >   2. Encode all 64-bit integers as a pair of 32-bit integers.
+> >    =20
+> >      This is fully compliant with the JSON spec as each half
+> >      is fully within the declared limits. App has to split or
+> >      assemble the 2 pieces from/to a signed/unsigned 64-bit
+> >      int as needed.
+> >=20
+> >=20
+> >   3. Encode all 64-bit integers as strings
+> >=20
+> >      The application has todo all parsing/formatting client
+> >      side.
+> >=20
+> >=20
+> > None of these changes are backwards compatible, so I doubt we could m=
+ake
+> > the change transparently in QMP.  Instead we would have to have a
+> > QMP greeting message capability where the client can request enableme=
+nt
+> > of the enhanced integer handling.
+> >=20
+> > Any of the three options above would likely work for libvirt, but I
+> > would have a slight preference for either 2 or 3, so that we become
+> > 100% standards compliant.
 >=20
-> There is an effort in QEMU to replace the obsolete DPRINTF() macros by
-> trace events (which prevent format strings bitroting).
+> My preference would be 3 with the strings defined as being
+> %x lower case hex formated with a 0x prefix and no longer than 18 chara=
+cters
+> ("0x" + 16 nybbles). Zero padding allowed but not required.
+> It's readable and unambiguous when dealing with addresses; I don't want
+> to have to start decoding (2) by hand when debugging.
 
-Trace events are even more powerful than conditional debugs (in that you
-can turn them on or off at runtime, instead of compile time). But
-incremental improvements are still better than nothing.
+Yep, that's a good point about readability.
 
-
->>
->> diff --git a/hw/virtio/virtio-mmio.c b/hw/virtio/virtio-mmio.c
->> index 5807aa87fe..693b3c9eb4 100644
->> --- a/hw/virtio/virtio-mmio.c
->> +++ b/hw/virtio/virtio-mmio.c
->> @@ -28,15 +28,14 @@
->>  #include "hw/virtio/virtio-bus.h"
->>  #include "qemu/error-report.h"
->> =20
->> -/* #define DEBUG_VIRTIO_MMIO */
->> -
->> -#ifdef DEBUG_VIRTIO_MMIO
-
-The old code let a user pass CFLAGS=3D-DDEBUG_VIRTIO_MMIO to turn things =
-on...
-
->> -
->> -#define DPRINTF(fmt, ...) \
->> -do { printf("virtio_mmio: " fmt , ## __VA_ARGS__); } while (0)
->> -#else
->> -#define DPRINTF(fmt, ...) do {} while (0)
->> -#endif
->> +#define DEBUG_VIRTIO_MMIO 0
-
-=2E..the new code requires a source code edit. This can be considered a
-step backwards in developer friendliness.  Better might be:
-
-#ifdef DEBUG_VIRTIO_MMIO
-#define DEBUG_VIRTIO_MMIO_PRINT 1
-#else
-#define DEBUG_VIRTIO_MMIO_PRINT 0
-#endif
-
->> +
->> +#define DPRINTF(fmt, ...)                                            =
-\
->> +    do {                                                             =
-\
->> +        if (DEBUG_VIRTIO_MMIO) {                                     =
-\
-
-and the corresponding use of DEBUG_VIRTIO_MMIO_PRINT here, so that you
-preserve the ability to do a command-line CFLAGS=3D-D override, rather
-than forcing a source code edit.
-
->> +            fprintf(stderr, "virtio_mmio: " fmt , ## __VA_ARGS__);   =
-\
-
-No space before ,
-
->> +        }                                                            =
-\
->> +    } while (0)
->> =20
->>  /* QOM macros */
->>  /* virtio-mmio-bus */
->>
->=20
->=20
-
+Regards,
+Daniel
 --=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3226
-Virtualization:  qemu.org | libvirt.org
-
-
---2MqIhRHehvafaaPeCANYMcdExHqA49PDl
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlzIY6kACgkQp6FrSiUn
-Q2ohCAf+O2qzgwj4/OP37+rMmBJK9d1ZYizKAcHPgFU3kvzcvnkQRz8hs+FEWo7H
-qN4R/RGqSiP7T+o/xqymHltFFumqegI1aG11IZf38qohr7j4MWVxdhWxFBwsgqXx
-rcMe7pV/XroFXS2RlMi05Lp3uUIDFRq0DmL0L+xm+82eMveNlqJv6SRQIeV1idwm
-ZPehg9LpWsTQvL4QhEwX7zsJ+EvXUMBtuGxaPX98hmE2euqo40CCi3D5tISdfIrN
-W3PjG7MxMML7RJqupcatJ0DRr1FkKXAQRtml0LTpLjL7X7NYKxEYEHQQITA6+Ea9
-P7Q4zhns+hMmoJYjEaOTppyIZft15w==
-=DNmD
------END PGP SIGNATURE-----
-
---2MqIhRHehvafaaPeCANYMcdExHqA49PDl--
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberran=
+ge :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.c=
+om :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberran=
+ge :|
