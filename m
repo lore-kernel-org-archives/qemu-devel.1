@@ -1,32 +1,25 @@
-Received: from eggs.gnu.org ([209.51.188.92]:44371)
+Received: from eggs.gnu.org ([209.51.188.92]:47616)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1hLUdV-0004Oh-Lh
-	for qemu-devel@nongnu.org; Tue, 30 Apr 2019 11:25:38 -0400
+	(envelope-from <eblake@redhat.com>) id 1hLUuF-0007OG-3n
+	for qemu-devel@nongnu.org; Tue, 30 Apr 2019 11:42:56 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1hLUdU-0007mM-Ow
-	for qemu-devel@nongnu.org; Tue, 30 Apr 2019 11:25:37 -0400
-Received: from mail-pg1-x541.google.com ([2607:f8b0:4864:20::541]:46611)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1hLUdU-0007kq-IF
-	for qemu-devel@nongnu.org; Tue, 30 Apr 2019 11:25:36 -0400
-Received: by mail-pg1-x541.google.com with SMTP id n2so6976684pgg.13
-	for <qemu-devel@nongnu.org>; Tue, 30 Apr 2019 08:25:35 -0700 (PDT)
-References: <20190330005900.17282-1-richard.henderson@linaro.org>
-	<20190330005900.17282-3-richard.henderson@linaro.org>
-	<CAFEAcA98_q1yx==QkHO1HiJA8cJqGv8k5OrCU5W=dC3ZWNPY=w@mail.gmail.com>
-	<920a0801-ed1d-23e8-9975-43d4d185707e@linaro.org>
-	<CAFEAcA-=JyNF94OTq+rJRVxbfhJ_B6=fLm93s+y0ScX9Uyfngw@mail.gmail.com>
-From: Richard Henderson <richard.henderson@linaro.org>
-Message-ID: <257d3eea-409c-6d2e-2384-d56f93f8d393@linaro.org>
-Date: Tue, 30 Apr 2019 08:25:28 -0700
+	(envelope-from <eblake@redhat.com>) id 1hLUsd-0000ac-Ss
+	for qemu-devel@nongnu.org; Tue, 30 Apr 2019 11:41:17 -0400
+References: <20190423125706.26989-1-vsementsov@virtuozzo.com>
+	<20190423125706.26989-3-vsementsov@virtuozzo.com>
+	<20190430092437.jbecehdkqa4zdavd@steredhat>
+	<4dabb261-f2d1-b6e0-8d97-ace159b87a54@virtuozzo.com>
+	<20190430110918.GF5607@linux.fritz.box>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <2c8b3197-316d-7215-9284-6f1e986a0803@redhat.com>
+Date: Tue, 30 Apr 2019 10:41:02 -0500
 MIME-Version: 1.0
-In-Reply-To: <CAFEAcA-=JyNF94OTq+rJRVxbfhJ_B6=fLm93s+y0ScX9Uyfngw@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v4 2/4] linux-user: Set PAGE_TARGET_1 for
- TARGET_PROT_BTI
+In-Reply-To: <20190430110918.GF5607@linux.fritz.box>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="JuRnLRaEtvMUin9Yb1nXuzMmsqDlRSMmV"
+Subject: Re: [Qemu-devel] [PATCH v5 2/3] block/io: bdrv_pdiscard: support
+ int64_t bytes parameter
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,34 +28,94 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>, Ramana Radhakrishnan <ramana.radhakrishnan@arm.com>
+To: Kevin Wolf <kwolf@redhat.com>, Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Cc: "fam@euphon.net" <fam@euphon.net>, Denis Lunev <den@virtuozzo.com>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "mreitz@redhat.com" <mreitz@redhat.com>, "stefanha@redhat.com" <stefanha@redhat.com>, Stefano Garzarella <sgarzare@redhat.com>
 
-On 4/30/19 3:40 AM, Peter Maydell wrote:
-> On Mon, 29 Apr 2019 at 21:13, Richard Henderson
-> <richard.henderson@linaro.org> wrote:
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--JuRnLRaEtvMUin9Yb1nXuzMmsqDlRSMmV
+From: Eric Blake <eblake@redhat.com>
+To: Kevin Wolf <kwolf@redhat.com>,
+ Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Cc: "fam@euphon.net" <fam@euphon.net>, Denis Lunev <den@virtuozzo.com>,
+ "qemu-block@nongnu.org" <qemu-block@nongnu.org>,
+ "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
+ "mreitz@redhat.com" <mreitz@redhat.com>,
+ "stefanha@redhat.com" <stefanha@redhat.com>,
+ Stefano Garzarella <sgarzare@redhat.com>
+Message-ID: <2c8b3197-316d-7215-9284-6f1e986a0803@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v5 2/3] block/io: bdrv_pdiscard: support
+ int64_t bytes parameter
+References: <20190423125706.26989-1-vsementsov@virtuozzo.com>
+ <20190423125706.26989-3-vsementsov@virtuozzo.com>
+ <20190430092437.jbecehdkqa4zdavd@steredhat>
+ <4dabb261-f2d1-b6e0-8d97-ace159b87a54@virtuozzo.com>
+ <20190430110918.GF5607@linux.fritz.box>
+In-Reply-To: <20190430110918.GF5607@linux.fritz.box>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+
+On 4/30/19 6:09 AM, Kevin Wolf wrote:
+> Am 30.04.2019 um 12:03 hat Vladimir Sementsov-Ogievskiy geschrieben:
+>> 30.04.2019 12:24, Stefano Garzarella wrote:
+>>> On Tue, Apr 23, 2019 at 03:57:05PM +0300, Vladimir Sementsov-Ogievski=
+y wrote:
+>>>> This fixes at least one overflow in qcow2_process_discards, which
+>>>> passes 64bit region length to bdrv_pdiscard where bytes (or sectors =
+in
+>>>> the past) parameter is int since its introduction in 0b919fae.
+>>>>
+>>>> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.co=
+m>
+
+>>>> -    if (!bs || !bs->drv) {
+>>>> +    if (!bs || !bs->drv || !bdrv_is_inserted(bs)) {
+>>>
+>>> Should we describe this change in the commit message?
 >>
->> On 4/29/19 9:21 AM, Peter Maydell wrote:
->>> This looks ok code-wise, but we'd need to hide it behind
->>> a defaults-to-off x-something property if we wanted to
->>> commit it before the kernel ABI is fixed.
->>
->> I'm not intending to change the user-level abi, only the
->> internal abi within qemu, for handling of the elf notes.
-> 
-> You're changing target_mmap(), which is used by the
-> guest mmap syscall, though, right?
+>> Honestly, don't want to resend the series for this.
+>=20
+> I haven't reviewed the patches yet, but if this remains the only thing
+> to change, it can be updated while applying the series if we have a
+> specific proposal for a new commit message.
 
-Yes, but it's also used by elfload.c to map the executable.
+How about:
 
-> I think that we shouldn't allow guest binaries written
-> to the ad-hoc TARGET_PROT_BTI ABI to work without an
-> explicit x-something command line argument to QEMU...
+This fixes at least one overflow in qcow2_process_discards, which was
+inadvertently truncating a 64-bit region length to the bdrv_pdiscard
+'int bytes' parameter (previously bdrv_discard's 'int sectors') since
+its introduction in 0b919fae.
 
-The guest binary is not written to an ad-hoc abi.
-
-It is written to the finalized ELF note abi, which
-I am trying to implement with a *private* QEMU abi.
+By inlining the remaining portions of bdrv_check_byte_request() that are
+still independent from the code previously validating a 32-bit request,
+we can drop the call to that function. A request larger than 31 bits (or
+the driver's max discard limit, if specified) is still split into
+smaller chunks by the block layer before reaching the driver.
 
 
-r~
+At any rate, you can add:
+Reviewed-by: Eric Blake <eblake@redhat.com>
+
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3226
+Virtualization:  qemu.org | libvirt.org
+
+
+--JuRnLRaEtvMUin9Yb1nXuzMmsqDlRSMmV
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlzIbI4ACgkQp6FrSiUn
+Q2r6sQf/XXjTsk75VmfCuh6wISaLexIoCpqItTSPix5QnEOWUFtPpv8leJh/tGit
+jgNDeiJBisePVvR1UK5MFP8nSy2Chrqe/IuvQfaRBpeLC7YLpEtS9YiHc5FuyIXa
+ka2u9cTtPhd3e2/t+LUQlCU7qhawVHzBXXJFfCDTX40xCJC8OUAUqRArAG/8bwaw
+cxADZs/pGmEf4KcxbcblYEs+3n7MwABk3hEuQrA/pwffnB/fueV+nkfffgoc60he
+XhvKAYU/wVlAM7dJkvmL2C4fepxc0hond0u+rEyhqhrBZtVuwj/WKontgnPd58N8
+J6Kx4vrTj96eF3W5egY1IG1Y39667A==
+=MmpC
+-----END PGP SIGNATURE-----
+
+--JuRnLRaEtvMUin9Yb1nXuzMmsqDlRSMmV--
