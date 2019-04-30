@@ -2,65 +2,63 @@ Return-Path: <SRS0=TP+Q=TA=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 09DA0C43219
-	for <qemu-devel@archiver.kernel.org>; Tue, 30 Apr 2019 07:15:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0850EC43219
+	for <qemu-devel@archiver.kernel.org>; Tue, 30 Apr 2019 07:16:26 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id CF85A2075E
-	for <qemu-devel@archiver.kernel.org>; Tue, 30 Apr 2019 07:15:17 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CF85A2075E
+	by mail.kernel.org (Postfix) with ESMTPS id CC8E02075E
+	for <qemu-devel@archiver.kernel.org>; Tue, 30 Apr 2019 07:16:25 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CC8E02075E
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:40272 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:40312 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hLMyy-0005ZM-UA
-	for qemu-devel@archiver.kernel.org; Tue, 30 Apr 2019 03:15:16 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:54568)
+	id 1hLN04-0006kH-VN
+	for qemu-devel@archiver.kernel.org; Tue, 30 Apr 2019 03:16:25 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:54776)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1hLMxm-00057g-Ne
-	for qemu-devel@nongnu.org; Tue, 30 Apr 2019 03:14:03 -0400
+	(envelope-from <thuth@redhat.com>) id 1hLMyM-0005SG-4G
+	for qemu-devel@nongnu.org; Tue, 30 Apr 2019 03:14:38 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1hLMxl-0003qY-Py
-	for qemu-devel@nongnu.org; Tue, 30 Apr 2019 03:14:02 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:60554)
+	(envelope-from <thuth@redhat.com>) id 1hLMyL-000455-9G
+	for qemu-devel@nongnu.org; Tue, 30 Apr 2019 03:14:38 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:56226)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <cohuck@redhat.com>)
-	id 1hLMxl-0003q6-JY; Tue, 30 Apr 2019 03:14:01 -0400
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
-	[10.5.11.23])
+	(Exim 4.71) (envelope-from <thuth@redhat.com>)
+	id 1hLMyH-00043G-7E; Tue, 30 Apr 2019 03:14:33 -0400
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+	[10.5.11.22])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id D7D093086201;
-	Tue, 30 Apr 2019 07:13:59 +0000 (UTC)
-Received: from gondolin (dhcp-192-187.str.redhat.com [10.33.192.187])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id 7B2AA79BD;
-	Tue, 30 Apr 2019 07:13:55 +0000 (UTC)
-Date: Tue, 30 Apr 2019 09:13:54 +0200
-From: Cornelia Huck <cohuck@redhat.com>
-To: David Hildenbrand <david@redhat.com>
-Message-ID: <20190430091354.23c9aca0.cohuck@redhat.com>
-In-Reply-To: <6e6c4b4e-4d08-b4fa-1092-06567a6473da@redhat.com>
-References: <20190429090250.7648-1-borntraeger@de.ibm.com>
-	<20190429090250.7648-5-borntraeger@de.ibm.com>
-	<0ad32bcf-0132-3905-3220-0f50e26937c3@redhat.com>
-	<b0b0ec8f-d5ee-c08f-11dd-894d9433159f@de.ibm.com>
-	<6e6c4b4e-4d08-b4fa-1092-06567a6473da@redhat.com>
-Organization: Red Hat GmbH
+	by mx1.redhat.com (Postfix) with ESMTPS id 3A220C05D3E4;
+	Tue, 30 Apr 2019 07:14:32 +0000 (UTC)
+Received: from thuth.com (ovpn-116-190.ams2.redhat.com [10.36.116.190])
+	by smtp.corp.redhat.com (Postfix) with ESMTP id 57E97100200A;
+	Tue, 30 Apr 2019 07:14:26 +0000 (UTC)
+From: Thomas Huth <thuth@redhat.com>
+To: yang.zhong@intel.com, Peter Maydell <peter.maydell@linaro.org>,
+	qemu-devel@nongnu.org, pbonzini@redhat.com
+Date: Tue, 30 Apr 2019 09:13:36 +0200
+Message-Id: <20190430071405.16714-2-thuth@redhat.com>
+In-Reply-To: <20190430071405.16714-1-thuth@redhat.com>
+References: <20190430071405.16714-1-thuth@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.42]);
-	Tue, 30 Apr 2019 07:13:59 +0000 (UTC)
+	(mx1.redhat.com [10.5.110.32]);
+	Tue, 30 Apr 2019 07:14:32 +0000 (UTC)
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH v3 4/9] s390x/cpumodel: msa9 facility
+Subject: [Qemu-devel] [PATCH v6 01/30] hw/pci/pci-stub: Add msi_enabled()
+ and msi_notify() to the pci stubs
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -72,38 +70,60 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "Jason J . Herne" <jjherne@linux.ibm.com>,
-	Collin Walling <walling@linux.ibm.com>, qemu-devel <qemu-devel@nongnu.org>,
-	Halil Pasic <pasic@linux.ibm.com>,
-	Christian Borntraeger <borntraeger@de.ibm.com>,
-	qemu-s390x <qemu-s390x@nongnu.org>, Richard Henderson <rth@twiddle.net>
+Cc: "Michael S. Tsirkin" <mst@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>,
+	"Edgar E . Iglesias" <edgar.iglesias@gmail.com>,
+	Subbaraya Sundeep <sundeep.lkml@gmail.com>,
+	Rob Herring <robh@kernel.org>, qemu-block@nongnu.org,
+	Andrey Smirnov <andrew.smirnov@gmail.com>,
+	Antony Pavlov <antonynpavlov@gmail.com>, Joel Stanley <joel@jms.id.au>,
+	Alistair Francis <alistair@alistair23.me>,
+	Beniamino Galvani <b.galvani@gmail.com>, qemu-arm@nongnu.org,
+	Jan Kiszka <jan.kiszka@web.de>, Cedric Le Goater <clg@kaod.org>,
+	John Snow <jsnow@redhat.com>, Igor Mitsyanko <i.mitsyanko@gmail.com>,
+	Philippe Mathieu-Daude <f4bug@amsat.org>,
+	Jean-Christophe Dubois <jcd@tribudubois.net>,
+	Andrew Jeffery <andrew@aj.id.au>, Peter Chubb <peter.chubb@nicta.com.au>,
+	Aurelien Jarno <aurelien@aurel32.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190430071354.l_Gzgx6i2XSiKmWLOaoV-iwX07wuT7xOBYAjhpupDss@z>
+Message-ID: <20190430071336.VxOhkX2mUqvGApsPTUr0Jk5fT1z2zWweTpMV5L0SEB0@z>
 
-On Tue, 30 Apr 2019 09:00:56 +0200
-David Hildenbrand <david@redhat.com> wrote:
+Some machines have an AHCI adapter, but no PCI. To be able to
+compile hw/ide/ahci.c without CONFIG_PCI, we still need the two
+functions msi_enabled() and msi_notify() for linking.
+This is required for the new Kconfig-like build system, if a user
+wants to compile a QEMU binary with just one machine that has AHCI,
+but no PCI, like the ARM "cubieboard" for example.
 
-> On 30.04.19 07:41, Christian Borntraeger wrote:
-> > 
-> > 
-> > On 29.04.19 21:24, David Hildenbrand wrote:  
+Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
+Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+Tested-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+Signed-off-by: Thomas Huth <thuth@redhat.com>
+---
+ hw/pci/pci-stub.c | 11 +++++++++++
+ 1 file changed, 11 insertions(+)
 
-> >> Just wondering, why keep the PCKMO ones separate, but not e.g. PCC ?  
-> > 
-> > Because those can be disabled at the HMC. It is painful to disable 5 elements
-> > for LPARs that are configured that way. So I created a group for those. That
-> > will allow to disable the full group.
-> > (we have the same issue with the  exisiting AES and DEA pckmo functions).  
-> 
-> Rings a bell, maybe that information would be good to have in the cover
-> letter. I guess Conny might want to change the description when picking up:
-> 
-> "Provide the MSA9 facility (stfle.155). This also contains pckmo
-> subfunctions for key wrapping. Keep them in a separate group to disable
-> those as a block if necessary. This is for example needed when disabling
-> key wrapping via the HMC."
+diff --git a/hw/pci/pci-stub.c b/hw/pci/pci-stub.c
+index b941a0e842..c04a5df651 100644
+--- a/hw/pci/pci-stub.c
++++ b/hw/pci/pci-stub.c
+@@ -53,3 +53,14 @@ uint16_t pci_requester_id(PCIDevice *dev)
+     g_assert(false);
+     return 0;
+ }
++
++/* Required by ahci.c */
++bool msi_enabled(const PCIDevice *dev)
++{
++    return false;
++}
++
++void msi_notify(PCIDevice *dev, unsigned int vector)
++{
++    g_assert_not_reached();
++}
+--=20
+2.21.0
 
-Sure, makes sense to fold that in.
 
