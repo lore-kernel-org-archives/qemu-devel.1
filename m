@@ -1,20 +1,21 @@
-Received: from eggs.gnu.org ([209.51.188.92]:37484)
+Received: from eggs.gnu.org ([209.51.188.92]:39130)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1hLUBN-0005Bv-FJ
-	for qemu-devel@nongnu.org; Tue, 30 Apr 2019 10:56:38 -0400
+	(envelope-from <eblake@redhat.com>) id 1hLUHp-0007Te-BB
+	for qemu-devel@nongnu.org; Tue, 30 Apr 2019 11:03:18 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1hLUBK-0007zg-QF
-	for qemu-devel@nongnu.org; Tue, 30 Apr 2019 10:56:32 -0400
-References: <20190205090825.14059-1-dplotnikov@virtuozzo.com>
+	(envelope-from <eblake@redhat.com>) id 1hLUHo-0004mN-7n
+	for qemu-devel@nongnu.org; Tue, 30 Apr 2019 11:03:13 -0400
+References: <20190428110258.86681-1-liboxuan@connect.hku.hk>
+	<a683a29f-ea7b-aaf9-258f-68f4ffcd9b96@redhat.com>
 From: Eric Blake <eblake@redhat.com>
-Message-ID: <dd8e89d4-b9eb-da1f-5afa-52c3399cf7e5@redhat.com>
-Date: Tue, 30 Apr 2019 09:56:20 -0500
+Message-ID: <5fe13664-cabc-6fc9-7437-285cc1452944@redhat.com>
+Date: Tue, 30 Apr 2019 10:03:05 -0500
 MIME-Version: 1.0
-In-Reply-To: <20190205090825.14059-1-dplotnikov@virtuozzo.com>
+In-Reply-To: <a683a29f-ea7b-aaf9-258f-68f4ffcd9b96@redhat.com>
 Content-Type: multipart/signed; micalg=pgp-sha256;
 	protocol="application/pgp-signature";
-	boundary="KM2JIEuPxsez22lvFycvPTytsdfFe6E95"
-Subject: Re: [Qemu-devel] [PATCH] [RFC] qcow2: add compression type feature
+	boundary="2MqIhRHehvafaaPeCANYMcdExHqA49PDl"
+Subject: Re: [Qemu-devel] [PATCH] virtio-mmio: Always compile debug prints
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,73 +24,100 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Denis Plotnikov <dplotnikov@virtuozzo.com>, kwolf@redhat.com, mreitz@redhat.com
-Cc: qemu-block@nongnu.org, qemu-devel@nongnu.org, den@virtuozzo.com
+To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>, Boxuan Li <liboxuan@connect.hku.hk>, qemu-devel@nongnu.org
+Cc: qemu-trivial@nongnu.org
 
 This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---KM2JIEuPxsez22lvFycvPTytsdfFe6E95
+--2MqIhRHehvafaaPeCANYMcdExHqA49PDl
 From: Eric Blake <eblake@redhat.com>
-To: Denis Plotnikov <dplotnikov@virtuozzo.com>, kwolf@redhat.com,
- mreitz@redhat.com
-Cc: qemu-block@nongnu.org, qemu-devel@nongnu.org, den@virtuozzo.com
-Message-ID: <dd8e89d4-b9eb-da1f-5afa-52c3399cf7e5@redhat.com>
-Subject: Re: [PATCH] [RFC] qcow2: add compression type feature
-References: <20190205090825.14059-1-dplotnikov@virtuozzo.com>
-In-Reply-To: <20190205090825.14059-1-dplotnikov@virtuozzo.com>
+To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
+ Boxuan Li <liboxuan@connect.hku.hk>, qemu-devel@nongnu.org
+Cc: qemu-trivial@nongnu.org
+Message-ID: <5fe13664-cabc-6fc9-7437-285cc1452944@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH] virtio-mmio: Always compile debug prints
+References: <20190428110258.86681-1-liboxuan@connect.hku.hk>
+ <a683a29f-ea7b-aaf9-258f-68f4ffcd9b96@redhat.com>
+In-Reply-To: <a683a29f-ea7b-aaf9-258f-68f4ffcd9b96@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
 
-On 2/5/19 3:08 AM, Denis Plotnikov wrote:
-> The patch adds some preparation parts for incompatible compression type=
-
-> feature into QCOW2 header that indicates that *all* compressed clusters=
-
-> must be (de)compressed using a certain compression type.
+On 4/30/19 5:15 AM, Philippe Mathieu-Daud=C3=A9 wrote:
+> Hi Li,
 >=20
-> It is implied that the compression type is set on the image creation an=
-d
-> can be changed only later by image convertion, thus the only compressio=
-n
+> On 4/28/19 1:02 PM, Boxuan Li wrote:
+>> Wrap printf calls inside debug macros (DPRINTF) in `if` statement, and=
 
-s/convertion/conversion/
+>> change output to stderr as well. This will ensure that printf function=
 
-> algorithm is used for the image.
+>> will always compile and prevent bitrot of the format strings.
 >=20
-> The plan is to add support for ZSTD and then may be something more effe=
-ctive
-> in the future.
+> There is an effort in QEMU to replace the obsolete DPRINTF() macros by
+> trace events (which prevent format strings bitroting).
+
+Trace events are even more powerful than conditional debugs (in that you
+can turn them on or off at runtime, instead of compile time). But
+incremental improvements are still better than nothing.
+
+
+>>
+>> diff --git a/hw/virtio/virtio-mmio.c b/hw/virtio/virtio-mmio.c
+>> index 5807aa87fe..693b3c9eb4 100644
+>> --- a/hw/virtio/virtio-mmio.c
+>> +++ b/hw/virtio/virtio-mmio.c
+>> @@ -28,15 +28,14 @@
+>>  #include "hw/virtio/virtio-bus.h"
+>>  #include "qemu/error-report.h"
+>> =20
+>> -/* #define DEBUG_VIRTIO_MMIO */
+>> -
+>> -#ifdef DEBUG_VIRTIO_MMIO
+
+The old code let a user pass CFLAGS=3D-DDEBUG_VIRTIO_MMIO to turn things =
+on...
+
+>> -
+>> -#define DPRINTF(fmt, ...) \
+>> -do { printf("virtio_mmio: " fmt , ## __VA_ARGS__); } while (0)
+>> -#else
+>> -#define DPRINTF(fmt, ...) do {} while (0)
+>> -#endif
+>> +#define DEBUG_VIRTIO_MMIO 0
+
+=2E..the new code requires a source code edit. This can be considered a
+step backwards in developer friendliness.  Better might be:
+
+#ifdef DEBUG_VIRTIO_MMIO
+#define DEBUG_VIRTIO_MMIO_PRINT 1
+#else
+#define DEBUG_VIRTIO_MMIO_PRINT 0
+#endif
+
+>> +
+>> +#define DPRINTF(fmt, ...)                                            =
+\
+>> +    do {                                                             =
+\
+>> +        if (DEBUG_VIRTIO_MMIO) {                                     =
+\
+
+and the corresponding use of DEBUG_VIRTIO_MMIO_PRINT here, so that you
+preserve the ability to do a command-line CFLAGS=3D-D override, rather
+than forcing a source code edit.
+
+>> +            fprintf(stderr, "virtio_mmio: " fmt , ## __VA_ARGS__);   =
+\
+
+No space before ,
+
+>> +        }                                                            =
+\
+>> +    } while (0)
+>> =20
+>>  /* QOM macros */
+>>  /* virtio-mmio-bus */
+>>
 >=20
-> ZSDT compression algorithm consumes 3-5 times less CPU power with a
-
-s/ZSDT/ZSTD/
-
-> comparable comression ratio with zlib. It would be wise to use it for
-
-s/comression/compression/
-
-> data compression f.e. for backups.
 >=20
-> The default compression is ZLIB.
->=20
-> Signed-off-by: Denis Plotnikov <dplotnikov@virtuozzo.com>
-> ---
->  block/qcow2.c | 25 +++++++++++++++++++++++++
->  block/qcow2.h | 26 ++++++++++++++++++++++----
->  2 files changed, 47 insertions(+), 4 deletions(-)
->=20
-> diff --git a/block/qcow2.c b/block/qcow2.c
-> index 8c91b92865..cb3d6cc1c0 100644
-> --- a/block/qcow2.c
-> +++ b/block/qcow2.c
-> @@ -73,6 +73,7 @@ typedef struct {
->  #define  QCOW2_EXT_MAGIC_FEATURE_TABLE 0x6803f857
->  #define  QCOW2_EXT_MAGIC_CRYPTO_HEADER 0x0537be77
->  #define  QCOW2_EXT_MAGIC_BITMAPS 0x23852875
-> +#define  QCOW2_EXT_MAGIC_COMPRESSION_TYPE 0x434D5052
-
-This appears to be adding a new header extension magic number, but
-didn't actually modify the specification. I'd expect this patch to touch
-docs/interop/qcow2.txt before it can be considered complete.
 
 --=20
 Eric Blake, Principal Software Engineer
@@ -97,21 +125,21 @@ Red Hat, Inc.           +1-919-301-3226
 Virtualization:  qemu.org | libvirt.org
 
 
---KM2JIEuPxsez22lvFycvPTytsdfFe6E95
+--2MqIhRHehvafaaPeCANYMcdExHqA49PDl
 Content-Type: application/pgp-signature; name="signature.asc"
 Content-Description: OpenPGP digital signature
 Content-Disposition: attachment; filename="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlzIYhQACgkQp6FrSiUn
-Q2rmiggAqzP0L8JnSkfqyUKjaopPtS+F8W2w+RmzssZuAkJifk0yLOkVwtcW4EVH
-St15IHLsPTlhyuYo89v4Jno530E0Lnu8EX9MAXhkisZ9aGT6k3T5b2GBQxQCmXyy
-Enq+XHR5+ookoNywn51l+xDb5wZq87eKxJZOMi9jOmN+TE3HU9RwI66V6VMYw1tu
-7vK9yUYIPGccbulSuSDcY3wBzfHC7HZem2nGymbj/Zc6/cVgB19PQiVR9+UTUXR2
-hmqN0F+pqcBO5WxbGnuUOaL8LfG8XKKgpZRYmijQjOEeL6KkHULvzHJPH7Vg0970
-1BtLk+5d3OosZkBwyXlNTSs6Ot990w==
-=x0uO
+iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlzIY6kACgkQp6FrSiUn
+Q2ohCAf+O2qzgwj4/OP37+rMmBJK9d1ZYizKAcHPgFU3kvzcvnkQRz8hs+FEWo7H
+qN4R/RGqSiP7T+o/xqymHltFFumqegI1aG11IZf38qohr7j4MWVxdhWxFBwsgqXx
+rcMe7pV/XroFXS2RlMi05Lp3uUIDFRq0DmL0L+xm+82eMveNlqJv6SRQIeV1idwm
+ZPehg9LpWsTQvL4QhEwX7zsJ+EvXUMBtuGxaPX98hmE2euqo40CCi3D5tISdfIrN
+W3PjG7MxMML7RJqupcatJ0DRr1FkKXAQRtml0LTpLjL7X7NYKxEYEHQQITA6+Ea9
+P7Q4zhns+hMmoJYjEaOTppyIZft15w==
+=DNmD
 -----END PGP SIGNATURE-----
 
---KM2JIEuPxsez22lvFycvPTytsdfFe6E95--
+--2MqIhRHehvafaaPeCANYMcdExHqA49PDl--
