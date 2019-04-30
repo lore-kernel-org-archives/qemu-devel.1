@@ -1,30 +1,23 @@
-Received: from eggs.gnu.org ([209.51.188.92]:54458)
+Received: from eggs.gnu.org ([209.51.188.92]:57114)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.weiyang@gmail.com>) id 1hLbMb-0006IY-KF
-	for qemu-devel@nongnu.org; Tue, 30 Apr 2019 18:36:38 -0400
+	(envelope-from <jsnow@redhat.com>) id 1hLbgi-00019q-1O
+	for qemu-devel@nongnu.org; Tue, 30 Apr 2019 18:57:25 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.weiyang@gmail.com>) id 1hLbMZ-0003mO-MM
-	for qemu-devel@nongnu.org; Tue, 30 Apr 2019 18:36:37 -0400
-Received: from mail-ed1-x544.google.com ([2a00:1450:4864:20::544]:45914)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <richard.weiyang@gmail.com>)
-	id 1hLbMX-0003hK-KG
-	for qemu-devel@nongnu.org; Tue, 30 Apr 2019 18:36:33 -0400
-Received: by mail-ed1-x544.google.com with SMTP id g57so7112118edc.12
-	for <qemu-devel@nongnu.org>; Tue, 30 Apr 2019 15:36:21 -0700 (PDT)
-Date: Tue, 30 Apr 2019 22:36:18 +0000
-From: Wei Yang <richard.weiyang@gmail.com>
-Message-ID: <20190430223618.lyl3ribm7gg5haa5@master>
-Reply-To: Wei Yang <richard.weiyang@gmail.com>
-References: <20190426003652.32633-1-richardw.yang@linux.intel.com>
-	<20190426003652.32633-2-richardw.yang@linux.intel.com>
-	<20190430204636.GK28722@habkost.net>
+	(envelope-from <jsnow@redhat.com>) id 1hLbfY-0008Tx-Rw
+	for qemu-devel@nongnu.org; Tue, 30 Apr 2019 18:56:13 -0400
+References: <20190426221528.30293-1-jsnow@redhat.com>
+	<20190426221528.30293-3-jsnow@redhat.com>
+	<20190429134454.GB4675@paraplu>
+From: John Snow <jsnow@redhat.com>
+Message-ID: <a9e5880b-cc9a-6f1e-3a6d-b1db09f1c895@redhat.com>
+Date: Tue, 30 Apr 2019 18:56:08 -0400
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20190430204636.GK28722@habkost.net>
-Subject: Re: [Qemu-devel] [PATCH v15 1/2] util/mmap-alloc: support MAP_SYNC
- in qemu_ram_mmap()
+In-Reply-To: <20190429134454.GB4675@paraplu>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v3 2/2] docs/interop/bitmaps: rewrite and
+ modernize doc
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,72 +26,53 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eduardo Habkost <ehabkost@redhat.com>
-Cc: Wei Yang <richardw.yang@linux.intel.com>, pagupta@redhat.com, xiaoguangrong.eric@gmail.com, mst@redhat.com, Haozhong Zhang <haozhong.zhang@intel.com>, qemu-devel@nongnu.org, yi.z.zhang@linux.intel.com, yu.c.zhang@linux.intel.com, stefanha@redhat.com, imammedo@redhat.com, pbonzini@redhat.com, dan.j.williams@intel.com
+To: Kashyap Chamarthy <kchamart@redhat.com>
+Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org, vsementsov@virtuozzo.com, armbru@redhat.com, aliang@redhat.com, nsoffer@redhat.com, Fam Zheng <fam@euphon.net>, qemu-stable@nongnu.org, eblake@redhat.com
 
-On Tue, Apr 30, 2019 at 05:46:36PM -0300, Eduardo Habkost wrote:
->Hi,
->
->On Fri, Apr 26, 2019 at 08:36:51AM +0800, Wei Yang wrote:
->> From: Zhang Yi <yi.z.zhang@linux.intel.com>
->> 
->> When a file supporting DAX is used as vNVDIMM backend, mmap it with
->> MAP_SYNC flag in addition which can ensure file system metadata
->> synced in each guest writes to the backend file, without other QEMU
->> actions (e.g., periodic fsync() by QEMU).
->> 
->> Current, We have below different possible use cases:
->> 
->> 1. pmem=on is set, shared=on is set, MAP_SYNC supported:
->>    a: backend is a dax supporting file.
->>     - MAP_SYNC will active.
->>    b: backend is not a dax supporting file.
->>     - mmap will trigger a warning. then MAP_SYNC flag will be ignored
->> 
->> 2. The rest of cases:
->>    - we will never pass the MAP_SYNC to mmap2
->> 
->> Signed-off-by: Haozhong Zhang <haozhong.zhang@intel.com>
->> Signed-off-by: Zhang Yi <yi.z.zhang@linux.intel.com>
->> [ehabkost: Rebased patch to latest code on master]
->> Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
->> Signed-off-by: Wei Yang <richardw.yang@linux.intel.com>
->> Tested-by: Wei Yang <richardw.yang@linux.intel.com>
->> Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
->> 
->> ---
->> v15: fix compile issue on pre-linux4.15
->> v14: rebase on top of current upstream
->
->Note that v14 was already merged, so the build fix would need to
->be submitted separately.  However:
->
 
-Sure, I would spin a separate patch.
 
->[...]
->> +#ifdef CONFIG_LINUX
->> +#include <linux/mman.h>
->> +#endif /* CONFIG_LINUX */
->> +
->> +#ifndef MAP_SYNC
->> +#define MAP_SYNC 0
->> +#endif
->> +#ifndef MAP_SHARED_VALIDATE
->> +#define MAP_SHARED_VALIDATE 0
->> +#endif
->
->Why would we need this, if we added copies of mman.h to
->linux-headers?
+On 4/29/19 9:44 AM, Kashyap Chamarthy wrote:
+> On Fri, Apr 26, 2019 at 06:15:28PM -0400, John Snow wrote:
+>> This just about rewrites the entirety of the bitmaps.rst document to
+>> make it consistent with the 4.0 release. I have added new features seen
+>> in the 4.0 release, as well as tried to clarify some points that keep
+>> coming up when discussing this feature both in-house and upstream.
+>>
+>> Yes, it's a lot longer, mostly due to examples. I get a bit chatty.
+>> I could use a good editor to help reign in my chattiness.
+>>
+>> It does not yet cover pull backups or migration details, but I intend to
+>> keep extending this document to cover those cases.
+>>
+>> Please try compiling it with sphinx and look at the rendered output, I
+>> don't have hosting to share my copy at present. 
+> 
+> FWIW, here's a public rendering (with the "Alabaster" Sphinx theme) with
+> your v3 applied:
+> 
+>     https://kashyapc.fedorapeople.org/QEMU-Docs-v4.0.0-143-g1cb2ca0415/_build/html/docs/interop/bitmaps.html
+> 
 
-This is reported by Stefan.
+Thank you!! We really need to figure out hosting for these.
 
-https://www.mail-archive.com/qemu-devel@nongnu.org/msg612168.html
+> Thanks for the overhaul.  Afraid, I've been just too swamped to be able
+> to look at this in detail, much as I'd love to.  I will slowly catch up.
+> 
+>     - - -
+> 
+> (Note to self: send to the list the text-to-rST converted QEMU docs
+> sitting locally on a Git branch.)
+> 
 
->
->-- 
->Eduardo
+PLEASE do! Please CC me on them. I realize it's not a priority for you
+at the moment but I will happily take any existing work you've done.
 
--- 
-Wei Yang
-Help you, Help me
+> [...]
+> 
+>> I think this new layout reads nicer in the HTML format than the old
+>> one did, at the expense of looking less readable in the source tree
+>> itself (though not completely unmanagable. We did decide to convert it
+>> from Markdown to ReST, after all, so I am going all-in on ReST.)
+> 
+> [...]
+> 
