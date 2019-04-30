@@ -3,80 +3,79 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
 X-Spam-Status: No, score=-3.7 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E3FA4C43219
-	for <qemu-devel@archiver.kernel.org>; Tue, 30 Apr 2019 16:23:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B7484C43219
+	for <qemu-devel@archiver.kernel.org>; Tue, 30 Apr 2019 16:27:04 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id ABBD32081C
-	for <qemu-devel@archiver.kernel.org>; Tue, 30 Apr 2019 16:23:54 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 6EED52081C
+	for <qemu-devel@archiver.kernel.org>; Tue, 30 Apr 2019 16:27:04 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="UvyYrSzX"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org ABBD32081C
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="uK/ofntA"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6EED52081C
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:49646 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:49737 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hLVXt-0007yh-Mf
-	for qemu-devel@archiver.kernel.org; Tue, 30 Apr 2019 12:23:53 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:50848)
+	id 1hLVax-0002GB-Hf
+	for qemu-devel@archiver.kernel.org; Tue, 30 Apr 2019 12:27:03 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:54200)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1hLV08-0004JK-Ni
-	for qemu-devel@nongnu.org; Tue, 30 Apr 2019 11:49:01 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1hLVAj-0004vo-29
+	for qemu-devel@nongnu.org; Tue, 30 Apr 2019 11:59:58 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1hLV07-0005kF-IC
-	for qemu-devel@nongnu.org; Tue, 30 Apr 2019 11:49:00 -0400
-Received: from mail-oi1-x244.google.com ([2607:f8b0:4864:20::244]:32825)
+	(envelope-from <peter.maydell@linaro.org>) id 1hLVAg-0004hq-SZ
+	for qemu-devel@nongnu.org; Tue, 30 Apr 2019 11:59:57 -0400
+Received: from mail-oi1-x241.google.com ([2607:f8b0:4864:20::241]:46871)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1hLV07-0005ja-Bh
-	for qemu-devel@nongnu.org; Tue, 30 Apr 2019 11:48:59 -0400
-Received: by mail-oi1-x244.google.com with SMTP id l1so9789694oib.0
-	for <qemu-devel@nongnu.org>; Tue, 30 Apr 2019 08:48:58 -0700 (PDT)
+	id 1hLVAg-0004hS-Mp
+	for qemu-devel@nongnu.org; Tue, 30 Apr 2019 11:59:54 -0400
+Received: by mail-oi1-x241.google.com with SMTP id d62so5797024oib.13
+	for <qemu-devel@nongnu.org>; Tue, 30 Apr 2019 08:59:54 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
 	h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-	:cc; bh=whpXleuULA2tEcHmo7/VDawTgrO7jOewkTpvlTF4ub0=;
-	b=UvyYrSzXWv1Vswsuxehsd2gtyWFYyI/cJ2AlkLs+3ZrpDvLYiektREGISm/YRIulRt
-	/Fkd8QNBGKUOXrPiW1r4sLVEJ+G61wXA3xDxuSTAb+qj6brBq/vkuXK+OfjEH/1RNeSt
-	Ad1ojMuDsgnFbomiFK4rysxWeY2heeCLwfi8RTOO8nyJ+28uDvLMDggfdcKZKXrQU9G+
-	hho3fI8PHlegnRnCZc2F1shlT0zpmYqJaS3trnFXrhEA6Y6B3a0iv5pmzoQdV6c2UFJf
-	gU/ro5g3u7jDtMmcJE7/aby+FQ0UMZVRkAbLPQmkUJPVhR4u+r8QYs28UXyyX+MtwEXS
-	U7sw==
+	:cc; bh=Aet0shfUY8OGFSb1g1Y0WlXxfX0QxQJu8SnrapWHQOQ=;
+	b=uK/ofntAD58zxofwXhMFuXY7YJyr8PX4lJJ4VfHGw3n0fwRlFdBpkRf8DWQ878haAd
+	sot803DSlzwWCbkVwM1PJAFmGiPBFJzQtPQ2mwE2edin0sSnL92+3OxshvEi5FVlbsir
+	ENffm/MPWGAdJjj5Vfc8IUbIgnTvuL1zozhYY5tAp6kAF22RW7fRE7ROlMacM7yGTQLo
+	F022jF2mi/BBz87/ZLs+EuJZdNrhQ7f+z6Ct5ERTwmpyqgBOEtaCEHUq0t6bcQTxbZYd
+	yTnbyW3Ui+55cLJwCMdUKpD6Uf8ap/Ljupd6myxAap695HP/M5VSoHbT8GgXNcI2ptXd
+	+zMA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
 	d=1e100.net; s=20161025;
 	h=x-gm-message-state:mime-version:references:in-reply-to:from:date
 	:message-id:subject:to:cc;
-	bh=whpXleuULA2tEcHmo7/VDawTgrO7jOewkTpvlTF4ub0=;
-	b=SI0BaZPQDu5FNpvZmsHwa2c9GBz1s98whn93Rhrbp5bjOHTihSK1CMR8zMZJXffbSr
-	hxjolE7+VF1fgqXQjnKsQuVnSDXy5rvO496PegPFP7v24eCzv4mvOeabdmQyxYCFX0yA
-	WcrQbldj4t5K3nynsC28xBxAq5RXYCvZbDkfxT0GHBurr2M+0kWptIj0/2kLNYBW92/M
-	YXPeN9MtjYeXemNQual7JL1Agu2d2+cW2eP4PF7ow0tSjSDdkLnruiqEuYXCfnbxm8aA
-	d+N5qVR0T9pz3fWMw22diFddQNcW5qyHTXt+04bD3oG0PNsnq7ocH2KRrudYmFEQibNk
-	pE/w==
-X-Gm-Message-State: APjAAAVUdJMs7CyYuap04xprbOm3ScYJG9ohujt/3D4U9dUTQ9lUjrtr
-	HJJS3Wh90osam3K93AtR8ECYcEpESJ2GiYBzW+Ltmw==
-X-Google-Smtp-Source: APXvYqzGQa4xaGuXvHMaOTMR1KkGxTgDvhIS/Nzy8ntZPYff7S0KNXx8DWpWOAoyoCjIuK7Kz1bbYBRzSf5NxBIQcxI=
-X-Received: by 2002:aca:4b04:: with SMTP id y4mr3290920oia.170.1556639338089; 
-	Tue, 30 Apr 2019 08:48:58 -0700 (PDT)
+	bh=Aet0shfUY8OGFSb1g1Y0WlXxfX0QxQJu8SnrapWHQOQ=;
+	b=anQAa2j9hWzRFRAfTyAEbHjj2Ok1ORPunEpdIT4undED40nhwboGN6UE90IRwIfWVh
+	Ubqf1NS5+ZinYGZwfjty+42tmm09BOxl0ugLB9zrnaJgo4dxkLgB1khLLL6y4JeWsDFX
+	oWLWX8ib+zgmsKWXfQ35Qwo5vkEKfiZo2daSyKfRm+YFUDdSo0sOtiSgZcVdyC8PBqUC
+	2Wm0uO67IB5Lj/GeG6RA1OvoppxPfpc/OlD4+XaNcV+lxmn52wABbC++rFpDzICPz+xE
+	6qqvlamCreVOQ7okFVdWARY1yRcezvcl0XUrj1QvHvMPozrTgKgZ5Twh5DWhMA+kOKfN
+	1wuw==
+X-Gm-Message-State: APjAAAXGXSmmWTPlU65HCmc88nRZfhxxqVoOhOPy5aH5ePviikFG2Wha
+	aTdShK2qr8dnT/ycRiPGsqN3PrF0bj01nQ1hheTKcw==
+X-Google-Smtp-Source: APXvYqz/mRC1mr54eujXPnEq90J7iAswEP57OwLVm/DE74DKalxAWKZUfqX7Ppvj2u7D/3RkPEMY83nNbPs3qiCBFnI=
+X-Received: by 2002:aca:b3c2:: with SMTP id c185mr3712378oif.98.1556639993674; 
+	Tue, 30 Apr 2019 08:59:53 -0700 (PDT)
 MIME-Version: 1.0
 References: <cover.1556515687.git.alistair@alistair23.me>
-	<PSXP216MB0277D0653D098FF32C5DC07DDD390@PSXP216MB0277.KORP216.PROD.OUTLOOK.COM>
-In-Reply-To: <PSXP216MB0277D0653D098FF32C5DC07DDD390@PSXP216MB0277.KORP216.PROD.OUTLOOK.COM>
+	<PSXP216MB027793B449E7DAAB995E0F33DD390@PSXP216MB0277.KORP216.PROD.OUTLOOK.COM>
+In-Reply-To: <PSXP216MB027793B449E7DAAB995E0F33DD390@PSXP216MB0277.KORP216.PROD.OUTLOOK.COM>
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 30 Apr 2019 16:48:47 +0100
+Date: Tue, 30 Apr 2019 16:59:42 +0100
 Message-ID:
- <CAFEAcA_T7-+de9=V=hnku9f0BXdpLfz6wLFFZYp9LyYDx2KLCw@mail.gmail.com>
+ <CAFEAcA_rzfL_-zZPpMhqvyGLe7wS-HFh0znd8n2ysnfhg4kHLA@mail.gmail.com>
 To: Alistair Francis <alistair@alistair23.me>
 Content-Type: text/plain; charset="UTF-8"
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
 	recognized.
-X-Received-From: 2607:f8b0:4864:20::244
-Subject: Re: [Qemu-devel] [PATCH v1 3/5] hw/misc: Add the STM32F4xx EXTI
- device
+X-Received-From: 2607:f8b0:4864:20::241
+Subject: Re: [Qemu-devel] [PATCH v1 4/5] hw/arm: Add the STM32F4xx SoC
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -93,125 +92,133 @@ Cc: "alistair23@gmail.com" <alistair23@gmail.com>,
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190430154847.GHTJUEyLxSooL1ERTt5QlV2w9Ouz9wElTLfaB4To8zo@z>
+Message-ID: <20190430155942.d37fScGpV08k619IMZLatwWHWGhFAFCrGMpFl-DCW1g@z>
 
-On Mon, 29 Apr 2019 at 06:37, Alistair Francis <alistair@alistair23.me> wrote:
+On Mon, 29 Apr 2019 at 06:38, Alistair Francis <alistair@alistair23.me> wrote:
 >
 > Signed-off-by: Alistair Francis <alistair@alistair23.me>
 > ---
->  default-configs/arm-softmmu.mak  |   1 +
->  hw/misc/Kconfig                  |   3 +
->  hw/misc/Makefile.objs            |   1 +
->  hw/misc/stm32f4xx_exti.c         | 175 +++++++++++++++++++++++++++++++
->  include/hw/misc/stm32f4xx_exti.h |  57 ++++++++++
->  5 files changed, 237 insertions(+)
->  create mode 100644 hw/misc/stm32f4xx_exti.c
->  create mode 100644 include/hw/misc/stm32f4xx_exti.h
+>  MAINTAINERS                     |   8 +
+>  default-configs/arm-softmmu.mak |   1 +
+>  hw/arm/Kconfig                  |   3 +
+>  hw/arm/Makefile.objs            |   1 +
+>  hw/arm/stm32f405_soc.c          | 292 ++++++++++++++++++++++++++++++++
+>  include/hw/arm/stm32f405_soc.h  |  70 ++++++++
+>  6 files changed, 375 insertions(+)
+>  create mode 100644 hw/arm/stm32f405_soc.c
+>  create mode 100644 include/hw/arm/stm32f405_soc.h
 
-Minor comments here only.
+Looks good; a few minor things below.
 
-(If Thomas's kconfig patchset gets into master before this
-there might be some minor fixups required to the kconfig
-stuff, but it shouldn't be too hard to adapt.)
-
-> +#include "qemu/osdep.h"
-> +#include "hw/sysbus.h"
-> +#include "qemu/log.h"
-> +#include "hw/misc/stm32f4xx_exti.h"
-> +
-> +#ifndef STM_EXTI_ERR_DEBUG
-> +#define STM_EXTI_ERR_DEBUG 0
-> +#endif
-> +
-> +#define DB_PRINT_L(lvl, fmt, args...) do { \
-> +    if (STM_EXTI_ERR_DEBUG >= lvl) { \
-> +        qemu_log("%s: " fmt, __func__, ## args); \
-> +    } \
-> +} while (0)
-> +
-> +#define DB_PRINT(fmt, args...) DB_PRINT_L(1, fmt, ## args)
-
-Could we use a tracepoint instead?
-
-> +
-> +#define NUM_GPIO_EVENT_IN_LINES 16
-> +#define NUM_INTERRUPT_OUT_LINES 16
-> +
-> +static void stm32f4xx_exti_reset(DeviceState *dev)
+> +static void stm32f405_soc_initfn(Object *obj)
 > +{
-> +    STM32F4xxExtiState *s = STM32F4XX_EXTI(dev);
-> +
-> +    s->exti_imr = 0x00000000;
-> +    s->exti_emr = 0x00000000;
-> +    s->exti_rtsr = 0x00000000;
-> +    s->exti_ftsr = 0x00000000;
-> +    s->exti_swier = 0x00000000;
-> +    s->exti_pr = 0x00000000;
-> +}
-> +
-> +static void stm32f4xx_exti_set_irq(void *opaque, int irq, int level)
-> +{
-> +    STM32F4xxExtiState *s = opaque;
-> +
-> +    DB_PRINT("Set EXTI: %d to %d\n", irq, level);
-> +
-> +    if (level) {
-> +        qemu_irq_pulse(s->irq[irq]);
-> +        s->exti_pr |= 1 << irq;
-> +    }
-> +}
-
-Just to check -- this should definitely be a pulse? I'm always
-a little bit wary of uses of qemu_irq_pulse(), though some
-hardware does pulse IRQ lines rather than holding them until
-dismissed.
-
-> +static void stm32f4xx_exti_init(Object *obj)
-> +{
-> +    STM32F4xxExtiState *s = STM32F4XX_EXTI(obj);
+> +    STM32F405State *s = STM32F405_SOC(obj);
 > +    int i;
 > +
-> +    s->irq = g_new0(qemu_irq, NUM_INTERRUPT_OUT_LINES);
-
-You could just have the array be inline in the
-STM32F4xxExtiState rather than allocating it separately,
-right?
-
-> +    for (i = 0; i < NUM_INTERRUPT_OUT_LINES; i++) {
-> +        sysbus_init_irq(SYS_BUS_DEVICE(obj), &s->irq[i]);
+> +    sysbus_init_child_obj(obj, "armv7m", &s->armv7m, sizeof(s->armv7m),
+> +                          TYPE_ARMV7M);
+> +
+> +    sysbus_init_child_obj(obj, "syscfg", &s->syscfg, sizeof(s->syscfg),
+> +                          TYPE_STM32F4XX_SYSCFG);
+> +
+> +    for (i = 0; i < STM_NUM_USARTS; i++) {
+> +        sysbus_init_child_obj(obj, "usart[*]", &s->usart[i],
+> +                              sizeof(s->usart[i]), TYPE_STM32F2XX_USART);
 > +    }
 > +
-> +    memory_region_init_io(&s->mmio, obj, &stm32f4xx_exti_ops, s,
-> +                          TYPE_STM32F4XX_EXTI, 0x400);
-> +    sysbus_init_mmio(SYS_BUS_DEVICE(obj), &s->mmio);
+> +    for (i = 0; i < STM_NUM_TIMERS; i++) {
+> +        sysbus_init_child_obj(obj, "timer[*]", &s->timer[i],
+> +                              sizeof(s->timer[i]), TYPE_STM32F2XX_TIMER);
+> +    }
 > +
-> +    qdev_init_gpio_in(DEVICE(obj), stm32f4xx_exti_set_irq,
-> +                      NUM_GPIO_EVENT_IN_LINES);
+> +    s->adc_irqs = OR_IRQ(object_new(TYPE_OR_IRQ));
+
+It would be more in keeping with the style of the rest of this
+device to have the device be inline in the STM32F405State
+struct and initialized with object_initialize_child() rather
+than allocated separately with object_new(). (hw/arm/armsse.c
+has an example of doing this with a TYPE_OR_IRQ object.)
+
+> +
+> +    for (i = 0; i < STM_NUM_ADCS; i++) {
+> +        sysbus_init_child_obj(obj, "adc[*]", &s->adc[i], sizeof(s->adc[i]),
+> +                              TYPE_STM32F2XX_ADC);
+> +    }
+> +
+> +    for (i = 0; i < STM_NUM_SPIS; i++) {
+> +        sysbus_init_child_obj(obj, "spi[*]", &s->spi[i], sizeof(s->spi[i]),
+> +                              TYPE_STM32F2XX_SPI);
+> +    }
+> +
+> +    sysbus_init_child_obj(obj, "exti", &s->exti, sizeof(s->exti),
+> +                          TYPE_STM32F4XX_EXTI);
 > +}
 > +
-> +static void stm32f4xx_exti_class_init(ObjectClass *klass, void *data)
+> +static void stm32f405_soc_realize(DeviceState *dev_soc, Error **errp)
+> +{
+> +    STM32F405State *s = STM32F405_SOC(dev_soc);
+> +    DeviceState *dev, *armv7m;
+> +    SysBusDevice *busdev;
+> +    Error *err = NULL;
+> +    int i;
+> +
+> +    MemoryRegion *system_memory = get_system_memory();
+> +    MemoryRegion *sram = g_new(MemoryRegion, 1);
+> +    MemoryRegion *flash = g_new(MemoryRegion, 1);
+> +    MemoryRegion *flash_alias = g_new(MemoryRegion, 1);
+
+I would prefer to have these MemoryRegions be in the STM32F405State
+struct rather than separately allocated.
+
+> +
+> +    memory_region_init_ram(flash, NULL, "STM32F405.flash", FLASH_SIZE,
+> +                           &error_fatal);
+
+Better to pass the error back up via errp rather than use error_fatal
+in a realize function.
+
+> +    memory_region_init_alias(flash_alias, NULL, "STM32F405.flash.alias",
+> +                             flash, 0, FLASH_SIZE);
+> +
+> +    memory_region_set_readonly(flash, true);
+> +    memory_region_set_readonly(flash_alias, true);
+> +
+> +    memory_region_add_subregion(system_memory, FLASH_BASE_ADDRESS, flash);
+> +    memory_region_add_subregion(system_memory, 0, flash_alias);
+> +
+> +    memory_region_init_ram(sram, NULL, "STM32F405.sram", SRAM_SIZE,
+> +                           &error_fatal);
+> +    memory_region_add_subregion(system_memory, SRAM_BASE_ADDRESS, sram);
+> +
+> +    armv7m = DEVICE(&s->armv7m);
+> +    qdev_prop_set_uint32(armv7m, "num-irq", 96);
+> +    qdev_prop_set_string(armv7m, "cpu-type", s->cpu_type);
+> +    qdev_prop_set_bit(armv7m, "enable-bitband", true);
+> +    object_property_set_link(OBJECT(&s->armv7m), OBJECT(get_system_memory()),
+
+You could use OBJECT(system_memory) rather than calling
+get_system_memory() again.
+
+> +static Property stm32f405_soc_properties[] = {
+> +    DEFINE_PROP_STRING("cpu-type", STM32F405State, cpu_type),
+> +    DEFINE_PROP_END_OF_LIST(),
+> +};
+> +
+> +static void stm32f405_soc_class_init(ObjectClass *klass, void *data)
 > +{
 > +    DeviceClass *dc = DEVICE_CLASS(klass);
 > +
-> +    dc->reset = stm32f4xx_exti_reset;
+> +    dc->realize = stm32f405_soc_realize;
+> +    dc->props = stm32f405_soc_properties;
 
-This one's missing vmstate too.
+A comment here "No vmstate or reset required: device has no internal state"
+would help indicate that dc->vmsd and dc->reset have not merely
+been forgotten.
+
+(Eventually I might actually write a patch to let us express
+in code "dc->vmsd = device_has_no_state;"...)
 
 > +}
-> +
-> +static const TypeInfo stm32f4xx_exti_info = {
-> +    .name          = TYPE_STM32F4XX_EXTI,
-> +    .parent        = TYPE_SYS_BUS_DEVICE,
-> +    .instance_size = sizeof(STM32F4xxExtiState),
-> +    .instance_init = stm32f4xx_exti_init,
-> +    .class_init    = stm32f4xx_exti_class_init,
-> +};
-> +
-> +static void stm32f4xx_exti_register_types(void)
-> +{
-> +    type_register_static(&stm32f4xx_exti_info);
-> +}
-> +
 
 thanks
 -- PMM
