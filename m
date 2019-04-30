@@ -1,26 +1,34 @@
-Received: from eggs.gnu.org ([209.51.188.92]:42097)
+Received: from eggs.gnu.org ([209.51.188.92]:42515)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1hLYQa-0006V2-RK
-	for qemu-devel@nongnu.org; Tue, 30 Apr 2019 15:28:33 -0400
+	(envelope-from <bounces@canonical.com>) id 1hLYSk-0008FE-JM
+	for qemu-devel@nongnu.org; Tue, 30 Apr 2019 15:30:47 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1hLYQZ-00071O-O0
-	for qemu-devel@nongnu.org; Tue, 30 Apr 2019 15:28:32 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:50330)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1hLYQZ-00070z-GU
-	for qemu-devel@nongnu.org; Tue, 30 Apr 2019 15:28:31 -0400
-References: <20190427144025.22880-1-philmd@redhat.com>
-	<6e3003f3-3d96-c1be-6890-baa2c61d34dc@redhat.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <766a1b03-47cb-2fc3-bdfb-e0d883ad0ebd@redhat.com>
-Date: Tue, 30 Apr 2019 21:28:18 +0200
+	(envelope-from <bounces@canonical.com>) id 1hLYSj-00089z-GV
+	for qemu-devel@nongnu.org; Tue, 30 Apr 2019 15:30:46 -0400
+Received: from indium.canonical.com ([91.189.90.7]:45314)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1hLYSj-00089Z-Av
+	for qemu-devel@nongnu.org; Tue, 30 Apr 2019 15:30:45 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1hLYSi-0005Px-4O
+	for <qemu-devel@nongnu.org>; Tue, 30 Apr 2019 19:30:44 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 0DE322E8079
+	for <qemu-devel@nongnu.org>; Tue, 30 Apr 2019 19:30:44 +0000 (UTC)
 MIME-Version: 1.0
-In-Reply-To: <6e3003f3-3d96-c1be-6890-baa2c61d34dc@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH 0/3] hw/i386/acpi: Improve build modularity
- (isapc/q35/...)
+Date: Tue, 30 Apr 2019 19:22:14 -0000
+From: Thomas Huth <1634726@bugs.launchpad.net>
+Reply-To: Bug 1634726 <1634726@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <20161019021427.23110.23706.malonedeb@soybean.canonical.com>
+Message-Id: <155665213466.16809.16731790246220587035.malone@soybean.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1634726] Re: qemu "make test" fails in iov.c with
+ "undefined reference" on aarch64 on Ubuntu 16.04
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,37 +37,58 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>, qemu-devel@nongnu.org
-Cc: Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, Igor Mammedov <imammedo@redhat.com>, Samuel Ortiz <sameo@linux.intel.com>, "Michael S. Tsirkin" <mst@redhat.com>, Yang Zhong <yang.zhong@intel.com>, Thomas Huth <thuth@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, Richard Henderson <rth@twiddle.net>
+To: qemu-devel@nongnu.org
 
-On 27/04/19 16:43, Philippe Mathieu-Daud=C3=A9 wrote:
-> On 4/27/19 4:40 PM, Philippe Mathieu-Daud=C3=A9 wrote:
->> This series allow to build the ISAPC/Q35 machines independently.
->=20
-> Oops I guess I forgot:
-> Based-on: 20190427141905.20393-1-philmd@redhat.com
-> (i440fx is not a machine)
-> https://lists.gnu.org/archive/html/qemu-devel/2019-04/msg04673.html
+"make test" has been removed, so I'll mark this as fixed now.
 
-Queued (*without* the based-on-but-not-really series), thanks.
+** Changed in: qemu
+       Status: New =3D> Fix Released
 
-Paolo
->=20
->>
->> Regards,
->>
->> Phil.
->>
->> Philippe Mathieu-Daud=C3=A9 (3):
->>   hw/acpi/piix4: Move TYPE_PIIX4_PM to a public header
->>   hw/i386/acpi: Add object_resolve_type_unambiguous to improve
->>     modularity
->>   hw/i386/acpi: Assert a pointer is not null BEFORE using it
->>
->>  hw/acpi/piix4.c         | 13 -------------
->>  hw/i386/acpi-build.c    | 22 +++++++++++++++++-----
->>  hw/isa/lpc_ich9.c       | 11 -----------
->>  include/hw/acpi/piix4.h |  2 +-
->>  include/hw/i386/ich9.h  |  2 --
->>  5 files changed, 18 insertions(+), 32 deletions(-)
->>
+-- =
+
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1634726
+
+Title:
+  qemu "make test" fails in iov.c with "undefined reference" on aarch64
+  on Ubuntu 16.04
+
+Status in QEMU:
+  Fix Released
+
+Bug description:
+  I'm building the master tree on a multicore ARMv8 machine running
+  Ubuntu 16.04. The build worked just fine, using the simple directions
+  in the README file and "make -j 64" to do the build.
+
+  Next, I did "make test", and got this:
+
+  emv@armv8hello:~/src/qemu/qemu/build$ make test
+  make -C tests/tcg test
+  make[1]: Entering directory '/mnt/src/qemu/qemu/build/tests/tcg'
+    CC      test_path.o
+    LINK    test_path
+  test_path.o: In function `qemu_iovec_is_zero':
+  /home/emv/src/qemu/qemu/util/iov.c:365: undefined reference to `buffer_is=
+_zero'
+  collect2: error: ld returned 1 exit status
+  /home/emv/src/qemu/qemu/rules.mak:105: recipe for target 'test_path' fail=
+ed
+  make[1]: *** [test_path] Error 1
+  make[1]: Leaving directory '/mnt/src/qemu/qemu/build/tests/tcg'
+  Makefile:498: recipe for target 'test' failed
+  make: *** [test] Error 2
+
+  I expected "make test" to complete with no errors.
+
+  uname -a:
+  Linux armv8hello.local.lan 4.4.0-38-generic #57-Ubuntu SMP Wed Sep 7 10:1=
+9:14 UTC 2016 aarch64 aarch64 aarch64 GNU/Linux
+
+  emv@armv8hello:~/src/qemu/qemu$ more VERSION =
+
+  2.7.50
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1634726/+subscriptions
