@@ -2,94 +2,90 @@ Return-Path: <SRS0=TP+Q=TA=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-4.0 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.7 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AA92EC43219
-	for <qemu-devel@archiver.kernel.org>; Tue, 30 Apr 2019 16:57:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6417BC43219
+	for <qemu-devel@archiver.kernel.org>; Tue, 30 Apr 2019 17:00:04 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 758C920645
-	for <qemu-devel@archiver.kernel.org>; Tue, 30 Apr 2019 16:57:11 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 2F2952075E
+	for <qemu-devel@archiver.kernel.org>; Tue, 30 Apr 2019 17:00:04 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="bDKsGKR2"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 758C920645
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="cJ7JBATh"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2F2952075E
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:50184 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:50218 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hLW46-0005g1-Ic
-	for qemu-devel@archiver.kernel.org; Tue, 30 Apr 2019 12:57:10 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:39122)
+	id 1hLW6t-00080X-88
+	for qemu-devel@archiver.kernel.org; Tue, 30 Apr 2019 13:00:03 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:39173)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1hLW26-00048Z-WE
+	(envelope-from <alex.bennee@linaro.org>) id 1hLW27-000491-0y
 	for qemu-devel@nongnu.org; Tue, 30 Apr 2019 12:55:07 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1hLW0E-00011w-SH
-	for qemu-devel@nongnu.org; Tue, 30 Apr 2019 12:53:11 -0400
-Received: from mail-pf1-x441.google.com ([2607:f8b0:4864:20::441]:34710)
+	(envelope-from <alex.bennee@linaro.org>) id 1hLVzq-0000q3-T1
+	for qemu-devel@nongnu.org; Tue, 30 Apr 2019 12:52:47 -0400
+Received: from mail-wm1-x344.google.com ([2a00:1450:4864:20::344]:39104)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1hLW0E-00011W-Lx
-	for qemu-devel@nongnu.org; Tue, 30 Apr 2019 12:53:10 -0400
-Received: by mail-pf1-x441.google.com with SMTP id b3so7361894pfd.1
-	for <qemu-devel@nongnu.org>; Tue, 30 Apr 2019 09:53:10 -0700 (PDT)
+	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+	id 1hLVzq-0000pD-Lz
+	for qemu-devel@nongnu.org; Tue, 30 Apr 2019 12:52:46 -0400
+Received: by mail-wm1-x344.google.com with SMTP id n25so4588964wmk.4
+	for <qemu-devel@nongnu.org>; Tue, 30 Apr 2019 09:52:46 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
-	h=subject:to:references:from:openpgp:message-id:date:user-agent
-	:mime-version:in-reply-to:content-language:content-transfer-encoding;
-	bh=TC1CCh339jHWyTpGjRd004brUkiO3stT5lq6ZVT1t7s=;
-	b=bDKsGKR2cbVkBXVoNh79Ozbh3p/gpUwmvibaR6jm7DMcrf9HBWZgNQ6hxTPfNhQihC
-	yPiOljaHCLAKR59O7+GrohBkAmwUZWEzy6MdSyx+mMUurVRtcotifZ1JtYDr5J55gU+G
-	ne1E055DW0jWlBR3e5eLOb7aSiY6+eUfrB35YLHSJnWFy5DPhCsZT/m/UWnn6c2Rks7u
-	mvEIjv1L/0E8UJ6NLi4yzqsbIEssQQmy0uI5RIC7IhiQl7XkyDqh8yFNPkO66UvjbDLH
-	EzUUJNfB0pLzjgU9tpOFfDSwetIgzUqoo86MC/QBsFdue4oVAnZsD/auqDwMXLpDVjec
-	iMMQ==
+	h=from:to:cc:subject:date:message-id:in-reply-to:references
+	:mime-version:content-transfer-encoding;
+	bh=wZWYsS060hsAv0hcVng0aTY1nyv7SpuxTkdVT9m0hYA=;
+	b=cJ7JBAThq59DcGlYEYT0hkikYdfNKSnodyjWN6r5G5laALGyzmT2he1aO7nuKfdox2
+	X0V5BWx87m+c5FMyO8lEBfGQuCa7yCyjQTenrSKtJUBThdA0CnetXh5UeiM1m32ydFBx
+	AnWVpP9Z3BcrRIPyePK0LQQM4PyO694DPFAlrx2+zc65dDvTSJGxROMUzXwmLObw0p4M
+	uXN2oY7ksZhPHamFP4HVg/W2qNneLgLJwgKUwlIkp5hShXI/a29i/sl4H6JiaojOjpV/
+	6kzxakJZsewVG5zVdJvawS+qPCpcut6RBQtNNJ6UDH3OaAkMoCtElgSWWTj+uJtbptCs
+	CDGg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
 	d=1e100.net; s=20161025;
-	h=x-gm-message-state:subject:to:references:from:openpgp:message-id
-	:date:user-agent:mime-version:in-reply-to:content-language
-	:content-transfer-encoding;
-	bh=TC1CCh339jHWyTpGjRd004brUkiO3stT5lq6ZVT1t7s=;
-	b=i3joZ7UqPrl+g09T1xXdC1Z8uxDHuBr4O7tFuEGaZtenQ0kLcMxtHqgYwMb+LgPO8q
-	YZqikEYJ6vT+dQuqGq/kwhVCga1k7Z/nn+Z/5+1yAg0V1t1aoVXR/5A8LuoG0h3pOUap
-	9QgE4UxOkxGbIpNFPVeeo8r0wOgLdtYiPL8azaSD6LrEhbtdPtRxZC7uS7u/gAJ8ip4D
-	KbdssHFfGhpb54kDjLmoybJFhj9KR7DcrsrjsiZQIzcanNmJd1v6kCes8OlVER+ftBgO
-	YV0wpouCd1Np5I4V/dSxtdRQR1VESgl7BsBm9GBpjL3Qj52MkUF8LoYQEyIGR7PgerUd
-	HJOQ==
-X-Gm-Message-State: APjAAAWh/Zqy+RkHp8x8EIcq7IFYm9BsyJSxtn4/+/KfvQ6GlBpNnszA
-	p4fbHJGbGKnnpI3K6UDOyDR3NQ==
-X-Google-Smtp-Source: APXvYqzT4NvPqaSy7jVLczhKBRRdnsubfsm98EOr5S1bxYnvXxJM1GWd2YAenR7bblAB7DS40AoOLw==
-X-Received: by 2002:a63:6988:: with SMTP id e130mr5709801pgc.150.1556643189713;
-	Tue, 30 Apr 2019 09:53:09 -0700 (PDT)
-Received: from [192.168.1.11] (97-113-18-231.tukw.qwest.net. [97.113.18.231])
+	h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+	:references:mime-version:content-transfer-encoding;
+	bh=wZWYsS060hsAv0hcVng0aTY1nyv7SpuxTkdVT9m0hYA=;
+	b=OMZ6GnhGg8OPPbeM0TSVJjJejBOycjE3OWRo/0olGN7OdHIJO0Ef2xv3naOe8UqJXT
+	JVt1rhe68SrRLn3YJL6fyvYCjxOjM6Qf00+OESXUAJ/xU9yUs4PC3AD4onlFenIS65gk
+	eLagA63LYTgviucfiOn+BJ9ktKFo7QXci8ieHB43aCQdbdU2+Q8ncGHeNvjGS8J1umny
+	YfYRkYg1v1xPWC0MZIWSiOcA5COirpyEVZXTQU3FzALL4PwYxjybWmbGsZDl2mNxdGvu
+	c1OyVpZxOzDn7d1/CwC8GKo1EEI4GwHNOkzFfYR1lyyqXW6KfLT1idy1tVbLAMhClliL
+	Ag0w==
+X-Gm-Message-State: APjAAAVoxFdeTsjwQ9wKp932LLC+Palt7RZyztovpMYD3IRJ5KrrPWR2
+	ZLceBxOhbYFXs7w6dEKXzD51Dw==
+X-Google-Smtp-Source: APXvYqwcG3A0Umk7aZ/TDdbmUlAVXCljPeL8UOGZUhNeB63qwWfVPuVAXzmLcfTpj65XiIzgrJlWyw==
+X-Received: by 2002:a1c:7005:: with SMTP id l5mr3848619wmc.149.1556643165639; 
+	Tue, 30 Apr 2019 09:52:45 -0700 (PDT)
+Received: from zen.linaroharston ([81.128.185.34])
 	by smtp.gmail.com with ESMTPSA id
-	j22sm48723345pfn.129.2019.04.30.09.53.04
-	(version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-	Tue, 30 Apr 2019 09:53:08 -0700 (PDT)
-To: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, qemu-devel@nongnu.org,
-	qemu-ppc@nongnu.org, david@gibson.dropbear.id.au, rth@twiddle.net,
-	gkurz@kaod.org
-References: <20190428143845.11810-1-mark.cave-ayland@ilande.co.uk>
-	<20190428143845.11810-12-mark.cave-ayland@ilande.co.uk>
-From: Richard Henderson <richard.henderson@linaro.org>
-Openpgp: preference=signencrypt
-Message-ID: <563644aa-8e79-8b46-61c0-3a10b62fbc28@linaro.org>
-Date: Tue, 30 Apr 2019 09:53:01 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
-	Thunderbird/60.6.1
+	k206sm5305271wmk.16.2019.04.30.09.52.38
+	(version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
+	Tue, 30 Apr 2019 09:52:43 -0700 (PDT)
+Received: from zen.linaroharston. (localhost [127.0.0.1])
+	by zen.linaroharston (Postfix) with ESMTP id 3283F1FF9E;
+	Tue, 30 Apr 2019 17:52:35 +0100 (BST)
+From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
+To: qemu-devel@nongnu.org
+Date: Tue, 30 Apr 2019 17:52:33 +0100
+Message-Id: <20190430165234.32272-15-alex.bennee@linaro.org>
+X-Mailer: git-send-email 2.20.1
+In-Reply-To: <20190430165234.32272-1-alex.bennee@linaro.org>
+References: <20190430165234.32272-1-alex.bennee@linaro.org>
 MIME-Version: 1.0
-In-Reply-To: <20190428143845.11810-12-mark.cave-ayland@ilande.co.uk>
 Content-Type: text/plain; charset="UTF-8"
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
 	recognized.
-X-Received-From: 2607:f8b0:4864:20::441
-Subject: Re: [Qemu-devel] [PATCH 11/14] target/ppc: decode target register
- in VSX_VECTOR_LOAD_STORE_LENGTH at translation time
+X-Received-From: 2a00:1450:4864:20::344
+Subject: [Qemu-devel] [PATCH v5 14/15] Makefile: include per-target build
+ directories in coverage report
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -101,22 +97,34 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
+	qemu-arm@nongnu.org, mark.cave-ayland@ilande.co.uk, cota@braap.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190430165301.BDgtnd5ioevKs72-wiQP1O_wDzWQi0fujlQUZjzz5qA@z>
+Message-ID: <20190430165233.-QKM2KYDoVFG5_iRHKTNoOOmSXTq0n7IKFOCeG_KVHo@z>
 
-On 4/28/19 7:38 AM, Mark Cave-Ayland wrote:
-> Signed-off-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-> ---
->  target/ppc/helper.h                 | 8 ++++----
->  target/ppc/mem_helper.c             | 6 ++----
->  target/ppc/translate/vsx-impl.inc.c | 7 ++++---
->  3 files changed, 10 insertions(+), 11 deletions(-)
+Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
+---
+ Makefile | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
 
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
-
-
-r~
+diff --git a/Makefile b/Makefile
+index 45dfe1b585..bb17b0d692 100644
+--- a/Makefile
++++ b/Makefile
+@@ -992,7 +992,9 @@ $(filter %.1 %.7 %.8,$(DOCS)): scripts/texi2pod.pl
+ %/coverage-report.html:
+ 	@mkdir -p $*
+ 	$(call quiet-command,\
+-		gcovr -r $(SRC_PATH) --object-directory $(BUILD_DIR) \
++		gcovr -r $(SRC_PATH) \
++		$(foreach t, $(TARGET_DIRS), --object-directory $(BUILD_DIR)/$(t)) \
++		 --object-directory $(BUILD_DIR) \
+ 		-p --html --html-details -o $@, \
+ 		"GEN", "coverage-report.html")
+ 
+-- 
+2.20.1
 
 
