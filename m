@@ -1,26 +1,26 @@
-Received: from eggs.gnu.org ([209.51.188.92]:59886)
+Received: from eggs.gnu.org ([209.51.188.92]:33789)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1hLRWV-0000pO-JQ
-	for qemu-devel@nongnu.org; Tue, 30 Apr 2019 08:06:12 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1hLRe4-0003Rq-HS
+	for qemu-devel@nongnu.org; Tue, 30 Apr 2019 08:14:01 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1hLRWU-0001p9-CM
-	for qemu-devel@nongnu.org; Tue, 30 Apr 2019 08:06:11 -0400
-Received: from mail-ot1-x342.google.com ([2607:f8b0:4864:20::342]:41620)
+	(envelope-from <peter.maydell@linaro.org>) id 1hLRe3-0006E3-PC
+	for qemu-devel@nongnu.org; Tue, 30 Apr 2019 08:14:00 -0400
+Received: from mail-ot1-x341.google.com ([2607:f8b0:4864:20::341]:38113)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1hLRWU-0001os-7B
-	for qemu-devel@nongnu.org; Tue, 30 Apr 2019 08:06:10 -0400
-Received: by mail-ot1-x342.google.com with SMTP id g8so10637220otl.8
-	for <qemu-devel@nongnu.org>; Tue, 30 Apr 2019 05:06:10 -0700 (PDT)
+	id 1hLRe3-0006Dj-Hl
+	for qemu-devel@nongnu.org; Tue, 30 Apr 2019 08:13:59 -0400
+Received: by mail-ot1-x341.google.com with SMTP id t20so11671751otl.5
+	for <qemu-devel@nongnu.org>; Tue, 30 Apr 2019 05:13:59 -0700 (PDT)
 MIME-Version: 1.0
-References: <20190430031238.40499-1-yangchuanlong@huawei.com>
-In-Reply-To: <20190430031238.40499-1-yangchuanlong@huawei.com>
+References: <20190223023957.18865-1-richard.henderson@linaro.org>
+	<20190223023957.18865-2-richard.henderson@linaro.org>
+In-Reply-To: <20190223023957.18865-2-richard.henderson@linaro.org>
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 30 Apr 2019 13:05:58 +0100
-Message-ID: <CAFEAcA-HkovdX3XayW22=wJ2i0cECV_Jm3OjTv3zsHLMhgsKDQ@mail.gmail.com>
+Date: Tue, 30 Apr 2019 13:13:47 +0100
+Message-ID: <CAFEAcA_Uco_Uczy1Ut5RCETtXVxrRpEE35MKHv0mDPYZeFE-mQ@mail.gmail.com>
 Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH v1] target/arm/arm-powerctl: mask the cpuid
- with affinity bits when get cpu
+Subject: Re: [Qemu-devel] [PATCH 1/6] target/arm: Implement ID_PFR2
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,50 +29,22 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Yang Chuanlong <yangchuanlong@huawei.com>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, gengdongjiu <gengdongjiu@huawei.com>
+To: Richard Henderson <richard.henderson@linaro.org>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>
 
-On Tue, 30 Apr 2019 at 04:22, Yang Chuanlong <yangchuanlong@huawei.com> wrote:
+On Sat, 23 Feb 2019 at 02:40, Richard Henderson
+<richard.henderson@linaro.org> wrote:
 >
-> Currently, the cpuid passed from the device tree may still contain
-> non-affinity fields, which will cause arm_set_cpu_on failure.
-> Therefore, we mask the cpuid with affinity fields here to
-> improve qemu compatibility.
+> This was defined at some point before ARMv8.4, and will
+> shortly be used by new processor descriptions.
 >
-> Signed-off-by: Yang Chuanlong <yangchuanlong@huawei.com>
+> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 > ---
->  target/arm/arm-powerctl.c | 8 +++++++-
->  1 file changed, 7 insertions(+), 1 deletion(-)
->
-> diff --git a/target/arm/arm-powerctl.c b/target/arm/arm-powerctl.c
-> index f77a950db6..ef9fec0b4d 100644
-> --- a/target/arm/arm-powerctl.c
-> +++ b/target/arm/arm-powerctl.c
-> @@ -31,7 +31,13 @@ CPUState *arm_get_cpu_by_id(uint64_t id)
->  {
->      CPUState *cpu;
->
-> -    DPRINTF("cpu %" PRId64 "\n", id);
-> +#ifdef TARGET_AARCH64
-> +    id &= ARM64_AFFINITY_MASK;
-> +#else
-> +    id &= ARM32_AFFINITY_MASK;
-> +#endif
-> +
-> +    DPRINTF("cpu %" PRId64 " after mask affinity\n", id);
->
->      CPU_FOREACH(cpu) {
->          ARMCPU *armcpu = ARM_CPU(cpu);
+>  target/arm/cpu.h    | 1 +
+>  target/arm/helper.c | 4 ++--
+>  2 files changed, 3 insertions(+), 2 deletions(-)
 
-Hi -- could you explain what the code path is where we
-end up passing a wrong value into this function? I'm
-wondering if this is the best place to fix it, or if maybe
-the calling function is at fault.
-
-Also, you can't use #ifdef TARGET_AARCH64 here to distinguish
-a 64-bit from a 32-bit CPU, because the qemu-system-aarch64
-binary (which is built with TARGET_AARCH64) also supports all
-the 32-bit CPUs.
+Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
 
 thanks
 -- PMM
