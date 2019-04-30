@@ -2,85 +2,117 @@ Return-Path: <SRS0=TP+Q=TA=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.3 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,FROM_LOCAL_NOVOWEL,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DDFCEC04AA8
-	for <qemu-devel@archiver.kernel.org>; Tue, 30 Apr 2019 21:09:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 196C3C43219
+	for <qemu-devel@archiver.kernel.org>; Tue, 30 Apr 2019 21:10:35 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 60FFB2087B
-	for <qemu-devel@archiver.kernel.org>; Tue, 30 Apr 2019 21:09:14 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="EN1QbCGn"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 60FFB2087B
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	by mail.kernel.org (Postfix) with ESMTPS id CB3352087B
+	for <qemu-devel@archiver.kernel.org>; Tue, 30 Apr 2019 21:10:34 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CB3352087B
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:53506 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:53557 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hLa01-0007QC-BD
-	for qemu-devel@archiver.kernel.org; Tue, 30 Apr 2019 17:09:13 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:60470)
+	id 1hLa1K-0008QO-1v
+	for qemu-devel@archiver.kernel.org; Tue, 30 Apr 2019 17:10:34 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:60638)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jcmvbkbc@gmail.com>) id 1hLZyd-0006W6-Ex
-	for qemu-devel@nongnu.org; Tue, 30 Apr 2019 17:07:48 -0400
+	(envelope-from <laurent@vivier.eu>) id 1hLZzE-00072a-3k
+	for qemu-devel@nongnu.org; Tue, 30 Apr 2019 17:08:25 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jcmvbkbc@gmail.com>) id 1hLZyb-0004Wa-J4
-	for qemu-devel@nongnu.org; Tue, 30 Apr 2019 17:07:47 -0400
-Received: from mail-yw1-xc44.google.com ([2607:f8b0:4864:20::c44]:36959)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <jcmvbkbc@gmail.com>) id 1hLZyb-0004Vs-6u
-	for qemu-devel@nongnu.org; Tue, 30 Apr 2019 17:07:45 -0400
-Received: by mail-yw1-xc44.google.com with SMTP id a62so6997313ywa.4
-	for <qemu-devel@nongnu.org>; Tue, 30 Apr 2019 14:07:44 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
-	h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-	:cc; bh=Nn8XWHXQJIluwQB/meGRemUNDEIdQ3iJZuNEL5RJjvA=;
-	b=EN1QbCGnNh02ABO4I9/5nwcZMyNWggcu25f+U7169xR/D6nvaE9/wgaVMIkXrqsIT8
-	KOppNy2iU93DPmAGmT/doJxe25QJwZkKVVtaGKYUBXJ+wvDeCd129s66vi2vmqVHdvZo
-	4KGretPeCj69NyQGsOpzexNLQRASeTvh4zxMsKsUy4/f7eChmZLg1q3PecLczLNdzlSc
-	4RHOYAZmcojGmxx007Zd98otDgIwv7wjCodga2TBHXavZHV0xoYo2HbPX4wCWu/RVLjQ
-	2uT5YTh7fnBHF0sV7vKx+EzDhOemDLbkz9BOmmUcfonI1bhdUzPM8uthHZYanmYLXNyw
-	K8kA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=1e100.net; s=20161025;
-	h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-	:message-id:subject:to:cc;
-	bh=Nn8XWHXQJIluwQB/meGRemUNDEIdQ3iJZuNEL5RJjvA=;
-	b=FHsX7f32AbF/lc3Vd+sr4RJcNUK3N257NUfdbcGevgXRvcKdFB3MJJkYYQ+iICCe+z
-	pinGrOn1i38IAJf1i6KlYqOwrf+S/q2QMR3EpgkrE0lS23oiP9wFaJbzA0TyGcqPb6pM
-	HmsS+ufRioOIkEVGarEjq15AEji4MKXc6GuAIDTwVyRe8qjqpEFkst0cOR0QxZtsTRye
-	QZu65igY5/SlPuKWwLMQRuzUw+E6FPIc5LVqAEb7bFxYMGcDcB0AthlE7h7gsY8nHQrG
-	aC2B1g2d7JXA4HMCjThPgq36speO63fUnONOY5OnRst93kW2iysJ8E1bVaB7UwQeADi2
-	pwyw==
-X-Gm-Message-State: APjAAAWs97xleGV5/RDqGZ71A23d/9dc6Z1alf0Wi1wargV4ijOkd3sZ
-	1iDHI5ZUQ2ZH2TDNm269srHsuLXHjJKEpzUTCr4=
-X-Google-Smtp-Source: APXvYqwqR4dwOlB5if1EaZcLolIAUeIT0fhRP0r2StQWeH1qGzLijchDeXXq7lIdbq/IzBahOMjxWWkHyWeQJLvyBQc=
-X-Received: by 2002:a25:4946:: with SMTP id w67mr33629253yba.445.1556658463898;
-	Tue, 30 Apr 2019 14:07:43 -0700 (PDT)
+	(envelope-from <laurent@vivier.eu>) id 1hLZzD-0004tD-5o
+	for qemu-devel@nongnu.org; Tue, 30 Apr 2019 17:08:24 -0400
+Received: from mout.kundenserver.de ([212.227.17.10]:35991)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <laurent@vivier.eu>)
+	id 1hLZzA-0004r3-Bo; Tue, 30 Apr 2019 17:08:20 -0400
+Received: from [192.168.100.1] ([78.238.229.36]) by mrelayeu.kundenserver.de
+	(mreue107 [213.165.67.119]) with ESMTPSA (Nemesis) id
+	1MCayD-1hVAcP41gJ-009kSE; Tue, 30 Apr 2019 23:07:59 +0200
+To: Alistair Francis <alistair23@gmail.com>
+References: <cover.1556650594.git.alistair.francis@wdc.com>
+	<6bfa446eb7c351b5d867eb4158198231af724b11.1556650594.git.alistair.francis@wdc.com>
+	<d4dd0758-64af-e249-1f1b-b52af014b404@vivier.eu>
+	<CAKmqyKNx2r93-ASC0dAZJvu_36dV69sRj92-m6G9zXqLdc2sag@mail.gmail.com>
+From: Laurent Vivier <laurent@vivier.eu>
+Openpgp: preference=signencrypt
+Autocrypt: addr=laurent@vivier.eu; prefer-encrypt=mutual; keydata=
+	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
+Message-ID: <3253f092-d227-b56a-3e15-febf6646e5f9@vivier.eu>
+Date: Tue, 30 Apr 2019 23:07:56 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+	Thunderbird/60.6.1
 MIME-Version: 1.0
-References: <20190403034358.21999-1-richard.henderson@linaro.org>
-	<20190403034358.21999-24-richard.henderson@linaro.org>
-	<CAFEAcA_FZHKXJHg4819JOZkwwhE44Vx874GKrnxRrOau1HhzRw@mail.gmail.com>
-	<CAMo8BfJVdDvYWEdN_08ed5OKBGXc+U8kSbmWaSWY9WCuvDj2pw@mail.gmail.com>
-	<bd57c22c-1bdc-80b4-0415-565117f6ae3e@linaro.org>
-	<CAMo8BfJsC9aPYUhi5Rg6SAXT4dhaZaU=dqy=um+aBJtnPMSwdA@mail.gmail.com>
-In-Reply-To: <CAMo8BfJsC9aPYUhi5Rg6SAXT4dhaZaU=dqy=um+aBJtnPMSwdA@mail.gmail.com>
-From: Max Filippov <jcmvbkbc@gmail.com>
-Date: Tue, 30 Apr 2019 14:07:31 -0700
-Message-ID:
- <CAMo8BfKjGrHsTn+riEnS8rxQDPgAQ9STwJrB4_TrYnqs2uHtmQ@mail.gmail.com>
-To: Richard Henderson <richard.henderson@linaro.org>
+In-Reply-To: <CAKmqyKNx2r93-ASC0dAZJvu_36dV69sRj92-m6G9zXqLdc2sag@mail.gmail.com>
 Content-Type: text/plain; charset="UTF-8"
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
-	recognized.
-X-Received-From: 2607:f8b0:4864:20::c44
-Subject: Re: [Qemu-devel] [PATCH 23/26] target/xtensa: Convert to
- CPUClass::tlb_fill
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+X-Provags-ID: V03:K1:sXGWjh7G3Ien4Df6hn5TPk0NbCTqtmRtVpViBsFM40DeMP0+1kt
+	p3pREJI2SzF0QV47WEzRm8+nezy2Mxu3e0zQZyZ+9qoXoQuaLXyvz+EVzt5AjQojp35esc6
+	XSMOssQP6OxkupYNlmmvim13qsax2FUyCKgCzUmRpRhKS2cIiZWqh7dFYneTMN7tEYFQ9n2
+	mpDkH0BTfFTOezMTmcfCg==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:YeIs09JEALM=:efwnTjK7XlMad7ikCS84DW
+	HpxhTGx2csyZvvoqw7vNpDB0jgr4AKCqAAJ6MLVoOY6VZY3lMAW6Pa6kDDufwXcak6GdxCTsA
+	wgimvzEVHT8XTZSCEeQpzRSukovp46Y9X7NnF+HRgv6epWfxsFQ0W64118Y1JbqFoGIKv/pH6
+	oTsCy0QB1w4jA8CMgOQ7tx/uX00qY38llpMkZbQ1/Ynz92EeAHjyT4X2U6EhlHdk3YH3p6M6I
+	a6llK90h49o9HGs4dy8uVQTsAOtPVqiytuUhzINXZ56tsXSHKV+3MhgTMpSiDtOEEPr/Jqn06
+	BG8lruwSkTPT4NR0AIUSDN7In/6FA3ZysvtW0CDwYjtlHwU/koB6yS2BzJ3kTH/wY9zUxBE/3
+	Y0E7+yOvc4y7AECd/6/nh1I7HshkDK2+3u+4hyoZVaZmle0pnFD09GZw8Tj32ZD6absUUrnHM
+	oWypwczLtJIJ1yRPfSsOv00qxuLITLdfLwb587eOwe7X3LTiPLwspe325uU6iPeLp8AWdXvHd
+	bjznFwSAKeNwRwvVbAMPUEm2i5TyzKGxdOOCnzg6u/+rnqQTLuQPYKUx5iU4C/1MZg3eJIVz0
+	gN9VL/8troD8NmHgxPx3CQFi/WwCnYzq3agmg/dK6PGQorSGKbkmW7ucxA90oPb7R7aIw9PNA
+	w1R5JNFNvw6Rk+mF9K6+B3RW35mF13Pl4a7tLofv+SUaanbQEQgJae25lvCf7NUizNyrXg4nT
+	bty/hKdqrS2/EiRynvUC8KHyqZDu0h/VNFnrjGrz5bP1vgn9Lz9E9esJxAs=
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 212.227.17.10
+Subject: Re: [Qemu-devel] [PATCH v1 5/5] linux-user/elfload: Fix GCC 9 build
+ warnings
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -92,24 +124,60 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>,
-	QEMU Developers <qemu-devel@nongnu.org>
+Cc: "qemu-trivial@nongnu.org" <qemu-trivial@nongnu.org>,
+	"riku.voipio@iki.fi" <riku.voipio@iki.fi>,
+	"qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
+	Alistair Francis <Alistair.Francis@wdc.com>,
+	"kraxel@redhat.com" <kraxel@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190430210731.UWXA-pvsm-lqGxoAmykELUPklbXu_vXMbByNLoSS6ks@z>
+Message-ID: <20190430210756.fs_xNF2bdqnYtERTnix45w1BDe68kYoCDf1JGnUtua8@z>
 
-On Tue, Apr 30, 2019 at 11:14 AM Max Filippov <jcmvbkbc@gmail.com> wrote:
-> On Tue, Apr 30, 2019 at 10:44 AM Richard Henderson
-> > And Peter's right that I should have kept EXC_USER.
+Le 30/04/2019 à 23:01, Alistair Francis a écrit :
+> On Tue, Apr 30, 2019 at 1:36 PM Laurent Vivier <laurent@vivier.eu> wrote:
+>>
+>> Le 30/04/2019 à 22:09, Alistair Francis a écrit :
+>>> Fix this warning when building with GCC9 on Fedora 30:
+>>> In function ‘strncpy’,
+>>>     inlined from ‘fill_psinfo’ at /home/alistair/qemu/linux-user/elfload.c:3208:12,
+>>>     inlined from ‘fill_note_info’ at /home/alistair/qemu/linux-user/elfload.c:3390:5,
+>>>     inlined from ‘elf_core_dump’ at /home/alistair/qemu/linux-user/elfload.c:3539:9:
+>>> /usr/include/bits/string_fortified.h:106:10: error: ‘__builtin_strncpy’ specified bound 16 equals destination size [-Werror=stringop-truncation]
+>>>   106 |   return __builtin___strncpy_chk (__dest, __src, __len, __bos (__dest));
+>>>       |          ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+>>>
+>>> Signed-off-by: Alistair Francis <alistair.francis@wdc.com>
+>>> ---
+>>>  linux-user/elfload.c | 4 ++--
+>>>  1 file changed, 2 insertions(+), 2 deletions(-)
+>>>
+>>> diff --git a/linux-user/elfload.c b/linux-user/elfload.c
+>>> index c1a26021f8..cbb7fc10fa 100644
+>>> --- a/linux-user/elfload.c
+>>> +++ b/linux-user/elfload.c
+>>> @@ -3206,7 +3206,7 @@ static int fill_psinfo(struct target_elf_prpsinfo *psinfo, const TaskState *ts)
+>>
+>>        /*
+>>         * Using strncpy here is fine: at max-length,
+>>>       * this field is not NUL-terminated.
+>>>       */>      (void) strncpy(psinfo->pr_fname, base_filename,
+>>> -                   sizeof(psinfo->pr_fname));
+>>> +                   sizeof(psinfo->pr_fname) - 1);
+>>
+>> Read the comment above :)
+> 
+> GCC can't read the comment though. The only other option I can think
+> of is using a pragma, which I avoided using unless I had to. Would you
+> prefer a pragma here? Or do you have a better solution?
+> 
 
-It appears to work as is: the EXC_USER is set up by the
-exception_cause helper because there's always PS_U in
-the PS, PS_EXCM is cleared in the cpu_loop and the
-current PC is preserved by the xtensa_cpu_tlb_fill.
-I'll play with it some more...
+perhaps:
 
--- 
-Thanks.
--- Max
+memcpy(psinfo->pr_fname, base_filename, MIN(strlen(base_filename) + 1, sizeof(psinfo->pr_fname));
+
+?
+
+Thanks,
+Laurent
 
