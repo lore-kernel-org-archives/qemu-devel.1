@@ -2,84 +2,88 @@ Return-Path: <SRS0=TP+Q=TA=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.7 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.7 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 328B1C43219
-	for <qemu-devel@archiver.kernel.org>; Tue, 30 Apr 2019 13:16:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 57F63C04AA6
+	for <qemu-devel@archiver.kernel.org>; Tue, 30 Apr 2019 13:16:48 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E7450205F4
-	for <qemu-devel@archiver.kernel.org>; Tue, 30 Apr 2019 13:16:45 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 1E200205F4
+	for <qemu-devel@archiver.kernel.org>; Tue, 30 Apr 2019 13:16:48 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="Nw7Iu52m"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E7450205F4
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="Q1AiOBUh"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1E200205F4
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:47145 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:47147 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hLScm-0002PN-PW
-	for qemu-devel@archiver.kernel.org; Tue, 30 Apr 2019 09:16:44 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:44504)
+	id 1hLScp-0002So-6g
+	for qemu-devel@archiver.kernel.org; Tue, 30 Apr 2019 09:16:47 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:44524)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1hLSaq-00010a-3N
+	(envelope-from <peter.maydell@linaro.org>) id 1hLSar-00010e-0H
 	for qemu-devel@nongnu.org; Tue, 30 Apr 2019 09:14:45 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1hLSap-0002AG-5T
+	(envelope-from <peter.maydell@linaro.org>) id 1hLSap-0002Aw-Vu
 	for qemu-devel@nongnu.org; Tue, 30 Apr 2019 09:14:44 -0400
-Received: from mail-wr1-x443.google.com ([2a00:1450:4864:20::443]:38669)
+Received: from mail-wm1-x341.google.com ([2a00:1450:4864:20::341]:38205)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1hLSao-000292-TT
+	id 1hLSap-0002AJ-Pa
 	for qemu-devel@nongnu.org; Tue, 30 Apr 2019 09:14:43 -0400
-Received: by mail-wr1-x443.google.com with SMTP id k16so20992005wrn.5
-	for <qemu-devel@nongnu.org>; Tue, 30 Apr 2019 06:14:42 -0700 (PDT)
+Received: by mail-wm1-x341.google.com with SMTP id w15so3791786wmc.3
+	for <qemu-devel@nongnu.org>; Tue, 30 Apr 2019 06:14:43 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
-	h=from:to:subject:date:message-id:mime-version
+	h=from:to:subject:date:message-id:in-reply-to:references:mime-version
 	:content-transfer-encoding;
-	bh=w6vzehaCUPSzmkvOvH14Y6PaZ3vtUSQ/vmVeOZradMw=;
-	b=Nw7Iu52miYbreKaP04SnKTM5paCXaH+E9+ZUSeEuI2DkvQfwkybnxXt63/53whpbmX
-	f+exjTAXv358SZsX8V5eB7hG2GWhzFQFTZpGe2iGo929nFQn3bsjF9FHkmccyP4UWu5B
-	oRJuHr5EYiDoKaSzeGQjpmaqTefgIsOxo3jMnZahNnqdmqXpqwgfcaj2vTXXB3cqlSm3
-	FLS5osifAjqYzTQ8Kgh4O5aoHiqf/JyHFRtHrCO6JAQpDsmsoQruSx3IXVQE5kZjm3MA
-	9OzWHeTkmHDVaAWdKXs1u8RL4Wq2CrHeFAYtMmgpqRuM2Xz3u05hVddFD+CdTSk62cQT
-	rbFQ==
+	bh=U/R8O7Qr7W3Gev40Mu9XCs2DcqDhxle1cGlCTNhZ1V0=;
+	b=Q1AiOBUhsGvl0IcKOiLai/mtenqy4Kr17qXwXw5RbT+iBk1OYQnlLt6o4LpTxPzjSd
+	td87MSU842aTbeQWtWHjklKn2qP8eIJlXdswud2xVGarUy+9Jx9RtuZOcsSp1NuB3mBu
+	Xf9rcgYwhP8dqWpJtLvI37VjX9iGENpCNK139NHnpcvrQ33h1tu0eJIFGmMVSyeYkTXn
+	RA0nPQtup+N08tvyskTvCxzpDHGiqvUaIhTXOk67RGuNOLaLPP4pWyQpKtQnjfof3lkN
+	w71P9TLydNHwbUIdZKgg6H4jvm3lmgReNUmuBa63j8NiqFJurb/Z9PFQ7UeB/w86ll0J
+	ZeUg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
 	d=1e100.net; s=20161025;
-	h=x-gm-message-state:from:to:subject:date:message-id:mime-version
-	:content-transfer-encoding;
-	bh=w6vzehaCUPSzmkvOvH14Y6PaZ3vtUSQ/vmVeOZradMw=;
-	b=eAKQjFb0pKQnBSFfdbCRVh7iU/W5v1pdcMMR7GOgGv9ZQR2DD4MlY74v7wCRxvk6Da
-	bno4GA8Cy+xKRv/Jy6M4U4tnOqCswOvNALiWuMcuq0I2zT9iWUdYHKxiZMeWPm1IYFNH
-	ScH+GLz14KpUOUtx877xBoV5ZKmnmheB/lcl60Gy0qj9G3BqqPFXyPetO2Vba9MoUlBd
-	0EWa1RXr0EQkoLBZXGzWhfmR87LlRLoTSEt2oVvNThN1wP8fSXHnTq0DZSu3bOw5Hy3D
-	ElqyuJrsB5xicLoDT5YoPOfWQJeMHziM/GTUiwY2r1BUXTydjoXHdlVLpTwyP5C4Apwp
-	BZhA==
-X-Gm-Message-State: APjAAAX6QcoSp2rI4ZGXcWcu8yvBfSyhC2CpOcv6sTVmBbHy3GPI9n83
-	lyqj25yEZfKChLYYglv8eflBH3ord1U=
-X-Google-Smtp-Source: APXvYqzBLL4prhQKWn8wFffgsO6wpSlYS94EYtKsbfJPbvGGKfIuX5EK24NEyycIKEQF3FfZzUNmtA==
-X-Received: by 2002:adf:cd05:: with SMTP id w5mr2696917wrm.84.1556630081614;
-	Tue, 30 Apr 2019 06:14:41 -0700 (PDT)
+	h=x-gm-message-state:from:to:subject:date:message-id:in-reply-to
+	:references:mime-version:content-transfer-encoding;
+	bh=U/R8O7Qr7W3Gev40Mu9XCs2DcqDhxle1cGlCTNhZ1V0=;
+	b=DhqKi1pSZEvY4cFXZ1L6nq7K6ZOk3h3oKoJbkGDt7Uk6mm5pOWUBXQRRQRKiZvWb/7
+	PSAUKJHB/eQmUL4NMUk0qWnFaTNcscXZk85a08XZqVq0UX9r631CTnMlxNXjvwhCXjJt
+	veq2p4qlC5lJ7uvrBJ1ztfCeawlifY56m4j52NqWYzNMlpsAV3LcV3BLFKai0VgJjP3/
+	ApKu47HLqhVL9cx2aFmNgB/1uQzkH1nJBYrBvFSe9xMKdCgEsaRI7EIwdwyX3qPxfAw/
+	Dk9esSYpSFiCcTC5B8lLL+8ewQmUPTNxnnrHWQmJceP7MQi447uaOSDaNMlu7eUR1Z+G
+	Czfg==
+X-Gm-Message-State: APjAAAWF5a65RzQHH0RbeC+LfwTBbiwsPLgCljpB2tEQ9UKZwhet++YH
+	8ZsK4B4UTEIZyKYHi3kt66AYmA==
+X-Google-Smtp-Source: APXvYqyW0sTuY6hcViJsEKypB8BM3Se7PQcuwyHwAntt6B5e2zeRE2VOzjATSx+EZivodfsBsMGsGg==
+X-Received: by 2002:a05:600c:2506:: with SMTP id
+	d6mr450717wma.106.1556630082710; 
+	Tue, 30 Apr 2019 06:14:42 -0700 (PDT)
 Received: from orth.archaic.org.uk (orth.archaic.org.uk. [81.2.115.148])
 	by smtp.gmail.com with ESMTPSA id
-	a12sm16557460wrh.46.2019.04.30.06.14.40
+	a12sm16557460wrh.46.2019.04.30.06.14.41
 	(version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-	Tue, 30 Apr 2019 06:14:40 -0700 (PDT)
+	Tue, 30 Apr 2019 06:14:42 -0700 (PDT)
 From: Peter Maydell <peter.maydell@linaro.org>
 To: qemu-arm@nongnu.org,
 	qemu-devel@nongnu.org
-Date: Tue, 30 Apr 2019 14:14:35 +0100
-Message-Id: <20190430131439.25251-1-peter.maydell@linaro.org>
+Date: Tue, 30 Apr 2019 14:14:36 +0100
+Message-Id: <20190430131439.25251-2-peter.maydell@linaro.org>
 X-Mailer: git-send-email 2.20.1
+In-Reply-To: <20190430131439.25251-1-peter.maydell@linaro.org>
+References: <20190430131439.25251-1-peter.maydell@linaro.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
 	recognized.
-X-Received-From: 2a00:1450:4864:20::443
-Subject: [Qemu-devel] [PATCH 0/4] target/arm: four minor M-profile bug fixes
+X-Received-From: 2a00:1450:4864:20::341
+Subject: [Qemu-devel] [PATCH 1/4] hw/arm/armv7m_nvic: Check subpriority in
+ nvic_recompute_state_secure()
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -95,26 +99,57 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 Content-Type: text/plain; charset="UTF-8"
-Message-ID: <20190430131435.h4lHkkrUGDRDFA2qj_p8tsBYmLEFP8I24LYhKJJKI20@z>
+Message-ID: <20190430131436.ah3XjLFVDwPWPXG-PqFMNix44M47L7HUMMDVs7b_0Kw@z>
 
-These patches are fixes for some minor bugs that I noticed while
-writing and testing the M-profile FPU support. They're not FPU
-related, so I didn't want to mix them up with that large patchset...
+Rule R_CQRV says that if two pending interrupts have the same
+group priority then ties are broken by looking at the subpriority.
+We had a comment describing this but had forgotten to actually
+implement the subpriority comparison. Correct the omission.
 
-thanks
--- PMM
+(The further tie break rules of "lowest exception number" and
+"secure before non-secure" are handled implicitly by the order
+in which we iterate through the exceptions in the loops.)
 
-Peter Maydell (4):
-  hw/arm/armv7m_nvic: Check subpriority in nvic_recompute_state_secure()
-  hw/intc/armv7m_nvic: NS BFAR and BFSR are RAZ/WI if BFHFNMINS == 0
-  hw/intc/armv7m_nvic: Don't enable ARMV7M_EXCP_DEBUG from reset
-  target/arm: Implement XPSR GE bits
+Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+---
+ hw/intc/armv7m_nvic.c | 9 +++++++--
+ 1 file changed, 7 insertions(+), 2 deletions(-)
 
- target/arm/cpu.h      |  4 ++++
- hw/intc/armv7m_nvic.c | 40 ++++++++++++++++++++++++++++++++++------
- target/arm/helper.c   | 12 ++++++++++--
- 3 files changed, 48 insertions(+), 8 deletions(-)
-
+diff --git a/hw/intc/armv7m_nvic.c b/hw/intc/armv7m_nvic.c
+index fff6e694e60..131b5938b9a 100644
+--- a/hw/intc/armv7m_nvic.c
++++ b/hw/intc/armv7m_nvic.c
+@@ -213,6 +213,7 @@ static void nvic_recompute_state_secure(NVICState *s)
+     int active_prio = NVIC_NOEXC_PRIO;
+     int pend_irq = 0;
+     bool pending_is_s_banked = false;
++    int pend_subprio = 0;
+ 
+     /* R_CQRV: precedence is by:
+      *  - lowest group priority; if both the same then
+@@ -226,7 +227,7 @@ static void nvic_recompute_state_secure(NVICState *s)
+     for (i = 1; i < s->num_irq; i++) {
+         for (bank = M_REG_S; bank >= M_REG_NS; bank--) {
+             VecInfo *vec;
+-            int prio;
++            int prio, subprio;
+             bool targets_secure;
+ 
+             if (bank == M_REG_S) {
+@@ -241,8 +242,12 @@ static void nvic_recompute_state_secure(NVICState *s)
+             }
+ 
+             prio = exc_group_prio(s, vec->prio, targets_secure);
+-            if (vec->enabled && vec->pending && prio < pend_prio) {
++            subprio = vec->prio & ~nvic_gprio_mask(s, targets_secure);
++            if (vec->enabled && vec->pending &&
++                ((prio < pend_prio) ||
++                 (prio == pend_prio && prio >= 0 && subprio < pend_subprio))) {
+                 pend_prio = prio;
++                pend_subprio = subprio;
+                 pend_irq = i;
+                 pending_is_s_banked = (bank == M_REG_S);
+             }
 -- 
 2.20.1
 
