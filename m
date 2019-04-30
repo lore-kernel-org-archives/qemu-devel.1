@@ -6,59 +6,59 @@ X-Spam-Status: No, score=-6.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 50DE0C04AA6
-	for <qemu-devel@archiver.kernel.org>; Tue, 30 Apr 2019 07:28:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D8F41C43219
+	for <qemu-devel@archiver.kernel.org>; Tue, 30 Apr 2019 07:29:29 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2435F2080C
-	for <qemu-devel@archiver.kernel.org>; Tue, 30 Apr 2019 07:28:55 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2435F2080C
+	by mail.kernel.org (Postfix) with ESMTPS id AF0312080C
+	for <qemu-devel@archiver.kernel.org>; Tue, 30 Apr 2019 07:29:29 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AF0312080C
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:40534 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:40540 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hLNCA-0000vh-Aj
-	for qemu-devel@archiver.kernel.org; Tue, 30 Apr 2019 03:28:54 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:55990)
+	id 1hLNCi-0001Nz-TM
+	for qemu-devel@archiver.kernel.org; Tue, 30 Apr 2019 03:29:28 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:55370)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1hLN1J-0008Gz-Iz
-	for qemu-devel@nongnu.org; Tue, 30 Apr 2019 03:17:42 -0400
+	(envelope-from <thuth@redhat.com>) id 1hLMzf-0006tA-NE
+	for qemu-devel@nongnu.org; Tue, 30 Apr 2019 03:16:00 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1hLN1I-0005D6-Kg
-	for qemu-devel@nongnu.org; Tue, 30 Apr 2019 03:17:41 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:49542)
+	(envelope-from <thuth@redhat.com>) id 1hLMzd-0004dP-OH
+	for qemu-devel@nongnu.org; Tue, 30 Apr 2019 03:15:59 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:25991)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <thuth@redhat.com>)
-	id 1hLN1E-0005C3-Lf; Tue, 30 Apr 2019 03:17:36 -0400
+	id 1hLMzV-0004bW-Qb; Tue, 30 Apr 2019 03:15:50 -0400
 Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
 	[10.5.11.22])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id B87BD859FB;
-	Tue, 30 Apr 2019 07:17:35 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id 3B0E3308338E;
+	Tue, 30 Apr 2019 07:15:48 +0000 (UTC)
 Received: from thuth.com (ovpn-116-190.ams2.redhat.com [10.36.116.190])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id A7EAF1001E85;
-	Tue, 30 Apr 2019 07:17:25 +0000 (UTC)
+	by smtp.corp.redhat.com (Postfix) with ESMTP id C5AC61001DD2;
+	Tue, 30 Apr 2019 07:15:35 +0000 (UTC)
 From: Thomas Huth <thuth@redhat.com>
 To: yang.zhong@intel.com, Peter Maydell <peter.maydell@linaro.org>,
 	qemu-devel@nongnu.org, pbonzini@redhat.com
-Date: Tue, 30 Apr 2019 09:13:53 +0200
-Message-Id: <20190430071405.16714-19-thuth@redhat.com>
+Date: Tue, 30 Apr 2019 09:13:43 +0200
+Message-Id: <20190430071405.16714-9-thuth@redhat.com>
 In-Reply-To: <20190430071405.16714-1-thuth@redhat.com>
 References: <20190430071405.16714-1-thuth@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="UTF-8"
 X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.26]);
-	Tue, 30 Apr 2019 07:17:36 +0000 (UTC)
+	(mx1.redhat.com [10.5.110.44]);
+	Tue, 30 Apr 2019 07:15:48 +0000 (UTC)
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] [PATCH v6 18/30] hw/arm: Express dependencies of
- netduino / stm32f2xx with Kconfig
+Subject: [Qemu-devel] [PATCH v6 08/30] hw/arm: Express dependencies of the
+ fsl-imx31 machine with Kconfig
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -87,76 +87,79 @@ Cc: "Michael S. Tsirkin" <mst@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>,
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190430071353.xy-Zhk13oo57XMG87NyXqraPCzh7_4RYLOqEygB-2go@z>
+Message-ID: <20190430071343._WB3KHwa-IrgWWe4VZzJt1j1qhEHjK29eZKnYHsL5d4@z>
 
-Netduino only depends on the stm32f205 SoC which in turn depends on
-its components.
+Add Kconfig dependencies for the fsl-imx31 / kzm machine.
+This patch is slightly based on earlier work by =C3=81kos Kov=C3=A1cs (i.=
+e.
+his "hw/arm/Kconfig: Add ARM Kconfig" patch).
 
-Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
+Reviewed-by: Peter Chubb <peter.chubb@data61.csiro.au>
 Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
 Tested-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
 Signed-off-by: Thomas Huth <thuth@redhat.com>
 ---
- default-configs/arm-softmmu.mak | 9 +--------
- hw/arm/Kconfig                  | 7 +++++++
- 2 files changed, 8 insertions(+), 8 deletions(-)
+ default-configs/arm-softmmu.mak | 3 +--
+ hw/arm/Kconfig                  | 4 ++++
+ hw/misc/Kconfig                 | 2 ++
+ 3 files changed, 7 insertions(+), 2 deletions(-)
 
 diff --git a/default-configs/arm-softmmu.mak b/default-configs/arm-softmm=
 u.mak
-index f440a2b1cd..c86a9f5427 100644
+index 6195b75f48..7f94811ccb 100644
 --- a/default-configs/arm-softmmu.mak
 +++ b/default-configs/arm-softmmu.mak
-@@ -28,25 +28,18 @@ CONFIG_TOSA=3Dy
- CONFIG_Z2=3Dy
- CONFIG_COLLIE=3Dy
- CONFIG_ASPEED_SOC=3Dy
-+CONFIG_NETDUINO2=3Dy
+@@ -10,6 +10,7 @@ CONFIG_PCI_TESTDEV=3Dy
+ CONFIG_EXYNOS4=3Dy
+ CONFIG_HIGHBANK=3Dy
+ CONFIG_INTEGRATOR=3Dy
++CONFIG_FSL_IMX31=3Dy
 =20
  CONFIG_VGA=3Dy
- CONFIG_SSI_M25P80=3Dy
- CONFIG_ALLWINNER_EMAC=3Dy
- CONFIG_IMX_FEC=3Dy
-=20
--CONFIG_NETDUINO2=3Dy
--
- CONFIG_FRAMEBUFFER=3Dy
-=20
- CONFIG_DIGIC=3Dy
+ CONFIG_NAND=3Dy
+@@ -68,7 +69,6 @@ CONFIG_TSC210X=3Dy
+ CONFIG_BLIZZARD=3Dy
+ CONFIG_ONENAND=3Dy
+ CONFIG_TUSB6010=3Dy
+-CONFIG_IMX=3Dy
+ CONFIG_MAINSTONE=3Dy
  CONFIG_MPS2=3Dy
- CONFIG_RASPI=3Dy
--CONFIG_STM32F2XX_TIMER=3Dy
--CONFIG_STM32F2XX_USART=3Dy
--CONFIG_STM32F2XX_SYSCFG=3Dy
--CONFIG_STM32F2XX_ADC=3Dy
--CONFIG_STM32F2XX_SPI=3Dy
--CONFIG_STM32F205_SOC=3Dy
- CONFIG_NRF51_SOC=3Dy
+ CONFIG_MUSCA=3Dy
+@@ -115,7 +115,6 @@ CONFIG_ALLWINNER_A10_PIC=3Dy
+ CONFIG_ALLWINNER_A10=3Dy
 =20
- CONFIG_CMSDK_APB_TIMER=3Dy
+ CONFIG_FSL_IMX6=3Dy
+-CONFIG_FSL_IMX31=3Dy
+ CONFIG_FSL_IMX25=3Dy
+ CONFIG_FSL_IMX7=3Dy
+ CONFIG_FSL_IMX6UL=3Dy
 diff --git a/hw/arm/Kconfig b/hw/arm/Kconfig
-index 2b63adb667..25ba109773 100644
+index ad3b1f9b40..9087b7d714 100644
 --- a/hw/arm/Kconfig
 +++ b/hw/arm/Kconfig
-@@ -81,6 +81,7 @@ config MUSICPAL
+@@ -98,6 +98,10 @@ config FSL_IMX25
 =20
- config NETDUINO2
+ config FSL_IMX31
      bool
-+    select STM32F205_SOC
++    select SERIAL
++    select IMX
++    select IMX_I2C
++    select LAN9118
 =20
- config NSERIES
+ config FSL_IMX6
      bool
-@@ -251,6 +252,12 @@ config RASPI
-=20
- config STM32F205_SOC
+diff --git a/hw/misc/Kconfig b/hw/misc/Kconfig
+index 5f67d0d6d9..385e1b0cec 100644
+--- a/hw/misc/Kconfig
++++ b/hw/misc/Kconfig
+@@ -76,6 +76,8 @@ config ECCMEMCTL
+ config IMX
      bool
-+    select ARM_V7M
-+    select STM32F2XX_TIMER
-+    select STM32F2XX_USART
-+    select STM32F2XX_SYSCFG
-+    select STM32F2XX_ADC
-+    select STM32F2XX_SPI
+     select PTIMER
++    select SSI
++    select USB_EHCI_SYSBUS
 =20
- config XLNX_ZYNQMP_ARM
+ config STM32F2XX_SYSCFG
      bool
 --=20
 2.21.0
