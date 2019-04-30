@@ -3,90 +3,110 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
 X-Spam-Status: No, score=-3.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED autolearn=ham
-	autolearn_force=no version=3.4.0
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 79F58C43219
-	for <qemu-devel@archiver.kernel.org>; Tue, 30 Apr 2019 18:31:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 435D9C43219
+	for <qemu-devel@archiver.kernel.org>; Tue, 30 Apr 2019 18:59:20 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4A25B20835
-	for <qemu-devel@archiver.kernel.org>; Tue, 30 Apr 2019 18:31:58 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4A25B20835
+	by mail.kernel.org (Postfix) with ESMTPS id 06CC920854
+	for <qemu-devel@archiver.kernel.org>; Tue, 30 Apr 2019 18:59:19 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 06CC920854
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:51602 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:51816 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hLXXp-0007ol-Br
-	for qemu-devel@archiver.kernel.org; Tue, 30 Apr 2019 14:31:57 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:60558)
+	id 1hLXyJ-00046S-3M
+	for qemu-devel@archiver.kernel.org; Tue, 30 Apr 2019 14:59:19 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:35842)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1hLXWo-0007O9-3a
-	for qemu-devel@nongnu.org; Tue, 30 Apr 2019 14:30:55 -0400
+	(envelope-from <thuth@redhat.com>) id 1hLXwk-00038m-Gf
+	for qemu-devel@nongnu.org; Tue, 30 Apr 2019 14:57:45 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1hLXWn-0003pt-3v
-	for qemu-devel@nongnu.org; Tue, 30 Apr 2019 14:30:54 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:37624)
+	(envelope-from <thuth@redhat.com>) id 1hLXu9-0001EK-5D
+	for qemu-devel@nongnu.org; Tue, 30 Apr 2019 14:55:02 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:45550)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1hLXWm-0003pJ-RF
-	for qemu-devel@nongnu.org; Tue, 30 Apr 2019 14:30:53 -0400
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
-	[10.5.11.22])
+	(Exim 4.71) (envelope-from <thuth@redhat.com>)
+	id 1hLXu8-0001Dl-TI; Tue, 30 Apr 2019 14:55:01 -0400
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+	[10.5.11.12])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id A34163087950;
-	Tue, 30 Apr 2019 18:30:51 +0000 (UTC)
-Received: from [10.3.116.15] (ovpn-116-15.phx2.redhat.com [10.3.116.15])
-	by smtp.corp.redhat.com (Postfix) with ESMTPS id 1A9291001284;
-	Tue, 30 Apr 2019 18:30:50 +0000 (UTC)
-To: Cao Jiaxi <driver1998@foxmail.com>, qemu-devel@nongnu.org
-References: <20190430181343.1362-1-driver1998@foxmail.com>
-From: Eric Blake <eblake@redhat.com>
+	by mx1.redhat.com (Postfix) with ESMTPS id 16088883A2;
+	Tue, 30 Apr 2019 18:54:59 +0000 (UTC)
+Received: from thuth.remote.csb (ovpn-116-21.ams2.redhat.com [10.36.116.21])
+	by smtp.corp.redhat.com (Postfix) with ESMTP id BF12F7DF40;
+	Tue, 30 Apr 2019 18:54:52 +0000 (UTC)
+To: Eric Blake <eblake@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
+	qemu-devel@nongnu.org
+References: <1552300145-12526-1-git-send-email-thuth@redhat.com>
+	<6d46de0f-a443-2c90-334b-edd34325ac16@redhat.com>
+From: Thomas Huth <thuth@redhat.com>
 Openpgp: preference=signencrypt
-Autocrypt: addr=eblake@redhat.com; keydata=
-	xsBNBEvHyWwBCACw7DwsQIh0kAbUXyqhfiKAKOTVu6OiMGffw2w90Ggrp4bdVKmCaEXlrVLU
-	xphBM8mb+wsFkU+pq9YR621WXo9REYVIl0FxKeQo9dyQBZ/XvmUMka4NOmHtFg74nvkpJFCD
-	TUNzmqfcjdKhfFV0d7P/ixKQeZr2WP1xMcjmAQY5YvQ2lUoHP43m8TtpB1LkjyYBCodd+LkV
-	GmCx2Bop1LSblbvbrOm2bKpZdBPjncRNob73eTpIXEutvEaHH72LzpzksfcKM+M18cyRH+nP
-	sAd98xIbVjm3Jm4k4d5oQyE2HwOur+trk2EcxTgdp17QapuWPwMfhaNq3runaX7x34zhABEB
-	AAHNHkVyaWMgQmxha2UgPGVibGFrZUByZWRoYXQuY29tPsLAegQTAQgAJAIbAwULCQgHAwUV
-	CgkICwUWAgMBAAIeAQIXgAUCS8fL9QIZAQAKCRCnoWtKJSdDahBHCACbl/5FGkUqJ89GAjeX
-	RjpAeJtdKhujir0iS4CMSIng7fCiGZ0fNJCpL5RpViSo03Q7l37ss+No+dJI8KtAp6ID+PMz
-	wTJe5Egtv/KGUKSDvOLYJ9WIIbftEObekP+GBpWP2+KbpADsc7EsNd70sYxExD3liwVJYqLc
-	Rw7so1PEIFp+Ni9A1DrBR5NaJBnno2PHzHPTS9nmZVYm/4I32qkLXOcdX0XElO8VPDoVobG6
-	gELf4v/vIImdmxLh/w5WctUpBhWWIfQDvSOW2VZDOihm7pzhQodr3QP/GDLfpK6wI7exeu3P
-	pfPtqwa06s1pae3ad13mZGzkBdNKs1HEm8x6zsBNBEvHyWwBCADGkMFzFjmmyqAEn5D+Mt4P
-	zPdO8NatsDw8Qit3Rmzu+kUygxyYbz52ZO40WUu7EgQ5kDTOeRPnTOd7awWDQcl1gGBXgrkR
-	pAlQ0l0ReO57Q0eglFydLMi5bkwYhfY+TwDPMh3aOP5qBXkm4qIYSsxb8A+i00P72AqFb9Q7
-	3weG/flxSPApLYQE5qWGSXjOkXJv42NGS6o6gd4RmD6Ap5e8ACo1lSMPfTpGzXlt4aRkBfvb
-	NCfNsQikLZzFYDLbQgKBA33BDeV6vNJ9Cj0SgEGOkYyed4I6AbU0kIy1hHAm1r6+sAnEdIKj
-	cHi3xWH/UPrZW5flM8Kqo14OTDkI9EtlABEBAAHCwF8EGAEIAAkFAkvHyWwCGwwACgkQp6Fr
-	SiUnQ2q03wgAmRFGDeXzc58NX0NrDijUu0zx3Lns/qZ9VrkSWbNZBFjpWKaeL1fdVeE4TDGm
-	I5mRRIsStjQzc2R9b+2VBUhlAqY1nAiBDv0Qnt+9cLiuEICeUwlyl42YdwpmY0ELcy5+u6wz
-	mK/jxrYOpzXKDwLq5k4X+hmGuSNWWAN3gHiJqmJZPkhFPUIozZUCeEc76pS/IUN72NfprZmF
-	Dp6/QDjDFtfS39bHSWXKVZUbqaMPqlj/z6Ugk027/3GUjHHr8WkeL1ezWepYDY7WSoXwfoAL
-	2UXYsMAr/uUncSKlfjvArhsej0S4zbqim2ZY6S8aRWw94J3bSvJR+Nwbs34GPTD4Pg==
-Organization: Red Hat, Inc.
-Message-ID: <141080f9-8374-1d16-7b40-a4848a455086@redhat.com>
-Date: Tue, 30 Apr 2019 13:30:49 -0500
+Autocrypt: addr=thuth@redhat.com; keydata=
+	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
+Organization: Red Hat
+Message-ID: <817b41fa-063e-7008-af0a-6758112bca67@redhat.com>
+Date: Tue, 30 Apr 2019 20:54:51 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
 	Thunderbird/60.6.1
 MIME-Version: 1.0
-In-Reply-To: <20190430181343.1362-1-driver1998@foxmail.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="D5znanzGLs8VqY6uYfzs3jAPpjiNkETT3"
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+In-Reply-To: <6d46de0f-a443-2c90-334b-edd34325ac16@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.45]);
-	Tue, 30 Apr 2019 18:30:51 +0000 (UTC)
+	(mx1.redhat.com [10.5.110.26]);
+	Tue, 30 Apr 2019 18:54:59 +0000 (UTC)
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-X-Content-Filtered-By: Mailman/MimeDel 2.1.21
-Subject: Re: [Qemu-devel] [PATCH v2 4/4] include/qemu/osdep.h: Move the
- __USE_MINGW_ANSI_STDIO define up to avoid confliction.
+Subject: Re: [Qemu-devel] [PATCH] configure: Remove old
+ *-config-devices.mak.d files when running configure
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -98,95 +118,59 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: qemu-trivial@nongnu.org,
+	=?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190430183049.PA_LUCx96DbJWswZ3bUDPwa8yHEpc4Dd1c0N9NKEFoE@z>
+Message-ID: <20190430185451.X3RKnvwC0d2RIAWLa2aRHnUu2Iq3OkiM-cz9w3fhj2k@z>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---D5znanzGLs8VqY6uYfzs3jAPpjiNkETT3
-From: Eric Blake <eblake@redhat.com>
-To: Cao Jiaxi <driver1998@foxmail.com>, qemu-devel@nongnu.org
-Message-ID: <141080f9-8374-1d16-7b40-a4848a455086@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v2 4/4] include/qemu/osdep.h: Move the
- __USE_MINGW_ANSI_STDIO define up to avoid confliction.
-References: <20190430181343.1362-1-driver1998@foxmail.com>
-In-Reply-To: <20190430181343.1362-1-driver1998@foxmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+On 11/03/2019 17.21, Eric Blake wrote:
+> On 3/11/19 5:29 AM, Thomas Huth wrote:
+>> When running "make" in a build directory from the pre-Kconfig merge ti=
+me,
+>> the build process currently fails with:
+>>
+>>  make: *** No rule to make target `.../default-configs/pci.mak',
+>>   needed by `aarch64-softmmu/config-devices.mak'.  Stop.
+>>
+>> To make sure that this problem at least goes away when the user runs
+>> "configure" (or "sh config.status") again, we have to make sure that
+>> we re-generate the .mak.d files. Thus remove the old stale files
+>> while running the configure script.
+>>
+>> Signed-off-by: Thomas Huth <thuth@redhat.com>
+>> ---
+>>  configure | 3 +++
+>>  1 file changed, 3 insertions(+)
+>=20
+> What are the conditions for make deciding it needs to rerun
+> config.status? Are end users still going to get 'make' failing with the
+> cryptic message (where we just advise on-list and on-wiki to
+> './config.status' to fix it), or is there a way to build in a dependenc=
+y
+> so that the makefile itself knows that if config.status has to be rerun=
+,
+> that takes priority over any other rule that depends on .mak files?
 
-On 4/30/19 1:13 PM, Cao Jiaxi wrote:
-> Signed-off-by: Cao Jiaxi <driver1998@foxmail.com>
+I just noticed that I never replied to this mail so far, sorry!
 
-Your entire series is missing 'In-Reply-To:' and 'References:' headers,
-making each message show up as individual new threads rather than
-properly threaded to a 0/4 cover letter. You'll want to fix your sending
-habits to avoid that problem in future submissions.
+The conditions for rerunning config.status can be found in the Makefile:
 
-It's unusual to use a trailing '.' in the subject line. Also, your
-subject is very long; commit message summaries should typically be
-around 60-70 characters because 'git log' shows them with further
-indentation, where an 80-column terminal window makes it hard to see the
-tail at a glance.  Better might be a short subject line explaining the
-"what", and then a non-empty commit message explaining the "why",
-perhaps looking like:
+config-host.mak: $(SRC_PATH)/configure $(SRC_PATH)/pc-bios $(SRC_PATH)/VE=
+RSION
+        @echo $@ is out-of-date, running configure
+	...
 
-osdep: Fix mingw compilation regarding stdio formats
+At least we change VERSION regularly, so while not being perfect, the pro=
+blem
+should go away after a while with this patch. Not sure whether there is a=
+ better
+way to do this - maybe depend on the files in default-configs/, too? Or m=
+aybe we
+could simply bump VERSION from x.y.50 to x.y.51 the next time when we eve=
+r hit
+such a problem again...?
 
-I encountered the following compilation error on mingw:
-=2E.. PASTE SOMETHING HERE
-
-It turns out that __USE_MINGW_ANSI_STDIO must be set before any system
-headers are included, not just before <stdio.h>.
-
-Signed-off-by:...
-
-> =20
-> +/* enable C99/POSIX format strings (needs mingw32-runtime 3.15 or late=
-r) */
-> +#ifdef __MINGW32__
-> +#define __USE_MINGW_ANSI_STDIO 1
-> +#endif
-> +
->  #include <stdarg.h>
->  #include <stddef.h>
->  #include <stdbool.h>
->  #include <stdint.h>
->  #include <sys/types.h>
->  #include <stdlib.h>
-> -
-> -/* enable C99/POSIX format strings (needs mingw32-runtime 3.15 or late=
-r) */
-> -#ifdef __MINGW32__
-> -#define __USE_MINGW_ANSI_STDIO 1
-> -#endif
-
-Question - does it hurt to make the define of __USE_MINGW_ANSI_STDIO
-unconditional?  In other words, we're unlikely to break any non-mingw
-platform if we drop the #ifdef __MINGW32__ line.
-
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3226
-Virtualization:  qemu.org | libvirt.org
-
-
---D5znanzGLs8VqY6uYfzs3jAPpjiNkETT3
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlzIlFoACgkQp6FrSiUn
-Q2qsLAf7BKrNA+pbzKmsmL8HdJ9SHauWc3MZG3US/HRC6jJP7izlSLIIMPYAvLsf
-LwLWbw5UahmwDhLZUXGELLnVLp1dCBUCwi3cv+DdfR7Z8gnp5KzTIgYgUOdurl5p
-T1J0Jv6KLm7uZTrLQ1egqMleZt6RnLyR41QE3dtXQNF4pWWdQk9+IMhCm9Vzx4yu
-9i7t5CiFFJAoCdi/JMXrxFDBBuoivNGxafwMYbrkx2WlXicyr7jzgRQ/N8oDN+Jb
-Cehgms1pxEQrrSnOtawkNSGFHWCesB6HaELzyRrGREVfuzYZyUe2ECH14YZFX7NY
-/RHTDxei6kRudVKJMac7RhRE9IlfbA==
-=43lk
------END PGP SIGNATURE-----
-
---D5znanzGLs8VqY6uYfzs3jAPpjiNkETT3--
+ Thomas
 
