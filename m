@@ -2,94 +2,83 @@ Return-Path: <SRS0=TP+Q=TA=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.7 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-11.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	FROM_EXCESS_BASE64,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4EFA4C43219
-	for <qemu-devel@archiver.kernel.org>; Tue, 30 Apr 2019 14:53:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2E4A6C43219
+	for <qemu-devel@archiver.kernel.org>; Tue, 30 Apr 2019 14:54:45 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 19BA620652
-	for <qemu-devel@archiver.kernel.org>; Tue, 30 Apr 2019 14:53:17 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id E70F020652
+	for <qemu-devel@archiver.kernel.org>; Tue, 30 Apr 2019 14:54:44 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="pAixm7Fv"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 19BA620652
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="jN4cWiQl"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E70F020652
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:48205 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:48215 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hLU8C-0002uk-EH
-	for qemu-devel@archiver.kernel.org; Tue, 30 Apr 2019 10:53:16 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:35818)
+	id 1hLU9c-0003eW-3u
+	for qemu-devel@archiver.kernel.org; Tue, 30 Apr 2019 10:54:44 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:36110)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1hLU7M-0002at-Dy
-	for qemu-devel@nongnu.org; Tue, 30 Apr 2019 10:52:25 -0400
+	(envelope-from <marcandre.lureau@gmail.com>) id 1hLU8J-00033U-8V
+	for qemu-devel@nongnu.org; Tue, 30 Apr 2019 10:53:24 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1hLU7L-0005db-Hm
-	for qemu-devel@nongnu.org; Tue, 30 Apr 2019 10:52:24 -0400
-Received: from mail-pg1-x52b.google.com ([2607:f8b0:4864:20::52b]:34630)
+	(envelope-from <marcandre.lureau@gmail.com>) id 1hLU8I-00067S-77
+	for qemu-devel@nongnu.org; Tue, 30 Apr 2019 10:53:23 -0400
+Received: from mail-wr1-x442.google.com ([2a00:1450:4864:20::442]:44029)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1hLU7L-0005dA-8T
-	for qemu-devel@nongnu.org; Tue, 30 Apr 2019 10:52:23 -0400
-Received: by mail-pg1-x52b.google.com with SMTP id c13so5983790pgt.1
-	for <qemu-devel@nongnu.org>; Tue, 30 Apr 2019 07:52:23 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
-	h=subject:to:cc:references:from:openpgp:message-id:date:user-agent
-	:mime-version:in-reply-to:content-language:content-transfer-encoding;
-	bh=p/5NPUlsw/ulNGg7HUzofaMTmY0SCmJvsf587diE75I=;
-	b=pAixm7FvPutJinrId3ulbsQoMrFbCDBym4RvhDePdPMYMfTxz6lvUkAJ8/MIBuAyW+
-	Kg1HipcS3DRZBUf35CXGOCPPB2spOvUF4WVokzx+wnCpJie7Jd7fc83oTsQYn4tQfo+i
-	v6Xcj3XA3qvvhULA2h2uaOLOkb7sYTtjEQGoHNSQxX34h2403yc0BgTTjlKn84r1DUHX
-	zu4aLzES0Jj/DnsNvh9etfeHNa/r0h5IMQiMKfj7d6dXcuGvanoDh3ix7FQabDGjwJRU
-	7FbiCZbPJJq81uBr4J01/71B9P1Da4aOAFB6OzuZpkEzh0LRAEgtx+TyNwxZNElLyWzM
-	IeAQ==
+	(Exim 4.71) (envelope-from <marcandre.lureau@gmail.com>)
+	id 1hLU8H-000677-US
+	for qemu-devel@nongnu.org; Tue, 30 Apr 2019 10:53:22 -0400
+Received: by mail-wr1-x442.google.com with SMTP id a12so21358387wrq.10
+	for <qemu-devel@nongnu.org>; Tue, 30 Apr 2019 07:53:21 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+	h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+	:cc:content-transfer-encoding;
+	bh=2HwaQh7uvLdq7tWjiACqCaZo8AMqwG+z74IpjuMcIEo=;
+	b=jN4cWiQlEks7Kv80XjHCf59rVPi1Jj1oD1F/EelAJ26rI5aG1M6W4PtQ7xY1e09jab
+	SZFm/hc7bE8eQr+Vz4b1/QjtQNnJl+NXFlF2Q1RAtiZXoMH0PWC3P4FdwrzNwl0jiSt0
+	eSF5zkKPgkZbGGkBN+9kdkqroGBy6BYajO33YYUXCoPfRnXwKmI8AzIoWUQ7LQ4RiK6i
+	KDCJJfu5EXjrLmWE9e0FBi1FJMO00OSL+ooIbrSBoFs4Zv5scxbpfVhftrEDWrYa50Xu
+	RnM/QwatCBIWJCyGKMHAHLijrg5cBQP+jblpw+SDnV40L9Xq/s3xJUE+chvlyqljzwi2
+	pd3A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
 	d=1e100.net; s=20161025;
-	h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
-	:date:user-agent:mime-version:in-reply-to:content-language
-	:content-transfer-encoding;
-	bh=p/5NPUlsw/ulNGg7HUzofaMTmY0SCmJvsf587diE75I=;
-	b=evveKR4sPmWdX68vJg+Wqr2zIXwBh33kY5ILaKnc6CB334e8HyKIP7X82S6zXuiqcP
-	ETqWyAzLkF004Dkj6e+1gAurc5sxh2v4GeKKJE6r55ULZlenHdsCwbIyPAArWGX9bK3c
-	2fHFK/n97K5oN9hCJVteq4gZMZXxbXFSHib143xD1S27uipMx31McEeLLkX7c8SRK3KM
-	mA+HNmmdSCBjDAg5wXKO/8HDKSspkYKY7wKtr+Hw06KLlWPDUVq7i3aJEA+SFZzOCaTe
-	//hUszdPr/vn8CJWFHxu/RZV0Y+9qI1n3fJAL/CeHHWC8yUtPYbBERWPYSZhAzFySVUK
-	H5Og==
-X-Gm-Message-State: APjAAAWrACK4iiWA81sZG8hVhoLG/ZZWg/ccFH76gbCDPbecamnyg0zO
-	1jk8cvSsN50fx/YvJTxGxOKHqw==
-X-Google-Smtp-Source: APXvYqyxwY3RRrJkJ7ftzlcMmnn4OoJHzigIVoMzYAQF/4zfmVD5qFhfPu3kDQ4rbgS7aoCxKawvwQ==
-X-Received: by 2002:a63:8bc9:: with SMTP id
-	j192mr23100726pge.212.1556635941824; 
-	Tue, 30 Apr 2019 07:52:21 -0700 (PDT)
-Received: from [192.168.1.11] (97-113-18-231.tukw.qwest.net. [97.113.18.231])
-	by smtp.gmail.com with ESMTPSA id
-	m11sm75644678pgd.12.2019.04.30.07.52.19
-	(version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-	Tue, 30 Apr 2019 07:52:20 -0700 (PDT)
-To: Peter Maydell <peter.maydell@linaro.org>
-References: <20190403034358.21999-1-richard.henderson@linaro.org>
-	<20190403034358.21999-8-richard.henderson@linaro.org>
-	<CAFEAcA-_OG6DKJCVqYahNOo_oMoiWSq0Tb7+dQhOGh3jFg01=g@mail.gmail.com>
-From: Richard Henderson <richard.henderson@linaro.org>
-Openpgp: preference=signencrypt
-Message-ID: <9ac3730c-930b-fdaf-6271-e16c1a0b50aa@linaro.org>
-Date: Tue, 30 Apr 2019 07:52:14 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
-	Thunderbird/60.6.1
+	h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+	:message-id:subject:to:cc:content-transfer-encoding;
+	bh=2HwaQh7uvLdq7tWjiACqCaZo8AMqwG+z74IpjuMcIEo=;
+	b=oiJ/ImAGnZL1Ce6FyqkDoXTZecc/hUFy9N4UJ4nVIIiRTotSvtHCBZEVYbFui//fsW
+	WfDK/Vqnu8EE+6HawpVjcmRN3DsBWXdUHGtsBaFxSc4I6oWJdq/KU2PLAbP81AyGXZae
+	CFGStpRF3rt6eDI4yPLAVyDQ5leQeWLb912S3hg13vOOv3CuMQ1U+r6hCM+SAziEERt/
+	aM2epMrY0oQxVxNYhQN1rVh2kTtIXVB1DDILjwnc9HZCTznJ02ox96S5dPm8OjSm4Q2R
+	wg3AeoBER26F+ooIPXrNnqqISd8LukRvEi0/XaHfFKmsmbQC+xv/3nzKWwkwxEiZQ1W7
+	ygfg==
+X-Gm-Message-State: APjAAAUYWFIrmST1Ey/pV1NlkpIlmRe8FmWLGysNsrtbMVyYJ5LyvXxY
+	8zUNv55JHVOhzF5SC6DddvYY7wlxI6yIT4ygp7s=
+X-Google-Smtp-Source: APXvYqyohwJNEmv915yUHfX+xxGkDQqSVC9NmVvJU1tVOsLLfOCnF8N+YMhrdVUE1LfL93Z1Cj405q7ysGaaPo+oYec=
+X-Received: by 2002:adf:f309:: with SMTP id i9mr43904908wro.258.1556636000341; 
+	Tue, 30 Apr 2019 07:53:20 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <CAFEAcA-_OG6DKJCVqYahNOo_oMoiWSq0Tb7+dQhOGh3jFg01=g@mail.gmail.com>
+References: <20190425145420.8888-1-stefanha@redhat.com>
+In-Reply-To: <20190425145420.8888-1-stefanha@redhat.com>
+From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
+Date: Tue, 30 Apr 2019 16:53:08 +0200
+Message-ID:
+ <CAJ+F1CLYjF8SQv0v8c-hfbPcFYgZdg1P-MVeB8nS_AXTy4eMDA@mail.gmail.com>
+To: Stefan Hajnoczi <stefanha@redhat.com>
 Content-Type: text/plain; charset="UTF-8"
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
 	recognized.
-X-Received-From: 2607:f8b0:4864:20::52b
-Subject: Re: [Qemu-devel] [PATCH 07/26] target/i386: Convert to
- CPUClass::tlb_fill
+X-Received-From: 2a00:1450:4864:20::442
+Subject: Re: [Qemu-devel] [PATCH v2] gitmodules: use qemu.org git mirrors
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -101,35 +90,72 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Paolo Bonzini <pbonzini@redhat.com>,
-	QEMU Developers <qemu-devel@nongnu.org>,
-	Eduardo Habkost <ehabkost@redhat.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>,
+	=?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>,
+	QEMU <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190430145214.NoRBTPs8ixhqt30Drr5ClPkD-jECeSilWJ9a90Y2Fzk@z>
+Message-ID: <20190430145308.5dShOAhIAwtc98bxHHg9SFkgbQEEWV-sNSxaBy9XSVA@z>
 
-On 4/30/19 4:49 AM, Peter Maydell wrote:
->> --- a/target/i386/mem_helper.c
->> +++ b/target/i386/mem_helper.c
->> @@ -191,24 +191,3 @@ void helper_boundl(CPUX86State *env, target_ulong a0, int v)
->>          raise_exception_ra(env, EXCP05_BOUND, GETPC());
->>      }
->>  }
->> -
->> -#if !defined(CONFIG_USER_ONLY)
->> -/* try to fill the TLB and return an exception if error. If retaddr is
->> - * NULL, it means that the function was called in C code (i.e. not
->> - * from generated code or from helper.c)
->> - */
->> -/* XXX: fix it to restore all registers */
-> 
-> Is this XXX comment definitely stale ?
+Hi
 
-This is a pre-TCG comment, from 61382a500a9 ("full softmmu support"), from
-2003.  It has only been moved around since.  I can only imagine what problem
-Fabrice might have been reminding himself.
+On Thu, Apr 25, 2019 at 4:54 PM Stefan Hajnoczi <stefanha@redhat.com> wrote=
+:
+>
+> qemu.org hosts git repository mirrors of all submodules.  Update
+> .gitmodules to use the mirrors and not the upstream repositories.
+>
+> Mirroring upstream repositories ensures that QEMU continues to build
+> even when upstream repositories are deleted or temporarily offline.
+>
+> Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
+> Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+> Tested-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+
+Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+
+Stefan, do you prepare a pullreq?
+
+> ---
+>  .gitmodules | 10 +++++-----
+>  1 file changed, 5 insertions(+), 5 deletions(-)
+>
+> diff --git a/.gitmodules b/.gitmodules
+> index aa77ce6f50..2857eec763 100644
+> --- a/.gitmodules
+> +++ b/.gitmodules
+> @@ -39,19 +39,19 @@
+>         url =3D https://git.qemu.org/git/capstone.git
+>  [submodule "roms/seabios-hppa"]
+>         path =3D roms/seabios-hppa
+> -       url =3D https://github.com/hdeller/seabios-hppa.git
+> +       url =3D https://git.qemu.org/git/seabios-hppa.git
+>  [submodule "roms/u-boot-sam460ex"]
+>         path =3D roms/u-boot-sam460ex
+>         url =3D https://git.qemu.org/git/u-boot-sam460ex.git
+>  [submodule "tests/fp/berkeley-testfloat-3"]
+>         path =3D tests/fp/berkeley-testfloat-3
+> -       url =3D https://github.com/cota/berkeley-testfloat-3
+> +       url =3D https://git.qemu.org/git/berkeley-testfloat-3.git
+>  [submodule "tests/fp/berkeley-softfloat-3"]
+>         path =3D tests/fp/berkeley-softfloat-3
+> -       url =3D https://github.com/cota/berkeley-softfloat-3
+> +       url =3D https://git.qemu.org/git/berkeley-softfloat-3.git
+>  [submodule "roms/edk2"]
+>         path =3D roms/edk2
+> -       url =3D https://github.com/tianocore/edk2.git
+> +       url =3D https://git.qemu.org/git/edk2.git
+>  [submodule "slirp"]
+>         path =3D slirp
+> -       url =3D https://gitlab.freedesktop.org/slirp/libslirp.git
+> +       url =3D https://git.qemu.org/git/libslirp.git
+> --
+> 2.20.1
+>
+>
 
 
-r~
+--=20
+Marc-Andr=C3=A9 Lureau
 
