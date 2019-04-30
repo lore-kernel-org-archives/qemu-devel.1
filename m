@@ -1,22 +1,22 @@
-Received: from eggs.gnu.org ([209.51.188.92]:52932)
+Received: from eggs.gnu.org ([209.51.188.92]:52966)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1hLZVX-0002Jh-8i
-	for qemu-devel@nongnu.org; Tue, 30 Apr 2019 16:37:44 -0400
+	(envelope-from <laurent@vivier.eu>) id 1hLZVb-0002L4-Ty
+	for qemu-devel@nongnu.org; Tue, 30 Apr 2019 16:37:48 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1hLZJL-00054g-Kk
-	for qemu-devel@nongnu.org; Tue, 30 Apr 2019 16:25:08 -0400
+	(envelope-from <laurent@vivier.eu>) id 1hLZDD-0002N3-Fw
+	for qemu-devel@nongnu.org; Tue, 30 Apr 2019 16:18:48 -0400
 References: <cover.1556650594.git.alistair.francis@wdc.com>
-	<c4768a18309b3918715f96a1f5b2a9a264a5a9e4.1556650594.git.alistair.francis@wdc.com>
+	<81a342ee886cf0f63cdbfc8573b14dd2d41de42d.1556650594.git.alistair.francis@wdc.com>
 From: Laurent Vivier <laurent@vivier.eu>
-Message-ID: <8ca522c7-d1dd-fe05-f8ab-031b72a9fbef@vivier.eu>
-Date: Tue, 30 Apr 2019 22:24:41 +0200
+Message-ID: <5f9283d7-aafd-1d6f-307d-c55c755709c1@vivier.eu>
+Date: Tue, 30 Apr 2019 22:18:18 +0200
 MIME-Version: 1.0
-In-Reply-To: <c4768a18309b3918715f96a1f5b2a9a264a5a9e4.1556650594.git.alistair.francis@wdc.com>
+In-Reply-To: <81a342ee886cf0f63cdbfc8573b14dd2d41de42d.1556650594.git.alistair.francis@wdc.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH v1 2/5] hw/usb/hcd-xhci: Fix GCC 9 build
- warning
+Subject: Re: [Qemu-devel] [PATCH v1 1/5] util/qemu-sockets: Fix GCC 9 build
+ warnings
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,50 +25,77 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alistair Francis <Alistair.Francis@wdc.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
-Cc: "alistair23@gmail.com" <alistair23@gmail.com>, "kraxel@redhat.com" <kraxel@redhat.com>, "berrange@redhat.com" <berrange@redhat.com>, "riku.voipio@iki.fi" <riku.voipio@iki.fi>, "qemu-trivial@nongnu.org" <qemu-trivial@nongnu.org>
+To: Alistair Francis <Alistair.Francis@wdc.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "berrange@redhat.com" <berrange@redhat.com>
+Cc: "alistair23@gmail.com" <alistair23@gmail.com>, "kraxel@redhat.com" <kraxel@redhat.com>, "riku.voipio@iki.fi" <riku.voipio@iki.fi>, "qemu-trivial@nongnu.org" <qemu-trivial@nongnu.org>
 
-Le 30/04/2019 à 22:09, Alistair Francis a écrit :
-> Fix this build warning with GCC 9 on Fedora 30:
-> hw/usb/hcd-xhci.c:3339:66: error: ‘%d’ directive output may be truncated writing between 1 and 10 bytes into a region of size 5 [-Werror=format-truncation=]
->  3339 |             snprintf(port->name, sizeof(port->name), "usb2 port #%d", i+1);
->       |                                                                  ^~
-> hw/usb/hcd-xhci.c:3339:54: note: directive argument in the range [1, 2147483647]
->  3339 |             snprintf(port->name, sizeof(port->name), "usb2 port #%d", i+1);
-
-"i" cannot be greater than 15.
-
-perhaps an "assert(i <= MAX(MAXPORTS_2, MAXPORTS_3))" can fix the warning ?
-
-Thanks,
-Laurent
-
->       |                                                      ^~~~~~~~~~~~~~~
-> In file included from /usr/include/stdio.h:867,
->                  from /home/alistair/qemu/include/qemu/osdep.h:99,
->                  from hw/usb/hcd-xhci.c:21:
-> /usr/include/bits/stdio2.h:67:10: note: ‘__builtin___snprintf_chk’ output between 13 and 22 bytes into a destination of size 16
->    67 |   return __builtin___snprintf_chk (__s, __n, __USE_FORTIFY_LEVEL - 1,
->       |          ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
->    68 |        __bos (__s), __fmt, __va_arg_pack ());
->       |        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Le 30/04/2019 à 22:08, Alistair Francis a écrit :
+> Fix this warning when building with GCC9 on Fedora 30:
+> In function ‘strncpy’,
+>     inlined from ‘unix_connect_saddr.isra.0’ at util/qemu-sockets.c:925:5:
+> /usr/include/bits/string_fortified.h:106:10: error: ‘__builtin_strncpy’ specified bound 108 equals destination size [-Werror=stringop-truncation]
+>   106 |   return __builtin___strncpy_chk (__dest, __src, __len, __bos (__dest));
+>       |          ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+> In function ‘strncpy’,
+>     inlined from ‘unix_listen_saddr.isra.0’ at util/qemu-sockets.c:880:5:
 > 
 > Signed-off-by: Alistair Francis <alistair.francis@wdc.com>
 > ---
->  hw/usb/hcd-xhci.h | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
+>  util/qemu-sockets.c | 4 ++--
+>  1 file changed, 2 insertions(+), 2 deletions(-)
 > 
-> diff --git a/hw/usb/hcd-xhci.h b/hw/usb/hcd-xhci.h
-> index 240caa4e51..9e4988abb6 100644
-> --- a/hw/usb/hcd-xhci.h
-> +++ b/hw/usb/hcd-xhci.h
-> @@ -133,7 +133,7 @@ typedef struct XHCIPort {
->      uint32_t portnr;
->      USBPort  *uport;
->      uint32_t speedmask;
-> -    char name[16];
-> +    char name[24];
->      MemoryRegion mem;
->  } XHCIPort;
+> diff --git a/util/qemu-sockets.c b/util/qemu-sockets.c
+> index 9705051690..4322652428 100644
+> --- a/util/qemu-sockets.c
+> +++ b/util/qemu-sockets.c
+> @@ -877,7 +877,7 @@ static int unix_listen_saddr(UnixSocketAddress *saddr,
 >  
+>      memset(&un, 0, sizeof(un));
+>      un.sun_family = AF_UNIX;
+> -    strncpy(un.sun_path, path, sizeof(un.sun_path));
+> +    strncpy(un.sun_path, path, sizeof(un.sun_path) - 1);
+>  
+>      if (bind(sock, (struct sockaddr*) &un, sizeof(un)) < 0) {
+>          error_setg_errno(errp, errno, "Failed to bind socket to %s", path);
+> @@ -922,7 +922,7 @@ static int unix_connect_saddr(UnixSocketAddress *saddr, Error **errp)
+>  
+>      memset(&un, 0, sizeof(un));
+>      un.sun_family = AF_UNIX;
+> -    strncpy(un.sun_path, saddr->path, sizeof(un.sun_path));
+> +    strncpy(un.sun_path, saddr->path, sizeof(un.sun_path) - 1);
+>  
+>      /* connect to peer */
+>      do {
 > 
+
+Your change reverts partially:
+
+commit ad9579aaa16d5b385922d49edac2c96c79bcfb62
+Author: Daniel P. Berrange <berrange@redhat.com>
+Date:   Thu May 25 16:53:00 2017 +0100
+
+    sockets: improve error reporting if UNIX socket path is too long
+
+    The 'struct sockaddr_un' only allows 108 bytes for the socket
+    path.
+
+    If the user supplies a path, QEMU uses snprintf() to silently
+    truncate it when too long. This is undesirable because the user
+    will then be unable to connect to the path they asked for.
+
+    If the user doesn't supply a path, QEMU builds one based on
+    TMPDIR, but if that leads to an overlong path, it mistakenly
+    uses error_setg_errno() with a stale errno value, because
+    snprintf() does not set errno on truncation.
+
+    In solving this the code needed some refactoring to ensure we
+    don't pass 'un.sun_path' directly to any APIs which expect
+    NUL-terminated strings, because the path is not required to
+    be terminated.
+
+    Signed-off-by: Daniel P. Berrange <berrange@redhat.com>
+    Message-Id: <20170525155300.22743-1-berrange@redhat.com>
+    Reviewed-by: Eric Blake <eblake@redhat.com>
+    Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+
+Thanks,
+Laurent
