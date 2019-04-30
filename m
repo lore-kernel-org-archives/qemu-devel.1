@@ -1,30 +1,24 @@
-Received: from eggs.gnu.org ([209.51.188.92]:60470)
+Received: from eggs.gnu.org ([209.51.188.92]:60638)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jcmvbkbc@gmail.com>) id 1hLZyd-0006W6-Ex
-	for qemu-devel@nongnu.org; Tue, 30 Apr 2019 17:07:48 -0400
+	(envelope-from <laurent@vivier.eu>) id 1hLZzE-00072a-3k
+	for qemu-devel@nongnu.org; Tue, 30 Apr 2019 17:08:25 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jcmvbkbc@gmail.com>) id 1hLZyb-0004Wa-J4
-	for qemu-devel@nongnu.org; Tue, 30 Apr 2019 17:07:47 -0400
-Received: from mail-yw1-xc44.google.com ([2607:f8b0:4864:20::c44]:36959)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <jcmvbkbc@gmail.com>) id 1hLZyb-0004Vs-6u
-	for qemu-devel@nongnu.org; Tue, 30 Apr 2019 17:07:45 -0400
-Received: by mail-yw1-xc44.google.com with SMTP id a62so6997313ywa.4
-	for <qemu-devel@nongnu.org>; Tue, 30 Apr 2019 14:07:44 -0700 (PDT)
+	(envelope-from <laurent@vivier.eu>) id 1hLZzD-0004tD-5o
+	for qemu-devel@nongnu.org; Tue, 30 Apr 2019 17:08:24 -0400
+References: <cover.1556650594.git.alistair.francis@wdc.com>
+	<6bfa446eb7c351b5d867eb4158198231af724b11.1556650594.git.alistair.francis@wdc.com>
+	<d4dd0758-64af-e249-1f1b-b52af014b404@vivier.eu>
+	<CAKmqyKNx2r93-ASC0dAZJvu_36dV69sRj92-m6G9zXqLdc2sag@mail.gmail.com>
+From: Laurent Vivier <laurent@vivier.eu>
+Message-ID: <3253f092-d227-b56a-3e15-febf6646e5f9@vivier.eu>
+Date: Tue, 30 Apr 2019 23:07:56 +0200
 MIME-Version: 1.0
-References: <20190403034358.21999-1-richard.henderson@linaro.org>
-	<20190403034358.21999-24-richard.henderson@linaro.org>
-	<CAFEAcA_FZHKXJHg4819JOZkwwhE44Vx874GKrnxRrOau1HhzRw@mail.gmail.com>
-	<CAMo8BfJVdDvYWEdN_08ed5OKBGXc+U8kSbmWaSWY9WCuvDj2pw@mail.gmail.com>
-	<bd57c22c-1bdc-80b4-0415-565117f6ae3e@linaro.org>
-	<CAMo8BfJsC9aPYUhi5Rg6SAXT4dhaZaU=dqy=um+aBJtnPMSwdA@mail.gmail.com>
-In-Reply-To: <CAMo8BfJsC9aPYUhi5Rg6SAXT4dhaZaU=dqy=um+aBJtnPMSwdA@mail.gmail.com>
-From: Max Filippov <jcmvbkbc@gmail.com>
-Date: Tue, 30 Apr 2019 14:07:31 -0700
-Message-ID: <CAMo8BfKjGrHsTn+riEnS8rxQDPgAQ9STwJrB4_TrYnqs2uHtmQ@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH 23/26] target/xtensa: Convert to
- CPUClass::tlb_fill
+In-Reply-To: <CAKmqyKNx2r93-ASC0dAZJvu_36dV69sRj92-m6G9zXqLdc2sag@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH v1 5/5] linux-user/elfload: Fix GCC 9 build
+ warnings
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,19 +27,52 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Richard Henderson <richard.henderson@linaro.org>
-Cc: Peter Maydell <peter.maydell@linaro.org>, QEMU Developers <qemu-devel@nongnu.org>
+To: Alistair Francis <alistair23@gmail.com>
+Cc: Alistair Francis <Alistair.Francis@wdc.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "kraxel@redhat.com" <kraxel@redhat.com>, "berrange@redhat.com" <berrange@redhat.com>, "riku.voipio@iki.fi" <riku.voipio@iki.fi>, "qemu-trivial@nongnu.org" <qemu-trivial@nongnu.org>
 
-On Tue, Apr 30, 2019 at 11:14 AM Max Filippov <jcmvbkbc@gmail.com> wrote:
-> On Tue, Apr 30, 2019 at 10:44 AM Richard Henderson
-> > And Peter's right that I should have kept EXC_USER.
+Le 30/04/2019 à 23:01, Alistair Francis a écrit :
+> On Tue, Apr 30, 2019 at 1:36 PM Laurent Vivier <laurent@vivier.eu> wrote:
+>>
+>> Le 30/04/2019 à 22:09, Alistair Francis a écrit :
+>>> Fix this warning when building with GCC9 on Fedora 30:
+>>> In function ‘strncpy’,
+>>>     inlined from ‘fill_psinfo’ at /home/alistair/qemu/linux-user/elfload.c:3208:12,
+>>>     inlined from ‘fill_note_info’ at /home/alistair/qemu/linux-user/elfload.c:3390:5,
+>>>     inlined from ‘elf_core_dump’ at /home/alistair/qemu/linux-user/elfload.c:3539:9:
+>>> /usr/include/bits/string_fortified.h:106:10: error: ‘__builtin_strncpy’ specified bound 16 equals destination size [-Werror=stringop-truncation]
+>>>   106 |   return __builtin___strncpy_chk (__dest, __src, __len, __bos (__dest));
+>>>       |          ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+>>>
+>>> Signed-off-by: Alistair Francis <alistair.francis@wdc.com>
+>>> ---
+>>>  linux-user/elfload.c | 4 ++--
+>>>  1 file changed, 2 insertions(+), 2 deletions(-)
+>>>
+>>> diff --git a/linux-user/elfload.c b/linux-user/elfload.c
+>>> index c1a26021f8..cbb7fc10fa 100644
+>>> --- a/linux-user/elfload.c
+>>> +++ b/linux-user/elfload.c
+>>> @@ -3206,7 +3206,7 @@ static int fill_psinfo(struct target_elf_prpsinfo *psinfo, const TaskState *ts)
+>>
+>>        /*
+>>         * Using strncpy here is fine: at max-length,
+>>>       * this field is not NUL-terminated.
+>>>       */>      (void) strncpy(psinfo->pr_fname, base_filename,
+>>> -                   sizeof(psinfo->pr_fname));
+>>> +                   sizeof(psinfo->pr_fname) - 1);
+>>
+>> Read the comment above :)
+> 
+> GCC can't read the comment though. The only other option I can think
+> of is using a pragma, which I avoided using unless I had to. Would you
+> prefer a pragma here? Or do you have a better solution?
+> 
 
-It appears to work as is: the EXC_USER is set up by the
-exception_cause helper because there's always PS_U in
-the PS, PS_EXCM is cleared in the cpu_loop and the
-current PC is preserved by the xtensa_cpu_tlb_fill.
-I'll play with it some more...
+perhaps:
 
--- 
-Thanks.
--- Max
+memcpy(psinfo->pr_fname, base_filename, MIN(strlen(base_filename) + 1, sizeof(psinfo->pr_fname));
+
+?
+
+Thanks,
+Laurent
