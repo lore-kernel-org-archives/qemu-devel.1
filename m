@@ -2,78 +2,66 @@ Return-Path: <SRS0=TP+Q=TA=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.5 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_PASS,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_PASS,URIBL_BLOCKED autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 07B9AC43219
-	for <qemu-devel@archiver.kernel.org>; Tue, 30 Apr 2019 17:40:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 99238C43219
+	for <qemu-devel@archiver.kernel.org>; Tue, 30 Apr 2019 17:42:23 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B365E20835
-	for <qemu-devel@archiver.kernel.org>; Tue, 30 Apr 2019 17:40:13 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="On7ouQlh"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B365E20835
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	by mail.kernel.org (Postfix) with ESMTPS id 6DAED20835
+	for <qemu-devel@archiver.kernel.org>; Tue, 30 Apr 2019 17:42:23 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6DAED20835
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=patchew.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:50897 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:50942 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hLWjk-0005cZ-Pz
-	for qemu-devel@archiver.kernel.org; Tue, 30 Apr 2019 13:40:12 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:50406)
+	id 1hLWlq-0007HP-NC
+	for qemu-devel@archiver.kernel.org; Tue, 30 Apr 2019 13:42:22 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:51238)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <fintelia@gmail.com>) id 1hLWgE-0003gZ-5j
-	for qemu-devel@nongnu.org; Tue, 30 Apr 2019 13:36:37 -0400
+	(envelope-from <no-reply@patchew.org>) id 1hLWkZ-0006Xc-5i
+	for qemu-devel@nongnu.org; Tue, 30 Apr 2019 13:41:04 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <fintelia@gmail.com>) id 1hLWgB-0000yf-6I
-	for qemu-devel@nongnu.org; Tue, 30 Apr 2019 13:36:34 -0400
-Received: from mail-lf1-x12f.google.com ([2a00:1450:4864:20::12f]:38154)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <fintelia@gmail.com>)
-	id 1hLWgA-0000wk-N1; Tue, 30 Apr 2019 13:36:31 -0400
-Received: by mail-lf1-x12f.google.com with SMTP id v1so11503179lfg.5;
-	Tue, 30 Apr 2019 10:36:29 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
-	h=mime-version:from:date:message-id:subject:to:cc;
-	bh=QtZivRwQs+3Md6ht780CSzroumzlvmP+q77ExQQ8mqQ=;
-	b=On7ouQlhkHkYhOpskOGIe8vLYTcsHNkqZbzO7cZqOtUpekKfW77hKzVdOLasJfP2Qi
-	VN9I34FzYSNv/Ast1/joopl/XBztJbyd+Wwk3Iqw0eDmTPju2LIh6Ji/qtYNjtkui0WO
-	YbUtoHEMPFzDdND4klI4/vbm2241fONljs2agtDx/0ViPxfWlD0qImJ81a0kR6rwldzT
-	uGadsVghK2GEJFdAxAU9+3tTN49XtnfE1zzNas7R/G4yxXZRlmR6VS/iDGewF6VhhQu1
-	1+8jPo6OdwUtidGa1iD1Fvw76vRsxmo0VfcVeqiH5Q+v5rnW1o9hiChX/tdafhoNV0D7
-	w2aA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=1e100.net; s=20161025;
-	h=x-gm-message-state:mime-version:from:date:message-id:subject:to:cc;
-	bh=QtZivRwQs+3Md6ht780CSzroumzlvmP+q77ExQQ8mqQ=;
-	b=TJ4ZCzNzs7BR7aHOi5ABG3sIeu+DhgwnDbDXEXdDDAK9Sb7Wq1corhIe/uif4hQKEQ
-	DPX9T/6iKMewkqSeFPk9mHbV3Eg8DzMCnhtYcKj/BrkUGvCs/zW5qE/6q89koKSRMHMS
-	t0LPgjG2Nb/3vx9n3UB0wQ2tghtBjhU2w6AnenSaODYi0J2SLY+dKbqYUNBCJCeKa8Gr
-	EulcCKR7QoX5YFlPOMZiwr1jRHsfqQMaJ6ZS/Fv0gNL6R4U/lRbu3wHpVg4C+P7sjfnU
-	4GYQv9o/ldvadjskKyl4rbVU351pSAPkMT4A/i/FqfMFOaI8dTR8knQmtsRFrka2Zbiy
-	aPrg==
-X-Gm-Message-State: APjAAAUSSR2yI1QxebISwlJmvF+dLnC5v00U4L/v0IuXuxyZHWF0WGQ5
-	OuTNjPqvPBAyWWUQBvaney91+gn7bzkaM1kqkEF5X4Q4i+o=
-X-Google-Smtp-Source: APXvYqxxErVHhvM9qIX6+unrzeKN95lKwtos+IKhbn552BcrlZ1N8fQoxGRVgb7hAFxto6rj6le5MeyQdR3mwGbmiSE=
-X-Received: by 2002:ac2:538a:: with SMTP id g10mr28012907lfh.141.1556645787991;
-	Tue, 30 Apr 2019 10:36:27 -0700 (PDT)
+	(envelope-from <no-reply@patchew.org>) id 1hLWkV-0003u2-3f
+	for qemu-devel@nongnu.org; Tue, 30 Apr 2019 13:41:02 -0400
+Resent-Date: Tue, 30 Apr 2019 13:41:01 -0400
+Resent-Message-Id: <E1hLWkV-0003u2-3f@eggs.gnu.org>
+Received: from sender-of-o52.zoho.com ([135.84.80.217]:21418)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
+	id 1hLWkT-0003rV-8T
+	for qemu-devel@nongnu.org; Tue, 30 Apr 2019 13:40:59 -0400
+ARC-Seal: i=1; a=rsa-sha256; t=1556646037; cv=none; d=zoho.com; s=zohoarc; 
+	b=c/ImklGOf0Mx76e7cF7AvB3bxLnSmjHDtWVY8wfmCOOlzeTBFu9o/v07gH2b7eDFA2RPyY7URrww3mTYwDVNl2ILyi1zGtjVE4fXOPOMG9TojLaWeG0j3jqHCov71gvgbnJSpf17QfaaRLh2yyBFGfu87lSkHL4+MQQjeATjlvA=
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zoho.com;
+	s=zohoarc; t=1556646037;
+	h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:Reply-To:Subject:To:ARC-Authentication-Results;
+	bh=3vDh5WxEm12BQsxdGloRGsOUJ7Z5k6d3M1rZ2q9qNSM=; 
+	b=e96V2qJDr5S7CKhFJPB/y7U8GIPSuU/AxEDZx/1BSSlB9U+afvL+i0vBi/1GkXuni7JuoZzQ8+YN+GICLiW1gBlA6rcCqR6H4aGd3bMd2grlaE3BiJcYTarDOgHxSoxssHE2KKTuA41cIMcBoeAypXUtqjQmuDaK4oF3pggxHyo=
+ARC-Authentication-Results: i=1; mx.zoho.com; dkim=pass  header.i=patchew.org;
+	spf=pass  smtp.mailfrom=no-reply@patchew.org;
+	dmarc=pass header.from=<no-reply@patchew.org>
+	header.from=<no-reply@patchew.org>
+Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by
+	mx.zohomail.com with SMTPS id 1556646026894844.8809037914904;
+	Tue, 30 Apr 2019 10:40:26 -0700 (PDT)
+In-Reply-To: <20190430172236.14325-1-paul.c.lai@intel.com>
+Message-ID: <155664602568.10667.9152899747507219100@c2072b67cc0c>
 MIME-Version: 1.0
-From: Jonathan Behrens <fintelia@gmail.com>
-Date: Tue, 30 Apr 2019 13:36:01 -0400
-Message-ID:
- <CANnJOVH_Jt0pCeqnqpZdCY97pUf72EiABXtOvHWLAkpfqhKbqg@mail.gmail.com>
-To: "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
-	recognized.
-X-Received-From: 2a00:1450:4864:20::12f
 Content-Type: text/plain; charset="UTF-8"
-X-Content-Filtered-By: Mailman/MimeDel 2.1.21
-Subject: [Qemu-devel] [PATCH for 4.1 v2] target/riscv: Expose time CSRs when
- allowed by [m|s]counteren
+Content-Transfer-Encoding: base64
+Resent-From: 
+From: no-reply@patchew.org
+To: paul.c.lai@intel.com
+Date: Tue, 30 Apr 2019 10:40:26 -0700 (PDT)
+X-ZohoMailClient: External
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 135.84.80.217
+Subject: Re: [Qemu-devel] [PATCH] Introduce SnowRidge CPU model
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -85,384 +73,59 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Bastian Koppelmann <kbastian@mail.uni-paderborn.de>,
-	Palmer Dabbelt <palmer@sifive.com>,
-	Alistair Francis <Alistair.Francis@wdc.com>,
-	"open list:RISC-V" <qemu-riscv@nongnu.org>,
-	Sagar Karandikar <sagark@eecs.berkeley.edu>
+Reply-To: qemu-devel@nongnu.org
+Cc: fam@euphon.net, luwei.kang@intel.com, tao3.xu@intel.com,
+	qemu-devel@nongnu.org, wei.w.wang@intel.com, paul.c.lai@intel.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190430173601.ew3kGSdvmVhmiMKkCRPnz3MIGjz2A-DRCHtkdirt3vg@z>
+Message-ID: <20190430174026.AkDUiPA-G9GUEarzTqNfTlf8PsmArsrfvWNFPLh8yKA@z>
 
-Currently mcounteren.TM acts as though it is hardwired to zero, even though
-QEMU allows it to be set. This change resolves the issue by allowing reads
-to the time and timeh control registers when running in a privileged mode
-where such accesses are allowed.
+UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDE5MDQzMDE3MjIzNi4xNDMy
+NS0xLXBhdWwuYy5sYWlAaW50ZWwuY29tLwoKCgpIaSwKClRoaXMgc2VyaWVzIHNlZW1zIHRvIGhh
+dmUgc29tZSBjb2Rpbmcgc3R5bGUgcHJvYmxlbXMuIFNlZSBvdXRwdXQgYmVsb3cgZm9yCm1vcmUg
+aW5mb3JtYXRpb246CgpUeXBlOiBzZXJpZXMKTWVzc2FnZS1pZDogMjAxOTA0MzAxNzIyMzYuMTQz
+MjUtMS1wYXVsLmMubGFpQGludGVsLmNvbQpTdWJqZWN0OiBbUWVtdS1kZXZlbF0gW1BBVENIXSBJ
+bnRyb2R1Y2UgU25vd1JpZGdlIENQVSBtb2RlbAoKPT09IFRFU1QgU0NSSVBUIEJFR0lOID09PQoj
+IS9iaW4vYmFzaApnaXQgcmV2LXBhcnNlIGJhc2UgPiAvZGV2L251bGwgfHwgZXhpdCAwCmdpdCBj
+b25maWcgLS1sb2NhbCBkaWZmLnJlbmFtZWxpbWl0IDAKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYu
+cmVuYW1lcyBUcnVlCmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLmFsZ29yaXRobSBoaXN0b2dyYW0K
+Li9zY3JpcHRzL2NoZWNrcGF0Y2gucGwgLS1tYWlsYmFjayBiYXNlLi4KPT09IFRFU1QgU0NSSVBU
+IEVORCA9PT0KClVwZGF0aW5nIDNjOGNmNWE5YzIxZmY4NzgyMTY0ZDFkZWY3ZjQ0YmQ4ODg3MTMz
+ODQKRnJvbSBodHRwczovL2dpdGh1Yi5jb20vcGF0Y2hldy1wcm9qZWN0L3FlbXUKICogW25ldyB0
+YWddICAgICAgICAgICAgICAgcGF0Y2hldy8yMDE5MDQzMDE3MjIzNi4xNDMyNS0xLXBhdWwuYy5s
+YWlAaW50ZWwuY29tIC0+IHBhdGNoZXcvMjAxOTA0MzAxNzIyMzYuMTQzMjUtMS1wYXVsLmMubGFp
+QGludGVsLmNvbQpTd2l0Y2hlZCB0byBhIG5ldyBicmFuY2ggJ3Rlc3QnCjRhNGNhNjhjMjEgSW50
+cm9kdWNlIFNub3dSaWRnZSBDUFUgbW9kZWwKCj09PSBPVVRQVVQgQkVHSU4gPT09CkVSUk9SOiBj
+b2RlIGluZGVudCBzaG91bGQgbmV2ZXIgdXNlIHRhYnMKIzM3OiBGSUxFOiB0YXJnZXQvaTM4Ni9j
+cHUuYzoyNjc1OgorXkkgICAgLyogbWlzc2luZzogQ1BVSURfUE4gQ1BVSURfSUE2NCAqLyQKCkVS
+Uk9SOiBzcGFjZXMgcmVxdWlyZWQgYXJvdW5kIHRoYXQgJ3wnIChjdHg6VnhXKQojMzk6IEZJTEU6
+IHRhcmdldC9pMzg2L2NwdS5jOjI2Nzc6CisgICAgICAgICAgICBDUFVJRF9GUDg3IHwgQ1BVSURf
+Vk1FIHwgQ1BVSURfREV8IENQVUlEX1BTRSB8CiAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
+ICAgICAgICAgICAgICAgICBeCgpXQVJOSU5HOiBCbG9jayBjb21tZW50cyB1c2UgYSBsZWFkaW5n
+IC8qIG9uIGEgc2VwYXJhdGUgbGluZQojNDM6IEZJTEU6IHRhcmdldC9pMzg2L2NwdS5jOjI2ODE6
+CisgICAgICAgICAgICBDUFVJRF9QQVQgfCBDUFVJRF9QU0UzNiB8IC8qIENQVUlEX1BOIHwgKi8g
+Q1BVSURfQ0xGTFVTSCB8CgpXQVJOSU5HOiBsaW5lIG92ZXIgODAgY2hhcmFjdGVycwojNTI6IEZJ
+TEU6IHRhcmdldC9pMzg2L2NwdS5jOjI2OTA6CisgICAgICAgICAgICBDUFVJRF9FWFRfU1NFNDIg
+fCBDUFVJRF9FWFRfWDJBUElDIHwgQ1BVSURfRVhUX01PVkJFIHwgQ1BVSURfRVhUX1BPUENOVCB8
+CgpFUlJPUjogbGluZSBvdmVyIDkwIGNoYXJhY3RlcnMKIzgwOiBGSUxFOiB0YXJnZXQvaTM4Ni9j
+cHUuYzoyNzE4OgorICAgICAgICAgICAgQ1BVSURfN18wX0VEWF9BUkNIX0NBUEFCSUxJVElFUyB8
+IENQVUlEXzdfMF9FRFhfU1BFQ19DVFJMX1NTQkQsIC8qIG1pc3NpbmcgYml0IDMwICovCgpXQVJO
+SU5HOiBCbG9jayBjb21tZW50cyB1c2UgYSBsZWFkaW5nIC8qIG9uIGEgc2VwYXJhdGUgbGluZQoj
+ODE6IEZJTEU6IHRhcmdldC9pMzg2L2NwdS5jOjI3MTk6CisgICAgICAgIC8qIE1pc3Npbmc6IFhT
+QVZFUyAobm90IHN1cHBvcnRlZCBieSBzb21lIExpbnV4IHZlcnNpb25zLAoKV0FSTklORzogQmxv
+Y2sgY29tbWVudHMgc2hvdWxkIGFsaWduIHRoZSAqIG9uIGVhY2ggbGluZQojODI6IEZJTEU6IHRh
+cmdldC9pMzg2L2NwdS5jOjI3MjA6CisgICAgICAgIC8qIE1pc3Npbmc6IFhTQVZFUyAobm90IHN1
+cHBvcnRlZCBieSBzb21lIExpbnV4IHZlcnNpb25zLAorICAgICAgICAgICAgICAgICogaW5jbHVk
+aW5nIHY0LjEgdG8gdjQuMTIpLgoKdG90YWw6IDMgZXJyb3JzLCA0IHdhcm5pbmdzLCA3MiBsaW5l
+cyBjaGVja2VkCgpDb21taXQgNGE0Y2E2OGMyMWJhIChJbnRyb2R1Y2UgU25vd1JpZGdlIENQVSBt
+b2RlbCkgaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55IG9mIHRoZXNl
+IGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBtYWludGFpbmVy
+LCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KPT09IE9VVFBVVCBFTkQgPT09CgpUZXN0
+IGNvbW1hbmQgZXhpdGVkIHdpdGggY29kZTogMQoKClRoZSBmdWxsIGxvZyBpcyBhdmFpbGFibGUg
+YXQKaHR0cDovL3BhdGNoZXcub3JnL2xvZ3MvMjAxOTA0MzAxNzIyMzYuMTQzMjUtMS1wYXVsLmMu
+bGFpQGludGVsLmNvbS90ZXN0aW5nLmNoZWNrcGF0Y2gvP3R5cGU9bWVzc2FnZS4KLS0tCkVtYWls
+IGdlbmVyYXRlZCBhdXRvbWF0aWNhbGx5IGJ5IFBhdGNoZXcgW2h0dHBzOi8vcGF0Y2hldy5vcmcv
+XS4KUGxlYXNlIHNlbmQgeW91ciBmZWVkYmFjayB0byBwYXRjaGV3LWRldmVsQHJlZGhhdC5jb20=
 
-The frequency of the time register is stored in the time_freq field of each
-hart so that it is accessible during CSR reads, but must be the same across
-all harts. Each board can initialize it to a custom value, although all
-currently use a 10 MHz frequency.
----
- hw/riscv/riscv_hart.c           |  4 ++++
- hw/riscv/sifive_clint.c         | 30 ++++++++++++++++++++++--------
- hw/riscv/sifive_e.c             |  2 ++
- hw/riscv/sifive_u.c             |  4 +++-
- hw/riscv/spike.c                |  6 +++++-
- hw/riscv/virt.c                 |  4 +++-
- include/hw/riscv/riscv_hart.h   |  1 +
- include/hw/riscv/sifive_clint.h |  4 ----
- include/hw/riscv/sifive_e.h     |  4 ++++
- include/hw/riscv/sifive_u.h     |  1 +
- include/hw/riscv/spike.h        |  1 +
- include/hw/riscv/virt.h         |  1 +
- target/riscv/cpu.h              |  2 ++
- target/riscv/csr.c              | 17 +++++++++++------
- 14 files changed, 60 insertions(+), 21 deletions(-)
 
-diff --git a/hw/riscv/riscv_hart.c b/hw/riscv/riscv_hart.c
-index e34a26a0ef..c39cd55330 100644
---- a/hw/riscv/riscv_hart.c
-+++ b/hw/riscv/riscv_hart.c
-@@ -19,6 +19,7 @@
-  */
-
- #include "qemu/osdep.h"
-+#include "qemu/timer.h"
- #include "qapi/error.h"
- #include "hw/sysbus.h"
- #include "target/riscv/cpu.h"
-@@ -27,6 +28,8 @@
- static Property riscv_harts_props[] = {
-     DEFINE_PROP_UINT32("num-harts", RISCVHartArrayState, num_harts, 1),
-     DEFINE_PROP_STRING("cpu-type", RISCVHartArrayState, cpu_type),
-+    DEFINE_PROP_UINT64("timebase-frequency", RISCVHartArrayState,
-time_freq,
-+                       NANOSECONDS_PER_SECOND),
-     DEFINE_PROP_END_OF_LIST(),
- };
-
-@@ -49,6 +52,7 @@ static void riscv_harts_realize(DeviceState *dev, Error
-**errp)
-                                 sizeof(RISCVCPU), s->cpu_type,
-                                 &error_abort, NULL);
-         s->harts[n].env.mhartid = n;
-+        s->harts[n].env.time_freq = s->time_freq;
-         qemu_register_reset(riscv_harts_cpu_reset, &s->harts[n]);
-         object_property_set_bool(OBJECT(&s->harts[n]), true,
-                                  "realized", &err);
-diff --git a/hw/riscv/sifive_clint.c b/hw/riscv/sifive_clint.c
-index d4c159e937..71edf4dcc6 100644
---- a/hw/riscv/sifive_clint.c
-+++ b/hw/riscv/sifive_clint.c
-@@ -26,10 +26,10 @@
- #include "hw/riscv/sifive_clint.h"
- #include "qemu/timer.h"
-
--static uint64_t cpu_riscv_read_rtc(void)
-+static uint64_t cpu_riscv_read_rtc(CPURISCVState *env)
- {
-     return muldiv64(qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL),
--        SIFIVE_CLINT_TIMEBASE_FREQ, NANOSECONDS_PER_SECOND);
-+        env->time_freq, NANOSECONDS_PER_SECOND);
- }
-
- /*
-@@ -41,7 +41,7 @@ static void sifive_clint_write_timecmp(RISCVCPU *cpu,
-uint64_t value)
-     uint64_t next;
-     uint64_t diff;
-
--    uint64_t rtc_r = cpu_riscv_read_rtc();
-+    uint64_t rtc_r = cpu_riscv_read_rtc(&cpu->env);
-
-     cpu->env.timecmp = value;
-     if (cpu->env.timecmp <= rtc_r) {
-@@ -56,7 +56,7 @@ static void sifive_clint_write_timecmp(RISCVCPU *cpu,
-uint64_t value)
-     diff = cpu->env.timecmp - rtc_r;
-     /* back to ns (note args switched in muldiv64) */
-     next = qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL) +
--        muldiv64(diff, NANOSECONDS_PER_SECOND, SIFIVE_CLINT_TIMEBASE_FREQ);
-+        muldiv64(diff, NANOSECONDS_PER_SECOND, cpu->env.time_freq);
-     timer_mod(cpu->env.timer, next);
- }
-
-@@ -107,11 +107,25 @@ static uint64_t sifive_clint_read(void *opaque,
-hwaddr addr, unsigned size)
-             return 0;
-         }
-     } else if (addr == clint->time_base) {
--        /* time_lo */
--        return cpu_riscv_read_rtc() & 0xFFFFFFFF;
-+        /* All harts must have the same time frequency, so just use hart 0
-*/
-+        CPUState *cpu = qemu_get_cpu(0);
-+        CPURISCVState *env = cpu ? cpu->env_ptr : NULL;
-+        if (!env) {
-+            error_report("clint: hart 0 not valid?!");
-+        } else {
-+            /* time_lo */
-+            return cpu_riscv_read_rtc(env) & 0xFFFFFFFF;
-+        }
-     } else if (addr == clint->time_base + 4) {
--        /* time_hi */
--        return (cpu_riscv_read_rtc() >> 32) & 0xFFFFFFFF;
-+        /* All harts must have the same time frequency, so just use hart 0
-*/
-+        CPUState *cpu = qemu_get_cpu(0);
-+        CPURISCVState *env = cpu ? cpu->env_ptr : NULL;
-+        if (!env) {
-+            error_report("clint: hart 0 not valid?!");
-+        } else {
-+            /* time_hi */
-+            return (cpu_riscv_read_rtc(env) >> 32) & 0xFFFFFFFF;
-+        }
-     }
-
-     error_report("clint: invalid read: %08x", (uint32_t)addr);
-diff --git a/hw/riscv/sifive_e.c b/hw/riscv/sifive_e.c
-index b1cd11363c..0a6bb629b6 100644
---- a/hw/riscv/sifive_e.c
-+++ b/hw/riscv/sifive_e.c
-@@ -146,6 +146,8 @@ static void riscv_sifive_e_soc_init(Object *obj)
-                             &error_abort);
-     object_property_set_int(OBJECT(&s->cpus), smp_cpus, "num-harts",
-                             &error_abort);
-+    object_property_set_int(OBJECT(&s->cpus), SIFIVE_E_TIMEBASE_FREQ,
-+                            "timebase-frequency", &error_abort);
- }
-
- static void riscv_sifive_e_soc_realize(DeviceState *dev, Error **errp)
-diff --git a/hw/riscv/sifive_u.c b/hw/riscv/sifive_u.c
-index 5ecc47cea3..ab2b00106b 100644
---- a/hw/riscv/sifive_u.c
-+++ b/hw/riscv/sifive_u.c
-@@ -116,7 +116,7 @@ static void create_fdt(SiFiveUState *s, const struct
-MemmapEntry *memmap,
-
-     qemu_fdt_add_subnode(fdt, "/cpus");
-     qemu_fdt_setprop_cell(fdt, "/cpus", "timebase-frequency",
--        SIFIVE_CLINT_TIMEBASE_FREQ);
-+        SIFIVE_U_TIMEBASE_FREQ);
-     qemu_fdt_setprop_cell(fdt, "/cpus", "#size-cells", 0x0);
-     qemu_fdt_setprop_cell(fdt, "/cpus", "#address-cells", 0x1);
-
-@@ -329,6 +329,8 @@ static void riscv_sifive_u_soc_init(Object *obj)
-                             &error_abort);
-     object_property_set_int(OBJECT(&s->cpus), smp_cpus, "num-harts",
-                             &error_abort);
-+    object_property_set_int(OBJECT(&s->cpus), SIFIVE_U_TIMEBASE_FREQ,
-+                            "timebase-frequency", &error_abort);
-
-     sysbus_init_child_obj(obj, "gem", &s->gem, sizeof(s->gem),
-                           TYPE_CADENCE_GEM);
-diff --git a/hw/riscv/spike.c b/hw/riscv/spike.c
-index 2a000a5800..6b85083308 100644
---- a/hw/riscv/spike.c
-+++ b/hw/riscv/spike.c
-@@ -105,7 +105,7 @@ static void create_fdt(SpikeState *s, const struct
-MemmapEntry *memmap,
-
-     qemu_fdt_add_subnode(fdt, "/cpus");
-     qemu_fdt_setprop_cell(fdt, "/cpus", "timebase-frequency",
--        SIFIVE_CLINT_TIMEBASE_FREQ);
-+        SPIKE_TIMEBASE_FREQ);
-     qemu_fdt_setprop_cell(fdt, "/cpus", "#size-cells", 0x0);
-     qemu_fdt_setprop_cell(fdt, "/cpus", "#address-cells", 0x1);
-
-@@ -179,6 +179,8 @@ static void spike_v1_10_0_board_init(MachineState
-*machine)
-                             &error_abort);
-     object_property_set_int(OBJECT(&s->soc), smp_cpus, "num-harts",
-                             &error_abort);
-+    object_property_set_int(OBJECT(&s->soc), SPIKE_TIMEBASE_FREQ,
-+                            "timebase-frequency", &error_abort);
-     object_property_set_bool(OBJECT(&s->soc), true, "realized",
-                             &error_abort);
-
-@@ -261,6 +263,8 @@ static void spike_v1_09_1_board_init(MachineState
-*machine)
-                             &error_abort);
-     object_property_set_int(OBJECT(&s->soc), smp_cpus, "num-harts",
-                             &error_abort);
-+    object_property_set_int(OBJECT(&s->soc), SPIKE_TIMEBASE_FREQ,
-+                            "timebase-frequency", &error_abort);
-     object_property_set_bool(OBJECT(&s->soc), true, "realized",
-                             &error_abort);
-
-diff --git a/hw/riscv/virt.c b/hw/riscv/virt.c
-index 3526463034..beeccba4ac 100644
---- a/hw/riscv/virt.c
-+++ b/hw/riscv/virt.c
-@@ -185,7 +185,7 @@ static void *create_fdt(RISCVVirtState *s, const struct
-MemmapEntry *memmap,
-
-     qemu_fdt_add_subnode(fdt, "/cpus");
-     qemu_fdt_setprop_cell(fdt, "/cpus", "timebase-frequency",
--                          SIFIVE_CLINT_TIMEBASE_FREQ);
-+                          VIRT_TIMEBASE_FREQ);
-     qemu_fdt_setprop_cell(fdt, "/cpus", "#size-cells", 0x0);
-     qemu_fdt_setprop_cell(fdt, "/cpus", "#address-cells", 0x1);
-
-@@ -403,6 +403,8 @@ static void riscv_virt_board_init(MachineState *machine)
-                             &error_abort);
-     object_property_set_int(OBJECT(&s->soc), smp_cpus, "num-harts",
-                             &error_abort);
-+    object_property_set_int(OBJECT(&s->soc), VIRT_TIMEBASE_FREQ,
-+                            "timebase-frequency", &error_abort);
-     object_property_set_bool(OBJECT(&s->soc), true, "realized",
-                             &error_abort);
-
-diff --git a/include/hw/riscv/riscv_hart.h b/include/hw/riscv/riscv_hart.h
-index 0671d88a44..2e82e85b2b 100644
---- a/include/hw/riscv/riscv_hart.h
-+++ b/include/hw/riscv/riscv_hart.h
-@@ -33,6 +33,7 @@ typedef struct RISCVHartArrayState {
-     /*< public >*/
-     uint32_t num_harts;
-     char *cpu_type;
-+    uint64_t time_freq;
-     RISCVCPU *harts;
- } RISCVHartArrayState;
-
-diff --git a/include/hw/riscv/sifive_clint.h
-b/include/hw/riscv/sifive_clint.h
-index e2865be1d1..aaa2a58c6e 100644
---- a/include/hw/riscv/sifive_clint.h
-+++ b/include/hw/riscv/sifive_clint.h
-@@ -47,8 +47,4 @@ enum {
-     SIFIVE_TIME_BASE    = 0xBFF8
- };
-
--enum {
--    SIFIVE_CLINT_TIMEBASE_FREQ = 10000000
--};
--
- #endif
-diff --git a/include/hw/riscv/sifive_e.h b/include/hw/riscv/sifive_e.h
-index 7b6d8aed96..b83e60493e 100644
---- a/include/hw/riscv/sifive_e.h
-+++ b/include/hw/riscv/sifive_e.h
-@@ -67,6 +67,10 @@ enum {
-     SIFIVE_E_UART1_IRQ = 4
- };
-
-+enum {
-+    SIFIVE_E_TIMEBASE_FREQ = 10000000,
-+};
-+
- #define SIFIVE_E_PLIC_HART_CONFIG "M"
- #define SIFIVE_E_PLIC_NUM_SOURCES 127
- #define SIFIVE_E_PLIC_NUM_PRIORITIES 7
-diff --git a/include/hw/riscv/sifive_u.h b/include/hw/riscv/sifive_u.h
-index be13cc1304..e94eb89866 100644
---- a/include/hw/riscv/sifive_u.h
-+++ b/include/hw/riscv/sifive_u.h
-@@ -63,6 +63,7 @@ enum {
- };
-
- enum {
-+    SIFIVE_U_TIMEBASE_FREQ = 10000000,
-     SIFIVE_U_CLOCK_FREQ = 1000000000,
-     SIFIVE_U_GEM_CLOCK_FREQ = 125000000
- };
-diff --git a/include/hw/riscv/spike.h b/include/hw/riscv/spike.h
-index 641b70da67..2d391d1559 100644
---- a/include/hw/riscv/spike.h
-+++ b/include/hw/riscv/spike.h
-@@ -36,6 +36,7 @@ enum {
- };
-
- enum {
-+    SPIKE_TIMEBASE_FREQ = 10000000,
-     SPIKE_CLOCK_FREQ = 1000000000
- };
-
-diff --git a/include/hw/riscv/virt.h b/include/hw/riscv/virt.h
-index f12deaebd6..f807bbfe1e 100644
---- a/include/hw/riscv/virt.h
-+++ b/include/hw/riscv/virt.h
-@@ -53,6 +53,7 @@ enum {
- };
-
- enum {
-+    VIRT_TIMEBASE_FREQ = 10000000,
-     VIRT_CLOCK_FREQ = 1000000000
- };
-
-diff --git a/target/riscv/cpu.h b/target/riscv/cpu.h
-index 20bce8742e..67b1769ad3 100644
---- a/target/riscv/cpu.h
-+++ b/target/riscv/cpu.h
-@@ -173,7 +173,9 @@ struct CPURISCVState {
-     /* temporary htif regs */
-     uint64_t mfromhost;
-     uint64_t mtohost;
-+
-     uint64_t timecmp;
-+    uint64_t time_freq;
-
-     /* physical memory protection */
-     pmp_table_t pmp_state;
-diff --git a/target/riscv/csr.c b/target/riscv/csr.c
-index e1d91b6c60..6083c782a1 100644
---- a/target/riscv/csr.c
-+++ b/target/riscv/csr.c
-@@ -191,22 +191,31 @@ static int read_instreth(CPURISCVState *env, int
-csrno, target_ulong *val)
- }
- #endif /* TARGET_RISCV32 */
-
--#if defined(CONFIG_USER_ONLY)
- static int read_time(CPURISCVState *env, int csrno, target_ulong *val)
- {
-+#if !defined(CONFIG_USER_ONLY)
-+    *val = muldiv64(qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL),
-+                    env->time_freq, NANOSECONDS_PER_SECOND);
-+#else
-     *val = cpu_get_host_ticks();
-+#endif
-     return 0;
- }
-
- #if defined(TARGET_RISCV32)
- static int read_timeh(CPURISCVState *env, int csrno, target_ulong *val)
- {
-+#if !defined(CONFIG_USER_ONLY)
-+    *val = muldiv64(qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL),
-+                    env->time_freq, NANOSECONDS_PER_SECOND) >> 32;
-+#else
-     *val = cpu_get_host_ticks() >> 32;
-+#endif
-     return 0;
- }
- #endif
-
--#else /* CONFIG_USER_ONLY */
-+#if !defined(CONFIG_USER_ONLY)
-
- /* Machine constants */
-
-@@ -854,14 +863,10 @@ static riscv_csr_operations csr_ops[CSR_TABLE_SIZE] =
-{
-     [CSR_INSTRETH] =            { ctr,
-read_instreth                       },
- #endif
-
--    /* User-level time CSRs are only available in linux-user
--     * In privileged mode, the monitor emulates these CSRs */
--#if defined(CONFIG_USER_ONLY)
-     [CSR_TIME] =                { ctr,
-read_time                           },
- #if defined(TARGET_RISCV32)
-     [CSR_TIMEH] =               { ctr,
-read_timeh                          },
- #endif
--#endif
-
- #if !defined(CONFIG_USER_ONLY)
-     /* Machine Timers and Counters */
--- 
-2.20.1
