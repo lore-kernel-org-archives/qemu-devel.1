@@ -1,19 +1,17 @@
-Received: from eggs.gnu.org ([209.51.188.92]:48827)
+Received: from eggs.gnu.org ([209.51.188.92]:48743)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1hLUus-000845-Ff
-	for qemu-devel@nongnu.org; Tue, 30 Apr 2019 11:43:36 -0400
+	(envelope-from <kwolf@redhat.com>) id 1hLUuq-00081c-Hi
+	for qemu-devel@nongnu.org; Tue, 30 Apr 2019 11:43:35 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1hLUup-00026N-Md
-	for qemu-devel@nongnu.org; Tue, 30 Apr 2019 11:43:34 -0400
+	(envelope-from <kwolf@redhat.com>) id 1hLUun-00024S-VC
+	for qemu-devel@nongnu.org; Tue, 30 Apr 2019 11:43:32 -0400
 From: Kevin Wolf <kwolf@redhat.com>
-Date: Tue, 30 Apr 2019 17:42:30 +0200
-Message-Id: <20190430154244.30083-14-kwolf@redhat.com>
-In-Reply-To: <20190430154244.30083-1-kwolf@redhat.com>
-References: <20190430154244.30083-1-kwolf@redhat.com>
+Date: Tue, 30 Apr 2019 17:42:17 +0200
+Message-Id: <20190430154244.30083-1-kwolf@redhat.com>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 13/27] qemu-img: Make create hint at protocol
- options
+Subject: [Qemu-devel] [PULL 00/27] Block layer patches
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,111 +23,152 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-block@nongnu.org
 Cc: kwolf@redhat.com, qemu-devel@nongnu.org
 
-From: Max Reitz <mreitz@redhat.com>
+The following changes since commit 22d96eac64877c4d96f9928babb6f2fcc68faa=
+cf:
 
-qemu-img create allows giving just a format and "-o help" to get a list
-of the options supported by that format.  Users may not realize that the
-protocol level may offer even more options, which they only get to see
-by specifying a filename.
+  Merge remote-tracking branch 'remotes/stefanha/tags/tracing-pull-reques=
+t' into staging (2019-04-29 19:11:15 +0100)
 
-This patch adds a note to hint at that fact.
+are available in the Git repository at:
 
-Signed-off-by: Max Reitz <mreitz@redhat.com>
-Reviewed-by: John Snow <jsnow@redhat.com>
-Signed-off-by: Kevin Wolf <kwolf@redhat.com>
----
- qemu-img.c                 | 13 ++++++++++++-
- tests/qemu-iotests/082.out | 20 ++++++++++++++++----
- 2 files changed, 28 insertions(+), 5 deletions(-)
+  git://repo.or.cz/qemu/kevin.git tags/for-upstream
 
-diff --git a/qemu-img.c b/qemu-img.c
-index d7fe546b85..ddd55ab291 100644
---- a/qemu-img.c
-+++ b/qemu-img.c
-@@ -267,9 +267,20 @@ static int print_block_option_help(const char *filen=
-ame, const char *fmt)
-         create_opts =3D qemu_opts_append(create_opts, proto_drv->create_=
-opts);
-     }
-=20
--    printf("Supported options:\n");
-+    if (filename) {
-+        printf("Supported options:\n");
-+    } else {
-+        printf("Supported %s options:\n", fmt);
-+    }
-     qemu_opts_print_help(create_opts, false);
-     qemu_opts_free(create_opts);
-+
-+    if (!filename) {
-+        printf("\n"
-+               "The protocol level may support further options.\n"
-+               "Specify the target filename to include those options.\n"=
-);
-+    }
-+
-     return 0;
- }
-=20
-diff --git a/tests/qemu-iotests/082.out b/tests/qemu-iotests/082.out
-index 9a23b68511..7e25706813 100644
---- a/tests/qemu-iotests/082.out
-+++ b/tests/qemu-iotests/082.out
-@@ -242,7 +242,7 @@ Testing: create -f qcow2 -o backing_file=3DTEST_DIR/t=
-.qcow2 -o ,, -o help TEST_DIR
- qemu-img: Invalid option list: ,,
-=20
- Testing: create -f qcow2 -o help
--Supported options:
-+Supported qcow2 options:
-   backing_file=3D<str>     - File name of a base image
-   backing_fmt=3D<str>      - Image format of the base image
-   cluster_size=3D<size>    - qcow2 cluster size
-@@ -263,10 +263,16 @@ Supported options:
-   refcount_bits=3D<num>    - Width of a reference count entry in bits
-   size=3D<size>            - Virtual disk size
-=20
-+The protocol level may support further options.
-+Specify the target filename to include those options.
-+
- Testing: create -o help
--Supported options:
-+Supported raw options:
-   size=3D<size>            - Virtual disk size
-=20
-+The protocol level may support further options.
-+Specify the target filename to include those options.
-+
- Testing: create -f bochs -o help
- qemu-img: Format driver 'bochs' does not support image creation
-=20
-@@ -516,7 +522,7 @@ Testing: convert -O qcow2 -o backing_file=3DTEST_DIR/=
-t.qcow2 -o ,, -o help TEST_DI
- qemu-img: Invalid option list: ,,
-=20
- Testing: convert -O qcow2 -o help
--Supported options:
-+Supported qcow2 options:
-   backing_file=3D<str>     - File name of a base image
-   backing_fmt=3D<str>      - Image format of the base image
-   cluster_size=3D<size>    - qcow2 cluster size
-@@ -537,10 +543,16 @@ Supported options:
-   refcount_bits=3D<num>    - Width of a reference count entry in bits
-   size=3D<size>            - Virtual disk size
-=20
-+The protocol level may support further options.
-+Specify the target filename to include those options.
-+
- Testing: convert -o help
--Supported options:
-+Supported raw options:
-   size=3D<size>            - Virtual disk size
-=20
-+The protocol level may support further options.
-+Specify the target filename to include those options.
-+
- Testing: convert -O bochs -o help
- qemu-img: Format driver 'bochs' does not support image creation
-=20
---=20
-2.20.1
+for you to fetch changes up to 54277a2aab876aba7b55c7e88e2b372691849741:
+
+  block/qed: add missed coroutine_fn markers (2019-04-30 15:29:00 +0200)
+
+----------------------------------------------------------------
+Block layer patches:
+
+- iotests: Fix output of qemu-io related tests
+- Don't ignore bdrv_set_aio_context() for nodes with bs->drv =3D NUL
+- vmdk: Set vmdk parent backing_format to vmdk
+- qcow2: Preallocation fixes (especially for external data files)
+- Add linear-buffer-based APIs (as wrappers around qiov-based ones)
+- Various code cleanups and small corner case fixes
+
+----------------------------------------------------------------
+Alberto Garcia (3):
+      qcow2: Fix error handling in the compression code
+      commit: Make base read-only if there is an early failure
+      iotests: Check that images are in read-only mode after block-commit
+
+Eric Blake (2):
+      cutils: Fix size_to_str() on 32-bit platforms
+      qemu-img: Saner printing of large file sizes
+
+Kevin Wolf (5):
+      block: Fix AioContext switch for bs->drv =3D=3D NULL
+      qcow2: Avoid COW during metadata preallocation
+      qcow2: Add errp to preallocate_co()
+      qcow2: Fix full preallocation with external data file
+      qcow2: Fix qcow2_make_empty() with external data file
+
+Max Reitz (2):
+      iotests: Perform the correct test in 082
+      qemu-img: Make create hint at protocol options
+
+Sam Eiderman (1):
+      vmdk: Set vmdk parent backing_format to vmdk
+
+Stefano Garzarella (2):
+      block/vhdx: Remove redundant IEC binary prefixes definition
+      block/vhdx: Use IEC binary prefixes for size constants
+
+Thomas Huth (1):
+      tests/qemu-iotests: Fix output of qemu-io related tests
+
+Vladimir Sementsov-Ogievskiy (10):
+      block: introduce byte-based io helpers
+      block/qcow2: use buffer-based io
+      block/qcow: use buffer-based io
+      block/qed: use buffer-based io
+      block/parallels: use buffer-based io
+      block/backup: use buffer-based io
+      block/commit: use buffer-based io
+      block/stream: use buffer-based io
+      qemu-img: use buffer-based io
+      block/qed: add missed coroutine_fn markers
+
+Zhengui li (1):
+      vpc: unlock Coroutine lock to make IO submit Concurrently
+
+ block/qed.h                    |  28 ++++---
+ block/vhdx.h                   |  16 ++--
+ include/block/block_int.h      |  16 ++++
+ include/sysemu/block-backend.h |  19 +++++
+ block.c                        |  12 +--
+ block/backup.c                 |  14 ++--
+ block/commit.c                 |   8 +-
+ block/parallels.c              |  14 ++--
+ block/qapi.c                   |  49 +++---------
+ block/qcow.c                   |  19 ++---
+ block/qcow2.c                  |  80 ++++++++++----------
+ block/qed-check.c              |   4 +-
+ block/qed-table.c              |  45 ++++++-----
+ block/qed.c                    |  11 ++-
+ block/stream.c                 |   4 +-
+ block/vhdx-log.c               |   2 +-
+ block/vhdx.c                   |   7 +-
+ block/vmdk.c                   |   2 +
+ block/vpc.c                    |   4 +
+ qemu-img.c                     |  26 ++++---
+ util/cutils.c                  |   2 +-
+ tests/qemu-iotests/026.out     | 168 ++++++++++++++++++++---------------=
+------
+ tests/qemu-iotests/043.out     |   6 +-
+ tests/qemu-iotests/053.out     |   2 +-
+ tests/qemu-iotests/059.out     |  10 +--
+ tests/qemu-iotests/060.out     |  16 ++--
+ tests/qemu-iotests/061.out     |  12 +--
+ tests/qemu-iotests/069.out     |   2 +-
+ tests/qemu-iotests/070.out     |   4 +-
+ tests/qemu-iotests/075.out     |  14 ++--
+ tests/qemu-iotests/076.out     |   6 +-
+ tests/qemu-iotests/078.out     |  12 +--
+ tests/qemu-iotests/080.out     |  40 +++++-----
+ tests/qemu-iotests/081.out     |   2 +-
+ tests/qemu-iotests/082         |   5 +-
+ tests/qemu-iotests/082.out     |  51 ++++++++-----
+ tests/qemu-iotests/084.out     |   8 +-
+ tests/qemu-iotests/088.out     |  12 +--
+ tests/qemu-iotests/089.out     |   2 +-
+ tests/qemu-iotests/095.out     |   4 +-
+ tests/qemu-iotests/103.out     |  14 ++--
+ tests/qemu-iotests/104.out     |   6 +-
+ tests/qemu-iotests/110.out     |   6 +-
+ tests/qemu-iotests/114.out     |   4 +-
+ tests/qemu-iotests/116.out     |  14 ++--
+ tests/qemu-iotests/126.out     |   4 +-
+ tests/qemu-iotests/130.out     |  10 +--
+ tests/qemu-iotests/131.out     |   2 +-
+ tests/qemu-iotests/133.out     |  30 ++++----
+ tests/qemu-iotests/137.out     |  28 +++----
+ tests/qemu-iotests/140.out     |   2 +-
+ tests/qemu-iotests/143.out     |   2 +-
+ tests/qemu-iotests/153.out     |  32 ++++----
+ tests/qemu-iotests/187.out     |   6 +-
+ tests/qemu-iotests/188.out     |   2 +-
+ tests/qemu-iotests/191.out     |   8 +-
+ tests/qemu-iotests/195.out     |   4 +-
+ tests/qemu-iotests/197.out     |   2 +-
+ tests/qemu-iotests/198.out     |   4 +-
+ tests/qemu-iotests/205         |   2 +-
+ tests/qemu-iotests/206.out     |  10 +--
+ tests/qemu-iotests/207.out     |  12 +--
+ tests/qemu-iotests/210.out     |   8 +-
+ tests/qemu-iotests/211.out     |  10 +--
+ tests/qemu-iotests/212.out     |  10 +--
+ tests/qemu-iotests/213.out     |  10 +--
+ tests/qemu-iotests/215.out     |   2 +-
+ tests/qemu-iotests/226.out     |  16 ++--
+ tests/qemu-iotests/233.out     |   4 +-
+ tests/qemu-iotests/237.out     |  22 +++---
+ tests/qemu-iotests/242.out     |  10 +--
+ tests/qemu-iotests/244.out     |  10 +--
+ tests/qemu-iotests/249         | 115 ++++++++++++++++++++++++++++
+ tests/qemu-iotests/249.out     |  35 +++++++++
+ tests/qemu-iotests/group       |   1 +
+ 75 files changed, 696 insertions(+), 519 deletions(-)
+ create mode 100755 tests/qemu-iotests/249
+ create mode 100644 tests/qemu-iotests/249.out
