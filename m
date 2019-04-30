@@ -2,48 +2,49 @@ Return-Path: <SRS0=TP+Q=TA=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_PASS autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1518BC43219
-	for <qemu-devel@archiver.kernel.org>; Tue, 30 Apr 2019 14:57:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E5F33C43219
+	for <qemu-devel@archiver.kernel.org>; Tue, 30 Apr 2019 15:04:23 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id DD6F220651
-	for <qemu-devel@archiver.kernel.org>; Tue, 30 Apr 2019 14:57:37 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DD6F220651
+	by mail.kernel.org (Postfix) with ESMTPS id A650620652
+	for <qemu-devel@archiver.kernel.org>; Tue, 30 Apr 2019 15:04:23 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A650620652
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:48286 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:48342 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hLUCP-0005j0-5t
-	for qemu-devel@archiver.kernel.org; Tue, 30 Apr 2019 10:57:37 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:37484)
+	id 1hLUIw-0007nL-Rt
+	for qemu-devel@archiver.kernel.org; Tue, 30 Apr 2019 11:04:22 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:39130)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1hLUBN-0005Bv-FJ
-	for qemu-devel@nongnu.org; Tue, 30 Apr 2019 10:56:38 -0400
+	(envelope-from <eblake@redhat.com>) id 1hLUHp-0007Te-BB
+	for qemu-devel@nongnu.org; Tue, 30 Apr 2019 11:03:18 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1hLUBK-0007zg-QF
-	for qemu-devel@nongnu.org; Tue, 30 Apr 2019 10:56:32 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:40486)
+	(envelope-from <eblake@redhat.com>) id 1hLUHo-0004mN-7n
+	for qemu-devel@nongnu.org; Tue, 30 Apr 2019 11:03:13 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:47946)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <eblake@redhat.com>)
-	id 1hLUBF-0007wh-68; Tue, 30 Apr 2019 10:56:26 -0400
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
-	[10.5.11.13])
+	id 1hLUHn-0004lj-V9; Tue, 30 Apr 2019 11:03:12 -0400
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+	[10.5.11.22])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 4753A308622F;
-	Tue, 30 Apr 2019 14:56:22 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id D1ECCC059B7A;
+	Tue, 30 Apr 2019 15:03:09 +0000 (UTC)
 Received: from [10.3.116.15] (ovpn-116-15.phx2.redhat.com [10.3.116.15])
-	by smtp.corp.redhat.com (Postfix) with ESMTPS id 98CB8438A;
-	Tue, 30 Apr 2019 14:56:21 +0000 (UTC)
-To: Denis Plotnikov <dplotnikov@virtuozzo.com>, kwolf@redhat.com,
-	mreitz@redhat.com
-References: <20190205090825.14059-1-dplotnikov@virtuozzo.com>
+	by smtp.corp.redhat.com (Postfix) with ESMTPS id 9B7611001E66;
+	Tue, 30 Apr 2019 15:03:06 +0000 (UTC)
+To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
+	Boxuan Li <liboxuan@connect.hku.hk>, qemu-devel@nongnu.org
+References: <20190428110258.86681-1-liboxuan@connect.hku.hk>
+	<a683a29f-ea7b-aaf9-258f-68f4ffcd9b96@redhat.com>
 From: Eric Blake <eblake@redhat.com>
 Openpgp: preference=signencrypt
 Autocrypt: addr=eblake@redhat.com; keydata=
@@ -70,23 +71,23 @@ Autocrypt: addr=eblake@redhat.com; keydata=
 	Dp6/QDjDFtfS39bHSWXKVZUbqaMPqlj/z6Ugk027/3GUjHHr8WkeL1ezWepYDY7WSoXwfoAL
 	2UXYsMAr/uUncSKlfjvArhsej0S4zbqim2ZY6S8aRWw94J3bSvJR+Nwbs34GPTD4Pg==
 Organization: Red Hat, Inc.
-Message-ID: <dd8e89d4-b9eb-da1f-5afa-52c3399cf7e5@redhat.com>
-Date: Tue, 30 Apr 2019 09:56:20 -0500
+Message-ID: <5fe13664-cabc-6fc9-7437-285cc1452944@redhat.com>
+Date: Tue, 30 Apr 2019 10:03:05 -0500
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
 	Thunderbird/60.6.1
 MIME-Version: 1.0
-In-Reply-To: <20190205090825.14059-1-dplotnikov@virtuozzo.com>
+In-Reply-To: <a683a29f-ea7b-aaf9-258f-68f4ffcd9b96@redhat.com>
 Content-Type: multipart/signed; micalg=pgp-sha256;
 	protocol="application/pgp-signature";
-	boundary="KM2JIEuPxsez22lvFycvPTytsdfFe6E95"
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+	boundary="2MqIhRHehvafaaPeCANYMcdExHqA49PDl"
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.42]);
-	Tue, 30 Apr 2019 14:56:22 +0000 (UTC)
+	(mx1.redhat.com [10.5.110.32]);
+	Tue, 30 Apr 2019 15:03:10 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
 X-Content-Filtered-By: Mailman/MimeDel 2.1.21
-Subject: Re: [Qemu-devel] [PATCH] [RFC] qcow2: add compression type feature
+Subject: Re: [Qemu-devel] [PATCH] virtio-mmio: Always compile debug prints
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -98,76 +99,103 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org, den@virtuozzo.com
+Cc: qemu-trivial@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190430145620.1z04w2BkeKBKDEJq93BxRloVD84suhpJJ-jLtlaO1U4@z>
+Message-ID: <20190430150305.Klf9vUhKTKY6nEEY-1P-y48zSoRwYMsV6Js3P2XSgvs@z>
 
 This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---KM2JIEuPxsez22lvFycvPTytsdfFe6E95
+--2MqIhRHehvafaaPeCANYMcdExHqA49PDl
 From: Eric Blake <eblake@redhat.com>
-To: Denis Plotnikov <dplotnikov@virtuozzo.com>, kwolf@redhat.com,
- mreitz@redhat.com
-Cc: qemu-block@nongnu.org, qemu-devel@nongnu.org, den@virtuozzo.com
-Message-ID: <dd8e89d4-b9eb-da1f-5afa-52c3399cf7e5@redhat.com>
-Subject: Re: [PATCH] [RFC] qcow2: add compression type feature
-References: <20190205090825.14059-1-dplotnikov@virtuozzo.com>
-In-Reply-To: <20190205090825.14059-1-dplotnikov@virtuozzo.com>
+To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
+ Boxuan Li <liboxuan@connect.hku.hk>, qemu-devel@nongnu.org
+Cc: qemu-trivial@nongnu.org
+Message-ID: <5fe13664-cabc-6fc9-7437-285cc1452944@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH] virtio-mmio: Always compile debug prints
+References: <20190428110258.86681-1-liboxuan@connect.hku.hk>
+ <a683a29f-ea7b-aaf9-258f-68f4ffcd9b96@redhat.com>
+In-Reply-To: <a683a29f-ea7b-aaf9-258f-68f4ffcd9b96@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
 
-On 2/5/19 3:08 AM, Denis Plotnikov wrote:
-> The patch adds some preparation parts for incompatible compression type=
-
-> feature into QCOW2 header that indicates that *all* compressed clusters=
-
-> must be (de)compressed using a certain compression type.
+On 4/30/19 5:15 AM, Philippe Mathieu-Daud=C3=A9 wrote:
+> Hi Li,
 >=20
-> It is implied that the compression type is set on the image creation an=
-d
-> can be changed only later by image convertion, thus the only compressio=
-n
+> On 4/28/19 1:02 PM, Boxuan Li wrote:
+>> Wrap printf calls inside debug macros (DPRINTF) in `if` statement, and=
 
-s/convertion/conversion/
+>> change output to stderr as well. This will ensure that printf function=
 
-> algorithm is used for the image.
+>> will always compile and prevent bitrot of the format strings.
 >=20
-> The plan is to add support for ZSTD and then may be something more effe=
-ctive
-> in the future.
+> There is an effort in QEMU to replace the obsolete DPRINTF() macros by
+> trace events (which prevent format strings bitroting).
+
+Trace events are even more powerful than conditional debugs (in that you
+can turn them on or off at runtime, instead of compile time). But
+incremental improvements are still better than nothing.
+
+
+>>
+>> diff --git a/hw/virtio/virtio-mmio.c b/hw/virtio/virtio-mmio.c
+>> index 5807aa87fe..693b3c9eb4 100644
+>> --- a/hw/virtio/virtio-mmio.c
+>> +++ b/hw/virtio/virtio-mmio.c
+>> @@ -28,15 +28,14 @@
+>>  #include "hw/virtio/virtio-bus.h"
+>>  #include "qemu/error-report.h"
+>> =20
+>> -/* #define DEBUG_VIRTIO_MMIO */
+>> -
+>> -#ifdef DEBUG_VIRTIO_MMIO
+
+The old code let a user pass CFLAGS=3D-DDEBUG_VIRTIO_MMIO to turn things =
+on...
+
+>> -
+>> -#define DPRINTF(fmt, ...) \
+>> -do { printf("virtio_mmio: " fmt , ## __VA_ARGS__); } while (0)
+>> -#else
+>> -#define DPRINTF(fmt, ...) do {} while (0)
+>> -#endif
+>> +#define DEBUG_VIRTIO_MMIO 0
+
+=2E..the new code requires a source code edit. This can be considered a
+step backwards in developer friendliness.  Better might be:
+
+#ifdef DEBUG_VIRTIO_MMIO
+#define DEBUG_VIRTIO_MMIO_PRINT 1
+#else
+#define DEBUG_VIRTIO_MMIO_PRINT 0
+#endif
+
+>> +
+>> +#define DPRINTF(fmt, ...)                                            =
+\
+>> +    do {                                                             =
+\
+>> +        if (DEBUG_VIRTIO_MMIO) {                                     =
+\
+
+and the corresponding use of DEBUG_VIRTIO_MMIO_PRINT here, so that you
+preserve the ability to do a command-line CFLAGS=3D-D override, rather
+than forcing a source code edit.
+
+>> +            fprintf(stderr, "virtio_mmio: " fmt , ## __VA_ARGS__);   =
+\
+
+No space before ,
+
+>> +        }                                                            =
+\
+>> +    } while (0)
+>> =20
+>>  /* QOM macros */
+>>  /* virtio-mmio-bus */
+>>
 >=20
-> ZSDT compression algorithm consumes 3-5 times less CPU power with a
-
-s/ZSDT/ZSTD/
-
-> comparable comression ratio with zlib. It would be wise to use it for
-
-s/comression/compression/
-
-> data compression f.e. for backups.
 >=20
-> The default compression is ZLIB.
->=20
-> Signed-off-by: Denis Plotnikov <dplotnikov@virtuozzo.com>
-> ---
->  block/qcow2.c | 25 +++++++++++++++++++++++++
->  block/qcow2.h | 26 ++++++++++++++++++++++----
->  2 files changed, 47 insertions(+), 4 deletions(-)
->=20
-> diff --git a/block/qcow2.c b/block/qcow2.c
-> index 8c91b92865..cb3d6cc1c0 100644
-> --- a/block/qcow2.c
-> +++ b/block/qcow2.c
-> @@ -73,6 +73,7 @@ typedef struct {
->  #define  QCOW2_EXT_MAGIC_FEATURE_TABLE 0x6803f857
->  #define  QCOW2_EXT_MAGIC_CRYPTO_HEADER 0x0537be77
->  #define  QCOW2_EXT_MAGIC_BITMAPS 0x23852875
-> +#define  QCOW2_EXT_MAGIC_COMPRESSION_TYPE 0x434D5052
-
-This appears to be adding a new header extension magic number, but
-didn't actually modify the specification. I'd expect this patch to touch
-docs/interop/qcow2.txt before it can be considered complete.
 
 --=20
 Eric Blake, Principal Software Engineer
@@ -175,22 +203,22 @@ Red Hat, Inc.           +1-919-301-3226
 Virtualization:  qemu.org | libvirt.org
 
 
---KM2JIEuPxsez22lvFycvPTytsdfFe6E95
+--2MqIhRHehvafaaPeCANYMcdExHqA49PDl
 Content-Type: application/pgp-signature; name="signature.asc"
 Content-Description: OpenPGP digital signature
 Content-Disposition: attachment; filename="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlzIYhQACgkQp6FrSiUn
-Q2rmiggAqzP0L8JnSkfqyUKjaopPtS+F8W2w+RmzssZuAkJifk0yLOkVwtcW4EVH
-St15IHLsPTlhyuYo89v4Jno530E0Lnu8EX9MAXhkisZ9aGT6k3T5b2GBQxQCmXyy
-Enq+XHR5+ookoNywn51l+xDb5wZq87eKxJZOMi9jOmN+TE3HU9RwI66V6VMYw1tu
-7vK9yUYIPGccbulSuSDcY3wBzfHC7HZem2nGymbj/Zc6/cVgB19PQiVR9+UTUXR2
-hmqN0F+pqcBO5WxbGnuUOaL8LfG8XKKgpZRYmijQjOEeL6KkHULvzHJPH7Vg0970
-1BtLk+5d3OosZkBwyXlNTSs6Ot990w==
-=x0uO
+iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlzIY6kACgkQp6FrSiUn
+Q2ohCAf+O2qzgwj4/OP37+rMmBJK9d1ZYizKAcHPgFU3kvzcvnkQRz8hs+FEWo7H
+qN4R/RGqSiP7T+o/xqymHltFFumqegI1aG11IZf38qohr7j4MWVxdhWxFBwsgqXx
+rcMe7pV/XroFXS2RlMi05Lp3uUIDFRq0DmL0L+xm+82eMveNlqJv6SRQIeV1idwm
+ZPehg9LpWsTQvL4QhEwX7zsJ+EvXUMBtuGxaPX98hmE2euqo40CCi3D5tISdfIrN
+W3PjG7MxMML7RJqupcatJ0DRr1FkKXAQRtml0LTpLjL7X7NYKxEYEHQQITA6+Ea9
+P7Q4zhns+hMmoJYjEaOTppyIZft15w==
+=DNmD
 -----END PGP SIGNATURE-----
 
---KM2JIEuPxsez22lvFycvPTytsdfFe6E95--
+--2MqIhRHehvafaaPeCANYMcdExHqA49PDl--
 
