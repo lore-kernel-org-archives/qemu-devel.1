@@ -1,24 +1,26 @@
-Received: from eggs.gnu.org ([209.51.188.92]:34978)
+Received: from eggs.gnu.org ([209.51.188.92]:35215)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1hLPq8-0001iV-Gg
-	for qemu-devel@nongnu.org; Tue, 30 Apr 2019 06:18:21 -0400
+	(envelope-from <berrange@redhat.com>) id 1hLPqU-00027N-Dz
+	for qemu-devel@nongnu.org; Tue, 30 Apr 2019 06:18:43 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1hLPbW-0002B8-UK
-	for qemu-devel@nongnu.org; Tue, 30 Apr 2019 06:03:16 -0400
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Date: Tue, 30 Apr 2019 10:03:08 +0000
-Message-ID: <4dabb261-f2d1-b6e0-8d97-ace159b87a54@virtuozzo.com>
-References: <20190423125706.26989-1-vsementsov@virtuozzo.com>
-	<20190423125706.26989-3-vsementsov@virtuozzo.com>
-	<20190430092437.jbecehdkqa4zdavd@steredhat>
-In-Reply-To: <20190430092437.jbecehdkqa4zdavd@steredhat>
-Content-Language: en-US
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <0D5930E6165D1446B5843BC93F12F60C@eurprd08.prod.outlook.com>
-Content-Transfer-Encoding: base64
+	(envelope-from <berrange@redhat.com>) id 1hLPqT-000353-8X
+	for qemu-devel@nongnu.org; Tue, 30 Apr 2019 06:18:42 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:42768)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1hLPqT-00034Y-2X
+	for qemu-devel@nongnu.org; Tue, 30 Apr 2019 06:18:41 -0400
+Date: Tue, 30 Apr 2019 11:18:33 +0100
+From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+Message-ID: <20190430101833.GC6818@redhat.com>
+Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+References: <20190427135642.16464-1-philmd@redhat.com>
 MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [PATCH v5 2/3] block/io: bdrv_pdiscard: support
- int64_t bytes parameter
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20190427135642.16464-1-philmd@redhat.com>
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH] qom/object: Display more helpful message
+ when an object type is missing
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,71 +29,69 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefano Garzarella <sgarzare@redhat.com>
-Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>, "kwolf@redhat.com" <kwolf@redhat.com>, "fam@euphon.net" <fam@euphon.net>, Denis Lunev <den@virtuozzo.com>, "mreitz@redhat.com" <mreitz@redhat.com>, "stefanha@redhat.com" <stefanha@redhat.com>
+To: Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>
+Cc: Eduardo Habkost <ehabkost@redhat.com>, qemu-devel@nongnu.org, Andreas =?utf-8?Q?F=C3=A4rber?= <afaerber@suse.de>, Eric Blake <eblake@redhat.com>, Markus Armbruster <armbru@redhat.com>
 
-MzAuMDQuMjAxOSAxMjoyNCwgU3RlZmFubyBHYXJ6YXJlbGxhIHdyb3RlOg0KPiBPbiBUdWUsIEFw
-ciAyMywgMjAxOSBhdCAwMzo1NzowNVBNICswMzAwLCBWbGFkaW1pciBTZW1lbnRzb3YtT2dpZXZz
-a2l5IHdyb3RlOg0KPj4gVGhpcyBmaXhlcyBhdCBsZWFzdCBvbmUgb3ZlcmZsb3cgaW4gcWNvdzJf
-cHJvY2Vzc19kaXNjYXJkcywgd2hpY2gNCj4+IHBhc3NlcyA2NGJpdCByZWdpb24gbGVuZ3RoIHRv
-IGJkcnZfcGRpc2NhcmQgd2hlcmUgYnl0ZXMgKG9yIHNlY3RvcnMgaW4NCj4+IHRoZSBwYXN0KSBw
-YXJhbWV0ZXIgaXMgaW50IHNpbmNlIGl0cyBpbnRyb2R1Y3Rpb24gaW4gMGI5MTlmYWUuDQo+Pg0K
-Pj4gU2lnbmVkLW9mZi1ieTogVmxhZGltaXIgU2VtZW50c292LU9naWV2c2tpeSA8dnNlbWVudHNv
-dkB2aXJ0dW96em8uY29tPg0KPj4gLS0tDQo+PiAgIGluY2x1ZGUvYmxvY2svYmxvY2suaCB8ICA0
-ICsrLS0NCj4+ICAgYmxvY2svaW8uYyAgICAgICAgICAgIHwgMTYgKysrKysrKystLS0tLS0tLQ0K
-Pj4gICAyIGZpbGVzIGNoYW5nZWQsIDEwIGluc2VydGlvbnMoKyksIDEwIGRlbGV0aW9ucygtKQ0K
-Pj4NCj4+IGRpZmYgLS1naXQgYS9pbmNsdWRlL2Jsb2NrL2Jsb2NrLmggYi9pbmNsdWRlL2Jsb2Nr
-L2Jsb2NrLmgNCj4+IGluZGV4IGM3YTI2MTk5YWEuLjY5ZmExODg2N2UgMTAwNjQ0DQo+PiAtLS0g
-YS9pbmNsdWRlL2Jsb2NrL2Jsb2NrLmgNCj4+ICsrKyBiL2luY2x1ZGUvYmxvY2svYmxvY2suaA0K
-Pj4gQEAgLTQzMiw4ICs0MzIsOCBAQCB2b2lkIGJkcnZfZHJhaW5fYWxsKHZvaWQpOw0KPj4gICAg
-ICAgQUlPX1dBSVRfV0hJTEUoYmRydl9nZXRfYWlvX2NvbnRleHQoYnNfKSwgICAgICAgICAgICAg
-IFwNCj4+ICAgICAgICAgICAgICAgICAgICAgIGNvbmQpOyB9KQ0KPj4gICANCj4+IC1pbnQgYmRy
-dl9wZGlzY2FyZChCZHJ2Q2hpbGQgKmNoaWxkLCBpbnQ2NF90IG9mZnNldCwgaW50IGJ5dGVzKTsN
-Cj4+IC1pbnQgYmRydl9jb19wZGlzY2FyZChCZHJ2Q2hpbGQgKmNoaWxkLCBpbnQ2NF90IG9mZnNl
-dCwgaW50IGJ5dGVzKTsNCj4+ICtpbnQgYmRydl9wZGlzY2FyZChCZHJ2Q2hpbGQgKmNoaWxkLCBp
-bnQ2NF90IG9mZnNldCwgaW50NjRfdCBieXRlcyk7DQo+PiAraW50IGJkcnZfY29fcGRpc2NhcmQo
-QmRydkNoaWxkICpjaGlsZCwgaW50NjRfdCBvZmZzZXQsIGludDY0X3QgYnl0ZXMpOw0KPj4gICBp
-bnQgYmRydl9oYXNfemVyb19pbml0XzEoQmxvY2tEcml2ZXJTdGF0ZSAqYnMpOw0KPj4gICBpbnQg
-YmRydl9oYXNfemVyb19pbml0KEJsb2NrRHJpdmVyU3RhdGUgKmJzKTsNCj4+ICAgYm9vbCBiZHJ2
-X3VuYWxsb2NhdGVkX2Jsb2Nrc19hcmVfemVybyhCbG9ja0RyaXZlclN0YXRlICpicyk7DQo+PiBk
-aWZmIC0tZ2l0IGEvYmxvY2svaW8uYyBiL2Jsb2NrL2lvLmMNCj4+IGluZGV4IGRmYzE1M2I4ZDgu
-LjE2YjZjNWQ4NTUgMTAwNjQ0DQo+PiAtLS0gYS9ibG9jay9pby5jDQo+PiArKysgYi9ibG9jay9p
-by5jDQo+PiBAQCAtMjY1Myw3ICsyNjUzLDcgQEAgaW50IGJkcnZfZmx1c2goQmxvY2tEcml2ZXJT
-dGF0ZSAqYnMpDQo+PiAgIHR5cGVkZWYgc3RydWN0IERpc2NhcmRDbyB7DQo+PiAgICAgICBCZHJ2
-Q2hpbGQgKmNoaWxkOw0KPj4gICAgICAgaW50NjRfdCBvZmZzZXQ7DQo+PiAtICAgIGludCBieXRl
-czsNCj4+ICsgICAgaW50NjRfdCBieXRlczsNCj4+ICAgICAgIGludCByZXQ7DQo+PiAgIH0gRGlz
-Y2FyZENvOw0KPj4gICBzdGF0aWMgdm9pZCBjb3JvdXRpbmVfZm4gYmRydl9wZGlzY2FyZF9jb19l
-bnRyeSh2b2lkICpvcGFxdWUpDQo+PiBAQCAtMjY2NCwxNCArMjY2NCwxNSBAQCBzdGF0aWMgdm9p
-ZCBjb3JvdXRpbmVfZm4gYmRydl9wZGlzY2FyZF9jb19lbnRyeSh2b2lkICpvcGFxdWUpDQo+PiAg
-ICAgICBhaW9fd2FpdF9raWNrKCk7DQo+PiAgIH0NCj4+ICAgDQo+PiAtaW50IGNvcm91dGluZV9m
-biBiZHJ2X2NvX3BkaXNjYXJkKEJkcnZDaGlsZCAqY2hpbGQsIGludDY0X3Qgb2Zmc2V0LCBpbnQg
-Ynl0ZXMpDQo+PiAraW50IGNvcm91dGluZV9mbiBiZHJ2X2NvX3BkaXNjYXJkKEJkcnZDaGlsZCAq
-Y2hpbGQsIGludDY0X3Qgb2Zmc2V0LA0KPj4gKyAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICBpbnQ2NF90IGJ5dGVzKQ0KPj4gICB7DQo+PiAgICAgICBCZHJ2VHJhY2tlZFJlcXVlc3Qg
-cmVxOw0KPj4gICAgICAgaW50IG1heF9wZGlzY2FyZCwgcmV0Ow0KPj4gICAgICAgaW50IGhlYWQs
-IHRhaWwsIGFsaWduOw0KPj4gICAgICAgQmxvY2tEcml2ZXJTdGF0ZSAqYnMgPSBjaGlsZC0+YnM7
-DQo+PiAgIA0KPj4gLSAgICBpZiAoIWJzIHx8ICFicy0+ZHJ2KSB7DQo+PiArICAgIGlmICghYnMg
-fHwgIWJzLT5kcnYgfHwgIWJkcnZfaXNfaW5zZXJ0ZWQoYnMpKSB7DQo+IA0KPiBTaG91bGQgd2Ug
-ZGVzY3JpYmUgdGhpcyBjaGFuZ2UgaW4gdGhlIGNvbW1pdCBtZXNzYWdlPw0KDQpIb25lc3RseSwg
-ZG9uJ3Qgd2FudCB0byByZXNlbmQgdGhlIHNlcmllcyBmb3IgdGhpcy4NCg0KPiBJSVVDIHlvdSBh
-ZGRlZCB0aGlzIGNoZWNrIGJlY2F1c2UgeW91IHJlbW92ZWQgYmRydl9jaGVja19ieXRlX3JlcXVl
-c3QoKQ0KPiBiZWxvdywNCj4gDQo+IE1heWJlIHdlIGNhbiBhbHNvIHJlbW92ZSAnIWJzLT5kcnYn
-LCBzaW5jZSBpdCBpcyBjaGVja2VkIGluDQo+IGJkcnZfaXNfaW5zZXJ0ZWQoKS4NCg0KSG1tLCBv
-biB2NCBLZXZpbiBjb21tZW50ZWQsIHRoYXQgYmRydl9pc19pbnNlcnRlZCBub3QgbmVlZGVkLCBh
-bmQsIGFzIEkgdW5kZXJzdGFuZCwgbm90IG9ubHkNCmluIGJkcnZfY29fcGRpc2NhcmQgaXQgc2hv
-dWxkIGJlIHJlbW92ZWQsIGJ1dCBpdCBtYXkgYmUgZG9uZSBsYXRlci4gU28sIEknZCBwcmVmZXIg
-dG8ga2VlcCBpdA0KYXMgaXMgZm9yIG5vdy4NCg0KPiANCj4+ICAgICAgICAgICByZXR1cm4gLUVO
-T01FRElVTTsNCj4+ICAgICAgIH0NCj4+ICAgDQo+PiBAQCAtMjY3OSw5ICsyNjgwLDggQEAgaW50
-IGNvcm91dGluZV9mbiBiZHJ2X2NvX3BkaXNjYXJkKEJkcnZDaGlsZCAqY2hpbGQsIGludDY0X3Qg
-b2Zmc2V0LCBpbnQgYnl0ZXMpDQo+PiAgICAgICAgICAgcmV0dXJuIC1FUEVSTTsNCj4+ICAgICAg
-IH0NCj4+ICAgDQo+PiAtICAgIHJldCA9IGJkcnZfY2hlY2tfYnl0ZV9yZXF1ZXN0KGJzLCBvZmZz
-ZXQsIGJ5dGVzKTsNCj4+IC0gICAgaWYgKHJldCA8IDApIHsNCj4+IC0gICAgICAgIHJldHVybiBy
-ZXQ7DQo+PiArICAgIGlmIChvZmZzZXQgPCAwIHx8IGJ5dGVzIDwgMCB8fCBieXRlcyA+IElOVDY0
-X01BWCAtIG9mZnNldCkgew0KPj4gKyAgICAgICAgcmV0dXJuIC1FSU87DQo+PiAgICAgICB9DQo+
-IA0KPiBTaG91bGQgd2UgY2hlY2sgaWYgJ2J5dGVzJyBpcyBncmVhdGVyIHRoYW4NCj4gJ0JEUlZf
-UkVRVUVTVF9NQVhfU0VDVE9SUyA8PCBCRFJWX1NFQ1RPUl9CSVRTJz8NCj4gDQoNCk5vLCBhcyB3
-ZSBhcmUgY29udHJhcml3aXNlIHRyeWluZyB0byBzdXBwb3J0IGxhcmdlIGJ5dGVzIHBhcmFtZXRl
-ciBpbiBiZHJ2X2NvX3BkaXNjYXJkLCB3aGljaCB3aWxsDQpleGNlZWQgbWF4IHJlcXVlc3QuIElm
-IEBieXRlcyBpcyBsYXJnZSwgaXQgd2lsbCBiZSBkaXZpZGVkIGludG8gc2V2ZXJhbCBzbWFsbGVy
-IHJlcXVlc3RzIGluIHRoZQ0KZm9sbG93aW5nIGxvb3AuDQoNCg0KLS0gDQpCZXN0IHJlZ2FyZHMs
-DQpWbGFkaW1pcg0K
+On Sat, Apr 27, 2019 at 03:56:42PM +0200, Philippe Mathieu-Daud=C3=A9 wro=
+te:
+> When writing a new board, adding device which uses other devices
+> (container) or simply refactoring, one can discover the hard way
+> his machine misses some devices. In the case of containers, the
+> error is not obvious:
+>=20
+>   $ qemu-system-microblaze -M xlnx-zynqmp-pmu
+>   **
+>   ERROR:/source/qemu/qom/object.c:454:object_initialize_with_type: asse=
+rtion failed: (type !=3D NULL)
+>   Aborted (core dumped)
+>=20
+> And we have to look at the coredump to figure the error:
+>=20
+>   (gdb) bt
+>   #1  0x00007f84773cf895 in abort () at /lib64/libc.so.6
+>   #2  0x00007f847961fb53 in  () at /lib64/libglib-2.0.so.0
+>   #3  0x00007f847967a4de in g_assertion_message_expr () at /lib64/libgl=
+ib-2.0.so.0
+>   #4  0x000055c4bcac6c11 in object_initialize_with_type (data=3Ddata@en=
+try=3D0x55c4bdf239e0, size=3Dsize@entry=3D2464, type=3D<optimized out>) a=
+t /source/qemu/qom/object.c:454
+>   #5  0x000055c4bcac6e6d in object_initialize (data=3Ddata@entry=3D0x55=
+c4bdf239e0, size=3Dsize@entry=3D2464, typename=3Dtypename@entry=3D0x55c4b=
+cc7c643 "xlnx.zynqmp_ipi") at /source/qemu/qom/object.c:474
+>   #6  0x000055c4bc9ea474 in xlnx_zynqmp_pmu_init (machine=3D0x55c4bdd46=
+000) at /source/qemu/hw/microblaze/xlnx-zynqmp-pmu.c:176
+>   #7  0x000055c4bca3b6cb in machine_run_board_init (machine=3D0x55c4bdd=
+46000) at /source/qemu/hw/core/machine.c:1030
+>   #8  0x000055c4bc95f6d2 in main (argc=3D<optimized out>, argv=3D<optim=
+ized out>, envp=3D<optimized out>) at /source/qemu/vl.c:4479
+>=20
+> Since the caller knows the type name requested, we can simply display i=
+t
+> to ease development.
+>=20
+> With this patch applied we get:
+>=20
+>   $ qemu-system-microblaze -M xlnx-zynqmp-pmu
+>   qemu-system-microblaze: missing object type 'xlnx.zynqmp_ipi'
+>   Aborted (core dumped)
+>=20
+> Since the assert(type) check in object_initialize_with_type() is
+> now impossible, remove it.
+>=20
+> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+> ---
+>  qom/object.c | 7 ++++++-
+>  1 file changed, 6 insertions(+), 1 deletion(-)
+
+Reviewed-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
+
+
+Regards,
+Daniel
+--=20
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberran=
+ge :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.c=
+om :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberran=
+ge :|
