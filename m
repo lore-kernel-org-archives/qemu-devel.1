@@ -5,48 +5,49 @@ X-Spam-Level:
 X-Spam-Status: No, score=-0.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	MAILING_LIST_MULTI,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 03D62C43219
-	for <qemu-devel@archiver.kernel.org>; Tue, 30 Apr 2019 23:11:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2B68EC43219
+	for <qemu-devel@archiver.kernel.org>; Tue, 30 Apr 2019 23:12:44 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id BA0CA20854
-	for <qemu-devel@archiver.kernel.org>; Tue, 30 Apr 2019 23:11:26 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BA0CA20854
+	by mail.kernel.org (Postfix) with ESMTPS id DF58E20854
+	for <qemu-devel@archiver.kernel.org>; Tue, 30 Apr 2019 23:12:43 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DF58E20854
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:54879 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:54885 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hLbuH-0007v3-W3
-	for qemu-devel@archiver.kernel.org; Tue, 30 Apr 2019 19:11:26 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:60059)
+	id 1hLbvX-00005E-7g
+	for qemu-devel@archiver.kernel.org; Tue, 30 Apr 2019 19:12:43 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:60430)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1hLbsv-00070S-T2
-	for qemu-devel@nongnu.org; Tue, 30 Apr 2019 19:10:02 -0400
+	(envelope-from <pbonzini@redhat.com>) id 1hLbui-0008Dj-Gl
+	for qemu-devel@nongnu.org; Tue, 30 Apr 2019 19:11:53 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1hLbsu-0006sv-V3
-	for qemu-devel@nongnu.org; Tue, 30 Apr 2019 19:10:01 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:51268)
+	(envelope-from <pbonzini@redhat.com>) id 1hLbuh-0007y2-KO
+	for qemu-devel@nongnu.org; Tue, 30 Apr 2019 19:11:52 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:53348)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1hLbsu-0006sE-Fg
-	for qemu-devel@nongnu.org; Tue, 30 Apr 2019 19:10:00 -0400
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
-	[10.5.11.15])
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1hLbuh-0007xo-Ce
+	for qemu-devel@nongnu.org; Tue, 30 Apr 2019 19:11:51 -0400
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+	[10.5.11.12])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 8449F81DF0
-	for <qemu-devel@nongnu.org>; Tue, 30 Apr 2019 23:09:58 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id 9856F30842A1;
+	Tue, 30 Apr 2019 23:11:50 +0000 (UTC)
 Received: from [10.36.112.20] (ovpn-112-20.ams2.redhat.com [10.36.112.20])
-	by smtp.corp.redhat.com (Postfix) with ESMTPS id 1878F5D705;
-	Tue, 30 Apr 2019 23:09:50 +0000 (UTC)
-To: Alex Williamson <alex.williamson@redhat.com>
-References: <20181220054037.24320-1-peterx@redhat.com>
-	<20181220054037.24320-2-peterx@redhat.com>
-	<20190426132744.2b594bf5@x1.home> <20190426150236.1af2ff08@x1.home>
-	<94415012.15677076.1556342950794.JavaMail.zimbra@redhat.com>
-	<daded638-42f1-9bc3-8c36-66b0fbba9438@redhat.com>
-	<20190429082106.4fd59e77@x1.home> <20190430170149.6c82398a@x1.home>
+	by smtp.corp.redhat.com (Postfix) with ESMTPS id 48E8E18979;
+	Tue, 30 Apr 2019 23:11:39 +0000 (UTC)
+To: "Michael S. Tsirkin" <mst@redhat.com>,
+	Eduardo Habkost <ehabkost@redhat.com>
+References: <20190426003652.32633-1-richardw.yang@linux.intel.com>
+	<20190426003652.32633-2-richardw.yang@linux.intel.com>
+	<20190430204636.GK28722@habkost.net>
+	<20190430223618.lyl3ribm7gg5haa5@master>
+	<20190430224816.GL28722@habkost.net>
+	<20190430185011-mutt-send-email-mst@kernel.org>
 From: Paolo Bonzini <pbonzini@redhat.com>
 Openpgp: preference=signencrypt
 Autocrypt: addr=pbonzini@redhat.com; prefer-encrypt=mutual; keydata=
@@ -104,23 +105,23 @@ Autocrypt: addr=pbonzini@redhat.com; prefer-encrypt=mutual; keydata=
 	DduC0U3xYkfbGAUvbxeepjgzp0uEnBXfPTy09JGpgWbg0w91GyfT/ujKaGd4vxG2Ei+MMNDm
 	S1SMx7wu0evvQ5kT9NPzyq8R2GIhVSiAd2jioGuTjX6AZCFv3ToO53DliFMkVTecLptsXaes
 	uUHgL9dKIfvpm+rNXRn9wAwGjk0X/A==
-Message-ID: <9de36ff8-78ec-8cb0-6c23-4c8ecc1efad9@redhat.com>
-Date: Wed, 1 May 2019 01:09:48 +0200
+Message-ID: <86e00247-588c-37c1-0737-82614a8f18c0@redhat.com>
+Date: Wed, 1 May 2019 01:11:34 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
 	Thunderbird/60.6.1
 MIME-Version: 1.0
-In-Reply-To: <20190430170149.6c82398a@x1.home>
+In-Reply-To: <20190430185011-mutt-send-email-mst@kernel.org>
 Content-Type: text/plain; charset="UTF-8"
 Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.25]);
-	Tue, 30 Apr 2019 23:09:58 +0000 (UTC)
-Content-Transfer-Encoding: quoted-printable
+	(mx1.redhat.com [10.5.110.40]);
+	Tue, 30 Apr 2019 23:11:50 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH v2 1/3] q35: set split kernel irqchip as
- default
+Subject: Re: [Qemu-devel] [PATCH v15 1/2] util/mmap-alloc: support MAP_SYNC
+ in qemu_ram_mmap()
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -132,38 +133,28 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Igor Mammedov <imammedo@redhat.com>, "Michael S . Tsirkin" <mst@redhat.com>,
-	qemu-devel@nongnu.org, Peter Xu <peterx@redhat.com>,
-	Eduardo Habkost <ehabkost@redhat.com>
+Cc: pagupta@redhat.com, xiaoguangrong.eric@gmail.com,
+	Haozhong Zhang <haozhong.zhang@intel.com>, qemu-devel@nongnu.org,
+	Wei Yang <richard.weiyang@gmail.com>, yi.z.zhang@linux.intel.com,
+	yu.c.zhang@linux.intel.com,
+	Wei Yang <richardw.yang@linux.intel.com>, stefanha@redhat.com,
+	imammedo@redhat.com, dan.j.williams@intel.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190430230948.6NJ0dtlT4DF6BB0Z_qsoMCPB9ruSq7iNtfXaAKEnsIQ@z>
+Message-ID: <20190430231134.ywSMo5pMBDwtj75fgddTllRhu2cfo9Y_hfZw_7Imno4@z>
 
-On 01/05/19 01:01, Alex Williamson wrote:
-> Poking at this a bit, we can add kvm_irqchip_is_split() to the set of
-> things we test for in hw/vfio/pci.c:vfio_intx_enable_kvm() to avoid the
-> KVM INTx bypass when using split IRQ chip.
+On 01/05/19 00:50, Michael S. Tsirkin wrote:
+>> Stefan, did you hit a build failure, or it was just theoretical?
+>>
+>> linux-headers/*/mman.h is updated by "linux-headers: add
+>> linux/mman.h" (commit 8cf108c5d159).  If the build really fails,
+>> something else is broken in our build system.
+> I think it's for non-linux hosts. linux-headers/ is only used
+> on linux hosts.
 
-Yes, this should be enough.
-
-> The only way I can get the GPU/Windows configuration usable is to
-> assert the IRQ, immediately de-assert, and unmask the device all from
-> vfio_intx_interrupt().  An interrupt intensive graphics benchmark runs
-> at ~80% of KVM irqchip with about 10% more CPU load with this
-> experiment (but it actually runs!).
-
-Nice.  If you can do it directly from hw/vfio there may be no need to do
-more changes to the IOAPIC, and least not immediately.  But that is not
-a good emulation of INTX, isn't it?  IIUC, it relies on the
-level-triggered interrupt never being masked in the IOAPIC.
-
-> Any other insights appreciated, and I really would like to understand
-> what we've gained with split irqchip and whether it's worth this.
-
-We've gained guest interrupt remapping support, we are not relying on
-newer kernel versions, and the attack surface from the guest to the
-hypervisor is smaller.
+Yes, it is.  Maybe the #ifndef/#define  part should be only used for
+non-Linux.
 
 Paolo
 
