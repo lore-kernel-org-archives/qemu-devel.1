@@ -1,22 +1,21 @@
-Received: from eggs.gnu.org ([209.51.188.92]:58258)
+Received: from eggs.gnu.org ([209.51.188.92]:59121)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1hLPLq-0001OM-Tc
-	for qemu-devel@nongnu.org; Tue, 30 Apr 2019 05:47:03 -0400
+	(envelope-from <kwolf@redhat.com>) id 1hLPRL-0003M8-Rp
+	for qemu-devel@nongnu.org; Tue, 30 Apr 2019 05:52:44 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1hLPLo-0007Tz-PU
-	for qemu-devel@nongnu.org; Tue, 30 Apr 2019 05:47:02 -0400
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Date: Tue, 30 Apr 2019 09:46:51 +0000
-Message-ID: <808ccd2e-56ae-f1c9-3361-efd416ad2465@virtuozzo.com>
-References: <20190422145838.70903-1-vsementsov@virtuozzo.com>
-	<20190430093828.gu3b7yjyh447qw6j@steredhat>
-In-Reply-To: <20190430093828.gu3b7yjyh447qw6j@steredhat>
-Content-Language: en-US
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <5CD7D38E64157D46868DFDADBCF63A2A@eurprd08.prod.outlook.com>
-Content-Transfer-Encoding: base64
+	(envelope-from <kwolf@redhat.com>) id 1hLPRK-00033y-PU
+	for qemu-devel@nongnu.org; Tue, 30 Apr 2019 05:52:43 -0400
+Date: Tue, 30 Apr 2019 11:52:34 +0200
+From: Kevin Wolf <kwolf@redhat.com>
+Message-ID: <20190430095234.GA5607@linux.fritz.box>
+References: <cover.1556562150.git.berto@igalia.com>
+	<08ed89d9905a7143201743ec8003058a083c7b72.1556562150.git.berto@igalia.com>
 MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [PATCH 0/9] block: buffer-based io
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <08ed89d9905a7143201743ec8003058a083c7b72.1556562150.git.berto@igalia.com>
+Subject: Re: [Qemu-devel] [PATCH 3/5] vvfat: Replace bdrv_{read,
+ write}() with bdrv_{pread, pwrite}()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,34 +24,65 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefano Garzarella <sgarzare@redhat.com>
-Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>, "kwolf@redhat.com" <kwolf@redhat.com>, "mreitz@redhat.com" <mreitz@redhat.com>, "stefanha@redhat.com" <stefanha@redhat.com>, Denis Lunev <den@virtuozzo.com>, "jsnow@redhat.com" <jsnow@redhat.com>
+To: Alberto Garcia <berto@igalia.com>
+Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>, Eric Blake <eblake@redhat.com>
 
-MzAuMDQuMjAxOSAxMjozOCwgU3RlZmFubyBHYXJ6YXJlbGxhIHdyb3RlOg0KPiBPbiBNb24sIEFw
-ciAyMiwgMjAxOSBhdCAwNTo1ODoyOVBNICswMzAwLCBWbGFkaW1pciBTZW1lbnRzb3YtT2dpZXZz
-a2l5IHdyb3RlOg0KPj4gSGkgYWxsIQ0KPj4NCj4+IFdlIG9mdGVuIG5lZWQgdG8gZG8gcmVhZC93
-cml0ZSB3aXRoIGJ1ZmZlciwgbm90IHFpb3YuIEluc3RlYWQgb2YNCj4+IGNyZWF0aW5nIHFpb3Yg
-aW4gc3VjaCBjYXNlcywgbGV0J3MgaW50cm9kdWNlIGNvcnJlc3BvbmRpbmcgaGVscGVycy4NCj4+
-DQo+PiBWbGFkaW1pciBTZW1lbnRzb3YtT2dpZXZza2l5ICg5KToNCj4+ICAgIGJsb2NrOiBpbnRy
-b2R1Y2UgYnl0ZS1iYXNlZCBpbyBoZWxwZXJzDQo+PiAgICBibG9jay9xY293MjogdXNlIGJ1ZmZl
-ci1iYXNlZCBpbw0KPj4gICAgYmxvY2svcWNvdzogdXNlIGJ1ZmZlci1iYXNlZCBpbw0KPj4gICAg
-YmxvY2svcWVkOiB1c2UgYnVmZmVyLWJhc2VkIGlvDQo+PiAgICBibG9jay9wYXJhbGxlbHM6IHVz
-ZSBidWZmZXItYmFzZWQgaW8NCj4+ICAgIGJsb2NrL2JhY2t1cDogdXNlIGJ1ZmZlci1iYXNlZCBp
-bw0KPj4gICAgYmxvY2svY29tbWl0OiB1c2UgYnVmZmVyLWJhc2VkIGlvDQo+PiAgICBibG9jay9z
-dHJlYW06IHVzZSBidWZmZXItYmFzZWQgaW8NCj4+ICAgIHFlbXUtaW1nOiB1c2UgYnVmZmVyLWJh
-c2VkIGlvDQo+Pg0KPj4gICBpbmNsdWRlL2Jsb2NrL2Jsb2NrX2ludC5oICAgICAgfCAxNiArKysr
-KysrKysrKysrKysrDQo+PiAgIGluY2x1ZGUvc3lzZW11L2Jsb2NrLWJhY2tlbmQuaCB8IDE5ICsr
-KysrKysrKysrKysrKysrKysNCj4+ICAgYmxvY2svYmFja3VwLmMgICAgICAgICAgICAgICAgIHwg
-MTQgKysrKysrLS0tLS0tLS0NCj4+ICAgYmxvY2svY29tbWl0LmMgICAgICAgICAgICAgICAgIHwg
-IDUgKystLS0NCj4+ICAgYmxvY2svcGFyYWxsZWxzLmMgICAgICAgICAgICAgIHwgMTQgKysrKysr
-LS0tLS0tLS0NCj4+ICAgYmxvY2svcWNvdy5jICAgICAgICAgICAgICAgICAgIHwgMTkgKysrKysr
-LS0tLS0tLS0tLS0tLQ0KPj4gICBibG9jay9xY293Mi5jICAgICAgICAgICAgICAgICAgfCAgOSAr
-Ky0tLS0tLS0NCj4+ICAgYmxvY2svcWVkLXRhYmxlLmMgICAgICAgICAgICAgIHwgMTIgKysrKyst
-LS0tLS0tDQo+PiAgIGJsb2NrL3FlZC5jICAgICAgICAgICAgICAgICAgICB8ICA2ICsrLS0tLQ0K
-Pj4gICBibG9jay9zdHJlYW0uYyAgICAgICAgICAgICAgICAgfCAgNCArLS0tDQo+PiAgIHFlbXUt
-aW1nLmMgICAgICAgICAgICAgICAgICAgICB8IDEzICsrKystLS0tLS0tLS0NCj4+ICAgMTEgZmls
-ZXMgY2hhbmdlZCwgNjkgaW5zZXJ0aW9ucygrKSwgNjIgZGVsZXRpb25zKC0pDQo+Pg0KPj4gLS0g
-DQo+PiAyLjE4LjANCj4+DQo+IA0KPiBUaGUgc2VyaWVzIExHVE0gYW5kIG5ldyBoZWxwZXJzIGNv
-dWxkIGJlIHZlcnkgdXNlZnVsIQ0KPiANCj4gUmV2aWV3ZWQtYnk6IFN0ZWZhbm8gR2FyemFyZWxs
-YSA8c2dhcnphcmVAcmVkaGF0LmNvbT4NCj4gDQoNClRoYW5rcyENCg0KDQotLSANCkJlc3QgcmVn
-YXJkcywNClZsYWRpbWlyDQo=
+Am 29.04.2019 um 20:42 hat Alberto Garcia geschrieben:
+> There's only a couple of bdrv_read() and bdrv_write() calls left in
+> the vvfat code, and they can be trivially replaced with the byte-based
+> bdrv_pread() and bdrv_pwrite().
+> 
+> Signed-off-by: Alberto Garcia <berto@igalia.com>
+> ---
+>  block/vvfat.c | 10 ++++++----
+>  1 file changed, 6 insertions(+), 4 deletions(-)
+> 
+> diff --git a/block/vvfat.c b/block/vvfat.c
+> index 5f66787890..35c7e2761f 100644
+> --- a/block/vvfat.c
+> +++ b/block/vvfat.c
+> @@ -1494,8 +1494,8 @@ static int vvfat_read(BlockDriverState *bs, int64_t sector_num,
+>                  DLOG(fprintf(stderr, "sectors %" PRId64 "+%" PRId64
+>                               " allocated\n", sector_num,
+>                               n >> BDRV_SECTOR_BITS));
+> -                if (bdrv_read(s->qcow, sector_num, buf + i * 0x200,
+> -                              n >> BDRV_SECTOR_BITS)) {
+> +                if (bdrv_pread(s->qcow, sector_num * BDRV_SECTOR_SIZE,
+> +                               buf + i * 0x200, n)) {
+
+bdrv_pread() returns a positive number of bytes in the success case, so
+this error check is wrong. (No real reason why it couldn't return 0, but
+we would have to check and possibly update all callers, so we never did
+that.)
+
+>                      return -1;
+>                  }
+>                  i += (n >> BDRV_SECTOR_BITS) - 1;
+> @@ -1983,7 +1983,8 @@ static uint32_t get_cluster_count_for_direntry(BDRVVVFATState* s,
+>                          if (res) {
+>                              return -1;
+>                          }
+> -                        res = bdrv_write(s->qcow, offset, s->cluster_buffer, 1);
+> +                        res = bdrv_pwrite(s->qcow, offset * BDRV_SECTOR_SIZE,
+> +                                          s->cluster_buffer, BDRV_SECTOR_SIZE);
+>                          if (res) {
+
+Same here, this needs to be res < 0 now.
+
+>                              return -2;
+>                          }
+> @@ -3050,7 +3051,8 @@ DLOG(checkpoint());
+>       * Use qcow backend. Commit later.
+>       */
+>  DLOG(fprintf(stderr, "Write to qcow backend: %d + %d\n", (int)sector_num, nb_sectors));
+> -    ret = bdrv_write(s->qcow, sector_num, buf, nb_sectors);
+> +    ret = bdrv_pwrite(s->qcow, sector_num * BDRV_SECTOR_SIZE, buf,
+> +                      nb_sectors * BDRV_SECTOR_SIZE);
+>      if (ret < 0) {
+
+This one is already correct.
+
+>          fprintf(stderr, "Error writing to qcow backend\n");
+>          return ret;
+
+Kevin
