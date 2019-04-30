@@ -1,26 +1,26 @@
-Received: from eggs.gnu.org ([209.51.188.92]:44524)
+Received: from eggs.gnu.org ([209.51.188.92]:44567)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1hLSar-00010e-0H
-	for qemu-devel@nongnu.org; Tue, 30 Apr 2019 09:14:45 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1hLSat-00011F-22
+	for qemu-devel@nongnu.org; Tue, 30 Apr 2019 09:14:48 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1hLSap-0002Aw-Vu
-	for qemu-devel@nongnu.org; Tue, 30 Apr 2019 09:14:44 -0400
-Received: from mail-wm1-x341.google.com ([2a00:1450:4864:20::341]:38205)
+	(envelope-from <peter.maydell@linaro.org>) id 1hLSas-0002Ci-4n
+	for qemu-devel@nongnu.org; Tue, 30 Apr 2019 09:14:47 -0400
+Received: from mail-wr1-x444.google.com ([2a00:1450:4864:20::444]:38670)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1hLSap-0002AJ-Pa
-	for qemu-devel@nongnu.org; Tue, 30 Apr 2019 09:14:43 -0400
-Received: by mail-wm1-x341.google.com with SMTP id w15so3791786wmc.3
-	for <qemu-devel@nongnu.org>; Tue, 30 Apr 2019 06:14:43 -0700 (PDT)
+	id 1hLSar-0002C6-Uz
+	for qemu-devel@nongnu.org; Tue, 30 Apr 2019 09:14:46 -0400
+Received: by mail-wr1-x444.google.com with SMTP id k16so20992206wrn.5
+	for <qemu-devel@nongnu.org>; Tue, 30 Apr 2019 06:14:45 -0700 (PDT)
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 30 Apr 2019 14:14:36 +0100
-Message-Id: <20190430131439.25251-2-peter.maydell@linaro.org>
+Date: Tue, 30 Apr 2019 14:14:38 +0100
+Message-Id: <20190430131439.25251-4-peter.maydell@linaro.org>
 In-Reply-To: <20190430131439.25251-1-peter.maydell@linaro.org>
 References: <20190430131439.25251-1-peter.maydell@linaro.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH 1/4] hw/arm/armv7m_nvic: Check subpriority in
- nvic_recompute_state_secure()
+Subject: [Qemu-devel] [PATCH 3/4] hw/intc/armv7m_nvic: Don't enable
+ ARMV7M_EXCP_DEBUG from reset
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,54 +31,36 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-arm@nongnu.org, qemu-devel@nongnu.org
 
-Rule R_CQRV says that if two pending interrupts have the same
-group priority then ties are broken by looking at the subpriority.
-We had a comment describing this but had forgotten to actually
-implement the subpriority comparison. Correct the omission.
+The M-profile architecture specifies that the DebugMonitor exception
+should be initially disabled, not enabled. It should be controlled
+by the DEMCR register's MON_EN bit, but we don't implement that
+register yet (like most of the debug architecture for M-profile).
 
-(The further tie break rules of "lowest exception number" and
-"secure before non-secure" are handled implicitly by the order
-in which we iterate through the exceptions in the loops.)
+Note that BKPT instructions will still work, because they
+will be escalated to HardFault.
 
 Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 ---
- hw/intc/armv7m_nvic.c | 9 +++++++--
- 1 file changed, 7 insertions(+), 2 deletions(-)
+ hw/intc/armv7m_nvic.c | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
 
 diff --git a/hw/intc/armv7m_nvic.c b/hw/intc/armv7m_nvic.c
-index fff6e694e60..131b5938b9a 100644
+index 15cba63c964..3a346a682a3 100644
 --- a/hw/intc/armv7m_nvic.c
 +++ b/hw/intc/armv7m_nvic.c
-@@ -213,6 +213,7 @@ static void nvic_recompute_state_secure(NVICState *s)
-     int active_prio = NVIC_NOEXC_PRIO;
-     int pend_irq = 0;
-     bool pending_is_s_banked = false;
-+    int pend_subprio = 0;
+@@ -2491,10 +2491,12 @@ static void armv7m_nvic_reset(DeviceState *dev)
+      * the System Handler Control register
+      */
+     s->vectors[ARMV7M_EXCP_SVC].enabled = 1;
+-    s->vectors[ARMV7M_EXCP_DEBUG].enabled = 1;
+     s->vectors[ARMV7M_EXCP_PENDSV].enabled = 1;
+     s->vectors[ARMV7M_EXCP_SYSTICK].enabled = 1;
  
-     /* R_CQRV: precedence is by:
-      *  - lowest group priority; if both the same then
-@@ -226,7 +227,7 @@ static void nvic_recompute_state_secure(NVICState *s)
-     for (i = 1; i < s->num_irq; i++) {
-         for (bank = M_REG_S; bank >= M_REG_NS; bank--) {
-             VecInfo *vec;
--            int prio;
-+            int prio, subprio;
-             bool targets_secure;
- 
-             if (bank == M_REG_S) {
-@@ -241,8 +242,12 @@ static void nvic_recompute_state_secure(NVICState *s)
-             }
- 
-             prio = exc_group_prio(s, vec->prio, targets_secure);
--            if (vec->enabled && vec->pending && prio < pend_prio) {
-+            subprio = vec->prio & ~nvic_gprio_mask(s, targets_secure);
-+            if (vec->enabled && vec->pending &&
-+                ((prio < pend_prio) ||
-+                 (prio == pend_prio && prio >= 0 && subprio < pend_subprio))) {
-                 pend_prio = prio;
-+                pend_subprio = subprio;
-                 pend_irq = i;
-                 pending_is_s_banked = (bank == M_REG_S);
-             }
++    /* DebugMonitor is enabled via DEMCR.MON_EN */
++    s->vectors[ARMV7M_EXCP_DEBUG].enabled = 0;
++
+     resetprio = arm_feature(&s->cpu->env, ARM_FEATURE_V8) ? -4 : -3;
+     s->vectors[ARMV7M_EXCP_RESET].prio = resetprio;
+     s->vectors[ARMV7M_EXCP_NMI].prio = -2;
 -- 
 2.20.1
