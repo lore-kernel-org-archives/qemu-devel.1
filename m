@@ -1,15 +1,24 @@
-Received: from eggs.gnu.org ([209.51.188.92]:47910)
+Received: from eggs.gnu.org ([209.51.188.92]:48198)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <like.xu@linux.intel.com>) id 1hLOUs-0000WV-MZ
-	for qemu-devel@nongnu.org; Tue, 30 Apr 2019 04:52:19 -0400
+	(envelope-from <vsementsov@virtuozzo.com>) id 1hLOWM-0001KK-P9
+	for qemu-devel@nongnu.org; Tue, 30 Apr 2019 04:53:52 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <like.xu@linux.intel.com>) id 1hLOUr-0006MC-DC
-	for qemu-devel@nongnu.org; Tue, 30 Apr 2019 04:52:18 -0400
-From: Like Xu <like.xu@linux.intel.com>
-Date: Tue, 30 Apr 2019 16:50:40 +0800
-Message-Id: <1556614240-36369-1-git-send-email-like.xu@linux.intel.com>
-Subject: [Qemu-devel] [PATCH] hw/arm/fsl-imx: move cpus initialization to
- realize time after smp_cpus check
+	(envelope-from <vsementsov@virtuozzo.com>) id 1hLOWL-0007l8-GZ
+	for qemu-devel@nongnu.org; Tue, 30 Apr 2019 04:53:50 -0400
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Date: Tue, 30 Apr 2019 08:53:41 +0000
+Message-ID: <8e928f60-f2b2-6e05-bf16-5578941bfd8b@virtuozzo.com>
+References: <20190402153730.54145-1-vsementsov@virtuozzo.com>
+	<20190402153730.54145-2-vsementsov@virtuozzo.com>
+	<fe340a80-f918-7999-fb75-4b129162bd89@redhat.com>
+In-Reply-To: <fe340a80-f918-7999-fb75-4b129162bd89@redhat.com>
+Content-Language: en-US
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <E7BFF8061BD00942A3BC910F2401377C@eurprd08.prod.outlook.com>
+Content-Transfer-Encoding: base64
+MIME-Version: 1.0
+Subject: Re: [Qemu-devel] [PATCH v5 01/10] tests/perf: Test qemu-img convert
+ from raw to encrypted qcow2
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -18,122 +27,67 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-arm@nongnu.org, qemu-devel@nongnu.org
-Cc: Peter Maydell <peter.maydell@linaro.org>, Jean-Christophe Dubois <jcd@tribudubois.net>, Andrey Smirnov <andrew.smirnov@gmail.com>, Igor Mammedov <imammedo@redhat.com>
+To: Max Reitz <mreitz@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>
+Cc: "kwolf@redhat.com" <kwolf@redhat.com>, "berto@igalia.com" <berto@igalia.com>, "pbonzini@redhat.com" <pbonzini@redhat.com>, Denis Lunev <den@virtuozzo.com>, "berrange@redhat.com" <berrange@redhat.com>
 
-If "smp_cpus> FSL_IMX6_NUM_CPUS" fails in *_realize(), there is no need to
-initialize the CPUs in *_init(). So it could be better to create all cpus
-after the validity in *_realize(). On the other hand, it makes the usages
-of global variable smp_cpus more centrally for maintenance.
-
-Suggested-by: Igor Mammedov <imammedo@redhat.com>
-Signed-off-by: Like Xu <like.xu@linux.intel.com>
----
- hw/arm/fsl-imx6.c   | 13 +++++++------
- hw/arm/fsl-imx6ul.c | 12 ++++++------
- hw/arm/fsl-imx7.c   | 15 +++++++--------
- 3 files changed, 20 insertions(+), 20 deletions(-)
-
-diff --git a/hw/arm/fsl-imx6.c b/hw/arm/fsl-imx6.c
-index 7b7b97f..14015a1 100644
---- a/hw/arm/fsl-imx6.c
-+++ b/hw/arm/fsl-imx6.c
-@@ -37,12 +37,6 @@ static void fsl_imx6_init(Object *obj)
-     char name[NAME_SIZE];
-     int i;
- 
--    for (i = 0; i < MIN(smp_cpus, FSL_IMX6_NUM_CPUS); i++) {
--        snprintf(name, NAME_SIZE, "cpu%d", i);
--        object_initialize_child(obj, name, &s->cpu[i], sizeof(s->cpu[i]),
--                                "cortex-a9-" TYPE_ARM_CPU, &error_abort, NULL);
--    }
--
-     sysbus_init_child_obj(obj, "a9mpcore", &s->a9mpcore, sizeof(s->a9mpcore),
-                           TYPE_A9MPCORE_PRIV);
- 
-@@ -95,6 +89,7 @@ static void fsl_imx6_realize(DeviceState *dev, Error **errp)
- {
-     FslIMX6State *s = FSL_IMX6(dev);
-     uint16_t i;
-+    char name[NAME_SIZE];
-     Error *err = NULL;
- 
-     if (smp_cpus > FSL_IMX6_NUM_CPUS) {
-@@ -103,6 +98,12 @@ static void fsl_imx6_realize(DeviceState *dev, Error **errp)
-         return;
-     }
- 
-+    for (i = 0; i < MIN(smp_cpus, FSL_IMX6_NUM_CPUS); i++) {
-+        snprintf(name, NAME_SIZE, "cpu%d", i);
-+        object_initialize_child(OBJECT(dev), name, &s->cpu[i],
-+            sizeof(s->cpu[i]), "cortex-a9-" TYPE_ARM_CPU, &error_abort, NULL);
-+    }
-+
-     for (i = 0; i < smp_cpus; i++) {
- 
-         /* On uniprocessor, the CBAR is set to 0 */
-diff --git a/hw/arm/fsl-imx6ul.c b/hw/arm/fsl-imx6ul.c
-index 4b56bfa..7f30eb7 100644
---- a/hw/arm/fsl-imx6ul.c
-+++ b/hw/arm/fsl-imx6ul.c
-@@ -32,12 +32,6 @@ static void fsl_imx6ul_init(Object *obj)
-     char name[NAME_SIZE];
-     int i;
- 
--    for (i = 0; i < MIN(smp_cpus, FSL_IMX6UL_NUM_CPUS); i++) {
--        snprintf(name, NAME_SIZE, "cpu%d", i);
--        object_initialize_child(obj, name, &s->cpu[i], sizeof(s->cpu[i]),
--                                "cortex-a7-" TYPE_ARM_CPU, &error_abort, NULL);
--    }
--
-     /*
-      * A7MPCORE
-      */
-@@ -167,6 +161,12 @@ static void fsl_imx6ul_realize(DeviceState *dev, Error **errp)
-         return;
-     }
- 
-+    for (i = 0; i < MIN(smp_cpus, FSL_IMX6UL_NUM_CPUS); i++) {
-+        snprintf(name, NAME_SIZE, "cpu%d", i);
-+        object_initialize_child(OBJECT(dev), name, &s->cpu[i],
-+            sizeof(s->cpu[i]), "cortex-a7-" TYPE_ARM_CPU, &error_abort, NULL);
-+    }
-+
-     for (i = 0; i < smp_cpus; i++) {
-         Object *o = OBJECT(&s->cpu[i]);
- 
-diff --git a/hw/arm/fsl-imx7.c b/hw/arm/fsl-imx7.c
-index 7663ad6..2580348 100644
---- a/hw/arm/fsl-imx7.c
-+++ b/hw/arm/fsl-imx7.c
-@@ -34,14 +34,6 @@ static void fsl_imx7_init(Object *obj)
-     char name[NAME_SIZE];
-     int i;
- 
--
--    for (i = 0; i < MIN(smp_cpus, FSL_IMX7_NUM_CPUS); i++) {
--        snprintf(name, NAME_SIZE, "cpu%d", i);
--        object_initialize_child(obj, name, &s->cpu[i], sizeof(s->cpu[i]),
--                                ARM_CPU_TYPE_NAME("cortex-a7"), &error_abort,
--                                NULL);
--    }
--
-     /*
-      * A7MPCORE
-      */
-@@ -167,6 +159,13 @@ static void fsl_imx7_realize(DeviceState *dev, Error **errp)
-         return;
-     }
- 
-+    for (i = 0; i < MIN(smp_cpus, FSL_IMX7_NUM_CPUS); i++) {
-+        snprintf(name, NAME_SIZE, "cpu%d", i);
-+        object_initialize_child(OBJECT(dev), name, &s->cpu[i],
-+            sizeof(s->cpu[i]), ARM_CPU_TYPE_NAME("cortex-a7"),
-+            &error_abort, NULL);
-+    }
-+
-     for (i = 0; i < smp_cpus; i++) {
-         o = OBJECT(&s->cpu[i]);
- 
--- 
-1.8.3.1
+MjkuMDQuMjAxOSAxOjU1LCBNYXggUmVpdHogd3JvdGU6DQo+IE9uIDAyLjA0LjE5IDE3OjM3LCBW
+bGFkaW1pciBTZW1lbnRzb3YtT2dpZXZza2l5IHdyb3RlOg0KPj4gU2lnbmVkLW9mZi1ieTogVmxh
+ZGltaXIgU2VtZW50c292LU9naWV2c2tpeSA8dnNlbWVudHNvdkB2aXJ0dW96em8uY29tPg0KPj4g
+LS0tDQo+PiAgIHRlc3RzL3BlcmYvYmxvY2svcWNvdzIvY29udmVydC10by1lbmNyeXB0ZWQgfCA0
+OCArKysrKysrKysrKysrKysrKysrKysNCj4+ICAgMSBmaWxlIGNoYW5nZWQsIDQ4IGluc2VydGlv
+bnMoKykNCj4+ICAgY3JlYXRlIG1vZGUgMTAwNzU1IHRlc3RzL3BlcmYvYmxvY2svcWNvdzIvY29u
+dmVydC10by1lbmNyeXB0ZWQNCj4gDQo+IFRoYW5rcyBmb3IgdGhlIHRlc3QgY2FzZSwgYnV0IEkg
+ZG9u4oCZdCBrbm93IHdoZXRoZXIgdGhpcyBpcyB0aGUgcmlnaHQgd2F5DQo+IHRvIGluY2x1ZGUg
+aXQuDQo+IA0KPiBBIGNvbmNyZXRlIHByb2JsZW0gaXMgdGhhdCBpdCBkb2VzbuKAmXQgd29yayB3
+aXRoIG91dC1vZi10cmVlIGJ1aWxkcyAoSQ0KPiBvbmx5IGRvIG91dC1vZi10cmVlIGJ1aWxkcyku
+ICBJIHdvbmRlciB3aGV0aGVyIGl0IHdvdWxkIGJlIHBvc3NpYmxlIGFuZA0KPiBtYWtlIHNlbnNl
+IChJIGhhdmUgbm8gaWRlYSkgdG8gYWRkIGEgc3ViZGlyZWN0b3J5ICJwZXJmIiB0byB0aGUgaW90
+ZXN0cw0KPiBhbmQgcmV1c2UgaXRzIGluZnJhc3RydWN0dXJlPyAgVGhvc2UgdGVzdHMgd291bGRu
+4oCZdCBydW4gYnkgZGVmYXVsdC4NCj4gDQoNCkhvbmVzdGx5LCBJIGRvbid0IHJlYWxseSBsaWtl
+IGV4aXN0aW5nIGlvdGVzdHMgaW5mcmFzdHJ1Y3R1cmUsIGJvdW5kIHRvIGNoZWNrDQpzY3JpcHQs
+IHdoaWNoIEkgZG9uJ3QgbGlrZSB0b28gKGFuZCBhbnkgb3RoZXIgbGFyZ2Ugc2NyaXB0IGluIGJh
+c2gsIHNvcnJ5IDooLi4NCg0KV2hhdCBkbyB5b3UgbWVhbj8gWW91IGhhdmUgZW52IHZhcmlhYmxl
+cyBRRU1VX0lNRywgZXRjLCBhbmQgd2FudCB0aGVtIHRvIGJlDQphY2NlcHRlZCBieSBzY3JpcHQ/
+DQoNCkknZCBwcmVmZXIgdG8gY29tbWl0IHNvbWV0aGluZyBzaW1wbGUgYW5kIHNlcGFyYXRlLCB0
+byBiZSBhYmxlIHRvIGJ1aWxkIHVwDQppbmZyYXN0cnVjdHVyZSBhcm91bmQgaXQgZ3JhZHVhbGx5
+Li4gRmluYWxseSwgSSB3YW50IGEgc2ltcGxlIHdheSB0byBydW4NCmEgc2V0IG9mIHBlcmYgdGVz
+dHMgb24gYSBzZXQgb2YgZ2l0IGNvbW1pdHMgYW5kIGdldCBhbiBodG1sIGFuZCBhc2NpaQ0KdGFi
+bGVzIG9mIHBlcmZvcm1hbmNlIGNvbXBhcmlzb24gYmV0d2VlbiB0aGVzZSBjb21taXRzLg0KDQo+
+IA0KPj4gZGlmZiAtLWdpdCBhL3Rlc3RzL3BlcmYvYmxvY2svcWNvdzIvY29udmVydC10by1lbmNy
+eXB0ZWQgYi90ZXN0cy9wZXJmL2Jsb2NrL3Fjb3cyL2NvbnZlcnQtdG8tZW5jcnlwdGVkDQo+PiBu
+ZXcgZmlsZSBtb2RlIDEwMDc1NQ0KPj4gaW5kZXggMDAwMDAwMDAwMC4uN2E2YjdiMWNhYg0KPj4g
+LS0tIC9kZXYvbnVsbA0KPj4gKysrIGIvdGVzdHMvcGVyZi9ibG9jay9xY293Mi9jb252ZXJ0LXRv
+LWVuY3J5cHRlZA0KPj4gQEAgLTAsMCArMSw0OCBAQA0KPj4gKyMhL2Jpbi9iYXNoDQo+PiArIw0K
+Pj4gKyMgVGVzdCBxZW11LWltZyBjb252ZXJ0IGZyb20gcmF3IHRvIGVuY3J5cHRlZCBxY293Mg0K
+Pj4gKyMNCj4+ICsjIENvcHlyaWdodCAoYykgMjAxOSBWaXJ0dW96em8gSW50ZXJuYXRpb25hbCBH
+bWJILiBBbGwgcmlnaHRzIHJlc2VydmVkLg0KPj4gKyMNCj4+ICsjIFRoaXMgcHJvZ3JhbSBpcyBm
+cmVlIHNvZnR3YXJlOyB5b3UgY2FuIHJlZGlzdHJpYnV0ZSBpdCBhbmQvb3IgbW9kaWZ5DQo+PiAr
+IyBpdCB1bmRlciB0aGUgdGVybXMgb2YgdGhlIEdOVSBHZW5lcmFsIFB1YmxpYyBMaWNlbnNlIGFz
+IHB1Ymxpc2hlZCBieQ0KPj4gKyMgdGhlIEZyZWUgU29mdHdhcmUgRm91bmRhdGlvbjsgZWl0aGVy
+IHZlcnNpb24gMiBvZiB0aGUgTGljZW5zZSwgb3INCj4+ICsjIChhdCB5b3VyIG9wdGlvbikgYW55
+IGxhdGVyIHZlcnNpb24uDQo+PiArIw0KPj4gKyMgVGhpcyBwcm9ncmFtIGlzIGRpc3RyaWJ1dGVk
+IGluIHRoZSBob3BlIHRoYXQgaXQgd2lsbCBiZSB1c2VmdWwsDQo+PiArIyBidXQgV0lUSE9VVCBB
+TlkgV0FSUkFOVFk7IHdpdGhvdXQgZXZlbiB0aGUgaW1wbGllZCB3YXJyYW50eSBvZg0KPj4gKyMg
+TUVSQ0hBTlRBQklMSVRZIG9yIEZJVE5FU1MgRk9SIEEgUEFSVElDVUxBUiBQVVJQT1NFLiAgU2Vl
+IHRoZQ0KPj4gKyMgR05VIEdlbmVyYWwgUHVibGljIExpY2Vuc2UgZm9yIG1vcmUgZGV0YWlscy4N
+Cj4+ICsjDQo+PiArIyBZb3Ugc2hvdWxkIGhhdmUgcmVjZWl2ZWQgYSBjb3B5IG9mIHRoZSBHTlUg
+R2VuZXJhbCBQdWJsaWMgTGljZW5zZQ0KPj4gKyMgYWxvbmcgd2l0aCB0aGlzIHByb2dyYW0uICBJ
+ZiBub3QsIHNlZSA8aHR0cDovL3d3dy5nbnUub3JnL2xpY2Vuc2VzLz4uDQo+PiArIw0KPj4gKw0K
+Pj4gK2lmIFsgIiQjIiAtbHQgMiBdOyB0aGVuDQo+PiArICAgIGVjaG8gIlVzYWdlOiAkMCBTT1VS
+Q0VfRklMRSBERVNUSU5BVElPTl9GSUxFIFthZGRpdGlvbmFsIHFlbXUtaW1nIGNvbnZlcnQgcGFy
+YW1ldGVyc10iDQo+PiArICAgIGV4aXQgMQ0KPj4gK2ZpDQo+PiArDQo+PiArUk9PVF9ESVI9IiQo
+IGNkICIkKCBkaXJuYW1lICIke0JBU0hfU09VUkNFWzBdfSIgKS8uLi8uLi8uLi8uLiIgPi9kZXYv
+bnVsbCAyPiYxICYmIHB3ZCApIg0KPj4gK1FFTVVfSU1HPSIkUk9PVF9ESVIvcWVtdS1pbWciDQo+
+PiArUUVNVV9JTz0iJFJPT1RfRElSL3FlbXUtaW8iDQo+PiArDQo+PiArc2l6ZT0xRw0KPj4gKw0K
+Pj4gK3NyYz0iJDEiDQo+PiArc2hpZnQNCj4+ICsNCj4+ICtkc3Q9IiQxIg0KPj4gK3NoaWZ0DQo+
+PiArDQo+PiArKA0KPj4gKyMgY3JlYXRlIHNvdXJjZQ0KPj4gKyRRRU1VX0lNRyBjcmVhdGUgLWYg
+cmF3ICIkc3JjIiAkc2l6ZQ0KPj4gKyRRRU1VX0lPIC1mIHJhdyAtYyAid3JpdGUgLVAgMHhhIDAg
+JHNpemUiICIkc3JjIg0KPj4gKw0KPj4gKyMgY3JlYXRlIHRhcmdldA0KPj4gKyRRRU1VX0lNRyBj
+cmVhdGUgLWYgcWNvdzIgLS1vYmplY3Qgc2VjcmV0LGlkPXNlYzAsZGF0YT10ZXN0IC1vIGVuY3J5
+cHQuZm9ybWF0PWx1a3MsZW5jcnlwdC5rZXktc2VjcmV0PXNlYzAgIiRkc3QiICRzaXplDQo+PiAr
+KSA+IC9kZXYvbnVsbA0KPj4gKw0KPj4gKyMgdGVzdCB3aXRoIGFkZGl0aW9uYWwgcGFyYW1ldGVy
+cyBsZWZ0IGluICRADQo+PiArL3Vzci9iaW4vdGltZSAtZiAlZSAkUUVNVV9JTUcgY29udmVydCAi
+JEAiIC1mIHJhdyAtLW9iamVjdCBzZWNyZXQsaWQ9c2VjMCxkYXRhPXRlc3QgLS10YXJnZXQtaW1h
+Z2Utb3B0cyAtbiAiJHNyYyIgImRyaXZlcj1xY293MixmaWxlLmZpbGVuYW1lPSRkc3QsZW5jcnlw
+dC5rZXktc2VjcmV0PXNlYzAiDQo+Pg0KPiANCj4gDQoNCg0KLS0gDQpCZXN0IHJlZ2FyZHMsDQpW
+bGFkaW1pcg0K
