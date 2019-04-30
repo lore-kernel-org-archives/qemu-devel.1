@@ -2,60 +2,66 @@ Return-Path: <SRS0=TP+Q=TA=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D7366C43219
-	for <qemu-devel@archiver.kernel.org>; Tue, 30 Apr 2019 15:56:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F3B80C43219
+	for <qemu-devel@archiver.kernel.org>; Tue, 30 Apr 2019 15:57:14 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A8BF121743
-	for <qemu-devel@archiver.kernel.org>; Tue, 30 Apr 2019 15:56:35 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A8BF121743
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id C6E4121743
+	for <qemu-devel@archiver.kernel.org>; Tue, 30 Apr 2019 15:57:14 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C6E4121743
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=patchew.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:49017 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:49023 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hLV7S-0001nj-Rx
-	for qemu-devel@archiver.kernel.org; Tue, 30 Apr 2019 11:56:34 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:49070)
+	id 1hLV86-0002LK-2H
+	for qemu-devel@archiver.kernel.org; Tue, 30 Apr 2019 11:57:14 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:48754)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1hLUv0-0008CD-DY
-	for qemu-devel@nongnu.org; Tue, 30 Apr 2019 11:43:43 -0400
+	(envelope-from <no-reply@patchew.org>) id 1hLUuq-000822-VO
+	for qemu-devel@nongnu.org; Tue, 30 Apr 2019 11:43:34 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1hLUuz-0002ET-Dm
-	for qemu-devel@nongnu.org; Tue, 30 Apr 2019 11:43:42 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:49908)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <kwolf@redhat.com>)
-	id 1hLUuv-0002BD-Id; Tue, 30 Apr 2019 11:43:37 -0400
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
-	[10.5.11.16])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id BF3C12D7FE;
-	Tue, 30 Apr 2019 15:43:36 +0000 (UTC)
-Received: from linux.fritz.box.com (unknown [10.36.118.15])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id EF3D64C7;
-	Tue, 30 Apr 2019 15:43:34 +0000 (UTC)
-From: Kevin Wolf <kwolf@redhat.com>
-To: qemu-block@nongnu.org
-Date: Tue, 30 Apr 2019 17:42:39 +0200
-Message-Id: <20190430154244.30083-23-kwolf@redhat.com>
-In-Reply-To: <20190430154244.30083-1-kwolf@redhat.com>
-References: <20190430154244.30083-1-kwolf@redhat.com>
+	(envelope-from <no-reply@patchew.org>) id 1hLUuo-00025R-RL
+	for qemu-devel@nongnu.org; Tue, 30 Apr 2019 11:43:32 -0400
+Resent-Date: Tue, 30 Apr 2019 11:43:32 -0400
+Resent-Message-Id: <E1hLUuo-00025R-RL@eggs.gnu.org>
+Received: from sender-of-o52.zoho.com ([135.84.80.217]:21432)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
+	id 1hLUu7-0001VZ-RB; Tue, 30 Apr 2019 11:42:48 -0400
+ARC-Seal: i=1; a=rsa-sha256; t=1556638947; cv=none; d=zoho.com; s=zohoarc; 
+	b=flh+1NQ+jQndwybZQZu+btFkZ38sgpmKX0TMaH9Snv5+tW2AuAkSvfp+P6MqAvc45Loa1xtYmqLc2DI9/Zq/1dRrxdVDPkZElkxv/mlWUGUv3STRe9xL++GYaiQc2gF4D4eMdnKQ/2X/eGtLMtLT11fhnB7CnYISarbqjAEm+EY=
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zoho.com;
+	s=zohoarc; t=1556638947;
+	h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:Reply-To:Subject:To:ARC-Authentication-Results;
+	bh=xIZA6At+pC/SJkdnbsNxxiyAEomACcsYMUbIpvpXpK4=; 
+	b=jVCmRmS74jMQ7nmyIX79cHpUpxBoEsTMEHOXWTfsCridMr0bcgn896TjBXuHNRr++5ruJKGqzdX+KD0dQudpLp9uEeYyu5tACg8cFiHvWndmP9cTUdhiTo/I2tJIH4gHx6Q7WIx1bIze7q5KM1/TrJXOQMdJRtxO1cKvTYTC9Ag=
+ARC-Authentication-Results: i=1; mx.zoho.com; dkim=pass  header.i=patchew.org;
+	spf=pass  smtp.mailfrom=no-reply@patchew.org;
+	dmarc=pass header.from=<no-reply@patchew.org>
+	header.from=<no-reply@patchew.org>
+Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by
+	mx.zohomail.com with SMTPS id 1556638945084225.8461772506937;
+	Tue, 30 Apr 2019 08:42:25 -0700 (PDT)
+In-Reply-To: <20190429105741.31033-1-kwolf@redhat.com>
+Message-ID: <155663894367.10667.5396049439602349313@c2072b67cc0c>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.30]);
-	Tue, 30 Apr 2019 15:43:36 +0000 (UTC)
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: base64
+Resent-From: 
+From: no-reply@patchew.org
+To: kwolf@redhat.com
+Date: Tue, 30 Apr 2019 08:42:25 -0700 (PDT)
+X-ZohoMailClient: External
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] [PULL 22/27] block/commit: use buffer-based io
+X-Received-From: 135.84.80.217
+Subject: Re: [Qemu-devel] [PATCH] qcow2: Fix qcow2_make_empty() with
+ external data file
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -67,48 +73,25 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: kwolf@redhat.com, qemu-devel@nongnu.org
+Reply-To: qemu-devel@nongnu.org
+Cc: fam@euphon.net, kwolf@redhat.com, qemu-block@nongnu.org,
+	qemu-stable@nongnu.org, qemu-devel@nongnu.org, mreitz@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Content-Type: text/plain; charset="UTF-8"
-Message-ID: <20190430154239.4V37pogs8YDiE4J7AxP0TbLU44qIKwRAdEqAGiXApxw@z>
+Message-ID: <20190430154225.MGkCIvGcm_JKFfbhabI_Ef-DLiI2iEdZAk6LATBkM1g@z>
 
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-
-Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
-Reviewed-by: Stefano Garzarella <sgarzare@redhat.com>
-Signed-off-by: Kevin Wolf <kwolf@redhat.com>
----
- block/commit.c | 5 ++---
- 1 file changed, 2 insertions(+), 3 deletions(-)
-
-diff --git a/block/commit.c b/block/commit.c
-index ba60fef58a..08204fa6f8 100644
---- a/block/commit.c
-+++ b/block/commit.c
-@@ -48,16 +48,15 @@ static int coroutine_fn commit_populate(BlockBackend =
-*bs, BlockBackend *base,
-                                         void *buf)
- {
-     int ret =3D 0;
--    QEMUIOVector qiov =3D QEMU_IOVEC_INIT_BUF(qiov, buf, bytes);
-=20
-     assert(bytes < SIZE_MAX);
-=20
--    ret =3D blk_co_preadv(bs, offset, qiov.size, &qiov, 0);
-+    ret =3D blk_co_pread(bs, offset, bytes, buf, 0);
-     if (ret < 0) {
-         return ret;
-     }
-=20
--    ret =3D blk_co_pwritev(base, offset, qiov.size, &qiov, 0);
-+    ret =3D blk_co_pwrite(base, offset, bytes, buf, 0);
-     if (ret < 0) {
-         return ret;
-     }
---=20
-2.20.1
+UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDE5MDQyOTEwNTc0MS4zMTAz
+My0xLWt3b2xmQHJlZGhhdC5jb20vCgoKCkhpLAoKVGhpcyBzZXJpZXMgZmFpbGVkIHRoZSBhc2Fu
+IGJ1aWxkIHRlc3QuIFBsZWFzZSBmaW5kIHRoZSB0ZXN0aW5nIGNvbW1hbmRzIGFuZAp0aGVpciBv
+dXRwdXQgYmVsb3cuIElmIHlvdSBoYXZlIERvY2tlciBpbnN0YWxsZWQsIHlvdSBjYW4gcHJvYmFi
+bHkgcmVwcm9kdWNlIGl0CmxvY2FsbHkuCgo9PT0gVEVTVCBTQ1JJUFQgQkVHSU4gPT09CiMhL2Jp
+bi9iYXNoCnRpbWUgbWFrZSBkb2NrZXItdGVzdC1kZWJ1Z0BmZWRvcmEgVEFSR0VUX0xJU1Q9eDg2
+XzY0LXNvZnRtbXUgSj0xNCBORVRXT1JLPTEKPT09IFRFU1QgU0NSSVBUIEVORCA9PT0KCgoKClRo
+ZSBmdWxsIGxvZyBpcyBhdmFpbGFibGUgYXQKaHR0cDovL3BhdGNoZXcub3JnL2xvZ3MvMjAxOTA0
+MjkxMDU3NDEuMzEwMzMtMS1rd29sZkByZWRoYXQuY29tL3Rlc3RpbmcuYXNhbi8/dHlwZT1tZXNz
+YWdlLgotLS0KRW1haWwgZ2VuZXJhdGVkIGF1dG9tYXRpY2FsbHkgYnkgUGF0Y2hldyBbaHR0cHM6
+Ly9wYXRjaGV3Lm9yZy9dLgpQbGVhc2Ugc2VuZCB5b3VyIGZlZWRiYWNrIHRvIHBhdGNoZXctZGV2
+ZWxAcmVkaGF0LmNvbQ==
 
 
