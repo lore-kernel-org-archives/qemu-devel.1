@@ -1,26 +1,26 @@
-Received: from eggs.gnu.org ([209.51.188.92]:35716)
+Received: from eggs.gnu.org ([209.51.188.92]:36155)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1hLRnG-0006S9-DL
-	for qemu-devel@nongnu.org; Tue, 30 Apr 2019 08:23:31 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1hLRpq-0007kn-Eb
+	for qemu-devel@nongnu.org; Tue, 30 Apr 2019 08:26:11 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1hLRnF-0004iC-9e
-	for qemu-devel@nongnu.org; Tue, 30 Apr 2019 08:23:30 -0400
-Received: from mail-ot1-x342.google.com ([2607:f8b0:4864:20::342]:37887)
+	(envelope-from <peter.maydell@linaro.org>) id 1hLRpp-0007eD-DL
+	for qemu-devel@nongnu.org; Tue, 30 Apr 2019 08:26:10 -0400
+Received: from mail-oi1-x242.google.com ([2607:f8b0:4864:20::242]:41231)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1hLRnE-0004hG-Vi
-	for qemu-devel@nongnu.org; Tue, 30 Apr 2019 08:23:29 -0400
-Received: by mail-ot1-x342.google.com with SMTP id r20so10548714otg.4
-	for <qemu-devel@nongnu.org>; Tue, 30 Apr 2019 05:23:28 -0700 (PDT)
+	id 1hLRpp-0007c2-4c
+	for qemu-devel@nongnu.org; Tue, 30 Apr 2019 08:26:09 -0400
+Received: by mail-oi1-x242.google.com with SMTP id v23so10884158oif.8
+	for <qemu-devel@nongnu.org>; Tue, 30 Apr 2019 05:26:08 -0700 (PDT)
 MIME-Version: 1.0
 References: <20190223023957.18865-1-richard.henderson@linaro.org>
-	<20190223023957.18865-3-richard.henderson@linaro.org>
-In-Reply-To: <20190223023957.18865-3-richard.henderson@linaro.org>
+	<20190223023957.18865-4-richard.henderson@linaro.org>
+In-Reply-To: <20190223023957.18865-4-richard.henderson@linaro.org>
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 30 Apr 2019 13:23:16 +0100
-Message-ID: <CAFEAcA9C6OU9vE1ST=v7X1u_JvXgX0iBADbqv_Jchj2=xrAnCQ@mail.gmail.com>
+Date: Tue, 30 Apr 2019 13:25:56 +0100
+Message-ID: <CAFEAcA81yQTHD=n_g9u0uU+d6PU4yJ2S+sFKcF0whYehRdEpcQ@mail.gmail.com>
 Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH 2/6] target/arm: Define cortex-a73
+Subject: Re: [Qemu-devel] [PATCH 3/6] target/arm: Implement ID_AA64MMFR2
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,15 +35,53 @@ Cc: QEMU Developers <qemu-devel@nongnu.org>, =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.
 On Sat, 23 Feb 2019 at 02:40, Richard Henderson
 <richard.henderson@linaro.org> wrote:
 >
-> There are new field definitions, CSV2 and CSV3, that do not yet
-> appear in the main ARM ARM.  Define the ID_AA64PF0 versions,
-
-"ID_AA64PFR0"
-
-> since we already define the rest of those bits.
+> This was res0 before ARMv8.2, but will shortly be used by
+> new processor definitions.
 >
 > Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
-> --
+> ---
+>  target/arm/cpu.h    | 15 +++++++++++++++
+>  target/arm/helper.c |  4 ++--
+>  target/arm/kvm64.c  |  2 ++
+>  3 files changed, 19 insertions(+), 2 deletions(-)
+>
+> diff --git a/target/arm/cpu.h b/target/arm/cpu.h
+> index c2899f0bed..02642a7db3 100644
+> --- a/target/arm/cpu.h
+> +++ b/target/arm/cpu.h
+> @@ -855,6 +855,7 @@ struct ARMCPU {
+>          uint64_t id_aa64pfr1;
+>          uint64_t id_aa64mmfr0;
+>          uint64_t id_aa64mmfr1;
+> +        uint64_t id_aa64mmfr2;
+>      } isar;
+>      uint32_t midr;
+>      uint32_t revidr;
+> @@ -1724,6 +1725,20 @@ FIELD(ID_AA64MMFR1, PAN, 20, 4)
+>  FIELD(ID_AA64MMFR1, SPECSEI, 24, 4)
+>  FIELD(ID_AA64MMFR1, XNX, 28, 4)
+>
+> +FIELD(ID_AA64MMFR2, CNP, 0, 4)
+> +FIELD(ID_AA64MMFR2, UAO, 4, 4)
+> +FIELD(ID_AA64MMFR2, LSM, 8, 4)
+> +FIELD(ID_AA64MMFR2, IESB, 12, 4)
+> +FIELD(ID_AA64MMFR2, VARANGE, 16, 4)
+> +FIELD(ID_AA64MMFR2, CCIDX, 20, 4)
+> +FIELD(ID_AA64MMFR2, NV, 24, 4)
+> +FIELD(ID_AA64MMFR2, ST, 28, 4)
+> +FIELD(ID_AA64MMFR2, AT, 32, 4)
+> +FIELD(ID_AA64MMFR2, IDS, 36, 4)
+> +FIELD(ID_AA64MMFR2, FWB, 40, 4)
+> +FIELD(ID_AA64MMFR2, TTL, 48, 4)
+> +FIELD(ID_AA64MMFR2, BBM, 52, 4)
+
+While we're here:
+FIELD(ID_AA64MMFR2, EVT, 56, 4)
+FIELD(ID_AA64MMFR2, E0PD, 60, 4)
+
+(from arm v8.5, see
+https://developer.arm.com/docs/ddi0595/b/aarch64-system-registers/id_aa64mmfr2_el1
+)
 
 otherwise
 Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
