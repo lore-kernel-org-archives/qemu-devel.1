@@ -1,27 +1,22 @@
-Received: from eggs.gnu.org ([209.51.188.92]:53820)
+Received: from eggs.gnu.org ([209.51.188.92]:54400)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <sgarzare@redhat.com>) id 1hLP0P-0000MK-Gs
-	for qemu-devel@nongnu.org; Tue, 30 Apr 2019 05:24:54 -0400
+	(envelope-from <wangjie88@huawei.com>) id 1hLP2V-0002AH-2a
+	for qemu-devel@nongnu.org; Tue, 30 Apr 2019 05:27:03 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <sgarzare@redhat.com>) id 1hLP0O-0002A3-9n
-	for qemu-devel@nongnu.org; Tue, 30 Apr 2019 05:24:53 -0400
-Received: from mail-wm1-f67.google.com ([209.85.128.67]:36687)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <sgarzare@redhat.com>) id 1hLP0N-00029S-OB
-	for qemu-devel@nongnu.org; Tue, 30 Apr 2019 05:24:51 -0400
-Received: by mail-wm1-f67.google.com with SMTP id h18so3041093wml.1
-	for <qemu-devel@nongnu.org>; Tue, 30 Apr 2019 02:24:51 -0700 (PDT)
-Date: Tue, 30 Apr 2019 11:24:37 +0200
-From: Stefano Garzarella <sgarzare@redhat.com>
-Message-ID: <20190430092437.jbecehdkqa4zdavd@steredhat>
-References: <20190423125706.26989-1-vsementsov@virtuozzo.com>
-	<20190423125706.26989-3-vsementsov@virtuozzo.com>
+	(envelope-from <wangjie88@huawei.com>) id 1hLP2U-0003OV-1i
+	for qemu-devel@nongnu.org; Tue, 30 Apr 2019 05:27:03 -0400
+Received: from szxga03-in.huawei.com ([45.249.212.189]:2062 helo=huawei.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <wangjie88@huawei.com>)
+	id 1hLP2T-0003MU-Ns
+	for qemu-devel@nongnu.org; Tue, 30 Apr 2019 05:27:02 -0400
+From: Jie Wang <wangjie88@huawei.com>
+Date: Tue, 30 Apr 2019 15:15:00 +0800
+Message-ID: <1556608500-12183-1-git-send-email-wangjie88@huawei.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20190423125706.26989-3-vsementsov@virtuozzo.com>
-Subject: Re: [Qemu-devel] [PATCH v5 2/3] block/io: bdrv_pdiscard: support
- int64_t bytes parameter
+Content-Type: text/plain
+Subject: [Qemu-devel] [PATCH] vhost: fix memory leak in
+ vhost_user_scsi_realize
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,87 +25,43 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org, kwolf@redhat.com, fam@euphon.net, den@virtuozzo.com, mreitz@redhat.com, stefanha@redhat.com
+To: qemu-devel@nongnu.org
+Cc: mst@redhat.com, wangjie88@huawei.com, wu.wubin@huawei.com
 
-On Tue, Apr 23, 2019 at 03:57:05PM +0300, Vladimir Sementsov-Ogievskiy wrote:
-> This fixes at least one overflow in qcow2_process_discards, which
-> passes 64bit region length to bdrv_pdiscard where bytes (or sectors in
-> the past) parameter is int since its introduction in 0b919fae.
-> 
-> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-> ---
->  include/block/block.h |  4 ++--
->  block/io.c            | 16 ++++++++--------
->  2 files changed, 10 insertions(+), 10 deletions(-)
-> 
-> diff --git a/include/block/block.h b/include/block/block.h
-> index c7a26199aa..69fa18867e 100644
-> --- a/include/block/block.h
-> +++ b/include/block/block.h
-> @@ -432,8 +432,8 @@ void bdrv_drain_all(void);
->      AIO_WAIT_WHILE(bdrv_get_aio_context(bs_),              \
->                     cond); })
->  
-> -int bdrv_pdiscard(BdrvChild *child, int64_t offset, int bytes);
-> -int bdrv_co_pdiscard(BdrvChild *child, int64_t offset, int bytes);
-> +int bdrv_pdiscard(BdrvChild *child, int64_t offset, int64_t bytes);
-> +int bdrv_co_pdiscard(BdrvChild *child, int64_t offset, int64_t bytes);
->  int bdrv_has_zero_init_1(BlockDriverState *bs);
->  int bdrv_has_zero_init(BlockDriverState *bs);
->  bool bdrv_unallocated_blocks_are_zero(BlockDriverState *bs);
-> diff --git a/block/io.c b/block/io.c
-> index dfc153b8d8..16b6c5d855 100644
-> --- a/block/io.c
-> +++ b/block/io.c
-> @@ -2653,7 +2653,7 @@ int bdrv_flush(BlockDriverState *bs)
->  typedef struct DiscardCo {
->      BdrvChild *child;
->      int64_t offset;
-> -    int bytes;
-> +    int64_t bytes;
->      int ret;
->  } DiscardCo;
->  static void coroutine_fn bdrv_pdiscard_co_entry(void *opaque)
-> @@ -2664,14 +2664,15 @@ static void coroutine_fn bdrv_pdiscard_co_entry(void *opaque)
->      aio_wait_kick();
->  }
->  
-> -int coroutine_fn bdrv_co_pdiscard(BdrvChild *child, int64_t offset, int bytes)
-> +int coroutine_fn bdrv_co_pdiscard(BdrvChild *child, int64_t offset,
-> +                                  int64_t bytes)
->  {
->      BdrvTrackedRequest req;
->      int max_pdiscard, ret;
->      int head, tail, align;
->      BlockDriverState *bs = child->bs;
->  
-> -    if (!bs || !bs->drv) {
-> +    if (!bs || !bs->drv || !bdrv_is_inserted(bs)) {
+fix memory leak in vhost_user_scsi_realize
 
-Should we describe this change in the commit message?
-IIUC you added this check because you removed bdrv_check_byte_request()
-below,
+Signed-off-by: Jie Wang <wangjie88@huawei.com>
+---
+ hw/scsi/vhost-user-scsi.c | 3 +++
+ 1 file changed, 3 insertions(+)
 
-Maybe we can also remove '!bs->drv', since it is checked in
-bdrv_is_inserted().
-
->          return -ENOMEDIUM;
->      }
->  
-> @@ -2679,9 +2680,8 @@ int coroutine_fn bdrv_co_pdiscard(BdrvChild *child, int64_t offset, int bytes)
->          return -EPERM;
->      }
->  
-> -    ret = bdrv_check_byte_request(bs, offset, bytes);
-> -    if (ret < 0) {
-> -        return ret;
-> +    if (offset < 0 || bytes < 0 || bytes > INT64_MAX - offset) {
-> +        return -EIO;
->      }
-
-Should we check if 'bytes' is greater than
-'BDRV_REQUEST_MAX_SECTORS << BDRV_SECTOR_BITS'?
-
-Thanks,
-Stefano
+diff --git a/hw/scsi/vhost-user-scsi.c b/hw/scsi/vhost-user-scsi.c
+index 8b1e6876db..a9fd8ea305 100644
+--- a/hw/scsi/vhost-user-scsi.c
++++ b/hw/scsi/vhost-user-scsi.c
+@@ -69,6 +69,7 @@ static void vhost_user_scsi_realize(DeviceState *dev, Error **errp)
+     VirtIOSCSICommon *vs = VIRTIO_SCSI_COMMON(dev);
+     VHostUserSCSI *s = VHOST_USER_SCSI(dev);
+     VHostSCSICommon *vsc = VHOST_SCSI_COMMON(s);
++    struct vhost_virtqueue *vqs = NULL;
+     Error *err = NULL;
+     int ret;
+ 
+@@ -93,6 +94,7 @@ static void vhost_user_scsi_realize(DeviceState *dev, Error **errp)
+     vsc->dev.vqs = g_new(struct vhost_virtqueue, vsc->dev.nvqs);
+     vsc->dev.vq_index = 0;
+     vsc->dev.backend_features = 0;
++    vqs = vsc->dev.vqs;
+ 
+     ret = vhost_dev_init(&vsc->dev, &s->vhost_user,
+                          VHOST_BACKEND_TYPE_USER, 0);
+@@ -100,6 +102,7 @@ static void vhost_user_scsi_realize(DeviceState *dev, Error **errp)
+         error_setg(errp, "vhost-user-scsi: vhost initialization failed: %s",
+                    strerror(-ret));
+         vhost_user_cleanup(&s->vhost_user);
++        g_free(vqs);
+         return;
+     }
+ 
+-- 
+2.16.2.windows.1
