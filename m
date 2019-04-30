@@ -1,27 +1,34 @@
-Received: from eggs.gnu.org ([209.51.188.92]:38104)
+Received: from eggs.gnu.org ([209.51.188.92]:38478)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1hLS4D-00038B-9B
-	for qemu-devel@nongnu.org; Tue, 30 Apr 2019 08:41:02 -0400
+	(envelope-from <ehabkost@redhat.com>) id 1hLS5s-0003wV-0G
+	for qemu-devel@nongnu.org; Tue, 30 Apr 2019 08:42:45 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1hLS4C-0006AB-2f
-	for qemu-devel@nongnu.org; Tue, 30 Apr 2019 08:41:01 -0400
-Received: from mail-ot1-x341.google.com ([2607:f8b0:4864:20::341]:36782)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1hLS4B-00069d-SM
-	for qemu-devel@nongnu.org; Tue, 30 Apr 2019 08:41:00 -0400
-Received: by mail-ot1-x341.google.com with SMTP id b18so2734598otq.3
-	for <qemu-devel@nongnu.org>; Tue, 30 Apr 2019 05:40:59 -0700 (PDT)
+	(envelope-from <ehabkost@redhat.com>) id 1hLS5q-0007SX-80
+	for qemu-devel@nongnu.org; Tue, 30 Apr 2019 08:42:43 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:53712)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1hLS5p-0007P3-VI
+	for qemu-devel@nongnu.org; Tue, 30 Apr 2019 08:42:42 -0400
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+	[10.5.11.11])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 82FF930820C9
+	for <qemu-devel@nongnu.org>; Tue, 30 Apr 2019 12:42:38 +0000 (UTC)
+Date: Tue, 30 Apr 2019 09:42:36 -0300
+From: Eduardo Habkost <ehabkost@redhat.com>
+Message-ID: <20190430124236.GC28722@habkost.net>
+References: <20190423212246.3542-1-ehabkost@redhat.com>
+	<20190423212246.3542-2-ehabkost@redhat.com>
+	<20190424082652.GC28615@redhat.com>
+	<20190424182036.GH18406@habkost.net>
+	<20190430101006.GA6818@redhat.com>
 MIME-Version: 1.0
-References: <20190223023957.18865-1-richard.henderson@linaro.org>
-	<20190223023957.18865-6-richard.henderson@linaro.org>
-In-Reply-To: <20190223023957.18865-6-richard.henderson@linaro.org>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 30 Apr 2019 13:40:47 +0100
-Message-ID: <CAFEAcA_60sosZCU8VNg6dd1toZON6D5sC8xgZU1tWpaspu=gHA@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [RFC 5/6] target/arm: Conditionalize DBGDIDR vs
- ID_AA64DFR0_EL1 assert
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+In-Reply-To: <20190430101006.GA6818@redhat.com>
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH 1/3] qapi: SupportStatusInfo struct
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,36 +37,98 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Richard Henderson <richard.henderson@linaro.org>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>
+To: Daniel =?iso-8859-1?Q?P=2E_Berrang=E9?= <berrange@redhat.com>
+Cc: qemu-devel@nongnu.org, mprivozn@redhat.com, Markus Armbruster <armbru@redhat.com>
 
-On Sat, 23 Feb 2019 at 02:40, Richard Henderson
-<richard.henderson@linaro.org> wrote:
->
-> Only perform the assert when both registers exist.
-> Extract the variables from ID_AA64DFR0_EL1 for AArch64.
->
-> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+On Tue, Apr 30, 2019 at 11:10:06AM +0100, Daniel P. Berrang=E9 wrote:
+> On Wed, Apr 24, 2019 at 03:20:36PM -0300, Eduardo Habkost wrote:
+> > On Wed, Apr 24, 2019 at 09:26:52AM +0100, Daniel P. Berrang=E9 wrote:
+> > > On Tue, Apr 23, 2019 at 06:22:44PM -0300, Eduardo Habkost wrote:
+> > > > This struct will be used to represent support and deprecation
+> > > > status of QEMU features.
+> > > >=20
+> > > > Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
+> > > > ---
+> > > >  qapi/common.json | 24 ++++++++++++++++++++++++
+> > > >  1 file changed, 24 insertions(+)
+> > > >=20
+> > > > diff --git a/qapi/common.json b/qapi/common.json
+> > > > index 99d313ef3b..b59d0dc66b 100644
+> > > > --- a/qapi/common.json
+> > > > +++ b/qapi/common.json
+> > > > @@ -193,3 +193,27 @@
+> > > >               'ppc64', 'riscv32', 'riscv64', 's390x', 'sh4',
+> > > >               'sh4eb', 'sparc', 'sparc64', 'tricore', 'unicore32'=
+,
+> > > >               'x86_64', 'xtensa', 'xtensaeb' ] }
+> > > > +
+> > > > +##
+> > > > +# @SupportStatusInfo:
+> > > > +#
+> > > > +# Information on support status of a given feature
+> > > > +# (e.g. machine type)
+> > > > +#
+> > > > +# @deprecated: if true, the given feature is deprecated and may =
+be removed
+> > > > +#              in future versions of QEMU according to the QEMU =
+deprecation
+> > > > +#              policy.
+> > > > +#
+> > > > +# @status-message: Human readable message describing support sta=
+tus
+> > > > +#                  of the feature.
+> > > > +#
+> > > > +# @suggested-alternative: Optional.  Suggested alternative for a=
+ deprecated
+> > > > +#                         feature.  For machine types, this shou=
+ld be the name
+> > > > +#                         of an available machine-type.
+> > > > +#
+> > > > +# Since: 4.1
+> > > > +##
+> > > > +{ 'struct': 'SupportStatusInfo',
+> > > > +  'data': { 'deprecated': 'bool',
+> > > > +            '*status-message': 'str',
+> > > > +            '*suggested-alternative': 'str' } }
+> > >=20
+> > > I see status-message has to be optional, since you're embedding the
+> > > struct into another struct and want deprecated=3D=3Dfalse by defaul=
+t.
+> > >=20
+> > > I'd be inclined to change it to embed a pointer to the struct and
+> > > drop the deprecated field, and make both status-message and
+> > > suggested-alternative be mandatory. ie a struct  "DeprecationInfo"=20
+> > > the pointer to which is NULL if not deprecated.
+> >=20
+> > That could be a simple solution if we were sure we would only
+> > track deprecation info.  But I would like us to track additional
+> > support status on that struct eventually.
+>=20
+> I've no objection to expanding it to capture other info - we'll
+> want to change the 'deprecated' field to an enum though. Also,
+> in some cases there won't be any real alternative so lets just
+> call it 'hint' instead. How about
+>=20
+>     { 'enum':  "SupportStatus",
+>       'data': { 'production',  # Secure for use in hostile production e=
+nv
+>                 'development', # No security guarentee, friendly dev on=
+ly
+> 		'deprecated',  # To be removed in the future
+>     } }
 
-> +    if (have_aa32) {
-> +        ARMCPRegInfo dbgdidr = {
-> +            .name = "DBGDIDR", .cp = 14, .crn = 0, .crm = 0,
-> +            .opc1 = 0, .opc2 = 0, .access = PL0_R, .accessfn = access_tda,
-> +            .type = ARM_CP_CONST, .resetvalue = cpu->dbgdidr,
-> +        };
-> +        define_one_arm_cp_reg(cpu, &dbgdidr);
-> +    }
+"secure for production" and "deprecated" are independent
+variables.  There are deprecated features that are still secure,
+and deprecated features that were never supposed to be used in
+production in the first place.
 
-So if only EL0 has AArch32 it doesn't architecturally require
-that this AArch32 system register doesn't exist, because the
-register is still readable from EL0. The Arm ARM says that
-"implementation of this register is optional and deprecated".
-I would suggest that we should probably go with "implement the
-register if cpu->dbgdidr is non-zero", since at least bit 15
-must be set so zero isn't a valid real value for it.
+>=20
+>     { 'struct': "SupportStatusInfo",
+>        'data': { 'status': 'SupportStatus',
+>                  '*info': 'str',
+> 		 '*hint': 'str' } }
 
-Otherwise
-Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
+"hint" seems nicer than "suggested" or "recommended".  I like it.
 
-thanks
--- PMM
+--=20
+Eduardo
