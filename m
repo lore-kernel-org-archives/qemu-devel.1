@@ -1,26 +1,26 @@
-Received: from eggs.gnu.org ([209.51.188.92]:46348)
+Received: from eggs.gnu.org ([209.51.188.92]:51000)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1hLIjQ-0004Db-2M
-	for qemu-devel@nongnu.org; Mon, 29 Apr 2019 22:42:57 -0400
+	(envelope-from <yangchuanlong@huawei.com>) id 1hLJL5-0001pB-85
+	for qemu-devel@nongnu.org; Mon, 29 Apr 2019 23:21:52 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1hLIjO-0001IE-Sy
-	for qemu-devel@nongnu.org; Mon, 29 Apr 2019 22:42:56 -0400
-Resent-Message-Id: <E1hLIjO-0001IE-Sy@eggs.gnu.org>
-Received: from sender4-of-o59.zoho.com ([136.143.188.59]:21975)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
-	id 1hLIjO-0001Hu-LQ
-	for qemu-devel@nongnu.org; Mon, 29 Apr 2019 22:42:54 -0400
-In-Reply-To: <cover.1556540297.git.berto@igalia.com>
-Message-ID: <155659211918.10667.8325441472549230900@c2072b67cc0c>
-Reply-To: <qemu-devel@nongnu.org>
+	(envelope-from <yangchuanlong@huawei.com>) id 1hLJL4-0007iS-D4
+	for qemu-devel@nongnu.org; Mon, 29 Apr 2019 23:21:51 -0400
+Received: from szxga06-in.huawei.com ([45.249.212.32]:42388 helo=huawei.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <yangchuanlong@huawei.com>)
+	id 1hLJL4-0007eg-0u
+	for qemu-devel@nongnu.org; Mon, 29 Apr 2019 23:21:50 -0400
+Received: from DGGEMS406-HUB.china.huawei.com (unknown [172.30.72.59])
+	by Forcepoint Email with ESMTP id BE80D3CC4C492BA067D2
+	for <qemu-devel@nongnu.org>; Tue, 30 Apr 2019 11:16:12 +0800 (CST)
+From: Yang Chuanlong <yangchuanlong@huawei.com>
+Date: Tue, 30 Apr 2019 11:12:38 +0800
+Message-ID: <20190430031238.40499-1-yangchuanlong@huawei.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Mon, 29 Apr 2019 19:42:00 -0700 (PDT)
-Subject: Re: [Qemu-devel] [PATCH v3 0/2] commit: Make base read-only if
- there is an early failure
+Content-Type: text/plain
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PATCH v1] target/arm/arm-powerctl: mask the cpuid
+ with affinity bits when get cpu
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,18 +29,36 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: berto@igalia.com
-Cc: fam@euphon.net, qemu-devel@nongnu.org, kwolf@redhat.com, qemu-block@nongnu.org, mreitz@redhat.com
+To: qemu-devel@nongnu.org, gengdongjiu@huawei.com
 
-UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS9jb3Zlci4xNTU2NTQwMjk3Lmdp
-dC5iZXJ0b0BpZ2FsaWEuY29tLwoKCgpIaSwKClRoaXMgc2VyaWVzIGZhaWxlZCB0aGUgZG9ja2Vy
-LW1pbmd3QGZlZG9yYSBidWlsZCB0ZXN0LiBQbGVhc2UgZmluZCB0aGUgdGVzdGluZyBjb21tYW5k
-cyBhbmQKdGhlaXIgb3V0cHV0IGJlbG93LiBJZiB5b3UgaGF2ZSBEb2NrZXIgaW5zdGFsbGVkLCB5
-b3UgY2FuIHByb2JhYmx5IHJlcHJvZHVjZSBpdApsb2NhbGx5LgoKPT09IFRFU1QgU0NSSVBUIEJF
-R0lOID09PQojIS9iaW4vYmFzaAp0aW1lIG1ha2UgZG9ja2VyLXRlc3QtbWluZ3dAZmVkb3JhIFNI
-T1dfRU5WPTEgSj0xNCBORVRXT1JLPTEKPT09IFRFU1QgU0NSSVBUIEVORCA9PT0KCgoKClRoZSBm
-dWxsIGxvZyBpcyBhdmFpbGFibGUgYXQKaHR0cDovL3BhdGNoZXcub3JnL2xvZ3MvY292ZXIuMTU1
-NjU0MDI5Ny5naXQuYmVydG9AaWdhbGlhLmNvbS90ZXN0aW5nLmRvY2tlci1taW5nd0BmZWRvcmEv
-P3R5cGU9bWVzc2FnZS4KLS0tCkVtYWlsIGdlbmVyYXRlZCBhdXRvbWF0aWNhbGx5IGJ5IFBhdGNo
-ZXcgW2h0dHBzOi8vcGF0Y2hldy5vcmcvXS4KUGxlYXNlIHNlbmQgeW91ciBmZWVkYmFjayB0byBw
-YXRjaGV3LWRldmVsQHJlZGhhdC5jb20=
+Currently, the cpuid passed from the device tree may still contain
+non-affinity fields, which will cause arm_set_cpu_on failure.
+Therefore, we mask the cpuid with affinity fields here to
+improve qemu compatibility.
+
+Signed-off-by: Yang Chuanlong <yangchuanlong@huawei.com>
+---
+ target/arm/arm-powerctl.c | 8 +++++++-
+ 1 file changed, 7 insertions(+), 1 deletion(-)
+
+diff --git a/target/arm/arm-powerctl.c b/target/arm/arm-powerctl.c
+index f77a950db6..ef9fec0b4d 100644
+--- a/target/arm/arm-powerctl.c
++++ b/target/arm/arm-powerctl.c
+@@ -31,7 +31,13 @@ CPUState *arm_get_cpu_by_id(uint64_t id)
+ {
+     CPUState *cpu;
+=20
+-    DPRINTF("cpu %" PRId64 "\n", id);
++#ifdef TARGET_AARCH64
++    id &=3D ARM64_AFFINITY_MASK;
++#else
++    id &=3D ARM32_AFFINITY_MASK;
++#endif
++
++    DPRINTF("cpu %" PRId64 " after mask affinity\n", id);
+=20
+     CPU_FOREACH(cpu) {
+         ARMCPU *armcpu =3D ARM_CPU(cpu);
+--=20
+2.21.0
