@@ -2,50 +2,81 @@ Return-Path: <SRS0=TP+Q=TA=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-13.9 required=3.0
-	tests=HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
+X-Spam-Status: No, score=-3.7 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8F257C43219
-	for <qemu-devel@archiver.kernel.org>; Tue, 30 Apr 2019 12:37:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 05A11C43219
+	for <qemu-devel@archiver.kernel.org>; Tue, 30 Apr 2019 12:42:08 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4B50620835
-	for <qemu-devel@archiver.kernel.org>; Tue, 30 Apr 2019 12:37:13 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4B50620835
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
+	by mail.kernel.org (Postfix) with ESMTPS id 681FA2075E
+	for <qemu-devel@archiver.kernel.org>; Tue, 30 Apr 2019 12:42:07 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="iyICyi5N"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 681FA2075E
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:46602 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:46652 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hLS0W-0001DU-Du
-	for qemu-devel@archiver.kernel.org; Tue, 30 Apr 2019 08:37:12 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:37401)
+	id 1hLS5G-0003cA-7p
+	for qemu-devel@archiver.kernel.org; Tue, 30 Apr 2019 08:42:06 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:38104)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1hLRzd-0000p8-Cr
-	for qemu-devel@nongnu.org; Tue, 30 Apr 2019 08:36:18 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1hLS4D-00038B-9B
+	for qemu-devel@nongnu.org; Tue, 30 Apr 2019 08:41:02 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1hLRzc-00041y-06
-	for qemu-devel@nongnu.org; Tue, 30 Apr 2019 08:36:17 -0400
-Received: from relay.sw.ru ([185.231.240.75]:59016)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
-	id 1hLRzb-000415-Pa; Tue, 30 Apr 2019 08:36:15 -0400
-Received: from [10.28.8.145] (helo=kvm.sw.ru)
-	by relay.sw.ru with esmtp (Exim 4.91)
-	(envelope-from <vsementsov@virtuozzo.com>)
-	id 1hLRzX-0000qs-KD; Tue, 30 Apr 2019 15:36:12 +0300
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-To: qemu-devel@nongnu.org,
-	qemu-block@nongnu.org
-Date: Tue, 30 Apr 2019 15:36:11 +0300
-Message-Id: <20190430123611.31203-1-vsementsov@virtuozzo.com>
-X-Mailer: git-send-email 2.18.0
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x
-X-Received-From: 185.231.240.75
-Subject: [Qemu-devel] [PATCH] block/qed: add missed coroutine_fn markers
+	(envelope-from <peter.maydell@linaro.org>) id 1hLS4C-0006AB-2f
+	for qemu-devel@nongnu.org; Tue, 30 Apr 2019 08:41:01 -0400
+Received: from mail-ot1-x341.google.com ([2607:f8b0:4864:20::341]:36782)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1hLS4B-00069d-SM
+	for qemu-devel@nongnu.org; Tue, 30 Apr 2019 08:41:00 -0400
+Received: by mail-ot1-x341.google.com with SMTP id b18so2734598otq.3
+	for <qemu-devel@nongnu.org>; Tue, 30 Apr 2019 05:40:59 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+	h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+	:cc; bh=PbvWrLM+f0aXRYDrJv/gSIHjbRs/mKVoLfhOQfZeF7o=;
+	b=iyICyi5N6NYLYe7LDYtJhDaqbnjbITQAlGpMZLdgnzAVA8dK8uEDW5rURvkWlWXwYS
+	emP8OyQteOBiZ1D41l+KloV4b6q7pr/qMO6+4iOEk5keoX7nDBVUfwQZeV9A4kCf5ZCS
+	R1X3paEAcw1IlXyz7gK7+lDP1g/In9KWu0I0fDnUjXtBsuLfjGXzzxnuzrp6fqoNWfWX
+	YpggcdIwIl10XH7FUH1D+xpl8tM9xnXzQ/Bv+avIVo3XPYJoAXxoPOECpNXYiaE4fndX
+	j8Swbbn9A/MLTou4nVWGHGujAMfJLTRqcNNiVAitpVARQvZn5IuYD/+TQDhlKxrQVRvE
+	UeCQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=1e100.net; s=20161025;
+	h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+	:message-id:subject:to:cc;
+	bh=PbvWrLM+f0aXRYDrJv/gSIHjbRs/mKVoLfhOQfZeF7o=;
+	b=MbGmDf6KLZI2VrVaTpKoVNm/RpJWxLXpShAPocp1EOL6e36/KR3hD0PZoFAhKqGG4p
+	rNxEqBzcEMSlL2MSjuvTprcKDT2Sy46B79oO0Eg/jaw4xIazKxlOK1N7aqaVZ/YpGLWw
+	2NdsrqycvVBAKjb/pHZlhCMAFvlMYdKHqeETQbM87MP2oD795YXZef+Tlbs7CkOoJTb5
+	ux7FWzLfXrH46edVx6bB5AY96L7fHRlKJh8otMjSxqtnyla1HszK0IC08bOia1agmSel
+	4hAb3CvbasI1saBryoGArE3mb0IO8aD9JHUWnO/Jno/PUmqO25WUatv55GxF16b0CZq8
+	OIvg==
+X-Gm-Message-State: APjAAAWr1WnQ88Gu1vE1Ie10HWL1NrdjBzM0RL2sw8lOH4UbziT+uGM9
+	RqT1gxEPfX9w9sT2QTOKIJcFvNysVf90k8z95gC5Vg==
+X-Google-Smtp-Source: APXvYqyYHyzRqAr767QtVz+9RFIp3Xyo7JftZ+DaNN3lbb6OahPOtWMo4cuFrQ9GqQZFX+11t1nTuvhSh1VJZHcQ/Kk=
+X-Received: by 2002:a9d:61c6:: with SMTP id h6mr4775943otk.316.1556628058779; 
+	Tue, 30 Apr 2019 05:40:58 -0700 (PDT)
+MIME-Version: 1.0
+References: <20190223023957.18865-1-richard.henderson@linaro.org>
+	<20190223023957.18865-6-richard.henderson@linaro.org>
+In-Reply-To: <20190223023957.18865-6-richard.henderson@linaro.org>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Tue, 30 Apr 2019 13:40:47 +0100
+Message-ID:
+ <CAFEAcA_60sosZCU8VNg6dd1toZON6D5sC8xgZU1tWpaspu=gHA@mail.gmail.com>
+To: Richard Henderson <richard.henderson@linaro.org>
+Content-Type: text/plain; charset="UTF-8"
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+	recognized.
+X-Received-From: 2607:f8b0:4864:20::341
+Subject: Re: [Qemu-devel] [RFC 5/6] target/arm: Conditionalize DBGDIDR vs
+ ID_AA64DFR0_EL1 assert
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -57,212 +88,41 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: kwolf@redhat.com, vsementsov@virtuozzo.com, stefanha@redhat.com,
-	mreitz@redhat.com
+Cc: =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>,
+	QEMU Developers <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Content-Type: text/plain; charset="UTF-8"
-Message-ID: <20190430123611.9P2AB3wQ2_gbcvniXc7_VW33RG0rAZH9cO4SPXib4yM@z>
+Message-ID: <20190430124047.CVYkJUU0IHL7PLK_TiTx-qYoH20_IOz1WRNifrty2NI@z>
 
-qed_read_table and qed_write_table use coroutine-only interfaces but
-are not marked coroutine_fn. Happily, they are called only from
-coroutine context, so we only need to add missed markers.
+On Sat, 23 Feb 2019 at 02:40, Richard Henderson
+<richard.henderson@linaro.org> wrote:
+>
+> Only perform the assert when both registers exist.
+> Extract the variables from ID_AA64DFR0_EL1 for AArch64.
+>
+> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 
-Reported-by: Kevin Wolf <kwolf@redhat.com>
-Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
----
+> +    if (have_aa32) {
+> +        ARMCPRegInfo dbgdidr = {
+> +            .name = "DBGDIDR", .cp = 14, .crn = 0, .crm = 0,
+> +            .opc1 = 0, .opc2 = 0, .access = PL0_R, .accessfn = access_tda,
+> +            .type = ARM_CP_CONST, .resetvalue = cpu->dbgdidr,
+> +        };
+> +        define_one_arm_cp_reg(cpu, &dbgdidr);
+> +    }
 
-Hi!
+So if only EL0 has AArch32 it doesn't architecturally require
+that this AArch32 system register doesn't exist, because the
+register is still readable from EL0. The Arm ARM says that
+"implementation of this register is optional and deprecated".
+I would suggest that we should probably go with "implement the
+register if cpu->dbgdidr is non-zero", since at least bit 15
+must be set so zero isn't a valid real value for it.
 
-This is a follow-up for my "block: buffer-based io" series, proposed by
-Kevin, based on Kevin's block branch.
+Otherwise
+Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
 
-Based-on: git://repo.or.cz/qemu/kevin.git block
-
- block/qed.h       | 28 ++++++++++++++++------------
- block/qed-check.c |  4 ++--
- block/qed-table.c | 33 ++++++++++++++++++++-------------
- block/qed.c       |  5 +++--
- 4 files changed, 41 insertions(+), 29 deletions(-)
-
-diff --git a/block/qed.h b/block/qed.h
-index f35341f134..42c115d822 100644
---- a/block/qed.h
-+++ b/block/qed.h
-@@ -201,17 +201,21 @@ void qed_commit_l2_cache_entry(L2TableCache *l2_cache, CachedL2Table *l2_table);
- /**
-  * Table I/O functions
-  */
--int qed_read_l1_table_sync(BDRVQEDState *s);
--int qed_write_l1_table(BDRVQEDState *s, unsigned int index, unsigned int n);
--int qed_write_l1_table_sync(BDRVQEDState *s, unsigned int index,
--                            unsigned int n);
--int qed_read_l2_table_sync(BDRVQEDState *s, QEDRequest *request,
--                           uint64_t offset);
--int qed_read_l2_table(BDRVQEDState *s, QEDRequest *request, uint64_t offset);
--int qed_write_l2_table(BDRVQEDState *s, QEDRequest *request,
--                       unsigned int index, unsigned int n, bool flush);
--int qed_write_l2_table_sync(BDRVQEDState *s, QEDRequest *request,
--                            unsigned int index, unsigned int n, bool flush);
-+int coroutine_fn qed_read_l1_table_sync(BDRVQEDState *s);
-+int coroutine_fn qed_write_l1_table(BDRVQEDState *s, unsigned int index,
-+                                    unsigned int n);
-+int coroutine_fn qed_write_l1_table_sync(BDRVQEDState *s, unsigned int index,
-+                                         unsigned int n);
-+int coroutine_fn qed_read_l2_table_sync(BDRVQEDState *s, QEDRequest *request,
-+                                        uint64_t offset);
-+int coroutine_fn qed_read_l2_table(BDRVQEDState *s, QEDRequest *request,
-+                                   uint64_t offset);
-+int coroutine_fn qed_write_l2_table(BDRVQEDState *s, QEDRequest *request,
-+                                    unsigned int index, unsigned int n,
-+                                    bool flush);
-+int coroutine_fn qed_write_l2_table_sync(BDRVQEDState *s, QEDRequest *request,
-+                                         unsigned int index, unsigned int n,
-+                                         bool flush);
- 
- /**
-  * Cluster functions
-@@ -223,7 +227,7 @@ int coroutine_fn qed_find_cluster(BDRVQEDState *s, QEDRequest *request,
- /**
-  * Consistency check
-  */
--int qed_check(BDRVQEDState *s, BdrvCheckResult *result, bool fix);
-+int coroutine_fn qed_check(BDRVQEDState *s, BdrvCheckResult *result, bool fix);
- 
- QEDTable *qed_alloc_table(BDRVQEDState *s);
- 
-diff --git a/block/qed-check.c b/block/qed-check.c
-index 0edac03159..418033ee24 100644
---- a/block/qed-check.c
-+++ b/block/qed-check.c
-@@ -106,7 +106,7 @@ static unsigned int qed_check_l2_table(QEDCheck *check, QEDTable *table)
- /**
-  * Descend tables and check each cluster is referenced once only
-  */
--static int qed_check_l1_table(QEDCheck *check, QEDTable *table)
-+static int coroutine_fn qed_check_l1_table(QEDCheck *check, QEDTable *table)
- {
-     BDRVQEDState *s = check->s;
-     unsigned int i, num_invalid_l1 = 0;
-@@ -218,7 +218,7 @@ static void qed_check_mark_clean(BDRVQEDState *s, BdrvCheckResult *result)
- }
- 
- /* Called with table_lock held.  */
--int qed_check(BDRVQEDState *s, BdrvCheckResult *result, bool fix)
-+int coroutine_fn qed_check(BDRVQEDState *s, BdrvCheckResult *result, bool fix)
- {
-     QEDCheck check = {
-         .s = s,
-diff --git a/block/qed-table.c b/block/qed-table.c
-index cf30edd977..405d446cbe 100644
---- a/block/qed-table.c
-+++ b/block/qed-table.c
-@@ -19,7 +19,8 @@
- #include "qemu/bswap.h"
- 
- /* Called with table_lock held.  */
--static int qed_read_table(BDRVQEDState *s, uint64_t offset, QEDTable *table)
-+static int coroutine_fn qed_read_table(BDRVQEDState *s, uint64_t offset,
-+                                       QEDTable *table)
- {
-     unsigned int bytes = s->header.cluster_size * s->header.table_size;
- 
-@@ -60,8 +61,9 @@ out:
-  *
-  * Called with table_lock held.
-  */
--static int qed_write_table(BDRVQEDState *s, uint64_t offset, QEDTable *table,
--                           unsigned int index, unsigned int n, bool flush)
-+static int coroutine_fn qed_write_table(BDRVQEDState *s, uint64_t offset,
-+                                        QEDTable *table, unsigned int index,
-+                                        unsigned int n, bool flush)
- {
-     unsigned int sector_mask = BDRV_SECTOR_SIZE / sizeof(uint64_t) - 1;
-     unsigned int start, end, i;
-@@ -109,27 +111,29 @@ out:
-     return ret;
- }
- 
--int qed_read_l1_table_sync(BDRVQEDState *s)
-+int coroutine_fn qed_read_l1_table_sync(BDRVQEDState *s)
- {
-     return qed_read_table(s, s->header.l1_table_offset, s->l1_table);
- }
- 
- /* Called with table_lock held.  */
--int qed_write_l1_table(BDRVQEDState *s, unsigned int index, unsigned int n)
-+int coroutine_fn qed_write_l1_table(BDRVQEDState *s, unsigned int index,
-+                                    unsigned int n)
- {
-     BLKDBG_EVENT(s->bs->file, BLKDBG_L1_UPDATE);
-     return qed_write_table(s, s->header.l1_table_offset,
-                            s->l1_table, index, n, false);
- }
- 
--int qed_write_l1_table_sync(BDRVQEDState *s, unsigned int index,
--                            unsigned int n)
-+int coroutine_fn qed_write_l1_table_sync(BDRVQEDState *s, unsigned int index,
-+                                         unsigned int n)
- {
-     return qed_write_l1_table(s, index, n);
- }
- 
- /* Called with table_lock held.  */
--int qed_read_l2_table(BDRVQEDState *s, QEDRequest *request, uint64_t offset)
-+int coroutine_fn qed_read_l2_table(BDRVQEDState *s, QEDRequest *request,
-+                                   uint64_t offset)
- {
-     int ret;
- 
-@@ -166,22 +170,25 @@ int qed_read_l2_table(BDRVQEDState *s, QEDRequest *request, uint64_t offset)
-     return ret;
- }
- 
--int qed_read_l2_table_sync(BDRVQEDState *s, QEDRequest *request, uint64_t offset)
-+int coroutine_fn qed_read_l2_table_sync(BDRVQEDState *s, QEDRequest *request,
-+                                        uint64_t offset)
- {
-     return qed_read_l2_table(s, request, offset);
- }
- 
- /* Called with table_lock held.  */
--int qed_write_l2_table(BDRVQEDState *s, QEDRequest *request,
--                       unsigned int index, unsigned int n, bool flush)
-+int coroutine_fn qed_write_l2_table(BDRVQEDState *s, QEDRequest *request,
-+                                    unsigned int index, unsigned int n,
-+                                    bool flush)
- {
-     BLKDBG_EVENT(s->bs->file, BLKDBG_L2_UPDATE);
-     return qed_write_table(s, request->l2_table->offset,
-                            request->l2_table->table, index, n, flush);
- }
- 
--int qed_write_l2_table_sync(BDRVQEDState *s, QEDRequest *request,
--                            unsigned int index, unsigned int n, bool flush)
-+int coroutine_fn qed_write_l2_table_sync(BDRVQEDState *s, QEDRequest *request,
-+                                         unsigned int index, unsigned int n,
-+                                         bool flush)
- {
-     return qed_write_l2_table(s, request, index, n, flush);
- }
-diff --git a/block/qed.c b/block/qed.c
-index 912edaf56a..dcdcd62b4a 100644
---- a/block/qed.c
-+++ b/block/qed.c
-@@ -1604,8 +1604,9 @@ static void coroutine_fn bdrv_qed_co_invalidate_cache(BlockDriverState *bs,
-     }
- }
- 
--static int bdrv_qed_co_check(BlockDriverState *bs, BdrvCheckResult *result,
--                             BdrvCheckMode fix)
-+static int coroutine_fn bdrv_qed_co_check(BlockDriverState *bs,
-+                                          BdrvCheckResult *result,
-+                                          BdrvCheckMode fix)
- {
-     BDRVQEDState *s = bs->opaque;
-     int ret;
--- 
-2.18.0
-
+thanks
+-- PMM
 
