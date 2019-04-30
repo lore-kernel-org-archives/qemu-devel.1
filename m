@@ -2,60 +2,84 @@ Return-Path: <SRS0=TP+Q=TA=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.7 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7073CC43219
-	for <qemu-devel@archiver.kernel.org>; Tue, 30 Apr 2019 16:12:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C465AC43219
+	for <qemu-devel@archiver.kernel.org>; Tue, 30 Apr 2019 16:12:52 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 427D720835
-	for <qemu-devel@archiver.kernel.org>; Tue, 30 Apr 2019 16:12:35 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 427D720835
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 8C62A20835
+	for <qemu-devel@archiver.kernel.org>; Tue, 30 Apr 2019 16:12:52 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="zNgexLOq"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8C62A20835
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:49260 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:49266 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hLVMw-00074Y-CT
-	for qemu-devel@archiver.kernel.org; Tue, 30 Apr 2019 12:12:34 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:48958)
+	id 1hLVND-0007NU-Pp
+	for qemu-devel@archiver.kernel.org; Tue, 30 Apr 2019 12:12:51 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:51689)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1hLUuw-00088z-3e
-	for qemu-devel@nongnu.org; Tue, 30 Apr 2019 11:43:41 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1hLV2T-0006WW-Se
+	for qemu-devel@nongnu.org; Tue, 30 Apr 2019 11:51:26 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1hLUuu-0002Ay-H8
-	for qemu-devel@nongnu.org; Tue, 30 Apr 2019 11:43:38 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:49848)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <kwolf@redhat.com>)
-	id 1hLUup-00025q-Pe; Tue, 30 Apr 2019 11:43:32 -0400
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
-	[10.5.11.16])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id D547A2D800;
-	Tue, 30 Apr 2019 15:43:30 +0000 (UTC)
-Received: from linux.fritz.box.com (unknown [10.36.118.15])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id E24F44D5;
-	Tue, 30 Apr 2019 15:43:29 +0000 (UTC)
-From: Kevin Wolf <kwolf@redhat.com>
-To: qemu-block@nongnu.org
-Date: Tue, 30 Apr 2019 17:42:36 +0200
-Message-Id: <20190430154244.30083-20-kwolf@redhat.com>
-In-Reply-To: <20190430154244.30083-1-kwolf@redhat.com>
-References: <20190430154244.30083-1-kwolf@redhat.com>
+	(envelope-from <peter.maydell@linaro.org>) id 1hLV2T-0007fU-2Z
+	for qemu-devel@nongnu.org; Tue, 30 Apr 2019 11:51:25 -0400
+Received: from mail-ot1-x343.google.com ([2607:f8b0:4864:20::343]:41178)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1hLV2R-0007do-Tm
+	for qemu-devel@nongnu.org; Tue, 30 Apr 2019 11:51:24 -0400
+Received: by mail-ot1-x343.google.com with SMTP id g8so11355975otl.8
+	for <qemu-devel@nongnu.org>; Tue, 30 Apr 2019 08:51:22 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+	h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+	:cc:content-transfer-encoding;
+	bh=H92g6IK0gE47e1yuPe+y1KlYH7xjzRkY2VktOjLQKhw=;
+	b=zNgexLOqtG5zDsnpTM1o0tUIy9NVG5+lKrLKsDBlDcVykth9f1xAstXlNf73kO+jpL
+	im+AMNN+OtGSS+WijPwTsmQxcW7aDOWwr4gFHaKI3HG4RIMbhHwPV2ThIl6y7Aauf0lL
+	2dO+CA8BffAfpyjuQl/TcWSWhOipn0IpwF77/MtrUxNcNKtyKSChvWlCJKoZqgCvMf0W
+	AeUy2X31JtE9At4SpijTETF8PXEVHMlAdyXbVp3fOY+MqTKSUL9zhyvJ5IXcB1nz/F/h
+	EZM8YMAq4EcuXFLjt69DYAN9kHSpp5oEoR3J3czKLzDdyGy7hZRmjV4atglyYJWnbnMA
+	R+ow==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=1e100.net; s=20161025;
+	h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+	:message-id:subject:to:cc:content-transfer-encoding;
+	bh=H92g6IK0gE47e1yuPe+y1KlYH7xjzRkY2VktOjLQKhw=;
+	b=N69RUuVWLqPHTxfxS2md3+QPkuIwdER+cly/BJtqL6LU0beSLSE7UXb+eNMQxlc4Sf
+	ompjCqHWYAAaV2wEDAxM/0uCwR/UHPrlvvJTbi7eMBfWmegq7NYCUa+SiCkd48fqT8ce
+	YfiiprT/zW0ykGob6Pk9rN78mgTAAa1P9uBsxQN124lAen6bGxF4zSwwcLx0Pee7dOrr
+	hLs7n9CuY3UK9HLbYK+H+almkP9XVRH7l7w7IluvI47pFLrnAJo04pxppjt0Sv19nBNI
+	QWa9pZs3kH4q7ArNreaqJoE5e930YQN6BwQusa5UvgU+/CvTK7PUycEWS07thNXUnoe5
+	/aMg==
+X-Gm-Message-State: APjAAAXGS41OVZnf+/juB0uVWVXyn8snDProKusDJTGsGgEJGRcpbv1T
+	jTptdzw2uB0c8iuc2sOsdZ9wdbmFkX2Upuv7yoiqNQ==
+X-Google-Smtp-Source: APXvYqxJYDmcaMBtMVk7g2SLVRmdEwuVx2bKSJlTcdzPBejYIYOrTll4s/QBMfWjiIEU9F7oPXwKxRxIAKpGIeZPjH0=
+X-Received: by 2002:a9d:404:: with SMTP id 4mr40749901otc.352.1556639481238;
+	Tue, 30 Apr 2019 08:51:21 -0700 (PDT)
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.30]);
-	Tue, 30 Apr 2019 15:43:30 +0000 (UTC)
+References: <cover.1556515687.git.alistair@alistair23.me>
+	<PSXP216MB027793B449E7DAAB995E0F33DD390@PSXP216MB0277.KORP216.PROD.OUTLOOK.COM>
+	<1c2303a0-62bf-53ce-e91c-b45a95a91376@redhat.com>
+	<CAKmqyKMWHot3UaRkN4gnwtcj7kje-Yx3ZJa7-9NGbgfg6vMJdQ@mail.gmail.com>
+In-Reply-To: <CAKmqyKMWHot3UaRkN4gnwtcj7kje-Yx3ZJa7-9NGbgfg6vMJdQ@mail.gmail.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Tue, 30 Apr 2019 16:51:09 +0100
+Message-ID:
+ <CAFEAcA-UaW=0QpCcLo4_HkKHskhvAJhnCBm949Dbr8qBNM8aJw@mail.gmail.com>
+To: Alistair Francis <alistair23@gmail.com>
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] [PULL 19/27] block/qed: use buffer-based io
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+	recognized.
+X-Received-From: 2607:f8b0:4864:20::343
+Subject: Re: [Qemu-devel] [PATCH v1 4/5] hw/arm: Add the STM32F4xx SoC
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -67,126 +91,37 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: kwolf@redhat.com, qemu-devel@nongnu.org
+Cc: Alistair Francis <alistair@alistair23.me>,
+	=?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>,
+	"qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Content-Type: text/plain; charset="UTF-8"
-Message-ID: <20190430154236.b6omBbokDOSNWUVkNGMQiZt8KlH8GunME745Wi3nyqI@z>
+Message-ID: <20190430155109.oQgRea4qs8n1LyiQ_PXZGArOlRGMypIYCTY0VjgHv94@z>
 
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+On Mon, 29 Apr 2019 at 18:30, Alistair Francis <alistair23@gmail.com> wrote=
+:
+>
+> On Mon, Apr 29, 2019 at 5:43 AM Philippe Mathieu-Daud=C3=A9
+> <philmd@redhat.com> wrote:
+> >
+> > On 4/29/19 7:33 AM, Alistair Francis wrote:
+> > > --- /dev/null
+> > > +++ b/hw/arm/stm32f405_soc.c
+> > > @@ -0,0 +1,292 @@
+> > > +/*
+> > > + * STM32F405 SoC
+> > > + *
+> > > + * Copyright (c) 2014 Alistair Francis <alistair@alistair23.me>
+> >
+> > 2019?
+>
+> I never know how this works. It was originally written in 2014, do I
+> update the year based on the upstream submission?
 
-Move to _co_ versions of io functions qed_read_table() and
-qed_write_table(), as we use qemu_co_mutex_unlock()
-anyway.
+You could say "2014, 2019" if you like; or just use the date of
+original authorship.
 
-Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
-Reviewed-by: Stefano Garzarella <sgarzare@redhat.com>
-Signed-off-by: Kevin Wolf <kwolf@redhat.com>
----
- block/qed-table.c | 12 +++++-------
- block/qed.c       |  6 ++----
- 2 files changed, 7 insertions(+), 11 deletions(-)
-
-diff --git a/block/qed-table.c b/block/qed-table.c
-index c497bd4aec..cf30edd977 100644
---- a/block/qed-table.c
-+++ b/block/qed-table.c
-@@ -21,22 +21,22 @@
- /* Called with table_lock held.  */
- static int qed_read_table(BDRVQEDState *s, uint64_t offset, QEDTable *ta=
-ble)
- {
--    QEMUIOVector qiov =3D QEMU_IOVEC_INIT_BUF(
--        qiov, table->offsets, s->header.cluster_size * s->header.table_s=
-ize);
-+    unsigned int bytes =3D s->header.cluster_size * s->header.table_size=
-;
-+
-     int noffsets;
-     int i, ret;
-=20
-     trace_qed_read_table(s, offset, table);
-=20
-     qemu_co_mutex_unlock(&s->table_lock);
--    ret =3D bdrv_preadv(s->bs->file, offset, &qiov);
-+    ret =3D bdrv_co_pread(s->bs->file, offset, bytes, table->offsets, 0)=
-;
-     qemu_co_mutex_lock(&s->table_lock);
-     if (ret < 0) {
-         goto out;
-     }
-=20
-     /* Byteswap offsets */
--    noffsets =3D qiov.size / sizeof(uint64_t);
-+    noffsets =3D bytes / sizeof(uint64_t);
-     for (i =3D 0; i < noffsets; i++) {
-         table->offsets[i] =3D le64_to_cpu(table->offsets[i]);
-     }
-@@ -66,7 +66,6 @@ static int qed_write_table(BDRVQEDState *s, uint64_t of=
-fset, QEDTable *table,
-     unsigned int sector_mask =3D BDRV_SECTOR_SIZE / sizeof(uint64_t) - 1=
-;
-     unsigned int start, end, i;
-     QEDTable *new_table;
--    QEMUIOVector qiov;
-     size_t len_bytes;
-     int ret;
-=20
-@@ -79,7 +78,6 @@ static int qed_write_table(BDRVQEDState *s, uint64_t of=
-fset, QEDTable *table,
-     len_bytes =3D (end - start) * sizeof(uint64_t);
-=20
-     new_table =3D qemu_blockalign(s->bs, len_bytes);
--    qemu_iovec_init_buf(&qiov, new_table->offsets, len_bytes);
-=20
-     /* Byteswap table */
-     for (i =3D start; i < end; i++) {
-@@ -91,7 +89,7 @@ static int qed_write_table(BDRVQEDState *s, uint64_t of=
-fset, QEDTable *table,
-     offset +=3D start * sizeof(uint64_t);
-=20
-     qemu_co_mutex_unlock(&s->table_lock);
--    ret =3D bdrv_pwritev(s->bs->file, offset, &qiov);
-+    ret =3D bdrv_co_pwrite(s->bs->file, offset, len_bytes, new_table->of=
-fsets, 0);
-     qemu_co_mutex_lock(&s->table_lock);
-     trace_qed_write_table_cb(s, table, flush, ret);
-     if (ret < 0) {
-diff --git a/block/qed.c b/block/qed.c
-index 89af05d524..912edaf56a 100644
---- a/block/qed.c
-+++ b/block/qed.c
-@@ -113,15 +113,13 @@ static int coroutine_fn qed_write_header(BDRVQEDSta=
-te *s)
-     int nsectors =3D DIV_ROUND_UP(sizeof(QEDHeader), BDRV_SECTOR_SIZE);
-     size_t len =3D nsectors * BDRV_SECTOR_SIZE;
-     uint8_t *buf;
--    QEMUIOVector qiov;
-     int ret;
-=20
-     assert(s->allocating_acb || s->allocating_write_reqs_plugged);
-=20
-     buf =3D qemu_blockalign(s->bs, len);
--    qemu_iovec_init_buf(&qiov, buf, len);
-=20
--    ret =3D bdrv_co_preadv(s->bs->file, 0, qiov.size, &qiov, 0);
-+    ret =3D bdrv_co_pread(s->bs->file, 0, len, buf, 0);
-     if (ret < 0) {
-         goto out;
-     }
-@@ -129,7 +127,7 @@ static int coroutine_fn qed_write_header(BDRVQEDState=
- *s)
-     /* Update header */
-     qed_header_cpu_to_le(&s->header, (QEDHeader *) buf);
-=20
--    ret =3D bdrv_co_pwritev(s->bs->file, 0, qiov.size,  &qiov, 0);
-+    ret =3D bdrv_co_pwrite(s->bs->file, 0, len,  buf, 0);
-     if (ret < 0) {
-         goto out;
-     }
---=20
-2.20.1
-
+thanks
+-- PMM
 
