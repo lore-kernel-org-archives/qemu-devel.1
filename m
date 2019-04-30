@@ -2,80 +2,84 @@ Return-Path: <SRS0=TP+Q=TA=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.7 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.7 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 367BDC43219
-	for <qemu-devel@archiver.kernel.org>; Tue, 30 Apr 2019 12:58:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 328B1C43219
+	for <qemu-devel@archiver.kernel.org>; Tue, 30 Apr 2019 13:16:46 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id F2DAB21670
-	for <qemu-devel@archiver.kernel.org>; Tue, 30 Apr 2019 12:58:51 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id E7450205F4
+	for <qemu-devel@archiver.kernel.org>; Tue, 30 Apr 2019 13:16:45 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="WXOalJt5"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F2DAB21670
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="Nw7Iu52m"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E7450205F4
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:46897 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:47145 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hLSLT-0005DB-8g
-	for qemu-devel@archiver.kernel.org; Tue, 30 Apr 2019 08:58:51 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:41944)
+	id 1hLScm-0002PN-PW
+	for qemu-devel@archiver.kernel.org; Tue, 30 Apr 2019 09:16:44 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:44504)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1hLSKi-0004v4-K3
-	for qemu-devel@nongnu.org; Tue, 30 Apr 2019 08:58:05 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1hLSaq-00010a-3N
+	for qemu-devel@nongnu.org; Tue, 30 Apr 2019 09:14:45 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1hLSKe-0000Wn-PZ
-	for qemu-devel@nongnu.org; Tue, 30 Apr 2019 08:58:04 -0400
-Received: from mail-oi1-x242.google.com ([2607:f8b0:4864:20::242]:37887)
+	(envelope-from <peter.maydell@linaro.org>) id 1hLSap-0002AG-5T
+	for qemu-devel@nongnu.org; Tue, 30 Apr 2019 09:14:44 -0400
+Received: from mail-wr1-x443.google.com ([2a00:1450:4864:20::443]:38669)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1hLSKb-0000VW-Ev
-	for qemu-devel@nongnu.org; Tue, 30 Apr 2019 08:57:58 -0400
-Received: by mail-oi1-x242.google.com with SMTP id k6so11137332oic.4
-	for <qemu-devel@nongnu.org>; Tue, 30 Apr 2019 05:57:55 -0700 (PDT)
+	id 1hLSao-000292-TT
+	for qemu-devel@nongnu.org; Tue, 30 Apr 2019 09:14:43 -0400
+Received: by mail-wr1-x443.google.com with SMTP id k16so20992005wrn.5
+	for <qemu-devel@nongnu.org>; Tue, 30 Apr 2019 06:14:42 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
-	h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-	:cc; bh=VKzAMeXgP5xZnftALNyfMgZYzeU7n7X+Hiuu99OttYE=;
-	b=WXOalJt5VGn+3thVI/ysFCyqIAi7DCp97ihsH+yhRMyp8ygrvuwAjbPPuEOvX8HtXB
-	zfcBsJoYbqCs3/W3QZYY2eMBlvNEOuFu8bYx3JMDGGvbwGk05sL/P/vXX36nGjDEVJFZ
-	w3/NESvtR1kn6i+m3sXaaNwzegPcik7bB0U+ZPr2kbGVNffr+fmZBDocolGW9McN4TpP
-	V9XukvSL5hM0tbvWX84uKxUtc251nym5hMwaggMXhrPF2eeCOcpXybSJ2yNuISt7/YdA
-	p66xBaawfbS4m0hcn0pRiSZ2cyYUody5kbC/KCA21oxep59hh4YRqsv7tt27fqeSjKdN
-	ooGA==
+	h=from:to:subject:date:message-id:mime-version
+	:content-transfer-encoding;
+	bh=w6vzehaCUPSzmkvOvH14Y6PaZ3vtUSQ/vmVeOZradMw=;
+	b=Nw7Iu52miYbreKaP04SnKTM5paCXaH+E9+ZUSeEuI2DkvQfwkybnxXt63/53whpbmX
+	f+exjTAXv358SZsX8V5eB7hG2GWhzFQFTZpGe2iGo929nFQn3bsjF9FHkmccyP4UWu5B
+	oRJuHr5EYiDoKaSzeGQjpmaqTefgIsOxo3jMnZahNnqdmqXpqwgfcaj2vTXXB3cqlSm3
+	FLS5osifAjqYzTQ8Kgh4O5aoHiqf/JyHFRtHrCO6JAQpDsmsoQruSx3IXVQE5kZjm3MA
+	9OzWHeTkmHDVaAWdKXs1u8RL4Wq2CrHeFAYtMmgpqRuM2Xz3u05hVddFD+CdTSk62cQT
+	rbFQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
 	d=1e100.net; s=20161025;
-	h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-	:message-id:subject:to:cc;
-	bh=VKzAMeXgP5xZnftALNyfMgZYzeU7n7X+Hiuu99OttYE=;
-	b=JqnjRpQfUHLtoQrRopbfVMG5cCZs+68ku3UUMzL3+IP0hS2Jz7J8UfiUa+kcSJyW0N
-	xRdZiSsV61X4ChysqaiuW6xwj/bgcWDbGni/rlTpB348kSXP/7JfBxTfHLa5oaXJ68QJ
-	2tkBDiS4zjfdcbm1QfOXKR1vdIqtrwRYEhl/6g9qih0PixNXU6no+zs3KMRsCPjK2gfl
-	F9We6JYAtWvis0XUlpXtiSKyd4UtrasW4Xdxzpyc8yvP9omlSD5h7Mal2IKBLXOWi1T8
-	ELeV3MV0AB8CF5M4aXMEP36UbOk8vdaEw5eyGzr70qKFxsF/hW3hojGDQhXsEb5zpAYf
-	h5SQ==
-X-Gm-Message-State: APjAAAVcsj0yVhJP5SnGrDUFG9JFzNsFYxLIEAkMo3EyHPhBfomFxEVs
-	qUFnVlv6nXlnxdQChs1pevqvfLB43xHoLgskM9KoXg==
-X-Google-Smtp-Source: APXvYqzblnnCgzU6RjOpa8Sh6v0C+JHsHe2RSEUHR/XVqFNieOKj+2Uexlv1CxeD4hSROjJDkffZ72aXMv0M9gJxpRk=
-X-Received: by 2002:aca:ab12:: with SMTP id u18mr2650716oie.48.1556629074807; 
-	Tue, 30 Apr 2019 05:57:54 -0700 (PDT)
-MIME-Version: 1.0
-References: <20190223023957.18865-1-richard.henderson@linaro.org>
-In-Reply-To: <20190223023957.18865-1-richard.henderson@linaro.org>
+	h=x-gm-message-state:from:to:subject:date:message-id:mime-version
+	:content-transfer-encoding;
+	bh=w6vzehaCUPSzmkvOvH14Y6PaZ3vtUSQ/vmVeOZradMw=;
+	b=eAKQjFb0pKQnBSFfdbCRVh7iU/W5v1pdcMMR7GOgGv9ZQR2DD4MlY74v7wCRxvk6Da
+	bno4GA8Cy+xKRv/Jy6M4U4tnOqCswOvNALiWuMcuq0I2zT9iWUdYHKxiZMeWPm1IYFNH
+	ScH+GLz14KpUOUtx877xBoV5ZKmnmheB/lcl60Gy0qj9G3BqqPFXyPetO2Vba9MoUlBd
+	0EWa1RXr0EQkoLBZXGzWhfmR87LlRLoTSEt2oVvNThN1wP8fSXHnTq0DZSu3bOw5Hy3D
+	ElqyuJrsB5xicLoDT5YoPOfWQJeMHziM/GTUiwY2r1BUXTydjoXHdlVLpTwyP5C4Apwp
+	BZhA==
+X-Gm-Message-State: APjAAAX6QcoSp2rI4ZGXcWcu8yvBfSyhC2CpOcv6sTVmBbHy3GPI9n83
+	lyqj25yEZfKChLYYglv8eflBH3ord1U=
+X-Google-Smtp-Source: APXvYqzBLL4prhQKWn8wFffgsO6wpSlYS94EYtKsbfJPbvGGKfIuX5EK24NEyycIKEQF3FfZzUNmtA==
+X-Received: by 2002:adf:cd05:: with SMTP id w5mr2696917wrm.84.1556630081614;
+	Tue, 30 Apr 2019 06:14:41 -0700 (PDT)
+Received: from orth.archaic.org.uk (orth.archaic.org.uk. [81.2.115.148])
+	by smtp.gmail.com with ESMTPSA id
+	a12sm16557460wrh.46.2019.04.30.06.14.40
+	(version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+	Tue, 30 Apr 2019 06:14:40 -0700 (PDT)
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 30 Apr 2019 13:57:44 +0100
-Message-ID:
- <CAFEAcA-30AuFEP6hYE-CEFTr7wosAi6Mugrp=FH-xWx4X-pNww@mail.gmail.com>
-To: Richard Henderson <richard.henderson@linaro.org>
-Content-Type: text/plain; charset="UTF-8"
+To: qemu-arm@nongnu.org,
+	qemu-devel@nongnu.org
+Date: Tue, 30 Apr 2019 14:14:35 +0100
+Message-Id: <20190430131439.25251-1-peter.maydell@linaro.org>
+X-Mailer: git-send-email 2.20.1
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
 	recognized.
-X-Received-From: 2607:f8b0:4864:20::242
-Subject: Re: [Qemu-devel] [PATCH+RFC 0/6] target/arm: Define cortex-a{73, 75,
- 76}
+X-Received-From: 2a00:1450:4864:20::443
+Subject: [Qemu-devel] [PATCH 0/4] target/arm: four minor M-profile bug fixes
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -87,39 +91,31 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>,
-	QEMU Developers <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190430125744.7MImJlKGaJdau0H6ZILeqH6pe5uM6zbznAJYQdhGtiw@z>
+Content-Type: text/plain; charset="UTF-8"
+Message-ID: <20190430131435.h4lHkkrUGDRDFA2qj_p8tsBYmLEFP8I24LYhKJJKI20@z>
 
-On Sat, 23 Feb 2019 at 02:40, Richard Henderson
-<richard.henderson@linaro.org> wrote:
->
-> There have been several announcements since the a72.
->
-> The a75 and a76 entries are RFC because, while they boot with a 3.15
-> kernel, they do not boot with a 5.0-rc7 kernel.  I'm really not sure
-> where things have gone off the rails.  It'll take some more serious
-> tracing to figure out what went wrong.
->
-> I post this now mostly to get feedback on patch 5.  Should we do
-> more to elide *all* of the aa32 system registers for that case?
-
-We should make sure we don't expose non-existent sysregs to
-EL0, but it's harmless to define aa32 PL1_RW sysregs in
-an AArch64-only-for-EL1-and-up CPU -- the guest is just never
-able to access them. (This is the inverse of the way we define
-a lot of AArch64 sysregs for AArch32 CPUs).
-
-The thing to watch out for here is that where we have AArch32 and
-AArch64 aliases of each other, we tend to define one as the
-"real thing" and the other as the alias, which matters for
-migration. If we've used the AArch32 version as the "real thing"
-then we can't just skip the definition or we'll drop the register
-state from the migration stream entirely.
+These patches are fixes for some minor bugs that I noticed while
+writing and testing the M-profile FPU support. They're not FPU
+related, so I didn't want to mix them up with that large patchset...
 
 thanks
 -- PMM
+
+Peter Maydell (4):
+  hw/arm/armv7m_nvic: Check subpriority in nvic_recompute_state_secure()
+  hw/intc/armv7m_nvic: NS BFAR and BFSR are RAZ/WI if BFHFNMINS == 0
+  hw/intc/armv7m_nvic: Don't enable ARMV7M_EXCP_DEBUG from reset
+  target/arm: Implement XPSR GE bits
+
+ target/arm/cpu.h      |  4 ++++
+ hw/intc/armv7m_nvic.c | 40 ++++++++++++++++++++++++++++++++++------
+ target/arm/helper.c   | 12 ++++++++++--
+ 3 files changed, 48 insertions(+), 8 deletions(-)
+
+-- 
+2.20.1
+
 
