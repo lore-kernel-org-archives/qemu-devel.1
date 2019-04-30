@@ -1,27 +1,29 @@
-Received: from eggs.gnu.org ([209.51.188.92]:39122)
+Received: from eggs.gnu.org ([209.51.188.92]:39237)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1hLW2I-00048Z-NP
-	for qemu-devel@nongnu.org; Tue, 30 Apr 2019 12:55:19 -0400
+	(envelope-from <richard.henderson@linaro.org>) id 1hLW2K-0004C1-ON
+	for qemu-devel@nongnu.org; Tue, 30 Apr 2019 12:55:21 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1hLVzh-0000c7-T5
-	for qemu-devel@nongnu.org; Tue, 30 Apr 2019 12:52:39 -0400
-Received: from mail-wm1-x343.google.com ([2a00:1450:4864:20::343]:37651)
+	(envelope-from <richard.henderson@linaro.org>) id 1hLVza-0000NH-TF
+	for qemu-devel@nongnu.org; Tue, 30 Apr 2019 12:52:31 -0400
+Received: from mail-pf1-x443.google.com ([2607:f8b0:4864:20::443]:33020)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1hLVzh-0000XL-Kx
-	for qemu-devel@nongnu.org; Tue, 30 Apr 2019 12:52:37 -0400
-Received: by mail-wm1-x343.google.com with SMTP id y5so4628095wma.2
-	for <qemu-devel@nongnu.org>; Tue, 30 Apr 2019 09:52:37 -0700 (PDT)
-From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
-Date: Tue, 30 Apr 2019 17:52:21 +0100
-Message-Id: <20190430165234.32272-3-alex.bennee@linaro.org>
-In-Reply-To: <20190430165234.32272-1-alex.bennee@linaro.org>
-References: <20190430165234.32272-1-alex.bennee@linaro.org>
+	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+	id 1hLVza-0000Mh-O5
+	for qemu-devel@nongnu.org; Tue, 30 Apr 2019 12:52:30 -0400
+Received: by mail-pf1-x443.google.com with SMTP id z28so2045698pfk.0
+	for <qemu-devel@nongnu.org>; Tue, 30 Apr 2019 09:52:30 -0700 (PDT)
+References: <20190428143845.11810-1-mark.cave-ayland@ilande.co.uk>
+	<20190428143845.11810-11-mark.cave-ayland@ilande.co.uk>
+From: Richard Henderson <richard.henderson@linaro.org>
+Message-ID: <45ae496e-eb58-9bd8-a96a-e1620a792d9e@linaro.org>
+Date: Tue, 30 Apr 2019 09:52:17 -0700
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH v5 02/15] tests/tcg/multiarch: add hello world
- system test
+In-Reply-To: <20190428143845.11810-11-mark.cave-ayland@ilande.co.uk>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH 10/14] target/ppc: introduce
+ GEN_VSX_HELPER_R2_AB macro to fpu_helper.c
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,35 +32,21 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: qemu-arm@nongnu.org, mark.cave-ayland@ilande.co.uk, cota@braap.org, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
+To: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, qemu-devel@nongnu.org, qemu-ppc@nongnu.org, david@gibson.dropbear.id.au, rth@twiddle.net, gkurz@kaod.org
 
-This is not really i386 only, we can have the same test for all
-architectures supporting system tests.
+On 4/28/19 7:38 AM, Mark Cave-Ayland wrote:
+> Rather than perform the VSR register decoding within the helper itself,
+> introduce a new GEN_VSX_HELPER_R2_AB macro which performs the decode based
+> upon rA and rB at translation time.
+> 
+> Signed-off-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+> ---
+>  target/ppc/fpu_helper.c             | 10 ++++------
+>  target/ppc/helper.h                 |  6 +++---
+>  target/ppc/translate/vsx-impl.inc.c | 24 +++++++++++++++++++++---
+>  3 files changed, 28 insertions(+), 12 deletions(-)
 
-Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
----
- tests/tcg/i386/Makefile.softmmu-target       | 2 +-
- tests/tcg/{i386 => multiarch}/system/hello.c | 0
- 2 files changed, 1 insertion(+), 1 deletion(-)
- rename tests/tcg/{i386 => multiarch}/system/hello.c (100%)
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 
-diff --git a/tests/tcg/i386/Makefile.softmmu-target b/tests/tcg/i386/Makefile.softmmu-target
-index 53c9c5ece0..c31bbbf39a 100644
---- a/tests/tcg/i386/Makefile.softmmu-target
-+++ b/tests/tcg/i386/Makefile.softmmu-target
-@@ -27,7 +27,7 @@ CFLAGS+=-m32
- LINK_SCRIPT=$(I386_SYSTEM_SRC)/kernel.ld
- LDFLAGS=-Wl,-T$(LINK_SCRIPT) -Wl,-melf_i386
- # FIXME: move to common once x86_64 is bootstrapped
--TESTS+=$(X86_TESTS)
-+TESTS+=$(X86_TESTS) $(MULTIARCH_TESTS)
- endif
- CFLAGS+=-nostdlib -ggdb -O0 $(MINILIB_INC)
- LDFLAGS+=-static -nostdlib $(CRT_OBJS) $(MINILIB_OBJS) -lgcc
-diff --git a/tests/tcg/i386/system/hello.c b/tests/tcg/multiarch/system/hello.c
-similarity index 100%
-rename from tests/tcg/i386/system/hello.c
-rename to tests/tcg/multiarch/system/hello.c
--- 
-2.20.1
+
+r~
