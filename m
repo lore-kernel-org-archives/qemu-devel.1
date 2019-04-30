@@ -2,88 +2,83 @@ Return-Path: <SRS0=TP+Q=TA=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.7 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BB737C43219
-	for <qemu-devel@archiver.kernel.org>; Tue, 30 Apr 2019 04:44:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AE7D1C43219
+	for <qemu-devel@archiver.kernel.org>; Tue, 30 Apr 2019 05:07:48 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 80ECF2075E
-	for <qemu-devel@archiver.kernel.org>; Tue, 30 Apr 2019 04:44:04 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="FMNy+O1q"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 80ECF2075E
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=jms.id.au
+	by mail.kernel.org (Postfix) with ESMTPS id 5C02A2147A
+	for <qemu-devel@archiver.kernel.org>; Tue, 30 Apr 2019 05:07:48 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5C02A2147A
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:39029 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:39194 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hLKcd-0008UH-PT
-	for qemu-devel@archiver.kernel.org; Tue, 30 Apr 2019 00:44:03 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:60630)
+	id 1hLKzb-0003lq-8j
+	for qemu-devel@archiver.kernel.org; Tue, 30 Apr 2019 01:07:47 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:35717)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <joel.stan@gmail.com>) id 1hLKZv-0006sC-Fx
-	for qemu-devel@nongnu.org; Tue, 30 Apr 2019 00:41:16 -0400
+	(envelope-from <philmd@redhat.com>) id 1hLKyn-0003Up-Vj
+	for qemu-devel@nongnu.org; Tue, 30 Apr 2019 01:06:59 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <joel.stan@gmail.com>) id 1hLKZu-0002jp-8P
-	for qemu-devel@nongnu.org; Tue, 30 Apr 2019 00:41:15 -0400
-Received: from mail-pl1-x641.google.com ([2607:f8b0:4864:20::641]:37703)
+	(envelope-from <philmd@redhat.com>) id 1hLKym-0000ba-FF
+	for qemu-devel@nongnu.org; Tue, 30 Apr 2019 01:06:57 -0400
+Received: from mail-wr1-f67.google.com ([209.85.221.67]:41250)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <joel.stan@gmail.com>)
-	id 1hLKZo-0002fr-38; Tue, 30 Apr 2019 00:41:08 -0400
-Received: by mail-pl1-x641.google.com with SMTP id z8so6152932pln.4;
-	Mon, 29 Apr 2019 21:41:07 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
-	h=sender:from:to:cc:subject:date:message-id:in-reply-to:references
-	:mime-version:content-transfer-encoding;
-	bh=MI5nCh4/5B0Sz0tu7042172x5DdKFcjyfCPFDvMLqR4=;
-	b=FMNy+O1qySsuJAVz3CQRoGWAKXFpdv1X6ytiDGe1oy245bXcMChEys5ecET2cQ6eTp
-	GHDtrUhncGDOBvC6sVtmueEh5oM05SrWB1qcMH1/2e/vFJDyTnwx/9iBYWZhCQ+X3GJS
-	1rJ0o8iR8gcSenxcUNpUgUxUy60nbQLJ75yOleCBfLjOB5e71lf708wN4nOvCXttLrTv
-	XW9LHhe493v+6wgOBinKa4HPv4HU/D4bSqofOcK154suuqNcdYZgYWp/xt8hnLb5Qor+
-	PsU1SOyv0S0xFyUzaO/cw9Y6zgy1z8WQd1Q/ldMvk7iP6G4wV9e4X+eMCKil1TJpXb1T
-	TSiw==
+	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1hLKym-0000bQ-8p
+	for qemu-devel@nongnu.org; Tue, 30 Apr 2019 01:06:56 -0400
+Received: by mail-wr1-f67.google.com with SMTP id c12so19298769wrt.8
+	for <qemu-devel@nongnu.org>; Mon, 29 Apr 2019 22:06:56 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
 	d=1e100.net; s=20161025;
-	h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
-	:in-reply-to:references:mime-version:content-transfer-encoding;
-	bh=MI5nCh4/5B0Sz0tu7042172x5DdKFcjyfCPFDvMLqR4=;
-	b=B5AA3kfI3+GIvyWpk056m49+izV28gft6Bz0iARdfwN/TAWkFC/BFObQ6uzU9TzSKX
-	2EvR6YHelqxuACXJ76lvLXOLpnmVHIgOykEVVhb33n3luOpYnaKT3+C1HUxpKSOMOdpA
-	9ARdzb+v2VUGsjISNAIeQITtJmRA4/VkaBEaGywitbUuOPanFkEifIhEOoDrJmjknFua
-	CypyLK1jIftSlE8Tah8EYlJXhb4ty54bYk6n8hwqOn3QnaJ6+QsEBc25G6AOUhw4aDXj
-	uIN8yKB+gJNJsJ7O2JVU2g/1DFT7thpqqQ+wpzUI9Ux8w++j/049zaCCg9NXAJwK/thj
-	pj3Q==
-X-Gm-Message-State: APjAAAVqtcb4fAwr9rQZudLOxKA9daGNh1Nv86Evvc0FCYz30b4ABMG5
-	u831VaV5zkW2UFo3kza6rgo=
-X-Google-Smtp-Source: APXvYqy+5++HsMw8idbOTW220U56XlyhPT0wX79jVHhkri1PVOZVeIMk41gbMRFKr0pZd02u7M8Wog==
-X-Received: by 2002:a17:902:822:: with SMTP id
-	31mr65976607plk.41.1556599266736; 
-	Mon, 29 Apr 2019 21:41:06 -0700 (PDT)
-Received: from voyager.jms.id.au ([45.124.203.18])
-	by smtp.gmail.com with ESMTPSA id
-	d5sm14411227pgb.33.2019.04.29.21.41.02
-	(version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
-	Mon, 29 Apr 2019 21:41:06 -0700 (PDT)
-Received: by voyager.jms.id.au (sSMTP sendmail emulation);
-	Tue, 30 Apr 2019 14:10:59 +0930
-From: Joel Stanley <joel@jms.id.au>
-To: Peter Maydell <peter.maydell@linaro.org>,
-	=?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>
-Date: Tue, 30 Apr 2019 14:10:35 +0930
-Message-Id: <20190430044036.1144-3-joel@jms.id.au>
-X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20190430044036.1144-1-joel@jms.id.au>
-References: <20190430044036.1144-1-joel@jms.id.au>
+	h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
+	:date:user-agent:mime-version:in-reply-to:content-language
+	:content-transfer-encoding;
+	bh=Yt7nRZWWkaWwdLOnVoGcCMVLBj7chyyQ+fkkOPxfABo=;
+	b=uhDqP/PEqio+BGWR9c9hB+wX+h38kmCrj2XDv4juQkV83GTHaKammCr9pSpnsWTanG
+	+jz3Y0z37PS5t7hq1sScfxW8boQJf8kWxnhJijNDNbZu1SzFBOqSoXznLhUpzmNUhVop
+	+Yv9+YMCtf3peVBT//HW4M2+f5aRXejhb2Gel2Vxfi/+xoYXCDhgCa1epwZcAEC5dec3
+	4axNRW1ozK6UJMCUl2cbD/z035KnHelWD4wmYo2AeFnuKU5TYXL03ON7iB8esIZmGGrb
+	3/sXV0rl0zzJUAsPHtD2Jf3Xg6beqotRgxF+Z0613rLScQibjenNxiMGWNIZmFqBm029
+	we6Q==
+X-Gm-Message-State: APjAAAW3OnCvjtq6Hom4d1t0AIsJMjopv/n5TX666Di9QFyCq8ikUaIq
+	pTjuBC+VuJ8fAuRZvO/wZfbkhvVUpd8=
+X-Google-Smtp-Source: APXvYqy/aFme5we1UGkaoyMQ0WEMnGaPGsB7gtN0jJ6u5kkvqKbFo+q88HcxvAz+N61UyH91+eoW3w==
+X-Received: by 2002:a5d:4e86:: with SMTP id e6mr6695337wru.59.1556600815014;
+	Mon, 29 Apr 2019 22:06:55 -0700 (PDT)
+Received: from [192.168.1.37] (193.red-88-21-103.staticip.rima-tde.net.
+	[88.21.103.193]) by smtp.gmail.com with ESMTPSA id
+	a4sm25279126wrr.39.2019.04.29.22.06.53
+	(version=TLS1_3 cipher=AEAD-AES128-GCM-SHA256 bits=128/128);
+	Mon, 29 Apr 2019 22:06:54 -0700 (PDT)
+To: "Longpeng (Mike)" <longpeng2@huawei.com>
+References: <1556523569-44480-1-git-send-email-longpeng2@huawei.com>
+	<7e19e93d-9ad4-51a8-3c1e-ed4d1672a47f@redhat.com>
+	<5CC6E333.90108@huawei.com>
+	<a14a352c-2587-11a6-7068-01bf52bac817@redhat.com>
+	<5CC7ACC7.2010306@huawei.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Openpgp: id=89C1E78F601EE86C867495CBA2A3FD6EDEADC0DE;
+	url=http://pgp.mit.edu/pks/lookup?op=get&search=0xA2A3FD6EDEADC0DE
+Message-ID: <ae81a8f8-fd36-a4b3-0c8c-4a6d698959a7@redhat.com>
+Date: Tue, 30 Apr 2019 07:06:52 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+	Thunderbird/60.6.1
 MIME-Version: 1.0
+In-Reply-To: <5CC7ACC7.2010306@huawei.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Language: en-US
 Content-Transfer-Encoding: 8bit
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
-	recognized.
-X-Received-From: 2607:f8b0:4864:20::641
-Subject: [Qemu-devel] [PATCH v3 2/2] hw/arm/aspeed: Add RTC to SoC
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+	[fuzzy]
+X-Received-From: 209.85.221.67
+Subject: Re: [Qemu-devel] [PATCH] usb/xchi: avoid trigger assertion if guest
+ write wrong epid
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -95,80 +90,217 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Andrew Jeffery <andrew@aj.id.au>, qemu-arm@nongnu.org,
-	qemu-devel@nongnu.org
+Cc: Gonglei <arei.gonglei@huawei.com>, kraxel@redhat.com, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Content-Type: text/plain; charset="UTF-8"
-Message-ID: <20190430044035.BHxlLOCBza8iKxRAajuYjZdQvtESdmWv0sYhFvwMlgk@z>
+Message-ID: <20190430050652.IrcEwcls-300Bdp4IGTXNVfnj72tGoFDiwmHBooXmH8@z>
 
-All systems have an RTC.
+On 4/30/19 4:02 AM, Longpeng (Mike) wrote:
+> On 2019/4/29 20:10, Philippe Mathieu-Daudé wrote:
+>> On 4/29/19 1:42 PM, Longpeng (Mike) wrote:
+>>> Hi Philippe,
+>>>
+>>> On 2019/4/29 19:16, Philippe Mathieu-Daudé wrote:
+>>>
+>>>> Hi Mike,
+>>>>
+>>>> On 4/29/19 9:39 AM, Longpeng(Mike) wrote:
+>>>>> From: Longpeng <longpeng2@huawei.com>
+>>>>>
+>>>>> we found the following core in our environment:
+>>>>> 0  0x00007fc6b06c2237 in raise ()
+>>>>> 1  0x00007fc6b06c3928 in abort ()
+>>>>> 2  0x00007fc6b06bb056 in __assert_fail_base ()
+>>>>> 3  0x00007fc6b06bb102 in __assert_fail ()
+>>>>> 4  0x0000000000702e36 in xhci_kick_ep (...)
+>>>>
+>>>>   5 xhci_doorbell_write?
+>>>>
+>>>>> 6  0x000000000047767f in access_with_adjusted_size (...)
+>>>>> 7  0x000000000047944d in memory_region_dispatch_write (...)
+>>>>> 8  0x000000000042df17 in address_space_write_continue (...)
+>>>>> 10 0x000000000043084d in address_space_rw (...)
+>>>>> 11 0x000000000047451b in kvm_cpu_exec (cpu=cpu@entry=0x1ab11b0)
+>>>>> 12 0x000000000045dcf5 in qemu_kvm_cpu_thread_fn (arg=0x1ab11b0)
+>>>>> 13 0x0000000000870631 in qemu_thread_start (args=args@entry=0x1acfb50)
+>>>>> 14 0x00000000008959a7 in thread_entry_for_hotfix (pthread_cb=<optimized out>)
+>>>>> 15 0x00007fc6b0a60dd5 in start_thread ()
+>>>>> 16 0x00007fc6b078a59d in clone ()
+>>>>> (gdb) bt
+>>>>> (gdb) f 5
+>>>>
+>>>> This is the frame you removed...
+>>>>
+>>>>> (gdb) p /x tmp
+>>>>> $9 = 0x62481a00 <-- last byte 0x00 is @epid
+>>>>
+>>>> I don't see 'tmp' in xhci_doorbell_write().
+>>>>
+>>>> Can you use trace events?
+>>>>
+>>>> There we have trace_usb_xhci_doorbell_write().
+>>>>
+>>>
+>>> Sorry , I'm careless to remove the important information.
+>>>
+>>>
+>>> This is our whole frame:
+>>>
+>>> (gdb) bt
+>>> #0  0x00007fc6b06c2237 in raise () from /usr/lib64/libc.so.6
+>>> #1  0x00007fc6b06c3928 in abort () from /usr/lib64/libc.so.6
+>>> #2  0x00007fc6b06bb056 in __assert_fail_base () from /usr/lib64/libc.so.6
+>>> #3  0x00007fc6b06bb102 in __assert_fail () from /usr/lib64/libc.so.6
+>>> #4  0x0000000000702e36 in xhci_kick_ep (...)
+>>> #5  0x000000000047897a in memory_region_write_accessor (...)
+>>> #6  0x000000000047767f in access_with_adjusted_size (...)
+>>> #7  0x000000000047944d in memory_region_dispatch_write
+>>> (mr=mr@entry=0x7fc6a0138df0, addr=addr@entry=156, data=1648892416,
+>>> size=size@entry=4, attrs=attrs@entry=...)
+>>
+>> So this is a 32-bit access, to address 156 (which is the slotid) and
+>> data=1648892416=0x62481a00 indeed.
+>>
+>> But watch out access_with_adjusted_size() calls adjust_endianness()...
+>>
+>>> #8  0x000000000042df17 in address_space_write_continue (...)
+>>> #9  0x00000000004302d5 in address_space_write (...)
+>>> #10 0x000000000043084d in address_space_rw (...)
+>>> #11 0x000000000047451b in kvm_cpu_exec (...)
+>>> #12 0x000000000045dcf5 in qemu_kvm_cpu_thread_fn (arg=0x1ab11b0)
+>>> #13 0x0000000000870631 in qemu_thread_start (args=args@entry=0x1acfb50)
+>>> #14 0x00000000008959a7 in thread_entry_for_hotfix (pthread_cb=<optimized out>)
+>>> #15 0x00007fc6b0a60dd5 in start_thread () from /usr/lib64/libpthread.so.0
+>>> #16 0x00007fc6b078a59d in clone () from /usr/lib64/libc.so.6
+>>>
+>>> (gdb) f 5
+>>> #5  0x000000000047897a in memory_region_write_accessor (...)
+>>> 529	    mr->ops->write(mr->opaque, addr, tmp, size);
+>>> (gdb) p /x tmp
+>>> $9 = 0x62481a00
+>>
+>> ... since memory_region_write_accessor() has the same argument, then I
+>> can assume your guest is running in Little-Endian.
+>>
+> 
+> Yes.
+> 
+>>> static void xhci_doorbell_write(void *ptr, hwaddr reg,
+>>>                                 uint64_t val, unsigned size)
+>>> So, the @val is 0x62481a00, and the last byte is epid, right?
+>>>
+>>>>>
+>>>>> xhci_doorbell_write() already check the upper bound of @slotid an @epid,
+>>>>> it also need to check the lower bound.
+>>>>>
+>>>>> Cc: Gonglei <arei.gonglei@huawei.com>
+>>>>> Signed-off-by: Longpeng <longpeng2@huawei.com>
+>>>>> ---
+>>>>>  hw/usb/hcd-xhci.c | 4 ++--
+>>>>>  1 file changed, 2 insertions(+), 2 deletions(-)
+>>>>>
+>>>>> diff --git a/hw/usb/hcd-xhci.c b/hw/usb/hcd-xhci.c
+>>>>> index ec28bee..b4e6bfc 100644
+>>>>> --- a/hw/usb/hcd-xhci.c
+>>>>> +++ b/hw/usb/hcd-xhci.c
+>>>>> @@ -3135,9 +3135,9 @@ static void xhci_doorbell_write(void *ptr, hwaddr reg,
+>>>>
+>>>> Expanding the diff:
+>>>>
+>>>>        if (reg == 0) {
+>>>>            if (val == 0) {
+>>>>                xhci_process_commands(xhci);
+>>>>            } else {
+>>>>                DPRINTF("xhci: bad doorbell 0 write: 0x%x\n",
+>>>>                        (uint32_t)val);
+>>>>            }
+>>>>>      } else {
+>>>>>          epid = val & 0xff;
+>>>>>          streamid = (val >> 16) & 0xffff;
+>>>>> -        if (reg > xhci->numslots) {
+>>>>> +        if (reg == 0 || reg > xhci->numslots) {
+>>>>
+>>>> So 'reg' can not be zero here...
+>>>>
+>>>
+>>> Oh, you're right.
+>>>
+>>>>>              DPRINTF("xhci: bad doorbell %d\n", (int)reg);
+>>>>> -        } else if (epid > 31) {
+>>>>> +        } else if (epid == 0 || epid > 31) {
+>>>>
+>>>> Here neither.
+>>>>
+>>>
+>>> In our frame, the epid is zero. The @val is from guest which is untrusted, when
+>>> this problem happened, I saw it wrote many invalid value, not only usb but also
+>>> other devices.
+>>
+>> If you use mainstream QEMU, we have:
+>>
+>> static void qemu_xhci_instance_init(Object *obj)
+>> {
+>>     ...
+>>     xhci->numslots = MAXSLOTS;
+>>     ...
+>> }
+>>
+>> $ git grep define.*MAXSLOTS
+>> hw/usb/hcd-xhci.c:52:#define LEN_DOORBELL    ((MAXSLOTS + 1) * 0x20)
+>> hw/usb/hcd-xhci.h:33:#define MAXSLOTS 64
+>> hw/usb/hcd-xhci.h:37:#define EV_QUEUE (((3 * 24) + 16) * MAXSLOTS)
+>>
+>>>
+>>>>>              DPRINTF("xhci: bad doorbell %d write: 0x%x\n",
+>>>>>                      (int)reg, (uint32_t)val);
+>>>>>          } else {
+>>>>>
+>>>>
+>>>> Isn't it the other line that triggered the assertion?
+>>>>
+>>>> static void xhci_kick_ep(XHCIState *xhci, unsigned int slotid,
+>>>>                          unsigned int epid, unsigned int streamid)
+>>>> {
+>>>>     XHCIEPContext *epctx;
+>>>>
+>>>>     assert(slotid >= 1 && slotid <= xhci->numslots); // <===
+>>
+>> slotid >= 1 // true
+>> slotid <= xhci->numslots // FALSE (156 > 64)
+>>
+>> So this assertion won't pass.
+>>
+> 
+> Oh, you miss the following code in xhci_doorbell_write():
+>     reg >>= 2;
+> 
+> So the @slotid pass to xhci_kick_ep() is 156/4 = 39 < 64 and the
+> 'assert(slotid >= 1 && slotid <= xhci->numslots)' assertion will pass.
+> 
+> Check the @epid in xhci_doorbell_write() is still needed.
 
-The IRQ is hooked up but the model does not use it at this stage. There
-is no guest code that uses it, so this limitation is acceptable.
+Oh! My bad, I missed that, I'm confused :S
 
-Signed-off-by: Joel Stanley <joel@jms.id.au>
----
-v3: Add commit message
-v2: Rebase on Cedric's patches (20190411161013.4514-4-clg@kaod.org)
----
- hw/arm/aspeed_soc.c         | 13 +++++++++++++
- include/hw/arm/aspeed_soc.h |  2 ++
- 2 files changed, 15 insertions(+)
+So for your next patch with simply this change:
 
-diff --git a/hw/arm/aspeed_soc.c b/hw/arm/aspeed_soc.c
-index 110956828c44..ea9700c35bc4 100644
---- a/hw/arm/aspeed_soc.c
-+++ b/hw/arm/aspeed_soc.c
-@@ -229,6 +229,9 @@ static void aspeed_soc_init(Object *obj)
-     sysbus_init_child_obj(obj, "vic", OBJECT(&s->vic), sizeof(s->vic),
-                           TYPE_ASPEED_VIC);
- 
-+    sysbus_init_child_obj(obj, "rtc", OBJECT(&s->rtc), sizeof(s->rtc),
-+                          TYPE_ASPEED_RTC);
-+
-     sysbus_init_child_obj(obj, "timerctrl", OBJECT(&s->timerctrl),
-                           sizeof(s->timerctrl), TYPE_ASPEED_TIMER);
-     object_property_add_const_link(OBJECT(&s->timerctrl), "scu",
-@@ -315,6 +318,16 @@ static void aspeed_soc_realize(DeviceState *dev, Error **errp)
-     sysbus_connect_irq(SYS_BUS_DEVICE(&s->vic), 1,
-                        qdev_get_gpio_in(DEVICE(&s->cpu), ARM_CPU_FIQ));
- 
-+    /* RTC */
-+    object_property_set_bool(OBJECT(&s->rtc), true, "realized", &err);
-+    if (err) {
-+        error_propagate(errp, err);
-+        return;
-+    }
-+    sysbus_mmio_map(SYS_BUS_DEVICE(&s->rtc), 0, sc->info->memmap[ASPEED_RTC]);
-+    sysbus_connect_irq(SYS_BUS_DEVICE(&s->rtc), 0,
-+                       aspeed_soc_get_irq(s, ASPEED_RTC));
-+
-     /* Timer */
-     object_property_set_bool(OBJECT(&s->timerctrl), true, "realized", &err);
-     if (err) {
-diff --git a/include/hw/arm/aspeed_soc.h b/include/hw/arm/aspeed_soc.h
-index eda9094660b5..d124674f25d8 100644
---- a/include/hw/arm/aspeed_soc.h
-+++ b/include/hw/arm/aspeed_soc.h
-@@ -17,6 +17,7 @@
- #include "hw/misc/aspeed_scu.h"
- #include "hw/misc/aspeed_sdmc.h"
- #include "hw/timer/aspeed_timer.h"
-+#include "hw/timer/aspeed_rtc.h"
- #include "hw/i2c/aspeed_i2c.h"
- #include "hw/ssi/aspeed_smc.h"
- #include "hw/watchdog/wdt_aspeed.h"
-@@ -33,6 +34,7 @@ typedef struct AspeedSoCState {
-     ARMCPU cpu;
-     MemoryRegion sram;
-     AspeedVICState vic;
-+    AspeedRtcState rtc;
-     AspeedTimerCtrlState timerctrl;
-     AspeedI2CState i2c;
-     AspeedSCUState scu;
--- 
-2.20.1
+-        } else if (epid > 31) {
++        } else if (epid == 0 || epid > 31) {
 
+You can include:
+Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+
+(Please include the full backtrace in the description).
+
+Thanks for being patient with me with this patch :)
+
+>>>>     assert(epid >= 1 && epid <= 31);
+>>>>
+>>>> Regards,
+>>>>
+>>>> Phil.
+>>>>
+>>
+>> .
+>>
 
