@@ -1,30 +1,26 @@
-Received: from eggs.gnu.org ([209.51.188.92]:35818)
+Received: from eggs.gnu.org ([209.51.188.92]:36110)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1hLU7M-0002at-Dy
-	for qemu-devel@nongnu.org; Tue, 30 Apr 2019 10:52:25 -0400
+	(envelope-from <marcandre.lureau@gmail.com>) id 1hLU8J-00033U-8V
+	for qemu-devel@nongnu.org; Tue, 30 Apr 2019 10:53:24 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1hLU7L-0005db-Hm
-	for qemu-devel@nongnu.org; Tue, 30 Apr 2019 10:52:24 -0400
-Received: from mail-pg1-x52b.google.com ([2607:f8b0:4864:20::52b]:34630)
+	(envelope-from <marcandre.lureau@gmail.com>) id 1hLU8I-00067S-77
+	for qemu-devel@nongnu.org; Tue, 30 Apr 2019 10:53:23 -0400
+Received: from mail-wr1-x442.google.com ([2a00:1450:4864:20::442]:44029)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1hLU7L-0005dA-8T
-	for qemu-devel@nongnu.org; Tue, 30 Apr 2019 10:52:23 -0400
-Received: by mail-pg1-x52b.google.com with SMTP id c13so5983790pgt.1
-	for <qemu-devel@nongnu.org>; Tue, 30 Apr 2019 07:52:23 -0700 (PDT)
-References: <20190403034358.21999-1-richard.henderson@linaro.org>
-	<20190403034358.21999-8-richard.henderson@linaro.org>
-	<CAFEAcA-_OG6DKJCVqYahNOo_oMoiWSq0Tb7+dQhOGh3jFg01=g@mail.gmail.com>
-From: Richard Henderson <richard.henderson@linaro.org>
-Message-ID: <9ac3730c-930b-fdaf-6271-e16c1a0b50aa@linaro.org>
-Date: Tue, 30 Apr 2019 07:52:14 -0700
+	(Exim 4.71) (envelope-from <marcandre.lureau@gmail.com>)
+	id 1hLU8H-000677-US
+	for qemu-devel@nongnu.org; Tue, 30 Apr 2019 10:53:22 -0400
+Received: by mail-wr1-x442.google.com with SMTP id a12so21358387wrq.10
+	for <qemu-devel@nongnu.org>; Tue, 30 Apr 2019 07:53:21 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <CAFEAcA-_OG6DKJCVqYahNOo_oMoiWSq0Tb7+dQhOGh3jFg01=g@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 07/26] target/i386: Convert to
- CPUClass::tlb_fill
+References: <20190425145420.8888-1-stefanha@redhat.com>
+In-Reply-To: <20190425145420.8888-1-stefanha@redhat.com>
+From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
+Date: Tue, 30 Apr 2019 16:53:08 +0200
+Message-ID: <CAJ+F1CLYjF8SQv0v8c-hfbPcFYgZdg1P-MVeB8nS_AXTy4eMDA@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v2] gitmodules: use qemu.org git mirrors
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,29 +29,66 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, Paolo Bonzini <pbonzini@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>
+To: Stefan Hajnoczi <stefanha@redhat.com>
+Cc: QEMU <qemu-devel@nongnu.org>, =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>, Peter Maydell <peter.maydell@linaro.org>
 
-On 4/30/19 4:49 AM, Peter Maydell wrote:
->> --- a/target/i386/mem_helper.c
->> +++ b/target/i386/mem_helper.c
->> @@ -191,24 +191,3 @@ void helper_boundl(CPUX86State *env, target_ulong a0, int v)
->>          raise_exception_ra(env, EXCP05_BOUND, GETPC());
->>      }
->>  }
->> -
->> -#if !defined(CONFIG_USER_ONLY)
->> -/* try to fill the TLB and return an exception if error. If retaddr is
->> - * NULL, it means that the function was called in C code (i.e. not
->> - * from generated code or from helper.c)
->> - */
->> -/* XXX: fix it to restore all registers */
-> 
-> Is this XXX comment definitely stale ?
+Hi
 
-This is a pre-TCG comment, from 61382a500a9 ("full softmmu support"), from
-2003.  It has only been moved around since.  I can only imagine what problem
-Fabrice might have been reminding himself.
+On Thu, Apr 25, 2019 at 4:54 PM Stefan Hajnoczi <stefanha@redhat.com> wrote=
+:
+>
+> qemu.org hosts git repository mirrors of all submodules.  Update
+> .gitmodules to use the mirrors and not the upstream repositories.
+>
+> Mirroring upstream repositories ensures that QEMU continues to build
+> even when upstream repositories are deleted or temporarily offline.
+>
+> Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
+> Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+> Tested-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+
+Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+
+Stefan, do you prepare a pullreq?
+
+> ---
+>  .gitmodules | 10 +++++-----
+>  1 file changed, 5 insertions(+), 5 deletions(-)
+>
+> diff --git a/.gitmodules b/.gitmodules
+> index aa77ce6f50..2857eec763 100644
+> --- a/.gitmodules
+> +++ b/.gitmodules
+> @@ -39,19 +39,19 @@
+>         url =3D https://git.qemu.org/git/capstone.git
+>  [submodule "roms/seabios-hppa"]
+>         path =3D roms/seabios-hppa
+> -       url =3D https://github.com/hdeller/seabios-hppa.git
+> +       url =3D https://git.qemu.org/git/seabios-hppa.git
+>  [submodule "roms/u-boot-sam460ex"]
+>         path =3D roms/u-boot-sam460ex
+>         url =3D https://git.qemu.org/git/u-boot-sam460ex.git
+>  [submodule "tests/fp/berkeley-testfloat-3"]
+>         path =3D tests/fp/berkeley-testfloat-3
+> -       url =3D https://github.com/cota/berkeley-testfloat-3
+> +       url =3D https://git.qemu.org/git/berkeley-testfloat-3.git
+>  [submodule "tests/fp/berkeley-softfloat-3"]
+>         path =3D tests/fp/berkeley-softfloat-3
+> -       url =3D https://github.com/cota/berkeley-softfloat-3
+> +       url =3D https://git.qemu.org/git/berkeley-softfloat-3.git
+>  [submodule "roms/edk2"]
+>         path =3D roms/edk2
+> -       url =3D https://github.com/tianocore/edk2.git
+> +       url =3D https://git.qemu.org/git/edk2.git
+>  [submodule "slirp"]
+>         path =3D slirp
+> -       url =3D https://gitlab.freedesktop.org/slirp/libslirp.git
+> +       url =3D https://git.qemu.org/git/libslirp.git
+> --
+> 2.20.1
+>
+>
 
 
-r~
+--=20
+Marc-Andr=C3=A9 Lureau
