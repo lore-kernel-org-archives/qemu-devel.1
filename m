@@ -3,59 +3,59 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
 X-Spam-Status: No, score=-6.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED
-	autolearn=ham autolearn_force=no version=3.4.0
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1D765C43219
-	for <qemu-devel@archiver.kernel.org>; Tue, 30 Apr 2019 15:55:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D7366C43219
+	for <qemu-devel@archiver.kernel.org>; Tue, 30 Apr 2019 15:56:35 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E550421743
-	for <qemu-devel@archiver.kernel.org>; Tue, 30 Apr 2019 15:55:15 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E550421743
+	by mail.kernel.org (Postfix) with ESMTPS id A8BF121743
+	for <qemu-devel@archiver.kernel.org>; Tue, 30 Apr 2019 15:56:35 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A8BF121743
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:48977 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:49017 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hLV6B-0000Xh-3e
-	for qemu-devel@archiver.kernel.org; Tue, 30 Apr 2019 11:55:15 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:48701)
+	id 1hLV7S-0001nj-Rx
+	for qemu-devel@archiver.kernel.org; Tue, 30 Apr 2019 11:56:34 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:49070)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1hLUup-000807-O2
-	for qemu-devel@nongnu.org; Tue, 30 Apr 2019 11:43:34 -0400
+	(envelope-from <kwolf@redhat.com>) id 1hLUv0-0008CD-DY
+	for qemu-devel@nongnu.org; Tue, 30 Apr 2019 11:43:43 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1hLUun-00023g-8Q
-	for qemu-devel@nongnu.org; Tue, 30 Apr 2019 11:43:31 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:45850)
+	(envelope-from <kwolf@redhat.com>) id 1hLUuz-0002ET-Dm
+	for qemu-devel@nongnu.org; Tue, 30 Apr 2019 11:43:42 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:49908)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <kwolf@redhat.com>)
-	id 1hLUuX-0001qU-Hn; Tue, 30 Apr 2019 11:43:15 -0400
+	id 1hLUuv-0002BD-Id; Tue, 30 Apr 2019 11:43:37 -0400
 Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
 	[10.5.11.16])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id BC0755D608;
-	Tue, 30 Apr 2019 15:43:12 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id BF3C12D7FE;
+	Tue, 30 Apr 2019 15:43:36 +0000 (UTC)
 Received: from linux.fritz.box.com (unknown [10.36.118.15])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id 999DB17106;
-	Tue, 30 Apr 2019 15:43:10 +0000 (UTC)
+	by smtp.corp.redhat.com (Postfix) with ESMTP id EF3D64C7;
+	Tue, 30 Apr 2019 15:43:34 +0000 (UTC)
 From: Kevin Wolf <kwolf@redhat.com>
 To: qemu-block@nongnu.org
-Date: Tue, 30 Apr 2019 17:42:27 +0200
-Message-Id: <20190430154244.30083-11-kwolf@redhat.com>
+Date: Tue, 30 Apr 2019 17:42:39 +0200
+Message-Id: <20190430154244.30083-23-kwolf@redhat.com>
 In-Reply-To: <20190430154244.30083-1-kwolf@redhat.com>
 References: <20190430154244.30083-1-kwolf@redhat.com>
 MIME-Version: 1.0
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.39]);
-	Tue, 30 Apr 2019 15:43:12 +0000 (UTC)
+	(mx1.redhat.com [10.5.110.30]);
+	Tue, 30 Apr 2019 15:43:36 +0000 (UTC)
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] [PULL 10/27] qcow2: Add errp to preallocate_co()
+Subject: [Qemu-devel] [PULL 22/27] block/commit: use buffer-based io
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -72,88 +72,42 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 Content-Type: text/plain; charset="UTF-8"
-Message-ID: <20190430154227.UXQb9DBCZFAowHmXvUAMJxa5s_kmc7oIEaTTMjK_KRA@z>
+Message-ID: <20190430154239.4V37pogs8YDiE4J7AxP0TbLU44qIKwRAdEqAGiXApxw@z>
 
-We'll add a bdrv_co_truncate() call in the next patch which can return
-an Error that we don't want to discard. So add an errp parameter to
-preallocate_co().
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 
-Cc: qemu-stable@nongnu.org
+Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
+Reviewed-by: Stefano Garzarella <sgarzare@redhat.com>
 Signed-off-by: Kevin Wolf <kwolf@redhat.com>
-Reviewed-by: Eric Blake <eblake@redhat.com>
 ---
- block/qcow2.c | 11 ++++++-----
- 1 file changed, 6 insertions(+), 5 deletions(-)
+ block/commit.c | 5 ++---
+ 1 file changed, 2 insertions(+), 3 deletions(-)
 
-diff --git a/block/qcow2.c b/block/qcow2.c
-index dfac74c264..b4f9f5a240 100644
---- a/block/qcow2.c
-+++ b/block/qcow2.c
-@@ -2721,7 +2721,7 @@ static int qcow2_set_up_encryption(BlockDriverState=
- *bs,
-  * Returns: 0 on success, -errno on failure.
-  */
- static int coroutine_fn preallocate_co(BlockDriverState *bs, uint64_t of=
-fset,
--                                       uint64_t new_length)
-+                                       uint64_t new_length, Error **errp=
-)
+diff --git a/block/commit.c b/block/commit.c
+index ba60fef58a..08204fa6f8 100644
+--- a/block/commit.c
++++ b/block/commit.c
+@@ -48,16 +48,15 @@ static int coroutine_fn commit_populate(BlockBackend =
+*bs, BlockBackend *base,
+                                         void *buf)
  {
-     BDRVQcow2State *s =3D bs->opaque;
-     uint64_t bytes;
-@@ -2738,6 +2738,7 @@ static int coroutine_fn preallocate_co(BlockDriverS=
-tate *bs, uint64_t offset,
-         ret =3D qcow2_alloc_cluster_offset(bs, offset, &cur_bytes,
-                                          &host_offset, &meta);
-         if (ret < 0) {
-+            error_setg_errno(errp, -ret, "Allocating clusters failed");
-             return ret;
-         }
+     int ret =3D 0;
+-    QEMUIOVector qiov =3D QEMU_IOVEC_INIT_BUF(qiov, buf, bytes);
 =20
-@@ -2746,6 +2747,7 @@ static int coroutine_fn preallocate_co(BlockDriverS=
-tate *bs, uint64_t offset,
+     assert(bytes < SIZE_MAX);
 =20
-             ret =3D qcow2_alloc_cluster_link_l2(bs, meta);
-             if (ret < 0) {
-+                error_setg_errno(errp, -ret, "Mapping clusters failed");
-                 qcow2_free_any_clusters(bs, meta->alloc_offset,
-                                         meta->nb_clusters, QCOW2_DISCARD=
-_NEVER);
-                 return ret;
-@@ -2775,6 +2777,7 @@ static int coroutine_fn preallocate_co(BlockDriverS=
-tate *bs, uint64_t offset,
-         ret =3D bdrv_pwrite(s->data_file, (host_offset + cur_bytes) - 1,
-                           &data, 1);
-         if (ret < 0) {
-+            error_setg_errno(errp, -ret, "Writing to EOF failed");
-             return ret;
-         }
+-    ret =3D blk_co_preadv(bs, offset, qiov.size, &qiov, 0);
++    ret =3D blk_co_pread(bs, offset, bytes, buf, 0);
+     if (ret < 0) {
+         return ret;
      }
-@@ -3748,9 +3751,8 @@ static int coroutine_fn qcow2_co_truncate(BlockDriv=
-erState *bs, int64_t offset,
-         break;
 =20
-     case PREALLOC_MODE_METADATA:
--        ret =3D preallocate_co(bs, old_length, offset);
-+        ret =3D preallocate_co(bs, old_length, offset, errp);
-         if (ret < 0) {
--            error_setg_errno(errp, -ret, "Preallocation failed");
-             goto fail;
-         }
-         break;
-@@ -3766,9 +3768,8 @@ static int coroutine_fn qcow2_co_truncate(BlockDriv=
-erState *bs, int64_t offset,
-         /* With a data file, preallocation means just allocating the met=
-adata
-          * and forwarding the truncate request to the data file */
-         if (has_data_file(bs)) {
--            ret =3D preallocate_co(bs, old_length, offset);
-+            ret =3D preallocate_co(bs, old_length, offset, errp);
-             if (ret < 0) {
--                error_setg_errno(errp, -ret, "Preallocation failed");
-                 goto fail;
-             }
-             break;
+-    ret =3D blk_co_pwritev(base, offset, qiov.size, &qiov, 0);
++    ret =3D blk_co_pwrite(base, offset, bytes, buf, 0);
+     if (ret < 0) {
+         return ret;
+     }
 --=20
 2.20.1
 
