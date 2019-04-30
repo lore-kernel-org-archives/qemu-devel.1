@@ -1,21 +1,32 @@
-Received: from eggs.gnu.org ([209.51.188.92]:36437)
+Received: from eggs.gnu.org ([209.51.188.92]:37471)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1hLcGv-00088n-IV
-	for qemu-devel@nongnu.org; Tue, 30 Apr 2019 19:34:50 -0400
+	(envelope-from <mst@redhat.com>) id 1hLcL4-0003Y5-O7
+	for qemu-devel@nongnu.org; Tue, 30 Apr 2019 19:39:07 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1hLcGu-0000Wc-AA
-	for qemu-devel@nongnu.org; Tue, 30 Apr 2019 19:34:49 -0400
-Resent-Message-Id: <E1hLcGu-0000Wc-AA@eggs.gnu.org>
-In-Reply-To: <20190430231536.25353-1-jsnow@redhat.com>
-Message-ID: <155666726797.10667.16771870824759307989@c2072b67cc0c>
-Reply-To: <qemu-devel@nongnu.org>
+	(envelope-from <mst@redhat.com>) id 1hLcL3-0003oO-QN
+	for qemu-devel@nongnu.org; Tue, 30 Apr 2019 19:39:06 -0400
+Received: from mail-qt1-f195.google.com ([209.85.160.195]:36176)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1hLcL1-0003mj-W6
+	for qemu-devel@nongnu.org; Tue, 30 Apr 2019 19:39:05 -0400
+Received: by mail-qt1-f195.google.com with SMTP id c35so18469407qtk.3
+	for <qemu-devel@nongnu.org>; Tue, 30 Apr 2019 16:39:03 -0700 (PDT)
+Date: Tue, 30 Apr 2019 19:38:59 -0400
+From: "Michael S. Tsirkin" <mst@redhat.com>
+Message-ID: <20190430193838-mutt-send-email-mst@kernel.org>
+References: <20190426003652.32633-1-richardw.yang@linux.intel.com>
+	<20190426003652.32633-2-richardw.yang@linux.intel.com>
+	<20190430204636.GK28722@habkost.net>
+	<20190430223618.lyl3ribm7gg5haa5@master>
+	<20190430224816.GL28722@habkost.net>
+	<20190430185011-mutt-send-email-mst@kernel.org>
+	<86e00247-588c-37c1-0737-82614a8f18c0@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Tue, 30 Apr 2019 16:34:29 -0700 (PDT)
-Subject: Re: [Qemu-devel] [PATCH RFC] migration/dirty-bitmaps: change bitmap
- enumeration method
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <86e00247-588c-37c1-0737-82614a8f18c0@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v15 1/2] util/mmap-alloc: support MAP_SYNC
+ in qemu_ram_mmap()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,36 +35,25 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: jsnow@redhat.com
-Cc: fam@euphon.net, qemu-devel@nongnu.orgfam@euphon.net, vsementsov@virtuozzo.com, qemu-block@nongnu.org, quintela@redhat.com, dgilbert@redhat.com, stefanha@redhat.com
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: Eduardo Habkost <ehabkost@redhat.com>, Wei Yang <richard.weiyang@gmail.com>, Wei Yang <richardw.yang@linux.intel.com>, pagupta@redhat.com, xiaoguangrong.eric@gmail.com, Haozhong Zhang <haozhong.zhang@intel.com>, qemu-devel@nongnu.org, yi.z.zhang@linux.intel.com, yu.c.zhang@linux.intel.com, stefanha@redhat.com, imammedo@redhat.com, dan.j.williams@intel.com
 
-UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDE5MDQzMDIzMTUzNi4yNTM1
-My0xLWpzbm93QHJlZGhhdC5jb20vCgoKCkhpLAoKVGhpcyBzZXJpZXMgc2VlbXMgdG8gaGF2ZSBz
-b21lIGNvZGluZyBzdHlsZSBwcm9ibGVtcy4gU2VlIG91dHB1dCBiZWxvdyBmb3IKbW9yZSBpbmZv
-cm1hdGlvbjoKClR5cGU6IHNlcmllcwpNZXNzYWdlLWlkOiAyMDE5MDQzMDIzMTUzNi4yNTM1My0x
-LWpzbm93QHJlZGhhdC5jb20KU3ViamVjdDogW1FlbXUtZGV2ZWxdIFtQQVRDSCBSRkNdIG1pZ3Jh
-dGlvbi9kaXJ0eS1iaXRtYXBzOiBjaGFuZ2UgYml0bWFwIGVudW1lcmF0aW9uIG1ldGhvZAoKPT09
-IFRFU1QgU0NSSVBUIEJFR0lOID09PQojIS9iaW4vYmFzaApnaXQgcmV2LXBhcnNlIGJhc2UgPiAv
-ZGV2L251bGwgfHwgZXhpdCAwCmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLnJlbmFtZWxpbWl0IDAK
-Z2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYucmVuYW1lcyBUcnVlCmdpdCBjb25maWcgLS1sb2NhbCBk
-aWZmLmFsZ29yaXRobSBoaXN0b2dyYW0KLi9zY3JpcHRzL2NoZWNrcGF0Y2gucGwgLS1tYWlsYmFj
-ayBiYXNlLi4KPT09IFRFU1QgU0NSSVBUIEVORCA9PT0KClVwZGF0aW5nIDNjOGNmNWE5YzIxZmY4
-NzgyMTY0ZDFkZWY3ZjQ0YmQ4ODg3MTMzODQKRnJvbSBodHRwczovL2dpdGh1Yi5jb20vcGF0Y2hl
-dy1wcm9qZWN0L3FlbXUKIHQgW3RhZyB1cGRhdGVdICAgICAgICAgICAgcGF0Y2hldy8yMDE5MDQy
-NDEwMzc0Ny4xMDE3My0xLXRodXRoQHJlZGhhdC5jb20gLT4gcGF0Y2hldy8yMDE5MDQyNDEwMzc0
-Ny4xMDE3My0xLXRodXRoQHJlZGhhdC5jb20KICogW25ldyB0YWddICAgICAgICAgICAgICAgcGF0
-Y2hldy8yMDE5MDQzMDIzMTUzNi4yNTM1My0xLWpzbm93QHJlZGhhdC5jb20gLT4gcGF0Y2hldy8y
-MDE5MDQzMDIzMTUzNi4yNTM1My0xLWpzbm93QHJlZGhhdC5jb20KU3dpdGNoZWQgdG8gYSBuZXcg
-YnJhbmNoICd0ZXN0Jwo2YzQ1YzNmYmQ0IG1pZ3JhdGlvbi9kaXJ0eS1iaXRtYXBzOiBjaGFuZ2Ug
-Yml0bWFwIGVudW1lcmF0aW9uIG1ldGhvZAoKPT09IE9VVFBVVCBCRUdJTiA9PT0KRVJST1I6IE1p
-c3NpbmcgU2lnbmVkLW9mZi1ieTogbGluZShzKQoKdG90YWw6IDEgZXJyb3JzLCAwIHdhcm5pbmdz
-LCAzOCBsaW5lcyBjaGVja2VkCgpDb21taXQgNmM0NWMzZmJkNDdkIChtaWdyYXRpb24vZGlydHkt
-Yml0bWFwczogY2hhbmdlIGJpdG1hcCBlbnVtZXJhdGlvbiBtZXRob2QpIGhhcyBzdHlsZSBwcm9i
-bGVtcywgcGxlYXNlIHJldmlldy4gIElmIGFueSBvZiB0aGVzZSBlcnJvcnMKYXJlIGZhbHNlIHBv
-c2l0aXZlcyByZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRhaW5lciwgc2VlCkNIRUNLUEFUQ0ggaW4g
-TUFJTlRBSU5FUlMuCj09PSBPVVRQVVQgRU5EID09PQoKVGVzdCBjb21tYW5kIGV4aXRlZCB3aXRo
-IGNvZGU6IDEKCgpUaGUgZnVsbCBsb2cgaXMgYXZhaWxhYmxlIGF0Cmh0dHA6Ly9wYXRjaGV3Lm9y
-Zy9sb2dzLzIwMTkwNDMwMjMxNTM2LjI1MzUzLTEtanNub3dAcmVkaGF0LmNvbS90ZXN0aW5nLmNo
-ZWNrcGF0Y2gvP3R5cGU9bWVzc2FnZS4KLS0tCkVtYWlsIGdlbmVyYXRlZCBhdXRvbWF0aWNhbGx5
-IGJ5IFBhdGNoZXcgW2h0dHBzOi8vcGF0Y2hldy5vcmcvXS4KUGxlYXNlIHNlbmQgeW91ciBmZWVk
-YmFjayB0byBwYXRjaGV3LWRldmVsQHJlZGhhdC5jb20=
+On Wed, May 01, 2019 at 01:11:34AM +0200, Paolo Bonzini wrote:
+> On 01/05/19 00:50, Michael S. Tsirkin wrote:
+> >> Stefan, did you hit a build failure, or it was just theoretical?
+> >>
+> >> linux-headers/*/mman.h is updated by "linux-headers: add
+> >> linux/mman.h" (commit 8cf108c5d159).  If the build really fails,
+> >> something else is broken in our build system.
+> > I think it's for non-linux hosts. linux-headers/ is only used
+> > on linux hosts.
+> 
+> Yes, it is.  Maybe the #ifndef/#define  part should be only used for
+> non-Linux.
+> 
+> Paolo
+
+Makes sense. We'd rather have an error on linux than stub it out as 0.
+
+-- 
+MST
