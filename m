@@ -5,81 +5,81 @@ X-Spam-Level:
 X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
 	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+	SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6C418C04AA6
-	for <qemu-devel@archiver.kernel.org>; Tue, 30 Apr 2019 20:57:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1BC1DC43219
+	for <qemu-devel@archiver.kernel.org>; Tue, 30 Apr 2019 21:05:40 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3614121744
-	for <qemu-devel@archiver.kernel.org>; Tue, 30 Apr 2019 20:57:23 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id D52A72081C
+	for <qemu-devel@archiver.kernel.org>; Tue, 30 Apr 2019 21:05:39 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="hWbylTdK"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3614121744
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Ju8Z2rKk"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D52A72081C
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:53327 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:53413 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hLZoY-0001Bu-HQ
-	for qemu-devel@archiver.kernel.org; Tue, 30 Apr 2019 16:57:22 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:55840)
+	id 1hLZwY-00046e-OH
+	for qemu-devel@archiver.kernel.org; Tue, 30 Apr 2019 17:05:38 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:58654)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alistair23@gmail.com>) id 1hLZeu-0002jO-Ar
-	for qemu-devel@nongnu.org; Tue, 30 Apr 2019 16:47:27 -0400
+	(envelope-from <alistair23@gmail.com>) id 1hLZuV-0002ix-R0
+	for qemu-devel@nongnu.org; Tue, 30 Apr 2019 17:03:32 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alistair23@gmail.com>) id 1hLZes-00005G-Db
-	for qemu-devel@nongnu.org; Tue, 30 Apr 2019 16:47:24 -0400
-Received: from mail-lf1-x144.google.com ([2a00:1450:4864:20::144]:39248)
+	(envelope-from <alistair23@gmail.com>) id 1hLZuU-0001tK-B3
+	for qemu-devel@nongnu.org; Tue, 30 Apr 2019 17:03:31 -0400
+Received: from mail-lf1-x141.google.com ([2a00:1450:4864:20::141]:33292)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <alistair23@gmail.com>)
-	id 1hLZeq-0008Ox-9I; Tue, 30 Apr 2019 16:47:21 -0400
-Received: by mail-lf1-x144.google.com with SMTP id d12so11886568lfk.6;
-	Tue, 30 Apr 2019 13:47:17 -0700 (PDT)
+	id 1hLZuT-0001rz-Uw; Tue, 30 Apr 2019 17:03:30 -0400
+Received: by mail-lf1-x141.google.com with SMTP id j11so11965604lfm.0;
+	Tue, 30 Apr 2019 14:03:29 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
 	h=mime-version:references:in-reply-to:from:date:message-id:subject:to
 	:cc:content-transfer-encoding;
-	bh=y7xfoofEm4PAoHQaMXpXigT2S2f6wMz1mt7eVkQs2Sw=;
-	b=hWbylTdKEQ9a861h6nsAFe7S7u7+cfpXDZHcAMySg4gVg9AZIXhsxtyeHpQlSQ24HD
-	0WKY5m5rW4/Lm9/QYvgGB9nGNySx/kB9KbSMHebNcik9Z8fF6B4lExipTt2LUfelZToZ
-	nBKT+oVNmq+Ki0VAL5tqjfhzyULDq0XOoAXjqkRUPa3d23fEav2aYXieeXWzBsB50MRb
-	wJ5UkbQet2I2Qj2CmG+SImTZqFR0HRRTqhdS37huNhvcX7tlpLGfFjDkBVJt2ztvVNp1
-	psoT3s06bmZhj38JardeplnuyW8p9xY08oWbvUXeWBvZfBtxhx/HarPgpMTsW9hpu8hS
-	i4Pw==
+	bh=Uz2HnqzsfMYSzCruClG78wktLuutjoRm8r0Nw9+5Gfs=;
+	b=Ju8Z2rKkAuS54kZbtGZqjTE0p1pln4WPSzPCajwL8zA/ARQY1U6XcZbDNDIaAZAqit
+	YO57za1EaYATGvoWlGJkALjRG/k3HWWqBzdLps1RxHdA1koxOlCtqi01RMH/LIQGoDdS
+	J9QUj1cdL/wvTb7m0A1/RqAkn2D9zGpWEzTv4z5tUAJTMYDRF6qWIzfo/c33pjJQWIVS
+	KHOvpRKK+bYgvhUhXSI0Ly31kygnu9E5086xlmLGpWShGvxWHvd0Gm7EJbmxJvSoopih
+	AuVZfWCjnjA757InKHMo8tQEhEe/rnQFMe4lHmK0suCBhQXD8QgmwHD3PulJFX02EUCu
+	regw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
 	d=1e100.net; s=20161025;
 	h=x-gm-message-state:mime-version:references:in-reply-to:from:date
 	:message-id:subject:to:cc:content-transfer-encoding;
-	bh=y7xfoofEm4PAoHQaMXpXigT2S2f6wMz1mt7eVkQs2Sw=;
-	b=fZl5w1D0LfsgxTcSUMSH0A7avV5RX5XtRN4IdGlOUUcq89JjPJoJsS0efT+RVD5gr5
-	ElHTmNmWh/9KlgEyUIryPM81O+HCn8F9pRT0qcTLV1+CyGTZQzE5aSs5Ev2QEYpkee2o
-	kr+iX9U2+2DMHFEfAierh9gyRhh0nrTZUS5O/cSPJqAZarvYy+HoVgqVjSqxHFIKekib
-	0zzs2ntBmrIYdIPFvVP/UC44g/RV6q7BXHXcCELgrCIlGZmHHOdKQAMcxGrW5/85J9C+
-	QLXhRGkhwea6HeOCCI4PTIdWoxFRKlSFohf3XLRwHJZwxbN9x6uD3oUwApwjvgxEQoN8
-	RpGQ==
-X-Gm-Message-State: APjAAAXDSBuD3Sk7TH5wYzx4ocznuM2aJ3F4xI6Qaw41G1/5jfaKsMQA
-	CTjnKGZnTzXdG67mj0kHeZJJaxVbaApnDkpeqmc=
-X-Google-Smtp-Source: APXvYqz9iXkzAzZmiA95VuA9Ydg4ZqCGyVXCiIq8qGHtVXRhEnc0GlMOmqUpe6A9mL/cOPFntcKWqp/cwa2yb8pNQsQ=
-X-Received: by 2002:a19:4a04:: with SMTP id x4mr355974lfa.124.1556657236454;
-	Tue, 30 Apr 2019 13:47:16 -0700 (PDT)
+	bh=Uz2HnqzsfMYSzCruClG78wktLuutjoRm8r0Nw9+5Gfs=;
+	b=OrKipJtj3/R2mdM7NQNjfp8Uln3oaQNhg9HXFIBNjTJEU1Inewfo6ww73123L6xNb4
+	8Bho49b143H4g5B7pF9zBhljMD+vgBei6T7XKhccy+jv/OISGV8nWWpU/N+2zWsHMtxG
+	jUr5gQtUxy6tnbkiTcD9PgzUUAwj4dEUNT7kIbLIYteqK9O8+NF9zTZ5O+5wNtt4Z8Rx
+	8w+JKEFzSxdogr5bOCpg+HrprEOlNibONFGn6mQZtfshiGqSivfBdSwHTueIQgDS820c
+	mGuWmcu4UxfPxgp4libpAnTZ9DbXHNuhIf6Vv4VxjKZGsJ+ZNBcatmbLz6D+YDVOiXw9
+	Ek+w==
+X-Gm-Message-State: APjAAAUxhH5Xv0bWpeiydKqP/kIVqUSQ2K0BSF1XzQ/bqzhSGIH4AyTy
+	tKJMMVdzHc5zKcn4cZ2Ag1B27WiJxLsChWVQEok=
+X-Google-Smtp-Source: APXvYqwvi4tgNYTFY8RDwuk2Vo+Xfn8V8rmlHs/7ijQzeOQPis4+svRO+zEWpy65styUAmVWWXLKet2Gsw+kMRItHTs=
+X-Received: by 2002:ac2:523a:: with SMTP id i26mr32047730lfl.118.1556658208840;
+	Tue, 30 Apr 2019 14:03:28 -0700 (PDT)
 MIME-Version: 1.0
 References: <cover.1556650594.git.alistair.francis@wdc.com>
-	<f2aaec5b3c12a8512cd7078f3a5d1230906d80ea.1556650594.git.alistair.francis@wdc.com>
-	<6650d0b8-1c5c-a8ea-ef92-a69ad50f7d8b@redhat.com>
-In-Reply-To: <6650d0b8-1c5c-a8ea-ef92-a69ad50f7d8b@redhat.com>
+	<6bfa446eb7c351b5d867eb4158198231af724b11.1556650594.git.alistair.francis@wdc.com>
+	<d4dd0758-64af-e249-1f1b-b52af014b404@vivier.eu>
+In-Reply-To: <d4dd0758-64af-e249-1f1b-b52af014b404@vivier.eu>
 From: Alistair Francis <alistair23@gmail.com>
-Date: Tue, 30 Apr 2019 13:45:23 -0700
+Date: Tue, 30 Apr 2019 14:01:35 -0700
 Message-ID:
- <CAKmqyKP0-Aikd3+fF-u=be_2ZaRtfa6Sx-Cxu49uFtXgN9C_Ew@mail.gmail.com>
-To: Eric Blake <eblake@redhat.com>
+ <CAKmqyKNx2r93-ASC0dAZJvu_36dV69sRj92-m6G9zXqLdc2sag@mail.gmail.com>
+To: Laurent Vivier <laurent@vivier.eu>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
 	recognized.
-X-Received-From: 2a00:1450:4864:20::144
-Subject: Re: [Qemu-devel] [PATCH v1 3/5] hw/usb/dev-mtp: Fix GCC 9 build
- warning
+X-Received-From: 2a00:1450:4864:20::141
+Subject: Re: [Qemu-devel] [PATCH v1 5/5] linux-user/elfload: Fix GCC 9 build
+ warnings
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -94,80 +94,81 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 Cc: "qemu-trivial@nongnu.org" <qemu-trivial@nongnu.org>,
 	"riku.voipio@iki.fi" <riku.voipio@iki.fi>,
 	"qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
-	"laurent@vivier.eu" <laurent@vivier.eu>,
 	Alistair Francis <Alistair.Francis@wdc.com>,
 	"kraxel@redhat.com" <kraxel@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190430204523.pzUCGsoltq9Q6dpWPHaHa5dwfVs6Wq7_ZpfI8zN_ZPc@z>
+Message-ID: <20190430210135.aPoO3ydrg-5ot-H6kEBUzoosk4YiuxqjC4h0HVyI1Zs@z>
 
-On Tue, Apr 30, 2019 at 1:37 PM Eric Blake <eblake@redhat.com> wrote:
+On Tue, Apr 30, 2019 at 1:36 PM Laurent Vivier <laurent@vivier.eu> wrote:
 >
-> On 4/30/19 3:09 PM, Alistair Francis wrote:
-> > Fix this warning with GCC 9 on Fedora 30:
-> > hw/usb/dev-mtp.c:1715:36: error: taking address of packed member of =E2=
-=80=98struct <anonymous>=E2=80=99 may result in an unaligned pointer value =
-[-Werror=3Daddress-of-packed-member]
-> >  1715 |                             dataset->filename);
-> >       |                             ~~~~~~~^~~~~~~~~~
+> Le 30/04/2019 =C3=A0 22:09, Alistair Francis a =C3=A9crit :
+> > Fix this warning when building with GCC9 on Fedora 30:
+> > In function =E2=80=98strncpy=E2=80=99,
+> >     inlined from =E2=80=98fill_psinfo=E2=80=99 at /home/alistair/qemu/l=
+inux-user/elfload.c:3208:12,
+> >     inlined from =E2=80=98fill_note_info=E2=80=99 at /home/alistair/qem=
+u/linux-user/elfload.c:3390:5,
+> >     inlined from =E2=80=98elf_core_dump=E2=80=99 at /home/alistair/qemu=
+/linux-user/elfload.c:3539:9:
+> > /usr/include/bits/string_fortified.h:106:10: error: =E2=80=98__builtin_=
+strncpy=E2=80=99 specified bound 16 equals destination size [-Werror=3Dstri=
+ngop-truncation]
+> >   106 |   return __builtin___strncpy_chk (__dest, __src, __len, __bos (=
+__dest));
+> >       |          ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~=
+~~~~~~~~
 > >
 > > Signed-off-by: Alistair Francis <alistair.francis@wdc.com>
 > > ---
-> >  hw/usb/dev-mtp.c | 13 +++++++++++++
-> >  1 file changed, 13 insertions(+)
+> >  linux-user/elfload.c | 4 ++--
+> >  1 file changed, 2 insertions(+), 2 deletions(-)
 > >
-> > diff --git a/hw/usb/dev-mtp.c b/hw/usb/dev-mtp.c
-> > index 99548b012d..6de85d99e6 100644
-> > --- a/hw/usb/dev-mtp.c
-> > +++ b/hw/usb/dev-mtp.c
-> > @@ -1711,9 +1711,22 @@ static void usb_mtp_write_metadata(MTPState *s, =
-uint64_t dlen)
-> >      assert(!s->write_pending);
-> >      assert(p !=3D NULL);
+> > diff --git a/linux-user/elfload.c b/linux-user/elfload.c
+> > index c1a26021f8..cbb7fc10fa 100644
+> > --- a/linux-user/elfload.c
+> > +++ b/linux-user/elfload.c
+> > @@ -3206,7 +3206,7 @@ static int fill_psinfo(struct target_elf_prpsinfo=
+ *psinfo, const TaskState *ts)
+>
+>        /*
+>         * Using strncpy here is fine: at max-length,
+> >       * this field is not NUL-terminated.
+> >       */>      (void) strncpy(psinfo->pr_fname, base_filename,
+> > -                   sizeof(psinfo->pr_fname));
+> > +                   sizeof(psinfo->pr_fname) - 1);
+>
+> Read the comment above :)
+
+GCC can't read the comment though. The only other option I can think
+of is using a pragma, which I avoided using unless I had to. Would you
+prefer a pragma here? Or do you have a better solution?
+
+>
 > >
-> > +/*
-> > + * We are about to access a packed struct. We are confident that the p=
-ointer
-> > + * address won't be unalligned, so we ignore GCC warnings.
+> >      g_free(base_filename);
+> >      bswap_psinfo(psinfo);
+> > @@ -3389,7 +3389,7 @@ static int fill_note_info(struct elf_note_info *i=
+nfo,
+> >                sizeof (*info->prstatus), info->prstatus);
+> >      fill_psinfo(info->psinfo, ts);
+> >      fill_note(&info->notes[1], "CORE", NT_PRPSINFO,
+> > -              sizeof (*info->psinfo), info->psinfo);
+> > +              sizeof(*info->psinfo) - 1, info->psinfo);
 >
-> unaligned
+> Why?
 
-Fixed.
-
->
-> Aren't there other potential proposed patches floating around for this
-> issue that do not involve messing with pragmas?
-
-I'm not sure, I haven't seen anything. I'm more then open to a better
-fix, this is the best option I could think of.
+Same issue as above.
 
 Alistair
 
 >
-> > + */
-> > +#if defined(CONFIG_PRAGMA_DIAGNOSTIC_AVAILABLE) && QEMU_GNUC_PREREQ(9,=
- 0)
-> > +#pragma GCC diagnostic push
-> > +#pragma GCC diagnostic ignored "-Waddress-of-packed-member"
-> > +#endif
-> > +
-> >      filename =3D utf16_to_str(MIN(dataset->length, filename_chars),
-> >                              dataset->filename);
+> >      fill_auxv_note(&info->notes[2], ts);
+> >      info->numnote =3D 3;
 > >
-> > +#if defined(CONFIG_PRAGMA_DIAGNOSTIC_AVAILABLE) && QEMU_GNUC_PREREQ(9,=
- 0)
-> > +#pragma GCC diagnostic pop
-> > +#endif
-> > +
-> >      if (strchr(filename, '/')) {
-> >          usb_mtp_queue_result(s, RES_PARAMETER_NOT_SUPPORTED, d->trans,
-> >                               0, 0, 0, 0);
 > >
 >
-> --
-> Eric Blake, Principal Software Engineer
-> Red Hat, Inc.           +1-919-301-3226
-> Virtualization:  qemu.org | libvirt.org
->
+> Thanks,
+> Laurent
 
