@@ -6,59 +6,59 @@ X-Spam-Status: No, score=-6.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D8537C43219
-	for <qemu-devel@archiver.kernel.org>; Tue, 30 Apr 2019 07:33:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 87E7DC04AA6
+	for <qemu-devel@archiver.kernel.org>; Tue, 30 Apr 2019 07:33:49 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id ABD002080C
-	for <qemu-devel@archiver.kernel.org>; Tue, 30 Apr 2019 07:33:46 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org ABD002080C
+	by mail.kernel.org (Postfix) with ESMTPS id 57A192080C
+	for <qemu-devel@archiver.kernel.org>; Tue, 30 Apr 2019 07:33:49 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 57A192080C
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:40623 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:40625 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hLNGr-0005GV-Mv
-	for qemu-devel@archiver.kernel.org; Tue, 30 Apr 2019 03:33:45 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:56053)
+	id 1hLNGu-0005Ik-G8
+	for qemu-devel@archiver.kernel.org; Tue, 30 Apr 2019 03:33:48 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:56953)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1hLN1U-0008Qo-8i
-	for qemu-devel@nongnu.org; Tue, 30 Apr 2019 03:17:53 -0400
+	(envelope-from <thuth@redhat.com>) id 1hLN3B-0001W5-RG
+	for qemu-devel@nongnu.org; Tue, 30 Apr 2019 03:19:38 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1hLN1T-0005Fh-BD
-	for qemu-devel@nongnu.org; Tue, 30 Apr 2019 03:17:52 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:45092)
+	(envelope-from <thuth@redhat.com>) id 1hLN3A-0006Gs-Th
+	for qemu-devel@nongnu.org; Tue, 30 Apr 2019 03:19:37 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:54950)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <thuth@redhat.com>)
-	id 1hLN1P-0005EM-69; Tue, 30 Apr 2019 03:17:47 -0400
+	id 1hLN35-00069i-At; Tue, 30 Apr 2019 03:19:32 -0400
 Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
 	[10.5.11.22])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 31C8330833A3;
-	Tue, 30 Apr 2019 07:17:46 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id 876A33082E56;
+	Tue, 30 Apr 2019 07:19:26 +0000 (UTC)
 Received: from thuth.com (ovpn-116-190.ams2.redhat.com [10.36.116.190])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id 1CFC7100200A;
-	Tue, 30 Apr 2019 07:17:35 +0000 (UTC)
+	by smtp.corp.redhat.com (Postfix) with ESMTP id 8847F1000049;
+	Tue, 30 Apr 2019 07:19:15 +0000 (UTC)
 From: Thomas Huth <thuth@redhat.com>
 To: yang.zhong@intel.com, Peter Maydell <peter.maydell@linaro.org>,
 	qemu-devel@nongnu.org, pbonzini@redhat.com
-Date: Tue, 30 Apr 2019 09:13:54 +0200
-Message-Id: <20190430071405.16714-20-thuth@redhat.com>
+Date: Tue, 30 Apr 2019 09:14:03 +0200
+Message-Id: <20190430071405.16714-29-thuth@redhat.com>
 In-Reply-To: <20190430071405.16714-1-thuth@redhat.com>
 References: <20190430071405.16714-1-thuth@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="UTF-8"
 X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.44]);
-	Tue, 30 Apr 2019 07:17:46 +0000 (UTC)
+	(mx1.redhat.com [10.5.110.46]);
+	Tue, 30 Apr 2019 07:19:26 +0000 (UTC)
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] [PATCH v6 19/30] hw/arm: Express dependencies of
- allwinner / cubieboard with Kconfig
+Subject: [Qemu-devel] [PATCH v6 28/30] hw/arm: Express dependencies of the
+ xlnx-versal-virt machine with Kconfig
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -87,76 +87,32 @@ Cc: "Michael S. Tsirkin" <mst@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>,
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190430071354.n31hztFxZ7hNf3wDaMl_-PX47hLAS7aZhywg_WN8TGY@z>
+Message-ID: <20190430071403.GPVeRmU8bd7DjTZExq9Ds4HALZAf72KL82GrxALZQ1E@z>
 
-Add dependencies for the Cubitech Cubieboard.
+Dependencies have been determined with trial-and-error and by
+looking at the xlnx-versal.c source file.
 
 Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
 Tested-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
 Signed-off-by: Thomas Huth <thuth@redhat.com>
 ---
- default-configs/arm-softmmu.mak | 6 +-----
- hw/arm/Kconfig                  | 9 +++++++++
- 2 files changed, 10 insertions(+), 5 deletions(-)
+ hw/arm/Kconfig | 4 ++++
+ 1 file changed, 4 insertions(+)
 
-diff --git a/default-configs/arm-softmmu.mak b/default-configs/arm-softmm=
-u.mak
-index c86a9f5427..a0b9016e3a 100644
---- a/default-configs/arm-softmmu.mak
-+++ b/default-configs/arm-softmmu.mak
-@@ -7,6 +7,7 @@ CONFIG_ARM_V7M=3Dy
- # CONFIG_TEST_DEVICES=3Dn
-=20
- CONFIG_ARM_VIRT=3Dy
-+CONFIG_CUBIEBOARD=3Dy
- CONFIG_EXYNOS4=3Dy
- CONFIG_HIGHBANK=3Dy
- CONFIG_INTEGRATOR=3Dy
-@@ -32,7 +33,6 @@ CONFIG_NETDUINO2=3Dy
-=20
- CONFIG_VGA=3Dy
- CONFIG_SSI_M25P80=3Dy
--CONFIG_ALLWINNER_EMAC=3Dy
- CONFIG_IMX_FEC=3Dy
-=20
- CONFIG_FRAMEBUFFER=3Dy
-@@ -60,10 +60,6 @@ CONFIG_IOTKIT_SYSINFO=3Dy
- CONFIG_ARMSSE_CPUID=3Dy
- CONFIG_ARMSSE_MHU=3Dy
-=20
--CONFIG_ALLWINNER_A10_PIT=3Dy
--CONFIG_ALLWINNER_A10_PIC=3Dy
--CONFIG_ALLWINNER_A10=3Dy
--
- CONFIG_FSL_IMX6=3Dy
- CONFIG_FSL_IMX25=3Dy
- CONFIG_FSL_IMX7=3Dy
 diff --git a/hw/arm/Kconfig b/hw/arm/Kconfig
-index 25ba109773..0e89383f50 100644
+index eff61efab9..9609caef87 100644
 --- a/hw/arm/Kconfig
 +++ b/hw/arm/Kconfig
-@@ -25,6 +25,10 @@ config CHEETAH
-     select OMAP
-     select TSC210X
+@@ -293,6 +293,10 @@ config XLNX_ZYNQMP_ARM
 =20
-+config CUBIEBOARD
-+    bool
-+    select ALLWINNER_A10
-+
- config DIGIC
+ config XLNX_VERSAL
      bool
-     select PTIMER
-@@ -246,6 +250,11 @@ config ARM_V7M
++    select ARM_GIC
++    select PL011
++    select CADENCE
++    select VIRTIO_MMIO
 =20
- config ALLWINNER_A10
-     bool
-+    select AHCI
-+    select ALLWINNER_A10_PIT
-+    select ALLWINNER_A10_PIC
-+    select ALLWINNER_EMAC
-+    select SERIAL
-=20
- config RASPI
+ config FSL_IMX25
      bool
 --=20
 2.21.0
