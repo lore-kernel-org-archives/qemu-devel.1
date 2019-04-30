@@ -2,122 +2,55 @@ Return-Path: <SRS0=TP+Q=TA=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 78886C43219
-	for <qemu-devel@archiver.kernel.org>; Tue, 30 Apr 2019 18:59:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id ED210C43219
+	for <qemu-devel@archiver.kernel.org>; Tue, 30 Apr 2019 19:02:24 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3C4FF20854
-	for <qemu-devel@archiver.kernel.org>; Tue, 30 Apr 2019 18:59:35 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3C4FF20854
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id B1ABF20854
+	for <qemu-devel@archiver.kernel.org>; Tue, 30 Apr 2019 19:02:24 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B1ABF20854
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=intel.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:51820 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:51911 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hLXyY-0004Ko-Br
-	for qemu-devel@archiver.kernel.org; Tue, 30 Apr 2019 14:59:34 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:35819)
+	id 1hLY1H-0007Cb-PA
+	for qemu-devel@archiver.kernel.org; Tue, 30 Apr 2019 15:02:23 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:36888)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1hLXx5-00038Q-7Q
-	for qemu-devel@nongnu.org; Tue, 30 Apr 2019 14:58:04 -0400
+	(envelope-from <paul.c.lai@intel.com>) id 1hLY01-0006UH-Nb
+	for qemu-devel@nongnu.org; Tue, 30 Apr 2019 15:01:06 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1hLXmQ-0005oe-Ue
-	for qemu-devel@nongnu.org; Tue, 30 Apr 2019 14:47:03 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:34312)
+	(envelope-from <paul.c.lai@intel.com>) id 1hLY00-0004eQ-Ef
+	for qemu-devel@nongnu.org; Tue, 30 Apr 2019 15:01:05 -0400
+Received: from mga02.intel.com ([134.134.136.20]:29737)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1hLXmQ-0005oH-Mj
-	for qemu-devel@nongnu.org; Tue, 30 Apr 2019 14:47:02 -0400
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
-	[10.5.11.15])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id AEF0B309264B;
-	Tue, 30 Apr 2019 18:47:01 +0000 (UTC)
-Received: from [10.36.112.20] (ovpn-112-20.ams2.redhat.com [10.36.112.20])
-	by smtp.corp.redhat.com (Postfix) with ESMTPS id BB40262A13;
-	Tue, 30 Apr 2019 18:46:54 +0000 (UTC)
-To: =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>,
-	qemu-devel@nongnu.org
-References: <20190429134757.13570-1-marcandre.lureau@redhat.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Openpgp: preference=signencrypt
-Autocrypt: addr=pbonzini@redhat.com; prefer-encrypt=mutual; keydata=
-	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
-	uUHgL9dKIfvpm+rNXRn9wAwGjk0X/A==
-Message-ID: <fa741bc2-4239-2dc9-ff8b-ca4ea9f5d416@redhat.com>
-Date: Tue, 30 Apr 2019 20:46:51 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
-	Thunderbird/60.6.1
-MIME-Version: 1.0
-In-Reply-To: <20190429134757.13570-1-marcandre.lureau@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.43]);
-	Tue, 30 Apr 2019 18:47:01 +0000 (UTC)
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH] vl: fix -sandbox parsing crash when
- seccomp support is disabled
+	(Exim 4.71) (envelope-from <paul.c.lai@intel.com>)
+	id 1hLY00-0004bB-60
+	for qemu-devel@nongnu.org; Tue, 30 Apr 2019 15:01:04 -0400
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from orsmga003.jf.intel.com ([10.7.209.27])
+	by orsmga101.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384;
+	30 Apr 2019 12:01:00 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.60,414,1549958400"; d="scan'208";a="147079588"
+Received: from pclaidev.sc.intel.com ([143.183.85.146])
+	by orsmga003.jf.intel.com with ESMTP; 30 Apr 2019 12:00:59 -0700
+From: Paul Lai <paul.c.lai@intel.com>
+To: qemu-devel@nongnu.org
+Date: Tue, 30 Apr 2019 11:59:18 -0700
+Message-Id: <20190430185918.14937-1-paul.c.lai@intel.com>
+X-Mailer: git-send-email 2.17.2
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+	recognized.
+X-Received-From: 134.134.136.20
+Subject: [Qemu-devel] [Qemu-devel v2] Introduce SnowRidge CPU model
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -129,76 +62,110 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: otubo@redhat.com, david@gibson.dropbear.id.au
+Cc: wei.w.wang@intel.com, luwei.kang@intel.com, tao3.xu@intel.com,
+	paul.c.lai@intel.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190430184651.uXcKUmF5dFAhEdTlCI3gkPdd72EhgqkmbMCYVLp6ZB0@z>
+Content-Type: text/plain; charset="UTF-8"
+Message-ID: <20190430185918.J3m9xL-WoQ0Hvr5t3ZMvXj5J62XCEgahW0a4hG7ulP4@z>
 
-On 29/04/19 15:47, Marc-Andr=C3=A9 Lureau wrote:
-> $ ./x86_64-softmmu/qemu-system-x86_64 -sandbox off
-> qemu-system-x86_64: -sandbox off: There is no option group 'sandbox'
-> Segmentation fault
->=20
-> Commit 5780760f5e ("seccomp: check TSYNC host capability") wrapped one
-> use of the sandbox option group to produce a sensible error, it didn't
-> do the same for another call to qemu_opts_parse_noisily():
->=20
-> (gdb) bt
->     at util/qemu-option.c:829
->  #0  0x00000000105b36d8 in opts_parse (list=3D0x0, params=3D0x3ffffffff=
-ab5 "off", permit_abbrev=3Dtrue, defaults=3Dfalse, errp=3D0x3ffffffff080)
->      at util/qemu-option.c:829
->  #1  0x00000000105b3b74 in qemu_opts_parse_noisily (list=3D<optimized o=
-ut>, params=3D<optimized out>, permit_abbrev=3D<optimized out>) at util/q=
-emu-option.c:890
->  #2  0x0000000010024964 in main (argc=3D<optimized out>, argv=3D<optimi=
-zed out>, envp=3D<optimized out>) at vl.c:3589
->=20
-> Fixes: 5780760f5ea6163939a5dabe7427318b4f07d1a2
-> Cc: david@gibson.dropbear.id.au
-> Cc: otubo@redhat.com
-> Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
-> ---
->  vl.c | 18 ++++++++++--------
->  1 file changed, 10 insertions(+), 8 deletions(-)
->=20
-> diff --git a/vl.c b/vl.c
-> index 4019a4387d..5fc4994d3c 100644
-> --- a/vl.c
-> +++ b/vl.c
-> @@ -3866,17 +3866,19 @@ int main(int argc, char **argv, char **envp)
->                  qtest_log =3D optarg;
->                  break;
->              case QEMU_OPTION_sandbox:
-> -#ifdef CONFIG_SECCOMP
-> -                opts =3D qemu_opts_parse_noisily(qemu_find_opts("sandb=
-ox"),
-> -                                               optarg, true);
-> +                olist =3D qemu_find_opts("sandbox");
-> +                if (!olist) {
-> +#ifndef CONFIG_SECCOMP
-> +                    error_report("-sandbox support is not enabled "
-> +                                 "in this QEMU binary");
-> +#endif
-> +                    exit(1);
-> +                }
-> +
-> +                opts =3D qemu_opts_parse_noisily(olist, optarg, true);
->                  if (!opts) {
->                      exit(1);
->                  }
-> -#else
-> -                error_report("-sandbox support is not enabled "
-> -                             "in this QEMU binary");
-> -                exit(1);
-> -#endif
->                  break;
->              case QEMU_OPTION_add_fd:
->  #ifndef _WIN32
->=20
+SnowRidge CPU supports Accelerator Infrastrcture Architecture (MOVDIRI,
+MOVDIR64B), CLDEMOTE and SPLIT_LOCK_DISABLE.
 
-Queued, thanks.
+MOVDIRI, MOVDIR64B, and CLDEMOTE are found via CPUID.
+The availability of SPLIT_LOCK_DISABLE is check via msr access
 
-Paolo
+References can be found in either:
+ https://software.intel.com/en-us/articles/intel-sdm
+ https://software.intel.com/en-us/download/intel-architecture-instruction-set-extensions-and-future-features-programming-reference
+
+Signed-off-by: Paul Lai <paul.c.lai@intel.com>
+Tested-by: Tao3 Xu <tao3.xu@intel.com>
+---
+ target/i386/cpu.c | 68 +++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 68 insertions(+)
+
+diff --git a/target/i386/cpu.c b/target/i386/cpu.c
+index d6bb57d210..1c03d9f6b4 100644
+--- a/target/i386/cpu.c
++++ b/target/i386/cpu.c
+@@ -2663,6 +2663,74 @@ static X86CPUDefinition builtin_x86_defs[] = {
+         .xlevel = 0x80000008,
+         .model_id = "Intel Xeon Processor (Icelake)",
+     },
++    {
++        .name = "SnowRidge",
++        .level = 27,
++        .vendor = CPUID_VENDOR_INTEL,
++        .family = 6,
++        .model = 134,
++        .stepping = 1,
++        .features[FEAT_1_EDX] =
++            /* missing: CPUID_PN CPUID_IA64 */
++            /* missing: CPUID_DTS, CPUID_HT, CPUID_TM, CPUID_PBE */
++            CPUID_FP87 | CPUID_VME | CPUID_DE | CPUID_PSE |
++            CPUID_TSC | CPUID_MSR | CPUID_PAE | CPUID_MCE |
++            CPUID_CX8 | CPUID_APIC | CPUID_SEP |
++            CPUID_MTRR | CPUID_PGE | CPUID_MCA | CPUID_CMOV |
++            CPUID_PAT | CPUID_PSE36 | CPUID_CLFLUSH |
++            CPUID_MMX |
++            CPUID_FXSR | CPUID_SSE | CPUID_SSE2,
++        .features[FEAT_1_ECX] =
++            CPUID_EXT_SSE3 | CPUID_EXT_PCLMULQDQ | CPUID_EXT_MONITOR |
++            CPUID_EXT_VMX |
++            CPUID_EXT_SSSE3 |
++            CPUID_EXT_CX16 |
++            CPUID_EXT_SSE41 |
++            CPUID_EXT_SSE42 | CPUID_EXT_X2APIC | CPUID_EXT_MOVBE |
++            CPUID_EXT_POPCNT |
++            CPUID_EXT_TSC_DEADLINE_TIMER | CPUID_EXT_AES | CPUID_EXT_XSAVE |
++            CPUID_EXT_RDRAND,
++        .features[FEAT_8000_0001_EDX] =
++            CPUID_EXT2_SYSCALL |
++            CPUID_EXT2_NX |
++            CPUID_EXT2_PDPE1GB | CPUID_EXT2_RDTSCP |
++            CPUID_EXT2_LM,
++        .features[FEAT_8000_0001_ECX] =
++            CPUID_EXT3_LAHF_LM |
++            CPUID_EXT3_3DNOWPREFETCH,
++        .features[FEAT_7_0_EBX] =
++            CPUID_7_0_EBX_FSGSBASE |
++            CPUID_7_0_EBX_SMEP |
++            CPUID_7_0_EBX_ERMS |
++            CPUID_7_0_EBX_MPX |  /* missing bits 13, 15 */
++            CPUID_7_0_EBX_RDSEED |
++            CPUID_7_0_EBX_SMAP | CPUID_7_0_EBX_CLFLUSHOPT |
++            CPUID_7_0_EBX_CLWB |
++            CPUID_7_0_EBX_SHA_NI,
++        .features[FEAT_7_0_ECX] =
++            CPUID_7_0_ECX_UMIP |
++            /* missing bit 5 */
++            CPUID_7_0_ECX_GFNI |
++            CPUID_7_0_ECX_MOVDIRI | CPUID_7_0_ECX_CLDEMOTE |
++            CPUID_7_0_ECX_MOVDIR64B,
++        .features[FEAT_7_0_EDX] =
++            CPUID_7_0_EDX_SPEC_CTRL |
++            CPUID_7_0_EDX_ARCH_CAPABILITIES | CPUID_7_0_EDX_SPEC_CTRL_SSBD,
++        /*
++         * Missing: XSAVES (not supported by some Linux versions,
++         * including v4.1 to v4.12).
++         * KVM doesn't yet expose any XSAVES state save component,
++         * and the only one defined in Skylake (processor tracing)
++         * probably will block migration anyway.
++         */
++        .features[FEAT_XSAVE] =
++            CPUID_XSAVE_XSAVEOPT | CPUID_XSAVE_XSAVEC |
++            CPUID_XSAVE_XGETBV1,
++        .features[FEAT_6_EAX] =
++            CPUID_6_EAX_ARAT,
++        .xlevel = 0x80000008,
++        .model_id = "Intel Atom Processor (SnowRidge)",
++    },
+     {
+         .name = "KnightsMill",
+         .level = 0xd,
+-- 
+2.17.2
+
 
