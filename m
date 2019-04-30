@@ -3,42 +3,42 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
 X-Spam-Status: No, score=-6.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.0
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 543F7C43219
-	for <qemu-devel@archiver.kernel.org>; Tue, 30 Apr 2019 20:42:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EC381C43219
+	for <qemu-devel@archiver.kernel.org>; Tue, 30 Apr 2019 20:43:20 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 158042063F
-	for <qemu-devel@archiver.kernel.org>; Tue, 30 Apr 2019 20:42:22 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 158042063F
+	by mail.kernel.org (Postfix) with ESMTPS id A048B2080C
+	for <qemu-devel@archiver.kernel.org>; Tue, 30 Apr 2019 20:43:20 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A048B2080C
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:53070 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:53079 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hLZa1-0006LM-BI
-	for qemu-devel@archiver.kernel.org; Tue, 30 Apr 2019 16:42:21 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:52966)
+	id 1hLZax-00079G-RC
+	for qemu-devel@archiver.kernel.org; Tue, 30 Apr 2019 16:43:19 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:52932)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1hLZVR-0002L4-3Q
-	for qemu-devel@nongnu.org; Tue, 30 Apr 2019 16:37:38 -0400
+	(envelope-from <laurent@vivier.eu>) id 1hLZVX-0002Jh-8i
+	for qemu-devel@nongnu.org; Tue, 30 Apr 2019 16:37:44 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1hLZOT-0008Ks-U5
-	for qemu-devel@nongnu.org; Tue, 30 Apr 2019 16:30:26 -0400
-Received: from mout.kundenserver.de ([217.72.192.74]:41945)
+	(envelope-from <laurent@vivier.eu>) id 1hLZJL-00054g-Kk
+	for qemu-devel@nongnu.org; Tue, 30 Apr 2019 16:25:08 -0400
+Received: from mout.kundenserver.de ([217.72.192.74]:57065)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <laurent@vivier.eu>)
-	id 1hLZOT-0008Kb-LW; Tue, 30 Apr 2019 16:30:25 -0400
+	id 1hLZJL-00054K-Bs; Tue, 30 Apr 2019 16:25:07 -0400
 Received: from [192.168.100.1] ([78.238.229.36]) by mrelayeu.kundenserver.de
 	(mreue108 [213.165.67.119]) with ESMTPSA (Nemesis) id
-	1N4R0a-1gf7tE0DqQ-011P23; Tue, 30 Apr 2019 22:30:10 +0200
+	1MRTIx-1h9pDa3p6j-00NPR4; Tue, 30 Apr 2019 22:24:44 +0200
 To: Alistair Francis <Alistair.Francis@wdc.com>,
 	"qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
 References: <cover.1556650594.git.alistair.francis@wdc.com>
-	<66295a3d9e21f52d777e6354d6c0f98b0bcb0c26.1556650594.git.alistair.francis@wdc.com>
+	<c4768a18309b3918715f96a1f5b2a9a264a5a9e4.1556650594.git.alistair.francis@wdc.com>
 From: Laurent Vivier <laurent@vivier.eu>
 Openpgp: preference=signencrypt
 Autocrypt: addr=laurent@vivier.eu; prefer-encrypt=mutual; keydata=
@@ -83,35 +83,35 @@ Autocrypt: addr=laurent@vivier.eu; prefer-encrypt=mutual; keydata=
 	OpKgu3nD0ahBDqANU/ZmNNarBJEwvM2vfusmNnWm3QMIwxNuJghRyuFfx694Im1js0ZY3LEU
 	JGSHFG4ZynA+ZFUPA6Xf0wHeJOxGKCGIyeKORsteIqgnkINW9fnKJw2pgk8qHkwVc3Vu+wGS
 	ZiJK0xFusPQehjWTHn9WjMG1zvQ5TQQHxau/2FkP45+nRPco6vVFQe8JmgtRF8WFJA==
-Message-ID: <aaebd05c-b1a6-a93e-222d-ede76633c07d@vivier.eu>
-Date: Tue, 30 Apr 2019 22:30:08 +0200
+Message-ID: <8ca522c7-d1dd-fe05-f8ab-031b72a9fbef@vivier.eu>
+Date: Tue, 30 Apr 2019 22:24:41 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
 	Thunderbird/60.6.1
 MIME-Version: 1.0
-In-Reply-To: <66295a3d9e21f52d777e6354d6c0f98b0bcb0c26.1556650594.git.alistair.francis@wdc.com>
+In-Reply-To: <c4768a18309b3918715f96a1f5b2a9a264a5a9e4.1556650594.git.alistair.francis@wdc.com>
 Content-Type: text/plain; charset="UTF-8"
 Content-Language: en-US
 Content-Transfer-Encoding: 8bit
-X-Provags-ID: V03:K1:G2xMvdzsc2dUxfUbdscOM9TlKrAgMkC3zOKFxWT7hs+SdLxCYVl
-	Agw+N7imrxNJDMJ05qbwSbLoVw4yiWZVz6rk/q/nGcN7qSwk3f1DyLYZi8OJ9q8WxHoj8lU
-	c3TVZ6iTnM/zygVxQfYB2kjfuz9iaARYwe8x1arFt3GKuN/sJSaofpvF0GXffVgwBK8+LCa
-	72kmlnWdiPpXyns2/2QBw==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:0+N1W4dtKkc=:ZK0JCGyTg7w6Z+0Fw/zDW0
-	0bcwXXn7uIHSKsS6W/EAFPGGjNP2ioTwSFJ35I/zIAU0xdITYYVcQ0uTk2k+jJkiNjRSvAdRW
-	/g+9/WhbOApezSl5VI3vK0TRMpArJs9PLkU/5SemKpQNPnjM1dVCHiVWxRM8EABjfDOY4b4dQ
-	bI0/eqiOOAq0SAnxPCFSdiqv+D3XK0KsqrczZUe8+Ca8xdHxNOaXRHSjGyVPPStvjp0kkDzZE
-	lSLAL2zCKZoYE/K6f1Jz93HwY9WWeT1+pUMfULq/ftLYwGKKwJ0cq8y6RDNKFGitcsQFGgtl6
-	R8Tcvkp+FxUyCmpxFg3BPITyWLHzz85zaLPvLZSmXe1DCkcKL1KiEjrE2UldceD1Uhcu1PnMP
-	yiAgyudNedvDFtfENX/3KY7kxqM+Tm21EmN3YLAdHYG88TP4Iyo41KAaXgayvf//Nutyuntry
-	WLsSxvfzubEdX7nbY/dXVtFAnz2g16gOUHcQIewy6owhyY2rljFDhj5Pwa1X8kD9Q0RJGCs3O
-	8bhMU/7wiSxajzFN7di9TEYLCLrOcR6rJtf3xyOTif1WqRqzPzfcpcB9YQuJoWMIlnVn13g1S
-	wosLJn4K4f7z/1x2YLy+anGnfpvXbR1b+xsmKnvfNyCwqFYqll9z6vdHiymTdD6t0dBbwP3o1
-	TbuUHWE4Xv5WKsP3BR2hWnfB8bgyBBIbmziCTLZDzE1v8pWmeRwi6MzVTTW07z88FXqvzpXGV
-	Lb6b80N1WqyZfHrQYvS1dlZjDuRCl1YZHkc4mJIqvvE9kaLkZVaoBGX9Pik=
+X-Provags-ID: V03:K1:bY2AYjdAB92M61PW3TyxhnpHkcZkblKdkskm0OiVC2dBO/4zb3Y
+	hJSkLtmO1Y2NalEjWBRONlHmgZQVQbjT8+uC5EJXEq2503QebZ4q+0z5DKAPpLVo/dCLM/O
+	Ol+tzJpamtCFSIvumLwIocbJ2GX/B2YrYLokJ57f5a5BEfWAnZyUKlfvZgQZ1/EG+f400Nw
+	+itYaG50RCZz+SMLt4SKg==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:fcc+XOYtyn4=:eI43qPNGY9KhFYSOgd6I2P
+	3vmNLGrzCvpTQ7XTpFSzfnb5yjOUPm/xZiT+XhR4hxIfqkAjTiqqoO7QOcuO1XDY5r9qDZGwr
+	fXBegO+fI+GERcs6OnH48ZQ3o0bt+rG0Wgxf+Ke0BY5ShIJtUl2Kw39+nqlbi3v1T6w2q2jbS
+	U5IaffHroiZwFLdgAlytJ+wW1wYvBlrjABzGfNx9QrctVmNKSa6BSsgj9fuefNnPwV1SoWQrB
+	ehFyEqvkGnqQ4mnm8DuovJO5ADGd6xO0xzo4Ue942TlXGLEn2ABXyRUWnvtakKXG9D4D9Gx8e
+	r7sxy5ZcK82K7M+KiV+Y0IZ+AiAT5y1r13AzKmYKunfUqhzqjRX0ZVNgRjXIOow9v9KqasHsv
+	ZByfwMtdgm/y8XgkfgFma5s9Nj9tMpHwF8c29ct+eJBU79arEkRK1565Lh8pENNKlZc/kZ6C7
+	z4/QFQy7GbsEnLnA3BZ+wKKKBVA8AF+TJXUzfGuigry/j6pRFp/opq8ZvDAvsmKno84rH7dhw
+	zxfnA806EWCO3j2CHZ5VztUbxvbckc5SiayTkR6LqJDmQqPBknGK8dFbelGMBoprPE4vAKn+1
+	m8KxMVW1YdMkuE96FK43xO4GZwn2+cygEIdgOM4ongGSfZMyAup9+W4sKs5OyDMMrztF7VI5E
+	jd9yftTHwDbXVEWS2u6BKnMw28oi6PUvjSXYUq2V6hDHQJrsFyrFgS901b9OdyUGJqLOH/nnp
+	9/iU3CnOgpZ0TL8w+1qSIWPC33okmf//LnJCVJcYcOgH1MACxFshefLk9r8=
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 217.72.192.74
-Subject: Re: [Qemu-devel] [PATCH v1 4/5] linux-user/uname: Fix GCC 9 build
- warnings
+Subject: Re: [Qemu-devel] [PATCH v1 2/5] hw/usb/hcd-xhci: Fix GCC 9 build
+ warning
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -130,52 +130,51 @@ Cc: "qemu-trivial@nongnu.org" <qemu-trivial@nongnu.org>,
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190430203008.fbHC-kFjTT0_1NdJ0XV6GXybNCZi6wFPbLp561dhe3k@z>
+Message-ID: <20190430202441.IlBGlbKyc3zBwnRQLdWInypg67IrpHtIXoclIqvoAzs@z>
 
 Le 30/04/2019 à 22:09, Alistair Francis a écrit :
-> Fix this warning when building with GCC9 on Fedora 30:
-> In function ‘strncpy’,
->     inlined from ‘sys_uname’ at /home/alistair/qemu/linux-user/uname.c:94:3:
-> /usr/include/bits/string_fortified.h:106:10: error: ‘__builtin_strncpy’ output may be truncated copying 64 bytes from a string of length 64 [-Werror=stringop-truncation]
->   106 |   return __builtin___strncpy_chk (__dest, __src, __len, __bos (__dest));
->       |          ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-> 
-> Signed-off-by: Alistair Francis <alistair.francis@wdc.com>
-> ---
->  linux-user/uname.c | 8 ++++++++
->  1 file changed, 8 insertions(+)
-> 
-> diff --git a/linux-user/uname.c b/linux-user/uname.c
-> index 313b79dbad..293b2238f2 100644
-> --- a/linux-user/uname.c
-> +++ b/linux-user/uname.c
-> @@ -90,6 +90,11 @@ int sys_uname(struct new_utsname *buf)
->     * struct linux kernel uses).
->     */
->  
-> +#if defined(CONFIG_PRAGMA_DIAGNOSTIC_AVAILABLE) && QEMU_GNUC_PREREQ(9, 0)
-> +#pragma GCC diagnostic push
-> +#pragma GCC diagnostic ignored "-Wstringop-truncation"
-> +#endif
-> +
->    memset(buf, 0, sizeof(*buf));
->    COPY_UTSNAME_FIELD(buf->sysname, uts_buf.sysname);
->    COPY_UTSNAME_FIELD(buf->nodename, uts_buf.nodename);
-> @@ -101,6 +106,9 @@ int sys_uname(struct new_utsname *buf)
->  #endif
->    return (0);
->  
-> +#if defined(CONFIG_PRAGMA_DIAGNOSTIC_AVAILABLE) && QEMU_GNUC_PREREQ(9, 0)
-> +#pragma GCC diagnostic pop
-> +#endif
->  #undef COPY_UTSNAME_FIELD
->  }
->  
-> 
+> Fix this build warning with GCC 9 on Fedora 30:
+> hw/usb/hcd-xhci.c:3339:66: error: ‘%d’ directive output may be truncated writing between 1 and 10 bytes into a region of size 5 [-Werror=format-truncation=]
+>  3339 |             snprintf(port->name, sizeof(port->name), "usb2 port #%d", i+1);
+>       |                                                                  ^~
+> hw/usb/hcd-xhci.c:3339:54: note: directive argument in the range [1, 2147483647]
+>  3339 |             snprintf(port->name, sizeof(port->name), "usb2 port #%d", i+1);
 
-You should use PRAGMA_DISABLE_PACKED_WARNING and
-PRAGMA_REENABLE_PACKED_WARNING from linux-user/qemu.h.
+"i" cannot be greater than 15.
+
+perhaps an "assert(i <= MAX(MAXPORTS_2, MAXPORTS_3))" can fix the warning ?
 
 Thanks,
 Laurent
+
+>       |                                                      ^~~~~~~~~~~~~~~
+> In file included from /usr/include/stdio.h:867,
+>                  from /home/alistair/qemu/include/qemu/osdep.h:99,
+>                  from hw/usb/hcd-xhci.c:21:
+> /usr/include/bits/stdio2.h:67:10: note: ‘__builtin___snprintf_chk’ output between 13 and 22 bytes into a destination of size 16
+>    67 |   return __builtin___snprintf_chk (__s, __n, __USE_FORTIFY_LEVEL - 1,
+>       |          ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+>    68 |        __bos (__s), __fmt, __va_arg_pack ());
+>       |        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+> 
+> Signed-off-by: Alistair Francis <alistair.francis@wdc.com>
+> ---
+>  hw/usb/hcd-xhci.h | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+> diff --git a/hw/usb/hcd-xhci.h b/hw/usb/hcd-xhci.h
+> index 240caa4e51..9e4988abb6 100644
+> --- a/hw/usb/hcd-xhci.h
+> +++ b/hw/usb/hcd-xhci.h
+> @@ -133,7 +133,7 @@ typedef struct XHCIPort {
+>      uint32_t portnr;
+>      USBPort  *uport;
+>      uint32_t speedmask;
+> -    char name[16];
+> +    char name[24];
+>      MemoryRegion mem;
+>  } XHCIPort;
+>  
+> 
+
 
