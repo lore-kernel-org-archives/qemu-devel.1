@@ -2,88 +2,60 @@ Return-Path: <SRS0=TP+Q=TA=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.7 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-2.3 required=3.0 tests=FROM_EXCESS_BASE64,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_MUTT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8A1D9C43219
-	for <qemu-devel@archiver.kernel.org>; Tue, 30 Apr 2019 13:19:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 206AAC43219
+	for <qemu-devel@archiver.kernel.org>; Tue, 30 Apr 2019 13:20:40 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 52C52205F4
-	for <qemu-devel@archiver.kernel.org>; Tue, 30 Apr 2019 13:19:28 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="HsV1RfBX"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 52C52205F4
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id E64B6205F4
+	for <qemu-devel@archiver.kernel.org>; Tue, 30 Apr 2019 13:20:39 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E64B6205F4
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:47173 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:47216 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hLSfL-0004Yc-KA
-	for qemu-devel@archiver.kernel.org; Tue, 30 Apr 2019 09:19:26 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:44595)
+	id 1hLSgZ-0005I2-6P
+	for qemu-devel@archiver.kernel.org; Tue, 30 Apr 2019 09:20:39 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:45610)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1hLSau-00012m-OF
-	for qemu-devel@nongnu.org; Tue, 30 Apr 2019 09:14:49 -0400
+	(envelope-from <berrange@redhat.com>) id 1hLSfP-0004eB-Ez
+	for qemu-devel@nongnu.org; Tue, 30 Apr 2019 09:19:28 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1hLSat-0002Du-Mg
-	for qemu-devel@nongnu.org; Tue, 30 Apr 2019 09:14:48 -0400
-Received: from mail-wr1-x442.google.com ([2a00:1450:4864:20::442]:45574)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1hLSat-0002DG-GG
-	for qemu-devel@nongnu.org; Tue, 30 Apr 2019 09:14:47 -0400
-Received: by mail-wr1-x442.google.com with SMTP id s15so20931621wra.12
-	for <qemu-devel@nongnu.org>; Tue, 30 Apr 2019 06:14:47 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
-	h=from:to:subject:date:message-id:in-reply-to:references:mime-version
-	:content-transfer-encoding;
-	bh=KjnNslhjeAVB43ev2plnZmB2mvGNvdHo3ozswBo1758=;
-	b=HsV1RfBXMD1XBjZGomeprBuZWd2xYzlQWf1PoS+CplVCmcJVGdNJSYodcPJRrXcKgf
-	pzinhIMtpePedJDmTHjGn1qOG4fjlqH3J80si0jFhzjZFwsxISkHEfuVjHIED4p9wLL+
-	qOtg5Q0mvkVe0ji8YcKen1yDA73rJ8wGPIbilXpYbdMzuN1sM81cAIm57FKq0VlIHqmF
-	sTGY1Rbr33CbktlWwjbnmrTZ+qtu5a4hvtf1QpQpWM76nQrvMnGJ2u7/pyV36Jvr6rsC
-	ECubcTtARpa7NwZvN7rjAnqzO6dGcA8hfXe/Itd3gyrOQOKHdgbJzR/xnjYzMPDIZdOl
-	QLRQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=1e100.net; s=20161025;
-	h=x-gm-message-state:from:to:subject:date:message-id:in-reply-to
-	:references:mime-version:content-transfer-encoding;
-	bh=KjnNslhjeAVB43ev2plnZmB2mvGNvdHo3ozswBo1758=;
-	b=ChETVE3www5YvH0vy6MyxLTblPJQ4f0x/4EDfKFNq8XoBCl5S4JecgFGyzkqQBJbao
-	iiZoBr4wslQZH1anWy2wiwENgGpqXr+L0/WVeFePdKpCDCjqmLKVdERIpRLKrT1PhZqi
-	YBaKYVQrzotwJY7i7VH486AoMTmN4+VRvPUZWwDefTV8869+vMQMayVktMLphvnQVDiw
-	umSWPhkSdI/9ixeumbLXOg/O26W/Xl5XqBz2xOzm6h0iz7hIXyvsnOmNJ7lGg0b+7KTM
-	FjbzRMcPFTcaRPz51LrT7Qh3T3j9AWUDwcutOFIEY5rp3s5w/qrd+xsz84w0u8i3MR/A
-	yixg==
-X-Gm-Message-State: APjAAAUr4WtQKVFsAj4wlfv4n/Rf48bTTJBdDIQCAGMl2AoDTr3MPBfp
-	6avzlO1qv+9iGDdK+jMxvZJ5ixpLwi0=
-X-Google-Smtp-Source: APXvYqx7GCssL3ndoRJwFTkznx94O0Hd0b8TH9R2xj8TNLUOGtt1aD56J+DCau0hIWGSb+44JBbJ6Q==
-X-Received: by 2002:a05:6000:11ce:: with SMTP id
-	i14mr16693110wrx.37.1556630086557; 
-	Tue, 30 Apr 2019 06:14:46 -0700 (PDT)
-Received: from orth.archaic.org.uk (orth.archaic.org.uk. [81.2.115.148])
-	by smtp.gmail.com with ESMTPSA id
-	a12sm16557460wrh.46.2019.04.30.06.14.45
-	(version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-	Tue, 30 Apr 2019 06:14:45 -0700 (PDT)
-From: Peter Maydell <peter.maydell@linaro.org>
-To: qemu-arm@nongnu.org,
-	qemu-devel@nongnu.org
-Date: Tue, 30 Apr 2019 14:14:39 +0100
-Message-Id: <20190430131439.25251-5-peter.maydell@linaro.org>
-X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20190430131439.25251-1-peter.maydell@linaro.org>
-References: <20190430131439.25251-1-peter.maydell@linaro.org>
+	(envelope-from <berrange@redhat.com>) id 1hLSfO-0004nr-1s
+	for qemu-devel@nongnu.org; Tue, 30 Apr 2019 09:19:27 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:41736)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1hLSfN-0004nC-Pi
+	for qemu-devel@nongnu.org; Tue, 30 Apr 2019 09:19:26 -0400
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+	[10.5.11.13])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 186878764B
+	for <qemu-devel@nongnu.org>; Tue, 30 Apr 2019 13:19:25 +0000 (UTC)
+Received: from redhat.com (unknown [10.42.22.189])
+	by smtp.corp.redhat.com (Postfix) with ESMTPS id C028F437F;
+	Tue, 30 Apr 2019 13:19:21 +0000 (UTC)
+Date: Tue, 30 Apr 2019 14:19:19 +0100
+From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+To: qemu-devel@nongnu.org
+Message-ID: <20190430131919.GN6818@redhat.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
-	recognized.
-X-Received-From: 2a00:1450:4864:20::442
-Subject: [Qemu-devel] [PATCH 4/4] target/arm: Implement XPSR GE bits
+Content-Type: text/plain; charset="UTF-8"
+Content-Disposition: inline
+User-Agent: Mutt/1.11.3 (2019-02-01)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+	(mx1.redhat.com [10.5.110.26]);
+	Tue, 30 Apr 2019 13:19:25 +0000 (UTC)
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 209.132.183.28
+Subject: [Qemu-devel] QMP; unsigned 64-bit ints; JSON standards compliance
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -95,91 +67,104 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+Cc: libvir-list@redhat.com, =?utf-8?Q?J=C3=A1n?= Tomko <jtomko@redhat.com>,
+	Markus Armbruster <armbru@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Content-Type: text/plain; charset="UTF-8"
-Message-ID: <20190430131439.P0KnQMPW-NWCjs5u01waEUy1aSPawGhyT2t_aaDsIjk@z>
+Message-ID: <20190430131919.HZnDMxEKLJRal6azafMbLmvmsOHSGj7zHqvb6Q_XUO0@z>
 
-In the M-profile architecture, if the CPU implements the DSP extension
-then the XPSR has GE bits, in the same way as the A-profile CPSR. When
-we added DSP extension support we forgot to add support for reading
-and writing the GE bits, which are stored in env->GE. We did put in
-the code to add XPSR_GE to the mask of bits to update in the v7m_msr
-helper, but forgot it in v7m_mrs. We also must not allow the XPSR we
-pull off the stack on exception return to set the nonexistent GE bits.
-Correct these errors:
- * read and write env->GE in xpsr_read() and xpsr_write()
- * only set GE bits on exception return if DSP present
- * read GE bits for MRS if DSP present
+The QEMU  QMP service is based on JSON which is nice because that is a
+widely supported "standard" data format.....
 
-Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
----
- target/arm/cpu.h    |  4 ++++
- target/arm/helper.c | 12 ++++++++++--
- 2 files changed, 14 insertions(+), 2 deletions(-)
+....except QEMU's implementation (and indeed most impls) are not strictly
+standards compliant.
 
-diff --git a/target/arm/cpu.h b/target/arm/cpu.h
-index 22bc6e00ab9..2ae1b36eaee 100644
---- a/target/arm/cpu.h
-+++ b/target/arm/cpu.h
-@@ -1285,6 +1285,7 @@ static inline uint32_t xpsr_read(CPUARMState *env)
-         | (env->CF << 29) | ((env->VF & 0x80000000) >> 3) | (env->QF << 27)
-         | (env->thumb << 24) | ((env->condexec_bits & 3) << 25)
-         | ((env->condexec_bits & 0xfc) << 8)
-+        | (env->GE << 16)
-         | env->v7m.exception;
- }
- 
-@@ -1300,6 +1301,9 @@ static inline void xpsr_write(CPUARMState *env, uint32_t val, uint32_t mask)
-     if (mask & XPSR_Q) {
-         env->QF = ((val & XPSR_Q) != 0);
-     }
-+    if (mask & XPSR_GE) {
-+        env->GE = (val & XPSR_GE) >> 16;
-+    }
-     if (mask & XPSR_T) {
-         env->thumb = ((val & XPSR_T) != 0);
-     }
-diff --git a/target/arm/helper.c b/target/arm/helper.c
-index 81a92ab4911..59ee5ee7c4a 100644
---- a/target/arm/helper.c
-+++ b/target/arm/helper.c
-@@ -8704,7 +8704,7 @@ static void do_v7m_exception_exit(ARMCPU *cpu)
- {
-     CPUARMState *env = &cpu->env;
-     uint32_t excret;
--    uint32_t xpsr;
-+    uint32_t xpsr, xpsr_mask;
-     bool ufault = false;
-     bool sfault = false;
-     bool return_to_sp_process;
-@@ -9156,8 +9156,13 @@ static void do_v7m_exception_exit(ARMCPU *cpu)
-         }
-         *frame_sp_p = frameptr;
-     }
-+
-+    xpsr_mask = ~(XPSR_SPREALIGN | XPSR_SFPA);
-+    if (!arm_feature(env, ARM_FEATURE_THUMB_DSP)) {
-+        xpsr_mask &= ~XPSR_GE;
-+    }
-     /* This xpsr_write() will invalidate frame_sp_p as it may switch stack */
--    xpsr_write(env, xpsr, ~(XPSR_SPREALIGN | XPSR_SFPA));
-+    xpsr_write(env, xpsr, xpsr_mask);
- 
-     if (env->v7m.secure) {
-         bool sfpa = xpsr & XPSR_SFPA;
-@@ -12642,6 +12647,9 @@ uint32_t HELPER(v7m_mrs)(CPUARMState *env, uint32_t reg)
-         }
-         if (!(reg & 4)) {
-             mask |= XPSR_NZCV | XPSR_Q; /* APSR */
-+            if (arm_feature(env, ARM_FEATURE_THUMB_DSP)) {
-+                mask |= XPSR_GE;
-+            }
-         }
-         /* EPSR reads as zero */
-         return xpsr_read(env) & mask;
+Specifically the problem is around representing 64-bit integers, whether
+signed or unsigned.
+
+The JSON standard declares that largest integer is 2^53-1 and the
+likewise the smallest is -(2^53-1):
+
+  http://www.ecma-international.org/ecma-262/6.0/index.html#sec-number.max_safe_integer
+
+A crazy limit inherited from its javascript origins IIUC.
+
+QEMU, and indeed many applications, want to handle 64-bit integers.
+The C JSON library impls have traditionally mapped integers to the
+data type 'long long int' which gives a min/max of  -(2^63) / 2^63-1.
+
+QEMU however /really/ needs 64-bit unsigned integers, ie a max 2^64-1.
+
+Libvirt has historically used the YAJL library which uses 'long long int'
+and thus can't officially go beyond 2^63-1 values. Fortunately it lets
+libvirt get at the raw json string, so libvirt can re-parse the value
+to get an 'unsigned long long'.
+
+We recently tried to switch to Jansson because YAJL has a dead upstream
+for many years and countless unanswered bugs & patches. Unfortunately we
+forgot about this need for 2^64-1 max, and Jansson also uses 'long long int'
+and raises a fatal parse error for unsigned 64-bit values above 2^63-1. It
+also provides no backdoor for libvirt todo its own integer parsing. Thus
+we had to abort our switch to jansson as it broke parsing QEMU's JSON:
+
+  https://bugzilla.redhat.com/show_bug.cgi?id=1614569
+
+Other JSON libraries we've investigated have similar problems. I imagine
+the same may well be true of non-C based JOSN impls, though I've not
+investigated in any detail.
+
+Essentially libvirt is stuck with either using the dead YAJL library
+forever, or writing its own JSON parser (most likely copying QEMU's
+JSON code into libvirt's git).
+
+This feels like a very unappealing situation to be in as not being
+able to use a JSON library of our choice is loosing one of the key
+benefits of using a standard data format.
+
+Thus I'd like to see a solution to this to allow QMP to be reliably
+consumed by any JSON library that exists.
+
+I can think of some options:
+
+  1. Encode unsigned 64-bit integers as signed 64-bit integers.
+
+     This follows the example that most C libraries map JSON ints
+     to 'long long int'. This is still relying on undefined
+     behaviour as apps don't need to support > 2^53-1.
+
+     Apps would need to cast back to 'unsigned long long' for
+     those QMP fields they know are supposed to be unsigned.
+
+
+  2. Encode all 64-bit integers as a pair of 32-bit integers.
+    
+     This is fully compliant with the JSON spec as each half
+     is fully within the declared limits. App has to split or
+     assemble the 2 pieces from/to a signed/unsigned 64-bit
+     int as needed.
+
+
+  3. Encode all 64-bit integers as strings
+
+     The application has todo all parsing/formatting client
+     side.
+
+
+None of these changes are backwards compatible, so I doubt we could make
+the change transparently in QMP.  Instead we would have to have a
+QMP greeting message capability where the client can request enablement
+of the enhanced integer handling.
+
+Any of the three options above would likely work for libvirt, but I
+would have a slight preference for either 2 or 3, so that we become
+100% standards compliant.
+
+Regards,
+Daniel
 -- 
-2.20.1
-
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
 
