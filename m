@@ -1,23 +1,30 @@
 Received: from eggs.gnu.org ([209.51.188.92]:57114)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1hLbgq-00019q-EZ
-	for qemu-devel@nongnu.org; Tue, 30 Apr 2019 18:57:33 -0400
+	(envelope-from <mst@redhat.com>) id 1hLbgx-00019q-Sa
+	for qemu-devel@nongnu.org; Tue, 30 Apr 2019 18:57:40 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1hLbdA-0007Rd-Aq
-	for qemu-devel@nongnu.org; Tue, 30 Apr 2019 18:53:45 -0400
-References: <20190426221528.30293-1-jsnow@redhat.com>
-	<20190426221528.30293-2-jsnow@redhat.com>
-	<5746f6e2-c6bc-23a4-686f-b6943fedbe2c@virtuozzo.com>
-From: John Snow <jsnow@redhat.com>
-Message-ID: <f8d5c4bd-13c3-8230-52d8-b877a10c9577@redhat.com>
-Date: Tue, 30 Apr 2019 18:53:40 -0400
+	(envelope-from <mst@redhat.com>) id 1hLbaO-0003Lv-IW
+	for qemu-devel@nongnu.org; Tue, 30 Apr 2019 18:50:53 -0400
+Received: from mail-qt1-f196.google.com ([209.85.160.196]:38728)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1hLbaO-0003Ju-Cu
+	for qemu-devel@nongnu.org; Tue, 30 Apr 2019 18:50:52 -0400
+Received: by mail-qt1-f196.google.com with SMTP id d13so18332782qth.5
+	for <qemu-devel@nongnu.org>; Tue, 30 Apr 2019 15:50:51 -0700 (PDT)
+Date: Tue, 30 Apr 2019 18:50:47 -0400
+From: "Michael S. Tsirkin" <mst@redhat.com>
+Message-ID: <20190430185011-mutt-send-email-mst@kernel.org>
+References: <20190426003652.32633-1-richardw.yang@linux.intel.com>
+	<20190426003652.32633-2-richardw.yang@linux.intel.com>
+	<20190430204636.GK28722@habkost.net>
+	<20190430223618.lyl3ribm7gg5haa5@master>
+	<20190430224816.GL28722@habkost.net>
 MIME-Version: 1.0
-In-Reply-To: <5746f6e2-c6bc-23a4-686f-b6943fedbe2c@virtuozzo.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v3 1/2] Makefile: add nit-picky mode to
- sphinx-build
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20190430224816.GL28722@habkost.net>
+Subject: Re: [Qemu-devel] [PATCH v15 1/2] util/mmap-alloc: support MAP_SYNC
+ in qemu_ram_mmap()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,31 +33,38 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>
-Cc: "kchamart@redhat.com" <kchamart@redhat.com>, "armbru@redhat.com" <armbru@redhat.com>, "aliang@redhat.com" <aliang@redhat.com>, "nsoffer@redhat.com" <nsoffer@redhat.com>, Fam Zheng <fam@euphon.net>, "qemu-stable@nongnu.org" <qemu-stable@nongnu.org>, "eblake@redhat.com" <eblake@redhat.com>
+To: Eduardo Habkost <ehabkost@redhat.com>
+Cc: Wei Yang <richard.weiyang@gmail.com>, Wei Yang <richardw.yang@linux.intel.com>, pagupta@redhat.com, xiaoguangrong.eric@gmail.com, Haozhong Zhang <haozhong.zhang@intel.com>, qemu-devel@nongnu.org, yi.z.zhang@linux.intel.com, yu.c.zhang@linux.intel.com, stefanha@redhat.com, imammedo@redhat.com, pbonzini@redhat.com, dan.j.williams@intel.com
 
-
-
-On 4/29/19 5:17 AM, Vladimir Sementsov-Ogievskiy wrote:
-> 27.04.2019 1:15, John Snow wrote:
->> If we add references that don't resolve (or accidentally remove them),
->> it will be helpful to have an error message alerting us to that.
+On Tue, Apr 30, 2019 at 07:48:16PM -0300, Eduardo Habkost wrote:
+> On Tue, Apr 30, 2019 at 10:36:18PM +0000, Wei Yang wrote:
+> [...]
+> > >> +#ifdef CONFIG_LINUX
+> > >> +#include <linux/mman.h>
+> > >> +#endif /* CONFIG_LINUX */
+> > >> +
+> > >> +#ifndef MAP_SYNC
+> > >> +#define MAP_SYNC 0
+> > >> +#endif
+> > >> +#ifndef MAP_SHARED_VALIDATE
+> > >> +#define MAP_SHARED_VALIDATE 0
+> > >> +#endif
+> > >
+> > >Why would we need this, if we added copies of mman.h to
+> > >linux-headers?
+> > 
+> > This is reported by Stefan.
+> > 
+> > https://www.mail-archive.com/qemu-devel@nongnu.org/msg612168.html
 > 
-> the wording still a bit in conflict with the fact that -n is originally a warning, not error,
-> but I don't really care:
+> Stefan, did you hit a build failure, or it was just theoretical?
 > 
-> Reviewed-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-> 
+> linux-headers/*/mman.h is updated by "linux-headers: add
+> linux/mman.h" (commit 8cf108c5d159).  If the build really fails,
+> something else is broken in our build system.
 
-Ah, sorry, I missed that. Not nice to ignore review comments. How about
-this:
+I think it's for non-linux hosts. linux-headers/ is only used
+on linux hosts.
 
-"If we add references that don't resolve (or accidentally remove them),
-it will be helpful to have warning messages alerting us to that.
-
-Further, turn warnings into errors so we can be alerted to these
-problems sooner rather than later."
-
-I can fix it in staging. Thank you for your review again.
-
---js
+> -- 
+> Eduardo
