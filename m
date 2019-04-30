@@ -1,23 +1,24 @@
-Received: from eggs.gnu.org ([209.51.188.92]:49225)
+Received: from eggs.gnu.org ([209.51.188.92]:49260)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <prvs=01690f4a8=Alistair.Francis@wdc.com>)
-	id 1hLZ44-0002Sc-PH
-	for qemu-devel@nongnu.org; Tue, 30 Apr 2019 16:09:21 -0400
+	id 1hLZ4C-0002WG-R7
+	for qemu-devel@nongnu.org; Tue, 30 Apr 2019 16:09:29 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
 	(envelope-from <prvs=01690f4a8=Alistair.Francis@wdc.com>)
-	id 1hLZ43-00077P-U1
-	for qemu-devel@nongnu.org; Tue, 30 Apr 2019 16:09:20 -0400
+	id 1hLZ4B-00079e-Ta
+	for qemu-devel@nongnu.org; Tue, 30 Apr 2019 16:09:28 -0400
 From: Alistair Francis <Alistair.Francis@wdc.com>
-Date: Tue, 30 Apr 2019 20:09:13 +0000
-Message-ID: <f2aaec5b3c12a8512cd7078f3a5d1230906d80ea.1556650594.git.alistair.francis@wdc.com>
+Date: Tue, 30 Apr 2019 20:09:21 +0000
+Message-ID: <66295a3d9e21f52d777e6354d6c0f98b0bcb0c26.1556650594.git.alistair.francis@wdc.com>
 References: <cover.1556650594.git.alistair.francis@wdc.com>
 In-Reply-To: <cover.1556650594.git.alistair.francis@wdc.com>
 Content-Language: en-US
 Content-Type: text/plain; charset="utf-8"
-Content-ID: <AFE9768B5F3E374CBD5CE5ABF90D21D9@namprd04.prod.outlook.com>
+Content-ID: <D2A8B247E6C6464DAB913E199DE06298@namprd04.prod.outlook.com>
 Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-Subject: [Qemu-devel] [PATCH v1 3/5] hw/usb/dev-mtp: Fix GCC 9 build warning
+Subject: [Qemu-devel] [PATCH v1 4/5] linux-user/uname: Fix GCC 9 build
+ warnings
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,30 +30,29 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
 Cc: Alistair Francis <Alistair.Francis@wdc.com>, "alistair23@gmail.com" <alistair23@gmail.com>, "kraxel@redhat.com" <kraxel@redhat.com>, "berrange@redhat.com" <berrange@redhat.com>, "riku.voipio@iki.fi" <riku.voipio@iki.fi>, "laurent@vivier.eu" <laurent@vivier.eu>, "qemu-trivial@nongnu.org" <qemu-trivial@nongnu.org>
 
-Rml4IHRoaXMgd2FybmluZyB3aXRoIEdDQyA5IG9uIEZlZG9yYSAzMDoNCmh3L3VzYi9kZXYtbXRw
-LmM6MTcxNTozNjogZXJyb3I6IHRha2luZyBhZGRyZXNzIG9mIHBhY2tlZCBtZW1iZXIgb2Yg4oCY
-c3RydWN0IDxhbm9ueW1vdXM+4oCZIG1heSByZXN1bHQgaW4gYW4gdW5hbGlnbmVkIHBvaW50ZXIg
-dmFsdWUgWy1XZXJyb3I9YWRkcmVzcy1vZi1wYWNrZWQtbWVtYmVyXQ0KIDE3MTUgfCAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgZGF0YXNldC0+ZmlsZW5hbWUpOw0KICAgICAgfCAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgfn5+fn5+fl5+fn5+fn5+fn4NCg0KU2lnbmVkLW9mZi1ieTog
-QWxpc3RhaXIgRnJhbmNpcyA8YWxpc3RhaXIuZnJhbmNpc0B3ZGMuY29tPg0KLS0tDQogaHcvdXNi
-L2Rldi1tdHAuYyB8IDEzICsrKysrKysrKysrKysNCiAxIGZpbGUgY2hhbmdlZCwgMTMgaW5zZXJ0
-aW9ucygrKQ0KDQpkaWZmIC0tZ2l0IGEvaHcvdXNiL2Rldi1tdHAuYyBiL2h3L3VzYi9kZXYtbXRw
-LmMNCmluZGV4IDk5NTQ4YjAxMmQuLjZkZTg1ZDk5ZTYgMTAwNjQ0DQotLS0gYS9ody91c2IvZGV2
-LW10cC5jDQorKysgYi9ody91c2IvZGV2LW10cC5jDQpAQCAtMTcxMSw5ICsxNzExLDIyIEBAIHN0
-YXRpYyB2b2lkIHVzYl9tdHBfd3JpdGVfbWV0YWRhdGEoTVRQU3RhdGUgKnMsIHVpbnQ2NF90IGRs
-ZW4pDQogICAgIGFzc2VydCghcy0+d3JpdGVfcGVuZGluZyk7DQogICAgIGFzc2VydChwICE9IE5V
-TEwpOw0KIA0KKy8qDQorICogV2UgYXJlIGFib3V0IHRvIGFjY2VzcyBhIHBhY2tlZCBzdHJ1Y3Qu
-IFdlIGFyZSBjb25maWRlbnQgdGhhdCB0aGUgcG9pbnRlcg0KKyAqIGFkZHJlc3Mgd29uJ3QgYmUg
-dW5hbGxpZ25lZCwgc28gd2UgaWdub3JlIEdDQyB3YXJuaW5ncy4NCisgKi8NCisjaWYgZGVmaW5l
-ZChDT05GSUdfUFJBR01BX0RJQUdOT1NUSUNfQVZBSUxBQkxFKSAmJiBRRU1VX0dOVUNfUFJFUkVR
-KDksIDApDQorI3ByYWdtYSBHQ0MgZGlhZ25vc3RpYyBwdXNoDQorI3ByYWdtYSBHQ0MgZGlhZ25v
-c3RpYyBpZ25vcmVkICItV2FkZHJlc3Mtb2YtcGFja2VkLW1lbWJlciINCisjZW5kaWYNCisNCiAg
-ICAgZmlsZW5hbWUgPSB1dGYxNl90b19zdHIoTUlOKGRhdGFzZXQtPmxlbmd0aCwgZmlsZW5hbWVf
-Y2hhcnMpLA0KICAgICAgICAgICAgICAgICAgICAgICAgICAgICBkYXRhc2V0LT5maWxlbmFtZSk7
-DQogDQorI2lmIGRlZmluZWQoQ09ORklHX1BSQUdNQV9ESUFHTk9TVElDX0FWQUlMQUJMRSkgJiYg
-UUVNVV9HTlVDX1BSRVJFUSg5LCAwKQ0KKyNwcmFnbWEgR0NDIGRpYWdub3N0aWMgcG9wDQorI2Vu
-ZGlmDQorDQogICAgIGlmIChzdHJjaHIoZmlsZW5hbWUsICcvJykpIHsNCiAgICAgICAgIHVzYl9t
-dHBfcXVldWVfcmVzdWx0KHMsIFJFU19QQVJBTUVURVJfTk9UX1NVUFBPUlRFRCwgZC0+dHJhbnMs
-DQogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAwLCAwLCAwLCAwKTsNCi0tIA0KMi4yMS4w
-DQoNCg==
+Rml4IHRoaXMgd2FybmluZyB3aGVuIGJ1aWxkaW5nIHdpdGggR0NDOSBvbiBGZWRvcmEgMzA6DQpJ
+biBmdW5jdGlvbiDigJhzdHJuY3B54oCZLA0KICAgIGlubGluZWQgZnJvbSDigJhzeXNfdW5hbWXi
+gJkgYXQgL2hvbWUvYWxpc3RhaXIvcWVtdS9saW51eC11c2VyL3VuYW1lLmM6OTQ6MzoNCi91c3Iv
+aW5jbHVkZS9iaXRzL3N0cmluZ19mb3J0aWZpZWQuaDoxMDY6MTA6IGVycm9yOiDigJhfX2J1aWx0
+aW5fc3RybmNweeKAmSBvdXRwdXQgbWF5IGJlIHRydW5jYXRlZCBjb3B5aW5nIDY0IGJ5dGVzIGZy
+b20gYSBzdHJpbmcgb2YgbGVuZ3RoIDY0IFstV2Vycm9yPXN0cmluZ29wLXRydW5jYXRpb25dDQog
+IDEwNiB8ICAgcmV0dXJuIF9fYnVpbHRpbl9fX3N0cm5jcHlfY2hrIChfX2Rlc3QsIF9fc3JjLCBf
+X2xlbiwgX19ib3MgKF9fZGVzdCkpOw0KICAgICAgfCAgICAgICAgICBefn5+fn5+fn5+fn5+fn5+
+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fg0KDQpTaWduZWQt
+b2ZmLWJ5OiBBbGlzdGFpciBGcmFuY2lzIDxhbGlzdGFpci5mcmFuY2lzQHdkYy5jb20+DQotLS0N
+CiBsaW51eC11c2VyL3VuYW1lLmMgfCA4ICsrKysrKysrDQogMSBmaWxlIGNoYW5nZWQsIDggaW5z
+ZXJ0aW9ucygrKQ0KDQpkaWZmIC0tZ2l0IGEvbGludXgtdXNlci91bmFtZS5jIGIvbGludXgtdXNl
+ci91bmFtZS5jDQppbmRleCAzMTNiNzlkYmFkLi4yOTNiMjIzOGYyIDEwMDY0NA0KLS0tIGEvbGlu
+dXgtdXNlci91bmFtZS5jDQorKysgYi9saW51eC11c2VyL3VuYW1lLmMNCkBAIC05MCw2ICs5MCwx
+MSBAQCBpbnQgc3lzX3VuYW1lKHN0cnVjdCBuZXdfdXRzbmFtZSAqYnVmKQ0KICAgICogc3RydWN0
+IGxpbnV4IGtlcm5lbCB1c2VzKS4NCiAgICAqLw0KIA0KKyNpZiBkZWZpbmVkKENPTkZJR19QUkFH
+TUFfRElBR05PU1RJQ19BVkFJTEFCTEUpICYmIFFFTVVfR05VQ19QUkVSRVEoOSwgMCkNCisjcHJh
+Z21hIEdDQyBkaWFnbm9zdGljIHB1c2gNCisjcHJhZ21hIEdDQyBkaWFnbm9zdGljIGlnbm9yZWQg
+Ii1Xc3RyaW5nb3AtdHJ1bmNhdGlvbiINCisjZW5kaWYNCisNCiAgIG1lbXNldChidWYsIDAsIHNp
+emVvZigqYnVmKSk7DQogICBDT1BZX1VUU05BTUVfRklFTEQoYnVmLT5zeXNuYW1lLCB1dHNfYnVm
+LnN5c25hbWUpOw0KICAgQ09QWV9VVFNOQU1FX0ZJRUxEKGJ1Zi0+bm9kZW5hbWUsIHV0c19idWYu
+bm9kZW5hbWUpOw0KQEAgLTEwMSw2ICsxMDYsOSBAQCBpbnQgc3lzX3VuYW1lKHN0cnVjdCBuZXdf
+dXRzbmFtZSAqYnVmKQ0KICNlbmRpZg0KICAgcmV0dXJuICgwKTsNCiANCisjaWYgZGVmaW5lZChD
+T05GSUdfUFJBR01BX0RJQUdOT1NUSUNfQVZBSUxBQkxFKSAmJiBRRU1VX0dOVUNfUFJFUkVRKDks
+IDApDQorI3ByYWdtYSBHQ0MgZGlhZ25vc3RpYyBwb3ANCisjZW5kaWYNCiAjdW5kZWYgQ09QWV9V
+VFNOQU1FX0ZJRUxEDQogfQ0KIA0KLS0gDQoyLjIxLjANCg0K
