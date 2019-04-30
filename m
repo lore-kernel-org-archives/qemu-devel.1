@@ -1,34 +1,15 @@
 Received: from eggs.gnu.org ([209.51.188.92]:34744)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1hLPpo-0001PR-N8
-	for qemu-devel@nongnu.org; Tue, 30 Apr 2019 06:18:01 -0400
+	(envelope-from <berto@igalia.com>) id 1hLPpz-0001PR-UM
+	for qemu-devel@nongnu.org; Tue, 30 Apr 2019 06:18:13 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1hLPiG-0006GE-K8
-	for qemu-devel@nongnu.org; Tue, 30 Apr 2019 06:10:13 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:38462)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1hLPiG-0006FX-Bf
-	for qemu-devel@nongnu.org; Tue, 30 Apr 2019 06:10:12 -0400
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
-	[10.5.11.12])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 861563084032
-	for <qemu-devel@nongnu.org>; Tue, 30 Apr 2019 10:10:11 +0000 (UTC)
-Date: Tue, 30 Apr 2019 11:10:06 +0100
-From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-Message-ID: <20190430101006.GA6818@redhat.com>
-Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-References: <20190423212246.3542-1-ehabkost@redhat.com>
-	<20190423212246.3542-2-ehabkost@redhat.com>
-	<20190424082652.GC28615@redhat.com>
-	<20190424182036.GH18406@habkost.net>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20190424182036.GH18406@habkost.net>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH 1/3] qapi: SupportStatusInfo struct
+	(envelope-from <berto@igalia.com>) id 1hLPgU-0005KA-UV
+	for qemu-devel@nongnu.org; Tue, 30 Apr 2019 06:08:23 -0400
+From: Alberto Garcia <berto@igalia.com>
+Date: Tue, 30 Apr 2019 13:08:02 +0300
+Message-Id: <20190430100802.15368-1-berto@igalia.com>
+Subject: [Qemu-devel] [PATCH] qcow2: Fix error handling in the compression
+ code
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,93 +18,93 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eduardo Habkost <ehabkost@redhat.com>
-Cc: qemu-devel@nongnu.org, mprivozn@redhat.com, Markus Armbruster <armbru@redhat.com>
+To: qemu-devel@nongnu.org
+Cc: Alberto Garcia <berto@igalia.com>, qemu-block@nongnu.org, Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>
 
-On Wed, Apr 24, 2019 at 03:20:36PM -0300, Eduardo Habkost wrote:
-> On Wed, Apr 24, 2019 at 09:26:52AM +0100, Daniel P. Berrang=C3=A9 wrote=
-:
-> > On Tue, Apr 23, 2019 at 06:22:44PM -0300, Eduardo Habkost wrote:
-> > > This struct will be used to represent support and deprecation
-> > > status of QEMU features.
-> > >=20
-> > > Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
-> > > ---
-> > >  qapi/common.json | 24 ++++++++++++++++++++++++
-> > >  1 file changed, 24 insertions(+)
-> > >=20
-> > > diff --git a/qapi/common.json b/qapi/common.json
-> > > index 99d313ef3b..b59d0dc66b 100644
-> > > --- a/qapi/common.json
-> > > +++ b/qapi/common.json
-> > > @@ -193,3 +193,27 @@
-> > >               'ppc64', 'riscv32', 'riscv64', 's390x', 'sh4',
-> > >               'sh4eb', 'sparc', 'sparc64', 'tricore', 'unicore32',
-> > >               'x86_64', 'xtensa', 'xtensaeb' ] }
-> > > +
-> > > +##
-> > > +# @SupportStatusInfo:
-> > > +#
-> > > +# Information on support status of a given feature
-> > > +# (e.g. machine type)
-> > > +#
-> > > +# @deprecated: if true, the given feature is deprecated and may be=
- removed
-> > > +#              in future versions of QEMU according to the QEMU de=
-precation
-> > > +#              policy.
-> > > +#
-> > > +# @status-message: Human readable message describing support statu=
-s
-> > > +#                  of the feature.
-> > > +#
-> > > +# @suggested-alternative: Optional.  Suggested alternative for a d=
-eprecated
-> > > +#                         feature.  For machine types, this should=
- be the name
-> > > +#                         of an available machine-type.
-> > > +#
-> > > +# Since: 4.1
-> > > +##
-> > > +{ 'struct': 'SupportStatusInfo',
-> > > +  'data': { 'deprecated': 'bool',
-> > > +            '*status-message': 'str',
-> > > +            '*suggested-alternative': 'str' } }
-> >=20
-> > I see status-message has to be optional, since you're embedding the
-> > struct into another struct and want deprecated=3D=3Dfalse by default.
-> >=20
-> > I'd be inclined to change it to embed a pointer to the struct and
-> > drop the deprecated field, and make both status-message and
-> > suggested-alternative be mandatory. ie a struct  "DeprecationInfo"=20
-> > the pointer to which is NULL if not deprecated.
->=20
-> That could be a simple solution if we were sure we would only
-> track deprecation info.  But I would like us to track additional
-> support status on that struct eventually.
+This patch fixes a few things in the way error codes are handled in
+the qcow2 compression code:
 
-I've no objection to expanding it to capture other info - we'll
-want to change the 'deprecated' field to an enum though. Also,
-in some cases there won't be any real alternative so lets just
-call it 'hint' instead. How about
+a) qcow2_co_pwritev_compressed() expects qcow2_co_compress() to only
+   return -1 or -2 on failure, but this is not correct. Since the
+   change from qcow2_compress() to qcow2_co_compress() in commit
+   ceb029cd6feccf9f7607 the new code can also return -EINVAL (although
+   there does not seem to exist any code path that would cause that
+   error in the current implementation).
 
-    { 'enum':  "SupportStatus",
-      'data': { 'production',  # Secure for use in hostile production env
-                'development', # No security guarentee, friendly dev only
-		'deprecated',  # To be removed in the future
-    } }
+b) -1 and -2 are ad-hoc error codes defined in qcow2_compress().
+   This patch replaces them with standard constants from errno.h.
 
-    { 'struct': "SupportStatusInfo",
-       'data': { 'status': 'SupportStatus',
-                 '*info': 'str',
-		 '*hint': 'str' } }
+c) Both qcow2_compress() and qcow2_co_do_compress() return a negative
+   value on failure, but qcow2_co_pwritev_compressed() stores the
+   value in an unsigned data type.
 
-Regards,
-Daniel
---=20
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberran=
-ge :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.c=
-om :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberran=
-ge :|
+Signed-off-by: Alberto Garcia <berto@igalia.com>
+---
+ block/qcow2.c | 18 +++++++++---------
+ 1 file changed, 9 insertions(+), 9 deletions(-)
+
+diff --git a/block/qcow2.c b/block/qcow2.c
+index 3ace3b2209..502a81720a 100644
+--- a/block/qcow2.c
++++ b/block/qcow2.c
+@@ -3923,8 +3923,8 @@ fail:
+  * @src - source buffer, @src_size bytes
+  *
+  * Returns: compressed size on success
+- *          -1 destination buffer is not enough to store compressed data
+- *          -2 on any other error
++ *          -ENOMEM destination buffer is not enough to store compressed data
++ *          -EIO    on any other error
+  */
+ static ssize_t qcow2_compress(void *dest, size_t dest_size,
+                               const void *src, size_t src_size)
+@@ -3937,7 +3937,7 @@ static ssize_t qcow2_compress(void *dest, size_t dest_size,
+     ret = deflateInit2(&strm, Z_DEFAULT_COMPRESSION, Z_DEFLATED,
+                        -12, 9, Z_DEFAULT_STRATEGY);
+     if (ret != Z_OK) {
+-        return -2;
++        return -EIO;
+     }
+ 
+     /* strm.next_in is not const in old zlib versions, such as those used on
+@@ -3951,7 +3951,7 @@ static ssize_t qcow2_compress(void *dest, size_t dest_size,
+     if (ret == Z_STREAM_END) {
+         ret = dest_size - strm.avail_out;
+     } else {
+-        ret = (ret == Z_OK ? -1 : -2);
++        ret = (ret == Z_OK ? -ENOMEM : -EIO);
+     }
+ 
+     deflateEnd(&strm);
+@@ -4090,7 +4090,7 @@ qcow2_co_pwritev_compressed(BlockDriverState *bs, uint64_t offset,
+     BDRVQcow2State *s = bs->opaque;
+     QEMUIOVector hd_qiov;
+     int ret;
+-    size_t out_len;
++    ssize_t out_len;
+     uint8_t *buf, *out_buf;
+     uint64_t cluster_offset;
+ 
+@@ -4129,16 +4129,16 @@ qcow2_co_pwritev_compressed(BlockDriverState *bs, uint64_t offset,
+ 
+     out_len = qcow2_co_compress(bs, out_buf, s->cluster_size - 1,
+                                 buf, s->cluster_size);
+-    if (out_len == -2) {
+-        ret = -EINVAL;
+-        goto fail;
+-    } else if (out_len == -1) {
++    if (out_len == -ENOMEM) {
+         /* could not compress: write normal cluster */
+         ret = qcow2_co_pwritev(bs, offset, bytes, qiov, 0);
+         if (ret < 0) {
+             goto fail;
+         }
+         goto success;
++    } else if (out_len < 0) {
++        ret = -EINVAL;
++        goto fail;
+     }
+ 
+     qemu_co_mutex_lock(&s->lock);
+-- 
+2.11.0
