@@ -2,60 +2,86 @@ Return-Path: <SRS0=TP+Q=TA=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.7 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7151AC43219
-	for <qemu-devel@archiver.kernel.org>; Tue, 30 Apr 2019 03:50:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 29009C43219
+	for <qemu-devel@archiver.kernel.org>; Tue, 30 Apr 2019 04:42:13 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 429042080C
-	for <qemu-devel@archiver.kernel.org>; Tue, 30 Apr 2019 03:50:36 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 429042080C
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.intel.com
+	by mail.kernel.org (Postfix) with ESMTPS id DACC52075E
+	for <qemu-devel@archiver.kernel.org>; Tue, 30 Apr 2019 04:42:12 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="nsA8ij/7"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DACC52075E
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=jms.id.au
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:38634 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:39017 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hLJmt-0007eG-HA
-	for qemu-devel@archiver.kernel.org; Mon, 29 Apr 2019 23:50:35 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:54457)
+	id 1hLKap-0007Or-RJ
+	for qemu-devel@archiver.kernel.org; Tue, 30 Apr 2019 00:42:11 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:60567)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richardw.yang@linux.intel.com>) id 1hLJj9-0005XH-22
-	for qemu-devel@nongnu.org; Mon, 29 Apr 2019 23:46:43 -0400
+	(envelope-from <joel.stan@gmail.com>) id 1hLKZc-0006bj-3c
+	for qemu-devel@nongnu.org; Tue, 30 Apr 2019 00:40:56 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richardw.yang@linux.intel.com>) id 1hLJj7-000352-6N
-	for qemu-devel@nongnu.org; Mon, 29 Apr 2019 23:46:43 -0400
-Received: from mga12.intel.com ([192.55.52.136]:44784)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <richardw.yang@linux.intel.com>)
-	id 1hLJj5-00032B-AZ
-	for qemu-devel@nongnu.org; Mon, 29 Apr 2019 23:46:39 -0400
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from fmsmga003.fm.intel.com ([10.253.24.29])
-	by fmsmga106.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384;
-	29 Apr 2019 20:46:34 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.60,412,1549958400"; d="scan'208";a="153455310"
-Received: from richard.sh.intel.com (HELO localhost) ([10.239.159.54])
-	by FMSMGA003.fm.intel.com with ESMTP; 29 Apr 2019 20:46:33 -0700
-From: Wei Yang <richardw.yang@linux.intel.com>
-To: qemu-devel@nongnu.org
-Date: Tue, 30 Apr 2019 11:44:12 +0800
-Message-Id: <20190430034412.12935-4-richardw.yang@linux.intel.com>
-X-Mailer: git-send-email 2.19.1
-In-Reply-To: <20190430034412.12935-1-richardw.yang@linux.intel.com>
-References: <20190430034412.12935-1-richardw.yang@linux.intel.com>
+	(envelope-from <joel.stan@gmail.com>) id 1hLKZb-0002by-93
+	for qemu-devel@nongnu.org; Tue, 30 Apr 2019 00:40:56 -0400
+Received: from mail-pg1-x544.google.com ([2607:f8b0:4864:20::544]:45215)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <joel.stan@gmail.com>)
+	id 1hLKZZ-0002aq-9G; Tue, 30 Apr 2019 00:40:53 -0400
+Received: by mail-pg1-x544.google.com with SMTP id i21so2788250pgi.12;
+	Mon, 29 Apr 2019 21:40:52 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+	h=sender:from:to:cc:subject:date:message-id:mime-version
+	:content-transfer-encoding;
+	bh=gFbCi86uIEW652j72gzX8jjTJZ5WmXcv260laN5+gkQ=;
+	b=nsA8ij/7y8hg+m8GN0iqRVa7Zh9WGVvC1rb1lC0CUVbrmNuM/1CbSjtPJ9a3UCT+iM
+	/2/l3cYO7ctzW0OT5aHjjxjZn1ob/Z/KrRYv9azK9DoLppERS4NP4xBPV2HbndBcc5rr
+	HwIzpIV2sLtGyGFciBN/U+BkrGSGGQhvFw2MhCLYO50ydFzzzFU00Q/ucNN6eAgxW5Iu
+	NN7BzpJmYDyiWlvD/Y4HwyoYqHHuJKslFBYNtuHBTXlERmtBbG6rUhN+pherr6UBb4ng
+	nW1iVYw1tsWEEHidffFxIXXzioDkz+bbMWTsk6kCLe6T2hK5fnuBpcj9Wfa6QbD7HM/d
+	iJWA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=1e100.net; s=20161025;
+	h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
+	:mime-version:content-transfer-encoding;
+	bh=gFbCi86uIEW652j72gzX8jjTJZ5WmXcv260laN5+gkQ=;
+	b=AJxkrbe855VjyoXqhLk16BS3g8JEDkXdErpYvNbKuk+slx7TDyRJhQaZ61hxWHRvbX
+	Kx9o9prx2/9OeaBaoAX1ogjCXd03BkmbV5+GjMdQb69MJ60V0Y8AUVFQpk+GvT0Y3Ko2
+	mYR9tkxosFAy3w5KWuAPvJfPRQVLWDkiK6ZOovcmf0SEs3Dd3TJVqw40PyXImLQKMV57
+	04cz3NIHCOR9cI6BN3fko5CbAiSwKgZM2EXgM5aDI7mtIK0QLulCkXKO9tCGaHVwK2Ii
+	w24Fn4F1Z2GXaNonq7fNElxB7vRVmwf5WImyJA/UTKsOYAVyU7IN58k+qVKGHXrYGu2e
+	5/UQ==
+X-Gm-Message-State: APjAAAUOiHp9cqO9IDFJYqQkoFAqaWh6zoEwKaiaeXvCzwFajRgX7MaB
+	/ktzdEcYMTsdiqc3HmC5wXo=
+X-Google-Smtp-Source: APXvYqwWPHU3fBBpv/Sw43QSuFU3MK3m6oO3GEPTccVrgo/4Sq84gNbMcBZClmaKblQae25hdtadfg==
+X-Received: by 2002:a63:117:: with SMTP id 23mr34286pgb.34.1556599251288;
+	Mon, 29 Apr 2019 21:40:51 -0700 (PDT)
+Received: from voyager.jms.id.au ([45.124.203.18])
+	by smtp.gmail.com with ESMTPSA id
+	e11sm25312107pfd.151.2019.04.29.21.40.47
+	(version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
+	Mon, 29 Apr 2019 21:40:50 -0700 (PDT)
+Received: by voyager.jms.id.au (sSMTP sendmail emulation);
+	Tue, 30 Apr 2019 14:10:44 +0930
+From: Joel Stanley <joel@jms.id.au>
+To: Peter Maydell <peter.maydell@linaro.org>,
+	=?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>
+Date: Tue, 30 Apr 2019 14:10:33 +0930
+Message-Id: <20190430044036.1144-1-joel@jms.id.au>
+X-Mailer: git-send-email 2.20.1
 MIME-Version: 1.0
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
 	recognized.
-X-Received-From: 192.55.52.136
-Subject: [Qemu-devel] [PATCH 3/3] ram: RAMBlock->offset is always aligned to
- a word
+X-Received-From: 2607:f8b0:4864:20::544
+Subject: [Qemu-devel] [PATCH v3 0/2] arm: aspeed: Add RTC Model
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -67,58 +93,41 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: pbonzini@redhat.com, Wei Yang <richardw.yang@linux.intel.com>,
-	dgilbert@redhat.com, quintela@redhat.com
+Cc: Andrew Jeffery <andrew@aj.id.au>, qemu-arm@nongnu.org,
+	qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Content-Type: text/plain; charset="UTF-8"
-Message-ID: <20190430034412.sI2P0Ov4Tupq6kV30zytGPP8uTek6mfaGhfbS-02KA4@z>
+Message-ID: <20190430044033.UWy0ymWK2odsNudvluZMr0Az_OQMGpttkQdtw_Eehe4@z>
 
-RAMBlock->offset is calculated by find_ram_offset, which makes sure the
-offset is aligned to a word.
+v3: Add some commit messages, resend as v2 didn't send properly
+v2: Minor fixes, added vmstate and reset, and rebased on Cédric's series
 
-This patch removes the alignment check on offset and unnecessary
-variable *word*.
+Based-on: 20190411161013.4514-4-clg@kaod.org
+[PATCH 3/3] aspeed: use sysbus_init_child_obj() to initialize children
 
-Signed-off-by: Wei Yang <richardw.yang@linux.intel.com>
----
- include/exec/ram_addr.h | 15 +++++++++------
- 1 file changed, 9 insertions(+), 6 deletions(-)
+A model for the ASPEED BMC real time clock (RTC). The model is sufficient
+for running the guest Linux kernel driver, and ticks in time with the
+host when programmed.
 
-diff --git a/include/exec/ram_addr.h b/include/exec/ram_addr.h
-index 3dfb2d52fb..a7c81bdb32 100644
---- a/include/exec/ram_addr.h
-+++ b/include/exec/ram_addr.h
-@@ -413,18 +413,21 @@ uint64_t cpu_physical_memory_sync_dirty_bitmap(RAMBlock *rb,
-                                                uint64_t *real_dirty_pages)
- {
-     ram_addr_t addr;
--    unsigned long word = BIT_WORD(rb->offset >> TARGET_PAGE_BITS);
-     uint64_t num_dirty = 0;
-     unsigned long *dest = rb->bmap;
- 
--    /* offset and length is aligned at the start of a word? */
--    if (((word * BITS_PER_LONG) << TARGET_PAGE_BITS) == (rb->offset) &&
--        !(length & ((BITS_PER_LONG << TARGET_PAGE_BITS) - 1))) {
-+    /*
-+     * Since RAMBlock->offset is guaranteed to be aligned to a word by
-+     * find_ram_offset(), if length is aligned at the start of a word, go the
-+     * fast path.
-+     */
-+    if (!(length & ((BITS_PER_LONG << TARGET_PAGE_BITS) - 1))) {
-         int k;
-         int nr = BITS_TO_LONGS(length >> TARGET_PAGE_BITS);
-         unsigned long * const *src;
--        unsigned long idx = (word * BITS_PER_LONG) / DIRTY_MEMORY_BLOCK_SIZE;
--        unsigned long offset = BIT_WORD((word * BITS_PER_LONG) %
-+        unsigned long idx = (rb->offset >> TARGET_PAGE_BITS) /
-+                            DIRTY_MEMORY_BLOCK_SIZE;
-+        unsigned long offset = BIT_WORD((rb->offset >> TARGET_PAGE_BITS) %
-                                         DIRTY_MEMORY_BLOCK_SIZE);
- 
-         rcu_read_lock();
+It does not implement the alarm functionality, which includes the
+interrupt.
+
+Joel Stanley (2):
+  hw: timer: Add ASPEED RTC device
+  hw/arm/aspeed: Add RTC to SoC
+
+ hw/arm/aspeed_soc.c           |  13 +++
+ hw/timer/Makefile.objs        |   2 +-
+ hw/timer/aspeed_rtc.c         | 180 ++++++++++++++++++++++++++++++++++
+ hw/timer/trace-events         |   4 +
+ include/hw/arm/aspeed_soc.h   |   2 +
+ include/hw/timer/aspeed_rtc.h |  31 ++++++
+ 6 files changed, 231 insertions(+), 1 deletion(-)
+ create mode 100644 hw/timer/aspeed_rtc.c
+ create mode 100644 include/hw/timer/aspeed_rtc.h
+
 -- 
-2.19.1
+2.20.1
 
 
