@@ -1,23 +1,26 @@
-Received: from eggs.gnu.org ([209.51.188.92]:46546)
+Received: from eggs.gnu.org ([209.51.188.92]:47432)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <longpeng2@huawei.com>) id 1hLM9N-0002jH-5k
-	for qemu-devel@nongnu.org; Tue, 30 Apr 2019 02:21:58 -0400
+	(envelope-from <thuth@redhat.com>) id 1hLMGQ-0003zu-4Z
+	for qemu-devel@nongnu.org; Tue, 30 Apr 2019 02:29:15 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <longpeng2@huawei.com>) id 1hLM9M-0006tT-0w
-	for qemu-devel@nongnu.org; Tue, 30 Apr 2019 02:21:57 -0400
-Received: from szxga04-in.huawei.com ([45.249.212.190]:2206 helo=huawei.com)
+	(envelope-from <thuth@redhat.com>) id 1hLMGP-0001RI-40
+	for qemu-devel@nongnu.org; Tue, 30 Apr 2019 02:29:14 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:55462)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <longpeng2@huawei.com>)
-	id 1hLM9L-0006sn-Mo
-	for qemu-devel@nongnu.org; Tue, 30 Apr 2019 02:21:55 -0400
-From: "Longpeng(Mike)" <longpeng2@huawei.com>
-Date: Tue, 30 Apr 2019 14:21:41 +0800
-Message-ID: <1556605301-44112-1-git-send-email-longpeng2@huawei.com>
+	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1hLMGO-0001R7-Sf
+	for qemu-devel@nongnu.org; Tue, 30 Apr 2019 02:29:13 -0400
+References: <20190429003322.22908-1-driver1998@foxmail.com>
+	<d25baf06-1176-5cce-2ff1-3b5652e3ca27@redhat.com>
+From: Thomas Huth <thuth@redhat.com>
+Message-ID: <d36b32b3-0402-bdd3-3c7e-c0ac35b7656e@redhat.com>
+Date: Tue, 30 Apr 2019 08:29:05 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
+In-Reply-To: <d25baf06-1176-5cce-2ff1-3b5652e3ca27@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v2] usb/xchi: avoid trigger assertion if guest
- write wrong epid
+Subject: Re: [Qemu-devel] [PATCH 3/4] util/cacheinfo.c: Use uintptr_t
+ instead of unsigned long in AArch64 arch_cache_info()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,68 +29,49 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: kraxel@redhat.com
-Cc: qemu-devel@nongnu.org, Longpeng <longpeng2@huawei.com>, Gonglei <arei.gonglei@huawei.com>
+To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>, driver1998 <driver1998@foxmail.com>, qemu-devel@nongnu.org
 
-From: Longpeng <longpeng2@huawei.com>
-
-we found the following core in our environment:
-0  0x00007fc6b06c2237 in raise ()
-1  0x00007fc6b06c3928 in abort ()
-2  0x00007fc6b06bb056 in __assert_fail_base ()
-3  0x00007fc6b06bb102 in __assert_fail ()
-4  0x0000000000702e36 in xhci_kick_ep (...)
-5  0x000000000047897a in memory_region_write_accessor (...)
-6  0x000000000047767f in access_with_adjusted_size (...)
-7  0x000000000047944d in memory_region_dispatch_write (...)
-(mr=3Dmr@entry=3D0x7fc6a0138df0, addr=3Daddr@entry=3D156, data=3D16488924=
-16,
-size=3Dsize@entry=3D4, attrs=3Dattrs@entry=3D...)
-8  0x000000000042df17 in address_space_write_continue (...)
-10 0x000000000043084d in address_space_rw (...)
-11 0x000000000047451b in kvm_cpu_exec (cpu=3Dcpu@entry=3D0x1ab11b0)
-12 0x000000000045dcf5 in qemu_kvm_cpu_thread_fn (arg=3D0x1ab11b0)
-13 0x0000000000870631 in qemu_thread_start (args=3Dargs@entry=3D0x1acfb50=
+On 30/04/2019 07.49, Philippe Mathieu-Daud=C3=A9 wrote:
+> On 4/29/19 2:33 AM, driver1998 wrote:
+>> Windows ARM64 uses LLP64 model, which breaks current assumptions.
+>>
+>> Signed-off-by: driver1998 <driver1998@foxmail.com>
+>> ---
+>>  util/cacheinfo.c | 4 +++-
+>>  1 file changed, 3 insertions(+), 1 deletion(-)
+>>
+>> diff --git a/util/cacheinfo.c b/util/cacheinfo.c
+>> index 3cd080b83d..a815cb0722 100644
+>> --- a/util/cacheinfo.c
+>> +++ b/util/cacheinfo.c
+>> @@ -107,7 +107,7 @@ static void sys_cache_info(int *isize, int *dsize)
+>>  static void arch_cache_info(int *isize, int *dsize)
+>>  {
+>>      if (*isize =3D=3D 0 || *dsize =3D=3D 0) {
+>> -        unsigned long ctr;
+>> +        uintptr_t ctr;
+>> =20
+>>          /* The real cache geometry is in CCSIDR_EL1/CLIDR_EL1/CSSELR_=
+EL1,
+>>             but (at least under Linux) these are marked protected by t=
+he
+>> @@ -120,6 +120,8 @@ static void arch_cache_info(int *isize, int *dsize=
 )
-14 0x00000000008959a7 in thread_entry_for_hotfix (pthread_cb=3D<optimized=
- out>)
-15 0x00007fc6b0a60dd5 in start_thread ()
-16 0x00007fc6b078a59d in clone ()
+>>          if (*dsize =3D=3D 0) {
+>>              *dsize =3D 4 << ((ctr >> 16) & 0xf);
+>>          }
+>> +
+>> +        printf("%d %d\n", *isize, *dsize);
+>=20
+> The patch looks correct (except your real name), but here you forgot to
+> remove this debugging code.
 
-(gdb) f 5
-5  0x000000000047897a in memory_region_write_accessor (...)
-529	    mr->ops->write(mr->opaque, addr, tmp, size);
-(gdb) p /x tmp
-$9 =3D 0x62481a00 <-- last byte 0x00 is @epid
+Right. With the "Signed-off-by" line you have to state that you've read
+and followed the "Developer's Certificate of Origin". For this, no
+pseudonym contributions are possible, sorry.
+See this URLs for details:
 
-xhci_doorbell_write() already check the upper bound of @slotid an @epid,
-it also need to check the lower bound.
+ https://wiki.qemu.org/Contribute/SubmitAPatch#Patch_emails_must_include_=
+a_Signed-off-by:_line
 
-Cc: Gonglei <arei.gonglei@huawei.com>
-Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
-Signed-off-by: Longpeng <longpeng2@huawei.com>
----
-v1 -> v2:
-  1) update the description, include the full backtrace
-  2) remove unnecessary check: 'reg =3D=3D 0'
-
----
- hw/usb/hcd-xhci.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
-
-diff --git a/hw/usb/hcd-xhci.c b/hw/usb/hcd-xhci.c
-index ec28bee..d8472b4 100644
---- a/hw/usb/hcd-xhci.c
-+++ b/hw/usb/hcd-xhci.c
-@@ -3137,7 +3137,7 @@ static void xhci_doorbell_write(void *ptr, hwaddr r=
-eg,
-         streamid =3D (val >> 16) & 0xffff;
-         if (reg > xhci->numslots) {
-             DPRINTF("xhci: bad doorbell %d\n", (int)reg);
--        } else if (epid > 31) {
-+        } else if (epid =3D=3D 0 || epid > 31) {
-             DPRINTF("xhci: bad doorbell %d write: 0x%x\n",
-                     (int)reg, (uint32_t)val);
-         } else {
---=20
-1.8.3.1
+  Thomas
