@@ -1,18 +1,18 @@
-Received: from eggs.gnu.org ([209.51.188.92]:48800)
+Received: from eggs.gnu.org ([209.51.188.92]:48995)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1hLUur-00083O-Vb
-	for qemu-devel@nongnu.org; Tue, 30 Apr 2019 11:43:35 -0400
+	(envelope-from <kwolf@redhat.com>) id 1hLUux-00089g-Dy
+	for qemu-devel@nongnu.org; Tue, 30 Apr 2019 11:43:40 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1hLUup-000269-9Z
-	for qemu-devel@nongnu.org; Tue, 30 Apr 2019 11:43:33 -0400
+	(envelope-from <kwolf@redhat.com>) id 1hLUuw-0002CP-DD
+	for qemu-devel@nongnu.org; Tue, 30 Apr 2019 11:43:39 -0400
 From: Kevin Wolf <kwolf@redhat.com>
-Date: Tue, 30 Apr 2019 17:42:33 +0200
-Message-Id: <20190430154244.30083-17-kwolf@redhat.com>
+Date: Tue, 30 Apr 2019 17:42:38 +0200
+Message-Id: <20190430154244.30083-22-kwolf@redhat.com>
 In-Reply-To: <20190430154244.30083-1-kwolf@redhat.com>
 References: <20190430154244.30083-1-kwolf@redhat.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 16/27] block: introduce byte-based io helpers
+Subject: [Qemu-devel] [PULL 21/27] block/backup: use buffer-based io
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,76 +31,59 @@ Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
 Reviewed-by: Stefano Garzarella <sgarzare@redhat.com>
 Signed-off-by: Kevin Wolf <kwolf@redhat.com>
 ---
- include/block/block_int.h      | 16 ++++++++++++++++
- include/sysemu/block-backend.h | 19 +++++++++++++++++++
- 2 files changed, 35 insertions(+)
+ block/backup.c | 14 ++++++--------
+ 1 file changed, 6 insertions(+), 8 deletions(-)
 
-diff --git a/include/block/block_int.h b/include/block/block_int.h
-index 01e855a066..94d45c9708 100644
---- a/include/block/block_int.h
-+++ b/include/block/block_int.h
-@@ -925,6 +925,22 @@ int coroutine_fn bdrv_co_pwritev(BdrvChild *child,
-     int64_t offset, unsigned int bytes, QEMUIOVector *qiov,
-     BdrvRequestFlags flags);
+diff --git a/block/backup.c b/block/backup.c
+index 9988753249..910ed764aa 100644
+--- a/block/backup.c
++++ b/block/backup.c
+@@ -107,7 +107,6 @@ static int coroutine_fn backup_cow_with_bounce_buffer=
+(BackupBlockJob *job,
+                                                       void **bounce_buff=
+er)
+ {
+     int ret;
+-    QEMUIOVector qiov;
+     BlockBackend *blk =3D job->common.blk;
+     int nbytes;
+     int read_flags =3D is_write_notifier ? BDRV_REQ_NO_SERIALISING : 0;
+@@ -118,9 +117,8 @@ static int coroutine_fn backup_cow_with_bounce_buffer=
+(BackupBlockJob *job,
+     if (!*bounce_buffer) {
+         *bounce_buffer =3D blk_blockalign(blk, job->cluster_size);
+     }
+-    qemu_iovec_init_buf(&qiov, *bounce_buffer, nbytes);
 =20
-+static inline int coroutine_fn bdrv_co_pread(BdrvChild *child,
-+    int64_t offset, unsigned int bytes, void *buf, BdrvRequestFlags flag=
-s)
-+{
-+    QEMUIOVector qiov =3D QEMU_IOVEC_INIT_BUF(qiov, buf, bytes);
-+
-+    return bdrv_co_preadv(child, offset, bytes, &qiov, flags);
-+}
-+
-+static inline int coroutine_fn bdrv_co_pwrite(BdrvChild *child,
-+    int64_t offset, unsigned int bytes, void *buf, BdrvRequestFlags flag=
-s)
-+{
-+    QEMUIOVector qiov =3D QEMU_IOVEC_INIT_BUF(qiov, buf, bytes);
-+
-+    return bdrv_co_pwritev(child, offset, bytes, &qiov, flags);
-+}
-+
- extern unsigned int bdrv_drain_all_count;
- void bdrv_apply_subtree_drain(BdrvChild *child, BlockDriverState *new_pa=
-rent);
- void bdrv_unapply_subtree_drain(BdrvChild *child, BlockDriverState *old_=
-parent);
-diff --git a/include/sysemu/block-backend.h b/include/sysemu/block-backen=
-d.h
-index 3be05c2d68..5be6224226 100644
---- a/include/sysemu/block-backend.h
-+++ b/include/sysemu/block-backend.h
-@@ -124,6 +124,25 @@ int coroutine_fn blk_co_preadv(BlockBackend *blk, in=
-t64_t offset,
- int coroutine_fn blk_co_pwritev(BlockBackend *blk, int64_t offset,
-                                unsigned int bytes, QEMUIOVector *qiov,
-                                BdrvRequestFlags flags);
-+
-+static inline int coroutine_fn blk_co_pread(BlockBackend *blk, int64_t o=
-ffset,
-+                                            unsigned int bytes, void *bu=
-f,
-+                                            BdrvRequestFlags flags)
-+{
-+    QEMUIOVector qiov =3D QEMU_IOVEC_INIT_BUF(qiov, buf, bytes);
-+
-+    return blk_co_preadv(blk, offset, bytes, &qiov, flags);
-+}
-+
-+static inline int coroutine_fn blk_co_pwrite(BlockBackend *blk, int64_t =
-offset,
-+                                             unsigned int bytes, void *b=
-uf,
-+                                             BdrvRequestFlags flags)
-+{
-+    QEMUIOVector qiov =3D QEMU_IOVEC_INIT_BUF(qiov, buf, bytes);
-+
-+    return blk_co_pwritev(blk, offset, bytes, &qiov, flags);
-+}
-+
- int blk_pwrite_zeroes(BlockBackend *blk, int64_t offset,
-                       int bytes, BdrvRequestFlags flags);
- BlockAIOCB *blk_aio_pwrite_zeroes(BlockBackend *blk, int64_t offset,
+-    ret =3D blk_co_preadv(blk, start, qiov.size, &qiov, read_flags);
++    ret =3D blk_co_pread(blk, start, nbytes, *bounce_buffer, read_flags)=
+;
+     if (ret < 0) {
+         trace_backup_do_cow_read_fail(job, start, ret);
+         if (error_is_read) {
+@@ -129,13 +127,13 @@ static int coroutine_fn backup_cow_with_bounce_buff=
+er(BackupBlockJob *job,
+         goto fail;
+     }
+=20
+-    if (qemu_iovec_is_zero(&qiov)) {
++    if (buffer_is_zero(*bounce_buffer, nbytes)) {
+         ret =3D blk_co_pwrite_zeroes(job->target, start,
+-                                   qiov.size, write_flags | BDRV_REQ_MAY=
+_UNMAP);
++                                   nbytes, write_flags | BDRV_REQ_MAY_UN=
+MAP);
+     } else {
+-        ret =3D blk_co_pwritev(job->target, start,
+-                             qiov.size, &qiov, write_flags |
+-                             (job->compress ? BDRV_REQ_WRITE_COMPRESSED =
+: 0));
++        ret =3D blk_co_pwrite(job->target, start,
++                            nbytes, *bounce_buffer, write_flags |
++                            (job->compress ? BDRV_REQ_WRITE_COMPRESSED :=
+ 0));
+     }
+     if (ret < 0) {
+         trace_backup_do_cow_write_fail(job, start, ret);
 --=20
 2.20.1
