@@ -1,22 +1,22 @@
-Received: from eggs.gnu.org ([209.51.188.92]:58654)
+Received: from eggs.gnu.org ([209.51.188.92]:58566)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alistair23@gmail.com>) id 1hLZuV-0002ix-R0
-	for qemu-devel@nongnu.org; Tue, 30 Apr 2019 17:03:32 -0400
+	(envelope-from <alistair23@gmail.com>) id 1hLZuX-0002hi-JU
+	for qemu-devel@nongnu.org; Tue, 30 Apr 2019 17:03:34 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alistair23@gmail.com>) id 1hLZuU-0001tK-B3
-	for qemu-devel@nongnu.org; Tue, 30 Apr 2019 17:03:31 -0400
+	(envelope-from <alistair23@gmail.com>) id 1hLZs6-0000RJ-Sy
+	for qemu-devel@nongnu.org; Tue, 30 Apr 2019 17:01:03 -0400
 MIME-Version: 1.0
 References: <cover.1556650594.git.alistair.francis@wdc.com>
-	<6bfa446eb7c351b5d867eb4158198231af724b11.1556650594.git.alistair.francis@wdc.com>
-	<d4dd0758-64af-e249-1f1b-b52af014b404@vivier.eu>
-In-Reply-To: <d4dd0758-64af-e249-1f1b-b52af014b404@vivier.eu>
+	<c4768a18309b3918715f96a1f5b2a9a264a5a9e4.1556650594.git.alistair.francis@wdc.com>
+	<8ca522c7-d1dd-fe05-f8ab-031b72a9fbef@vivier.eu>
+In-Reply-To: <8ca522c7-d1dd-fe05-f8ab-031b72a9fbef@vivier.eu>
 From: Alistair Francis <alistair23@gmail.com>
-Date: Tue, 30 Apr 2019 14:01:35 -0700
-Message-ID: <CAKmqyKNx2r93-ASC0dAZJvu_36dV69sRj92-m6G9zXqLdc2sag@mail.gmail.com>
+Date: Tue, 30 Apr 2019 13:59:06 -0700
+Message-ID: <CAKmqyKNRO7ESNmngtV3b8EjZfiuuu9QQm6avfwUuGe=NtpS46A@mail.gmail.com>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v1 5/5] linux-user/elfload: Fix GCC 9 build
- warnings
+Subject: Re: [Qemu-devel] [PATCH v1 2/5] hw/usb/hcd-xhci: Fix GCC 9 build
+ warning
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,73 +28,67 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: Laurent Vivier <laurent@vivier.eu>
 Cc: Alistair Francis <Alistair.Francis@wdc.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "kraxel@redhat.com" <kraxel@redhat.com>, "berrange@redhat.com" <berrange@redhat.com>, "riku.voipio@iki.fi" <riku.voipio@iki.fi>, "qemu-trivial@nongnu.org" <qemu-trivial@nongnu.org>
 
-On Tue, Apr 30, 2019 at 1:36 PM Laurent Vivier <laurent@vivier.eu> wrote:
+On Tue, Apr 30, 2019 at 1:24 PM Laurent Vivier <laurent@vivier.eu> wrote:
 >
 > Le 30/04/2019 =C3=A0 22:09, Alistair Francis a =C3=A9crit :
-> > Fix this warning when building with GCC9 on Fedora 30:
-> > In function =E2=80=98strncpy=E2=80=99,
-> >     inlined from =E2=80=98fill_psinfo=E2=80=99 at /home/alistair/qemu/l=
-inux-user/elfload.c:3208:12,
-> >     inlined from =E2=80=98fill_note_info=E2=80=99 at /home/alistair/qem=
-u/linux-user/elfload.c:3390:5,
-> >     inlined from =E2=80=98elf_core_dump=E2=80=99 at /home/alistair/qemu=
-/linux-user/elfload.c:3539:9:
-> > /usr/include/bits/string_fortified.h:106:10: error: =E2=80=98__builtin_=
-strncpy=E2=80=99 specified bound 16 equals destination size [-Werror=3Dstri=
-ngop-truncation]
-> >   106 |   return __builtin___strncpy_chk (__dest, __src, __len, __bos (=
-__dest));
-> >       |          ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~=
-~~~~~~~~
-> >
-> > Signed-off-by: Alistair Francis <alistair.francis@wdc.com>
-> > ---
-> >  linux-user/elfload.c | 4 ++--
-> >  1 file changed, 2 insertions(+), 2 deletions(-)
-> >
-> > diff --git a/linux-user/elfload.c b/linux-user/elfload.c
-> > index c1a26021f8..cbb7fc10fa 100644
-> > --- a/linux-user/elfload.c
-> > +++ b/linux-user/elfload.c
-> > @@ -3206,7 +3206,7 @@ static int fill_psinfo(struct target_elf_prpsinfo=
- *psinfo, const TaskState *ts)
+> > Fix this build warning with GCC 9 on Fedora 30:
+> > hw/usb/hcd-xhci.c:3339:66: error: =E2=80=98%d=E2=80=99 directive output=
+ may be truncated writing between 1 and 10 bytes into a region of size 5 [-=
+Werror=3Dformat-truncation=3D]
+> >  3339 |             snprintf(port->name, sizeof(port->name), "usb2 port=
+ #%d", i+1);
+> >       |                                                                =
+  ^~
+> > hw/usb/hcd-xhci.c:3339:54: note: directive argument in the range [1, 21=
+47483647]
+> >  3339 |             snprintf(port->name, sizeof(port->name), "usb2 port=
+ #%d", i+1);
 >
->        /*
->         * Using strncpy here is fine: at max-length,
-> >       * this field is not NUL-terminated.
-> >       */>      (void) strncpy(psinfo->pr_fname, base_filename,
-> > -                   sizeof(psinfo->pr_fname));
-> > +                   sizeof(psinfo->pr_fname) - 1);
+> "i" cannot be greater than 15.
 >
-> Read the comment above :)
+> perhaps an "assert(i <=3D MAX(MAXPORTS_2, MAXPORTS_3))" can fix the warni=
+ng ?
 
-GCC can't read the comment though. The only other option I can think
-of is using a pragma, which I avoided using unless I had to. Would you
-prefer a pragma here? Or do you have a better solution?
-
->
-> >
-> >      g_free(base_filename);
-> >      bswap_psinfo(psinfo);
-> > @@ -3389,7 +3389,7 @@ static int fill_note_info(struct elf_note_info *i=
-nfo,
-> >                sizeof (*info->prstatus), info->prstatus);
-> >      fill_psinfo(info->psinfo, ts);
-> >      fill_note(&info->notes[1], "CORE", NT_PRPSINFO,
-> > -              sizeof (*info->psinfo), info->psinfo);
-> > +              sizeof(*info->psinfo) - 1, info->psinfo);
->
-> Why?
-
-Same issue as above.
+It does seem to stop the warnings, I'll change this patch to use a g_assert=
+().
 
 Alistair
 
 >
-> >      fill_auxv_note(&info->notes[2], ts);
-> >      info->numnote =3D 3;
+> Thanks,
+> Laurent
+>
+> >       |                                                      ^~~~~~~~~~=
+~~~~~
+> > In file included from /usr/include/stdio.h:867,
+> >                  from /home/alistair/qemu/include/qemu/osdep.h:99,
+> >                  from hw/usb/hcd-xhci.c:21:
+> > /usr/include/bits/stdio2.h:67:10: note: =E2=80=98__builtin___snprintf_c=
+hk=E2=80=99 output between 13 and 22 bytes into a destination of size 16
+> >    67 |   return __builtin___snprintf_chk (__s, __n, __USE_FORTIFY_LEVE=
+L - 1,
+> >       |          ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~=
+~~~~~~
+> >    68 |        __bos (__s), __fmt, __va_arg_pack ());
+> >       |        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+> >
+> > Signed-off-by: Alistair Francis <alistair.francis@wdc.com>
+> > ---
+> >  hw/usb/hcd-xhci.h | 2 +-
+> >  1 file changed, 1 insertion(+), 1 deletion(-)
+> >
+> > diff --git a/hw/usb/hcd-xhci.h b/hw/usb/hcd-xhci.h
+> > index 240caa4e51..9e4988abb6 100644
+> > --- a/hw/usb/hcd-xhci.h
+> > +++ b/hw/usb/hcd-xhci.h
+> > @@ -133,7 +133,7 @@ typedef struct XHCIPort {
+> >      uint32_t portnr;
+> >      USBPort  *uport;
+> >      uint32_t speedmask;
+> > -    char name[16];
+> > +    char name[24];
+> >      MemoryRegion mem;
+> >  } XHCIPort;
 > >
 > >
 >
-> Thanks,
-> Laurent
