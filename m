@@ -2,81 +2,67 @@ Return-Path: <SRS0=TP+Q=TA=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.7 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS
+X-Spam-Status: No, score=-8.4 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,USER_AGENT_MUTT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 05A11C43219
-	for <qemu-devel@archiver.kernel.org>; Tue, 30 Apr 2019 12:42:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5EBCBC43219
+	for <qemu-devel@archiver.kernel.org>; Tue, 30 Apr 2019 12:43:45 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 681FA2075E
-	for <qemu-devel@archiver.kernel.org>; Tue, 30 Apr 2019 12:42:07 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="iyICyi5N"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 681FA2075E
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id 323222075E
+	for <qemu-devel@archiver.kernel.org>; Tue, 30 Apr 2019 12:43:45 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 323222075E
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:46652 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:46662 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hLS5G-0003cA-7p
-	for qemu-devel@archiver.kernel.org; Tue, 30 Apr 2019 08:42:06 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:38104)
+	id 1hLS6q-0004VT-Ec
+	for qemu-devel@archiver.kernel.org; Tue, 30 Apr 2019 08:43:44 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:38478)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1hLS4D-00038B-9B
-	for qemu-devel@nongnu.org; Tue, 30 Apr 2019 08:41:02 -0400
+	(envelope-from <ehabkost@redhat.com>) id 1hLS5s-0003wV-0G
+	for qemu-devel@nongnu.org; Tue, 30 Apr 2019 08:42:45 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1hLS4C-0006AB-2f
-	for qemu-devel@nongnu.org; Tue, 30 Apr 2019 08:41:01 -0400
-Received: from mail-ot1-x341.google.com ([2607:f8b0:4864:20::341]:36782)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1hLS4B-00069d-SM
-	for qemu-devel@nongnu.org; Tue, 30 Apr 2019 08:41:00 -0400
-Received: by mail-ot1-x341.google.com with SMTP id b18so2734598otq.3
-	for <qemu-devel@nongnu.org>; Tue, 30 Apr 2019 05:40:59 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
-	h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-	:cc; bh=PbvWrLM+f0aXRYDrJv/gSIHjbRs/mKVoLfhOQfZeF7o=;
-	b=iyICyi5N6NYLYe7LDYtJhDaqbnjbITQAlGpMZLdgnzAVA8dK8uEDW5rURvkWlWXwYS
-	emP8OyQteOBiZ1D41l+KloV4b6q7pr/qMO6+4iOEk5keoX7nDBVUfwQZeV9A4kCf5ZCS
-	R1X3paEAcw1IlXyz7gK7+lDP1g/In9KWu0I0fDnUjXtBsuLfjGXzzxnuzrp6fqoNWfWX
-	YpggcdIwIl10XH7FUH1D+xpl8tM9xnXzQ/Bv+avIVo3XPYJoAXxoPOECpNXYiaE4fndX
-	j8Swbbn9A/MLTou4nVWGHGujAMfJLTRqcNNiVAitpVARQvZn5IuYD/+TQDhlKxrQVRvE
-	UeCQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=1e100.net; s=20161025;
-	h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-	:message-id:subject:to:cc;
-	bh=PbvWrLM+f0aXRYDrJv/gSIHjbRs/mKVoLfhOQfZeF7o=;
-	b=MbGmDf6KLZI2VrVaTpKoVNm/RpJWxLXpShAPocp1EOL6e36/KR3hD0PZoFAhKqGG4p
-	rNxEqBzcEMSlL2MSjuvTprcKDT2Sy46B79oO0Eg/jaw4xIazKxlOK1N7aqaVZ/YpGLWw
-	2NdsrqycvVBAKjb/pHZlhCMAFvlMYdKHqeETQbM87MP2oD795YXZef+Tlbs7CkOoJTb5
-	ux7FWzLfXrH46edVx6bB5AY96L7fHRlKJh8otMjSxqtnyla1HszK0IC08bOia1agmSel
-	4hAb3CvbasI1saBryoGArE3mb0IO8aD9JHUWnO/Jno/PUmqO25WUatv55GxF16b0CZq8
-	OIvg==
-X-Gm-Message-State: APjAAAWr1WnQ88Gu1vE1Ie10HWL1NrdjBzM0RL2sw8lOH4UbziT+uGM9
-	RqT1gxEPfX9w9sT2QTOKIJcFvNysVf90k8z95gC5Vg==
-X-Google-Smtp-Source: APXvYqyYHyzRqAr767QtVz+9RFIp3Xyo7JftZ+DaNN3lbb6OahPOtWMo4cuFrQ9GqQZFX+11t1nTuvhSh1VJZHcQ/Kk=
-X-Received: by 2002:a9d:61c6:: with SMTP id h6mr4775943otk.316.1556628058779; 
-	Tue, 30 Apr 2019 05:40:58 -0700 (PDT)
+	(envelope-from <ehabkost@redhat.com>) id 1hLS5q-0007SX-80
+	for qemu-devel@nongnu.org; Tue, 30 Apr 2019 08:42:43 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:53712)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1hLS5p-0007P3-VI
+	for qemu-devel@nongnu.org; Tue, 30 Apr 2019 08:42:42 -0400
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+	[10.5.11.11])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 82FF930820C9
+	for <qemu-devel@nongnu.org>; Tue, 30 Apr 2019 12:42:38 +0000 (UTC)
+Received: from localhost (ovpn-116-9.gru2.redhat.com [10.97.116.9])
+	by smtp.corp.redhat.com (Postfix) with ESMTP id 0C2CF75283;
+	Tue, 30 Apr 2019 12:42:37 +0000 (UTC)
+Date: Tue, 30 Apr 2019 09:42:36 -0300
+From: Eduardo Habkost <ehabkost@redhat.com>
+To: Daniel =?iso-8859-1?Q?P=2E_Berrang=E9?= <berrange@redhat.com>
+Message-ID: <20190430124236.GC28722@habkost.net>
+References: <20190423212246.3542-1-ehabkost@redhat.com>
+	<20190423212246.3542-2-ehabkost@redhat.com>
+	<20190424082652.GC28615@redhat.com>
+	<20190424182036.GH18406@habkost.net>
+	<20190430101006.GA6818@redhat.com>
 MIME-Version: 1.0
-References: <20190223023957.18865-1-richard.henderson@linaro.org>
-	<20190223023957.18865-6-richard.henderson@linaro.org>
-In-Reply-To: <20190223023957.18865-6-richard.henderson@linaro.org>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 30 Apr 2019 13:40:47 +0100
-Message-ID:
- <CAFEAcA_60sosZCU8VNg6dd1toZON6D5sC8xgZU1tWpaspu=gHA@mail.gmail.com>
-To: Richard Henderson <richard.henderson@linaro.org>
 Content-Type: text/plain; charset="UTF-8"
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
-	recognized.
-X-Received-From: 2607:f8b0:4864:20::341
-Subject: Re: [Qemu-devel] [RFC 5/6] target/arm: Conditionalize DBGDIDR vs
- ID_AA64DFR0_EL1 assert
+Content-Disposition: inline
+In-Reply-To: <20190430101006.GA6818@redhat.com>
+User-Agent: Mutt/1.10.1 (2018-07-13)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+	(mx1.redhat.com [10.5.110.47]);
+	Tue, 30 Apr 2019 12:42:38 +0000 (UTC)
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 209.132.183.28
+Subject: Re: [Qemu-devel] [PATCH 1/3] qapi: SupportStatusInfo struct
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -88,41 +74,103 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>,
-	QEMU Developers <qemu-devel@nongnu.org>
+Cc: mprivozn@redhat.com, qemu-devel@nongnu.org,
+	Markus Armbruster <armbru@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190430124047.CVYkJUU0IHL7PLK_TiTx-qYoH20_IOz1WRNifrty2NI@z>
+Message-ID: <20190430124236.V9pIcLktJdjRsL6nw7eGB4pA8PFcRczfykSarDfTZro@z>
 
-On Sat, 23 Feb 2019 at 02:40, Richard Henderson
-<richard.henderson@linaro.org> wrote:
->
-> Only perform the assert when both registers exist.
-> Extract the variables from ID_AA64DFR0_EL1 for AArch64.
->
-> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+On Tue, Apr 30, 2019 at 11:10:06AM +0100, Daniel P. Berrang=E9 wrote:
+> On Wed, Apr 24, 2019 at 03:20:36PM -0300, Eduardo Habkost wrote:
+> > On Wed, Apr 24, 2019 at 09:26:52AM +0100, Daniel P. Berrang=E9 wrote:
+> > > On Tue, Apr 23, 2019 at 06:22:44PM -0300, Eduardo Habkost wrote:
+> > > > This struct will be used to represent support and deprecation
+> > > > status of QEMU features.
+> > > >=20
+> > > > Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
+> > > > ---
+> > > >  qapi/common.json | 24 ++++++++++++++++++++++++
+> > > >  1 file changed, 24 insertions(+)
+> > > >=20
+> > > > diff --git a/qapi/common.json b/qapi/common.json
+> > > > index 99d313ef3b..b59d0dc66b 100644
+> > > > --- a/qapi/common.json
+> > > > +++ b/qapi/common.json
+> > > > @@ -193,3 +193,27 @@
+> > > >               'ppc64', 'riscv32', 'riscv64', 's390x', 'sh4',
+> > > >               'sh4eb', 'sparc', 'sparc64', 'tricore', 'unicore32'=
+,
+> > > >               'x86_64', 'xtensa', 'xtensaeb' ] }
+> > > > +
+> > > > +##
+> > > > +# @SupportStatusInfo:
+> > > > +#
+> > > > +# Information on support status of a given feature
+> > > > +# (e.g. machine type)
+> > > > +#
+> > > > +# @deprecated: if true, the given feature is deprecated and may =
+be removed
+> > > > +#              in future versions of QEMU according to the QEMU =
+deprecation
+> > > > +#              policy.
+> > > > +#
+> > > > +# @status-message: Human readable message describing support sta=
+tus
+> > > > +#                  of the feature.
+> > > > +#
+> > > > +# @suggested-alternative: Optional.  Suggested alternative for a=
+ deprecated
+> > > > +#                         feature.  For machine types, this shou=
+ld be the name
+> > > > +#                         of an available machine-type.
+> > > > +#
+> > > > +# Since: 4.1
+> > > > +##
+> > > > +{ 'struct': 'SupportStatusInfo',
+> > > > +  'data': { 'deprecated': 'bool',
+> > > > +            '*status-message': 'str',
+> > > > +            '*suggested-alternative': 'str' } }
+> > >=20
+> > > I see status-message has to be optional, since you're embedding the
+> > > struct into another struct and want deprecated=3D=3Dfalse by defaul=
+t.
+> > >=20
+> > > I'd be inclined to change it to embed a pointer to the struct and
+> > > drop the deprecated field, and make both status-message and
+> > > suggested-alternative be mandatory. ie a struct  "DeprecationInfo"=20
+> > > the pointer to which is NULL if not deprecated.
+> >=20
+> > That could be a simple solution if we were sure we would only
+> > track deprecation info.  But I would like us to track additional
+> > support status on that struct eventually.
+>=20
+> I've no objection to expanding it to capture other info - we'll
+> want to change the 'deprecated' field to an enum though. Also,
+> in some cases there won't be any real alternative so lets just
+> call it 'hint' instead. How about
+>=20
+>     { 'enum':  "SupportStatus",
+>       'data': { 'production',  # Secure for use in hostile production e=
+nv
+>                 'development', # No security guarentee, friendly dev on=
+ly
+> 		'deprecated',  # To be removed in the future
+>     } }
 
-> +    if (have_aa32) {
-> +        ARMCPRegInfo dbgdidr = {
-> +            .name = "DBGDIDR", .cp = 14, .crn = 0, .crm = 0,
-> +            .opc1 = 0, .opc2 = 0, .access = PL0_R, .accessfn = access_tda,
-> +            .type = ARM_CP_CONST, .resetvalue = cpu->dbgdidr,
-> +        };
-> +        define_one_arm_cp_reg(cpu, &dbgdidr);
-> +    }
+"secure for production" and "deprecated" are independent
+variables.  There are deprecated features that are still secure,
+and deprecated features that were never supposed to be used in
+production in the first place.
 
-So if only EL0 has AArch32 it doesn't architecturally require
-that this AArch32 system register doesn't exist, because the
-register is still readable from EL0. The Arm ARM says that
-"implementation of this register is optional and deprecated".
-I would suggest that we should probably go with "implement the
-register if cpu->dbgdidr is non-zero", since at least bit 15
-must be set so zero isn't a valid real value for it.
+>=20
+>     { 'struct': "SupportStatusInfo",
+>        'data': { 'status': 'SupportStatus',
+>                  '*info': 'str',
+> 		 '*hint': 'str' } }
 
-Otherwise
-Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
+"hint" seems nicer than "suggested" or "recommended".  I like it.
 
-thanks
--- PMM
+--=20
+Eduardo
 
