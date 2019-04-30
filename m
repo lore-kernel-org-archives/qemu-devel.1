@@ -1,29 +1,24 @@
-Received: from eggs.gnu.org ([209.51.188.92]:39319)
+Received: from eggs.gnu.org ([209.51.188.92]:39137)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1hLW2L-0004J9-Sn
-	for qemu-devel@nongnu.org; Tue, 30 Apr 2019 12:55:25 -0400
+	(envelope-from <alex.bennee@linaro.org>) id 1hLW2K-00048d-N7
+	for qemu-devel@nongnu.org; Tue, 30 Apr 2019 12:55:21 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1hLVyb-0007tQ-Gd
-	for qemu-devel@nongnu.org; Tue, 30 Apr 2019 12:51:30 -0400
-Received: from mail-pg1-x534.google.com ([2607:f8b0:4864:20::534]:43566)
+	(envelope-from <alex.bennee@linaro.org>) id 1hLVzh-0000aG-Jw
+	for qemu-devel@nongnu.org; Tue, 30 Apr 2019 12:52:38 -0400
+Received: from mail-wr1-x444.google.com ([2a00:1450:4864:20::444]:43726)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1hLVyb-0007sn-8u
-	for qemu-devel@nongnu.org; Tue, 30 Apr 2019 12:51:29 -0400
-Received: by mail-pg1-x534.google.com with SMTP id t22so4098247pgi.10
-	for <qemu-devel@nongnu.org>; Tue, 30 Apr 2019 09:51:29 -0700 (PDT)
-References: <20190428143845.11810-1-mark.cave-ayland@ilande.co.uk>
-	<20190428143845.11810-10-mark.cave-ayland@ilande.co.uk>
-From: Richard Henderson <richard.henderson@linaro.org>
-Message-ID: <92815e75-c3da-51df-adb9-a1a2c5b06a30@linaro.org>
-Date: Tue, 30 Apr 2019 09:51:15 -0700
+	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+	id 1hLVzh-0000WQ-BQ
+	for qemu-devel@nongnu.org; Tue, 30 Apr 2019 12:52:37 -0400
+Received: by mail-wr1-x444.google.com with SMTP id a12so21813766wrq.10
+	for <qemu-devel@nongnu.org>; Tue, 30 Apr 2019 09:52:36 -0700 (PDT)
+From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
+Date: Tue, 30 Apr 2019 17:52:19 +0100
+Message-Id: <20190430165234.32272-1-alex.bennee@linaro.org>
 MIME-Version: 1.0
-In-Reply-To: <20190428143845.11810-10-mark.cave-ayland@ilande.co.uk>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 09/14] target/ppc: introduce
- GEN_VSX_HELPER_R2 macro to fpu_helper.c
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Subject: [Qemu-devel] [PATCH v5 00/15] demacro softmmu (plus tests/coverage)
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,24 +27,131 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, qemu-devel@nongnu.org, qemu-ppc@nongnu.org, david@gibson.dropbear.id.au, rth@twiddle.net, gkurz@kaod.org
-
-On 4/28/19 7:38 AM, Mark Cave-Ayland wrote:
-> -void helper_xsrqpi(CPUPPCState *env, uint32_t opcode)
-> +void helper_xsrqpi(CPUPPCState *env, uint32_t opcode,
-> +                   ppc_vsr_t *xt, ppc_vsr_t *xb)
->  {
-> -    ppc_vsr_t *xt = &env->vsr[rD(opcode) + 32];
-> -    ppc_vsr_t *xb = &env->vsr[rB(opcode) + 32];
->      uint8_t r = Rrm(opcode);
->      uint8_t ex = Rc(opcode);
->      uint8_t rmc = RMC(opcode);
-
-For future cleanup, it looks like the rounding mode should be passed in directly.
-
-But anyway,
-
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+To: qemu-devel@nongnu.org
+Cc: qemu-arm@nongnu.org, mark.cave-ayland@ilande.co.uk, cota@braap.org, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
 
 
-r~
+Hi,
+
+This is the latest iteration of the softmmu demacro series. The main
+changes from the last submission are some updates from Richard. Some
+are merged into the main demacro patch (mostly casting cleanups) and
+then a series of 3 patches to out of line some of the less hot code to
+keep the main access functions a reasonable size. For example:
+
+  readelf -s aarch64-softmmu/accel/tcg/cputlb.o | ag helper |\
+    ag -v atomic | ag mmu | tr -s ' ' | cut -d ' ' -f 4,9 | sort -n
+
+Before:
+
+  16 helper_be_ldsl_mmu
+  16 helper_le_ldsl_mmu
+  18 helper_be_ldsw_mmu
+  18 helper_le_ldsw_mmu
+  18 helper_ret_ldsb_mmu
+  535 helper_ret_ldub_mmu
+  556 helper_ret_ldb_cmmu
+  586 helper_ret_stb_mmu
+  679 helper_le_ldul_mmu
+  681 helper_be_ldul_mmu
+  685 helper_le_ldq_mmu
+  688 helper_be_ldq_mmu
+  688 helper_le_lduw_mmu
+  693 helper_le_ldl_cmmu
+  701 helper_le_ldq_cmmu
+  701 helper_le_ldw_cmmu
+  703 helper_be_ldl_cmmu
+  704 helper_be_ldq_cmmu
+  708 helper_be_lduw_mmu
+  713 helper_be_ldw_cmmu
+  943 helper_le_stw_mmu
+  944 helper_le_stl_mmu
+  952 helper_be_stl_mmu
+  952 helper_le_stq_mmu
+  959 helper_be_stw_mmu
+  960 helper_be_stq_mmu
+
+After:
+
+  5 helper_be_ldul_mmu
+  5 helper_be_lduw_mmu
+  5 helper_le_ldul_mmu
+  5 helper_le_lduw_mmu
+  5 helper_ret_ldub_mmu
+  14 helper_be_ldl_cmmu
+  14 helper_be_ldw_cmmu
+  14 helper_le_ldl_cmmu
+  14 helper_le_ldw_cmmu
+  16 helper_be_ldsl_mmu
+  16 helper_le_ldsl_mmu
+  18 helper_be_ldsw_mmu
+  18 helper_le_ldsw_mmu
+  18 helper_ret_ldsb_mmu
+  783 helper_ret_stb_mmu
+  785 helper_ret_ldb_cmmu
+  881 helper_be_ldq_mmu
+  881 helper_le_ldq_mmu
+  889 helper_le_ldq_cmmu
+  897 helper_be_ldq_cmmu
+  1150 helper_be_stw_mmu
+  1150 helper_le_stw_mmu
+  1151 helper_be_stq_mmu
+  1151 helper_le_stl_mmu
+  1151 helper_le_stq_mmu
+  1159 helper_be_stl_mmu
+
+I've also moved the existing system memory test and made it multiarch
+and added the bootstrapping for aarch64 system tests. I would like to
+add support for Big Endian as well but I didn't want to delay the
+posting of the series. It would also be nice to exercise the
+ioread/write paths and other handling but I leave this as an exercise
+for later.
+
+There are also some minor tweaks for the code coverage reports now I'm
+running with out-of-tree builds.
+
+Alex Bennée (11):
+  tests/tcg/multiarch: add support for multiarch system tests
+  tests/tcg/multiarch: add hello world system test
+  tests/tcg/aarch64: add system boot.S
+  tests/tcg/multiarch: move the system memory test
+  tests/tcg/minilib: support %c format char
+  tests/tcg/multiarch: expand system memory test to cover more
+  accel/tcg: demacro cputlb
+  accel/tcg: remove softmmu_template.h
+  Makefile: fix coverage-report reference to BUILD_DIR
+  Makefile: include per-target build directories in coverage report
+  Makefile.target: support per-target coverage reports
+
+Richard Henderson (4):
+  cputlb: Move TLB_RECHECK handling into load/store_helper
+  cputlb: Drop attribute flatten
+  cputlb: Do unaligned load recursion to outermost function
+  cputlb: Do unaligned store recursion to outermost function
+
+ Makefile                                      |   4 +-
+ Makefile.target                               |  16 +
+ accel/tcg/cputlb.c                            | 626 +++++++++++++++---
+ accel/tcg/softmmu_template.h                  | 454 -------------
+ tests/tcg/Makefile                            |   1 +
+ tests/tcg/aarch64/Makefile.softmmu-target     |  32 +
+ tests/tcg/aarch64/system/boot.S               | 200 ++++++
+ tests/tcg/aarch64/system/kernel.ld            |  22 +
+ tests/tcg/i386/Makefile.softmmu-target        |   2 +-
+ tests/tcg/i386/system/memory.c                | 243 -------
+ tests/tcg/minilib/printf.c                    |   6 +-
+ .../multiarch/system/Makefile.softmmu-target  |  14 +
+ tests/tcg/{i386 => multiarch}/system/hello.c  |   0
+ tests/tcg/multiarch/system/memory.c           | 427 ++++++++++++
+ 14 files changed, 1267 insertions(+), 780 deletions(-)
+ delete mode 100644 accel/tcg/softmmu_template.h
+ create mode 100644 tests/tcg/aarch64/Makefile.softmmu-target
+ create mode 100644 tests/tcg/aarch64/system/boot.S
+ create mode 100644 tests/tcg/aarch64/system/kernel.ld
+ delete mode 100644 tests/tcg/i386/system/memory.c
+ create mode 100644 tests/tcg/multiarch/system/Makefile.softmmu-target
+ rename tests/tcg/{i386 => multiarch}/system/hello.c (100%)
+ create mode 100644 tests/tcg/multiarch/system/memory.c
+
+-- 
+2.20.1
