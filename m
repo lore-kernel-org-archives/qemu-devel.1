@@ -1,27 +1,29 @@
-Received: from eggs.gnu.org ([209.51.188.92]:40451)
+Received: from eggs.gnu.org ([209.51.188.92]:40954)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1hLW5U-0007Cl-Uu
-	for qemu-devel@nongnu.org; Tue, 30 Apr 2019 12:58:37 -0400
+	(envelope-from <richard.henderson@linaro.org>) id 1hLW7R-0000UY-B1
+	for qemu-devel@nongnu.org; Tue, 30 Apr 2019 13:00:38 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1hLW5T-0003mO-0A
-	for qemu-devel@nongnu.org; Tue, 30 Apr 2019 12:58:36 -0400
-Received: from mail-wr1-x442.google.com ([2a00:1450:4864:20::442]:39618)
+	(envelope-from <richard.henderson@linaro.org>) id 1hLW7P-0004q3-DM
+	for qemu-devel@nongnu.org; Tue, 30 Apr 2019 13:00:37 -0400
+Received: from mail-pl1-x642.google.com ([2607:f8b0:4864:20::642]:41106)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1hLW5S-0003lo-Pt
-	for qemu-devel@nongnu.org; Tue, 30 Apr 2019 12:58:34 -0400
-Received: by mail-wr1-x442.google.com with SMTP id a9so21866015wrp.6
-	for <qemu-devel@nongnu.org>; Tue, 30 Apr 2019 09:58:34 -0700 (PDT)
-From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
-Date: Tue, 30 Apr 2019 17:52:31 +0100
-Message-Id: <20190430165234.32272-13-alex.bennee@linaro.org>
-In-Reply-To: <20190430165234.32272-1-alex.bennee@linaro.org>
-References: <20190430165234.32272-1-alex.bennee@linaro.org>
+	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+	id 1hLW7P-0004l5-7G
+	for qemu-devel@nongnu.org; Tue, 30 Apr 2019 13:00:35 -0400
+Received: by mail-pl1-x642.google.com with SMTP id d9so7015986pls.8
+	for <qemu-devel@nongnu.org>; Tue, 30 Apr 2019 10:00:23 -0700 (PDT)
+References: <20190428143845.11810-1-mark.cave-ayland@ilande.co.uk>
+	<20190428143845.11810-15-mark.cave-ayland@ilande.co.uk>
+From: Richard Henderson <richard.henderson@linaro.org>
+Message-ID: <3c05b552-a692-e439-fc28-90ad69767cf2@linaro.org>
+Date: Tue, 30 Apr 2019 10:00:12 -0700
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH v5 12/15] cputlb: Do unaligned store recursion
- to outermost function
+In-Reply-To: <20190428143845.11810-15-mark.cave-ayland@ilande.co.uk>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH 14/14] target/ppc: improve VSX_FMADD with
+ new GEN_VSX_HELPER_VSX_MADD macro
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,45 +32,33 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: qemu-arm@nongnu.org, mark.cave-ayland@ilande.co.uk, cota@braap.org, Richard Henderson <richard.henderson@linaro.org>, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
+To: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, qemu-devel@nongnu.org, qemu-ppc@nongnu.org, david@gibson.dropbear.id.au, rth@twiddle.net, gkurz@kaod.org
 
-From: Richard Henderson <richard.henderson@linaro.org>
+On 4/28/19 7:38 AM, Mark Cave-Ayland wrote:
+>  #define VSX_MADD(op, nels, tp, fld, maddflgs, afrm, sfprf, r2sp)              \
+>  void helper_##op(CPUPPCState *env, uint32_t opcode,                           \
+> -                 ppc_vsr_t *xt, ppc_vsr_t *xa, ppc_vsr_t *xb)                 \
+> +                 ppc_vsr_t *xt, ppc_vsr_t *xa,                                \
+> +                 ppc_vsr_t *b, ppc_vsr_t *c)                                  \
+>  {                                                                             \
+> -    ppc_vsr_t *b, *c;                                                         \
+>      int i;                                                                    \
+>                                                                                \
+> -    if (afrm) { /* AxB + T */                                                 \
+> -        b = xb;                                                               \
+> -        c = xt;                                                               \
+> -    } else { /* AxT + B */                                                    \
+> -        b = xt;                                                               \
+> -        c = xb;                                                               \
+> -    }                                                                         \
 
-This is less tricky than for loads, because we always fall
-back to single byte stores to implement unaligned stores.
+The afrm argument is no longer used.
+This also means that e.g.
 
-Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
-Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
----
- accel/tcg/cputlb.c | 8 ++++----
- 1 file changed, 4 insertions(+), 4 deletions(-)
+VSX_MADD(xsmaddadp, 1, float64, VsrD(0), MADD_FLGS, 1, 1, 0)
+VSX_MADD(xsmaddmdp, 1, float64, VsrD(0), MADD_FLGS, 0, 1, 0)
 
-diff --git a/accel/tcg/cputlb.c b/accel/tcg/cputlb.c
-index e4d0c94301..a083324768 100644
---- a/accel/tcg/cputlb.c
-+++ b/accel/tcg/cputlb.c
-@@ -1413,9 +1413,9 @@ tcg_target_ulong helper_be_ldsl_mmu(CPUArchState *env, target_ulong addr,
-  * Store Helpers
-  */
- 
--static void store_helper(CPUArchState *env, target_ulong addr, uint64_t val,
--                         TCGMemOpIdx oi, uintptr_t retaddr, size_t size,
--                         bool big_endian)
-+static inline void __attribute__((always_inline))
-+store_helper(CPUArchState *env, target_ulong addr, uint64_t val,
-+             TCGMemOpIdx oi, uintptr_t retaddr, size_t size, bool big_endian)
- {
-     uintptr_t mmu_idx = get_mmuidx(oi);
-     uintptr_t index = tlb_index(env, mmu_idx, addr);
-@@ -1514,7 +1514,7 @@ static void store_helper(CPUArchState *env, target_ulong addr, uint64_t val,
-                 /* Little-endian extract.  */
-                 val8 = val >> (i * 8);
-             }
--            store_helper(env, addr + i, val8, oi, retaddr, 1, big_endian);
-+            helper_ret_stb_mmu(env, addr + i, val8, oi, retaddr);
-         }
-         return;
-     }
--- 
-2.20.1
+are redundant.  Similarly with all of the other pairs.
+
+
+r~
