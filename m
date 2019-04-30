@@ -2,66 +2,65 @@ Return-Path: <SRS0=TP+Q=TA=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.4 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,USER_AGENT_MUTT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A03D3C43219
-	for <qemu-devel@archiver.kernel.org>; Tue, 30 Apr 2019 11:33:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D6DEFC04AA6
+	for <qemu-devel@archiver.kernel.org>; Tue, 30 Apr 2019 11:59:32 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7223D21707
-	for <qemu-devel@archiver.kernel.org>; Tue, 30 Apr 2019 11:33:30 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7223D21707
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id A65C321707
+	for <qemu-devel@archiver.kernel.org>; Tue, 30 Apr 2019 11:59:32 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A65C321707
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kamp.de
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:44764 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:45072 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hLR0r-0005qT-5A
-	for qemu-devel@archiver.kernel.org; Tue, 30 Apr 2019 07:33:29 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:51240)
-	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1hLQzR-0005Fo-38
-	for qemu-devel@nongnu.org; Tue, 30 Apr 2019 07:32:02 -0400
+	id 1hLRQ3-0003Ka-MV
+	for qemu-devel@archiver.kernel.org; Tue, 30 Apr 2019 07:59:31 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:56389)
+	by lists.gnu.org with esmtp (Exim 4.71) (envelope-from <pl@kamp.de>)
+	id 1hLROD-0002E3-NA
+	for qemu-devel@nongnu.org; Tue, 30 Apr 2019 07:57:38 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1hLQzP-00032e-Jo
-	for qemu-devel@nongnu.org; Tue, 30 Apr 2019 07:32:01 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:60848)
+	(envelope-from <pl@kamp.de>) id 1hLRKz-0002Hv-MJ
+	for qemu-devel@nongnu.org; Tue, 30 Apr 2019 07:54:19 -0400
+Received: from mx01.kamp.de ([82.141.2.16]:36460)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <kwolf@redhat.com>)
-	id 1hLQyq-0002WC-Tr; Tue, 30 Apr 2019 07:31:47 -0400
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
-	[10.5.11.16])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id BB9043199378;
-	Tue, 30 Apr 2019 11:31:19 +0000 (UTC)
-Received: from linux.fritz.box (unknown [10.36.118.15])
-	by smtp.corp.redhat.com (Postfix) with ESMTPS id ACD176A513;
-	Tue, 30 Apr 2019 11:31:18 +0000 (UTC)
-Date: Tue, 30 Apr 2019 13:31:17 +0200
-From: Kevin Wolf <kwolf@redhat.com>
-To: Max Reitz <mreitz@redhat.com>
-Message-ID: <20190430113117.GH5607@linux.fritz.box>
-References: <20190311165017.32247-1-kwolf@redhat.com>
-	<20190311165017.32247-11-kwolf@redhat.com>
-	<03585bce-afb0-cd39-9732-7946fa1b03fc@redhat.com>
-MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="a8Wt8u1KmwUX3Y2C"
-Content-Disposition: inline
-In-Reply-To: <03585bce-afb0-cd39-9732-7946fa1b03fc@redhat.com>
-User-Agent: Mutt/1.11.3 (2019-02-01)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.41]);
-	Tue, 30 Apr 2019 11:31:19 +0000 (UTC)
+	(Exim 4.71) (envelope-from <pl@kamp.de>) id 1hLRKz-0002GI-Cj
+	for qemu-devel@nongnu.org; Tue, 30 Apr 2019 07:54:17 -0400
+Received: (qmail 15431 invoked by uid 89); 30 Apr 2019 11:54:12 -0000
+Received: from [195.62.97.192] by client-16-kamp (envelope-from <pl@kamp.de>,
+	uid 89) with qmail-scanner-2010/03/19-MF 
+	(clamdscan: 0.101.2/25435. avast: 1.2.2/17010300. spamassassin: 3.4.1. 
+	Clear:RC:1(195.62.97.192):. 
+	Processed in 0.061591 secs); 30 Apr 2019 11:54:12 -0000
+Received: from kerio.kamp.de ([195.62.97.192])
+	by mx01.kamp.de with ESMTPS (DHE-RSA-AES256-SHA encrypted);
+	30 Apr 2019 11:54:11 -0000
+X-GL_Whitelist: yes
+X-Footer: a2FtcC5kZQ==
+Received: from submission.kamp.de ([195.62.97.28]) by kerio.kamp.de with ESMTPS
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256 bits))
+	for qemu-devel@nongnu.org; Tue, 30 Apr 2019 13:54:09 +0200
+Received: (qmail 17984 invoked from network); 30 Apr 2019 11:54:11 -0000
+Received: from lieven-pc.kamp-intra.net (HELO lieven-pc)
+	(relay@kamp.de@::ffff:172.21.12.60)
+	by submission.kamp.de with ESMTPS (DHE-RSA-AES256-GCM-SHA384 encrypted)
+	ESMTPA; 30 Apr 2019 11:54:11 -0000
+Received: by lieven-pc (Postfix, from userid 1060)
+	id 7967113EA62; Tue, 30 Apr 2019 13:54:11 +0200 (CEST)
+From: Peter Lieven <pl@kamp.de>
+To: qemu-devel@nongnu.org
+Date: Tue, 30 Apr 2019 13:54:04 +0200
+Message-Id: <20190430115404.18483-1-pl@kamp.de>
+X-Mailer: git-send-email 2.17.1
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [Qemu-block] [PATCH v2 10/10] file-posix: Make
- auto-read-only dynamic
+X-Received-From: 82.141.2.16
+Subject: [Qemu-devel] [PATCH RESEND] megasas: fix mapped frame size
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -73,106 +72,40 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org
+Cc: fam@euphon.net, pbonzini@redhat.com, hare@suse.com,
+	Peter Lieven <pl@kamp.de>, qemu-stable@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190430113117.rMCDB6mhfEYHMV5qPu9cQRBLy30bnuA1rcOjyNKV3yo@z>
+Content-Type: text/plain; charset="UTF-8"
+Message-ID: <20190430115404.Yyw11ckgR_CMGDt0RfMh0dNxEBmuPF1yOv1eTPQg1O0@z>
+
+the current value of 1024 bytes (16 * MFI_FRAME_SIZE) we map is not enough to hold
+the maximum number of scatter gather elements we advertise. We actually need a
+maximum of 2048 bytes. This is 128 max sg elements * 16 bytes (sizeof (union mfi_sgl)).
+
+Cc: qemu-stable@nongnu.org
+Signed-off-by: Peter Lieven <pl@kamp.de>
+Reviewed-by: Hannes Reinecke <hare@suse.com>
+---
+ hw/scsi/megasas.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/hw/scsi/megasas.c b/hw/scsi/megasas.c
+index a56317e026..5ad762de23 100644
+--- a/hw/scsi/megasas.c
++++ b/hw/scsi/megasas.c
+@@ -477,7 +477,7 @@ static MegasasCmd *megasas_enqueue_frame(MegasasState *s,
+ {
+     PCIDevice *pcid = PCI_DEVICE(s);
+     MegasasCmd *cmd = NULL;
+-    int frame_size = MFI_FRAME_SIZE * 16;
++    int frame_size = MEGASAS_MAX_SGE * sizeof(union mfi_sgl);
+     hwaddr frame_size_p = frame_size;
+     unsigned long index;
+ 
+-- 
+2.17.1
 
 
---a8Wt8u1KmwUX3Y2C
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
-
-Am 29.04.2019 um 22:16 hat Max Reitz geschrieben:
-> On 11.03.19 17:50, Kevin Wolf wrote:
-> > Until now, with auto-read-only=3Don we tried to open the file read-write
-> > first and if that failed, read-only was tried. This is actually not good
-> > enough for libvirt, which gives QEMU SELinux permissions for read-write
-> > only as soon as it actually intends to write to the image. So we need to
-> > be able to switch between read-only and read-write at runtime.
-> >=20
-> > This patch makes auto-read-only dynamic, i.e. the file is opened
-> > read-only as long as no user of the node has requested write
-> > permissions, but it is automatically reopened read-write as soon as the
-> > first writer is attached. Conversely, if the last writer goes away, the
-> > file is reopened read-only again.
-> >=20
-> > bs->read_only is no longer set for auto-read-only=3Don files even if the
-> > file descriptor is opened read-only because it will be transparently
-> > upgraded as soon as a writer is attached. This changes the output of
-> > qemu-iotests 232.
-> >=20
-> > Signed-off-by: Kevin Wolf <kwolf@redhat.com>
-> > ---
-> >  block/file-posix.c         | 36 +++++++++++++++++-------------------
-> >  tests/qemu-iotests/232.out | 12 ++++++------
-> >  2 files changed, 23 insertions(+), 25 deletions(-)
->=20
-> https://bugzilla.redhat.com/show_bug.cgi?id=3D1703793 seems to be caused
-> by this patch: When the mirror job completes, it drops all permissions
-> on its target BB with an &error_abort.  As of this patch, this may
-> result in file-posix attempting to reopen the FD, which may fail.
-
-Hm, yes. But we already agreed that dropping permissions should never
-fail, so maybe we should just implement that now (in block.c).
-
-> There are two problems I can see: First, the previous patch should have
-> updated s->open_flags along with s->fd when the FD is switched.  As it
-> is now, s->open_flags is not updated, so it stays on O_RDONLY and every
-> time the permissions are checked, the FD is reconfigured and then switche=
-d.
->=20
-> That's simple to fix, just add BDRVRawState.perm_change_flags and set it
-> to open_flags after raw_reconfigure_getfd() returned a ret !=3D s->fd
-> (when s->perm_change_fd is set).
-
-=2E..and actually do s->open_flags =3D s->perm_change_flags in
-raw_set_perm(), otherwise it doesn't help much. :-)
-
-> That fixes the problem of file-posix attempting to reopen the FD to
-> O_RDWR all the time, which caused the crash.
-
-Good.
-
-> But that gives us another crash, because now dropping the permissions
-> (correctly) reopens the FD to O_RDONLY, with the exact same implications
-> as above: If the target becomes unavailable, opening the new FD will
-> fail, and qemu will crash.
->=20
-> I don't know what to do about this.  In the spirit of "dropping
-> permissions should always work", I presume raw_reconfigure_getfd()
-> should just return the old FD if it had more permissions than the new
-> one would have.  But if the user issues an explicit reopen command, they
-> probably want such an error to be reported.
-
-Yes, I think file-posix should let the operation fail (because it
-actually failed) and the permission functions in block.c should ignore
-the error for dropping permissions. This way, reopen will still
-correctly return the error because it has a different call chain.
-
-Kevin
-
---a8Wt8u1KmwUX3Y2C
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQIcBAEBAgAGBQJcyDIFAAoJEH8JsnLIjy/WeNAQAK0jbe+ytjNBTD8CsW23J1kD
-XE7ta7jevXSc59LtsOoFKvGjuspEiejKc3OaJr+Oh1r247xTWzn+GzO2yVs6kA8z
-qOYdEvg12pgDlFLYzQkYs9npCIctq7RSHRBFGx0KRDleUq0Jdkp9Pttm0RZ7YtfG
-Lm26CIup7f8BdRZDEtuXKb7HKSJjbMDH+KAB38zcesLSf/b7QSNN8h4lIoY+XQd9
-bYWXSLp/dYwHUdpE6ZDaK/Eb8hpWrNxDghwRcJ4UAPfdzctReqM5vB/yAiQU+fnU
-zCR74cPQLpOtQlbhfJ/HBExuL90UQySW8KEfMAfW65/QL2Clz8eI50gK0+CjfccE
-I2Vm3ebMvXCQ/UvA17R81/avxf5/VOIjYxC/3qBxi1AhZmC/NRV5Faxn55CCTtXJ
-bqy7fHopn2830dS/I7F+g56P41ZHosm0AWeZZAktAlXuI7BBfwdii2fHjvFkXr9M
-hUJtjr2f1O3nAMa2o8nnxEm7YAWpuM/adpzmwp2zdm/Mj5FpWmr9wrbjqSdTtr1U
-Gvg+ncSAcP6GcdXzfzhvRFiwaIU0i4819zYlFSmxBusfLxbY3T5+JzIpPy/Uj1JM
-AA/1EMn6Kso61/t/QYS3cZOiyVJ2K0ugFAtvA8E71wC2287GiT5M8o09fsxvQaJY
-YPqbOJ4TXcoMGmIMVIXv
-=0wko
------END PGP SIGNATURE-----
-
---a8Wt8u1KmwUX3Y2C--
 
