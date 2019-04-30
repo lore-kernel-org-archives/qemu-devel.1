@@ -1,25 +1,23 @@
-Received: from eggs.gnu.org ([209.51.188.92]:55744)
+Received: from eggs.gnu.org ([209.51.188.92]:55816)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1hLZeM-0002Ob-T8
-	for qemu-devel@nongnu.org; Tue, 30 Apr 2019 16:46:55 -0400
+	(envelope-from <laurent@vivier.eu>) id 1hLZeq-0002gm-Ac
+	for qemu-devel@nongnu.org; Tue, 30 Apr 2019 16:47:21 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1hLZeH-00088x-Ut
-	for qemu-devel@nongnu.org; Tue, 30 Apr 2019 16:46:50 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:39746)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1hLZeG-00088D-Po
-	for qemu-devel@nongnu.org; Tue, 30 Apr 2019 16:46:45 -0400
-Date: Tue, 30 Apr 2019 17:46:36 -0300
-From: Eduardo Habkost <ehabkost@redhat.com>
-Message-ID: <20190430204636.GK28722@habkost.net>
-References: <20190426003652.32633-1-richardw.yang@linux.intel.com>
-	<20190426003652.32633-2-richardw.yang@linux.intel.com>
+	(envelope-from <laurent@vivier.eu>) id 1hLZeo-0008Td-CV
+	for qemu-devel@nongnu.org; Tue, 30 Apr 2019 16:47:20 -0400
+From: Laurent Vivier <laurent@vivier.eu>
+References: <cover.1556650594.git.alistair.francis@wdc.com>
+	<66295a3d9e21f52d777e6354d6c0f98b0bcb0c26.1556650594.git.alistair.francis@wdc.com>
+	<aaebd05c-b1a6-a93e-222d-ede76633c07d@vivier.eu>
+Message-ID: <555e5b87-0918-35d9-f7d1-6cb0dd11cc85@vivier.eu>
+Date: Tue, 30 Apr 2019 22:46:56 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20190426003652.32633-2-richardw.yang@linux.intel.com>
-Subject: Re: [Qemu-devel] [PATCH v15 1/2] util/mmap-alloc: support MAP_SYNC
- in qemu_ram_mmap()
+In-Reply-To: <aaebd05c-b1a6-a93e-222d-ede76633c07d@vivier.eu>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH v1 4/5] linux-user/uname: Fix GCC 9 build
+ warnings
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,59 +26,55 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Wei Yang <richardw.yang@linux.intel.com>
-Cc: qemu-devel@nongnu.org, xiaoguangrong.eric@gmail.com, stefanha@redhat.com, pbonzini@redhat.com, pagupta@redhat.com, yu.c.zhang@linux.intel.com, mst@redhat.com, imammedo@redhat.com, dan.j.williams@intel.com, yi.z.zhang@linux.intel.com, Haozhong Zhang <haozhong.zhang@intel.com>
+To: Alistair Francis <Alistair.Francis@wdc.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+Cc: "alistair23@gmail.com" <alistair23@gmail.com>, "kraxel@redhat.com" <kraxel@redhat.com>, "berrange@redhat.com" <berrange@redhat.com>, "riku.voipio@iki.fi" <riku.voipio@iki.fi>, "qemu-trivial@nongnu.org" <qemu-trivial@nongnu.org>
 
-Hi,
+Le 30/04/2019 à 22:30, Laurent Vivier a écrit :
+> Le 30/04/2019 à 22:09, Alistair Francis a écrit :
+>> Fix this warning when building with GCC9 on Fedora 30:
+>> In function ‘strncpy’,
+>>     inlined from ‘sys_uname’ at /home/alistair/qemu/linux-user/uname.c:94:3:
+>> /usr/include/bits/string_fortified.h:106:10: error: ‘__builtin_strncpy’ output may be truncated copying 64 bytes from a string of length 64 [-Werror=stringop-truncation]
+>>   106 |   return __builtin___strncpy_chk (__dest, __src, __len, __bos (__dest));
+>>       |          ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+>>
+>> Signed-off-by: Alistair Francis <alistair.francis@wdc.com>
+>> ---
+>>  linux-user/uname.c | 8 ++++++++
+>>  1 file changed, 8 insertions(+)
+>>
+>> diff --git a/linux-user/uname.c b/linux-user/uname.c
+>> index 313b79dbad..293b2238f2 100644
+>> --- a/linux-user/uname.c
+>> +++ b/linux-user/uname.c
+>> @@ -90,6 +90,11 @@ int sys_uname(struct new_utsname *buf)
+>>     * struct linux kernel uses).
+>>     */
+>>  
+>> +#if defined(CONFIG_PRAGMA_DIAGNOSTIC_AVAILABLE) && QEMU_GNUC_PREREQ(9, 0)
+>> +#pragma GCC diagnostic push
+>> +#pragma GCC diagnostic ignored "-Wstringop-truncation"
+>> +#endif
+>> +
+>>    memset(buf, 0, sizeof(*buf));
+>>    COPY_UTSNAME_FIELD(buf->sysname, uts_buf.sysname);
+>>    COPY_UTSNAME_FIELD(buf->nodename, uts_buf.nodename);
+>> @@ -101,6 +106,9 @@ int sys_uname(struct new_utsname *buf)
+>>  #endif
+>>    return (0);
+>>  
+>> +#if defined(CONFIG_PRAGMA_DIAGNOSTIC_AVAILABLE) && QEMU_GNUC_PREREQ(9, 0)
+>> +#pragma GCC diagnostic pop
+>> +#endif
+>>  #undef COPY_UTSNAME_FIELD
+>>  }
+>>  
+>>
+> 
+> You should use PRAGMA_DISABLE_PACKED_WARNING and
+> PRAGMA_REENABLE_PACKED_WARNING from linux-user/qemu.h.
 
-On Fri, Apr 26, 2019 at 08:36:51AM +0800, Wei Yang wrote:
-> From: Zhang Yi <yi.z.zhang@linux.intel.com>
-> 
-> When a file supporting DAX is used as vNVDIMM backend, mmap it with
-> MAP_SYNC flag in addition which can ensure file system metadata
-> synced in each guest writes to the backend file, without other QEMU
-> actions (e.g., periodic fsync() by QEMU).
-> 
-> Current, We have below different possible use cases:
-> 
-> 1. pmem=on is set, shared=on is set, MAP_SYNC supported:
->    a: backend is a dax supporting file.
->     - MAP_SYNC will active.
->    b: backend is not a dax supporting file.
->     - mmap will trigger a warning. then MAP_SYNC flag will be ignored
-> 
-> 2. The rest of cases:
->    - we will never pass the MAP_SYNC to mmap2
-> 
-> Signed-off-by: Haozhong Zhang <haozhong.zhang@intel.com>
-> Signed-off-by: Zhang Yi <yi.z.zhang@linux.intel.com>
-> [ehabkost: Rebased patch to latest code on master]
-> Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
-> Signed-off-by: Wei Yang <richardw.yang@linux.intel.com>
-> Tested-by: Wei Yang <richardw.yang@linux.intel.com>
-> Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
-> 
-> ---
-> v15: fix compile issue on pre-linux4.15
-> v14: rebase on top of current upstream
+Ok, I should read correctly, the pragma here is not related to them
 
-Note that v14 was already merged, so the build fix would need to
-be submitted separately.  However:
-
-[...]
-> +#ifdef CONFIG_LINUX
-> +#include <linux/mman.h>
-> +#endif /* CONFIG_LINUX */
-> +
-> +#ifndef MAP_SYNC
-> +#define MAP_SYNC 0
-> +#endif
-> +#ifndef MAP_SHARED_VALIDATE
-> +#define MAP_SHARED_VALIDATE 0
-> +#endif
-
-Why would we need this, if we added copies of mman.h to
-linux-headers?
-
--- 
-Eduardo
+Thanks,
+Laurent
