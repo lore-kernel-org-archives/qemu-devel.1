@@ -1,27 +1,22 @@
-Received: from eggs.gnu.org ([209.51.188.92]:57499)
+Received: from eggs.gnu.org ([209.51.188.92]:57594)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1hLPJA-0007m4-AR
-	for qemu-devel@nongnu.org; Tue, 30 Apr 2019 05:44:17 -0400
+	(envelope-from <cohuck@redhat.com>) id 1hLPJQ-0007th-2d
+	for qemu-devel@nongnu.org; Tue, 30 Apr 2019 05:44:33 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1hLPJ9-0005qe-4R
-	for qemu-devel@nongnu.org; Tue, 30 Apr 2019 05:44:16 -0400
-Received: from mail-ot1-x343.google.com ([2607:f8b0:4864:20::343]:42676)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1hLPJ8-0005q8-VO
-	for qemu-devel@nongnu.org; Tue, 30 Apr 2019 05:44:15 -0400
-Received: by mail-ot1-x343.google.com with SMTP id f23so11290374otl.9
-	for <qemu-devel@nongnu.org>; Tue, 30 Apr 2019 02:44:14 -0700 (PDT)
+	(envelope-from <cohuck@redhat.com>) id 1hLPJP-0005y8-2U
+	for qemu-devel@nongnu.org; Tue, 30 Apr 2019 05:44:32 -0400
+Date: Tue, 30 Apr 2019 11:44:26 +0200
+From: Cornelia Huck <cohuck@redhat.com>
+Message-ID: <20190430114426.5e805d30.cohuck@redhat.com>
+In-Reply-To: <099881e7-b0a9-055a-ba3e-2ebb66b4e15c@linux.ibm.com>
+References: <1556543381-12671-1-git-send-email-jjherne@linux.ibm.com>
+	<20190429154003.7f8fc423.cohuck@redhat.com>
+	<ef10a003-3eb8-df60-bfb1-bc99bfd6b7af@de.ibm.com>
+	<099881e7-b0a9-055a-ba3e-2ebb66b4e15c@linux.ibm.com>
 MIME-Version: 1.0
-References: <20190403034358.21999-1-richard.henderson@linaro.org>
-	<20190403034358.21999-14-richard.henderson@linaro.org>
-In-Reply-To: <20190403034358.21999-14-richard.henderson@linaro.org>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 30 Apr 2019 10:44:02 +0100
-Message-ID: <CAFEAcA_PFGUWdhGuPzjuzW7kdu849iRTGLRNMewT-7RnTAuA+A@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH 13/26] target/nios2: Convert to
- CPUClass::tlb_fill
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH] s390-bios: Skip bootmap signature entries
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,70 +25,44 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Richard Henderson <richard.henderson@linaro.org>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, Marek Vasut <marex@denx.de>, Chris Wulff <crwulff@gmail.com>
+To: Peter Oberparleiter <oberpar@linux.ibm.com>
+Cc: Christian Borntraeger <borntraeger@de.ibm.com>, "Jason J. Herne" <jjherne@linux.ibm.com>, qemu-devel@nongnu.org, qemu-s390x@nongnu.org, thuth@redhat.com, alifm@linux.ibm.com, Stefan Haberland <sth@linux.vnet.ibm.com>
 
-On Wed, 3 Apr 2019 at 04:55, Richard Henderson
-<richard.henderson@linaro.org> wrote:
->
-> Cc: Chris Wulff <crwulff@gmail.com>
-> Cc: Marek Vasut <marex@denx.de>
-> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
-> ---
->  target/nios2/cpu.h    |   5 +-
->  target/nios2/cpu.c    |   5 +-
->  target/nios2/helper.c | 181 ++++++++++++++++++++----------------------
->  target/nios2/mmu.c    |  12 ---
->  4 files changed, 92 insertions(+), 111 deletions(-)
-> --- a/target/nios2/helper.c
-> +++ b/target/nios2/helper.c
-> @@ -36,17 +36,6 @@ void nios2_cpu_do_interrupt(CPUState *cs)
->      env->regs[R_EA] = env->regs[R_PC] + 4;
->  }
->
-> -int nios2_cpu_handle_mmu_fault(CPUState *cs, vaddr address, int size,
-> -                               int rw, int mmu_idx)
-> -{
-> -    cs->exception_index = 0xaa;
-> -    /* Page 0x1000 is kuser helper */
-> -    if (address < 0x1000 || address >= 0x2000) {
-> -        cpu_dump_state(cs, stderr, fprintf, 0);
-> -    }
-> -    return 1;
-> -}
+On Tue, 30 Apr 2019 11:24:27 +0200
+Peter Oberparleiter <oberpar@linux.ibm.com> wrote:
 
-For user mode we used to set cs->exception_index to 0xaa...
+> On 29.04.2019 15:45, Christian Borntraeger wrote:
+> > 
+> > 
+> > On 29.04.19 15:40, Cornelia Huck wrote:  
+> >> On Mon, 29 Apr 2019 09:09:41 -0400
+> >> "Jason J. Herne" <jjherne@linux.ibm.com> wrote:
+> >>  
+> >>> Newer versions of zipl have the ability to write signature entries to the boot
+> >>> script for secure boot. We don't yet support secure boot, but we need to skip
+> >>> over signature entries while reading the boot script in order to maintain our
+> >>> ability to boot guest operating systems that have a secure bootloader.
+> >>>
+> >>> Signed-off-by: Jason J. Herne <jjherne@linux.ibm.com>
+> >>> Reviewed-by: Farhan Ali <alifm@linux.ibm.com>
+> >>> ---
+> >>>  pc-bios/s390-ccw/bootmap.c | 19 +++++++++++++++++--
+> >>>  pc-bios/s390-ccw/bootmap.h | 10 ++++++----
+> >>>  2 files changed, 23 insertions(+), 6 deletions(-)  
+> >>
+> >> Skipping something that we don't have support for yet, but that doesn't
+> >> hinder normal operation sounds reasonable; but can you point me to the
+> >> relevant commit implementing this in zipl or some documentation? I
+> >> haven't been able to find something like that in the s390-tools git
+> >> tree.  
+> > 
+> > the s390-tools update is currently in preparation, adding Stefan and Peter.  
+> 
+> Here's the link to the s390-tools commit that introduces the new
+> signature component to zipl:
+> 
+> https://github.com/ibm-s390-tools/s390-tools/commit/7c7e10ed8fb048efc4e0cd91b0f6fa704fba128e
+> 
+> 
 
-> +bool nios2_cpu_tlb_fill(CPUState *cs, vaddr address, int size,
-> +                        MMUAccessType access_type, int mmu_idx,
-> +                        bool probe, uintptr_t retaddr)
-> +{
-> +    Nios2CPU *cpu = NIOS2_CPU(cs);
-> +    CPUNios2State *env = &cpu->env;
-> +    unsigned int excp = EXCP_TLBD;
-
-...but in the new code we end up setting it to
-EXCP_TLBD, which is 12.
-
-> +
-> +#ifndef CONFIG_USER_ONLY
-
-[...]
-
->  #endif /* !CONFIG_USER_ONLY */
-> +
-> +    cs->exception_index = excp;
-> +    env->regs[CR_BADADDR] = address;
-> +    cpu_loop_exit_restore(cs, retaddr);
-> +}
-
-We also set env->regs[CR_BADADDR], which we weren't
-doing before.
-
-We've lost the cpu_dump_state() as well (though I'm not
-sure why that was there -- maybe stray debug printing?)
-
-Otherwise the changes look OK (ie no-behaviour-change).
-
-thanks
--- PMM
+Thanks!
