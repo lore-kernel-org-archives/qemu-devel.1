@@ -1,23 +1,25 @@
-Received: from eggs.gnu.org ([209.51.188.92]:54464)
+Received: from eggs.gnu.org ([209.51.188.92]:55744)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1hLZZb-0006MG-98
-	for qemu-devel@nongnu.org; Tue, 30 Apr 2019 16:41:56 -0400
+	(envelope-from <ehabkost@redhat.com>) id 1hLZeM-0002Ob-T8
+	for qemu-devel@nongnu.org; Tue, 30 Apr 2019 16:46:55 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1hLZZa-0005vQ-5G
-	for qemu-devel@nongnu.org; Tue, 30 Apr 2019 16:41:55 -0400
-From: Laurent Vivier <laurent@vivier.eu>
-References: <cover.1556650594.git.alistair.francis@wdc.com>
-	<f2aaec5b3c12a8512cd7078f3a5d1230906d80ea.1556650594.git.alistair.francis@wdc.com>
-	<900dab1c-d200-18fa-530b-43c3d6f017a5@vivier.eu>
-Message-ID: <5f1c936c-c250-5f64-ccca-1940cc9124d5@vivier.eu>
-Date: Tue, 30 Apr 2019 22:41:26 +0200
+	(envelope-from <ehabkost@redhat.com>) id 1hLZeH-00088x-Ut
+	for qemu-devel@nongnu.org; Tue, 30 Apr 2019 16:46:50 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:39746)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1hLZeG-00088D-Po
+	for qemu-devel@nongnu.org; Tue, 30 Apr 2019 16:46:45 -0400
+Date: Tue, 30 Apr 2019 17:46:36 -0300
+From: Eduardo Habkost <ehabkost@redhat.com>
+Message-ID: <20190430204636.GK28722@habkost.net>
+References: <20190426003652.32633-1-richardw.yang@linux.intel.com>
+	<20190426003652.32633-2-richardw.yang@linux.intel.com>
 MIME-Version: 1.0
-In-Reply-To: <900dab1c-d200-18fa-530b-43c3d6f017a5@vivier.eu>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH v1 3/5] hw/usb/dev-mtp: Fix GCC 9 build
- warning
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20190426003652.32633-2-richardw.yang@linux.intel.com>
+Subject: Re: [Qemu-devel] [PATCH v15 1/2] util/mmap-alloc: support MAP_SYNC
+ in qemu_ram_mmap()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,58 +28,59 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alistair Francis <Alistair.Francis@wdc.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
-Cc: "alistair23@gmail.com" <alistair23@gmail.com>, "kraxel@redhat.com" <kraxel@redhat.com>, "berrange@redhat.com" <berrange@redhat.com>, "riku.voipio@iki.fi" <riku.voipio@iki.fi>, "qemu-trivial@nongnu.org" <qemu-trivial@nongnu.org>
+To: Wei Yang <richardw.yang@linux.intel.com>
+Cc: qemu-devel@nongnu.org, xiaoguangrong.eric@gmail.com, stefanha@redhat.com, pbonzini@redhat.com, pagupta@redhat.com, yu.c.zhang@linux.intel.com, mst@redhat.com, imammedo@redhat.com, dan.j.williams@intel.com, yi.z.zhang@linux.intel.com, Haozhong Zhang <haozhong.zhang@intel.com>
 
-Le 30/04/2019 à 22:28, Laurent Vivier a écrit :
-> Le 30/04/2019 à 22:09, Alistair Francis a écrit :
->> Fix this warning with GCC 9 on Fedora 30:
->> hw/usb/dev-mtp.c:1715:36: error: taking address of packed member of ‘struct <anonymous>’ may result in an unaligned pointer value [-Werror=address-of-packed-member]
->>  1715 |                             dataset->filename);
->>       |                             ~~~~~~~^~~~~~~~~~
->>
->> Signed-off-by: Alistair Francis <alistair.francis@wdc.com>
->> ---
->>  hw/usb/dev-mtp.c | 13 +++++++++++++
->>  1 file changed, 13 insertions(+)
->>
->> diff --git a/hw/usb/dev-mtp.c b/hw/usb/dev-mtp.c
->> index 99548b012d..6de85d99e6 100644
->> --- a/hw/usb/dev-mtp.c
->> +++ b/hw/usb/dev-mtp.c
->> @@ -1711,9 +1711,22 @@ static void usb_mtp_write_metadata(MTPState *s, uint64_t dlen)
->>      assert(!s->write_pending);
->>      assert(p != NULL);
->>  
->> +/*
->> + * We are about to access a packed struct. We are confident that the pointer
->> + * address won't be unalligned, so we ignore GCC warnings.
->> + */
->> +#if defined(CONFIG_PRAGMA_DIAGNOSTIC_AVAILABLE) && QEMU_GNUC_PREREQ(9, 0)
->> +#pragma GCC diagnostic push
->> +#pragma GCC diagnostic ignored "-Waddress-of-packed-member"
->> +#endif
->> +
->>      filename = utf16_to_str(MIN(dataset->length, filename_chars),
->>                              dataset->filename);
->>  
->> +#if defined(CONFIG_PRAGMA_DIAGNOSTIC_AVAILABLE) && QEMU_GNUC_PREREQ(9, 0)
->> +#pragma GCC diagnostic pop
->> +#endif
->> +
->>      if (strchr(filename, '/')) {
->>          usb_mtp_queue_result(s, RES_PARAMETER_NOT_SUPPORTED, d->trans,
->>                               0, 0, 0, 0);
->>
+Hi,
+
+On Fri, Apr 26, 2019 at 08:36:51AM +0800, Wei Yang wrote:
+> From: Zhang Yi <yi.z.zhang@linux.intel.com>
 > 
-> You should move and use PRAGMA_DISABLE_PACKED_WARNING and
-> PRAGMA_REENABLE_PACKED_WARNING from linux-user/qemu.h.
+> When a file supporting DAX is used as vNVDIMM backend, mmap it with
+> MAP_SYNC flag in addition which can ensure file system metadata
+> synced in each guest writes to the backend file, without other QEMU
+> actions (e.g., periodic fsync() by QEMU).
 > 
-> It has laready been very well tested :)
+> Current, We have below different possible use cases:
+> 
+> 1. pmem=on is set, shared=on is set, MAP_SYNC supported:
+>    a: backend is a dax supporting file.
+>     - MAP_SYNC will active.
+>    b: backend is not a dax supporting file.
+>     - mmap will trigger a warning. then MAP_SYNC flag will be ignored
+> 
+> 2. The rest of cases:
+>    - we will never pass the MAP_SYNC to mmap2
+> 
+> Signed-off-by: Haozhong Zhang <haozhong.zhang@intel.com>
+> Signed-off-by: Zhang Yi <yi.z.zhang@linux.intel.com>
+> [ehabkost: Rebased patch to latest code on master]
+> Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
+> Signed-off-by: Wei Yang <richardw.yang@linux.intel.com>
+> Tested-by: Wei Yang <richardw.yang@linux.intel.com>
+> Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
+> 
+> ---
+> v15: fix compile issue on pre-linux4.15
+> v14: rebase on top of current upstream
 
+Note that v14 was already merged, so the build fix would need to
+be submitted separately.  However:
 
-Oh, they are for clang and a false positive, so forget my comment (and
-the following one)
+[...]
+> +#ifdef CONFIG_LINUX
+> +#include <linux/mman.h>
+> +#endif /* CONFIG_LINUX */
+> +
+> +#ifndef MAP_SYNC
+> +#define MAP_SYNC 0
+> +#endif
+> +#ifndef MAP_SHARED_VALIDATE
+> +#define MAP_SHARED_VALIDATE 0
+> +#endif
 
-Thanks,
-Laurent
+Why would we need this, if we added copies of mman.h to
+linux-headers?
+
+-- 
+Eduardo
