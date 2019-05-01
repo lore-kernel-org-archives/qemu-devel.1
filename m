@@ -1,27 +1,31 @@
-Received: from eggs.gnu.org ([209.51.188.92]:54637)
+Received: from eggs.gnu.org ([209.51.188.92]:58025)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1hLsHJ-0005VL-Lc
-	for qemu-devel@nongnu.org; Wed, 01 May 2019 12:40:20 -0400
+	(envelope-from <ehabkost@redhat.com>) id 1hLsZJ-0001lB-It
+	for qemu-devel@nongnu.org; Wed, 01 May 2019 12:58:56 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1hLsHF-0005xE-Rk
-	for qemu-devel@nongnu.org; Wed, 01 May 2019 12:40:17 -0400
-Received: from mail-io1-xd31.google.com ([2607:f8b0:4864:20::d31]:41748)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1hLsHD-0005ip-Qt
-	for qemu-devel@nongnu.org; Wed, 01 May 2019 12:40:13 -0400
-Received: by mail-io1-xd31.google.com with SMTP id r10so15267436ioc.8
-	for <qemu-devel@nongnu.org>; Wed, 01 May 2019 09:40:09 -0700 (PDT)
-Date: Wed, 1 May 2019 12:40:06 -0400
-From: Stefan Hajnoczi <stefanha@gmail.com>
-Message-ID: <20190501164006.GH21155@stefanha-x1.localdomain>
-References: <1556608500-12183-1-git-send-email-wangjie88@huawei.com>
+	(envelope-from <ehabkost@redhat.com>) id 1hLsZG-0004vz-Fs
+	for qemu-devel@nongnu.org; Wed, 01 May 2019 12:58:53 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:47116)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1hLsZG-0004r3-93
+	for qemu-devel@nongnu.org; Wed, 01 May 2019 12:58:50 -0400
+Date: Wed, 1 May 2019 13:58:41 -0300
+From: Eduardo Habkost <ehabkost@redhat.com>
+Message-ID: <20190501165841.GM28722@habkost.net>
+References: <20190426003652.32633-1-richardw.yang@linux.intel.com>
+	<20190426003652.32633-2-richardw.yang@linux.intel.com>
+	<20190430204636.GK28722@habkost.net>
+	<20190430223618.lyl3ribm7gg5haa5@master>
+	<20190430224816.GL28722@habkost.net>
+	<20190430185011-mutt-send-email-mst@kernel.org>
+	<86e00247-588c-37c1-0737-82614a8f18c0@redhat.com>
+	<20190430193838-mutt-send-email-mst@kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="bpVaumkpfGNUagdU"
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <1556608500-12183-1-git-send-email-wangjie88@huawei.com>
-Subject: Re: [Qemu-devel] [PATCH] vhost: fix memory leak in
- vhost_user_scsi_realize
+In-Reply-To: <20190430193838-mutt-send-email-mst@kernel.org>
+Subject: Re: [Qemu-devel] [PATCH v15 1/2] util/mmap-alloc: support MAP_SYNC
+ in qemu_ram_mmap()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,38 +34,42 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Jie Wang <wangjie88@huawei.com>
-Cc: qemu-devel@nongnu.org, wu.wubin@huawei.com, mst@redhat.com
+To: "Michael S. Tsirkin" <mst@redhat.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Wei Yang <richard.weiyang@gmail.com>, Wei Yang <richardw.yang@linux.intel.com>, pagupta@redhat.com, xiaoguangrong.eric@gmail.com, Haozhong Zhang <haozhong.zhang@intel.com>, qemu-devel@nongnu.org, yi.z.zhang@linux.intel.com, yu.c.zhang@linux.intel.com, stefanha@redhat.com, imammedo@redhat.com, dan.j.williams@intel.com
+
+On Tue, Apr 30, 2019 at 07:38:59PM -0400, Michael S. Tsirkin wrote:
+> On Wed, May 01, 2019 at 01:11:34AM +0200, Paolo Bonzini wrote:
+> > On 01/05/19 00:50, Michael S. Tsirkin wrote:
+> > >> Stefan, did you hit a build failure, or it was just theoretical?
+> > >>
+> > >> linux-headers/*/mman.h is updated by "linux-headers: add
+> > >> linux/mman.h" (commit 8cf108c5d159).  If the build really fails,
+> > >> something else is broken in our build system.
+> > > I think it's for non-linux hosts. linux-headers/ is only used
+> > > on linux hosts.
+> > 
+> > Yes, it is.  Maybe the #ifndef/#define  part should be only used for
+> > non-Linux.
+> > 
+> > Paolo
+> 
+> Makes sense. We'd rather have an error on linux than stub it out as 0.
 
 
---bpVaumkpfGNUagdU
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+I'm confused by these replies.  When exactly do you expect an
+error on Linux?
 
-On Tue, Apr 30, 2019 at 03:15:00PM +0800, Jie Wang wrote:
-> fix memory leak in vhost_user_scsi_realize
->=20
-> Signed-off-by: Jie Wang <wangjie88@huawei.com>
-> ---
->  hw/scsi/vhost-user-scsi.c | 3 +++
->  1 file changed, 3 insertions(+)
+For context, I'm talking about the code in v14 of the series (which was already
+merged):
 
-Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
+#ifdef CONFIG_LINUX
+#include <linux/mman.h>
+#else  /* !CONFIG_LINUX */
+#define MAP_SYNC              0x0
+#define MAP_SHARED_VALIDATE   0x0
+#endif /* CONFIG_LINUX */
 
---bpVaumkpfGNUagdU
-Content-Type: application/pgp-signature; name="signature.asc"
+I fail to see any case where the build would fail in v14.
 
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAlzJy+YACgkQnKSrs4Gr
-c8jdTAf/XASDBhfsUuQ2Eg2K16EIYqccv1L6AWfV9aAIzlXP7wOdQmqpad1Fwq0u
-gXJ5Hs64+dJfJt14pGPVoK1Jkics7ll1lykjrVuOR5kD2+3j7YadbTvbHa5T52a+
-s+RcW3xtb2KwAugoaBPH3+GS8/aaYGfgkRxAVWh150bpmFVcI19Rc8f9ZxlNqiBZ
-gIPB8kwbg0gDYj54nF6AV+iD49ifYuEWYtDEKIJXbJTtUWJigZqkxKM+qGKxhLn4
-4aydVzUWLJJ2W3O2sS5HUBKHVXcAcnbFCRD0dvW2W5leTfRM0aVQ2ce4zcq3i7DF
-VYThl2NMVK7l5QbVXupoLB3OyUESGg==
-=I4BG
------END PGP SIGNATURE-----
-
---bpVaumkpfGNUagdU--
+-- 
+Eduardo
