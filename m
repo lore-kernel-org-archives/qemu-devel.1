@@ -1,23 +1,25 @@
-Received: from eggs.gnu.org ([209.51.188.92]:37826)
+Received: from eggs.gnu.org ([209.51.188.92]:42009)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1hLp3T-00081s-SV
-	for qemu-devel@nongnu.org; Wed, 01 May 2019 09:13:50 -0400
+	(envelope-from <no-reply@patchew.org>) id 1hLpN6-0004sA-U8
+	for qemu-devel@nongnu.org; Wed, 01 May 2019 09:34:07 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1hLp3Q-0004AO-QO
-	for qemu-devel@nongnu.org; Wed, 01 May 2019 09:13:47 -0400
-References: <20190428155451.15653-1-thuth@redhat.com>
-	<20190428155451.15653-3-thuth@redhat.com>
-	<877eba77ps.fsf@zen.linaroharston>
-From: Thomas Huth <thuth@redhat.com>
-Message-ID: <3911e5a6-fe1c-9b4b-d6f8-2da54a47742c@redhat.com>
-Date: Wed, 1 May 2019 15:13:26 +0200
+	(envelope-from <no-reply@patchew.org>) id 1hLpN3-0002NW-Sl
+	for qemu-devel@nongnu.org; Wed, 01 May 2019 09:34:04 -0400
+Resent-Message-Id: <E1hLpN3-0002NW-Sl@eggs.gnu.org>
+Received: from sender4-of-o55.zoho.com ([136.143.188.55]:21534)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
+	id 1hLpN3-0002Lw-LB
+	for qemu-devel@nongnu.org; Wed, 01 May 2019 09:34:01 -0400
+In-Reply-To: <20190429090250.7648-1-borntraeger@de.ibm.com>
+Message-ID: <155671759623.10667.1703201848536994146@c2072b67cc0c>
+Reply-To: <qemu-devel@nongnu.org>
 MIME-Version: 1.0
-In-Reply-To: <877eba77ps.fsf@zen.linaroharston>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v2 2/8] tests/qemu-iotests/005: Add a
- sanity check for large sparse file support
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+From: no-reply@patchew.org
+Date: Wed, 1 May 2019 06:33:17 -0700 (PDT)
+Subject: Re: [Qemu-devel] [PATCH v3 0/9] s390x: new guest features
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,41 +28,27 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>
-Cc: qemu-devel@nongnu.org, Fam Zheng <fam@euphon.net>, qemu-block@nongnu.org, Eric Blake <eblake@redhat.com>, Ed Maste <emaste@freebsd.org>, Christophe Fergeau <cfergeau@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, Li-Wen Hsu <lwhsu@freebsd.org>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>, Wainer dos Santos Moschetta <wainersm@redhat.com>, Markus Armbruster <armbru@redhat.com>
+To: borntraeger@de.ibm.com
+Cc: fam@euphon.net, cohuck@redhat.com, jjherne@linux.ibm.com, walling@linux.ibm.com, david@redhat.com, qemu-devel@nongnu.org, pasic@linux.ibm.com, qemu-s390x@nongnu.org, rth@twiddle.net
 
-On 01/05/2019 13.08, Alex Benn=C3=A9e wrote:
->=20
-> Thomas Huth <thuth@redhat.com> writes:
->=20
->> "check -raw 005" fails when running on ext4 filesystems - these do not
->> support such large sparse files. Use the same check as in test 220 to
->> skip the test in this case.
->>
->> Suggested-by: Eric Blake <eblake@redhat.com>
->> Signed-off-by: Thomas Huth <thuth@redhat.com>
->> ---
->>  tests/qemu-iotests/005 | 9 +++++++++
->>  1 file changed, 9 insertions(+)
->>
->> diff --git a/tests/qemu-iotests/005 b/tests/qemu-iotests/005
->> index 2fef63af88..6136ced5c8 100755
->> --- a/tests/qemu-iotests/005
->> +++ b/tests/qemu-iotests/005
->> @@ -55,6 +55,15 @@ if [ "$IMGPROTO" =3D "sheepdog" ]; then
->>      _notrun "image protocol $IMGPROTO does not support large image si=
-zes"
->>  fi
->>
->> +# Sanity check: For raw, we require a file system that permits the cr=
-eation
->> +# of a HUGE (but very sparse) file.  tmpfs works, ext4 does not.
->=20
-> Is this comment correct? Running on my ext4 home partition this test
-> seems to be running fine and not skipping.
-Maybe it depends on the kernel version (I'm still using a 3.10-based
-kernel here) or the way how the file system was created? It fails at
-least for me on my ext4 partition.
-But I can adjust a little bit for sure.
-
- Thomas
+UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDE5MDQyOTA5MDI1MC43NjQ4
+LTEtYm9ybnRyYWVnZXJAZGUuaWJtLmNvbS8KCgoKSGksCgpUaGlzIHNlcmllcyBmYWlsZWQgdGhl
+IGRvY2tlci1taW5nd0BmZWRvcmEgYnVpbGQgdGVzdC4gUGxlYXNlIGZpbmQgdGhlIHRlc3Rpbmcg
+Y29tbWFuZHMgYW5kCnRoZWlyIG91dHB1dCBiZWxvdy4gSWYgeW91IGhhdmUgRG9ja2VyIGluc3Rh
+bGxlZCwgeW91IGNhbiBwcm9iYWJseSByZXByb2R1Y2UgaXQKbG9jYWxseS4KCj09PSBURVNUIFND
+UklQVCBCRUdJTiA9PT0KIyEvYmluL2Jhc2gKdGltZSBtYWtlIGRvY2tlci10ZXN0LW1pbmd3QGZl
+ZG9yYSBTSE9XX0VOVj0xIEo9MTQgTkVUV09SSz0xCj09PSBURVNUIFNDUklQVCBFTkQgPT09Cgog
+IENPUFkgICAgUlVOTkVSCiAgICBSVU4gdGVzdC1taW5ndyBpbiBxZW11OmZlZG9yYSAKY29udGFp
+bmVyX2xpbnV4LmdvOjI0Nzogc3RhcnRpbmcgY29udGFpbmVyIHByb2Nlc3MgY2F1c2VkICJwcm9j
+ZXNzX2xpbnV4LmdvOjI1ODogYXBwbHlpbmcgY2dyb3VwIGNvbmZpZ3VyYXRpb24gZm9yIHByb2Nl
+c3MgY2F1c2VkIFwiVGhlIG1heGltdW0gbnVtYmVyIG9mIGFjdGl2ZSBjb25uZWN0aW9ucyBmb3Ig
+VUlEIDAgaGFzIGJlZW4gcmVhY2hlZFwiIgovdXNyL2Jpbi9kb2NrZXItY3VycmVudDogRXJyb3Ig
+cmVzcG9uc2UgZnJvbSBkYWVtb246IG9jaSBydW50aW1lIGVycm9yOiBUaGUgbWF4aW11bSBudW1i
+ZXIgb2YgYWN0aXZlIGNvbm5lY3Rpb25zIGZvciBVSUQgMCBoYXMgYmVlbiByZWFjaGVkLgpUcmFj
+ZWJhY2sgKG1vc3QgcmVjZW50IGNhbGwgbGFzdCk6CiAgRmlsZSAiLi90ZXN0cy9kb2NrZXIvZG9j
+a2VyLnB5IiwgbGluZSA2MTUsIGluIDxtb2R1bGU+CiAgICBzeXMuZXhpdChtYWluKCkpCgoKVGhl
+IGZ1bGwgbG9nIGlzIGF2YWlsYWJsZSBhdApodHRwOi8vcGF0Y2hldy5vcmcvbG9ncy8yMDE5MDQy
+OTA5MDI1MC43NjQ4LTEtYm9ybnRyYWVnZXJAZGUuaWJtLmNvbS90ZXN0aW5nLmRvY2tlci1taW5n
+d0BmZWRvcmEvP3R5cGU9bWVzc2FnZS4KLS0tCkVtYWlsIGdlbmVyYXRlZCBhdXRvbWF0aWNhbGx5
+IGJ5IFBhdGNoZXcgW2h0dHBzOi8vcGF0Y2hldy5vcmcvXS4KUGxlYXNlIHNlbmQgeW91ciBmZWVk
+YmFjayB0byBwYXRjaGV3LWRldmVsQHJlZGhhdC5jb20=
