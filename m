@@ -1,25 +1,26 @@
-Received: from eggs.gnu.org ([209.51.188.92]:42978)
+Received: from eggs.gnu.org ([209.51.188.92]:43988)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <arilou@gmail.com>) id 1hM6tk-0003cY-Rb
-	for qemu-devel@nongnu.org; Thu, 02 May 2019 04:16:59 -0400
+	(envelope-from <no-reply@patchew.org>) id 1hM6x6-0006Lu-Cy
+	for qemu-devel@nongnu.org; Thu, 02 May 2019 04:20:26 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <arilou@gmail.com>) id 1hM6th-0008Oo-Du
-	for qemu-devel@nongnu.org; Thu, 02 May 2019 04:16:56 -0400
-Received: from mail-wr1-x441.google.com ([2a00:1450:4864:20::441]:35259)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <arilou@gmail.com>) id 1hM6th-0008EY-1X
-	for qemu-devel@nongnu.org; Thu, 02 May 2019 04:16:53 -0400
-Received: by mail-wr1-x441.google.com with SMTP id f7so2034714wrs.2
-	for <qemu-devel@nongnu.org>; Thu, 02 May 2019 01:16:52 -0700 (PDT)
-From: Jon Doron <arilou@gmail.com>
-Date: Thu,  2 May 2019 11:15:54 +0300
-Message-Id: <20190502081554.5521-28-arilou@gmail.com>
-In-Reply-To: <20190502081554.5521-1-arilou@gmail.com>
-References: <20190502081554.5521-1-arilou@gmail.com>
+	(envelope-from <no-reply@patchew.org>) id 1hM6x5-0003YJ-78
+	for qemu-devel@nongnu.org; Thu, 02 May 2019 04:20:24 -0400
+Resent-Message-Id: <E1hM6x5-0003YJ-78@eggs.gnu.org>
+Received: from sender-of-o52.zoho.com ([135.84.80.217]:21449)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
+	id 1hM6x3-00037g-Sr
+	for qemu-devel@nongnu.org; Thu, 02 May 2019 04:20:23 -0400
+In-Reply-To: <20190429134757.13570-1-marcandre.lureau@redhat.com>
+Message-ID: <155671401236.10667.11403551007670440961@c2072b67cc0c>
+Reply-To: <qemu-devel@nongnu.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH v9 27/27] gdbstub: Add support to write a MSR
- for KVM target
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+From: no-reply@patchew.org
+Date: Wed, 1 May 2019 05:33:33 -0700 (PDT)
+Subject: Re: [Qemu-devel] [PATCH] vl: fix -sandbox parsing crash when
+ seccomp support is disabled
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,69 +29,18 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: alex.bennee@linaro.org, Jon Doron <arilou@gmail.com>
+To: marcandre.lureau@redhat.com
+Cc: fam@euphon.net, qemu-devel@nongnu.org, otubo@redhat.com, pbonzini@redhat.com, david@gibson.dropbear.id.au
 
-gdb> maint packet Qqemu.kvm.Wrmsr:MsrIndex,Value
-
-Signed-off-by: Jon Doron <arilou@gmail.com>
----
- gdbstub.c | 29 ++++++++++++++++++++++++++++-
- 1 file changed, 28 insertions(+), 1 deletion(-)
-
-diff --git a/gdbstub.c b/gdbstub.c
-index f48c3a2b5f..a434a3749e 100644
---- a/gdbstub.c
-+++ b/gdbstub.c
-@@ -2145,7 +2145,8 @@ static void handle_query_qemu_supported(GdbCmdContext *gdb_ctx, void *user_ctx)
-              "sstepbits;sstep;PhyMemMode");
- 
-     if (kvm_enabled()) {
--        pstrcat(gdb_ctx->str_buf, sizeof(gdb_ctx->str_buf), ";kvm.Rdmsr");
-+        pstrcat(gdb_ctx->str_buf, sizeof(gdb_ctx->str_buf),
-+                ";kvm.Rdmsr;kvm.Wrmsr");
-     }
- 
-     put_packet(gdb_ctx->s, gdb_ctx->str_buf);
-@@ -2196,6 +2197,26 @@ static void handle_query_kvm_read_msr(GdbCmdContext *gdb_ctx, void *user_ctx)
-     put_packet(gdb_ctx->s, gdb_ctx->str_buf);
- }
- 
-+static void handle_set_kvm_write_msr(GdbCmdContext *gdb_ctx, void *user_ctx)
-+{
-+    if (!kvm_enabled()) {
-+        return;
-+    }
-+
-+    if (gdb_ctx->num_params < 2) {
-+        put_packet(gdb_ctx->s, "E22");
-+        return;
-+    }
-+
-+    if (kvm_arch_write_msr(gdbserver_state->c_cpu, gdb_ctx->params[0].val_ul,
-+                           gdb_ctx->params[1].val_ull)) {
-+        put_packet(gdb_ctx->s, "E00");
-+        return;
-+    }
-+
-+    put_packet(gdb_ctx->s, "OK");
-+}
-+
- static GdbCmdParseEntry gdb_gen_query_set_common_table[] = {
-     /* Order is important if has same prefix */
-     {
-@@ -2302,6 +2323,12 @@ static GdbCmdParseEntry gdb_gen_set_table[] = {
-         .cmd_startswith = 1,
-         .schema = "l0"
-     },
-+    {
-+        .handler = handle_set_kvm_write_msr,
-+        .cmd = "qemu.kvm.Wrmsr:",
-+        .cmd_startswith = 1,
-+        .schema = "l,L0"
-+    },
- };
- 
- static void handle_gen_query(GdbCmdContext *gdb_ctx, void *user_ctx)
--- 
-2.20.1
+UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDE5MDQyOTEzNDc1Ny4xMzU3
+MC0xLW1hcmNhbmRyZS5sdXJlYXVAcmVkaGF0LmNvbS8KCgoKSGksCgpUaGlzIHNlcmllcyBmYWls
+ZWQgdGhlIGFzYW4gYnVpbGQgdGVzdC4gUGxlYXNlIGZpbmQgdGhlIHRlc3RpbmcgY29tbWFuZHMg
+YW5kCnRoZWlyIG91dHB1dCBiZWxvdy4gSWYgeW91IGhhdmUgRG9ja2VyIGluc3RhbGxlZCwgeW91
+IGNhbiBwcm9iYWJseSByZXByb2R1Y2UgaXQKbG9jYWxseS4KCj09PSBURVNUIFNDUklQVCBCRUdJ
+TiA9PT0KIyEvYmluL2Jhc2gKdGltZSBtYWtlIGRvY2tlci10ZXN0LWRlYnVnQGZlZG9yYSBUQVJH
+RVRfTElTVD14ODZfNjQtc29mdG1tdSBKPTE0IE5FVFdPUks9MQo9PT0gVEVTVCBTQ1JJUFQgRU5E
+ID09PQoKCgoKVGhlIGZ1bGwgbG9nIGlzIGF2YWlsYWJsZSBhdApodHRwOi8vcGF0Y2hldy5vcmcv
+bG9ncy8yMDE5MDQyOTEzNDc1Ny4xMzU3MC0xLW1hcmNhbmRyZS5sdXJlYXVAcmVkaGF0LmNvbS90
+ZXN0aW5nLmFzYW4vP3R5cGU9bWVzc2FnZS4KLS0tCkVtYWlsIGdlbmVyYXRlZCBhdXRvbWF0aWNh
+bGx5IGJ5IFBhdGNoZXcgW2h0dHBzOi8vcGF0Y2hldy5vcmcvXS4KUGxlYXNlIHNlbmQgeW91ciBm
+ZWVkYmFjayB0byBwYXRjaGV3LWRldmVsQHJlZGhhdC5jb20=
