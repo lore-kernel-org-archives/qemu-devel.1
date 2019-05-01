@@ -1,25 +1,22 @@
-Received: from eggs.gnu.org ([209.51.188.92]:50088)
+Received: from eggs.gnu.org ([209.51.188.92]:50108)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1hLlj5-0004Py-Ur
-	for qemu-devel@nongnu.org; Wed, 01 May 2019 05:40:34 -0400
+	(envelope-from <laurent@vivier.eu>) id 1hLlj8-0004Rg-Sw
+	for qemu-devel@nongnu.org; Wed, 01 May 2019 05:40:37 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1hLlj2-0005cH-Lx
-	for qemu-devel@nongnu.org; Wed, 01 May 2019 05:40:31 -0400
-Resent-Message-Id: <E1hLlj2-0005cH-Lx@eggs.gnu.org>
-Received: from sender-of-o52.zoho.com ([135.84.80.217]:21441)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
-	id 1hLlj2-0005bZ-EP
-	for qemu-devel@nongnu.org; Wed, 01 May 2019 05:40:28 -0400
-In-Reply-To: <cover.1556562150.git.berto@igalia.com>
-Message-ID: <155670086531.10667.18189622875201687295@c2072b67cc0c>
-Reply-To: <qemu-devel@nongnu.org>
+	(envelope-from <laurent@vivier.eu>) id 1hLlj4-0005dI-6I
+	for qemu-devel@nongnu.org; Wed, 01 May 2019 05:40:34 -0400
+References: <cover.1556666645.git.alistair.francis@wdc.com>
+	<14aab381eaa678eca875d0b8bd456feb22a21bd8.1556666645.git.alistair.francis@wdc.com>
+From: Laurent Vivier <laurent@vivier.eu>
+Message-ID: <503a1f5f-7dad-1e4e-e1b1-aaeeeac9739f@vivier.eu>
+Date: Wed, 1 May 2019 11:40:13 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Wed, 1 May 2019 01:54:26 -0700 (PDT)
-Subject: Re: [Qemu-devel] [PATCH 0/5] Remove bdrv_read() and bdrv_write()
+In-Reply-To: <14aab381eaa678eca875d0b8bd456feb22a21bd8.1556666645.git.alistair.francis@wdc.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH v2 4/5] linux-user/uname: Fix GCC 9 build
+ warnings
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,18 +25,37 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: berto@igalia.com
-Cc: fam@euphon.net, qemu-devel@nongnu.org, kwolf@redhat.com, qemu-block@nongnu.org, mreitz@redhat.com
+To: Alistair Francis <Alistair.Francis@wdc.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+Cc: "alistair23@gmail.com" <alistair23@gmail.com>, "kraxel@redhat.com" <kraxel@redhat.com>, "berrange@redhat.com" <berrange@redhat.com>, "riku.voipio@iki.fi" <riku.voipio@iki.fi>, "qemu-trivial@nongnu.org" <qemu-trivial@nongnu.org>
 
-UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS9jb3Zlci4xNTU2NTYyMTUwLmdp
-dC5iZXJ0b0BpZ2FsaWEuY29tLwoKCgpIaSwKClRoaXMgc2VyaWVzIGZhaWxlZCB0aGUgYXNhbiBi
-dWlsZCB0ZXN0LiBQbGVhc2UgZmluZCB0aGUgdGVzdGluZyBjb21tYW5kcyBhbmQKdGhlaXIgb3V0
-cHV0IGJlbG93LiBJZiB5b3UgaGF2ZSBEb2NrZXIgaW5zdGFsbGVkLCB5b3UgY2FuIHByb2JhYmx5
-IHJlcHJvZHVjZSBpdApsb2NhbGx5LgoKPT09IFRFU1QgU0NSSVBUIEJFR0lOID09PQojIS9iaW4v
-YmFzaAp0aW1lIG1ha2UgZG9ja2VyLXRlc3QtZGVidWdAZmVkb3JhIFRBUkdFVF9MSVNUPXg4Nl82
-NC1zb2Z0bW11IEo9MTQgTkVUV09SSz0xCj09PSBURVNUIFNDUklQVCBFTkQgPT09CgoKCgpUaGUg
-ZnVsbCBsb2cgaXMgYXZhaWxhYmxlIGF0Cmh0dHA6Ly9wYXRjaGV3Lm9yZy9sb2dzL2NvdmVyLjE1
-NTY1NjIxNTAuZ2l0LmJlcnRvQGlnYWxpYS5jb20vdGVzdGluZy5hc2FuLz90eXBlPW1lc3NhZ2Uu
-Ci0tLQpFbWFpbCBnZW5lcmF0ZWQgYXV0b21hdGljYWxseSBieSBQYXRjaGV3IFtodHRwczovL3Bh
-dGNoZXcub3JnL10uClBsZWFzZSBzZW5kIHlvdXIgZmVlZGJhY2sgdG8gcGF0Y2hldy1kZXZlbEBy
-ZWRoYXQuY29t
+On 01/05/2019 01:28, Alistair Francis wrote:
+> Fix this warning when building with GCC9 on Fedora 30:
+> In function ‘strncpy’,
+>     inlined from ‘sys_uname’ at /home/alistair/qemu/linux-user/uname.c:94:3:
+> /usr/include/bits/string_fortified.h:106:10: error: ‘__builtin_strncpy’ output may be truncated copying 64 bytes from a string of length 64 [-Werror=stringop-truncation]
+>   106 |   return __builtin___strncpy_chk (__dest, __src, __len, __bos (__dest));
+>       |          ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+> 
+> Signed-off-by: Alistair Francis <alistair.francis@wdc.com>
+> ---
+>  linux-user/uname.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+> diff --git a/linux-user/uname.c b/linux-user/uname.c
+> index 313b79dbad..2fc6096a5b 100644
+> --- a/linux-user/uname.c
+> +++ b/linux-user/uname.c
+> @@ -73,7 +73,7 @@ const char *cpu_to_uname_machine(void *cpu_env)
+>  #define COPY_UTSNAME_FIELD(dest, src) \
+>    do { \
+>        /* __NEW_UTS_LEN doesn't include terminating null */ \
+> -      (void) strncpy((dest), (src), __NEW_UTS_LEN); \
+> +      (void) memcpy((dest), (src), MIN(strlen(src), __NEW_UTS_LEN)); \
+
+You should use MIN(strlen(src) + 1, __NEW_UTS_LEN) to copy the NUL
+character if it is present and fit in __NEW_UTS_LEN.
+
+>        (dest)[__NEW_UTS_LEN] = '\0'; \
+>    } while (0)
+>  
+> 
