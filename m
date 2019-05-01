@@ -1,25 +1,27 @@
-Received: from eggs.gnu.org ([209.51.188.92]:46896)
+Received: from eggs.gnu.org ([209.51.188.92]:47226)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1hLprd-0004fl-4i
-	for qemu-devel@nongnu.org; Wed, 01 May 2019 10:05:40 -0400
+	(envelope-from <richard.henderson@linaro.org>) id 1hLpt7-0005vg-T6
+	for qemu-devel@nongnu.org; Wed, 01 May 2019 10:07:12 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1hLprZ-0007lL-UW
-	for qemu-devel@nongnu.org; Wed, 01 May 2019 10:05:37 -0400
-Resent-Message-Id: <E1hLprZ-0007lL-UW@eggs.gnu.org>
-Received: from sender-of-o52.zoho.com ([135.84.80.217]:21447)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
-	id 1hLprZ-0007kc-Mq
-	for qemu-devel@nongnu.org; Wed, 01 May 2019 10:05:33 -0400
-In-Reply-To: <20190429090250.7648-1-borntraeger@de.ibm.com>
-Message-ID: <155671948930.10667.17588937283524246648@c2072b67cc0c>
-Reply-To: <qemu-devel@nongnu.org>
+	(envelope-from <richard.henderson@linaro.org>) id 1hLpt3-00008y-8L
+	for qemu-devel@nongnu.org; Wed, 01 May 2019 10:07:09 -0400
+Received: from mail-pg1-x532.google.com ([2607:f8b0:4864:20::532]:43681)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+	id 1hLpt3-00008A-1O
+	for qemu-devel@nongnu.org; Wed, 01 May 2019 10:07:05 -0400
+Received: by mail-pg1-x532.google.com with SMTP id t22so5337176pgi.10
+	for <qemu-devel@nongnu.org>; Wed, 01 May 2019 07:07:04 -0700 (PDT)
+References: <20190501061827.23080-1-joel@jms.id.au>
+From: Richard Henderson <richard.henderson@linaro.org>
+Message-ID: <d1c73e60-d828-4192-24c6-ca2f595a25b3@linaro.org>
+Date: Wed, 1 May 2019 07:07:00 -0700
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Wed, 1 May 2019 07:04:50 -0700 (PDT)
-Subject: Re: [Qemu-devel] [PATCH v3 0/9] s390x: new guest features
+In-Reply-To: <20190501061827.23080-1-joel@jms.id.au>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH] arm: aspeed: Set SDRAM size
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,18 +30,24 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: borntraeger@de.ibm.com
-Cc: fam@euphon.net, cohuck@redhat.com, jjherne@linux.ibm.com, walling@linux.ibm.com, david@redhat.com, qemu-devel@nongnu.org, pasic@linux.ibm.com, qemu-s390x@nongnu.org, rth@twiddle.net
+To: Joel Stanley <joel@jms.id.au>, Peter Maydell <peter.maydell@linaro.org>, =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
+Cc: Andrew Jeffery <andrew@aj.id.au>, qemu-arm@nongnu.org, qemu-devel@nongnu.org
 
-UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDE5MDQyOTA5MDI1MC43NjQ4
-LTEtYm9ybnRyYWVnZXJAZGUuaWJtLmNvbS8KCgoKSGksCgpUaGlzIHNlcmllcyBmYWlsZWQgdGhl
-IGFzYW4gYnVpbGQgdGVzdC4gUGxlYXNlIGZpbmQgdGhlIHRlc3RpbmcgY29tbWFuZHMgYW5kCnRo
-ZWlyIG91dHB1dCBiZWxvdy4gSWYgeW91IGhhdmUgRG9ja2VyIGluc3RhbGxlZCwgeW91IGNhbiBw
-cm9iYWJseSByZXByb2R1Y2UgaXQKbG9jYWxseS4KCj09PSBURVNUIFNDUklQVCBCRUdJTiA9PT0K
-IyEvYmluL2Jhc2gKdGltZSBtYWtlIGRvY2tlci10ZXN0LWRlYnVnQGZlZG9yYSBUQVJHRVRfTElT
-VD14ODZfNjQtc29mdG1tdSBKPTE0IE5FVFdPUks9MQo9PT0gVEVTVCBTQ1JJUFQgRU5EID09PQoK
-CgoKVGhlIGZ1bGwgbG9nIGlzIGF2YWlsYWJsZSBhdApodHRwOi8vcGF0Y2hldy5vcmcvbG9ncy8y
-MDE5MDQyOTA5MDI1MC43NjQ4LTEtYm9ybnRyYWVnZXJAZGUuaWJtLmNvbS90ZXN0aW5nLmFzYW4v
-P3R5cGU9bWVzc2FnZS4KLS0tCkVtYWlsIGdlbmVyYXRlZCBhdXRvbWF0aWNhbGx5IGJ5IFBhdGNo
-ZXcgW2h0dHBzOi8vcGF0Y2hldy5vcmcvXS4KUGxlYXNlIHNlbmQgeW91ciBmZWVkYmFjayB0byBw
-YXRjaGV3LWRldmVsQHJlZGhhdC5jb20=
+On 4/30/19 11:18 PM, Joel Stanley wrote:
+>      mc->no_parallel = 1;
+> +    if (board->ram)
+> +        mc->default_ram_size = board->ram;
+
+In addition to the braces, for which patchew will have sent you nag mail...
+
+> +        .ram       = 256 << 20,
+
+In <qemu/units.h> there are some defines to make this more readable as
+
+  .ram = 256 * MiB,
+
+Otherwise,
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+
+
+r~
