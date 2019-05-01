@@ -3,93 +3,94 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
 X-Spam-Status: No, score=-1.0 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F2428C43219
-	for <qemu-devel@archiver.kernel.org>; Wed,  1 May 2019 20:19:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8B81FC43219
+	for <qemu-devel@archiver.kernel.org>; Wed,  1 May 2019 20:22:36 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id BC111205F4
-	for <qemu-devel@archiver.kernel.org>; Wed,  1 May 2019 20:19:46 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 54FA420866
+	for <qemu-devel@archiver.kernel.org>; Wed,  1 May 2019 20:22:36 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="KBryzJ98"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BC111205F4
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="cqb3L/P7"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 54FA420866
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:40754 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:40884 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hLvhh-00017t-OS
-	for qemu-devel@archiver.kernel.org; Wed, 01 May 2019 16:19:45 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:50131)
+	id 1hLvkR-00039V-Cc
+	for qemu-devel@archiver.kernel.org; Wed, 01 May 2019 16:22:35 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:51161)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1hLvgv-0000cN-E8
-	for qemu-devel@nongnu.org; Wed, 01 May 2019 16:18:58 -0400
+	(envelope-from <richard.henderson@linaro.org>) id 1hLvjh-0002ns-0A
+	for qemu-devel@nongnu.org; Wed, 01 May 2019 16:21:49 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1hLvgu-0006BC-C6
-	for qemu-devel@nongnu.org; Wed, 01 May 2019 16:18:57 -0400
-Received: from mail-pf1-x430.google.com ([2607:f8b0:4864:20::430]:36015)
+	(envelope-from <richard.henderson@linaro.org>) id 1hLvjg-0007s7-3v
+	for qemu-devel@nongnu.org; Wed, 01 May 2019 16:21:48 -0400
+Received: from mail-pl1-x644.google.com ([2607:f8b0:4864:20::644]:34873)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1hLvgu-0006Ad-2k
-	for qemu-devel@nongnu.org; Wed, 01 May 2019 16:18:56 -0400
-Received: by mail-pf1-x430.google.com with SMTP id v80so4499273pfa.3
-	for <qemu-devel@nongnu.org>; Wed, 01 May 2019 13:18:55 -0700 (PDT)
+	id 1hLvjf-0007rY-Tn
+	for qemu-devel@nongnu.org; Wed, 01 May 2019 16:21:48 -0400
+Received: by mail-pl1-x644.google.com with SMTP id w24so8671616plp.2
+	for <qemu-devel@nongnu.org>; Wed, 01 May 2019 13:21:47 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
 	h=subject:to:references:from:openpgp:message-id:date:user-agent
 	:mime-version:in-reply-to:content-language:content-transfer-encoding;
-	bh=3wIBTFOfM06wCjbYumHhumaEncB5CotptKbheOQPwww=;
-	b=KBryzJ98SCospX6ukCegpa4xYEerbStXB/eE1/5nWC0zH0RDZn9SL7XnxJdWs/I0X4
-	Kw7hY9fxobRcpVty/cvFGUy9WRiXqRzl4yCI/CVflJ/kkXXJT0IZL7oK9raegWEXNRkS
-	gJdTM626FQPaA3Lm8n34urr1m1hZlFbA9kk1zB5SuzBVLhORnOJ8n0fRNR0eDT3ESSiO
-	MK3Serpf16hJjk9i9GsrLcHxF4IU//A72COUpyVwb1A4Dx47vsT/d/8BISMG7t6jsH0/
-	zEM62+XDQ9yuaHcglGXviBleA9H25SNpjJHS9cQUrykn5UKkcCxCVGmYYY3G+03YzMCV
-	ipiQ==
+	bh=igkppwCXm54O3OBwUGQYzCmsVfl8AXOSNeV0i24t+4c=;
+	b=cqb3L/P7K1xabOrB6Gybb3iQ5z6UcoKVf3FOv7g/soL3VwiqUmNMYeAYQMWd7YR12E
+	qdXusFvab/VZUNtVB86j9sCtpYWR4mVk6UY4vN2nCKyXLTbsBpZPFnSMqVvmUI0fMlDv
+	aW8Na8oNYByuvSbh+QgEyTRs0DBdGEO0RbWnBhNCaGJFEkiyQCQZQolS/wUKTpd+JwYU
+	jVtaYTsj/LqRdqtXeBP67IbDwqNc/2Bj04zNbfYGN9qFzQCrG6b2KG46GN71bLcSgZRE
+	wu8D2IX+7avjbkbmhQyXSe1EMSTEDu4Cj0ZDkoSI1uJ/Bd7VSPNcx6KyHPXje3il//Rp
+	EINA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
 	d=1e100.net; s=20161025;
 	h=x-gm-message-state:subject:to:references:from:openpgp:message-id
 	:date:user-agent:mime-version:in-reply-to:content-language
 	:content-transfer-encoding;
-	bh=3wIBTFOfM06wCjbYumHhumaEncB5CotptKbheOQPwww=;
-	b=uT11qz5gZEcsjUWTkHmORKrEoTPEB2FiCdcuErWBb6Gt20fXNJoLtFQfXrvsMH5xHx
-	KKBl7F/SwZMT77QAID4O9+Z6KWPY40AQDUfpLurdIb+4eGWlNIFP7TKh8XA51imEdhf0
-	7PwcVWx2SBm5ZW6AYJsAR+g1dUiZzIwh3kpW3noonJ8qL2arQQeaLXGJilAb0P/+/Yqo
-	APl7weMdDf9yhqjIa1uqvzfgwMTtwPiPy6VTINJF7Z/9h6fW14Xf9kd8Z0XvbUa/9/EJ
-	LU9PjRnNnNT41aqifBA0rVgTOKIgtWuAG3sLr9Ydik+V9lYztzeJJY1PhZnz0tQ1Ztlf
-	ql7Q==
-X-Gm-Message-State: APjAAAXLs11Jh0bNT2Yy+qG96LmK5G8TM7z57lR1Rz6G97Yj4Ysuiy4l
-	DN/VPJ/tHgNDVJdNeWOysGKmAoPD9YE=
-X-Google-Smtp-Source: APXvYqzy3VJsFvggLFZSRLWnw7gvLSqc2DqjxzbXkzlEP0WE+hjLueWgxPSw1n7YlW7Lr3SD1Yc2Xg==
-X-Received: by 2002:a62:be13:: with SMTP id l19mr31552064pff.137.1556741934473;
-	Wed, 01 May 2019 13:18:54 -0700 (PDT)
+	bh=igkppwCXm54O3OBwUGQYzCmsVfl8AXOSNeV0i24t+4c=;
+	b=SZegmWvY5HlvpnicnyHPmKpn0lc7Wb+u87HIGSHEEopFaTZG2Udu8O+TR+tAEBraV2
+	AVJurHE7CTT4yP2HvxVUZ/xC0I4G5trNxuAbOEN5HXpR01WHqI3dNNZxHc0bkuNiw6JC
+	Ca2nkcmwBKvao6fanK482sns7t1K1iehWA8YIEQt09IWzvroJl6USCulDoIN+qECKIMP
+	G9vFQNC3XksUV9bRw8ik5vDJpz6d5IveTCIkscfoQTuhTYSnk6o3oop9S8ngxy9pTLcf
+	mfuXdcJHsOErV8voxgrFmR9918llIi7YxIBcF+hLFBxAzO0S/axHyYMPb161sXwCPvpG
+	Zhjg==
+X-Gm-Message-State: APjAAAWHv4jS2dK+pAxsdri+0M1gss5UHcMN4gwutMZUrq7ly34SKfu4
+	jgjKS4B0+fZCPBhYXs6Mt9DY4m2GjVI=
+X-Google-Smtp-Source: APXvYqxwwgn9aUCyvljfhaXKaUxHmU34dVb2LC0JTHgNkAd8vQG66bdaxmcVdgQxQyJrQp4UDz482A==
+X-Received: by 2002:a17:902:a583:: with SMTP id
+	az3mr79667490plb.205.1556742105937; 
+	Wed, 01 May 2019 13:21:45 -0700 (PDT)
 Received: from [192.168.1.11] (97-113-189-189.tukw.qwest.net. [97.113.189.189])
 	by smtp.gmail.com with ESMTPSA id
-	o66sm49286407pfb.184.2019.05.01.13.18.53
+	y1sm46300098pgc.29.2019.05.01.13.21.44
 	(version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-	Wed, 01 May 2019 13:18:53 -0700 (PDT)
+	Wed, 01 May 2019 13:21:45 -0700 (PDT)
 To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>,
 	qemu-devel@nongnu.org
 References: <20190501050536.15580-1-richard.henderson@linaro.org>
-	<20190501050536.15580-8-richard.henderson@linaro.org>
-	<87muk65bat.fsf@zen.linaroharston>
+	<20190501050536.15580-9-richard.henderson@linaro.org>
+	<87lfzq5b4w.fsf@zen.linaroharston>
 From: Richard Henderson <richard.henderson@linaro.org>
 Openpgp: preference=signencrypt
-Message-ID: <12699c3d-3c5e-33db-ba6f-53f533f8ecf8@linaro.org>
-Date: Wed, 1 May 2019 13:18:51 -0700
+Message-ID: <71153219-741d-3c27-53b8-455c62de36c8@linaro.org>
+Date: Wed, 1 May 2019 13:21:43 -0700
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
 	Thunderbird/60.6.1
 MIME-Version: 1.0
-In-Reply-To: <87muk65bat.fsf@zen.linaroharston>
+In-Reply-To: <87lfzq5b4w.fsf@zen.linaroharston>
 Content-Type: text/plain; charset="UTF-8"
 Content-Language: en-US
 Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
 	recognized.
-X-Received-From: 2607:f8b0:4864:20::430
-Subject: Re: [Qemu-devel] [PATCH v2 07/29] tcg: Support cross-class moves
- without instruction support
+X-Received-From: 2607:f8b0:4864:20::644
+Subject: Re: [Qemu-devel] [PATCH v2 08/29] tcg: Promote tcg_out_{dup,
+ dupi}_vec to backend interface
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -104,32 +105,22 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190501201851.II-yJE8z8LAfieSD05KCnKCaInw2k77mmOo4l5w04QI@z>
+Message-ID: <20190501202143.Sivx3r5BM0c55m28Iltuy4btTjqTCsMEH1UjitZ0djI@z>
 
-On 5/1/19 10:34 AM, Alex Bennée wrote:
+On 5/1/19 10:37 AM, Alex Bennée wrote:
 > 
 > Richard Henderson <richard.henderson@linaro.org> writes:
 > 
->> PowerPC Altivec does not support direct moves between vector registers
->> and general registers.  So when tcg_out_mov fails, we can use the
->> backing memory for the temporary to perform the move.
+>> The i386 backend already has these functions, and the aarch64
+>> backend could easily split out one.  Nothing is done with these
+>> functions yet, but this will aid register allocation of
+>> INDEX_op_dup_vec in a later patch.
 > 
-> I couldn't see where tcg_out_mov fails in this way for ppc, it is still
-> abort or pass:
-> 
-> static bool tcg_out_mov(TCGContext *s, TCGType type, TCGReg ret, TCGReg arg)
-> {
->     tcg_debug_assert(TCG_TARGET_REG_BITS == 64 || type == TCG_TYPE_I32);
->     if (ret != arg) {
->         tcg_out32(s, OR | SAB(arg, ret, arg));
->     }
->     return true;
-> }
-> 
-> did a patch get missed somewhere?
+>   "Also use correct type for tcg_out_dupi_vec"?
 
-No, it's in another patch set that depends on this --
-adding host vector support for tcg/ppc/.
+Added:
+
+"Adjust the aarch64 tcg_out_dupi_vec signature to match the new interface."
 
 
 r~
