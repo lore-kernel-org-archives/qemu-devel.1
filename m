@@ -2,94 +2,93 @@ Return-Path: <SRS0=aVj3=TB=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.7 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS,URIBL_BLOCKED
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.7 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9256CC43219
-	for <qemu-devel@archiver.kernel.org>; Wed,  1 May 2019 14:16:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3BDCFC004C9
+	for <qemu-devel@archiver.kernel.org>; Wed,  1 May 2019 14:24:48 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 07AC420866
-	for <qemu-devel@archiver.kernel.org>; Wed,  1 May 2019 14:16:35 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 0481221783
+	for <qemu-devel@archiver.kernel.org>; Wed,  1 May 2019 14:24:47 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="yisvstR0"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 07AC420866
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="KvXnOApJ"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0481221783
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:59397 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:59583 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hLq2F-0002VQ-2M
-	for qemu-devel@archiver.kernel.org; Wed, 01 May 2019 10:16:35 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:48661)
+	id 1hLqAA-0004kC-Tz
+	for qemu-devel@archiver.kernel.org; Wed, 01 May 2019 10:24:46 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:50195)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1hLq17-0001sT-UL
-	for qemu-devel@nongnu.org; Wed, 01 May 2019 10:15:28 -0400
+	(envelope-from <alex.bennee@linaro.org>) id 1hLq9I-0004PW-FF
+	for qemu-devel@nongnu.org; Wed, 01 May 2019 10:23:55 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1hLq10-0006fK-AC
-	for qemu-devel@nongnu.org; Wed, 01 May 2019 10:15:22 -0400
-Received: from mail-pl1-x629.google.com ([2607:f8b0:4864:20::629]:43533)
+	(envelope-from <alex.bennee@linaro.org>) id 1hLq9F-0003ko-DT
+	for qemu-devel@nongnu.org; Wed, 01 May 2019 10:23:52 -0400
+Received: from mail-wr1-x441.google.com ([2a00:1450:4864:20::441]:37210)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1hLq0y-0006eg-ND
-	for qemu-devel@nongnu.org; Wed, 01 May 2019 10:15:18 -0400
-Received: by mail-pl1-x629.google.com with SMTP id n8so8237276plp.10
-	for <qemu-devel@nongnu.org>; Wed, 01 May 2019 07:15:16 -0700 (PDT)
+	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+	id 1hLq9F-0003kJ-6C
+	for qemu-devel@nongnu.org; Wed, 01 May 2019 10:23:49 -0400
+Received: by mail-wr1-x441.google.com with SMTP id k23so1799583wrd.4
+	for <qemu-devel@nongnu.org>; Wed, 01 May 2019 07:23:49 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
-	h=subject:to:cc:references:from:openpgp:message-id:date:user-agent
-	:mime-version:in-reply-to:content-language:content-transfer-encoding;
-	bh=AaR/jWZxbFEORr7Pg8KcRpvGmry5QEQL1q30DXO3fCE=;
-	b=yisvstR0Xv9+2lCuJ7UOkhC3H/nyy2XcjEjhpx2z9K/NVhP/3HAMO/Ce+dHYTovXb3
-	39iv8EUqbw78qNDEEXrCShzTt9C4KQjtFUUvd+t5V2nQEg+7O7jDONqzRQQd8glrIr3D
-	bZMTYxODYYZ2g3OrrZ0XS1JDfdEYjIZHxck3EIkCfHZTVZ+Ra0ZSXzuZmEDcv7fEzBz8
-	mkQYU/QeKSZOJx1NzBVGfeYX8FgKneOnFBMNEqTX1ohnNv8cDXUfoXIiXrSol49Gt32j
-	E0LFzC64Os8xjpymBy0RQ2tvo9WNLVOrdkph1homdFOexk8rL2WdLThHJh1Bv/xyc6t6
-	dCJQ==
+	h=references:user-agent:from:to:cc:subject:in-reply-to:date
+	:message-id:mime-version:content-transfer-encoding;
+	bh=X/X/GkR+j5LtWiIxgCLouqHjw+ezjmjiWjIouofNdK8=;
+	b=KvXnOApJxBhpN/98fDZxdhLnZV7+Qbv5Ai+D1Hz2GLCAOsMk/E2UUiBRLh8iigPVLY
+	7FEv2p2ZxDGPQ12A2IO1VzLML4pjD7uJ2+qwKu7Lnu65330F+9lPpATKjDwSy3rbC6xS
+	MEtB+Trznsyd8+IG7LibkMwnWHAZO92dnHxRFxpqgiiQ9n6WCZbwetomD+DuL863NmU8
+	zUmYPAxz5kUnRem8bKPPFIAWWT7OGQdrtiWh3kxSdoXWT4ohj2EJKm4k4wBsaedIDUJC
+	TR+1q0fq5pDq0EnIyPO5/YFl2HJckKWRieGW+eFg5eOZpPPkw4pNwUfGucZh5kVdYhb5
+	YSmw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
 	d=1e100.net; s=20161025;
-	h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
-	:date:user-agent:mime-version:in-reply-to:content-language
-	:content-transfer-encoding;
-	bh=AaR/jWZxbFEORr7Pg8KcRpvGmry5QEQL1q30DXO3fCE=;
-	b=DyCgLISeBKxZK1w/hZuGq+uY6rmZjjuL/OTKJcKVYXL1Ad9l+Dd3eqqkLX9LfEuN2D
-	PwqKBuFIACg1XiVqG9tIx3/F2tbEFvKV8F2r9hl2EnKM+Nfg+Gm+IdE2cPa4KCbsDrW6
-	hbzPeXjKISU2P3GVmqt8WstRR7xL2VlGBU8OHVjFpVi0ETZcEEU6ATI3W5OAMfLtCvgE
-	LohiLExyqKM7ZuAMsCA8DN+AhWptytvjtTJzKgz2g7ehGBmTGkZz9eLbwI8soZycnysI
-	C2EAbjngqut0QxA5PgN9IcSzRVP7DQoTSlELpr3sQVVVyFIoYk4KnP/DEoVCotrg6fbB
-	8kLQ==
-X-Gm-Message-State: APjAAAUnz+N4btu35z07b+3GrxkqBdnDArS4WO1447MEJnSI/1MUE9/j
-	WdIqIjL4NxnSD9Wj5s/aE51A6Q==
-X-Google-Smtp-Source: APXvYqyXs5wsZyEL1g/pKKOaz2QktcJKDIWocVZOHQweP1CKQ70bXkdRin5kQvMD6cAq4MP6qAPnmQ==
-X-Received: by 2002:a17:902:5a03:: with SMTP id
-	q3mr22132793pli.209.1556720115469; 
-	Wed, 01 May 2019 07:15:15 -0700 (PDT)
-Received: from [192.168.1.11] (97-113-189-189.tukw.qwest.net. [97.113.189.189])
+	h=x-gm-message-state:references:user-agent:from:to:cc:subject
+	:in-reply-to:date:message-id:mime-version:content-transfer-encoding;
+	bh=X/X/GkR+j5LtWiIxgCLouqHjw+ezjmjiWjIouofNdK8=;
+	b=NY0mcj4r+p51ZKPq4Ps+IGWO9XWEMZaID1XIvMLzBK1otbvKPimTxjuAnUMHk5lfmp
+	IlsRkCUNe55+2s0uHPZDbMfSGkldNCcadYnq8Hgp9ayLkxbetW0d9NZA9O5N3e3OJoBy
+	Z5wvaqgPF4mNGi7Gplt0ey6L9cmXNbcz1gFRDd/rbJQGmBX4PLzvuh4JO81RpVIqRedg
+	m2540w8f+2M2rrV9virJbi10kvWaMAs+L0sqwT2nOIkr1wM161DBTZYPrAN4Th6V1J8k
+	4VTIDwncSsZuMiIgyw/hP+OqwWSLwmoOTkmCFJ7uhxBcGNgns81Iq/Rrs7SaZhP1Wj3q
+	sj4A==
+X-Gm-Message-State: APjAAAUY6EUDAerkWSqfnoNg1owgDPHDc1WSE9+1XB2DX9iqKtZVGEzx
+	Gdpm1YbRnoGlM3+jm0Uwjucy/Q==
+X-Google-Smtp-Source: APXvYqzu0U6DM9SeZvH/Acfeil/E+LTfIw2lZLMX9JR2sXIqb0BfP6r+aMHoSTJen+HNMZWb2xC9PQ==
+X-Received: by 2002:adf:f109:: with SMTP id r9mr14770718wro.321.1556720627867; 
+	Wed, 01 May 2019 07:23:47 -0700 (PDT)
+Received: from zen.linaroharston ([81.128.185.34])
 	by smtp.gmail.com with ESMTPSA id
-	e23sm8666087pfi.159.2019.05.01.07.15.14
-	(version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-	Wed, 01 May 2019 07:15:14 -0700 (PDT)
-To: Alistair Francis <Alistair.Francis@wdc.com>,
-	"qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
-References: <cover.1556666645.git.alistair.francis@wdc.com>
-	<c4d2b1de9efadcf1c900b91361af9302823a72a9.1556666645.git.alistair.francis@wdc.com>
-From: Richard Henderson <richard.henderson@linaro.org>
-Openpgp: preference=signencrypt
-Message-ID: <035c917e-be1c-1cda-6b1b-337fa804a69b@linaro.org>
-Date: Wed, 1 May 2019 07:15:12 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
-	Thunderbird/60.6.1
+	a184sm7266158wmh.36.2019.05.01.07.23.47
+	(version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
+	Wed, 01 May 2019 07:23:47 -0700 (PDT)
+Received: from zen (localhost [127.0.0.1])
+	by zen.linaroharston (Postfix) with ESMTP id C2DC11FF87;
+	Wed,  1 May 2019 15:23:46 +0100 (BST)
+References: <20190428155451.15653-1-thuth@redhat.com>
+	<20190428155451.15653-3-thuth@redhat.com>
+	<877eba77ps.fsf@zen.linaroharston>
+	<3911e5a6-fe1c-9b4b-d6f8-2da54a47742c@redhat.com>
+User-agent: mu4e 1.3.1; emacs 26.1
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+To: Thomas Huth <thuth@redhat.com>
+In-reply-to: <3911e5a6-fe1c-9b4b-d6f8-2da54a47742c@redhat.com>
+Date: Wed, 01 May 2019 15:23:46 +0100
+Message-ID: <8736ly6yod.fsf@zen.linaroharston>
 MIME-Version: 1.0
-In-Reply-To: <c4d2b1de9efadcf1c900b91361af9302823a72a9.1556666645.git.alistair.francis@wdc.com>
 Content-Type: text/plain; charset="UTF-8"
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
 	recognized.
-X-Received-From: 2607:f8b0:4864:20::629
-Subject: Re: [Qemu-devel] [PATCH v2 5/5] linux-user/elfload: Fix GCC 9 build
- warnings
+X-Received-From: 2a00:1450:4864:20::441
+Subject: Re: [Qemu-devel] [PATCH v2 2/8] tests/qemu-iotests/005: Add a
+ sanity check for large sparse file support
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -101,26 +100,65 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "qemu-trivial@nongnu.org" <qemu-trivial@nongnu.org>,
-	"alistair23@gmail.com" <alistair23@gmail.com>,
-	"riku.voipio@iki.fi" <riku.voipio@iki.fi>,
-	"laurent@vivier.eu" <laurent@vivier.eu>,
-	"kraxel@redhat.com" <kraxel@redhat.com>
+Cc: Fam Zheng <fam@euphon.net>, Kevin Wolf <kwolf@redhat.com>,
+	Ed Maste <emaste@freebsd.org>, qemu-block@nongnu.org,
+	Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
+	qemu-devel@nongnu.org, Christophe Fergeau <cfergeau@redhat.com>,
+	Max Reitz <mreitz@redhat.com>,
+	Wainer dos Santos Moschetta <wainersm@redhat.com>,
+	Li-Wen Hsu <lwhsu@freebsd.org>, Markus Armbruster <armbru@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190501141512.hUrdkbLo1lTiyhg6DE0V00KXFswB9nqY7i0tKI1ugaM@z>
-
-On 4/30/19 4:29 PM, Alistair Francis wrote:
-> @@ -2872,7 +2872,7 @@ struct target_elf_prpsinfo {
->      target_gid_t pr_gid;
->      target_pid_t pr_pid, pr_ppid, pr_pgrp, pr_sid;
->      /* Lots missing */
-> -    char    pr_fname[16];           /* filename of executable */
-> +    char    pr_fname[16] QEMU_NONSTRING; /* filename of executable */
-
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+Message-ID: <20190501142346.YasJ6PKpbx6YJFMD8pWazB8E0ySl7cMke_c0UE1zjuk@z>
 
 
-r~
+Thomas Huth <thuth@redhat.com> writes:
+
+> On 01/05/2019 13.08, Alex Benn=C3=A9e wrote:
+>>
+>> Thomas Huth <thuth@redhat.com> writes:
+>>
+>>> "check -raw 005" fails when running on ext4 filesystems - these do not
+>>> support such large sparse files. Use the same check as in test 220 to
+>>> skip the test in this case.
+>>>
+>>> Suggested-by: Eric Blake <eblake@redhat.com>
+>>> Signed-off-by: Thomas Huth <thuth@redhat.com>
+>>> ---
+>>>  tests/qemu-iotests/005 | 9 +++++++++
+>>>  1 file changed, 9 insertions(+)
+>>>
+>>> diff --git a/tests/qemu-iotests/005 b/tests/qemu-iotests/005
+>>> index 2fef63af88..6136ced5c8 100755
+>>> --- a/tests/qemu-iotests/005
+>>> +++ b/tests/qemu-iotests/005
+>>> @@ -55,6 +55,15 @@ if [ "$IMGPROTO" =3D "sheepdog" ]; then
+>>>      _notrun "image protocol $IMGPROTO does not support large image siz=
+es"
+>>>  fi
+>>>
+>>> +# Sanity check: For raw, we require a file system that permits the cre=
+ation
+>>> +# of a HUGE (but very sparse) file.  tmpfs works, ext4 does not.
+>>
+>> Is this comment correct? Running on my ext4 home partition this test
+>> seems to be running fine and not skipping.
+> Maybe it depends on the kernel version (I'm still using a 3.10-based
+> kernel here) or the way how the file system was created? It fails at
+> least for me on my ext4 partition.
+> But I can adjust a little bit for sure.
+
+  # Sanity check: For raw, we require a file system that permits the
+  # creation of a HUGE (but very sparse) file. Check we can create such
+  # a file before continuing.
+
+?
+
+>
+>  Thomas
+
+
+--
+Alex Benn=C3=A9e
 
