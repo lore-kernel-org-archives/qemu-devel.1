@@ -1,24 +1,24 @@
-Received: from eggs.gnu.org ([209.51.188.92]:51262)
+Received: from eggs.gnu.org ([209.51.188.92]:51525)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1hLloy-0000rQ-FJ
-	for qemu-devel@nongnu.org; Wed, 01 May 2019 05:46:39 -0400
+	(envelope-from <dgilbert@redhat.com>) id 1hLlpq-0001al-Q5
+	for qemu-devel@nongnu.org; Wed, 01 May 2019 05:47:34 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1hLlou-0001fy-ON
-	for qemu-devel@nongnu.org; Wed, 01 May 2019 05:46:36 -0400
-References: <cover.1556666645.git.alistair.francis@wdc.com>
-	<14aab381eaa678eca875d0b8bd456feb22a21bd8.1556666645.git.alistair.francis@wdc.com>
-	<503a1f5f-7dad-1e4e-e1b1-aaeeeac9739f@vivier.eu>
-	<20190501094452.GQ29808@redhat.com>
-From: Laurent Vivier <laurent@vivier.eu>
-Message-ID: <aad5f010-75c5-9b45-b830-3719cec77b9d@vivier.eu>
-Date: Wed, 1 May 2019 11:46:07 +0200
+	(envelope-from <dgilbert@redhat.com>) id 1hLlpn-0002OO-OU
+	for qemu-devel@nongnu.org; Wed, 01 May 2019 05:47:30 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:49300)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1hLlpn-0002No-HS
+	for qemu-devel@nongnu.org; Wed, 01 May 2019 05:47:27 -0400
+Date: Wed, 1 May 2019 10:47:23 +0100
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Message-ID: <20190501094722.GB10995@work-vm>
+References: <20190412152652.827-1-dgilbert@redhat.com>
+	<20190415094552.GC29134@stefanha-x1.localdomain>
 MIME-Version: 1.0
-In-Reply-To: <20190501094452.GQ29808@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH v2 4/5] linux-user/uname: Fix GCC 9 build
- warnings
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20190415094552.GC29134@stefanha-x1.localdomain>
+Subject: Re: [Qemu-devel] [PATCH] hmp: gva2gpa debug command
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,45 +27,40 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "=?UTF-8?Q?Daniel_P._Berrang=c3=a9?=" <berrange@redhat.com>
-Cc: Alistair Francis <Alistair.Francis@wdc.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "alistair23@gmail.com" <alistair23@gmail.com>, "kraxel@redhat.com" <kraxel@redhat.com>, "riku.voipio@iki.fi" <riku.voipio@iki.fi>, "qemu-trivial@nongnu.org" <qemu-trivial@nongnu.org>
+To: Stefan Hajnoczi <stefanha@gmail.com>
+Cc: qemu-devel@nongnu.org, pbonzini@redhat.com, armbru@redhat.com
 
-On 01/05/2019 11:44, Daniel P. Berrangé wrote:
-> On Wed, May 01, 2019 at 11:40:13AM +0200, Laurent Vivier wrote:
->> On 01/05/2019 01:28, Alistair Francis wrote:
->>> Fix this warning when building with GCC9 on Fedora 30:
->>> In function ‘strncpy’,
->>>     inlined from ‘sys_uname’ at /home/alistair/qemu/linux-user/uname.c:94:3:
->>> /usr/include/bits/string_fortified.h:106:10: error: ‘__builtin_strncpy’ output may be truncated copying 64 bytes from a string of length 64 [-Werror=stringop-truncation]
->>>   106 |   return __builtin___strncpy_chk (__dest, __src, __len, __bos (__dest));
->>>       |          ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
->>>
->>> Signed-off-by: Alistair Francis <alistair.francis@wdc.com>
->>> ---
->>>  linux-user/uname.c | 2 +-
->>>  1 file changed, 1 insertion(+), 1 deletion(-)
->>>
->>> diff --git a/linux-user/uname.c b/linux-user/uname.c
->>> index 313b79dbad..2fc6096a5b 100644
->>> --- a/linux-user/uname.c
->>> +++ b/linux-user/uname.c
->>> @@ -73,7 +73,7 @@ const char *cpu_to_uname_machine(void *cpu_env)
->>>  #define COPY_UTSNAME_FIELD(dest, src) \
->>>    do { \
->>>        /* __NEW_UTS_LEN doesn't include terminating null */ \
->>> -      (void) strncpy((dest), (src), __NEW_UTS_LEN); \
->>> +      (void) memcpy((dest), (src), MIN(strlen(src), __NEW_UTS_LEN)); \
->>
->> You should use MIN(strlen(src) + 1, __NEW_UTS_LEN) to copy the NUL
->> character if it is present and fit in __NEW_UTS_LEN.
+* Stefan Hajnoczi (stefanha@gmail.com) wrote:
+> On Fri, Apr 12, 2019 at 04:26:52PM +0100, Dr. David Alan Gilbert (git) wrote:
+> > diff --git a/hmp-commands.hx b/hmp-commands.hx
+> > index d3bad2fc27..ba4690b9ac 100644
+> > --- a/hmp-commands.hx
+> > +++ b/hmp-commands.hx
+> > @@ -585,6 +585,21 @@ STEXI
+> >  @findex gpa2hpa
+> >  Print the host physical address at which the guest's physical address @var{addr}
+> >  is mapped.
+> > +ETEXI
+> > +
+> > +    {
+> > +        .name       = "gva2gpa",
+> > +        .args_type  = "addr:l",
+> > +        .params     = "addr",
+> > +        .help       = "print the guest physical address corresponding to a guest virtual address",
+> > +        .cmd        = hmp_gva2gpa,
+> > +    },
+> > +
+> > +STEXI
+> > +@item gpa2hpa @var{addr}
+> > +@findex gpa2hpa
 > 
-> IMHO we shouldn't use strlen at all. I proposed fixing it using sizeof()
-> instead here:
+> s/gpa2hpa/gva2gpa/
 > 
->   https://lists.gnu.org/archive/html/qemu-devel/2019-04/msg02154.html
+> Aside from this:
 > 
+> Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
 
-Yes, it's better.
+Queued
 
-Thanks,
-Laurent
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
