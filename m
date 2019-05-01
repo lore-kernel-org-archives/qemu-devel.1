@@ -4,89 +4,79 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-6.7 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+	SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2F419C43219
-	for <qemu-devel@archiver.kernel.org>; Wed,  1 May 2019 11:12:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EEE85C43219
+	for <qemu-devel@archiver.kernel.org>; Wed,  1 May 2019 11:13:06 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id BBEE921670
-	for <qemu-devel@archiver.kernel.org>; Wed,  1 May 2019 11:12:32 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 98BC021670
+	for <qemu-devel@archiver.kernel.org>; Wed,  1 May 2019 11:13:06 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="AsRY4YfQ"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BBEE921670
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="rUa6ndaM"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 98BC021670
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:54786 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:54790 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hLnA7-0006id-V7
-	for qemu-devel@archiver.kernel.org; Wed, 01 May 2019 07:12:31 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:48932)
+	id 1hLnAf-000765-TJ
+	for qemu-devel@archiver.kernel.org; Wed, 01 May 2019 07:13:05 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:49023)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1hLn87-000578-7b
-	for qemu-devel@nongnu.org; Wed, 01 May 2019 07:10:30 -0400
+	(envelope-from <ard.biesheuvel@linaro.org>) id 1hLn8R-0005RN-8Z
+	for qemu-devel@nongnu.org; Wed, 01 May 2019 07:10:50 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1hLn83-00075r-JO
-	for qemu-devel@nongnu.org; Wed, 01 May 2019 07:10:26 -0400
-Received: from mail-wr1-x436.google.com ([2a00:1450:4864:20::436]:40113)
+	(envelope-from <ard.biesheuvel@linaro.org>) id 1hLn8N-0007BX-Fw
+	for qemu-devel@nongnu.org; Wed, 01 May 2019 07:10:47 -0400
+Received: from mail-it1-x141.google.com ([2607:f8b0:4864:20::141]:35525)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1hLn83-00075M-5q
-	for qemu-devel@nongnu.org; Wed, 01 May 2019 07:10:23 -0400
-Received: by mail-wr1-x436.google.com with SMTP id h4so24240620wre.7
-	for <qemu-devel@nongnu.org>; Wed, 01 May 2019 04:10:23 -0700 (PDT)
+	(Exim 4.71) (envelope-from <ard.biesheuvel@linaro.org>)
+	id 1hLn8J-0007AG-PJ
+	for qemu-devel@nongnu.org; Wed, 01 May 2019 07:10:40 -0400
+Received: by mail-it1-x141.google.com with SMTP id l140so8043585itb.0
+	for <qemu-devel@nongnu.org>; Wed, 01 May 2019 04:10:37 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
-	h=references:user-agent:from:to:cc:subject:in-reply-to:date
-	:message-id:mime-version:content-transfer-encoding;
-	bh=p61sQFx3pu37C7//hDVUEsnMWssYsBycN4XFyi7hMlk=;
-	b=AsRY4YfQ0HqIkgjBvrAfmyoiUM8n8I6wAbM3FFmMgxh7qFSJeaLwvKUj6jqAVzqwTh
-	Pu4+6jaRcxZdtT/ee516M5wteTOD10XPnd5nZ2OUjCY9MwdQLkOtSyS7B/ipkmwc2SsI
-	ZD61ZKrKwjrDQHc/YjXHrHlRhTLlBxh9wWNsArzRtUO+/cKJxxa/F4oGz57ljiI256LZ
-	ThpKaZfUKocSQpjBNUvOjOEw305lXWNMG/jkr7qyLPiOQHvdCDV8qA8H+8lB8Vx2LQWA
-	nlOwwWpCQpYYgqXft96OWH4kNY4uZlCx3YVe0MOogu0LGY3cf8MOHX5KFYTUsjRbpFtR
-	aicw==
+	h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+	:cc; bh=4sK7WHq0i0ToCD9xFJXXNHrCG1+wqaIbUdnkIurZZRc=;
+	b=rUa6ndaMzkXEK8JRLRlHwmk52yKpfz4J4619LOBBOiKJLmcc08i39DcCtw88ciYlEu
+	3u3XhtkzIgoMW3JSa47GiQyy4QZozW9B64qiy3AWH7FpX6Q1j2a+utyHigrxGYVkLRg5
+	IE6fIr1mz3rhQSvTGI8wRn5JOMCXnnlmu5S9k2QdwuQVw18Cmrt66aCPpqmtF9SEIKFm
+	PGE6sVKdmNGl6hvyELZrYRCBFMHrzwR0ShY43t2r8ZGOiB5MAj1RDQrqHYxd6Jj2MBcB
+	V9BYri+UM4hiMYYI9t50DEyv/yBJdT2b1l0uIRouPOYoBwiew4OJHFh0y91qrA5YWept
+	UmUw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
 	d=1e100.net; s=20161025;
-	h=x-gm-message-state:references:user-agent:from:to:cc:subject
-	:in-reply-to:date:message-id:mime-version:content-transfer-encoding;
-	bh=p61sQFx3pu37C7//hDVUEsnMWssYsBycN4XFyi7hMlk=;
-	b=nKSe6wd/Baujh3+juR0iwwe+OIN+IJFYjSjlpDM68ZJLJ/yNSTBi9DXhqWyxtd51uc
-	8oxyeu+DYI0Qbpofx58yIvbFnABdBcACRl7cwO6L8D5+aTZYUvoJPYmXIjBimY2YuGL6
-	128VOFk+hzJaVjK5egv2TlR5pJxxy3suU2TlcDqq6Jz/s/QpKUY2VcCTpTSj61B5cN41
-	mrHnxyqSz6dwjhxwINTMm/oKw2HnlHcFsn2+mNZktP4YWPSBp/j+TW5kWTRZZOEmIZ2K
-	6JfzhxbFynwjaTztWi4l9E5vIBm4ijsjkcH6HZBPLtZ6OdJJlSiwHQDq8SQMALiUTtNx
-	TSoQ==
-X-Gm-Message-State: APjAAAUkhhN3pS0SwC/BO1ahU0eKKQj1O8Z4tUVEunTO10jfGaoiBM8T
-	dqZ7kkCVtLVrzt5RHPz4tO5Gaw==
-X-Google-Smtp-Source: APXvYqz/ADWsGPdLVwvOtsay12v/TeVY7nVWYCBHqdpN2uwnRrCrPLYGmqHJeQbqSn7dc66JqLbhyA==
-X-Received: by 2002:adf:cd81:: with SMTP id q1mr1107407wrj.185.1556709021601; 
-	Wed, 01 May 2019 04:10:21 -0700 (PDT)
-Received: from zen.linaroharston ([81.128.185.34])
-	by smtp.gmail.com with ESMTPSA id
-	k67sm5518787wmb.34.2019.05.01.04.10.20
-	(version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
-	Wed, 01 May 2019 04:10:20 -0700 (PDT)
-Received: from zen (localhost [127.0.0.1])
-	by zen.linaroharston (Postfix) with ESMTP id 650A81FF87;
-	Wed,  1 May 2019 12:10:20 +0100 (BST)
-References: <20190428155451.15653-1-thuth@redhat.com>
-	<20190428155451.15653-7-thuth@redhat.com>
-User-agent: mu4e 1.3.1; emacs 26.1
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-To: Thomas Huth <thuth@redhat.com>
-In-reply-to: <20190428155451.15653-7-thuth@redhat.com>
-Date: Wed, 01 May 2019 12:10:20 +0100
-Message-ID: <874l6e77mr.fsf@zen.linaroharston>
+	h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+	:message-id:subject:to:cc;
+	bh=4sK7WHq0i0ToCD9xFJXXNHrCG1+wqaIbUdnkIurZZRc=;
+	b=g1y5tl00N/bElc0orZumNmO03UDm0GOG/0O+lJNvYEpz0LC6zGbewgTfPfmMm9Ucaz
+	a4XfmxpkV5GTdv4z3g1vx8t8RvyAta2EZYYVSrO/awnAamlRjNeM8+YKQ4k+G6JAZ4Ej
+	eFZ0K8GXvs3uYDVdXAq+hIG5nt7yxMyuuUVFGppTtr5aluYMm0yFEYd3JeQDn/OXqFoP
+	gLYoBNcuoyRaqjGCrALPM8LL+nZIN+Vbb+J3W2CZA0j2O667SXPNeyV7z29jkpQRXU/n
+	KgyxX2sa0Rkm2CiLjwpPn9f9pEfGmaEKNfprJYNyvWvydIM13uFmCZ0k961f0p3LEgWv
+	1dwg==
+X-Gm-Message-State: APjAAAUKTMH2hciS8da9l+GfEeF/1eo8/Q/nES2kazpNyiJ4W7oEpEXJ
+	lkSk6PUkK6X4IvNJadAPZSNRSMDvG28ZiRDMvO4+eA==
+X-Google-Smtp-Source: APXvYqz2aH1snYcuuJYNvIWHNwthMHAVU0g8pMT5sNb93o/2vIcJ0xGfXDEwNWzPfRNTArYEMfyYRdXktBMfZX4eU3s=
+X-Received: by 2002:a02:1dc7:: with SMTP id 190mr32978229jaj.62.1556709036559; 
+	Wed, 01 May 2019 04:10:36 -0700 (PDT)
 MIME-Version: 1.0
+References: <20190409102935.28292-1-shameerali.kolothum.thodi@huawei.com>
+	<20190409102935.28292-4-shameerali.kolothum.thodi@huawei.com>
+In-Reply-To: <20190409102935.28292-4-shameerali.kolothum.thodi@huawei.com>
+From: Ard Biesheuvel <ard.biesheuvel@linaro.org>
+Date: Wed, 1 May 2019 13:10:24 +0200
+Message-ID:
+ <CAKv+Gu_guvAydmCZDeVnj0NR_WyTHeCmwh4tK9WKUBY6cy-4Pg@mail.gmail.com>
+To: Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
 	recognized.
-X-Received-From: 2a00:1450:4864:20::436
-Subject: Re: [Qemu-devel] [PATCH v2 6/8] tests/qemu-iotests: Remove the
- "_supported_os Linux" line from many tests
+X-Received-From: 2607:f8b0:4864:20::141
+Subject: Re: [Qemu-devel] [PATCH v4 3/8] hw/acpi: Add ACPI Generic Event
+ Device Support
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -98,1340 +88,526 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Fam Zheng <fam@euphon.net>, Kevin Wolf <kwolf@redhat.com>,
-	Ed Maste <emaste@freebsd.org>, qemu-block@nongnu.org,
-	Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
-	qemu-devel@nongnu.org, Christophe Fergeau <cfergeau@redhat.com>,
-	Max Reitz <mreitz@redhat.com>,
-	Wainer dos Santos Moschetta <wainersm@redhat.com>,
-	Li-Wen Hsu <lwhsu@freebsd.org>, Markus Armbruster <armbru@redhat.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>, sameo@linux.intel.com,
+	shannon.zhaosl@gmail.com, QEMU Developers <qemu-devel@nongnu.org>,
+	Wei Xu <xuwei5@hisilicon.com>, Linuxarm <linuxarm@huawei.com>,
+	Auger Eric <eric.auger@redhat.com>, qemu-arm <qemu-arm@nongnu.org>,
+	Igor Mammedov <imammedo@redhat.com>, sebastien.boeuf@intel.com,
+	Laszlo Ersek <lersek@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190501111020.Hx_YS3OfQxjWkXDsmvk721rM3c3lIwcBVht4lfPmWhc@z>
+Message-ID: <20190501111024.j1Cro8L2Jv9UPnUy-P05XrBbPyYrBhlGZKRsETBRxyo@z>
 
-
-Thomas Huth <thuth@redhat.com> writes:
-
-> A lot of tests run fine on FreeBSD and macOS, too - the limitation
-> to Linux here was likely just copied-and-pasted from other tests.
-> Thus remove the "_supported_os Linux" line from tests that run
-> successful in our CI pipelines on FreeBSD and macOS.
+On Tue, 9 Apr 2019 at 12:31, Shameer Kolothum
+<shameerali.kolothum.thodi@huawei.com> wrote:
 >
-> Signed-off-by: Thomas Huth <thuth@redhat.com>
+> From: Samuel Ortiz <sameo@linux.intel.com>
+>
+> The ACPI Generic Event Device (GED) is a hardware-reduced specific
+> device[ACPI v6.1 Section 5.6.9] that handles all platform events,
+> including the hotplug ones.This patch generates the AML code that
+> defines GEDs.
+>
+> Platforms need to specify their own GedEvent array to describe what
+> kind of events they want to support through GED.  Also this uses a
+> a single interrupt for the  GED device, relying on IO memory region
+> to communicate the type of device affected by the interrupt. This
+> way, we can support up to 32 events with a unique interrupt.
+>
+> This supports only memory hotplug for now.
+>
+> Signed-off-by: Samuel Ortiz <sameo@linux.intel.com>
+> Signed-off-by: Sebastien Boeuf <sebastien.boeuf@intel.com>
+> Signed-off-by: Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>
 
-Reviewed-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
-Tested-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
+Apologies if this question has been raised before, but do we really
+need a separate device for this? We already handle the power button
+via _AEI/_Exx on the GPIO device, and I think we should be able to add
+additional events using that interface, rather than have two event
+signalling methods/devices on the same platform.
+
 
 
 > ---
->  tests/qemu-iotests/001 | 1 -
->  tests/qemu-iotests/002 | 1 -
->  tests/qemu-iotests/003 | 1 -
->  tests/qemu-iotests/004 | 1 -
->  tests/qemu-iotests/007 | 1 -
->  tests/qemu-iotests/008 | 1 -
->  tests/qemu-iotests/009 | 1 -
->  tests/qemu-iotests/010 | 1 -
->  tests/qemu-iotests/011 | 1 -
->  tests/qemu-iotests/012 | 1 -
->  tests/qemu-iotests/015 | 1 -
->  tests/qemu-iotests/017 | 1 -
->  tests/qemu-iotests/020 | 1 -
->  tests/qemu-iotests/021 | 1 -
->  tests/qemu-iotests/022 | 1 -
->  tests/qemu-iotests/025 | 1 -
->  tests/qemu-iotests/026 | 1 -
->  tests/qemu-iotests/027 | 1 -
->  tests/qemu-iotests/029 | 1 -
->  tests/qemu-iotests/031 | 1 -
->  tests/qemu-iotests/032 | 1 -
->  tests/qemu-iotests/033 | 1 -
->  tests/qemu-iotests/035 | 1 -
->  tests/qemu-iotests/036 | 1 -
->  tests/qemu-iotests/037 | 1 -
->  tests/qemu-iotests/042 | 1 -
->  tests/qemu-iotests/043 | 1 -
->  tests/qemu-iotests/046 | 1 -
->  tests/qemu-iotests/047 | 1 -
->  tests/qemu-iotests/049 | 1 -
->  tests/qemu-iotests/050 | 1 -
->  tests/qemu-iotests/051 | 1 -
->  tests/qemu-iotests/052 | 1 -
->  tests/qemu-iotests/053 | 1 -
->  tests/qemu-iotests/054 | 1 -
->  tests/qemu-iotests/062 | 1 -
->  tests/qemu-iotests/063 | 1 -
->  tests/qemu-iotests/066 | 1 -
->  tests/qemu-iotests/067 | 1 -
->  tests/qemu-iotests/068 | 1 -
->  tests/qemu-iotests/069 | 1 -
->  tests/qemu-iotests/071 | 1 -
->  tests/qemu-iotests/072 | 1 -
->  tests/qemu-iotests/073 | 1 -
->  tests/qemu-iotests/079 | 1 -
->  tests/qemu-iotests/082 | 1 -
->  tests/qemu-iotests/085 | 1 -
->  tests/qemu-iotests/089 | 1 -
->  tests/qemu-iotests/090 | 1 -
->  tests/qemu-iotests/094 | 1 -
->  tests/qemu-iotests/095 | 1 -
->  tests/qemu-iotests/098 | 1 -
->  tests/qemu-iotests/102 | 1 -
->  tests/qemu-iotests/103 | 1 -
->  tests/qemu-iotests/104 | 1 -
->  tests/qemu-iotests/105 | 1 -
->  tests/qemu-iotests/107 | 1 -
->  tests/qemu-iotests/110 | 1 -
->  tests/qemu-iotests/111 | 1 -
->  tests/qemu-iotests/112 | 1 -
->  tests/qemu-iotests/114 | 1 -
->  tests/qemu-iotests/115 | 1 -
->  tests/qemu-iotests/117 | 1 -
->  tests/qemu-iotests/120 | 1 -
->  tests/qemu-iotests/125 | 1 -
->  tests/qemu-iotests/126 | 1 -
->  tests/qemu-iotests/127 | 1 -
->  tests/qemu-iotests/133 | 1 -
->  tests/qemu-iotests/134 | 1 -
->  tests/qemu-iotests/142 | 1 -
->  tests/qemu-iotests/143 | 1 -
->  tests/qemu-iotests/144 | 1 -
->  tests/qemu-iotests/145 | 1 -
->  tests/qemu-iotests/153 | 1 -
->  tests/qemu-iotests/156 | 1 -
->  tests/qemu-iotests/157 | 1 -
->  tests/qemu-iotests/158 | 1 -
->  tests/qemu-iotests/159 | 1 -
->  tests/qemu-iotests/162 | 1 -
->  tests/qemu-iotests/170 | 1 -
->  tests/qemu-iotests/173 | 1 -
->  tests/qemu-iotests/182 | 1 -
->  tests/qemu-iotests/183 | 1 -
->  tests/qemu-iotests/186 | 1 -
->  tests/qemu-iotests/187 | 1 -
->  tests/qemu-iotests/190 | 1 -
->  tests/qemu-iotests/191 | 1 -
->  tests/qemu-iotests/192 | 1 -
->  tests/qemu-iotests/195 | 1 -
->  tests/qemu-iotests/197 | 1 -
->  tests/qemu-iotests/200 | 1 -
->  tests/qemu-iotests/214 | 1 -
->  tests/qemu-iotests/215 | 1 -
->  tests/qemu-iotests/217 | 1 -
->  tests/qemu-iotests/227 | 1 -
->  tests/qemu-iotests/231 | 1 -
->  tests/qemu-iotests/233 | 1 -
->  tests/qemu-iotests/240 | 1 -
->  tests/qemu-iotests/247 | 1 -
->  99 files changed, 99 deletions(-)
+>  hw/acpi/Kconfig                        |   4 +
+>  hw/acpi/Makefile.objs                  |   1 +
+>  hw/acpi/generic_event_device.c         | 311 +++++++++++++++++++++++++++++++++
+>  include/hw/acpi/generic_event_device.h | 121 +++++++++++++
+>  4 files changed, 437 insertions(+)
+>  create mode 100644 hw/acpi/generic_event_device.c
+>  create mode 100644 include/hw/acpi/generic_event_device.h
+>
+> diff --git a/hw/acpi/Kconfig b/hw/acpi/Kconfig
+> index eca3bee..01a8b41 100644
+> --- a/hw/acpi/Kconfig
+> +++ b/hw/acpi/Kconfig
+> @@ -27,3 +27,7 @@ config ACPI_VMGENID
+>      bool
+>      default y
+>      depends on PC
+> +
+> +config ACPI_HW_REDUCED
+> +    bool
+> +    depends on ACPI
+> diff --git a/hw/acpi/Makefile.objs b/hw/acpi/Makefile.objs
+> index 2d46e37..b753232 100644
+> --- a/hw/acpi/Makefile.objs
+> +++ b/hw/acpi/Makefile.objs
+> @@ -6,6 +6,7 @@ common-obj-$(CONFIG_ACPI_MEMORY_HOTPLUG) += memory_hotplug.o
+>  common-obj-$(CONFIG_ACPI_CPU_HOTPLUG) += cpu.o
+>  common-obj-$(CONFIG_ACPI_NVDIMM) += nvdimm.o
+>  common-obj-$(CONFIG_ACPI_VMGENID) += vmgenid.o
+> +common-obj-$(CONFIG_ACPI_HW_REDUCED) += generic_event_device.o
+>  common-obj-$(call lnot,$(CONFIG_ACPI_X86)) += acpi-stub.o
+>
+>  common-obj-y += acpi_interface.o
+> diff --git a/hw/acpi/generic_event_device.c b/hw/acpi/generic_event_device.c
+> new file mode 100644
+> index 0000000..856ca04
+> --- /dev/null
+> +++ b/hw/acpi/generic_event_device.c
+> @@ -0,0 +1,311 @@
+> +/*
+> + *
+> + * Copyright (c) 2018 Intel Corporation
+> + *
+> + * This program is free software; you can redistribute it and/or modify it
+> + * under the terms and conditions of the GNU General Public License,
+> + * version 2 or later, as published by the Free Software Foundation.
+> + *
+> + * This program is distributed in the hope it will be useful, but WITHOUT
+> + * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+> + * FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for
+> + * more details.
+> + *
+> + * You should have received a copy of the GNU General Public License along with
+> + * this program.  If not, see <http://www.gnu.org/licenses/>.
+> + */
+> +
+> +#include "qemu/osdep.h"
+> +#include "qapi/error.h"
+> +#include "exec/address-spaces.h"
+> +#include "hw/sysbus.h"
+> +#include "hw/acpi/acpi.h"
+> +#include "hw/acpi/generic_event_device.h"
+> +#include "hw/mem/pc-dimm.h"
+> +
+> +static Aml *ged_event_aml(const GedEvent *event)
+> +{
+> +
+> +    if (!event) {
+> +        return NULL;
+> +    }
+> +
+> +    switch (event->event) {
+> +    case GED_MEMORY_HOTPLUG:
+> +        /* We run a complete memory SCAN when getting a memory hotplug event */
+> +        return aml_call0(MEMORY_DEVICES_CONTAINER "." MEMORY_SLOT_SCAN_METHOD);
+> +    default:
+> +        break;
+> +    }
+> +
+> +    return NULL;
+> +}
+> +
+> +/*
+> + * The ACPI Generic Event Device (GED) is a hardware-reduced specific
+> + * device[ACPI v6.1 Section 5.6.9] that handles all platform events,
+> + * including the hotplug ones. Platforms need to specify their own
+> + * GedEvent array to describe what kind of events they want to support
+> + * through GED. This routine uses a single interrupt for the GED device,
+> + * relying on IO memory region to communicate the type of device
+> + * affected by the interrupt. This way, we can support up to 32 events
+> + * with a unique interrupt.
+> + */
+> +void build_ged_aml(Aml *table, const char *name, HotplugHandler *hotplug_dev,
+> +                   uint32_t ged_irq, AmlRegionSpace rs)
+> +{
+> +    AcpiGedState *s = ACPI_GED(hotplug_dev);
+> +    GedEvent *ged_events = s->ged_events;
+> +    Aml *crs = aml_resource_template();
+> +    Aml *evt, *field;
+> +    Aml *dev = aml_device("%s", name);
+> +    Aml *irq_sel = aml_local(0);
+> +    Aml *isel = aml_name(AML_GED_IRQ_SEL);
+> +    uint32_t i;
+> +
+> +    if (!s->ged_base || !ged_events || !s->ged_events_size) {
+> +        return;
+> +    }
+> +
+> +    /* _CRS interrupt */
+> +    aml_append(crs, aml_interrupt(AML_CONSUMER, AML_EDGE, AML_ACTIVE_HIGH,
+> +                                  AML_EXCLUSIVE, &ged_irq, 1));
+> +    /*
+> +     * For each GED event we:
+> +     * - Add an interrupt to the CRS section.
+> +     * - Add a conditional block for each event, inside a while loop.
+> +     *   This is semantically equivalent to a switch/case implementation.
+> +     */
+> +    evt = aml_method("_EVT", 1, AML_SERIALIZED);
+> +    {
+> +        Aml *ged_aml;
+> +        Aml *if_ctx;
+> +
+> +        /* Local0 = ISEL */
+> +        aml_append(evt, aml_store(isel, irq_sel));
+> +
+> +        /*
+> +         * Here we want to call a method for each supported GED event type.
+> +         * The resulting ASL code looks like:
+> +         *
+> +         * Local0 = ISEL
+> +         * If ((Local0 & irq0) == irq0)
+> +         * {
+> +         *     MethodEvent0()
+> +         * }
+> +         *
+> +         * If ((Local0 & irq1) == irq1)
+> +         * {
+> +         *     MethodEvent1()
+> +         * }
+> +         * ...
+> +         */
+> +
+> +        for (i = 0; i < s->ged_events_size; i++) {
+> +            ged_aml = ged_event_aml(&ged_events[i]);
+> +            if (!ged_aml) {
+> +                continue;
+> +            }
+> +
+> +            /* If ((Local1 == irq))*/
+> +            if_ctx = aml_if(aml_equal(aml_and(irq_sel,
+> +                                      aml_int(ged_events[i].selector), NULL),
+> +                                      aml_int(ged_events[i].selector)));
+> +            {
+> +                /* AML for this specific type of event */
+> +                aml_append(if_ctx, ged_aml);
+> +            }
+> +
+> +            /*
+> +             * We append the first "if" to the "while" context.
+> +             * Other "if"s will be "elseif"s.
+> +             */
+> +            aml_append(evt, if_ctx);
+> +        }
+> +    }
+> +
+> +    aml_append(dev, aml_name_decl("_HID", aml_string("ACPI0013")));
+> +    aml_append(dev, aml_name_decl("_UID", aml_string(GED_DEVICE)));
+> +    aml_append(dev, aml_name_decl("_CRS", crs));
+> +
+> +    /* Append IO region */
+> +    aml_append(dev, aml_operation_region(AML_GED_IRQ_REG, rs,
+> +               aml_int(s->ged_base + ACPI_GED_IRQ_SEL_OFFSET),
+> +               ACPI_GED_IRQ_SEL_LEN));
+> +    field = aml_field(AML_GED_IRQ_REG, AML_DWORD_ACC, AML_NOLOCK,
+> +                      AML_WRITE_AS_ZEROS);
+> +    aml_append(field, aml_named_field(AML_GED_IRQ_SEL,
+> +                                      ACPI_GED_IRQ_SEL_LEN * 8));
+> +    aml_append(dev, field);
+> +
+> +    /* Append _EVT method */
+> +    aml_append(dev, evt);
+> +
+> +    aml_append(table, dev);
+> +}
+> +
+> +/* Memory read by the GED _EVT AML dynamic method */
+> +static uint64_t ged_read(void *opaque, hwaddr addr, unsigned size)
+> +{
+> +    uint64_t val = 0;
+> +    GEDState *ged_st = opaque;
+> +
+> +    switch (addr) {
+> +    case ACPI_GED_IRQ_SEL_OFFSET:
+> +        /* Read the selector value and reset it */
+> +        qemu_mutex_lock(&ged_st->lock);
+> +        val = ged_st->sel;
+> +        ged_st->sel = 0;
+> +        qemu_mutex_unlock(&ged_st->lock);
+> +        break;
+> +    default:
+> +        break;
+> +    }
+> +
+> +    return val;
+> +}
+> +
+> +/* Nothing is expected to be written to the GED memory region */
+> +static void ged_write(void *opaque, hwaddr addr, uint64_t data,
+> +                      unsigned int size)
+> +{
+> +}
+> +
+> +static const MemoryRegionOps ged_ops = {
+> +    .read = ged_read,
+> +    .write = ged_write,
+> +    .endianness = DEVICE_LITTLE_ENDIAN,
+> +    .valid = {
+> +        .min_access_size = 4,
+> +        .max_access_size = 4,
+> +    },
+> +};
+> +
+> +static void acpi_ged_event(GEDState *ged_st, uint32_t ged_irq_sel)
+> +{
+> +    /*
+> +     * Set the GED IRQ selector to the expected device type value. This
+> +     * way, the ACPI method will be able to trigger the right code based
+> +     * on a unique IRQ.
+> +     */
+> +    qemu_mutex_lock(&ged_st->lock);
+> +    ged_st->sel = ged_irq_sel;
+> +    qemu_mutex_unlock(&ged_st->lock);
+> +
+> +    /* Trigger the event by sending an interrupt to the guest. */
+> +    qemu_irq_pulse(ged_st->gsi[ged_st->irq]);
+> +}
+> +
+> +static void acpi_ged_init(MemoryRegion *as, DeviceState *dev, GEDState *ged_st)
+> +{
+> +    AcpiGedState *s = ACPI_GED(dev);
+> +
+> +    assert(s->ged_base);
+> +
+> +    ged_st->irq = s->ged_irq;
+> +    ged_st->gsi = s->gsi;
+> +    qemu_mutex_init(&ged_st->lock);
+> +    memory_region_init_io(&ged_st->io, OBJECT(dev), &ged_ops, ged_st,
+> +                          "acpi-ged-event", ACPI_GED_REG_LEN);
+> +    memory_region_add_subregion(as, s->ged_base, &ged_st->io);
+> +}
+> +
+> +static void acpi_ged_device_plug_cb(HotplugHandler *hotplug_dev,
+> +                                    DeviceState *dev, Error **errp)
+> +{
+> +    AcpiGedState *s = ACPI_GED(hotplug_dev);
+> +
+> +    if (s->memhp_state.is_enabled &&
+> +        object_dynamic_cast(OBJECT(dev), TYPE_PC_DIMM)) {
+> +            acpi_memory_plug_cb(hotplug_dev, &s->memhp_state,
+> +                                dev, errp);
+> +    } else {
+> +        error_setg(errp, "virt: device plug request for unsupported device"
+> +                   " type: %s", object_get_typename(OBJECT(dev)));
+> +    }
+> +}
+> +
+> +static void acpi_ged_send_event(AcpiDeviceIf *adev, AcpiEventStatusBits ev)
+> +{
+> +    AcpiGedState *s = ACPI_GED(adev);
+> +    uint32_t sel;
+> +
+> +    if (ev & ACPI_MEMORY_HOTPLUG_STATUS) {
+> +        sel = ACPI_GED_IRQ_SEL_MEM;
+> +    } else {
+> +        /* Unknown event. Return without generating interrupt. */
+> +        return;
+> +    }
+> +
+> +    /*
+> +     * We inject the hotplug interrupt. The IRQ selector will make
+> +     * the difference from the ACPI table.
+> +     */
+> +    acpi_ged_event(&s->ged_state, sel);
+> +}
+> +
+> +static void acpi_ged_device_realize(DeviceState *dev, Error **errp)
+> +{
+> +    AcpiGedState *s = ACPI_GED(dev);
+> +
+> +    if (s->memhp_state.is_enabled) {
+> +        acpi_memory_hotplug_init(get_system_memory(), OBJECT(dev),
+> +                                 &s->memhp_state,
+> +                                 s->memhp_base);
+> +        acpi_ged_init(get_system_memory(), dev, &s->ged_state);
+> +    }
+> +}
+> +
+> +static Property acpi_ged_properties[] = {
+> +    /*
+> +     * Memory hotplug base address is a property of GED here,
+> +     * because GED handles memory hotplug event and MEMORY_HOTPLUG_DEVICE
+> +     * gets initialized when GED device is realized.
+> +     */
+> +    DEFINE_PROP_UINT64("memhp-base", AcpiGedState, memhp_base, 0),
+> +    DEFINE_PROP_BOOL("memory-hotplug-support", AcpiGedState,
+> +                     memhp_state.is_enabled, true),
+> +    DEFINE_PROP_PTR("gsi", AcpiGedState, gsi),
+> +    DEFINE_PROP_UINT64("ged-base", AcpiGedState, ged_base, 0),
+> +    DEFINE_PROP_UINT32("ged-irq", AcpiGedState, ged_irq, 0),
+> +    DEFINE_PROP_PTR("ged-events", AcpiGedState, ged_events),
+> +    DEFINE_PROP_UINT32("ged-events-size", AcpiGedState, ged_events_size, 0),
+> +    DEFINE_PROP_END_OF_LIST(),
+> +};
+> +
+> +static void acpi_ged_class_init(ObjectClass *class, void *data)
+> +{
+> +    DeviceClass *dc = DEVICE_CLASS(class);
+> +    HotplugHandlerClass *hc = HOTPLUG_HANDLER_CLASS(class);
+> +    AcpiDeviceIfClass *adevc = ACPI_DEVICE_IF_CLASS(class);
+> +
+> +    dc->desc = "ACPI";
+> +    dc->props = acpi_ged_properties;
+> +    dc->realize = acpi_ged_device_realize;
+> +
+> +    /* Reason: pointer properties "gsi" and "ged_events" */
+> +    dc->user_creatable = false;
+> +
+> +    hc->plug = acpi_ged_device_plug_cb;
+> +
+> +    adevc->send_event = acpi_ged_send_event;
+> +}
+> +
+> +static const TypeInfo acpi_ged_info = {
+> +    .name          = TYPE_ACPI_GED,
+> +    .parent        = TYPE_DEVICE,
+> +    .instance_size = sizeof(AcpiGedState),
+> +    .class_init    = acpi_ged_class_init,
+> +    .interfaces = (InterfaceInfo[]) {
+> +        { TYPE_HOTPLUG_HANDLER },
+> +        { TYPE_ACPI_DEVICE_IF },
+> +        { }
+> +    }
+> +};
+> +
+> +static void acpi_ged_register_types(void)
+> +{
+> +    type_register_static(&acpi_ged_info);
+> +}
+> +
+> +type_init(acpi_ged_register_types)
+> diff --git a/include/hw/acpi/generic_event_device.h b/include/hw/acpi/generic_event_device.h
+> new file mode 100644
+> index 0000000..9c840d8
+> --- /dev/null
+> +++ b/include/hw/acpi/generic_event_device.h
+> @@ -0,0 +1,121 @@
+> +/*
+> + *
+> + * Copyright (c) 2018 Intel Corporation
+> + *
+> + * This program is free software; you can redistribute it and/or modify it
+> + * under the terms and conditions of the GNU General Public License,
+> + * version 2 or later, as published by the Free Software Foundation.
+> + *
+> + * This program is distributed in the hope it will be useful, but WITHOUT
+> + * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+> + * FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for
+> + * more details.
+> + *
+> + * You should have received a copy of the GNU General Public License along with
+> + * this program.  If not, see <http://www.gnu.org/licenses/>.
+> + *
+> + * The ACPI Generic Event Device (GED) is a hardware-reduced specific
+> + * device[ACPI v6.1 Section 5.6.9] that handles all platform events,
+> + * including the hotplug ones. Generic Event Device allows platforms
+> + * to handle interrupts in ACPI ASL statements. It follows a very
+> + * similar approach like the _EVT method from GPIO events. All
+> + * interrupts are listed in  _CRS and the handler is written in _EVT
+> + * method. Here, we use a single interrupt for the GED device, relying
+> + * on IO memory region to communicate the type of device affected by
+> + * the interrupt. This way, we can support up to 32 events with a
+> + * unique interrupt.
+> + *
+> + * Here is an example.
+> + *
+> + * Device (\_SB.GED)
+> + * {
+> + *     Name (_HID, "ACPI0013")
+> + *     Name (_UID, Zero)
+> + *     Name (_CRS, ResourceTemplate ()
+> + *     {
+> + *         Interrupt (ResourceConsumer, Edge, ActiveHigh, Exclusive, ,, )
+> + *         {
+> + *              0x00000029,
+> + *         }
+> + *     })
+> + *     OperationRegion (IREG, SystemMemory, 0x09080000, 0x04)
+> + *     Field (IREG, DWordAcc, NoLock, WriteAsZeros)
+> + *     {
+> + *         ISEL,   32
+> + *     }
+> + *
+> + *     Method (_EVT, 1, Serialized)  // _EVT: Event
+> + *     {
+> + *         Local0 = ISEL // ISEL = IO memory region which specifies the
+> + *                       // device type.
+> + *         If (((Local0 & irq0) == irq0))
+> + *         {
+> + *             MethodEvent0()
+> + *         }
+> + *         ElseIf ((Local0 & irq1) == irq1)
+> + *         {
+> + *             MethodEvent1()
+> + *         }
+> + *         ...
+> + *     }
+> + * }
+> + *
+> + */
+> +
+> +#ifndef HW_ACPI_GED_H
+> +#define HW_ACPI_GED_H
+> +
+> +#include "hw/acpi/memory_hotplug.h"
+> +
+> +#define TYPE_ACPI_GED "acpi-ged"
+> +#define ACPI_GED(obj) \
+> +    OBJECT_CHECK(AcpiGedState, (obj), TYPE_ACPI_GED)
+> +
+> +#define ACPI_GED_IRQ_SEL_OFFSET 0x0
+> +#define ACPI_GED_IRQ_SEL_LEN    0x4
+> +#define ACPI_GED_IRQ_SEL_MEM    0x1
+> +#define ACPI_GED_REG_LEN        0x4
+> +
+> +#define GED_DEVICE      "GED"
+> +#define AML_GED_IRQ_REG "IREG"
+> +#define AML_GED_IRQ_SEL "ISEL"
+> +
+> +typedef enum {
+> +    GED_MEMORY_HOTPLUG = 1,
+> +} GedEventType;
+> +
+> +/*
+> + * Platforms need to specify their own GedEvent array
+> + * to describe what kind of events they want to support
+> + * through GED.
+> + */
+> +typedef struct GedEvent {
+> +    uint32_t     selector;
+> +    GedEventType event;
+> +} GedEvent;
+> +
+> +typedef struct GEDState {
+> +    MemoryRegion io;
+> +    uint32_t     sel;
+> +    uint32_t     irq;
+> +    qemu_irq     *gsi;
+> +    QemuMutex    lock;
+> +} GEDState;
+> +
+> +
+> +typedef struct AcpiGedState {
+> +    DeviceClass parent_obj;
+> +    MemHotplugState memhp_state;
+> +    hwaddr memhp_base;
+> +    void *gsi;
+> +    hwaddr ged_base;
+> +    GEDState ged_state;
+> +    uint32_t ged_irq;
+> +    void *ged_events;
+> +    uint32_t ged_events_size;
+> +} AcpiGedState;
+> +
+> +void build_ged_aml(Aml *table, const char* name, HotplugHandler *hotplug_dev,
+> +                   uint32_t ged_irq, AmlRegionSpace rs);
+> +
+> +#endif
+> --
+> 2.7.4
 >
-> diff --git a/tests/qemu-iotests/001 b/tests/qemu-iotests/001
-> index 5d266e170a..d87a535c33 100755
-> --- a/tests/qemu-iotests/001
-> +++ b/tests/qemu-iotests/001
-> @@ -38,7 +38,6 @@ trap "_cleanup; exit \$status" 0 1 2 3 15
 >
->  _supported_fmt generic
->  _supported_proto generic
-> -_supported_os Linux
->
->
->  size=3D128M
-> diff --git a/tests/qemu-iotests/002 b/tests/qemu-iotests/002
-> index 7fb85084a1..fd413bce48 100755
-> --- a/tests/qemu-iotests/002
-> +++ b/tests/qemu-iotests/002
-> @@ -38,7 +38,6 @@ trap "_cleanup; exit \$status" 0 1 2 3 15
->
->  _supported_fmt generic
->  _supported_proto generic
-> -_supported_os Linux
->
->
->  size=3D128M
-> diff --git a/tests/qemu-iotests/003 b/tests/qemu-iotests/003
-> index f008c57cdc..ccd3a39dfb 100755
-> --- a/tests/qemu-iotests/003
-> +++ b/tests/qemu-iotests/003
-> @@ -38,7 +38,6 @@ trap "_cleanup; exit \$status" 0 1 2 3 15
->
->  _supported_fmt generic
->  _supported_proto generic
-> -_supported_os Linux
->
->  size=3D128M
->  offset=3D67M
-> diff --git a/tests/qemu-iotests/004 b/tests/qemu-iotests/004
-> index 64fab3e714..d308dc4b49 100755
-> --- a/tests/qemu-iotests/004
-> +++ b/tests/qemu-iotests/004
-> @@ -38,7 +38,6 @@ trap "_cleanup; exit \$status" 0 1 2 3 15
->
->  _supported_fmt raw qcow qcow2 qed vdi vmdk vhdx luks
->  _supported_proto generic
-> -_supported_os Linux
->
->
->  size=3D128M
-> diff --git a/tests/qemu-iotests/007 b/tests/qemu-iotests/007
-> index 3ab5490db3..6abd402423 100755
-> --- a/tests/qemu-iotests/007
-> +++ b/tests/qemu-iotests/007
-> @@ -40,7 +40,6 @@ trap "_cleanup; exit \$status" 0 1 2 3 15
->  # currently only qcow2 allows for consistency checks using qemu-img
->  _supported_fmt qcow2
->  _supported_proto generic
-> -_supported_os Linux
->  # refcount_bits must be at least 4 so we can create ten internal snapsho=
-ts
->  # (1 bit supports none, 2 bits support two, 4 bits support 14)
->  _unsupported_imgopts 'refcount_bits=3D\(1\|2\)[^0-9]'
-> diff --git a/tests/qemu-iotests/008 b/tests/qemu-iotests/008
-> index 75067e36ad..2b81b119bf 100755
-> --- a/tests/qemu-iotests/008
-> +++ b/tests/qemu-iotests/008
-> @@ -38,7 +38,6 @@ trap "_cleanup; exit \$status" 0 1 2 3 15
->
->  _supported_fmt generic
->  _supported_proto generic
-> -_supported_os Linux
->
->
->  size=3D128M
-> diff --git a/tests/qemu-iotests/009 b/tests/qemu-iotests/009
-> index bc4b461122..51b200db1d 100755
-> --- a/tests/qemu-iotests/009
-> +++ b/tests/qemu-iotests/009
-> @@ -38,7 +38,6 @@ trap "_cleanup; exit \$status" 0 1 2 3 15
->
->  _supported_fmt generic
->  _supported_proto generic
-> -_supported_os Linux
->
->
->  size=3D6G
-> diff --git a/tests/qemu-iotests/010 b/tests/qemu-iotests/010
-> index 6920408d28..48c533f632 100755
-> --- a/tests/qemu-iotests/010
-> +++ b/tests/qemu-iotests/010
-> @@ -38,7 +38,6 @@ trap "_cleanup; exit \$status" 0 1 2 3 15
->
->  _supported_fmt generic
->  _supported_proto generic
-> -_supported_os Linux
->
->
->  size=3D6G
-> diff --git a/tests/qemu-iotests/011 b/tests/qemu-iotests/011
-> index b4c7e8f799..8b1fce069a 100755
-> --- a/tests/qemu-iotests/011
-> +++ b/tests/qemu-iotests/011
-> @@ -38,7 +38,6 @@ trap "_cleanup; exit \$status" 0 1 2 3 15
->
->  _supported_fmt generic
->  _supported_proto generic
-> -_supported_os Linux
->
->
->  size=3D6G
-> diff --git a/tests/qemu-iotests/012 b/tests/qemu-iotests/012
-> index 2c3b42d9dd..12957285b3 100755
-> --- a/tests/qemu-iotests/012
-> +++ b/tests/qemu-iotests/012
-> @@ -40,7 +40,6 @@ trap "_cleanup; exit \$status" 0 1 2 3 15
->
->  _supported_fmt generic
->  _supported_proto file
-> -_supported_os Linux
->
->  # Remove once all tests are fixed to use TEST_IMG_FILE
->  # correctly and common.rc sets it unconditionally
-> diff --git a/tests/qemu-iotests/015 b/tests/qemu-iotests/015
-> index 5a4063e4f5..eec5387f3d 100755
-> --- a/tests/qemu-iotests/015
-> +++ b/tests/qemu-iotests/015
-> @@ -40,7 +40,6 @@ trap "_cleanup; exit \$status" 0 1 2 3 15
->  # actually any format that supports snapshots
->  _supported_fmt qcow2
->  _supported_proto generic
-> -_supported_os Linux
->  # Internal snapshots are (currently) impossible with refcount_bits=3D1
->  _unsupported_imgopts 'refcount_bits=3D1[^0-9]'
->
-> diff --git a/tests/qemu-iotests/017 b/tests/qemu-iotests/017
-> index 83744f29a3..79875de454 100755
-> --- a/tests/qemu-iotests/017
-> +++ b/tests/qemu-iotests/017
-> @@ -41,7 +41,6 @@ trap "_cleanup; exit \$status" 0 1 2 3 15
->  _supported_fmt qcow qcow2 vmdk qed
->  _supported_proto generic
->  _unsupported_proto vxhs
-> -_supported_os Linux
->  _unsupported_imgopts "subformat=3DmonolithicFlat" "subformat=3DtwoGbMaxE=
-xtentFlat"
->
->  TEST_OFFSETS=3D"0 4294967296"
-> diff --git a/tests/qemu-iotests/020 b/tests/qemu-iotests/020
-> index 71fa753b4e..6b0ebb37d2 100755
-> --- a/tests/qemu-iotests/020
-> +++ b/tests/qemu-iotests/020
-> @@ -42,7 +42,6 @@ trap "_cleanup; exit \$status" 0 1 2 3 15
->  # Any format supporting backing files
->  _supported_fmt qcow qcow2 vmdk qed
->  _supported_proto file
-> -_supported_os Linux
->  _unsupported_imgopts "subformat=3DmonolithicFlat" \
->                       "subformat=3DtwoGbMaxExtentFlat" \
->                       "subformat=3DtwoGbMaxExtentSparse"
-> diff --git a/tests/qemu-iotests/021 b/tests/qemu-iotests/021
-> index f6555f3b74..f888269fd4 100755
-> --- a/tests/qemu-iotests/021
-> +++ b/tests/qemu-iotests/021
-> @@ -38,7 +38,6 @@ trap "_cleanup; exit \$status" 0 1 2 3 15
->
->  _supported_fmt generic
->  _supported_proto generic
-> -_supported_os Linux
->
->
->  size=3D128M
-> diff --git a/tests/qemu-iotests/022 b/tests/qemu-iotests/022
-> index b68cd64b33..99eb08f57f 100755
-> --- a/tests/qemu-iotests/022
-> +++ b/tests/qemu-iotests/022
-> @@ -42,7 +42,6 @@ trap "_cleanup; exit \$status" 0 1 2 3 15
->  # Any format that supports snapshots
->  _supported_fmt qcow2
->  _supported_proto generic
-> -_supported_os Linux
->
->  TEST_OFFSETS=3D"10485760 4294967296"
->  CLUSTER_SIZE=3D"4096"
-> diff --git a/tests/qemu-iotests/025 b/tests/qemu-iotests/025
-> index d9a4ebc5e7..e05d833452 100755
-> --- a/tests/qemu-iotests/025
-> +++ b/tests/qemu-iotests/025
-> @@ -39,7 +39,6 @@ trap "_cleanup; exit \$status" 0 1 2 3 15
->
->  _supported_fmt raw qcow2 qed luks
->  _supported_proto file sheepdog rbd nfs
-> -_supported_os Linux
->
->  echo "=3D=3D=3D Creating image"
->  echo
-> diff --git a/tests/qemu-iotests/026 b/tests/qemu-iotests/026
-> index ca89ad7048..e30243608b 100755
-> --- a/tests/qemu-iotests/026
-> +++ b/tests/qemu-iotests/026
-> @@ -41,7 +41,6 @@ trap "_cleanup; exit \$status" 0 1 2 3 15
->  # Currently only qcow2 supports rebasing
->  _supported_fmt qcow2
->  _supported_proto file
-> -_supported_os Linux
->  _default_cache_mode "writethrough"
->  _supported_cache_modes "writethrough" "none"
->  # The refcount table tests expect a certain minimum width for refcount e=
-ntries
-> diff --git a/tests/qemu-iotests/027 b/tests/qemu-iotests/027
-> index b7df9701f7..4cb638022a 100755
-> --- a/tests/qemu-iotests/027
-> +++ b/tests/qemu-iotests/027
-> @@ -38,7 +38,6 @@ trap "_cleanup; exit \$status" 0 1 2 3 15
->
->  _supported_fmt vmdk qcow qcow2 qed
->  _supported_proto generic
-> -_supported_os Linux
->
->
->  size=3D128M
-> diff --git a/tests/qemu-iotests/029 b/tests/qemu-iotests/029
-> index 5f42f76cc6..94c2713132 100755
-> --- a/tests/qemu-iotests/029
-> +++ b/tests/qemu-iotests/029
-> @@ -42,7 +42,6 @@ trap "_cleanup; exit \$status" 0 1 2 3 15
->  _supported_fmt qcow2
->  _supported_proto generic
->  _unsupported_proto vxhs
-> -_supported_os Linux
->  # Internal snapshots are (currently) impossible with refcount_bits=3D1
->  _unsupported_imgopts 'refcount_bits=3D1[^0-9]'
->
-> diff --git a/tests/qemu-iotests/031 b/tests/qemu-iotests/031
-> index ef92d8eee3..a3c25ec237 100755
-> --- a/tests/qemu-iotests/031
-> +++ b/tests/qemu-iotests/031
-> @@ -40,7 +40,6 @@ trap "_cleanup; exit \$status" 0 1 2 3 15
->  # This tests qcow2-specific low-level functionality
->  _supported_fmt qcow2
->  _supported_proto file
-> -_supported_os Linux
->
->  CLUSTER_SIZE=3D65536
->
-> diff --git a/tests/qemu-iotests/032 b/tests/qemu-iotests/032
-> index a1757bb15e..23c216c549 100755
-> --- a/tests/qemu-iotests/032
-> +++ b/tests/qemu-iotests/032
-> @@ -42,7 +42,6 @@ trap "_cleanup; exit \$status" 0 1 2 3 15
->  # This works for any image format (though unlikely to segfault for raw)
->  _supported_fmt generic
->  _supported_proto generic
-> -_supported_os Linux
->
->  echo
->  echo =3D=3D=3D Prepare image =3D=3D=3D
-> diff --git a/tests/qemu-iotests/033 b/tests/qemu-iotests/033
-> index cfdf1ec2ba..362a48c0a0 100755
-> --- a/tests/qemu-iotests/033
-> +++ b/tests/qemu-iotests/033
-> @@ -38,7 +38,6 @@ trap "_cleanup; exit \$status" 0 1 2 3 15
->
->  _supported_fmt generic
->  _supported_proto generic
-> -_supported_os Linux
->
->
->  size=3D128M
-> diff --git a/tests/qemu-iotests/035 b/tests/qemu-iotests/035
-> index 46aa835936..ad6fa3115a 100755
-> --- a/tests/qemu-iotests/035
-> +++ b/tests/qemu-iotests/035
-> @@ -39,7 +39,6 @@ trap "_cleanup; exit \$status" 0 1 2 3 15
->
->  _supported_fmt qcow2
->  _supported_proto generic
-> -_supported_os Linux
->
->
->  size=3D6G
-> diff --git a/tests/qemu-iotests/036 b/tests/qemu-iotests/036
-> index 1b56394129..f06ff67408 100755
-> --- a/tests/qemu-iotests/036
-> +++ b/tests/qemu-iotests/036
-> @@ -43,7 +43,6 @@ trap "_cleanup; exit \$status" 0 1 2 3 15
->  # This tests qcow2-specific low-level functionality
->  _supported_fmt qcow2
->  _supported_proto file
-> -_supported_os Linux
->
->  # Only qcow2v3 and later supports feature bits
->  IMGOPTS=3D"compat=3D1.1"
-> diff --git a/tests/qemu-iotests/037 b/tests/qemu-iotests/037
-> index 0781bebefe..819a2a52d2 100755
-> --- a/tests/qemu-iotests/037
-> +++ b/tests/qemu-iotests/037
-> @@ -38,7 +38,6 @@ trap "_cleanup; exit \$status" 0 1 2 3 15
->
->  _supported_fmt qcow qcow2 vmdk qed
->  _supported_proto file
-> -_supported_os Linux
->  _unsupported_imgopts "subformat=3DmonolithicFlat" \
->                       "subformat=3DtwoGbMaxExtentFlat" \
->                       "subformat=3DtwoGbMaxExtentSparse"
-> diff --git a/tests/qemu-iotests/042 b/tests/qemu-iotests/042
-> index a9a7fc3041..0e85b356b7 100755
-> --- a/tests/qemu-iotests/042
-> +++ b/tests/qemu-iotests/042
-> @@ -38,7 +38,6 @@ trap "_cleanup; exit \$status" 0 1 2 3 15
->
->  _supported_fmt qcow2 qed
->  _supported_proto file
-> -_supported_os Linux
->
->  echo
->  echo "=3D=3D Creating zero size image =3D=3D"
-> diff --git a/tests/qemu-iotests/043 b/tests/qemu-iotests/043
-> index 9894b154ec..67cc7e74c2 100755
-> --- a/tests/qemu-iotests/043
-> +++ b/tests/qemu-iotests/043
-> @@ -40,7 +40,6 @@ trap "_cleanup; exit \$status" 0 1 2 3 15
->  # Any format supporting backing files
->  _supported_fmt qcow2 qed
->  _supported_proto file
-> -_supported_os Linux
->
->
->  size=3D128M
-> diff --git a/tests/qemu-iotests/046 b/tests/qemu-iotests/046
-> index 95160bea4c..543355c64f 100755
-> --- a/tests/qemu-iotests/046
-> +++ b/tests/qemu-iotests/046
-> @@ -38,7 +38,6 @@ trap "_cleanup; exit \$status" 0 1 2 3 15
->
->  _supported_fmt qcow2
->  _supported_proto file
-> -_supported_os Linux
->
->  CLUSTER_SIZE=3D64k
->  size=3D128M
-> diff --git a/tests/qemu-iotests/047 b/tests/qemu-iotests/047
-> index ce81fc6fa7..4528465fb0 100755
-> --- a/tests/qemu-iotests/047
-> +++ b/tests/qemu-iotests/047
-> @@ -39,7 +39,6 @@ trap "_cleanup; exit \$status" 0 1 2 3 15
->
->  _supported_fmt qcow2
->  _supported_proto generic
-> -_supported_os Linux
->
->  size=3D128M
->
-> diff --git a/tests/qemu-iotests/049 b/tests/qemu-iotests/049
-> index bc09cd6717..c100d30ed0 100755
-> --- a/tests/qemu-iotests/049
-> +++ b/tests/qemu-iotests/049
-> @@ -38,7 +38,6 @@ trap "_cleanup; exit \$status" 0 1 2 3 15
->
->  _supported_fmt qcow2
->  _supported_proto file
-> -_supported_os Linux
->
->  filter_test_dir()
->  {
-> diff --git a/tests/qemu-iotests/050 b/tests/qemu-iotests/050
-> index dd7b2c72eb..211fc00797 100755
-> --- a/tests/qemu-iotests/050
-> +++ b/tests/qemu-iotests/050
-> @@ -40,7 +40,6 @@ trap "_cleanup; exit \$status" 0 1 2 3 15
->
->  _supported_fmt qcow2 qed
->  _supported_proto file
-> -_supported_os Linux
->
->  if test "$IMGFMT" =3D qcow2 && test $IMGOPTS =3D ""; then
->    IMGOPTS=3Dcompat=3D1.1
-> diff --git a/tests/qemu-iotests/051 b/tests/qemu-iotests/051
-> index 02ac960da4..a3deb1fcad 100755
-> --- a/tests/qemu-iotests/051
-> +++ b/tests/qemu-iotests/051
-> @@ -38,7 +38,6 @@ trap "_cleanup; exit \$status" 0 1 2 3 15
->
->  _supported_fmt qcow2
->  _supported_proto file
-> -_supported_os Linux
->  # A compat=3D0.10 image is created in this test which does not support a=
-nything
->  # other than refcount_bits=3D16
->  _unsupported_imgopts 'refcount_bits=3D\([^1]\|.\([^6]\|$\)\)'
-> diff --git a/tests/qemu-iotests/052 b/tests/qemu-iotests/052
-> index b3a2dc1143..6e2ecbfe21 100755
-> --- a/tests/qemu-iotests/052
-> +++ b/tests/qemu-iotests/052
-> @@ -38,7 +38,6 @@ trap "_cleanup; exit \$status" 0 1 2 3 15
->
->  _supported_fmt generic
->  _supported_proto file
-> -_supported_os Linux
->
->  # Don't do O_DIRECT on tmpfs
->  _supported_cache_modes "writeback" "writethrough" "unsafe"
-> diff --git a/tests/qemu-iotests/053 b/tests/qemu-iotests/053
-> index 50c62f0f56..e82bb69881 100755
-> --- a/tests/qemu-iotests/053
-> +++ b/tests/qemu-iotests/053
-> @@ -39,7 +39,6 @@ trap "_cleanup; exit \$status" 0 1 2 3 15
->
->  _supported_fmt qcow2 qcow
->  _supported_proto file
-> -_supported_os Linux
->
->  echo
->  echo "=3D=3D Creating single sector image =3D=3D"
-> diff --git a/tests/qemu-iotests/054 b/tests/qemu-iotests/054
-> index 0d5e14f847..a8905b60d0 100755
-> --- a/tests/qemu-iotests/054
-> +++ b/tests/qemu-iotests/054
-> @@ -38,7 +38,6 @@ trap "_cleanup; exit \$status" 0 1 2 3 15
->
->  _supported_fmt qcow2
->  _supported_proto file
-> -_supported_os Linux
->
->  echo
->  echo "creating too large image (1 EB)"
-> diff --git a/tests/qemu-iotests/062 b/tests/qemu-iotests/062
-> index ed7400fed2..d5f818fcce 100755
-> --- a/tests/qemu-iotests/062
-> +++ b/tests/qemu-iotests/062
-> @@ -40,7 +40,6 @@ trap "_cleanup; exit \$status" 0 1 2 3 15
->  # This tests qocw2-specific low-level functionality
->  _supported_fmt qcow2
->  _supported_proto generic
-> -_supported_os Linux
->
->  IMGOPTS=3D"compat=3D1.1"
->  IMG_SIZE=3D64M
-> diff --git a/tests/qemu-iotests/063 b/tests/qemu-iotests/063
-> index 2d5c0ce9fb..fe4892e467 100755
-> --- a/tests/qemu-iotests/063
-> +++ b/tests/qemu-iotests/063
-> @@ -41,7 +41,6 @@ trap "_cleanup; exit \$status" 0 1 2 3 15
->
->  _supported_fmt qcow qcow2 vmdk qed raw
->  _supported_proto file
-> -_supported_os Linux
->  _unsupported_imgopts "subformat=3DmonolithicFlat" \
->                       "subformat=3DtwoGbMaxExtentFlat" \
->                       "subformat=3DtwoGbMaxExtentSparse"
-> diff --git a/tests/qemu-iotests/066 b/tests/qemu-iotests/066
-> index f480986e35..28f8c98412 100755
-> --- a/tests/qemu-iotests/066
-> +++ b/tests/qemu-iotests/066
-> @@ -39,7 +39,6 @@ trap "_cleanup; exit \$status" 0 1 2 3 15
->  # This tests qocw2-specific low-level functionality
->  _supported_fmt qcow2
->  _supported_proto generic
-> -_supported_os Linux
->
->  # Intentionally create an unaligned image
->  IMGOPTS=3D"compat=3D1.1"
-> diff --git a/tests/qemu-iotests/067 b/tests/qemu-iotests/067
-> index fda16a6b0d..926c79b37c 100755
-> --- a/tests/qemu-iotests/067
-> +++ b/tests/qemu-iotests/067
-> @@ -32,7 +32,6 @@ status=3D1	# failure is the default!
->
->  _supported_fmt qcow2
->  _supported_proto file
-> -_supported_os Linux
->  # Because anything other than 16 would change the output of query-block
->  _unsupported_imgopts 'refcount_bits=3D\([^1]\|.\([^6]\|$\)\)'
->
-> diff --git a/tests/qemu-iotests/068 b/tests/qemu-iotests/068
-> index 881a022107..22f5ca3ba6 100755
-> --- a/tests/qemu-iotests/068
-> +++ b/tests/qemu-iotests/068
-> @@ -39,7 +39,6 @@ trap "_cleanup; exit \$status" 0 1 2 3 15
->  # This tests qocw2-specific low-level functionality
->  _supported_fmt qcow2
->  _supported_proto generic
-> -_supported_os Linux
->
->  IMGOPTS=3D"compat=3D1.1"
->  IMG_SIZE=3D128K
-> diff --git a/tests/qemu-iotests/069 b/tests/qemu-iotests/069
-> index 6a8e4aa22e..3974714852 100755
-> --- a/tests/qemu-iotests/069
-> +++ b/tests/qemu-iotests/069
-> @@ -38,7 +38,6 @@ trap "_cleanup; exit \$status" 0 1 2 3 15
->
->  _supported_fmt qed qcow qcow2 vmdk
->  _supported_proto file
-> -_supported_os Linux
->  _unsupported_imgopts "subformat=3DmonolithicFlat" "subformat=3DtwoGbMaxE=
-xtentFlat"
->
->  IMG_SIZE=3D128K
-> diff --git a/tests/qemu-iotests/071 b/tests/qemu-iotests/071
-> index 7f3e5abd57..1cca9233d0 100755
-> --- a/tests/qemu-iotests/071
-> +++ b/tests/qemu-iotests/071
-> @@ -38,7 +38,6 @@ trap "_cleanup; exit \$status" 0 1 2 3 15
->
->  _supported_fmt qcow2
->  _supported_proto file
-> -_supported_os Linux
->
->  do_run_qemu()
->  {
-> diff --git a/tests/qemu-iotests/072 b/tests/qemu-iotests/072
-> index 6f9f247fa5..661b36da2d 100755
-> --- a/tests/qemu-iotests/072
-> +++ b/tests/qemu-iotests/072
-> @@ -38,7 +38,6 @@ trap "_cleanup; exit \$status" 0 1 2 3 15
->
->  _supported_fmt vpc vmdk vhdx vdi qed qcow2 qcow
->  _supported_proto file
-> -_supported_os Linux
->
->  IMG_SIZE=3D64M
->
-> diff --git a/tests/qemu-iotests/073 b/tests/qemu-iotests/073
-> index 990f90acbd..e684b1b780 100755
-> --- a/tests/qemu-iotests/073
-> +++ b/tests/qemu-iotests/073
-> @@ -39,7 +39,6 @@ trap "_cleanup; exit \$status" 0 1 2 3 15
->  _supported_fmt qcow2
->  _supported_proto generic
->  _unsupported_proto vxhs
-> -_supported_os Linux
->
->  CLUSTER_SIZE=3D64k
->  size=3D128M
-> diff --git a/tests/qemu-iotests/079 b/tests/qemu-iotests/079
-> index 1b6594ebef..81f0c21f53 100755
-> --- a/tests/qemu-iotests/079
-> +++ b/tests/qemu-iotests/079
-> @@ -38,7 +38,6 @@ trap "_cleanup; exit \$status" 0 1 2 3 15
->
->  _supported_fmt qcow2
->  _supported_proto file nfs
-> -_supported_os Linux
->
->  echo "=3D=3D=3D Check option preallocation and cluster_size =3D=3D=3D"
->  echo
-> diff --git a/tests/qemu-iotests/082 b/tests/qemu-iotests/082
-> index d0afa46e9a..d084a0844d 100755
-> --- a/tests/qemu-iotests/082
-> +++ b/tests/qemu-iotests/082
-> @@ -38,7 +38,6 @@ trap "_cleanup; exit \$status" 0 1 2 3 15
->
->  _supported_fmt qcow2
->  _supported_proto file nfs
-> -_supported_os Linux
->
->  run_qemu_img()
->  {
-> diff --git a/tests/qemu-iotests/085 b/tests/qemu-iotests/085
-> index 68cb665987..d40fdab542 100755
-> --- a/tests/qemu-iotests/085
-> +++ b/tests/qemu-iotests/085
-> @@ -56,7 +56,6 @@ trap "_cleanup; exit \$status" 0 1 2 3 15
->
->  _supported_fmt qcow2
->  _supported_proto file
-> -_supported_os Linux
->
->
->  # ${1}: unique identifier for the snapshot filename
-> diff --git a/tests/qemu-iotests/089 b/tests/qemu-iotests/089
-> index 6609954908..ad029f1f09 100755
-> --- a/tests/qemu-iotests/089
-> +++ b/tests/qemu-iotests/089
-> @@ -38,7 +38,6 @@ trap "_cleanup; exit \$status" 0 1 2 3 15
->
->  _supported_fmt qcow2
->  _supported_proto file
-> -_supported_os Linux
->  # Because anything other than 16 would change the output of qemu_io -c i=
-nfo
->  _unsupported_imgopts 'refcount_bits=3D\([^1]\|.\([^6]\|$\)\)'
->
-> diff --git a/tests/qemu-iotests/090 b/tests/qemu-iotests/090
-> index 193bae7d77..9f8cfbb80f 100755
-> --- a/tests/qemu-iotests/090
-> +++ b/tests/qemu-iotests/090
-> @@ -38,7 +38,6 @@ trap "_cleanup; exit \$status" 0 1 2 3 15
->
->  _supported_fmt qcow2
->  _supported_proto file nfs
-> -_supported_os Linux
->
->  IMG_SIZE=3D128K
->
-> diff --git a/tests/qemu-iotests/094 b/tests/qemu-iotests/094
-> index 0bcca77261..9343e09492 100755
-> --- a/tests/qemu-iotests/094
-> +++ b/tests/qemu-iotests/094
-> @@ -42,7 +42,6 @@ trap "_cleanup; exit \$status" 0 1 2 3 15
->
->  _supported_fmt generic
->  _supported_proto nbd
-> -_supported_os Linux
->  _unsupported_imgopts "subformat=3DmonolithicFlat" "subformat=3DtwoGbMaxE=
-xtentFlat"
->
->  _make_test_img 64M
-> diff --git a/tests/qemu-iotests/095 b/tests/qemu-iotests/095
-> index 18505b7181..58fe174b5e 100755
-> --- a/tests/qemu-iotests/095
-> +++ b/tests/qemu-iotests/095
-> @@ -44,7 +44,6 @@ trap "_cleanup; exit \$status" 0 1 2 3 15
->
->  _supported_fmt qcow2
->  _supported_proto file
-> -_supported_os Linux
->
->  size_smaller=3D5M
->  size_larger=3D100M
-> diff --git a/tests/qemu-iotests/098 b/tests/qemu-iotests/098
-> index 461144c831..1c1d1c468f 100755
-> --- a/tests/qemu-iotests/098
-> +++ b/tests/qemu-iotests/098
-> @@ -40,7 +40,6 @@ trap "_cleanup; exit \$status" 0 1 2 3 15
->
->  _supported_fmt qcow2
->  _supported_proto file
-> -_supported_os Linux
->
->  IMGOPTS=3D"compat=3D1.1"
->
-> diff --git a/tests/qemu-iotests/102 b/tests/qemu-iotests/102
-> index cedd2b25dc..749ff66b8a 100755
-> --- a/tests/qemu-iotests/102
-> +++ b/tests/qemu-iotests/102
-> @@ -40,7 +40,6 @@ trap "_cleanup; exit \$status" 0 1 2 3 15
->
->  _supported_fmt qcow2
->  _supported_proto file
-> -_supported_os Linux
->
->  IMG_SIZE=3D64K
->
-> diff --git a/tests/qemu-iotests/103 b/tests/qemu-iotests/103
-> index 6773e94d9f..554b9de054 100755
-> --- a/tests/qemu-iotests/103
-> +++ b/tests/qemu-iotests/103
-> @@ -38,7 +38,6 @@ trap "_cleanup; exit \$status" 0 1 2 3 15
->
->  _supported_fmt qcow2
->  _supported_proto file nfs
-> -_supported_os Linux
->  # Internal snapshots are (currently) impossible with refcount_bits=3D1
->  _unsupported_imgopts 'refcount_bits=3D1[^0-9]'
->
-> diff --git a/tests/qemu-iotests/104 b/tests/qemu-iotests/104
-> index 390167bad4..c70f28a9a1 100755
-> --- a/tests/qemu-iotests/104
-> +++ b/tests/qemu-iotests/104
-> @@ -34,7 +34,6 @@ trap "exit \$status" 0 1 2 3 15
->
->  _supported_fmt raw qcow qcow2 qed vdi vmdk vhdx
->  _supported_proto generic
-> -_supported_os Linux
->
->  echo "=3D=3D=3D Check qemu-img info output =3D=3D=3D"
->  echo
-> diff --git a/tests/qemu-iotests/105 b/tests/qemu-iotests/105
-> index 3b5a596844..3346e8cb25 100755
-> --- a/tests/qemu-iotests/105
-> +++ b/tests/qemu-iotests/105
-> @@ -38,7 +38,6 @@ trap "_cleanup; exit \$status" 0 1 2 3 15
->
->  _supported_fmt qcow2 vmdk vhdx qed
->  _supported_proto generic
-> -_supported_os Linux
->  _unsupported_imgopts "subformat=3DtwoGbMaxExtentFlat" \
->                       "subformat=3DtwoGbMaxExtentSparse"
->
-> diff --git a/tests/qemu-iotests/107 b/tests/qemu-iotests/107
-> index fcd5a24dfe..268ba27688 100755
-> --- a/tests/qemu-iotests/107
-> +++ b/tests/qemu-iotests/107
-> @@ -38,7 +38,6 @@ trap "_cleanup; exit \$status" 0 1 2 3 15
->
->  _supported_fmt qcow2
->  _supported_proto file nfs
-> -_supported_os Linux
->
->
->  IMG_SIZE=3D64K
-> diff --git a/tests/qemu-iotests/110 b/tests/qemu-iotests/110
-> index fad672c1ae..4318341ac5 100755
-> --- a/tests/qemu-iotests/110
-> +++ b/tests/qemu-iotests/110
-> @@ -40,7 +40,6 @@ trap "_cleanup; exit \$status" 0 1 2 3 15
->  # Any format supporting backing files
->  _supported_fmt qed qcow qcow2 vmdk
->  _supported_proto file
-> -_supported_os Linux
->  _unsupported_imgopts "subformat=3DmonolithicFlat" "subformat=3DtwoGbMaxE=
-xtentFlat"
->
->  TEST_IMG_REL=3D$(basename "$TEST_IMG")
-> diff --git a/tests/qemu-iotests/111 b/tests/qemu-iotests/111
-> index 57395be64c..490a5bbcb5 100755
-> --- a/tests/qemu-iotests/111
-> +++ b/tests/qemu-iotests/111
-> @@ -39,7 +39,6 @@ trap "_cleanup; exit \$status" 0 1 2 3 15
->
->  _supported_fmt qed qcow qcow2 vmdk
->  _supported_proto file
-> -_supported_os Linux
->  _unsupported_imgopts "subformat=3DmonolithicFlat" "subformat=3DtwoGbMaxE=
-xtentFlat"
->
->  $QEMU_IMG create -f $IMGFMT -b "$TEST_IMG.inexistent" "$TEST_IMG" 2>&1 \
-> diff --git a/tests/qemu-iotests/112 b/tests/qemu-iotests/112
-> index 6d81c75a9c..706c10b600 100755
-> --- a/tests/qemu-iotests/112
-> +++ b/tests/qemu-iotests/112
-> @@ -39,7 +39,6 @@ trap "_cleanup; exit \$status" 0 1 2 3 15
->  # This tests qcow2-specific low-level functionality
->  _supported_fmt qcow2
->  _supported_proto file
-> -_supported_os Linux
->  # This test will set refcount_bits on its own which would conflict with =
-the
->  # manual setting; compat will be overridden as well
->  _unsupported_imgopts refcount_bits 'compat=3D0.10'
-> diff --git a/tests/qemu-iotests/114 b/tests/qemu-iotests/114
-> index f36b88f3f3..f90a744fc0 100755
-> --- a/tests/qemu-iotests/114
-> +++ b/tests/qemu-iotests/114
-> @@ -39,7 +39,6 @@ trap "_cleanup; exit \$status" 0 1 2 3 15
->  _supported_fmt qcow2
->  _supported_proto generic
->  _unsupported_proto vxhs
-> -_supported_os Linux
->
->
->  TEST_IMG=3D"$TEST_IMG.base" _make_test_img 64M
-> diff --git a/tests/qemu-iotests/115 b/tests/qemu-iotests/115
-> index 7ed347010f..9ed3cb6a83 100755
-> --- a/tests/qemu-iotests/115
-> +++ b/tests/qemu-iotests/115
-> @@ -38,7 +38,6 @@ trap "_cleanup; exit \$status" 0 1 2 3 15
->
->  _supported_fmt qcow2
->  _supported_proto file
-> -_supported_os Linux
->  # This test relies on refcounts being 64 bits wide (which does not work =
-with
->  # compat=3D0.10)
->  _unsupported_imgopts 'refcount_bits=3D\([^6]\|.\([^4]\|$\)\)' 'compat=3D=
-0.10'
-> diff --git a/tests/qemu-iotests/117 b/tests/qemu-iotests/117
-> index 0af0f31c5a..f37b34f8b1 100755
-> --- a/tests/qemu-iotests/117
-> +++ b/tests/qemu-iotests/117
-> @@ -40,7 +40,6 @@ trap "_cleanup; exit \$status" 0 1 2 3 15
->
->  _supported_fmt qcow2
->  _supported_proto file
-> -_supported_os Linux
->
->  _make_test_img 64k
->
-> diff --git a/tests/qemu-iotests/120 b/tests/qemu-iotests/120
-> index ca95b9276e..e9b4fbb009 100755
-> --- a/tests/qemu-iotests/120
-> +++ b/tests/qemu-iotests/120
-> @@ -39,7 +39,6 @@ trap "_cleanup; exit \$status" 0 1 2 3 15
->
->  _supported_fmt generic
->  _supported_proto file
-> -_supported_os Linux
->  _unsupported_fmt luks
->
->  _make_test_img 64M
-> diff --git a/tests/qemu-iotests/125 b/tests/qemu-iotests/125
-> index 212dcd8f0d..dc4b8f5fb9 100755
-> --- a/tests/qemu-iotests/125
-> +++ b/tests/qemu-iotests/125
-> @@ -44,7 +44,6 @@ get_image_size_on_host()
->
->  _supported_fmt qcow2
->  _supported_proto file
-> -_supported_os Linux
->
->  if [ -z "$TEST_IMG_FILE" ]; then
->      TEST_IMG_FILE=3D$TEST_IMG
-> diff --git a/tests/qemu-iotests/126 b/tests/qemu-iotests/126
-> index 96dc048d59..580fae5d62 100755
-> --- a/tests/qemu-iotests/126
-> +++ b/tests/qemu-iotests/126
-> @@ -37,7 +37,6 @@ _supported_fmt qcow qcow2 qed vmdk
->  # colons which separate a protocol prefix from the rest and colons which=
- are
->  # just part of the filename, so we cannot test protocols which require a=
- prefix)
->  _supported_proto file
-> -_supported_os Linux
->
->  echo
->  echo '=3D=3D=3D Testing plain files =3D=3D=3D'
-> diff --git a/tests/qemu-iotests/127 b/tests/qemu-iotests/127
-> index 3e941f74d4..b64926ab31 100755
-> --- a/tests/qemu-iotests/127
-> +++ b/tests/qemu-iotests/127
-> @@ -42,7 +42,6 @@ trap "_cleanup; exit \$status" 0 1 2 3 15
->
->  _supported_fmt qcow2
->  _supported_proto file
-> -_supported_os Linux
->
->  IMG_SIZE=3D64K
->
-> diff --git a/tests/qemu-iotests/133 b/tests/qemu-iotests/133
-> index 1f6056d144..6f7cacc091 100755
-> --- a/tests/qemu-iotests/133
-> +++ b/tests/qemu-iotests/133
-> @@ -38,7 +38,6 @@ trap "_cleanup; exit \$status" 0 1 2 3 15
->
->  _supported_fmt qcow2
->  _supported_proto file
-> -_supported_os Linux
->
->  TEST_IMG=3D"$TEST_IMG.base" _make_test_img 64M
->  _make_test_img -b "$TEST_IMG.base"
-> diff --git a/tests/qemu-iotests/134 b/tests/qemu-iotests/134
-> index e9e3e84c2a..141a2eaa7e 100755
-> --- a/tests/qemu-iotests/134
-> +++ b/tests/qemu-iotests/134
-> @@ -39,7 +39,6 @@ trap "_cleanup; exit \$status" 0 1 2 3 15
->  _supported_fmt qcow qcow2
->  _supported_proto generic
->  _unsupported_proto vxhs
-> -_supported_os Linux
->
->
->  size=3D128M
-> diff --git a/tests/qemu-iotests/142 b/tests/qemu-iotests/142
-> index d9b98cf60a..6b62271876 100755
-> --- a/tests/qemu-iotests/142
-> +++ b/tests/qemu-iotests/142
-> @@ -39,7 +39,6 @@ trap "_cleanup; exit \$status" 0 1 2 3 15
->
->  _supported_fmt qcow2
->  _supported_proto file
-> -_supported_os Linux
->
->  # We test all cache modes anyway, but O_DIRECT needs to be supported
->  _default_cache_mode none
-> diff --git a/tests/qemu-iotests/143 b/tests/qemu-iotests/143
-> index c223867cb3..92249ac8da 100755
-> --- a/tests/qemu-iotests/143
-> +++ b/tests/qemu-iotests/143
-> @@ -40,7 +40,6 @@ trap "_cleanup; exit \$status" 0 1 2 3 15
->
->  _supported_fmt generic
->  _supported_proto generic
-> -_supported_os Linux
->
->  keep_stderr=3Dy \
->  _launch_qemu 2> >(_filter_nbd)
-> diff --git a/tests/qemu-iotests/144 b/tests/qemu-iotests/144
-> index 15157f33d7..011ed4f2bc 100755
-> --- a/tests/qemu-iotests/144
-> +++ b/tests/qemu-iotests/144
-> @@ -46,7 +46,6 @@ trap "_cleanup; exit \$status" 0 1 2 3 15
->
->  _supported_fmt qcow2
->  _supported_proto file
-> -_supported_os Linux
->
->  size=3D512M
->
-> diff --git a/tests/qemu-iotests/145 b/tests/qemu-iotests/145
-> index 28878dc8a1..9427549651 100755
-> --- a/tests/qemu-iotests/145
-> +++ b/tests/qemu-iotests/145
-> @@ -39,7 +39,6 @@ trap "_cleanup; exit \$status" 0 1 2 3 15
->
->  _supported_fmt generic
->  _supported_proto generic
-> -_supported_os Linux
->
->  _make_test_img 1M
->
-> diff --git a/tests/qemu-iotests/153 b/tests/qemu-iotests/153
-> index 08ad8a6730..c969a1a16f 100755
-> --- a/tests/qemu-iotests/153
-> +++ b/tests/qemu-iotests/153
-> @@ -62,7 +62,6 @@ _check_ofd || _notrun "OFD lock not available"
->
->  _supported_fmt qcow2
->  _supported_proto file
-> -_supported_os Linux
->
->  _run_cmd()
->  {
-> diff --git a/tests/qemu-iotests/156 b/tests/qemu-iotests/156
-> index 8d134029c6..2ffa3ca942 100755
-> --- a/tests/qemu-iotests/156
-> +++ b/tests/qemu-iotests/156
-> @@ -49,7 +49,6 @@ trap "_cleanup; exit \$status" 0 1 2 3 15
->  _supported_fmt qcow2 qed
->  _supported_proto generic
->  _unsupported_proto vxhs
-> -_supported_os Linux
->
->  # Create source disk
->  TEST_IMG=3D"$TEST_IMG.backing" _make_test_img 1M
-> diff --git a/tests/qemu-iotests/157 b/tests/qemu-iotests/157
-> index 69b25cab30..7cbac38099 100755
-> --- a/tests/qemu-iotests/157
-> +++ b/tests/qemu-iotests/157
-> @@ -38,7 +38,6 @@ trap "_cleanup; exit \$status" 0 1 2 3 15
->
->  _supported_fmt generic
->  _supported_proto file
-> -_supported_os Linux
->
->  do_run_qemu()
->  {
-> diff --git a/tests/qemu-iotests/158 b/tests/qemu-iotests/158
-> index 8c0928a7f9..ba4db6116a 100755
-> --- a/tests/qemu-iotests/158
-> +++ b/tests/qemu-iotests/158
-> @@ -39,7 +39,6 @@ trap "_cleanup; exit \$status" 0 1 2 3 15
->  _supported_fmt qcow qcow2
->  _supported_proto generic
->  _unsupported_proto vxhs
-> -_supported_os Linux
->
->
->  size=3D128M
-> diff --git a/tests/qemu-iotests/159 b/tests/qemu-iotests/159
-> index 29066eebde..2557140ac2 100755
-> --- a/tests/qemu-iotests/159
-> +++ b/tests/qemu-iotests/159
-> @@ -38,7 +38,6 @@ trap "_cleanup; exit \$status" 0 1 2 3 15
->
->  _supported_fmt generic
->  _supported_proto file
-> -_supported_os Linux
->  _unsupported_fmt luks
->
->  TEST_SIZES=3D"5 512 1024 1999 1K 64K 1M"
-> diff --git a/tests/qemu-iotests/162 b/tests/qemu-iotests/162
-> index 2e9947fd9a..4e5ed74fd5 100755
-> --- a/tests/qemu-iotests/162
-> +++ b/tests/qemu-iotests/162
-> @@ -39,7 +39,6 @@ trap "_cleanup; exit \$status" 0 1 2 3 15
->  . ./common.filter
->
->  _supported_fmt generic
-> -_supported_os Linux
->
->  test_ssh=3D$($QEMU_IMG --help | grep '^Supported formats:.* ssh\( \|$\)')
->  [ "$test_ssh" =3D "" ] && _notrun "ssh support required"
-> diff --git a/tests/qemu-iotests/170 b/tests/qemu-iotests/170
-> index 7deb7563c9..05dd6ed6c3 100755
-> --- a/tests/qemu-iotests/170
-> +++ b/tests/qemu-iotests/170
-> @@ -38,7 +38,6 @@ trap "_cleanup; exit \$status" 0 1 2 3 15
->
->  _supported_fmt generic
->  _supported_proto file
-> -_supported_os Linux
->  _unsupported_fmt luks
->
->  echo
-> diff --git a/tests/qemu-iotests/173 b/tests/qemu-iotests/173
-> index 47036a5564..9e2fa2e73c 100755
-> --- a/tests/qemu-iotests/173
-> +++ b/tests/qemu-iotests/173
-> @@ -41,7 +41,6 @@ trap "_cleanup; exit \$status" 0 1 2 3 15
->
->  _supported_fmt qcow2
->  _supported_proto nfs
-> -_supported_os Linux
->
->  size=3D100M
->
-> diff --git a/tests/qemu-iotests/182 b/tests/qemu-iotests/182
-> index ff3d7e7ec1..fd7627fb65 100755
-> --- a/tests/qemu-iotests/182
-> +++ b/tests/qemu-iotests/182
-> @@ -41,7 +41,6 @@ trap "_cleanup; exit \$status" 0 1 2 3 15
->
->  _supported_fmt qcow2
->  _supported_proto file
-> -_supported_os Linux
->
->  size=3D32M
->
-> diff --git a/tests/qemu-iotests/183 b/tests/qemu-iotests/183
-> index 93b7bd798a..fbe5a99beb 100755
-> --- a/tests/qemu-iotests/183
-> +++ b/tests/qemu-iotests/183
-> @@ -44,7 +44,6 @@ trap "_cleanup; exit \$status" 0 1 2 3 15
->
->  _supported_fmt qcow2 raw qed quorum
->  _supported_proto file
-> -_supported_os Linux
->
->  size=3D64M
->  _make_test_img $size
-> diff --git a/tests/qemu-iotests/186 b/tests/qemu-iotests/186
-> index 5dd2177b89..7e7d45babc 100755
-> --- a/tests/qemu-iotests/186
-> +++ b/tests/qemu-iotests/186
-> @@ -38,7 +38,6 @@ trap "_cleanup; exit \$status" 0 1 2 3 15
->
->  _supported_fmt qcow2
->  _supported_proto file
-> -_supported_os Linux
->
->  if [ "$QEMU_DEFAULT_MACHINE" !=3D "pc" ]; then
->      _notrun "Requires a PC machine"
-> diff --git a/tests/qemu-iotests/187 b/tests/qemu-iotests/187
-> index a45addde09..2fcef9e2bd 100755
-> --- a/tests/qemu-iotests/187
-> +++ b/tests/qemu-iotests/187
-> @@ -40,7 +40,6 @@ trap "_cleanup; exit \$status" 0 1 2 3 15
->
->  _supported_fmt qcow2
->  _supported_proto file
-> -_supported_os Linux
->
->  size=3D64M
->  _make_test_img $size
-> diff --git a/tests/qemu-iotests/190 b/tests/qemu-iotests/190
-> index e1c1d407f0..eb766ad09f 100755
-> --- a/tests/qemu-iotests/190
-> +++ b/tests/qemu-iotests/190
-> @@ -41,7 +41,6 @@ trap "_cleanup; exit \$status" 0 1 2 3 15
->  # See 178 for more extensive tests across more formats
->  _supported_fmt qcow2
->  _supported_proto file
-> -_supported_os Linux
->
->  echo "=3D=3D Huge file =3D=3D"
->  echo
-> diff --git a/tests/qemu-iotests/191 b/tests/qemu-iotests/191
-> index 1ea908ce3d..528022e8d8 100755
-> --- a/tests/qemu-iotests/191
-> +++ b/tests/qemu-iotests/191
-> @@ -43,7 +43,6 @@ trap "_cleanup; exit \$status" 0 1 2 3 15
->
->  _supported_fmt qcow2
->  _supported_proto file
-> -_supported_os Linux
->
->  size=3D64M
->
-> diff --git a/tests/qemu-iotests/192 b/tests/qemu-iotests/192
-> index 158086f9d2..84d1ed7cfa 100755
-> --- a/tests/qemu-iotests/192
-> +++ b/tests/qemu-iotests/192
-> @@ -40,7 +40,6 @@ trap "_cleanup; exit \$status" 0 1 2 3 15
->
->  _supported_fmt generic
->  _supported_proto file
-> -_supported_os Linux
->
->  if [ "$QEMU_DEFAULT_MACHINE" !=3D "pc" ]; then
->      _notrun "Requires a PC machine"
-> diff --git a/tests/qemu-iotests/195 b/tests/qemu-iotests/195
-> index bd1b71ae5e..ef7b9a94e2 100755
-> --- a/tests/qemu-iotests/195
-> +++ b/tests/qemu-iotests/195
-> @@ -39,7 +39,6 @@ trap "_cleanup; exit \$status" 0 1 2 3 15
->
->  _supported_fmt qcow2
->  _supported_proto file
-> -_supported_os Linux
->
->  do_run_qemu()
->  {
-> diff --git a/tests/qemu-iotests/197 b/tests/qemu-iotests/197
-> index 2c664793f4..383d7d7f61 100755
-> --- a/tests/qemu-iotests/197
-> +++ b/tests/qemu-iotests/197
-> @@ -51,7 +51,6 @@ trap "_cleanup; exit \$status" 0 1 2 3 15
->  # Test is supported for any backing file; but we force qcow2 for our wra=
-pper.
->  _supported_fmt generic
->  _supported_proto generic
-> -_supported_os Linux
->  # LUKS support may be possible, but it complicates things.
->  _unsupported_fmt luks
->
-> diff --git a/tests/qemu-iotests/200 b/tests/qemu-iotests/200
-> index 1c0f8cafc2..72d431f251 100755
-> --- a/tests/qemu-iotests/200
-> +++ b/tests/qemu-iotests/200
-> @@ -42,7 +42,6 @@ trap "_cleanup; exit \$status" 0 1 2 3 15
->
->  _supported_fmt qcow2 qed
->  _supported_proto file
-> -_supported_os Linux
->
->  BACKING_IMG=3D"${TEST_DIR}/backing.img"
->  TEST_IMG=3D"${TEST_DIR}/test.img"
-> diff --git a/tests/qemu-iotests/214 b/tests/qemu-iotests/214
-> index c1a452ff9a..21ec8a2ad8 100755
-> --- a/tests/qemu-iotests/214
-> +++ b/tests/qemu-iotests/214
-> @@ -36,7 +36,6 @@ trap "_cleanup; exit \$status" 0 1 2 3 15
->
->  _supported_fmt qcow2
->  _supported_proto file
-> -_supported_os Linux
->
->  # Repairing the corrupted image requires qemu-img check to store a
->  # refcount up to 3, which requires at least two refcount bits.
-> diff --git a/tests/qemu-iotests/215 b/tests/qemu-iotests/215
-> index 7b063d7cfa..958c14f5a0 100755
-> --- a/tests/qemu-iotests/215
-> +++ b/tests/qemu-iotests/215
-> @@ -48,7 +48,6 @@ trap "_cleanup; exit \$status" 0 1 2 3 15
->  # Test is supported for any backing file; but we force qcow2 for our wra=
-pper.
->  _supported_fmt generic
->  _supported_proto generic
-> -_supported_os Linux
->  # LUKS support may be possible, but it complicates things.
->  _unsupported_fmt luks
->
-> diff --git a/tests/qemu-iotests/217 b/tests/qemu-iotests/217
-> index f5482bb669..58a78a6098 100755
-> --- a/tests/qemu-iotests/217
-> +++ b/tests/qemu-iotests/217
-> @@ -37,7 +37,6 @@ trap "_cleanup; exit \$status" 0 1 2 3 15
->  # This test is specific to qcow2
->  _supported_fmt qcow2
->  _supported_proto file
-> -_supported_os Linux
->
->  # This test needs clusters with at least a refcount of 2 so that
->  # OFLAG_COPIED is not set.  refcount_bits=3D1 is therefore unsupported.
-> diff --git a/tests/qemu-iotests/227 b/tests/qemu-iotests/227
-> index 10cf144eb0..bdd727a721 100755
-> --- a/tests/qemu-iotests/227
-> +++ b/tests/qemu-iotests/227
-> @@ -38,7 +38,6 @@ trap "_cleanup; exit \$status" 0 1 2 3 15
->
->  _supported_fmt generic
->  _supported_proto file
-> -_supported_os Linux
->
->  do_run_qemu()
->  {
-> diff --git a/tests/qemu-iotests/231 b/tests/qemu-iotests/231
-> index 5b2cbab9ac..c0b053ac30 100755
-> --- a/tests/qemu-iotests/231
-> +++ b/tests/qemu-iotests/231
-> @@ -40,7 +40,6 @@ trap "_cleanup; exit \$status" 0 1 2 3 15
->
->  _supported_fmt generic
->  _supported_proto rbd
-> -_supported_os Linux
->
->  BOGUS_CONF=3D${TEST_DIR}/ceph-$$.conf
->  touch "${BOGUS_CONF}"
-> diff --git a/tests/qemu-iotests/233 b/tests/qemu-iotests/233
-> index b8b6c8cc4c..5855f94b9a 100755
-> --- a/tests/qemu-iotests/233
-> +++ b/tests/qemu-iotests/233
-> @@ -47,7 +47,6 @@ trap "_cleanup; exit \$status" 0 1 2 3 15
->  _supported_fmt raw qcow2
->  _supported_proto file
->  # If porting to non-Linux, consider using socat instead of ss in common.=
-nbd
-> -_supported_os Linux
->  _require_command QEMU_NBD
->
->  nbd_server_set_tcp_port
-> diff --git a/tests/qemu-iotests/240 b/tests/qemu-iotests/240
-> index d3e663ed65..b4cf95096d 100755
-> --- a/tests/qemu-iotests/240
-> +++ b/tests/qemu-iotests/240
-> @@ -33,7 +33,6 @@ status=3D1	# failure is the default!
->
->  _supported_fmt generic
->  _supported_proto generic
-> -_supported_os Linux
->
->  do_run_qemu()
->  {
-> diff --git a/tests/qemu-iotests/247 b/tests/qemu-iotests/247
-> index fc50eb5dc1..546a794d3d 100755
-> --- a/tests/qemu-iotests/247
-> +++ b/tests/qemu-iotests/247
-> @@ -40,7 +40,6 @@ trap "_cleanup; exit \$status" 0 1 2 3 15
->  # Requires backing files and .bdrv_change_backing_file support
->  _supported_fmt qcow2 qed
->  _supported_proto file
-> -_supported_os Linux
->
->  size=3D128M
-
-
---
-Alex Benn=C3=A9e
 
