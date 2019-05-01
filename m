@@ -1,23 +1,23 @@
-Received: from eggs.gnu.org ([209.51.188.92]:50410)
+Received: from eggs.gnu.org ([209.51.188.92]:50728)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1hLlkO-0005Sj-Tz
-	for qemu-devel@nongnu.org; Wed, 01 May 2019 05:41:56 -0400
+	(envelope-from <berrange@redhat.com>) id 1hLlmD-0006x5-8D
+	for qemu-devel@nongnu.org; Wed, 01 May 2019 05:43:48 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1hLlkL-0006Al-Sk
-	for qemu-devel@nongnu.org; Wed, 01 May 2019 05:41:52 -0400
-Date: Wed, 1 May 2019 10:41:40 +0100
+	(envelope-from <berrange@redhat.com>) id 1hLlm8-0007fF-LX
+	for qemu-devel@nongnu.org; Wed, 01 May 2019 05:43:44 -0400
+Date: Wed, 1 May 2019 10:43:31 +0100
 From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-Message-ID: <20190501094140.GO29808@redhat.com>
+Message-ID: <20190501094331.GP29808@redhat.com>
 Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
 References: <cover.1556666645.git.alistair.francis@wdc.com>
-	<002f222d86322a66276de39cb29796acffe384c1.1556666645.git.alistair.francis@wdc.com>
+	<ff51c73e3095fa503d14aafece54f8565fe99900.1556666645.git.alistair.francis@wdc.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <002f222d86322a66276de39cb29796acffe384c1.1556666645.git.alistair.francis@wdc.com>
+In-Reply-To: <ff51c73e3095fa503d14aafece54f8565fe99900.1556666645.git.alistair.francis@wdc.com>
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v2 1/5] util/qemu-sockets: Fix GCC 9 build
- warnings
+Subject: Re: [Qemu-devel] [PATCH v2 2/5] hw/usb/hcd-xhci: Fix GCC 9 build
+ warning
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,57 +29,59 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: Alistair Francis <Alistair.Francis@wdc.com>
 Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "alistair23@gmail.com" <alistair23@gmail.com>, "kraxel@redhat.com" <kraxel@redhat.com>, "riku.voipio@iki.fi" <riku.voipio@iki.fi>, "laurent@vivier.eu" <laurent@vivier.eu>, "qemu-trivial@nongnu.org" <qemu-trivial@nongnu.org>
 
-On Tue, Apr 30, 2019 at 11:28:22PM +0000, Alistair Francis wrote:
-> Fix this warning when building with GCC9 on Fedora 30:
-> In function =E2=80=98strncpy=E2=80=99,
->     inlined from =E2=80=98unix_connect_saddr.isra.0=E2=80=99 at util/qe=
-mu-sockets.c:925:5:
-> /usr/include/bits/string_fortified.h:106:10: error: =E2=80=98__builtin_=
-strncpy=E2=80=99 specified bound 108 equals destination size [-Werror=3Ds=
-tringop-truncation]
->   106 |   return __builtin___strncpy_chk (__dest, __src, __len, __bos (=
-__dest));
+On Tue, Apr 30, 2019 at 11:28:31PM +0000, Alistair Francis wrote:
+> Fix this build warning with GCC 9 on Fedora 30:
+> hw/usb/hcd-xhci.c:3339:66: error: =E2=80=98%d=E2=80=99 directive output=
+ may be truncated writing between 1 and 10 bytes into a region of size 5 =
+[-Werror=3Dformat-truncation=3D]
+>  3339 |             snprintf(port->name, sizeof(port->name), "usb2 port=
+ #%d", i+1);
+>       |                                                                =
+  ^~
+> hw/usb/hcd-xhci.c:3339:54: note: directive argument in the range [1, 21=
+47483647]
+>  3339 |             snprintf(port->name, sizeof(port->name), "usb2 port=
+ #%d", i+1);
+>       |                                                      ^~~~~~~~~~=
+~~~~~
+> In file included from /usr/include/stdio.h:867,
+>                  from /home/alistair/qemu/include/qemu/osdep.h:99,
+>                  from hw/usb/hcd-xhci.c:21:
+> /usr/include/bits/stdio2.h:67:10: note: =E2=80=98__builtin___snprintf_c=
+hk=E2=80=99 output between 13 and 22 bytes into a destination of size 16
+>    67 |   return __builtin___snprintf_chk (__s, __n, __USE_FORTIFY_LEVE=
+L - 1,
 >       |          ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~=
-~~~~~~~~
-> In function =E2=80=98strncpy=E2=80=99,
->     inlined from =E2=80=98unix_listen_saddr.isra.0=E2=80=99 at util/qem=
-u-sockets.c:880:5:
+~~~~~~
+>    68 |        __bos (__s), __fmt, __va_arg_pack ());
+>       |        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 >=20
 > Signed-off-by: Alistair Francis <alistair.francis@wdc.com>
 > ---
->  util/qemu-sockets.c | 4 ++--
->  1 file changed, 2 insertions(+), 2 deletions(-)
+>  hw/usb/hcd-xhci.c | 1 +
+>  1 file changed, 1 insertion(+)
 >=20
-> diff --git a/util/qemu-sockets.c b/util/qemu-sockets.c
-> index 9705051690..8c3322958f 100644
-> --- a/util/qemu-sockets.c
-> +++ b/util/qemu-sockets.c
-> @@ -829,7 +829,7 @@ static int unix_listen_saddr(UnixSocketAddress *sad=
-dr,
->      struct sockaddr_un un;
->      int sock, fd;
->      char *pathbuf =3D NULL;
-> -    const char *path;
-> +    const char *path QEMU_NONSTRING;
+> diff --git a/hw/usb/hcd-xhci.c b/hw/usb/hcd-xhci.c
+> index ec28bee319..2b061772b2 100644
+> --- a/hw/usb/hcd-xhci.c
+> +++ b/hw/usb/hcd-xhci.c
+> @@ -3322,6 +3322,7 @@ static void usb_xhci_init(XHCIState *xhci)
+>      usb_bus_new(&xhci->bus, sizeof(xhci->bus), &xhci_bus_ops, dev);
 > =20
->      sock =3D qemu_socket(PF_UNIX, SOCK_STREAM, 0);
->      if (sock < 0) {
-> @@ -922,7 +922,7 @@ static int unix_connect_saddr(UnixSocketAddress *sa=
-ddr, Error **errp)
-> =20
->      memset(&un, 0, sizeof(un));
->      un.sun_family =3D AF_UNIX;
-> -    strncpy(un.sun_path, saddr->path, sizeof(un.sun_path));
-> +    memcpy(un.sun_path, saddr->path, MIN(strlen(saddr->path), sizeof(u=
-n.sun_path)));
-> =20
->      /* connect to peer */
->      do {
+>      for (i =3D 0; i < usbports; i++) {
+> +        g_assert(i < MAX(MAXPORTS_2, MAXPORTS_3));
+>          speedmask =3D 0;
+>          if (i < xhci->numports_2) {
+>              if (xhci_get_flag(xhci, XHCI_FLAG_SS_FIRST)) {
 
-I think my proposed fix for this file is preferrable as it avoids
-repeated strlen calls=20
+I proposed a slightly different fix here:
 
-  https://lists.gnu.org/archive/html/qemu-devel/2019-04/msg02124.html
+  https://lists.gnu.org/archive/html/qemu-devel/2019-04/msg02125.html
+
+but both have the same effect
+
+
+  Reviewed-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
 
 
 Regards,
