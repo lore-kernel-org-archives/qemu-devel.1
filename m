@@ -7,61 +7,61 @@ X-Spam-Status: No, score=-8.3 required=3.0 tests=FROM_EXCESS_BASE64,
 	SPF_PASS,URIBL_BLOCKED,USER_AGENT_MUTT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5EADBC43219
-	for <qemu-devel@archiver.kernel.org>; Wed,  1 May 2019 09:45:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EB106C43219
+	for <qemu-devel@archiver.kernel.org>; Wed,  1 May 2019 09:46:48 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2EFA321670
-	for <qemu-devel@archiver.kernel.org>; Wed,  1 May 2019 09:45:22 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2EFA321670
+	by mail.kernel.org (Postfix) with ESMTPS id BD15521670
+	for <qemu-devel@archiver.kernel.org>; Wed,  1 May 2019 09:46:48 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BD15521670
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:48974 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:49042 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hLlnl-0007ze-E5
-	for qemu-devel@archiver.kernel.org; Wed, 01 May 2019 05:45:21 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:50728)
+	id 1hLlpA-0000l7-1B
+	for qemu-devel@archiver.kernel.org; Wed, 01 May 2019 05:46:48 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:50410)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1hLlmD-0006x5-8D
-	for qemu-devel@nongnu.org; Wed, 01 May 2019 05:43:48 -0400
+	(envelope-from <berrange@redhat.com>) id 1hLlkO-0005Sj-Tz
+	for qemu-devel@nongnu.org; Wed, 01 May 2019 05:41:56 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1hLlm8-0007fF-LX
-	for qemu-devel@nongnu.org; Wed, 01 May 2019 05:43:44 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:44122)
+	(envelope-from <berrange@redhat.com>) id 1hLlkL-0006Al-Sk
+	for qemu-devel@nongnu.org; Wed, 01 May 2019 05:41:52 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:50130)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <berrange@redhat.com>)
-	id 1hLlm8-0007ei-CK; Wed, 01 May 2019 05:43:40 -0400
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
-	[10.5.11.16])
+	id 1hLlkL-0006AR-N6; Wed, 01 May 2019 05:41:49 -0400
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+	[10.5.11.23])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 7719C99CE3;
-	Wed,  1 May 2019 09:43:39 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id EFB8A882F2;
+	Wed,  1 May 2019 09:41:48 +0000 (UTC)
 Received: from redhat.com (ovpn-112-28.ams2.redhat.com [10.36.112.28])
-	by smtp.corp.redhat.com (Postfix) with ESMTPS id 69144171B7;
-	Wed,  1 May 2019 09:43:34 +0000 (UTC)
-Date: Wed, 1 May 2019 10:43:31 +0100
+	by smtp.corp.redhat.com (Postfix) with ESMTPS id 973F79081;
+	Wed,  1 May 2019 09:41:43 +0000 (UTC)
+Date: Wed, 1 May 2019 10:41:40 +0100
 From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
 To: Alistair Francis <Alistair.Francis@wdc.com>
-Message-ID: <20190501094331.GP29808@redhat.com>
+Message-ID: <20190501094140.GO29808@redhat.com>
 References: <cover.1556666645.git.alistair.francis@wdc.com>
-	<ff51c73e3095fa503d14aafece54f8565fe99900.1556666645.git.alistair.francis@wdc.com>
+	<002f222d86322a66276de39cb29796acffe384c1.1556666645.git.alistair.francis@wdc.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="UTF-8"
 Content-Disposition: inline
-In-Reply-To: <ff51c73e3095fa503d14aafece54f8565fe99900.1556666645.git.alistair.francis@wdc.com>
+In-Reply-To: <002f222d86322a66276de39cb29796acffe384c1.1556666645.git.alistair.francis@wdc.com>
 User-Agent: Mutt/1.11.3 (2019-02-01)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.38]);
-	Wed, 01 May 2019 09:43:39 +0000 (UTC)
+	(mx1.redhat.com [10.5.110.28]);
+	Wed, 01 May 2019 09:41:49 +0000 (UTC)
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH v2 2/5] hw/usb/hcd-xhci: Fix GCC 9 build
- warning
+Subject: Re: [Qemu-devel] [PATCH v2 1/5] util/qemu-sockets: Fix GCC 9 build
+ warnings
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -83,61 +83,59 @@ Cc: "qemu-trivial@nongnu.org" <qemu-trivial@nongnu.org>,
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190501094331.q5jhKb4n9_tln4M4NBT6jtgd9Ey9lzM4NBRWkfybkuc@z>
+Message-ID: <20190501094140.UYtXPBMFEglfD-4iLwiymT-BUHHBQHqeCYx13YwO2Xc@z>
 
-On Tue, Apr 30, 2019 at 11:28:31PM +0000, Alistair Francis wrote:
-> Fix this build warning with GCC 9 on Fedora 30:
-> hw/usb/hcd-xhci.c:3339:66: error: =E2=80=98%d=E2=80=99 directive output=
- may be truncated writing between 1 and 10 bytes into a region of size 5 =
-[-Werror=3Dformat-truncation=3D]
->  3339 |             snprintf(port->name, sizeof(port->name), "usb2 port=
- #%d", i+1);
->       |                                                                =
-  ^~
-> hw/usb/hcd-xhci.c:3339:54: note: directive argument in the range [1, 21=
-47483647]
->  3339 |             snprintf(port->name, sizeof(port->name), "usb2 port=
- #%d", i+1);
->       |                                                      ^~~~~~~~~~=
-~~~~~
-> In file included from /usr/include/stdio.h:867,
->                  from /home/alistair/qemu/include/qemu/osdep.h:99,
->                  from hw/usb/hcd-xhci.c:21:
-> /usr/include/bits/stdio2.h:67:10: note: =E2=80=98__builtin___snprintf_c=
-hk=E2=80=99 output between 13 and 22 bytes into a destination of size 16
->    67 |   return __builtin___snprintf_chk (__s, __n, __USE_FORTIFY_LEVE=
-L - 1,
+On Tue, Apr 30, 2019 at 11:28:22PM +0000, Alistair Francis wrote:
+> Fix this warning when building with GCC9 on Fedora 30:
+> In function =E2=80=98strncpy=E2=80=99,
+>     inlined from =E2=80=98unix_connect_saddr.isra.0=E2=80=99 at util/qe=
+mu-sockets.c:925:5:
+> /usr/include/bits/string_fortified.h:106:10: error: =E2=80=98__builtin_=
+strncpy=E2=80=99 specified bound 108 equals destination size [-Werror=3Ds=
+tringop-truncation]
+>   106 |   return __builtin___strncpy_chk (__dest, __src, __len, __bos (=
+__dest));
 >       |          ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~=
-~~~~~~
->    68 |        __bos (__s), __fmt, __va_arg_pack ());
->       |        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~
+> In function =E2=80=98strncpy=E2=80=99,
+>     inlined from =E2=80=98unix_listen_saddr.isra.0=E2=80=99 at util/qem=
+u-sockets.c:880:5:
 >=20
 > Signed-off-by: Alistair Francis <alistair.francis@wdc.com>
 > ---
->  hw/usb/hcd-xhci.c | 1 +
->  1 file changed, 1 insertion(+)
+>  util/qemu-sockets.c | 4 ++--
+>  1 file changed, 2 insertions(+), 2 deletions(-)
 >=20
-> diff --git a/hw/usb/hcd-xhci.c b/hw/usb/hcd-xhci.c
-> index ec28bee319..2b061772b2 100644
-> --- a/hw/usb/hcd-xhci.c
-> +++ b/hw/usb/hcd-xhci.c
-> @@ -3322,6 +3322,7 @@ static void usb_xhci_init(XHCIState *xhci)
->      usb_bus_new(&xhci->bus, sizeof(xhci->bus), &xhci_bus_ops, dev);
+> diff --git a/util/qemu-sockets.c b/util/qemu-sockets.c
+> index 9705051690..8c3322958f 100644
+> --- a/util/qemu-sockets.c
+> +++ b/util/qemu-sockets.c
+> @@ -829,7 +829,7 @@ static int unix_listen_saddr(UnixSocketAddress *sad=
+dr,
+>      struct sockaddr_un un;
+>      int sock, fd;
+>      char *pathbuf =3D NULL;
+> -    const char *path;
+> +    const char *path QEMU_NONSTRING;
 > =20
->      for (i =3D 0; i < usbports; i++) {
-> +        g_assert(i < MAX(MAXPORTS_2, MAXPORTS_3));
->          speedmask =3D 0;
->          if (i < xhci->numports_2) {
->              if (xhci_get_flag(xhci, XHCI_FLAG_SS_FIRST)) {
+>      sock =3D qemu_socket(PF_UNIX, SOCK_STREAM, 0);
+>      if (sock < 0) {
+> @@ -922,7 +922,7 @@ static int unix_connect_saddr(UnixSocketAddress *sa=
+ddr, Error **errp)
+> =20
+>      memset(&un, 0, sizeof(un));
+>      un.sun_family =3D AF_UNIX;
+> -    strncpy(un.sun_path, saddr->path, sizeof(un.sun_path));
+> +    memcpy(un.sun_path, saddr->path, MIN(strlen(saddr->path), sizeof(u=
+n.sun_path)));
+> =20
+>      /* connect to peer */
+>      do {
 
-I proposed a slightly different fix here:
+I think my proposed fix for this file is preferrable as it avoids
+repeated strlen calls=20
 
-  https://lists.gnu.org/archive/html/qemu-devel/2019-04/msg02125.html
-
-but both have the same effect
-
-
-  Reviewed-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
+  https://lists.gnu.org/archive/html/qemu-devel/2019-04/msg02124.html
 
 
 Regards,
