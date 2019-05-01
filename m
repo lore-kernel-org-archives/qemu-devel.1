@@ -2,86 +2,83 @@ Return-Path: <SRS0=aVj3=TB=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.7 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-3.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,
+	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CCCEDC43219
-	for <qemu-devel@archiver.kernel.org>; Wed,  1 May 2019 03:17:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A7496C43219
+	for <qemu-devel@archiver.kernel.org>; Wed,  1 May 2019 03:56:13 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 88E412087B
-	for <qemu-devel@archiver.kernel.org>; Wed,  1 May 2019 03:17:58 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 6F415206DF
+	for <qemu-devel@archiver.kernel.org>; Wed,  1 May 2019 03:56:13 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=connect-hku-hk.20150623.gappssmtp.com header.i=@connect-hku-hk.20150623.gappssmtp.com header.b="Js5eez6O"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 88E412087B
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=connect.hku.hk
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="T6LY3fn5"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6F415206DF
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:32836 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:33994 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hLfkr-0002PC-Ff
-	for qemu-devel@archiver.kernel.org; Tue, 30 Apr 2019 23:17:57 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:47407)
+	id 1hLgLs-0002Qa-NM
+	for qemu-devel@archiver.kernel.org; Tue, 30 Apr 2019 23:56:12 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:53889)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <liboxuan@connect.hku.hk>) id 1hLfjx-00021J-LM
-	for qemu-devel@nongnu.org; Tue, 30 Apr 2019 23:17:04 -0400
+	(envelope-from <alistair23@gmail.com>) id 1hLgL0-0001j2-HP
+	for qemu-devel@nongnu.org; Tue, 30 Apr 2019 23:55:21 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <liboxuan@connect.hku.hk>) id 1hLfju-0000Uo-Kf
-	for qemu-devel@nongnu.org; Tue, 30 Apr 2019 23:17:01 -0400
-Received: from mail-yw1-xc44.google.com ([2607:f8b0:4864:20::c44]:45938)
+	(envelope-from <alistair23@gmail.com>) id 1hLgKx-0006bi-Fp
+	for qemu-devel@nongnu.org; Tue, 30 Apr 2019 23:55:18 -0400
+Received: from mail-lf1-x144.google.com ([2a00:1450:4864:20::144]:40047)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <liboxuan@connect.hku.hk>)
-	id 1hLfju-0000Tq-3j
-	for qemu-devel@nongnu.org; Tue, 30 Apr 2019 23:16:58 -0400
-Received: by mail-yw1-xc44.google.com with SMTP id r139so7500820ywe.12
-	for <qemu-devel@nongnu.org>; Tue, 30 Apr 2019 20:16:56 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=connect-hku-hk.20150623.gappssmtp.com; s=20150623;
+	(Exim 4.71) (envelope-from <alistair23@gmail.com>)
+	id 1hLgKx-0006a8-63
+	for qemu-devel@nongnu.org; Tue, 30 Apr 2019 23:55:15 -0400
+Received: by mail-lf1-x144.google.com with SMTP id o16so12418351lfl.7
+	for <qemu-devel@nongnu.org>; Tue, 30 Apr 2019 20:55:15 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
 	h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-	:cc; bh=1YqRuH2R8B5aXHMnRryW3QIvT3FJY0yab9JQob5LiBU=;
-	b=Js5eez6OodSVmS3ImNbqBgC49NXCteVNfpjT61/UXaSGdNp+q3uEetG1MGMVH6aVcI
-	0U8nfgxtFR3dvyzIkyyuDqdKxMT1vywF0hfsVo/rIquM3e9LM5umboxsBfM+AaFrZJFW
-	VbMglOxm2jLCSZoARg+nZaI2k1Yoz5hXYM0rpQCkUTvo4qQMegY1pZYy92KQ0x8IAvSo
-	s5WE5HW6jtfAk/P7ufUumF4hN1Sia1k1D7byfiVefskQHN1TMOELv/FLflIQnWzPgHmV
-	Z7INKpnO8VSTEQLK0yK6o2IvTo4VL74g/ucmuT8dMirjGHYB5j1qGpSOIrHJ/DFyhv2i
-	TlUA==
+	:cc; bh=+xo5jvc/rBRh9ekPC+pCSkHWIimdbJZrueLfMiYvsiE=;
+	b=T6LY3fn5XHcCJpAn0I1qFj39eeaT7HedxEP8C5WaI5eR5LkDwnH/E7cePzA/BeK4Jy
+	Mf/pSfcVB3xmySkBGSiaLbDGDWTvM55OdhBfb+ZN5pinXsFIOY5izIHdl0i6QOmjtz9g
+	bmTZJNJsUaorpLitq/m/1DJVt6FBcaGO51BMI2aGsuTyBXoHEv5RRMLyKO0yD/+eTwag
+	s6taMS4Jyf2gX6zn/Flr9DTNgn35DwRQleOhM3COQuVItVhKpAHkUiI5O97r+K3N/+cj
+	waWiBagy+nWG4VlqBkTG+OH8Os1lIiWafQY7kWk9HPWiLYot0eEQ27eF3Z46k2qv9T1u
+	b3Jg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
 	d=1e100.net; s=20161025;
 	h=x-gm-message-state:mime-version:references:in-reply-to:from:date
 	:message-id:subject:to:cc;
-	bh=1YqRuH2R8B5aXHMnRryW3QIvT3FJY0yab9JQob5LiBU=;
-	b=ebwrKrz244i+39khr+Zg2zP/dBsdjyF1xZOicmkYr2Ckvq4Pwk3y15Iim8dBhAcMeL
-	Uh+35OKdxAdsRsJIsbYJYLivWk5juSNkahXMdKCCzSJtGNEJctUMYdl9h+1Wp1q9NBlI
-	t836/s+pzqF9rTG62mnr+8QStYisbUefSfnravLvas+FPS7AyEgRm3QIRk9GvZtiy5LW
-	BaRQT8o+v8hJULk1IEX1Yl1W962NDqQmBaAAffqWMn+cGTJVwLXcreG9IflHoZtKVKty
-	KyGyKdGvF3vr3+PxIB3FRh2YoBzeDdiep+J8+vI88nd7a9H/BRZj81cPY0h9pC944vGK
-	FePA==
-X-Gm-Message-State: APjAAAXhldNZh8sG3uRF4OyKKczb+SE9SUMrzUbRbUUksdbgMRdJJec/
-	qMChcD29WP2Znl0XY9UdjCzA27b5+IucO3j+3iUE7A==
-X-Google-Smtp-Source: APXvYqxbXCJIWRxAGOF++ZxmMlrsJVzg/4zwRCmVsk1NGO9j4j9pPGtEhpylmXR1co2ZytMhVkzB6KBr8Lzr0Nlm724=
-X-Received: by 2002:a25:c694:: with SMTP id k142mr18984969ybf.67.1556680616187;
-	Tue, 30 Apr 2019 20:16:56 -0700 (PDT)
+	bh=+xo5jvc/rBRh9ekPC+pCSkHWIimdbJZrueLfMiYvsiE=;
+	b=EZbZy07KUGr5FhsP2R7Xc9I+qraERa+I+/oItZZYE0eXAlax/PuS26BHBHwma0AODR
+	8Eq0uEfzaV+r1rcHlSF3uJsZko63uBRUjdqXznBuXio+0XO3X0IW8Vj8gxw5GcCmtj4F
+	0+/VIyL8do+DbF/JbMgz8HyYUzAp3cPtZXV83FkKdEgSR3N7kVxy+GkkBXmBmdsUMIPq
+	jfl38xAhPwjpXFcyYZ1oJG6unHCQK7R/l/GxQLgja6C2RQaFqNvpc1HWoUEBhNyU4Q0U
+	UjntrC+SnqVkOtznHj77PFDdOE/k8XSS1aFGt5yWZ1g/WUynZV/pxc34A/Hej2ZGOo2T
+	uYRA==
+X-Gm-Message-State: APjAAAVJ+CWqpMYGxUscj5Mg5Y6zwzwhuzu5molyIEn0U0sN5Kv6Xhab
+	OI4ePIhyGg/YUo3+4WotsXm6jzwxBY+j7pFdiJY=
+X-Google-Smtp-Source: APXvYqz8w+SWTybd2q5sDR6Rb/eY+PaFM+0h7u9VxEeNL3Kh5zHb+WgkLVfdXUhLkHAJdy+so+xfplrqgU1mex/DwAs=
+X-Received: by 2002:ac2:4205:: with SMTP id y5mr106863lfh.15.1556682913663;
+	Tue, 30 Apr 2019 20:55:13 -0700 (PDT)
 MIME-Version: 1.0
-References: <20190428110258.86681-1-liboxuan@connect.hku.hk>
-	<a683a29f-ea7b-aaf9-258f-68f4ffcd9b96@redhat.com>
-	<5fe13664-cabc-6fc9-7437-285cc1452944@redhat.com>
-In-Reply-To: <5fe13664-cabc-6fc9-7437-285cc1452944@redhat.com>
-From: "LI, BO XUAN" <liboxuan@connect.hku.hk>
-Date: Wed, 1 May 2019 11:16:20 +0800
+References: <cover.1556515687.git.alistair@alistair23.me>
+	<PSXP216MB0277192E4A6C255E30EFE627DD390@PSXP216MB0277.KORP216.PROD.OUTLOOK.COM>
+	<CAFEAcA_rJT3NxMAyoVFCbxNi0vNfCRg1bhHTsOmd5pa1pb_DzA@mail.gmail.com>
+In-Reply-To: <CAFEAcA_rJT3NxMAyoVFCbxNi0vNfCRg1bhHTsOmd5pa1pb_DzA@mail.gmail.com>
+From: Alistair Francis <alistair23@gmail.com>
+Date: Tue, 30 Apr 2019 20:54:44 -0700
 Message-ID:
- <CALM0=-msXgYqraKzKcxCZgH-+VM7=MUvGLRAjP_r2im_Oj2Spw@mail.gmail.com>
-To: Eric Blake <eblake@redhat.com>,
-	=?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>
+ <CAKmqyKPGkgYNntZV70pys3PvzdneWWsk=jMiWJQ6SpHCA8rUXQ@mail.gmail.com>
+To: Peter Maydell <peter.maydell@linaro.org>
+Content-Type: text/plain; charset="UTF-8"
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
 	recognized.
-X-Received-From: 2607:f8b0:4864:20::c44
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Content-Filtered-By: Mailman/MimeDel 2.1.21
-Subject: Re: [Qemu-devel] [PATCH] virtio-mmio: Always compile debug prints
+X-Received-From: 2a00:1450:4864:20::144
+Subject: Re: [Qemu-devel] [PATCH v1 1/5] armv7m: Allow entry information to
+ be returned
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -93,110 +90,46 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-trivial@nongnu.org, qemu-devel@nongnu.org
+Cc: Alistair Francis <alistair@alistair23.me>,
+	"qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190501031620.R78hKVzU_50yHCHk4eBLhOn5hRUos7jZXFv3EM3dQ_4@z>
+Message-ID: <20190501035444.nr0lT0_QtO8teopSbphpV_fRtnYPDbOsAwiefZgiF2k@z>
 
-Hi Eric and Phil,
-
-Thanks for your reviews. I am looking into trace events and I'll send a
-patch v2 soon.
-
-Eric Blake <eblake@redhat.com> =E6=96=BC 2019=E5=B9=B44=E6=9C=8830=E6=97=A5=
-=E9=80=B1=E4=BA=8C =E4=B8=8B=E5=8D=8811:03=E5=AF=AB=E9=81=93=EF=BC=9A
-
-> On 4/30/19 5:15 AM, Philippe Mathieu-Daud=C3=A9 wrote:
-> > Hi Li,
+On Tue, Apr 30, 2019 at 9:04 AM Peter Maydell <peter.maydell@linaro.org> wrote:
+>
+> On Mon, 29 Apr 2019 at 06:34, Alistair Francis <alistair@alistair23.me> wrote:
 > >
-> > On 4/28/19 1:02 PM, Boxuan Li wrote:
-> >> Wrap printf calls inside debug macros (DPRINTF) in `if` statement, and
-> >> change output to stderr as well. This will ensure that printf function
-> >> will always compile and prevent bitrot of the format strings.
+> > Allow the kernel's entry point information to be returned when loading a
+> > kernel.
 > >
-> > There is an effort in QEMU to replace the obsolete DPRINTF() macros by
-> > trace events (which prevent format strings bitroting).
+> > Signed-off-by: Alistair Francis <alistair@alistair23.me>
+> > ---
+> >  hw/arm/armv7m.c      | 6 +++---
+> >  hw/arm/microbit.c    | 2 +-
+> >  hw/arm/mps2-tz.c     | 3 ++-
+> >  hw/arm/mps2.c        | 2 +-
+> >  hw/arm/msf2-som.c    | 2 +-
+> >  hw/arm/musca.c       | 3 ++-
+> >  hw/arm/netduino2.c   | 2 +-
+> >  hw/arm/stellaris.c   | 3 ++-
+> >  include/hw/arm/arm.h | 4 +++-
+> >  9 files changed, 16 insertions(+), 11 deletions(-)
 >
-> Trace events are even more powerful than conditional debugs (in that you
-> can turn them on or off at runtime, instead of compile time). But
-> incremental improvements are still better than nothing.
+> > -void armv7m_load_kernel(ARMCPU *cpu, const char *kernel_filename, int mem_size)
+> > +void armv7m_load_kernel(ARMCPU *cpu, const char *kernel_filename, int mem_size,
+> > +                        uint64_t *entry)
+>
+> If we need to return the entry point, why not just return it
+> as the return value of the function rather than having the
+> caller pass in a pointer which we fill in ?
 
+There wasn't really a reason, it was just following along with load_elf().
 
-> >>
-> >> diff --git a/hw/virtio/virtio-mmio.c b/hw/virtio/virtio-mmio.c
-> >> index 5807aa87fe..693b3c9eb4 100644
-> >> --- a/hw/virtio/virtio-mmio.c
-> >> +++ b/hw/virtio/virtio-mmio.c
-> >> @@ -28,15 +28,14 @@
-> >>  #include "hw/virtio/virtio-bus.h"
-> >>  #include "qemu/error-report.h"
-> >>
-> >> -/* #define DEBUG_VIRTIO_MMIO */
-> >> -
-> >> -#ifdef DEBUG_VIRTIO_MMIO
->
-The old code let a user pass CFLAGS=3D-DDEBUG_VIRTIO_MMIO to turn things on=
-...
->
-> >> -
-> >> -#define DPRINTF(fmt, ...) \
-> >> -do { printf("virtio_mmio: " fmt , ## __VA_ARGS__); } while (0)
-> >> -#else
-> >> -#define DPRINTF(fmt, ...) do {} while (0)
-> >> -#endif
-> >> +#define DEBUG_VIRTIO_MMIO 0
->
-> ...the new code requires a source code edit. This can be considered a
-> step backwards in developer friendliness.  Better might be:
->
-> #ifdef DEBUG_VIRTIO_MMIO
-> #define DEBUG_VIRTIO_MMIO_PRINT 1
-> #else
-> #define DEBUG_VIRTIO_MMIO_PRINT 0
-> #endif
->
-> >> +
-> >> +#define DPRINTF(fmt, ...)                                            =
-\
-> >> +    do {                                                             =
-\
-> >> +        if (DEBUG_VIRTIO_MMIO) {                                     =
-\
->
-> and the corresponding use of DEBUG_VIRTIO_MMIO_PRINT here, so that you
-> preserve the ability to do a command-line CFLAGS=3D-D override, rather
-> than forcing a source code edit.
->
->
-Got it. Actually, I learned from
-https://git.qemu.org/?p=3Dqemu.git;a=3Dcommitdiff;h=3Dc691320faa6, which is=
- used
-as an example of Bitrot prevention part in
-https://wiki.qemu.org/Contribute/BiteSizedTasks. Maybe the wiki page can be
-updated.
+Alistair
 
+>
+> thanks
+> -- PMM
 
-> >> +            fprintf(stderr, "virtio_mmio: " fmt , ## __VA_ARGS__);   =
-\
->
-> No space before ,
->
-> >> +        }                                                            =
-\
-> >> +    } while (0)
-> >>
-> >>  /* QOM macros */
-> >>  /* virtio-mmio-bus */
-> >>
-> >
-> >
->
-> --
-> Eric Blake, Principal Software Engineer
-> Red Hat, Inc.           +1-919-301-3226
-> Virtualization:  qemu.org | libvirt.org
->
->
-Best regards,
-Boxuan Li
