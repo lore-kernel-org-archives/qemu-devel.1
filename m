@@ -2,94 +2,76 @@ Return-Path: <SRS0=aVj3=TB=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.0 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_PASS,URIBL_BLOCKED autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C273BC43219
-	for <qemu-devel@archiver.kernel.org>; Wed,  1 May 2019 17:30:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E2BEEC43219
+	for <qemu-devel@archiver.kernel.org>; Wed,  1 May 2019 17:31:49 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 86DAA20866
-	for <qemu-devel@archiver.kernel.org>; Wed,  1 May 2019 17:30:14 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="McsMcmpV"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 86DAA20866
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id AEA3520866
+	for <qemu-devel@archiver.kernel.org>; Wed,  1 May 2019 17:31:49 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AEA3520866
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:37499 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:37537 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hLt3d-00004x-St
-	for qemu-devel@archiver.kernel.org; Wed, 01 May 2019 13:30:13 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:36464)
+	id 1hLt5B-0001VK-0t
+	for qemu-devel@archiver.kernel.org; Wed, 01 May 2019 13:31:49 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:36853)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1hLt2r-0008D8-Sr
-	for qemu-devel@nongnu.org; Wed, 01 May 2019 13:29:26 -0400
+	(envelope-from <bounces@canonical.com>) id 1hLt4G-0000tt-Qx
+	for qemu-devel@nongnu.org; Wed, 01 May 2019 13:30:54 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1hLt2m-0007lS-Ip
-	for qemu-devel@nongnu.org; Wed, 01 May 2019 13:29:25 -0400
-Received: from mail-wr1-x441.google.com ([2a00:1450:4864:20::441]:42803)
+	(envelope-from <bounces@canonical.com>) id 1hLt4F-0003eA-MD
+	for qemu-devel@nongnu.org; Wed, 01 May 2019 13:30:52 -0400
+Received: from indium.canonical.com ([91.189.90.7]:42836)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1hLt2j-0007a6-1I
-	for qemu-devel@nongnu.org; Wed, 01 May 2019 13:29:18 -0400
-Received: by mail-wr1-x441.google.com with SMTP id l2so9694912wrb.9
-	for <qemu-devel@nongnu.org>; Wed, 01 May 2019 10:29:13 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
-	h=references:user-agent:from:to:subject:in-reply-to:date:message-id
-	:mime-version:content-transfer-encoding;
-	bh=FqPwB7wOVZ+ihzatNBIrJmUBQFh/LB6/ZAiDti+0VHg=;
-	b=McsMcmpVPE8r4ArSvAKP32HIDnmGaKjoLMkUoqbQDXXmmuvzjdkuLeHOurZLBjiBhs
-	qBTi7yY88PWZU9HjgCFT0GcGKwSRg99Pio6gfOKIUpdfoj7JODS8O87nlyUYhiVvCOuU
-	Y4INNEszE+FR9+cPTPF42mPx4LImC9gz5NeFp3Nna77rEvTi67niPfNu2c0XMTjpJG0l
-	2CziUg9jr4dvBr5/k9NIEQb1vMRvQ0QvfThjnmjq8bUxqHy5ZeXCcLxQbFT9tvoEgt3Q
-	mbatDwL0ZvXtOOtCyPNCsCbdS78Ts+SEO/u+JvYpWbX6goA6KKKdwHltdfpjU4Rer1L+
-	tytQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=1e100.net; s=20161025;
-	h=x-gm-message-state:references:user-agent:from:to:subject
-	:in-reply-to:date:message-id:mime-version:content-transfer-encoding;
-	bh=FqPwB7wOVZ+ihzatNBIrJmUBQFh/LB6/ZAiDti+0VHg=;
-	b=UCH8h+LnCB1Wv+gWR0lRDhpjXLitxsfVz8NGkgGQMNrDXELHSJY24lDiwgh+AD5MnX
-	zS2wPUPiqHyv3x2k+43sPXa01Xkf+yJxJ3rkTiWXI0WvsghIqXZaOBy0ONhLNTSzPcex
-	1DdGGCGY8xHcm4nkIGL+scOkP/L7EbfFhwa0snllr7KDin69YaQvdkNFP5+AtNjbim/9
-	xOt/H7uWLCzRxzTcHFZG8Zrt/Iiiem6owAC6dNqCT4DfmhZH6hw+Ze5nrOhGoInka1bc
-	BcOArtnXx1Eygz/1gnKoFimeHKZkyROhzEyAfwQ4f+zOfXjwQxMU+ipyZio9a9QB8QfN
-	W09A==
-X-Gm-Message-State: APjAAAXCRMujW/heFR80csY2uuhS45/Q25+9Jco4gMvLpfb3Dx3elii+
-	Kp5xp10Lvfo7T5cwd3n2ZgrESTSL0r8=
-X-Google-Smtp-Source: APXvYqw8JvGXqw3Fx1baVT3yuVL+53hpbsQFog6lzEAl1ROJyfbyXpjakgeN4LYQEyBitUW4KC8bjg==
-X-Received: by 2002:adf:f590:: with SMTP id f16mr2872359wro.74.1556731752406; 
-	Wed, 01 May 2019 10:29:12 -0700 (PDT)
-Received: from zen.linaroharston ([81.128.185.34])
-	by smtp.gmail.com with ESMTPSA id
-	z4sm15181000wrq.75.2019.05.01.10.29.11 for <qemu-devel@nongnu.org>
-	(version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
-	Wed, 01 May 2019 10:29:11 -0700 (PDT)
-Received: from zen (localhost [127.0.0.1])
-	by zen.linaroharston (Postfix) with ESMTP id 6ADD41FF87
-	for <qemu-devel@nongnu.org>; Wed,  1 May 2019 18:29:11 +0100 (BST)
-References: <20190501050536.15580-1-richard.henderson@linaro.org>
-	<20190501050536.15580-7-richard.henderson@linaro.org>
-User-agent: mu4e 1.3.1; emacs 26.1
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-To: qemu-devel@nongnu.org
-In-reply-to: <20190501050536.15580-7-richard.henderson@linaro.org>
-Date: Wed, 01 May 2019 18:29:11 +0100
-Message-ID: <87o94m5biw.fsf@zen.linaroharston>
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1hLt4E-0003Tb-Nw
+	for qemu-devel@nongnu.org; Wed, 01 May 2019 13:30:51 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1hLt4A-0004zk-Nt
+	for <qemu-devel@nongnu.org>; Wed, 01 May 2019 17:30:46 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id B1ADB2E80CB
+	for <qemu-devel@nongnu.org>; Wed,  1 May 2019 17:30:46 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
-	recognized.
-X-Received-From: 2a00:1450:4864:20::441
-Subject: Re: [Qemu-devel] [PATCH v2 06/29] tcg: Return bool success from
- tcg_out_mov
+Date: Wed, 01 May 2019 17:24:23 -0000
+From: =?utf-8?q?Philippe_Mathieu-Daud=C3=A9?= <1797262@bugs.launchpad.net>
+To: qemu-devel@nongnu.org
+X-Launchpad-Notification-Type: bug
+X-Launchpad-Bug: product=qemu; status=Confirmed; importance=Undecided;
+	assignee=f4bug@amsat.org; 
+X-Launchpad-Bug-Tags: arm
+X-Launchpad-Bug-Information-Type: Public
+X-Launchpad-Bug-Private: no
+X-Launchpad-Bug-Security-Vulnerability: no
+X-Launchpad-Bug-Commenters: ajbennee pmaydell xrobau
+X-Launchpad-Bug-Reporter: Rob Thomas (xrobau)
+X-Launchpad-Bug-Modifier: =?utf-8?q?Philippe_Mathieu-Daud=C3=A9_=28philmd?=
+	=?utf-8?q?=29?=
+References: <153921596093.13046.16485884973780639345.malonedeb@wampee.canonical.com>
+Message-Id:
+ <155673146461.13229.17830983789503237119.launchpad@wampee.canonical.com>
+X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
+X-Launchpad-Message-For: qemu-devel-ml
+Precedence: bulk
+X-Generated-By: Launchpad (canonical.com); Revision="18928";
+	Instance="launchpad-lazr.conf"
+X-Launchpad-Hash: f8910acb2d24ed6ec9cc6f8f9092879bfa371960
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 91.189.90.7
+Subject: [Qemu-devel] [Bug 1797262] Re: qemu arm no longer able to boot RPI
+ Kernels
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
-Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -98,40 +80,63 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Reply-To: Bug 1797262 <1797262@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190501172911.3OERCCI8C5Z2z8NMmZTXXCkDAvCqEow3v2qF9TtIbfs@z>
+Message-ID: <20190501172423.YKVeox0yoZSzNQ9ADCVCKz0dH5LJ8hBC9DIwK6D7kis@z>
 
+** Tags added: arm
 
-Richard Henderson <richard.henderson@linaro.org> writes:
+** Changed in: qemu
+       Status: New =3D> Confirmed
 
-> This patch merely changes the interface, aborting on all failures,
+** Changed in: qemu
+     Assignee: (unassigned) =3D> Philippe Mathieu-Daud=C3=A9 (philmd)
 
-You say this but...
+-- =
 
-<snip>
->
-> -static inline void tcg_out_mov(TCGContext *s, TCGType type,
-> +static inline bool tcg_out_mov(TCGContext *s, TCGType type,
->                                 TCGReg ret, TCGReg arg)
->  {
-> -    tcg_out_dat_reg(s, COND_AL, ARITH_MOV, ret, 0, arg, SHIFT_IMM_LSL(0)=
-);
-> +    if (ret !=3D arg) {
-> +        tcg_out_dat_reg(s, COND_AL, ARITH_MOV, ret, 0, arg, SHIFT_IMM_LS=
-L(0));
-> +    }
-> +    return true;
->  }
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1797262
 
-You fix a mov folding here.. either mention in commit message or fix in
-a separate commit. I appreciate the other arches already do this.
+Title:
+  qemu arm no longer able to boot RPI Kernels
 
-Otherwise:
+Status in QEMU:
+  Confirmed
 
-Reviewed-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
+Bug description:
+  Since RPi Kernel 1.20170427, qemu is no longer able to emulate the
+  Rasberry Pi, as the linux kernel is complaining about timing issues.
 
---
-Alex Benn=C3=A9e
+  Old kernel output - https://pastebin.com/wvkneNNF
+  New kernel output - https://pastebin.com/QTwgCkV2
+
+  Note that the actual error is caused by the kernel being unable to get
+  the timing source for the mmc (Line 160), which causes an unable-to-
+  mount-root panic.  There are other issues with the serial port
+  returning an invalid speed, which displays a divide-by-zero error,
+  which is PROBABLY a symptom of the same root cause.
+
+  This is simple to replicate - The last working kernel is available
+  here:
+
+  https://github.com/raspberrypi/firmware/tree/1.20170405/boot
+
+  Download kernel7 and the dtb, and try to boot with (for example)
+
+  qemu-system-aarch64 -M raspi2 -kernel kernel7.img -dtb
+  bcm2709-rpi-2-b.dtb -serial stdio -sd noobs.img -append
+  "root=3D/dev/mmcblk0p2 init=3D/bin/bash"
+
+  This works, and boots successfully.
+
+  However, if you replace the kernel7.img and dtb with ones taken from
+  https://github.com/raspberrypi/firmware/tree/1.20170427/boot it will
+  NOT boot because of various clock timing issues (as in the second
+  paste)
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1797262/+subscriptions
 
