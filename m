@@ -1,30 +1,16 @@
-Received: from eggs.gnu.org ([209.51.188.92]:51161)
+Received: from eggs.gnu.org ([209.51.188.92]:51831)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1hLvjh-0002ns-0A
-	for qemu-devel@nongnu.org; Wed, 01 May 2019 16:21:49 -0400
+	(envelope-from <jsnow@redhat.com>) id 1hLvn0-0003eo-NN
+	for qemu-devel@nongnu.org; Wed, 01 May 2019 16:25:15 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1hLvjg-0007s7-3v
-	for qemu-devel@nongnu.org; Wed, 01 May 2019 16:21:48 -0400
-Received: from mail-pl1-x644.google.com ([2607:f8b0:4864:20::644]:34873)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1hLvjf-0007rY-Tn
-	for qemu-devel@nongnu.org; Wed, 01 May 2019 16:21:48 -0400
-Received: by mail-pl1-x644.google.com with SMTP id w24so8671616plp.2
-	for <qemu-devel@nongnu.org>; Wed, 01 May 2019 13:21:47 -0700 (PDT)
-References: <20190501050536.15580-1-richard.henderson@linaro.org>
-	<20190501050536.15580-9-richard.henderson@linaro.org>
-	<87lfzq5b4w.fsf@zen.linaroharston>
-From: Richard Henderson <richard.henderson@linaro.org>
-Message-ID: <71153219-741d-3c27-53b8-455c62de36c8@linaro.org>
-Date: Wed, 1 May 2019 13:21:43 -0700
+	(envelope-from <jsnow@redhat.com>) id 1hLvmz-00018U-Pd
+	for qemu-devel@nongnu.org; Wed, 01 May 2019 16:25:14 -0400
+From: John Snow <jsnow@redhat.com>
+Date: Wed,  1 May 2019 16:25:04 -0400
+Message-Id: <20190501202506.13875-1-jsnow@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <87lfzq5b4w.fsf@zen.linaroharston>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH v2 08/29] tcg: Promote tcg_out_{dup,
- dupi}_vec to backend interface
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PULL 0/2] Bitmaps patches
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,22 +19,36 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>, qemu-devel@nongnu.org
+To: qemu-devel@nongnu.org
+Cc: jsnow@redhat.com, peter.maydell@linaro.org, qemu-block@nongnu.org, qemu-stable@nongnu.org
 
-On 5/1/19 10:37 AM, Alex Bennée wrote:
-> 
-> Richard Henderson <richard.henderson@linaro.org> writes:
-> 
->> The i386 backend already has these functions, and the aarch64
->> backend could easily split out one.  Nothing is done with these
->> functions yet, but this will aid register allocation of
->> INDEX_op_dup_vec in a later patch.
-> 
->   "Also use correct type for tcg_out_dupi_vec"?
+The following changes since commit 46316f1dfffc6be72e94e89f7b0e9162e7dcdc=
+f1:
 
-Added:
+  Merge remote-tracking branch 'remotes/awilliam/tags/vfio-updates-201903=
+11.0' into staging (2019-03-12 13:37:29 +0000)
 
-"Adjust the aarch64 tcg_out_dupi_vec signature to match the new interface."
+are available in the Git repository at:
 
+  https://github.com/jnsnow/qemu.git tags/bitmaps-pull-request
 
-r~
+for you to fetch changes up to 90edef80a0852cf8a3d2668898ee40e8970e4314:
+
+  docs/interop/bitmaps: rewrite and modernize doc (2019-05-01 16:21:24 -0=
+400)
+
+----------------------------------------------------------------
+Pull request
+
+----------------------------------------------------------------
+
+John Snow (2):
+  Makefile: add nit-picky mode to sphinx-build
+  docs/interop/bitmaps: rewrite and modernize doc
+
+ docs/interop/bitmaps.rst | 1599 ++++++++++++++++++++++++++++++--------
+ Makefile                 |    2 +-
+ 2 files changed, 1265 insertions(+), 336 deletions(-)
+
+--=20
+2.20.1
