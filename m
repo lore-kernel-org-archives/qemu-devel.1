@@ -1,25 +1,25 @@
-Received: from eggs.gnu.org ([209.51.188.92]:34391)
+Received: from eggs.gnu.org ([209.51.188.92]:34416)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <palmer@sifive.com>) id 1hLsvL-0002WW-MN
-	for qemu-devel@nongnu.org; Wed, 01 May 2019 13:21:40 -0400
+	(envelope-from <palmer@sifive.com>) id 1hLsvP-0002XU-Cv
+	for qemu-devel@nongnu.org; Wed, 01 May 2019 13:21:46 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <palmer@sifive.com>) id 1hLsvJ-00050Q-OC
-	for qemu-devel@nongnu.org; Wed, 01 May 2019 13:21:39 -0400
-Received: from mail-pl1-x641.google.com ([2607:f8b0:4864:20::641]:38358)
+	(envelope-from <palmer@sifive.com>) id 1hLsvL-00054B-MX
+	for qemu-devel@nongnu.org; Wed, 01 May 2019 13:21:42 -0400
+Received: from mail-pf1-x442.google.com ([2607:f8b0:4864:20::442]:36235)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <palmer@sifive.com>) id 1hLsvH-0004sV-8u
-	for qemu-devel@nongnu.org; Wed, 01 May 2019 13:21:37 -0400
-Received: by mail-pl1-x641.google.com with SMTP id a59so1093091pla.5
-	for <qemu-devel@nongnu.org>; Wed, 01 May 2019 10:21:33 -0700 (PDT)
-Date: Wed, 01 May 2019 10:21:31 -0700 (PDT)
-In-Reply-To: <20190425172636.11128-2-richard.henderson@linaro.org>
+	(Exim 4.71) (envelope-from <palmer@sifive.com>) id 1hLsvJ-0004ox-NI
+	for qemu-devel@nongnu.org; Wed, 01 May 2019 13:21:38 -0400
+Received: by mail-pf1-x442.google.com with SMTP id v80so4298110pfa.3
+	for <qemu-devel@nongnu.org>; Wed, 01 May 2019 10:21:32 -0700 (PDT)
+Date: Wed, 01 May 2019 10:21:29 -0700 (PDT)
+In-Reply-To: <03ac8b9b-20ae-e6ec-5647-f679471f4d3b@linaro.org>
 From: Palmer Dabbelt <palmer@sifive.com>
-Message-ID: <mhng-6fa8c1f8-fe4c-4d72-b0ea-c9809704637e@palmer-si-x1e>
+Message-ID: <mhng-c095a304-dace-4b99-8dc6-7a179a3f80bb@palmer-si-x1e>
 Mime-Version: 1.0 (MHng)
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH 1/2] fixup! target/riscv: Name the argument
- sets for all of insn32 formats
+Subject: Re: [Qemu-devel] [PATCH 2/2] target/riscv: Add checks for several
+ RVC reserved operands
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,38 +31,19 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: richard.henderson@linaro.org
 Cc: qemu-devel@nongnu.org
 
-On Thu, 25 Apr 2019 10:26:35 PDT (-0700), richard.henderson@linaro.org wrote:
-> ---
->  target/riscv/translate.c | 13 ++++++++++---
->  1 file changed, 10 insertions(+), 3 deletions(-)
+On Thu, 25 Apr 2019 10:32:43 PDT (-0700), richard.henderson@linaro.org wrote:
+> On 4/25/19 10:26 AM, Richard Henderson wrote:
+>>  {
+>> +  illegal         011 0  -----  00000 01 # c.addi16sp, RES nzimm=0
+>>    addi            011 .  00010  ..... 01 @c_addi16sp
+>>    lui             011 .  .....  ..... 01 @c_lui
+>>  }
 >
-> diff --git a/target/riscv/translate.c b/target/riscv/translate.c
-> index d1f599a92d..009c146e8f 100644
-> --- a/target/riscv/translate.c
-> +++ b/target/riscv/translate.c
-> @@ -713,12 +713,19 @@ static bool gen_shift(DisasContext *ctx, arg_r *a,
->   * initially declared by the 32-bit decoder, which results in duplicate
->   * declaration warnings.  Suppress them.
->   */
-> -#pragma GCC diagnostic push
-> -#pragma GCC diagnostic ignored "-Wredundant-decls"
-> +#ifdef CONFIG_PRAGMA_DIAGNOSTIC_AVAILABLE
-> +# pragma GCC diagnostic push
-> +# pragma GCC diagnostic ignored "-Wredundant-decls"
-> +# ifdef __clang__
-> +#  pragma GCC diagnostic ignored "-Wtypedef-redefinition"
-> +# endif
-> +#endif
+> Bah.  I just realized the comment should be more like
 >
->  #include "decode_insn16.inc.c"
+>   # c.addi16sp and c.lui, RES nzimm=0
 >
-> -#pragma GCC diagnostic pop
-> +#ifdef CONFIG_PRAGMA_DIAGNOSTIC_AVAILABLE
-> +# pragma GCC diagnostic pop
-> +#endif
->
->  static void decode_opc(DisasContext *ctx)
->  {
+> Otherwise one is led to believe that rd=2 is missing
+> from the illegal pattern.
 
-I've attemeted to fixup the patch on my for-master, let me know if I've screwed
-something up!
+OK, I went ahead and squashed in that fix as well.
