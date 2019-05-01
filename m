@@ -1,22 +1,22 @@
-Received: from eggs.gnu.org ([209.51.188.92]:49337)
+Received: from eggs.gnu.org ([209.51.188.92]:49736)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1hLlf7-0002PZ-Au
-	for qemu-devel@nongnu.org; Wed, 01 May 2019 05:36:28 -0400
+	(envelope-from <laurent@vivier.eu>) id 1hLlhD-0003OV-I0
+	for qemu-devel@nongnu.org; Wed, 01 May 2019 05:38:38 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1hLlf4-0003TZ-6o
-	for qemu-devel@nongnu.org; Wed, 01 May 2019 05:36:25 -0400
-References: <cover.1556666645.git.alistair.francis@wdc.com>
-	<002f222d86322a66276de39cb29796acffe384c1.1556666645.git.alistair.francis@wdc.com>
+	(envelope-from <laurent@vivier.eu>) id 1hLlhA-0004U8-Gm
+	for qemu-devel@nongnu.org; Wed, 01 May 2019 05:38:35 -0400
 From: Laurent Vivier <laurent@vivier.eu>
-Message-ID: <3ff5539c-ee8c-336e-9a15-182834f1686c@vivier.eu>
-Date: Wed, 1 May 2019 11:35:50 +0200
+References: <cover.1556666645.git.alistair.francis@wdc.com>
+	<ff51c73e3095fa503d14aafece54f8565fe99900.1556666645.git.alistair.francis@wdc.com>
+Message-ID: <74fcaa14-6e80-9d7b-bcd6-9c951a4f46de@vivier.eu>
+Date: Wed, 1 May 2019 11:37:58 +0200
 MIME-Version: 1.0
-In-Reply-To: <002f222d86322a66276de39cb29796acffe384c1.1556666645.git.alistair.francis@wdc.com>
+In-Reply-To: <ff51c73e3095fa503d14aafece54f8565fe99900.1556666645.git.alistair.francis@wdc.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH v2 1/5] util/qemu-sockets: Fix GCC 9 build
- warnings
+Subject: Re: [Qemu-devel] [PATCH v2 2/5] hw/usb/hcd-xhci: Fix GCC 9 build
+ warning
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,32 +29,39 @@ To: Alistair Francis <Alistair.Francis@wdc.com>, "qemu-devel@nongnu.org" <qemu-d
 Cc: "alistair23@gmail.com" <alistair23@gmail.com>, "kraxel@redhat.com" <kraxel@redhat.com>, "berrange@redhat.com" <berrange@redhat.com>, "riku.voipio@iki.fi" <riku.voipio@iki.fi>, "qemu-trivial@nongnu.org" <qemu-trivial@nongnu.org>
 
 Le 01/05/2019 à 01:28, Alistair Francis a écrit :
-> Fix this warning when building with GCC9 on Fedora 30:
-> In function ‘strncpy’,
->     inlined from ‘unix_connect_saddr.isra.0’ at util/qemu-sockets.c:925:5:
-> /usr/include/bits/string_fortified.h:106:10: error: ‘__builtin_strncpy’ specified bound 108 equals destination size [-Werror=stringop-truncation]
->   106 |   return __builtin___strncpy_chk (__dest, __src, __len, __bos (__dest));
->       |          ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-> In function ‘strncpy’,
->     inlined from ‘unix_listen_saddr.isra.0’ at util/qemu-sockets.c:880:5:
+> Fix this build warning with GCC 9 on Fedora 30:
+> hw/usb/hcd-xhci.c:3339:66: error: ‘%d’ directive output may be truncated writing between 1 and 10 bytes into a region of size 5 [-Werror=format-truncation=]
+>  3339 |             snprintf(port->name, sizeof(port->name), "usb2 port #%d", i+1);
+>       |                                                                  ^~
+> hw/usb/hcd-xhci.c:3339:54: note: directive argument in the range [1, 2147483647]
+>  3339 |             snprintf(port->name, sizeof(port->name), "usb2 port #%d", i+1);
+>       |                                                      ^~~~~~~~~~~~~~~
+> In file included from /usr/include/stdio.h:867,
+>                  from /home/alistair/qemu/include/qemu/osdep.h:99,
+>                  from hw/usb/hcd-xhci.c:21:
+> /usr/include/bits/stdio2.h:67:10: note: ‘__builtin___snprintf_chk’ output between 13 and 22 bytes into a destination of size 16
+>    67 |   return __builtin___snprintf_chk (__s, __n, __USE_FORTIFY_LEVEL - 1,
+>       |          ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+>    68 |        __bos (__s), __fmt, __va_arg_pack ());
+>       |        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 > 
 > Signed-off-by: Alistair Francis <alistair.francis@wdc.com>
 > ---
->  util/qemu-sockets.c | 4 ++--
->  1 file changed, 2 insertions(+), 2 deletions(-)
+>  hw/usb/hcd-xhci.c | 1 +
+>  1 file changed, 1 insertion(+)
 > 
-> diff --git a/util/qemu-sockets.c b/util/qemu-sockets.c
-> index 9705051690..8c3322958f 100644
-> --- a/util/qemu-sockets.c
-> +++ b/util/qemu-sockets.c
-> @@ -829,7 +829,7 @@ static int unix_listen_saddr(UnixSocketAddress *saddr,
->      struct sockaddr_un un;
->      int sock, fd;
->      char *pathbuf = NULL;
-> -    const char *path;
-> +    const char *path QEMU_NONSTRING;
+> diff --git a/hw/usb/hcd-xhci.c b/hw/usb/hcd-xhci.c
+> index ec28bee319..2b061772b2 100644
+> --- a/hw/usb/hcd-xhci.c
+> +++ b/hw/usb/hcd-xhci.c
+> @@ -3322,6 +3322,7 @@ static void usb_xhci_init(XHCIState *xhci)
+>      usb_bus_new(&xhci->bus, sizeof(xhci->bus), &xhci_bus_ops, dev);
+>  
+>      for (i = 0; i < usbports; i++) {
+> +        g_assert(i < MAX(MAXPORTS_2, MAXPORTS_3));
+>          speedmask = 0;
+>          if (i < xhci->numports_2) {
+>              if (xhci_get_flag(xhci, XHCI_FLAG_SS_FIRST)) {
+> 
 
-Do we need this with memcpy()?
-
-Thanks,
-Laurent
+Reviewed-by: Laurent Vivier <laurent@vivier.eu>
