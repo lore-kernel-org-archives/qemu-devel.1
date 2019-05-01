@@ -1,31 +1,28 @@
-Received: from eggs.gnu.org ([209.51.188.92]:38418)
+Received: from eggs.gnu.org ([209.51.188.92]:38438)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1hLhRf-0006de-1s
-	for qemu-devel@nongnu.org; Wed, 01 May 2019 01:06:18 -0400
+	(envelope-from <richard.henderson@linaro.org>) id 1hLhRg-0006fu-RK
+	for qemu-devel@nongnu.org; Wed, 01 May 2019 01:06:19 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1hLhRb-00030j-Cz
-	for qemu-devel@nongnu.org; Wed, 01 May 2019 01:06:14 -0400
-Received: from mail-pg1-x542.google.com ([2607:f8b0:4864:20::542]:38308)
+	(envelope-from <richard.henderson@linaro.org>) id 1hLhRd-00031h-4X
+	for qemu-devel@nongnu.org; Wed, 01 May 2019 01:06:16 -0400
+Received: from mail-pg1-x52d.google.com ([2607:f8b0:4864:20::52d]:38983)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1hLhRZ-0002xi-Bc
-	for qemu-devel@nongnu.org; Wed, 01 May 2019 01:06:10 -0400
-Received: by mail-pg1-x542.google.com with SMTP id j26so7869534pgl.5
-	for <qemu-devel@nongnu.org>; Tue, 30 Apr 2019 22:06:08 -0700 (PDT)
+	id 1hLhRb-0002zP-CA
+	for qemu-devel@nongnu.org; Wed, 01 May 2019 01:06:12 -0400
+Received: by mail-pg1-x52d.google.com with SMTP id l18so7862535pgj.6
+	for <qemu-devel@nongnu.org>; Tue, 30 Apr 2019 22:06:09 -0700 (PDT)
 Received: from localhost.localdomain (97-113-189-189.tukw.qwest.net.
 	[97.113.189.189]) by smtp.gmail.com with ESMTPSA id
-	t127sm9687251pfb.106.2019.04.30.22.06.05 for <qemu-devel@nongnu.org>
+	t127sm9687251pfb.106.2019.04.30.22.06.07 for <qemu-devel@nongnu.org>
 	(version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-	Tue, 30 Apr 2019 22:06:06 -0700 (PDT)
+	Tue, 30 Apr 2019 22:06:07 -0700 (PDT)
 From: Richard Henderson <richard.henderson@linaro.org>
-Date: Tue, 30 Apr 2019 22:05:26 -0700
-Message-Id: <20190501050536.15580-20-richard.henderson@linaro.org>
+Date: Tue, 30 Apr 2019 22:05:27 -0700
+Message-Id: <20190501050536.15580-21-richard.henderson@linaro.org>
 In-Reply-To: <20190501050536.15580-1-richard.henderson@linaro.org>
 References: <20190501050536.15580-1-richard.henderson@linaro.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH v2 19/29] tcg: Add support for integer absolute
+Subject: [Qemu-devel] [PATCH v2 20/29] tcg: Add support for vector absolute
  value
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
@@ -37,120 +34,315 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-Remove a function of the same name from target/arm/.
-Use a branchless implementation of abs gleaned from gcc.
-
-Reviewed-by: David Hildenbrand <david@redhat.com>
-Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
 Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- tcg/tcg-op.h           |  5 +++++
- target/arm/translate.c | 10 ----------
- tcg/tcg-op.c           | 20 ++++++++++++++++++++
- 3 files changed, 25 insertions(+), 10 deletions(-)
+ accel/tcg/tcg-runtime.h      |  5 +++
+ tcg/aarch64/tcg-target.h     |  1 +
+ tcg/i386/tcg-target.h        |  1 +
+ tcg/tcg-op-gvec.h            |  2 ++
+ tcg/tcg-opc.h                |  1 +
+ tcg/tcg.h                    |  1 +
+ accel/tcg/tcg-runtime-gvec.c | 48 +++++++++++++++++++++++++++
+ tcg/tcg-op-gvec.c            | 63 ++++++++++++++++++++++++++++++++++++
+ tcg/tcg-op-vec.c             | 39 ++++++++++++++++++++++
+ tcg/tcg.c                    |  2 ++
+ tcg/README                   |  4 +++
+ 11 files changed, 167 insertions(+)
 
-diff --git a/tcg/tcg-op.h b/tcg/tcg-op.h
-index 472b73cb38..660fe205d0 100644
---- a/tcg/tcg-op.h
-+++ b/tcg/tcg-op.h
-@@ -335,6 +335,7 @@ void tcg_gen_smin_i32(TCGv_i32, TCGv_i32 arg1, TCGv_i32 arg2);
- void tcg_gen_smax_i32(TCGv_i32, TCGv_i32 arg1, TCGv_i32 arg2);
- void tcg_gen_umin_i32(TCGv_i32, TCGv_i32 arg1, TCGv_i32 arg2);
- void tcg_gen_umax_i32(TCGv_i32, TCGv_i32 arg1, TCGv_i32 arg2);
-+void tcg_gen_abs_i32(TCGv_i32, TCGv_i32);
+diff --git a/accel/tcg/tcg-runtime.h b/accel/tcg/tcg-runtime.h
+index ed3ce5fd91..6d73dc2d65 100644
+--- a/accel/tcg/tcg-runtime.h
++++ b/accel/tcg/tcg-runtime.h
+@@ -225,6 +225,11 @@ DEF_HELPER_FLAGS_3(gvec_neg16, TCG_CALL_NO_RWG, void, ptr, ptr, i32)
+ DEF_HELPER_FLAGS_3(gvec_neg32, TCG_CALL_NO_RWG, void, ptr, ptr, i32)
+ DEF_HELPER_FLAGS_3(gvec_neg64, TCG_CALL_NO_RWG, void, ptr, ptr, i32)
  
- static inline void tcg_gen_discard_i32(TCGv_i32 arg)
- {
-@@ -534,6 +535,7 @@ void tcg_gen_smin_i64(TCGv_i64, TCGv_i64 arg1, TCGv_i64 arg2);
- void tcg_gen_smax_i64(TCGv_i64, TCGv_i64 arg1, TCGv_i64 arg2);
- void tcg_gen_umin_i64(TCGv_i64, TCGv_i64 arg1, TCGv_i64 arg2);
- void tcg_gen_umax_i64(TCGv_i64, TCGv_i64 arg1, TCGv_i64 arg2);
-+void tcg_gen_abs_i64(TCGv_i64, TCGv_i64);
- 
- #if TCG_TARGET_REG_BITS == 64
- static inline void tcg_gen_discard_i64(TCGv_i64 arg)
-@@ -973,6 +975,7 @@ void tcg_gen_nor_vec(unsigned vece, TCGv_vec r, TCGv_vec a, TCGv_vec b);
- void tcg_gen_eqv_vec(unsigned vece, TCGv_vec r, TCGv_vec a, TCGv_vec b);
- void tcg_gen_not_vec(unsigned vece, TCGv_vec r, TCGv_vec a);
- void tcg_gen_neg_vec(unsigned vece, TCGv_vec r, TCGv_vec a);
-+void tcg_gen_abs_vec(unsigned vece, TCGv_vec r, TCGv_vec a);
- void tcg_gen_ssadd_vec(unsigned vece, TCGv_vec r, TCGv_vec a, TCGv_vec b);
- void tcg_gen_usadd_vec(unsigned vece, TCGv_vec r, TCGv_vec a, TCGv_vec b);
- void tcg_gen_sssub_vec(unsigned vece, TCGv_vec r, TCGv_vec a, TCGv_vec b);
-@@ -1019,6 +1022,7 @@ void tcg_gen_stl_vec(TCGv_vec r, TCGv_ptr base, TCGArg offset, TCGType t);
- #define tcg_gen_addi_tl tcg_gen_addi_i64
- #define tcg_gen_sub_tl tcg_gen_sub_i64
- #define tcg_gen_neg_tl tcg_gen_neg_i64
-+#define tcg_gen_abs_tl tcg_gen_abs_i64
- #define tcg_gen_subfi_tl tcg_gen_subfi_i64
- #define tcg_gen_subi_tl tcg_gen_subi_i64
- #define tcg_gen_and_tl tcg_gen_and_i64
-@@ -1131,6 +1135,7 @@ void tcg_gen_stl_vec(TCGv_vec r, TCGv_ptr base, TCGArg offset, TCGType t);
- #define tcg_gen_addi_tl tcg_gen_addi_i32
- #define tcg_gen_sub_tl tcg_gen_sub_i32
- #define tcg_gen_neg_tl tcg_gen_neg_i32
-+#define tcg_gen_abs_tl tcg_gen_abs_i32
- #define tcg_gen_subfi_tl tcg_gen_subfi_i32
- #define tcg_gen_subi_tl tcg_gen_subi_i32
- #define tcg_gen_and_tl tcg_gen_and_i32
-diff --git a/target/arm/translate.c b/target/arm/translate.c
-index 35bd426a3d..b25781554f 100644
---- a/target/arm/translate.c
-+++ b/target/arm/translate.c
-@@ -604,16 +604,6 @@ static void gen_sar(TCGv_i32 dest, TCGv_i32 t0, TCGv_i32 t1)
-     tcg_temp_free_i32(tmp1);
- }
- 
--static void tcg_gen_abs_i32(TCGv_i32 dest, TCGv_i32 src)
--{
--    TCGv_i32 c0 = tcg_const_i32(0);
--    TCGv_i32 tmp = tcg_temp_new_i32();
--    tcg_gen_neg_i32(tmp, src);
--    tcg_gen_movcond_i32(TCG_COND_GT, dest, src, c0, src, tmp);
--    tcg_temp_free_i32(c0);
--    tcg_temp_free_i32(tmp);
--}
--
- static void shifter_out_im(TCGv_i32 var, int shift)
- {
-     if (shift == 0) {
-diff --git a/tcg/tcg-op.c b/tcg/tcg-op.c
-index a00d1df37e..0ac291f1c4 100644
---- a/tcg/tcg-op.c
-+++ b/tcg/tcg-op.c
-@@ -1091,6 +1091,16 @@ void tcg_gen_umax_i32(TCGv_i32 ret, TCGv_i32 a, TCGv_i32 b)
-     tcg_gen_movcond_i32(TCG_COND_LTU, ret, a, b, b, a);
- }
- 
-+void tcg_gen_abs_i32(TCGv_i32 ret, TCGv_i32 a)
-+{
-+    TCGv_i32 t = tcg_temp_new_i32();
++DEF_HELPER_FLAGS_3(gvec_abs8, TCG_CALL_NO_RWG, void, ptr, ptr, i32)
++DEF_HELPER_FLAGS_3(gvec_abs16, TCG_CALL_NO_RWG, void, ptr, ptr, i32)
++DEF_HELPER_FLAGS_3(gvec_abs32, TCG_CALL_NO_RWG, void, ptr, ptr, i32)
++DEF_HELPER_FLAGS_3(gvec_abs64, TCG_CALL_NO_RWG, void, ptr, ptr, i32)
 +
-+    tcg_gen_sari_i32(t, a, 31);
-+    tcg_gen_xor_i32(ret, a, t);
-+    tcg_gen_sub_i32(ret, ret, t);
-+    tcg_temp_free_i32(t);
+ DEF_HELPER_FLAGS_3(gvec_not, TCG_CALL_NO_RWG, void, ptr, ptr, i32)
+ DEF_HELPER_FLAGS_4(gvec_and, TCG_CALL_NO_RWG, void, ptr, ptr, ptr, i32)
+ DEF_HELPER_FLAGS_4(gvec_or, TCG_CALL_NO_RWG, void, ptr, ptr, ptr, i32)
+diff --git a/tcg/aarch64/tcg-target.h b/tcg/aarch64/tcg-target.h
+index f5640a229b..21d06d928c 100644
+--- a/tcg/aarch64/tcg-target.h
++++ b/tcg/aarch64/tcg-target.h
+@@ -132,6 +132,7 @@ typedef enum {
+ #define TCG_TARGET_HAS_orc_vec          1
+ #define TCG_TARGET_HAS_not_vec          1
+ #define TCG_TARGET_HAS_neg_vec          1
++#define TCG_TARGET_HAS_abs_vec          0
+ #define TCG_TARGET_HAS_shi_vec          1
+ #define TCG_TARGET_HAS_shs_vec          0
+ #define TCG_TARGET_HAS_shv_vec          1
+diff --git a/tcg/i386/tcg-target.h b/tcg/i386/tcg-target.h
+index 618aa520d2..7445f05885 100644
+--- a/tcg/i386/tcg-target.h
++++ b/tcg/i386/tcg-target.h
+@@ -182,6 +182,7 @@ extern bool have_avx2;
+ #define TCG_TARGET_HAS_orc_vec          0
+ #define TCG_TARGET_HAS_not_vec          0
+ #define TCG_TARGET_HAS_neg_vec          0
++#define TCG_TARGET_HAS_abs_vec          0
+ #define TCG_TARGET_HAS_shi_vec          1
+ #define TCG_TARGET_HAS_shs_vec          1
+ #define TCG_TARGET_HAS_shv_vec          have_avx2
+diff --git a/tcg/tcg-op-gvec.h b/tcg/tcg-op-gvec.h
+index 6ee98f3378..52a398c190 100644
+--- a/tcg/tcg-op-gvec.h
++++ b/tcg/tcg-op-gvec.h
+@@ -228,6 +228,8 @@ void tcg_gen_gvec_not(unsigned vece, uint32_t dofs, uint32_t aofs,
+                       uint32_t oprsz, uint32_t maxsz);
+ void tcg_gen_gvec_neg(unsigned vece, uint32_t dofs, uint32_t aofs,
+                       uint32_t oprsz, uint32_t maxsz);
++void tcg_gen_gvec_abs(unsigned vece, uint32_t dofs, uint32_t aofs,
++                      uint32_t oprsz, uint32_t maxsz);
+ 
+ void tcg_gen_gvec_add(unsigned vece, uint32_t dofs, uint32_t aofs,
+                       uint32_t bofs, uint32_t oprsz, uint32_t maxsz);
+diff --git a/tcg/tcg-opc.h b/tcg/tcg-opc.h
+index 4bf71f261f..4a2dd116eb 100644
+--- a/tcg/tcg-opc.h
++++ b/tcg/tcg-opc.h
+@@ -225,6 +225,7 @@ DEF(add_vec, 1, 2, 0, IMPLVEC)
+ DEF(sub_vec, 1, 2, 0, IMPLVEC)
+ DEF(mul_vec, 1, 2, 0, IMPLVEC | IMPL(TCG_TARGET_HAS_mul_vec))
+ DEF(neg_vec, 1, 1, 0, IMPLVEC | IMPL(TCG_TARGET_HAS_neg_vec))
++DEF(abs_vec, 1, 1, 0, IMPLVEC | IMPL(TCG_TARGET_HAS_abs_vec))
+ DEF(ssadd_vec, 1, 2, 0, IMPLVEC | IMPL(TCG_TARGET_HAS_sat_vec))
+ DEF(usadd_vec, 1, 2, 0, IMPLVEC | IMPL(TCG_TARGET_HAS_sat_vec))
+ DEF(sssub_vec, 1, 2, 0, IMPLVEC | IMPL(TCG_TARGET_HAS_sat_vec))
+diff --git a/tcg/tcg.h b/tcg/tcg.h
+index 2c7315da25..0e01a70d66 100644
+--- a/tcg/tcg.h
++++ b/tcg/tcg.h
+@@ -176,6 +176,7 @@ typedef uint64_t TCGRegSet;
+     && !defined(TCG_TARGET_HAS_v128) \
+     && !defined(TCG_TARGET_HAS_v256)
+ #define TCG_TARGET_MAYBE_vec            0
++#define TCG_TARGET_HAS_abs_vec          0
+ #define TCG_TARGET_HAS_neg_vec          0
+ #define TCG_TARGET_HAS_not_vec          0
+ #define TCG_TARGET_HAS_andc_vec         0
+diff --git a/accel/tcg/tcg-runtime-gvec.c b/accel/tcg/tcg-runtime-gvec.c
+index 2152fb6903..0f09e0ef38 100644
+--- a/accel/tcg/tcg-runtime-gvec.c
++++ b/accel/tcg/tcg-runtime-gvec.c
+@@ -398,6 +398,54 @@ void HELPER(gvec_neg64)(void *d, void *a, uint32_t desc)
+     clear_high(d, oprsz, desc);
+ }
+ 
++void HELPER(gvec_abs8)(void *d, void *a, uint32_t desc)
++{
++    intptr_t oprsz = simd_oprsz(desc);
++    intptr_t i;
++
++    for (i = 0; i < oprsz; i += sizeof(int8_t)) {
++        int8_t aa = *(int8_t *)(a + i);
++        *(int8_t *)(d + i) = aa < 0 ? -aa : aa;
++    }
++    clear_high(d, oprsz, desc);
 +}
 +
- /* 64-bit ops */
- 
- #if TCG_TARGET_REG_BITS == 32
-@@ -2548,6 +2558,16 @@ void tcg_gen_umax_i64(TCGv_i64 ret, TCGv_i64 a, TCGv_i64 b)
-     tcg_gen_movcond_i64(TCG_COND_LTU, ret, a, b, b, a);
++void HELPER(gvec_abs16)(void *d, void *a, uint32_t desc)
++{
++    intptr_t oprsz = simd_oprsz(desc);
++    intptr_t i;
++
++    for (i = 0; i < oprsz; i += sizeof(int16_t)) {
++        int16_t aa = *(int16_t *)(a + i);
++        *(int16_t *)(d + i) = aa < 0 ? -aa : aa;
++    }
++    clear_high(d, oprsz, desc);
++}
++
++void HELPER(gvec_abs32)(void *d, void *a, uint32_t desc)
++{
++    intptr_t oprsz = simd_oprsz(desc);
++    intptr_t i;
++
++    for (i = 0; i < oprsz; i += sizeof(int32_t)) {
++        int32_t aa = *(int32_t *)(a + i);
++        *(int32_t *)(d + i) = aa < 0 ? -aa : aa;
++    }
++    clear_high(d, oprsz, desc);
++}
++
++void HELPER(gvec_abs64)(void *d, void *a, uint32_t desc)
++{
++    intptr_t oprsz = simd_oprsz(desc);
++    intptr_t i;
++
++    for (i = 0; i < oprsz; i += sizeof(int64_t)) {
++        int64_t aa = *(int64_t *)(a + i);
++        *(int64_t *)(d + i) = aa < 0 ? -aa : aa;
++    }
++    clear_high(d, oprsz, desc);
++}
++
+ void HELPER(gvec_mov)(void *d, void *a, uint32_t desc)
+ {
+     intptr_t oprsz = simd_oprsz(desc);
+diff --git a/tcg/tcg-op-gvec.c b/tcg/tcg-op-gvec.c
+index 8fc5ba042b..bbccb3f5a1 100644
+--- a/tcg/tcg-op-gvec.c
++++ b/tcg/tcg-op-gvec.c
+@@ -2177,6 +2177,69 @@ void tcg_gen_gvec_neg(unsigned vece, uint32_t dofs, uint32_t aofs,
+     tcg_gen_gvec_2(dofs, aofs, oprsz, maxsz, &g[vece]);
  }
  
-+void tcg_gen_abs_i64(TCGv_i64 ret, TCGv_i64 a)
++static void gen_absv_mask(TCGv_i64 d, TCGv_i64 b, unsigned vece)
 +{
 +    TCGv_i64 t = tcg_temp_new_i64();
++    int nbit = 8 << vece;
 +
-+    tcg_gen_sari_i64(t, a, 63);
-+    tcg_gen_xor_i64(ret, a, t);
-+    tcg_gen_sub_i64(ret, ret, t);
++    /* Create -1 for each negative element.  */
++    tcg_gen_shri_i64(t, b, nbit - 1);
++    tcg_gen_andi_i64(t, t, dup_const(vece, 1));
++    tcg_gen_muli_i64(t, t, (1 << nbit) - 1);
++
++    /*
++     * Invert (via xor -1) and add one (via sub -1).
++     * Because of the ordering the msb is cleared,
++     * so we never have carry into the next element.
++     */
++    tcg_gen_xor_i64(d, b, t);
++    tcg_gen_sub_i64(d, d, t);
++
 +    tcg_temp_free_i64(t);
 +}
 +
- /* Size changing operations.  */
++static void tcg_gen_vec_abs8_i64(TCGv_i64 d, TCGv_i64 b)
++{
++    gen_absv_mask(d, b, MO_8);
++}
++
++static void tcg_gen_vec_abs16_i64(TCGv_i64 d, TCGv_i64 b)
++{
++    gen_absv_mask(d, b, MO_16);
++}
++
++void tcg_gen_gvec_abs(unsigned vece, uint32_t dofs, uint32_t aofs,
++                      uint32_t oprsz, uint32_t maxsz)
++{
++    static const TCGOpcode vecop_list[] = { INDEX_op_abs_vec, 0 };
++    static const GVecGen2 g[4] = {
++        { .fni8 = tcg_gen_vec_abs8_i64,
++          .fniv = tcg_gen_abs_vec,
++          .fno = gen_helper_gvec_abs8,
++          .opt_opc = vecop_list,
++          .vece = MO_8 },
++        { .fni8 = tcg_gen_vec_abs16_i64,
++          .fniv = tcg_gen_abs_vec,
++          .fno = gen_helper_gvec_abs16,
++          .opt_opc = vecop_list,
++          .vece = MO_16 },
++        { .fni4 = tcg_gen_abs_i32,
++          .fniv = tcg_gen_abs_vec,
++          .fno = gen_helper_gvec_abs32,
++          .opt_opc = vecop_list,
++          .vece = MO_32 },
++        { .fni8 = tcg_gen_abs_i64,
++          .fniv = tcg_gen_abs_vec,
++          .fno = gen_helper_gvec_abs64,
++          .opt_opc = vecop_list,
++          .prefer_i64 = TCG_TARGET_REG_BITS == 64,
++          .vece = MO_64 },
++    };
++
++    tcg_debug_assert(vece <= MO_64);
++    tcg_gen_gvec_2(dofs, aofs, oprsz, maxsz, &g[vece]);
++}
++
+ void tcg_gen_gvec_and(unsigned vece, uint32_t dofs, uint32_t aofs,
+                       uint32_t bofs, uint32_t oprsz, uint32_t maxsz)
+ {
+diff --git a/tcg/tcg-op-vec.c b/tcg/tcg-op-vec.c
+index 16062f5995..543508d545 100644
+--- a/tcg/tcg-op-vec.c
++++ b/tcg/tcg-op-vec.c
+@@ -110,6 +110,14 @@ bool tcg_can_emit_vecop_list(const TCGOpcode *list,
+                 continue;
+             }
+             break;
++        case INDEX_op_abs_vec:
++            if (tcg_can_emit_vec_op(INDEX_op_sub_vec, type, vece)
++                && (tcg_can_emit_vec_op(INDEX_op_smax_vec, type, vece) > 0
++                    || tcg_can_emit_vec_op(INDEX_op_sari_vec, type, vece) > 0
++                    || tcg_can_emit_vec_op(INDEX_op_cmp_vec, type, vece))) {
++                continue;
++            }
++            break;
+         default:
+             break;
+         }
+@@ -429,6 +437,37 @@ void tcg_gen_neg_vec(unsigned vece, TCGv_vec r, TCGv_vec a)
+     tcg_swap_vecop_list(hold_list);
+ }
  
- void tcg_gen_extrl_i64_i32(TCGv_i32 ret, TCGv_i64 arg)
++void tcg_gen_abs_vec(unsigned vece, TCGv_vec r, TCGv_vec a)
++{
++    const TCGOpcode *hold_list;
++
++    tcg_assert_listed_vecop(INDEX_op_abs_vec);
++    hold_list = tcg_swap_vecop_list(NULL);
++
++    if (!do_op2(vece, r, a, INDEX_op_abs_vec)) {
++        TCGType type = tcgv_vec_temp(r)->base_type;
++        TCGv_vec t = tcg_temp_new_vec(type);
++
++        tcg_debug_assert(tcg_can_emit_vec_op(INDEX_op_sub_vec, type, vece));
++        if (tcg_can_emit_vec_op(INDEX_op_smax_vec, type, vece) > 0) {
++            tcg_gen_neg_vec(vece, t, a);
++            tcg_gen_smax_vec(vece, r, a, t);
++        } else {
++            if (tcg_can_emit_vec_op(INDEX_op_sari_vec, type, vece) > 0) {
++                tcg_gen_sari_vec(vece, t, a, (8 << vece) - 1);
++            } else {
++                do_dupi_vec(t, MO_REG, 0);
++                tcg_gen_cmp_vec(TCG_COND_LT, vece, t, a, t);
++            }
++            tcg_gen_xor_vec(vece, r, a, t);
++            tcg_gen_sub_vec(vece, r, r, t);
++        }
++
++        tcg_temp_free_vec(t);
++    }
++    tcg_swap_vecop_list(hold_list);
++}
++
+ static void do_shifti(TCGOpcode opc, unsigned vece,
+                       TCGv_vec r, TCGv_vec a, int64_t i)
+ {
+diff --git a/tcg/tcg.c b/tcg/tcg.c
+index bb1e124e80..9393f21a5b 100644
+--- a/tcg/tcg.c
++++ b/tcg/tcg.c
+@@ -1616,6 +1616,8 @@ bool tcg_op_supported(TCGOpcode op)
+         return have_vec && TCG_TARGET_HAS_not_vec;
+     case INDEX_op_neg_vec:
+         return have_vec && TCG_TARGET_HAS_neg_vec;
++    case INDEX_op_abs_vec:
++        return have_vec && TCG_TARGET_HAS_abs_vec;
+     case INDEX_op_andc_vec:
+         return have_vec && TCG_TARGET_HAS_andc_vec;
+     case INDEX_op_orc_vec:
+diff --git a/tcg/README b/tcg/README
+index c30e5418a6..cbdfd3b6bc 100644
+--- a/tcg/README
++++ b/tcg/README
+@@ -561,6 +561,10 @@ E.g. VECL=1 -> 64 << 1 -> v128, and VECE=2 -> 1 << 2 -> i32.
+ 
+   Similarly, v0 = -v1.
+ 
++* abs_vec   v0, v1
++
++  Similarly, v0 = v1 < 0 ? -v1 : v1, in elements across the vector.
++
+ * smin_vec:
+ * umin_vec:
+ 
 -- 
 2.17.1
