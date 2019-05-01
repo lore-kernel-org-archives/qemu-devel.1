@@ -1,26 +1,26 @@
-Received: from eggs.gnu.org ([209.51.188.92]:38492)
+Received: from eggs.gnu.org ([209.51.188.92]:38530)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1hLhRk-0006jC-3K
-	for qemu-devel@nongnu.org; Wed, 01 May 2019 01:06:23 -0400
+	(envelope-from <richard.henderson@linaro.org>) id 1hLhRn-0006mf-5N
+	for qemu-devel@nongnu.org; Wed, 01 May 2019 01:06:26 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1hLhRh-000344-1q
-	for qemu-devel@nongnu.org; Wed, 01 May 2019 01:06:20 -0400
-Received: from mail-pg1-x541.google.com ([2607:f8b0:4864:20::541]:44934)
+	(envelope-from <richard.henderson@linaro.org>) id 1hLhRk-00036B-4k
+	for qemu-devel@nongnu.org; Wed, 01 May 2019 01:06:23 -0400
+Received: from mail-pl1-x62a.google.com ([2607:f8b0:4864:20::62a]:39747)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1hLhRg-00033F-SZ
-	for qemu-devel@nongnu.org; Wed, 01 May 2019 01:06:16 -0400
-Received: by mail-pg1-x541.google.com with SMTP id z16so7854964pgv.11
-	for <qemu-devel@nongnu.org>; Tue, 30 Apr 2019 22:06:16 -0700 (PDT)
+	id 1hLhRj-00035g-Uv
+	for qemu-devel@nongnu.org; Wed, 01 May 2019 01:06:20 -0400
+Received: by mail-pl1-x62a.google.com with SMTP id e92so7750733plb.6
+	for <qemu-devel@nongnu.org>; Tue, 30 Apr 2019 22:06:19 -0700 (PDT)
 From: Richard Henderson <richard.henderson@linaro.org>
-Date: Tue, 30 Apr 2019 22:05:32 -0700
-Message-Id: <20190501050536.15580-26-richard.henderson@linaro.org>
+Date: Tue, 30 Apr 2019 22:05:35 -0700
+Message-Id: <20190501050536.15580-29-richard.henderson@linaro.org>
 In-Reply-To: <20190501050536.15580-1-richard.henderson@linaro.org>
 References: <20190501050536.15580-1-richard.henderson@linaro.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH v2 25/29] target/ppc: Use tcg_gen_abs_i32
+Subject: [Qemu-devel] [PATCH v2 28/29] target/tricore: Use tcg_gen_abs_tl
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,37 +34,72 @@ Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
 
 From: Philippe Mathieu-Daudé <f4bug@amsat.org>
 
+Reviewed-by: Bastian Koppelmann<kbastian@mail.uni-paderborn.de>
 Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
-Message-Id: <20190423102145.14812-2-f4bug@amsat.org>
+Message-Id: <20190423102145.14812-3-f4bug@amsat.org>
 Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- target/ppc/translate/spe-impl.inc.c | 14 +-------------
- 1 file changed, 1 insertion(+), 13 deletions(-)
+ target/tricore/translate.c | 27 +++++----------------------
+ 1 file changed, 5 insertions(+), 22 deletions(-)
 
-diff --git a/target/ppc/translate/spe-impl.inc.c b/target/ppc/translate/spe-impl.inc.c
-index 7ab0a29b5f..36b4d5654d 100644
---- a/target/ppc/translate/spe-impl.inc.c
-+++ b/target/ppc/translate/spe-impl.inc.c
-@@ -126,19 +126,7 @@ static inline void gen_##name(DisasContext *ctx)                              \
-     tcg_temp_free_i32(t0);                                                    \
+diff --git a/target/tricore/translate.c b/target/tricore/translate.c
+index 8f6416144e..06c4485e55 100644
+--- a/target/tricore/translate.c
++++ b/target/tricore/translate.c
+@@ -2415,11 +2415,7 @@ gen_msubadr32s_h(TCGv ret, TCGv r1, TCGv r2, TCGv r3, uint32_t n, uint32_t mode)
+ 
+ static inline void gen_abs(TCGv ret, TCGv r1)
+ {
+-    TCGv temp = tcg_temp_new();
+-    TCGv t0 = tcg_const_i32(0);
+-
+-    tcg_gen_neg_tl(temp, r1);
+-    tcg_gen_movcond_tl(TCG_COND_GE, ret, r1, t0, r1, temp);
++    tcg_gen_abs_tl(ret, r1);
+     /* overflow can only happen, if r1 = 0x80000000 */
+     tcg_gen_setcondi_tl(TCG_COND_EQ, cpu_PSW_V, r1, 0x80000000);
+     tcg_gen_shli_tl(cpu_PSW_V, cpu_PSW_V, 31);
+@@ -2430,9 +2426,6 @@ static inline void gen_abs(TCGv ret, TCGv r1)
+     tcg_gen_xor_tl(cpu_PSW_AV, ret, cpu_PSW_AV);
+     /* calc SAV bit */
+     tcg_gen_or_tl(cpu_PSW_SAV, cpu_PSW_SAV, cpu_PSW_AV);
+-
+-    tcg_temp_free(temp);
+-    tcg_temp_free(t0);
  }
  
--static inline void gen_op_evabs(TCGv_i32 ret, TCGv_i32 arg1)
--{
--    TCGLabel *l1 = gen_new_label();
--    TCGLabel *l2 = gen_new_label();
--
--    tcg_gen_brcondi_i32(TCG_COND_GE, arg1, 0, l1);
--    tcg_gen_neg_i32(ret, arg1);
--    tcg_gen_br(l2);
--    gen_set_label(l1);
--    tcg_gen_mov_i32(ret, arg1);
--    gen_set_label(l2);
--}
--GEN_SPEOP_ARITH1(evabs, gen_op_evabs);
-+GEN_SPEOP_ARITH1(evabs, tcg_gen_abs_i32);
- GEN_SPEOP_ARITH1(evneg, tcg_gen_neg_i32);
- GEN_SPEOP_ARITH1(evextsb, tcg_gen_ext8s_i32);
- GEN_SPEOP_ARITH1(evextsh, tcg_gen_ext16s_i32);
+ static inline void gen_absdif(TCGv ret, TCGv r1, TCGv r2)
+@@ -6617,13 +6610,8 @@ static void decode_rr_divide(CPUTriCoreState *env, DisasContext *ctx)
+         tcg_gen_movi_tl(cpu_PSW_AV, 0);
+         if (!tricore_feature(env, TRICORE_FEATURE_131)) {
+             /* overflow = (abs(D[r3+1]) >= abs(D[r2])) */
+-            tcg_gen_neg_tl(temp, temp3);
+-            /* use cpu_PSW_AV to compare against 0 */
+-            tcg_gen_movcond_tl(TCG_COND_LT, temp, temp3, cpu_PSW_AV,
+-                               temp, temp3);
+-            tcg_gen_neg_tl(temp2, cpu_gpr_d[r2]);
+-            tcg_gen_movcond_tl(TCG_COND_LT, temp2, cpu_gpr_d[r2], cpu_PSW_AV,
+-                               temp2, cpu_gpr_d[r2]);
++            tcg_gen_abs_tl(temp, temp3);
++            tcg_gen_abs_tl(temp2, cpu_gpr_d[r2]);
+             tcg_gen_setcond_tl(TCG_COND_GE, cpu_PSW_V, temp, temp2);
+         } else {
+             /* overflow = (D[b] == 0) */
+@@ -6655,13 +6643,8 @@ static void decode_rr_divide(CPUTriCoreState *env, DisasContext *ctx)
+         tcg_gen_movi_tl(cpu_PSW_AV, 0);
+         if (!tricore_feature(env, TRICORE_FEATURE_131)) {
+             /* overflow = (abs(D[r3+1]) >= abs(D[r2])) */
+-            tcg_gen_neg_tl(temp, temp3);
+-            /* use cpu_PSW_AV to compare against 0 */
+-            tcg_gen_movcond_tl(TCG_COND_LT, temp, temp3, cpu_PSW_AV,
+-                               temp, temp3);
+-            tcg_gen_neg_tl(temp2, cpu_gpr_d[r2]);
+-            tcg_gen_movcond_tl(TCG_COND_LT, temp2, cpu_gpr_d[r2], cpu_PSW_AV,
+-                               temp2, cpu_gpr_d[r2]);
++            tcg_gen_abs_tl(temp, temp3);
++            tcg_gen_abs_tl(temp2, cpu_gpr_d[r2]);
+             tcg_gen_setcond_tl(TCG_COND_GE, cpu_PSW_V, temp, temp2);
+         } else {
+             /* overflow = (D[b] == 0) */
 -- 
 2.17.1
