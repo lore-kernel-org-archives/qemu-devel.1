@@ -3,42 +3,42 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
 X-Spam-Status: No, score=-6.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED
-	autolearn=ham autolearn_force=no version=3.4.0
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C85EEC43219
-	for <qemu-devel@archiver.kernel.org>; Wed,  1 May 2019 09:42:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7728BC43219
+	for <qemu-devel@archiver.kernel.org>; Wed,  1 May 2019 09:44:30 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8782E21670
-	for <qemu-devel@archiver.kernel.org>; Wed,  1 May 2019 09:42:25 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8782E21670
+	by mail.kernel.org (Postfix) with ESMTPS id 349DE21670
+	for <qemu-devel@archiver.kernel.org>; Wed,  1 May 2019 09:44:30 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 349DE21670
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:48928 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:48965 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hLlku-0005VB-O7
-	for qemu-devel@archiver.kernel.org; Wed, 01 May 2019 05:42:24 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:50108)
+	id 1hLlmv-0007B1-Eo
+	for qemu-devel@archiver.kernel.org; Wed, 01 May 2019 05:44:29 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:50155)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1hLlj8-0004Rg-Sw
-	for qemu-devel@nongnu.org; Wed, 01 May 2019 05:40:37 -0400
+	(envelope-from <laurent@vivier.eu>) id 1hLljW-0004jq-7m
+	for qemu-devel@nongnu.org; Wed, 01 May 2019 05:41:01 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1hLlj4-0005dI-6I
-	for qemu-devel@nongnu.org; Wed, 01 May 2019 05:40:34 -0400
-Received: from mout.kundenserver.de ([212.227.17.10]:44145)
+	(envelope-from <laurent@vivier.eu>) id 1hLljT-0005nG-5k
+	for qemu-devel@nongnu.org; Wed, 01 May 2019 05:40:58 -0400
+Received: from mout.kundenserver.de ([212.227.17.10]:38027)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <laurent@vivier.eu>)
-	id 1hLlj3-0005cX-Tp; Wed, 01 May 2019 05:40:30 -0400
+	id 1hLljS-0005mW-Ta; Wed, 01 May 2019 05:40:55 -0400
 Received: from [192.168.100.1] ([78.238.229.36]) by mrelayeu.kundenserver.de
-	(mreue108 [213.165.67.119]) with ESMTPSA (Nemesis) id
-	1MiJdI-1gsmV40MDO-00fUVI; Wed, 01 May 2019 11:40:16 +0200
+	(mreue107 [213.165.67.119]) with ESMTPSA (Nemesis) id
+	1M5PRT-1hMb4n2Oe5-001TOt; Wed, 01 May 2019 11:40:40 +0200
 To: Alistair Francis <Alistair.Francis@wdc.com>,
 	"qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
 References: <cover.1556666645.git.alistair.francis@wdc.com>
-	<14aab381eaa678eca875d0b8bd456feb22a21bd8.1556666645.git.alistair.francis@wdc.com>
+	<c4d2b1de9efadcf1c900b91361af9302823a72a9.1556666645.git.alistair.francis@wdc.com>
 From: Laurent Vivier <laurent@vivier.eu>
 Openpgp: preference=signencrypt
 Autocrypt: addr=laurent@vivier.eu; prefer-encrypt=mutual; keydata=
@@ -83,34 +83,34 @@ Autocrypt: addr=laurent@vivier.eu; prefer-encrypt=mutual; keydata=
 	OpKgu3nD0ahBDqANU/ZmNNarBJEwvM2vfusmNnWm3QMIwxNuJghRyuFfx694Im1js0ZY3LEU
 	JGSHFG4ZynA+ZFUPA6Xf0wHeJOxGKCGIyeKORsteIqgnkINW9fnKJw2pgk8qHkwVc3Vu+wGS
 	ZiJK0xFusPQehjWTHn9WjMG1zvQ5TQQHxau/2FkP45+nRPco6vVFQe8JmgtRF8WFJA==
-Message-ID: <503a1f5f-7dad-1e4e-e1b1-aaeeeac9739f@vivier.eu>
-Date: Wed, 1 May 2019 11:40:13 +0200
+Message-ID: <ae0e2fe0-7354-ba9b-3f97-71955c792f88@vivier.eu>
+Date: Wed, 1 May 2019 11:40:39 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:52.0) Gecko/20100101
 	Thunderbird/52.8.0
 MIME-Version: 1.0
-In-Reply-To: <14aab381eaa678eca875d0b8bd456feb22a21bd8.1556666645.git.alistair.francis@wdc.com>
+In-Reply-To: <c4d2b1de9efadcf1c900b91361af9302823a72a9.1556666645.git.alistair.francis@wdc.com>
 Content-Type: text/plain; charset="UTF-8"
 Content-Language: en-US
 Content-Transfer-Encoding: 8bit
-X-Provags-ID: V03:K1:L0wORCxnL4mMfon80gkjROoIU67WAOjT1pMYNKryvOPhxW0hzGR
-	ETlBqtIPD5svHBN9QdjQ/SJnD0HnTAsCnUNRe/Y3n6M4MHDIMFVwXlcMyvEogBTLu4E2qJO
-	FWDxVP31L7i+OWSBfE4Llwnw7WmUVZ0yP04m9TwEwRIY+vd0e10Q7Npt9l3sDk+2NmT3KNS
-	bG3XFhE4wFt4uW6v9KhZA==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:hnuYqWqJ6Kk=:MOLK+mSbiKONbjPyTIeVUB
-	3O2v9jzwhwpdXu+RGioRS9wUT/XupmlHi37OL4uIQjYrUtMBMxmH5Dx/ER2/wLUF6UoRUFgzU
-	rcqCjfD2dX01pxxGas1ITgrgcHRHJf8J6jkPoufN+++E13XWHgs8vOfNP6BNx7+AJdB6FZY+1
-	UO/3TWaLwaK6J08Yo1O3Fe7kR9TmtqyEX8Uo4es+/Z/xxNtstIFIt5Y06ScwVjwnM1lYoRnjY
-	CNjPWK8QD6O6RG3RpQ2Q75ZoEf4IGsV/zADu7NFquLZu0umOiclJdZ4W+Lho5YWQ9nlaIIMgV
-	jxezSp7YKFFgp7Qqkbg67qdbN08OQOLI7WVMp3A0/4kuasHU8KtgEA3c7Rgynaa/pLJ76tfzg
-	7YfB8Mufhhb34AZVfV7Jglk32D/2XGjrw6Atjt+deDjHtw//RH0S3rzxEVz0R7bABKXM+oRjb
-	4PscGhHUaaDfpY7aeDD9zYGq+kie2FDFsA3PgHYrcMRiRF4DbcGux3GC+OcFukf0j8+InfuWR
-	RApSUVHzG468m145fYrLyaeuvNr/VAwRKKIJT/aQSwTfZ0Ipd3qjFZvtLsPMPQ7WmK58UauAi
-	lBmePBYcdNMCca0MD78+BP9iCps29xAIZTU7RRQRBRrpfuGqj8bykF1tVeBKPMZcbBWUH7aNl
-	jid1wpJsAfMU0FGAx92xfTJF7kLpHaqr1fSWQz7GV8Pdbkv/trFGmVlLmyI6EOn6Gcm8xj9+V
-	mq2edTLWpg6AmZJR1E7MZW9vk6kw8t9DdAGX5q2HxlIvOW7ntHsh/1xW9cg=
+X-Provags-ID: V03:K1:yHyJzQ9bmLaWkmp/dlfFilj2cuzqNH93uIY+XDgN9qGkAlf/meo
+	kINjuZPJ6Aivj+Dc5+WtqmdbQQk1v7Oltrq99VIgsAf4H+JnLko73JHVqdGQfspGcj4OCBk
+	7wWw348ERtyJdKTETTe0SH+7PXXklQuKqhGCGDdj4oXG22FNSvhXTbfDpSsTSfTECM/MLjf
+	XMJYLNDQFHxjALKuL3vyQ==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:gwQTj6o2T8w=:Wk6xWSvbSGCzoRm4sMgt2y
+	FjTgoTz1+5OLqZFdmxcZwm933eienKS8mBnaII5xaKvmzjNEm5tCQTXIETBTP8aRR/RQwogZO
+	MkAzdwTONCpb0A2OijBv8bopM+pCNYyJapd8l3IBAeLGlNGQxdticnlAtz9vOLAVARkDKITYk
+	v3Dmrs0iSJRam9Fp53i8VXpuyxE6C8gACrzdsUqc5td4DuUGYAhJo4upXtA8qgsvgSBxm3F+r
+	iKAYlpgsF77UdtcCTbuynGcr28r4zsM6BC3EMPYHUrH8bFyjMFekZ+6b5hvLAf1todWOpVgwT
+	1o9dUebPF3F8WbW1PTpjRatkWtG5nc1zsf/HGk/YB8eHWt9bxmJzAVlkaM0Ecz3swRbL2ZQjJ
+	6JIvmipEE+I2ireF3N1fnMaxeAREvVV/iHd62Ic/kLsQaL49IEuT1Y/VUgzsQvwR+sSfkrmI1
+	O+VOYYlnRgf/YYC5VYFSHyyWtcucWUVkmvtzJxu6M5H0QWbJ0bKyUX4bX0mRVyjqy2mmBX98+
+	Gd5zafqQxTNXz9mjps5ekrE7bK8qaY4vgnPpI8/21exn8oSpsqA81/S2j6jLONxOUKFfkyPTc
+	4uTlLpniYnQu03CEMY429kdcHbwL2nDPRj/VhwM2DHuYTuunx08YqN19M5iaCt16N1yky9PzH
+	J35yS3KSmzl3Tu5gvlCcYmRIY0fdjU2OyCOzFWW5PZKCjxzRDAeDzZfBlKX27aYz7qVg8SJgV
+	IHi/fjLRw+RmwTBPXYOgDJltLD/Faso/D8i8TPiFmbHGky8nnxPHYh19BLw=
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 212.227.17.10
-Subject: Re: [Qemu-devel] [PATCH v2 4/5] linux-user/uname: Fix GCC 9 build
+Subject: Re: [Qemu-devel] [PATCH v2 5/5] linux-user/elfload: Fix GCC 9 build
  warnings
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
@@ -130,38 +130,38 @@ Cc: "qemu-trivial@nongnu.org" <qemu-trivial@nongnu.org>,
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190501094013.P2nrfFzOSEDIhuFyL4hmV6yULeaM7HPCQXLpWfZwPdk@z>
+Message-ID: <20190501094039.qJeoHE3O5GGH6i76JhklhSAEhxEyDJ2Mmk7UwQ68J4o@z>
 
-On 01/05/2019 01:28, Alistair Francis wrote:
+On 01/05/2019 01:29, Alistair Francis wrote:
 > Fix this warning when building with GCC9 on Fedora 30:
 > In function ‘strncpy’,
->     inlined from ‘sys_uname’ at /home/alistair/qemu/linux-user/uname.c:94:3:
-> /usr/include/bits/string_fortified.h:106:10: error: ‘__builtin_strncpy’ output may be truncated copying 64 bytes from a string of length 64 [-Werror=stringop-truncation]
+>     inlined from ‘fill_psinfo’ at /home/alistair/qemu/linux-user/elfload.c:3208:12,
+>     inlined from ‘fill_note_info’ at /home/alistair/qemu/linux-user/elfload.c:3390:5,
+>     inlined from ‘elf_core_dump’ at /home/alistair/qemu/linux-user/elfload.c:3539:9:
+> /usr/include/bits/string_fortified.h:106:10: error: ‘__builtin_strncpy’ specified bound 16 equals destination size [-Werror=stringop-truncation]
 >   106 |   return __builtin___strncpy_chk (__dest, __src, __len, __bos (__dest));
 >       |          ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 > 
 > Signed-off-by: Alistair Francis <alistair.francis@wdc.com>
 > ---
->  linux-user/uname.c | 2 +-
+>  linux-user/elfload.c | 2 +-
 >  1 file changed, 1 insertion(+), 1 deletion(-)
 > 
-> diff --git a/linux-user/uname.c b/linux-user/uname.c
-> index 313b79dbad..2fc6096a5b 100644
-> --- a/linux-user/uname.c
-> +++ b/linux-user/uname.c
-> @@ -73,7 +73,7 @@ const char *cpu_to_uname_machine(void *cpu_env)
->  #define COPY_UTSNAME_FIELD(dest, src) \
->    do { \
->        /* __NEW_UTS_LEN doesn't include terminating null */ \
-> -      (void) strncpy((dest), (src), __NEW_UTS_LEN); \
-> +      (void) memcpy((dest), (src), MIN(strlen(src), __NEW_UTS_LEN)); \
-
-You should use MIN(strlen(src) + 1, __NEW_UTS_LEN) to copy the NUL
-character if it is present and fit in __NEW_UTS_LEN.
-
->        (dest)[__NEW_UTS_LEN] = '\0'; \
->    } while (0)
+> diff --git a/linux-user/elfload.c b/linux-user/elfload.c
+> index c1a26021f8..d08fe23466 100644
+> --- a/linux-user/elfload.c
+> +++ b/linux-user/elfload.c
+> @@ -2872,7 +2872,7 @@ struct target_elf_prpsinfo {
+>      target_gid_t pr_gid;
+>      target_pid_t pr_pid, pr_ppid, pr_pgrp, pr_sid;
+>      /* Lots missing */
+> -    char    pr_fname[16];           /* filename of executable */
+> +    char    pr_fname[16] QEMU_NONSTRING; /* filename of executable */
+>      char    pr_psargs[ELF_PRARGSZ]; /* initial part of arg list */
+>  };
 >  
 > 
+
+Reviewed-by: Laurent Vivier <laurent@vivier.eu>
 
 
