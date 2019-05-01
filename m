@@ -1,27 +1,24 @@
-Received: from eggs.gnu.org ([209.51.188.92]:51695)
+Received: from eggs.gnu.org ([209.51.188.92]:53149)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1hLs3d-0006M4-Si
-	for qemu-devel@nongnu.org; Wed, 01 May 2019 12:26:12 -0400
+	(envelope-from <jsnow@redhat.com>) id 1hLs9K-0001od-Ha
+	for qemu-devel@nongnu.org; Wed, 01 May 2019 12:32:05 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1hLs3Y-0001cx-3t
-	for qemu-devel@nongnu.org; Wed, 01 May 2019 12:26:08 -0400
-Date: Wed, 1 May 2019 12:25:51 -0400
-From: Stefan Hajnoczi <stefanha@gmail.com>
-Message-ID: <20190501162551.GE21155@stefanha-x1.localdomain>
-References: <20190103144124.18917-1-stefanha@redhat.com>
-	<CAFEAcA-B_T9E3ezWFXg-wp3RotMjv3-z3qY7hSJZEoqFBqCWnQ@mail.gmail.com>
-	<62b29bc1-cc78-cd64-4377-fc4007ba7189@redhat.com>
-	<20190426091702.GA2071@stefanha-x1.localdomain>
-	<CAFEAcA8OVKO087uiNvwDGObiaxHAPYHwoXLEN1t5Y4v9B43r9A@mail.gmail.com>
-	<20190429122819.GB7587@stefanha-x1.localdomain>
-	<CAFEAcA9_=a72BAmyb0eJhLF_nYLhRb_O7e=__MPazQ0nLC9Tmw@mail.gmail.com>
+	(envelope-from <jsnow@redhat.com>) id 1hLs9H-0004VG-GM
+	for qemu-devel@nongnu.org; Wed, 01 May 2019 12:32:02 -0400
+References: <20181116184324.8093-1-jsnow@redhat.com>
+	<4bc81482-fab6-80dd-f684-4ffde4241dce@virtuozzo.com>
+	<cb6469ca-9ba3-1ac7-7c3e-9e6c8c53e55f@redhat.com>
+	<fb05bc7d-7632-f72c-1c32-ba16d21a7fcb@redhat.com>
+From: John Snow <jsnow@redhat.com>
+Message-ID: <596c4cc2-88d0-e34c-d104-11ede3e98164@redhat.com>
+Date: Wed, 1 May 2019 12:31:37 -0400
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="WK3l2KTTmXPVedZ6"
-Content-Disposition: inline
-In-Reply-To: <CAFEAcA9_=a72BAmyb0eJhLF_nYLhRb_O7e=__MPazQ0nLC9Tmw@mail.gmail.com>
-Subject: Re: [Qemu-devel] [PATCH] Revert "armv7m: Guard against no -kernel
- argument"
+In-Reply-To: <fb05bc7d-7632-f72c-1c32-ba16d21a7fcb@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH] migration/block-dirty-bitmap: Silence
+ coverity CID 1390625
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,61 +27,73 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: Stefan Hajnoczi <stefanha@redhat.com>, Jim Mussared <jim@groklearning.com>, Alex =?iso-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>, Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <philmd@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>, Steffen Gortz <qemu.ml@steffen-goertz.de>, qemu-arm <qemu-arm@nongnu.org>, Joel Stanley <joel@jms.id.au>, Thomas Huth <thuth@redhat.com>, Julia Suvorova <jusual@mail.ru>
+To: Eric Blake <eblake@redhat.com>, Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+Cc: Stefan Hajnoczi <stefanha@redhat.com>, Max Reitz <mreitz@redhat.com>
 
 
---WK3l2KTTmXPVedZ6
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
 
-On Mon, Apr 29, 2019 at 01:58:46PM +0100, Peter Maydell wrote:
-> On Mon, 29 Apr 2019 at 13:28, Stefan Hajnoczi <stefanha@redhat.com> wrote:
-> >
-> > On Fri, Apr 26, 2019 at 12:45:37PM +0100, Peter Maydell wrote:
-> > I was going to add a function to check kernel_filename and the presence
-> > of -device loader.  Then each machine type init function would call the
-> > function with flags indicating which modes are allowed:
-> >
-> >   /* Allow both -kernel and -device loader */
-> >   check_kernel_loaded(KERNEL_CMDLINE | KERNEL_LOADER);
-> >
-> >   /* Allow only -kernel */
-> >   check_kernel_loaded(KERNEL_CMDLINE);
-> >
-> >   /* Allow only -device loader */
-> >   check_kernel_loaded(KERNEL_LOADER);
->=20
-> Every machine should permit -device loader: the point
-> of it is that it is entirely generic and works the same
-> way on every machine.
+On 5/1/19 11:24 AM, Eric Blake wrote:
+> On 4/30/19 6:08 PM, John Snow wrote:
+>>
+>>
+>> On 11/20/18 10:15 AM, Vladimir Sementsov-Ogievskiy wrote:
+>>> 16.11.2018 21:43, John Snow wrote:
+>>>> Coverity warns that backing_bs() could give us a NULL pointer, which
+>>>> we then use without checking that it isn't.
+>>>>
+>>>> In our loop condition, we check bs && bs->drv as a point of habit, but
+>>>> by nature of the block graph, we cannot have null bs pointers here.
+>>>>
+>>>> This loop skips only implicit nodes, which always have children, so
+>>>> this loop should never encounter a null value.
+>>>
+>>
+>> I let this drop again :)
+>>
+>>> You mean, always have backing (not file for ex.)? Should we at least add a comment
+>>> near "bool implicit;" that the node must have backing..
+>>>
+>>> Do we have filters, using 'file' child instead of backing, will we want to auto insert them, and therefore mark them with implicit=true?
+>>>
+>>
+>> I actually have no idea. I guess this is the sort of thing we actually
+>> really want a dedicated kind of API for. "Find first non-filter" seems
+>> like a common use case that we'd want.
+>>
+>> [But maybe I'll avoid this problem.]
+> 
+> Max has already tried to tackle that problem:
+> https://lists.gnu.org/archive/html/qemu-devel/2019-04/msg01713.html
+> 
 
-It seems every person has a slightly different preference :).  Can we
-reach a consensus?
+OK, that's great!
 
-1. Should QEMU print a readable error message when launched without a
-   kernel?
+>>
+>>> And one more thing:
+>>> So, it's looks like a wrong way to search for all block-nodes, instead of looping through backing chain to the first not-implicit bds, we must recursively explore the whole block graph, to find _all_ the bitmaps.
+>>>
+>>
+>> Looking at this again after not having done so for so long -- I guess
+>> that bdrv_first/bdrv_next only iterate over *top level* BDSes and not
+>> any children thereof. You're right, even the method here isn't quite
+>> correct. We want to find ALL nodes, wherever they are.
+>>
+>> query_named_block_nodes uses an implementation in block.c to accomplish
+>> this because the API is not public.... or, it wasn't, but it looks like
+>> we have bdrv_next_all_states now, and we could use this to just find ALL
+>> of the bdrv nodes.
+>>
+>> Ehm.... let me send something a little more RFC-caliber that should
+>> address your concern (as well as Peter's) here.
+> 
+> Max's series also tries to improve how we visit nodes when determining
+> which bitmaps to find.
+> 
 
-If yes:
+2/11 adds the "skip filters" helper I mentioned wanting, but the idea of
+visiting *every* node for bitmap migration is not addressed in that series.
 
-2. What checks are sensible?
+Therefore, I believe these series conflict, but that this one takes
+precedence for this particular issue.
 
-Stefan
-
---WK3l2KTTmXPVedZ6
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAlzJyI8ACgkQnKSrs4Gr
-c8hBDQgAtG/Dxap2gsiS1yWR1zi3RCHdY8hzRGJ1Sp/514jLWc/nWTfBRM+nIkd0
-Um+NzuJwoX+M0eeECmfMJOrhmimHIHS1P3fZChGWzucj7eQb0RDV741Ahs+olxJk
-ri+N0mNQMtHn3RUURRDDSeHrJedLPYvLZSYsUpIeVxywyWv1wmnRn+yE7GrBKi3L
-WprN/VWQZiduVLlm7/eMjsbcJ5AIalTowuNJoCtXRc0YxjHwcOlAfrtDL9vkE0Ln
-mdHCxbHy+oRBerkH4ziudOj7galnyjRLZJ8jVqgwN/FVGuMv3WJlKWtMsGqUlWrh
-Zcy4zMSeom55p74grZ+MDxZmjUceeA==
-=q6kg
------END PGP SIGNATURE-----
-
---WK3l2KTTmXPVedZ6--
+--js
