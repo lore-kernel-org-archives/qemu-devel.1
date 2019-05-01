@@ -2,93 +2,66 @@ Return-Path: <SRS0=aVj3=TB=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-4.0 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4D4B9C43219
-	for <qemu-devel@archiver.kernel.org>; Wed,  1 May 2019 18:37:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C4E34C43219
+	for <qemu-devel@archiver.kernel.org>; Wed,  1 May 2019 18:38:49 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 13A9B204EC
-	for <qemu-devel@archiver.kernel.org>; Wed,  1 May 2019 18:37:20 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="a2LsA3rC"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 13A9B204EC
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id 9BBDC20652
+	for <qemu-devel@archiver.kernel.org>; Wed,  1 May 2019 18:38:49 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9BBDC20652
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=patchew.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:38256 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:38279 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hLu6Z-0002da-9Z
-	for qemu-devel@archiver.kernel.org; Wed, 01 May 2019 14:37:19 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:51074)
+	id 1hLu80-0003oN-SJ
+	for qemu-devel@archiver.kernel.org; Wed, 01 May 2019 14:38:48 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:51960)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1hLu57-00015V-1e
-	for qemu-devel@nongnu.org; Wed, 01 May 2019 14:35:49 -0400
+	(envelope-from <no-reply@patchew.org>) id 1hLu7C-0003RI-5o
+	for qemu-devel@nongnu.org; Wed, 01 May 2019 14:37:59 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1hLu56-0001KG-3x
-	for qemu-devel@nongnu.org; Wed, 01 May 2019 14:35:49 -0400
-Received: from mail-pg1-x541.google.com ([2607:f8b0:4864:20::541]:46111)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1hLu55-0001Jd-TX
-	for qemu-devel@nongnu.org; Wed, 01 May 2019 14:35:48 -0400
-Received: by mail-pg1-x541.google.com with SMTP id n2so8630841pgg.13
-	for <qemu-devel@nongnu.org>; Wed, 01 May 2019 11:35:47 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
-	h=subject:to:cc:references:from:openpgp:message-id:date:user-agent
-	:mime-version:in-reply-to:content-language:content-transfer-encoding;
-	bh=XUGPEUxedUCxBVt9SRj52ALy7ewssWD6AjmHlbbsC3U=;
-	b=a2LsA3rCfW/ZnGIHvGudkoGXL1c379iW+aWChfdb6Jnb0ffab9PvDTLKUHDCtlfxyN
-	CmuI/i7bzuk0mkci/vbQJawmxncFmM9hVBgL5+kwBWq0p87qsK2x+43cLPfPIM8DWzNJ
-	EaraORheBy51fuQVfG9J/TvFQ+wbVqW+DQy9U12kJw29zjorKOsayuYB8RMcdnaehRkH
-	KyZ4gXkwCeQkR2+HxE2wmXzb02GcWHEkcLQ9vf266uFtCVik4dpj89XbSPdRUI02Ks2X
-	bfIQaKzc/ggkgDnR3t4OYd7SlC5eaf4ViZip4Ek1Bi0edlFss1nbkvEpvh15NEEHaByJ
-	bhQA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=1e100.net; s=20161025;
-	h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
-	:date:user-agent:mime-version:in-reply-to:content-language
-	:content-transfer-encoding;
-	bh=XUGPEUxedUCxBVt9SRj52ALy7ewssWD6AjmHlbbsC3U=;
-	b=n5i8yjqGaSShhy5aPDOUqJrwSdNnY0+mv7vX4BkmdFG1TLZ5zkG11gXB+jOGftpaTg
-	3nApPAGQxt19vjqcKyS4zWpznYqUzwP1fKVEFL7uW0DuRoGD4uTZZ4J+aEdv08Igi+TQ
-	nlwglpLj+r9dLF4RYDtUTA0CgvO6zaVyie4CB2AUeZex/qMkOLBxuZdDZTiV8yeBwf1U
-	4dba9kU+3b/aTHC+Wizu6N1lX21dZXGhtobmV/5526AnoCNNUnNZ4ImLIve94z6/VPaj
-	kZZu7PkbQrEfSP8zAadTgS4IrVWGqEyXbIQDm6jZ+SegYPdjb6jQjZQFOA6EhCQZXjtj
-	k9/A==
-X-Gm-Message-State: APjAAAXkspnsiVL0WlsfB8+miEjW/xiFrO/LRvme9dqfN3HP2W+ouc9M
-	EN9M9gA1LFFInrXR25crs4XGOAaI+xc=
-X-Google-Smtp-Source: APXvYqxmQhm+E8HSf60UAxJdq1BAV2oYJyxq+EUFrIHF83sYKxOB+nfF+tVMZzB6Qe2iobqBvHibcg==
-X-Received: by 2002:a63:7f0b:: with SMTP id a11mr70655312pgd.234.1556735746908;
-	Wed, 01 May 2019 11:35:46 -0700 (PDT)
-Received: from [192.168.1.11] (97-113-189-189.tukw.qwest.net. [97.113.189.189])
-	by smtp.gmail.com with ESMTPSA id
-	t5sm50925926pfh.141.2019.05.01.11.35.45
-	(version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-	Wed, 01 May 2019 11:35:46 -0700 (PDT)
-To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>,
-	qemu-devel@nongnu.org
-References: <20190430165234.32272-1-alex.bennee@linaro.org>
-	<20190430165234.32272-5-alex.bennee@linaro.org>
-From: Richard Henderson <richard.henderson@linaro.org>
-Openpgp: preference=signencrypt
-Message-ID: <243c271f-ffff-6a6c-d5ad-1b5ced78491c@linaro.org>
-Date: Wed, 1 May 2019 11:35:44 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
-	Thunderbird/60.6.1
+	(envelope-from <no-reply@patchew.org>) id 1hLu7A-0002jG-Tk
+	for qemu-devel@nongnu.org; Wed, 01 May 2019 14:37:58 -0400
+Resent-Date: Wed, 01 May 2019 14:37:58 -0400
+Resent-Message-Id: <E1hLu7A-0002jG-Tk@eggs.gnu.org>
+Received: from sender4-of-o59.zoho.com ([136.143.188.59]:21921)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
+	id 1hLu7A-0002i6-M3
+	for qemu-devel@nongnu.org; Wed, 01 May 2019 14:37:56 -0400
+ARC-Seal: i=1; a=rsa-sha256; t=1556735862; cv=none; d=zoho.com; s=zohoarc; 
+	b=ZibURtDmkK1Eq8+IBafD3c8+HOMiV7KgQ8g1OrvSNpDaiKgXe8ZIHQLLdxUh9o0WpCMZBJKBlhUjdgLzzUwJDB6+tZN8fSVtlYKQ5Rwt1FQhGcpOvjzCHs9VJ326mRSVJH/Rc1EHyAlYZhUNl8h9d9oRvMv849nlEJ7l3d+yDqA=
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zoho.com;
+	s=zohoarc; t=1556735862;
+	h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:Reply-To:Subject:To:ARC-Authentication-Results;
+	bh=JfkBfRT91L2YjOZeH2TKn11HR5L+5nCW9ohB95NNCLY=; 
+	b=cLigysWXb3xNt8UJ/Qu5Qbr/HdUyftTTuhrwV67QtK/Au5RYs0PfrS7mtSbcznPMnfRx5Ox1s4RhiYyr+ujkwL9afIrMA+qUBr7Ep5jigZ2qIj1f8ri1aFfBZZNr5GFYIs6urzL3NRGC57yv1atKWRrxqrXtOWrB9glDI98cUK0=
+ARC-Authentication-Results: i=1; mx.zoho.com; dkim=pass  header.i=patchew.org;
+	spf=pass  smtp.mailfrom=no-reply@patchew.org;
+	dmarc=pass header.from=<no-reply@patchew.org>
+	header.from=<no-reply@patchew.org>
+Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by
+	mx.zohomail.com with SMTPS id 1556735861226477.83141453521523;
+	Wed, 1 May 2019 11:37:41 -0700 (PDT)
+In-Reply-To: <20190430031238.40499-1-yangchuanlong@huawei.com>
+Message-ID: <155673586019.10667.9130032716299474327@c2072b67cc0c>
 MIME-Version: 1.0
-In-Reply-To: <20190430165234.32272-5-alex.bennee@linaro.org>
 Content-Type: text/plain; charset="UTF-8"
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
-	recognized.
-X-Received-From: 2607:f8b0:4864:20::541
-Subject: Re: [Qemu-devel] [PATCH v5 04/15] tests/tcg/multiarch: move the
- system memory test
+Content-Transfer-Encoding: base64
+Resent-From: 
+From: no-reply@patchew.org
+To: yangchuanlong@huawei.com
+Date: Wed, 1 May 2019 11:37:41 -0700 (PDT)
+X-ZohoMailClient: External
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 136.143.188.59
+Subject: Re: [Qemu-devel] [PATCH v1] target/arm/arm-powerctl: mask the cpuid
+ with affinity bits when get cpu
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -100,28 +73,24 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-arm@nongnu.org, mark.cave-ayland@ilande.co.uk, cota@braap.org
+Reply-To: qemu-devel@nongnu.org
+Cc: fam@euphon.net, qemu-devel@nongnu.org, gengdongjiu@huawei.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190501183544.gFz2rjjcdK34vXR1ejVYjKd8dNP0pdrGehX9KbMc_gU@z>
+Message-ID: <20190501183741.QCST5Ox1oPv4Xv6f3AOvHBUDmqFHaLMKteWg8kutl88@z>
 
-On 4/30/19 9:52 AM, Alex Bennée wrote:
-> There is nothing inherently architecture specific about the memory
-> test although we may have to manage different restrictions of
-> unaligned access across architectures.
-> 
-> Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
-> ---
->  tests/tcg/{i386 => multiarch}/system/memory.c | 0
->  1 file changed, 0 insertions(+), 0 deletions(-)
->  rename tests/tcg/{i386 => multiarch}/system/memory.c (100%)
-
-
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
-
-
-r~
-
+UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDE5MDQzMDAzMTIzOC40MDQ5
+OS0xLXlhbmdjaHVhbmxvbmdAaHVhd2VpLmNvbS8KCgoKSGksCgpUaGlzIHNlcmllcyBmYWlsZWQg
+dGhlIGFzYW4gYnVpbGQgdGVzdC4gUGxlYXNlIGZpbmQgdGhlIHRlc3RpbmcgY29tbWFuZHMgYW5k
+CnRoZWlyIG91dHB1dCBiZWxvdy4gSWYgeW91IGhhdmUgRG9ja2VyIGluc3RhbGxlZCwgeW91IGNh
+biBwcm9iYWJseSByZXByb2R1Y2UgaXQKbG9jYWxseS4KCj09PSBURVNUIFNDUklQVCBCRUdJTiA9
+PT0KIyEvYmluL2Jhc2gKdGltZSBtYWtlIGRvY2tlci10ZXN0LWRlYnVnQGZlZG9yYSBUQVJHRVRf
+TElTVD14ODZfNjQtc29mdG1tdSBKPTE0IE5FVFdPUks9MQo9PT0gVEVTVCBTQ1JJUFQgRU5EID09
+PQoKCgoKVGhlIGZ1bGwgbG9nIGlzIGF2YWlsYWJsZSBhdApodHRwOi8vcGF0Y2hldy5vcmcvbG9n
+cy8yMDE5MDQzMDAzMTIzOC40MDQ5OS0xLXlhbmdjaHVhbmxvbmdAaHVhd2VpLmNvbS90ZXN0aW5n
+LmFzYW4vP3R5cGU9bWVzc2FnZS4KLS0tCkVtYWlsIGdlbmVyYXRlZCBhdXRvbWF0aWNhbGx5IGJ5
+IFBhdGNoZXcgW2h0dHBzOi8vcGF0Y2hldy5vcmcvXS4KUGxlYXNlIHNlbmQgeW91ciBmZWVkYmFj
+ayB0byBwYXRjaGV3LWRldmVsQHJlZGhhdC5jb20=
 
 
