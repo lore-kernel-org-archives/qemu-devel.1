@@ -1,19 +1,19 @@
-Received: from eggs.gnu.org ([209.51.188.92]:45611)
+Received: from eggs.gnu.org ([209.51.188.92]:45624)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berto@igalia.com>) id 1hLtkc-0007NH-4u
+	(envelope-from <berto@igalia.com>) id 1hLtkc-0007Nb-Jg
 	for qemu-devel@nongnu.org; Wed, 01 May 2019 14:14:39 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berto@igalia.com>) id 1hLtkb-0002cK-4k
+	(envelope-from <berto@igalia.com>) id 1hLtka-0002bI-0L
 	for qemu-devel@nongnu.org; Wed, 01 May 2019 14:14:38 -0400
 From: Alberto Garcia <berto@igalia.com>
-Date: Wed,  1 May 2019 21:13:56 +0300
-Message-Id: <f64d9b6b1bc90d45c9be5aae63176b34879182c2.1556732434.git.berto@igalia.com>
+Date: Wed,  1 May 2019 21:13:59 +0300
+Message-Id: <6026d9eb2851d22f6ff031e208120735361ea606.1556732434.git.berto@igalia.com>
 In-Reply-To: <cover.1556732434.git.berto@igalia.com>
 References: <cover.1556732434.git.berto@igalia.com>
 In-Reply-To: <cover.1556732434.git.berto@igalia.com>
 References: <cover.1556732434.git.berto@igalia.com>
-Subject: [Qemu-devel] [PATCH v2 2/5] vdi: Replace bdrv_{read,
- write}() with bdrv_{pread, pwrite}()
+Subject: [Qemu-devel] [PATCH v2 5/5] qcow2: Remove
+ BDRVQcow2State.cluster_sectors
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,70 +25,38 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Alberto Garcia <berto@igalia.com>, qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Eric Blake <eblake@redhat.com>
 
-There's only a couple of bdrv_read() and bdrv_write() calls left in
-the vdi code, and they can be trivially replaced with the byte-based
-bdrv_pread() and bdrv_pwrite().
+The last user of this field disappeared when we replace the
+sector-based bdrv_write() with the byte-based bdrv_pwrite().
 
 Signed-off-by: Alberto Garcia <berto@igalia.com>
 ---
- block/vdi.c | 15 +++++++++------
- 1 file changed, 9 insertions(+), 6 deletions(-)
+ block/qcow2.c | 1 -
+ block/qcow2.h | 1 -
+ 2 files changed, 2 deletions(-)
 
-diff --git a/block/vdi.c b/block/vdi.c
-index e1c42ad732..9caeb50dd1 100644
---- a/block/vdi.c
-+++ b/block/vdi.c
-@@ -171,6 +171,8 @@ typedef struct {
-     uint64_t unused2[7];
- } QEMU_PACKED VdiHeader;
+diff --git a/block/qcow2.c b/block/qcow2.c
+index a520d116ef..8e024007db 100644
+--- a/block/qcow2.c
++++ b/block/qcow2.c
+@@ -1259,7 +1259,6 @@ static int coroutine_fn qcow2_do_open(BlockDriverState *bs, QDict *options,
  
-+QEMU_BUILD_BUG_ON(sizeof(VdiHeader) != 512);
-+
- typedef struct {
-     /* The block map entries are little endian (even in memory). */
-     uint32_t *bmap;
-@@ -384,7 +386,7 @@ static int vdi_open(BlockDriverState *bs, QDict *options, int flags,
+     s->cluster_bits = header.cluster_bits;
+     s->cluster_size = 1 << s->cluster_bits;
+-    s->cluster_sectors = 1 << (s->cluster_bits - BDRV_SECTOR_BITS);
  
-     logout("\n");
- 
--    ret = bdrv_read(bs->file, 0, (uint8_t *)&header, 1);
-+    ret = bdrv_pread(bs->file, 0, (uint8_t *)&header, sizeof(header));
-     if (ret < 0) {
-         goto fail;
-     }
-@@ -484,8 +486,8 @@ static int vdi_open(BlockDriverState *bs, QDict *options, int flags,
-         goto fail;
-     }
- 
--    ret = bdrv_read(bs->file, s->bmap_sector, (uint8_t *)s->bmap,
--                    bmap_size);
-+    ret = bdrv_pread(bs->file, header.offset_bmap, (uint8_t *)s->bmap,
-+                     bmap_size * SECTOR_SIZE);
-     if (ret < 0) {
-         goto fail_free_bmap;
-     }
-@@ -704,7 +706,7 @@ nonallocating_write:
-         assert(VDI_IS_ALLOCATED(bmap_first));
-         *header = s->header;
-         vdi_header_to_le(header);
--        ret = bdrv_write(bs->file, 0, block, 1);
-+        ret = bdrv_pwrite(bs->file, 0, block, sizeof(VdiHeader));
-         g_free(block);
-         block = NULL;
- 
-@@ -722,10 +724,11 @@ nonallocating_write:
-         base = ((uint8_t *)&s->bmap[0]) + bmap_first * SECTOR_SIZE;
-         logout("will write %u block map sectors starting from entry %u\n",
-                n_sectors, bmap_first);
--        ret = bdrv_write(bs->file, offset, base, n_sectors);
-+        ret = bdrv_pwrite(bs->file, offset * SECTOR_SIZE, base,
-+                          n_sectors * SECTOR_SIZE);
-     }
- 
--    return ret;
-+    return ret < 0 ? ret : 0;
- }
- 
- static int coroutine_fn vdi_co_do_create(BlockdevCreateOptions *create_options,
+     /* Initialise version 3 header fields */
+     if (header.version == 2) {
+diff --git a/block/qcow2.h b/block/qcow2.h
+index fdee297f33..e62508d1ce 100644
+--- a/block/qcow2.h
++++ b/block/qcow2.h
+@@ -266,7 +266,6 @@ typedef struct Qcow2BitmapHeaderExt {
+ typedef struct BDRVQcow2State {
+     int cluster_bits;
+     int cluster_size;
+-    int cluster_sectors;
+     int l2_slice_size;
+     int l2_bits;
+     int l2_size;
 -- 
 2.11.0
