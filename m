@@ -1,28 +1,28 @@
-Received: from eggs.gnu.org ([209.51.188.92]:47055)
+Received: from eggs.gnu.org ([209.51.188.92]:48425)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1hLmxG-0000Vg-In
-	for qemu-devel@nongnu.org; Wed, 01 May 2019 06:59:17 -0400
+	(envelope-from <alex.bennee@linaro.org>) id 1hLn6L-0003UA-7s
+	for qemu-devel@nongnu.org; Wed, 01 May 2019 07:08:40 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1hLmxC-0002lp-Pj
-	for qemu-devel@nongnu.org; Wed, 01 May 2019 06:59:13 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:41730)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1hLmxC-0002dh-H9
-	for qemu-devel@nongnu.org; Wed, 01 May 2019 06:59:10 -0400
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
-	[10.5.11.16])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 7DB8F3092675
-	for <qemu-devel@nongnu.org>; Wed,  1 May 2019 10:59:08 +0000 (UTC)
-From: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>
-Date: Wed,  1 May 2019 11:59:03 +0100
-Message-Id: <20190501105904.29907-2-dgilbert@redhat.com>
-In-Reply-To: <20190501105904.29907-1-dgilbert@redhat.com>
-References: <20190501105904.29907-1-dgilbert@redhat.com>
+	(envelope-from <alex.bennee@linaro.org>) id 1hLn6I-0006NH-6q
+	for qemu-devel@nongnu.org; Wed, 01 May 2019 07:08:37 -0400
+Received: from mail-wr1-x444.google.com ([2a00:1450:4864:20::444]:34372)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+	id 1hLn6H-0006Mt-UG
+	for qemu-devel@nongnu.org; Wed, 01 May 2019 07:08:34 -0400
+Received: by mail-wr1-x444.google.com with SMTP id v16so21822308wrp.1
+	for <qemu-devel@nongnu.org>; Wed, 01 May 2019 04:08:33 -0700 (PDT)
+References: <20190428155451.15653-1-thuth@redhat.com>
+	<20190428155451.15653-3-thuth@redhat.com>
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+In-reply-to: <20190428155451.15653-3-thuth@redhat.com>
+Date: Wed, 01 May 2019 12:08:31 +0100
+Message-ID: <877eba77ps.fsf@zen.linaroharston>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 1/2] hmp: delvm: use hmp_handle_error
+Subject: Re: [Qemu-devel] [PATCH v2 2/8] tests/qemu-iotests/005: Add a
+ sanity check for large sparse file support
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,42 +31,69 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org, crobinso@redhat.com
+To: Thomas Huth <thuth@redhat.com>
+Cc: qemu-devel@nongnu.org, Fam Zheng <fam@euphon.net>, qemu-block@nongnu.org, Eric Blake <eblake@redhat.com>, Ed Maste <emaste@freebsd.org>, Christophe Fergeau <cfergeau@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, Li-Wen Hsu <lwhsu@freebsd.org>, Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>, Wainer dos Santos Moschetta <wainersm@redhat.com>, Markus Armbruster <armbru@redhat.com>
 
-From: Cole Robinson <crobinso@redhat.com>
 
-This gives us the consistent 'Error:' prefix added in 66363e9a43f,
-which helps users like libvirt who still need to scrape hmp error
-messages to detect failure.
+Thomas Huth <thuth@redhat.com> writes:
 
-Reviewed-by: Eric Blake <eblake@redhat.com>
-Signed-off-by: Cole Robinson <crobinso@redhat.com>
-Message-Id: <984634226fa14316641f31f84e7dd0bb770bd94c.1556141033.git.crob=
-inso@redhat.com>
-Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
----
- hmp.c | 7 ++++---
- 1 file changed, 4 insertions(+), 3 deletions(-)
+> "check -raw 005" fails when running on ext4 filesystems - these do not
+> support such large sparse files. Use the same check as in test 220 to
+> skip the test in this case.
+>
+> Suggested-by: Eric Blake <eblake@redhat.com>
+> Signed-off-by: Thomas Huth <thuth@redhat.com>
+> ---
+>  tests/qemu-iotests/005 | 9 +++++++++
+>  1 file changed, 9 insertions(+)
+>
+> diff --git a/tests/qemu-iotests/005 b/tests/qemu-iotests/005
+> index 2fef63af88..6136ced5c8 100755
+> --- a/tests/qemu-iotests/005
+> +++ b/tests/qemu-iotests/005
+> @@ -55,6 +55,15 @@ if [ "$IMGPROTO" =3D "sheepdog" ]; then
+>      _notrun "image protocol $IMGPROTO does not support large image sizes"
+>  fi
+>
+> +# Sanity check: For raw, we require a file system that permits the creat=
+ion
+> +# of a HUGE (but very sparse) file.  tmpfs works, ext4 does not.
 
-diff --git a/hmp.c b/hmp.c
-index 4bb3af748e..56a3ed7375 100644
---- a/hmp.c
-+++ b/hmp.c
-@@ -1480,10 +1480,11 @@ void hmp_delvm(Monitor *mon, const QDict *qdict)
-     const char *name =3D qdict_get_str(qdict, "name");
-=20
-     if (bdrv_all_delete_snapshot(name, &bs, &err) < 0) {
--        error_reportf_err(err,
--                          "Error while deleting snapshot on device '%s':=
- ",
--                          bdrv_get_device_name(bs));
-+        error_prepend(&err,
-+                      "deleting snapshot on device '%s': ",
-+                      bdrv_get_device_name(bs));
-     }
-+    hmp_handle_error(mon, &err);
- }
-=20
- void hmp_info_snapshots(Monitor *mon, const QDict *qdict)
---=20
-2.21.0
+Is this comment correct? Running on my ext4 home partition this test
+seems to be running fine and not skipping. Indeed:
+
+  12:06:29 [alex@idun:~/l/q/b/k/t/qemu-iotests] review/iotests-fixup-v2 + p=
+wd
+  /home/alex/lsrc/qemu.git/builds/kvm/tests/qemu-iotests
+  12:07:12 [alex@idun:~/l/q/b/k/t/qemu-iotests] review/iotests-fixup-v2 + s=
+tat -f -c %T .
+  ext2/ext3
+  12:07:40 [alex@idun:~/l/q/b/k/t/qemu-iotests] review/iotests-fixup-v2 + t=
+ouch scratch/t.img
+  12:07:45 [alex@idun:~/l/q/b/k/t/qemu-iotests] review/iotests-fixup-v2 + t=
+runcate --size=3D5T scratch/t.img
+  12:07:47 [alex@idun:~/l/q/b/k/t/qemu-iotests] review/iotests-fixup-v2 + l=
+s -lh scratch/t.img
+  -rw-r--r-- 1 alex alex 5.0T May  1 12:07 scratch/t.img
+  12:07:51 [alex@idun:~/l/q/b/k/t/qemu-iotests] review/iotests-fixup-v2 + s=
+tat -f -c %T scratch/t.img
+  ext2/ext3
+  12:07:58 [alex@idun:~/l/q/b/k/t/qemu-iotests] review/iotests-fixup-v2 + d=
+u -sh scratch/
+  4.0K    scratch/
+
+
+> +if [ "$IMGFMT" =3D "raw" ]; then
+> +    if ! truncate --size=3D5T "$TEST_IMG"; then
+> +        _notrun "file system on $TEST_DIR does not support large enough =
+files"
+> +    fi
+> +    rm "$TEST_IMG"
+> +fi
+> +
+>  echo
+>  echo "creating large image"
+>  _make_test_img 5000G
+
+--
+Alex Benn=C3=A9e
