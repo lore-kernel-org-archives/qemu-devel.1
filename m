@@ -1,28 +1,28 @@
-Received: from eggs.gnu.org ([209.51.188.92]:47407)
+Received: from eggs.gnu.org ([209.51.188.92]:53889)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <liboxuan@connect.hku.hk>) id 1hLfjx-00021J-LM
-	for qemu-devel@nongnu.org; Tue, 30 Apr 2019 23:17:04 -0400
+	(envelope-from <alistair23@gmail.com>) id 1hLgL0-0001j2-HP
+	for qemu-devel@nongnu.org; Tue, 30 Apr 2019 23:55:21 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <liboxuan@connect.hku.hk>) id 1hLfju-0000Uo-Kf
-	for qemu-devel@nongnu.org; Tue, 30 Apr 2019 23:17:01 -0400
-Received: from mail-yw1-xc44.google.com ([2607:f8b0:4864:20::c44]:45938)
+	(envelope-from <alistair23@gmail.com>) id 1hLgKx-0006bi-Fp
+	for qemu-devel@nongnu.org; Tue, 30 Apr 2019 23:55:18 -0400
+Received: from mail-lf1-x144.google.com ([2a00:1450:4864:20::144]:40047)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <liboxuan@connect.hku.hk>)
-	id 1hLfju-0000Tq-3j
-	for qemu-devel@nongnu.org; Tue, 30 Apr 2019 23:16:58 -0400
-Received: by mail-yw1-xc44.google.com with SMTP id r139so7500820ywe.12
-	for <qemu-devel@nongnu.org>; Tue, 30 Apr 2019 20:16:56 -0700 (PDT)
+	(Exim 4.71) (envelope-from <alistair23@gmail.com>)
+	id 1hLgKx-0006a8-63
+	for qemu-devel@nongnu.org; Tue, 30 Apr 2019 23:55:15 -0400
+Received: by mail-lf1-x144.google.com with SMTP id o16so12418351lfl.7
+	for <qemu-devel@nongnu.org>; Tue, 30 Apr 2019 20:55:15 -0700 (PDT)
 MIME-Version: 1.0
-References: <20190428110258.86681-1-liboxuan@connect.hku.hk>
-	<a683a29f-ea7b-aaf9-258f-68f4ffcd9b96@redhat.com>
-	<5fe13664-cabc-6fc9-7437-285cc1452944@redhat.com>
-In-Reply-To: <5fe13664-cabc-6fc9-7437-285cc1452944@redhat.com>
-From: "LI, BO XUAN" <liboxuan@connect.hku.hk>
-Date: Wed, 1 May 2019 11:16:20 +0800
-Message-ID: <CALM0=-msXgYqraKzKcxCZgH-+VM7=MUvGLRAjP_r2im_Oj2Spw@mail.gmail.com>
+References: <cover.1556515687.git.alistair@alistair23.me>
+	<PSXP216MB0277192E4A6C255E30EFE627DD390@PSXP216MB0277.KORP216.PROD.OUTLOOK.COM>
+	<CAFEAcA_rJT3NxMAyoVFCbxNi0vNfCRg1bhHTsOmd5pa1pb_DzA@mail.gmail.com>
+In-Reply-To: <CAFEAcA_rJT3NxMAyoVFCbxNi0vNfCRg1bhHTsOmd5pa1pb_DzA@mail.gmail.com>
+From: Alistair Francis <alistair23@gmail.com>
+Date: Tue, 30 Apr 2019 20:54:44 -0700
+Message-ID: <CAKmqyKPGkgYNntZV70pys3PvzdneWWsk=jMiWJQ6SpHCA8rUXQ@mail.gmail.com>
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH] virtio-mmio: Always compile debug prints
+Subject: Re: [Qemu-devel] [PATCH v1 1/5] armv7m: Allow entry information to
+ be returned
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,107 +31,41 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>, =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>
-Cc: qemu-devel@nongnu.org, qemu-trivial@nongnu.org
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: Alistair Francis <alistair@alistair23.me>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
 
-Hi Eric and Phil,
-
-Thanks for your reviews. I am looking into trace events and I'll send a
-patch v2 soon.
-
-Eric Blake <eblake@redhat.com> =E6=96=BC 2019=E5=B9=B44=E6=9C=8830=E6=97=A5=
-=E9=80=B1=E4=BA=8C =E4=B8=8B=E5=8D=8811:03=E5=AF=AB=E9=81=93=EF=BC=9A
-
-> On 4/30/19 5:15 AM, Philippe Mathieu-Daud=C3=A9 wrote:
-> > Hi Li,
+On Tue, Apr 30, 2019 at 9:04 AM Peter Maydell <peter.maydell@linaro.org> wrote:
+>
+> On Mon, 29 Apr 2019 at 06:34, Alistair Francis <alistair@alistair23.me> wrote:
 > >
-> > On 4/28/19 1:02 PM, Boxuan Li wrote:
-> >> Wrap printf calls inside debug macros (DPRINTF) in `if` statement, and
-> >> change output to stderr as well. This will ensure that printf function
-> >> will always compile and prevent bitrot of the format strings.
+> > Allow the kernel's entry point information to be returned when loading a
+> > kernel.
 > >
-> > There is an effort in QEMU to replace the obsolete DPRINTF() macros by
-> > trace events (which prevent format strings bitroting).
+> > Signed-off-by: Alistair Francis <alistair@alistair23.me>
+> > ---
+> >  hw/arm/armv7m.c      | 6 +++---
+> >  hw/arm/microbit.c    | 2 +-
+> >  hw/arm/mps2-tz.c     | 3 ++-
+> >  hw/arm/mps2.c        | 2 +-
+> >  hw/arm/msf2-som.c    | 2 +-
+> >  hw/arm/musca.c       | 3 ++-
+> >  hw/arm/netduino2.c   | 2 +-
+> >  hw/arm/stellaris.c   | 3 ++-
+> >  include/hw/arm/arm.h | 4 +++-
+> >  9 files changed, 16 insertions(+), 11 deletions(-)
 >
-> Trace events are even more powerful than conditional debugs (in that you
-> can turn them on or off at runtime, instead of compile time). But
-> incremental improvements are still better than nothing.
+> > -void armv7m_load_kernel(ARMCPU *cpu, const char *kernel_filename, int mem_size)
+> > +void armv7m_load_kernel(ARMCPU *cpu, const char *kernel_filename, int mem_size,
+> > +                        uint64_t *entry)
+>
+> If we need to return the entry point, why not just return it
+> as the return value of the function rather than having the
+> caller pass in a pointer which we fill in ?
 
+There wasn't really a reason, it was just following along with load_elf().
 
-> >>
-> >> diff --git a/hw/virtio/virtio-mmio.c b/hw/virtio/virtio-mmio.c
-> >> index 5807aa87fe..693b3c9eb4 100644
-> >> --- a/hw/virtio/virtio-mmio.c
-> >> +++ b/hw/virtio/virtio-mmio.c
-> >> @@ -28,15 +28,14 @@
-> >>  #include "hw/virtio/virtio-bus.h"
-> >>  #include "qemu/error-report.h"
-> >>
-> >> -/* #define DEBUG_VIRTIO_MMIO */
-> >> -
-> >> -#ifdef DEBUG_VIRTIO_MMIO
->
-The old code let a user pass CFLAGS=3D-DDEBUG_VIRTIO_MMIO to turn things on=
-...
->
-> >> -
-> >> -#define DPRINTF(fmt, ...) \
-> >> -do { printf("virtio_mmio: " fmt , ## __VA_ARGS__); } while (0)
-> >> -#else
-> >> -#define DPRINTF(fmt, ...) do {} while (0)
-> >> -#endif
-> >> +#define DEBUG_VIRTIO_MMIO 0
->
-> ...the new code requires a source code edit. This can be considered a
-> step backwards in developer friendliness.  Better might be:
->
-> #ifdef DEBUG_VIRTIO_MMIO
-> #define DEBUG_VIRTIO_MMIO_PRINT 1
-> #else
-> #define DEBUG_VIRTIO_MMIO_PRINT 0
-> #endif
->
-> >> +
-> >> +#define DPRINTF(fmt, ...)                                            =
-\
-> >> +    do {                                                             =
-\
-> >> +        if (DEBUG_VIRTIO_MMIO) {                                     =
-\
->
-> and the corresponding use of DEBUG_VIRTIO_MMIO_PRINT here, so that you
-> preserve the ability to do a command-line CFLAGS=3D-D override, rather
-> than forcing a source code edit.
->
->
-Got it. Actually, I learned from
-https://git.qemu.org/?p=3Dqemu.git;a=3Dcommitdiff;h=3Dc691320faa6, which is=
- used
-as an example of Bitrot prevention part in
-https://wiki.qemu.org/Contribute/BiteSizedTasks. Maybe the wiki page can be
-updated.
+Alistair
 
-
-> >> +            fprintf(stderr, "virtio_mmio: " fmt , ## __VA_ARGS__);   =
-\
 >
-> No space before ,
->
-> >> +        }                                                            =
-\
-> >> +    } while (0)
-> >>
-> >>  /* QOM macros */
-> >>  /* virtio-mmio-bus */
-> >>
-> >
-> >
->
-> --
-> Eric Blake, Principal Software Engineer
-> Red Hat, Inc.           +1-919-301-3226
-> Virtualization:  qemu.org | libvirt.org
->
->
-Best regards,
-Boxuan Li
+> thanks
+> -- PMM
