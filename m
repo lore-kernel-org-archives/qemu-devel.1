@@ -1,28 +1,32 @@
-Received: from eggs.gnu.org ([209.51.188.92]:38250)
+Received: from eggs.gnu.org ([209.51.188.92]:38253)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1hLhRL-0006Li-JK
+	(envelope-from <richard.henderson@linaro.org>) id 1hLhRL-0006Lm-MG
 	for qemu-devel@nongnu.org; Wed, 01 May 2019 01:05:58 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1hLhRI-0002pj-I4
+	(envelope-from <richard.henderson@linaro.org>) id 1hLhRI-0002pp-Km
 	for qemu-devel@nongnu.org; Wed, 01 May 2019 01:05:55 -0400
-Received: from mail-pg1-x543.google.com ([2607:f8b0:4864:20::543]:37724)
+Received: from mail-pl1-x643.google.com ([2607:f8b0:4864:20::643]:39956)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1hLhRI-0002ow-Be
+	id 1hLhRI-0002pT-CJ
 	for qemu-devel@nongnu.org; Wed, 01 May 2019 01:05:52 -0400
-Received: by mail-pg1-x543.google.com with SMTP id e6so7869095pgc.4
-	for <qemu-devel@nongnu.org>; Tue, 30 Apr 2019 22:05:50 -0700 (PDT)
+Received: by mail-pl1-x643.google.com with SMTP id b3so7749326plr.7
+	for <qemu-devel@nongnu.org>; Tue, 30 Apr 2019 22:05:52 -0700 (PDT)
 Received: from localhost.localdomain (97-113-189-189.tukw.qwest.net.
 	[97.113.189.189]) by smtp.gmail.com with ESMTPSA id
-	t127sm9687251pfb.106.2019.04.30.22.05.48 for <qemu-devel@nongnu.org>
+	t127sm9687251pfb.106.2019.04.30.22.05.49 for <qemu-devel@nongnu.org>
 	(version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-	Tue, 30 Apr 2019 22:05:49 -0700 (PDT)
+	Tue, 30 Apr 2019 22:05:50 -0700 (PDT)
 From: Richard Henderson <richard.henderson@linaro.org>
-Date: Tue, 30 Apr 2019 22:05:12 -0700
-Message-Id: <20190501050536.15580-6-richard.henderson@linaro.org>
+Date: Tue, 30 Apr 2019 22:05:13 -0700
+Message-Id: <20190501050536.15580-7-richard.henderson@linaro.org>
 In-Reply-To: <20190501050536.15580-1-richard.henderson@linaro.org>
 References: <20190501050536.15580-1-richard.henderson@linaro.org>
-Subject: [Qemu-devel] [PATCH v2 05/29] tcg: Assert fixed_reg is read-only
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Subject: [Qemu-devel] [PATCH v2 06/29] tcg: Return bool success from
+ tcg_out_mov
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,169 +37,268 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-The only fixed_reg is cpu_env, and it should not be modified
-during any TB.  Therefore code that tries to special-case moves
-into a fixed_reg is dead.  Remove it.
+This patch merely changes the interface, aborting on all failures,
+of which there are currently none.
 
 Reviewed-by: David Hildenbrand <david@redhat.com>
+Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+Reviewed-by: David Gibson <david@gibson.dropbear.id.au>
 Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- tcg/tcg.c | 87 +++++++++++++++++++++++++------------------------------
- 1 file changed, 40 insertions(+), 47 deletions(-)
+ tcg/aarch64/tcg-target.inc.c |  5 +++--
+ tcg/arm/tcg-target.inc.c     |  7 +++++--
+ tcg/i386/tcg-target.inc.c    |  5 +++--
+ tcg/mips/tcg-target.inc.c    |  3 ++-
+ tcg/ppc/tcg-target.inc.c     |  3 ++-
+ tcg/riscv/tcg-target.inc.c   |  5 +++--
+ tcg/s390/tcg-target.inc.c    |  3 ++-
+ tcg/sparc/tcg-target.inc.c   |  3 ++-
+ tcg/tcg.c                    | 14 ++++++++++----
+ tcg/tci/tcg-target.inc.c     |  3 ++-
+ 10 files changed, 34 insertions(+), 17 deletions(-)
 
+diff --git a/tcg/aarch64/tcg-target.inc.c b/tcg/aarch64/tcg-target.inc.c
+index eefa929948..ee89734318 100644
+--- a/tcg/aarch64/tcg-target.inc.c
++++ b/tcg/aarch64/tcg-target.inc.c
+@@ -938,10 +938,10 @@ static void tcg_out_ldst(TCGContext *s, AArch64Insn insn, TCGReg rd,
+     tcg_out_ldst_r(s, insn, rd, rn, TCG_TYPE_I64, TCG_REG_TMP);
+ }
+ 
+-static void tcg_out_mov(TCGContext *s, TCGType type, TCGReg ret, TCGReg arg)
++static bool tcg_out_mov(TCGContext *s, TCGType type, TCGReg ret, TCGReg arg)
+ {
+     if (ret == arg) {
+-        return;
++        return true;
+     }
+     switch (type) {
+     case TCG_TYPE_I32:
+@@ -970,6 +970,7 @@ static void tcg_out_mov(TCGContext *s, TCGType type, TCGReg ret, TCGReg arg)
+     default:
+         g_assert_not_reached();
+     }
++    return true;
+ }
+ 
+ static void tcg_out_ld(TCGContext *s, TCGType type, TCGReg ret,
+diff --git a/tcg/arm/tcg-target.inc.c b/tcg/arm/tcg-target.inc.c
+index abf0c444b4..dab93f7872 100644
+--- a/tcg/arm/tcg-target.inc.c
++++ b/tcg/arm/tcg-target.inc.c
+@@ -2264,10 +2264,13 @@ static inline bool tcg_out_sti(TCGContext *s, TCGType type, TCGArg val,
+     return false;
+ }
+ 
+-static inline void tcg_out_mov(TCGContext *s, TCGType type,
++static inline bool tcg_out_mov(TCGContext *s, TCGType type,
+                                TCGReg ret, TCGReg arg)
+ {
+-    tcg_out_dat_reg(s, COND_AL, ARITH_MOV, ret, 0, arg, SHIFT_IMM_LSL(0));
++    if (ret != arg) {
++        tcg_out_dat_reg(s, COND_AL, ARITH_MOV, ret, 0, arg, SHIFT_IMM_LSL(0));
++    }
++    return true;
+ }
+ 
+ static inline void tcg_out_movi(TCGContext *s, TCGType type,
+diff --git a/tcg/i386/tcg-target.inc.c b/tcg/i386/tcg-target.inc.c
+index d5ed9f1ffd..1198c76392 100644
+--- a/tcg/i386/tcg-target.inc.c
++++ b/tcg/i386/tcg-target.inc.c
+@@ -809,12 +809,12 @@ static inline void tgen_arithr(TCGContext *s, int subop, int dest, int src)
+     tcg_out_modrm(s, OPC_ARITH_GvEv + (subop << 3) + ext, dest, src);
+ }
+ 
+-static void tcg_out_mov(TCGContext *s, TCGType type, TCGReg ret, TCGReg arg)
++static bool tcg_out_mov(TCGContext *s, TCGType type, TCGReg ret, TCGReg arg)
+ {
+     int rexw = 0;
+ 
+     if (arg == ret) {
+-        return;
++        return true;
+     }
+     switch (type) {
+     case TCG_TYPE_I64:
+@@ -852,6 +852,7 @@ static void tcg_out_mov(TCGContext *s, TCGType type, TCGReg ret, TCGReg arg)
+     default:
+         g_assert_not_reached();
+     }
++    return true;
+ }
+ 
+ static void tcg_out_dup_vec(TCGContext *s, TCGType type, unsigned vece,
+diff --git a/tcg/mips/tcg-target.inc.c b/tcg/mips/tcg-target.inc.c
+index 412cacdcb9..7cafd4a790 100644
+--- a/tcg/mips/tcg-target.inc.c
++++ b/tcg/mips/tcg-target.inc.c
+@@ -558,13 +558,14 @@ static inline void tcg_out_dsra(TCGContext *s, TCGReg rd, TCGReg rt, TCGArg sa)
+     tcg_out_opc_sa64(s, OPC_DSRA, OPC_DSRA32, rd, rt, sa);
+ }
+ 
+-static inline void tcg_out_mov(TCGContext *s, TCGType type,
++static inline bool tcg_out_mov(TCGContext *s, TCGType type,
+                                TCGReg ret, TCGReg arg)
+ {
+     /* Simple reg-reg move, optimising out the 'do nothing' case */
+     if (ret != arg) {
+         tcg_out_opc_reg(s, OPC_OR, ret, arg, TCG_REG_ZERO);
+     }
++    return true;
+ }
+ 
+ static void tcg_out_movi(TCGContext *s, TCGType type,
+diff --git a/tcg/ppc/tcg-target.inc.c b/tcg/ppc/tcg-target.inc.c
+index 36b4791707..30c095d3d5 100644
+--- a/tcg/ppc/tcg-target.inc.c
++++ b/tcg/ppc/tcg-target.inc.c
+@@ -559,12 +559,13 @@ static bool patch_reloc(tcg_insn_unit *code_ptr, int type,
+ static void tcg_out_mem_long(TCGContext *s, int opi, int opx, TCGReg rt,
+                              TCGReg base, tcg_target_long offset);
+ 
+-static void tcg_out_mov(TCGContext *s, TCGType type, TCGReg ret, TCGReg arg)
++static bool tcg_out_mov(TCGContext *s, TCGType type, TCGReg ret, TCGReg arg)
+ {
+     tcg_debug_assert(TCG_TARGET_REG_BITS == 64 || type == TCG_TYPE_I32);
+     if (ret != arg) {
+         tcg_out32(s, OR | SAB(arg, ret, arg));
+     }
++    return true;
+ }
+ 
+ static inline void tcg_out_rld(TCGContext *s, int op, TCGReg ra, TCGReg rs,
+diff --git a/tcg/riscv/tcg-target.inc.c b/tcg/riscv/tcg-target.inc.c
+index 2932505094..6497a4dab2 100644
+--- a/tcg/riscv/tcg-target.inc.c
++++ b/tcg/riscv/tcg-target.inc.c
+@@ -515,10 +515,10 @@ static bool patch_reloc(tcg_insn_unit *code_ptr, int type,
+  * TCG intrinsics
+  */
+ 
+-static void tcg_out_mov(TCGContext *s, TCGType type, TCGReg ret, TCGReg arg)
++static bool tcg_out_mov(TCGContext *s, TCGType type, TCGReg ret, TCGReg arg)
+ {
+     if (ret == arg) {
+-        return;
++        return true;
+     }
+     switch (type) {
+     case TCG_TYPE_I32:
+@@ -528,6 +528,7 @@ static void tcg_out_mov(TCGContext *s, TCGType type, TCGReg ret, TCGReg arg)
+     default:
+         g_assert_not_reached();
+     }
++    return true;
+ }
+ 
+ static void tcg_out_movi(TCGContext *s, TCGType type, TCGReg rd,
+diff --git a/tcg/s390/tcg-target.inc.c b/tcg/s390/tcg-target.inc.c
+index 3d6150b10e..331d51852c 100644
+--- a/tcg/s390/tcg-target.inc.c
++++ b/tcg/s390/tcg-target.inc.c
+@@ -548,7 +548,7 @@ static void tcg_out_sh32(TCGContext* s, S390Opcode op, TCGReg dest,
+     tcg_out_insn_RS(s, op, dest, sh_reg, 0, sh_imm);
+ }
+ 
+-static void tcg_out_mov(TCGContext *s, TCGType type, TCGReg dst, TCGReg src)
++static bool tcg_out_mov(TCGContext *s, TCGType type, TCGReg dst, TCGReg src)
+ {
+     if (src != dst) {
+         if (type == TCG_TYPE_I32) {
+@@ -557,6 +557,7 @@ static void tcg_out_mov(TCGContext *s, TCGType type, TCGReg dst, TCGReg src)
+             tcg_out_insn(s, RRE, LGR, dst, src);
+         }
+     }
++    return true;
+ }
+ 
+ static const S390Opcode lli_insns[4] = {
+diff --git a/tcg/sparc/tcg-target.inc.c b/tcg/sparc/tcg-target.inc.c
+index 7a61839dc1..83295955a7 100644
+--- a/tcg/sparc/tcg-target.inc.c
++++ b/tcg/sparc/tcg-target.inc.c
+@@ -407,12 +407,13 @@ static void tcg_out_arithc(TCGContext *s, TCGReg rd, TCGReg rs1,
+               | (val2const ? INSN_IMM13(val2) : INSN_RS2(val2)));
+ }
+ 
+-static inline void tcg_out_mov(TCGContext *s, TCGType type,
++static inline bool tcg_out_mov(TCGContext *s, TCGType type,
+                                TCGReg ret, TCGReg arg)
+ {
+     if (ret != arg) {
+         tcg_out_arith(s, ret, arg, TCG_REG_G0, ARITH_OR);
+     }
++    return true;
+ }
+ 
+ static inline void tcg_out_sethi(TCGContext *s, TCGReg ret, uint32_t arg)
 diff --git a/tcg/tcg.c b/tcg/tcg.c
-index f7bef51de8..70ca113c26 100644
+index 70ca113c26..8ed7cb8654 100644
 --- a/tcg/tcg.c
 +++ b/tcg/tcg.c
-@@ -3274,11 +3274,8 @@ static void tcg_reg_alloc_do_movi(TCGContext *s, TCGTemp *ots,
-                                   tcg_target_ulong val, TCGLifeData arg_life,
-                                   TCGRegSet preferred_regs)
- {
--    if (ots->fixed_reg) {
--        /* For fixed registers, we do not do any constant propagation.  */
--        tcg_out_movi(s, ots->type, ots->reg, val);
--        return;
--    }
-+    /* ENV should not be modified.  */
-+    tcg_debug_assert(!ots->fixed_reg);
- 
-     /* The movi is not explicitly generated here.  */
-     if (ots->val_type == TEMP_VAL_REG) {
-@@ -3314,6 +3311,9 @@ static void tcg_reg_alloc_mov(TCGContext *s, const TCGOp *op)
-     ots = arg_temp(op->args[0]);
-     ts = arg_temp(op->args[1]);
- 
-+    /* ENV should not be modified.  */
-+    tcg_debug_assert(!ots->fixed_reg);
-+
-     /* Note that otype != itype for no-op truncation.  */
-     otype = ots->type;
-     itype = ts->type;
-@@ -3338,7 +3338,7 @@ static void tcg_reg_alloc_mov(TCGContext *s, const TCGOp *op)
-     }
- 
-     tcg_debug_assert(ts->val_type == TEMP_VAL_REG);
--    if (IS_DEAD_ARG(0) && !ots->fixed_reg) {
-+    if (IS_DEAD_ARG(0)) {
-         /* mov to a non-saved dead register makes no sense (even with
-            liveness analysis disabled). */
-         tcg_debug_assert(NEED_SYNC_ARG(0));
-@@ -3351,7 +3351,7 @@ static void tcg_reg_alloc_mov(TCGContext *s, const TCGOp *op)
+@@ -103,7 +103,7 @@ static const char *target_parse_constraint(TCGArgConstraint *ct,
+                                            const char *ct_str, TCGType type);
+ static void tcg_out_ld(TCGContext *s, TCGType type, TCGReg ret, TCGReg arg1,
+                        intptr_t arg2);
+-static void tcg_out_mov(TCGContext *s, TCGType type, TCGReg ret, TCGReg arg);
++static bool tcg_out_mov(TCGContext *s, TCGType type, TCGReg ret, TCGReg arg);
+ static void tcg_out_movi(TCGContext *s, TCGType type,
+                          TCGReg ret, tcg_target_long arg);
+ static void tcg_out_op(TCGContext *s, TCGOpcode opc, const TCGArg *args,
+@@ -3367,7 +3367,9 @@ static void tcg_reg_alloc_mov(TCGContext *s, const TCGOp *op)
+                                          allocated_regs, preferred_regs,
+                                          ots->indirect_base);
+             }
+-            tcg_out_mov(s, otype, ots->reg, ts->reg);
++            if (!tcg_out_mov(s, otype, ots->reg, ts->reg)) {
++                abort();
++            }
          }
-         temp_dead(s, ots);
-     } else {
--        if (IS_DEAD_ARG(1) && !ts->fixed_reg && !ots->fixed_reg) {
-+        if (IS_DEAD_ARG(1) && !ts->fixed_reg) {
-             /* the mov can be suppressed */
-             if (ots->val_type == TEMP_VAL_REG) {
-                 s->reg_to_temp[ots->reg] = NULL;
-@@ -3504,6 +3504,10 @@ static void tcg_reg_alloc_op(TCGContext *s, const TCGOp *op)
-             arg = op->args[i];
-             arg_ct = &def->args_ct[i];
-             ts = arg_temp(arg);
-+
-+            /* ENV should not be modified.  */
-+            tcg_debug_assert(!ts->fixed_reg);
-+
-             if ((arg_ct->ct & TCG_CT_ALIAS)
-                 && !const_args[arg_ct->alias_index]) {
-                 reg = new_args[arg_ct->alias_index];
-@@ -3512,29 +3516,21 @@ static void tcg_reg_alloc_op(TCGContext *s, const TCGOp *op)
-                                     i_allocated_regs | o_allocated_regs,
-                                     op->output_pref[k], ts->indirect_base);
+         ots->val_type = TEMP_VAL_REG;
+         ots->mem_coherent = 0;
+@@ -3467,7 +3469,9 @@ static void tcg_reg_alloc_op(TCGContext *s, const TCGOp *op)
+                       i_allocated_regs, 0);
+             reg = tcg_reg_alloc(s, arg_ct->u.regs, i_allocated_regs,
+                                 o_preferred_regs, ts->indirect_base);
+-            tcg_out_mov(s, ts->type, reg, ts->reg);
++            if (!tcg_out_mov(s, ts->type, reg, ts->reg)) {
++                abort();
++            }
+         }
+         new_args[i] = reg;
+         const_args[i] = 0;
+@@ -3626,7 +3630,9 @@ static void tcg_reg_alloc_call(TCGContext *s, TCGOp *op)
+             if (ts->val_type == TEMP_VAL_REG) {
+                 if (ts->reg != reg) {
+                     tcg_reg_free(s, reg, allocated_regs);
+-                    tcg_out_mov(s, ts->type, reg, ts->reg);
++                    if (!tcg_out_mov(s, ts->type, reg, ts->reg)) {
++                        abort();
++                    }
+                 }
              } else {
--                /* if fixed register, we try to use it */
--                reg = ts->reg;
--                if (ts->fixed_reg &&
--                    tcg_regset_test_reg(arg_ct->u.regs, reg)) {
--                    goto oarg_end;
--                }
-                 reg = tcg_reg_alloc(s, arg_ct->u.regs, o_allocated_regs,
-                                     op->output_pref[k], ts->indirect_base);
-             }
-             tcg_regset_set_reg(o_allocated_regs, reg);
--            /* if a fixed register is used, then a move will be done afterwards */
--            if (!ts->fixed_reg) {
--                if (ts->val_type == TEMP_VAL_REG) {
--                    s->reg_to_temp[ts->reg] = NULL;
--                }
--                ts->val_type = TEMP_VAL_REG;
--                ts->reg = reg;
--                /* temp value is modified, so the value kept in memory is
--                   potentially not the same */
--                ts->mem_coherent = 0;
--                s->reg_to_temp[reg] = ts;
-+            if (ts->val_type == TEMP_VAL_REG) {
-+                s->reg_to_temp[ts->reg] = NULL;
-             }
--        oarg_end:
-+            ts->val_type = TEMP_VAL_REG;
-+            ts->reg = reg;
-+            /*
-+             * Temp value is modified, so the value kept in memory is
-+             * potentially not the same.
-+             */
-+            ts->mem_coherent = 0;
-+            s->reg_to_temp[reg] = ts;
-             new_args[i] = reg;
-         }
-     }
-@@ -3550,10 +3546,10 @@ static void tcg_reg_alloc_op(TCGContext *s, const TCGOp *op)
-     /* move the outputs in the correct register if needed */
-     for(i = 0; i < nb_oargs; i++) {
-         ts = arg_temp(op->args[i]);
--        reg = new_args[i];
--        if (ts->fixed_reg && ts->reg != reg) {
--            tcg_out_mov(s, ts->type, ts->reg, reg);
--        }
-+
-+        /* ENV should not be modified.  */
-+        tcg_debug_assert(!ts->fixed_reg);
-+
-         if (NEED_SYNC_ARG(i)) {
-             temp_sync(s, ts, o_allocated_regs, 0, IS_DEAD_ARG(i));
-         } else if (IS_DEAD_ARG(i)) {
-@@ -3674,26 +3670,23 @@ static void tcg_reg_alloc_call(TCGContext *s, TCGOp *op)
-     for(i = 0; i < nb_oargs; i++) {
-         arg = op->args[i];
-         ts = arg_temp(arg);
-+
-+        /* ENV should not be modified.  */
-+        tcg_debug_assert(!ts->fixed_reg);
-+
-         reg = tcg_target_call_oarg_regs[i];
-         tcg_debug_assert(s->reg_to_temp[reg] == NULL);
--
--        if (ts->fixed_reg) {
--            if (ts->reg != reg) {
--                tcg_out_mov(s, ts->type, ts->reg, reg);
--            }
--        } else {
--            if (ts->val_type == TEMP_VAL_REG) {
--                s->reg_to_temp[ts->reg] = NULL;
--            }
--            ts->val_type = TEMP_VAL_REG;
--            ts->reg = reg;
--            ts->mem_coherent = 0;
--            s->reg_to_temp[reg] = ts;
--            if (NEED_SYNC_ARG(i)) {
--                temp_sync(s, ts, allocated_regs, 0, IS_DEAD_ARG(i));
--            } else if (IS_DEAD_ARG(i)) {
--                temp_dead(s, ts);
--            }
-+        if (ts->val_type == TEMP_VAL_REG) {
-+            s->reg_to_temp[ts->reg] = NULL;
-+        }
-+        ts->val_type = TEMP_VAL_REG;
-+        ts->reg = reg;
-+        ts->mem_coherent = 0;
-+        s->reg_to_temp[reg] = ts;
-+        if (NEED_SYNC_ARG(i)) {
-+            temp_sync(s, ts, allocated_regs, 0, IS_DEAD_ARG(i));
-+        } else if (IS_DEAD_ARG(i)) {
-+            temp_dead(s, ts);
-         }
-     }
+                 TCGRegSet arg_set = 0;
+diff --git a/tcg/tci/tcg-target.inc.c b/tcg/tci/tcg-target.inc.c
+index 0015a98485..992d50cb1e 100644
+--- a/tcg/tci/tcg-target.inc.c
++++ b/tcg/tci/tcg-target.inc.c
+@@ -509,7 +509,7 @@ static void tcg_out_ld(TCGContext *s, TCGType type, TCGReg ret, TCGReg arg1,
+     old_code_ptr[1] = s->code_ptr - old_code_ptr;
  }
+ 
+-static void tcg_out_mov(TCGContext *s, TCGType type, TCGReg ret, TCGReg arg)
++static bool tcg_out_mov(TCGContext *s, TCGType type, TCGReg ret, TCGReg arg)
+ {
+     uint8_t *old_code_ptr = s->code_ptr;
+     tcg_debug_assert(ret != arg);
+@@ -521,6 +521,7 @@ static void tcg_out_mov(TCGContext *s, TCGType type, TCGReg ret, TCGReg arg)
+     tcg_out_r(s, ret);
+     tcg_out_r(s, arg);
+     old_code_ptr[1] = s->code_ptr - old_code_ptr;
++    return true;
+ }
+ 
+ static void tcg_out_movi(TCGContext *s, TCGType type,
 -- 
 2.17.1
