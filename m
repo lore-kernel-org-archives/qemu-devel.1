@@ -1,27 +1,27 @@
-Received: from eggs.gnu.org ([209.51.188.92]:33185)
+Received: from eggs.gnu.org ([209.51.188.92]:33456)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1hLr4s-0003Yr-Cx
-	for qemu-devel@nongnu.org; Wed, 01 May 2019 11:23:25 -0400
+	(envelope-from <philmd@redhat.com>) id 1hLr5u-000484-Ij
+	for qemu-devel@nongnu.org; Wed, 01 May 2019 11:24:29 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1hLr4o-0000Qt-0v
-	for qemu-devel@nongnu.org; Wed, 01 May 2019 11:23:21 -0400
-Received: from mail-wr1-x442.google.com ([2a00:1450:4864:20::442]:37653)
+	(envelope-from <philmd@redhat.com>) id 1hLr5p-0000vK-EN
+	for qemu-devel@nongnu.org; Wed, 01 May 2019 11:24:26 -0400
+Received: from mail-wm1-f65.google.com ([209.85.128.65]:34452)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1hLr4n-0000Q4-No
-	for qemu-devel@nongnu.org; Wed, 01 May 2019 11:23:17 -0400
-Received: by mail-wr1-x442.google.com with SMTP id k23so1987379wrd.4
-	for <qemu-devel@nongnu.org>; Wed, 01 May 2019 08:23:17 -0700 (PDT)
-References: <20190501050536.15580-1-richard.henderson@linaro.org>
-	<20190501050536.15580-2-richard.henderson@linaro.org>
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-In-reply-to: <20190501050536.15580-2-richard.henderson@linaro.org>
-Date: Wed, 01 May 2019 16:23:14 +0100
-Message-ID: <87woja5hct.fsf@zen.linaroharston>
+	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1hLr5o-0000uU-Sf
+	for qemu-devel@nongnu.org; Wed, 01 May 2019 11:24:21 -0400
+Received: by mail-wm1-f65.google.com with SMTP id b67so4643482wmg.1
+	for <qemu-devel@nongnu.org>; Wed, 01 May 2019 08:24:19 -0700 (PDT)
+References: <20190501144646.4851-1-berrange@redhat.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Message-ID: <cb43af48-c48b-74cf-6e83-982a310bf1d9@redhat.com>
+Date: Wed, 1 May 2019 17:24:17 +0200
 MIME-Version: 1.0
+In-Reply-To: <20190501144646.4851-1-berrange@redhat.com>
 Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v2 01/29] tcg: Implement tcg_gen_gvec_3i()
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH v2] linux-user: avoid string truncation
+ warnings in uname field copying
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,267 +30,50 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: David Hildenbrand <david@redhat.com>
+To: =?UTF-8?Q?Daniel_P=2e_Berrang=c3=a9?= <berrange@redhat.com>, qemu-devel@nongnu.org
+Cc: Riku Voipio <riku.voipio@iki.fi>, Laurent Vivier <laurent@vivier.eu>
 
+On 5/1/19 4:46 PM, Daniel P. Berrangé wrote:
+> In file included from /usr/include/string.h:494,
+>                  from include/qemu/osdep.h:101,
+>                  from linux-user/uname.c:20:
+> In function ‘strncpy’,
+>     inlined from ‘sys_uname’ at linux-user/uname.c:94:3:
+> /usr/include/bits/string_fortified.h:106:10: warning: ‘__builtin_strncpy’ output may be truncated copying 64 bytes from a string of length 64 [-Wstringop-truncation]
+>   106 |   return __builtin___strncpy_chk (__dest, __src, __len, __bos (__dest));
+>       |          ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+> 
+> We don't care where the NUL terminator in the original uname
+> field was. It suffices to copy the entire original field and
+> simply force a NUL terminator at the end of the new field.
+> 
+> Signed-off-by: Daniel P. Berrangé <berrange@redhat.com>
 
-Richard Henderson <richard.henderson@linaro.org> writes:
+Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
 
-> From: David Hildenbrand <david@redhat.com>
->
-> Let's add tcg_gen_gvec_3i(), similar to tcg_gen_gvec_2i(), however
-> without introducing "gen_helper_gvec_3i *fnoi", as it isn't needed
-> for now.
->
-> Signed-off-by: David Hildenbrand <david@redhat.com>
-> Message-Id: <20190416185301.25344-2-david@redhat.com>
-> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 > ---
->  tcg/tcg-op-gvec.h |  24 ++++++++
->  tcg/tcg-op-gvec.c | 139 ++++++++++++++++++++++++++++++++++++++++++++++
->  2 files changed, 163 insertions(+)
->
-> diff --git a/tcg/tcg-op-gvec.h b/tcg/tcg-op-gvec.h
-> index 850da32ded..c093243c4c 100644
-> --- a/tcg/tcg-op-gvec.h
-> +++ b/tcg/tcg-op-gvec.h
-> @@ -164,6 +164,27 @@ typedef struct {
->      bool load_dest;
->  } GVecGen3;
->
-> +typedef struct {
-> +    /*
-> +     * Expand inline as a 64-bit or 32-bit integer. Only one of these wi=
-ll be
-> +     * non-NULL.
-> +     */
-> +    void (*fni8)(TCGv_i64, TCGv_i64, TCGv_i64, int64_t);
-> +    void (*fni4)(TCGv_i32, TCGv_i32, TCGv_i32, int32_t);
-> +    /* Expand inline with a host vector type.  */
-> +    void (*fniv)(unsigned, TCGv_vec, TCGv_vec, TCGv_vec, int64_t);
-> +    /* Expand out-of-line helper w/descriptor, data in descriptor.  */
-> +    gen_helper_gvec_3 *fno;
-> +    /* The opcode, if any, to which this corresponds.  */
-> +    TCGOpcode opc;
-> +    /* The vector element size, if applicable.  */
-> +    uint8_t vece;
-> +    /* Prefer i64 to v64.  */
-> +    bool prefer_i64;
-> +    /* Load dest as a 3rd source operand.  */
-> +    bool load_dest;
-> +} GVecGen3i;
-> +
->  typedef struct {
->      /* Expand inline as a 64-bit or 32-bit integer.
->         Only one of these will be non-NULL.  */
-> @@ -193,6 +214,9 @@ void tcg_gen_gvec_2s(uint32_t dofs, uint32_t aofs, ui=
-nt32_t oprsz,
->                       uint32_t maxsz, TCGv_i64 c, const GVecGen2s *);
->  void tcg_gen_gvec_3(uint32_t dofs, uint32_t aofs, uint32_t bofs,
->                      uint32_t oprsz, uint32_t maxsz, const GVecGen3 *);
-> +void tcg_gen_gvec_3i(uint32_t dofs, uint32_t aofs, uint32_t bofs,
-> +                     uint32_t oprsz, uint32_t maxsz, int64_t c,
-> +                     const GVecGen3i *);
->  void tcg_gen_gvec_4(uint32_t dofs, uint32_t aofs, uint32_t bofs, uint32_=
-t cofs,
->                      uint32_t oprsz, uint32_t maxsz, const GVecGen4 *);
->
-> diff --git a/tcg/tcg-op-gvec.c b/tcg/tcg-op-gvec.c
-> index 0996ef0812..f831adb4e7 100644
-> --- a/tcg/tcg-op-gvec.c
-> +++ b/tcg/tcg-op-gvec.c
-> @@ -663,6 +663,29 @@ static void expand_3_i32(uint32_t dofs, uint32_t aof=
-s,
->      tcg_temp_free_i32(t0);
->  }
->
-> +static void expand_3i_i32(uint32_t dofs, uint32_t aofs, uint32_t bofs,
-> +                          uint32_t oprsz, int32_t c, bool load_dest,
-> +                          void (*fni)(TCGv_i32, TCGv_i32, TCGv_i32, int3=
-2_t))
-> +{
-> +    TCGv_i32 t0 =3D tcg_temp_new_i32();
-> +    TCGv_i32 t1 =3D tcg_temp_new_i32();
-> +    TCGv_i32 t2 =3D tcg_temp_new_i32();
-> +    uint32_t i;
-> +
-> +    for (i =3D 0; i < oprsz; i +=3D 4) {
-> +        tcg_gen_ld_i32(t0, cpu_env, aofs + i);
-> +        tcg_gen_ld_i32(t1, cpu_env, bofs + i);
-> +        if (load_dest) {
-> +            tcg_gen_ld_i32(t2, cpu_env, dofs + i);
-> +        }
-> +        fni(t2, t0, t1, c);
-> +        tcg_gen_st_i32(t2, cpu_env, dofs + i);
-> +    }
-> +    tcg_temp_free_i32(t0);
-> +    tcg_temp_free_i32(t1);
-> +    tcg_temp_free_i32(t2);
-> +}
-> +
->  /* Expand OPSZ bytes worth of three-operand operations using i32 element=
-s.  */
->  static void expand_4_i32(uint32_t dofs, uint32_t aofs, uint32_t bofs,
->                           uint32_t cofs, uint32_t oprsz, bool write_aofs,
-> @@ -770,6 +793,29 @@ static void expand_3_i64(uint32_t dofs, uint32_t aof=
-s,
->      tcg_temp_free_i64(t0);
->  }
->
-> +static void expand_3i_i64(uint32_t dofs, uint32_t aofs, uint32_t bofs,
-> +                          uint32_t oprsz, int64_t c, bool load_dest,
-> +                          void (*fni)(TCGv_i64, TCGv_i64, TCGv_i64, int6=
-4_t))
-> +{
-> +    TCGv_i64 t0 =3D tcg_temp_new_i64();
-> +    TCGv_i64 t1 =3D tcg_temp_new_i64();
-> +    TCGv_i64 t2 =3D tcg_temp_new_i64();
-> +    uint32_t i;
-> +
-> +    for (i =3D 0; i < oprsz; i +=3D 8) {
-> +        tcg_gen_ld_i64(t0, cpu_env, aofs + i);
-> +        tcg_gen_ld_i64(t1, cpu_env, bofs + i);
-> +        if (load_dest) {
-> +            tcg_gen_ld_i64(t2, cpu_env, dofs + i);
-> +        }
-> +        fni(t2, t0, t1, c);
-> +        tcg_gen_st_i64(t2, cpu_env, dofs + i);
-> +    }
-> +    tcg_temp_free_i64(t0);
-> +    tcg_temp_free_i64(t1);
-> +    tcg_temp_free_i64(t2);
-> +}
-> +
->  /* Expand OPSZ bytes worth of three-operand operations using i64 element=
-s.  */
->  static void expand_4_i64(uint32_t dofs, uint32_t aofs, uint32_t bofs,
->                           uint32_t cofs, uint32_t oprsz, bool write_aofs,
-> @@ -883,6 +929,35 @@ static void expand_3_vec(unsigned vece, uint32_t dof=
-s, uint32_t aofs,
->      tcg_temp_free_vec(t0);
->  }
->
-> +/*
-> + * Expand OPSZ bytes worth of three-vector operands and an immediate ope=
-rand
-> + * using host vectors.
-> + */
-> +static void expand_3i_vec(unsigned vece, uint32_t dofs, uint32_t aofs,
-> +                          uint32_t bofs, uint32_t oprsz, uint32_t tysz,
-> +                          TCGType type, int64_t c, bool load_dest,
-> +                          void (*fni)(unsigned, TCGv_vec, TCGv_vec, TCGv=
-_vec,
-> +                                      int64_t))
-> +{
-> +    TCGv_vec t0 =3D tcg_temp_new_vec(type);
-> +    TCGv_vec t1 =3D tcg_temp_new_vec(type);
-> +    TCGv_vec t2 =3D tcg_temp_new_vec(type);
-> +    uint32_t i;
-> +
-> +    for (i =3D 0; i < oprsz; i +=3D tysz) {
-> +        tcg_gen_ld_vec(t0, cpu_env, aofs + i);
-> +        tcg_gen_ld_vec(t1, cpu_env, bofs + i);
-> +        if (load_dest) {
-> +            tcg_gen_ld_vec(t2, cpu_env, dofs + i);
-> +        }
-> +        fni(vece, t2, t0, t1, c);
-> +        tcg_gen_st_vec(t2, cpu_env, dofs + i);
-> +    }
-> +    tcg_temp_free_vec(t0);
-> +    tcg_temp_free_vec(t1);
-> +    tcg_temp_free_vec(t2);
-> +}
-> +
->  /* Expand OPSZ bytes worth of four-operand operations using host vectors=
-.  */
->  static void expand_4_vec(unsigned vece, uint32_t dofs, uint32_t aofs,
->                           uint32_t bofs, uint32_t cofs, uint32_t oprsz,
-> @@ -1174,6 +1249,70 @@ void tcg_gen_gvec_3(uint32_t dofs, uint32_t aofs, =
-uint32_t bofs,
->      }
->  }
->
-> +/* Expand a vector operation with three vectors and an immediate.  */
-> +void tcg_gen_gvec_3i(uint32_t dofs, uint32_t aofs, uint32_t bofs,
-> +                     uint32_t oprsz, uint32_t maxsz, int64_t c,
-> +                     const GVecGen3i *g)
-> +{
-> +    TCGType type;
-> +    uint32_t some;
-> +
-> +    check_size_align(oprsz, maxsz, dofs | aofs | bofs);
-> +    check_overlap_3(dofs, aofs, bofs, maxsz);
-> +
-> +    type =3D 0;
-> +    if (g->fniv) {
-> +        type =3D choose_vector_type(g->opc, g->vece, oprsz, g->prefer_i6=
-4);
-> +    }
-> +    switch (type) {
-> +    case TCG_TYPE_V256:
-> +        /*
-> +         * Recall that ARM SVE allows vector sizes that are not a
-> +         * power of 2, but always a multiple of 16.  The intent is
-> +         * that e.g. size =3D=3D 80 would be expanded with 2x32 + 1x16.
-> +         */
-> +        some =3D QEMU_ALIGN_DOWN(oprsz, 32);
-> +        expand_3i_vec(g->vece, dofs, aofs, bofs, some, 32, TCG_TYPE_V256,
-> +                      c, g->load_dest, g->fniv);
-> +        if (some =3D=3D oprsz) {
-> +            break;
-> +        }
-> +        dofs +=3D some;
-> +        aofs +=3D some;
-> +        bofs +=3D some;
-> +        oprsz -=3D some;
-> +        maxsz -=3D some;
-> +        /* fallthru */
-> +    case TCG_TYPE_V128:
-> +        expand_3i_vec(g->vece, dofs, aofs, bofs, oprsz, 16, TCG_TYPE_V12=
-8,
-> +                      c, g->load_dest, g->fniv);
-> +        break;
-> +    case TCG_TYPE_V64:
-> +        expand_3i_vec(g->vece, dofs, aofs, bofs, oprsz, 8, TCG_TYPE_V64,
-> +                      c, g->load_dest, g->fniv);
-> +        break;
-> +
-> +    case 0:
-> +        if (g->fni8 && check_size_impl(oprsz, 8)) {
-> +            expand_3i_i64(dofs, aofs, bofs, oprsz, c, g->load_dest, g->f=
-ni8);
-> +        } else if (g->fni4 && check_size_impl(oprsz, 4)) {
-> +            expand_3i_i32(dofs, aofs, bofs, oprsz, c, g->load_dest, g->f=
-ni4);
-> +        } else {
-> +            assert(g->fno !=3D NULL);
-> +            tcg_gen_gvec_3_ool(dofs, aofs, bofs, oprsz, maxsz, c, g->fno=
-);
-> +            return;
-> +        }
-> +        break;
-> +
-> +    default:
-> +        g_assert_not_reached();
-> +    }
-> +
-> +    if (oprsz < maxsz) {
-> +        expand_clr(dofs + oprsz, maxsz - oprsz);
-> +    }
-> +}
-> +
-
-My only slight concern is this is effectively a c&p of the helper above.
-However I can't really see any way to DRY so:
-
-Reviewed-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
-
-
->  /* Expand a vector four-operand operation.  */
->  void tcg_gen_gvec_4(uint32_t dofs, uint32_t aofs, uint32_t bofs, uint32_=
-t cofs,
->                      uint32_t oprsz, uint32_t maxsz, const GVecGen4 *g)
-
-
---
-Alex Benn=C3=A9e
+> 
+> Changed in v2:
+> 
+>  - Always use sizeof() in preference to __NEW_UTS_LEN
+> 
+>  linux-user/uname.c | 5 ++---
+>  1 file changed, 2 insertions(+), 3 deletions(-)
+> 
+> diff --git a/linux-user/uname.c b/linux-user/uname.c
+> index 313b79dbad..1c05f95387 100644
+> --- a/linux-user/uname.c
+> +++ b/linux-user/uname.c
+> @@ -72,9 +72,8 @@ const char *cpu_to_uname_machine(void *cpu_env)
+>  
+>  #define COPY_UTSNAME_FIELD(dest, src) \
+>    do { \
+> -      /* __NEW_UTS_LEN doesn't include terminating null */ \
+> -      (void) strncpy((dest), (src), __NEW_UTS_LEN); \
+> -      (dest)[__NEW_UTS_LEN] = '\0'; \
+> +      memcpy((dest), (src), MIN(sizeof(src), sizeof(dest))); \
+> +      (dest)[sizeof(dest) - 1] = '\0'; \
+>    } while (0)
+>  
+>  int sys_uname(struct new_utsname *buf)
+> 
