@@ -1,19 +1,19 @@
-Received: from eggs.gnu.org ([209.51.188.92]:45624)
+Received: from eggs.gnu.org ([209.51.188.92]:45620)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berto@igalia.com>) id 1hLtkc-0007Nb-Jg
+	(envelope-from <berto@igalia.com>) id 1hLtkc-0007NY-Hj
 	for qemu-devel@nongnu.org; Wed, 01 May 2019 14:14:39 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berto@igalia.com>) id 1hLtka-0002bI-0L
+	(envelope-from <berto@igalia.com>) id 1hLtkb-0002cF-4S
 	for qemu-devel@nongnu.org; Wed, 01 May 2019 14:14:38 -0400
 From: Alberto Garcia <berto@igalia.com>
-Date: Wed,  1 May 2019 21:13:59 +0300
-Message-Id: <6026d9eb2851d22f6ff031e208120735361ea606.1556732434.git.berto@igalia.com>
+Date: Wed,  1 May 2019 21:13:57 +0300
+Message-Id: <524e211cb818a20f521d6e271e782ab62b8e5e80.1556732434.git.berto@igalia.com>
 In-Reply-To: <cover.1556732434.git.berto@igalia.com>
 References: <cover.1556732434.git.berto@igalia.com>
 In-Reply-To: <cover.1556732434.git.berto@igalia.com>
 References: <cover.1556732434.git.berto@igalia.com>
-Subject: [Qemu-devel] [PATCH v2 5/5] qcow2: Remove
- BDRVQcow2State.cluster_sectors
+Subject: [Qemu-devel] [PATCH v2 3/5] vvfat: Replace bdrv_{read,
+ write}() with bdrv_{pread, pwrite}()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,38 +25,51 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Alberto Garcia <berto@igalia.com>, qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Eric Blake <eblake@redhat.com>
 
-The last user of this field disappeared when we replace the
-sector-based bdrv_write() with the byte-based bdrv_pwrite().
+There's only a couple of bdrv_read() and bdrv_write() calls left in
+the vvfat code, and they can be trivially replaced with the byte-based
+bdrv_pread() and bdrv_pwrite().
 
 Signed-off-by: Alberto Garcia <berto@igalia.com>
 ---
- block/qcow2.c | 1 -
- block/qcow2.h | 1 -
- 2 files changed, 2 deletions(-)
+ block/vvfat.c | 12 +++++++-----
+ 1 file changed, 7 insertions(+), 5 deletions(-)
 
-diff --git a/block/qcow2.c b/block/qcow2.c
-index a520d116ef..8e024007db 100644
---- a/block/qcow2.c
-+++ b/block/qcow2.c
-@@ -1259,7 +1259,6 @@ static int coroutine_fn qcow2_do_open(BlockDriverState *bs, QDict *options,
- 
-     s->cluster_bits = header.cluster_bits;
-     s->cluster_size = 1 << s->cluster_bits;
--    s->cluster_sectors = 1 << (s->cluster_bits - BDRV_SECTOR_BITS);
- 
-     /* Initialise version 3 header fields */
-     if (header.version == 2) {
-diff --git a/block/qcow2.h b/block/qcow2.h
-index fdee297f33..e62508d1ce 100644
---- a/block/qcow2.h
-+++ b/block/qcow2.h
-@@ -266,7 +266,6 @@ typedef struct Qcow2BitmapHeaderExt {
- typedef struct BDRVQcow2State {
-     int cluster_bits;
-     int cluster_size;
--    int cluster_sectors;
-     int l2_slice_size;
-     int l2_bits;
-     int l2_size;
+diff --git a/block/vvfat.c b/block/vvfat.c
+index 5f66787890..253cc716dd 100644
+--- a/block/vvfat.c
++++ b/block/vvfat.c
+@@ -1494,8 +1494,8 @@ static int vvfat_read(BlockDriverState *bs, int64_t sector_num,
+                 DLOG(fprintf(stderr, "sectors %" PRId64 "+%" PRId64
+                              " allocated\n", sector_num,
+                              n >> BDRV_SECTOR_BITS));
+-                if (bdrv_read(s->qcow, sector_num, buf + i * 0x200,
+-                              n >> BDRV_SECTOR_BITS)) {
++                if (bdrv_pread(s->qcow, sector_num * BDRV_SECTOR_SIZE,
++                               buf + i * 0x200, n) < 0) {
+                     return -1;
+                 }
+                 i += (n >> BDRV_SECTOR_BITS) - 1;
+@@ -1983,8 +1983,9 @@ static uint32_t get_cluster_count_for_direntry(BDRVVVFATState* s,
+                         if (res) {
+                             return -1;
+                         }
+-                        res = bdrv_write(s->qcow, offset, s->cluster_buffer, 1);
+-                        if (res) {
++                        res = bdrv_pwrite(s->qcow, offset * BDRV_SECTOR_SIZE,
++                                          s->cluster_buffer, BDRV_SECTOR_SIZE);
++                        if (res < 0) {
+                             return -2;
+                         }
+                     }
+@@ -3050,7 +3051,8 @@ DLOG(checkpoint());
+      * Use qcow backend. Commit later.
+      */
+ DLOG(fprintf(stderr, "Write to qcow backend: %d + %d\n", (int)sector_num, nb_sectors));
+-    ret = bdrv_write(s->qcow, sector_num, buf, nb_sectors);
++    ret = bdrv_pwrite(s->qcow, sector_num * BDRV_SECTOR_SIZE, buf,
++                      nb_sectors * BDRV_SECTOR_SIZE);
+     if (ret < 0) {
+         fprintf(stderr, "Error writing to qcow backend\n");
+         return ret;
 -- 
 2.11.0
