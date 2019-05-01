@@ -1,26 +1,28 @@
-Received: from eggs.gnu.org ([209.51.188.92]:51960)
+Received: from eggs.gnu.org ([209.51.188.92]:52606)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1hLu7C-0003RI-5o
-	for qemu-devel@nongnu.org; Wed, 01 May 2019 14:37:59 -0400
+	(envelope-from <richard.henderson@linaro.org>) id 1hLu8k-00049g-PG
+	for qemu-devel@nongnu.org; Wed, 01 May 2019 14:39:35 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1hLu7A-0002jG-Tk
-	for qemu-devel@nongnu.org; Wed, 01 May 2019 14:37:58 -0400
-Resent-Message-Id: <E1hLu7A-0002jG-Tk@eggs.gnu.org>
-Received: from sender4-of-o59.zoho.com ([136.143.188.59]:21921)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
-	id 1hLu7A-0002i6-M3
-	for qemu-devel@nongnu.org; Wed, 01 May 2019 14:37:56 -0400
-In-Reply-To: <20190430031238.40499-1-yangchuanlong@huawei.com>
-Message-ID: <155673586019.10667.9130032716299474327@c2072b67cc0c>
-Reply-To: <qemu-devel@nongnu.org>
+	(envelope-from <richard.henderson@linaro.org>) id 1hLu8j-0003za-Rf
+	for qemu-devel@nongnu.org; Wed, 01 May 2019 14:39:34 -0400
+Received: from mail-pg1-x533.google.com ([2607:f8b0:4864:20::533]:33044)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+	id 1hLu8i-0003sk-0d
+	for qemu-devel@nongnu.org; Wed, 01 May 2019 14:39:33 -0400
+Received: by mail-pg1-x533.google.com with SMTP id k19so8664416pgh.0
+	for <qemu-devel@nongnu.org>; Wed, 01 May 2019 11:39:30 -0700 (PDT)
+References: <20190430165234.32272-1-alex.bennee@linaro.org>
+From: Richard Henderson <richard.henderson@linaro.org>
+Message-ID: <9a538ea2-358a-dc61-b2f3-f8155c1a2283@linaro.org>
+Date: Wed, 1 May 2019 11:39:26 -0700
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Wed, 1 May 2019 11:37:41 -0700 (PDT)
-Subject: Re: [Qemu-devel] [PATCH v1] target/arm/arm-powerctl: mask the cpuid
- with affinity bits when get cpu
+In-Reply-To: <20190430165234.32272-1-alex.bennee@linaro.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH v5 00/15] demacro softmmu (plus
+ tests/coverage)
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,18 +31,29 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: yangchuanlong@huawei.com
-Cc: fam@euphon.net, qemu-devel@nongnu.org, gengdongjiu@huawei.com
+To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>, qemu-devel@nongnu.org
+Cc: qemu-arm@nongnu.org, mark.cave-ayland@ilande.co.uk, cota@braap.org
 
-UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDE5MDQzMDAzMTIzOC40MDQ5
-OS0xLXlhbmdjaHVhbmxvbmdAaHVhd2VpLmNvbS8KCgoKSGksCgpUaGlzIHNlcmllcyBmYWlsZWQg
-dGhlIGFzYW4gYnVpbGQgdGVzdC4gUGxlYXNlIGZpbmQgdGhlIHRlc3RpbmcgY29tbWFuZHMgYW5k
-CnRoZWlyIG91dHB1dCBiZWxvdy4gSWYgeW91IGhhdmUgRG9ja2VyIGluc3RhbGxlZCwgeW91IGNh
-biBwcm9iYWJseSByZXByb2R1Y2UgaXQKbG9jYWxseS4KCj09PSBURVNUIFNDUklQVCBCRUdJTiA9
-PT0KIyEvYmluL2Jhc2gKdGltZSBtYWtlIGRvY2tlci10ZXN0LWRlYnVnQGZlZG9yYSBUQVJHRVRf
-TElTVD14ODZfNjQtc29mdG1tdSBKPTE0IE5FVFdPUks9MQo9PT0gVEVTVCBTQ1JJUFQgRU5EID09
-PQoKCgoKVGhlIGZ1bGwgbG9nIGlzIGF2YWlsYWJsZSBhdApodHRwOi8vcGF0Y2hldy5vcmcvbG9n
-cy8yMDE5MDQzMDAzMTIzOC40MDQ5OS0xLXlhbmdjaHVhbmxvbmdAaHVhd2VpLmNvbS90ZXN0aW5n
-LmFzYW4vP3R5cGU9bWVzc2FnZS4KLS0tCkVtYWlsIGdlbmVyYXRlZCBhdXRvbWF0aWNhbGx5IGJ5
-IFBhdGNoZXcgW2h0dHBzOi8vcGF0Y2hldy5vcmcvXS4KUGxlYXNlIHNlbmQgeW91ciBmZWVkYmFj
-ayB0byBwYXRjaGV3LWRldmVsQHJlZGhhdC5jb20=
+On 4/30/19 9:52 AM, Alex Bennée wrote:
+> I've also moved the existing system memory test and made it multiarch
+> and added the bootstrapping for aarch64 system tests. I would like to
+> add support for Big Endian as well but I didn't want to delay the
+> posting of the series. It would also be nice to exercise the
+> ioread/write paths and other handling but I leave this as an exercise
+> for later.
+
+Somewhere in there you're adding
+
+  -chardev file,path=hello.out,id=output
+
+but there's no corresponding use of the chardev.
+Which, somehow doesn't seem to matter to your aarch64
+testcase, but when I try this for alpha I truly get
+no output at all.  I needed
+
+  -serial chardev:output
+
+to populate the file.
+
+
+r~
