@@ -2,91 +2,68 @@ Return-Path: <SRS0=aVj3=TB=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.0 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-2.4 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_PASS,URIBL_BLOCKED,USER_AGENT_MUTT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 89252C43219
-	for <qemu-devel@archiver.kernel.org>; Wed,  1 May 2019 17:27:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A9ADFC43219
+	for <qemu-devel@archiver.kernel.org>; Wed,  1 May 2019 17:28:22 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3945B2075E
-	for <qemu-devel@archiver.kernel.org>; Wed,  1 May 2019 17:27:42 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="zFPOEBZy"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3945B2075E
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id 7654E20866
+	for <qemu-devel@archiver.kernel.org>; Wed,  1 May 2019 17:28:22 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7654E20866
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:37454 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:37456 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hLt1B-0007Es-GM
-	for qemu-devel@archiver.kernel.org; Wed, 01 May 2019 13:27:41 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:35823)
+	id 1hLt1p-0007fJ-Qj
+	for qemu-devel@archiver.kernel.org; Wed, 01 May 2019 13:28:21 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:35933)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1hLt0E-0005dh-Tl
-	for qemu-devel@nongnu.org; Wed, 01 May 2019 13:26:44 -0400
+	(envelope-from <stefanha@redhat.com>) id 1hLt0f-0006xa-8o
+	for qemu-devel@nongnu.org; Wed, 01 May 2019 13:27:10 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1hLt0D-0001gJ-ES
-	for qemu-devel@nongnu.org; Wed, 01 May 2019 13:26:42 -0400
-Received: from mail-wm1-x341.google.com ([2a00:1450:4864:20::341]:39490)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1hLt0D-0001e0-52
-	for qemu-devel@nongnu.org; Wed, 01 May 2019 13:26:41 -0400
-Received: by mail-wm1-x341.google.com with SMTP id n25so7694254wmk.4
-	for <qemu-devel@nongnu.org>; Wed, 01 May 2019 10:26:41 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
-	h=references:user-agent:from:to:subject:in-reply-to:date:message-id
-	:mime-version:content-transfer-encoding;
-	bh=uMPGYUgTyiwfgPNUcPgtB09Iv1BGZouhictmutLTguc=;
-	b=zFPOEBZy3jwkdw7ZA50vBhame9EXPfQ6qJgx1SPn6XFohs/w6pZKLday4pwRzbmR7f
-	QzFjOJotW1XUzsVL2+8evu1+qxSl6LUwUWI5BjVwEdvO0XYFDYExnvOKbCybmjI+4h21
-	NE4jlOovRldCD2QVyyEFs2JfbRN9xg2d/0LZEThbSxwrBa8XY6I8dq7ENM8yoPw4RStR
-	tWrOUdI8zrieImL1Te5wfAclzwZGoy9ySNNs3IXgGus526FSbEdZHKIUgVFy7l0zomKI
-	j2cRpNYBvod51uZFLzQ71jfuEoqLagX4zxnhX1qsWAPCDcZ98SbBq0C1Foz3oEcd0Nv2
-	CfrA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=1e100.net; s=20161025;
-	h=x-gm-message-state:references:user-agent:from:to:subject
-	:in-reply-to:date:message-id:mime-version:content-transfer-encoding;
-	bh=uMPGYUgTyiwfgPNUcPgtB09Iv1BGZouhictmutLTguc=;
-	b=eepQJ93MbkB7X8DaLGNnTB849cbBpwPsQ8f70jXxPM+rCydZB629UYkCNXAWuD47Dp
-	eu3lCZwiR1ic+B5gLwp2Q+9I0VhfZx0RwEVYljJ35U+wMoO83TLIJojlG4GZs77gNeb4
-	DztIUF8nvPfzY7Ksx9FciLnbmw6htMxL3BvwLQqTfc8k6oAwhe1QUxy5ucun5wFyLR8D
-	5eRdq6TPK2Ga9x7ou1c+9/ZD8OR3v4LOf9+sw0i1bdnFAjFK6/Uhnvi2f4XseJ/IH4H9
-	V/raK4vwNhJshz/Q5kVG5P5eXhJfqEezb/FsyyIgHAn2KxovygQYZ6qdbzMRn+/OSEbR
-	f19Q==
-X-Gm-Message-State: APjAAAXYzsYb/cM6jPrUVd3dhDSZvVUijjNONLOJqYfksz7aYr/NcFur
-	Wr7hKx1nQH075EmEcxJ1RxXnUM6YN58=
-X-Google-Smtp-Source: APXvYqwe67+9lFSym9D9G8lfSzK8YQ7y/LVnKGni7fVzyhxQmwSby2xTYU+X44oXPJgj8HZHrcVcxw==
-X-Received: by 2002:a1c:1941:: with SMTP id 62mr7044854wmz.100.1556731599600; 
-	Wed, 01 May 2019 10:26:39 -0700 (PDT)
-Received: from zen.linaroharston ([81.128.185.34])
-	by smtp.gmail.com with ESMTPSA id
-	v17sm4345537wmc.30.2019.05.01.10.26.38 for <qemu-devel@nongnu.org>
-	(version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
-	Wed, 01 May 2019 10:26:38 -0700 (PDT)
-Received: from zen (localhost [127.0.0.1])
-	by zen.linaroharston (Postfix) with ESMTP id 6CF881FF87
-	for <qemu-devel@nongnu.org>; Wed,  1 May 2019 18:26:38 +0100 (BST)
-References: <20190501050536.15580-1-richard.henderson@linaro.org>
-	<20190501050536.15580-6-richard.henderson@linaro.org>
-User-agent: mu4e 1.3.1; emacs 26.1
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-To: qemu-devel@nongnu.org
-In-reply-to: <20190501050536.15580-6-richard.henderson@linaro.org>
-Date: Wed, 01 May 2019 18:26:38 +0100
-Message-ID: <87pnp25bn5.fsf@zen.linaroharston>
+	(envelope-from <stefanha@redhat.com>) id 1hLt0d-0002an-2P
+	for qemu-devel@nongnu.org; Wed, 01 May 2019 13:27:08 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:34806)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1hLt0c-0002Wx-RA
+	for qemu-devel@nongnu.org; Wed, 01 May 2019 13:27:06 -0400
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+	[10.5.11.13])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 725BE3082E6E;
+	Wed,  1 May 2019 17:27:04 +0000 (UTC)
+Received: from localhost (ovpn-116-250.ams2.redhat.com [10.36.116.250])
+	by smtp.corp.redhat.com (Postfix) with ESMTP id 7311B86CCF;
+	Wed,  1 May 2019 17:27:01 +0000 (UTC)
+Date: Wed, 1 May 2019 13:26:59 -0400
+From: Stefan Hajnoczi <stefanha@redhat.com>
+To: Eduardo Habkost <ehabkost@redhat.com>
+Message-ID: <20190501172659.GE22391@stefanha-x1.localdomain>
+References: <20190426003652.32633-1-richardw.yang@linux.intel.com>
+	<20190426003652.32633-2-richardw.yang@linux.intel.com>
+	<20190430204636.GK28722@habkost.net>
+	<20190430223618.lyl3ribm7gg5haa5@master>
+	<20190430224816.GL28722@habkost.net>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
-	recognized.
-X-Received-From: 2a00:1450:4864:20::341
-Subject: Re: [Qemu-devel] [PATCH v2 05/29] tcg: Assert fixed_reg is read-only
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature"; boundary="BQPnanjtCNWHyqYD"
+Content-Disposition: inline
+In-Reply-To: <20190430224816.GL28722@habkost.net>
+User-Agent: Mutt/1.11.4 (2019-03-13)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+	(mx1.redhat.com [10.5.110.46]);
+	Wed, 01 May 2019 17:27:05 +0000 (UTC)
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 209.132.183.28
+Subject: Re: [Qemu-devel] [PATCH v15 1/2] util/mmap-alloc: support MAP_SYNC
+ in qemu_ram_mmap()
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -98,197 +75,69 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: pagupta@redhat.com, xiaoguangrong.eric@gmail.com, mst@redhat.com,
+	qemu-devel@nongnu.org, Wei Yang <richard.weiyang@gmail.com>,
+	yi.z.zhang@linux.intel.com, yu.c.zhang@linux.intel.com,
+	Wei Yang <richardw.yang@linux.intel.com>,
+	Haozhong Zhang <haozhong.zhang@intel.com>, pbonzini@redhat.com,
+	imammedo@redhat.com, dan.j.williams@intel.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190501172638.G6hjwogJserSkUWTTX21yOhdQMePb8awnK2rkZM2ZV4@z>
+Message-ID: <20190501172659.AX_DUNtlSZw-Y6MJk458MOXVt8YNDOuESYpBR6X5AU0@z>
 
 
-Richard Henderson <richard.henderson@linaro.org> writes:
+--BQPnanjtCNWHyqYD
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-> The only fixed_reg is cpu_env, and it should not be modified
-> during any TB.  Therefore code that tries to special-case moves
-> into a fixed_reg is dead.  Remove it.
->
-> Reviewed-by: David Hildenbrand <david@redhat.com>
-> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+On Tue, Apr 30, 2019 at 07:48:16PM -0300, Eduardo Habkost wrote:
+> On Tue, Apr 30, 2019 at 10:36:18PM +0000, Wei Yang wrote:
+> [...]
+> > >> +#ifdef CONFIG_LINUX
+> > >> +#include <linux/mman.h>
+> > >> +#endif /* CONFIG_LINUX */
+> > >> +
+> > >> +#ifndef MAP_SYNC
+> > >> +#define MAP_SYNC 0
+> > >> +#endif
+> > >> +#ifndef MAP_SHARED_VALIDATE
+> > >> +#define MAP_SHARED_VALIDATE 0
+> > >> +#endif
+> > >
+> > >Why would we need this, if we added copies of mman.h to
+> > >linux-headers?
+> >=20
+> > This is reported by Stefan.
+> >=20
+> > https://www.mail-archive.com/qemu-devel@nongnu.org/msg612168.html
+>=20
+> Stefan, did you hit a build failure, or it was just theoretical?
+>=20
+> linux-headers/*/mman.h is updated by "linux-headers: add
+> linux/mman.h" (commit 8cf108c5d159).  If the build really fails,
+> something else is broken in our build system.
 
-Reviewed-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
+I wasn't aware that QEMU ships its own mman.h.  In that case we don't
+need the ifndef for Linux hosts.
 
-> ---
->  tcg/tcg.c | 87 +++++++++++++++++++++++++------------------------------
->  1 file changed, 40 insertions(+), 47 deletions(-)
->
-> diff --git a/tcg/tcg.c b/tcg/tcg.c
-> index f7bef51de8..70ca113c26 100644
-> --- a/tcg/tcg.c
-> +++ b/tcg/tcg.c
-> @@ -3274,11 +3274,8 @@ static void tcg_reg_alloc_do_movi(TCGContext *s, T=
-CGTemp *ots,
->                                    tcg_target_ulong val, TCGLifeData arg_=
-life,
->                                    TCGRegSet preferred_regs)
->  {
-> -    if (ots->fixed_reg) {
-> -        /* For fixed registers, we do not do any constant propagation.  =
-*/
-> -        tcg_out_movi(s, ots->type, ots->reg, val);
-> -        return;
-> -    }
-> +    /* ENV should not be modified.  */
-> +    tcg_debug_assert(!ots->fixed_reg);
->
->      /* The movi is not explicitly generated here.  */
->      if (ots->val_type =3D=3D TEMP_VAL_REG) {
-> @@ -3314,6 +3311,9 @@ static void tcg_reg_alloc_mov(TCGContext *s, const =
-TCGOp *op)
->      ots =3D arg_temp(op->args[0]);
->      ts =3D arg_temp(op->args[1]);
->
-> +    /* ENV should not be modified.  */
-> +    tcg_debug_assert(!ots->fixed_reg);
-> +
->      /* Note that otype !=3D itype for no-op truncation.  */
->      otype =3D ots->type;
->      itype =3D ts->type;
-> @@ -3338,7 +3338,7 @@ static void tcg_reg_alloc_mov(TCGContext *s, const =
-TCGOp *op)
->      }
->
->      tcg_debug_assert(ts->val_type =3D=3D TEMP_VAL_REG);
-> -    if (IS_DEAD_ARG(0) && !ots->fixed_reg) {
-> +    if (IS_DEAD_ARG(0)) {
->          /* mov to a non-saved dead register makes no sense (even with
->             liveness analysis disabled). */
->          tcg_debug_assert(NEED_SYNC_ARG(0));
-> @@ -3351,7 +3351,7 @@ static void tcg_reg_alloc_mov(TCGContext *s, const =
-TCGOp *op)
->          }
->          temp_dead(s, ots);
->      } else {
-> -        if (IS_DEAD_ARG(1) && !ts->fixed_reg && !ots->fixed_reg) {
-> +        if (IS_DEAD_ARG(1) && !ts->fixed_reg) {
->              /* the mov can be suppressed */
->              if (ots->val_type =3D=3D TEMP_VAL_REG) {
->                  s->reg_to_temp[ots->reg] =3D NULL;
-> @@ -3504,6 +3504,10 @@ static void tcg_reg_alloc_op(TCGContext *s, const =
-TCGOp *op)
->              arg =3D op->args[i];
->              arg_ct =3D &def->args_ct[i];
->              ts =3D arg_temp(arg);
-> +
-> +            /* ENV should not be modified.  */
-> +            tcg_debug_assert(!ts->fixed_reg);
-> +
->              if ((arg_ct->ct & TCG_CT_ALIAS)
->                  && !const_args[arg_ct->alias_index]) {
->                  reg =3D new_args[arg_ct->alias_index];
-> @@ -3512,29 +3516,21 @@ static void tcg_reg_alloc_op(TCGContext *s, const=
- TCGOp *op)
->                                      i_allocated_regs | o_allocated_regs,
->                                      op->output_pref[k], ts->indirect_bas=
-e);
->              } else {
-> -                /* if fixed register, we try to use it */
-> -                reg =3D ts->reg;
-> -                if (ts->fixed_reg &&
-> -                    tcg_regset_test_reg(arg_ct->u.regs, reg)) {
-> -                    goto oarg_end;
-> -                }
->                  reg =3D tcg_reg_alloc(s, arg_ct->u.regs, o_allocated_reg=
-s,
->                                      op->output_pref[k], ts->indirect_bas=
-e);
->              }
->              tcg_regset_set_reg(o_allocated_regs, reg);
-> -            /* if a fixed register is used, then a move will be done aft=
-erwards */
-> -            if (!ts->fixed_reg) {
-> -                if (ts->val_type =3D=3D TEMP_VAL_REG) {
-> -                    s->reg_to_temp[ts->reg] =3D NULL;
-> -                }
-> -                ts->val_type =3D TEMP_VAL_REG;
-> -                ts->reg =3D reg;
-> -                /* temp value is modified, so the value kept in memory is
-> -                   potentially not the same */
-> -                ts->mem_coherent =3D 0;
-> -                s->reg_to_temp[reg] =3D ts;
-> +            if (ts->val_type =3D=3D TEMP_VAL_REG) {
-> +                s->reg_to_temp[ts->reg] =3D NULL;
->              }
-> -        oarg_end:
-> +            ts->val_type =3D TEMP_VAL_REG;
-> +            ts->reg =3D reg;
-> +            /*
-> +             * Temp value is modified, so the value kept in memory is
-> +             * potentially not the same.
-> +             */
-> +            ts->mem_coherent =3D 0;
-> +            s->reg_to_temp[reg] =3D ts;
->              new_args[i] =3D reg;
->          }
->      }
-> @@ -3550,10 +3546,10 @@ static void tcg_reg_alloc_op(TCGContext *s, const=
- TCGOp *op)
->      /* move the outputs in the correct register if needed */
->      for(i =3D 0; i < nb_oargs; i++) {
->          ts =3D arg_temp(op->args[i]);
-> -        reg =3D new_args[i];
-> -        if (ts->fixed_reg && ts->reg !=3D reg) {
-> -            tcg_out_mov(s, ts->type, ts->reg, reg);
-> -        }
-> +
-> +        /* ENV should not be modified.  */
-> +        tcg_debug_assert(!ts->fixed_reg);
-> +
->          if (NEED_SYNC_ARG(i)) {
->              temp_sync(s, ts, o_allocated_regs, 0, IS_DEAD_ARG(i));
->          } else if (IS_DEAD_ARG(i)) {
-> @@ -3674,26 +3670,23 @@ static void tcg_reg_alloc_call(TCGContext *s, TCG=
-Op *op)
->      for(i =3D 0; i < nb_oargs; i++) {
->          arg =3D op->args[i];
->          ts =3D arg_temp(arg);
-> +
-> +        /* ENV should not be modified.  */
-> +        tcg_debug_assert(!ts->fixed_reg);
-> +
->          reg =3D tcg_target_call_oarg_regs[i];
->          tcg_debug_assert(s->reg_to_temp[reg] =3D=3D NULL);
-> -
-> -        if (ts->fixed_reg) {
-> -            if (ts->reg !=3D reg) {
-> -                tcg_out_mov(s, ts->type, ts->reg, reg);
-> -            }
-> -        } else {
-> -            if (ts->val_type =3D=3D TEMP_VAL_REG) {
-> -                s->reg_to_temp[ts->reg] =3D NULL;
-> -            }
-> -            ts->val_type =3D TEMP_VAL_REG;
-> -            ts->reg =3D reg;
-> -            ts->mem_coherent =3D 0;
-> -            s->reg_to_temp[reg] =3D ts;
-> -            if (NEED_SYNC_ARG(i)) {
-> -                temp_sync(s, ts, allocated_regs, 0, IS_DEAD_ARG(i));
-> -            } else if (IS_DEAD_ARG(i)) {
-> -                temp_dead(s, ts);
-> -            }
-> +        if (ts->val_type =3D=3D TEMP_VAL_REG) {
-> +            s->reg_to_temp[ts->reg] =3D NULL;
-> +        }
-> +        ts->val_type =3D TEMP_VAL_REG;
-> +        ts->reg =3D reg;
-> +        ts->mem_coherent =3D 0;
-> +        s->reg_to_temp[reg] =3D ts;
-> +        if (NEED_SYNC_ARG(i)) {
-> +            temp_sync(s, ts, allocated_regs, 0, IS_DEAD_ARG(i));
-> +        } else if (IS_DEAD_ARG(i)) {
-> +            temp_dead(s, ts);
->          }
->      }
->  }
+Stefan
 
+--BQPnanjtCNWHyqYD
+Content-Type: application/pgp-signature; name="signature.asc"
 
---
-Alex Benn=C3=A9e
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAlzJ1uMACgkQnKSrs4Gr
+c8inSAf/WhaIeEahwaL6UO28vaCGvJxB8ix7z+8ivtkB8hLbnoWuo1S9m5TeIdbQ
+ZCafLUbYkOCe+py/uEAPylkHViiayR7xIdbzLzrS+wEFHaUdkhC9OTmHJhVS0tM7
+dq2pF5Ocg2s1F9zAZvEAhgZANpDhCoRsuSubljv95DunQXKsXhOdwdfvZKdKdYVA
+qDvqJ2u7PKk10ksqnmyt14PrReNu5Ss4hKhRz6oPoahyePTYUTkqg7qpWbHU6rka
+BqMymPRk6thMvUNifEucVE/VjhxKjZCzuNv/ocbN9LtrAMz0PToK+lpQpzp58YTL
+Xs+8b01P8D0pCA/rT6ZY9J70ScB74A==
+=0fNg
+-----END PGP SIGNATURE-----
+
+--BQPnanjtCNWHyqYD--
 
