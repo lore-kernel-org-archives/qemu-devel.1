@@ -2,68 +2,91 @@ Return-Path: <SRS0=aVj3=TB=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.4 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_PASS,URIBL_BLOCKED,USER_AGENT_MUTT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-1.0 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A9ADFC43219
-	for <qemu-devel@archiver.kernel.org>; Wed,  1 May 2019 17:28:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C273BC43219
+	for <qemu-devel@archiver.kernel.org>; Wed,  1 May 2019 17:30:14 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7654E20866
-	for <qemu-devel@archiver.kernel.org>; Wed,  1 May 2019 17:28:22 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7654E20866
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 86DAA20866
+	for <qemu-devel@archiver.kernel.org>; Wed,  1 May 2019 17:30:14 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="McsMcmpV"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 86DAA20866
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:37456 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:37499 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hLt1p-0007fJ-Qj
-	for qemu-devel@archiver.kernel.org; Wed, 01 May 2019 13:28:21 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:35933)
+	id 1hLt3d-00004x-St
+	for qemu-devel@archiver.kernel.org; Wed, 01 May 2019 13:30:13 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:36464)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1hLt0f-0006xa-8o
-	for qemu-devel@nongnu.org; Wed, 01 May 2019 13:27:10 -0400
+	(envelope-from <alex.bennee@linaro.org>) id 1hLt2r-0008D8-Sr
+	for qemu-devel@nongnu.org; Wed, 01 May 2019 13:29:26 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1hLt0d-0002an-2P
-	for qemu-devel@nongnu.org; Wed, 01 May 2019 13:27:08 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:34806)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1hLt0c-0002Wx-RA
-	for qemu-devel@nongnu.org; Wed, 01 May 2019 13:27:06 -0400
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
-	[10.5.11.13])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 725BE3082E6E;
-	Wed,  1 May 2019 17:27:04 +0000 (UTC)
-Received: from localhost (ovpn-116-250.ams2.redhat.com [10.36.116.250])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id 7311B86CCF;
-	Wed,  1 May 2019 17:27:01 +0000 (UTC)
-Date: Wed, 1 May 2019 13:26:59 -0400
-From: Stefan Hajnoczi <stefanha@redhat.com>
-To: Eduardo Habkost <ehabkost@redhat.com>
-Message-ID: <20190501172659.GE22391@stefanha-x1.localdomain>
-References: <20190426003652.32633-1-richardw.yang@linux.intel.com>
-	<20190426003652.32633-2-richardw.yang@linux.intel.com>
-	<20190430204636.GK28722@habkost.net>
-	<20190430223618.lyl3ribm7gg5haa5@master>
-	<20190430224816.GL28722@habkost.net>
+	(envelope-from <alex.bennee@linaro.org>) id 1hLt2m-0007lS-Ip
+	for qemu-devel@nongnu.org; Wed, 01 May 2019 13:29:25 -0400
+Received: from mail-wr1-x441.google.com ([2a00:1450:4864:20::441]:42803)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+	id 1hLt2j-0007a6-1I
+	for qemu-devel@nongnu.org; Wed, 01 May 2019 13:29:18 -0400
+Received: by mail-wr1-x441.google.com with SMTP id l2so9694912wrb.9
+	for <qemu-devel@nongnu.org>; Wed, 01 May 2019 10:29:13 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+	h=references:user-agent:from:to:subject:in-reply-to:date:message-id
+	:mime-version:content-transfer-encoding;
+	bh=FqPwB7wOVZ+ihzatNBIrJmUBQFh/LB6/ZAiDti+0VHg=;
+	b=McsMcmpVPE8r4ArSvAKP32HIDnmGaKjoLMkUoqbQDXXmmuvzjdkuLeHOurZLBjiBhs
+	qBTi7yY88PWZU9HjgCFT0GcGKwSRg99Pio6gfOKIUpdfoj7JODS8O87nlyUYhiVvCOuU
+	Y4INNEszE+FR9+cPTPF42mPx4LImC9gz5NeFp3Nna77rEvTi67niPfNu2c0XMTjpJG0l
+	2CziUg9jr4dvBr5/k9NIEQb1vMRvQ0QvfThjnmjq8bUxqHy5ZeXCcLxQbFT9tvoEgt3Q
+	mbatDwL0ZvXtOOtCyPNCsCbdS78Ts+SEO/u+JvYpWbX6goA6KKKdwHltdfpjU4Rer1L+
+	tytQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=1e100.net; s=20161025;
+	h=x-gm-message-state:references:user-agent:from:to:subject
+	:in-reply-to:date:message-id:mime-version:content-transfer-encoding;
+	bh=FqPwB7wOVZ+ihzatNBIrJmUBQFh/LB6/ZAiDti+0VHg=;
+	b=UCH8h+LnCB1Wv+gWR0lRDhpjXLitxsfVz8NGkgGQMNrDXELHSJY24lDiwgh+AD5MnX
+	zS2wPUPiqHyv3x2k+43sPXa01Xkf+yJxJ3rkTiWXI0WvsghIqXZaOBy0ONhLNTSzPcex
+	1DdGGCGY8xHcm4nkIGL+scOkP/L7EbfFhwa0snllr7KDin69YaQvdkNFP5+AtNjbim/9
+	xOt/H7uWLCzRxzTcHFZG8Zrt/Iiiem6owAC6dNqCT4DfmhZH6hw+Ze5nrOhGoInka1bc
+	BcOArtnXx1Eygz/1gnKoFimeHKZkyROhzEyAfwQ4f+zOfXjwQxMU+ipyZio9a9QB8QfN
+	W09A==
+X-Gm-Message-State: APjAAAXCRMujW/heFR80csY2uuhS45/Q25+9Jco4gMvLpfb3Dx3elii+
+	Kp5xp10Lvfo7T5cwd3n2ZgrESTSL0r8=
+X-Google-Smtp-Source: APXvYqw8JvGXqw3Fx1baVT3yuVL+53hpbsQFog6lzEAl1ROJyfbyXpjakgeN4LYQEyBitUW4KC8bjg==
+X-Received: by 2002:adf:f590:: with SMTP id f16mr2872359wro.74.1556731752406; 
+	Wed, 01 May 2019 10:29:12 -0700 (PDT)
+Received: from zen.linaroharston ([81.128.185.34])
+	by smtp.gmail.com with ESMTPSA id
+	z4sm15181000wrq.75.2019.05.01.10.29.11 for <qemu-devel@nongnu.org>
+	(version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
+	Wed, 01 May 2019 10:29:11 -0700 (PDT)
+Received: from zen (localhost [127.0.0.1])
+	by zen.linaroharston (Postfix) with ESMTP id 6ADD41FF87
+	for <qemu-devel@nongnu.org>; Wed,  1 May 2019 18:29:11 +0100 (BST)
+References: <20190501050536.15580-1-richard.henderson@linaro.org>
+	<20190501050536.15580-7-richard.henderson@linaro.org>
+User-agent: mu4e 1.3.1; emacs 26.1
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+To: qemu-devel@nongnu.org
+In-reply-to: <20190501050536.15580-7-richard.henderson@linaro.org>
+Date: Wed, 01 May 2019 18:29:11 +0100
+Message-ID: <87o94m5biw.fsf@zen.linaroharston>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="BQPnanjtCNWHyqYD"
-Content-Disposition: inline
-In-Reply-To: <20190430224816.GL28722@habkost.net>
-User-Agent: Mutt/1.11.4 (2019-03-13)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.46]);
-	Wed, 01 May 2019 17:27:05 +0000 (UTC)
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH v15 1/2] util/mmap-alloc: support MAP_SYNC
- in qemu_ram_mmap()
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+	recognized.
+X-Received-From: 2a00:1450:4864:20::441
+Subject: Re: [Qemu-devel] [PATCH v2 06/29] tcg: Return bool success from
+ tcg_out_mov
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -75,69 +98,40 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: pagupta@redhat.com, xiaoguangrong.eric@gmail.com, mst@redhat.com,
-	qemu-devel@nongnu.org, Wei Yang <richard.weiyang@gmail.com>,
-	yi.z.zhang@linux.intel.com, yu.c.zhang@linux.intel.com,
-	Wei Yang <richardw.yang@linux.intel.com>,
-	Haozhong Zhang <haozhong.zhang@intel.com>, pbonzini@redhat.com,
-	imammedo@redhat.com, dan.j.williams@intel.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190501172659.AX_DUNtlSZw-Y6MJk458MOXVt8YNDOuESYpBR6X5AU0@z>
+Message-ID: <20190501172911.3OERCCI8C5Z2z8NMmZTXXCkDAvCqEow3v2qF9TtIbfs@z>
 
 
---BQPnanjtCNWHyqYD
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+Richard Henderson <richard.henderson@linaro.org> writes:
 
-On Tue, Apr 30, 2019 at 07:48:16PM -0300, Eduardo Habkost wrote:
-> On Tue, Apr 30, 2019 at 10:36:18PM +0000, Wei Yang wrote:
-> [...]
-> > >> +#ifdef CONFIG_LINUX
-> > >> +#include <linux/mman.h>
-> > >> +#endif /* CONFIG_LINUX */
-> > >> +
-> > >> +#ifndef MAP_SYNC
-> > >> +#define MAP_SYNC 0
-> > >> +#endif
-> > >> +#ifndef MAP_SHARED_VALIDATE
-> > >> +#define MAP_SHARED_VALIDATE 0
-> > >> +#endif
-> > >
-> > >Why would we need this, if we added copies of mman.h to
-> > >linux-headers?
-> >=20
-> > This is reported by Stefan.
-> >=20
-> > https://www.mail-archive.com/qemu-devel@nongnu.org/msg612168.html
->=20
-> Stefan, did you hit a build failure, or it was just theoretical?
->=20
-> linux-headers/*/mman.h is updated by "linux-headers: add
-> linux/mman.h" (commit 8cf108c5d159).  If the build really fails,
-> something else is broken in our build system.
+> This patch merely changes the interface, aborting on all failures,
 
-I wasn't aware that QEMU ships its own mman.h.  In that case we don't
-need the ifndef for Linux hosts.
+You say this but...
 
-Stefan
+<snip>
+>
+> -static inline void tcg_out_mov(TCGContext *s, TCGType type,
+> +static inline bool tcg_out_mov(TCGContext *s, TCGType type,
+>                                 TCGReg ret, TCGReg arg)
+>  {
+> -    tcg_out_dat_reg(s, COND_AL, ARITH_MOV, ret, 0, arg, SHIFT_IMM_LSL(0)=
+);
+> +    if (ret !=3D arg) {
+> +        tcg_out_dat_reg(s, COND_AL, ARITH_MOV, ret, 0, arg, SHIFT_IMM_LS=
+L(0));
+> +    }
+> +    return true;
+>  }
 
---BQPnanjtCNWHyqYD
-Content-Type: application/pgp-signature; name="signature.asc"
+You fix a mov folding here.. either mention in commit message or fix in
+a separate commit. I appreciate the other arches already do this.
 
------BEGIN PGP SIGNATURE-----
+Otherwise:
 
-iQEzBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAlzJ1uMACgkQnKSrs4Gr
-c8inSAf/WhaIeEahwaL6UO28vaCGvJxB8ix7z+8ivtkB8hLbnoWuo1S9m5TeIdbQ
-ZCafLUbYkOCe+py/uEAPylkHViiayR7xIdbzLzrS+wEFHaUdkhC9OTmHJhVS0tM7
-dq2pF5Ocg2s1F9zAZvEAhgZANpDhCoRsuSubljv95DunQXKsXhOdwdfvZKdKdYVA
-qDvqJ2u7PKk10ksqnmyt14PrReNu5Ss4hKhRz6oPoahyePTYUTkqg7qpWbHU6rka
-BqMymPRk6thMvUNifEucVE/VjhxKjZCzuNv/ocbN9LtrAMz0PToK+lpQpzp58YTL
-Xs+8b01P8D0pCA/rT6ZY9J70ScB74A==
-=0fNg
------END PGP SIGNATURE-----
+Reviewed-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
 
---BQPnanjtCNWHyqYD--
+--
+Alex Benn=C3=A9e
 
