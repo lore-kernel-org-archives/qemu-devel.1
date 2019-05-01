@@ -2,77 +2,94 @@ Return-Path: <SRS0=aVj3=TB=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-7.0 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 33954C43219
-	for <qemu-devel@archiver.kernel.org>; Wed,  1 May 2019 17:38:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1455EC004C9
+	for <qemu-devel@archiver.kernel.org>; Wed,  1 May 2019 17:39:02 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 026332081C
-	for <qemu-devel@archiver.kernel.org>; Wed,  1 May 2019 17:38:57 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 026332081C
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
+	by mail.kernel.org (Postfix) with ESMTPS id BEF38208C4
+	for <qemu-devel@archiver.kernel.org>; Wed,  1 May 2019 17:39:01 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="flmkOl5b"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BEF38208C4
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:37630 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:37634 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hLtC4-0005a6-9x
-	for qemu-devel@archiver.kernel.org; Wed, 01 May 2019 13:38:56 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:38010)
+	id 1hLtC9-0005f4-3l
+	for qemu-devel@archiver.kernel.org; Wed, 01 May 2019 13:39:01 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:38512)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1hLt8o-0003lk-RN
-	for qemu-devel@nongnu.org; Wed, 01 May 2019 13:35:35 -0400
+	(envelope-from <alex.bennee@linaro.org>) id 1hLtAp-0004lp-Vt
+	for qemu-devel@nongnu.org; Wed, 01 May 2019 13:37:41 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1hLt8n-0003BZ-PJ
-	for qemu-devel@nongnu.org; Wed, 01 May 2019 13:35:34 -0400
-Received: from indium.canonical.com ([91.189.90.7]:43910)
+	(envelope-from <alex.bennee@linaro.org>) id 1hLtAo-0005NW-Nf
+	for qemu-devel@nongnu.org; Wed, 01 May 2019 13:37:39 -0400
+Received: from mail-wr1-x444.google.com ([2a00:1450:4864:20::444]:44775)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1hLt8n-0003AF-Jy
-	for qemu-devel@nongnu.org; Wed, 01 May 2019 13:35:33 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1hLt8m-0005PN-Ad
-	for <qemu-devel@nongnu.org>; Wed, 01 May 2019 17:35:32 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 3F7302E80CC
-	for <qemu-devel@nongnu.org>; Wed,  1 May 2019 17:35:32 +0000 (UTC)
+	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+	id 1hLtAo-0005MC-HW
+	for qemu-devel@nongnu.org; Wed, 01 May 2019 13:37:38 -0400
+Received: by mail-wr1-x444.google.com with SMTP id c5so25341697wrs.11
+	for <qemu-devel@nongnu.org>; Wed, 01 May 2019 10:37:38 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+	h=references:user-agent:from:to:subject:in-reply-to:date:message-id
+	:mime-version:content-transfer-encoding;
+	bh=ca8k9DmO9DRfeSA2ahMAlcCr221iG0TjupF1hE0uinE=;
+	b=flmkOl5b9OeqOeqlG7AppEz34i7kmgYdO5hniOglTXKsolfA5VFM4ekw5rOBPdk6ta
+	g5e9ke+RuwHB9P2DJOHfq7hqiTMmn6mCCS7n6Q65JzpkzAlt0Zvgf8IZA8HoCXhWv8gD
+	g9nOiR9xTylxJRupOjPeGcQTUH3Vd3IZ7kaRGqHr5w8sPi4tg+XEGepFk/B5+kE+2KM9
+	2sgo9VU4fnFH/erY9CadnvA97t0XWYFPBjZy9ms5pThNaNKk64Q92DA7zrFL5oo+L6ww
+	Be1a2mtKWkQtiqc7hHm/Ux/F9ateqhBLapKgaoV/3KC283Qq+E8mlkaooJUXoQeSeMHp
+	k34g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=1e100.net; s=20161025;
+	h=x-gm-message-state:references:user-agent:from:to:subject
+	:in-reply-to:date:message-id:mime-version:content-transfer-encoding;
+	bh=ca8k9DmO9DRfeSA2ahMAlcCr221iG0TjupF1hE0uinE=;
+	b=Q2CemAiX/2m9lXpdah97rpCt0nHLdoODKv3ZzRyBBdr7HV59v8sUDoRDi1/gXVPQXL
+	yM7yCm2OaEFqr9GPNn4ScpIdwwmZ40hflrp6Nxe3z8ussKcGi2Jk2abtk4CfM5eqm3oW
+	SmX8gvOTqFwDPVmooeH/m1g+hhT2oGvEFuE6bAqKyZ/UX/L9smUlaXA0ie/OhqegBO7r
+	ZUH+cwXfdv7nQj7BQ2ND22pfpcZQlATdfFoQgVrat+kZ3H7Mg2BeWXNlH9BxNQigdt+i
+	A8q9nB8QJpbJ0IDSXbiktYXM6MphyHSzBwkhndz4VUq/BLTYvm+j4j/tvpxYULEL99B/
+	E4sw==
+X-Gm-Message-State: APjAAAX1Fcz2ebntTQUNUut3VTFdYHSB/WmCfMMEbrnPWIO64A11TAWN
+	4Pld49E/TfZ+hLOAijlVw7ARX+sORqs=
+X-Google-Smtp-Source: APXvYqzKbEIcAQhWoaVdJ7lS9iloUR8ctTlWy7qhWAHSVVxHQuYjNiPsDdFa2zKRANyAGLROZuSktA==
+X-Received: by 2002:adf:8b0b:: with SMTP id n11mr11787223wra.149.1556732256809;
+	Wed, 01 May 2019 10:37:36 -0700 (PDT)
+Received: from zen.linaroharston ([81.128.185.34])
+	by smtp.gmail.com with ESMTPSA id
+	e10sm31553607wra.52.2019.05.01.10.37.35 for <qemu-devel@nongnu.org>
+	(version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
+	Wed, 01 May 2019 10:37:36 -0700 (PDT)
+Received: from zen (localhost [127.0.0.1])
+	by zen.linaroharston (Postfix) with ESMTP id 1D0FE1FF87
+	for <qemu-devel@nongnu.org>; Wed,  1 May 2019 18:37:35 +0100 (BST)
+References: <20190501050536.15580-1-richard.henderson@linaro.org>
+	<20190501050536.15580-9-richard.henderson@linaro.org>
+User-agent: mu4e 1.3.1; emacs 26.1
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+To: qemu-devel@nongnu.org
+In-reply-to: <20190501050536.15580-9-richard.henderson@linaro.org>
+Date: Wed, 01 May 2019 18:37:35 +0100
+Message-ID: <87lfzq5b4w.fsf@zen.linaroharston>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Wed, 01 May 2019 17:25:41 -0000
-From: =?utf-8?q?Philippe_Mathieu-Daud=C3=A9?= <1809291@bugs.launchpad.net>
-To: qemu-devel@nongnu.org
-X-Launchpad-Notification-Type: bug
-X-Launchpad-Bug: product=qemu; status=Incomplete; importance=Undecided;
-	assignee=f4bug@amsat.org; 
-X-Launchpad-Bug-Information-Type: Public
-X-Launchpad-Bug-Private: no
-X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: kcwang philmd pmaydell
-X-Launchpad-Bug-Reporter: k.c. Wang (kcwang)
-X-Launchpad-Bug-Modifier: =?utf-8?q?Philippe_Mathieu-Daud=C3=A9_=28philmd?=
-	=?utf-8?q?=29?=
-References: <154532874183.18487.10011391612831676105.malonedeb@gac.canonical.com>
-Message-Id:
- <155673154266.6733.8580056002824194359.launchpad@chaenomeles.canonical.com>
-X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
-X-Launchpad-Message-For: qemu-devel-ml
-Precedence: bulk
-X-Generated-By: Launchpad (canonical.com); Revision="18928";
-	Instance="launchpad-lazr.conf"
-X-Launchpad-Hash: 83029a00d743f4cca8a7e9c44800cad34dc2bb42
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 91.189.90.7
-Subject: [Qemu-devel] [Bug 1809291] Re: ARM PL181 (mmc for Security Digital
- Card) not working in Ubuntu 18.10 (CMD 2,
- 3 timeout). The SDC driver worked fine in Ubuntu 18.04 and earlier versions
- but not in Ubuntu 18.10
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+	recognized.
+X-Received-From: 2a00:1450:4864:20::444
+Subject: Re: [Qemu-devel] [PATCH v2 08/29] tcg: Promote tcg_out_{dup,
+ dupi}_vec to backend interface
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
+Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -81,44 +98,131 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1809291 <1809291@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190501172541.bfkkQ39teKZ6rhAovr0huXW_nfRbNPc3EHeAlpBk5Kg@z>
+Message-ID: <20190501173735.fT28q1oaGF8zP1_j0H4uzdC1LTvTLAEb86rMekMvlsA@z>
 
-** Changed in: qemu
-     Assignee: (unassigned) =3D> Philippe Mathieu-Daud=C3=A9 (philmd)
 
--- =
+Richard Henderson <richard.henderson@linaro.org> writes:
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1809291
+> The i386 backend already has these functions, and the aarch64
+> backend could easily split out one.  Nothing is done with these
+> functions yet, but this will aid register allocation of
+> INDEX_op_dup_vec in a later patch.
 
-Title:
-  ARM PL181 (mmc for Security Digital Card) not working in Ubuntu 18.10
-  (CMD 2,3 timeout).  The SDC driver worked fine in Ubuntu 18.04 and
-  earlier versions but not in Ubuntu 18.10
+  "Also use correct type for tcg_out_dupi_vec"?
 
-Status in QEMU:
-  Incomplete
+Anyway:
 
-Bug description:
-  ARM PL181 MMC card no longer working in qemu-system-arm in Ubuntu 18.10
-  The MMC driver code worked fine in Ubuntu 15.10 to 18.04.
-  The command to run qemu-system-arm is
+Reviewed-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
 
-      qemu-system-arm -M versatilepb -m 256M -sd sdimage -kernel t.bin
-  -serial mon:stdio
 
-  During SDC initialization, SDC commands 2, 3, 9, 13, 7, 16 all timeout, =
+>
+> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+> ---
+>  tcg/aarch64/tcg-target.inc.c | 12 ++++++++++--
+>  tcg/i386/tcg-target.inc.c    |  3 ++-
+>  tcg/tcg.c                    | 14 ++++++++++++++
+>  3 files changed, 26 insertions(+), 3 deletions(-)
+>
+> diff --git a/tcg/aarch64/tcg-target.inc.c b/tcg/aarch64/tcg-target.inc.c
+> index ee89734318..e443b5df23 100644
+> --- a/tcg/aarch64/tcg-target.inc.c
+> +++ b/tcg/aarch64/tcg-target.inc.c
+> @@ -799,7 +799,7 @@ static void tcg_out_logicali(TCGContext *s, AArch64In=
+sn insn, TCGType ext,
+>  }
+>
+>  static void tcg_out_dupi_vec(TCGContext *s, TCGType type,
+> -                             TCGReg rd, uint64_t v64)
+> +                             TCGReg rd, tcg_target_long v64)
+>  {
+>      int op, cmode, imm8;
+>
+> @@ -814,6 +814,14 @@ static void tcg_out_dupi_vec(TCGContext *s, TCGType =
+type,
+>      }
+>  }
+>
+> +static bool tcg_out_dup_vec(TCGContext *s, TCGType type, unsigned vece,
+> +                            TCGReg rd, TCGReg rs)
+> +{
+> +    int is_q =3D type - TCG_TYPE_V64;
+> +    tcg_out_insn(s, 3605, DUP, is_q, rd, rs, 1 << vece, 0);
+> +    return true;
+> +}
+> +
+>  static void tcg_out_movi(TCGContext *s, TCGType type, TCGReg rd,
+>                           tcg_target_long value)
+>  {
+> @@ -2201,7 +2209,7 @@ static void tcg_out_vec_op(TCGContext *s, TCGOpcode=
+ opc,
+>          tcg_out_insn(s, 3617, NOT, is_q, 0, a0, a1);
+>          break;
+>      case INDEX_op_dup_vec:
+> -        tcg_out_insn(s, 3605, DUP, is_q, a0, a1, 1 << vece, 0);
+> +        tcg_out_dup_vec(s, type, vece, a0, a1);
+>          break;
+>      case INDEX_op_shli_vec:
+>          tcg_out_insn(s, 3614, SHL, is_q, a0, a1, a2 + (8 << vece));
+> diff --git a/tcg/i386/tcg-target.inc.c b/tcg/i386/tcg-target.inc.c
+> index 1198c76392..0d621670c7 100644
+> --- a/tcg/i386/tcg-target.inc.c
+> +++ b/tcg/i386/tcg-target.inc.c
+> @@ -855,7 +855,7 @@ static bool tcg_out_mov(TCGContext *s, TCGType type, =
+TCGReg ret, TCGReg arg)
+>      return true;
+>  }
+>
+> -static void tcg_out_dup_vec(TCGContext *s, TCGType type, unsigned vece,
+> +static bool tcg_out_dup_vec(TCGContext *s, TCGType type, unsigned vece,
+>                              TCGReg r, TCGReg a)
+>  {
+>      if (have_avx2) {
+> @@ -888,6 +888,7 @@ static void tcg_out_dup_vec(TCGContext *s, TCGType ty=
+pe, unsigned vece,
+>              g_assert_not_reached();
+>          }
+>      }
+> +    return true;
+>  }
+>
+>  static void tcg_out_dupi_vec(TCGContext *s, TCGType type,
+> diff --git a/tcg/tcg.c b/tcg/tcg.c
+> index 68d86361e2..3ef4d3478d 100644
+> --- a/tcg/tcg.c
+> +++ b/tcg/tcg.c
+> @@ -109,10 +109,24 @@ static void tcg_out_movi(TCGContext *s, TCGType typ=
+e,
+>  static void tcg_out_op(TCGContext *s, TCGOpcode opc, const TCGArg *args,
+>                         const int *const_args);
+>  #if TCG_TARGET_MAYBE_vec
+> +static bool tcg_out_dup_vec(TCGContext *s, TCGType type, unsigned vece,
+> +                            TCGReg dst, TCGReg src);
+> +static void tcg_out_dupi_vec(TCGContext *s, TCGType type,
+> +                             TCGReg dst, tcg_target_long arg);
+>  static void tcg_out_vec_op(TCGContext *s, TCGOpcode opc, unsigned vecl,
+>                             unsigned vece, const TCGArg *args,
+>                             const int *const_args);
+>  #else
+> +static inline bool tcg_out_dup_vec(TCGContext *s, TCGType type, unsigned=
+ vece,
+> +                                   TCGReg dst, TCGReg src)
+> +{
+> +    g_assert_not_reached();
+> +}
+> +static inline void tcg_out_dupi_vec(TCGContext *s, TCGType type,
+> +                                    TCGReg dst, tcg_target_long arg)
+> +{
+> +    g_assert_not_reached();
+> +}
+>  static inline void tcg_out_vec_op(TCGContext *s, TCGOpcode opc, unsigned=
+ vecl,
+>                                    unsigned vece, const TCGArg *args,
+>                                    const int *const_args)
 
-  which cause subsequent read/write commands 17/24 to fail also.
 
-  Tried both ARM versatilepb and realview-pb-a8, realview-pbx-a9 boards:
-  all the same.
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1809291/+subscriptions
+--
+Alex Benn=C3=A9e
 
