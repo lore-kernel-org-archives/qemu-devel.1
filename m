@@ -2,66 +2,93 @@ Return-Path: <SRS0=aVj3=TB=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.7 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-4.0 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 23DFEC43219
-	for <qemu-devel@archiver.kernel.org>; Wed,  1 May 2019 18:22:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 25E06C43219
+	for <qemu-devel@archiver.kernel.org>; Wed,  1 May 2019 18:36:50 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E095520675
-	for <qemu-devel@archiver.kernel.org>; Wed,  1 May 2019 18:22:12 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id DFC322081C
+	for <qemu-devel@archiver.kernel.org>; Wed,  1 May 2019 18:36:49 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=igalia.com header.i=@igalia.com header.b="FPMOeqWj"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E095520675
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=igalia.com
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="Ip6IYdHK"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DFC322081C
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:38099 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:38252 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hLtrw-0003da-4g
-	for qemu-devel@archiver.kernel.org; Wed, 01 May 2019 14:22:12 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:45620)
+	id 1hLu65-00028w-1N
+	for qemu-devel@archiver.kernel.org; Wed, 01 May 2019 14:36:49 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:50829)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berto@igalia.com>) id 1hLtkc-0007NY-Hj
-	for qemu-devel@nongnu.org; Wed, 01 May 2019 14:14:39 -0400
+	(envelope-from <richard.henderson@linaro.org>) id 1hLu4i-0000im-R7
+	for qemu-devel@nongnu.org; Wed, 01 May 2019 14:35:25 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berto@igalia.com>) id 1hLtkb-0002cF-4S
-	for qemu-devel@nongnu.org; Wed, 01 May 2019 14:14:38 -0400
-Received: from fanzine.igalia.com ([91.117.99.155]:38856)
+	(envelope-from <richard.henderson@linaro.org>) id 1hLu4h-000154-LB
+	for qemu-devel@nongnu.org; Wed, 01 May 2019 14:35:24 -0400
+Received: from mail-pg1-x529.google.com ([2607:f8b0:4864:20::529]:41956)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <berto@igalia.com>)
-	id 1hLtka-0002RI-RG; Wed, 01 May 2019 14:14:37 -0400
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=igalia.com;
-	s=20170329; 
-	h=References:In-Reply-To:References:In-Reply-To:Message-Id:Date:Subject:Cc:To:From;
-	bh=gu6vZ9BZd32QJ/IQ0z70dkM0F4vMe4X00civB0gcGbI=; 
-	b=FPMOeqWjBEHefkfrav8r2YRsWmiqQoEpYuxJx1DG87ZPsjH1bqTd9IhanlPvk6FfspAGosvc8oMh1Nt6k78wkJkBiBxj90Ly/1pw+7AkFQi/VjF0lh5rcH2sGHOiyH4SQhXqsnIro5Bfkj90LIn7UQXNxYyg6I3NZu7F2PHsKFclyVmjPr5vyKwAdPalg+BzCzf7nV3szX19OzxtGXIAkp1z34VFvsHA9irZtJ7AZtH1LwBGAlC3kCXnBbdoHN3D3xndT+fhlbRvJXumkFM8IKZ62QOhG3U2CxxX3kNq8//OvorO6vbbYsztbVpe1uz1mwLZgblumSEgNBLb7BMFrw==;
-Received: from 87-92-6-174.bb.dnainternet.fi ([87.92.6.174] helo=perseus.local)
-	by fanzine.igalia.com with esmtpsa 
-	(Cipher TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256) (Exim)
-	id 1hLtkH-0002E8-5H; Wed, 01 May 2019 20:14:17 +0200
-Received: from berto by perseus.local with local (Exim 4.89)
-	(envelope-from <berto@igalia.com>)
-	id 1hLtk2-0002yN-Ke; Wed, 01 May 2019 21:14:02 +0300
-From: Alberto Garcia <berto@igalia.com>
-To: qemu-devel@nongnu.org
-Date: Wed,  1 May 2019 21:13:57 +0300
-Message-Id:
- <524e211cb818a20f521d6e271e782ab62b8e5e80.1556732434.git.berto@igalia.com>
-X-Mailer: git-send-email 2.11.0
-In-Reply-To: <cover.1556732434.git.berto@igalia.com>
-References: <cover.1556732434.git.berto@igalia.com>
-In-Reply-To: <cover.1556732434.git.berto@igalia.com>
-References: <cover.1556732434.git.berto@igalia.com>
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x (no
-	timestamps) [generic] [fuzzy]
-X-Received-From: 91.117.99.155
-Subject: [Qemu-devel] [PATCH v2 3/5] vvfat: Replace bdrv_{read,
- write}() with bdrv_{pread, pwrite}()
+	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+	id 1hLu4h-00014N-0Q
+	for qemu-devel@nongnu.org; Wed, 01 May 2019 14:35:23 -0400
+Received: by mail-pg1-x529.google.com with SMTP id f6so8641297pgs.8
+	for <qemu-devel@nongnu.org>; Wed, 01 May 2019 11:35:22 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+	h=subject:to:cc:references:from:openpgp:message-id:date:user-agent
+	:mime-version:in-reply-to:content-language:content-transfer-encoding;
+	bh=/JQSbGM/O19FqjA8tccpETQvPRZf58W19j52MJxDAkE=;
+	b=Ip6IYdHKykjavxxak7ouh2KLbvcSxTYCb1KNrElaglbEF7FYYRI8xBgVmO6JrZcUVD
+	YT6LzMxOZf7Jd0UvLeqbgSwi24iHQrpsQcMK5sevIeVG+fxvWM0HC17RKLPVAjAcrdk3
+	/g+m9hsGqwxknPle515lXpkdqdOP7/ComJM2U+gWMfAKkgR3cSxUCLCg250Ckaqix9Xu
+	MnrZ3UmrhQwNYDw/b/l8c8Bec9zLMbYf62vgU1OJ3HXE7XnxjW5xHoXHVXAIdI4z33Oz
+	D3a11N3nTrx+67uC7X9rTD0PaDCmd2gfgKNrqXRjw9YQ8wvrG+xiC3RMZFEIVILUQu5L
+	mFZA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=1e100.net; s=20161025;
+	h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
+	:date:user-agent:mime-version:in-reply-to:content-language
+	:content-transfer-encoding;
+	bh=/JQSbGM/O19FqjA8tccpETQvPRZf58W19j52MJxDAkE=;
+	b=ZmD9tle3JI7wnw9qMLKYNZvWcUH5uI7G8SfYg3krrISCEvwQ0QNWjjgAyzN03aznqr
+	/c1M7IJRW860hx/MCUEHXXqfAgwYN1jKHWNmP5UdVrISIm6EKMAe/5LSk24IvT3b6ra4
+	Fgazgqeixf5rdKEY+d4uEMhNQwU8YvFW2JS5MoPmWn7DmtZJaTcbyvBdTwnihiitApul
+	WS1r+v08u9PBCoM7ORvsX7XUWqHzCnhxZIA/hLeedO5zouV3XCZWAhJoutdI+dScNx+X
+	bxsM+ncUooa2f3aoZ6cDc/WOE9pGo+YgkmMk4f+gQqiCT2hIDVrEbXk6tz+jSev/IcBd
+	b7rA==
+X-Gm-Message-State: APjAAAU/xBFLJiHmhsojorQ2S0djvEmE/CZ6SfHxSCohlvz6JBY4iR3k
+	tAhBNagIIS2xxKQ33OgbzdAQ3A==
+X-Google-Smtp-Source: APXvYqxNBQzlIm1ZGaYSLhe1PHkFnvh8szrv3LWygBa74uFdNdrP829aFQZR8doOED3iwg+jBauAfQ==
+X-Received: by 2002:a63:d908:: with SMTP id r8mr42526024pgg.268.1556735720714; 
+	Wed, 01 May 2019 11:35:20 -0700 (PDT)
+Received: from [192.168.1.11] (97-113-189-189.tukw.qwest.net. [97.113.189.189])
+	by smtp.gmail.com with ESMTPSA id
+	g13sm13384891pgr.63.2019.05.01.11.35.18
+	(version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+	Wed, 01 May 2019 11:35:19 -0700 (PDT)
+To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>,
+	qemu-devel@nongnu.org
+References: <20190430165234.32272-1-alex.bennee@linaro.org>
+	<20190430165234.32272-2-alex.bennee@linaro.org>
+From: Richard Henderson <richard.henderson@linaro.org>
+Openpgp: preference=signencrypt
+Message-ID: <0ef0d685-ddb1-850e-9478-e9c88da8ebb0@linaro.org>
+Date: Wed, 1 May 2019 11:35:17 -0700
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+	Thunderbird/60.6.1
+MIME-Version: 1.0
+In-Reply-To: <20190430165234.32272-2-alex.bennee@linaro.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+	recognized.
+X-Received-From: 2607:f8b0:4864:20::529
+Subject: Re: [Qemu-devel] [PATCH v5 01/15] tests/tcg/multiarch: add support
+ for multiarch system tests
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -73,61 +100,29 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, Alberto Garcia <berto@igalia.com>,
-	qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>
+Cc: qemu-arm@nongnu.org, mark.cave-ayland@ilande.co.uk, cota@braap.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Content-Type: text/plain; charset="UTF-8"
-Message-ID: <20190501181357.V-jt6PShjZ3KfdQnhwX-k963OkARzgrn1BDpM2MV6A8@z>
+Message-ID: <20190501183517.LbT8hc1OJGnRkMzKYqRKJGdH5mVp44ZpPNfluiNdOsw@z>
 
-There's only a couple of bdrv_read() and bdrv_write() calls left in
-the vvfat code, and they can be trivially replaced with the byte-based
-bdrv_pread() and bdrv_pwrite().
+On 4/30/19 9:52 AM, Alex Bennée wrote:
+> We can certainly support some common tests for system emulation that
+> make use of our minimal defined boot.S support. It will still be up to
+> individual architectures to ensure they build so we provide a
+> MULTIARCH_TESTS variable that they can tack onto TESTS themselves.
+> 
+> Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
+> ---
+>  tests/tcg/Makefile                                 |  1 +
+>  tests/tcg/multiarch/system/Makefile.softmmu-target | 14 ++++++++++++++
+>  2 files changed, 15 insertions(+)
+>  create mode 100644 tests/tcg/multiarch/system/Makefile.softmmu-target
 
-Signed-off-by: Alberto Garcia <berto@igalia.com>
----
- block/vvfat.c | 12 +++++++-----
- 1 file changed, 7 insertions(+), 5 deletions(-)
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 
-diff --git a/block/vvfat.c b/block/vvfat.c
-index 5f66787890..253cc716dd 100644
---- a/block/vvfat.c
-+++ b/block/vvfat.c
-@@ -1494,8 +1494,8 @@ static int vvfat_read(BlockDriverState *bs, int64_t sector_num,
-                 DLOG(fprintf(stderr, "sectors %" PRId64 "+%" PRId64
-                              " allocated\n", sector_num,
-                              n >> BDRV_SECTOR_BITS));
--                if (bdrv_read(s->qcow, sector_num, buf + i * 0x200,
--                              n >> BDRV_SECTOR_BITS)) {
-+                if (bdrv_pread(s->qcow, sector_num * BDRV_SECTOR_SIZE,
-+                               buf + i * 0x200, n) < 0) {
-                     return -1;
-                 }
-                 i += (n >> BDRV_SECTOR_BITS) - 1;
-@@ -1983,8 +1983,9 @@ static uint32_t get_cluster_count_for_direntry(BDRVVVFATState* s,
-                         if (res) {
-                             return -1;
-                         }
--                        res = bdrv_write(s->qcow, offset, s->cluster_buffer, 1);
--                        if (res) {
-+                        res = bdrv_pwrite(s->qcow, offset * BDRV_SECTOR_SIZE,
-+                                          s->cluster_buffer, BDRV_SECTOR_SIZE);
-+                        if (res < 0) {
-                             return -2;
-                         }
-                     }
-@@ -3050,7 +3051,8 @@ DLOG(checkpoint());
-      * Use qcow backend. Commit later.
-      */
- DLOG(fprintf(stderr, "Write to qcow backend: %d + %d\n", (int)sector_num, nb_sectors));
--    ret = bdrv_write(s->qcow, sector_num, buf, nb_sectors);
-+    ret = bdrv_pwrite(s->qcow, sector_num * BDRV_SECTOR_SIZE, buf,
-+                      nb_sectors * BDRV_SECTOR_SIZE);
-     if (ret < 0) {
-         fprintf(stderr, "Error writing to qcow backend\n");
-         return ret;
--- 
-2.11.0
+
+r~
+
 
 
