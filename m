@@ -2,96 +2,91 @@ Return-Path: <SRS0=aVj3=TB=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-7.0 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F1B21C43219
-	for <qemu-devel@archiver.kernel.org>; Wed,  1 May 2019 15:26:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 281E9C43219
+	for <qemu-devel@archiver.kernel.org>; Wed,  1 May 2019 15:28:00 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B4168208C3
-	for <qemu-devel@archiver.kernel.org>; Wed,  1 May 2019 15:26:20 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B4168208C3
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id E4FFF208C3
+	for <qemu-devel@archiver.kernel.org>; Wed,  1 May 2019 15:27:59 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="fThQjWcy"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E4FFF208C3
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:32873 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:32929 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hLr7j-0005HE-Qe
-	for qemu-devel@archiver.kernel.org; Wed, 01 May 2019 11:26:19 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:33600)
+	id 1hLr9L-00067m-6J
+	for qemu-devel@archiver.kernel.org; Wed, 01 May 2019 11:27:59 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:34079)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1hLr6b-0004Zw-Nn
-	for qemu-devel@nongnu.org; Wed, 01 May 2019 11:25:12 -0400
+	(envelope-from <alex.bennee@linaro.org>) id 1hLr8U-0005ll-O7
+	for qemu-devel@nongnu.org; Wed, 01 May 2019 11:27:09 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1hLr6V-0001Ds-Sk
-	for qemu-devel@nongnu.org; Wed, 01 May 2019 11:25:07 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:38728)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>)
-	id 1hLr6H-00017L-MS; Wed, 01 May 2019 11:24:50 -0400
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
-	[10.5.11.11])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 41604308FED4;
-	Wed,  1 May 2019 15:24:47 +0000 (UTC)
-Received: from [10.3.116.15] (ovpn-116-15.phx2.redhat.com [10.3.116.15])
-	by smtp.corp.redhat.com (Postfix) with ESMTPS id 3EBB37B91F;
-	Wed,  1 May 2019 15:24:37 +0000 (UTC)
-To: John Snow <jsnow@redhat.com>,
-	Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
-	"qemu-block@nongnu.org" <qemu-block@nongnu.org>,
-	"qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
-References: <20181116184324.8093-1-jsnow@redhat.com>
-	<4bc81482-fab6-80dd-f684-4ffde4241dce@virtuozzo.com>
-	<cb6469ca-9ba3-1ac7-7c3e-9e6c8c53e55f@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Openpgp: preference=signencrypt
-Autocrypt: addr=eblake@redhat.com; keydata=
-	xsBNBEvHyWwBCACw7DwsQIh0kAbUXyqhfiKAKOTVu6OiMGffw2w90Ggrp4bdVKmCaEXlrVLU
-	xphBM8mb+wsFkU+pq9YR621WXo9REYVIl0FxKeQo9dyQBZ/XvmUMka4NOmHtFg74nvkpJFCD
-	TUNzmqfcjdKhfFV0d7P/ixKQeZr2WP1xMcjmAQY5YvQ2lUoHP43m8TtpB1LkjyYBCodd+LkV
-	GmCx2Bop1LSblbvbrOm2bKpZdBPjncRNob73eTpIXEutvEaHH72LzpzksfcKM+M18cyRH+nP
-	sAd98xIbVjm3Jm4k4d5oQyE2HwOur+trk2EcxTgdp17QapuWPwMfhaNq3runaX7x34zhABEB
-	AAHNHkVyaWMgQmxha2UgPGVibGFrZUByZWRoYXQuY29tPsLAegQTAQgAJAIbAwULCQgHAwUV
-	CgkICwUWAgMBAAIeAQIXgAUCS8fL9QIZAQAKCRCnoWtKJSdDahBHCACbl/5FGkUqJ89GAjeX
-	RjpAeJtdKhujir0iS4CMSIng7fCiGZ0fNJCpL5RpViSo03Q7l37ss+No+dJI8KtAp6ID+PMz
-	wTJe5Egtv/KGUKSDvOLYJ9WIIbftEObekP+GBpWP2+KbpADsc7EsNd70sYxExD3liwVJYqLc
-	Rw7so1PEIFp+Ni9A1DrBR5NaJBnno2PHzHPTS9nmZVYm/4I32qkLXOcdX0XElO8VPDoVobG6
-	gELf4v/vIImdmxLh/w5WctUpBhWWIfQDvSOW2VZDOihm7pzhQodr3QP/GDLfpK6wI7exeu3P
-	pfPtqwa06s1pae3ad13mZGzkBdNKs1HEm8x6zsBNBEvHyWwBCADGkMFzFjmmyqAEn5D+Mt4P
-	zPdO8NatsDw8Qit3Rmzu+kUygxyYbz52ZO40WUu7EgQ5kDTOeRPnTOd7awWDQcl1gGBXgrkR
-	pAlQ0l0ReO57Q0eglFydLMi5bkwYhfY+TwDPMh3aOP5qBXkm4qIYSsxb8A+i00P72AqFb9Q7
-	3weG/flxSPApLYQE5qWGSXjOkXJv42NGS6o6gd4RmD6Ap5e8ACo1lSMPfTpGzXlt4aRkBfvb
-	NCfNsQikLZzFYDLbQgKBA33BDeV6vNJ9Cj0SgEGOkYyed4I6AbU0kIy1hHAm1r6+sAnEdIKj
-	cHi3xWH/UPrZW5flM8Kqo14OTDkI9EtlABEBAAHCwF8EGAEIAAkFAkvHyWwCGwwACgkQp6Fr
-	SiUnQ2q03wgAmRFGDeXzc58NX0NrDijUu0zx3Lns/qZ9VrkSWbNZBFjpWKaeL1fdVeE4TDGm
-	I5mRRIsStjQzc2R9b+2VBUhlAqY1nAiBDv0Qnt+9cLiuEICeUwlyl42YdwpmY0ELcy5+u6wz
-	mK/jxrYOpzXKDwLq5k4X+hmGuSNWWAN3gHiJqmJZPkhFPUIozZUCeEc76pS/IUN72NfprZmF
-	Dp6/QDjDFtfS39bHSWXKVZUbqaMPqlj/z6Ugk027/3GUjHHr8WkeL1ezWepYDY7WSoXwfoAL
-	2UXYsMAr/uUncSKlfjvArhsej0S4zbqim2ZY6S8aRWw94J3bSvJR+Nwbs34GPTD4Pg==
-Organization: Red Hat, Inc.
-Message-ID: <fb05bc7d-7632-f72c-1c32-ba16d21a7fcb@redhat.com>
-Date: Wed, 1 May 2019 10:24:36 -0500
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
-	Thunderbird/60.6.1
+	(envelope-from <alex.bennee@linaro.org>) id 1hLr8R-00026I-1j
+	for qemu-devel@nongnu.org; Wed, 01 May 2019 11:27:06 -0400
+Received: from mail-wm1-x341.google.com ([2a00:1450:4864:20::341]:40376)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+	id 1hLr8P-00024f-64
+	for qemu-devel@nongnu.org; Wed, 01 May 2019 11:27:02 -0400
+Received: by mail-wm1-x341.google.com with SMTP id h11so7327107wmb.5
+	for <qemu-devel@nongnu.org>; Wed, 01 May 2019 08:27:00 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+	h=references:user-agent:from:to:subject:in-reply-to:date:message-id
+	:mime-version:content-transfer-encoding;
+	bh=YkMhKUfy4+zicN3gSufR3xOnaniz8Tcu9ruNEGDsIbI=;
+	b=fThQjWcy9AEyib3SQ7gyN2Xfblf8YZoQuzxS0H0noiuMHZ/WCRKhTlcVqgnYGBhXGB
+	v9vqciajRV5VZ9V/m3VHurifQxv4Bifg4zubWkhmZ5gjIIUVvz8pFdlrYm4FapweNSTS
+	C79KOizVzIDetA4WtLTOwRdapIh1wPh0aJ6OzszcZ6r1W0sMctTVFDn9OqSxN35n4eEu
+	1TR98wOOVvHFQ0CyzQej7ml/BZqchIbKXl6p9SEAJq/FWjXhsU8NXq46MGPuU0Trecqr
+	BKs0GxEg9K1lRj2wnltTgWjG2cYvavJa+ZTXOrsSB5RtEc4CCrLWwKg4Bkh6oAKI+JLQ
+	fa+Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=1e100.net; s=20161025;
+	h=x-gm-message-state:references:user-agent:from:to:subject
+	:in-reply-to:date:message-id:mime-version:content-transfer-encoding;
+	bh=YkMhKUfy4+zicN3gSufR3xOnaniz8Tcu9ruNEGDsIbI=;
+	b=GbiKOpDphCkUeI0A2M1RkWDrBlCglxaFxyB8UjngWLa0UIqyD93O39PJyhBuSF1t4F
+	2ZIlE+C+7PkyxFZtb4YyPpPghjM7BPT9yNRMqfxSE1F20kUAwSk8OLUcCvHe52HE8al8
+	Akk/zvYIE8NvhDYPY+nhbXjkiXLvxCEeZC8Zw1emlS5HdQg5dpF8aSMU2750jOmVsqqg
+	/MHHOIhtc+dKDb/YSGtAf7c0r2YgRbMar2oh4yEpKDzoiv+1EWNgWU4+Ph9/m1SzZt7O
+	cRKmwyJ8Dz2R9fM0GxaSn87AzWak3Pt8rIOmB5WxgwU5G+SOTYiSwflkDSWU6oagjjwI
+	xUpA==
+X-Gm-Message-State: APjAAAUHU+xLbxTAeXJ0QDRyr2gRKH4qOjStCiNyajVeM6BD18RYMT2E
+	jWW4J777bTEjp0y9FtQkNfwCJXqpcpY=
+X-Google-Smtp-Source: APXvYqzHAftBzK9HE4ueuazA4Ca925ZQeBmA80UIrPSnQzGtpwToqClH8uUFDgHqkOdj5mNA3jyEBQ==
+X-Received: by 2002:a1c:4602:: with SMTP id t2mr6944923wma.120.1556724418896; 
+	Wed, 01 May 2019 08:26:58 -0700 (PDT)
+Received: from zen.linaroharston ([81.128.185.34])
+	by smtp.gmail.com with ESMTPSA id
+	d10sm6156503wmb.15.2019.05.01.08.26.58 for <qemu-devel@nongnu.org>
+	(version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
+	Wed, 01 May 2019 08:26:58 -0700 (PDT)
+Received: from zen (localhost [127.0.0.1])
+	by zen.linaroharston (Postfix) with ESMTP id E31B31FF87
+	for <qemu-devel@nongnu.org>; Wed,  1 May 2019 16:26:57 +0100 (BST)
+References: <20190501050536.15580-1-richard.henderson@linaro.org>
+	<20190501050536.15580-3-richard.henderson@linaro.org>
+User-agent: mu4e 1.3.1; emacs 26.1
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+To: qemu-devel@nongnu.org
+In-reply-to: <20190501050536.15580-3-richard.henderson@linaro.org>
+Date: Wed, 01 May 2019 16:26:57 +0100
+Message-ID: <87v9yu5h6m.fsf@zen.linaroharston>
 MIME-Version: 1.0
-In-Reply-To: <cb6469ca-9ba3-1ac7-7c3e-9e6c8c53e55f@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="NZ2bxkoyGL4juIOgvnyHGP1wjlx3mAtbj"
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.49]);
-	Wed, 01 May 2019 15:24:47 +0000 (UTC)
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-X-Content-Filtered-By: Mailman/MimeDel 2.1.21
-Subject: Re: [Qemu-devel] [PATCH] migration/block-dirty-bitmap: Silence
- coverity CID 1390625
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+	recognized.
+X-Received-From: 2a00:1450:4864:20::341
+Subject: Re: [Qemu-devel] [PATCH v2 02/29] tcg: Do not recreate
+ INDEX_op_neg_vec unless supported
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -103,113 +98,48 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Stefan Hajnoczi <stefanha@redhat.com>, Max Reitz <mreitz@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190501152436.Eed7dmaoQg8JsrMco4uEloDopxyh8eY56OdWwUF_E6o@z>
-
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---NZ2bxkoyGL4juIOgvnyHGP1wjlx3mAtbj
-From: Eric Blake <eblake@redhat.com>
-To: John Snow <jsnow@redhat.com>,
- Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
- "qemu-block@nongnu.org" <qemu-block@nongnu.org>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
-Cc: Stefan Hajnoczi <stefanha@redhat.com>, Max Reitz <mreitz@redhat.com>
-Message-ID: <fb05bc7d-7632-f72c-1c32-ba16d21a7fcb@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH] migration/block-dirty-bitmap: Silence
- coverity CID 1390625
-References: <20181116184324.8093-1-jsnow@redhat.com>
- <4bc81482-fab6-80dd-f684-4ffde4241dce@virtuozzo.com>
- <cb6469ca-9ba3-1ac7-7c3e-9e6c8c53e55f@redhat.com>
-In-Reply-To: <cb6469ca-9ba3-1ac7-7c3e-9e6c8c53e55f@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-
-On 4/30/19 6:08 PM, John Snow wrote:
->=20
->=20
-> On 11/20/18 10:15 AM, Vladimir Sementsov-Ogievskiy wrote:
->> 16.11.2018 21:43, John Snow wrote:
->>> Coverity warns that backing_bs() could give us a NULL pointer, which
->>> we then use without checking that it isn't.
->>>
->>> In our loop condition, we check bs && bs->drv as a point of habit, bu=
-t
->>> by nature of the block graph, we cannot have null bs pointers here.
->>>
->>> This loop skips only implicit nodes, which always have children, so
->>> this loop should never encounter a null value.
->>
->=20
-> I let this drop again :)
->=20
->> You mean, always have backing (not file for ex.)? Should we at least a=
-dd a comment
->> near "bool implicit;" that the node must have backing..
->>
->> Do we have filters, using 'file' child instead of backing, will we wan=
-t to auto insert them, and therefore mark them with implicit=3Dtrue?
->>
->=20
-> I actually have no idea. I guess this is the sort of thing we actually
-> really want a dedicated kind of API for. "Find first non-filter" seems
-> like a common use case that we'd want.
->=20
-> [But maybe I'll avoid this problem.]
-
-Max has already tried to tackle that problem:
-https://lists.gnu.org/archive/html/qemu-devel/2019-04/msg01713.html
-
->=20
->> And one more thing:
->> So, it's looks like a wrong way to search for all block-nodes, instead=
- of looping through backing chain to the first not-implicit bds, we must =
-recursively explore the whole block graph, to find _all_ the bitmaps.
->>
->=20
-> Looking at this again after not having done so for so long -- I guess
-> that bdrv_first/bdrv_next only iterate over *top level* BDSes and not
-> any children thereof. You're right, even the method here isn't quite
-> correct. We want to find ALL nodes, wherever they are.
->=20
-> query_named_block_nodes uses an implementation in block.c to accomplish=
-
-> this because the API is not public.... or, it wasn't, but it looks like=
-
-> we have bdrv_next_all_states now, and we could use this to just find AL=
-L
-> of the bdrv nodes.
->=20
-> Ehm.... let me send something a little more RFC-caliber that should
-> address your concern (as well as Peter's) here.
-
-Max's series also tries to improve how we visit nodes when determining
-which bitmaps to find.
-
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3226
-Virtualization:  qemu.org | libvirt.org
+Message-ID: <20190501152657.bVwjedPl1c7yhePN2uQDpKcidWDzoynumdFwKR_NjYM@z>
 
 
---NZ2bxkoyGL4juIOgvnyHGP1wjlx3mAtbj
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
+Richard Henderson <richard.henderson@linaro.org> writes:
 
------BEGIN PGP SIGNATURE-----
+> Use tcg_can_emit_vec_op instead of just TCG_TARGET_HAS_neg_vec,
+> so that we check the type and vece for the actual operation.
+>
+> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 
-iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlzJujQACgkQp6FrSiUn
-Q2rrgwf/Z4xmDq0VHvF3495unToxko7PShHyR5SSiF5FCuN+WV1m3XyDdJNzWawO
-qzo1XZ+4aTMmSocXBXggY359d0GkgXpMZo+dxuvp2Sqox0Pft34WfkYQz05RlG82
-vYW1LMzyAlUmg9SwKTf2YnOBfA2nV7cK+HT26gReCcozifJHz6IMsw6iBqUvihln
-RBmbM5xTmPuynscwL6EuCw00ngQK9KBDC6oaI2cXoWs1O8qGF4XK5CRY43FbOMXE
-CiewuU//VoJEJ6k+mkVfzcZAAd1YH+GZGtfrbt/G85TzS+26DjMvMaclX/ONq9PP
-3y0xnNVsAvUk9bl8enkZiyNJONXqXA==
-=0q0G
------END PGP SIGNATURE-----
+Reviewed-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
 
---NZ2bxkoyGL4juIOgvnyHGP1wjlx3mAtbj--
+> ---
+>  tcg/optimize.c | 8 ++++++--
+>  1 file changed, 6 insertions(+), 2 deletions(-)
+>
+> diff --git a/tcg/optimize.c b/tcg/optimize.c
+> index 5150c38a25..24faa06260 100644
+> --- a/tcg/optimize.c
+> +++ b/tcg/optimize.c
+> @@ -734,9 +734,13 @@ void tcg_optimize(TCGContext *s)
+>                  } else if (opc =3D=3D INDEX_op_sub_i64) {
+>                      neg_op =3D INDEX_op_neg_i64;
+>                      have_neg =3D TCG_TARGET_HAS_neg_i64;
+> -                } else {
+> +                } else if (TCG_TARGET_HAS_neg_vec) {
+> +                    TCGType type =3D TCGOP_VECL(op) + TCG_TYPE_V64;
+> +                    unsigned vece =3D TCGOP_VECE(op);
+>                      neg_op =3D INDEX_op_neg_vec;
+> -                    have_neg =3D TCG_TARGET_HAS_neg_vec;
+> +                    have_neg =3D tcg_can_emit_vec_op(neg_op, type, vece)=
+ > 0;
+> +                } else {
+> +                    break;
+>                  }
+>                  if (!have_neg) {
+>                      break;
+
+
+--
+Alex Benn=C3=A9e
 
