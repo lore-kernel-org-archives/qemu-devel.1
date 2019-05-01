@@ -2,80 +2,96 @@ Return-Path: <SRS0=aVj3=TB=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 763BAC43219
-	for <qemu-devel@archiver.kernel.org>; Wed,  1 May 2019 15:25:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F1B21C43219
+	for <qemu-devel@archiver.kernel.org>; Wed,  1 May 2019 15:26:20 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 49972208C3
-	for <qemu-devel@archiver.kernel.org>; Wed,  1 May 2019 15:25:38 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 49972208C3
+	by mail.kernel.org (Postfix) with ESMTPS id B4168208C3
+	for <qemu-devel@archiver.kernel.org>; Wed,  1 May 2019 15:26:20 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B4168208C3
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:32862 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:32873 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hLr73-0004fx-IO
-	for qemu-devel@archiver.kernel.org; Wed, 01 May 2019 11:25:37 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:33456)
+	id 1hLr7j-0005HE-Qe
+	for qemu-devel@archiver.kernel.org; Wed, 01 May 2019 11:26:19 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:33600)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1hLr5u-000484-Ij
-	for qemu-devel@nongnu.org; Wed, 01 May 2019 11:24:29 -0400
+	(envelope-from <eblake@redhat.com>) id 1hLr6b-0004Zw-Nn
+	for qemu-devel@nongnu.org; Wed, 01 May 2019 11:25:12 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1hLr5p-0000vK-EN
-	for qemu-devel@nongnu.org; Wed, 01 May 2019 11:24:26 -0400
-Received: from mail-wm1-f65.google.com ([209.85.128.65]:34452)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1hLr5o-0000uU-Sf
-	for qemu-devel@nongnu.org; Wed, 01 May 2019 11:24:21 -0400
-Received: by mail-wm1-f65.google.com with SMTP id b67so4643482wmg.1
-	for <qemu-devel@nongnu.org>; Wed, 01 May 2019 08:24:19 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=1e100.net; s=20161025;
-	h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
-	:date:user-agent:mime-version:in-reply-to:content-language
-	:content-transfer-encoding;
-	bh=KmEsYrfEjl0ocBs3Sq2w59isDxD/ManTKjXSduTJFLc=;
-	b=ciFTBsNhBu1lOGxsIYPXwv3Pi1HriVTsdQ9DnpwQyrD3vl7eV5lG3l/AD/eJDXuGxw
-	ZqFDWbSt1BxYiEOR6zHl58JO4sxC43OtxtgQZFh255Ix1SXCa9k95Jq8q4p8rvWLCxZx
-	2iwVgRb5QxeCshn/MKlQevKtq66MJpctuCoKOXUtKUrOg/FOhhgjW9/+4PbsTrvcYqok
-	Dh8AnXWqYzRja349BuGUVwGJlJWNqxqWsA6a4+BVySCHPcUOFzMLhDe9NWa9xJhA9+9v
-	2JrUgmn6gCTg6f+vhK3T/Y713uCYV45S40oeS+9vSHBEgjqnRjxVrU30HZo1VyyPVMug
-	zijQ==
-X-Gm-Message-State: APjAAAVbMrHuz02AcKmtNxeynRjH0givqlFT2FM7A3lCVvkDoWdgG2L7
-	Y+bbDqG23ukx2sfLvbryCvzrxw==
-X-Google-Smtp-Source: APXvYqxSbmB9F77WukEjEJW80aTHbKP8kfdzekvWZpTV6kS05Wb86qG4RHt+kRxvt4p0Zp7n4f+MPw==
-X-Received: by 2002:a1c:a893:: with SMTP id r141mr6888842wme.7.1556724258777; 
-	Wed, 01 May 2019 08:24:18 -0700 (PDT)
-Received: from [192.168.1.37] (193.red-88-21-103.staticip.rima-tde.net.
-	[88.21.103.193]) by smtp.gmail.com with ESMTPSA id
-	o16sm34704950wrw.10.2019.05.01.08.24.17
-	(version=TLS1_3 cipher=AEAD-AES128-GCM-SHA256 bits=128/128);
-	Wed, 01 May 2019 08:24:18 -0700 (PDT)
-To: =?UTF-8?Q?Daniel_P=2e_Berrang=c3=a9?= <berrange@redhat.com>,
-	qemu-devel@nongnu.org
-References: <20190501144646.4851-1-berrange@redhat.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Openpgp: id=89C1E78F601EE86C867495CBA2A3FD6EDEADC0DE;
-	url=http://pgp.mit.edu/pks/lookup?op=get&search=0xA2A3FD6EDEADC0DE
-Message-ID: <cb43af48-c48b-74cf-6e83-982a310bf1d9@redhat.com>
-Date: Wed, 1 May 2019 17:24:17 +0200
+	(envelope-from <eblake@redhat.com>) id 1hLr6V-0001Ds-Sk
+	for qemu-devel@nongnu.org; Wed, 01 May 2019 11:25:07 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:38728)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <eblake@redhat.com>)
+	id 1hLr6H-00017L-MS; Wed, 01 May 2019 11:24:50 -0400
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+	[10.5.11.11])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 41604308FED4;
+	Wed,  1 May 2019 15:24:47 +0000 (UTC)
+Received: from [10.3.116.15] (ovpn-116-15.phx2.redhat.com [10.3.116.15])
+	by smtp.corp.redhat.com (Postfix) with ESMTPS id 3EBB37B91F;
+	Wed,  1 May 2019 15:24:37 +0000 (UTC)
+To: John Snow <jsnow@redhat.com>,
+	Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
+	"qemu-block@nongnu.org" <qemu-block@nongnu.org>,
+	"qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+References: <20181116184324.8093-1-jsnow@redhat.com>
+	<4bc81482-fab6-80dd-f684-4ffde4241dce@virtuozzo.com>
+	<cb6469ca-9ba3-1ac7-7c3e-9e6c8c53e55f@redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Openpgp: preference=signencrypt
+Autocrypt: addr=eblake@redhat.com; keydata=
+	xsBNBEvHyWwBCACw7DwsQIh0kAbUXyqhfiKAKOTVu6OiMGffw2w90Ggrp4bdVKmCaEXlrVLU
+	xphBM8mb+wsFkU+pq9YR621WXo9REYVIl0FxKeQo9dyQBZ/XvmUMka4NOmHtFg74nvkpJFCD
+	TUNzmqfcjdKhfFV0d7P/ixKQeZr2WP1xMcjmAQY5YvQ2lUoHP43m8TtpB1LkjyYBCodd+LkV
+	GmCx2Bop1LSblbvbrOm2bKpZdBPjncRNob73eTpIXEutvEaHH72LzpzksfcKM+M18cyRH+nP
+	sAd98xIbVjm3Jm4k4d5oQyE2HwOur+trk2EcxTgdp17QapuWPwMfhaNq3runaX7x34zhABEB
+	AAHNHkVyaWMgQmxha2UgPGVibGFrZUByZWRoYXQuY29tPsLAegQTAQgAJAIbAwULCQgHAwUV
+	CgkICwUWAgMBAAIeAQIXgAUCS8fL9QIZAQAKCRCnoWtKJSdDahBHCACbl/5FGkUqJ89GAjeX
+	RjpAeJtdKhujir0iS4CMSIng7fCiGZ0fNJCpL5RpViSo03Q7l37ss+No+dJI8KtAp6ID+PMz
+	wTJe5Egtv/KGUKSDvOLYJ9WIIbftEObekP+GBpWP2+KbpADsc7EsNd70sYxExD3liwVJYqLc
+	Rw7so1PEIFp+Ni9A1DrBR5NaJBnno2PHzHPTS9nmZVYm/4I32qkLXOcdX0XElO8VPDoVobG6
+	gELf4v/vIImdmxLh/w5WctUpBhWWIfQDvSOW2VZDOihm7pzhQodr3QP/GDLfpK6wI7exeu3P
+	pfPtqwa06s1pae3ad13mZGzkBdNKs1HEm8x6zsBNBEvHyWwBCADGkMFzFjmmyqAEn5D+Mt4P
+	zPdO8NatsDw8Qit3Rmzu+kUygxyYbz52ZO40WUu7EgQ5kDTOeRPnTOd7awWDQcl1gGBXgrkR
+	pAlQ0l0ReO57Q0eglFydLMi5bkwYhfY+TwDPMh3aOP5qBXkm4qIYSsxb8A+i00P72AqFb9Q7
+	3weG/flxSPApLYQE5qWGSXjOkXJv42NGS6o6gd4RmD6Ap5e8ACo1lSMPfTpGzXlt4aRkBfvb
+	NCfNsQikLZzFYDLbQgKBA33BDeV6vNJ9Cj0SgEGOkYyed4I6AbU0kIy1hHAm1r6+sAnEdIKj
+	cHi3xWH/UPrZW5flM8Kqo14OTDkI9EtlABEBAAHCwF8EGAEIAAkFAkvHyWwCGwwACgkQp6Fr
+	SiUnQ2q03wgAmRFGDeXzc58NX0NrDijUu0zx3Lns/qZ9VrkSWbNZBFjpWKaeL1fdVeE4TDGm
+	I5mRRIsStjQzc2R9b+2VBUhlAqY1nAiBDv0Qnt+9cLiuEICeUwlyl42YdwpmY0ELcy5+u6wz
+	mK/jxrYOpzXKDwLq5k4X+hmGuSNWWAN3gHiJqmJZPkhFPUIozZUCeEc76pS/IUN72NfprZmF
+	Dp6/QDjDFtfS39bHSWXKVZUbqaMPqlj/z6Ugk027/3GUjHHr8WkeL1ezWepYDY7WSoXwfoAL
+	2UXYsMAr/uUncSKlfjvArhsej0S4zbqim2ZY6S8aRWw94J3bSvJR+Nwbs34GPTD4Pg==
+Organization: Red Hat, Inc.
+Message-ID: <fb05bc7d-7632-f72c-1c32-ba16d21a7fcb@redhat.com>
+Date: Wed, 1 May 2019 10:24:36 -0500
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
 	Thunderbird/60.6.1
 MIME-Version: 1.0
-In-Reply-To: <20190501144646.4851-1-berrange@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
+In-Reply-To: <cb6469ca-9ba3-1ac7-7c3e-9e6c8c53e55f@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="NZ2bxkoyGL4juIOgvnyHGP1wjlx3mAtbj"
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+	(mx1.redhat.com [10.5.110.49]);
+	Wed, 01 May 2019 15:24:47 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-	[fuzzy]
-X-Received-From: 209.85.128.65
-Subject: Re: [Qemu-devel] [PATCH v2] linux-user: avoid string truncation
- warnings in uname field copying
+X-Received-From: 209.132.183.28
+X-Content-Filtered-By: Mailman/MimeDel 2.1.21
+Subject: Re: [Qemu-devel] [PATCH] migration/block-dirty-bitmap: Silence
+ coverity CID 1390625
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -87,54 +103,113 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Riku Voipio <riku.voipio@iki.fi>, Laurent Vivier <laurent@vivier.eu>
+Cc: Stefan Hajnoczi <stefanha@redhat.com>, Max Reitz <mreitz@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190501152417.K-Oqo2-9Jy089gpXh5izUU8sBQyhbhorsP-dv-eQUXU@z>
+Message-ID: <20190501152436.Eed7dmaoQg8JsrMco4uEloDopxyh8eY56OdWwUF_E6o@z>
 
-On 5/1/19 4:46 PM, Daniel P. Berrangé wrote:
-> In file included from /usr/include/string.h:494,
->                  from include/qemu/osdep.h:101,
->                  from linux-user/uname.c:20:
-> In function ‘strncpy’,
->     inlined from ‘sys_uname’ at linux-user/uname.c:94:3:
-> /usr/include/bits/string_fortified.h:106:10: warning: ‘__builtin_strncpy’ output may be truncated copying 64 bytes from a string of length 64 [-Wstringop-truncation]
->   106 |   return __builtin___strncpy_chk (__dest, __src, __len, __bos (__dest));
->       |          ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-> 
-> We don't care where the NUL terminator in the original uname
-> field was. It suffices to copy the entire original field and
-> simply force a NUL terminator at the end of the new field.
-> 
-> Signed-off-by: Daniel P. Berrangé <berrange@redhat.com>
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--NZ2bxkoyGL4juIOgvnyHGP1wjlx3mAtbj
+From: Eric Blake <eblake@redhat.com>
+To: John Snow <jsnow@redhat.com>,
+ Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
+ "qemu-block@nongnu.org" <qemu-block@nongnu.org>,
+ "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+Cc: Stefan Hajnoczi <stefanha@redhat.com>, Max Reitz <mreitz@redhat.com>
+Message-ID: <fb05bc7d-7632-f72c-1c32-ba16d21a7fcb@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH] migration/block-dirty-bitmap: Silence
+ coverity CID 1390625
+References: <20181116184324.8093-1-jsnow@redhat.com>
+ <4bc81482-fab6-80dd-f684-4ffde4241dce@virtuozzo.com>
+ <cb6469ca-9ba3-1ac7-7c3e-9e6c8c53e55f@redhat.com>
+In-Reply-To: <cb6469ca-9ba3-1ac7-7c3e-9e6c8c53e55f@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+On 4/30/19 6:08 PM, John Snow wrote:
+>=20
+>=20
+> On 11/20/18 10:15 AM, Vladimir Sementsov-Ogievskiy wrote:
+>> 16.11.2018 21:43, John Snow wrote:
+>>> Coverity warns that backing_bs() could give us a NULL pointer, which
+>>> we then use without checking that it isn't.
+>>>
+>>> In our loop condition, we check bs && bs->drv as a point of habit, bu=
+t
+>>> by nature of the block graph, we cannot have null bs pointers here.
+>>>
+>>> This loop skips only implicit nodes, which always have children, so
+>>> this loop should never encounter a null value.
+>>
+>=20
+> I let this drop again :)
+>=20
+>> You mean, always have backing (not file for ex.)? Should we at least a=
+dd a comment
+>> near "bool implicit;" that the node must have backing..
+>>
+>> Do we have filters, using 'file' child instead of backing, will we wan=
+t to auto insert them, and therefore mark them with implicit=3Dtrue?
+>>
+>=20
+> I actually have no idea. I guess this is the sort of thing we actually
+> really want a dedicated kind of API for. "Find first non-filter" seems
+> like a common use case that we'd want.
+>=20
+> [But maybe I'll avoid this problem.]
 
-> ---
-> 
-> Changed in v2:
-> 
->  - Always use sizeof() in preference to __NEW_UTS_LEN
-> 
->  linux-user/uname.c | 5 ++---
->  1 file changed, 2 insertions(+), 3 deletions(-)
-> 
-> diff --git a/linux-user/uname.c b/linux-user/uname.c
-> index 313b79dbad..1c05f95387 100644
-> --- a/linux-user/uname.c
-> +++ b/linux-user/uname.c
-> @@ -72,9 +72,8 @@ const char *cpu_to_uname_machine(void *cpu_env)
->  
->  #define COPY_UTSNAME_FIELD(dest, src) \
->    do { \
-> -      /* __NEW_UTS_LEN doesn't include terminating null */ \
-> -      (void) strncpy((dest), (src), __NEW_UTS_LEN); \
-> -      (dest)[__NEW_UTS_LEN] = '\0'; \
-> +      memcpy((dest), (src), MIN(sizeof(src), sizeof(dest))); \
-> +      (dest)[sizeof(dest) - 1] = '\0'; \
->    } while (0)
->  
->  int sys_uname(struct new_utsname *buf)
-> 
+Max has already tried to tackle that problem:
+https://lists.gnu.org/archive/html/qemu-devel/2019-04/msg01713.html
+
+>=20
+>> And one more thing:
+>> So, it's looks like a wrong way to search for all block-nodes, instead=
+ of looping through backing chain to the first not-implicit bds, we must =
+recursively explore the whole block graph, to find _all_ the bitmaps.
+>>
+>=20
+> Looking at this again after not having done so for so long -- I guess
+> that bdrv_first/bdrv_next only iterate over *top level* BDSes and not
+> any children thereof. You're right, even the method here isn't quite
+> correct. We want to find ALL nodes, wherever they are.
+>=20
+> query_named_block_nodes uses an implementation in block.c to accomplish=
+
+> this because the API is not public.... or, it wasn't, but it looks like=
+
+> we have bdrv_next_all_states now, and we could use this to just find AL=
+L
+> of the bdrv nodes.
+>=20
+> Ehm.... let me send something a little more RFC-caliber that should
+> address your concern (as well as Peter's) here.
+
+Max's series also tries to improve how we visit nodes when determining
+which bitmaps to find.
+
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3226
+Virtualization:  qemu.org | libvirt.org
+
+
+--NZ2bxkoyGL4juIOgvnyHGP1wjlx3mAtbj
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlzJujQACgkQp6FrSiUn
+Q2rrgwf/Z4xmDq0VHvF3495unToxko7PShHyR5SSiF5FCuN+WV1m3XyDdJNzWawO
+qzo1XZ+4aTMmSocXBXggY359d0GkgXpMZo+dxuvp2Sqox0Pft34WfkYQz05RlG82
+vYW1LMzyAlUmg9SwKTf2YnOBfA2nV7cK+HT26gReCcozifJHz6IMsw6iBqUvihln
+RBmbM5xTmPuynscwL6EuCw00ngQK9KBDC6oaI2cXoWs1O8qGF4XK5CRY43FbOMXE
+CiewuU//VoJEJ6k+mkVfzcZAAd1YH+GZGtfrbt/G85TzS+26DjMvMaclX/ONq9PP
+3y0xnNVsAvUk9bl8enkZiyNJONXqXA==
+=0q0G
+-----END PGP SIGNATURE-----
+
+--NZ2bxkoyGL4juIOgvnyHGP1wjlx3mAtbj--
 
