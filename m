@@ -1,27 +1,23 @@
-Received: from eggs.gnu.org ([209.51.188.92]:33456)
+Received: from eggs.gnu.org ([209.51.188.92]:33600)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1hLr5u-000484-Ij
-	for qemu-devel@nongnu.org; Wed, 01 May 2019 11:24:29 -0400
+	(envelope-from <eblake@redhat.com>) id 1hLr6b-0004Zw-Nn
+	for qemu-devel@nongnu.org; Wed, 01 May 2019 11:25:12 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1hLr5p-0000vK-EN
-	for qemu-devel@nongnu.org; Wed, 01 May 2019 11:24:26 -0400
-Received: from mail-wm1-f65.google.com ([209.85.128.65]:34452)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1hLr5o-0000uU-Sf
-	for qemu-devel@nongnu.org; Wed, 01 May 2019 11:24:21 -0400
-Received: by mail-wm1-f65.google.com with SMTP id b67so4643482wmg.1
-	for <qemu-devel@nongnu.org>; Wed, 01 May 2019 08:24:19 -0700 (PDT)
-References: <20190501144646.4851-1-berrange@redhat.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Message-ID: <cb43af48-c48b-74cf-6e83-982a310bf1d9@redhat.com>
-Date: Wed, 1 May 2019 17:24:17 +0200
+	(envelope-from <eblake@redhat.com>) id 1hLr6V-0001Ds-Sk
+	for qemu-devel@nongnu.org; Wed, 01 May 2019 11:25:07 -0400
+References: <20181116184324.8093-1-jsnow@redhat.com>
+	<4bc81482-fab6-80dd-f684-4ffde4241dce@virtuozzo.com>
+	<cb6469ca-9ba3-1ac7-7c3e-9e6c8c53e55f@redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <fb05bc7d-7632-f72c-1c32-ba16d21a7fcb@redhat.com>
+Date: Wed, 1 May 2019 10:24:36 -0500
 MIME-Version: 1.0
-In-Reply-To: <20190501144646.4851-1-berrange@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH v2] linux-user: avoid string truncation
- warnings in uname field copying
+In-Reply-To: <cb6469ca-9ba3-1ac7-7c3e-9e6c8c53e55f@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="NZ2bxkoyGL4juIOgvnyHGP1wjlx3mAtbj"
+Subject: Re: [Qemu-devel] [PATCH] migration/block-dirty-bitmap: Silence
+ coverity CID 1390625
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,50 +26,109 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Daniel_P=2e_Berrang=c3=a9?= <berrange@redhat.com>, qemu-devel@nongnu.org
-Cc: Riku Voipio <riku.voipio@iki.fi>, Laurent Vivier <laurent@vivier.eu>
+To: John Snow <jsnow@redhat.com>, Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+Cc: Stefan Hajnoczi <stefanha@redhat.com>, Max Reitz <mreitz@redhat.com>
 
-On 5/1/19 4:46 PM, Daniel P. Berrangé wrote:
-> In file included from /usr/include/string.h:494,
->                  from include/qemu/osdep.h:101,
->                  from linux-user/uname.c:20:
-> In function ‘strncpy’,
->     inlined from ‘sys_uname’ at linux-user/uname.c:94:3:
-> /usr/include/bits/string_fortified.h:106:10: warning: ‘__builtin_strncpy’ output may be truncated copying 64 bytes from a string of length 64 [-Wstringop-truncation]
->   106 |   return __builtin___strncpy_chk (__dest, __src, __len, __bos (__dest));
->       |          ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-> 
-> We don't care where the NUL terminator in the original uname
-> field was. It suffices to copy the entire original field and
-> simply force a NUL terminator at the end of the new field.
-> 
-> Signed-off-by: Daniel P. Berrangé <berrange@redhat.com>
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--NZ2bxkoyGL4juIOgvnyHGP1wjlx3mAtbj
+From: Eric Blake <eblake@redhat.com>
+To: John Snow <jsnow@redhat.com>,
+ Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
+ "qemu-block@nongnu.org" <qemu-block@nongnu.org>,
+ "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+Cc: Stefan Hajnoczi <stefanha@redhat.com>, Max Reitz <mreitz@redhat.com>
+Message-ID: <fb05bc7d-7632-f72c-1c32-ba16d21a7fcb@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH] migration/block-dirty-bitmap: Silence
+ coverity CID 1390625
+References: <20181116184324.8093-1-jsnow@redhat.com>
+ <4bc81482-fab6-80dd-f684-4ffde4241dce@virtuozzo.com>
+ <cb6469ca-9ba3-1ac7-7c3e-9e6c8c53e55f@redhat.com>
+In-Reply-To: <cb6469ca-9ba3-1ac7-7c3e-9e6c8c53e55f@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+On 4/30/19 6:08 PM, John Snow wrote:
+>=20
+>=20
+> On 11/20/18 10:15 AM, Vladimir Sementsov-Ogievskiy wrote:
+>> 16.11.2018 21:43, John Snow wrote:
+>>> Coverity warns that backing_bs() could give us a NULL pointer, which
+>>> we then use without checking that it isn't.
+>>>
+>>> In our loop condition, we check bs && bs->drv as a point of habit, bu=
+t
+>>> by nature of the block graph, we cannot have null bs pointers here.
+>>>
+>>> This loop skips only implicit nodes, which always have children, so
+>>> this loop should never encounter a null value.
+>>
+>=20
+> I let this drop again :)
+>=20
+>> You mean, always have backing (not file for ex.)? Should we at least a=
+dd a comment
+>> near "bool implicit;" that the node must have backing..
+>>
+>> Do we have filters, using 'file' child instead of backing, will we wan=
+t to auto insert them, and therefore mark them with implicit=3Dtrue?
+>>
+>=20
+> I actually have no idea. I guess this is the sort of thing we actually
+> really want a dedicated kind of API for. "Find first non-filter" seems
+> like a common use case that we'd want.
+>=20
+> [But maybe I'll avoid this problem.]
 
-> ---
-> 
-> Changed in v2:
-> 
->  - Always use sizeof() in preference to __NEW_UTS_LEN
-> 
->  linux-user/uname.c | 5 ++---
->  1 file changed, 2 insertions(+), 3 deletions(-)
-> 
-> diff --git a/linux-user/uname.c b/linux-user/uname.c
-> index 313b79dbad..1c05f95387 100644
-> --- a/linux-user/uname.c
-> +++ b/linux-user/uname.c
-> @@ -72,9 +72,8 @@ const char *cpu_to_uname_machine(void *cpu_env)
->  
->  #define COPY_UTSNAME_FIELD(dest, src) \
->    do { \
-> -      /* __NEW_UTS_LEN doesn't include terminating null */ \
-> -      (void) strncpy((dest), (src), __NEW_UTS_LEN); \
-> -      (dest)[__NEW_UTS_LEN] = '\0'; \
-> +      memcpy((dest), (src), MIN(sizeof(src), sizeof(dest))); \
-> +      (dest)[sizeof(dest) - 1] = '\0'; \
->    } while (0)
->  
->  int sys_uname(struct new_utsname *buf)
-> 
+Max has already tried to tackle that problem:
+https://lists.gnu.org/archive/html/qemu-devel/2019-04/msg01713.html
+
+>=20
+>> And one more thing:
+>> So, it's looks like a wrong way to search for all block-nodes, instead=
+ of looping through backing chain to the first not-implicit bds, we must =
+recursively explore the whole block graph, to find _all_ the bitmaps.
+>>
+>=20
+> Looking at this again after not having done so for so long -- I guess
+> that bdrv_first/bdrv_next only iterate over *top level* BDSes and not
+> any children thereof. You're right, even the method here isn't quite
+> correct. We want to find ALL nodes, wherever they are.
+>=20
+> query_named_block_nodes uses an implementation in block.c to accomplish=
+
+> this because the API is not public.... or, it wasn't, but it looks like=
+
+> we have bdrv_next_all_states now, and we could use this to just find AL=
+L
+> of the bdrv nodes.
+>=20
+> Ehm.... let me send something a little more RFC-caliber that should
+> address your concern (as well as Peter's) here.
+
+Max's series also tries to improve how we visit nodes when determining
+which bitmaps to find.
+
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3226
+Virtualization:  qemu.org | libvirt.org
+
+
+--NZ2bxkoyGL4juIOgvnyHGP1wjlx3mAtbj
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlzJujQACgkQp6FrSiUn
+Q2rrgwf/Z4xmDq0VHvF3495unToxko7PShHyR5SSiF5FCuN+WV1m3XyDdJNzWawO
+qzo1XZ+4aTMmSocXBXggY359d0GkgXpMZo+dxuvp2Sqox0Pft34WfkYQz05RlG82
+vYW1LMzyAlUmg9SwKTf2YnOBfA2nV7cK+HT26gReCcozifJHz6IMsw6iBqUvihln
+RBmbM5xTmPuynscwL6EuCw00ngQK9KBDC6oaI2cXoWs1O8qGF4XK5CRY43FbOMXE
+CiewuU//VoJEJ6k+mkVfzcZAAd1YH+GZGtfrbt/G85TzS+26DjMvMaclX/ONq9PP
+3y0xnNVsAvUk9bl8enkZiyNJONXqXA==
+=0q0G
+-----END PGP SIGNATURE-----
+
+--NZ2bxkoyGL4juIOgvnyHGP1wjlx3mAtbj--
