@@ -1,21 +1,29 @@
-Received: from eggs.gnu.org ([209.51.188.92]:58251)
+Received: from eggs.gnu.org ([209.51.188.92]:58852)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1hLqpU-0003X8-WE
-	for qemu-devel@nongnu.org; Wed, 01 May 2019 11:07:32 -0400
+	(envelope-from <alex.bennee@linaro.org>) id 1hLqsi-0005aS-9M
+	for qemu-devel@nongnu.org; Wed, 01 May 2019 11:10:51 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1hLqpP-00064L-15
-	for qemu-devel@nongnu.org; Wed, 01 May 2019 11:07:26 -0400
-Date: Mon, 29 Apr 2019 12:13:31 -0400
-From: Stefan Hajnoczi <stefanha@gmail.com>
-Message-ID: <20190429161331.GC13640@stefanha-x1.localdomain>
-References: <20190429105741.31033-1-kwolf@redhat.com>
+	(envelope-from <alex.bennee@linaro.org>) id 1hLqsY-0007KX-OM
+	for qemu-devel@nongnu.org; Wed, 01 May 2019 11:10:42 -0400
+Received: from mail-wm1-x342.google.com ([2a00:1450:4864:20::342]:36812)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+	id 1hLqsT-00078n-U4
+	for qemu-devel@nongnu.org; Wed, 01 May 2019 11:10:36 -0400
+Received: by mail-wm1-x342.google.com with SMTP id p16so1510011wma.1
+	for <qemu-devel@nongnu.org>; Wed, 01 May 2019 08:10:14 -0700 (PDT)
+References: <20190430165234.32272-1-alex.bennee@linaro.org>
+	<20190430165234.32272-10-alex.bennee@linaro.org>
+	<357d799d-898f-3e1e-d4cb-beeac89cb528@linaro.org>
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+In-reply-to: <357d799d-898f-3e1e-d4cb-beeac89cb528@linaro.org>
+Date: Wed, 01 May 2019 16:10:12 +0100
+Message-ID: <87zho65hyj.fsf@zen.linaroharston>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="MnLPg7ZWsaic7Fhd"
-Content-Disposition: inline
-In-Reply-To: <20190429105741.31033-1-kwolf@redhat.com>
-Subject: Re: [Qemu-devel] [Qemu-block] [PATCH] qcow2: Fix qcow2_make_empty()
- with external data file
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v5 09/15] accel/tcg: remove
+ softmmu_template.h
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,45 +32,27 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Kevin Wolf <kwolf@redhat.com>
-Cc: qemu-block@nongnu.org, qemu-devel@nongnu.org, qemu-stable@nongnu.org, mreitz@redhat.com
+To: Richard Henderson <richard.henderson@linaro.org>
+Cc: qemu-devel@nongnu.org, qemu-arm@nongnu.org, mark.cave-ayland@ilande.co.uk, cota@braap.org
 
 
---MnLPg7ZWsaic7Fhd
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+Richard Henderson <richard.henderson@linaro.org> writes:
 
-On Mon, Apr 29, 2019 at 12:57:41PM +0200, Kevin Wolf wrote:
-> make_completely_empty() is an optimisated path for bdrv_make_empty()
-> where completely new metadata is created inside the image file instead
-> of going through all clusters and discarding them. For an external data
-> file, however, we actually need to do discard operations on the data
-> file; just overwriting the qcow2 file doesn't get rid of the data.
->=20
-> The necessary slow path with an explicit discard operation already
-> exists for other cases. Use it for external data files, too.
->=20
-> Cc: qemu-stable@nongnu.org
-> Signed-off-by: Kevin Wolf <kwolf@redhat.com>
-> ---
->  block/qcow2.c | 3 ++-
->  1 file changed, 2 insertions(+), 1 deletion(-)
+> On 4/30/19 9:52 AM, Alex Benn=C3=A9e wrote:
+>> Signed-off-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
+>> ---
+>>  accel/tcg/softmmu_template.h | 454 -----------------------------------
+>>  1 file changed, 454 deletions(-)
+>>  delete mode 100644 accel/tcg/softmmu_template.h
+>
+> Why is this separate from patch 7?
 
-Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
+No particular reason, we can certainly merge them.
 
---MnLPg7ZWsaic7Fhd
-Content-Type: application/pgp-signature; name="signature.asc"
+>
+>
+> r~
 
------BEGIN PGP SIGNATURE-----
 
-iQEcBAEBAgAGBQJcxyKrAAoJEJykq7OBq3PIU8cH/Rp4YpsMyrtD9O2KA5mvpEcB
-JutWX3bfCQxwPfT49VwhL2beKHLoc4sLlh+t4K6kyB4TIoK/GHGQFKN9/La6waTy
-yUg4YJ74O9Ir/Cny9Q+ht1HdqWJ/1FRPulNwJENwAQ4UbBp0vL3KrUe6VDX2aRgC
-vSGnqlKE+IGJz+qHOWkIP3csgsyFWc7i7GCT9z11mP7LAjoZf8NETz2D53RoT2/N
-/9gLXONIoAMpr+SJWUv/NUH60ZtDWYfDPwztYmziY5syHd0L4j3l29sT3aW+MFEH
-c8qMctinA3E+JqIr0cs8/BSZLxkgBdRDIxa5S57haNf3b7XZx4XXDJfzXWCtKC0=
-=pAiJ
------END PGP SIGNATURE-----
-
---MnLPg7ZWsaic7Fhd--
+--
+Alex Benn=C3=A9e
