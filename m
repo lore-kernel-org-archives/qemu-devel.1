@@ -2,92 +2,92 @@ Return-Path: <SRS0=aVj3=TB=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.0 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id ECC75C43219
-	for <qemu-devel@archiver.kernel.org>; Wed,  1 May 2019 15:49:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F03EAC43219
+	for <qemu-devel@archiver.kernel.org>; Wed,  1 May 2019 15:57:59 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C44B620835
-	for <qemu-devel@archiver.kernel.org>; Wed,  1 May 2019 15:49:04 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C44B620835
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id B9C202085A
+	for <qemu-devel@archiver.kernel.org>; Wed,  1 May 2019 15:57:59 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="uTX/AsU/"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B9C202085A
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:33714 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:34080 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hLrTj-0005gu-Hu
-	for qemu-devel@archiver.kernel.org; Wed, 01 May 2019 11:49:03 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:38715)
+	id 1hLrcM-00089G-S8
+	for qemu-devel@archiver.kernel.org; Wed, 01 May 2019 11:57:58 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:41694)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1hLrSN-000583-2f
-	for qemu-devel@nongnu.org; Wed, 01 May 2019 11:47:42 -0400
+	(envelope-from <alex.bennee@linaro.org>) id 1hLrbV-0007nh-0x
+	for qemu-devel@nongnu.org; Wed, 01 May 2019 11:57:08 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1hLrSK-0002oA-1Z
-	for qemu-devel@nongnu.org; Wed, 01 May 2019 11:47:39 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:48288)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1hLrSJ-0002mz-PI
-	for qemu-devel@nongnu.org; Wed, 01 May 2019 11:47:35 -0400
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
-	[10.5.11.22])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id B94A4CD001
-	for <qemu-devel@nongnu.org>; Wed,  1 May 2019 15:47:34 +0000 (UTC)
-Received: from [10.3.116.15] (ovpn-116-15.phx2.redhat.com [10.3.116.15])
-	by smtp.corp.redhat.com (Postfix) with ESMTPS id 28CB810027C0;
-	Wed,  1 May 2019 15:47:31 +0000 (UTC)
-To: =?UTF-8?Q?Daniel_P=2e_Berrang=c3=a9?= <berrange@redhat.com>,
-	qemu-devel@nongnu.org
-References: <20190501145052.12579-1-berrange@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Openpgp: preference=signencrypt
-Autocrypt: addr=eblake@redhat.com; keydata=
-	xsBNBEvHyWwBCACw7DwsQIh0kAbUXyqhfiKAKOTVu6OiMGffw2w90Ggrp4bdVKmCaEXlrVLU
-	xphBM8mb+wsFkU+pq9YR621WXo9REYVIl0FxKeQo9dyQBZ/XvmUMka4NOmHtFg74nvkpJFCD
-	TUNzmqfcjdKhfFV0d7P/ixKQeZr2WP1xMcjmAQY5YvQ2lUoHP43m8TtpB1LkjyYBCodd+LkV
-	GmCx2Bop1LSblbvbrOm2bKpZdBPjncRNob73eTpIXEutvEaHH72LzpzksfcKM+M18cyRH+nP
-	sAd98xIbVjm3Jm4k4d5oQyE2HwOur+trk2EcxTgdp17QapuWPwMfhaNq3runaX7x34zhABEB
-	AAHNHkVyaWMgQmxha2UgPGVibGFrZUByZWRoYXQuY29tPsLAegQTAQgAJAIbAwULCQgHAwUV
-	CgkICwUWAgMBAAIeAQIXgAUCS8fL9QIZAQAKCRCnoWtKJSdDahBHCACbl/5FGkUqJ89GAjeX
-	RjpAeJtdKhujir0iS4CMSIng7fCiGZ0fNJCpL5RpViSo03Q7l37ss+No+dJI8KtAp6ID+PMz
-	wTJe5Egtv/KGUKSDvOLYJ9WIIbftEObekP+GBpWP2+KbpADsc7EsNd70sYxExD3liwVJYqLc
-	Rw7so1PEIFp+Ni9A1DrBR5NaJBnno2PHzHPTS9nmZVYm/4I32qkLXOcdX0XElO8VPDoVobG6
-	gELf4v/vIImdmxLh/w5WctUpBhWWIfQDvSOW2VZDOihm7pzhQodr3QP/GDLfpK6wI7exeu3P
-	pfPtqwa06s1pae3ad13mZGzkBdNKs1HEm8x6zsBNBEvHyWwBCADGkMFzFjmmyqAEn5D+Mt4P
-	zPdO8NatsDw8Qit3Rmzu+kUygxyYbz52ZO40WUu7EgQ5kDTOeRPnTOd7awWDQcl1gGBXgrkR
-	pAlQ0l0ReO57Q0eglFydLMi5bkwYhfY+TwDPMh3aOP5qBXkm4qIYSsxb8A+i00P72AqFb9Q7
-	3weG/flxSPApLYQE5qWGSXjOkXJv42NGS6o6gd4RmD6Ap5e8ACo1lSMPfTpGzXlt4aRkBfvb
-	NCfNsQikLZzFYDLbQgKBA33BDeV6vNJ9Cj0SgEGOkYyed4I6AbU0kIy1hHAm1r6+sAnEdIKj
-	cHi3xWH/UPrZW5flM8Kqo14OTDkI9EtlABEBAAHCwF8EGAEIAAkFAkvHyWwCGwwACgkQp6Fr
-	SiUnQ2q03wgAmRFGDeXzc58NX0NrDijUu0zx3Lns/qZ9VrkSWbNZBFjpWKaeL1fdVeE4TDGm
-	I5mRRIsStjQzc2R9b+2VBUhlAqY1nAiBDv0Qnt+9cLiuEICeUwlyl42YdwpmY0ELcy5+u6wz
-	mK/jxrYOpzXKDwLq5k4X+hmGuSNWWAN3gHiJqmJZPkhFPUIozZUCeEc76pS/IUN72NfprZmF
-	Dp6/QDjDFtfS39bHSWXKVZUbqaMPqlj/z6Ugk027/3GUjHHr8WkeL1ezWepYDY7WSoXwfoAL
-	2UXYsMAr/uUncSKlfjvArhsej0S4zbqim2ZY6S8aRWw94J3bSvJR+Nwbs34GPTD4Pg==
-Organization: Red Hat, Inc.
-Message-ID: <d27247ee-6fb7-5a5d-2720-f21f3382c075@redhat.com>
-Date: Wed, 1 May 2019 10:47:30 -0500
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
-	Thunderbird/60.6.1
+	(envelope-from <alex.bennee@linaro.org>) id 1hLrbR-0001ne-Vh
+	for qemu-devel@nongnu.org; Wed, 01 May 2019 11:57:04 -0400
+Received: from mail-wm1-x343.google.com ([2a00:1450:4864:20::343]:50727)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+	id 1hLrbR-0001mn-Nu
+	for qemu-devel@nongnu.org; Wed, 01 May 2019 11:57:01 -0400
+Received: by mail-wm1-x343.google.com with SMTP id p21so7591179wmc.0
+	for <qemu-devel@nongnu.org>; Wed, 01 May 2019 08:57:01 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+	h=references:user-agent:from:to:subject:in-reply-to:date:message-id
+	:mime-version:content-transfer-encoding;
+	bh=LUp/KCzQcL6/zpofoX0MZYa6CwpiwxMHiatc14ais7g=;
+	b=uTX/AsU/p8T3UhY4bNm2XxUw1x9g+Doxpb9/ihgCj58Y3dFKTdjBSC/JHuEmUthhEA
+	MwGIa67AJNDR72luoPLsv7fU7+e6aj1Hmkt/+wdxqUvrUHUjGwArMJWjFRswKS4svj9e
+	I1JBXh7befdGr/fzt1ibxK0j7SLCKWcGQi/OPBcShE1FJN02vGmVOCYy5jdLcT+igJQf
+	H9RhRG9UI/aihjafbN9ob5ZpuYpdlS6Pf6X4f0tCn9VH4Iahs0DIKbrVJf+GSFCK4TGl
+	UEsJF7Amh5JrQAOx6rAB3Nc+EPLfSwv8nkxBsd+qXTOqoNmcAk77rfaSYwt3qlgkoXmm
+	9ItQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=1e100.net; s=20161025;
+	h=x-gm-message-state:references:user-agent:from:to:subject
+	:in-reply-to:date:message-id:mime-version:content-transfer-encoding;
+	bh=LUp/KCzQcL6/zpofoX0MZYa6CwpiwxMHiatc14ais7g=;
+	b=kWFjMkZj6QMYJPx8CtRMvIyZnydrQZZ/uKzj0oNDkRtWIzpAbrUp/TDFFE9Chk7oRc
+	r1oabySyzgSvw03X+2kXRxLeiFyG4pq0hqJuPNShYlBCj9jQyRLbivqir/9HvgRE5LmR
+	eIhCFuls9URvX9MWnzomIhXaSoGBDFfNdC+EXztkaoeH8EXfNW4RQRkUNsh3QkCy7/AL
+	bHHa4XuW4b3UIWiV/h9JqNrGe5G1YWqn41cYwTVHFRsyAa5SQqS2/AhFUN/pkdtFK9fr
+	XYktf/5mXtCXIFJ1LxEQAaEB/FDZtDHKiy6l9Fjxn0vcuQPNv+3FpDaXIN2xA4fsAyTY
+	1Jdg==
+X-Gm-Message-State: APjAAAUsq0qInfuEe7jzDi5iNwbQy/pj7PVAz0iJ0UnvCwoLDz+FTo75
+	5l6leJdwbVdHSbZnalCWTvUbiYo6ugo=
+X-Google-Smtp-Source: APXvYqx9n633fdTrGXLSeTCyC4WSUYOp42Xzr3SehHgJ0YHkSNxCVm139UQnPamFrGi4Vh6MD0C2hw==
+X-Received: by 2002:a7b:ce03:: with SMTP id m3mr6546125wmc.99.1556726220038;
+	Wed, 01 May 2019 08:57:00 -0700 (PDT)
+Received: from zen.linaroharston ([81.128.185.34])
+	by smtp.gmail.com with ESMTPSA id
+	n63sm5381331wmn.38.2019.05.01.08.56.59 for <qemu-devel@nongnu.org>
+	(version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
+	Wed, 01 May 2019 08:56:59 -0700 (PDT)
+Received: from zen (localhost [127.0.0.1])
+	by zen.linaroharston (Postfix) with ESMTP id 0EE1D1FF87
+	for <qemu-devel@nongnu.org>; Wed,  1 May 2019 16:56:59 +0100 (BST)
+References: <20190501050536.15580-1-richard.henderson@linaro.org>
+	<20190501050536.15580-4-richard.henderson@linaro.org>
+User-agent: mu4e 1.3.1; emacs 26.1
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+To: qemu-devel@nongnu.org
+In-reply-to: <20190501050536.15580-4-richard.henderson@linaro.org>
+Date: Wed, 01 May 2019 16:56:59 +0100
+Message-ID: <87tvee5fsk.fsf@zen.linaroharston>
 MIME-Version: 1.0
-In-Reply-To: <20190501145052.12579-1-berrange@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="jkeRwep2eGkxEZahCXraThw6v4oH3inQs"
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.38]);
-	Wed, 01 May 2019 15:47:34 +0000 (UTC)
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-X-Content-Filtered-By: Mailman/MimeDel 2.1.21
-Subject: Re: [Qemu-devel] [PATCH v2] sockets: avoid string truncation
- warnings when copying UNIX path
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+	recognized.
+X-Received-From: 2a00:1450:4864:20::343
+Subject: Re: [Qemu-devel] [PATCH v2 03/29] tcg: Allow add_vec, sub_vec,
+ neg_vec, not_vec to be expanded
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -99,84 +99,114 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Gerd Hoffmann <kraxel@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190501154730.8rjttUhYj2kQ94WfOoZfbWBD8D_yHe1CP6rDwUEO5ok@z>
+Message-ID: <20190501155659.uU3p3xCF3hQh7hZuw4EMEN2NhfwmKc8gbbCe2FvxqPs@z>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---jkeRwep2eGkxEZahCXraThw6v4oH3inQs
-From: Eric Blake <eblake@redhat.com>
-To: =?UTF-8?Q?Daniel_P=2e_Berrang=c3=a9?= <berrange@redhat.com>,
- qemu-devel@nongnu.org
-Cc: Gerd Hoffmann <kraxel@redhat.com>
-Message-ID: <d27247ee-6fb7-5a5d-2720-f21f3382c075@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v2] sockets: avoid string truncation warnings
- when copying UNIX path
-References: <20190501145052.12579-1-berrange@redhat.com>
-In-Reply-To: <20190501145052.12579-1-berrange@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
 
-On 5/1/19 9:50 AM, Daniel P. Berrang=C3=A9 wrote:
-> In file included from /usr/include/string.h:494,
->                  from include/qemu/osdep.h:101,
->                  from util/qemu-sockets.c:18:
-> In function =E2=80=98strncpy=E2=80=99,
->     inlined from =E2=80=98unix_connect_saddr.isra.0=E2=80=99 at util/qe=
-mu-sockets.c:925:5:
-> /usr/include/bits/string_fortified.h:106:10: warning: =E2=80=98__builti=
-n_strncpy=E2=80=99 specified bound 108 equals destination size [-Wstringo=
-p-truncation]
->   106 |   return __builtin___strncpy_chk (__dest, __src, __len, __bos (=
-__dest));
->       |          ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~=
-~~~~~~~~
-> In function =E2=80=98strncpy=E2=80=99,
->     inlined from =E2=80=98unix_listen_saddr.isra.0=E2=80=99 at util/qem=
-u-sockets.c:880:5:
-> /usr/include/bits/string_fortified.h:106:10: warning: =E2=80=98__builti=
-n_strncpy=E2=80=99 specified bound 108 equals destination size [-Wstringo=
-p-truncation]
->   106 |   return __builtin___strncpy_chk (__dest, __src, __len, __bos (=
-__dest));
->       |          ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
->=20
-> We are already validating the UNIX socket path length earlier in
-> the functions. If we save this string length when we first check
-> it, then we can simply use memcpy instead of strcpy later, avoiding
-> the gcc truncation warnings.
->=20
-> Signed-off-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
+Richard Henderson <richard.henderson@linaro.org> writes:
+
+> Reviewed-by: David Hildenbrand <david@redhat.com>
+> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+
+Reviewed-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
+
 > ---
->  util/qemu-sockets.c | 12 ++++++++----
->  1 file changed, 8 insertions(+), 4 deletions(-)
+>  tcg/tcg-op-vec.c | 49 ++++++++++++++++++++++++++++++++----------------
+>  1 file changed, 33 insertions(+), 16 deletions(-)
+>
+> diff --git a/tcg/tcg-op-vec.c b/tcg/tcg-op-vec.c
+> index 27f65600c3..cfb18682b1 100644
+> --- a/tcg/tcg-op-vec.c
+> +++ b/tcg/tcg-op-vec.c
+> @@ -226,16 +226,6 @@ void tcg_gen_stl_vec(TCGv_vec r, TCGv_ptr b, TCGArg =
+o, TCGType low_type)
+>      vec_gen_3(INDEX_op_st_vec, low_type, 0, ri, bi, o);
+>  }
+>
+> -void tcg_gen_add_vec(unsigned vece, TCGv_vec r, TCGv_vec a, TCGv_vec b)
+> -{
+> -    vec_gen_op3(INDEX_op_add_vec, vece, r, a, b);
+> -}
+> -
+> -void tcg_gen_sub_vec(unsigned vece, TCGv_vec r, TCGv_vec a, TCGv_vec b)
+> -{
+> -    vec_gen_op3(INDEX_op_sub_vec, vece, r, a, b);
+> -}
+> -
+>  void tcg_gen_and_vec(unsigned vece, TCGv_vec r, TCGv_vec a, TCGv_vec b)
+>  {
+>      vec_gen_op3(INDEX_op_and_vec, 0, r, a, b);
+> @@ -296,11 +286,30 @@ void tcg_gen_eqv_vec(unsigned vece, TCGv_vec r, TCG=
+v_vec a, TCGv_vec b)
+>      tcg_gen_not_vec(0, r, r);
+>  }
+>
+> +static bool do_op2(unsigned vece, TCGv_vec r, TCGv_vec a, TCGOpcode opc)
+> +{
+> +    TCGTemp *rt =3D tcgv_vec_temp(r);
+> +    TCGTemp *at =3D tcgv_vec_temp(a);
+> +    TCGArg ri =3D temp_arg(rt);
+> +    TCGArg ai =3D temp_arg(at);
+> +    TCGType type =3D rt->base_type;
+> +    int can;
+> +
+> +    tcg_debug_assert(at->base_type >=3D type);
+> +    can =3D tcg_can_emit_vec_op(opc, type, vece);
+> +    if (can > 0) {
+> +        vec_gen_2(opc, type, vece, ri, ai);
+> +    } else if (can < 0) {
+> +        tcg_expand_vec_op(opc, type, vece, ri, ai);
+> +    } else {
+> +        return false;
+> +    }
+> +    return true;
+> +}
+> +
+>  void tcg_gen_not_vec(unsigned vece, TCGv_vec r, TCGv_vec a)
+>  {
+> -    if (TCG_TARGET_HAS_not_vec) {
+> -        vec_gen_op2(INDEX_op_not_vec, 0, r, a);
+> -    } else {
+> +    if (!TCG_TARGET_HAS_not_vec || !do_op2(vece, r, a, INDEX_op_not_vec)=
+) {
+>          TCGv_vec t =3D tcg_const_ones_vec_matching(r);
+>          tcg_gen_xor_vec(0, r, a, t);
+>          tcg_temp_free_vec(t);
+> @@ -309,9 +318,7 @@ void tcg_gen_not_vec(unsigned vece, TCGv_vec r, TCGv_=
+vec a)
+>
+>  void tcg_gen_neg_vec(unsigned vece, TCGv_vec r, TCGv_vec a)
+>  {
+> -    if (TCG_TARGET_HAS_neg_vec) {
+> -        vec_gen_op2(INDEX_op_neg_vec, vece, r, a);
+> -    } else {
+> +    if (!TCG_TARGET_HAS_neg_vec || !do_op2(vece, r, a, INDEX_op_neg_vec)=
+) {
+>          TCGv_vec t =3D tcg_const_zeros_vec_matching(r);
+>          tcg_gen_sub_vec(vece, r, t, a);
+>          tcg_temp_free_vec(t);
+> @@ -409,6 +416,16 @@ static void do_op3(unsigned vece, TCGv_vec r, TCGv_v=
+ec a,
+>      }
+>  }
+>
+> +void tcg_gen_add_vec(unsigned vece, TCGv_vec r, TCGv_vec a, TCGv_vec b)
+> +{
+> +    do_op3(vece, r, a, b, INDEX_op_add_vec);
+> +}
+> +
+> +void tcg_gen_sub_vec(unsigned vece, TCGv_vec r, TCGv_vec a, TCGv_vec b)
+> +{
+> +    do_op3(vece, r, a, b, INDEX_op_sub_vec);
+> +}
+> +
+>  void tcg_gen_mul_vec(unsigned vece, TCGv_vec r, TCGv_vec a, TCGv_vec b)
+>  {
+>      do_op3(vece, r, a, b, INDEX_op_mul_vec);
 
-Reviewed-by: Eric Blake <eblake@redhat.com>
 
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3226
-Virtualization:  qemu.org | libvirt.org
-
-
---jkeRwep2eGkxEZahCXraThw6v4oH3inQs
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlzJv5IACgkQp6FrSiUn
-Q2opswf5AbjGC4AfEmV1hhWZCbn/rM8i/fh9bQVoIicb8n3r+omPyFgvp0PPTFSD
-qaQz4fGr+SoIRJ9D0Kyoxnq7bCbke1NZoLUGUdxEPawRMX8X8VmOnOTD7701Ajmb
-OY2IVwlYHG9OcZMZvLNITMwFvjes30iTBjKR5BI7Em/X/duSfKReLa9pBoXjasDt
-QIAf+bCHg8Zy8GxlqPoCRmuqzxv12JDiYY46ps2KU26RFLufim5eM3CS8CwT3eMH
-K8AsDq0OG0Zb7plFms5Kf++LMzU2fI5HmNtF5Dk32Rnh2+jUs9hC8wDu2VdtggQ8
-JSGMeq0KOsamLVNKCzv89yTDNpQxtA==
-=U78n
------END PGP SIGNATURE-----
-
---jkeRwep2eGkxEZahCXraThw6v4oH3inQs--
+--
+Alex Benn=C3=A9e
 
