@@ -1,23 +1,23 @@
-Received: from eggs.gnu.org ([209.51.188.92]:55971)
+Received: from eggs.gnu.org ([209.51.188.92]:56805)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1hLnuz-0002AA-IS
-	for qemu-devel@nongnu.org; Wed, 01 May 2019 08:01:00 -0400
+	(envelope-from <eblake@redhat.com>) id 1hLo0N-00047Z-Ax
+	for qemu-devel@nongnu.org; Wed, 01 May 2019 08:06:34 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1hLnuw-00031u-GD
-	for qemu-devel@nongnu.org; Wed, 01 May 2019 08:00:57 -0400
-References: <cover.1556666645.git.alistair.francis@wdc.com>
-	<14aab381eaa678eca875d0b8bd456feb22a21bd8.1556666645.git.alistair.francis@wdc.com>
-	<503a1f5f-7dad-1e4e-e1b1-aaeeeac9739f@vivier.eu>
+	(envelope-from <eblake@redhat.com>) id 1hLo0K-0006e4-AD
+	for qemu-devel@nongnu.org; Wed, 01 May 2019 08:06:31 -0400
+References: <20190428155451.15653-1-thuth@redhat.com>
+	<20190428155451.15653-3-thuth@redhat.com>
+	<877eba77ps.fsf@zen.linaroharston>
 From: Eric Blake <eblake@redhat.com>
-Message-ID: <af19377f-4874-0374-99b6-ee9ab5b0f446@redhat.com>
-Date: Wed, 1 May 2019 07:00:03 -0500
+Message-ID: <3205a43e-20f3-b152-2f8c-a450dd8e7cdc@redhat.com>
+Date: Wed, 1 May 2019 07:06:10 -0500
 MIME-Version: 1.0
-In-Reply-To: <503a1f5f-7dad-1e4e-e1b1-aaeeeac9739f@vivier.eu>
+In-Reply-To: <877eba77ps.fsf@zen.linaroharston>
 Content-Type: multipart/signed; micalg=pgp-sha256;
 	protocol="application/pgp-signature";
-	boundary="cWuKhQNXUyPcCDWb7oTARORvy0k7wUsDw"
-Subject: Re: [Qemu-devel] [PATCH v2 4/5] linux-user/uname: Fix GCC 9 build
- warnings
+	boundary="F45pTOfiaZ1h9EkmYDIahfkltsXurWfiX"
+Subject: Re: [Qemu-devel] [PATCH v2 2/8] tests/qemu-iotests/005: Add a
+ sanity check for large sparse file support
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,66 +26,70 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Laurent Vivier <laurent@vivier.eu>, Alistair Francis <Alistair.Francis@wdc.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
-Cc: "qemu-trivial@nongnu.org" <qemu-trivial@nongnu.org>, "alistair23@gmail.com" <alistair23@gmail.com>, "riku.voipio@iki.fi" <riku.voipio@iki.fi>, "kraxel@redhat.com" <kraxel@redhat.com>
+To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>, Thomas Huth <thuth@redhat.com>
+Cc: qemu-devel@nongnu.org, Fam Zheng <fam@euphon.net>, qemu-block@nongnu.org, Ed Maste <emaste@freebsd.org>, Christophe Fergeau <cfergeau@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, Li-Wen Hsu <lwhsu@freebsd.org>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>, Wainer dos Santos Moschetta <wainersm@redhat.com>, Markus Armbruster <armbru@redhat.com>
 
 This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---cWuKhQNXUyPcCDWb7oTARORvy0k7wUsDw
+--F45pTOfiaZ1h9EkmYDIahfkltsXurWfiX
 From: Eric Blake <eblake@redhat.com>
-To: Laurent Vivier <laurent@vivier.eu>,
- Alistair Francis <Alistair.Francis@wdc.com>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
-Cc: "qemu-trivial@nongnu.org" <qemu-trivial@nongnu.org>,
- "alistair23@gmail.com" <alistair23@gmail.com>,
- "riku.voipio@iki.fi" <riku.voipio@iki.fi>,
- "kraxel@redhat.com" <kraxel@redhat.com>
-Message-ID: <af19377f-4874-0374-99b6-ee9ab5b0f446@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v2 4/5] linux-user/uname: Fix GCC 9 build
- warnings
-References: <cover.1556666645.git.alistair.francis@wdc.com>
- <14aab381eaa678eca875d0b8bd456feb22a21bd8.1556666645.git.alistair.francis@wdc.com>
- <503a1f5f-7dad-1e4e-e1b1-aaeeeac9739f@vivier.eu>
-In-Reply-To: <503a1f5f-7dad-1e4e-e1b1-aaeeeac9739f@vivier.eu>
+To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>,
+ Thomas Huth <thuth@redhat.com>
+Cc: qemu-devel@nongnu.org, Fam Zheng <fam@euphon.net>, qemu-block@nongnu.org,
+ Ed Maste <emaste@freebsd.org>, Christophe Fergeau <cfergeau@redhat.com>,
+ Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>,
+ Li-Wen Hsu <lwhsu@freebsd.org>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?=
+ <philmd@redhat.com>, Wainer dos Santos Moschetta <wainersm@redhat.com>,
+ Markus Armbruster <armbru@redhat.com>
+Message-ID: <3205a43e-20f3-b152-2f8c-a450dd8e7cdc@redhat.com>
+Subject: Re: [PATCH v2 2/8] tests/qemu-iotests/005: Add a sanity check for
+ large sparse file support
+References: <20190428155451.15653-1-thuth@redhat.com>
+ <20190428155451.15653-3-thuth@redhat.com> <877eba77ps.fsf@zen.linaroharston>
+In-Reply-To: <877eba77ps.fsf@zen.linaroharston>
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
 
-On 5/1/19 4:40 AM, Laurent Vivier wrote:
-> On 01/05/2019 01:28, Alistair Francis wrote:
->> Fix this warning when building with GCC9 on Fedora 30:
->> In function =E2=80=98strncpy=E2=80=99,
->>     inlined from =E2=80=98sys_uname=E2=80=99 at /home/alistair/qemu/li=
-nux-user/uname.c:94:3:
->> /usr/include/bits/string_fortified.h:106:10: error: =E2=80=98__builtin=
-_strncpy=E2=80=99 output may be truncated copying 64 bytes from a string =
-of length 64 [-Werror=3Dstringop-truncation]
->>   106 |   return __builtin___strncpy_chk (__dest, __src, __len, __bos =
-(__dest));
->>       |          ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~=
-~~~~~~~~~
->>
->> Signed-off-by: Alistair Francis <alistair.francis@wdc.com>
->> ---
->>  linux-user/uname.c | 2 +-
->>  1 file changed, 1 insertion(+), 1 deletion(-)
->>
->> diff --git a/linux-user/uname.c b/linux-user/uname.c
->> index 313b79dbad..2fc6096a5b 100644
->> --- a/linux-user/uname.c
->> +++ b/linux-user/uname.c
->> @@ -73,7 +73,7 @@ const char *cpu_to_uname_machine(void *cpu_env)
->>  #define COPY_UTSNAME_FIELD(dest, src) \
->>    do { \
->>        /* __NEW_UTS_LEN doesn't include terminating null */ \
->> -      (void) strncpy((dest), (src), __NEW_UTS_LEN); \
->> +      (void) memcpy((dest), (src), MIN(strlen(src), __NEW_UTS_LEN)); =
-\
+On 5/1/19 6:08 AM, Alex Benn=C3=A9e wrote:
 >=20
-> You should use MIN(strlen(src) + 1, __NEW_UTS_LEN) to copy the NUL
-> character if it is present and fit in __NEW_UTS_LEN.
+> Thomas Huth <thuth@redhat.com> writes:
+>=20
+>> "check -raw 005" fails when running on ext4 filesystems - these do not=
 
-No, the NUL character is already present, due to the memset() prior to
-any use of COPY_UTSNAME_FIELD().  However, the commit message should
-call that out, as it is not part of the default 3-line diff.
+>> support such large sparse files. Use the same check as in test 220 to
+>> skip the test in this case.
+>>
+>> Suggested-by: Eric Blake <eblake@redhat.com>
+>> Signed-off-by: Thomas Huth <thuth@redhat.com>
+>> ---
+>>  tests/qemu-iotests/005 | 9 +++++++++
+>>  1 file changed, 9 insertions(+)
+>>
+>> diff --git a/tests/qemu-iotests/005 b/tests/qemu-iotests/005
+>> index 2fef63af88..6136ced5c8 100755
+>> --- a/tests/qemu-iotests/005
+>> +++ b/tests/qemu-iotests/005
+>> @@ -55,6 +55,15 @@ if [ "$IMGPROTO" =3D "sheepdog" ]; then
+>>      _notrun "image protocol $IMGPROTO does not support large image si=
+zes"
+>>  fi
+>>
+>> +# Sanity check: For raw, we require a file system that permits the cr=
+eation
+>> +# of a HUGE (but very sparse) file.  tmpfs works, ext4 does not.
+>=20
+> Is this comment correct? Running on my ext4 home partition this test
+> seems to be running fine and not skipping. Indeed:
+
+>> +if [ "$IMGFMT" =3D "raw" ]; then
+>> +    if ! truncate --size=3D5T "$TEST_IMG"; then
+
+5T fits on ext4 but not ext3. This is not a straight copy from 220
+(where the size in question was even bigger, at 513T), so the comment is
+indeed slightly inaccurate; it may be worth figuring out which file
+system actually failed to update the comment. But the code change is
+correct once the comments are fixed.
+
+Reviewed-by: Eric Blake <eblake@redhat.com>
 
 --=20
 Eric Blake, Principal Software Engineer
@@ -93,21 +97,21 @@ Red Hat, Inc.           +1-919-301-3226
 Virtualization:  qemu.org | libvirt.org
 
 
---cWuKhQNXUyPcCDWb7oTARORvy0k7wUsDw
+--F45pTOfiaZ1h9EkmYDIahfkltsXurWfiX
 Content-Type: application/pgp-signature; name="signature.asc"
 Content-Description: OpenPGP digital signature
 Content-Disposition: attachment; filename="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlzJikQACgkQp6FrSiUn
-Q2qfuAgApDJvUYWkMmk2kJMcz8AzL8zkLXtT1lbru3HnonwcauRyRUmLeUHgn7hq
-I0lNxoR1/rxZmOr3cuiRxuO2N2Y6bLMNgYlRXeW7cgGnkEYVsjwuSD3dVkJ53ggh
-pfIfVmiY2V1+WgoTj/9OL+RVDK5iu18GT3/D3FCqbjJTuDX4UlrCM0usd9kt616j
-C0A5THCh7JhfY0GuqgkzrZmMUofBwR6CJTriAFPfEWQhNQRoTSCGS8kRjYNwGeW4
-QZkOfRwZIX/3Mc1RsAf1Zba40mwtNAIKDfJNahYqidK4GulptiGIK2Mi33xKIocW
-W0OqU6jTHk6ocLw7NjSwgC5wp0jwnw==
-=74z3
+iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlzJi7MACgkQp6FrSiUn
+Q2ruHgf9E8G/M1Rflj6m0/pjpBxJKZBbQaIu1+DYVqvQ++Rt5Euzuv69ikKVl34O
+/eGor9gQYRUvaUK0eqSAijvbd2KEcjqrq9M5OmNSqfCbiNamQNl1kFUAa0XmX+/9
+wVwkAwJ3QX8EYRhdOZdELOU8UuM/kN7OLpCM23Yjk25HQ1Q8eoUDztCKTZ5+3CTW
+kZIYXJ2VR0//1d8+rT/gVKVoiXQOq6KyBDoCV7MYH9liVjuLVufpQ7NnE+Gn9UOO
+md+awGMPwYD1B/qvAkoBrjXVm+s7v2F7925c1z2c2rGxfjV5iXuhWbwwSAlXdEe9
+IKquF2Iq6ptyT3kLVp7LgxbgNWQKKw==
+=v6jz
 -----END PGP SIGNATURE-----
 
---cWuKhQNXUyPcCDWb7oTARORvy0k7wUsDw--
+--F45pTOfiaZ1h9EkmYDIahfkltsXurWfiX--
