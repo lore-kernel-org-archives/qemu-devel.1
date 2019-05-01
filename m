@@ -1,19 +1,29 @@
-Received: from eggs.gnu.org ([209.51.188.92]:45620)
+Received: from eggs.gnu.org ([209.51.188.92]:50829)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berto@igalia.com>) id 1hLtkc-0007NY-Hj
-	for qemu-devel@nongnu.org; Wed, 01 May 2019 14:14:39 -0400
+	(envelope-from <richard.henderson@linaro.org>) id 1hLu4i-0000im-R7
+	for qemu-devel@nongnu.org; Wed, 01 May 2019 14:35:25 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berto@igalia.com>) id 1hLtkb-0002cF-4S
-	for qemu-devel@nongnu.org; Wed, 01 May 2019 14:14:38 -0400
-From: Alberto Garcia <berto@igalia.com>
-Date: Wed,  1 May 2019 21:13:57 +0300
-Message-Id: <524e211cb818a20f521d6e271e782ab62b8e5e80.1556732434.git.berto@igalia.com>
-In-Reply-To: <cover.1556732434.git.berto@igalia.com>
-References: <cover.1556732434.git.berto@igalia.com>
-In-Reply-To: <cover.1556732434.git.berto@igalia.com>
-References: <cover.1556732434.git.berto@igalia.com>
-Subject: [Qemu-devel] [PATCH v2 3/5] vvfat: Replace bdrv_{read,
- write}() with bdrv_{pread, pwrite}()
+	(envelope-from <richard.henderson@linaro.org>) id 1hLu4h-000154-LB
+	for qemu-devel@nongnu.org; Wed, 01 May 2019 14:35:24 -0400
+Received: from mail-pg1-x529.google.com ([2607:f8b0:4864:20::529]:41956)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+	id 1hLu4h-00014N-0Q
+	for qemu-devel@nongnu.org; Wed, 01 May 2019 14:35:23 -0400
+Received: by mail-pg1-x529.google.com with SMTP id f6so8641297pgs.8
+	for <qemu-devel@nongnu.org>; Wed, 01 May 2019 11:35:22 -0700 (PDT)
+References: <20190430165234.32272-1-alex.bennee@linaro.org>
+	<20190430165234.32272-2-alex.bennee@linaro.org>
+From: Richard Henderson <richard.henderson@linaro.org>
+Message-ID: <0ef0d685-ddb1-850e-9478-e9c88da8ebb0@linaro.org>
+Date: Wed, 1 May 2019 11:35:17 -0700
+MIME-Version: 1.0
+In-Reply-To: <20190430165234.32272-2-alex.bennee@linaro.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH v5 01/15] tests/tcg/multiarch: add support
+ for multiarch system tests
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,54 +32,23 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Alberto Garcia <berto@igalia.com>, qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Eric Blake <eblake@redhat.com>
+To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>, qemu-devel@nongnu.org
+Cc: qemu-arm@nongnu.org, mark.cave-ayland@ilande.co.uk, cota@braap.org
 
-There's only a couple of bdrv_read() and bdrv_write() calls left in
-the vvfat code, and they can be trivially replaced with the byte-based
-bdrv_pread() and bdrv_pwrite().
+On 4/30/19 9:52 AM, Alex Bennée wrote:
+> We can certainly support some common tests for system emulation that
+> make use of our minimal defined boot.S support. It will still be up to
+> individual architectures to ensure they build so we provide a
+> MULTIARCH_TESTS variable that they can tack onto TESTS themselves.
+> 
+> Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
+> ---
+>  tests/tcg/Makefile                                 |  1 +
+>  tests/tcg/multiarch/system/Makefile.softmmu-target | 14 ++++++++++++++
+>  2 files changed, 15 insertions(+)
+>  create mode 100644 tests/tcg/multiarch/system/Makefile.softmmu-target
 
-Signed-off-by: Alberto Garcia <berto@igalia.com>
----
- block/vvfat.c | 12 +++++++-----
- 1 file changed, 7 insertions(+), 5 deletions(-)
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 
-diff --git a/block/vvfat.c b/block/vvfat.c
-index 5f66787890..253cc716dd 100644
---- a/block/vvfat.c
-+++ b/block/vvfat.c
-@@ -1494,8 +1494,8 @@ static int vvfat_read(BlockDriverState *bs, int64_t sector_num,
-                 DLOG(fprintf(stderr, "sectors %" PRId64 "+%" PRId64
-                              " allocated\n", sector_num,
-                              n >> BDRV_SECTOR_BITS));
--                if (bdrv_read(s->qcow, sector_num, buf + i * 0x200,
--                              n >> BDRV_SECTOR_BITS)) {
-+                if (bdrv_pread(s->qcow, sector_num * BDRV_SECTOR_SIZE,
-+                               buf + i * 0x200, n) < 0) {
-                     return -1;
-                 }
-                 i += (n >> BDRV_SECTOR_BITS) - 1;
-@@ -1983,8 +1983,9 @@ static uint32_t get_cluster_count_for_direntry(BDRVVVFATState* s,
-                         if (res) {
-                             return -1;
-                         }
--                        res = bdrv_write(s->qcow, offset, s->cluster_buffer, 1);
--                        if (res) {
-+                        res = bdrv_pwrite(s->qcow, offset * BDRV_SECTOR_SIZE,
-+                                          s->cluster_buffer, BDRV_SECTOR_SIZE);
-+                        if (res < 0) {
-                             return -2;
-                         }
-                     }
-@@ -3050,7 +3051,8 @@ DLOG(checkpoint());
-      * Use qcow backend. Commit later.
-      */
- DLOG(fprintf(stderr, "Write to qcow backend: %d + %d\n", (int)sector_num, nb_sectors));
--    ret = bdrv_write(s->qcow, sector_num, buf, nb_sectors);
-+    ret = bdrv_pwrite(s->qcow, sector_num * BDRV_SECTOR_SIZE, buf,
-+                      nb_sectors * BDRV_SECTOR_SIZE);
-     if (ret < 0) {
-         fprintf(stderr, "Error writing to qcow backend\n");
-         return ret;
--- 
-2.11.0
+
+r~
