@@ -1,24 +1,36 @@
-Received: from eggs.gnu.org ([209.51.188.92]:53149)
+Received: from eggs.gnu.org ([209.51.188.92]:53982)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1hLs9K-0001od-Ha
-	for qemu-devel@nongnu.org; Wed, 01 May 2019 12:32:05 -0400
+	(envelope-from <stefanha@gmail.com>) id 1hLsE5-0002rq-PV
+	for qemu-devel@nongnu.org; Wed, 01 May 2019 12:37:00 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1hLs9H-0004VG-GM
-	for qemu-devel@nongnu.org; Wed, 01 May 2019 12:32:02 -0400
-References: <20181116184324.8093-1-jsnow@redhat.com>
-	<4bc81482-fab6-80dd-f684-4ffde4241dce@virtuozzo.com>
-	<cb6469ca-9ba3-1ac7-7c3e-9e6c8c53e55f@redhat.com>
-	<fb05bc7d-7632-f72c-1c32-ba16d21a7fcb@redhat.com>
-From: John Snow <jsnow@redhat.com>
-Message-ID: <596c4cc2-88d0-e34c-d104-11ede3e98164@redhat.com>
-Date: Wed, 1 May 2019 12:31:37 -0400
+	(envelope-from <stefanha@gmail.com>) id 1hLsE2-0003RQ-NX
+	for qemu-devel@nongnu.org; Wed, 01 May 2019 12:36:57 -0400
+Received: from mail-io1-xd42.google.com ([2607:f8b0:4864:20::d42]:33620)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1hLsE2-0003Nx-GM
+	for qemu-devel@nongnu.org; Wed, 01 May 2019 12:36:54 -0400
+Received: by mail-io1-xd42.google.com with SMTP id u12so15311912iop.0
+	for <qemu-devel@nongnu.org>; Wed, 01 May 2019 09:36:54 -0700 (PDT)
+Date: Wed, 1 May 2019 12:36:50 -0400
+From: Stefan Hajnoczi <stefanha@gmail.com>
+Message-ID: <20190501163650.GF21155@stefanha-x1.localdomain>
+References: <CC372DF3-1AC6-46B5-98A5-21159497034A@oracle.com>
+	<60340EAF-4C85-4798-9999-34F1A37E2086@oracle.com>
+	<898ef1d4-bfa2-9952-8ceb-f1282b85e29c@oracle.com>
+	<20190416092042.GB32709@stefanha-x1.localdomain>
+	<8E5AF770-69ED-4D44-8A25-B51344996D9E@oracle.com>
+	<3F7E854A-3C1D-4204-8C35-893FC0614796@oracle.com>
+	<20190423120453.GF32465@stefanha-x1.localdomain>
+	<44520476-d6a8-2e3f-1602-388e2e1e874e@redhat.com>
+	<20190429134048.GH7587@stefanha-x1.localdomain>
+	<1A278B43-AA26-43B4-B6C2-17231E780BBE@oracle.com>
 MIME-Version: 1.0
-In-Reply-To: <fb05bc7d-7632-f72c-1c32-ba16d21a7fcb@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH] migration/block-dirty-bitmap: Silence
- coverity CID 1390625
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature"; boundary="Zi0sgQQBxRFxMTsj"
+Content-Disposition: inline
+In-Reply-To: <1A278B43-AA26-43B4-B6C2-17231E780BBE@oracle.com>
+Subject: Re: [Qemu-devel] Following up questions related to QEMU and I/O
+ Thread
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,73 +39,36 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>, Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
-Cc: Stefan Hajnoczi <stefanha@redhat.com>, Max Reitz <mreitz@redhat.com>
+To: Wei Li <wei.d.li@oracle.com>
+Cc: Stefan Hajnoczi <stefanha@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Dongli Zhang <dongli.zhang@oracle.com>, qemu-devel@nongnu.org
 
 
+--Zi0sgQQBxRFxMTsj
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 
-On 5/1/19 11:24 AM, Eric Blake wrote:
-> On 4/30/19 6:08 PM, John Snow wrote:
->>
->>
->> On 11/20/18 10:15 AM, Vladimir Sementsov-Ogievskiy wrote:
->>> 16.11.2018 21:43, John Snow wrote:
->>>> Coverity warns that backing_bs() could give us a NULL pointer, which
->>>> we then use without checking that it isn't.
->>>>
->>>> In our loop condition, we check bs && bs->drv as a point of habit, but
->>>> by nature of the block graph, we cannot have null bs pointers here.
->>>>
->>>> This loop skips only implicit nodes, which always have children, so
->>>> this loop should never encounter a null value.
->>>
->>
->> I let this drop again :)
->>
->>> You mean, always have backing (not file for ex.)? Should we at least add a comment
->>> near "bool implicit;" that the node must have backing..
->>>
->>> Do we have filters, using 'file' child instead of backing, will we want to auto insert them, and therefore mark them with implicit=true?
->>>
->>
->> I actually have no idea. I guess this is the sort of thing we actually
->> really want a dedicated kind of API for. "Find first non-filter" seems
->> like a common use case that we'd want.
->>
->> [But maybe I'll avoid this problem.]
-> 
-> Max has already tried to tackle that problem:
-> https://lists.gnu.org/archive/html/qemu-devel/2019-04/msg01713.html
-> 
+On Mon, Apr 29, 2019 at 10:56:31AM -0700, Wei Li wrote:
+> Does this mean the performance could be improved via adding Batch I/O submission support in Guest driver side which will be able to reduce the number of virtqueue kicks?
 
-OK, that's great!
+Yes, I think so.  It's not obvious to me how a Linux SCSI driver is
+supposed to implement batching though.  The .queuecommand API doesn't
+seem to include information relevant to batching.
 
->>
->>> And one more thing:
->>> So, it's looks like a wrong way to search for all block-nodes, instead of looping through backing chain to the first not-implicit bds, we must recursively explore the whole block graph, to find _all_ the bitmaps.
->>>
->>
->> Looking at this again after not having done so for so long -- I guess
->> that bdrv_first/bdrv_next only iterate over *top level* BDSes and not
->> any children thereof. You're right, even the method here isn't quite
->> correct. We want to find ALL nodes, wherever they are.
->>
->> query_named_block_nodes uses an implementation in block.c to accomplish
->> this because the API is not public.... or, it wasn't, but it looks like
->> we have bdrv_next_all_states now, and we could use this to just find ALL
->> of the bdrv nodes.
->>
->> Ehm.... let me send something a little more RFC-caliber that should
->> address your concern (as well as Peter's) here.
-> 
-> Max's series also tries to improve how we visit nodes when determining
-> which bitmaps to find.
-> 
+Stefan
 
-2/11 adds the "skip filters" helper I mentioned wanting, but the idea of
-visiting *every* node for bitmap migration is not addressed in that series.
+--Zi0sgQQBxRFxMTsj
+Content-Type: application/pgp-signature; name="signature.asc"
 
-Therefore, I believe these series conflict, but that this one takes
-precedence for this particular issue.
+-----BEGIN PGP SIGNATURE-----
 
---js
+iQEzBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAlzJywoACgkQnKSrs4Gr
+c8ibRQgApviIvzBkdGSYDCfxjvmfv9kjionlS8Vj63GB5PtcEok9fvOoaQlXHIni
+syrKPmZxcBVTLKmie1H5QBecbOU6FFr/wfaIQd/VIe9E2/hDjEsJKYSfQyr2vqEh
+lpKb9yNfiguVWQThCruqNkwRxh62sQL9w/okJjXt+igyjNlQmonxhRMLok/AOu6Z
+36td6F3oCfkEPA3apaAEbtv9mvt3ztKJ7C9tuD4U9/vSgsKNUircByDBFaxYX2GO
+3zFaFo5RP10Z6aRdtOlwRdRe3Kl9DfVidVTKDf2moYHiwyvBC7nlyfMMxT810Two
+ii7c1hAReVJBmJaGtwmLUwRntZZnXA==
+=GFKD
+-----END PGP SIGNATURE-----
+
+--Zi0sgQQBxRFxMTsj--
