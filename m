@@ -1,25 +1,25 @@
-Received: from eggs.gnu.org ([209.51.188.92]:59775)
+Received: from eggs.gnu.org ([209.51.188.92]:34391)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1hLsh6-0005UH-KM
-	for qemu-devel@nongnu.org; Wed, 01 May 2019 13:06:59 -0400
+	(envelope-from <palmer@sifive.com>) id 1hLsvL-0002WW-MN
+	for qemu-devel@nongnu.org; Wed, 01 May 2019 13:21:40 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1hLsh3-0007KZ-K6
-	for qemu-devel@nongnu.org; Wed, 01 May 2019 13:06:56 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:59408)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1hLsh3-0007F2-Dd
-	for qemu-devel@nongnu.org; Wed, 01 May 2019 13:06:53 -0400
-Date: Wed, 1 May 2019 13:06:47 -0400
-From: Stefan Hajnoczi <stefanha@redhat.com>
-Message-ID: <20190501170647.GC22391@stefanha-x1.localdomain>
-References: <20190425145420.8888-1-stefanha@redhat.com>
-	<CAJ+F1CLYjF8SQv0v8c-hfbPcFYgZdg1P-MVeB8nS_AXTy4eMDA@mail.gmail.com>
-MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="zCKi3GIZzVBPywwA"
-Content-Disposition: inline
-In-Reply-To: <CAJ+F1CLYjF8SQv0v8c-hfbPcFYgZdg1P-MVeB8nS_AXTy4eMDA@mail.gmail.com>
-Subject: Re: [Qemu-devel] [PATCH v2] gitmodules: use qemu.org git mirrors
+	(envelope-from <palmer@sifive.com>) id 1hLsvJ-00050Q-OC
+	for qemu-devel@nongnu.org; Wed, 01 May 2019 13:21:39 -0400
+Received: from mail-pl1-x641.google.com ([2607:f8b0:4864:20::641]:38358)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <palmer@sifive.com>) id 1hLsvH-0004sV-8u
+	for qemu-devel@nongnu.org; Wed, 01 May 2019 13:21:37 -0400
+Received: by mail-pl1-x641.google.com with SMTP id a59so1093091pla.5
+	for <qemu-devel@nongnu.org>; Wed, 01 May 2019 10:21:33 -0700 (PDT)
+Date: Wed, 01 May 2019 10:21:31 -0700 (PDT)
+In-Reply-To: <20190425172636.11128-2-richard.henderson@linaro.org>
+From: Palmer Dabbelt <palmer@sifive.com>
+Message-ID: <mhng-6fa8c1f8-fe4c-4d72-b0ea-c9809704637e@palmer-si-x1e>
+Mime-Version: 1.0 (MHng)
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH 1/2] fixup! target/riscv: Name the argument
+ sets for all of insn32 formats
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,54 +28,41 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?iso-8859-1?Q?Marc-Andr=E9?= Lureau <marcandre.lureau@gmail.com>
-Cc: QEMU <qemu-devel@nongnu.org>, Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <philmd@redhat.com>, Peter Maydell <peter.maydell@linaro.org>
+To: richard.henderson@linaro.org
+Cc: qemu-devel@nongnu.org
 
+On Thu, 25 Apr 2019 10:26:35 PDT (-0700), richard.henderson@linaro.org wrote:
+> ---
+>  target/riscv/translate.c | 13 ++++++++++---
+>  1 file changed, 10 insertions(+), 3 deletions(-)
+>
+> diff --git a/target/riscv/translate.c b/target/riscv/translate.c
+> index d1f599a92d..009c146e8f 100644
+> --- a/target/riscv/translate.c
+> +++ b/target/riscv/translate.c
+> @@ -713,12 +713,19 @@ static bool gen_shift(DisasContext *ctx, arg_r *a,
+>   * initially declared by the 32-bit decoder, which results in duplicate
+>   * declaration warnings.  Suppress them.
+>   */
+> -#pragma GCC diagnostic push
+> -#pragma GCC diagnostic ignored "-Wredundant-decls"
+> +#ifdef CONFIG_PRAGMA_DIAGNOSTIC_AVAILABLE
+> +# pragma GCC diagnostic push
+> +# pragma GCC diagnostic ignored "-Wredundant-decls"
+> +# ifdef __clang__
+> +#  pragma GCC diagnostic ignored "-Wtypedef-redefinition"
+> +# endif
+> +#endif
+>
+>  #include "decode_insn16.inc.c"
+>
+> -#pragma GCC diagnostic pop
+> +#ifdef CONFIG_PRAGMA_DIAGNOSTIC_AVAILABLE
+> +# pragma GCC diagnostic pop
+> +#endif
+>
+>  static void decode_opc(DisasContext *ctx)
+>  {
 
---zCKi3GIZzVBPywwA
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
-
-On Tue, Apr 30, 2019 at 04:53:08PM +0200, Marc-Andr=E9 Lureau wrote:
-> Hi
->=20
-> On Thu, Apr 25, 2019 at 4:54 PM Stefan Hajnoczi <stefanha@redhat.com> wro=
-te:
-> >
-> > qemu.org hosts git repository mirrors of all submodules.  Update
-> > .gitmodules to use the mirrors and not the upstream repositories.
-> >
-> > Mirroring upstream repositories ensures that QEMU continues to build
-> > even when upstream repositories are deleted or temporarily offline.
-> >
-> > Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
-> > Reviewed-by: Philippe Mathieu-Daud=E9 <philmd@redhat.com>
-> > Tested-by: Philippe Mathieu-Daud=E9 <philmd@redhat.com>
->=20
-> Reviewed-by: Marc-Andr=E9 Lureau <marcandre.lureau@redhat.com>
->=20
-> Stefan, do you prepare a pullreq?
-
-This patch isn't within the scope of my block or tracing trees.
-
-Perhaps Peter is willing to apply it?
-
-Stefan
-
---zCKi3GIZzVBPywwA
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAlzJ0icACgkQnKSrs4Gr
-c8gQUgf+PiHaaTgD3rkcy0RfcaB4FGMcngIVCSK2otQZF5eDd+MFIsPQ9bo5RVKh
-mXb7YrPSLWsUjyq+cGltg4P/XgZ5UU6EKnkKJHYFrjyi+3R6BkQIkhDU/0c99db0
-Xbltv9HxjnkKIwq1v52bXTbCtVPyltumIlEqj+QntzdDZAsi0T5x7dWd/t7M/Uq4
-hzOjXgAtvU3MB8XbgsCp3ZvsrWq+BSJmf2EVmn30HWYJ7aAV2OOP765xETzJQvyU
-jf3Q2ss+YuX6vgu1bxPla7tRaianAo3ahl8AB9zXUufrZvxAZLzjBi08sRN+sTmf
-u52O09N5rdMa4Ax2MYxsNbdURZVuSg==
-=Galr
------END PGP SIGNATURE-----
-
---zCKi3GIZzVBPywwA--
+I've attemeted to fixup the patch on my for-master, let me know if I've screwed
+something up!
